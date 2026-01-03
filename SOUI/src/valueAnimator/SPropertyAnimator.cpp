@@ -459,7 +459,7 @@ SPropertyValuesHolder *SPropertyValuesHolder::ofPosition(LPCWSTR propertyName, c
 //////////////////////////////////////////////////////////////////////////
 // SPropertyAnimator实现
 
-SPropertyAnimator::SPropertyAnimator(IWindow *pTarget)
+SPropertyAnimator::SPropertyAnimator(IWindow *pTarget /*= NULL*/)
 {
     _this_for_callback = (IPropertyAnimator *)this;
     m_pTarget = pTarget;
@@ -472,6 +472,8 @@ SPropertyAnimator::~SPropertyAnimator()
 
 void SPropertyAnimator::onAnimationStart(IValueAnimator *pAnimator)
 {
+    if(!m_pTarget) 
+        return;
     for (int i = 0; i < m_propertyHolders.GetCount(); i++)
     {
         m_pTarget->SetAnimatorValue(m_propertyHolders[i], 0.f, ANI_START);
@@ -480,6 +482,8 @@ void SPropertyAnimator::onAnimationStart(IValueAnimator *pAnimator)
 
 void SPropertyAnimator::onAnimationEnd(IValueAnimator *pAnimator)
 {
+    if(!m_pTarget) 
+        return;
     for (int i = 0; i < m_propertyHolders.GetCount(); i++)
     {
         m_pTarget->SetAnimatorValue(m_propertyHolders[i], 1.f, ANI_END);
@@ -533,6 +537,30 @@ IPropertyValuesHolder *SPropertyAnimator::GetPropertyValuesHolderByIndex(int ind
         return m_propertyHolders[index];
     }
     return NULL;
+}
+
+void SPropertyAnimator::copy(const IValueAnimator *pAnimator)
+{
+    const IPropertyAnimator *pPropAnimator = sobj_cast<const IPropertyAnimator>(pAnimator);
+    if(pPropAnimator){
+        SValueAnimator::copy(pAnimator);
+        SetTarget(pPropAnimator->GetTarget());
+        int count = pPropAnimator->GetPropertyValuesHolderCount();
+        IPropertyValuesHolder **pHolders = new IPropertyValuesHolder *[count];
+        for (int i = 0; i < count; i++)
+        {
+            pHolders[i] = pPropAnimator->GetPropertyValuesHolderByIndex(i);
+        }
+        SetPropertyValuesHolders(pHolders, count);
+        delete[] pHolders;
+    }
+}
+
+IValueAnimator * SPropertyAnimator::clone() const
+{
+    SPropertyAnimator *pAnimator = new SPropertyAnimator();
+    pAnimator->copy((const IPropertyAnimator*)this);
+    return (IValueAnimator *)(IPropertyAnimator*)pAnimator;
 }
 
 // 静态工厂方法

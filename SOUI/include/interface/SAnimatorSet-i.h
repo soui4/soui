@@ -238,7 +238,7 @@ DECLARE_INTERFACE_(IAnimatorSet, IValueAnimator)
      * @param pAnimator - The animator to be added
      * @return void
      */
-    STDMETHOD_(void, addAnimator)(THIS_ IValueAnimator * pAnimator) PURE;
+    STDMETHOD_(void, AddAnimator)(THIS_ IValueAnimator * pAnimator) PURE;
 
     /**
      * @brief Add a value animator with an after-animator dependency
@@ -247,7 +247,7 @@ DECLARE_INTERFACE_(IAnimatorSet, IValueAnimator)
      * @param pAfterAnimator - The animator that must finish before pAnimator starts
      * @return void
      */
-    STDMETHOD_(void, addAnimatorAfter)(THIS_ IValueAnimator * pAnimator, IValueAnimator * pAfterAnimator) PURE;
+    STDMETHOD_(void, AddAnimatorAfter)(THIS_ IValueAnimator * pAnimator, IValueAnimator * pAfterAnimator) PURE;
 
     /**
      * @brief Add a value animator with a with-animator dependency
@@ -256,46 +256,46 @@ DECLARE_INTERFACE_(IAnimatorSet, IValueAnimator)
      * @param pWithAnimator - The animator that will run in parallel with pAnimator
      * @return void
      */
-    STDMETHOD_(void, addAnimatorWith)(THIS_ IValueAnimator * pAnimator, IValueAnimator * pWithAnimator) PURE;
+    STDMETHOD_(void, AddAnimatorWith)(THIS_ IValueAnimator * pAnimator, IValueAnimator * pWithAnimator) PURE;
 
     /**
      * @brief Remove an animator from the set
      * @param pAnimator - The animator to be removed
      * @return void
      */
-    STDMETHOD_(void, removeAnimator)(THIS_ IValueAnimator * pAnimator) PURE;
+    STDMETHOD_(void, RemoveAnimator)(THIS_ IValueAnimator * pAnimator) PURE;
 
     /**
      * @brief Remove all animators from the set
      * @return void
      */
-    STDMETHOD_(void, removeAllAnimators)(THIS) PURE;
+    STDMETHOD_(void, RemoveAllAnimators)(THIS) PURE;
 
     /**
      * @brief Get the number of animators in the set
      * @return int - The count of animators
      */
-    STDMETHOD_(int, getAnimatorCount)(CTHIS) SCONST PURE;
+    STDMETHOD_(int, GetAnimatorCount)(CTHIS) SCONST PURE;
 
     /**
      * @brief Get animator at the specified index
      * @param index - The index of the animator
      * @return IValueAnimator* - The animator at the specified index
      */
-    STDMETHOD_(IValueAnimator *, getAnimatorAt)(CTHIS_ int index) SCONST PURE;
+    STDMETHOD_(IValueAnimator *, GetAnimatorAt)(CTHIS_ int index) SCONST PURE;
 
     /**
      * @brief Set play mode for all animators in the set (sequential or parallel)
      * @param mode - The play mode (SEQUENCE or PARALLEL)
      * @return void
      */
-    STDMETHOD_(void, setPlayMode)(THIS_ AnimatorSetPlayMode mode) PURE;
+    STDMETHOD_(void, SetPlayMode)(THIS_ AnimatorSetPlayMode mode) PURE;
 
     /**
      * @brief Get the current play mode
      * @return AnimatorSetPlayMode - The current play mode
      */
-    STDMETHOD_(AnimatorSetPlayMode, getPlayMode)(CTHIS) SCONST PURE;
+    STDMETHOD_(AnimatorSetPlayMode, GetPlayMode)(CTHIS) SCONST PURE;
 };
 
 SNSEND

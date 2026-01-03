@@ -318,10 +318,10 @@ int  CChessLayout::GetPossiableMoves(int x,int y,POINT ptMoves[MAX_MOVES])
 }
 
 //在走棋描述中需要使用到的字符串常量
-static const LPTSTR kszPosCn[]={_T(""),_T("一"),_T("二"),_T("三"),_T("四"),_T("五"),_T("六"),_T("七"),_T("八"),_T("九")};
-static const LPTSTR kszPosArabic[]={_T("0"),_T("1"),_T("2"),_T("3"),_T("4"),_T("5"),_T("6"),_T("7"),_T("8"),_T("9")};
-static const LPTSTR kszRedChess[]={_T("帥"),_T("車"),_T("馬"),_T("炮"),_T("仕"),_T("相"),_T("兵")}; 
-static const LPTSTR kszBlackChess[]={_T("将"),_T("車"),_T("馬"),_T("炮"),_T("士"),_T("象"),_T("卒")}; 
+static const LPCTSTR kszPosCn[]={_T(""),_T("一"),_T("二"),_T("三"),_T("四"),_T("五"),_T("六"),_T("七"),_T("八"),_T("九")};
+static const LPCTSTR kszPosArabic[]={_T("0"),_T("1"),_T("2"),_T("3"),_T("4"),_T("5"),_T("6"),_T("7"),_T("8"),_T("9")};
+static const LPCTSTR kszRedChess[]={_T("帥"),_T("車"),_T("馬"),_T("炮"),_T("仕"),_T("相"),_T("兵")}; 
+static const LPCTSTR kszBlackChess[]={_T("将"),_T("車"),_T("馬"),_T("炮"),_T("士"),_T("象"),_T("卒")}; 
 
 //找到与当前走子在同一列的相同棋子的位置
 int CChessLayout::SameLineSameChess(CHESSMAN chsLayout[10][9],POINT pt1,POINT pt2,CHESSMAN chsMove)
@@ -337,7 +337,7 @@ int CChessLayout::SameLineSameChess(CHESSMAN chsLayout[10][9],POINT pt1,POINT pt
 //获得走棋描述
 void CChessLayout::GetMoveDescription(MOVESTEP mstep,TCHAR szDesc[100])
 {
-	static const LPTSTR kszMove[]={
+	static const LPCTSTR kszMove[]={
 		_T("进"),
 		_T("平"),
 		_T("退"),
@@ -357,8 +357,8 @@ void CChessLayout::GetMoveDescription(MOVESTEP mstep,TCHAR szDesc[100])
 		MT_BACK,
 	};
 
-	const LPTSTR *pszPos=kszPosCn;
-	const LPTSTR *pszChess=kszRedChess;
+	const LPCTSTR *pszPos=kszPosCn;
+	const LPCTSTR *pszChess=kszRedChess;
 	POINT pt1=mstep.pt1,pt2=mstep.pt2;
 	CHESSMAN chsMove=m_chesses[pt2.y][pt2.x];
 	CHESSMAN tmpLayout[10][9];

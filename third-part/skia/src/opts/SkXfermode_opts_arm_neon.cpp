@@ -759,78 +759,22 @@ void SkNEONProcCoeffXfermode::xfer32(SkPMColor* SK_RESTRICT dst,
     SkASSERT(procSIMD != NULL);
 
     if (NULL == aa) {
-        // Unrolled NEON code
-        // We'd like to just do this (modulo a few casts):
-        // vst4_u8(dst, procSIMD(vld4_u8(src), vld4_u8(dst)));
-        // src += 8;
-        // dst += 8;
-        // but that tends to generate miserable code. Here are a bunch of faster
-        // workarounds for different architectures and compilers.
+        // Unrolled NEON code using intrinsics for better readability and maintainability
         while (count >= 8) {
-
-#ifdef SK_CPU_ARM32
             uint8x8x4_t vsrc, vdst, vres;
-#if (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ > 6))
-            asm volatile (
-                "vld4.u8    %h[vsrc], [%[src]]!  \t\n"
-                "vld4.u8    %h[vdst], [%[dst]]   \t\n"
-                : [vsrc] "=w" (vsrc), [vdst] "=w" (vdst), [src] "+&r" (src)
-                : [dst] "r" (dst)
-                :
-            );
-#else
-            register uint8x8_t d0 asm("d0");
-            register uint8x8_t d1 asm("d1");
-            register uint8x8_t d2 asm("d2");
-            register uint8x8_t d3 asm("d3");
-            register uint8x8_t d4 asm("d4");
-            register uint8x8_t d5 asm("d5");
-            register uint8x8_t d6 asm("d6");
-            register uint8x8_t d7 asm("d7");
+            
+            // Load source and destination data using NEON intrinsics
+            vsrc = vld4_u8((uint8_t*)src);
+            vdst = vld4_u8((uint8_t*)dst);
 
-            asm volatile (
-                "vld4.u8    {d0-d3},[%[src]]!;"
-                "vld4.u8    {d4-d7},[%[dst]];"
-                : "=w" (d0), "=w" (d1), "=w" (d2), "=w" (d3),
-                  "=w" (d4), "=w" (d5), "=w" (d6), "=w" (d7),
-                  [src] "+&r" (src)
-                : [dst] "r" (dst)
-                :
-            );
-            vsrc.val[0] = d0; vdst.val[0] = d4;
-            vsrc.val[1] = d1; vdst.val[1] = d5;
-            vsrc.val[2] = d2; vdst.val[2] = d6;
-            vsrc.val[3] = d3; vdst.val[3] = d7;
-#endif
-
+            // Process the data using the SIMD procedure
             vres = procSIMD(vsrc, vdst);
 
+            // Store the result back to destination
             vst4_u8((uint8_t*)dst, vres);
 
+            src += 8;
             dst += 8;
-
-#else // #ifdef SK_CPU_ARM32
-
-            asm volatile (
-                "ld4    {v0.8b - v3.8b}, [%[src]], #32 \t\n"
-                "ld4    {v4.8b - v7.8b}, [%[dst]]      \t\n"
-                "blr    %[proc]                        \t\n"
-                "st4    {v0.8b - v3.8b}, [%[dst]], #32 \t\n"
-                : [src] "+&r" (src), [dst] "+&r" (dst)
-                : [proc] "r" (procSIMD)
-                : "cc", "memory",
-                  /* We don't know what proc is going to clobber so we must
-                   * add everything that is not callee-saved.
-                   */
-                  "x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9",
-                  "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x18",
-                  "v0", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v16", "v17",
-                  "v18", "v19", "v20", "v21", "v22", "v23", "v24", "v25", "v26",
-                  "v27", "v28", "v29", "v30", "v31"
-            );
-
-#endif // #ifdef SK_CPU_ARM32
-
             count -= 8;
         }
         // Leftovers
@@ -866,47 +810,27 @@ void SkNEONProcCoeffXfermode::xfer16(uint16_t* SK_RESTRICT dst,
             uint16x8_t vdst, vres16;
             uint8x8x4_t vdst32, vsrc, vres;
 
+            // Load destination data as 16-bit values
             vdst = vld1q_u16(dst);
 
-#ifdef SK_CPU_ARM64
+            // Load source data using NEON intrinsics
             vsrc = vld4_u8((uint8_t*)src);
-#else
-#if (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ > 6))
-            asm volatile (
-                "vld4.u8    %h[vsrc], [%[src]]!  \t\n"
-                : [vsrc] "=w" (vsrc), [src] "+&r" (src)
-                : :
-            );
-#else
-            register uint8x8_t d0 asm("d0");
-            register uint8x8_t d1 asm("d1");
-            register uint8x8_t d2 asm("d2");
-            register uint8x8_t d3 asm("d3");
 
-            asm volatile (
-                "vld4.u8    {d0-d3},[%[src]]!;"
-                : "=w" (d0), "=w" (d1), "=w" (d2), "=w" (d3),
-                  [src] "+&r" (src)
-                : :
-            );
-            vsrc.val[0] = d0;
-            vsrc.val[1] = d1;
-            vsrc.val[2] = d2;
-            vsrc.val[3] = d3;
-#endif
-#endif // #ifdef SK_CPU_ARM64
-
+            // Convert 16-bit pixel to 32-bit format for processing
             vdst32 = SkPixel16ToPixel32_neon8(vdst);
+            
+            // Process the data using the SIMD procedure
             vres = procSIMD(vsrc, vdst32);
+            
+            // Convert result back to 16-bit format
             vres16 = SkPixel32ToPixel16_neon8(vres);
 
+            // Store the result back to destination
             vst1q_u16(dst, vres16);
 
             count -= 8;
             dst += 8;
-#ifdef SK_CPU_ARM64
             src += 8;
-#endif
         }
         for (int i = 0; i < count; i++) {
             SkPMColor dstC = SkPixel16ToPixel32(dst[i]);

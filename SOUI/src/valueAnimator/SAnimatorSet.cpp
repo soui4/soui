@@ -60,7 +60,7 @@ SAnimatorSet::AnimatorNode *SAnimatorSet::findNode(IValueAnimator *pAnimator) co
     return NULL;
 }
 
-void SAnimatorSet::addAnimator(IValueAnimator *pAnimator)
+void SAnimatorSet::AddAnimator(IValueAnimator *pAnimator)
 {
     if (!pAnimator)
         return;
@@ -71,7 +71,7 @@ void SAnimatorSet::addAnimator(IValueAnimator *pAnimator)
     // In SEQUENCE mode, they will be arranged sequentially
 }
 
-void SAnimatorSet::addAnimatorAfter(IValueAnimator *pAnimator, IValueAnimator *pAfterAnimator)
+void SAnimatorSet::AddAnimatorAfter(IValueAnimator *pAnimator, IValueAnimator *pAfterAnimator)
 {
     if (!pAnimator || !pAfterAnimator)
         return;
@@ -82,7 +82,7 @@ void SAnimatorSet::addAnimatorAfter(IValueAnimator *pAnimator, IValueAnimator *p
     if (!pAfterNode)
     {
         // If the after animator doesn't exist, just add this animator
-        addAnimator(pAnimator);
+        AddAnimator(pAnimator);
         return;
     }
 
@@ -91,7 +91,7 @@ void SAnimatorSet::addAnimatorAfter(IValueAnimator *pAnimator, IValueAnimator *p
     pNode->beforeNodes.Add(pAfterNode);
 }
 
-void SAnimatorSet::addAnimatorWith(IValueAnimator *pAnimator, IValueAnimator *pWithAnimator)
+void SAnimatorSet::AddAnimatorWith(IValueAnimator *pAnimator, IValueAnimator *pWithAnimator)
 {
     if (!pAnimator || !pWithAnimator)
         return;
@@ -102,7 +102,7 @@ void SAnimatorSet::addAnimatorWith(IValueAnimator *pAnimator, IValueAnimator *pW
     if (!pWithNode)
     {
         // If the with animator doesn't exist, just add this animator
-        addAnimator(pAnimator);
+        AddAnimator(pAnimator);
         return;
     }
 
@@ -111,7 +111,7 @@ void SAnimatorSet::addAnimatorWith(IValueAnimator *pAnimator, IValueAnimator *pW
     pNode->beforeNodes.Add(pWithNode);
 }
 
-void SAnimatorSet::removeAnimator(IValueAnimator *pAnimator)
+void SAnimatorSet::RemoveAnimator(IValueAnimator *pAnimator)
 {
     if (!pAnimator)
         return;
@@ -135,17 +135,17 @@ void SAnimatorSet::removeAnimator(IValueAnimator *pAnimator)
     delete pNode;
 }
 
-void SAnimatorSet::removeAllAnimators()
+void SAnimatorSet::RemoveAllAnimators()
 {
     cleanup();
 }
 
-int SAnimatorSet::getAnimatorCount() const
+int SAnimatorSet::GetAnimatorCount() const
 {
     return (int)mAnimatorNodes.GetCount();
 }
 
-IValueAnimator *SAnimatorSet::getAnimatorAt(int index) const
+IValueAnimator *SAnimatorSet::GetAnimatorAt(int index) const
 {
     if (index < 0 || index >= (int)mAnimatorNodes.GetCount())
         return NULL;
@@ -342,12 +342,12 @@ void SAnimatorSet::reverse()
     }
 }
 
-void SAnimatorSet::setPlayMode(AnimatorSetPlayMode mode)
+void SAnimatorSet::SetPlayMode(AnimatorSetPlayMode mode)
 {
     mPlayMode = mode;
 }
 
-AnimatorSetPlayMode SAnimatorSet::getPlayMode() const
+AnimatorSetPlayMode SAnimatorSet::GetPlayMode() const
 {
     return mPlayMode;
 }

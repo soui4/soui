@@ -23,94 +23,85 @@
 #endif
 
 #if USE_ARM_CODE
-
+#include <arm_neon.h>
 static void S32A_D565_Opaque(uint16_t* SK_RESTRICT dst,
                              const SkPMColor* SK_RESTRICT src, int count,
                              U8CPU alpha, int /*x*/, int /*y*/) {
     SkASSERT(255 == alpha);
 
-    asm volatile (
-                  "1:                                   \n\t"
-                  "ldr     r3, [%[src]], #4             \n\t"
-                  "cmp     r3, #0xff000000              \n\t"
-                  "blo     2f                           \n\t"
-                  "and     r4, r3, #0x0000f8            \n\t"
-                  "and     r5, r3, #0x00fc00            \n\t"
-                  "and     r6, r3, #0xf80000            \n\t"
-#ifdef SK_ARM_HAS_EDSP
-                  "pld     [r1, #32]                    \n\t"
-#endif
-                  "lsl     r3, r4, #8                   \n\t"
-                  "orr     r3, r3, r5, lsr #5           \n\t"
-                  "orr     r3, r3, r6, lsr #19          \n\t"
-                  "subs    %[count], %[count], #1       \n\t"
-                  "strh    r3, [%[dst]], #2             \n\t"
-                  "bne     1b                           \n\t"
-                  "b       4f                           \n\t"
-                  "2:                                   \n\t"
-                  "lsrs    r7, r3, #24                  \n\t"
-                  "beq     3f                           \n\t"
-                  "ldrh    r4, [%[dst]]                 \n\t"
-                  "rsb     r7, r7, #255                 \n\t"
-                  "and     r6, r4, #0x001f              \n\t"
-#if SK_ARM_ARCH <= 6
-                  "lsl     r5, r4, #21                  \n\t"
-                  "lsr     r5, r5, #26                  \n\t"
-#else
-                  "ubfx    r5, r4, #5, #6               \n\t"
-#endif
-#ifdef SK_ARM_HAS_EDSP
-                  "pld     [r0, #16]                    \n\t"
-#endif
-                  "lsr     r4, r4, #11                  \n\t"
-#ifdef SK_ARM_HAS_EDSP
-                  "smulbb  r6, r6, r7                   \n\t"
-                  "smulbb  r5, r5, r7                   \n\t"
-                  "smulbb  r4, r4, r7                   \n\t"
-#else
-                  "mul     r6, r6, r7                   \n\t"
-                  "mul     r5, r5, r7                   \n\t"
-                  "mul     r4, r4, r7                   \n\t"
-#endif
-#if SK_ARM_ARCH >= 6
-                  "uxtb    r7, r3, ROR #16              \n\t"
-                  "uxtb    ip, r3, ROR #8               \n\t"
-#else
-                  "mov     ip, #0xff                    \n\t"
-                  "and     r7, ip, r3, ROR #16          \n\t"
-                  "and     ip, ip, r3, ROR #8           \n\t"
-#endif
-                  "and     r3, r3, #0xff                \n\t"
-                  "add     r6, r6, #16                  \n\t"
-                  "add     r5, r5, #32                  \n\t"
-                  "add     r4, r4, #16                  \n\t"
-                  "add     r6, r6, r6, lsr #5           \n\t"
-                  "add     r5, r5, r5, lsr #6           \n\t"
-                  "add     r4, r4, r4, lsr #5           \n\t"
-                  "add     r6, r7, r6, lsr #5           \n\t"
-                  "add     r5, ip, r5, lsr #6           \n\t"
-                  "add     r4, r3, r4, lsr #5           \n\t"
-                  "lsr     r6, r6, #3                   \n\t"
-                  "and     r5, r5, #0xfc                \n\t"
-                  "and     r4, r4, #0xf8                \n\t"
-                  "orr     r6, r6, r5, lsl #3           \n\t"
-                  "orr     r4, r6, r4, lsl #8           \n\t"
-                  "strh    r4, [%[dst]], #2             \n\t"
-#ifdef SK_ARM_HAS_EDSP
-                  "pld     [r1, #32]                    \n\t"
-#endif
-                  "subs    %[count], %[count], #1       \n\t"
-                  "bne     1b                           \n\t"
-                  "b       4f                           \n\t"
-                  "3:                                   \n\t"
-                  "subs    %[count], %[count], #1       \n\t"
-                  "add     %[dst], %[dst], #2           \n\t"
-                  "bne     1b                           \n\t"
-                  "4:                                   \n\t"
-                  : [dst] "+r" (dst), [src] "+r" (src), [count] "+r" (count)
-                  :
-                  : "memory", "cc", "r3", "r4", "r5", "r6", "r7", "ip"
-                  );
+    while (count >= 8) {
+        // Load 8 source pixels (32-bit RGBA)
+        uint32x4_t src01 = vld1q_u32((const uint32_t*)src);
+        uint32x4_t src23 = vld1q_u32((const uint32_t*)(src + 4));
+        src += 8;
+
+        // Extract color channels for first 4 pixels
+        uint32x4_t a01 = vshrq_n_u32(src01, 24);  // Extract alpha
+        uint32x4_t r01 = vandq_u32(vshrq_n_u32(src01, 16), vdupq_n_u32(0xFF));
+        uint32x4_t g01 = vandq_u32(vshrq_n_u32(src01, 8), vdupq_n_u32(0xFF));
+        uint32x4_t b01 = vandq_u32(src01, vdupq_n_u32(0xFF));
+
+        // Extract color channels for second 4 pixels
+        uint32x4_t a23 = vshrq_n_u32(src23, 24);
+        uint32x4_t r23 = vandq_u32(vshrq_n_u32(src23, 16), vdupq_n_u32(0xFF));
+        uint32x4_t g23 = vandq_u32(vshrq_n_u32(src23, 8), vdupq_n_u32(0xFF));
+        uint32x4_t b23 = vandq_u32(src23, vdupq_n_u32(0xFF));
+
+        // Convert to 16-bit (5-6-5 format)
+        // R: 5 bits, G: 6 bits, B: 5 bits
+        uint32x4_t r01_5 = vshrq_n_u32(r01, 3);  // 8-bit -> 5-bit
+        uint32x4_t g01_6 = vshrq_n_u32(g01, 2);  // 8-bit -> 6-bit
+        uint32x4_t b01_5 = vshrq_n_u32(b01, 3);  // 8-bit -> 5-bit
+
+        uint32x4_t r23_5 = vshrq_n_u32(r23, 3);
+        uint32x4_t g23_6 = vshrq_n_u32(g23, 2);
+        uint32x4_t b23_5 = vshrq_n_u32(b23, 3);
+
+        // Pack into 16-bit RGB565: RRRRRGGGGGGBBBBB
+        uint32x4_t rgb01 = vorrq_u32(vshlq_n_u32(r01_5, 11), vorrq_u32(vshlq_n_u32(g01_6, 5), b01_5));
+        uint32x4_t rgb23 = vorrq_u32(vshlq_n_u32(r23_5, 11), vorrq_u32(vshlq_n_u32(g23_6, 5), b23_5));
+
+        // Narrow to 16-bit and store
+        uint16x4_t rgb01_16 = vmovn_u32(rgb01);
+        uint16x4_t rgb23_16 = vmovn_u32(rgb23);
+
+        vst1_u16(dst, rgb01_16);
+        vst1_u16(dst + 4, rgb23_16);
+        dst += 8;
+        count -= 8;
+    }
+
+
+    // Handle remaining pixels
+    while (count > 0) {
+        SkPMColor c = *src++;
+        uint32_t a = SkGetPackedA32(c);
+
+        if (a == 255) {
+            // Opaque pixel - fast path
+            uint32_t r = SkGetPackedR32(c) >> 3;
+            uint32_t g = SkGetPackedG32(c) >> 2;
+            uint32_t b = SkGetPackedB32(c) >> 3;
+            *dst++ = (r << 11) | (g << 5) | b;
+        } else if (a != 0) {
+            // Semi-transparent pixel
+            uint16_t d = *dst;
+            uint32_t dst_b = (d & 0x001F) << 3;
+            uint32_t dst_g = ((d >> 5) & 0x003F) << 2;
+            uint32_t dst_r = ((d >> 11) & 0x001F) << 3;
+
+            uint32_t scale = 255 - a;
+            dst_b = (dst_b * scale + SkGetPackedB32(c) * a + 127) / 255;
+            dst_g = (dst_g * scale + SkGetPackedG32(c) * a + 127) / 255;
+            dst_r = (dst_r * scale + SkGetPackedR32(c) * a + 127) / 255;
+
+            *dst++ = ((dst_r >> 3) << 11) | ((dst_g >> 2) << 5) | (dst_b >> 3);
+        } else {
+            // Fully transparent
+            dst++;
+        }
+        count--;
+    }
 }
 
 static void S32A_Opaque_BlitRow32_arm(SkPMColor* SK_RESTRICT dst,
@@ -119,230 +110,157 @@ static void S32A_Opaque_BlitRow32_arm(SkPMColor* SK_RESTRICT dst,
 
     SkASSERT(255 == alpha);
 
-    asm volatile (
-                  "cmp    %[count], #0               \n\t" /* comparing count with 0 */
-                  "beq    3f                         \n\t" /* if zero exit */
 
-                  "mov    ip, #0xff                  \n\t" /* load the 0xff mask in ip */
-                  "orr    ip, ip, ip, lsl #16        \n\t" /* convert it to 0xff00ff in ip */
+    uint32x4_t mask = vdupq_n_u32(0xFF00FF);
 
-                  "cmp    %[count], #2               \n\t" /* compare count with 2 */
-                  "blt    2f                         \n\t" /* if less than 2 -> single loop */
+    while (count >= 4) {
+        // Load 4 source and destination pixels
+        uint32x4_t src_pixels = vld1q_u32((const uint32_t*)src);
+        uint32x4_t dst_pixels = vld1q_u32((uint32_t*)dst);
 
-                  /* Double Loop */
-                  "1:                                \n\t" /* <double loop> */
-                  "ldm    %[src]!, {r5,r6}           \n\t" /* load the src(s) at r5-r6 */
-                  "ldm    %[dst], {r7,r8}            \n\t" /* loading dst(s) into r7-r8 */
-                  "lsr    r4, r5, #24                \n\t" /* extracting the alpha from source and storing it to r4 */
+        // Extract alpha from source (high byte)
+        uint32x4_t src_alpha = vshrq_n_u32(src_pixels, 24);
 
-                  /* ----------- */
-                  "and    r9, ip, r7                 \n\t" /* r9 = br masked by ip */
-                  "rsb    r4, r4, #256               \n\t" /* subtracting the alpha from 256 -> r4=scale */
-                  "and    r10, ip, r7, lsr #8        \n\t" /* r10 = ag masked by ip */
+        // Calculate dst_scale = 256 - src_alpha
+        uint32x4_t dst_scale = vsubq_u32(vdupq_n_u32(256), src_alpha);
 
-                  "mul    r9, r9, r4                 \n\t" /* br = br * scale */
-                  "mul    r10, r10, r4               \n\t" /* ag = ag * scale */
-                  "and    r9, ip, r9, lsr #8         \n\t" /* lsr br by 8 and mask it */
+        // Extract dst BR components (blue and red)
+        uint32x4_t dst_br = vandq_u32(dst_pixels, mask);
+        // Extract dst AG components (alpha and green)
+        uint32x4_t dst_ag = vandq_u32(vshrq_n_u32(dst_pixels, 8), mask);
 
-                  "and    r10, r10, ip, lsl #8       \n\t" /* mask ag with reverse mask */
-                  "lsr    r4, r6, #24                \n\t" /* extracting the alpha from source and storing it to r4 */
-                  "orr    r7, r9, r10                \n\t" /* br | ag*/
+        // Scale dst components
+        uint32x4_t scaled_br = vmulq_u32(dst_br, dst_scale);
+        uint32x4_t scaled_ag = vmulq_u32(dst_ag, dst_scale);
 
-                  "add    r7, r5, r7                 \n\t" /* dst = src + calc dest(r7) */
-                  "rsb    r4, r4, #256               \n\t" /* subtracting the alpha from 255 -> r4=scale */
+        // Shift and mask to get final dst components
+        uint32x4_t dst_br_final = vandq_u32(vshrq_n_u32(scaled_br, 8), mask);
+        uint32x4_t dst_ag_final = vandq_u32(scaled_ag, vshlq_n_u32(mask, 8));
 
-                  /* ----------- */
-                  "and    r9, ip, r8                 \n\t" /* r9 = br masked by ip */
+        // Combine dst_br and dst_ag
+        uint32x4_t dst_scaled = vorrq_u32(dst_br_final, dst_ag_final);
 
-                  "and    r10, ip, r8, lsr #8        \n\t" /* r10 = ag masked by ip */
-                  "mul    r9, r9, r4                 \n\t" /* br = br * scale */
-                  "sub    %[count], %[count], #2     \n\t"
-                  "mul    r10, r10, r4               \n\t" /* ag = ag * scale */
+        // Add source
+        uint32x4_t result = vaddq_u32(src_pixels, dst_scaled);
 
-                  "and    r9, ip, r9, lsr #8         \n\t" /* lsr br by 8 and mask it */
-                  "and    r10, r10, ip, lsl #8       \n\t" /* mask ag with reverse mask */
-                  "cmp    %[count], #1               \n\t" /* comparing count with 1 */
-                  "orr    r8, r9, r10                \n\t" /* br | ag */
+        // Store result
+        vst1q_u32((uint32_t*)dst, result);
 
-                  "add    r8, r6, r8                 \n\t" /* dst = src + calc dest(r8) */
+        src += 4;
+        dst += 4;
+        count -= 4;
+    }
 
-                  /* ----------------- */
-                  "stm    %[dst]!, {r7,r8}           \n\t" /* *dst = r7, increment dst by two (each times 4) */
-                  /* ----------------- */
 
-                  "bgt    1b                         \n\t" /* if greater than 1 -> reloop */
-                  "blt    3f                         \n\t" /* if less than 1 -> exit */
+    // Handle remaining pixels
+    while (count > 0) {
+        uint32_t src_pixel = *src++;
+        uint32_t src_a = src_pixel >> 24;
+        uint32_t dst_scale = 256 - src_a;
 
-                  /* Single Loop */
-                  "2:                                \n\t" /* <single loop> */
-                  "ldr    r5, [%[src]], #4           \n\t" /* load the src pointer into r5 r5=src */
-                  "ldr    r7, [%[dst]]               \n\t" /* loading dst into r7 */
-                  "lsr    r4, r5, #24                \n\t" /* extracting the alpha from source and storing it to r4 */
+        uint32_t dst_pixel = *dst;
+        uint32_t dst_br = dst_pixel & 0xFF00FF;
+        uint32_t dst_ag = (dst_pixel >> 8) & 0xFF00FF;
 
-                  /* ----------- */
-                  "and    r9, ip, r7                 \n\t" /* r9 = br masked by ip */
-                  "rsb    r4, r4, #256               \n\t" /* subtracting the alpha from 256 -> r4=scale */
+        uint32_t scaled_br = ((dst_br * dst_scale) >> 8) & 0xFF00FF;
+        uint32_t scaled_ag = (dst_ag * dst_scale) & 0xFF00FF00;
 
-                  "and    r10, ip, r7, lsr #8        \n\t" /* r10 = ag masked by ip */
-                  "mul    r9, r9, r4                 \n\t" /* br = br * scale */
-                  "mul    r10, r10, r4               \n\t" /* ag = ag * scale */
-                  "and    r9, ip, r9, lsr #8         \n\t" /* lsr br by 8 and mask it */
-
-                  "and    r10, r10, ip, lsl #8       \n\t" /* mask ag */
-                  "orr    r7, r9, r10                \n\t" /* br | ag */
-
-                  "add    r7, r5, r7                 \n\t" /* *dst = src + calc dest(r7) */
-
-                  /* ----------------- */
-                  "str    r7, [%[dst]], #4           \n\t" /* *dst = r7, increment dst by one (times 4) */
-                  /* ----------------- */
-
-                  "3:                                \n\t" /* <exit> */
-                  : [dst] "+r" (dst), [src] "+r" (src), [count] "+r" (count)
-                  :
-                  : "cc", "r4", "r5", "r6", "r7", "r8", "r9", "r10", "ip", "memory"
-                  );
+        *dst++ = src_pixel + (scaled_br | scaled_ag);
+        count--;
+    }
 }
 
 /*
- * ARM asm version of S32A_Blend_BlitRow32
+ * ARM NEON version of S32A_Blend_BlitRow32
  */
 void S32A_Blend_BlitRow32_arm(SkPMColor* SK_RESTRICT dst,
                               const SkPMColor* SK_RESTRICT src,
                               int count, U8CPU alpha) {
-    asm volatile (
-                  "cmp    %[count], #0               \n\t" /* comparing count with 0 */
-                  "beq    3f                         \n\t" /* if zero exit */
 
-                  "mov    r12, #0xff                 \n\t" /* load the 0xff mask in r12 */
-                  "orr    r12, r12, r12, lsl #16     \n\t" /* convert it to 0xff00ff in r12 */
+    uint32x4_t mask = vdupq_n_u32(0xFF00FF);
+    uint32_t src_scale = alpha + 1;
+    uint32x4_t src_scale_vec = vdupq_n_u32(src_scale);
 
-                  /* src1,2_scale */
-                  "add    %[alpha], %[alpha], #1     \n\t" /* loading %[alpha]=src_scale=alpha+1 */
+    while (count >= 4) {
+        // Load 4 source and destination pixels
+        uint32x4_t src_pixels = vld1q_u32((const uint32_t*)src);
+        uint32x4_t dst_pixels = vld1q_u32((uint32_t*)dst);
 
-                  "cmp    %[count], #2               \n\t" /* comparing count with 2 */
-                  "blt    2f                         \n\t" /* if less than 2 -> single loop */
+        // Extract alpha from source (high byte)
+        uint32x4_t src_alpha = vshrq_n_u32(src_pixels, 24);
 
-                  /* Double Loop */
-                  "1:                                \n\t" /* <double loop> */
-                  "ldm    %[src]!, {r5, r6}          \n\t" /* loading src pointers into r5 and r6 */
-                  "ldm    %[dst], {r7, r8}           \n\t" /* loading dst pointers into r7 and r8 */
+        // Scale source alpha by input alpha: src_a = src_a * (alpha + 1)
+        uint32x4_t scaled_src_a = vmulq_u32(src_alpha, src_scale_vec);
+        scaled_src_a = vshrq_n_u32(scaled_src_a, 8);
 
-                  /* dst1_scale and dst2_scale*/
-                  "lsr    r9, r5, #24                \n\t" /* src >> 24 */
-                  "lsr    r10, r6, #24               \n\t" /* src >> 24 */
-#ifdef SK_ARM_HAS_EDSP
-                  "smulbb r9, r9, %[alpha]           \n\t" /* r9 = SkMulS16 r9 with src_scale */
-                  "smulbb r10, r10, %[alpha]         \n\t" /* r10 = SkMulS16 r10 with src_scale */
-#else
-                  "mul    r9, r9, %[alpha]           \n\t" /* r9 = SkMulS16 r9 with src_scale */
-                  "mul    r10, r10, %[alpha]         \n\t" /* r10 = SkMulS16 r10 with src_scale */
-#endif
-                  "lsr    r9, r9, #8                 \n\t" /* r9 >> 8 */
-                  "lsr    r10, r10, #8               \n\t" /* r10 >> 8 */
-                  "rsb    r9, r9, #256               \n\t" /* dst1_scale = r9 = 255 - r9 + 1 */
-                  "rsb    r10, r10, #256             \n\t" /* dst2_scale = r10 = 255 - r10 + 1 */
+        // Calculate dst_scale = 256 - scaled_src_a
+        uint32x4_t dst_scale = vsubq_u32(vdupq_n_u32(256), scaled_src_a);
 
-                  /* ---------------------- */
+        // Scale source
+        uint32x4_t src_br = vandq_u32(src_pixels, mask);
+        uint32x4_t src_ag = vandq_u32(vshrq_n_u32(src_pixels, 8), mask);
 
-                  /* src1, src1_scale */
-                  "and    r11, r12, r5, lsr #8       \n\t" /* ag = r11 = r5 masked by r12 lsr by #8 */
-                  "and    r4, r12, r5                \n\t" /* rb = r4 = r5 masked by r12 */
-                  "mul    r11, r11, %[alpha]         \n\t" /* ag = r11 times src_scale */
-                  "mul    r4, r4, %[alpha]           \n\t" /* rb = r4 times src_scale */
-                  "and    r11, r11, r12, lsl #8      \n\t" /* ag masked by reverse mask (r12) */
-                  "and    r4, r12, r4, lsr #8        \n\t" /* rb masked by mask (r12) */
-                  "orr    r5, r11, r4                \n\t" /* r5 = (src1, src_scale) */
+        uint32x4_t scaled_src_br = vmulq_u32(src_br, src_scale_vec);
+        uint32x4_t scaled_src_ag = vmulq_u32(src_ag, src_scale_vec);
 
-                  /* dst1, dst1_scale */
-                  "and    r11, r12, r7, lsr #8       \n\t" /* ag = r11 = r7 masked by r12 lsr by #8 */
-                  "and    r4, r12, r7                \n\t" /* rb = r4 = r7 masked by r12 */
-                  "mul    r11, r11, r9               \n\t" /* ag = r11 times dst_scale (r9) */
-                  "mul    r4, r4, r9                 \n\t" /* rb = r4 times dst_scale (r9) */
-                  "and    r11, r11, r12, lsl #8      \n\t" /* ag masked by reverse mask (r12) */
-                  "and    r4, r12, r4, lsr #8        \n\t" /* rb masked by mask (r12) */
-                  "orr    r9, r11, r4                \n\t" /* r9 = (dst1, dst_scale) */
+        uint32x4_t src_br_final = vandq_u32(vshrq_n_u32(scaled_src_br, 8), mask);
+        uint32x4_t src_ag_final = vandq_u32(scaled_src_ag, vshlq_n_u32(mask, 8));
 
-                  /* ---------------------- */
-                  "add    r9, r5, r9                 \n\t" /* *dst = src plus dst both scaled */
-                  /* ---------------------- */
+        uint32x4_t src_scaled = vorrq_u32(src_br_final, src_ag_final);
 
-                  /* ====================== */
+        // Scale destination
+        uint32x4_t dst_br = vandq_u32(dst_pixels, mask);
+        uint32x4_t dst_ag = vandq_u32(vshrq_n_u32(dst_pixels, 8), mask);
 
-                  /* src2, src2_scale */
-                  "and    r11, r12, r6, lsr #8       \n\t" /* ag = r11 = r6 masked by r12 lsr by #8 */
-                  "and    r4, r12, r6                \n\t" /* rb = r4 = r6 masked by r12 */
-                  "mul    r11, r11, %[alpha]         \n\t" /* ag = r11 times src_scale */
-                  "mul    r4, r4, %[alpha]           \n\t" /* rb = r4 times src_scale */
-                  "and    r11, r11, r12, lsl #8      \n\t" /* ag masked by reverse mask (r12) */
-                  "and    r4, r12, r4, lsr #8        \n\t" /* rb masked by mask (r12) */
-                  "orr    r6, r11, r4                \n\t" /* r6 = (src2, src_scale) */
+        uint32x4_t scaled_dst_br = vmulq_u32(dst_br, dst_scale);
+        uint32x4_t scaled_dst_ag = vmulq_u32(dst_ag, dst_scale);
 
-                  /* dst2, dst2_scale */
-                  "and    r11, r12, r8, lsr #8       \n\t" /* ag = r11 = r8 masked by r12 lsr by #8 */
-                  "and    r4, r12, r8                \n\t" /* rb = r4 = r8 masked by r12 */
-                  "mul    r11, r11, r10              \n\t" /* ag = r11 times dst_scale (r10) */
-                  "mul    r4, r4, r10                \n\t" /* rb = r4 times dst_scale (r6) */
-                  "and    r11, r11, r12, lsl #8      \n\t" /* ag masked by reverse mask (r12) */
-                  "and    r4, r12, r4, lsr #8        \n\t" /* rb masked by mask (r12) */
-                  "orr    r10, r11, r4               \n\t" /* r10 = (dst2, dst_scale) */
+        uint32x4_t dst_br_final = vandq_u32(vshrq_n_u32(scaled_dst_br, 8), mask);
+        uint32x4_t dst_ag_final = vandq_u32(scaled_dst_ag, vshlq_n_u32(mask, 8));
 
-                  "sub    %[count], %[count], #2     \n\t" /* decrease count by 2 */
-                  /* ---------------------- */
-                  "add    r10, r6, r10               \n\t" /* *dst = src plus dst both scaled */
-                  /* ---------------------- */
-                  "cmp    %[count], #1               \n\t" /* compare count with 1 */
-                  /* ----------------- */
-                  "stm    %[dst]!, {r9, r10}         \n\t" /* copy r9 and r10 to r7 and r8 respectively */
-                  /* ----------------- */
+        uint32x4_t dst_scaled = vorrq_u32(dst_br_final, dst_ag_final);
 
-                  "bgt    1b                         \n\t" /* if %[count] greater than 1 reloop */
-                  "blt    3f                         \n\t" /* if %[count] less than 1 exit */
-                                                           /* else get into the single loop */
-                  /* Single Loop */
-                  "2:                                \n\t" /* <single loop> */
-                  "ldr    r5, [%[src]], #4           \n\t" /* loading src pointer into r5: r5=src */
-                  "ldr    r7, [%[dst]]               \n\t" /* loading dst pointer into r7: r7=dst */
+        // Combine scaled source and destination
+        uint32x4_t result = vaddq_u32(src_scaled, dst_scaled);
 
-                  "lsr    r6, r5, #24                \n\t" /* src >> 24 */
-                  "and    r8, r12, r5, lsr #8        \n\t" /* ag = r8 = r5 masked by r12 lsr by #8 */
-#ifdef SK_ARM_HAS_EDSP
-                  "smulbb r6, r6, %[alpha]           \n\t" /* r6 = SkMulS16 with src_scale */
-#else
-                  "mul    r6, r6, %[alpha]           \n\t" /* r6 = SkMulS16 with src_scale */
-#endif
-                  "and    r9, r12, r5                \n\t" /* rb = r9 = r5 masked by r12 */
-                  "lsr    r6, r6, #8                 \n\t" /* r6 >> 8 */
-                  "mul    r8, r8, %[alpha]           \n\t" /* ag = r8 times scale */
-                  "rsb    r6, r6, #256               \n\t" /* r6 = 255 - r6 + 1 */
+        // Store result
+        vst1q_u32((uint32_t*)dst, result);
 
-                  /* src, src_scale */
-                  "mul    r9, r9, %[alpha]           \n\t" /* rb = r9 times scale */
-                  "and    r8, r8, r12, lsl #8        \n\t" /* ag masked by reverse mask (r12) */
-                  "and    r9, r12, r9, lsr #8        \n\t" /* rb masked by mask (r12) */
-                  "orr    r10, r8, r9                \n\t" /* r10 = (scr, src_scale) */
+        src += 4;
+        dst += 4;
+        count -= 4;
+    }
 
-                  /* dst, dst_scale */
-                  "and    r8, r12, r7, lsr #8        \n\t" /* ag = r8 = r7 masked by r12 lsr by #8 */
-                  "and    r9, r12, r7                \n\t" /* rb = r9 = r7 masked by r12 */
-                  "mul    r8, r8, r6                 \n\t" /* ag = r8 times scale (r6) */
-                  "mul    r9, r9, r6                 \n\t" /* rb = r9 times scale (r6) */
-                  "and    r8, r8, r12, lsl #8        \n\t" /* ag masked by reverse mask (r12) */
-                  "and    r9, r12, r9, lsr #8        \n\t" /* rb masked by mask (r12) */
-                  "orr    r7, r8, r9                 \n\t" /* r7 = (dst, dst_scale) */
 
-                  "add    r10, r7, r10               \n\t" /* *dst = src plus dst both scaled */
+    // Handle remaining pixels
+    while (count > 0) {
+        uint32_t src_pixel = *src++;
+        uint32_t src_a = src_pixel >> 24;
 
-                  /* ----------------- */
-                  "str    r10, [%[dst]], #4          \n\t" /* *dst = r10, postincrement dst by one (times 4) */
-                  /* ----------------- */
+        // Scale source alpha
+        uint32_t scaled_src_a = (src_a * src_scale) >> 8;
+        uint32_t dst_scale = 256 - scaled_src_a;
 
-                  "3:                                \n\t" /* <exit> */
-                  : [dst] "+r" (dst), [src] "+r" (src), [count] "+r" (count), [alpha] "+r" (alpha)
-                  :
-                  : "cc", "r4", "r5", "r6", "r7", "r8", "r9", "r10", "r11", "r12", "memory"
-                  );
+        // Scale source
+        uint32_t src_br = src_pixel & 0xFF00FF;
+        uint32_t src_ag = (src_pixel >> 8) & 0xFF00FF;
 
+        uint32_t scaled_src_br = ((src_br * src_scale) >> 8) & 0xFF00FF;
+        uint32_t scaled_src_ag = (src_ag * src_scale) & 0xFF00FF00;
+
+        uint32_t src_scaled = scaled_src_br | scaled_src_ag;
+
+        // Scale destination
+        uint32_t dst_pixel = *dst;
+        uint32_t dst_br = dst_pixel & 0xFF00FF;
+        uint32_t dst_ag = (dst_pixel >> 8) & 0xFF00FF;
+
+        uint32_t scaled_dst_br = ((dst_br * dst_scale) >> 8) & 0xFF00FF;
+        uint32_t scaled_dst_ag = (dst_ag * dst_scale) & 0xFF00FF00;
+
+        *dst++ = src_scaled + (scaled_dst_br | scaled_dst_ag);
+        count--;
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

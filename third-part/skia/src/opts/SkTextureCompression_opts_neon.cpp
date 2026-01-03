@@ -118,23 +118,10 @@ static inline uint8x16_t make_index_row(const uint8x16_t &x) {
 static inline bool is_zero(uint8x16_t x) {
 // First experiments say that this is way slower than just examining the lanes
 // but it might need a little more investigation.
-#if 0
-    // This code path tests the system register for overflow. We trigger
-    // overflow by adding x to a register with all of its bits set. The
-    // first instruction sets the bits.
-    int reg;
-    asm ("VTST.8   %%q0, %q1, %q1\n"
-         "VQADD.u8 %q1, %%q0\n"
-         "VMRS     %0, FPSCR\n"
-         : "=r"(reg) : "w"(vreinterpretq_f32_u8(x)) : "q0", "q1");
 
-    // Bit 21 corresponds to the overflow flag.
-    return reg & (0x1 << 21);
-#else
     const uint64x2_t cvt = vreinterpretq_u64_u8(x);
     const uint64_t l1 = vgetq_lane_u64(cvt, 0);
     return (l1 == 0) && (l1 == vgetq_lane_u64(cvt, 1));
-#endif
 }
 
 #if defined (SK_CPU_BENDIAN)

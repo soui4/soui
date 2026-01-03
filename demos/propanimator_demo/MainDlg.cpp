@@ -307,7 +307,7 @@ void CMainDlg::OnParallelAnimation()
 
 	// 创建动画集
 	m_runningAnimatorSet.Attach(new SAnimatorSet());
-	m_runningAnimatorSet->setPlayMode(PARALLEL);  // 设置为并行模式
+	m_runningAnimatorSet->SetPlayMode(PARALLEL);  // 设置为并行模式
 
 	// 获取各窗口的当前位置
 	AnchorPos anchorPos[4];
@@ -325,7 +325,7 @@ void CMainDlg::OnParallelAnimation()
 		IPropertyAnimator *pAnimator = SPropertyAnimator::ofPosition(pWnd_left_top, LayoutProperty::POSITION, pos, ARRAYSIZE(pos), sizeof(AnchorPos));
 		if (pAnimator)
 		{
-			m_runningAnimatorSet->addAnimator(pAnimator);
+			m_runningAnimatorSet->AddAnimator(pAnimator);
 			pAnimator->Release();
 		}
 	}
@@ -339,7 +339,7 @@ void CMainDlg::OnParallelAnimation()
 		IPropertyAnimator *pAnimator = SPropertyAnimator::ofPosition(pWnd_right_top, LayoutProperty::POSITION, pos, ARRAYSIZE(pos), sizeof(AnchorPos));
 		if (pAnimator)
 		{
-			m_runningAnimatorSet->addAnimator(pAnimator);
+			m_runningAnimatorSet->AddAnimator(pAnimator);
 			pAnimator->Release();
 		}
 	}
@@ -353,7 +353,7 @@ void CMainDlg::OnParallelAnimation()
 		IPropertyAnimator *pAnimator = SPropertyAnimator::ofPosition(pWnd_left_bottom, LayoutProperty::POSITION, pos, ARRAYSIZE(pos), sizeof(AnchorPos));
 		if (pAnimator)
 		{
-			m_runningAnimatorSet->addAnimator(pAnimator);
+			m_runningAnimatorSet->AddAnimator(pAnimator);
 			pAnimator->Release();
 		}
 	}
@@ -367,7 +367,7 @@ void CMainDlg::OnParallelAnimation()
 		IPropertyAnimator *pAnimator = SPropertyAnimator::ofPosition(pWnd_right_bottom, LayoutProperty::POSITION, pos, ARRAYSIZE(pos), sizeof(AnchorPos));
 		if (pAnimator)
 		{
-			m_runningAnimatorSet->addAnimator(pAnimator);
+			m_runningAnimatorSet->AddAnimator(pAnimator);
 			pAnimator->Release();
 		}
 	}
@@ -400,7 +400,7 @@ void CMainDlg::OnSequentialAnimation()
 
 	// 创建动画集
 	m_runningAnimatorSet.Attach(new SAnimatorSet());
-	m_runningAnimatorSet->setPlayMode(SEQUENCE);  // 设置为串行模式
+	m_runningAnimatorSet->SetPlayMode(SEQUENCE);  // 设置为串行模式
 
 	// 获取各窗口的当前位置
 	AnchorPos anchorPos[4];
@@ -426,7 +426,7 @@ void CMainDlg::OnSequentialAnimation()
 		if (pAnimator1)
 		{
 			pAnimator1->setDuration(500);
-			m_runningAnimatorSet->addAnimator(pAnimator1);
+			m_runningAnimatorSet->AddAnimator(pAnimator1);
 		}
 	}
 
@@ -440,7 +440,7 @@ void CMainDlg::OnSequentialAnimation()
 		if (pAnimator2)
 		{
 			pAnimator2->setDuration(500);
-			m_runningAnimatorSet->addAnimatorAfter(pAnimator2, pAnimator1);
+			m_runningAnimatorSet->AddAnimatorAfter(pAnimator2, pAnimator1);
 		}
 	}
 
@@ -454,7 +454,7 @@ void CMainDlg::OnSequentialAnimation()
 		if (pAnimator3)
 		{
 			pAnimator3->setDuration(500);
-			m_runningAnimatorSet->addAnimatorAfter(pAnimator3, pAnimator2);
+			m_runningAnimatorSet->AddAnimatorAfter(pAnimator3, pAnimator2);
 		}
 	}
 
@@ -468,7 +468,7 @@ void CMainDlg::OnSequentialAnimation()
 		if (pAnimator4)
 		{
 			pAnimator4->setDuration(500);
-			m_runningAnimatorSet->addAnimatorAfter(pAnimator4, pAnimator3);
+			m_runningAnimatorSet->AddAnimatorAfter(pAnimator4, pAnimator3);
 		}
 	}
 
@@ -530,7 +530,7 @@ void CMainDlg::OnComplexAnimatorSetAnimation()
 		if (pAnimator1)
 		{
 			pAnimator1->setDuration(600);
-			m_runningAnimatorSet->addAnimator(pAnimator1);
+			m_runningAnimatorSet->AddAnimator(pAnimator1);
 		}
 	}
 
@@ -546,7 +546,7 @@ void CMainDlg::OnComplexAnimatorSetAnimation()
 		if (pAnimator2)
 		{
 			pAnimator2->setDuration(600);
-			m_runningAnimatorSet->addAnimatorAfter(pAnimator2, pAnimator1);
+			m_runningAnimatorSet->AddAnimatorAfter(pAnimator2, pAnimator1);
 		}
 	}
 
@@ -561,7 +561,7 @@ void CMainDlg::OnComplexAnimatorSetAnimation()
 		if (pAnimator3)
 		{
 			pAnimator3->setDuration(600);
-			m_runningAnimatorSet->addAnimatorAfter(pAnimator3, pAnimator1);
+			m_runningAnimatorSet->AddAnimatorAfter(pAnimator3, pAnimator1);
 		}
 	}
 
@@ -577,7 +577,7 @@ void CMainDlg::OnComplexAnimatorSetAnimation()
 		if (pAnimator4)
 		{
 			pAnimator4->setDuration(600);
-			m_runningAnimatorSet->addAnimatorAfter(pAnimator4, pAnimator2);
+			m_runningAnimatorSet->AddAnimatorAfter(pAnimator4, pAnimator2);
 		}
 	}
 
@@ -634,7 +634,7 @@ void CMainDlg::OnBtnSetRestore()
 		if (pAnimator1)
 		{
 			pAnimator1->setDuration(500);
-			m_runningAnimatorSet->addAnimator(pAnimator1);
+			m_runningAnimatorSet->AddAnimator(pAnimator1);
 		}
 	}
 
@@ -649,7 +649,7 @@ void CMainDlg::OnBtnSetRestore()
 		if (pAnimator2)
 		{
 			pAnimator2->setDuration(500);
-			m_runningAnimatorSet->addAnimatorAfter(pAnimator2, pAnimator1);
+			m_runningAnimatorSet->AddAnimatorAfter(pAnimator2, pAnimator1);
 		}
 	}
 
@@ -664,7 +664,7 @@ void CMainDlg::OnBtnSetRestore()
 		if (pAnimator3)
 		{
 			pAnimator3->setDuration(500);
-			m_runningAnimatorSet->addAnimatorAfter(pAnimator3, pAnimator2);
+			m_runningAnimatorSet->AddAnimatorAfter(pAnimator3, pAnimator2);
 		}
 	}
 
@@ -679,7 +679,7 @@ void CMainDlg::OnBtnSetRestore()
 		if (pAnimator4)
 		{
 			pAnimator4->setDuration(500);
-			m_runningAnimatorSet->addAnimatorAfter(pAnimator4, pAnimator3);
+			m_runningAnimatorSet->AddAnimatorAfter(pAnimator4, pAnimator3);
 		}
 	}
 

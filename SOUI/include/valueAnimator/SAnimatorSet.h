@@ -114,45 +114,45 @@ class SOUI_EXP SAnimatorSet
      * @brief Add an animator to the set (will play in parallel by default or according to play mode)
      * @param pAnimator The animator to add
      */
-    STDMETHOD_(void, addAnimator)(THIS_ IValueAnimator * pAnimator) OVERRIDE;
+    STDMETHOD_(void, AddAnimator)(THIS_ IValueAnimator * pAnimator) OVERRIDE;
 
     /**
      * @brief Add an animator that will play after the specified animator finishes
      * @param pAnimator The animator to add
      * @param pAfterAnimator The animator that must finish first
      */
-    STDMETHOD_(void, addAnimatorAfter)(THIS_ IValueAnimator * pAnimator, IValueAnimator * pAfterAnimator) OVERRIDE;
+    STDMETHOD_(void, AddAnimatorAfter)(THIS_ IValueAnimator * pAnimator, IValueAnimator * pAfterAnimator) OVERRIDE;
 
     /**
      * @brief Add an animator that will play in parallel with the specified animator
      * @param pAnimator The animator to add
      * @param pWithAnimator The animator to run in parallel with
      */
-    STDMETHOD_(void, addAnimatorWith)(THIS_ IValueAnimator * pAnimator, IValueAnimator * pWithAnimator) OVERRIDE;
+    STDMETHOD_(void, AddAnimatorWith)(THIS_ IValueAnimator * pAnimator, IValueAnimator * pWithAnimator) OVERRIDE;
 
     /**
      * @brief Remove an animator from the set
      * @param pAnimator The animator to remove
      */
-    STDMETHOD_(void, removeAnimator)(THIS_ IValueAnimator * pAnimator) OVERRIDE;
+    STDMETHOD_(void, RemoveAnimator)(THIS_ IValueAnimator * pAnimator) OVERRIDE;
 
     /**
      * @brief Remove all animators from the set
      */
-    STDMETHOD_(void, removeAllAnimators)(THIS) OVERRIDE;
+    STDMETHOD_(void, RemoveAllAnimators)(THIS) OVERRIDE;
 
     /**
      * @brief Get the number of animators
      * @return The count of animators
      */
-    STDMETHOD_(int, getAnimatorCount)(CTHIS) SCONST OVERRIDE;
+    STDMETHOD_(int, GetAnimatorCount)(CTHIS) SCONST OVERRIDE;
 
     /**
      * @brief Get animator at specified index
      * @param index The index
      * @return The animator at the specified index
      */
-    STDMETHOD_(IValueAnimator *, getAnimatorAt)(CTHIS_ int index) SCONST OVERRIDE;
+    STDMETHOD_(IValueAnimator *, GetAnimatorAt)(CTHIS_ int index) SCONST OVERRIDE;
 
     /**
      * @brief Set the duration of the set
@@ -265,13 +265,13 @@ class SOUI_EXP SAnimatorSet
      * @brief Set the play mode (SEQUENCE or PARALLEL)
      * @param mode The play mode
      */
-    STDMETHOD_(void, setPlayMode)(THIS_ AnimatorSetPlayMode mode) OVERRIDE;
+    STDMETHOD_(void, SetPlayMode)(THIS_ AnimatorSetPlayMode mode) OVERRIDE;
 
     /**
      * @brief Get the current play mode
      * @return The play mode
      */
-    STDMETHOD_(AnimatorSetPlayMode, getPlayMode)(CTHIS) SCONST OVERRIDE;
+    STDMETHOD_(AnimatorSetPlayMode, GetPlayMode)(CTHIS) SCONST OVERRIDE;
 
   private:
     /**
