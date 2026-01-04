@@ -1,7 +1,7 @@
 #include <windows.h>
 #include <helper/slog.h>
 #include <stdio.h>
-
+#include <stdint.h>
 #ifndef E_RANGE
 #define E_RANGE 9944
 #endif
