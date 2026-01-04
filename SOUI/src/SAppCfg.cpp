@@ -363,7 +363,7 @@ BOOL SAppCfg::DoConfig(SApplication *pApp) const
         SASSERT(bLoaded);
         if (!bLoaded)
         {
-            SLOGW() << "Load system resource failed! sys res type: " << m_sysResDesc->m_type;
+            SLOGW() << "Load system resource failed! sys res type: " << m_sysResDesc->m_type<<" file: "<<m_sysResDesc->m_szFile;
             return FALSE;
         }
         pApp->LoadSystemNamedResource(resLoader.GetResProvider());
@@ -404,7 +404,7 @@ BOOL SAppCfg::DoConfig(SApplication *pApp) const
         SASSERT(bLoaded);
         if (!bLoaded)
         {
-            SLOGW() << "Load application resource failed! app res type: " << m_appResDesc->m_type;
+            SLOGW() << "Load application resource failed! app res type: " << m_appResDesc->m_type<<" file: "<<m_appResDesc->m_szFile;
             return FALSE;
         }
         pApp->AddResProvider(resLoader.GetResProvider(), m_uidefId);
