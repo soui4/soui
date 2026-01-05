@@ -129,6 +129,7 @@ DECLARE_INTERFACE_(IWsClient, IConnection)
     STDMETHOD_(int, connectTo)(THIS_ const char *pszSvr, const char *pszPath, uint16_t nPort, const char *pszProtocol, ClientOption option) PURE;
     STDMETHOD_(void, disconnect)(THIS) PURE;
     STDMETHOD_(BOOL, wait)(THIS_ int timeoutMs) PURE;
+    STDMETHOD_(void, blockReceive)(THIS_ BOOL bBlock) PURE;
 };
 
 typedef void (*WsLogCallback)(int level, const char *line);

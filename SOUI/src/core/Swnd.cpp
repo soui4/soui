@@ -1292,6 +1292,9 @@ SWindow *SWindow::FindChildByName(LPCWSTR pszName, int nDeep)
     SStringW strName(pszName);
     if (strName.IsEmpty())
         return NULL;
+    if (!GetContainer())
+        return _FindChildByName(strName, nDeep);
+
     ISwndFinder *pFinder = GetContainer()->GetSwndFinder();
     SWindow *pRet = (SWindow *)pFinder->FindChildByName(this, strName, nDeep);
     if (pRet)

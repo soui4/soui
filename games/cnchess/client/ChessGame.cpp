@@ -60,7 +60,7 @@ CChessGame::CChessGame(CMainDlg* pMainDlg, SGameTheme* pTheme)
     ,m_pTheme(pTheme)
     ,m_iSelfIndex(0)
     ,m_iRedIndex(-1)
-    ,m_roundResult(RESULT_NEUTRAL)
+    ,m_roundResult(RESULT_DRAW)
     ,m_LytState(&m_layout)
 {
     memset(m_pUserInfo, 0, sizeof(m_pUserInfo));
@@ -1367,7 +1367,7 @@ void CChessGame::OnGameOver(const void *pData, int nSize)
     }else if(pOver->iWinner == (m_iSelfIndex + 1) % PLAYER_COUNT){
         m_roundResult = RESULT_LOSE;
     }else{
-        m_roundResult = RESULT_NEUTRAL;
+        m_roundResult = RESULT_DRAW;
     }
     OnStageChanged(STAGE_CONTINUE);
 }
@@ -1501,7 +1501,7 @@ void CChessGame::PlayEffectSound(LPCWSTR pszSound)
     if(!strFile.IsEmpty()){
         TCHAR szResPrefix[MAX_PATH]={0};
         SApplication::getSingletonPtr()->GetFilePrefix(szResPrefix, MAX_PATH);
-        SStringT strFull = SStringT(szResPrefix) + _T("/") + S_CW2T(strFile);
+        SStringT strFull = SStringT(szResPrefix) + S_CW2T(strFile);
         m_pMainDlg->PlayWave(strFull);
     } 
 }

@@ -171,7 +171,7 @@ BOOL CWebSocketGame::GameStart(unsigned short uPort)
 	SvrOption option = { FALSE, NULL, NULL }; // 非安全连接
     SvrPingCfg pingCfg = { 50, 100, 10 };
     SLOGI() << "Started on port:" << uPort;
-	int nRet = m_pWsServer->start(uPort, "upgrade", option, pingCfg);
+	int nRet = m_pWsServer->start(uPort, "cnchess", option, pingCfg);
 	if (nRet != 0)
 		return FALSE;
     bool bFinish = m_pWsServer->wait(-1);

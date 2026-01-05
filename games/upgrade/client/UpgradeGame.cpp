@@ -2010,7 +2010,7 @@ void UpgradeGame::PlayEffectSound(LPCWSTR pszSound)
     if(!strFile.IsEmpty()){
         TCHAR szResPrefix[MAX_PATH]={0};
         SApplication::getSingletonPtr()->GetFilePrefix(szResPrefix, MAX_PATH);
-        SStringT strFull = SStringT(szResPrefix) + _T("/") + S_CW2T(strFile);
+        SStringT strFull = SStringT(szResPrefix) + S_CW2T(strFile);
         m_pMainDlg->PlayWave(strFull);
     }   
 }

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme name="default">
+    <skin>
+        <gif name="ani_conn" src="file:Sprite/connect.gif"/>
+        <imglist name="skin_ready" src="file:image/ready.png"/>
+        <gif name="gif_chair" src="file:avatar/chair.gif" enableScale="0"/>
+        <gif name="gif_avatar_male" src="file:avatar/male.gif" enableScale="0"/>
+        <gif name="gif_avatar_female" src="file:avatar/female.gif" enableScale="0"/>
+
+        <apng name="ani_vectory_1" src="file:Sprite/礼花1.png" enableScale="0"/>
+        <apng name="ani_vectory_2" src="file:Sprite/礼花2.png" enableScale="0"/>
+        <apng name="ani_vectory_3" src="file:Sprite/礼花3.png" enableScale="0"/>
+
+        <imglist name="skin_background" src="file:image/bk.png"/>"
+        <piece name="skin_pieces" src="file:image/pieces.png"  filterLevel="high" size="31,29" center="15,14"/>
+        <board name="skin_junqi_board" src="file:image/junqi_board.png" filterLevel="high" margin="0,0,0,0"/>
+        <imglist name="skin_dir" src="file:image/dir.png" states="8"/>
+        <imgframe name="skin_dest_box" src="file:image/dest_box.png" filterLevel="high" margin="5,5,5,5"/>
+
+        <imglist name="skin_digit" src="file:image/digital_score.png" states="12"/>
+        <imglist name="skin_clock" src="file:image/闹钟.png"/>
+        <imglist name="skin_clock_digital" src="file:image/闹钟数字.png" states="10"/>
+
+        <imglist name="skin_btn_common" src="file:image/btn_common.png" states="4"/>
+    </skin>
+    <template>
+        <tip wndclass="text" colorText="#FF0000FF" ownerLayout="anchor" pos="0,100,4" offset="-0.5,-0.5" layer="300000"/>
+        <avatar wndclass="window" ownerLayout="anchor" layout="vbox" size="-1,-1" interval="5" gravity="center" layer="-1">
+            <window size="150,190">
+                <gifplayer pos="0,0" size="-2,-2" name="gif_avatar" skin="gif_chair"/>
+                <img pos="|0,|0" offset="-0.5,-0.5" name="flag_ready" skin="skin_ready" visible="0"/>
+            </window>
+            <text name="txt_name" text=" " font="size:16"/>
+        </avatar>
+        <piece  wndClass="junqipiece" skin="skin_pieces" ownerLayout="anchor" offset="-0.5,-0.5" layer="10" size="31,29" cursor="hand"/>
+        <clock wndClass="img"  ownerLayout="anchor" skin="skin_clock" fitImage="1" layout="hbox" gravity="center" layer="100000">
+            <window size="0,0" weight="1"/>
+            <include src="file:xml/clock_digit.xml" name="digit1" pos="0,0,4" size="-1,-1" offset="-0.5,-0.5"/>
+            <include src="file:xml/clock_digit.xml" name="digit2" pos="0,0,4" size="-1,-1" offset="-0.5,-0.5"/>
+            <window size="0,0" weight="1"/>
+        </clock>
+        <movedir wndclass="img" skin="skin_dir" ownerLayout="anchor" pos="0,0,10" offset="-0.5,-0.5" size="23,23" layer="5"/>
+    </template>
+    <widgets>
+        <gifplayer name="sprite_connecting" skin="ani_conn" ownerLayout="anchor" pos="0,-50,4" offset="-0.5,-0.5" layer="100" />
+        <gifplayer name="sprite_vectory" skin="ani_vectory_0" ownerLayout="anchor" pos="0,-50,4" offset="-0.5,-0.5" layer="1000" loopCount="1" msgTransparent="1" />
+        <img name="img_background" skin="skin_background" ownerLayout="anchor" pos="0,0,0" size="-2,-2" layer="-2"/>
+        <boardgrid name="board_main" skin="skin_junqi_board" layout="anchor" ownerLayout="anchor" pos="0,0,4" offset="-0.5,-0.5" fitImage="1"/>
+        
+        <gifplayer name="sprite_flag_pos_to" skin="ani_flag_pos_to" ownerLayout="anchor" pos="0,1,10" size="90,90" offset="-0.5,-0.5" layer="50" msgTransparent="1" visible="0" />
+        <img name="img_flag_pos_from" skin="skin_flag_pos_from" ownerLayout="anchor" pos="0,0,10" size="55,55" offset="-0.5,-0.5" layer="4" msgTransparent="1" visible="0"/>
+        <tabctrl name="tab_toolbar" curSel="0" ownerLayout="anchor" pos="0,0,5" offset="-1,-0.5" tabHeight="0" size="100,200" animateSteps="20" layer="100">
+            <page title="start">
+                <button name="btn_start" pos="|0,|0" offset="-0.5,-0.5" size="76,31" skin="skin_btn_common" text="@string/start" colorText="#604635" colorTextHover="#932325" colorTextPush="#817C27" colorTextDisable="#676767"/>
+            </page>
+            <page title="playing" layout="vbox" interval="5">
+                <button name="btn_req_peace" size="76,31" skin="skin_btn_common" text="@string/peace" colorText="#604635" colorTextHover="#932325" colorTextPush="#817C27" colorTextDisable="#676767"/>
+                <button name="btn_req_surrender" size="76,31" skin="skin_btn_common" text="@string/surrender" colorText="#604635" colorTextHover="#932325" colorTextPush="#817C27" colorTextDisable="#676767"/>
+                <button name="btn_req_pass" size="76,31" skin="skin_btn_common" text="@string/pass" colorText="#604635" colorTextHover="#932325" colorTextPush="#817C27" colorTextDisable="#676767"/>
+            </page>
+            <page title="local" layout="vbox" interval="5">
+                <button name="btn_new_round" size="76,31" skin="skin_btn_common" text="@string/new_round" colorText="#604635" colorTextHover="#932325" colorTextPush="#817C27" colorTextDisable="#676767"/>
+                <button name="btn_local_save" size="76,31" skin="skin_btn_common" text="@string/save" colorText="#604635" colorTextHover="#932325" colorTextPush="#817C27" colorTextDisable="#676767"/>
+                <button name="btn_local_load" size="76,31" skin="skin_btn_common" text="@string/load" colorText="#604635" colorTextHover="#932325" colorTextPush="#817C27" colorTextDisable="#676767"/>
+                <button name="btn_local_prev" size="76,31" skin="skin_btn_common" text="@string/prev" colorText="#604635" colorTextHover="#932325" colorTextPush="#817C27" colorTextDisable="#676767"/>
+                <button name="btn_local_next" size="76,31" skin="skin_btn_common" text="@string/next" colorText="#604635" colorTextHover="#932325" colorTextPush="#817C27" colorTextDisable="#676767"/>
+            </page>
+        </tabctrl>
+        <img name="img_dest_box" skin="skin_dest_box" size="37,35" ownerLayout="anchor" pos="0,0,10" offset="-0.5,-0.5" layer="11"/>
+    </widgets>
+    <anchors>
+        <!-- 0号用户头像位置 (bottom)-->
+        <avatar_bottom pos="10,10,11" offsetX="0" offsetY="0"/>
+        <!-- 1号用户头像位置(right) -->
+        <avatar_right pos="10,-10,12" offsetX="0" offsetY="-1"/>
+        <!-- 2号用户头像位置(top) -->
+        <avatar_top pos="-10,-10,13" offsetX="-1" offsetY="-1"/>
+        <!-- 3号用户头像位置(left) -->
+        <avatar_left pos="-10,10,14" offsetX="-1" offsetY="0"/>
+
+        <!-- 时钟位置 -->
+        <!-- 0号用户clock位置(bottom) -->
+        <clock_bottom pos="10,180,11" offsetX="0" offsetY="-0.5"/>
+        <!-- 1号用户clock位置(right) -->
+        <clock_right pos="150,-10,12" offsetX="1" offsetY="-1"/>
+        <!-- 2号用户clock位置(top) -->
+        <clock_top pos="-10,-180,13" offsetX="-1" offsetY="-0.5"/>
+        <!-- 3号用户clock位置(left) -->
+        <clock_left pos="-150,10,14" offsetX="-1" offsetY="-0"/>
+    </anchors>
+    <anims>
+        <anim name="clock_alarm" src="file:anim/clock_alarm.xml"/>
+        <anim name="sel_piece" src="file:anim/sel_piece.xml"/>
+    </anims>
+    <sounds>
+        <!--音效, processes分为男女声音，weight可以控制播放频率-->
+        <effects>
+            <file name="进入游戏" src="Sound/effect/ty_进入游戏-01.wav"/>
+            <file name="退出游戏" src="Sound/effect/ty_退出游戏-01.wav"/>
+            <file name="倒计时" src="Sound/effect/ty_倒计时-02.wav"/>
+            <file name="焰火" src="Sound/effect/ty_焰火-02.wav"/>
+
+            <file name="出征" src="Sound/effect/Begin.wav"/>
+            <file name="开始游戏" src="Sound/effect/start.wav"/>
+            <file name="走子" src="Sound/effect/move.wav"/>
+            <file name="吃子" src="Sound/effect/eat.wav"/>
+            <file name="被吃" src="Sound/effect/killed.wav"/>
+            <file name="进兵营" src="Sound/effect/barback.wav"/>
+            <file name="BOMB" src="Sound/effect/bomb.wav"/>
+            <file name="亮军棋" src="Sound/effect/showflag.wav"/>
+
+        </effects>
+    </sounds>
+</theme>

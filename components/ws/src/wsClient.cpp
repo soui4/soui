@@ -1,4 +1,4 @@
-#include "wsClient.h"
+﻿#include "wsClient.h"
 #include <vector>
 #include "Connection.h"
 #include <sstream>
@@ -11,6 +11,7 @@ WsClient::WsClient(IConnListener *pGroup)
     , m_connected(false)
     , m_context(nullptr)
     , m_wsi(nullptr)
+    , m_bBlockReceive(FALSE)
 {
 
 }
@@ -190,6 +191,14 @@ int WsClient::handler(lws_callback_reasons reasons, void *user, const void *data
         return -1;
     }
     lwsl_info("%s,reaon=%d\n", __func__, reasons);
+    // 处理缓存中的接收数据，仅在未阻止接收时处理
+    while (!m_bBlockReceive && !m_receivingBuf.empty() && m_pListener)
+    {
+        std::shared_ptr<MsgData> it = m_receivingBuf.front();
+        m_receivingBuf.pop_front();
+        lock_guard_rev rev(m_mutex);
+        m_pListener->onDataRecv(it->buf.c_str(), it->buf.length(), it->bBinary);
+    }
     switch (reasons)
     {
     case LWS_CALLBACK_CLIENT_ESTABLISHED:
@@ -216,8 +225,13 @@ int WsClient::handler(lws_callback_reasons reasons, void *user, const void *data
         {
             if (m_pListener)
             {
-                lock_guard_rev rev(m_mutex);
-                m_pListener->onDataRecv(m_receiveStream.str().c_str(), m_receiveStream.str().length(), isBinary);
+                if(m_bBlockReceive || !m_receivingBuf.empty()){
+                    std::shared_ptr<MsgData> msgData = std::make_shared<MsgData>(m_receiveStream.str(), isBinary, -1);
+                    m_receivingBuf.push_back(msgData);
+                }else{
+                    lock_guard_rev rev(m_mutex);
+                    m_pListener->onDataRecv(m_receiveStream.str().c_str(), m_receiveStream.str().length(), isBinary);
+                }
             }
             m_receiveStream.str(std::string());
         }
@@ -289,6 +303,22 @@ int WsClient::cb_lws(lws *websocket, lws_callback_reasons reasons, void *user, v
 void WsClient::disconnect()
 {
     quit();
+}
+
+void WsClient::blockReceive(BOOL bBlock)
+{
+    BOOL bEmpty = FALSE;
+    {
+        std::lock_guard<std::mutex> lockGuard(m_mutex);
+        m_bBlockReceive = bBlock;
+        bEmpty = m_receivingBuf.empty();
+    }
+    // 解除阻塞时，如果缓冲中有消息，触发handler来处理
+    if (!bBlock && !bEmpty)
+    {
+        lws_callback_on_writable(m_wsi);
+        lws_cancel_service(m_context);
+    }
 }
 
 SNSEND

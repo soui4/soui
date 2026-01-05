@@ -62,6 +62,7 @@ class SOUI_EXP SPropertyValuesHolder : public TObjRefImpl<IPropertyValuesHolder>
     STDMETHOD_(void, GetStartValue)(CTHIS_ void *pValue) SCONST OVERRIDE;
     STDMETHOD_(void, GetEndValue)(CTHIS_ void *pValue) SCONST OVERRIDE;
     STDMETHOD_(float, Fraction2Index)(CTHIS_ float fraction, int idx[2]) SCONST OVERRIDE;
+    STDMETHOD_(int, Fraction2FrameIndex)(CTHIS_ float fraction) SCONST OVERRIDE;
     STDMETHOD_(BOOL, GetValueByIndex)(CTHIS_ int index, void *pValue, int valueSize) SCONST OVERRIDE;
     STDMETHOD_(int, GetKeyframeCount)(CTHIS) SCONST OVERRIDE
     {

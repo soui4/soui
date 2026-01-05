@@ -1,0 +1,7 @@
+add_subdirectory(algorithm)
+add_subdirectory(server)
+add_subdirectory(client)
+set(SOUI_ENABLE_GAME_TEST ON)
+if(SOUI_ENABLE_GAME_TEST)
+add_subdirectory(test)
+endif()

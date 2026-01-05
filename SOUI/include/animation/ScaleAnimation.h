@@ -75,10 +75,13 @@ class SOUI_EXP SScaleAnimation : public SAnimation {
     STDMETHOD_(void, initialize)
     (THIS_ int width, int height, int parentWidth, int parentHeight, int nScale) OVERRIDE;
 
+public:
     /**
      * @brief Attributes for SScaleAnimation
      */
     SOUI_ATTRS_BEGIN()
+        ATTR_FLOAT(L"fromScale", mFromX=mFromY, FALSE)
+        ATTR_FLOAT(L"toScale", mToX=mToY, FALSE)
         ATTR_FLOAT(L"fromXScale", mFromX, FALSE) ///< Horizontal scaling factor to apply at the start of the animation.
         ATTR_FLOAT(L"toXScale", mToX, FALSE)     ///< Horizontal scaling factor to apply at the end of the animation.
         ATTR_FLOAT(L"fromYScale", mFromY, FALSE) ///< Vertical scaling factor to apply at the start of the animation.

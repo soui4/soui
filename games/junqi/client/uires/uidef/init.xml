@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UIDEF>
+  <deffont value="face:宋体,size:16"/>
+  <unit defUnit="dp"/>
+
+  <string src="values:string" />
+  <skin src="values:skin"/>
+  <color src="values:color"/>
+  
+  <style>
+    <class name="normalbtn" font="" colorText="#385e8a" colorTextDisable="#91a7c0" textMode="0x25" cursor="hand" margin="5,5,5,5"/>
+    <class name="cls_btn_weblink" cursor="hand" colorText="#1e78d5" colorTextHover="#1e78d5" font="italic:1" fontHover="underline:1,italic:1" />
+    <class name="cls_edit_border" ncSkin="_skin.sys.border" margin="2,2,2,2"/>
+    <class name="cls_edit_norborder" font="size:12,face:微软雅黑" colorText="#000000" colorTextInactive="#808080" ncMargin="3,3,3,3"/>
+  </style>
+</UIDEF>

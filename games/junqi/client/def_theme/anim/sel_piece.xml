@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set repeatCount="-1" fillAfter="true">
+    <scale duration="300" startOffset="0" fromScale="1.0" toScale="1.2"  pivotX="50%" pivotY="50%" repeatCount="1" repeatMode="reverse"/>
+    <scale duration="400" startOffset="600" fromScale="1.0" toScale="1.0" pivotX="50%" pivotY="50%"/>
+</set>
+

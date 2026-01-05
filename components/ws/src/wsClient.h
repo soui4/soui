@@ -48,6 +48,7 @@ class WsClient : public TObjRefImpl<IWsClient> {
 
     STDMETHODIMP_(void) disconnect(THIS) OVERRIDE;
 
+    STDMETHOD_(void, blockReceive)(THIS_ BOOL bBlock) OVERRIDE;
   private:
     void quit();
 
@@ -83,6 +84,12 @@ class WsClient : public TObjRefImpl<IWsClient> {
 
     struct MsgData
     {
+        MsgData(const std::string &buf_, bool bBinary_, int msgId_)
+            : buf(buf_)
+            , bBinary(bBinary_)
+            , msgId(msgId_)
+        {
+        }
         std::string buf;
         bool bBinary;
         int msgId;
@@ -90,6 +97,9 @@ class WsClient : public TObjRefImpl<IWsClient> {
     std::list<MsgData> m_sendingBuf;
     int m_msgId;
 
+    std::list<std::shared_ptr<MsgData> > m_receivingBuf;
+    BOOL m_bBlockReceive;
+    
     static int cb_lws(lws *websocket, lws_callback_reasons reasons, void *, void *data, std::size_t len);
 };
 

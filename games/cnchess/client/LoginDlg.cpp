@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "LoginDlg.h"
 
-#define kConfigFile _T("cnchess_cfg.xml")
+#define kConfigFile _T("/cnchess_cfg.xml")
 
 CLoginDlg::CLoginDlg() : SHostDialog(_T("LAYOUT:XML_LOGIN"))
 {

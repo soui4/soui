@@ -181,7 +181,9 @@
 #define ATTR_FLOAT(attribname, varname, allredraw)    \
     if (0 == strAttribName.CompareNoCase(attribname)) \
     {                                                 \
-        swscanf_s(strValue, L"%f", &varname);         \
+        float v;                                      \
+        swscanf_s(strValue, L"%f", &v);               \
+        varname = v;                                  \
         hRet = allredraw ? S_OK : S_FALSE;            \
     }                                                 \
     else

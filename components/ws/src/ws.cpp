@@ -30,8 +30,6 @@ static void lws_log_emit(int level, const char *line)
     }
     if(g_logCallback){
         g_logCallback(soui_level,line);
-    }else{
-        SLOG(kLogTag,soui_level) << line;
     }
 }
 

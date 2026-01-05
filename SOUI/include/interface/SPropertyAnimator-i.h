@@ -156,6 +156,14 @@ DECLARE_INTERFACE_(IPropertyValuesHolder, IObjRef)
      * @return 分段内动画进度（0.0-1.0）
      */
     STDMETHOD_(float, Fraction2Index)(CTHIS_ float fraction, int idx[2]) SCONST PURE;
+    
+    /**
+     * @brief 将动画进度转换为帧索引
+     * @param fraction 动画进度(0.0-1.0)
+     * @return 帧索引
+     */
+    STDMETHOD_(int, Fraction2FrameIndex)(CTHIS_ float fraction) SCONST PURE;
+
 
     /**
      * @brief 通过索引获取值

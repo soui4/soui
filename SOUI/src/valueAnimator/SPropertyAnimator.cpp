@@ -290,6 +290,16 @@ float SPropertyValuesHolder::Fraction2Index(float fraction, int idx[2]) const
     }
 }
 
+int SPropertyValuesHolder::Fraction2FrameIndex(float fraction) const
+{
+    int idx[2];
+    Fraction2Index(fraction, idx);
+    if(fraction >= 1.0f)
+        return idx[1];
+    else
+        return idx[0];
+}
+
 BOOL SPropertyValuesHolder::SetKeyFrameWeights(const float *weights, int count)
 {
     // 权重数量应该是关键帧数减1，因为权重表示的是帧之间的段

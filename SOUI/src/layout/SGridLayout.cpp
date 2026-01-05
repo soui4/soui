@@ -271,7 +271,7 @@ SIZE SGridLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeigh
     {
         const SGridLayoutParam *pLayoutParam = (const SGridLayoutParam *)pCell->GetLayoutParam();
         SASSERT(pLayoutParam);
-        //将当前网络所占用的空间位置清0
+        // 将当前网络所占用的空间位置清0
         int colSpan = pLayoutParam->nColSpan;
         int rowSpan = pLayoutParam->nRowSpan;
 
@@ -279,8 +279,8 @@ SIZE SGridLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeigh
         rowSpan = smin(rowSpan, nRows - iRow);
         SASSERT(colSpan >= 1);
         SASSERT(rowSpan >= 1);
-        SASSERT(pCellsOccupy[iRow * nCols + iCol] == false); //保证至少有一个空间可用
-        //计算可占用空间
+        SASSERT(pCellsOccupy[iRow * nCols + iCol] == false); // 保证至少有一个空间可用
+        // 计算可占用空间
         for (int y = 0; y < rowSpan; y++)
             for (int x = 0; x < colSpan; x++)
             {
@@ -294,10 +294,10 @@ SIZE SGridLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeigh
                 }
             }
 
-        //计算出网络大小
+        // 计算出网络大小
         CSize szCell;
         ((IWindow *)pCell)->GetDesiredSize(&szCell, SIZE_WRAP_CONTENT, SIZE_WRAP_CONTENT);
-        //填充网格,把大小平均分散到网格中。
+        // 填充网格,把大小平均分散到网格中。
         szCell.cx /= colSpan;
         szCell.cy /= rowSpan;
         for (int y = 0; y < rowSpan; y++)
@@ -308,7 +308,7 @@ SIZE SGridLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeigh
                 pCellsSize[iCell] = szCell;
             }
 
-        //计算下一个网络的排列位置(先在当前行查找，再到下面行从0开始查找)
+        // 计算下一个网络的排列位置(先在当前行查找，再到下面行从0开始查找)
         bool bFind = false;
         for (int x = iCol + 1; x < nCols; x++)
         {
@@ -336,7 +336,7 @@ SIZE SGridLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeigh
     }
 
     CSize szRet;
-    //计算列宽
+    // 计算列宽
     for (int x = 0; x < nCols; x++)
     {
         int maxWid = 0;
@@ -347,7 +347,7 @@ SIZE SGridLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeigh
         }
         szRet.cx += maxWid;
     }
-    //计算列高
+    // 计算列高
     for (int y = 0; y < nRows; y++)
     {
         int maxHei = 0;
@@ -375,6 +375,10 @@ SIZE SGridLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeigh
 
 void SGridLayout::LayoutChildren(IWindow *pParent)
 {
+    struct CFloatSize
+    {
+        float cx, cy;
+    };
     if (m_nCols == -1 && m_nRows == -1)
         return;
 
@@ -390,9 +394,9 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
     CRect rcParent;
     pParent->GetChildrenLayoutRect(&rcParent);
 
-    //先计算出每个格子的大小,算法和MeasureChildren一样，后面再考虑如何优化
+    // 先计算出每个格子的大小,算法和MeasureChildren一样，后面再考虑如何优化
     int cells = nCols * nRows;
-    CSize *pCellsSize = new CSize[cells];
+    CFloatSize *pCellsSize = new CFloatSize[cells];
     bool *pCellsOccupy = new bool[cells];
     float *pCellsColWeight = new float[cells];
     float *pCellsRowWeight = new float[cells];
@@ -414,7 +418,7 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
         pCellsChild[iRow * nCols + iCol] = pCell;
         SGridLayoutParam *pLayoutParam = (SGridLayoutParam *)pCell->GetLayoutParam();
         SASSERT(pLayoutParam);
-        //将当前网络所占用的空间位置清0
+        // 将当前网络所占用的空间位置清0
         int colSpan = pLayoutParam->nColSpan;
         int rowSpan = pLayoutParam->nRowSpan;
 
@@ -422,8 +426,8 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
         rowSpan = smin(rowSpan, nRows - iRow);
         SASSERT(colSpan >= 1);
         SASSERT(rowSpan >= 1);
-        SASSERT(pCellsOccupy[iRow * nCols + iCol] == false); //保证至少有一个空间可用
-        //计算可占用空间
+        SASSERT(pCellsOccupy[iRow * nCols + iCol] == false); // 保证至少有一个空间可用
+        // 计算可占用空间
         for (int y = 0; y < rowSpan; y++)
             for (int x = 0; x < colSpan; x++)
             {
@@ -437,12 +441,12 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
                 }
             }
 
-        //计算出网络大小,强制使用-1,-1代表自适应大小
+        // 计算出网络大小,强制使用-1,-1代表自适应大小
         CSize szCell;
         pCell->GetDesiredSize(&szCell, SIZE_WRAP_CONTENT, SIZE_WRAP_CONTENT);
-        //填充网格,把大小平均分散到网格中。
-        szCell.cx /= colSpan;
-        szCell.cy /= rowSpan;
+        // 填充网格,把大小平均分散到网格中。
+        float fCx = (float)szCell.cx / colSpan;
+        float fCy = (float)szCell.cy / rowSpan;
 
         float colWeight = pLayoutParam->fColWeight / colSpan;
         float rowWeight = pLayoutParam->fRowWeight / rowSpan;
@@ -451,7 +455,8 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
             {
                 int iCell = (iRow + y) * nCols + iCol + x;
                 pCellsOccupy[iCell] = true;
-                pCellsSize[iCell] = szCell;
+                pCellsSize[iCell].cx = fCx;
+                pCellsSize[iCell].cy = fCy;
                 pCellsColWeight[iCell] = colWeight;
                 pCellsRowWeight[iCell] = rowWeight;
                 pCellsSpan[iCell].x = 0;
@@ -461,7 +466,7 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
             }
         pCellsSpan[iRow * nCols + iCol] = CPoint(colSpan, rowSpan);
 
-        //计算下一个网络的排列位置(先在当前行查找，再到下面行从0开始查找)
+        // 计算下一个网络的排列位置(先在当前行查找，再到下面行从0开始查找)
         bool bFind = false;
         for (int x = iCol + 1; x < nCols; x++)
         {
@@ -488,14 +493,14 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
         pCell = pParent->GetNextLayoutIChild(pCell);
     }
 
-    int *pCellsWidth = new int[nCols];
+    float *pCellsWidth = new float[nCols];
     int nTotalWidth = 0;
     float *pColsWeight = new float[nCols];
     float totalColsWeight = 0.0f;
-    //计算列宽及相应的weight
+    // 计算列宽及相应的weight
     for (int x = 0; x < nCols; x++)
     {
-        int maxWid = 0;
+        float maxWid = 0;
         float maxWeight = 0.0f;
         for (int y = 0; y < nRows; y++)
         {
@@ -510,14 +515,14 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
         pColsWeight[x] = maxWeight;
         totalColsWeight += maxWeight;
     }
-    //计算列高
-    int *pCellsHeight = new int[nRows];
+    // 计算列高
+    float *pCellsHeight = new float[nRows];
     int nTotalHeight = 0;
     float *pRowsWeight = new float[nRows];
     float totalRowsWeight = 0.0f;
     for (int y = 0; y < nRows; y++)
     {
-        int maxHei = 0;
+        float maxHei = 0;
         float maxWeight = 0.0f;
         for (int x = 0; x < nCols; x++)
         {
@@ -542,7 +547,7 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
 
     int xInter = m_xInterval.toPixelSize(pParent->GetScale());
     int yInter = m_yInterval.toPixelSize(pParent->GetScale());
-    //分配weight
+    // 分配weight
     if (totalColsWeight > 0.0f)
     {
         int netParentWid = rcParent.Width() - (nCols - 1) * (xInter > 0 ? xInter : 0);
@@ -550,7 +555,7 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
         {
             int nRemain = netParentWid - nTotalWidth;
             for (int i = 0; i < nCols; i++)
-            { //采用逐行4舍5入的方式解决不能整除的问题.
+            { // 采用逐行4舍5入的方式解决不能整除的问题.
                 if (SLayoutSize::fequal(totalColsWeight, 0.0f))
                     break;
                 int extra = int(nRemain * pColsWeight[i] / totalColsWeight + 0.5f);
@@ -580,7 +585,7 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
         {
             int nRemain = netParentHei - nTotalHeight;
             for (int i = 0; i < nRows; i++)
-            { //采用逐行4舍5入的方式解决不能整除的问题.
+            { // 采用逐行4舍5入的方式解决不能整除的问题.
                 if (SLayoutSize::fequal(totalRowsWeight, 0.0f))
                     break;
                 int extra = int(nRemain * pRowsWeight[i] / totalRowsWeight + 0.5f);
@@ -607,7 +612,7 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
     delete[] pColsWeight;
     delete[] pRowsWeight;
 
-    //计算子窗口位置
+    // 计算子窗口位置
     CPoint pt = rcParent.TopLeft();
     for (int y = 0; y < nRows; y++)
     {
@@ -633,9 +638,9 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
             szCell.cx += xInter * (pCellsSpan[iCell].x - 1);
             szCell.cy += yInter * (pCellsSpan[iCell].y - 1);
 
-            CSize szDesired = pCellsSize[iCell];
-            szDesired.cx *= pCellsSpan[iCell].x;
-            szDesired.cy *= pCellsSpan[iCell].y;
+            CSize szDesired;
+            szDesired.cx = pCellsSize[iCell].cx * pCellsSpan[iCell].x;
+            szDesired.cy = pCellsSize[iCell].cy * pCellsSpan[iCell].y;
 
             CPoint pt2 = pt;
             GridGravity gx = pLayoutParam->layoutGravityX;

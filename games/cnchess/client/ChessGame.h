@@ -316,7 +316,7 @@ private:
     int m_iSelfIndex;                   ///< 自己的座位号
     BOOL m_bReady[PLAYER_COUNT];        ///< 玩家准备状态
     enum RoundResult{                   ///< 本局结果，用于显示动画，不参与结算
-        RESULT_NEUTRAL = 0,             ///< 平局结果
+        RESULT_DRAW = 0,                ///< 平局结果
         RESULT_WIN = 1,                 ///< 获胜
         RESULT_LOSE = 2,                ///< 失败
     };

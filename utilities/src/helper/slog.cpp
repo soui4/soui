@@ -55,7 +55,7 @@ SLog::~SLog()
 #else
         int nLen = _snprintf(logbuf2, kMaxLog, "tid=%u,%04d-%02d-%02d %02d:%02d:%02d %03dms %s,%s %s %s:%d\n", tid, wtm.wYear, wtm.wMonth, wtm.wDay, wtm.wHour, wtm.wMinute, wtm.wSecond, wtm.wMilliseconds, m_tag, m_logBuf, m_func, m_file, m_line);
 #endif //_WIN32
-        if (nLen > 0 && 0)
+        if (nLen > 0)
         {
             logbuf2[nLen] = 0;
             if (IsConsoleProgram())

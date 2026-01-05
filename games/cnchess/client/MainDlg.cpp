@@ -155,14 +155,14 @@ void CMainDlg::OnBtnMute()
 {
     FindChildByName(L"btn_mute")->SetVisible(FALSE);
     FindChildByName(L"btn_unmute")->SetVisible(TRUE);
-    m_bMute = TRUE;
+    m_bMute = FALSE;
 }
 
 void CMainDlg::OnBtnUnmute()
 {
     FindChildByName(L"btn_mute")->SetVisible(TRUE);
     FindChildByName(L"btn_unmute")->SetVisible(FALSE);
-    m_bMute = FALSE;
+    m_bMute = TRUE;
 }
 
 void CMainDlg::PlayWave(LPCTSTR pszSound)
