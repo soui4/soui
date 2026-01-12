@@ -13,6 +13,6 @@
   <new_round value="再来一局" />
   <save value="保存" />
   <load value="载入" />
-  <prev value="上一局" />
-  <next value="下一局" />
+  <prev value="上一步" />
+  <next value="下一步" />
 </string>
