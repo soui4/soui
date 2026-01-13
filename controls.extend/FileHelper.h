@@ -83,6 +83,7 @@ class CFileDialogEx {
         m_ofn.lpstrFile = m_szFileName;
         m_ofn.nMaxFile = _MAX_PATH;
         m_ofn.lpstrDefExt = lpszDefExt;
+        m_ofn.lpstrTitle = m_szFileTitle;
         m_ofn.lpstrFileTitle = (LPTSTR)m_szFileTitle;
         m_ofn.nMaxFileTitle = _MAX_FNAME;
         m_ofn.Flags = dwFlags | OFN_EXPLORER | OFN_ENABLEHOOK | OFN_ENABLESIZING | OFN_NOCHANGEDIR;

@@ -75,7 +75,7 @@ CJunqiGame::CJunqiGame(CMainDlg* pMainDlg, SGameTheme* pTheme)
     ,m_bReplay(FALSE)
     ,m_bEnableAnimation(TRUE)
 {
-    memset(m_pUserInfo, 0, sizeof(m_pUserInfo));
+    memset(m_userInfo, 0, sizeof(m_userInfo));
     
      // 初始化准备状态
     for(int i = 0; i < PLAYER_COUNT; i++)
@@ -578,7 +578,7 @@ void CJunqiGame::OnBtnSave()
 
 void CJunqiGame::OnBtnLoad()
 {
-    CFileDialogEx dlg(TRUE, _T("sjq"), _T("*.sjq"), OFN_HIDEREADONLY, _T("Junqi Files (*.sjq)|*.sjq|All Files (*.*)|*.*||"), 0);
+    CFileDialogEx dlg(TRUE, _T("sjq"), _T("qj.sjq"), OFN_HIDEREADONLY, _T("Junqi Files (*.sjq)\0*.sjq\0All Files (*.*)\0*.*\0\0"), 0);
     if(dlg.DoModal(m_pMainDlg->m_hWnd) == IDOK){
         SLOGI() << "Load from " << dlg.m_szFileName;
 
@@ -633,8 +633,9 @@ void CJunqiGame::InitReplay()
     {
         for(int i = 0; i < PLAYER_COUNT; i++)
         {
-            SWindow *pAvatar = m_pGameBoard->FindChildByID(ID_AVATAR_BASE + i);
-            pAvatar->FindChildByName(L"txt_name")->SetWindowText(S_CA2T(m_userInfo[i].szName, CP_UTF8));
+            int iSeat = Index2Seat(i);
+            SWindow *pAvatar = m_pGameBoard->FindChildByID(ID_AVATAR_BASE + iSeat);
+            pAvatar->FindChildByName(L"txt_name")->SetWindowText(S_CA2T(m_userInfo[iSeat].szName, CP_UTF8));
         }
     }
     {
@@ -660,34 +661,9 @@ void CJunqiGame::InitReplay()
     }
     
     // 初始化棋子从初始布局
+    for(int i = 0; i < PLAYER_COUNT; i++)
     {
-        SXmlNode xmlPiece = m_pTheme->GetTemplate(Template::kPiece);
-        // 根据加载的初始布局初始化其他玩家
-        for(int iSeat = 0; iSeat < PLAYER_COUNT; iSeat++){
-            m_layout.InitLayout(iSeat, m_byInitLayouts[iSeat]);
-        }
-        
-        // 创建所有棋子窗口
-        for(int iSeat = 0; iSeat < PLAYER_COUNT; iSeat++){
-            const SOUI::SList<CHESSMAN> * pTroopList = m_layout.GetTroopList(iSeat);
-            for(SOUI::SPOSITION it = pTroopList->GetHeadPosition(); it ; )
-            {
-                CHESSMAN  cm = pTroopList->GetNext(it);
-                CJunqiPiece *pPiece = (CJunqiPiece *)SApplication::getSingletonPtr()->CreateWindowByName(xmlPiece.attribute(L"wndclass").as_string());
-                pPiece->InitFromXml(&xmlPiece);
-                SAnchorLayoutParam *pParam = (SAnchorLayoutParam *)pPiece->GetLayoutParam();
-                pParam->pos.type = 10;
-                pParam->pos.x.fSize = cm.ptCell.x;
-                pParam->pos.y.fSize = cm.ptCell.y;
-                pPiece->SetColor(iSeat);
-                pPiece->SetChessman(cm.nOffRank);
-                pPiece->SetPos(cm.ptCell);
-                pPiece->SetID(ID_CHESS_BASE + iSeat * 100 + cm.nID);
-                float fRotate = pPiece->CalcRotate(cm.ptCell, m_iSelfIndex);
-                pPiece->SetRotate(fRotate);
-                m_pGameBoard->InsertChild(pPiece);
-            }
-        }
+        InitLayout(m_byInitLayouts[i], i);
     }
     
     OnStageChanged(STAGE_PLAYING);
@@ -705,7 +681,7 @@ void CJunqiGame::StepForward()
     const LPBYTE pMsg = data ? data->data() : NULL;
     DWORD dwLen = data ? data->size() : 0;
     
-    ProcessHistoryMessage(dwType, pMsg, dwLen, TRUE);
+    ProcessHistoryMessage(dwType, pMsg, dwLen);
     
     m_nHistoryIndex++;
     m_itCurrentHistory++;
@@ -751,7 +727,7 @@ void CJunqiGame::FastReplayToStep(int nTargetStep)
         const LPBYTE pMsg = data ? data->data() : NULL;
         DWORD dwLen = data ? data->size() : 0;
         
-        ProcessHistoryMessage(dwType, pMsg, dwLen, TRUE);
+        ProcessHistoryMessage(dwType, pMsg, dwLen);
         m_itCurrentHistory++;
     }
     m_bEnableAnimation = TRUE;
@@ -760,7 +736,7 @@ void CJunqiGame::FastReplayToStep(int nTargetStep)
     m_nHistoryIndex = nTargetStep;
 }
 
-void CJunqiGame::ProcessHistoryMessage(DWORD dwType, const void *pData, int nSize, BOOL bReplay)
+void CJunqiGame::ProcessHistoryMessage(DWORD dwType, const void *pData, int nSize)
 {
     const LPBYTE pMsg = (const LPBYTE)pData;
     DWORD dwLen = nSize;
@@ -1181,17 +1157,11 @@ void CJunqiGame::OnSeatDownAck(const void *lpData, int nSize){
         }
     }
 }
-void CJunqiGame::OnStartFight(const void *pData, int nSize)
-{
-    SLOGI() << "Start fight";
-    if(nSize < sizeof(MSGSTARTFIGHT))
-        return;
-    MSGSTARTFIGHT *pStart = (MSGSTARTFIGHT *)pData;
-    if(pStart->iIndex == m_iSelfIndex)
-        return;
-    int iSeat = Index2Seat(pStart->iIndex);
+
+void CJunqiGame::InitLayout(BYTE byLayout[13], int idx){
+    int iSeat = Index2Seat(idx);
     m_bReady[iSeat] = TRUE;
-    m_layout.InitLayout(iSeat, pStart->byLayout);
+    m_layout.InitLayout(iSeat, byLayout);
     const SOUI::SList<CHESSMAN> * pTroopList = m_layout.GetTroopList(iSeat);
     SXmlNode xmlPiece = m_pTheme->GetTemplate(Template::kPiece);
     for(SOUI::SPOSITION it = pTroopList->GetHeadPosition(); it ; )
@@ -1203,7 +1173,7 @@ void CJunqiGame::OnStartFight(const void *pData, int nSize)
         pParam->pos.type = 10;
         pParam->pos.x.fSize = cm.ptCell.x;
         pParam->pos.y.fSize = cm.ptCell.y;
-        pPiece->SetColor(pStart->iIndex);
+        pPiece->SetColor(idx);
         pPiece->SetChessman(cm.nOffRank);
         pPiece->SetPos(cm.ptCell);
         pPiece->SetID(ID_CHESS_BASE + iSeat * 100 + cm.nID);
@@ -1212,6 +1182,17 @@ void CJunqiGame::OnStartFight(const void *pData, int nSize)
         m_pGameBoard->InsertChild(pPiece);
     }
     m_pGameBoard->RequestRelayout();
+}
+
+void CJunqiGame::OnStartFight(const void *pData, int nSize)
+{
+    SLOGI() << "Start fight";
+    if(nSize < sizeof(MSGSTARTFIGHT))
+        return;
+    MSGSTARTFIGHT *pStart = (MSGSTARTFIGHT *)pData;
+    if(pStart->iIndex == m_iSelfIndex)
+        return;
+    InitLayout(pStart->byLayout, pStart->iIndex);
 }
 
 void CJunqiGame::OnGameStart(const void *pData, int nSize)

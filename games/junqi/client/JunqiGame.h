@@ -221,6 +221,7 @@ public:
         MSG_WM_TIMER(OnTimer)
     END_MSG_MAP()
 protected:
+    void InitLayout(BYTE byLayout[13], int idx);
     void OnStartFight(const void *pData, int nSize);
 
     /**
@@ -358,7 +359,7 @@ private:
     
     // 复盘相关函数
     void InitReplay();          //初始化复盘
-    void ProcessHistoryMessage(DWORD dwType, const void *pData, int nSize, BOOL bReplay); //处理历史消息（复盘用）
+    void ProcessHistoryMessage(DWORD dwType, const void *pData, int nSize); //处理历史消息（复盘用）
     void StepForward();         //前进一步
     void StepBackward();        //后退一步
     void FastReplayToStep(int nTargetStep);  //快速重放到指定步数（无动画）
