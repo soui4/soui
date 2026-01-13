@@ -50,20 +50,30 @@
         <gifplayer name="sprite_flag_pos_to" skin="ani_flag_pos_to" ownerLayout="anchor" pos="0,1,10" size="90,90" offset="-0.5,-0.5" layer="50" msgTransparent="1" visible="0" />
         <img name="img_flag_pos_from" skin="skin_flag_pos_from" ownerLayout="anchor" pos="0,0,10" size="55,55" offset="-0.5,-0.5" layer="4" msgTransparent="1" visible="0"/>
         <tabctrl name="tab_toolbar" curSel="0" ownerLayout="anchor" pos="0,0,5" offset="-1,-0.5" tabHeight="0" size="100,200" animateSteps="20" layer="100">
-            <page title="start">
-                <button name="btn_start" pos="|0,|0" offset="-0.5,-0.5" size="76,31" skin="skin_btn_common" text="@string/start" colorText="#604635" colorTextHover="#932325" colorTextPush="#817C27" colorTextDisable="#676767"/>
+            <page title="start" layout="vbox" interval="5">
+                <window size="0,0" weight="1"/>
+                <button name="btn_start" size="76,31" skin="skin_btn_common" text="@string/start" colorText="#604635" colorTextHover="#932325" colorTextPush="#817C27" colorTextDisable="#676767"/>
+                <button name="btn_replay" size="76,31" skin="skin_btn_common" text="@string/replay" colorText="#604635" colorTextHover="#932325" colorTextPush="#817C27" colorTextDisable="#676767"/>
+                <window size="0,0" weight="1"/>
             </page>
             <page title="playing" layout="vbox" interval="5">
+                <window size="0,0" weight="1"/>
                 <button name="btn_req_peace" size="76,31" skin="skin_btn_common" text="@string/peace" colorText="#604635" colorTextHover="#932325" colorTextPush="#817C27" colorTextDisable="#676767"/>
                 <button name="btn_req_surrender" size="76,31" skin="skin_btn_common" text="@string/surrender" colorText="#604635" colorTextHover="#932325" colorTextPush="#817C27" colorTextDisable="#676767"/>
                 <button name="btn_req_pass" size="76,31" skin="skin_btn_common" text="@string/pass" colorText="#604635" colorTextHover="#932325" colorTextPush="#817C27" colorTextDisable="#676767"/>
+                <window size="0,0" weight="1"/>
             </page>
-            <page title="local" layout="vbox" interval="5">
+            <page title="gameover" layout="vbox" interval="5">
+                <window size="0,0" weight="1"/>
                 <button name="btn_new_round" size="76,31" skin="skin_btn_common" text="@string/new_round" colorText="#604635" colorTextHover="#932325" colorTextPush="#817C27" colorTextDisable="#676767"/>
-                <button name="btn_local_save" size="76,31" skin="skin_btn_common" text="@string/save" colorText="#604635" colorTextHover="#932325" colorTextPush="#817C27" colorTextDisable="#676767"/>
-                <button name="btn_local_load" size="76,31" skin="skin_btn_common" text="@string/load" colorText="#604635" colorTextHover="#932325" colorTextPush="#817C27" colorTextDisable="#676767"/>
-                <button name="btn_local_prev" size="76,31" skin="skin_btn_common" text="@string/prev" colorText="#604635" colorTextHover="#932325" colorTextPush="#817C27" colorTextDisable="#676767"/>
-                <button name="btn_local_next" size="76,31" skin="skin_btn_common" text="@string/next" colorText="#604635" colorTextHover="#932325" colorTextPush="#817C27" colorTextDisable="#676767"/>
+                <button name="btn_replay" size="76,31" skin="skin_btn_common" text="@string/replay" colorText="#604635" colorTextHover="#932325" colorTextPush="#817C27" colorTextDisable="#676767"/>
+                <window size="0,0" weight="1"/>
+            </page>
+            <page title="replay" layout="vbox" interval="5"> 
+                <button name="btn_save" size="76,31" skin="skin_btn_common" text="@string/save" colorText="#604635" colorTextHover="#932325" colorTextPush="#817C27" colorTextDisable="#676767"/>
+                <button name="btn_load" size="76,31" skin="skin_btn_common" text="@string/load" colorText="#604635" colorTextHover="#932325" colorTextPush="#817C27" colorTextDisable="#676767"/>
+                <button name="btn_prev" size="76,31" skin="skin_btn_common" text="@string/prev" colorText="#604635" colorTextHover="#932325" colorTextPush="#817C27" colorTextDisable="#676767"/>
+                <button name="btn_next" size="76,31" skin="skin_btn_common" text="@string/next" colorText="#604635" colorTextHover="#932325" colorTextPush="#817C27" colorTextDisable="#676767"/>
             </page>
         </tabctrl>
         <img name="img_dest_box" skin="skin_dest_box" size="37,35" ownerLayout="anchor" pos="0,0,10" offset="-0.5,-0.5" layer="11"/>

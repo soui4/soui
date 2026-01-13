@@ -71,6 +71,9 @@ CJunqiGame::CJunqiGame(CMainDlg* pMainDlg, SGameTheme* pTheme)
     ,m_roundResult(RESULT_DRAW)
     ,m_nSelectedChessID(-1)
     ,m_bMoving(FALSE)
+    ,m_nHistoryIndex(0)
+    ,m_bReplay(FALSE)
+    ,m_bEnableAnimation(TRUE)
 {
     memset(m_pUserInfo, 0, sizeof(m_pUserInfo));
     
@@ -81,6 +84,7 @@ CJunqiGame::CJunqiGame(CMainDlg* pMainDlg, SGameTheme* pTheme)
     }
     
     memset(m_dwProps, 0, sizeof(m_dwProps));
+    m_itCurrentHistory = m_lstHistory.end();
 }
 
 /**
@@ -242,7 +246,8 @@ void CJunqiGame::onAnimationUpdate(IValueAnimator *pAnimator)
 
                 pos = pos2;
             }
-            PlayEffectSound(Sounds::Effects::kMove);
+            if(index < pHolder->GetKeyframeCount()-1)
+                PlayEffectSound(Sounds::Effects::kMove);
         }
     }
 }
@@ -329,6 +334,7 @@ BOOL CJunqiGame::DoMovePiece(POINT ptFrom, POINT ptTarget,BOOL bSapper, int nRes
     pPiece->SetMoveResult(nResult);
     pPiece->SetLayer(SGameTheme::LAYER_PIESE+1);
     SLOGI() << "move piece to: " << ptTarget.x << "," << ptTarget.y;
+
     POINT pt = pPiece->GetPos();
     std::vector<POINT> lstCell;
     m_layout.GetMoveCMPath(bSapper, pt, ptTarget, &lstCell);
@@ -370,6 +376,9 @@ BOOL CJunqiGame::DoMovePiece(POINT ptFrom, POINT ptTarget,BOOL bSapper, int nRes
     pAnimator->addListener(this);
     pAnimator->addUpdateListener(this);
     pAnimator->SetUserData((void *)(UINT_PTR)0);
+    if(!m_bEnableAnimation){
+        pAnimator->end();
+    }
     return TRUE;
 }
 
@@ -461,6 +470,7 @@ void CJunqiGame::OnBtnStart()
         return;
     }
     m_lstHistory.clear();
+    m_bReplay = FALSE;
     DeselectPiece();
     MSGSTARTFIGHT msg;
     msg.iIndex = m_iSelfIndex;
@@ -510,17 +520,30 @@ void CJunqiGame::OnBtnNewRound()
     OnStageChanged(STAGE_CONTINUE);
 }
 
+void CJunqiGame::OnBtnReplay()
+{
+    STabCtrl *pToolBar = (STabCtrl*)m_pTheme->GetWidget(Widgets::ktab_toolbar);
+    pToolBar->SetCurSel(3);
+    InitReplay();
+}
+
 void CJunqiGame::OnBtnPrev()
-{ 
+{
+    if(!m_bReplay)
+        return;
+    StepBackward();
 }
 
 void CJunqiGame::OnBtnNext()
 { 
+    if(!m_bReplay)
+        return;
+    StepForward();
 }
 
 void CJunqiGame::OnBtnSave()
 {
-    CFileDialogEx dlg(TRUE, _T("sjq"), _T("*.sjq"), OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, _T("Junqi Files (*.sjq)|*.sjq|All Files (*.*)|*.*||"), 0);
+    CFileDialogEx dlg(FALSE, _T("sjq"), _T("*.sjq"), OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, _T("Junqi Files (*.sjq)|*.sjq|All Files (*.*)|*.*||"), 0);
     if(dlg.DoModal(m_pMainDlg->m_hWnd) == IDOK){
         SLOGI() << "Save to " << dlg.m_szFileName;
         FILE *fp = _tfopen(dlg.m_szFileName, _T("wb"));
@@ -531,7 +554,7 @@ void CJunqiGame::OnBtnSave()
             //write user info
             for (int i = 0; i < PLAYER_COUNT; i++)
             {
-                fwrite(m_pUserInfo[i].get(), sizeof(GS_USERINFO), 1, fp);
+                fwrite(&m_userInfo[i], sizeof(GS_USERINFO), 1, fp);
             }
             fwrite(m_dwProps, sizeof(m_dwProps), 1, fp);
             //write init layout
@@ -543,7 +566,10 @@ void CJunqiGame::OnBtnSave()
             fwrite(&nCount, sizeof(nCount), 1, fp);
             for (auto it = m_lstHistory.begin(); it != m_lstHistory.end(); it++)
             {
-                fwrite(&(*it), sizeof(MSG_MOVE), 1, fp);
+                fwrite(&it->first, sizeof(it->first), 1, fp);
+                int nSize = it->second->size();
+                fwrite(&nSize, sizeof(nSize), 1, fp);
+                fwrite(it->second->data(), nSize, 1, fp);
             }
             fclose(fp);
         }
@@ -552,7 +578,7 @@ void CJunqiGame::OnBtnSave()
 
 void CJunqiGame::OnBtnLoad()
 {
-    CFileDialogEx dlg(FALSE, _T("sjq"), _T("*.sjq"), OFN_HIDEREADONLY, _T("Junqi Files (*.sjq)|*.sjq|All Files (*.*)|*.*||"), 0);
+    CFileDialogEx dlg(TRUE, _T("sjq"), _T("*.sjq"), OFN_HIDEREADONLY, _T("Junqi Files (*.sjq)|*.sjq|All Files (*.*)|*.*||"), 0);
     if(dlg.DoModal(m_pMainDlg->m_hWnd) == IDOK){
         SLOGI() << "Load from " << dlg.m_szFileName;
 
@@ -566,11 +592,11 @@ void CJunqiGame::OnBtnLoad()
                 SLOGW() << "File version mismatch";
                 return;
             }
+            m_lstHistory.clear();
             //read user info
             for (int i = 0; i < PLAYER_COUNT; i++)
             {
-                m_pUserInfo[i] = std::make_shared<GS_USERINFO>();
-                fread(m_pUserInfo[i].get(), sizeof(GS_USERINFO), 1, fp);
+                fread(&m_userInfo[i], sizeof(GS_USERINFO), 1, fp);
             }
             fread(m_dwProps, sizeof(m_dwProps), 1, fp);
             //read init layout
@@ -582,17 +608,187 @@ void CJunqiGame::OnBtnLoad()
             fread(&nHistoryCount, sizeof(nHistoryCount), 1, fp);
             for (int i = 0; i < nHistoryCount; i++)
             {
-                MSG_MOVE msg;
-                fread(&msg, sizeof(MSG_MOVE), 1, fp);
-                m_lstHistory.push_back(msg);
+                DWORD dwType;
+                fread(&dwType, sizeof(dwType), 1, fp);
+                int nSize;
+                fread(&nSize, sizeof(nSize), 1, fp);
+                std::shared_ptr<std::vector<BYTE> > data(new std::vector<BYTE>(nSize));
+                fread(data->data(), nSize, 1, fp);
+                m_lstHistory.push_back(std::make_pair(dwType, data));
             }
             fclose(fp);
+            InitReplay();
         }
+    }
+}
+
+void CJunqiGame::InitReplay()
+{
+    SLOGI() << "InitReplay: start replay mode";
+    m_bReplay = TRUE;
+    m_nHistoryIndex = 0;
+    m_itCurrentHistory = m_lstHistory.begin();
+    
+    // 设置用户信息
+    {
+        for(int i = 0; i < PLAYER_COUNT; i++)
+        {
+            SWindow *pAvatar = m_pGameBoard->FindChildByID(ID_AVATAR_BASE + i);
+            pAvatar->FindChildByName(L"txt_name")->SetWindowText(S_CA2T(m_userInfo[i].szName, CP_UTF8));
+        }
+    }
+    {
+        IWindow *pVectory = m_pGameBoard->FindChildByName(Widgets::kVectory);
+        if(pVectory){
+            m_pGameBoard->RemoveIChild(pVectory);
+            pVectory->Release();
+        }
+    }
+    // 清空棋盘
+    {
+        for(int i=0;i<PLAYER_COUNT;i++){
+            for(int j=0;j<25;j++){
+                SWindow *pPiece = m_pGameBoard->FindChildByID(ID_CHESS_BASE + i*100 + j);
+                if(pPiece){
+                    pPiece->Destroy();
+                }
+            }
+            m_layout.ClearLayout(i);
+        }
+        ClearMovePath();
+        m_pGameBoard->FindChildByName(Widgets::kimg_dest_box)->SetVisible(FALSE, TRUE);
+    }
+    
+    // 初始化棋子从初始布局
+    {
+        SXmlNode xmlPiece = m_pTheme->GetTemplate(Template::kPiece);
+        // 根据加载的初始布局初始化其他玩家
+        for(int iSeat = 0; iSeat < PLAYER_COUNT; iSeat++){
+            m_layout.InitLayout(iSeat, m_byInitLayouts[iSeat]);
+        }
+        
+        // 创建所有棋子窗口
+        for(int iSeat = 0; iSeat < PLAYER_COUNT; iSeat++){
+            const SOUI::SList<CHESSMAN> * pTroopList = m_layout.GetTroopList(iSeat);
+            for(SOUI::SPOSITION it = pTroopList->GetHeadPosition(); it ; )
+            {
+                CHESSMAN  cm = pTroopList->GetNext(it);
+                CJunqiPiece *pPiece = (CJunqiPiece *)SApplication::getSingletonPtr()->CreateWindowByName(xmlPiece.attribute(L"wndclass").as_string());
+                pPiece->InitFromXml(&xmlPiece);
+                SAnchorLayoutParam *pParam = (SAnchorLayoutParam *)pPiece->GetLayoutParam();
+                pParam->pos.type = 10;
+                pParam->pos.x.fSize = cm.ptCell.x;
+                pParam->pos.y.fSize = cm.ptCell.y;
+                pPiece->SetColor(iSeat);
+                pPiece->SetChessman(cm.nOffRank);
+                pPiece->SetPos(cm.ptCell);
+                pPiece->SetID(ID_CHESS_BASE + iSeat * 100 + cm.nID);
+                float fRotate = pPiece->CalcRotate(cm.ptCell, m_iSelfIndex);
+                pPiece->SetRotate(fRotate);
+                m_pGameBoard->InsertChild(pPiece);
+            }
+        }
+    }
+    
+    OnStageChanged(STAGE_PLAYING);
+}
+
+void CJunqiGame::StepForward()
+{
+    if(!m_bReplay || m_itCurrentHistory == m_lstHistory.end()){
+        PlayTip(_T("已到最后"));
+        return;
+    }
+    
+    DWORD dwType = m_itCurrentHistory->first;
+    std::shared_ptr<std::vector<BYTE> > data = m_itCurrentHistory->second;
+    const LPBYTE pMsg = data ? data->data() : NULL;
+    DWORD dwLen = data ? data->size() : 0;
+    
+    ProcessHistoryMessage(dwType, pMsg, dwLen, TRUE);
+    
+    m_nHistoryIndex++;
+    m_itCurrentHistory++;
+    
+    SLOGI() << "Replay step forward, index=" << m_nHistoryIndex;
+}
+
+void CJunqiGame::StepBackward()
+{
+    if(m_nHistoryIndex == 0){
+        PlayTip(_T("已到开始"));
+        return;
+    }
+    
+    // 使用快速重放到上一个位置（无动画）
+    int nTargetStep = m_nHistoryIndex - 1;
+    FastReplayToStep(nTargetStep);
+    
+    SLOGI() << "Replay step backward, index=" << m_nHistoryIndex;
+}
+
+void CJunqiGame::FastReplayToStep(int nTargetStep)
+{
+    if(nTargetStep < 0){
+        nTargetStep = 0;
+    }
+    
+    if(nTargetStep > (int)m_lstHistory.size()){
+        nTargetStep = (int)m_lstHistory.size();
+    }
+    
+    SLOGI() << "FastReplayToStep: target=" << nTargetStep << ", current=" << m_nHistoryIndex;
+    
+    m_bEnableAnimation = FALSE;  // 禁用动画以提高速度
+    m_pGameBoard->LockUpdate();
+    InitReplay();
+    
+    // 快速重放到指定步数（无动画）
+    m_itCurrentHistory = m_lstHistory.begin();
+    for(int i = 0; i < nTargetStep && m_itCurrentHistory != m_lstHistory.end(); i++){
+        DWORD dwType = m_itCurrentHistory->first;
+        std::shared_ptr<std::vector<BYTE> > data = m_itCurrentHistory->second;
+        const LPBYTE pMsg = data ? data->data() : NULL;
+        DWORD dwLen = data ? data->size() : 0;
+        
+        ProcessHistoryMessage(dwType, pMsg, dwLen, TRUE);
+        m_itCurrentHistory++;
+    }
+    m_bEnableAnimation = TRUE;
+    m_pGameBoard->UnlockUpdate();
+    m_pGameBoard->InvalidateRect(NULL);
+    m_nHistoryIndex = nTargetStep;
+}
+
+void CJunqiGame::ProcessHistoryMessage(DWORD dwType, const void *pData, int nSize, BOOL bReplay)
+{
+    const LPBYTE pMsg = (const LPBYTE)pData;
+    DWORD dwLen = nSize;
+    
+    switch(dwType)
+    {
+    case MSG_NOTIFY_PLAYER_LOSE:
+        OnPlayerLose(pMsg, dwLen);
+        break;
+    case MSG_REQ_MOVE:
+        OnMoveChess(pMsg, dwLen);
+        break;
+    case MSG_ACK_GAMEOVER:
+        OnGameOver(pMsg, dwLen);
+        break;
+    case MSG_REQ_SURRENDER:
+        OnReqSurrender(pMsg, dwLen);
+        break;
+    default:
+        SLOGW() << "Unknown message type in replay: " << dwType;
+        break;
     }
 }
 
 void CJunqiGame::MoveClock(int nSeat, int value)
 {
+    if(m_bReplay)
+        return;
     SWindow *pClock = m_pGameBoard->FindChildByID(ID_ALARM_CLOCK);
     pClock->SetVisible(TRUE, TRUE);
     pClock->ClearAnimation();
@@ -865,13 +1061,6 @@ void CJunqiGame::OnGameBoardSizeChanged(IEvtArgs *e)
 
 void CJunqiGame::OnBtnTest()
 {
-    MSG_MOVE msgMove;
-    msgMove.iIndex = m_iSelfIndex;
-    msgMove.ptBegin = { 6, 5 };
-    msgMove.ptEnd = { 6, 6 };
-    msgMove.bSapper = 0;
-    msgMove.result = PUT_MOVE;
-    OnMoveChess(&msgMove, sizeof(msgMove));
 }
 
 void CJunqiGame::OnTimer(UINT_PTR uIDEvent)
@@ -932,6 +1121,7 @@ BOOL CJunqiGame::OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE> > dat
         OnGameStart(pMsg, dwLen);
         break;
     case MSG_NOTIFY_PLAYER_LOSE:
+        m_lstHistory.push_back(std::make_pair(dwType, data));
         OnPlayerLose(pMsg, dwLen);
         break;
     case MSG_NOTIFY_PLAYER_ACTIVE:
@@ -950,6 +1140,7 @@ BOOL CJunqiGame::OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE> > dat
         OnGameMsg(pMsg, dwLen);
         break;
     case MSG_REQ_MOVE:
+        m_lstHistory.push_back(std::make_pair(dwType, data));
         OnMoveChess(pMsg, dwLen);
         break;
     case MSG_REQ_PEACE:
@@ -959,9 +1150,11 @@ BOOL CJunqiGame::OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE> > dat
         OnAckPeace(pMsg,dwLen);
         break;
     case MSG_ACK_GAMEOVER:
+        m_lstHistory.push_back(std::make_pair(dwType, data));
         OnGameOver(pMsg, dwLen);
         break;
     case MSG_REQ_SURRENDER:
+        m_lstHistory.push_back(std::make_pair(dwType, data));
         OnReqSurrender(pMsg, dwLen);
         break;
     case GMT_SEATDOWN_ACK:
@@ -1028,6 +1221,7 @@ void CJunqiGame::OnGameStart(const void *pData, int nSize)
     {
         SWindow *pAvatar = m_pGameBoard->FindChildByID(ID_AVATAR_BASE + i);
         pAvatar->FindChildByName(L"flag_ready")->SetVisible(FALSE, TRUE);
+        m_userInfo[i] = *m_pUserInfo[i].get();//backup user info
     }
     // set toolbar for playing
     STabCtrl *pToolBar = (STabCtrl *)m_pTheme->GetWidget(Widgets::ktab_toolbar);
@@ -1057,7 +1251,6 @@ void CJunqiGame::OnMoveChess(const void *pData, int nSize)
     MSG_MOVE *pMove = (MSG_MOVE *)pData;
     POINT ptFrom = PtNet2Local(pMove->ptBegin);
     POINT ptTo = PtNet2Local(pMove->ptEnd);
-    m_lstHistory.push_back(*pMove);
     DoMovePiece(ptFrom, ptTo, pMove->bSapper, pMove->result);
 }
 
@@ -1140,7 +1333,8 @@ void CJunqiGame::OnGameOver(const void *pData, int nSize)
     }else{
         m_roundResult = RESULT_LOSE;
     }
-    OnStageChanged(STAGE_GAMEOVER);
+    if(!m_bReplay)
+        OnStageChanged(STAGE_GAMEOVER);
 }
 
 void CJunqiGame::OnPlayerLose(const void *pData, int nSize){
@@ -1231,6 +1425,8 @@ int CJunqiGame::GetActivePlayerIndex() const
 
 void CJunqiGame::UpdateClock(int nSecond)
 {
+    if(m_bReplay)
+        return;
     nSecond %=100;  //max 99s
     SWindow *pClock = m_pGameBoard->FindChildByID(ID_ALARM_CLOCK);
     pClock->SetUserData(nSecond);
@@ -1256,6 +1452,8 @@ void CJunqiGame::UpdateClock(int nSecond)
 
 void CJunqiGame::PlayTip(const SStringT &strTip)
 {
+    if(!m_bEnableAnimation)
+        return;
     SXmlNode xmlTip = m_pTheme->GetTemplate(L"tip");
     SASSERT(xmlTip);
     SStringW strWndClass = xmlTip.attribute(L"wndclass").as_string(L"text");
@@ -1281,6 +1479,9 @@ void CJunqiGame::wsSendMsg(DWORD dwType, LPVOID lpData, DWORD dwSize)
 
 void CJunqiGame::PlayEffectSound(LPCWSTR pszSound)
 {
+    if(!m_bEnableAnimation){
+        return;
+    }
     SStringW strFile = m_pTheme->GetEffectSoundFile(pszSound);
     if(!strFile.IsEmpty()){
         TCHAR szResPrefix[MAX_PATH]={0};

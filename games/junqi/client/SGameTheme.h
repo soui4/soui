@@ -95,6 +95,7 @@ namespace Widgets{
     static const wchar_t *kbtn_req_surrender = L"btn_req_surrender";
     static const wchar_t *kbtn_req_pass = L"btn_req_pass";
     static const wchar_t *kbtn_new_round = L"btn_new_round";   ///< 新一局按钮部件名称
+    static const wchar_t *kbtn_replay = L"btn_replay";          ///< 复盘按钮部件名称
     static const wchar_t *kbtn_load = L"btn_load";            ///< 加载按钮部件名称
     static const wchar_t *kbtn_save = L"btn_save";            ///< 保存按钮部件名称
     static const wchar_t *kbtn_next = L"btn_next";            ///< 下一局按钮部件名称

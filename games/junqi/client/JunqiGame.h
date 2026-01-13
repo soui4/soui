@@ -161,6 +161,7 @@ public:
     void OnBtnReqPass();
 
     void OnBtnNewRound();
+    void OnBtnReplay();
     void OnBtnSave();
     void OnBtnLoad();
     void OnBtnPrev();
@@ -196,6 +197,7 @@ public:
         EVENT_NAME_COMMAND(Widgets::kbtn_req_surrender,OnBtnReqSurrender)
         EVENT_NAME_COMMAND(Widgets::kbtn_req_pass,OnBtnReqPass)
         EVENT_NAME_COMMAND(Widgets::kbtn_new_round,OnBtnNewRound)
+        EVENT_NAME_COMMAND(Widgets::kbtn_replay,OnBtnReplay)
         EVENT_NAME_COMMAND(Widgets::kbtn_save,OnBtnSave)
         EVENT_NAME_COMMAND(Widgets::kbtn_load,OnBtnLoad)
         EVENT_NAME_COMMAND(Widgets::kbtn_prev,OnBtnPrev)
@@ -343,9 +345,21 @@ private:
     int  m_iActiveIndex; //当前活动座位号
     BOOL m_bMoving;     //是否正在移动
     CJunQiLayout m_layout;  //布局
-    std::list<MSG_MOVE> m_lstHistory; //历史记录
-    
+    typedef std::list<std::pair<DWORD, std::shared_ptr<std::vector<BYTE> > > > HistoryList; //历史记录列表类型
+    HistoryList m_lstHistory; //历史记录列表实例
+    HistoryList::iterator m_itCurrentHistory;  //当前复盘位置
     BYTE m_byInitLayouts[PLAYER_COUNT][13];
-
-    BOOL m_bStuding;    //是否处于研究模式
+    GS_USERINFO m_userInfo[PLAYER_COUNT];
+    
+    // 复盘相关成员变量
+    int m_nHistoryIndex;        //当前历史步数（从0开始）
+    BOOL m_bReplay;             //是否处于复盘模式
+    BOOL m_bEnableAnimation;    //是否启用动画（复盘时禁用以提高速度）
+    
+    // 复盘相关函数
+    void InitReplay();          //初始化复盘
+    void ProcessHistoryMessage(DWORD dwType, const void *pData, int nSize, BOOL bReplay); //处理历史消息（复盘用）
+    void StepForward();         //前进一步
+    void StepBackward();        //后退一步
+    void FastReplayToStep(int nTargetStep);  //快速重放到指定步数（无动画）
 };

@@ -11,6 +11,7 @@
   <pass value="跳过" />  
   <start value="出征" />
   <new_round value="再来一局" />
+  <replay value="复盘" />
   <save value="保存" />
   <load value="载入" />
   <prev value="上一步" />
