@@ -37,7 +37,7 @@ void SSkinPiece::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BY
     CRect rcSrc(CPoint(), szChess);
     rcSrc.OffsetRect(iCol * szChess.cx, iRow * szChess.cy);
     CRect rcDst = *rcDraw;
-    rcDst.bottom = rcDst.top + rcDst.Width();
+    rcDst.bottom = rcDst.top + rcDst.Height();
     pRT->DrawBitmapEx(&rcDst, GetImage(), &rcSrc, GetExpandMode(), byAlpha);
 }
 
@@ -49,6 +49,7 @@ CJunqiPiece::CJunqiPiece()
     , m_bShow(TRUE)
 {
     m_bMsgTransparent = FALSE;
+    //m_bClipClient = TRUE;
     m_pos = { 0, 0 };
     m_target = { 0, 0 };
 }

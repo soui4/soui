@@ -6,7 +6,8 @@
 #include <com-loader.hpp>
 #include <vector>
 #include <memory>
-
+#include <list>
+#include <interface/SMsgLoop-i.h>
 
 #define MAX_MSGSIZE		(1<<18)	//256K
 
@@ -42,7 +43,7 @@ public:
 	};
 public:
 
-	WebSocketClient();
+	WebSocketClient(IMessageLoop *pLoop);
 	virtual ~WebSocketClient();
 
 	// 连接和断开连接
@@ -57,12 +58,19 @@ public:
 	void blockReceive(BOOL bBlock);
 
 private:
+	// 内部方法
+	void ProcessReceivedData(const void* data, int len);
+	void _NotifyMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE> > data);
+    void NotifyMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE>> data);
+
+  private:
 	// WebSocket相关成员
 	SComLoader m_comLoader;
 	SAutoRefPtr<IWebsocket> m_pWebsocket;
 	SAutoRefPtr<IWsClient> m_pWsClient;
 	SAutoRefPtr<WebSocketConnListener> m_pListener;
-
+	SAutoRefPtr<IMessageLoop> m_pLoop;
+	std::list<std::pair<DWORD, std::shared_ptr<std::vector<BYTE> > > > m_msgQueue;
 	// 消息处理相关
 	IListener *m_pMsgListener;
 	BOOL m_bConnected;
@@ -70,10 +78,7 @@ private:
 	// 连接参数
 	char m_szServerIP[64];
 	WORD m_wPort;
-
-	// 内部方法
-	void ProcessReceivedData(const void* data, int len);
-	void NotifyMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE> > data);
+	BOOL m_bBlock;
 };
 
 #endif//WEBSOCKETCLIENT_H

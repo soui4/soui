@@ -7,7 +7,6 @@
 #include "LoginDlg.h"
 #include <junqiProtocol.h>
 #include <helper/SMenuEx.h>
-#include <helper/SFunctor.hpp>
 #include <helper/slog.h>
 #include <mmsystem.h>
 #define kLogTag "MainDlg"
@@ -16,6 +15,7 @@ CMainDlg::CMainDlg(SGameTheme* pTheme)
 : SHostWnd(_T("LAYOUT:XML_MAINWND"))
 , m_pTheme(pTheme)
 , m_bMute(FALSE)
+, m_webSocketClient(GetMsgLoop())
 {
     m_pGame = new CJunqiGame(this,pTheme);
     m_pLobbyHandler = new LobbyHandler();
@@ -96,29 +96,6 @@ void CMainDlg::OnScaleChanged(int nScale)
 
 BOOL CMainDlg::OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE>> data)
 {
-    if(dwType == MSG_REQ_MOVE){
-        m_webSocketClient.blockReceive(TRUE);
-    }
-	STaskHelper::post(GetMsgLoop(), this, &CMainDlg::_OnMessage, dwType, data);
-    return TRUE;
-}
-
-void CMainDlg::OnConnected()
-{
-    SLOGI()<<"Connected to server";
-    m_pLobbyHandler->OnConnected();
-    m_pGame->OnConnected();
-}
-
-void CMainDlg::OnDisconnected()
-{
-    SLOGI()<<"Disconnected from server";
-    m_pLobbyHandler->OnDisconnected();
-    m_pGame->OnDisconnected();
-}
-
-BOOL CMainDlg::_OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE> > data)
-{
     BOOL bRet = FALSE;
     const BYTE *pData = data?data->data():NULL;
     int nSize = data?data->size():0;
@@ -153,6 +130,20 @@ BOOL CMainDlg::_OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE> > data
     if(bRet) return TRUE;
     bRet = m_pGame->OnMessage(dwType, data);
     return bRet;
+}
+
+void CMainDlg::OnConnected()
+{
+    SLOGI()<<"Connected to server";
+    m_pLobbyHandler->OnConnected();
+    m_pGame->OnConnected();
+}
+
+void CMainDlg::OnDisconnected()
+{
+    SLOGI()<<"Disconnected from server";
+    m_pLobbyHandler->OnDisconnected();
+    m_pGame->OnDisconnected();
 }
 
 void CMainDlg::OnBtnMute()

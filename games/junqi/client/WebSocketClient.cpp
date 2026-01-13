@@ -3,7 +3,7 @@
 #include <protocol.h>
 #include <tchar.h>
 #include <string.h>
-
+#include <helper/SFunctor.hpp>
 //////////////////////////////////////////////////////////////////////
 // WebSocketConnListener Implementation
 //////////////////////////////////////////////////////////////////////
@@ -71,9 +71,11 @@ void WebSocketConnListener::onDataRecv(const void *data, int len, BOOL bBinary)
 // WebSocketClient Implementation
 //////////////////////////////////////////////////////////////////////
 
-WebSocketClient::WebSocketClient()
+WebSocketClient::WebSocketClient(IMessageLoop *pLoop)
     : m_pMsgListener(NULL)
+	, m_bBlock(FALSE)
 {
+	m_pLoop = pLoop;
 	m_bConnected = FALSE;
 	m_wPort = 0;
 	memset(m_szServerIP, 0, sizeof(m_szServerIP));
@@ -189,13 +191,23 @@ void WebSocketClient::ProcessReceivedData(const void* data, int len)
     {
 		data2 = std::shared_ptr<std::vector<BYTE> >(new std::vector<BYTE>(pData, pData  + dwSize));
 	}
-	NotifyMessage(dwType, data2);
+    NotifyMessage(dwType, data2);
 }
 
-void WebSocketClient::NotifyMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE> > data)
+void WebSocketClient::NotifyMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE>> data)
 {
-	if(m_pMsgListener)
-		m_pMsgListener->OnMessage(dwType, data);
+    STaskHelper::post(m_pLoop, this, &WebSocketClient::_NotifyMessage, dwType, data);
+}
+
+void WebSocketClient::_NotifyMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE> > data)
+{
+	if(m_bBlock){
+		m_msgQueue.push_back(std::make_pair(dwType, data));
+	}else{
+		SASSERT(m_msgQueue.empty());
+		if(m_pMsgListener)
+			m_pMsgListener->OnMessage(dwType, data);
+	}
 }
 
 void WebSocketClient::SetMessageHandler(IListener *pMsgListener)
@@ -205,6 +217,13 @@ void WebSocketClient::SetMessageHandler(IListener *pMsgListener)
 
 void WebSocketClient::blockReceive(BOOL bBlock)
 {
-	if (m_pWsClient)
-		m_pWsClient->blockReceive(bBlock);
+	m_bBlock = bBlock;
+	if(!bBlock){
+		while(!m_bBlock && !m_msgQueue.empty()){
+			auto &msg = m_msgQueue.front();
+			if(m_pMsgListener)
+				m_pMsgListener->OnMessage(msg.first, msg.second);
+			m_msgQueue.pop_front();
+		}
+	}
 }

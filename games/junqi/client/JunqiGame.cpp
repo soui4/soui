@@ -175,7 +175,6 @@ void CJunqiGame::onAnimationEnd(IValueAnimator *pAnimator)
         }
 
         m_bMoving = FALSE;
-        //note, stop block receive after move animation end. the block operation is setted in CMainDlg::OnMessage.
         m_webSocketClient->blockReceive(FALSE);
     }else if(pPropAnimator->GetID() == ANI_TIP)
     {
@@ -336,6 +335,7 @@ BOOL CJunqiGame::DoMovePiece(POINT ptFrom, POINT ptTarget,BOOL bSapper, int nRes
     if(lstCell.empty())
         return FALSE;
     m_bMoving = TRUE;
+    m_webSocketClient->blockReceive(TRUE);
     std::vector<AnchorPos> lstPos;
     std::vector<float> lstRotate;
     lstPos.resize(lstCell.size());
@@ -612,6 +612,11 @@ void CJunqiGame::OnSetActivePlayerIndex(int nActiveSeat){
     SLOGI() << "OnSetActivePlayerIndex, new index=" << nActiveSeat;
     m_iActiveIndex = nActiveSeat;
     MoveClock(Index2Seat(m_iActiveIndex), m_dwProps[PROPID_STEPTICK]);
+    if(m_iActiveIndex == GetSelfIndex()){
+        if(GetForegroundWindow() != m_pMainDlg->m_hWnd){
+            FlashWindow(m_pMainDlg->m_hWnd, TRUE);
+        }
+    }
 }
 
 void CJunqiGame::OnStageChanged(STAGE stage)

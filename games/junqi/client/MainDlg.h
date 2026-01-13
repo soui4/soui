@@ -34,7 +34,6 @@ public:
 
     void OnConnected();
     void OnDisconnected();
-    BOOL _OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE> > data);
   protected:
     void OnBtnMute();
     void OnBtnUnmute();
