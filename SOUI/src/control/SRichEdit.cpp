@@ -1999,6 +1999,11 @@ int SRichEdit::GetWindowTextLength() const
 #endif //_UNICODE
 }
 
+ITextServices *SRichEdit::GetTextServices()
+{
+    return m_pTxtHost->GetTextService();
+}
+
 void SRichEdit::ReplaceSel(LPCTSTR pszText, BOOL bCanUndo)
 {
 #ifdef _UNICODE

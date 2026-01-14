@@ -231,6 +231,11 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
      */
     int GetWindowTextLength() const;
 
+    /**
+     * @brief Get the text services interface
+     * @return Text services interface
+     */
+    ITextServices *GetTextServices();
   protected:
     /**
      * @brief Handle creation of the control
