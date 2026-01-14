@@ -118,7 +118,7 @@ public:
     int CalcMoveDir(POINT ptFrom, POINT ptTo);
 
   public:
-    STDMETHOD_(void, onAnimationStart)(THIS_ IValueAnimator * pAnimator) override{}
+    STDMETHOD_(void, onAnimationStart)(THIS_ IValueAnimator *pAnimator) override;
     STDMETHOD_(void, onAnimationEnd)(THIS_ IValueAnimator * pAnimator) override;
     STDMETHOD_(void, onAnimationRepeat)(THIS_ IValueAnimator *pAnimator) override
     {

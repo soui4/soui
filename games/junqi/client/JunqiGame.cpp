@@ -110,6 +110,13 @@ int CJunqiGame::Index2Seat(int nIndex)
     return (nIndex + PLAYER_COUNT - m_iSelfIndex) % PLAYER_COUNT;
 }
 
+void CJunqiGame::onAnimationStart(IValueAnimator *pAnimator)
+{
+    if (pAnimator->GetID() == ANI_MOVE)
+    {
+        PlayEffectSound(Sounds::Effects::kMove);
+    }
+}
 void CJunqiGame::onAnimationEnd(IValueAnimator *pAnimator)
 {
     IPropertyAnimator *pPropAnimator = sobj_cast<IPropertyAnimator>(pAnimator);
@@ -372,9 +379,9 @@ BOOL CJunqiGame::DoMovePiece(POINT ptFrom, POINT ptTarget,BOOL bSapper, int nRes
     pHolderRotate->Release();
     pAnimator->setDuration(100*fTotalWeight);
     pAnimator->SetID(ANI_MOVE);
-    Util::StartAnimator(pAnimator, pPiece);
     pAnimator->addListener(this);
     pAnimator->addUpdateListener(this);
+    Util::StartAnimator(pAnimator, pPiece);
     pAnimator->SetUserData((void *)(UINT_PTR)0);
     if(!m_bEnableAnimation){
         pAnimator->end();
