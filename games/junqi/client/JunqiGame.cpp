@@ -659,13 +659,13 @@ void CJunqiGame::InitReplay()
         ClearMovePath();
         m_pGameBoard->FindChildByName(Widgets::kimg_dest_box)->SetVisible(FALSE, TRUE);
     }
-    
-    // 初始化棋子从初始布局
-    for(int i = 0; i < PLAYER_COUNT; i++)
-    {
-        InitLayout(m_byInitLayouts[i], i);
-    }
-    
+    if(!m_lstHistory.empty()){
+        // 初始化棋子从初始布局
+        for(int i = 0; i < PLAYER_COUNT; i++)
+        {
+            InitLayout(m_byInitLayouts[i], i);
+        }
+    }    
     OnStageChanged(STAGE_PLAYING);
 }
 
