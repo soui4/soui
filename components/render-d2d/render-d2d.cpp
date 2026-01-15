@@ -1203,6 +1203,7 @@ SNSBEGIN
 
 		HRESULT hr = pD2DFac->CreateWicBitmapRenderTarget(pBmp,D2D1::RenderTargetProperties (targetType, pixelFormat,0.0,0.0,D2D1_RENDER_TARGET_USAGE_GDI_COMPATIBLE),(ID2D1RenderTarget**)&m_rt);
 		m_ptOrg.x=m_ptOrg.y=0;
+		m_ptCur.x=m_ptCur.y=0;
 		m_mtx = Matrix3x2F::Identity();
 		SetAntiAlias(m_bAntiAlias);
 
@@ -1660,16 +1661,23 @@ SNSBEGIN
 	}
 
     HRESULT SRenderTarget_D2D::MoveToEx(POINT pt,LPPOINT lpPointRet){
-		//todo:hjx
+		if(lpPointRet)
+			*lpPointRet = m_ptCur;
+		m_ptCur = pt;
         return S_OK;
     }
     HRESULT SRenderTarget_D2D::LineTo(POINT pt){
-		//todo:hjx
-        return S_OK;
+		if(!m_curPen) return E_INVALIDARG;
+		POINT pts[2] = {m_ptCur, pt};
+		HRESULT hr = DrawLines(pts, 2);
+		if(SUCCEEDED(hr))
+			m_ptCur = pt;
+		return hr;
     }
 
     HRESULT SRenderTarget_D2D::GetCurrentPositionEx(LPPOINT lpPoint){
-		//todo:hjx
+		if(!lpPoint) return E_INVALIDARG;
+		*lpPoint = m_ptCur;
         return S_OK;
     }
 
@@ -2126,9 +2134,7 @@ SNSBEGIN
 	{
 		if(!m_curPen) return E_INVALIDARG;
 		D2D1_ELLIPSE shape={{(float)(pRect->left+pRect->right)/2,(float)(pRect->top+pRect->bottom)/2},(float)RectWidth(pRect)/2,(float)RectHeight(pRect)/2};
-		m_rt->FillEllipse(shape, m_curBrush->toBrush(m_rt,pRect));
-		
-		SPen_D2D *pen=(SPen_D2D*)(IPenS*)m_curPen;
+		SPen_D2D *pen=m_curPen;
 		SComPtr<ID2D1Brush> br = pen->GetColorBrush(m_rt);
 		m_rt->DrawEllipse(shape, br, pen->GetWidth(), pen->GetStrokeStyle());
 		return S_OK;
@@ -2255,9 +2261,10 @@ SNSBEGIN
 			HDC hdc=0;
 			gdiRt->GetDC(D2D1_DC_INITIALIZE_MODE_COPY,&hdc);
 			RECT rcUpdate={x,y,x+1,y+1};
-			COLORREF crRet = ::GetPixel(hdc,x,y);
+			COLORREF crRet = ::GetPixel(hdc,x,y);  // 保存旧颜色
+			::SetPixel(hdc,x,y,cr);  // 设置新颜色
 			gdiRt->ReleaseDC(&rcUpdate);
-			return crRet;
+			return crRet;  // 返回旧颜色
 		}
 		return CR_INVALID;
 	}

@@ -586,6 +586,7 @@ protected:
 	SAutoRefPtr<SBrush_D2D> m_curBrush;
 	SAutoRefPtr<SFont_D2D> m_curFont;
 	POINT               m_ptOrg;
+	POINT               m_ptCur;
 	D2D1::Matrix3x2F			m_mtx;
 	//注意保存4个默认的GDI对象
 	SAutoRefPtr<IPenS> m_defPen;
