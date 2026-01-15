@@ -169,7 +169,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
     }
     SApplication2 app(hInstance);
     SAppCfg cfg;
-    cfg.SetRender(nType == IDYES ? Render_Skia : Render_Gdi)
+    cfg.SetRender(nType == IDYES ? Render_Skia : Render_D2d)
         .SetImgDecoder(ImgDecoder_Stb)
         .SetAppDir(appDir)
         .SetLog(TRUE, 2, "demo")

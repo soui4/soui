@@ -600,8 +600,8 @@ BOOL SPropertyGrid::OnScroll(BOOL bVertical, UINT uCode, int nPos)
 void SPropertyGrid::OnInplaceActiveWndCreate(IPropertyItem *pItem, SWindow *pWnd, SXmlNode xmlInit)
 {
     SASSERT(m_pInplaceActiveWnd == NULL);
-    InsertChild(pWnd);
     pWnd->InitFromXml(&xmlInit);
+    InsertChild(pWnd);
 
     CRect rcValue = GetInplaceWndPos(pItem);
     pWnd->Move(rcValue);

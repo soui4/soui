@@ -300,6 +300,9 @@ protected:
 	SIZE        m_sz;
 	SComPtr<IWICBitmap> m_bmp2;
 	IWICBitmapLock* m_lock;
+	// 优化: 缓存D2D1Bitmap以避免重复创建
+	mutable SComPtr<ID2D1Bitmap> m_cachedD2DBitmap;
+	mutable ID2D1RenderTarget* m_cachedRTForBitmap;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -385,27 +388,23 @@ public:
 	STDMETHOD_(void,rCubicTo)(THIS_ float x1, float y1, float x2, float y2,
 		float x3, float y3) OVERRIDE;
 
-	STDMETHOD_(void,addRect)(THIS_ const RECT* rect, Direction dir /*= kCW_Direction*/) OVERRIDE;
+	STDMETHOD_(void,addRect)(THIS_ const RECT* rect, Direction dir DEF_VAL(kCW_Direction)) OVERRIDE;
 
-	STDMETHOD_(void,addRect2)(THIS_ float left, float top, float right, float bottom,
-		Direction dir/* = kCW_Direction*/) OVERRIDE;
+	STDMETHOD_(void,addRect2)(THIS_ float left, float top, float right, float bottom, Direction dir DEF_VAL(kCW_Direction)) OVERRIDE;
 
-	STDMETHOD_(void,addOval)(THIS_ const RECT * oval, Direction dir/*= kCW_Direction*/) OVERRIDE;
+	STDMETHOD_(void, addOval)(THIS_ const RECT *oval, Direction dir DEF_VAL(kCW_Direction)) OVERRIDE;
 
-	STDMETHOD_(void,addOval2)(THIS_ float left, float top, float right, float bottom, Direction dir/*= kCW_Direction*/) OVERRIDE;
+	STDMETHOD_(void, addOval2)(THIS_ float left, float top, float right, float bottom, Direction dir DEF_VAL(kCW_Direction)) OVERRIDE;
 
-	STDMETHOD_(void,addCircle)(THIS_ float x, float y, float radius,
-		Direction dir /*= kCW_Direction*/) OVERRIDE;
+	STDMETHOD_(void,addCircle)(THIS_ float x, float y, float radius, Direction dir DEF_VAL(kCW_Direction)) OVERRIDE;
 
 	STDMETHOD_(void,addArc)(THIS_ const RECT* oval, float startAngle, float sweepAngle) OVERRIDE;
 
 	STDMETHOD_(void,addArc2)(THIS_ float left, float top, float right, float bottom,float startAngle, float sweepAngle) OVERRIDE;
 
-	STDMETHOD_(void,addRoundRect)(THIS_ const RECT* rect, float rx, float ry,
-		Direction dir/* = kCW_Direction*/) OVERRIDE;
+	STDMETHOD_(void,addRoundRect)(THIS_ const RECT* rect, float rx, float ry, Direction dir DEF_VAL(kCW_Direction)) OVERRIDE;
 
-	STDMETHOD_(void,addRoundRect2)(THIS_ float left, float top,float right,float bottom, float rx,float ry,
-		Direction dir/* = kCW_Direction*/) OVERRIDE;
+	STDMETHOD_(void,addRoundRect2)(THIS_ float left, float top,float right,float bottom, float rx,float ry, Direction dir DEF_VAL(kCW_Direction)) OVERRIDE;
 
 	STDMETHOD_(void,addPoly)(THIS_ const POINT pts[], int count, BOOL close) OVERRIDE;
 
@@ -434,7 +433,11 @@ public:
 	STDMETHOD_(BOOL, hitTestStroke)(CTHIS_ float x,float y,float strokeSize) SCONST OVERRIDE;
 	
 	STDMETHOD_(BOOL, op)(CTHIS_ const IPathS *other, PathOP op, IPathS * out) SCONST OVERRIDE;
-private:
+
+    D2D1_POINT_2F getArcStart(THIS_ float left, float top, float right, float bottom, float _startAngle, float sweepAngle);
+
+  private:
+
 	SComPtr<ID2D1PathGeometry>    m_path;
 	SComPtr<ID2D1Geometry>		  m_geometry;
 	SComPtr<ID2D1GeometrySink>	  m_sink;
@@ -592,6 +595,11 @@ protected:
 	BOOL	m_bAntiAlias;
 	int  m_cDrawing;
 	HBITMAP m_hBmp;
+	// 优化: 添加笔刷缓存以避免重复创建
+	SComPtr<ID2D1Brush> m_cachedPenBrush;
+	COLORREF m_cachedPenColor;
+	// 优化: 添加文本格式缓存
+	SMap<DWORD,SComPtr<IDWriteTextLayout>> m_textLayoutCache;
 };
 
 namespace RENDER_D2D

@@ -720,7 +720,7 @@ class STextHost : public ITextHost {
 
 STextHost::STextHost(void)
     : m_pRichEdit(NULL)
-    , cRefs(0)
+    , cRefs(1)
     , m_fUiActive(FALSE)
     , pserv(NULL)
 {
@@ -1167,7 +1167,6 @@ int SRichEdit::OnCreate(LPVOID)
     InitDefaultParaFormat(&m_pfDef);
 
     m_pTxtHost = new STextHost;
-    m_pTxtHost->AddRef();
     if (!m_pTxtHost->Init(this))
     {
         m_pTxtHost->Release();

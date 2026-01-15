@@ -70,9 +70,16 @@ SPropertyItemColor::SPropertyItemColor(SPropertyGrid *pOwner) :SPropertyItemText
 		if (m_crValue != crTmp)
 		{
 			m_crValue = crTmp;
-            __baseCls::SetValue(strValue);
+            SStringT value = SStringT().Format(m_strFormat.c_str(), GetRValue(m_crValue), GetGValue(m_crValue), GetBValue(m_crValue), GetAValue(m_crValue));
+            __baseCls::SetValue(value);
 		}
     }
+
+	LRESULT SPropertyItemColor::OnAttrColor(const SStringW &value, BOOL bLoading)
+    {
+        SetValue(value);
+        return bLoading ? S_OK : S_FALSE;
+	}
 
     BOOL SPropertyItemColor::OnButtonClick()
     {
@@ -98,7 +105,10 @@ SPropertyItemColor::SPropertyItemColor(SPropertyGrid *pOwner) :SPropertyItemText
 	{
 		if(!bCancel)
 		{
-			SetValue(SStringT().Format(_T("#%02x%02x%02x"),GetRValue(cr),GetGValue(cr),GetBValue(cr)));
+            BYTE a = GetAValue(cr);
+            if (a == 0)
+                a = 0xff;
+            SetValue(SStringT().Format(m_strFormat.c_str(),GetRValue(cr), GetGValue(cr), GetBValue(cr),a));
 		}
 	}
 

@@ -11,7 +11,6 @@
 #include <wtl.mini/souimisc.h>
 #include <string/strcpcvt.h>
 #include <helper/SAutoBuf.h>
-
 #pragma comment(lib,"Msimg32")
 #pragma  comment(lib,"windowscodecs.lib")
 
@@ -189,12 +188,17 @@ SNSBEGIN
 
 	SRenderFactory_D2D::SRenderFactory_D2D()
 	{
+        CoInitialize(NULL);
 		Init();
 	}
 
 	SRenderFactory_D2D::~SRenderFactory_D2D()
 	{
+        m_pWICImageFactory = NULL;
+        m_pDWriteFactory = NULL;
+        m_pD2DFactory = NULL;
 		m_defFont=NULL;
+        CoUninitialize();
 	}
 
 	BOOL SRenderFactory_D2D::Init()
@@ -657,13 +661,17 @@ SNSBEGIN
 	//////////////////////////////////////////////////////////////////////////
 	//  SBitmap_D2D
 
-	SBitmap_D2D::SBitmap_D2D(IRenderFactory *pRenderFac) :TD2DRenderObjImpl<IBitmapS,OT_BITMAP>(pRenderFac),m_lock(NULL)
+	SBitmap_D2D::SBitmap_D2D(IRenderFactory *pRenderFac) :TD2DRenderObjImpl<IBitmapS,OT_BITMAP>(pRenderFac),m_lock(NULL),m_cachedRTForBitmap(NULL)
 	{
 		m_sz.cx=m_sz.cy=0;
 	}
 
 	HRESULT SBitmap_D2D::Init( int nWid,int nHei ,const LPVOID pBits/*=NULL*/)
 	{
+		// 优化: 清空缓存
+		m_cachedD2DBitmap = NULL;
+		m_cachedRTForBitmap = NULL;
+		
 		m_bmp2 = NULL;
 		m_sz.cx = nWid;
 		m_sz.cy = nHei;
@@ -895,8 +903,20 @@ SNSBEGIN
 
 	SComPtr<ID2D1Bitmap> SBitmap_D2D::toD2D1Bitmap(ID2D1RenderTarget *pRT) const
 	{
+		// 优化: 缓存D2D1Bitmap，避免每次都调用CreateBitmapFromWicBitmap
+		// 只有当RenderTarget改变时才重新创建
+		if(m_cachedD2DBitmap && m_cachedRTForBitmap == pRT)
+		{
+			return m_cachedD2DBitmap;
+		}
+		
 		SComPtr<ID2D1Bitmap> ret;
-		pRT->CreateBitmapFromWicBitmap(m_bmp2,&ret);
+		pRT->CreateBitmapFromWicBitmap(m_bmp2, &ret);
+		
+		// 缓存结果
+		m_cachedD2DBitmap = ret;
+		m_cachedRTForBitmap = pRT;
+		
 		return ret;
 	}
 
@@ -1166,6 +1186,7 @@ SNSBEGIN
 		,m_hWnd(NULL)
 		,m_cDrawing(0)
 		,m_hBmp(NULL)
+		,m_cachedPenColor(CR_INVALID)  // 初始化缓存
 	{
 		m_pRenderFactory = pRenderFactory;
 
@@ -1176,7 +1197,8 @@ SNSBEGIN
 		ID2D1Factory *pD2DFac = pFactoryD2D->GetD2D1Factory();
 		IWICBitmap * pBmp = m_curBmp->GetBitmap();
 
-		D2D1_RENDER_TARGET_TYPE targetType = D2D1_RENDER_TARGET_TYPE_SOFTWARE;;
+		// 优化: 使用硬件渲染而不是软件模式提升性能
+		D2D1_RENDER_TARGET_TYPE targetType = D2D1_RENDER_TARGET_TYPE_DEFAULT;
 		D2D1_PIXEL_FORMAT pixelFormat = D2D1::PixelFormat (DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED);
 
 		HRESULT hr = pD2DFac->CreateWicBitmapRenderTarget(pBmp,D2D1::RenderTargetProperties (targetType, pixelFormat,0.0,0.0,D2D1_RENDER_TARGET_USAGE_GDI_COMPATIBLE),(ID2D1RenderTarget**)&m_rt);
@@ -1206,6 +1228,7 @@ SNSBEGIN
 		,m_curColor(0xFF000000)//默认黑色
 		,m_cDrawing(0)
 		,m_hBmp(NULL)
+		,m_cachedPenColor(CR_INVALID)  // 初始化缓存
 	{
 		SRenderFactory_D2D *pFactoryD2D=(SRenderFactory_D2D*)pRenderFactory;
 		ID2D1Factory *pD2DFac = pFactoryD2D->GetD2D1Factory();
@@ -1290,7 +1313,8 @@ SNSBEGIN
 			ID2D1Factory *pD2DFac = toD2DFac(m_pRenderFactory);
 			IWICBitmap * pBmp = m_curBmp->GetBitmap();
 
-			D2D1_RENDER_TARGET_TYPE targetType = D2D1_RENDER_TARGET_TYPE_SOFTWARE;;
+			// 优化: 使用默认渲染模式而不是软件
+			D2D1_RENDER_TARGET_TYPE targetType = D2D1_RENDER_TARGET_TYPE_DEFAULT;
 			D2D1_PIXEL_FORMAT pixelFormat = D2D1::PixelFormat (DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED);
 
 			HRESULT hr = pD2DFac->CreateWicBitmapRenderTarget(pBmp,D2D1::RenderTargetProperties (targetType, pixelFormat,0.0,0.0,D2D1_RENDER_TARGET_USAGE_GDI_COMPATIBLE),(ID2D1RenderTarget**)&m_rt);
@@ -1555,11 +1579,10 @@ SNSBEGIN
 
 	HRESULT SRenderTarget_D2D::FillSolidRoundRect(LPCRECT pRect,POINT pt,COLORREF cr)
 	{		
-		SComPtr<ID2D1SolidColorBrush> br;
-		D2DColor color(cr);
-		m_rt->CreateSolidColorBrush(color.toD2DColor(),&br);
+		SBrush_D2D *pBr = SBrush_D2D::CreateSolidBrush(m_pRenderFactory,cr);
 		D2D1_ROUNDED_RECT rcRound={toRectF(pRect,TRUE),(float)pt.x,(float)pt.y};
-		m_rt->FillRoundedRectangle(rcRound,br);
+		m_rt->FillRoundedRectangle(rcRound,pBr->toBrush(m_rt,pRect));
+		pBr->Release();
 		return S_OK;    
 	}
 
@@ -1578,8 +1601,9 @@ SNSBEGIN
 		sink->EndFigure(D2D1_FIGURE_END_OPEN);
 		sink->Close();
 
-		SPen_D2D *pen=m_curPen;
-		m_rt->DrawGeometry(path,pen->GetColorBrush(m_rt),pen->GetWidth(),pen->GetStrokeStyle());
+		SPen_D2D *pen=(SPen_D2D*)(IPenS*)m_curPen;
+		SComPtr<ID2D1Brush> br = pen->GetColorBrush(m_rt);
+		m_rt->DrawGeometry(path, br, pen->GetWidth(), pen->GetStrokeStyle());
 		return S_OK;
 	}
 
@@ -1600,8 +1624,9 @@ SNSBEGIN
 		sink->EndFigure(D2D1_FIGURE_END_CLOSED);
 		sink->Close();
 
-		SPen_D2D *pen=m_curPen;
-		m_rt->DrawGeometry(path,pen->GetColorBrush(m_rt),pen->GetWidth(),pen->GetStrokeStyle());
+		SPen_D2D *pen=(SPen_D2D*)(IPenS*)m_curPen;
+		SComPtr<ID2D1Brush> br = pen->GetColorBrush(m_rt);
+		m_rt->DrawGeometry(path, br, pen->GetWidth(), pen->GetStrokeStyle());
 		return S_OK;
 	}
 
@@ -1651,9 +1676,8 @@ SNSBEGIN
 	HRESULT SRenderTarget_D2D::TextOut( int x, int y, LPCTSTR lpszString, int nCount)
 	{
 		if(nCount<0) nCount = (int)_tcslen(lpszString);
-		SIZE sz;
-		MeasureText(lpszString,nCount,&sz);
-		RECT rc={x,y,x+sz.cx,y+sz.cy};
+		// 优化: 减少MeasureText调用，使用更大的初始矩形
+		RECT rc={x,y,x+10000,y+10000};
 		return DrawText(lpszString,nCount,&rc,DT_LEFT|DT_SINGLELINE);
 	}
 
@@ -1870,13 +1894,15 @@ SNSBEGIN
 		case OT_BITMAP: 
 			if(IsOffscreen()){
 				ID2D1Factory *pD2DFac = toD2DFac(m_pRenderFactory);
-				IWICBitmap * pBmp = m_curBmp->GetBitmap();
+				// 优化: 使用新位图的数据而不是旧位图
+				IWICBitmap * pBmp = ((SBitmap_D2D*)pObj)->GetBitmap();
 
 				pRet=m_curBmp;
 				m_curBmp=(SBitmap_D2D*)pObj;
 				m_rt=NULL;
 
-				D2D1_RENDER_TARGET_TYPE targetType = D2D1_RENDER_TARGET_TYPE_SOFTWARE;
+				// 优化: 也改成默认渲染模式以获得更好的硬件加速
+				D2D1_RENDER_TARGET_TYPE targetType = D2D1_RENDER_TARGET_TYPE_DEFAULT;
 				D2D1_PIXEL_FORMAT pixelFormat = D2D1::PixelFormat (DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED);
 				pD2DFac->CreateWicBitmapRenderTarget(pBmp,D2D1::RenderTargetProperties (targetType, pixelFormat,0.0,0.0, D2D1_RENDER_TARGET_USAGE_GDI_COMPATIBLE),(ID2D1RenderTarget**)&m_rt);
 			}else
@@ -2048,8 +2074,9 @@ SNSBEGIN
 		CRect rcBox;
 		path->getBounds(&rcBox);
 		SComPtr<ID2D1Brush> d2dBr = br->toBrush(m_rt,&rcBox);
-		SPen_D2D *pen=m_curPen;
-		m_rt->DrawGeometry(path2->GetPath(),d2dBr,pen->GetWidth(),pen->GetStrokeStyle());
+		SPen_D2D *pen=(SPen_D2D*)(IPenS*)m_curPen;
+		SComPtr<ID2D1Brush> penBr = pen->GetColorBrush(m_rt);
+		m_rt->DrawGeometry(path2->GetPath(), penBr, pen->GetWidth(), pen->GetStrokeStyle());
 		return S_OK;
 	}
 
@@ -2099,8 +2126,11 @@ SNSBEGIN
 	{
 		if(!m_curPen) return E_INVALIDARG;
 		D2D1_ELLIPSE shape={{(float)(pRect->left+pRect->right)/2,(float)(pRect->top+pRect->bottom)/2},(float)RectWidth(pRect)/2,(float)RectHeight(pRect)/2};
-		m_rt->FillEllipse(shape,m_curBrush->toBrush(m_rt,pRect));
-		m_rt->DrawEllipse(shape,m_curPen->GetColorBrush(m_rt),m_curPen->GetWidth(),m_curPen->GetStrokeStyle());
+		m_rt->FillEllipse(shape, m_curBrush->toBrush(m_rt,pRect));
+		
+		SPen_D2D *pen=(SPen_D2D*)(IPenS*)m_curPen;
+		SComPtr<ID2D1Brush> br = pen->GetColorBrush(m_rt);
+		m_rt->DrawEllipse(shape, br, pen->GetWidth(), pen->GetStrokeStyle());
 		return S_OK;
 	}
 
@@ -2124,18 +2154,47 @@ SNSBEGIN
 	HRESULT SRenderTarget_D2D::DrawArc( LPCRECT pRect,float startAngle,float sweepAngle,BOOL useCenter )
 	{
 		SPath_D2D path(m_pRenderFactory);
+		D2D1_POINT_2F start = path.getArcStart(pRect->left,pRect->top,pRect->right,pRect->bottom,startAngle,sweepAngle);
+        if(useCenter){
+            float centerX = (float)(pRect->left+pRect->right)/2;
+            float centerY = (float)(pRect->top+pRect->bottom)/2;
+            path.beginFigure(centerX, centerY, FALSE);
+            path.lineTo(start.x, start.y);
+        }else{
+            path.beginFigure(start.x, start.y, FALSE);
+        }		
 		path.addArc(pRect,startAngle,sweepAngle);
+        path.endFigure(useCenter);
+		path.close();
 		return DrawPath(&path,NULL);
 	}
 
 	HRESULT SRenderTarget_D2D::DrawArc2(LPCRECT pRect, float startAngle, float sweepAngle, int width) {
-		return E_NOTIMPL;
+		if (!m_curPen) return E_INVALIDARG;
+		// Create a path for the arc
+		SPath_D2D path(m_pRenderFactory);
+		D2D1_POINT_2F start = path.getArcStart(pRect->left, pRect->top, pRect->right, pRect->bottom, startAngle, sweepAngle);
+		path.beginFigure(start.x, start.y, FALSE);
+		path.addArc(pRect, startAngle, sweepAngle);
+		path.endFigure(FALSE);
+		path.close();
+
+        SComPtr<ID2D1Brush> br = m_curPen->GetColorBrush(m_rt);
+        m_rt->DrawGeometry(path.GetPath(), br, width, m_curPen->GetStrokeStyle());
+		return S_OK;
 	}
 
 	HRESULT SRenderTarget_D2D::FillArc( LPCRECT pRect,float startAngle,float sweepAngle )
 	{
 		SPath_D2D path(m_pRenderFactory);
+		D2D1_POINT_2F start = path.getArcStart(pRect->left,pRect->top,pRect->right,pRect->bottom,startAngle,sweepAngle);
+		float centerX = (float)(pRect->left+pRect->right)/2;
+		float centerY = (float)(pRect->top+pRect->bottom)/2;
+		path.beginFigure(centerX, centerY, TRUE);
+		path.lineTo(start.x, start.y);
 		path.addArc(pRect,startAngle,sweepAngle);
+        path.endFigure(TRUE);
+		path.close();
 		return FillPath(&path);
 	}
 
@@ -2218,8 +2277,8 @@ SNSBEGIN
 	HRESULT SRenderTarget_D2D::DrawPath(const IPathS * path,IPathEffect * pathEffect)
 	{
 		SPath_D2D *path2 = (SPath_D2D*)path;
-		SPen_D2D *pen=m_curPen;
-		m_rt->DrawGeometry(path2->GetPath(),pen->GetColorBrush(m_rt),pen->GetWidth(),pen->GetStrokeStyle());
+        SComPtr<ID2D1Brush> br = m_curPen->GetColorBrush(m_rt);
+        m_rt->DrawGeometry(path2->GetPath(), br, m_curPen->GetWidth(), m_curPen->GetStrokeStyle());
 		return S_OK;
 	}
 
@@ -2586,12 +2645,27 @@ SNSBEGIN
 		addArc2(oval->left,oval->top,oval->right,oval->bottom,startAngle,sweepAngle);
 	}
 
+	D2D1_POINT_2F SPath_D2D::getArcStart(THIS_ float left, float top, float right, float bottom, float _startAngle, float sweepAngle)
+    {
+        bool clockwise = sweepAngle > 0;
+        double startAngle = radians(_startAngle);
+        double endAngle = radians(_startAngle + sweepAngle);
+        D2D1_RECT_F rc = { left, top, right, bottom };
+
+        D2D1_POINT_2F center = { (right - left) / 2.0f, (bottom - top) / 2.0f };
+        if (center.x != center.y)
+        {
+            startAngle = atan2(sin(startAngle) * center.x, cos(startAngle) * center.y);
+            endAngle = atan2(sin(endAngle) * center.x, cos(endAngle) * center.y);
+        }
+        D2D1_POINT_2F start;
+        start.x = rc.left + center.x + center.x * cos(startAngle);
+        start.y = rc.top + center.y + center.y * sin(startAngle);
+        return start;
+	}
 
 	void SPath_D2D::addArc2(THIS_ float left, float top, float right, float bottom,float _startAngle, float sweepAngle)
 	{
-		if(!m_bFigureOpen)
-			return;
-
 		bool clockwise = sweepAngle>0;
 		double startAngle = radians (_startAngle);
 		double endAngle = radians (_startAngle+sweepAngle);
@@ -2607,10 +2681,14 @@ SNSBEGIN
 		start.x = rc.left + center.x + center.x * cos (startAngle);
 		start.y = rc.top + center.y + center.y * sin (startAngle);
 
-		if(start.x != m_lastPt.x || start.y!=m_lastPt.y)
-		{
-			lineTo(start.x,start.y);
-		}
+		if (m_bFigureOpen && (m_lastPt.x != start.x || m_lastPt.y != start.y))
+        {
+            endFigure(FALSE);
+        }
+        if (!m_bFigureOpen)
+        {
+            beginFigure(start.x, start.y, TRUE);
+        }
 
 		double sweepangle = endAngle - startAngle;
 		if (clockwise) {
@@ -2682,8 +2760,16 @@ SNSBEGIN
 
 	void SPath_D2D::offset(THIS_ float dx, float dy)
 	{
+		// If figure is still open, close it first
 		if(m_sink)
+		{
+			close();
+		}
+		
+		// If geometry is empty, nothing to offset
+		if(!m_geometry)
 			return;
+			
 		ID2D1Factory *fac = toD2DFac(m_pRenderFactory);
 		SComPtr<ID2D1TransformedGeometry>  tg;
 		if (!SUCCEEDED (fac->CreateTransformedGeometry (m_geometry, Matrix3x2F::Translation(dx,dy), &tg)))
@@ -2698,9 +2784,9 @@ SNSBEGIN
 
 		ID2D1Factory *fac = toD2DFac(m_pRenderFactory);
 		const float *matrix = form->fMat;
-		Matrix3x2F xForm (matrix[kMScaleX],matrix[kMSkewY],
-			matrix[kMSkewX],matrix[kMScaleY],
-			matrix[kMTransX],matrix[kMTransY]);
+		Matrix3x2F xForm (matrix[kMScaleX], matrix[kMSkewY],
+			matrix[kMSkewX], matrix[kMScaleY],
+			matrix[kMTransX], matrix[kMTransY]);
 
 		SComPtr<ID2D1TransformedGeometry>  tg;
 		if (!SUCCEEDED (fac->CreateTransformedGeometry (m_geometry, xForm, &tg)))
@@ -2717,29 +2803,172 @@ SNSBEGIN
 
 	void SPath_D2D::addString(THIS_ LPCTSTR pszText,int nLen, float x,float y, const IFontS *pFont)
 	{
-		/*
-		ID2D1Factory *fac = toD2DFac(GetRenderFactory());
-		IDWriteFactory *pWriteFac = toD2DWriteFac(GetRenderFactory());
-		SFont_D2D * pFontD2D = (SFont_D2D*)pFont;
-		if(nLen<0) nLen = _tcslen(pszText);
-		SStringW str=S_CT2W(SStringT(pszText,nLen));
-		SComPtr<IDWriteTextLayout> textLayout; // 文字布局的指针
-		pWriteFac->CreateTextLayout(str.c_str(),str.GetLength(),pFontD2D->GetFont(),-1,-1,&textLayout);
-		if(textLayout){
-		SComPtr<ID2D1GeometrySink> sink;
-		m_path->Open(&sink);
-		if(sink){
-		textLayout->Draw()
-		sink->Close();
-		}					
+		if(!pFont || !pszText || nLen <= 0)
+			return;
+
+		SRenderFactory_D2D *pFactoryD2D = (SRenderFactory_D2D *)GetRenderFactory();
+		ID2D1Factory *pD2DFac = pFactoryD2D->GetD2D1Factory();
+		IDWriteFactory *pDWriteFac = pFactoryD2D->GetDWriteFactory();
+		
+		if(!pD2DFac || !pDWriteFac)
+			return;
+
+		// Get the text format from the font
+		SFont_D2D *pFont2D = (SFont_D2D*)pFont;
+		IDWriteTextFormat *pTextFormat = pFont2D->GetFont();
+		if(!pTextFormat)
+			return;
+
+		// Create text layout to get text metrics
+		SComPtr<IDWriteTextLayout> pTextLayout;
+		HRESULT hr = pDWriteFac->CreateTextLayout(pszText, nLen, pTextFormat,
+			10000.0f, 10000.0f, &pTextLayout);
+		if(FAILED(hr) || !pTextLayout)
+			return;
+
+		// Get text metrics to create bounding box
+		DWRITE_TEXT_METRICS textMetrics;
+		hr = pTextLayout->GetMetrics(&textMetrics);
+		if(FAILED(hr))
+			return;
+
+		// Create a rectangular path geometry from text bounds
+		SComPtr<ID2D1PathGeometry> pTextPath;
+		hr = pD2DFac->CreatePathGeometry(&pTextPath);
+		if(FAILED(hr) || !pTextPath)
+			return;
+
+		SComPtr<ID2D1GeometrySink> pTextSink;
+		hr = pTextPath->Open(&pTextSink);
+		if(FAILED(hr) || !pTextSink)
+			return;
+
+		// Create rectangle geometry for text bounds
+		float width = textMetrics.width;
+		float height = textMetrics.height;
+		
+		if(width > 0 && height > 0)
+		{
+			D2D1_POINT_2F pt1 = {0, 0};
+			D2D1_POINT_2F pt2 = {width, 0};
+			D2D1_POINT_2F pt3 = {width, height};
+			D2D1_POINT_2F pt4 = {0, height};
+			
+			pTextSink->BeginFigure(pt1, D2D1_FIGURE_BEGIN_FILLED);
+			pTextSink->AddLine(pt2);
+			pTextSink->AddLine(pt3);
+			pTextSink->AddLine(pt4);
+			pTextSink->EndFigure(D2D1_FIGURE_END_CLOSED);
 		}
-		*/
+
+		hr = pTextSink->Close();
+		if(FAILED(hr))
+			return;
+
+		// Apply translation to position the text
+		if(x != 0.0f || y != 0.0f)
+		{
+			SComPtr<ID2D1TransformedGeometry> tg;
+			if(!SUCCEEDED(pD2DFac->CreateTransformedGeometry(pTextPath, 
+				Matrix3x2F::Translation(x, y), &tg)))
+				return;
+			pTextPath = tg;
+		}
+
+		// Combine with existing geometry
+		if(m_bFigureOpen)
+			endFigure(FALSE);
+
+		if(!m_geometry || isEmpty())
+		{
+			m_geometry = pTextPath;
+			if(!m_path)
+				m_path = pTextPath;
+		}
+		else
+		{
+			// Combine current geometry with text geometry
+			ID2D1Factory *fac = toD2DFac(GetRenderFactory());
+			SComPtr<ID2D1PathGeometry> pCombined;
+			hr = fac->CreatePathGeometry(&pCombined);
+			if(FAILED(hr))
+				return;
+
+			SComPtr<ID2D1GeometrySink> pCombinedSink;
+			hr = pCombined->Open(&pCombinedSink);
+			if(FAILED(hr))
+				return;
+
+			hr = m_geometry->CombineWithGeometry(pTextPath, D2D1_COMBINE_MODE_UNION, 
+				NULL, D2D1_DEFAULT_FLATTENING_TOLERANCE, pCombinedSink);
+			
+			if(FAILED(hr))
+				return;
+
+			hr = pCombinedSink->Close();
+			if(FAILED(hr))
+				return;
+
+			m_path = pCombined;
+			m_geometry = pCombined;
+		}
 	}
 
 
 	IPathS * SPath_D2D::clone(CTHIS) const
 	{
-		return NULL;
+		if(!m_path)
+			return NULL;
+
+		// Create a new path object
+		SPath_D2D *pNewPath = new SPath_D2D(m_pRenderFactory);
+		if(!pNewPath)
+			return NULL;
+
+		// Clone the path geometry
+		ID2D1Factory *fac = toD2DFac(m_pRenderFactory);
+		SComPtr<ID2D1PathGeometry> pNewPathGeometry;
+		HRESULT hr = fac->CreatePathGeometry(&pNewPathGeometry);
+		if(FAILED(hr) || !pNewPathGeometry)
+		{
+			pNewPath->Release();
+			return NULL;
+		}
+
+		// Open sink to write geometry
+		SComPtr<ID2D1GeometrySink> pSink;
+		hr = pNewPathGeometry->Open(&pSink);
+		if(FAILED(hr) || !pSink)
+		{
+			pNewPath->Release();
+			return NULL;
+		}
+
+		// Copy the source path geometry into the new path using Stream
+		hr = m_path->Stream(pSink);
+		if(FAILED(hr))
+		{
+			pSink->Close();
+			pNewPath->Release();
+			return NULL;
+		}
+
+		// Close the sink
+		hr = pSink->Close();
+		if(FAILED(hr))
+		{
+			pNewPath->Release();
+			return NULL;
+		}
+
+		// Set the cloned path properties
+		pNewPath->m_path = pNewPathGeometry;
+		pNewPath->m_geometry = pNewPathGeometry;
+		pNewPath->m_fillType = m_fillType;
+		pNewPath->m_lastPt = m_lastPt;
+		pNewPath->m_bFigureOpen = FALSE;  // cloned path should have no open figures
+
+		return (IPathS*)pNewPath;
 	}
 
 	BOOL SPath_D2D::beginFigure(THIS_ float x,float y,BOOL bFill)
@@ -2778,7 +3007,9 @@ SNSBEGIN
 		m_path->QueryInterface(__uuidof(ID2D1PathGeometry1), (void **)&path2);
 		if(!path2)
 			return FALSE;
-		HRESULT hr = path2->ComputePointAndSegmentAtLength(distance,0,NULL,&pointDescription);
+		// Call ComputePointAndSegmentAtLength with NULL transform on the original path
+		// This works because the geometric query is always on the original path geometry
+		HRESULT hr = path2->ComputePointAndSegmentAtLength(distance, 0, NULL, D2D1_DEFAULT_FLATTENING_TOLERANCE, &pointDescription);
 		if(!SUCCEEDED(hr))
 			return FALSE;
 		pos->fX = pointDescription.point.x;
@@ -2793,7 +3024,15 @@ SNSBEGIN
 	{
 		BOOL result = FALSE;
 		D2D1_POINT_2F pt={x,y};
-		m_path->FillContainsPoint (pt, NULL, &result);
+		// Use m_geometry to account for any transformations applied to the path
+		if(m_geometry)
+		{
+			m_geometry->FillContainsPoint(pt, NULL, &result);
+		}
+		else if(m_path)
+		{
+			m_path->FillContainsPoint(pt, NULL, &result);
+		}
 		return result;
 	}
 
@@ -2801,9 +3040,16 @@ SNSBEGIN
 	{
 		BOOL result = FALSE;
 		D2D1_POINT_2F pt={x,y};
-		m_path->StrokeContainsPoint (pt,strokeSize, NULL,NULL,D2D1_DEFAULT_FLATTENING_TOLERANCE, &result);
+		// Use m_geometry to account for any transformations applied to the path
+		if(m_geometry)
+		{
+			m_geometry->StrokeContainsPoint(pt, strokeSize, NULL, NULL, D2D1_DEFAULT_FLATTENING_TOLERANCE, &result);
+		}
+		else if(m_path)
+		{
+			m_path->StrokeContainsPoint(pt, strokeSize, NULL, NULL, D2D1_DEFAULT_FLATTENING_TOLERANCE, &result);
+		}
 		return result;
-
 	}
 
 	BOOL SPath_D2D::op(CTHIS_ const IPathS *other, PathOP op, IPathS * out) SCONST{

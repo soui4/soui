@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-  <window size="full,full" name="game_wnd" on_size="on_canvas_size" id="300">
+  <window size="full,full" name="game_wnd" id="300">
     <text pos="0,0,-0,@30" colorBkgnd="#cccccc" colorText="#ff0000" align="center">SOUI + LUA 跑马机</text>
     <window pos="0,[0,-0,-50">
-      <window pos="0,0,-64,-0" name="game_canvas" clipClient="1" colorBkgnd="#ffffff">
+      <window pos="0,0,-64,-0" name="game_canvas" on_size="on_canvas_size" clipClient="1" colorBkgnd="#ffffff">
         <!--比赛场地-->
         <gifplayer name="player_1" float="1" skin="gif_horse">
           <text pos="0,%1" colorText="rgb(255,0,0)" font="size:20">1</text>

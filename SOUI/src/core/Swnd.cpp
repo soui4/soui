@@ -1484,16 +1484,15 @@ BOOL SWindow::InitFromXml(IXmlNode *pNode)
             }
         }
     }
+    // 发送WM_CREATE消息
+    if (0 != SSendMessage(WM_CREATE))
+    {
+        if (m_pParent)
+            m_pParent->DestroyChild(this);
+        return FALSE;
+    }
     if (m_pContainer)
     {
-        // 发送WM_CREATE消息
-        if (0 != SSendMessage(WM_CREATE))
-        {
-            if (m_pParent)
-                m_pParent->DestroyChild(this);
-            return FALSE;
-        }
-
         // 给this发一个WM_SHOWWINDOW消息，一些控件需要在WM_SHOWWINDOW中处理状态
         // 初始化的WM_SHOWWINDOW只影响this,子窗口的SHOW由子窗口发出。
         // 不改变窗口的m_bVisible状态，需要使用ParentShow标志
@@ -2314,11 +2313,13 @@ void SWindow::SetPivot(float x, float y)
 
 int SWindow::OnCreate(LPVOID)
 {
-    SASSERT(GetContainer());
-    if (GetStyle().m_bTrackMouseEvent)
-        GetContainer()->RegisterTrackMouseEvent(m_swnd);
-    if (GetStyle().m_bVideoCanvas)
-        GetContainer()->RegisterVideoCanvas(m_swnd);
+    if (GetContainer())
+    {
+        if (GetStyle().m_bTrackMouseEvent)
+            GetContainer()->RegisterTrackMouseEvent(m_swnd);
+        if (GetStyle().m_bVideoCanvas)
+            GetContainer()->RegisterVideoCanvas(m_swnd);    
+    }
 
     GetStyle().SetScale(GetScale());
 
