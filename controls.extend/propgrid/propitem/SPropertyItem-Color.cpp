@@ -77,7 +77,7 @@ SPropertyItemColor::SPropertyItemColor(SPropertyGrid *pOwner) :SPropertyItemText
 
 	LRESULT SPropertyItemColor::OnAttrColor(const SStringW &value, BOOL bLoading)
     {
-        SetValue(value);
+        SetValue(S_CW2T(value));
         return bLoading ? S_OK : S_FALSE;
 	}
 
