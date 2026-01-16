@@ -88,8 +88,6 @@ static const wchar_t *ksel_piece = L"sel_piece";     ///< select a piece animati
 namespace Widgets{
     static const wchar_t *kVectory = L"sprite_vectory";     ///< 胜利动画
     static const wchar_t *ktab_toolbar = L"tab_toolbar";    ///< 工具栏
-    static const wchar_t *kflag_pos_to = L"sprite_flag_pos_to";    ///< 位置标志动画
-    static const wchar_t *kflag_pos_from = L"img_flag_pos_from";
     static const wchar_t *kbtn_start = L"btn_start";
     static const wchar_t *kbtn_req_peace = L"btn_req_peace";
     static const wchar_t *kbtn_req_surrender = L"btn_req_surrender";

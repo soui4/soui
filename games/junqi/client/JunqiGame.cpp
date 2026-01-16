@@ -143,6 +143,17 @@ void CJunqiGame::onAnimationEnd(IValueAnimator *pAnimator)
             CHESSMAN chess = m_layout.GetCellChessMan(ptTarget);
             pDstPiece = m_pGameBoard->FindChildByID2<CJunqiPiece>(ID_CHESS_BASE + cell.nSide*100 + chess.nID);
         }
+        {
+            //show dest box
+            CRotateImage *pDestBox = m_pGameBoard->FindChildByName2<CRotateImage>(Widgets::kimg_dest_box);
+            pDestBox->SetVisible(TRUE, TRUE);
+            SAnchorLayoutParam *pParam = (SAnchorLayoutParam*)pDestBox->GetLayoutParam();
+            pParam->pos.type = 10;
+            pParam->pos.x.fSize = ptTarget.x;
+            pParam->pos.y.fSize = ptTarget.y;
+            pDestBox->SetRotate(CRotateImage::CalcRotate(ptTarget, m_iSelfIndex, pPiece->GetColor()),TRUE);
+            pDestBox->RequestRelayout();
+        }
         int nResult = pPiece->GetMoveResult();
         m_layout.MoveChessmanClient(ptFrom, ptTarget,nResult);
         if(nResult != PUT_MOVE){
@@ -173,16 +184,6 @@ void CJunqiGame::onAnimationEnd(IValueAnimator *pAnimator)
             if(m_layout.GetJunQiMap()->GetCellType(ptTarget) == CP_BARBACK){
                 PlayEffectSound(Sounds::Effects::kBarback);
             }
-        }
-        {
-            //show dest box
-            SWindow *pDestBox = m_pGameBoard->FindChildByName(Widgets::kimg_dest_box);
-            pDestBox->SetVisible(TRUE, TRUE);
-            SAnchorLayoutParam *pParam = (SAnchorLayoutParam*)pDestBox->GetLayoutParam();
-            pParam->pos.type = 10;
-            pParam->pos.x.fSize = ptTarget.x;
-            pParam->pos.y.fSize = ptTarget.y;
-            pDestBox->RequestRelayout();
         }
 
         m_bMoving = FALSE;

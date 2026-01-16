@@ -2,79 +2,21 @@
 #include "JunqiPiece.h"
 
 SNSBEGIN
-
-SSkinPiece::SSkinPiece(void)
-    : m_ptCenter(15, 14)
-    , m_szChess(31, 29)
+void CRotateImage::SetRotate(float fRotate, BOOL bUpdate)
 {
-    m_bEnableScale = FALSE;
+    m_fRotate = fRotate;
+    if (bUpdate)
+    {
+        CRect rcWnd = GetWindowRect();
+        SMatrix mtx;
+        mtx.setRotate2(fRotate, rcWnd.Width() / 2, rcWnd.Height() / 2);
+        SetMatrix(mtx);
+    }
 }
 
-SIZE SSkinPiece::GetSkinSize() const
+float CRotateImage::CalcRotate(POINT pt, int iBottomColor, int iColor)
 {
-    return m_szChess;
-}
-
-int SSkinPiece::GetStates() const
-{
-    return PIECE_COLS * PIECE_ROWS;
-}
-
-CPoint SSkinPiece::GetCenter() const
-{
-    return m_ptCenter;
-}
-
-void SSkinPiece::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const
-{
-    if (!GetImage())
-        return;
-
-    int iRow = iState % PIECE_ROWS;
-    int iCol = iState / PIECE_ROWS;
-    SIZE szImg = GetImage()->Size();
-    SIZE szChess = { szImg.cx / PIECE_COLS, szImg.cy / PIECE_ROWS };
-    CRect rcSrc(CPoint(), szChess);
-    rcSrc.OffsetRect(iCol * szChess.cx, iRow * szChess.cy);
-    CRect rcDst = *rcDraw;
-    rcDst.bottom = rcDst.top + rcDst.Height();
-    pRT->DrawBitmapEx(&rcDst, GetImage(), &rcSrc, GetExpandMode(), byAlpha);
-}
-
-//------------------------------------------------------------------
-CJunqiPiece::CJunqiPiece()
-    : m_fRotate(0.0f)
-    , m_chessman(0)
-    , m_iColor(0)
-    , m_bShow(TRUE)
-{
-    m_bMsgTransparent = FALSE;
-    //m_bClipClient = TRUE;
-    m_pos = { 0, 0 };
-    m_target = { 0, 0 };
-}
-
-CJunqiPiece::~CJunqiPiece()
-{
-}
-
-void CJunqiPiece::SetChessman(int chessman)
-{
-    m_chessman = chessman;
-    SASSERT(m_chessman >= OR_SAPPER && m_chessman <= OR_FAKE);
-    SetIcon((m_iColor * SSkinPiece::PIECE_ROWS) + GetIconIndex());
-}
-
-int CJunqiPiece::GetIconIndex() const
-{
-    int idx = m_chessman - 1;
-    if (!m_bShow)
-        idx = IDX_FAKE;
-    return idx;
-}
-float CJunqiPiece::CalcRotate(POINT pt, int iBottomColor) const
-{
-    if (m_iColor % 2 == iBottomColor % 2)
+    if (iColor % 2 == iBottomColor % 2)
     {
         // self and top
         if (pt.x < 6)
@@ -96,17 +38,37 @@ float CJunqiPiece::CalcRotate(POINT pt, int iBottomColor) const
     }
 }
 
-void CJunqiPiece::SetRotate(float fRotate, BOOL bUpdate)
+//---------------------------------------------------------------------
+CJunqiPiece::CJunqiPiece()
+    :m_chessman(OR_FAKE)
+    , m_iColor(0)
+    , m_bShow(TRUE)
 {
-    m_fRotate = fRotate;
-    if (bUpdate)
-    {
-        CRect rcWnd = GetWindowRect();
-        SMatrix mtx;
-        mtx.setRotate2(fRotate, rcWnd.Width() / 2, rcWnd.Height() / 2);
-        SetMatrix(mtx);
-    }
+    m_bMsgTransparent = FALSE;
+    m_pos = { 0, 0 };
+    m_target = { 0, 0 };
 }
+
+CJunqiPiece::~CJunqiPiece()
+{
+}
+
+void CJunqiPiece::SetChessman(int chessman)
+{
+    SASSERT(m_chessman >= OR_SAPPER && m_chessman <= OR_FAKE);
+    m_chessman = chessman;
+    InvalidateRect(NULL);
+}
+void CJunqiPiece::SetColor(int side)
+{
+    m_iColor = side;
+    InvalidateRect(NULL);
+}
+float CJunqiPiece::CalcRotate(POINT pt, int iBottomColor) const
+{
+    return CRotateImage::CalcRotate(pt, iBottomColor, m_iColor);
+}
+
 void CJunqiPiece::OnSize(UINT nType, CSize size)
 {
     SWindow::OnSize(nType, size);
@@ -115,6 +77,17 @@ void CJunqiPiece::OnSize(UINT nType, CSize size)
     SetMatrix(mtx);
 }
 
+void CJunqiPiece::OnPaint(IRenderTarget *pRT)
+{
+    CRect rcWnd = GetWindowRect();
+    SASSERT(m_pSkin);
+    SASSERT(m_pRankSkin);
+    m_pSkin->DrawByIndex(pRT, rcWnd, m_iColor);
+    if(m_bShow && m_chessman >= OR_SAPPER && m_chessman < OR_FAKE)
+    {
+        m_pRankSkin->DrawByIndex(pRT, rcWnd, m_chessman -1);
+    }
+}
 BOOL CJunqiPiece::SetAnimatorValue(IPropertyValuesHolder *pHolder, float fraction, ANI_STATE state)
 {
     if (wcscmp(pHolder->GetPropertyName(), WindowProperty::ROTATE) == 0)

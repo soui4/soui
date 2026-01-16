@@ -5,38 +5,27 @@
 #include <JunqiLayout.h>
 SNSBEGIN
 
-class SSkinPiece : public SSkinImgList
-{
-	DEF_SOBJECT(SSkinImgList, L"piece")
-public:
-    enum{
-        PIECE_COLS=4,
-        PIECE_ROWS=13,
-    };
-public:
-    SSkinPiece(void);
-	~SSkinPiece(void){ }
-    CPoint GetCenter() const;
-   
-public:
-    STDMETHOD_(SIZE, GetSkinSize)(THIS) SCONST OVERRIDE;
-    STDMETHOD_(int, GetStates)(THIS) SCONST OVERRIDE;
-protected:
-    void _DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const override;
-public:
-    SOUI_ATTRS_BEGIN()
-        ATTR_POINT(L"center", m_ptCenter, TRUE)
-        ATTR_SIZE(L"size", m_szChess, TRUE) //chess size, default is 76,86
-    SOUI_ATTRS_END()
-private:
-    CPoint m_ptCenter;
-    CSize  m_szChess;
+class CRotateImage : public SImageWnd{
+    DEF_SOBJECT(SImageWnd, L"rotateimage")
+
+    public:
+        CRotateImage():m_fRotate(0.0f){}
+        ~CRotateImage(){}
+
+        void SetRotate(float fRotate,BOOL bUpdate=FALSE);
+
+        float GetRotate() const{
+            return m_fRotate;
+        }
+
+        static float CalcRotate(POINT pt, int iBottomColor, int iColor);
+    protected:
+        float m_fRotate;
 };
 
-
-class CJunqiPiece : public SImageWnd
+class CJunqiPiece : public CRotateImage
 {
-    DEF_SOBJECT(SImageWnd, L"junqipiece")
+    DEF_SOBJECT(CRotateImage, L"junqipiece")
 
     enum{
         IDX_FAKE=12,
@@ -57,12 +46,7 @@ class CJunqiPiece : public SImageWnd
     int GetChessman() const{
         return m_chessman;
     }
-
-    int GetIconIndex() const;
-    void SetColor(int side){
-        m_iColor = side;
-        SetIcon((m_iColor * SSkinPiece::PIECE_ROWS) + GetIconIndex());
-    }    
+    void SetColor(int side);
     int GetColor() const{
         return m_iColor;
     }
@@ -90,8 +74,6 @@ class CJunqiPiece : public SImageWnd
 
     float CalcRotate(POINT pt, int iBottomColor) const;
 
-    void SetRotate(float fRotate,BOOL bUpdate=FALSE);
-
     void SetMoveResult(int nResult){
         m_nMoveResult = nResult;
     }
@@ -102,11 +84,18 @@ public:
     STDMETHOD_(BOOL, SetAnimatorValue)(THIS_ IPropertyValuesHolder *pHolder, float fraction, ANI_STATE state) OVERRIDE;
 public:
     void OnSize(UINT nType, CSize size);
+    void OnPaint(IRenderTarget *pRT);
     SOUI_MSG_MAP_BEGIN()
         MSG_WM_SIZE(OnSize)
+        MSG_WM_PAINT_EX(OnPaint)
     SOUI_MSG_MAP_END()
+
+public:
+    SOUI_ATTRS_BEGIN()
+        ATTR_SKIN(L"rankSkin", m_pRankSkin, TRUE)
+    SOUI_ATTRS_END()
 protected:
-    float m_fRotate;
+    SAutoRefPtr<ISkinObj> m_pRankSkin;
     int m_chessman;       // 棋子类型
     int m_iColor;           // 棋子所属方位
     BOOL m_bShow;         // 是否显示

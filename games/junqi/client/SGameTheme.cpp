@@ -1,5 +1,7 @@
 ﻿#include "stdafx.h"
 #include "SGameTheme.h"
+#include <helper/slog.h>
+#define kLogTag "SGameTheme"
 
 SNSBEGIN
 
@@ -41,6 +43,10 @@ BOOL SGameTheme::Load(LPCTSTR pszThemeDir)
             pWidget->InitFromXml(&xmlWidget);
             m_mapWidgets[strName] = pWidget;
             pWidget->Release();
+        }
+        else
+        {
+            SLOGW() << "Create widget failed,name=" << strName.c_str() << L",class=" << clsName.c_str();
         }
         xmlWidget = xmlWidget.next_sibling();
     }
