@@ -1152,7 +1152,7 @@ SNSBEGIN
 		::Arc(m_hdc,pRect->left,pRect->top,pRect->right,pRect->bottom,pt2.x,pt2.y,pt1.x,pt1.y);
         ::SelectObject(m_hdc,oldBr);
         ::SelectObject(m_hdc,oldPen);
-        return E_NOTIMPL;
+        return S_OK;
     }
 
     HRESULT SRenderTarget_GDI::FillArc( LPCRECT pRect,float startAngle,float sweepAngle )
@@ -1244,7 +1244,41 @@ SNSBEGIN
 
 	HRESULT SRenderTarget_GDI::DrawGradientPath(THIS_ const IPathS* path, const GradientItem *pGradients, int nCount,const GradientInfo *info, BYTE byAlpha)
 	{
-		return E_NOTIMPL;
+		if (!path || !pGradients || nCount < 2) return E_INVALIDARG;
+
+		const SPath_GDI* pGdiPath = static_cast<const SPath_GDI*>(path);
+		HRGN hRgn = pGdiPath->CreateRegionFromCommands();
+		if (!hRgn) return E_FAIL;
+
+		// Get path bounds for gradient calculation
+		RECT rcBounds;
+		GetRgnBox(hRgn, &rcBounds);
+
+		// Use existing gradient rectangle implementation with path clipping
+		HRGN hOldClip = CreateRectRgn(0, 0, 0, 0);
+		int clipResult = GetClipRgn(m_hdc, hOldClip);
+
+		// Set path as clipping region
+		SelectClipRgn(m_hdc, hRgn);
+
+		// Draw gradient rectangle over the path bounds
+		POINT ptCorner={0,0};
+		HRESULT hr = DrawGradientRectEx(&rcBounds,ptCorner, pGradients, nCount, info, byAlpha);
+
+		// Restore original clipping
+		if (clipResult == 1)
+		{
+			SelectClipRgn(m_hdc, hOldClip);
+		}
+		else
+		{
+			SelectClipRgn(m_hdc, NULL);
+		}
+
+		DeleteObject(hOldClip);
+		DeleteObject(hRgn);
+
+		return hr;
 	}
 
 	HRESULT SRenderTarget_GDI::CreateRegion(IRegionS ** ppRegion)
@@ -1254,17 +1288,50 @@ SNSBEGIN
 
 	HRESULT SRenderTarget_GDI::PushClipPath(const IPathS * path, UINT mode, BOOL doAntiAlias /*= false*/)
 	{
-		return E_NOTIMPL;
+		if (!path) return E_INVALIDARG;
+
+		const SPath_GDI* pGdiPath = static_cast<const SPath_GDI*>(path);
+		HRGN hRgn = pGdiPath->CreateRegionFromCommands();
+		if (!hRgn) return E_FAIL;
+
+		// Convert path to region and use existing region clipping
+		SAutoRefPtr<IRegionS> pRegion;
+		if (SUCCEEDED(CreateRegion(&pRegion)))
+		{
+			SRegion_GDI* pGdiRegion = static_cast<SRegion_GDI*>(pRegion.Get());
+			pGdiRegion->_CombineRgn(hRgn, RGN_COPY);
+			HRESULT hr = PushClipRegion(pRegion, mode);
+			DeleteObject(hRgn);
+			return hr;
+		}
+
+		DeleteObject(hRgn);
+		return S_OK;
 	}
 
 	HRESULT SRenderTarget_GDI::DrawPath(const IPathS * path,IPathEffect * pathEffect)
 	{
-		return E_NOTIMPL;
+		if (!path) return E_INVALIDARG;
+		const SPath_GDI* pGdiPath = static_cast<const SPath_GDI*>(path);
+        RECT rcBox;
+        pGdiPath->getBounds(&rcBox);
+		// Execute path commands on current HDC and stroke
+		pGdiPath->ExecuteCommands(m_hdc);
+		::StrokePath(m_hdc);
+        return S_OK;
 	}
 
 	HRESULT SRenderTarget_GDI::FillPath(const IPathS * path)
 	{
-		return E_NOTIMPL;
+		if (!path) return E_INVALIDARG;
+
+		const SPath_GDI* pGdiPath = static_cast<const SPath_GDI*>(path);
+        RECT rcBox;
+        pGdiPath->getBounds(&rcBox);
+		// Execute path commands on current HDC and fill
+		pGdiPath->ExecuteCommands(m_hdc);
+		::FillPath(m_hdc);
+		return S_OK;
 	}
 
 	HRESULT SRenderTarget_GDI::SetXfermode(int mode,int *pOldMode)

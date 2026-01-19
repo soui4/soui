@@ -2247,7 +2247,27 @@ SNSBEGIN
     }
 
     HRESULT SRenderTarget_GDI::DrawArc2(LPCRECT pRect, float startAngle, float sweepAngle, int width) {
-        return E_NOTIMPL;
+        if(!m_curPen) return E_INVALIDARG;
+        RECT rcBuf = *pRect;
+		::InflateRect(&rcBuf,width/2,width/2);
+        HPEN hPen = ::CreatePen(m_curPen->GetStyle(),width,m_curPen->GetColor());
+
+        DCBuffer dcBuf(m_hdc,&rcBuf,GetAValue(m_curPen->GetColor()));
+        HGDIOBJ oldPen = ::SelectObject(dcBuf,hPen);
+        HGDIOBJ oldBr=::SelectObject(dcBuf,GetStockObject(NULL_BRUSH));
+        POINT ptCenter = {(pRect->left+pRect->right)/2,(pRect->top+pRect->bottom)/2};
+        int   a=ptCenter.x-pRect->left,b=ptCenter.y-pRect->top;
+        POINT pt1,pt2;
+        float startAngle2 =startAngle*PI/180.0f;
+        float endAngle2 = (startAngle+sweepAngle)*PI/180.0f;
+        pt1.x=ptCenter.x+(int)(a*cos(startAngle2));
+        pt1.y=ptCenter.y+(int)(b*sin(startAngle2));
+        pt2.x=ptCenter.x+(int)(a*cos(endAngle2));
+        pt2.y=ptCenter.y+(int)(b*sin(endAngle2));
+		::Arc(dcBuf,pRect->left,pRect->top,pRect->right,pRect->bottom,pt2.x,pt2.y,pt1.x,pt1.y);
+        ::SelectObject(dcBuf,oldBr);
+        ::SelectObject(dcBuf,oldPen);
+        return S_OK;
     }
 
     HRESULT SRenderTarget_GDI::FillArc( LPCRECT pRect,float startAngle,float sweepAngle )
@@ -2413,7 +2433,7 @@ SNSBEGIN
 		}
 
 		DeleteObject(hRgn);
-		return E_FAIL;
+		return S_OK;
 	}
 
 	HRESULT SRenderTarget_GDI::DrawPath(const IPathS * path,IPathEffect * pathEffect)
