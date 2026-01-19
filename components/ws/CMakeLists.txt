@@ -21,31 +21,12 @@ endif()
 
 
 get_target_property(websockets_includes websockets INTERFACE_INCLUDE_DIRECTORIES)
-if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-        set(platform "x64")
-else()
-        set(platform "x86")
-endif()
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/third-part/openssl_1.1.1d/${platform}/include)
+
 target_include_directories(${PROJECT_NAME} PRIVATE ${websockets_includes})
 
 set(COM_LIBS ${COM_LIBS} ${PROJECT_NAME} CACHE INTERNAL "com_lib")
 set_target_properties (${PROJECT_NAME} PROPERTIES
     FOLDER components
-)
-
-install(TARGETS ${PROJECT_NAME}
-    CONFIGURATIONS Release
-    RUNTIME DESTINATION bin/Release
-    LIBRARY DESTINATION lib/Release
-    ARCHIVE DESTINATION lib/Release
-)
-
-install(TARGETS ${PROJECT_NAME}
-    CONFIGURATIONS Debug
-    RUNTIME DESTINATION bin/Debug
-    LIBRARY DESTINATION lib/Debug
-    ARCHIVE DESTINATION lib/Debug
 )
 
 

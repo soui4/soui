@@ -412,7 +412,9 @@ BOOL CJunQi::OnPlayerPass(PWSCLIENT pClient, DWORD dwType, LPVOID pData, DWORD d
 			BrdcstAckOver(GOT_NORMAL, iWinerSeat, L"游戏结束");
 			return TRUE;
 		}
-	}
+	}else{
+        SendMsg(NULL, dwType, pData, dwSize);
+    }
 	NotifyNextActiveMove();
     return TRUE;
 }

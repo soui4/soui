@@ -10,7 +10,9 @@
 #include <helper/slog.h>
 #include <mmsystem.h>
 #define kLogTag "MainDlg"
-
+#ifdef _WIN32
+#include "win32_audio.h"
+#endif
 CMainDlg::CMainDlg(SGameTheme* pTheme) 
 : SHostWnd(_T("LAYOUT:XML_MAINWND"))
 , m_pTheme(pTheme)
@@ -168,6 +170,12 @@ void CMainDlg::OnBtnUnmute()
 void CMainDlg::PlayWave(LPCTSTR pszSound)
 {
     if(m_bMute) return;
-    ::PlaySound(pszSound,NULL,SND_ASYNC | SND_NOSTOP | SND_FILENAME);
+    
+#ifdef _WIN32
+    Win32PlaySound(pszSound, NULL, SND_ASYNC | SND_NOSTOP | SND_FILENAME);
+#else
+    // Use the default PlaySound implementation on other platforms
+    ::PlaySound(pszSound, NULL, SND_ASYNC | SND_NOSTOP | SND_FILENAME);
+#endif
 }
 

@@ -7,13 +7,18 @@
 #include <math.h>
 #include <tchar.h>
 #include <algorithm>
+#include <vector>
 #include <atl.mini/SComHelper.h>
 #include <wtl.mini/souimisc.h>
 #include <string/strcpcvt.h>
 #include <helper/SAutoBuf.h>
 #pragma comment(lib,"Msimg32")
 #pragma  comment(lib,"windowscodecs.lib")
-
+#include <initguid.h>
+//62baa2d2-ab54-41b7-b872-787e0106a421
+DEFINE_GUID(IID_ID2D1PathGeometry1, 0x62baa2d2, 0xab54, 0x41b7, 0xb8, 0x72, 0x78, 0x7e, 0x01, 0x06, 0xa4, 0x21);
+//b859ee5a-d838-4b5b-a2e8-1adc7d93db48
+DEFINE_GUID(IID_IDWriteFactory, 0xb859ee5a, 0xd838, 0x4b5b, 0xa2, 0xe8, 0x1a, 0xdc, 0x7d, 0x93, 0xdb, 0x48);
 
 #pragma warning(disable:4244 4018)
 
@@ -208,7 +213,7 @@ SNSBEGIN
 
 		hr = DWriteCreateFactory(
 			DWRITE_FACTORY_TYPE_SHARED,
-			__uuidof(m_pDWriteFactory),
+			IID_IDWriteFactory,
 			reinterpret_cast<IUnknown **>(&m_pDWriteFactory)
 			);
 		if(!SUCCEEDED(hr)) return FALSE;
@@ -655,7 +660,7 @@ SNSBEGIN
 			default:
 				break;
 		}
-		return NULL;
+		return SComPtr<ID2D1Brush>();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -1050,7 +1055,7 @@ SNSBEGIN
 			return;
 		}
 		if(nCombineMode == RGN_COPY){
-			hr=hRgn->CombineWithGeometry(hRgn,D2D1_COMBINE_MODE_UNION,NULL,NULL,pSink);
+			hr=hRgn->CombineWithGeometry(hRgn,D2D1_COMBINE_MODE_UNION,NULL,D2D1_DEFAULT_FLATTENING_TOLERANCE,pSink);
 		}else
 		{
 			D2D1_COMBINE_MODE d2dCombineMode;
@@ -1063,7 +1068,7 @@ SNSBEGIN
 			case RGN_XOR:
 				d2dCombineMode=D2D1_COMBINE_MODE_XOR;break;
 			}
-			hr=m_hRgn->CombineWithGeometry(hRgn,d2dCombineMode,NULL,NULL,pSink);
+			hr=m_hRgn->CombineWithGeometry(hRgn,d2dCombineMode,NULL,D2D1_DEFAULT_FLATTENING_TOLERANCE,pSink);
 		}
 		pSink->Close();
 
@@ -1469,7 +1474,7 @@ SNSBEGIN
 
 	HRESULT SRenderTarget_D2D::DrawText( LPCTSTR pszText,int cchLen,LPRECT pRc,UINT uFormat)
 	{
-		if(cchLen<0) cchLen = (int)_tcslen(pszText);
+        SStringW wstr = S_CT2W(SStringT(pszText,cchLen));
 		ID2D1Factory *pFac = toD2DFac(m_pRenderFactory);
 		IDWriteFactory *pWriteFac = toD2DWriteFac(m_pRenderFactory);
 		SFont_D2D *pFont = m_curFont;
@@ -1496,25 +1501,97 @@ SNSBEGIN
 			pWriteFac->CreateEllipsisTrimmingSign(txtFormat,(IDWriteInlineObject**)&signObj);
 			txtFormat->SetTrimming(&trimming, signObj);
 		}
+		// 处理&字符，解析为下划线
+		SStringW processedText;
+		std::vector<DWRITE_TEXT_RANGE> underlineRanges;
+        if (uFormat & DT_NOPREFIX)
+		{
+			processedText = wstr;
+		}
+        else
+        {
+            int processedLen = 0;
+            int wstrLen = wstr.GetLength();
+			const LPCWSTR wstrPtr = wstr.c_str();
+            for (int i = 0; i < wstrLen; )
+            {
+				// 获取当前字符的长度
+				wchar_t* pCurrentEnd = wchar_traits::CharNext((wchar_t*)wstrPtr + i);
+				int currentLen = pCurrentEnd - (wstrPtr + i);
+                
+                if (currentLen == 1 && wstrPtr[i] == L'&')
+                {
+                    // 处理&符号
+                    if (i + 1 < wstrLen)
+                    {
+                        // 获取&后面的字符的长度
+                        wchar_t *pNextEnd = wchar_traits::CharNext(pCurrentEnd);
+                        int nextLen = pNextEnd - pCurrentEnd;
+                        
+                        // 确保&后面的字符在字符串范围内
+                        if (i + 1 + nextLen <= wstrLen)
+                        {
+                            // 将&后面的字符添加到处理后的字符串
+                            processedText += SStringW(pCurrentEnd, nextLen);
+                            if ((*pCurrentEnd) != L'&')
+                            {
+                                // 为该字符添加下划线范围
+                                DWRITE_TEXT_RANGE range;
+                                range.startPosition = processedLen;
+                                range.length = nextLen;
+                                underlineRanges.push_back(range);
+                            }
+                            
+                            processedLen += nextLen;
+                            i += 1 + nextLen; // 跳过&和后面的字符
+                        }
+                        else
+                        {
+                            // &后面的字符超出范围，只添加&符号
+                            processedText += L'&';
+                            processedLen++;
+                            i++;
+                        }
+                    }
+                    else
+                    {
+                        // &是字符串的最后一个字符，直接添加
+                        processedText += L'&';
+                        processedLen++;
+                        i++;
+                    }
+                }
+                else
+                {
+                    // 正常字符，直接添加
+                    processedText += SStringW(wstrPtr + i, currentLen);
+                    processedLen += currentLen;
+                    i += currentLen;
+                }
+            }
+        }
 		SComPtr<IDWriteTextLayout> layout;
-#ifdef _UNICODE
-		pWriteFac->CreateTextLayout(pszText,cchLen,txtFormat,RectWidth(pRc),RectHeight(pRc),&layout);
-#else
-		SStringW str=S_CA2W(SStringA(pszText,cchLen));
-		pWriteFac->CreateTextLayout(str.c_str(),str.GetLength(),txtFormat,RectWidth(pRc),RectHeight(pRc),&layout);
-#endif
+		int finalLen = processedText.GetLength();
+		pWriteFac->CreateTextLayout(processedText,finalLen,txtFormat,RectWidth(pRc),RectHeight(pRc),&layout);
 		if(uFormat & DT_CALCRECT)
 		{
 			DWRITE_TEXT_METRICS metrics;
 			layout->GetMetrics(&metrics);
 			pRc->right = pRc->left + (int)ceil(metrics.widthIncludingTrailingWhitespace);
 			pRc->bottom = pRc->top + (int)ceil(metrics.height);
-		}else if(cchLen>0){
+		}else if(finalLen>0){
 			DWRITE_TEXT_RANGE range;
 			range.startPosition=0;
-			range.length = cchLen;
+			range.length = finalLen;
 			layout->SetStrikethrough(lf->lfStrikeOut,range);
 			layout->SetUnderline(lf->lfUnderline,range);
+			
+			// 设置&字符解析出的下划线
+			for(size_t i=0; i<underlineRanges.size(); i++)
+			{
+				layout->SetUnderline(TRUE, underlineRanges[i]);
+			}
+			
 			SBrush_D2D *pBr = SBrush_D2D::CreateSolidBrush(m_pRenderFactory,m_curColor.toCOLORREF());
 			D2D1_POINT_2F pt={ (float)pRc->left,(float)pRc->top};
 			m_rt->PushAxisAlignedClip(toRectF(pRc),D2D1_ANTIALIAS_MODE_ALIASED);
@@ -3011,7 +3088,7 @@ SNSBEGIN
 	{
 		D2D1_POINT_DESCRIPTION pointDescription;
 		SComPtr<ID2D1PathGeometry1> path2;
-		m_path->QueryInterface(__uuidof(ID2D1PathGeometry1), (void **)&path2);
+		m_path->QueryInterface(IID_ID2D1PathGeometry1, (void **)&path2);
 		if(!path2)
 			return FALSE;
 		// Call ComputePointAndSegmentAtLength with NULL transform on the original path

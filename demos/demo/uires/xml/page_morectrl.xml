@@ -24,4 +24,9 @@
 		<imgknob size="80,80"  skin="skin_knob" min="0" max="1" value="0.5"/>
 		<imgknob size="80,80"  skin="skin_knob" min="0" max="1" value="0"/>
 	</window>
+	<window size="-1,-1" layout="hbox" interval="10">
+		<waveProgress size="100,100" name="waveProgress0" value="50" min="0" max="100"/>
+		<waveProgress size="100,100" name="waveProgress1" value="60" min="0" max="100"/>
+		<waveProgress size="100,100" name="waveProgress2" value="80" min="0" max="100"/>
+	</window>
 </window>

@@ -265,6 +265,7 @@ protected:
      * @param nSize 消息数据大小
      */
     void OnReqSurrender(const void *pData, int nSize);
+    void OnPlayerPass(const void *pData, int nSize);
     void OnActivePlayer(const void *pData, int nSize);
     void OnPlayerLose(const void *pData, int nSize);
     void OnFlagPos(const void *pData, int nSize);

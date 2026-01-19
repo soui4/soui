@@ -763,6 +763,9 @@ void CJunqiGame::ProcessHistoryMessage(DWORD dwType, const void *pData, int nSiz
     case MSG_REQ_SURRENDER:
         OnReqSurrender(pMsg, dwLen);
         break;
+    case MSG_REQ_PASS:
+        OnPlayerPass(pMsg, dwLen);
+        break;
     default:
         SLOGW() << "Unknown message type in replay: " << dwType;
         break;
@@ -1144,6 +1147,10 @@ BOOL CJunqiGame::OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE> > dat
     case GMT_SEATDOWN_ACK:
         OnSeatDownAck(pMsg, dwLen);
         break;
+    case MSG_REQ_PASS:
+        m_lstHistory.push_back(std::make_pair(dwType, data));
+        OnPlayerPass(pMsg, dwLen);
+        break;
     default:
         SLOGW() << "Unknown message type: " << dwType;
         break;
@@ -1365,6 +1372,21 @@ void CJunqiGame::OnReqSurrender(const void *pData, int nSize)
         PlayTip(strMsg);
     }else{
         PlayTip(_T("玩家认输"));
+    }
+}
+
+void CJunqiGame::OnPlayerPass(const void *pData, int nSize){
+    if(nSize < sizeof(MSG_PASS))
+        return;
+    MSG_PASS *pPass = (MSG_PASS *)pData;
+    int nSeat = Index2Seat(pPass->iIndex);
+    std::shared_ptr<GS_USERINFO> pUserInfo = m_pUserInfo[nSeat];
+    if(pUserInfo){
+        SStringT strName = S_CA2T(pUserInfo->szName, CP_UTF8);
+        SStringT strMsg = SStringT().Format(_T("玩家%s超时"), strName.c_str());
+        PlayTip(strMsg);
+    }else{
+        PlayTip(_T("玩家超时"));
     }
 }
 

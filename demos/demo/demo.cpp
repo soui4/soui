@@ -19,6 +19,7 @@
 #include <controls.extend/SImageKnob.h>
 #include <controls.extend/SMcListViewEx/SHeaderCtrlEx.h>
 #include <controls.extend/SMcListViewEx/SMCListViewEx.h>
+#include <controls.extend/SWaveProgress.h>
 
 #if defined(_WIN32) && !defined(__MINGW32__)
 #include <controls.extend/SIECtrl.h>
@@ -247,7 +248,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 
     app.RegisterWindowClass<SShellTray>();
     app.RegisterWindowClass<FpsWnd>();
-
+    app.RegisterWindowClass<SWaveProgress>();
 #if defined(_WIN32) && !defined(__MINGW32__)
     app.RegisterWindowClass<SIECtrl>(); // 注册IECtrl
     app.RegisterWindowClass<SStaticGdip>();

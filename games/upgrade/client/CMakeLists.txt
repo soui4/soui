@@ -28,7 +28,8 @@ link_directories(${SOUI_ROOT}/lib)
 target_link_libraries(${current_project} soui4 utilities4 ExtendCtrls upgrade_algorithm)
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    target_link_libraries(${current_project} winmm)
+    # Link win32 audio library on Windows
+    target_link_libraries(${current_project} win32_audio)
     if(MSVC)
     set(DPI_AWARE_MANIFEST "${PROJECT_SOURCE_DIR}/__cmake/dpi_aware.manifest")
     set_target_properties(${current_project} PROPERTIES

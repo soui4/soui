@@ -1,4 +1,8 @@
 option(SOUI_ENABLE_GAME_TEST "Enable game test" OFF)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+add_subdirectory(audio)
+include_directories(audio/src)
+endif()
 add_subdirectory(upgrade)
 add_subdirectory(cnchess)
 add_subdirectory(junqi)

@@ -21,7 +21,7 @@ else()
     target_link_libraries(render-d2d PUBLIC utilities4 d2d1.lib dwrite.lib)
 endif()
 
-if(MSVC_VERSION LESS 1600)
+if(MSVC AND MSVC_VERSION LESS 1600)
 message("vs is less than vs2008 d2d")
 target_include_directories(render-d2d
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/sdk7.1_d2d/include
