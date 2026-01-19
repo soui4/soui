@@ -54,11 +54,12 @@ public:
      */
     TcpClientSocket *accept();
 
+	typedef std::vector<SAutoRefPtr<TcpClientSocket> > TcpClientSocketVector;
     /**
      * Get TCP client sockets for all connections.
      * @return TCP client socket list.
      */
-    std::vector<SAutoRefPtr<TcpClientSocket>> clients() const;
+    TcpClientSocketVector clients() const;
 
     /**
      * Close TCP server socket.
@@ -68,7 +69,7 @@ private:
     void clearClosedTcpClientSockets();
     void clearTcpClientSockets();
 
-    std::list<SAutoRefPtr<TcpClientSocket> > _clientSockets;
+    std::list<TcpClientSocket* > _clientSockets;
 };
 
 SNSEND

@@ -23,9 +23,7 @@
 
 SNSBEGIN
 
-ServerSocket::ServerSocket() :
-    Socket(),
-    _clientSockets()
+ServerSocket::ServerSocket()
 {
 }
 
@@ -105,22 +103,22 @@ TcpClientSocket *ServerSocket::accept()
                                  clientPort);
 
     _clientSockets.push_back(newClientSock);
-    newClientSock->Release();
     return newClientSock;
 }
 
 void ServerSocket::clearClosedTcpClientSockets()
 {
-    std::list<SAutoRefPtr<TcpClientSocket>>::iterator iter = _clientSockets.begin();
+    std::list<TcpClientSocket*>::iterator iter = _clientSockets.begin();
 
     while (iter != _clientSockets.end())
     {
-        std::list<SAutoRefPtr<TcpClientSocket>>::iterator cur = iter;
-        SAutoRefPtr<TcpClientSocket> client = *iter;
+        std::list<TcpClientSocket* >::iterator cur = iter;
+        TcpClientSocket* client = *iter;
         ++ iter;
 
         if (client->address() == "")
         {
+			client->Release();
             _clientSockets.erase(cur);
         }
     }
@@ -128,24 +126,25 @@ void ServerSocket::clearClosedTcpClientSockets()
 
 void ServerSocket::clearTcpClientSockets()
 {
-    std::list<SAutoRefPtr<TcpClientSocket>>::iterator iter = _clientSockets.begin();
+    std::list<TcpClientSocket*>::iterator iter = _clientSockets.begin();
 
     for (; iter != _clientSockets.end(); ++ iter)
     {
         (*iter)->close();
+		(*iter)->Release();
     }
 
     _clientSockets.clear();
 }
 
-std::vector<SAutoRefPtr<TcpClientSocket>> ServerSocket::clients() const
+ServerSocket::TcpClientSocketVector ServerSocket::clients() const
 {
-    std::vector<SAutoRefPtr<TcpClientSocket>> clients;
-    std::list<SAutoRefPtr<TcpClientSocket>>::const_iterator iter = _clientSockets.begin();
+    TcpClientSocketVector clients;
+    std::list<TcpClientSocket* >::const_iterator iter = _clientSockets.begin();
 
     for (; iter != _clientSockets.end(); ++ iter)
     {
-        SAutoRefPtr<TcpClientSocket> client = *iter;
+        TcpClientSocket* client = *iter;
 
         if (client->address() != "")
         {
@@ -185,16 +184,16 @@ STDMETHODIMP_(int) ServerSocket::GetClientSocketCount(CTHIS) SCONST
 
 STDMETHODIMP_(int) ServerSocket::GetClientSocketsRef(THIS_ ITcpClientSocket **sockets, unsigned int count) const
 {
-    std::vector<SAutoRefPtr<TcpClientSocket>> vec = clients();
+    TcpClientSocketVector vec = clients();
     if(count > vec.size())
     {
         count = vec.size();
     }
 
-    std::vector<SAutoRefPtr<TcpClientSocket>>::iterator iter = vec.begin();
+    TcpClientSocketVector::iterator iter = vec.begin();
     for(unsigned int i = 0; i < count; ++i,++iter)
     {
-        sockets[i] = iter->Get();
+        sockets[i] = *iter;
         sockets[i]->AddRef();
     }
 
