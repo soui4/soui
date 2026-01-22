@@ -5,6 +5,11 @@
 
 #include <atl.mini/SComHelper.h>
 
+#ifndef __RPC__in_opt
+#define __RPC__in_opt
+#define __RPC__inout
+
+#endif//__RPC__in_opt
 struct IFileDropHandler{
     virtual void OnFileDropdown(HDROP hDrop) = 0;
 };

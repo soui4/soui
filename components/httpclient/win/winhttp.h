@@ -47,6 +47,10 @@ extern "C" {
 
 #endif
 
+#ifndef __out_data_source
+#define __out_data_source(x)
+#endif//__out_data_source
+
 //#define BOOLAPI WINHTTPAPI BOOL WINAPI
 //
 // types

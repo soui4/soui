@@ -7,7 +7,9 @@
 #include "layout/SAnchorLayout.h"
 #include "layout/SLinearLayout.h"
 #include "layout/SGridLayout.h"
+#ifdef SOUI_ENABLE_ACC
 #include "interface/sacchelper-i.h"
+#endif//SOUI_ENABLE_ACC
 #include "helper/SwndFinder.h"
 #include "helper/STime.h"
 #include "animation/STransformation.h"

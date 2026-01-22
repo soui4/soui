@@ -1235,6 +1235,7 @@ BOOL LogerManager::pushLog(int level, const char * filter, const char * log, con
 #if defined (WIN32) || defined(_WIN64)
 	char szPath[MAX_PATH]={0};
 	char *pModuleName = szPath;
+#ifdef GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS
     if(pRetAddr)
     {
         HMODULE hMod = 0;
@@ -1242,6 +1243,7 @@ BOOL LogerManager::pushLog(int level, const char * filter, const char * log, con
         GetModuleFileNameA(hMod,szPath,MAX_PATH);
         pModuleName = strrchr(szPath,'\\')+1;
     }
+#endif//GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS
 	pLog->_moduleName = pModuleName;
 #endif
     pLog->_pid = GetCurrentProcessId();

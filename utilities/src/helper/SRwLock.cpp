@@ -22,6 +22,7 @@ struct IRwLock {
 };
 
 #ifdef _WIN32
+#if defined(SRWLOCK_INIT)
 static bool native_rw_locks_supported = false;
 static bool module_load_attempted = false;
 static HMODULE library = NULL;
@@ -73,6 +74,30 @@ static bool LoadModule() {
     return native_rw_locks_supported;
 }
 
+class SRwLockWin7 : public IRwLock {
+    SRWLOCK m_rwlock;
+public:
+    SRwLockWin7() {
+        initialize_srw_lock(&m_rwlock);
+    }
+
+    void LockExclusive() override{
+        acquire_srw_lock_exclusive(&m_rwlock);
+    }
+
+    void UnlockExclusive() override {
+        release_srw_lock_exclusive(&m_rwlock);
+    }
+
+    void LockShared() override {
+        acquire_srw_lock_shared(&m_rwlock);
+    }
+
+    void UnlockShared() override {
+        release_srw_lock_shared(&m_rwlock);
+    }
+};
+#endif
 class SRwLockWinXP : public IRwLock
 {
 public:
@@ -133,29 +158,6 @@ private:
     HANDLE m_evtReaders;
 };
 
-class SRwLockWin7 : public IRwLock {
-    SRWLOCK m_rwlock;
-public:
-    SRwLockWin7() {
-        initialize_srw_lock(&m_rwlock);
-    }
-
-    void LockExclusive() override{
-        acquire_srw_lock_exclusive(&m_rwlock);
-    }
-
-    void UnlockExclusive() override {
-        release_srw_lock_exclusive(&m_rwlock);
-    }
-
-    void LockShared() override {
-        acquire_srw_lock_shared(&m_rwlock);
-    }
-
-    void UnlockShared() override {
-        release_srw_lock_shared(&m_rwlock);
-    }
-};
 #else
 
 class SRwLockPosix : public IRwLock {
@@ -189,10 +191,12 @@ public:
 SRwLock::SRwLock()
 {
 #ifdef _WIN32
+#if defined(SRWLOCK_INIT)
     if (LoadModule()) {
         impl = new SRwLockWin7();
     }
     else
+#endif
     {
         impl = new SRwLockWinXP();
     }

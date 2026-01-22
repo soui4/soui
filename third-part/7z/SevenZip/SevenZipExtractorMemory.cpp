@@ -35,7 +35,7 @@ namespace SevenZip
 	public:
 		virtual HRESULT STDMETHODCALLTYPE QueryInterface( 
 			/* [in] */ REFIID riid,
-			/* [iid_is][out] */ __RPC__deref_out void  **ppvObject) {
+			/* [iid_is][out] */  void  **ppvObject) {
 				HRESULT hRet = S_OK;
 				if(riid == IID_IUnknown){
 					*ppvObject = this;
@@ -142,14 +142,14 @@ namespace SevenZip
 		}
 
 		virtual HRESULT STDMETHODCALLTYPE Stat( 
-			/* [out] */ __RPC__out STATSTG *pstatstg,
+			/* [out] */  STATSTG *pstatstg,
 			/* [in] */ DWORD grfStatFlag) {
 				pstatstg->cbSize.QuadPart = m_szBuf;
 				return S_OK;
 		}
 
 		virtual HRESULT STDMETHODCALLTYPE Clone( 
-			/* [out] */ __RPC__deref_out_opt IStream **ppstm) {
+			/* [out] */  IStream **ppstm) {
 				return E_FAIL;
 		}
 
