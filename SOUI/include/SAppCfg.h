@@ -2,12 +2,11 @@
 #define _SAPP_CFG_H_
 
 #include <SApp.h>
-#include <resprovider-zip/SResProviderZip.h>
-#include <resprovider-7zip/SResProvider7Zip.h>
 #include <commgr2.h>    //define SCOM_MASK to select components
 #include <SouiFactory.h>
 #include <helper/slog.h>
-
+#include <resprovider-7zip/zip7resprovider-param.h>
+#include <resprovider-zip/zipresprovider-param.h>
 SNSBEGIN
 
 
