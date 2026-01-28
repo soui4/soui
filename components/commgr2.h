@@ -51,7 +51,7 @@
     #pragma comment(lib,"render-gdi")
 #endif
 #if(SCOM_MASK&scom_mask_render_d2d)
-#if defined(_WIN32)  && !defined(__MINGW32__)
+#if defined(_WIN32)
 #pragma comment(lib,"render-d2d")
 #pragma comment(lib,"d2d1")
 #pragma comment(lib,"dwrite")

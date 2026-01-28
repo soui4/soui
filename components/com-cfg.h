@@ -51,7 +51,7 @@
 #pragma comment(lib,"log4z")
 #pragma comment(lib,"taskloop")
 
-#if defined(_WIN32)  && !defined(__MINGW32__)
+#if defined(_WIN32)
 #pragma comment(lib,"imgdecoder-gdip")
 #pragma comment(lib,"render-d2d")
 #pragma comment(lib,"d2d1")

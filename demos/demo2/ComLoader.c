@@ -124,6 +124,9 @@ struct SComInfo s_comInfo[] = {
 #endif
 #if(SCOM_MASK&scom_mask_render_d2d)
 #pragma comment(lib,"render-d2d")
+#pragma comment(lib, "d2d1")
+#pragma comment(lib, "dwrite")
+
 #endif
 #if(SCOM_MASK&scom_mask_imgdecoder_wic)
 #pragma comment(lib,"imgdecoder-wic")

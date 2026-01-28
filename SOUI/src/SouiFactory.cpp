@@ -5,7 +5,6 @@
 #include <helper/STimer.h>
 #include <core/SHostDialog.h>
 #include <valueAnimator/SValueAnimator.h>
-#include <SAppCfg.h>
 
 SNSBEGIN
 
