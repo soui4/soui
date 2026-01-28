@@ -2842,24 +2842,53 @@ SNSBEGIN
 		}
 	}
 
-	void SPath_D2D::offset(THIS_ float dx, float dy)
+void SPath_D2D::offset(THIS_ float dx, float dy)
+{
+	// If figure is still open, close it first
+	if(m_sink)
 	{
-		// If figure is still open, close it first
-		if(m_sink)
-		{
-			close();
-		}
-		
-		// If geometry is empty, nothing to offset
-		if(!m_geometry)
-			return;
-			
-		ID2D1Factory *fac = toD2DFac(m_pRenderFactory);
-		SComPtr<ID2D1TransformedGeometry>  tg;
-		if (!SUCCEEDED (fac->CreateTransformedGeometry (m_geometry, Matrix3x2F::Translation(dx,dy), &tg)))
-			return;
-		m_geometry = tg;
+		close();
 	}
+	
+	// If geometry is empty, nothing to offset
+	if(!m_geometry)
+		return;
+		
+	ID2D1Factory *fac = toD2DFac(m_pRenderFactory);
+	
+	// 检查是否已经是 TransformedGeometry
+	ID2D1TransformedGeometry *tg = NULL;
+	HRESULT hr = m_geometry->QueryInterface(IID_ID2D1TransformedGeometry, (void**)&tg);
+	
+	if(SUCCEEDED(hr) && tg)
+	{
+		// 如果已经是 TransformedGeometry，获取其源几何图形和变换矩阵
+		SComPtr<ID2D1Geometry> sourceGeometry;
+		tg->GetSourceGeometry(&sourceGeometry);
+		
+		D2D1_MATRIX_3X2_F transform;
+		tg->GetTransform(&transform);
+		
+		// 计算新的变换矩阵（累积之前的变换）
+		D2D1_MATRIX_3X2_F newTransform = transform * D2D1::Matrix3x2F::Translation(dx, dy);
+		
+		// 创建新的 TransformedGeometry，直接基于原始几何图形
+		SComPtr<ID2D1TransformedGeometry> newTg;
+		if (SUCCEEDED(fac->CreateTransformedGeometry(sourceGeometry, newTransform, &newTg)))
+		{
+			m_geometry = newTg;
+		}
+		tg->Release();
+	}
+	else
+	{
+		// 如果不是 TransformedGeometry，创建新的
+		SComPtr<ID2D1TransformedGeometry> newTg;
+		if (!SUCCEEDED (fac->CreateTransformedGeometry (m_geometry, Matrix3x2F::Translation(dx,dy), &newTg)))
+			return;
+		m_geometry = newTg;
+	}
+}
 
 	void SPath_D2D::transform(THIS_ const IxForm * form)
 	{

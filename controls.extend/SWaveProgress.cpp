@@ -151,8 +151,6 @@ void SWaveProgress::OnPaint(IRenderTarget *pRT)
                 pRT->FillPath(m_path);
                 pRT->SelectObject(oldBrush);
             }
-            CRect rcBounds;
-            m_path->getBounds(&rcBounds);
         }
         {
             int waveOffset = rcClient.Width() / m_nWaveCount * 0.5f;
