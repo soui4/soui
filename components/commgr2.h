@@ -65,7 +65,7 @@
     #pragma comment(lib,"imgdecoder-stb")
 #endif
 #if(SCOM_MASK&scom_mask_imgdecoder_gdip)
-#if defined(_WIN32)  && !defined(__MINGW32__)
+#if defined(_WIN32)
     #pragma comment(lib,"imgdecoder-gdip")
 #endif
 #endif
@@ -107,7 +107,7 @@ SNSBEGIN
     {
         BOOL SCreateInstance(IObjRef **);
     }
-#if defined(_WIN32)  && !defined(__MINGW32__)
+#if defined(_WIN32)
     namespace IMGDECODOR_GDIP
     {
         BOOL SCreateInstance(IObjRef **);
@@ -156,9 +156,7 @@ SNSBEGIN
 	namespace HttpClient {
 		BOOL SCreateInstance(IObjRef **);
 	}
-SNSEND
 
-SNSBEGIN
 class SComMgr2
 {
 public:
@@ -190,81 +188,105 @@ public:
          return FALSE;
     }
 
-#if(SCOM_MASK&scom_mask_render_gdi)
     BOOL CreateRender_GDI(IObjRef **ppObj)
     {
+        #if(SCOM_MASK&scom_mask_render_gdi)
         return RENDER_GDI::SCreateInstance(ppObj);
+        #else
+        return FALSE;
+        #endif
     }
-#endif
 
-#if(SCOM_MASK&scom_mask_render_skia)
     BOOL CreateRender_Skia(IObjRef **ppObj)
     {
+        #if(SCOM_MASK&scom_mask_render_skia)
         return RENDER_SKIA::SCreateInstance(ppObj);
+        #else
+        return FALSE;
+        #endif
     }
-#endif
 
-#if(SCOM_MASK&scom_mask_render_d2d)
 	BOOL CreateRender_D2D(IObjRef **ppObj)
 	{
+        #if(SCOM_MASK&scom_mask_render_d2d)
 		return RENDER_D2D::SCreateInstance(ppObj);
+        #else
+        return FALSE;
+        #endif
 	}
-#endif
 
-#if(SCOM_MASK&scom_mask_script_lua)
     BOOL CreateScrpit_Lua(IObjRef **ppObj)
     {
+        #if(SCOM_MASK&scom_mask_script_lua)
         return SCRIPT_LUA::SCreateInstance(ppObj);
+        #else
+        return FALSE;
+        #endif
     }
-#endif
 
-#if(SCOM_MASK&scom_mask_translator)
     BOOL CreateTranslator(IObjRef **ppObj)
     {
+        #if(SCOM_MASK&scom_mask_translator)
         return TRANSLATOR::SCreateInstance(ppObj);
+        #else
+        return FALSE;
+        #endif
     }
-#endif
 
-#if(SCOM_MASK&scom_mask_resprovider_zip)
     BOOL CreateResProvider_ZIP(IObjRef **ppObj)
     {
+        #if(SCOM_MASK&scom_mask_resprovider_zip)
         return RESPROVIDER_ZIP::SCreateInstance(ppObj);
+        #else
+        return FALSE;
+        #endif
     }
-#endif
 
 
-#if(SCOM_MASK&scom_mask_resprovider_7z)
 	BOOL CreateResProvider_7ZIP(IObjRef **ppObj)
 	{
+        #if(SCOM_MASK&scom_mask_resprovider_7z)
 		return RESPROVIDER_7ZIP::SCreateInstance(ppObj);
+        #else
+        return FALSE;
+        #endif
 	}
-#endif
     
-#if(SCOM_MASK&scom_mask_log4z)
     BOOL CreateLog4z(IObjRef **ppObj)
     {
+        #if(SCOM_MASK&scom_mask_log4z)
         return LOG4Z::SCreateInstance(ppObj);
+        #else
+        return FALSE;
+        #endif
     }
-#endif
 
-#if(SCOM_MASK&scom_mask_taskloop)
 	BOOL CreateTaskLoop(IObjRef **ppObj)
 	{
+        #if(SCOM_MASK&scom_mask_taskloop)
 		return TASKLOOP::SCreateInstance(ppObj);
+        #else
+        return FALSE;
+        #endif
 	}
-#endif
-#if(SCOM_MASK&scom_mask_ipcobject)
+
 	BOOL CreateIpcObject(IObjRef **ppObj)
 	{
+        #if(SCOM_MASK&scom_mask_ipcobject)
 		return IPC::SCreateInstance(ppObj);
+        #else
+        return FALSE;
+        #endif
 	}
-#endif
-#if(SCOM_MASK&scom_mask_httpclient)
+
 	BOOL CreateHttpClient(IObjRef **ppObj)
 	{
+        #if(SCOM_MASK&scom_mask_httpclient)
 		return HttpClient::SCreateInstance(ppObj);
+        #else
+        return FALSE;
+        #endif
 	}
-#endif
 
 	HMODULE GetRenderModule(){
 		return NULL;

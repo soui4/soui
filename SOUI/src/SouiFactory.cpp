@@ -102,10 +102,6 @@ IAnimatorGroup *SouiFactory::CreateAnimatorGroup(THIS)
     return new SAnimatorGroup();
 }
 
-IAppCfg *SouiFactory::CreateAppCfg(THIS)
-{
-    return new SAppCfg();
-}
 SNSEND
 
 EXTERN_C ISouiFactoryPtr CreateSouiFactory()
