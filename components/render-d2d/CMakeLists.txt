@@ -22,8 +22,7 @@ else()
 endif()
 
 if(MSVC AND MSVC_VERSION LESS 1600)
-    message("vs is less than vs2008 d2d")
-    add_definitions(-DUSE_D2D1_1=0)
+    message(STATUS "vs is less than vs2008 d2d")
     target_include_directories(render-d2d
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/sdk7.1_d2d/include
     )
@@ -33,7 +32,13 @@ if(MSVC AND MSVC_VERSION LESS 1600)
         target_link_directories(render-d2d PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/sdk7.1_d2d/lib/x86")
     endif ()
 else()
+
+endif()
+if(MINGW OR (MSVC AND MSVC_VERSION GREATER 1600))
+    message(STATUS "enable d2d1.1")
     add_definitions(-DUSE_D2D1_1=1)
+else()
+    add_definitions(-DUSE_D2D1_1=0)
 endif()
 
 target_include_directories(render-d2d
