@@ -17,6 +17,7 @@ void SRoundWnd::OnCommitSurface(IRenderTarget *pRtDest, LPCRECT pRcDest, IRender
 	SAutoRefPtr<IRenderTarget> pRT; 
 	CRect rc = GetClientRect();
 	GETRENDERFACTORY->CreateRenderTarget(&pRT, rc.Width(), rc.Height());
+    pRT->BeginDraw();
 	pRT->OffsetViewportOrg(-rc.left,-rc.top);
 	pRT->ClearRect(&rc, 0);
 	SAutoRefPtr<IBrushS> br;
@@ -29,6 +30,7 @@ void SRoundWnd::OnCommitSurface(IRenderTarget *pRtDest, LPCRECT pRcDest, IRender
 	}
 	pRT->SetXfermode(kSrcIn_Mode,NULL);
 	pRT->AlphaBlend(&rc,pRtSrc,&rc,255);
+    pRT->EndDraw();
 	pRtDest->AlphaBlend(pRcDest,pRT,&rc,alpha);
 }
 

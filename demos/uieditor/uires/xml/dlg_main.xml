@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <SOUI name="mainWindow" title="@string/title" bigIcon="ICON_LOGO:48" smallIcon="ICON_LOGO:32" width="1377" height="900" margin="5,5,5,5" resizable="1" wndType="appMain"
       sendWheel2Hover="1">
-	<root colorBkgnd="#6f1111" cache="1" padding="5,5,5,5">
+	<root colorBkgnd="#6f1111" padding="5,5,5,5">
 		<window pos="1,[1,-1,-1" colorBkgnd="@color/bkBlack1">
 			<caption pos="0,0,-0,40" name="UI_main_caption" show="1" font="adding:0" colorBkgnd="#FFFFFF20" layout="hbox" gravity="center">
 				<icon src="ICON_LOGO:32"/>
@@ -23,8 +23,7 @@
 				<imgbtnex name="toolbar_btn_Close" skin="skin_app_button" text="关闭工程" size="100,30" animate="1" class="ue_cls_title" />
 				<imgbtnex name="toolbar_btn_NewLayout" skin="skin_app_button" text="新建布局" size="100,30" animate="1" class="ue_cls_title" />
 				<imgbtnex name="toolbar_btn_NewInclude" skin="skin_app_button" text="新建Include" size="100,30" animate="1" class="ue_cls_title" />
-				<imgbtnex name="toolbar_btn_savexml" skin="skin_app_button" text="保存XML" size="100,30" animate="1" class="ue_cls_title" />
-				<imgbtnex name="toolbar_btn_resmgr" size="100,30" skin="skin_app_button" text="资源管理" animate="1" class="ue_cls_title" />
+				<imgbtnex name="toolbar_btn_viewskin" skin="skin_app_button" text="查看皮肤" size="100,30" animate="1" class="ue_cls_title" />
 				<check name="chk_autosave" text="文件自动保存" colorText="@color/white"/>
 				<window size="0,0" weight="1" visible="0"/>
 			</window>
@@ -34,9 +33,6 @@
 				</pane>
 				<pane idealSize="800" minSize="30" priority="0" clipClient="1">
 					<include src="layout:xml_uidesigner_main" />
-				</pane>
-				<pane idealSize="250" minSize="30" priority="1" clipClient="1">
-					<include src="layout:xml_mainwnd_right" />
 				</pane>
 			</splitcol>
 		</window>

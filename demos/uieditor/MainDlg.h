@@ -3,8 +3,8 @@
 
 #include <core/SWnd.h>
 #include <control/SCmnCtrl.h>
-#include "Dialog/DlgCreatePro.h"
 #include "XmlEditor.h"
+#include "ImageViewer.h"
 #include "propgrid/SPropertyGrid.h"
 #include "SImageBtnEx.h"
 #include "ResManger.h"
@@ -14,6 +14,8 @@
 #include "DropTarget.h"
 #include "SToolBar.h"
 #include <algorithm>
+#include "FileTreeAdapter.h"
+#include "monitor/PathMonitor.h"
 #define MenuId_Start  20000
 
 
@@ -190,19 +192,18 @@ private:
 	IListener * m_pListener;
 };
 
-
-class CMainDlg : public SHostWnd, STreeCtrl::IListener,CScintillaWnd::IListener,public CDropTarget::IDropListener, CWidgetTBAdapter::IListener, CSkinTBAdapter::IListener
+class CMainDlg : public SHostWnd, CScintillaWnd::IListener,public CDropTarget::IDropListener, CWidgetTBAdapter::IListener, CSkinTBAdapter::IListener, CPathMonitor::IListener
 {
-	enum XmlType{
-		XML_LAYOUT,
-		XML_SKIN,
-		XML_UNKNOWN,
-	};
 public:
 	CMainDlg();
 	~CMainDlg();
-
+	
 protected:
+	// CPathMonitor::IListener接口实现
+    void OnFileChanged(LPCTSTR pszFile, CPathMonitor::Flag nFlag) override;
+    void _OnFileChanged(tstring &pszFile, CPathMonitor::Flag nFlag);
+
+  protected:
 	void LoadAppCfg();
 
 	void SaveAppCfg();
@@ -214,6 +215,8 @@ protected:
 	void UpdateEditorToolbar();
 	void UpdateToolbar();
 	bool CheckSave();
+
+	BOOL NewLayout(const SStringT& strPath, const SStringT& strName);
 protected:
 	void onScintillaSave(CScintillaWnd *pSci,LPCTSTR pszFileName) override;
 	void onScintillaAutoComplete(CScintillaWnd *pSci,char c) override;
@@ -221,11 +224,8 @@ protected:
 	BOOL OnDrop(LPCTSTR pszName) override;
 	void OnInsertWidget(CWidgetTBAdapter::IconInfo *info) override;
 	void OnInertSkin(CSkinTBAdapter::IconInfo * info) override;
-	void OnInsertItem(STreeCtrl *pTreeCtrl,HSTREEITEM hItem) override{}
-	void OnDeleteItem(STreeCtrl *pTreeCtrl,HSTREEITEM hItem,LPARAM lParam) override;
 protected:
 	//soui消息
-	bool OnTreeproContextMenu(CPoint pt);
 	void OnAutoCheck(IEvtArgs *e);
 	void OnClose();
 	void OnMaximize();
@@ -236,13 +236,15 @@ protected:
 	BOOL OnBtnSave(); //保存布局
 	void OnBtnNewLayout(); //新建Dialog
 	void OnBtnNewInclude(); //新建Include
-	void OnBtnResMgr();
 	void OnBtnAbout();
+	void OnBtnViewSkin();
 	void OnBtnRecentFile();
-	void OnTreeItemDbClick(IEvtArgs *pEvtBase);
-	void OnWorkspaceXMLDbClick(IEvtArgs *pEvtBase);
+	void OnTvEventOfPanel(IEvtArgs *pEvtBase);
+	// 递归添加目录中的所有文件到UIRes
+	void AddFilesInDirectoryToUIRes(const SStringT& dirPath);
 	EVENT_MAP_BEGIN()
 		if(m_pXmlEdtior) CHAIN_EVENT_MAP_MEMBER((*m_pXmlEdtior))
+		if(m_pImageViewer) CHAIN_EVENT_MAP_MEMBER((*m_pImageViewer))
 		EVENT_NAME_COMMAND(L"btn_close", OnClose)
 		EVENT_NAME_COMMAND(L"btn_min", OnMinimize)
 		EVENT_NAME_COMMAND(L"btn_max", OnMaximize)
@@ -254,14 +256,11 @@ protected:
 		EVENT_ID_COMMAND(R.id.toolbar_btn_NewLayout, OnBtnNewLayout)
 		EVENT_ID_COMMAND(R.id.toolbar_btn_NewInclude, OnBtnNewInclude)
 		EVENT_ID_COMMAND(R.id.toolbar_btn_savexml, OnBtnSave)
+		EVENT_ID_COMMAND(R.id.toolbar_btn_viewskin, OnBtnViewSkin)
 		EVENT_ID_COMMAND(R.id.btn_help, OnBtnAbout)
 		EVENT_ID_COMMAND(R.id.toolbar_btn_recent, OnBtnRecentFile)
-		
-		EVENT_ID_COMMAND(R.id.toolbar_btn_resmgr, OnBtnResMgr)
-		EVENT_ID_CONTEXTMENU(R.id.workspace_tree, OnTreeproContextMenu)
-		EVENT_ID_HANDLER(R.id.workspace_tree,EVT_TC_DBCLICK,OnTreeItemDbClick)
-		EVENT_ID_HANDLER(R.id.workspace_xmlfile_lb,EVT_LB_DBCLICK,OnWorkspaceXMLDbClick)
 		EVENT_ID_HANDLER(R.id.chk_autosave,EventSwndStateChanged::EventID,OnAutoCheck)
+		EVENT_ID_HANDLER(R.id.workspace_treeview,EventOfPanel::EventID,OnTvEventOfPanel)
 	EVENT_MAP_END2(SHostWnd)
 
 protected:
@@ -284,23 +283,33 @@ protected:
 	END_MSG_MAP()
 
 private:
-	std::vector<SStringT>	m_vecRecentFile;
+	std::vector<SStringT> m_vecRecentFile;
 
 public:
-	SStringT		   m_strUIResFile;
+	SStringT	   m_strUIResFile;
 
-	SMenuEx			m_RecentFileMenu;
+	SMenuEx		m_RecentFileMenu;
 	SButton*		m_btn_recentFile;
 
-	STreeCtrl * m_treePro;			//工程Layout列表
-	SListBox* m_lbWorkSpaceXml;		//工程中的XML文件列表
+	STreeView *m_treeView;          //文件树视图
+	SAutoRefPtr<CFileTreeAdapter> m_pFileTreeAdapter; //文件树适配器
 
 	SStringT  m_cmdWorkspaceFile;	//命令行要打开的工程文件
+	
+	// 文件操作相关
+	CPathMonitor m_pathMonitor;     // 路径监视器
 
+	// Clipboard 相关
+	UINT m_uClipboardFormat;        // 自定义 clipboard format
+	void SerializeItemsToClipboard(const std::vector<HSTREEITEM>& items, int nOperation);
+	BOOL DeserializeItemsFromClipboard(std::vector<SStringT>& vecItemPaths, int& nOperation);
+	BOOL HasClipboardData();
+	
 	ResManger m_UIResFileMgr;	// 管理编辑的UI文件资源
 
 	CXmlEditor *m_pXmlEdtior;
-	XmlType		m_editXmlType;
+	CImageViewer *m_pImageViewer;
+	int		m_editXmlType;
 	
 	SListView * m_lvSkin;
 	SListView * m_lvWidget;
@@ -308,7 +317,7 @@ public:
 	SStringT m_strUiresPath;	//uires.idx 的全路径
 	SStringT m_strProPath;
 
-	STabCtrl *m_tabWorkspace;
+	STabCtrl *m_tabWorkspace;	
 	
 	BOOL		m_bIsOpen;  //工程是否打开
 	bool		m_bAutoSave;

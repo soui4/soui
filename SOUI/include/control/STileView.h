@@ -18,6 +18,7 @@
 #include <interface/SAdapter-i.h>
 #include <helper/STileViewItemLocator.h>
 #include <proxy/SPanelProxy.h>
+#include "SViewBase.h"
 
 SNSBEGIN
 
@@ -29,8 +30,7 @@ SNSBEGIN
  */
 class SOUI_EXP STileView
     : public TPanelProxy<ITileView>
-    , protected SHostProxy
-    , protected IItemContainer {
+    , public SViewBase {
     DEF_SOBJECT(SPanel, L"tileview")
 
     friend class STileViewDataSetObserver;
@@ -98,6 +98,55 @@ class SOUI_EXP STileView
      */
     STDMETHOD_(IItemPanel *, HitTest)(THIS_ const POINT *pt) SCONST OVERRIDE;
 
+    /**
+     * @brief Sets the multiple selection mode.
+     * @param bMultiSel TRUE to enable multiple selection, FALSE otherwise.
+     */
+    STDMETHOD_(void, SetMultiSel)(THIS_ BOOL bMultiSel) OVERRIDE;
+    
+    /**
+     * @brief Gets the multiple selection mode.
+     * @return TRUE if multiple selection is enabled, FALSE otherwise.
+     */
+    STDMETHOD_(BOOL, GetMultiSel)(CTHIS) SCONST OVERRIDE;
+    
+    /**
+     * @brief Adds an item to the selection.
+     * @param iItem Index of the item.
+     */
+    STDMETHOD_(void, AddSelItem)(THIS_ int iItem) OVERRIDE;
+    
+    /**
+     * @brief Removes an item from the selection.
+     * @param iItem Index of the item.
+     */
+    STDMETHOD_(void, RemoveSelItem)(THIS_ int iItem) OVERRIDE;
+    
+    /**
+     * @brief Clears all selected items.
+     */
+    STDMETHOD_(void, ClearSelItems)(THIS) OVERRIDE;
+    
+    /**
+     * @brief Checks if an item is selected.
+     * @param iItem Index of the item.
+     * @return TRUE if the item is selected, FALSE otherwise.
+     */
+    STDMETHOD_(BOOL, IsItemSelected)(THIS_ int iItem) SCONST OVERRIDE;
+    
+    /**
+     * @brief Gets the count of selected items.
+     * @return Number of selected items.
+     */
+    STDMETHOD_(int, GetSelItemCount)(CTHIS) SCONST OVERRIDE;
+    
+    /**
+     * @brief Gets all selected items.
+     * @param items Output parameter to store the selected item indices.
+     * @param nMaxCount Maximum number of items to retrieve.
+     * @return Number of selected items.
+     */
+    STDMETHOD_(int, GetSelItems)(THIS_ int *items, int nMaxCount) SCONST OVERRIDE;
   public:
     /**
      * @brief Performs a hit test on the tile view.
@@ -105,47 +154,6 @@ class SOUI_EXP STileView
      * @return Pointer to the item panel at the specified point.
      */
     SItemPanel *HitTest(CPoint &pt) const;
-
-  protected:
-    /**
-     * @brief Handles the capture of an item.
-     * @param pItem Pointer to the item panel.
-     * @param bCapture Flag indicating if the item should be captured.
-     */
-    virtual void OnItemSetCapture(SOsrPanel *pItem, BOOL bCapture);
-
-    /**
-     * @brief Gets the rectangle of an item.
-     * @param pItem Pointer to the item panel.
-     * @param rcItem Rectangle to receive the item position.
-     * @return TRUE if successful, otherwise FALSE.
-     */
-    virtual BOOL OnItemGetRect(const SOsrPanel *pItem, CRect &rcItem) const;
-
-    /**
-     * @brief Checks if item redraw is delayed.
-     * @return TRUE if item redraw is delayed, otherwise FALSE.
-     */
-    virtual BOOL IsItemRedrawDelay() const;
-
-    virtual BOOL IsTimelineEnabled() const;
-
-  protected:
-    /**
-     * @brief Handles data set changes.
-     */
-    void onDataSetChanged();
-
-    /**
-     * @brief Handles data set invalidation.
-     */
-    void onDataSetInvalidated();
-
-    /**
-     * @brief Handles data changes for a specific item.
-     * @param iItem Index of the item.
-     */
-    void onItemDataChanged(int iItem);
 
   protected:
     /**
@@ -188,12 +196,6 @@ class SOUI_EXP STileView
     virtual BOOL UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo);
 
     /**
-     * @brief Gets the dialog code for the window.
-     * @return Dialog code.
-     */
-    virtual UINT WINAPI OnGetDlgCode() const;
-
-    /**
      * @brief Sets the cursor.
      * @param pt Mouse position.
      * @return TRUE if the cursor was set, otherwise FALSE.
@@ -201,36 +203,11 @@ class SOUI_EXP STileView
     virtual BOOL OnSetCursor(const CPoint &pt);
 
     /**
-     * @brief Handles colorization.
-     * @param cr Color reference.
+     * @brief Calculates the drawing rectangle for an item.
+     * @param iItem Index of the item.
+     * @return Drawing rectangle of the item.
      */
-    virtual void OnColorize(COLORREF cr);
-
-    /**
-     * @brief Handles scale changes.
-     * @param nScale New scale value.
-     */
-    virtual void OnScaleChanged(int nScale);
-
-    /**
-     * @brief Handles language changes.
-     * @return Result of the language change handling.
-     */
-    virtual HRESULT OnLanguageChanged();
-
-    /**
-     * @brief Rebuilds the font.
-     */
-    virtual void OnRebuildFont();
-
-  protected:
-    /**
-     * @brief Dispatches messages to items.
-     * @param uMsg Message identifier.
-     * @param wParam Additional message-specific information.
-     * @param lParam Additional message-specific information.
-     */
-    void DispatchMessage2Items(UINT uMsg, WPARAM wParam, LPARAM lParam);
+    CRect CalcItemDrawRect(int iItem) const; // 计算item实际绘制的位置
 
     /**
      * @brief Updates the scroll bars.
@@ -238,24 +215,11 @@ class SOUI_EXP STileView
     void UpdateScrollBar();
 
     /**
-     * @brief Redraws a specific item.
-     * @param pItem Pointer to the item panel.
-     */
-    void RedrawItem(SOsrPanel *pItem);
-
-    /**
      * @brief Gets the item panel by index.
      * @param iItem Index of the item.
      * @return Pointer to the item panel.
      */
     SItemPanel *GetItemPanel(int iItem);
-
-    /**
-     * @brief Calculates the drawing rectangle for an item.
-     * @param iItem Index of the item.
-     * @return Drawing rectangle of the item.
-     */
-    CRect CalcItemDrawRect(int iItem) const; // 计算item实际绘制的位置
 
     /**
      * @brief Updates the visible items.
@@ -313,11 +277,6 @@ class SOUI_EXP STileView
     void OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags);
 
     /**
-     * @brief Handles the mouse leave event.
-     */
-    void OnMouseLeave();
-
-    /**
      * @brief Handles the mouse wheel event.
      * @param nFlags Flags associated with the mouse event.
      * @param zDelta Wheel delta.
@@ -327,18 +286,6 @@ class SOUI_EXP STileView
     BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 
     /**
-     * @brief Handles the kill focus event.
-     * @param wndFocus Handle to the window receiving focus.
-     */
-    void OnKillFocus(SWND wndFocus);
-
-    /**
-     * @brief Handles the set focus event.
-     * @param wndOld Handle to the window losing focus.
-     */
-    void OnSetFocus(SWND wndOld);
-
-    /**
      * @brief Handles the set scale event.
      * @param uMsg Message identifier.
      * @param wParam Additional message-specific information.
@@ -346,11 +293,28 @@ class SOUI_EXP STileView
      * @return Result of the message handling.
      */
     LRESULT OnSetScale(UINT uMsg, WPARAM wParam, LPARAM lParam);
-
+    
     /**
-     * @brief Handles the show window event.
-     * @param bShow Flag indicating if the window is being shown.
-     * @param nStatus Status of the window.
+     * @brief Handle mouse leave event
+     */
+    void OnMouseLeave();
+    
+    /**
+     * @brief Handle kill focus event
+     * @param wndFocus New focus window
+     */
+    void OnKillFocus(SWND wndFocus);
+    
+    /**
+     * @brief Handle set focus event
+     * @param wndOld Old focus window
+     */
+    void OnSetFocus(SWND wndOld);
+    
+    /**
+     * @brief Handle show window event
+     * @param bShow Whether the window is shown
+     * @param nStatus Show status
      */
     void OnShowWindow(BOOL bShow, UINT nStatus);
 
@@ -374,41 +338,102 @@ class SOUI_EXP STileView
 
     SOUI_ATTRS_BEGIN()
         ATTR_LAYOUTSIZE(L"marginSize", m_nMarginSize, FALSE) /**< Margin size for items. */
-        ATTR_BOOL(L"wantTab", m_bWantTab, FALSE)             /**< Flag indicating if tabbing is wanted. */
+        ATTR_CHAIN_CLASS(SViewBase)
     SOUI_ATTRS_END()
+
+  protected:
+    /**
+     * @brief Handle data set changed event
+     */
+    virtual void onDataSetChanged();
+
+    /**
+     * @brief Handle data set invalidated event
+     */
+    virtual void onDataSetInvalidated();
+
+    /**
+     * @brief Handle item data changed event
+     * @param iItem Index of the item
+     */
+    virtual void onItemDataChanged(int iItem);
+
+    /**
+     * @brief Indicates if item redraw is delayed
+     * @return TRUE if redraw is delayed, FALSE otherwise
+     */
+    virtual BOOL IsItemRedrawDelay() const;
+
+    /**
+     * @brief Indicates if timeline is enabled
+     * @return TRUE if timeline is enabled, FALSE otherwise
+     */
+    virtual BOOL IsTimelineEnabled() const;
+
+    /**
+     * @brief Gets the rectangle of an item
+     * @param pItem Pointer to the item panel
+     * @param rcItem Reference to the rectangle to fill
+     * @return TRUE if successful, FALSE otherwise
+     */
+    virtual BOOL OnItemGetRect(const SOsrPanel *pItem, CRect &rcItem) const;
+
+    /**
+     * @brief Sets or releases capture on an item
+     * @param pItem Pointer to the item panel
+     * @param bCapture TRUE to set capture, FALSE to release
+     */
+    virtual void OnItemSetCapture(SOsrPanel *pItem, BOOL bCapture);
+
+    /**
+     * @brief Redraws an item
+     * @param pItem Pointer to the item panel
+     */
+    virtual void RedrawItem(SOsrPanel *pItem);
+
+    /**
+     * @brief Gets the dialog code
+     * @return Dialog code
+     */
+    virtual UINT WINAPI OnGetDlgCode() const;
+
+    /**
+     * @brief Handles colorization event
+     * @param cr Color reference
+     */
+    virtual void OnColorize(COLORREF cr);
+
+    /**
+     * @brief Handles scale change event
+     * @param nScale Scale factor
+     */
+    virtual void OnScaleChanged(int nScale);
+
+    /**
+     * @brief Handles language change event
+     * @return HRESULT
+     */
+    virtual HRESULT OnLanguageChanged();
+
+    /**
+     * @brief Handles font rebuild event
+     */
+    virtual void OnRebuildFont();
+
+    /**
+     * @brief Dispatches messages to items
+     * @param uMsg Message identifier
+     * @param wParam Additional message parameter
+     * @param lParam Additional message parameter
+     */
+    virtual void DispatchMessage2Items(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
   protected:
     SAutoRefPtr<ILvAdapter> m_adapter;                 /**< Adapter for the tile view. */
     SAutoRefPtr<ILvDataSetObserver> m_observer;        /**< Data set observer. */
     SAutoRefPtr<ITileViewItemLocator> m_tvItemLocator; /**< Item locator for the tile view. */
 
-    /**
-     * @struct ItemInfo
-     * @brief Information about an item in the tile view.
-     */
-    struct ItemInfo
-    {
-        SItemPanel *pItem; /**< Pointer to the item panel. */
-        int nType;         /**< Type of the item. */
-    };
-
-    bool m_bPendingUpdate;    /**< Flag indicating if an update is pending due to data set changes. */
-    int m_iPendingUpdateItem; /**< Index of the item to update, -1 for all, -2 for nothing. */
-    int m_iPendingViewItem;   /**< Index of the item to view, -1 for initialization. */
-
-    int m_iFirstVisible;        /**< Index of the first visible item. */
-    SList<ItemInfo> m_lstItems; // List of currently visible items.
-
-    SOsrPanel *m_itemCapture; /**< Item panel that has been set capture. */
-
-    int m_iSelItem;          /**< Index of the selected item. */
-    SOsrPanel *m_pHoverItem; /**< Item panel under the hover state. */
-
-    SArray<SList<SItemPanel *> *> m_itemRecycle; // Recycle bin for item panels, one list per style for reuse.
-
-    SXmlDoc m_xmlTemplate;      /**< XML template for item panels. */
     SLayoutSize m_nMarginSize;  /**< Margin size for items. */
-    BOOL m_bWantTab;            /**< Flag indicating if tabbing is wanted. */
     BOOL m_bDatasetInvalidated; /**< Flag indicating if the data set is invalidated. */
 };
 

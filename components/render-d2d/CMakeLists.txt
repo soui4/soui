@@ -22,15 +22,18 @@ else()
 endif()
 
 if(MSVC AND MSVC_VERSION LESS 1600)
-message("vs is less than vs2008 d2d")
-target_include_directories(render-d2d
-  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/sdk7.1_d2d/include
-)
-if (CMAKE_CL_64)
-	target_link_directories(render-d2d PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/sdk7.1_d2d/lib/x64")
-else ()
-	target_link_directories(render-d2d PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/sdk7.1_d2d/lib/x86")
-endif ()
+    message("vs is less than vs2008 d2d")
+    add_definitions(-DUSE_D2D1_1=0)
+    target_include_directories(render-d2d
+    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/sdk7.1_d2d/include
+    )
+    if (CMAKE_CL_64)
+        target_link_directories(render-d2d PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/sdk7.1_d2d/lib/x64")
+    else ()
+        target_link_directories(render-d2d PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/sdk7.1_d2d/lib/x86")
+    endif ()
+else()
+    add_definitions(-DUSE_D2D1_1=1)
 endif()
 
 target_include_directories(render-d2d

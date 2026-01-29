@@ -1,5 +1,4 @@
 ﻿#include "stdafx.h"
-#include <souistd.h>
 #include "SMCListViewEx.h"
 #include "helper/SListViewItemLocator.h"
 
@@ -62,14 +61,9 @@ namespace SOUI
 	//  SMCListViewEx
 
 	SMCListViewEx::SMCListViewEx()
-		:m_pHeader(NULL)
-		, m_iSelItem(-1)
-		, m_iFirstVisible(-1)
-		, m_pHoverItem(NULL)
-		, m_itemCapture(NULL)
+		:SViewBase(this)
+		, m_pHeader(NULL)
 		, m_pSkinDivider(NULL)
-		, m_bWantTab(FALSE)
-		, m_bDatasetInvalidated(TRUE)
 		, m_bCanSwapItem(TRUE)
 		, m_bDrop(false), m_bDroping(false)
 		, m_bSwap(false)
@@ -78,10 +72,7 @@ namespace SOUI
 		, m_colorSwapLine(RGBA(0, 0, 0, 255))
 		, m_colorDropBk(RGB(0, 0, 255))
 		, m_DropBkAlpha(88)
-		, m_bPendingUpdate(false)
-		, m_iPendingUpdateItem(-2)
 		, m_crGrid(CR_INVALID)
-		, SHostProxy(this)
 	{
 		m_bFocusable = TRUE;
 		m_bClipClient = TRUE;
@@ -466,56 +457,56 @@ namespace SOUI
 	}
 
 	void SMCListViewEx::onDataSetChanged()
+{
+	if (!m_adapter) return;
+	// Call base class method
+	SViewBase::onDataSetChanged();
+	//更新列显示状态
+	if (!IsVisible(TRUE))
 	{
-		if (!m_adapter) return;
-		//更新列显示状态
-		if (!IsVisible(TRUE))
-		{
-			m_bPendingUpdate = true;
-			m_iPendingUpdateItem = -1;
-			return;
-		}
+		return;
+	}
 
-		m_pHeader->GetEventSet()->setMutedState(true);
-		for (size_t i = 0; i < m_pHeader->GetItemCount(); i++)
-		{
-			m_pHeader->SetItemVisible(i, m_adapter->IsColumnVisible(i));
-		}
-		m_pHeader->GetEventSet()->setMutedState(false);
+	m_pHeader->GetEventSet()->setMutedState(true);
+	for (size_t i = 0; i < m_pHeader->GetItemCount(); i++)
+	{
+		m_pHeader->SetItemVisible(i, m_adapter->IsColumnVisible(i));
+	}
+	m_pHeader->GetEventSet()->setMutedState(false);
 
-		if (m_lvItemLocator) m_lvItemLocator->OnDataSetChanged();
-		if (m_iSelItem >= m_adapter->getCount())
-		{
-			m_iSelItem = -1;
-		}
-		m_adapter->ClearSel(m_adapter->getCount() - 1);
+	if (m_lvItemLocator) m_lvItemLocator->OnDataSetChanged();
+	if (m_iSelItem >= m_adapter->getCount())
+	{
+		m_iSelItem = -1;
+	}
+	m_adapter->ClearSel(m_adapter->getCount() - 1);
 
-		UpdateScrollBar();
+	UpdateScrollBar();
+	UpdateVisibleItems();
+}
+
+void SMCListViewEx::onDataSetInvalidated()
+{
+	// Call base class method
+	SViewBase::onDataSetInvalidated();
+}
+
+void SMCListViewEx::onItemDataChanged(int iItem)
+{
+	if (!m_adapter) return;
+	// Call base class method
+	SViewBase::onItemDataChanged(iItem);
+	if (!IsVisible(TRUE))
+	{
+		return;
+	}
+	if (iItem < m_iFirstVisible) return;
+	if (iItem >= m_iFirstVisible + (int)m_lstItems.GetCount()) return;
+	if (m_lvItemLocator->IsFixHeight())
+		UpdateVisibleItem(iItem);
+	else
 		UpdateVisibleItems();
-	}
-
-	void SMCListViewEx::onDataSetInvalidated()
-	{
-		m_bDatasetInvalidated = TRUE;
-		Invalidate();
-	}
-
-	void SMCListViewEx::onItemDataChanged(int iItem)
-	{
-		if (!m_adapter) return;
-		if (!IsVisible(TRUE))
-		{
-			m_bPendingUpdate = true;
-			m_iPendingUpdateItem = m_iPendingUpdateItem == -2 ? iItem : -1;
-			return;
-		}
-		if (iItem < m_iFirstVisible) return;
-		if (iItem >= m_iFirstVisible + (int)m_lstItems.GetCount()) return;
-		if (m_lvItemLocator->IsFixHeight())
-			UpdateVisibleItem(iItem);
-		else
-			UpdateVisibleItems();
-	}
+}
 
 	void SMCListViewEx::OnPaint(IRenderTarget* pRT)
 	{
@@ -1330,78 +1321,146 @@ namespace SOUI
 	}
 
 	void SMCListViewEx::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
+{
+	if (!m_adapter)
 	{
-		if (!m_adapter)
-		{
-			SetMsgHandled(FALSE);
-			return;
-		}
+		SetMsgHandled(FALSE);
+		return;
+	}
 
-		if (m_iSelItem != -1 && m_bWantTab)
+	if (m_iSelItem != -1 && m_bWantTab)
+	{
+		SItemPanel* pItem = GetItemPanel(m_iSelItem);
+		if (pItem)
 		{
-			SItemPanel* pItem = GetItemPanel(m_iSelItem);
-			if (pItem)
-			{
-				pItem->DoFrameEvent(WM_KEYDOWN, nChar, MAKELONG(nFlags, nRepCnt));
-				if (pItem->IsMsgHandled()) return;
-			}
-		}
-
-		int  nNewSelItem = -1;
-		SWindow* pOwner = GetOwner();
-		if (pOwner && (nChar == VK_ESCAPE || nChar == VK_RETURN))
-		{
-			pOwner->SSendMessage(WM_KEYDOWN, nChar, MAKELONG(nFlags, nRepCnt));
-			return;
-		}
-
-		if (nChar == VK_DOWN && m_iSelItem < m_adapter->getCount() - 1)
-			nNewSelItem = m_iSelItem + 1;
-		else if (nChar == VK_UP && m_iSelItem > 0)
-			nNewSelItem = m_iSelItem - 1;
-		else
-		{
-			switch (nChar)
-			{
-				case VK_PRIOR:
-					OnScroll(TRUE, SB_PAGEUP, 0);
-					break;
-				case VK_NEXT:
-					OnScroll(TRUE, SB_PAGEDOWN, 0);
-					break;
-				case VK_HOME:
-					OnScroll(TRUE, SB_TOP, 0);
-					break;
-				case VK_END:
-					OnScroll(TRUE, SB_BOTTOM, 0);
-					break;
-			}
-
-			if (nChar == VK_PRIOR || nChar == VK_HOME)
-			{
-				if (!m_lstItems.IsEmpty())
-				{
-					nNewSelItem = m_lstItems.GetHead().pItem->GetItemIndex();
-				}
-			}
-			else if (nChar == VK_NEXT || nChar == VK_END)
-			{
-				if (!m_lstItems.IsEmpty())
-				{
-					nNewSelItem = m_lstItems.GetTail().pItem->GetItemIndex();
-				}
-			}
-		}
-
-		if (nNewSelItem != -1)
-		{
-			EnsureVisible(nNewSelItem);
-			// 取消选择通知
-			SetSel(nNewSelItem, TRUE);
-		}else{
-			SetMsgHandled(FALSE);
+			pItem->DoFrameEvent(WM_KEYDOWN, nChar, MAKELONG(nFlags, nRepCnt));
+			if (pItem->IsMsgHandled()) return;
 		}
 	}
+
+	int  nNewSelItem = -1;
+	SWindow* pOwner = GetOwner();
+	if (pOwner && (nChar == VK_ESCAPE || nChar == VK_RETURN))
+	{
+		pOwner->SSendMessage(WM_KEYDOWN, nChar, MAKELONG(nFlags, nRepCnt));
+		return;
+	}
+
+	BOOL bCtrlPressed = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
+	BOOL bShiftPressed = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
+	BOOL bMultiSelMode = GetMultiSel();
+
+	// Handle space key to toggle selection
+	if (nChar == VK_SPACE && m_iSelItem != -1)
+	{
+		if (bMultiSelMode)
+		{
+			if (m_adapter->IsSel(m_iSelItem))
+			{
+				m_adapter->DelSel(m_iSelItem);
+			}
+			else
+			{
+				m_adapter->ControlSel(m_iSelItem);
+			}
+			return;
+		}
+		else
+		{
+			SetMsgHandled(FALSE);
+			return;
+		}
+	}
+
+	// Handle Ctrl+A to select all
+	if (bCtrlPressed && nChar == 'A')
+	{
+		if (bMultiSelMode)
+		{
+			m_adapter->SelAll();
+			return;
+		}
+		else
+		{
+			SetMsgHandled(FALSE);
+			return;
+		}
+	}
+
+	if (nChar == VK_DOWN && m_iSelItem < m_adapter->getCount() - 1)
+		nNewSelItem = m_iSelItem + 1;
+	else if (nChar == VK_UP && m_iSelItem > 0)
+		nNewSelItem = m_iSelItem - 1;
+	else
+	{
+		switch (nChar)
+		{
+			case VK_PRIOR:
+				OnScroll(TRUE, SB_PAGEUP, 0);
+				break;
+			case VK_NEXT:
+				OnScroll(TRUE, SB_PAGEDOWN, 0);
+				break;
+			case VK_HOME:
+				OnScroll(TRUE, SB_TOP, 0);
+				break;
+			case VK_END:
+				OnScroll(TRUE, SB_BOTTOM, 0);
+				break;
+		}
+
+		if (nChar == VK_PRIOR || nChar == VK_HOME)
+		{
+			if (!m_lstItems.IsEmpty())
+			{
+				nNewSelItem = m_lstItems.GetHead().pItem->GetItemIndex();
+			}
+		}
+		else if (nChar == VK_NEXT || nChar == VK_END)
+		{
+			if (!m_lstItems.IsEmpty())
+			{
+				nNewSelItem = m_lstItems.GetTail().pItem->GetItemIndex();
+			}
+		}
+	}
+
+	if (nNewSelItem != -1)
+	{
+		EnsureVisible(nNewSelItem);
+		
+		if (bMultiSelMode)
+		{
+			if (bCtrlPressed)
+			{
+				// Ctrl + arrow: move focus without changing selection
+				m_iSelItem = nNewSelItem;
+				// Update visible items to reflect the new focus
+				UpdateVisibleItems();
+			}
+			else if (bShiftPressed)
+			{
+				// Shift + arrow: extend selection from current to new item
+				m_adapter->ShiftSel(nNewSelItem);
+				m_iSelItem = nNewSelItem;
+			}
+			else
+			{
+				// Normal arrow: clear selection and select new item
+				SetSel(nNewSelItem, TRUE);
+			}
+		}
+		else
+		{
+			// Single selection mode
+			SetSel(nNewSelItem, TRUE);
+		}
+	}
+	else
+	{
+		SetMsgHandled(FALSE);
+	}
+}
 
 	void SMCListViewEx::EnsureVisible(int iItem)
 	{
@@ -1511,7 +1570,13 @@ namespace SOUI
 
 		m_iSelItem = nNewSel;
 
-		m_adapter->ClickSel(m_iSelItem);
+	// Clear old selection if in multi-select mode
+	if (GetMultiSel())
+	{
+		m_adapter->ClearSel();
+	}
+
+	m_adapter->ClickSel(m_iSelItem);
 		if (bNotify)
 		{
 			EventLVSelChanging evt(this);
@@ -1637,16 +1702,49 @@ namespace SOUI
 	}
 
 	BOOL SMCListViewEx::OnItemClick(IEvtArgs* pEvt)
+{
+	SItemPanel* pItemPanel = sobj_cast<SItemPanel>(pEvt->Sender());
+	SASSERT(pItemPanel);
+	int iItem = (int)pItemPanel->GetItemIndex();
+	
+	BOOL bCtrlPressed = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
+	BOOL bShiftPressed = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
+	BOOL bMultiSelMode = GetMultiSel();
+	
+	if (bMultiSelMode)
 	{
-		SItemPanel* pItemPanel = sobj_cast<SItemPanel>(pEvt->Sender());
-		SASSERT(pItemPanel);
-		int iItem = (int)pItemPanel->GetItemIndex();
-		if (!m_adapter->IsOnlySel(iItem))
+		if (bCtrlPressed)
 		{
+			// Ctrl+Click: toggle selection of current item
+			if (m_adapter->IsSel(iItem))
+			{
+				m_adapter->DelSel(iItem);
+			}
+			else
+			{
+				m_adapter->ControlSel(iItem);
+			}
+			m_iSelItem = iItem;
+		}
+		else if (bShiftPressed)
+		{
+			// Shift+Click: extend selection from previous selected item to current item
+			m_adapter->ShiftSel(iItem);
+			m_iSelItem = iItem;
+		}
+		else
+		{
+			// Normal Click: select only current item
 			SetSel(iItem, TRUE);
 		}
-		return TRUE;
 	}
+	else
+	{
+		// Single selection mode
+		SetSel(iItem, TRUE);
+	}
+	return TRUE;
+}
 
 	void SMCListViewEx::OnColorize(COLORREF cr)
 	{

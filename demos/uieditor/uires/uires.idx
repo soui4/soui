@@ -7,15 +7,15 @@
 		<file name="xml_messagebox" path="xml\messagebox.xml" />
 		<file name="XML_MAINWND" path="xml\dlg_main.xml" />
 		<file name="xml_mainwnd_left" path="xml\dlg_main_left.xml" />
-		<file name="xml_mainwnd_right" path="xml\dlg_main_right.xml" />
+		<file name="property_panel" path="xml\property_panel.xml" />
 		<file name="xml_uidesigner_main" path="xml\dlg_uidesigner.xml" />
-		<file name="xml_res_mgr" path="xml\dlg_res_mgr.xml" />
 		<file name="UIDESIGNER_XML_NEW_LAYOUT" path="xml\dlg_new_layout.xml" />
 		<file name="UIDESIGNER_XML_NEW_SKIN" path="xml\dlg_new_skin.xml" />
 		<file name="UIDESIGNER_XML_INPUT" path="xml\dlg_input.xml" />
 		<file name="UIDESIGNER_XML_ABOUT" path="xml\dlg_about.xml" />
 		<file name="UIDESIGNER_XML_INSERT_ELEMENT" path="xml\dlg_insert_element.xml" />
 		<file name="designer_wnd" path="xml\designer_wnd.xml" />
+		<file name="dlg_skin_viewer" path="xml\dlg_skin_viewer.xml" />
 	</LAYOUT>
 	<values>
 		<file name="string" path="values\string.xml" />
@@ -39,7 +39,9 @@
 		<file name="png_toolbar_state" path="image\toolbar_state.png" />
 		<file name="png_toolbar_prop" path="image\tb_prop.png" />
 		<file name="png_btn_help" path="image\btn_help.png" />
-		<file name="png_designer_background" path="image\designer_background.png" />"
+		<file name="png_designer_background" path="image\designer_background.png" />
+		<file name="png_filetypes" path="image\filetypes.png" />
+		<file name="png_item_bk" path="image\item_bk.png" />
 	</IMG>
 	<ICON>
 		<file name="ICON_logo" path="image\soui.ico" />
@@ -47,5 +49,6 @@
 	<smenu>
 		<file name="menu_layoutfile" path="smenu\menu_layoutfile.xml" />
 		<file name="menu_recent" path="smenu\menu_recent.xml" />
+		<file name="menu_file_ctx" path="smenu\menu_file_ctx.xml" />
 	</smenu>
 </resource>

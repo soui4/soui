@@ -29,6 +29,8 @@
 #include "SAniWindow.h"
 #include "SCheckBox2.h"
 #include "SWaveProgress.h"
+#include "SImageBtnEx.h"
+#include "SImgCanvas.h"
 SNSBEGIN
 
 void SCtrlsRegister::RegisterCtrls(SApplication *theApp)
@@ -54,7 +56,9 @@ void SCtrlsRegister::RegisterCtrls(SApplication *theApp)
 	theApp->RegisterWindowClass<SLightButton>();
 	theApp->RegisterWindowClass<SAniWindow>();
 	theApp->RegisterWindowClass<SCheckBox2>();
-	theApp->RegisterWindowClass<SWaveProgress>();//WaveProgress
+	theApp->RegisterWindowClass<SWaveProgress>();
+	theApp->RegisterWindowClass<SImageBtnEx>();
+	theApp->RegisterWindowClass<SImgCanvas>();
 
 	// Register HelloCharts controls
 	SHelloChartsRegister::RegisterControls(theApp);

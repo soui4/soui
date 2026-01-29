@@ -15,196 +15,70 @@ class STabSlider
         , m_aniInterpoloator(pInterpolator)
         , m_nSteps(nSteps)
         , m_iStep(0)
+        , m_iFrom(iFrom)
+        , m_iTo(iTo)
     {
         SASSERT(pTabCtrl);
         SASSERT(pInterpolator);
-
+        m_bClipClient = TRUE;
+        
+        m_bVertical = pTabCtrl->m_nTabAlign == STabCtrl::AlignLeft || pTabCtrl->m_nTabAlign == STabCtrl::AlignRight;
         pTabCtrl->GetRoot()->UpdateLayout();
 
         CRect rcPage;
         pTabCtrl->GetChildrenLayoutRect(&rcPage);
-        if (nType == 0)
+        pTabCtrl->InsertChild(this);
+        SetVisible(FALSE);
+        if (pTabCtrl->m_nTabAlign == STabCtrl::AlignMiddle)
         {
-            pTabCtrl->InsertChild(this);
-            Move(rcPage);
-
-            m_bVertical = pTabCtrl->m_nTabAlign == STabCtrl::AlignLeft || pTabCtrl->m_nTabAlign == STabCtrl::AlignRight;
-            if (m_bVertical)
-            {
-                GETRENDERFACTORY->CreateRenderTarget(&m_memRT, rcPage.Width(), rcPage.Height() * 2);
-            }
-            else
-            {
-                GETRENDERFACTORY->CreateRenderTarget(&m_memRT, rcPage.Width() * 2, rcPage.Height());
-            }
-
-            m_memRT->BeginDraw();
-            CPoint pt;
-
-            if (m_bVertical)
-            {
-                if (iFrom < iTo)
-                { // move up
-                    pt.x = pt.y = 0;
-                    m_nFrom = 0;
-                    m_nTo = rcPage.Height();
-                }
-                else
-                { // move down
-                    pt.x = 0, pt.y = rcPage.Height();
-                    m_ptOffset.y = rcPage.Height();
-                    m_nFrom = rcPage.Height();
-                    m_nTo = 0;
-                }
-            }
-            else
-            {
-                if (iFrom < iTo)
-                { // move left
-                    pt.x = pt.y = 0;
-                    m_nFrom = 0;
-                    m_nTo = rcPage.Width();
-                }
-                else
-                {
-                    pt.x = rcPage.Width(), pt.y = 0;
-                    m_ptOffset.x = rcPage.Width();
-                    m_nFrom = rcPage.Width();
-                    m_nTo = 0;
-                }
-            }
-            pt -= rcPage.TopLeft();
-            m_memRT->SetViewportOrg(pt);
-            PaintBackground(m_memRT, &rcPage);
-
-            pTabCtrl->GetItem(iFrom)->SetVisible(FALSE);
-
-            if (m_bVertical)
-            {
-                if (iFrom < iTo)
-                { // move up
-                    pt.x = 0, pt.y = rcPage.Height();
-                }
-                else
-                { // move down
-                    pt.x = pt.y = 0;
-                }
-            }
-            else
-            {
-                if (iFrom < iTo)
-                { // move left
-                    pt.x = rcPage.Width(), pt.y = 0;
-                }
-                else
-                {
-                    pt.x = pt.y = 0;
-                }
-            }
-
-            pt -= rcPage.TopLeft();
-            m_memRT->SetViewportOrg(pt);
-
-            pTabCtrl->GetItem(iTo)->SetVisible(TRUE);
-            PaintBackground(m_memRT, &rcPage);
-
-            m_memRT->SetViewportOrg(CPoint());
-
-            GetContainer()->RegisterTimelineHandler(this);
-            pTabCtrl->GetItem(iTo)->SetVisible(FALSE);
-            SetVisible(TRUE, TRUE);
-            m_memRT->EndDraw();
+            CRect rcClient = pTabCtrl->GetClientRect();
+            rcClient.DeflateRect(pTabCtrl->GetStyle().GetPadding());
+            Move(rcClient);
         }
         else
         {
-            pTabCtrl->InsertChild(this, ICWND_FIRST);
             Move(rcPage);
-
-            m_bVertical = pTabCtrl->m_nTabAlign == STabCtrl::AlignLeft || pTabCtrl->m_nTabAlign == STabCtrl::AlignRight;
-            if (m_bVertical)
-            {
-                GETRENDERFACTORY->CreateRenderTarget(&m_memRT, rcPage.Width(), rcPage.Height() * 2);
-            }
-            else
-            {
-                GETRENDERFACTORY->CreateRenderTarget(&m_memRT, rcPage.Width() * 2, rcPage.Height());
-            }
-            m_memRT->BeginDraw();
-            CPoint pt;
-
-            if (m_bVertical)
-            {
-                if (iFrom < iTo)
-                { // move up
-                    pt.x = pt.y = 0;
-                    m_nFrom = 0;
-                    m_nTo = rcPage.Height();
-                }
-                else
-                { // move down
-                    pt.x = 0, pt.y = rcPage.Height();
-                    m_ptOffset.y = rcPage.Height();
-                    m_nFrom = rcPage.Height();
-                    m_nTo = 0;
-                }
-            }
-            else
-            {
-                if (iFrom < iTo)
-                { // move left
-                    pt.x = pt.y = 0;
-                    m_nFrom = 0;
-                    m_nTo = rcPage.Width();
-                }
-                else
-                {
-                    pt.x = rcPage.Width(), pt.y = 0;
-                    m_ptOffset.x = rcPage.Width();
-                    m_nFrom = rcPage.Width();
-                    m_nTo = 0;
-                }
-            }
-            pt -= rcPage.TopLeft();
-            m_memRT->SetViewportOrg(pt);
-            PaintForeground(m_memRT, &rcPage, GetParent());
-
-            pTabCtrl->GetItem(iFrom)->SetVisible(FALSE);
-
-            if (m_bVertical)
-            {
-                if (iFrom < iTo)
-                { // move up
-                    pt.x = 0, pt.y = rcPage.Height();
-                }
-                else
-                { // move down
-                    pt.x = pt.y = 0;
-                }
-            }
-            else
-            {
-                if (iFrom < iTo)
-                { // move left
-                    pt.x = rcPage.Width(), pt.y = 0;
-                }
-                else
-                {
-                    pt.x = pt.y = 0;
-                }
-            }
-
-            pt -= rcPage.TopLeft();
-            m_memRT->SetViewportOrg(pt);
-
-            pTabCtrl->GetItem(iTo)->SetVisible(TRUE);
-            PaintForeground(m_memRT, &rcPage, GetParent());
-
-            m_memRT->SetViewportOrg(CPoint());
-            m_memRT->EndDraw();
-            GetContainer()->RegisterTimelineHandler(this);
-            pTabCtrl->GetItem(iTo)->SetVisible(FALSE);
-            SetVisible(TRUE, TRUE);
         }
+
+        SWindow *pageFrom = pTabCtrl->GetItem(iFrom);
+        SWindow *pageTo = pTabCtrl->GetItem(iTo);
+
+        // render page from content to m_rtPageFrom
+        GETRENDERFACTORY->CreateRenderTarget(&m_rtPageFrom, rcPage.Width(), rcPage.Height());
+        m_rtPageFrom->BeginDraw();
+        pageFrom->SetVisible(TRUE);
+        pageTo->SetVisible(FALSE);
+        m_rtPageFrom->SetViewportOrg(-rcPage.TopLeft());
+        pageFrom->PaintBackground(m_rtPageFrom, &rcPage);
+        pageFrom->SSendMessage(WM_ERASEBKGND, (WPARAM)m_rtPageFrom.Get());
+        pageFrom->SSendMessage(WM_PAINT, (WPARAM)m_rtPageFrom.Get());
+        pageFrom->PaintForeground(m_rtPageFrom, &rcPage);
+        m_rtPageFrom->EndDraw();
+        m_rtPageFrom->SetViewportOrg(CPoint());
+        IBitmapS *pBmp = (IBitmapS *)m_rtPageFrom->GetCurrentObject(OT_BITMAP);
+        //pBmp->Save2(L"d:/pagefrom.png",Img_PNG);
+
+        // render page to content to m_rtPageTo
+        GETRENDERFACTORY->CreateRenderTarget(&m_rtPageTo, rcPage.Width(), rcPage.Height());
+        m_rtPageTo->BeginDraw();
+        pageFrom->SetVisible(FALSE);
+        pageTo->SetVisible(TRUE);
+        m_rtPageTo->SetViewportOrg(-rcPage.TopLeft());
+        pageTo->PaintBackground(m_rtPageTo, &rcPage);
+        pageTo->SSendMessage(WM_ERASEBKGND, (WPARAM)m_rtPageTo.Get());
+        pageTo->SSendMessage(WM_PAINT, (WPARAM)m_rtPageTo.Get());
+        pageTo->PaintForeground(m_rtPageTo, &rcPage);
+        m_rtPageTo->EndDraw();
+        m_rtPageTo->SetViewportOrg(CPoint());
+
+        pBmp = (IBitmapS *)m_rtPageTo->GetCurrentObject(OT_BITMAP);
+        //pBmp->Save2(L"d:/pageTo.png",Img_PNG);
+        // hide page from and page to
+        pageFrom->SetVisible(FALSE);
+        pageTo->SetVisible(FALSE);
+
+        GetContainer()->RegisterTimelineHandler(this);
+        SetVisible(TRUE, TRUE);
     }
 
     virtual ~STabSlider()
@@ -219,12 +93,6 @@ class STabSlider
         }
         else
         {
-            float fPos = m_aniInterpoloator->getInterpolation(m_iStep * 1.0f / m_nSteps);
-            int nOffset = m_nFrom + (int)(fPos * (m_nTo - m_nFrom));
-            if (m_bVertical)
-                m_ptOffset.y = nOffset;
-            else
-                m_ptOffset.x = nOffset;
             InvalidateRect(NULL);
         }
     }
@@ -244,17 +112,117 @@ class STabSlider
         SWindow::OnContainerChanged(pOldContainer, pNewContainer);
     }
 
+    int GetItemState(int iItem) const
+    {
+        DWORD dwState = WndState_Normal;
+        if (iItem == m_iTo)
+        {
+            dwState = WndState_PushDown;
+        }
+        return dwState;
+    }
     void OnPaint(IRenderTarget *pRT)
     {
-        CRect rcWnd = GetWindowRect();
-        CRect rcSrc(m_ptOffset.x, m_ptOffset.y, m_ptOffset.x + rcWnd.Width(), m_ptOffset.y + rcWnd.Height());
-        pRT->AlphaBlend(rcWnd, m_memRT, rcSrc, 255);
+        CRect rcWnd = GetClientRect();
+        float fraction = m_aniInterpoloator->getInterpolation(m_iStep / (float)m_nSteps);
+        if(m_pTabCtrl->m_nTabAlign == STabCtrl::AlignMiddle){
+            int nHeight = rcWnd.Height();
+            int nTabHeight = m_pTabCtrl->m_szTab[1].toPixelSize(m_pTabCtrl->GetScale());
+            int nPageHeight = rcWnd.Height() - nTabHeight*m_pTabCtrl->GetItemCount();
+            int nPageFromHeight = nPageHeight * (1.0f - fraction);
+            int nPageToHeight = nPageHeight - nPageFromHeight;
+
+            CRect rcTab(rcWnd.TopLeft(), CSize(rcWnd.Width(), nTabHeight));
+            // Draw all tab items before from and to
+            int iTopItem = smin(m_iFrom, m_iTo);
+            int iBottomItem = smax(m_iFrom, m_iTo);
+            if(m_iFrom == m_iTo)
+                return;
+            IRenderTarget *pRtTop = m_iFrom < m_iTo ? m_rtPageFrom : m_rtPageTo;
+            IRenderTarget *pRtBottom = m_iFrom > m_iTo ? m_rtPageFrom : m_rtPageTo;
+            POINT ptViewOrg1, ptViewOrg2;
+            pRtTop->GetViewportOrg(&ptViewOrg1);
+            pRtBottom->GetViewportOrg(&ptViewOrg2);
+            for(int i=0;i<=iTopItem;i++){
+                int state = GetItemState(i);
+                m_pTabCtrl->DrawItem(pRT, rcTab, i, state);
+                rcTab.OffsetRect(0, nTabHeight);
+            }
+            //draw middle parts
+            CRect rcCenter = rcWnd;
+            rcCenter.top += nTabHeight * (iTopItem+1);
+            rcCenter.bottom -= (m_pTabCtrl->GetItemCount() - iBottomItem - 1) * nTabHeight;
+            pRT->PushClipRect(rcCenter, RGN_AND);
+            int offset = (m_iFrom < m_iTo ? fraction : (1- fraction))* nPageHeight;
+
+            CRect rcItem = rcTab;
+            rcItem.top -= offset;
+            rcItem.bottom = rcItem.top + nPageHeight;
+            // draw top page
+            pRT->AlphaBlend(rcItem, pRtTop, CRect(CPoint(), rcItem.Size()), 0xff);
+
+            rcTab.MoveToY(rcItem.bottom);
+            // draw middle tabs
+            for (int i = iTopItem + 1; i <= iBottomItem; i++)
+            {
+                int state = GetItemState(i);
+                m_pTabCtrl->DrawItem(pRT, rcTab, i, state);
+                rcTab.OffsetRect(0, nTabHeight);
+            }
+            // draw bottom page
+            rcItem.MoveToY(rcTab.top);
+            pRT->AlphaBlend(rcItem, pRtBottom, CRect(CPoint(), rcItem.Size()), 0xff);
+
+            pRT->PopClip();
+            // Draw all tab items after from and to
+            rcTab.MoveToY(rcWnd.bottom-nTabHeight*(m_pTabCtrl->GetItemCount()-iBottomItem-1));
+            for(int i=iBottomItem+1;i<m_pTabCtrl->GetItemCount();i++){
+                int state = GetItemState(i);
+                m_pTabCtrl->DrawItem(pRT, rcTab, i, state);
+                rcTab.OffsetRect(0, nTabHeight);
+            }
+        }else{
+            CRect rcPageFrom,rcPageTo;
+            if(m_bVertical){
+                int nHeight = rcWnd.Height();
+                rcPageTo = rcPageFrom = CRect(0, 0, rcWnd.Width(), nHeight);
+                int nOffset = -nHeight * fraction;
+                if (m_iFrom < m_iTo)
+                {
+                    rcPageTo.OffsetRect(0, nHeight);
+                }else{
+                    rcPageTo.OffsetRect(0, -nHeight);
+                    nOffset *= -1;
+                }
+                rcPageTo.OffsetRect(0, nOffset);
+                rcPageFrom.OffsetRect(0, nOffset);
+            }else{
+                int nWidth = rcWnd.Width();
+                rcPageTo = rcPageFrom = CRect(0, 0, nWidth, rcWnd.Height());
+                int nOffset = - nWidth * fraction;
+                if(m_iFrom < m_iTo){
+                    rcPageTo.OffsetRect(nWidth, 0);
+                }else{
+                    rcPageTo.OffsetRect(-nWidth, 0);
+                    nOffset *= -1;
+                }
+                rcPageTo.OffsetRect(nOffset, 0);
+                rcPageFrom.OffsetRect(nOffset, 0);
+            }
+            rcPageFrom.OffsetRect(rcWnd.TopLeft());
+            rcPageTo.OffsetRect(rcWnd.TopLeft());
+
+            CRect rcSrc = rcWnd;
+            rcSrc.MoveToXY(0, 0);
+            pRT->AlphaBlend(rcPageFrom, m_rtPageFrom, rcSrc, 0xff);
+            pRT->AlphaBlend(rcPageTo, m_rtPageTo, rcSrc, 0xff);
+        }
     }
 
     void OnSize(UINT fType, CSize sz)
     {
         SWindow::OnSize(fType, sz);
-        if (!m_memRT)
+        if (!m_rtPageFrom || !m_rtPageTo)
             return;
         Stop();
     }
@@ -265,9 +233,8 @@ class STabSlider
         SWindow::OnDestroy();
     }
 
-    SAutoRefPtr<IRenderTarget> m_memRT;
-    CPoint m_ptOffset;
-    int m_nFrom, m_nTo;
+    SAutoRefPtr<IRenderTarget> m_rtPageFrom, m_rtPageTo;
+    int m_iFrom, m_iTo;
     int m_nSteps;
     int m_iStep;
     bool m_bVertical;
@@ -318,13 +285,14 @@ void STabCtrl::OnPaint(IRenderTarget *pRT)
 
     CRect rcTitle = GetTitleRect();
 
-    if (!rcTitle.IsRectEmpty())
+    if (!rcTitle.IsRectEmpty() || (m_nTabAlign == AlignMiddle && !m_tabSlider))
     {
         CRect rcItem, rcItemPrev;
         CRect rcSplit;
         DWORD dwState;
 
-        pRT->PushClipRect(&rcTitle, RGN_AND);
+        if(m_nTabAlign != AlignMiddle)
+            pRT->PushClipRect(&rcTitle, RGN_AND);
 
         for (int i = 0; i < (int)GetItemCount(); i++)
         {
@@ -358,7 +326,8 @@ void STabCtrl::OnPaint(IRenderTarget *pRT)
             DrawItem(pRT, rcItem, i, dwState);
             rcItemPrev = rcItem;
         }
-        pRT->PopClip();
+        if(m_nTabAlign != AlignMiddle)
+            pRT->PopClip();
     }
     if (m_pSkinFrame)
     {
@@ -382,19 +351,25 @@ void STabCtrl::GetChildrenLayoutRect(RECT *prc) const
     CRect rcRet;
     GetClientRect(rcRet);
     rcRet.DeflateRect(GetStyle().GetPadding());
+    int nTabWidth = m_szTab[0].toPixelSize(GetScale());
+    int nTabHeight = m_szTab[1].toPixelSize(GetScale());
     switch (m_nTabAlign)
     {
     case AlignLeft:
-        rcRet.left += m_szTab[0].toPixelSize(GetScale());
+        rcRet.left += nTabWidth;
         break;
     case AlignRight:
-        rcRet.right -= m_szTab[0].toPixelSize(GetScale());
+        rcRet.right -= nTabWidth;
         break;
     case AlignTop:
-        rcRet.top += m_szTab[1].toPixelSize(GetScale());
+        rcRet.top += nTabHeight;
         break;
     case AlignBottom:
-        rcRet.bottom -= m_szTab[1].toPixelSize(GetScale());
+        rcRet.bottom -= nTabHeight;
+        break;
+    case AlignMiddle:
+        rcRet.top += (m_nCurrentPage+1) * nTabHeight;
+        rcRet.bottom -= (GetItemCount() - m_nCurrentPage -1) * nTabHeight;
         break;
     }
     *prc = rcRet;
@@ -598,6 +573,7 @@ BOOL STabCtrl::SetCurSel(int nIndex)
         }
     }
     m_nCurrentPage = nIndex;
+    UpdateChildrenPosition();
     GetItemRect(m_nCurrentPage, rcItem);
     InvalidateRect(rcItem);
 
@@ -736,24 +712,37 @@ BOOL STabCtrl::GetItemRect(int nIndex, CRect &rcItem)
 {
     if (nIndex < 0 || nIndex >= (int)GetItemCount())
         return FALSE;
+    if(m_nTabAlign == AlignMiddle){
+        // middle, each tab is same height
+        CRect rcClient = GetClientRect();
+        int nTabHeight = m_szTab[1].toPixelSize(GetScale());
+        rcItem = CRect(0,0, rcClient.Width(), nTabHeight);
+        if(nIndex <= m_nCurrentPage){
+            rcItem.OffsetRect(0, nTabHeight * nIndex);
+        }else{
+            rcItem.OffsetRect(0, rcClient.Height() - nTabHeight * (GetItemCount() - nIndex));
+        }
+        rcItem.OffsetRect(rcClient.left, rcClient.top);
+        return TRUE;
+    }else{
+        CRect rcTitle = GetTitleRect();
 
-    CRect rcTitle = GetTitleRect();
+        rcItem = CRect(rcTitle.TopLeft(), CSize(m_szTab[0].toPixelSize(GetScale()), m_szTab[1].toPixelSize(GetScale())));
 
-    rcItem = CRect(rcTitle.TopLeft(), CSize(m_szTab[0].toPixelSize(GetScale()), m_szTab[1].toPixelSize(GetScale())));
-
-    switch (m_nTabAlign)
-    {
-    case AlignTop:
-    case AlignBottom:
-        rcItem.OffsetRect(m_nTabPos.toPixelSize(GetScale()) + nIndex * (rcItem.Width() + m_nTabInterSize.toPixelSize(GetScale())), 0);
-        break;
-    case AlignLeft:
-    case AlignRight:
-        rcItem.OffsetRect(0, m_nTabPos.toPixelSize(GetScale()) + nIndex * (rcItem.Height() + m_nTabInterSize.toPixelSize(GetScale())));
-        break;
+        switch (m_nTabAlign)
+        {
+        case AlignTop:
+        case AlignBottom:
+            rcItem.OffsetRect(m_nTabPos.toPixelSize(GetScale()) + nIndex * (rcItem.Width() + m_nTabInterSize.toPixelSize(GetScale())), 0);
+            break;
+        case AlignLeft:
+        case AlignRight:
+            rcItem.OffsetRect(0, m_nTabPos.toPixelSize(GetScale()) + nIndex * (rcItem.Height() + m_nTabInterSize.toPixelSize(GetScale())));
+            break;
+        }
+        rcItem.IntersectRect(rcItem, rcTitle);
+        return TRUE;
     }
-    rcItem.IntersectRect(rcItem, rcTitle);
-    return TRUE;
 }
 
 void STabCtrl::DrawItem(IRenderTarget *pRT, const CRect &rcItem, int iItem, DWORD dwState)
@@ -992,6 +981,27 @@ int STabCtrl::GetCurSel() const
 int STabCtrl::GetItemCount(THIS) const
 {
     return (int)m_lstPages.GetCount();
+}
+
+LRESULT STabCtrl::OnAttrTabAlign(const SStringW &strValue, BOOL bLoading){
+    int nAlign = AlignTop;
+    if (strValue.CompareNoCase(L"top") == 0)
+        nAlign = AlignTop;
+    else if(strValue.CompareNoCase(L"left") == 0)
+        nAlign = AlignLeft;
+    else if(strValue.CompareNoCase(L"right") == 0)
+        nAlign = AlignRight;
+    else if(strValue.CompareNoCase(L"bottom") == 0)
+        nAlign = AlignBottom;
+    else if(strValue.CompareNoCase(L"middle") == 0)
+        nAlign = AlignMiddle;
+    if(!bLoading){
+        UpdateChildrenPosition();
+        return S_OK;
+    }else{
+        m_nTabAlign = nAlign;
+        return S_FALSE;
+    }
 }
 
 SNSEND

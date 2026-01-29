@@ -1013,4 +1013,185 @@ HRESULT SSkinImgFrame2::OnAttrSrc(const SStringW &strValue, BOOL bLoading)
     return hRet;
 }
 
+//////////////////////////////////////////////////////////////////////////
+// SSkinTreeLines
+SSkinTreeLines::SSkinTreeLines()
+    : m_crLine(RGBA(128, 128, 128,255))
+    , m_crCross(RGBA(0, 0, 0, 255))
+    , m_nLineWidth(1)
+    , m_nBoxSize(12)
+{
+}
+
+SIZE SSkinTreeLines::GetSkinSize() const
+{
+    // 返回一个合适的默认大小
+    return CSize(16, 16);
+}
+
+int SSkinTreeLines::GetStates() const
+{
+    // 返回10个状态
+    return 10;
+}
+
+void SSkinTreeLines::_DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iState, BYTE byAlpha) const
+{
+    SAutoRefPtr<IPenS> pPen, pPenCross, pPenDash;
+    HRESULT hr = S_OK;
+
+    // 创建线条颜色的画笔和钢笔
+    hr = pRT->CreatePen(PS_SOLID, m_crCross, m_nLineWidth, &pPenCross);
+    if (FAILED(hr)) return;
+    hr = pRT->CreatePen(PS_SOLID, m_crLine, m_nLineWidth, &pPen);
+    if (FAILED(hr)) return;
+    hr = pRT->CreatePen(PS_DOT, m_crLine, m_nLineWidth, &pPenDash);
+    if (FAILED(hr)) return;
+    
+    // 保存当前使用的对象
+    IRenderObj *pOldPen = NULL;
+    pRT->SelectObject(pPen, &pOldPen);
+
+    BOOL oldAntiAlias = pRT->SetAntiAlias(FALSE);
+    // 计算中心点
+    CRect rcDraw(prcDraw);
+    int centerX = (prcDraw->left+prcDraw->right)/2;
+    int centerY = (prcDraw->top + prcDraw->bottom) / 2;
+    // 定义方框尺寸
+    int boxSize = m_nBoxSize;
+    CRect rcBox(centerX - boxSize / 2, centerY - boxSize / 2, centerX + boxSize / 2, centerY + boxSize / 2);
+    rcBox.OffsetRect(-m_nLineWidth / 2, -m_nLineWidth/2); 
+    // 定义10个状态的绘制逻辑
+    switch (iState) {
+    case 0: {
+        // 方框中间有+号, 右边带连接虚线
+        // 绘制方框
+        pRT->DrawRectangle(&rcBox);
+        // 绘制+号
+        pRT->SelectObject(pPenCross, NULL);
+        pRT->DrawLine(CPoint(centerX, centerY - 2), CPoint(centerX, centerY + 2));
+        pRT->DrawLine(CPoint(centerX - 2, centerY), CPoint(centerX + 2, centerY));
+        // 绘制右边连接虚线
+        pRT->SelectObject(pPenDash, NULL);
+        pRT->DrawLine(CPoint(centerX + boxSize/2, centerY), CPoint(rcDraw.right, centerY));
+        break;
+    }
+    case 1: {
+        // 方框中间有+号, 上右下带连接虚线
+        // 绘制方框
+        pRT->DrawRectangle(&rcBox);
+        // 绘制+号
+        pRT->SelectObject(pPenCross, NULL);
+        pRT->DrawLine(CPoint(centerX, centerY - 2), CPoint(centerX, centerY + 2));
+        pRT->DrawLine(CPoint(centerX - 2, centerY), CPoint(centerX + 2, centerY));
+        // 绘制上右连接虚线
+        pRT->SelectObject(pPenDash, NULL);
+        pRT->DrawLine(CPoint(centerX, rcDraw.top), CPoint(centerX, centerY - boxSize/2));//top line
+        pRT->DrawLine(CPoint(centerX + boxSize/2, centerY), CPoint(rcDraw.right, centerY));//right line
+        pRT->DrawLine(CPoint(centerX, centerY + boxSize/2), CPoint(centerX, rcDraw.bottom));//bottom line
+        break;
+    }
+    case 2: {
+        // 方框中间有+号, 上右带连接虚线
+        // 绘制方框
+        pRT->DrawRectangle(&rcBox);
+        // 绘制+号
+        pRT->SelectObject(pPenCross, NULL);
+        pRT->DrawLine(CPoint(centerX, centerY - 2), CPoint(centerX, centerY + 2));
+        pRT->DrawLine(CPoint(centerX - 2, centerY), CPoint(centerX + 2, centerY));
+        // 绘制上右连接虚线
+        pRT->SelectObject(pPenDash, NULL);
+        pRT->DrawLine(CPoint(centerX, rcDraw.top), CPoint(centerX, centerY - boxSize/2));//top line
+        pRT->DrawLine(CPoint(centerX + boxSize/2, centerY), CPoint(rcDraw.right, centerY));//right line
+        break;
+    }
+    case 3: {
+        // 方框中间有-号, 右边带连接虚线
+        // 绘制方框
+        pRT->DrawRectangle(&rcBox);
+        // 绘制-号
+        pRT->SelectObject(pPenCross, NULL);
+        pRT->DrawLine(CPoint(centerX - 2, centerY), CPoint(centerX + 2, centerY));
+        // 绘制右边连接虚线
+        pRT->SelectObject(pPenDash, NULL);
+        pRT->DrawLine(CPoint(centerX + boxSize/2, centerY), CPoint(rcDraw.right, centerY));//right line
+        break;
+    }
+    case 4: {
+        // 方框中间有-号, 上右下带连接虚线
+        // 绘制方框
+        pRT->DrawRectangle(&rcBox);
+        // 绘制-号
+        pRT->SelectObject(pPenCross, NULL);
+        pRT->DrawLine(CPoint(centerX - 2, centerY), CPoint(centerX + 2, centerY));
+        // 绘制上右下连接虚线
+        pRT->SelectObject(pPenDash, NULL);
+        pRT->DrawLine(CPoint(centerX, rcDraw.top), CPoint(centerX, centerY - boxSize/2));//top line
+        pRT->DrawLine(CPoint(centerX + boxSize/2, centerY), CPoint(rcDraw.right, centerY));//right line
+        pRT->DrawLine(CPoint(centerX, centerY + boxSize/2), CPoint(centerX, rcDraw.bottom));//bottom line
+        break;
+    }
+    case 5: {
+        // 方框中间有-号, 上右带连接虚线
+        // 绘制方框
+        pRT->DrawRectangle(&rcBox);
+        // 绘制-号
+        pRT->SelectObject(pPenCross, NULL);
+        pRT->DrawLine(CPoint(centerX - 2, centerY), CPoint(centerX + 2, centerY));
+        // 绘制上右连接虚线
+        pRT->SelectObject(pPenDash, NULL);
+        pRT->DrawLine(CPoint(centerX, rcDraw.top), CPoint(centerX, centerY - boxSize/2));//top line
+        pRT->DrawLine(CPoint(centerX + boxSize/2, centerY), CPoint(rcDraw.right, centerY));//right line
+        break;
+    }
+    case 6: {
+        // 中间垂直虚线
+        // 绘制垂直虚线
+        pRT->SelectObject(pPenDash, NULL);
+        pRT->DrawLine(CPoint(centerX, rcDraw.top), CPoint(centerX, rcDraw.bottom));
+        break;
+    }
+    case 7: {
+        // 中间垂直虚线+向右虚线
+        // 绘制垂直虚线
+        pRT->SelectObject(pPenDash, NULL);
+        pRT->DrawLine(CPoint(centerX, rcDraw.top), CPoint(centerX, rcDraw.bottom));
+        // 绘制向右虚线
+        pRT->DrawLine(CPoint(centerX, centerY), CPoint(rcDraw.right, centerY));
+        break;
+    }
+    case 8: {
+        // 从中心点向上及向右带连接虚线
+        // 绘制向上虚线
+        pRT->SelectObject(pPenDash, NULL);
+        pRT->DrawLine(CPoint(centerX, rcDraw.top), CPoint(centerX, centerY));
+        // 绘制向右虚线
+        pRT->DrawLine(CPoint(centerX, centerY), CPoint(rcDraw.right, centerY));
+        break;
+    }
+    case 9: {
+        // 从中心点向下及向右带连接虚线
+        // 绘制向下虚线
+        pRT->SelectObject(pPenDash, NULL);
+        pRT->DrawLine(CPoint(centerX, centerY), CPoint(centerX, rcDraw.bottom));
+        // 绘制向右虚线
+        pRT->DrawLine(CPoint(centerX, centerY), CPoint(rcDraw.right, centerY));
+        break;
+    }
+    }
+
+    // 恢复原来的对象
+    if (pOldPen) pRT->SelectObject(pOldPen, NULL);
+    pRT->SetAntiAlias(oldAntiAlias);
+}
+
+void SSkinTreeLines::_Scale(ISkinObj *skinObj, int nScale)
+{
+    __baseCls::_Scale(skinObj, nScale);
+    SSkinTreeLines *pRet = sobj_cast<SSkinTreeLines>(skinObj);
+    if (pRet) {
+        pRet->m_nLineWidth = MulDiv(m_nLineWidth, nScale, 100);
+    }
+}
+
 SNSEND

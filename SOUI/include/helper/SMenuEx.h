@@ -60,6 +60,8 @@ class SOUI_EXP SMenuExItem : public SWindow {
     WCHAR GetHotKey() const;
 
   protected:
+    void BeforePaint(IRenderTarget *pRT, SPainter &painter) override;
+    
     /**
      * @brief 处理子菜单隐藏事件
      * @param bUncheckItem 是否取消选中子菜单项
@@ -231,6 +233,14 @@ class SOUI_EXP SMenuEx
      * @return 成功返回TRUE，失败返回FALSE
      */
     STDMETHOD_(BOOL, CheckMenuItem)(THIS_ UINT uIdCheckItem, UINT uCheck) OVERRIDE;
+
+    /**
+     * @brief 启用或禁用菜单项
+     * @param uIDEnableItem 项目ID或索引
+     * @param uEnable MF_BYCOMMAND/MF_BYPOSITION | MF_ENABLED/MF_GRAYED/MF_DISABLED
+     * @return 成功返回TRUE，失败返回FALSE
+     */
+    STDMETHOD_(BOOL, EnableMenuItem)(THIS_ UINT uIDEnableItem, UINT uEnable) OVERRIDE;
 
     /**
      * @brief 删除菜单项

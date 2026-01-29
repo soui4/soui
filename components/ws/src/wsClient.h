@@ -1,8 +1,7 @@
 #ifndef WsClient_H
 #define WsClient_H
 
-#include <interface/ws-i.h>
-#include <libwebsockets.h>
+#include "Connection.h"
 #include <helper/obj-ref-impl.hpp>
 #include <string>
 #include <thread>
@@ -11,7 +10,7 @@
 #include <atomic>
 #include <mutex>
 #include <list>
-#include <windows.h>
+
 SNSBEGIN
 
 class WsClient : public TObjRefImpl<IWsClient> {

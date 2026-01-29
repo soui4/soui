@@ -916,10 +916,23 @@ SStringA & SStringA::MakeLower()
 	return *this;
 }
 
+SStringA SStringA::MakeUpper2() const
+{
+	SStringA str = *this;
+	str.ToUpper();
+	return str;
+}
 SStringA & SStringA::MakeUpper()
 {
 	ToUpper();
 	return *this;
+}
+
+SStringA SStringA::MakeLower2() const
+{
+	SStringA str = *this;
+	str.ToLower();
+	return str;
 }
 
 SStringA SStringA::Left(int nCount) const

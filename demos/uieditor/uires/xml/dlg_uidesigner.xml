@@ -1,68 +1,46 @@
 <?xml version="1.0"?>
-	<splitrow name="xml_editor" sepSkin="" pos="1,[0,-0,-0" sepSize="6">
-		<pane idealSize="10" minSize="10" priority="0" clipClient="1">
-      <splitcol name="xml_editor_splitcol" sepSkin="" size="-2,-2" sepSize="6">
-        <pane idealSize="10" minSize="10" priority="0" clipClient="1">
-          <realwnd pos="0, 0, -0, -0" name="uidesigner_wnd_layout" wndclass="designer_wnd" id="100000" wndname="designer_wnd"/>
-        </pane>
-        <pane idealSize="300" minSize="300" priority="1" clipClient="1" layout="vbox" padding="5,5,5,5" interval="5"> 
-          <text text="property:"/>
-          <propgrid size="-2,0" weight="1" name="propgrid_element" switchSkin="skin_prop_switch"	titleWidth="150" orderType="group" itemHeight="26" colorGroup="RGB(96,112,138)" colorTitle="rgb(200,200,200)" colorTitleSel="rgb(234,128,16)" colorTitleTextSel="#ffffff" colorItem="@color/white">
-            <cmdbtnstyle skin="_skin.sys.btn.normal">...</cmdbtnstyle>
-            <editStyle colorBkgnd="#FFFFFF" colorText="#000000" autoWordSel="1"/>
-            <optionStyle dropDown="1" btnSkin="skin_open_menu_png" colorBkgnd="#ffffff" drawFocusRect="0" colorText="#000000">
-              <liststyle colorBorder="#000000" margin-x="1" margin-y="1" colorText="#000000" colorSelText="#FFFFFF" colorItemBkgnd="#FFFFFF" colorItemSelBkgnd="#000088"/>
-            </optionStyle>
-            <autoCompleteStyle>
-              <dropdownStyle translucent="1" resizable="0" sendWheel2Hover="1">
-                    <root colorBorder="@color/border" margin="1" colorBkgnd="@color/white"/>
-              </dropdownStyle>
-              <liststyles>
-                <!--template for different extend item type-->
-                <default size="-2,-2" >
-                  <template itemHeight="40" layout="vbox" colorNormal="@color/white" colorSelected="#e4f0fc" colorHover="#e4f0fc">
-                    <text name="txt_desc" colorText="@color/red"/>
-                    <window size="0,0" weight="1" visible="0"/>
-                    <text name="txt_value" colorText="@color/black"/>
-                  </template>
-                </default>
-                <skin size="-2,-2" >
-                  <template itemHeight="20" layout="hbox" gravity="center" colorNormal="@color/white" colorSelected="#e4f0fc" colorHover="#e4f0fc">
-                    <text name="txt_desc" colorText="@color/red"/>
-                    <window size="0,0" weight="1"/>
-                    <img name="skin_preview" width="20" height="20" iconIndex="0"/>
-                  </template>
-                </skin>
-                <color size="-2,-2" >
-                  <template itemHeight="30" layout="hbox" gravity="center" colorNormal="@color/white" colorSelected="#e4f0fc" colorHover="#e4f0fc">
-                    <text name="txt_desc" colorText="@color/red"/>
-                    <window size="0,0" weight="1"/>
-                    <window name="color_preview" width="20" height="20"/>
-                  </template>
-                </color>
-              </liststyles>
-            </autoCompleteStyle>
-          </propgrid>
-        </pane>
-      </splitcol>
-		</pane>
-		<pane idealSize="300" minSize="30" priority="1" clipClient="1" layout="vbox">      
-      <listview size="-2,50" name="lv_tb_skin" display="0" vertical="0" visible="0">
-        <template skin="skin_toolbar_state" itemWidth="100" layout="hbox" gravity="center" clipClient="1" interval="5">
-          <window size="0,0" visible="0" weight="1"/>
-          <img name="item_icon" skin="skin_icon"/>
-          <text name="item_text" colorText="@color/white"/>
-          <window size="0,0" visible="0" weight="1"/>
-        </template>
-      </listview>
-      <listview size="-2,50" name="lv_tb_widget" display="0" vertical="0" visible="0">
-        <template skin="skin_app_button" layout="hbox" itemWidth="110" gravity="center" clipClient="1" interval="5">
-          <window size="0,0" visible="0" weight="1"/>
-          <img name="item_icon" skin="widget_icons"/>
-          <text name="item_text" colorText="@color/white"/>
-          <window size="0,0" visible="0" weight="1"/>
-        </template>
-      </listview>
-      <realwnd size="-2,0" weight="1" name="uidesigner_scintilla" wndclass="scintilla" id="100000" wndname="scintilla"/>
-    </pane>
-  </splitrow>
+<tabctrl name="tab_editor" size="-2,-2" tabAlign="top" tabHeight="30" tabWidth="200" tabInterSize="10" tabSkin="skin_tab_skin">
+  <page name="page_xml" title="@string/xml_editor" layout="vbox">
+    <window size="-2,30" layout="hbox" interval="5">
+			<imgbtnex name="toolbar_btn_savexml" skin="skin_app_button" text="@string/save_xml" size="100,30" animate="1" class="ue_cls_title" />
+			<imgbtnex name="toolbar_btn_formatxml" skin="skin_app_button" text="@string/format_xml" size="100,30" animate="1" class="ue_cls_title" />
+    </window>
+    <splitcol name="xml_editor_main" sepSkin="" size="-2,0" weight="1" sepSize="6">
+      <pane idealSize="500" minSize="100" priority="0" clipClient="1">
+        <splitrow name="xml_editor_sub" sepSkin="" size="-2,-2" sepSize="6">
+          <pane idealSize="10" minSize="10" priority="0" clipClient="1">
+            <realwnd pos="0, 0, -0, -0" name="uidesigner_wnd_layout" wndclass="designer_wnd" id="100000" wndname="designer_wnd"/>
+          </pane>
+          <pane idealSize="300" minSize="30" priority="1" clipClient="1" layout="vbox">      
+            <listview size="-2,50" name="lv_tb_skin" display="0" vertical="0" visible="0">
+              <template skin="skin_toolbar_state" itemWidth="100" layout="hbox" gravity="center" clipClient="1" interval="5">
+                <window size="0,0" visible="0" weight="1"/>
+                <img name="item_icon" skin="skin_icon"/>
+                <text name="item_text" colorText="@color/white"/>
+                <window size="0,0" visible="0" weight="1"/>
+              </template>
+            </listview>
+            <listview size="-2,50" name="lv_tb_widget" display="0" vertical="0" visible="0">
+              <template skin="skin_app_button" layout="hbox" itemWidth="110" gravity="center" clipClient="1" interval="5">
+                <window size="0,0" visible="0" weight="1"/>
+                <img name="item_icon" skin="widget_icons"/>
+                <text name="item_text" colorText="@color/white"/>
+                <window size="0,0" visible="0" weight="1"/>
+              </template>
+            </listview>
+            <realwnd size="-2,0" weight="1" name="uidesigner_scintilla" wndclass="scintilla" id="100000" wndname="scintilla"/>
+          </pane>
+        </splitrow>
+      </pane>
+      <pane idealSize="250" minSize="100" priority="1" clipClient="1">
+					<include src="layout:property_panel" />
+			</pane>
+    </splitcol>
+  </page>
+  <page name="page_image" title="@string/image_viewer" layout="hbox">
+     <window size="0, -2" weight="1" skin="skin_designer_background">
+      <img name="img_viewer" pos="|0,|0" offset="-0.5,-0.5" size="0,0"/>
+     </window>
+     <sliderbar name="slider_zoom" size="30,-2" padding="5,20,5,20" min="20" max="500" value="100" vertical="1"/>
+  </page>
+</tabctrl>

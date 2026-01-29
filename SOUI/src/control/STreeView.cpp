@@ -423,6 +423,7 @@ STreeView::STreeView()
     , m_hSelected(ITEM_NULL)
     , m_pVisibleMap(new VISIBLEITEMSMAP)
     , m_bWantTab(FALSE)
+    , m_bMultiSel(FALSE)
     , m_pLineSkin(GETBUILTINSKIN(SKIN_SYS_TREE_LINES))
     , m_bHasLines(FALSE)
     , SHostProxy(this)
@@ -668,22 +669,49 @@ void STreeView::SetSel(HSTREEITEM hItem, BOOL bNotify /*=FALSE*/)
         }
     }
 
-    if (m_hSelected == hItem)
-        return;
+    if (!m_bMultiSel)
+    {
+        // Single selection mode
+        if (m_hSelected == hItem)
+            return;
 
-    SItemPanel *pItem = GetItemPanel(m_hSelected);
-    if (pItem)
-    {
-        pItem->GetFocusManager()->ClearFocus();
-        pItem->ModifyItemState(0, WndState_Check);
-        RedrawItem(pItem);
+        // Clear old selection
+        SItemPanel *pItem = GetItemPanel(m_hSelected);
+        if (pItem)
+        {
+            pItem->GetFocusManager()->ClearFocus();
+            pItem->ModifyItemState(0, WndState_Check);
+            RedrawItem(pItem);
+        }
+        
+        // Update selection map
+        ClearSelItems();
+        
+        // Set new selection
+        m_hSelected = hItem;
+        if (hItem != ITEM_NULL)
+        {
+            AddSelItem(hItem);
+        }
     }
-    m_hSelected = hItem;
-    pItem = GetItemPanel(m_hSelected);
-    if (pItem)
+    else
     {
-        pItem->ModifyItemState(WndState_Check, 0);
-        RedrawItem(pItem);
+        // Multi selection mode
+        if (hItem == ITEM_NULL)
+        {
+            // Clear all selections
+            ClearSelItems();
+            m_hSelected = ITEM_NULL;
+        }
+        else
+        {
+            // Clear old selection
+            ClearSelItems();
+            
+            // Select new item
+            m_hSelected = hItem;
+            AddSelItem(hItem);
+        }
     }
 
     if (bNotify)
@@ -719,6 +747,55 @@ void STreeView::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
     {
         pOwner->SSendMessage(WM_KEYDOWN, nChar, MAKELONG(nFlags, nRepCnt));
         return;
+    }
+
+    BOOL bCtrlPressed = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
+    BOOL bShiftPressed = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
+    BOOL bMultiSelMode = GetMultiSel();
+
+    // Handle space key to toggle selection
+    if (nChar == VK_SPACE && m_hSelected != ITEM_NULL)
+    {
+        if (bMultiSelMode)
+        {
+            if (IsItemSelected(m_hSelected))
+            {
+                RemoveSelItem(m_hSelected);
+            }
+            else
+            {
+                AddSelItem(m_hSelected);
+            }
+            return;
+        }
+        else
+        {
+            SetMsgHandled(FALSE);
+            return;
+        }
+    }
+
+    // Handle Ctrl+A to select all
+    if (bCtrlPressed && nChar == 'A')
+    {
+        if (bMultiSelMode)
+        {
+            ClearSelItems();
+            // This would require additional logic to traverse all tree items
+            // For simplicity, we'll just select the visible items for now
+            HSTREEITEM hItem = m_adapter->GetFirstVisibleItem();
+            while (hItem != ITEM_NULL)
+            {
+                AddSelItem(hItem);
+                hItem = m_adapter->GetNextVisibleItem(hItem);
+            }
+            return;
+        }
+        else
+        {
+            SetMsgHandled(FALSE);
+            return;
+        }
     }
 
     HSTREEITEM nNewSelItem = ITEM_NULL;
@@ -767,7 +844,33 @@ void STreeView::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
     if (nNewSelItem != ITEM_NULL)
     {
         EnsureVisible(nNewSelItem);
-        SetSel(nNewSelItem, TRUE);
+        
+        if (bMultiSelMode)
+        {
+            if (bCtrlPressed)
+            {
+                // Ctrl + arrow: move focus without changing selection
+                m_hSelected = nNewSelItem;
+                // Update visible items to reflect the new focus
+                UpdateVisibleItems();
+            }
+            else if (bShiftPressed)
+            {
+                // Shift + arrow: select the new item (tree view doesn't support range selection easily)
+                AddSelItem(nNewSelItem);
+                m_hSelected = nNewSelItem;
+            }
+            else
+            {
+                // Normal arrow: clear selection and select new item
+                SetSel(nNewSelItem, TRUE);
+            }
+        }
+        else
+        {
+            // Single selection mode
+            SetSel(nNewSelItem, TRUE);
+        }
     }
     else
     {
@@ -964,7 +1067,7 @@ void STreeView::UpdateVisibleItems()
         m_pVisibleMap->SetAt(hItem, ii);
         ii.pItem->SetVisible(TRUE);
 
-        if (hItem == m_hSelected)
+        if (IsItemSelected(hItem))
             ii.pItem->ModifyItemState(WndState_Check, 0);
         else
             ii.pItem->ModifyItemState(0, WndState_Check);
@@ -1368,12 +1471,103 @@ SItemPanel *STreeView::HitTest(CPoint &pt) const
 
 BOOL STreeView::OnItemClick(IEvtArgs *pEvt)
 {
+    EventItemPanelClick *pClickEvt = sobj_cast<EventItemPanelClick>(pEvt);
+    if (!pClickEvt) return TRUE;
+    
     SItemPanel *pItemPanel = sobj_cast<SItemPanel>(pEvt->Sender());
     HSTREEITEM hItem = (HSTREEITEM)pItemPanel->GetItemIndex();
-    if (hItem != m_hSelected)
+    
+    if (!m_bMultiSel)
     {
-        SetSel(hItem, TRUE);
+        // Single selection mode
+        if (hItem != m_hSelected)
+        {
+            SetSel(hItem, TRUE);
+        }
     }
+    else
+    {
+        // Multi selection mode
+        UINT uKeyFlags = GetKeyState(VK_CONTROL) & 0x8000 ? MK_CONTROL : 0;
+        uKeyFlags |= GetKeyState(VK_SHIFT) & 0x8000 ? MK_SHIFT : 0;
+        
+        if (uKeyFlags & MK_CONTROL)
+        {
+            // Ctrl + click: toggle selection
+            if (IsItemSelected(hItem))
+            {
+                RemoveSelItem(hItem);
+            }
+            else
+            {
+                AddSelItem(hItem);
+            }
+            m_hSelected = hItem;
+        }
+        else if (uKeyFlags & MK_SHIFT)
+        {
+            // Shift + click: select range
+            if (m_hSelected != ITEM_NULL)
+            {
+                // Get the current selected item and the clicked item
+                HSTREEITEM hStart = m_hSelected;
+                HSTREEITEM hEnd = hItem;
+                
+                // Select all visible items between hStart and hEnd
+                // First, collect all visible items
+                SArray<HSTREEITEM> visibleItems;
+                HSTREEITEM hCurrent = m_adapter->GetFirstVisibleItem();
+                while (hCurrent != ITEM_NULL)
+                {
+                    visibleItems.Add(hCurrent);
+                    hCurrent = m_adapter->GetNextVisibleItem(hCurrent);
+                }
+                
+                // Find the indices of hStart and hEnd in the visible items list
+                int nStartIndex = -1, nEndIndex = -1;
+                for (int i = 0; i < visibleItems.GetCount(); i++)
+                {
+                    if (visibleItems[i] == hStart)
+                    {
+                        nStartIndex = i;
+                    }
+                    if (visibleItems[i] == hEnd)
+                    {
+                        nEndIndex = i;
+                    }
+                }
+                
+                // If both items are found, select the range
+                if (nStartIndex != -1 && nEndIndex != -1)
+                {
+                    int nMin = smin(nStartIndex, nEndIndex);
+                    int nMax = smax(nStartIndex, nEndIndex);
+                    
+                    for (int i = nMin; i <= nMax; i++)
+                    {
+                        AddSelItem(visibleItems[i]);
+                    }
+                }
+                else
+                {
+                    // If either item is not found, just select the clicked item
+                    AddSelItem(hItem);
+                }
+            }
+            else
+            {
+                // If no item is selected, just select the clicked item
+                AddSelItem(hItem);
+            }
+            m_hSelected = hItem;
+        }
+        else
+        {
+            // Single click: clear all and select clicked item
+            SetSel(hItem, TRUE);
+        }
+    }
+    
     return TRUE;
 }
 
@@ -1499,6 +1693,102 @@ ITreeViewItemLocator *STreeView::GetItemLocator() const
 HSTREEITEM STreeView::GetSel() const
 {
     return m_hSelected;
+}
+
+void STreeView::SetMultiSel(BOOL bMultiSel)
+{
+    m_bMultiSel = bMultiSel;
+    if (!bMultiSel)
+    {
+        // Clear all selections except the current one
+        ClearSelItems();
+        if (m_hSelected != ITEM_NULL)
+        {
+            AddSelItem(m_hSelected);
+        }
+    }
+}
+
+BOOL STreeView::GetMultiSel() const
+{
+    return m_bMultiSel;
+}
+
+void STreeView::AddSelItem(HSTREEITEM hItem)
+{
+    if (hItem == ITEM_NULL) return;
+    
+    m_mapSelItems[hItem] = TRUE;
+    
+    // Update the visible item's state
+    SItemPanel *pItem = GetItemPanel(hItem);
+    if (pItem)
+    {
+        pItem->ModifyItemState(WndState_Check, 0);
+        RedrawItem(pItem);
+    }
+}
+
+void STreeView::RemoveSelItem(HSTREEITEM hItem)
+{
+    if (hItem == ITEM_NULL) return;
+    
+    m_mapSelItems.RemoveKey(hItem);
+    
+    // Update the visible item's state
+    SItemPanel *pItem = GetItemPanel(hItem);
+    if (pItem)
+    {
+        pItem->ModifyItemState(0, WndState_Check);
+        RedrawItem(pItem);
+    }
+}
+
+void STreeView::ClearSelItems()
+{
+    // Update all visible items' states
+    for (SPOSITION pos = m_mapSelItems.GetStartPosition(); pos;)
+    {
+        HSTREEITEM hItem;
+        BOOL bVal;
+        m_mapSelItems.GetNextAssoc(pos, hItem, bVal);
+        
+        SItemPanel *pItem = GetItemPanel(hItem);
+        if (pItem)
+        {
+            pItem->ModifyItemState(0, WndState_Check);
+            RedrawItem(pItem);
+        }
+    }
+    
+    m_mapSelItems.RemoveAll();
+}
+
+BOOL STreeView::IsItemSelected(HSTREEITEM hItem) const
+{
+    if (hItem == ITEM_NULL) return FALSE;
+    
+    const ItemSelectionMap::CPair *pVal = m_mapSelItems.Lookup(hItem);
+    return pVal && pVal->m_value;
+}
+
+int STreeView::GetSelItemCount() const
+{
+    return m_mapSelItems.GetCount();
+}
+
+int STreeView::GetSelItems(HSTREEITEM *items, int nMaxCount) const
+{
+    int i = 0;
+    for (SPOSITION pos = m_mapSelItems.GetStartPosition(); pos && nMaxCount > 0;)
+    {
+        HSTREEITEM hItem;
+        BOOL bVal;
+        m_mapSelItems.GetNextAssoc(pos, hItem, bVal);
+        items[i++] = hItem;
+        nMaxCount--;
+    }
+    return i;
 }
 
 void STreeView::DrawLines(IRenderTarget *pRT, const CRect &rc, HSTREEITEM hItem)

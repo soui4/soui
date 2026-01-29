@@ -1,9 +1,11 @@
-﻿#pragma once
+﻿#ifndef __SIMAGEBTNEXT_H__
+#define __SIMAGEBTNEXT_H__
+
 #include <core/SWnd.h>
 #include <control/SCmnCtrl.h>
 
-namespace SOUI
-{
+SNSBEGIN
+
 	class SImageBtnEx :public SImageButton
 	{
 		DEF_SOBJECT(SImageButton, L"imgbtnex")
@@ -28,4 +30,7 @@ namespace SOUI
 			ATTR_STRINGT(L"text", m_strText, FALSE)
 		SOUI_ATTRS_END()
 	};
-}
+
+SNSEND
+
+#endif//__SIMAGEBTNEXT_H__

@@ -1,7 +1,9 @@
 ﻿#include "stdafx.h"
 #include "SImageBtnEx.h"
 
-void SOUI::SImageBtnEx::OnPaint( IRenderTarget *pRT )
+SNSBEGIN
+
+void SImageBtnEx::OnPaint( IRenderTarget *pRT )
 {
 	__baseCls::OnPaint(pRT);
 	SPainter painter;
@@ -34,3 +36,5 @@ void SOUI::SImageBtnEx::OnPaint( IRenderTarget *pRT )
 
 	AfterPaint(pRT, painter);
 }
+
+SNSEND

@@ -329,8 +329,16 @@ public:
     SStringW Left(int nCount) const;
 
     /// @brief Converts the string to uppercase.
+    /// @return The converted string.
+    SStringW MakeUpper2() const;
+
+    /// @brief Converts the string to uppercase.
     /// @return A reference to the modified string.
     SStringW& MakeUpper();
+
+    /// @brief Converts the string to lowercase.
+    /// @return The converted string.
+    SStringW MakeLower2() const;
 
     /// @brief Converts the string to lowercase.
     /// @return A reference to the modified string.

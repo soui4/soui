@@ -8,13 +8,15 @@
 #include <MainDlg.h>
 #define kLogTag "ResManger"
 
-ResManger::ResManger(CMainDlg *pMainDlg):m_pMainDlg(pMainDlg),m_pathMonitor(this)
+ResManger::ResManger(CMainDlg *pMainDlg):m_pMainDlg(pMainDlg)
 {
+    m_pMainDlg->m_pathMonitor.AddListener(this);
 }
 
 
 ResManger::~ResManger()
 {
+    m_pMainDlg->m_pathMonitor.RemoveListener(this);
 }
 
 // 添加获取资源提供者的公共方法
@@ -43,8 +45,9 @@ void ResManger::SetUiDefInfo(IUiDefInfo* pUiDef)
 
 BOOL ResManger::OpenProject(SStringT strPath)
 {
-	m_strProPath = strPath.Mid(0, strPath.ReverseFind(TPATH_SLASH));
 	m_strUIResFile = strPath;
+	m_strUIResFile.ReplaceChar(_T('\\'),_T('/'));
+    m_strProPath = m_strUIResFile.Mid(0, m_strUIResFile.ReverseFind(_T('/')));
 
 	if(!LoadUIRes())
 		return FALSE;
@@ -55,7 +58,7 @@ BOOL ResManger::OpenProject(SStringT strPath)
 	LoadObjattrFile();
 	LoadDimensionFile();
 	LoadFontFile();
-	m_pathMonitor.SetPath(m_strProPath);
+    m_pMainDlg->m_pathMonitor.SetPath(m_strProPath);
 
 	
 	SouiFactory souiFac;
@@ -69,15 +72,50 @@ BOOL ResManger::OpenProject(SStringT strPath)
 	return TRUE;
 }
 
+void ResManger::UpdateProject()
+{
+	m_pUiDef=NULL;
+	m_pResProvider=NULL;
+	m_mapSkins.RemoveAll();
+	m_mapStrings.RemoveAll();
+	m_mapColors.RemoveAll();
+	m_mapStyles.RemoveAll();
+	m_mapLayoutFile.RemoveAll();
+	m_mapDimensions.RemoveAll();
+	m_mapFonts.RemoveAll();
+
+	m_xmlDocSkin.reset();
+	m_xmlDocString.reset();
+	m_xmlDocColor.reset();
+	m_xmlDocStyle.reset();
+	m_xmlDocObjattr.reset();
+	m_xmlDocDimension.reset();
+	m_xmlDocFont.reset();
+	m_xmlDocUiRes.reset();
+
+	LoadSkinFile();
+	LoadStringFile();
+	LoadColorFile();
+	LoadStyleFile();
+	LoadObjattrFile();
+	LoadDimensionFile();
+	LoadFontFile();
+	
+	SouiFactory souiFac;
+	m_pResProvider.Attach(souiFac.CreateResProvider(RES_FILE));
+	m_pResProvider->Init((WPARAM)m_strProPath.c_str(),0);
+	SApplication::getSingletonPtr()->AddResProvider(m_pResProvider,NULL);
+	m_pUiDef = SUiDef::CreateUiDefInfo();
+	m_pUiDef->Init(m_pResProvider, _T("UIDEF:XML_INIT"));
+	SApplication::getSingletonPtr()->RemoveResProvider(m_pResProvider);
+}
 void ResManger::CloseProject()
 {
 	m_pUiDef=NULL;
 	m_pResProvider=NULL;
-	m_pathMonitor.Stop();
+    m_pMainDlg->m_pathMonitor.Stop();
 	m_strUIResFile = m_strProPath = _T("");
 
-	m_mapResFile.RemoveAll();
-	m_mapXmlFile.RemoveAll();
 	m_mapSkins.RemoveAll();
 	m_mapStrings.RemoveAll();
 	m_mapColors.RemoveAll();
@@ -160,11 +198,7 @@ BOOL ResManger::LoadUIRes()
 
 	m_xmlNodeUiRes = m_xmlDocUiRes.root();
 
-	m_mapResFile.RemoveAll();
-	m_mapXmlFile.RemoveAll();
-
 	pugi::xml_node xmlNode = m_xmlNodeUiRes.child(L"resource").first_child();
-	GetSubNodes(xmlNode, L"");
 	// 获取 Init.xml 文件名
 	pugi::xml_node xmlNode_init = m_xmlNodeUiRes.child(L"resource").child(L"UIDEF").first_child();
 
@@ -208,10 +242,8 @@ BOOL ResManger::LoadUIRes()
 				{
 					SStringW strName = xmlFile.attribute(L"name").value();
 					SStringW strPath = xmlFile.attribute(L"path").value();
-					if (!strName.IsEmpty() && !strPath.IsEmpty())
-					{
-						m_mapXmlFile[S_CW2T(strName)] = S_CW2T(strPath);
-					}
+					strPath.ReplaceChar(_T('\\'),_T('/'));
+
 					if (nodeName.CompareNoCase(L"uidef") == 0)
 					{
 						m_strInitFile = S_CW2T(strPath);
@@ -231,7 +263,7 @@ BOOL ResManger::LoadUIRes()
 					}
 					if(bLayout){
 						SStringW strLayoutId = SStringW(xmlType.name())+L":"+strName;
-						m_mapLayoutFile[S_CW2T(strLayoutId)] = S_CW2T(strPath);
+                        m_mapLayoutFile[S_CW2T(strPath)] = S_CW2T(strLayoutId);
 					}
 					xmlFile = xmlFile.next_sibling(L"file");
 				}
@@ -240,72 +272,6 @@ BOOL ResManger::LoadUIRes()
 		}
 	}
 	return TRUE;
-}
-
-void ResManger::GetSubNodes(pugi::xml_node& parentNode, SStringW parentNodeName)
-{
-	while (parentNode)
-	{
-		if (parentNode.type() == pugi::node_element)
-		{
-			SStringW strParentName = parentNode.name();
-			if (parentNode.first_child() != NULL)
-			{
-				pugi::xml_node childNode = parentNode.first_child();
-				GetSubNodes(childNode, strParentName + L":");
-			}
-			else
-			{
-				if (strParentName == L"file")
-				{
-					SStringW strName, strPath;
-					strName = parentNode.attribute(L"name").value();
-					strPath = parentNode.attribute(L"path").value();
-					if (!strName.IsEmpty() && !strPath.IsEmpty())
-					{
-						SStringT strKey = S_CW2T(parentNodeName + strName);
-						strKey.MakeLower();
-						SStringT strPathT=S_CW2T(strPath);
-						SStringT extname = GetFileExtname(strPathT);
-						if (extname.CompareNoCase(_T(".xml")) == 0)
-						{
-							m_mapXmlFile[strKey] = strPathT;
-						}
-						else
-						{
-							m_mapResFile[strKey] = strPathT;
-						}
-					}
-				}
-			}
-		}
-		parentNode = parentNode.next_sibling();
-	}
-}
-
-// 删除资源类型名 如LAYOUT:sin_manm 将变成 sin_manm
-SStringT ResManger::RemoveResTypename(const SStringT& resname)
-{
-	int nPos = resname.ReverseFind(':');
-	if (nPos == -1)	nPos = 0;
-	SStringT name = resname.Mid(nPos + 1);
-	name.Trim();
-	return name;
-}
-
-SStringT ResManger::GetResPathByName(const SStringT& resname)
-{
-	SStringT key = resname; 
-	key.MakeLower();
-	const SMap<SStringT, SStringT>::CPair * pFilePair = m_mapXmlFile.Lookup(key);
-	if (pFilePair == NULL)
-	{
-		pFilePair = m_mapResFile.Lookup(key);
-	}
-	if (pFilePair == NULL)
-		return _T("");
-
-	return m_strProPath + TPATH_SLASH + pFilePair->m_value;
 }
 
 void ResManger::LoadResFileEx(SStringT &filepath, pugi::xml_document &xmlDoc, SStringT tagname)
@@ -765,6 +731,17 @@ BOOL ResManger::IsSkinXml(const SStringT &strPath) const
 	return m_strSkinFile.CompareNoCase(strPath) == 0;
 }
 
+BOOL ResManger::IsLayoutXml(const SStringT & strPath, SStringT & layoutId) const
+{
+    SStringT strPath2 = strPath;
+    strPath2.ReplaceChar(_T('\\'), _T('/'));
+    if (strPath2.StartsWith(m_strProPath))
+    {
+        strPath2 = strPath2.Mid(m_strProPath.GetLength() + 1);
+    }
+    return m_mapLayoutFile.Lookup(strPath2, layoutId);
+}
+
 BOOL ResManger::NewLayout(SStringT strResName, SStringT strPath)
 {
     SStringT strShortPath = strPath.Mid(m_strProPath.GetLength() + 1);
@@ -780,7 +757,7 @@ BOOL ResManger::NewLayout(SStringT strResName, SStringT strPath)
         m_xmlDocUiRes.save_file(m_strUIResFile);
     }
     SStringT strType = SStringT().Format(_T("layout:%s"), strResName.c_str());
-    m_mapXmlFile[strType] = strPath;
+	m_mapLayoutFile[strPath] = strType;
     return TRUE;
 }
 
@@ -793,34 +770,182 @@ void ResManger::_OnFileChanged(tstring & strFile, CPathMonitor::Flag nFlag)
 {
 	SStringT strFile2(strFile.c_str(),strFile.length());
 	strFile2 = strFile2.Mid(m_strProPath.GetLength() + 1);
-	strFile2.ReplaceChar(_T('/'), _T('\\'));
+	strFile2.ReplaceChar(_T('\\'), _T('/'));
 	if(nFlag == CPathMonitor::FILE_MODIFIED)
 	{
+		BOOL bReload = FALSE;
 		if(m_strUIResFile.CompareNoCase(strFile2.c_str()) == 0)
 		{
-			LoadUIRes();
+			bReload = TRUE;
 		}
 		else if(m_strSkinFile.CompareNoCase(strFile2.c_str()) == 0)
 		{
-			LoadSkinFile();
+			bReload = TRUE;
 		}
 		else if(m_strStringFile.CompareNoCase(strFile2.c_str()) == 0)
 		{
-			LoadStringFile();
+			bReload = TRUE;
 		}
 		else if(m_strColorFile.CompareNoCase(strFile2.c_str()) == 0)
 		{
-			LoadColorFile();
+			bReload = TRUE;
 		}
 		else if(m_strStyleFile.CompareNoCase(strFile2.c_str()) == 0)
 		{
-			LoadStyleFile();
+			bReload = TRUE;
 		}
 		else if(m_strObjattrFile.CompareNoCase(strFile2.c_str()) == 0)
 		{
-			LoadObjattrFile();
+			bReload = TRUE;
+		}else if(m_strDimensionFile.CompareNoCase(strFile2.c_str()) == 0)
+		{
+			bReload = TRUE;
+		}
+		else if(m_strFontFile.CompareNoCase(strFile2.c_str()) == 0)
+		{
+			bReload = TRUE;
+		}
+		if(bReload)
+		{
+			UpdateProject();
 		}
 	}
-	//todo: handle other flags
+}
 
+/**
+ * @brief AddToUIRes, 添加资源文件到UIRes文件
+ * @param strPath: 相对于工程目录的路径
+ * @return TRUE: 成功, FALSE: 失败
+ * @note  查找uires.idx所有文件, 如果文件已经存在，则不添加, 没有时,根据文件第一级目录名确定资源类型，添加到uires.idx中, 并更新m_mapXmlFile
+ */
+BOOL ResManger::AddToUIRes(SStringT strPath)
+{
+    SStringT strShortPath = strPath.Mid(m_strProPath.GetLength() + 1);
+	strShortPath.ReplaceChar(_T('/'), _T('\\'));
+
+	// 解析路径，获取第一级目录名作为资源类型
+	SStringT strPathCopy = strShortPath;
+	strPathCopy.ReplaceChar(_T('/'), _T('\\'));
+	int nPos = strPathCopy.FindChar(_T('\\'));
+	if (nPos <= 0) return FALSE; // 没有找到子目录
+	
+	SStringT strResType = strPathCopy.Left(nPos); // 获取第一级目录名作为资源类型
+	SStringT strFileName = strPathCopy.Mid(nPos + 1); // 获取文件名
+	int nFilePos = strFileName.ReverseFind(_T('\\'));
+	if (nFilePos >= 0) {
+		strFileName = strFileName.Mid(nFilePos + 1); // 获取纯文件名（去掉路径部分）
+	}
+
+	// 去掉扩展名获得文件名
+	SStringT strName = strFileName;
+	int nDotPos = strName.ReverseFind(_T('.'));
+	if (nDotPos > 0) {
+		strName = strName.Left(nDotPos);
+	}
+
+	// 检查文件是否已经存在于UIRes中
+	// 遍历所有资源类型节点
+	pugi::xml_node resRoot = m_xmlNodeUiRes.child(L"resource");
+	for (pugi::xml_node resTypeNode = resRoot.first_child(); resTypeNode; resTypeNode = resTypeNode.next_sibling())
+	{
+		// 遍历当前资源类型下的所有文件节点
+		for (pugi::xml_node fileNode = resTypeNode.first_child(); fileNode; fileNode = fileNode.next_sibling())
+		{
+			if (wcscmp(fileNode.name(), L"file") == 0) // 确保是file节点
+			{
+				SStringW existingPath = fileNode.attribute(L"path").value();
+				if (existingPath.CompareNoCase(S_CT2W(strShortPath)) == 0) {
+					// 文件已经存在，不需要添加
+					return FALSE;
+				}
+			}
+		}
+	}
+
+	// 查找对应的资源类型节点，如果没有则创建
+	pugi::xml_node resTypeNode = resRoot.child(S_CT2W(strResType));
+
+	if (!resTypeNode) {
+		// 如果没有找到对应类型的节点，创建一个新的
+		resTypeNode = resRoot.append_child(S_CT2W(strResType));
+	}
+
+	// 添加文件节点
+	pugi::xml_node fileNode = resTypeNode.append_child(L"file");
+	fileNode.append_attribute(L"name").set_value(S_CT2W(strName));
+	fileNode.append_attribute(L"path").set_value(S_CT2W(strShortPath));
+
+	// 保存UIRes文件
+	if (!m_xmlDocUiRes.save_file(m_strUIResFile)) {
+		return FALSE;
+	}
+	m_xmlNodeUiRes = resRoot;
+	return TRUE;
+}
+
+int ResManger::GetFileType(SStringT strPath) const
+{
+    strPath.ReplaceChar(_T('\\'), _T('/'));
+    if (strPath.StartsWith(m_strProPath))
+    {
+        strPath = strPath.Mid(m_strProPath.GetLength() + 1);
+    }
+    SStringT strFullPath = m_strProPath + _T("/") + strPath;
+    // 检查是否为目录
+    DWORD dwAttrib = GetFileAttributes(strFullPath);
+    if (dwAttrib != INVALID_FILE_ATTRIBUTES && (dwAttrib & FILE_ATTRIBUTE_DIRECTORY))
+    {
+        return FT_DIR;
+    }
+
+    // 获取文件扩展名
+    SStringT strExt = SStringT(strPath).Mid(strPath.ReverseFind(_T('.'))).MakeLower();
+
+    // 根据扩展名和路径判断文件类型
+    if (strExt == _T(".idx"))
+    {
+        if (strPath.Find(_T("uires.idx")) != -1)
+            return FT_INDEX_XML;
+        else
+            return FT_UNKNOWN;
+    }
+
+    if (strExt == _T(".xml"))
+    {
+        // 检查是否为布局XML文件
+        SStringT layoutId;
+        if (IsLayoutXml(strPath, layoutId))
+            return FT_LAYOUT_XML;
+        // 检查是否为皮肤XML文件
+        else if (IsSkinXml(strPath))
+            return FT_SKIN;
+        else
+            return FT_XML;
+    }
+
+    // 检查是否为图片文件
+    if (strExt == _T(".png") || strExt == _T(".jpg") || strExt == _T(".jpeg") ||
+        strExt == _T(".bmp") || strExt == _T(".gif") || strExt == _T(".ico"))
+    {
+        return FT_IMAGE;
+    }
+
+    // 检查文件名是否包含特定标识符来判断类型
+    SStringT strPathLower = strPath.MakeLower();
+
+    if (strPathLower.Find(_T("color")) != -1)
+        return FT_COLOR;
+    if (strPathLower.Find(_T("string")) != -1 || strPathLower.Find(_T("text")) != -1)
+        return FT_STRING;
+    if (strPathLower.Find(_T("style")) != -1)
+        return FT_STYLE;
+    if (strPathLower.Find(_T("objattr")) != -1)
+        return FT_OBJATTR;
+    if (strPathLower.Find(_T("dim")) != -1 || strPathLower.Find(_T("dimension")) != -1)
+        return FT_DIM;
+    if (strPathLower.Find(_T("font")) != -1)
+        return FT_FONT;
+
+    // 默认返回未知类型
+    return FT_UNKNOWN;
 }

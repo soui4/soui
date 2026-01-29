@@ -907,9 +907,21 @@ SStringW & SStringW::MakeLower(){
 	return *this;
 }
 
+SStringW SStringW::MakeUpper2() const
+{
+	SStringW str = *this;
+	str.ToUpper();
+	return str;
+}
 SStringW & SStringW::MakeUpper(){
 	ToUpper();
 	return *this;
+}
+SStringW SStringW::MakeLower2() const
+{
+	SStringW str = *this;
+	str.ToLower();
+	return str;
 }
 
 SStringW SStringW::Left(int nCount) const

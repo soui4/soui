@@ -226,6 +226,30 @@ SMenuExItem::SMenuExItem(SMenuEx *pOwnerMenu, ISkinObj *pItemSkin)
     m_style.SetAlign(DT_LEFT);
 }
 
+void SMenuExItem::BeforePaint(IRenderTarget *pRT, SPainter &painter){
+    SMenuEx *pRootMenu = m_pOwnerMenu;
+    while(pRootMenu->m_pParent){
+        pRootMenu = pRootMenu->m_pParent->m_pOwnerMenu;
+    }
+    SWindow *pRoot = (SWindow*)pRootMenu->GetHostWnd()->GetIRoot();
+    int iState = SState2Index::GetDefIndex(GetState(), true);
+    IFontPtr pFont = GetStyle().GetTextFont(iState);
+    if (pFont)
+        pRT->SelectObject(pFont, (IRenderObj **)&painter.oldFont);
+    else
+    {
+        pFont =  pRoot->GetStyle().GetTextFont(iState);
+        if (pFont)
+            pRT->SelectObject(pFont, (IRenderObj **)&painter.oldFont);
+    }
+    COLORREF crTxt = GetStyle().GetTextColor(iState);
+    if (crTxt != CR_INVALID)
+        painter.oldTextColor = pRT->SetTextColor(crTxt);
+    else{
+        painter.oldTextColor = pRT->SetTextColor(pRoot->GetStyle().GetTextColor(iState));
+    }
+}
+
 void SMenuExItem::OnPaint(IRenderTarget *pRT)
 {
     __baseCls::OnPaint(pRT);
@@ -1303,6 +1327,25 @@ BOOL SMenuEx::CheckMenuItem(UINT uPos, UINT uFlag)
     else
     {
         pItemRef->SetAttribute(L"check", L"0");
+    }
+    return TRUE;
+}
+
+BOOL SMenuEx::EnableMenuItem(UINT uIDEnableItem, UINT uEnable)
+{
+    SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot());
+    SASSERT(pMenuRoot);
+    SWindow *pItemRef = FindItem(uIDEnableItem, uEnable);
+    if (!pItemRef)
+        return FALSE;
+
+    if (uEnable & MF_DISABLED)
+    {
+        pItemRef->SetAttribute(L"enable", L"0");
+    }
+    else
+    {   
+        pItemRef->SetAttribute(L"enable", L"1");
     }
     return TRUE;
 }

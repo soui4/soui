@@ -1176,5 +1176,64 @@ class SOUI_EXP SSKinGroup : public SSkinObjBase {
     SAutoRefPtr<ISkinObj> m_skins[4]; // Array of skins for different states.
 };
 
+/**
+ * @class      SSkinTreeLines
+ * @brief      Tree Lines Skin
+ *
+ * Description: Represents a skin that draws tree control lines using IRenderTarget API,
+ * supporting 10 states and adapting to any row height.
+ */
+class SOUI_EXP SSkinTreeLines : public SSkinObjBase {
+    DEF_SOBJECT(SSkinObjBase, L"treelines")
+
+  public:
+    /**
+     * @brief Constructor for SSkinTreeLines.
+     */
+    SSkinTreeLines();
+
+    /**
+     * @brief Gets the size of the skin.
+     * @return Size of the skin.
+     */
+    STDMETHOD_(SIZE, GetSkinSize)(THIS) SCONST OVERRIDE;
+
+    /**
+     * @brief Gets the number of states in the skin.
+     * @return Number of states.
+     */
+    STDMETHOD_(int, GetStates)(THIS) SCONST OVERRIDE;
+
+  protected:
+    /**
+     * @brief Draws the skin by index.
+     * @param pRT Pointer to the render target.
+     * @param rcDraw Rectangle to draw in.
+     * @param iState State index.
+     * @param byAlpha Alpha value for transparency.
+     */
+    void _DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const override;
+
+    /**
+     * @brief Scales the skin.
+     * @param skinObj Pointer to the skin object.
+     * @param nScale Scale factor.
+     */
+    void _Scale(ISkinObj *skinObj, int nScale) override;
+
+  protected:
+    COLORREF m_crLine; // Line color
+    COLORREF m_crCross; // Cross color for expand/collapse indicators
+    int m_nLineWidth;  // Line width
+    int m_nBoxSize;     // Size of the expand/collapse box
+  public:
+    SOUI_ATTRS_BEGIN()
+        ATTR_COLOR(L"colorLine", m_crLine, TRUE)        // Line color
+        ATTR_COLOR(L"colorCross", m_crCross, TRUE)
+        ATTR_INT(L"lineWidth", m_nLineWidth, TRUE)  // Line width
+        ATTR_INT(L"boxSize", m_nBoxSize, TRUE)     // Expand/collapse box size)
+    SOUI_ATTRS_END()
+};
+
 SNSEND
 #endif // __SSKIN__H__

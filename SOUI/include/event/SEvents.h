@@ -51,12 +51,13 @@ typedef enum _SOUI_EVENTS
     EVT_ANIMATION_REPEAT, ///< 动画重复事件
     EVT_POS,              ///< 位置改变事件
     EVT_ANIMATOR_FRACTOR, ///< 数值动画事件
-
+    
     EVT_KEYDOWN = 8200, ///< 键盘按下事件
 
     // 两个窗口鼠标状态事件
     EVT_MOUSE_HOVER = 9000, ///< 鼠标悬停事件
     EVT_MOUSE_LEAVE,        ///< 鼠标离开事件
+    EVT_MOUSE_MOVE,         ///< 鼠标移动事件
 
     EVT_CMD = 10000, ///< 命令事件
     EVT_MENU_CMD,    ///< 菜单命令事件
@@ -432,6 +433,8 @@ DEF_EVT(EventKeyDown, EVT_KEYDOWN, on_key_down, {
 DEF_EVT(EventSwndMouseLeave, EVT_MOUSE_LEAVE, on_mouse_leave, { int fake; })
 
 DEF_EVT(EventSwndMouseHover, EVT_MOUSE_HOVER, on_mouse_hover, { int fake; })
+
+DEF_EVT(EventSwndMouseMove, EVT_MOUSE_MOVE, on_mouse_move, { int nFlags; POINT pt; })
 
 DEF_EVT(EventSwndUpdateTooltip, EVT_UPDATE_TOOLTIP, on_update_tooltip, {
     IStringT *strToolTip; ///< 工具提示字符串

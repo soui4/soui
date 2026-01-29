@@ -8,10 +8,10 @@
 #ifndef WsServer_H
 #define WsServer_H
 
+#include "Connection.h"
 #include <interface/ws-i.h>
 #include <helper/obj-ref-impl.hpp>
 #include <string>
-#include "Connection.h"
 #include <condition_variable>
 #include <thread>
 

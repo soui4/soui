@@ -1,8 +1,8 @@
 ﻿#include "stdafx.h"
 #include "SGroupList.h"
 
-namespace SOUI
-{
+SNSBEGIN
+
 using namespace GroupListStuct;
 
 SGroupList::SGroupList()
@@ -237,4 +237,4 @@ BOOL SGroupList::OnItemClick(IEvtArgs *e)
     return true;
 }
 
-} // namespace SOUI
+SNSEND

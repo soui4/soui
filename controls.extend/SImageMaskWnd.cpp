@@ -72,11 +72,13 @@ void SImageMaskWnd::UpdateCacheFromSkin(ISkinObj *pSkin)
     SASSERT(m_bmpMask && m_bmpCache);
     SAutoRefPtr<IRenderTarget> pRTDst;
     GETRENDERFACTORY->CreateRenderTarget(&pRTDst, 0, 0);
+    pRTDst->BeginDraw();
     SAutoRefPtr<IRenderObj> pOldBmp;
     pRTDst->SelectObject(m_bmpCache, &pOldBmp);
     CRect rc(CPoint(0, 0), m_bmpCache->Size());
     pSkin->DrawByIndex(pRTDst, &rc, 0);
     pRTDst->SelectObject(pOldBmp, NULL);
+    pRTDst->EndDraw();
 }
 
 void SImageMaskWnd::UpdateCacheFromImage(IBitmapS *pBitmap, FilterLevel fl)
@@ -84,12 +86,14 @@ void SImageMaskWnd::UpdateCacheFromImage(IBitmapS *pBitmap, FilterLevel fl)
     SASSERT(m_bmpMask && m_bmpCache);
     SAutoRefPtr<IRenderTarget> pRTDst;
     GETRENDERFACTORY->CreateRenderTarget(&pRTDst, 0, 0);
+    pRTDst->BeginDraw();
     SAutoRefPtr<IRenderObj> pOldBmp;
     pRTDst->SelectObject(m_bmpCache, &pOldBmp);
     CRect rc(CPoint(0, 0), m_bmpCache->Size());
     CRect rcSrc(CPoint(0, 0), pBitmap->Size());
     pRTDst->DrawBitmapEx(rc, pBitmap, rcSrc, MAKELONG(EM_STRETCH, fl), 0xff);
     pRTDst->SelectObject(pOldBmp, NULL);
+    pRTDst->EndDraw();
 }
 
 void SImageMaskWnd::MakeCacheAlpha()

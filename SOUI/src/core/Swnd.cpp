@@ -621,6 +621,7 @@ SWindow::SWindow()
     m_evtSet.addEvent(EVENTID(EventSwndPos));
     m_evtSet.addEvent(EVENTID(EventSwndMouseHover));
     m_evtSet.addEvent(EVENTID(EventSwndMouseLeave));
+    m_evtSet.addEvent(EVENTID(EventSwndMouseMove));
     m_evtSet.addEvent(EVENTID(EventSwndStateChanged));
     m_evtSet.addEvent(EVENTID(EventSwndVisibleChanged));
     m_evtSet.addEvent(EVENTID(EventSwndCaptureChanged));
@@ -2615,8 +2616,10 @@ SIZE SWindow::MeasureContent(int nParentWid, int nParentHei)
         rcTest4Text.right = smax(nMaxWid, 10);
         SAutoRefPtr<IRenderTarget> pRT;
         GETRENDERFACTORY->CreateRenderTarget(&pRT, 0, 0);
+        pRT->BeginDraw();
         BeforePaintEx(pRT);
         DrawText(pRT, strText, strText.GetLength(), rcTest4Text, nTestDrawMode | DT_CALCRECT);
+        pRT->EndDraw();
     }
     return rcTest4Text.Size();
 }
@@ -2798,6 +2801,10 @@ void SWindow::OnRButtonUp(UINT nFlags, CPoint point)
 
 void SWindow::OnMouseMove(UINT nFlags, CPoint pt)
 {
+    EventSwndMouseMove evtMove(this);
+    evtMove.nFlags = nFlags;
+    evtMove.pt = pt;
+    FireEvent(evtMove);
 }
 
 void SWindow::OnMouseHover(UINT nFlags, CPoint ptPos)

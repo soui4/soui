@@ -81,6 +81,7 @@ void SColorMask::MakeCacheApha()
     // 创建画布并把skin选进画布
     CAutoRefPtr<IRenderTarget> pRTDst;
     GETRENDERFACTORY->CreateRenderTarget(&pRTDst, 0, 0);
+    pRTDst->BeginDraw();
     CAutoRefPtr<IRenderObj> pOldBmp;
     pRTDst->SelectObject(m_bmpSkin, &pOldBmp);
     for (int i = 0; i < STATE_COUNT; ++i)
@@ -90,6 +91,7 @@ void SColorMask::MakeCacheApha()
         pRTDst->FillSolidRect(&rc, cr.toCOLORREF());
     }
     pRTDst->SelectObject(pOldBmp, NULL);
+    pRTDst->EndDraw();
 
     //从mask的指定channel中获得alpha通道，与cache按位运算
     LPBYTE pBitCache = (LPBYTE)m_bmpSkin->LockPixelBits();

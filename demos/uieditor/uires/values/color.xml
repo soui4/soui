@@ -12,5 +12,6 @@
   <bkBlack2 value="#292b2f"/>
   <itemHover value="#3f6c8e" />
   <itemSelected value="rgb(234,128,16)" />
+  <border value="#808080" />
 </color> 
  

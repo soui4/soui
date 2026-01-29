@@ -1,7 +1,8 @@
-#pragma once
+#ifndef SGroupList_H_
+#define SGroupList_H_
 
-namespace SOUI
-{
+SNSBEGIN
+
 namespace GroupListStuct
 {
 struct ItemInfo
@@ -18,22 +19,33 @@ struct GroupInfo : ItemInfo
 };
 } // namespace GroupListStuct
 
-DEF_EVT_EXT(EventGroupListInitGroup, EVT_EXTERNAL_BEGIN + 3000, {
+#ifndef EVT_GROUPLIST_BEGIN
+#define EVT_GROUPLIST_BEGIN EVT_EXTERNAL_BEGIN + 3000
+#endif
+enum
+{
+    EVT_GROUPLIST_INIT_GROUP = EVT_GROUPLIST_BEGIN,
+    EVT_GROUPLIST_INIT_ITEM,
+    EVT_GROUPLIST_ITEM_CHECK,
+    EVT_GROUPLIST_GROUP_STATE_CHANGED,
+};
+
+DEF_EVT_EXT(EventGroupListInitGroup, EVT_GROUPLIST_INIT_GROUP, {
     SWindow *pItem;
     GroupListStuct::GroupInfo *pGroupInfo;
 });
 
-DEF_EVT_EXT(EventGroupListInitItem, EVT_EXTERNAL_BEGIN + 3001, {
+DEF_EVT_EXT(EventGroupListInitItem, EVT_GROUPLIST_INIT_ITEM, {
     SWindow *pItem;
     GroupListStuct::ItemInfo *pItemInfo;
 });
 
-DEF_EVT_EXT(EventGroupListItemCheck, EVT_EXTERNAL_BEGIN + 3002, {
+DEF_EVT_EXT(EventGroupListItemCheck, EVT_GROUPLIST_ITEM_CHECK, {
     SWindow *pItem;
     GroupListStuct::ItemInfo *pItemInfo;
 });
 
-DEF_EVT_EXT(EventGroupStateChanged, EVT_EXTERNAL_BEGIN + 3003, {
+DEF_EVT_EXT(EventGroupStateChanged, EVT_GROUPLIST_GROUP_STATE_CHANGED, {
     SWindow *pItem;
     GroupListStuct::GroupInfo *pGroupInfo;
 });
@@ -78,4 +90,7 @@ class SGroupList : public SScrollView {
 
     SWindow *m_pSelectedItem;
 };
-} // namespace SOUI
+SNSEND
+
+
+#endif // SGroupList_H_

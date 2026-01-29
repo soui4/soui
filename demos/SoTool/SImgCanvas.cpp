@@ -178,6 +178,7 @@ namespace SOUI
         
         SAutoRefPtr<IRenderTarget> pMemRT;
         GETRENDERFACTORY->CreateRenderTarget(&pMemRT,szBmp.cx,szBmp.cy);
+        pMemRT->BeginDraw();
         
         CRect rcDst(CPoint(),pBmp->Size());
         
@@ -189,6 +190,7 @@ namespace SOUI
             if(m_bVert) rcDst.OffsetRect(0,rcDst.Height());
             else rcDst.OffsetRect(rcDst.Width(),0);
         }
+        pMemRT->EndDraw();
         
         IBitmapS * pCache = (IBitmapS*)pMemRT->GetCurrentObject(OT_BITMAP);
         return pCache->Save2(pszFileName, Img_PNG);
@@ -215,6 +217,7 @@ namespace SOUI
 		SAutoRefPtr<IRenderTarget> pMemRT;
 
 		GETRENDERFACTORY->CreateRenderTarget(&pMemRT,szBmp.cx,szBmp.cy);
+		pMemRT->BeginDraw();
 		{//render img
 			SPOSITION pos = m_lstImg.GetHeadPosition();
 			CRect rcDst(CPoint(),szImg);
@@ -230,7 +233,7 @@ namespace SOUI
 			}
 			m_lstImg.RemoveAll();
 		}
-
+		pMemRT->EndDraw();
 
 		CSize szSub = szBmp;
 		if(m_bVert) szSub.cy/=nSplit;
@@ -243,13 +246,17 @@ namespace SOUI
 			{
 				SAutoRefPtr<IRenderTarget> pMemRT2;
 				GETRENDERFACTORY->CreateRenderTarget(&pMemRT2,szSub.cx,szSub.cy);
+				pMemRT2->BeginDraw();				
 				pMemRT2->ClearRect(&rcDst,0);
 				pMemRT2->AlphaBlend(rcDst,pMemRT,rcSrc,255);
+				pMemRT2->EndDraw();				
 				IBitmapS *pCache = (IBitmapS*)pMemRT2->GetCurrentObject(OT_BITMAP);
 				m_lstImg.AddTail(pCache);
 				pCache->AddRef();
-				if(m_bVert) rcSrc.OffsetRect(0,szSub.cy);
-				else rcSrc.OffsetRect(szSub.cx,0);
+				if(m_bVert) 
+					rcSrc.OffsetRect(0,szSub.cy);
+				else 
+					rcSrc.OffsetRect(szSub.cx,0);
 			}
 		}
 		Invalidate();

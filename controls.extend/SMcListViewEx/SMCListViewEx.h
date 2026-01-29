@@ -16,6 +16,7 @@
 #include "core/SPanel.h"
 #include "core/SItemPanel.h"
 #include "control/SHeaderCtrl.h"
+#include "control/SViewBase.h"
 #include "helper/SAdapterBase.h"
 
 
@@ -280,8 +281,7 @@ DECLARE_INTERFACE_(IMcListViewEx, IObjRef)
 	//////////////////////////////////////////////////////////////////////////
 	//  SMCListViewEx
 	class SMCListViewEx : public TPanelProxy<IMcListViewEx>
-		, protected SHostProxy
-		, protected IItemContainer {
+		, public SViewBase {
 
 		DEF_SOBJECT(SPanel, L"mclistviewex")
 
@@ -335,27 +335,20 @@ DECLARE_INTERFACE_(IMcListViewEx, IObjRef)
 
 		SHeaderCtrl* GetHeaderCtrl() const;
 
-		void UpdateVisibleItems();
-
-		void UpdateVisibleItem(int iItem);
-
 	protected:
-
-		virtual void OnItemSetCapture(SOsrPanel* pItem, BOOL bCapture);
-
-		virtual BOOL OnItemGetRect(const SOsrPanel* pItem, CRect& rcItem)const;
-
-		virtual BOOL IsItemRedrawDelay()const;
-		virtual BOOL IsTimelineEnabled()const;
 
 		virtual void OnItemRequestRelayout(SItemPanel* pItem);
-	protected:
 
-		void onDataSetChanged();
-
-		void onDataSetInvalidated();
-
-		void onItemDataChanged(int iItem);
+		virtual void onDataSetChanged();
+		virtual void onDataSetInvalidated();
+		virtual void onItemDataChanged(int iItem);
+		virtual void UpdateVisibleItems();
+		virtual void UpdateVisibleItem(int iItem);
+		virtual BOOL IsItemRedrawDelay()const;
+		virtual BOOL IsTimelineEnabled()const;
+		virtual BOOL OnItemGetRect(const SOsrPanel* pItem, CRect& rcItem)const;
+		virtual void OnItemSetCapture(SOsrPanel* pItem, BOOL bCapture);
+		virtual void RedrawItem(SOsrPanel* pItem);
 
 	protected:
 
@@ -387,8 +380,6 @@ DECLARE_INTERFACE_(IMcListViewEx, IObjRef)
 		void DispatchMessage2Items(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 		void UpdateScrollBar();
-
-		void RedrawItem(SOsrPanel* pItem);
 
 		SItemPanel* GetItemPanel(int iItem);
 
@@ -437,46 +428,29 @@ DECLARE_INTERFACE_(IMcListViewEx, IObjRef)
 			ATTR_INT(L"hotTrack", m_bHotTrack, FALSE)
 			ATTR_SKIN(L"dividerSkin", m_pSkinDivider, TRUE)
 			ATTR_LAYOUTSIZE(L"dividerSize", m_nDividerSize, FALSE)
-			ATTR_INT(L"wantTab", m_bWantTab, FALSE)
 			ATTR_COLOR(L"colorGrid", m_crGrid, TRUE)
 			ATTR_INT(L"canSwapItem", m_bCanSwapItem, FALSE)
 			ATTR_COLOR(L"colorSwapLine", m_colorSwapLine, FALSE)
 			ATTR_COLOR(L"colorDropBk", m_colorDropBk, FALSE)
 			ATTR_INT(L"dropBkAlpha", m_DropBkAlpha, FALSE)
-			SOUI_ATTRS_END()
+			ATTR_CHAIN_CLASS(SViewBase)
+		SOUI_ATTRS_END()
 
 	protected:
 		SAutoRefPtr<IMcAdapterEx>			m_adapter;
 		SAutoRefPtr<ILvDataSetObserver>		m_observer;
 		SAutoRefPtr<IListViewItemLocator>	m_lvItemLocator;//列表项定位接口
-		struct ItemInfo
-		{
-			SItemPanel* pItem;
-			int nType;
-		};
-		bool							m_bPendingUpdate;//response for data set changed in OnShowWindow.
-		int								m_iPendingUpdateItem; //-1 for all. -2 for nothing
-		int								m_iSelItem;
-		int                             m_iFirstVisible;//第一个显示项索引
-		SList<ItemInfo>                 m_lstItems; //当前正在显示的项
-		SOsrPanel* m_itemCapture;//The item panel that has been set capture.		
-		SOsrPanel* m_pHoverItem;
 		CPoint							m_dropStartPos, m_dropEndPos;
 		bool							m_bDrop, m_bDroping, m_bSwap, m_bSwaped, m_bSwapToTop;
 		LPARAM							oldLoc;
 		COLORREF						m_colorSwapLine, m_colorDropBk;
 		bool							m_bOutLeft, m_bOutRight, m_bOutTop, m_bOutBottom;
 
-		SArray<SList<SItemPanel*>*>		m_itemRecycle;//item回收站,每一种样式在回收站中保持一个列表，以便重复利用
-
-		SXmlDoc							m_xmlTemplate;
 		SAutoRefPtr<ISkinObj>			m_pSkinDivider;
 		SLayoutSize						m_nDividerSize;
-		BOOL                            m_bWantTab;
-		BOOL                            m_bDatasetInvalidated;
 		BOOL							m_bCanSwapItem;
-		int								m_DropBkAlpha;
 		COLORREF						m_crGrid;
+		int								m_DropBkAlpha;
 	protected:
 
 		/**

@@ -1,6 +1,6 @@
-#include <interface/ws-i.h>
 #include "wsClient.h"
 #include "wsServer.h"
+#include <interface/ws-i.h>
 #include <helper/slog.h>
 #define kLogTag "Ws"
 

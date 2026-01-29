@@ -8,7 +8,7 @@ namespace SOUI
 	class SDlgNewLayout: public SHostDialog
 	{
 	public:
-		SDlgNewLayout(LPCTSTR pszXmlName, SStringT strProPath);
+		SDlgNewLayout(LPCTSTR pszXmlName, SStringT strProPath,SStringT strFolder=_T("xml"));
 
 		~SDlgNewLayout(void)
 		{
@@ -19,50 +19,30 @@ namespace SOUI
 		void OnBtnDlgOpenFile();
 
 		BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam);
-		//virtual INT_PTR DoModal(HWND hParent=NULL);
-
-		//virtual void EndDialog(INT_PTR nResult);
-
 
 	protected:
-		//void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 		void OnOK();
-		//void OnCancel();
-		//virtual SMessageLoop * GetMsgLoop(){return m_MsgLoop;}
 		void OnResNameInputNotify(IEvtArgs *e);
 
 		EVENT_MAP_BEGIN()
 			EVENT_NAME_COMMAND(L"NAME_UIDESIGNER_btn_close", OnClose)
-
 			EVENT_NAME_COMMAND(L"NAME_UIDESIGNER_btn_dlg", OnBtnDlgOpenFile)
 			EVENT_NAME_COMMAND(L"NAME_UIDESIGNER_btn_OK", OnOK)
-			//EVENT_NAME_COMMAND(L"NAME_UIDESIGNER_btn_ZY_NEW", OnZYNew)
-			//EVENT_NAME_COMMAND(L"NAME_UIDESIGNER_btn_ZY_DEL", OnZYDel)
-			//EVENT_NAME_COMMAND(L"NAME_UIDESIGNER_btn_SKIN_NEW", OnSkinNew)
-			//EVENT_NAME_COMMAND(L"NAME_UIDESIGNER_btn_SKIN_DEL", OnSkinDel)
-
-			//EVENT_ID_COMMAND(IDOK,OnOK)
-			//EVENT_ID_COMMAND(IDCANCEL,OnCancel)
 			EVENT_ID_HANDLER(R.id.new_layout_resname, EventRENotify::EventID, OnResNameInputNotify)
 		EVENT_MAP_END2(SHostDialog)
 
 		BEGIN_MSG_MAP_EX(SResMgrDlg)
 			MSG_WM_INITDIALOG(OnInitDialog)
-			//MSG_WM_CLOSE(OnCancel)
-			//MSG_WM_KEYDOWN(OnKeyDown)
 			CHAIN_MSG_MAP(SHostDialog)
 			REFLECT_NOTIFICATIONS_EX()
 		END_MSG_MAP()
 
 	protected:
 		SStringT m_strProPath;
+		SStringT m_strFolder;
 
 		SEdit *m_edtName;
 		SEdit *m_edtPath;
-
-
-
-
 	public:
 		SStringT m_strPath;
 		SStringT m_strName;		

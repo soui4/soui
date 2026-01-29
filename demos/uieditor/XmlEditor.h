@@ -57,7 +57,11 @@ SNSBEGIN
 		void OnPropGridItemAutoCompleteFill(IEvtArgs *pEvt);
 		void OnPropGridItemAutoCompleteSelected(IEvtArgs *pEvt);
 		void OnPropGridConvertColor(IEvtArgs *pEvt);
+		void OnSaveXml();
+		void OnFormatXml();
 		EVENT_MAP_BEGIN()
+			EVENT_ID_COMMAND(R.id.toolbar_btn_savexml,OnSaveXml)
+			EVENT_ID_COMMAND(R.id.toolbar_btn_formatxml,OnFormatXml)
 			EVENT_NAME_HANDLER(L"propgrid_element",EventPropGridValueChanged::EventID,OnPropGridValueChanged)
 			EVENT_NAME_HANDLER(L"propgrid_element",EventPropGridItemAutoCompleteFill::EventID,OnPropGridItemAutoCompleteFill)
 			EVENT_NAME_HANDLER(L"propgrid_element",EventPropGridItemAutoCompleteSelected::EventID,OnPropGridItemAutoCompleteSelected)
@@ -82,8 +86,6 @@ SNSBEGIN
 
 	public:
 		CMainDlg * m_pMainDlg;
-
-		SSplitWnd * m_xml_editor;
 		STreeCtrl *m_treeXmlStruct; //显示xml文档结构的tree控件
 		SPropertyGrid *m_pPropGrid;
 
@@ -103,6 +105,7 @@ SNSBEGIN
 		std::vector<int> m_vecSelectOrder;
 		SXmlDoc  m_xmlEditing;
 		ResManger *m_pResManger;
+        SWindow *m_pRoot;
 	};
 
 SNSEND

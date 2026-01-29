@@ -37,18 +37,8 @@ void STileViewDataSetObserver::OnItemChanged(int iItem)
 
 //////////////////////////////////////////////////////////////////////////
 STileView::STileView()
-    : m_iSelItem(-1)
-    , m_iFirstVisible(-1)
-    , m_pHoverItem(NULL)
-    , m_itemCapture(NULL)
+    : SViewBase(this)
     , m_nMarginSize(0.0f, px)
-    , m_bWantTab(FALSE)
-    , m_bDatasetInvalidated(false)
-    , m_bPendingUpdate(false)
-    , m_iPendingUpdateItem(-2)
-    , m_iPendingViewItem(-1)
-    , SHostProxy(this)
-
 {
     m_bFocusable = TRUE;
     m_observer.Attach(new STileViewDataSetObserver(this));
@@ -323,7 +313,7 @@ void STileView::UpdateVisibleItems()
             DWORD dwState = WndState_Normal;
             if (iHoverItem == iNewLastVisible)
                 dwState |= WndState_Hover;
-            if (m_iSelItem == iNewLastVisible)
+            if (IsItemSelected(iNewLastVisible))
                 dwState |= WndState_Check;
 
             ItemInfo ii = { NULL, -1 };
@@ -381,10 +371,6 @@ void STileView::UpdateVisibleItems()
             }
 
             ii.pItem->UpdateLayout();
-            if (iNewLastVisible == m_iSelItem)
-            {
-                ii.pItem->ModifyItemState(WndState_Check, 0);
-            }
 
             m_lstItems.AddTail(ii);
 
@@ -656,6 +642,51 @@ void STileView::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
         return;
     }
 
+    BOOL bCtrlPressed = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
+    BOOL bShiftPressed = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
+    BOOL bMultiSelMode = GetMultiSel();
+
+    // Handle space key to toggle selection
+    if (nChar == VK_SPACE && m_iSelItem != -1)
+    {
+        if (bMultiSelMode)
+        {
+            if (IsItemSelected(m_iSelItem))
+            {
+                RemoveSelItem(m_iSelItem);
+            }
+            else
+            {
+                AddSelItem(m_iSelItem);
+            }
+            return;
+        }
+        else
+        {
+            SetMsgHandled(FALSE);
+            return;
+        }
+    }
+
+    // Handle Ctrl+A to select all
+    if (bCtrlPressed && nChar == 'A')
+    {
+        if (bMultiSelMode)
+        {
+            ClearSelItems();
+            for (int i = 0; i < m_adapter->getCount(); i++)
+            {
+                AddSelItem(i);
+            }
+            return;
+        }
+        else
+        {
+            SetMsgHandled(FALSE);
+            return;
+        }
+    }
+
     if (nChar == VK_RIGHT && m_iSelItem < m_adapter->getCount() - 1)
     {
         nNewSelItem = m_iSelItem + 1;
@@ -708,7 +739,38 @@ void STileView::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
     if (nNewSelItem != -1)
     {
         EnsureVisible(nNewSelItem);
-        SetSel(nNewSelItem, TRUE);
+        
+        if (bMultiSelMode)
+        {
+            if (bCtrlPressed)
+            {
+                // Ctrl + arrow: move focus without changing selection
+                m_iSelItem = nNewSelItem;
+                // Update visible items to reflect the new focus
+                UpdateVisibleItems();
+            }
+            else if (bShiftPressed)
+            {
+                // Shift + arrow: extend selection from current to new item
+                int iStart = smin(m_iSelItem, nNewSelItem);
+                int iEnd = smax(m_iSelItem, nNewSelItem);
+                for (int i = iStart; i <= iEnd; i++)
+                {
+                    AddSelItem(i);
+                }
+                m_iSelItem = nNewSelItem;
+            }
+            else
+            {
+                // Normal arrow: clear selection and select new item
+                SetSel(nNewSelItem, TRUE);
+            }
+        }
+        else
+        {
+            // Single selection mode
+            SetSel(nNewSelItem, TRUE);
+        }
     }
     else
     {
@@ -852,26 +914,8 @@ void STileView::SetSel(int iItem, BOOL bNotify)
         }
     }
 
-    if (nOldSel == nNewSel)
-    {
-        return;
-    }
-
-    m_iSelItem = nOldSel;
-    SItemPanel *pItem = GetItemPanel(nOldSel);
-    if (pItem)
-    {
-        pItem->GetFocusManager()->ClearFocus();
-        pItem->ModifyItemState(0, WndState_Check);
-        RedrawItem(pItem);
-    }
-    m_iSelItem = nNewSel;
-    pItem = GetItemPanel(nNewSel);
-    if (pItem)
-    {
-        pItem->ModifyItemState(WndState_Check, 0);
-        RedrawItem(pItem);
-    }
+    // Use the base class method to handle the selection change
+    HandleSelectionChange(nOldSel, nNewSel);
 
     if (bNotify)
     {
@@ -1049,4 +1093,35 @@ int STileView::GetSel() const
     return m_iSelItem;
 }
 
+void STileView::SetMultiSel(BOOL bMultiSel) {
+    SViewBase::SetMultiSel(bMultiSel);
+}
+
+BOOL STileView::GetMultiSel() const {
+    return SViewBase::GetMultiSel();
+}
+
+void STileView::AddSelItem(int iItem) {
+    SViewBase::AddSelItem(iItem);
+}
+
+void STileView::RemoveSelItem(int iItem) {
+    SViewBase::RemoveSelItem(iItem);
+}
+
+void STileView::ClearSelItems() {
+    SViewBase::ClearSelItems();
+}
+
+BOOL STileView::IsItemSelected(int iItem) const {
+    return SViewBase::IsItemSelected(iItem);
+}
+
+int STileView::GetSelItemCount() const {
+    return SViewBase::GetSelItemCount();
+}
+
+int STileView::GetSelItems(int *items, int nMaxCount) const {
+    return SViewBase::GetSelItems(items, nMaxCount);
+}
 SNSEND

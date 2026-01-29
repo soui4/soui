@@ -18,6 +18,7 @@ namespace SOUI
 		SAutoRefPtr<IRenderTarget> pRT; 
 		CRect rc = GetClientRect();
 		GETRENDERFACTORY->CreateRenderTarget(&pRT, rc.Width(), rc.Height());
+		pRT->BeginDraw();
 		rc.MoveToXY(0, 0);
 		pRT->ClearRect(&rc, 0);
 		SAutoRefPtr<IBrushS> br;
@@ -30,6 +31,7 @@ namespace SOUI
 		}
 		pRT->SetXfermode(kSrcIn_Mode,NULL);
 		m_pSkin->DrawByIndex(pRT, rc, 0);
+		pRT->EndDraw();
 		return (IBitmapS*)pRT->GetCurrentObject(OT_BITMAP);
 	}
 

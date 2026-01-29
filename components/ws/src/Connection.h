@@ -2,6 +2,9 @@
 #define WS_CONNECTION_H
 
 #include <mutex>
+#ifdef _WIN32
+#include <winsock2.h>
+#endif
 #include <libwebsockets.h>
 #include <sstream>
 #include <string>

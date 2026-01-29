@@ -25,9 +25,11 @@ public:
 		virtual void OnFileChanged(LPCTSTR pszFile, Flag nFlag) = 0;
 	};
 public:
-	CPathMonitor(IListener *pListener);
+	CPathMonitor();
 	~CPathMonitor(void);
 
+	void AddListener(IListener *pListener);
+	void RemoveListener(IListener *pListener);
 	void SetPath(LPCTSTR pszPath);
 	void Stop();
 protected:
@@ -49,12 +51,14 @@ protected:
 
 	typedef std::vector<_FileInfo> FileInfoList;
 	typedef std::vector<_FileChange> FileChangeList;
+	typedef std::vector<IListener*> ListenerList;
 
     static void GetFilesInDirectory(const tstring &directory, std::vector<CPathMonitor::_FileInfo> &files);
     static std::vector<_FileChange> FindModifiedFiles(const FileInfoList &old_files, const FileInfoList &new_files);
 
     FileInfoList m_files;
-	IListener *m_pListener;
+	ListenerList m_listeners;
+	CRITICAL_SECTION m_csListeners;
 };
 
 #endif// _PATHMONITOR_H_

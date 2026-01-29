@@ -24,7 +24,7 @@ SButtonEx::~SButtonEx(void)
 
 CSize SButtonEx::GetDesiredSize(LPCRECT pRcContainer)
 {
-    CAutoRefPtr<IRenderTarget> pRT;
+    SAutoRefPtr<IRenderTarget> pRT;
     GETRENDERFACTORY->CreateRenderTarget(&pRT, 0, 0);
     BeforePaintEx(pRT);
     return GetDesiredSize(pRT, pRcContainer);

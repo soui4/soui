@@ -2,8 +2,8 @@
 #include "SImgCanvas.h"
 
 
-namespace SOUI
-{
+SNSBEGIN
+
 	SImgCanvas::SImgCanvas(void) :m_bVert(FALSE)
 	{
 	}
@@ -117,6 +117,7 @@ namespace SOUI
 
 		CAutoRefPtr<IRenderTarget> pMemRT;
 		GETRENDERFACTORY->CreateRenderTarget(&pMemRT, szBmp.cx, szBmp.cy);
+		pMemRT->BeginDraw();
 
 		CRect rcDst(CPoint(), pBmp->Size());
 
@@ -128,6 +129,7 @@ namespace SOUI
 			if (m_bVert) rcDst.OffsetRect(0, rcDst.Height());
 			else rcDst.OffsetRect(rcDst.Width(), 0);
 		}
+		pMemRT->EndDraw();
 
 		IBitmapS * pCache = (IBitmapS*)pMemRT->GetCurrentObject(OT_BITMAP);
 		if (nSplit == 1)
@@ -142,7 +144,7 @@ namespace SOUI
 			else szSub.cx /= nSplit;
 
 			GETRENDERFACTORY->CreateRenderTarget(&pMemRT2, szSub.cx, szSub.cy);
-
+			pMemRT2->BeginDraw();
 			SStringW strSaveName = pszFileName;
 			int nDot = strSaveName.ReverseFind(L'.');
 			if (nDot != -1) strSaveName = strSaveName.Left(nDot);
@@ -157,6 +159,7 @@ namespace SOUI
 				if (m_bVert) rcSrc.OffsetRect(0, rcSrc.Height());
 				else rcSrc.OffsetRect(rcSrc.Width(), 0);
 			}
+			pMemRT2->EndDraw();
 			return TRUE;
 		}
 	}
@@ -167,4 +170,4 @@ namespace SOUI
 		Invalidate();
 	}
 
-}
+SNSEND

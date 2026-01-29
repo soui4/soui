@@ -124,14 +124,7 @@
     <Shape icon="8"  parent="base">
       <groups>
         <propgroup title="属性:  Shape"  description="属性">
-          <propoption title="type" name="type" options="linear|radial|sweep"/>
-          <proptext title="渐变角度(angle)" name="angle" value=""/>
-          <proptext title="渐变中心(centerX)" name="centerX" value="0.5"/>
-          <proptext title="渐变中心(centerY)" name="centerY" value="0.5"/>
-          <propcolor title="渐变开始点(startColor)" name="startColor" value=""  extendType="color" autoComplete="1"/>
-          <propcolor title="渐变中间点(centerColor)" name="centerColor" value=""  extendType="color" autoComplete="1"/>
-          <propcolor title="渐变结束点(endColor)" name="endColor" value=""  extendType="color" autoComplete="1"/>
-          <propcolor title="渐变半径(radius)" name="radius" value="" />
+          <propoption title="shape" name="shape" options="rectangle|oval|ring"/>
         </propgroup>
       </groups>
     </Shape>

@@ -574,6 +574,13 @@ public:
 	STDMETHOD_(BOOL,GetAntiAlias)(THIS) SCONST OVERRIDE;
 
 protected:
+	// 辅助函数：应用混合模式到位图绘制
+	void ApplyXfermodeForBitmap(ID2D1Bitmap* pBitmap, const D2D1_RECT_F& rcDest, float opacity,
+		D2D1_BITMAP_INTERPOLATION_MODE interpolationMode, const D2D1_RECT_F* pRcSrc);
+
+	// 辅助函数：应用混合模式到几何图形填充
+	void ApplyXfermodeForGeometry(ID2D1Geometry* pGeometry, ID2D1Brush* pBrush);
+
 	HWND					   m_hWnd;
 	SComPtr<ID2D1RenderTarget> m_rt;
 	SComPtr<ID2D1GdiInteropRenderTarget> m_rtGdi;
@@ -601,6 +608,8 @@ protected:
 	COLORREF m_cachedPenColor;
 	// 优化: 添加文本格式缓存
 	SMap<DWORD,SComPtr<IDWriteTextLayout>> m_textLayoutCache;
+	// Xfermode state
+	int m_xferMode;
 };
 
 namespace RENDER_D2D

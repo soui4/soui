@@ -1,0 +1,17 @@
+﻿<menuRoot itemSkin="skin_menu_skin_png" itemHeight="26" iconPos="4,4" textOffset="5" iconBarWidth="24" maxWidth="180" minWidth="170" margin="1,1,1,1" colorText="@color/white" colorTextDisable="@color/gray" colorBkgnd="@color/bkBlack1" >
+  <menuItem id="190" text="@string/new_xml" />
+  <menuItem id="191" text="@string/new_folder" />
+  <menuItem id="192" text="@string/new_layout" />
+  <menuItem id="193" text="@string/new_include" />
+  <sep/>
+  <menuItem id="200" text="@string/copy" />
+  <menuItem id="201" text="@string/cut" />
+  <menuItem id="202" text="@string/paste" />
+  <sep/>
+  <menuItem id="203" text="@string/delete" />
+  <sep/>
+  <menuItem id="204" text="@string/rename" />
+  <menuItem id="205" text="@string/explorer" />
+  <sep/>
+  <menuItem id="206" text="@string/add_uires" />
+</menuRoot>

@@ -42,19 +42,11 @@ void SMCListViewDataSetObserver::OnItemChanged(int iItem)
 //  SMCListView
 
 SMCListView::SMCListView()
-    : m_pHeader(NULL)
-    , m_iSelItem(-1)
-    , m_iFirstVisible(-1)
-    , m_pHoverItem(NULL)
-    , m_itemCapture(NULL)
+    : SViewBase(this)
+    , m_pHeader(NULL)
     , m_pSkinDivider(NULL)
-    , m_bWantTab(FALSE)
     , m_bDatasetInvalidated(TRUE)
-    , m_bPendingUpdate(false)
-    , m_iPendingUpdateItem(-2)
-    , m_iPendingViewItem(-1)
     , m_crGrid(CR_INVALID)
-    , SHostProxy(this)
 {
     m_bFocusable = TRUE;
     m_bClipClient = TRUE;
@@ -619,7 +611,7 @@ void SMCListView::UpdateVisibleItems()
             DWORD dwState = WndState_Normal;
             if (iHoverItem == iNewLastVisible)
                 dwState |= WndState_Hover;
-            if (m_iSelItem == iNewLastVisible)
+            if (IsItemSelected(iNewLastVisible))
                 dwState |= WndState_Check;
 
             ItemInfo ii = { NULL, -1 };
@@ -1000,6 +992,51 @@ void SMCListView::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
         return;
     }
 
+    BOOL bCtrlPressed = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
+    BOOL bShiftPressed = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
+    BOOL bMultiSelMode = GetMultiSel();
+
+    // Handle space key to toggle selection
+    if (nChar == VK_SPACE && m_iSelItem != -1)
+    {
+        if (bMultiSelMode)
+        {
+            if (IsItemSelected(m_iSelItem))
+            {
+                RemoveSelItem(m_iSelItem);
+            }
+            else
+            {
+                AddSelItem(m_iSelItem);
+            }
+            return;
+        }
+        else
+        {
+            SetMsgHandled(FALSE);
+            return;
+        }
+    }
+
+    // Handle Ctrl+A to select all
+    if (bCtrlPressed && nChar == 'A')
+    {
+        if (bMultiSelMode)
+        {
+            ClearSelItems();
+            for (int i = 0; i < m_adapter->getCount(); i++)
+            {
+                AddSelItem(i);
+            }
+            return;
+        }
+        else
+        {
+            SetMsgHandled(FALSE);
+            return;
+        }
+    }
+
     if (nChar == VK_DOWN && m_iSelItem < m_adapter->getCount() - 1)
         nNewSelItem = m_iSelItem + 1;
     else if (nChar == VK_UP && m_iSelItem > 0)
@@ -1041,8 +1078,38 @@ void SMCListView::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
     if (nNewSelItem != -1)
     {
         EnsureVisible(nNewSelItem);
-        // 取消选择通知
-        SetSel(nNewSelItem, TRUE);
+        
+        if (bMultiSelMode)
+        {
+            if (bCtrlPressed)
+            {
+                // Ctrl + arrow: move focus without changing selection
+                m_iSelItem = nNewSelItem;
+                // Update visible items to reflect the new focus
+                UpdateVisibleItems();
+            }
+            else if (bShiftPressed)
+            {
+                // Shift + arrow: extend selection from current to new item
+                int iStart = smin(m_iSelItem, nNewSelItem);
+                int iEnd = smax(m_iSelItem, nNewSelItem);
+                for (int i = iStart; i <= iEnd; i++)
+                {
+                    AddSelItem(i);
+                }
+                m_iSelItem = nNewSelItem;
+            }
+            else
+            {
+                // Normal arrow: clear selection and select new item
+                SetSel(nNewSelItem, TRUE);
+            }
+        }
+        else
+        {
+            // Single selection mode
+            SetSel(nNewSelItem, TRUE);
+        }
     }
     else
     {
@@ -1187,24 +1254,8 @@ void SMCListView::SetSel(int iItem, BOOL bNotify)
         }
     }
 
-    if (nOldSel == nNewSel)
-        return;
-
-    m_iSelItem = nOldSel;
-    SItemPanel *pItem = GetItemPanel(nOldSel);
-    if (pItem)
-    {
-        pItem->GetFocusManager()->ClearFocus();
-        pItem->ModifyItemState(0, WndState_Check);
-        RedrawItem(pItem);
-    }
-    m_iSelItem = nNewSel;
-    pItem = GetItemPanel(nNewSel);
-    if (pItem)
-    {
-        pItem->ModifyItemState(WndState_Check, 0);
-        RedrawItem(pItem);
-    }
+    // Use the base class method to handle the selection change
+    HandleSelectionChange(nOldSel, nNewSel);
 
     if (bNotify)
     {
@@ -1270,8 +1321,46 @@ BOOL SMCListView::OnItemClick(IEvtArgs *pEvt)
 {
     SItemPanel *pItemPanel = sobj_cast<SItemPanel>(pEvt->Sender());
     int iItem = (int)pItemPanel->GetItemIndex();
-    if (iItem != m_iSelItem)
+    
+    BOOL bCtrlPressed = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
+    BOOL bShiftPressed = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
+    BOOL bMultiSelMode = GetMultiSel();
+    
+    if (bMultiSelMode)
     {
+        if (bCtrlPressed)
+        {
+            // Ctrl+Click: toggle selection of current item
+            if (IsItemSelected(iItem))
+            {
+                RemoveSelItem(iItem);
+            }
+            else
+            {
+                AddSelItem(iItem);
+            }
+            m_iSelItem = iItem;
+        }
+        else if (bShiftPressed)
+        {
+            // Shift+Click: extend selection from previous selected item to current item
+            int iStart = smin(m_iSelItem, iItem);
+            int iEnd = smax(m_iSelItem, iItem);
+            for (int i = iStart; i <= iEnd; i++)
+            {
+                AddSelItem(i);
+            }
+            m_iSelItem = iItem;
+        }
+        else
+        {
+            // Normal Click: select only current item
+            SetSel(iItem, TRUE);
+        }
+    }
+    else
+    {
+        // Single selection mode
         SetSel(iItem, TRUE);
     }
     return TRUE;
@@ -1407,4 +1496,36 @@ void SMCListView::_UpdateAdapterColumnsWidth() const
     }
 }
 
+
+void SMCListView::SetMultiSel(BOOL bMultiSel) {
+    SViewBase::SetMultiSel(bMultiSel);
+}
+
+BOOL SMCListView::GetMultiSel() const {
+    return SViewBase::GetMultiSel();
+}
+
+void SMCListView::AddSelItem(int iItem) {
+    SViewBase::AddSelItem(iItem);
+}
+
+void SMCListView::RemoveSelItem(int iItem) {
+    SViewBase::RemoveSelItem(iItem);
+}
+
+void SMCListView::ClearSelItems() {
+    SViewBase::ClearSelItems();
+}
+
+BOOL SMCListView::IsItemSelected(int iItem) const {
+    return SViewBase::IsItemSelected(iItem);
+}
+
+int SMCListView::GetSelItemCount() const {
+    return SViewBase::GetSelItemCount();
+}
+
+int SMCListView::GetSelItems(int *items, int nMaxCount) const {
+    return SViewBase::GetSelItems(items, nMaxCount);
+}
 SNSEND

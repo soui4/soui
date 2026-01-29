@@ -1,10 +1,17 @@
 ﻿<?xml version="1.0"?>
-<tabctrl name="workspace_tab" pos="0,0,-0,-0" tabAlign="top" tabInterSize="2" tabWidth="90" tabHeight="30" tabSkin="skin_tab_skin" colorText="#FFFFFF" focusable="0" show="1" curSel="0" font="face:微软雅黑,size:15">
-  <page title="Layout" colorBorder="#ffff00">
-    <treectrl pos="0,0,-0,-0" name="workspace_tree" itemHeight="28" colorItemText="#FFFFFF" colorItemSelText="#FFFFFF" colorItemSelBkgnd="@color/itemSelected" colorHover="@color/itemHover" rightClickSel="1" colorBkgnd="#FFFFFF12" />
-  </page>
-
-  <page title="XML文件" colorBorder="#ffff00">
-    <listbox pos="0,0,-0,-0" name="workspace_xmlfile_lb" weight="1" hotTrack="1" itemHeight="28" colorSelText="#FFFFFF" colorItemSelBkgnd="rgb(234,128,16)" colorBkgnd="#FFFFFF12" text-x="20" />
-  </page>
+<tabctrl size="-2,-2" tabAlign="middle" tabHeight="30" tabSkin="skin_tab_skin" animateSteps="10" text-x="10">
+      <page title="@string/project_struct" >
+        <treeview size="-2,-2" name="workspace_treeview" multiSel="1"  hasLines="1" indent="20">
+          <template height="30" layout="hbox" skin="skin_item_bk" trackMouseEvent="1" gravity="center" interval="5"  font="size:16">
+            <img name="img_state" size="16,16" skin="skin_filetypes" iconIndex="0"/>
+            <stack size="-1,-1" curSel="0" aniType="none" samePageSize="1">
+              <text size="-1,-1" name="txt_label" colorText="#FFFFFF"/>
+              <edit size="-2,-2" name="edt_label" margin="2"/>
+            </stack>
+          </template>
+        </treeview>
+      </page>
+      <page title="@string/xml_struct">
+        <treectrl size="-2,-2" name="uidesigner_wnd_xmltree" hasLines="1" toggleSkin="skin_tree_toggle_png" colorBkgnd="#FFFFFF12" itemHeight="30" colorItemText="#FFFFFF" colorItemSelText="#FFFFFF" colorItemSelBkgnd="@color/itemSelected" />
+      </page>
 </tabctrl>

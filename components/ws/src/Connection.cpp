@@ -2,6 +2,7 @@
 #include "wsServer.h"
 #include <vector>
 #include <sstream>
+
 SNSBEGIN
 
 SvrConnection::SvrConnection(lws_context *ctx, lws *socket,ISvrListener *pSvrListener)

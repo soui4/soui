@@ -13,8 +13,10 @@
 #include <helper/SMenu.h>
 #include <helper/SMenuEx.h>
 #include "SImgCanvas.h"
-#include "Dialog/DlgResMgr.h"
+#include "SkinViewerDlg.h"
 #include "Dialog/DlgInsertXmlElement.h"
+#include <helper/SFunctor.hpp>
+#include <shlwapi.h>
 #define kLogTag "maindlg"
 
 #define UIRES_FILE	L"uires.idx"
@@ -24,28 +26,48 @@ CSysDataMgr g_SysDataMgr;
 CMainDlg::CMainDlg() 
 : SHostWnd(_T("LAYOUT:XML_MAINWND"))
 ,m_pXmlEdtior(NULL)
+,m_pImageViewer(NULL)
 ,m_bAutoSave(TRUE)
-,m_editXmlType(XML_UNKNOWN)
+,m_editXmlType(FT_UNKNOWN)
 ,m_UIResFileMgr(this)
 ,m_bIsOpen(FALSE)
+,m_uClipboardFormat(0)
 {
+	// 注册自定义 clipboard format
+	m_uClipboardFormat = RegisterClipboardFormat(_T("SOUI_UIEDITOR_FILE_ITEMS"));
 }
 
 CMainDlg::~CMainDlg()
 {
+	if(m_pXmlEdtior)
+	{
+		delete m_pXmlEdtior;
+	}
+	
+	if(m_pImageViewer)
+	{
+		delete m_pImageViewer;
+	}
 }
 
 BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 {
-	m_treePro = FindChildByName2<STreeCtrl>(L"workspace_tree");
-	m_treePro->SetListener(this);
-	m_lbWorkSpaceXml = FindChildByName2<SListBox>(L"workspace_xmlfile_lb");
 	m_btn_recentFile = FindChildByName2<SButton>(L"toolbar_btn_recent");
 	
 	m_tabWorkspace = FindChildByName2<STabCtrl>(L"workspace_tab");
 
 	m_lvSkin = FindChildByName2<SListView>(L"lv_tb_skin");
 	m_lvWidget = FindChildByName2<SListView>(L"lv_tb_widget");
+
+	// 初始化文件树视图
+	m_treeView = FindChildByID2<STreeView>(R.id.workspace_treeview);
+	if (m_treeView)
+	{
+		m_pFileTreeAdapter.Attach(new CFileTreeAdapter(&m_UIResFileMgr));
+		m_treeView->SetAdapter(m_pFileTreeAdapter);
+		// 初始化路径监视器
+		m_pathMonitor.AddListener(this);
+	}
 
 	m_RecentFileMenu.LoadMenu(UIRES.smenu.menu_recent);
 
@@ -55,6 +77,8 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 	//======================================================================
 	m_pXmlEdtior = new CXmlEditor(this);
 	m_pXmlEdtior->Init(GetRoot(),this);
+    m_pImageViewer = new CImageViewer(this);
+	m_pImageViewer->Init(GetRoot());
 	SStringT strCfgDir = SApplication::getSingletonPtr()->GetAppDir() + _T("/Config");
 	SApplication::getSingleton().SetFilePrefix(strCfgDir);
 	g_SysDataMgr.LoadSysData(strCfgDir);
@@ -72,7 +96,7 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 
 
 	HRESULT hr = ::RegisterDragDrop(m_hWnd, GetDropTarget());
-	RegisterDragDrop(m_treePro->GetSwnd(), new CDropTarget(this));
+	RegisterDragDrop(m_treeView->GetSwnd(), new CDropTarget(this));
 	SWindow* MainWnd = FindChildByName2<SWindow>("UI_main_caption");
 	if (MainWnd)
 		RegisterDragDrop(MainWnd->GetSwnd(), new CDropTarget(this));
@@ -141,23 +165,12 @@ void CMainDlg::SaveAppCfg()
 	xmlDoc.save_file(SApplication::getSingletonPtr()->GetAppDir() + _T("/sEditor.cfg"));
 }
 
-bool CMainDlg::OnTreeproContextMenu(CPoint pt)
-{
-	CPoint pt2 = pt;
-	ClientToScreen(&pt2);
-
-	HSTREEITEM Item = m_treePro->HitTest(pt);
-	if (!Item) return false;
-
-	SMenuEx menu;
-	menu.LoadMenu(UIRES.smenu.menu_layoutfile);
-	int cmd = menu.TrackPopupMenu(TPM_RETURNCMD, pt2.x, pt2.y, m_hWnd);
-
-	return false;
-}
-
 void CMainDlg::OnClose()
 {
+	// 停止路径监视器
+	m_pathMonitor.Stop();
+	m_pathMonitor.RemoveListener(this);
+	
 	if (m_bIsOpen)
 	{
 		if(!CloseProject())
@@ -258,11 +271,10 @@ bool CMainDlg::CloseProject()
 	if(!CheckSave())
 		return false;
 	m_pXmlEdtior->CloseProject();
-	m_treePro->RemoveAllItems();
-	m_lbWorkSpaceXml->DeleteAll();
+	m_pFileTreeAdapter->Clear();
 	m_UIResFileMgr.CloseProject();	
 
-	m_editXmlType = XML_UNKNOWN;
+	m_editXmlType = FT_UNKNOWN;
 	UpdateEditorToolbar();
 
 	m_bIsOpen = FALSE;
@@ -273,14 +285,12 @@ bool CMainDlg::CloseProject()
 //打开工程
 void CMainDlg::OpenProject(SStringT strFileName)
 {
-	m_treePro->RemoveAllItems();
-	m_lbWorkSpaceXml->DeleteAll();
-	
 	SStringT strFile = strFileName;
 	int n = strFileName.ReverseFind(TPATH_SLASH);
 	m_strUiresPath = strFileName;
 	m_strProPath = strFileName.Mid(0, n);
 	
+	SLOGI() << "open project:" << strFileName.c_str();
 	if (!FileIsExist(strFileName))
 	{
 		SStringT notestr;
@@ -308,36 +318,14 @@ void CMainDlg::OpenProject(SStringT strFileName)
 	m_strUIResFile = strFileName;
 	m_pXmlEdtior->SetProjectPath(strFileName);
 
-	{
-		SPOSITION pos = m_UIResFileMgr.m_mapLayoutFile.GetStartPosition();
-		while(pos){
-			const SMap<SStringT, SStringT>::CPair* item = m_UIResFileMgr.m_mapLayoutFile.GetNext(pos);
-			SStringT strPath = item->m_value;
-			SStringT strName = item->m_key;
-			HSTREEITEM hitem = m_treePro->InsertItem(strName);  //strName = "xml_mainwnd"
-			m_treePro->SetItemData(hitem, (LPARAM)new SStringT(strPath));  //strpath = "xml\dlg_maing.xml"
-		}
-	}
-    {
-        std::vector<SStringT> vecTemp;
-        SPOSITION pos = m_UIResFileMgr.m_mapXmlFile.GetStartPosition();
-        while (pos)
-        {
-            const SMap<SStringT, SStringT>::CPair *item = m_UIResFileMgr.m_mapXmlFile.GetAt(pos);
-            vecTemp.push_back(item->m_value);
-            m_UIResFileMgr.m_mapXmlFile.GetNext(pos);
-        }
-
-        m_lbWorkSpaceXml->AddString(S_CW2T(UIRES_FILE));
-        std::sort(vecTemp.begin(), vecTemp.end(), SortSStringNoCase);
-        std::vector<SStringT>::iterator it = vecTemp.begin();
-        for (; it != vecTemp.end(); it++)
-        {
-            m_lbWorkSpaceXml->AddString(*it);
-        }
-    }
-
     m_bIsOpen = TRUE;
+	
+	// 更新文件树的根目录为项目目录
+	if (m_pFileTreeAdapter)
+	{
+		m_pFileTreeAdapter->SetRootPath(S_CT2W(m_strProPath));
+	}
+	
 	UpdateToolbar();
 	if (std::find(m_vecRecentFile.begin(), m_vecRecentFile.end(), strFileName) == m_vecRecentFile.end())
 	{
@@ -356,6 +344,153 @@ void CMainDlg::ReloadWorkspaceUIRes()
 	m_UIResFileMgr.OpenProject(m_strUiresPath);
 }
 
+// 序列化项目到 clipboard
+void CMainDlg::SerializeItemsToClipboard(const std::vector<HSTREEITEM>& items, int nOperation)
+{
+	if(items.empty())
+		return;
+
+	// 准备数据：操作类型 + 项目数量 + 项目路径列表（UTF-8）
+	std::vector<SStringA> vecItemPathsUtf8;
+	for(size_t i = 0; i < items.size(); i++)
+	{
+		const FileItemData& itemData = m_pFileTreeAdapter->GetItemData(items[i]);
+		vecItemPathsUtf8.push_back(S_CT2A(itemData.strPath, CP_UTF8));
+	}
+
+	// 计算所需缓冲区大小
+	int nCount = vecItemPathsUtf8.size();
+	int nBufferSize = sizeof(int) * 2; // 操作类型和项目数量
+	for(size_t i = 0; i < vecItemPathsUtf8.size(); i++)
+	{
+		nBufferSize += vecItemPathsUtf8[i].GetLength() + 1; // UTF-8 编码
+	}
+
+	// 分配内存
+	HGLOBAL hGlobal = GlobalAlloc(GMEM_MOVEABLE, nBufferSize);
+	if(hGlobal)
+	{
+		LPVOID lpData = GlobalLock(hGlobal);
+		if(lpData)
+		{
+			BYTE* pBuffer = (BYTE*)lpData;
+			
+			// 写入操作类型
+			*((int*)pBuffer) = nOperation;
+			pBuffer += sizeof(int);
+			
+			// 写入项目数量
+			*((int*)pBuffer) = nCount;
+			pBuffer += sizeof(int);
+			
+			// 写入项目路径（UTF-8）
+			for(size_t i = 0; i < vecItemPathsUtf8.size(); i++)
+			{
+				const char* szPath = vecItemPathsUtf8[i].c_str();
+				int nLen = vecItemPathsUtf8[i].GetLength() + 1;
+				memcpy(pBuffer, szPath, nLen);
+				pBuffer += nLen;
+			}
+			
+			GlobalUnlock(hGlobal);
+			
+			// 设置到 clipboard
+			if(OpenClipboard(m_hWnd))
+			{
+				EmptyClipboard();
+				SetClipboardData(m_uClipboardFormat, hGlobal);
+				CloseClipboard();
+			}
+			else
+			{
+				GlobalFree(hGlobal);
+			}
+		}
+		else
+		{
+			GlobalFree(hGlobal);
+		}
+	}
+}
+
+// 检查 clipboard 是否有数据
+BOOL CMainDlg::HasClipboardData()
+{
+	BOOL bHasData = FALSE;
+	
+	if(IsClipboardFormatAvailable(m_uClipboardFormat))
+	{
+		if(OpenClipboard(m_hWnd))
+		{
+			HGLOBAL hGlobal = (HGLOBAL)GetClipboardData(m_uClipboardFormat);
+			if(hGlobal)
+			{
+				LPVOID lpData = GlobalLock(hGlobal);
+				if(lpData)
+				{
+					BYTE* pBuffer = (BYTE*)lpData;
+					int nOperation = *((int*)pBuffer);
+					int nCount = *((int*)(pBuffer + sizeof(int)));
+					bHasData = (nOperation > 0 && nCount > 0);
+					GlobalUnlock(hGlobal);
+				}
+			}
+			CloseClipboard();
+		}
+	}
+	
+	return bHasData;
+}
+
+// 从 clipboard 反序列化项目
+BOOL CMainDlg::DeserializeItemsFromClipboard(std::vector<SStringT>& vecItemPaths, int& nOperation)
+{
+	vecItemPaths.clear();
+
+	if(!IsClipboardFormatAvailable(m_uClipboardFormat))
+		return FALSE;
+
+	if(OpenClipboard(m_hWnd))
+	{
+		HGLOBAL hGlobal = (HGLOBAL)GetClipboardData(m_uClipboardFormat);
+		if(hGlobal)
+		{
+			LPVOID lpData = GlobalLock(hGlobal);
+			if(lpData)
+			{
+				BYTE* pBuffer = (BYTE*)lpData;
+				
+				// 读取操作类型
+				nOperation = *((int*)pBuffer);
+				pBuffer += sizeof(int);
+				
+				// 读取项目数量
+				int nCount = *((int*)pBuffer);
+				pBuffer += sizeof(int);
+				
+				// 读取项目路径（UTF-8）
+				for(int i = 0; i < nCount; i++)
+				{
+					// 读取 UTF-8 字符串
+					char* szUtf8Path = (char*)pBuffer;
+					int nLen = strlen(szUtf8Path) + 1;
+					// 转换为宽字符串
+					SStringT strPath = S_CA2T(szUtf8Path, CP_UTF8);
+					vecItemPaths.push_back(strPath);
+					pBuffer += nLen;
+				}
+				
+				GlobalUnlock(hGlobal);
+				CloseClipboard();
+				return !vecItemPaths.empty();
+			}
+		}
+		CloseClipboard();
+	}
+
+	return FALSE;
+}
+
 BOOL CMainDlg::OnBtnSave()
 {
 	if(!m_pXmlEdtior->isValidXml())
@@ -365,6 +500,18 @@ BOOL CMainDlg::OnBtnSave()
 	}
 	m_pXmlEdtior->SaveFile();
 	return TRUE;
+}
+
+BOOL CMainDlg::NewLayout(const SStringT &strPath, const SStringT &strName)
+{
+
+	BOOL bRet = m_UIResFileMgr.NewLayout(strName, strPath);
+	if(bRet){
+		SStringT strType;
+		m_UIResFileMgr.IsLayoutXml(strPath, strType);
+		m_pXmlEdtior->LoadXml(strPath, strType);
+	}
+	return bRet;
 }
 
 void CMainDlg::OnBtnNewLayout()
@@ -378,15 +525,7 @@ void CMainDlg::OnBtnNewLayout()
 	if (IDOK == DlgNewDialog.DoModal(m_hWnd))
 	{
 		CopyFile(CSysDataMgr::getSingleton().GetConfigDir() + _T("/LayoutTmpl/Dialog.xml"), DlgNewDialog.m_strPath, FALSE);
-		m_UIResFileMgr.NewLayout(DlgNewDialog.m_strName, DlgNewDialog.m_strPath);
-
-		SStringT *strShortPath = new SStringT(DlgNewDialog.m_strPath.Mid(m_strProPath.GetLength() + 1));
-
-		//将文件名插入工程列表
-		HSTREEITEM item = m_treePro->InsertItem(DlgNewDialog.m_strName);  //strName = "xml_mainwnd"
-		m_treePro->SetItemText(item, DlgNewDialog.m_strName);
-		m_treePro->SetItemData(item, (LPARAM)strShortPath);  //strpath = "xml\dlg_maing.xml"
-		m_treePro->Invalidate();
+		NewLayout(DlgNewDialog.m_strPath, DlgNewDialog.m_strName);
 	}
 }
 
@@ -402,31 +541,6 @@ void CMainDlg::OnBtnNewInclude()
 	{
 		CopyFile(CSysDataMgr::getSingleton().GetConfigDir() + _T("/LayoutTmpl/Include.xml"), DlgNewDialog.m_strPath, FALSE);
 		m_UIResFileMgr.NewLayout(DlgNewDialog.m_strName, DlgNewDialog.m_strPath);
-
-		SStringT *strShortPath = new SStringT(DlgNewDialog.m_strPath.Mid(m_strProPath.GetLength() + 1));
-
-		//将文件名插入工程列表
-		HSTREEITEM item = m_treePro->InsertItem(DlgNewDialog.m_strName);  //strName = "xml_mainwnd"
-		m_treePro->SetItemText(item, DlgNewDialog.m_strName);
-		m_treePro->SetItemData(item, (LPARAM)strShortPath);  //strpath = "xml\dlg_maing.xml"
-		m_treePro->Invalidate();
-
-	}
-}
-
-
-void CMainDlg::OnBtnResMgr()
-{
-	if (m_strProPath.IsEmpty())
-	{
-		SMessageBox(m_hWnd, _T("请先打开工程"), _T("提示"), MB_OK);
-		return;
-	}
-
-	SResMgrDlg DlgSkin(m_strUIResFile, &m_UIResFileMgr);
-	if (DlgSkin.DoModal(m_hWnd) == IDOK)
-	{
-		ReloadWorkspaceUIRes();
 	}
 }
 
@@ -444,48 +558,381 @@ void CMainDlg::OnBtnRecentFile()
 	m_RecentFileMenu.TrackPopupMenu(0, rect.left, rect.bottom, m_hWnd);
 }
 
-void CMainDlg::OnTreeItemDbClick(IEvtArgs *pEvtBase)
+enum {
+	file_op_copy=1,
+	file_op_cut=2,
+};
+
+void CMainDlg::OnTvEventOfPanel(IEvtArgs *e)
 {
-	EventTCDbClick *pEvt = (EventTCDbClick*)pEvtBase;
-	STreeCtrl *tree = (STreeCtrl*)pEvt->sender;
+	enum{
+		menu_new_xml = 190,
+		menu_new_folder = 191,
+		menu_new_layout = 192,
+		menu_new_include = 193,
+		menu_copy = 200,
+		menu_cut = 201,
+		menu_paste = 202,
+		menu_delete = 203,
+		menu_rename = 204,
+		menu_explorer = 205,
+		menu_add_to_uires = 206,
+	};
 
-	SStringT *s = (SStringT*)tree->GetItemData(pEvt->hItem);
-	SStringT strLayoutName;
-	tree->GetItemText(pEvt->hItem, strLayoutName);
-
-	if(!CheckSave())
-		return;
-
-	m_pXmlEdtior->LoadXml(*s, strLayoutName);
-	m_editXmlType = XML_LAYOUT;
-	UpdateEditorToolbar();
-}
-
-
-// 双击打开文件
-void CMainDlg::OnWorkspaceXMLDbClick(IEvtArgs * pEvtBase)
-{
-	EventLBDbClick *pEvt = (EventLBDbClick*)pEvtBase;
-	SListBox *listbox = (SListBox*)pEvt->sender;
-
-	if (pEvt->nCurSel != -1)
+	EventOfPanel *e2 = sobj_cast<EventOfPanel>(e);
+	if(!e2) return;
+	if(e2->pOrgEvt->GetID()==EventItemPanelRclick::EventID)
 	{
-		SStringT filename = listbox->GetText(pEvt->nCurSel);
+	EventItemPanelRclick *pEvt = sobj_cast<EventItemPanelRclick>(e2->pOrgEvt);
+	SMenuEx menu;
+	menu.LoadMenu(UIRES.smenu.menu_file_ctx);
+    SItemPanel *pItemPanel = sobj_cast<SItemPanel>(pEvt->sender);
+	HSTREEITEM hItem = (HSTREEITEM)pItemPanel->GetItemIndex();
+    CPoint pt(GET_X_LPARAM(pEvt->lParam), GET_Y_LPARAM(pEvt->lParam));
+    CRect rc(pt, CSize());
+    pItemPanel->FrameToHost(&rc);
+	const FileItemData& itemData = m_pFileTreeAdapter->GetItemData(hItem);
+	if(!itemData.bIsDir){
+        menu.EnableMenuItem(menu_new_xml, MF_DISABLED);
+        menu.EnableMenuItem(menu_new_folder, MF_DISABLED);
+        menu.EnableMenuItem(menu_new_layout, MF_DISABLED);
+		menu.EnableMenuItem(menu_new_include, MF_DISABLED);
+	}
+	
+	// 根据 clipboard 状态更新菜单项
+	menu.EnableMenuItem(menu_paste, HasClipboardData()?MF_ENABLED:MF_DISABLED);
+	
+	int nId = menu.TrackPopupMenu(TPM_RETURNCMD, rc.left, rc.top, m_hWnd);
+	SLOGI()<<"menu id:"<<nId;
+	if(nId>0)
+	{
+		switch(nId)
+		{
+			case menu_new_xml://new Xml
+			{
+				if (m_strProPath.IsEmpty())
+				{
+					SLOGW() << "请先打开工程";
+					return;
+				}
+				
+				const FileItemData& itemData = m_pFileTreeAdapter->GetItemData(hItem);
+				SStringT strDir = itemData.bIsDir ? itemData.strPath : itemData.strPath.Left(itemData.strPath.ReverseFind(_T('\\')));
+				SStringT strNewName = CFileTreeAdapter::GenerateAvailableName(strDir, _T("NewXml"), _T("xml"));
+				m_pFileTreeAdapter->CreateItem(hItem, strNewName, FALSE);
+			}
+			break;
+			case menu_new_folder://new folder
+			{
+				if (m_strProPath.IsEmpty())
+				{
+					SLOGW() << "请先打开工程";
+					return;
+				}
+				
+				SStringT strDir = itemData.bIsDir ? itemData.strPath : itemData.strPath.Left(itemData.strPath.ReverseFind(_T('\\')));
+				SStringT strNewName = CFileTreeAdapter::GenerateAvailableName(strDir, _T("NewFolder"), _T(""));
+				m_pFileTreeAdapter->CreateItem(hItem, strNewName, TRUE);
+			}
+			break;
+			case menu_new_layout://new layout
+			{
+				if (m_strProPath.IsEmpty())
+				{
+					SLOGW() << "请先打开工程";
+					return;
+				}
+				
+				const FileItemData& itemData = m_pFileTreeAdapter->GetItemData(hItem);
+				SASSERT(itemData.bIsDir);
+				SDlgNewLayout DlgNewDialog(_T("layout:UIDESIGNER_XML_NEW_LAYOUT"), m_strProPath, itemData.strName);
+				if (IDOK == DlgNewDialog.DoModal(m_hWnd))
+				{
+					CopyFile(CSysDataMgr::getSingleton().GetConfigDir() + _T("/LayoutTmpl/Dialog.xml"), DlgNewDialog.m_strPath, FALSE);
+					NewLayout(DlgNewDialog.m_strPath, DlgNewDialog.m_strName);
+				}
+            }
+            break;
+		case menu_new_include://new include
+			{
+				if (m_strProPath.IsEmpty())
+				{
+					SLOGW() << "请先打开工程";
+					return;
+				}
+				
+				const FileItemData& itemData = m_pFileTreeAdapter->GetItemData(hItem);
+				SASSERT(itemData.bIsDir);
+				SDlgNewLayout DlgNewDialog(_T("layout:UIDESIGNER_XML_NEW_LAYOUT"), m_strProPath, itemData.strName);
+				if (IDOK == DlgNewDialog.DoModal(m_hWnd))
+				{
+					CopyFile(CSysDataMgr::getSingleton().GetConfigDir() + _T("/LayoutTmpl/Include.xml"), DlgNewDialog.m_strPath, FALSE);
+					NewLayout(DlgNewDialog.m_strPath, DlgNewDialog.m_strName);
+				}
+				break;
+			}
+		case menu_copy://复制
+			{
+				// 处理多选
+				std::vector<HSTREEITEM> selectedItems;
+				int selCount = m_treeView->GetSelItemCount();
+				if(selCount > 0)
+				{
+					HSTREEITEM *pItems = new HSTREEITEM[selCount];
+					m_treeView->GetSelItems(pItems, selCount);
+					for(int i = 0; i < selCount; i++)
+					{
+						selectedItems.push_back(pItems[i]);
+					}
+					delete []pItems;
+				}
+				else
+				{
+					selectedItems.push_back(hItem);
+				}
+				// 序列化到 clipboard
+				SerializeItemsToClipboard(selectedItems, file_op_copy);
+			}
+			break;
+		case menu_cut://剪切
+			{
+				// 处理多选
+				std::vector<HSTREEITEM> selectedItems;
+				int selCount = m_treeView->GetSelItemCount();
+				if(selCount > 0)
+				{
+					HSTREEITEM *pItems = new HSTREEITEM[selCount];
+					m_treeView->GetSelItems(pItems, selCount);
+					for(int i = 0; i < selCount; i++)
+					{
+						selectedItems.push_back(pItems[i]);
+					}
+					delete []pItems;
+				}
+				else
+				{
+					selectedItems.push_back(hItem);
+				}
+				// 序列化到 clipboard
+				SerializeItemsToClipboard(selectedItems, file_op_cut);
+			}
+			break;
+		case menu_paste://粘贴
+			{
+				// 从 clipboard 读取
+				std::vector<SStringT> vecClipboardItems;
+				int nClipboardOperation = 0;
+				BOOL bFromClipboard = DeserializeItemsFromClipboard(vecClipboardItems, nClipboardOperation);
+				
+				if(bFromClipboard && !vecClipboardItems.empty() && nClipboardOperation > 0)
+				{
+					// 获取目标目录路径
+					const FileItemData& destItemData = m_pFileTreeAdapter->GetItemData(hItem);
+					SStringT strDestPath = destItemData.bIsDir ? destItemData.strPath : destItemData.strPath.Left(destItemData.strPath.ReverseFind(_T('\\')));
+					
+					// 直接操作文件系统
+					for(size_t i = 0; i < vecClipboardItems.size(); i++)
+					{
+						SStringT strSrcPath = vecClipboardItems[i];
+						// 提取文件名
+						int nPos = strSrcPath.ReverseFind(_T('/'));
+						SStringT strFileName = strSrcPath.Mid(nPos + 1);
+						SStringT strDestFilePath = strDestPath + _T('/') + strFileName;
+						
+						if(nClipboardOperation == 1) // 复制
+						{
+							// 检查目标文件是否存在
+							if(::PathFileExists(strDestFilePath))
+							{
+								// 生成可用的文件名
+								SStringT strBaseName = strFileName.Left(strFileName.ReverseFind(_T('.')));
+								SStringT strExt = strFileName.Mid(strFileName.ReverseFind(_T('.')));
+								int nIndex = 1;
+								while(::PathFileExists(strDestPath + _T('/') + strBaseName + _T('(') + SStringT().Format(_T("%d"), nIndex) + _T(')') + strExt))
+								{
+									nIndex++;
+								}
+								strDestFilePath = strDestPath + _T('/') + strBaseName + _T('(') + SStringT().Format(_T("%d"), nIndex) + _T(')') + strExt;
+							}
+							
+							// 复制文件或目录
+							if(::PathIsDirectory(strSrcPath))
+							{
+								// 复制目录
+								SHFILEOPSTRUCT fos = {0};
+								fos.wFunc = FO_COPY;
+								fos.pFrom = strSrcPath + _T('\0');
+								fos.pTo = strDestFilePath + _T('\0');
+								fos.fFlags = FOF_NOCONFIRMMKDIR | FOF_SILENT | FOF_NOERRORUI;
+								::SHFileOperation(&fos);
+							}
+							else
+							{
+								// 复制文件
+								::CopyFile(strSrcPath, strDestFilePath, FALSE);
+							}
+						}
+						else if(nClipboardOperation == file_op_cut) // 剪切
+						{
+							// 移动文件或目录
+							if(::PathIsDirectory(strSrcPath))
+							{
+								// 移动目录
+								SHFILEOPSTRUCT fos = {0};
+								fos.wFunc = FO_MOVE;
+								fos.pFrom = strSrcPath + _T('\0');
+								fos.pTo = strDestPath + _T('\0');
+								fos.fFlags = FOF_NOCONFIRMMKDIR | FOF_SILENT | FOF_NOERRORUI;
+								::SHFileOperation(&fos);
+							}
+							else
+							{
+								// 移动文件
+								::MoveFile(strSrcPath, strDestFilePath);
+							}
+						}
+					}
+				}
+			}
+			break;
+		case menu_delete://删除
+			{
+				// 处理多选
+				std::vector<HSTREEITEM> itemsToDelete;
+				int selCount = m_treeView->GetSelItemCount();
+				if(selCount > 0)
+				{
+					HSTREEITEM *pItems = new HSTREEITEM[selCount];
+					m_treeView->GetSelItems(pItems, selCount);
+					for(int i = 0; i < selCount; i++)
+					{
+						if(pItems[i] != ITEM_ROOT)
+						{
+							itemsToDelete.push_back(pItems[i]);
+						}
+					}
+					delete []pItems;
+				}
+				else if(hItem != ITEM_ROOT)
+				{
+					itemsToDelete.push_back(hItem);
+				}
+				
+				if(!itemsToDelete.empty())
+				{
+					SStringT strMsg = _T("确定要删除") + SStringT().Format(_T("%d"), itemsToDelete.size()) + _T("个项目吗？");
+					if(SMessageBox(m_hWnd, strMsg, _T("提示"), MB_YESNO | MB_ICONQUESTION) == IDYES)
+					{
+						for(size_t i = 0; i < itemsToDelete.size(); i++)
+						{
+							m_pFileTreeAdapter->RemoveItem(itemsToDelete[i]);
+						}
+					}
+				}
+			}
+			break;
+		case menu_rename://重命名
+			// 这里可以实现重命名功能，需要添加重命名的UI交互
+			break;
+		case menu_explorer://reveal in explorer
+			{
+				const FileItemData& itemData = m_pFileTreeAdapter->GetItemData(hItem);
+                SStringT strPath = itemData.strPath;
+#ifdef _WIN32
+                strPath.ReplaceChar(_T('/'), PATH_SLASH);
+#else
+                strPath.ReplaceChar(_T('\\'), PATH_SLASH);
+#endif
+				ShellExecute(0, _T("open"), _T("explorer.exe"), _T("/select,") + strPath, NULL, SW_SHOW);
+				SLOGI() << "Reveal in explorer: " << strPath.c_str();
+			}
+			break;
+		case menu_add_to_uires://add to uires.idx
+			{
+				BOOL bUpdated = FALSE;
+				int selCount = m_treeView->GetSelItemCount();
+				if(selCount)
+				{
+					HSTREEITEM *pItems = new HSTREEITEM[selCount];
+					m_treeView->GetSelItems(pItems, selCount);
+					//support multi select including sub directory
+					for(int i = 0; i < selCount; i++)
+					{
+						const FileItemData& itemData = m_pFileTreeAdapter->GetItemData(pItems[i]);
+						
+						if (itemData.bIsDir)
+						{
+							// 如果是目录，递归添加目录中的所有文件
+							AddFilesInDirectoryToUIRes(itemData.strPath);
+							bUpdated = TRUE;
+						}
+						else
+						{
+							// 如果是文件，直接添加到UIRes
+							if (m_UIResFileMgr.AddToUIRes(itemData.strPath))
+								bUpdated = TRUE;
+						}
+					}
+					delete []pItems;
+				}else{
+					const FileItemData& itemData = m_pFileTreeAdapter->GetItemData(hItem);
+                	bUpdated = m_UIResFileMgr.AddToUIRes(itemData.strPath);
+				}
+                if (bUpdated && m_editXmlType == FT_INDEX_XML)
+                { // 如果正在编辑uires.idx
+                    m_pXmlEdtior->LoadXml(m_strUIResFile, _T(""));
+                }
+			}
+			break;
+		}
+	}
+	}else if(e2->pOrgEvt->GetID()==EventItemPanelDbclick::EventID)
+	{
+		EventItemPanelDbclick *pEvt = sobj_cast<EventItemPanelDbclick>(e2->pOrgEvt);
+		SItemPanel *pItemPanel = sobj_cast<SItemPanel>(pEvt->Sender());
+		HSTREEITEM hItem = (HSTREEITEM)pItemPanel->GetItemIndex();
+		const FileItemData& itemData = m_pFileTreeAdapter->GetItemData(hItem);
+		SLOGI()<<"File:"<<itemData.strPath.c_str();
+
 		if(!CheckSave())
 			return;
-		m_pXmlEdtior->LoadXml(filename,SStringT());
-		BOOL bSkin = m_UIResFileMgr.IsSkinXml(filename);
-		m_editXmlType = bSkin?XML_SKIN:XML_UNKNOWN;
-		UpdateEditorToolbar();
+		if(itemData.bIsDir)
+		{
+			m_pFileTreeAdapter->ExpandItem(hItem, TVC_TOGGLE);
+			return;
+		}
+		int type = m_UIResFileMgr.GetFileType(itemData.strPath);
+		SStringT strPath = itemData.strPath;
+		SStringT layoutId;
+		if(type == FT_LAYOUT_XML){
+			m_UIResFileMgr.IsLayoutXml(strPath, layoutId);
+		}
+		STabCtrl *pTab = FindChildByID2<STabCtrl>(R.id.tab_editor);
+		if(type != FT_IMAGE){
+			pTab->SetCurSel(0);
+			m_editXmlType = type;
+			m_pXmlEdtior->LoadXml(strPath, layoutId);
+			UpdateEditorToolbar();
+		}else{
+			// 打开图片查看器
+			pTab->SetCurSel(1);
+			if(m_pImageViewer)
+			{
+				m_pImageViewer->LoadImage(strPath);
+			}
+		}
+	}else if(e2->pOrgEvt->GetID()==EventMouseClick::EventID){
+		EventMouseClick *pEvt = sobj_cast<EventMouseClick>(e2->pOrgEvt);
+		if(pEvt->clickId==MOUSE_LBTN_DOWN){
+			SLOGI()<<"Mouse click:"<<pEvt->pt.x<<","<<pEvt->pt.y;
+		}else if(pEvt->clickId == MOUSE_LBTN_UP){
+			SLOGI()<<"Mouse up:"<<pEvt->pt.x<<","<<pEvt->pt.y;
+		}
+	}else if(e2->pOrgEvt->GetID()==EventSwndMouseMove::EventID){
+		EventSwndMouseMove *pEvt = sobj_cast<EventSwndMouseMove>(e2->pOrgEvt);
+		SLOGI()<<"Mouse move:"<<pEvt->pt.x<<","<<pEvt->pt.y;
 	}
 }
-
-void CMainDlg::OnDeleteItem(STreeCtrl *pTreeCtrl,HSTREEITEM hItem,LPARAM lParam)
-{
-	SStringT * pPath = (SStringT*)lParam;
-	delete pPath;
-}
-
 
 BOOL CMainDlg::OnDrop(LPCTSTR pszName)
 {
@@ -528,7 +975,7 @@ void CMainDlg::onScintillaSave(CScintillaWnd *pSci,LPCTSTR pszFileName)
 
 void CMainDlg::onScintillaAutoComplete(CScintillaWnd *pSci,char ch)
 {
-	if(m_editXmlType == XML_UNKNOWN)
+	if(m_editXmlType == FT_UNKNOWN)
 		return;
 
 	long lStart = pSci->SendEditor(SCI_GETCURRENTPOS, 0, 0);
@@ -561,8 +1008,11 @@ void CMainDlg::onScintillaAutoComplete(CScintillaWnd *pSci,char ch)
 	}
 	else if (ch == '<')
 	{//start element
-		SStringA strAutoShow = m_editXmlType == XML_LAYOUT? CSysDataMgr::getSingleton().GetCtrlAutos()
-			:CSysDataMgr::getSingleton().GetSkinAutos();
+		SStringA strAutoShow;
+		if(m_editXmlType== FT_LAYOUT_XML)
+			strAutoShow = CSysDataMgr::getSingleton().GetCtrlAutos();
+		if(m_editXmlType== FT_SKIN)
+			strAutoShow = CSysDataMgr::getSingleton().GetSkinAutos();
 		if (!strAutoShow.IsEmpty())
 		{
 			pSci->SendEditor(SCI_AUTOCSHOW, lStart - startPos, (LPARAM)strAutoShow.c_str());
@@ -577,8 +1027,12 @@ void CMainDlg::onScintillaAutoComplete(CScintillaWnd *pSci,char ch)
 		if (!tagname.IsEmpty() && strPrefix==" " && strPrefix!="\t")
 		{//编辑的元素name不为空，而且当前不是编辑属性
 			SStringW strTag = S_CA2W(tagname,CP_UTF8);
-			SStringA str = m_editXmlType == XML_LAYOUT?CSysDataMgr::getSingleton().GetCtrlAttrAutos(strTag)
-				:CSysDataMgr::getSingleton().GetSkinAttrAutos(strTag);
+			
+			SStringA str;
+			if(m_editXmlType== FT_LAYOUT_XML)
+				str = CSysDataMgr::getSingleton().GetCtrlAttrAutos(strTag);
+			if(m_editXmlType== FT_SKIN)
+				str = CSysDataMgr::getSingleton().GetSkinAttrAutos(strTag);
 			if (!str.IsEmpty())
 			{	// 自动完成字串要进行升充排列, 否则功能不正常
 				pSci->SendEditor(SCI_AUTOCSHOW, lStart - startPos, (LPARAM)(LPCSTR)str);
@@ -591,11 +1045,11 @@ void CMainDlg::UpdateEditorToolbar()
 {
 	switch(m_editXmlType)
 	{
-	case XML_LAYOUT:
+	case FT_LAYOUT_XML:
 		m_lvWidget->SetVisible(TRUE,TRUE);
 		m_lvSkin->SetVisible(FALSE,TRUE);
 		break;
-	case XML_SKIN:
+	case FT_SKIN:
 		m_lvWidget->SetVisible(FALSE,TRUE);
 		m_lvSkin->SetVisible(TRUE,TRUE);
 		break;
@@ -643,7 +1097,75 @@ void CMainDlg::UpdateToolbar()
 	
 	FindChildByID(R.id.toolbar_btn_NewInclude)->EnableWindow(m_bIsOpen,TRUE);
 	FindChildByID(R.id.toolbar_btn_NewLayout)->EnableWindow(m_bIsOpen,TRUE);
-	FindChildByID(R.id.toolbar_btn_savexml)->EnableWindow(m_bIsOpen,TRUE);
-	FindChildByID(R.id.toolbar_btn_resmgr)->EnableWindow(m_bIsOpen,TRUE);
+	FindChildByID(R.id.toolbar_btn_viewskin)->EnableWindow(m_bIsOpen,TRUE);
 	FindChildByID(R.id.toolbar_btn_Close)->EnableWindow(m_bIsOpen,TRUE);
+}
+
+void CMainDlg::OnFileChanged(LPCTSTR pszFile, CPathMonitor::Flag nFlag)
+{
+    STaskHelper::post(GetMsgLoop(), this, &CMainDlg::_OnFileChanged, tstring(pszFile), nFlag);
+}
+
+void CMainDlg::_OnFileChanged(tstring& strFile, CPathMonitor::Flag nFlag)
+{
+    SStringT strFilePath = strFile.c_str();
+    
+    switch (nFlag)
+    {
+    case CPathMonitor::FILE_DELETED:
+        // 删除文件：先在文件树中找到这个文件并从文件树中删除
+        // 如果该文件还没有枚举到文件树中，则不处理
+        m_pFileTreeAdapter->RemoveItemByPath(strFilePath);
+        break;
+        
+    case CPathMonitor::FILE_CREATED:
+        // 增加文件/夹：如果上一级目录已经展开，则直接增加这个项，否则不处理
+        m_pFileTreeAdapter->AddItemByPath(strFilePath);
+        break;
+    }
+}
+
+// 递归添加目录中的所有文件到UIRes
+void CMainDlg::AddFilesInDirectoryToUIRes(const SStringT& dirPath)
+{
+    WIN32_FIND_DATA findData;
+    HANDLE hFind;
+    SStringT searchPath = dirPath;
+    searchPath += _T("\\*.*");
+
+    hFind = FindFirstFile(searchPath, &findData);
+    if (hFind != INVALID_HANDLE_VALUE)
+    {
+        do
+        {
+            if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+            {
+                // 是子目录，跳过"."和".."目录
+                if (_tcscmp(findData.cFileName, _T(".")) != 0 &&
+                    _tcscmp(findData.cFileName, _T("..")) != 0)
+                {
+                    SStringT subDirPath = dirPath;
+                    subDirPath += _T("\\");
+                    subDirPath += findData.cFileName;
+                    AddFilesInDirectoryToUIRes(subDirPath); // 递归处理子目录
+                }
+            }
+            else
+            {
+                // 是文件，添加到UIRes
+                SStringT filePath = dirPath;
+                filePath += _T("\\");
+                filePath += findData.cFileName;
+                m_UIResFileMgr.AddToUIRes(filePath);
+            }
+        } while (FindNextFile(hFind, &findData));
+
+        FindClose(hFind);
+    }
+}
+
+void CMainDlg::OnBtnViewSkin()
+{
+	CSkinViewerDlg dlg(&m_UIResFileMgr);
+	dlg.DoModal();
 }

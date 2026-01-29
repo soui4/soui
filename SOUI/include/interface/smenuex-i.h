@@ -98,6 +98,14 @@ DECLARE_INTERFACE_(IMenuEx, IObjRef)
     STDMETHOD_(BOOL, CheckMenuRadioItem)(THIS_ UINT idFirst, UINT idLast, UINT idCheck, UINT uFlags) PURE;
 
     /**
+     * @brief 启用或禁用菜单项
+     * @param uIDEnableItem - 项目ID或索引
+     * @param uEnable - MF_BYCOMMAND/MF_BYPOSITION | MF_ENABLED/MF_GRAYED/MF_DISABLED
+     * @return BOOL - 成功返回TRUE，失败返回FALSE
+     */
+    STDMETHOD_(BOOL, EnableMenuItem)(THIS_ UINT uIDEnableItem, UINT uEnable) PURE;
+
+    /**
      * @brief 删除菜单项
      * @param uPosition - 位置
      * @param uFlags - 标志，MF_BYCOMMAND或MF_BYPOSITION

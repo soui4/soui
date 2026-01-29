@@ -37,11 +37,8 @@
 #include "CAdapter.h"
 #include "CDropTarget.h"
 
-#ifdef _WIN32
-#define SKIN_CFG _T("\\themes\\skin_config.xml")
-#else
 #define SKIN_CFG _T("/themes/skin_config.xml")
-#endif//_WIN32
+
 #define kLogTag "maindlg"
 
 int CMainDlg::OnCreate( LPCREATESTRUCT lpCreateStruct )

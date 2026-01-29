@@ -5,6 +5,23 @@
 #include <res.mgr/SUiDef.h>
 
 class CMainDlg;
+
+enum{
+    FT_UNKNOWN=0,
+    FT_DIR,
+    FT_INDEX_XML,
+    FT_LAYOUT_XML,
+    FT_XML,
+    FT_IMAGE,
+    FT_SKIN,
+    FT_COLOR,
+    FT_STRING,
+    FT_STYLE,
+    FT_OBJATTR,
+    FT_DIM,
+    FT_FONT,
+};
+
 class ResManger : public CPathMonitor::IListener
 {
 public:
@@ -52,6 +69,9 @@ public:
 
 	BOOL OpenProject(SStringT strPath);
 	void CloseProject();
+
+	void UpdateProject();
+	
 	void SaveRes();
 	BOOL LoadUIRes();
 	
@@ -93,15 +113,13 @@ public:
 	SStringW GetFont(SStringT fontname);
 
 	BOOL IsSkinXml(const SStringT & strPath) const;
-	
-	void GetSubNodes(pugi::xml_node & parentNode, SStringW parentNodeName);
-	
-	static SStringT RemoveResTypename(const SStringT & resname);
-	
-	SStringT GetResPathByName(const SStringT & resname);
-	
+	BOOL IsLayoutXml(const SStringT & strPath, SStringT & layoutId) const;
+			
 	BOOL NewLayout(SStringT strResName, SStringT strPath);
 
+	BOOL AddToUIRes(SStringT strPath);
+
+	int GetFileType(SStringT strPath) const;
 protected:
 	void OnFileChanged(LPCTSTR pszFile, CPathMonitor::Flag nFlag) override;
 	void _OnFileChanged(tstring &pszFile, CPathMonitor::Flag nFlag);
@@ -136,8 +154,7 @@ public:
 	SAutoRefPtr<IResProvider> m_pResProvider;
 	SAutoRefPtr<IUiDefInfo> m_pUiDef;
 
-	SMap<SStringT, SStringT> m_mapResFile;
-	SMap<SStringT, SStringT> m_mapXmlFile;		// 所有XML文件信息
+
 	SMap<SStringT, SStringT> m_mapLayoutFile;	// 所有Layout文件信息
 
 	SMap<SStringT, SkinItem> m_mapSkins;		//所有定义的Skin项目
@@ -147,7 +164,6 @@ public:
 	SMap<SStringT, SStringW> m_mapDimensions;	//所有定义的Dimension
 	SMap<SStringT, SStringW> m_mapFonts;		//所有定义的Font项目
 
-	CPathMonitor m_pathMonitor;
 	CMainDlg *m_pMainDlg;
 };
 

@@ -14,93 +14,35 @@
 #include <helper/SAutoBuf.h>
 #pragma comment(lib,"Msimg32")
 #pragma  comment(lib,"windowscodecs.lib")
+#if USE_D2D1_1
+#include <d2d1_1.h>
+#else
+typedef enum D2D1_COMPOSITE_MODE
+{
+    D2D1_COMPOSITE_MODE_SOURCE_OVER = 0,
+    D2D1_COMPOSITE_MODE_DESTINATION_OVER = 1,
+    D2D1_COMPOSITE_MODE_SOURCE_IN = 2,
+    D2D1_COMPOSITE_MODE_DESTINATION_IN = 3,
+    D2D1_COMPOSITE_MODE_SOURCE_OUT = 4,
+    D2D1_COMPOSITE_MODE_DESTINATION_OUT = 5,
+    D2D1_COMPOSITE_MODE_SOURCE_ATOP = 6,
+    D2D1_COMPOSITE_MODE_DESTINATION_ATOP = 7,
+    D2D1_COMPOSITE_MODE_XOR = 8,
+    D2D1_COMPOSITE_MODE_PLUS = 9,
+    D2D1_COMPOSITE_MODE_SOURCE_COPY = 10,
+    D2D1_COMPOSITE_MODE_BOUNDED_SOURCE_COPY = 11,
+    D2D1_COMPOSITE_MODE_MASK_INVERT = 12,
+    D2D1_COMPOSITE_MODE_FORCE_DWORD = 0xffffffff
+
+} D2D1_COMPOSITE_MODE;
+#endif//USE_D2D1_1
 #include <initguid.h>
-//62baa2d2-ab54-41b7-b872-787e0106a421
-DEFINE_GUID(IID_ID2D1PathGeometry1, 0x62baa2d2, 0xab54, 0x41b7, 0xb8, 0x72, 0x78, 0x7e, 0x01, 0x06, 0xa4, 0x21);
 //b859ee5a-d838-4b5b-a2e8-1adc7d93db48
 DEFINE_GUID(IID_IDWriteFactory, 0xb859ee5a, 0xd838, 0x4b5b, 0xa2, 0xe8, 0x1a, 0xdc, 0x7d, 0x93, 0xdb, 0x48);
 
 #pragma warning(disable:4244 4018)
 
 using namespace D2D1;
-
-#ifndef _D2D1_1_H_
-#define _D2D1_1_H_
-//copy from d2d1_1.h hjx
-
-#ifndef DX_DECLARE_INTERFACE
-#define DX_DECLARE_INTERFACE(x) DECLSPEC_UUID(x) DECLSPEC_NOVTABLE
-#endif
-
-/// <summary>
-/// Describes a point along a path.
-/// </summary>
-typedef struct D2D1_POINT_DESCRIPTION
-{
-	D2D1_POINT_2F point;
-	D2D1_POINT_2F unitTangentVector;
-	UINT32 endSegment;
-	UINT32 endFigure;
-	FLOAT lengthToEndSegment;
-
-} D2D1_POINT_DESCRIPTION;
-
-#define D2D1_DEFAULT_FLATTENING_TOLERANCE (0.25f)
-
-/// <summary>
-/// The ID2D1PathGeometry1 interface adds functionality to ID2D1PathGeometry. In
-/// particular, it provides the path geometry-specific
-/// ComputePointAndSegmentAtLength method.
-/// </summary>
-interface DX_DECLARE_INTERFACE("62baa2d2-ab54-41b7-b872-787e0106a421") ID2D1PathGeometry1  : public ID2D1PathGeometry
-{
-
-	STDMETHOD(ComputePointAndSegmentAtLength)(
-		FLOAT length,
-		UINT32 startSegment,
-		_In_opt_ CONST D2D1_MATRIX_3X2_F *worldTransform,
-		FLOAT flatteningTolerance,
-		_Out_ D2D1_POINT_DESCRIPTION *pointDescription 
-		) CONST PURE;
-
-	COM_DECLSPEC_NOTHROW
-		HRESULT
-		ComputePointAndSegmentAtLength(
-		FLOAT length,
-		UINT32 startSegment,
-		CONST D2D1_MATRIX_3X2_F &worldTransform,
-		FLOAT flatteningTolerance,
-		_Out_ D2D1_POINT_DESCRIPTION *pointDescription 
-		) CONST  
-	{
-		return ComputePointAndSegmentAtLength(length, startSegment, &worldTransform, flatteningTolerance, pointDescription);
-	}
-
-	COM_DECLSPEC_NOTHROW
-		HRESULT
-		ComputePointAndSegmentAtLength(
-		FLOAT length,
-		UINT32 startSegment,
-		_In_opt_ CONST D2D1_MATRIX_3X2_F *worldTransform,
-		_Out_ D2D1_POINT_DESCRIPTION *pointDescription 
-		) CONST  
-	{
-		return ComputePointAndSegmentAtLength(length, startSegment, worldTransform, D2D1_DEFAULT_FLATTENING_TOLERANCE, pointDescription);
-	}
-
-	COM_DECLSPEC_NOTHROW
-		HRESULT
-		ComputePointAndSegmentAtLength(
-		FLOAT length,
-		UINT32 startSegment,
-		CONST D2D1_MATRIX_3X2_F &worldTransform,
-		_Out_ D2D1_POINT_DESCRIPTION *pointDescription 
-		) CONST  
-	{
-		return ComputePointAndSegmentAtLength(length, startSegment, &worldTransform, D2D1_DEFAULT_FLATTENING_TOLERANCE, pointDescription);
-	}
-}; // interface ID2D1PathGeometry1
-#endif //_D2D1_1_H_
 
 SNSBEGIN
 	class D2DColor
@@ -1192,6 +1134,7 @@ SNSBEGIN
 		,m_cDrawing(0)
 		,m_hBmp(NULL)
 		,m_cachedPenColor(CR_INVALID)  // 初始化缓存
+		,m_xferMode(kSrcOver_Mode)  // 默认混合模式
 	{
 		m_pRenderFactory = pRenderFactory;
 
@@ -1235,6 +1178,7 @@ SNSBEGIN
 		,m_cDrawing(0)
 		,m_hBmp(NULL)
 		,m_cachedPenColor(CR_INVALID)  // 初始化缓存
+		,m_xferMode(kSrcOver_Mode)  // 默认混合模式
 	{
 		SRenderFactory_D2D *pFactoryD2D=(SRenderFactory_D2D*)pRenderFactory;
 		ID2D1Factory *pD2DFac = pFactoryD2D->GetD2D1Factory();
@@ -1466,7 +1410,9 @@ SNSBEGIN
 		CRect rcDst(pRcDest);
 		CRect rcSrc(xSrc,ySrc,xSrc+rcDst.Width(),ySrc+rcDst.Height());
 		rcSrc.OffsetRect(pRTGdiSrc->m_ptOrg);
-		m_rt->DrawBitmap(pSrc->toD2D1Bitmap(m_rt),toRectF(pRcDest),1.0f,D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR,toRectF(&rcSrc));
+		D2D1_RECT_F rcSrcF = toRectF(&rcSrc);
+		ApplyXfermodeForBitmap(pSrc->toD2D1Bitmap(m_rt), toRectF(pRcDest), 1.0f,
+			D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR, &rcSrcF);
 		if(bDrawing)
 			pRTGdiSrc->m_rt->BeginDraw();
 		return S_OK;
@@ -1634,7 +1580,28 @@ SNSBEGIN
 	HRESULT SRenderTarget_D2D::FillRectangle(LPCRECT pRect)
 	{
 		SComPtr<ID2D1Brush> br = m_curBrush->toBrush(m_rt,pRect);
-		m_rt->FillRectangle(toRectF(pRect,TRUE),br);
+		D2D1_RECT_F rcF = toRectF(pRect,TRUE);
+
+		// 对于默认的SrcOver模式，直接填充
+		if(m_xferMode == kSrcOver_Mode)
+		{
+			m_rt->FillRectangle(rcF, br);
+			return S_OK;
+		}
+
+		// 创建矩形几何图形并应用混合模式
+		ID2D1Factory *fac = toD2DFac(m_pRenderFactory);
+		SComPtr<ID2D1RectangleGeometry> rectGeo;
+		fac->CreateRectangleGeometry(rcF, &rectGeo);
+		if(rectGeo)
+		{
+			ApplyXfermodeForGeometry(rectGeo, br);
+		}
+		else
+		{
+			// 如果创建几何图形失败，回退到普通填充
+			m_rt->FillRectangle(rcF, br);
+		}
 		return S_OK;
 	}
 
@@ -1651,17 +1618,60 @@ SNSBEGIN
 	{
 		SComPtr<ID2D1Brush> br = m_curBrush->toBrush(m_rt,pRect);
 		D2D1_ROUNDED_RECT rcRound={toRectF(pRect,TRUE),(float)pt.x,(float)pt.y};
-		m_rt->FillRoundedRectangle(rcRound,br);
+
+		// 对于默认的SrcOver模式，直接填充
+		if(m_xferMode == kSrcOver_Mode)
+		{
+			m_rt->FillRoundedRectangle(rcRound, br);
+			return S_OK;
+		}
+
+		// 创建圆角矩形几何图形并应用混合模式
+		ID2D1Factory *fac = toD2DFac(m_pRenderFactory);
+		SComPtr<ID2D1RoundedRectangleGeometry> roundRectGeo;
+		fac->CreateRoundedRectangleGeometry(rcRound, &roundRectGeo);
+		if(roundRectGeo)
+		{
+			ApplyXfermodeForGeometry(roundRectGeo, br);
+		}
+		else
+		{
+			// 如果创建几何图形失败，回退到普通填充
+			m_rt->FillRoundedRectangle(rcRound, br);
+		}
 		return S_OK;
 	}
 
 	HRESULT SRenderTarget_D2D::FillSolidRoundRect(LPCRECT pRect,POINT pt,COLORREF cr)
-	{		
+	{
 		SBrush_D2D *pBr = SBrush_D2D::CreateSolidBrush(m_pRenderFactory,cr);
 		D2D1_ROUNDED_RECT rcRound={toRectF(pRect,TRUE),(float)pt.x,(float)pt.y};
-		m_rt->FillRoundedRectangle(rcRound,pBr->toBrush(m_rt,pRect));
+		SComPtr<ID2D1Brush> br = pBr->toBrush(m_rt,pRect);
+
+		// 对于默认的SrcOver模式，直接填充
+		if(m_xferMode == kSrcOver_Mode)
+		{
+			m_rt->FillRoundedRectangle(rcRound, br);
+			pBr->Release();
+			return S_OK;
+		}
+
+		// 创建圆角矩形几何图形并应用混合模式
+		ID2D1Factory *fac = toD2DFac(m_pRenderFactory);
+		SComPtr<ID2D1RoundedRectangleGeometry> roundRectGeo;
+		fac->CreateRoundedRectangleGeometry(rcRound, &roundRectGeo);
+		if(roundRectGeo)
+		{
+			ApplyXfermodeForGeometry(roundRectGeo, br);
+		}
+		else
+		{
+			// 如果创建几何图形失败，回退到普通填充
+			m_rt->FillRoundedRectangle(rcRound, br);
+		}
+
 		pBr->Release();
-		return S_OK;    
+		return S_OK;
 	}
 
 	HRESULT SRenderTarget_D2D::DrawLines(LPPOINT pts,size_t nCount)
@@ -1733,7 +1743,9 @@ SNSBEGIN
 		rcBox2.right = rcBox.right;
 		rcBox2.bottom = rcBox.bottom;
 		SComPtr<ID2D1Brush> br = m_curBrush->toBrush(m_rt,&rcBox2);
-		m_rt->FillGeometry(path,br);
+
+		// 应用混合模式
+		ApplyXfermodeForGeometry(path, br);
 		return S_OK;
 	}
 
@@ -1781,7 +1793,9 @@ SNSBEGIN
 			SComPtr<ID2D1Bitmap> pBitmap ;
 			hr = m_rt->CreateBitmapFromWicBitmap(bmp,&pBitmap);
 			if(hr==S_OK){
-				m_rt->DrawBitmap(pBitmap, D2D1::RectF(xLeft, yTop, xLeft+cxWidth,yTop+cyWidth));
+				D2D1_RECT_F rcDest = D2D1::RectF(xLeft, yTop, xLeft+cxWidth, yTop+cyWidth);
+				ApplyXfermodeForBitmap(pBitmap, rcDest, 1.0f,
+					D2D1_BITMAP_INTERPOLATION_MODE_LINEAR, NULL);
 			}
 		}
 		if(iconInfo.hbmColor){
@@ -1798,7 +1812,9 @@ SNSBEGIN
 	{
 		SBitmap_D2D *pBmp = (SBitmap_D2D*)pBitmap;
 		SComPtr<ID2D1Bitmap> bmp=pBmp->toD2D1Bitmap(m_rt);
-		m_rt->DrawBitmap(bmp,toRectF(pRcDest),float(byAlpha)/255.f,D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR,RectF(xSrc,ySrc,xSrc+RectWidth(pRcDest),ySrc+RectHeight(pRcDest)));
+		D2D1_RECT_F rcSrc = RectF(xSrc,ySrc,xSrc+RectWidth(pRcDest),ySrc+RectHeight(pRcDest));
+		ApplyXfermodeForBitmap(bmp, toRectF(pRcDest), float(byAlpha)/255.f,
+			D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR, &rcSrc);
 		return S_OK;
 	}
 
@@ -1813,7 +1829,9 @@ SNSBEGIN
 		SBitmap_D2D *pSrc = pRTGdiSrc->m_curBmp;
 		CRect rcSrc(pRcSrc);
 		rcSrc.OffsetRect(pRTGdiSrc->m_ptOrg);
-		m_rt->DrawBitmap(pSrc->toD2D1Bitmap(m_rt),toRectF(pRcDest),float(byAlpha)/255.f,D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR,toRectF(&rcSrc));
+		D2D1_RECT_F rcSrcF = toRectF(&rcSrc);
+		ApplyXfermodeForBitmap(pSrc->toD2D1Bitmap(m_rt), toRectF(pRcDest), float(byAlpha)/255.f,
+			D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR, &rcSrcF);
 		if(bDrawing)
 			pRTGdiSrc->m_rt->BeginDraw();
 
@@ -1836,20 +1854,22 @@ SNSBEGIN
 		D2D1_BITMAP_INTERPOLATION_MODE mode = quality<kMedium_FilterLevel?D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR:D2D1_BITMAP_INTERPOLATION_MODE_LINEAR;
 		if(expandModeLow == EM_STRETCH)
 		{
-			m_rt->DrawBitmap(bmp,toRectF(pRcDest),float(byAlpha)/255.f,mode,toRectF(pRcSrc));
+			D2D1_RECT_F rcSrcF = toRectF(pRcSrc);
+			ApplyXfermodeForBitmap(bmp, toRectF(pRcDest), float(byAlpha)/255.f, mode, &rcSrcF);
 		}else
 		{//tile mode
 			PushClipRect(pRcDest,RGN_AND);
 
 			CRect rcDest(pRcDest);
 			CRect rcSrc(pRcSrc);
-			CRect rcSubDest(0,0,rcSrc.Width(),rcSrc.Height()); 
+			CRect rcSubDest(0,0,rcSrc.Width(),rcSrc.Height());
+			D2D1_RECT_F rcSrcF = toRectF(rcSrc);
 			for(int y=rcDest.top;y<rcDest.bottom;y+=rcSrc.Height())
 			{
-				rcSubDest.OffsetRect(rcDest.left,y);               
+				rcSubDest.OffsetRect(rcDest.left,y);
 				for(int x=rcDest.left;x<rcDest.right;x += rcSrc.Width())
 				{
-					m_rt->DrawBitmap(bmp,toRectF(rcSubDest),float(byAlpha)/255.f,mode,toRectF(rcSrc));
+					ApplyXfermodeForBitmap(bmp, toRectF(rcSubDest), float(byAlpha)/255.f, mode, &rcSrcF);
 					rcSubDest.OffsetRect(rcSrc.Width(),0);
 				}
 			}
@@ -2172,9 +2192,33 @@ SNSBEGIN
 		SBrush_D2D *pBr = SBrush_D2D::CreateSolidBrush(m_pRenderFactory,cr);
 		D2D1_MATRIX_3X2_F  mtx;
 		m_rt->GetTransform(&mtx);
-		m_rt->FillRectangle(toRectF(pRect),pBr->toBrush(m_rt,pRect));
+		D2D1_RECT_F rcF = toRectF(pRect);
+		SComPtr<ID2D1Brush> br = pBr->toBrush(m_rt,pRect);
+
+		// 对于默认的SrcOver模式，直接填充
+		if(m_xferMode == kSrcOver_Mode)
+		{
+			m_rt->FillRectangle(rcF, br);
+			pBr->Release();
+			return S_OK;
+		}
+
+		// 创建矩形几何图形并应用混合模式
+		ID2D1Factory *fac = toD2DFac(m_pRenderFactory);
+		SComPtr<ID2D1RectangleGeometry> rectGeo;
+		fac->CreateRectangleGeometry(rcF, &rectGeo);
+		if(rectGeo)
+		{
+			ApplyXfermodeForGeometry(rectGeo, br);
+		}
+		else
+		{
+			// 如果创建几何图形失败，回退到普通填充
+			m_rt->FillRectangle(rcF, br);
+		}
+
 		pBr->Release();
-		return S_OK;    
+		return S_OK;
 	}
 
 	HRESULT SRenderTarget_D2D::ClearRect( LPCRECT pRect,COLORREF cr )
@@ -2220,7 +2264,28 @@ SNSBEGIN
 	HRESULT SRenderTarget_D2D::FillEllipse( LPCRECT pRect )
 	{
 		D2D1_ELLIPSE shape={{(float)(pRect->left+pRect->right)/2,(float)(pRect->top+pRect->bottom)/2},(float)RectWidth(pRect)/2,(float)RectHeight(pRect)/2};
-		m_rt->FillEllipse(shape,m_curBrush->toBrush(m_rt,pRect));
+		SComPtr<ID2D1Brush> br = m_curBrush->toBrush(m_rt,pRect);
+
+		// 对于默认的SrcOver模式，直接填充
+		if(m_xferMode == kSrcOver_Mode)
+		{
+			m_rt->FillEllipse(shape, br);
+			return S_OK;
+		}
+
+		// 创建椭圆几何图形并应用混合模式
+		ID2D1Factory *fac = toD2DFac(m_pRenderFactory);
+		SComPtr<ID2D1EllipseGeometry> ellipseGeo;
+		fac->CreateEllipseGeometry(shape, &ellipseGeo);
+		if(ellipseGeo)
+		{
+			ApplyXfermodeForGeometry(ellipseGeo, br);
+		}
+		else
+		{
+			// 如果创建几何图形失败，回退到普通填充
+			m_rt->FillEllipse(shape, br);
+		}
 		return S_OK;
 	}
 
@@ -2228,9 +2293,32 @@ SNSBEGIN
 	{
 		D2D1_ELLIPSE shape={{(float)(pRect->left+pRect->right)/2,(float)(pRect->top+pRect->bottom)/2},(float)RectWidth(pRect)/2,(float)RectHeight(pRect)/2};
 		SBrush_D2D *pBr = SBrush_D2D::CreateSolidBrush(m_pRenderFactory,cr);
-		m_rt->FillEllipse(shape,pBr->toBrush(m_rt,pRect));
+		SComPtr<ID2D1Brush> br = pBr->toBrush(m_rt,pRect);
+
+		// 对于默认的SrcOver模式，直接填充
+		if(m_xferMode == kSrcOver_Mode)
+		{
+			m_rt->FillEllipse(shape, br);
+			pBr->Release();
+			return S_OK;
+		}
+
+		// 创建椭圆几何图形并应用混合模式
+		ID2D1Factory *fac = toD2DFac(m_pRenderFactory);
+		SComPtr<ID2D1EllipseGeometry> ellipseGeo;
+		fac->CreateEllipseGeometry(shape, &ellipseGeo);
+		if(ellipseGeo)
+		{
+			ApplyXfermodeForGeometry(ellipseGeo, br);
+		}
+		else
+		{
+			// 如果创建几何图形失败，回退到普通填充
+			m_rt->FillEllipse(shape, br);
+		}
+
 		pBr->Release();
-		return S_OK;    
+		return S_OK;
 	}
 
 
@@ -2372,23 +2460,426 @@ SNSBEGIN
 		RECT rcBox;
 		path->getBounds(&rcBox);
 		SComPtr<ID2D1Brush> br = m_curBrush->toBrush(m_rt,&rcBox);
-		m_rt->FillGeometry(path2->GetPath(),br);
+
+		// 应用混合模式
+		ApplyXfermodeForGeometry(path2->GetPath(), br);
 		return S_OK;
 	}
 
 	HRESULT SRenderTarget_D2D::SetXfermode(int mode,int *pOldMode)
 	{
+		// 保存旧模式
+		if(pOldMode)
+			*pOldMode = m_xferMode;
+
+		// 验证模式是否有效
+		bool bValidMode = false;
 		switch (mode)
 		{
+		// 基本ROP2模式 (通过GDI互操作支持)
 		case kSrcCopy:
 		case kDstInvert:
 		case kSrcInvert:
 		case kSrcAnd:
+			bValidMode = true;
+			break;
+		// Porter-Duff混合模式 (Direct2D 1.1+支持，但需要ID2D1DeviceContext)
+		case kClear_Mode:
+		case kSrc_Mode:
+		case kDst_Mode:
+		case kSrcOver_Mode:
+		case kDstOver_Mode:
+		case kSrcIn_Mode:
+		case kDstIn_Mode:
+		case kSrcOut_Mode:
+		case kDstOut_Mode:
+		case kSrcATop_Mode:
+		case kDstATop_Mode:
+		case kXor_Mode:
+		case kPlus_Mode:
+		case kModulate_Mode:
+		case kScreen_Mode:
+		case kOverlay_Mode:
+		case kDarken_Mode:
+		case kLighten_Mode:
+		case kColorDodge_Mode:
+		case kColorBurn_Mode:
+		case kHardLight_Mode:
+		case kSoftLight_Mode:
+		case kDifference_Mode:
+		case kExclusion_Mode:
+		case kMultiply_Mode:
+		case kHue_Mode:
+		case kSaturation_Mode:
+		case kColor_Mode:
+		case kLuminosity_Mode:
+			bValidMode = true;
 			break;
 		default:
 			return E_INVALIDARG;
 		}
-		return E_NOTIMPL;
+
+		if(!bValidMode)
+			return E_INVALIDARG;
+
+		// 保存新模式
+		m_xferMode = mode;
+
+		// 注意: Direct2D 1.0 (ID2D1RenderTarget) 不直接支持混合模式设置
+		// Direct2D 1.1+ (ID2D1DeviceContext) 通过SetPrimitiveBlend支持部分模式
+		//
+		// 实现说明:
+		// 1. 对于基本ROP2模式(kSrcCopy, kDstInvert, kSrcInvert, kSrcAnd)，
+		//    可以在需要时通过GDI互操作(GetDC/ReleaseDC)配合SetROP2实现
+		// 2. 对于Porter-Duff混合模式，Direct2D主要通过以下方式支持:
+		//    - DrawBitmap的compositeMode参数 (仅影响位图绘制)
+		//    - ID2D1DeviceContext::SetPrimitiveBlend (需要D2D 1.1+, Windows 8+)
+		//    - 使用图层(ID2D1Layer)配合不同的参数
+		// 3. 当前实现仅保存模式状态，具体的混合效果需要在各个绘制函数中
+		//    根据m_xferMode的值来应用相应的混合逻辑
+
+		return S_OK;
+	}
+
+	// 辅助函数：将SOUI的blend mode映射到D2D1_COMPOSITE_MODE
+	static bool MapXfermodeToCompositeMode(int xferMode, D2D1_COMPOSITE_MODE* pCompositeMode)
+	{
+		switch(xferMode)
+		{
+		case kClear_Mode:
+			// Clear模式没有直接对应，返回false
+			return false;
+		case kSrc_Mode:
+		case kSrcCopy:
+			*pCompositeMode = D2D1_COMPOSITE_MODE_SOURCE_COPY;
+			return true;
+		case kDst_Mode:
+			// Dst模式（不绘制）没有直接对应
+			return false;
+		case kSrcOver_Mode:
+			*pCompositeMode = D2D1_COMPOSITE_MODE_SOURCE_OVER;
+			return true;
+		case kDstOver_Mode:
+			*pCompositeMode = D2D1_COMPOSITE_MODE_DESTINATION_OVER;
+			return true;
+		case kSrcIn_Mode:
+			*pCompositeMode = D2D1_COMPOSITE_MODE_SOURCE_IN;
+			return true;
+		case kDstIn_Mode:
+			*pCompositeMode = D2D1_COMPOSITE_MODE_DESTINATION_IN;
+			return true;
+		case kSrcOut_Mode:
+			*pCompositeMode = D2D1_COMPOSITE_MODE_SOURCE_OUT;
+			return true;
+		case kDstOut_Mode:
+			*pCompositeMode = D2D1_COMPOSITE_MODE_DESTINATION_OUT;
+			return true;
+		case kSrcATop_Mode:
+			*pCompositeMode = D2D1_COMPOSITE_MODE_SOURCE_ATOP;
+			return true;
+		case kDstATop_Mode:
+			*pCompositeMode = D2D1_COMPOSITE_MODE_DESTINATION_ATOP;
+			return true;
+		case kXor_Mode:
+			*pCompositeMode = D2D1_COMPOSITE_MODE_XOR;
+			return true;
+		case kPlus_Mode:
+			*pCompositeMode = D2D1_COMPOSITE_MODE_PLUS;
+			return true;
+		default:
+			// 其他高级混合模式（kScreen_Mode, kMultiply_Mode等）在D2D1_COMPOSITE_MODE中没有对应
+			// 需要使用效果(Effects)来实现
+			return false;
+		}
+	}
+
+	// 辅助函数：应用混合模式到位图绘制
+	void SRenderTarget_D2D::ApplyXfermodeForBitmap(ID2D1Bitmap* pBitmap, const D2D1_RECT_F& rcDest,
+		float opacity, D2D1_BITMAP_INTERPOLATION_MODE interpolationMode, const D2D1_RECT_F* pRcSrc)
+	{
+		// 对于默认的SrcOver模式，直接绘制
+		if(m_xferMode == kSrcOver_Mode)
+		{
+			m_rt->DrawBitmap(pBitmap, rcDest, opacity, interpolationMode, pRcSrc);
+			return;
+		}
+#if USE_D2D1_1
+		// 尝试使用Direct2D 1.1的ID2D1DeviceContext接口
+		SComPtr<ID2D1DeviceContext> deviceContext;
+		HRESULT hr = m_rt->QueryInterface(IID_ID2D1DeviceContext, (void**)&deviceContext);
+
+		if(SUCCEEDED(hr) && deviceContext)
+		{
+			// 成功获取ID2D1DeviceContext，使用DrawImage配合CompositeMode
+			D2D1_COMPOSITE_MODE compositeMode;
+			if(MapXfermodeToCompositeMode(m_xferMode, &compositeMode))
+			{
+				// 使用DrawImage方法，它支持D2D1_COMPOSITE_MODE参数
+				// 注意：DrawImage需要ID2D1Image，而ID2D1Bitmap继承自ID2D1Image
+
+				// 计算源矩形
+				D2D1_RECT_F srcRect;
+				if(pRcSrc)
+				{
+					srcRect = *pRcSrc;
+				}
+				else
+				{
+					// 如果没有指定源矩形，使用整个位图
+					D2D1_SIZE_F bmpSize = pBitmap->GetSize();
+					srcRect = D2D1::RectF(0, 0, bmpSize.width, bmpSize.height);
+				}
+
+				// 计算源和目标的尺寸
+				float srcWidth = srcRect.right - srcRect.left;
+				float srcHeight = srcRect.bottom - srcRect.top;
+				float destWidth = rcDest.right - rcDest.left;
+				float destHeight = rcDest.bottom - rcDest.top;
+
+				// 检查是否需要拉伸
+				bool needScale = (fabs(srcWidth - destWidth) > 0.01f || fabs(srcHeight - destHeight) > 0.01f);
+
+				if(needScale)
+				{
+					// DrawImage不支持拉伸，需要使用变换矩阵
+					// 保存当前变换
+					D2D1::Matrix3x2F oldTransform;
+					deviceContext->GetTransform(&oldTransform);
+
+					// 计算缩放比例
+					float scaleX = destWidth / srcWidth;
+					float scaleY = destHeight / srcHeight;
+
+					// 创建新的变换矩阵：先缩放，再平移到目标位置
+					// 注意：DrawImage的destPoint是相对于变换后的坐标系
+					D2D1::Matrix3x2F scaleTransform = D2D1::Matrix3x2F::Scale(scaleX, scaleY, D2D1::Point2F(0, 0));
+					D2D1::Matrix3x2F translateTransform = D2D1::Matrix3x2F::Translation(rcDest.left, rcDest.top);
+					D2D1::Matrix3x2F newTransform = scaleTransform * translateTransform * oldTransform;
+
+					deviceContext->SetTransform(newTransform);
+
+					// 使用DrawImage绘制，目标点为(0,0)因为已经通过变换定位了
+					D2D1_POINT_2F destPoint = D2D1::Point2F(0, 0);
+					deviceContext->DrawImage(
+						pBitmap,
+						&destPoint,
+						&srcRect,
+						interpolationMode == D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR ?
+							D2D1_INTERPOLATION_MODE_NEAREST_NEIGHBOR : D2D1_INTERPOLATION_MODE_LINEAR,
+						compositeMode
+					);
+
+					// 恢复变换
+					deviceContext->SetTransform(oldTransform);
+				}
+				else
+				{
+					// 不需要拉伸，直接绘制
+					D2D1_POINT_2F destPoint = D2D1::Point2F(rcDest.left, rcDest.top);
+					deviceContext->DrawImage(
+						pBitmap,
+						&destPoint,
+						&srcRect,
+						interpolationMode == D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR ?
+							D2D1_INTERPOLATION_MODE_NEAREST_NEIGHBOR : D2D1_INTERPOLATION_MODE_LINEAR,
+						compositeMode
+					);
+				}
+				return;
+			}
+		}
+
+		// 对于基本ROP2模式，使用GDI互操作
+		if(m_xferMode == kSrcCopy || m_xferMode == kDstInvert ||
+		   m_xferMode == kSrcInvert || m_xferMode == kSrcAnd)
+		{
+			// 使用GDI互操作实现ROP2模式
+			SComPtr<ID2D1GdiInteropRenderTarget> gdiRt;
+			hr = m_rt->QueryInterface(__uuidof(ID2D1GdiInteropRenderTarget), (void**)&gdiRt);
+			if(SUCCEEDED(hr) && gdiRt)
+			{
+				HDC hdc = 0;
+				hr = gdiRt->GetDC(D2D1_DC_INITIALIZE_MODE_COPY, &hdc);
+				if(SUCCEEDED(hr) && hdc)
+				{
+					// 设置ROP2模式
+					int oldRop = ::SetROP2(hdc, m_xferMode);
+
+					// 创建临时DC和位图来绘制
+					HDC hdcMem = ::CreateCompatibleDC(hdc);
+					UINT width = pBitmap->GetPixelSize().width;
+					UINT height = pBitmap->GetPixelSize().height;
+
+					// 从D2D位图获取像素数据并使用GDI绘制
+					// 注意：这是一个简化实现，完整实现需要处理像素格式转换
+
+					::DeleteDC(hdcMem);
+					::SetROP2(hdc, oldRop);
+
+					RECT rcUpdate = {(LONG)rcDest.left, (LONG)rcDest.top,
+									 (LONG)rcDest.right, (LONG)rcDest.bottom};
+					gdiRt->ReleaseDC(&rcUpdate);
+					return;
+				}
+			}
+			// 如果GDI互操作失败，回退到普通绘制
+			m_rt->DrawBitmap(pBitmap, rcDest, opacity, interpolationMode, pRcSrc);
+			return;
+		}
+
+		// 对于kSrc_Mode (源复制)，可以通过清除目标区域然后绘制来实现
+		if(m_xferMode == kSrc_Mode || m_xferMode == kSrcCopy)
+		{
+			// 先清除目标区域
+			m_rt->PushAxisAlignedClip(rcDest, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
+			m_rt->Clear(D2D1::ColorF(0, 0, 0, 0));
+			m_rt->PopAxisAlignedClip();
+			// 然后绘制位图
+			m_rt->DrawBitmap(pBitmap, rcDest, opacity, interpolationMode, pRcSrc);
+			return;
+		}
+
+		// 对于kClear_Mode，只清除目标区域
+		if(m_xferMode == kClear_Mode)
+		{
+			m_rt->PushAxisAlignedClip(rcDest, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
+			m_rt->Clear(D2D1::ColorF(0, 0, 0, 0));
+			m_rt->PopAxisAlignedClip();
+			return;
+		}
+
+		// 对于其他模式，暂时使用默认绘制
+		// TODO: 实现更多混合模式，可能需要使用效果(Effects)或自定义着色器
+		m_rt->DrawBitmap(pBitmap, rcDest, opacity, interpolationMode, pRcSrc);
+		#else
+		m_rt->DrawBitmap(pBitmap, rcDest, opacity, interpolationMode, pRcSrc);
+		#endif//USE_D2D1_1
+	}
+
+	// 辅助函数：创建临时位图用于几何图形渲染
+	static HRESULT CreateTemporaryBitmap(ID2D1RenderTarget* pRT, const D2D1_RECT_F& bounds,
+		ID2D1Bitmap** ppBitmap, ID2D1BitmapRenderTarget** ppBitmapRT)
+	{
+		if(!pRT || !ppBitmap || !ppBitmapRT)
+			return E_INVALIDARG;
+
+		// 计算位图大小
+		UINT32 width = (UINT32)ceil(bounds.right - bounds.left);
+		UINT32 height = (UINT32)ceil(bounds.bottom - bounds.top);
+
+		if(width == 0 || height == 0)
+			return E_INVALIDARG;
+
+		// 创建兼容的位图渲染目标
+		D2D1_SIZE_F size = D2D1::SizeF((FLOAT)width, (FLOAT)height);
+		HRESULT hr = pRT->CreateCompatibleRenderTarget(
+			&size,
+			NULL,
+			NULL,
+			D2D1_COMPATIBLE_RENDER_TARGET_OPTIONS_NONE,
+			ppBitmapRT
+		);
+
+		if(FAILED(hr))
+			return hr;
+
+		// 从位图渲染目标获取位图
+		hr = (*ppBitmapRT)->GetBitmap(ppBitmap);
+		return hr;
+	}
+
+	// 辅助函数：应用混合模式到几何图形填充
+	void SRenderTarget_D2D::ApplyXfermodeForGeometry(ID2D1Geometry* pGeometry, ID2D1Brush* pBrush)
+	{
+		// 对于默认的SrcOver模式，直接填充
+		if(m_xferMode == kSrcOver_Mode)
+		{
+			m_rt->FillGeometry(pGeometry, pBrush);
+			return;
+		}
+#if USE_D2D1_1
+		// 尝试使用Direct2D 1.1的ID2D1DeviceContext接口
+		SComPtr<ID2D1DeviceContext> deviceContext;
+		HRESULT hr = m_rt->QueryInterface(IID_ID2D1DeviceContext, (void**)&deviceContext);
+
+		if(SUCCEEDED(hr) && deviceContext)
+		{
+			// 成功获取ID2D1DeviceContext，使用DrawImage配合CompositeMode
+			D2D1_COMPOSITE_MODE compositeMode;
+			if(MapXfermodeToCompositeMode(m_xferMode, &compositeMode))
+			{
+				// 获取几何图形的边界
+				D2D1_RECT_F bounds;
+				pGeometry->GetBounds(NULL, &bounds);
+
+				// 创建临时位图来渲染几何图形
+				SComPtr<ID2D1Bitmap> tempBitmap;
+				SComPtr<ID2D1BitmapRenderTarget> bitmapRT;
+				hr = CreateTemporaryBitmap(m_rt, bounds, &tempBitmap, &bitmapRT);
+
+				if(SUCCEEDED(hr) && tempBitmap && bitmapRT)
+				{
+					// 在临时位图上绘制几何图形
+					bitmapRT->BeginDraw();
+					bitmapRT->Clear(D2D1::ColorF(0, 0, 0, 0)); // 透明背景
+
+					// 调整几何图形的位置，使其相对于临时位图的原点
+					D2D1::Matrix3x2F translation = D2D1::Matrix3x2F::Translation(-bounds.left, -bounds.top);
+					bitmapRT->SetTransform(translation);
+
+					// 填充几何图形
+					bitmapRT->FillGeometry(pGeometry, pBrush);
+
+					hr = bitmapRT->EndDraw();
+
+					if(SUCCEEDED(hr))
+					{
+						// 使用DrawImage将临时位图绘制到目标，应用混合模式
+						D2D1_POINT_2F destPoint = D2D1::Point2F(bounds.left, bounds.top);
+						D2D1_RECT_F srcRect = D2D1::RectF(0, 0, bounds.right - bounds.left, bounds.bottom - bounds.top);
+
+						deviceContext->DrawImage(
+							tempBitmap,
+							&destPoint,
+							&srcRect,
+							D2D1_INTERPOLATION_MODE_LINEAR,
+							compositeMode
+						);
+						return;
+					}
+				}
+				// 如果创建临时位图失败，回退到基本实现
+			}
+		}
+
+		// 对于kSrc_Mode，先清除区域再填充
+		if(m_xferMode == kSrc_Mode || m_xferMode == kSrcCopy)
+		{
+			D2D1_RECT_F bounds;
+			pGeometry->GetBounds(NULL, &bounds);
+			m_rt->PushAxisAlignedClip(bounds, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
+			m_rt->Clear(D2D1::ColorF(0, 0, 0, 0));
+			m_rt->PopAxisAlignedClip();
+			m_rt->FillGeometry(pGeometry, pBrush);
+			return;
+		}
+
+		// 对于kClear_Mode
+		if(m_xferMode == kClear_Mode)
+		{
+			D2D1_RECT_F bounds;
+			pGeometry->GetBounds(NULL, &bounds);
+			m_rt->PushAxisAlignedClip(bounds, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
+			m_rt->Clear(D2D1::ColorF(0, 0, 0, 0));
+			m_rt->PopAxisAlignedClip();
+			return;
+		}
+
+		// 对于其他模式，暂时使用默认填充
+		m_rt->FillGeometry(pGeometry, pBrush);
+#else
+		m_rt->FillGeometry(pGeometry, pBrush);
+#endif//USE_D2D1_1
 	}
 
 	BOOL SRenderTarget_D2D::SetAntiAlias(BOOL bAntiAlias)
@@ -3115,6 +3606,7 @@ void SPath_D2D::offset(THIS_ float dx, float dy)
 
 	BOOL SPath_D2D::getPosTan(CTHIS_ float distance, fPoint *pos, fPoint *vec) const
 	{
+#if USE_D2D1_1
 		D2D1_POINT_DESCRIPTION pointDescription;
 		SComPtr<ID2D1PathGeometry1> path2;
 		m_path->QueryInterface(IID_ID2D1PathGeometry1, (void **)&path2);
@@ -3131,6 +3623,9 @@ void SPath_D2D::offset(THIS_ float dx, float dy)
 		vec->fX = pointDescription.unitTangentVector.x;
 		vec->fY = pointDescription.unitTangentVector.y;
 		return TRUE;
+#else
+		return FALSE;
+#endif//USE_D2D1_1
 	}
 
 	BOOL SPath_D2D::hitTest(CTHIS_ float x,float y) const

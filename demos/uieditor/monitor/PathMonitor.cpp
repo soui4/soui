@@ -12,11 +12,14 @@ void CPathMonitor::GetFilesInDirectory(const tstring& directory,std::vector<CPat
     
     if (hFind != INVALID_HANDLE_VALUE) {
         do {
-            // 只关注文件，忽略目录
             if ((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			{
 				if(_tcscmp(fd.cFileName,_T("."))!=0 && _tcscmp(fd.cFileName,_T(".."))!=0)
 				{
+					_FileInfo fi;
+					fi.path = directory + _T("/") + fd.cFileName;
+					fi.tLastModify = fd.ftLastWriteTime;
+					files.push_back(fi);
 					GetFilesInDirectory(directory + _T("/") + fd.cFileName, files);
 				}
 			}
@@ -70,12 +73,36 @@ std::vector<CPathMonitor::_FileChange> CPathMonitor::FindModifiedFiles(
     }
     return modified_files;
 }
-CPathMonitor::CPathMonitor(IListener *pListener):m_pListener(pListener)
+CPathMonitor::CPathMonitor()
 {
+	InitializeCriticalSection(&m_csListeners);
 }
 
 CPathMonitor::~CPathMonitor(void)
 {
+	DeleteCriticalSection(&m_csListeners);
+}
+
+void CPathMonitor::AddListener(IListener *pListener)
+{
+	if (!pListener) return;
+	
+	EnterCriticalSection(&m_csListeners);
+	m_listeners.push_back(pListener);
+	LeaveCriticalSection(&m_csListeners);
+}
+
+void CPathMonitor::RemoveListener(IListener *pListener)
+{
+	if (!pListener) return;
+	
+	EnterCriticalSection(&m_csListeners);
+	ListenerList::iterator it = std::find(m_listeners.begin(), m_listeners.end(), pListener);
+	if (it != m_listeners.end())
+	{
+		m_listeners.erase(it);
+	}
+	LeaveCriticalSection(&m_csListeners);
 }
 
 UINT CPathMonitor::Run()
@@ -83,6 +110,8 @@ UINT CPathMonitor::Run()
 	HANDLE h = FindFirstChangeNotification(m_strPath.c_str(), TRUE, FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME);
 	if (h != INVALID_HANDLE_VALUE)
 	{
+        GetFilesInDirectory(m_strPath, m_files);
+
 		HANDLE hs[2] = { m_evtStop, h };
 
 		for (;;)
@@ -95,10 +124,18 @@ UINT CPathMonitor::Run()
 			FileInfoList files;
 			GetFilesInDirectory(m_strPath.c_str(),files);
 			FileChangeList modified_files = FindModifiedFiles(m_files, files);
-			for (FileChangeList::iterator it= modified_files.begin();it!=modified_files.end();++it)
+			
+			// 通知所有监听器
+			EnterCriticalSection(&m_csListeners);
+			for (ListenerList::iterator listener_it = m_listeners.begin(); listener_it != m_listeners.end(); ++listener_it)
 			{
-				m_pListener->OnFileChanged(it->path.c_str(),it->nFlag);
-			} 
+				for (FileChangeList::iterator file_it = modified_files.begin(); file_it != modified_files.end(); ++file_it)
+				{
+					(*listener_it)->OnFileChanged(file_it->path.c_str(), file_it->nFlag);
+				}
+			}
+			LeaveCriticalSection(&m_csListeners);
+			
 			m_files = files;
 			
 			if (!FindNextChangeNotification(h))
@@ -116,7 +153,6 @@ void CPathMonitor::SetPath(LPCTSTR pszPath)
 		EndThread();
 	m_strPath = pszPath;
 	m_files.clear();
-	GetFilesInDirectory(pszPath,m_files);
 	BeginThread();
 }
 

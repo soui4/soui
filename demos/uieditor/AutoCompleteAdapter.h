@@ -59,9 +59,6 @@ public:
         
         SWindow *pTxtPath = pItem->FindChildByID(R.id.txt_path);
         pTxtPath->SetWindowText(m_vecImage[position].strPath);
-
-        //SImageWnd *pImgPreview = pItem->FindChildByID2<SImageWnd>(R.id.skin_preview);
-        //pImgPreview->SetAttribute(L"src",m_vecImage[position].strImage);
     }
 };
 

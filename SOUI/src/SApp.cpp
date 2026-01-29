@@ -196,6 +196,7 @@ void SObjectDefaultRegister::RegisterSkins(SObjectFactoryMgr *objFactory) const
     objFactory->TplRegisterFactory<SSkinColorRect>();
     objFactory->TplRegisterFactory<SSkinShape>();
     objFactory->TplRegisterFactory<SSKinGroup>();
+    objFactory->TplRegisterFactory<SSkinTreeLines>();
 }
 
 void SObjectDefaultRegister::RegisterLayouts(SObjectFactoryMgr *objFactory) const

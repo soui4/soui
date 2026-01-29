@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "XmlEditor.h"
 #include "core/SWnd.h"
 #include "MainDlg.h"
@@ -10,6 +10,7 @@
 #include <helper/SFunctor.hpp>
 #include <control/SRealWnd.h>
 #include <SouiFactory.h>
+#include <sstream>
 #ifdef _WIN32
 #include <shlwapi.h>
 #endif//_WIN32
@@ -41,11 +42,11 @@ void CXmlEditor::SetProjectPath(const SStringT & strProjPath)
 {
 	if(!m_strProPath.IsEmpty())
 		return;
-	int pos = strProjPath.ReverseFind(SLASH);
+    m_strProPath = strProjPath;
+    m_strProPath.ReplaceChar(_T('\\'), _T('/'));
+    int pos = m_strProPath.ReverseFind(_T('/'));
 	if(pos!=-1)
-		m_strProPath = strProjPath.Left(pos);
-	else
-		m_strProPath = strProjPath;
+        m_strProPath = m_strProPath.Left(pos);
 }
 
 BOOL CXmlEditor::CloseProject()
@@ -78,32 +79,50 @@ void CXmlEditor::StartPreviewProcess()
 BOOL CXmlEditor::LoadXml(SStringT strFileName, SStringT layoutName)
 {
 	m_bChanged = FALSE;
-	m_strXmlFile = strFileName;
-	m_strXmlFile.ReplaceChar(_T('\\'),_T('/'));
+    strFileName.ReplaceChar(_T('\\'), _T('/'));
 	m_strLayoutName = layoutName;
 	m_pScintillaWnd->SendMessage(SCI_SETREADONLY, 0, 0);
-	SStringT strPath = m_strProPath + TPATH_SLASH + m_strXmlFile;
-	m_pScintillaWnd->OpenFile(strPath);
+    if (strFileName.StartsWith(m_strProPath))
+    {
+        m_strXmlFile = strFileName;
+    }
+    else
+    {
+        m_strXmlFile = m_strProPath + _T("/") + strFileName;
+    }
+    m_pScintillaWnd->OpenFile(m_strXmlFile);
 	m_nCaretPos = m_pScintillaWnd->SendEditor(SCI_GETCURRENTPOS);
     m_bSetCaretPos = FALSE;
 	m_treeXmlStruct->RemoveAllItems();
+
+	SSplitWnd * split_xml_editor_main = m_pRoot->FindChildByID2<SSplitWnd>(R.id.xml_editor_main);
+    SSplitWnd *splite_xml_editor_sub = m_pRoot->FindChildByID2<SSplitWnd>(R.id.xml_editor_sub);
+
 	if(!layoutName.IsEmpty())
 	{
-		m_xml_editor->ShowPane(0);
+		splite_xml_editor_sub->ShowPane(0);
+        split_xml_editor_main->ShowPane(1);
 		StartPreviewProcess();
 	}else
 	{
-		m_xml_editor->HidePane(0);
-	}
+		splite_xml_editor_sub->HidePane(0);
+        split_xml_editor_main->HidePane(1);
+    }
 
 	return TRUE;
 }
 
 void CXmlEditor::UpdateXmlData()
 {
-	SStringA strUtf8=m_pScintillaWnd->GetWindowText();
-	m_bValidXml=m_xmlParser.loadUtf8(strUtf8,strUtf8.GetLength());
 	m_treeXmlStruct->RemoveAllItems();
+
+	SStringA strUtf8=m_pScintillaWnd->GetWindowText();
+    if (strUtf8.IsEmpty())
+	{
+		m_bValidXml = FALSE;
+		return;
+    }
+	m_bValidXml=m_xmlParser.loadUtf8(strUtf8,strUtf8.GetLength());
 
 	spugi::xml_node root = m_xmlParser.first_child();
 	UpdateXmlStruct(root, STVI_ROOT);
@@ -132,7 +151,7 @@ bool CXmlEditor::SaveFile()
 		return false;
 	}
 	
-	return m_pScintillaWnd->SaveFile(m_strProPath + TPATH_SLASH+ m_strXmlFile);
+	return m_pScintillaWnd->SaveFile(m_strXmlFile);
 }
 
 bool CXmlEditor::UpdateXmlStruct(spugi::xml_node xmlNode, HSTREEITEM item,int iSib)
@@ -326,13 +345,13 @@ void CXmlEditor::OnPropGridValueChanged(IEvtArgs *e)
 	if(nr.begin!=-1)
 	{
 		m_bSetCaretPos = TRUE;
-		if(bSetText)
+        if (bSetText || nr._break == -1)
 		{
 			SStringW strXml;
 			xmlNode.ToString(&strXml);
 			m_pScintillaWnd->SetSel(nr.begin,nr.end);
 			m_pScintillaWnd->ReplaseSel(S_CW2A(strXml,CP_UTF8));
-		}else if(nr._break!=-1){
+		}else{
 			//update attribute value
 			SStringW strXml= SStringW().Format(L"<%s",xmlNode.name());
 			for(SXmlAttr attr = xmlNode.first_attribute();attr;attr = attr.next_attribute()){
@@ -450,8 +469,8 @@ void CXmlEditor::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
 
 void CXmlEditor::Init(SWindow * pRoot,CScintillaWnd::IListener *pListener)
 {
+    m_pRoot = pRoot;
 	m_treeXmlStruct = pRoot->FindChildByName2<STreeCtrl>(L"uidesigner_wnd_xmltree");
-	m_xml_editor = pRoot->FindChildByName2<SSplitWnd>("xml_editor");
 	{
 		SRealWnd *pRealWnd  = pRoot->FindChildByName2<SRealWnd>(L"uidesigner_wnd_layout");
 		m_pDesignWnd = (CDesignWnd*)pRealWnd->GetUserData();
@@ -715,4 +734,46 @@ void CXmlEditor::UpdatePropGridLayout()
 
     m_pPropGrid->GetEventSet()->setMutedState(FALSE);
 }
+
+
+void CXmlEditor::OnSaveXml()
+{
+	if(!isValidXml())
+	{
+		if(IDCANCEL == SMessageBox(m_pMainDlg->m_hWnd,_T("编辑器中的XML文件格式有错误,确定要保存吗?"),_T("提示"),MB_OKCANCEL))
+			return ;
+	}
+	SaveFile();
+}
+
+class StreamWrite: public pugi::xml_writer
+	{
+	public:
+		virtual ~StreamWrite() {}
+
+		// Write memory chunk into stream/file/whatever
+		virtual void write(const void* data, size_t size){
+			m_stream.write((const char*)data, size);
+		}
+
+		public:
+		std::stringstream m_stream;
+	};
+
+void CXmlEditor::OnFormatXml()
+{
+	SStringA strXml = m_pScintillaWnd->GetWindowText();
+    pugi::xml_document xmlDoc;
+    if (!xmlDoc.load_buffer(strXml.c_str(), strXml.GetLength(), pugi::parse_full, pugi::encoding_utf8))
+    {
+    
+		SMessageBox(m_pMainDlg->m_hWnd, _T("XML格式有错误，无法格式化!"), _T("提示"), MB_OK);
+        return;
+    }
+	StreamWrite writer;
+    xmlDoc.save(writer, L"\t", pugi::format_default, pugi::encoding_utf8);
+    m_pScintillaWnd->SetSel(0, -1);
+	m_pScintillaWnd->ReplaseSel(writer.m_stream.str().c_str());
+}
+
 SNSEND

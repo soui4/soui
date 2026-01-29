@@ -38,18 +38,9 @@ void SListViewDataSetObserver::OnItemChanged(int iItem)
 
 //////////////////////////////////////////////////////////////////////////
 SListView::SListView()
-    : m_iSelItem(-1)
-    , m_iFirstVisible(-1)
-    , m_pHoverItem(NULL)
-    , m_itemCapture(NULL)
+    : SViewBase(this)
     , m_pSkinDivider(NULL)
-    , m_bWantTab(FALSE)
-    , m_bDataSetInvalidated(FALSE)
-    , m_bPendingUpdate(false)
-    , m_iPendingUpdateItem(-2)
-    , m_iPendingViewItem(-1)
     , m_bVertical(TRUE)
-    , SHostProxy(this)
 {
     m_bFocusable = TRUE;
     m_observer.Attach(new SListViewDataSetObserver(this));
@@ -219,7 +210,7 @@ void SListView::onDataSetChanged()
 
 void SListView::onDataSetInvalidated()
 {
-    m_bDataSetInvalidated = TRUE;
+    m_bDatasetInvalidated = TRUE;
     Invalidate();
 }
 
@@ -246,10 +237,10 @@ void SListView::onItemDataChanged(int iItem)
 
 void SListView::OnPaint(IRenderTarget *pRT)
 {
-    if (m_bDataSetInvalidated)
+    if (m_bDatasetInvalidated)
     {
         UpdateVisibleItems();
-        m_bDataSetInvalidated = FALSE;
+        m_bDatasetInvalidated = FALSE;
     }
 
     SPainter duiDC;
@@ -374,7 +365,7 @@ void SListView::UpdateVisibleItems()
             DWORD dwState = WndState_Normal;
             if (iHoverItem == iNewLastVisible)
                 dwState |= WndState_Hover;
-            if (m_iSelItem == iNewLastVisible)
+            if (IsItemSelected(iNewLastVisible))
                 dwState |= WndState_Check;
 
             ItemInfo ii = { NULL, -1 };
@@ -740,6 +731,51 @@ void SListView::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
         return;
     }
 
+    BOOL bCtrlPressed = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
+    BOOL bShiftPressed = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
+    BOOL bMultiSelMode = GetMultiSel();
+
+    // Handle space key to toggle selection
+    if (nChar == VK_SPACE && m_iSelItem != -1)
+    {
+        if (bMultiSelMode)
+        {
+            if (IsItemSelected(m_iSelItem))
+            {
+                RemoveSelItem(m_iSelItem);
+            }
+            else
+            {
+                AddSelItem(m_iSelItem);
+            }
+            return;
+        }
+        else
+        {
+            SetMsgHandled(FALSE);
+            return;
+        }
+    }
+
+    // Handle Ctrl+A to select all
+    if (bCtrlPressed && nChar == 'A')
+    {
+        if (bMultiSelMode)
+        {
+            ClearSelItems();
+            for (int i = 0; i < m_adapter->getCount(); i++)
+            {
+                AddSelItem(i);
+            }
+            return;
+        }
+        else
+        {
+            SetMsgHandled(FALSE);
+            return;
+        }
+    }
+
     if (nChar == VK_DOWN && m_iSelItem < m_adapter->getCount() - 1)
         nNewSelItem = m_iSelItem + 1;
     else if (nChar == VK_UP && m_iSelItem > 0)
@@ -780,7 +816,38 @@ void SListView::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
     if (nNewSelItem != -1)
     {
         EnsureVisible(nNewSelItem);
-        SetSel(nNewSelItem, TRUE);
+        
+        if (bMultiSelMode)
+        {
+            if (bCtrlPressed)
+            {
+                // Ctrl + arrow: move focus without changing selection
+                m_iSelItem = nNewSelItem;
+                // Update visible items to reflect the new focus
+                UpdateVisibleItems();
+            }
+            else if (bShiftPressed)
+            {
+                // Shift + arrow: extend selection from current to new item
+                int iStart = smin(m_iSelItem, nNewSelItem);
+                int iEnd = smax(m_iSelItem, nNewSelItem);
+                for (int i = iStart; i <= iEnd; i++)
+                {
+                    AddSelItem(i);
+                }
+                m_iSelItem = nNewSelItem;
+            }
+            else
+            {
+                // Normal arrow: clear selection and select new item
+                SetSel(nNewSelItem, TRUE);
+            }
+        }
+        else
+        {
+            // Single selection mode
+            SetSel(nNewSelItem, TRUE);
+        }
     }
     else
     {
@@ -951,24 +1018,8 @@ void SListView::SetSel(int iItem, BOOL bNotify)
         }
     }
 
-    if (nOldSel == nNewSel)
-        return;
-
-    m_iSelItem = nOldSel;
-    SItemPanel *pItem = GetItemPanel(nOldSel);
-    if (pItem)
-    {
-        pItem->GetFocusManager()->ClearFocus();
-        pItem->ModifyItemState(0, WndState_Check);
-        RedrawItem(pItem);
-    }
-    m_iSelItem = nNewSel;
-    pItem = GetItemPanel(nNewSel);
-    if (pItem)
-    {
-        pItem->ModifyItemState(WndState_Check, 0);
-        RedrawItem(pItem);
-    }
+    // Use the base class method to handle the selection change
+    HandleSelectionChange(nOldSel, nNewSel);
 
     if (bNotify)
     {
@@ -1147,6 +1198,38 @@ void SListView::GetDesiredSize(THIS_ SIZE *psz, int nParentWid, int nParentHei)
         if (nParentHei > 0 && psz->cy > nParentHei)
             psz->cy = nParentHei;
     }
+}
+
+void SListView::SetMultiSel(BOOL bMultiSel) {
+    SViewBase::SetMultiSel(bMultiSel);
+}
+
+BOOL SListView::GetMultiSel() const {
+    return SViewBase::GetMultiSel();
+}
+
+void SListView::AddSelItem(int iItem) {
+    SViewBase::AddSelItem(iItem);
+}
+
+void SListView::RemoveSelItem(int iItem) {
+    SViewBase::RemoveSelItem(iItem);
+}
+
+void SListView::ClearSelItems() {
+    SViewBase::ClearSelItems();
+}
+
+BOOL SListView::IsItemSelected(int iItem) const {
+    return SViewBase::IsItemSelected(iItem);
+}
+
+int SListView::GetSelItemCount() const {
+    return SViewBase::GetSelItemCount();
+}
+
+int SListView::GetSelItems(int *items, int nMaxCount) const {
+    return SViewBase::GetSelItems(items, nMaxCount);
 }
 
 SNSEND

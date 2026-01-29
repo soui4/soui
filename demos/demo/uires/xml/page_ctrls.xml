@@ -45,7 +45,7 @@
 	</grouplist>
 	<tabctrl pos="[0,0,-0,-0" name="tab_ctrls" font="style:StrokeAndFill,blurStyle:solid,blurRadius:3" animateSteps="10" animateType="1" tabHeight="0">
     <page title="mclistview">
-      <mclistview name="mclv_test" colorBkgnd="@color/white" pos="10,10,-10,-10" headerHeight="30" colorGrid="@color/red">
+      <mclistview name="mclv_test" multiSel="1" colorBkgnd="@color/white" pos="10,10,-10,-10" headerHeight="30" colorGrid="@color/red">
         <headerStyle wndclass="header" align="center" name="mclv_test_header" sortSkin="skin_lcex_header_arrow" itemSkin="skin_lcex_header" itemSwapEnable="1" fixWidth="0" font="underline:0,adding:-3" sortHeader="1" colorBkgnd="#ffffff">
           <items>
             <item weight="480" align="left">@string/mccol_1</item>

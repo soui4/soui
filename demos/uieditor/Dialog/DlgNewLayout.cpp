@@ -6,9 +6,10 @@
 namespace SOUI
 {
 
-	SDlgNewLayout::SDlgNewLayout(LPCTSTR pszXmlName, SStringT strProPath):SHostDialog(pszXmlName)
+	SDlgNewLayout::SDlgNewLayout(LPCTSTR pszXmlName, SStringT strProPath,SStringT strFolder):SHostDialog(pszXmlName)
 	{
 		m_strProPath = strProPath;
+		m_strFolder = strFolder;
 	}
 
 	//TODO:消息映射
@@ -44,7 +45,7 @@ namespace SOUI
 		if (e2->iNotify != EN_CHANGE) return;
 		SEdit *pEdit = sobj_cast<SEdit>(e->Sender());
 		SStringT resname = pEdit->GetWindowText();
-		m_edtPath->SetWindowText(m_strProPath + _T("\\xml\\") + resname + _T(".xml"));
+		m_edtPath->SetWindowText(m_strProPath + TPATH_SLASH + m_strFolder + TPATH_SLASH + resname + _T(".xml"));
 	}
 
 	BOOL SDlgNewLayout::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
@@ -53,7 +54,7 @@ namespace SOUI
 		m_edtPath = FindChildByName2<SEdit>(L"new_layout_path");
 
 		m_edtName->SSendMessage(EM_SETEVENTMASK, 0, ENM_CHANGE);
-		m_edtPath->SetWindowText(m_strProPath + _T("\\xml\\"));
+		m_edtPath->SetWindowText(m_strProPath + TPATH_SLASH + m_strFolder);
 		return TRUE;
 	}
 

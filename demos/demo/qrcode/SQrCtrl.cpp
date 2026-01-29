@@ -35,6 +35,7 @@ void SQrCtrl::MakeCacheApha( ISkinObj *pSkin, IBitmapS *_pBitCache, IBitmapS *_p
 {
 	SAutoRefPtr<IRenderTarget> pRTDst;
 	GETRENDERFACTORY->CreateRenderTarget(&pRTDst, 0, 0);
+	pRTDst->BeginDraw();
 	SAutoRefPtr<IRenderObj> pOldBmp;
 	pRTDst->SelectObject(_pBitCache, &pOldBmp);
 	CRect rc(CPoint(0, 0), _pBitCache->Size());
@@ -54,6 +55,7 @@ void SQrCtrl::MakeCacheApha( ISkinObj *pSkin, IBitmapS *_pBitCache, IBitmapS *_p
 		pRTDst->DrawBitmapEx(rc, _pBitMask, rcSrc, MAKELONG(EM_STRETCH, m_fl),0xff);
 		pRTDst->SelectObject(pOldBmp,NULL);
 	}
+	pRTDst->EndDraw();
 
 
 	int nDesLinePixels = _pBitCache->Width();

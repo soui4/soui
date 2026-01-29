@@ -1,9 +1,9 @@
 ﻿#ifndef __SADAPTERBASE__H__
 #define __SADAPTERBASE__H__
 
-#include "interface/SAdapter-i.h"
+#include <interface/SAdapter-i.h>
 #include <souicoll.h>
-#include "control/STree.h"
+#include <control/STree.h>
 
 SNSBEGIN
 
@@ -1100,6 +1100,18 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter>> {
      * @return 数据对象引用
      */
     const T &GetItemData(HSTREEITEM hItem) const
+    {
+        SASSERT(hItem != STVI_ROOT);
+        ItemInfo &ii = m_tree.GetItemRef((HSTREEITEM)hItem);
+        return ii.data;
+    }
+
+    /**
+     * @brief 获取项数据
+     * @param hItem 项句柄
+     * @return 数据对象引用
+     */
+    T &GetItemData(HSTREEITEM hItem)
     {
         SASSERT(hItem != STVI_ROOT);
         ItemInfo &ii = m_tree.GetItemRef((HSTREEITEM)hItem);

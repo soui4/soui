@@ -1,17 +1,13 @@
 ﻿#include "stdafx.h"
 #include "MainDlg.h"
-#include "SImageBtnEx.h"
 #include "SouiRealWndHandler.h"
-#include "SImgCanvas.h"
 #include "CmdLine.h"
 #include <helper/SAppDir.h>
-#include <interface/SMessageBox-i.h>
 #include <SAppCfg.h>
-#include "SCtrlsRegister.h"
+#include <SCtrlsRegister.h>
 #include "AttrStorage.h"
 #include "designer/SizingFrame.h"
 #include "SysdataMgr.h"
-#pragma comment(lib, "shlwapi.lib")
 
 
 //定义唯一的一个R,UIRES对象,ROBJ_IN_CPP是resource.h中定义的宏。
@@ -96,8 +92,6 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 
     Scintilla_RegisterClasses(hInstance);
 
-    theApp.RegisterWindowClass<SImageBtnEx>();
-    theApp.RegisterWindowClass<SImgCanvas>();
     theApp.RegisterWindowClass<SSizingFrame>();
     // 注册扩展控件
     SCtrlsRegister::RegisterCtrls(&theApp);

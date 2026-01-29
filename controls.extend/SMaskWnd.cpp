@@ -18,6 +18,7 @@ namespace SOUI
 			SAutoRefPtr<IRenderTarget> pRT;
 			CRect rcWnd = GetWindowRect();
 			GETRENDERFACTORY->CreateRenderTarget(&pRT, rcWnd.Width(), rcWnd.Height());
+			pRT->BeginDraw();
 			pRT->OffsetViewportOrg(-rcWnd.left, -rcWnd.top);
 			pRT->ClearRect(&rcWnd, 0);
 			pRT->BitBlt(&rcWnd, pRtDest, pRcDest->left, pRcDest->top, SRCCOPY);
@@ -26,6 +27,7 @@ namespace SOUI
 			MakeCacheApha(pBmp);
 			pRT->SetXfermode(kSrcIn_Mode, NULL);
 			pRT->AlphaBlend(&rcWnd, pRtSrc, &rcWnd, 255);
+			pRT->EndDraw();
 			pRtDest->AlphaBlend(pRcDest, pRT, &rcWnd, alpha);
 		}
 		else {
@@ -105,11 +107,13 @@ namespace SOUI
 			m_bmpMaskTemp->Init(rccache.Width(), rccache.Height(), NULL);
 			SAutoRefPtr<IRenderTarget> pRT;
 			GETRENDERFACTORY->CreateRenderTarget(&pRT, rccache.Width(), rccache.Height());
+			pRT->BeginDraw();
 			SAutoRefPtr<IRenderObj> pOldBmp;
 			pRT->SelectObject(m_bmpMaskTemp, &pOldBmp);
 			CRect rcmask(CPoint(0, 0), m_bmpMask->Size());
 			pRT->DrawBitmapEx(&rccache, m_bmpMask, &rcmask, MAKELONG(EM_STRETCH, kHigh_FilterLevel), 255);
 			pRT->SelectObject(pOldBmp, NULL);
+			pRT->EndDraw();
 		}
 	}
 

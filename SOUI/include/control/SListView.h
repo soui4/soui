@@ -6,13 +6,13 @@
 #include <interface/SAdapter-i.h>
 #include <interface/SListViewItemLocator-i.h>
 #include <proxy/SPanelProxy.h>
+#include "SViewBase.h"
 
 SNSBEGIN
 
 class SOUI_EXP SListView
     : public TPanelProxy<IListView>
-    , protected SHostProxy
-    , protected IItemContainer {
+    , public SViewBase {
     DEF_SOBJECT(SPanel, L"listview")
 
     friend class SListViewDataSetObserver;
@@ -80,6 +80,57 @@ class SOUI_EXP SListView
     STDMETHOD_(IItemPanel *, HitTest)(THIS_ const POINT *pt) SCONST OVERRIDE;
 
     /**
+     * @brief Sets the multiple selection mode.
+     * @param bMultiSel TRUE to enable multiple selection, FALSE otherwise.
+     */
+    STDMETHOD_(void, SetMultiSel)(THIS_ BOOL bMultiSel) OVERRIDE;
+    
+    /**
+     * @brief Gets the multiple selection mode.
+     * @return TRUE if multiple selection is enabled, FALSE otherwise.
+     */
+    STDMETHOD_(BOOL, GetMultiSel)(CTHIS) SCONST OVERRIDE;
+    
+    /**
+     * @brief Adds an item to the selection.
+     * @param iItem Index of the item.
+     */
+    STDMETHOD_(void, AddSelItem)(THIS_ int iItem) OVERRIDE;
+    
+    /**
+     * @brief Removes an item from the selection.
+     * @param iItem Index of the item.
+     */
+    STDMETHOD_(void, RemoveSelItem)(THIS_ int iItem) OVERRIDE;
+    
+    /**
+     * @brief Clears all selected items.
+     */
+    STDMETHOD_(void, ClearSelItems)(THIS) OVERRIDE;
+    
+    /**
+     * @brief Checks if an item is selected.
+     * @param iItem Index of the item.
+     * @return TRUE if the item is selected, FALSE otherwise.
+     */
+    STDMETHOD_(BOOL, IsItemSelected)(THIS_ int iItem) SCONST OVERRIDE;
+    
+    /**
+     * @brief Gets the count of selected items.
+     * @return Number of selected items.
+     */
+    STDMETHOD_(int, GetSelItemCount)(CTHIS) SCONST OVERRIDE;
+    
+    /**
+     * @brief Gets all selected items.
+     * @param items Output parameter to store the selected item indices.
+     * @param nMaxCount Maximum number of items to retrieve.
+     * @return Number of selected items.
+     */
+    STDMETHOD_(int, GetSelItems)(THIS_ int *items, int nMaxCount) SCONST OVERRIDE;
+    
+  public:
+    /**
      * @brief Hit test to determine the item under the mouse
      * @param pt Mouse coordinates
      * @return Pointer to the item panel if found, NULL otherwise
@@ -93,47 +144,6 @@ class SOUI_EXP SListView
      * @param nParentHei Parent container height
      */
     STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *psz, int nParentWid, int nParentHei) OVERRIDE;
-
-  protected:
-    /**
-     * @brief Handle item capture
-     * @param pItem Pointer to the item panel
-     * @param bCapture Capture flag
-     */
-    virtual void OnItemSetCapture(SOsrPanel *pItem, BOOL bCapture);
-
-    /**
-     * @brief Get the rectangle of an item
-     * @param pItem Pointer to the item panel
-     * @param rcItem Output rectangle
-     * @return TRUE if successful, FALSE otherwise
-     */
-    virtual BOOL OnItemGetRect(const SOsrPanel *pItem, CRect &rcItem) const;
-
-    /**
-     * @brief Check if item redraw is delayed
-     * @return TRUE if redraw is delayed, FALSE otherwise
-     */
-    virtual BOOL IsItemRedrawDelay() const;
-
-    virtual BOOL IsTimelineEnabled() const;
-
-  protected:
-    /**
-     * @brief Handle data set changed event
-     */
-    void onDataSetChanged();
-
-    /**
-     * @brief Handle data set invalidated event
-     */
-    void onDataSetInvalidated();
-
-    /**
-     * @brief Handle item data changed event
-     * @param iItem Index of the item
-     */
-    void onItemDataChanged(int iItem);
 
   protected:
     /**
@@ -176,42 +186,12 @@ class SOUI_EXP SListView
     virtual BOOL UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo);
 
     /**
-     * @brief Get the dialog code
-     * @return Dialog code
-     */
-    virtual UINT WINAPI OnGetDlgCode() const;
-
-    /**
      * @brief Handle set cursor event
      * @param pt Mouse coordinates
      * @return TRUE if handled, FALSE otherwise
      */
     virtual BOOL OnSetCursor(const CPoint &pt);
 
-    /**
-     * @brief Handle colorization event
-     * @param cr Color reference
-     */
-    virtual void OnColorize(COLORREF cr);
-
-    /**
-     * @brief Handle scale change event
-     * @param nScale Scale factor
-     */
-    virtual void OnScaleChanged(int nScale);
-
-    /**
-     * @brief Handle language change event
-     * @return HRESULT
-     */
-    virtual HRESULT OnLanguageChanged();
-
-    /**
-     * @brief Handle rebuild font event
-     */
-    virtual void OnRebuildFont();
-
-  protected:
     /**
      * @brief Dispatch messages to items
      * @param uMsg Message identifier
@@ -226,28 +206,22 @@ class SOUI_EXP SListView
     void UpdateScrollBar();
 
     /**
-     * @brief Redraw a specific item
-     * @param pItem Pointer to the item panel
-     */
-    void RedrawItem(SOsrPanel *pItem);
-
-    /**
      * @brief Get the item panel for a specific item
      * @param iItem Index of the item
      * @return Pointer to the item panel
      */
-    SItemPanel *GetItemPanel(int iItem);
+    SItemPanel *GetItemPanel(int iItem) override;
 
     /**
      * @brief Update visible items
      */
-    void UpdateVisibleItems();
+    void UpdateVisibleItems() override;
 
     /**
      * @brief Update a specific visible item
      * @param iItem Index of the item
      */
-    void UpdateVisibleItem(int iItem);
+    void UpdateVisibleItem(int iItem) override;
 
     /**
      * @brief Paint the control
@@ -294,11 +268,6 @@ class SOUI_EXP SListView
     void OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags);
 
     /**
-     * @brief Handle mouse leave event
-     */
-    void OnMouseLeave();
-
-    /**
      * @brief Handle mouse wheel event
      * @param nFlags Flags
      * @param zDelta Delta value
@@ -306,23 +275,28 @@ class SOUI_EXP SListView
      * @return TRUE if handled, FALSE otherwise
      */
     BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
-
+    
+    /**
+     * @brief Handle mouse leave event
+     */
+    void OnMouseLeave();
+    
     /**
      * @brief Handle kill focus event
-     * @param wndFocus New focus window handle
+     * @param wndFocus New focus window
      */
     void OnKillFocus(SWND wndFocus);
-
+    
     /**
      * @brief Handle set focus event
-     * @param wndOld Previous focus window handle
+     * @param wndOld Old focus window
      */
     void OnSetFocus(SWND wndOld);
-
+    
     /**
      * @brief Handle show window event
-     * @param bShow Show flag
-     * @param nStatus Status code
+     * @param bShow Whether the window is shown
+     * @param nStatus Show status
      */
     void OnShowWindow(BOOL bShow, UINT nStatus);
 
@@ -346,39 +320,96 @@ class SOUI_EXP SListView
     SOUI_ATTRS_BEGIN()
         ATTR_SKIN(L"dividerSkin", m_pSkinDivider, TRUE)
         ATTR_LAYOUTSIZE(L"dividerSize", m_nDividerSize, FALSE)
-        ATTR_BOOL(L"wantTab", m_bWantTab, FALSE)
         ATTR_BOOL(L"vertical", m_bVertical, FALSE)
+        ATTR_CHAIN_CLASS(SViewBase)
     SOUI_ATTRS_END()
+
+  protected:
+    /**
+     * @brief Handle data set changed event
+     */
+    virtual void onDataSetChanged();
+
+    /**
+     * @brief Handle data set invalidated event
+     */
+    virtual void onDataSetInvalidated();
+
+    /**
+     * @brief Handle item data changed event
+     * @param iItem Index of the item
+     */
+    virtual void onItemDataChanged(int iItem);
+
+    /**
+     * @brief Indicates if item redraw is delayed
+     * @return TRUE if redraw is delayed, FALSE otherwise
+     */
+    virtual BOOL IsItemRedrawDelay() const;
+
+    /**
+     * @brief Indicates if timeline is enabled
+     * @return TRUE if timeline is enabled, FALSE otherwise
+     */
+    virtual BOOL IsTimelineEnabled() const;
+
+    /**
+     * @brief Gets the rectangle of an item
+     * @param pItem Pointer to the item panel
+     * @param rcItem Reference to the rectangle to fill
+     * @return TRUE if successful, FALSE otherwise
+     */
+    virtual BOOL OnItemGetRect(const SOsrPanel *pItem, CRect &rcItem) const;
+
+    /**
+     * @brief Sets or releases capture on an item
+     * @param pItem Pointer to the item panel
+     * @param bCapture TRUE to set capture, FALSE to release
+     */
+    virtual void OnItemSetCapture(SOsrPanel *pItem, BOOL bCapture);
+
+    /**
+     * @brief Redraws an item
+     * @param pItem Pointer to the item panel
+     */
+    virtual void RedrawItem(SOsrPanel *pItem);
+
+    /**
+     * @brief Gets the dialog code
+     * @return Dialog code
+     */
+    virtual UINT WINAPI OnGetDlgCode() const;
+
+    /**
+     * @brief Handles colorization event
+     * @param cr Color reference
+     */
+    virtual void OnColorize(COLORREF cr);
+
+    /**
+     * @brief Handles scale change event
+     * @param nScale Scale factor
+     */
+    virtual void OnScaleChanged(int nScale);
+
+    /**
+     * @brief Handles language change event
+     * @return HRESULT
+     */
+    virtual HRESULT OnLanguageChanged();
+
+    /**
+     * @brief Handles font rebuild event
+     */
+    virtual void OnRebuildFont();
 
   protected:
     SAutoRefPtr<ILvAdapter> m_adapter;                 /**< Pointer to the list view adapter */
     SAutoRefPtr<ILvDataSetObserver> m_observer;        /**< Pointer to the data set observer */
     SAutoRefPtr<IListViewItemLocator> m_lvItemLocator; /**< Pointer to the item locator */
 
-    struct ItemInfo
-    {
-        SItemPanel *pItem; /**< Pointer to the item panel */
-        int nType;         /**< Type of the item */
-    };
-
-    bool m_bPendingUpdate;    /**< Flag indicating pending update */
-    int m_iPendingUpdateItem; /**< Index of the item to update, -1 for all, -2 for nothing */
-    int m_iPendingViewItem;   /**< Index of the item to view, -1 for init */
-
-    int m_iFirstVisible;        /**< Index of the first visible item */
-    SList<ItemInfo> m_lstItems; /**< List of currently visible items */
-    SOsrPanel *m_itemCapture;   /**< Item panel that has been set capture */
-
-    int m_iSelItem;             /**< Index of the selected item */
-    SOsrPanel *m_pHoverItem;    /**< Item panel under the mouse */
-    BOOL m_bDataSetInvalidated; /**< Flag indicating data set is invalidated */
-
-    SArray<SList<SItemPanel *> *> m_itemRecycle; /**< Recycle bin for item panels */
-
-    SXmlDoc m_xmlTemplate;                /**< XML template for items */
     SAutoRefPtr<ISkinObj> m_pSkinDivider; /**< Skin for dividers */
     SLayoutSize m_nDividerSize;           /**< Size of dividers */
-    BOOL m_bWantTab;                      /**< Flag indicating whether to want tab */
     BOOL m_bVertical;                     /**< Flag indicating vertical orientation */
 };
 

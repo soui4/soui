@@ -37,11 +37,11 @@
 
 SNSBEGIN
 	//PS_SOLID
-	const float  ps_solid[] ={1.0f,0.0f};
-	const float  ps_dash[] ={5.0f,5.0f};
-	const float  ps_dot[] ={1.0f,4.0f};
-	const float  ps_dashdot[] ={4.0f,1.0f,1.0f,1.0f};
-	const float  ps_dashdotdot[] ={4.0f,1.0f,1.0f,1.0f,1.0f,1.0f};
+	static const float ps_solid[] ={1.0f,0.0f};
+	static const float ps_dash[] = { 12.0f, 6.0f };
+    static const float ps_dot[] = { 3.0f, 3.0f };
+	static const float ps_dashdot[] = { 12.0f, 3.0f, 3.0f, 6.0f };
+    static const float ps_dashdotdot[] = { 12.0f, 3.0f, 3.0f, 3.0f, 3.0f, 6.0f };
 
 	const struct LineDashEffect
 	{
@@ -110,13 +110,19 @@ SNSBEGIN
 	class SLineDashEffect
 	{
 	public:
-		SLineDashEffect(int iStyle):pDashPathEffect(NULL)
+		SLineDashEffect(int iStyle, int nLineWidth):pDashPathEffect(NULL)
 		{
 			iStyle = iStyle&PS_STYLE_MASK;
 			if(iStyle>=PS_SOLID && iStyle<=PS_DASHDOTDOT)
 			{
 				const LineDashEffect *pEff=&LINEDASHEFFECT[iStyle];
-				pDashPathEffect=SkDashPathEffect::Create(pEff->fDash,pEff->nCount,0.0f);
+                float *pDash = new float[pEff->nCount];
+                for (int i=0;i<pEff->nCount;i++)
+				{
+                    pDash[i] = pEff->fDash[i] / nLineWidth;
+                }
+				pDashPathEffect=SkDashPathEffect::Create(pDash,pEff->nCount,0.0f);
+                delete[] pDash;
 			}
 		}
 		~SLineDashEffect()
@@ -603,7 +609,7 @@ SNSBEGIN
 	{
 		SkPaint paint=m_paint;
 		paint.setColor(SColor(m_curPen->GetColor()).toARGB());
-		SLineDashEffect skDash(m_curPen->GetStyle());
+		SLineDashEffect skDash(m_curPen->GetStyle(), m_curPen->GetWidth());
 		paint.setPathEffect(skDash.Get());
 		SStrokeCap strokeCap(m_curPen->GetStyle());
 		paint.setStrokeCap(strokeCap.Get());
@@ -646,8 +652,8 @@ SNSBEGIN
 		SkPaint paint=m_paint;
 		SetPaintXferMode(paint,m_xferMode);
 		paint.setColor(SColor(m_curPen->GetColor()).toARGB());
-		SLineDashEffect skDash(m_curPen->GetStyle());
-		paint.setPathEffect(skDash.Get());
+        SLineDashEffect skDash(m_curPen->GetStyle(), m_curPen->GetWidth());
+        paint.setPathEffect(skDash.Get());
 		paint.setStyle(SkPaint::kStroke_Style);
 		if(m_bAntiAlias)
 		{
@@ -718,8 +724,8 @@ SNSBEGIN
 		}
 
 		paint.setColor(SColor(m_curPen->GetColor()).toARGB());
-		SLineDashEffect skDash(m_curPen->GetStyle());
-		paint.setPathEffect(skDash.Get());
+        SLineDashEffect skDash(m_curPen->GetStyle(), m_curPen->GetWidth());
+        paint.setPathEffect(skDash.Get());
 		SStrokeCap strokeCap(m_curPen->GetStyle());
 		paint.setStrokeCap(strokeCap.Get());
 		SStrokeJoin strokeJoin(m_curPen->GetStyle());
@@ -756,7 +762,7 @@ SNSBEGIN
 		}
 
 		paint.setColor(SColor(m_curPen->GetColor()).toARGB());
-		SLineDashEffect skDash(m_curPen->GetStyle());
+		SLineDashEffect skDash(m_curPen->GetStyle(), m_curPen->GetWidth());
 		paint.setPathEffect(skDash.Get());
 		SStrokeCap strokeCap(m_curPen->GetStyle());
 		paint.setStrokeCap(strokeCap.Get());
@@ -800,7 +806,7 @@ SNSBEGIN
 	{
 		SkPaint paint=m_paint;
 		paint.setColor(SColor(m_curPen->GetColor()).toARGB());
-		SLineDashEffect skDash(m_curPen->GetStyle());
+		SLineDashEffect skDash(m_curPen->GetStyle(), m_curPen->GetWidth());
 		paint.setPathEffect(skDash.Get());
 		paint.setStyle(SkPaint::kStroke_Style);
 		m_SkCanvas->drawLine(m_ptCur.fX+m_ptOrg.fX,m_ptCur.fY+m_ptOrg.fY,pt.x+m_ptOrg.fX,pt.y+m_ptOrg.fY,paint);
@@ -1350,7 +1356,7 @@ SNSBEGIN
 		const SPath_Skia * path2 = (const SPath_Skia *)path;
 		SkPaint paint=m_paint;
 
-		SLineDashEffect skDash(m_curPen->GetStyle());
+		SLineDashEffect skDash(m_curPen->GetStyle(), m_curPen->GetWidth());
 		paint.setPathEffect(skDash.Get());
 		SStrokeCap strokeCap(m_curPen->GetStyle());
 		paint.setStrokeCap(strokeCap.Get());
@@ -1418,7 +1424,7 @@ SNSBEGIN
 	{
 		SkPaint paint=m_paint;
 		paint.setColor(SColor(m_curPen->GetColor()).toARGB());
-		SLineDashEffect skDash(m_curPen->GetStyle());
+		SLineDashEffect skDash(m_curPen->GetStyle(), m_curPen->GetWidth());
 		paint.setPathEffect(skDash.Get());
 		paint.setStyle(SkPaint::kStroke_Style);
 		if(m_bAntiAlias)
@@ -1463,7 +1469,7 @@ SNSBEGIN
 	{
 		SkPaint paint=m_paint;
 		paint.setColor(SColor(m_curPen->GetColor()).toARGB());
-		SLineDashEffect skDash(m_curPen->GetStyle());
+		SLineDashEffect skDash(m_curPen->GetStyle(), m_curPen->GetWidth());
 		paint.setPathEffect(skDash.Get());
 		SStrokeCap strokeCap(m_curPen->GetStyle());
 		paint.setStrokeCap(strokeCap.Get());
@@ -1614,7 +1620,7 @@ SNSBEGIN
 
 		SkPaint paint=m_paint;
 		paint.setColor(SColor(m_curPen->GetColor()).toARGB());
-		SLineDashEffect skDash(m_curPen->GetStyle());
+		SLineDashEffect skDash(m_curPen->GetStyle(), m_curPen->GetWidth());
 		paint.setPathEffect(skDash.Get());
 		SStrokeCap strokeCap(m_curPen->GetStyle());
 		paint.setStrokeCap(strokeCap.Get());
@@ -1632,7 +1638,9 @@ SNSBEGIN
 		if(pathEffect!=NULL)
 		{
 			SkPathEffect * skPathEffect = (SkPathEffect*)pathEffect->GetRealPathEffect();
-			paint.setPathEffect(skPathEffect);
+            SkComposePathEffect *composeEffect = SkComposePathEffect::Create(skPathEffect,skDash.Get());
+            paint.setPathEffect(composeEffect);
+            composeEffect->unref();
 		}
 		SkPath skPath;
 		path2->m_skPath.offset(m_ptOrg.fX,m_ptOrg.fY,&skPath);

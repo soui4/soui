@@ -1,7 +1,8 @@
-﻿#pragma once
+﻿#ifndef __SIMGCANVAS_H__
+#define __SIMGCANVAS_H__
 
-namespace SOUI
-{
+
+SNSBEGIN
     class SImgCanvas : public SWindow
     {
         DEF_SOBJECT(SWindow, L"imgcanvas")
@@ -30,4 +31,6 @@ namespace SOUI
         BOOL            m_bVert;
         SList<IBitmapS*> m_lstImg;
     };
-}
+SNSEND
+
+#endif//__SIMGCANVAS_H__

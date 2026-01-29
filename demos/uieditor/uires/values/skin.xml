@@ -17,4 +17,6 @@
   <imglist name="skin_toolbar_prop" src="img:png_toolbar_prop" states="2"/>
   <imglist name="skin_help" src="img:png_btn_help" states="3"/>
   <imglist name="skin_designer_background" src="img:png_designer_background" tile="1"/>
+  <imglist name="skin_filetypes" src="img:png_filetypes" states="12" />
+  <imgframe name="skin_item_bk" src="img:png_item_bk" states="3" margin="3,3,3,3" />
 </skin>

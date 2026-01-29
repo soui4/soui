@@ -315,6 +315,7 @@ class SOUI_EXP STreeView
      * @return Handle to the selected item.
      */
     STDMETHOD_(HSTREEITEM, GetSel)(THIS) SCONST OVERRIDE;
+    
 
     /**
      * @brief Ensures an item is visible.
@@ -328,6 +329,56 @@ class SOUI_EXP STreeView
      * @return Pointer to the item panel at the specified position.
      */
     STDMETHOD_(IItemPanel *, HitTest)(THIS_ const POINT *pt) SCONST OVERRIDE;
+
+    /**
+     * @brief Sets the multiple selection mode.
+     * @param bMultiSel TRUE to enable multiple selection, FALSE otherwise.
+     */
+    STDMETHOD_(void, SetMultiSel)(THIS_ BOOL bMultiSel) OVERRIDE;
+    
+    /**
+     * @brief Gets the multiple selection mode.
+     * @return TRUE if multiple selection is enabled, FALSE otherwise.
+     */
+    STDMETHOD_(BOOL, GetMultiSel)(THIS) SCONST OVERRIDE;
+    
+    /**
+     * @brief Adds an item to the selection.
+     * @param hItem Handle to the item.
+     */
+    STDMETHOD_(void, AddSelItem)(THIS_ HSTREEITEM hItem) OVERRIDE;
+    
+    /**
+     * @brief Removes an item from the selection.
+     * @param hItem Handle to the item.
+     */
+    STDMETHOD_(void, RemoveSelItem)(THIS_ HSTREEITEM hItem) OVERRIDE;
+    
+    /**
+     * @brief Clears all selected items.
+     */
+    STDMETHOD_(void, ClearSelItems)(THIS) OVERRIDE;
+    
+    /**
+     * @brief Checks if an item is selected.
+     * @param hItem Handle to the item.
+     * @return TRUE if the item is selected, FALSE otherwise.
+     */
+    STDMETHOD_(BOOL, IsItemSelected)(THIS_ HSTREEITEM hItem) SCONST OVERRIDE;
+
+    /**
+     * @brief Gets the count of selected items.
+     * @return Number of selected items.
+     */
+    STDMETHOD_(int, GetSelItemCount)(THIS) SCONST OVERRIDE;
+
+    /**
+     * @brief Gets all selected items.
+     * @param items Output parameter to store the selected item handles.
+     * @param nMaxCount Maximum number of items to retrieve.
+     * @return Number of selected items.
+     */
+    STDMETHOD_(int, GetSelItems)(THIS_ HSTREEITEM *items, int nMaxCount) SCONST OVERRIDE;
 
   public:
     /**
@@ -489,6 +540,7 @@ class SOUI_EXP STreeView
         ATTR_CUSTOM(L"indent", OnAttrIndent)
         ATTR_INT(L"wantTab", m_bWantTab, FALSE)
         ATTR_BOOL(L"hasLines", m_bHasLines, TRUE)
+        ATTR_BOOL(L"multiSel", m_bMultiSel, FALSE)
         ATTR_SKIN(L"lineSkin", m_pLineSkin, TRUE)
     SOUI_ATTRS_END()
 
@@ -648,8 +700,12 @@ class SOUI_EXP STreeView
 
     BOOL m_bWantTab;                   /**< Flag indicating if tab is wanted. */
     BOOL m_bHasLines;                  /**< Flag indicating if lines are drawn between items. */
+    BOOL m_bMultiSel;                  /**< Flag indicating if multiple selection is enabled. */
     SAutoRefPtr<ISkinObj> m_pLineSkin; /**< Skin for the lines. */
     SLayoutSize m_indent;              /**< Indentation between levels. */
+    
+    typedef SMap<HSTREEITEM, BOOL> ItemSelectionMap;
+    ItemSelectionMap m_mapSelItems; /**< Map of selected items. */
 };
 SNSEND
 #endif // __STREEVIEW__H__

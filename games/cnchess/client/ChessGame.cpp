@@ -1432,6 +1432,7 @@ void CChessGame::ShowClock(int iSeat,BOOL bShow)
     {
         m_pMainDlg->KillTimer(TIMERID_CLOCK_ME + iSeat);
         pClock->SetVisible(FALSE, TRUE);
+        pClock->ClearAnimation();
     }
 }
 

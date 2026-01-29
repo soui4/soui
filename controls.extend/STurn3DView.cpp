@@ -99,10 +99,11 @@ BOOL STurn3dView::Turn(SWindow *pWndFront, SWindow *pWndBack, BOOL bTurn2Front /
     pRT->ClearRect(&rcWnd, 0);
     pFrmWnd->RedrawRegion(pRT, NULL);
 
-    CAutoRefPtr<IRenderTarget> pRTCopy1;
+    SAutoRefPtr<IRenderTarget> pRTCopy1;
     GETRENDERFACTORY->CreateRenderTarget(&pRTCopy1, rcWnd.Width(), rcWnd.Height());
-
+    pRTCopy1->BeginDraw();
     pRTCopy1->BitBlt(CRect(CPoint(0, 0), rcWnd.Size()), pRT, rcWnd.left, rcWnd.top, SRCCOPY);
+    pRTCopy1->EndDraw();
     m_bmpBefore = (IBitmapS *)pRTCopy1->GetCurrentObject(OT_BITMAP);
 
     //渲染窗口变化后状态
@@ -112,9 +113,11 @@ BOOL STurn3dView::Turn(SWindow *pWndFront, SWindow *pWndBack, BOOL bTurn2Front /
     pRT->ClearRect(&rcWnd, 0);
     pFrmWnd->RedrawRegion(pRT, NULL);
 
-    CAutoRefPtr<IRenderTarget> pRTCopy2;
+    SAutoRefPtr<IRenderTarget> pRTCopy2;
     GETRENDERFACTORY->CreateRenderTarget(&pRTCopy2, rcWnd.Width(), rcWnd.Height());
+    pRTCopy2->BeginDraw();    
     pRTCopy2->BitBlt(CRect(CPoint(0, 0), rcWnd.Size()), pRT, rcWnd.left, rcWnd.top, SRCCOPY);
+    pRTCopy2->EndDraw(); 
     m_bmpAfter = (IBitmapS *)pRTCopy2->GetCurrentObject(OT_BITMAP);
 
     pFrmWnd->ReleaseRenderTarget(pRT);
