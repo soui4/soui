@@ -64,12 +64,12 @@ endif()
 
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
 	add_dependencies(${current_project} soui-sys-resource ${COM_LIBS})
-    if(MSVC)
+    if(MSVC AND MSVC_VERSION GREATER_EQUAL 1900)
     set(DPI_AWARE_MANIFEST "${PROJECT_SOURCE_DIR}/__cmake/dpi_aware.manifest")
     set_target_properties(${current_project} PROPERTIES
             LINK_FLAGS "/MANIFEST:EMBED /MANIFESTINPUT:${DPI_AWARE_MANIFEST}"
         )
-    endif(MSVC)
+    endif()
 endif()
 
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
