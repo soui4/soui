@@ -475,6 +475,19 @@ void SItemPanel::SetColor(COLORREF crBk, COLORREF crSelBk)
     m_crSelBk = crSelBk;
 }
 
+BOOL SItemPanel::IsSelected() const
+{
+    return (m_dwState & WndState_Check) != 0;
+}
+
+void SItemPanel::SetSelected(BOOL bSelected, BOOL bUpdate)
+{
+    if (bSelected)
+        ModifyState(WndState_Check, 0, bUpdate);
+    else
+        ModifyState(0, WndState_Check, bUpdate);
+}
+
 COLORREF SItemPanel::GetBkgndColor() const
 {
     if ((m_dwState & WndState_Check) && m_crSelBk != CR_INVALID)

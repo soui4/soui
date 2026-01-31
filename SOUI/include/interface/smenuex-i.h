@@ -190,6 +190,12 @@ DECLARE_INTERFACE_(IMenuEx, IObjRef)
      * @return IHostWnd* - 宿主窗口指针
      */
     STDMETHOD_(IHostWnd *, GetHostWnd)(THIS) PURE;
+
+    /**
+     * @brief 获取菜单项数量
+     * @return int - 菜单项数量
+    */
+    STDMETHOD_(int, GetMenuItemCount)(CTHIS) SCONST PURE;
 };
 
 EXTERN_C void SOUI_EXP EndMenuEx(int nCmdId);

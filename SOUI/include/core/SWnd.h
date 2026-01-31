@@ -2344,6 +2344,12 @@ class SOUI_EXP SWindow
      */
     LRESULT OnUpdateFont(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+    void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+    void OnKeyUp(UINT nChar, UINT nFlagsCnt, UINT nFlags);
+    void OnChar(UINT nChar, UINT nFlagsCnt, UINT nFlags);
+    void OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+    void OnSysKeyUp(UINT nChar, UINT nFlagsCnt, UINT nFlags);
+
     // Message map for associating messages with handlers
     SOUI_MSG_MAP_BEGIN()
         MSG_WM_PAINT_EX(OnPaint)
@@ -2366,6 +2372,11 @@ class SOUI_EXP SWindow
         MSG_WM_MOUSEWHEEL(OnMouseWheel)
         MSG_WM_SETFOCUS_EX(OnSetFocus)
         MSG_WM_KILLFOCUS_EX(OnKillFocus)
+        MSG_WM_KEYDOWN(OnKeyDown)
+        MSG_WM_KEYUP(OnKeyUp)
+        MSG_WM_CHAR(OnChar)
+        MSG_WM_SYSKEYDOWN(OnSysKeyDown)
+        MSG_WM_SYSKEYUP(OnSysKeyUp)
         MESSAGE_HANDLER_EX(UM_SETLANGUAGE, OnSetLanguage)
         MESSAGE_HANDLER_EX(UM_SETSCALE, OnSetScale)
         MESSAGE_HANDLER_EX(UM_SETCOLORIZE, OnSetColorize)

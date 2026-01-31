@@ -164,6 +164,20 @@ DECLARE_INTERFACE_(IItemPanel, IOsrPanel)
      * @return
      */
     STDMETHOD_(void, SetColor)(THIS_ COLORREF crBk, COLORREF crSelBk) PURE;
+
+    /**
+     * @brief 列表项是否被选中
+     * @return BOOL TRUE-选中，FALSE-未选中
+     */
+    STDMETHOD_(BOOL, IsSelected)(CTHIS) SCONST PURE;
+
+    /**
+     * @brief 设置列表项的选中状态
+     * @param bSelected -- 选中标志，TRUE-选中，FALSE-未选中
+     * @param bUpdate -- 是否立即更新显示，TRUE-更新，FALSE-不更新
+     * @return
+     */
+    STDMETHOD_(void, SetSelected)(THIS_ BOOL bSelected, BOOL bUpdate DEF_VAL(TRUE)) PURE;
 };
 
 // {310A0C73-1DCA-4ac2-B6C9-569B0EA40496}

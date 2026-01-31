@@ -662,4 +662,9 @@ BOOL SMenu::GetMenuString(THIS_ UINT uPosition, UINT uFlags, IStringT *lpItemStr
     return TRUE;
 }
 
+int SMenu::GetMenuItemCount() const
+{
+    return ::GetMenuItemCount(m_hMenu);
+}
+
 SNSEND

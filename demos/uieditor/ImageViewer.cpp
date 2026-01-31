@@ -80,3 +80,8 @@ void CImageViewer::OnZoomChanged(IEvtArgs *pEvt)
 		SetZoom(nValue);
 	}
 }
+
+void CImageViewer::CloseProject()
+{
+	m_pImage->SetImage(NULL);
+}

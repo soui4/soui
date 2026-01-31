@@ -691,7 +691,7 @@ IMenuEx *SMenuEx::GetSubMenu(THIS_ int nPos)
 
 UINT SMenuEx::TrackPopupMenu(UINT flag, int x, int y, HWND hOwner, int nScale)
 {
-    if (!IsWindow())
+    if (!IsWindow() || GetMenuItemCount() == 0)
         return (UINT)-1;
     if (!s_MenuData)
         s_MenuData = new SMenuExRunData(hOwner, nScale);
@@ -1479,6 +1479,13 @@ BOOL SMenuEx::GetMenuString(THIS_ UINT uPosition, UINT uFlags, IStringT *lpItemS
     SStringT strText = pItemRef->GetWindowText();
     lpItemString->Copy(&strText);
     return TRUE;
+}
+
+int SMenuEx::GetMenuItemCount(CTHIS) SCONST
+{
+    SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot());
+    SASSERT(pMenuRoot);
+    return pMenuRoot->GetChildrenCount();
 }
 
 SNSEND

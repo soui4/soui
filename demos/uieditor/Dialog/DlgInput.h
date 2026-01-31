@@ -38,10 +38,9 @@ namespace SOUI
 			REFLECT_NOTIFICATIONS_EX()
 			END_MSG_MAP()
 
-	protected:
-
 	public:
 		SStringT m_strValue;	
+		SStringT m_strTitle;
 		SEdit *m_edt;
 	};
 

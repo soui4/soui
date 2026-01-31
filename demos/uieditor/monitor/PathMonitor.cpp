@@ -2,6 +2,9 @@
 #include "PathMonitor.h"
 #include <vector>
 #include <algorithm>
+#include <helper/slog.h>
+#define kLogTag "PathMonitor"
+
 // 获取文件夹中所有文件的列表
 void CPathMonitor::GetFilesInDirectory(const tstring& directory,std::vector<CPathMonitor::_FileInfo> & files)
 {

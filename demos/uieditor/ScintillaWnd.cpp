@@ -95,11 +95,17 @@ static const LPBYTE map_file(LPCTSTR name, LPDWORD filesize)
 		hMapping = CreateFileMapping(hFile, NULL, PAGE_READONLY, 0, 0, NULL);
 		if (hMapping != INVALID_HANDLE_VALUE)
 		{
+            DWORD dwSize = GetFileSize(hFile, NULL);
 			ptr = (LPBYTE)MapViewOfFile(hMapping, FILE_MAP_READ, 0, 0, 0);
 			CloseHandle(hMapping);
 			if (filesize)
-				*filesize = GetFileSize(hFile, NULL);
-		}
+                *filesize = dwSize;
+            if (!ptr && dwSize == 0)
+            {
+                static BYTE buf[1] = { 0 };
+                ptr = buf;
+            }
+        }
 		CloseHandle(hFile);
 	}
 	return ptr;
@@ -124,7 +130,7 @@ BOOL CScintillaWnd::OpenFile(LPCTSTR lpFileName)
 	{//utf8无签名
 		str = SStringA((LPCSTR)pbuf, dwSize);
 	}
-	UnmapViewOfFile(pbuf);
+    if(dwSize) UnmapViewOfFile(pbuf);
 	SendEditor(SCI_CLEARALL);
 	SendEditor(SCI_MARKERDELETEALL, (WPARAM)-1, 0);
 

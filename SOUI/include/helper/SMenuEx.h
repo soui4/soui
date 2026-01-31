@@ -329,6 +329,7 @@ class SOUI_EXP SMenuEx
         return this;
     }
 
+    STDMETHOD_(int, GetMenuItemCount)(CTHIS) SCONST OVERRIDE;
   public:
     /**
      * @brief 结束菜单

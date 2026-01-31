@@ -201,6 +201,12 @@ DECLARE_INTERFACE_(IMenu, IObjRef)
      * @return BOOL - 成功返回TRUE，失败返回FALSE
      */
     STDMETHOD_(BOOL, GetMenuString)(THIS_ UINT uPosition, UINT uFlags, IStringT * lpItemString) PURE;
+
+    /**
+     * @brief 获取菜单项数量
+     * @return int - 菜单项数量
+    */
+    STDMETHOD_(int, GetMenuItemCount)(CTHIS) SCONST PURE;
 };
 
 SNSEND

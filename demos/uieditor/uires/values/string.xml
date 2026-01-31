@@ -16,6 +16,7 @@
     <new_include value="新建include" />
     <explorer value="在资源管理器中打开" />
     <add_uires value="添加到uires.idx" />
+    <add_skin value="添加到skin"/>
     <property value="属性:" />
     <xml_editor value="XML编辑器" />
     <image_viewer value="图片查看器" />

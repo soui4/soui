@@ -52,6 +52,7 @@ void CFileTreeAdapter::SetRootPath(const SStringT& strRootPath)
     rootData.strName = m_strRootPath.Right(m_strRootPath.GetLength() - m_strRootPath.ReverseFind(_T('/')) - 1);
     rootData.bIsDir = TRUE;
     rootData.nChilds = -1;
+    rootData.bIsCut = FALSE;
     rootData.nFileType = FT_DIR;
     
     SLOGI()<<"SetRootPath, root path:"<<m_strRootPath.c_str();
@@ -86,6 +87,7 @@ void CFileTreeAdapter::EnumDirectory(const SStringT& strPath, HSTREEITEM hParent
             itemData.bIsDir = (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
             itemData.nChilds = -1;
             itemData.nFileType = FT_UNKNOWN;
+            itemData.bIsCut = FALSE;
             HSTREEITEM hItem = InsertItem(itemData, hParentItem);
             nChilds++;
             // 如果是目录，设置默认展开状态
@@ -131,6 +133,15 @@ void CFileTreeAdapter::getView(HSTREEITEM hItem, SItemPanel *pItem, SXmlNode xml
     if (pImgState)
     {
         pImgState->SetIcon(itemData.nFileType);
+        // 如果处于剪切状态，设置半透明效果
+        if (itemData.bIsCut)
+        {
+            pImgState->SetAlpha(128); // 设置50%透明度
+        }
+        else
+        {
+            pImgState->SetAlpha(255); // 恢复完全不透明
+        }
     }
     
     // 设置文本
@@ -138,6 +149,72 @@ void CFileTreeAdapter::getView(HSTREEITEM hItem, SItemPanel *pItem, SXmlNode xml
     if (pTxtLabel)
     {
         pTxtLabel->SetWindowText(itemData.strName);
+        if (itemData.bIsCut)
+        {
+            pTxtLabel->SetAttributeA("colorText", "rgba(255,255,255,128)",FALSE);
+        }
+        else
+        {
+            pTxtLabel->SetAttributeA("colorText", "#ffffff", FALSE);
+        }
+    }
+}
+
+// 设置项的剪切状态
+void CFileTreeAdapter::SetItemCutState(HSTREEITEM hItem, BOOL bIsCut)
+{
+    if (hItem == ITEM_NULL || hItem == ITEM_ROOT)
+        return;
+    
+    FileItemData& itemData = GetItemData(hItem);
+    itemData.bIsCut = bIsCut;
+    
+    // 通知该项需要重绘
+    notifyBranchInvalidated(hItem,FALSE,FALSE);
+}
+
+// 清除所有项的剪切状态
+void CFileTreeAdapter::ClearAllCutStates()
+{
+    // 遍历所有项，清除剪切状态
+    std::vector<HSTREEITEM> items;
+    GetAllItems(items, ITEM_ROOT);
+    
+	for (std::vector<HSTREEITEM>::iterator it = items.begin();it!=items.end(); it++)
+    {
+		HSTREEITEM hItem = *it;
+        if (hItem != ITEM_ROOT)
+        {
+            FileItemData& itemData = GetItemData(hItem);
+            if (itemData.bIsCut)
+            {
+                itemData.bIsCut = FALSE;
+            }
+        }
+    }
+    notifyBranchInvalidated(ITEM_ROOT);
+}
+
+// 检查项是否处于剪切状态
+BOOL CFileTreeAdapter::IsItemCut(HSTREEITEM hItem)
+{
+    if (hItem == ITEM_NULL || hItem == ITEM_ROOT)
+        return FALSE;
+    
+    const FileItemData& itemData = GetItemData(hItem);
+    return itemData.bIsCut;
+}
+
+// 递归获取所有树项
+void CFileTreeAdapter::GetAllItems(std::vector<HSTREEITEM>& items, HSTREEITEM hParentItem)
+{
+    HSTREEITEM hChildItem = GetFirstChildItem(hParentItem);
+    while (hChildItem != ITEM_NULL)
+    {
+        items.push_back(hChildItem);
+        // 递归获取子项
+        GetAllItems(items, hChildItem);
+        hChildItem = GetNextSiblingItem(hChildItem);
     }
 }
 
@@ -217,26 +294,7 @@ BOOL CFileTreeAdapter::CreateItem(HSTREEITEM hParentItem, const SStringT& strNam
             CloseHandle(hFile);
         }
     }
-    
-    if (bSuccess)
-    {
-        // 添加到树中
-        FileItemData newData;
-        newData.strPath = strNewPath;
-        newData.strName = strName;
-        newData.bIsDir = bIsDir;
-        newData.nChilds = -1;
-        newData.nFileType = FT_UNKNOWN;
-        
-        InsertItem(newData, hParentItem);
-        
-        // 如果父目录已展开，通知数据变化
-        if (IsItemExpanded(hParentItem))
-        {
-            notifyBranchChanged(hParentItem);
-        }
-    }
-    
+ 
     return bSuccess;
 }
 
@@ -270,26 +328,7 @@ BOOL CFileTreeAdapter::CopyItem(HSTREEITEM hSrcItem, HSTREEITEM hDestParentItem,
         // 复制文件
         bSuccess = CopyFile(srcData.strPath, strDestPath, FALSE) ? TRUE : FALSE;
     }
-    
-    if (bSuccess)
-    {
-        // 添加到树中
-        FileItemData newData;
-        newData.strPath = strDestPath;
-        newData.strName = strNewNameFinal;
-        newData.bIsDir = srcData.bIsDir;
-        newData.nChilds = -1;
-        newData.nFileType = FT_UNKNOWN;
-        
-        InsertItem(newData, hDestParentItem);
-        
-        // 如果目标父目录已展开，通知数据变化
-        if (IsItemExpanded(hDestParentItem))
-        {
-            notifyBranchChanged(hDestParentItem);
-        }
-    }
-    
+ 
     return bSuccess;
 }
 
@@ -313,19 +352,7 @@ BOOL CFileTreeAdapter::RemoveItem(HSTREEITEM hItem)
         // 删除文件
         bSuccess = DeleteFile(itemData.strPath) ? TRUE : FALSE;
     }
-    
-    if (bSuccess)
-    {
-        // 从树中移除
-        DeleteItem(hItem);
-        
-        // 通知数据变化
-        if (hParentItem != ITEM_NULL)
-        {
-            notifyBranchChanged(hParentItem);
-        }
-    }
-    
+
     return bSuccess;
 }
 
@@ -350,35 +377,7 @@ BOOL CFileTreeAdapter::MoveItem(HSTREEITEM hSrcItem, HSTREEITEM hDestParentItem,
     
     // 移动文件或目录
     BOOL bSuccess = MoveFile(srcData.strPath, strDestPath) ? TRUE : FALSE;
-    
-    if (bSuccess)
-    {
-        HSTREEITEM hParentItem = GetParentItem(hSrcItem);
-        
-        // 更新树中的项
-        FileItemData newData = srcData;
-        newData.strPath = strDestPath;
-        newData.strName = strNewNameFinal;
-        
-        // 先删除原项
-        DeleteItem(hSrcItem);
-        
-        // 再添加到新位置
-        InsertItem(newData, hDestParentItem);
-        
-        // 通知源父目录变化
-        if (hParentItem != ITEM_NULL)
-        {
-            notifyBranchChanged(hParentItem);
-        }
-        
-        // 通知目标父目录变化
-        if (IsItemExpanded(hDestParentItem))
-        {
-            notifyBranchChanged(hDestParentItem);
-        }
-    }
-    
+ 
     return bSuccess;
 }
 
@@ -537,6 +536,7 @@ BOOL CFileTreeAdapter::AddItemByPath(const SStringT& strPath)
     newData.strPath = strPath;
     newData.strName = strItemName;
     newData.bIsDir = bIsDir;
+    newData.bIsCut = FALSE;
     newData.nChilds = bIsDir ? -1 : 0;
     newData.nFileType = FT_UNKNOWN;
     

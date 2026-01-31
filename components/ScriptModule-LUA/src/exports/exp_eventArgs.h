@@ -46,9 +46,13 @@ BOOL ExpLua_EventArgs(lua_State *L)
 		lua_tinker::class_add<StEventKeyDown>(L,"StEventKeyDown");
 		lua_tinker::class_mem<StEventKeyDown>(L,"nChar",&EventKeyDown::nChar);
 		lua_tinker::class_mem<StEventKeyDown>(L,"nFlags",&EventKeyDown::nFlags);
-		lua_tinker::class_mem<StEventKeyDown>(L,"bCancel",&EventKeyDown::bCancel);
+		lua_tinker::class_mem<StEventKeyDown>(L,"nRepCnt",&EventKeyDown::nRepCnt);
 		DEF_CAST_PVOID(L,StEventKeyDown);
 
+		lua_tinker::class_add<StEventKeyUp>(L,"StEventKeyUp");
+		lua_tinker::class_mem<StEventKeyUp>(L,"nChar",&EventKeyUp::nChar);
+		lua_tinker::class_mem<StEventKeyUp>(L,"nRepCnt",&EventKeyUp::nRepCnt);
+		DEF_CAST_PVOID(L,StEventKeyUp);
 
 		lua_tinker::class_add<StEventSwndUpdateTooltip>(L,"StEventSwndUpdateTooltip");
 		lua_tinker::class_mem<StEventSwndUpdateTooltip>(L,"strToolTip",&EventSwndUpdateTooltip::strToolTip);

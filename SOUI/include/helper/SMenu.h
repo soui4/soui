@@ -584,6 +584,12 @@ class SOUI_EXP SMenu : public TObjRefImpl<IMenu> {
      */
     STDMETHOD_(BOOL, GetMenuString)(THIS_ UINT uPosition, UINT uFlags, IStringT *lpItemString) OVERRIDE;
 
+    /**
+     * @brief 获取菜单项数量
+     * @return 菜单项数量
+     */
+    STDMETHOD_(int, GetMenuItemCount)(CTHIS) SCONST OVERRIDE;
+
   protected:
     /**
      * @brief 更新缩放比例

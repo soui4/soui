@@ -8,15 +8,39 @@
 #include "AttrStorage.h"
 #include "designer/SizingFrame.h"
 #include "SysdataMgr.h"
-
+#include <helper/slog.h>
+#define kLogTag "SouiEditor"
 
 //定义唯一的一个R,UIRES对象,ROBJ_IN_CPP是resource.h中定义的宏。
 #define INIT_R_DATA
 #include "res/resource.h"
 
 #define SYS_NAMED_RESOURCE _T("soui-sys-resource.dll")
-static const TCHAR *kPath_SysRes = _T("/soui-sys-resource.zip");
+#ifdef __APPLE__
+static const TCHAR *kPath_AppRes = _T("/uires");
+static const TCHAR *kPath_SysRes = _T("/data/soui-sys-resource.zip");
+#else
 static const TCHAR *kPath_AppRes = _T("/uieditor_uires");
+static const TCHAR *kPath_SysRes = _T("/../../soui-sys-resource.zip");
+#endif
+
+static SStringT getSourceDir()
+{
+#ifdef __APPLE__
+    char szBunblePath[1024];
+    GetAppleBundlePath(szBunblePath, sizeof(szBunblePath));
+    return S_CA2T(szBunblePath) + _T("/Contents/Resources");
+#else
+    SStringA file(__FILE__);
+    file = file.Left(file.ReverseFind(PATH_SLASH));
+	if(*__FILE__=='.'){
+		char absPath[MAX_PATH]={0};
+		GetFullPathNameA(file,MAX_PATH,absPath,NULL);
+		file = absPath;
+	}
+    return S_CA2T(file);
+#endif
+}
 
 class CUiEditorApp : public SApplication
 {
@@ -65,16 +89,23 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 
     SStringT appDir = theApp.GetAppDir();
     SetCurrentDirectory(appDir);
-
+    SStringT srcDir = getSourceDir();
     SAppCfg cfg;
     cfg.SetRender(Render_Skia)
         .SetImgDecoder(ImgDecoder_Stb)
         .SetAppDir(appDir)
         .SetLog(TRUE, LOG_LEVEL_INFO, "uiedtior");
-    
+#ifdef __linux__
+    AddFontResource((srcDir + _T("/../../simsun.ttc")).c_str());
+#elif defined(__APPLE__)
+    AddFontResource((srcDir + _T("/fonts/simsun.ttc")).c_str());
+#endif    
 #ifdef _WIN32
     cfg.SetSysResPeFile(SYS_NAMED_RESOURCE);
     cfg.SetAppResPeHandle(hInstance);
+#elif defined__APPLE__
+    cfg.SetSysResZip(srcDir + kPath_SysRes);
+    cfg.SetAppResFile(srcDir + kPath_AppRes);
 #else
     cfg.SetSysResZip(appDir + kPath_SysRes);
     cfg.SetAppResFile(appDir + kPath_AppRes);

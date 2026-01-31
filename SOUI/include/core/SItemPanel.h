@@ -254,7 +254,8 @@ class SOUI_EXP SItemPanel : public TOsrPanelProxy<IItemPanel> {
   public:
     STDMETHOD_(void, SetSkin)(THIS_ ISkinObj *pSkin) OVERRIDE;
     STDMETHOD_(void, SetColor)(THIS_ COLORREF crBk, COLORREF crSelBk) OVERRIDE;
-
+    STDMETHOD_(BOOL, IsSelected)(CTHIS) SCONST OVERRIDE;
+    STDMETHOD_(void, SetSelected)(THIS_ BOOL bSelected,BOOL bUpdate DEF_VAL(TRUE)) OVERRIDE;
   public:
     SOUI_ATTRS_BEGIN()
         ATTR_COLOR(L"colorNormal", m_crBk, FALSE)

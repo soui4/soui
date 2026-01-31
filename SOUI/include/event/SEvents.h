@@ -53,6 +53,10 @@ typedef enum _SOUI_EVENTS
     EVT_ANIMATOR_FRACTOR, ///< 数值动画事件
     
     EVT_KEYDOWN = 8200, ///< 键盘按下事件
+    EVT_KEYUP,          ///< 键盘释放事件
+    EVT_CHAR,            ///< 字符输入事件
+    EVT_SYSKEYDOWN,     ///< 系统键盘按下事件
+    EVT_SYSKEYUP,       ///< 系统键盘释放事件
 
     // 两个窗口鼠标状态事件
     EVT_MOUSE_HOVER = 9000, ///< 鼠标悬停事件
@@ -426,9 +430,35 @@ DEF_EVT(EventSwndAnimationRepeat, EVT_ANIMATION_REPEAT, on_animation_repeat, { I
 
 DEF_EVT(EventKeyDown, EVT_KEYDOWN, on_key_down, {
     UINT nChar;   ///< 字符码
+    UINT nRepCnt; ///< 重复计数
     UINT nFlags;  ///< 标志
-    BOOL bCancel; ///< 是否取消
 })
+
+DEF_EVT(EventKeyUp, EVT_KEYUP, on_key_up, {
+    UINT nChar;   ///< 字符码
+    UINT nRepCnt; ///< 重复计数   
+    UINT nFlags;  ///< 标志
+})
+
+DEF_EVT(EventChar, EVT_CHAR, on_char, {
+    UINT nChar;   ///< 字符码
+    UINT nRepCnt; ///< 重复计数   
+    UINT nFlags;  ///< 标志
+})
+
+DEF_EVT(EventSysKeyDown, EVT_SYSKEYDOWN, on_sys_key_down, {
+    UINT nChar;   ///< 字符码
+    UINT nRepCnt; ///< 重复计数
+    UINT nFlags;  ///< 标志
+})
+
+DEF_EVT(EventSysKeyUp, EVT_SYSKEYUP, on_sys_key_up, {
+    UINT nChar;   ///< 字符码
+    UINT nRepCnt; ///< 重复计数   
+    UINT nFlags;  ///< 标志
+})
+
+
 
 DEF_EVT(EventSwndMouseLeave, EVT_MOUSE_LEAVE, on_mouse_leave, { int fake; })
 

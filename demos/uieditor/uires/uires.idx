@@ -11,7 +11,7 @@
 		<file name="xml_uidesigner_main" path="xml\dlg_uidesigner.xml" />
 		<file name="UIDESIGNER_XML_NEW_LAYOUT" path="xml\dlg_new_layout.xml" />
 		<file name="UIDESIGNER_XML_NEW_SKIN" path="xml\dlg_new_skin.xml" />
-		<file name="UIDESIGNER_XML_INPUT" path="xml\dlg_input.xml" />
+		<file name="DLG_INPUT" path="xml\dlg_input.xml" />
 		<file name="UIDESIGNER_XML_ABOUT" path="xml\dlg_about.xml" />
 		<file name="UIDESIGNER_XML_INSERT_ELEMENT" path="xml\dlg_insert_element.xml" />
 		<file name="designer_wnd" path="xml\designer_wnd.xml" />
@@ -23,7 +23,7 @@
 		<file name="skin" path="values\skin.xml" />
 	</values>
 	<IMG>
-		<file name="icon_main" path="image\soui.png" />
+		<file name="icon_main" path="image\logo2.png" />
 		<file name="caption_line" path="image\caption_line.png" />
 		<file name="png_tool_button" path="image\tool_button.png" />
 		<file name="png_prop_switch" path="image\propswitch.png" />
@@ -44,7 +44,7 @@
 		<file name="png_item_bk" path="image\item_bk.png" />
 	</IMG>
 	<ICON>
-		<file name="ICON_logo" path="image\soui.ico" />
+		<file name="ICON_logo" path="image\logo.ico" />
 	</ICON>
 	<smenu>
 		<file name="menu_layoutfile" path="smenu\menu_layoutfile.xml" />

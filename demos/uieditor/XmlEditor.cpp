@@ -54,7 +54,7 @@ BOOL CXmlEditor::CloseProject()
 	m_strXmlFile =
 	m_strProPath = SStringT();
 	m_bValidXml = true;
-
+	m_xmlParser.reset();
 	m_pScintillaWnd->SendEditor(SCI_CLEARALL);
 	m_pScintillaWnd->SetDirty(false);
 	m_treeXmlStruct->RemoveAllItems();

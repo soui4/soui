@@ -631,6 +631,11 @@ SWindow::SWindow()
     m_evtSet.addEvent(EVENTID(EventCtxMenu));
     m_evtSet.addEvent(EVENTID(EventSetFocus));
     m_evtSet.addEvent(EVENTID(EventKillFocus));
+    m_evtSet.addEvent(EVENTID(EventKeyDown));
+    m_evtSet.addEvent(EVENTID(EventKeyUp));
+    m_evtSet.addEvent(EVENTID(EventChar));
+    m_evtSet.addEvent(EVENTID(EventSysKeyDown));
+    m_evtSet.addEvent(EVENTID(EventSysKeyUp));
 
     m_evtSet.addEvent(EVENTID(EventSwndAnimationStart));
     m_evtSet.addEvent(EVENTID(EventSwndAnimationStop));
@@ -2955,6 +2960,41 @@ void SWindow::OnKillFocus(SWND wndFocus)
     FireEvent(evt);
 }
 
+void SWindow::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags){
+    EventKeyDown evt(this);
+    evt.nChar = nChar;
+    evt.nRepCnt = nRepCnt;
+    evt.nFlags = nFlags;
+    FireEvent(evt);
+}
+void SWindow::OnKeyUp(UINT nChar, UINT nFlagsCnt, UINT nFlags){
+    EventKeyUp evt(this);
+    evt.nChar = nChar;
+    evt.nRepCnt = nFlagsCnt;
+    evt.nFlags = nFlags;
+    FireEvent(evt);
+}
+void SWindow::OnChar(UINT nChar, UINT nFlagsCnt, UINT nFlags){
+    EventChar evt(this);
+    evt.nChar = nChar;
+    evt.nRepCnt = nFlagsCnt;
+    evt.nFlags = nFlags;
+    FireEvent(evt);
+}
+void SWindow::OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags){
+    EventSysKeyDown evt(this);
+    evt.nChar = nChar;
+    evt.nRepCnt = nRepCnt;
+    evt.nFlags = nFlags;
+    FireEvent(evt);
+}
+void SWindow::OnSysKeyUp(UINT nChar, UINT nFlagsCnt, UINT nFlags){
+    EventSysKeyUp evt(this);
+    evt.nChar = nChar;
+    evt.nRepCnt = nFlagsCnt;
+    evt.nFlags = nFlags;
+    FireEvent(evt);
+}
 LRESULT SWindow::OnSetScale(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     int nScale = (int)wParam;

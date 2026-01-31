@@ -1,4 +1,4 @@
-﻿//stamp:2181cb5c7885008c
+﻿//stamp:2181dc7b762a28fc
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -16,7 +16,7 @@
 			const TCHAR * xml_uidesigner_main;
 			const TCHAR * UIDESIGNER_XML_NEW_LAYOUT;
 			const TCHAR * UIDESIGNER_XML_NEW_SKIN;
-			const TCHAR * UIDESIGNER_XML_INPUT;
+			const TCHAR * DLG_INPUT;
 			const TCHAR * UIDESIGNER_XML_ABOUT;
 			const TCHAR * UIDESIGNER_XML_INSERT_ELEMENT;
 			const TCHAR * designer_wnd;
@@ -71,7 +71,7 @@ struct _UIRES UIRES={
 			_T("LAYOUT:xml_uidesigner_main"),
 			_T("LAYOUT:UIDESIGNER_XML_NEW_LAYOUT"),
 			_T("LAYOUT:UIDESIGNER_XML_NEW_SKIN"),
-			_T("LAYOUT:UIDESIGNER_XML_INPUT"),
+			_T("LAYOUT:DLG_INPUT"),
 			_T("LAYOUT:UIDESIGNER_XML_ABOUT"),
 			_T("LAYOUT:UIDESIGNER_XML_INSERT_ELEMENT"),
 			_T("LAYOUT:designer_wnd"),
@@ -278,6 +278,7 @@ struct _R{
 		int white;
 	}color;
 	struct _string{
+		int add_skin;
 		int add_uires;
 		int copy;
 		int cut;
@@ -489,7 +490,8 @@ struct _R R={
 		18,
 		19,
 		20,
-		21
+		21,
+		22
 	}
 	
 };

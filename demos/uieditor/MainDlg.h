@@ -239,9 +239,13 @@ protected:
 	void OnBtnAbout();
 	void OnBtnViewSkin();
 	void OnBtnRecentFile();
-	void OnTvEventOfPanel(IEvtArgs *pEvtBase);
-	// 递归添加目录中的所有文件到UIRes
+    void OnTvEventOfPanel(IEvtArgs *pEvtBase);
+    void addUires(HSTREEITEM hItem);
+	void addSkin(HSTREEITEM hItem);
+	
+    // 递归添加目录中的所有文件到UIRes
 	void AddFilesInDirectoryToUIRes(const SStringT& dirPath);
+	void OnTvKeyDown(IEvtArgs *e);
 	EVENT_MAP_BEGIN()
 		if(m_pXmlEdtior) CHAIN_EVENT_MAP_MEMBER((*m_pXmlEdtior))
 		if(m_pImageViewer) CHAIN_EVENT_MAP_MEMBER((*m_pImageViewer))
@@ -261,6 +265,7 @@ protected:
 		EVENT_ID_COMMAND(R.id.toolbar_btn_recent, OnBtnRecentFile)
 		EVENT_ID_HANDLER(R.id.chk_autosave,EventSwndStateChanged::EventID,OnAutoCheck)
 		EVENT_ID_HANDLER(R.id.workspace_treeview,EventOfPanel::EventID,OnTvEventOfPanel)
+		EVENT_ID_HANDLER(R.id.workspace_treeview,EventKeyDown::EventID,OnTvKeyDown)
 	EVENT_MAP_END2(SHostWnd)
 
 protected:
@@ -304,7 +309,14 @@ public:
 	void SerializeItemsToClipboard(const std::vector<HSTREEITEM>& items, int nOperation);
 	BOOL DeserializeItemsFromClipboard(std::vector<SStringT>& vecItemPaths, int& nOperation);
 	BOOL HasClipboardData();
+	BOOL HandleTreeViewKeyboardShortcut(UINT nChar);
+	void OnFileCopy();
+	void OnFileCut();
+	void OnFilePaste();
+	void OnFilePaste(HSTREEITEM hItem);
 	
+	// 辅助函数
+	std::vector<HSTREEITEM> GetSelectedItems(HSTREEITEM hDefaultItem = ITEM_NULL);
 	ResManger m_UIResFileMgr;	// 管理编辑的UI文件资源
 
 	CXmlEditor *m_pXmlEdtior;

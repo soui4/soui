@@ -4,9 +4,9 @@
 namespace SOUI
 {
 
-	SDlgInput::SDlgInput():SHostDialog(_T("LAYOUT:UIDESIGNER_XML_INPUT"))
+	SDlgInput::SDlgInput():SHostDialog(_T("LAYOUT:DLG_INPUT"))
 	{
-
+		m_strTitle = _T("输入对话框");
 	}
 
 	//TODO:消息映射
@@ -17,20 +17,16 @@ namespace SOUI
 
 	void SDlgInput::OnOK()
 	{
-	
 		m_strValue = m_edt->GetWindowText();
-		if (m_strValue.IsEmpty())
-		{
-			//CDebug::Debug(_T("请输入内容"));
-			return;
-		}
 		SHostDialog::OnOK();
 	}
 
 	BOOL SDlgInput::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 	{
 		m_edt = FindChildByName2<SEdit>(L"edtInput");
-
+		m_edt->SetWindowText(m_strValue);
+		SWindow * txtTitle = FindChildByName(L"txt_title");
+		txtTitle->SetWindowText(m_strTitle);
 		return TRUE;
 	}
 

@@ -680,7 +680,7 @@ void STreeView::SetSel(HSTREEITEM hItem, BOOL bNotify /*=FALSE*/)
         if (pItem)
         {
             pItem->GetFocusManager()->ClearFocus();
-            pItem->ModifyItemState(0, WndState_Check);
+            pItem->SetSelected(FALSE);
             RedrawItem(pItem);
         }
         
@@ -1010,9 +1010,9 @@ void STreeView::UpdateVisibleItems()
             }
 
             ii.pItem->GetEventSet()->setMutedState(true);
-            if ((HSTREEITEM)ii.pItem->GetItemIndex() == m_hSelected)
+            if (ii.pItem->IsSelected())
             {
-                ii.pItem->ModifyItemState(0, WndState_Check);
+                ii.pItem->SetSelected(FALSE,FALSE);
                 ii.pItem->GetFocusManager()->ClearFocus();
             }
             ii.pItem->SetVisible(FALSE); // 防止执行SItemPanel::OnTimeFrame()
@@ -1067,10 +1067,7 @@ void STreeView::UpdateVisibleItems()
         m_pVisibleMap->SetAt(hItem, ii);
         ii.pItem->SetVisible(TRUE);
 
-        if (IsItemSelected(hItem))
-            ii.pItem->ModifyItemState(WndState_Check, 0);
-        else
-            ii.pItem->ModifyItemState(0, WndState_Check);
+        ii.pItem->SetSelected(IsItemSelected(hItem),FALSE);
 
         if (m_pHoverItem && hItem == (HSTREEITEM)m_pHoverItem->GetItemIndex())
             ii.pItem->ModifyItemState(WndState_Hover, 0);
@@ -1241,19 +1238,20 @@ void STreeView::onBranchInvalidated(HSTREEITEM hBranch, BOOL bInvalidParents, BO
             const ItemInfo &ii = m_visible_items.GetNext(pos);
             bool bInvalid = false;
             HSTREEITEM hItem = (HSTREEITEM)ii.pItem->GetItemIndex();
-            while (hItem)
+            HSTREEITEM hParent = hItem;
+            while (hParent)
             {
-                if (hItem == hBranch)
+                if (hParent == hBranch)
                 {
                     bInvalid = true;
                     break;
                 }
-                hItem = m_adapter->GetParentItem(hItem);
+                hParent = m_adapter->GetParentItem(hParent);
             }
             if (bInvalid)
             {
                 SXmlNode xmlNode = m_xmlTemplate.root().first_child();
-                m_adapter->getView(hBranch, ii.pItem, &xmlNode);
+                m_adapter->getView(hItem, ii.pItem, &xmlNode);
                 ii.pItem->InvalidateRect(NULL);
             }
         }
@@ -1724,7 +1722,7 @@ void STreeView::AddSelItem(HSTREEITEM hItem)
     SItemPanel *pItem = GetItemPanel(hItem);
     if (pItem)
     {
-        pItem->ModifyItemState(WndState_Check, 0);
+        pItem->SetSelected(TRUE);
         RedrawItem(pItem);
     }
 }
