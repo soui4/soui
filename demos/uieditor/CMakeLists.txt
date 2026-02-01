@@ -24,43 +24,44 @@ set(current_project "uieditor")
 add_soui_exe(${current_project} ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${CURRENT_RC})
 
 if(CMAKE_SYSTEM_NAME MATCHES Darwin)
-# 配置代码签名
-set(MACOSX_CODESIGN_IDENTITY "Apple Development")
-set(MACOSX_TEAM_ID "XXXXXXXXXXXX")
+    # 配置代码签名
+    set(MACOSX_CODESIGN_IDENTITY "Apple Development")
+    set(MACOSX_TEAM_ID "XXXXXXXXXXXX")
 
-# 设置 Xcode 特定的签名属性
-set_target_properties(${current_project} PROPERTIES
-    XCODE_ATTRIBUTE_DEVELOPMENT_TEAM "${MACOSX_TEAM_ID}"
-    XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "${MACOSX_CODESIGN_IDENTITY}"
-    XCODE_ATTRIBUTE_CODE_SIGN_STYLE "Automatic"
-    XCODE_ATTRIBUTE_PROVISIONING_PROFILE_SPECIFIER ""
-)
+    # 设置 Xcode 特定的签名属性
+    set_target_properties(${current_project} PROPERTIES
+        XCODE_ATTRIBUTE_DEVELOPMENT_TEAM "${MACOSX_TEAM_ID}"
+        XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "${MACOSX_CODESIGN_IDENTITY}"
+        XCODE_ATTRIBUTE_CODE_SIGN_STYLE "Automatic"
+        XCODE_ATTRIBUTE_PROVISIONING_PROFILE_SPECIFIER ""
+    )
+
+    # 准备要复制的目标列表
+    set(DEMO_TARGET_LIST
+        cairo
+        swinx
+        soui4
+        msftedit
+        utilities4
+        imgdecoder-stb
+        resprovider-zip
+        resprovider-7zip
+        log4z
+        translator
+        render-skia
+    )
+    copy_targets_to_bundle(${current_project} "${DEMO_TARGET_LIST}")
+
+    add_macos_res_folder(${current_project} ${CMAKE_CURRENT_SOURCE_DIR}/uires uires)
+    add_macos_res_file(${current_project} ${PROJECT_SOURCE_DIR}/simsun.ttc fonts)
+    add_macos_res_file(${current_project} ${PROJECT_SOURCE_DIR}/soui-sys-resource.zip data)
+    add_macos_res_folder(${current_project} ${CMAKE_CURRENT_SOURCE_DIR}/Config data/Config)
+    set_macos_icon(${current_project} ${CMAKE_CURRENT_SOURCE_DIR}/logo.icns ${PROJECT_SOURCE_DIR}/__cmake/plist.in)
+else()
+    add_app_res_folder(${current_project} ${CMAKE_CURRENT_SOURCE_DIR}/Config Config)
+    add_app_res_file(${current_project} ${PROJECT_SOURCE_DIR}/soui-sys-resource.zip ".")
 endif()
 
-# 准备要复制的目标列表
-set(DEMO_TARGET_LIST
-	cairo
-    swinx
-    soui4
-	msftedit
-    utilities4
-	imgdecoder-stb
-	resprovider-zip
-	resprovider-7zip
-	log4z
-	translator
-	render-skia
-)
-copy_targets_to_bundle(${current_project} "${DEMO_TARGET_LIST}")
-
-add_macos_res_folder(${current_project} ${CMAKE_CURRENT_SOURCE_DIR}/uires uires)
-add_macos_res_file(${current_project} ${PROJECT_SOURCE_DIR}/simsun.ttc fonts)
-add_macos_res_file(${current_project} ${PROJECT_SOURCE_DIR}/soui-sys-resource.zip data)
-add_macos_res_folder(${current_project} ${CMAKE_CURRENT_SOURCE_DIR}/Config data/Config)
-set_macos_icon(${current_project} ${CMAKE_CURRENT_SOURCE_DIR}/logo.icns ${PROJECT_SOURCE_DIR}/__cmake/plist.in)
-if(CMAKE_DEBUG_POSTFIX)
-    set_target_properties(${current_project} PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
-endif()
 
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
 	add_dependencies(${current_project} soui-sys-resource ${COM_LIBS})

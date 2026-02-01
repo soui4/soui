@@ -21,7 +21,6 @@
 #define kLogTag "maindlg"
 
 #define UIRES_FILE	L"uires.idx"
-CSysDataMgr g_SysDataMgr;
 
 //----------------------------------------------------------------------------
 CMainDlg::CMainDlg() 
@@ -80,25 +79,14 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 	m_pXmlEdtior->Init(GetRoot(),this);
     m_pImageViewer = new CImageViewer(this);
 	m_pImageViewer->Init(GetRoot());
-#ifdef __APPLE__
-    char szBunblePath[1024];
-    GetAppleBundlePath(szBunblePath, sizeof(szBunblePath));
-	SStringA strBunblePath = SStringA(szBunblePath);
-	strBunblePath += _T("/Contents/Resources/data/Config");
-	SStringT strCfgDir = S_CA2T(strBunblePath);
-#else
-	SStringT strCfgDir = SApplication::getSingletonPtr()->GetAppDir() + _T("/Config");
-#endif
-	SApplication::getSingleton().SetFilePrefix(strCfgDir);
-	g_SysDataMgr.LoadSysData(strCfgDir);
 
 	{//init control listbox
-		CWidgetTBAdapter * pAdapter = new CWidgetTBAdapter(g_SysDataMgr.getCtrlDefNode(),this);
+		CWidgetTBAdapter * pAdapter = new CWidgetTBAdapter(CSysDataMgr::getSingleton().getCtrlDefNode(),this);
 		m_lvWidget->SetAdapter(pAdapter);
 		pAdapter->Release();
 	}
 	{//init skin listbox
-		CSkinTBAdapter * pAdapter = new CSkinTBAdapter(g_SysDataMgr.getSkinDefNode(),this);
+		CSkinTBAdapter * pAdapter = new CSkinTBAdapter(CSysDataMgr::getSingleton().getSkinDefNode(),this);
 		m_lvSkin->SetAdapter(pAdapter);
 		pAdapter->Release();
 	}
@@ -1263,7 +1251,7 @@ void CMainDlg::OnInsertWidget(CWidgetTBAdapter::IconInfo *info)
 void CMainDlg::OnInertSkin(CSkinTBAdapter::IconInfo * info)
 {
 	m_lvSkin->SetSel(-1,FALSE);
-	DlgInsertXmlElement dlg(&m_UIResFileMgr,g_SysDataMgr.getSkinDefNode().child(L"skins"),S_CT2W(info->strElement));
+	DlgInsertXmlElement dlg(&m_UIResFileMgr,CSysDataMgr::getSingleton().getSkinDefNode().child(L"skins"),S_CT2W(info->strElement));
 	if(IDOK==dlg.DoModal())
 	{
 		m_pXmlEdtior->InsertElement(dlg.GetXml());

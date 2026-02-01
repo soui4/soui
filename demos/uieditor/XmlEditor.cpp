@@ -16,11 +16,6 @@
 #endif//_WIN32
 #include "AutoCompleteAdapter.h"
 
-//编辑界面时XML窗口只显示选择控件的XML文本
-//#define  ONLYSHOWSELXML
-
-extern CSysDataMgr g_SysDataMgr;
-
 #define  MARGIN 20
 #define kLogTag "xml_editor"
 
@@ -366,7 +361,7 @@ void CXmlEditor::OnPropGridValueChanged(IEvtArgs *e)
 }
 void CXmlEditor::InitPropGrid(const SStringW &strNodeName, SStringW strParents)
 {
-	SXmlNode xmlInitProp = g_SysDataMgr.getCtrlDefNode().child(L"controls");
+	SXmlNode xmlInitProp = CSysDataMgr::getSingleton().getCtrlDefNode().child(L"controls");
     SXmlNode xmlNode = xmlInitProp.child(strNodeName);
     if (xmlNode)
     {
@@ -386,7 +381,8 @@ void CXmlEditor::InitPropGrid(const SStringW &strNodeName, SStringW strParents)
             }
         }
 		m_pPropGrid->LoadFromXml(xmlNode.child(L"groups"));
-    }else
+    }
+    else if (strNodeName.CompareNoCase(SWindow::GetClassName())!=0)
 	{
 		//check if strNodeName is a window object
 		IWindow *pWnd = SApplication::getSingletonPtr()->CreateWindowByName(strNodeName);

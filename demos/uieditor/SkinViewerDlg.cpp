@@ -1,12 +1,11 @@
 ﻿#include "stdafx.h"
 #include "SkinViewerDlg.h"
 #include "ResManger.h"
-
+#include "AutoCompleteAdapter.h"
 CSkinViewerDlg::CSkinViewerDlg(ResManger *pResMgr)
 	: SHostDialog(_T("LAYOUT:dlg_skin_viewer"))
 	, m_pResMgr(pResMgr)
-	, m_pListBox(NULL)
-	, m_pImgPreview(NULL)
+	, m_pImgPreviewFull(NULL)
 	, m_pBtnPrev(NULL)
 	, m_pBtnNext(NULL)
 	, m_pLblIndex(NULL)
@@ -17,43 +16,33 @@ CSkinViewerDlg::CSkinViewerDlg(ResManger *pResMgr)
 CSkinViewerDlg::~CSkinViewerDlg()
 {}
 
-SStringT CSkinViewerDlg::GetSelectedSkin() const
-{
-	if(m_pListBox && m_pListBox->GetCurSel() != -1)
-	{
-		return m_pListBox->GetText(m_pListBox->GetCurSel());
-	}
-	return _T("");
-}
-
 BOOL CSkinViewerDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 {
 	// 获取控件
-	m_pListBox = FindChildByName2<SListBox>(L"NAME_UIDESIGNER_NEW_SKIN_LB");
-	m_pImgPreview = FindChildByName2<SImageWnd>(L"img_preview");
-	m_pBtnPrev = FindChildByName2<SButton>(L"btn_prev");
-	m_pBtnNext = FindChildByName2<SButton>(L"btn_next");
-	m_pLblIndex = FindChildByName2<SStatic>(L"lbl_index");
+	m_plvSkins = FindChildByID2<SListView>(R.id.lv_skin);
+	m_pImgPreviewFull = FindChildByID2<SImageWnd>(R.id.img_preview_full);
+	m_pImgPreviewAuto = FindChildByID2<SImageWnd>(R.id.img_preview_auto);
+	m_pBtnPrev = FindChildByID2<SButton>(R.id.btn_prev);
+	m_pBtnNext = FindChildByID2<SButton>(R.id.btn_next);
+	m_pLblIndex = FindChildByID2<SStatic>(R.id.lbl_index);
 
+	m_bAutoSize = FindChildByID(R.id.chk_auto_size)->IsChecked();
+	m_pImgPreviewFull->SetVisible(!m_bAutoSize);
+	m_pImgPreviewAuto->SetVisible(m_bAutoSize);
 	// 从 ResManager 获取皮肤列表
 	if(m_pResMgr)
 	{
 		m_pResMgr->GetSkinList(m_vecSkinTypes);
 	}
-
-	// 填充皮肤类型列表
-	if(m_pListBox)
-	{
-		m_pListBox->DeleteAll();
-		for(size_t i = 0; i < m_vecSkinTypes.size(); i++)
-		{
-			m_pListBox->AddString(m_vecSkinTypes[i]);
-		}
-		if(!m_vecSkinTypes.empty())
-		{
-			m_pListBox->SetCurSel(0,TRUE);
-		}
-	}
+    CAutoCompleteSkinAdapter *pAdapter = new CAutoCompleteSkinAdapter;
+    for (int i = 0; i < m_vecSkinTypes.size(); i++)
+    {
+        ISkinObj *pSkin = m_pResMgr->GetSkin(S_CT2W(m_vecSkinTypes[i]), 100);
+        pAdapter->AddSkin(m_vecSkinTypes[i], pSkin);
+    }
+    m_plvSkins->SetAdapter(pAdapter);
+	pAdapter->Release();
+	m_plvSkins->SetSel(0,TRUE);
 	return TRUE;
 }
 
@@ -97,15 +86,15 @@ void CSkinViewerDlg::OnBtnNext()
 
 void CSkinViewerDlg::OnSkinTypeSelected(IEvtArgs *e)
 {
-    EventLBSelChanged *e2 = sobj_cast<EventLBSelChanged>(e);
-    m_nCurrentSkinIndex = e2->nNewSel;
+    EventLVSelChanged *e2 = sobj_cast<EventLVSelChanged>(e);
+    m_nCurrentSkinIndex = e2->iNewSel;
     m_nCurrentStateIndex = 0;
     UpdatePreview();
 }
 
 void CSkinViewerDlg::UpdatePreview()
 {
-	if(m_pImgPreview && m_pResMgr && m_nCurrentSkinIndex >= 0 && m_nCurrentSkinIndex < (int)m_vecSkinTypes.size())
+	if(m_pImgPreviewFull && m_pResMgr && m_nCurrentSkinIndex >= 0 && m_nCurrentSkinIndex < (int)m_vecSkinTypes.size())
 	{
 		// 获取当前选中的皮肤名称
 		SStringT strSkinName = m_vecSkinTypes[m_nCurrentSkinIndex];
@@ -123,9 +112,10 @@ void CSkinViewerDlg::UpdatePreview()
 			if(m_nCurrentStateIndex >= nStates) m_nCurrentStateIndex = nStates - 1;
 			
 			// 设置图片控件显示指定状态的皮肤
-			m_pImgPreview->SetSkin(pSkin);
-			m_pImgPreview->SetIcon(m_nCurrentStateIndex);
-			
+			m_pImgPreviewFull->SetSkin(pSkin);
+			m_pImgPreviewFull->SetIcon(m_nCurrentStateIndex);
+			m_pImgPreviewAuto->SetSkin(pSkin);
+			m_pImgPreviewAuto->SetIcon(m_nCurrentStateIndex);
 			// 更新索引标签
 			if(m_pLblIndex)
 			{
@@ -139,5 +129,16 @@ void CSkinViewerDlg::UpdatePreview()
 				m_pBtnNext->EnableWindow(m_nCurrentStateIndex < nStates - 1);
 			}
 		}
+	}
+}
+
+void CSkinViewerDlg::OnChkAutoSize(IEvtArgs *e)
+{
+	EventSwndStateChanged *e2 = sobj_cast<EventSwndStateChanged>(e);
+	if(EventSwndStateChanged_CheckState(e2,WndState_Check))
+	{
+		m_bAutoSize = e2->dwNewState&WndState_Check;
+		m_pImgPreviewFull->SetVisible(!m_bAutoSize,TRUE);
+		m_pImgPreviewAuto->SetVisible(m_bAutoSize,TRUE);
 	}
 }

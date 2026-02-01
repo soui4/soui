@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<SOUI name="window" title="皮肤 Viewer" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" width="500" height="300" resizable="1" margin="5,5,5,5">
+<SOUI name="window" title="皮肤 Viewer" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" width="600" height="400" resizable="1" margin="5,5,5,5">
 	<root colorBkgnd="#6f1111" padding="2">
 		<window pos="0,0,-1,-1" colorBkgnd="@color/bkBlack1" colorText="#ffffff" font="face:微软雅黑;bold:1;size:13" skin="" layout="vbox">
 			<caption size="-2,30" layout="hbox" gravity="center">
@@ -7,19 +7,31 @@
 				<window size="0,0" visible="0" weight="1"/>
 				<imgbtn id="IDCANCEL" skin="_skin.sys.btn.close" tip="close" animate="1" />
 			</caption>
-			<window size="-2,0" weight="1" layout="hbox" interval="5"> 
-				<listbox size="100,-2" hotTrack="1" itemHeight="30" colorText="#FFFFFF" colorSelText="#FFFFFF" colorItemSelBkgnd="rgb(234,128,16)" text-x="20" name="NAME_UIDESIGNER_NEW_SKIN_LB" />
-				<window size="0,-2" weight="1" layout="vbox" gravity="center"> 
+			<splitcol size="-2,0" weight="1" layout="hbox" interval="5">
+			    <pane idealSize="200" minSize="100" priority="2" > 
+					<listview size="-2,-2" name="lv_skin" colorBkgnd="@color/gray">
+						<template itemHeight="20" layout="hbox" gravity="center" colorNormal="@color/white" colorSelected="#e4f0fc" colorHover="#e4f0fc">
+							<text name="txt_desc" colorText="@color/red"/>
+							<window size="0,0" weight="1"/>
+							<img name="skin_preview" width="20" height="20" iconIndex="0"/>
+						</template>
+					</listview>
+			    </pane> 
+				<pane idealSize="200" minSize="10" priority="1" layout="vbox"> 
 					<window size="-2,0" weight="1" skin="skin_designer_background">
-						<img size="-2,-2" name="img_preview" />
+						<img size="-2,-2" name="img_preview_full" visible="1"/>
+						<img size="-1,-1" offset="-0.5,-0.5" pos="|0,|0" name="img_preview_auto" visible="0"/>
 					</window>
-					<window size="-1,-1" layout="hbox" interval="5" colorText="@color/black"> 
-						<button name="btn_prev" text="<" size="50,30" />
-						<text size="50,30" name="lbl_index" text="1/1" />
-						<button name="btn_next" text=">" size="50,30" />
+					<window size="-2,30"> 
+						<check pos="10,|0" offset="0,-0.5" name="chk_auto_size" text="@string/auto_size" checked="1" />
+						<window pos="|0,|0" size="-1,-1" offset="-0.5,-0.5" layout="hbox" interval="5" colorText="@color/black">
+							<button name="btn_prev" text="<" size="50,30" />
+							<text size="50,30" name="lbl_index" text="1/1" align="center"/>
+							<button name="btn_next" text=">" size="50,30" />
+						</window>
 					</window>
-				</window>
-			</window>
+				</pane>
+			</splitcol>
 		</window>
 	</root>
 </SOUI>

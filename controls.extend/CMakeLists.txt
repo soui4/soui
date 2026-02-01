@@ -24,3 +24,17 @@ endif()
 
 # 仅安装当前源码目录下的 .h/.hpp/.hxx/.hh 头文件到 include/ 目录
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/" DESTINATION include/controls.extend FILES_MATCHING PATTERN "*.h")
+
+install(TARGETS ExtendCtrls
+    CONFIGURATIONS Release
+    RUNTIME DESTINATION bin/Release
+    LIBRARY DESTINATION lib/Release
+    ARCHIVE DESTINATION lib/Release
+)
+
+install(TARGETS ExtendCtrls
+    CONFIGURATIONS Debug
+    RUNTIME DESTINATION bin/Debug
+    LIBRARY DESTINATION lib/Debug
+    ARCHIVE DESTINATION lib/Debug
+)

@@ -1166,7 +1166,11 @@ void SCheckBox::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 HRESULT SCheckBox::OnAttrCheck(const SStringW &strValue, BOOL bLoading)
 {
+    if (bLoading)
+        GetEventSet()->setMutedState(TRUE);
     SetCheck(STRINGASBOOL(strValue));
+    if (bLoading)
+        GetEventSet()->setMutedState(FALSE);
     return S_FALSE;
 }
 

@@ -103,7 +103,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 #ifdef _WIN32
     cfg.SetSysResPeFile(SYS_NAMED_RESOURCE);
     cfg.SetAppResPeHandle(hInstance);
-#elif defined__APPLE__
+#elif defined(__APPLE__)
     cfg.SetSysResZip(srcDir + kPath_SysRes);
     cfg.SetAppResFile(srcDir + kPath_AppRes);
 #else
@@ -115,6 +115,16 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
     {
         return -1;
     }
+
+    CSysDataMgr * pSysDataMgr = new CSysDataMgr;
+#ifdef __APPLE__
+	SStringT strCfgDir = srcDir + _T("/Config");
+#else
+	SStringT strCfgDir = appDir + _T("/Config");
+#endif
+	SApplication::getSingleton().SetFilePrefix(strCfgDir);
+	pSysDataMgr->LoadSysData(strCfgDir);
+
 
     theApp.InitXmlNamedID((const LPCWSTR *)&R.name, (const int *)&R.id, sizeof(R.id) / sizeof(int));
     
@@ -144,7 +154,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
         dlgMain.ShowWindow(SW_MAXIMIZE);
         nRet = theApp.Run(dlgMain.m_hWnd);
     }
-
+    delete pSysDataMgr;
     Scintilla_ReleaseResources();
 
     OleUninitialize();

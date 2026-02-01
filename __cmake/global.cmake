@@ -126,7 +126,7 @@ macro(add_app_res_folder app_name res_path res_name)
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different
                     "${res_file}"
                     "$<TARGET_FILE_DIR:${app_name}>/${res_name}/${relative_dir}/${res_id}"
-                COMMENT "Copying ${res_file} to ${app_name} "
+                COMMENT "Copying ${res_file} for ${app_name} "
             )
         else()
             message(WARNING "resource file not found: ${res_file}")
@@ -134,6 +134,23 @@ macro(add_app_res_folder app_name res_path res_name)
     endforeach()
 endmacro()
 
+
+macro(add_app_res_file app_name res_file dest_path)
+# 检查文件是否存在（在配置时检查）
+    if(EXISTS "${res_file}")
+        #message(STATUS "resource file found: ${res_file}")
+        get_filename_component(res_id "${res_file}" NAME)
+
+        add_custom_command(TARGET ${app_name} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${res_file}"
+                "$<TARGET_FILE_DIR:${app_name}>/${dest_path}/${res_id}"
+            COMMENT "Copying ${res_file} for ${app_name} "
+        )
+    else()
+        message(WARNING "resource file not found: ${res_file}")
+    endif()
+endmacro()
 
 macro(add_macos_res_file app res_file dest_path)
     if(APPLE)

@@ -1,4 +1,4 @@
-﻿//stamp:2181dc7b762a28fc
+﻿//stamp:2181ed602587b80d
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -141,6 +141,7 @@ struct _R{
 		 const wchar_t * button1st;
 		 const wchar_t * button2nd;
 		 const wchar_t * button3rd;
+		 const wchar_t * chk_auto_size;
 		 const wchar_t * chk_autosave;
 		 const wchar_t * color_preview;
 		 const wchar_t * edtInput;
@@ -149,11 +150,14 @@ struct _R{
 		 const wchar_t * img_icon_information;
 		 const wchar_t * img_icon_question;
 		 const wchar_t * img_preview;
+		 const wchar_t * img_preview_auto;
+		 const wchar_t * img_preview_full;
 		 const wchar_t * img_state;
 		 const wchar_t * img_viewer;
 		 const wchar_t * item_icon;
 		 const wchar_t * item_text;
 		 const wchar_t * lbl_index;
+		 const wchar_t * lv_skin;
 		 const wchar_t * lv_tb_skin;
 		 const wchar_t * lv_tb_widget;
 		 const wchar_t * msgicon;
@@ -213,6 +217,7 @@ struct _R{
 		int button1st;
 		int button2nd;
 		int button3rd;
+		int chk_auto_size;
 		int chk_autosave;
 		int color_preview;
 		int edtInput;
@@ -221,11 +226,14 @@ struct _R{
 		int img_icon_information;
 		int img_icon_question;
 		int img_preview;
+		int img_preview_auto;
+		int img_preview_full;
 		int img_state;
 		int img_viewer;
 		int item_icon;
 		int item_text;
 		int lbl_index;
+		int lv_skin;
 		int lv_tb_skin;
 		int lv_tb_widget;
 		int msgicon;
@@ -280,6 +288,7 @@ struct _R{
 	struct _string{
 		int add_skin;
 		int add_uires;
+		int auto_size;
 		int copy;
 		int cut;
 		int delete_cpp;
@@ -329,6 +338,7 @@ struct _R R={
 		L"button1st",
 		L"button2nd",
 		L"button3rd",
+		L"chk_auto_size",
 		L"chk_autosave",
 		L"color_preview",
 		L"edtInput",
@@ -337,11 +347,14 @@ struct _R R={
 		L"img_icon_information",
 		L"img_icon_question",
 		L"img_preview",
+		L"img_preview_auto",
+		L"img_preview_full",
 		L"img_state",
 		L"img_viewer",
 		L"item_icon",
 		L"item_text",
 		L"lbl_index",
+		L"lv_skin",
 		L"lv_tb_skin",
 		L"lv_tb_widget",
 		L"msgicon",
@@ -396,12 +409,13 @@ struct _R R={
 		65548,
 		65550,
 		65549,
-		65603,
-		65601,
+		65607,
+		65605,
 		65551,
 		65543,
 		65544,
 		65545,
+		65604,
 		65559,
 		65570,
 		65594,
@@ -410,11 +424,14 @@ struct _R R={
 		65538,
 		65539,
 		65600,
+		65603,
+		65602,
 		65562,
 		65582,
 		65578,
 		65579,
-		65602,
+		65606,
+		65601,
 		65577,
 		65580,
 		65537,
@@ -491,7 +508,8 @@ struct _R R={
 		19,
 		20,
 		21,
-		22
+		22,
+		23
 	}
 	
 };
