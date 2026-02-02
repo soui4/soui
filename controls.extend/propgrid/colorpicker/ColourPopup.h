@@ -87,6 +87,7 @@ protected:
 protected:
     void OnLButtonUp(UINT nFlags, CPoint point);
     void OnPaint(HDC);
+    BOOL OnEraseBkgnd(HDC);
     void OnMouseMove(UINT nFlags, CPoint point);
     void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	void OnKillFocus(HWND hNewWnd);
@@ -97,6 +98,7 @@ protected:
 	BEGIN_MSG_MAP_EX(CColourPopup)
 		MSG_WM_LBUTTONUP(OnLButtonUp)
 		MSG_WM_PAINT(OnPaint)
+        MSG_WM_ERASEBKGND(OnEraseBkgnd)
 		MSG_WM_MOUSEMOVE(OnMouseMove)
 		MSG_WM_KEYDOWN(OnKeyDown)
 		MSG_WM_KILLFOCUS(OnKillFocus)
