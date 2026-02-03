@@ -20,9 +20,9 @@ public:
 	void UpdateLayoutBuf(SStringA strUtf8);
 	void SelectCtrlByOrder(const int *pOrder,int nLen);
 	void Close();
-    BOOL IsXmlParseSuccess() const
+    XmlParseResult GetXmlParseResult() const
     {
-        return m_previewHost->IsXmlParseSuccess();
+        return m_previewHost->GetXmlParseResult();
     }
 
   protected:

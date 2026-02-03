@@ -69,10 +69,20 @@ void CXmlEditor::StartPreviewProcess()
 	m_pDesignWnd->Init(m_strLayoutName,m_pMainDlg->m_hWnd);
 	GETUIDEF->SetUiDef(pUiDef,false);
 	SApplication::getSingletonPtr()->RemoveResProvider(m_pResManger->m_pResProvider);
-    if (!m_pDesignWnd->IsXmlParseSuccess())
+    XmlParseResult res = m_pDesignWnd->GetXmlParseResult();
+    if (res.status != xml_ok)
     {
+        SStringA xmlUtf8 = m_pScintillaWnd->GetWindowText();
+        SStringW xmlStr = S_CA2W(xmlUtf8,CP_UTF8);
+        SStringW strPrefix = xmlStr.Left(res.offset);
+        SStringA utf8Prefix = S_CW2A(strPrefix, CP_UTF8);
+        int pos = utf8Prefix.GetLength();
+        m_pScintillaWnd->SetSel(pos,pos);
+        int errLine = m_pScintillaWnd->SendMessage(SCI_LINEFROMPOSITION,pos); 
+        m_pScintillaWnd->SendMessage(SCI_ENSUREVISIBLEENFORCEPOLICY, errLine);
         SMessageBox(m_pMainDlg->m_hWnd, _T("XML解析失败，请检查XML代码是否正确"), _T("提示"), MB_OK | MB_ICONERROR);
-	}
+        m_pScintillaWnd->SetFocus();
+    }
 
 }
 	

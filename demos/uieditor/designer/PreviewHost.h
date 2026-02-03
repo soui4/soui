@@ -19,8 +19,12 @@ public:
 	HWND GetEditor() const { return m_hOwner; }
 	void UpdateLayoutBuf(SStringA strUtf8);
 	void SelectCtrlByOrder(const int *pOrder,int nLen);
-	BOOL IsXmlParseSuccess() const { return m_bXmlParseSuccess; }
-protected:
+    XmlParseResult GetXmlParseResult() const
+    {
+        return m_GetXmlParseResult;
+    }
+
+  protected:
 	BOOL OnLoadLayoutFromResourceID(SXmlDoc& xmlDoc) override;
     void OnFinalMessage(HWND hWnd) override;
 
@@ -33,8 +37,9 @@ protected:
 	BOOL	  m_bSOUIWnd;
 	BOOL	  m_bVirtualRoot;
 	HWND	  m_hOwner;
-	BOOL      m_bXmlParseSuccess;
-protected:
+    XmlParseResult m_GetXmlParseResult;
+
+  protected:
 	void OnSwndInitFinish(IEvtArgs *e);
 	void OnFrameMoved(IEvtArgs *e);
 	//soui消息

@@ -23,7 +23,6 @@ CPreviewHost::CPreviewHost(IListener *pListener,LPCTSTR pszLayoutId, HWND hEdito
 ,m_iRootIndex(0)
 ,m_hOwner(hEditor)
 ,m_pListener(pListener)
-,m_bXmlParseSuccess(TRUE)
 {
 }
 
@@ -165,16 +164,16 @@ void CPreviewHost::GetSwndIndex(SWindow *pWnd,SList<int> &lstIndex)
 }
 
 BOOL CPreviewHost::OnLoadLayoutFromResourceID(SXmlDoc& xmlDoc) {
-	m_bXmlParseSuccess = FALSE;
+    BOOL bXmlParseSuccess = FALSE;
 	if (!m_utf8Buffer.IsEmpty())
 	{
-		m_bXmlParseSuccess = xmlDoc.load_buffer(m_utf8Buffer.c_str(), m_utf8Buffer.GetLength(), xml_parse_default, enc_utf8);
+		bXmlParseSuccess = xmlDoc.load_buffer(m_utf8Buffer.c_str(), m_utf8Buffer.GetLength(), xml_parse_default, enc_utf8);
 	}
 	else
 	{
-		m_bXmlParseSuccess = LOADXML(xmlDoc, m_strXmlLayout);
+		bXmlParseSuccess = LOADXML(xmlDoc, m_strXmlLayout);
 	}
-	if (m_bXmlParseSuccess)
+	if (bXmlParseSuccess)
 	{
 		m_iRootIndex = 0;
 		SXmlNode xmlSoui = xmlDoc.root().child(L"SOUI");
@@ -229,7 +228,8 @@ BOOL CPreviewHost::OnLoadLayoutFromResourceID(SXmlDoc& xmlDoc) {
 	{
 		SLOGFMTI("Load layout [%s] Failed", S_CT2A(m_strXmlLayout).c_str());
 	}
-	return m_bXmlParseSuccess;
+    xmlDoc.GetParseResult(&m_GetXmlParseResult);
+	return bXmlParseSuccess;
 }
 int CPreviewHost::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
