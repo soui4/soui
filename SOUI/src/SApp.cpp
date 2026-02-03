@@ -128,6 +128,7 @@ class SDefMsgLoopFactory : public TObjRefImpl<IMsgLoopFactory> {
 void SObjectDefaultRegister::RegisterWindows(SObjectFactoryMgr *objFactory) const
 {
     objFactory->TplRegisterFactory<SWindow>();
+    objFactory->TplRegisterFactory<SRootWindow>();
     objFactory->TplRegisterFactory<SPanel>();
     objFactory->TplRegisterFactory<SStatic>();
     objFactory->TplRegisterFactory<SButton>();

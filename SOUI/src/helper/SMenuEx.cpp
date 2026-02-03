@@ -81,8 +81,8 @@ class SMenuExRoot : public SRootWindow {
         , m_pIconSkin(NULL)
         , m_pMenuEx(pMenuEx)
         , m_dwContextHelpId(0)
-        , SRootWindow(pMenuEx)
     {
+        SetHostWnd(pMenuEx);
         m_nItemHei.setSize(26.f, dp);
         m_nIconBarWidth.setSize(24.f, dp);
         m_nMinWidth.setSize(WIDTH_MENU_MIN, dp);

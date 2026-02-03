@@ -69,6 +69,11 @@ void CXmlEditor::StartPreviewProcess()
 	m_pDesignWnd->Init(m_strLayoutName,m_pMainDlg->m_hWnd);
 	GETUIDEF->SetUiDef(pUiDef,false);
 	SApplication::getSingletonPtr()->RemoveResProvider(m_pResManger->m_pResProvider);
+    if (!m_pDesignWnd->IsXmlParseSuccess())
+    {
+        SMessageBox(m_pMainDlg->m_hWnd, _T("XML解析失败，请检查XML代码是否正确"), _T("提示"), MB_OK | MB_ICONERROR);
+	}
+
 }
 	
 BOOL CXmlEditor::LoadXml(SStringT strFileName, SStringT layoutName)
@@ -394,6 +399,13 @@ void CXmlEditor::InitPropGrid(const SStringW &strNodeName, SStringW strParents)
 	}
 }
 
+void CXmlEditor::ClearSelect(){
+	m_xmlEditing.Reset();
+	m_pPropGrid->RemoveAllItems();
+	m_pDesignWnd->SelectCtrlByOrder(NULL, 0);
+	m_vecSelectOrder.clear();
+}
+
 void CXmlEditor::SelectCtrlByOrder(const int *pOrder, int nLen, BOOL bSelXml)
 {
 	#ifdef _DEBUG
@@ -416,6 +428,7 @@ void CXmlEditor::SelectCtrlByOrder(const int *pOrder, int nLen, BOOL bSelXml)
             if (bSelXml)
             {
                 m_bSetCaretPos = TRUE;
+                SLOGI() << "set sel to pos :" << begin << "," << end;
                 m_pScintillaWnd->SetSel(begin, end);
                 m_bSetCaretPos = FALSE;
             }
@@ -556,6 +569,7 @@ LRESULT CXmlEditor::OnNotify(int idCtrl, LPNMHDR pnmh)
             OnTimer(300); // update xml data if needed
 			std::vector<int> order;
 			m_xmlParser.findElementOrder(nCaretPos,order);
+            SLOGI() << "set caret to pos:" << nCaretPos;
 			if(order.size()>1)
 			{//skip the root element
 				SelectCtrlByOrder(&order[1],order.size()-1,FALSE);
@@ -742,32 +756,18 @@ void CXmlEditor::OnSaveXml()
 	SaveFile();
 }
 
-class StreamWrite: public pugi::xml_writer
-	{
-	public:
-		virtual ~StreamWrite() {}
-
-		// Write memory chunk into stream/file/whatever
-		virtual void write(const void* data, size_t size){
-			m_stream.write((const char*)data, size);
-		}
-
-		public:
-		std::stringstream m_stream;
-	};
-
 void CXmlEditor::OnFormatXml()
 {
 	SStringA strXml = m_pScintillaWnd->GetWindowText();
-    pugi::xml_document xmlDoc;
-    if (!xmlDoc.load_buffer(strXml.c_str(), strXml.GetLength(), pugi::parse_full, pugi::encoding_utf8))
+    spugi::xml_document xmlDoc;
+    if (!xmlDoc.load_buffer(strXml.c_str(), strXml.GetLength(), pugi::parse_full, spugi::encoding_utf8))
     {
     
 		SMessageBox(m_pMainDlg->m_hWnd, _T("XML格式有错误，无法格式化!"), _T("提示"), MB_OK);
         return;
     }
 	StreamWrite writer;
-    xmlDoc.save(writer, L"\t", pugi::format_default, pugi::encoding_utf8);
+    xmlDoc.save(writer, "\t", spugi::format_default, spugi::encoding_utf8);
     m_pScintillaWnd->SetSel(0, -1);
 	m_pScintillaWnd->ReplaseSel(writer.m_stream.str().c_str());
 }

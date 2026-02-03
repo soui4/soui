@@ -2,12 +2,29 @@
 
 #include "spugixml/pugixml.hpp"
 #include <vector>
+#include <sstream>
 
 struct NodeRange
 {
 	int begin;
 	int _break;
 	int end;
+};
+
+class StreamWrite : public spugi::xml_writer {
+  public:
+    virtual ~StreamWrite()
+    {
+    }
+
+    // Write memory chunk into stream/file/whatever
+    virtual void write(const void *data, size_t size)
+    {
+        m_stream.write((const char *)data, size);
+    }
+
+  public:
+    std::stringstream m_stream;
 };
 
 class CXmlParser :  public spugi::xml_document, spugi::xml_parse_listener

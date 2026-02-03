@@ -23,6 +23,7 @@ CPreviewHost::CPreviewHost(IListener *pListener,LPCTSTR pszLayoutId, HWND hEdito
 ,m_iRootIndex(0)
 ,m_hOwner(hEditor)
 ,m_pListener(pListener)
+,m_bXmlParseSuccess(TRUE)
 {
 }
 
@@ -107,7 +108,11 @@ void CPreviewHost::SelectCtrlByOrder(const int *pOrder,int nLen)
 {
     //刷新前重新布局，会自动检查布局脏标志
     GetRoot()->UpdateLayout();
-
+	if(!pOrder)
+	{
+		m_pSel->SetVisible(FALSE,TRUE);
+		return;
+	}
 	SWindow *pRoot = this->GetRoot();
 	SWindow *pChild = pRoot;
 	int i = 0;
@@ -160,16 +165,16 @@ void CPreviewHost::GetSwndIndex(SWindow *pWnd,SList<int> &lstIndex)
 }
 
 BOOL CPreviewHost::OnLoadLayoutFromResourceID(SXmlDoc& xmlDoc) {
-	BOOL bLoaded = FALSE;
+	m_bXmlParseSuccess = FALSE;
 	if (!m_utf8Buffer.IsEmpty())
 	{
-		bLoaded = xmlDoc.load_buffer(m_utf8Buffer.c_str(), m_utf8Buffer.GetLength(), xml_parse_default, enc_utf8);
+		m_bXmlParseSuccess = xmlDoc.load_buffer(m_utf8Buffer.c_str(), m_utf8Buffer.GetLength(), xml_parse_default, enc_utf8);
 	}
 	else
 	{
-		bLoaded = LOADXML(xmlDoc, m_strXmlLayout);
+		m_bXmlParseSuccess = LOADXML(xmlDoc, m_strXmlLayout);
 	}
-	if (bLoaded)
+	if (m_bXmlParseSuccess)
 	{
 		m_iRootIndex = 0;
 		SXmlNode xmlSoui = xmlDoc.root().child(L"SOUI");
@@ -186,7 +191,6 @@ BOOL CPreviewHost::OnLoadLayoutFromResourceID(SXmlDoc& xmlDoc) {
 			m_bSOUIWnd = TRUE;
 			xmlSoui.attribute(L"translucent").set_value(0);
 			xmlSoui.attribute(L"wndType").set_value(L"normal");
-			return TRUE;
 		}
 		else
 		{//include element.
@@ -210,7 +214,6 @@ BOOL CPreviewHost::OnLoadLayoutFromResourceID(SXmlDoc& xmlDoc) {
                 }
                 xmlDoc.Reset();
                 xmlDoc.root().append_copy(xmlDoc2.root().first_child());				
-				return TRUE;
 			}
 			else
 			{
@@ -219,15 +222,14 @@ BOOL CPreviewHost::OnLoadLayoutFromResourceID(SXmlDoc& xmlDoc) {
 				xmlRoot2.append_copy(xmlDoc.root().first_child());
                 xmlDoc.Reset();
                 xmlDoc.root().append_copy(xmlDoc2.root().first_child());	
-				return TRUE;
 			}
 		}
 	}
 	else
 	{
 		SLOGFMTI("Load layout [%s] Failed", S_CT2A(m_strXmlLayout).c_str());
-		return FALSE;
 	}
+	return m_bXmlParseSuccess;
 }
 int CPreviewHost::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {

@@ -199,9 +199,16 @@ class SOUI_EXP SRootWindow : public SWindow {
      *
      * @param pHostWnd Pointer to the host window.
      */
-    SRootWindow(SHostWnd *pHostWnd);
+    SRootWindow();
 
   public:
+    /**
+     * @brief Sets the pointer to the host window.
+     *
+     * @param pHostWnd Pointer to the host window.
+     */
+    void SetHostWnd(SHostWnd *pHostWnd);
+
     /**
      * @brief Gets the pointer to the host window.
      *

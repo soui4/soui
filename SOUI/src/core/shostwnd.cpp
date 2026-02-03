@@ -157,8 +157,8 @@ enum AniState
     Ani_All = (Ani_win | Ani_host),
 };
 
-SRootWindow::SRootWindow(SHostWnd *pHostWnd)
-    : m_pHostWnd(pHostWnd)
+SRootWindow::SRootWindow()
+    : m_pHostWnd(NULL)
 {
     GetEventSet()->addEvent(EVENTID(EventInit));
     GetEventSet()->addEvent(EVENTID(EventExit));
@@ -283,6 +283,11 @@ void SRootWindow::RequestRelayout(SWND hSource, BOOL bSourceResizable)
         rcSour = pSource->GetWindowRect();
     }
     m_pHostWnd->OnRedraw(rcSour, FALSE);
+}
+
+void SRootWindow::SetHostWnd(SHostWnd *pHostWnd)
+{
+    m_pHostWnd = pHostWnd;
 }
 
 SHostWnd *SRootWindow::GetHostWnd() const
@@ -849,7 +854,9 @@ BOOL SHostWnd::OnLoadLayoutFromResourceID(SXmlDoc &xmlDoc)
 
 SRootWindow *SHostWnd::CreateRoot()
 {
-    return new SRootWindow(this);
+    SRootWindow * pRet = new SRootWindow;
+    pRet->SetHostWnd(this);
+    return pRet;
 }
 
 int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)

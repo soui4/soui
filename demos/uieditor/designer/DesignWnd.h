@@ -20,7 +20,12 @@ public:
 	void UpdateLayoutBuf(SStringA strUtf8);
 	void SelectCtrlByOrder(const int *pOrder,int nLen);
 	void Close();
-protected:
+    BOOL IsXmlParseSuccess() const
+    {
+        return m_previewHost->IsXmlParseSuccess();
+    }
+
+  protected:
 	void OnResize() override;
 	void OnRePos(const POINT *pt) override;
 	void OnSelectedCtrl(const int * pOrder, int nLen) override;

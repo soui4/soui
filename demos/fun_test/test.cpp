@@ -1,4 +1,4 @@
-﻿#include <stdio.h>
+#include <stdio.h>
 #include <tchar.h>
 
 #pragma warning(disable:4800)
@@ -654,4 +654,83 @@ TEST(demo,window){
 int run_app(HINSTANCE hInst);
 TEST(demo,app){
     EXPECT_EQ(run_app(0),0);
+}
+
+// Waitable Timer and Timer Queue Tests
+TEST(sowinapi, waitable_timer) {
+    // Test 1: Create unnamed waitable timer
+    HANDLE hTimer = CreateWaitableTimer(NULL, FALSE, NULL);
+    EXPECT_TRUE(hTimer != NULL);
+    
+    if (hTimer) {
+        // Test 2: Set waitable timer (100ms)
+        LARGE_INTEGER liDueTime;
+        liDueTime.QuadPart = -100000LL; // 100ms in 100ns units
+        BOOL bSet = SetWaitableTimer(hTimer, &liDueTime, 0, NULL, NULL, FALSE);
+        EXPECT_TRUE(bSet);
+        
+        if (bSet) {
+            // Test 3: Wait for timer
+            DWORD dwWait = WaitForSingleObject(hTimer, 200);
+            EXPECT_EQ(dwWait, WAIT_OBJECT_0);
+        }
+        
+        // Test 4: Cancel waitable timer
+        BOOL bCancel = CancelWaitableTimer(hTimer);
+        EXPECT_TRUE(bCancel);
+        
+        CloseHandle(hTimer);
+    }
+    
+    // Test 5: Create named waitable timer
+    const TCHAR* timerName = _T("TestWaitableTimer");
+    HANDLE hNamedTimer = CreateWaitableTimer(NULL, FALSE, timerName);
+    EXPECT_TRUE(hNamedTimer != NULL);
+    
+    if (hNamedTimer) {
+        // Test 6: Open existing named timer
+        HANDLE hOpenedTimer = OpenWaitableTimer(TIMER_ALL_ACCESS, FALSE, timerName);
+        EXPECT_TRUE(hOpenedTimer != NULL);
+        
+        if (hOpenedTimer) {
+            CloseHandle(hOpenedTimer);
+        }
+        
+        CloseHandle(hNamedTimer);
+    }
+}
+
+// Timer callback function
+VOID CALLBACK TimerCallback(PVOID lpParameter, BOOLEAN TimerOrWaitFired)
+{
+    static int callbackCount = 0;
+    callbackCount++;
+    printf("Timer callback fired, count=%d\n", callbackCount);
+}
+
+TEST(sowinapi, timer_queue) {
+    // Test 1: Create timer queue
+    HANDLE hTimerQueue = CreateTimerQueue();
+    EXPECT_TRUE(hTimerQueue != NULL);
+    
+    if (hTimerQueue) {
+        // Test 2: Create timer in queue
+        HANDLE hTimer = NULL;
+        BOOL bCreate = CreateTimerQueueTimer(&hTimer, hTimerQueue, TimerCallback, NULL, 100, 0, 0);
+        EXPECT_TRUE(bCreate);
+        EXPECT_TRUE(hTimer != NULL);
+        
+        if (bCreate && hTimer) {
+            // Wait for timer to fire
+            Sleep(200);
+            
+            // Test 3: Delete timer from queue
+            BOOL bDelete = DeleteTimerQueueTimer(hTimerQueue, hTimer, NULL);
+            EXPECT_TRUE(bDelete);
+        }
+        
+        // Test 4: Delete timer queue
+        BOOL bDeleteQueue = DeleteTimerQueue(hTimerQueue);
+        EXPECT_TRUE(bDeleteQueue);
+    }
 }

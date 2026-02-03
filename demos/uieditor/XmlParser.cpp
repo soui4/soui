@@ -33,7 +33,7 @@ spugi::xml_node CXmlParser::_findNodeRange(spugi::xml_node node, int pos)
 	if(!node)
 		return spugi::xml_node();
 	NodeRange *pRange = (NodeRange*)node.get_userdata();
-	if(pRange->begin<=pos && pRange->end>pos)
+	if(pRange->begin<pos && pRange->end>pos)
 	{
 		spugi::xml_node child = node.first_child();
         spugi::xml_node ret = node;
@@ -67,12 +67,21 @@ int CXmlParser::findElementOrder(int pos,std::vector<int> &order){
 	if(!node){
 		return 0;
 	}
+    SObjectInfo objInfo;
+    ObjInfo_New(&objInfo, S_CA2W(node.name(), CP_UTF8), Window);
+    if (!SApplication::getSingleton().HasKey(objInfo))
+        return 0;
 	while(node){
 		int i=0;
 		spugi::xml_node sibling = node.previous_sibling();
 		while(sibling)
 		{
-			i++;
+			SObjectInfo objInfo;
+			ObjInfo_New(&objInfo,S_CA2W(sibling.name(),CP_UTF8),Window);
+			if(SApplication::getSingleton().HasKey(objInfo))
+			{
+				i++;
+			}
 			sibling = sibling.previous_sibling();
 		}
 		order.push_back(i);
@@ -93,22 +102,35 @@ NodeRange CXmlParser::findElementRange(int pos)
 	return *pRange;
 }
 
-NodeRange CXmlParser::getNodePos(const int *nodePos,int nLen)
+static xml_node find_child_by_index(xml_node parent, int idx,BOOL bFirst)
+{
+	xml_node child = parent.first_child();
+	for(;child;)
+	{
+		if(child.type()==spugi::node_element)
+		{
+			StreamWrite sw;
+			child.print(sw);
+            SObjectInfo objInfo;
+            ObjInfo_New(&objInfo, S_CA2W(child.name(), CP_UTF8), Window);
+            if (bFirst || SApplication::getSingleton().HasKey(objInfo))
+			{
+				if (idx == 0)
+					return child;
+				idx--;
+			}	
+		}
+		child=child.next_sibling();
+	}
+    return xml_node();
+}
+
+NodeRange CXmlParser::getNodePos(const int *nodePos, int nLen)
 {
 	xml_node selNode = root();
 	for(int i=0;i<nLen;i++)
 	{
-		xml_node child = selNode.first_child();
-		while(child && child.type()!=spugi::node_element){
-			child = child.next_sibling();
-		}
-		for(int j=0;j<nodePos[i];j++)
-		{
-			do{
-				child = child.next_sibling();
-			}while(child && child.type()!=spugi::node_element);
-		}
-		selNode = child;
+        selNode = find_child_by_index(selNode, nodePos[i],i==0);
 		if(!selNode)
 			break;
 	}
