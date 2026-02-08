@@ -2,10 +2,10 @@
 #define _DROP_TARGET_H_
 
 #include <shellapi.h>
-#include <helper/SUnknown.h>
+#include <helper/SUnkImpl.h>
 
 
-class CDropTarget : public SUnknown, public IDropTarget
+class CDropTarget : public SUnkImpl<IDropTarget>
 {
 public:
 	struct IDropListener
@@ -25,7 +25,7 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 	// IDropTarget
 
-	virtual HRESULT STDMETHODCALLTYPE DragEnter(
+	STDMETHOD(DragEnter)(
 		/* [unique][in] */ __RPC__in_opt IDataObject *pDataObj,
 		/* [in] */ DWORD grfKeyState,
 		/* [in] */ POINTL pt,
@@ -35,7 +35,7 @@ public:
 		return S_OK;
 	}
 
-	virtual HRESULT STDMETHODCALLTYPE DragOver(
+	STDMETHOD(DragOver)(
 		/* [in] */ DWORD grfKeyState,
 		/* [in] */ POINTL pt,
 		/* [out][in] */ __RPC__inout DWORD *pdwEffect)
@@ -44,12 +44,12 @@ public:
 		return S_OK;
 	}
 
-	virtual HRESULT STDMETHODCALLTYPE DragLeave(void)
+	STDMETHOD(DragLeave)() OVERRIDE
 	{
 		return S_OK;
 	}
 
-	virtual HRESULT STDMETHODCALLTYPE Drop(
+	STDMETHOD(Drop)(
 		/* [unique][in] */ __RPC__in_opt IDataObject *pDataObj,
 		/* [in] */ DWORD grfKeyState,
 		/* [in] */ POINTL pt,

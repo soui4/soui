@@ -1,6 +1,7 @@
 ﻿#ifndef __SUNKNOWNIMPL__H__
 #define __SUNKNOWNIMPL__H__
 
+#ifndef IUNKNOWN_BEGIN
 #define IUNKNOWN_BEGIN2(iid, cls)                                    \
     STDMETHODIMP_(ULONG) AddRef(void)                                \
     {                                                                \
@@ -38,6 +39,7 @@
 #define IUNKNOWN_BEGIN(iface) IUNKNOWN_BEGIN2(__suidof(iface), iface)
 
 #define IUNKNOWN_ADD_IID(iface) IUNKNOWN_ADD_IID2(__suidof(iface), iface)
+#endif//IUNKNOWN_BEGIN
 
 template <class T>
 class SUnkImpl : public T {

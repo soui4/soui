@@ -1,6 +1,7 @@
 ﻿#ifndef __SUNKNOWN__H__
 #define __SUNKNOWN__H__
 
+#ifndef IUNKNOWN_BEGIN
 #define IUNKNOWN_BEGIN2(iid, cls)                                    \
     STDMETHODIMP_(ULONG) AddRef(void)                                \
     {                                                                \
@@ -38,6 +39,8 @@
 #define IUNKNOWN_BEGIN(iface) IUNKNOWN_BEGIN2(__uuidof(iface), iface)
 
 #define IUNKNOWN_ADD_IID(iface) IUNKNOWN_ADD_IID2(__uuidof(iface), iface)
+
+#endif//IUNKNOWN_BEGIN
 
 class SUnknown {
   public:

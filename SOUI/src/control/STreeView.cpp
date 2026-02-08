@@ -1007,6 +1007,7 @@ void STreeView::UpdateVisibleItems()
             {
                 m_pHoverItem->DoFrameEvent(WM_MOUSELEAVE, 0, 0);
                 m_pHoverItem = NULL;
+                //SSLOGI() << "m_pHoverItem = " << m_pHoverItem;
             }
 
             ii.pItem->GetEventSet()->setMutedState(true);
@@ -1057,6 +1058,7 @@ void STreeView::UpdateVisibleItems()
                 bNewItem = TRUE;
                 ii.pItem = SItemPanel::Create(this, SXmlNode(), this);
                 ii.pItem->GetEventSet()->subscribeEvent(EventItemPanelClick::EventID, Subscriber(&STreeView::OnItemClick, this));
+                ii.pItem->GetEventSet()->subscribeEvent(EventItemPanelClickUp::EventID, Subscriber(&STreeView::OnItemClickUp, this));
             }
             else
             {
@@ -1111,6 +1113,8 @@ void STreeView::UpdateVisibleItems()
         {
             m_pHoverItem->DoFrameEvent(WM_MOUSELEAVE, 0, 0);
             m_pHoverItem = NULL;
+            //SSLOGI() << "m_pHoverItem = " << m_pHoverItem;
+
         }
 
         ii.pItem->GetEventSet()->setMutedState(true);
@@ -1288,6 +1292,8 @@ void STreeView::onItemBeforeRemove(HSTREEITEM hItem)
         {
             m_pHoverItem->DoFrameEvent(WM_MOUSELEAVE, 0, 0);
             m_pHoverItem = NULL;
+            //SSLOGI() << "m_pHoverItem = " << m_pHoverItem;
+
         }
     }
     if (m_itemCapture)
@@ -1339,6 +1345,8 @@ LRESULT STreeView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
         {
             SOsrPanel *oldHover = m_pHoverItem;
             m_pHoverItem = pHover;
+//            SSLOGI() << "m_pHoverItem = " << m_pHoverItem;
+
             if (oldHover)
             {
                 oldHover->DoFrameEvent(WM_MOUSELEAVE, 0, 0);
@@ -1378,6 +1386,7 @@ void STreeView::OnMouseLeave()
     {
         m_pHoverItem->DoFrameEvent(WM_MOUSELEAVE, 0, 0);
         m_pHoverItem = NULL;
+        //SSLOGI() << "m_pHoverItem = " << m_pHoverItem;
     }
 }
 
@@ -1465,6 +1474,26 @@ SItemPanel *STreeView::HitTest(CPoint &pt) const
         }
     }
     return NULL;
+}
+
+BOOL STreeView::OnItemClickUp(IEvtArgs *pEvt)
+{
+    EventItemPanelClickUp *pClickEvt = sobj_cast<EventItemPanelClickUp>(pEvt);
+    if (!pClickEvt)
+        return TRUE;
+    if (!m_bMultiSel)
+        return TRUE;
+    UINT uKeyFlags = GetKeyState(VK_CONTROL) & 0x8000 ? MK_CONTROL : 0;
+    uKeyFlags |= GetKeyState(VK_SHIFT) & 0x8000 ? MK_SHIFT : 0;
+    if(uKeyFlags == 0){
+        SItemPanel *pItemPanel = sobj_cast<SItemPanel>(pEvt->Sender());
+        HSTREEITEM hItem = (HSTREEITEM)pItemPanel->GetItemIndex();
+        if(GetSelItemCount() > 1){
+            //remove other selected items
+            SetSel(hItem, TRUE);
+        }
+    }
+    return TRUE;
 }
 
 BOOL STreeView::OnItemClick(IEvtArgs *pEvt)
@@ -1562,7 +1591,10 @@ BOOL STreeView::OnItemClick(IEvtArgs *pEvt)
         else
         {
             // Single click: clear all and select clicked item
-            SetSel(hItem, TRUE);
+            if(!IsItemSelected(hItem))
+            {
+                SetSel(hItem, TRUE);
+            }
         }
     }
     
@@ -1754,6 +1786,7 @@ void STreeView::ClearSelItems()
         SItemPanel *pItem = GetItemPanel(hItem);
         if (pItem)
         {
+            SSLOGI() << "Clearing selection for item: " << hItem << " state="<<pItem->GetState();
             pItem->ModifyItemState(0, WndState_Check);
             RedrawItem(pItem);
         }

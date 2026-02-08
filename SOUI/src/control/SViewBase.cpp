@@ -2,8 +2,9 @@
 
 SNSBEGIN
 
-SViewBase::SViewBase(SWindow *pHost)
-    : SHostProxy(pHost)
+SViewBase::SViewBase(SPanel *pView)
+    : SHostProxy(pView)
+    , m_pView(pView)
     , m_bPendingUpdate(false)
     , m_iPendingUpdateItem(-2)
     , m_iPendingViewItem(-1)
@@ -95,6 +96,84 @@ void SViewBase::SetMultiSel(BOOL bMultiSel) {
 
 BOOL SViewBase::GetMultiSel() const {
     return m_bMultiSel;
+}
+
+void SViewBase::SetSel(int iItem,BOOL bNotify) {
+    ILvAdapter *pAdapter = getAdapter();
+    if (!pAdapter)
+        return;
+    if (iItem >= pAdapter->getCount())
+        return;
+    if (iItem < 0)
+        iItem = -1;
+
+    int nOldSel = m_iSelItem;
+    int nNewSel = iItem;
+
+     if (bNotify)
+     {
+         EventLVSelChanging evt(m_pView);
+         evt.bCancel = FALSE;
+         evt.iOldSel = nOldSel;
+         evt.iNewSel = nNewSel;
+         m_pView->FireEvent(evt);
+         if (evt.bCancel)
+         {
+             m_iSelItem = nOldSel;
+             return;
+         }
+     }
+    if (!m_bMultiSel)
+    {
+        // Single selection mode
+        if (m_iSelItem == iItem)
+            return;
+
+        // Clear old selection
+        SItemPanel *pItem = GetItemPanel(m_iSelItem);
+        if (pItem)
+        {
+            pItem->GetFocusManager()->ClearFocus();
+            pItem->SetSelected(FALSE);
+            RedrawItem(pItem);
+        }
+        
+        // Update selection map
+        ClearSelItems();
+        
+        // Set new selection
+        m_iSelItem = iItem;
+        if (iItem != -1)
+        {
+            AddSelItem(iItem);
+        }
+    }
+    else
+    {
+        // Multi selection mode
+        if (iItem == -1)
+        {
+            // Clear all selections
+            ClearSelItems();
+            m_iSelItem = -1;
+        }
+        else
+        {
+            // Clear old selection
+            ClearSelItems();
+            
+            // Select new item
+            m_iSelItem = iItem;
+            AddSelItem(iItem);
+        }
+    }
+     if (bNotify)
+     {
+         EventLVSelChanged evt(m_pView);
+         evt.iOldSel = nOldSel;
+         evt.iNewSel = nNewSel;
+         m_pView->FireEvent(evt);
+     }
 }
 
 void SViewBase::AddSelItem(int iItem) {
@@ -215,4 +294,76 @@ void SViewBase::HandleSelectionChange(int nOldSel, int nNewSel) {
     }
 }
 
+
+BOOL SViewBase::OnItemClick(IEvtArgs *pEvt)
+{
+    EventItemPanelClick *pClickEvt = sobj_cast<EventItemPanelClick>(pEvt);
+    if (!pClickEvt) return TRUE;
+    SItemPanel *pItemPanel = sobj_cast<SItemPanel>(pEvt->Sender());
+    int iItem = (int)pItemPanel->GetItemIndex();
+    
+    BOOL bCtrlPressed = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
+    BOOL bShiftPressed = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
+    BOOL bMultiSelMode = GetMultiSel();
+    
+    if (bMultiSelMode)
+    {
+        if (bCtrlPressed)
+        {
+            // Ctrl+Click: toggle selection of current item
+            if (IsItemSelected(iItem))
+            {
+                RemoveSelItem(iItem);
+            }
+            else
+            {
+                AddSelItem(iItem);
+            }
+            m_iSelItem = iItem;
+        }
+        else if (bShiftPressed)
+        {
+            // Shift+Click: extend selection from previous selected item to current item
+            int iStart = smin(m_iSelItem, iItem);
+            int iEnd = smax(m_iSelItem, iItem);
+            for (int i = iStart; i <= iEnd; i++)
+            {
+                AddSelItem(i);
+            }
+            m_iSelItem = iItem;
+        }
+        else
+        {
+            // Normal Click: select only current item
+            if(!IsItemSelected(iItem))
+                SetSel(iItem, TRUE);
+        }
+    }
+    else
+    {
+        // Single selection mode
+        SetSel(iItem, TRUE);
+    }
+    return TRUE;
+}
+
+BOOL SViewBase::OnItemClickUp(IEvtArgs *pEvt)
+{
+    SItemPanel *pItemPanel = sobj_cast<SItemPanel>(pEvt->Sender());
+    SASSERT(pItemPanel);
+    int iItem = (int)pItemPanel->GetItemIndex();
+    if (!m_bMultiSel)
+        return TRUE;
+    UINT uKeyFlags = GetKeyState(VK_CONTROL) & 0x8000 ? MK_CONTROL : 0;
+    uKeyFlags |= GetKeyState(VK_SHIFT) & 0x8000 ? MK_SHIFT : 0;
+    if(uKeyFlags == 0){
+        SItemPanel *pItemPanel = sobj_cast<SItemPanel>(pEvt->Sender());
+        int hItem = (int)pItemPanel->GetItemIndex();
+        if(GetSelItemCount() > 1){
+            //remove other selected items
+            SetSel(iItem, TRUE);
+        }
+    }    
+    return TRUE;
+}
 SNSEND

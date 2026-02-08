@@ -395,6 +395,7 @@ class SOUI_EXP STreeView
      * @return TRUE if the event is handled, otherwise FALSE.
      */
     BOOL OnItemClick(IEvtArgs *pEvt);
+    BOOL OnItemClickUp(IEvtArgs *pEvt);
 
     /**
      * @brief Handles the item double-click event.

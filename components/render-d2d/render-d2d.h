@@ -288,12 +288,14 @@ public:
 
 	STDMETHOD_(HRESULT, Save2)(CTHIS_ LPCWSTR pszFileName, ImgFmt imgFmt) SCONST OVERRIDE;
 
-		virtual void SetMaskFilter(IMaskFilter *pMaskFilter){}
-		virtual IMaskFilter* GetMaskFilter(){return NULL;}
+	STDMETHOD_(HBITMAP, ToHBITMAP)(CTHIS) SCONST OVERRIDE;
+
+	virtual void SetMaskFilter(IMaskFilter *pMaskFilter){}
+	virtual IMaskFilter* GetMaskFilter(){return NULL;}
 public:
 	SComPtr<ID2D1Bitmap> toD2D1Bitmap(ID2D1RenderTarget *pRT) const;
 	IWICBitmap* GetBitmap() {return m_bmp2;}
-	HBITMAP     GetGdiBitmap();
+	static HBITMAP CreateGDIBitmap( int nWid,int nHei,void ** ppBits );
 protected:
 
 	HRESULT ImgFromDecoder(IImgX *imgDecoder);

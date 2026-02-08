@@ -3,7 +3,7 @@
 
 #ifdef SOUI_ENABLE_ACC
 #include <oleacc.h>
-#include <helper/SUnknown.h>
+#include <helper/SUnkImpl.h>
 #include "Swnd.h"
 #include "interface/sacchelper-i.h"
 
@@ -17,9 +17,8 @@ SNSBEGIN
  * It allows screen readers and other assistive technologies to interact with the windows.
  */
 class SOUI_EXP SAccessible
-    : public IAccessible
-    , public IAccHelper
-    , public SUnknown {
+    : public IAccHelper
+    , public SUnkImpl<IAccessible> {
   protected:
     SWindow *m_pWnd; // Pointer to the associated SWindow.
 

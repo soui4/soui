@@ -32,7 +32,7 @@
           </pane>
         </splitrow>
       </pane>
-      <pane idealSize="250" minSize="100" priority="1" clipClient="1">
+      <pane idealSize="300" minSize="100" priority="1" clipClient="1">
 					<include src="layout:property_panel" />
 			</pane>
     </splitcol>

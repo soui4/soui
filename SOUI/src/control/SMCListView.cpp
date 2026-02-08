@@ -636,7 +636,8 @@ void SMCListView::UpdateVisibleItems()
                 { //创建一个新的列表项
                     bNewItem = TRUE;
                     ii.pItem = SItemPanel::Create(this, SXmlNode(), this);
-                    ii.pItem->GetEventSet()->subscribeEvent(EventItemPanelClick::EventID, Subscriber(&SMCListView::OnItemClick, this));
+                    ii.pItem->GetEventSet()->subscribeEvent(EventItemPanelClick::EventID, Subscriber(&SViewBase::OnItemClick, (SViewBase*)this));
+                    ii.pItem->GetEventSet()->subscribeEvent(EventItemPanelClickUp::EventID, Subscriber(&SViewBase::OnItemClickUp, (SViewBase *)this));
                 }
                 else
                 {
@@ -1317,54 +1318,6 @@ BOOL SMCListView::OnSetCursor(const CPoint &pt)
     return bRet;
 }
 
-BOOL SMCListView::OnItemClick(IEvtArgs *pEvt)
-{
-    SItemPanel *pItemPanel = sobj_cast<SItemPanel>(pEvt->Sender());
-    int iItem = (int)pItemPanel->GetItemIndex();
-    
-    BOOL bCtrlPressed = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
-    BOOL bShiftPressed = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
-    BOOL bMultiSelMode = GetMultiSel();
-    
-    if (bMultiSelMode)
-    {
-        if (bCtrlPressed)
-        {
-            // Ctrl+Click: toggle selection of current item
-            if (IsItemSelected(iItem))
-            {
-                RemoveSelItem(iItem);
-            }
-            else
-            {
-                AddSelItem(iItem);
-            }
-            m_iSelItem = iItem;
-        }
-        else if (bShiftPressed)
-        {
-            // Shift+Click: extend selection from previous selected item to current item
-            int iStart = smin(m_iSelItem, iItem);
-            int iEnd = smax(m_iSelItem, iItem);
-            for (int i = iStart; i <= iEnd; i++)
-            {
-                AddSelItem(i);
-            }
-            m_iSelItem = iItem;
-        }
-        else
-        {
-            // Normal Click: select only current item
-            SetSel(iItem, TRUE);
-        }
-    }
-    else
-    {
-        // Single selection mode
-        SetSel(iItem, TRUE);
-    }
-    return TRUE;
-}
 
 void SMCListView::OnColorize(COLORREF cr)
 {

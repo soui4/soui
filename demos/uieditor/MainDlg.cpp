@@ -18,7 +18,14 @@
 #include "Dialog/DlgInsertXmlElement.h"
 #include <helper/SFunctor.hpp>
 #include <shlwapi.h>
+#include <atl.mini/SComCli.h>
+
+// 添加 OLE 相关的头文件
+#include <ole2.h>
+
+#undef kLogTag
 #define kLogTag "maindlg"
+#include "FileTreeDragdrop.h"
 
 #define UIRES_FILE	L"uires.idx"
 
@@ -52,6 +59,8 @@ CMainDlg::~CMainDlg()
 
 BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 {
+	::RegisterDragDrop(hWnd, GetDropTarget());
+
 	m_btn_recentFile = FindChildByName2<SButton>(L"toolbar_btn_recent");
 	
 	m_tabWorkspace = FindChildByName2<STabCtrl>(L"workspace_tab");
@@ -67,6 +76,10 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 		m_treeView->SetAdapter(m_pFileTreeAdapter);
 		// 初始化路径监视器
 		m_pathMonitor.AddListener(this);
+
+		IDropTarget *pDT = new FileTreeDropTarget(m_treeView);
+		RegisterDragDrop(m_treeView->GetSwnd(), pDT);
+		pDT->Release();
 	}
 
 	m_RecentFileMenu.LoadMenu(UIRES.smenu.menu_recent);
@@ -912,27 +925,7 @@ void CMainDlg::OnTvEventOfPanel(IEvtArgs *e)
 			break;
 			case menu_delete://删除
 				{
-					// 处理多选
-					std::vector<HSTREEITEM> itemsToDelete;
-					int selCount = m_treeView->GetSelItemCount();
-					if(selCount > 0)
-					{
-						HSTREEITEM *pItems = new HSTREEITEM[selCount];
-						m_treeView->GetSelItems(pItems, selCount);
-						for(int i = 0; i < selCount; i++)
-						{
-							if(pItems[i] != ITEM_ROOT)
-							{
-								itemsToDelete.push_back(pItems[i]);
-							}
-						}
-						delete []pItems;
-					}
-					else if(hItem != ITEM_ROOT)
-					{
-						itemsToDelete.push_back(hItem);
-					}
-				
+					std::vector<HSTREEITEM> itemsToDelete = GetSelectedItems(hItem);
 					if(!itemsToDelete.empty())
 					{
 						SStringT strMsg = _T("确定要删除") + SStringT().Format(_T("%d"), itemsToDelete.size()) + _T("个项目吗？");
@@ -1013,16 +1006,126 @@ void CMainDlg::OnTvEventOfPanel(IEvtArgs *e)
 			}
 		}
 	}
-	else if(e2->pOrgEvt->GetID()==EventMouseClick::EventID){
+	else if(e2->pOrgEvt->GetID()==EventMouseClick::EventID)
+	{
 		EventMouseClick *pEvt = sobj_cast<EventMouseClick>(e2->pOrgEvt);
 		if(pEvt->clickId==MOUSE_LBTN_DOWN){
+			m_tvClickPt = pEvt->pt;
 //			SLOGI()<<"Mouse click:"<<pEvt->pt.x<<","<<pEvt->pt.y;
 		}else if(pEvt->clickId == MOUSE_LBTN_UP){
+			m_tvClickPt = CPoint(-1, -1);
 //			SLOGI()<<"Mouse up:"<<pEvt->pt.x<<","<<pEvt->pt.y;
 		}
-	}else if(e2->pOrgEvt->GetID()==EventSwndMouseMove::EventID){
+    }
+    else if (m_tvClickPt.x!=-1 && e2->pOrgEvt->GetID() == EventSwndMouseMove::EventID)
+    {
 		EventSwndMouseMove *pEvt = sobj_cast<EventSwndMouseMove>(e2->pOrgEvt);
-//		SLOGI()<<"Mouse move:"<<pEvt->pt.x<<","<<pEvt->pt.y;
+		CPoint pt = pEvt->pt;
+		// 检查是否开始拖动（移动距离>2像素且按住左键）
+		if((pEvt->nFlags & MK_LBUTTON) && (abs(m_tvClickPt.x-pt.x) > 2 || abs(m_tvClickPt.y-pt.y) > 2))
+		{
+            SWindow *pSender = sobj_cast<SWindow>(pEvt->sender);
+            SItemPanel *pItemPanel = sobj_cast<SItemPanel>(pSender->GetRoot());
+			if(!pItemPanel) return;
+			
+			HSTREEITEM hItem = (HSTREEITEM)pItemPanel->GetItemIndex();
+			std::vector<HSTREEITEM> selectedItems = GetSelectedItems(hItem);
+			if(selectedItems.empty())
+			{
+				m_tvClickPt = CPoint(-1, -1);
+				return;
+			}
+
+			// 收集所有选中项目的文件路径信息
+			std::vector<SStringW> filePaths;
+			int totalPathLength = 0;
+			
+			for(size_t i = 0; i < selectedItems.size(); i++)
+			{
+				const FileItemData &itemData = m_pFileTreeAdapter->GetItemData(selectedItems[i]);
+                SStringW strPathW = S_CT2W(itemData.strPath);
+                filePaths.push_back(strPathW);
+                totalPathLength += strPathW.GetLength() + 1; // +1 用于宽字符终止符
+			}
+
+			// 创建 DROPFILES 格式的全局内存，用于支持标准文件拖放
+			HGLOBAL hGlobal = GlobalAlloc(GMEM_MOVEABLE, sizeof(DROPFILES) + totalPathLength * sizeof(wchar_t) + sizeof(wchar_t));
+			if(!hGlobal)
+			{
+				m_tvClickPt = CPoint(-1, -1);
+				return;
+			}
+
+			DROPFILES *pDropFiles = (DROPFILES *)GlobalLock(hGlobal);
+			if(!pDropFiles)
+			{
+				GlobalFree(hGlobal);
+				m_tvClickPt = CPoint(-1, -1);
+				return;
+			}
+
+			// 初始化 DROPFILES 结构
+			pDropFiles->pFiles = sizeof(DROPFILES);
+			pDropFiles->pt.x = m_tvClickPt.x;
+			pDropFiles->pt.y = m_tvClickPt.y;
+			pDropFiles->fNC = FALSE;
+			pDropFiles->fWide = TRUE;
+
+			// 复制所有选中项目的路径到全局内存
+			wchar_t *pPath = (wchar_t *)((BYTE *)pDropFiles + sizeof(DROPFILES));
+			for(size_t i = 0; i < filePaths.size(); i++)
+			{
+				SStringW strPathW =filePaths[i];
+				int pathLength = strPathW.GetLength() + 1;
+				wcscpy_s(pPath, pathLength, strPathW.c_str());
+				pPath += pathLength;
+			}
+			// 添加最终的空终止符
+			*pPath = L'\0';
+
+			GlobalUnlock(hGlobal);
+
+			// 创建数据对象和拖放源
+			SComPtr<IDataObject> pDataObj(new FileTreeDataSource(hGlobal, TRUE), FALSE);
+            SComPtr<FileTreeDropSource> pDropSource(new FileTreeDropSource(), FALSE);
+			
+			if(!pDataObj || !pDropSource)
+			{
+				GlobalFree(hGlobal);
+				m_tvClickPt = CPoint(-1, -1);
+				return;
+			}
+            HBITMAP hDragBitmap = FileTreeDropSource::CreateDragBitmap(filePaths);
+            pDropSource->SetDragImage(hDragBitmap, CPoint(-10, -10));
+            SWND swndCapture = pSender->GetCapture();
+            SWindow *pCapture = SWindowMgr::GetWindow(swndCapture); 
+            if (pCapture)
+            {
+                pCapture->ReleaseCapture();
+            }
+			// 执行拖放操作
+			DWORD dwEffect = DROPEFFECT_MOVE;
+            SLOGI() << "Before DoDragDrop";
+			HRESULT hr = ::DoDragDrop(pDataObj, pDropSource, DROPEFFECT_MOVE, &dwEffect);
+			SLOGI()<<"DoDragDrop hr="<<hr<<" dwEffect="<<dwEffect;
+            pCapture = SWindowMgr::GetWindow(swndCapture); 
+			if (pCapture)
+            {//restore item state.
+                pCapture->SetCapture();
+                CPoint pt;
+                GetCursorPos(&pt);
+                ScreenToClient(&pt);
+                SendMessage(WM_LBUTTONUP, 0, MAKELPARAM(pt.x, pt.y));
+                SendMessage(WM_MOUSEMOVE, 0, MAKELPARAM(pt.x, pt.y));
+            }
+			// 拖放操作完成后才删除位图
+			if (hDragBitmap)
+			{
+				DeleteObject(hDragBitmap);
+			}
+			
+			m_tvClickPt = CPoint(-1, -1);
+		}
 	}
 }
 

@@ -148,6 +148,31 @@ SWND SwndContainerImpl::GetHover() const
 
 void SwndContainerImpl::OnFrameMouseMove(UINT uFlag, CPoint pt)
 {
+    //处理trackMouseEvent属性
+    SPOSITION pos = m_lstTrackMouseEvtWnd.GetHeadPosition();
+    while (pos)
+    {
+        SWND swnd = m_lstTrackMouseEvtWnd.GetNext(pos);
+        SWindow *pWnd = SWindowMgr::GetWindow(swnd);
+        if (!pWnd)
+        {
+            UnregisterTrackMouseEvent(swnd);
+        }
+        else if (pWnd->IsVisible(TRUE))
+        {
+            CPoint pt4(pt);
+            pWnd->TransformPointEx(pt4);
+            BOOL bInWnd = pWnd->IsContainPoint(pt4, FALSE);
+            if (bInWnd && !(pWnd->GetState() & WndState_Hover))
+            {
+                pWnd->SSendMessage(WM_MOUSEHOVER);
+            }
+            else if (!bInWnd && (pWnd->GetState() & WndState_Hover))
+            {
+                pWnd->SSendMessage(WM_MOUSELEAVE);
+            }
+        }
+    }
     SWindow *pCapture = SWindowMgr::GetWindow(m_hCapture);
     if (pCapture)
     { //有窗口设置了鼠标捕获,不需要判断是否有TrackMouseEvent属性,也不需要判断客户区与非客户区的变化
@@ -224,32 +249,6 @@ void SwndContainerImpl::OnFrameMouseMove(UINT uFlag, CPoint pt)
         }
         if (pHover && !pHover->IsDisabled(TRUE))
             pHover->SSendMessage(m_bNcHover ? WM_NCMOUSEMOVE : WM_MOUSEMOVE, uFlag, MAKELPARAM(pt2.x, pt2.y));
-    }
-
-    //处理trackMouseEvent属性
-    SPOSITION pos = m_lstTrackMouseEvtWnd.GetHeadPosition();
-    while (pos)
-    {
-        SWND swnd = m_lstTrackMouseEvtWnd.GetNext(pos);
-        SWindow *pWnd = SWindowMgr::GetWindow(swnd);
-        if (!pWnd)
-        {
-            UnregisterTrackMouseEvent(swnd);
-        }
-        else if (pWnd->IsVisible(TRUE))
-        {
-            CPoint pt4(pt);
-            pWnd->TransformPointEx(pt4);
-            BOOL bInWnd = pWnd->IsContainPoint(pt4, FALSE);
-            if (bInWnd && !(pWnd->GetState() & WndState_Hover))
-            {
-                pWnd->SSendMessage(WM_MOUSEHOVER);
-            }
-            else if (!bInWnd && (pWnd->GetState() & WndState_Hover))
-            {
-                pWnd->SSendMessage(WM_MOUSELEAVE);
-            }
-        }
     }
 }
 

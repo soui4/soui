@@ -333,5 +333,6 @@ public:
 	
 	BOOL		m_bIsOpen;  //工程是否打开
 	bool		m_bAutoSave;
+	CPoint 	    m_tvClickPt;
 };
 #endif//_MAINDLG_H_

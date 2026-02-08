@@ -18,12 +18,11 @@ class SOUI_EXP SViewBase
     : protected SHostProxy
     , protected IItemContainer {
 
-
 public:
     /**
      * @brief Constructor
      */
-    SViewBase(SWindow *pHost);
+    SViewBase(SPanel * pView);
 
     /**
      * @brief Destructor
@@ -60,6 +59,21 @@ protected:
      */
     virtual void RedrawItem(SOsrPanel *pItem) = 0;
 
+    virtual ILvAdapter *getAdapter() = 0;
+public:
+    /**
+     * @brief Handle item click event
+     * @param pEvt Event arguments
+     * @return TRUE if handled, FALSE otherwise
+     */
+    BOOL OnItemClick(IEvtArgs *pEvt);
+    
+    /**
+     * @brief Handle item click up event
+     * @param pEvt Event arguments
+     * @return TRUE if handled, FALSE otherwise
+     */
+    BOOL OnItemClickUp(IEvtArgs *pEvt);
 protected:
     /**
      * @brief Handle data set changed event
@@ -116,6 +130,12 @@ protected:
      */
     BOOL GetMultiSel() const;
     
+    /**
+     * @brief Sets the selected item.
+     * @param iItem Index of the item.
+     */
+    void SetSel(int iItem,BOOL bNotify);
+
     /**
      * @brief Adds an item to the selection.
      * @param iItem Index of the item.
@@ -197,6 +217,8 @@ protected:
     
     typedef SMap<int, BOOL> ItemSelectionMap;
     ItemSelectionMap m_mapSelItems; /**< Map of selected items (index -> is_selected) */
+
+    SPanel *m_pView; /**< Pointer to the view panel */
 };
 
 SNSEND

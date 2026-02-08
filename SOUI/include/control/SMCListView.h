@@ -198,13 +198,6 @@ class SOUI_EXP SMCListView
      */
     void UpdateVisibleItem(int iItem);
 
-  protected:
-    /**
-     * @brief Handle item click event
-     * @param pEvt Event arguments
-     * @return TRUE if handled, FALSE otherwise
-     */
-    BOOL OnItemClick(IEvtArgs *pEvt);
 
   protected:
     /**
@@ -417,7 +410,7 @@ class SOUI_EXP SMCListView
      * @param pItem Pointer to the item panel
      */
     virtual void RedrawItem(SOsrPanel *pItem);
-
+    virtual ILvAdapter *getAdapter() override { return m_adapter; }
     /**
      * @brief Gets the dialog code
      * @return Dialog code

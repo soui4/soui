@@ -612,6 +612,16 @@ DECLARE_INTERFACE_(IBitmapS, IRenderObj)
      * @return HRESULT indicating success or failure.
      */
     STDMETHOD_(HRESULT, Save2)(THIS_ LPCWSTR pszFileName, ImgFmt imgFmt) SCONST PURE;
+
+    /**
+     * @brief Converts the bitmap to a HBITMAP handle.
+     *
+     * @details Returns a HBITMAP handle associated with the bitmap.
+     *
+     * @return HBITMAP Handle to the bitmap.
+     * @note The caller is responsible for releasing the HBITMAP handle when done.
+     */
+    STDMETHOD_(HBITMAP, ToHBITMAP)(CTHIS) SCONST PURE;
 };
 
 typedef IBitmapS *IBitmapPtr;

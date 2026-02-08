@@ -215,17 +215,17 @@ public:
 
 	STDMETHOD_(HRESULT,Save)(THIS_ LPCWSTR pszFileName,const LPVOID pFormat) SCONST OVERRIDE;
 	STDMETHOD_(HRESULT, Save2)(CTHIS_ LPCWSTR pszFileName, ImgFmt imgFmt) SCONST OVERRIDE;
-
+	STDMETHOD_(HBITMAP, ToHBITMAP)(CTHIS) SCONST OVERRIDE;
 public:
-	const SkBitmap & GetSkBitmap() const{return m_bitmap;}
-	HBITMAP  GetGdiBitmap(){return m_hBmp;}
+	HBITMAP GetBitmap() const {return m_hBmp;}
+	const SkBitmap & GetSkBitmap() const {return m_bitmap;}
 	#ifndef _WIN32
 	void MarkDirty(){
 		MarkPixmapDirty(m_hBmp);
 	}
 	#endif//_WIN32
 protected:
-	HBITMAP CreateGDIBitmap(int nWid,int nHei,void ** ppBits);
+	static HBITMAP CreateGDIBitmap(int nWid,int nHei,void ** ppBits);
 
 	HRESULT ImgFromDecoder(IImgX *imgDecoder);
 

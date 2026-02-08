@@ -389,7 +389,8 @@ void SListView::UpdateVisibleItems()
                 { //创建一个新的列表项
                     bNewItem = TRUE;
                     ii.pItem = SItemPanel::Create(this, SXmlNode(), this);
-                    ii.pItem->GetEventSet()->subscribeEvent(EventItemPanelClick::EventID, Subscriber(&SListView::OnItemClick, this));
+                    ii.pItem->GetEventSet()->subscribeEvent(EventItemPanelClick::EventID, Subscriber(&SViewBase::OnItemClick, (SViewBase *)this));
+                    ii.pItem->GetEventSet()->subscribeEvent(EventItemPanelClickUp::EventID, Subscriber(&SViewBase::OnItemClickUp, (SViewBase *)this));
                 }
                 else
                 {
@@ -1079,18 +1080,6 @@ BOOL SListView::OnSetCursor(const CPoint &pt)
         bRet = __baseCls::OnSetCursor(pt);
     }
     return bRet;
-}
-
-BOOL SListView::OnItemClick(IEvtArgs *pEvt)
-{
-    SItemPanel *pItemPanel = sobj_cast<SItemPanel>(pEvt->Sender());
-    SASSERT(pItemPanel);
-    int iItem = (int)pItemPanel->GetItemIndex();
-    if (iItem != m_iSelItem)
-    {
-        SetSel(iItem, TRUE);
-    }
-    return TRUE;
 }
 
 void SListView::OnColorize(COLORREF cr)

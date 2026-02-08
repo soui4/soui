@@ -497,6 +497,16 @@ SNSBEGIN
 		return GetRenderFactory()->GetImgDecoderFactory()->SaveImage2((BYTE *)(char *)buf, nWid, nHei, pszFileName, imgFmt);
 	}
 
+    HBITMAP SBitmap_GDI::ToHBITMAP() const
+    {
+		const LPBYTE pSrcBits = (const LPBYTE)GetPixelBits();
+		LPVOID pDstBits = NULL;
+		int nWid = Width();
+		int nHei = Height();
+		HBITMAP hRet= CreateGDIBitmap(nWid,nHei,&pDstBits);
+		memcpy(pDstBits,pSrcBits,nWid*4*nHei);
+		return hRet;
+    }
 
     //////////////////////////////////////////////////////////////////////////
     //	SRegion_GDI

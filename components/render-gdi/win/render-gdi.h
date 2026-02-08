@@ -248,12 +248,12 @@ public:
 
 	STDMETHOD_(HRESULT,Save)(THIS_ LPCWSTR pszFileName,const LPVOID pFormat) SCONST OVERRIDE;
 	STDMETHOD_(HRESULT, Save2)(CTHIS_ LPCWSTR pszFileName, ImgFmt imgFmt) SCONST OVERRIDE;
-		virtual void SetMaskFilter(IMaskFilter *pMaskFilter){}
-		virtual IMaskFilter* GetMaskFilter(){return NULL;}
+	STDMETHOD_(HBITMAP, ToHBITMAP)(CTHIS) SCONST OVERRIDE;
+	virtual void SetMaskFilter(IMaskFilter *pMaskFilter){}
+	virtual IMaskFilter* GetMaskFilter(){return NULL;}
 public:
-	HBITMAP  GetBitmap(){return m_hBmp;}
-
 	static HBITMAP CreateGDIBitmap(int nWid,int nHei,void ** ppBits);
+	HBITMAP GetBitmap() SCONST{return m_hBmp;}
 protected:
 
 	HRESULT ImgFromDecoder(IImgX *imgDecoder);

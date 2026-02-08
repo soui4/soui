@@ -416,6 +416,10 @@ SNSBEGIN
 		return GetRenderFactory()->GetImgDecoderFactory()->SaveImage2(pBits,Width(),Height(),pszFileName,imgFmt);
 	}
 
+	HBITMAP SBitmap_GDI::ToHBITMAP() const
+	{
+		return RefGdiObj(m_hBmp);
+	}
 
     //////////////////////////////////////////////////////////////////////////
     //	SRegion_GDI

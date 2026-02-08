@@ -1164,7 +1164,7 @@ SNSBEGIN
 			return m_hGetDC;
 		}
 
-		HBITMAP bmp=m_curBmp->GetGdiBitmap();//bmp可能为NULL
+		HBITMAP bmp=m_curBmp->GetBitmap();
 		HDC hdc_desk = ::GetDC(0);
 		m_hGetDC = CreateCompatibleDC(hdc_desk);
 		::ReleaseDC(0,hdc_desk);
@@ -1998,6 +1998,16 @@ SNSBEGIN
         return GetRenderFactory()->GetImgDecoderFactory()->SaveImage2((BYTE *)(char *)buf, nWid, nHei, pszFileName, imgFmt);
     }
 
+    HBITMAP SBitmap_Skia::ToHBITMAP() const
+    {
+		const LPBYTE pSrcBits = (const LPBYTE)GetPixelBits();
+		LPVOID pDstBits = NULL;
+		int nWid = Width();
+		int nHei = Height();
+		HBITMAP hRet= CreateGDIBitmap(nWid,nHei,&pDstBits);
+		memcpy(pDstBits,pSrcBits,nWid*4*nHei);
+		return hRet;
+    }
 
 	//////////////////////////////////////////////////////////////////////////
 	static int s_cRgn =0;

@@ -349,6 +349,7 @@ DECLARE_INTERFACE_(IMcListViewEx, IObjRef)
 		virtual BOOL OnItemGetRect(const SOsrPanel* pItem, CRect& rcItem)const;
 		virtual void OnItemSetCapture(SOsrPanel* pItem, BOOL bCapture);
 		virtual void RedrawItem(SOsrPanel* pItem);
+		virtual ILvAdapter* getAdapter() OVERRIDE{ return GetAdapterEx(); }
 
 	protected:
 

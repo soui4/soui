@@ -869,7 +869,7 @@ SNSBEGIN
 		return ret;
 	}
 
-	static HBITMAP CreateGDIBitmap( int nWid,int nHei,void ** ppBits )
+	HBITMAP SBitmap_D2D::CreateGDIBitmap( int nWid,int nHei,void ** ppBits )
 	{
 		BITMAPINFO bmi;
 		memset(&bmi, 0, sizeof(bmi));
@@ -888,7 +888,7 @@ SNSBEGIN
 		return hBmp;
 	}
 
-	HBITMAP SBitmap_D2D::GetGdiBitmap()
+	HBITMAP SBitmap_D2D::ToHBITMAP() const
 	{
 		const LPBYTE pSrcBits = (const LPBYTE)GetPixelBits();
 		LPVOID pDstBits = NULL;
@@ -2091,7 +2091,7 @@ SNSBEGIN
 			return hdc;
 		}else{
 			SAutoRefPtr<SBitmap_D2D> bmp2=m_curBmp;
-			HBITMAP bmp=bmp2->GetGdiBitmap();//bmp可能为NULL
+			HBITMAP bmp=bmp2->ToHBITMAP();
 			HDC hdc_desk = ::GetDC(NULL);
 			HDC hdc = CreateCompatibleDC(hdc_desk);
 			::ReleaseDC(NULL,hdc_desk);

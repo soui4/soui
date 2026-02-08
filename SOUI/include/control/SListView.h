@@ -144,15 +144,6 @@ class SOUI_EXP SListView
      * @param nParentHei Parent container height
      */
     STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *psz, int nParentWid, int nParentHei) OVERRIDE;
-
-  protected:
-    /**
-     * @brief Handle item click event
-     * @param pEvt Event arguments
-     * @return TRUE if handled, FALSE otherwise
-     */
-    BOOL OnItemClick(IEvtArgs *pEvt);
-
   protected:
     /**
      * @brief Handle scroll event
@@ -373,7 +364,7 @@ class SOUI_EXP SListView
      * @param pItem Pointer to the item panel
      */
     virtual void RedrawItem(SOsrPanel *pItem);
-
+    virtual ILvAdapter *getAdapter() override { return m_adapter; }
     /**
      * @brief Gets the dialog code
      * @return Dialog code

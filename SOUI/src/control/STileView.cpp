@@ -339,7 +339,8 @@ void STileView::UpdateVisibleItems()
                     //创建一个新的列表项
                     bNewItem = TRUE;
                     ii.pItem = SItemPanel::Create(this, SXmlNode(), this);
-                    ii.pItem->GetEventSet()->subscribeEvent(EventItemPanelClick::EventID, Subscriber(&STileView::OnItemClick, this));
+                    ii.pItem->GetEventSet()->subscribeEvent(EventItemPanelClick::EventID, Subscriber(&SViewBase::OnItemClick, (SViewBase *)this));
+                    ii.pItem->GetEventSet()->subscribeEvent(EventItemPanelClickUp::EventID, Subscriber(&SViewBase::OnItemClickUp, (SViewBase *)this));
                 }
                 else
                 {
@@ -997,16 +998,6 @@ BOOL STileView::OnSetCursor(const CPoint &pt)
     return bRet;
 }
 
-BOOL STileView::OnItemClick(IEvtArgs *pEvt)
-{
-    SItemPanel *pItemPanel = sobj_cast<SItemPanel>(pEvt->Sender());
-    int iItem = (int)pItemPanel->GetItemIndex();
-    if (iItem != m_iSelItem)
-    {
-        SetSel(iItem, TRUE);
-    }
-    return true;
-}
 
 void STileView::OnColorize(COLORREF cr)
 {

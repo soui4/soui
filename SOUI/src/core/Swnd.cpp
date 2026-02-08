@@ -657,7 +657,7 @@ SWindow::~SWindow()
     if (m_pAcc)
     {
         SComPtr<IAccHelper> accHelper;
-        if (m_pAcc->QueryInterface(__uuidof(IAccHelper), (void **)&accHelper) == S_OK)
+        if (m_pAcc->QueryInterface(__suidof(IAccHelper), (void **)&accHelper) == S_OK)
         {
             SASSERT(accHelper->GetOwner() == NULL);
         }
@@ -2382,7 +2382,7 @@ void SWindow::OnDestroy()
     if (m_pAcc)
     {
         SComPtr<IAccHelper> accHelper;
-        if (m_pAcc->QueryInterface(__uuidof(IAccHelper), (void **)&accHelper) == S_OK)
+        if (m_pAcc->QueryInterface(__suidof(IAccHelper), (void **)&accHelper) == S_OK)
         {
             accHelper->SetOwner(NULL);
         }

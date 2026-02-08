@@ -157,14 +157,6 @@ class SOUI_EXP STileView
 
   protected:
     /**
-     * @brief Handles item click events.
-     * @param pEvt Pointer to the event arguments.
-     * @return TRUE if the event was handled, otherwise FALSE.
-     */
-    BOOL OnItemClick(IEvtArgs *pEvt);
-
-  protected:
-    /**
      * @brief Handles scroll events.
      * @param bVertical Flag indicating if the scroll is vertical.
      * @param uCode Scroll code.
@@ -390,7 +382,7 @@ class SOUI_EXP STileView
      * @param pItem Pointer to the item panel
      */
     virtual void RedrawItem(SOsrPanel *pItem);
-
+    virtual ILvAdapter *getAdapter() override { return m_adapter; }
     /**
      * @brief Gets the dialog code
      * @return Dialog code

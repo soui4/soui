@@ -5,7 +5,7 @@
 
 SNSBEGIN
 
-class SDragWnd : public SNativeWnd {
+class SOUI_EXP SDragWnd : public SNativeWnd {
   public:
     SDragWnd(void);
     ~SDragWnd(void);
