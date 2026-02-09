@@ -19,13 +19,8 @@
 #include <helper/SFunctor.hpp>
 #include <shlwapi.h>
 #include <atl.mini/SComCli.h>
-
-// 添加 OLE 相关的头文件
-#include <ole2.h>
-
-#undef kLogTag
-#define kLogTag "maindlg"
 #include "FileTreeDragdrop.h"
+#define kLogTag "maindlg"
 
 #define UIRES_FILE	L"uires.idx"
 
@@ -282,7 +277,7 @@ BOOL CMainDlg::HandleTreeViewKeyboardShortcut(UINT nChar)
 		return FALSE;
 
 	BOOL bCtrlPressed = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
-	
+	HSTREEITEM hItem = m_treeView->GetSel();
 	if(bCtrlPressed)
 	{
 		if(nChar == _T('C') || nChar == _T('c'))
@@ -292,8 +287,7 @@ BOOL CMainDlg::HandleTreeViewKeyboardShortcut(UINT nChar)
 		}
 		else if(nChar == _T('V') || nChar == _T('v'))
 		{
-			HSTREEITEM hItem = m_treeView->GetSel();
-			if(!hItem)
+			if(hItem == ITEM_NULL)
 				return FALSE;
 			
 			OnFilePaste(hItem);
@@ -304,8 +298,19 @@ BOOL CMainDlg::HandleTreeViewKeyboardShortcut(UINT nChar)
 			OnFileCut();
 			return TRUE;
 		}
-	}
-	
+    }
+    else if (nChar == VK_DELETE || nChar == VK_BACK)
+    {
+        OnFileDelete(ITEM_NULL);
+        return TRUE;
+    }
+    else if (nChar == VK_F2)
+    {
+        if (hItem == ITEM_NULL)
+            return FALSE;
+        OnFileRename(hItem);
+        return TRUE;
+    }
 	return FALSE;
 }
 
@@ -339,6 +344,34 @@ void CMainDlg::OnFileCut()
 		}
 		SerializeItemsToClipboard(selectedItems, file_op_cut);
 	}
+}
+
+void CMainDlg::OnFileDelete(HSTREEITEM hItem)
+{
+    std::vector<HSTREEITEM> itemsToDelete = GetSelectedItems(hItem);
+    if (!itemsToDelete.empty())
+    {
+        SStringT strMsg = _T("确定要删除") + SStringT().Format(_T("%d"), itemsToDelete.size()) + _T("个项目吗？");
+        if (SMessageBox(m_hWnd, strMsg, _T("提示"), MB_YESNO | MB_ICONQUESTION) == IDYES)
+        {
+            for (size_t i = 0; i < itemsToDelete.size(); i++)
+            {
+                m_pFileTreeAdapter->RemoveItem(itemsToDelete[i]);
+            }
+        }
+    }
+}
+
+void CMainDlg::OnFileRename(HSTREEITEM hItem)
+{
+    const FileItemData &itemData = m_pFileTreeAdapter->GetItemData(hItem);
+    SDlgInput dlgInput;
+    dlgInput.m_strTitle = _T("请输入新名称");
+    dlgInput.m_strValue = itemData.strName;
+    if (IDOK == dlgInput.DoModal(m_hWnd) && !dlgInput.m_strValue.IsEmpty())
+    {
+        ::MoveFile(itemData.strPath, itemData.strPath.Left(itemData.strPath.ReverseFind(_T('/')) + 1) + dlgInput.m_strValue);
+    }
 }
 
 void CMainDlg::OnFilePaste()
@@ -448,8 +481,8 @@ bool CMainDlg::CloseProject()
 {
 	if(!CheckSave())
 		return false;
-	m_pXmlEdtior->CloseProject();
-	m_pImageViewer->CloseProject();
+	m_pXmlEdtior->CloseXml();
+	m_pImageViewer->Clear();
 	m_pFileTreeAdapter->Clear();
 	m_UIResFileMgr.CloseProject();	
 
@@ -534,19 +567,21 @@ void CMainDlg::SerializeItemsToClipboard(const std::vector<HSTREEITEM>& items, i
 	for(size_t i = 0; i < items.size(); i++)
 	{
 		const FileItemData& itemData = m_pFileTreeAdapter->GetItemData(items[i]);
-		vecItemPathsUtf8.push_back(S_CT2A(itemData.strPath, CP_UTF8));
+		vecItemPathsUtf8.push_back(S_CT2A(itemData.strPath));
 	}
 
 	// 计算所需缓冲区大小
+	std::stringstream ss;
 	int nCount = vecItemPathsUtf8.size();
-	int nBufferSize = sizeof(int) * 2; // 操作类型和项目数量
 	for(size_t i = 0; i < vecItemPathsUtf8.size(); i++)
 	{
-		nBufferSize += vecItemPathsUtf8[i].GetLength() + 1; // UTF-8 编码
+		ss<< vecItemPathsUtf8[i].c_str();
+		ss<< '\0';
 	}
+	ss<< '\0';
 
 	// 分配内存
-	HGLOBAL hGlobal = GlobalAlloc(GMEM_MOVEABLE, nBufferSize);
+	HGLOBAL hGlobal = GlobalAlloc(GMEM_MOVEABLE, ss.str().size() + sizeof(int) * 2);
 	if(hGlobal)
 	{
 		LPVOID lpData = GlobalLock(hGlobal);
@@ -561,15 +596,8 @@ void CMainDlg::SerializeItemsToClipboard(const std::vector<HSTREEITEM>& items, i
 			// 写入项目数量
 			*((int*)pBuffer) = nCount;
 			pBuffer += sizeof(int);
-			
 			// 写入项目路径（UTF-8）
-			for(size_t i = 0; i < vecItemPathsUtf8.size(); i++)
-			{
-				const char* szPath = vecItemPathsUtf8[i].c_str();
-				int nLen = vecItemPathsUtf8[i].GetLength() + 1;
-				memcpy(pBuffer, szPath, nLen);
-				pBuffer += nLen;
-			}
+			memcpy(pBuffer, ss.str().c_str(), ss.str().size());
 			
 			GlobalUnlock(hGlobal);
 			
@@ -578,6 +606,38 @@ void CMainDlg::SerializeItemsToClipboard(const std::vector<HSTREEITEM>& items, i
 			{
 				EmptyClipboard();
 				SetClipboardData(m_uClipboardFormat, hGlobal);
+				CloseClipboard();
+			}
+			else
+			{
+				GlobalFree(hGlobal);
+			}
+		}
+		else
+		{
+			GlobalFree(hGlobal);
+		}
+	}
+	hGlobal = GlobalAlloc(GMEM_MOVEABLE, ss.str().size() + sizeof(DROPFILES));
+	if(hGlobal)
+	{
+		LPVOID lpData = GlobalLock(hGlobal);
+		if(lpData)
+		{
+			BYTE* pBuffer = (BYTE*)lpData;
+			DROPFILES* pDropFiles = (DROPFILES*)pBuffer;
+			pDropFiles->fNC = FALSE;
+			pDropFiles->fWide = FALSE;
+			pDropFiles->pFiles = sizeof(DROPFILES);
+			pBuffer += sizeof(DROPFILES);
+			memcpy(pBuffer, ss.str().c_str(), ss.str().size());
+			GlobalUnlock(hGlobal);
+			
+			// 设置到 clipboard
+			if(OpenClipboard(m_hWnd))
+			{
+				EmptyClipboard();
+				SetClipboardData(CF_HDROP, hGlobal);
 				CloseClipboard();
 			}
 			else
@@ -723,7 +783,6 @@ BOOL CMainDlg::OnBtnSave()
 
 BOOL CMainDlg::NewLayout(const SStringT &strPath, const SStringT &strName)
 {
-
 	BOOL bRet = m_UIResFileMgr.NewLayout(strName, strPath);
 	if(bRet){
 		SStringT strType;
@@ -791,8 +850,9 @@ void CMainDlg::OnTvEventOfPanel(IEvtArgs *e)
 		menu_delete = 203,
 		menu_rename = 204,
 		menu_explorer = 205,
-		menu_add_to_uires = 206,
-		menu_add_skin = 207,
+		menu_copy_path = 206,
+		menu_add_to_uires = 207,
+		menu_add_skin = 208,
 	};
 
 	EventOfPanel *e2 = sobj_cast<EventOfPanel>(e);
@@ -836,7 +896,7 @@ void CMainDlg::OnTvEventOfPanel(IEvtArgs *e)
 					const FileItemData& itemData = m_pFileTreeAdapter->GetItemData(hItem);
 					SStringT strDir = itemData.bIsDir ? itemData.strPath : itemData.strPath.Left(itemData.strPath.ReverseFind(_T('/')));
 					SDlgInput dlgInput;
-					dlgInput.m_strTitle = _T("请输入文件名");
+					dlgInput.m_strTitle = _T("请输入文件名,不含扩展名");
 					dlgInput.m_strValue = _T("NewXml");
 					if (IDOK == dlgInput.DoModal(m_hWnd) && !dlgInput.m_strValue.IsEmpty())
 					{
@@ -918,58 +978,56 @@ void CMainDlg::OnTvEventOfPanel(IEvtArgs *e)
 				}
 			}
 			break;
-		case menu_paste://粘贴
+            case menu_paste: // 粘贴
+            {
+                OnFilePaste(hItem);
+            }
+            break;
+            case menu_delete: // 删除
+            {
+                OnFileDelete(hItem);
+            }
+            break;
+            case menu_rename: // 重命名
+                OnFileRename(hItem);
+                break;
+            case menu_explorer: // reveal in explorer
+            {
+                const FileItemData &itemData = m_pFileTreeAdapter->GetItemData(hItem);
+                SStringT strPath = itemData.strPath;
+                strPath.ReplaceChar(_T('/'), PATH_SLASH);
+                ShellExecute(0, _T("open"), _T("explorer.exe"), _T("/select,") + strPath, NULL, SW_SHOW);
+                SLOGI() << "Reveal in explorer: " << strPath.c_str();
+            }
+            break;
+			case menu_copy_path:
 			{
-				OnFilePaste(hItem);
+				const FileItemData &itemData = m_pFileTreeAdapter->GetItemData(hItem);
+				SStringW strPath = S_CT2W(itemData.strPath);
+				HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, (strPath.GetLength() + 1) * sizeof(wchar_t));
+				if(hMem)
+				{
+					wchar_t *pMem = (wchar_t *)GlobalLock(hMem);
+					wcsncpy(pMem, strPath, strPath.GetLength()+1);
+					GlobalUnlock(hMem);
+					OpenClipboard(m_hWnd);
+					EmptyClipboard();
+					SetClipboardData(CF_UNICODETEXT, hMem);
+					CloseClipboard();
+					GlobalFree(hMem);
+				}
 			}
 			break;
-			case menu_delete://删除
-				{
-					std::vector<HSTREEITEM> itemsToDelete = GetSelectedItems(hItem);
-					if(!itemsToDelete.empty())
-					{
-						SStringT strMsg = _T("确定要删除") + SStringT().Format(_T("%d"), itemsToDelete.size()) + _T("个项目吗？");
-						if(SMessageBox(m_hWnd, strMsg, _T("提示"), MB_YESNO | MB_ICONQUESTION) == IDYES)
-						{
-							for(size_t i = 0; i < itemsToDelete.size(); i++)
-							{
-								m_pFileTreeAdapter->RemoveItem(itemsToDelete[i]);
-							}
-						}
-					}
-				}
-				break;
-			case menu_rename://重命名
-				{
-					const FileItemData& itemData = m_pFileTreeAdapter->GetItemData(hItem);
-					SDlgInput dlgInput;
-					dlgInput.m_strTitle = _T("请输入新名称");
-					dlgInput.m_strValue = itemData.strName;
-					if (IDOK == dlgInput.DoModal(m_hWnd) && !dlgInput.m_strValue.IsEmpty())
-					{
-						::MoveFile(itemData.strPath, itemData.strPath.Left(itemData.strPath.ReverseFind(_T('/')) + 1) + dlgInput.m_strValue);
-					}
-				}
-				break;
-			case menu_explorer://reveal in explorer
-				{
-					const FileItemData& itemData = m_pFileTreeAdapter->GetItemData(hItem);
-					SStringT strPath = itemData.strPath;
-					strPath.ReplaceChar(_T('/'), PATH_SLASH);
-					ShellExecute(0, _T("open"), _T("explorer.exe"), _T("/select,") + strPath, NULL, SW_SHOW);
-					SLOGI() << "Reveal in explorer: " << strPath.c_str();
-				}
-				break;
-			case menu_add_to_uires://add to uires.idx
-				addUires(hItem);
-				break;
-			case menu_add_skin:
-				addUires(hItem);//add to uires.idx first
-				addSkin(hItem);
-				break;
-			}
-		}
-	}
+            case menu_add_to_uires: // add to uires.idx
+                addUires(hItem);
+                break;
+            case menu_add_skin:
+                addUires(hItem); // add to uires.idx first
+                addSkin(hItem);
+                break;
+            }
+        }
+    }
 	else if(e2->pOrgEvt->GetID()==EventItemPanelDbclick::EventID)
 	{
 		EventItemPanelDbclick *pEvt = sobj_cast<EventItemPanelDbclick>(e2->pOrgEvt);
@@ -1510,19 +1568,29 @@ void CMainDlg::OnFileChanged(LPCTSTR pszFile, CPathMonitor::Flag nFlag)
 
 void CMainDlg::_OnFileChanged(tstring& strFile, CPathMonitor::Flag nFlag)
 {
+    m_UIResFileMgr.OnFileChanged(strFile, nFlag);
     SStringT strFilePath = strFile.c_str();
-    
     switch (nFlag)
     {
     case CPathMonitor::FILE_DELETED:
-        // 删除文件：先在文件树中找到这个文件并从文件树中删除
-        // 如果该文件还没有枚举到文件树中，则不处理
         m_pFileTreeAdapter->RemoveItemByPath(strFilePath);
+        if (m_pXmlEdtior->GetCurrentXml() == strFilePath)
+        {
+            m_pXmlEdtior->CloseXml();
+			m_editXmlType = FT_UNKNOWN;
+			UpdateEditorToolbar();
+		}
         break;
         
     case CPathMonitor::FILE_CREATED:
         // 增加文件/夹：如果上一级目录已经展开，则直接增加这个项，否则不处理
         m_pFileTreeAdapter->AddItemByPath(strFilePath);
+        break;
+    case CPathMonitor::FILE_MODIFIED:
+        if (m_pXmlEdtior->GetCurrentXml() == strFilePath)
+        {
+            m_pXmlEdtior->Reload();
+        }
         break;
     }
 }

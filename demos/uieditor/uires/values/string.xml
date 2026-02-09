@@ -5,16 +5,17 @@
     <skin_build value="皮肤构建"/>
     <openincode value="在XML编辑中打开" />
 
-    <copy value="复制" />
-    <paste value="粘贴" />
-    <cut value="剪切" />
-    <delete value="删除" />
-    <rename value="重命名" />
+    <copy value="复制\tCtrl+&C" />
+    <paste value="粘贴\tCtrl+&V" />
+    <cut value="剪切\tCtrl+&X" />
+    <delete value="删除\tDel" />
+    <rename value="重命名\tF2" />
     <new_xml value="新建XML" />
     <new_folder value="新建文件夹" />
     <new_layout value="新建布局" />
     <new_include value="新建include" />
     <explorer value="在资源管理器中打开" />
+    <copy_path value="复制路径" />
     <add_uires value="添加到uires.idx" />
     <add_skin value="添加到skin"/>
     <property value="属性:" />

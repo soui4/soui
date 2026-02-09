@@ -44,11 +44,11 @@ void CXmlEditor::SetProjectPath(const SStringT & strProjPath)
         m_strProPath = m_strProPath.Left(pos);
 }
 
-BOOL CXmlEditor::CloseProject()
+BOOL CXmlEditor::CloseXml()
 {
-	m_strXmlFile =
-	m_strProPath = SStringT();
-	m_bValidXml = true;
+	m_strXmlFile.Empty();
+	m_strLayoutName.Empty();
+	m_bValidXml = false;
 	m_xmlParser.reset();
 	m_pScintillaWnd->SendEditor(SCI_CLEARALL);
 	m_pScintillaWnd->SetDirty(false);
@@ -57,6 +57,16 @@ BOOL CXmlEditor::CloseProject()
 	m_vecSelectOrder.clear();
 	m_pDesignWnd->Close();
 	return TRUE;
+}
+
+void CXmlEditor::Reload(){
+    SXmlDoc xmlDoc;
+    if (!xmlDoc.load_file(m_strXmlFile))
+        return;
+    SStringT strXml = m_strXmlFile;
+    SStringT strLayoutName = m_strLayoutName;
+    CloseXml();
+    LoadXml(strXml, strLayoutName);
 }
 
 void CXmlEditor::StartPreviewProcess()

@@ -10,13 +10,12 @@
 
 ResManger::ResManger(CMainDlg *pMainDlg):m_pMainDlg(pMainDlg)
 {
-    m_pMainDlg->m_pathMonitor.AddListener(this);
 }
 
 
 ResManger::~ResManger()
 {
-    m_pMainDlg->m_pathMonitor.RemoveListener(this);
+
 }
 
 // 添加获取资源提供者的公共方法
@@ -147,7 +146,7 @@ void ResManger::SaveRes()
 	if (!m_strSkinFile.IsEmpty())
 		m_xmlDocSkin.save_file(m_strSkinFile);
 	m_xmlDocUiRes.save_file(m_strUIResFile);
-
+	m_pResProvider->Init((WPARAM)m_strProPath.c_str(),0);
 	//重新加载
 	LoadUIRes();
 	LoadSkinFile();
@@ -755,18 +754,15 @@ BOOL ResManger::NewLayout(SStringT strResName, SStringT strPath)
         Child.append_attribute(L"path").set_value(S_CT2W(strShortPath));
 
         m_xmlDocUiRes.save_file(m_strUIResFile);
+		m_pResProvider->Init((WPARAM)m_strProPath.c_str(),0);
     }
     SStringT strType = SStringT().Format(_T("layout:%s"), strResName.c_str());
-	m_mapLayoutFile[strPath] = strType;
+    strShortPath.ReplaceChar(_T('\\'), _T('/'));
+    m_mapLayoutFile[strShortPath] = strType;
     return TRUE;
 }
 
-void ResManger::OnFileChanged(LPCTSTR pszFile, CPathMonitor::Flag nFlag)
-{
-	STaskHelper::post(m_pMainDlg->GetMsgLoop(),this,&ResManger::_OnFileChanged,tstring(pszFile),nFlag);
-}
-
-void ResManger::_OnFileChanged(tstring & strFile, CPathMonitor::Flag nFlag)
+void ResManger::OnFileChanged(tstring & strFile, CPathMonitor::Flag nFlag)
 {
 	SStringT strFile2(strFile.c_str(),strFile.length());
 	strFile2 = strFile2.Mid(m_strProPath.GetLength() + 1);
@@ -809,7 +805,55 @@ void ResManger::_OnFileChanged(tstring & strFile, CPathMonitor::Flag nFlag)
 		{
 			UpdateProject();
 		}
+	}else if(nFlag == CPathMonitor::FILE_DELETED)
+	{
+		RemoveFromUIRes(strFile2); 
 	}
+}
+
+BOOL ResManger::RemoveFromUIRes(SStringT strPath)
+{
+    SStringT strShortPath = strPath;
+
+	strShortPath.ReplaceChar(_T('/'), _T('\\'));
+
+	pugi::xml_node xmlNode = m_xmlDocUiRes.child(L"resource");
+	if (!xmlNode) return FALSE;
+	SStringW wstrPath = S_CT2W(strShortPath);
+	// 遍历所有资源类型节点
+	for (pugi::xml_node resTypeNode = xmlNode.first_child(); resTypeNode; resTypeNode = resTypeNode.next_sibling())
+	{
+		// 遍历当前资源类型下的所有文件节点
+		BOOL bFind = FALSE;
+		for (pugi::xml_node fileNode = resTypeNode.first_child(); fileNode; fileNode = fileNode.next_sibling())
+		{
+			SStringW strPath2 = fileNode.attribute(L"path").value();
+			if (strPath2.CompareNoCase(wstrPath) == 0)
+			{
+				fileNode.parent().remove_child(fileNode);
+				bFind = TRUE;
+				break;
+			}
+		}
+		if(bFind)
+		{
+			if(resTypeNode.first_child() == NULL){
+				resTypeNode.parent().remove_child(resTypeNode);
+			}
+			m_xmlDocUiRes.save_file(m_strUIResFile);
+			m_pResProvider->Init((WPARAM)m_strProPath.c_str(),0);
+			//update memory
+			m_mapLayoutFile.RemoveKey(strShortPath);
+			m_mapSkins.RemoveKey(strShortPath);
+			m_mapStrings.RemoveKey(strShortPath);
+			m_mapColors.RemoveKey(strShortPath);
+			m_mapStyles.RemoveKey(strShortPath);
+			m_mapDimensions.RemoveKey(strShortPath);
+			m_mapFonts.RemoveKey(strShortPath);
+			return TRUE;
+		}
+	}
+	return FALSE;
 }
 
 /**
@@ -879,6 +923,7 @@ BOOL ResManger::AddToUIRes(SStringT strPath)
 	if (!m_xmlDocUiRes.save_file(m_strUIResFile)) {
 		return FALSE;
 	}
+	m_pResProvider->Init((WPARAM)m_strProPath.c_str(),0);
 	m_xmlNodeUiRes = resRoot;
 	return TRUE;
 }

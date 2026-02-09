@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<SOUI name="window" title="布局" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" width="400" height="130" wndType="8" toolWindow="1">
+<SOUI name="window" title="布局" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" width="400" height="130" wndType="8" toolWindow="0">
 	<root cache="1">
 		<window pos="0,0,-0,-0" colorBkgnd="@color/bkBlack1" colorText="#ffffff" font="face:微软雅黑;bold:1;size:13">
 			<caption pos="0,0,-0,30" focusable="1" drawfocusrect="0">

@@ -24,16 +24,11 @@ SNSBEGIN
 		
 		// 打开工程
 		void SetProjectPath(const SStringT & strProjPath);
-
-		BOOL CloseProject();
-
-		bool SaveFile();
-
-
-		bool isValidXml();
-
-		
         BOOL LoadXml(SStringT strFileName, SStringT layoutName);   //加载布局
+		BOOL CloseXml();
+		void Reload(); // 重新加载xml文件
+		bool SaveFile();
+		bool isValidXml();
 		
         void OnSelectedCtrl(const int *pOrder, int nLen);
 		void OnUpdateSize(int nWidth, int nHeight);
@@ -46,6 +41,10 @@ SNSBEGIN
 
 		BOOL InsertElement(SStringA xmlElement);
 		BOOL InsertWidget(SStringA xmlWidget);
+        SStringT GetCurrentXml() const
+        {
+            return m_strXmlFile;
+        }
 	protected:
 		void OnMoveCtrl();
 		void UpdatePropGridLayout();

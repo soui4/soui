@@ -22,7 +22,7 @@ enum{
     FT_FONT,
 };
 
-class ResManger : public CPathMonitor::IListener
+class ResManger
 {
 public:
 	ResManger(CMainDlg *pMainDlg);
@@ -120,11 +120,12 @@ public:
 	BOOL AddToUIRes(SStringT strPath);
 
 	int GetFileType(SStringT strPath) const;
+	void OnFileChanged(tstring & pszFile, CPathMonitor::Flag nFlag);
 protected:
-	void OnFileChanged(LPCTSTR pszFile, CPathMonitor::Flag nFlag) override;
-	void _OnFileChanged(tstring &pszFile, CPathMonitor::Flag nFlag);
-protected:
-	pugi::xml_node GetResFirstNode(const SStringT tagname);
+    BOOL RemoveFromUIRes(SStringT strPath);
+
+  protected:
+    pugi::xml_node GetResFirstNode(const SStringT tagname);
 	void LoadResFileEx(SStringT & filepath, pugi::xml_document &xmlDoc, SStringT tagname);
 
 public:

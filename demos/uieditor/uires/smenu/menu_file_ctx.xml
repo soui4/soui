@@ -12,7 +12,8 @@
   <sep/>
   <menuItem id="204" text="@string/rename" />
   <menuItem id="205" text="@string/explorer" />
+  <menuItem id="206" text="@string/copy_path" />
   <sep/>
-  <menuItem id="206" text="@string/add_uires" />
-  <menuItem id="207" text="@string/add_skin" />
+  <menuItem id="207" text="@string/add_uires" />
+  <menuItem id="208" text="@string/add_skin" />
 </menuRoot>

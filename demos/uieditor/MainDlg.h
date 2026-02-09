@@ -314,6 +314,8 @@ public:
 	void OnFileCut();
 	void OnFilePaste();
 	void OnFilePaste(HSTREEITEM hItem);
+	void OnFileDelete(HSTREEITEM hItem);
+	void OnFileRename(HSTREEITEM hItem);
 	
 	// 辅助函数
 	std::vector<HSTREEITEM> GetSelectedItems(HSTREEITEM hDefaultItem = ITEM_NULL);

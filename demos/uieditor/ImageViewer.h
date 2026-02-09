@@ -12,7 +12,7 @@ public:
 	void LoadImage(const SStringT &strImagePath);
 	void SetZoom(int nZoom);
 	int GetZoom() const;
-	void CloseProject();
+	void Clear();
 
 protected:
 	void OnZoomChanged(IEvtArgs *pEvt);
