@@ -31,6 +31,8 @@
 #include "SWaveProgress.h"
 #include "SImageBtnEx.h"
 #include "SImgCanvas.h"
+#include "SEdit2.h"
+#include "SVerificationCodeEdit.h"
 SNSBEGIN
 
 void SCtrlsRegister::RegisterCtrls(SApplication *theApp)
@@ -59,6 +61,8 @@ void SCtrlsRegister::RegisterCtrls(SApplication *theApp)
 	theApp->RegisterWindowClass<SWaveProgress>();
 	theApp->RegisterWindowClass<SImageBtnEx>();
 	theApp->RegisterWindowClass<SImgCanvas>();
+	theApp->RegisterWindowClass<SEdit2>();
+	theApp->RegisterWindowClass<SVerificationCodeEdit>();//SVerificationCodeEdit
 
 	// Register HelloCharts controls
 	SHelloChartsRegister::RegisterControls(theApp);

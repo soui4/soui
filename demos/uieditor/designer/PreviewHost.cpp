@@ -33,11 +33,21 @@ CPreviewHost::~CPreviewHost()
 void CPreviewHost::OnFinalMessage(HWND hWnd)
 {
 	SHostWnd::OnFinalMessage(hWnd);
-	delete this;
+	if(m_pListener){
+		delete this;
+    }
+    else
+    {
+        PostQuitMessage(0);
+    }
 }
 
 LRESULT CPreviewHost::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	if(!m_pListener){
+		SetMsgHandled(FALSE);
+		return 0;
+	}
 	SASSERT(m_pSel);
 	if(GetKeyState(VK_MENU)&0x80 || m_pSel->GetCapture() == m_pSel->GetSwnd())
 	{
@@ -234,7 +244,7 @@ BOOL CPreviewHost::OnLoadLayoutFromResourceID(SXmlDoc& xmlDoc) {
 int CPreviewHost::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	int nRet = SHostWnd::OnCreate(lpCreateStruct);
-	if(nRet==0)
+	if(nRet==0 && m_pListener)
 	{
 		const WCHAR *pszXml=L"<sizingframe name=\"_preview_sel_frame\" float=\"1\"/>"
 			L"<window float=\"1\" name=\"_preview_hover_frame\" msgTransparent=\"1\" margin=\"1,1,1,1\" colorBorder=\"#0000ff\"/>";
@@ -665,12 +675,14 @@ void CPreviewHost::OnFrameMoved(IEvtArgs *e)
 void CPreviewHost::OnSize(UINT nType, CSize size)
 {
 	SHostWnd::OnSize(nType,size);
-	m_pListener->OnResize();
+	if(m_pListener) 
+		m_pListener->OnResize();
 }
 
 void CPreviewHost::OnExitSizeMove()
 {
-	m_pListener->OnResize();
+	if(m_pListener) 
+		m_pListener->OnResize();
 }
 void CPreviewHost::Reload()
 {
@@ -687,7 +699,7 @@ void CPreviewHost::Reload()
 
 LRESULT CPreviewHost::OnNcMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	if(wParam != HTCAPTION)
+	if(!m_pListener || wParam != HTCAPTION)
 		SetMsgHandled(FALSE);
 	return 0;
 }

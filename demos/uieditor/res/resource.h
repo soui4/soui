@@ -1,4 +1,4 @@
-﻿//stamp:2181ed602587b80d
+﻿//stamp:2182ced41c71a4a0
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -177,6 +177,7 @@ struct _R{
 		 const wchar_t * toolbar_btn_NewLayout;
 		 const wchar_t * toolbar_btn_Open;
 		 const wchar_t * toolbar_btn_formatxml;
+		 const wchar_t * toolbar_btn_preview;
 		 const wchar_t * toolbar_btn_recent;
 		 const wchar_t * toolbar_btn_savexml;
 		 const wchar_t * toolbar_btn_viewskin;
@@ -253,6 +254,7 @@ struct _R{
 		int toolbar_btn_NewLayout;
 		int toolbar_btn_Open;
 		int toolbar_btn_formatxml;
+		int toolbar_btn_preview;
 		int toolbar_btn_recent;
 		int toolbar_btn_savexml;
 		int toolbar_btn_viewskin;
@@ -290,6 +292,7 @@ struct _R{
 		int add_uires;
 		int auto_size;
 		int copy;
+		int copy_path;
 		int cut;
 		int delete_cpp;
 		int explorer;
@@ -301,6 +304,7 @@ struct _R{
 		int new_xml;
 		int openincode;
 		int paste;
+		int preview;
 		int project_struct;
 		int property;
 		int rename;
@@ -374,6 +378,7 @@ struct _R R={
 		L"toolbar_btn_NewLayout",
 		L"toolbar_btn_Open",
 		L"toolbar_btn_formatxml",
+		L"toolbar_btn_preview",
 		L"toolbar_btn_recent",
 		L"toolbar_btn_savexml",
 		L"toolbar_btn_viewskin",
@@ -394,80 +399,81 @@ struct _R R={
 	}
 	,
 	{
-		65592,
+		65593,
+		65590,
+		65586,
 		65589,
 		65585,
-		65588,
-		65584,
 		65560,
 		65546,
 		65547,
-		65591,
-		65593,
+		65592,
+		65594,
 		65542,
 		65552,
 		65548,
 		65550,
 		65549,
-		65607,
-		65605,
+		65608,
+		65606,
 		65551,
 		65543,
 		65544,
 		65545,
-		65604,
+		65605,
 		65559,
 		65570,
-		65594,
+		65595,
 		65564,
 		65540,
 		65538,
 		65539,
-		65600,
-		65603,
-		65602,
-		65562,
-		65582,
-		65578,
-		65579,
-		65606,
 		65601,
-		65577,
+		65604,
+		65603,
+		65562,
+		65583,
+		65579,
 		65580,
+		65607,
+		65602,
+		65578,
+		65581,
 		65537,
 		65541,
 		65536,
+		65588,
 		65587,
-		65586,
-		65581,
+		65582,
 		65572,
 		65566,
 		65569,
-		65583,
+		65584,
 		65571,
-		65595,
+		65596,
 		65555,
 		65557,
 		65556,
 		65553,
 		65574,
+		65575,
 		65554,
 		65573,
 		65558,
 		65567,
 		65563,
-		65596,
-		65598,
 		65597,
-		65590,
+		65599,
+		65598,
+		65591,
 		65568,
 		100000,
 		100000,
 		65565,
 		65561,
-		65599,
-		65575,
-		65576
+		65600,
+		65576,
+		65577
 	}
 	,
 	{
@@ -509,7 +515,9 @@ struct _R R={
 		20,
 		21,
 		22,
-		23
+		23,
+		24,
+		25
 	}
 	
 };

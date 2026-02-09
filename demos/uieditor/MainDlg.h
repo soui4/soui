@@ -238,6 +238,7 @@ protected:
 	void OnBtnNewInclude(); //新建Include
 	void OnBtnAbout();
 	void OnBtnViewSkin();
+	void OnBtnPreview(); 
 	void OnBtnRecentFile();
     void OnTvEventOfPanel(IEvtArgs *pEvtBase);
     void addUires(HSTREEITEM hItem);
@@ -261,6 +262,7 @@ protected:
 		EVENT_ID_COMMAND(R.id.toolbar_btn_NewInclude, OnBtnNewInclude)
 		EVENT_ID_COMMAND(R.id.toolbar_btn_savexml, OnBtnSave)
 		EVENT_ID_COMMAND(R.id.toolbar_btn_viewskin, OnBtnViewSkin)
+		EVENT_ID_COMMAND(R.id.toolbar_btn_preview, OnBtnPreview)
 		EVENT_ID_COMMAND(R.id.btn_help, OnBtnAbout)
 		EVENT_ID_COMMAND(R.id.toolbar_btn_recent, OnBtnRecentFile)
 		EVENT_ID_HANDLER(R.id.chk_autosave,EventSwndStateChanged::EventID,OnAutoCheck)

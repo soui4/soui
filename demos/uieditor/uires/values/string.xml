@@ -26,4 +26,5 @@
     <save_xml value="保存XML" />
     <format_xml value="格式化XML" />
     <auto_size value="自动大小" />
+    <preview value="预览" />
   </string>

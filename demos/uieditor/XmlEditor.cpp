@@ -69,7 +69,7 @@ void CXmlEditor::Reload(){
     LoadXml(strXml, strLayoutName);
 }
 
-void CXmlEditor::StartPreviewProcess()
+void CXmlEditor::UpdatePreview()
 {
 	m_pPropGrid->RemoveAllItems();
 	m_vecSelectOrder.clear();
@@ -95,7 +95,22 @@ void CXmlEditor::StartPreviewProcess()
     }
 
 }
-	
+
+BOOL CXmlEditor::StartPreviewProcess(){
+	if(m_strLayoutName.IsEmpty())
+		return FALSE;
+	TCHAR szExePath[MAX_PATH];
+	GetModuleFileName(NULL,szExePath,MAX_PATH);
+	SStringT cmdLine = SStringT(szExePath) + _T(" -preview ") + _T("\"") + m_strProPath+ _T("\"") + _T(" -layout ") + m_strLayoutName;
+	STARTUPINFO si = { sizeof(si) };
+	PROCESS_INFORMATION pi;
+	if (!CreateProcess(NULL, cmdLine.GetBuffer(), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi))
+		return FALSE;
+	CloseHandle(pi.hProcess);
+	CloseHandle(pi.hThread);
+	return TRUE;
+}
+
 BOOL CXmlEditor::LoadXml(SStringT strFileName, SStringT layoutName)
 {
 	m_bChanged = FALSE;
@@ -122,7 +137,7 @@ BOOL CXmlEditor::LoadXml(SStringT strFileName, SStringT layoutName)
 	{
 		splite_xml_editor_sub->ShowPane(0);
         split_xml_editor_main->ShowPane(1);
-		StartPreviewProcess();
+		UpdatePreview();
 	}else
 	{
 		splite_xml_editor_sub->HidePane(0);

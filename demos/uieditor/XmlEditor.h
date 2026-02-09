@@ -45,6 +45,7 @@ SNSBEGIN
         {
             return m_strXmlFile;
         }
+		BOOL StartPreviewProcess();
 	protected:
 		void OnMoveCtrl();
 		void UpdatePropGridLayout();
@@ -80,7 +81,7 @@ SNSBEGIN
 		END_MSG_MAP()
 
 	protected:
-		void StartPreviewProcess();
+		void UpdatePreview();
 		void UpdateXmlData();
 		bool UpdateXmlStruct(spugi::xml_node xmlNode, HSTREEITEM item,int iSib=0);
 

@@ -8,6 +8,7 @@
 #include "AttrStorage.h"
 #include "designer/SizingFrame.h"
 #include "SysdataMgr.h"
+#include "designer/PreviewHost.h"
 #include <helper/slog.h>
 #define kLogTag "SouiEditor"
 
@@ -111,20 +112,6 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
     cfg.SetAppResFile(appDir + kPath_AppRes);
 #endif
 
-    if (!cfg.DoConfig(&theApp))
-    {
-        return -1;
-    }
-
-    CSysDataMgr * pSysDataMgr = new CSysDataMgr;
-#ifdef __APPLE__
-	SStringT strCfgDir = srcDir + _T("/Config");
-#else
-	SStringT strCfgDir = appDir + _T("/Config");
-#endif
-	SApplication::getSingleton().SetFilePrefix(strCfgDir);
-	pSysDataMgr->LoadSysData(strCfgDir);
-
 
     theApp.InitXmlNamedID((const LPCWSTR *)&R.name, (const int *)&R.id, sizeof(R.id) / sizeof(int));
     
@@ -137,14 +124,46 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
     // 注册扩展控件
     SCtrlsRegister::RegisterCtrls(&theApp);
 
+    CCmdLine cmdLine(GetCommandLine());
     //读取自定义消息框布局
     theApp.SetMessageBoxTemplateResId(_T("LAYOUT:xml_messagebox"));
-    //设置真窗口处理接口
-    CSouiRealWndHandler * pRealWndHandler = new CSouiRealWndHandler();
-    theApp.SetRealWndHandler(pRealWndHandler);
-    pRealWndHandler->Release();
+    if(cmdLine.GetParamCount() >= 5 && _tcscmp(cmdLine.GetParam(1),_T("-preview"))==0)
+    {//预览模式, uieditor -preview project -layout pageid
+        SStringT strProj = cmdLine.GetParam(2);
+        SStringT strLayout = cmdLine.GetParam(3);
+        if(strLayout == _T("-layout")){
+            cfg.SetAppDir(strProj).SetAppResFile(strProj);
+            if (!cfg.DoConfig(&theApp))
+            {
+                return -1;
+            }
+            SStringT strPage = cmdLine.GetParam(4);
+            CPreviewHost *pPreviewHost = new CPreviewHost(NULL, strPage.c_str());
+            pPreviewHost->CreateEx(GetActiveWindow(),WS_OVERLAPPEDWINDOW,WS_EX_APPWINDOW,0,0,0,0,NULL);
+            pPreviewHost->ShowWindow(SW_SHOWNORMAL);
+            nRet = theApp.Run(pPreviewHost->m_hWnd);
+            delete pPreviewHost;
+        }
+    }else
     {
-        CCmdLine cmdLine(GetCommandLine());
+        if (!cfg.DoConfig(&theApp))
+        {
+            return -1;
+        }
+
+        CSysDataMgr * pSysDataMgr = new CSysDataMgr;
+    #ifdef __APPLE__
+        SStringT strCfgDir = srcDir + _T("/Config");
+    #else
+        SStringT strCfgDir = appDir + _T("/Config");
+    #endif
+        SApplication::getSingleton().SetFilePrefix(strCfgDir);
+        pSysDataMgr->LoadSysData(strCfgDir);
+        //设置真窗口处理接口
+        CSouiRealWndHandler * pRealWndHandler = new CSouiRealWndHandler();
+        theApp.SetRealWndHandler(pRealWndHandler);
+        pRealWndHandler->Release();
+
         CMainDlg dlgMain;
         if (cmdLine.GetParamCount() > 1)
             dlgMain.m_cmdWorkspaceFile = cmdLine.GetParam(1);
@@ -153,8 +172,8 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
         dlgMain.CenterWindow(dlgMain.m_hWnd);
         dlgMain.ShowWindow(SW_MAXIMIZE);
         nRet = theApp.Run(dlgMain.m_hWnd);
+        delete pSysDataMgr;
     }
-    delete pSysDataMgr;
     Scintilla_ReleaseResources();
 
     OleUninitialize();

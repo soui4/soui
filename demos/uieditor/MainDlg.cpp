@@ -1639,3 +1639,8 @@ void CMainDlg::OnBtnViewSkin()
 	CSkinViewerDlg dlg(&m_UIResFileMgr);
 	dlg.DoModal();
 }
+
+void CMainDlg::OnBtnPreview()
+{
+	m_pXmlEdtior->StartPreviewProcess();
+}

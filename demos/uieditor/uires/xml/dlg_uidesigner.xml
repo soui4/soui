@@ -4,6 +4,7 @@
     <window size="-2,30" layout="hbox" interval="5">
 			<imgbtnex name="toolbar_btn_savexml" skin="skin_app_button" text="@string/save_xml" size="100,30" animate="1" class="ue_cls_title" />
 			<imgbtnex name="toolbar_btn_formatxml" skin="skin_app_button" text="@string/format_xml" size="100,30" animate="1" class="ue_cls_title" />
+			<imgbtnex name="toolbar_btn_preview" skin="skin_app_button" text="@string/preview" size="100,30" animate="1" class="ue_cls_title" />
     </window>
     <splitcol name="xml_editor_main" sepSkin="" size="-2,0" weight="1" sepSize="6">
       <pane idealSize="500" minSize="100" priority="0" clipClient="1">
