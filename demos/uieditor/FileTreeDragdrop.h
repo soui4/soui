@@ -197,6 +197,60 @@ public:
 	}
 };
 
+class FileTreeFmtEnum: public SUnkImpl<IEnumFORMATETC>
+{
+	int m_nIndex;
+	std::vector<FORMATETC> m_format;
+public:
+	FileTreeFmtEnum(const FORMATETC * fmts, int nCount):m_nIndex(0)
+	{
+		m_format.assign(fmts, fmts + nCount);
+	}
+
+	virtual ~FileTreeFmtEnum()
+	{
+	}
+
+	IUNKNOWN_BEGIN(IEnumFORMATETC)
+	IUNKNOWN_END()
+
+	// IEnumFORMATETC methods
+	STDMETHOD(Next)(ULONG celt, FORMATETC *rgelt, ULONG *pceltFetched) OVERRIDE{
+		if(m_nIndex + celt > m_format.size())
+		{
+			return E_UNEXPECTED;
+		}
+		if(pceltFetched)
+		{
+			*pceltFetched = m_nIndex;
+		}
+		for(int i = 0; i < celt; i++)
+		{
+			rgelt[i] = m_format[m_nIndex + i];
+		}
+		m_nIndex += celt;
+		return S_OK;
+	}
+
+	STDMETHOD(Skip)(ULONG celt) OVERRIDE
+	{
+		m_nIndex += celt;
+		return S_OK;
+	}
+
+	STDMETHOD(Reset)() OVERRIDE
+	{
+		m_nIndex = 0;
+		return S_OK;
+	}
+
+	STDMETHOD(Clone)(IEnumFORMATETC **ppEnumFormatEtc) OVERRIDE
+	{
+		*ppEnumFormatEtc = new FileTreeFmtEnum(m_format.data(), m_format.size());
+		return S_OK;
+	}
+};
+
 class FileTreeDataSource : public SUnkImpl<IDataObject>
 {
 private:
@@ -236,8 +290,13 @@ public:
 
 			// 填充 STGMEDIUM 结构
 			pMedium->tymed = TYMED_HGLOBAL;
-			pMedium->hGlobal = m_hGlobal;
+			size_t size = GlobalSize(m_hGlobal);
+			pMedium->hGlobal = GlobalAlloc(GMEM_MOVEABLE, size);
 			pMedium->pUnkForRelease = NULL;
+			void *dst = GlobalLock(pMedium->hGlobal);
+			memcpy(dst, GlobalLock(m_hGlobal), size);
+			GlobalUnlock(m_hGlobal);
+			GlobalUnlock(pMedium->hGlobal);
 
 			return S_OK;
 		}
@@ -247,7 +306,22 @@ public:
 
 	STDMETHOD(GetDataHere)(FORMATETC *pFormatEtc, STGMEDIUM *pMedium) OVERRIDE
 	{
-		return E_NOTIMPL;
+		if (!pFormatEtc || !pMedium)
+			return E_INVALIDARG;
+
+		// 检查是否支持 CF_HDROP 格式
+		if (pFormatEtc->cfFormat == CF_HDROP && pFormatEtc->tymed == TYMED_HGLOBAL)
+		{
+			if (!m_hGlobal)
+				return E_FAIL;
+			// 填充 STGMEDIUM 结构
+			pMedium->tymed = TYMED_HGLOBAL;
+			size_t size = GlobalSize(m_hGlobal);
+			pMedium->hGlobal = m_hGlobal;
+			return S_OK;
+		}
+
+		return DV_E_FORMATETC;
 	}
 
 	STDMETHOD(QueryGetData)(FORMATETC *pFormatEtc) OVERRIDE
@@ -280,6 +354,14 @@ public:
 
 	STDMETHOD(EnumFormatEtc)(DWORD dwDirection, IEnumFORMATETC **ppEnumFormatEtc) OVERRIDE
 	{
+		if (dwDirection == DATADIR_GET)
+		{ 
+			FORMATETC fmts[] = {
+				{ CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL },
+			};
+			*ppEnumFormatEtc = new FileTreeFmtEnum(fmts, ARRAYSIZE(fmts));
+			return S_OK;
+		}
 		return E_NOTIMPL;
 	}
 

@@ -4,10 +4,7 @@
         <treeview size="-2,-2" name="workspace_treeview" multiSel="1"  hasLines="1" indent="20" colorBkgnd="#FFFFFF12">
           <template height="30" layout="hbox" skin="skin_item_bk" trackMouseEvent="1" gravity="center" interval="5"  font="size:16">
             <img name="img_state" size="16,16" skin="skin_filetypes" iconIndex="0"/>
-            <stack size="-1,-1" curSel="0" aniType="none" samePageSize="1">
-              <text size="-1,-1" name="txt_label" colorText="#FFFFFF"/>
-              <edit size="-2,-2" name="edt_label" margin="2"/>
-            </stack>
+            <text size="-1,-1" name="txt_label" colorText="#ff0000"/>
           </template>
         </treeview>
       </page>

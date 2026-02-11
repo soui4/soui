@@ -25,6 +25,7 @@ public:
     ~SVerificationCodeEdit();
 
 protected:
+    SIZE MeasureContent(int nParentWid, int nParentHei) override;
     /**
      * @brief Paint the control
      * @param pRT Rendering target handle
@@ -94,7 +95,6 @@ protected:
         ATTR_INT(L"boxSpacing", m_nBoxSpacing, TRUE)
         ATTR_INT(L"boxWidth", m_nBoxWidth, TRUE)
         ATTR_INT(L"boxHeight", m_nBoxHeight, TRUE)
-        ATTR_CHAIN_CLASS(SEdit2)
     SOUI_ATTRS_END()
 
 protected:

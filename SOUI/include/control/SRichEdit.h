@@ -43,7 +43,7 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
     /**
      * @brief Destructor
      */
-    virtual ~SRichEdit(){}
+    virtual ~SRichEdit();
 
   private:
     /**

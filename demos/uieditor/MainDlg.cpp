@@ -224,7 +224,6 @@ void CMainDlg::OnShowWindow(BOOL bShow, UINT nStatus)
 	if (bShow && !m_cmdWorkspaceFile.IsEmpty())
 	{
 		OpenProject(m_cmdWorkspaceFile);
-		m_bIsOpen = TRUE;
 		m_cmdWorkspaceFile.Empty();
 	}
 }
@@ -275,8 +274,11 @@ BOOL CMainDlg::HandleTreeViewKeyboardShortcut(UINT nChar)
 {
 	if(!m_treeView || !m_bIsOpen)
 		return FALSE;
-
+#ifdef __APPLE__
+	BOOL  bCtrlPressed  = (GetKeyState(VK_LWIN) | GetKeyState(VK_RWIN)) & 0x8000 != 0;
+#else
 	BOOL bCtrlPressed = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
+#endif
 	HSTREEITEM hItem = m_treeView->GetSel();
 	if(bCtrlPressed)
 	{
@@ -495,7 +497,7 @@ bool CMainDlg::CloseProject()
 }
 
 //打开工程
-void CMainDlg::OpenProject(SStringT strFileName)
+BOOL CMainDlg::OpenProject(SStringT strFileName)
 {
 	SStringT strFile = strFileName;
 	int n = strFileName.ReverseFind(TPATH_SLASH);
@@ -518,13 +520,13 @@ void CMainDlg::OpenProject(SStringT strFileName)
 			}
 		}
 		
-		return;
+		return FALSE;
 	}
 
 	if(!m_UIResFileMgr.OpenProject(m_strUiresPath))
 	{
 		SLOGW()<<"open project file failed";
-		return;
+		return FALSE;
 	}
 
 	m_strUIResFile = strFileName;
@@ -546,6 +548,7 @@ void CMainDlg::OpenProject(SStringT strFileName)
 			m_vecRecentFile.erase(m_vecRecentFile.begin());
 		SaveAppCfg();
 	}
+    return TRUE;
 }
 
 void CMainDlg::ReloadWorkspaceUIRes()
@@ -561,7 +564,12 @@ void CMainDlg::SerializeItemsToClipboard(const std::vector<HSTREEITEM>& items, i
 {
 	if(items.empty())
 		return;
-
+	if(!OpenClipboard(m_hWnd))
+	{
+		SLOGW()<<"OpenClipboard failed";
+		return;
+	}
+	EmptyClipboard();
 	// 准备数据：操作类型 + 项目数量 + 项目路径列表（UTF-8）
 	std::vector<SStringA> vecItemPathsUtf8;
 	for(size_t i = 0; i < items.size(); i++)
@@ -600,18 +608,7 @@ void CMainDlg::SerializeItemsToClipboard(const std::vector<HSTREEITEM>& items, i
 			memcpy(pBuffer, ss.str().c_str(), ss.str().size());
 			
 			GlobalUnlock(hGlobal);
-			
-			// 设置到 clipboard
-			if(OpenClipboard(m_hWnd))
-			{
-				EmptyClipboard();
-				SetClipboardData(m_uClipboardFormat, hGlobal);
-				CloseClipboard();
-			}
-			else
-			{
-				GlobalFree(hGlobal);
-			}
+			SetClipboardData(m_uClipboardFormat, hGlobal);
 		}
 		else
 		{
@@ -632,24 +629,14 @@ void CMainDlg::SerializeItemsToClipboard(const std::vector<HSTREEITEM>& items, i
 			pBuffer += sizeof(DROPFILES);
 			memcpy(pBuffer, ss.str().c_str(), ss.str().size());
 			GlobalUnlock(hGlobal);
-			
-			// 设置到 clipboard
-			if(OpenClipboard(m_hWnd))
-			{
-				EmptyClipboard();
-				SetClipboardData(CF_HDROP, hGlobal);
-				CloseClipboard();
-			}
-			else
-			{
-				GlobalFree(hGlobal);
-			}
+			SetClipboardData(CF_HDROP, hGlobal);
 		}
 		else
 		{
 			GlobalFree(hGlobal);
 		}
 	}
+	CloseClipboard();
 }
 
 // 从 CF_HDROP 读取文件路径

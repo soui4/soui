@@ -7,7 +7,7 @@
 #include "string/tstring.h"
 #include <gdialpha.h>
 #include <helper/STimer.h>
-
+#include <helper/SUnkImpl.h>
 #ifndef LY_PER_INCH
 #define LY_PER_INCH 1440
 #endif
@@ -120,11 +120,10 @@ void SRichEdit::UninitTextService()
 
 //////////////////////////////////////////////////////////////////////////
 //
-class SRicheditDropTarget : public IDropTarget {
+class SRicheditDropTarget : public SUnkImpl<IDropTarget> {
   public:
     SRicheditDropTarget(ITextServices *pTxtSvr)
-        : nRef(1)
-        , pserv(pTxtSvr)
+        : pserv(pTxtSvr)
     {
         SASSERT(pserv);
         pserv->AddRef();
@@ -136,36 +135,11 @@ class SRicheditDropTarget : public IDropTarget {
         pserv->Release();
     }
 
-    // IUnkown
-    virtual HRESULT STDMETHODCALLTYPE QueryInterface(
-        /* [in] */ REFIID riid,
-        /* [iid_is][out] */ void **ppvObject)
-    {
-        HRESULT hr = E_NOINTERFACE;
-        if (riid == __uuidof(IUnknown))
-            *ppvObject = (IUnknown *)this, hr = S_OK;
-        else if (riid == __uuidof(IDropTarget))
-            *ppvObject = (IDropTarget *)this, hr = S_OK;
-        if (SUCCEEDED(hr))
-            AddRef();
-        return hr;
-    }
-
-    virtual ULONG STDMETHODCALLTYPE AddRef(void)
-    {
-        return ++nRef;
-    }
-
-    virtual ULONG STDMETHODCALLTYPE Release(void)
-    {
-        ULONG uRet = --nRef;
-        if (uRet == 0)
-            delete this;
-        return uRet;
-    }
-
+    IUNKNOWN_BEGIN(IDropTarget)
+    IUNKNOWN_END()
+ 
     // IDropTarget
-    virtual HRESULT STDMETHODCALLTYPE DragEnter(
+    STDMETHOD(DragEnter)(
         /* [unique][in] */ IDataObject *pDataObj,
         /* [in] */ DWORD grfKeyState,
         /* [in] */ POINTL pt,
@@ -183,7 +157,7 @@ class SRicheditDropTarget : public IDropTarget {
         return hr;
     }
 
-    virtual HRESULT STDMETHODCALLTYPE DragOver(
+    STDMETHOD(DragOver)(
         /* [in] */ DWORD grfKeyState,
         /* [in] */ POINTL pt,
         /* [out][in] */ DWORD *pdwEffect)
@@ -200,7 +174,7 @@ class SRicheditDropTarget : public IDropTarget {
         return hr;
     }
 
-    virtual HRESULT STDMETHODCALLTYPE DragLeave(void)
+    STDMETHOD(DragLeave)(void)
     {
         HRESULT hr = S_FALSE;
         IDropTarget *pDropTarget = NULL;
@@ -213,7 +187,7 @@ class SRicheditDropTarget : public IDropTarget {
         return hr;
     }
 
-    virtual HRESULT STDMETHODCALLTYPE Drop(
+    STDMETHOD(Drop)(
         /* [unique][in] */ IDataObject *pDataObj,
         /* [in] */ DWORD grfKeyState,
         /* [in] */ POINTL pt,
@@ -234,7 +208,6 @@ class SRicheditDropTarget : public IDropTarget {
 
   protected:
     ITextServices *pserv; // pointer to Text Services object
-    LONG nRef;
 };
 
 const LONG cInitTextMax = (32 * 1024) - 1;
@@ -266,7 +239,7 @@ LONG HimetrictoD(LONG lHimetric, LONG dPerInch)
  *
  * Describe
  */
-class STextHost : public ITextHost {
+class STextHost : public SUnkImpl<ITextHost> {
     friend class SRichEdit;
 
   public:
@@ -304,9 +277,8 @@ class STextHost : public ITextHost {
     }
 
   protected:
-    STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFGUID riid, void **ppvObject) OVERRIDE;
-    STDMETHOD_(ULONG, AddRef)(THIS) OVERRIDE;
-    STDMETHOD_(ULONG, Release)(THIS) OVERRIDE;
+    IUNKNOWN_BEGIN(ITextHost)
+    IUNKNOWN_END()
 
     /**
      * STextHost::TxGetDC
@@ -711,8 +683,6 @@ class STextHost : public ITextHost {
 
   protected:
     BOOL m_fUiActive; /**< Whether control is inplace active */
-
-    ULONG cRefs;            /**< Reference Count */
     ITextServices *pserv;   /**< pointer to Text Services object */
     SRichEdit *m_pRichEdit; /**< swindow for text host */
     POINT m_ptCaret;
@@ -720,7 +690,6 @@ class STextHost : public ITextHost {
 
 STextHost::STextHost(void)
     : m_pRichEdit(NULL)
-    , cRefs(1)
     , m_fUiActive(FALSE)
     , pserv(NULL)
 {
@@ -731,40 +700,6 @@ STextHost::~STextHost(void)
 {
     if (pserv)
         pserv->Release();
-}
-
-//////////////////////////////////////////////////////////////////////////
-// IUnknown
-HRESULT STextHost::QueryInterface(REFIID riid, void **ppvObject)
-{
-    HRESULT hr = E_NOINTERFACE;
-    *ppvObject = NULL;
-
-    if (IsEqualIID(riid, IID_IUnknown) || IsEqualIID(riid, IID_ITextHost))
-    {
-        AddRef();
-        *ppvObject = (ITextHost *)this;
-        hr = S_OK;
-    }
-
-    return hr;
-}
-
-ULONG STextHost::AddRef(void)
-{
-    return ++cRefs;
-}
-
-ULONG STextHost::Release(void)
-{
-    ULONG c_Refs = --cRefs;
-
-    if (c_Refs == 0)
-    {
-        delete this;
-    }
-
-    return c_Refs;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1126,8 +1061,7 @@ BOOL STextHost::Init(SRichEdit *pRichEdit)
 // SRichEdit
 
 SRichEdit::SRichEdit()
-    : m_pTxtHost(NULL)
-    , m_fTransparent(0)
+    : m_fTransparent(0)
     , m_fRich(1)
     , m_fSaveSelection(TRUE)
     , m_fVertical(FALSE)
@@ -1155,23 +1089,35 @@ SRichEdit::SRichEdit()
     m_sizelExtent.cx = m_sizelExtent.cy = 0;
     m_evtSet.addEvent(EVENTID(EventRENotify));
     m_evtSet.addEvent(EVENTID(EventREMenu));
-}
-
-int SRichEdit::OnCreate(LPVOID)
-{
-    if (0 != __baseCls::OnCreate(NULL))
-        return 1;
-
-    InitDefaultCharFormat(&m_cfDef);
-    InitDefaultParaFormat(&m_pfDef);
 
     m_pTxtHost = new STextHost;
     if (!m_pTxtHost->Init(this))
     {
         m_pTxtHost->Release();
         m_pTxtHost = NULL;
-        return 1;
     }
+}
+
+SRichEdit::~SRichEdit()
+{
+    if (m_pTxtHost)
+    {
+        m_pTxtHost->Release();
+        m_pTxtHost = NULL;
+    }
+}
+int SRichEdit::OnCreate(LPVOID)
+{
+    int ret = __baseCls::OnCreate(NULL);
+    if (ret != 0)
+        return ret;
+    if(!m_pTxtHost)
+    {
+        SSLOGE() << "create text host failed!";
+        return 2;
+    }
+    InitDefaultCharFormat(&m_cfDef);
+    InitDefaultParaFormat(&m_pfDef);
 
     if (!m_fTransparent && m_style.m_crBg == CR_INVALID && !m_pBgSkin)
         m_style.m_crBg = RGB(0xff, 0xff, 0xff);
@@ -1210,9 +1156,8 @@ void SRichEdit::OnDestroy()
     if (m_pTxtHost)
     {
         m_pTxtHost->GetTextService()->OnTxInPlaceDeactivate();
-        m_pTxtHost->Release();
-        m_pTxtHost = NULL;
     }
+    
     m_mapTimer.RemoveAll();
     __baseCls::OnDestroy();
 }
@@ -1806,10 +1751,10 @@ LRESULT SRichEdit::OnNcCalcSize(BOOL bCalcValidRects, LPARAM lParam)
 
     if (m_pTxtHost)
     {
-        HDC hdc = GetDC(GetContainer()->GetHostHwnd());
+        HDC hdc = GetDC(NULL);
         LONG xPerInch = ::GetDeviceCaps(hdc, LOGPIXELSX);
         LONG yPerInch = ::GetDeviceCaps(hdc, LOGPIXELSY);
-        ReleaseDC(GetContainer()->GetHostHwnd(), hdc);
+        ReleaseDC(NULL, hdc);
 
         m_sizelExtent.cx = DtoHimetric(m_rcClient.Width(), xPerInch);
         m_sizelExtent.cy = DtoHimetric(m_rcClient.Height(), yPerInch);

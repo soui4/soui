@@ -19,6 +19,14 @@ SVerificationCodeEdit::~SVerificationCodeEdit()
 {
 }
 
+SIZE SVerificationCodeEdit::MeasureContent(int nParentWid, int nParentHei)
+{
+    SIZE ret;
+    ret.cx = m_nBoxWidth * m_cchTextMost + m_nBoxSpacing * (m_cchTextMost - 1);
+    ret.cy = m_nBoxHeight;
+    return ret;
+}
+
 void SVerificationCodeEdit::OnPaint(IRenderTarget *pRT)
 {
     // 绘制字符格子
@@ -31,6 +39,10 @@ void SVerificationCodeEdit::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
     if(nChar == VK_LEFT || nChar == VK_RIGHT || nChar == VK_UP || nChar == VK_DOWN)
         return;
     __baseCls::OnKeyDown(nChar, nRepCnt, nFlags);
+    if(GetWindowTextLength() == m_cchTextMost){
+        EventKeyEnter evt(this);
+        FireEvent(evt);
+    }
     Invalidate();
 }
 

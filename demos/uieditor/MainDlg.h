@@ -208,7 +208,7 @@ protected:
 
 	void SaveAppCfg();
 
-	void OpenProject(SStringT strFileName);
+	BOOL OpenProject(SStringT strFileName);
 	void ReloadWorkspaceUIRes();
 	bool CloseProject();
 
