@@ -50,7 +50,7 @@ if(CMAKE_SYSTEM_NAME MATCHES Darwin)
         translator
         render-skia
     )
-    if(SOUI_ENABLE_CORE_LIB)
+    if(NOT SOUI_ENABLE_CORE_LIB)
         list(APPEND TARGET_LIST "default.exctrl")
     endif()
     copy_targets_to_bundle(${current_project} "${TARGET_LIST}")
