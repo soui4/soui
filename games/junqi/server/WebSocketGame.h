@@ -7,7 +7,6 @@
 
 #include <interface/ws-i.h>
 #include <helper/obj-ref-impl.hpp>
-#include <com-loader.hpp>
 #include <map>
 #include <list>
 #include <vector>
@@ -15,7 +14,7 @@
 #include <string>
 #include "GameClient.h"
 #include "GameTable-i.h"
-
+#include <commgr2.h>
 using namespace SOUI;
 
 // 前向声明
@@ -65,7 +64,7 @@ protected:
 	BOOL OnMsg(PWSCLIENT pClient, DWORD dwType, LPVOID pData, DWORD dwSize);
 
 	// WebSocket相关成员
-	SComLoader m_comLoader;
+	SComMgr2 m_comLoader;
 	SAutoRefPtr<IWebsocket> m_pWebsocket;
 	SAutoRefPtr<IWsServer> m_pWsServer;
 	SAutoRefPtr<WebSocketSvrListener> m_pListener;

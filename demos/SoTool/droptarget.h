@@ -10,9 +10,13 @@
 #define __RPC__inout
 
 #endif//__RPC__in_opt
+
+SNSBEGIN
+
 struct IFileDropHandler{
     virtual void OnFileDropdown(HDROP hDrop) = 0;
 };
+
 
 class CDropTarget:public SOUI::SUnknownImpl<IDropTarget>
 {
@@ -93,6 +97,8 @@ public:
     }
 
 };
+
+SNSEND
 
 
 #endif//_DROP_TARGET_H_

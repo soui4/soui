@@ -42,6 +42,10 @@ typedef struct
 class ITxNotify
 {
 public:
+    ITxNotify()
+        : _pnext(NULL)
+    {
+    }
 	virtual void OnPreReplaceRange( LONG cp, LONG cchDel, LONG cchNew,
 					LONG cpFormatMin, LONG cpFormatMax, NOTIFY_DATA *pNotifyData ) = 0;
 	virtual void OnPostReplaceRange( LONG cp, LONG cchDel, LONG cchNew,

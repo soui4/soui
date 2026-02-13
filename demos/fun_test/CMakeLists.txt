@@ -20,17 +20,22 @@ test_native.cpp
 
 add_executable(fun_test ${CURRENT_HEADERS} ${FUN_TEST_SRC})
 
-add_dependencies(fun_test utilities4 gtest soui4 resprovider-zip log4z render-gdi taskloop Scintilla)
-target_include_directories(fun_test 
+target_include_directories(fun_test
     PUBLIC ${PROJECT_SOURCE_DIR}/third-part/Scintilla/include
 )
 
-target_link_libraries(fun_test utilities4 gtest soui4 Scintilla)
-if (NOT CMAKE_SYSTEM_NAME MATCHES Windows)
+add_dependencies(fun_test gtest soui4 Scintilla ${COM_LIBS})
+target_link_libraries(fun_test gtest soui4 Scintilla)
+if (CMAKE_SYSTEM_NAME MATCHES Windows)
+    add_dependencies(fun_test soui-sys-resource)
+    target_link_libraries(fun_test Msimg32 imm32)
+else()
     add_dependencies(fun_test swinx)
     target_link_libraries(fun_test swinx pthread dl)
-else()
-    target_link_libraries(fun_test Msimg32 imm32)
+endif()
+
+if(SOUI_ENABLE_COM_LIB)
+    target_link_libraries(fun_test ${COM_LIBS})
 endif()
 
 set_target_properties (fun_test PROPERTIES

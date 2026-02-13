@@ -9,7 +9,7 @@
 #ifndef SCOM_MASK
 #define SCOM_MASK scom_mask_scom_all
 #endif 
-
+    
 #if  defined(_WIN32) && !defined(__MINGW32__) && !defined(__MINGW64__) 
 #define COM_IMGDECODER  _T("imgdecoder-stb")
 #define COM_RENDER_GDI  _T("render-gdi")
@@ -23,6 +23,8 @@
 #define COM_TASKLOOP _T("taskloop")
 #define COM_IPCOBJ _T("sipcobject")
 #define COM_HTTPCLIENT _T("httpclient")
+#define COM_NETWORK _T("network")
+#define COM_WS _T("ws")
 #else
 #define COM_IMGDECODER  _T("libimgdecoder-stb")
 #define COM_RENDER_GDI  _T("librender-gdi")
@@ -36,6 +38,8 @@
 #define COM_RENDER_D2D _T("librender-d2d")
 #define COM_IPCOBJ _T("libsipcobject")
 #define COM_HTTPCLIENT _T("libhttpclient")
+#define COM_NETWORK _T("libnetwork")
+#define COM_WS _T("libws")
 #endif//_WIN32
 
 #ifdef LIB_SOUI_COM
@@ -97,6 +101,18 @@
 	#pragma comment(lib,"ScriptModule-LUA")
 #endif
 
+#if(SCOM_MASK&scom_mask_network)
+    #pragma comment(lib,"iphlpapi")
+	#pragma comment(lib,"network")
+#endif
+#if(SCOM_MASK&scom_mask_ws)
+    #pragma comment(lib, "ws2_32")
+    #pragma comment(lib, "Crypt32")
+    #pragma comment(lib, "libssl_1_1")
+    #pragma comment(lib, "libcrypto_1_1")
+    #pragma comment(lib,"websockets")
+	#pragma comment(lib,"ws")
+#endif
 
 SNSBEGIN
     namespace IMGDECODOR_WIC
@@ -157,6 +173,13 @@ SNSBEGIN
 		BOOL SCreateInstance(IObjRef **);
 	}
 
+    namespace NETWORK {
+		BOOL SCreateInstance(IObjRef **);
+	}
+    namespace WS {
+		BOOL SCreateInstance(IObjRef **);
+	}
+    
 class SComMgr2
 {
 public:
@@ -172,16 +195,16 @@ public:
     {
         SStringT strImgDecoder = pszImgDecoder?SStringT(pszImgDecoder):m_strImgDecoder;
         strImgDecoder.MakeLower();
-#if(SCOM_MASK&scom_mask_imgdecoder_wic)
-        if(strImgDecoder == _T("imgdecoder-wic"))
+#if(SCOM_MASK&scom_mask_imgdecoder_wic) && defined(_WIN32)
+        if(strImgDecoder == _T("imgdecoder-wic") || strImgDecoder == _T("libimgdecoder-wic"))
             return IMGDECODOR_WIC::SCreateInstance(ppObj);
 #endif
 #if(SCOM_MASK&scom_mask_imgdecoder_stb)
-        if(strImgDecoder == _T("imgdecoder-stb"))
+        if(strImgDecoder == _T("imgdecoder-stb") || strImgDecoder == _T("libimgdecoder-stb"))
             return IMGDECODOR_STB::SCreateInstance(ppObj);
 #endif
-#if(SCOM_MASK&scom_mask_imgdecoder_gdip)
-        if(strImgDecoder == _T("imgdecoder-gdip"))
+#if(SCOM_MASK&scom_mask_imgdecoder_gdip) && defined(_WIN32)
+        if(strImgDecoder == _T("imgdecoder-gdip") || strImgDecoder == _T("libimgdecoder-gdip"))
             return IMGDECODOR_GDIP::SCreateInstance(ppObj);
 #endif
          SASSERT(0);
@@ -208,7 +231,7 @@ public:
 
 	BOOL CreateRender_D2D(IObjRef **ppObj)
 	{
-        #if(SCOM_MASK&scom_mask_render_d2d)
+        #if(SCOM_MASK&scom_mask_render_d2d) && defined(_WIN32)  && !defined(__MINGW32__)
 		return RENDER_D2D::SCreateInstance(ppObj);
         #else
         return FALSE;
@@ -217,7 +240,7 @@ public:
 
     BOOL CreateScrpit_Lua(IObjRef **ppObj)
     {
-        #if(SCOM_MASK&scom_mask_script_lua)
+        #if(SCOM_MASK&scom_mask_script_lua) && defined(DLL_SOUI_COM)
         return SCRIPT_LUA::SCreateInstance(ppObj);
         #else
         return FALSE;
@@ -283,6 +306,24 @@ public:
 	{
         #if(SCOM_MASK&scom_mask_httpclient)
 		return HttpClient::SCreateInstance(ppObj);
+        #else
+        return FALSE;
+        #endif
+	}
+
+    BOOL CreateNetwork(IObjRef **ppObj)
+	{
+        #if(SCOM_MASK&scom_mask_network)
+		return NETWORK::SCreateInstance(ppObj);
+        #else
+        return FALSE;
+        #endif
+	}
+
+    BOOL CreateWS(IObjRef **ppObj)
+	{
+        #if(SCOM_MASK&scom_mask_ws)
+		return WS::SCreateInstance(ppObj);
         #else
         return FALSE;
         #endif
@@ -389,6 +430,15 @@ public:
 		return httpClientLoader.CreateInstance(m_strDllPath + COM_HTTPCLIENT, ppObj);
 	}
 
+    BOOL CreateNetwork(IObjRef **ppObj)
+	{
+		return networkLoader.CreateInstance(m_strDllPath + COM_NETWORK, ppObj);
+	}
+
+    BOOL CreateWS(IObjRef **ppObj)
+	{
+		return wsLoader.CreateInstance(m_strDllPath + COM_WS, ppObj);
+	}
 	HMODULE GetRenderModule(){
 		return renderLoader.GetModule();
 	}
@@ -404,6 +454,8 @@ protected:
 	SComLoader taskLoopLoader;
 	SComLoader ipcLoader;
     SComLoader httpClientLoader;
+    SComLoader networkLoader;
+    SComLoader wsLoader;
 
     SStringT m_strImgDecoder;
 	SStringT m_strDllPath;

@@ -60,12 +60,7 @@ else()
     add_library(scriptmodule-lua STATIC ${ScriptModule-lua_src} ${ScriptModule-lua_header})
 endif()
 
-if (NOT SOUI_ENABLE_CORE_LIB)
-	message(STATUS "[DLL_CORE] scriptmodule-lua: ON")
-    set(COM_LIBS ${COM_LIBS} scriptmodule-lua CACHE INTERNAL "com_lib")
-else()
-	message(STATUS "[LIB_CORE] scriptmodule-lua: OFF")
-endif()
+set(COM_LIBS ${COM_LIBS} scriptmodule-lua CACHE INTERNAL "com_lib")
 
 set_target_properties (scriptmodule-lua PROPERTIES
     FOLDER components

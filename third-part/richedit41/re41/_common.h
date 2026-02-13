@@ -33,11 +33,23 @@
 #define STRICT
 #endif
 
+#ifdef _MSC_VER		
+#define SELECT_ANY __declspec(selectany)
+#else
+#define SELECT_ANY
+#endif
+
 #define NOSHELLDEBUG			//disables asserts in shell.h
 
 #define W32INCLUDE "w32win32.cpp"
 
 #define WINVER 0x0500
+
+#ifndef SELECT_ANY
+#ifdef _WIN32
+#define SELECT_ANY __declspec(selectany)
+#endif //_ WIN32
+#endif // SELECT_ANY
 
 // 4201 : nameless struct/union
 // 4514 : unreferenced inline function has been removed

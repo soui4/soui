@@ -71,6 +71,7 @@ if (NOT SOUI_ENABLE_COM_LIB)
     endif()
 else()
     add_library(httpclient STATIC ${srcs} ${headers})
+    target_link_libraries(httpclient PUBLIC utilities4 ${CURL_LIBRARIES})
 endif()
 
 set(COM_LIBS ${COM_LIBS} httpclient CACHE INTERNAL "com_lib")

@@ -22,9 +22,14 @@ source_group("Resource Files" FILES ${CURRENT_RC})
 
 add_executable(SoTool WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${CURRENT_RC})
 
-target_link_libraries(SoTool soui4 utilities4)
+add_dependencies(SoTool soui4 ${COM_LIBS})
+target_link_libraries(SoTool soui4)
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-target_link_libraries(SoTool comctl32.lib Psapi.lib)
+    add_dependencies(${current_project} soui-sys-resource)
+    target_link_libraries(SoTool comctl32.lib Psapi.lib)
+endif()
+if(SOUI_ENABLE_COM_LIB)
+    target_link_libraries(SoTool ${COM_LIBS})
 endif()
 
 target_precompile_headers(SoTool PRIVATE "stdafx.h")

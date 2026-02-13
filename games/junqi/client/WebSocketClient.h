@@ -3,7 +3,7 @@
 
 #include <interface/ws-i.h>
 #include <helper/obj-ref-impl.hpp>
-#include <com-loader.hpp>
+#include <commgr2.h>
 #include <vector>
 #include <memory>
 #include <list>
@@ -65,7 +65,7 @@ private:
 
   private:
 	// WebSocket相关成员
-	SComLoader m_comLoader;
+	SComMgr2 m_comLoader;
 	SAutoRefPtr<IWebsocket> m_pWebsocket;
 	SAutoRefPtr<IWsClient> m_pWsClient;
 	SAutoRefPtr<WebSocketConnListener> m_pListener;

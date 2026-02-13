@@ -54,15 +54,6 @@ class Websocket : public TObjRefImpl<IWebsocket> {
     }
 };
 
-#undef SOUI_COM_API
-#ifdef _WIN32
-#define SOUI_COM_API __declspec(dllexport)
-#else
-#define SOUI_COM_API
-#endif
-#undef SOUI_COM_C
-#define SOUI_COM_C EXTERN_C
-
 namespace WS
 {
 SOUI_COM_C BOOL SOUI_COM_API SCreateInstance(IObjRef **ppRet)

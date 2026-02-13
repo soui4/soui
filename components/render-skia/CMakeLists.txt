@@ -21,25 +21,27 @@ source_group("Source Files" FILES ${render-skia_src})
 if (NOT SOUI_ENABLE_COM_LIB)
     set (render-skia_src  ${render-skia_src} render-skia.rc)
     add_library(render-skia SHARED ${render-skia_src} ${render-skia_header})
-    add_dependencies(render-skia skia utilities4)
-    if (CMAKE_SYSTEM_NAME MATCHES Windows)
-        target_link_libraries(render-skia skia utilities4 Usp10 opengl32 soui4)
-    else()
-        # 通过swinx间接获取fontconfig和freetype支持
-        # swinx已经包含了这些库，不需要直接链接
-        add_dependencies(render-skia swinx)
-        if(CMAKE_SYSTEM_NAME MATCHES Darwin)
-                # 查找GLEW和GLFW包
-            find_package(GLEW REQUIRED)
-            find_package(glfw3 REQUIRED)
-            target_link_libraries(render-skia swinx skia utilities4 soui4 GLEW::GLEW glfw)
-        else()
-            target_link_libraries(render-skia swinx skia utilities4 soui4 GL)
-        endif()
-    endif()
 else()
     add_library(render-skia STATIC ${render-skia_src} ${render-skia_header})
 endif()
+add_dependencies(render-skia skia utilities4)
+target_link_libraries(render-skia skia utilities4 soui4)
+if (CMAKE_SYSTEM_NAME MATCHES Windows)
+    target_link_libraries(render-skia Usp10 opengl32)
+else()
+    # 通过swinx间接获取fontconfig和freetype支持
+    # swinx已经包含了这些库，不需要直接链接
+    add_dependencies(render-skia swinx)
+    if(CMAKE_SYSTEM_NAME MATCHES Darwin)
+            # 查找GLEW和GLFW包
+        find_package(GLEW REQUIRED)
+        find_package(glfw3 REQUIRED)
+        target_link_libraries(render-skia swinx GLEW::GLEW glfw)
+    else()
+        target_link_libraries(render-skia swinx GL)
+    endif()
+endif()
+
 
 target_compile_definitions(render-skia
   PUBLIC SOUI_RENDER_USE_SKIA

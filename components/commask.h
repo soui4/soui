@@ -7,9 +7,9 @@
 
 #define scom_mask_render_skia  (1 << 3)
 #define scom_mask_render_gdi  (1 << 4)
-#define scom_mask_render_d2d  (1 << 14)
+#define scom_mask_render_d2d  (1 << 5)
 
-#define scom_mask_imgdecoder_gdip  (1 << 5)
+#define scom_mask_imgdecoder_gdip  (1 << 6)
 #define scom_mask_imgdecoder_stb  (1 << 7)
 #define scom_mask_imgdecoder_wic  (1 << 8)
 
@@ -19,6 +19,8 @@
 
 #define scom_mask_ipcobject   (1<<12)
 #define scom_mask_httpclient   (1<<13)
+#define scom_mask_network   (1<<14)
+#define scom_mask_ws   (1<<15)
 
 #define scom_mask_scom_all  (0xffffffff)
 

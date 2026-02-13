@@ -1,3 +1,10 @@
+
+if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
+# GCC/Clang需要未知无关代码
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIE")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIE")
+endif()
+
 add_subdirectory(demo)
 add_subdirectory(demo2)
 add_subdirectory(wxDemo)

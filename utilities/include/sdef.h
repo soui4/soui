@@ -55,4 +55,12 @@
 typedef unsigned int tid_t;
 #endif//_WIN32
 
+#ifdef _WIN32
+#ifndef SELECT_ANY
+#define SELECT_ANY __declspec(selectany)
+#endif
+#else
+
+#endif//_WIN32
+
 #endif // __SDEF__H__

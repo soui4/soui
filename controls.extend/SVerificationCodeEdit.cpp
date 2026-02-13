@@ -39,13 +39,18 @@ void SVerificationCodeEdit::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
     if(nChar == VK_LEFT || nChar == VK_RIGHT || nChar == VK_UP || nChar == VK_DOWN)
         return;
     __baseCls::OnKeyDown(nChar, nRepCnt, nFlags);
+    Invalidate();
+}
+
+void SVerificationCodeEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+    __baseCls::OnChar(nChar, nRepCnt, nFlags);
     if(GetWindowTextLength() == m_cchTextMost){
         EventKeyEnter evt(this);
         FireEvent(evt);
     }
     Invalidate();
 }
-
 void SVerificationCodeEdit::OnLButtonDown(UINT flags, CPoint pt)
 {
     // 调用父类的OnLButtonDown方法

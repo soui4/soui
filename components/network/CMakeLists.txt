@@ -45,13 +45,17 @@ else()
     endif()
 endif()
 
-add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS})
+if (NOT SOUI_ENABLE_COM_LIB)
+    add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS} src/network.rc)
+else()
+    add_library(${PROJECT_NAME} STATIC ${SOURCES})
+endif()
 
 # 链接库
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    target_link_libraries(${PROJECT_NAME} ws2_32 iphlpapi utilities4)
+    target_link_libraries(${PROJECT_NAME} PUBLIC ws2_32 iphlpapi utilities4)
 else()
-    target_link_libraries(${PROJECT_NAME} utilities4)
+    target_link_libraries(${PROJECT_NAME} PUBLIC utilities4)
 endif()
 
 set(COM_LIBS ${COM_LIBS} ${PROJECT_NAME} CACHE INTERNAL "com_lib")

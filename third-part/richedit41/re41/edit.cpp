@@ -52,7 +52,7 @@ ASSERTDATA
 
 // This is not public because we don't really want folks using it.
 // ITextServices is a private interface.
-EXTERN_C const IID IID_ITextServices = { // 8d33f740-cf58-11ce-a89d-00aa006cadc5
+EXTERN_C SELECT_ANY const IID IID_ITextServices = { // 8d33f740-cf58-11ce-a89d-00aa006cadc5
 	0x8d33f740,
 	0xcf58,
 	0x11ce,
@@ -60,15 +60,15 @@ EXTERN_C const IID IID_ITextServices = { // 8d33f740-cf58-11ce-a89d-00aa006cadc5
   };
 
 // {13E670F4-1A5A-11cf-ABEB-00AA00B65EA1}
-EXTERN_C const GUID IID_ITextHost = 
+EXTERN_C SELECT_ANY const GUID IID_ITextHost =
 { 0x13e670f4, 0x1a5a, 0x11cf, { 0xab, 0xeb, 0x0, 0xaa, 0x0, 0xb6, 0x5e, 0xa1 } };
 
 // {13E670F5-1A5A-11cf-ABEB-00AA00B65EA1}
-EXTERN_C const GUID IID_ITextHost2 = 
+EXTERN_C SELECT_ANY const GUID IID_ITextHost2 =
 { 0x13e670f5, 0x1a5a, 0x11cf, { 0xab, 0xeb, 0x0, 0xaa, 0x0, 0xb6, 0x5e, 0xa1 } };
 
 // this is used internally do tell if a data object is one of our own.
-EXTERN_C const GUID IID_IRichEditDO =
+EXTERN_C SELECT_ANY const GUID IID_IRichEditDO =
 { /* 21bc3b20-e5d5-11cf-93e1-00aa00b65ea1 */
     0x21bc3b20,
     0xe5d5,

@@ -17,10 +17,18 @@ source_group("Source Files" FILES ${CURRENT_SRCS})
 source_group("SoUI Resource" FILES ${CURRENT_SOUIS})
 source_group("Resource Files" FILES ${CURRENT_RC})
 
-link_directories(${SOUI_ROOT}/bin)
 add_executable(dpidemo WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${CURRENT_RC})
-add_dependencies(dpidemo translator)
-target_link_libraries(dpidemo soui4 utilities4 jsoncpp)
+
+add_dependencies(dpidemo soui4 ${COM_LIBS})
+target_link_libraries(dpidemo soui4 jsoncpp)
+if (CMAKE_SYSTEM_NAME MATCHES Windows)
+    add_dependencies(dpidemo soui-sys-resource)
+endif()
+
+if(SOUI_ENABLE_COM_LIB)
+    target_link_libraries(dpidemo ${COM_LIBS})
+endif()
+
 target_precompile_headers(dpidemo PRIVATE "stdafx.h")
 
 

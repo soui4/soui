@@ -4,7 +4,7 @@
 #include <shellapi.h>
 #include <helper/SUnkImpl.h>
 
-
+SNSBEGIN
 class CDropTarget : public SUnkImpl<IDropTarget>
 {
 public:
@@ -93,5 +93,7 @@ public:
 	IUNKNOWN_BEGIN(IDropTarget)
 	IUNKNOWN_END()
 };
+
+SNSEND
 
 #endif//_DROP_TARGET_H_

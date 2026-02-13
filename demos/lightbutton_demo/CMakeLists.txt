@@ -28,9 +28,16 @@ source_group("Resource Files" FILES ${CURRENT_RC})
 
 add_executable(lightbutton_demo WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${CURRENT_RC} ${LIGHTBUTTON_HEADERS} ${LIGHTBUTTON_SRCS})
 
-add_dependencies(lightbutton_demo soui4 utilities4)
-target_link_libraries(lightbutton_demo utilities4 soui4)
+add_dependencies(lightbutton_demo soui4 ${COM_LIBS})
+target_link_libraries(lightbutton_demo soui4)
 
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+    add_dependencies(lightbutton_demo soui-sys-resource)
+endif()
+
+if(SOUI_ENABLE_COM_LIB)
+    target_link_libraries(lightbutton_demo ${COM_LIBS})
+endif()
 
 target_precompile_headers(lightbutton_demo PRIVATE "stdafx.h")
 

@@ -18,6 +18,13 @@
 
 #define USE_MSFTEDIT
 
+#ifdef INIT_RICHEDIT
+extern "C"{
+STDAPI InitRichedit(HINSTANCE hInst);
+STDAPI UninitRichedit(HINSTANCE hInst);
+}
+#endif//INIT_RICHEDIT
+
 SNSBEGIN
 //////////////////////////////////////////////////////////////////////////
 //  STextServiceHelper
@@ -72,16 +79,26 @@ class STextServiceHelper {
     PCreateTextServices m_funCreateTextServices; /**< 回调函数 */
 };
 
+
 STextServiceHelper::STextServiceHelper()
     : m_funCreateTextServices(NULL)
 {
+#ifdef INIT_RICHEDIT
+    m_rich20 =NULL;
+    ::InitRichedit(GetModuleHandle(NULL));
+    m_funCreateTextServices = ::CreateTextServices;
+    return;
+#else//INIT_RICHEDIT
 #ifdef _WIN32
     m_rich20 = LoadLibrary(_T("Msftedit.dll"));
 #else
     m_rich20 = LoadLibrary(_T("libmsftedit"));
 #endif
+
     if (m_rich20)
+    {
         m_funCreateTextServices = (PCreateTextServices)GetProcAddress(m_rich20, "CreateTextServices");
+    }
     else
     {
 #ifndef _WIN32
@@ -89,12 +106,17 @@ STextServiceHelper::STextServiceHelper()
         printf("load so failed, err=%s\n", err);
 #endif
     }
+#endif//INIT_RICHEDIT
 }
 
 STextServiceHelper::~STextServiceHelper()
 {
+#ifdef INIT_RICHEDIT
+    ::UninitRichedit(GetModuleHandle(NULL));
+#else
     if (m_rich20)
         FreeLibrary(m_rich20);
+#endif//INIT_RICHEDIT
     m_funCreateTextServices = NULL;
 }
 
@@ -215,10 +237,11 @@ const LONG cInitTextMax = (32 * 1024) - 1;
 #define FValidPF(_ppf)   ((_ppf)->cbSize == sizeof(PARAFORMAT2))
 #define TIMER_INVALIDATE 6
 
-EXTERN_C const IID IID_ITextServices = // 8d33f740-cf58-11ce-a89d-00aa006cadc5
+
+EXTERN_C SELECT_ANY const IID IID_ITextServices = // 8d33f740-cf58-11ce-a89d-00aa006cadc5
     { 0x8d33f740, 0xcf58, 0x11ce, { 0xa8, 0x9d, 0x00, 0xaa, 0x00, 0x6c, 0xad, 0xc5 } };
 
-EXTERN_C const IID IID_ITextHost = /* c5bdd8d0-d26e-11ce-a89e-00aa006cadc5 */
+EXTERN_C SELECT_ANY const IID IID_ITextHost = /* c5bdd8d0-d26e-11ce-a89e-00aa006cadc5 */
     { 0xc5bdd8d0, 0xd26e, 0x11ce, { 0xa8, 0x9e, 0x00, 0xaa, 0x00, 0x6c, 0xad, 0xc5 } };
 
 // Convert Device Pixels to Himetric
@@ -2222,10 +2245,7 @@ HRESULT SRichEdit::OnAttrReStyle(const SStringW &strValue, DWORD dwStyle, DWORD 
         m_dwStyle &= ~dwStyle;
     else
         m_dwStyle |= dwStyle, dwBit = txtBit;
-    if (!bLoading && txtBit != 0)
-    {
-        m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(txtBit, dwBit);
-    }
+    m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(txtBit, dwBit);
     return bLoading ? S_FALSE : S_OK;
 }
 
@@ -2236,10 +2256,7 @@ HRESULT SRichEdit::OnAttrReStyle2(const SStringW &strValue, DWORD dwStyle, DWORD
         m_dwStyle &= ~dwStyle;
     else
         m_dwStyle |= dwStyle;
-    if (!bLoading && txtBit != 0)
-    {
-        m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(txtBit, txtBit);
-    }
+    m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(txtBit, txtBit);
     return bLoading ? S_FALSE : S_OK;
 }
 

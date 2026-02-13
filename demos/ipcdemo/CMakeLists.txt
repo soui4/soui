@@ -21,13 +21,17 @@ source_group("SoUI Resource" FILES ${CURRENT_SOUIS})
 source_group("Resource Files" FILES ${CURRENT_RC})
 
 add_executable(ipc_client WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CLIENT_SRCS} ${CURRENT_SOUIS} ${CURRENT_RC})
-add_dependencies(ipc_client utilities4 soui4 log4z render-skia render-gdi sipcobject)
 
+add_dependencies(ipc_client soui4 ${COM_LIBS})
+target_link_libraries(ipc_client soui4)
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
-add_dependencies(ipc_client soui-sys-resource ${COM_LIBS})
-target_link_libraries(ipc_client soui4 utilities4)
+    add_dependencies(ipc_client soui-sys-resource)
 else()
-target_link_libraries(ipc_client soui4 utilities4 dl)
+    target_link_libraries(ipc_client dl)
+endif()
+
+if(SOUI_ENABLE_COM_LIB)
+    target_link_libraries(ipc_client ${COM_LIBS})
 endif()
 
 set_target_properties (ipc_client PROPERTIES
@@ -36,13 +40,17 @@ set_target_properties (ipc_client PROPERTIES
 
 
 add_executable(ipc_server WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${SVR_SRCS} ${CURRENT_SOUIS} ${CURRENT_RC})
-add_dependencies(ipc_server utilities4 soui4 log4z render-skia render-gdi sipcobject)
+add_dependencies(ipc_server soui4 ${COM_LIBS})
+target_link_libraries(ipc_server soui4)
 
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
-add_dependencies(ipc_server soui-sys-resource ${COM_LIBS})
-target_link_libraries(ipc_server soui4 utilities4)
+    add_dependencies(ipc_server soui-sys-resource)
 else()
-target_link_libraries(ipc_server soui4 utilities4 dl)
+    target_link_libraries(ipc_server dl)
+endif()
+
+if(SOUI_ENABLE_COM_LIB)
+    target_link_libraries(ipc_server render-gdi render-skia imgdecoder-stb translator log4z resprovider-7zip sipcobject)
 endif()
 
 set_target_properties (ipc_server PROPERTIES

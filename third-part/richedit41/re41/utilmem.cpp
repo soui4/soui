@@ -321,7 +321,7 @@ void _cdecl operator delete (void* pv)
 
 #else //DEBUG
 
-#ifdef _WIN32
+#if defined(_WIN32) && defined(_DLL)
 void* _cdecl operator new (size_t size)
 {
 	TRACEBEGIN(TRCSUBSYSEDIT, TRCSCOPEINTERN, "new");

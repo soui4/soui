@@ -102,8 +102,8 @@ BOOL WebSocketClient::ConnectToServer(LPCSTR pszSvr, LPCSTR args)
 	m_wPort = (WORD)atoi(pColon + 1);
 
 	// 创建WebSocket组件
-	HRESULT hr = m_comLoader.CreateInstance(_T("ws"), (IObjRef**)&m_pWebsocket);
-	if (FAILED(hr) || !m_pWebsocket)
+	BOOL bOK = m_comLoader.CreateWS((IObjRef**)&m_pWebsocket);
+	if (!bOK || !m_pWebsocket)
 		return FALSE;
 
 	// 创建连接监听器

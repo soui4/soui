@@ -15,10 +15,19 @@ source_group("Source Files" FILES ${CURRENT_SRCS})
 source_group("SoUI Resource" FILES ${CURRENT_SOUIS})
 source_group("Resource Files" FILES ${CURRENT_RC})
 
-link_directories(${SOUI_ROOT}/lib)
+
 add_executable(wallpaper WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${CURRENT_RC})
 
-target_link_libraries(wallpaper soui4 utilities4 jsoncpp)
+add_dependencies(SoTool soui4 ${COM_LIBS})
+target_link_directories(SoTool PRIVATE ${SOUI_ROOT}/lib)
+target_link_libraries(wallpaper soui4 jsoncpp)
+
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+    add_dependencies(wallpaper soui-sys-resource)
+endif()
+if(SOUI_ENABLE_COM_LIB)
+    target_link_libraries(wallpaper ${COM_LIBS})
+endif()
 target_precompile_headers(wallpaper PRIVATE "stdafx.h")
 
 

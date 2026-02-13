@@ -19,7 +19,6 @@ endif()
 message(STATUS "build type is ${CMAKE_BUILD_TYPE}")
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/__cmake/")
 include(__cmake/internal_utils.cmake)
-include(__cmake/global.cmake)
 
 set(BUILD_FOR_ARM OFF)
 detectArmTarget(BUILD_FOR_ARM)
@@ -68,6 +67,7 @@ option(SOUI_ENABLE_CORE_LIB "Enable compile 'core' as static lib" OFF)
 #
 #
 option(SOUI_ENABLE_COM_LIB "Enable compile 'components' as static lib" OFF)
+
 #
 #
 option(SOUI_XP_TOOLSET "" ON)
@@ -103,7 +103,7 @@ set(SOUI_ENABLE_ACC OFF)
 set(SOUI_ENABLE_SPY OFF)
 endif()
 
-
+include(__cmake/global.cmake)
 config_compiler_and_linker()
 
 
@@ -134,6 +134,11 @@ else()
         else()
                 message(FATAL_ERROR "swinx submodule not available, please checkout submodules manually")
         endif()
+
+  # GCC/Clang需要未知无关代码
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pie")
 
   # 添加调试标志
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")

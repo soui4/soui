@@ -8,6 +8,7 @@
  *	Copyright (c) 1995-2001, Microsoft Corporation. All rights reserved.
  */
 
+#include <config.h>
 #include "_common.h"
 #include "_font.h"
 #include "_format.h"
@@ -239,7 +240,7 @@ extern "C" void ClearTypeUnInitialize()
 extern "C"
 {
 
-BOOL WINAPI DllMain(HANDLE hmod, DWORD dwReason, LPVOID lpvReserved)
+BOOL WINAPI DllMain(HINSTANCE hmod, DWORD dwReason, LPVOID lpvReserved)
 {
 	DebugMain ((HINSTANCE) hmod, dwReason, lpvReserved);
 
@@ -333,25 +334,38 @@ BOOL WINAPI DllMain(HANDLE hmod, DWORD dwReason, LPVOID lpvReserved)
 	return TRUE;
 }
 
+#ifdef DLL_CORE
 #ifndef _WIN32
 #include <dlfcn.h>
 #ifdef __APPLE__
 #define lib_name "libmsftedit.dylib"
-#else
+#else //__APPLE__
 #define lib_name "libmsftedit.so"
-#endif//__APPLE__
-__attribute__((constructor)) void OnSoInit(){
-	void* hMod = dlopen(lib_name, RTLD_LAZY);
-	DllMain((HANDLE)hMod, DLL_PROCESS_ATTACH, NULL);
-	dlclose(hMod);
+#endif //__APPLE__
+__attribute__((constructor)) void OnSoInit()
+{
+    void* hMod = dlopen(lib_name, RTLD_LAZY);
+    DllMain((HINSTANCE)hMod, DLL_PROCESS_DETACH, NULL);
+    dlclose(hMod);
 }
 
-__attribute__((destructor)) void OnSoUninit(){
-	void* hMod = dlopen(lib_name, RTLD_LAZY);
-	DllMain((HANDLE)hMod,DLL_PROCESS_DETACH,NULL);
-	dlclose(hMod);
+__attribute__((destructor)) void OnSoUninit()
+{
+    void* hMod = dlopen(lib_name, RTLD_LAZY);
+    DllMain((HINSTANCE)hMod, DLL_PROCESS_DETACH, NULL);
+    dlclose(hMod);
 }
-#endif//_WIN32
+#endif //_WIN32
+#endif //defined(DLL_CORE) 
+
+STDAPI InitRichedit(HINSTANCE hInst)
+{
+    return DllMain(hInst, DLL_PROCESS_ATTACH, NULL)?S_OK:E_FAIL;
+}
+STDAPI UninitRichedit(HINSTANCE hInst)
+{
+    return DllMain(hInst, DLL_PROCESS_DETACH, NULL)?S_OK:E_FAIL;
+}
 
 #ifndef NOVERSIONINFO
 HRESULT CALLBACK DllGetVersion(

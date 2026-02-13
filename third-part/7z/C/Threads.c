@@ -540,34 +540,6 @@ void CriticalSection_Delete(CCriticalSection *p)
   }
 }
 
-LONG InterlockedIncrement(LONG volatile *addend)
-{
-  // Print("InterlockedIncrement")
-  #ifdef USE_HACK_UNSAFE_ATOMIC
-    LONG val = *addend + 1;
-    *addend = val;
-    return val;
-  #else
-
-  #if defined(__clang__) && (__clang_major__ >= 8)
-    #pragma GCC diagnostic ignored "-Watomic-implicit-seq-cst"
-  #endif
-    return __sync_add_and_fetch(addend, 1);
-  #endif
-}
-
-LONG InterlockedDecrement(LONG volatile *addend)
-{
-  // Print("InterlockedDecrement")
-  #ifdef USE_HACK_UNSAFE_ATOMIC
-    LONG val = *addend - 1;
-    *addend = val;
-    return val;
-  #else
-    return __sync_sub_and_fetch(addend, 1);
-  #endif
-}
-
 #endif // _WIN32
 
 WRes AutoResetEvent_OptCreate_And_Reset(CAutoResetEvent *p)

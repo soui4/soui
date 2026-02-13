@@ -8,7 +8,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_SOURCE_DIR}/third-part/Scintilla/include)
 
 include_directories(${CMAKE_SOURCE_DIR}/controls.extend)
-
+add_subdirectory(exctrls)
 
 file(GLOB_RECURSE CURRENT_HEADERS  *.h *.hpp)
 file(GLOB_RECURSE CURRENT_SRCS  *.cpp)
@@ -37,7 +37,7 @@ if(CMAKE_SYSTEM_NAME MATCHES Darwin)
     )
 
     # 准备要复制的目标列表
-    set(DEMO_TARGET_LIST
+    set(TARGET_LIST
         cairo
         swinx
         soui4
@@ -50,7 +50,10 @@ if(CMAKE_SYSTEM_NAME MATCHES Darwin)
         translator
         render-skia
     )
-    copy_targets_to_bundle(${current_project} "${DEMO_TARGET_LIST}")
+    if(SOUI_ENABLE_CORE_LIB)
+        list(APPEND TARGET_LIST "default.exctrl")
+    endif()
+    copy_targets_to_bundle(${current_project} "${TARGET_LIST}")
 
     add_macos_res_folder(${current_project} ${CMAKE_CURRENT_SOURCE_DIR}/uires uires)
     add_macos_res_file(${current_project} ${PROJECT_SOURCE_DIR}/simsun.ttc fonts)
@@ -64,9 +67,9 @@ else()
     add_app_res_file(${current_project} ${PROJECT_SOURCE_DIR}/simsun.ttc ".")
 endif()
 
-
+add_dependencies(${current_project} soui4 ${COM_LIBS})
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
-	add_dependencies(${current_project} soui-sys-resource ${COM_LIBS})
+	add_dependencies(${current_project} soui-sys-resource)
     if(MSVC AND MSVC_VERSION GREATER_EQUAL 1900)
     set(DPI_AWARE_MANIFEST "${PROJECT_SOURCE_DIR}/__cmake/dpi_aware.manifest")
     set_target_properties(${current_project} PROPERTIES
@@ -75,14 +78,18 @@ if (CMAKE_SYSTEM_NAME MATCHES Windows)
     endif()
 endif()
 
+target_link_libraries(${current_project} soui4 ExtendCtrls Scintilla)
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
-	target_link_libraries(${current_project} soui4 utilities4 ExtendCtrls Scintilla Msimg32)
+	target_link_libraries(${current_project} Msimg32)
 else()
-    target_link_libraries(${current_project} soui4 utilities4 ExtendCtrls Scintilla dl)
+    target_link_libraries(${current_project} dl)
+endif()
+if(SOUI_ENABLE_COM_LIB)
+    target_link_libraries(${current_project} ${COM_LIBS})
 endif()
 
 target_precompile_headers(${current_project} PRIVATE "stdafx.h")
 
 set_target_properties (${current_project} PROPERTIES
-    FOLDER demos
+    FOLDER demos/uieditor
 )

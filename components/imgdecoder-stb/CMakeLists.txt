@@ -15,13 +15,13 @@ source_group("Source Files" FILES ${imgdecoder-stb_src})
 if (NOT SOUI_ENABLE_COM_LIB)
     set (imgdecoder-stb_src  ${imgdecoder-stb_src} imgdecoder-stb.rc)
     add_library(imgdecoder-stb SHARED ${imgdecoder-stb_src} ${imgdecoder-stb_header})
-    target_link_libraries(imgdecoder-stb utilities4 aupng)
 else()
     add_library(imgdecoder-stb STATIC ${imgdecoder-stb_src} ${imgdecoder-stb_header})
     target_compile_definitions(imgdecoder-stb
       PUBLIC SOUI_IMAGE_DECODER_USE_STB_STATIC
     )
 endif()
+target_link_libraries(imgdecoder-stb utilities4 aupng)
 
 target_compile_definitions(imgdecoder-stb
   PUBLIC SOUI_IMAGE_DECODER_USE_STB

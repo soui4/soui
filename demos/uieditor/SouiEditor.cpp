@@ -4,12 +4,15 @@
 #include "CmdLine.h"
 #include <helper/SAppDir.h>
 #include <SAppCfg.h>
-#include <SCtrlsRegister.h>
 #include "AttrStorage.h"
 #include "designer/SizingFrame.h"
 #include "SysdataMgr.h"
 #include "designer/PreviewHost.h"
+#ifdef SOUI_ENABLE_CORE_LIB
+#include <SCtrlsRegister.h>
+#endif//SOUI_ENABLE_CORE_LIB
 #include <helper/slog.h>
+#include "include/plugin-i.h"
 #define kLogTag "SouiEditor"
 
 //定义唯一的一个R,UIRES对象,ROBJ_IN_CPP是resource.h中定义的宏。
@@ -121,9 +124,30 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
     Scintilla_RegisterClasses(hInstance);
 
     theApp.RegisterWindowClass<SSizingFrame>();
+    #ifdef SOUI_ENABLE_CORE_LIB
     // 注册扩展控件
     SCtrlsRegister::RegisterCtrls(&theApp);
-
+    #else
+    // 加载扩展控件
+    WIN32_FIND_DATA fd;
+    HANDLE hFind = FindFirstFile((appDir + _T("/*.exctrl")).c_str(), &fd);
+    if(hFind != INVALID_HANDLE_VALUE)
+    {
+        do
+        {
+            HMODULE hExCtrl = LoadLibrary(fd.cFileName);
+            if(hExCtrl)
+            {
+                FUN_REG_EXCTRLS pfnReg = (FUN_REG_EXCTRLS)GetProcAddress(hExCtrl, "RegisterExCtrls");
+                if(pfnReg)
+                {
+                    pfnReg(&theApp);
+                }
+            }
+        }while(FindNextFile(hFind, &fd));
+        FindClose(hFind);
+    }
+    #endif//SOUI_ENABLE_CORE_LIB
     CCmdLine cmdLine(GetCommandLine());
     //读取自定义消息框布局
     theApp.SetMessageBoxTemplateResId(_T("LAYOUT:xml_messagebox"));

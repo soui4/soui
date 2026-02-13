@@ -41,6 +41,14 @@ protected:
     void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 
     /**
+     * @brief Handle character input
+     * @param nChar Character code
+     * @param nRepCnt Repeat count
+     * @param nFlags Flags
+     */
+    void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
+
+    /**
      * @brief Handle mouse left button down event
      * @param flags Flags
      * @param pt Mouse coordinates
@@ -82,6 +90,7 @@ protected:
         MSG_WM_PAINT_EX(OnPaint)
         MSG_WM_KEYDOWN(OnKeyDown)
         MSG_WM_LBUTTONDOWN(OnLButtonDown)
+        MSG_WM_CHAR(OnChar)
         MSG_WM_LBUTTONUP(OnLButtonUp)
         MSG_WM_MOUSEMOVE(OnMouseMove)
         MSG_WM_SETFOCUS_EX(OnSetFocus)

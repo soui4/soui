@@ -123,12 +123,15 @@ SNSBEGIN
 
 		BOOL CreateImgDecoder(IObjRef ** ppObj)
 		{
-			if (m_strImgDecoder == _T("imgdecoder-wic"))
+#ifdef _WIN32
+			if (m_strImgDecoder == _T("imgdecoder-wic") || m_strImgDecoder == _T("libimgdecoder-wic"))
 				return IMGDECODOR_WIC::SCreateInstance(ppObj);
-			else if (m_strImgDecoder == _T("imgdecoder-stb"))
+			else
+#endif
+			if (m_strImgDecoder == _T("imgdecoder-stb") || m_strImgDecoder == _T("libimgdecoder-stb"))
 				return IMGDECODOR_STB::SCreateInstance(ppObj);
 #if defined(_WIN32)  && !defined(__MINGW32__)
-			else if (m_strImgDecoder == _T("imgdecoder-gdip"))
+			else if (m_strImgDecoder == _T("imgdecoder-gdip") || m_strImgDecoder == _T("libimgdecoder-gdip"))
 				return IMGDECODOR_GDIP::SCreateInstance(ppObj);
 #endif//_WIN32
 			else

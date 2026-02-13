@@ -2,7 +2,6 @@
 // Microsoft Visual C++ 生成的包含文件。
 // 供 demo.rc 使用
 //
-#define DISABLE_SWNDSPY                 1
 #define IDR_XML1                        111
 #define IDR_XML21                       112
 #define IDR_ZIP1                        113

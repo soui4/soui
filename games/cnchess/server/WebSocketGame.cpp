@@ -150,8 +150,8 @@ BOOL CWebSocketGame::GameStart(unsigned short uPort)
     if (m_pListener)
         return FALSE;
     // 创建WebSocket组件
-    HRESULT hr = m_comLoader.CreateInstance(_T("ws"), (IObjRef **)&m_pWebsocket);
-    if (FAILED(hr) || !m_pWebsocket)
+    BOOL bOK = m_comLoader.CreateWS((IObjRef **)&m_pWebsocket);
+    if (!bOK || !m_pWebsocket)
         return FALSE;
 
     // 创建服务器监听器

@@ -12,13 +12,15 @@ source_group("Source Files" FILES ${SOURCES})
 project(ws)
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
-add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS} ws.rc)
-target_link_libraries(${PROJECT_NAME}  websockets utilities4)
-
-if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
-    target_link_libraries(${PROJECT_NAME} swinx)
+if (NOT SOUI_ENABLE_COM_LIB)
+    add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS} ws.rc)
+else()
+    add_library(${PROJECT_NAME} STATIC ${SOURCES})
 endif()
-
+target_link_libraries(${PROJECT_NAME} PUBLIC  websockets utilities4)
+if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
+    target_link_libraries(${PROJECT_NAME} PUBLIC swinx)
+endif()
 
 get_target_property(websockets_includes websockets INTERFACE_INCLUDE_DIRECTORIES)
 

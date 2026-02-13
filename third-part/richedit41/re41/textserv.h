@@ -413,6 +413,10 @@ typedef HRESULT (STDAPICALLTYPE * PCreateTextServices)(
 	ITextHost *pITextHost, 
 	IUnknown **ppUnk);
 
+
+STDAPI InitRichedit(HINSTANCE hInst);
+STDAPI UninitRichedit(HINSTANCE hInst);
+
 #ifdef __cplusplus
 }
 #endif//__cplusplus

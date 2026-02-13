@@ -24,9 +24,10 @@ set(current_project "upgrade_client")
 add_executable(${current_project} WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${CURRENT_RC})
  
 add_dependencies(${current_project} soui4 ExtendCtrls)
-link_directories(${SOUI_ROOT}/lib)
 target_link_libraries(${current_project} soui4 utilities4 ExtendCtrls upgrade_algorithm)
-
+if(SOUI_ENABLE_COM_LIB)
+    target_link_libraries(${current_project} ${COM_LIBS})
+endif()
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     # Link win32 audio library on Windows
     target_link_libraries(${current_project} win32_audio)

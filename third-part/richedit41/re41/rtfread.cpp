@@ -4426,12 +4426,12 @@ CleanUp:
 		{
 			pstate->DeletePF();
 			pstate = pstate->pstatePrev;
-			FreePv(pstate->pstateNext);
+			delete pstate->pstateNext;
 		}
 		pstate->DeletePF();
 	}
 	Assert(_PF._iTabs == -1);
-	FreePv(pstate);								// Free first STATE
+	delete pstate;								// Free first STATE
 	FreePv(_szUnicode);
 
 Quit:

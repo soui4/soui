@@ -103,7 +103,11 @@ cmsgflt.cpp
 source_group("Header Files" FILES ${re_header})
 source_group("Source Files" FILES ${re_src})
 
-add_library(msftedit SHARED ${re_src} ${re_header})
+if(NOT SOUI_ENABLE_CORE_LIB)
+    add_library(msftedit SHARED ${re_src} ${re_header})
+else()
+    add_library(msftedit STATIC ${re_src} ${re_header})
+endif()
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
 	target_sources(msftedit PRIVATE msftedit.rc msftedit.rc2)
 	target_link_libraries(msftedit Usp10.lib msls31 imm32)

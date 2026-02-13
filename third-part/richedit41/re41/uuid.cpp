@@ -9,7 +9,6 @@
 #include "_common.h"
 
 //set these two GUIDs up for export in our file
-
 #undef IID_RichEditOle
 #undef IID_IRichEditOleCallback
 DEFINE_GUID(IID_IRichEditOle,         0x00020D00, 0, 0, 0xC0,0,0,0,0,0,0,0x46);
@@ -19,7 +18,7 @@ DEFINE_GUID(IID_IRichEditOleCallback, 0x00020D03, 0, 0, 0xC0,0,0,0,0,0,0,0x46);
 #undef DEFINE_OLEGUID
 
 #define DEFINE_GUID(name, l, w1, w2, b1, b2, b3, b4, b5, b6, b7, b8) \
-    const IID name \
+    const IID SELECT_ANY name \
         = { l, w1, w2, { b1, b2,  b3,  b4,  b5,  b6,  b7,  b8 } }
 #define DEFINE_OLEGUID(name, l, w1, w2) \
     DEFINE_GUID(name, l, w1, w2, 0xC0,0,0,0,0,0,0,0x46)
@@ -76,4 +75,3 @@ DEFINE_GUID(IID_ITextDocument2,	0x01C25500,	0x4268,0x11D1,0x88,0x3A,0x3C,0x8B,
 EXTERN_C DEFINE_GUID(IID_IAccessible,		0x618736e0, 0x3c3d, 0x11cf, 0x81, 0x0c, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
 EXTERN_C DEFINE_GUID(LIBID_Accessibility,	0x1ea4dbf0, 0x3c3b, 0x11cf, 0x81, 0x0c, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);											
 EXTERN_C DEFINE_OLEGUID(IID_IEnumVARIANT,	0x00020404, 0x0000, 0x0000);
-

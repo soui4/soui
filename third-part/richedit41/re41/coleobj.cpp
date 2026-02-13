@@ -31,7 +31,7 @@ ASSERTDATA
 // 
 // data private to this file
 //
-static const OLECHAR szSiteFlagsStm[] = OLESTR("RichEditFlags");	
+static const OLECHAR szSiteFlagsStm[] = OLESTR("RichEditFlags");
 
 // 
 // EXCEL clsid's.  We have to make some special purpose hacks
@@ -49,19 +49,19 @@ const INT cclsidExcel = sizeof(rgclsidExcel) / sizeof(rgclsidExcel[0]);
 //
 //	WordArt CLSID for more special purpose hacks.
 //
-const GUID CLSID_WordArt = 
+const GUID CLSID_WordArt =
     { 0x000212F0L, 0, 0, {0xC0, 0, 0, 0, 0, 0, 0, 0x46} };
-const GUID CLSID_PaintbrushPicture = 
+const GUID CLSID_PaintbrushPicture =
     { 0x0003000AL, 0x0000, 0x0000, { 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46 } };
-const GUID CLSID_BitmapImage = 
+const GUID CLSID_BitmapImage =
     { 0xD3E34B21L, 0x9D75, 0x101A, { 0x8C, 0x3D, 0x00, 0xAA, 0x00, 0x1A, 0x16, 0x52 } };
 
 //
 //	Ink object
 //
-const GUID CLSID_Ink = 
+const GUID SELECT_ANY CLSID_Ink =
 	{ 0x13DE4A42, 0x8D21, 0x4C8E, {0xBF, 0x9C, 0x8F, 0x69, 0xCB, 0x06, 0x8F, 0xCA} };
-const IID IID_ILineInfo = 
+const IID SELECT_ANY IID_ILineInfo =
 	{ 0x9C1C5AD5, 0xF22F, 0x4DE4, {0xB4, 0x53, 0xA2, 0xCC, 0x48, 0x2E, 0x7C, 0x33} };
 
 #define dxyHandle (6) // Object frame handle size
@@ -1053,7 +1053,8 @@ COleObject::COleObject(
 	CTxtEdit *ped)	//@parm context for this object
 {
 	TRACEBEGIN(TRCSUBSYSOLE, TRCSCOPEINTERN, "COleObject::COleObject");
-
+    int offset = FIELD_OFFSET(COleObject, _ped);
+    memset((char *)this + offset, 0, sizeof(COleObject) - offset);
 	AddRef();
 
 	// Most values will be NULL by virtue of the allocator

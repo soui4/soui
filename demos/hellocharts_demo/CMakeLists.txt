@@ -21,9 +21,16 @@ source_group("SoUI Resource" FILES ${CURRENT_SOUIS})
 set(current_project "hellocharts_demo")
 add_executable(${current_project} WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${CURRENT_RC} ${CHARTCTRL_SRC})
 
-add_dependencies(${current_project} soui4 )
-link_directories(${SOUI_ROOT}/lib)
-target_link_libraries(${current_project} soui4 utilities4)
+add_dependencies(${current_project} soui4 ${COM_LIBS})
+target_link_libraries(${current_project} soui4)
+
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+    add_dependencies(${current_project} soui-sys-resource)
+endif()
+
+if(SOUI_ENABLE_COM_LIB)
+    target_link_libraries(${current_project} ${COM_LIBS})
+endif()
 
 set_target_properties (${current_project} PROPERTIES
     FOLDER demos

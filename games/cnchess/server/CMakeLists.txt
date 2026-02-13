@@ -30,6 +30,8 @@ add_executable(${current_project}
 target_link_libraries(${current_project}
     utilities4
     cnchess_algorithm
+    ws
+    log4z
 )
 
 

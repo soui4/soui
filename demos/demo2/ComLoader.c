@@ -184,16 +184,33 @@ SOUI_COM_C BOOL TaskLoop_SCreateInstance(IObjRef **ppObj);
 SOUI_COM_C BOOL Translator_SCreateInstance(IObjRef **ppObj);
 
 struct SComInfo s_comInfo[]={
+#ifdef _WIN32
 	{Decoder_Gdip,Decoder_Gdip_SCreateInstance},
 	{Decoder_Wic,Decoder_Wic_SCreateInstance},
+#else
+{Decoder_Gdip,NULL},
+{Decoder_Wic,NULL},
+#endif
 	{Decoder_Stb,Decoder_Stb_SCreateInstance},
 	{Render_GDI,Render_Gdi_SCreateInstance},
 	{Render_SKIA,Render_Skia_SCreateInstance},
+#ifdef _WIN32
 	{Render_D2D,Render_D2D_SCreateInstance},
+#else
+{Render_D2D,NULL},
+#endif
 	{Log4Z,Log4z_SCreateInstance},
+#ifdef DLL_SOUI_COM
 	{Resprovider_7Zip,Resp_7zip_SCreateInstance},
+#else
+{Resprovider_7Zip,NULL},
+#endif
 	{Resprovider_Zip,Resp_Zip_SCreateInstance},
+#ifdef DLL_SOUI_COM
 	{Script_Lua,Script_Lua_SCreateInstance},
+#else
+{Script_Lua,NULL},
+#endif
 	{TaskLoop,TaskLoop_SCreateInstance},
 	{Translator,Translator_SCreateInstance},
 };

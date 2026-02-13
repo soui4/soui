@@ -31,16 +31,21 @@ if(CMAKE_DEBUG_POSTFIX)
     set_target_properties(demo2 PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
 endif()
 
-target_link_libraries(demo2 soui4 utilities4)
+add_dependencies(demo soui4 ${COM_LIBS})
+target_link_libraries(demo2 soui4)
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
     if(MSVC)
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO")
     else()
 	    target_link_libraries(demo2 -municode)
     endif()
-    add_dependencies(demo2 soui-sys-resource ${COM_LIBS})
+    add_dependencies(demo2 soui-sys-resource)
 else()
     target_link_libraries(demo2 dl)
+endif()
+
+if(SOUI_ENABLE_COM_LIB)
+    target_link_libraries(demo2 ${COM_LIBS})
 endif()
 
 set_target_properties (demo2 PROPERTIES
