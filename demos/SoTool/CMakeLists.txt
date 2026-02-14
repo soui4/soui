@@ -25,7 +25,6 @@ add_executable(SoTool WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} 
 add_dependencies(SoTool soui4 ${COM_LIBS})
 target_link_libraries(SoTool soui4)
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    add_dependencies(${current_project} soui-sys-resource)
     target_link_libraries(SoTool comctl32.lib Psapi.lib)
 endif()
 if(SOUI_ENABLE_COM_LIB)
