@@ -279,10 +279,18 @@ void CPreviewHost::OnSwndInitFinish(IEvtArgs *e)
 			listAdapter->Release();
 		}
 		if(pRet->IsClass(STreeView::GetClassName()))
-		{//todo:
+		{
 			SEmptyTreeAdapter *treeAdapter = new SEmptyTreeAdapter();
 			((STreeView*)pRet)->SetAdapter(treeAdapter);
 			treeAdapter->Release();
+		}
+		if(pRet->IsClass(SComboView::GetClassName()))
+		{
+			SComboView *pComboView = sobj_cast<SComboView>(pRet);
+			SListView *pListView = pComboView->GetListView();
+			CBaseAdapterFix *listAdapter = new CBaseAdapterFix();
+			pListView->SetAdapter(listAdapter);
+			listAdapter->Release();
 		}
 	}
 }
