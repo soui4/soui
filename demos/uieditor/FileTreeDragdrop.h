@@ -246,7 +246,7 @@ public:
 
 	STDMETHOD(Clone)(IEnumFORMATETC **ppEnumFormatEtc) OVERRIDE
 	{
-		*ppEnumFormatEtc = new FileTreeFmtEnum(m_format.data(), m_format.size());
+		*ppEnumFormatEtc = new FileTreeFmtEnum(&m_format[0], m_format.size());
 		return S_OK;
 	}
 };

@@ -40,8 +40,7 @@ set_target_properties (ipc_client PROPERTIES
 
 
 add_executable(ipc_server WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${SVR_SRCS} ${CURRENT_SOUIS} ${CURRENT_RC})
-add_dependencies(ipc_server soui4 ${COM_LIBS})
-target_link_libraries(ipc_server soui4)
+target_link_libraries(ipc_server soui4 ${COM_LIBS})
 
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
     add_dependencies(ipc_server soui-sys-resource)
