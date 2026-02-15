@@ -281,14 +281,15 @@ void SAnimatorSet::start(ITimelineHandlersMgr *pContainer)
     mContainer = pContainer;
     mStarted = true;
     mRunning = true;
-    mSetStartTime = -1;  // Will be initialized on first frame
+    mSetStartTime = -1; // Will be initialized on first frame
     mCurrentPlayTime = 0;
     mStartListenersCalled = false;
 
     // Calculate start times for all animators based on dependencies
     calculateStartTimes();
 
-    if(mContainer){
+    if (mContainer)
+    {
         // Register with timeline handler
         mContainer->RegisterTimelineHandler(GetTimelineHandler());
     }
@@ -359,30 +360,30 @@ void SAnimatorSet::notifyStartListeners()
     mStartListenersCalled = true;
     // Notify IAnimatorListener listeners (inherited from SValueAnimator)
     // We get the listener list from SValueAnimator's mListeners and notify them
-    SValueAnimator* pValueAnimator = static_cast<SValueAnimator*>(this);
+    SValueAnimator *pValueAnimator = static_cast<SValueAnimator *>(this);
     for (int i = 0; i < (int)mListeners.GetCount(); i++)
     {
-        mListeners[i]->onAnimationStart(static_cast<IValueAnimator*>(pValueAnimator));
+        mListeners[i]->onAnimationStart(static_cast<IValueAnimator *>(pValueAnimator));
     }
 }
 
 void SAnimatorSet::notifyEndListeners()
 {
     // Notify IAnimatorListener listeners (inherited from SValueAnimator)
-    SValueAnimator* pValueAnimator = static_cast<SValueAnimator*>(this);
+    SValueAnimator *pValueAnimator = static_cast<SValueAnimator *>(this);
     for (int i = 0; i < (int)mListeners.GetCount(); i++)
     {
-        mListeners[i]->onAnimationEnd(static_cast<IValueAnimator*>(pValueAnimator));
+        mListeners[i]->onAnimationEnd(static_cast<IValueAnimator *>(pValueAnimator));
     }
 }
 
 void SAnimatorSet::notifyRepeatListeners()
 {
     // Notify IAnimatorListener listeners (inherited from SValueAnimator)
-    SValueAnimator* pValueAnimator = static_cast<SValueAnimator*>(this);
+    SValueAnimator *pValueAnimator = static_cast<SValueAnimator *>(this);
     for (int i = 0; i < (int)mListeners.GetCount(); i++)
     {
-        mListeners[i]->onAnimationRepeat(static_cast<IValueAnimator*>(pValueAnimator));
+        mListeners[i]->onAnimationRepeat(static_cast<IValueAnimator *>(pValueAnimator));
     }
 }
 
@@ -509,7 +510,6 @@ float SAnimatorSet::getAnimatedFraction() const
     return (float)mCurrentPlayTime / (float)mDuration;
 }
 
-
 void SAnimatorSet::onEvaluateValue(float fraction)
 {
     // AnimatorSet doesn't have property values to update like ValueAnimator
@@ -517,13 +517,13 @@ void SAnimatorSet::onEvaluateValue(float fraction)
     mAnimatedFraction = fraction;
 }
 
-IValueAnimator * SAnimatorSet::clone() const
+IValueAnimator *SAnimatorSet::clone() const
 {
     // Return NULL for now - cloning AnimatorSet is complex
     return NULL;
 }
 
-void SAnimatorSet::copy(const IValueAnimator * src)
+void SAnimatorSet::copy(const IValueAnimator *src)
 {
     // Copy implementation would go here if needed
 }

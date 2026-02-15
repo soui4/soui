@@ -80,21 +80,21 @@ class SOUI_EXP SwndStyle {
      * @brief Retrieves the number of states.
      * @return Number of states.
      */
-    int GetStates();
+    int GetStates() const;
 
     /**
      * @brief Retrieves the text color for a specific state.
      * @param iState State index.
      * @return Text color for the specified state.
      */
-    COLORREF GetTextColor(int iState);
+    COLORREF GetTextColor(int iState) const;
 
     /**
      * @brief Retrieves the text font for a specific state.
      * @param iState State index.
      * @return Text font for the specified state.
      */
-    IFontPtr GetTextFont(int iState);
+    IFontPtr GetTextFont(int iState) const;
 
     /**
      * @brief Retrieves the margin rectangle.

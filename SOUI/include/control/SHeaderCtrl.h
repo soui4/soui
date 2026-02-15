@@ -1,4 +1,4 @@
-﻿#ifndef __SHEADERCTRL__H__
+#ifndef __SHEADERCTRL__H__
 #define __SHEADERCTRL__H__
 
 #include <core/SWnd.h>
@@ -6,6 +6,19 @@
 #include <proxy/SWindowProxy.h>
 
 SNSBEGIN
+
+namespace SHeaderCtrl_style
+{
+    static const LPCWSTR kStyle_items = L"items";
+    static const LPCWSTR kStyle_item = L"item";
+    static const LPCWSTR kStyle_text = L"text";
+    static const LPCWSTR kStyle_width = L"width";
+    static const LPCWSTR kStyle_weight = L"weight";
+    static const LPCWSTR kStyle_userData = L"userData";
+    static const LPCWSTR kStyle_visible = L"visible";
+    static const LPCWSTR kStyle_sortFlag = L"sortFlag";
+    static const LPCWSTR kStyle_align = L"align";
+}
 
 #define SORT_MASK  (HDF_SORTDOWN | HDF_SORTUP)
 #define ALIGN_MASK (HDF_LEFT | HDF_RIGHT | HDF_CENTER)

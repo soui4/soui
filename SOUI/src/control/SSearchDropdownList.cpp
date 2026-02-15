@@ -3,9 +3,6 @@
 
 SNSBEGIN
 
-static const wchar_t *KStyle_Dropdown = L"dropdownStyle"; //下拉列表风格，只包含root节点
-static const wchar_t *KStyle_DropdownList = L"listStyle";
-
 //---------------------------------------------------------------------
 
 class SDropdownList : public SDropDownWnd {
@@ -162,7 +159,7 @@ void SSearchDropdownList::DropDown(const IStringT *pText)
     {
         m_pDropDownWnd = new SDropdownList(this);
         GetContainer()->EnableHostPrivateUiDef(TRUE);
-        SXmlNode xmlDropdownStyleNode = m_xmlDropdownStyle.root().child(KStyle_Dropdown);
+        SXmlNode xmlDropdownStyleNode = m_xmlDropdownStyle.root().child(SSearchDropdownList_style::kStyle_Dropdown);
         if (xmlDropdownStyleNode)
             m_pDropDownWnd->Create(&xmlDropdownStyleNode);
         else
@@ -191,7 +188,7 @@ BOOL SSearchDropdownList::CreateChildren(SXmlNode xmlNode)
     BOOL bRet = __baseCls::CreateChildren(xmlNode);
     if (!bRet)
         return FALSE;
-    m_xmlDropdownStyle.root().append_copy(xmlNode.child(KStyle_Dropdown));
+    m_xmlDropdownStyle.root().append_copy(xmlNode.child(SSearchDropdownList_style::kStyle_Dropdown));
     return CreateListBox(xmlNode);
 }
 
@@ -212,7 +209,7 @@ BOOL SSearchDropdownList::CreateListBox(SXmlNode xmlNode)
 {
     SASSERT(xmlNode);
     //创建列表控件
-    SXmlNode listStyle = xmlNode.child(KStyle_DropdownList);
+    SXmlNode listStyle = xmlNode.child(SSearchDropdownList_style::kStyle_DropdownList);
     SStringW strListClass = listStyle.attribute(L"wndclass").as_string(SListView::GetClassName());
     SListView *pListBox = sobj_cast<SListView>(CreateChildByName(strListClass));
     if (!pListBox)

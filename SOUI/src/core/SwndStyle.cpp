@@ -63,7 +63,7 @@ UINT SwndStyle::GetTextAlign() const
     return uRet;
 }
 
-int SwndStyle::GetStates()
+int SwndStyle::GetStates() const
 {
     int fonts = 1, colors = 1;
     for (int i = 1; i < 4; i++)
@@ -76,7 +76,7 @@ int SwndStyle::GetStates()
     return smax(fonts, colors);
 }
 
-COLORREF SwndStyle::GetTextColor(int iState)
+COLORREF SwndStyle::GetTextColor(int iState) const
 {
     iState %= 4;
     if (m_crText[iState] == CR_INVALID)
@@ -84,7 +84,7 @@ COLORREF SwndStyle::GetTextColor(int iState)
     return m_crText[iState];
 }
 
-IFontPtr SwndStyle::GetTextFont(int iState)
+IFontPtr SwndStyle::GetTextFont(int iState) const
 {
     iState %= 4;
     if (!m_ftText[iState].GetFontPtr())

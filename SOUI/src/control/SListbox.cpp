@@ -266,10 +266,10 @@ BOOL SListBox::CreateChildren(SXmlNode xmlNode)
     if (!xmlNode)
         return TRUE;
 
-    SXmlNode xmlItems = xmlNode.child(L"items");
+    SXmlNode xmlItems = xmlNode.child(SListBox_style::kStyle_items);
     if (xmlItems)
     {
-        SXmlNode xmlItem = xmlItems.child(L"item");
+        SXmlNode xmlItem = xmlItems.child(SListBox_style::kStyle_item);
         while (xmlItem)
         {
             LPLBITEM pItemObj = new LBITEM(this);
@@ -279,7 +279,7 @@ BOOL SListBox::CreateChildren(SXmlNode xmlNode)
         }
     }
 
-    int nSelItem = xmlNode.attribute(L"curSel").as_int(-1);
+    int nSelItem = xmlNode.attribute(SListBox_style::kStyle_curSel).as_int(-1);
     SetCurSel(nSelItem);
 
     return TRUE;
@@ -287,9 +287,9 @@ BOOL SListBox::CreateChildren(SXmlNode xmlNode)
 
 void SListBox::LoadItemAttribute(SXmlNode xmlNode, LPLBITEM pItem)
 {
-    pItem->nImage = xmlNode.attribute(L"icon").as_int(pItem->nImage);
-    pItem->lParam = xmlNode.attribute(L"data").as_uint((UINT)pItem->lParam);
-    SStringW strText = GETSTRING(xmlNode.attribute(L"text").value());
+    pItem->nImage = xmlNode.attribute(SListBox_style::kStyle_icon).as_int(pItem->nImage);
+    pItem->lParam = xmlNode.attribute(SListBox_style::kStyle_data).as_uint((UINT)pItem->lParam);
+    SStringW strText = GETSTRING(xmlNode.attribute(SListBox_style::kStyle_text).value());
     if (strText.IsEmpty())
         strText = GetXmlText(xmlNode);
     pItem->strText.SetText(S_CW2T(GETSTRING(strText)));

@@ -22,8 +22,8 @@ SComboBox::~SComboBox()
 BOOL SComboBox::CreateListBox(SXmlNode xmlNode)
 {
     //创建列表控件
-    SXmlNode listStyle = xmlNode.child(L"listStyle");
-    SStringW strListClass = listStyle.attribute(L"wndclass").as_string(SListBox::GetClassName());
+    SXmlNode listStyle = xmlNode.child(SComboBox_style::kStyle_listStyle);
+    SStringW strListClass = listStyle.attribute(SComboBox_style::kStyle_wndclass).as_string(SListBox::GetClassName());
     SListBox *pListBox = sobj_cast<SListBox>(CreateChildByName(strListClass));
     if (!pListBox)
         return FALSE;
@@ -39,20 +39,20 @@ BOOL SComboBox::CreateListBox(SXmlNode xmlNode)
     m_pListBox->SSendMessage(UM_SETSCALE, GetScale());
 
     //初始化列表数据
-    SXmlNode xmlNode_Items = xmlNode.child(L"items");
+    SXmlNode xmlNode_Items = xmlNode.child(SComboBox_style::kStyle_items);
     if (xmlNode_Items)
     {
-        SXmlNode xmlNode_Item = xmlNode_Items.child(L"item");
+        SXmlNode xmlNode_Item = xmlNode_Items.child(SComboBox_style::kStyle_item);
         while (xmlNode_Item)
         {
 
-            SStringW strText = xmlNode_Item.attribute(L"text").value();
+            SStringW strText = xmlNode_Item.attribute(SComboBox_style::kStyle_text).value();
             if (strText.IsEmpty())
                 strText = GetXmlText(xmlNode_Item);
-            int iIcon = xmlNode_Item.attribute(L"icon").as_int(0);
-            LPARAM lParam = xmlNode_Item.attribute(L"data").as_int(0);
+            int iIcon = xmlNode_Item.attribute(SComboBox_style::kStyle_icon).as_int(0);
+            LPARAM lParam = xmlNode_Item.attribute(SComboBox_style::kStyle_data).as_int(0);
             m_pListBox->AddString(S_CW2T(GETSTRING(strText)), iIcon, lParam);
-            xmlNode_Item = xmlNode_Item.next_sibling(L"item");
+            xmlNode_Item = xmlNode_Item.next_sibling(SComboBox_style::kStyle_item);
         }
     }
 

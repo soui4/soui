@@ -264,7 +264,7 @@ class SOUI_EXP SMatrix
 
     bool operator==(const SMatrix &other) const
     {
-        return SFloatsEqual(fMat, other.fMat,9);
+        return SFloatsEqual(fMat, other.fMat, 9);
     }
 
     bool operator!=(const SMatrix &other) const

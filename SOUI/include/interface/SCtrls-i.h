@@ -1025,43 +1025,43 @@ DECLARE_INTERFACE_(IListView, IPanel)
      * @param bMultiSel TRUE to enable multiple selection, FALSE otherwise.
      */
     STDMETHOD_(void, SetMultiSel)(THIS_ BOOL bMultiSel) PURE;
-    
+
     /**
      * @brief Gets the multiple selection mode.
      * @return TRUE if multiple selection is enabled, FALSE otherwise.
      */
     STDMETHOD_(BOOL, GetMultiSel)(CTHIS) SCONST PURE;
-    
+
     /**
      * @brief Adds an item to the selection.
      * @param iItem Index of the item.
      */
     STDMETHOD_(void, AddSelItem)(THIS_ int iItem) PURE;
-    
+
     /**
      * @brief Removes an item from the selection.
      * @param iItem Index of the item.
      */
     STDMETHOD_(void, RemoveSelItem)(THIS_ int iItem) PURE;
-    
+
     /**
      * @brief Clears all selected items.
      */
     STDMETHOD_(void, ClearSelItems)(THIS) PURE;
-    
+
     /**
      * @brief Checks if an item is selected.
      * @param iItem Index of the item.
      * @return TRUE if the item is selected, FALSE otherwise.
      */
     STDMETHOD_(BOOL, IsItemSelected)(THIS_ int iItem) SCONST PURE;
-    
+
     /**
      * @brief Gets the count of selected items.
      * @return Number of selected items.
      */
     STDMETHOD_(int, GetSelItemCount)(CTHIS) SCONST PURE;
-    
+
     /**
      * @brief Gets all selected items.
      * @param items Output parameter to store the selected item indices.
@@ -1273,43 +1273,43 @@ DECLARE_INTERFACE_(IMcListView, IPanel)
      * @param bMultiSel TRUE to enable multiple selection, FALSE otherwise.
      */
     STDMETHOD_(void, SetMultiSel)(THIS_ BOOL bMultiSel) PURE;
-    
+
     /**
      * @brief Gets the multiple selection mode.
      * @return TRUE if multiple selection is enabled, FALSE otherwise.
      */
     STDMETHOD_(BOOL, GetMultiSel)(CTHIS) SCONST PURE;
-    
+
     /**
      * @brief Adds an item to the selection.
      * @param iItem Index of the item.
      */
     STDMETHOD_(void, AddSelItem)(THIS_ int iItem) PURE;
-    
+
     /**
      * @brief Removes an item from the selection.
      * @param iItem Index of the item.
      */
     STDMETHOD_(void, RemoveSelItem)(THIS_ int iItem) PURE;
-    
+
     /**
      * @brief Clears all selected items.
      */
     STDMETHOD_(void, ClearSelItems)(THIS) PURE;
-    
+
     /**
      * @brief Checks if an item is selected.
      * @param iItem Index of the item.
      * @return TRUE if the item is selected, FALSE otherwise.
      */
     STDMETHOD_(BOOL, IsItemSelected)(THIS_ int iItem) SCONST PURE;
-    
+
     /**
      * @brief Gets the count of selected items.
      * @return Number of selected items.
      */
     STDMETHOD_(int, GetSelItemCount)(CTHIS) SCONST PURE;
-    
+
     /**
      * @brief Gets all selected items.
      * @param items Output parameter to store the selected item indices.
@@ -1488,30 +1488,30 @@ DECLARE_INTERFACE_(ITreeView, IPanel)
      * @param bMultiSel TRUE to enable multiple selection, FALSE otherwise.
      */
     STDMETHOD_(void, SetMultiSel)(THIS_ BOOL bMultiSel) PURE;
-    
+
     /**
      * @brief Gets the multiple selection mode.
      * @return TRUE if multiple selection is enabled, FALSE otherwise.
      */
     STDMETHOD_(BOOL, GetMultiSel)(THIS) SCONST PURE;
-    
+
     /**
      * @brief Adds an item to the selection.
      * @param hItem Handle to the item.
      */
     STDMETHOD_(void, AddSelItem)(THIS_ HSTREEITEM hItem) PURE;
-    
+
     /**
      * @brief Removes an item from the selection.
      * @param hItem Handle to the item.
      */
     STDMETHOD_(void, RemoveSelItem)(THIS_ HSTREEITEM hItem) PURE;
-    
+
     /**
      * @brief Clears all selected items.
      */
     STDMETHOD_(void, ClearSelItems)(THIS) PURE;
-    
+
     /**
      * @brief Checks if an item is selected.
      * @param hItem Handle to the item.
@@ -1531,8 +1531,7 @@ DECLARE_INTERFACE_(ITreeView, IPanel)
      * @param nMaxCount Maximum number of items to retrieve.
      * @return Number of selected items.
      */
-    STDMETHOD_(int, GetSelItems)(THIS_ HSTREEITEM *items, int nMaxCount) SCONST PURE;
-
+    STDMETHOD_(int, GetSelItems)(THIS_ HSTREEITEM * items, int nMaxCount) SCONST PURE;
 };
 
 // {5586EA88-3D4B-4d5f-8F71-436D43420D00}
@@ -1704,43 +1703,43 @@ DECLARE_INTERFACE_(ITileView, IPanel)
      * @param bMultiSel TRUE to enable multiple selection, FALSE otherwise.
      */
     STDMETHOD_(void, SetMultiSel)(THIS_ BOOL bMultiSel) PURE;
-    
+
     /**
      * @brief Gets the multiple selection mode.
      * @return TRUE if multiple selection is enabled, FALSE otherwise.
      */
     STDMETHOD_(BOOL, GetMultiSel)(CTHIS) SCONST PURE;
-    
+
     /**
      * @brief Adds an item to the selection.
      * @param iItem Index of the item.
      */
     STDMETHOD_(void, AddSelItem)(THIS_ int iItem) PURE;
-    
+
     /**
      * @brief Removes an item from the selection.
      * @param iItem Index of the item.
      */
     STDMETHOD_(void, RemoveSelItem)(THIS_ int iItem) PURE;
-    
+
     /**
      * @brief Clears all selected items.
      */
     STDMETHOD_(void, ClearSelItems)(THIS) PURE;
-    
+
     /**
      * @brief Checks if an item is selected.
      * @param iItem Index of the item.
      * @return TRUE if the item is selected, FALSE otherwise.
      */
     STDMETHOD_(BOOL, IsItemSelected)(THIS_ int iItem) SCONST PURE;
-    
+
     /**
      * @brief Gets the count of selected items.
      * @return Number of selected items.
      */
     STDMETHOD_(int, GetSelItemCount)(CTHIS) SCONST PURE;
-    
+
     /**
      * @brief Gets all selected items.
      * @param items Output parameter to store the selected item indices.

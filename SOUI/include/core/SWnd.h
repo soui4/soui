@@ -46,6 +46,15 @@
 
 SNSBEGIN
 
+// String constants for SWindow template support
+namespace SWindow_style
+{
+    static LPCWSTR kLabel_Include = L"include";        // 文件包含标签
+    static LPCWSTR kTemp_Namespace = L"t:";            // 模板识别命名空间
+    static LPCWSTR kTemp_Data = L"data";               // 模板参数
+    static LPCWSTR kTemp_ParamFormat = L"{{%s}}";      // 模板数据替换格式
+}
+
 /**
  * @brief 布局属性名称常量 - 参考Android属性动画设计
  */
@@ -1764,13 +1773,13 @@ class SOUI_EXP SWindow
      * BeforePaint
      * @brief Prepare rendering environment
      */
-    virtual void BeforePaint(IRenderTarget *pRT, SPainter &painter);
+    virtual void BeforePaint(IRenderTarget *pRT, SPainter &painter) const;
 
     /**
      * AfterPaint
      * @brief Restore rendering environment
      */
-    virtual void AfterPaint(IRenderTarget *pRT, SPainter &painter);
+    virtual void AfterPaint(IRenderTarget *pRT, SPainter &painter) const;
 
     /**
      * GetTrCtx
@@ -1855,7 +1864,7 @@ class SOUI_EXP SWindow
      *
      * Describe  Typically used in conjunction with CreateRenderTarget.
      */
-    void BeforePaintEx(IRenderTarget *pRT);
+    void BeforePaintEx(IRenderTarget *pRT) const;
 
     /**
      * TransformPoint

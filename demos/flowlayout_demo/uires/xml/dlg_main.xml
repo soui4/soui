@@ -1,0 +1,66 @@
+﻿<SOUI name="mainWindow" title="@string/title" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" margin="5,5,5,5"  resizable="1" wndType="appMain"
+appWnd="1"
+translucent="1" 
+>
+  <style>
+    <class name="title" textColor="#333333" font="size:20dp,bold:1" margin="10dp,10dp,10dp,5dp" />
+    <class name="demo_btn" width="80dp" height="40dp" extend="2dp,2dp,2dp,2dp" />
+  </style>
+  <root skin="_skin.sys.wnd.bkgnd" cache="1"  width="600" height="400" layout="vbox" padding="5,5,5,5">
+    <caption size="-2,30" layout="hbox" interval="0" gravity="center">
+      <icon src="ICON_LOGO:16"/>
+      <text >@string/title</text>
+      <window size="0,0" weight="1"/>
+      <imgbtn name="btn_min" skin="_skin.sys.btn.minimize"  animate="1" />
+      <window>
+      <imgbtn pos="0,0" name="btn_max" skin="_skin.sys.btn.maximize"   animate="1" />
+      <imgbtn pos="0,0" name="btn_restore" skin="_skin.sys.btn.restore"   show="0" animate="1" />
+      </window>
+      <imgbtn name="btn_close" skin="_skin.sys.btn.close"     tip="close" animate="1"/>
+    </caption>
+    <window size="-2,0" weight="1" layout="vbox" interval="10dp">
+      <window size="-2,-1" layout="hflow" interval="10dp" gravity="center">
+        <button text="Button 1" class="demo_btn" />
+        <button text="Button 2" class="demo_btn" />
+        <button text="Button 3" class="demo_btn" />
+        <button text="Button 4" class="demo_btn" />
+        <button text="Button 5" class="demo_btn" />
+        <button text="Button 6" class="demo_btn" />
+        <button text="Button 7" class="demo_btn" />
+        <button text="Button 8" class="demo_btn" />
+      </window>
+      <window size="-2,0" weight="1" layout="hbox" interval="10dp" gravity="center">
+        <window size="0,-2" weight="1" layout="vflow" interval="10dp" gravity="left">
+          <button text="Button 1" class="demo_btn"/>
+          <button text="Button 2" class="demo_btn"  width="100dp"/>
+          <button text="Button 3" class="demo_btn" />
+          <button text="Button 4" class="demo_btn" />
+          <button text="Button 5" class="demo_btn" />
+          <button text="Button 6" class="demo_btn" />
+          <button text="Button 7" class="demo_btn" />
+          <button text="Button 8" class="demo_btn" />
+        </window>
+        <window size="0,-2" weight="1" layout="vflow" interval="10dp" gravity="center">
+          <button text="Button 1" class="demo_btn" />
+          <button text="Button 2" class="demo_btn"  width="100dp"/>
+          <button text="Button 3" class="demo_btn" />
+          <button text="Button 4" class="demo_btn" />
+          <button text="Button 5" class="demo_btn" />
+          <button text="Button 6" class="demo_btn" />
+          <button text="Button 7" class="demo_btn" />
+          <button text="Button 8" class="demo_btn" />
+        </window>
+        <window size="0,-2" weight="1" layout="vflow" interval="10dp" gravity="right">
+          <button text="Button 1" class="demo_btn" />
+          <button text="Button 2" class="demo_btn"  width="100dp"/>
+          <button text="Button 3" class="demo_btn" />
+          <button text="Button 4" class="demo_btn" />
+          <button text="Button 5" class="demo_btn" />
+          <button text="Button 6" class="demo_btn" />
+          <button text="Button 7" class="demo_btn" />
+          <button text="Button 8" class="demo_btn" />
+        </window>
+      </window>
+    </window>
+  </root>
+</SOUI>

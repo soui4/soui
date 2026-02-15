@@ -188,13 +188,13 @@ namespace SOUI{
 		if(e2->nCmdId == 0)
 		{
 			m_propgrid->SetOrderType(SPropertyGrid::OT_GROUP);
-			m_tbProp->SetItemCheck(0,TRUE);
-			m_tbProp->SetItemCheck(1,FALSE);
+			m_tbProp->CheckButton(0,TRUE);
+			m_tbProp->CheckButton(1,FALSE);
 		}else
 		{
 			m_propgrid->SetOrderType(SPropertyGrid::OT_NAME);
-			m_tbProp->SetItemCheck(1,TRUE);
-			m_tbProp->SetItemCheck(0,FALSE);
+			m_tbProp->CheckButton(1,TRUE);
+			m_tbProp->CheckButton(0,FALSE);
 		}
 	}
 

@@ -24,7 +24,6 @@
 #include "hellocharts/SHelloCharts.h"
 #include "propgrid/SPropertyGrid.h"
 #include "gridctrl/SGridCtrl.h"
-#include "SToolBar.h"
 #include "SLightButton.h"
 #include "SAniWindow.h"
 #include "SCheckBox2.h"
@@ -54,7 +53,6 @@ void SCtrlsRegister::RegisterCtrls(SApplication *theApp)
 	theApp->RegisterWindowClass<SHexEdit>();
 	theApp->RegisterWindowClass<SPropertyGrid>();
 	theApp->RegisterWindowClass<SGridCtrl>();
-	theApp->RegisterWindowClass<SToolBar>();
 	theApp->RegisterWindowClass<SLightButton>();
 	theApp->RegisterWindowClass<SAniWindow>();
 	theApp->RegisterWindowClass<SCheckBox2>();

@@ -12,7 +12,7 @@ SDpiAwareFont::~SDpiAwareFont(void)
 {
 }
 
-IFontS *SDpiAwareFont::GetFontPtr()
+IFontS *SDpiAwareFont::GetFontPtr() const
 {
     return m_object;
 }

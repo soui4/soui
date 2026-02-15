@@ -1,4 +1,4 @@
-﻿//stamp:2182ced41c71a4a0
+﻿//stamp:2182fb63f63ec95b
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -47,6 +47,7 @@
 			const TCHAR * png_designer_background;
 			const TCHAR * png_filetypes;
 			const TCHAR * png_item_bk;
+			const TCHAR * png_dropdown;
 			}IMG;
 		struct _ICON{
 			const TCHAR * ICON_logo;
@@ -102,6 +103,7 @@ struct _UIRES UIRES={
 			_T("IMG:png_designer_background"),
 			_T("IMG:png_filetypes"),
 			_T("IMG:png_item_bk"),
+			_T("IMG:png_dropdown"),
 		},
 		{
 			_T("ICON:ICON_logo"),
@@ -145,7 +147,6 @@ struct _R{
 		 const wchar_t * chk_autosave;
 		 const wchar_t * color_preview;
 		 const wchar_t * edtInput;
-		 const wchar_t * edt_label;
 		 const wchar_t * img_icon_exclamation;
 		 const wchar_t * img_icon_information;
 		 const wchar_t * img_icon_question;
@@ -172,6 +173,8 @@ struct _R{
 		 const wchar_t * slider_zoom;
 		 const wchar_t * tab_editor;
 		 const wchar_t * tb_prop;
+		 const wchar_t * tb_skin;
+		 const wchar_t * tb_widget;
 		 const wchar_t * toolbar_btn_Close;
 		 const wchar_t * toolbar_btn_NewInclude;
 		 const wchar_t * toolbar_btn_NewLayout;
@@ -181,6 +184,7 @@ struct _R{
 		 const wchar_t * toolbar_btn_recent;
 		 const wchar_t * toolbar_btn_savexml;
 		 const wchar_t * toolbar_btn_viewskin;
+		 const wchar_t * toolbar_container;
 		 const wchar_t * txt_desc;
 		 const wchar_t * txt_label;
 		 const wchar_t * txt_path;
@@ -222,7 +226,6 @@ struct _R{
 		int chk_autosave;
 		int color_preview;
 		int edtInput;
-		int edt_label;
 		int img_icon_exclamation;
 		int img_icon_information;
 		int img_icon_question;
@@ -249,6 +252,8 @@ struct _R{
 		int slider_zoom;
 		int tab_editor;
 		int tb_prop;
+		int tb_skin;
+		int tb_widget;
 		int toolbar_btn_Close;
 		int toolbar_btn_NewInclude;
 		int toolbar_btn_NewLayout;
@@ -258,6 +263,7 @@ struct _R{
 		int toolbar_btn_recent;
 		int toolbar_btn_savexml;
 		int toolbar_btn_viewskin;
+		int toolbar_container;
 		int txt_desc;
 		int txt_label;
 		int txt_path;
@@ -346,7 +352,6 @@ struct _R R={
 		L"chk_autosave",
 		L"color_preview",
 		L"edtInput",
-		L"edt_label",
 		L"img_icon_exclamation",
 		L"img_icon_information",
 		L"img_icon_question",
@@ -373,6 +378,8 @@ struct _R R={
 		L"slider_zoom",
 		L"tab_editor",
 		L"tb_prop",
+		L"tb_skin",
+		L"tb_widget",
 		L"toolbar_btn_Close",
 		L"toolbar_btn_NewInclude",
 		L"toolbar_btn_NewLayout",
@@ -382,6 +389,7 @@ struct _R R={
 		L"toolbar_btn_recent",
 		L"toolbar_btn_savexml",
 		L"toolbar_btn_viewskin",
+		L"toolbar_container",
 		L"txt_desc",
 		L"txt_label",
 		L"txt_path",
@@ -399,81 +407,83 @@ struct _R R={
 	}
 	,
 	{
-		65593,
-		65590,
-		65586,
-		65589,
-		65585,
-		65560,
+		65595,
+		65592,
+		65588,
+		65591,
+		65587,
+		65563,
 		65546,
 		65547,
-		65592,
 		65594,
+		65596,
 		65542,
 		65552,
 		65548,
 		65550,
 		65549,
+		65610,
 		65608,
-		65606,
 		65551,
 		65543,
 		65544,
 		65545,
-		65605,
-		65559,
-		65570,
-		65595,
-		65564,
+		65607,
+		65562,
+		65572,
+		65597,
 		65540,
 		65538,
 		65539,
-		65601,
-		65604,
 		65603,
-		65562,
-		65583,
-		65579,
-		65580,
-		65607,
-		65602,
-		65578,
+		65606,
+		65605,
+		65565,
+		65585,
 		65581,
+		65582,
+		65609,
+		65604,
+		65580,
+		65583,
 		65537,
 		65541,
 		65536,
-		65588,
-		65587,
-		65582,
-		65572,
-		65566,
-		65569,
+		65590,
+		65589,
 		65584,
-		65571,
-		65596,
-		65555,
-		65557,
-		65556,
-		65553,
 		65574,
-		65575,
-		65554,
-		65573,
-		65558,
-		65567,
-		65563,
-		65597,
-		65599,
-		65598,
-		65591,
 		65568,
-		100000,
-		100000,
-		65565,
-		65561,
-		65600,
+		65571,
+		65586,
+		65573,
+		65598,
+		65555,
+		65554,
+		65558,
+		65560,
+		65559,
+		65556,
 		65576,
-		65577
+		65577,
+		65557,
+		65575,
+		65561,
+		65553,
+		65569,
+		65566,
+		65599,
+		65601,
+		65600,
+		65593,
+		65570,
+		100000,
+		100000,
+		65567,
+		65564,
+		65602,
+		65578,
+		65579
 	}
 	,
 	{

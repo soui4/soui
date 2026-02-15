@@ -463,14 +463,14 @@ void SHeaderCtrl::OnMouseLeave()
 
 BOOL SHeaderCtrl::CreateChildren(SXmlNode xmlNode)
 {
-    SXmlNode xmlItems = xmlNode.child(L"items");
+    SXmlNode xmlItems = xmlNode.child(SHeaderCtrl_style::kStyle_items);
     if (xmlItems)
         xmlItems.set_userdata(1);
     __baseCls::CreateChildren(xmlNode);
 
     if (!xmlItems)
         return FALSE;
-    SXmlNode xmlItem = xmlItems.child(L"item");
+    SXmlNode xmlItem = xmlItems.child(SHeaderCtrl_style::kStyle_item);
     int iOrder = 0;
     while (xmlItem)
     {
@@ -478,27 +478,27 @@ BOOL SHeaderCtrl::CreateChildren(SXmlNode xmlNode)
         item.strText.SetOwner(this);
         item.mask = 0xFFFFFFFF;
         item.iOrder = iOrder++;
-        SStringW strText = xmlItem.attribute(L"text").as_string();
+        SStringW strText = xmlItem.attribute(SHeaderCtrl_style::kStyle_text).as_string();
         if (strText.IsEmpty())
         {
             strText = SWindow::GetXmlText(xmlItem);
         }
         item.strText.SetText(S_CW2T(GETSTRING(strText)));
-        SLayoutSize szItem = GETLAYOUTSIZE(xmlItem.attribute(L"width").as_string(L"50"));
+        SLayoutSize szItem = GETLAYOUTSIZE(xmlItem.attribute(SHeaderCtrl_style::kStyle_width).as_string(L"50"));
         item.cx = szItem.toPixelSize(GetScale());
-        item.fWeight = xmlItem.attribute(L"weight").as_float();
+        item.fWeight = xmlItem.attribute(SHeaderCtrl_style::kStyle_weight).as_float();
         item.bDpiAware = (szItem.unit != px);
-        item.lParam = xmlItem.attribute(L"userData").as_uint(0);
-        item.bVisible = xmlItem.attribute(L"visible").as_bool(true);
+        item.lParam = xmlItem.attribute(SHeaderCtrl_style::kStyle_userData).as_uint(0);
+        item.bVisible = xmlItem.attribute(SHeaderCtrl_style::kStyle_visible).as_bool(true);
         item.fmt = 0;
         item.state = 0;
-        SStringW strSort = xmlItem.attribute(L"sortFlag").as_string();
+        SStringW strSort = xmlItem.attribute(SHeaderCtrl_style::kStyle_sortFlag).as_string();
         strSort.MakeLower();
         if (strSort == L"down")
             item.fmt |= HDF_SORTDOWN;
         else if (strSort == L"up")
             item.fmt |= HDF_SORTUP;
-        SStringW strAlign = xmlItem.attribute(L"align").as_string();
+        SStringW strAlign = xmlItem.attribute(SHeaderCtrl_style::kStyle_align).as_string();
         strAlign.MakeLower();
         if (strAlign == L"left")
             item.fmt |= HDF_LEFT;

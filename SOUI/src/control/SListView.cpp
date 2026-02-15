@@ -817,7 +817,7 @@ void SListView::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
     if (nNewSelItem != -1)
     {
         EnsureVisible(nNewSelItem);
-        
+
         if (bMultiSelMode)
         {
             if (bCtrlPressed)
@@ -948,12 +948,12 @@ SItemPanel *SListView::GetItemPanel(int iItem)
 
 BOOL SListView::CreateChildren(SXmlNode xmlNode)
 {
-    SXmlNode xmlTemplate = xmlNode.child(L"template");
+    SXmlNode xmlTemplate = xmlNode.child(SListView_style::kStyle_template);
     if (xmlTemplate)
     {
         m_xmlTemplate.Reset();
         m_xmlTemplate.root().append_copy(xmlTemplate);
-        LPCWSTR kItemSize = m_bVertical ? L"itemHeight" : L"itemWidth";
+        LPCWSTR kItemSize = m_bVertical ? SListView_style::kStyle_itemHeight : SListView_style::kStyle_itemWidth;
         SLayoutSize nItemHei = GETLAYOUTSIZE(xmlTemplate.attribute(kItemSize).value());
         if (nItemHei.fSize > 0.0f)
         { //指定了itemHeight属性时创建一个固定行高的定位器
@@ -963,7 +963,7 @@ BOOL SListView::CreateChildren(SXmlNode xmlNode)
         }
         else
         { //创建一个行高可变的行定位器，从defHeight/defWidth属性中获取默认行高
-            LPCWSTR kDefSize = m_bVertical ? L"defHeight" : L"defWidth";
+            LPCWSTR kDefSize = m_bVertical ? SListView_style::kStyle_defHeight : SListView_style::kStyle_defWidth;
             IListViewItemLocator *pItemLocator = new SListViewItemLocatorFlex(GETLAYOUTSIZE(xmlTemplate.attribute(kDefSize).as_string(L"30dp")), m_nDividerSize);
             SetItemLocator(pItemLocator);
             pItemLocator->Release();
@@ -1189,35 +1189,43 @@ void SListView::GetDesiredSize(THIS_ SIZE *psz, int nParentWid, int nParentHei)
     }
 }
 
-void SListView::SetMultiSel(BOOL bMultiSel) {
+void SListView::SetMultiSel(BOOL bMultiSel)
+{
     SViewBase::SetMultiSel(bMultiSel);
 }
 
-BOOL SListView::GetMultiSel() const {
+BOOL SListView::GetMultiSel() const
+{
     return SViewBase::GetMultiSel();
 }
 
-void SListView::AddSelItem(int iItem) {
+void SListView::AddSelItem(int iItem)
+{
     SViewBase::AddSelItem(iItem);
 }
 
-void SListView::RemoveSelItem(int iItem) {
+void SListView::RemoveSelItem(int iItem)
+{
     SViewBase::RemoveSelItem(iItem);
 }
 
-void SListView::ClearSelItems() {
+void SListView::ClearSelItems()
+{
     SViewBase::ClearSelItems();
 }
 
-BOOL SListView::IsItemSelected(int iItem) const {
+BOOL SListView::IsItemSelected(int iItem) const
+{
     return SViewBase::IsItemSelected(iItem);
 }
 
-int SListView::GetSelItemCount() const {
+int SListView::GetSelItemCount() const
+{
     return SViewBase::GetSelItemCount();
 }
 
-int SListView::GetSelItems(int *items, int nMaxCount) const {
+int SListView::GetSelItems(int *items, int nMaxCount) const
+{
     return SViewBase::GetSelItems(items, nMaxCount);
 }
 

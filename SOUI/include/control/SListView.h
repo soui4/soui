@@ -10,6 +10,15 @@
 
 SNSBEGIN
 
+namespace SListView_style
+{
+    static const LPCWSTR kStyle_template = L"template";
+    static const LPCWSTR kStyle_itemHeight = L"itemHeight";
+    static const LPCWSTR kStyle_itemWidth = L"itemWidth";
+    static const LPCWSTR kStyle_defHeight = L"defHeight";
+    static const LPCWSTR kStyle_defWidth = L"defWidth";
+}
+
 class SOUI_EXP SListView
     : public TPanelProxy<IListView>
     , public SViewBase {
@@ -84,43 +93,43 @@ class SOUI_EXP SListView
      * @param bMultiSel TRUE to enable multiple selection, FALSE otherwise.
      */
     STDMETHOD_(void, SetMultiSel)(THIS_ BOOL bMultiSel) OVERRIDE;
-    
+
     /**
      * @brief Gets the multiple selection mode.
      * @return TRUE if multiple selection is enabled, FALSE otherwise.
      */
     STDMETHOD_(BOOL, GetMultiSel)(CTHIS) SCONST OVERRIDE;
-    
+
     /**
      * @brief Adds an item to the selection.
      * @param iItem Index of the item.
      */
     STDMETHOD_(void, AddSelItem)(THIS_ int iItem) OVERRIDE;
-    
+
     /**
      * @brief Removes an item from the selection.
      * @param iItem Index of the item.
      */
     STDMETHOD_(void, RemoveSelItem)(THIS_ int iItem) OVERRIDE;
-    
+
     /**
      * @brief Clears all selected items.
      */
     STDMETHOD_(void, ClearSelItems)(THIS) OVERRIDE;
-    
+
     /**
      * @brief Checks if an item is selected.
      * @param iItem Index of the item.
      * @return TRUE if the item is selected, FALSE otherwise.
      */
     STDMETHOD_(BOOL, IsItemSelected)(THIS_ int iItem) SCONST OVERRIDE;
-    
+
     /**
      * @brief Gets the count of selected items.
      * @return Number of selected items.
      */
     STDMETHOD_(int, GetSelItemCount)(CTHIS) SCONST OVERRIDE;
-    
+
     /**
      * @brief Gets all selected items.
      * @param items Output parameter to store the selected item indices.
@@ -128,7 +137,7 @@ class SOUI_EXP SListView
      * @return Number of selected items.
      */
     STDMETHOD_(int, GetSelItems)(THIS_ int *items, int nMaxCount) SCONST OVERRIDE;
-    
+
   public:
     /**
      * @brief Hit test to determine the item under the mouse
@@ -144,6 +153,7 @@ class SOUI_EXP SListView
      * @param nParentHei Parent container height
      */
     STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *psz, int nParentWid, int nParentHei) OVERRIDE;
+
   protected:
     /**
      * @brief Handle scroll event
@@ -266,24 +276,24 @@ class SOUI_EXP SListView
      * @return TRUE if handled, FALSE otherwise
      */
     BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
-    
+
     /**
      * @brief Handle mouse leave event
      */
     void OnMouseLeave();
-    
+
     /**
      * @brief Handle kill focus event
      * @param wndFocus New focus window
      */
     void OnKillFocus(SWND wndFocus);
-    
+
     /**
      * @brief Handle set focus event
      * @param wndOld Old focus window
      */
     void OnSetFocus(SWND wndOld);
-    
+
     /**
      * @brief Handle show window event
      * @param bShow Whether the window is shown
@@ -364,7 +374,10 @@ class SOUI_EXP SListView
      * @param pItem Pointer to the item panel
      */
     virtual void RedrawItem(SOsrPanel *pItem);
-    virtual ILvAdapter *getAdapter() override { return m_adapter; }
+    virtual ILvAdapter *getAdapter() override
+    {
+        return m_adapter;
+    }
     /**
      * @brief Gets the dialog code
      * @return Dialog code

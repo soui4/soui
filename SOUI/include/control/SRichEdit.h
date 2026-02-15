@@ -234,6 +234,7 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
      * @return Text services interface
      */
     ITextServices *GetTextServices();
+
   protected:
     /**
      * @brief Handle creation of the control

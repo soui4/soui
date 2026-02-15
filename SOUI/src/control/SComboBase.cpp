@@ -3,9 +3,6 @@
 
 SNSBEGIN
 
-static const wchar_t *KStyle_Dropdown = L"dropdownStyle"; //下拉列表风格，只包含root节点
-static const wchar_t *KStyle_Edit = L"editStyle";         //编辑框风格
-
 //////////////////////////////////////////////////////////////////////////
 // CComboEdit
 SComboEdit::SComboEdit()
@@ -105,9 +102,9 @@ SComboBase::~SComboBase(void)
 
 BOOL SComboBase::CreateChildren(SXmlNode xmlNode)
 {
-    m_xmlDropdownStyle.root().append_copy(xmlNode.child(KStyle_Dropdown));
+    m_xmlDropdownStyle.root().append_copy(xmlNode.child(SComboBase_style::kStyle_Dropdown));
     //创建edit对象
-    SXmlNode xmlEditStyle = xmlNode.child(KStyle_Edit);
+    SXmlNode xmlEditStyle = xmlNode.child(SComboBase_style::kStyle_Edit);
     SStringW strEditClass = xmlEditStyle.attribute(L"wndclass").as_string(SComboEdit::GetClassName());
     m_pEdit = sobj_cast<SComboEdit>(CreateChildByName(strEditClass));
     if (!m_pEdit)
@@ -353,16 +350,15 @@ SWindow *SComboBase::GetDropDownOwner()
     return this;
 }
 
-static const wchar_t *KAttrTrCtx = L"trCtx";
 void SComboBase::OnCreateDropDown(SDropDownWnd *pDropDown)
 {
     GetContainer()->EnableHostPrivateUiDef(TRUE);
-    SXmlNode xmlDropdownStyleNode = m_xmlDropdownStyle.root().child(KStyle_Dropdown);
+    SXmlNode xmlDropdownStyleNode = m_xmlDropdownStyle.root().child(SComboBase_style::kStyle_Dropdown);
     if (xmlDropdownStyleNode)
     {
-        if (!xmlDropdownStyleNode.attribute(KAttrTrCtx))
+        if (!xmlDropdownStyleNode.attribute(L"TrCtx"))
         {
-            xmlDropdownStyleNode.append_attribute(KAttrTrCtx).set_value(GetTrCtx());
+            xmlDropdownStyleNode.append_attribute(L"TrCtx").set_value(GetTrCtx());
         }
         pDropDown->InitFromXml(&xmlDropdownStyleNode);
     }

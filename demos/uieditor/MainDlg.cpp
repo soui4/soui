@@ -37,6 +37,8 @@ CMainDlg::CMainDlg()
 {
 	// 注册自定义 clipboard format
 	m_uClipboardFormat = RegisterClipboardFormat(_T("SOUI_UIEDITOR_FILE_ITEMS"));
+	m_skinPool.Attach(new SSkinPool());
+	SUiDef::getSingleton().PushSkinPool(m_skinPool);
 }
 
 CMainDlg::~CMainDlg()
@@ -50,6 +52,7 @@ CMainDlg::~CMainDlg()
 	{
 		delete m_pImageViewer;
 	}
+	SUiDef::getSingleton().PopSkinPool(m_skinPool);
 }
 
 BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
@@ -59,10 +62,6 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 	m_btn_recentFile = FindChildByName2<SButton>(L"toolbar_btn_recent");
 	
 	m_tabWorkspace = FindChildByName2<STabCtrl>(L"workspace_tab");
-
-	m_lvSkin = FindChildByName2<SListView>(L"lv_tb_skin");
-	m_lvWidget = FindChildByName2<SListView>(L"lv_tb_widget");
-
 	// 初始化文件树视图
 	m_treeView = FindChildByID2<STreeView>(R.id.workspace_treeview);
 	if (m_treeView)
@@ -88,17 +87,8 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
     m_pImageViewer = new CImageViewer(this);
 	m_pImageViewer->Init(GetRoot());
 
-	{//init control listbox
-		CWidgetTBAdapter * pAdapter = new CWidgetTBAdapter(CSysDataMgr::getSingleton().getCtrlDefNode(),this);
-		m_lvWidget->SetAdapter(pAdapter);
-		pAdapter->Release();
-	}
-	{//init skin listbox
-		CSkinTBAdapter * pAdapter = new CSkinTBAdapter(CSysDataMgr::getSingleton().getSkinDefNode(),this);
-		m_lvSkin->SetAdapter(pAdapter);
-		pAdapter->Release();
-	}
-
+	InitSkinToolbar();
+	InitWidgetToolbar();
 
 	HRESULT hr = ::RegisterDragDrop(m_hWnd, GetDropTarget());
 	RegisterDragDrop(m_treeView->GetSwnd(), new CDropTarget(this));
@@ -1390,21 +1380,21 @@ BOOL CMainDlg::OnDrop(LPCTSTR pszName)
 	return TRUE;
 }
 
-void CMainDlg::OnInsertWidget(CWidgetTBAdapter::IconInfo *info)
-{
-	m_pXmlEdtior->InsertWidget(info->strContent);
-	m_lvWidget->SetSel(-1,FALSE);
-}
+// void CMainDlg::OnInsertWidget(CWidgetTBAdapter::IconInfo *info)
+// {
+// 	m_pXmlEdtior->InsertWidget(info->strContent);
+// 	m_lvWidget->SetSel(-1,FALSE);
+// }
 
-void CMainDlg::OnInertSkin(CSkinTBAdapter::IconInfo * info)
-{
-	m_lvSkin->SetSel(-1,FALSE);
-	DlgInsertXmlElement dlg(&m_UIResFileMgr,CSysDataMgr::getSingleton().getSkinDefNode().child(L"skins"),S_CT2W(info->strElement));
-	if(IDOK==dlg.DoModal())
-	{
-		m_pXmlEdtior->InsertElement(dlg.GetXml());
-	}
-}
+// void CMainDlg::OnInertSkin(CSkinTBAdapter::IconInfo * info)
+// {
+// 	m_lvSkin->SetSel(-1,FALSE);
+// 	DlgInsertXmlElement dlg(&m_UIResFileMgr,CSysDataMgr::getSingleton().getSkinDefNode().child(L"skins"),S_CT2W(info->strElement));
+// 	if(IDOK==dlg.DoModal())
+// 	{
+// 		m_pXmlEdtior->InsertElement(dlg.GetXml());
+// 	}
+// }
 
 void CMainDlg::OnAutoCheck(IEvtArgs *e)
 {
@@ -1493,16 +1483,16 @@ void CMainDlg::UpdateEditorToolbar()
 	switch(m_editXmlType)
 	{
 	case FT_LAYOUT_XML:
-		m_lvWidget->SetVisible(TRUE,TRUE);
-		m_lvSkin->SetVisible(FALSE,TRUE);
+		m_tbWidget->SetVisible(TRUE,TRUE);
+		m_tbSkin->SetVisible(FALSE,TRUE);
 		break;
 	case FT_SKIN:
-		m_lvWidget->SetVisible(FALSE,TRUE);
-		m_lvSkin->SetVisible(TRUE,TRUE);
+		m_tbWidget->SetVisible(FALSE,TRUE);
+		m_tbSkin->SetVisible(TRUE,TRUE);
 		break;
 	default:
-		m_lvWidget->SetVisible(FALSE,TRUE);
-		m_lvSkin->SetVisible(FALSE,TRUE);
+		m_tbWidget->SetVisible(FALSE,TRUE);
+		m_tbSkin->SetVisible(FALSE,TRUE);
 		break;
 	}
 }
@@ -1630,4 +1620,92 @@ void CMainDlg::OnBtnViewSkin()
 void CMainDlg::OnBtnPreview()
 {
 	m_pXmlEdtior->StartPreviewProcess();
+}
+
+	struct IconInfo{
+		int iIcon;
+		SStringT strTxt;
+		SStringT strTip;
+		SStringT strElement;
+		SStringA strContent;
+	};
+static bool CompareIcon(const IconInfo &a,const IconInfo &b){
+		return a.strTxt < b.strTxt;
+}
+void CMainDlg::InitWidgetToolbar(){
+    SXmlNode xmlNode = CSysDataMgr::getSingleton().getCtrlDefNode();
+    SXmlNode xmlIconSkin = xmlNode.child(L"toolbar").child(L"icons");
+    ISkinObj *pSkin = SApplication::getSingleton().CreateSkinByName(xmlIconSkin.attribute(L"class_name").as_string(SSkinImgList::GetClassName()));
+    if (pSkin)
+    {
+        pSkin->InitFromXml(&xmlIconSkin);
+        m_skinPool->AddSkin(pSkin);
+        pSkin->Release();
+    }
+	SArray<IconInfo> arrIcons;
+    SXmlNode xmlWidget = xmlNode.child(L"controls").first_child();
+    while (xmlWidget)
+    {
+        if (xmlWidget.attribute(L"visible").as_bool(true))
+        {
+            IconInfo info;
+            info.iIcon = xmlWidget.attribute(L"icon").as_int(0);
+            info.strElement = S_CW2T(xmlWidget.name());
+            if (xmlWidget.attribute(L"text"))
+                info.strTxt = S_CW2T(xmlWidget.attribute(L"text").as_string());
+            else
+                info.strTxt = S_CW2T(xmlWidget.name());
+            info.strTip = S_CW2T(xmlWidget.attribute(L"tip").as_string());
+            SStringW strContent;
+            xmlWidget.child(xmlWidget.name()).ToString(&strContent);
+            info.strContent = S_CW2A(strContent, CP_UTF8);
+            arrIcons.Add(info);
+        }
+        xmlWidget = xmlWidget.next_sibling();
+    }
+    std::sort(arrIcons.GetData(), arrIcons.GetData() + arrIcons.GetCount(), CompareIcon);
+	SToolBar *pToolBar = FindChildByID2<SToolBar>(R.id.tb_widget);
+	pToolBar->SetIconsSkin(pSkin);
+	for(int i = 0; i < arrIcons.GetCount(); i++){
+		pToolBar->AddButton(i,arrIcons[i].iIcon,arrIcons[i].strTxt);
+	}
+    m_tbWidget = pToolBar;
+}
+
+void CMainDlg::InitSkinToolbar(){
+    SXmlNode xmlNode = CSysDataMgr::getSingleton().getSkinDefNode();
+    SXmlNode xmlIconSkin = xmlNode.child(L"toolbar").child(L"icons");
+    ISkinObj *pSkin = SApplication::getSingleton().CreateSkinByName(xmlIconSkin.attribute(L"class_name").as_string(SSkinImgList::GetClassName()));
+    if (pSkin)
+    {
+        pSkin->InitFromXml(&xmlIconSkin);
+        m_skinPool->AddSkin(pSkin);
+        pSkin->Release();
+    }
+    SArray<IconInfo> arrIcons;
+    SXmlNode xmlSkin = xmlNode.child(L"skins").first_child();
+    while (xmlSkin)
+    {
+        if (xmlSkin.attribute(L"visible").as_bool(true))
+        {
+            IconInfo info;
+            info.iIcon = xmlSkin.attribute(L"icon").as_int(0);
+            info.strElement = S_CW2T(xmlSkin.name());
+            if (xmlSkin.attribute(L"text"))
+                info.strTxt = S_CW2T(xmlSkin.attribute(L"text").as_string());
+            else
+                info.strTxt = S_CW2T(xmlSkin.name());
+            info.strTip = S_CW2T(xmlSkin.attribute(L"tip").as_string());
+            arrIcons.Add(info);
+        }
+        xmlSkin = xmlSkin.next_sibling();
+    }
+    std::sort(arrIcons.GetData(), arrIcons.GetData() + arrIcons.GetCount(), CompareIcon);
+    SToolBar *pToolBar = FindChildByID2<SToolBar>(R.id.tb_skin);
+    pToolBar->SetIconsSkin(pSkin);
+    for (int i = 0; i < arrIcons.GetCount(); i++)
+    {
+        pToolBar->AddButton(i, arrIcons[i].iIcon, arrIcons[i].strTxt);
+    }
+    m_tbSkin = pToolBar;
 }

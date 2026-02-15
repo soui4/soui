@@ -13,8 +13,8 @@ typedef struct IAnimatorSet IAnimatorSet;
  */
 enum AnimatorSetPlayMode
 {
-    SEQUENCE = 0,  ///< Sequential execution
-    PARALLEL = 1   ///< Parallel execution
+    SEQUENCE = 0, ///< Sequential execution
+    PARALLEL = 1  ///< Parallel execution
 };
 
 #undef INTERFACE
@@ -232,7 +232,7 @@ DECLARE_INTERFACE_(IAnimatorSet, IValueAnimator)
     STDMETHOD_(void, SetUserData)(THIS_ LPVOID pUserData) PURE;
 
     //-------------------------------------------------------------------------
-    
+
     /**
      * @brief Add a value animator to the set
      * @param pAnimator - The animator to be added

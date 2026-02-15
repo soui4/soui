@@ -19,11 +19,12 @@
 #define USE_MSFTEDIT
 
 #ifdef INIT_RICHEDIT
-extern "C"{
-STDAPI InitRichedit(HINSTANCE hInst);
-STDAPI UninitRichedit(HINSTANCE hInst);
+extern "C"
+{
+    STDAPI InitRichedit(HINSTANCE hInst);
+    STDAPI UninitRichedit(HINSTANCE hInst);
 }
-#endif//INIT_RICHEDIT
+#endif // INIT_RICHEDIT
 
 SNSBEGIN
 //////////////////////////////////////////////////////////////////////////
@@ -79,16 +80,15 @@ class STextServiceHelper {
     PCreateTextServices m_funCreateTextServices; /**< 回调函数 */
 };
 
-
 STextServiceHelper::STextServiceHelper()
     : m_funCreateTextServices(NULL)
 {
 #ifdef INIT_RICHEDIT
-    m_rich20 =NULL;
+    m_rich20 = NULL;
     ::InitRichedit(GetModuleHandle(NULL));
     m_funCreateTextServices = ::CreateTextServices;
     return;
-#else//INIT_RICHEDIT
+#else // INIT_RICHEDIT
 #ifdef _WIN32
     m_rich20 = LoadLibrary(_T("Msftedit.dll"));
 #else
@@ -106,7 +106,7 @@ STextServiceHelper::STextServiceHelper()
         printf("load so failed, err=%s\n", err);
 #endif
     }
-#endif//INIT_RICHEDIT
+#endif // INIT_RICHEDIT
 }
 
 STextServiceHelper::~STextServiceHelper()
@@ -116,7 +116,7 @@ STextServiceHelper::~STextServiceHelper()
 #else
     if (m_rich20)
         FreeLibrary(m_rich20);
-#endif//INIT_RICHEDIT
+#endif // INIT_RICHEDIT
     m_funCreateTextServices = NULL;
 }
 
@@ -159,9 +159,10 @@ class SRicheditDropTarget : public SUnkImpl<IDropTarget> {
 
     IUNKNOWN_BEGIN(IDropTarget)
     IUNKNOWN_END()
- 
+
     // IDropTarget
-    STDMETHOD(DragEnter)(
+    STDMETHOD(DragEnter)
+    (
         /* [unique][in] */ IDataObject *pDataObj,
         /* [in] */ DWORD grfKeyState,
         /* [in] */ POINTL pt,
@@ -179,7 +180,8 @@ class SRicheditDropTarget : public SUnkImpl<IDropTarget> {
         return hr;
     }
 
-    STDMETHOD(DragOver)(
+    STDMETHOD(DragOver)
+    (
         /* [in] */ DWORD grfKeyState,
         /* [in] */ POINTL pt,
         /* [out][in] */ DWORD *pdwEffect)
@@ -209,7 +211,8 @@ class SRicheditDropTarget : public SUnkImpl<IDropTarget> {
         return hr;
     }
 
-    STDMETHOD(Drop)(
+    STDMETHOD(Drop)
+    (
         /* [unique][in] */ IDataObject *pDataObj,
         /* [in] */ DWORD grfKeyState,
         /* [in] */ POINTL pt,
@@ -236,7 +239,6 @@ const LONG cInitTextMax = (32 * 1024) - 1;
 #define FValidCF(_pcf)   ((_pcf)->cbSize == sizeof(CHARFORMAT2W))
 #define FValidPF(_ppf)   ((_ppf)->cbSize == sizeof(PARAFORMAT2))
 #define TIMER_INVALIDATE 6
-
 
 EXTERN_C SELECT_ANY const IID IID_ITextServices = // 8d33f740-cf58-11ce-a89d-00aa006cadc5
     { 0x8d33f740, 0xcf58, 0x11ce, { 0xa8, 0x9d, 0x00, 0xaa, 0x00, 0x6c, 0xad, 0xc5 } };
@@ -705,7 +707,7 @@ class STextHost : public SUnkImpl<ITextHost> {
     virtual HRESULT TxGetSelectionBarWidth(LONG *plSelBarWidth);
 
   protected:
-    BOOL m_fUiActive; /**< Whether control is inplace active */
+    BOOL m_fUiActive;       /**< Whether control is inplace active */
     ITextServices *pserv;   /**< pointer to Text Services object */
     SRichEdit *m_pRichEdit; /**< swindow for text host */
     POINT m_ptCaret;
@@ -1134,7 +1136,7 @@ int SRichEdit::OnCreate(LPVOID)
     int ret = __baseCls::OnCreate(NULL);
     if (ret != 0)
         return ret;
-    if(!m_pTxtHost)
+    if (!m_pTxtHost)
     {
         SSLOGE() << "create text host failed!";
         return 2;
@@ -1180,7 +1182,7 @@ void SRichEdit::OnDestroy()
     {
         m_pTxtHost->GetTextService()->OnTxInPlaceDeactivate();
     }
-    
+
     m_mapTimer.RemoveAll();
     __baseCls::OnDestroy();
 }

@@ -60,8 +60,8 @@ class SOUI_EXP SMenuExItem : public SWindow {
     WCHAR GetHotKey() const;
 
   protected:
-    void BeforePaint(IRenderTarget *pRT, SPainter &painter) override;
-    
+    void BeforePaint(IRenderTarget *pRT, SPainter &painter) const override;
+
     /**
      * @brief 处理子菜单隐藏事件
      * @param bUncheckItem 是否取消选中子菜单项
@@ -330,6 +330,7 @@ class SOUI_EXP SMenuEx
     }
 
     STDMETHOD_(int, GetMenuItemCount)(CTHIS) SCONST OVERRIDE;
+
   public:
     /**
      * @brief 结束菜单

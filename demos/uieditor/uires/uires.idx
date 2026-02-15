@@ -42,6 +42,7 @@
 		<file name="png_designer_background" path="image\designer_background.png" />
 		<file name="png_filetypes" path="image\filetypes.png" />
 		<file name="png_item_bk" path="image\item_bk.png" />
+		<file name="png_dropdown" path="image\dropdown.png" />"
 	</IMG>
 	<ICON>
 		<file name="ICON_logo" path="image\logo.ico" />

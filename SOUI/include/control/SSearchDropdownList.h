@@ -7,6 +7,13 @@
 
 SNSBEGIN
 
+// String constants for SearchDropdownList control
+namespace SSearchDropdownList_style
+{
+    static LPCWSTR kStyle_Dropdown = L"dropdownStyle";      // 下拉列表风格
+    static LPCWSTR kStyle_DropdownList = L"listStyle";      // 列表风格
+}
+
 class SDropdownList;
 class SOUI_EXP SSearchDropdownList
     : public TWindowProxy<ISearchDropdownList>

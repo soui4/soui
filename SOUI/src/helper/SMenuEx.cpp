@@ -226,26 +226,29 @@ SMenuExItem::SMenuExItem(SMenuEx *pOwnerMenu, ISkinObj *pItemSkin)
     m_style.SetAlign(DT_LEFT);
 }
 
-void SMenuExItem::BeforePaint(IRenderTarget *pRT, SPainter &painter){
+void SMenuExItem::BeforePaint(IRenderTarget *pRT, SPainter &painter) const
+{
     SMenuEx *pRootMenu = m_pOwnerMenu;
-    while(pRootMenu->m_pParent){
+    while (pRootMenu->m_pParent)
+    {
         pRootMenu = pRootMenu->m_pParent->m_pOwnerMenu;
     }
-    SWindow *pRoot = (SWindow*)pRootMenu->GetHostWnd()->GetIRoot();
+    SWindow *pRoot = (SWindow *)pRootMenu->GetHostWnd()->GetIRoot();
     int iState = SState2Index::GetDefIndex(GetState(), true);
     IFontPtr pFont = GetStyle().GetTextFont(iState);
     if (pFont)
         pRT->SelectObject(pFont, (IRenderObj **)&painter.oldFont);
     else
     {
-        pFont =  pRoot->GetStyle().GetTextFont(iState);
+        pFont = pRoot->GetStyle().GetTextFont(iState);
         if (pFont)
             pRT->SelectObject(pFont, (IRenderObj **)&painter.oldFont);
     }
     COLORREF crTxt = GetStyle().GetTextColor(iState);
     if (crTxt != CR_INVALID)
         painter.oldTextColor = pRT->SetTextColor(crTxt);
-    else{
+    else
+    {
         painter.oldTextColor = pRT->SetTextColor(pRoot->GetStyle().GetTextColor(iState));
     }
 }
@@ -1344,7 +1347,7 @@ BOOL SMenuEx::EnableMenuItem(UINT uIDEnableItem, UINT uEnable)
         pItemRef->SetAttribute(L"enable", L"0");
     }
     else
-    {   
+    {
         pItemRef->SetAttribute(L"enable", L"1");
     }
     return TRUE;

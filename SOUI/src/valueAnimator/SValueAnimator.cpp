@@ -52,7 +52,7 @@ SValueAnimator::~SValueAnimator()
 
 void SValueAnimator::addAnimationCallback()
 {
-    if(mContainer)
+    if (mContainer)
         mContainer->RegisterValueAnimator(this); // this value animator will holded by mContainer.
 }
 

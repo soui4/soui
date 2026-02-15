@@ -2,8 +2,8 @@
 <SOUI name="mainWindow" title="@string/title" bigIcon="ICON_LOGO:48" smallIcon="ICON_LOGO:32" width="1377" height="900" margin="5,5,5,5" resizable="1" wndType="appMain"
       sendWheel2Hover="1">
 	<root colorBkgnd="#6f1111" padding="5,5,5,5">
-		<window pos="1,[1,-1,-1" colorBkgnd="@color/bkBlack1">
-			<caption pos="0,0,-0,40" name="UI_main_caption" show="1" font="adding:0" colorBkgnd="#FFFFFF20" layout="hbox" gravity="center">
+		<window pos="1,[1,-1,-1" colorBkgnd="@color/bkBlack1" layout="vbox">
+			<caption size="-2,30" name="UI_main_caption" show="1" font="adding:0" colorBkgnd="#FFFFFF20" layout="hbox" gravity="center">
 				<icon src="ICON_LOGO:32"/>
 				<text name="apptitle" class="ue_cls_title">@string/title</text>
 
@@ -16,8 +16,10 @@
 				</window>
 				<imgbtn name="btn_close" skin="_skin.sys.btn.close" tip="close" animate="1" />
 			</caption>
-			<img pos="0,[0, -0, @2" skin="skin_caption_line" />
-			<window pos="1,[1,-1,@34" colorBkgnd="@color/bkBlack1" layout="hbox" interval="10" gravity="center">
+			<img size="-2,2" skin="skin_caption_line" />
+			<toolbar name="tb_widget" size="-2,40" skin="skin_item_bk" dropArrowSkin="skin_dropdown" display="0" visible="0"/>
+			<toolbar name="tb_skin" size="-2,40" skin="skin_item_bk" dropArrowSkin="skin_dropdown" display="0" visible="0"/>
+			<window size="-2,34" colorBkgnd="@color/bkBlack1" layout="hbox" interval="10" gravity="center">
 				<imgbtnex name="toolbar_btn_Open" skin="skin_app_button" text="打开工程" size="100,30" animate="1" class="ue_cls_title" />
 				<imgbtnex name="toolbar_btn_recent" skin="skin_open_menu_png" text="" size="25,30" animate="1" margin-x="0" />
 				<imgbtnex name="toolbar_btn_Close" skin="skin_app_button" text="关闭工程" size="100,30" animate="1" class="ue_cls_title" />
@@ -27,7 +29,7 @@
 				<check name="chk_autosave" text="文件自动保存" colorText="@color/white"/>
 				<window size="0,0" weight="1" visible="0"/>
 			</window>
-			<splitcol name="NAME_UIDESIGNER_split_col" pos="0,[5,-0,-5" sepSkin="" sepSize="6">
+			<splitcol name="NAME_UIDESIGNER_split_col" size="-2,0" weight="1" sepSkin="" sepSize="6">
 				<pane idealSize="380" minSize="30" priority="1" clipClient="1">
 					<include src="layout:xml_mainwnd_left" />
 				</pane>

@@ -40,7 +40,7 @@
 
 #define IUNKNOWN_ADD_IID(iface) IUNKNOWN_ADD_IID2(__uuidof(iface), iface)
 
-#endif//IUNKNOWN_BEGIN
+#endif // IUNKNOWN_BEGIN
 
 class SUnknown {
   public:

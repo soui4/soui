@@ -51,10 +51,10 @@ typedef enum _SOUI_EVENTS
     EVT_ANIMATION_REPEAT, ///< 动画重复事件
     EVT_POS,              ///< 位置改变事件
     EVT_ANIMATOR_FRACTOR, ///< 数值动画事件
-    
+
     EVT_KEYDOWN = 8200, ///< 键盘按下事件
     EVT_KEYUP,          ///< 键盘释放事件
-    EVT_CHAR,            ///< 字符输入事件
+    EVT_CHAR,           ///< 字符输入事件
     EVT_SYSKEYDOWN,     ///< 系统键盘按下事件
     EVT_SYSKEYUP,       ///< 系统键盘释放事件
 
@@ -156,6 +156,8 @@ typedef enum _SOUI_EVENTS
     EVT_DROPDOWN_LIST_FILL = 22170,
     EVT_DROPDOWN_LIST_SELECTED,
     EVT_DROPDOWN_LIST_GET_BUDDY_RECT,
+
+    EVT_TB_ITEMCLICK = 22180,
 
     EVT_EXTERNAL_BEGIN = 10000000, ///< 外部事件开始ID
 } SOUI_EVENTS;
@@ -436,13 +438,13 @@ DEF_EVT(EventKeyDown, EVT_KEYDOWN, on_key_down, {
 
 DEF_EVT(EventKeyUp, EVT_KEYUP, on_key_up, {
     UINT nChar;   ///< 字符码
-    UINT nRepCnt; ///< 重复计数   
+    UINT nRepCnt; ///< 重复计数
     UINT nFlags;  ///< 标志
 })
 
 DEF_EVT(EventChar, EVT_CHAR, on_char, {
     UINT nChar;   ///< 字符码
-    UINT nRepCnt; ///< 重复计数   
+    UINT nRepCnt; ///< 重复计数
     UINT nFlags;  ///< 标志
 })
 
@@ -454,17 +456,18 @@ DEF_EVT(EventSysKeyDown, EVT_SYSKEYDOWN, on_sys_key_down, {
 
 DEF_EVT(EventSysKeyUp, EVT_SYSKEYUP, on_sys_key_up, {
     UINT nChar;   ///< 字符码
-    UINT nRepCnt; ///< 重复计数   
+    UINT nRepCnt; ///< 重复计数
     UINT nFlags;  ///< 标志
 })
-
-
 
 DEF_EVT(EventSwndMouseLeave, EVT_MOUSE_LEAVE, on_mouse_leave, { int fake; })
 
 DEF_EVT(EventSwndMouseHover, EVT_MOUSE_HOVER, on_mouse_hover, { int fake; })
 
-DEF_EVT(EventSwndMouseMove, EVT_MOUSE_MOVE, on_mouse_move, { int nFlags; POINT pt; })
+DEF_EVT(EventSwndMouseMove, EVT_MOUSE_MOVE, on_mouse_move, {
+    int nFlags;
+    POINT pt;
+})
 
 DEF_EVT(EventSwndUpdateTooltip, EVT_UPDATE_TOOLTIP, on_update_tooltip, {
     IStringT *strToolTip; ///< 工具提示字符串
@@ -758,6 +761,13 @@ DEF_EVT(EventDropdownListFill, EVT_DROPDOWN_LIST_FILL, on_dropdown_list_fill, {
 DEF_EVT(EventDropdownListSelected, EVT_DROPDOWN_LIST_SELECTED, on_dropdown_list_selected, {
     IListView *pListView;
     int nValue;
+})
+
+DEF_EVT(EventToolBarCmd, EVT_TB_ITEMCLICK, on_toolbar_cmd, {
+    int iItem;
+    int nCmdId;
+    const IStringT *strText;
+    LPARAM lParam;
 })
 
 SNSEND

@@ -854,7 +854,7 @@ BOOL SHostWnd::OnLoadLayoutFromResourceID(SXmlDoc &xmlDoc)
 
 SRootWindow *SHostWnd::CreateRoot()
 {
-    SRootWindow * pRet = new SRootWindow;
+    SRootWindow *pRet = new SRootWindow;
     pRet->SetHostWnd(this);
     return pRet;
 }

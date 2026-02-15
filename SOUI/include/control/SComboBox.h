@@ -1,4 +1,4 @@
-﻿#ifndef __SCOMBOBOX__H__
+#ifndef __SCOMBOBOX__H__
 #define __SCOMBOBOX__H__
 
 #include <control/SComboBase.h>
@@ -6,6 +6,17 @@
 #include <control/SCmnCtrl.h>
 
 SNSBEGIN
+
+namespace SComboBox_style
+{
+    static const LPCWSTR kStyle_listStyle = L"listStyle";
+    static const LPCWSTR kStyle_wndclass = L"wndclass";
+    static const LPCWSTR kStyle_items = L"items";
+    static const LPCWSTR kStyle_item = L"item";
+    static const LPCWSTR kStyle_text = L"text";
+    static const LPCWSTR kStyle_icon = L"icon";
+    static const LPCWSTR kStyle_data = L"data";
+}
 
 /**
  * @class SComboBox

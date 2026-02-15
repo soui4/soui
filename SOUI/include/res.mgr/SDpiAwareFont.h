@@ -24,7 +24,7 @@ class SOUI_EXP SDpiAwareFont {
      * @brief Retrieves the pointer to the current font object.
      * @return Pointer to the IFontS object.
      */
-    IFontS *GetFontPtr();
+    IFontS *GetFontPtr() const;
 
     /**
      * @brief Sets the font description and scale.

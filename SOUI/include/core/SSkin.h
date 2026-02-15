@@ -782,7 +782,8 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
     {
         rectangle,
         oval,
-        ring
+        ring,
+        polygon,
     };
 
     /**
@@ -1093,6 +1094,36 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
         float m_sweepAngle; // Sweep angle for the ring.
     };
 
+    class SShapePolygon : public TObjRefImpl<SObject> {
+        DEF_SOBJECT(TObjRefImpl<SObject>, L"polygon")
+        friend class SSkinShape;
+        enum { MAX_POINTS = 20 };
+      public:
+        SOUI_ATTRS_BEGIN()
+            ATTR_BOOL(L"close", m_bClosed, TRUE) // Close the polygon.
+        SOUI_ATTRS_END()
+
+        SShapePolygon():m_ptCount(0),m_bClosed(TRUE)
+        {
+        }
+
+        int GetPoints() const
+        {
+            return m_ptCount;
+        }
+
+        BOOL IsClosed() const
+        {
+            return m_bClosed;
+        }
+
+        STDMETHOD_(void, OnInitFinished)(THIS_ IXmlNode *pNode) OVERRIDE;
+
+      protected:
+        int m_ptCount; // Number of points in the polygon.
+        SPoint m_points[MAX_POINTS];
+        BOOL m_bClosed;
+    };
   public:
     SSkinShape();
 
@@ -1104,6 +1135,7 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
             ATTR_ENUM_VALUE(L"rectangle", rectangle)
             ATTR_ENUM_VALUE(L"oval", oval)
             ATTR_ENUM_VALUE(L"ring", ring)
+            ATTR_ENUM_VALUE(L"polygon", polygon)
         ATTR_ENUM_END(m_shape)
     SOUI_ATTRS_END()
   protected:
@@ -1124,6 +1156,7 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
     SAutoRefPtr<SRatioCornerSize> m_ratioCornerSize;
     SAutoRefPtr<SStroke> m_stroke;
     SAutoRefPtr<SShapeRing> m_ringParam;
+    SAutoRefPtr<SShapePolygon> m_polygon;
 };
 
 /**
@@ -1222,15 +1255,15 @@ class SOUI_EXP SSkinTreeLines : public SSkinObjBase {
     void _Scale(ISkinObj *skinObj, int nScale) override;
 
   protected:
-    COLORREF m_crLine; // Line color
+    COLORREF m_crLine;  // Line color
     COLORREF m_crCross; // Cross color for expand/collapse indicators
-    int m_nLineWidth;  // Line width
+    int m_nLineWidth;   // Line width
     int m_nBoxSize;     // Size of the expand/collapse box
   public:
     SOUI_ATTRS_BEGIN()
-        ATTR_COLOR(L"colorLine", m_crLine, TRUE)        // Line color
+        ATTR_COLOR(L"colorLine", m_crLine, TRUE) // Line color
         ATTR_COLOR(L"colorCross", m_crCross, TRUE)
-        ATTR_INT(L"lineWidth", m_nLineWidth, TRUE)  // Line width
+        ATTR_INT(L"lineWidth", m_nLineWidth, TRUE) // Line width
         ATTR_INT(L"boxSize", m_nBoxSize, TRUE)     // Expand/collapse box size)
     SOUI_ATTRS_END()
 };

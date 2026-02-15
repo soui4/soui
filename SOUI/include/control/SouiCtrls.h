@@ -29,6 +29,7 @@
 #include <control/SMenuBar.h>
 #include <control/SSwitch.h>
 #include <control/SSearchDropdownList.h>
+#include <control/SToolBar.h>
 #ifdef _WIN32
 #include <control/SActiveX.h>
 #endif //_WIN32

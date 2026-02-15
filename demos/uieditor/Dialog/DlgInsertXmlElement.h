@@ -2,7 +2,6 @@
 #include "propgrid/SPropertyGrid.h"
 #include "spugixml/pugixml.hpp"
 #include "ScintillaWnd.h"
-#include "SToolBar.h"
 #include "ResManger.h"
 
 namespace SOUI{

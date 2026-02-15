@@ -10,7 +10,6 @@
 
 #include <interface/obj-ref-i.h>
 
-
 SNSBEGIN
 
 typedef struct IWindow IWindow;
@@ -53,7 +52,7 @@ DECLARE_INTERFACE_(IPropertyValuesHolder, IObjRef)
      * @details This method is intended to perform any necessary cleanup before the object is deleted.
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
-    
+
     //--------------------------------------------------------------------------
     /**
      * @brief 设置属性名称
@@ -156,14 +155,13 @@ DECLARE_INTERFACE_(IPropertyValuesHolder, IObjRef)
      * @return 分段内动画进度（0.0-1.0）
      */
     STDMETHOD_(float, Fraction2Index)(CTHIS_ float fraction, int idx[2]) SCONST PURE;
-    
+
     /**
      * @brief 将动画进度转换为帧索引
      * @param fraction 动画进度(0.0-1.0)
      * @return 帧索引
      */
     STDMETHOD_(int, Fraction2FrameIndex)(CTHIS_ float fraction) SCONST PURE;
-
 
     /**
      * @brief 通过索引获取值
@@ -197,7 +195,6 @@ DECLARE_INTERFACE_(IPropertyValuesHolder, IObjRef)
      */
     STDMETHOD_(BOOL, GetKeyFrameWeights)(CTHIS_ float *weights, int count) SCONST PURE;
 };
-
 
 DECLARE_INTERFACE_(IPropertyAnimator, IValueAnimator)
 {
@@ -411,49 +408,49 @@ DECLARE_INTERFACE_(IPropertyAnimator, IValueAnimator)
      */
     STDMETHOD_(void, SetUserData)(THIS_ LPVOID pUserData) PURE;
     //------------------------------------------------------------------------------
-    
+
     /**
      * @brief 获取动画目标
      * @return 动画目标
      */
-    STDMETHOD_(IWindow *,GetTarget)(CTHIS) SCONST PURE;
+    STDMETHOD_(IWindow *, GetTarget)(CTHIS) SCONST PURE;
 
     /**
      * @brief 设置动画目标
      * @param target 动画目标
      */
-    STDMETHOD_(void,SetTarget)(THIS_ IWindow *target) PURE;
+    STDMETHOD_(void, SetTarget)(THIS_ IWindow * target) PURE;
 
     /**
      * @brief 设置属性值持有者
      * @param pHolder 属性值持有者
      */
-    STDMETHOD_(void,SetPropertyValuesHolder)(THIS_ IPropertyValuesHolder *pHolder) PURE;
+    STDMETHOD_(void, SetPropertyValuesHolder)(THIS_ IPropertyValuesHolder * pHolder) PURE;
     /**
      * @brief 设置属性值持有者数组
      * @param pHolders 属性值持有者数组
      * @param count 属性值持有者数量
      */
-    STDMETHOD_(void,SetPropertyValuesHolders)(THIS_ IPropertyValuesHolder **pHolders, int count) PURE; 
+    STDMETHOD_(void, SetPropertyValuesHolders)(THIS_ IPropertyValuesHolder * *pHolders, int count) PURE;
     /**
      * @brief 获取属性值持有者
      * @param propertyName 属性名称
      * @return 属性值持有者
      */
-    STDMETHOD_(IPropertyValuesHolder *,GetPropertyValuesHolderByName)(CTHIS_ LPCWSTR propertyName) SCONST PURE;
+    STDMETHOD_(IPropertyValuesHolder *, GetPropertyValuesHolderByName)(CTHIS_ LPCWSTR propertyName) SCONST PURE;
 
     /**
      * @brief 获取属性值持有者
      * @param index 索引
      * @return 属性值持有者
      */
-    STDMETHOD_(IPropertyValuesHolder *,GetPropertyValuesHolderByIndex)(CTHIS_ int index) SCONST PURE;
+    STDMETHOD_(IPropertyValuesHolder *, GetPropertyValuesHolderByIndex)(CTHIS_ int index) SCONST PURE;
 
     /**
      * @brief 获取属性值持有者数量
      * @return 属性值持有者数量
      */
-    STDMETHOD_(int,GetPropertyValuesHolderCount)(CTHIS) SCONST PURE;
+    STDMETHOD_(int, GetPropertyValuesHolderCount)(CTHIS) SCONST PURE;
 };
 
 SNSEND

@@ -107,16 +107,17 @@ class SOUI_EXP SPropertyAnimator
     , protected IAnimatorListener {
     DEF_SOBJECT(SValueAnimator, L"propertyAnimator")
   public:
-    SPropertyAnimator(IWindow *pTarget=NULL);
+    SPropertyAnimator(IWindow *pTarget = NULL);
     virtual ~SPropertyAnimator();
 
   public:
     // IPropertyAnimator接口实现
-    STDMETHOD_(IWindow *,GetTarget)(CTHIS) SCONST OVERRIDE
+    STDMETHOD_(IWindow *, GetTarget)(CTHIS) SCONST OVERRIDE
     {
         return m_pTarget;
     }
-    STDMETHOD_(void,SetTarget)(THIS_ IWindow *target) OVERRIDE{
+    STDMETHOD_(void, SetTarget)(THIS_ IWindow *target) OVERRIDE
+    {
         m_pTarget = target;
     }
 
@@ -124,16 +125,17 @@ class SOUI_EXP SPropertyAnimator
     STDMETHOD_(void, SetPropertyValuesHolders)(THIS_ IPropertyValuesHolder **pHolders, int count) OVERRIDE;
     STDMETHOD_(IPropertyValuesHolder *, GetPropertyValuesHolderByName)(CTHIS_ LPCWSTR propertyName) SCONST OVERRIDE;
     STDMETHOD_(IPropertyValuesHolder *, GetPropertyValuesHolderByIndex)(CTHIS_ int index) SCONST OVERRIDE;
-    STDMETHOD_(int, GetPropertyValuesHolderCount)(CTHIS) SCONST OVERRIDE{
+    STDMETHOD_(int, GetPropertyValuesHolderCount)(CTHIS) SCONST OVERRIDE
+    {
         return m_propertyHolders.GetCount();
     }
 
   public:
-  // SValueAnimator接口实现
+    // SValueAnimator接口实现
     STDMETHOD_(void, copy)(THIS_ const IValueAnimator *pAnimator) OVERRIDE;
     STDMETHOD_(IValueAnimator *, clone)(CTHIS) SCONST OVERRIDE;
     STDMETHOD_(void, onEvaluateValue)(THIS_ float fraction) OVERRIDE;
-  
+
   protected:
     // IAnimatorListener接口实现
     STDMETHOD_(void, onAnimationStart)(THIS_ IValueAnimator *pAnimator) OVERRIDE;
@@ -152,7 +154,7 @@ class SOUI_EXP SPropertyAnimator
 
   private:
     SAutoRefPtr<IWindow> m_pTarget;
-    SArray<SAutoRefPtr<IPropertyValuesHolder> > m_propertyHolders;
+    SArray<SAutoRefPtr<IPropertyValuesHolder>> m_propertyHolders;
 };
 
 SNSEND

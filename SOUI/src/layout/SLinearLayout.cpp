@@ -5,6 +5,25 @@
 
 SNSBEGIN
 
+Gravity SLinearLayoutParam::parseGravity(const SStringW &strValue)
+{
+    struct ValueMap
+    {
+        Gravity gravity;
+        LPCWSTR pszGravity;
+    } map[] = {
+        { G_Left, L"left" }, { G_Top, L"top" }, { G_Center, L"center" }, { G_Right, L"right" }, { G_Bottom, L"bottom" },
+    };
+
+    for (int i = 0; i < ARRAYSIZE(map); i++)
+    {
+        if (strValue.CompareNoCase(map[i].pszGravity) == 0)
+        {
+            return map[i].gravity;
+        }
+    }
+    return G_Undefined;
+}
 SLinearLayoutParam::SLinearLayoutParam()
 {
     Clear();

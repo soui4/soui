@@ -1,4 +1,4 @@
-﻿#ifndef __STREEVIEW__H__
+#ifndef __STREEVIEW__H__
 #define __STREEVIEW__H__
 
 #include <core/SWnd.h>
@@ -9,6 +9,11 @@
 #include <proxy/SPanelProxy.h>
 
 SNSBEGIN
+
+namespace STreeView_style
+{
+    static const LPCWSTR kStyle_template = L"template";
+}
 
 /**
  * @class STreeViewItemLocator
@@ -315,7 +320,6 @@ class SOUI_EXP STreeView
      * @return Handle to the selected item.
      */
     STDMETHOD_(HSTREEITEM, GetSel)(THIS) SCONST OVERRIDE;
-    
 
     /**
      * @brief Ensures an item is visible.
@@ -335,30 +339,30 @@ class SOUI_EXP STreeView
      * @param bMultiSel TRUE to enable multiple selection, FALSE otherwise.
      */
     STDMETHOD_(void, SetMultiSel)(THIS_ BOOL bMultiSel) OVERRIDE;
-    
+
     /**
      * @brief Gets the multiple selection mode.
      * @return TRUE if multiple selection is enabled, FALSE otherwise.
      */
     STDMETHOD_(BOOL, GetMultiSel)(THIS) SCONST OVERRIDE;
-    
+
     /**
      * @brief Adds an item to the selection.
      * @param hItem Handle to the item.
      */
     STDMETHOD_(void, AddSelItem)(THIS_ HSTREEITEM hItem) OVERRIDE;
-    
+
     /**
      * @brief Removes an item from the selection.
      * @param hItem Handle to the item.
      */
     STDMETHOD_(void, RemoveSelItem)(THIS_ HSTREEITEM hItem) OVERRIDE;
-    
+
     /**
      * @brief Clears all selected items.
      */
     STDMETHOD_(void, ClearSelItems)(THIS) OVERRIDE;
-    
+
     /**
      * @brief Checks if an item is selected.
      * @param hItem Handle to the item.
@@ -704,7 +708,7 @@ class SOUI_EXP STreeView
     BOOL m_bMultiSel;                  /**< Flag indicating if multiple selection is enabled. */
     SAutoRefPtr<ISkinObj> m_pLineSkin; /**< Skin for the lines. */
     SLayoutSize m_indent;              /**< Indentation between levels. */
-    
+
     typedef SMap<HSTREEITEM, BOOL> ItemSelectionMap;
     ItemSelectionMap m_mapSelItems; /**< Map of selected items. */
 };

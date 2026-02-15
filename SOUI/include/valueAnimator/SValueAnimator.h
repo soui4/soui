@@ -160,11 +160,12 @@ class SOUI_EXP SValueAnimator
     void *m_pUserData;
 
     /**
-    * NOTE: Due to multiple inheritance paths to IValueAnimator in subclasses
-    * (e.g., TValueAnimatorProxy<T> inherits both T and SValueAnimator),
-    * we cache _this_for_callback to avoid pointer offset issues in listener callbacks.
+     * NOTE: Due to multiple inheritance paths to IValueAnimator in subclasses
+     * (e.g., TValueAnimatorProxy<T> inherits both T and SValueAnimator),
+     * we cache _this_for_callback to avoid pointer offset issues in listener callbacks.
      */
-    IValueAnimator * _this_for_callback; 
+    IValueAnimator *_this_for_callback;
+
   public:
     /**
      * @brief Creates a new SValueAnimator object.
@@ -470,7 +471,8 @@ class SOUI_EXP SValueAnimator
      * @param frameTime The current frame time.
      * @return TRUE if the animation is finished, FALSE otherwise.
      */
-    STDMETHOD_(BOOL, commitAnimationFrame)(THIS_ uint64_t frameTime) OVERRIDE;  public:
+    STDMETHOD_(BOOL, commitAnimationFrame)(THIS_ uint64_t frameTime) OVERRIDE;
+  public:
     /**
      * @brief Returns the current animation fraction.
      * @details This is the elapsed/interpolated fraction used in the most recent frame update on the animation.

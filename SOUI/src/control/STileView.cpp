@@ -740,7 +740,7 @@ void STileView::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
     if (nNewSelItem != -1)
     {
         EnsureVisible(nNewSelItem);
-        
+
         if (bMultiSelMode)
         {
             if (bCtrlPressed)
@@ -844,14 +844,14 @@ SItemPanel *STileView::GetItemPanel(int iItem)
 
 BOOL STileView::CreateChildren(SXmlNode xmlNode)
 {
-    SXmlNode xmlTemplate = xmlNode.child(L"template");
+    SXmlNode xmlTemplate = xmlNode.child(STileView_style::kStyle_template);
     if (xmlTemplate)
     {
         m_xmlTemplate.Reset();
         m_xmlTemplate.root().append_copy(xmlTemplate);
         {
             //创建一个定位器
-            STileViewItemLocator *pItemLocator = new STileViewItemLocator(this, xmlTemplate.attribute(L"itemHeight").as_string(L"10dp"), xmlTemplate.attribute(L"itemWidth").as_string(L"10dp"), m_nMarginSize);
+            STileViewItemLocator *pItemLocator = new STileViewItemLocator(this, xmlTemplate.attribute(STileView_style::kStyle_itemHeight).as_string(L"10dp"), xmlTemplate.attribute(STileView_style::kStyle_itemWidth).as_string(L"10dp"), m_nMarginSize);
             SetItemLocator(pItemLocator);
             pItemLocator->Release();
         }
@@ -998,7 +998,6 @@ BOOL STileView::OnSetCursor(const CPoint &pt)
     return bRet;
 }
 
-
 void STileView::OnColorize(COLORREF cr)
 {
     __baseCls::OnColorize(cr);
@@ -1084,35 +1083,43 @@ int STileView::GetSel() const
     return m_iSelItem;
 }
 
-void STileView::SetMultiSel(BOOL bMultiSel) {
+void STileView::SetMultiSel(BOOL bMultiSel)
+{
     SViewBase::SetMultiSel(bMultiSel);
 }
 
-BOOL STileView::GetMultiSel() const {
+BOOL STileView::GetMultiSel() const
+{
     return SViewBase::GetMultiSel();
 }
 
-void STileView::AddSelItem(int iItem) {
+void STileView::AddSelItem(int iItem)
+{
     SViewBase::AddSelItem(iItem);
 }
 
-void STileView::RemoveSelItem(int iItem) {
+void STileView::RemoveSelItem(int iItem)
+{
     SViewBase::RemoveSelItem(iItem);
 }
 
-void STileView::ClearSelItems() {
+void STileView::ClearSelItems()
+{
     SViewBase::ClearSelItems();
 }
 
-BOOL STileView::IsItemSelected(int iItem) const {
+BOOL STileView::IsItemSelected(int iItem) const
+{
     return SViewBase::IsItemSelected(iItem);
 }
 
-int STileView::GetSelItemCount() const {
+int STileView::GetSelItemCount() const
+{
     return SViewBase::GetSelItemCount();
 }
 
-int STileView::GetSelItems(int *items, int nMaxCount) const {
+int STileView::GetSelItems(int *items, int nMaxCount) const
+{
     return SViewBase::GetSelItems(items, nMaxCount);
 }
 SNSEND

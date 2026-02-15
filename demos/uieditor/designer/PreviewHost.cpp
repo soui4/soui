@@ -10,6 +10,7 @@
 #include <layout/SLinearLayout.h>
 #include <layout/SGridLayout.h>
 #include <layout/SAnchorLayout.h>
+#include <layout/SFlowLayout.h>
 
 #define kLogTag "CPreviewHost"
 

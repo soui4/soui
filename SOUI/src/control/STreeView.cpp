@@ -509,7 +509,7 @@ BOOL STreeView::SetAdapter(ITvAdapter *adapter)
 
 BOOL STreeView::CreateChildren(SXmlNode xmlNode)
 {
-    SXmlNode xmlTemplate = xmlNode.child(L"template");
+    SXmlNode xmlTemplate = xmlNode.child(STreeView_style::kStyle_template);
     if (xmlTemplate)
     {
         m_xmlTemplate.Reset();
@@ -683,10 +683,10 @@ void STreeView::SetSel(HSTREEITEM hItem, BOOL bNotify /*=FALSE*/)
             pItem->SetSelected(FALSE);
             RedrawItem(pItem);
         }
-        
+
         // Update selection map
         ClearSelItems();
-        
+
         // Set new selection
         m_hSelected = hItem;
         if (hItem != ITEM_NULL)
@@ -707,7 +707,7 @@ void STreeView::SetSel(HSTREEITEM hItem, BOOL bNotify /*=FALSE*/)
         {
             // Clear old selection
             ClearSelItems();
-            
+
             // Select new item
             m_hSelected = hItem;
             AddSelItem(hItem);
@@ -844,7 +844,7 @@ void STreeView::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
     if (nNewSelItem != ITEM_NULL)
     {
         EnsureVisible(nNewSelItem);
-        
+
         if (bMultiSelMode)
         {
             if (bCtrlPressed)
@@ -1007,13 +1007,13 @@ void STreeView::UpdateVisibleItems()
             {
                 m_pHoverItem->DoFrameEvent(WM_MOUSELEAVE, 0, 0);
                 m_pHoverItem = NULL;
-                //SSLOGI() << "m_pHoverItem = " << m_pHoverItem;
+                // SSLOGI() << "m_pHoverItem = " << m_pHoverItem;
             }
 
             ii.pItem->GetEventSet()->setMutedState(true);
             if (ii.pItem->IsSelected())
             {
-                ii.pItem->SetSelected(FALSE,FALSE);
+                ii.pItem->SetSelected(FALSE, FALSE);
                 ii.pItem->GetFocusManager()->ClearFocus();
             }
             ii.pItem->SetVisible(FALSE); // 防止执行SItemPanel::OnTimeFrame()
@@ -1069,7 +1069,7 @@ void STreeView::UpdateVisibleItems()
         m_pVisibleMap->SetAt(hItem, ii);
         ii.pItem->SetVisible(TRUE);
 
-        ii.pItem->SetSelected(IsItemSelected(hItem),FALSE);
+        ii.pItem->SetSelected(IsItemSelected(hItem), FALSE);
 
         if (m_pHoverItem && hItem == (HSTREEITEM)m_pHoverItem->GetItemIndex())
             ii.pItem->ModifyItemState(WndState_Hover, 0);
@@ -1113,8 +1113,7 @@ void STreeView::UpdateVisibleItems()
         {
             m_pHoverItem->DoFrameEvent(WM_MOUSELEAVE, 0, 0);
             m_pHoverItem = NULL;
-            //SSLOGI() << "m_pHoverItem = " << m_pHoverItem;
-
+            // SSLOGI() << "m_pHoverItem = " << m_pHoverItem;
         }
 
         ii.pItem->GetEventSet()->setMutedState(true);
@@ -1292,8 +1291,7 @@ void STreeView::onItemBeforeRemove(HSTREEITEM hItem)
         {
             m_pHoverItem->DoFrameEvent(WM_MOUSELEAVE, 0, 0);
             m_pHoverItem = NULL;
-            //SSLOGI() << "m_pHoverItem = " << m_pHoverItem;
-
+            // SSLOGI() << "m_pHoverItem = " << m_pHoverItem;
         }
     }
     if (m_itemCapture)
@@ -1345,7 +1343,7 @@ LRESULT STreeView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
         {
             SOsrPanel *oldHover = m_pHoverItem;
             m_pHoverItem = pHover;
-//            SSLOGI() << "m_pHoverItem = " << m_pHoverItem;
+            //            SSLOGI() << "m_pHoverItem = " << m_pHoverItem;
 
             if (oldHover)
             {
@@ -1386,7 +1384,7 @@ void STreeView::OnMouseLeave()
     {
         m_pHoverItem->DoFrameEvent(WM_MOUSELEAVE, 0, 0);
         m_pHoverItem = NULL;
-        //SSLOGI() << "m_pHoverItem = " << m_pHoverItem;
+        // SSLOGI() << "m_pHoverItem = " << m_pHoverItem;
     }
 }
 
@@ -1485,11 +1483,13 @@ BOOL STreeView::OnItemClickUp(IEvtArgs *pEvt)
         return TRUE;
     UINT uKeyFlags = GetKeyState(VK_CONTROL) & 0x8000 ? MK_CONTROL : 0;
     uKeyFlags |= GetKeyState(VK_SHIFT) & 0x8000 ? MK_SHIFT : 0;
-    if(uKeyFlags == 0){
+    if (uKeyFlags == 0)
+    {
         SItemPanel *pItemPanel = sobj_cast<SItemPanel>(pEvt->Sender());
         HSTREEITEM hItem = (HSTREEITEM)pItemPanel->GetItemIndex();
-        if(GetSelItemCount() > 1){
-            //remove other selected items
+        if (GetSelItemCount() > 1)
+        {
+            // remove other selected items
             SetSel(hItem, TRUE);
         }
     }
@@ -1499,11 +1499,12 @@ BOOL STreeView::OnItemClickUp(IEvtArgs *pEvt)
 BOOL STreeView::OnItemClick(IEvtArgs *pEvt)
 {
     EventItemPanelClick *pClickEvt = sobj_cast<EventItemPanelClick>(pEvt);
-    if (!pClickEvt) return TRUE;
-    
+    if (!pClickEvt)
+        return TRUE;
+
     SItemPanel *pItemPanel = sobj_cast<SItemPanel>(pEvt->Sender());
     HSTREEITEM hItem = (HSTREEITEM)pItemPanel->GetItemIndex();
-    
+
     if (!m_bMultiSel)
     {
         // Single selection mode
@@ -1517,7 +1518,7 @@ BOOL STreeView::OnItemClick(IEvtArgs *pEvt)
         // Multi selection mode
         UINT uKeyFlags = GetKeyState(VK_CONTROL) & 0x8000 ? MK_CONTROL : 0;
         uKeyFlags |= GetKeyState(VK_SHIFT) & 0x8000 ? MK_SHIFT : 0;
-        
+
         if (uKeyFlags & MK_CONTROL)
         {
             // Ctrl + click: toggle selection
@@ -1539,7 +1540,7 @@ BOOL STreeView::OnItemClick(IEvtArgs *pEvt)
                 // Get the current selected item and the clicked item
                 HSTREEITEM hStart = m_hSelected;
                 HSTREEITEM hEnd = hItem;
-                
+
                 // Select all visible items between hStart and hEnd
                 // First, collect all visible items
                 SArray<HSTREEITEM> visibleItems;
@@ -1549,7 +1550,7 @@ BOOL STreeView::OnItemClick(IEvtArgs *pEvt)
                     visibleItems.Add(hCurrent);
                     hCurrent = m_adapter->GetNextVisibleItem(hCurrent);
                 }
-                
+
                 // Find the indices of hStart and hEnd in the visible items list
                 int nStartIndex = -1, nEndIndex = -1;
                 for (int i = 0; i < visibleItems.GetCount(); i++)
@@ -1563,13 +1564,13 @@ BOOL STreeView::OnItemClick(IEvtArgs *pEvt)
                         nEndIndex = i;
                     }
                 }
-                
+
                 // If both items are found, select the range
                 if (nStartIndex != -1 && nEndIndex != -1)
                 {
                     int nMin = smin(nStartIndex, nEndIndex);
                     int nMax = smax(nStartIndex, nEndIndex);
-                    
+
                     for (int i = nMin; i <= nMax; i++)
                     {
                         AddSelItem(visibleItems[i]);
@@ -1591,13 +1592,13 @@ BOOL STreeView::OnItemClick(IEvtArgs *pEvt)
         else
         {
             // Single click: clear all and select clicked item
-            if(!IsItemSelected(hItem))
+            if (!IsItemSelected(hItem))
             {
                 SetSel(hItem, TRUE);
             }
         }
     }
-    
+
     return TRUE;
 }
 
@@ -1746,10 +1747,11 @@ BOOL STreeView::GetMultiSel() const
 
 void STreeView::AddSelItem(HSTREEITEM hItem)
 {
-    if (hItem == ITEM_NULL) return;
-    
+    if (hItem == ITEM_NULL)
+        return;
+
     m_mapSelItems[hItem] = TRUE;
-    
+
     // Update the visible item's state
     SItemPanel *pItem = GetItemPanel(hItem);
     if (pItem)
@@ -1761,10 +1763,11 @@ void STreeView::AddSelItem(HSTREEITEM hItem)
 
 void STreeView::RemoveSelItem(HSTREEITEM hItem)
 {
-    if (hItem == ITEM_NULL) return;
-    
+    if (hItem == ITEM_NULL)
+        return;
+
     m_mapSelItems.RemoveKey(hItem);
-    
+
     // Update the visible item's state
     SItemPanel *pItem = GetItemPanel(hItem);
     if (pItem)
@@ -1782,23 +1785,24 @@ void STreeView::ClearSelItems()
         HSTREEITEM hItem;
         BOOL bVal;
         m_mapSelItems.GetNextAssoc(pos, hItem, bVal);
-        
+
         SItemPanel *pItem = GetItemPanel(hItem);
         if (pItem)
         {
-            SSLOGI() << "Clearing selection for item: " << hItem << " state="<<pItem->GetState();
+            SSLOGI() << "Clearing selection for item: " << hItem << " state=" << pItem->GetState();
             pItem->ModifyItemState(0, WndState_Check);
             RedrawItem(pItem);
         }
     }
-    
+
     m_mapSelItems.RemoveAll();
 }
 
 BOOL STreeView::IsItemSelected(HSTREEITEM hItem) const
 {
-    if (hItem == ITEM_NULL) return FALSE;
-    
+    if (hItem == ITEM_NULL)
+        return FALSE;
+
     const ItemSelectionMap::CPair *pVal = m_mapSelItems.Lookup(hItem);
     return pVal && pVal->m_value;
 }

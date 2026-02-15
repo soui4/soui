@@ -1,4 +1,4 @@
-ï»¿// Microsoft Visual C++ generated resource script.
+// Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
 
@@ -11,7 +11,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// ä¸­æ–‡(ä¸­åäººæ°‘å…±å’Œå›½) resources
+// ÖĞÎÄ(ÖĞ»ªÈËÃñ¹²ºÍ¹ú) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 #ifdef _WIN32
@@ -41,7 +41,7 @@ BEGIN
 "LANGUAGE 4, 2\r\n"
 "#pragma code_page(936)\r\n"
 #ifndef _DEBUG
-"#include ""res\\soui_res.rc2"" //SOUIèµ„æº\r\n"
+"#include ""res\\soui_res.rc2"" //SOUI×ÊÔ´\r\n"
 #endif
 "#endif\r\n"
 END
@@ -87,7 +87,7 @@ END
 END
 
 
-#endif    // ä¸­æ–‡(ä¸­åäººæ°‘å…±å’Œå›½) resources
+#endif    // ÖĞÎÄ(ÖĞ»ªÈËÃñ¹²ºÍ¹ú) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -101,7 +101,7 @@ END
 LANGUAGE 4, 2
 #pragma code_page(936)
 #ifndef _DEBUG
-#include "res\\soui_res.rc2" //SOUIèµ„æº\r\n"
+#include "res\\soui_res.rc2" //SOUI×ÊÔ´\r\n"
 #endif
 #endif
 /////////////////////////////////////////////////////////////////////////////

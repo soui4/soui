@@ -12,187 +12,13 @@
 #include <vector>
 #include <control/STreeCtrl.h>
 #include "DropTarget.h"
-#include "SToolBar.h"
+#include <control/SToolBar.h>
 #include <algorithm>
 #include "FileTreeAdapter.h"
 #include "monitor/PathMonitor.h"
 #define MenuId_Start  20000
 
-
-class CWidgetTBAdapter : public SAdapterBase
-{
-public:
-	struct IconInfo{
-		int iIcon;
-		SStringT strTxt;
-		SStringT strTip;
-		SStringT strElement;
-		SStringA strContent;
-	};
-	struct IListener{
-		virtual void OnInsertWidget(IconInfo *info) = 0;
-	};
-	SAutoRefPtr<SSkinPool> m_skinPool;
-public:
-	static bool Compare(const IconInfo &a,const IconInfo &b){
-		return a.strTxt < b.strTxt;
-	}
-	CWidgetTBAdapter(SXmlNode xmlNode,IListener* pListener):m_pListener(pListener)
-	{
-		m_skinPool.Attach(new SSkinPool());
-		SUiDef::getSingleton().PushSkinPool(m_skinPool);
-		SXmlNode xmlIconSkin = xmlNode.child(L"toolbar").child(L"icons");
-		ISkinObj *pSkin = SApplication::getSingleton().CreateSkinByName(xmlIconSkin.attribute(L"class_name").as_string(SSkinImgList::GetClassName()));
-		if(pSkin)
-		{
-			pSkin->InitFromXml(&xmlIconSkin);
-			m_skinPool->AddSkin(pSkin);
-			pSkin->Release();
-		}
-		SXmlNode xmlWidget = xmlNode.child(L"controls").first_child();
-		while(xmlWidget)
-		{
-			if(xmlWidget.attribute(L"visible").as_bool(true))
-			{
-				IconInfo info;
-				info.iIcon = xmlWidget.attribute(L"icon").as_int(0);
-				info.strElement = S_CW2T(xmlWidget.name());
-				if(xmlWidget.attribute(L"text"))
-					info.strTxt=S_CW2T(xmlWidget.attribute(L"text").as_string());
-				else
-					info.strTxt = S_CW2T(xmlWidget.name());
-				info.strTip = S_CW2T(xmlWidget.attribute(L"tip").as_string());
-				SStringW strContent;
-				xmlWidget.child(xmlWidget.name()).ToString(&strContent); 
-				info.strContent = S_CW2A(strContent,CP_UTF8);
-				m_arrIcons.Add(info);
-			}
-			xmlWidget = xmlWidget.next_sibling();
-		}
-		//sort m_arrIcons by strTxt
-		std::sort(m_arrIcons.GetData(),m_arrIcons.GetData()+m_arrIcons.GetCount(),Compare);
-	}
-	~CWidgetTBAdapter(){
-		SUiDef::getSingleton().PopSkinPool(m_skinPool);
-	}
-protected:
-	virtual int WINAPI getCount()
-	{
-		return m_arrIcons.GetCount();
-	}
-
-	virtual void WINAPI getView(int position, SItemPanel * pItem, SXmlNode xmlTemplate)
-	{
-		if(pItem->GetChildrenCount()==0)
-		{
-			pItem->InitFromXml(&xmlTemplate);
-		}
-		SImageWnd *pIcon = pItem->FindChildByName2<SImageWnd>(L"item_icon");
-		if(pIcon) pIcon->SetIcon(m_arrIcons[position].iIcon);
-		SWindow *pTxt = pItem->FindChildByName(L"item_text");
-		if(pTxt) pTxt->SetWindowText(m_arrIcons[position].strTxt);
-		pItem->GetEventSet()->subscribeEvent(EventItemPanelClickUp::EventID,Subscriber(&CWidgetTBAdapter::OnItemClickUp,this));
-	}
-
-	BOOL OnItemClickUp(IEvtArgs *e)
-	{
-		SItemPanel *pItem = sobj_cast<SItemPanel>(e->Sender());
-		int iItem = pItem->GetItemIndex();
-		m_pListener->OnInsertWidget(&m_arrIcons[iItem]);
-		return true;
-	}
-private:
-	SArray<IconInfo> m_arrIcons;
-	IListener * m_pListener;
-};
-
-
-class CSkinTBAdapter : public SAdapterBase
-{
-	SAutoRefPtr<SSkinPool> m_skinPool;
-public:
-	struct IconInfo{
-		int iIcon;
-		SStringT strTxt;
-		SStringT strElement;
-		SStringT strTip;
-	};
-
-	struct IListener
-	{
-		virtual void OnInertSkin(IconInfo * info) = 0;
-	};
-	static bool Compare(const IconInfo &a,const IconInfo &b){
-		return a.strTxt < b.strTxt;
-	}
-public:
-	~CSkinTBAdapter(){
-		SUiDef::getSingleton().PopSkinPool(m_skinPool);
-	}
-	CSkinTBAdapter(SXmlNode xmlNode, IListener * pListener):m_pListener(pListener)
-	{
-		m_skinPool.Attach(new SSkinPool());
-		SUiDef::getSingleton().PushSkinPool(m_skinPool);
-		SXmlNode xmlIconSkin = xmlNode.child(L"toolbar").child(L"icons");
-		ISkinObj *pSkin = SApplication::getSingleton().CreateSkinByName(xmlIconSkin.attribute(L"class_name").as_string(SSkinImgList::GetClassName()));
-		if(pSkin)
-		{
-			pSkin->InitFromXml(&xmlIconSkin);
-			m_skinPool->AddSkin(pSkin);
-			pSkin->Release();
-		}
-		SXmlNode xmlSkin = xmlNode.child(L"skins").first_child();
-		while(xmlSkin)
-		{
-			if(xmlSkin.attribute(L"visible").as_bool(true))
-			{
-				IconInfo info;
-				info.iIcon = xmlSkin.attribute(L"icon").as_int(0);
-				info.strElement = S_CW2T(xmlSkin.name());
-				if(xmlSkin.attribute(L"text"))
-					info.strTxt=S_CW2T(xmlSkin.attribute(L"text").as_string());
-				else
-					info.strTxt = S_CW2T(xmlSkin.name());
-				info.strTip = S_CW2T(xmlSkin.attribute(L"tip").as_string());
-				m_arrIcons.Add(info);
-			}
-			xmlSkin = xmlSkin.next_sibling();
-		}
-		//sort m_arrIcons by strTxt
-		std::sort(m_arrIcons.GetData(),m_arrIcons.GetData()+m_arrIcons.GetCount(),Compare);
-	}
-protected:
-	virtual int WINAPI getCount()
-	{
-		return m_arrIcons.GetCount();
-	}
-
-	virtual void WINAPI getView(int position, SItemPanel * pItem, SXmlNode xmlTemplate)
-	{
-		if(pItem->GetChildrenCount()==0)
-		{
-			pItem->InitFromXml(&xmlTemplate);
-		}
-		SImageWnd *pIcon = pItem->FindChildByName2<SImageWnd>(L"item_icon");
-		if(pIcon) pIcon->SetIcon(m_arrIcons[position].iIcon);
-		SWindow *pTxt = pItem->FindChildByName(L"item_text");
-		if(pTxt) pTxt->SetWindowText(m_arrIcons[position].strTxt);
-		pItem->GetEventSet()->subscribeEvent(EventItemPanelClickUp::EventID,Subscriber(&CSkinTBAdapter::OnItemClickUp,this));
-	}
-
-	BOOL OnItemClickUp(IEvtArgs *e)
-	{
-		SItemPanel *pItem = sobj_cast<SItemPanel>(e->Sender());
-		int iItem = pItem->GetItemIndex();
-		m_pListener->OnInertSkin(&m_arrIcons[iItem]);
-		return true;
-	}
-private:
-	SArray<IconInfo> m_arrIcons;
-	IListener * m_pListener;
-};
-
-class CMainDlg : public SHostWnd, CScintillaWnd::IListener,public CDropTarget::IDropListener, CWidgetTBAdapter::IListener, CSkinTBAdapter::IListener, CPathMonitor::IListener
+class CMainDlg : public SHostWnd, CScintillaWnd::IListener,public CDropTarget::IDropListener,  CPathMonitor::IListener
 {
 public:
 	CMainDlg();
@@ -217,13 +43,13 @@ protected:
 	bool CheckSave();
 
 	BOOL NewLayout(const SStringT& strPath, const SStringT& strName);
+	void InitWidgetToolbar();
+	void InitSkinToolbar();
 protected:
 	void onScintillaSave(CScintillaWnd *pSci,LPCTSTR pszFileName) override;
 	void onScintillaAutoComplete(CScintillaWnd *pSci,char c) override;
 protected:
 	BOOL OnDrop(LPCTSTR pszName) override;
-	void OnInsertWidget(CWidgetTBAdapter::IconInfo *info) override;
-	void OnInertSkin(CSkinTBAdapter::IconInfo * info) override;
 protected:
 	//soui消息
 	void OnAutoCheck(IEvtArgs *e);
@@ -327,8 +153,8 @@ public:
 	CImageViewer *m_pImageViewer;
 	int		m_editXmlType;
 	
-	SListView * m_lvSkin;
-	SListView * m_lvWidget;
+	SToolBar * m_tbSkin;
+    SToolBar *m_tbWidget;
 
 	SStringT m_strUiresPath;	//uires.idx 的全路径
 	SStringT m_strProPath;
@@ -338,5 +164,7 @@ public:
 	BOOL		m_bIsOpen;  //工程是否打开
 	bool		m_bAutoSave;
 	CPoint 	    m_tvClickPt;
+
+	SAutoRefPtr<SSkinPool> m_skinPool;
 };
 #endif//_MAINDLG_H_

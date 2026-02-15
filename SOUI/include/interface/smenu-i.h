@@ -205,7 +205,7 @@ DECLARE_INTERFACE_(IMenu, IObjRef)
     /**
      * @brief 获取菜单项数量
      * @return int - 菜单项数量
-    */
+     */
     STDMETHOD_(int, GetMenuItemCount)(CTHIS) SCONST PURE;
 };
 

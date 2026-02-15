@@ -4,12 +4,9 @@
 #include "helper/SColor.h"
 #include "helper/SplitString.h"
 #include "layout/SouiLayout.h"
-#include "layout/SAnchorLayout.h"
-#include "layout/SLinearLayout.h"
-#include "layout/SGridLayout.h"
 #ifdef SOUI_ENABLE_ACC
 #include "interface/sacchelper-i.h"
-#endif//SOUI_ENABLE_ACC
+#endif // SOUI_ENABLE_ACC
 #include "helper/SwndFinder.h"
 #include "helper/STime.h"
 #include "animation/STransformation.h"
@@ -269,13 +266,7 @@ struct PropIdMap
 };
 
 static const PropIdMap kPropIdMap[] = {
-    { WindowProperty::SCALE, ANI_SCALE }, 
-    { WindowProperty::SCALE_X, ANI_SCALE_X }, 
-    { WindowProperty::SCALE_Y, ANI_SCALE_Y }, 
-    { WindowProperty::ROTATE, ANI_ROTATE }, 
-    { WindowProperty::TRANSLATE, ANI_TRANSLATE },
-    { WindowProperty::TRANSLATE_X, ANI_TRANSLATE_X }, 
-    { WindowProperty::TRANSLATE_Y, ANI_TRANSLATE_Y },
+    { WindowProperty::SCALE, ANI_SCALE }, { WindowProperty::SCALE_X, ANI_SCALE_X }, { WindowProperty::SCALE_Y, ANI_SCALE_Y }, { WindowProperty::ROTATE, ANI_ROTATE }, { WindowProperty::TRANSLATE, ANI_TRANSLATE }, { WindowProperty::TRANSLATE_X, ANI_TRANSLATE_X }, { WindowProperty::TRANSLATE_Y, ANI_TRANSLATE_Y },
 };
 
 class AnimatorHolder : public TObjRefImpl<IObjRef> {
@@ -1324,11 +1315,6 @@ SWindow *SWindow::FindChildByName(LPCSTR strName, int nDeep /*= -1*/)
     return FindChildByName(S_CA2W(strName, CP_UTF8), nDeep);
 }
 
-const static wchar_t KLabelInclude[] = L"include"; // 文件包含的标签
-const static wchar_t KTempNamespace[] = L"t:";     // 模板识别ＮＳ
-const static wchar_t KTempData[] = L"data";        // 模板参数
-const static wchar_t KTempParamFmt[] = L"{{%s}}";  // 模板数据替换格式
-
 BOOL SWindow::CreateChildren(SXmlNode xmlNode)
 {
     ASSERT_UI_THREAD();
@@ -1338,14 +1324,14 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
         if (xmlChild.type() != node_element)
             continue;
 
-        if (_wcsicmp(xmlChild.name(), KLabelInclude) == 0)
+        if (_wcsicmp(xmlChild.name(), SWindow_style::kLabel_Include) == 0)
         { // 在窗口布局中支持include标签
             SStringT strSrc = S_CW2T(xmlChild.attribute(L"src").value());
             SXmlDoc xmlDoc;
             if (LOADXML(xmlDoc, strSrc))
             {
                 SXmlNode xmlInclude = xmlDoc.root().first_child();
-                if (_wcsicmp(xmlInclude.name(), KLabelInclude) == 0)
+                if (_wcsicmp(xmlInclude.name(), SWindow_style::kLabel_Include) == 0)
                 { // compatible with 2.9.0.1
                     CreateChildren(xmlInclude);
                 }
@@ -1376,20 +1362,20 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
         else if (!xmlChild.get_userdata()) // 通过userdata来标记一个节点是否可以忽略
         {
             SStringW strName = xmlChild.name();
-            if (strName.StartsWith(KTempNamespace))
+            if (strName.StartsWith(SWindow_style::kTemp_Namespace))
             {
                 strName = strName.Right(strName.GetLength() - 2);
                 SStringW strXmlTemp = GETUIDEF->GetTemplateString(strName);
                 SASSERT(!strXmlTemp.IsEmpty());
                 if (!strXmlTemp.IsEmpty())
                 { // create children by template.
-                    SXmlNode xmlData = xmlChild.child(KTempData);
+                    SXmlNode xmlData = xmlChild.child(SWindow_style::kTemp_Data);
                     while (xmlData)
                     {
                         SStringW strXml = strXmlTemp;
                         for (SXmlAttr param = xmlData.first_attribute(); param; param = param.next_attribute())
                         {
-                            SStringW strParam = SStringW().Format(KTempParamFmt, param.name());
+                            SStringW strParam = SStringW().Format(SWindow_style::kTemp_ParamFormat, param.name());
                             SStringW strValue = param.value();
                             strValue.Replace(L"\"", L"&#34;");  // 防止数据中包含“双引号”，导致破坏XML结构
                             strXml.Replace(strParam, strValue); // replace params to value.
@@ -1400,7 +1386,7 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
                             CreateChilds(xmlDoc.root());
                         }
                         strXml.ReleaseBuffer();
-                        xmlData = xmlData.next_sibling(KTempData);
+                        xmlData = xmlData.next_sibling(SWindow_style::kTemp_Data);
                     }
                 }
             }
@@ -2281,7 +2267,7 @@ BOOL SWindow::SetAnimatorValue(IPropertyValuesHolder *pHolder, float fraction, A
     }
     if (strPropName.CompareNoCase(WindowProperty::ALPHA) == 0)
     {
-        if(pHolder->GetValueType() != PROP_TYPE_BYTE)
+        if (pHolder->GetValueType() != PROP_TYPE_BYTE)
             return FALSE;
         BYTE byAlpha;
         pHolder->GetAnimatedValue(fraction, &byAlpha);
@@ -2326,7 +2312,7 @@ int SWindow::OnCreate(LPVOID)
         if (GetStyle().m_bTrackMouseEvent)
             GetContainer()->RegisterTrackMouseEvent(m_swnd);
         if (GetStyle().m_bVideoCanvas)
-            GetContainer()->RegisterVideoCanvas(m_swnd);    
+            GetContainer()->RegisterVideoCanvas(m_swnd);
     }
 
     GetStyle().SetScale(GetScale());
@@ -2422,7 +2408,7 @@ BOOL SWindow::OnEraseBkgnd(IRenderTarget *pRT)
     return TRUE;
 }
 
-void SWindow::BeforePaint(IRenderTarget *pRT, SPainter &painter)
+void SWindow::BeforePaint(IRenderTarget *pRT, SPainter &painter) const
 {
     int iState = SState2Index::GetDefIndex(GetState(), true);
     IFontPtr pFont = GetStyle().GetTextFont(iState);
@@ -2434,7 +2420,7 @@ void SWindow::BeforePaint(IRenderTarget *pRT, SPainter &painter)
         painter.oldTextColor = pRT->SetTextColor(crTxt);
 }
 
-void SWindow::BeforePaintEx(IRenderTarget *pRT)
+void SWindow::BeforePaintEx(IRenderTarget *pRT) const
 {
     SWindow *pParent = GetParent();
     if (pParent)
@@ -2443,7 +2429,7 @@ void SWindow::BeforePaintEx(IRenderTarget *pRT)
     BeforePaint(pRT, painter);
 }
 
-void SWindow::AfterPaint(IRenderTarget *pRT, SPainter &painter)
+void SWindow::AfterPaint(IRenderTarget *pRT, SPainter &painter) const
 {
     if (painter.oldFont)
         pRT->SelectObject(painter.oldFont, NULL);
@@ -2960,35 +2946,40 @@ void SWindow::OnKillFocus(SWND wndFocus)
     FireEvent(evt);
 }
 
-void SWindow::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags){
+void SWindow::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
     EventKeyDown evt(this);
     evt.nChar = nChar;
     evt.nRepCnt = nRepCnt;
     evt.nFlags = nFlags;
     FireEvent(evt);
 }
-void SWindow::OnKeyUp(UINT nChar, UINT nFlagsCnt, UINT nFlags){
+void SWindow::OnKeyUp(UINT nChar, UINT nFlagsCnt, UINT nFlags)
+{
     EventKeyUp evt(this);
     evt.nChar = nChar;
     evt.nRepCnt = nFlagsCnt;
     evt.nFlags = nFlags;
     FireEvent(evt);
 }
-void SWindow::OnChar(UINT nChar, UINT nFlagsCnt, UINT nFlags){
+void SWindow::OnChar(UINT nChar, UINT nFlagsCnt, UINT nFlags)
+{
     EventChar evt(this);
     evt.nChar = nChar;
     evt.nRepCnt = nFlagsCnt;
     evt.nFlags = nFlags;
     FireEvent(evt);
 }
-void SWindow::OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags){
+void SWindow::OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
     EventSysKeyDown evt(this);
     evt.nChar = nChar;
     evt.nRepCnt = nRepCnt;
     evt.nFlags = nFlags;
     FireEvent(evt);
 }
-void SWindow::OnSysKeyUp(UINT nChar, UINT nFlagsCnt, UINT nFlags){
+void SWindow::OnSysKeyUp(UINT nChar, UINT nFlagsCnt, UINT nFlags)
+{
     EventSysKeyUp evt(this);
     evt.nChar = nChar;
     evt.nRepCnt = nFlagsCnt;
@@ -3306,10 +3297,10 @@ STransformation SWindow::GetTransformation() const
 
 void SWindow::SetMatrix(const SMatrix &mtx, BOOL bInvalidate)
 {
-    if(bInvalidate)
+    if (bInvalidate)
         InvalidateRect(NULL);
     m_transform.setMatrix(mtx);
-    if(bInvalidate)
+    if (bInvalidate)
         InvalidateRect(NULL);
 }
 
@@ -3915,20 +3906,11 @@ HRESULT SWindow::OnAttrOwnerLayout(const SStringW &strValue, BOOL bLoading)
 {
     if (GetParent())
         return E_INVALIDARG;
-    if (strValue.CompareNoCase(SouiLayout::GetClassName()) == 0)
-        m_pLayoutParam.Attach(new SouiLayoutParam());
-    else if (strValue.CompareNoCase(SLinearLayout::GetClassName()) == 0)
-        m_pLayoutParam.Attach(new SLinearLayoutParam());
-    else if (strValue.CompareNoCase(SHBox::GetClassName()) == 0)
-        m_pLayoutParam.Attach(new SLinearLayoutParam());
-    else if (strValue.CompareNoCase(SVBox::GetClassName()) == 0)
-        m_pLayoutParam.Attach(new SLinearLayoutParam());
-    else if (strValue.CompareNoCase(SGridLayout::GetClassName()) == 0)
-        m_pLayoutParam.Attach(new SGridLayoutParam());
-    else if (strValue.CompareNoCase(SAnchorLayout::GetClassName()) == 0)
-        m_pLayoutParam.Attach(new SAnchorLayoutParam());
-    else
+    ILayout *pLayout = (ILayout *)SApplication::getSingleton().CreateObject(strValue, Layout);
+    if (!pLayout)
         return E_INVALIDARG;
+    m_pLayoutParam.Attach(pLayout->CreateLayoutParam());
+    pLayout->Release();
     return S_FALSE;
 }
 

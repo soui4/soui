@@ -294,7 +294,7 @@ int SPropertyValuesHolder::Fraction2FrameIndex(float fraction) const
 {
     int idx[2];
     Fraction2Index(fraction, idx);
-    if(fraction >= 1.0f)
+    if (fraction >= 1.0f)
         return idx[1];
     else
         return idx[0];
@@ -482,7 +482,7 @@ SPropertyAnimator::~SPropertyAnimator()
 
 void SPropertyAnimator::onAnimationStart(IValueAnimator *pAnimator)
 {
-    if(!m_pTarget) 
+    if (!m_pTarget)
         return;
     for (int i = 0; i < m_propertyHolders.GetCount(); i++)
     {
@@ -492,7 +492,7 @@ void SPropertyAnimator::onAnimationStart(IValueAnimator *pAnimator)
 
 void SPropertyAnimator::onAnimationEnd(IValueAnimator *pAnimator)
 {
-    if(!m_pTarget) 
+    if (!m_pTarget)
         return;
     for (int i = 0; i < m_propertyHolders.GetCount(); i++)
     {
@@ -552,7 +552,8 @@ IPropertyValuesHolder *SPropertyAnimator::GetPropertyValuesHolderByIndex(int ind
 void SPropertyAnimator::copy(const IValueAnimator *pAnimator)
 {
     const IPropertyAnimator *pPropAnimator = sobj_cast<const IPropertyAnimator>(pAnimator);
-    if(pPropAnimator){
+    if (pPropAnimator)
+    {
         SValueAnimator::copy(pAnimator);
         SetTarget(pPropAnimator->GetTarget());
         int count = pPropAnimator->GetPropertyValuesHolderCount();
@@ -566,11 +567,11 @@ void SPropertyAnimator::copy(const IValueAnimator *pAnimator)
     }
 }
 
-IValueAnimator * SPropertyAnimator::clone() const
+IValueAnimator *SPropertyAnimator::clone() const
 {
     SPropertyAnimator *pAnimator = new SPropertyAnimator();
-    pAnimator->copy((const IPropertyAnimator*)this);
-    return (IValueAnimator *)(IPropertyAnimator*)pAnimator;
+    pAnimator->copy((const IPropertyAnimator *)this);
+    return (IValueAnimator *)(IPropertyAnimator *)pAnimator;
 }
 
 // 静态工厂方法

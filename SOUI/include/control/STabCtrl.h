@@ -435,7 +435,7 @@ class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
         MSG_WM_KEYDOWN(OnKeyDown)
     SOUI_MSG_MAP_END()
 
-    LRESULT OnAttrTabAlign(const SStringW & strValue, BOOL bLoading);
+    LRESULT OnAttrTabAlign(const SStringW &strValue, BOOL bLoading);
     SOUI_ATTRS_BEGIN()
         ATTR_INT(L"curSel", m_nCurrentPage, FALSE)               /**< Index of the currently selected page. */
         ATTR_LAYOUTSIZE2(L"tabSize", m_szTab, TRUE)              /**< Size of the tab pages. */
@@ -451,7 +451,7 @@ class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
         ATTR_LAYOUTSIZE(L"icon-y", m_ptIcon[1], FALSE)           /**< Y-coordinate of the icons. */
         ATTR_LAYOUTSIZE(L"text-x", m_ptText[0], FALSE)           /**< X-coordinate of the text. */
         ATTR_LAYOUTSIZE(L"text-y", m_ptText[1], FALSE)           /**< Y-coordinate of the text. */
-        ATTR_CUSTOM(L"tabAlign", OnAttrTabAlign)                  /**< Alignment of the tabs. */
+        ATTR_CUSTOM(L"tabAlign", OnAttrTabAlign)                 /**< Alignment of the tabs. */
         ATTR_ENUM_BEGIN(L"textDir", TEXTDIR, TRUE)
             ATTR_ENUM_VALUE(L"hori", Text_Horz)       /**< Horizontal text direction. */
             ATTR_ENUM_VALUE(L"horizontal", Text_Horz) /**< Horizontal text direction. */

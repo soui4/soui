@@ -20,18 +20,18 @@ SNSBEGIN
  *
  * @details This class provides a mechanism to play a set of SValueAnimator objects in sequence or in parallel.
  * It establishes dependencies between animations and plays them in the correct order.
- * SAnimatorSet itself is an IAnimatorSet (which inherits from IValueAnimator), which means it can be used 
- * just like any other animator, and can even be added to other AnimatorSets for nesting, following the 
+ * SAnimatorSet itself is an IAnimatorSet (which inherits from IValueAnimator), which means it can be used
+ * just like any other animator, and can even be added to other AnimatorSets for nesting, following the
  * Android AnimatorSet design.
  */
-class SOUI_EXP SAnimatorSet
-    : public TValueAnimatorProxy<IAnimatorSet> {
+class SOUI_EXP SAnimatorSet : public TValueAnimatorProxy<IAnimatorSet> {
     DEF_SOBJECT(SValueAnimator, L"animatorSet")
   protected:
     /**
      * @brief Internal node to track animator dependencies
      */
-    struct AnimatorNode {
+    struct AnimatorNode
+    {
         SAutoRefPtr<IValueAnimator> animator;
         // List of animators that should run after this one
         SArray<AnimatorNode *> afterNodes;
@@ -114,27 +114,27 @@ class SOUI_EXP SAnimatorSet
      * @brief Add an animator to the set (will play in parallel by default or according to play mode)
      * @param pAnimator The animator to add
      */
-    STDMETHOD_(void, AddAnimator)(THIS_ IValueAnimator * pAnimator) OVERRIDE;
+    STDMETHOD_(void, AddAnimator)(THIS_ IValueAnimator *pAnimator) OVERRIDE;
 
     /**
      * @brief Add an animator that will play after the specified animator finishes
      * @param pAnimator The animator to add
      * @param pAfterAnimator The animator that must finish first
      */
-    STDMETHOD_(void, AddAnimatorAfter)(THIS_ IValueAnimator * pAnimator, IValueAnimator * pAfterAnimator) OVERRIDE;
+    STDMETHOD_(void, AddAnimatorAfter)(THIS_ IValueAnimator *pAnimator, IValueAnimator *pAfterAnimator) OVERRIDE;
 
     /**
      * @brief Add an animator that will play in parallel with the specified animator
      * @param pAnimator The animator to add
      * @param pWithAnimator The animator to run in parallel with
      */
-    STDMETHOD_(void, AddAnimatorWith)(THIS_ IValueAnimator * pAnimator, IValueAnimator * pWithAnimator) OVERRIDE;
+    STDMETHOD_(void, AddAnimatorWith)(THIS_ IValueAnimator *pAnimator, IValueAnimator *pWithAnimator) OVERRIDE;
 
     /**
      * @brief Remove an animator from the set
      * @param pAnimator The animator to remove
      */
-    STDMETHOD_(void, RemoveAnimator)(THIS_ IValueAnimator * pAnimator) OVERRIDE;
+    STDMETHOD_(void, RemoveAnimator)(THIS_ IValueAnimator *pAnimator) OVERRIDE;
 
     /**
      * @brief Remove all animators from the set
@@ -188,7 +188,7 @@ class SOUI_EXP SAnimatorSet
      * @brief Start the animator set
      * @param pContainer The timeline handlers container
      */
-    STDMETHOD_(void, start)(THIS_ ITimelineHandlersMgr * pContainer) OVERRIDE;
+    STDMETHOD_(void, start)(THIS_ ITimelineHandlersMgr *pContainer) OVERRIDE;
 
     /**
      * @brief End the animator set
@@ -259,7 +259,7 @@ class SOUI_EXP SAnimatorSet
      * @brief Copy from another animator
      * @param src The source animator
      */
-    STDMETHOD_(void, copy)(THIS_ const IValueAnimator * src) OVERRIDE;
+    STDMETHOD_(void, copy)(THIS_ const IValueAnimator *src) OVERRIDE;
 
     /**
      * @brief Set the play mode (SEQUENCE or PARALLEL)

@@ -7,6 +7,13 @@
 
 SNSBEGIN
 
+// String constants for ComboBase control
+namespace SComboBase_style
+{
+    static LPCWSTR kStyle_Dropdown = L"dropdownStyle";  // 下拉列表风格，只包含root节点
+    static LPCWSTR kStyle_Edit = L"editStyle";          // 编辑框风格
+}
+
 #define IDC_CB_EDIT -100
 
 /**

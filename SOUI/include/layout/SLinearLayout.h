@@ -7,6 +7,15 @@
 
 SNSBEGIN
 
+// Int = %d StringA
+#define ATTR_GRAVITY(attribname, varname, allredraw)          \
+    if (0 == strAttribName.CompareNoCase(attribname))         \
+    {                                                         \
+        varname = SLinearLayoutParam::parseGravity(strValue); \
+        hRet = allredraw ? S_OK : S_FALSE;                    \
+    }                                                         \
+    else
+
 /**
  * @class SLinearLayoutParam
  * @brief 线性布局参数类
@@ -17,6 +26,9 @@ class SLinearLayoutParam
     DEF_SOBJECT(SObjectImpl<ILayoutParam>, L"LinearLayoutParam")
 
     friend class SLinearLayout;
+
+  public:
+    static Gravity parseGravity(const SStringW &strValue);
 
   public:
     /**
@@ -98,17 +110,11 @@ class SLinearLayoutParam
 
   public:
     SOUI_ATTRS_BEGIN()
-        ATTR_CUSTOM(L"width", OnAttrWidth)                 // 宽度
-        ATTR_CUSTOM(L"height", OnAttrHeight)               // 高度
-        ATTR_CUSTOM(L"size", OnAttrSize)                   // 大小
-        ATTR_FLOAT(L"weight", weight, FALSE)               // 权重
-        ATTR_ENUM_BEGIN(L"layout_gravity", Gravity, FALSE) // 对齐方式
-            ATTR_ENUM_VALUE(L"left", G_Left)               // 左对齐
-            ATTR_ENUM_VALUE(L"top", G_Top)                 // 顶部对齐
-            ATTR_ENUM_VALUE(L"center", G_Center)           // 居中对齐
-            ATTR_ENUM_VALUE(L"right", G_Right)             // 右对齐
-            ATTR_ENUM_VALUE(L"bottom", G_Bottom)           // 底部对齐
-        ATTR_ENUM_END(gravity)
+        ATTR_CUSTOM(L"width", OnAttrWidth)                      // 宽度
+        ATTR_CUSTOM(L"height", OnAttrHeight)                    // 高度
+        ATTR_CUSTOM(L"size", OnAttrSize)                        // 大小
+        ATTR_FLOAT(L"weight", weight, FALSE)                    // 权重
+        ATTR_GRAVITY(L"layout_gravity", gravity, FALSE)         // 对齐方式
         ATTR_CUSTOM(L"extend", OnAttrExtend)                    // 扩展属性
         ATTR_LAYOUTSIZE(L"extend_left", extend_left, FALSE)     // 左侧扩展
         ATTR_LAYOUTSIZE(L"extend_top", extend_top, FALSE)       // 顶部扩展
@@ -203,13 +209,7 @@ class SOUI_EXP SLinearLayout : public TObjRefImpl<SObjectImpl<ILayout>> {
             ATTR_ENUM_VALUE(L"horizontal", Horz)            // 水平方向
             ATTR_ENUM_VALUE(L"vertical", Vert)              // 垂直方向
         ATTR_ENUM_END(m_orientation)
-        ATTR_ENUM_BEGIN(L"gravity", Gravity, FALSE) // 对齐方式
-            ATTR_ENUM_VALUE(L"left", G_Left)        // 左对齐
-            ATTR_ENUM_VALUE(L"top", G_Top)          // 顶部对齐
-            ATTR_ENUM_VALUE(L"center", G_Center)    // 居中对齐
-            ATTR_ENUM_VALUE(L"right", G_Right)      // 右对齐
-            ATTR_ENUM_VALUE(L"bottom", G_Bottom)    // 底部对齐
-        ATTR_ENUM_END(m_gravity)
+        ATTR_GRAVITY(L"gravity", m_gravity, FALSE)      // 对齐方式
         ATTR_LAYOUTSIZE(L"interval", m_interval, FALSE) // 间距
     SOUI_ATTRS_BREAK()
 

@@ -39,7 +39,7 @@
 #define IUNKNOWN_BEGIN(iface) IUNKNOWN_BEGIN2(__suidof(iface), iface)
 
 #define IUNKNOWN_ADD_IID(iface) IUNKNOWN_ADD_IID2(__suidof(iface), iface)
-#endif//IUNKNOWN_BEGIN
+#endif // IUNKNOWN_BEGIN
 
 template <class T>
 class SUnkImpl : public T {

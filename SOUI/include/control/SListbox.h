@@ -1,4 +1,4 @@
-﻿#ifndef __SLISTBOX__H__
+#ifndef __SLISTBOX__H__
 #define __SLISTBOX__H__
 
 #include <core/SPanel.h>
@@ -6,6 +6,16 @@
 #include <interface/SCtrls-i.h>
 
 SNSBEGIN
+
+namespace SListBox_style
+{
+    static const LPCWSTR kStyle_items = L"items";
+    static const LPCWSTR kStyle_item = L"item";
+    static const LPCWSTR kStyle_curSel = L"curSel";
+    static const LPCWSTR kStyle_icon = L"icon";
+    static const LPCWSTR kStyle_data = L"data";
+    static const LPCWSTR kStyle_text = L"text";
+}
 
 /**
  * @struct tagLBITEM
