@@ -73,6 +73,8 @@ protected:
     // 递归添加目录中的所有文件到UIRes
 	void AddFilesInDirectoryToUIRes(const SStringT& dirPath);
 	void OnTvKeyDown(IEvtArgs *e);
+	void OnTbWidgetClick(IEvtArgs *e);
+	void OnTbSkinClick(IEvtArgs *e);
 	EVENT_MAP_BEGIN()
 		if(m_pXmlEdtior) CHAIN_EVENT_MAP_MEMBER((*m_pXmlEdtior))
 		if(m_pImageViewer) CHAIN_EVENT_MAP_MEMBER((*m_pImageViewer))
@@ -94,6 +96,8 @@ protected:
 		EVENT_ID_HANDLER(R.id.chk_autosave,EventSwndStateChanged::EventID,OnAutoCheck)
 		EVENT_ID_HANDLER(R.id.workspace_treeview,EventOfPanel::EventID,OnTvEventOfPanel)
 		EVENT_ID_HANDLER(R.id.workspace_treeview,EventKeyDown::EventID,OnTvKeyDown)
+		EVENT_ID_HANDLER(R.id.tb_widget,EventToolBarCmd::EventID,OnTbWidgetClick)
+		EVENT_ID_HANDLER(R.id.tb_skin,EventToolBarCmd::EventID,OnTbSkinClick)
 	EVENT_MAP_END2(SHostWnd)
 
 protected:
@@ -166,5 +170,6 @@ public:
 	CPoint 	    m_tvClickPt;
 
 	SAutoRefPtr<SSkinPool> m_skinPool;
+	SMap<SStringT, SStringW> m_mapWidget;
 };
 #endif//_MAINDLG_H_

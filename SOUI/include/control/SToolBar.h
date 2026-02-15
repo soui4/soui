@@ -21,6 +21,27 @@ namespace SToolBar_style
     static const LPCWSTR kStyle_menuStyle = L"menuStyle";
 }
 
+struct ToolBarItem
+{
+    int nId;
+    int iIcon;
+    LPARAM lParam;
+    SStringT strText;
+    SStringT strTip;
+    int dwState;
+    int dwStyle; // Item style flags (TBSTYLE_*)
+    SAutoRefPtr<IBitmapS> icon;
+
+    ToolBarItem()
+        : nId(0)
+        , iIcon(0)
+        , lParam(0)
+        , dwState(0)
+        , dwStyle(TBSTYLE_BUTTON)
+    {
+    }
+};
+
 class SOUI_EXP SToolBar : public SWindow {
     DEF_SOBJECT(SWindow, L"toolbar")
   public:
@@ -28,27 +49,6 @@ class SOUI_EXP SToolBar : public SWindow {
     ~SToolBar(void);
 
   public:
-    struct ToolBarItem
-    {
-        int nId;
-        int iIcon;
-        LPARAM lParam;
-        SStringT strText;
-        SStringT strTip;
-        int dwState;
-        int dwStyle; // Item style flags (TBSTYLE_*)
-        SAutoRefPtr<IBitmapS> icon;
-
-        ToolBarItem()
-            : nId(0)
-            , iIcon(0)
-            , lParam(0)
-            , dwState(0)
-            , dwStyle(TBSTYLE_BUTTON)
-        {
-        }
-    };
-
     void InsertItem(const ToolBarItem &item, int nPos = -1);
     void AddButton(int nID, int nImage, LPCTSTR lpszText = NULL, int dwStyle = TBSTYLE_BUTTON);
     BOOL DeleteButton(int nIndex);

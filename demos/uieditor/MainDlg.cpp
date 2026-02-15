@@ -1380,22 +1380,6 @@ BOOL CMainDlg::OnDrop(LPCTSTR pszName)
 	return TRUE;
 }
 
-// void CMainDlg::OnInsertWidget(CWidgetTBAdapter::IconInfo *info)
-// {
-// 	m_pXmlEdtior->InsertWidget(info->strContent);
-// 	m_lvWidget->SetSel(-1,FALSE);
-// }
-
-// void CMainDlg::OnInertSkin(CSkinTBAdapter::IconInfo * info)
-// {
-// 	m_lvSkin->SetSel(-1,FALSE);
-// 	DlgInsertXmlElement dlg(&m_UIResFileMgr,CSysDataMgr::getSingleton().getSkinDefNode().child(L"skins"),S_CT2W(info->strElement));
-// 	if(IDOK==dlg.DoModal())
-// 	{
-// 		m_pXmlEdtior->InsertElement(dlg.GetXml());
-// 	}
-// }
-
 void CMainDlg::OnAutoCheck(IEvtArgs *e)
 {
 	EventSwndStateChanged *e2=sobj_cast<EventSwndStateChanged>(e);
@@ -1708,4 +1692,29 @@ void CMainDlg::InitSkinToolbar(){
         pToolBar->AddButton(i, arrIcons[i].iIcon, arrIcons[i].strTxt);
     }
     m_tbSkin = pToolBar;
+}
+
+
+void CMainDlg::OnTbWidgetClick(IEvtArgs *e)
+{
+	EventToolBarCmd *e2=sobj_cast<EventToolBarCmd>(e);
+	ToolBarItem item;
+	m_tbWidget->GetItemInfo(e2->iItem,&item);
+    SXmlNode xmlNode = CSysDataMgr::getSingleton().getSkinDefNode();
+	SXmlNode xmlWidget = xmlNode.child(L"controls").child(S_CT2W(item.strText));
+	SStringW strContent;
+    xmlWidget.child(xmlWidget.name()).ToString(&strContent);
+	m_pXmlEdtior->InsertWidget(S_CW2A(strContent, CP_UTF8));
+}
+
+void CMainDlg::OnTbSkinClick(IEvtArgs *e)
+{
+	EventToolBarCmd *e2=sobj_cast<EventToolBarCmd>(e);
+	ToolBarItem item;
+	m_tbSkin->GetItemInfo(e2->iItem,&item);
+    DlgInsertXmlElement dlg(&m_UIResFileMgr, CSysDataMgr::getSingleton().getSkinDefNode().child(L"skins"), S_CT2W(item.strText));
+	if(IDOK==dlg.DoModal())
+	{
+		m_pXmlEdtior->InsertElement(dlg.GetXml());
+	}
 }
