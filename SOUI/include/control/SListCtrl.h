@@ -1,4 +1,4 @@
-﻿#ifndef __SLISTCTRL__H__
+#ifndef __SLISTCTRL__H__
 #define __SLISTCTRL__H__
 
 #include "core/SPanel.h"
@@ -177,6 +177,18 @@ class SOUI_EXP SListCtrl : public SPanel {
     void SetSelectedItem(int nItem);
 
     /**
+     * @brief Get the selected column
+     * @return Index of the selected column
+     */
+    int GetSelectedColumn();
+
+    /**
+     * @brief Set the selected column
+     * @param nColumn Index of the column to select
+     */
+    void SetSelectedColumn(int nColumn);
+
+    /**
      * @brief Get the total number of items
      * @return Number of items
      */
@@ -308,6 +320,14 @@ class SOUI_EXP SListCtrl : public SPanel {
      * @return Index of the item or -1 if no item
      */
     int HitTest(const CPoint &pt);
+
+    /**
+     * @brief Hit test to determine the item and subitem under the mouse
+     * @param pt Mouse coordinates
+     * @param pnSubItem Pointer to receive the subitem index
+     * @return Index of the item or -1 if no item
+     */
+    int HitTest(const CPoint &pt, int *pnSubItem);
 
     /**
      * @brief Get the index of the top visible item
@@ -458,9 +478,10 @@ class SOUI_EXP SListCtrl : public SPanel {
     SLayoutSize m_nHeaderHeight; /**< Height of the header */
     SLayoutSize m_nItemHeight;   /**< Height of the items */
 
-    int m_nSelectItem; /**< Index of the selected item */
-    int m_nHoverItem;  /**< Index of the item under the mouse */
-    BOOL m_bHotTrack;  /**< Hot tracking flag */
+    int m_nSelectItem;   /**< Index of the selected item */
+    int m_nSelectColumn; /**< Index of the selected column */
+    int m_nHoverItem;    /**< Index of the item under the mouse */
+    BOOL m_bHotTrack;    /**< Hot tracking flag */
 
     CPoint m_ptIcon; /**< Icon position */
     CPoint m_ptText; /**< Text position */

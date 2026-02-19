@@ -13,6 +13,7 @@ SListCtrl::SListCtrl()
     , m_nItemHeight(20)
     , m_pHeader(NULL)
     , m_nSelectItem(-1)
+    , m_nSelectColumn(-1)
     , m_crItemBg(RGBA(255, 255, 255, 255))
     , m_crItemBg2(RGBA(226, 226, 226, 255))
     , m_crItemSelBg(RGBA(57, 145, 209, 255))
@@ -193,6 +194,20 @@ void SListCtrl::SetSelectedItem(int nItem)
     if (nItem != m_nSelectItem)
     {
         NotifySelChange(m_nSelectItem, nItem);
+    }
+}
+
+int SListCtrl::GetSelectedColumn()
+{
+    return m_nSelectColumn;
+}
+
+void SListCtrl::SetSelectedColumn(int nColumn)
+{
+    if (nColumn != m_nSelectColumn && (nColumn == -1 || (nColumn >= 0 && nColumn < GetColumnCount())))
+    {
+        m_nSelectColumn = nColumn;
+        Invalidate();
     }
 }
 
@@ -479,6 +494,36 @@ int SListCtrl::HitTest(const CPoint &pt)
     return nRet;
 }
 
+int SListCtrl::HitTest(const CPoint &pt, int *pnSubItem)
+{
+    int nItem = HitTest(pt);
+    if (pnSubItem)
+    {
+        *pnSubItem = -1;
+        if (nItem != -1 && m_pHeader)
+        {
+            CRect rcList = GetListRect();
+            CPoint pt2 = pt;
+            pt2.x -= rcList.left - m_ptOrigin.x;
+            
+            int x = 0;
+            for (int nCol = 0; nCol < GetColumnCount(); nCol++)
+            {
+                SHDITEM hdi = { SHDI_WIDTH | SHDI_ORDER, 0 };
+                m_pHeader->GetItem(nCol, &hdi);
+                int colWidth = hdi.cx;
+                if (pt2.x >= x && pt2.x < x + colWidth)
+                {
+                    *pnSubItem = hdi.iOrder;
+                    break;
+                }
+                x += colWidth;
+            }
+        }
+    }
+    return nItem;
+}
+
 void SListCtrl::RedrawItem(int nItem)
 {
     if (!IsVisible(TRUE))
@@ -579,11 +624,6 @@ void SListCtrl::DrawItem(IRenderTarget *pRT, CRect rcItem, int nItem)
 
     if (nItem % 2)
     {
-        //         if (m_pItemSkin != NULL)
-        //             nBgImg = 1;
-        //         else if (CR_INVALID != m_crItemBg2)
-        //             crItemBg = m_crItemBg2;
-        //上面的代码不要了，因为skin间隔效果没必要，只留下颜色间隔就好了
         if (CR_INVALID != m_crItemBg2)
             crItemBg = m_crItemBg2;
     }
@@ -608,13 +648,6 @@ void SListCtrl::DrawItem(IRenderTarget *pRT, CRect rcItem, int nItem)
         if (CR_INVALID != m_crSelText)
             crText = m_crSelText;
     }
-
-    //绘制背景
-    //     if (m_pItemSkin != NULL)
-    //         m_pItemSkin->Draw(pRT, rc, nBgImg);
-    //     else if (CR_INVALID != crItemBg)
-    //         pRT->FillSolidRect( rc, crItemBg);
-    //上面的代码在某些时候，【指定skin的时候，会导致背景异常】，所以颠倒一下顺序
     if (CR_INVALID != crItemBg) //先画背景
         pRT->FillSolidRect(rcItem, crItemBg);
 
@@ -647,6 +680,13 @@ void SListCtrl::DrawItem(IRenderTarget *pRT, CRect rcItem, int nItem)
 
         if (rcVisiblePart.IsRectEmpty())
             continue;
+
+        // 高亮选中的列
+        if (hdi.iOrder == m_nSelectColumn)
+        {
+            if (CR_INVALID != m_crItemSelBg)
+                pRT->FillSolidRect(rcVisiblePart, m_crItemSelBg);
+        }
 
         // 绘制 checkbox
         if (nCol == 0 && m_bCheckBox && m_pCheckSkin)
@@ -835,8 +875,12 @@ BOOL SListCtrl::OnScroll(BOOL bVertical, UINT uCode, int nPos)
 void SListCtrl::OnLButtonDown(UINT nFlags, CPoint pt)
 {
     __baseCls::OnLButtonDown(nFlags, pt);
-    m_nHoverItem = HitTest(pt);
+    int nSubItem = -1;
+    m_nHoverItem = HitTest(pt, &nSubItem);
     BOOL hitCheckBox = HitCheckBox(pt);
+
+    // 选择列
+    SetSelectedColumn(nSubItem);
 
     if (hitCheckBox)
         NotifySelChange(m_nSelectItem, m_nHoverItem, TRUE);
@@ -848,7 +892,12 @@ void SListCtrl::OnLButtonDown(UINT nFlags, CPoint pt)
 
 void SListCtrl::OnLButtonDbClick(UINT nFlags, CPoint pt)
 {
-    m_nHoverItem = HitTest(pt);
+    int nSubItem = -1;
+    m_nHoverItem = HitTest(pt, &nSubItem);
+    
+    // 选择列
+    SetSelectedColumn(nSubItem);
+    
     if (m_nHoverItem != m_nSelectItem)
         NotifySelChange(m_nSelectItem, m_nHoverItem);
 

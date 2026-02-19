@@ -46,7 +46,8 @@ void CXmlEditor::SetProjectPath(const SStringT & strProjPath)
 
 BOOL CXmlEditor::CloseXml()
 {
-	m_strXmlFile.Empty();
+    m_strProPath.Empty();
+    m_strXmlFile.Empty();
 	m_strLayoutName.Empty();
 	m_bValidXml = false;
 	m_xmlParser.reset();

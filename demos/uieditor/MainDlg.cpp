@@ -1611,7 +1611,6 @@ void CMainDlg::OnBtnPreview()
 		SStringT strTxt;
 		SStringT strTip;
 		SStringT strElement;
-		SStringA strContent;
 	};
 static bool CompareIcon(const IconInfo &a,const IconInfo &b){
 		return a.strTxt < b.strTxt;
@@ -1642,8 +1641,8 @@ void CMainDlg::InitWidgetToolbar(){
             info.strTip = S_CW2T(xmlWidget.attribute(L"tip").as_string());
             SStringW strContent;
             xmlWidget.child(xmlWidget.name()).ToString(&strContent);
-            info.strContent = S_CW2A(strContent, CP_UTF8);
             arrIcons.Add(info);
+            m_mapWidget[info.strTxt] = strContent;
         }
         xmlWidget = xmlWidget.next_sibling();
     }
@@ -1700,11 +1699,10 @@ void CMainDlg::OnTbWidgetClick(IEvtArgs *e)
 	EventToolBarCmd *e2=sobj_cast<EventToolBarCmd>(e);
 	ToolBarItem item;
 	m_tbWidget->GetItemInfo(e2->iItem,&item);
-    SXmlNode xmlNode = CSysDataMgr::getSingleton().getSkinDefNode();
-	SXmlNode xmlWidget = xmlNode.child(L"controls").child(S_CT2W(item.strText));
-	SStringW strContent;
-    xmlWidget.child(xmlWidget.name()).ToString(&strContent);
-	m_pXmlEdtior->InsertWidget(S_CW2A(strContent, CP_UTF8));
+    if (SMap<SStringT,SStringT>::CPair *pair = m_mapWidget.Lookup(item.strText))
+    {
+        m_pXmlEdtior->InsertWidget(S_CT2A(pair->m_value, CP_UTF8));
+	}
 }
 
 void CMainDlg::OnTbSkinClick(IEvtArgs *e)
