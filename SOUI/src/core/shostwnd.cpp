@@ -199,10 +199,10 @@ void SRootWindow::OnAnimationStop(IAnimation *pAni)
     }
 }
 
-void SRootWindow::BeforePaint(IRenderTarget *pRT, SPainter &painter)
+void SRootWindow::BeforePaint(IRenderTarget *pRT, SPainter &painter) const
 {
     int iState = SState2Index::GetDefIndex(GetState(), true);
-    SwndStyle &style = SWindow::GetStyle();
+    const SwndStyle &style = SWindow::GetStyle();
     IFontPtr pFont = style.GetTextFont(iState);
     if (pFont)
         pRT->SelectObject(pFont, (IRenderObj **)&painter.oldFont);
@@ -216,7 +216,7 @@ void SRootWindow::BeforePaint(IRenderTarget *pRT, SPainter &painter)
         pRT->SetTextColor(RGBA(0, 0, 0, 255));
 }
 
-void SRootWindow::AfterPaint(IRenderTarget *pRT, SPainter &painter)
+void SRootWindow::AfterPaint(IRenderTarget *pRT, SPainter &painter) const
 {
     pRT->SelectDefaultObject(OT_FONT, NULL);
 }

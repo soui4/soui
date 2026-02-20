@@ -153,7 +153,7 @@ class SOUI_EXP SOsrPanel
 
     virtual void Draw(IRenderTarget *pRT, const CRect &rc);
 
-    virtual void BeforePaint(IRenderTarget *pRT, SPainter &painter);
+    virtual void BeforePaint(IRenderTarget *pRT, SPainter &painter) const override;
 
     virtual BOOL NeedRedrawWhenStateChange();
     virtual BOOL UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo);

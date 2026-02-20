@@ -292,7 +292,7 @@ class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
      * @param pRT Pointer to the rendering target.
      * @param painter Painter object.
      */
-    virtual void BeforePaint(IRenderTarget *pRT, SPainter &painter);
+    void BeforePaint(IRenderTarget *pRT, SPainter &painter) const override;
 
     /**
      * @brief Gets the layout rectangle for child windows.

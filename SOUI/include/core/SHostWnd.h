@@ -255,7 +255,7 @@ class SOUI_EXP SRootWindow : public SWindow {
      * @param pRT Pointer to the render target.
      * @param painter Painter object.
      */
-    virtual void BeforePaint(IRenderTarget *pRT, SPainter &painter);
+    void BeforePaint(IRenderTarget *pRT, SPainter &painter) const override;
 
     /**
      * @brief Called after painting the window.
@@ -263,7 +263,7 @@ class SOUI_EXP SRootWindow : public SWindow {
      * @param pRT Pointer to the render target.
      * @param painter Painter object.
      */
-    virtual void AfterPaint(IRenderTarget *pRT, SPainter &painter);
+    void AfterPaint(IRenderTarget *pRT, SPainter &painter) const override;
 
     /**
      * @brief Checks if the window is a layered window.

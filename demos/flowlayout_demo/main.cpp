@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "MainDlg.h"
+#include "SCheckGroup.h"
 #include <SAppCfg.h>
 #define SYS_NAMED_RESOURCE _T("soui-sys-resource.dll")
 
@@ -52,7 +53,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 #ifndef _WIN32
     AddFontResource(srcDir+"fonts/simsun.ttc");
 #endif //_WIN32
-
+    app.RegisterWindowClass<SCheckGroup>();
     // 如果需要在代码中使用R::id::namedid这种方式来使用控件必须要这一行代码：2016年2月2日，R::id,R.name是由uiresbuilder
     // 增加-h .\res\resource.h 这2个参数后生成的。
     app.InitXmlNamedID((const LPCWSTR *)&R.name, (const int *)&R.id, sizeof(R.id) / sizeof(int));

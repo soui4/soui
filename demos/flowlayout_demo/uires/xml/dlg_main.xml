@@ -18,31 +18,11 @@ translucent="1"
       </window>
       <imgbtn name="btn_close" skin="_skin.sys.btn.close"     tip="close" animate="1"/>
     </caption>
-    <window size="-2,0" weight="1" layout="vbox" interval="10dp">
-      <window size="-2,-1" layout="hflow" interval="10dp" gravity="center">
-        <button text="Button 1" class="demo_btn" />
-        <button text="Button 2" class="demo_btn" />
-        <button text="Button 3" class="demo_btn" />
-        <button text="Button 4" class="demo_btn" />
-        <button text="Button 5" class="demo_btn" />
-        <button text="Button 6" class="demo_btn" />
-        <button text="Button 7" class="demo_btn" />
-        <button text="Button 8" class="demo_btn" />
-      </window>
-      <window size="-2,0" weight="1" layout="hbox" interval="10dp" gravity="center">
-        <window size="0,-2" weight="1" layout="vflow" interval="10dp" gravity="left">
-          <button text="Button 1" class="demo_btn"/>
-          <button text="Button 2" class="demo_btn"  width="100dp"/>
-          <button text="Button 3" class="demo_btn" />
-          <button text="Button 4" class="demo_btn" />
-          <button text="Button 5" class="demo_btn" />
-          <button text="Button 6" class="demo_btn" />
-          <button text="Button 7" class="demo_btn" />
-          <button text="Button 8" class="demo_btn" />
-        </window>
-        <window size="0,-2" weight="1" layout="vflow" interval="10dp" gravity="center">
+    <tabctrl size="-2,0" weight="1" tabHeight="30" curSel="0">
+      <page title="page1" layout="vbox" interval="10dp">
+        <window size="-2,-1" layout="hflow" interval="10dp" gravity="center">
           <button text="Button 1" class="demo_btn" />
-          <button text="Button 2" class="demo_btn"  width="100dp"/>
+          <button text="Button 2" class="demo_btn" />
           <button text="Button 3" class="demo_btn" />
           <button text="Button 4" class="demo_btn" />
           <button text="Button 5" class="demo_btn" />
@@ -50,17 +30,58 @@ translucent="1"
           <button text="Button 7" class="demo_btn" />
           <button text="Button 8" class="demo_btn" />
         </window>
-        <window size="0,-2" weight="1" layout="vflow" interval="10dp" gravity="right">
-          <button text="Button 1" class="demo_btn" />
-          <button text="Button 2" class="demo_btn"  width="100dp"/>
-          <button text="Button 3" class="demo_btn" />
-          <button text="Button 4" class="demo_btn" />
-          <button text="Button 5" class="demo_btn" />
-          <button text="Button 6" class="demo_btn" />
-          <button text="Button 7" class="demo_btn" />
-          <button text="Button 8" class="demo_btn" />
+        <window size="-2,0" weight="1" layout="hbox" interval="10dp" gravity="center">
+          <window size="0,-2" weight="1" layout="vflow" interval="10dp" gravity="left">
+            <button text="Button 1" class="demo_btn"/>
+            <button text="Button 2" class="demo_btn"  width="100dp"/>
+            <button text="Button 3" class="demo_btn" />
+            <button text="Button 4" class="demo_btn" />
+            <button text="Button 5" class="demo_btn" />
+            <button text="Button 6" class="demo_btn" />
+            <button text="Button 7" class="demo_btn" />
+            <button text="Button 8" class="demo_btn" />
+          </window>
+          <window size="0,-2" weight="1" layout="vflow" interval="10dp" gravity="center">
+            <button text="Button 1" class="demo_btn" />
+            <button text="Button 2" class="demo_btn"  width="100dp"/>
+            <button text="Button 3" class="demo_btn" />
+            <button text="Button 4" class="demo_btn" />
+            <button text="Button 5" class="demo_btn" />
+            <button text="Button 6" class="demo_btn" />
+            <button text="Button 7" class="demo_btn" />
+            <button text="Button 8" class="demo_btn" />
+          </window>
+          <window size="0,-2" weight="1" layout="vflow" interval="10dp" gravity="right">
+            <button text="Button 1" class="demo_btn" />
+            <button text="Button 2" class="demo_btn"  width="100dp"/>
+            <button text="Button 3" class="demo_btn" />
+            <button text="Button 4" class="demo_btn" />
+            <button text="Button 5" class="demo_btn" />
+            <button text="Button 6" class="demo_btn" />
+            <button text="Button 7" class="demo_btn" />
+            <button text="Button 8" class="demo_btn" />
+          </window>
         </window>
-      </window>
-    </window>
+      </page>
+      <page title="page2" layout="vbox" columnCount="2" gravity="fill" interval="5">
+        <window size="-2,-1" layout="hbox">
+          <text text="面积" size="100,-1"/>
+          <checkgroup name="ckg_area" size="0,-1" weight="1" layout="hflow" interval="10dp" gravity="center" colorBkgnd="@color/gray">
+            <template wndClass="window" checkid="1000" layout="hbox" gravity="center">
+              <check id="1000"/>
+              <text text="cm"/>
+              <text text="2" font="size:10" layout_gravity="top"/>
+            </template>
+          </checkgroup>
+        </window>
+        <window size="-2,-1" layout="hbox">
+          <text text="商用厨房类别" size="100,-1"/>
+          <checkgroup name="ckg_type" size="0,-1" weight="1" layout="hflow" xinterval="10dp" yinterval="20dp" gravity="center" colorBkgnd="@color/gray">
+            <template wndClass="check"/>
+          </checkgroup>
+        </window>
+      </page>
+    </tabctrl>
+
   </root>
 </SOUI>

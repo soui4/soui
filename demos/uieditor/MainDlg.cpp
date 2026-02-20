@@ -1699,9 +1699,9 @@ void CMainDlg::OnTbWidgetClick(IEvtArgs *e)
 	EventToolBarCmd *e2=sobj_cast<EventToolBarCmd>(e);
 	ToolBarItem item;
 	m_tbWidget->GetItemInfo(e2->iItem,&item);
-    if (SMap<SStringT,SStringT>::CPair *pair = m_mapWidget.Lookup(item.strText))
+    if (SMap<SStringT,SStringW>::CPair *pair = m_mapWidget.Lookup(item.strText))
     {
-        m_pXmlEdtior->InsertWidget(S_CT2A(pair->m_value, CP_UTF8));
+        m_pXmlEdtior->InsertWidget(S_CW2A(pair->m_value, CP_UTF8));
 	}
 }
 

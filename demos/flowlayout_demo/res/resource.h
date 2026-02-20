@@ -1,4 +1,4 @@
-﻿//stamp:077204a06dee057e
+﻿//stamp:07727d508de39ad3
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -50,12 +50,16 @@ struct _R{
 		 const wchar_t * btn_max;
 		 const wchar_t * btn_min;
 		 const wchar_t * btn_restore;
+		 const wchar_t * ckg_area;
+		 const wchar_t * ckg_type;
 	}name;
 	struct _id{
 		int btn_close;
 		int btn_max;
 		int btn_min;
 		int btn_restore;
+		int ckg_area;
+		int ckg_type;
 	}id;
 	struct _color{
 		int blue;
@@ -77,14 +81,18 @@ struct _R R={
 		L"btn_close",
 		L"btn_max",
 		L"btn_min",
-		L"btn_restore"
+		L"btn_restore",
+		L"ckg_area",
+		L"ckg_type"
 	}
 	,
 	{
 		65539,
 		65537,
 		65536,
-		65538
+		65538,
+		65540,
+		65541
 	}
 	,
 	{

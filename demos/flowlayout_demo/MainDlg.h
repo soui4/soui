@@ -2,7 +2,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 #pragma once
-
+#include "SCheckGroup.h"
 class CMainDlg : public SHostWnd
 			   , public SDpiHandler<CMainDlg>
 {
@@ -16,6 +16,8 @@ public:
 	void OnMinimize();
 	void OnSize(UINT nType, CSize size);
 	BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam);
+	void OnCkgArea(IEvtArgs *e);
+	void OnCkgType(IEvtArgs *e);
 
 protected:
 	//soui消息
@@ -24,6 +26,8 @@ protected:
 		EVENT_NAME_COMMAND(L"btn_min", OnMinimize)
 		EVENT_NAME_COMMAND(L"btn_max", OnMaximize)
 		EVENT_NAME_COMMAND(L"btn_restore", OnRestore)
+        EVENT_ID_HANDLER(R.id.ckg_area, EventGroupCheck::EventID, OnCkgArea)
+        EVENT_ID_HANDLER(R.id.ckg_type, EventGroupCheck::EventID, OnCkgType)
 	EVENT_MAP_END2(SHostWnd)
 		
 	//HostWnd真实窗口消息处理

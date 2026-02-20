@@ -335,7 +335,7 @@ void SOsrPanel::FrameToHost(RECT *rc) const
 }
 
 //不继承宿主的字体，从指定的字体或者系统字体开始，避免在GetRenderTarget时还需要从宿主窗口到获取当前的文字属性。
-void SOsrPanel::BeforePaint(IRenderTarget *pRT, SPainter &painter)
+void SOsrPanel::BeforePaint(IRenderTarget *pRT, SPainter &painter) const
 {
     int iState = SState2Index::GetDefIndex(GetState(), true);
     IFontPtr fontText = GetStyle().GetTextFont(iState);

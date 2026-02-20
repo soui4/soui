@@ -902,7 +902,7 @@ void STabCtrl::UpdateChildrenPosition()
     }
 }
 
-void STabCtrl::BeforePaint(IRenderTarget *pRT, SPainter &painter)
+void STabCtrl::BeforePaint(IRenderTarget *pRT, SPainter &painter) const
 {
     IFontPtr pFont = m_style.GetTextFont(0);
     if (pFont)
