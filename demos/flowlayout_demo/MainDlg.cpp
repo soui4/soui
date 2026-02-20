@@ -106,5 +106,5 @@ void CMainDlg::OnCkgType(IEvtArgs *e)
 	EventGroupCheck *e2 = sobj_cast<EventGroupCheck>(e);
 	SCheckGroup *pCkgType = sobj_cast<SCheckGroup>(e->Sender());
 	int item = e2->iItem;
-	SLOGI()<<"OnCkgArea:"<<item;
+	SLOGI()<<"OnCkgType:"<<item;
 }
