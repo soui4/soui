@@ -209,6 +209,10 @@ class SOUI_EXP SGridLayout : public TObjRefImpl<SObjectImpl<ILayout>> {
         ATTR_GRIDGRAVITY(L"xGravity", m_GravityX, TRUE)               // 水平对齐方式
         ATTR_GRIDGRAVITY(L"yGravity", m_GravityY, TRUE)               // 垂直对齐方式
         ATTR_GRIDGRAVITY(L"gravity", m_GravityX = m_GravityY, TRUE)   // 对齐方式（水平和垂直相同）
+        ATTR_ENUM_BEGIN(L"orientation", ORIENTATION, TRUE)  // 排列方向
+            ATTR_ENUM_VALUE(L"horizontal", Horz) // 水平排列
+            ATTR_ENUM_VALUE(L"vertical", Vert)     // 垂直排列
+        ATTR_ENUM_END(m_orientation)
     SOUI_ATTRS_BREAK()
 
   protected:
@@ -224,8 +228,9 @@ class SOUI_EXP SGridLayout : public TObjRefImpl<SObjectImpl<ILayout>> {
     SLayoutSize m_xInterval; /**< 水平间距 */
     SLayoutSize m_yInterval; /**< 垂直间距 */
 
-    GridGravity m_GravityX; /**< 水平对齐方式 */
-    GridGravity m_GravityY; /**< 垂直对齐方式 */
+    GridGravity m_GravityX;              /**< 水平对齐方式 */
+    GridGravity m_GravityY;              /**< 垂直对齐方式 */
+    ORIENTATION m_orientation; /**< 排列方向 */
 };
 
 SNSEND

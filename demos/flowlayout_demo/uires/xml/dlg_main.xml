@@ -63,23 +63,22 @@ translucent="1"
           </window>
         </window>
       </page>
-      <page title="page2" layout="vbox" columnCount="2" gravity="fill" interval="5">
-        <window size="-2,-1" layout="hbox">
-          <text text="面积" size="100,-1"/>
-          <checkgroup name="ckg_area" size="0,-1" weight="1" layout="hflow" interval="10dp" gravity="center" colorBkgnd="@color/gray">
+      <page title="page2" padding_top="10">
+        <scrollview size="-2,-2" viewSize="-2,-1" layout="grid" columnCount="2" gravity="fill" interval="5">
+          <text text="面积" layout_gravity="top"/>
+          <checkgroup name="ckg_area" size="0,-1" columnWeight="1" layout="hflow" interval="10dp" gravity="center" colorBkgnd="@color/gray">
             <template wndClass="window" checkid="1000" layout="hbox" gravity="center">
               <check id="1000"/>
               <text text="cm"/>
               <text text="2" font="size:10" layout_gravity="top"/>
             </template>
           </checkgroup>
-        </window>
-        <window size="-2,-1" layout="hbox">
-          <text text="商用厨房类别" size="100,-1"/>
-          <checkgroup name="ckg_type" size="0,-1" weight="1" layout="hflow" xinterval="10dp" yinterval="20dp" gravity="center" colorBkgnd="@color/gray">
+          <text text="商用厨房类别" layout_gravity="top"/>
+          <checkgroup name="ckg_type" size="0,-1" columnWeight="1" layout="hflow" xinterval="10dp" yinterval="20dp" gravity="center" colorBkgnd="@color/gray">
             <template wndClass="check"/>
           </checkgroup>
-        </window>
+          <button columnSpan="2" text="bottom line" height="50"/>
+        </scrollview>
       </page>
     </tabctrl>
 

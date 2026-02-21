@@ -17,8 +17,7 @@ CMainDlg::~CMainDlg()
 
 BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 {
-	{
-		SCheckGroup *pCheckGroup = FindChildByID2<SCheckGroup>(R.id.ckg_area);
+    if(SCheckGroup *pCheckGroup = FindChildByID2<SCheckGroup>(R.id.ckg_area)){
 		SCheckItem vOptions[] = {
 			{TRUE, _T("50-80")},
 			{FALSE, _T("80-100")},
@@ -31,8 +30,7 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 		};
 		pCheckGroup->SetOptions(vOptions, ARRAYSIZE(vOptions));
 	}
-	{
-		SCheckGroup *pCheckGroup = FindChildByID2<SCheckGroup>(R.id.ckg_type);
+    if(SCheckGroup *pCheckGroup = FindChildByID2<SCheckGroup>(R.id.ckg_type)){
 		SCheckItem vOptions[] = {
 		 {FALSE, _T("单位食堂")},
 		 {FALSE, _T("学校食堂")},

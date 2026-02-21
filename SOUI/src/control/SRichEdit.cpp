@@ -1114,35 +1114,25 @@ SRichEdit::SRichEdit()
     m_sizelExtent.cx = m_sizelExtent.cy = 0;
     m_evtSet.addEvent(EVENTID(EventRENotify));
     m_evtSet.addEvent(EVENTID(EventREMenu));
+}
+
+SRichEdit::~SRichEdit(){}
+
+int SRichEdit::OnCreate(LPVOID)
+{
+    if (0 != __baseCls::OnCreate(NULL))
+        return 1;
+
+    InitDefaultCharFormat(&m_cfDef);
+    InitDefaultParaFormat(&m_pfDef);
 
     m_pTxtHost = new STextHost;
     if (!m_pTxtHost->Init(this))
     {
         m_pTxtHost->Release();
         m_pTxtHost = NULL;
+        return 1;
     }
-}
-
-SRichEdit::~SRichEdit()
-{
-    if (m_pTxtHost)
-    {
-        m_pTxtHost->Release();
-        m_pTxtHost = NULL;
-    }
-}
-int SRichEdit::OnCreate(LPVOID)
-{
-    int ret = __baseCls::OnCreate(NULL);
-    if (ret != 0)
-        return ret;
-    if (!m_pTxtHost)
-    {
-        SSLOGE() << "create text host failed!";
-        return 2;
-    }
-    InitDefaultCharFormat(&m_cfDef);
-    InitDefaultParaFormat(&m_pfDef);
 
     if (!m_fTransparent && m_style.m_crBg == CR_INVALID && !m_pBgSkin)
         m_style.m_crBg = RGB(0xff, 0xff, 0xff);
@@ -1181,8 +1171,9 @@ void SRichEdit::OnDestroy()
     if (m_pTxtHost)
     {
         m_pTxtHost->GetTextService()->OnTxInPlaceDeactivate();
+        m_pTxtHost->Release();
+        m_pTxtHost = NULL;
     }
-
     m_mapTimer.RemoveAll();
     __baseCls::OnDestroy();
 }
@@ -1900,7 +1891,8 @@ void SRichEdit::OnSetFont(IFontS *pFont, BOOL bRedraw)
 {
     if (SUCCEEDED(InitDefaultCharFormat(&m_cfDef, pFont)))
     {
-        m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_CHARFORMATCHANGE, TXTBIT_CHARFORMATCHANGE);
+        if(m_pTxtHost)
+            m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_CHARFORMATCHANGE, TXTBIT_CHARFORMATCHANGE);
     }
 }
 
@@ -2247,7 +2239,10 @@ HRESULT SRichEdit::OnAttrReStyle(const SStringW &strValue, DWORD dwStyle, DWORD 
         m_dwStyle &= ~dwStyle;
     else
         m_dwStyle |= dwStyle, dwBit = txtBit;
-    m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(txtBit, dwBit);
+    if (!bLoading && txtBit != 0)
+    {
+        m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(txtBit, dwBit);
+    }
     return bLoading ? S_FALSE : S_OK;
 }
 
@@ -2258,7 +2253,10 @@ HRESULT SRichEdit::OnAttrReStyle2(const SStringW &strValue, DWORD dwStyle, DWORD
         m_dwStyle &= ~dwStyle;
     else
         m_dwStyle |= dwStyle;
-    m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(txtBit, txtBit);
+    if (!bLoading && txtBit != 0)
+    {
+        m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(txtBit, txtBit);
+    }
     return bLoading ? S_FALSE : S_OK;
 }
 

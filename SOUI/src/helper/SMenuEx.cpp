@@ -243,14 +243,16 @@ void SMenuExItem::BeforePaint(IRenderTarget *pRT, SPainter &painter) const
         pFont = pRoot->GetStyle().GetTextFont(iState);
         if (pFont)
             pRT->SelectObject(pFont, (IRenderObj **)&painter.oldFont);
+        else
+            pRT->SelectObject(GETUIDEF->GetFont(FF_DEFAULTFONT, GetScale()), NULL);
     }
     COLORREF crTxt = GetStyle().GetTextColor(iState);
+    if (crTxt == CR_INVALID)
+        crTxt = pRoot->GetStyle().GetTextColor(iState);
     if (crTxt != CR_INVALID)
         painter.oldTextColor = pRT->SetTextColor(crTxt);
     else
-    {
-        painter.oldTextColor = pRT->SetTextColor(pRoot->GetStyle().GetTextColor(iState));
-    }
+        pRT->SetTextColor(RGBA(0, 0, 0, 255));
 }
 
 void SMenuExItem::OnPaint(IRenderTarget *pRT)
