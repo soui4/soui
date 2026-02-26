@@ -73,6 +73,7 @@ public:
 	BYTE	_fIncludeCell:1;	// Include CELL in line after nested table
 
 public:
+    CLine();
 	// !!!!! CLine should not have any virtual methods !!!!!!
 
 	// The "big four" line methods: measure, render, CchFromUp, UpFromCch 

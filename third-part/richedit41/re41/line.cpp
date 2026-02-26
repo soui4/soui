@@ -24,6 +24,12 @@ ASSERTDATA
 
 extern BOOL g_OLSBusy;
 
+CLine::CLine()
+{
+    int offset = FIELD_OFFSET(CLine, _plo);
+    memset((char *)this + offset, 0, sizeof(CLine) - offset);
+}
+ 
 /*
  *	CLine::Measure(&me, uiFlags, pliTarget)
  *
