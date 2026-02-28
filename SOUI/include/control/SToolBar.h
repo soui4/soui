@@ -136,6 +136,7 @@ class SOUI_EXP SToolBar : public SWindow, public ITimelineHandler, public IIdleH
     SOUI_MSG_MAP_END()
 
   protected:
+    CSize GetItemSize(CRect &rcWnd, IRenderTarget *pRT, int iItem) const;
     CSize GetItemSize(IRenderTarget *pRT, int iItem) const;
     int GetSepWid() const;
     int HitTest(CPoint pt) const;

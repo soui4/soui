@@ -74,15 +74,71 @@ BOOL SToolBar::CreateChildren(SXmlNode xmlNode)
     return TRUE;
 }
 
+CSize SToolBar::GetItemSize(CRect &rcWnd, IRenderTarget *pRT, int iItem) const
+{
+    CSize szRet;
+    if (iItem < 0 || iItem >= m_arrItems.GetCount())
+        return szRet;
+    const ToolBarItem &item = m_arrItems[iItem];
+    if (m_bVert)
+    {
+        szRet = CSize(rcWnd.Width(), item.nId < 0 ? GetSepWid() : rcWnd.Width());
+    }
+    else
+    {
+        if (item.nId < 0)
+        {
+            szRet = CSize(GetSepWid(), rcWnd.Height());
+        }
+        else
+        {
+            CSize szIcon;
+            if (item.icon)
+                szIcon = item.icon->Size();
+            else if (m_skinIcons)
+                szIcon = m_skinIcons->GetSkinSize();
+
+            if (m_bTextIconVertical && (item.dwStyle & BTNS_SHOWTEXT))
+            {
+                // For vertical text-icon arrangement, height should be larger to accommodate both
+                CSize szTxt;
+                pRT->MeasureText(item.strText, item.strText.GetLength(), &szTxt);
+                szRet.cx = smax(rcWnd.Height(), szIcon.cx);
+                szRet.cy = szIcon.cy + szTxt.cy + m_nTextIconInterval * 2;
+            }
+            else
+            {
+                // Default horizontal arrangement
+                szRet = CSize(rcWnd.Height(), rcWnd.Height());
+                if ((item.dwStyle & BTNS_SHOWTEXT))
+                {
+                    CSize szTxt;
+                    pRT->MeasureText(item.strText, item.strText.GetLength(), &szTxt);
+                    szTxt.cx = smin(szTxt.cx, m_nMaxItemWidth);
+                    szRet.cx += szTxt.cx + m_nTextIconInterval;
+                }
+            }
+
+            if ((item.dwStyle & TBSTYLE_DROPDOWN) && m_skinDropArrow)
+            {
+                CSize szDropArrow = m_skinDropArrow->GetSkinSize();
+                szRet.cx += szDropArrow.cx;
+            }
+        }
+    }
+    return szRet;
+}
+
 SIZE SToolBar::MeasureContent(int nParentWid, int nParentHei)
 {
-    IRenderTarget *pRT=NULL;
+    IRenderTarget *pRT = NULL;
     GETRENDERFACTORY->CreateRenderTarget(&pRT, 0, 0);
     BeforePaintEx(pRT);
     CSize szContent;
+    CRect rcWnd = { 0, 0, nParentWid, nParentHei };
     for (UINT i = 0; i < m_arrItems.GetCount(); i++)
     {
-        CSize szItem = GetItemSize(pRT,i);
+        CSize szItem = GetItemSize(rcWnd, pRT, i);
         if (m_bVert)
         {
             szContent.cx = smax(szContent.cx, szItem.cx);
@@ -102,8 +158,8 @@ CSize SToolBar::GetItemSize(IRenderTarget *pRT, int iItem) const
 {
     CRect rc = GetClientRect();
     CSize szRet;
-    if (iItem<0 || iItem >= m_arrItems.GetCount())
-        return szRet; 
+    if (iItem < 0 || iItem >= m_arrItems.GetCount())
+        return szRet;
     const ToolBarItem &item = m_arrItems[iItem];
     if (m_bVert)
     {
@@ -122,7 +178,7 @@ CSize SToolBar::GetItemSize(IRenderTarget *pRT, int iItem) const
                 szIcon = item.icon->Size();
             else if (m_skinIcons)
                 szIcon = m_skinIcons->GetSkinSize();
-            
+
             if (m_bTextIconVertical && (item.dwStyle & BTNS_SHOWTEXT))
             {
                 // For vertical text-icon arrangement, height should be larger to accommodate both
@@ -143,7 +199,7 @@ CSize SToolBar::GetItemSize(IRenderTarget *pRT, int iItem) const
                     szRet.cx += szTxt.cx + m_nTextIconInterval;
                 }
             }
-            
+
             if ((item.dwStyle & TBSTYLE_DROPDOWN) && m_skinDropArrow)
             {
                 CSize szDropArrow = m_skinDropArrow->GetSkinSize();
@@ -198,10 +254,10 @@ CRect SToolBar::GetItemRect(int iItem) const
         }
         else
         {
-            IRenderTarget *pRT=NULL;
+            IRenderTarget *pRT = NULL;
             GETRENDERFACTORY->CreateRenderTarget(&pRT, 0, 0);
             BeforePaintEx(pRT);
-            CSize szItem = GetItemSize(pRT,i);
+            CSize szItem = GetItemSize(pRT, i);
             pRT->Release();
             if (m_bVert)
             {
@@ -231,7 +287,7 @@ int SToolBar::HitTest(CPoint pt) const
         rc.right = rc.left;
     }
     int ret = -1;
-    IRenderTarget *pRT=NULL;
+    IRenderTarget *pRT = NULL;
     GETRENDERFACTORY->CreateRenderTarget(&pRT, 0, 0);
     BeforePaintEx(pRT);
     for (int i = 0; i < m_nVisibleItems; i++)
@@ -251,7 +307,7 @@ int SToolBar::HitTest(CPoint pt) const
         }
         else
         {
-            CSize szItem = GetItemSize(pRT,i);
+            CSize szItem = GetItemSize(pRT, i);
             if (m_bVert)
             {
                 rc.top = rc.bottom;
@@ -296,13 +352,13 @@ void SToolBar::DrawItem(IRenderTarget *pRT, const CRect &rcItem, const ToolBarIt
         bool bHasDropDown = (pItem->dwStyle & TBSTYLE_DROPDOWN) != 0;
         int nDropArrowWidth = 0;
         int nDropArrowHeight = 0;
-        
+
         if (bHasDropDown && m_skinDropArrow)
         {
             CSize szDropArrow = m_skinDropArrow->GetSkinSize();
             nDropArrowWidth = szDropArrow.cx;
             nDropArrowHeight = szDropArrow.cy;
-            
+
             if (!m_bVert)
             {
                 rcContent.right -= nDropArrowWidth;
@@ -328,7 +384,8 @@ void SToolBar::DrawItem(IRenderTarget *pRT, const CRect &rcItem, const ToolBarIt
             if (item.byAlphaAni == 0xFF)
             { // Not in animation
                 m_skinState->DrawByState(pRT, rcContent, pItem->dwState);
-                if(bHasDropDown){
+                if (bHasDropDown)
+                {
                     m_skinState->DrawByState(pRT, rcDropArrow, pItem->dwState);
                 }
             }
@@ -338,26 +395,28 @@ void SToolBar::DrawItem(IRenderTarget *pRT, const CRect &rcItem, const ToolBarIt
                 if (pItem->dwState & WndState_Hover)
                 {
                     // Get hover state - fade from normal to hover
-                    m_skinState->DrawByState2(pRT, rcContent, WndState_Normal, (0xff-byNewAlpha));
+                    m_skinState->DrawByState2(pRT, rcContent, WndState_Normal, (0xff - byNewAlpha));
                     m_skinState->DrawByState2(pRT, rcContent, WndState_Hover, byNewAlpha);
 
-                    if(bHasDropDown){
-                        m_skinState->DrawByState2(pRT, rcDropArrow, WndState_Normal, (0xff-byNewAlpha));
+                    if (bHasDropDown)
+                    {
+                        m_skinState->DrawByState2(pRT, rcDropArrow, WndState_Normal, (0xff - byNewAlpha));
                         m_skinState->DrawByState2(pRT, rcDropArrow, WndState_Hover, byNewAlpha);
                     }
                 }
                 else
                 {
                     // Leave hover state - fade from hover to normal
-                    m_skinState->DrawByState2(pRT, rcContent, WndState_Hover, (0xff-byNewAlpha));
+                    m_skinState->DrawByState2(pRT, rcContent, WndState_Hover, (0xff - byNewAlpha));
                     m_skinState->DrawByState2(pRT, rcContent, WndState_Normal, byNewAlpha);
-                    if(bHasDropDown){
-                        m_skinState->DrawByState2(pRT, rcDropArrow, WndState_Hover, (0xff-byNewAlpha));
+                    if (bHasDropDown)
+                    {
+                        m_skinState->DrawByState2(pRT, rcDropArrow, WndState_Hover, (0xff - byNewAlpha));
                         m_skinState->DrawByState2(pRT, rcDropArrow, WndState_Normal, byNewAlpha);
                     }
                 }
             }
-        }    
+        }
         // Icon is always displayed. Check if text should be shown.
         BOOL bShowText = (pItem->dwStyle & BTNS_SHOWTEXT) != 0 && (!m_bVert || m_bTextIconVertical);
 
@@ -372,7 +431,7 @@ void SToolBar::DrawItem(IRenderTarget *pRT, const CRect &rcItem, const ToolBarIt
 
             CSize szTxt;
             pRT->MeasureText(pItem->strText, pItem->strText.GetLength(), &szTxt);
-            
+
             if (m_bTextIconVertical)
             {
                 // Vertical arrangement: icon above text
@@ -445,12 +504,12 @@ void SToolBar::OnPaint(IRenderTarget *pRT)
         if (m_bVert)
         {
             rcItem.top = rcItem.bottom;
-            rcItem.bottom += item.nId < 0 ? nSep : GetItemSize(pRT,i).cy;
+            rcItem.bottom += item.nId < 0 ? nSep : GetItemSize(pRT, i).cy;
         }
         else
         {
             rcItem.left = rcItem.right;
-            rcItem.right += item.nId < 0 ? nSep : GetItemSize(pRT,i).cx;
+            rcItem.right += item.nId < 0 ? nSep : GetItemSize(pRT, i).cx;
         }
 
         DrawItem(pRT, rcItem, &item, i);
@@ -582,7 +641,9 @@ void SToolBar::OnMouseMove(UINT nFlags, CPoint pt)
                 m_dwDropBtnState &= ~WndState_Hover;
                 InvalidateRect(rcDropButton);
             }
-        }else{
+        }
+        else
+        {
             if (m_dwDropBtnState & WndState_Hover)
             {
                 CRect rcDropButton = GetDropdownButtonRect();
@@ -658,7 +719,7 @@ void SToolBar::SetIconsSkin(SAutoRefPtr<ISkinObj> skinIcons)
 
 void SToolBar::UpdateVisibleItemCount()
 {
-    IRenderTarget *pRT=NULL;
+    IRenderTarget *pRT = NULL;
     GETRENDERFACTORY->CreateRenderTarget(&pRT, 0, 0);
     BeforePaintEx(pRT);
     // Calculate m_nMoreButtonSize dynamically based on drop arrow size
@@ -693,7 +754,7 @@ void SToolBar::UpdateVisibleItemCount()
         }
         else
         {
-            CSize szItem = GetItemSize(pRT,i);
+            CSize szItem = GetItemSize(pRT, i);
             if (m_bVert)
             {
                 rc.top = rc.bottom;
@@ -773,7 +834,7 @@ CRect SToolBar::GetDropdownButtonRect() const
 
 void SToolBar::DrawDropButton(IRenderTarget *pRT, const CRect &rc, DWORD dwState)
 {
-    if(m_skinState)
+    if (m_skinState)
         m_skinState->DrawByState(pRT, rc, dwState);
     if (m_skinDropArrow)
     {
@@ -781,10 +842,13 @@ void SToolBar::DrawDropButton(IRenderTarget *pRT, const CRect &rc, DWORD dwState
         CPoint ptCenter = rc.CenterPoint();
         CRect rcArrow(ptCenter, szArrow);
         rcArrow.OffsetRect(-szArrow.cx / 2, -szArrow.cy / 2);
-        if(m_bVert){
-            rcArrow.MoveToX(rc.right-szArrow.cx);
-        }else{
-            rcArrow.MoveToY(rc.bottom-szArrow.cy);
+        if (m_bVert)
+        {
+            rcArrow.MoveToX(rc.right - szArrow.cx);
+        }
+        else
+        {
+            rcArrow.MoveToY(rc.bottom - szArrow.cy);
         }
         m_skinDropArrow->DrawByIndex(pRT, rcArrow, 0);
     }
@@ -1048,21 +1112,21 @@ void SToolBar::SetButtonStyle(int nIndex, int nStyle)
 void SToolBar::OnItemHover(int iItem)
 {
     if (iItem < 0 || iItem >= (int)m_arrItems.GetCount())
-        return;  
+        return;
     ToolBarItem &item = m_arrItems[iItem];
     if ((item.dwStyle & TBSTYLE_CHECK) && (item.dwState & WndState_Check))
         return;
     item.dwState |= WndState_Hover;
     CRect rc = GetItemRect(iItem);
-    
+
     // Start animation if enabled
     if (m_bAnimate)
     {
         StopItemAnimate(iItem);
-        item.byAlphaAni = 50;  // ani alpha from 50 to 255
+        item.byAlphaAni = 50; // ani alpha from 50 to 255
         GetContainer()->RegisterTimelineHandler(this);
     }
-    
+
     InvalidateRect(rc);
 }
 
@@ -1070,21 +1134,21 @@ void SToolBar::OnItemLeave(int iItem)
 {
     if (iItem < 0 || iItem >= (int)m_arrItems.GetCount())
         return;
-    
+
     ToolBarItem &item = m_arrItems[iItem];
-    if ((item.dwStyle & TBSTYLE_CHECK) && (item.dwState& WndState_Check))
+    if ((item.dwStyle & TBSTYLE_CHECK) && (item.dwState & WndState_Check))
         return;
     item.dwState &= ~WndState_Hover;
     CRect rc = GetItemRect(iItem);
-    
+
     // Start animation if enabled
     if (m_bAnimate)
     {
         StopItemAnimate(iItem);
-        item.byAlphaAni = 50;  // ani alpha from 50 to 255 (but leaving hover)
+        item.byAlphaAni = 50; // ani alpha from 50 to 255 (but leaving hover)
         GetContainer()->RegisterTimelineHandler(this);
     }
-    
+
     InvalidateRect(rc);
 }
 
@@ -1106,7 +1170,7 @@ void SToolBar::OnNextFrame()
         if (item.byAlphaAni != 0xFF)
         {
             bAnyAnimating = TRUE;
-            int byAlpha = item.byAlphaAni+ m_nAniStep;
+            int byAlpha = item.byAlphaAni + m_nAniStep;
             if (byAlpha > 0xFF)
             {
                 byAlpha = 0xFF;
@@ -1115,7 +1179,7 @@ void SToolBar::OnNextFrame()
             InvalidateRect(GetItemRect(i));
         }
     }
-    
+
     // Unregister if no more animations
     if (!bAnyAnimating && GetContainer())
     {
@@ -1123,13 +1187,16 @@ void SToolBar::OnNextFrame()
     }
 }
 
-void SToolBar::OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer){
-    __baseCls::OnContainerChanged(pOldContainer,pNewContainer);
-    if(pOldContainer){
+void SToolBar::OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer)
+{
+    __baseCls::OnContainerChanged(pOldContainer, pNewContainer);
+    if (pOldContainer)
+    {
         pOldContainer->UnregisterTimelineHandler(this);
         pOldContainer->GetMsgLoop()->RemoveIdleHandler(this);
     }
-    if(pNewContainer){
+    if (pNewContainer)
+    {
         pNewContainer->RegisterTimelineHandler(this);
         pNewContainer->GetMsgLoop()->AddIdleHandler(this);
     }
@@ -1138,20 +1205,21 @@ void SToolBar::OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer 
 BOOL SToolBar::OnIdle(int iRun)
 {
     if (iRun == 0)
-    {//update toolbar state, only for button item.
+    { // update toolbar state, only for button item.
         for (size_t i = 0; i < m_arrItems.GetCount(); i++)
         {
             ToolBarItem &item = m_arrItems[i];
-            if(IsSeparator(&item))
+            if (IsSeparator(&item))
                 continue;
             EventUpdateCmdUI evt(this);
             evt.nCmdId = m_arrItems[i].nId;
             evt.iIndex = i;
-            evt.bEnable = (item.dwState & WndState_Disable)?FALSE:TRUE;
+            evt.bEnable = (item.dwState & WndState_Disable) ? FALSE : TRUE;
             evt.bChecked = (item.dwState & WndState_Check) ? TRUE : FALSE;
-            if(FireEvent(evt)){
+            if (FireEvent(evt))
+            {
                 DWORD dwState = item.dwState;
-                if(evt.bEnable)
+                if (evt.bEnable)
                     item.dwState &= ~WndState_Disable;
                 else
                     item.dwState |= WndState_Disable;
@@ -1159,7 +1227,7 @@ BOOL SToolBar::OnIdle(int iRun)
                     item.dwState |= WndState_Check;
                 else
                     item.dwState &= ~WndState_Check;
-                if(item.dwState != dwState)
+                if (item.dwState != dwState)
                     InvalidateRect(GetItemRect(i));
             }
         }
