@@ -85,6 +85,7 @@ protected:
         EVENT_ID_COMMAND(R.id.btn_min, OnMinimize)
         EVENT_ID_COMMAND(R.id.btn_max, OnMaximize)
         EVENT_ID_COMMAND(R.id.btn_restore, OnRestore)
+		EVENT_ID_COMMAND(R.id.btn_help, OnBtnAbout)
 
 		EVENT_ID_HANDLER(R.id.workspace_treeview,EventOfPanel::EventID,OnTvEventOfPanel)
 		EVENT_ID_HANDLER(R.id.workspace_treeview,EventKeyDown::EventID,OnTvKeyDown)
