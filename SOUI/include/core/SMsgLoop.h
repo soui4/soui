@@ -147,7 +147,7 @@ class SOUI_EXP SMessageLoop : public TObjRefImpl<IMessageLoop> {
     /**
      * @brief Runs idle processing.
      */
-    void RunIdle();
+    BOOL RunIdle();
 
   protected:
     // Flag indicating whether the message loop is running

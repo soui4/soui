@@ -7,6 +7,7 @@
 #include "helper/SplitString.h"
 #include "helper/STime.h"
 #include <helper/SHostMgr.h>
+#include <helper/SMenuEx.h>
 #include <core/SHostPresenter.h>
 #ifdef _WIN32
 #include <Imm.h>
@@ -163,6 +164,7 @@ SRootWindow::SRootWindow()
     GetEventSet()->addEvent(EVENTID(EventInit));
     GetEventSet()->addEvent(EVENTID(EventExit));
     GetEventSet()->addEvent(EVENTID(EventMenuCmd));
+    GetEventSet()->addEvent(EVENTID(EventUpdateCmdUI));
 }
 
 void SRootWindow::OnAnimationInvalidate(bool bErase)
@@ -2255,6 +2257,47 @@ LRESULT SHostWnd::OnSetLanguage(UINT uMsg, WPARAM wp, LPARAM lp)
     GetRoot()->SDispatchMessage(uMsg);
     GetRoot()->RequestRelayout();
     return 0;
+}
+
+void SHostWnd::OnInitMenuPopup(HMENU menuPopup, UINT nIndex, BOOL bSysMenu)
+{
+    int nCount = ::GetMenuItemCount(menuPopup);
+    for (int i = 0; i < nCount; i++)
+    {
+        MENUITEMINFO mii = { sizeof(mii), MIIM_STATE|MIIM_ID, 0 };
+        GetMenuItemInfo(menuPopup, i, TRUE, &mii);
+        if(mii.wID == 0)
+            continue;
+        EventUpdateCmdUI evt(GetRoot());
+        evt.nCmdId = mii.wID;
+        evt.iIndex = i;
+        evt.bEnable = mii.fState & MF_DISABLED ? FALSE : TRUE;
+        evt.bChecked = mii.fState & MF_CHECKED ? TRUE : FALSE;
+        if(GetRoot()->FireEvent(&evt)){
+            CheckMenuItem(menuPopup, i, MF_BYPOSITION | (evt.bChecked ? MF_CHECKED : 0));
+            EnableMenuItem(menuPopup, i, MF_BYPOSITION|(evt.bEnable ? MF_ENABLED : MF_GRAYED));
+        }
+    }
+}
+
+void SHostWnd::OnInitMenuExPopup(SMenuEx* menuPopup, UINT nIndex)
+{
+    int nCount = menuPopup->GetMenuItemCount();
+    for (int i = 0; i < nCount; i++)
+    {
+        EventUpdateCmdUI evt(GetRoot());
+        SMenuExItem* pMenuItem = menuPopup->GetMenuItem(i,FALSE);
+        if(!pMenuItem || pMenuItem->GetID() == 0)
+            continue;
+        evt.nCmdId = pMenuItem->GetID();
+        evt.iIndex = i;
+        evt.bEnable = pMenuItem->IsDisabled() ? FALSE : TRUE;
+        evt.bChecked = pMenuItem->IsChecked();
+        if(GetRoot()->FireEvent(&evt)){
+            menuPopup->EnableMenuItem(i, evt.bEnable?0:MF_GRAYED);
+            menuPopup->CheckMenuItem(i, evt.bChecked ? MF_CHECKED : 0);
+        }
+    }
 }
 
 //////////////////////////////////////////////////////////////////

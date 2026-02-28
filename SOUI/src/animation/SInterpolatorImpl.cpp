@@ -1,6 +1,6 @@
 ﻿#include "souistd.h"
 #include "animation/SInterpolatorImpl.h"
-#include "layout/SLayoutSize.h" //for SLayoutSize::fequal
+#include "core/SLayoutSize.h" //for SLayoutSize::fequal
 #pragma warning(push)
 #pragma warning(disable : 4985) // disable the warning message during the include
 #include <math.h>               // this is where I would normally get the warning message

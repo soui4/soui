@@ -111,7 +111,7 @@ BOOL SMessageLoop::OnIdle(int nIdleCount)
     for (size_t i = 0; i < m_priv->m_aIdleHandler.GetCount(); i++)
     {
         IIdleHandler *pIdleHandler = m_priv->m_aIdleHandler[i];
-        if (!pIdleHandler->OnIdle())
+        if (!pIdleHandler->OnIdle(nIdleCount))
             bContinue = FALSE;
     }
     if (m_priv->m_parentLoop)
@@ -278,20 +278,27 @@ BOOL SMessageLoop::PeekMsg(THIS_ LPMSG pMsg, UINT wMsgFilterMin, UINT wMsgFilter
     return ::PeekMessage(pMsg, 0, wMsgFilterMin, wMsgFilterMax, bRemove ? PM_REMOVE : PM_NOREMOVE);
 }
 
-void SMessageLoop::RunIdle()
+BOOL SMessageLoop::RunIdle()
 {
     MSG msg;
-    while (!m_bQuit && m_bDoIdle && !PeekMsg(&msg, 0, 0, FALSE))
+    while (!m_bQuit && m_bDoIdle)
     {
+        if(PeekMsg(&msg, 0, 0, FALSE))
+            return FALSE;
         m_bDoIdle = OnIdle(m_nIdleCount++);
+        if (m_bDoIdle)
+            Sleep(0);
     }
+    return TRUE;
 }
 
 BOOL SMessageLoop::WaitMsg(THIS)
 {
-    RunIdle();
+    BOOL bIdle = RunIdle();
     if (m_bQuit)
         return FALSE;
+    if (!bIdle)
+        return TRUE;
     return ::WaitMessage();
 }
 

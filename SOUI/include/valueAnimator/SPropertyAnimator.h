@@ -10,7 +10,7 @@
 
 #include <interface/slayout-i.h>
 #include <interface/SPropertyAnimator-i.h>
-#include <layout/SLayoutSize.h>
+#include <core/SLayoutSize.h>
 #include <helper/obj-ref-impl.hpp>
 #include <proxy/SValueAnimatorProxy.h>
 

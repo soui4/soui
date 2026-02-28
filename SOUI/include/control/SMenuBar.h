@@ -77,7 +77,7 @@ class SOUI_EXP SMenuBar : public SWindow {
      * @param xmlNode XML node for the child items
      * @return TRUE if successful, FALSE otherwise
      */
-    virtual BOOL CreateChildren(SXmlNode xmlNode);
+    BOOL CreateChildren(SXmlNode xmlNode) override;
 
     /**
      * @brief Callback function for menu switch

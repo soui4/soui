@@ -131,18 +131,14 @@ BOOL CXmlEditor::LoadXml(SStringT strFileName, SStringT layoutName)
     m_bSetCaretPos = FALSE;
 	m_treeXmlStruct->RemoveAllItems();
 
-	SSplitWnd * split_xml_editor_main = m_pRoot->FindChildByID2<SSplitWnd>(R.id.xml_editor_main);
-    SSplitWnd *splite_xml_editor_sub = m_pRoot->FindChildByID2<SSplitWnd>(R.id.xml_editor_sub);
-
+	SSplitWnd * split_xml_editor = m_pRoot->FindChildByID2<SSplitWnd>(R.id.xml_editor);
 	if(!layoutName.IsEmpty())
 	{
-		splite_xml_editor_sub->ShowPane(0);
-        split_xml_editor_main->ShowPane(1);
+        split_xml_editor->ShowPane(0);
 		UpdatePreview();
 	}else
 	{
-		splite_xml_editor_sub->HidePane(0);
-        split_xml_editor_main->HidePane(1);
+        split_xml_editor->HidePane(0);
     }
 
 	return TRUE;
@@ -782,17 +778,18 @@ void CXmlEditor::UpdatePropGridLayout()
 }
 
 
-void CXmlEditor::OnSaveXml()
+BOOL CXmlEditor::OnSaveXml()
 {
 	if(!isValidXml())
 	{
 		if(IDCANCEL == SMessageBox(m_pMainDlg->m_hWnd,_T("编辑器中的XML文件格式有错误,确定要保存吗?"),_T("提示"),MB_OKCANCEL))
-			return ;
+			return FALSE;
 	}
 	SaveFile();
+    return TRUE;
 }
 
-void CXmlEditor::OnFormatXml()
+BOOL CXmlEditor::OnFormatXml()
 {
 	SStringA strXml = m_pScintillaWnd->GetWindowText();
     spugi::xml_document xmlDoc;
@@ -800,12 +797,13 @@ void CXmlEditor::OnFormatXml()
     {
     
 		SMessageBox(m_pMainDlg->m_hWnd, _T("XML格式有错误，无法格式化!"), _T("提示"), MB_OK);
-        return;
+        return FALSE;
     }
 	StreamWrite writer;
     xmlDoc.save(writer, "\t", spugi::format_default, spugi::encoding_utf8);
     m_pScintillaWnd->SetSel(0, -1);
 	m_pScintillaWnd->ReplaseSel(writer.m_stream.str().c_str());
+    return TRUE;
 }
 
 SNSEND

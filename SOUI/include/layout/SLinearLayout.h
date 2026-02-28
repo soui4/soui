@@ -110,8 +110,8 @@ class SLinearLayoutParam
 
   public:
     SOUI_ATTRS_BEGIN()
-        ATTR_CUSTOM(L"width", OnAttrWidth)                      // 宽度
-        ATTR_CUSTOM(L"height", OnAttrHeight)                    // 高度
+        ATTR_LAYOUTSIZE(L"width", width,TRUE)                   // 宽度
+        ATTR_LAYOUTSIZE(L"height", height,TRUE)                 // 高度
         ATTR_CUSTOM(L"size", OnAttrSize)                        // 大小
         ATTR_FLOAT(L"weight", weight, FALSE)                    // 权重
         ATTR_GRAVITY(L"layout_gravity", gravity, FALSE)         // 对齐方式
@@ -130,22 +130,6 @@ class SLinearLayoutParam
      * @return 处理结果
      */
     HRESULT OnAttrSize(const SStringW &strValue, BOOL bLoading);
-
-    /**
-     * @brief 处理宽度属性
-     * @param strValue 属性值字符串
-     * @param bLoading 是否正在加载
-     * @return 处理结果
-     */
-    HRESULT OnAttrWidth(const SStringW &strValue, BOOL bLoading);
-
-    /**
-     * @brief 处理高度属性
-     * @param strValue 属性值字符串
-     * @param bLoading 是否正在加载
-     * @return 处理结果
-     */
-    HRESULT OnAttrHeight(const SStringW &strValue, BOOL bLoading);
 
     /**
      * @brief 处理扩展属性

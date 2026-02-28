@@ -1,4 +1,4 @@
-//stamp:01dc9e6492744546
+//stamp:01dca8836dd81eac
 /*<------------------------------------------------------------------------------------------------->*/
 #define DEFINE_UIRES(name, type, file_path)\
     name type file_path
@@ -39,7 +39,13 @@ DEFINE_UIRES(png_designer_background,	IMG,	"uires/image/designer_background.png"
 DEFINE_UIRES(png_filetypes,	IMG,	"uires/image/filetypes.png")
 DEFINE_UIRES(png_item_bk,	IMG,	"uires/image/item_bk.png")
 DEFINE_UIRES(png_dropdown,	IMG,	"uires/image/dropdown.png")
+DEFINE_UIRES(png_tb_main,	IMG,	"uires/image/tb_main.png")
+DEFINE_UIRES(png_tb_sep,	IMG,	"uires/image/tb_sep.png")
 DEFINE_UIRES(ICON_logo,	ICON,	"uires/image/logo.ico")
 DEFINE_UIRES(menu_layoutfile,	smenu,	"uires/smenu/menu_layoutfile.xml")
 DEFINE_UIRES(menu_recent,	smenu,	"uires/smenu/menu_recent.xml")
 DEFINE_UIRES(menu_file_ctx,	smenu,	"uires/smenu/menu_file_ctx.xml")
+DEFINE_UIRES(menu_file,	smenu,	"uires/smenu/menu_file.xml")
+DEFINE_UIRES(menu_view,	smenu,	"uires/smenu/menu_view.xml")
+DEFINE_UIRES(menu_tool,	smenu,	"uires/smenu/menu_tool.xml")
+DEFINE_UIRES(menu_help,	smenu,	"uires/smenu/menu_help.xml")

@@ -15,7 +15,7 @@
 #define __SSKIN__H__
 
 #include <core/SSkinObjBase.h>
-#include <layout/SLayoutSize.h>
+#include <core/SLayoutSize.h>
 #include <helper/SplitString.h>
 #include <matrix/SPoint.h>
 #include <sobject/Sobject.hpp>

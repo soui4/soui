@@ -16,27 +16,50 @@
 				</window>
 				<imgbtn name="btn_close" skin="_skin.sys.btn.close" tip="close" animate="1" />
 			</caption>
-			<img size="-2,2" skin="skin_caption_line" />
-			<toolbar name="tb_widget" size="-2,40" skin="skin_item_bk" dropArrowSkin="skin_dropdown" display="0" visible="0"/>
-			<toolbar name="tb_skin" size="-2,40" skin="skin_item_bk" dropArrowSkin="skin_dropdown" display="0" visible="0"/>
-			<window size="-2,34" colorBkgnd="@color/bkBlack1" layout="hbox" interval="10" gravity="center">
-				<imgbtnex name="toolbar_btn_Open" skin="skin_app_button" text="打开工程" size="100,30" animate="1" class="ue_cls_title" />
-				<imgbtnex name="toolbar_btn_recent" skin="skin_open_menu_png" text="" size="25,30" animate="1" margin-x="0" />
-				<imgbtnex name="toolbar_btn_Close" skin="skin_app_button" text="关闭工程" size="100,30" animate="1" class="ue_cls_title" />
-				<imgbtnex name="toolbar_btn_NewLayout" skin="skin_app_button" text="新建布局" size="100,30" animate="1" class="ue_cls_title" />
-				<imgbtnex name="toolbar_btn_NewInclude" skin="skin_app_button" text="新建Include" size="100,30" animate="1" class="ue_cls_title" />
-				<imgbtnex name="toolbar_btn_viewskin" skin="skin_app_button" text="查看皮肤" size="100,30" animate="1" class="ue_cls_title" />
-				<check name="chk_autosave" text="文件自动保存" colorText="@color/white"/>
-				<window size="0,0" weight="1" visible="0"/>
+			<window size="-2,0" weight="1" layout="frame" enableDockMode="any">
+				<!--menu bar-->
+				<menubar name="main_menu" size="-2,36" dock="top">
+					<btnstyle skin="skin_item_bk" colorText="@color/white" padding="2"/>
+					<menus>
+						<menuItem src="SMENU:MENU_FILE">文件(&F)</menuItem>
+						<menuItem src="SMENU:MENU_VIEW">视图(&V)</menuItem>
+						<menuItem src="SMENU:MENU_TOOL">工具(&T)</menuItem>
+						<menuItem src="SMENU:MENU_HELP">帮助(&H)</menuItem>
+					</menus>
+				</menubar>
+				<toolbar name="tb_main" dock="top" size="0,40" weight="1" skin="skin_item_bk" colorText="@color/white" colorTextDisable="@color/gray" iconSkin="skin_tb_main" dropArrowSkin="skin_dropdown" sepSkin="skin_tb_sep">
+				  <data>
+					<item  id="1" name="tb_main_openproject" text="@string/open_prject" iconIndex="0" dropdown="1" showText="1"/>
+					<item  id="2" name="tb_main_closeproject" text="@string/close_prject" iconIndex="1" showText="1"/>
+					<item  id="3" name="tb_main_savexml" text="@string/save_xml" iconIndex="2" showText="1"/>
+					<sep/>
+					<item  id="4" name="tb_main_newlayout" text="@string/new_layout" iconIndex="3" showText="1"/>
+					<item  id="5" name="tb_main_newinclude" text="@string/new_include" iconIndex="4" showText="1"/>
+					<sep/>
+					<item  id="6" name="tb_main_formatxml" text="@string/format_xml" iconIndex="5" showText="1"/>
+					<item  id="7" name="tb_main_viewskin" text="@string/view_skin" iconIndex="6" showText="1"/>
+					<item  id="8" name="tb_main_autosave" text="@string/auto_save" iconIndex="7" showText="1" check="1"/>
+					<sep/>
+					<item  id="9" name="tb_main_about" text="@string/about" iconIndex="8" showText="1"/>
+				  </data>
+				</toolbar>
+				<!--widget toolbar-->
+				<toolbar name="tb_widget" dock="top" size="-2,40" skin="skin_item_bk" dropArrowSkin="skin_dropdown" display="0" visible="0"/>
+				<!--skin toolbar-->
+				<toolbar name="tb_skin" dock="top" size="-2,40" skin="skin_item_bk" dropArrowSkin="skin_dropdown" display="0" visible="0"/>
+				<!--main designer-->
+				<splitcol name="NAME_UIDESIGNER_split_col" dock="mainview" sepSkin="" sepSize="6">
+					<pane idealSize="380" minSize="30" priority="1" clipClient="1">
+						<include src="layout:xml_mainwnd_left" />
+					</pane>
+					<pane idealSize="800" minSize="30" priority="0" clipClient="1">
+						<include src="layout:xml_uidesigner_main" />
+					</pane>
+				</splitcol>
+				<dockbar width="300" dock="right" name="property_panel_dock" text="@string/property" resizable="1" margin="2">
+					<include src="layout:property_panel" />
+				</dockbar>
 			</window>
-			<splitcol name="NAME_UIDESIGNER_split_col" size="-2,0" weight="1" sepSkin="" sepSize="6">
-				<pane idealSize="380" minSize="30" priority="1" clipClient="1">
-					<include src="layout:xml_mainwnd_left" />
-				</pane>
-				<pane idealSize="800" minSize="30" priority="0" clipClient="1">
-					<include src="layout:xml_uidesigner_main" />
-				</pane>
-			</splitcol>
 		</window>
 	</root>
 </SOUI>

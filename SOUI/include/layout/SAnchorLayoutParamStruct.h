@@ -1,7 +1,7 @@
 ﻿#ifndef __SANILAYOUTPARAMSTRUCT__H__
 #define __SANILAYOUTPARAMSTRUCT__H__
 
-#include <layout/SLayoutSize.h>
+#include <core/SLayoutSize.h>
 #include <interface/SValueAnimator-i.h>
 
 SNSBEGIN

@@ -1,6 +1,7 @@
 ﻿#include <souistd.h>
 #include <control/SMenuBar.h>
 #include <control/SCmnCtrl.h>
+#include <layout/SLinearLayout.h>
 
 #define TIMER_POP 10
 
@@ -181,6 +182,8 @@ SMenuBar::SMenuBar()
 {
     m_evtSet.addEvent(EVENTID(EventSelectMenu));
     SMenuBar::m_pMenuBar = this;
+    m_pLayout.Attach(new SHBox());
+    m_pLayout->SetAttribute(L"gravity",L"center",TRUE);
 }
 
 SMenuBar::~SMenuBar()

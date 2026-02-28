@@ -115,22 +115,6 @@ class SouiLayoutParam
 
   protected:
     /**
-     * @brief 处理宽度属性
-     * @param strValue 属性值字符串
-     * @param bLoading 是否正在加载
-     * @return 处理结果
-     */
-    HRESULT OnAttrWidth(const SStringW &strValue, BOOL bLoading);
-
-    /**
-     * @brief 处理高度属性
-     * @param strValue 属性值字符串
-     * @param bLoading 是否正在加载
-     * @return 处理结果
-     */
-    HRESULT OnAttrHeight(const SStringW &strValue, BOOL bLoading);
-
-    /**
      * @brief 处理大小属性
      * @param strValue 属性值字符串
      * @param bLoading 是否正在加载
@@ -155,8 +139,8 @@ class SouiLayoutParam
     HRESULT OnAttrOffset(const SStringW &strValue, BOOL bLoading);
 
     SOUI_ATTRS_BEGIN()
-        ATTR_CUSTOM(L"width", OnAttrWidth)   // 宽度
-        ATTR_CUSTOM(L"height", OnAttrHeight) // 高度
+        ATTR_LAYOUTSIZE(L"width", width,TRUE)   // 宽度
+        ATTR_LAYOUTSIZE(L"height", height,TRUE) // 高度
         ATTR_CUSTOM(L"pos", OnAttrPos)       // 位置
         ATTR_CUSTOM(L"size", OnAttrSize)     // 大小
         ATTR_CUSTOM(L"offset", OnAttrOffset) // 偏移

@@ -105,6 +105,14 @@ DECLARE_INTERFACE_(IMenu, IObjRef)
     STDMETHOD_(BOOL, AppendMenu)(THIS_ UINT uFlags, UINT_PTR uIDNewItem, LPCTSTR strText, int iIcon DEF_VAL(-1), HICON hIcon DEF_VAL(0)) PURE;
 
     /**
+     * @brief 启用菜单项
+     * @param uIdEnableItem - 启用项ID
+     * @param uEnable - 启用标志
+     * @return BOOL - 启用成功返回TRUE，失败返回FALSE
+     */
+    STDMETHOD_(BOOL, EnableMenuItem)(THIS_ UINT uIDEnableItem, UINT uEnable) PURE;
+
+    /**
      * @brief 检查菜单单选项
      * @param idFirst - 第一个ID
      * @param idLast - 最后一个ID

@@ -25,6 +25,8 @@
 #include "layout/SGridLayout.h"
 #include "layout/SAnchorLayout.h"
 #include "layout/SFlowLayout.h"
+#include "layout/SFrameLayout.h"
+
 #include "animation/SInterpolatorImpl.h"
 #include "core/SWndAccessible.h"
 
@@ -181,6 +183,7 @@ void SObjectDefaultRegister::RegisterWindows(SObjectFactoryMgr *objFactory) cons
     objFactory->TplRegisterFactory<SSwitch>();
     objFactory->TplRegisterFactory<SSearchDropdownList>();
     objFactory->TplRegisterFactory<SToolBar>();
+    objFactory->TplRegisterFactory<SDockBar>();
 #if defined(_WIN32) && !defined(__MINGW32__)
     objFactory->TplRegisterFactory<SActiveX>();
 #endif //_WIN32
@@ -213,6 +216,7 @@ void SObjectDefaultRegister::RegisterLayouts(SObjectFactoryMgr *objFactory) cons
     objFactory->TplRegisterFactory<SFlowLayout>();
     objFactory->TplRegisterFactory<SHFlowBox>();
     objFactory->TplRegisterFactory<SVFlowBox>();
+    objFactory->TplRegisterFactory<SFrameLayout>();
 }
 
 void SObjectDefaultRegister::RegisterInterpolator(SObjectFactoryMgr *objFactory) const

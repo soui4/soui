@@ -1,7 +1,7 @@
 ﻿#ifndef __SFLOWLAYOUTPARAMSTRUCT__H__
 #define __SFLOWLAYOUTPARAMSTRUCT__H__
 
-#include <layout/SLayoutSize.h>
+#include <core/SLayoutSize.h>
 #include <layout/SLinearLayoutParamStruct.h>
 SNSBEGIN
 

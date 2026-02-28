@@ -21,7 +21,7 @@
 #include <interface/scaret-i.h>
 #include <helper/SwndMsgCracker.h>
 #include <helper/SplitString.h>
-#include <layout/SLayoutSize.h>
+#include <core/SLayoutSize.h>
 #include <event/SEventSlot.h>
 #include <event/SEvents.h>
 #include <event/SEventSet.h>
@@ -1737,7 +1737,7 @@ class SOUI_EXP SWindow
      * @param pt Point coordinates
      * @return BOOL TRUE if the point is within the non-client area; otherwise, FALSE
      */
-    virtual BOOL OnNcHitTest(CPoint pt); // Non-client area hit test
+    virtual UINT OnNcHitTest(const CPoint & pt); // Non-client area hit test
 
     /**
      * OnUpdateFloatPosition
@@ -1965,6 +1965,15 @@ class SOUI_EXP SWindow
      */
     virtual void OnCommitSurface(IRenderTarget *pRtDest, LPCRECT pRcDest, IRenderTarget *pRtSrc, LPCRECT pRcSrc, BYTE alpha);
 
+    /**
+     * @brief    OnDecendantFocusChanged
+     * @param    SWND swnd -- Child window.
+     * @param    BOOL bSet -- TRUE if focus set, FALSE if focus removed.
+     * @return   void
+     *
+     * Describe  Called when child window focus changes.
+     */
+    virtual void OnDecendantFocusChanged(SWND swnd, BOOL bSet);
     // Protected helper functions
   protected:
     /**

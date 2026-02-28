@@ -355,11 +355,21 @@ CRect SPanel::GetClientRect() const
     return m_rcClient;
 }
 
-BOOL SPanel::OnNcHitTest(CPoint pt)
+UINT SPanel::OnNcHitTest(const CPoint& pt)
 {
-    if (m_dragSb != SSB_NULL)
-        return TRUE;
-    return !m_rcClient.PtInRect(pt);
+    if (m_dragSb == SSB_VERT)
+        return HTVSCROLL;
+    else if (m_dragSb == SSB_HORZ)
+        return HTHSCROLL;
+    else
+    {
+        if (HasScrollBar(TRUE) && GetScrollBarRect(TRUE).PtInRect(pt))
+            return HTVSCROLL;
+        else if (HasScrollBar(FALSE) && GetScrollBarRect(FALSE).PtInRect(pt))
+            return HTHSCROLL;
+        else
+            return __baseCls::OnNcHitTest(pt);
+    }
 }
 
 void SPanel::OnNcLButtonDown(UINT nFlags, CPoint point)

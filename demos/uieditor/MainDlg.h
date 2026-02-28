@@ -39,7 +39,6 @@ protected:
 	bool CloseProject();
 
 	void UpdateEditorToolbar();
-	void UpdateToolbar();
 	bool CheckSave();
 
 	BOOL NewLayout(const SStringT& strPath, const SStringT& strName);
@@ -64,8 +63,9 @@ protected:
 	void OnBtnNewInclude(); //新建Include
 	void OnBtnAbout();
 	void OnBtnViewSkin();
+	void OnBtnFormatXml();
 	void OnBtnPreview(); 
-	void OnBtnRecentFile();
+	void OnBtnRecentFile(IEvtArgs *e);
     void OnTvEventOfPanel(IEvtArgs *pEvtBase);
     void addUires(HSTREEITEM hItem);
 	void addSkin(HSTREEITEM hItem);
@@ -75,29 +75,24 @@ protected:
 	void OnTvKeyDown(IEvtArgs *e);
 	void OnTbWidgetClick(IEvtArgs *e);
 	void OnTbSkinClick(IEvtArgs *e);
+	void OnTbMainClick(IEvtArgs *e);
+	void OnMenuSelect(IEvtArgs *e);
+	void OnUpdateCmdUI(IEvtArgs *e);
 	EVENT_MAP_BEGIN()
 		if(m_pXmlEdtior) CHAIN_EVENT_MAP_MEMBER((*m_pXmlEdtior))
 		if(m_pImageViewer) CHAIN_EVENT_MAP_MEMBER((*m_pImageViewer))
-		EVENT_NAME_COMMAND(L"btn_close", OnClose)
-		EVENT_NAME_COMMAND(L"btn_min", OnMinimize)
-		EVENT_NAME_COMMAND(L"btn_max", OnMaximize)
-		EVENT_NAME_COMMAND(L"btn_restore", OnRestore)
+		EVENT_ID_COMMAND(R.id.btn_close, OnClose)
+        EVENT_ID_COMMAND(R.id.btn_min, OnMinimize)
+        EVENT_ID_COMMAND(R.id.btn_max, OnMaximize)
+        EVENT_ID_COMMAND(R.id.btn_restore, OnRestore)
 
-		EVENT_ID_COMMAND(R.id.toolbar_btn_Open, OnBtnOpen)
-		EVENT_ID_COMMAND(R.id.toolbar_btn_Close, OnBtnClose)
-		
-		EVENT_ID_COMMAND(R.id.toolbar_btn_NewLayout, OnBtnNewLayout)
-		EVENT_ID_COMMAND(R.id.toolbar_btn_NewInclude, OnBtnNewInclude)
-		EVENT_ID_COMMAND(R.id.toolbar_btn_savexml, OnBtnSave)
-		EVENT_ID_COMMAND(R.id.toolbar_btn_viewskin, OnBtnViewSkin)
-		EVENT_ID_COMMAND(R.id.toolbar_btn_preview, OnBtnPreview)
-		EVENT_ID_COMMAND(R.id.btn_help, OnBtnAbout)
-		EVENT_ID_COMMAND(R.id.toolbar_btn_recent, OnBtnRecentFile)
-		EVENT_ID_HANDLER(R.id.chk_autosave,EventSwndStateChanged::EventID,OnAutoCheck)
 		EVENT_ID_HANDLER(R.id.workspace_treeview,EventOfPanel::EventID,OnTvEventOfPanel)
 		EVENT_ID_HANDLER(R.id.workspace_treeview,EventKeyDown::EventID,OnTvKeyDown)
 		EVENT_ID_HANDLER(R.id.tb_widget,EventToolBarCmd::EventID,OnTbWidgetClick)
 		EVENT_ID_HANDLER(R.id.tb_skin,EventToolBarCmd::EventID,OnTbSkinClick)
+		EVENT_ID_HANDLER(R.id.tb_main,EventToolBarCmd::EventID,OnTbMainClick)
+		EVENT_ID_HANDLER(R.id.main_menu,EventSelectMenu::EventID,OnMenuSelect)
+		EVENT_HANDLER(EventUpdateCmdUI::EventID,OnUpdateCmdUI)
 	EVENT_MAP_END2(SHostWnd)
 
 protected:
@@ -162,8 +157,6 @@ public:
 
 	SStringT m_strUiresPath;	//uires.idx 的全路径
 	SStringT m_strProPath;
-
-	STabCtrl *m_tabWorkspace;	
 	
 	BOOL		m_bIsOpen;  //工程是否打开
 	bool		m_bAutoSave;

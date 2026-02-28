@@ -148,6 +148,15 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
         FindClose(hFind);
     }
     #endif//SOUI_ENABLE_CORE_LIB
+    CSysDataMgr *pSysDataMgr = new CSysDataMgr;
+#ifdef __APPLE__
+    SStringT strCfgDir = srcDir + _T("/Config");
+#else
+    SStringT strCfgDir = appDir + _T("/Config");
+#endif
+    SApplication::getSingleton().SetFilePrefix(strCfgDir);
+    pSysDataMgr->LoadSysData(strCfgDir);
+
     CCmdLine cmdLine(GetCommandLine());
     //读取自定义消息框布局
     theApp.SetMessageBoxTemplateResId(_T("LAYOUT:xml_messagebox"));
@@ -159,6 +168,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
             cfg.SetAppDir(strProj).SetAppResFile(strProj);
             if (!cfg.DoConfig(&theApp))
             {
+                delete pSysDataMgr;
                 return -1;
             }
             SStringT strPage = cmdLine.GetParam(4);
@@ -172,17 +182,9 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
     {
         if (!cfg.DoConfig(&theApp))
         {
+            delete pSysDataMgr;
             return -1;
         }
-
-        CSysDataMgr * pSysDataMgr = new CSysDataMgr;
-    #ifdef __APPLE__
-        SStringT strCfgDir = srcDir + _T("/Config");
-    #else
-        SStringT strCfgDir = appDir + _T("/Config");
-    #endif
-        SApplication::getSingleton().SetFilePrefix(strCfgDir);
-        pSysDataMgr->LoadSysData(strCfgDir);
         //设置真窗口处理接口
         CSouiRealWndHandler * pRealWndHandler = new CSouiRealWndHandler();
         theApp.SetRealWndHandler(pRealWndHandler);

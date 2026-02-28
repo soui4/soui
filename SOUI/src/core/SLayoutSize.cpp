@@ -1,5 +1,5 @@
 ﻿#include "souistd.h"
-#include "layout/SLayoutSize.h"
+#include <core/SLayoutSize.h>
 #include <interface/slayout-i.h>
 #pragma warning(push)
 #pragma warning(disable : 4985) // disable the warning message during the include
@@ -7,13 +7,16 @@
 #pragma warning(pop)
 
 SNSBEGIN
+
 static const wchar_t *kUnitMap[] = {
-    L"px",
-    L"dp",
-    L"dip",
-    L"sp",
+    LayoutSize_Unit::kUnit_Px,
+    LayoutSize_Unit::kUnit_Dp,
+    LayoutSize_Unit::kUnit_Dip,
+    LayoutSize_Unit::kUnit_Sp,
 };
 
+
+Unit SLayoutSize::defUnit = px;
 SLayoutSize::SLayoutSize(float _fSize)
 {
     fSize = _fSize;
@@ -115,6 +118,13 @@ void SLayoutSize::parseString(const SStringW &strSize)
 {
     if (strSize.IsEmpty())
         return;
+    if(strSize.CompareNoCase(LayoutSize_Style::kSize_WrapContent)==0){
+        setWrapContent();
+        return;
+    }else if(strSize.CompareNoCase(LayoutSize_Style::kSize_MatchParent)==0 || strSize.CompareNoCase(LayoutSize_Style::kSize_FillParent)==0){
+        setMatchParent();
+        return;
+    }
     int cUnitSize = 0;
     for (int i = strSize.GetLength() - 1; i >= 0; i--)
     {
@@ -180,5 +190,4 @@ Unit SLayoutSize::unitFromString(const SStringW &strUnit)
     return ret;
 }
 
-Unit SLayoutSize::defUnit = px;
 SNSEND

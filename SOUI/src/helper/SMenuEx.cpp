@@ -1260,6 +1260,7 @@ BOOL SMenuEx::InsertMenu(UINT uPos, UINT uFlag, int nId, LPCTSTR lpNewItem, int 
     {
         pMenuRoot->InsertChild(pMenuItem);
     }
+    pMenuItem->GetLayoutParam()->SetMatchParent(Horz);
     if (!(uFlag & MF_SEPARATOR))
     {
         pMenuItem->SetWindowText(lpNewItem);

@@ -16,7 +16,7 @@ class SSelectedValue;
 class SViewport;
 
 /**
- * @class ISChart
+ * @struct ISChart
  * @brief Interface for all chart types
  * @details Base interface that all chart implementations must implement
  */

@@ -13,7 +13,6 @@
 #define __SSPLITWND__H__
 
 #include <core/SWnd.h>
-#include <layout/SLayoutSize.h>
 
 SNSBEGIN
 

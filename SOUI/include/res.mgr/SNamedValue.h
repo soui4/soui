@@ -1,8 +1,8 @@
 ﻿#ifndef __SNAMEDVALUE__H__
 #define __SNAMEDVALUE__H__
 
-#include "helper/SColor.h"
-#include "layout/SLayoutSize.h"
+#include <helper/SColor.h>
+#include <core/SLayoutSize.h>
 #include <stdlib.h>
 
 SNSBEGIN

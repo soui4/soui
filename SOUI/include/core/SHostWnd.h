@@ -15,11 +15,11 @@
 #include <interface/SHostPresenter-i.h>
 #include <core/SCaret.h>
 #include <core/SNcPainter.h>
-#include <layout/SLayoutSize.h>
 #include <helper/SplitString.h>
 #include <helper/swndspy.h>
 #include <helper/STimerGenerator.h>
 #include <proxy/SNativeWndProxy.h>
+
 SNSBEGIN
 
 /**
@@ -311,7 +311,7 @@ class SOUI_EXP SRootWindow : public SWindow {
     SHostWnd *m_pHostWnd;
 };
 class SDummyWnd;
-
+class SMenuEx;
 /**
  * @class SHostWnd
  * @brief The main host window class responsible for managing the layout, events, and rendering of SOUI windows.
@@ -1382,6 +1382,16 @@ class SOUI_EXP SHostWnd
     LRESULT OnUpdateFont(UINT uMsg, WPARAM wp, LPARAM lp);
 
     /**
+     * @brief Handles the WM_INITMENUPOPUP message.
+     * @param HMENU menuPopup
+     * @param UINT nIndex
+     * @param BOOL bSysMenu
+     */
+    void OnInitMenuPopup(HMENU menuPopup, UINT nIndex, BOOL bSysMenu);
+
+    void OnInitMenuExPopup(SMenuEx* menuPopup, UINT nIndex);
+
+    /**
      * @brief Handles the UM_RUN_TASKS message.
      *
      * @param uMsg Message identifier.
@@ -1420,6 +1430,8 @@ class SOUI_EXP SHostWnd
         MESSAGE_HANDLER_EX(WM_GETOBJECT, OnGetObject)
         MSG_WM_COMMAND(OnCommand)
         MSG_WM_SYSCOMMAND(OnSysCommand)
+        MSG_WM_INITMENUPOPUP(OnInitMenuPopup)
+        MSG_WM_INITMENUPOPUP_EX(OnInitMenuExPopup)
         MESSAGE_HANDLER_EX(UM_UPDATEFONT, OnUpdateFont)
         MESSAGE_HANDLER_EX(UM_SETLANGUAGE, OnSetLanguage)
         MESSAGE_HANDLER_EX(UM_RUN_TASKS, OnRunTasks)

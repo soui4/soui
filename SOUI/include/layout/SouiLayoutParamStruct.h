@@ -1,7 +1,7 @@
 ﻿#ifndef __SOUILAYOUTPARAMSTRUCT__H__
 #define __SOUILAYOUTPARAMSTRUCT__H__
 
-#include "SLayoutSize.h"
+#include <core/SLayoutSize.h>
 
 #define POSFLAG_REFCENTER    '|' //参考父窗口中心
 #define POSFLAG_REFPREV_NEAR '[' //参考前一个兄弟窗口与自己近的边

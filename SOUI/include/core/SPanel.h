@@ -354,7 +354,7 @@ class SOUI_EXP SPanel
      * @param pt Point to test.
      * @return Hit test result.
      */
-    virtual BOOL OnNcHitTest(CPoint pt);
+    virtual UINT OnNcHitTest(const CPoint &pt) OVERRIDE;
 
     /**
      * @brief Handles the WM_NCLBUTTONDOWN message.

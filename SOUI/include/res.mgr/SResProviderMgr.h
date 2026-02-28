@@ -3,7 +3,7 @@
 
 #include <windows.h>
 #include <interface/SResProviderMgr-i.h>
-#include <layout/SLayoutSize.h>
+#include <core/SLayoutSize.h>
 #include <helper/SCriticalSection.h>
 #include <helper/SAutoBuf.h>
 

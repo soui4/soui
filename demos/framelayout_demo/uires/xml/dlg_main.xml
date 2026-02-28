@@ -1,0 +1,33 @@
+﻿<SOUI name="mainWindow" title="@string/title" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" margin="5,5,5,5"  resizable="1" wndType="appMain"
+appWnd="1"
+translucent="1" 
+>
+  <style>
+    <window.bar margin="1" colorBorder="rgb(0,0,0)"/>
+  </style>
+  <root skin="_skin.sys.wnd.bkgnd" cache="1"  width="600" height="400" layout="vbox" padding="5,5,5,5">
+    <caption size="-2,30" layout="hbox" interval="0" gravity="center">
+      <icon src="ICON_LOGO:16"/>
+      <text >@string/title</text>
+      <window size="0,0" weight="1"/>
+      <imgbtn name="btn_min" skin="_skin.sys.btn.minimize"  animate="1" />
+      <window>
+      <imgbtn pos="0,0" name="btn_max" skin="_skin.sys.btn.maximize"   animate="1" />
+      <imgbtn pos="0,0" name="btn_restore" skin="_skin.sys.btn.restore"   show="0" animate="1" />
+      </window>
+      <imgbtn name="btn_close" skin="_skin.sys.btn.close"     tip="close" animate="1"/>
+    </caption>
+    <window size="-2,0" weight="1" layout="frame" enableDockMode="any">
+      <window.bar name="top1" width="120" height="30" dock="top" text="Top Toolbar 1"/>
+      <window.bar name="top2" width="300" height="30" layout_gravity="center"  weight="1" dock="top" dockRelativeTo="top1" text="Top Toolbar 2"/>
+      <window.bar name="top3" width="-2" height="30" dock="top" text="Top Toolbar 3"/>
+      <window name="mainview" dock="main" text="mainview" colorBkgnd="@color/red" focusable="1"/>
+      <dockbar name="right1" width="130" height="0" weight="1" dock="right" text="Right dockbar 1" resizable="1"/>
+      <dockbar name="right2" width="130" height="0" weight="1" dock="right" dockRelativeTo="right1" text="Right dockbar 2" resizable="1"/>
+      <dockbar name="left1" width="130" height="0" weight="1" dock="left" text="Left dockbar 1" resizable="1"/>
+      <dockbar name="left2" width="130" height="0" weight="1" dock="left" dockRelativeTo="left1" text="Left dockbar 2" resizable="1"/>
+      <window.bar name="bottom1" width="-2" height="30" dock="bottom" text="Bottom Toolbar 1"/>
+    </window>
+
+  </root>
+</SOUI>

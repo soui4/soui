@@ -7,7 +7,7 @@
 SNSBEGIN
 
 // Forward declarations
-class ISChart;
+struct ISChart;
 
 /**
  * @class SChartRenderer

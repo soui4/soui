@@ -1,7 +1,7 @@
 ﻿#ifndef __SLINEARLAYOUTPARAMSTRUCT__H__
 #define __SLINEARLAYOUTPARAMSTRUCT__H__
 
-#include "SLayoutSize.h"
+#include <core/SLayoutSize.h>
 SNSBEGIN
 enum Gravity
 {

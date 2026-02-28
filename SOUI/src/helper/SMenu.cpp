@@ -560,6 +560,11 @@ BOOL SMenu::AppendMenu(UINT uFlags, UINT_PTR uIDNewItem, LPCTSTR lpNewItem, int 
     return InsertMenu(-1, uFlags, uIDNewItem, lpNewItem, iIcon, hIcon);
 }
 
+BOOL SMenu::EnableMenuItem(UINT uIDEnableItem, UINT uEnable)
+{
+    return ::EnableMenuItem(m_hMenu, uIDEnableItem, uEnable);
+}
+
 BOOL SMenu::CheckMenuItem(UINT uIdCheckItem, UINT uCheck)
 {
     return ::CheckMenuItem(m_hMenu, uIdCheckItem, uCheck);

@@ -50,7 +50,7 @@ class SWkeWebkit
 
   protected:
     virtual void onBufUpdated(const HDC hdc, int x, int y, int cx, int cy);
-    virtual BOOL WINAPI OnIdle();
+    virtual BOOL WINAPI OnIdle(int iRun);
 
   protected:
     int OnCreate(void *);

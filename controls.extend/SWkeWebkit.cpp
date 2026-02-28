@@ -281,7 +281,7 @@ void SWkeWebkit::onBufUpdated(const HDC hdc, int x, int y, int cx, int cy)
     InvalidateRect(rcInvalid);
 }
 
-BOOL SWkeWebkit::OnIdle()
+BOOL SWkeWebkit::OnIdle(int iRun)
 {
     m_pWebView->tick();
     return TRUE;

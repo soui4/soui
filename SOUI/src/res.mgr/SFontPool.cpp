@@ -5,7 +5,7 @@
 #include "souistd.h"
 #include "res.mgr/SFontPool.h"
 #include "helper/SplitString.h"
-#include "layout/SLayoutSize.h"
+#include "core/SLayoutSize.h"
 #include "helper/SHostMgr.h"
 
 SNSBEGIN

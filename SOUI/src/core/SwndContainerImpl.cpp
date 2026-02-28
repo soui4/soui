@@ -13,7 +13,7 @@ SNSBEGIN
 SwndContainerImpl::SwndContainerImpl()
     : m_hCapture(0)
     , m_hHover(0)
-    , m_bNcHover(FALSE)
+    , m_uNcHitTest(HTCLIENT)
     , m_bZorderDirty(TRUE)
     , m_pRoot(NULL)
 {
@@ -185,18 +185,18 @@ void SwndContainerImpl::OnFrameMouseMove(UINT uFlag, CPoint pt)
             m_hHover = hHover;
             if (pOldHover)
             {
-                if (m_bNcHover)
-                    pOldHover->SSendMessage(WM_NCMOUSELEAVE);
+                if (m_uNcHitTest != HTCLIENT)
+                    pOldHover->SSendMessage(WM_NCMOUSELEAVE, m_uNcHitTest, 0);
                 pOldHover->SSendMessage(WM_MOUSELEAVE);
             }
             if (pHover && !(pHover->GetState() & WndState_Hover))
             {
-                if (m_bNcHover)
-                    pHover->SSendMessage(WM_NCMOUSEHOVER, uFlag, MAKELPARAM(pt.x, pt.y));
+                if (m_uNcHitTest != HTCLIENT)
+                    pHover->SSendMessage(WM_NCMOUSEHOVER, m_uNcHitTest, MAKELPARAM(pt.x, pt.y));
                 pHover->SSendMessage(WM_MOUSEHOVER, uFlag, MAKELPARAM(pt.x, pt.y));
             }
         }
-        pCapture->SSendMessage(m_bNcHover ? WM_NCMOUSEMOVE : WM_MOUSEMOVE, uFlag, MAKELPARAM(pt.x, pt.y));
+        pCapture->SSendMessage(m_uNcHitTest != HTCLIENT ? WM_NCMOUSEMOVE : WM_MOUSEMOVE, m_uNcHitTest != HTCLIENT ? m_uNcHitTest : uFlag, MAKELPARAM(pt.x, pt.y));
     }
     else
     { //没有设置鼠标捕获
@@ -218,37 +218,37 @@ void SwndContainerImpl::OnFrameMouseMove(UINT uFlag, CPoint pt)
                 }
                 if (bLeave)
                 {
-                    if (m_bNcHover)
-                        pOldHover->SSendMessage(WM_NCMOUSELEAVE);
+                    if (m_uNcHitTest != HTCLIENT)
+                        pOldHover->SSendMessage(WM_NCMOUSELEAVE, m_uNcHitTest, 0);
                     pOldHover->SSendMessage(WM_MOUSELEAVE);
                 }
             }
             if (pHover && !pHover->IsDisabled(TRUE) && !(pHover->GetState() & WndState_Hover))
             {
-                m_bNcHover = pHover->OnNcHitTest(pt2);
-                if (m_bNcHover)
-                    pHover->SSendMessage(WM_NCMOUSEHOVER, uFlag, MAKELPARAM(pt2.x, pt2.y));
+                m_uNcHitTest = pHover->OnNcHitTest(pt2);
+                if (m_uNcHitTest != HTCLIENT)
+                    pHover->SSendMessage(WM_NCMOUSEHOVER, m_uNcHitTest, MAKELPARAM(pt2.x, pt2.y));
                 pHover->SSendMessage(WM_MOUSEHOVER, uFlag, MAKELPARAM(pt2.x, pt2.y));
             }
         }
         else if (pHover && !pHover->IsDisabled(TRUE))
         { //窗口内移动，检测客户区和非客户区的变化
-            BOOL bNcHover = pHover->OnNcHitTest(pt2);
-            if (bNcHover != m_bNcHover)
+            UINT uNcHitTest = pHover->OnNcHitTest(pt2);
+            if (uNcHitTest != m_uNcHitTest)
             {
-                m_bNcHover = bNcHover;
-                if (m_bNcHover)
+                m_uNcHitTest = uNcHitTest;
+                if (m_uNcHitTest != HTCLIENT)
                 {
-                    pHover->SSendMessage(WM_NCMOUSEHOVER, uFlag, MAKELPARAM(pt2.x, pt2.y));
+                    pHover->SSendMessage(WM_NCMOUSEHOVER, m_uNcHitTest, MAKELPARAM(pt2.x, pt2.y));
                 }
                 else
                 {
-                    pHover->SSendMessage(WM_NCMOUSELEAVE);
+                    pHover->SSendMessage(WM_NCMOUSELEAVE, m_uNcHitTest, 0);
                 }
             }
         }
         if (pHover && !pHover->IsDisabled(TRUE))
-            pHover->SSendMessage(m_bNcHover ? WM_NCMOUSEMOVE : WM_MOUSEMOVE, uFlag, MAKELPARAM(pt2.x, pt2.y));
+            pHover->SSendMessage(m_uNcHitTest != HTCLIENT ? WM_NCMOUSEMOVE : WM_MOUSEMOVE, m_uNcHitTest != HTCLIENT ? m_uNcHitTest : uFlag, MAKELPARAM(pt2.x, pt2.y));
     }
 }
 
@@ -266,8 +266,8 @@ void SwndContainerImpl::OnFrameMouseLeave()
         {
             pHover->AddRef();
             pHover->SSendMessage(WM_MOUSELEAVE);
-            if (m_bNcHover)
-                pHover->SSendMessage(WM_NCMOUSELEAVE);
+            if (m_uNcHitTest != HTCLIENT)
+                pHover->SSendMessage(WM_NCMOUSELEAVE, m_uNcHitTest, 0);
             pHover->Release();
         }
     }
@@ -309,8 +309,11 @@ void SwndContainerImpl::OnFrameMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lPara
     SWindow *pCapture = SWindowMgr::GetWindow(m_hCapture);
     if (pCapture)
     {
-        if (m_bNcHover)
+        if (m_uNcHitTest != HTCLIENT)
+        {
             uMsg += (UINT)WM_NCMOUSEFIRST - WM_MOUSEFIRST; //转换成NC对应的消息
+            wParam = m_uNcHitTest; // 使用m_uNcHitTest作为wparam
+        }
         BOOL bMsgHandled = FALSE;
         CPoint pt(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         pCapture->TransformPointEx(pt);
@@ -326,8 +329,11 @@ void SwndContainerImpl::OnFrameMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lPara
         if (pHover && !pHover->IsDisabled(TRUE))
         {
             BOOL bMsgHandled = FALSE;
-            if (m_bNcHover)
+            if (m_uNcHitTest != HTCLIENT)
+            {
                 uMsg += (UINT)WM_NCMOUSEFIRST - WM_MOUSEFIRST; //转换成NC对应的消息
+                wParam = m_uNcHitTest; // 使用m_uNcHitTest作为wparam
+            }
             lParam = MAKELPARAM(pt.x, pt.y);
             pHover->SSendMessage(uMsg, wParam, lParam, &bMsgHandled);
             m_pRoot->SetMsgHandled(bMsgHandled);

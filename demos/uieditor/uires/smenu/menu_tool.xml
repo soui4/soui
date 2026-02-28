@@ -1,0 +1,4 @@
+﻿<menu iconSkin="" itemHeight="26" iconMargin="4" textMargin="8" maxWidth="120">
+  <item name="menu_tool_format_xml" id="31" text="@string/format_xml"/>
+  <item name="menu_tool_view_skin" id="32" text="@string/view_skin"/>
+</menu>

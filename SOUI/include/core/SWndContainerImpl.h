@@ -306,7 +306,7 @@ class SOUI_EXP SwndContainerImpl
     SWindow *m_pRoot;                          /**< Root window of the container */
     SWND m_hCapture;                           /**< Window handle with capture */
     SWND m_hHover;                             /**< Window handle that is hovered */
-    BOOL m_bNcHover;                           /**< Non-client area hover flag */
+    UINT m_uNcHitTest;                         /**< Non-client value */
     SFocusManager m_focusMgr;                  /**< Focus manager */
     SDropTargetDispatcher m_dropTarget;        /**< Drop target dispatcher */
     BOOL m_bZorderDirty;                       /**< Z-order dirty flag */

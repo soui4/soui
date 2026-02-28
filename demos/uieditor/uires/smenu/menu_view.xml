@@ -1,0 +1,6 @@
+﻿<menu iconSkin="" itemHeight="26" iconMargin="4" textMargin="8" maxWidth="180">
+  <item id="21" name="menu_view_toolbar" text="@string/view_toolbar"/>
+  <item id="22" name="menu_view_property" text="@string/view_property"/>
+	<sep/>
+  <item id="23" name="menu_view_preview" text="@string/view_preview"/>
+</menu>

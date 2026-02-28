@@ -19,5 +19,7 @@
   <imglist name="skin_designer_background" src="img:png_designer_background" tile="1"/>
   <imglist name="skin_filetypes" src="img:png_filetypes" states="12" />
   <imgframe name="skin_item_bk" src="img:png_item_bk" states="3" margin="3,3,3,3" />
-  <imglist name="skin_dropdown" src="img:png_dropdown"/>
+  <imglist name="skin_dropdown" src="img:png_dropdown" states="2"/>
+  <imglist name="skin_tb_main" src="img:png_tb_main" states="9"/>
+  <imglist name="skin_tb_sep" src="img:png_tb_sep" states="1"/>
 </skin>

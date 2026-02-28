@@ -1,7 +1,7 @@
 ﻿#ifndef __SGRIDLAYOUTPARAMSTRUCT__H__
 #define __SGRIDLAYOUTPARAMSTRUCT__H__
 
-#include "SLayoutSize.h"
+#include <core/SLayoutSize.h>
 
 SNSBEGIN
 

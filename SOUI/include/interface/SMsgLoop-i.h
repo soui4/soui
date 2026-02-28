@@ -29,9 +29,10 @@ DECLARE_INTERFACE(IIdleHandler)
 {
     /**
      * @brief Handles idle time.
+     * @param iRun Idle count.
      * @return TRUE if further idle processing is needed, FALSE otherwise.
      */
-    STDMETHOD_(BOOL, OnIdle)(THIS) PURE;
+    STDMETHOD_(BOOL, OnIdle)(THIS_ int iRun) PURE;
 };
 
 #undef INTERFACE

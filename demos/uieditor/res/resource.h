@@ -1,4 +1,4 @@
-﻿//stamp:2182fb63f63ec95b
+﻿//stamp:28f5ccef6a4dc9b3
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -48,6 +48,8 @@
 			const TCHAR * png_filetypes;
 			const TCHAR * png_item_bk;
 			const TCHAR * png_dropdown;
+			const TCHAR * png_tb_main;
+			const TCHAR * png_tb_sep;
 			}IMG;
 		struct _ICON{
 			const TCHAR * ICON_logo;
@@ -56,6 +58,10 @@
 			const TCHAR * menu_layoutfile;
 			const TCHAR * menu_recent;
 			const TCHAR * menu_file_ctx;
+			const TCHAR * menu_file;
+			const TCHAR * menu_view;
+			const TCHAR * menu_tool;
+			const TCHAR * menu_help;
 			}smenu;
 	};
 #endif//_UIRES_H_
@@ -104,6 +110,8 @@ struct _UIRES UIRES={
 			_T("IMG:png_filetypes"),
 			_T("IMG:png_item_bk"),
 			_T("IMG:png_dropdown"),
+			_T("IMG:png_tb_main"),
+			_T("IMG:png_tb_sep"),
 		},
 		{
 			_T("ICON:ICON_logo"),
@@ -112,6 +120,10 @@ struct _UIRES UIRES={
 			_T("smenu:menu_layoutfile"),
 			_T("smenu:menu_recent"),
 			_T("smenu:menu_file_ctx"),
+			_T("smenu:menu_file"),
+			_T("smenu:menu_view"),
+			_T("smenu:menu_tool"),
+			_T("smenu:menu_help"),
 		},
 	};
 #else
@@ -144,7 +156,6 @@ struct _R{
 		 const wchar_t * button2nd;
 		 const wchar_t * button3rd;
 		 const wchar_t * chk_auto_size;
-		 const wchar_t * chk_autosave;
 		 const wchar_t * color_preview;
 		 const wchar_t * edtInput;
 		 const wchar_t * img_icon_exclamation;
@@ -155,12 +166,21 @@ struct _R{
 		 const wchar_t * img_preview_full;
 		 const wchar_t * img_state;
 		 const wchar_t * img_viewer;
-		 const wchar_t * item_icon;
-		 const wchar_t * item_text;
 		 const wchar_t * lbl_index;
 		 const wchar_t * lv_skin;
-		 const wchar_t * lv_tb_skin;
-		 const wchar_t * lv_tb_widget;
+		 const wchar_t * main_menu;
+		 const wchar_t * menu_about;
+		 const wchar_t * menu_file_closeproject;
+		 const wchar_t * menu_file_exit;
+		 const wchar_t * menu_file_newinclude;
+		 const wchar_t * menu_file_newlayout;
+		 const wchar_t * menu_file_openproject;
+		 const wchar_t * menu_file_save_xml;
+		 const wchar_t * menu_tool_format_xml;
+		 const wchar_t * menu_tool_view_skin;
+		 const wchar_t * menu_view_preview;
+		 const wchar_t * menu_view_property;
+		 const wchar_t * menu_view_toolbar;
 		 const wchar_t * msgicon;
 		 const wchar_t * msgtext;
 		 const wchar_t * msgtitle;
@@ -168,23 +188,24 @@ struct _R{
 		 const wchar_t * new_layout_resname;
 		 const wchar_t * page_image;
 		 const wchar_t * page_xml;
+		 const wchar_t * property_panel_dock;
 		 const wchar_t * propgrid_element;
 		 const wchar_t * skin_preview;
 		 const wchar_t * slider_zoom;
 		 const wchar_t * tab_editor;
+		 const wchar_t * tb_main;
+		 const wchar_t * tb_main_about;
+		 const wchar_t * tb_main_autosave;
+		 const wchar_t * tb_main_closeproject;
+		 const wchar_t * tb_main_formatxml;
+		 const wchar_t * tb_main_newinclude;
+		 const wchar_t * tb_main_newlayout;
+		 const wchar_t * tb_main_openproject;
+		 const wchar_t * tb_main_savexml;
+		 const wchar_t * tb_main_viewskin;
 		 const wchar_t * tb_prop;
 		 const wchar_t * tb_skin;
 		 const wchar_t * tb_widget;
-		 const wchar_t * toolbar_btn_Close;
-		 const wchar_t * toolbar_btn_NewInclude;
-		 const wchar_t * toolbar_btn_NewLayout;
-		 const wchar_t * toolbar_btn_Open;
-		 const wchar_t * toolbar_btn_formatxml;
-		 const wchar_t * toolbar_btn_preview;
-		 const wchar_t * toolbar_btn_recent;
-		 const wchar_t * toolbar_btn_savexml;
-		 const wchar_t * toolbar_btn_viewskin;
-		 const wchar_t * toolbar_container;
 		 const wchar_t * txt_desc;
 		 const wchar_t * txt_label;
 		 const wchar_t * txt_path;
@@ -197,8 +218,6 @@ struct _R{
 		 const wchar_t * uidesigner_wnd_xmltree;
 		 const wchar_t * workspace_treeview;
 		 const wchar_t * xml_editor;
-		 const wchar_t * xml_editor_main;
-		 const wchar_t * xml_editor_sub;
 	}name;
 	struct _id{
 		int NAME_UIDESIGNER_NEW_SKIN_LB;
@@ -223,7 +242,6 @@ struct _R{
 		int button2nd;
 		int button3rd;
 		int chk_auto_size;
-		int chk_autosave;
 		int color_preview;
 		int edtInput;
 		int img_icon_exclamation;
@@ -234,12 +252,21 @@ struct _R{
 		int img_preview_full;
 		int img_state;
 		int img_viewer;
-		int item_icon;
-		int item_text;
 		int lbl_index;
 		int lv_skin;
-		int lv_tb_skin;
-		int lv_tb_widget;
+		int main_menu;
+		int menu_about;
+		int menu_file_closeproject;
+		int menu_file_exit;
+		int menu_file_newinclude;
+		int menu_file_newlayout;
+		int menu_file_openproject;
+		int menu_file_save_xml;
+		int menu_tool_format_xml;
+		int menu_tool_view_skin;
+		int menu_view_preview;
+		int menu_view_property;
+		int menu_view_toolbar;
 		int msgicon;
 		int msgtext;
 		int msgtitle;
@@ -247,23 +274,24 @@ struct _R{
 		int new_layout_resname;
 		int page_image;
 		int page_xml;
+		int property_panel_dock;
 		int propgrid_element;
 		int skin_preview;
 		int slider_zoom;
 		int tab_editor;
+		int tb_main;
+		int tb_main_about;
+		int tb_main_autosave;
+		int tb_main_closeproject;
+		int tb_main_formatxml;
+		int tb_main_newinclude;
+		int tb_main_newlayout;
+		int tb_main_openproject;
+		int tb_main_savexml;
+		int tb_main_viewskin;
 		int tb_prop;
 		int tb_skin;
 		int tb_widget;
-		int toolbar_btn_Close;
-		int toolbar_btn_NewInclude;
-		int toolbar_btn_NewLayout;
-		int toolbar_btn_Open;
-		int toolbar_btn_formatxml;
-		int toolbar_btn_preview;
-		int toolbar_btn_recent;
-		int toolbar_btn_savexml;
-		int toolbar_btn_viewskin;
-		int toolbar_container;
 		int txt_desc;
 		int txt_label;
 		int txt_path;
@@ -276,8 +304,6 @@ struct _R{
 		int uidesigner_wnd_xmltree;
 		int workspace_treeview;
 		int xml_editor;
-		int xml_editor_main;
-		int xml_editor_sub;
 	}id;
 	struct _color{
 		int bkBlack1;
@@ -294,13 +320,17 @@ struct _R{
 		int white;
 	}color;
 	struct _string{
+		int about;
 		int add_skin;
 		int add_uires;
+		int auto_save;
 		int auto_size;
+		int close_prject;
 		int copy;
 		int copy_path;
 		int cut;
 		int delete_cpp;
+		int exit;
 		int explorer;
 		int format_xml;
 		int image_viewer;
@@ -308,9 +338,10 @@ struct _R{
 		int new_include;
 		int new_layout;
 		int new_xml;
+		int open_prject;
 		int openincode;
 		int paste;
-		int preview;
+		int project;
 		int project_struct;
 		int property;
 		int rename;
@@ -318,6 +349,10 @@ struct _R{
 		int skin_build;
 		int title;
 		int ver;
+		int view_preview;
+		int view_property;
+		int view_skin;
+		int view_toolbar;
 		int xml_editor;
 		int xml_struct;
 	}string;
@@ -349,7 +384,6 @@ struct _R R={
 		L"button2nd",
 		L"button3rd",
 		L"chk_auto_size",
-		L"chk_autosave",
 		L"color_preview",
 		L"edtInput",
 		L"img_icon_exclamation",
@@ -360,12 +394,21 @@ struct _R R={
 		L"img_preview_full",
 		L"img_state",
 		L"img_viewer",
-		L"item_icon",
-		L"item_text",
 		L"lbl_index",
 		L"lv_skin",
-		L"lv_tb_skin",
-		L"lv_tb_widget",
+		L"main_menu",
+		L"menu_about",
+		L"menu_file_closeproject",
+		L"menu_file_exit",
+		L"menu_file_newinclude",
+		L"menu_file_newlayout",
+		L"menu_file_openproject",
+		L"menu_file_save_xml",
+		L"menu_tool_format_xml",
+		L"menu_tool_view_skin",
+		L"menu_view_preview",
+		L"menu_view_property",
+		L"menu_view_toolbar",
 		L"msgicon",
 		L"msgtext",
 		L"msgtitle",
@@ -373,23 +416,24 @@ struct _R R={
 		L"new_layout_resname",
 		L"page_image",
 		L"page_xml",
+		L"property_panel_dock",
 		L"propgrid_element",
 		L"skin_preview",
 		L"slider_zoom",
 		L"tab_editor",
+		L"tb_main",
+		L"tb_main_about",
+		L"tb_main_autosave",
+		L"tb_main_closeproject",
+		L"tb_main_formatxml",
+		L"tb_main_newinclude",
+		L"tb_main_newlayout",
+		L"tb_main_openproject",
+		L"tb_main_savexml",
+		L"tb_main_viewskin",
 		L"tb_prop",
 		L"tb_skin",
 		L"tb_widget",
-		L"toolbar_btn_Close",
-		L"toolbar_btn_NewInclude",
-		L"toolbar_btn_NewLayout",
-		L"toolbar_btn_Open",
-		L"toolbar_btn_formatxml",
-		L"toolbar_btn_preview",
-		L"toolbar_btn_recent",
-		L"toolbar_btn_savexml",
-		L"toolbar_btn_viewskin",
-		L"toolbar_container",
 		L"txt_desc",
 		L"txt_label",
 		L"txt_path",
@@ -401,89 +445,94 @@ struct _R R={
 		L"uidesigner_wnd_layout",
 		L"uidesigner_wnd_xmltree",
 		L"workspace_treeview",
-		L"xml_editor",
-		L"xml_editor_main",
-		L"xml_editor_sub"
+		L"xml_editor"
 	}
 	,
 	{
-		65595,
-		65592,
-		65588,
-		65591,
-		65587,
-		65563,
+		65582,
+		65579,
+		65575,
+		65578,
+		65574,
+		65557,
 		65546,
 		65547,
-		65594,
-		65596,
+		65581,
+		65583,
 		65542,
 		65552,
 		65548,
 		65550,
 		65549,
-		65610,
-		65608,
+		65596,
+		65594,
 		65551,
 		65543,
 		65544,
 		65545,
-		65607,
-		65562,
-		65572,
-		65597,
+		65593,
+		65567,
+		65584,
 		65540,
 		65538,
 		65539,
-		65603,
-		65606,
-		65605,
-		65565,
-		65585,
-		65581,
-		65582,
-		65609,
-		65604,
-		65580,
-		65583,
+		65589,
+		65592,
+		65591,
+		65560,
+		65572,
+		65595,
+		65590,
+		65553,
+		400,
+		2,
+		100,
+		5,
+		4,
+		1,
+		3,
+		31,
+		32,
+		23,
+		22,
+		21,
 		65537,
 		65541,
 		65536,
-		65590,
-		65589,
-		65584,
-		65574,
-		65568,
-		65571,
-		65586,
-		65573,
-		65598,
-		65555,
-		65554,
-		65558,
-		65560,
-		65559,
-		65556,
-		65576,
 		65577,
-		65557,
-		65575,
-		65561,
-		65553,
+		65576,
+		65571,
 		65569,
+		65558,
+		65563,
 		65566,
-		65599,
-		65601,
-		65600,
-		65593,
-		65570,
-		100000,
-		100000,
-		65567,
+		65573,
+		65568,
+		65554,
+		9,
+		8,
+		2,
+		6,
+		5,
+		4,
+		1,
+		3,
+		7,
+		65585,
+		65556,
+		65555,
 		65564,
-		65602,
-		65578,
-		65579
+		65561,
+		65586,
+		65588,
+		65587,
+		65580,
+		65565,
+		100000,
+		100000,
+		65562,
+		65559,
+		65570
 	}
 	,
 	{
@@ -527,7 +576,16 @@ struct _R R={
 		22,
 		23,
 		24,
-		25
+		25,
+		26,
+		27,
+		28,
+		29,
+		30,
+		31,
+		32,
+		33,
+		34
 	}
 	
 };

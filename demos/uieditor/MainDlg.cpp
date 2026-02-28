@@ -60,8 +60,6 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 	::RegisterDragDrop(hWnd, GetDropTarget());
 
 	m_btn_recentFile = FindChildByName2<SButton>(L"toolbar_btn_recent");
-	
-	m_tabWorkspace = FindChildByName2<STabCtrl>(L"workspace_tab");
 	// 初始化文件树视图
 	m_treeView = FindChildByID2<STreeView>(R.id.workspace_treeview);
 	if (m_treeView)
@@ -79,7 +77,6 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 	m_RecentFileMenu.LoadMenu(UIRES.smenu.menu_recent);
 
 	LoadAppCfg();
-	FindChildByID(R.id.chk_autosave)->SetCheck(m_bAutoSave);
 
 	//======================================================================
 	m_pXmlEdtior = new CXmlEditor(this);
@@ -95,8 +92,6 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 	SWindow* MainWnd = FindChildByName2<SWindow>("UI_main_caption");
 	if (MainWnd)
 		RegisterDragDrop(MainWnd->GetSwnd(), new CDropTarget(this));
-
-	UpdateToolbar();
 	return 0;
 }
 
@@ -230,6 +225,36 @@ void CMainDlg::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
 				return;
 			}
 			OpenProject(m_vecRecentFile[nID - MenuId_Start]);
+		}
+		else if(nID == R.id.menu_file_openproject){
+			OnBtnOpen();
+		}else if(nID == R.id.menu_file_closeproject){
+			OnBtnClose();
+		}else if(nID == R.id.menu_file_save_xml){
+			OnBtnSave();
+		}else if(nID == R.id.menu_file_newlayout){
+			OnBtnNewLayout();
+		}else if(nID == R.id.menu_file_newinclude){
+			OnBtnNewInclude();
+		}else if(nID == R.id.menu_view_preview){
+			OnBtnPreview();
+        }
+		else if(nID == R.id.menu_tool_format_xml){
+			OnBtnFormatXml();
+		}else if(nID == R.id.menu_tool_view_skin){
+			 OnBtnViewSkin();
+		}else if(nID == R.id.menu_about){
+			OnBtnAbout();
+		}else if(nID == R.id.menu_file_exit){
+			OnClose();
+		}else if(nID == R.id.menu_view_property){
+			SWindow *pProp = FindChildByID(R.id.property_panel_dock);
+			pProp->SetVisible(!pProp->IsVisible(), TRUE);
+			pProp->RequestRelayout();
+		}else if(nID == R.id.menu_view_toolbar){
+			SWindow *pToolbar = FindChildByID(R.id.tb_main);
+			pToolbar->SetVisible(!pToolbar->IsVisible(), TRUE);
+            pToolbar->GetParent()->RequestRelayout();
 		}
 	}
 }
@@ -482,7 +507,6 @@ bool CMainDlg::CloseProject()
 	UpdateEditorToolbar();
 
 	m_bIsOpen = FALSE;
-	UpdateToolbar();
 	return true;
 }
 
@@ -530,7 +554,6 @@ BOOL CMainDlg::OpenProject(SStringT strFileName)
 		m_pFileTreeAdapter->SetRootPath(m_strProPath);
 	}
 	
-	UpdateToolbar();
 	if (std::find(m_vecRecentFile.begin(), m_vecRecentFile.end(), strFileName) == m_vecRecentFile.end())
 	{
 		m_vecRecentFile.push_back(strFileName);
@@ -749,13 +772,7 @@ BOOL CMainDlg::DeserializeItemsFromClipboard(std::vector<SStringT>& vecItemPaths
 
 BOOL CMainDlg::OnBtnSave()
 {
-	if(!m_pXmlEdtior->isValidXml())
-	{
-		if(IDCANCEL == SMessageBox(m_hWnd,_T("编辑器中的XML文件格式有错误，确定要保存吗？"),_T("提示"),MB_OKCANCEL))
-			return FALSE;
-	}
-	m_pXmlEdtior->SaveFile();
-	return TRUE;
+    return m_pXmlEdtior->OnSaveXml();
 }
 
 BOOL CMainDlg::NewLayout(const SStringT &strPath, const SStringT &strName)
@@ -765,6 +782,7 @@ BOOL CMainDlg::NewLayout(const SStringT &strPath, const SStringT &strName)
 		SStringT strType;
 		m_UIResFileMgr.IsLayoutXml(strPath, strType);
 		m_pXmlEdtior->LoadXml(strPath, strType);
+        FindChildByID(R.id.property_panel_dock)->SetVisible(TRUE, TRUE);
 	}
 	return bRet;
 }
@@ -805,14 +823,18 @@ void CMainDlg::OnBtnAbout()
 	dlg.DoModal(m_hWnd);
 }
 
-void CMainDlg::OnBtnRecentFile()
+void CMainDlg::OnBtnRecentFile(IEvtArgs *e)
 {
-	CRect rect = m_btn_recentFile->GetWindowRect();
-	ClientToScreen2(&rect);
-
-	m_RecentFileMenu.TrackPopupMenu(0, rect.left, rect.bottom, m_hWnd);
+	SToolBar *pToolBar = sobj_cast<SToolBar>(e->Sender());
+	CRect rcItem = pToolBar->GetItemRect(pToolBar->CommandToIndex(R.id.tb_main_openproject));
+	ClientToScreen2(&rcItem);
+	m_RecentFileMenu.TrackPopupMenu(TPM_LEFTALIGN|TPM_TOPALIGN, rcItem.left, rcItem.bottom, m_hWnd);
 }
 
+void CMainDlg::OnBtnFormatXml()
+{
+	m_pXmlEdtior->OnFormatXml();
+}
 
 void CMainDlg::OnTvEventOfPanel(IEvtArgs *e)
 {
@@ -1031,6 +1053,7 @@ void CMainDlg::OnTvEventOfPanel(IEvtArgs *e)
 			pTab->SetCurSel(0);
 			m_editXmlType = type;
 			m_pXmlEdtior->LoadXml(strPath, layoutId);
+            FindChildByID(R.id.property_panel_dock)->SetVisible(TRUE, TRUE);
 			UpdateEditorToolbar();
 		}else{
 			// 打开图片查看器
@@ -1200,6 +1223,7 @@ void CMainDlg::addUires(HSTREEITEM hItem)
         if (bUpdated && m_editXmlType == FT_INDEX_XML)
         { // 如果正在编辑uires.idx
             m_pXmlEdtior->LoadXml(m_strUIResFile, _T(""));
+            FindChildByID(R.id.property_panel_dock)->SetVisible(FALSE, TRUE);
         }
 }
 
@@ -1366,6 +1390,7 @@ void CMainDlg::addSkin(HSTREEITEM hItem)
             {
                 // 如果正在编辑skin.xml，重新加载
                 m_pXmlEdtior->LoadXml(m_UIResFileMgr.m_strSkinFile, _T(""));
+                FindChildByID(R.id.property_panel_dock)->SetVisible(FALSE, TRUE);
             }
         }
     }
@@ -1509,17 +1534,6 @@ bool CMainDlg::CheckSave()
 		}
 	}
 	return true;
-}
-
-void CMainDlg::UpdateToolbar()
-{
-	FindChildByID(R.id.toolbar_btn_Open)->EnableWindow(!m_bIsOpen,TRUE);
-	FindChildByID(R.id.toolbar_btn_recent)->EnableWindow(!m_bIsOpen,TRUE);
-	
-	FindChildByID(R.id.toolbar_btn_NewInclude)->EnableWindow(m_bIsOpen,TRUE);
-	FindChildByID(R.id.toolbar_btn_NewLayout)->EnableWindow(m_bIsOpen,TRUE);
-	FindChildByID(R.id.toolbar_btn_viewskin)->EnableWindow(m_bIsOpen,TRUE);
-	FindChildByID(R.id.toolbar_btn_Close)->EnableWindow(m_bIsOpen,TRUE);
 }
 
 void CMainDlg::OnFileChanged(LPCTSTR pszFile, CPathMonitor::Flag nFlag)
@@ -1715,4 +1729,65 @@ void CMainDlg::OnTbSkinClick(IEvtArgs *e)
 	{
 		m_pXmlEdtior->InsertElement(dlg.GetXml());
 	}
+}
+
+void CMainDlg::OnUpdateCmdUI(IEvtArgs *e){
+	EventUpdateCmdUI *e2=sobj_cast<EventUpdateCmdUI>(e);
+	if(e2->nCmdId == R.id.tb_main_openproject){
+		e2->bEnable = !m_bIsOpen;
+	}else if(e2->nCmdId == R.id.tb_main_closeproject){
+		e2->bEnable = m_bIsOpen;
+	}else if(e2->nCmdId == R.id.tb_main_savexml){
+		e2->bEnable = m_bIsOpen && m_pXmlEdtior->isDirty();
+	}else if(e2->nCmdId == R.id.tb_main_viewskin || e2->nCmdId == R.id.menu_tool_view_skin){
+		e2->bEnable = m_bIsOpen;
+	}else if(e2->nCmdId == R.id.tb_main_formatxml || e2->nCmdId == R.id.menu_tool_format_xml){
+		e2->bEnable = m_bIsOpen && (m_editXmlType != FT_UNKNOWN);
+	}else if(e2->nCmdId == R.id.tb_main_newinclude || e2->nCmdId == R.id.tb_main_newlayout){
+		e2->bEnable = m_bIsOpen;
+    }
+    else if (e2->nCmdId == R.id.menu_view_preview)
+    {
+		e2->bEnable = m_bIsOpen && (m_editXmlType == FT_LAYOUT_XML);
+	}else if(e2->nCmdId == R.id.menu_view_property){
+		e2->bEnable = m_bIsOpen && m_editXmlType == FT_LAYOUT_XML;
+		e2->bChecked = FindChildByID(R.id.property_panel_dock)->IsVisible();
+	}else if(e2->nCmdId == R.id.menu_view_toolbar){
+		e2->bChecked = FindChildByID(R.id.tb_main)->IsVisible();
+	}else if(e2->nCmdId == R.id.tb_main_autosave){
+		e2->bChecked = m_bAutoSave;
+	}
+}
+
+void CMainDlg::OnTbMainClick(IEvtArgs *e)
+{
+	EventToolBarCmd *e2=sobj_cast<EventToolBarCmd>(e);
+	if(e2->nCmdId == R.id.tb_main_openproject){
+		if(e2->bDropDown){
+			OnBtnRecentFile(e);
+		}else{
+			OnBtnOpen();
+		}
+	}else if(e2->nCmdId == R.id.tb_main_closeproject){ 
+		OnBtnClose();
+	}else if(e2->nCmdId == R.id.tb_main_savexml){
+		OnBtnSave();
+	}else if(e2->nCmdId == R.id.tb_main_viewskin){
+		OnBtnViewSkin();
+	}else if(e2->nCmdId == R.id.tb_main_formatxml){
+		OnBtnFormatXml();
+	}else if(e2->nCmdId == R.id.tb_main_about){
+		OnBtnAbout();
+	}else if(e2->nCmdId == R.id.tb_main_newlayout){
+		OnBtnNewLayout();
+	}else if(e2->nCmdId == R.id.tb_main_newinclude){
+		OnBtnNewInclude();
+	}else if(e2->nCmdId == R.id.tb_main_autosave){
+		m_bAutoSave = !m_bAutoSave;
+	}
+}
+
+void CMainDlg::OnMenuSelect(IEvtArgs *e){
+	EventSelectMenu *e2 = sobj_cast<EventSelectMenu>(e);
+	OnCommand(0,e2->nMenuId,NULL);
 }

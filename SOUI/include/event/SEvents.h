@@ -159,6 +159,8 @@ typedef enum _SOUI_EVENTS
 
     EVT_TB_ITEMCLICK = 22180,
 
+    EVT_UPDATE_CMDUI = 22190, ///< 更新命令UI事件
+
     EVT_EXTERNAL_BEGIN = 10000000, ///< 外部事件开始ID
 } SOUI_EVENTS;
 
@@ -768,6 +770,14 @@ DEF_EVT(EventToolBarCmd, EVT_TB_ITEMCLICK, on_toolbar_cmd, {
     int nCmdId;
     const IStringT *strText;
     LPARAM lParam;
+    BOOL bDropDown;
+})
+
+DEF_EVT(EventUpdateCmdUI, EVT_UPDATE_CMDUI, on_update_cmdui, { 
+    int nCmdId;
+    int iIndex;
+    BOOL bEnable;
+    BOOL bChecked; 
 })
 
 SNSEND

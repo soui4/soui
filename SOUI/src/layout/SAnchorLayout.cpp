@@ -141,29 +141,8 @@ HRESULT SAnchorLayoutParam::OnAttrSize(const SStringW &strValue, BOOL bLoading)
     if (2 != SplitString(strValue, L',', szStr))
         return E_FAIL;
 
-    OnAttrWidth(szStr[0], bLoading);
-    OnAttrHeight(szStr[1], bLoading);
-    return S_OK;
-}
-
-HRESULT SAnchorLayoutParam::OnAttrHeight(const SStringW &strValue, BOOL bLoading)
-{
-    if (strValue.CompareNoCase(L"matchParent") == 0 || strValue.CompareNoCase(L"full") == 0)
-        height.setMatchParent();
-    else if (strValue.CompareNoCase(L"wrapContent") == 0)
-        height.setWrapContent();
-    else
-        height = GETLAYOUTSIZE(strValue);
-    return S_OK;
-}
-HRESULT SAnchorLayoutParam::OnAttrWidth(const SStringW &strValue, BOOL bLoading)
-{
-    if (strValue.CompareNoCase(L"matchParent") == 0 || strValue.CompareNoCase(L"full") == 0)
-        width.setMatchParent();
-    else if (strValue.CompareNoCase(L"wrapContent") == 0)
-        width.setWrapContent();
-    else
-        width = GETLAYOUTSIZE(strValue);
+    width = GETLAYOUTSIZE(szStr[0]);
+    height = GETLAYOUTSIZE(szStr[1]);
     return S_OK;
 }
 

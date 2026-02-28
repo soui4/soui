@@ -1,4 +1,4 @@
-﻿#ifndef __SOUICTRLS__H__
+#ifndef __SOUICTRLS__H__
 #define __SOUICTRLS__H__
 #include <core/SPanel.h>
 #include <control/SCmnCtrl.h>
@@ -30,6 +30,7 @@
 #include <control/SSwitch.h>
 #include <control/SSearchDropdownList.h>
 #include <control/SToolBar.h>
+#include <control/SDockBar.h>
 #ifdef _WIN32
 #include <control/SActiveX.h>
 #endif //_WIN32

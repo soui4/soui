@@ -2,7 +2,7 @@
 	<window size="-2,-1" layout="hbox" gravity="center" interval="5">
 		<text text="menubar:"/>
 		<menubar size="-1,30">
-			<btnStyle2 skin="SKIN_MENU_BTN" />
+			<btnStyle skin="SKIN_MENU_BTN" />
 			<menus>
 				<menuItem src="SMENU:MENU_FILE">文件(&F)</menuItem>
 				<menuItem src="SMENU:MENU_EDIT">编辑(&E)</menuItem>

@@ -487,6 +487,15 @@ class SOUI_EXP SMenu : public TObjRefImpl<IMenu> {
      * @return 成功返回TRUE，失败返回FALSE
      */
     STDMETHOD_(BOOL, AppendMenu)(THIS_ UINT uFlags, UINT_PTR uIDNewItem, LPCTSTR lpNewItem, int iIcon DEF_VAL(-1), HICON hIcon DEF_VAL(0)) OVERRIDE;
+
+    /**
+     * @brief 启用或禁用菜单项
+     * @param uIDEnableItem 项目ID或索引
+     * @param uEnable MF_BYCOMMAND/MF_BYPOSITION | MF_ENABLED/MF_GRAYED/MF_DISABLED
+     * @return 成功返回TRUE，失败返回FALSE
+     */
+    STDMETHOD_(BOOL, EnableMenuItem)(THIS_ UINT uIDEnableItem, UINT uEnable) OVERRIDE;
+
     /**
      * @brief 检查菜单项
      * @param uIdCheckItem 要检查的菜单项ID

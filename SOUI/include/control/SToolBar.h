@@ -31,6 +31,9 @@ struct ToolBarItem
     int dwState;
     int dwStyle; // Item style flags (TBSTYLE_*)
     SAutoRefPtr<IBitmapS> icon;
+    
+    // Animation support for item hover/leave state
+    BYTE byAlphaAni;  // Animation alpha value, 0xFF means not animating
 
     ToolBarItem()
         : nId(0)
@@ -38,11 +41,12 @@ struct ToolBarItem
         , lParam(0)
         , dwState(0)
         , dwStyle(TBSTYLE_BUTTON)
+        , byAlphaAni(0xFF)
     {
     }
 };
 
-class SOUI_EXP SToolBar : public SWindow {
+class SOUI_EXP SToolBar : public SWindow, public ITimelineHandler, public IIdleHandler {
     DEF_SOBJECT(SWindow, L"toolbar")
   public:
     SToolBar(void);
@@ -66,10 +70,6 @@ class SOUI_EXP SToolBar : public SWindow {
     BOOL SetItemInfo(int nIndex, const ToolBarItem *pItem);
 
     void SetIconsSkin(SAutoRefPtr<ISkinObj> skinIcons);
-    void SetDropDownSize(int nSize)
-    {
-        m_nDropDownSize = nSize;
-    }
 
     // Button state methods (MFC-compatible)
     BOOL EnableButton(int nID, BOOL bEnable = TRUE);
@@ -91,24 +91,32 @@ class SOUI_EXP SToolBar : public SWindow {
     BOOL LoadMenuStyle(LPCTSTR pszResName);
     void SetMenuStyle(SXmlNode xmlMenuStyle);
 
+    CRect GetItemRect(int iItem) const;
+
+  protected:
+        STDMETHOD_(void, OnNextFrame)(THIS) OVERRIDE; // ITimelineHandler interface
+        STDMETHOD_(BOOL, OnIdle)(THIS_ int iRun) OVERRIDE;
   public:
     SOUI_ATTRS_BEGIN()
         ATTR_SKIN(L"iconSkin", m_skinIcons, TRUE)
         ATTR_SKIN(L"sepSkin", m_skinSep, TRUE)
         ATTR_SKIN(L"skin", m_skinState, TRUE)
         ATTR_SKIN(L"dropArrowSkin", m_skinDropArrow, TRUE)
-        ATTR_INT(L"dropDownSize", m_nDropDownSize, TRUE)
         ATTR_BOOL(L"vertical", m_bVert, TRUE)
+        ATTR_BOOL(L"textIconVertical", m_bTextIconVertical, TRUE)
+        ATTR_BOOL(L"animate", m_bAnimate, TRUE)
         ATTR_INT(L"maxItemWidth", m_nMaxItemWidth, TRUE)
-        ATTR_INT(L"interItemSep", m_nInterItemSep, TRUE)
+        ATTR_INT(L"textIconInterval", m_nTextIconInterval, TRUE)
     SOUI_ATTRS_END()
 
   protected:
-    virtual void DrawItem(IRenderTarget *pRT, const CRect &rc, const ToolBarItem *pItem);
+    virtual void DrawItem(IRenderTarget *pRT, const CRect &rc, const ToolBarItem *pItem, int iItemIndex);
     virtual void DrawDropButton(IRenderTarget *pRT, const CRect &rc, DWORD dwState);
-    virtual BOOL CreateChildren(SXmlNode xmlNode) override;
-    virtual SIZE MeasureContent(int nParentWid, int nParentHei) override;
-    virtual BOOL UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo) override;
+
+    BOOL CreateChildren(SXmlNode xmlNode) override;
+    SIZE MeasureContent(int nParentWid, int nParentHei) override;
+    BOOL UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo) override;
+    void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer) override;
 
   protected:
     void OnPaint(IRenderTarget *pRT);
@@ -130,7 +138,6 @@ class SOUI_EXP SToolBar : public SWindow {
   protected:
     CSize GetItemSize(IRenderTarget *pRT, int iItem) const;
     int GetSepWid() const;
-    CRect GetItemRect(int iItem) const;
     int HitTest(CPoint pt) const;
     BOOL IsSeparator(const ToolBarItem *pItem) const;
     void UpdateVisibleItemCount();
@@ -154,6 +161,24 @@ class SOUI_EXP SToolBar : public SWindow {
      * @param iItem Item index
      */
     void ShowItemDropDownMenu(const CRect &rc, int iItem);
+    
+    /**
+     * Handle item hover animation
+     * @param iItem Item index
+     */
+    void OnItemHover(int iItem);
+    
+    /**
+     * Handle item leave animation
+     * @param iItem Item index
+     */
+    void OnItemLeave(int iItem);
+    
+    /**
+     * Stop animation for a specific item
+     * @param iItem Item index
+     */
+    void StopItemAnimate(int iItem);
 
   protected:
     SAutoRefPtr<ISkinObj> m_skinState;
@@ -166,12 +191,16 @@ class SOUI_EXP SToolBar : public SWindow {
     int m_iClickItem;
     int m_iHoverItem;
     BOOL m_bVert;
+    BOOL m_bTextIconVertical; // Whether to arrange text and icon vertically
+    int m_nTextIconInterval;   // Separation between items (in pixels)
     int m_nMaxItemWidth;
     int m_nVisibleItems;
-    int m_nDropDownSize; // Size of dropdown arrow for TBSTYLE_DROPDOWN items
     DWORD m_dwDropBtnState;
     int m_nMoreButtonSize; // Size of more button (calculated dynamically)
-    int m_nInterItemSep;   // Separation between items (in pixels)
+    
+    // Animation support
+    BOOL m_bAnimate;    // Enable/disable item animation
+    BYTE m_nAniStep;    // Animation step for alpha value increment
 };
 
 SNSEND

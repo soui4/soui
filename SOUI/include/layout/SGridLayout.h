@@ -116,8 +116,8 @@ class SGridLayoutParam
     SOUI_ATTRS_BEGIN()
         ATTR_INT(L"rowSpan", nRowSpan, TRUE)                                       // 行跨越数
         ATTR_INT(L"columnSpan", nColSpan, TRUE)                                    // 列跨越数
-        ATTR_CUSTOM(L"width", OnAttrWidth)                                         // 宽度
-        ATTR_CUSTOM(L"height", OnAttrHeight)                                       // 高度
+        ATTR_LAYOUTSIZE(L"width", width,TRUE)                                      // 宽度
+        ATTR_LAYOUTSIZE(L"height", height,TRUE)                                        // 高度
         ATTR_CUSTOM(L"size", OnAttrSize)                                           // 大小
         ATTR_GRIDGRAVITY(L"layout_xGravity", layoutGravityX, TRUE)                 // 水平对齐方式
         ATTR_GRIDGRAVITY(L"layout_yGravity", layoutGravityY, TRUE)                 // 垂直对齐方式
@@ -134,22 +134,6 @@ class SGridLayoutParam
      * @return 处理结果
      */
     HRESULT OnAttrSize(const SStringW &strValue, BOOL bLoading);
-
-    /**
-     * @brief 处理宽度属性
-     * @param strValue 属性值字符串
-     * @param bLoading 是否正在加载
-     * @return 处理结果
-     */
-    HRESULT OnAttrWidth(const SStringW &strValue, BOOL bLoading);
-
-    /**
-     * @brief 处理高度属性
-     * @param strValue 属性值字符串
-     * @param bLoading 是否正在加载
-     * @return 处理结果
-     */
-    HRESULT OnAttrHeight(const SStringW &strValue, BOOL bLoading);
 };
 
 /**

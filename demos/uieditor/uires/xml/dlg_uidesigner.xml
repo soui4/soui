@@ -1,26 +1,14 @@
 <?xml version="1.0"?>
 <tabctrl name="tab_editor" size="-2,-2" tabAlign="top" tabHeight="30" tabWidth="200" tabInterSize="10" tabSkin="skin_tab_skin">
   <page name="page_xml" title="@string/xml_editor" layout="vbox">
-    <window size="-2,30" layout="hbox" interval="5">
-			<imgbtnex name="toolbar_btn_savexml" skin="skin_app_button" text="@string/save_xml" size="100,30" animate="1" class="ue_cls_title" />
-			<imgbtnex name="toolbar_btn_formatxml" skin="skin_app_button" text="@string/format_xml" size="100,30" animate="1" class="ue_cls_title" />
-			<imgbtnex name="toolbar_btn_preview" skin="skin_app_button" text="@string/preview" size="100,30" animate="1" class="ue_cls_title" />
-    </window>
-    <splitcol name="xml_editor_main" sepSkin="" size="-2,0" weight="1" sepSize="6">
-      <pane idealSize="500" minSize="100" priority="0" clipClient="1">
-        <splitrow name="xml_editor_sub" sepSkin="" size="-2,-2" sepSize="6">
-          <pane idealSize="10" minSize="10" priority="0" clipClient="1">
-            <realwnd pos="0, 0, -0, -0" name="uidesigner_wnd_layout" wndclass="designer_wnd" id="100000" wndname="designer_wnd"/>
-          </pane>
-          <pane idealSize="300" minSize="30" priority="1" clipClient="1" layout="vbox">      
-            <realwnd size="-2,-2" name="uidesigner_scintilla" wndclass="scintilla" id="100000" wndname="scintilla"/>
-          </pane>
-        </splitrow>
+    <splitrow name="xml_editor" sepSkin="" size="-2,-2" sepSize="6">
+      <pane idealSize="10" minSize="10" priority="0" clipClient="1">
+        <realwnd pos="0, 0, -0, -0" name="uidesigner_wnd_layout" wndclass="designer_wnd" id="100000" wndname="designer_wnd"/>
       </pane>
-      <pane idealSize="300" minSize="100" priority="1" clipClient="1">
-					<include src="layout:property_panel" />
-			</pane>
-    </splitcol>
+      <pane idealSize="300" minSize="30" priority="1" clipClient="1" layout="vbox">      
+        <realwnd size="-2,-2" name="uidesigner_scintilla" wndclass="scintilla" id="100000" wndname="scintilla"/>
+      </pane>
+    </splitrow>
   </page>
   <page name="page_image" title="@string/image_viewer" layout="hbox">
      <window size="0, -2" weight="1" skin="skin_designer_background">

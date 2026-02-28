@@ -42,7 +42,9 @@
 		<file name="png_designer_background" path="image\designer_background.png" />
 		<file name="png_filetypes" path="image\filetypes.png" />
 		<file name="png_item_bk" path="image\item_bk.png" />
-		<file name="png_dropdown" path="image\dropdown.png" />"
+		<file name="png_dropdown" path="image\dropdown.png" />
+		<file name="png_tb_main" path="image\tb_main.png" />
+		<file name="png_tb_sep" path="image\tb_sep.png" />
 	</IMG>
 	<ICON>
 		<file name="ICON_logo" path="image\logo.ico" />
@@ -51,5 +53,9 @@
 		<file name="menu_layoutfile" path="smenu\menu_layoutfile.xml" />
 		<file name="menu_recent" path="smenu\menu_recent.xml" />
 		<file name="menu_file_ctx" path="smenu\menu_file_ctx.xml" />
+		<file name="menu_file" path="smenu\menu_file.xml" />
+		<file name="menu_view" path="smenu\menu_view.xml" />
+		<file name="menu_tool" path="smenu\menu_tool.xml" />
+		<file name="menu_help" path="smenu\menu_help.xml" />
 	</smenu>
 </resource>

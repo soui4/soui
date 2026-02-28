@@ -981,7 +981,7 @@ public: \
             return TRUE; \
     }
 
-// void OnInitMenuPopup(SMenuEx* menuPopup, UINT nIndex)
+// void OnInitMenuExPopup(SMenuEx* menuPopup, UINT nIndex)
 #define MSG_WM_INITMENUPOPUP_EX(func) \
     if (uMsg == WM_INITMENUPOPUP) \
     { \

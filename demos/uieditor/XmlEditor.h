@@ -46,6 +46,8 @@ SNSBEGIN
             return m_strXmlFile;
         }
 		BOOL StartPreviewProcess();
+        BOOL OnFormatXml();
+        BOOL OnSaveXml();
 	protected:
 		void OnMoveCtrl();
 		void UpdatePropGridLayout();
@@ -58,11 +60,7 @@ SNSBEGIN
 		void OnPropGridItemAutoCompleteFill(IEvtArgs *pEvt);
 		void OnPropGridItemAutoCompleteSelected(IEvtArgs *pEvt);
 		void OnPropGridConvertColor(IEvtArgs *pEvt);
-		void OnSaveXml();
-		void OnFormatXml();
 		EVENT_MAP_BEGIN()
-			EVENT_ID_COMMAND(R.id.toolbar_btn_savexml,OnSaveXml)
-			EVENT_ID_COMMAND(R.id.toolbar_btn_formatxml,OnFormatXml)
 			EVENT_ID_HANDLER(R.id.propgrid_element,EventPropGridValueChanged::EventID,OnPropGridValueChanged)
 			EVENT_ID_HANDLER(R.id.propgrid_element,EventPropGridItemAutoCompleteFill::EventID,OnPropGridItemAutoCompleteFill)
 			EVENT_ID_HANDLER(R.id.propgrid_element,EventPropGridItemAutoCompleteSelected::EventID,OnPropGridItemAutoCompleteSelected)
