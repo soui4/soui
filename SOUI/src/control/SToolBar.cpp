@@ -164,7 +164,7 @@ SIZE SToolBar::MeasureContent(int nParentWid, int nParentHei)
     GETRENDERFACTORY->CreateRenderTarget(&pRT, 0, 0);
     BeforePaintEx(pRT);
     CSize szContent;
-    CRect rcWnd = { 0, 0, nParentWid, nParentHei };
+    CRect rcWnd(0, 0, nParentWid, nParentHei);
     for (UINT i = 0; i < m_arrItems.GetCount(); i++)
     {
         CSize szItem = GetItemSize(rcWnd, pRT, i);
