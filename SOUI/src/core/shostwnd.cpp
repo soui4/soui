@@ -165,6 +165,7 @@ SRootWindow::SRootWindow()
     GetEventSet()->addEvent(EVENTID(EventExit));
     GetEventSet()->addEvent(EVENTID(EventMenuCmd));
     GetEventSet()->addEvent(EVENTID(EventUpdateCmdUI));
+    GetEventSet()->addEvent(EVENTID(EventUpdateCmdTip));
 }
 
 void SRootWindow::OnAnimationInvalidate(bool bErase)
@@ -2259,45 +2260,97 @@ LRESULT SHostWnd::OnSetLanguage(UINT uMsg, WPARAM wp, LPARAM lp)
     return 0;
 }
 
-void SHostWnd::OnInitMenuPopup(HMENU menuPopup, UINT nIndex, BOOL bSysMenu)
+void SHostWnd::InitMenuPopup(HMENU menuPopup, UINT nIndex, BOOL bSysMenu)
 {
     int nCount = ::GetMenuItemCount(menuPopup);
     for (int i = 0; i < nCount; i++)
     {
-        MENUITEMINFO mii = { sizeof(mii), MIIM_STATE|MIIM_ID, 0 };
+        MENUITEMINFO mii = { sizeof(mii), MIIM_STATE | MIIM_ID, 0 };
         GetMenuItemInfo(menuPopup, i, TRUE, &mii);
-        if(mii.wID == 0)
+        if (mii.wID == 0)
             continue;
         EventUpdateCmdUI evt(GetRoot());
         evt.nCmdId = mii.wID;
         evt.iIndex = i;
         evt.bEnable = mii.fState & MF_DISABLED ? FALSE : TRUE;
         evt.bChecked = mii.fState & MF_CHECKED ? TRUE : FALSE;
-        if(GetRoot()->FireEvent(&evt)){
+        if (GetRoot()->FireEvent(&evt))
+        {
             CheckMenuItem(menuPopup, i, MF_BYPOSITION | (evt.bChecked ? MF_CHECKED : 0));
-            EnableMenuItem(menuPopup, i, MF_BYPOSITION|(evt.bEnable ? MF_ENABLED : MF_GRAYED));
+            EnableMenuItem(menuPopup, i, MF_BYPOSITION | (evt.bEnable ? MF_ENABLED : MF_GRAYED));
         }
     }
 }
 
-void SHostWnd::OnInitMenuExPopup(SMenuEx* menuPopup, UINT nIndex)
+void SHostWnd::InitMenuExPopup(SMenuEx *menuPopup, UINT nIndex)
 {
     int nCount = menuPopup->GetMenuItemCount();
     for (int i = 0; i < nCount; i++)
     {
         EventUpdateCmdUI evt(GetRoot());
-        SMenuExItem* pMenuItem = menuPopup->GetMenuItem(i,FALSE);
-        if(!pMenuItem || pMenuItem->GetID() == 0)
+        SMenuExItem *pMenuItem = menuPopup->GetMenuItem(i, FALSE);
+        if (!pMenuItem || pMenuItem->GetID() == 0)
             continue;
         evt.nCmdId = pMenuItem->GetID();
         evt.iIndex = i;
         evt.bEnable = pMenuItem->IsDisabled() ? FALSE : TRUE;
         evt.bChecked = pMenuItem->IsChecked();
-        if(GetRoot()->FireEvent(&evt)){
-            menuPopup->EnableMenuItem(i, evt.bEnable?0:MF_GRAYED);
+        if (GetRoot()->FireEvent(&evt))
+        {
+            menuPopup->EnableMenuItem(i, evt.bEnable ? 0 : MF_GRAYED);
             menuPopup->CheckMenuItem(i, evt.bChecked ? MF_CHECKED : 0);
         }
     }
+}
+
+LRESULT SHostWnd::OnInitMenuPopup(UINT uMsg, WPARAM wp, LPARAM lp)
+{
+    if (::IsMenu((HMENU)wp))
+    {
+        InitMenuPopup((HMENU)wp, (UINT)LOWORD(lp), (BOOL)HIWORD(lp));
+    }
+    else
+    {
+        InitMenuExPopup((SMenuEx*)wp, (UINT)lp);
+    }
+    SetMsgHandled(FALSE);
+    return 0;
+}
+
+void SHostWnd::OnMenuSelect(UINT uItem, UINT uFlags, HMENU hMenu)
+{
+    if (uFlags == 0xFFFF && hMenu == NULL) {
+        EventUpdateCmdTip evt(GetRoot());
+        evt.iIndex = -1;
+        evt.nCmdId = -1;
+        evt.strTip = NULL;
+        GetRoot()->FireEvent(&evt);
+    } 
+    else if (hMenu != NULL) 
+    {
+        TCHAR szText[256];
+        SStringT strTip;
+        EventUpdateCmdTip evt(GetRoot());
+        evt.strTip = NULL;
+        if(uFlags & MF_POPUP){
+            evt.iIndex = uItem;
+            evt.nCmdId = -1;
+            GetMenuString (hMenu, uItem, szText, sizeof(szText) / sizeof(TCHAR), MF_BYPOSITION);
+            strTip = szText;
+            evt.strTip = &strTip;
+        }else{
+            int nCount = GetMenuItemCount(hMenu);
+            for(int i=0;i<nCount;i++){
+                if(::GetMenuItemID(hMenu, i) == uItem){
+                    evt.iIndex = i;
+                    break;
+                }
+            }
+            evt.nCmdId = uItem;
+        }
+        GetRoot()->FireEvent(&evt);
+    }
+    SetMsgHandled(FALSE);
 }
 
 //////////////////////////////////////////////////////////////////

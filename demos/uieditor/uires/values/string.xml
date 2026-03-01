@@ -36,4 +36,5 @@
     <auto_save value="自动保存" />
     <about value="关于" />
     <exit value="退出\tCtrl+&Q"/>
+    <idlemsg value="就绪" />
   </string>

@@ -2,6 +2,7 @@
 #include "helper/SMenuEx.h"
 #include "helper/SplitString.h"
 #include <layout/SLinearLayout.h>
+
 SNSBEGIN
 #define TIMERID_POPSUBMENU 100
 #define TIME_PUPSUBMENU    500

@@ -9,9 +9,9 @@
 			</caption>
 			<splitcol size="-2,0" weight="1" layout="hbox" interval="5">
 			    <pane idealSize="200" minSize="100" priority="2" > 
-					<listview size="-2,-2" name="lv_skin" colorBkgnd="@color/gray">
-						<template itemHeight="20" layout="hbox" gravity="center" colorNormal="@color/white" colorSelected="#e4f0fc" colorHover="#e4f0fc">
-							<text name="txt_desc" colorText="@color/red"/>
+					<listview size="-2,-2" name="lv_skin" colorBkgnd="@color/bkBlack1">
+						<template itemHeight="20" layout="hbox" gravity="center" skin="skin_item_bk">
+							<text name="txt_desc" colorText="@color/white"/>
 							<window size="0,0" weight="1"/>
 							<img name="skin_preview" width="20" height="20" iconIndex="0"/>
 						</template>

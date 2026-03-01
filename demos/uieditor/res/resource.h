@@ -1,4 +1,4 @@
-﻿//stamp:28f5cd9a71875644
+﻿//stamp:28f5ce776b1d2fce
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -211,11 +211,13 @@ struct _R{
 		 const wchar_t * txt_path;
 		 const wchar_t * txt_prop_desc;
 		 const wchar_t * txt_prop_title;
+		 const wchar_t * txt_status;
 		 const wchar_t * txt_title;
 		 const wchar_t * txt_value;
 		 const wchar_t * uidesigner_scintilla;
 		 const wchar_t * uidesigner_wnd_layout;
 		 const wchar_t * uidesigner_wnd_xmltree;
+		 const wchar_t * wnd_status;
 		 const wchar_t * workspace_treeview;
 		 const wchar_t * xml_editor;
 	}name;
@@ -297,11 +299,13 @@ struct _R{
 		int txt_path;
 		int txt_prop_desc;
 		int txt_prop_title;
+		int txt_status;
 		int txt_title;
 		int txt_value;
 		int uidesigner_scintilla;
 		int uidesigner_wnd_layout;
 		int uidesigner_wnd_xmltree;
+		int wnd_status;
 		int workspace_treeview;
 		int xml_editor;
 	}id;
@@ -333,6 +337,7 @@ struct _R{
 		int exit;
 		int explorer;
 		int format_xml;
+		int idlemsg;
 		int image_viewer;
 		int new_folder;
 		int new_include;
@@ -439,51 +444,53 @@ struct _R R={
 		L"txt_path",
 		L"txt_prop_desc",
 		L"txt_prop_title",
+		L"txt_status",
 		L"txt_title",
 		L"txt_value",
 		L"uidesigner_scintilla",
 		L"uidesigner_wnd_layout",
 		L"uidesigner_wnd_xmltree",
+		L"wnd_status",
 		L"workspace_treeview",
 		L"xml_editor"
 	}
 	,
 	{
-		65583,
-		65580,
-		65576,
-		65579,
-		65575,
+		65585,
+		65582,
+		65578,
+		65581,
+		65577,
 		65558,
 		65546,
 		65547,
-		65582,
 		65584,
+		65586,
 		65542,
 		65552,
 		65548,
 		65550,
 		65549,
+		65599,
 		65597,
-		65595,
 		65551,
 		65543,
 		65544,
 		65545,
-		65594,
+		65596,
 		65555,
-		65568,
-		65585,
+		65570,
+		65587,
 		65540,
 		65538,
 		65539,
-		65590,
-		65593,
 		65592,
-		65561,
-		65573,
-		65596,
-		65591,
+		65595,
+		65594,
+		65563,
+		65575,
+		65598,
+		65593,
 		65553,
 		400,
 		2,
@@ -500,15 +507,15 @@ struct _R R={
 		65537,
 		65541,
 		65536,
-		65578,
-		65577,
-		65572,
-		65570,
-		65559,
-		65564,
-		65567,
+		65580,
+		65579,
 		65574,
+		65572,
+		65559,
+		65566,
 		65569,
+		65576,
+		65571,
 		65554,
 		8,
 		2,
@@ -518,21 +525,23 @@ struct _R R={
 		1,
 		3,
 		7,
-		65586,
+		65588,
 		65557,
 		65556,
-		65565,
-		65562,
-		65587,
+		65567,
+		65564,
 		65589,
-		65588,
-		65581,
-		65566,
+		65591,
+		65590,
+		65561,
+		65583,
+		65568,
 		100000,
 		100000,
-		65563,
+		65565,
 		65560,
-		65571
+		65562,
+		65573
 	}
 	,
 	{
@@ -585,7 +594,8 @@ struct _R R={
 		31,
 		32,
 		33,
-		34
+		34,
+		35
 	}
 	
 };

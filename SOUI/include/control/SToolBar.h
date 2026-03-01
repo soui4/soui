@@ -138,6 +138,8 @@ class SOUI_EXP SToolBar : public SWindow, public ITimelineHandler, public IIdleH
     void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer) override;
 
   protected:
+      STDMETHOD_(void, UpdateChildrenPosition)(THIS) OVERRIDE;
+  protected:
     void OnPaint(IRenderTarget *pRT);
     void OnLButtonDown(UINT nFlags, CPoint pt);
     void OnLButtonUp(UINT nFlags, CPoint pt);
@@ -185,7 +187,7 @@ class SOUI_EXP SToolBar : public SWindow, public ITimelineHandler, public IIdleH
      * Handle item hover animation
      * @param iItem Item index
      */
-    void OnItemHover(int iItem);
+    BOOL OnItemHover(int iItem);
     
     /**
      * Handle item leave animation
@@ -199,10 +201,6 @@ class SOUI_EXP SToolBar : public SWindow, public ITimelineHandler, public IIdleH
      */
     void StopItemAnimate(int iItem);
     
-    /**
-     * Update all child controls positions
-     */
-    void UpdateChildrenPosition() override;
   protected:
     SAutoRefPtr<ISkinObj> m_skinState;
     SAutoRefPtr<ISkinObj> m_skinIcons;

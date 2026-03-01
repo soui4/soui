@@ -1414,7 +1414,6 @@ void CMainDlg::OnAutoCheck(IEvtArgs *e)
 	}
 }
 
-
 void CMainDlg::onScintillaSave(CScintillaWnd *pSci,LPCTSTR pszFileName)
 {
 }
@@ -1786,4 +1785,45 @@ void CMainDlg::OnTbMainClick(IEvtArgs *e)
 void CMainDlg::OnMenuSelect(IEvtArgs *e){
 	EventSelectMenu *e2 = sobj_cast<EventSelectMenu>(e);
 	OnCommand(0,e2->nMenuId,NULL);
+}
+
+void CMainDlg::OnUpdateCmdTip(IEvtArgs *e)
+{
+    SWindow *pTxtStatus = FindChildByID(R.id.txt_status);
+    EventUpdateCmdTip *e2 = sobj_cast<EventUpdateCmdTip>(e);
+    if (e2->strTip)
+    {
+        pTxtStatus->SetWindowText(SStringT(e2->strTip));
+	}
+	else if (e2->nCmdId >= 0) {
+        if (e2->nCmdId == R.id.menu_file_openproject)
+        {
+			SStringT strTip = GETSTRING(R.string.open_prject);
+			pTxtStatus->SetWindowText(strTip);
+		}
+		else if (e2->nCmdId == R.id.menu_file_closeproject)
+		{
+			SStringT strTip = GETSTRING(R.string.close_prject);
+			pTxtStatus->SetWindowText(strTip);
+		}
+		else if (e2->nCmdId == R.id.menu_file_exit)
+		{
+			SStringT strTip = GETSTRING(R.string.exit);
+			pTxtStatus->SetWindowText(strTip);
+		}
+		else if (e2->nCmdId == R.id.menu_tool_view_skin)
+		{
+			SStringT strTip = GETSTRING(R.string.view_skin);
+			pTxtStatus->SetWindowText(strTip);
+		}
+		 else if (e2->nCmdId == R.id.menu_tool_format_xml)
+		 {
+			 SStringT strTip = GETSTRING(R.string.format_xml);
+             pTxtStatus->SetWindowText(strTip);
+        }
+	}else
+    {
+        SStringT strDefaultTip = GETSTRING(R.string.idlemsg);
+        pTxtStatus->SetWindowText(strDefaultTip);
+    }
 }

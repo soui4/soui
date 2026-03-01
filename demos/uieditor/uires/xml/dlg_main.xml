@@ -59,6 +59,9 @@
 				<dockbar width="300" dock="right" name="property_panel_dock" text="@string/property" resizable="1" margin="2">
 					<include src="layout:property_panel" />
 				</dockbar>
+				<window name="wnd_status" size="-2,25" dock="bottom" margin="2" colorBorder="@color/border" layout="hbox" gravity="center">
+					<text name="txt_status" text="@string/idlemsg" />
+				</window>
 			</window>
 		</window>
 	</root>

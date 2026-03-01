@@ -78,6 +78,7 @@ protected:
 	void OnMenuSelect(IEvtArgs *e);
 	void OnUpdateCmdUI(IEvtArgs *e);
     void OnAutoCheck(IEvtArgs *e);
+    void OnUpdateCmdTip(IEvtArgs *e);
 	EVENT_MAP_BEGIN()
 		if(m_pXmlEdtior) CHAIN_EVENT_MAP_MEMBER((*m_pXmlEdtior))
 		if(m_pImageViewer) CHAIN_EVENT_MAP_MEMBER((*m_pImageViewer))
@@ -93,6 +94,8 @@ protected:
 		EVENT_ID_HANDLER(R.id.tb_skin,EventToolBarCmd::EventID,OnTbSkinClick)
 		EVENT_ID_HANDLER(R.id.tb_main,EventToolBarCmd::EventID,OnTbMainClick)
 		EVENT_ID_HANDLER(R.id.main_menu,EventSelectMenu::EventID,OnMenuSelect)
+        EVENT_ID_HANDLER(R.id.tb_main,EventUpdateCmdTip::EventID,OnUpdateCmdTip)
+        EVENT_ID_HANDLER(ROOT_ID, EventUpdateCmdTip::EventID, OnUpdateCmdTip)
 		EVENT_ID_HANDLER(R.id.tb_main,EventUpdateCmdUI::EventID,OnUpdateCmdUI)
 		EVENT_ID_HANDLER(ROOT_ID,EventUpdateCmdUI::EventID,OnUpdateCmdUI)
 	EVENT_MAP_END2(SHostWnd)

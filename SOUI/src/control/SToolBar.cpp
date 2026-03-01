@@ -18,7 +18,7 @@ SToolBar::SToolBar(void)
     , m_nAniStep(25)
 {
     GetEventSet()->addEvent(EVENTID(EventToolBarCmd));
-    GetEventSet()->addEvent(EVENTID(EventToolBarItemTip));
+    GetEventSet()->addEvent(EVENTID(EventUpdateCmdTip));
     GetEventSet()->addEvent(EVENTID(EventUpdateCmdUI));
 }
 
@@ -597,9 +597,8 @@ void SToolBar::OnMouseMove(UINT nFlags, CPoint pt)
             }
             if (iItem != -1)
             {
-                if (!(m_arrItems[iItem].dwState & (WndState_Disable | WndState_Check)))
+                if (OnItemHover(iItem))
                 {
-                    OnItemHover(iItem);
                     m_iHoverItem = iItem;
                 }
             }
@@ -655,6 +654,12 @@ void SToolBar::OnMouseLeave()
         m_dwDropBtnState = 0;
         InvalidateRect(GetDropdownButtonRect());
     }
+
+    EventUpdateCmdTip evt(this);
+    evt.iIndex = -1;
+    evt.nCmdId = -1;
+    evt.strTip = NULL;
+    FireEvent(&evt);
 }
 
 BOOL SToolBar::UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo)
@@ -1085,33 +1090,37 @@ void SToolBar::SetButtonStyle(int nIndex, int nStyle)
     Invalidate();
 }
 
-void SToolBar::OnItemHover(int iItem)
+BOOL SToolBar::OnItemHover(int iItem)
 {
     if (iItem < 0 || iItem >= (int)m_arrItems.GetCount())
-        return;
+        return FALSE;
+    BOOL ret = FALSE;
     ToolBarItem &item = m_arrItems[iItem];
-    if ((item.dwStyle & TBSTYLE_CHECK) && (item.dwState & WndState_Check))
-        return;
-    if(item.pChild)
-        return;
-    item.dwState |= WndState_Hover;
-    CRect rc = GetItemRect(iItem);
-
-    // Start animation if enabled
-    if (m_bAnimate)
+    if (!((item.dwState & WndState_Disable)|| (item.dwStyle & TBSTYLE_CHECK) && (item.dwState & WndState_Check) || item.pChild))
     {
-        StopItemAnimate(iItem);
-        item.byAlphaAni = 50; // ani alpha from 50 to 255
-        GetContainer()->RegisterTimelineHandler(this);
+        item.dwState |= WndState_Hover;
+        CRect rc = GetItemRect(iItem);
+
+        // Start animation if enabled
+        if (m_bAnimate)
+        {
+            StopItemAnimate(iItem);
+            item.byAlphaAni = 50; // ani alpha from 50 to 255
+            GetContainer()->RegisterTimelineHandler(this);
+        }
+
+        InvalidateRect(rc);
+        ret = TRUE;
     }
-
-    InvalidateRect(rc);
-
-    EventToolBarItemTip evt(this);
-    evt.iItem = iItem;
+    EventUpdateCmdTip evt(this);
+    evt.iIndex = iItem;
     evt.nCmdId = item.nId;
-    evt.strTip = &item.strTip;
+    if (!item.strTip.IsEmpty())
+        evt.strTip = &item.strTip;
+    else
+        evt.strTip = &item.strText;
     FireEvent(&evt);
+    return ret;
 }
 
 void SToolBar::OnItemLeave(int iItem)

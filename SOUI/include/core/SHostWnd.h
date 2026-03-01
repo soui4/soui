@@ -1400,9 +1400,12 @@ class SOUI_EXP SHostWnd
      * @param UINT nIndex
      * @param BOOL bSysMenu
      */
-    void OnInitMenuPopup(HMENU menuPopup, UINT nIndex, BOOL bSysMenu);
+    LRESULT OnInitMenuPopup(UINT uMsg,WPARAM wp, LPARAM lp);
 
-    void OnInitMenuExPopup(SMenuEx* menuPopup, UINT nIndex);
+    void InitMenuPopup(HMENU menuPopup, UINT nIndex, BOOL bSysMenu);
+    void InitMenuExPopup(SMenuEx* menuPopup, UINT nIndex);
+
+    void OnMenuSelect(UINT nItemID, UINT nFlags, HMENU menu);
 
     /**
      * @brief Handles the UM_RUN_TASKS message.
@@ -1443,8 +1446,8 @@ class SOUI_EXP SHostWnd
         MESSAGE_HANDLER_EX(WM_GETOBJECT, OnGetObject)
         MSG_WM_COMMAND(OnCommand)
         MSG_WM_SYSCOMMAND(OnSysCommand)
-        MSG_WM_INITMENUPOPUP(OnInitMenuPopup)
-        MSG_WM_INITMENUPOPUP_EX(OnInitMenuExPopup)
+        MESSAGE_HANDLER_EX(WM_INITMENUPOPUP,OnInitMenuPopup)
+        MSG_WM_MENUSELECT(OnMenuSelect)
         MESSAGE_HANDLER_EX(UM_UPDATEFONT, OnUpdateFont)
         MESSAGE_HANDLER_EX(UM_SETLANGUAGE, OnSetLanguage)
         MESSAGE_HANDLER_EX(UM_RUN_TASKS, OnRunTasks)
