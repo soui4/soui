@@ -1,4 +1,4 @@
-﻿//stamp:28f5ccef6a4dc9b3
+﻿//stamp:28f5cd9a71875644
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -156,6 +156,7 @@ struct _R{
 		 const wchar_t * button2nd;
 		 const wchar_t * button3rd;
 		 const wchar_t * chk_auto_size;
+		 const wchar_t * chk_autosave;
 		 const wchar_t * color_preview;
 		 const wchar_t * edtInput;
 		 const wchar_t * img_icon_exclamation;
@@ -195,7 +196,6 @@ struct _R{
 		 const wchar_t * tab_editor;
 		 const wchar_t * tb_main;
 		 const wchar_t * tb_main_about;
-		 const wchar_t * tb_main_autosave;
 		 const wchar_t * tb_main_closeproject;
 		 const wchar_t * tb_main_formatxml;
 		 const wchar_t * tb_main_newinclude;
@@ -242,6 +242,7 @@ struct _R{
 		int button2nd;
 		int button3rd;
 		int chk_auto_size;
+		int chk_autosave;
 		int color_preview;
 		int edtInput;
 		int img_icon_exclamation;
@@ -281,7 +282,6 @@ struct _R{
 		int tab_editor;
 		int tb_main;
 		int tb_main_about;
-		int tb_main_autosave;
 		int tb_main_closeproject;
 		int tb_main_formatxml;
 		int tb_main_newinclude;
@@ -384,6 +384,7 @@ struct _R R={
 		L"button2nd",
 		L"button3rd",
 		L"chk_auto_size",
+		L"chk_autosave",
 		L"color_preview",
 		L"edtInput",
 		L"img_icon_exclamation",
@@ -423,7 +424,6 @@ struct _R R={
 		L"tab_editor",
 		L"tb_main",
 		L"tb_main_about",
-		L"tb_main_autosave",
 		L"tb_main_closeproject",
 		L"tb_main_formatxml",
 		L"tb_main_newinclude",
@@ -449,40 +449,41 @@ struct _R R={
 	}
 	,
 	{
-		65582,
+		65583,
+		65580,
+		65576,
 		65579,
 		65575,
-		65578,
-		65574,
-		65557,
+		65558,
 		65546,
 		65547,
-		65581,
-		65583,
+		65582,
+		65584,
 		65542,
 		65552,
 		65548,
 		65550,
 		65549,
-		65596,
-		65594,
+		65597,
+		65595,
 		65551,
 		65543,
 		65544,
 		65545,
-		65593,
-		65567,
-		65584,
+		65594,
+		65555,
+		65568,
+		65585,
 		65540,
 		65538,
 		65539,
-		65589,
-		65592,
-		65591,
-		65560,
-		65572,
-		65595,
 		65590,
+		65593,
+		65592,
+		65561,
+		65573,
+		65596,
+		65591,
 		65553,
 		400,
 		2,
@@ -499,17 +500,16 @@ struct _R R={
 		65537,
 		65541,
 		65536,
+		65578,
 		65577,
-		65576,
-		65571,
+		65572,
+		65570,
+		65559,
+		65564,
+		65567,
+		65574,
 		65569,
-		65558,
-		65563,
-		65566,
-		65573,
-		65568,
 		65554,
-		9,
 		8,
 		2,
 		6,
@@ -518,21 +518,21 @@ struct _R R={
 		1,
 		3,
 		7,
-		65585,
-		65556,
-		65555,
-		65564,
-		65561,
 		65586,
-		65588,
-		65587,
-		65580,
+		65557,
+		65556,
 		65565,
-		100000,
-		100000,
 		65562,
-		65559,
-		65570
+		65587,
+		65589,
+		65588,
+		65581,
+		65566,
+		100000,
+		100000,
+		65563,
+		65560,
+		65571
 	}
 	,
 	{

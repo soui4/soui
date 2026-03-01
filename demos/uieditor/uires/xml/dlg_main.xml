@@ -38,9 +38,9 @@
 					<sep/>
 					<item  id="6" name="tb_main_formatxml" text="@string/format_xml" iconIndex="5" showText="1"/>
 					<item  id="7" name="tb_main_viewskin" text="@string/view_skin" iconIndex="6" showText="1"/>
-					<item  id="8" name="tb_main_autosave" text="@string/auto_save" iconIndex="7" showText="1" check="1"/>
+					<check name="chk_autosave" text="@string/auto_save"/>
 					<sep/>
-					<item  id="9" name="tb_main_about" text="@string/about" iconIndex="8" showText="1"/>
+					<item  id="8" name="tb_main_about" text="@string/about" iconIndex="8" showText="1"/>
 				  </data>
 				</toolbar>
 				<!--widget toolbar-->

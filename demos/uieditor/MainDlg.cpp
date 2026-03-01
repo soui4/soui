@@ -73,7 +73,7 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 		RegisterDragDrop(m_treeView->GetSwnd(), pDT);
 		pDT->Release();
 	}
-
+    FindChildByID(R.id.chk_autosave)->SetCheck(m_bAutoSave);
 	m_RecentFileMenu.LoadMenu(UIRES.smenu.menu_recent);
 
 	LoadAppCfg();
@@ -1754,8 +1754,6 @@ void CMainDlg::OnUpdateCmdUI(IEvtArgs *e){
 		e2->bChecked = FindChildByID(R.id.property_panel_dock)->IsVisible();
 	}else if(e2->nCmdId == R.id.menu_view_toolbar){
 		e2->bChecked = FindChildByID(R.id.tb_main)->IsVisible();
-	}else if(e2->nCmdId == R.id.tb_main_autosave){
-		e2->bChecked = m_bAutoSave;
 	}
 }
 
@@ -1782,8 +1780,6 @@ void CMainDlg::OnTbMainClick(IEvtArgs *e)
 		OnBtnNewLayout();
 	}else if(e2->nCmdId == R.id.tb_main_newinclude){
 		OnBtnNewInclude();
-	}else if(e2->nCmdId == R.id.tb_main_autosave){
-		m_bAutoSave = !m_bAutoSave;
 	}
 }
 

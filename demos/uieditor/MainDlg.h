@@ -51,7 +51,6 @@ protected:
 	BOOL OnDrop(LPCTSTR pszName) override;
 protected:
 	//soui消息
-	void OnAutoCheck(IEvtArgs *e);
 	void OnClose();
 	void OnMaximize();
 	void OnRestore();
@@ -78,6 +77,7 @@ protected:
 	void OnTbMainClick(IEvtArgs *e);
 	void OnMenuSelect(IEvtArgs *e);
 	void OnUpdateCmdUI(IEvtArgs *e);
+    void OnAutoCheck(IEvtArgs *e);
 	EVENT_MAP_BEGIN()
 		if(m_pXmlEdtior) CHAIN_EVENT_MAP_MEMBER((*m_pXmlEdtior))
 		if(m_pImageViewer) CHAIN_EVENT_MAP_MEMBER((*m_pImageViewer))
@@ -86,14 +86,15 @@ protected:
         EVENT_ID_COMMAND(R.id.btn_max, OnMaximize)
         EVENT_ID_COMMAND(R.id.btn_restore, OnRestore)
 		EVENT_ID_COMMAND(R.id.btn_help, OnBtnAbout)
-
+        EVENT_ID_HANDLER(R.id.chk_autosave, EventSwndStateChanged::EventID, OnAutoCheck)
 		EVENT_ID_HANDLER(R.id.workspace_treeview,EventOfPanel::EventID,OnTvEventOfPanel)
 		EVENT_ID_HANDLER(R.id.workspace_treeview,EventKeyDown::EventID,OnTvKeyDown)
 		EVENT_ID_HANDLER(R.id.tb_widget,EventToolBarCmd::EventID,OnTbWidgetClick)
 		EVENT_ID_HANDLER(R.id.tb_skin,EventToolBarCmd::EventID,OnTbSkinClick)
 		EVENT_ID_HANDLER(R.id.tb_main,EventToolBarCmd::EventID,OnTbMainClick)
 		EVENT_ID_HANDLER(R.id.main_menu,EventSelectMenu::EventID,OnMenuSelect)
-		EVENT_HANDLER(EventUpdateCmdUI::EventID,OnUpdateCmdUI)
+		EVENT_ID_HANDLER(R.id.tb_main,EventUpdateCmdUI::EventID,OnUpdateCmdUI)
+		EVENT_ID_HANDLER(ROOT_ID,EventUpdateCmdUI::EventID,OnUpdateCmdUI)
 	EVENT_MAP_END2(SHostWnd)
 
 protected:

@@ -157,7 +157,8 @@ typedef enum _SOUI_EVENTS
     EVT_DROPDOWN_LIST_SELECTED,
     EVT_DROPDOWN_LIST_GET_BUDDY_RECT,
 
-    EVT_TB_ITEMCLICK = 22180,
+    EVT_TB_ITEMCLICK = 22180, // 工具栏项点击事件
+    EVT_TB_ITEMTIP,           // 工具栏项提示事件
 
     EVT_UPDATE_CMDUI = 22190, ///< 更新命令UI事件
 
@@ -771,6 +772,12 @@ DEF_EVT(EventToolBarCmd, EVT_TB_ITEMCLICK, on_toolbar_cmd, {
     const IStringT *strText;
     LPARAM lParam;
     BOOL bDropDown;
+})
+
+DEF_EVT(EventToolBarItemTip, EVT_TB_ITEMTIP, on_toolbar_itemtip, {
+    int iItem;
+    int nCmdId;
+    const IStringT *strTip;
 })
 
 DEF_EVT(EventUpdateCmdUI, EVT_UPDATE_CMDUI, on_update_cmdui, { 

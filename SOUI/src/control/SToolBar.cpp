@@ -18,13 +18,12 @@ SToolBar::SToolBar(void)
     , m_nAniStep(25)
 {
     GetEventSet()->addEvent(EVENTID(EventToolBarCmd));
+    GetEventSet()->addEvent(EVENTID(EventToolBarItemTip));
     GetEventSet()->addEvent(EVENTID(EventUpdateCmdUI));
 }
 
 SToolBar::~SToolBar(void)
 {
-    if (GetContainer())
-        GetContainer()->UnregisterTimelineHandler(this);
 }
 
 BOOL SToolBar::CreateChildren(SXmlNode xmlNode)
@@ -61,6 +60,16 @@ BOOL SToolBar::CreateChildren(SXmlNode xmlNode)
             item.nId = -1;
             item.dwStyle = TBSTYLE_SEP;
             m_arrItems.Add(item);
+        }else{
+            SWindow *pChild = (SWindow*)SApplication::getSingleton().CreateWindowByName(xmlItem.name());
+            if(pChild){
+                InsertChild(pChild);
+                pChild->InitFromXml(&xmlItem);
+                ToolBarItem item;
+                item.nId = pChild->GetID();
+                item.pChild = pChild;
+                m_arrItems.Add(item);
+            }
         }
         xmlItem = xmlItem.next_sibling();
     }
@@ -74,7 +83,7 @@ BOOL SToolBar::CreateChildren(SXmlNode xmlNode)
     return TRUE;
 }
 
-CSize SToolBar::GetItemSize(CRect &rcWnd, IRenderTarget *pRT, int iItem) const
+CSize SToolBar::GetItemSize(const CRect &rcWnd, IRenderTarget *pRT, int iItem) const
 {
     CSize szRet;
     if (iItem < 0 || iItem >= m_arrItems.GetCount())
@@ -82,15 +91,35 @@ CSize SToolBar::GetItemSize(CRect &rcWnd, IRenderTarget *pRT, int iItem) const
     const ToolBarItem &item = m_arrItems[iItem];
     if (m_bVert)
     {
-        szRet = CSize(rcWnd.Width(), item.nId < 0 ? GetSepWid() : rcWnd.Width());
+        if(IsSeparator(&item)){
+            szRet.cy = GetSepWid();
+        }else if(item.pChild){
+            item.pChild->GetDesiredSize(&szRet,rcWnd.Width(),SIZE_WRAP_CONTENT);
+        }else{
+            CSize szIcon;
+            if (item.icon)
+                szIcon = item.icon->Size();
+            else if (m_skinIcons)
+                szIcon = m_skinIcons->GetSkinSize();
+            szRet.cy = szRet.cy + 8;
+            if ((item.dwStyle & BTNS_SHOWTEXT))
+            {
+                CSize szText;
+                pRT->MeasureText(item.strText, item.strText.GetLength(), &szText);
+                szRet.cy += szText.cy + m_nTextIconInterval;
+            }
+        }
+        szRet.cx = rcWnd.Width();
     }
     else
     {
-        if (item.nId < 0)
+        if (IsSeparator(&item))
         {
             szRet = CSize(GetSepWid(), rcWnd.Height());
         }
-        else
+        else if(item.pChild){
+            item.pChild->GetDesiredSize(&szRet,SIZE_WRAP_CONTENT,rcWnd.Height());
+        }else
         {
             CSize szIcon;
             if (item.icon)
@@ -154,62 +183,6 @@ SIZE SToolBar::MeasureContent(int nParentWid, int nParentHei)
     return szContent;
 }
 
-CSize SToolBar::GetItemSize(IRenderTarget *pRT, int iItem) const
-{
-    CRect rc = GetClientRect();
-    CSize szRet;
-    if (iItem < 0 || iItem >= m_arrItems.GetCount())
-        return szRet;
-    const ToolBarItem &item = m_arrItems[iItem];
-    if (m_bVert)
-    {
-        szRet = CSize(rc.Width(), item.nId < 0 ? GetSepWid() : rc.Width());
-    }
-    else
-    {
-        if (item.nId < 0)
-        {
-            szRet = CSize(GetSepWid(), rc.Height());
-        }
-        else
-        {
-            CSize szIcon;
-            if (item.icon)
-                szIcon = item.icon->Size();
-            else if (m_skinIcons)
-                szIcon = m_skinIcons->GetSkinSize();
-
-            if (m_bTextIconVertical && (item.dwStyle & BTNS_SHOWTEXT))
-            {
-                // For vertical text-icon arrangement, height should be larger to accommodate both
-                CSize szTxt;
-                pRT->MeasureText(item.strText, item.strText.GetLength(), &szTxt);
-                szRet.cx = smax(rc.Height(), szIcon.cx);
-                szRet.cy = szIcon.cy + szTxt.cy + m_nTextIconInterval * 2;
-            }
-            else
-            {
-                // Default horizontal arrangement
-                szRet = CSize(rc.Height(), rc.Height());
-                if ((item.dwStyle & BTNS_SHOWTEXT))
-                {
-                    CSize szTxt;
-                    pRT->MeasureText(item.strText, item.strText.GetLength(), &szTxt);
-                    szTxt.cx = smin(szTxt.cx, m_nMaxItemWidth);
-                    szRet.cx += szTxt.cx + m_nTextIconInterval;
-                }
-            }
-
-            if ((item.dwStyle & TBSTYLE_DROPDOWN) && m_skinDropArrow)
-            {
-                CSize szDropArrow = m_skinDropArrow->GetSkinSize();
-                szRet.cx += szDropArrow.cx;
-            }
-        }
-    }
-    return szRet;
-}
-
 int SToolBar::GetSepWid() const
 {
     if (!m_skinSep)
@@ -220,7 +193,7 @@ int SToolBar::GetSepWid() const
 
 BOOL SToolBar::IsSeparator(const ToolBarItem *pItem) const
 {
-    return pItem->nId < 0;
+    return pItem->dwStyle & TBSTYLE_SEP;
 }
 
 CRect SToolBar::GetItemRect(int iItem) const
@@ -257,7 +230,7 @@ CRect SToolBar::GetItemRect(int iItem) const
             IRenderTarget *pRT = NULL;
             GETRENDERFACTORY->CreateRenderTarget(&pRT, 0, 0);
             BeforePaintEx(pRT);
-            CSize szItem = GetItemSize(pRT, i);
+            CSize szItem = GetItemSize(rc, pRT, i);
             pRT->Release();
             if (m_bVert)
             {
@@ -307,7 +280,7 @@ int SToolBar::HitTest(CPoint pt) const
         }
         else
         {
-            CSize szItem = GetItemSize(pRT, i);
+            CSize szItem = GetItemSize(rc, pRT, i);
             if (m_bVert)
             {
                 rc.top = rc.bottom;
@@ -491,6 +464,7 @@ void SToolBar::OnPaint(IRenderTarget *pRT)
 {
     SPainter painter;
     BeforePaint(pRT, painter);
+    
     CRect rcClient = GetClientRect();
     CRect rcItem = rcClient;
     int nSep = GetSepWid();
@@ -504,15 +478,17 @@ void SToolBar::OnPaint(IRenderTarget *pRT)
         if (m_bVert)
         {
             rcItem.top = rcItem.bottom;
-            rcItem.bottom += item.nId < 0 ? nSep : GetItemSize(pRT, i).cy;
+            rcItem.bottom += IsSeparator(&item) ? nSep : GetItemSize(rcClient, pRT, i).cy;
         }
         else
         {
             rcItem.left = rcItem.right;
-            rcItem.right += item.nId < 0 ? nSep : GetItemSize(pRT, i).cx;
+            rcItem.right += IsSeparator(&item) ? nSep : GetItemSize(rcClient, pRT, i).cx;
         }
-
-        DrawItem(pRT, rcItem, &item, i);
+        if (!item.pChild)
+        {
+            DrawItem(pRT, rcItem, &item, i);
+        }
     }
     if (HasDropDownButton())
     {
@@ -727,14 +703,14 @@ void SToolBar::UpdateVisibleItemCount()
 
     int nSep = GetSepWid();
     CRect rcClient = GetClientRect();
-    CRect rc = rcClient;
+    CRect rcItem = rcClient;
     if (m_bVert)
     {
-        rc.bottom = rc.top;
+        rcItem.bottom = rcItem.top;
     }
     else
     {
-        rc.right = rc.left;
+        rcItem.right = rcItem.left;
     }
     m_nVisibleItems = m_arrItems.GetCount();
     for (int i = 0; i < m_arrItems.GetCount(); i++)
@@ -743,32 +719,32 @@ void SToolBar::UpdateVisibleItemCount()
         {
             if (m_bVert)
             {
-                rc.top = rc.bottom;
-                rc.bottom += nSep;
+                rcItem.top = rcItem.bottom;
+                rcItem.bottom += nSep;
             }
             else
             {
-                rc.left = rc.right;
-                rc.right += nSep;
+                rcItem.left = rcItem.right;
+                rcItem.right += nSep;
             }
         }
         else
         {
-            CSize szItem = GetItemSize(pRT, i);
+            CSize szItem = GetItemSize(rcClient, pRT, i);
             if (m_bVert)
             {
-                rc.top = rc.bottom;
-                rc.bottom += szItem.cy;
+                rcItem.top = rcItem.bottom;
+                rcItem.bottom += szItem.cy;
             }
             else
             {
-                rc.left = rc.right;
-                rc.right += szItem.cx;
+                rcItem.left = rcItem.right;
+                rcItem.right += szItem.cx;
             }
         }
         if (m_bVert)
         {
-            if (rc.bottom > rcClient.bottom)
+            if (rcItem.bottom > rcClient.bottom)
             {
                 m_nVisibleItems = i;
                 break;
@@ -776,7 +752,7 @@ void SToolBar::UpdateVisibleItemCount()
         }
         else
         {
-            if (rc.right > rcClient.right)
+            if (rcItem.right > rcClient.right)
             {
                 m_nVisibleItems = i;
                 break;
@@ -792,12 +768,12 @@ void SToolBar::UpdateVisibleItemCount()
         }
         if (m_bVert)
         {
-            if (rcClient.bottom - rc.top < m_nMoreButtonSize)
+            if (rcClient.bottom - rcItem.top < m_nMoreButtonSize)
                 m_nVisibleItems--;
         }
         else
         {
-            if (rcClient.right - rc.left < m_nMoreButtonSize)
+            if (rcClient.right - rcItem.left < m_nMoreButtonSize)
                 m_nVisibleItems--;
         }
         if (m_nVisibleItems < 0)
@@ -1116,6 +1092,8 @@ void SToolBar::OnItemHover(int iItem)
     ToolBarItem &item = m_arrItems[iItem];
     if ((item.dwStyle & TBSTYLE_CHECK) && (item.dwState & WndState_Check))
         return;
+    if(item.pChild)
+        return;
     item.dwState |= WndState_Hover;
     CRect rc = GetItemRect(iItem);
 
@@ -1128,6 +1106,12 @@ void SToolBar::OnItemHover(int iItem)
     }
 
     InvalidateRect(rc);
+
+    EventToolBarItemTip evt(this);
+    evt.iItem = iItem;
+    evt.nCmdId = item.nId;
+    evt.strTip = &item.strTip;
+    FireEvent(&evt);
 }
 
 void SToolBar::OnItemLeave(int iItem)
@@ -1137,6 +1121,8 @@ void SToolBar::OnItemLeave(int iItem)
 
     ToolBarItem &item = m_arrItems[iItem];
     if ((item.dwStyle & TBSTYLE_CHECK) && (item.dwState & WndState_Check))
+        return;
+    if(item.pChild)
         return;
     item.dwState &= ~WndState_Hover;
     CRect rc = GetItemRect(iItem);
@@ -1209,7 +1195,7 @@ BOOL SToolBar::OnIdle(int iRun)
         for (size_t i = 0; i < m_arrItems.GetCount(); i++)
         {
             ToolBarItem &item = m_arrItems[i];
-            if (IsSeparator(&item))
+            if (IsSeparator(&item) || item.pChild)
                 continue;
             EventUpdateCmdUI evt(this);
             evt.nCmdId = m_arrItems[i].nId;
@@ -1233,6 +1219,50 @@ BOOL SToolBar::OnIdle(int iRun)
         }
     }
     return TRUE;
+}
+
+BOOL SToolBar::SetItemChild(int iItem, SWindow *pChild)
+{
+    if (iItem < 0 || iItem >= (int)m_arrItems.GetCount())
+        return FALSE;
+    
+    ToolBarItem &item = m_arrItems[iItem];
+    
+    // Remove old child if exists
+    if (item.pChild)
+    {
+        // Destroy the child
+        DestroyChild(item.pChild);
+        item.pChild = NULL;
+    }
+    
+    if (!pChild)
+        return TRUE;
+    
+    // Set new child
+    item.pChild = pChild;
+    InsertChild(pChild);
+    RequestRelayout();
+    return TRUE;
+}
+
+SWindow* SToolBar::GetItemChild(int iItem) const
+{
+    if (iItem < 0 || iItem >= (int)m_arrItems.GetCount())
+        return NULL;
+    
+    return m_arrItems[iItem].pChild;
+}
+void SToolBar::UpdateChildrenPosition()
+{
+    for (size_t i = 0; i < m_arrItems.GetCount(); i++)
+    {
+        ToolBarItem &item = m_arrItems[i];
+        if (!item.pChild)
+            continue;
+        CRect rcItem = GetItemRect(i);
+        item.pChild->OnRelayout(rcItem);
+    }
 }
 
 SNSEND

@@ -179,6 +179,11 @@ class SOUI_EXP SHostWndAttr : public TObjRefImpl<SObject> {
     HICON m_hAppIconSmall;
     HICON m_hAppIconBig;
 };
+
+enum{
+      ROOT_ID = -100, // The ID of the root window
+};
+
 /**
  * @class SRootWindow
  * @brief Root window class derived from SWindow.
@@ -190,7 +195,6 @@ class SOUI_EXP SRootWindow : public SWindow {
     DEF_SOBJECT(SWindow, L"root")
     // Declare SHostWnd as a friend class to allow access to private members
     friend class SHostWnd;
-
   public:
     /**
      * @brief Constructor for SRootWindow.
@@ -231,6 +235,15 @@ class SOUI_EXP SRootWindow : public SWindow {
      */
     STDMETHOD_(void, UpdateLayout)(THIS) OVERRIDE;
 
+    /**
+     * @brief Gets the ID of the window.
+     *
+     * @return ID of the window.
+     */
+    STDMETHOD_(int, GetID)(CTHIS) SCONST OVERRIDE
+    {
+        return ROOT_ID;
+    }
   protected:
     /**
      * @brief Called when an animation stops.

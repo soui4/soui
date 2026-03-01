@@ -34,6 +34,9 @@ struct ToolBarItem
     
     // Animation support for item hover/leave state
     BYTE byAlphaAni;  // Animation alpha value, 0xFF means not animating
+    
+    // Child control support
+    SAutoRefPtr<SWindow> pChild;  // Optional child control for this item
 
     ToolBarItem()
         : nId(0)
@@ -92,6 +95,22 @@ class SOUI_EXP SToolBar : public SWindow, public ITimelineHandler, public IIdleH
     void SetMenuStyle(SXmlNode xmlMenuStyle);
 
     CRect GetItemRect(int iItem) const;
+    
+    // Child control management methods
+    /**
+     * Create a child control for toolbar item
+     * @param iItem Item index
+     * @param pChild Child window to attach to this item
+     * @return TRUE if successful
+     */
+    BOOL SetItemChild(int iItem, SWindow *pChild);
+    
+    /**
+     * Get the child control of a toolbar item
+     * @param iItem Item index
+     * @return Child window pointer or NULL if no child
+     */
+    SWindow* GetItemChild(int iItem) const;
 
   protected:
         STDMETHOD_(void, OnNextFrame)(THIS) OVERRIDE; // ITimelineHandler interface
@@ -136,8 +155,7 @@ class SOUI_EXP SToolBar : public SWindow, public ITimelineHandler, public IIdleH
     SOUI_MSG_MAP_END()
 
   protected:
-    CSize GetItemSize(CRect &rcWnd, IRenderTarget *pRT, int iItem) const;
-    CSize GetItemSize(IRenderTarget *pRT, int iItem) const;
+    CSize GetItemSize(const CRect &rcWnd, IRenderTarget *pRT, int iItem) const;
     int GetSepWid() const;
     int HitTest(CPoint pt) const;
     BOOL IsSeparator(const ToolBarItem *pItem) const;
@@ -180,7 +198,11 @@ class SOUI_EXP SToolBar : public SWindow, public ITimelineHandler, public IIdleH
      * @param iItem Item index
      */
     void StopItemAnimate(int iItem);
-
+    
+    /**
+     * Update all child controls positions
+     */
+    void UpdateChildrenPosition() override;
   protected:
     SAutoRefPtr<ISkinObj> m_skinState;
     SAutoRefPtr<ISkinObj> m_skinIcons;
