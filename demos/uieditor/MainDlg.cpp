@@ -1623,11 +1623,7 @@ void CMainDlg::OnBtnPreview()
 		int iIcon;
 		SStringT strTxt;
 		SStringT strTip;
-		SStringT strElement;
 	};
-static bool CompareIcon(const IconInfo &a,const IconInfo &b){
-		return a.strTxt < b.strTxt;
-}
 void CMainDlg::InitWidgetToolbar(){
     SXmlNode xmlNode = CSysDataMgr::getSingleton().getCtrlDefNode();
     SXmlNode xmlIconSkin = xmlNode.child(L"toolbar").child(L"icons");
@@ -1639,27 +1635,19 @@ void CMainDlg::InitWidgetToolbar(){
         pSkin->Release();
     }
 	SArray<IconInfo> arrIcons;
-    SXmlNode xmlWidget = xmlNode.child(L"controls").first_child();
+    SXmlNode xmlWidget = xmlNode.child(L"toolbar").child(L"items").first_child();
     while (xmlWidget)
     {
-        if (xmlWidget.attribute(L"visible").as_bool(true))
-        {
-            IconInfo info;
-            info.iIcon = xmlWidget.attribute(L"icon").as_int(0);
-            info.strElement = S_CW2T(xmlWidget.name());
-            if (xmlWidget.attribute(L"text"))
-                info.strTxt = S_CW2T(xmlWidget.attribute(L"text").as_string());
-            else
-                info.strTxt = S_CW2T(xmlWidget.name());
-            info.strTip = S_CW2T(xmlWidget.attribute(L"tip").as_string());
-            SStringW strContent;
-            xmlWidget.child(xmlWidget.name()).ToString(&strContent);
-            arrIcons.Add(info);
-            m_mapWidget[info.strTxt] = strContent;
-        }
+        IconInfo info;
+        info.iIcon = xmlWidget.attribute(L"iconIndex").as_int(0);
+        info.strTxt = S_CW2T(xmlWidget.attribute(L"name").as_string());
+        info.strTip = S_CW2T(xmlWidget.attribute(L"tip").as_string());
+        SStringW strContent;
+        xmlWidget.child(info.strTxt).ToString(&strContent);
+        arrIcons.Add(info);
+        m_mapWidget[info.strTxt] = strContent;
         xmlWidget = xmlWidget.next_sibling();
     }
-    std::sort(arrIcons.GetData(), arrIcons.GetData() + arrIcons.GetCount(), CompareIcon);
 	SToolBar *pToolBar = FindChildByID2<SToolBar>(R.id.tb_widget);
 	pToolBar->SetIconsSkin(pSkin);
 	for(int i = 0; i < arrIcons.GetCount(); i++){
@@ -1679,24 +1667,16 @@ void CMainDlg::InitSkinToolbar(){
         pSkin->Release();
     }
     SArray<IconInfo> arrIcons;
-    SXmlNode xmlSkin = xmlNode.child(L"skins").first_child();
+    SXmlNode xmlSkin = xmlNode.child(L"toolbar").child(L"items").first_child();
     while (xmlSkin)
     {
-        if (xmlSkin.attribute(L"visible").as_bool(true))
-        {
-            IconInfo info;
-            info.iIcon = xmlSkin.attribute(L"icon").as_int(0);
-            info.strElement = S_CW2T(xmlSkin.name());
-            if (xmlSkin.attribute(L"text"))
-                info.strTxt = S_CW2T(xmlSkin.attribute(L"text").as_string());
-            else
-                info.strTxt = S_CW2T(xmlSkin.name());
-            info.strTip = S_CW2T(xmlSkin.attribute(L"tip").as_string());
-            arrIcons.Add(info);
-        }
+        IconInfo info;
+        info.iIcon = xmlSkin.attribute(L"iconIndex").as_int(0);
+        info.strTxt = S_CW2T(xmlSkin.attribute(L"name").as_string());
+        info.strTip = S_CW2T(xmlSkin.attribute(L"tip").as_string());
+        arrIcons.Add(info);
         xmlSkin = xmlSkin.next_sibling();
     }
-    std::sort(arrIcons.GetData(), arrIcons.GetData() + arrIcons.GetCount(), CompareIcon);
     SToolBar *pToolBar = FindChildByID2<SToolBar>(R.id.tb_skin);
     pToolBar->SetIconsSkin(pSkin);
     for (int i = 0; i < arrIcons.GetCount(); i++)

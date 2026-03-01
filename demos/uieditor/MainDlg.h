@@ -95,6 +95,8 @@ protected:
 		EVENT_ID_HANDLER(R.id.tb_main,EventToolBarCmd::EventID,OnTbMainClick)
 		EVENT_ID_HANDLER(R.id.main_menu,EventSelectMenu::EventID,OnMenuSelect)
         EVENT_ID_HANDLER(R.id.tb_main,EventUpdateCmdTip::EventID,OnUpdateCmdTip)
+		EVENT_ID_HANDLER(R.id.tb_widget,EventUpdateCmdTip::EventID,OnUpdateCmdTip)
+		EVENT_ID_HANDLER(R.id.tb_skin,EventUpdateCmdTip::EventID,OnUpdateCmdTip)
         EVENT_ID_HANDLER(ROOT_ID, EventUpdateCmdTip::EventID, OnUpdateCmdTip)
 		EVENT_ID_HANDLER(R.id.tb_main,EventUpdateCmdUI::EventID,OnUpdateCmdUI)
 		EVENT_ID_HANDLER(ROOT_ID,EventUpdateCmdUI::EventID,OnUpdateCmdUI)

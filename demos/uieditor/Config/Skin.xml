@@ -1,6 +1,19 @@
 <root>
   <toolbar>
     <icons class_name="imglist" name="skin_icon" src="file:img/skin_icons.png" states="10"/>
+    <items>
+      <item name="imglist" iconIndex="0" />
+      <item name="imgframe" iconIndex="2" />
+      <item name="imgframe2" iconIndex="3" />
+      <item name="imgcenter" iconIndex="1" />
+      <item name="Button" iconIndex="3" />
+      <item name="gradation" iconIndex="4" />
+      <item name="scrollbar" iconIndex="5" />
+      <item name="gif" iconIndex="6" />
+      <item name="ColorRect" iconIndex="7" />
+      <item name="Shape" iconIndex="8" />
+      <item name="Group" iconIndex="9" />
+    </items>
   </toolbar>
   <user_skins>
     <!-- 项目中使用到的未注册的皮肤对象，在这里配置，用它的父对象来代替 -->
