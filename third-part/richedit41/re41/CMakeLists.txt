@@ -105,6 +105,7 @@ source_group("Source Files" FILES ${re_src})
 
 if(NOT SOUI_ENABLE_CORE_LIB)
     add_library(msftedit SHARED ${re_src} ${re_header})
+    add_definitions(-D_BUILD_DLL)
 else()
     add_library(msftedit STATIC ${re_src} ${re_header})
 endif()

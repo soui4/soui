@@ -334,7 +334,6 @@ BOOL WINAPI DllMain(HINSTANCE hmod, DWORD dwReason, LPVOID lpvReserved)
 	return TRUE;
 }
 
-#ifdef DLL_CORE
 #ifndef _WIN32
 #include <dlfcn.h>
 #ifdef __APPLE__
@@ -342,10 +341,12 @@ BOOL WINAPI DllMain(HINSTANCE hmod, DWORD dwReason, LPVOID lpvReserved)
 #else //__APPLE__
 #define lib_name "libmsftedit.so"
 #endif //__APPLE__
+
+#ifdef _BUILD_DLL
 __attribute__((constructor)) void OnSoInit()
 {
     void* hMod = dlopen(lib_name, RTLD_LAZY);
-    DllMain((HINSTANCE)hMod, DLL_PROCESS_DETACH, NULL);
+    DllMain((HINSTANCE)hMod, DLL_PROCESS_ATTACH, NULL);
     dlclose(hMod);
 }
 
@@ -355,8 +356,8 @@ __attribute__((destructor)) void OnSoUninit()
     DllMain((HINSTANCE)hMod, DLL_PROCESS_DETACH, NULL);
     dlclose(hMod);
 }
+#endif//_BUILD_DLL
 #endif //_WIN32
-#endif //defined(DLL_CORE) 
 
 STDAPI InitRichedit(HINSTANCE hInst)
 {
