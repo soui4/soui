@@ -1640,10 +1640,11 @@ void CMainDlg::InitWidgetToolbar(){
     {
         IconInfo info;
         info.iIcon = xmlWidget.attribute(L"iconIndex").as_int(0);
-        info.strTxt = S_CW2T(xmlWidget.attribute(L"name").as_string());
+		SStringW strTxt = xmlWidget.attribute(L"name").as_string();
+        info.strTxt = S_CW2T(strTxt);
         info.strTip = S_CW2T(xmlWidget.attribute(L"tip").as_string());
         SStringW strContent;
-        xmlWidget.child(info.strTxt).ToString(&strContent);
+        xmlWidget.child(strTxt).ToString(&strContent);
         arrIcons.Add(info);
         m_mapWidget[info.strTxt] = strContent;
         xmlWidget = xmlWidget.next_sibling();
@@ -1778,32 +1779,32 @@ void CMainDlg::OnUpdateCmdTip(IEvtArgs *e)
 	else if (e2->nCmdId >= 0) {
         if (e2->nCmdId == R.id.menu_file_openproject)
         {
-			SStringT strTip = GETSTRING(R.string.open_prject);
+			SStringT strTip = S_CW2T(GETSTRING(R.string.open_prject));
 			pTxtStatus->SetWindowText(strTip);
 		}
 		else if (e2->nCmdId == R.id.menu_file_closeproject)
 		{
-			SStringT strTip = GETSTRING(R.string.close_prject);
+			SStringT strTip = S_CW2T(GETSTRING(R.string.close_prject));
 			pTxtStatus->SetWindowText(strTip);
 		}
 		else if (e2->nCmdId == R.id.menu_file_exit)
 		{
-			SStringT strTip = GETSTRING(R.string.exit);
+			SStringT strTip = S_CW2T(GETSTRING(R.string.exit));
 			pTxtStatus->SetWindowText(strTip);
 		}
 		else if (e2->nCmdId == R.id.menu_tool_view_skin)
 		{
-			SStringT strTip = GETSTRING(R.string.view_skin);
+			SStringT strTip = S_CW2T(GETSTRING(R.string.view_skin));
 			pTxtStatus->SetWindowText(strTip);
 		}
 		 else if (e2->nCmdId == R.id.menu_tool_format_xml)
 		 {
-			 SStringT strTip = GETSTRING(R.string.format_xml);
+			 SStringT strTip = S_CW2T(GETSTRING(R.string.format_xml));
              pTxtStatus->SetWindowText(strTip);
         }
 	}else
     {
-        SStringT strDefaultTip = GETSTRING(R.string.idlemsg);
+        SStringT strDefaultTip = S_CW2T(GETSTRING(R.string.idlemsg));
         pTxtStatus->SetWindowText(strDefaultTip);
     }
 }
