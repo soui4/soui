@@ -2,8 +2,8 @@
 
 <root>
 	<user_widgets>
-		<!-- 用户没有注册的自定义控件，自动识别为它的父类型,test_widget为用户自定义的类型,parent为父类型,编辑时自动创建为父类型 -->
-		<test_widget parent="SWindow"/>
+		<!-- 用户没有注册的自定义控件，自动识别为它的父类型,checkgroup为用户自定义的类型,parent为父类型,编辑时自动创建为父类型 -->
+		<checkgroup parent="window"/>
 	</user_widgets>
 
 	<toolbar>

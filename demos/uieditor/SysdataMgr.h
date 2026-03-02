@@ -49,6 +49,9 @@ public:
 
 	SStringW GetUserWidgetParent(SStringW strWidgetName) const;
 	SStringW GetUserSkinParent(SStringW strSkinName) const;
+
+	BOOL IsUserWidget(SStringW strWidgetName) const;
+	BOOL IsUserSkin(SStringW strSkinName) const;
 private:
 	void _GetSkinAttrs(SStringW skinName,std::set<SStringW> &attrs);
 	void _GetCtrlAttrs(SStringW skinName,std::set<SStringW> &attrs);

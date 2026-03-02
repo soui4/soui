@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "XmlParser.h"
 #include <algorithm>
+#include "SysDataMgr.h"
 using namespace spugi;
 
 CXmlParser::CXmlParser(void):m_utf8Loading(NULL),m_utf8Len(0),m_tsLoad(0)
@@ -109,16 +110,17 @@ static xml_node find_child_by_index(xml_node parent, int idx,BOOL bFirst)
 	{
 		if(child.type()==spugi::node_element)
 		{
-			StreamWrite sw;
-			child.print(sw);
-            SObjectInfo objInfo;
-            ObjInfo_New(&objInfo, S_CA2W(child.name(), CP_UTF8), Window);
-            if (bFirst || SApplication::getSingleton().HasKey(objInfo))
-			{
-				if (idx == 0)
-					return child;
-				idx--;
-			}	
+            if (idx == 0)
+            {
+                SObjectInfo objInfo;
+				SStringW strName = S_CA2W(child.name(), CP_UTF8);
+                ObjInfo_New(&objInfo, strName, Window);
+                if (bFirst || SApplication::getSingleton().HasKey(objInfo) || CSysDataMgr::getSingleton().IsUserWidget(strName))
+                    return child;
+                else
+                    break;
+            }
+            idx--;
 		}
 		child=child.next_sibling();
 	}

@@ -418,48 +418,6 @@ void CPreviewHost::OnFrameMoved(IEvtArgs *e)
 			m_pListener->OnUpdatePos(SStringW().Format(L"%d,%d,%d",ptConfig.x,ptConfig.y,anchorPos.type),FALSE);
 		}
 	}
-    else if (pLayout->IsClass(SLinearLayout::GetClassName()))
-    {
-        if (nWidth != rcOld.Width())
-        {
-			SLayoutSize width(nWidth, px);
-			pLayoutParam->SetSpecifiedSize(Horz, &width);
-		}    
-        else if (pLayoutParam->IsWrapContent(Horz))
-            nWidth = SIZE_WRAP_CONTENT;
-        else if (pLayoutParam->IsMatchParent(Horz))
-            nWidth = SIZE_MATCH_PARENT;
-        if (nHeight != rcOld.Height()){
-			SLayoutSize height(nHeight, px);
-			pLayoutParam->SetSpecifiedSize(Vert, &height);
-		}
-		else if (pLayoutParam->IsWrapContent(Vert))
-			nHeight = SIZE_WRAP_CONTENT;
-		else if (pLayoutParam->IsMatchParent(Vert))
-            nHeight = SIZE_MATCH_PARENT;
-		m_pListener->OnUpdateSize(nWidth,nHeight);
-    }
-    else if (pLayout->IsClass(SGridLayout::GetClassName()))
-    {
-        if (nWidth != rcOld.Width())
-        {
-			SLayoutSize width(nWidth, px);
-			pLayoutParam->SetSpecifiedSize(Horz, &width);
-		}   
-        else if (pLayoutParam->IsWrapContent(Horz))
-            nWidth = SIZE_WRAP_CONTENT;
-        else if (pLayoutParam->IsMatchParent(Horz))
-            nWidth = SIZE_MATCH_PARENT;
-        if (nHeight != rcOld.Height()){
-			SLayoutSize height(nHeight, px);
-			pLayoutParam->SetSpecifiedSize(Vert, &height);
-		}
-        else if (pLayoutParam->IsWrapContent(Vert))
-            nHeight = SIZE_WRAP_CONTENT;
-        else if (pLayoutParam->IsMatchParent(Vert))
-            nHeight = SIZE_MATCH_PARENT;
-		m_pListener->OnUpdateSize(nWidth,nHeight);
-    }
     else if (pLayout->IsClass(SouiLayout::GetClassName()))
     {
 		SStringW strPos;
@@ -673,7 +631,25 @@ void CPreviewHost::OnFrameMoved(IEvtArgs *e)
     }
     else
     {
-        SLOGW()<<"unknown layout type";
+        if (nWidth != rcOld.Width())
+        {
+            SLayoutSize width(nWidth, px);
+            pLayoutParam->SetSpecifiedSize(Horz, &width);
+        }
+        else if (pLayoutParam->IsWrapContent(Horz))
+            nWidth = SIZE_WRAP_CONTENT;
+        else if (pLayoutParam->IsMatchParent(Horz))
+            nWidth = SIZE_MATCH_PARENT;
+        if (nHeight != rcOld.Height())
+        {
+            SLayoutSize height(nHeight, px);
+            pLayoutParam->SetSpecifiedSize(Vert, &height);
+        }
+        else if (pLayoutParam->IsWrapContent(Vert))
+            nHeight = SIZE_WRAP_CONTENT;
+        else if (pLayoutParam->IsMatchParent(Vert))
+            nHeight = SIZE_MATCH_PARENT;
+        m_pListener->OnUpdateSize(nWidth, nHeight);
     }
     pParent->RequestRelayout();
 	

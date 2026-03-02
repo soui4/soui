@@ -236,7 +236,9 @@ void CMainDlg::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
 			OnBtnNewLayout();
 		}else if(nID == R.id.menu_file_newinclude){
 			OnBtnNewInclude();
-		}else if(nID == R.id.menu_view_preview){
+        }
+        else if (nID == R.id.menu_tool_preview)
+        {
 			OnBtnPreview();
         }
 		else if(nID == R.id.menu_tool_format_xml){
@@ -1727,7 +1729,7 @@ void CMainDlg::OnUpdateCmdUI(IEvtArgs *e){
 	}else if(e2->nCmdId == R.id.tb_main_newinclude || e2->nCmdId == R.id.tb_main_newlayout){
 		e2->bEnable = m_bIsOpen;
     }
-    else if (e2->nCmdId == R.id.menu_view_preview)
+    else if (e2->nCmdId == R.id.menu_tool_preview)
     {
 		e2->bEnable = m_bIsOpen && (m_editXmlType == FT_LAYOUT_XML);
 	}else if(e2->nCmdId == R.id.menu_view_property){

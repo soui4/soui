@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// ÖÐÎÄ(¼òÌå£¬ÖÐ¹ú) resources
+// ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½ï¿½å£¬ï¿½Ð¹ï¿½) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
@@ -52,8 +52,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
+ FILEVERSION 5,1,0,1
+ PRODUCTVERSION 5,1,0,1
  FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -69,12 +69,12 @@ BEGIN
         BLOCK "080404b0"
         BEGIN
             VALUE "FileDescription", "SouiEditor"
-            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "FileVersion", "5, 1, 0, 1"
             VALUE "InternalName", "SouiEditor"
             VALUE "LegalCopyright", "Copyright (C) 2011"
             VALUE "OriginalFilename", "SouiEditor.exe"
             VALUE "ProductName", "SouiEditor"
-            VALUE "ProductVersion", "1, 0, 0, 1"
+            VALUE "ProductVersion", "5, 1, 0, 1"
         END
     END
     BLOCK "VarFileInfo"
@@ -93,7 +93,7 @@ END
 // remains consistent on all systems.
 IDI_ICON1               ICON                    "uires\\image\\logo.ico"
 
-#endif    // ÖÐÎÄ(¼òÌå£¬ÖÐ¹ú) resources
+#endif    // ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½ï¿½å£¬ï¿½Ð¹ï¿½) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
