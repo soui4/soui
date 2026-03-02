@@ -27,7 +27,7 @@
 						<menuItem src="SMENU:MENU_HELP">帮助(&H)</menuItem>
 					</menus>
 				</menubar>
-				<toolbar name="tb_main" dock="top" size="0,40" weight="1" skin="skin_item_bk" colorText="@color/white" colorTextDisable="@color/gray" iconSkin="skin_tb_main" dropArrowSkin="skin_dropdown" sepSkin="skin_tb_sep">
+				<toolbar name="tb_main" dock="top" size="0,40" weight="1" skin="skin_item_bk" colorText="@color/white" colorTextDisable="@color/gray" iconSkin="skin_tb_main" dropArrowSkin="skin_dropdown" sepSkin="skin_tb_sep" display="0">
 				  <data>
 					<item  id="1" name="tb_main_openproject" text="@string/open_prject" iconIndex="0" dropdown="1" showText="1"/>
 					<item  id="2" name="tb_main_closeproject" text="@string/close_prject" iconIndex="1" showText="1"/>
@@ -59,7 +59,7 @@
 				<dockbar width="300" dock="right" name="property_panel_dock" text="@string/property" resizable="1" margin="2">
 					<include src="layout:property_panel" />
 				</dockbar>
-				<window name="wnd_status" size="-2,25" dock="bottom" margin="2" colorBorder="@color/border" layout="hbox" gravity="center">
+				<window name="wnd_status" size="-2,25" dock="bottom" margin="2" colorBorder="@color/border" layout="hbox" gravity="center" display="0">
 					<text name="txt_status" text="@string/idlemsg" />
 				</window>
 			</window>

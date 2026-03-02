@@ -370,6 +370,7 @@ class SOUI_EXP SMenuEx
     SMenuExItem *GetMenuItem(int nID, BOOL byCmdId);
 
   protected:
+    void OnMenuEnd();
 
     /**
      * @brief 菜单项选中状态改变
@@ -511,6 +512,13 @@ class SOUI_EXP SMenuEx
      * @param idx 索引
      */
     void SendInitPopupMenu2Owner(int idx);
+
+    /**
+     * @brief 菜单项转换为索引
+     * @param pItem 菜单项对象指针
+     * @return 索引
+     */
+    int MenuItem2Index(SMenuExItem *pItem) const;
 
     SMenuExItem *m_pParent;    // 父菜单项对象指针
     SMenuExItem *m_pHoverItem; // 悬停菜单项对象指针

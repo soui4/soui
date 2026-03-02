@@ -1,4 +1,4 @@
-﻿
+
 function OnFinish(selProj, selObj) {
     try {
         var strProjectPath = wizard.FindSymbol('PROJECT_PATH');
@@ -24,53 +24,63 @@ function OnFinish(selProj, selObj) {
 
 function CreateCustomProject(strProjectName, strProjectPath) {
     try {
-        var supportXp = wizard.FindSymbol('SUPPORT_XP');
+        var supportXp32 = wizard.FindSymbol('SUPPORT_XP_32');
+        var supportXp64 = wizard.FindSymbol('SUPPORT_XP_64');
+
+        var nosuportXp = ((supportXp32 != 1) && (supportXp64 != 1));
+
         var strProjTemplatePath = '';
         var WizardVersion = wizard.FindSymbol('WIZARD_VERSION');
         strProjTemplatePath = wizard.FindSymbol('PROJECT_TEMPLATE_PATH');
-        if (supportXp != 1 && WizardVersion > 10.0) {
-            strProjTemplatePath = wizard.FindSymbol('TEMPLATES_PATH');
-            strProjTemplatePath += '\\porjectTemplatesDefault';
-            if (WizardVersion == 10.0)
-                strProjTemplatePath += '\\2010';
-            else if (WizardVersion == 11.0)
-                strProjTemplatePath += '\\2012';
-            else if (WizardVersion == 12.0)
-                strProjTemplatePath += '\\2013';
-			else if (WizardVersion == 14.0)
-                strProjTemplatePath += '\\2015';
-            else if (WizardVersion == 15.0)
-                strProjTemplatePath += '\\2017';
-            else if (WizardVersion == 16.0)
-                strProjTemplatePath += '\\2019';
-            else if (WizardVersion == 17.0)
-                strProjTemplatePath += '\\2022';
-        }
-        if (supportXp == 1 && WizardVersion > 10.0) {
-            strProjTemplatePath = wizard.FindSymbol('TEMPLATES_PATH');
-            strProjTemplatePath += '\\porjectTemplates';
 
-	     if (WizardVersion == 10.0)
-                strProjTemplatePath += '\\2010';
-            else if (WizardVersion == 11.0)
-                strProjTemplatePath += '\\2012';
-            else if (WizardVersion == 12.0)
-                strProjTemplatePath += '\\2013';
-            else if (WizardVersion == 14.0)
-                strProjTemplatePath += '\\2015';
-            else if (WizardVersion == 15.0)
-                strProjTemplatePath += '\\2017';
-            else if (WizardVersion == 16.0)
-                strProjTemplatePath += '\\2019';
-            else if (WizardVersion == 17.0)
-                strProjTemplatePath += '\\2022';
+        if (WizardVersion > 10.0) {
+            if (nosuportXp) {
+                strProjTemplatePath = wizard.FindSymbol('TEMPLATES_PATH');
+                strProjTemplatePath += '\\porjectTemplatesDefault';
+                if (WizardVersion == 10.0)
+                    strProjTemplatePath += '\\2010';
+                else if (WizardVersion == 11.0)
+                    strProjTemplatePath += '\\2012';
+                else if (WizardVersion == 12.0)
+                    strProjTemplatePath += '\\2013';
+                else if (WizardVersion == 14.0)
+                    strProjTemplatePath += '\\2015';
+                else if (WizardVersion == 15.0)
+                    strProjTemplatePath += '\\2017';
+                else if (WizardVersion == 16.0)
+                    strProjTemplatePath += '\\2019';
+                else if (WizardVersion == 17.0)
+                    strProjTemplatePath += '\\2022';
+            }
+            else {
+                strProjTemplatePath = wizard.FindSymbol('TEMPLATES_PATH');
+                strProjTemplatePath += '\\porjectTemplates';
+                if (WizardVersion == 10.0)
+                    strProjTemplatePath += '\\2010';
+                else if (WizardVersion == 11.0)
+                    strProjTemplatePath += '\\2012';
+                else if (WizardVersion == 12.0)
+                    strProjTemplatePath += '\\2013';
+                else if (WizardVersion == 14.0)
+                    strProjTemplatePath += '\\2015';
+                else if (WizardVersion == 15.0)
+                    strProjTemplatePath += '\\2017';
+                else if (WizardVersion == 16.0)
+                    strProjTemplatePath += '\\2019';
+                else if (WizardVersion == 17.0)
+                    strProjTemplatePath += '\\2022';
+            }
         }
 
         var strProjTemplate = '';
 
         if (WizardVersion > 10.0) {
-            var projex = (supportXp32 == 1 ? '1' : '0') + (supportXp64 == 1 ? '1' : '0');
-            strProjTemplate = strProjTemplatePath + '\\default' + projex + '.vcxproj';
+            if(!nosuportXp){
+                var projex = (supportXp32 == 1 ? '1' : '0') + (supportXp64 == 1 ? '1' : '0');
+                strProjTemplate = strProjTemplatePath + '\\default' + projex + '.vcxproj';
+            }else{
+                strProjTemplate = strProjTemplatePath + '\\default.vcxproj';
+            }
         }else if(WizardVersion == 10.0){
             //vs2010.WizardVersion==10.0, it need default.vcxproj
             strProjTemplate = strProjTemplatePath + '\\default.vcxproj';
@@ -123,7 +133,6 @@ function CreateCustomProject(strProjectName, strProjectPath) {
 
 function AddFilters(proj) {
     try {
-        // 将文件夹添加到项目
         var strSrcFilter = wizard.FindSymbol('SOURCE_FILTER');
         var group = proj.Object.AddFilter('Source Files');
         group.Filter = strSrcFilter;
@@ -155,11 +164,17 @@ function AddConfig(proj, strProjectName) {
         var SysResBuiltin = wizard.FindSymbol('CHECKBOX_SYSRES_BUILTIN');
         var ResLoadType = wizard.FindSymbol('ResLoaderType');
 
-        var wcharSet = wizard.FindSymbol('WCHAR');
-        var mtSet = wizard.FindSymbol('MT');
-        // Debug设置
+        var soui_com_lib = ' imgdecoder-gdip.lib imgdecoder-stb.lib aupng.lib imgdecoder-wic.lib log4z.lib render-d2d.lib render-gdi.lib render-skia.lib skia.lib resprovider-7zip.lib 7z.lib resprovider-zip.lib  zlib.lib scriptmodule-lua.lib  lua-54.lib  translator.lib';
+        var SOUI_ENABLE_COM_LIB_32 = wizard.FindSymbol('SOUI_ENABLE_COM_LIB_32');
+        var SOUI_ENABLE_COM_LIB_64 = wizard.FindSymbol('SOUI_ENABLE_COM_LIB_64');
+
+        var wcharSet = wizard.FindSymbol('WCHAR_32');
+        var mtSet = wizard.FindSymbol('MT_32');
+        var charSetUNICODE = wizard.FindSymbol('UNICODE_32');
+        
+        // Debug
         var config = proj.Object.Configurations('Debug|Win32');
-		config.DebugSettings.Environment = 'PATH=%SOUI4_INSTALL_32%\\bin\\Debug\\;%PATH%';
+        config.DebugSettings.Environment = 'PATH=%SOUI4_INSTALL_32%\\bin\\Debug\\;%PATH%';
         config.ConfigurationType = typeDynamicLibrary;
         config.CharacterSet = charSetUNICODE;
         if (WizardVersion >= 10.0) {
@@ -170,18 +185,17 @@ function AddConfig(proj, strProjectName) {
             config.IntermediateDirectory = '$(ConfigurationName)';
             config.OutputDirectory = '$(SolutionDir)$(ConfigurationName)';
         }
-
         var CLTool = config.Tools('VCCLCompilerTool');
-        //添加编译器设置
-        CLTool.UsePrecompiledHeader = 2;    // 2-使用预编译头,1-创建,0-不使用
+		//添加编译器设置
+        CLTool.UsePrecompiledHeader = 2;    //  2-使用预编译头,1-创建,0-不使用
         CLTool.SuppressStartupBanner = true;
         CLTool.TreatWChar_tAsBuiltInType = (wcharSet == 1);
         CLTool.WarningLevel = warningLevelOption.warningLevel_3;
-	  if(WizardVersion < 10.0){
-         	CLTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_32)\\include\\config";"$(SOUI4_INSTALL_32)\\include\\components";"$(SOUI4_INSTALL_32)\\include\\SOUI";"$(SOUI4_INSTALL_32)\\include\\SOUI\\include";"$(SOUI4_INSTALL_32)\\include\\utilities\\include";;"$(SOUI4_INSTALL_32)\\third-part\\stdint"';			
-         }else{
-         	CLTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_32)\\include\\config";"$(SOUI4_INSTALL_32)\\include\\components";"$(SOUI4_INSTALL_32)\\include\\SOUI";"$(SOUI4_INSTALL_32)\\include\\SOUI\\include";"$(SOUI4_INSTALL_32)\\include\\utilities\\include"';			
-         }
+        if (WizardVersion < 10.0) {
+            CLTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_32)\\include\\config";"$(SOUI4_INSTALL_32)\\include\\components";"$(SOUI4_INSTALL_32)\\include\\SOUI";"$(SOUI4_INSTALL_32)\\include\\SOUI\\include";"$(SOUI4_INSTALL_32)\\include\\utilities\\include";;"$(SOUI4_INSTALL_32)\\third-part\\stdint"';
+        } else {
+            CLTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_32)\\include\\config";"$(SOUI4_INSTALL_32)\\include\\components";"$(SOUI4_INSTALL_32)\\include\\SOUI";"$(SOUI4_INSTALL_32)\\include\\SOUI\\include";"$(SOUI4_INSTALL_32)\\include\\utilities\\include"';
+        }
         CLTool.PreprocessorDefinitions = 'WIN32;_WINDOWS;_USRDLL;STRICT;_DEBUG';
         CLTool.RuntimeLibrary = (mtSet == 1) ? 1 : 3; // 0=MT, 1=MTd, 2=MD (DLL), 3=MDd
         CLTool.BrowseInformation = browseInfoOption.brAllInfo;// FR
@@ -189,26 +203,31 @@ function AddConfig(proj, strProjectName) {
         CLTool.DebugInformationFormat = debugOption.debugEditAndContinue;//Edit and continue
 
         var LinkTool = config.Tools('VCLinkerTool');
-        //添加链接器设置
+		//添加链接器设置
         LinkTool.GenerateDebugInformation = true;
         LinkTool.LinkIncremental = linkIncrementalYes;
         LinkTool.SuppressStartupBanner = true;  // nologo
         LinkTool.GenerateDebugInformation = true;
-	 LinkTool.AdditionalLibraryDirectories = '"$(SOUI4_INSTALL_32)\\lib\\debug"';
+        LinkTool.AdditionalLibraryDirectories = '"$(SOUI4_INSTALL_32)\\lib\\debug"';
         LinkTool.AdditionalDependencies = 'utilities4.lib soui4.lib'
+        if(SOUI_ENABLE_COM_LIB_32){
+            LinkTool.AdditionalDependencies += soui_com_lib;
+        }
+
         LinkTool.SubSystem = subSystemOption.subSystemWindows;
 
         var resCplTool = config.Tools('VCResourceCompilerTool');
         resCplTool.Culture = 0x804;
+        resCplTool.PreprocessorDefinitions += ';_DEBUG';
         if (SysResBuiltin && (ResLoadType == 0)) {
             resCplTool.AdditionalIncludeDirectories = '"$(SOUI4PATH)\\soui-sys-resource"';
         }
-		else {
-			resCplTool.PreprocessorDefinitions += ';_DEBUG';	
-		}
-        // Release设置
+        else {
+            resCplTool.PreprocessorDefinitions += ';_DEBUG';
+        }
+		// Release设置
         var config = proj.Object.Configurations('Release|Win32');
- 		config.DebugSettings.Environment = 'PATH=%SOUI4_INSTALL_32%\\bin\\Release\\;%PATH%';
+        config.DebugSettings.Environment = 'PATH=%SOUI4_INSTALL_32%\\bin\\Release\\;%PATH%';
         config.ConfigurationType = typeDynamicLibrary;
         config.CharacterSet = charSetUNICODE;
         if (WizardVersion >= 10.0) {
@@ -219,28 +238,30 @@ function AddConfig(proj, strProjectName) {
             config.IntermediateDirectory = '$(ConfigurationName)';
             config.OutputDirectory = '$(SolutionDir)$(ConfigurationName)';
         }
-        var CLTool = config.Tools('VCCLCompilerTool');
-        //添加编译器设置
-        CLTool.UsePrecompiledHeader = 2;    // 2-使用预编译头,1-创建,0-不使用
+		var CLTool = config.Tools('VCCLCompilerTool');
+		//添加编译器设置
+		CLTool.UsePrecompiledHeader = 2;    // 2-使用预编译头,1-创建,0-不使用
         CLTool.SuppressStartupBanner = true;
         CLTool.TreatWChar_tAsBuiltInType = (wcharSet == 1);
         CLTool.WarningLevel = warningLevelOption.warningLevel_3;
-	  if(WizardVersion < 10.0){
-         	CLTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_32)\\include\\config";"$(SOUI4_INSTALL_32)\\include\\components";"$(SOUI4_INSTALL_32)\\include\\SOUI";"$(SOUI4_INSTALL_32)\\include\\SOUI\\include";"$(SOUI4_INSTALL_32)\\include\\utilities\\include";;"$(SOUI4_INSTALL_32)\\third-part\\stdint"';			
-         }else{
-         	CLTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_32)\\include\\config";"$(SOUI4_INSTALL_32)\\include\\components";"$(SOUI4_INSTALL_32)\\include\\SOUI";"$(SOUI4_INSTALL_32)\\include\\SOUI\\include";"$(SOUI4_INSTALL_32)\\include\\utilities\\include"';			
-         }
+        if (WizardVersion < 10.0) {
+            CLTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_32)\\include\\config";"$(SOUI4_INSTALL_32)\\include\\components";"$(SOUI4_INSTALL_32)\\include\\SOUI";"$(SOUI4_INSTALL_32)\\include\\SOUI\\include";"$(SOUI4_INSTALL_32)\\include\\utilities\\include";;"$(SOUI4_INSTALL_32)\\third-part\\stdint"';
+        } else {
+            CLTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_32)\\include\\config";"$(SOUI4_INSTALL_32)\\include\\components";"$(SOUI4_INSTALL_32)\\include\\SOUI";"$(SOUI4_INSTALL_32)\\include\\SOUI\\include";"$(SOUI4_INSTALL_32)\\include\\utilities\\include"';
+        }
         CLTool.PreprocessorDefinitions = 'WIN32;_WINDOWS;_USRDLL;NDEBUG';
         CLTool.RuntimeLibrary = (mtSet == 1) ? 0 : 2;; // 0=MT, 1=MTd, 2=MD (DLL), 3=MDd
-        CLTool.WholeProgramOptimization = true;	//全程序优化：启动链接时代码生成
+		CLTool.WholeProgramOptimization = true;	//全程序优化：启动链接时代码生成
 
         var LinkTool = config.Tools('VCLinkerTool');
-        //添加链接器设置
         LinkTool.GenerateDebugInformation = true;
         LinkTool.LinkIncremental = linkIncrementalYes;
         LinkTool.SuppressStartupBanner = true;  // nologoif(UserDll)
-		LinkTool.AdditionalLibraryDirectories = '"$(SOUI4_INSTALL_32)\\lib\\release"';
+        LinkTool.AdditionalLibraryDirectories = '"$(SOUI4_INSTALL_32)\\lib\\release"';
         LinkTool.AdditionalDependencies = 'utilities4.lib soui4.lib'
+        if(SOUI_ENABLE_COM_LIB_32){
+            LinkTool.AdditionalDependencies += soui_com_lib;
+        }
         LinkTool.LinkIncremental = 1;
         LinkTool.SubSystem = subSystemOption.subSystemWindows;
 
@@ -249,11 +270,16 @@ function AddConfig(proj, strProjectName) {
         if (SysResBuiltin && (ResLoadType == 0)) {
             resCplTool.AdditionalIncludeDirectories = '"$(SOUI4PATH)\\soui-sys-resource"';
         }
+
         //x64配置,默认情况15以前的版本是没有X64的配置的
+        wcharSet = wizard.FindSymbol('WCHAR_64');
+        mtSet = wizard.FindSymbol('MT_64');
+        charSetUNICODE = wizard.FindSymbol('UNICODE_64');
+
         var config_x64 = proj.Object.Configurations('Debug|x64');
         if (config_x64 != null) {
-			config_x64.CharacterSet = charSetUNICODE;
-    		config_x64.DebugSettings.Environment = 'PATH=%SOUI4_INSTALL_64%\\bin\\Debug\\;%PATH%';
+            config_x64.CharacterSet = charSetUNICODE;
+            config_x64.DebugSettings.Environment = 'PATH=%SOUI4_INSTALL_64%\\bin\\Debug\\;%PATH%';
             if (WizardVersion >= 10.0) {
                 config_x64.IntermediateDirectory = '$(Configuration)64\\';
                 config_x64.OutputDirectory = '$(SolutionDir)$(Configuration)64\\';
@@ -263,16 +289,16 @@ function AddConfig(proj, strProjectName) {
                 config_x64.OutputDirectory = '$(SolutionDir)$(ConfigurationName)64';
             }
             var CLTool_x64 = config_x64.Tools('VCCLCompilerTool');
-            //添加64位编译器设置
-            CLTool_x64.UsePrecompiledHeader = 2;    // 2-使用预编译头,1-创建,0-不使用
+			//添加64位编译器设置
+			CLTool_x64.UsePrecompiledHeader = 2;    // 2-使用预编译头,1-创建,0-不使用
             CLTool_x64.SuppressStartupBanner = true;
             CLTool_x64.TreatWChar_tAsBuiltInType = (wcharSet == 1);
             CLTool_x64.WarningLevel = warningLevelOption.warningLevel_3;
-	  if(WizardVersion < 10.0){
-         	CLTool_x64.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_64)\\include\\config";"$(SOUI4_INSTALL_64)\\include\\components";"$(SOUI4_INSTALL_64)\\include\\SOUI";"$(SOUI4_INSTALL_64)\\include\\SOUI\\include";"$(SOUI4_INSTALL_64)\\include\\utilities\\include";;"$(SOUI4_INSTALL_64)\\third-part\\stdint"';			
-         }else{
-         	CLTool_x64.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_64)\\include\\config";"$(SOUI4_INSTALL_64)\\include\\components";"$(SOUI4_INSTALL_64)\\include\\SOUI";"$(SOUI4_INSTALL_64)\\include\\SOUI\\include";"$(SOUI4_INSTALL_64)\\include\\utilities\\include"';			
-         }
+            if (WizardVersion < 10.0) {
+                CLTool_x64.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_64)\\include\\config";"$(SOUI4_INSTALL_64)\\include\\components";"$(SOUI4_INSTALL_64)\\include\\SOUI";"$(SOUI4_INSTALL_64)\\include\\SOUI\\include";"$(SOUI4_INSTALL_64)\\include\\utilities\\include";;"$(SOUI4_INSTALL_64)\\third-part\\stdint"';
+            } else {
+                CLTool_x64.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_64)\\include\\config";"$(SOUI4_INSTALL_64)\\include\\components";"$(SOUI4_INSTALL_64)\\include\\SOUI";"$(SOUI4_INSTALL_64)\\include\\SOUI\\include";"$(SOUI4_INSTALL_64)\\include\\utilities\\include"';
+            }
             CLTool_x64.PreprocessorDefinitions = 'WIN64;_WINDOWS;_USRDLL;STRICT;_DEBUG';
             CLTool_x64.RuntimeLibrary = (mtSet == 1) ? 1 : 3; // 0=MT, 1=MTd, 2=MD (DLL), 3=MDd
             CLTool_x64.BrowseInformation = browseInfoOption.brAllInfo;// FR
@@ -280,13 +306,16 @@ function AddConfig(proj, strProjectName) {
             CLTool_x64.DebugInformationFormat = debugOption.debugEditAndContinue;//Edit and continue
 
             var LinkTool_64 = config_x64.Tools('VCLinkerTool');
-            //添加链接器设置
+			//添加链接器设置
             LinkTool_64.GenerateDebugInformation = true;
             LinkTool_64.LinkIncremental = linkIncrementalYes;
             LinkTool_64.SuppressStartupBanner = true;  // nologo
             LinkTool_64.GenerateDebugInformation = true;
-		LinkTool_64.AdditionalLibraryDirectories = '"$(SOUI4_INSTALL_64)\\lib\\debug"';
+            LinkTool_64.AdditionalLibraryDirectories = '"$(SOUI4_INSTALL_64)\\lib\\debug"';
             LinkTool_64.AdditionalDependencies = 'utilities4.lib soui4.lib'
+            if(SOUI_ENABLE_COM_LIB_64){
+                LinkTool_64.AdditionalDependencies += soui_com_lib;
+            }
             LinkTool_64.SubSystem = subSystemOption.subSystemWindows;
             var resCplTool_64 = config_x64.Tools('VCResourceCompilerTool');
             resCplTool_64.Culture = 0x804;
@@ -295,8 +324,8 @@ function AddConfig(proj, strProjectName) {
                 resCplTool_64.AdditionalIncludeDirectories = '"$(SOUI4PATH)\\soui-sys-resource"';
             }
             var config_64 = proj.Object.Configurations('Release|x64');
-    		config_64.DebugSettings.Environment = 'PATH=%SOUI4_INSTALL_64%\\bin\\Release\\;%PATH%';
-			config_64.CharacterSet = charSetUNICODE;
+            config_64.DebugSettings.Environment = 'PATH=%SOUI4_INSTALL_64%\\bin\\Release\\;%PATH%';
+            config_64.CharacterSet = charSetUNICODE;
             if (WizardVersion >= 10.0) {
                 config_64.IntermediateDirectory = '$(Configuration)64\\';
                 config_64.OutputDirectory = '$(SolutionDir)$(Configuration)64\\';
@@ -306,26 +335,29 @@ function AddConfig(proj, strProjectName) {
                 config_64.OutputDirectory = '$(SolutionDir)$(ConfigurationName)64';
             }
             var CLTool_x64 = config_64.Tools('VCCLCompilerTool');
-            //添加编译器设置
-            CLTool_x64.UsePrecompiledHeader = 2;    // 2-使用预编译头,1-创建,0-不使用
+			//添加编译器设置
+			CLTool_x64.UsePrecompiledHeader = 2;    // 2-使用预编译头,1-创建,0-不使用
             CLTool_x64.SuppressStartupBanner = true;
             CLTool_x64.TreatWChar_tAsBuiltInType = (wcharSet == 1);
             CLTool_x64.WarningLevel = warningLevelOption.warningLevel_3;
-	  if(WizardVersion < 10.0){
-         	CLTool_x64.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_64)\\include\\config";"$(SOUI4_INSTALL_64)\\include\\components";"$(SOUI4_INSTALL_64)\\include\\SOUI";"$(SOUI4_INSTALL_64)\\include\\SOUI\\include";"$(SOUI4_INSTALL_64)\\include\\utilities\\include";;"$(SOUI4_INSTALL_64)\\third-part\\stdint"';			
-         }else{
-         	CLTool_x64.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_64)\\include\\config";"$(SOUI4_INSTALL_64)\\include\\components";"$(SOUI4_INSTALL_64)\\include\\SOUI";"$(SOUI4_INSTALL_64)\\include\\SOUI\\include";"$(SOUI4_INSTALL_64)\\include\\utilities\\include"';			
-         }
+            if (WizardVersion < 10.0) {
+                CLTool_x64.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_64)\\include\\config";"$(SOUI4_INSTALL_64)\\include\\components";"$(SOUI4_INSTALL_64)\\include\\SOUI";"$(SOUI4_INSTALL_64)\\include\\SOUI\\include";"$(SOUI4_INSTALL_64)\\include\\utilities\\include";;"$(SOUI4_INSTALL_64)\\third-part\\stdint"';
+            } else {
+                CLTool_x64.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_64)\\include\\config";"$(SOUI4_INSTALL_64)\\include\\components";"$(SOUI4_INSTALL_64)\\include\\SOUI";"$(SOUI4_INSTALL_64)\\include\\SOUI\\include";"$(SOUI4_INSTALL_64)\\include\\utilities\\include"';
+            }
             CLTool_x64.PreprocessorDefinitions = 'WIN64;_WINDOWS;_USRDLL;NDEBUG';
             CLTool_x64.RuntimeLibrary = (mtSet == 1) ? 0 : 2;; // 0=MT, 1=MTd, 2=MD (DLL), 3=MDd
             CLTool_x64.WholeProgramOptimization = true;	//全程序优化：启动链接时代码生成
             var LinkTool_x64 = config_64.Tools('VCLinkerTool');
-            //添加链接器设置
+			//添加链接器设置
             LinkTool_x64.GenerateDebugInformation = true;
             LinkTool_x64.LinkIncremental = linkIncrementalYes;
             LinkTool_x64.SuppressStartupBanner = true;  // nologoif(UserDll)
-		LinkTool_64.AdditionalLibraryDirectories = '"$(SOUI4_INSTALL_64)\\lib\\release"';
+            LinkTool_x64.AdditionalLibraryDirectories = '"$(SOUI4_INSTALL_64)\\lib\\release"';
             LinkTool_x64.AdditionalDependencies = 'utilities4.lib soui4.lib'
+            if(SOUI_ENABLE_COM_LIB_64){
+                LinkTool_x64.AdditionalDependencies += soui_com_lib;
+            }
             LinkTool_x64.LinkIncremental = 1;
             LinkTool_x64.SubSystem = subSystemOption.subSystemWindows;
 
@@ -343,7 +375,7 @@ function AddConfig(proj, strProjectName) {
 }
 
 function PchSettings(proj) {
-    // TODO: 指定 pch 设置
+	// TODO: 指定 pch 设置
 }
 
 function DelFile(fso, strWizTempFile) {
@@ -400,17 +432,17 @@ function GetSourceName(strName) {
 
 function GetTargetName(strName, strProjectName) {
     try {
-        strName.toLowerCase();
-        // TODO: 基于模板文件名设置呈现文件的名称
-        var strTarget = strName;
+		strName.toLowerCase();
+		// TODO: 基于模板文件名设置呈现文件的名称
+		var strTarget = strName;
 
-        if (strName == 'demo.cpp')
-            strTarget = strProjectName + '.cpp';
+		if (strName == 'demo.cpp')
+			strTarget = strProjectName + '.cpp';
 
-        if (strName == 'demo.rc')
-            strTarget = strProjectName + '.rc';
+		if (strName == 'demo.rc')
+			strTarget = strProjectName + '.rc';
 
-        if (strName.indexOf('[uires]') == 0) // UI资源文件
+		if (strName.indexOf('[uires]') == 0) // UI资源文件
         {
             strTarget = "uires\\" + strName.substr(7);
         }
@@ -433,7 +465,7 @@ function AddFilesToCustomProj(proj, strProjectName, strProjectPath, InfFile) {
         var strTpl = '';
         var strName = '';
 
-        // 过滤器对象
+		// 过滤器对象
         var projFilters = proj.Object.Filters;
         var filterRes = projFilters.Item('Resource Files');
         var filterUIRES = projFilters.Item('SoUI Resource');
@@ -441,17 +473,17 @@ function AddFilesToCustomProj(proj, strProjectName, strProjectPath, InfFile) {
         var strTextStream = InfFile.OpenAsTextStream(1, -2);
         while (!strTextStream.AtEndOfStream) {
             strTpl = strTextStream.ReadLine();
-            if (strTpl != '' && strTpl.indexOf(';') != 0) // ;注释行
+			if (strTpl != '' && strTpl.indexOf(';') != 0) // ;注释行
             {
-                var bCopyOnly = false;  //“true”仅将文件从 strTemplate 复制到 strTarget，而不对项目进行呈现/添加
+				var bCopyOnly = false;  //“true”仅将文件从 strTemplate 复制到 strTarget，而不对项目进行呈现/添加
                 var bBinary = false;
-                if (strTpl.indexOf('=') == 0) // 二进制文件
+				if (strTpl.indexOf('=') == 0) // 二进制文件
                 {
                     bBinary = true;
                     strTpl = strTpl.substr(1);
                 }
 
-                if (strTpl.indexOf('-') == 0) // 只拷贝不需要添加的文件
+				if (strTpl.indexOf('-') == 0) // 只拷贝不需要添加的文件
                 {
                     bCopyOnly = true;
                     strTpl = strTpl.substr(1);
@@ -476,7 +508,7 @@ function AddFilesToCustomProj(proj, strProjectName, strProjectPath, InfFile) {
                 var strExt = strName.substr(strName.lastIndexOf("."));
                 if (strExt == ".bmp" || strExt == ".ico" || strExt == ".gif" || strExt == ".rtf" || strExt == ".css" || strExt == ".png" || strExt == ".jpg" || strExt == ".lua")
                     bBinary = true;
-                // 复制文件和添加到工程
+				// 复制文件和添加到工程
                 wizard.RenderTemplate(strTemplate, strFile, bBinary);
                 if (!bCopyOnly) {
                     if (filter) {
@@ -489,12 +521,12 @@ function AddFilesToCustomProj(proj, strProjectName, strProjectPath, InfFile) {
         }
         strTextStream.Close();
 
-        // 设置某些文件的编译选项
+		// 设置某些文件的编译选项
         var files = proj.Object.Files;
         var file = files.Item('stdafx.cpp');
-        var fileConfig = file.FileConfigurations('Debug');
+        var fileConfig = file.FileConfigurations('Debug|Win32');
         fileConfig.Tool.UsePrecompiledHeader = 1;
-        fileConfig = file.FileConfigurations('Release');
+        fileConfig = file.FileConfigurations('Release|Win32');
         fileConfig.Tool.UsePrecompiledHeader = 1;
 
         var fileConfig64 = file.FileConfigurations('Debug|x64');
@@ -511,7 +543,7 @@ function AddFilesToCustomProj(proj, strProjectName, strProjectPath, InfFile) {
         var psw = wizard.FindSymbol("ZIP_PSW");
         var ResLoadType = wizard.FindSymbol('ResLoaderType');
 
-        //指定uires.idx的编译命令
+		//指定uires.idx的编译命令
         var WizardVersion = wizard.FindSymbol('WIZARD_VERSION');
         var DirFor7z;
         var outFile = '';
@@ -548,12 +580,12 @@ function AddFilesToCustomProj(proj, strProjectName, strProjectPath, InfFile) {
 
         //var ResLoadType = wizard.FindSymbol('ResLoaderType');
         var file = files.Item('uires.idx');
-        var fileConfig = file.FileConfigurations('Debug');
+        var fileConfig = file.FileConfigurations('Debug|Win32');
         buildTool = fileConfig.Tool;
         buildTool.CommandLine = cmdline;
         buildTool.Description = 'Building SoUI Resource';
         buildTool.Outputs = outfiles;
-        fileConfig = file.FileConfigurations('Release');
+        fileConfig = file.FileConfigurations('Release|Win32');
         buildTool = fileConfig.Tool;
         if (ResLoadType == 0) {
             buildTool.CommandLine = cmdline;
@@ -575,19 +607,21 @@ function AddFilesToCustomProj(proj, strProjectName, strProjectPath, InfFile) {
             buildTool64.Outputs = outfiles;
             fileConfig64 = file.FileConfigurations('Release|x64');
             buildTool64 = fileConfig64.Tool;
+            buildTool64.Description = 'Building SoUI Resource';
+            buildTool64.Outputs = outfiles;
             if (ResLoadType == 0) {
                 buildTool.CommandLine = cmdline;
+                buildTool64.CommandLine = cmdline;
             }
             else if ((ResLoadType == 1) || (ResLoadType == 2)) {
                 buildTool.CommandLine = cmdline + "\r\n" + cmd7z;
+                buildTool64.CommandLine = cmdline + "\r\n" + cmd7z;
             }
             else if (ResLoadType == 3) {
                 buildTool.CommandLine = cmdline + "\r\n" + cmdcopyres;
+                buildTool64.CommandLine = cmdline + "\r\n" + cmdcopyres;
             }
-            buildTool64.Description = 'Building SoUI Resource';
-            buildTool64.Outputs = outfiles;
         }
-
     }
     catch (e) {
         throw e;

@@ -250,15 +250,12 @@ void CMainDlg::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
 		}else if(nID == R.id.menu_view_property){
 			SWindow *pProp = FindChildByID(R.id.property_panel_dock);
 			pProp->SetVisible(!pProp->IsVisible(), TRUE);
-			pProp->RequestRelayout();
 		}else if(nID == R.id.menu_view_toolbar){
 			SWindow *pToolbar = FindChildByID(R.id.tb_main);
 			pToolbar->SetVisible(!pToolbar->IsVisible(), TRUE);
-            pToolbar->GetParent()->RequestRelayout();
 		}else if(nID==R.id.menu_view_statusbar){
 			SWindow *pStatusbar = FindChildByID(R.id.wnd_status);
 			pStatusbar->SetVisible(!pStatusbar->IsVisible(), TRUE);
-            pStatusbar->GetParent()->RequestRelayout();
 		}
 	}
 }

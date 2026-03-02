@@ -859,6 +859,8 @@ void SToolBar::ShowDropDownMenu(const CRect &rc)
     menu.LoadMenu2(&xmlNode);
     for (int i = m_nVisibleItems; i < m_arrItems.GetCount(); i++)
     {
+        if(m_arrItems[i].pChild)
+            continue;
         UINT uFlag = IsSeparator(&m_arrItems[i]) ? MF_SEPARATOR : MF_STRING;
         if (m_arrItems[i].dwState & WndState_Check)
             uFlag |= MF_CHECKED;

@@ -695,6 +695,18 @@ IMenuEx *SMenuEx::GetSubMenu(THIS_ int nPos)
     return GetSubMenu(nPos, FALSE);
 }
 
+void SMenuEx::OnMenuEnd(){
+    m_bMenuInitialized = FALSE;
+    SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot());
+    SMenuExItem *pItem = sobj_cast<SMenuExItem>(pMenuRoot->GetWindow(GSW_FIRSTCHILD));
+    while(pItem){
+        if(pItem->GetSubMenu()){
+            pItem->GetSubMenu()->OnMenuEnd();
+        }
+        pItem = sobj_cast<SMenuExItem>(pItem->GetWindow(GSW_NEXTSIBLING));
+    }
+}
+
 UINT SMenuEx::TrackPopupMenu(UINT flag, int x, int y, HWND hOwner, int nScale)
 {
     if (!IsWindow() || GetMenuItemCount() == 0)
@@ -718,6 +730,7 @@ UINT SMenuEx::TrackPopupMenu(UINT flag, int x, int y, HWND hOwner, int nScale)
     ShowMenu(flag, x, y);
     RunMenu(hRoot);
     HideMenu(FALSE);
+    OnMenuEnd();
 
     if (hActive)
     {
@@ -840,10 +853,11 @@ void SMenuEx::ShowMenu(UINT uFlag, int x, int y)
 
 void SMenuEx::HideMenu(BOOL bUncheckParentItem)
 {
-    if (!SNativeWnd::IsWindowVisible())
-        return;
-    HideSubMenu();
-    ShowWindow(SW_HIDE);
+    if (SNativeWnd::IsWindowVisible())
+    {
+        HideSubMenu();
+        ShowWindow(SW_HIDE);
+    }
     if (m_pCheckItem)
     {
         m_pCheckItem->SetCheck(FALSE);
@@ -1000,6 +1014,18 @@ SMenuEx *SMenuEx::GetEvtOwner()
     return SMenuExEventOwner::GetEvtOwner();
 }
 
+int SMenuEx::MenuItem2Index(SMenuExItem *pMenuItem) const
+{
+    int nIndex = 0;
+    SWindow *pPrev = pMenuItem->GetWindow(GSW_PREVSIBLING);
+    while (pPrev)
+    {
+        nIndex++;
+        pPrev = pPrev->GetWindow(GSW_PREVSIBLING);
+    }
+    return nIndex;
+}
+
 void SMenuEx::OnSelItemChanged(SMenuExItem *pMenuItem, BOOL bByMouse)
 {
     if (pMenuItem)
@@ -1008,12 +1034,7 @@ void SMenuEx::OnSelItemChanged(SMenuExItem *pMenuItem, BOOL bByMouse)
         int nFlag = bByMouse ? MF_MOUSESELECT : 0;
         if (pMenuItem->GetSubMenu() != NULL)
         {
-            SWindow *pPrev = pMenuItem->GetWindow(GSW_PREVSIBLING);
-            while (pPrev)
-            {
-                idx++;
-                pPrev = pPrev->GetWindow(GSW_PREVSIBLING);
-            }
+            idx = MenuItem2Index(pMenuItem);
             nFlag = MF_POPUP;
         }
         else
@@ -1115,13 +1136,7 @@ void SMenuEx::PopupSubMenu(SMenuExItem *pItem, BOOL bCheckFirstItem)
     SASSERT(pSubMenu);
     if (!pSubMenu->m_bMenuInitialized)
     {
-        int idx = 0;
-        SWindow *pPrev = pItem->GetWindow(GSW_PREVSIBLING);
-        while (pPrev)
-        {
-            idx++;
-            pPrev = pPrev->GetWindow(GSW_PREVSIBLING);
-        }
+        int idx = MenuItem2Index(pItem);
         pSubMenu->SendInitPopupMenu2Owner(idx);
     }
 
