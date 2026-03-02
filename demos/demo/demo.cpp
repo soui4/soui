@@ -20,6 +20,7 @@
 #include <controls.extend/SMcListViewEx/SHeaderCtrlEx.h>
 #include <controls.extend/SMcListViewEx/SMCListViewEx.h>
 #include <controls.extend/SWaveProgress.h>
+#include <controls.extend/SVerificationCodeEdit.h>
 
 #if defined(_WIN32) && !defined(__MINGW32__)
 #include <controls.extend/SIECtrl.h>
@@ -249,6 +250,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
     app.RegisterWindowClass<SShellTray>();
     app.RegisterWindowClass<FpsWnd>();
     app.RegisterWindowClass<SWaveProgress>();
+    app.RegisterWindowClass<SVerificationCodeEdit>();
 #if defined(_WIN32) && !defined(__MINGW32__)
     app.RegisterWindowClass<SIECtrl>(); // 注册IECtrl
     app.RegisterWindowClass<SStaticGdip>();

@@ -10,6 +10,7 @@ SVerificationCodeEdit::SVerificationCodeEdit()
     , m_nBoxSpacing(10)
     , m_nBoxWidth(40)
     , m_nBoxHeight(40)
+    , m_iCaretPos(0)
 {
     m_cchTextMost = 6;
     m_fDisableCaret = 1;
@@ -45,6 +46,7 @@ void SVerificationCodeEdit::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 void SVerificationCodeEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
     __baseCls::OnChar(nChar, nRepCnt, nFlags);
+    UpdateCursorPosition();
     if(GetWindowTextLength() == m_cchTextMost){
         EventKeyEnter evt(this);
         FireEvent(evt);
@@ -134,7 +136,7 @@ void SVerificationCodeEdit::DrawCharBoxes(IRenderTarget *pRT)
         SAutoRefPtr<IPenS> hPen, oldPen;
         
         // 确定使用哪种颜色
-        if (bHasFocus && i == strText.GetLength())
+        if (bHasFocus && i == m_iCaretPos)
         {
             // 当前格子是活动格子，且控件有焦点
             pRT->CreatePen(PS_SOLID,  m_crActiveBox, 2 , &hPen);
@@ -169,9 +171,16 @@ void SVerificationCodeEdit::UpdateCursorPosition()
 {
     // 获取文本长度
     int nTextLength = GetWindowTextLength();
-    
-    // 设置光标位置到最后
-    SetSel(nTextLength, nTextLength, FALSE);
+    if (nTextLength < m_cchTextMost)
+    {
+        SetSel(nTextLength, nTextLength, FALSE);
+        m_iCaretPos = nTextLength;
+    }
+    else
+    {
+        SetSel(nTextLength-1, nTextLength, FALSE);
+        m_iCaretPos = nTextLength-1;
+    }
 }
 
 SNSEND

@@ -1,7 +1,7 @@
 #ifndef _SVERIFICATIONCODEEDIT_H_
 #define _SVERIFICATIONCODEEDIT_H_
 
-#include <SEdit2.h>
+#include "SEdit2.h"
 
 SNSBEGIN
 
@@ -125,6 +125,7 @@ protected:
     int m_nBoxSpacing;          /**< Spacing between boxes */
     int m_nBoxWidth;            /**< Width of each box */
     int m_nBoxHeight;           /**< Height of each box */
+    int m_iCaretPos;            /**< Current caret position */
 };
 
 SNSEND
