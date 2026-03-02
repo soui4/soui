@@ -31,6 +31,7 @@
     <auto_size value="自动大小" />
     <view_preview value="预览" />
     <view_toolbar value="工具栏" />
+    <view_statusbar value="状态栏" />
     <view_property value="属性" />
     <view_skin value="查看皮肤" />
     <auto_save value="自动保存" />

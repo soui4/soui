@@ -1,4 +1,4 @@
-﻿//stamp:28f5ce776b1d2fce
+﻿//stamp:28f5debf183c4731
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -181,6 +181,7 @@ struct _R{
 		 const wchar_t * menu_tool_view_skin;
 		 const wchar_t * menu_view_preview;
 		 const wchar_t * menu_view_property;
+		 const wchar_t * menu_view_statusbar;
 		 const wchar_t * menu_view_toolbar;
 		 const wchar_t * msgicon;
 		 const wchar_t * msgtext;
@@ -269,6 +270,7 @@ struct _R{
 		int menu_tool_view_skin;
 		int menu_view_preview;
 		int menu_view_property;
+		int menu_view_statusbar;
 		int menu_view_toolbar;
 		int msgicon;
 		int msgtext;
@@ -357,6 +359,7 @@ struct _R{
 		int view_preview;
 		int view_property;
 		int view_skin;
+		int view_statusbar;
 		int view_toolbar;
 		int xml_editor;
 		int xml_struct;
@@ -414,6 +417,7 @@ struct _R R={
 		L"menu_tool_view_skin",
 		L"menu_view_preview",
 		L"menu_view_property",
+		L"menu_view_statusbar",
 		L"menu_view_toolbar",
 		L"msgicon",
 		L"msgtext",
@@ -501,6 +505,7 @@ struct _R R={
 		3,
 		31,
 		32,
+		24,
 		23,
 		22,
 		21,
@@ -595,7 +600,8 @@ struct _R R={
 		32,
 		33,
 		34,
-		35
+		35,
+		36
 	}
 	
 };

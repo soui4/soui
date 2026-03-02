@@ -255,6 +255,10 @@ void CMainDlg::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
 			SWindow *pToolbar = FindChildByID(R.id.tb_main);
 			pToolbar->SetVisible(!pToolbar->IsVisible(), TRUE);
             pToolbar->GetParent()->RequestRelayout();
+		}else if(nID==R.id.menu_view_statusbar){
+			SWindow *pStatusbar = FindChildByID(R.id.wnd_status);
+			pStatusbar->SetVisible(!pStatusbar->IsVisible(), TRUE);
+            pStatusbar->GetParent()->RequestRelayout();
 		}
 	}
 }
@@ -1734,6 +1738,8 @@ void CMainDlg::OnUpdateCmdUI(IEvtArgs *e){
 		e2->bChecked = FindChildByID(R.id.property_panel_dock)->IsVisible();
 	}else if(e2->nCmdId == R.id.menu_view_toolbar){
 		e2->bChecked = FindChildByID(R.id.tb_main)->IsVisible();
+	}else if(e2->nCmdId == R.id.menu_view_statusbar){
+		e2->bChecked = FindChildByID(R.id.wnd_status)->IsVisible();
 	}
 }
 
