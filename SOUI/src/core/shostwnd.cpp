@@ -2317,8 +2317,11 @@ LRESULT SHostWnd::OnInitMenuPopup(UINT uMsg, WPARAM wp, LPARAM lp)
     return 0;
 }
 
-void SHostWnd::OnMenuSelect(UINT uItem, UINT uFlags, HMENU hMenu)
+LRESULT SHostWnd::OnMenuSelect(UINT uMsg,WPARAM wp, LPARAM lp)
 {
+    HMENU hMenu = (HMENU)lp;
+    int uItem = (int)LOWORD(wp);
+    int uFlags = (int)HIWORD(wp);
     if (uFlags == 0xFFFF && hMenu == NULL) {
         EventUpdateCmdTip evt(GetRoot());
         evt.iIndex = -1;
@@ -2332,25 +2335,47 @@ void SHostWnd::OnMenuSelect(UINT uItem, UINT uFlags, HMENU hMenu)
         SStringT strTip;
         EventUpdateCmdTip evt(GetRoot());
         evt.strTip = NULL;
-        if(uFlags & MF_POPUP){
-            evt.iIndex = uItem;
-            evt.nCmdId = -1;
-            GetMenuString (hMenu, uItem, szText, sizeof(szText) / sizeof(TCHAR), MF_BYPOSITION);
-            strTip = szText;
-            evt.strTip = &strTip;
-        }else{
-            int nCount = GetMenuItemCount(hMenu);
-            for(int i=0;i<nCount;i++){
-                if(::GetMenuItemID(hMenu, i) == uItem){
-                    evt.iIndex = i;
-                    break;
+        if(IsMenu(hMenu)){
+            //smenu.
+            if(uFlags & MF_POPUP){
+                evt.iIndex = uItem;
+                evt.nCmdId = -1;
+                GetMenuString (hMenu, uItem, szText, sizeof(szText) / sizeof(TCHAR), MF_BYPOSITION);
+                strTip = szText;
+                evt.strTip = &strTip;
+            }else{
+                int nCount = GetMenuItemCount(hMenu);
+                for(int i=0;i<nCount;i++){
+                    if(::GetMenuItemID(hMenu, i) == uItem){
+                        evt.iIndex = i;
+                        break;
+                    }
                 }
+                evt.nCmdId = uItem;
             }
-            evt.nCmdId = uItem;
+        }else{
+            //sMenuEx
+            SMenuEx *pMenu = (SMenuEx*)hMenu;
+            if(uFlags & MF_POPUP){
+                evt.iIndex = uItem;
+                evt.nCmdId = -1;
+                pMenu->GetMenuString(uItem,MF_BYPOSITION,&strTip);
+                evt.strTip = &strTip;
+            }else{
+                int nCount = pMenu->GetMenuItemCount();
+                for(int i=0;i<nCount;i++){
+                    if(pMenu->GetMenuItem(i,FALSE)->GetID() == uItem){
+                        evt.iIndex = i;
+                        break;
+                    }
+                }
+                evt.nCmdId = uItem;
+            }
         }
         GetRoot()->FireEvent(&evt);
     }
     SetMsgHandled(FALSE);
+    return 0;
 }
 
 //////////////////////////////////////////////////////////////////

@@ -370,6 +370,14 @@ class SOUI_EXP SMenuEx
     SMenuExItem *GetMenuItem(int nID, BOOL byCmdId);
 
   protected:
+
+    /**
+     * @brief 菜单项选中状态改变
+     * @param pItem 菜单项对象指针
+     * @param bByMouse 是否由鼠标触发
+     */
+    void OnSelItemChanged(SMenuExItem *pItem, BOOL bByMouse);
+
     /**
      * @brief 初始化一个空菜单（不应在外部调用）
      * @param ParentRoot 父菜单根对象指针
@@ -400,10 +408,16 @@ class SOUI_EXP SMenuEx
      */
     void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 
+    /**
+     * @brief 处理鼠标离开消息
+     */
+    void OnMouseLeave();
+
     BEGIN_MSG_MAP_EX(SMenuEx)
         MSG_WM_MOUSEACTIVATE(OnMouseActivate)
         MSG_WM_TIMER(OnTimer)
         MSG_WM_KEYDOWN(OnKeyDown)
+        MSG_WM_MOUSELEAVE(OnMouseLeave)
         CHAIN_MSG_MAP(SHostWnd)
     END_MSG_MAP()
 

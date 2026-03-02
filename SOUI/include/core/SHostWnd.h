@@ -1396,16 +1396,32 @@ class SOUI_EXP SHostWnd
 
     /**
      * @brief Handles the WM_INITMENUPOPUP message.
-     * @param HMENU menuPopup
-     * @param UINT nIndex
-     * @param BOOL bSysMenu
+     * @param uMsg WM_INITMENUPOPUP message identifier.
      */
     LRESULT OnInitMenuPopup(UINT uMsg,WPARAM wp, LPARAM lp);
 
+    /**
+     * @brief Handles the WM_INITMENUPOPUP message for SMenu.
+     * @brief Initializes a menu popup.
+     * @param menuPopup Menu popup handle.
+     * @param nIndex Index of the menu item.
+     * @param bSysMenu Flag indicating whether the menu is a system menu.
+     */
     void InitMenuPopup(HMENU menuPopup, UINT nIndex, BOOL bSysMenu);
+
+    /**
+     * @brief Handles the WM_INITMENUPOPUP message for SMenuEx.
+     * @brief Initializes a menu popup.
+     * @param menuPopup Menu popup pointer.
+     * @param nIndex Index of the menu item.
+     */
     void InitMenuExPopup(SMenuEx* menuPopup, UINT nIndex);
 
-    void OnMenuSelect(UINT nItemID, UINT nFlags, HMENU menu);
+    /**
+     * @brief Handles the WM_MENUSELECT message.
+     * @param uMsg WM_MENUSELECT message identifier.
+     */
+    LRESULT OnMenuSelect(UINT uMsg, WPARAM wp, LPARAM lp);
 
     /**
      * @brief Handles the UM_RUN_TASKS message.
@@ -1447,7 +1463,7 @@ class SOUI_EXP SHostWnd
         MSG_WM_COMMAND(OnCommand)
         MSG_WM_SYSCOMMAND(OnSysCommand)
         MESSAGE_HANDLER_EX(WM_INITMENUPOPUP,OnInitMenuPopup)
-        MSG_WM_MENUSELECT(OnMenuSelect)
+        MESSAGE_HANDLER_EX(WM_MENUSELECT,OnMenuSelect)
         MESSAGE_HANDLER_EX(UM_UPDATEFONT, OnUpdateFont)
         MESSAGE_HANDLER_EX(UM_SETLANGUAGE, OnSetLanguage)
         MESSAGE_HANDLER_EX(UM_RUN_TASKS, OnRunTasks)

@@ -1000,6 +1000,39 @@ SMenuEx *SMenuEx::GetEvtOwner()
     return SMenuExEventOwner::GetEvtOwner();
 }
 
+void SMenuEx::OnSelItemChanged(SMenuExItem *pMenuItem, BOOL bByMouse)
+{
+    if (pMenuItem)
+    {
+        int idx = pMenuItem->GetID();
+        int nFlag = bByMouse ? MF_MOUSESELECT : 0;
+        if (pMenuItem->GetSubMenu() != NULL)
+        {
+            SWindow *pPrev = pMenuItem->GetWindow(GSW_PREVSIBLING);
+            while (pPrev)
+            {
+                idx++;
+                pPrev = pPrev->GetWindow(GSW_PREVSIBLING);
+            }
+            nFlag = MF_POPUP;
+        }
+        else
+        {
+            nFlag |= pMenuItem->IsDisabled() ? MF_GRAYED : 0;
+        }
+        ::SendMessage(s_MenuData->GetOwner(), WM_MENUSELECT, MAKEWPARAM(idx, nFlag), (LPARAM)this);
+    }
+    else
+    {
+        ::SendMessage(s_MenuData->GetOwner(), WM_MENUSELECT, MAKEWPARAM(0, 0xffff), 0);
+    }
+}
+
+void SMenuEx::OnMouseLeave()
+{
+    OnSelItemChanged(NULL, TRUE);
+    SetMsgHandled(FALSE);
+}
 BOOL SMenuEx::_HandleEvent(IEvtArgs *pEvt)
 {
     if (pEvt->Sender()->IsClass(SMenuExItem::GetClassName()))
@@ -1013,6 +1046,7 @@ BOOL SMenuEx::_HandleEvent(IEvtArgs *pEvt)
                 m_pHoverItem = pMenuItem;
             }
             HideSubMenu();
+            OnSelItemChanged(pMenuItem, TRUE);
             return FALSE;
         }
         else if (pEvt->GetID() == EventSwndMouseLeave::EventID)
@@ -1129,6 +1163,7 @@ void SMenuEx::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
             m_pCheckItem->SetCheck(TRUE);
             m_pCheckItem->Invalidate();
         }
+        OnSelItemChanged(m_pCheckItem, FALSE);
         break;
     case VK_ESCAPE:
     case VK_LEFT:
