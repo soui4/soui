@@ -1022,7 +1022,7 @@ void SMenuEx::OnSelItemChanged(SMenuExItem *pMenuItem, BOOL bByMouse)
         }
         ::SendMessage(s_MenuData->GetOwner(), WM_MENUSELECT, MAKEWPARAM(idx, nFlag), (LPARAM)this);
     }
-    else
+    else if(s_MenuData)
     {
         ::SendMessage(s_MenuData->GetOwner(), WM_MENUSELECT, MAKEWPARAM(0, 0xffff), 0);
     }
