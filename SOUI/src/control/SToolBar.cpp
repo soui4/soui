@@ -138,7 +138,7 @@ CSize SToolBar::GetItemSize(const CRect &rcWnd, IRenderTarget *pRT, int iItem) c
             else
             {
                 // Default horizontal arrangement
-                szRet = CSize(rcWnd.Height(), rcWnd.Height());
+                szRet = CSize(szIcon.cx, rcWnd.Height());
                 if ((item.dwStyle & BTNS_SHOWTEXT))
                 {
                     CSize szTxt;
