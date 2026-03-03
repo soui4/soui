@@ -25,7 +25,7 @@ static const TCHAR *kPath_AppRes = _T("/uires");
 static const TCHAR *kPath_SysRes = _T("/data/soui-sys-resource.zip");
 #else
 static const TCHAR *kPath_AppRes = _T("/uieditor_uires");
-static const TCHAR *kPath_SysRes = _T("/../../soui-sys-resource.zip");
+static const TCHAR *kPath_SysRes = _T("/soui-sys-resource.zip");
 #endif
 
 static SStringT getSourceDir()
@@ -100,7 +100,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
         .SetAppDir(appDir)
         .SetLog(TRUE, LOG_LEVEL_INFO, "uiedtior");
 #ifdef __linux__
-    AddFontResource((srcDir + _T("/../../simsun.ttc")).c_str());
+    AddFontResource((appDir + _T("/simsun.ttc")).c_str());
 #elif defined(__APPLE__)
     AddFontResource((srcDir + _T("/fonts/simsun.ttc")).c_str());
 #endif    
