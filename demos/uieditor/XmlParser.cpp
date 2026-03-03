@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "XmlParser.h"
 #include <algorithm>
-#include "SysDataMgr.h"
+#include "SysdataMgr.h"
 using namespace spugi;
 
 CXmlParser::CXmlParser(void):m_utf8Loading(NULL),m_utf8Len(0),m_tsLoad(0)

@@ -4,19 +4,17 @@
 SNSBEGIN
 SAppDir::SAppDir(HINSTANCE hInst)
 {
-    TCHAR szCurrentDir[MAX_PATH] = { 0 };
-    if (GetModuleFileName(hInst, szCurrentDir, MAX_PATH))
+    TCHAR apppath[MAX_PATH] = { 0 };
+    if (GetModuleFileName(hInst, apppath, MAX_PATH))
     {
-#ifdef _WIN32
-        LPTSTR lpInsertPos = _tcsrchr(szCurrentDir, _T('\\'));
-#else
-        LPTSTR lpInsertPos = _tcsrchr(szCurrentDir, _T('/'));
-#endif //
+        TCHAR appfullpath[MAX_PATH];
+        GetFullPathName(apppath,MAX_PATH,appfullpath,NULL);
+        LPTSTR lpInsertPos = _tcsrchr(appfullpath, PATH_SLASH);
         if (lpInsertPos)
         {
             *lpInsertPos = 0;
         }
-        m_strAppPath = szCurrentDir;
+        m_strAppPath = appfullpath;
     }
 }
 
