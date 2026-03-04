@@ -2775,7 +2775,7 @@ void SWindow::OnLButtonUp(UINT nFlags, CPoint pt)
     if (!GetWindowRect().PtInRect(pt))
         return;
 
-    if (GetID() || GetName())
+    if (GetID() || (GetName() && *GetName()))
     {
         FireCommand();
     }
