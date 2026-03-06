@@ -13,33 +13,41 @@ if(CMAKE_SYSTEM_NAME MATCHES Windows)
     set(ENABLE_RESOURCES_BUILD ON)
 else()
     # Find windres (MinGW resource compiler)
-    find_program(WINDRES_EXECUTABLE NAMES x86_64-w64-mingw32-windres i686-w64-mingw32-windres windres)
-    set(WINDRES_EXECUTABLE x86_64-w64-mingw32-windres)
-    # Find required tools
-    find_program(LD_EXECUTABLE NAMES ld REQUIRED)
-    find_program(OBJCOPY_EXECUTABLE NAMES objcopy REQUIRED)
-    find_program(NM_EXECUTABLE NAMES nm REQUIRED)
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+        if(EXISTS /usr/local/bin/x86_64-w64-mingw32-windres)
+            set(WINDRES_EXE x86_64-w64-mingw32-windres)
+        endif()
+    else()
+        if(EXISTS /usr/bin/i686-w64-mingw32-windres)
+            set(WINDRES_EXE i686-w64-mingw32-windres)
+        endif()
+    endif()
 
-    if(NOT WINDRES_EXECUTABLE)
-        message(WARNING "windres not found. Resource files (.rc) will not be compiled. "
+    # Find required tools
+    find_program(LD_EXECUTABLE NAMES ld)
+    find_program(OBJCOPY_EXECUTABLE NAMES objcopy)
+    find_program(NM_EXECUTABLE NAMES nm)
+
+    if(NOT WINDRES_EXE)
+        message(STATUS "windres not found. Resource files (.rc) will not be compiled. "
                         "Install mingw-w64-tools or similar package to enable resource compilation.")
     endif()
     if(NOT LD_EXECUTABLE)
-        message(WARNING "ld not found. Resource files (.rc) will not be compiled. "
+        message(STATUS "ld not found. Resource files (.rc) will not be compiled. "
                         "Install mingw-w64-tools or similar package to enable resource compilation.")
     endif()
 
     if(NOT OBJCOPY_EXECUTABLE)
-        message(WARNING "objcopy not found. Resource files (.rc) will not be compiled. "
+        message(STATUS "objcopy not found. Resource files (.rc) will not be compiled. "
                         "Install mingw-w64-tools or similar package to enable resource compilation.")
     endif()
 
     if(NOT NM_EXECUTABLE)
-        message(WARNING "nm not found. Resource files (.rc) will not be compiled. "
+        message(STATUS "nm not found. Resource files (.rc) will not be compiled. "
                         "Install mingw-w64-tools or similar package to enable resource compilation.")
-    endif()
-    if(WINDRES_EXECUTABLE AND LD_EXECUTABLE AND OBJCOPY_EXECUTABLE AND NM_EXECUTABLE)
-        message(STATUS "Found windres: ${WINDRES_EXECUTABLE}, ld: ${LD_EXECUTABLE}, objcopy: ${OBJCOPY_EXECUTABLE}, nm: ${NM_EXECUTABLE}")
+    endif() 
+    if(WINDRES_EXE AND LD_EXECUTABLE AND OBJCOPY_EXECUTABLE AND NM_EXECUTABLE)
+        message(STATUS "Found windres: ${WINDRES_EXE}, ld: ${LD_EXECUTABLE}, objcopy: ${OBJCOPY_EXECUTABLE}, nm: ${NM_EXECUTABLE}")
         set(ENABLE_RESOURCES_BUILD ON)
     else()
         set(ENABLE_RESOURCES_BUILD OFF)
@@ -75,7 +83,7 @@ function(windres_compile_rc output_var rc_file)
     # Step 1: Compile .rc to COFF format (Windows format)
     add_custom_command(
         OUTPUT ${coff_obj}
-        COMMAND ${WINDRES_EXECUTABLE}
+        COMMAND ${WINDRES_EXE}
                 --target=pe-x86-64  # Compile for 64-bit Windows
                 ${include_flags}
                 -i "${rc_abs_path}"
@@ -142,7 +150,7 @@ endfunction()
 # target_compile_resources(<target> <rc_file1> [<rc_file2> ...])
 function(target_compile_resources target) 
     if(NOT ENABLE_RESOURCES_BUILD)
-        message(WARNING "windres not found, skipping resource compilation for target: ${target}")
+        message(STATUS "windres not found, skipping resource compilation for target: ${target}")
         return()
     endif()
     
