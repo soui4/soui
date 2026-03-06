@@ -16,6 +16,7 @@ SToolBar::SToolBar(void)
     , m_nMaxItemWidth(100)
     , m_bAnimate(TRUE)
     , m_nAniStep(25)
+    , m_nItemSize(-2, SLayoutSize::defUnit)
 {
     GetEventSet()->addEvent(EVENTID(EventToolBarCmd));
     GetEventSet()->addEvent(EVENTID(EventUpdateCmdTip));
@@ -109,7 +110,13 @@ CSize SToolBar::GetItemSize(const CRect &rcWnd, IRenderTarget *pRT, int iItem) c
                 szIcon = item.icon->Size();
             else if (m_skinIcons)
                 szIcon = m_skinIcons->GetSkinSize();
-            szRet.cy = szRet.cy + 8;
+            if(m_nItemSize.isWrapContent())
+                szRet.cy = szIcon.cy;
+            else if(m_nItemSize.isMatchParent())
+                szRet.cy = rcWnd.Width();
+            else
+                szRet.cy = m_nItemSize.toPixelSize(GetScale());
+            szRet.cy += 8; //padding
             if ((item.dwStyle & BTNS_SHOWTEXT))
             {
                 CSize szText;
@@ -148,7 +155,13 @@ CSize SToolBar::GetItemSize(const CRect &rcWnd, IRenderTarget *pRT, int iItem) c
             else
             {
                 // Default horizontal arrangement
-                szRet = CSize(szIcon.cx, rcWnd.Height());
+                szRet.cy = rcWnd.Height();
+                if(m_nItemSize.isWrapContent())
+                    szRet.cx = szIcon.cx;
+                else if(m_nItemSize.isMatchParent())
+                    szRet.cx = rcWnd.Height();
+                else
+                    szRet.cx = m_nItemSize.toPixelSize(rcWnd.Width());
                 if ((item.dwStyle & BTNS_SHOWTEXT))
                 {
                     CSize szTxt;

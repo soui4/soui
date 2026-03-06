@@ -130,6 +130,7 @@ class SOUI_EXP SToolBar
         ATTR_BOOL(L"animate", m_bAnimate, TRUE)
         ATTR_INT(L"maxItemWidth", m_nMaxItemWidth, TRUE)
         ATTR_INT(L"textIconInterval", m_nTextIconInterval, TRUE)
+        ATTR_LAYOUTSIZE(L"itemSize", m_nItemSize, TRUE)
     SOUI_ATTRS_END()
 
   protected:
@@ -213,7 +214,7 @@ class SOUI_EXP SToolBar
     SAutoRefPtr<ISkinObj> m_skinDropArrow;
     SXmlDoc m_menuStyle;
     SArray<ToolBarItem> m_arrItems;
-
+    SLayoutSize m_nItemSize;
     int m_iClickItem;
     int m_iHoverItem;
     BOOL m_bVert;
