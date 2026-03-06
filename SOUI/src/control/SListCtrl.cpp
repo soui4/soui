@@ -505,7 +505,7 @@ int SListCtrl::HitTest(const CPoint &pt, int *pnSubItem)
             CRect rcList = GetListRect();
             CPoint pt2 = pt;
             pt2.x -= rcList.left - m_ptOrigin.x;
-            
+
             int x = 0;
             for (int nCol = 0; nCol < GetColumnCount(); nCol++)
             {
@@ -894,10 +894,10 @@ void SListCtrl::OnLButtonDbClick(UINT nFlags, CPoint pt)
 {
     int nSubItem = -1;
     m_nHoverItem = HitTest(pt, &nSubItem);
-    
+
     // 选择列
     SetSelectedColumn(nSubItem);
-    
+
     if (m_nHoverItem != m_nSelectItem)
         NotifySelChange(m_nSelectItem, m_nHoverItem);
 

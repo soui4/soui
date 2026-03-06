@@ -62,11 +62,11 @@ IResProvider *SouiFactory::CreateResProvider(THIS_ BUILTIN_RESTYPE resType)
     IResProvider *pObj = NULL;
     switch (resType)
     {
-#ifdef _WIN32
+#ifndef __apple__
     case RES_PE:
         pObj = new SResProviderPE;
         break;
-#endif //_WIN32
+#endif //__apple__
     case RES_FILE:
         pObj = new SResProviderFiles;
         break;

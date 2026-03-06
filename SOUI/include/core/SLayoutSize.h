@@ -5,18 +5,20 @@
 
 SNSBEGIN
 
-namespace LayoutSize_Style{
-    static const LPCWSTR kSize_WrapContent = L"wrapContent";
-    static const LPCWSTR kSize_MatchParent = L"matchParent";
-    static const LPCWSTR kSize_FillParent = L"full";
-}
+namespace LayoutSize_Style
+{
+static const LPCWSTR kSize_WrapContent = L"wrapContent";
+static const LPCWSTR kSize_MatchParent = L"matchParent";
+static const LPCWSTR kSize_FillParent = L"full";
+} // namespace LayoutSize_Style
 
-namespace LayoutSize_Unit{
-    static const LPCWSTR kUnit_Px = L"px";
-    static const LPCWSTR kUnit_Dp = L"dp";
-    static const LPCWSTR kUnit_Dip = L"dip";
-    static const LPCWSTR kUnit_Sp = L"sp";
-}
+namespace LayoutSize_Unit
+{
+static const LPCWSTR kUnit_Px = L"px";
+static const LPCWSTR kUnit_Dp = L"dp";
+static const LPCWSTR kUnit_Dip = L"dip";
+static const LPCWSTR kUnit_Sp = L"sp";
+} // namespace LayoutSize_Unit
 
 /**
  * @class SLayoutSize

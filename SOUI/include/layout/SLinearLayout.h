@@ -110,8 +110,8 @@ class SLinearLayoutParam
 
   public:
     SOUI_ATTRS_BEGIN()
-        ATTR_LAYOUTSIZE(L"width", width,TRUE)                   // 宽度
-        ATTR_LAYOUTSIZE(L"height", height,TRUE)                 // 高度
+        ATTR_LAYOUTSIZE(L"width", width, TRUE)                  // 宽度
+        ATTR_LAYOUTSIZE(L"height", height, TRUE)                // 高度
         ATTR_CUSTOM(L"size", OnAttrSize)                        // 大小
         ATTR_FLOAT(L"weight", weight, FALSE)                    // 权重
         ATTR_GRAVITY(L"layout_gravity", gravity, FALSE)         // 对齐方式

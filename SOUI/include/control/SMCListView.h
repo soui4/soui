@@ -10,12 +10,12 @@ SNSBEGIN
 
 namespace SMCListView_style
 {
-    static const LPCWSTR kStyle_template = L"template";
-    static const LPCWSTR kStyle_headerStyle = L"headerStyle";
-    static const LPCWSTR kStyle_wndclass = L"wndclass";
-    static const LPCWSTR kStyle_itemHeight = L"itemHeight";
-    static const LPCWSTR kStyle_defHeight = L"defHeight";
-}
+static const LPCWSTR kStyle_template = L"template";
+static const LPCWSTR kStyle_headerStyle = L"headerStyle";
+static const LPCWSTR kStyle_wndclass = L"wndclass";
+static const LPCWSTR kStyle_itemHeight = L"itemHeight";
+static const LPCWSTR kStyle_defHeight = L"defHeight";
+} // namespace SMCListView_style
 
 /**
  * @class SMCListView

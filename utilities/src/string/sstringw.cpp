@@ -8,11 +8,7 @@ SNSBEGIN
 
 int wchar_traits::LoadString(HINSTANCE hInst, UINT uID, wchar_t* lpBuffer, int nBufferMax)
 {
-#ifdef _WIN32
 	return ::LoadStringW(hInst, uID, lpBuffer, nBufferMax);
-#else
-	return 0;
-#endif
 }
 
 int wchar_traits::Format(wchar_t** ppszDst, const wchar_t* pszFormat, va_list & args)

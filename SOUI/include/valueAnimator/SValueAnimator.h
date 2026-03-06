@@ -472,6 +472,7 @@ class SOUI_EXP SValueAnimator
      * @return TRUE if the animation is finished, FALSE otherwise.
      */
     STDMETHOD_(BOOL, commitAnimationFrame)(THIS_ uint64_t frameTime) OVERRIDE;
+
   public:
     /**
      * @brief Returns the current animation fraction.

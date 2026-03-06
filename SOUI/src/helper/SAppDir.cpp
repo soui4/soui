@@ -8,7 +8,7 @@ SAppDir::SAppDir(HINSTANCE hInst)
     if (GetModuleFileName(hInst, apppath, MAX_PATH))
     {
         TCHAR appfullpath[MAX_PATH];
-        GetFullPathName(apppath,MAX_PATH,appfullpath,NULL);
+        GetFullPathName(apppath, MAX_PATH, appfullpath, NULL);
         LPTSTR lpInsertPos = _tcsrchr(appfullpath, PATH_SLASH);
         if (lpInsertPos)
         {

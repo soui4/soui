@@ -695,12 +695,15 @@ IMenuEx *SMenuEx::GetSubMenu(THIS_ int nPos)
     return GetSubMenu(nPos, FALSE);
 }
 
-void SMenuEx::OnMenuEnd(){
+void SMenuEx::OnMenuEnd()
+{
     m_bMenuInitialized = FALSE;
     SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot());
     SMenuExItem *pItem = sobj_cast<SMenuExItem>(pMenuRoot->GetWindow(GSW_FIRSTCHILD));
-    while(pItem){
-        if(pItem->GetSubMenu()){
+    while (pItem)
+    {
+        if (pItem->GetSubMenu())
+        {
             pItem->GetSubMenu()->OnMenuEnd();
         }
         pItem = sobj_cast<SMenuExItem>(pItem->GetWindow(GSW_NEXTSIBLING));
@@ -1043,7 +1046,7 @@ void SMenuEx::OnSelItemChanged(SMenuExItem *pMenuItem, BOOL bByMouse)
         }
         ::SendMessage(s_MenuData->GetOwner(), WM_MENUSELECT, MAKEWPARAM(idx, nFlag), (LPARAM)this);
     }
-    else if(s_MenuData)
+    else if (s_MenuData)
     {
         ::SendMessage(s_MenuData->GetOwner(), WM_MENUSELECT, MAKEWPARAM(0, 0xffff), 0);
     }

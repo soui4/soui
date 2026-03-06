@@ -15,7 +15,6 @@ static const wchar_t *kUnitMap[] = {
     LayoutSize_Unit::kUnit_Sp,
 };
 
-
 Unit SLayoutSize::defUnit = px;
 SLayoutSize::SLayoutSize(float _fSize)
 {
@@ -118,10 +117,13 @@ void SLayoutSize::parseString(const SStringW &strSize)
 {
     if (strSize.IsEmpty())
         return;
-    if(strSize.CompareNoCase(LayoutSize_Style::kSize_WrapContent)==0){
+    if (strSize.CompareNoCase(LayoutSize_Style::kSize_WrapContent) == 0)
+    {
         setWrapContent();
         return;
-    }else if(strSize.CompareNoCase(LayoutSize_Style::kSize_MatchParent)==0 || strSize.CompareNoCase(LayoutSize_Style::kSize_FillParent)==0){
+    }
+    else if (strSize.CompareNoCase(LayoutSize_Style::kSize_MatchParent) == 0 || strSize.CompareNoCase(LayoutSize_Style::kSize_FillParent) == 0)
+    {
         setMatchParent();
         return;
     }

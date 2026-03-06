@@ -2948,7 +2948,8 @@ void SWindow::OnKillFocus(SWND wndFocus)
     OnDecendantFocusChanged(m_swnd, FALSE);
 }
 
-void SWindow::OnDecendantFocusChanged(SWND swnd, BOOL bSet){
+void SWindow::OnDecendantFocusChanged(SWND swnd, BOOL bSet)
+{
     SWindow *pParent = GetParent();
     if (pParent)
     {
@@ -3364,7 +3365,7 @@ BOOL SWindow::IsFocused() const
     return GetContainer()->GetFocus() == m_swnd;
 }
 
-UINT SWindow::OnNcHitTest(const CPoint& pt)
+UINT SWindow::OnNcHitTest(const CPoint &pt)
 {
     CRect rcClient = GetClientRect();
     if (rcClient.PtInRect(pt))
@@ -3372,7 +3373,7 @@ UINT SWindow::OnNcHitTest(const CPoint& pt)
     CRect rcWnd = GetWindowRect();
     if (!rcWnd.PtInRect(pt))
         return HTNOWHERE;
-    if (rcClient.left<pt.x)
+    if (rcClient.left < pt.x)
         return HTLEFT;
     if (rcClient.right > pt.x)
         return HTRIGHT;

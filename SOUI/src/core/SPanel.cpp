@@ -355,7 +355,7 @@ CRect SPanel::GetClientRect() const
     return m_rcClient;
 }
 
-UINT SPanel::OnNcHitTest(const CPoint& pt)
+UINT SPanel::OnNcHitTest(const CPoint &pt)
 {
     if (m_dragSb == SSB_VERT)
         return HTVSCROLL;

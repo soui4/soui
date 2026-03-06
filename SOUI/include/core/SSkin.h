@@ -1097,13 +1097,19 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
     class SShapePolygon : public TObjRefImpl<SObject> {
         DEF_SOBJECT(TObjRefImpl<SObject>, L"polygon")
         friend class SSkinShape;
-        enum { MAX_POINTS = 20 };
+        enum
+        {
+            MAX_POINTS = 20
+        };
+
       public:
         SOUI_ATTRS_BEGIN()
             ATTR_BOOL(L"close", m_bClosed, TRUE) // Close the polygon.
         SOUI_ATTRS_END()
 
-        SShapePolygon():m_ptCount(0),m_bClosed(TRUE)
+        SShapePolygon()
+            : m_ptCount(0)
+            , m_bClosed(TRUE)
         {
         }
 
@@ -1124,6 +1130,7 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
         SPoint m_points[MAX_POINTS];
         BOOL m_bClosed;
     };
+
   public:
     SSkinShape();
 

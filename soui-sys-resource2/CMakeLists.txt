@@ -13,6 +13,7 @@ source_group("Header Files" FILES ${SRC_MAIN})
 source_group("Resource Files" FILES ${RCS_MAIN})
 
 add_library(soui-sys-resource2 SHARED  ${SRC_MAIN} ${RCS_MAIN})
+target_compile_resources(soui-sys-resource2 ${RCS_MAIN})
 if(MSVC)
     string(REPLACE "/RTC1" "" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
     set_target_properties(soui-sys-resource2 PROPERTIES LINK_FLAGS "/NOENTRY") 

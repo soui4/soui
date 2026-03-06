@@ -9,14 +9,14 @@ SNSBEGIN
 
 namespace SComboBox_style
 {
-    static const LPCWSTR kStyle_listStyle = L"listStyle";
-    static const LPCWSTR kStyle_wndclass = L"wndclass";
-    static const LPCWSTR kStyle_items = L"items";
-    static const LPCWSTR kStyle_item = L"item";
-    static const LPCWSTR kStyle_text = L"text";
-    static const LPCWSTR kStyle_icon = L"icon";
-    static const LPCWSTR kStyle_data = L"data";
-}
+static const LPCWSTR kStyle_listStyle = L"listStyle";
+static const LPCWSTR kStyle_wndclass = L"wndclass";
+static const LPCWSTR kStyle_items = L"items";
+static const LPCWSTR kStyle_item = L"item";
+static const LPCWSTR kStyle_text = L"text";
+static const LPCWSTR kStyle_icon = L"icon";
+static const LPCWSTR kStyle_data = L"data";
+} // namespace SComboBox_style
 
 /**
  * @class SComboBox

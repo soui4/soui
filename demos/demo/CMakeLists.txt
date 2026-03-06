@@ -39,6 +39,9 @@ set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.soui.demo")
 set(MACOSX_BUNDLE_BUNDLE_NAME "demo")
 
 add_soui_exe(demo ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${CURRENT_RC} )
+# Compile resource files with windres on Linux
+target_compile_resources(demo ${CURRENT_RC})
+
 if(CMAKE_SYSTEM_NAME MATCHES Darwin)
 # 配置代码签名
 set(MACOSX_CODESIGN_IDENTITY "Apple Development")

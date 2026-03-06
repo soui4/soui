@@ -60,9 +60,12 @@ BOOL SToolBar::CreateChildren(SXmlNode xmlNode)
             item.nId = -1;
             item.dwStyle = TBSTYLE_SEP;
             m_arrItems.Add(item);
-        }else{
-            SWindow *pChild = (SWindow*)SApplication::getSingleton().CreateWindowByName(xmlItem.name());
-            if(pChild){
+        }
+        else
+        {
+            SWindow *pChild = (SWindow *)SApplication::getSingleton().CreateWindowByName(xmlItem.name());
+            if (pChild)
+            {
                 InsertChild(pChild);
                 pChild->InitFromXml(&xmlItem);
                 ToolBarItem item;
@@ -91,11 +94,16 @@ CSize SToolBar::GetItemSize(const CRect &rcWnd, IRenderTarget *pRT, int iItem) c
     const ToolBarItem &item = m_arrItems[iItem];
     if (m_bVert)
     {
-        if(IsSeparator(&item)){
+        if (IsSeparator(&item))
+        {
             szRet.cy = GetSepWid();
-        }else if(item.pChild){
-            item.pChild->GetDesiredSize(&szRet,rcWnd.Width(),SIZE_WRAP_CONTENT);
-        }else{
+        }
+        else if (item.pChild)
+        {
+            item.pChild->GetDesiredSize(&szRet, rcWnd.Width(), SIZE_WRAP_CONTENT);
+        }
+        else
+        {
             CSize szIcon;
             if (item.icon)
                 szIcon = item.icon->Size();
@@ -117,9 +125,11 @@ CSize SToolBar::GetItemSize(const CRect &rcWnd, IRenderTarget *pRT, int iItem) c
         {
             szRet = CSize(GetSepWid(), rcWnd.Height());
         }
-        else if(item.pChild){
-            item.pChild->GetDesiredSize(&szRet,SIZE_WRAP_CONTENT,rcWnd.Height());
-        }else
+        else if (item.pChild)
+        {
+            item.pChild->GetDesiredSize(&szRet, SIZE_WRAP_CONTENT, rcWnd.Height());
+        }
+        else
         {
             CSize szIcon;
             if (item.icon)
@@ -464,7 +474,7 @@ void SToolBar::OnPaint(IRenderTarget *pRT)
 {
     SPainter painter;
     BeforePaint(pRT, painter);
-    
+
     CRect rcClient = GetClientRect();
     CRect rcItem = rcClient;
     int nSep = GetSepWid();
@@ -859,7 +869,7 @@ void SToolBar::ShowDropDownMenu(const CRect &rc)
     menu.LoadMenu2(&xmlNode);
     for (int i = m_nVisibleItems; i < m_arrItems.GetCount(); i++)
     {
-        if(m_arrItems[i].pChild)
+        if (m_arrItems[i].pChild)
             continue;
         UINT uFlag = IsSeparator(&m_arrItems[i]) ? MF_SEPARATOR : MF_STRING;
         if (m_arrItems[i].dwState & WndState_Check)
@@ -1098,7 +1108,7 @@ BOOL SToolBar::OnItemHover(int iItem)
         return FALSE;
     BOOL ret = FALSE;
     ToolBarItem &item = m_arrItems[iItem];
-    if (!((item.dwState & WndState_Disable)|| (item.dwStyle & TBSTYLE_CHECK) && (item.dwState & WndState_Check) || item.pChild))
+    if (!((item.dwState & WndState_Disable) || (item.dwStyle & TBSTYLE_CHECK) && (item.dwState & WndState_Check) || item.pChild))
     {
         item.dwState |= WndState_Hover;
         CRect rc = GetItemRect(iItem);
@@ -1133,7 +1143,7 @@ void SToolBar::OnItemLeave(int iItem)
     ToolBarItem &item = m_arrItems[iItem];
     if ((item.dwStyle & TBSTYLE_CHECK) && (item.dwState & WndState_Check))
         return;
-    if(item.pChild)
+    if (item.pChild)
         return;
     item.dwState &= ~WndState_Hover;
     CRect rc = GetItemRect(iItem);
@@ -1236,9 +1246,9 @@ BOOL SToolBar::SetItemChild(int iItem, SWindow *pChild)
 {
     if (iItem < 0 || iItem >= (int)m_arrItems.GetCount())
         return FALSE;
-    
+
     ToolBarItem &item = m_arrItems[iItem];
-    
+
     // Remove old child if exists
     if (item.pChild)
     {
@@ -1246,10 +1256,10 @@ BOOL SToolBar::SetItemChild(int iItem, SWindow *pChild)
         DestroyChild(item.pChild);
         item.pChild = NULL;
     }
-    
+
     if (!pChild)
         return TRUE;
-    
+
     // Set new child
     item.pChild = pChild;
     InsertChild(pChild);
@@ -1257,11 +1267,11 @@ BOOL SToolBar::SetItemChild(int iItem, SWindow *pChild)
     return TRUE;
 }
 
-SWindow* SToolBar::GetItemChild(int iItem) const
+SWindow *SToolBar::GetItemChild(int iItem) const
 {
     if (iItem < 0 || iItem >= (int)m_arrItems.GetCount())
         return NULL;
-    
+
     return m_arrItems[iItem].pChild;
 }
 void SToolBar::UpdateChildrenPosition()

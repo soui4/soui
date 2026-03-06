@@ -174,13 +174,15 @@ LRESULT SIPAddressCtrl::OnCreate(LPVOID)
         = L"<ipedit margin=\"0\" number=\"1\" transparent=\"1\" align=\"center\" maxBuf=\"3\" mouseRelay=\"1\"/>";
     SXmlDoc xmlDoc;
     xmlDoc.load_buffer(szEditAttr, sizeof(szEditAttr));
+    SXmlNode xmlNode = xmlDoc.root().first_child();
     for (int i = 0; i < 4; i++)
     {
-        m_editFields[i] = new SEditIP; //直接new出来。
-        InsertChild(m_editFields[i]);
-        SXmlNode xmlNode = xmlDoc.root().first_child();
-        m_editFields[i]->InitFromXml(&xmlNode);
-        m_editFields[i]->SetField(m_ipFields[i]);
+        SAutoRefPtr<SEditIP> pEdit = new SEditIP; //直接new出来。
+        InsertChild(pEdit);
+        if(!pEdit->InitFromXml(&xmlNode))
+            return -1;
+        pEdit->SetField(m_ipFields[i]);
+        m_editFields[i] = pEdit;
     }
     return 0;
 }

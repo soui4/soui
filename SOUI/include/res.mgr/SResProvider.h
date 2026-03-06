@@ -36,8 +36,6 @@ class SOUI_EXP SResLoadFromMemory {
     static IImgX *LoadImgX(LPVOID pBuf, size_t size);
 };
 
-#ifdef _WIN32
-
 /**
  * @class SResProviderPE
  * @brief Resource provider for resources embedded in a PE file (Windows-specific).
@@ -162,8 +160,6 @@ class SOUI_EXP SResProviderPE : public TObjRefImpl<IResProvider> {
     HINSTANCE m_hResInst; // Handle to the resource instance
     BOOL m_bOwner;        // Flag indicating if the instance is owned
 };
-
-#endif // _WIN32
 
 /**
  * @class SResLoadFromFile

@@ -2311,60 +2311,74 @@ LRESULT SHostWnd::OnInitMenuPopup(UINT uMsg, WPARAM wp, LPARAM lp)
     }
     else
     {
-        InitMenuExPopup((SMenuEx*)wp, (UINT)lp);
+        InitMenuExPopup((SMenuEx *)wp, (UINT)lp);
     }
     SetMsgHandled(FALSE);
     return 0;
 }
 
-LRESULT SHostWnd::OnMenuSelect(UINT uMsg,WPARAM wp, LPARAM lp)
+LRESULT SHostWnd::OnMenuSelect(UINT uMsg, WPARAM wp, LPARAM lp)
 {
     HMENU hMenu = (HMENU)lp;
     int uItem = (int)LOWORD(wp);
     int uFlags = (int)HIWORD(wp);
-    if (uFlags == 0xFFFF && hMenu == NULL) {
+    if (uFlags == 0xFFFF && hMenu == NULL)
+    {
         EventUpdateCmdTip evt(GetRoot());
         evt.iIndex = -1;
         evt.nCmdId = -1;
         evt.strTip = NULL;
         GetRoot()->FireEvent(&evt);
-    } 
-    else if (hMenu != NULL) 
+    }
+    else if (hMenu != NULL)
     {
         TCHAR szText[256];
         SStringT strTip;
         EventUpdateCmdTip evt(GetRoot());
         evt.strTip = NULL;
-        if(IsMenu(hMenu)){
-            //smenu.
-            if(uFlags & MF_POPUP){
+        if (IsMenu(hMenu))
+        {
+            // smenu.
+            if (uFlags & MF_POPUP)
+            {
                 evt.iIndex = uItem;
                 evt.nCmdId = -1;
-                GetMenuString (hMenu, uItem, szText, sizeof(szText) / sizeof(TCHAR), MF_BYPOSITION);
+                GetMenuString(hMenu, uItem, szText, sizeof(szText) / sizeof(TCHAR), MF_BYPOSITION);
                 strTip = szText;
                 evt.strTip = &strTip;
-            }else{
+            }
+            else
+            {
                 int nCount = GetMenuItemCount(hMenu);
-                for(int i=0;i<nCount;i++){
-                    if(::GetMenuItemID(hMenu, i) == uItem){
+                for (int i = 0; i < nCount; i++)
+                {
+                    if (::GetMenuItemID(hMenu, i) == uItem)
+                    {
                         evt.iIndex = i;
                         break;
                     }
                 }
                 evt.nCmdId = uItem;
             }
-        }else{
-            //sMenuEx
-            SMenuEx *pMenu = (SMenuEx*)hMenu;
-            if(uFlags & MF_POPUP){
+        }
+        else
+        {
+            // sMenuEx
+            SMenuEx *pMenu = (SMenuEx *)hMenu;
+            if (uFlags & MF_POPUP)
+            {
                 evt.iIndex = uItem;
                 evt.nCmdId = -1;
-                pMenu->GetMenuString(uItem,MF_BYPOSITION,&strTip);
+                pMenu->GetMenuString(uItem, MF_BYPOSITION, &strTip);
                 evt.strTip = &strTip;
-            }else{
+            }
+            else
+            {
                 int nCount = pMenu->GetMenuItemCount();
-                for(int i=0;i<nCount;i++){
-                    if(pMenu->GetMenuItem(i,FALSE)->GetID() == uItem){
+                for (int i = 0; i < nCount; i++)
+                {
+                    if (pMenu->GetMenuItem(i, FALSE)->GetID() == uItem)
+                    {
                         evt.iIndex = i;
                         break;
                     }

@@ -305,6 +305,7 @@ void CatchLeaks(void)
 	}
 }
 
+#ifdef _BUILD_DLL
 void* _cdecl operator new (size_t size, char *szFile, int line)
 {
 	TRACEBEGIN(TRCSUBSYSEDIT, TRCSCOPEINTERN, "new");
@@ -318,10 +319,11 @@ void _cdecl operator delete (void* pv)
 
 	W32->FreePvDebug(pv);
 }
+#endif //_BUILD_DLL
 
 #else //DEBUG
 
-#if defined(_WIN32) && defined(_DLL)
+#if defined(_WIN32) && defined(_BUILD_DLL)
 void* _cdecl operator new (size_t size)
 {
 	TRACEBEGIN(TRCSUBSYSEDIT, TRCSCOPEINTERN, "new");

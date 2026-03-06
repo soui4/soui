@@ -160,7 +160,7 @@ typedef enum _SOUI_EVENTS
     EVT_TB_ITEMCLICK = 22180, // 工具栏项点击事件
 
     EVT_UPDATE_ITEMTIP = 22190, ///< 更新项提示事件
-    EVT_UPDATE_CMDUI = 22191, ///< 更新命令UI事件
+    EVT_UPDATE_CMDUI = 22191,   ///< 更新命令UI事件
 
     EVT_EXTERNAL_BEGIN = 10000000, ///< 外部事件开始ID
 } SOUI_EVENTS;
@@ -780,11 +780,11 @@ DEF_EVT(EventUpdateCmdTip, EVT_UPDATE_ITEMTIP, on_update_cmd_tip, {
     const IStringT *strTip;
 })
 
-DEF_EVT(EventUpdateCmdUI, EVT_UPDATE_CMDUI, on_update_cmd_ui, { 
+DEF_EVT(EventUpdateCmdUI, EVT_UPDATE_CMDUI, on_update_cmd_ui, {
     int iIndex;
     int nCmdId;
     BOOL bEnable;
-    BOOL bChecked; 
+    BOOL bChecked;
 })
 
 SNSEND

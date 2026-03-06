@@ -24,10 +24,10 @@ SNSBEGIN
 
 namespace STileView_style
 {
-    static const LPCWSTR kStyle_template = L"template";
-    static const LPCWSTR kStyle_itemHeight = L"itemHeight";
-    static const LPCWSTR kStyle_itemWidth = L"itemWidth";
-}
+static const LPCWSTR kStyle_template = L"template";
+static const LPCWSTR kStyle_itemHeight = L"itemHeight";
+static const LPCWSTR kStyle_itemWidth = L"itemWidth";
+} // namespace STileView_style
 
 /**
  * @class STileView

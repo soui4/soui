@@ -12,7 +12,7 @@ SNSBEGIN
 
 namespace STreeView_style
 {
-    static const LPCWSTR kStyle_template = L"template";
+static const LPCWSTR kStyle_template = L"template";
 }
 
 /**

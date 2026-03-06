@@ -747,7 +747,7 @@ void SSkinShape::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BY
     }
 
     CPoint ptCorner = GetCornerSize(rcDest);
-    POINT pts[SShapePolygon::MAX_POINTS+1];
+    POINT pts[SShapePolygon::MAX_POINTS + 1];
 
     if (pBrush)
     {
@@ -763,10 +763,11 @@ void SSkinShape::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BY
         case oval:
             pRT->FillEllipse(&rcDest);
             break;
-        case ring://do nothing
+        case ring: // do nothing
             break;
         case polygon:
-            if(m_polygon){
+            if (m_polygon)
+            {
                 int wid = rcDraw->right - rcDraw->left;
                 int hei = rcDraw->bottom - rcDraw->top;
                 for (int i = 0; i < m_polygon->GetPoints(); i++)
@@ -774,8 +775,8 @@ void SSkinShape::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BY
                     pts[i].x = m_polygon->m_points[i].fX * wid + rcDraw->left;
                     pts[i].y = m_polygon->m_points[i].fY * hei + rcDraw->top;
                 }
-                if(m_polygon->IsClosed())
-                   pRT->FillPolygon(pts, m_polygon->GetPoints());
+                if (m_polygon->IsClosed())
+                    pRT->FillPolygon(pts, m_polygon->GetPoints());
             }
             break;
         }
@@ -812,9 +813,11 @@ void SSkinShape::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BY
         }
         break;
         case polygon:
-            if(m_polygon){
+            if (m_polygon)
+            {
                 int ptCount = m_polygon->GetPoints();
-                if(m_polygon->IsClosed()){
+                if (m_polygon->IsClosed())
+                {
                     pts[ptCount++] = pts[0];
                 }
                 pRT->DrawPolygon(pts, ptCount);
@@ -933,10 +936,12 @@ void SSkinShape::SShapePolygon::OnInitFinished(IXmlNode *pNode)
     SXmlNode xmlNode(pNode);
     SXmlNode xmlPoint = xmlNode.child(L"point");
     int i = 0;
-    while(xmlPoint){
+    while (xmlPoint)
+    {
         SPoint pt;
         SStringW value = xmlPoint.attribute(L"value").as_string();
-        if(swscanf_s(value.c_str(), L"%f,%f", &pt.fX, &pt.fY) == 2){
+        if (swscanf_s(value.c_str(), L"%f,%f", &pt.fX, &pt.fY) == 2)
+        {
             m_points[i++] = pt;
         }
         xmlPoint = xmlPoint.next_sibling(L"point");

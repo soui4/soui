@@ -180,8 +180,9 @@ class SOUI_EXP SHostWndAttr : public TObjRefImpl<SObject> {
     HICON m_hAppIconBig;
 };
 
-enum{
-      ROOT_ID = -100, // The ID of the root window
+enum
+{
+    ROOT_ID = -100, // The ID of the root window
 };
 
 /**
@@ -195,6 +196,7 @@ class SOUI_EXP SRootWindow : public SWindow {
     DEF_SOBJECT(SWindow, L"root")
     // Declare SHostWnd as a friend class to allow access to private members
     friend class SHostWnd;
+
   public:
     /**
      * @brief Constructor for SRootWindow.
@@ -244,6 +246,7 @@ class SOUI_EXP SRootWindow : public SWindow {
     {
         return ROOT_ID;
     }
+
   protected:
     /**
      * @brief Called when an animation stops.
@@ -1398,7 +1401,7 @@ class SOUI_EXP SHostWnd
      * @brief Handles the WM_INITMENUPOPUP message.
      * @param uMsg WM_INITMENUPOPUP message identifier.
      */
-    LRESULT OnInitMenuPopup(UINT uMsg,WPARAM wp, LPARAM lp);
+    LRESULT OnInitMenuPopup(UINT uMsg, WPARAM wp, LPARAM lp);
 
     /**
      * @brief Handles the WM_INITMENUPOPUP message for SMenu.
@@ -1415,7 +1418,7 @@ class SOUI_EXP SHostWnd
      * @param menuPopup Menu popup pointer.
      * @param nIndex Index of the menu item.
      */
-    void InitMenuExPopup(SMenuEx* menuPopup, UINT nIndex);
+    void InitMenuExPopup(SMenuEx *menuPopup, UINT nIndex);
 
     /**
      * @brief Handles the WM_MENUSELECT message.
@@ -1462,8 +1465,8 @@ class SOUI_EXP SHostWnd
         MESSAGE_HANDLER_EX(WM_GETOBJECT, OnGetObject)
         MSG_WM_COMMAND(OnCommand)
         MSG_WM_SYSCOMMAND(OnSysCommand)
-        MESSAGE_HANDLER_EX(WM_INITMENUPOPUP,OnInitMenuPopup)
-        MESSAGE_HANDLER_EX(WM_MENUSELECT,OnMenuSelect)
+        MESSAGE_HANDLER_EX(WM_INITMENUPOPUP, OnInitMenuPopup)
+        MESSAGE_HANDLER_EX(WM_MENUSELECT, OnMenuSelect)
         MESSAGE_HANDLER_EX(UM_UPDATEFONT, OnUpdateFont)
         MESSAGE_HANDLER_EX(UM_SETLANGUAGE, OnSetLanguage)
         MESSAGE_HANDLER_EX(UM_RUN_TASKS, OnRunTasks)

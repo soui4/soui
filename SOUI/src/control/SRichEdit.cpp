@@ -1106,6 +1106,7 @@ SRichEdit::SRichEdit()
     , m_dwStyle(ES_LEFT | ES_AUTOHSCROLL)
     , m_byDbcsLeadByte(0)
     , m_nFontHeight(10)
+    , m_pTxtHost(NULL)
 {
     m_pNcSkin = GETBUILTINSKIN(SKIN_SYS_BORDER);
 
@@ -1116,7 +1117,9 @@ SRichEdit::SRichEdit()
     m_evtSet.addEvent(EVENTID(EventREMenu));
 }
 
-SRichEdit::~SRichEdit(){}
+SRichEdit::~SRichEdit()
+{
+}
 
 int SRichEdit::OnCreate(LPVOID)
 {
@@ -1891,7 +1894,7 @@ void SRichEdit::OnSetFont(IFontS *pFont, BOOL bRedraw)
 {
     if (SUCCEEDED(InitDefaultCharFormat(&m_cfDef, pFont)))
     {
-        if(m_pTxtHost)
+        if (m_pTxtHost)
             m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_CHARFORMATCHANGE, TXTBIT_CHARFORMATCHANGE);
     }
 }

@@ -50,7 +50,6 @@ IImgX *SResLoadFromMemory::LoadImgX(LPVOID pBuf, size_t size)
     return pImgX;
 }
 
-#ifdef _WIN32
 //////////////////////////////////////////////////////////////////////////
 SResProviderPE::SResProviderPE()
     : m_hResInst(0)
@@ -267,7 +266,6 @@ void SResProviderPE::EnumFile(THIS_ EnumFileCallback funEnumCB, LPARAM lp)
     EnumResourceTypes(m_hResInst, EnumResTypeProc2, (LONG_PTR)&param);
 }
 
-#endif //_WIN32
 //////////////////////////////////////////////////////////////////////////
 //
 

@@ -283,7 +283,7 @@ BOOL SMessageLoop::RunIdle()
     MSG msg;
     while (!m_bQuit && m_bDoIdle)
     {
-        if(PeekMsg(&msg, 0, 0, FALSE))
+        if (PeekMsg(&msg, 0, 0, FALSE))
             return FALSE;
         m_bDoIdle = OnIdle(m_nIdleCount++);
         if (m_bDoIdle)

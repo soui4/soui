@@ -69,36 +69,12 @@ __int64 GetLastWriteTime(LPCWSTR pszFileName)
     return tmFile;
 }
 
-//将单反斜扛转换成双反斜扛
+//将反斜扛转换成正斜扛
 wstring BuildPath(LPCWSTR pszPath)
 {
-	LPCWSTR p=pszPath;
-	WCHAR szBuf[MAX_PATH*2]={0};
-	WCHAR *p2=szBuf;
-	while(*p)
-	{
-		if(*p==L'\\')
-		{
-			if(*(p+1)!=L'\\')
-			{//单斜扛
-				p2[0]=p2[1]=L'\\';
-				p++;
-				p2+=2;
-			}else
-			{//已经是双斜扛
-				p2[0]=p2[1]=L'\\';
-				p+=2;
-				p2+=2;
-			}
-		}else
-		{
-			*p2=*p;
-			p++;
-			p2++;
-		}
-	}
-	*p2=0;
-	return wstring(szBuf);
+	wstring ret(pszPath);
+	std::replace(ret.begin(), ret.end(), L'\\', L'/');
+	return ret;
 }
 
 #define STAMP_FORMAT	L"//stamp:0000000000000000\r\n"

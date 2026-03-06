@@ -12,12 +12,12 @@ SNSBEGIN
 
 namespace SListView_style
 {
-    static const LPCWSTR kStyle_template = L"template";
-    static const LPCWSTR kStyle_itemHeight = L"itemHeight";
-    static const LPCWSTR kStyle_itemWidth = L"itemWidth";
-    static const LPCWSTR kStyle_defHeight = L"defHeight";
-    static const LPCWSTR kStyle_defWidth = L"defWidth";
-}
+static const LPCWSTR kStyle_template = L"template";
+static const LPCWSTR kStyle_itemHeight = L"itemHeight";
+static const LPCWSTR kStyle_itemWidth = L"itemWidth";
+static const LPCWSTR kStyle_defHeight = L"defHeight";
+static const LPCWSTR kStyle_defWidth = L"defWidth";
+} // namespace SListView_style
 
 class SOUI_EXP SListView
     : public TPanelProxy<IListView>

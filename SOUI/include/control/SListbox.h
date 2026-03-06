@@ -9,13 +9,13 @@ SNSBEGIN
 
 namespace SListBox_style
 {
-    static const LPCWSTR kStyle_items = L"items";
-    static const LPCWSTR kStyle_item = L"item";
-    static const LPCWSTR kStyle_curSel = L"curSel";
-    static const LPCWSTR kStyle_icon = L"icon";
-    static const LPCWSTR kStyle_data = L"data";
-    static const LPCWSTR kStyle_text = L"text";
-}
+static const LPCWSTR kStyle_items = L"items";
+static const LPCWSTR kStyle_item = L"item";
+static const LPCWSTR kStyle_curSel = L"curSel";
+static const LPCWSTR kStyle_icon = L"icon";
+static const LPCWSTR kStyle_data = L"data";
+static const LPCWSTR kStyle_text = L"text";
+} // namespace SListBox_style
 
 /**
  * @struct tagLBITEM

@@ -59,7 +59,11 @@
 static const TCHAR *kPath_SysRes = _T("/../../soui-sys-resource");
 static const TCHAR *kPath_UiRes = _T("/uires");
 
+#ifdef _WIN32
 #define SYS_NAMED_RESOURCE _T("soui-sys-resource.dll")
+#else
+#define SYS_NAMED_RESOURCE _T("soui-sys-resource.so")
+#endif
 
 #include <controls.extend/smiley/SSmileyCtrl.h>
 #include "skin/SSkinLoader.h"
@@ -169,6 +173,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
     {
         return 0;
     }
+    
     SApplication2 app(hInstance);
     SAppCfg cfg;
     cfg.SetRender(nType == IDYES ? Render_Skia : Render_Gdi)
@@ -181,7 +186,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 #endif // DLL_CORE
 
 // 加载系统资源
-#ifdef _WIN32
+#ifdef ENABLE_BUILD_RESOURCE
 #if (defined(LIB_CORE) && defined(LIB_SOUI_COM))
     cfg.SetSysResPeHandle(hInstance);
 #else
@@ -194,8 +199,9 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
     static const TCHAR *kPath_SysRes = _T("/../../soui-sys-resource");
 #endif //__APPLE__
     cfg.SetSysResFile(appDir + kPath_SysRes);
-#endif
-#if defined(_WIN32) && (RES_TYPE == RESTYPE_PE) // 从EXE资源加载
+#endif//ENABLE_BUILD_RESOURCE
+
+#ifdef ENABLE_BUILD_RESOURCE
     cfg.SetAppResPeHandle(hInstance);
 #elif (RES_TYPE == RESTYPE_ZIP) // 从ZIP包加载
     cfg.SetAppResZipFile(appDir + _T("/uires.zip"), "souizip");
@@ -203,7 +209,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
     cfg.SetAppRes7ZipFile(appDir + _T("/uires.zip"), "souizip");
 #else // #if (RES_TYPE == RESTYPE_FILE)//从文件加载
     cfg.SetAppResFile(appDir + _T("/uires"));
-#endif
+#endif//ENABLE_BUILD_RESOURCE
 
     // 向SApplication系统中注册由外部扩展的控件及SkinObj类
     app.RegisterSkinClass<SSkinAni>();          // 注册SkinGif

@@ -139,11 +139,11 @@ class SouiLayoutParam
     HRESULT OnAttrOffset(const SStringW &strValue, BOOL bLoading);
 
     SOUI_ATTRS_BEGIN()
-        ATTR_LAYOUTSIZE(L"width", width,TRUE)   // 宽度
-        ATTR_LAYOUTSIZE(L"height", height,TRUE) // 高度
-        ATTR_CUSTOM(L"pos", OnAttrPos)       // 位置
-        ATTR_CUSTOM(L"size", OnAttrSize)     // 大小
-        ATTR_CUSTOM(L"offset", OnAttrOffset) // 偏移
+        ATTR_LAYOUTSIZE(L"width", width, TRUE)   // 宽度
+        ATTR_LAYOUTSIZE(L"height", height, TRUE) // 高度
+        ATTR_CUSTOM(L"pos", OnAttrPos)           // 位置
+        ATTR_CUSTOM(L"size", OnAttrSize)         // 大小
+        ATTR_CUSTOM(L"offset", OnAttrOffset)     // 偏移
         ATTR_FLOAT(L"offsetX", fOffsetX, TRUE)
         ATTR_FLOAT(L"offsetY", fOffsetY, TRUE)
     SOUI_ATTRS_BREAK()

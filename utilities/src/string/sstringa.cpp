@@ -14,11 +14,7 @@ SNSBEGIN
 
 int char_traits::LoadString(HINSTANCE hInst, UINT uID, char* lpBuffer, int nBufferMax)
 {
-#ifdef _WIN32
 	return ::LoadStringA(hInst, uID, lpBuffer, nBufferMax);
-#else
-	return 0;
-#endif
 }
 
 int char_traits::Format(char** ppszDst, const char* pszFormat, va_list & args)

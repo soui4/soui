@@ -312,7 +312,7 @@ void SwndContainerImpl::OnFrameMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lPara
         if (m_uNcHitTest != HTCLIENT)
         {
             uMsg += (UINT)WM_NCMOUSEFIRST - WM_MOUSEFIRST; //转换成NC对应的消息
-            wParam = m_uNcHitTest; // 使用m_uNcHitTest作为wparam
+            wParam = m_uNcHitTest;                         // 使用m_uNcHitTest作为wparam
         }
         BOOL bMsgHandled = FALSE;
         CPoint pt(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
@@ -332,7 +332,7 @@ void SwndContainerImpl::OnFrameMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lPara
             if (m_uNcHitTest != HTCLIENT)
             {
                 uMsg += (UINT)WM_NCMOUSEFIRST - WM_MOUSEFIRST; //转换成NC对应的消息
-                wParam = m_uNcHitTest; // 使用m_uNcHitTest作为wparam
+                wParam = m_uNcHitTest;                         // 使用m_uNcHitTest作为wparam
             }
             lParam = MAKELPARAM(pt.x, pt.y);
             pHover->SSendMessage(uMsg, wParam, lParam, &bMsgHandled);

@@ -15,10 +15,12 @@ class SOUI_EXP SDockBar : public SWindow {
   public:
     STDMETHOD_(BOOL, IsDisplay)(THIS) SCONST OVERRIDE;
     STDMETHOD_(void, GetChildrenLayoutRect)(THIS_ RECT *prc) SCONST OVERRIDE;
+
   protected:
     void OnDecendantFocusChanged(SWND swnd, BOOL bSet) override;
     BOOL OnSetCursor(const CPoint &pt) override;
     UINT OnNcHitTest(const CPoint &pt) override;
+
   public:
     SOUI_ATTRS_BEGIN()
         ATTR_SKIN(L"captionSkin", m_skinCaption, TRUE)
@@ -37,7 +39,7 @@ class SOUI_EXP SDockBar : public SWindow {
     void OnNcLButtonDown(UINT nHitTest, CPoint point);
     void OnNcLButtonUp(UINT nHitTest, CPoint point);
     void OnNcMouseMove(UINT nHitTest, CPoint point);
- 
+
     SOUI_MSG_MAP_BEGIN()
         MSG_WM_PAINT_EX(OnPaint)
         MSG_WM_LBUTTONDOWN(OnLButtonDown)
@@ -65,7 +67,7 @@ class SOUI_EXP SDockBar : public SWindow {
     BOOL m_bActive;
     BOOL m_bResizable;
     SLayoutSize m_nCaptionHeight;
-    
+
     int m_nResizeHitTest;
     BOOL m_bIsResizing;
     CPoint m_ptResizeStart;

@@ -5,21 +5,21 @@ SNSBEGIN
 
 namespace SToolBar_style
 {
-    static const LPCWSTR kStyle_data = L"data";
-    static const LPCWSTR kStyle_item = L"item";
-    static const LPCWSTR kStyle_sep = L"sep";
-    static const LPCWSTR kStyle_iconIndex = L"iconIndex";
-    static const LPCWSTR kStyle_id = L"id";
-    static const LPCWSTR kStyle_dataAttr = L"data";
-    static const LPCWSTR kStyle_text = L"text";
-    static const LPCWSTR kStyle_tip = L"tip";
-    static const LPCWSTR kStyle_disable = L"disable";
-    static const LPCWSTR kStyle_check = L"check";
-    static const LPCWSTR kStyle_dropdown = L"dropdown";
-    static const LPCWSTR kStyle_showText = L"showText";
-    static const LPCWSTR kStyle_checked = L"checked";
-    static const LPCWSTR kStyle_menuStyle = L"menuStyle";
-}
+static const LPCWSTR kStyle_data = L"data";
+static const LPCWSTR kStyle_item = L"item";
+static const LPCWSTR kStyle_sep = L"sep";
+static const LPCWSTR kStyle_iconIndex = L"iconIndex";
+static const LPCWSTR kStyle_id = L"id";
+static const LPCWSTR kStyle_dataAttr = L"data";
+static const LPCWSTR kStyle_text = L"text";
+static const LPCWSTR kStyle_tip = L"tip";
+static const LPCWSTR kStyle_disable = L"disable";
+static const LPCWSTR kStyle_check = L"check";
+static const LPCWSTR kStyle_dropdown = L"dropdown";
+static const LPCWSTR kStyle_showText = L"showText";
+static const LPCWSTR kStyle_checked = L"checked";
+static const LPCWSTR kStyle_menuStyle = L"menuStyle";
+} // namespace SToolBar_style
 
 struct ToolBarItem
 {
@@ -31,12 +31,12 @@ struct ToolBarItem
     int dwState;
     int dwStyle; // Item style flags (TBSTYLE_*)
     SAutoRefPtr<IBitmapS> icon;
-    
+
     // Animation support for item hover/leave state
-    BYTE byAlphaAni;  // Animation alpha value, 0xFF means not animating
-    
+    BYTE byAlphaAni; // Animation alpha value, 0xFF means not animating
+
     // Child control support
-    SAutoRefPtr<SWindow> pChild;  // Optional child control for this item
+    SAutoRefPtr<SWindow> pChild; // Optional child control for this item
 
     ToolBarItem()
         : nId(0)
@@ -49,7 +49,10 @@ struct ToolBarItem
     }
 };
 
-class SOUI_EXP SToolBar : public SWindow, public ITimelineHandler, public IIdleHandler {
+class SOUI_EXP SToolBar
+    : public SWindow
+    , public ITimelineHandler
+    , public IIdleHandler {
     DEF_SOBJECT(SWindow, L"toolbar")
   public:
     SToolBar(void);
@@ -95,7 +98,7 @@ class SOUI_EXP SToolBar : public SWindow, public ITimelineHandler, public IIdleH
     void SetMenuStyle(SXmlNode xmlMenuStyle);
 
     CRect GetItemRect(int iItem) const;
-    
+
     // Child control management methods
     /**
      * Create a child control for toolbar item
@@ -104,17 +107,18 @@ class SOUI_EXP SToolBar : public SWindow, public ITimelineHandler, public IIdleH
      * @return TRUE if successful
      */
     BOOL SetItemChild(int iItem, SWindow *pChild);
-    
+
     /**
      * Get the child control of a toolbar item
      * @param iItem Item index
      * @return Child window pointer or NULL if no child
      */
-    SWindow* GetItemChild(int iItem) const;
+    SWindow *GetItemChild(int iItem) const;
 
   protected:
-        STDMETHOD_(void, OnNextFrame)(THIS) OVERRIDE; // ITimelineHandler interface
-        STDMETHOD_(BOOL, OnIdle)(THIS_ int iRun) OVERRIDE;
+    STDMETHOD_(void, OnNextFrame)(THIS) OVERRIDE; // ITimelineHandler interface
+    STDMETHOD_(BOOL, OnIdle)(THIS_ int iRun) OVERRIDE;
+
   public:
     SOUI_ATTRS_BEGIN()
         ATTR_SKIN(L"iconSkin", m_skinIcons, TRUE)
@@ -138,7 +142,8 @@ class SOUI_EXP SToolBar : public SWindow, public ITimelineHandler, public IIdleH
     void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer) override;
 
   protected:
-      STDMETHOD_(void, UpdateChildrenPosition)(THIS) OVERRIDE;
+    STDMETHOD_(void, UpdateChildrenPosition)(THIS) OVERRIDE;
+
   protected:
     void OnPaint(IRenderTarget *pRT);
     void OnLButtonDown(UINT nFlags, CPoint pt);
@@ -182,25 +187,25 @@ class SOUI_EXP SToolBar : public SWindow, public ITimelineHandler, public IIdleH
      * @param iItem Item index
      */
     void ShowItemDropDownMenu(const CRect &rc, int iItem);
-    
+
     /**
      * Handle item hover animation
      * @param iItem Item index
      */
     BOOL OnItemHover(int iItem);
-    
+
     /**
      * Handle item leave animation
      * @param iItem Item index
      */
     void OnItemLeave(int iItem);
-    
+
     /**
      * Stop animation for a specific item
      * @param iItem Item index
      */
     void StopItemAnimate(int iItem);
-    
+
   protected:
     SAutoRefPtr<ISkinObj> m_skinState;
     SAutoRefPtr<ISkinObj> m_skinIcons;
@@ -213,15 +218,15 @@ class SOUI_EXP SToolBar : public SWindow, public ITimelineHandler, public IIdleH
     int m_iHoverItem;
     BOOL m_bVert;
     BOOL m_bTextIconVertical; // Whether to arrange text and icon vertically
-    int m_nTextIconInterval;   // Separation between items (in pixels)
+    int m_nTextIconInterval;  // Separation between items (in pixels)
     int m_nMaxItemWidth;
     int m_nVisibleItems;
     DWORD m_dwDropBtnState;
     int m_nMoreButtonSize; // Size of more button (calculated dynamically)
-    
+
     // Animation support
-    BOOL m_bAnimate;    // Enable/disable item animation
-    BYTE m_nAniStep;    // Animation step for alpha value increment
+    BOOL m_bAnimate; // Enable/disable item animation
+    BYTE m_nAniStep; // Animation step for alpha value increment
 };
 
 SNSEND

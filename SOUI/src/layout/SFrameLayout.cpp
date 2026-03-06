@@ -10,13 +10,7 @@ DockPosition SFrameLayoutParam::parseDockPosition(const SStringW &strValue)
         DockPosition dockPos;
         LPCWSTR pszDock;
     } map[] = {
-        { DockNone, L"none" },
-        { DockLeft, L"left" },
-        { DockTop, L"top" },
-        { DockRight, L"right" },
-        { DockBottom, L"bottom" },
-        { DockMainView, L"mainview" },
-        { DockMainView, L"main" },
+        { DockNone, L"none" }, { DockLeft, L"left" }, { DockTop, L"top" }, { DockRight, L"right" }, { DockBottom, L"bottom" }, { DockMainView, L"mainview" }, { DockMainView, L"main" },
     };
 
     for (int i = 0; i < ARRAYSIZE(map); i++)
@@ -28,7 +22,6 @@ DockPosition SFrameLayoutParam::parseDockPosition(const SStringW &strValue)
     }
     return DockNone;
 }
-
 
 HRESULT SFrameLayoutParam::OnAttrSize(const SStringW &strValue, BOOL bLoading)
 {
@@ -58,10 +51,10 @@ void SFrameLayoutParam::Clear()
     height.setWrapContent();
     dockPos = DockNone;
     strDockRelativeTo.Empty();
-    extend_left.setSize(0,px);
-    extend_right.setSize(0,px);
-    extend_top.setSize(0,px);
-    extend_bottom.setSize(0,px);
+    extend_left.setSize(0, px);
+    extend_right.setSize(0, px);
+    extend_top.setSize(0, px);
+    extend_bottom.setSize(0, px);
     weight = 0.0f;
     gravity = G_Left;
 }
@@ -229,7 +222,6 @@ DockMode SFrameLayout::GetEnableDockMode() const
     return m_enableDockMode;
 }
 
-
 DockMode SFrameLayout::parseDockMode(const SStringW &strValue)
 {
     struct ValueMap
@@ -237,12 +229,7 @@ DockMode SFrameLayout::parseDockMode(const SStringW &strValue)
         DockMode dockMode;
         LPCWSTR pszMode;
     } map[] = {
-        { DockMode_None, L"none" },
-        { DockMode_Left, L"left" },
-        { DockMode_Top, L"top" },
-        { DockMode_Right, L"right" },
-        { DockMode_Bottom, L"bottom" },
-        { DockMode_Any, L"any" },
+        { DockMode_None, L"none" }, { DockMode_Left, L"left" }, { DockMode_Top, L"top" }, { DockMode_Right, L"right" }, { DockMode_Bottom, L"bottom" }, { DockMode_Any, L"any" },
     };
 
     for (int i = 0; i < ARRAYSIZE(map); i++)
@@ -280,7 +267,7 @@ void SFrameLayout::CollectChildren(const IWindow *pParent, SList<ChildInfo> &lst
             ChildInfo info;
             info.pWnd = (IWindow *)pChild;
             info.pParam = (SFrameLayoutParam *)pChild->GetLayoutParam();
-            
+
             // 检查子dockbar的dockPos是否与父布局的enableDockMode匹配
             bool bDockModeMatch = false;
             switch (info.pParam->dockPos)
@@ -302,7 +289,7 @@ void SFrameLayout::CollectChildren(const IWindow *pParent, SList<ChildInfo> &lst
                 bDockModeMatch = true; // mainview和none模式不受dockMode限制
                 break;
             }
-            
+
             if (bDockModeMatch)
             {
                 lstChildren.AddTail(info);
@@ -350,7 +337,7 @@ SIZE SFrameLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeig
         ChildInfo &info = lstChildren.GetNext(pos);
         if (!info.pWnd->IsVisible(TRUE))
             continue;
-            
+
         CSize sz = MeasureChild(info, SIZE_WRAP_CONTENT, SIZE_WRAP_CONTENT);
 
         if (info.pParam->dockPos == DockMainView)
@@ -380,7 +367,7 @@ void SFrameLayout::LayoutDockTopBottom(IWindow *pParent, SList<ChildInfo *> &lst
 {
     int nTotalHeight = 0;
     SList<ChildInfo *> lstOrdered;
-    
+
     // 处理相对停靠关系
     SList<ChildInfo *> lstRemaining = lstChildren;
     while (!lstRemaining.IsEmpty())
@@ -390,7 +377,7 @@ void SFrameLayout::LayoutDockTopBottom(IWindow *pParent, SList<ChildInfo *> &lst
         {
             SPOSITION posCurrent = pos;
             ChildInfo *pInfo = lstRemaining.GetNext(pos);
-            
+
             if (pInfo->pParam->strDockRelativeTo.IsEmpty())
             {
                 lstOrdered.AddTail(pInfo);
@@ -402,8 +389,8 @@ void SFrameLayout::LayoutDockTopBottom(IWindow *pParent, SList<ChildInfo *> &lst
                 SPOSITION posOrdered = lstOrdered.GetHeadPosition();
                 while (posOrdered)
                 {
-                    ChildInfo *pOrderedInfo = lstOrdered.GetNext(posOrdered);  
-                    bool bMatch =  pInfo->pParam->strDockRelativeTo.CompareNoCase(pOrderedInfo->pWnd->GetName()) == 0;
+                    ChildInfo *pOrderedInfo = lstOrdered.GetNext(posOrdered);
+                    bool bMatch = pInfo->pParam->strDockRelativeTo.CompareNoCase(pOrderedInfo->pWnd->GetName()) == 0;
                     if (bMatch)
                     {
                         lstOrdered.InsertAfter(posOrdered, pInfo);
@@ -415,16 +402,16 @@ void SFrameLayout::LayoutDockTopBottom(IWindow *pParent, SList<ChildInfo *> &lst
             }
         }
     }
-    
+
     // 将窗口分组到不同的行中
     // 规则：如果窗口没有dockRelativeTo，或者其dockRelativeTo引用的是前一行的最后一个窗口，则另起一行
     SList<SList<ChildInfo *>> lstRows;
-    
+
     SPOSITION pos = lstOrdered.GetHeadPosition();
     while (pos)
     {
         ChildInfo *pInfo = lstOrdered.GetNext(pos);
-        
+
         if (pInfo->pParam->strDockRelativeTo.IsEmpty())
         {
             // 没有dockRelativeTo，另起一行
@@ -464,14 +451,14 @@ void SFrameLayout::LayoutDockTopBottom(IWindow *pParent, SList<ChildInfo *> &lst
             }
         }
     }
-    
+
     // 计算总行高
     SPOSITION posRow = lstRows.GetHeadPosition();
     while (posRow)
     {
         SList<ChildInfo *> &row = lstRows.GetNext(posRow);
         int rowHeight = 0;
-        
+
         SPOSITION posRowChild = row.GetHeadPosition();
         while (posRowChild)
         {
@@ -482,10 +469,10 @@ void SFrameLayout::LayoutDockTopBottom(IWindow *pParent, SList<ChildInfo *> &lst
             CSize sz = MeasureChild(*pInfo, rcParent.Width(), SIZE_WRAP_CONTENT);
             rowHeight = smax(rowHeight, sz.cy + rcExtend.top + rcExtend.bottom);
         }
-        
+
         nTotalHeight += rowHeight;
     }
-    
+
     // 调整可用区域
     if (bIsTop)
     {
@@ -495,10 +482,10 @@ void SFrameLayout::LayoutDockTopBottom(IWindow *pParent, SList<ChildInfo *> &lst
     {
         rcAvailable.bottom -= nTotalHeight;
     }
-    
+
     // 布局子窗口
     int yOffset = bIsTop ? rcParent.top : rcParent.bottom - nTotalHeight;
-    
+
     posRow = lstRows.GetHeadPosition();
     while (posRow)
     {
@@ -507,7 +494,7 @@ void SFrameLayout::LayoutDockTopBottom(IWindow *pParent, SList<ChildInfo *> &lst
         float totalWeight = 0.0f;
         int fixedWidthSum = 0;
         int availableWidth = rcAvailable.Width();
-        
+
         // 计算当前行的高度、总权重和固定宽度总和
         SPOSITION posRowChild = row.GetHeadPosition();
         while (posRowChild)
@@ -518,7 +505,7 @@ void SFrameLayout::LayoutDockTopBottom(IWindow *pParent, SList<ChildInfo *> &lst
             CalcExtendRect(*pInfo, rcExtend, nScale);
             CSize sz = MeasureChild(*pInfo, rcParent.Width(), SIZE_WRAP_CONTENT);
             rowHeight = smax(rowHeight, sz.cy + rcExtend.top + rcExtend.bottom);
-            
+
             // 计算总权重和固定宽度总和
             if (pInfo->pParam->weight > 0)
             {
@@ -529,10 +516,10 @@ void SFrameLayout::LayoutDockTopBottom(IWindow *pParent, SList<ChildInfo *> &lst
                 fixedWidthSum += sz.cx + rcExtend.left + rcExtend.right;
             }
         }
-        
+
         // 计算剩余宽度
         int remainingWidth = availableWidth - fixedWidthSum;
-        
+
         // 布局当前行的窗口
         int xOffset = rcParent.left;
         posRowChild = row.GetHeadPosition();
@@ -542,7 +529,7 @@ void SFrameLayout::LayoutDockTopBottom(IWindow *pParent, SList<ChildInfo *> &lst
             int nScale = pInfo->pWnd->GetScale();
             CRect rcExtend;
             CalcExtendRect(*pInfo, rcExtend, nScale);
-            
+
             // 计算窗口宽度
             CSize sz;
             if (pInfo->pParam->weight > 0 && totalWeight > 0)
@@ -557,12 +544,12 @@ void SFrameLayout::LayoutDockTopBottom(IWindow *pParent, SList<ChildInfo *> &lst
                 // 使用默认宽度
                 sz = MeasureChild(*pInfo, rcParent.Width(), SIZE_WRAP_CONTENT);
             }
-            
+
             // 应用gravity
             Gravity gravity = pInfo->pParam->gravity == G_Undefined ? G_Left : pInfo->pParam->gravity;
             int x = xOffset + rcExtend.left;
             int y = yOffset + rcExtend.top;
-            
+
             // 垂直方向对齐
             if (gravity == G_Center)
             {
@@ -572,11 +559,11 @@ void SFrameLayout::LayoutDockTopBottom(IWindow *pParent, SList<ChildInfo *> &lst
             {
                 y += rowHeight - (sz.cy + rcExtend.top + rcExtend.bottom);
             }
-            
+
             CRect rcWnd;
             rcWnd.left = x;
             rcWnd.right = x + sz.cx;
-            
+
             if (bIsTop)
             {
                 rcWnd.top = y;
@@ -587,13 +574,13 @@ void SFrameLayout::LayoutDockTopBottom(IWindow *pParent, SList<ChildInfo *> &lst
                 rcWnd.bottom = y + sz.cy;
                 rcWnd.top = y;
             }
-            
+
             ((SWindow *)pInfo->pWnd)->OnRelayout(rcWnd);
-            
+
             // 更新xOffset，为下一个窗口留出空间
             xOffset += sz.cx + rcExtend.left + rcExtend.right;
         }
-        
+
         // 更新yOffset，为下一行留出空间
         yOffset += rowHeight;
     }
@@ -603,7 +590,7 @@ void SFrameLayout::LayoutDockLeftRight(IWindow *pParent, SList<ChildInfo *> &lst
 {
     int nTotalWidth = 0;
     SList<ChildInfo *> lstOrdered;
-    
+
     // 处理相对停靠关系
     SList<ChildInfo *> lstRemaining = lstChildren;
     while (!lstRemaining.IsEmpty())
@@ -613,7 +600,7 @@ void SFrameLayout::LayoutDockLeftRight(IWindow *pParent, SList<ChildInfo *> &lst
         {
             SPOSITION posCurrent = pos;
             ChildInfo *pInfo = lstRemaining.GetNext(pos);
-            
+
             if (pInfo->pParam->strDockRelativeTo.IsEmpty())
             {
                 lstOrdered.AddTail(pInfo);
@@ -625,8 +612,8 @@ void SFrameLayout::LayoutDockLeftRight(IWindow *pParent, SList<ChildInfo *> &lst
                 SPOSITION posOrdered = lstOrdered.GetHeadPosition();
                 while (posOrdered)
                 {
-                    ChildInfo *pOrderedInfo = lstOrdered.GetNext(posOrdered);  
-                    bool bMatch =  pInfo->pParam->strDockRelativeTo.CompareNoCase(pOrderedInfo->pWnd->GetName()) == 0;
+                    ChildInfo *pOrderedInfo = lstOrdered.GetNext(posOrdered);
+                    bool bMatch = pInfo->pParam->strDockRelativeTo.CompareNoCase(pOrderedInfo->pWnd->GetName()) == 0;
                     if (bMatch)
                     {
                         lstOrdered.InsertAfter(posOrdered, pInfo);
@@ -638,16 +625,16 @@ void SFrameLayout::LayoutDockLeftRight(IWindow *pParent, SList<ChildInfo *> &lst
             }
         }
     }
-    
+
     // 将窗口分组到不同的列中
     // 规则：如果窗口没有dockRelativeTo，或者其dockRelativeTo引用的是前一列的最后一个窗口，则另起一列
     SList<SList<ChildInfo *>> lstColumns;
-    
+
     SPOSITION pos = lstOrdered.GetHeadPosition();
     while (pos)
     {
         ChildInfo *pInfo = lstOrdered.GetNext(pos);
-        
+
         if (pInfo->pParam->strDockRelativeTo.IsEmpty())
         {
             // 没有dockRelativeTo，另起一列
@@ -687,14 +674,14 @@ void SFrameLayout::LayoutDockLeftRight(IWindow *pParent, SList<ChildInfo *> &lst
             }
         }
     }
-    
+
     // 计算总宽度
     SPOSITION posColumn = lstColumns.GetHeadPosition();
     while (posColumn)
     {
         SList<ChildInfo *> &column = lstColumns.GetNext(posColumn);
         int columnWidth = 0;
-        
+
         SPOSITION posColumnChild = column.GetHeadPosition();
         while (posColumnChild)
         {
@@ -705,10 +692,10 @@ void SFrameLayout::LayoutDockLeftRight(IWindow *pParent, SList<ChildInfo *> &lst
             CSize sz = MeasureChild(*pInfo, SIZE_WRAP_CONTENT, rcAvailable.Height());
             columnWidth = smax(columnWidth, sz.cx + rcExtend.left + rcExtend.right);
         }
-        
+
         nTotalWidth += columnWidth;
     }
-    
+
     // 调整可用区域
     if (bIsLeft)
     {
@@ -718,10 +705,10 @@ void SFrameLayout::LayoutDockLeftRight(IWindow *pParent, SList<ChildInfo *> &lst
     {
         rcAvailable.right -= nTotalWidth;
     }
-    
+
     // 布局子窗口
     int xOffset = bIsLeft ? rcParent.left : rcParent.right - nTotalWidth;
-    
+
     posColumn = lstColumns.GetHeadPosition();
     while (posColumn)
     {
@@ -730,7 +717,7 @@ void SFrameLayout::LayoutDockLeftRight(IWindow *pParent, SList<ChildInfo *> &lst
         float totalWeight = 0.0f;
         int fixedHeightSum = 0;
         int availableHeight = rcAvailable.Height();
-        
+
         // 计算当前列的宽度、总权重和固定高度总和
         SPOSITION posColumnChild = column.GetHeadPosition();
         while (posColumnChild)
@@ -741,7 +728,7 @@ void SFrameLayout::LayoutDockLeftRight(IWindow *pParent, SList<ChildInfo *> &lst
             CalcExtendRect(*pInfo, rcExtend, nScale);
             CSize sz = MeasureChild(*pInfo, SIZE_WRAP_CONTENT, rcAvailable.Height());
             columnWidth = smax(columnWidth, sz.cx + rcExtend.left + rcExtend.right);
-            
+
             // 计算总权重和固定高度总和
             if (pInfo->pParam->weight > 0)
             {
@@ -752,10 +739,10 @@ void SFrameLayout::LayoutDockLeftRight(IWindow *pParent, SList<ChildInfo *> &lst
                 fixedHeightSum += sz.cy + rcExtend.top + rcExtend.bottom;
             }
         }
-        
+
         // 计算剩余高度
         int remainingHeight = availableHeight - fixedHeightSum;
-        
+
         // 布局当前列的窗口
         int yOffset = rcAvailable.top;
         posColumnChild = column.GetHeadPosition();
@@ -765,7 +752,7 @@ void SFrameLayout::LayoutDockLeftRight(IWindow *pParent, SList<ChildInfo *> &lst
             int nScale = pInfo->pWnd->GetScale();
             CRect rcExtend;
             CalcExtendRect(*pInfo, rcExtend, nScale);
-            
+
             // 计算窗口高度
             CSize sz;
             if (pInfo->pParam->weight > 0 && totalWeight > 0)
@@ -780,12 +767,12 @@ void SFrameLayout::LayoutDockLeftRight(IWindow *pParent, SList<ChildInfo *> &lst
                 // 使用默认高度
                 sz = MeasureChild(*pInfo, SIZE_WRAP_CONTENT, rcAvailable.Height());
             }
-            
+
             // 应用gravity
             Gravity gravity = pInfo->pParam->gravity == G_Undefined ? G_Top : pInfo->pParam->gravity;
             int x = xOffset + rcExtend.left;
             int y = yOffset + rcExtend.top;
-            
+
             // 水平方向对齐
             if (gravity == G_Center)
             {
@@ -795,11 +782,11 @@ void SFrameLayout::LayoutDockLeftRight(IWindow *pParent, SList<ChildInfo *> &lst
             {
                 x += columnWidth - (sz.cx + rcExtend.left + rcExtend.right);
             }
-            
+
             CRect rcWnd;
             rcWnd.top = y;
             rcWnd.bottom = y + sz.cy;
-            
+
             if (bIsLeft)
             {
                 rcWnd.left = x;
@@ -810,13 +797,13 @@ void SFrameLayout::LayoutDockLeftRight(IWindow *pParent, SList<ChildInfo *> &lst
                 rcWnd.right = x + sz.cx;
                 rcWnd.left = x;
             }
-            
+
             ((SWindow *)pInfo->pWnd)->OnRelayout(rcWnd);
-            
+
             // 更新yOffset，为下一个窗口留出空间
             yOffset += sz.cy + rcExtend.top + rcExtend.bottom;
         }
-        
+
         // 更新xOffset，为下一列留出空间
         xOffset += columnWidth;
     }

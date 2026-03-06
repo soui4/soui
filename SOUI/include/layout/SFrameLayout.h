@@ -8,24 +8,26 @@
 
 SNSBEGIN
 
-namespace FrameLayout_Dock{
-  static const LPCWSTR kDock_None = L"none";
-  static const LPCWSTR kDock_Left = L"left";
-  static const LPCWSTR kDock_Top = L"top";
-  static const LPCWSTR kDock_Right = L"right";
-  static const LPCWSTR kDock_Bottom = L"bottom";
-  static const LPCWSTR kDock_MainView = L"mainview";
-  static const LPCWSTR kDock_Main = L"main";
-}
+namespace FrameLayout_Dock
+{
+static const LPCWSTR kDock_None = L"none";
+static const LPCWSTR kDock_Left = L"left";
+static const LPCWSTR kDock_Top = L"top";
+static const LPCWSTR kDock_Right = L"right";
+static const LPCWSTR kDock_Bottom = L"bottom";
+static const LPCWSTR kDock_MainView = L"mainview";
+static const LPCWSTR kDock_Main = L"main";
+} // namespace FrameLayout_Dock
 
-namespace FrameLayout_DockMode{
-  static const LPCWSTR kDockMode_None = L"none";
-  static const LPCWSTR kDockMode_Left = L"left";
-  static const LPCWSTR kDockMode_Top = L"top";
-  static const LPCWSTR kDockMode_Right = L"right";
-  static const LPCWSTR kDockMode_Bottom = L"bottom";
-  static const LPCWSTR kDockMode_All = L"all";
-}
+namespace FrameLayout_DockMode
+{
+static const LPCWSTR kDockMode_None = L"none";
+static const LPCWSTR kDockMode_Left = L"left";
+static const LPCWSTR kDockMode_Top = L"top";
+static const LPCWSTR kDockMode_Right = L"right";
+static const LPCWSTR kDockMode_Bottom = L"bottom";
+static const LPCWSTR kDockMode_All = L"all";
+} // namespace FrameLayout_DockMode
 
 class SOUI_EXP SFrameLayoutParam
     : public TObjRefImpl<SObjectImpl<ILayoutParam>>
@@ -36,6 +38,7 @@ class SOUI_EXP SFrameLayoutParam
 
   public:
     static DockPosition parseDockPosition(const SStringW &strValue);
+
   public:
     SFrameLayoutParam();
 
@@ -53,13 +56,13 @@ class SOUI_EXP SFrameLayoutParam
 
   public:
     SOUI_ATTRS_BEGIN()
-        ATTR_LAYOUTSIZE(L"width", width,TRUE)
-        ATTR_LAYOUTSIZE(L"height", height,TRUE)
+        ATTR_LAYOUTSIZE(L"width", width, TRUE)
+        ATTR_LAYOUTSIZE(L"height", height, TRUE)
         ATTR_CUSTOM(L"size", OnAttrSize)
         ATTR_CUSTOM(L"dock", OnAttrDockPosition)
         ATTR_STRINGW(L"dockRelativeTo", strDockRelativeTo, FALSE)
         ATTR_FLOAT(L"weight", weight, FALSE)
-        ATTR_GRAVITY(L"layout_gravity", gravity, FALSE)  
+        ATTR_GRAVITY(L"layout_gravity", gravity, FALSE)
         ATTR_LAYOUTSIZE(L"extend_left", extend_left, FALSE)
         ATTR_LAYOUTSIZE(L"extend_top", extend_top, FALSE)
         ATTR_LAYOUTSIZE(L"extend_right", extend_right, FALSE)
@@ -72,17 +75,19 @@ class SOUI_EXP SFrameLayoutParam
 };
 
 class SOUI_EXP SFrameLayout : public TObjRefImpl<SObjectImpl<ILayout>> {
-    DEF_SOBJECT_EX(SObjectImpl<ILayout>, L"frameLayout",L"frame")
+    DEF_SOBJECT_EX(SObjectImpl<ILayout>, L"frameLayout", L"frame")
 
   public:
     SFrameLayout(void);
     ~SFrameLayout(void);
-    
+
     void SetEnableDockMode(DockMode mode);
     DockMode GetEnableDockMode() const;
+
   protected:
     static DockMode parseDockMode(const SStringW &strValue);
     DockMode m_enableDockMode;
+
   public:
     SOUI_ATTRS_BEGIN()
         ATTR_CUSTOM(L"enableDockMode", OnAttrEnableDockMode)

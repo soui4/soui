@@ -29,6 +29,5 @@
 		<waveProgress size="100,100" name="waveProgress1" value="60" min="0" max="100"/>
 		<waveProgress size="100,100" name="waveProgress2" value="80" min="0" max="100"/>
 	</window>
-	<window size="200,40" colorBkgnd="#ff0000" colorText="#000000"/>
 	<verificationCodeEdit size="300,40" name="verificationCodeEdit" maxBuffer="6"/>
 </window>

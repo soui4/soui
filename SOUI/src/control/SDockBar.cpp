@@ -53,12 +53,12 @@ BOOL SDockBar::IsPointOnCloseBtn(CPoint point) const
     return rcCloseBtn.PtInRect(point);
 }
 
-UINT SDockBar::OnNcHitTest(const CPoint & point)
+UINT SDockBar::OnNcHitTest(const CPoint &point)
 {
     if (!m_bResizable)
         return HTNOWHERE;
 
-    CRect rcWnd,rcClient;
+    CRect rcWnd, rcClient;
     GetWindowRect(&rcWnd);
     GetClientRect(&rcClient);
 
@@ -68,7 +68,7 @@ UINT SDockBar::OnNcHitTest(const CPoint & point)
     if (rcClient.PtInRect(point))
         return HTCLIENT;
     DockPosition dockPos = pParam->dockPos;
-    
+
     if (dockPos == DockLeft)
     {
         if (point.x >= rcClient.right && point.x <= rcWnd.right)
@@ -121,14 +121,14 @@ BOOL SDockBar::OnSetCursor(const CPoint &pt)
         UpdateResizeCursor(m_nResizeHitTest);
         return TRUE;
     }
-    
+
     int nHitTest = OnNcHitTest(pt);
     if (nHitTest != HTNOWHERE)
     {
         UpdateResizeCursor(nHitTest);
         return TRUE;
     }
-    
+
     return FALSE;
 }
 
@@ -137,7 +137,7 @@ void SDockBar::OnPaint(IRenderTarget *pRT)
     SPainter painter;
     BeforePaint(pRT, painter);
     CRect rcCaption = GetCaptionRect();
-    
+
     if (m_skinCaption)
     {
         int nSkinState = m_bActive ? 1 : 0;
@@ -148,7 +148,7 @@ void SDockBar::OnPaint(IRenderTarget *pRT)
         COLORREF clrCaption = m_bActive ? RGBA(100, 150, 255, 255) : RGBA(200, 200, 200, 255);
         pRT->FillSolidRect(&rcCaption, clrCaption);
     }
-    
+
     CRect rcText = rcCaption;
     CRect rcCloseBtn = GetCloseBtnRect();
     rcText.right = rcCloseBtn.left - 8;
@@ -167,13 +167,13 @@ void SDockBar::OnPaint(IRenderTarget *pRT)
             pRT->SetTextColor(oldTextColor);
         }
     }
-    
+
     DWORD dwState = 0;
     if (m_bCloseBtnPressed)
         dwState |= WndState_PushDown;
     else if (m_bCloseBtnHover)
         dwState |= WndState_Hover;
-    
+
     if (m_skinCloseBtn)
     {
         m_skinCloseBtn->DrawByState(pRT, rcCloseBtn, dwState);
@@ -185,9 +185,9 @@ void SDockBar::OnPaint(IRenderTarget *pRT)
             clrBtn = RGBA(200, 50, 50, 255);
         else if (m_bCloseBtnHover)
             clrBtn = RGBA(255, 150, 150, 255);
-            
+
         pRT->FillSolidRect(&rcCloseBtn, clrBtn);
-        
+
         COLORREF oldColor = pRT->SetTextColor(RGBA(255, 255, 255, 255));
         pRT->DrawText(_T("x"), 1, &rcCloseBtn, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
         pRT->SetTextColor(oldColor);
@@ -203,7 +203,7 @@ void SDockBar::OnLButtonDown(UINT nFlags, CPoint point)
         Invalidate();
         return;
     }
-    if(IsFocusable()) 
+    if (IsFocusable())
         SetFocus();
 }
 
@@ -213,7 +213,7 @@ void SDockBar::OnLButtonUp(UINT nFlags, CPoint point)
     {
         OnCloseBtnClick();
     }
-    
+
     m_bCloseBtnPressed = FALSE;
     Invalidate();
 }
@@ -231,7 +231,7 @@ void SDockBar::OnMouseMove(UINT nFlags, CPoint point)
 void SDockBar::OnMouseLeave()
 {
     SetMsgHandled(FALSE);
-    
+
     if (m_bCloseBtnHover)
     {
         m_bCloseBtnHover = FALSE;
@@ -296,7 +296,7 @@ void SDockBar::OnNcMouseMove(UINT nHitTest, CPoint point)
             int nDeltaY = point.y - m_ptResizeStart.y;
             int nNewWidth = m_szResizeStart.cx;
             int nNewHeight = m_szResizeStart.cy;
-            
+
             if (dockPos == DockLeft)
             {
                 nNewWidth = m_szResizeStart.cx + nDeltaX;
@@ -313,19 +313,19 @@ void SDockBar::OnNcMouseMove(UINT nHitTest, CPoint point)
             {
                 nNewHeight = m_szResizeStart.cy - nDeltaY;
             }
-            
+
             nNewWidth = smax(nNewWidth, 30);
             nNewHeight = smax(nNewHeight, 30);
-            
+
             if (dockPos == DockLeft || dockPos == DockRight)
             {
-                pParam->width.setSize(nNewWidth,px);
+                pParam->width.setSize(nNewWidth, px);
             }
             else
             {
-                pParam->height.setSize(nNewHeight,px);
+                pParam->height.setSize(nNewHeight, px);
             }
-            
+
             RequestRelayout();
         }
     }

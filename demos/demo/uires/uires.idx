@@ -13,7 +13,7 @@
 		<file name="ICON_0" path="image\img_logo.ico" />
 		<file name="ICON_LOGO" path="image\img_logo.ico" />
 		<file name="ICON_MM_ONLINE" path="image\MM\imonline.ico" />
-		<file name="ICON_MM_OFFLINE" path="image\mm\offline.ico" />
+		<file name="ICON_MM_OFFLINE" path="image\MM\offline.ico" />
 		<file name="ICON_Loading1" path="image\32\loading_1.ico" />
 		<file name="ICON_Loading2" path="image\32\loading_2.ico" />
 		<file name="ICON_Loading3" path="image\32\loading_3.ico" />
