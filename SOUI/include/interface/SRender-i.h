@@ -1654,6 +1654,13 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
     STDMETHOD_(HRESULT, MeasureText)(THIS_ LPCTSTR pszText, int cchLen, SIZE *psz) PURE;
 
     /**
+     * @brief Get font metrics of the currently selected font.
+     * @param ptm Pointer to TEXTMETRIC to receive font metrics (ascent, descent, height, etc.).
+     * @return HRESULT indicating success or failure.
+     */
+    STDMETHOD_(HRESULT, GetFontMetrics)(THIS_ TEXTMETRIC *ptm) PURE;
+
+    /**
      * @brief Output text at a specified position.
      * @param x X-coordinate of the text position.
      * @param y Y-coordinate of the text position.

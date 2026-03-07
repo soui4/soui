@@ -36,6 +36,13 @@ class SOUI_EXP SDIBHelper {
     static bool GrayImage(IBitmapS *pBmp);
 
     /**
+     * @brief 将位图转换为禁用样式的图片  
+     * @param pBmp 位图对象指针
+     * @return 成功返回TRUE，失败返回FALSE
+     */
+    static bool DisabledStyleImage(IBitmapS *pBmp);
+
+    /**
      * @brief 计算图片的平均颜色
      * @param pBmp 图片源位图对象指针
      * @param nPercent 有效值百分比，90代表最高和最低5%的值会丢掉，不参与平均

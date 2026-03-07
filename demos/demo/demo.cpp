@@ -201,7 +201,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
     cfg.SetSysResFile(appDir + kPath_SysRes);
 #endif//ENABLE_BUILD_RESOURCE
 
-#ifdef ENABLE_BUILD_RESOURCE
+#if (RES_TYPE == RESTYPE_PE) && defined(ENABLE_BUILD_RESOURCE)
     cfg.SetAppResPeHandle(hInstance);
 #elif (RES_TYPE == RESTYPE_ZIP) // 从ZIP包加载
     cfg.SetAppResZipFile(appDir + _T("/uires.zip"), "souizip");
@@ -209,7 +209,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
     cfg.SetAppRes7ZipFile(appDir + _T("/uires.zip"), "souizip");
 #else // #if (RES_TYPE == RESTYPE_FILE)//从文件加载
     cfg.SetAppResFile(appDir + _T("/uires"));
-#endif//ENABLE_BUILD_RESOURCE
+#endif
 
     // 向SApplication系统中注册由外部扩展的控件及SkinObj类
     app.RegisterSkinClass<SSkinAni>();          // 注册SkinGif

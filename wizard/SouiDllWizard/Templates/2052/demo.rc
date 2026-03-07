@@ -1,17 +1,20 @@
 // Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
+#include <config.h>
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "winres.h"/////////////////////////////////////////////////////////////////////////////
+#include <winresrc.h>
+
+/////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// 中文(中华人民共和国) resources
+//  resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 #ifdef _WIN32
@@ -42,11 +45,11 @@ BEGIN
 "#pragma code_page(936)\r\n"
 #ifndef _DEBUG
 [!if ResLoaderType == 0]
-"#include ""res\\soui_res.rc2"" //SOUI资源\r\n"
+"#include ""res/soui_res.rc2"" //SOUI Resource\r\n"
 [!endif]
 [!if ResLoaderType == 0]
 [!if CHECKBOX_SYSRES_BUILTIN]
-"#include ""theme_sys_res.rc2"" //SOUI系统资源\r\n"
+"#include ""theme_sys_res.rc2"" //SOUI SYS Resource\r\n"
 [!endif]
 [!endif]
 #endif
@@ -94,7 +97,7 @@ END
 END
 
 
-#endif    // 中文(中华人民共和国) resources
+#endif    // resources
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -109,11 +112,11 @@ LANGUAGE 4, 2
 #pragma code_page(936)
 #ifndef _DEBUG
 [!if ResLoaderType == 0]
-#include "res\\soui_res.rc2" //SOUI资源\r\n"
+#include "res/soui_res.rc2" //SOUI Resource\r\n"
 [!endif]
 [!if ResLoaderType == 0]
 [!if CHECKBOX_SYSRES_BUILTIN]
-#include "theme_sys_res.rc2" //SOUI系统资源\r\n"
+#include "theme_sys_res.rc2" //SOUI SYS Resource\r\n"
 [!endif]
 [!endif]
 #endif

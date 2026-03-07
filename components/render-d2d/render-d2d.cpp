@@ -1568,6 +1568,25 @@ SNSBEGIN
 		return S_OK;
 	}
 
+	HRESULT SRenderTarget_D2D::GetFontMetrics( TEXTMETRIC *ptm )
+	{
+		memset(ptm, 0, sizeof(TEXTMETRIC));
+		if(!m_curFont) 
+			return E_FAIL;
+		HDC hdc = ::GetDC(0);
+		if(hdc)
+		{
+			const LOGFONT *plf = m_curFont->LogFont();
+			HFONT hFont = ::CreateFontIndirect(plf);
+			HGDIOBJ hOldFont = ::SelectObject(hdc, hFont);
+			::GetTextMetrics(hdc, ptm);
+			::SelectObject(hdc, hOldFont);
+			::DeleteObject(hFont);
+		}
+		::ReleaseDC(0, hdc);
+		return S_OK;
+	}
+
 	HRESULT SRenderTarget_D2D::DrawRectangle(LPCRECT pRect)
 	{
 		if(!m_curPen) return E_INVALIDARG;

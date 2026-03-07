@@ -59,3 +59,4 @@ skin_config.xml
 xcode/
 
 dugon
+.claude/settings.local.json

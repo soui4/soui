@@ -75,7 +75,7 @@ class SOUI_EXP SToolBar
     BOOL GetItemInfo(int nIndex, ToolBarItem *pItem) const;
     BOOL SetItemInfo(int nIndex, const ToolBarItem *pItem);
 
-    void SetIconsSkin(SAutoRefPtr<ISkinObj> skinIcons);
+    void SetIconsSkin(SAutoRefPtr<ISkinObj> skinIcons, int iState = 0);
 
     // Button state methods (MFC-compatible)
     BOOL EnableButton(int nID, BOOL bEnable = TRUE);
@@ -121,7 +121,10 @@ class SOUI_EXP SToolBar
 
   public:
     SOUI_ATTRS_BEGIN()
-        ATTR_SKIN(L"iconSkin", m_skinIcons, TRUE)
+        ATTR_SKIN(L"iconSkin", m_skinIcons[0], TRUE)
+        ATTR_SKIN(L"hoverIconSkin", m_skinIcons[1], TRUE)
+        ATTR_SKIN(L"pushIconSkin", m_skinIcons[2], TRUE)
+        ATTR_SKIN(L"disableIconSkin", m_skinIcons[3], TRUE)
         ATTR_SKIN(L"sepSkin", m_skinSep, TRUE)
         ATTR_SKIN(L"skin", m_skinState, TRUE)
         ATTR_SKIN(L"dropArrowSkin", m_skinDropArrow, TRUE)
@@ -152,8 +155,11 @@ class SOUI_EXP SToolBar
     void OnMouseMove(UINT nFlags, CPoint pt);
     void OnMouseLeave();
     void OnSize(UINT nType, CSize size);
-
+    int  OnCreate(void * pcs);
+    void OnDestroy();
     SOUI_MSG_MAP_BEGIN()
+        MSG_WM_CREATE(OnCreate)
+        MSG_WM_DESTROY(OnDestroy)
         MSG_WM_LBUTTONDOWN(OnLButtonDown)
         MSG_WM_LBUTTONUP(OnLButtonUp)
         MSG_WM_MOUSEMOVE(OnMouseMove)
@@ -209,7 +215,7 @@ class SOUI_EXP SToolBar
 
   protected:
     SAutoRefPtr<ISkinObj> m_skinState;
-    SAutoRefPtr<ISkinObj> m_skinIcons;
+    SAutoRefPtr<ISkinObj> m_skinIcons[4];
     SAutoRefPtr<ISkinObj> m_skinSep;
     SAutoRefPtr<ISkinObj> m_skinDropArrow;
     SXmlDoc m_menuStyle;

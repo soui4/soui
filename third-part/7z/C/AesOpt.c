@@ -28,6 +28,11 @@ Igor Pavlov : Public domain */
           #define ATTRIB_VAES __attribute__((__target__("aes,vaes,avx,avx2")))
         #endif
       #endif
+      #ifndef USE_INTEL_VAES
+        /* GCC < 8 or Clang < 8: AES-NI is supported but VAES/AVX2 is not.
+           Generate stub functions that forward _HW_256 calls to plain _HW variants. */
+        #define Z7_USE_VAES_HW_STUB
+      #endif
   #elif defined(_MSC_VER)
     #if (_MSC_VER > 1500) || (_MSC_FULL_VER >= 150030729)
       #define USE_INTEL_AES

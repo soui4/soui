@@ -605,6 +605,28 @@ SNSBEGIN
 		return S_OK;
 	}
 
+	HRESULT SRenderTarget_Skia::GetFontMetrics( TEXTMETRIC *ptm )
+	{
+		SkPaint txtPaint = m_paint;
+		if(m_curFont)
+		{
+			txtPaint.setTypeface(m_curFont->GetFont());
+			txtPaint.setTextSize(SkIntToScalar(abs(m_curFont->TextSize())));
+		}
+		SkPaint::FontMetrics m;
+		txtPaint.getFontMetrics(&m);
+		memset(ptm, 0, sizeof(TEXTMETRIC));
+		ptm->tmAscent        = (LONG)ceilf(-m.fAscent);
+		ptm->tmDescent       = (LONG)ceilf(m.fDescent);
+		ptm->tmHeight        = ptm->tmAscent + ptm->tmDescent;
+		ptm->tmInternalLeading = (LONG)ceilf(m.fLeading);
+		SIZE sz = {0,0};
+		MeasureText(_T("x"), 1, &sz);
+		ptm->tmAveCharWidth  = sz.cx;
+		ptm->tmMaxCharWidth  = sz.cx * 2;
+		return S_OK;
+	}
+
 	HRESULT SRenderTarget_Skia::DrawRectangle(LPCRECT pRect)
 	{
 		SkPaint paint=m_paint;

@@ -1,7 +1,7 @@
 ﻿#include "souistd.h"
 #include "helper/SDIBHelper.h"
 
-#define RGB2GRAY(r, g, b) (((b)*117 + (g)*601 + (r)*306) >> 10)
+#define RGB2GRAY(r, g, b) (((b) * 117 + (g) * 601 + (r) * 306) >> 10)
 
 SNSBEGIN
 struct DIBINFO
@@ -48,6 +48,52 @@ bool ColorTransform(DIBINFO *pDib, Mode mode, const Param &param)
 static void GrayMode(BYTE *pColor, const int &)
 {
     pColor[0] = pColor[1] = pColor[2] = RGB2GRAY(pColor[0], pColor[1], pColor[2]);
+}
+
+static void DisabledStyleMode(BYTE *pColor, const COLORREF & /*ref*/)
+{
+    BYTE blue = pColor[0], green = pColor[1], red = pColor[2], alpha = pColor[3];
+
+    if (alpha == 0)
+        return; // 完全透明，不处理
+
+    // 若像素为预乘 alpha，先解预乘（整数运算）
+    if (alpha != 255)
+    {
+        red = (red * 255) / alpha;
+        green = (green * 255) / alpha;
+        blue = (blue * 255) / alpha;
+    }
+
+    int gray = RGB2GRAY(red, green, blue); // 0..255
+
+    // 固定目标禁用颜色（用户要求的值）
+    const int disabledR = 160;
+    const int disabledG = 166;
+    const int disabledB = 187;
+
+    // 浅色（高亮部分）
+    const int light = 230;
+
+    // 使用整数线性插值： out = disabled*(255 - gray)/255 + light*gray/255
+    // 为了四舍五入加上 127 (半除数)
+    int inv = 255 - gray;
+    int outR = (disabledR * inv + light * gray + 127) / 255;
+    int outG = (disabledG * inv + light * gray + 127) / 255;
+    int outB = (disabledB * inv + light * gray + 127) / 255;
+
+    // 重新应用预乘 alpha（若原先为预乘）
+    if (alpha != 255)
+    {
+        outR = (outR * alpha) / 255;
+        outG = (outG * alpha) / 255;
+        outB = (outB * alpha) / 255;
+    }
+
+    pColor[0] = (BYTE)outB;
+    pColor[1] = (BYTE)outG;
+    pColor[2] = (BYTE)outR;
+    // 保留原 alpha：pColor[3] 不变
 }
 
 struct COLORIZEPARAM
@@ -290,6 +336,14 @@ bool SDIBHelper::GrayImage(IBitmapS *pBmp)
     return bRet;
 }
 
+bool SDIBHelper::DisabledStyleImage(IBitmapS *pBmp)
+{
+    DIBINFO di = { (LPBYTE)pBmp->LockPixelBits(), pBmp->Width(), pBmp->Height() };
+    bool bRet = ColorTransform(&di, DisabledStyleMode, 0);
+    pBmp->UnlockPixelBits(di.pBits);
+    return bRet;
+}
+
 static COLORREF CalcAvarageRectColor(const DIBINFO &di, RECT rc)
 {
     LPBYTE pLine = di.pBits + di.nWid * rc.top * 4;
@@ -355,7 +409,7 @@ COLORREF SDIBHelper::CalcAvarageColor(IBitmapS *pBmp, int nPercent, int nBlockSi
     // RGB排序
     qsort(pAvgColors, nBlocks, sizeof(COLORREF), RgbCmp);
 
-    int nThrows = nBlocks * (100 - nPercent) / 200; //一端丢弃数量
+    int nThrows = nBlocks * (100 - nPercent) / 200; // 一端丢弃数量
     int iBegin = nThrows;
     int iEnd = nBlocks - nThrows;
 

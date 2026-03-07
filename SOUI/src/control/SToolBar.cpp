@@ -1,6 +1,9 @@
 #include "souistd.h"
 #include <control/SToolBar.h>
 #include <helper/SMenu.h>
+#include <helper/SDIBHelper.h>
+#include <helper/slog.h>
+#define kLogTag "SToolBar"
 
 SNSBEGIN
 
@@ -109,7 +112,7 @@ CSize SToolBar::GetItemSize(const CRect &rcWnd, IRenderTarget *pRT, int iItem) c
             if (item.icon)
                 szIcon = item.icon->Size();
             else if (m_skinIcons)
-                szIcon = m_skinIcons->GetSkinSize();
+                szIcon = m_skinIcons[0]->GetSkinSize();
             if(m_nItemSize.isWrapContent())
                 szRet.cy = szIcon.cy;
             else if(m_nItemSize.isMatchParent())
@@ -142,7 +145,7 @@ CSize SToolBar::GetItemSize(const CRect &rcWnd, IRenderTarget *pRT, int iItem) c
             if (item.icon)
                 szIcon = item.icon->Size();
             else if (m_skinIcons)
-                szIcon = m_skinIcons->GetSkinSize();
+                szIcon = m_skinIcons[0]->GetSkinSize();
 
             if (m_bTextIconVertical && (item.dwStyle & BTNS_SHOWTEXT))
             {
@@ -340,7 +343,7 @@ void SToolBar::DrawItem(IRenderTarget *pRT, const CRect &rcItem, const ToolBarIt
         if (pItem->icon)
             szIcon = pItem->icon->Size();
         else if (m_skinIcons)
-            szIcon = m_skinIcons->GetSkinSize();
+            szIcon = m_skinIcons[0]->GetSkinSize();
 
         // Calculate content area, reserve space for dropdown arrow if needed
         CRect rcContent = rcItem;
@@ -416,10 +419,13 @@ void SToolBar::DrawItem(IRenderTarget *pRT, const CRect &rcItem, const ToolBarIt
         // Icon is always displayed. Check if text should be shown.
         BOOL bShowText = (pItem->dwStyle & BTNS_SHOWTEXT) != 0 && (!m_bVert || m_bTextIconVertical);
 
+        int iState = SState2Index::GetDefIndex(pItem->dwState, true);
+        ISkinObj *_skinIcons = m_skinIcons[iState];
+        if(!_skinIcons) _skinIcons = m_skinIcons[0];
+
         if (bShowText)
         {
             // Display both icon and text
-            int iState = SState2Index::GetDefIndex(pItem->dwState, true);
             COLORREF crTxt = GetStyle().GetTextColor(iState);
             COLORREF crOld = pRT->GetTextColor();
             if (crTxt != CR_INVALID)
@@ -437,8 +443,8 @@ void SToolBar::DrawItem(IRenderTarget *pRT, const CRect &rcItem, const ToolBarIt
                 rcIcon.MoveToY(rcContent.top + nInter);
                 if (pItem->icon)
                     pRT->DrawBitmapEx(rcIcon, pItem->icon, CRect(CPoint(), szIcon), EM_STRETCH, 0xff);
-                else if (m_skinIcons && pItem->iIcon >= 0)
-                    m_skinIcons->DrawByIndex(pRT, rcIcon, pItem->iIcon);
+                else if (_skinIcons && pItem->iIcon >= 0)
+                    _skinIcons->DrawByIndex(pRT, rcIcon, pItem->iIcon);
 
                 CRect rcTxt(rcContent.CenterPoint(), szTxt);
                 rcTxt.OffsetRect(-szTxt.cx / 2, 0);
@@ -452,8 +458,8 @@ void SToolBar::DrawItem(IRenderTarget *pRT, const CRect &rcItem, const ToolBarIt
                 CRect rcIcon(rcContent.left + nInter, rcContent.top + nInter, rcContent.left + nInter + szIcon.cx, rcContent.top + nInter + szIcon.cy);
                 if (pItem->icon)
                     pRT->DrawBitmapEx(rcIcon, pItem->icon, CRect(CPoint(), szIcon), EM_STRETCH, 0xff);
-                else if (m_skinIcons && pItem->iIcon >= 0)
-                    m_skinIcons->DrawByIndex(pRT, rcIcon, pItem->iIcon);
+                else if (_skinIcons && pItem->iIcon >= 0)
+                    _skinIcons->DrawByIndex(pRT, rcIcon, pItem->iIcon);
 
                 CRect rcTxt(rcIcon.right + m_nTextIconInterval, rcContent.top + nInter, rcContent.right - nInter, rcContent.bottom - nInter);
                 pRT->TextOut(rcTxt.left, rcTxt.top, pItem->strText.c_str(), pItem->strText.GetLength());
@@ -467,8 +473,8 @@ void SToolBar::DrawItem(IRenderTarget *pRT, const CRect &rcItem, const ToolBarIt
             rcIcon.OffsetRect(-szIcon.cx / 2, -szIcon.cy / 2);
             if (pItem->icon)
                 pRT->DrawBitmapEx(rcIcon, pItem->icon, CRect(CPoint(), szIcon), EM_STRETCH, 0xff);
-            else if (m_skinIcons && pItem->iIcon >= 0)
-                m_skinIcons->DrawByIndex(pRT, rcIcon, pItem->iIcon);
+            else if (_skinIcons && pItem->iIcon >= 0)
+                _skinIcons->DrawByIndex(pRT, rcIcon, pItem->iIcon);
         }
 
         // Draw dropdown arrow if this is a dropdown item
@@ -481,6 +487,41 @@ void SToolBar::DrawItem(IRenderTarget *pRT, const CRect &rcItem, const ToolBarIt
         }
     }
     pRT->PopClip();
+}
+
+int SToolBar::OnCreate(void * pcs){
+    int ret = __baseCls::OnCreate(pcs);
+    if(ret != 0) return ret;
+    if (m_skinIcons[0]  && !m_skinIcons[3])
+    {
+        SSkinImgList* pImg= sobj_cast<SSkinImgList>(m_skinIcons[0]);
+        if (pImg)
+        {
+            SAutoRefPtr<IBitmapS> img=NULL;
+            pImg->GetImage()->Clone(&img);
+            if (img)
+            {
+                SDIBHelper::DisabledStyleImage(img);
+                SSkinImgList* graySkin =new SSkinImgList();
+                graySkin->SetImage(img);
+                graySkin->SetStates(pImg->GetStates());
+                m_skinIcons[3].Attach(graySkin);                
+            }
+        }
+    }
+    return 0;
+}
+
+void SToolBar::OnDestroy()
+{
+    __baseCls::OnDestroy();
+    if (GetContainer())
+    {
+        GetContainer()->UnregisterTimelineHandler(this);
+        GetContainer()->GetMsgLoop()->RemoveIdleHandler(this);    
+    }
+    m_iClickItem = -1;
+    m_iHoverItem = -1;
 }
 
 void SToolBar::OnPaint(IRenderTarget *pRT)
@@ -715,9 +756,9 @@ void SToolBar::InsertItem(const ToolBarItem &item, int nPos /*=-1*/)
     Invalidate();
 }
 
-void SToolBar::SetIconsSkin(SAutoRefPtr<ISkinObj> skinIcons)
+void SToolBar::SetIconsSkin(SAutoRefPtr<ISkinObj> skinIcons, int iState)
 {
-    m_skinIcons = skinIcons;
+    m_skinIcons[iState] = skinIcons;
     Invalidate();
 }
 
@@ -877,7 +918,7 @@ void SToolBar::ShowItemDropDownMenu(const CRect &rc, int iItem)
 void SToolBar::ShowDropDownMenu(const CRect &rc)
 {
     SMenu menu;
-    menu.SetIconSkin(m_skinIcons);
+    menu.SetIconSkin(m_skinIcons[0]);
     SXmlNode xmlNode = m_menuStyle.root().child(L"menuStyle");
     menu.LoadMenu2(&xmlNode);
     for (int i = m_nVisibleItems; i < m_arrItems.GetCount(); i++)

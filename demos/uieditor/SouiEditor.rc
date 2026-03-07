@@ -1,19 +1,20 @@
 // Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
+#include <config.h>
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "winres.h"
+#include <winresrc.h>
 
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// ����(���壬�й�) resources
+// resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
@@ -39,7 +40,10 @@ BEGIN
     "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)\r\n"
     "LANGUAGE 4, 2\r\n"
     "#pragma code_page(936)\r\n"
-    "#include ""res\\soui_res.rc2""\r\n"
+    "#include ""res/soui_res.rc2""\r\n"
+#if (defined(LIB_CORE) && defined(LIB_SOUI_COM))
+    "#include ""../../soui-sys-resource/theme_sys_res.rc2"" //SOUI SYS Resource\r\n"
+#endif
     "#endif\r\0"
 END
 
@@ -91,9 +95,9 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_ICON1               ICON                    "uires\\image\\logo.ico"
+IDI_ICON1               ICON                    "uires/image/logo.ico"
 
-#endif    // ����(���壬�й�) resources
+#endif    //  resources
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -106,7 +110,10 @@ IDI_ICON1               ICON                    "uires\\image\\logo.ico"
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE 4, 2
 #pragma code_page(936)
-#include "res\soui_res.rc2"
+#include "res/soui_res.rc2"
+#if (defined(LIB_CORE) && defined(LIB_SOUI_COM))
+#include "../../soui-sys-resource/theme_sys_res.rc2" //SOUI SYS Resource
+#endif
 #endif
 
 /////////////////////////////////////////////////////////////////////////////

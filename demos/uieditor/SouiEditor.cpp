@@ -19,7 +19,12 @@
 #define INIT_R_DATA
 #include "res/resource.h"
 
+#ifdef _WIN32
 #define SYS_NAMED_RESOURCE _T("soui-sys-resource.dll")
+#else
+#define SYS_NAMED_RESOURCE _T("soui-sys-resource.so")
+#endif//_WIN32
+
 #ifdef __APPLE__
 static const TCHAR *kPath_AppRes = _T("/uires");
 static const TCHAR *kPath_SysRes = _T("/data/soui-sys-resource.zip");
@@ -104,8 +109,12 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 #elif defined(__APPLE__)
     AddFontResource((srcDir + _T("/fonts/simsun.ttc")).c_str());
 #endif    
-#ifdef _WIN32
+#if defined(ENABLE_BUILD_RESOURCE)
+#if (defined(LIB_CORE) && defined(LIB_SOUI_COM))
+    cfg.SetSysResPeHandle(hInstance);
+#else
     cfg.SetSysResPeFile(SYS_NAMED_RESOURCE);
+#endif
     cfg.SetAppResPeHandle(hInstance);
 #elif defined(__APPLE__)
     cfg.SetSysResZip(srcDir + kPath_SysRes);

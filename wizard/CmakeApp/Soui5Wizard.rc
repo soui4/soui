@@ -1,17 +1,20 @@
 // Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
+#incude <config.h>
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "winres.h"/////////////////////////////////////////////////////////////////////////////
+#include <winresrc.h>
+
+/////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// 中文(中华人民共和国) resources
+//  resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 #ifdef _WIN32
@@ -41,7 +44,7 @@ BEGIN
 "LANGUAGE 4, 2\r\n"
 "#pragma code_page(936)\r\n"
 #ifndef _DEBUG
-"#include ""res\\soui_res.rc2"" //SOUI资源\r\n"
+"#include ""res\\soui_res.rc2"" //SOUI Resource\r\n"
 #endif
 "#endif\r\n"
 END
@@ -87,7 +90,7 @@ END
 END
 
 
-#endif    // 中文(中华人民共和国) resources
+#endif    // resources
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -101,7 +104,7 @@ END
 LANGUAGE 4, 2
 #pragma code_page(936)
 #ifndef _DEBUG
-#include "res\\soui_res.rc2" //SOUI资源\r\n"
+#include "res/soui_res.rc2" //SOUI Resource\r\n"
 #endif
 #endif
 /////////////////////////////////////////////////////////////////////////////

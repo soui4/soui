@@ -1659,6 +1659,12 @@ SNSBEGIN
         return S_OK;
     }
 
+    HRESULT SRenderTarget_GDI::GetFontMetrics( TEXTMETRIC *ptm )
+    {
+        ::GetTextMetrics(m_hdc, ptm);
+        return S_OK;
+    }
+
     HRESULT SRenderTarget_GDI::DrawRectangle(LPCRECT pRect)
     {
 		if(!m_curPen) return E_INVALIDARG;
