@@ -494,19 +494,24 @@ int SToolBar::OnCreate(void * pcs){
     if(ret != 0) return ret;
     if (m_skinIcons[0]  && !m_skinIcons[3])
     {
-        SSkinImgList* pImg= sobj_cast<SSkinImgList>(m_skinIcons[0]);
+        ISkinObj *pCloneImg = m_skinIcons[0]->Scale(GetScale());
+        SSkinImgList *pImg = sobj_cast<SSkinImgList>(pCloneImg);        
         if (pImg)
         {
-            SAutoRefPtr<IBitmapS> img=NULL;
-            pImg->GetImage()->Clone(&img);
+            SAutoRefPtr<IBitmapS> img = pImg->GetImage();
             if (img)
             {
                 SDIBHelper::DisabledStyleImage(img);
-                SSkinImgList* graySkin =new SSkinImgList();
-                graySkin->SetImage(img);
-                graySkin->SetStates(pImg->GetStates());
-                m_skinIcons[3].Attach(graySkin);                
+                m_skinIcons[3].Attach(pCloneImg);
             }
+            else
+            {
+                pCloneImg->Release();
+            }
+        }
+        else//不支持的皮肤则直接释放
+        {
+            pCloneImg->Release();
         }
     }
     return 0;
