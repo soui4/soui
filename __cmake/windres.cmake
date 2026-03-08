@@ -8,15 +8,15 @@
 #   target_compile_resources(target_name resource1.rc resource2.rc ...)
 #
 # The compiled resources will be linked into the target as object files.
+set(SOUI_CMAKE_DIR "${CMAKE_CURRENT_LIST_DIR}" CACHE INTERNAL "Current directory for windres.cmake")
 
 if(CMAKE_SYSTEM_NAME MATCHES Windows)
     set(ENABLE_RESOURCES_BUILD ON)
 else()
-    # Find windres (MinGW resource compiler)
-if(EXISTS /usr/local/bin/x86_64-w64-mingw32-windres OR EXISTS /usr/bin/x86_64-w64-mingw32-windres)
-            set(WINDRES_EXE x86_64-w64-mingw32-windres)
-        endif()
-
+    # Find windres (MinGW resource compiler, don't try to use find_program, is would cause build rc failure and report can't include windres.h or windresrc.h )
+    if(EXISTS /usr/local/bin/x86_64-w64-mingw32-windres OR EXISTS /usr/bin/x86_64-w64-mingw32-windres)
+        set(WINDRES_EXE x86_64-w64-mingw32-windres)
+    endif()
     # Find required tools
     find_program(LD_EXECUTABLE NAMES ld)
     find_program(OBJCOPY_EXECUTABLE NAMES objcopy)
@@ -53,11 +53,10 @@ endif()
 # windres_compile_rc(<output_var> <rc_file> [INCLUDE_DIRS dir1 dir2 ...])
 function(windres_compile_rc output_var rc_file) 
     cmake_parse_arguments(ARG "" "" "INCLUDE_DIRS" ${ARGN})
-    
     message(STATUS "Compiling resource file ${rc_file} to ELF (via COFF conversion), include dirs: ${ARG_INCLUDE_DIRS}")
     get_filename_component(rc_name ${rc_file} NAME_WE)
     get_filename_component(rc_abs_path ${rc_file} ABSOLUTE)
-    
+    get_filename_component(CURRENT_DIR "${CMAKE_CURRENT_LIST_DIR}" REALPATH)
     # Output files
     set(coff_obj "${CMAKE_CURRENT_BINARY_DIR}/${rc_name}_res.coff.o")
     set(elf_obj "${CMAKE_CURRENT_BINARY_DIR}/${rc_name}_res.o")
@@ -105,7 +104,7 @@ function(windres_compile_rc output_var rc_file)
         OUTPUT ${rename_script} ${symbol_list}
         COMMAND ${CMAKE_COMMAND} -E echo "# Symbol rename script for ${rc_name}" > ${rename_script}
         COMMAND ${NM_EXECUTABLE} -g ${elf_obj} > ${symbol_list}
-        COMMAND ${CMAKE_COMMAND} -DNM_EXECUTABLE=${NM_EXECUTABLE} -Delf_obj=${elf_obj} -Drename_script=${rename_script} -Dsymbol_list=${symbol_list} -P "${PROJECT_SOURCE_DIR}/__cmake/process_symbols.cmake"
+        COMMAND ${CMAKE_COMMAND} -DNM_EXECUTABLE=${NM_EXECUTABLE} -Delf_obj=${elf_obj} -Drename_script=${rename_script} -Dsymbol_list=${symbol_list} -P "${SOUI_CMAKE_DIR}/process_symbols.cmake"
         DEPENDS ${elf_obj}
         COMMENT "Step 3: Extracting symbols with nm -g and generating rename script for ${rc_name}"
         VERBATIM

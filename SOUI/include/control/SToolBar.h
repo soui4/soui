@@ -144,7 +144,7 @@ class SOUI_EXP SToolBar
     SIZE MeasureContent(int nParentWid, int nParentHei) override;
     BOOL UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo) override;
     void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer) override;
-
+    void OnScaleChanged(int nScale) override;
   protected:
     STDMETHOD_(void, UpdateChildrenPosition)(THIS) OVERRIDE;
 
@@ -178,7 +178,7 @@ class SOUI_EXP SToolBar
     CRect GetDropdownButtonRect() const;
     void ShowDropDownMenu(const CRect &rc);
     int GetItemByID(int nID) const;
-
+    SAutoRefPtr<ISkinObj> CreateGraySkin(ISkinObj *pSkin) const;
     /**
      * Check if point is on the dropdown arrow of an item with TBSTYLE_DROPDOWN
      * @param iItem Item index

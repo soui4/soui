@@ -489,30 +489,26 @@ void SToolBar::DrawItem(IRenderTarget *pRT, const CRect &rcItem, const ToolBarIt
     pRT->PopClip();
 }
 
+SAutoRefPtr<ISkinObj> SToolBar::CreateGraySkin(ISkinObj *pSkin) const{
+    SAutoRefPtr<ISkinObj> pRet(pSkin->Scale(GetScale()), FALSE);
+    SSkinImgList *pImgList = sobj_cast<SSkinImgList>(pRet);
+    if (pImgList)
+    {
+        IBitmapS *img = pImgList->GetImage();
+        if (img)
+        {
+            SDIBHelper::DisabledStyleImage(img);
+        }
+    }
+    return pRet;
+}
+
 int SToolBar::OnCreate(void * pcs){
     int ret = __baseCls::OnCreate(pcs);
     if(ret != 0) return ret;
     if (m_skinIcons[0]  && !m_skinIcons[3])
     {
-        ISkinObj *pCloneImg = m_skinIcons[0]->Scale(GetScale());
-        SSkinImgList *pImg = sobj_cast<SSkinImgList>(pCloneImg);        
-        if (pImg)
-        {
-            SAutoRefPtr<IBitmapS> img = pImg->GetImage();
-            if (img)
-            {
-                SDIBHelper::DisabledStyleImage(img);
-                m_skinIcons[3].Attach(pCloneImg);
-            }
-            else
-            {
-                pCloneImg->Release();
-            }
-        }
-        else//不支持的皮肤则直接释放
-        {
-            pCloneImg->Release();
-        }
+        m_skinIcons[3] = CreateGraySkin(m_skinIcons[0]);
     }
     return 0;
 }
@@ -764,6 +760,10 @@ void SToolBar::InsertItem(const ToolBarItem &item, int nPos /*=-1*/)
 void SToolBar::SetIconsSkin(SAutoRefPtr<ISkinObj> skinIcons, int iState)
 {
     m_skinIcons[iState] = skinIcons;
+    if (iState == 0 && !m_skinIcons[3])
+    {
+        m_skinIcons[3] = CreateGraySkin(m_skinIcons[0]);
+    }
     Invalidate();
 }
 
@@ -1265,6 +1265,24 @@ void SToolBar::OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer 
     {
         pNewContainer->RegisterTimelineHandler(this);
         pNewContainer->GetMsgLoop()->AddIdleHandler(this);
+    }
+}
+
+void SToolBar::OnScaleChanged(int nScale)
+{
+    __baseCls::OnScaleChanged(nScale);
+    for(int i =0;i< 4;i++){
+        if(m_skinIcons[i]){
+            GetScaleSkin(m_skinIcons[i], nScale);
+        }
+    }
+    for (size_t i = 0; i < m_arrItems.GetCount(); i++)
+    {
+        ToolBarItem &item = m_arrItems[i];
+        if (item.icon)
+        {
+            item.icon->Scale(&item.icon,nScale,kHigh_FilterLevel);
+        }
     }
 }
 
