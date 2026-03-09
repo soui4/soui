@@ -18,7 +18,7 @@
 			</caption>
 			<window size="-2,0" weight="1" layout="frame" enableDockMode="any">
 				<!--menu bar-->
-				<menubar name="main_menu" size="-2,36" dock="top">
+				<menubar name="main_menu" size="-2,36" useMenuEx="1" dock="top">
 					<btnstyle skin="skin_item_bk" colorText="@color/white" padding="2"/>
 					<menus>
 						<menuItem src="SMENU:MENU_FILE">文件(&F)</menuItem>

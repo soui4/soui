@@ -13,9 +13,7 @@ SMenuBar *SMenuBar::m_pMenuBar = NULL;
 const wchar_t XmlBtnStyle[] = L"btnStyle";
 const wchar_t XmlMenus[] = L"menus";
 
-class SMenuBarItem
-    : public SButton
-    , public SMenu {
+class SMenuBarItem : public SButton {
     DEF_SOBJECT(SButton, L"menuItem")
     friend class SMenuBar;
 
@@ -33,6 +31,10 @@ class SMenuBarItem
     }
 
     bool IsMenuLoaded() const;
+
+    SMenu *GetMenu() const { return m_pMenu; }
+    SMenuEx *GetMenuEx() const { return m_pMenuEx; }
+    BOOL IsUseMenuEx() const { return m_pHostMenu ? m_pHostMenu->IsUseMenuEx() : FALSE; }
 
   protected:
     UINT PopMenu();
@@ -61,6 +63,8 @@ class SMenuBarItem
     BOOL m_bIsRegHotKey;
     int m_iIndex;
     TCHAR m_cAccessKey;
+    SMenu *m_pMenu;
+    SMenuEx *m_pMenuEx;
 };
 
 SMenuBarItem::SMenuBarItem(SMenuBar *pHostMenu)
@@ -69,6 +73,8 @@ SMenuBarItem::SMenuBarItem(SMenuBar *pHostMenu)
     , m_bIsRegHotKey(FALSE)
     , m_iIndex(-1)
     , m_cAccessKey(0)
+    , m_pMenu(NULL)
+    , m_pMenuEx(NULL)
 {
     m_bDrawFocusRect = FALSE;
     GetEventSet()->subscribeEvent(EventCmd::EventID, Subscriber(&SMenuBarItem::OnCmd, this));
@@ -76,11 +82,24 @@ SMenuBarItem::SMenuBarItem(SMenuBar *pHostMenu)
 
 SMenuBarItem::~SMenuBarItem()
 {
+    if (m_pMenu)
+    {
+        delete m_pMenu;
+        m_pMenu = NULL;
+    }
+    if (m_pMenuEx)
+    {
+        m_pMenuEx->Release();
+        m_pMenuEx = NULL;
+    }
 }
 
 bool SMenuBarItem::IsMenuLoaded() const
 {
-    return true;
+    if (IsUseMenuEx())
+        return m_pMenuEx != NULL;
+    else
+        return m_pMenu != NULL;
 }
 
 UINT SMenuBarItem::PopMenu()
@@ -108,7 +127,16 @@ UINT SMenuBarItem::PopMenu()
                                                   GetCurrentThreadId()); // m_bLoop may become TRUE
 
     int iRet = 0;
-    iRet = TrackPopupMenu(TPM_RETURNCMD, rcHost.left + rcMenu.left, rcHost.top + rcMenu.bottom + 2, m_pHostMenu->m_hWnd, 0, GetScale());
+    if (IsUseMenuEx())
+    {
+        if (m_pMenuEx)
+            iRet = m_pMenuEx->TrackPopupMenu(TPM_RETURNCMD, rcHost.left + rcMenu.left, rcHost.top + rcMenu.bottom + 2, m_pHostMenu->m_hWnd, GetScale());
+    }
+    else
+    {
+        if (m_pMenu)
+            iRet = m_pMenu->TrackPopupMenu(TPM_RETURNCMD, rcHost.left + rcMenu.left, rcHost.top + rcMenu.bottom + 2, m_pHostMenu->m_hWnd, 0, GetScale());
+    }
 
     SetCheck(FALSE);
     m_pHostMenu->m_bIsShow = FALSE;
@@ -138,7 +166,18 @@ UINT SMenuBarItem::PopMenu()
 
 HRESULT SMenuBarItem::OnAttrSrc(const SStringW &strValue, BOOL bLoading)
 {
-    return LoadMenu(S_CW2T(strValue)) ? S_OK : E_INVALIDARG;
+    if (IsUseMenuEx())
+    {
+        if (!m_pMenuEx)
+            m_pMenuEx = new SMenuEx();
+        return m_pMenuEx->LoadMenu(S_CW2T(strValue)) ? S_OK : E_INVALIDARG;
+    }
+    else
+    {
+        if (!m_pMenu)
+            m_pMenu = new SMenu();
+        return m_pMenu->LoadMenu(S_CW2T(strValue)) ? S_OK : E_INVALIDARG;
+    }
 }
 
 void SMenuBarItem::GetDesiredSize(SIZE *psz, int nParentWid, int nParentHei)
@@ -179,6 +218,7 @@ SMenuBar::SMenuBar()
     , m_hWnd(NULL)
     , m_pNowMenu(NULL)
     , m_iNowMenu(-1)
+    , m_bUseMenuEx(FALSE)
 {
     m_evtSet.addEvent(EVENTID(EventSelectMenu));
     SMenuBar::m_pMenuBar = this;
@@ -275,7 +315,14 @@ SMenu *SMenuBar::GetMenu(DWORD dwPos)
 {
     if (dwPos >= m_lstMenuItem.GetCount())
         return NULL;
-    return m_lstMenuItem[dwPos];
+    return m_lstMenuItem[dwPos]->GetMenu();
+}
+
+SMenuEx *SMenuBar::GetMenuEx(DWORD dwPos)
+{
+    if (dwPos >= m_lstMenuItem.GetCount())
+        return NULL;
+    return m_lstMenuItem[dwPos]->GetMenuEx();
 }
 int SMenuBar::HitTest(CPoint pt)
 {
@@ -302,6 +349,7 @@ BOOL SMenuBar::CreateChildren(SXmlNode xmlNode)
     {
         m_xmlStyle.root().append_copy(xmlBtnStyle);
     }
+
     SXmlNode xmlTMenus = xmlNode.child(XmlMenus);
     if (xmlTMenus)
     {
@@ -362,23 +410,52 @@ LRESULT SMenuBar::MenuSwitch(int code, WPARAM wParam, LPARAM lParam)
             SMenuBarItem *pNowMenu = SMenuBar::m_pMenuBar->m_pNowMenu;
             SASSERT(pNowMenu);
             int selItem = -1;
-            HMENU hSubMenu = 0;
-            for (int i = 0; i < GetMenuItemCount(pNowMenu->m_hMenu); i++)
+            HWND hSubMenuWnd= 0;
+            if (!pNowMenu->IsUseMenuEx())
             {
-                MENUITEMINFO mii = { 0 };
-                mii.cbSize = sizeof(MENUITEMINFO);
-                mii.fMask = MIIM_STATE | MIIM_SUBMENU;
-                GetMenuItemInfo(pNowMenu->m_hMenu, i, TRUE, &mii);
-                if (mii.fState & MF_HILITE)
+                SMenu *pMenu = pNowMenu->GetMenu();
+                if (pMenu && pMenu->GetHMenu())
                 {
-                    selItem = i;
-                    hSubMenu = mii.hSubMenu;
-                    break;
+                    HMENU hMenu = pMenu->GetHMenu();
+                    int nMenuItemCount = GetMenuItemCount(hMenu);
+                    for (int i = 0; i < nMenuItemCount; i++)
+                    {
+                        MENUITEMINFO mii = { 0 };
+                        mii.cbSize = sizeof(MENUITEMINFO);
+                        mii.fMask = MIIM_STATE | MIIM_SUBMENU;
+                        GetMenuItemInfo(hMenu, i, TRUE, &mii);
+                        if (mii.fState & MF_HILITE)
+                        {
+                            selItem = i;
+                            hSubMenuWnd = (HWND)mii.hSubMenu;
+                            break;
+                        }
+                    }
                 }
             }
-            if (selItem != -1 && hSubMenu)
+            else
             {
-                BOOL isMenuExpended = IsWindowVisible((HWND)hSubMenu);
+                SMenuEx *pMenuEx = pNowMenu->GetMenuEx();
+                if (pMenuEx)
+                {
+                    for(int i = 0; i < pMenuEx->GetMenuItemCount(); i++)
+                    {
+                        SMenuExItem *pItem = pMenuEx->GetMenuItem(i, FALSE);
+                        if (pItem->GetState() & WndState_Hover)
+                        {
+                            selItem = i;
+                            if(pItem->GetSubMenu())
+                                hSubMenuWnd = pItem->GetSubMenu()->GetHostWnd()->GetHwnd();
+                            else
+                                hSubMenuWnd = NULL;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (selItem != -1 && hSubMenuWnd)
+            {
+                BOOL isMenuExpended = IsWindowVisible(hSubMenuWnd);
                 if (isMenuExpended && vKey == VK_LEFT)
                 {
                     return FALSE;

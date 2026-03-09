@@ -1,5 +1,5 @@
-﻿<menu iconSkin="" itemHeight="26" iconMargin="4" textMargin="8" maxWidth="120">
-  <item id="31" name="menu_tool_format_xml" text="@string/format_xml"/>
-  <item id="32" name="menu_tool_view_skin" text="@string/view_skin"/>
-  <item id="33" name="menu_tool_preview" text="@string/view_preview"/>
-</menu>
+﻿<menuRoot iconSkin="" itemHeight="26" iconMargin="4" textMargin="8" maxWidth="120" itemSkin="skin_menu_skin_png" colorText="@color/white" colorTextDisable="@color/gray">
+  <menuItem id="31" name="menu_tool_format_xml" text="@string/format_xml"/>
+  <menuItem id="32" name="menu_tool_view_skin" text="@string/view_skin"/>
+  <menuItem id="33" name="menu_tool_preview" text="@string/view_preview"/>
+</menuRoot>

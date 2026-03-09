@@ -20,6 +20,9 @@
 #include <shlwapi.h>
 #include <atl.mini/SComCli.h>
 #include "FileTreeDragdrop.h"
+#include "FileOperationManager.h"
+#include "UIResManager.h"
+
 #define kLogTag "maindlg"
 
 #define UIRES_FILE	L"uires.idx"
@@ -33,10 +36,10 @@ CMainDlg::CMainDlg()
 ,m_editXmlType(FT_UNKNOWN)
 ,m_UIResFileMgr(this)
 ,m_bIsOpen(FALSE)
-,m_uClipboardFormat(0)
+,m_pFileOperationManager(NULL)
+,m_pUIResManager(NULL)
+,m_pToolbarManager(NULL)
 {
-	// 注册自定义 clipboard format
-	m_uClipboardFormat = RegisterClipboardFormat(_T("SOUI_UIEDITOR_FILE_ITEMS"));
 	m_skinPool.Attach(new SSkinPool());
 	SUiDef::getSingleton().PushSkinPool(m_skinPool);
 }
@@ -52,14 +55,28 @@ CMainDlg::~CMainDlg()
 	{
 		delete m_pImageViewer;
 	}
+	
+	if (m_pFileOperationManager)
+	{
+		delete m_pFileOperationManager;
+	}
+	
+	if (m_pUIResManager)
+	{
+		delete m_pUIResManager;
+	}
+	
+	if (m_pToolbarManager)
+	{
+		delete m_pToolbarManager;
+	}
+	
 	SUiDef::getSingleton().PopSkinPool(m_skinPool);
 }
 
 BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 {
 	::RegisterDragDrop(hWnd, GetDropTarget());
-
-	m_btn_recentFile = FindChildByName2<SButton>(L"toolbar_btn_recent");
 	// 初始化文件树视图
 	m_treeView = FindChildByID2<STreeView>(R.id.workspace_treeview);
 	if (m_treeView)
@@ -73,10 +90,11 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 		RegisterDragDrop(m_treeView->GetSwnd(), pDT);
 		pDT->Release();
 	}
-    FindChildByID(R.id.chk_autosave)->SetCheck(m_bAutoSave);
 	m_RecentFileMenu.LoadMenu(UIRES.smenu.menu_recent);
-
 	LoadAppCfg();
+
+    FindChildByID(R.id.chk_autosave)->SetCheck(m_bAutoSave);
+
 
 	//======================================================================
 	m_pXmlEdtior = new CXmlEditor(this);
@@ -84,8 +102,14 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
     m_pImageViewer = new CImageViewer(this);
 	m_pImageViewer->Init(GetRoot());
 
-	InitSkinToolbar();
-	InitWidgetToolbar();
+	// 初始化管理类
+	m_pFileOperationManager = new CFileOperationManager(m_treeView, m_pFileTreeAdapter, m_hWnd);
+	m_pUIResManager = new CUIResManager(&m_UIResFileMgr);
+	m_pToolbarManager = new CToolbarManager(m_skinPool);
+
+	// 初始化工具栏
+	m_pToolbarManager->InitWidgetToolbar(GetRoot(), m_pXmlEdtior);
+	m_pToolbarManager->InitSkinToolbar(GetRoot());
 
 	HRESULT hr = ::RegisterDragDrop(m_hWnd, GetDropTarget());
 	RegisterDragDrop(m_treeView->GetSwnd(), new CDropTarget(this));
@@ -261,215 +285,17 @@ void CMainDlg::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
 		}
 	}
 }
-std::vector<HSTREEITEM> CMainDlg::GetSelectedItems(HSTREEITEM hDefaultItem /*= NULL*/)
-{
-	std::vector<HSTREEITEM> selectedItems;
-	int selCount = m_treeView->GetSelItemCount();
-	if(selCount > 0)
-	{
-		HSTREEITEM *pItems = new HSTREEITEM[selCount];
-		m_treeView->GetSelItems(pItems, selCount);
-		for(int i = 0; i < selCount; i++)
-		{
-			selectedItems.push_back(pItems[i]);
-		}
-		delete []pItems;
-	}
-	else if(hDefaultItem)
-	{
-		selectedItems.push_back(hDefaultItem);
-	}
-	return selectedItems;
-}
-
 void CMainDlg::OnTvKeyDown(IEvtArgs *e)
 {
 	EventKeyDown * e2 = sobj_cast<EventKeyDown>(e);
-	HandleTreeViewKeyboardShortcut(e2->nChar);
-}
-
-BOOL CMainDlg::HandleTreeViewKeyboardShortcut(UINT nChar)
-{
-	if(!m_treeView || !m_bIsOpen)
-		return FALSE;
-#ifdef __APPLE__
-	BOOL  bCtrlPressed  = (GetKeyState(VK_LWIN) | GetKeyState(VK_RWIN)) & 0x8000 != 0;
-#else
-	BOOL bCtrlPressed = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
-#endif
-	HSTREEITEM hItem = m_treeView->GetSel();
-	if(bCtrlPressed)
+	if (m_pFileOperationManager)
 	{
-		if(nChar == _T('C') || nChar == _T('c'))
-		{
-			OnFileCopy();
-			return TRUE;
-		}
-		else if(nChar == _T('V') || nChar == _T('v'))
-		{
-			if(hItem == ITEM_NULL)
-				return FALSE;
-			
-			OnFilePaste(hItem);
-			return TRUE;
-		}
-		else if(nChar == _T('X') || nChar == _T('x'))
-		{
-			OnFileCut();
-			return TRUE;
-		}
-    }
-    else if (nChar == VK_DELETE || nChar == VK_BACK)
-    {
-        OnFileDelete(ITEM_NULL);
-        return TRUE;
-    }
-    else if (nChar == VK_F2)
-    {
-        if (hItem == ITEM_NULL)
-            return FALSE;
-        OnFileRename(hItem);
-        return TRUE;
-    }
-	return FALSE;
-}
-
-
-enum {
-	file_op_copy=1,
-	file_op_cut=2,
-};
-void CMainDlg::OnFileCopy()
-{
-	std::vector<HSTREEITEM> selectedItems = GetSelectedItems();
-	if(!selectedItems.empty())
-	{
-		// 清除之前的剪切状态
-		m_pFileTreeAdapter->ClearAllCutStates();
-		SerializeItemsToClipboard(selectedItems, file_op_copy);
+		m_pFileOperationManager->HandleTreeViewKeyboardShortcut(e2->nChar);
 	}
 }
 
-void CMainDlg::OnFileCut()
-{
-	std::vector<HSTREEITEM> selectedItems = GetSelectedItems();
-	if(!selectedItems.empty())
-	{
-		// 清除之前的剪切状态
-		m_pFileTreeAdapter->ClearAllCutStates();
-		// 标记当前选中项为剪切状态
-		for(std::vector<HSTREEITEM>::iterator it = selectedItems.begin();it!= selectedItems.end();it++)
-		{
-			m_pFileTreeAdapter->SetItemCutState(*it, TRUE);
-		}
-		SerializeItemsToClipboard(selectedItems, file_op_cut);
-	}
-}
 
-void CMainDlg::OnFileDelete(HSTREEITEM hItem)
-{
-    std::vector<HSTREEITEM> itemsToDelete = GetSelectedItems(hItem);
-    if (!itemsToDelete.empty())
-    {
-        SStringT strMsg = _T("确定要删除") + SStringT().Format(_T("%d"), itemsToDelete.size()) + _T("个项目吗？");
-        if (SMessageBox(m_hWnd, strMsg, _T("提示"), MB_YESNO | MB_ICONQUESTION) == IDYES)
-        {
-            for (size_t i = 0; i < itemsToDelete.size(); i++)
-            {
-                m_pFileTreeAdapter->RemoveItem(itemsToDelete[i]);
-            }
-        }
-    }
-}
-
-void CMainDlg::OnFileRename(HSTREEITEM hItem)
-{
-    const FileItemData &itemData = m_pFileTreeAdapter->GetItemData(hItem);
-    SDlgInput dlgInput;
-    dlgInput.m_strTitle = _T("请输入新名称");
-    dlgInput.m_strValue = itemData.strName;
-    if (IDOK == dlgInput.DoModal(m_hWnd) && !dlgInput.m_strValue.IsEmpty())
-    {
-        ::MoveFile(itemData.strPath, itemData.strPath.Left(itemData.strPath.ReverseFind(_T('/')) + 1) + dlgInput.m_strValue);
-    }
-}
-
-void CMainDlg::OnFilePaste()
-{
-	HSTREEITEM hItem = m_treeView->GetSel();
-	if(hItem)
-	{
-		OnFilePaste(hItem);
-	}
-}
-
-void CMainDlg::OnFilePaste(HSTREEITEM hItem)
-{
-	std::vector<SStringT> vecClipboardItems;
-	int nClipboardOperation = 0;
-	BOOL bFromClipboard = DeserializeItemsFromClipboard(vecClipboardItems, nClipboardOperation);
-	
-	if(bFromClipboard && !vecClipboardItems.empty() && nClipboardOperation > 0)
-	{
-		const FileItemData& destItemData = m_pFileTreeAdapter->GetItemData(hItem);
-		SStringT strDestPath = destItemData.bIsDir ? destItemData.strPath : destItemData.strPath.Left(destItemData.strPath.ReverseFind(_T('/')));
-		
-		for(size_t i = 0; i < vecClipboardItems.size(); i++)
-		{
-			SStringT strSrcPath = vecClipboardItems[i];
-			int nPos = strSrcPath.ReverseFind(_T('/'));
-			SStringT strFileName = strSrcPath.Mid(nPos + 1);
-			SStringT strDestFilePath = strDestPath + _T('/') + strFileName;
-			
-			if(nClipboardOperation == 1)
-			{
-				if(::PathFileExists(strDestFilePath))
-				{
-					SStringT strBaseName = strFileName.Left(strFileName.ReverseFind(_T('.')));
-					SStringT strExt = strFileName.Mid(strFileName.ReverseFind(_T('.')));
-					int nIndex = 1;
-					while(::PathFileExists(strDestPath + _T('/') + strBaseName + _T('(') + SStringT().Format(_T("%d"), nIndex) + _T(')') + strExt))
-					{
-						nIndex++;
-					}
-					strDestFilePath = strDestPath + _T('/') + strBaseName + _T('(') + SStringT().Format(_T("%d"), nIndex) + _T(')') + strExt;
-				}
-				
-				if(::PathIsDirectory(strSrcPath))
-				{
-					SHFILEOPSTRUCT fos = {0};
-					fos.wFunc = FO_COPY;
-					fos.pFrom = strSrcPath + _T('\0');
-					fos.pTo = strDestFilePath + _T('\0');
-					fos.fFlags = FOF_NOCONFIRMMKDIR | FOF_SILENT | FOF_NOERRORUI;
-					::SHFileOperation(&fos);
-				}
-				else
-				{
-					::CopyFile(strSrcPath, strDestFilePath, FALSE);
-				}
-			}
-			else if(nClipboardOperation == file_op_cut)
-			{
-				if(::PathIsDirectory(strSrcPath))
-				{
-					SHFILEOPSTRUCT fos = {0};
-					fos.wFunc = FO_MOVE;
-					fos.pFrom = strSrcPath + _T('\0');
-					fos.pTo = strDestPath + _T('\0');
-					fos.fFlags = FOF_NOCONFIRMMKDIR | FOF_SILENT | FOF_NOERRORUI;
-					::SHFileOperation(&fos);
-				}
-				else
-				{
-					::MoveFile(strSrcPath, strDestFilePath);
-				}
-			}
-		}
-		// 清除所有剪切状态
-		m_pFileTreeAdapter->ClearAllCutStates();
-	}
-}
+// 文件操作相关方法已移至CFileOperationManager
 
 
 void CMainDlg::OnBtnOpen()
@@ -530,7 +356,7 @@ BOOL CMainDlg::OpenProject(SStringT strFileName)
 		{
 			std::vector<SStringT>::iterator it = std::find(m_vecRecentFile.begin(), m_vecRecentFile.end(), strFileName);
 			if (it != m_vecRecentFile.end())
-			{				
+			{			
 				m_vecRecentFile.erase(it);
 				SaveAppCfg();
 				LoadAppCfg();
@@ -546,7 +372,6 @@ BOOL CMainDlg::OpenProject(SStringT strFileName)
 		return FALSE;
 	}
 
-	m_strUIResFile = strFileName;
 	m_pXmlEdtior->SetProjectPath(strFileName);
 
     m_bIsOpen = TRUE;
@@ -575,203 +400,7 @@ void CMainDlg::ReloadWorkspaceUIRes()
 	m_UIResFileMgr.OpenProject(m_strUiresPath);
 }
 
-// 序列化项目到 clipboard
-void CMainDlg::SerializeItemsToClipboard(const std::vector<HSTREEITEM>& items, int nOperation)
-{
-	if(items.empty())
-		return;
-	if(!OpenClipboard(m_hWnd))
-	{
-		SLOGW()<<"OpenClipboard failed";
-		return;
-	}
-	EmptyClipboard();
-	// 准备数据：操作类型 + 项目数量 + 项目路径列表（UTF-8）
-	std::vector<SStringA> vecItemPathsUtf8;
-	for(size_t i = 0; i < items.size(); i++)
-	{
-		const FileItemData& itemData = m_pFileTreeAdapter->GetItemData(items[i]);
-		vecItemPathsUtf8.push_back(S_CT2A(itemData.strPath));
-	}
-
-	// 计算所需缓冲区大小
-	std::stringstream ss;
-	int nCount = vecItemPathsUtf8.size();
-	for(size_t i = 0; i < vecItemPathsUtf8.size(); i++)
-	{
-		ss<< vecItemPathsUtf8[i].c_str();
-		ss<< '\0';
-	}
-	ss<< '\0';
-
-	// 分配内存
-	HGLOBAL hGlobal = GlobalAlloc(GMEM_MOVEABLE, ss.str().size() + sizeof(int) * 2);
-	if(hGlobal)
-	{
-		LPVOID lpData = GlobalLock(hGlobal);
-		if(lpData)
-		{
-			BYTE* pBuffer = (BYTE*)lpData;
-			
-			// 写入操作类型
-			*((int*)pBuffer) = nOperation;
-			pBuffer += sizeof(int);
-			
-			// 写入项目数量
-			*((int*)pBuffer) = nCount;
-			pBuffer += sizeof(int);
-			// 写入项目路径（UTF-8）
-			memcpy(pBuffer, ss.str().c_str(), ss.str().size());
-			
-			GlobalUnlock(hGlobal);
-			SetClipboardData(m_uClipboardFormat, hGlobal);
-		}
-		else
-		{
-			GlobalFree(hGlobal);
-		}
-	}
-	hGlobal = GlobalAlloc(GMEM_MOVEABLE, ss.str().size() + sizeof(DROPFILES));
-	if(hGlobal)
-	{
-		LPVOID lpData = GlobalLock(hGlobal);
-		if(lpData)
-		{
-			BYTE* pBuffer = (BYTE*)lpData;
-			DROPFILES* pDropFiles = (DROPFILES*)pBuffer;
-			pDropFiles->fNC = FALSE;
-			pDropFiles->fWide = FALSE;
-			pDropFiles->pFiles = sizeof(DROPFILES);
-			pBuffer += sizeof(DROPFILES);
-			memcpy(pBuffer, ss.str().c_str(), ss.str().size());
-			GlobalUnlock(hGlobal);
-			SetClipboardData(CF_HDROP, hGlobal);
-		}
-		else
-		{
-			GlobalFree(hGlobal);
-		}
-	}
-	CloseClipboard();
-}
-
-// 从 CF_HDROP 读取文件路径
-// 检查 clipboard 是否有数据
-BOOL CMainDlg::HasClipboardData()
-{
-	BOOL bHasData = FALSE;
-	
-	if(IsClipboardFormatAvailable(m_uClipboardFormat))
-	{
-		if(OpenClipboard(m_hWnd))
-		{
-			HGLOBAL hGlobal = (HGLOBAL)GetClipboardData(m_uClipboardFormat);
-			if(hGlobal)
-			{
-				LPVOID lpData = GlobalLock(hGlobal);
-				if(lpData)
-				{
-					BYTE* pBuffer = (BYTE*)lpData;
-					int nOperation = *((int*)pBuffer);
-					int nCount = *((int*)(pBuffer + sizeof(int)));
-					bHasData = (nOperation > 0 && nCount > 0);
-					GlobalUnlock(hGlobal);
-				}
-			}
-			CloseClipboard();
-		}
-	}
-	
-	if(!bHasData && IsClipboardFormatAvailable(CF_HDROP))
-	{
-		bHasData = TRUE;
-	}
-	
-	return bHasData;
-}
-
-// 从 clipboard 反序列化项目
-BOOL CMainDlg::DeserializeItemsFromClipboard(std::vector<SStringT>& vecItemPaths, int& nOperation)
-{
-	vecItemPaths.clear();
-
-	// 首先尝试读取自定义格式
-	if(IsClipboardFormatAvailable(m_uClipboardFormat))
-	{
-		if(OpenClipboard(m_hWnd))
-		{
-			HGLOBAL hGlobal = (HGLOBAL)GetClipboardData(m_uClipboardFormat);
-			if(hGlobal)
-			{
-				LPVOID lpData = GlobalLock(hGlobal);
-				if(lpData)
-				{
-					BYTE* pBuffer = (BYTE*)lpData;
-					
-					// 读取操作类型
-					nOperation = *((int*)pBuffer);
-					pBuffer += sizeof(int);
-					
-					// 读取项目数量
-					int nCount = *((int*)pBuffer);
-					pBuffer += sizeof(int);
-					
-					// 读取项目路径（UTF-8）
-					for(int i = 0; i < nCount; i++)
-					{
-						// 读取 UTF-8 字符串
-						char* szUtf8Path = (char*)pBuffer;
-						int nLen = strlen(szUtf8Path) + 1;
-						// 转换为宽字符串
-						SStringT strPath = S_CA2T(szUtf8Path, CP_UTF8);
-						vecItemPaths.push_back(strPath);
-						pBuffer += nLen;
-					}
-					
-					GlobalUnlock(hGlobal);
-					CloseClipboard();
-					return !vecItemPaths.empty();
-				}
-			}
-			CloseClipboard();
-		}
-	}
-
-	// 如果自定义格式失败，尝试读取系统资源管理器的 CF_HDROP 格式
-	if(IsClipboardFormatAvailable(CF_HDROP))
-	{
-		if(OpenClipboard(m_hWnd))
-		{
-			HGLOBAL hGlobal = (HGLOBAL)GetClipboardData(CF_HDROP);
-			if(hGlobal)
-			{
-				HDROP hDrop = (HDROP)GlobalLock(hGlobal);
-				if(hDrop)
-				{
-					UINT nFileCount = DragQueryFile(hDrop, 0xFFFFFFFF, NULL, 0);
-					for(UINT i = 0; i < nFileCount; i++)
-					{
-						TCHAR szFilePath[MAX_PATH];
-						if(DragQueryFile(hDrop, i, szFilePath, MAX_PATH))
-						{
-							vecItemPaths.push_back(szFilePath);
-						}
-					}
-					GlobalUnlock(hGlobal);
-					CloseClipboard();
-					if(!vecItemPaths.empty())
-					{
-						nOperation = file_op_copy; // 资源管理器复制默认为复制操作
-						return TRUE;
-					}
-				}
-			}
-			CloseClipboard();
-		}
-	}
-
-	return FALSE;
-}
+// 剪贴板相关方法已移至CClipboardManager
 
 BOOL CMainDlg::OnBtnSave()
 {
@@ -879,7 +508,7 @@ void CMainDlg::OnTvEventOfPanel(IEvtArgs *e)
 		}
 	
 		// 根据 clipboard 状态更新菜单项
-		menu.EnableMenuItem(menu_paste, HasClipboardData()?MF_ENABLED:MF_DISABLED);
+		menu.EnableMenuItem(menu_paste, m_pFileOperationManager->HasClipboardData()?MF_ENABLED:MF_DISABLED);
 	
 		int nId = menu.TrackPopupMenu(TPM_RETURNCMD, rc.left, rc.top, m_hWnd);
 		SLOGI()<<"menu id:"<<nId;
@@ -894,7 +523,7 @@ void CMainDlg::OnTvEventOfPanel(IEvtArgs *e)
 						SLOGW() << "请先打开工程";
 						return;
 					}
-				
+					
 					const FileItemData& itemData = m_pFileTreeAdapter->GetItemData(hItem);
 					SStringT strDir = itemData.bIsDir ? itemData.strPath : itemData.strPath.Left(itemData.strPath.ReverseFind(_T('/')));
 					SDlgInput dlgInput;
@@ -914,7 +543,7 @@ void CMainDlg::OnTvEventOfPanel(IEvtArgs *e)
 						SLOGW() << "请先打开工程";
 						return;
 					}
-				
+					
 					SStringT strDir = itemData.bIsDir ? itemData.strPath : itemData.strPath.Left(itemData.strPath.ReverseFind(_T('/')));
 					SDlgInput dlgInput;
 					dlgInput.m_strTitle = _T("请输入文件夹名");
@@ -933,7 +562,7 @@ void CMainDlg::OnTvEventOfPanel(IEvtArgs *e)
 						SLOGW() << "请先打开工程";
 						return;
 					}
-				
+					
 					const FileItemData& itemData = m_pFileTreeAdapter->GetItemData(hItem);
 					SASSERT(itemData.bIsDir);
 					SDlgNewLayout DlgNewDialog(_T("layout:UIDESIGNER_XML_NEW_LAYOUT"), m_strProPath, itemData.strName);
@@ -951,7 +580,7 @@ void CMainDlg::OnTvEventOfPanel(IEvtArgs *e)
 						SLOGW() << "请先打开工程";
 						return;
 					}
-				
+					
 					const FileItemData& itemData = m_pFileTreeAdapter->GetItemData(hItem);
 					SASSERT(itemData.bIsDir);
 					SDlgNewLayout DlgNewDialog(_T("layout:UIDESIGNER_XML_NEW_LAYOUT"), m_strProPath, itemData.strName);
@@ -964,34 +593,26 @@ void CMainDlg::OnTvEventOfPanel(IEvtArgs *e)
 				}
 			case menu_copy://复制
 			{
-				std::vector<HSTREEITEM> selectedItems = GetSelectedItems(hItem);
-				if(!selectedItems.empty())
-				{
-					SerializeItemsToClipboard(selectedItems, file_op_copy);
-				}
+				m_pFileOperationManager->OnFileCopy();
 			}
 			break;
 		case menu_cut://剪切
 			{
-				std::vector<HSTREEITEM> selectedItems = GetSelectedItems(hItem);
-				if(!selectedItems.empty())
-				{
-					SerializeItemsToClipboard(selectedItems, file_op_cut);
-				}
+				m_pFileOperationManager->OnFileCut();
 			}
 			break;
             case menu_paste: // 粘贴
             {
-                OnFilePaste(hItem);
+                m_pFileOperationManager->OnFilePaste(hItem);
             }
             break;
             case menu_delete: // 删除
             {
-                OnFileDelete(hItem);
+                m_pFileOperationManager->OnFileDelete(hItem);
             }
             break;
             case menu_rename: // 重命名
-                OnFileRename(hItem);
+                m_pFileOperationManager->OnFileRename(hItem);
                 break;
             case menu_explorer: // reveal in explorer
             {
@@ -1021,11 +642,11 @@ void CMainDlg::OnTvEventOfPanel(IEvtArgs *e)
 			}
 			break;
             case menu_add_to_uires: // add to uires.idx
-                addUires(hItem);
+                m_pUIResManager->AddUires(hItem, m_treeView, m_pFileTreeAdapter);
                 break;
             case menu_add_skin:
-                addUires(hItem); // add to uires.idx first
-                addSkin(hItem);
+                m_pUIResManager->AddUires(hItem, m_treeView, m_pFileTreeAdapter); // add to uires.idx first
+                m_pUIResManager->AddSkin(hItem, m_treeView, m_pFileTreeAdapter);
                 break;
             }
         }
@@ -1072,10 +693,10 @@ void CMainDlg::OnTvEventOfPanel(IEvtArgs *e)
 		EventMouseClick *pEvt = sobj_cast<EventMouseClick>(e2->pOrgEvt);
 		if(pEvt->clickId==MOUSE_LBTN_DOWN){
 			m_tvClickPt = pEvt->pt;
-//			SLOGI()<<"Mouse click:"<<pEvt->pt.x<<","<<pEvt->pt.y;
+			//		SLOGI()<<"Mouse click:"<<pEvt->pt.x<<","<<pEvt->pt.y;
 		}else if(pEvt->clickId == MOUSE_LBTN_UP){
 			m_tvClickPt = CPoint(-1, -1);
-//			SLOGI()<<"Mouse up:"<<pEvt->pt.x<<","<<pEvt->pt.y;
+			//		SLOGI()<<"Mouse up:"<<pEvt->pt.x<<","<<pEvt->pt.y;
 		}
     }
     else if (m_tvClickPt.x!=-1 && e2->pOrgEvt->GetID() == EventSwndMouseMove::EventID)
@@ -1090,313 +711,30 @@ void CMainDlg::OnTvEventOfPanel(IEvtArgs *e)
 			if(!pItemPanel) return;
 			
 			HSTREEITEM hItem = (HSTREEITEM)pItemPanel->GetItemIndex();
-			std::vector<HSTREEITEM> selectedItems = GetSelectedItems(hItem);
-			if(selectedItems.empty())
-			{
-				m_tvClickPt = CPoint(-1, -1);
-				return;
-			}
-
-			// 收集所有选中项目的文件路径信息
-			std::vector<SStringW> filePaths;
-			int totalPathLength = 0;
+			SWND swndCapture = pSender->GetCapture();
+		    SWindow *pCapture = SWindowMgr::GetWindow(swndCapture); 
+		    if (pCapture)
+		    {
+		        pCapture->ReleaseCapture();
+		    }
 			
-			for(size_t i = 0; i < selectedItems.size(); i++)
-			{
-				const FileItemData &itemData = m_pFileTreeAdapter->GetItemData(selectedItems[i]);
-                SStringW strPathW = S_CT2W(itemData.strPath);
-                filePaths.push_back(strPathW);
-                totalPathLength += strPathW.GetLength() + 1; // +1 用于宽字符终止符
-			}
-
-			// 创建 DROPFILES 格式的全局内存，用于支持标准文件拖放
-			HGLOBAL hGlobal = GlobalAlloc(GMEM_MOVEABLE, sizeof(DROPFILES) + totalPathLength * sizeof(wchar_t) + sizeof(wchar_t));
-			if(!hGlobal)
-			{
-				m_tvClickPt = CPoint(-1, -1);
-				return;
-			}
-
-			DROPFILES *pDropFiles = (DROPFILES *)GlobalLock(hGlobal);
-			if(!pDropFiles)
-			{
-				GlobalFree(hGlobal);
-				m_tvClickPt = CPoint(-1, -1);
-				return;
-			}
-
-			// 初始化 DROPFILES 结构
-			pDropFiles->pFiles = sizeof(DROPFILES);
-			pDropFiles->pt.x = m_tvClickPt.x;
-			pDropFiles->pt.y = m_tvClickPt.y;
-			pDropFiles->fNC = FALSE;
-			pDropFiles->fWide = TRUE;
-
-			// 复制所有选中项目的路径到全局内存
-			wchar_t *pPath = (wchar_t *)((BYTE *)pDropFiles + sizeof(DROPFILES));
-			for(size_t i = 0; i < filePaths.size(); i++)
-			{
-				SStringW strPathW =filePaths[i];
-				int pathLength = strPathW.GetLength() + 1;
-				wcscpy_s(pPath, pathLength, strPathW.c_str());
-				pPath += pathLength;
-			}
-			// 添加最终的空终止符
-			*pPath = L'\0';
-
-			GlobalUnlock(hGlobal);
-
-			// 创建数据对象和拖放源
-			SComPtr<IDataObject> pDataObj(new FileTreeDataSource(hGlobal, TRUE), FALSE);
-            SComPtr<FileTreeDropSource> pDropSource(new FileTreeDropSource(), FALSE);
-			
-			if(!pDataObj || !pDropSource)
-			{
-				GlobalFree(hGlobal);
-				m_tvClickPt = CPoint(-1, -1);
-				return;
-			}
-            HBITMAP hDragBitmap = FileTreeDropSource::CreateDragBitmap(filePaths);
-            pDropSource->SetDragImage(hDragBitmap, CPoint(-10, -10));
-            SWND swndCapture = pSender->GetCapture();
-            SWindow *pCapture = SWindowMgr::GetWindow(swndCapture); 
-            if (pCapture)
-            {
-                pCapture->ReleaseCapture();
-            }
 			// 执行拖放操作
-			DWORD dwEffect = DROPEFFECT_MOVE;
-            SLOGI() << "Before DoDragDrop";
-			HRESULT hr = ::DoDragDrop(pDataObj, pDropSource, DROPEFFECT_MOVE, &dwEffect);
-			SLOGI()<<"DoDragDrop hr="<<hr<<" dwEffect="<<dwEffect;
-            pCapture = SWindowMgr::GetWindow(swndCapture); 
+			m_pFileOperationManager->StartDrag(hItem, m_tvClickPt);
+			
+		    pCapture = SWindowMgr::GetWindow(swndCapture); 
 			if (pCapture)
-            {//restore item state.
-                pCapture->SetCapture();
-                CPoint pt;
-                GetCursorPos(&pt);
-                ScreenToClient(&pt);
-                SendMessage(WM_LBUTTONUP, 0, MAKELPARAM(pt.x, pt.y));
-                SendMessage(WM_MOUSEMOVE, 0, MAKELPARAM(pt.x, pt.y));
-            }
-			// 拖放操作完成后才删除位图
-			if (hDragBitmap)
-			{
-				DeleteObject(hDragBitmap);
-			}
+		    {//restore item state.
+		        pCapture->SetCapture();
+		        CPoint pt;
+		        GetCursorPos(&pt);
+		        ScreenToClient(&pt);
+		        SendMessage(WM_LBUTTONUP, 0, MAKELPARAM(pt.x, pt.y));
+		        SendMessage(WM_MOUSEMOVE, 0, MAKELPARAM(pt.x, pt.y));
+		    }
 			
 			m_tvClickPt = CPoint(-1, -1);
 		}
 	}
-}
-
-void CMainDlg::addUires(HSTREEITEM hItem)
-{
-        BOOL bUpdated = FALSE;
-        int selCount = m_treeView->GetSelItemCount();
-        if (selCount)
-        {
-            HSTREEITEM *pItems = new HSTREEITEM[selCount];
-            m_treeView->GetSelItems(pItems, selCount);
-            // support multi select including sub directory
-            for (int i = 0; i < selCount; i++)
-            {
-                const FileItemData &itemData = m_pFileTreeAdapter->GetItemData(pItems[i]);
-
-                if (itemData.bIsDir)
-                {
-                    // 如果是目录，递归添加目录中的所有文件
-                    AddFilesInDirectoryToUIRes(itemData.strPath);
-                    bUpdated = TRUE;
-                }
-                else
-                {
-                    // 如果是文件，直接添加到UIRes
-                    if (m_UIResFileMgr.AddToUIRes(itemData.strPath))
-                        bUpdated = TRUE;
-                }
-            }
-            delete[] pItems;
-        }
-        else
-        {
-            const FileItemData &itemData = m_pFileTreeAdapter->GetItemData(hItem);
-            bUpdated = m_UIResFileMgr.AddToUIRes(itemData.strPath);
-        }
-        if (bUpdated && m_editXmlType == FT_INDEX_XML)
-        { // 如果正在编辑uires.idx
-            m_pXmlEdtior->LoadXml(m_strUIResFile, _T(""));
-            FindChildByID(R.id.property_panel_dock)->SetVisible(FALSE, TRUE);
-        }
-}
-
-void CMainDlg::addSkin(HSTREEITEM hItem)
-{
-    BOOL bUpdated = FALSE;
-    int selCount = m_treeView->GetSelItemCount();
-    std::vector<FileItemData> selectedItems;
-
-    if (selCount)
-    {
-        HSTREEITEM *pItems = new HSTREEITEM[selCount];
-        m_treeView->GetSelItems(pItems, selCount);
-        for (int i = 0; i < selCount; i++)
-        {
-            const FileItemData &itemData = m_pFileTreeAdapter->GetItemData(pItems[i]);
-            if (!itemData.bIsDir && m_UIResFileMgr.GetFileType(itemData.strPath) == FT_IMAGE)
-            {
-                selectedItems.push_back(itemData);
-            }
-        }
-        delete[] pItems;
-    }
-    else
-    {
-        const FileItemData &itemData = m_pFileTreeAdapter->GetItemData(hItem);
-        if (!itemData.bIsDir && m_UIResFileMgr.GetFileType(itemData.strPath) == FT_IMAGE)
-        {
-            selectedItems.push_back(itemData);
-        }
-    }
-
-    if (!selectedItems.empty())
-    {
-        // 加载skin.xml文件
-        pugi::xml_document &xmlDocSkin = m_UIResFileMgr.m_xmlDocSkin;
-        pugi::xml_node xmlSkinRoot = xmlDocSkin.child(L"skins");
-        if (!xmlSkinRoot)
-        {
-            xmlSkinRoot = xmlDocSkin.append_child(L"skins");
-        }
-
-        // 遍历选中的图片文件
-        for (std::vector<FileItemData>::iterator it = selectedItems.begin(); it != selectedItems.end(); ++it)
-        {
-			FileItemData &itemData = *it;
-            wchar_t szName[MAX_PATH], szExt[50];
-			SStringW strPath = S_CT2W(itemData.strPath);
-            _wsplitpath(strPath.c_str(), NULL, NULL, szName, szExt);
-
-            SStringW strName = szName;
-
-            // 解析文件名中的配置信息
-            int nStates = 1, left = -1, top = -1, right = -1, bottom = -1;
-            int nValues = 0;
-            int nColorize = 1, nAutoFit = 1, nTile = 0, nVertical = 0, nFilter = 0;
-
-            wchar_t* p = wcsrchr(szName, L'[');
-            if (p)
-            {
-                *p = 0;
-                strName = szName;
-                nValues = swscanf(p + 1, L"%d{%d,%d,%d,%d}]", &nStates, &left, &top, &right, &bottom);
-
-                const wchar_t* pszFind = wcsstr(p + 1, L"{ec=");
-                if (pszFind) nColorize = _wtoi(pszFind + 4);
-                pszFind = wcsstr(p + 1, L"{fit=");
-                if (pszFind) nAutoFit = _wtoi(pszFind + 5);
-                pszFind = wcsstr(p + 1, L"{filter=");
-                if (pszFind) nFilter = _wtoi(pszFind + 8);
-                pszFind = wcsstr(p + 1, L"{tile=");
-                if (pszFind) nTile = _wtoi(pszFind + 6);
-                pszFind = wcsstr(p + 1, L"{vert=");
-                if (pszFind) nVertical = _wtoi(pszFind + 6);
-            }
-
-            // 从uires.idx中查询src路径
-            SStringW strSrc;
-            pugi::xml_node xmlNodeUiRes = m_UIResFileMgr.m_xmlDocUiRes.child(L"uires");
-            if (xmlNodeUiRes)
-            {
-                pugi::xml_node fileNode = xmlNodeUiRes.child(strName.c_str());
-                if (fileNode)
-                {
-                    SStringW strPath = fileNode.attribute(L"path").as_string();
-                    wchar_t szPathName[MAX_PATH], szPathExt[50];
-                    _wsplitpath(strPath, NULL, NULL, szPathName, szPathExt);
-                    SStringW strPathName = szPathName;
-                    // 构建src路径，格式为：section:name
-                    pugi::xml_node parentNode = fileNode.parent();
-                    if (parentNode && wcscmp(parentNode.name(), L"uires") != 0)
-                    {
-                        strSrc = parentNode.name();
-                        strSrc += L":";
-                        strSrc += strName;
-                    }
-                    else
-                    {
-                        strSrc = L"";
-                        strSrc += L":";
-                        strSrc += strName;
-                    }
-                }
-            }
-
-            if (!strSrc.IsEmpty())
-            {
-                // 检查是否已存在同名皮肤
-                pugi::xml_node existingSkin = xmlSkinRoot.child(strName.c_str());
-                if (existingSkin)
-                {
-                    xmlSkinRoot.remove_child(existingSkin);
-                }
-
-                // 根据解析结果添加相应的皮肤配置
-                pugi::xml_node newSkin;
-                if (strPath.EndsWith(L".9.png"))
-                {
-                    // Android .9.png 格式
-                    newSkin = xmlSkinRoot.append_child(L"imgframe2");
-                }
-                else if (nValues == 0 || nValues == 1)
-                {
-                    // imglist
-                    newSkin = xmlSkinRoot.append_child(L"imglist");
-                }
-                else if (nValues == 3 || nValues == 5)
-                {
-                    // imgframe
-                    newSkin = xmlSkinRoot.append_child(L"imgframe");
-					SStringW strMargin;
-					strMargin.Format(L"%d,%d,%d,%d", left, top, right == -1 ? left : right, bottom == -1 ? top : bottom);
-                    newSkin.append_attribute(L"margin") = strMargin;
-                }
-
-                if (newSkin)
-                {
-                    newSkin.append_attribute(L"name") = strName;
-                    newSkin.append_attribute(L"src") = strSrc;
-                    newSkin.append_attribute(L"states") = nStates;
-
-                    // 设置各种可选属性
-                    if (nColorize == 0) newSkin.append_attribute(L"enableColorize") = 0;
-                    if (nAutoFit == 0) newSkin.append_attribute(L"autoFit") = 0;
-                    if (nTile != 0) newSkin.append_attribute(L"tile") = 1;
-                    if (nVertical != 0) newSkin.append_attribute(L"vertical") = 1;
-                    switch (nFilter)
-                    {
-                    case 1: newSkin.append_attribute(L"filterLevel") = L"low"; break;
-                    case 2: newSkin.append_attribute(L"filterLevel") = L"midium"; break;
-                    case 3: newSkin.append_attribute(L"filterLevel") = L"high"; break;
-                    }
-
-                    bUpdated = TRUE;
-                }
-            }
-        }
-
-        if (bUpdated)
-        {
-            // 保存skin.xml文件
-            xmlDocSkin.save_file(m_UIResFileMgr.m_strSkinFile, L"\t", pugi::format_default, pugi::encoding_utf8);
-            if (m_editXmlType == FT_SKIN)
-            {
-                // 如果正在编辑skin.xml，重新加载
-                m_pXmlEdtior->LoadXml(m_UIResFileMgr.m_strSkinFile, _T(""));
-                FindChildByID(R.id.property_panel_dock)->SetVisible(FALSE, TRUE);
-            }
-        }
-    }
 }
 
 BOOL CMainDlg::OnDrop(LPCTSTR pszName)
@@ -1482,7 +820,7 @@ void CMainDlg::onScintillaAutoComplete(CScintillaWnd *pSci,char ch)
 			if(m_editXmlType== FT_SKIN)
 				str = CSysDataMgr::getSingleton().GetSkinAttrAutos(strTag);
 			if (!str.IsEmpty())
-			{	// 自动完成字串要进行升充排列, 否则功能不正常
+			{ 	// 自动完成字串要进行升充排列, 否则功能不正常
 				pSci->SendEditor(SCI_AUTOCSHOW, lStart - startPos, (LPARAM)(LPCSTR)str);
 			}
 		}
@@ -1491,21 +829,7 @@ void CMainDlg::onScintillaAutoComplete(CScintillaWnd *pSci,char ch)
 
 void CMainDlg::UpdateEditorToolbar()
 {
-	switch(m_editXmlType)
-	{
-	case FT_LAYOUT_XML:
-		m_tbWidget->SetVisible(TRUE,TRUE);
-		m_tbSkin->SetVisible(FALSE,TRUE);
-		break;
-	case FT_SKIN:
-		m_tbWidget->SetVisible(FALSE,TRUE);
-		m_tbSkin->SetVisible(TRUE,TRUE);
-		break;
-	default:
-		m_tbWidget->SetVisible(FALSE,TRUE);
-		m_tbSkin->SetVisible(FALSE,TRUE);
-		break;
-	}
+    m_pToolbarManager->UpdateEditorToolbar(m_editXmlType);
 }
 
 void CMainDlg::OnDestroy()
@@ -1572,45 +896,6 @@ void CMainDlg::_OnFileChanged(tstring& strFile, CPathMonitor::Flag nFlag)
     }
 }
 
-// 递归添加目录中的所有文件到UIRes
-void CMainDlg::AddFilesInDirectoryToUIRes(const SStringT& dirPath)
-{
-    WIN32_FIND_DATA findData;
-    HANDLE hFind;
-    SStringT searchPath = dirPath;
-    searchPath += _T("/*.*");
-
-    hFind = FindFirstFile(searchPath, &findData);
-    if (hFind != INVALID_HANDLE_VALUE)
-    {
-        do
-        {
-            if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-            {
-                // 是子目录，跳过"."和".."目录
-                if (_tcscmp(findData.cFileName, _T(".")) != 0 &&
-                    _tcscmp(findData.cFileName, _T("..")) != 0)
-                {
-                    SStringT subDirPath = dirPath;
-                    subDirPath += _T("/");
-                    subDirPath += findData.cFileName;
-                    AddFilesInDirectoryToUIRes(subDirPath); // 递归处理子目录
-                }
-            }
-            else
-            {
-                // 是文件，添加到UIRes
-                SStringT filePath = dirPath;
-                filePath += _T("/");
-                filePath += findData.cFileName;
-                m_UIResFileMgr.AddToUIRes(filePath);
-            }
-        } while (FindNextFile(hFind, &findData));
-
-        FindClose(hFind);
-    }
-}
-
 void CMainDlg::OnBtnViewSkin()
 {
 	CSkinViewerDlg dlg(&m_UIResFileMgr);
@@ -1622,83 +907,15 @@ void CMainDlg::OnBtnPreview()
 	m_pXmlEdtior->StartPreviewProcess();
 }
 
-	struct IconInfo{
-		int iIcon;
-		SStringT strTxt;
-		SStringT strTip;
-	};
-void CMainDlg::InitWidgetToolbar(){
-    SXmlNode xmlNode = CSysDataMgr::getSingleton().getCtrlDefNode();
-    SXmlNode xmlIconSkin = xmlNode.child(L"toolbar").child(L"icons");
-    ISkinObj *pSkin = SApplication::getSingleton().CreateSkinByName(xmlIconSkin.attribute(L"class_name").as_string(SSkinImgList::GetClassName()));
-    if (pSkin)
-    {
-        pSkin->InitFromXml(&xmlIconSkin);
-        m_skinPool->AddSkin(pSkin);
-        pSkin->Release();
-    }
-	SArray<IconInfo> arrIcons;
-    SXmlNode xmlWidget = xmlNode.child(L"toolbar").child(L"items").first_child();
-    while (xmlWidget)
-    {
-        IconInfo info;
-        info.iIcon = xmlWidget.attribute(L"iconIndex").as_int(0);
-		SStringW strTxt = xmlWidget.attribute(L"name").as_string();
-        info.strTxt = S_CW2T(strTxt);
-        info.strTip = S_CW2T(xmlWidget.attribute(L"tip").as_string());
-        SStringW strContent;
-        xmlWidget.child(strTxt).ToString(&strContent);
-        arrIcons.Add(info);
-        m_mapWidget[info.strTxt] = strContent;
-        xmlWidget = xmlWidget.next_sibling();
-    }
-	SToolBar *pToolBar = FindChildByID2<SToolBar>(R.id.tb_widget);
-	pToolBar->SetIconsSkin(pSkin);
-	for(int i = 0; i < arrIcons.GetCount(); i++){
-		pToolBar->AddButton(i,arrIcons[i].iIcon,arrIcons[i].strTxt);
-	}
-    m_tbWidget = pToolBar;
-}
-
-void CMainDlg::InitSkinToolbar(){
-    SXmlNode xmlNode = CSysDataMgr::getSingleton().getSkinDefNode();
-    SXmlNode xmlIconSkin = xmlNode.child(L"toolbar").child(L"icons");
-    ISkinObj *pSkin = SApplication::getSingleton().CreateSkinByName(xmlIconSkin.attribute(L"class_name").as_string(SSkinImgList::GetClassName()));
-    if (pSkin)
-    {
-        pSkin->InitFromXml(&xmlIconSkin);
-        m_skinPool->AddSkin(pSkin);
-        pSkin->Release();
-    }
-    SArray<IconInfo> arrIcons;
-    SXmlNode xmlSkin = xmlNode.child(L"toolbar").child(L"items").first_child();
-    while (xmlSkin)
-    {
-        IconInfo info;
-        info.iIcon = xmlSkin.attribute(L"iconIndex").as_int(0);
-        info.strTxt = S_CW2T(xmlSkin.attribute(L"name").as_string());
-        info.strTip = S_CW2T(xmlSkin.attribute(L"tip").as_string());
-        arrIcons.Add(info);
-        xmlSkin = xmlSkin.next_sibling();
-    }
-    SToolBar *pToolBar = FindChildByID2<SToolBar>(R.id.tb_skin);
-    pToolBar->SetIconsSkin(pSkin);
-    for (int i = 0; i < arrIcons.GetCount(); i++)
-    {
-        pToolBar->AddButton(i, arrIcons[i].iIcon, arrIcons[i].strTxt);
-    }
-    m_tbSkin = pToolBar;
-}
-
-
 void CMainDlg::OnTbWidgetClick(IEvtArgs *e)
 {
 	EventToolBarCmd *e2=sobj_cast<EventToolBarCmd>(e);
 	ToolBarItem item;
-	m_tbWidget->GetItemInfo(e2->iItem,&item);
-    if (SMap<SStringT,SStringW>::CPair *pair = m_mapWidget.Lookup(item.strText))
+	m_pToolbarManager->GetWidgetToolbar()->GetItemInfo(e2->iItem,&item);
+    SStringW strContent = m_pToolbarManager->GetWidgetContent(item.strText);
+    if (!strContent.IsEmpty())
     {
-        m_pXmlEdtior->InsertWidget(S_CW2A(pair->m_value, CP_UTF8));
+        m_pXmlEdtior->InsertWidget(S_CW2A(strContent, CP_UTF8));
 	}
 }
 
@@ -1706,7 +923,7 @@ void CMainDlg::OnTbSkinClick(IEvtArgs *e)
 {
 	EventToolBarCmd *e2=sobj_cast<EventToolBarCmd>(e);
 	ToolBarItem item;
-	m_tbSkin->GetItemInfo(e2->iItem,&item);
+    m_pToolbarManager->GetSkinToolbar()->GetItemInfo(e2->iItem, &item);
     DlgInsertXmlElement dlg(&m_UIResFileMgr, CSysDataMgr::getSingleton().getSkinDefNode().child(L"skins"), S_CT2W(item.strText));
 	if(IDOK==dlg.DoModal())
 	{

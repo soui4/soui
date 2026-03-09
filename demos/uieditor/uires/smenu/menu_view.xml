@@ -1,6 +1,6 @@
-﻿<menu iconSkin="" itemHeight="26" iconMargin="4" textMargin="8" maxWidth="180">
-  <item id="21" name="menu_view_toolbar" text="@string/view_toolbar"/>
-  <item id="22" name="menu_view_statusbar" text="@string/view_statusbar"/>
+﻿<menuRoot iconSkin="" itemHeight="26" iconMargin="4" textMargin="8" maxWidth="180" itemSkin="skin_menu_skin_png" colorText="@color/white" colorTextDisable="@color/gray">
+  <menuItem id="21" name="menu_view_toolbar" text="@string/view_toolbar"/>
+  <menuItem id="22" name="menu_view_statusbar" text="@string/view_statusbar"/>
 	<sep/>
-  <item id="23" name="menu_view_property" text="@string/view_property"/>
-</menu>
+  <menuItem id="23" name="menu_view_property" text="@string/view_property"/>
+</menuRoot>

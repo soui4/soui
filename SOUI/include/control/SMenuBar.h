@@ -3,6 +3,7 @@
 
 #include <core/SWnd.h>
 #include <helper/SMenu.h>
+#include <helper/SMenuEx.h>
 
 SNSBEGIN
 
@@ -58,11 +59,24 @@ class SOUI_EXP SMenuBar : public SWindow {
     SMenu *GetMenu(DWORD dwPos);
 
     /**
+     * @brief Get the menu ex at a specific position
+     * @param dwPos Position of the menu
+     * @return Pointer to the menu ex, NULL if not found
+     */
+    SMenuEx *GetMenuEx(DWORD dwPos);
+
+    /**
      * @brief Hit test to determine the menu item under the mouse
      * @param pt Mouse coordinates
      * @return Index of the menu item if found, -1 otherwise
      */
     int HitTest(CPoint pt);
+
+    /**
+     * @brief Check if using SMenuEx
+     * @return TRUE if using SMenuEx, FALSE otherwise
+     */
+    BOOL IsUseMenuEx() const { return m_bUseMenuEx; }
 
   protected:
     /**
@@ -88,6 +102,9 @@ class SOUI_EXP SMenuBar : public SWindow {
      */
     static LRESULT CALLBACK MenuSwitch(int code, WPARAM wParam, LPARAM lParam);
 
+    SOUI_ATTRS_BEGIN()
+        ATTR_BOOL(L"useMenuEx", m_bUseMenuEx, FALSE)
+    SOUI_ATTRS_END()
   protected:
     SArray<SMenuBarItem *> m_lstMenuItem; /**< Array of menu bar items */
     HWND m_hWnd;                          /**< Handle to the window */
@@ -96,6 +113,7 @@ class SOUI_EXP SMenuBar : public SWindow {
     SMenuBarItem *m_pNowMenu;             /**< Pointer to the currently active menu item */
     int m_iNowMenu;                       /**< Index of the currently active menu item */
     CPoint m_ptMouse;                     /**< Mouse coordinates */
+    BOOL m_bUseMenuEx;                    /**< Flag indicating whether to use SMenuEx */
 
     static HHOOK m_hMsgHook;     /**< Handle to the message hook */
     static SMenuBar *m_pMenuBar; /**< Pointer to the current menu bar instance */

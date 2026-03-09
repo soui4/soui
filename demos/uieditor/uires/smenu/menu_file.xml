@@ -1,11 +1,11 @@
-﻿<menu iconSkin="" itemHeight="26" iconMargin="4" textMargin="8" maxWidth="180">
-  <item id="1" name="menu_file_openproject" text="@string/open_prject"/>
-  <item id="2" name="menu_file_closeproject" text="@string/close_prject"/>
+﻿<menuRoot iconSkin="" itemHeight="26" iconMargin="4" textMargin="8" maxWidth="180" itemSkin="skin_menu_skin_png" colorText="@color/white" colorTextDisable="@color/gray">
+  <menuItem id="1" name="menu_file_openproject" text="@string/open_prject"/>
+  <menuItem id="2" name="menu_file_closeproject" text="@string/close_prject"/>
 	<sep/>
-  <item id="3" name="menu_file_save_xml" text="@string/save_xml"/>
+  <menuItem id="3" name="menu_file_save_xml" text="@string/save_xml"/>
   <sep/>
-  <item id="4" name="menu_file_newlayout" text="@string/new_layout"/>
-  <item id="5" name="menu_file_newinclude" text="@string/new_include"/>
+  <menuItem id="4" name="menu_file_newlayout" text="@string/new_layout"/>
+  <menuItem id="5" name="menu_file_newinclude" text="@string/new_include"/>
   <sep/>
-	<item name="menu_file_exit" id="100" text="@string/exit"/>
-</menu>
+	<menuItem name="menu_file_exit" id="100" text="@string/exit"/>
+</menuRoot>

@@ -2,6 +2,7 @@
 #define _MAINDLG_H_
 
 #include <core/SWnd.h>
+#include <souicoll.h>
 #include <control/SCmnCtrl.h>
 #include "XmlEditor.h"
 #include "ImageViewer.h"
@@ -16,6 +17,10 @@
 #include <algorithm>
 #include "FileTreeAdapter.h"
 #include "monitor/PathMonitor.h"
+#include "FileOperationManager.h"
+#include "ClipboardManager.h"
+#include "UIResManager.h"
+#include "ToolbarManager.h"
 #define MenuId_Start  20000
 
 class CMainDlg : public SHostWnd, CScintillaWnd::IListener,public CDropTarget::IDropListener,  CPathMonitor::IListener
@@ -38,12 +43,9 @@ protected:
 	void ReloadWorkspaceUIRes();
 	bool CloseProject();
 
-	void UpdateEditorToolbar();
 	bool CheckSave();
 
 	BOOL NewLayout(const SStringT& strPath, const SStringT& strName);
-	void InitWidgetToolbar();
-	void InitSkinToolbar();
 protected:
 	void onScintillaSave(CScintillaWnd *pSci,LPCTSTR pszFileName) override;
 	void onScintillaAutoComplete(CScintillaWnd *pSci,char c) override;
@@ -66,11 +68,6 @@ protected:
 	void OnBtnPreview(); 
 	void OnBtnRecentFile(IEvtArgs *e);
     void OnTvEventOfPanel(IEvtArgs *pEvtBase);
-    void addUires(HSTREEITEM hItem);
-	void addSkin(HSTREEITEM hItem);
-	
-    // 递归添加目录中的所有文件到UIRes
-	void AddFilesInDirectoryToUIRes(const SStringT& dirPath);
 	void OnTvKeyDown(IEvtArgs *e);
 	void OnTbWidgetClick(IEvtArgs *e);
 	void OnTbSkinClick(IEvtArgs *e);
@@ -79,6 +76,7 @@ protected:
 	void OnUpdateCmdUI(IEvtArgs *e);
     void OnAutoCheck(IEvtArgs *e);
     void OnUpdateCmdTip(IEvtArgs *e);
+	void UpdateEditorToolbar();
 	EVENT_MAP_BEGIN()
 		if(m_pXmlEdtior) CHAIN_EVENT_MAP_MEMBER((*m_pXmlEdtior))
 		if(m_pImageViewer) CHAIN_EVENT_MAP_MEMBER((*m_pImageViewer))
@@ -125,51 +123,33 @@ private:
 	std::vector<SStringT> m_vecRecentFile;
 
 public:
-	SStringT	   m_strUIResFile;
-
 	SMenuEx		m_RecentFileMenu;
-	SButton*		m_btn_recentFile;
 
 	STreeView *m_treeView;          //文件树视图
 	SAutoRefPtr<CFileTreeAdapter> m_pFileTreeAdapter; //文件树适配器
-
 	SStringT  m_cmdWorkspaceFile;	//命令行要打开的工程文件
 	
 	// 文件操作相关
 	CPathMonitor m_pathMonitor;     // 路径监视器
 
-	// Clipboard 相关
-	UINT m_uClipboardFormat;        // 自定义 clipboard format
-	void SerializeItemsToClipboard(const std::vector<HSTREEITEM>& items, int nOperation);
-	BOOL DeserializeItemsFromClipboard(std::vector<SStringT>& vecItemPaths, int& nOperation);
-	BOOL HasClipboardData();
-	BOOL HandleTreeViewKeyboardShortcut(UINT nChar);
-	void OnFileCopy();
-	void OnFileCut();
-	void OnFilePaste();
-	void OnFilePaste(HSTREEITEM hItem);
-	void OnFileDelete(HSTREEITEM hItem);
-	void OnFileRename(HSTREEITEM hItem);
-	
-	// 辅助函数
-	std::vector<HSTREEITEM> GetSelectedItems(HSTREEITEM hDefaultItem = ITEM_NULL);
-	ResManger m_UIResFileMgr;	// 管理编辑的UI文件资源
+	// 管理类
+	CFileOperationManager* m_pFileOperationManager;
+	CUIResManager* m_pUIResManager;
+	CToolbarManager* m_pToolbarManager;
+
+	ResManger m_UIResFileMgr;    // 管理编辑的UI文件资源
 
 	CXmlEditor *m_pXmlEdtior;
 	CImageViewer *m_pImageViewer;
-	int		m_editXmlType;
-	
-	SToolBar * m_tbSkin;
-    SToolBar *m_tbWidget;
+	int	m_editXmlType;
 
-	SStringT m_strUiresPath;	//uires.idx 的全路径
+	SStringT m_strUiresPath;    //uires.idx 的全路径
 	SStringT m_strProPath;
 	
-	BOOL		m_bIsOpen;  //工程是否打开
-	bool		m_bAutoSave;
-	CPoint 	    m_tvClickPt;
+	BOOL	m_bIsOpen;  //工程是否打开
+	bool	m_bAutoSave;
+	CPoint  	m_tvClickPt;
 
 	SAutoRefPtr<SSkinPool> m_skinPool;
-	SMap<SStringT, SStringW> m_mapWidget;
 };
 #endif//_MAINDLG_H_
