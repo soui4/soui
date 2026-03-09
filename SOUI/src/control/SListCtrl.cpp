@@ -879,9 +879,6 @@ void SListCtrl::OnLButtonDown(UINT nFlags, CPoint pt)
     m_nHoverItem = HitTest(pt, &nSubItem);
     BOOL hitCheckBox = HitCheckBox(pt);
 
-    // 选择列
-    SetSelectedColumn(nSubItem);
-
     if (hitCheckBox)
         NotifySelChange(m_nSelectItem, m_nHoverItem, TRUE);
     else if (m_nHoverItem != m_nSelectItem && !m_bHotTrack)
