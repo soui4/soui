@@ -23,7 +23,7 @@
 #include "ToolbarManager.h"
 #define MenuId_Start  20000
 
-class CMainDlg : public SHostWnd, CScintillaWnd::IListener,public CDropTarget::IDropListener,  CPathMonitor::IListener
+class CMainDlg : public SHostWnd, public CDropTarget::IDropListener,  CPathMonitor::IListener
 {
 public:
 	CMainDlg();
@@ -46,9 +46,6 @@ protected:
 	bool CheckSave();
 
 	BOOL NewLayout(const SStringT& strPath, const SStringT& strName);
-protected:
-	void onScintillaSave(CScintillaWnd *pSci,LPCTSTR pszFileName) override;
-	void onScintillaAutoComplete(CScintillaWnd *pSci,char c) override;
 protected:
 	BOOL OnDrop(LPCTSTR pszName) override;
 protected:

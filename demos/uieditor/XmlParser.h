@@ -35,7 +35,7 @@ public:
 
 	bool loadUtf8(const char *utf8,int nLen);
 
-	NodeRange getNodePos(const int *nodePos,int nLen);
+	NodeRange getNodePos(const int *nodePos, int nLen, BOOL bWidgetNode);
 	NodeRange findElementRange(int pos);
 	int findElementOrder(int pos,std::vector<int> &order);
 	bool isRootLayout() const;

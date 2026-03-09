@@ -1,4 +1,4 @@
-﻿//stamp:28f5e2560df94dd3
+﻿//stamp:2ad33b80e679d21e
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -21,6 +21,7 @@
 			const TCHAR * UIDESIGNER_XML_INSERT_ELEMENT;
 			const TCHAR * designer_wnd;
 			const TCHAR * dlg_skin_viewer;
+			const TCHAR * dlg_find;
 			}LAYOUT;
 		struct _values{
 			const TCHAR * string;
@@ -83,6 +84,7 @@ struct _UIRES UIRES={
 			_T("LAYOUT:UIDESIGNER_XML_INSERT_ELEMENT"),
 			_T("LAYOUT:designer_wnd"),
 			_T("LAYOUT:dlg_skin_viewer"),
+			_T("LAYOUT:dlg_find"),
 		},
 		{
 			_T("values:string"),
@@ -151,13 +153,18 @@ struct _R{
 		 const wchar_t * btn_min;
 		 const wchar_t * btn_next;
 		 const wchar_t * btn_prev;
+		 const wchar_t * btn_replace;
 		 const wchar_t * btn_restore;
 		 const wchar_t * button1st;
 		 const wchar_t * button2nd;
 		 const wchar_t * button3rd;
 		 const wchar_t * chk_auto_size;
 		 const wchar_t * chk_autosave;
+		 const wchar_t * chk_match_case;
+		 const wchar_t * chk_match_whole_word;
 		 const wchar_t * color_preview;
+		 const wchar_t * edit_replace;
+		 const wchar_t * edit_search;
 		 const wchar_t * edtInput;
 		 const wchar_t * img_icon_exclamation;
 		 const wchar_t * img_icon_information;
@@ -240,13 +247,18 @@ struct _R{
 		int btn_min;
 		int btn_next;
 		int btn_prev;
+		int btn_replace;
 		int btn_restore;
 		int button1st;
 		int button2nd;
 		int button3rd;
 		int chk_auto_size;
 		int chk_autosave;
+		int chk_match_case;
+		int chk_match_whole_word;
 		int color_preview;
+		int edit_replace;
+		int edit_search;
 		int edtInput;
 		int img_icon_exclamation;
 		int img_icon_information;
@@ -338,9 +350,14 @@ struct _R{
 		int delete_cpp;
 		int exit;
 		int explorer;
+		int find_next;
+		int find_prev;
+		int find_text;
 		int format_xml;
 		int idlemsg;
 		int image_viewer;
+		int match_case;
+		int match_whole_word;
 		int new_folder;
 		int new_include;
 		int new_layout;
@@ -352,7 +369,11 @@ struct _R{
 		int project_struct;
 		int property;
 		int rename;
+		int replace;
+		int replace_all;
+		int replace_to;
 		int save_xml;
+		int search;
 		int skin_build;
 		int title;
 		int ver;
@@ -387,13 +408,18 @@ struct _R R={
 		L"btn_min",
 		L"btn_next",
 		L"btn_prev",
+		L"btn_replace",
 		L"btn_restore",
 		L"button1st",
 		L"button2nd",
 		L"button3rd",
 		L"chk_auto_size",
 		L"chk_autosave",
+		L"chk_match_case",
+		L"chk_match_whole_word",
 		L"color_preview",
+		L"edit_replace",
+		L"edit_search",
 		L"edtInput",
 		L"img_icon_exclamation",
 		L"img_icon_information",
@@ -477,13 +503,18 @@ struct _R R={
 		65549,
 		65599,
 		65597,
+		65604,
 		65551,
 		65543,
 		65544,
 		65545,
 		65596,
 		65555,
+		65602,
+		65603,
 		65570,
+		65601,
+		65600,
 		65587,
 		65540,
 		65538,
@@ -601,7 +632,16 @@ struct _R R={
 		33,
 		34,
 		35,
-		36
+		36,
+		37,
+		38,
+		39,
+		40,
+		41,
+		42,
+		43,
+		44,
+		45
 	}
 	
 };

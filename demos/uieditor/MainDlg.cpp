@@ -98,7 +98,7 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 
 	//======================================================================
 	m_pXmlEdtior = new CXmlEditor(this);
-	m_pXmlEdtior->Init(GetRoot(),this);
+	m_pXmlEdtior->Init(GetRoot());
     m_pImageViewer = new CImageViewer(this);
 	m_pImageViewer->Init(GetRoot());
 
@@ -754,79 +754,6 @@ void CMainDlg::OnAutoCheck(IEvtArgs *e)
 		m_bAutoSave = e2->dwNewState&WndState_Check;
 	}
 }
-
-void CMainDlg::onScintillaSave(CScintillaWnd *pSci,LPCTSTR pszFileName)
-{
-}
-
-void CMainDlg::onScintillaAutoComplete(CScintillaWnd *pSci,char ch)
-{
-	if(m_editXmlType == FT_UNKNOWN)
-		return;
-
-	long lStart = pSci->SendEditor(SCI_GETCURRENTPOS, 0, 0);
-	int startPos = pSci->SendEditor(SCI_WORDSTARTPOSITION, lStart, true);
-
-	if(ch == '_')
-	{//test for skin_xxx
-		SStringA strPrefix = pSci->GetNotePart(lStart - 1);
-		SStringA str;
-		if (strPrefix.CompareNoCase("skin") == 0)
-			str = m_UIResFileMgr.GetSkinAutos(S_CA2T(strPrefix,CP_UTF8));
-		if (!str.IsEmpty())
-		{
-			pSci->SendEditor(SCI_AUTOCSHOW, lStart - startPos, (LPARAM)str.c_str());
-		}
-	}
-	else if (ch == '/')
-	{
-		SStringA clsName = pSci->GetNotePart(lStart - 1);
-		SStringA str;
-		if (clsName.CompareNoCase("color") == 0)
-			str = m_UIResFileMgr.GetColorAutos(_T(""));
-		else if (clsName.CompareNoCase("string") == 0)
-			str = m_UIResFileMgr.GetStringAutos(_T(""));
-
-		if (!str.IsEmpty())
-		{
-			pSci->SendEditor(SCI_AUTOCSHOW, lStart - startPos, (LPARAM)(LPCSTR)str);
-		}
-	}
-	else if (ch == '<')
-	{//start element
-		SStringA strAutoShow;
-		if(m_editXmlType== FT_LAYOUT_XML)
-			strAutoShow = CSysDataMgr::getSingleton().GetCtrlAutos();
-		if(m_editXmlType== FT_SKIN)
-			strAutoShow = CSysDataMgr::getSingleton().GetSkinAutos();
-		if (!strAutoShow.IsEmpty())
-		{
-			pSci->SendEditor(SCI_AUTOCSHOW, lStart - startPos, (LPARAM)strAutoShow.c_str());
-		}
-	}
-	else if (ch >= 'a' && ch <= 'z')
-	{
-		int tagpos = -1;
-		SStringA tagname = pSci->GetHtmlTagName(tagpos);
-		SStringA strPrefix = pSci->GetRange(lStart-2,lStart-1);
-
-		if (!tagname.IsEmpty() && strPrefix==" " && strPrefix!="\t")
-		{//编辑的元素name不为空，而且当前不是编辑属性
-			SStringW strTag = S_CA2W(tagname,CP_UTF8);
-			
-			SStringA str;
-			if(m_editXmlType== FT_LAYOUT_XML)
-				str = CSysDataMgr::getSingleton().GetCtrlAttrAutos(strTag);
-			if(m_editXmlType== FT_SKIN)
-				str = CSysDataMgr::getSingleton().GetSkinAttrAutos(strTag);
-			if (!str.IsEmpty())
-			{ 	// 自动完成字串要进行升充排列, 否则功能不正常
-				pSci->SendEditor(SCI_AUTOCSHOW, lStart - startPos, (LPARAM)(LPCSTR)str);
-			}
-		}
-	}
-}
-
 void CMainDlg::UpdateEditorToolbar()
 {
     m_pToolbarManager->UpdateEditorToolbar(m_editXmlType);

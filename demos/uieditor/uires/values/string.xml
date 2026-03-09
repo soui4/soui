@@ -6,7 +6,7 @@
     <openincode value="在XML编辑中打开" />
     <open_prject value="打开工程" />
     <close_prject value="关闭工程" />
-    
+    <close value="关闭"/>
     <copy value="复制\tCtrl+&C" />
     <paste value="粘贴\tCtrl+&V" />
     <cut value="剪切\tCtrl+&X" />
@@ -38,4 +38,15 @@
     <about value="关于" />
     <exit value="退出\tCtrl+&Q"/>
     <idlemsg value="就绪" />
+
+    <find_text value="查找文本" />
+    <find_next value="查找下一个" />
+    <find_prev value="查找上一个" />
+    <replace value="替换" />
+    <search value="搜索" />
+    <replace_all value="替换所有" />
+    <replace_to value="替换为" />
+    <match_case value="匹配大小写" />
+    <match_whole_word value="匹配整个单词" />
+
   </string>

@@ -16,6 +16,7 @@
 		<file name="UIDESIGNER_XML_INSERT_ELEMENT" path="xml\dlg_insert_element.xml" />
 		<file name="designer_wnd" path="xml\designer_wnd.xml" />
 		<file name="dlg_skin_viewer" path="xml\dlg_skin_viewer.xml" />
+		<file name="dlg_find" path="xml\dlg_find.xml" />
 	</LAYOUT>
 	<values>
 		<file name="string" path="values\string.xml" />

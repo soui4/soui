@@ -22,7 +22,10 @@
 SNSBEGIN
 
 //-----------------------------------------------------------------------------------------------
-CXmlEditor::CXmlEditor(CMainDlg *pMainDlg):m_bValidXml(TRUE),m_bUpdateDesigner(TRUE)
+CXmlEditor::CXmlEditor(CMainDlg *pMainDlg)
+:m_bValidXml(TRUE)
+,m_bUpdateDesigner(TRUE)
+,m_pFindDlg(NULL)
 {
 	m_pMainDlg = pMainDlg;
 	m_pResManger = &pMainDlg->m_UIResFileMgr;
@@ -205,7 +208,7 @@ bool CXmlEditor::UpdateXmlStruct(spugi::xml_node xmlNode, HSTREEITEM item,int iS
     {
         strName += SStringA().Format(".%s", xmlNode.attribute("id").value());
 	}
-    HSTREEITEM itemNew = m_treeXmlStruct->InsertItem(S_CA2T(strName), item);
+    HSTREEITEM itemNew = m_treeXmlStruct->InsertItem(S_CA2T(strName,CP_UTF8), item);
 	m_treeXmlStruct->SetItemData(itemNew,iSib);
 
 	int iChild = 0;
@@ -373,7 +376,7 @@ void CXmlEditor::OnPropGridValueChanged(IEvtArgs *e)
 	}
 
 
-	NodeRange nr = m_xmlParser.getNodePos(&m_vecSelectOrder[0],m_vecSelectOrder.size());
+	NodeRange nr = m_xmlParser.getNodePos(&m_vecSelectOrder[0],m_vecSelectOrder.size(),TRUE);
 	if(nr.begin!=-1)
 	{
 		m_bSetCaretPos = TRUE;
@@ -450,7 +453,8 @@ void CXmlEditor::SelectCtrlByOrder(const int *pOrder, int nLen, BOOL bSelXml)
 	#endif
 	if(m_vecSelectOrder.size()==nLen && memcmp(&m_vecSelectOrder[0],pOrder,nLen*sizeof(int))==0)
 		return;
-	NodeRange range = m_xmlParser.getNodePos(pOrder,nLen);
+    BOOL bLayout = m_pMainDlg->m_editXmlType == FT_LAYOUT_XML;
+    NodeRange range = m_xmlParser.getNodePos(pOrder, nLen, bLayout);
 	if(range.begin!=-1)
 	{
 		int begin = range.begin;
@@ -489,7 +493,8 @@ void CXmlEditor::SelectCtrlByOrder(const int *pOrder, int nLen, BOOL bSelXml)
 			}
 		}
 	}
-	m_pDesignWnd->SelectCtrlByOrder(pOrder,nLen);
+    if(bLayout) 
+		m_pDesignWnd->SelectCtrlByOrder(pOrder,nLen);
 	m_vecSelectOrder.assign(pOrder,pOrder+nLen);
 }
 
@@ -508,7 +513,7 @@ void CXmlEditor::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
 	}
 }
 
-void CXmlEditor::Init(SWindow * pRoot,CScintillaWnd::IListener *pListener)
+void CXmlEditor::Init(SWindow * pRoot)
 {
     m_pRoot = pRoot;
 	m_treeXmlStruct = pRoot->FindChildByName2<STreeCtrl>(L"uidesigner_wnd_xmltree");
@@ -523,7 +528,7 @@ void CXmlEditor::Init(SWindow * pRoot,CScintillaWnd::IListener *pListener)
 		if (m_pScintillaWnd)
 		{
 			m_pScintillaWnd->SendEditor(SCI_SETMODEVENTMASK,SC_MOD_INSERTTEXT|SC_MOD_DELETETEXT);
-			m_pScintillaWnd->SetListener(pListener);
+			m_pScintillaWnd->SetListener(this);
 		}
 	}
 	{
@@ -653,7 +658,7 @@ void CXmlEditor::OnSelectedCtrl(const int *pData, int nCount)
 
 void CXmlEditor::OnMoveCtrl()
 {
-    NodeRange nr = m_xmlParser.getNodePos(&m_vecSelectOrder[0], m_vecSelectOrder.size());
+    NodeRange nr = m_xmlParser.getNodePos(&m_vecSelectOrder[0], m_vecSelectOrder.size(),TRUE);
     if (nr.begin != -1)
     {
 		m_bSetCaretPos = TRUE;
@@ -789,6 +794,60 @@ BOOL CXmlEditor::OnSaveXml()
     return TRUE;
 }
 
+void CXmlEditor::findtext(const SStringT &strText, bool bFindNext)
+{
+	if(strText.IsEmpty())
+		return;
+	
+	// Use the existing OnFind method with default case-sensitive and whole-word options
+	bool bMatchCase = false;
+	bool bMatchWholeWord = false;
+	
+	if(OnFind(strText, bFindNext, bMatchCase, bMatchWholeWord))
+	{
+		// Text found successfully
+		SLOGI() << "Found text: " << strText;
+	}
+	else
+	{
+		// Text not found
+		SMessageBox(m_pMainDlg->m_hWnd, 
+			bFindNext ? _T("未找到更多匹配的文本") : _T("未找到匹配的文本"), 
+			_T("查找"), 
+			MB_OK | MB_ICONINFORMATION);
+	}
+}
+
+bool CXmlEditor::OnFind(const SStringT & strText, bool bFindNext, bool bMatchCase, bool bMatchWholeWord)
+{
+	int flags = (bMatchCase?SCFIND_MATCHCASE:0) | (bMatchWholeWord?SCFIND_WHOLEWORD:0);
+	TextToFind ttf;
+	ttf.chrg.cpMin = m_pScintillaWnd->SendMessage(SCI_GETCURRENTPOS);
+	if(bFindNext)
+		ttf.chrg.cpMax = m_pScintillaWnd->SendMessage(SCI_GETLENGTH, 0, 0);
+	else
+		ttf.chrg.cpMax = 0;
+
+	SStringA strUtf8 = S_CT2A(strText,CP_UTF8);
+	ttf.lpstrText = (char *)(LPCSTR) strUtf8;
+	int nPos = m_pScintillaWnd->SendMessage(SCI_FINDTEXT,flags,(LPARAM)&ttf);
+	if(nPos==-1) return false;
+
+	if(bFindNext)
+		m_pScintillaWnd->SendMessage(SCI_SETSEL,nPos,nPos + strUtf8.GetLength());
+	else
+		m_pScintillaWnd->SendMessage(SCI_SETSEL,nPos+ strUtf8.GetLength(),nPos);
+
+	m_pScintillaWnd->SetFocus();
+	return true;
+}
+
+void CXmlEditor::OnReplace(const SStringT &strText)
+{
+	SStringA strUtf8 = S_CT2A(strText,CP_UTF8);
+	m_pScintillaWnd->SendMessage(SCI_REPLACESEL,0,(LPARAM)strUtf8.c_str());
+}
+
 BOOL CXmlEditor::OnFormatXml()
 {
 	SStringA strXml = m_pScintillaWnd->GetWindowText();
@@ -804,6 +863,110 @@ BOOL CXmlEditor::OnFormatXml()
     m_pScintillaWnd->SetSel(0, -1);
 	m_pScintillaWnd->ReplaseSel(writer.m_stream.str().c_str());
     return TRUE;
+}
+
+// CScintillaWnd::IListener interface methods
+void CXmlEditor::onScintillaSave(CScintillaWnd *pSci, LPCTSTR pszFileName)
+{
+	// Handle save event - could trigger XML validation or UI update
+	SLOGI() << "XML saved: " << pszFileName;
+	UpdateXmlData();
+}
+
+void CXmlEditor::onScintillaAutoComplete(CScintillaWnd *pSci,char ch)
+{
+	if(m_pMainDlg->m_editXmlType == FT_UNKNOWN)
+		return;
+
+	long lStart = pSci->SendEditor(SCI_GETCURRENTPOS, 0, 0);
+	int startPos = pSci->SendEditor(SCI_WORDSTARTPOSITION, lStart, true);
+
+	if(ch == '_')
+	{//test for skin_xxx
+		SStringA strPrefix = pSci->GetNotePart(lStart - 1);
+		SStringA str;
+		if (strPrefix.CompareNoCase("skin") == 0)
+            str = m_pMainDlg->m_UIResFileMgr.GetSkinAutos(S_CA2T(strPrefix, CP_UTF8));
+		if (!str.IsEmpty())
+		{
+			pSci->SendEditor(SCI_AUTOCSHOW, lStart - startPos, (LPARAM)str.c_str());
+		}
+	}
+	else if (ch == '/')
+	{
+		SStringA clsName = pSci->GetNotePart(lStart - 1);
+		SStringA str;
+		if (clsName.CompareNoCase("color") == 0)
+            str = m_pMainDlg->m_UIResFileMgr.GetColorAutos(_T(""));
+		else if (clsName.CompareNoCase("string") == 0)
+            str = m_pMainDlg->m_UIResFileMgr.GetStringAutos(_T(""));
+
+		if (!str.IsEmpty())
+		{
+			pSci->SendEditor(SCI_AUTOCSHOW, lStart - startPos, (LPARAM)(LPCSTR)str);
+		}
+	}
+	else if (ch == '<')
+	{//start element
+		SStringA strAutoShow;
+        if (m_pMainDlg->m_editXmlType == FT_LAYOUT_XML)
+			strAutoShow = CSysDataMgr::getSingleton().GetCtrlAutos();
+        if (m_pMainDlg->m_editXmlType == FT_SKIN)
+			strAutoShow = CSysDataMgr::getSingleton().GetSkinAutos();
+		if (!strAutoShow.IsEmpty())
+		{
+			pSci->SendEditor(SCI_AUTOCSHOW, lStart - startPos, (LPARAM)strAutoShow.c_str());
+		}
+	}
+	else if (ch >= 'a' && ch <= 'z')
+	{
+		int tagpos = -1;
+		SStringA tagname = pSci->GetHtmlTagName(tagpos);
+		SStringA strPrefix = pSci->GetRange(lStart-2,lStart-1);
+
+		if (!tagname.IsEmpty() && strPrefix==" " && strPrefix!="\t")
+		{//编辑的元素name不为空，而且当前不是编辑属性
+			SStringW strTag = S_CA2W(tagname,CP_UTF8);
+			
+			SStringA str;
+            if (m_pMainDlg->m_editXmlType == FT_LAYOUT_XML)
+				str = CSysDataMgr::getSingleton().GetCtrlAttrAutos(strTag);
+            if (m_pMainDlg->m_editXmlType == FT_SKIN)
+				str = CSysDataMgr::getSingleton().GetSkinAttrAutos(strTag);
+			if (!str.IsEmpty())
+			{ 	// 自动完成字串要进行升充排列, 否则功能不正常
+				pSci->SendEditor(SCI_AUTOCSHOW, lStart - startPos, (LPARAM)(LPCSTR)str);
+			}
+		}
+	}
+}
+
+
+void CXmlEditor::OnScintillaFindStart(CScintillaWnd *pSci, SStringT strFindText)
+{
+    if (m_pFindDlg == NULL)
+    {
+        m_pFindDlg = new CFindDlg(this, strFindText);
+        m_pFindDlg->Create(m_pMainDlg->m_hWnd);
+        m_pFindDlg->CenterWindow(m_pMainDlg->m_hWnd);
+    }
+    else
+    {
+        m_pFindDlg->SetFindText(strFindText);
+    }
+    m_pFindDlg->ShowWindow(SW_SHOW);
+}
+
+void CXmlEditor::OnScintillaFindNext(CScintillaWnd *pSci, BOOL bFindNext)
+{
+	if(m_pFindDlg && m_pFindDlg->IsWindow())
+	{
+		SStringT strText = m_pFindDlg->GetFindText();
+		if(!strText.IsEmpty())
+		{
+			findtext(strText, bFindNext);
+		}
+	}
 }
 
 SNSEND

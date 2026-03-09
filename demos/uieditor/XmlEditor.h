@@ -11,16 +11,18 @@
 #include <propgrid/SPropertyGrid.h>
 #include "monitor/PathMonitor.h"
 #include "ResManger.h"
+#include "Dialog/FindDlg.h"
+
 class CMainDlg;
 SNSBEGIN
 
-	class CXmlEditor
+	class CXmlEditor : public CScintillaWnd::IListener, IFindListener
 	{
 	public:
 		CXmlEditor(CMainDlg *pMainHost);
 		~CXmlEditor();
 
-		void Init(SWindow * pRoot,CScintillaWnd::IListener *pListener);
+		void Init(SWindow * pRoot);
 		
 		// 打开工程
 		void SetProjectPath(const SStringT & strProjPath);
@@ -48,6 +50,17 @@ SNSBEGIN
 		BOOL StartPreviewProcess();
         BOOL OnFormatXml();
         BOOL OnSaveXml();
+		void findtext(const SStringT &strText, bool bFindNext);
+	protected:
+		bool OnFind(const SStringT & strText, bool bFindNext, bool bMatchCase, bool bMatchWholeWord) override;
+		void OnReplace(const SStringT &strText) override;
+		
+		// CScintillaWnd::IListener interface methods
+		void onScintillaSave(CScintillaWnd *pSci, LPCTSTR pszFileName) override;
+		void onScintillaAutoComplete(CScintillaWnd *pSci, char c) override;
+		void OnScintillaFindStart(CScintillaWnd *pSci, SStringT strFindText) override;
+		void OnScintillaFindNext(CScintillaWnd *pSci, BOOL bFindNext) override;
+
 	protected:
 		void OnMoveCtrl();
 		void UpdatePropGridLayout();
@@ -105,6 +118,7 @@ SNSBEGIN
 		SXmlDoc  m_xmlEditing;
 		ResManger *m_pResManger;
         SWindow *m_pRoot;
+		CFindDlg   *			 m_pFindDlg;
 	};
 
 SNSEND

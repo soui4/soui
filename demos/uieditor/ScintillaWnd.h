@@ -24,6 +24,10 @@ public:
 	{
 		virtual void onScintillaSave(CScintillaWnd *pSci,LPCTSTR pszFileName) {}
 		virtual void onScintillaAutoComplete(CScintillaWnd *pSci,char c) {}
+		
+		virtual void OnScintillaFindStart(CScintillaWnd *pSci, SStringT strFindText) {}
+
+		virtual void OnScintillaFindNext(CScintillaWnd *pSci, BOOL bFindNext) {}
 	};
 
 public:
@@ -62,7 +66,8 @@ public:
 	void GetRange(int start, int end, char* text);
 
 	SStringA GetRange(int start, int end);
-
+	
+	SStringA GetSelectionText();
 	SStringA GetNotePart(int curPos);
 protected:
 	// 显示行号
@@ -82,7 +87,7 @@ protected:
 
 	void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 
-
+	void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
 	void displaySectionCentered(int posStart, int posEnd, bool isDownwards = true);
 
 	LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
@@ -90,6 +95,7 @@ protected:
 	BEGIN_MSG_MAP_EX(CScintillaWnd)
 		MSG_OCM_NOTIFY(OnNotify)
 		MSG_WM_KEYDOWN(OnKeyDown)
+		MSG_WM_CHAR(OnChar)
 		CHAIN_MSG_MAP(SNativeWnd)
 	END_MSG_MAP()
 

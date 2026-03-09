@@ -103,7 +103,7 @@ NodeRange CXmlParser::findElementRange(int pos)
 	return *pRange;
 }
 
-static xml_node find_child_by_index(xml_node parent, int idx,BOOL bFirst)
+static xml_node find_child_by_index(xml_node parent, int idx,BOOL bWidgetNode)
 {
 	xml_node child = parent.first_child();
 	for(;child;)
@@ -112,10 +112,12 @@ static xml_node find_child_by_index(xml_node parent, int idx,BOOL bFirst)
 		{
             if (idx == 0)
             {
+                if (!bWidgetNode)
+                    return child;
                 SObjectInfo objInfo;
 				SStringW strName = S_CA2W(child.name(), CP_UTF8);
                 ObjInfo_New(&objInfo, strName, Window);
-                if (bFirst || SApplication::getSingleton().HasKey(objInfo) || CSysDataMgr::getSingleton().IsUserWidget(strName))
+                if (SApplication::getSingleton().HasKey(objInfo) || CSysDataMgr::getSingleton().IsUserWidget(strName))
                     return child;
                 else
                     break;
@@ -127,12 +129,12 @@ static xml_node find_child_by_index(xml_node parent, int idx,BOOL bFirst)
     return xml_node();
 }
 
-NodeRange CXmlParser::getNodePos(const int *nodePos, int nLen)
+NodeRange CXmlParser::getNodePos(const int *nodePos, int nLen,BOOL bWidgetNode)
 {
 	xml_node selNode = root();
 	for(int i=0;i<nLen;i++)
 	{
-        selNode = find_child_by_index(selNode, nodePos[i],i==0);
+        selNode = find_child_by_index(selNode, nodePos[i],i>0 && bWidgetNode);
 		if(!selNode)
 			break;
 	}

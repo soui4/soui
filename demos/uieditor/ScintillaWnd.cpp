@@ -184,7 +184,6 @@ void CScintillaWnd::SetDirty(bool bDirty)
 		SetXmlLexer(default_bk);
 	}
 }
-
 void CScintillaWnd::GetRange(int start, int end, char* text)
 {
 	Sci_TextRange tr;
@@ -201,6 +200,13 @@ SOUI::SStringA CScintillaWnd::GetRange(int start, int end)
 	SStringA ret(pBuf,end-start);
 	delete []pBuf;
 	return ret;
+}
+
+SOUI::SStringA CScintillaWnd::GetSelectionText()
+{
+	 int startPos = SendMessage(SCI_GETSELECTIONSTART);
+	 int endPos = SendMessage(SCI_GETSELECTIONEND);
+	 return GetRange(startPos, endPos);
 }
 
 #define BLOCKSIZE	1024
@@ -575,11 +581,35 @@ BOOL IsShiftPressed()
 
 void CScintillaWnd::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-	if (nChar == 'S' && IsCtrlPressed())
-	{
-		DoSave();
-	}
-	SetMsgHandled(FALSE);
+	if(IsCtrlPressed()){
+		if (nChar == 'S')
+		{
+			DoSave();
+		}else if(nChar == 'F'){
+			if(m_pListener){
+				SStringA strFind=GetSelectionText();
+				SStringT strFind2=S_CA2T(strFind,CP_UTF8);
+				m_pListener->OnScintillaFindStart(this,strFind2);
+			}
+		}
+    }
+    else if (nChar == VK_F3)
+    {
+        if (IsShiftPressed())
+        {
+            if (m_pListener)
+                m_pListener->OnScintillaFindNext(this, false);
+        }
+        else
+        {
+            if (m_pListener)
+                m_pListener->OnScintillaFindNext(this, true);
+        }
+    }
+    else
+    {
+        SetMsgHandled(FALSE);
+    }
 }
 
 void CScintillaWnd::GotoFoundLine()
@@ -603,6 +633,16 @@ void CScintillaWnd::GotoFoundLine()
 void CScintillaWnd::InsertText(int pos, LPCSTR text)
 {
 	SendEditor(SCI_INSERTTEXT, pos, (LPARAM)text);
+}
+
+void CScintillaWnd::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+	if(IsCtrlPressed() || IsAltPressed() || IsShiftPressed())
+	{
+		return;
+	}else{
+		SetMsgHandled(FALSE);
+	}
 }
 
 void CScintillaWnd::displaySectionCentered(int posStart, int posEnd, bool isDownwards)
