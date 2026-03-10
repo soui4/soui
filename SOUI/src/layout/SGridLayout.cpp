@@ -990,7 +990,7 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
             }
 
             // 如果列权重被分配了，用分配的列宽重新测量高度
-            if (bColWeightMatched)
+            if (bColWeightMatched && pRowsWeight[y]==0.f)
             {
                 // 计算这个cell分配到的总宽度
                 float cellWidth = 0;
@@ -1008,7 +1008,7 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
                 state.UpdateRowHeight(y);
             }
             // 如果行权重被分配了，用分配的行高重新测量宽度
-            else if (bRowWeightMatched)
+            else if (bRowWeightMatched && pColsWeight[x] == 0.f)
             {
                 // 计算这个cell分配到的总高度
                 float cellHeight = 0;

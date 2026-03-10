@@ -44,3 +44,10 @@ endif()
 set_target_properties (${current_project} PROPERTIES
     FOLDER "games/upgrade"
 )
+
+# Copy def_theme directory to output directory
+add_custom_command(TARGET ${current_project} POST_BUILD 
+    COMMAND ${CMAKE_COMMAND} -E copy_directory 
+    ${CMAKE_CURRENT_SOURCE_DIR}/def_theme 
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIGURATION>/upgrade/def_theme
+)

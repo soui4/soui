@@ -130,6 +130,10 @@ jobs:
         path: |
           build/bin/${{ env.BUILD_TYPE }}/*.exe
           build/bin/${{ env.BUILD_TYPE }}/*.dll
+          build/bin/${{ env.BUILD_TYPE }}/*.exctrl
+          build/bin/${{ env.BUILD_TYPE }}/junqi/**
+          build/bin/${{ env.BUILD_TYPE }}/cnchess/**
+          build/bin/${{ env.BUILD_TYPE }}/upgrade/**
           build/bin/${{ env.BUILD_TYPE }}/Config/**
 
     - name: Upload demo (Linux)
@@ -139,7 +143,11 @@ jobs:
         name: demo-${{ matrix.os }}-${{ matrix.arch }}
         path: |
           build/bin/*
+          build/bin/*.exctrl
           build/bin/Config/**
+          build/bin/junqi/**
+          build/bin/cnchess/**
+          build/bin/upgrade/**
           !build/bin/*.a
           !build/bin/*.o
 
@@ -150,6 +158,10 @@ jobs:
         name: demo-${{ matrix.os }}-${{ matrix.arch }}
         path: |
           build/bin/*
+          build/bin/*.exctrl
+          build/bin/junqi/**
+          build/bin/cnchess/**
+          build/bin/upgrade/**
           build/bin/Config/**
           !build/bin/*.a
           !build/bin/*.o

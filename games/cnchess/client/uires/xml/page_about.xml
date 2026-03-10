@@ -2,7 +2,7 @@
 <page name="room_container" title="@string/about" layout="vbox" gravity="center" padding="20dp">
     <text name="txt_title" text="象棋游戏" font="size:24" align="center" margin="10dp"/>
     
-    <text name="txt_desc" text="这是一个使用SOUI框架开发的纸牌升级游戏。" font="size:14" align="center" margin="5dp"/>
+    <text name="txt_desc" text="这是一个使用SOUI框架开发的象棋游戏。" font="size:14" align="center" margin="5dp"/>
     
     <text name="txt_new_features" text="SOUI 5.1 新特性：" font="size:16;bold:1" margin="10dp,20dp,5dp,5dp"/>
     

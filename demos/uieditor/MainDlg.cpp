@@ -667,11 +667,12 @@ void CMainDlg::OnTvEventOfPanel(IEvtArgs *e)
     }
 	else if(e2->pOrgEvt->GetID()==EventItemPanelDbclick::EventID)
 	{
+        m_tvClickPt = CPoint(-1, -1);
 		EventItemPanelDbclick *pEvt = sobj_cast<EventItemPanelDbclick>(e2->pOrgEvt);
 		SItemPanel *pItemPanel = sobj_cast<SItemPanel>(pEvt->Sender());
 		HSTREEITEM hItem = (HSTREEITEM)pItemPanel->GetItemIndex();
 		const FileItemData& itemData = m_pFileTreeAdapter->GetItemData(hItem);
-		SLOGI()<<"File:"<<itemData.strPath.c_str();
+        SLOGI() << "File:" << itemData.strPath.c_str() << " pItemPanel="<<pItemPanel;
 
 		if(!CheckSave())
 			return;

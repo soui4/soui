@@ -191,7 +191,8 @@ void CFileOperationManager::OnFilePaste(HSTREEITEM hItem, BOOL bCopy, HGLOBAL hd
             int nPos = strSrcPath.ReverseFind(_T('/'));
             SStringT strFileName = strSrcPath.Mid(nPos + 1);
             SStringT strDestFilePath = strDestPath + _T('/') + strFileName;
-
+            if (strSrcPath == strDestFilePath)
+                continue;
             if (nClipboardOperation == 1)
             {
                 if (::PathFileExists(strDestFilePath))
