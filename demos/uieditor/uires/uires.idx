@@ -17,6 +17,7 @@
 		<file name="designer_wnd" path="xml\designer_wnd.xml" />
 		<file name="dlg_skin_viewer" path="xml\dlg_skin_viewer.xml" />
 		<file name="dlg_find" path="xml\dlg_find.xml" />
+		<file name="dlg_new_custom" path="xml\dlg_new_custom.xml" />
 	</LAYOUT>
 	<values>
 		<file name="string" path="values\string.xml" />
@@ -58,5 +59,6 @@
 		<file name="menu_view" path="smenu\menu_view.xml" />
 		<file name="menu_tool" path="smenu\menu_tool.xml" />
 		<file name="menu_help" path="smenu\menu_help.xml" />
+		<file name="menu_xmlstruct_ctx" path="smenu\menu_xmlstruct_ctx.xml" />"
 	</smenu>
 </resource>

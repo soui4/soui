@@ -69,6 +69,7 @@ SNSBEGIN
 		void InitPropGrid(const SStringW &strNodeName, SStringW strParents);
         // soui消息
         void OnTCSelChanged(IEvtArgs *pEvt);
+		void OnTCRClick(IEvtArgs *pEvt); // 右键点击xml结构树
 		void OnPropGridValueChanged(IEvtArgs *pEvt);
 		void OnPropGridItemAutoCompleteFill(IEvtArgs *pEvt);
 		void OnPropGridItemAutoCompleteSelected(IEvtArgs *pEvt);
@@ -79,6 +80,7 @@ SNSBEGIN
 			EVENT_ID_HANDLER(R.id.propgrid_element,EventPropGridItemAutoCompleteSelected::EventID,OnPropGridItemAutoCompleteSelected)
 			EVENT_ID_HANDLER(R.id.propgrid_element,EventPropGridConvertColor::EventID,OnPropGridConvertColor)
 			EVENT_ID_HANDLER(R.id.uidesigner_wnd_xmltree,EventTCSelChanged::EventID,OnTCSelChanged)
+			EVENT_ID_HANDLER(R.id.uidesigner_wnd_xmltree,EventTCRClick::EventID,OnTCRClick)
 		EVENT_MAP_BREAK()
 	protected:
 		void OnCommand(UINT uNotifyCode, int nID, HWND wndCtl);

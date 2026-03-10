@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<SOUI name="window" title="@string/new_custom" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" width="400" height="130" wndType="8" toolWindow="0">
+	<root>
+		<window pos="0,0,-0,-0" layout="vbox" gravity="right" colorBkgnd="@color/bkBlack1" colorText="#ffffff" font="face:微软雅黑;bold:1;size:13">
+			<caption size="-2,30" focusable="1" drawfocusrect="0">
+				<text pos="5,4" name="txt_title" />
+				<imgbtn id="IDCANCEL" skin="_skin.sys.btn.close" pos="-45,0" tip="close" animate="1" />
+			</caption>
+			<window size="-2,0" weight="1" layout="grid" columnCount="2" interval="5" gravity="fill">
+				<text text="@string/custom_name"/>
+				<edit columnWeight="1" height="30" cueText="" colorText="@color/white" name="edt_custom_name" />
+				<text text="@string/custom_parent"/>
+				<edit columnWeight="1"  height="30" cueText="" colorText="@color/white" name="edt_custom_parent" />
+			</window>
+			<window size="-1,30" layout="hbox" interval="5">
+				<button id="IDOK" size="80,-2" text="确定" />
+				<window size="30,0"/>
+				<button id="IDCANCEL" size="80,-2" text="取消" />
+			</window>
+		</window>
+	</root>
+</SOUI>

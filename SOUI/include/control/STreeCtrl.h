@@ -855,6 +855,13 @@ class SOUI_EXP STreeCtrl
     void OnRButtonDown(UINT nFlags, CPoint pt);
 
     /**
+     * @brief Handles the right mouse button up event.
+     * @param nFlags Flags associated with the mouse event.
+     * @param pt Mouse position.
+     */
+    void OnRButtonUp(UINT nFlags, CPoint pt);
+
+    /**
      * @brief Handles the mouse move event.
      * @param nFlags Flags associated with the mouse event.
      * @param pt Mouse position.
@@ -880,6 +887,7 @@ class SOUI_EXP STreeCtrl
         MSG_WM_LBUTTONDBLCLK(OnLButtonDbClick)
         MSG_WM_LBUTTONUP(OnLButtonUp)
         MSG_WM_RBUTTONDOWN(OnRButtonDown);
+        MSG_WM_RBUTTONUP(OnRButtonUp);
         MSG_WM_MOUSEMOVE(OnMouseMove)
         MSG_WM_MOUSELEAVE(OnMouseLeave)
         MSG_WM_SIZE(OnSize)

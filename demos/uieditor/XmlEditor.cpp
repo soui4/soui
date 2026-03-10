@@ -249,6 +249,35 @@ void CXmlEditor::OnTCSelChanged(IEvtArgs *pEvt)
 	delete []idx;
 }
 
+void CXmlEditor::OnTCRClick(IEvtArgs *e)
+{
+	EventTCRClick *e2 = sobj_cast<EventTCRClick>(e);
+    HSTREEITEM item = e2->hItem;
+	if (!item)
+		return;
+    CPoint pt = e2->pt;
+	::ClientToScreen(m_pMainDlg->m_hWnd,&pt);
+	BOOL bLayout = m_pMainDlg->m_editXmlType == FT_LAYOUT_XML;
+	SMenuEx menu;
+	menu.LoadMenu(UIRES.smenu.menu_xmlstruct_ctx);
+	menu.EnableMenuItem(1, MF_BYCOMMAND | (bLayout?MF_ENABLED:MF_GRAYED));
+	menu.EnableMenuItem(2, MF_BYCOMMAND | (!bLayout?MF_ENABLED:MF_GRAYED));
+	int id = menu.TrackPopupMenu(TPM_LEFTALIGN|TPM_TOPALIGN|TPM_RETURNCMD,pt.x,pt.y,m_pMainDlg->m_hWnd);
+	SStringT strNodeName;
+	m_treeXmlStruct->GetItemText(item,&strNodeName);
+    int pos = strNodeName.FindChar('.');
+	if(pos != -1)
+	{
+		strNodeName = strNodeName.Left(pos);
+	}
+	if(id == 1){
+		m_pMainDlg->OnNewCustomExtend(false,strNodeName);
+	}else if(id == 2){
+		m_pMainDlg->OnNewCustomExtend(true,strNodeName);
+	}
+	SLOGI()<<"tcrclick.menu ret="<<id;
+}
+
 void CXmlEditor::OnPropGridItemAutoCompleteFill(IEvtArgs *e)
 {
 	EventPropGridItemAutoCompleteFill *e2 = sobj_cast<EventPropGridItemAutoCompleteFill>(e);

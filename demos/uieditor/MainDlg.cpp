@@ -8,6 +8,7 @@
 #include "Dialog/DlgNewLayout.h"
 #include "Dialog/DlgAbout.h"
 #include "Dialog/DlgInput.h"
+#include "Dialog/DlgNewCustom.h"
 #include "SysdataMgr.h"
 #include <vector>
 #include <algorithm>
@@ -282,9 +283,27 @@ void CMainDlg::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
 		}else if(nID==R.id.menu_view_statusbar){
 			SWindow *pStatusbar = FindChildByID(R.id.wnd_status);
 			pStatusbar->SetVisible(!pStatusbar->IsVisible(), TRUE);
+		}else if(nID == R.id.menu_tool_new_custom_skin){
+			OnNewCustomExtend(true);
+		}else if(nID == R.id.menu_tool_new_custom_widget){
+			OnNewCustomExtend(false);
 		}
 	}
 }
+
+void CMainDlg::OnNewCustomExtend(bool bSkin, SStringT strName){
+	SDlgNewCustom dlg;
+    dlg.m_strTitle = GETSTRING(bSkin ? R.string.new_custom_skin : R.string.new_custom_widget);
+	dlg.m_strName = strName;
+	if (IDOK == dlg.DoModal(m_hWnd))
+	{
+		if(bSkin)
+			CSysDataMgr::getSingleton().AddNewUserSkin(dlg.m_strName,dlg.m_strParent);
+		else
+			CSysDataMgr::getSingleton().AddNewUserWidget(dlg.m_strName,dlg.m_strParent);
+	}
+}
+
 void CMainDlg::OnTvKeyDown(IEvtArgs *e)
 {
 	EventKeyDown * e2 = sobj_cast<EventKeyDown>(e);

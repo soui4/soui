@@ -29,7 +29,9 @@ public:
 	CMainDlg();
 	~CMainDlg();
 	
-protected:
+ public:
+	void OnNewCustomExtend(bool bSkin, SStringT strName = _T(""));
+  protected:
 	// CPathMonitor::IListener接口实现
     void OnFileChanged(LPCTSTR pszFile, CPathMonitor::Flag nFlag) override;
     void _OnFileChanged(tstring &pszFile, CPathMonitor::Flag nFlag);

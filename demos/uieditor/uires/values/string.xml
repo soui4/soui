@@ -49,4 +49,10 @@
     <match_case value="匹配大小写" />
     <match_whole_word value="匹配整个单词" />
 
+    <new_custom_widget value="配置自定义控件" />
+    <new_custom_skin value="配置自定义皮肤" />
+
+    <new_custom value="新建扩展对象" />
+    <custom_name value="自定义名称" />
+    <custom_parent value="自定义父类" />
   </string>

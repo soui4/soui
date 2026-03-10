@@ -1,4 +1,4 @@
-﻿//stamp:2ad33b80e679d21e
+﻿//stamp:2e8ca06253b8a73e
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -22,6 +22,7 @@
 			const TCHAR * designer_wnd;
 			const TCHAR * dlg_skin_viewer;
 			const TCHAR * dlg_find;
+			const TCHAR * dlg_new_custom;
 			}LAYOUT;
 		struct _values{
 			const TCHAR * string;
@@ -63,6 +64,7 @@
 			const TCHAR * menu_view;
 			const TCHAR * menu_tool;
 			const TCHAR * menu_help;
+			const TCHAR * menu_xmlstruct_ctx;
 			}smenu;
 	};
 #endif//_UIRES_H_
@@ -85,6 +87,7 @@ struct _UIRES UIRES={
 			_T("LAYOUT:designer_wnd"),
 			_T("LAYOUT:dlg_skin_viewer"),
 			_T("LAYOUT:dlg_find"),
+			_T("LAYOUT:dlg_new_custom"),
 		},
 		{
 			_T("values:string"),
@@ -126,6 +129,7 @@ struct _UIRES UIRES={
 			_T("smenu:menu_view"),
 			_T("smenu:menu_tool"),
 			_T("smenu:menu_help"),
+			_T("smenu:menu_xmlstruct_ctx"),
 		},
 	};
 #else
@@ -166,6 +170,8 @@ struct _R{
 		 const wchar_t * edit_replace;
 		 const wchar_t * edit_search;
 		 const wchar_t * edtInput;
+		 const wchar_t * edt_custom_name;
+		 const wchar_t * edt_custom_parent;
 		 const wchar_t * img_icon_exclamation;
 		 const wchar_t * img_icon_information;
 		 const wchar_t * img_icon_question;
@@ -185,6 +191,8 @@ struct _R{
 		 const wchar_t * menu_file_openproject;
 		 const wchar_t * menu_file_save_xml;
 		 const wchar_t * menu_tool_format_xml;
+		 const wchar_t * menu_tool_new_custom_skin;
+		 const wchar_t * menu_tool_new_custom_widget;
 		 const wchar_t * menu_tool_preview;
 		 const wchar_t * menu_tool_view_skin;
 		 const wchar_t * menu_view_property;
@@ -260,6 +268,8 @@ struct _R{
 		int edit_replace;
 		int edit_search;
 		int edtInput;
+		int edt_custom_name;
+		int edt_custom_parent;
 		int img_icon_exclamation;
 		int img_icon_information;
 		int img_icon_question;
@@ -279,6 +289,8 @@ struct _R{
 		int menu_file_openproject;
 		int menu_file_save_xml;
 		int menu_tool_format_xml;
+		int menu_tool_new_custom_skin;
+		int menu_tool_new_custom_widget;
 		int menu_tool_preview;
 		int menu_tool_view_skin;
 		int menu_view_property;
@@ -343,9 +355,12 @@ struct _R{
 		int add_uires;
 		int auto_save;
 		int auto_size;
+		int close;
 		int close_prject;
 		int copy;
 		int copy_path;
+		int custom_name;
+		int custom_parent;
 		int cut;
 		int delete_cpp;
 		int exit;
@@ -358,6 +373,9 @@ struct _R{
 		int image_viewer;
 		int match_case;
 		int match_whole_word;
+		int new_custom;
+		int new_custom_skin;
+		int new_custom_widget;
 		int new_folder;
 		int new_include;
 		int new_layout;
@@ -421,6 +439,8 @@ struct _R R={
 		L"edit_replace",
 		L"edit_search",
 		L"edtInput",
+		L"edt_custom_name",
+		L"edt_custom_parent",
 		L"img_icon_exclamation",
 		L"img_icon_information",
 		L"img_icon_question",
@@ -440,6 +460,8 @@ struct _R R={
 		L"menu_file_openproject",
 		L"menu_file_save_xml",
 		L"menu_tool_format_xml",
+		L"menu_tool_new_custom_skin",
+		L"menu_tool_new_custom_widget",
 		L"menu_tool_preview",
 		L"menu_tool_view_skin",
 		L"menu_view_property",
@@ -516,6 +538,8 @@ struct _R R={
 		65601,
 		65600,
 		65587,
+		65605,
+		65606,
 		65540,
 		65538,
 		65539,
@@ -535,6 +559,8 @@ struct _R R={
 		1,
 		3,
 		31,
+		35,
+		34,
 		33,
 		32,
 		23,
@@ -641,7 +667,13 @@ struct _R R={
 		42,
 		43,
 		44,
-		45
+		45,
+		46,
+		47,
+		48,
+		49,
+		50,
+		51
 	}
 	
 };

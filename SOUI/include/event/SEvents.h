@@ -94,11 +94,13 @@ typedef enum _SOUI_EVENTS
     EVT_LB_SELCHANGING = 12000, ///< 列表框选择改变中事件
     EVT_LB_SELCHANGED,          ///< 列表框选择改变事件
     EVT_LB_DBCLICK,             ///< 列表框双击事件
+    EVT_LB_RCLICK,              ///< 列表框右键点击事件
 
     EVT_LC_SELCHANGING = 13000, ///< 列表控件选择改变中事件
     EVT_LC_SELCHANGED,          ///< 列表控件选择改变事件
     EVT_LC_ITEMDELETED,         ///< 列表控件项删除事件
     EVT_LC_DBCLICK,             ///< 列表控件双击事件
+    EVT_LC_RCLICK,              ///< 列表控件右键点击事件
 
     EVT_TV_SELCHANGING = 14000, ///< 树控件选择改变中事件
     EVT_TV_SELCHANGED,          ///< 树控件选择改变事件
@@ -108,7 +110,10 @@ typedef enum _SOUI_EVENTS
     EVT_TC_EXPAND,              ///< 树形控件展开事件
     EVT_TC_CHECKSTATE,          ///< 树形控件检查状态改变事件
     EVT_TC_DBCLICK,             ///< 树形控件双击事件
-    EVT_CB_BEFORE_CLOSEUP,      ///< 组合框关闭前事件
+    EVT_TC_RCLICK,              ///< 树形控件右键点击事件
+
+    EVT_CB_BEFORE_CLOSEUP = 15050,///< 组合框关闭前事件
+
 
     EVT_LV_SELCHANGING = 15100, ///< 列表视图选择改变中事件
     EVT_LV_SELCHANGED,          ///< 列表视图选择改变事件
@@ -715,6 +720,11 @@ DEF_EVT(EventTCExpand, EVT_TC_EXPAND, on_treectrl_item_expand, {
 DEF_EVT(EventTCDbClick, EVT_TC_DBCLICK, on_treectrl_item_dbclick, {
     HSTREEITEM hItem; ///< 双击选中的节点
     BOOL bCancel;     ///< 是否取消
+})
+
+DEF_EVT(EventTCRClick, EVT_TC_RCLICK, on_treectrl_item_rclick, {
+    POINT pt;       ///< 右键位置
+    HSTREEITEM hItem; ///< 右键选中的节点
 })
 
 DEF_EVT(EventSplitPaneMoved, EVT_SPLIT_PANE_MOVED, on_split_pane_moved, { RECT rcPane; })

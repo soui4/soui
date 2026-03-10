@@ -1,4 +1,4 @@
-//stamp:01dcaf8914b6d2d5
+//stamp:01dcb02f6d655ef4
 /*<------------------------------------------------------------------------------------------------->*/
 #define DEFINE_UIRES(name, type, file_path)\
     name type file_path
@@ -17,6 +17,7 @@ DEFINE_UIRES(UIDESIGNER_XML_INSERT_ELEMENT,	LAYOUT,	"uires/xml/dlg_insert_elemen
 DEFINE_UIRES(designer_wnd,	LAYOUT,	"uires/xml/designer_wnd.xml")
 DEFINE_UIRES(dlg_skin_viewer,	LAYOUT,	"uires/xml/dlg_skin_viewer.xml")
 DEFINE_UIRES(dlg_find,	LAYOUT,	"uires/xml/dlg_find.xml")
+DEFINE_UIRES(dlg_new_custom,	LAYOUT,	"uires/xml/dlg_new_custom.xml")
 DEFINE_UIRES(string,	values,	"uires/values/string.xml")
 DEFINE_UIRES(color,	values,	"uires/values/color.xml")
 DEFINE_UIRES(skin,	values,	"uires/values/skin.xml")
@@ -50,3 +51,4 @@ DEFINE_UIRES(menu_file,	smenu,	"uires/smenu/menu_file.xml")
 DEFINE_UIRES(menu_view,	smenu,	"uires/smenu/menu_view.xml")
 DEFINE_UIRES(menu_tool,	smenu,	"uires/smenu/menu_tool.xml")
 DEFINE_UIRES(menu_help,	smenu,	"uires/smenu/menu_help.xml")
+DEFINE_UIRES(menu_xmlstruct_ctx,	smenu,	"uires/smenu/menu_xmlstruct_ctx.xml")

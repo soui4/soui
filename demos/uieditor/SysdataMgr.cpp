@@ -109,6 +109,35 @@ BOOL CSysDataMgr::IsUserWidget(SStringW strWidgetName) const
 	return false;
 }
 
+BOOL CSysDataMgr::AddNewUserSkin(SStringW strSkinName,SStringW strParentName)
+{
+	SXmlNode xmlUserSkins = m_xmlSkinProp.root().child(L"root").child2(L"user_skins");
+	SXmlNode xmlSkin = xmlUserSkins.child(strSkinName);
+	if(xmlSkin){
+		return false;
+	}
+	xmlSkin = xmlUserSkins.append_child(strSkinName.c_str());
+	xmlSkin.attribute2(L"name").set_value(strSkinName);
+	xmlSkin.attribute2(L"parent").set_value(strParentName);
+	m_xmlSkinProp.save_file(m_strConfigDir + _T("/Skin.xml"));
+	return true;
+}
+
+BOOL CSysDataMgr::AddNewUserWidget(SStringW strWidgetName,SStringW strParentName)
+{
+	SXmlNode xmlUserWidgets = m_xmlCtrlDef.root().child(L"root").child2(L"user_widgets");
+    SXmlNode xmlWidget = xmlUserWidgets.child(strWidgetName);
+    if (xmlWidget)
+    {
+        return false;
+    }
+    xmlWidget = xmlUserWidgets.append_child(strWidgetName.c_str());
+    xmlWidget.attribute2(L"name").set_value(strWidgetName);
+    xmlWidget.attribute2(L"parent").set_value(strParentName);
+	m_xmlCtrlDef.save_file(m_strConfigDir + _T("/Ctrl.xml"));
+    return true;
+}
+
 SOUI::SStringT CSysDataMgr::GetConfigDir() const
 {
 	return m_strConfigDir;

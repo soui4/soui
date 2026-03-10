@@ -44,6 +44,7 @@ STreeCtrl::STreeCtrl()
     m_evtSet.addEvent(EVENTID(EventTCCheckState));
     m_evtSet.addEvent(EVENTID(EventTCExpand));
     m_evtSet.addEvent(EVENTID(EventTCDbClick));
+    m_evtSet.addEvent(EVENTID(EventTCRClick));
 }
 
 STreeCtrl::~STreeCtrl()
@@ -1218,6 +1219,16 @@ void STreeCtrl::OnRButtonDown(UINT nFlags, CPoint pt)
         SelectItem(m_hHoverItem, FALSE);
 
     __baseCls::OnRButtonDown(nFlags, pt2);
+}
+
+void STreeCtrl::OnRButtonUp(UINT nFlags, CPoint pt)
+{
+    EventTCRClick evt(this);
+    evt.pt = pt;
+    evt.hItem = HitTest(pt);
+    if(!FireEvent(&evt)){
+        __baseCls::OnRButtonUp(nFlags, pt);
+    }
 }
 
 void STreeCtrl::OnLButtonUp(UINT nFlags, CPoint pt)
