@@ -293,14 +293,14 @@ void CMainDlg::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
 
 void CMainDlg::OnNewCustomExtend(bool bSkin, SStringT strName){
 	SDlgNewCustom dlg;
-    dlg.m_strTitle = GETSTRING(bSkin ? R.string.new_custom_skin : R.string.new_custom_widget);
+    dlg.m_strTitle = S_CW2T(GETSTRING(bSkin ? R.string.new_custom_skin : R.string.new_custom_widget));
 	dlg.m_strName = strName;
 	if (IDOK == dlg.DoModal(m_hWnd))
 	{
 		if(bSkin)
-			CSysDataMgr::getSingleton().AddNewUserSkin(dlg.m_strName,dlg.m_strParent);
+			CSysDataMgr::getSingleton().AddNewUserSkin(S_CT2W(dlg.m_strName),S_CT2W(dlg.m_strParent));
 		else
-			CSysDataMgr::getSingleton().AddNewUserWidget(dlg.m_strName,dlg.m_strParent);
+			CSysDataMgr::getSingleton().AddNewUserWidget(S_CT2W(dlg.m_strName),S_CT2W(dlg.m_strParent));
 	}
 }
 
