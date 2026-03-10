@@ -804,7 +804,7 @@ void SFrameLayout::LayoutDockLeftRight(IWindow *pParent, SList<ChildInfo *> &lst
 
             if(rcWnd.bottom > rcParent.bottom)
                 rcWnd.bottom = rcParent.bottom;
-            if(rcWnd.top < rcWnd.bottom)
+            if(rcWnd.top > rcWnd.bottom)
                 rcWnd.top = rcWnd.bottom;
             sz.cy = rcWnd.bottom - rcWnd.top;
             ((SWindow *)pInfo->pWnd)->OnRelayout(rcWnd);
