@@ -77,7 +77,8 @@ CMainDlg::~CMainDlg()
 
 BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 {
-	::RegisterDragDrop(hWnd, GetDropTarget());
+	HRESULT hr = ::RegisterDragDrop(m_hWnd, GetDropTarget());
+
 	// 初始化文件树视图
 	m_treeView = FindChildByID2<STreeView>(R.id.workspace_treeview);
 	if (m_treeView)
@@ -87,7 +88,7 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 		// 初始化路径监视器
 		m_pathMonitor.AddListener(this);
 
-		IDropTarget *pDT = new FileTreeDropTarget(m_treeView);
+		IDropTarget *pDT = new FileTreeDropTarget(this,m_treeView);
 		RegisterDragDrop(m_treeView->GetSwnd(), pDT);
 		pDT->Release();
 	}
@@ -104,19 +105,13 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 	m_pImageViewer->Init(GetRoot());
 
 	// 初始化管理类
-	m_pFileOperationManager = new CFileOperationManager(m_treeView, m_pFileTreeAdapter, m_hWnd);
+	m_pFileOperationManager = new CFileOperationManager(this, m_treeView, m_pFileTreeAdapter, m_hWnd);
 	m_pUIResManager = new CUIResManager(&m_UIResFileMgr);
 	m_pToolbarManager = new CToolbarManager(m_skinPool);
 
 	// 初始化工具栏
 	m_pToolbarManager->InitWidgetToolbar(GetRoot(), m_pXmlEdtior);
 	m_pToolbarManager->InitSkinToolbar(GetRoot());
-
-	HRESULT hr = ::RegisterDragDrop(m_hWnd, GetDropTarget());
-	RegisterDragDrop(m_treeView->GetSwnd(), new CDropTarget(this));
-	SWindow* MainWnd = FindChildByName2<SWindow>("UI_main_caption");
-	if (MainWnd)
-		RegisterDragDrop(MainWnd->GetSwnd(), new CDropTarget(this));
 	return 0;
 }
 

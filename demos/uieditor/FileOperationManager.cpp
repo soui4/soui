@@ -2,10 +2,10 @@
 #include "FileOperationManager.h"
 #include "Dialog/DlgInput.h"
 #include <shlwapi.h>
-#include <helper/slog.h>
 #include <atl.mini/SComCli.h>
 #include "FileTreeDragdrop.h"
-
+#include "MainDlg.h"
+#include <helper/slog.h>
 #define kLogTag "FileOperationManager"
 
 enum {
@@ -13,10 +13,11 @@ enum {
     file_op_cut=2,
 };
 
-CFileOperationManager::CFileOperationManager(STreeView* pTreeView, CFileTreeAdapter* pAdapter, HWND hWnd)
+CFileOperationManager::CFileOperationManager( CMainDlg *pMainDlg, STreeView* pTreeView, CFileTreeAdapter* pAdapter, HWND hWnd)
     : m_pTreeView(pTreeView)
     , m_pFileTreeAdapter(pAdapter)
     , m_pClipboardManager(new CClipboardManager(hWnd))
+    , m_pMainDlg(pMainDlg)
 {
 }
 
@@ -162,11 +163,21 @@ void CFileOperationManager::OnFilePaste()
     }
 }
 
-void CFileOperationManager::OnFilePaste(HSTREEITEM hItem)
+void CFileOperationManager::OnFilePaste(HSTREEITEM hItem, BOOL bCopy, HGLOBAL hdrop)
 {
     std::vector<SStringT> vecClipboardItems;
     int nClipboardOperation = 0;
-    BOOL bFromClipboard = m_pClipboardManager->DeserializeItemsFromClipboard(vecClipboardItems, nClipboardOperation);
+    BOOL bFromClipboard = FALSE;
+    if (hdrop)
+    {
+        bFromClipboard = m_pClipboardManager->DeserializeItemsFromHdrop(hdrop,vecClipboardItems, nClipboardOperation);
+        if(bFromClipboard && vecClipboardItems.size() == 1 && vecClipboardItems[0].EndsWith(_T(".idx"))){
+            m_pMainDlg->OnDrop(vecClipboardItems[0]);
+            return;
+        }
+    }    
+    else
+        bFromClipboard = m_pClipboardManager->DeserializeItemsFromClipboard(vecClipboardItems, nClipboardOperation);
 
     if (bFromClipboard && !vecClipboardItems.empty() && nClipboardOperation > 0)
     {
@@ -198,7 +209,7 @@ void CFileOperationManager::OnFilePaste(HSTREEITEM hItem)
                 if (::PathIsDirectory(strSrcPath))
                 {
                     SHFILEOPSTRUCT fos = { 0 };
-                    fos.wFunc = FO_COPY;
+                    fos.wFunc = bCopy?FO_COPY:FO_MOVE;
                     fos.pFrom = strSrcPath + _T('\0');
                     fos.pTo = strDestFilePath + _T('\0');
                     fos.fFlags = FOF_NOCONFIRMMKDIR | FOF_SILENT | FOF_NOERRORUI;
@@ -206,7 +217,10 @@ void CFileOperationManager::OnFilePaste(HSTREEITEM hItem)
                 }
                 else
                 {
-                    ::CopyFile(strSrcPath, strDestFilePath, FALSE);
+                    if (bCopy)
+                        ::CopyFile(strSrcPath, strDestFilePath, FALSE);
+                    else
+                        ::MoveFile(strSrcPath, strDestFilePath);
                 }
             }
             else if (nClipboardOperation == file_op_cut)

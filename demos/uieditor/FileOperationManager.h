@@ -5,18 +5,18 @@
 #include <control/STreeCtrl.h>
 #include "FileTreeAdapter.h"
 #include "ClipboardManager.h"
-
+class CMainDlg;
 class CFileOperationManager
 {
 public:
-    CFileOperationManager(STreeView* pTreeView, CFileTreeAdapter* pAdapter, HWND hWnd);
+    CFileOperationManager( CMainDlg *pMainDlg, STreeView* pTreeView, CFileTreeAdapter* pAdapter, HWND hWnd);
     ~CFileOperationManager();
 
     // 文件操作
     void OnFileCopy();
     void OnFileCut();
     void OnFilePaste();
-    void OnFilePaste(HSTREEITEM hItem);
+    void OnFilePaste(HSTREEITEM hItem,BOOL bCopy=TRUE, HGLOBAL hdrop=NULL);
     void OnFileDelete(HSTREEITEM hItem);
     void OnFileRename(HSTREEITEM hItem);
 
@@ -30,10 +30,12 @@ public:
     // 剪贴板相关
     BOOL HasClipboardData();
 
+    CClipboardManager * GetClipboardManager(){return m_pClipboardManager;}
 private:
     STreeView* m_pTreeView;
     CFileTreeAdapter* m_pFileTreeAdapter;
     CClipboardManager* m_pClipboardManager;
+    CMainDlg *m_pMainDlg;
 
     // 拖拽相关
     BOOL CreateDragData(const std::vector<HSTREEITEM>& selectedItems, HGLOBAL& hGlobal, std::vector<SStringW>& filePaths);

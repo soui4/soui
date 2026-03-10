@@ -149,6 +149,33 @@ BOOL CClipboardManager::HasClipboardData()
     return bHasData;
 }
 
+BOOL CClipboardManager::DeserializeItemsFromHdrop(HGLOBAL hGlobal, std::vector<SStringT> &vecItemPaths, int &nOperation)
+{
+    if (hGlobal)
+    {
+        HDROP hDrop = (HDROP)GlobalLock(hGlobal);
+        if (hDrop)
+        {
+            UINT nFileCount = DragQueryFile(hDrop, 0xFFFFFFFF, NULL, 0);
+            for (UINT i = 0; i < nFileCount; i++)
+            {
+                TCHAR szFilePath[MAX_PATH];
+                if (DragQueryFile(hDrop, i, szFilePath, MAX_PATH))
+                {
+                    vecItemPaths.push_back(szFilePath);
+                }
+            }
+            GlobalUnlock(hGlobal);
+            if (!vecItemPaths.empty())
+            {
+                nOperation = 1; // 资源管理器复制默认为复制操作
+                return TRUE;
+            }
+        }
+    }
+    return FALSE;
+}
+
 BOOL CClipboardManager::DeserializeItemsFromClipboard(std::vector<SStringT>& vecItemPaths, int& nOperation)
 {
     vecItemPaths.clear();
@@ -195,38 +222,17 @@ BOOL CClipboardManager::DeserializeItemsFromClipboard(std::vector<SStringT>& vec
         }
     }
 
+    BOOL bRet = FALSE;
     // 如果自定义格式失败，尝试读取系统资源管理器的 CF_HDROP 格式
     if(IsClipboardFormatAvailable(CF_HDROP))
     {
         if(OpenClipboard(m_hWnd))
         {
             HGLOBAL hGlobal = (HGLOBAL)GetClipboardData(CF_HDROP);
-            if(hGlobal)
-            {
-                HDROP hDrop = (HDROP)GlobalLock(hGlobal);
-                if(hDrop)
-                {
-                    UINT nFileCount = DragQueryFile(hDrop, 0xFFFFFFFF, NULL, 0);
-                    for(UINT i = 0; i < nFileCount; i++)
-                    {
-                        TCHAR szFilePath[MAX_PATH];
-                        if(DragQueryFile(hDrop, i, szFilePath, MAX_PATH))
-                        {
-                            vecItemPaths.push_back(szFilePath);
-                        }
-                    }
-                    GlobalUnlock(hGlobal);
-                    CloseClipboard();
-                    if(!vecItemPaths.empty())
-                    {
-                        nOperation = 1; // 资源管理器复制默认为复制操作
-                        return TRUE;
-                    }
-                }
-            }
+            bRet = DeserializeItemsFromHdrop(hGlobal, vecItemPaths, nOperation);
             CloseClipboard();
         }
     }
 
-    return FALSE;
+    return bRet;
 }

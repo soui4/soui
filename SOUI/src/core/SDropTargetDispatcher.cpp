@@ -45,30 +45,15 @@ BOOL SDropTargetDispatcher::UnregisterDragDrop(SWND swnd)
     return TRUE;
 }
 
-#ifdef _WIN32
-#define __uuidofsys __uuidof
-#else
-#define __uuidofsys __suidof
-#endif
-
-HRESULT SDropTargetDispatcher::QueryInterface(/* [in] */ REFIID riid,
-                                              /* [iid_is][out] */ void **ppvObject)
-{
-    HRESULT hr = S_FALSE;
-    if (riid == __uuidofsys(IUnknown))
-        *ppvObject = (IUnknown *)this, hr = S_OK;
-    else if (riid == __uuidofsys(IDropTarget))
-        *ppvObject = (IDropTarget *)this, hr = S_OK;
-    return hr;
-}
-
 HRESULT SDropTargetDispatcher::DragEnter(/* [unique][in] */ IDataObject *pDataObj,
                                          /* [in] */ DWORD grfKeyState,
                                          /* [in] */ POINTL pt,
                                          /* [out][in] */ DWORD *pdwEffect)
 {
     m_pDataObj = pDataObj;
+    m_dwEnterEffect = *pdwEffect;
     m_pDataObj->AddRef();
+    //SSLOGI() << "DragEnter: m_dwEnterEffect=" << m_dwEnterEffect;
     return DragOver(grfKeyState, pt, pdwEffect);
 }
 
@@ -102,7 +87,10 @@ HRESULT SDropTargetDispatcher::DragOver(/* [in] */ DWORD grfKeyState,
             pPairOld->m_value->DragLeave();
         m_hHover = hHover;
         if (pPairNew && m_hHover)
+        {
+            *pdwEffect = m_dwEnterEffect;
             pPairNew->m_value->DragEnter(m_pDataObj, grfKeyState, pt, pdwEffect);
+        }
     }
     else
     {
@@ -114,30 +102,36 @@ HRESULT SDropTargetDispatcher::DragOver(/* [in] */ DWORD grfKeyState,
     return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE SDropTargetDispatcher::DragLeave(void)
+HRESULT  SDropTargetDispatcher::DragLeave(void)
 {
     if (m_pDataObj)
     {
         m_pDataObj->Release();
         m_pDataObj = NULL;
     }
+    m_hHover = 0;
+    m_dwEnterEffect = 0;
+    //SSLOGI() << "DragLeave";
     return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE SDropTargetDispatcher::Drop(/* [unique][in] */ IDataObject *pDataObj,
+HRESULT  SDropTargetDispatcher::Drop(/* [unique][in] */ IDataObject *pDataObj,
                                                       /* [in] */ DWORD grfKeyState,
                                                       /* [in] */ POINTL pt,
                                                       /* [out][in] */ DWORD *pdwEffect)
 {
+    //SSLOGI() << "Drop, *pdwEffect="<<*pdwEffect;
     DTMAP::CPair *pPair = m_mapDropTarget.Lookup(m_hHover);
     if (m_hHover && pPair)
         pPair->m_value->Drop(pDataObj, grfKeyState, pt, pdwEffect);
     m_hHover = 0;
+    m_dwEnterEffect = 0;
     if (m_pDataObj)
     {
         m_pDataObj->Release();
         m_pDataObj = NULL;
     }
+
     return S_OK;
 }
 

@@ -17,6 +17,7 @@
 #include <windows.h>
 #include <souicoll.h>
 #include <core/SWnd.h>
+#include <helper/SUnkImpl.h>
 
 SNSBEGIN
 
@@ -28,7 +29,7 @@ SNSBEGIN
  *             for DUI windows. It implements the `IDropTarget` interface to manage drag-and-drop
  *             operations and routes them to the appropriate window.
  */
-class SDropTargetDispatcher : public IDropTarget {
+class SDropTargetDispatcher : public SUnkImpl<IDropTarget> {
   public:
     /**
      * @brief    Constructor
@@ -71,43 +72,8 @@ class SDropTargetDispatcher : public IDropTarget {
      */
     BOOL UnregisterDragDrop(SWND swnd);
 
-    //////////////////////////////////////////////////////////////////////////
-    // IUnknown
-
-    /**
-     * @brief    Queries for a specific interface
-     * @param    riid      Interface identifier
-     * @param    ppvObject Pointer to the interface pointer
-     * @return   HRESULT indicating success or failure
-     *
-     * @details  Queries for the specified interface and returns a pointer to it.
-     */
-    STDMETHOD_(HRESULT, QueryInterface)
-    (
-        /* [in] */ REFIID riid,
-        /* [iid_is][out] */ void **ppvObject);
-
-    /**
-     * @brief    Increments the reference count
-     * @return   New reference count
-     *
-     * @details  Increments the reference count of the object. Always returns 1.
-     */
-    STDMETHOD_(ULONG, AddRef)(void)
-    {
-        return 1;
-    }
-
-    /**
-     * @brief    Decrements the reference count
-     * @return   New reference count
-     *
-     * @details  Decrements the reference count of the object. Always returns 1.
-     */
-    STDMETHOD_(ULONG, Release)(void)
-    {
-        return 1;
-    }
+    IUNKNOWN_BEGIN(IDropTarget)
+    IUNKNOWN_END()
 
     //////////////////////////////////////////////////////////////////////////
     // IDropTarget
@@ -184,6 +150,7 @@ class SDropTargetDispatcher : public IDropTarget {
     IDataObject *m_pDataObj;                 /**< Pointer to the data object. */
     SWND m_hHover;                           /**< Handle to the window currently being hovered over. */
     SWindow *m_pOwner;                       /**< Pointer to the owner window. */
+    DWORD m_dwEnterEffect;                   /**< Effect of the drag operation when entering a window. */
 };
 
 SNSEND

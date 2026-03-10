@@ -12,7 +12,6 @@
 #include <helper/SMenuEx.h>
 #include <vector>
 #include <control/STreeCtrl.h>
-#include "DropTarget.h"
 #include <control/SToolBar.h>
 #include <algorithm>
 #include "FileTreeAdapter.h"
@@ -23,7 +22,7 @@
 #include "ToolbarManager.h"
 #define MenuId_Start  20000
 
-class CMainDlg : public SHostWnd, public CDropTarget::IDropListener,  CPathMonitor::IListener
+class CMainDlg : public SHostWnd, CPathMonitor::IListener
 {
 public:
 	CMainDlg();
@@ -31,6 +30,7 @@ public:
 	
  public:
 	void OnNewCustomExtend(bool bSkin, SStringT strName = _T(""));
+	BOOL OnDrop(LPCTSTR pszName);
   protected:
 	// CPathMonitor::IListener接口实现
     void OnFileChanged(LPCTSTR pszFile, CPathMonitor::Flag nFlag) override;
@@ -48,8 +48,7 @@ public:
 	bool CheckSave();
 
 	BOOL NewLayout(const SStringT& strPath, const SStringT& strName);
-protected:
-	BOOL OnDrop(LPCTSTR pszName) override;
+
 protected:
 	//soui消息
 	void OnClose();

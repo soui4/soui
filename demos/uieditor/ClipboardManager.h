@@ -14,6 +14,7 @@ public:
     // 剪贴板操作
     void SerializeItemsToClipboard(const std::vector<HSTREEITEM>& items, int nOperation, CFileTreeAdapter* pAdapter);
     BOOL DeserializeItemsFromClipboard(std::vector<SStringT>& vecItemPaths, int& nOperation);
+    BOOL DeserializeItemsFromHdrop(HGLOBAL hDrop, std::vector<SStringT> &vecItemPaths, int &nOperation);
     BOOL HasClipboardData();
 
     // 常量定义
