@@ -167,36 +167,37 @@ void CFileOperationManager::OnFilePaste(HSTREEITEM hItem)
     std::vector<SStringT> vecClipboardItems;
     int nClipboardOperation = 0;
     BOOL bFromClipboard = m_pClipboardManager->DeserializeItemsFromClipboard(vecClipboardItems, nClipboardOperation);
-    
-    if(bFromClipboard && !vecClipboardItems.empty() && nClipboardOperation > 0)
+
+    if (bFromClipboard && !vecClipboardItems.empty() && nClipboardOperation > 0)
     {
-        const FileItemData& destItemData = m_pFileTreeAdapter->GetItemData(hItem);
+        const FileItemData &destItemData = m_pFileTreeAdapter->GetItemData(hItem);
         SStringT strDestPath = destItemData.bIsDir ? destItemData.strPath : destItemData.strPath.Left(destItemData.strPath.ReverseFind(_T('/')));
-        
-        for(size_t i = 0; i < vecClipboardItems.size(); i++)
+
+        for (size_t i = 0; i < vecClipboardItems.size(); i++)
         {
             SStringT strSrcPath = vecClipboardItems[i];
+            strSrcPath.ReplaceChar(_T('\\'), _T('/'));
             int nPos = strSrcPath.ReverseFind(_T('/'));
             SStringT strFileName = strSrcPath.Mid(nPos + 1);
             SStringT strDestFilePath = strDestPath + _T('/') + strFileName;
-            
-            if(nClipboardOperation == 1)
+
+            if (nClipboardOperation == 1)
             {
-                if(::PathFileExists(strDestFilePath))
+                if (::PathFileExists(strDestFilePath))
                 {
                     SStringT strBaseName = strFileName.Left(strFileName.ReverseFind(_T('.')));
                     SStringT strExt = strFileName.Mid(strFileName.ReverseFind(_T('.')));
                     int nIndex = 1;
-                    while(::PathFileExists(strDestPath + _T('/') + strBaseName + _T('(') + SStringT().Format(_T("%d"), nIndex) + _T(')') + strExt))
+                    while (::PathFileExists(strDestPath + _T('/') + strBaseName + _T('(') + SStringT().Format(_T("%d"), nIndex) + _T(')') + strExt))
                     {
                         nIndex++;
                     }
                     strDestFilePath = strDestPath + _T('/') + strBaseName + _T('(') + SStringT().Format(_T("%d"), nIndex) + _T(')') + strExt;
                 }
-                
-                if(::PathIsDirectory(strSrcPath))
+
+                if (::PathIsDirectory(strSrcPath))
                 {
-                    SHFILEOPSTRUCT fos = {0};
+                    SHFILEOPSTRUCT fos = { 0 };
                     fos.wFunc = FO_COPY;
                     fos.pFrom = strSrcPath + _T('\0');
                     fos.pTo = strDestFilePath + _T('\0');
@@ -208,11 +209,11 @@ void CFileOperationManager::OnFilePaste(HSTREEITEM hItem)
                     ::CopyFile(strSrcPath, strDestFilePath, FALSE);
                 }
             }
-            else if(nClipboardOperation == file_op_cut)
+            else if (nClipboardOperation == file_op_cut)
             {
-                if(::PathIsDirectory(strSrcPath))
+                if (::PathIsDirectory(strSrcPath))
                 {
-                    SHFILEOPSTRUCT fos = {0};
+                    SHFILEOPSTRUCT fos = { 0 };
                     fos.wFunc = FO_MOVE;
                     fos.pFrom = strSrcPath + _T('\0');
                     fos.pTo = strDestPath + _T('\0');
