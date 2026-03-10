@@ -191,4 +191,10 @@ void SwndStyle::UpdateFont()
     }
 }
 
+void SwndStyle::SetPadding(int iBorder, SLayoutSize size)
+{
+    if (iBorder >= 0 && iBorder < 4)
+        m_rcInset[iBorder] = size;
+}
+
 SNSEND

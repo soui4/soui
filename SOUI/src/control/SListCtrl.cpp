@@ -35,6 +35,7 @@ SListCtrl::SListCtrl()
     m_evtSet.addEvent(EVENTID(EventLCSelChanged));
     m_evtSet.addEvent(EVENTID(EventLCDbClick));
     m_evtSet.addEvent(EVENTID(EventLCItemDeleted));
+    m_evtSet.addEvent(EVENTID(EventLCRClick));
 }
 
 SListCtrl::~SListCtrl()
@@ -900,12 +901,17 @@ void SListCtrl::OnLButtonDbClick(UINT nFlags, CPoint pt)
 
     EventLCDbClick evt2(this);
     evt2.nCurSel = m_nHoverItem;
+    evt2.pt = pt;
     FireEvent(evt2);
 }
 
-void SListCtrl::OnLButtonUp(UINT nFlags, CPoint pt)
+void SListCtrl::OnRButtonUp(UINT nFlags, CPoint pt)
 {
-    __baseCls::OnLButtonUp(nFlags, pt);
+    EventLCRClick evt2(this);
+    evt2.nCurSel = HitTest(pt);
+    evt2.pt = pt;;
+    if(!FireEvent(evt2))
+        __baseCls::OnRButtonUp(nFlags, pt);
 }
 
 void SListCtrl::UpdateChildrenPosition()

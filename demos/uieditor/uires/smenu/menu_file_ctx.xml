@@ -1,4 +1,4 @@
-﻿<menuRoot itemSkin="skin_menu_skin_png" itemHeight="26" iconPos="4,4" textOffset="5" iconBarWidth="24" maxWidth="180" minWidth="170" margin="1,1,1,1" colorText="@color/white" colorTextDisable="@color/gray" colorBkgnd="@color/bkBlack1" >
+﻿<menuRoot itemSkin="skin_menu_skin_png" itemHeight="26" itemPadding="0,0,10,0" iconPos="4,4" textOffset="5" iconBarWidth="24" maxWidth="180" minWidth="170" margin="1,1,1,1" colorText="@color/white" colorTextDisable="@color/gray" colorBkgnd="@color/bkBlack1" >
   <menuItem id="190" text="@string/new_xml" />
   <menuItem id="191" text="@string/new_folder" />
   <menuItem id="192" text="@string/new_layout" />

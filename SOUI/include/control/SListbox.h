@@ -322,6 +322,13 @@ class SOUI_EXP SListBox : public TPanelProxy<IListBox> {
     void OnLButtonUp(UINT nFlags, CPoint pt);
 
     /**
+     * @brief Handle left mouse button up event
+     * @param nFlags Flags
+     * @param pt Mouse coordinates
+     */
+    void OnRButtonUp(UINT nFlags, CPoint pt);
+
+    /**
      * @brief Handle mouse move event
      * @param nFlags Flags
      * @param pt Mouse coordinates
@@ -406,6 +413,7 @@ class SOUI_EXP SListBox : public TPanelProxy<IListBox> {
         MSG_WM_LBUTTONDOWN(OnLButtonDown)
         MSG_WM_LBUTTONDBLCLK(OnLButtonDbClick)
         MSG_WM_LBUTTONUP(OnLButtonUp)
+        MSG_WM_RBUTTONUP(OnRButtonUp)
         MSG_WM_MOUSEMOVE(OnMouseMove)
         MSG_WM_KEYDOWN(OnKeyDown)
         MSG_WM_CHAR(OnChar)

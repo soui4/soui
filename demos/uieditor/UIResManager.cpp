@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "UIResManager.h"
 #include <shlwapi.h>
 #include <helper/slog.h>

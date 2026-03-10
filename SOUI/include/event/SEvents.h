@@ -580,7 +580,15 @@ DEF_EVT(EventLBSelChanged, EVT_LB_SELCHANGED, on_listbox_sel_changed, {
     int nOldSel; ///< 旧选中项
 })
 
-DEF_EVT(EventLBDbClick, EVT_LB_DBCLICK, on_listbox_item_dbclick, { int nCurSel; })
+DEF_EVT(EventLBDbClick, EVT_LB_DBCLICK, on_listbox_item_dbclick, { 
+    int nCurSel; 
+    POINT pt; 
+})
+
+DEF_EVT(EventLBRClick, EVT_LB_RCLICK, on_listbox_item_rclick, {
+    int nCurSel; 
+    POINT pt; 
+})
 
 DEF_EVT(EventLVSelChanged, EVT_LV_SELCHANGED, on_listview_select_changed, {
     int iOldSel; ///< 原选中项
@@ -672,7 +680,15 @@ DEF_EVT(EventLCSelChanged, EVT_LC_SELCHANGED, on_listctrl_sel_changed, {
     int nOldSel; ///< 旧选中项
 })
 
-DEF_EVT(EventLCDbClick, EVT_LC_DBCLICK, on_listctrl_item_dbclick, { int nCurSel; })
+DEF_EVT(EventLCDbClick, EVT_LC_DBCLICK, on_listctrl_item_dbclick, { 
+    int nCurSel; 
+    POINT pt; 
+})
+
+DEF_EVT(EventLCRClick, EVT_LC_RCLICK, on_listctrl_item_rclick, {
+     int nCurSel; 
+    POINT pt; 
+})
 
 DEF_EVT(EventLCItemDeleted, EVT_LC_ITEMDELETED, on_listctrl_del_item, {
     int nItem;     ///< 项索引

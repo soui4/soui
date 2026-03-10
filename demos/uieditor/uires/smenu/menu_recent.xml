@@ -1,4 +1,4 @@
-﻿<menuRoot itemSkin="skin_menu_skin_png" itemHeight="30" textOffset="5" iconBarWidth="5" maxWidth="800" minWidth="180" colorText="@color/white" colorBkgnd="#505050" >
+﻿<menuRoot itemSkin="skin_menu_skin_png" itemPadding="0,0,10,0" itemHeight="30" textOffset="5" iconBarWidth="5" maxWidth="800" minWidth="180" colorText="@color/white" colorBkgnd="#505050" >
   
 </menuRoot>
 

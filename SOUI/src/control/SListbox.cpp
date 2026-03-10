@@ -33,6 +33,7 @@ SListBox::SListBox()
     m_evtSet.addEvent(EVENTID(EventLBSelChanging));
     m_evtSet.addEvent(EVENTID(EventLBSelChanged));
     m_evtSet.addEvent(EVENTID(EventLBDbClick));
+    m_evtSet.addEvent(EVENTID(EventLBRClick));
 }
 
 SListBox::~SListBox()
@@ -497,6 +498,15 @@ void SListBox::OnLButtonUp(UINT nFlags, CPoint pt)
     __baseCls::OnLButtonUp(nFlags, pt);
 }
 
+void SListBox::OnRButtonUp(UINT nFlags, CPoint pt)
+{
+    EventLBRClick evt2(this);
+    evt2.nCurSel = HitTest(pt);
+    evt2.pt = pt;
+    if(!FireEvent(evt2))
+        __baseCls::OnRButtonUp(nFlags, pt);
+}
+
 void SListBox::OnLButtonDbClick(UINT nFlags, CPoint pt)
 {
     __baseCls::OnLButtonDbClick(nFlags, pt);
@@ -506,6 +516,7 @@ void SListBox::OnLButtonDbClick(UINT nFlags, CPoint pt)
 
     EventLBDbClick evt2(this);
     evt2.nCurSel = m_iHoverItem;
+    evt2.pt = pt;
     FireEvent(evt2);
 }
 

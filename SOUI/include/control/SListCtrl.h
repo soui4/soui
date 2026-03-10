@@ -421,11 +421,11 @@ class SOUI_EXP SListCtrl : public SPanel {
     void OnLButtonDbClick(UINT nFlags, CPoint pt);
 
     /**
-     * @brief Handle left mouse button up event
+     * @brief Handle right mouse button up event
      * @param nFlags Flags
      * @param pt Mouse coordinates
      */
-    void OnLButtonUp(UINT nFlags, CPoint pt);
+    void OnRButtonUp(UINT nFlags, CPoint pt);
 
     /**
      * @brief Handle mouse move event
@@ -534,7 +534,7 @@ class SOUI_EXP SListCtrl : public SPanel {
         MSG_WM_SIZE(OnSize)
         MSG_WM_LBUTTONDBLCLK(OnLButtonDbClick)
         MSG_WM_LBUTTONDOWN(OnLButtonDown)
-        MSG_WM_LBUTTONUP(OnLButtonUp)
+        MSG_WM_RBUTTONUP(OnRButtonUp)
         MSG_WM_MOUSEMOVE(OnMouseMove)
         MSG_WM_MOUSELEAVE(OnMouseLeave)
     SOUI_MSG_MAP_END()

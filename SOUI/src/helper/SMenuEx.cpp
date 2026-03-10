@@ -35,6 +35,7 @@ class SMenuExRoot : public SRootWindow {
     SLayoutSize m_iconX, m_iconY;
     SLayoutSize m_nMinWidth;
     SLayoutSize m_nSubMenuOffset;
+    SLayoutSize m_rcItemPadding[4];
 
     DWORD m_dwContextHelpId;
 
@@ -53,6 +54,8 @@ class SMenuExRoot : public SRootWindow {
         pNewMenuExRoot->m_iconY = m_iconY;
         pNewMenuExRoot->m_nMinWidth = m_nMinWidth;
         pNewMenuExRoot->m_nSubMenuOffset = m_nSubMenuOffset;
+        for (int i=0;i<4;i++)
+            pNewMenuExRoot->m_rcItemPadding[i] = m_rcItemPadding[i];
         pNewMenuExRoot->m_style = m_style; // 设置了 些 margin 之类的 属性 也要 copy
     }
 
@@ -70,6 +73,7 @@ class SMenuExRoot : public SRootWindow {
         ATTR_LAYOUTSIZE(L"textOffset", m_nTextOffset, FALSE)
         ATTR_LAYOUTSIZE(L"minWidth", m_nMinWidth, FALSE)
         ATTR_LAYOUTSIZE(L"subMenuOffset", m_nSubMenuOffset, FALSE)
+        ATTR_LAYOUTSIZE4(L"itemPadding",m_rcItemPadding,FALSE)
         ATTR_DWORD(L"contextHelpId", m_dwContextHelpId, FALSE)
     SOUI_ATTRS_END()
 
@@ -225,6 +229,11 @@ SMenuExItem::SMenuExItem(SMenuEx *pOwnerMenu, ISkinObj *pItemSkin)
     m_pBgSkin = pItemSkin;
     m_style.m_bTrackMouseEvent = TRUE;
     m_style.SetAlign(DT_LEFT);
+    SMenuExRoot *pRoot = (SMenuExRoot *)pOwnerMenu->GetRoot();
+    for (int i = 0; i < 4; i++)
+    {
+        m_style.SetPadding(i,pRoot->m_rcItemPadding[i]);
+    }
 }
 
 void SMenuExItem::BeforePaint(IRenderTarget *pRT, SPainter &painter) const

@@ -1,4 +1,4 @@
-﻿<menuRoot iconSkin="" itemHeight="26" iconMargin="4" textMargin="8" maxWidth="300" itemSkin="skin_menu_skin_png" colorText="@color/white" colorTextDisable="@color/gray">
+﻿<menuRoot iconSkin="" itemHeight="26" itemPadding="0,0,10,0" iconMargin="4" textMargin="8" maxWidth="300" itemSkin="skin_menu_skin_png" colorText="@color/white" colorTextDisable="@color/gray">
   <menuItem id="1" name="menu_file_openproject" text="@string/open_prject"/>
   <menuItem id="2" name="menu_file_closeproject" text="@string/close_prject"/>
 	<sep/>
