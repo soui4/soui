@@ -13,13 +13,16 @@ SNSBEGIN
     public:
 		static LPCWSTR GetInplaceItemStyleName();
         
-		virtual PropType GetType() const {return PT_OPTION;}
-        virtual void SetValue(const SStringT & strValue);
+		virtual PropType GetType() const OVERRIDE
+        {
+            return PT_OPTION;
+        }
+        virtual void SetValue(const SStringT &strValue) OVERRIDE;
 
-        virtual SStringT GetValue() const;
+        virtual SStringT GetValue() const OVERRIDE;
 
-		virtual BOOL HasValue() const ;
-		virtual void ClearValue() ;
+		virtual BOOL HasValue() const OVERRIDE;
+        virtual void ClearValue() OVERRIDE;
 
         SStringT Option2Value(const SStringT& value) const;
 

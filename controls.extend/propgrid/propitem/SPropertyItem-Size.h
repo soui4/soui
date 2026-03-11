@@ -17,16 +17,22 @@ SNSBEGIN
     public:
 		static LPCWSTR GetInplaceItemStyleName(){return NULL;}
 
-		virtual PropType GetType() const {return PT_SIZE;}
-        virtual void SetValue(const SStringT & strValue);
+		virtual PropType GetType() const OVERRIDE
+        {
+            return PT_SIZE;
+        }
+        virtual void SetValue(const SStringT &strValue) OVERRIDE;
         
-        virtual SStringT GetValue() const;
-        virtual void OnValueChanged();
-        virtual void OnChildValueChanged(IPropertyItem *pChild);
+        virtual SStringT GetValue() const OVERRIDE;
+        virtual void OnValueChanged() OVERRIDE;
+        virtual void OnChildValueChanged(IPropertyItem *pChild) OVERRIDE;
         
-		SIZE GetValue2() const{return m_szValue;}
-		virtual BOOL HasValue() const ;
-		virtual void ClearValue() ;
+		SIZE GetValue2() const
+        {
+            return m_szValue;
+        }
+        virtual BOOL HasValue() const OVERRIDE;
+        virtual void ClearValue() OVERRIDE;
 
         SOUI_ATTRS_BEGIN()
 			ATTR_BOOL(L"digit",m_bDigit,FALSE)

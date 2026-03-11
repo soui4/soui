@@ -46,6 +46,7 @@ class SPropEdit: public SEdit
         : SPropertyItemBase(pOwner)
         , m_pEdit(NULL)
         , m_hasButton(FALSE)
+        , m_isNumber(FALSE)
         , m_bAutoComplete(FALSE)
     {
 	}
@@ -96,6 +97,7 @@ class SPropEdit: public SEdit
 				inplaceStyle.append_attribute(L"colorText").set_value(L"#000000");
 				inplaceStyle.append_attribute(L"autoWordSel").set_value(L"1");
 			}
+            inplaceStyle.append_attribute(L"Number").set_value(m_isNumber ? L"1" : L"0");
             m_pOwner->OnInplaceActiveWndCreate(this,m_pEdit,inplaceStyle);
             m_pEdit->SetWindowText(GetValue());
 			m_pEdit->SetFocus();
