@@ -144,6 +144,7 @@ void SSearchDropdownList::CloseUp(int code)
 {
     if (m_pDropDownWnd)
     {
+        m_pDropDownWnd->SNativeWnd::ReleaseCapture();
         m_pDropDownWnd->EndDropDown(code);
     }
 }

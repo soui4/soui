@@ -493,7 +493,7 @@ void CXmlEditor::SelectCtrlByOrder(const int *pOrder, int nLen, BOOL bSelXml)
             if (bSelXml)
             {
                 m_bSetCaretPos = TRUE;
-                SLOGI() << "set sel to pos :" << begin << "," << end;
+                //SLOGI() << "set sel to pos :" << begin << "," << end;
                 m_pScintillaWnd->SetSel(begin, end);
                 m_bSetCaretPos = FALSE;
             }
@@ -635,7 +635,7 @@ LRESULT CXmlEditor::OnNotify(int idCtrl, LPNMHDR pnmh)
             OnTimer(300); // update xml data if needed
 			std::vector<int> order;
 			m_xmlParser.findElementOrder(nCaretPos,order);
-            SLOGI() << "set caret to pos:" << nCaretPos;
+            //SLOGI() << "set caret to pos:" << nCaretPos;
 			if(order.size()>1)
 			{//skip the root element
 				SelectCtrlByOrder(&order[1],order.size()-1,FALSE);

@@ -68,21 +68,12 @@ int CXmlParser::findElementOrder(int pos,std::vector<int> &order){
 	if(!node){
 		return 0;
 	}
-    SObjectInfo objInfo;
-    ObjInfo_New(&objInfo, S_CA2W(node.name(), CP_UTF8), Window);
-    if (!SApplication::getSingleton().HasKey(objInfo))
-        return 0;
 	while(node){
 		int i=0;
 		spugi::xml_node sibling = node.previous_sibling();
 		while(sibling)
 		{
-			SObjectInfo objInfo;
-			ObjInfo_New(&objInfo,S_CA2W(sibling.name(),CP_UTF8),Window);
-			if(SApplication::getSingleton().HasKey(objInfo))
-			{
-				i++;
-			}
+			i++;
 			sibling = sibling.previous_sibling();
 		}
 		order.push_back(i);

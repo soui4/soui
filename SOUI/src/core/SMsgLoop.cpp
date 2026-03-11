@@ -84,7 +84,10 @@ int SMessageLoop::Run()
             break;
         if (!bGetMsg)
         {
-            continue;
+            m_bDoIdle = TRUE;
+            m_nIdleCount = 0;
+            if(RunIdle())
+                continue;
         }
         nRet = HandleMsg();
     } while (!m_bQuit);
@@ -299,7 +302,7 @@ BOOL SMessageLoop::WaitMsg(THIS)
         return FALSE;
     if (!bIdle)
         return TRUE;
-    return ::WaitMessage();
+    return WAIT_TIMEOUT != ::MsgWaitForMultipleObjects(0, NULL, FALSE, 100, QS_ALLINPUT);
 }
 
 int SMessageLoop::HandleMsg(THIS)
