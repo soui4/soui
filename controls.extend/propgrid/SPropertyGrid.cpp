@@ -599,6 +599,9 @@ BOOL SPropertyGrid::OnScroll(BOOL bVertical, UINT uCode, int nPos)
 
 void SPropertyGrid::OnInplaceActiveWndCreate(IPropertyItem *pItem, SWindow *pWnd, SXmlNode xmlInit)
 {
+    if(GetCapture()==m_swnd){
+        ReleaseCapture();
+    }
     SASSERT(m_pInplaceActiveWnd == NULL);
     pWnd->InitFromXml(&xmlInit);
     InsertChild(pWnd);

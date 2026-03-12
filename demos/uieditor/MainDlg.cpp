@@ -308,10 +308,6 @@ void CMainDlg::OnTvKeyDown(IEvtArgs *e)
 	}
 }
 
-
-// 文件操作相关方法已移至CFileOperationManager
-
-
 void CMainDlg::OnBtnOpen()
 {
 	if (m_bIsOpen)

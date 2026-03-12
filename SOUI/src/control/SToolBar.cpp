@@ -1086,7 +1086,13 @@ BOOL SToolBar::EnableButton(int nID, BOOL bEnable)
     if (bEnable)
         m_arrItems[iItem].dwState &= ~WndState_Disable;
     else
+    {
         m_arrItems[iItem].dwState |= WndState_Disable;
+        if(m_arrItems[iItem].dwState & WndState_Hover){
+            m_arrItems[iItem].dwState &= ~WndState_Hover;
+            m_iHoverItem = -1;
+        }
+    }    
 
     Invalidate();
     return TRUE;
@@ -1305,8 +1311,13 @@ BOOL SToolBar::OnIdle(int iRun)
                 DWORD dwState = item.dwState;
                 if (evt.bEnable)
                     item.dwState &= ~WndState_Disable;
-                else
+                else{
                     item.dwState |= WndState_Disable;
+                    if(item.dwState & WndState_Hover)
+                        item.dwState &= ~WndState_Hover;
+                    if(m_iHoverItem == i) 
+                        m_iHoverItem = -1;
+                }
                 if (evt.bChecked)
                     item.dwState |= WndState_Check;
                 else
