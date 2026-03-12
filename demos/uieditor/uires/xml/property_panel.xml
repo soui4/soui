@@ -2,8 +2,8 @@
 <propgrid size="-2,-2" name="propgrid_element" switchSkin="skin_prop_switch"	titleWidth="150" orderType="group" itemHeight="26" colorGroup="RGB(96,112,138)" colorTitle="rgb(200,200,200)" colorTitleSel="rgb(234,128,16)" colorTitleTextSel="#ffffff" colorItem="@color/white">
 		<cmdbtnstyle skin="_skin.sys.btn.normal">...</cmdbtnstyle>
 		<editStyle colorBkgnd="#FFFFFF" colorText="#000000" autoWordSel="1"/>
-		<optionStyle dropDown="1" btnSkin="skin_open_menu_png" colorBkgnd="#ffffff" drawFocusRect="0" colorText="#000000">
-			<liststyle colorBorder="@color/border" margin-x="1" margin-y="1" colorText="@color/black" skin="skin_item_bk"/>
+		<optionStyle dropDown="1" btnSkin="skin_open_menu_png" drawFocusRect="0">
+			<liststyle colorBorder="@color/border" margin-x="1" margin-y="1" colorText="@color/black" itemSkin="skin_item_bk" colorBkgnd="#ffffff" />
 		</optionStyle>
 		<autoCompleteStyle>
 			<dropdownStyle translucent="1" resizable="0" sendWheel2Hover="1">

@@ -249,6 +249,8 @@ void CScintillaWnd::InitScintillaWnd(void)
 
 
 	SendEditor(SCI_ASSIGNCMDKEY, (WPARAM)('S' + (SCMOD_CTRL << 16)), (LPARAM)SCI_NULL);
+    SendEditor(SCI_ASSIGNCMDKEY, (WPARAM)('F' + (SCMOD_CTRL << 16)), (LPARAM)SCI_NULL);
+    SendEditor(SCI_ASSIGNCMDKEY, (WPARAM)(VK_F3), (LPARAM)SCI_NULL);
 
 	//自动完成
 	SendEditor(SCI_AUTOCSETSEPARATOR, static_cast<WPARAM>(' '), 0);	//设置自动完成列表单词分隔符
@@ -606,10 +608,7 @@ void CScintillaWnd::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
                 m_pListener->OnScintillaFindNext(this, true);
         }
     }
-    else
-    {
-        SetMsgHandled(FALSE);
-    }
+    SetMsgHandled(FALSE);
 }
 
 void CScintillaWnd::GotoFoundLine()
@@ -633,16 +632,6 @@ void CScintillaWnd::GotoFoundLine()
 void CScintillaWnd::InsertText(int pos, LPCSTR text)
 {
 	SendEditor(SCI_INSERTTEXT, pos, (LPARAM)text);
-}
-
-void CScintillaWnd::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
-{
-	if(IsCtrlPressed() || IsAltPressed() || IsShiftPressed())
-	{
-		return;
-	}else{
-		SetMsgHandled(FALSE);
-	}
 }
 
 void CScintillaWnd::displaySectionCentered(int posStart, int posEnd, bool isDownwards)

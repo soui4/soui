@@ -283,14 +283,13 @@ BOOL SMessageLoop::PeekMsg(THIS_ LPMSG pMsg, UINT wMsgFilterMin, UINT wMsgFilter
 
 BOOL SMessageLoop::RunIdle()
 {
-    MSG msg;
     while (!m_bQuit && m_bDoIdle)
     {
-        if (PeekMsg(&msg, 0, 0, FALSE))
+        if(MsgWaitForMultipleObjects(0, NULL, FALSE, 5, QS_ALLINPUT) != WAIT_TIMEOUT)
+        {
             return FALSE;
+        }
         m_bDoIdle = OnIdle(m_nIdleCount++);
-        if (m_bDoIdle)
-            Sleep(0);
     }
     return TRUE;
 }

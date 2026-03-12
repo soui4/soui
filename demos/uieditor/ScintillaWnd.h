@@ -16,6 +16,13 @@ protected:
 	HINSTANCE m_hModule;
 };
 
+enum
+{
+    SCI_SAVEFILE = 10000,
+	SCI_FIND,
+	SCI_FIND_NEXT,
+};
+
 // CScintillaWnd
 class CScintillaWnd : public SNativeWnd
 {
@@ -95,7 +102,6 @@ protected:
 	BEGIN_MSG_MAP_EX(CScintillaWnd)
 		MSG_OCM_NOTIFY(OnNotify)
 		MSG_WM_KEYDOWN(OnKeyDown)
-		MSG_WM_CHAR(OnChar)
 		CHAIN_MSG_MAP(SNativeWnd)
 	END_MSG_MAP()
 
