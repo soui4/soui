@@ -285,7 +285,7 @@ BOOL SMessageLoop::RunIdle()
 {
     while (!m_bQuit && m_bDoIdle)
     {
-        if(MsgWaitForMultipleObjects(0, NULL, FALSE, 5, QS_ALLINPUT) != WAIT_TIMEOUT)
+        if(MsgWaitForMultipleObjects(0, NULL, FALSE, 20, QS_ALLINPUT) != WAIT_TIMEOUT)
         {
             return FALSE;
         }
@@ -301,7 +301,10 @@ BOOL SMessageLoop::WaitMsg(THIS)
         return FALSE;
     if (!bIdle)
         return TRUE;
-    return WAIT_TIMEOUT != ::MsgWaitForMultipleObjects(0, NULL, FALSE, 100, QS_ALLINPUT);
+    if(m_bDoIdle)
+        return WAIT_TIMEOUT != ::MsgWaitForMultipleObjects(0, NULL, FALSE, 100, QS_ALLINPUT);
+    else
+        return WaitMessage();
 }
 
 int SMessageLoop::HandleMsg(THIS)

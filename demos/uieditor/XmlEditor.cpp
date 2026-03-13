@@ -394,18 +394,22 @@ void CXmlEditor::OnPropGridValueChanged(IEvtArgs *e)
 	BOOL bSetText = FALSE;
 	if(strName.CompareNoCase(L"text")==0)
 	{
-		if(xmlNode.attribute(strName)){
-			xmlNode.attribute(strName).set_value(strValue);
-		}else{
-			xmlNode.SetText(strValue);
-			bSetText = TRUE;
-		}
+        SStringW strText = xmlNode.Text();
+        if (!strText.IsEmpty())
+		{
+            xmlNode.SetText(strValue);
+            bSetText = TRUE;
+        }
+        else
+        {
+            xmlNode.attribute2(strName).set_value(strValue);
+        }
 	}else{
 		xmlNode.attribute2(strName).set_value(strValue);
 	}
 
-
-	NodeRange nr = m_xmlParser.getNodePos(&m_vecSelectOrder[0],m_vecSelectOrder.size(),TRUE);
+	BOOL bLayout = m_pMainDlg->m_editXmlType == FT_LAYOUT_XML;
+    NodeRange nr = m_xmlParser.getNodePos(&m_vecSelectOrder[0], m_vecSelectOrder.size(), bLayout);
 	if(nr.begin!=-1)
 	{
 		m_bSetCaretPos = TRUE;
