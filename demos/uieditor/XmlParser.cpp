@@ -158,9 +158,6 @@ void CXmlParser::on_node_break(xml_node node,int pos)
 	{
 		NodeRange *pRange =(NodeRange *)node.get_userdata();
 		pRange->_break = pos;
-		SStringA strA = SStringA(m_utf8Loading+pRange->begin,pRange->_break-pRange->begin);
-		SStringW strW = S_CA2W(strA,CP_UTF8);
-		//SLOG_INFO("node:"<<strW.c_str());
 	}
 }
 

@@ -1053,7 +1053,8 @@ void SMenuEx::OnSelItemChanged(SMenuExItem *pMenuItem, BOOL bByMouse)
         {
             nFlag |= pMenuItem->IsDisabled() ? MF_GRAYED : 0;
         }
-        ::SendMessage(s_MenuData->GetOwner(), WM_MENUSELECT, MAKEWPARAM(idx, nFlag), (LPARAM)this);
+        if(s_MenuData)
+            ::SendMessage(s_MenuData->GetOwner(), WM_MENUSELECT, MAKEWPARAM(idx, nFlag), (LPARAM)this);
     }
     else if (s_MenuData)
     {
@@ -1104,7 +1105,8 @@ BOOL SMenuEx::_HandleEvent(IEvtArgs *pEvt)
         {
             return FALSE;
         }
-        s_MenuData->ExitMenu(pMenuItem->GetID());
+        if(s_MenuData)
+            s_MenuData->ExitMenu(pMenuItem->GetID());
         return TRUE;
     }
     else if (s_MenuData && ::IsWindow(s_MenuData->GetOwner()))

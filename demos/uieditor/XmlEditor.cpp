@@ -164,7 +164,7 @@ void CXmlEditor::UpdateXmlData()
 	m_treeXmlStruct->Invalidate();
 	if(!m_bValidXml)
 	{
-		SLOGI()<<"error xml";
+		//SLOGI()<<"error xml";
 		return;
 	}
     if (!m_strLayoutName.IsEmpty() && m_bUpdateDesigner)
@@ -570,7 +570,7 @@ void CXmlEditor::Init(SWindow * pRoot)
 }
 bool CXmlEditor::isDirty() const
 {
-	return m_pScintillaWnd->isDirty();
+	return m_pScintillaWnd->isDirty() && !m_strXmlFile.IsEmpty();
 }
 
 void CXmlEditor::InsertText(SStringA strText)
@@ -818,6 +818,8 @@ void CXmlEditor::UpdatePropGridLayout()
 
 BOOL CXmlEditor::OnSaveXml()
 {
+	if(m_strXmlFile.IsEmpty())
+		return TRUE;
 	if(!isValidXml())
 	{
 		if(IDCANCEL == SMessageBox(m_pMainDlg->m_hWnd,_T("编辑器中的XML文件格式有错误,确定要保存吗?"),_T("提示"),MB_OKCANCEL))

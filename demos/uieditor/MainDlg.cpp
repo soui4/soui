@@ -410,8 +410,6 @@ void CMainDlg::ReloadWorkspaceUIRes()
 	m_UIResFileMgr.OpenProject(m_strUiresPath);
 }
 
-// 剪贴板相关方法已移至CClipboardManager
-
 BOOL CMainDlg::OnBtnSave()
 {
     return m_pXmlEdtior->OnSaveXml();
@@ -670,13 +668,13 @@ void CMainDlg::OnTvEventOfPanel(IEvtArgs *e)
 		const FileItemData& itemData = m_pFileTreeAdapter->GetItemData(hItem);
         SLOGI() << "File:" << itemData.strPath.c_str() << " pItemPanel="<<pItemPanel;
 
-		if(!CheckSave())
-			return;
 		if(itemData.bIsDir)
 		{
 			m_pFileTreeAdapter->ExpandItem(hItem, TVC_TOGGLE);
 			return;
 		}
+		if(!CheckSave())
+			return;
 		int type = m_UIResFileMgr.GetFileType(itemData.strPath);
 		SStringT strPath = itemData.strPath;
 		SStringT layoutId;

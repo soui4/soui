@@ -3298,7 +3298,10 @@ LOC_TAG:
 						PUGI__PUSHNODE(node_element); // Append a new node to the tree.
 						if(listener)
 						{
-							listener->on_node_begin(xml_node(cursor),tagBegin-header);
+							if(tagBegin)
+								listener->on_node_begin(xml_node(cursor),tagBegin-header);
+							else
+								listener->on_node_begin(xml_node(cursor),s-header);
 						}
 						cursor->name = s;
 

@@ -167,8 +167,6 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
     pSysDataMgr->LoadSysData(strCfgDir);
 
     CCmdLine cmdLine(GetCommandLine());
-    //读取自定义消息框布局
-    theApp.SetMessageBoxTemplateResId(_T("LAYOUT:xml_messagebox"));
     if(cmdLine.GetParamCount() >= 5 && _tcscmp(cmdLine.GetParam(1),_T("-preview"))==0)
     {//预览模式, uieditor -preview project -layout pageid
         SStringT strProj = cmdLine.GetParam(2);
@@ -194,7 +192,9 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
             delete pSysDataMgr;
             return -1;
         }
-        //设置真窗口处理接口
+        // 读取自定义消息框布局
+        theApp.SetMessageBoxTemplateResId(UIRES.LAYOUT.xml_messagebox);
+        // 设置真窗口处理接口
         CSouiRealWndHandler * pRealWndHandler = new CSouiRealWndHandler();
         theApp.SetRealWndHandler(pRealWndHandler);
         pRealWndHandler->Release();

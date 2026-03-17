@@ -52,7 +52,7 @@ if(CMAKE_SYSTEM_NAME MATCHES Darwin)
         render-skia
     )
     if(NOT SOUI_ENABLE_CORE_LIB)
-        list(APPEND TARGET_LIST "default.exctrl")
+        list(APPEND TARGET_LIST "default")
     endif()
     copy_targets_to_bundle(${current_project} "${TARGET_LIST}")
 
