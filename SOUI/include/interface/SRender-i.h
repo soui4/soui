@@ -2204,8 +2204,20 @@ DECLARE_INTERFACE_(IRenderFactory, IObjRef)
      */
     STDMETHOD_(BOOL, CreatePathEffect)(THIS_ REFGUID guidEffect, IPathEffect * *ppPathEffect) PURE;
 
+    /**
+     * @brief Creates a mask filter with specified GUID.
+     * @param guidEffect - GUID identifying the mask filter type.
+     * @param ppMaskFilter - Pointer to receive the created mask filter.
+     * @return BOOL - TRUE if successful, FALSE otherwise.
+     */
     STDMETHOD_(BOOL, CreateMaskFilter)(THIS_ REFGUID guidEffect, IMaskFilter * *ppMaskFilter) PURE;
 
+    /**
+     * @brief Creates an image filter with specified GUID.
+     * @param guidEffect - GUID identifying the image filter type.
+     * @param ppImageFilter - Pointer to receive the created image filter.
+     * @return BOOL - TRUE if successful, FALSE otherwise.
+     */
     STDMETHOD_(BOOL, CreateImageFilter)(THIS_ REFGUID guidEffect, IImageFilter * *ppImageFilter) PURE;
     /**
      * @brief Retrieves the default font object.
