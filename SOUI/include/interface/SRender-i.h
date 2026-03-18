@@ -5,6 +5,8 @@
 #include <interface/sobject-i.h>
 #include <interface/SGradient-i.h>
 #include <interface/SPathEffect-i.h>
+#include <interface/SMaskFilter-i.h>
+#include <interface/SImageFilter-i.h>
 #include <interface/SImgDecoder-i.h>
 #include <interface/sxml-i.h>
 
@@ -84,37 +86,6 @@ typedef struct fRect
 {
     float fLeft, fTop, fRight, fBottom;
 } fRect;
-
-typedef enum _BlurStyle
-{
-    kNone_BLurStyle = -1,
-    kNormal_BlurStyle = 0, //!< 模糊内部和外部
-    kSolid_BlurStyle,      //!< 固定内部，模糊外部
-    kOuter_BlurStyle,      //!< 无内部，模糊外部
-    kInner_BlurStyle,      //!< 模糊内部，无外部
-
-    kLastEnum_BlurStyle = kInner_BlurStyle
-} BlurStyle;
-
-typedef enum _BlurFlags
-{
-    kNone_BlurFlag = 0x00,
-    /** The blur layer's radius is not affected by transforms */
-    kIgnoreTransform_BlurFlag = 0x01,
-    /** Use a smoother, higher quality blur algorithm */
-    kHighQuality_BlurFlag = 0x02,
-    /** mask for all blur flags */
-    kAll_BlurFlag = 0x03
-} BlurFlags;
-
-// Interfaces
-#undef INTERFACE
-#define INTERFACE IMaskFilter
-DECLARE_INTERFACE_(IMaskFilter, IObjRef)
-{
-    // Retrieves a pointer to the mask filter
-    STDMETHOD_(void *, GetPtr)(THIS) PURE;
-};
 
 typedef enum _OBJTYPE
 {
@@ -2086,6 +2057,56 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
      * @return BOOL indicating whether anti-aliasing is enabled.
      */
     STDMETHOD_(BOOL, GetAntiAlias)(CTHIS) SCONST PURE;
+
+    /**
+     * @brief Draw a rectangle with shadow.
+     * @param pRect Rectangle to draw.
+     * @param dx X offset of the shadow.
+     * @param dy Y offset of the shadow.
+     * @param sigmaX X blur radius of the shadow.
+     * @param sigmaY Y blur radius of the shadow.
+     * @param color Shadow color.
+     * @return HRESULT indicating success or failure.
+     */
+    //STDMETHOD_(HRESULT, DrawShadowRect)(THIS_ LPCRECT pRect, float dx, float dy, float sigmaX, float sigmaY, COLORREF color) PURE;
+
+    /**
+     * @brief Draw a rounded rectangle with shadow.
+     * @param pRect Rectangle defining the bounds of the rounded rectangle.
+     * @param pt X and Y radii for the rounded corners.
+     * @param dx X offset of the shadow.
+     * @param dy Y offset of the shadow.
+     * @param sigmaX X blur radius of the shadow.
+     * @param sigmaY Y blur radius of the shadow.
+     * @param color Shadow color.
+     * @return HRESULT indicating success or failure.
+     */
+    //STDMETHOD_(HRESULT, DrawShadowRoundRect)(THIS_ LPCRECT pRect, POINT pt, float dx, float dy, float sigmaX, float sigmaY, COLORREF color) PURE;
+
+    /**
+     * @brief Draw a path with shadow.
+     * @param pPath Path object.
+     * @param dx X offset of the shadow.
+     * @param dy Y offset of the shadow.
+     * @param sigmaX X blur radius of the shadow.
+     * @param sigmaY Y blur radius of the shadow.
+     * @param color Shadow color.
+     * @return HRESULT indicating success or failure.
+     */
+    //STDMETHOD_(HRESULT, DrawShadowPath)(THIS_ IPathS * pPath, float dx, float dy, float sigmaX, float sigmaY, COLORREF color) PURE;
+
+    /**
+     * @brief Set the image effect for rendering operations.
+     * @param pImageEffect Image effect object.
+     * @return HRESULT indicating success or failure.
+     */
+    STDMETHOD_(void, SetImageFilter)(THIS_ IImageFilter * pImageEffect) PURE;
+
+    /**
+     * @brief Get the current image effect.
+     * @return IImageFilter* Current image effect object.
+     */
+    STDMETHOD_(IImageFilter *, GetImageFilter)(CTHIS) SCONST PURE;
 };
 
 /**
@@ -2176,29 +2197,6 @@ DECLARE_INTERFACE_(IRenderFactory, IObjRef)
     STDMETHOD_(BOOL, CreatePath)(THIS_ IPathS * *ppPath) PURE;
 
     /**
-     * @brief Creates a blur mask filter with specified parameters.
-     * @param radius - Blur radius.
-     * @param style - Blur style (e.g., normal, solid, outer, inner).
-     * @param flag - Blur flags (e.g., ignore transform, high quality).
-     * @param ppMaskFilter - Pointer to receive the created mask filter.
-     * @return HRESULT - S_OK if successful, error code otherwise.
-     */
-    STDMETHOD_(HRESULT, CreateBlurMaskFilter)
-    (THIS_ float radius, BlurStyle style, BlurFlags flag, IMaskFilter **ppMaskFilter) PURE;
-
-    /**
-     * @brief Creates an emboss mask filter with specified parameters.
-     * @param direction - Array of 3 floats defining the light direction.
-     * @param ambient - Ambient light intensity.
-     * @param specular - Specular light intensity.
-     * @param blurRadius - Blur radius for the emboss effect.
-     * @param ppMaskFilter - Pointer to receive the created mask filter.
-     * @return HRESULT - S_OK if successful, error code otherwise.
-     */
-    STDMETHOD_(HRESULT, CreateEmbossMaskFilter)
-    (THIS_ float direction[3], float ambient, float specular, float blurRadius, IMaskFilter **ppMaskFilter) PURE;
-
-    /**
      * @brief Creates a path effect with specified GUID.
      * @param guidEffect - GUID identifying the path effect type.
      * @param ppPathEffect - Pointer to receive the created path effect.
@@ -2206,6 +2204,9 @@ DECLARE_INTERFACE_(IRenderFactory, IObjRef)
      */
     STDMETHOD_(BOOL, CreatePathEffect)(THIS_ REFGUID guidEffect, IPathEffect * *ppPathEffect) PURE;
 
+    STDMETHOD_(BOOL, CreateMaskFilter)(THIS_ REFGUID guidEffect, IMaskFilter * *ppMaskFilter) PURE;
+
+    STDMETHOD_(BOOL, CreateImageFilter)(THIS_ REFGUID guidEffect, IImageFilter * *ppImageFilter) PURE;
     /**
      * @brief Retrieves the default font object.
      * @return IFontS* - Pointer to the default font object.

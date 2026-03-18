@@ -24,11 +24,15 @@ void SClock::OnPaint(SOUI::IRenderTarget * pRT)
 
 
 	//演示使用IMaskFilter
-	SAutoRefPtr<IMaskFilter> maskFilter;
+	SAutoRefPtr<IMaskFilterBlur> maskFilter;
 	SAutoRefPtr<IPenS> br,oldBr;
 	pRT->CreatePen(PS_SOLID,RGBA(200,128,128,128),10,&br);
 	pRT->SelectObject(br,(IRenderObj**)&oldBr);
-	GETRENDERFACTORY->CreateBlurMaskFilter(10,kOuter_BlurStyle,kNone_BlurFlag,&maskFilter);
+    GETRENDERFACTORY->CreateMaskFilter(IID_IMaskFilterBlur, (IMaskFilter**) & maskFilter);
+    if (maskFilter)
+    {
+        maskFilter->Init(10, kOuter_BlurStyle, kNone_BlurFlag);
+    }
 	pRT->SetMaskFilter(maskFilter);
 	pRT->DrawEllipse(&rcClient);
 	pRT->SetMaskFilter(NULL);

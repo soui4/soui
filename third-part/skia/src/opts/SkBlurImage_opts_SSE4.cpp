@@ -14,7 +14,6 @@
  * SSE4 functions and enable the caller to determine SSE4 support.  However for
  * compilers that do not support SSE4x we provide a stub implementation.
  */
-#if SK_CPU_SSE_LEVEL >= SK_CPU_SSE_LEVEL_SSE41
 
 #include <smmintrin.h>
 
@@ -108,16 +107,3 @@ bool SkBoxBlurGetPlatformProcs_SSE4(SkBoxBlurProc* boxBlurX,
     *boxBlurYX = SkBoxBlur_SSE4<kY, kX>;
     return true;
 }
-
-#else // SK_CPU_SSE_LEVEL >= SK_CPU_SSE_LEVEL_SSE41
-
-bool SkBoxBlurGetPlatformProcs_SSE4(SkBoxBlurProc* boxBlurX,
-                                    SkBoxBlurProc* boxBlurY,
-                                    SkBoxBlurProc* boxBlurXY,
-                                    SkBoxBlurProc* boxBlurYX) {
-    sk_throw();
-    return false;
-}
-
-
-#endif

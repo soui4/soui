@@ -694,6 +694,44 @@ void SSkinShape::OnInitFinished(IXmlNode *pNode)
             m_polygon.Attach(new SShapePolygon());
         m_polygon->InitFromXml(&xmlPolygon);
     }
+
+    SXmlNode xmlShadow = xmlNode.child(SShapeShadow::GetClassName());
+    if (xmlShadow)
+    {
+        if (!m_shadow)
+            m_shadow.Attach(new SShapeShadow());
+        m_shadow->InitFromXml(&xmlShadow);
+    }
+
+    SXmlNode xmlBlur = xmlNode.child(SShapeBlur::GetClassName());
+    if (xmlBlur)
+    {
+        if (!m_blur)
+            m_blur.Attach(new SShapeBlur());
+        m_blur->InitFromXml(&xmlBlur);
+    }
+}
+
+void SSkinShape::SShapeShadow::OnInitFinished(IXmlNode *pNode)
+{
+    if(m_color != CR_INVALID){
+        GETRENDERFACTORY->CreateImageFilter(IID_IDropShadowImageFilter, (IImageFilter **)&m_filter);
+        if (m_filter)
+        {
+            IDropShadowImageFilter *pShadowFilter = (IDropShadowImageFilter *)(IImageFilter*)m_filter;
+            pShadowFilter->Init(m_dx, m_dy, m_sigmaX, m_sigmaY, m_color);
+        }
+    }
+}
+void SSkinShape::SShapeBlur::OnInitFinished(IXmlNode *pNode)
+{
+
+    GETRENDERFACTORY->CreateImageFilter(IID_IBlurImageFilter, (IImageFilter **)&m_filter);
+    if (m_filter)
+    {
+        IBlurImageFilter *pBlurFilter = (IBlurImageFilter *)(IImageFilter *)m_filter;
+        pBlurFilter->Init(m_sigmaX, m_sigmaY, NULL);
+    }
 }
 
 void SSkinShape::_Scale(ISkinObj *pObj, int nScale)
@@ -710,6 +748,8 @@ void SSkinShape::_Scale(ISkinObj *pObj, int nScale)
     pRet->m_cornerSize = m_cornerSize;
     pRet->m_stroke = m_stroke;
     pRet->m_ringParam = m_ringParam;
+    pRet->m_shadow = m_shadow;
+    pRet->m_blur = m_blur;
 }
 
 SIZE SSkinShape::GetSkinSize() const
@@ -748,7 +788,25 @@ void SSkinShape::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BY
 
     CPoint ptCorner = GetCornerSize(rcDest);
     POINT pts[SShapePolygon::MAX_POINTS + 1];
-
+    IImageFilter *pOldImageFilter = pRT->GetImageFilter();
+    IImageFilter *pShadowFilter = NULL;
+    IImageFilter *pBlurFilter = NULL;
+    if(m_shadow)
+        pShadowFilter = m_shadow->GetFilter();
+    if(m_blur)
+        pBlurFilter = m_blur->GetFilter();
+    if(pShadowFilter || pBlurFilter){
+        if(pBlurFilter && pBlurFilter){
+            SAutoRefPtr<IComposeImageFilter> pFilterCompose;
+            GETRENDERFACTORY->CreateImageFilter(IID_IComposeImageFilter, (IImageFilter **)&pFilterCompose);
+            pFilterCompose->Init(pShadowFilter, pBlurFilter);
+            pRT->SetImageFilter(pFilterCompose);
+        }else if(pBlurFilter){
+            pRT->SetImageFilter(pBlurFilter);
+        }else{
+            pRT->SetImageFilter(pShadowFilter);
+        }
+    }
     if (pBrush)
     {
         pRT->SelectObject(pBrush, (IRenderObj **)&oldBrush);
@@ -782,6 +840,7 @@ void SSkinShape::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BY
         }
         pRT->SelectObject(oldBrush, NULL);
     }
+    pRT->SetImageFilter(pOldImageFilter);
     if (pPen)
     {
         pRT->SelectObject(pPen, (IRenderObj **)&oldPen);

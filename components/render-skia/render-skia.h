@@ -38,11 +38,8 @@ public:
 	STDMETHOD_(BOOL,CreatePath)(THIS_ IPathS ** ppPath) OVERRIDE;
 
 	STDMETHOD_(BOOL,CreatePathEffect)(THIS_ REFGUID guidEffect,IPathEffect ** ppPathEffect) OVERRIDE;
-
-	STDMETHOD_(HRESULT,CreateBlurMaskFilter)(THIS_ float radius, BlurStyle style,BlurFlags flag,IMaskFilter ** ppMaskFilter) OVERRIDE;
-
-	STDMETHOD_(HRESULT,CreateEmbossMaskFilter)(THIS_ float direction[3], float ambient, float specular, float blurRadius,IMaskFilter ** ppMaskFilter) OVERRIDE;
-
+	STDMETHOD_(BOOL,CreateMaskFilter)(THIS_ REFGUID guidEffect,IMaskFilter ** ppMaskFilter) OVERRIDE;
+	STDMETHOD_(BOOL,CreateImageFilter)(THIS_ REFGUID guidEffect,IImageFilter ** ppImageFilter) OVERRIDE;
     STDMETHOD_(IFontS *,GetDefFont)(CTHIS) OVERRIDE{
 		return m_defFont;
 	}
@@ -488,12 +485,25 @@ public:
 	STDMETHOD_(HRESULT,FillPath)(THIS_ const IPathS * path) OVERRIDE;
 	STDMETHOD_(HRESULT,SetXfermode)(THIS_ int mode,int *pOldMode=NULL) OVERRIDE;
 	STDMETHOD_(BOOL,SetAntiAlias)(THIS_ BOOL bAntiAlias) OVERRIDE;
-	STDMETHOD_(BOOL,GetAntiAlias)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(BOOL,GetAntiAlias)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(void, SetImageFilter)(THIS_ IImageFilter * pImageEffect) OVERRIDE;
+    STDMETHOD_(IImageFilter *, GetImageFilter)(CTHIS) SCONST OVERRIDE;
 public:
 	SkCanvas *GetCanvas(){return m_SkCanvas;}
 
 protected:
 	bool SetPaintXferMode(SkPaint & paint,int nRopMode);
+	
+	/**
+	 * @brief Apply image filter to paint if one is set
+	 * @param paint Reference to SkPaint object to modify
+	 */
+	inline void ApplyImageFilter(SkPaint &paint)
+	{
+		if(m_curImageFilter)
+			paint.setImageFilter((SkImageFilter*)m_curImageFilter->GetPtr());
+	}
+
 protected:
 	SkCanvas *m_SkCanvas;
 	SkPoint     m_ptCur;
@@ -513,6 +523,7 @@ protected:
 	SAutoRefPtr<IBrushS> m_defBrush;
 	SAutoRefPtr<IFontS> m_defFont;
 	SAutoRefPtr<IMaskFilter> m_curMaskFilter;
+    SAutoRefPtr<IImageFilter> m_curImageFilter;
 
 	SAutoRefPtr<IRenderFactory> m_pRenderFactory;
 

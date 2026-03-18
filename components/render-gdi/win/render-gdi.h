@@ -32,13 +32,19 @@ public:
 
 	STDMETHOD_(BOOL,CreateRegion)(THIS_ IRegionS **ppRgn) OVERRIDE;
 
-	STDMETHOD_(HRESULT,CreateBlurMaskFilter)(THIS_ float radius, BlurStyle style,BlurFlags flag,IMaskFilter ** ppMaskFilter) OVERRIDE {return E_NOTIMPL;}
-
-	STDMETHOD_(HRESULT,CreateEmbossMaskFilter)(THIS_ float direction[3], float ambient, float specular, float blurRadius,IMaskFilter ** ppMaskFilter) OVERRIDE {return E_NOTIMPL;}
-
 	STDMETHOD_(BOOL,CreatePath)(THIS_ IPathS ** ppPath) OVERRIDE;
 
-	STDMETHOD_(BOOL,CreatePathEffect)(THIS_ REFGUID guidEffect,IPathEffect ** ppPathEffect) OVERRIDE;
+	STDMETHOD_(BOOL, CreateMaskFilter)(THIS_ REFGUID guidEffect, IMaskFilter **ppMaskFilter) OVERRIDE
+    {
+        return FALSE;
+    }
+
+    STDMETHOD_(BOOL, CreateImageFilter)(THIS_ REFGUID guidEffect, IImageFilter **ppImageFilter) OVERRIDE
+    {
+        return FALSE;
+    }
+
+    STDMETHOD_(BOOL, CreatePathEffect)(THIS_ REFGUID guidEffect, IPathEffect **ppPathEffect) OVERRIDE;
 
 	STDMETHOD_(IFontS *,GetDefFont)(CTHIS) OVERRIDE{
 		return m_defFont;
@@ -513,6 +519,13 @@ public:
 	STDMETHOD_(COLORREF,SetTextColor)(THIS_ COLORREF color) OVERRIDE;
 	STDMETHOD_(void,SetMaskFilter)(THIS_ IMaskFilter *pMaskFilter) OVERRIDE{}
 	STDMETHOD_(IMaskFilter *,GetMaskFilter)(THIS) OVERRIDE{return NULL;}
+    STDMETHOD_(void, SetImageFilter)(THIS_ IImageFilter *pImgFilter) OVERRIDE
+    {
+    }
+    STDMETHOD_(IImageFilter *, GetImageFilter)(CTHIS) SCONST OVERRIDE
+    {
+        return NULL;
+    }
 	STDMETHOD_(HDC,GetDC)(THIS_ UINT uFlag) OVERRIDE;
 	STDMETHOD_(void,ReleaseDC)(THIS_ HDC hdc,LPCRECT pRc) OVERRIDE;
 	STDMETHOD_(HRESULT,SetTransform)(THIS_ const float matrix[9], float oldMatrix[9]/*=NULL*/) OVERRIDE;

@@ -7,12 +7,16 @@ set(render-skia_header
 	render-skia.h
 	skia2rop2.h
 	PathEffect-Skia.h
+    MaskFilter-Skia.h
+    ImageFilter-Skia.h
 )
 set(render-skia_src
 	drawtext-skia.cpp
 	render-skia.cpp
 	skia2rop2.cpp
 	PathEffect-Skia.cpp
+    MaskFilter-Skia.cpp
+    ImageFilter-Skia.cpp
 )
 
 source_group("Header Files" FILES ${render-skia_header})

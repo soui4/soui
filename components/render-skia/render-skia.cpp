@@ -7,8 +7,10 @@
 #include <effects/SkDashPathEffect.h>
 #include <effects/SkGradientShader.h>
 #include <effects/SkBlurMaskFilter.h>
+#include <effects/SkDropShadowImageFilter.h>
 #include <core/SkGraphics.h>
 #include <core/SkPathMeasure.h>
+#include <core/SkImageFilter.h>
 #include <src/effects/SkBlurMask.h>
 #include <pathops/SkPathOps.h>
 #include <gdialpha.h>
@@ -19,7 +21,8 @@
 
 #include "skia2rop2.h"
 #include "PathEffect-Skia.h"
-
+#include "MaskFilter-Skia.h"
+#include "ImageFilter-Skia.h"
 #include <tchar.h>
 #include <algorithm>
 #include <vector>
@@ -255,23 +258,38 @@ SNSBEGIN
 		return (*ppPathEffect) != NULL;
 	}
 
-	HRESULT SRenderFactory_Skia::CreateBlurMaskFilter(float radius, BlurStyle style,BlurFlags flag,IMaskFilter ** ppMaskFilter)
+	BOOL SRenderFactory_Skia::CreateMaskFilter(REFGUID guidEffect,IMaskFilter ** ppMaskFilter)
 	{
-		SkMaskFilter *pMaskFilter = SkBlurMaskFilter::Create(::SkBlurStyle(style),SkBlurMaskFilter::ConvertRadiusToSigma(radius),flag);
-		if(!pMaskFilter)
-			return E_OUTOFMEMORY;
-		*ppMaskFilter = new SMaskFilter_Skia(pMaskFilter);
-		return S_OK;
+		*ppMaskFilter = NULL;
+		if(guidEffect == __suidof(IMaskFilterBlur))
+		{
+			*ppMaskFilter = (IMaskFilter *) new SMaskFilter_Blur();
+		}else if(guidEffect == __suidof(IMaskFilterEmboss))
+		{
+			*ppMaskFilter = (IMaskFilter *) new SMaskFilter_Emboss();
+		}
+		return (*ppMaskFilter) != NULL;
 	}
 
-
-	HRESULT SRenderFactory_Skia::CreateEmbossMaskFilter(float direction[3], float ambient, float specular, float blurRadius,IMaskFilter ** ppMaskFilter)
+	BOOL SRenderFactory_Skia::CreateImageFilter(REFGUID guidEffect,IImageFilter ** ppImageFilter)
 	{
-		SkMaskFilter *pMaskFilter=SkBlurMaskFilter::CreateEmboss(SkBlurMask::ConvertRadiusToSigma(blurRadius),direction,ambient,specular);
-		if(!pMaskFilter)
-			return E_OUTOFMEMORY;
-		*ppMaskFilter = new SMaskFilter_Skia(pMaskFilter);
-		return S_OK;
+
+		*ppImageFilter = NULL;
+		if (guidEffect == __suidof(IDropShadowImageFilter)){
+			*ppImageFilter = (IImageFilter *) new SDropShadowImageFilter();
+		}else if(guidEffect == __suidof(IBlurImageFilter)){
+			*ppImageFilter = (IImageFilter *) new SBlurImageFilter();
+		}else if(guidEffect == __suidof(IComposeImageFilter)){
+			*ppImageFilter = (IImageFilter *) new SComposeImageFilter();
+		}else if(guidEffect == __suidof(IMergeImageFilter)){
+			*ppImageFilter = (IImageFilter *) new SMergeImageFilter();
+		}else if(guidEffect == __suidof(ITileImageFilter)){
+			*ppImageFilter = (IImageFilter *) new STileImageFilter();
+		}else if(guidEffect == __suidof(IOffsetImageFilter)){
+			*ppImageFilter = (IImageFilter *) new SOffsetImageFilter();
+		}
+
+		return (*ppImageFilter) != NULL;
 	}
 
 	BOOL SRenderFactory_Skia::CreateRenderTarget2(THIS_ IRenderTarget ** ppRenderTarget,HWND hWnd)
@@ -647,7 +665,8 @@ SNSBEGIN
 			paint.setStrokeWidth((SkScalar)m_curPen->GetWidth());
 		}
 		paint.setStyle(SkPaint::kStroke_Style);
-
+		ApplyImageFilter(paint);
+		
 		SkRect skrc=toSkRect(pRect);
 		skrc.offset(m_ptOrg);
 		InflateSkRect(&skrc,-0.5f,-0.5f);
@@ -664,6 +683,7 @@ SNSBEGIN
 		SkRect skrc=toSkRect(pRect);
 		skrc.offset(m_ptOrg);
 		m_curBrush->InitPaint(paint,skrc);
+		ApplyImageFilter(paint);
 		InflateSkRect(&skrc,-0.5f,-0.5f);
 		m_SkCanvas->drawRect(skrc,paint);
 		return S_OK;
@@ -699,9 +719,10 @@ SNSBEGIN
 		paint.setStyle(SkPaint::kFill_Style);
 
 		SkRect skrc=toSkRect(pRect);
-		InflateSkRect(&skrc,-0.5f,-0.5f);//要缩小0.5显示效果才和GDI一致。
+		InflateSkRect(&skrc,-0.5f,-0.5f);//要缩小 0.5 显示效果才和 GDI 一致。
 		skrc.offset(m_ptOrg);
 		m_curBrush->InitPaint(paint,skrc);
+		ApplyImageFilter(paint);
 
 		m_SkCanvas->drawRoundRect(skrc,(SkScalar)pt.x,(SkScalar)pt.y,paint);
 		return S_OK;
@@ -716,8 +737,9 @@ SNSBEGIN
 		paint.setStyle(SkPaint::kFill_Style);
 
 		SkRect skrc=toSkRect(pRect);
-		InflateSkRect(&skrc,-0.5f,-0.5f);//要缩小0.5显示效果才和GDI一致。
+		InflateSkRect(&skrc,-0.5f,-0.5f);//要缩小 0.5 显示效果才和 GDI 一致。
 		skrc.offset(m_ptOrg);
+		ApplyImageFilter(paint);
 
 		m_SkCanvas->drawRoundRect(skrc,(SkScalar)pt.x,(SkScalar)pt.y,paint);
 		return S_OK;
@@ -810,6 +832,7 @@ SNSBEGIN
 		SkRect rcPath = path.getBounds();
 		SkPaint paint = m_paint;
 		m_curBrush->InitPaint(paint,rcPath);
+		ApplyImageFilter(paint);
 		m_SkCanvas->drawPath(path, paint);
 		return S_OK;
 	}
@@ -1356,6 +1379,7 @@ SNSBEGIN
 
 		SkPaint paint=m_paint;
 		paint.setShader(pShader)->unref();
+		ApplyImageFilter(paint);
 		if(ptRoundCorner.x==0 && ptRoundCorner.y==0)
 			m_SkCanvas->drawRect(skrc,paint);
 		else
@@ -1393,6 +1417,7 @@ SNSBEGIN
 			paint.setStrokeWidth((SkScalar)m_curPen->GetWidth());
 		}
 		paint.setShader(pShader)->unref();
+		ApplyImageFilter(paint);
 
 		SkPath skPath;
 		path2->m_skPath.offset(m_ptOrg.fX,m_ptOrg.fY,&skPath);
@@ -1414,6 +1439,7 @@ SNSBEGIN
 
 		SkRect skrc=toSkRect(pRect);
 		skrc.offset(m_ptOrg);
+		ApplyImageFilter(paint);
 		m_SkCanvas->drawRect(skrc,paint);
 		return S_OK;    
 	}
@@ -1427,6 +1453,7 @@ SNSBEGIN
 
 		SkRect skrc=toSkRect(pRect);
 		skrc.offset(m_ptOrg);
+		ApplyImageFilter(paint);
 		m_SkCanvas->drawRect(skrc,paint);
 		return S_OK;    
 	}
@@ -1438,6 +1465,7 @@ SNSBEGIN
 		paint.setXfermode(new ProcXfermode(ProcXfermode::Rop2_Invert));
 		SkRect skrc = toSkRect(pRect);
 		skrc.offset(m_ptOrg);
+		ApplyImageFilter(paint);
 		m_SkCanvas->drawRect(skrc,paint);
 		return S_OK;  
 	}
@@ -1480,6 +1508,7 @@ SNSBEGIN
 		paint.setFilterLevel(SkPaint::kNone_FilterLevel);
 		paint.setColor(SColor(cr).toARGB());
 		paint.setStyle(SkPaint::kFill_Style);
+		ApplyImageFilter(paint);
 
 		SkRect skrc=toSkRect(pRect);
 		skrc.offset(m_ptOrg);
@@ -1552,6 +1581,29 @@ SNSBEGIN
 		m_curBrush->InitPaint(paint,skrc);
 		m_SkCanvas->drawArc(skrc,startAngle, sweepAngle,true,paint);
 		return S_OK;
+	}
+
+	void drawRectWithDropShadow(SkCanvas* canvas) {
+    // 1. 创建画笔并设置阴影滤镜
+    SkPaint paint;
+    paint.setColor(SK_ColorBLUE); // 矩形本身的颜色
+    paint.setAntiAlias(true);
+    
+    // 创建投影滤镜
+    // 参数: (dx, dy, sigmaX, sigmaY, color, input)
+    SkImageFilter* dropShadow = SkDropShadowImageFilter::Create(
+        10.0f,  // X 轴偏移量
+        10.0f,  // Y 轴偏移量
+        8.0f,   // X 方向模糊半径 (sigma)
+        8.0f,   // Y 方向模糊半径 (sigma)
+        SK_ColorBLACK, // 阴影颜色
+        NULL // 输入图像滤镜，nullptr 表示作用于后续绘制的图形
+    );
+    paint.setImageFilter(dropShadow);
+    dropShadow->unref();
+    // 2. 定义矩形并绘制
+    SkRect rect = SkRect::MakeXYWH(100, 100, 200, 150);
+    canvas->drawRect(rect, paint);
 	}
 
 	HRESULT SRenderTarget_Skia::SetTransform(const float matrix[9], float oldMatrix[9])
@@ -1664,6 +1716,7 @@ SNSBEGIN
             paint.setPathEffect(composeEffect);
             composeEffect->unref();
 		}
+		ApplyImageFilter(paint);
 		SkPath skPath;
 		path2->m_skPath.offset(m_ptOrg.fX,m_ptOrg.fY,&skPath);
 		m_SkCanvas->drawPath(skPath,paint);
@@ -1682,6 +1735,7 @@ SNSBEGIN
 		path2->m_skPath.offset(m_ptOrg.fX,m_ptOrg.fY,&skPath);
 		const SkRect &rcBound = skPath.getBounds();
 		m_curBrush->InitPaint(paint,rcBound);
+		ApplyImageFilter(paint);
 
 		m_SkCanvas->drawPath(skPath,paint);
 
@@ -1767,7 +1821,15 @@ SNSBEGIN
 			m_paint.setMaskFilter(NULL);
 		}
 	}
+    void SRenderTarget_Skia::SetImageFilter(THIS_ IImageFilter *pImageFilter)
+    {
+        m_curImageFilter = pImageFilter;
+    }
 
+    IImageFilter * SRenderTarget_Skia::GetImageFilter(CTHIS) SCONST
+    {
+        return m_curImageFilter;
+    }
 
 	//////////////////////////////////////////////////////////////////////////
 	// SBitmap_Skia
@@ -2267,7 +2329,13 @@ SNSBEGIN
 		
 		if(blurStyle != SOUI::kNone_BLurStyle && blurRadius > 0.0f)
 		{
-			GetRenderFactory()->CreateBlurMaskFilter(blurRadius,blurStyle,blurFlags,&m_maskFilter);
+            SAutoRefPtr<IMaskFilterBlur> blurFilter;
+            GetRenderFactory()->CreateMaskFilter(IID_IMaskFilterBlur, (IMaskFilter **)&blurFilter);
+            if (blurFilter)
+            {
+                blurFilter->Init(blurRadius, blurStyle, blurFlags);
+                m_maskFilter = blurFilter;
+            }
 		}
 	}
 
@@ -2876,3 +2944,4 @@ EXTERN_C void Render_Skia_SetFontFallback(FontFallback fontFallback)
 		SkCanvas::SetFontFallback(NULL);
 	}
 }
+

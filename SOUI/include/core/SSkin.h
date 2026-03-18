@@ -19,6 +19,7 @@
 #include <helper/SplitString.h>
 #include <matrix/SPoint.h>
 #include <sobject/Sobject.hpp>
+#include <interface/SImageFilter-i.h>
 
 SNSBEGIN
 
@@ -1131,6 +1132,79 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
         BOOL m_bClosed;
     };
 
+    /**
+     * @class      SShapeShadow
+     * @brief      Shadow Image Filter
+     *
+     * Description: Represents a shadow image filter for shapes.
+     */
+    class SShapeShadow : public TObjRefImpl<SObject> {
+        DEF_SOBJECT(TObjRefImpl<SObject>, L"shadow")
+
+      public:
+        SShapeShadow()
+            : m_dx(0.0f)
+            , m_dy(0.0f)
+            , m_sigmaX(0.0f)
+            , m_sigmaY(0.0f)
+            , m_color(RGBA(0, 0, 0, 255))
+        {
+        }
+        IImageFilter *GetFilter() const
+        {
+            return m_filter;
+        }
+        STDMETHOD_(void, OnInitFinished)(THIS_ IXmlNode *pNode) OVERRIDE;
+        
+        SOUI_ATTRS_BEGIN()
+            ATTR_FLOAT(L"dx", m_dx, TRUE) // Horizontal shadow offset
+            ATTR_FLOAT(L"dy", m_dy, TRUE) // Vertical shadow offset
+            ATTR_FLOAT(L"sigmaX", m_sigmaX, TRUE) // Horizontal blur radius
+            ATTR_FLOAT(L"sigmaY", m_sigmaY, TRUE) // Vertical blur radius
+            ATTR_COLOR(L"color", m_color, TRUE) // Shadow color
+        SOUI_ATTRS_END()
+ 
+      protected:
+        float m_dx;     // Horizontal shadow offset
+        float m_dy;     // Vertical shadow offset
+        float m_sigmaX; // Horizontal blur radius
+        float m_sigmaY; // Vertical blur radius
+        COLORREF m_color; // Shadow color
+        SAutoRefPtr<IImageFilter> m_filter;
+    };
+
+    /**
+     * @class      SShapeBlur
+     * @brief      Blur Image Filter
+     *
+     * Description: Represents a blur image filter for shapes.
+     */
+    class SShapeBlur : public TObjRefImpl<SObject> {
+        DEF_SOBJECT(TObjRefImpl<SObject>, L"blur")
+
+      public:
+        SShapeBlur()
+            : m_sigmaX(0.0f)
+            , m_sigmaY(0.0f)
+        {
+        }
+
+        IImageFilter *GetFilter() const
+        {
+            return m_filter;
+        }
+        STDMETHOD_(void, OnInitFinished)(THIS_ IXmlNode *pNode) OVERRIDE;
+        SOUI_ATTRS_BEGIN()
+            ATTR_FLOAT(L"sigmaX", m_sigmaX, TRUE) // Horizontal blur radius
+            ATTR_FLOAT(L"sigmaY", m_sigmaY, TRUE) // Vertical blur radius
+        SOUI_ATTRS_END()
+
+      protected:
+        float m_sigmaX; // Horizontal blur radius
+        float m_sigmaY; // Vertical blur radius
+        SAutoRefPtr<IImageFilter> m_filter;
+    };
+
   public:
     SSkinShape();
 
@@ -1164,6 +1238,8 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
     SAutoRefPtr<SStroke> m_stroke;
     SAutoRefPtr<SShapeRing> m_ringParam;
     SAutoRefPtr<SShapePolygon> m_polygon;
+    SAutoRefPtr<SShapeShadow> m_shadow;
+    SAutoRefPtr<SShapeBlur> m_blur;
 };
 
 /**

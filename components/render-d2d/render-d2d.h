@@ -39,9 +39,15 @@ public:
 
 	STDMETHOD_(BOOL,CreatePath)(THIS_ IPathS ** ppPath) OVERRIDE;
 
-	STDMETHOD_(HRESULT,CreateBlurMaskFilter)(THIS_ float radius, BlurStyle style,BlurFlags flag,IMaskFilter ** ppMaskFilter) OVERRIDE {return E_NOTIMPL;}
+	STDMETHOD_(BOOL, CreateMaskFilter)(THIS_ REFGUID guidEffect, IMaskFilter **ppMaskFilter) OVERRIDE
+    {
+        return FALSE;
+    }
 
-	STDMETHOD_(HRESULT,CreateEmbossMaskFilter)(THIS_ float direction[3], float ambient, float specular, float blurRadius,IMaskFilter ** ppMaskFilter) OVERRIDE {return E_NOTIMPL;}
+	STDMETHOD_(BOOL, CreateImageFilter)(THIS_ REFGUID guidEffect, IImageFilter **ppImgFilter) OVERRIDE
+    {
+        return FALSE;
+    }
 
 	STDMETHOD_(BOOL,CreatePathEffect)(THIS_ REFGUID guidEffect,IPathEffect ** ppPathEffect) OVERRIDE;
 	STDMETHOD_(IFontS *,GetDefFont)(CTHIS) OVERRIDE{
@@ -575,8 +581,15 @@ public:
 	STDMETHOD_(HRESULT,SetXfermode)(THIS_ int mode,int *pOldMode=NULL) OVERRIDE;
 	STDMETHOD_(BOOL,SetAntiAlias)(THIS_ BOOL bAntiAlias) OVERRIDE;
 	STDMETHOD_(BOOL,GetAntiAlias)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(void, SetImageFilter)(THIS_ IImageFilter *pImgFilter) OVERRIDE
+    {
+    }
+    STDMETHOD_(IImageFilter *, GetImageFilter)(CTHIS) SCONST OVERRIDE
+    {
+        return NULL;
+    }
 
-protected:
+  protected:
 	// 辅助函数：应用混合模式到位图绘制
 	void ApplyXfermodeForBitmap(ID2D1Bitmap* pBitmap, const D2D1_RECT_F& rcDest, float opacity,
 		D2D1_BITMAP_INTERPOLATION_MODE interpolationMode, const D2D1_RECT_F* pRcSrc);

@@ -1,4 +1,25 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-
 <skin>
- 	</skin>
+    <shape name="shp_shadow" shape="rectangle">
+	  <size width="100" height="100"/>
+      <solid color="#cccccc88"/>
+      <shadow dx="0" dy="0" sigmaX="5" sigmaY="5" color="#000000CC"/>
+    </shape>
+    <shape name="shp_shadow_round" shape="rectangle">
+	  <size width="100" height="100"/>
+      <solid color="#cccccc88"/>
+      <corners radius="5"/>
+      <shadow dx="0" dy="0" sigmaX="5" sigmaY="5" color="#000000CC"/>
+    </shape>
+    <shape name="shp_blur" shape="rectangle">
+	  <size width="100" height="100"/>
+      <solid color="#cccccc88"/>
+      <blur sigmaX="5" sigmaY="5"/>
+    </shape>
+    <shape name="shp_blur_round" shape="rectangle">
+	  <size width="100" height="100"/>
+      <solid color="#cccccc88"/>
+      <corners radius="5"/>
+      <blur sigmaX="5" sigmaY="5"/>
+    </shape>
+</skin>
