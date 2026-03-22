@@ -51,19 +51,19 @@ DECLARE_INTERFACE_(ISvgObj, IObjRef)
      *
      * @details This method loads an SVG file from a string.
      *
-     * @param strSvg The string containing the SVG file content. 
+     * @param strSvg The string containing the SVG file content.
      *
      * @return BOOL TRUE if the SVG file was successfully loaded, FALSE otherwise.
      * @note The string must be null-terminated. string will modified by this method.
      */
-    STDMETHOD_(BOOL,Load)(THIS_ char* strSvg) PURE;
+    STDMETHOD_(BOOL, Load)(THIS_ char *strSvg) PURE;
 
     /**
      * @brief Frees the SVG object.
      *
      * @details This method frees the SVG object, releasing any associated resources.
      */
-    STDMETHOD_(void,Free)(THIS) PURE;
+    STDMETHOD_(void, Free)(THIS) PURE;
 
     /**
      * @brief Returns a pointer to the underlying object.
@@ -1712,7 +1712,7 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
      * @param ptm Pointer to TEXTMETRIC to receive font metrics (ascent, descent, height, etc.).
      * @return HRESULT indicating success or failure.
      */
-    STDMETHOD_(HRESULT, GetFontMetrics)(THIS_ TEXTMETRIC *ptm) PURE;
+    STDMETHOD_(HRESULT, GetFontMetrics)(THIS_ TEXTMETRIC * ptm) PURE;
 
     /**
      * @brief Output text at a specified position.
@@ -2151,7 +2151,7 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
      * @param color Shadow color.
      * @return HRESULT indicating success or failure.
      */
-    //STDMETHOD_(HRESULT, DrawShadowRect)(THIS_ LPCRECT pRect, float dx, float dy, float sigmaX, float sigmaY, COLORREF color) PURE;
+    // STDMETHOD_(HRESULT, DrawShadowRect)(THIS_ LPCRECT pRect, float dx, float dy, float sigmaX, float sigmaY, COLORREF color) PURE;
 
     /**
      * @brief Draw a rounded rectangle with shadow.
@@ -2164,7 +2164,7 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
      * @param color Shadow color.
      * @return HRESULT indicating success or failure.
      */
-    //STDMETHOD_(HRESULT, DrawShadowRoundRect)(THIS_ LPCRECT pRect, POINT pt, float dx, float dy, float sigmaX, float sigmaY, COLORREF color) PURE;
+    // STDMETHOD_(HRESULT, DrawShadowRoundRect)(THIS_ LPCRECT pRect, POINT pt, float dx, float dy, float sigmaX, float sigmaY, COLORREF color) PURE;
 
     /**
      * @brief Draw a path with shadow.
@@ -2176,7 +2176,7 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
      * @param color Shadow color.
      * @return HRESULT indicating success or failure.
      */
-    //STDMETHOD_(HRESULT, DrawShadowPath)(THIS_ IPathS * pPath, float dx, float dy, float sigmaX, float sigmaY, COLORREF color) PURE;
+    // STDMETHOD_(HRESULT, DrawShadowPath)(THIS_ IPathS * pPath, float dx, float dy, float sigmaX, float sigmaY, COLORREF color) PURE;
 
     /**
      * @brief Set the image effect for rendering operations.
@@ -2198,7 +2198,7 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
      * @param byAlpha Alpha value for blending (default is 0xFF).
      * @return HRESULT indicating success or failure.
      */
-    STDMETHOD_(HRESULT, DrawSVG)(THIS_ ISvgObj*  pSvg, LPCRECT pRect, BYTE byAlpha DEF_VAL(0xFF)) PURE;
+    STDMETHOD_(HRESULT, DrawSVG)(THIS_ ISvgObj * pSvg, LPCRECT pRect, BYTE byAlpha DEF_VAL(0xFF)) PURE;
 };
 
 /**

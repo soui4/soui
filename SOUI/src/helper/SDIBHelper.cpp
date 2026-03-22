@@ -1,7 +1,7 @@
 ﻿#include "souistd.h"
 #include "helper/SDIBHelper.h"
 
-#define RGB2GRAY(r, g, b) (((b) * 117 + (g) * 601 + (r) * 306) >> 10)
+#define RGB2GRAY(r, g, b) (((b)*117 + (g)*601 + (r)*306) >> 10)
 
 SNSBEGIN
 struct DIBINFO

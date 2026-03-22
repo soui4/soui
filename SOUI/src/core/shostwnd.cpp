@@ -2297,8 +2297,8 @@ void SHostWnd::InitMenuExPopup(SMenuEx *menuPopup, UINT nIndex)
         evt.bChecked = pMenuItem->IsChecked();
         if (GetRoot()->FireEvent(&evt))
         {
-            menuPopup->EnableMenuItem(i, MF_BYPOSITION |( evt.bEnable ? 0 : MF_GRAYED));
-            menuPopup->CheckMenuItem(i, MF_BYPOSITION |(evt.bChecked ? MF_CHECKED : 0));
+            menuPopup->EnableMenuItem(i, MF_BYPOSITION | (evt.bEnable ? 0 : MF_GRAYED));
+            menuPopup->CheckMenuItem(i, MF_BYPOSITION | (evt.bChecked ? MF_CHECKED : 0));
         }
     }
 }

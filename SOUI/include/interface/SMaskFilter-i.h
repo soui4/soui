@@ -120,9 +120,8 @@ DECLARE_INTERFACE_(IMaskFilterEmboss, IMaskFilter)
      * @param ambient 环境光
      * @param specular 镜面光
      */
-    STDMETHOD_(void, Init)(THIS_ float blurSigma,float direction[3], float ambient, float specular) PURE;
+    STDMETHOD_(void, Init)(THIS_ float blurSigma, float direction[3], float ambient, float specular) PURE;
 };
-
 
 SNSEND
 #endif // __SMASKFILTER_I__H__

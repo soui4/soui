@@ -503,7 +503,7 @@ void SListBox::OnRButtonUp(UINT nFlags, CPoint pt)
     EventLBRClick evt2(this);
     evt2.nCurSel = HitTest(pt);
     evt2.pt = pt;
-    if(!FireEvent(evt2))
+    if (!FireEvent(evt2))
         __baseCls::OnRButtonUp(nFlags, pt);
 }
 

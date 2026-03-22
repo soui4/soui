@@ -388,17 +388,17 @@ void STreeViewItemLocator::OnBranchExpandedChanged(HSTREEITEM hItem, BOOL bExpan
         return;
     int nOldBranchWidth = _GetBranchWidth(hItem);
     int nBranchHei = _GetBranchHeight(hItem);
-    if(nBranchHei == 0 && bExpandedNew)
+    if (nBranchHei == 0 && bExpandedNew)
     {
         HSTREEITEM hChild = m_adapter->GetFirstChildItem(hItem);
         while (hChild != ITEM_NULL)
         {
             _SetItemOffset(hChild, nBranchHei);
             _SetItemHeight(hChild, m_nLineHeight);
-            nBranchHei +=m_nLineHeight;
+            nBranchHei += m_nLineHeight;
             hChild = m_adapter->GetNextSiblingItem(hChild);
         }
-        _SetBranchHeight(hItem,nBranchHei);
+        _SetBranchHeight(hItem, nBranchHei);
     }
     HSTREEITEM hParent = m_adapter->GetParentItem(hItem);
     while (hParent != ITEM_NULL)
@@ -531,7 +531,8 @@ BOOL STreeView::CreateChildren(SXmlNode xmlNode)
     {
         m_xmlTemplate.Reset();
         m_xmlTemplate.root().append_copy(xmlTemplate);
-        if(m_tvItemLocator){
+        if (m_tvItemLocator)
+        {
             int defItemHeight = m_xmlTemplate.root().attribute(STreeView_style::kStyle_defItemHeight).as_int(30);
             if (defItemHeight > 0)
             {

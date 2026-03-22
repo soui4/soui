@@ -113,13 +113,13 @@ CSize SToolBar::GetItemSize(const CRect &rcWnd, IRenderTarget *pRT, int iItem) c
                 szIcon = item.icon->Size();
             else if (m_skinIcons)
                 szIcon = m_skinIcons[0]->GetSkinSize();
-            if(m_nItemSize.isWrapContent())
+            if (m_nItemSize.isWrapContent())
                 szRet.cy = szIcon.cy;
-            else if(m_nItemSize.isMatchParent())
+            else if (m_nItemSize.isMatchParent())
                 szRet.cy = rcWnd.Width();
             else
                 szRet.cy = m_nItemSize.toPixelSize(GetScale());
-            szRet.cy += 8; //padding
+            szRet.cy += 8; // padding
             if ((item.dwStyle & BTNS_SHOWTEXT))
             {
                 CSize szText;
@@ -159,9 +159,9 @@ CSize SToolBar::GetItemSize(const CRect &rcWnd, IRenderTarget *pRT, int iItem) c
             {
                 // Default horizontal arrangement
                 szRet.cy = rcWnd.Height();
-                if(m_nItemSize.isWrapContent())
+                if (m_nItemSize.isWrapContent())
                     szRet.cx = szIcon.cx;
-                else if(m_nItemSize.isMatchParent())
+                else if (m_nItemSize.isMatchParent())
                     szRet.cx = rcWnd.Height();
                 else
                     szRet.cx = m_nItemSize.toPixelSize(rcWnd.Width());
@@ -421,7 +421,8 @@ void SToolBar::DrawItem(IRenderTarget *pRT, const CRect &rcItem, const ToolBarIt
 
         int iState = SState2Index::GetDefIndex(pItem->dwState, true);
         ISkinObj *_skinIcons = m_skinIcons[iState];
-        if(!_skinIcons) _skinIcons = m_skinIcons[0];
+        if (!_skinIcons)
+            _skinIcons = m_skinIcons[0];
 
         if (bShowText)
         {
@@ -489,7 +490,8 @@ void SToolBar::DrawItem(IRenderTarget *pRT, const CRect &rcItem, const ToolBarIt
     pRT->PopClip();
 }
 
-SAutoRefPtr<ISkinObj> SToolBar::CreateGraySkin(ISkinObj *pSkin) const{
+SAutoRefPtr<ISkinObj> SToolBar::CreateGraySkin(ISkinObj *pSkin) const
+{
     SAutoRefPtr<ISkinObj> pRet(pSkin->Scale(GetScale()), FALSE);
     SSkinImgList *pImgList = sobj_cast<SSkinImgList>(pRet);
     if (pImgList)
@@ -503,10 +505,12 @@ SAutoRefPtr<ISkinObj> SToolBar::CreateGraySkin(ISkinObj *pSkin) const{
     return pRet;
 }
 
-int SToolBar::OnCreate(void * pcs){
+int SToolBar::OnCreate(void *pcs)
+{
     int ret = __baseCls::OnCreate(pcs);
-    if(ret != 0) return ret;
-    if (m_skinIcons[0]  && !m_skinIcons[3])
+    if (ret != 0)
+        return ret;
+    if (m_skinIcons[0] && !m_skinIcons[3])
     {
         m_skinIcons[3] = CreateGraySkin(m_skinIcons[0]);
     }
@@ -519,7 +523,7 @@ void SToolBar::OnDestroy()
     if (GetContainer())
     {
         GetContainer()->UnregisterTimelineHandler(this);
-        GetContainer()->GetMsgLoop()->RemoveIdleHandler(this);    
+        GetContainer()->GetMsgLoop()->RemoveIdleHandler(this);
     }
     m_iClickItem = -1;
     m_iHoverItem = -1;
@@ -1088,11 +1092,12 @@ BOOL SToolBar::EnableButton(int nID, BOOL bEnable)
     else
     {
         m_arrItems[iItem].dwState |= WndState_Disable;
-        if(m_arrItems[iItem].dwState & WndState_Hover){
+        if (m_arrItems[iItem].dwState & WndState_Hover)
+        {
             m_arrItems[iItem].dwState &= ~WndState_Hover;
             m_iHoverItem = -1;
         }
-    }    
+    }
 
     Invalidate();
     return TRUE;
@@ -1277,8 +1282,10 @@ void SToolBar::OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer 
 void SToolBar::OnScaleChanged(int nScale)
 {
     __baseCls::OnScaleChanged(nScale);
-    for(int i =0;i< 4;i++){
-        if(m_skinIcons[i]){
+    for (int i = 0; i < 4; i++)
+    {
+        if (m_skinIcons[i])
+        {
             GetScaleSkin(m_skinIcons[i], nScale);
         }
     }
@@ -1287,7 +1294,7 @@ void SToolBar::OnScaleChanged(int nScale)
         ToolBarItem &item = m_arrItems[i];
         if (item.icon)
         {
-            item.icon->Scale(&item.icon,nScale,kHigh_FilterLevel);
+            item.icon->Scale(&item.icon, nScale, kHigh_FilterLevel);
         }
     }
 }
@@ -1311,11 +1318,12 @@ BOOL SToolBar::OnIdle(int iRun)
                 DWORD dwState = item.dwState;
                 if (evt.bEnable)
                     item.dwState &= ~WndState_Disable;
-                else{
+                else
+                {
                     item.dwState |= WndState_Disable;
-                    if(item.dwState & WndState_Hover)
+                    if (item.dwState & WndState_Hover)
                         item.dwState &= ~WndState_Hover;
-                    if(m_iHoverItem == i) 
+                    if (m_iHoverItem == i)
                         m_iHoverItem = -1;
                 }
                 if (evt.bChecked)

@@ -990,7 +990,7 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
             }
 
             // 如果列权重被分配了，用分配的列宽重新测量高度
-            if (bColWeightMatched && pRowsWeight[y]==0.f)
+            if (bColWeightMatched && pRowsWeight[y] == 0.f)
             {
                 // 计算这个cell分配到的总宽度
                 float cellWidth = 0;

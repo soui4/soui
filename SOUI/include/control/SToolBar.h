@@ -145,6 +145,7 @@ class SOUI_EXP SToolBar
     BOOL UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo) override;
     void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer) override;
     void OnScaleChanged(int nScale) override;
+
   protected:
     STDMETHOD_(void, UpdateChildrenPosition)(THIS) OVERRIDE;
 
@@ -155,7 +156,7 @@ class SOUI_EXP SToolBar
     void OnMouseMove(UINT nFlags, CPoint pt);
     void OnMouseLeave();
     void OnSize(UINT nType, CSize size);
-    int  OnCreate(void * pcs);
+    int OnCreate(void *pcs);
     void OnDestroy();
     SOUI_MSG_MAP_BEGIN()
         MSG_WM_CREATE(OnCreate)

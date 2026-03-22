@@ -36,7 +36,7 @@ class SOUI_EXP SDIBHelper {
     static bool GrayImage(IBitmapS *pBmp);
 
     /**
-     * @brief 将位图转换为禁用样式的图片  
+     * @brief 将位图转换为禁用样式的图片
      * @param pBmp 位图对象指针
      * @return 成功返回TRUE，失败返回FALSE
      */

@@ -112,8 +112,7 @@ typedef enum _SOUI_EVENTS
     EVT_TC_DBCLICK,             ///< 树形控件双击事件
     EVT_TC_RCLICK,              ///< 树形控件右键点击事件
 
-    EVT_CB_BEFORE_CLOSEUP = 15050,///< 组合框关闭前事件
-
+    EVT_CB_BEFORE_CLOSEUP = 15050, ///< 组合框关闭前事件
 
     EVT_LV_SELCHANGING = 15100, ///< 列表视图选择改变中事件
     EVT_LV_SELCHANGED,          ///< 列表视图选择改变事件
@@ -580,14 +579,14 @@ DEF_EVT(EventLBSelChanged, EVT_LB_SELCHANGED, on_listbox_sel_changed, {
     int nOldSel; ///< 旧选中项
 })
 
-DEF_EVT(EventLBDbClick, EVT_LB_DBCLICK, on_listbox_item_dbclick, { 
-    int nCurSel; 
-    POINT pt; 
+DEF_EVT(EventLBDbClick, EVT_LB_DBCLICK, on_listbox_item_dbclick, {
+    int nCurSel;
+    POINT pt;
 })
 
 DEF_EVT(EventLBRClick, EVT_LB_RCLICK, on_listbox_item_rclick, {
-    int nCurSel; 
-    POINT pt; 
+    int nCurSel;
+    POINT pt;
 })
 
 DEF_EVT(EventLVSelChanged, EVT_LV_SELCHANGED, on_listview_select_changed, {
@@ -680,14 +679,14 @@ DEF_EVT(EventLCSelChanged, EVT_LC_SELCHANGED, on_listctrl_sel_changed, {
     int nOldSel; ///< 旧选中项
 })
 
-DEF_EVT(EventLCDbClick, EVT_LC_DBCLICK, on_listctrl_item_dbclick, { 
-    int nCurSel; 
-    POINT pt; 
+DEF_EVT(EventLCDbClick, EVT_LC_DBCLICK, on_listctrl_item_dbclick, {
+    int nCurSel;
+    POINT pt;
 })
 
 DEF_EVT(EventLCRClick, EVT_LC_RCLICK, on_listctrl_item_rclick, {
-     int nCurSel; 
-    POINT pt; 
+    int nCurSel;
+    POINT pt;
 })
 
 DEF_EVT(EventLCItemDeleted, EVT_LC_ITEMDELETED, on_listctrl_del_item, {
@@ -739,7 +738,7 @@ DEF_EVT(EventTCDbClick, EVT_TC_DBCLICK, on_treectrl_item_dbclick, {
 })
 
 DEF_EVT(EventTCRClick, EVT_TC_RCLICK, on_treectrl_item_rclick, {
-    POINT pt;       ///< 右键位置
+    POINT pt;         ///< 右键位置
     HSTREEITEM hItem; ///< 右键选中的节点
 })
 

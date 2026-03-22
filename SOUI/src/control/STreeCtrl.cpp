@@ -1226,7 +1226,8 @@ void STreeCtrl::OnRButtonUp(UINT nFlags, CPoint pt)
     EventTCRClick evt(this);
     evt.pt = pt;
     evt.hItem = HitTest(pt);
-    if(!FireEvent(&evt)){
+    if (!FireEvent(&evt))
+    {
         __baseCls::OnRButtonUp(nFlags, pt);
     }
 }

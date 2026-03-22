@@ -54,7 +54,7 @@ class SMenuExRoot : public SRootWindow {
         pNewMenuExRoot->m_iconY = m_iconY;
         pNewMenuExRoot->m_nMinWidth = m_nMinWidth;
         pNewMenuExRoot->m_nSubMenuOffset = m_nSubMenuOffset;
-        for (int i=0;i<4;i++)
+        for (int i = 0; i < 4; i++)
             pNewMenuExRoot->m_rcItemPadding[i] = m_rcItemPadding[i];
         pNewMenuExRoot->m_style = m_style; // 设置了 些 margin 之类的 属性 也要 copy
     }
@@ -73,7 +73,7 @@ class SMenuExRoot : public SRootWindow {
         ATTR_LAYOUTSIZE(L"textOffset", m_nTextOffset, FALSE)
         ATTR_LAYOUTSIZE(L"minWidth", m_nMinWidth, FALSE)
         ATTR_LAYOUTSIZE(L"subMenuOffset", m_nSubMenuOffset, FALSE)
-        ATTR_LAYOUTSIZE4(L"itemPadding",m_rcItemPadding,FALSE)
+        ATTR_LAYOUTSIZE4(L"itemPadding", m_rcItemPadding, FALSE)
         ATTR_DWORD(L"contextHelpId", m_dwContextHelpId, FALSE)
     SOUI_ATTRS_END()
 
@@ -232,7 +232,7 @@ SMenuExItem::SMenuExItem(SMenuEx *pOwnerMenu, ISkinObj *pItemSkin)
     SMenuExRoot *pRoot = (SMenuExRoot *)pOwnerMenu->GetRoot();
     for (int i = 0; i < 4; i++)
     {
-        m_style.SetPadding(i,pRoot->m_rcItemPadding[i]);
+        m_style.SetPadding(i, pRoot->m_rcItemPadding[i]);
     }
 }
 
@@ -1053,7 +1053,7 @@ void SMenuEx::OnSelItemChanged(SMenuExItem *pMenuItem, BOOL bByMouse)
         {
             nFlag |= pMenuItem->IsDisabled() ? MF_GRAYED : 0;
         }
-        if(s_MenuData)
+        if (s_MenuData)
             ::SendMessage(s_MenuData->GetOwner(), WM_MENUSELECT, MAKEWPARAM(idx, nFlag), (LPARAM)this);
     }
     else if (s_MenuData)
@@ -1105,7 +1105,7 @@ BOOL SMenuEx::_HandleEvent(IEvtArgs *pEvt)
         {
             return FALSE;
         }
-        if(s_MenuData)
+        if (s_MenuData)
             s_MenuData->ExitMenu(pMenuItem->GetID());
         return TRUE;
     }
@@ -1406,11 +1406,11 @@ BOOL SMenuEx::EnableMenuItem(UINT uIDEnableItem, UINT uEnable)
 {
     SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot());
     SASSERT(pMenuRoot);
-    SWindow *pItemRef = FindItem(uIDEnableItem, uEnable&MF_BYPOSITION);
+    SWindow *pItemRef = FindItem(uIDEnableItem, uEnable & MF_BYPOSITION);
     if (!pItemRef)
         return FALSE;
 
-    if (uEnable & (MF_DISABLED|MF_GRAYED))
+    if (uEnable & (MF_DISABLED | MF_GRAYED))
     {
         pItemRef->SetAttribute(L"enable", L"0");
     }

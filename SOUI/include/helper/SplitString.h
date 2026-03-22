@@ -83,7 +83,8 @@ inline int ParseResID(const SStringT &str, SStringTList &strLst)
     return (int)strLst.GetCount();
 }
 
-inline SStringTList ParseResID(const SStringT &str){
+inline SStringTList ParseResID(const SStringT &str)
+{
     SStringTList strLst;
     ParseResID(str, strLst);
     return strLst;

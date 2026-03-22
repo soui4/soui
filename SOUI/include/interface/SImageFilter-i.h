@@ -142,7 +142,7 @@ DECLARE_INTERFACE_(IComposeImageFilter, IImageFilter)
      * @param outer 外层图像
      * @param inner 内层图像
      */
-    STDMETHOD_(void, Init)(THIS_ IImageFilter *outer, IImageFilter *inner DEF_VAL(NULL)) PURE;
+    STDMETHOD_(void, Init)(THIS_ IImageFilter * outer, IImageFilter * inner DEF_VAL(NULL)) PURE;
 };
 
 // {C7B6A594-E3D2-4160-9C6B-A594E3D21600}
@@ -178,7 +178,7 @@ DECLARE_INTERFACE_(IMergeImageFilter, IImageFilter)
      * @param filters 图像数组
      * @param count 图像数量
      */
-    STDMETHOD_(void, Init)(THIS_ IImageFilter *filters[], int count) PURE;
+    STDMETHOD_(void, Init)(THIS_ IImageFilter * filters[], int count) PURE;
 };
 
 // {B6A59483-D2C1-405F-8B5A-9483D2C10501}
@@ -215,7 +215,7 @@ DECLARE_INTERFACE_(ITileImageFilter, IImageFilter)
      * @param dstRect 目标图像区域
      * @param input 输入图像
      */
-    STDMETHOD_(void, Init)(THIS_ RECT srcRect, RECT dstRect, IImageFilter *input DEF_VAL(NULL)) PURE;
+    STDMETHOD_(void, Init)(THIS_ RECT srcRect, RECT dstRect, IImageFilter * input DEF_VAL(NULL)) PURE;
 };
 
 // {A5948372-C1B0-4F4E-9A49-8372C1B04E02}

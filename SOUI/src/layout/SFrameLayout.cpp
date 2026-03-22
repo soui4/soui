@@ -574,9 +574,9 @@ void SFrameLayout::LayoutDockTopBottom(IWindow *pParent, SList<ChildInfo *> &lst
                 rcWnd.bottom = y + sz.cy;
                 rcWnd.top = y;
             }
-            if(rcWnd.right > rcParent.right)
+            if (rcWnd.right > rcParent.right)
                 rcWnd.right = rcParent.right;
-            if(rcWnd.left > rcWnd.right)
+            if (rcWnd.left > rcWnd.right)
                 rcWnd.left = rcWnd.right;
             sz.cx = rcWnd.right - rcWnd.left;
             ((SWindow *)pInfo->pWnd)->OnRelayout(rcWnd);
@@ -802,9 +802,9 @@ void SFrameLayout::LayoutDockLeftRight(IWindow *pParent, SList<ChildInfo *> &lst
                 rcWnd.left = x;
             }
 
-            if(rcWnd.bottom > rcParent.bottom)
+            if (rcWnd.bottom > rcParent.bottom)
                 rcWnd.bottom = rcParent.bottom;
-            if(rcWnd.top > rcWnd.bottom)
+            if (rcWnd.top > rcWnd.bottom)
                 rcWnd.top = rcWnd.bottom;
             sz.cy = rcWnd.bottom - rcWnd.top;
             ((SWindow *)pInfo->pWnd)->OnRelayout(rcWnd);

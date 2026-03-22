@@ -76,7 +76,10 @@ class SOUI_EXP SMenuBar : public SWindow {
      * @brief Check if using SMenuEx
      * @return TRUE if using SMenuEx, FALSE otherwise
      */
-    BOOL IsUseMenuEx() const { return m_bUseMenuEx; }
+    BOOL IsUseMenuEx() const
+    {
+        return m_bUseMenuEx;
+    }
 
   protected:
     /**

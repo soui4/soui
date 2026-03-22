@@ -56,6 +56,7 @@ class SOUI_EXP SwndStyle {
         Border_Right = 2,
         Border_Bottom = 3,
     };
+
   public:
     /**
      * @brief Constructor.
@@ -174,8 +175,9 @@ class SOUI_EXP SwndStyle {
 
     /**
      * @brief Sets the padding for a specific border.
-    */
+     */
     void SetPadding(int iBorder, SLayoutSize size);
+
   protected:
     SLayoutSize m_rcMargin[4]; /**< 4-week non-client area size */
     SLayoutSize m_rcInset[4];  /**< Text area 4-directional inner padding */

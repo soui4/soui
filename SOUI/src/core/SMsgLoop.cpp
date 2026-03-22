@@ -86,7 +86,7 @@ int SMessageLoop::Run()
         {
             m_bDoIdle = TRUE;
             m_nIdleCount = 0;
-            if(RunIdle())
+            if (RunIdle())
                 continue;
         }
         nRet = HandleMsg();
@@ -285,11 +285,12 @@ BOOL SMessageLoop::RunIdle()
 {
     while (!m_bQuit && m_bDoIdle)
     {
-        if(MsgWaitForMultipleObjects(0, NULL, FALSE, 20, QS_ALLINPUT) != WAIT_TIMEOUT)
+        if (MsgWaitForMultipleObjects(0, NULL, FALSE, 20, QS_ALLINPUT) != WAIT_TIMEOUT)
         {
             MSG msg;
-            PeekMessage(&msg,0,0,0, PM_NOREMOVE);
-            if(IsIdleMessage(&msg)){
+            PeekMessage(&msg, 0, 0, 0, PM_NOREMOVE);
+            if (IsIdleMessage(&msg))
+            {
                 m_bDoIdle = OnIdle(m_nIdleCount++);
             }
             return FALSE;

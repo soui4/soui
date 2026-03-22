@@ -53,7 +53,7 @@ HRESULT SDropTargetDispatcher::DragEnter(/* [unique][in] */ IDataObject *pDataOb
     m_pDataObj = pDataObj;
     m_dwEnterEffect = *pdwEffect;
     m_pDataObj->AddRef();
-    //SSLOGI() << "DragEnter: m_dwEnterEffect=" << m_dwEnterEffect;
+    // SSLOGI() << "DragEnter: m_dwEnterEffect=" << m_dwEnterEffect;
     return DragOver(grfKeyState, pt, pdwEffect);
 }
 
@@ -102,7 +102,7 @@ HRESULT SDropTargetDispatcher::DragOver(/* [in] */ DWORD grfKeyState,
     return S_OK;
 }
 
-HRESULT  SDropTargetDispatcher::DragLeave(void)
+HRESULT SDropTargetDispatcher::DragLeave(void)
 {
     if (m_pDataObj)
     {
@@ -111,16 +111,16 @@ HRESULT  SDropTargetDispatcher::DragLeave(void)
     }
     m_hHover = 0;
     m_dwEnterEffect = 0;
-    //SSLOGI() << "DragLeave";
+    // SSLOGI() << "DragLeave";
     return S_OK;
 }
 
-HRESULT  SDropTargetDispatcher::Drop(/* [unique][in] */ IDataObject *pDataObj,
-                                                      /* [in] */ DWORD grfKeyState,
-                                                      /* [in] */ POINTL pt,
-                                                      /* [out][in] */ DWORD *pdwEffect)
+HRESULT SDropTargetDispatcher::Drop(/* [unique][in] */ IDataObject *pDataObj,
+                                    /* [in] */ DWORD grfKeyState,
+                                    /* [in] */ POINTL pt,
+                                    /* [out][in] */ DWORD *pdwEffect)
 {
-    //SSLOGI() << "Drop, *pdwEffect="<<*pdwEffect;
+    // SSLOGI() << "Drop, *pdwEffect="<<*pdwEffect;
     DTMAP::CPair *pPair = m_mapDropTarget.Lookup(m_hHover);
     if (m_hHover && pPair)
         pPair->m_value->Drop(pDataObj, grfKeyState, pt, pdwEffect);

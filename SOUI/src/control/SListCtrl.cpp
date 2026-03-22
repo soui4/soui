@@ -909,8 +909,9 @@ void SListCtrl::OnRButtonUp(UINT nFlags, CPoint pt)
 {
     EventLCRClick evt2(this);
     evt2.nCurSel = HitTest(pt);
-    evt2.pt = pt;;
-    if(!FireEvent(evt2))
+    evt2.pt = pt;
+    ;
+    if (!FireEvent(evt2))
         __baseCls::OnRButtonUp(nFlags, pt);
 }
 

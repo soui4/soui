@@ -718,11 +718,12 @@ void SSkinShape::OnInitFinished(IXmlNode *pNode)
 
 void SSkinShape::SShapeShadow::OnInitFinished(IXmlNode *pNode)
 {
-    if(m_color != CR_INVALID){
+    if (m_color != CR_INVALID)
+    {
         GETRENDERFACTORY->CreateImageFilter(IID_IDropShadowImageFilter, (IImageFilter **)&m_filter);
         if (m_filter)
         {
-            IDropShadowImageFilter *pShadowFilter = (IDropShadowImageFilter *)(IImageFilter*)m_filter;
+            IDropShadowImageFilter *pShadowFilter = (IDropShadowImageFilter *)(IImageFilter *)m_filter;
             pShadowFilter->Init(m_dx, m_dy, m_sigmaX, m_sigmaY, m_color);
         }
     }
@@ -845,19 +846,25 @@ void SSkinShape::DrawShapeInternal(IRenderTarget *pRT, LPCRECT rcDraw, BYTE byAl
     IImageFilter *pOldImageFilter = pRT->GetImageFilter();
     IImageFilter *pShadowFilter = NULL;
     IImageFilter *pBlurFilter = NULL;
-    if(m_shadow)
+    if (m_shadow)
         pShadowFilter = m_shadow->GetFilter();
-    if(m_blur)
+    if (m_blur)
         pBlurFilter = m_blur->GetFilter();
-    if(pShadowFilter || pBlurFilter){
-        if(pBlurFilter && pBlurFilter){
+    if (pShadowFilter || pBlurFilter)
+    {
+        if (pBlurFilter && pBlurFilter)
+        {
             SAutoRefPtr<IComposeImageFilter> pFilterCompose;
             GETRENDERFACTORY->CreateImageFilter(IID_IComposeImageFilter, (IImageFilter **)&pFilterCompose);
             pFilterCompose->Init(pShadowFilter, pBlurFilter);
             pRT->SetImageFilter(pFilterCompose);
-        }else if(pBlurFilter){
+        }
+        else if (pBlurFilter)
+        {
             pRT->SetImageFilter(pBlurFilter);
-        }else{
+        }
+        else
+        {
             pRT->SetImageFilter(pShadowFilter);
         }
     }
@@ -1454,7 +1461,8 @@ SSkinSvg::~SSkinSvg()
 
 SIZE SSkinSvg::GetSkinSize() const
 {
-    if(m_svgObj && (m_cacheSize.cx == 0 || m_cacheSize.cy == 0)){
+    if (m_svgObj && (m_cacheSize.cx == 0 || m_cacheSize.cy == 0))
+    {
         SIZE sz;
         sz.cx = m_svgObj->GetWidth();
         sz.cy = m_svgObj->GetHeight();
@@ -1501,12 +1509,13 @@ void SSkinSvg::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE
                 {
                     // Render SVG object to memory bitmap
                     pMemRT->BeginDraw();
-                    pMemRT->ClearRect(&rcMem,RGBA(0,0,0,0));
+                    pMemRT->ClearRect(&rcMem, RGBA(0, 0, 0, 0));
                     HRESULT hr = pMemRT->DrawSVG(m_svgObj, &rcMem, 0xFF);
                     pMemRT->EndDraw();
-                    if(S_OK == hr){
+                    if (S_OK == hr)
+                    {
                         // Get current bitmap from memory render target
-                        IBitmapS * pNewBitmap = (IBitmapS*)pMemRT->GetCurrentObject(OT_BITMAP);
+                        IBitmapS *pNewBitmap = (IBitmapS *)pMemRT->GetCurrentObject(OT_BITMAP);
                         if (pNewBitmap)
                         {
                             // Update cache
@@ -1547,8 +1556,8 @@ HRESULT SSkinSvg::OnAttrSrc(const SStringW &value, BOOL bLoading)
 
         // Clear cache so it will be regenerated
         m_cacheBitmap = NULL;
-	    m_cacheSize.cx = m_cacheSize.cy = 0;
-	}
+        m_cacheSize.cx = m_cacheSize.cy = 0;
+    }
     return S_OK;
 }
 
@@ -1568,4 +1577,3 @@ void SSkinSvg::_Scale(ISkinObj *skinObj, int nScale)
 }
 
 SNSEND
-

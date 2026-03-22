@@ -1155,20 +1155,20 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
             return m_filter;
         }
         STDMETHOD_(void, OnInitFinished)(THIS_ IXmlNode *pNode) OVERRIDE;
-        
+
         SOUI_ATTRS_BEGIN()
-            ATTR_FLOAT(L"dx", m_dx, TRUE) // Horizontal shadow offset
-            ATTR_FLOAT(L"dy", m_dy, TRUE) // Vertical shadow offset
+            ATTR_FLOAT(L"dx", m_dx, TRUE)         // Horizontal shadow offset
+            ATTR_FLOAT(L"dy", m_dy, TRUE)         // Vertical shadow offset
             ATTR_FLOAT(L"sigmaX", m_sigmaX, TRUE) // Horizontal blur radius
             ATTR_FLOAT(L"sigmaY", m_sigmaY, TRUE) // Vertical blur radius
-            ATTR_COLOR(L"color", m_color, TRUE) // Shadow color
+            ATTR_COLOR(L"color", m_color, TRUE)   // Shadow color
         SOUI_ATTRS_END()
- 
+
       protected:
-        float m_dx;     // Horizontal shadow offset
-        float m_dy;     // Vertical shadow offset
-        float m_sigmaX; // Horizontal blur radius
-        float m_sigmaY; // Vertical blur radius
+        float m_dx;       // Horizontal shadow offset
+        float m_dy;       // Vertical shadow offset
+        float m_sigmaX;   // Horizontal blur radius
+        float m_sigmaY;   // Vertical blur radius
         COLORREF m_color; // Shadow color
         SAutoRefPtr<IImageFilter> m_filter;
     };
@@ -1472,16 +1472,17 @@ class SOUI_EXP SSkinSvg : public SSkinObjBase {
     HRESULT OnAttrSrc(const SStringW &value, BOOL bLoading);
 
     BOOL LoadSvg();
+
   protected:
-    mutable SAutoRefPtr<IBitmapS> m_cacheBitmap;   // Cached rasterized bitmap
-    mutable SIZE m_cacheSize;                      // Size of the cached bitmap
-    mutable SAutoRefPtr<ISvgObj> m_svgObj;                         // Parsed SVG object
-    SStringW m_strSrc;                             // SVG source file path
-    BOOL m_bEnableCache;                           // Cache enable flag
+    mutable SAutoRefPtr<IBitmapS> m_cacheBitmap; // Cached rasterized bitmap
+    mutable SIZE m_cacheSize;                    // Size of the cached bitmap
+    mutable SAutoRefPtr<ISvgObj> m_svgObj;       // Parsed SVG object
+    SStringW m_strSrc;                           // SVG source file path
+    BOOL m_bEnableCache;                         // Cache enable flag
 
     SOUI_ATTRS_BEGIN()
-        ATTR_CUSTOM(L"src", OnAttrSrc)             // SVG file path
-        ATTR_BOOL(L"cache", m_bEnableCache, TRUE)  // Enable caching
+        ATTR_CUSTOM(L"src", OnAttrSrc)            // SVG file path
+        ATTR_BOOL(L"cache", m_bEnableCache, TRUE) // Enable caching
     SOUI_ATTRS_END()
 };
 

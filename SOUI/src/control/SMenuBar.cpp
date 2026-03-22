@@ -32,9 +32,18 @@ class SMenuBarItem : public SButton {
 
     bool IsMenuLoaded() const;
 
-    SMenu *GetMenu() const { return m_pMenu; }
-    SMenuEx *GetMenuEx() const { return m_pMenuEx; }
-    BOOL IsUseMenuEx() const { return m_pHostMenu ? m_pHostMenu->IsUseMenuEx() : FALSE; }
+    SMenu *GetMenu() const
+    {
+        return m_pMenu;
+    }
+    SMenuEx *GetMenuEx() const
+    {
+        return m_pMenuEx;
+    }
+    BOOL IsUseMenuEx() const
+    {
+        return m_pHostMenu ? m_pHostMenu->IsUseMenuEx() : FALSE;
+    }
 
   protected:
     UINT PopMenu();
@@ -410,7 +419,7 @@ LRESULT SMenuBar::MenuSwitch(int code, WPARAM wParam, LPARAM lParam)
             SMenuBarItem *pNowMenu = SMenuBar::m_pMenuBar->m_pNowMenu;
             SASSERT(pNowMenu);
             int selItem = -1;
-            HWND hSubMenuWnd= 0;
+            HWND hSubMenuWnd = 0;
             if (!pNowMenu->IsUseMenuEx())
             {
                 SMenu *pMenu = pNowMenu->GetMenu();
@@ -438,13 +447,13 @@ LRESULT SMenuBar::MenuSwitch(int code, WPARAM wParam, LPARAM lParam)
                 SMenuEx *pMenuEx = pNowMenu->GetMenuEx();
                 if (pMenuEx)
                 {
-                    for(int i = 0; i < pMenuEx->GetMenuItemCount(); i++)
+                    for (int i = 0; i < pMenuEx->GetMenuItemCount(); i++)
                     {
                         SMenuExItem *pItem = pMenuEx->GetMenuItem(i, FALSE);
                         if (pItem->GetState() & WndState_Hover)
                         {
                             selItem = i;
-                            if(pItem->GetSubMenu())
+                            if (pItem->GetSubMenu())
                                 hSubMenuWnd = pItem->GetSubMenu()->GetHostWnd()->GetHwnd();
                             else
                                 hSubMenuWnd = NULL;
