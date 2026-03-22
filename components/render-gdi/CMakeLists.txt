@@ -47,6 +47,7 @@ target_include_directories(render-gdi
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
   PRIVATE ${PROJECT_SOURCE_DIR}/utilities/include
   PRIVATE ${PROJECT_SOURCE_DIR}/SOUI/include
+  PRIVATE ${PROJECT_SOURCE_DIR}/third-part/nanosvg
 )
 
 set(COM_LIBS ${COM_LIBS} render-gdi CACHE INTERNAL "com_lib")

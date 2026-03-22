@@ -538,6 +538,7 @@ public:
 	STDMETHOD_(HRESULT,SetXfermode)(THIS_ int mode,int *pOldMode=NULL) OVERRIDE;
 	STDMETHOD_(BOOL,SetAntiAlias)(THIS_ BOOL bAntiAlias) OVERRIDE;
 	STDMETHOD_(BOOL,GetAntiAlias)(THIS) SCONST OVERRIDE;
+	STDMETHOD_(HRESULT, DrawSVG)(THIS_ ISvgObj*  pSvg, LPCRECT pRect, BYTE byAlpha = 0xFF) OVERRIDE;
 protected:
 	HDC               m_hdc;
 	SColor            m_curColor;

@@ -37,7 +37,7 @@ class STreeViewDataSetObserver : public TObjRefImpl<ITvDataSetObserver> {
 
 //////////////////////////////////////////////////////////////////////////
 STreeViewItemLocator::STreeViewItemLocator(int nIndent)
-    : m_nLineHeight(50)
+    : m_nLineHeight(30)
     , m_nIndent(nIndent)
     , m_szDef(10, 50)
 {
@@ -367,6 +367,11 @@ int STreeViewItemLocator::GetScrollLineSize() const
     return m_nLineHeight;
 }
 
+void STreeViewItemLocator::SetDefItemHeight(int nHeight)
+{
+    m_nLineHeight = nHeight;
+}
+
 int STreeViewItemLocator::GetTotalWidth() const
 {
     return (int)m_adapter->GetItemDataByIndex(ITEM_ROOT, DATA_INDEX_BRANCH_WIDTH);
@@ -383,6 +388,18 @@ void STreeViewItemLocator::OnBranchExpandedChanged(HSTREEITEM hItem, BOOL bExpan
         return;
     int nOldBranchWidth = _GetBranchWidth(hItem);
     int nBranchHei = _GetBranchHeight(hItem);
+    if(nBranchHei == 0 && bExpandedNew)
+    {
+        HSTREEITEM hChild = m_adapter->GetFirstChildItem(hItem);
+        while (hChild != ITEM_NULL)
+        {
+            _SetItemOffset(hChild, nBranchHei);
+            _SetItemHeight(hChild, m_nLineHeight);
+            nBranchHei +=m_nLineHeight;
+            hChild = m_adapter->GetNextSiblingItem(hChild);
+        }
+        _SetBranchHeight(hItem,nBranchHei);
+    }
     HSTREEITEM hParent = m_adapter->GetParentItem(hItem);
     while (hParent != ITEM_NULL)
     {
@@ -514,6 +531,13 @@ BOOL STreeView::CreateChildren(SXmlNode xmlNode)
     {
         m_xmlTemplate.Reset();
         m_xmlTemplate.root().append_copy(xmlTemplate);
+        if(m_tvItemLocator){
+            int defItemHeight = m_xmlTemplate.root().attribute(STreeView_style::kStyle_defItemHeight).as_int(30);
+            if (defItemHeight > 0)
+            {
+                m_tvItemLocator->SetDefItemHeight(defItemHeight);
+            }
+        }
     }
     return TRUE;
 }

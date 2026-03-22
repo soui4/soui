@@ -38,10 +38,6 @@
 #define kLogTag "demo"
 //-->
 
-#define NANOSVG_IMPLEMENTATION
-#include <nanosvg.h>
-#define NANOSVGRAST_IMPLEMENTATION
-#include <nanosvgrast.h>
 
 #include "MainDlg.h"
 
@@ -92,67 +88,6 @@ static SStringT getSourceDir()
 #endif
 }
 
-class SApplication2 : public SApplication {
-  public:
-    SApplication2(HINSTANCE hInst)
-        : SApplication(hInst)
-    {
-    }
-
-  protected:
-    STDMETHOD_(IBitmapS *, LoadImage)(THIS_ LPCTSTR pszType, LPCTSTR pszResName)
-    {
-        int nBufSize = GetRawBufferSize(pszType, pszResName);
-        SAutoBuf buf(nBufSize);
-        char *pBuf = buf;
-        BOOL bLoad = GetRawBuffer(pszType, pszResName, pBuf, nBufSize);
-        if (bLoad && nBufSize > 6)
-        {
-            if (_tcscmp(pszType, _T("svg")) == 0)
-            {
-                const unsigned char bom16[2] = { 0xff, 0xfe };
-                const unsigned char bom8[3] = { 0xef, 0xbb, 0xbf };
-                SStringA strBuf;
-                if (memcmp(pBuf, bom16, 2) == 0)
-                {
-                    strBuf = S_CW2A(SStringW((WCHAR *)(pBuf + 2), (nBufSize - 2) / 2), CP_UTF8);
-                }
-                else if (memcmp(pBuf, bom8, 3) == 0)
-                {
-                    strBuf = SStringA(pBuf + 3, nBufSize - 3);
-                }
-                else
-                {
-                    strBuf = S_CA2A(SStringA(pBuf, nBufSize), CP_ACP, CP_UTF8);
-                }
-                if (strBuf.Left(4) == "<svg")
-                {
-                    NSVGimage *image = nsvgParse((char *)strBuf.c_str(), "px", 96.0f);
-                    IBitmapS *Ret = NULL;
-                    if (image)
-                    {
-                        int w = (int)image->width;
-                        int h = (int)image->height;
-
-                        NSVGrasterizer *rast = nsvgCreateRasterizer();
-
-                        unsigned char *img = (unsigned char *)malloc(w * h * 4);
-                        nsvgRasterize(rast, image, 0, 0, 1, img, w, h, w * 4);
-                        GETRENDERFACTORY->CreateBitmap(&Ret);
-                        Ret->Init(w, h, img);
-                        free(img);
-
-                        nsvgDeleteRasterizer(rast);
-                        nsvgDelete(image);
-                    }
-                    return Ret;
-                }
-            }
-        }
-        return SResLoadFromMemory::LoadImage(pBuf, nBufSize);
-    }
-};
-
 int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*lpstrCmdLine*/, int /*nCmdShow*/)
 {
     // 必须要调用OleInitialize来初始化运行环境
@@ -174,7 +109,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
         return 0;
     }
     
-    SApplication2 app(hInstance);
+    SApplication app(hInstance);
     SAppCfg cfg;
     cfg.SetRender(nType == IDYES ? Render_Skia : Render_Gdi)
         .SetImgDecoder(ImgDecoder_Stb)

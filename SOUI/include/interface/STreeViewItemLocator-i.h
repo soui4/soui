@@ -76,6 +76,13 @@ DECLARE_INTERFACE_(ITreeViewItemLocator, IObjRef)
     STDMETHOD_(HSTREEITEM, Position2Item)(CTHIS_ int position) SCONST PURE;
 
     /**
+     * @brief 设置默认项高度
+     * @param nHeight int--默认项高度
+     * @return
+     */
+    STDMETHOD_(void, SetDefItemHeight)(THIS_ int nHeight) PURE;
+
+    /**
      * @brief 获取滚动行大小
      * @return int--滚动行大小
      */
@@ -118,8 +125,17 @@ DECLARE_INTERFACE_(ITreeViewItemLocator, IObjRef)
      */
     STDMETHOD_(int, GetItemIndent)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
+    /**
+     * @brief 获取缩进
+     * @return int--缩进
+     */
     STDMETHOD_(int, GetIndent)(CTHIS) SCONST PURE;
 
+    /**
+     * @brief 设置缩进
+     * @param nIndent int--缩进
+     * @return
+     */
     STDMETHOD_(void, SetIndent)(THIS_ int nIndent) PURE;
 };
 

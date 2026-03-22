@@ -4,7 +4,9 @@
 #include "souistd.h"
 #include "core/SSkin.h"
 #include "helper/SDIBHelper.h"
+#include "helper/SplitString.h"
 #include <core/SGradient.h>
+#include "core/Svg.h"
 SNSBEGIN
 
 //////////////////////////////////////////////////////////////////////////
@@ -621,7 +623,9 @@ ISkinObj *SSkinColorRect::Scale(int nScale)
 
 SSkinShape::SSkinShape()
     : m_shape(rectangle)
+    , m_bEnableCache(FALSE)
 {
+    m_cacheSize.cx = m_cacheSize.cy = 0;
 }
 
 void SSkinShape::OnInitFinished(IXmlNode *pNode)
@@ -741,7 +745,7 @@ void SSkinShape::_Scale(ISkinObj *pObj, int nScale)
     SSkinShape *pRet = sobj_cast<SSkinShape>(pObj);
     SASSERT(pRet);
     pRet->m_solid = m_solid;
-    pRet->m_bitmap = m_bitmap; // todo:hjx
+    pRet->m_bitmap = m_bitmap;
     pRet->m_gradient = m_gradient;
     pRet->m_shape = m_shape;
     pRet->m_shapeSize = m_shapeSize;
@@ -750,6 +754,10 @@ void SSkinShape::_Scale(ISkinObj *pObj, int nScale)
     pRet->m_ringParam = m_ringParam;
     pRet->m_shadow = m_shadow;
     pRet->m_blur = m_blur;
+    pRet->m_polygon = m_polygon;
+    pRet->m_bEnableCache = m_bEnableCache;
+    pRet->m_cacheBitmap = NULL;
+    pRet->m_cacheSize.cx = pRet->m_cacheSize.cy = 0;
 }
 
 SIZE SSkinShape::GetSkinSize() const
@@ -761,6 +769,52 @@ SIZE SSkinShape::GetSkinSize() const
 }
 
 void SSkinShape::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const
+{
+    int nWidth = rcDraw->right - rcDraw->left;
+    int nHeight = rcDraw->bottom - rcDraw->top;
+
+    if (nWidth <= 0 || nHeight <= 0)
+        return;
+
+    if (m_bEnableCache)
+    {
+        if (!m_cacheBitmap || (m_cacheSize.cx != nWidth || m_cacheSize.cy != nHeight))
+        {
+            m_cacheBitmap = NULL;
+            RECT rcMem = { 0, 0, nWidth, nHeight };
+            IRenderFactory *pRenderFactory = GETRENDERFACTORY;
+            if (pRenderFactory)
+            {
+                SAutoRefPtr<IRenderTarget> pMemRT;
+                if (pRenderFactory->CreateRenderTarget(&pMemRT, nWidth, nHeight))
+                {
+                    pMemRT->BeginDraw();
+                    pMemRT->ClearRect(&rcMem, RGBA(0, 0, 0, 0));
+                    DrawShapeInternal(pMemRT, &rcMem, byAlpha);
+                    pMemRT->EndDraw();
+                    IBitmapS *pNewBitmap = (IBitmapS *)pMemRT->GetCurrentObject(OT_BITMAP);
+                    if (pNewBitmap)
+                    {
+                        m_cacheBitmap = pNewBitmap;
+                        m_cacheSize.cx = nWidth;
+                        m_cacheSize.cy = nHeight;
+                    }
+                }
+            }
+        }
+        if (m_cacheBitmap)
+        {
+            RECT rcSrc = { 0, 0, nWidth, nHeight };
+            pRT->DrawBitmapEx(rcDraw, m_cacheBitmap, &rcSrc, MAKELONG(EM_NULL, kLow_FilterLevel), byAlpha);
+        }
+    }
+    else
+    {
+        DrawShapeInternal(pRT, rcDraw, byAlpha);
+    }
+}
+
+void SSkinShape::DrawShapeInternal(IRenderTarget *pRT, LPCRECT rcDraw, BYTE byAlpha) const
 {
     CRect rcDest(rcDraw);
     SAutoRefPtr<IBrushS> pBrush, oldBrush;
@@ -1047,6 +1101,70 @@ void SSKinGroup::_Scale(ISkinObj *skinObj, int nScale)
     }
 }
 
+//////////////////////////////////////////////////////////////////////////
+// SSKinGroup2
+
+int SSKinGroup2::GetStates() const
+{
+    return (int)m_skins.GetCount();
+}
+
+void SSKinGroup2::OnInitFinished(IXmlNode *pNode)
+{
+    __baseCls::OnInitFinished(pNode);
+    SXmlNode xmlNode(pNode);
+    SXmlNode xmlItems = xmlNode.child(L"items");
+    if (xmlItems)
+    {
+        SXmlNode xmlItem = xmlItems.first_child();
+        while (xmlItem)
+        {
+            ISkinObj *pSkin = SApplication::getSingleton().CreateSkinByName(xmlItem.name());
+            if (pSkin)
+            {
+                pSkin->InitFromXml(&xmlItem);
+                m_skins.Add(pSkin);
+                pSkin->Release();
+            }
+            xmlItem = xmlItem.next_sibling();
+        }
+    }
+}
+
+void SSKinGroup2::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const
+{
+    if (iState < 0 || iState >= (int)m_skins.GetCount())
+        return;
+    ISkinObj *pSkin = m_skins[iState];
+    if (!pSkin)
+        return;
+    pSkin->DrawByIndex2(pRT, rcDraw, 0, byAlpha);
+}
+
+SIZE SSKinGroup2::GetSkinSize() const
+{
+    for (UINT i = 0; i < m_skins.GetCount(); i++)
+    {
+        if (m_skins[i])
+            return m_skins[i]->GetSkinSize();
+    }
+    return CSize();
+}
+
+void SSKinGroup2::_Scale(ISkinObj *skinObj, int nScale)
+{
+    __baseCls::_Scale(skinObj, nScale);
+    SSKinGroup2 *pRet = sobj_cast<SSKinGroup2>(skinObj);
+    for (UINT i = 0; i < m_skins.GetCount(); i++)
+    {
+        if (!m_skins[i])
+            continue;
+        SAutoRefPtr<ISkinObj> skinPtr;
+        skinPtr.Attach(m_skins[i]->Scale(nScale));
+        pRet->m_skins.Add(skinPtr);
+    }
+}
+
 /*
 IBitmap中的内存为RGBA格式，.9中使用alpha通道==0或者255来确定如何拉伸
 */
@@ -1321,4 +1439,133 @@ void SSkinTreeLines::_Scale(ISkinObj *skinObj, int nScale)
     }
 }
 
+//////////////////////////////////////////////////////////////////////////
+// SSkinSvg
+SSkinSvg::SSkinSvg()
+    : m_bEnableCache(TRUE)
+    , m_svgObj(NULL)
+{
+    m_cacheSize.cx = m_cacheSize.cy = 0;
+}
+
+SSkinSvg::~SSkinSvg()
+{
+}
+
+SIZE SSkinSvg::GetSkinSize() const
+{
+    if(m_svgObj && (m_cacheSize.cx == 0 || m_cacheSize.cy == 0)){
+        SIZE sz;
+        sz.cx = m_svgObj->GetWidth();
+        sz.cy = m_svgObj->GetHeight();
+        m_cacheSize = sz;
+    }
+    return m_cacheSize;
+}
+
+int SSkinSvg::GetStates() const
+{
+    return 1;
+}
+
+void SSkinSvg::OnInitFinished(IXmlNode *xmlNode)
+{
+    LoadSvg();
+}
+
+void SSkinSvg::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const
+{
+    if (!m_svgObj)
+        return;
+
+    int nWidth = rcDraw->right - rcDraw->left;
+    int nHeight = rcDraw->bottom - rcDraw->top;
+
+    if (nWidth <= 0 || nHeight <= 0)
+        return;
+
+    if (m_bEnableCache)
+    {
+        // Try to use cached bitmap if size matches
+        if (!m_cacheBitmap || (m_cacheSize.cx != nWidth || m_cacheSize.cy != nHeight))
+        {
+            m_cacheBitmap = NULL;
+            // Size changed or cache not initialized - update cache
+            RECT rcMem = { 0, 0, nWidth, nHeight };
+            IRenderFactory *pRenderFactory = GETRENDERFACTORY;
+            if (pRenderFactory)
+            {
+                // Create memory render target
+                SAutoRefPtr<IRenderTarget> pMemRT;
+                if (pRenderFactory->CreateRenderTarget(&pMemRT, nWidth, nHeight))
+                {
+                    // Render SVG object to memory bitmap
+                    pMemRT->BeginDraw();
+                    pMemRT->ClearRect(&rcMem,RGBA(0,0,0,0));
+                    HRESULT hr = pMemRT->DrawSVG(m_svgObj, &rcMem, 0xFF);
+                    pMemRT->EndDraw();
+                    if(S_OK == hr){
+                        // Get current bitmap from memory render target
+                        IBitmapS * pNewBitmap = (IBitmapS*)pMemRT->GetCurrentObject(OT_BITMAP);
+                        if (pNewBitmap)
+                        {
+                            // Update cache
+                            m_cacheBitmap = pNewBitmap;
+                            m_cacheSize.cx = nWidth;
+                            m_cacheSize.cy = nHeight;
+                        }
+                    }
+                }
+            }
+        }
+        if (m_cacheBitmap)
+        {
+            RECT rcSrc = { 0, 0, nWidth, nHeight };
+            pRT->DrawBitmapEx(rcDraw, m_cacheBitmap, &rcSrc, MAKELONG(EM_NULL, kLow_FilterLevel), byAlpha);
+        }
+    }
+    else
+    {
+        // Direct rendering without cache
+        pRT->DrawSVG(m_svgObj, rcDraw, byAlpha);
+    }
+}
+
+BOOL SSkinSvg::LoadSvg()
+{
+    m_svgObj.Attach(CreateSvgFromResId(S_CW2T(m_strSrc)));
+    return m_svgObj != NULL;
+}
+
+HRESULT SSkinSvg::OnAttrSrc(const SStringW &value, BOOL bLoading)
+{
+    m_strSrc = value;
+
+    if (!bLoading)
+    {
+        LoadSvg();
+
+        // Clear cache so it will be regenerated
+        m_cacheBitmap = NULL;
+	    m_cacheSize.cx = m_cacheSize.cy = 0;
+	}
+    return S_OK;
+}
+
+void SSkinSvg::_Scale(ISkinObj *skinObj, int nScale)
+{
+    __baseCls::_Scale(skinObj, nScale);
+    SSkinSvg *pRet = sobj_cast<SSkinSvg>(skinObj);
+    if (pRet)
+    {
+        pRet->m_strSrc = m_strSrc;
+        pRet->m_svgObj = m_svgObj;
+        pRet->m_bEnableCache = m_bEnableCache;
+        // Clear cache so it will be regenerated at new scale
+        pRet->m_cacheBitmap = NULL;
+        pRet->m_cacheSize.cx = pRet->m_cacheSize.cy = 0;
+    }
+}
+
 SNSEND
+

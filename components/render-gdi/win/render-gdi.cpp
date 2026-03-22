@@ -10,6 +10,10 @@
 #include <utilities.h>
 #include <helper/SAutoBuf.h>
 
+#include <src/nanosvg.h>
+#define NANOSVGRAST_IMPLEMENTATION
+#include <src/nanosvgrast.h>
+
 SNSBEGIN
 
     //////////////////////////////////////////////////////////////////////////
@@ -2528,6 +2532,196 @@ SNSBEGIN
 	BOOL SRenderTarget_GDI::GetAntiAlias() SCONST
 	{
 		return FALSE;
+	}
+
+	HRESULT SRenderTarget_GDI::DrawSVG(ISvgObj*  pSvgObj, LPCRECT pRect, BYTE byAlpha)
+	{
+		if (!pSvgObj || !pRect)
+			return E_INVALIDARG;
+
+		if (!m_hdc)
+			return E_FAIL;
+		NSVGimage *pSvg = (NSVGimage *)pSvgObj->GetPtr();
+
+		int nWid = pRect->right - pRect->left;
+		int nHei = pRect->bottom - pRect->top;
+		if (nWid <= 0 || nHei <= 0)
+			return E_INVALIDARG;
+
+		float svgWidth = pSvg->width;
+		float svgHeight = pSvg->height;
+		if (svgWidth <= 0 || svgHeight <= 0)
+		{
+			svgWidth = (float)nWid;
+			svgHeight = (float)nHei;
+		}
+
+		float scaleX = nWid / svgWidth;
+		float scaleY = nHei / svgHeight;
+		float scale = scaleX < scaleY ? scaleX : scaleY;
+
+		float tx = (float)(pRect->left + m_ptOrg.x);
+		float ty = (float)(pRect->top + m_ptOrg.y);
+
+		BITMAPINFO bmi = {0};
+		bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+		bmi.bmiHeader.biWidth = nWid;
+		bmi.bmiHeader.biHeight = -nHei;
+		bmi.bmiHeader.biPlanes = 1;
+		bmi.bmiHeader.biBitCount = 32;
+		bmi.bmiHeader.biCompression = BI_RGB;
+
+		HDC hMemDC = CreateCompatibleDC(m_hdc);
+		if (!hMemDC)
+			return E_OUTOFMEMORY;
+
+		unsigned char* rgbaBuffer = NULL;
+		HBITMAP hMemBmp = CreateDIBSection(hMemDC, &bmi, DIB_RGB_COLORS, (void**)&rgbaBuffer, NULL, 0);
+		if (!hMemBmp || !rgbaBuffer)
+		{
+			DeleteDC(hMemDC);
+			return E_OUTOFMEMORY;
+		}
+
+		HBITMAP hOldBmp = (HBITMAP)::SelectObject(hMemDC, hMemBmp);
+        SetBkMode(hMemDC, TRANSPARENT);
+		memset(rgbaBuffer, 0, nWid * nHei * 4);
+
+		NSVGrasterizer* rast = nsvgCreateRasterizer();
+		if (rast)
+		{
+			nsvgRasterize(rast, pSvg, tx, ty, scale, rgbaBuffer, nWid, nHei, nWid * 4);
+			nsvgDeleteRasterizer(rast);
+		}
+        RECT rcMem = {0,0,nWid,nHei};
+        ALPHAINFO alphaInfo;
+        CGdiAlpha::AlphaBackup(hMemDC, &rcMem, alphaInfo);
+		for (NSVGtext* text = pSvg->texts; text != NULL; text = text->next)
+		{
+			if (text->text[0] == '\0')
+				continue;
+
+			float fontSize = text->fontSize * scale;
+			if (fontSize <= 0) fontSize = 16.0f * scale;
+
+			LOGFONTW lf = {0};
+			lf.lfHeight = -(int)fontSize;
+			MultiByteToWideChar(CP_UTF8, 0, text->fontFamily, -1, lf.lfFaceName, LF_FACESIZE);
+
+			if (text->fontWeight >= 7)
+				lf.lfWeight = FW_BOLD;
+			else
+				lf.lfWeight = FW_NORMAL;
+
+			if (text->fontStyle == 1 || text->fontStyle == 2)
+				lf.lfItalic = TRUE;
+
+			HFONT hFont = ::CreateFontIndirectW(&lf);
+			HGDIOBJ hOldFont = ::SelectObject(hMemDC, hFont);
+
+			unsigned int color = text->fillColor;
+			float opacity = text->opacity * (byAlpha / 255.0f);
+			unsigned char a = (unsigned char)(((color >> 24) & 0xFF) * opacity);
+			unsigned char r = (unsigned char)(color & 0xFF);
+			unsigned char g = (unsigned char)((color >> 8) & 0xFF);
+			unsigned char b = (unsigned char)((color >> 16) & 0xFF);
+			COLORREF crText = RGB(r, g, b);
+			COLORREF crOldText = ::SetTextColor(hMemDC, crText);
+
+			float x = text->x * scale + tx;
+			float y = text->y * scale + ty;
+
+			SIZE textSize = {0};
+            wchar_t szText[1024] = { 0 };
+            int len = MultiByteToWideChar(CP_UTF8, 0, text->text, -1, szText, 1024);
+            if (szText[len - 1] == 0)
+            {
+                len--;
+            }
+            ::GetTextExtentPoint32W(hMemDC, szText, len, &textSize);
+
+			TEXTMETRIC tm = {0};
+			::GetTextMetrics(hMemDC, &tm);
+
+			switch (text->anchor)
+			{
+			case NSVG_ANCHOR_MIDDLE:
+				x -= textSize.cx / 2.0f;
+				break;
+			case NSVG_ANCHOR_END:
+				x -= textSize.cx;
+				break;
+			default:
+				break;
+			}
+
+			y -= tm.tmAscent;
+
+			XFORM xform = {0};
+			xform.eM11 = text->xform[0] * scale;
+			xform.eM12 = text->xform[2] * scale;
+			xform.eM21 = text->xform[1] * scale;
+			xform.eM22 = text->xform[3] * scale;
+			xform.eDx = text->xform[4] * scale + tx;
+			xform.eDy = text->xform[5] * scale + ty;
+
+			BOOL hasTransform = (xform.eM11 != 1.0f || xform.eM12 != 0.0f || 
+			                      xform.eM21 != 0.0f || xform.eM22 != 1.0f || 
+			                      xform.eDx != 0.0f || xform.eDy != 0.0f);
+
+			if (hasTransform)
+			{
+				::SetGraphicsMode(hMemDC, GM_ADVANCED);
+				::SetWorldTransform(hMemDC, &xform);
+
+				float localX = 0;
+				float localY = 0;
+
+				SIZE localTextSize = {0};
+				::GetTextExtentPoint32W(hMemDC, szText, len, &localTextSize);
+
+				switch (text->anchor)
+				{
+				case NSVG_ANCHOR_MIDDLE:
+					localX -= localTextSize.cx / 2.0f;
+					break;
+				case NSVG_ANCHOR_END:
+					localX -= localTextSize.cx;
+					break;
+				default:
+					break;
+				}
+
+				TEXTMETRIC localTm = {0};
+				::GetTextMetrics(hMemDC, &localTm);
+				localY -= localTm.tmAscent;
+
+				::TextOutW(hMemDC, (int)localX, (int)localY, szText,len);
+
+				XFORM identity = {1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f};
+				::SetWorldTransform(hMemDC, &identity);
+				::SetGraphicsMode(hMemDC, GM_COMPATIBLE);
+			}
+			else
+			{
+                ::TextOutW(hMemDC, (int)x, (int)y, szText, len);
+			}
+
+			::SetTextColor(hMemDC, crOldText);
+			::SelectObject(hMemDC, hOldFont);
+			::DeleteObject(hFont);
+		}
+        CGdiAlpha::AlphaRestore(alphaInfo);
+
+		BLENDFUNCTION bf = {AC_SRC_OVER, 0, byAlpha, AC_SRC_ALPHA};
+		::AlphaBlend(m_hdc, pRect->left + m_ptOrg.x, pRect->top + m_ptOrg.y, nWid, nHei,
+			hMemDC, 0, 0, nWid, nHei, bf);
+
+		::SelectObject(hMemDC, hOldBmp);
+		DeleteObject(hMemBmp);
+		DeleteDC(hMemDC);
+
+		return S_OK;
 	}
 
 	COLORREF SRenderTarget_GDI::GetTextColor()

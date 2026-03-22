@@ -1218,16 +1218,22 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
             ATTR_ENUM_VALUE(L"ring", ring)
             ATTR_ENUM_VALUE(L"polygon", polygon)
         ATTR_ENUM_END(m_shape)
+        ATTR_BOOL(L"cache", m_bEnableCache, TRUE)
     SOUI_ATTRS_END()
   protected:
     STDMETHOD_(void, OnInitFinished)(THIS_ IXmlNode *pNode) OVERRIDE;
 
     void _DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const override;
+    void DrawShapeInternal(IRenderTarget *pRT, LPCRECT rcDraw, BYTE byAlpha) const;
 
     void _Scale(ISkinObj *pObj, int nScale) override;
     POINT GetCornerSize(const CRect &rc) const;
 
     Shape m_shape;
+
+    mutable SAutoRefPtr<IBitmapS> m_cacheBitmap;
+    mutable SIZE m_cacheSize;
+    BOOL m_bEnableCache;
 
     SAutoRefPtr<SShapeSolid> m_solid;
     SAutoRefPtr<SShapeBitmap> m_bitmap;
@@ -1293,6 +1299,55 @@ class SOUI_EXP SSKinGroup : public SSkinObjBase {
 };
 
 /**
+ * @class SSKinGroup2
+ * @brief Represents a group of skins for different states.
+ *
+ * This class allows grouping multiple skins. Skins are loaded from child "items" nodes in order.
+ */
+class SOUI_EXP SSKinGroup2 : public SSkinObjBase {
+    DEF_SOBJECT(SSkinObjBase, L"group2")
+
+  public:
+    /**
+     * @brief Gets the size of the skin group.
+     * @return SIZE representing the skin group size.
+     */
+    STDMETHOD_(SIZE, GetSkinSize)(CTHIS) SCONST OVERRIDE;
+
+    /**
+     * @brief Gets the number of states supported by the skin group.
+     * @return int representing the number of states.
+     */
+    STDMETHOD_(int, GetStates)(CTHIS) SCONST OVERRIDE;
+
+  protected:
+    /**
+     * @brief Called when initialization is finished.
+     * @param pNode Pointer to the XML node.
+     */
+    STDMETHOD_(void, OnInitFinished)(THIS_ IXmlNode *pNode) OVERRIDE;
+
+    /**
+     * @brief Draws the skin group by index.
+     * @param pRT Pointer to the render target.
+     * @param rcDraw Rectangle to draw in.
+     * @param iState State index.
+     * @param byAlpha Alpha value for transparency.
+     */
+    void _DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const override;
+
+    /**
+     * @brief Scales the skin group.
+     * @param skinObj Pointer to the skin object.
+     * @param nScale Scale factor.
+     */
+    void _Scale(ISkinObj *skinObj, int nScale) override;
+
+  protected:
+    SArray<SAutoRefPtr<ISkinObj>> m_skins; // Array of skins for different states.
+};
+
+/**
  * @class      SSkinTreeLines
  * @brief      Tree Lines Skin
  *
@@ -1348,6 +1403,85 @@ class SOUI_EXP SSkinTreeLines : public SSkinObjBase {
         ATTR_COLOR(L"colorCross", m_crCross, TRUE)
         ATTR_INT(L"lineWidth", m_nLineWidth, TRUE) // Line width
         ATTR_INT(L"boxSize", m_nBoxSize, TRUE)     // Expand/collapse box size)
+    SOUI_ATTRS_END()
+};
+
+/**
+ * @class      SSkinSvg
+ * @brief      SVG Skin with rasterization caching
+ *
+ * Description: Represents a skin that renders SVG data. The SVG is rasterized to a memory bitmap
+ * and cached. When the rendering size changes, the cache is automatically updated.
+ */
+class SOUI_EXP SSkinSvg : public SSkinObjBase {
+    DEF_SOBJECT(SSkinObjBase, L"svg")
+
+  public:
+    /**
+     * @brief Constructor for SSkinSvg.
+     */
+    SSkinSvg();
+
+    /**
+     * @brief Destructor for SSkinSvg.
+     */
+    virtual ~SSkinSvg();
+
+    /**
+     * @brief Gets the size of the skin.
+     * @return Size of the skin.
+     */
+    STDMETHOD_(SIZE, GetSkinSize)(THIS) SCONST OVERRIDE;
+
+    /**
+     * @brief Gets the number of states in the skin.
+     * @return Number of states (always 1 for SVG).
+     */
+    STDMETHOD_(int, GetStates)(THIS) SCONST OVERRIDE;
+
+  protected:
+    /**
+     * @brief Called when initialization is finished.
+     * @param pNode Pointer to the XML node.
+     */
+    STDMETHOD_(void, OnInitFinished)(THIS_ IXmlNode *pNode) OVERRIDE;
+
+    /**
+     * @brief Draws the skin by index.
+     * @param pRT Pointer to the render target.
+     * @param rcDraw Rectangle to draw in.
+     * @param iState State index.
+     * @param byAlpha Alpha value for transparency.
+     */
+    void _DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const override;
+
+    /**
+     * @brief Scales the skin.
+     * @param skinObj Pointer to the skin object.
+     * @param nScale Scale factor.
+     */
+    void _Scale(ISkinObj *skinObj, int nScale) override;
+
+  protected:
+    /**
+     * @brief Handles the 'src' attribute.
+     * @param value Source string (file path).
+     * @param bLoading TRUE if loading, FALSE otherwise.
+     * @return Result of the attribute handling.
+     */
+    HRESULT OnAttrSrc(const SStringW &value, BOOL bLoading);
+
+    BOOL LoadSvg();
+  protected:
+    mutable SAutoRefPtr<IBitmapS> m_cacheBitmap;   // Cached rasterized bitmap
+    mutable SIZE m_cacheSize;                      // Size of the cached bitmap
+    mutable SAutoRefPtr<ISvgObj> m_svgObj;                         // Parsed SVG object
+    SStringW m_strSrc;                             // SVG source file path
+    BOOL m_bEnableCache;                           // Cache enable flag
+
+    SOUI_ATTRS_BEGIN()
+        ATTR_CUSTOM(L"src", OnAttrSrc)             // SVG file path
+        ATTR_BOOL(L"cache", m_bEnableCache, TRUE)  // Enable caching
     SOUI_ATTRS_END()
 };
 

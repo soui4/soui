@@ -13,6 +13,8 @@
 #include <core/SkImageFilter.h>
 #include <src/effects/SkBlurMask.h>
 #include <pathops/SkPathOps.h>
+#include <svg/SkSVGParser.h>
+#include <svg/SkSVGTypes.h>
 #include <gdialpha.h>
 
 #include "drawtext-skia.h"
@@ -30,6 +32,8 @@
 #include <windows.h>
 #include <string/strcpcvt.h>
 #include <helper/SAutoBuf.h>
+#define NANOSVG_IMPLEMENTATION
+#include <src/nanosvg.h>
 
 #define getTotalClip internal_private_getTotalClip
 // #include <vld.h>
@@ -1831,8 +1835,309 @@ SNSBEGIN
         return m_curImageFilter;
     }
 
-	//////////////////////////////////////////////////////////////////////////
-	// SBitmap_Skia
+    static void nsvgPathToSkPath(const NSVGpath* nsvgPath, SkPath& skPath)
+    {
+        if (!nsvgPath || !nsvgPath->pts || nsvgPath->npts < 1)
+            return;
+
+        const float* pts = nsvgPath->pts;
+        int npts = nsvgPath->npts;
+
+        skPath.moveTo(pts[0], pts[1]);
+
+        for (int i = 0; i < npts - 1; i += 3)
+        {
+            if (i + 6 <= npts * 2)
+            {
+                float cp1x = pts[i * 2 + 2];
+                float cp1y = pts[i * 2 + 3];
+                float cp2x = pts[i * 2 + 4];
+                float cp2y = pts[i * 2 + 5];
+                float endx = pts[i * 2 + 6];
+                float endy = pts[i * 2 + 7];
+                skPath.cubicTo(cp1x, cp1y, cp2x, cp2y, endx, endy);
+            }
+        }
+
+        if (nsvgPath->closed)
+            skPath.close();
+    }
+
+    static SkColor nsvgColorToSkColor(unsigned int color, float opacity)
+    {
+        unsigned char a = (unsigned char)((color >> 24) & 0xFF);
+        unsigned char r = (unsigned char)(color & 0xFF);
+        unsigned char g = (unsigned char)((color >> 8) & 0xFF);
+        unsigned char b = (unsigned char)((color >> 16) & 0xFF);
+        a = (unsigned char)(a * opacity);
+        return SkColorSetARGB(a, r, g, b);
+    }
+
+    static void nsvgPaintToSkPaint(const NSVGpaint* paint, float opacity, SkPaint& skPaint, const float* xform)
+    {
+        if (!paint)
+        {
+            skPaint.setColor(SK_ColorTRANSPARENT);
+            return;
+        }
+
+        switch (paint->type)
+        {
+        case NSVG_PAINT_NONE:
+            skPaint.setColor(SK_ColorTRANSPARENT);
+            break;
+        case NSVG_PAINT_COLOR:
+            skPaint.setColor(nsvgColorToSkColor(paint->color, opacity));
+            break;
+        case NSVG_PAINT_LINEAR_GRADIENT:
+        case NSVG_PAINT_RADIAL_GRADIENT:
+            {
+                NSVGgradient* grad = paint->gradient;
+                if (!grad || grad->nstops <= 0)
+                {
+                    skPaint.setColor(SK_ColorTRANSPARENT);
+                    break;
+                }
+
+                SkPoint pts[2];
+                SkColor colors[8];
+                SkScalar pos[8];
+                int nstops = grad->nstops > 8 ? 8 : grad->nstops;
+
+                for (int i = 0; i < nstops; i++)
+                {
+                    pos[i] = grad->stops[i].offset;
+                    colors[i] = nsvgColorToSkColor(grad->stops[i].color, opacity);
+                }
+
+                if (paint->type == NSVG_PAINT_LINEAR_GRADIENT)
+                {
+                    pts[0].set(grad->xform[4], grad->xform[5]);
+                    pts[1].set(grad->xform[2] + grad->xform[4], grad->xform[3] + grad->xform[5]);
+                    SkShader* shader = SkGradientShader::CreateLinear(pts, colors, pos, nstops,
+                        (SkShader::TileMode)grad->spread);
+                    skPaint.setShader(shader);
+                    shader->unref();
+                }
+                else
+                {
+                    SkPoint center;
+                    center.set(grad->xform[4], grad->xform[5]);
+                    SkScalar radius = SkScalarSqrt(grad->xform[0] * grad->xform[0] + grad->xform[1] * grad->xform[1]);
+                    SkShader* shader = SkGradientShader::CreateRadial(center, radius, colors, pos, nstops,
+                        (SkShader::TileMode)grad->spread);
+                    skPaint.setShader(shader);
+                    shader->unref();
+                }
+            }
+            break;
+        default:
+            skPaint.setColor(SK_ColorTRANSPARENT);
+            break;
+        }
+    }
+
+    static void renderNSVGshape(SkCanvas* canvas, const NSVGshape* shape, float scale, float tx, float ty, BYTE byAlpha)
+    {
+        if (!shape || !canvas)
+            return;
+
+        if (!(shape->flags & NSVG_FLAGS_VISIBLE))
+            return;
+
+        SkPaint fillPaint;
+        fillPaint.setAntiAlias(true);
+        fillPaint.setStyle(SkPaint::kFill_Style);
+
+        SkPaint strokePaint;
+        strokePaint.setAntiAlias(true);
+        strokePaint.setStyle(SkPaint::kStroke_Style);
+        strokePaint.setStrokeWidth(shape->strokeWidth * scale);
+        strokePaint.setStrokeMiter(shape->miterLimit * scale);
+
+        switch (shape->strokeLineCap)
+        {
+        case NSVG_CAP_BUTT: strokePaint.setStrokeCap(SkPaint::kButt_Cap); break;
+        case NSVG_CAP_ROUND: strokePaint.setStrokeCap(SkPaint::kRound_Cap); break;
+        case NSVG_CAP_SQUARE: strokePaint.setStrokeCap(SkPaint::kSquare_Cap); break;
+        }
+
+        switch (shape->strokeLineJoin)
+        {
+        case NSVG_JOIN_MITER: strokePaint.setStrokeJoin(SkPaint::kMiter_Join); break;
+        case NSVG_JOIN_ROUND: strokePaint.setStrokeJoin(SkPaint::kRound_Join); break;
+        case NSVG_JOIN_BEVEL: strokePaint.setStrokeJoin(SkPaint::kBevel_Join); break;
+        }
+
+        float opacity = shape->opacity * (byAlpha / 255.0f);
+
+        for (const NSVGpath* path = shape->paths; path != NULL; path = path->next)
+        {
+            SkPath skPath;
+            nsvgPathToSkPath(path, skPath);
+
+            SkPath transformedPath;
+            SkMatrix matrix;
+            matrix.setScale(scale, scale);
+            matrix.postTranslate(tx, ty);
+            skPath.transform(matrix, &transformedPath);
+
+            unsigned char paintOrder = shape->paintOrder;
+            for (int j = 0; j < 3; j++)
+            {
+                unsigned char order = (paintOrder >> (2 * j)) & 0x03;
+
+                if (order == NSVG_PAINT_FILL && shape->fill.type != NSVG_PAINT_NONE)
+                {
+                    nsvgPaintToSkPaint(&shape->fill, opacity, fillPaint, shape->xform);
+                    if (shape->fillRule == NSVG_FILLRULE_EVENODD)
+                        transformedPath.setFillType(SkPath::kEvenOdd_FillType);
+                    else
+                        transformedPath.setFillType(SkPath::kWinding_FillType);
+                    canvas->drawPath(transformedPath, fillPaint);
+                }
+                else if (order == NSVG_PAINT_STROKE && shape->stroke.type != NSVG_PAINT_NONE && shape->strokeWidth > 0)
+                {
+                    nsvgPaintToSkPaint(&shape->stroke, opacity, strokePaint, shape->xform);
+                    canvas->drawPath(transformedPath, strokePaint);
+                }
+            }
+        }
+    }
+
+    static void renderNSVGtext(SkCanvas* canvas, const NSVGtext* text, float scale, float tx, float ty, BYTE byAlpha)
+    {
+        if (!text || !canvas || text->text[0] == '\0')
+            return;
+
+        SkPaint paint;
+        paint.setAntiAlias(true);
+        paint.setTextEncoding(SkPaint::kUTF8_TextEncoding);
+
+        float fontSize = text->fontSize * scale;
+        if (fontSize <= 0) fontSize = 16.0f * scale;
+        paint.setTextSize(fontSize);
+
+        SkTypeface::Style style = SkTypeface::kNormal;
+        if (text->fontStyle == 1 || text->fontStyle == 2) {
+            style = SkTypeface::kItalic;
+        }
+        if (text->fontWeight >= 7) {
+            style = (SkTypeface::Style)(style | SkTypeface::kBold);
+        }
+
+        SkTypeface* typeface = SkTypeface::CreateFromName(text->fontFamily, style);
+        if (typeface) {
+            paint.setTypeface(typeface);
+            typeface->unref();
+        }
+
+        float opacity = text->opacity * (byAlpha / 255.0f);
+        paint.setColor(nsvgColorToSkColor(text->fillColor, opacity));
+
+        float x = text->x * scale + tx;
+        float y = text->y * scale + ty;
+
+        SkRect bounds;
+        paint.measureText(text->text, strlen(text->text), &bounds);
+
+        switch (text->anchor)
+        {
+        case NSVG_ANCHOR_MIDDLE:
+            x -= bounds.width() / 2.0f;
+            break;
+        case NSVG_ANCHOR_END:
+            x -= bounds.width();
+            break;
+        default:
+            break;
+        }
+
+        SkMatrix textMatrix;
+        textMatrix.setAll(
+            text->xform[0] * scale, text->xform[2] * scale, text->xform[4] * scale + tx,
+            text->xform[1] * scale, text->xform[3] * scale, text->xform[5] * scale + ty,
+            0, 0, 1);
+
+        bool hasTransform = !textMatrix.isIdentity();
+
+        if (hasTransform)
+        {
+            canvas->save();
+            canvas->concat(textMatrix);
+
+            float localX = 0;
+            float localY = 0;
+
+            SkRect localBounds;
+            paint.measureText(text->text, strlen(text->text), &localBounds);
+
+            switch (text->anchor)
+            {
+            case NSVG_ANCHOR_MIDDLE:
+                localX -= localBounds.width() / 2.0f;
+                break;
+            case NSVG_ANCHOR_END:
+                localX -= localBounds.width();
+                break;
+            default:
+                break;
+            }
+
+            canvas->drawText(text->text, strlen(text->text), localX, localY, paint);
+            canvas->restore();
+        }
+        else
+        {
+            canvas->drawText(text->text, strlen(text->text), x, y, paint);
+        }
+    }
+
+    HRESULT SRenderTarget_Skia::DrawSVG(THIS_ ISvgObj*  pSvgObj, LPCRECT pRect, BYTE byAlpha)
+    {
+        if (!pSvgObj || !pRect)
+            return E_INVALIDARG;
+
+        if (!m_SkCanvas)
+            return E_FAIL;
+
+        NSVGimage *pSvg = (NSVGimage *)pSvgObj->GetPtr();
+
+        SkRect skRect = toSkRect(pRect);
+        skRect.offset(m_ptOrg);
+
+        float svgWidth = pSvg->width;
+        float svgHeight = pSvg->height;
+        if (svgWidth <= 0 || svgHeight <= 0)
+        {
+            svgWidth = (float)(pRect->right - pRect->left);
+            svgHeight = (float)(pRect->bottom - pRect->top);
+        }
+
+        float scaleX = (pRect->right - pRect->left) / svgWidth;
+        float scaleY = (pRect->bottom - pRect->top) / svgHeight;
+        float scale = scaleX < scaleY ? scaleX : scaleY;
+
+        float tx = skRect.fLeft;
+        float ty = skRect.fTop;
+
+        m_SkCanvas->save();
+        m_SkCanvas->clipRect(skRect);
+
+        for (NSVGshape* shape = pSvg->shapes; shape != NULL; shape = shape->next)
+        {
+            renderNSVGshape(m_SkCanvas, shape, scale, tx, ty, byAlpha);
+        }
+
+        for (NSVGtext* text = pSvg->texts; text != NULL; text = text->next)
+        {
+            renderNSVGtext(m_SkCanvas, text, scale, tx, ty, byAlpha);
+        }
+
+        m_SkCanvas->restore();
+        return S_OK;
+    }
+
 	static int s_cBmp = 0;
 	SBitmap_Skia::SBitmap_Skia( IRenderFactory *pRenderFac ) :TSkiaRenderObjImpl<IBitmapS,OT_BITMAP>(pRenderFac),m_hBmp(0)
 	{

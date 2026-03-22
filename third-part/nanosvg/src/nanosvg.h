@@ -71,10 +71,8 @@ extern "C" {
 	nsvgDelete(image);
 */
 
-#ifdef _WIN32
-#define strtoll _strtoui64
-#endif 
 enum NSVGpaintType {
+	NSVG_PAINT_UNDEF = -1,
 	NSVG_PAINT_NONE = 0,
 	NSVG_PAINT_COLOR = 1,
 	NSVG_PAINT_LINEAR_GRADIENT = 2,
@@ -108,6 +106,12 @@ enum NSVGflags {
 	NSVG_FLAGS_VISIBLE = 0x01
 };
 
+enum NSVGpaintOrder {
+	NSVG_PAINT_FILL = 0x00,
+	NSVG_PAINT_MARKERS = 0x01,
+	NSVG_PAINT_STROKE = 0x02,
+};
+
 typedef struct NSVGgradientStop {
 	unsigned int color;
 	float offset;
@@ -122,7 +126,7 @@ typedef struct NSVGgradient {
 } NSVGgradient;
 
 typedef struct NSVGpaint {
-	char type;
+	signed char type;
 	union {
 		unsigned int color;
 		NSVGgradient* gradient;
@@ -146,23 +150,52 @@ typedef struct NSVGshape
 	float opacity;				// Opacity of the shape.
 	float strokeWidth;			// Stroke width (scaled).
 	float strokeDashOffset;		// Stroke dash offset (scaled).
-	float strokeDashArray[8];			// Stroke dash array (scaled).
-	char strokeDashCount;				// Number of dash values in dash array.
+	float strokeDashArray[8];	// Stroke dash array (scaled).
+	char strokeDashCount;		// Number of dash values in dash array.
 	char strokeLineJoin;		// Stroke join type.
 	char strokeLineCap;			// Stroke cap type.
 	float miterLimit;			// Miter limit
 	char fillRule;				// Fill rule, see NSVGfillRule.
+    unsigned char paintOrder;	// Encoded paint order (3×2-bit fields) see NSVGpaintOrder
 	unsigned char flags;		// Logical or of NSVG_FLAGS_* flags
 	float bounds[4];			// Tight bounding box of the shape [minx,miny,maxx,maxy].
+	char fillGradient[64];		// Optional 'id' of fill gradient
+	char strokeGradient[64];	// Optional 'id' of stroke gradient
+	float xform[6];				// Root transformation for fill/stroke gradient
 	NSVGpath* paths;			// Linked list of paths in the image.
 	struct NSVGshape* next;		// Pointer to next shape, or NULL if last element.
 } NSVGshape;
+
+
+typedef enum NSGAnchorText
+{
+    NSVG_ANCHOR_START = 0,
+    NSVG_ANCHOR_MIDDLE,
+    NSVG_ANCHOR_END
+} NSGAnchorText;
+
+typedef struct NSVGtext
+{
+	char id[64];				// Optional 'id' attr
+	float x, y;					// Text position
+	float fontSize;				// Font size
+	char fontFamily[64];		// Font family
+	char fontWeight;			// Font weight
+	char fontStyle;				// Font style
+	NSGAnchorText anchor;		// Text anchor
+	unsigned int fillColor;		// Fill color
+	float opacity;				// Opacity
+	float xform[6];				// Transformation matrix
+	struct NSVGtext* next;		// Pointer to next text element
+	char text[1];			    // Text content
+} NSVGtext;
 
 typedef struct NSVGimage
 {
 	float width;				// Width of the image.
 	float height;				// Height of the image.
 	NSVGshape* shapes;			// Linked list of shapes in the image.
+	NSVGtext* texts;			// Linked list of text elements in the image.
 } NSVGimage;
 
 // Parses SVG file from a file, returns SVG image as paths.
@@ -184,12 +217,11 @@ void nsvgDelete(NSVGimage* image);
 #endif
 #endif
 
-#endif // NANOSVG_H
-
 #ifdef NANOSVG_IMPLEMENTATION
 
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <math.h>
 
 #define NSVG_PI (3.14159265358979323846264338327f)
@@ -203,7 +235,8 @@ void nsvgDelete(NSVGimage* image);
 #define NSVG_ALIGN_SLICE 2
 
 #define NSVG_NOTUSED(v) do { (void)(1 ? (void)0 : ( (void)(v) ) ); } while(0)
-#define NSVG_RGB(r, g, b) (((unsigned int)r) | ((unsigned int)g << 8) | ((unsigned int)b << 16))
+#define NSVG_RGBA(r, g, b, a) (((unsigned int)r)| ((unsigned int)g << 8)| ((unsigned int)b << 16) | ((unsigned int)a << 24)  )
+#define NSVG_RGB(r, g, b) NSVG_RGBA((r), (g), (b), 255)
 
 #ifdef _MSC_VER
 	#pragma warning (disable: 4996) // Switch off security warnings
@@ -398,7 +431,7 @@ typedef struct NSVGgradientData
 {
 	char id[64];
 	char ref[64];
-	char type;
+	signed char type;
 	union {
 		NSVGlinearData linear;
 		NSVGradialData radial;
@@ -437,6 +470,14 @@ typedef struct NSVGattrib
 	char hasFill;
 	char hasStroke;
 	char visible;
+    unsigned char paintOrder;
+    char fontFamily[64];
+    char fontWeight;
+    char fontStyle;
+    NSGAnchorText anchor;
+    char textDecoration;
+    float letterSpacing;
+    float wordSpacing;
 } NSVGattrib;
 
 typedef struct NSVGparser
@@ -450,11 +491,15 @@ typedef struct NSVGparser
 	NSVGimage* image;
 	NSVGgradientData* gradients;
 	NSVGshape* shapesTail;
+	NSVGtext* textsTail;
 	float viewMinx, viewMiny, viewWidth, viewHeight;
 	int alignX, alignY, alignType;
 	float dpi;
 	char pathFlag;
 	char defsFlag;
+	char textFlag;
+	char textBuffer[1024];
+	int textBufferLen;
 } NSVGparser;
 
 static void nsvg__xformIdentity(float* t)
@@ -614,7 +659,11 @@ static void nsvg__curveBounds(float* bounds, float* curve)
 	}
 }
 
-static NSVGparser* nsvg__createParser()
+static unsigned char nsvg__encodePaintOrder(enum NSVGpaintOrder a, enum NSVGpaintOrder b, enum NSVGpaintOrder c) {
+    return (a & 0x03) | ((b & 0x03) << 2) | ((c & 0x03) << 4);
+}
+
+static NSVGparser* nsvg__createParser(void)
 {
 	NSVGparser* p;
 	p = (NSVGparser*)malloc(sizeof(NSVGparser));
@@ -641,7 +690,15 @@ static NSVGparser* nsvg__createParser()
 	p->attr[0].fillRule = NSVG_FILLRULE_NONZERO;
 	p->attr[0].hasFill = 1;
 	p->attr[0].visible = 1;
-
+    p->attr[0].paintOrder = nsvg__encodePaintOrder(NSVG_PAINT_FILL, NSVG_PAINT_STROKE, NSVG_PAINT_MARKERS);
+    p->attr[0].fontSize = 16.0f;
+    strcpy(p->attr[0].fontFamily, "sans-serif");
+    p->attr[0].fontWeight = 4;
+    p->attr[0].fontStyle = 0;
+    p->attr[0].textDecoration = 0;
+    p->attr[0].letterSpacing = 0;
+    p->attr[0].wordSpacing = 0;
+	p->attr[0].anchor = NSVG_ANCHOR_START;
 	return p;
 
 error:
@@ -818,9 +875,8 @@ static NSVGgradientData* nsvg__findGradientData(NSVGparser* p, const char* id)
 	return NULL;
 }
 
-static NSVGgradient* nsvg__createGradient(NSVGparser* p, const char* id, const float* localBounds, char* paintType)
+static NSVGgradient* nsvg__createGradient(NSVGparser* p, const char* id, const float* localBounds, float *xform, signed char* paintType)
 {
-	NSVGattrib* attr = nsvg__getAttr(p);
 	NSVGgradientData* data = NULL;
 	NSVGgradientData* ref = NULL;
 	NSVGgradientStop* stops = NULL;
@@ -895,7 +951,7 @@ static NSVGgradient* nsvg__createGradient(NSVGparser* p, const char* id, const f
 	}
 
 	nsvg__xformMultiply(grad->xform, data->xform);
-	nsvg__xformMultiply(grad->xform, attr->xform);
+	nsvg__xformMultiply(grad->xform, xform);
 
 	grad->spread = data->spread;
 	memcpy(grad->stops, stops, nstops*sizeof(NSVGgradientStop));
@@ -959,6 +1015,9 @@ static void nsvg__addShape(NSVGparser* p)
 	memset(shape, 0, sizeof(NSVGshape));
 
 	memcpy(shape->id, attr->id, sizeof shape->id);
+	memcpy(shape->fillGradient, attr->fillGradient, sizeof shape->fillGradient);
+	memcpy(shape->strokeGradient, attr->strokeGradient, sizeof shape->strokeGradient);
+	memcpy(shape->xform, attr->xform, sizeof shape->xform);
 	scale = nsvg__getAverageScale(attr->xform);
 	shape->strokeWidth = attr->strokeWidth * scale;
 	shape->strokeDashOffset = attr->strokeDashOffset * scale;
@@ -970,6 +1029,7 @@ static void nsvg__addShape(NSVGparser* p)
 	shape->miterLimit = attr->miterLimit;
 	shape->fillRule = attr->fillRule;
 	shape->opacity = attr->opacity;
+    shape->paintOrder = attr->paintOrder;
 
 	shape->paths = p->plist;
 	p->plist = NULL;
@@ -994,13 +1054,7 @@ static void nsvg__addShape(NSVGparser* p)
 		shape->fill.color = attr->fillColor;
 		shape->fill.color |= (unsigned int)(attr->fillOpacity*255) << 24;
 	} else if (attr->hasFill == 2) {
-		float inv[6], localBounds[4];
-		nsvg__xformInverse(inv, attr->xform);
-		nsvg__getLocalBounds(localBounds, shape, inv);
-		shape->fill.gradient = nsvg__createGradient(p, attr->fillGradient, localBounds, &shape->fill.type);
-		if (shape->fill.gradient == NULL) {
-			shape->fill.type = NSVG_PAINT_NONE;
-		}
+		shape->fill.type = NSVG_PAINT_UNDEF;
 	}
 
 	// Set stroke
@@ -1011,12 +1065,7 @@ static void nsvg__addShape(NSVGparser* p)
 		shape->stroke.color = attr->strokeColor;
 		shape->stroke.color |= (unsigned int)(attr->strokeOpacity*255) << 24;
 	} else if (attr->hasStroke == 2) {
-		float inv[6], localBounds[4];
-		nsvg__xformInverse(inv, attr->xform);
-		nsvg__getLocalBounds(localBounds, shape, inv);
-		shape->stroke.gradient = nsvg__createGradient(p, attr->strokeGradient, localBounds, &shape->stroke.type);
-		if (shape->stroke.gradient == NULL)
-			shape->stroke.type = NSVG_PAINT_NONE;
+		shape->stroke.type = NSVG_PAINT_UNDEF;
 	}
 
 	// Set flags
@@ -1096,7 +1145,7 @@ error:
 }
 
 // We roll our own string to float because the std library one uses locale and messes things up.
-static float nsvg__atof(const char* s)
+static double nsvg__atof(const char* s)
 {
 	char* cur = (char*)s;
 	char* end = NULL;
@@ -1115,7 +1164,7 @@ static float nsvg__atof(const char* s)
 	// Parse integer part
 	if (nsvg__isdigit(*cur)) {
 		// Parse digit sequence
-		intPart = strtoll(cur, &end, 10);
+		intPart = strtol(cur, &end, 10);
 		if (cur != end) {
 			res = (double)intPart;
 			hasIntPart = 1;
@@ -1128,7 +1177,7 @@ static float nsvg__atof(const char* s)
 		cur++; // Skip '.'
 		if (nsvg__isdigit(*cur)) {
 			// Parse digit sequence
-			fracPart = strtoll(cur, &end, 10);
+			fracPart = strtol(cur, &end, 10);
 			if (cur != end) {
 				res += (double)fracPart / pow(10.0, (double)(end - cur));
 				hasFracPart = 1;
@@ -1139,7 +1188,7 @@ static float nsvg__atof(const char* s)
 
 	// A valid number should have integer or fractional part.
 	if (!hasIntPart && !hasFracPart)
-		return 0.0f;
+		return 0.0;
 
 	// Parse optional exponent
 	if (*cur == 'e' || *cur == 'E') {
@@ -1151,7 +1200,7 @@ static float nsvg__atof(const char* s)
 		}
 	}
 
-	return (float)(res * sign);
+	return res * sign;
 }
 
 
@@ -1198,6 +1247,19 @@ static const char* nsvg__parseNumber(const char* s, char* it, const int size)
 	return s;
 }
 
+static const char* nsvg__getNextPathItemWhenArcFlag(const char* s, char* it)
+{
+	it[0] = '\0';
+	while (*s && (nsvg__isspace(*s) || *s == ',')) s++;
+	if (!*s) return s;
+	if (*s == '0' || *s == '1') {
+		it[0] = *s++;
+		it[1] = '\0';
+		return s;
+	}
+	return s;
+}
+
 static const char* nsvg__getNextPathItem(const char* s, char* it)
 {
 	it[0] = '\0';
@@ -1218,22 +1280,221 @@ static const char* nsvg__getNextPathItem(const char* s, char* it)
 
 static unsigned int nsvg__parseColorHex(const char* str)
 {
-	unsigned int r=0, g=0, b=0;
+	unsigned int r=0, g=0, b=0, a=255;
+	if (sscanf(str, "#%2x%2x%2x%2x", &r, &g, &b, &a) == 4 )		// 2 digit hex with alpha
+		return NSVG_RGBA(r, g, b, a);
 	if (sscanf(str, "#%2x%2x%2x", &r, &g, &b) == 3 )		// 2 digit hex
 		return NSVG_RGB(r, g, b);
+	if (sscanf(str, "#%1x%1x%1x%1x", &r, &g, &b, &a) == 4 )		// 1 digit hex with alpha, e.g. #rgba -> 0xaabbccdd
+		return NSVG_RGBA(r*17, g*17, b*17, a*17);
 	if (sscanf(str, "#%1x%1x%1x", &r, &g, &b) == 3 )		// 1 digit hex, e.g. #abc -> 0xccbbaa
-		return NSVG_RGB(r*17, g*17, b*17);			// same effect as (r<<4|r), (g<<4|g), ..
-	return NSVG_RGB(128, 128, 128);
+		return NSVG_RGB(r*17, g*17, b*17);		// same effect as (r<<4|r), (g<<4|g), ..
+	return NSVG_RGB(r, g, b);
 }
+
+static int nsvg_roundf(float v){
+	return (int)((v>0.f)?(v+0.5f):(v-0.5f));
+}
+
+// Parse rgb color. The pointer 'str' must point at "rgb(" (4+ characters).
+// This function returns gray (rgb(128, 128, 128) == '#808080') on parse errors
+// for backwards compatibility. Note: other image viewers return black instead.
 
 static unsigned int nsvg__parseColorRGB(const char* str)
 {
-	unsigned int r=0, g=0, b=0;
-	if (sscanf(str, "rgb(%u, %u, %u)", &r, &g, &b) == 3)		// decimal integers
-		return NSVG_RGB(r, g, b);
-	if (sscanf(str, "rgb(%u%%, %u%%, %u%%)", &r, &g, &b) == 3)	// decimal integer percentage
-		return NSVG_RGB(r*255/100, g*255/100, b*255/100);
-	return NSVG_RGB(128, 128, 128);
+	int i;
+	unsigned int rgbi[3];
+	float rgbf[3];
+	// try decimal integers first
+	if (sscanf(str, "rgb(%u, %u, %u)", &rgbi[0], &rgbi[1], &rgbi[2]) != 3) {
+		// integers failed, try percent values (float, locale independent)
+		const char delimiter[3] = {',', ',', ')'};
+		str += 4; // skip "rgb("
+		for (i = 0; i < 3; i++) {
+			while (*str && (nsvg__isspace(*str))) str++; 	// skip leading spaces
+			if (*str == '+') str++;				// skip '+' (don't allow '-')
+			if (!*str) break;
+			rgbf[i] = nsvg__atof(str);
+
+			// Note 1: it would be great if nsvg__atof() returned how many
+			// bytes it consumed but it doesn't. We need to skip the number,
+			// the '%' character, spaces, and the delimiter ',' or ')'.
+
+			// Note 2: The following code does not allow values like "33.%",
+			// i.e. a decimal point w/o fractional part, but this is consistent
+			// with other image viewers, e.g. firefox, chrome, eog, gimp.
+
+			while (*str && nsvg__isdigit(*str)) str++;		// skip integer part
+			if (*str == '.') {
+				str++;
+				if (!nsvg__isdigit(*str)) break;		// error: no digit after '.'
+				while (*str && nsvg__isdigit(*str)) str++;	// skip fractional part
+			}
+			if (*str == '%') str++; else break;
+			while (*str && nsvg__isspace(*str)) str++;
+			if (*str == delimiter[i]) str++;
+			else break;
+		}
+		if (i == 3) {
+			rgbi[0] = nsvg_roundf(rgbf[0] * 2.55f);
+			rgbi[1] = nsvg_roundf(rgbf[1] * 2.55f);
+			rgbi[2] = nsvg_roundf(rgbf[2] * 2.55f);
+		} else {
+			rgbi[0] = rgbi[1] = rgbi[2] = 128;
+		}
+	}
+	// clip values as the CSS spec requires
+	for (i = 0; i < 3; i++) {
+		if (rgbi[i] > 255) rgbi[i] = 255;
+	}
+	return NSVG_RGB(rgbi[0], rgbi[1], rgbi[2]);
+}
+
+// Parse rgba color. The pointer 'str' must point at "rgba(" (5+ characters).
+// This function returns gray (rgba(128, 128, 128, 1) == '#808080') on parse errors
+static unsigned int nsvg__parseColorRGBA(const char* str)
+{
+	int i;
+	unsigned int rgbi[4];
+	float rgbf[4];
+	// try decimal integers first
+	if (sscanf(str, "rgba(%u, %u, %u, %f)", &rgbi[0], &rgbi[1], &rgbi[2], &rgbf[3]) != 4) {
+		// integers failed, try percent values (float, locale independent)
+		const char delimiter[4] = {',', ',', ',', ')' };
+		str += 5; // skip "rgba("
+		for (i = 0; i < 4; i++) {
+			while (*str && (nsvg__isspace(*str))) str++; 	// skip leading spaces
+			if (i < 3 && *str == '+') str++; 			// skip '+' (don't allow '-') for RGB
+			if (!*str) break;
+			rgbf[i] = nsvg__atof(str);
+
+			// Note 1: it would be great if nsvg__atof() returned how many
+			// bytes it consumed but it doesn't. We need to skip the number,
+			// the '%' character (for RGB), spaces, and the delimiter ',' or ')'.
+
+			while (*str && nsvg__isdigit(*str)) str++; 		// skip integer part
+			if (*str == '.') {
+				str++;
+				if (!nsvg__isdigit(*str)) break; 		// error: no digit after '.'
+				while (*str && nsvg__isdigit(*str)) str++; 	// skip fractional part
+			}
+			if (i < 3 && *str == '%') str++; else if (i < 3) break;
+			while (*str && nsvg__isspace(*str)) str++;
+			if (*str == delimiter[i]) str++;
+			else break;
+		}
+		if (i == 4) {
+			rgbi[0] = nsvg_roundf(rgbf[0] * 2.55f);
+			rgbi[1] = nsvg_roundf(rgbf[1] * 2.55f);
+			rgbi[2] = nsvg_roundf(rgbf[2] * 2.55f);
+			rgbi[3] = nsvg_roundf(rgbf[3] * 255.0f);
+		} else {
+			rgbi[0] = rgbi[1] = rgbi[2] = 128;
+			rgbi[3] = 255;
+		}
+	} else {
+		rgbi[3] = nsvg_roundf(rgbf[3] * 255.0f);
+	}
+	// clip values as the CSS spec requires
+	for (i = 0; i < 4; i++) {
+		if (rgbi[i] > 255) rgbi[i] = 255;
+	}
+	return NSVG_RGBA(rgbi[0], rgbi[1], rgbi[2], rgbi[3]);
+}
+
+// Convert HSL to RGB
+static void nsvg__hslToRgb(float h, float s, float l, unsigned int* r, unsigned int* g, unsigned int* b)
+{
+	float c = (1.0f - fabs(2.0f * l - 1.0f)) * s;
+	float x = c * (1.0f - fabs(fmod(h / 60.0f, 2.0f) - 1.0f));
+	float m = l - c / 2.0f;
+	float rf, gf, bf;
+
+	if (h >= 0 && h < 60) {
+		rf = c; gf = x; bf = 0;
+	} else if (h >= 60 && h < 120) {
+		rf = x; gf = c; bf = 0;
+	} else if (h >= 120 && h < 180) {
+		rf = 0; gf = c; bf = x;
+	} else if (h >= 180 && h < 240) {
+		rf = 0; gf = x; bf = c;
+	} else if (h >= 240 && h < 300) {
+		rf = x; gf = 0; bf = c;
+	} else {
+		rf = c; gf = 0; bf = x;
+	}
+
+	*r = nsvg_roundf((rf + m) * 255.0f);
+	*g = nsvg_roundf((gf + m) * 255.0f);
+	*b = nsvg_roundf((bf + m) * 255.0f);
+}
+
+// Parse hsl color. The pointer 'str' must point at "hsl(" (4+ characters).
+// This function returns gray (hsl(0, 0%, 50%) == '#808080') on parse errors
+static unsigned int nsvg__parseColorHSL(const char* str)
+{
+	int i;
+	float hsl[3];
+	unsigned int r, g, b;
+	
+	// try decimal values
+	if (sscanf(str, "hsl(%f, %f%%, %f%%)", &hsl[0], &hsl[1], &hsl[2]) != 3) {
+		// parsing failed
+		r = g = b = 128;
+	} else {
+		// normalize values
+		hsl[1] /= 100.0f;
+		hsl[2] /= 100.0f;
+		
+		// clip values
+		if (hsl[0] < 0) hsl[0] = 0;
+		if (hsl[0] > 360) hsl[0] = 360;
+		if (hsl[1] < 0) hsl[1] = 0;
+		if (hsl[1] > 1) hsl[1] = 1;
+		if (hsl[2] < 0) hsl[2] = 0;
+		if (hsl[2] > 1) hsl[2] = 1;
+		
+		// convert to RGB
+		nsvg__hslToRgb(hsl[0], hsl[1], hsl[2], &r, &g, &b);
+	}
+	
+	return (255 << 24) | (b << 16) | (g << 8) | r;
+}
+
+// Parse hsla color. The pointer 'str' must point at "hsla(" (5+ characters).
+// This function returns gray (hsla(0, 0%, 50%, 1) == '#808080') on parse errors
+static unsigned int nsvg__parseColorHSLA(const char* str)
+{
+	int i;
+	float hsla[4];
+	unsigned int r, g, b, a;
+	
+	// try decimal values
+	if (sscanf(str, "hsla(%f, %f%%, %f%%, %f)", &hsla[0], &hsla[1], &hsla[2], &hsla[3]) != 4) {
+		// parsing failed
+		r = g = b = 128;
+		a = 255;
+	} else {
+		// normalize values
+		hsla[1] /= 100.0f;
+		hsla[2] /= 100.0f;
+		
+		// clip values
+		if (hsla[0] < 0) hsla[0] = 0;
+		if (hsla[0] > 360) hsla[0] = 360;
+		if (hsla[1] < 0) hsla[1] = 0;
+		if (hsla[1] > 1) hsla[1] = 1;
+		if (hsla[2] < 0) hsla[2] = 0;
+		if (hsla[2] > 1) hsla[2] = 1;
+		if (hsla[3] < 0) hsla[3] = 0;
+		if (hsla[3] > 1) hsla[3] = 1;
+		
+		// convert to RGB
+		nsvg__hslToRgb(hsla[0], hsla[1], hsla[2], &r, &g, &b);
+		a = nsvg_roundf(hsla[3] * 255.0f);
+	}
+	
+	return NSVG_RGBA(r, g, b, a);
 }
 
 typedef struct NSVGNamedColor {
@@ -1244,12 +1505,12 @@ typedef struct NSVGNamedColor {
 NSVGNamedColor nsvg__colors[] = {
 
 	{ "red", NSVG_RGB(255, 0, 0) },
-	{ "green", NSVG_RGB( 0, 128, 0) },
-	{ "blue", NSVG_RGB( 0, 0, 255) },
-	{ "yellow", NSVG_RGB(255, 255, 0) },
-	{ "cyan", NSVG_RGB( 0, 255, 255) },
+	{ "green", NSVG_RGB(0, 255, 0) },
+	{ "blue", NSVG_RGB(255, 0, 0) },
+	{ "yellow", NSVG_RGB(0, 255, 255) },
+	{ "cyan", NSVG_RGB(255, 255, 0) },
 	{ "magenta", NSVG_RGB(255, 0, 255) },
-	{ "black", NSVG_RGB( 0, 0, 0) },
+	{ "black", NSVG_RGB(0, 0, 0) },
 	{ "grey", NSVG_RGB(128, 128, 128) },
 	{ "gray", NSVG_RGB(128, 128, 128) },
 	{ "white", NSVG_RGB(255, 255, 255) },
@@ -1410,13 +1671,20 @@ static unsigned int nsvg__parseColorName(const char* str)
 
 static unsigned int nsvg__parseColor(const char* str)
 {
-	size_t len = 0;
 	while(*str == ' ') ++str;
-	len = strlen(str);
-	if (len >= 1 && *str == '#')
+	if (*str == '#')
 		return nsvg__parseColorHex(str);
-	else if (len >= 4 && str[0] == 'r' && str[1] == 'g' && str[2] == 'b' && str[3] == '(')
-		return nsvg__parseColorRGB(str);
+	else if (str[0] == 'r' && str[1] == 'g' && str[2] == 'b') {
+		if (str[3] == 'a' && str[4] == '(')
+			return nsvg__parseColorRGBA(str);
+		else if (str[3] == '(')
+			return nsvg__parseColorRGB(str);
+	} else if (str[0] == 'h' && str[1] == 's' && str[2] == 'l') {
+		if (str[3] == 'a' && str[4] == '(')
+			return nsvg__parseColorHSLA(str);
+		else if (str[3] == '(')
+			return nsvg__parseColorHSL(str);
+	}
 	return nsvg__parseColorName(str);
 }
 
@@ -1464,7 +1732,7 @@ static int nsvg__isCoordinate(const char* s)
 	if (*s == '-' || *s == '+')
 		s++;
 	// must have at least one digit, or start by a dot
-	return (nsvg__isdigit(*s) || *s == '.');
+	return nsvg__isdigit(*s) || *s == '.';
 }
 
 static NSVGcoordinate nsvg__parseCoordinateRaw(const char* str)
@@ -1641,9 +1909,9 @@ static void nsvg__parseUrl(char* id, const char* str)
 {
 	int i = 0;
 	str += 4; // "url(";
-	if (*str == '#')
+	if (*str && *str == '#')
 		str++;
-	while (i < 63 && *str != ')') {
+	while (i < 63 && *str && *str != ')') {
 		id[i] = *str++;
 		i++;
 	}
@@ -1682,6 +1950,24 @@ static char nsvg__parseFillRule(const char* str)
 		return NSVG_FILLRULE_EVENODD;
 	// TODO: handle inherit.
 	return NSVG_FILLRULE_NONZERO;
+}
+
+static unsigned char nsvg__parsePaintOrder(const char* str)
+{
+	if (strcmp(str, "normal") == 0 || strcmp(str, "fill stroke markers") == 0)
+		return nsvg__encodePaintOrder(NSVG_PAINT_FILL, NSVG_PAINT_STROKE, NSVG_PAINT_MARKERS);
+	else if (strcmp(str, "fill markers stroke") == 0)
+		return nsvg__encodePaintOrder(NSVG_PAINT_FILL, NSVG_PAINT_MARKERS, NSVG_PAINT_STROKE);
+	else if (strcmp(str, "markers fill stroke") == 0)
+		return nsvg__encodePaintOrder(NSVG_PAINT_MARKERS, NSVG_PAINT_FILL, NSVG_PAINT_STROKE);
+	else if (strcmp(str, "markers stroke fill") == 0)
+		return nsvg__encodePaintOrder(NSVG_PAINT_MARKERS, NSVG_PAINT_STROKE, NSVG_PAINT_FILL);
+	else if (strcmp(str, "stroke fill markers") == 0)
+		return nsvg__encodePaintOrder(NSVG_PAINT_STROKE, NSVG_PAINT_FILL, NSVG_PAINT_MARKERS);
+	else if (strcmp(str, "stroke markers fill") == 0)
+		return nsvg__encodePaintOrder(NSVG_PAINT_STROKE, NSVG_PAINT_MARKERS, NSVG_PAINT_FILL);
+	// TODO: handle inherit.
+	return nsvg__encodePaintOrder(NSVG_PAINT_FILL, NSVG_PAINT_STROKE, NSVG_PAINT_MARKERS);
 }
 
 static const char* nsvg__getNextDashItem(const char* s, char* it)
@@ -1734,6 +2020,11 @@ static int nsvg__parseAttr(NSVGparser* p, const char* name, const char* value)
 	NSVGattrib* attr = nsvg__getAttr(p);
 	if (!attr) return 0;
 
+	// Initialize transform matrix to identity
+	xform[0] = 1.0f; xform[1] = 0.0f;
+	xform[2] = 0.0f; xform[3] = 1.0f;
+	xform[4] = 0.0f; xform[5] = 0.0f;
+
 	if (strcmp(name, "style") == 0) {
 		nsvg__parseStyle(p, value);
 	} else if (strcmp(name, "display") == 0) {
@@ -1783,6 +2074,52 @@ static int nsvg__parseAttr(NSVGparser* p, const char* name, const char* value)
 		attr->fillRule = nsvg__parseFillRule(value);
 	} else if (strcmp(name, "font-size") == 0) {
 		attr->fontSize = nsvg__parseCoordinate(p, value, 0.0f, nsvg__actualLength(p));
+	} else if (strcmp(name, "font-family") == 0) {
+		strncpy(attr->fontFamily, value, 63);
+		attr->fontFamily[63] = '\0';
+	} else if (strcmp(name, "font-weight") == 0) {
+		if (strcmp(value, "normal") == 0) {
+			attr->fontWeight = 4;
+		} else if (strcmp(value, "bold") == 0) {
+			attr->fontWeight = 7;
+		} else if (strcmp(value, "lighter") == 0) {
+			attr->fontWeight = 3;
+		} else if (strcmp(value, "bolder") == 0) {
+			attr->fontWeight = 9;
+		} else {
+			attr->fontWeight = (char)atoi(value);
+		}
+	} else if (strcmp(name, "font-style") == 0) {
+		if (strcmp(value, "normal") == 0) {
+			attr->fontStyle = 0;
+		} else if (strcmp(value, "italic") == 0) {
+			attr->fontStyle = 1;
+		} else if (strcmp(value, "oblique") == 0) {
+			attr->fontStyle = 2;
+		}
+	} else if (strcmp(name, "text-decoration") == 0) {
+		attr->textDecoration = 0;
+		if (strstr(value, "underline") != NULL) {
+			attr->textDecoration |= 0x01;
+		}
+		if (strstr(value, "overline") != NULL) {
+			attr->textDecoration |= 0x02;
+		}
+		if (strstr(value, "line-through") != NULL) {
+			attr->textDecoration |= 0x04;
+		}
+	} else if (strcmp(name, "letter-spacing") == 0) {
+		attr->letterSpacing = nsvg__parseCoordinate(p, value, 0.0f, nsvg__actualLength(p));
+	} else if (strcmp(name, "word-spacing") == 0) {
+		attr->wordSpacing = nsvg__parseCoordinate(p, value, 0.0f, nsvg__actualLength(p));
+	} else if (strcmp(name, "text-anchor") == 0) {
+		if (strcmp(value, "start") == 0) {
+			attr->anchor = NSVG_ANCHOR_START;
+		} else if (strcmp(value, "middle") == 0) {
+			attr->anchor = NSVG_ANCHOR_MIDDLE;
+		} else if (strcmp(value, "end") == 0) {
+			attr->anchor = NSVG_ANCHOR_END;
+		}
 	} else if (strcmp(name, "transform") == 0) {
 		nsvg__parseTransform(xform, value);
 		nsvg__xformPremultiply(attr->xform, xform);
@@ -1792,6 +2129,8 @@ static int nsvg__parseAttr(NSVGparser* p, const char* name, const char* value)
 		attr->stopOpacity = nsvg__parseOpacity(value);
 	} else if (strcmp(name, "offset") == 0) {
 		attr->stopOffset = nsvg__parseCoordinate(p, value, 0.0f, 1.0f);
+	} else if (strcmp(name, "paint-order") == 0) {
+		attr->paintOrder = nsvg__parsePaintOrder(value);
 	} else if (strcmp(name, "id") == 0) {
 		strncpy(attr->id, value, 63);
 		attr->id[63] = '\0';
@@ -2239,7 +2578,11 @@ static void nsvg__parsePath(NSVGparser* p, const char** attr)
 		nargs = 0;
 
 		while (*s) {
-			s = nsvg__getNextPathItem(s, item);
+			item[0] = '\0';
+			if ((cmd == 'A' || cmd == 'a') && (nargs == 3 || nargs == 4))
+				s = nsvg__getNextPathItemWhenArcFlag(s, item);
+			if (!*item)
+				s = nsvg__getNextPathItem(s, item);
 			if (!*item) break;
 			if (cmd != '\0' && nsvg__isCoordinate(item)) {
 				if (nargs < 10)
@@ -2493,6 +2836,76 @@ static void nsvg__parseLine(NSVGparser* p, const char** attr)
 	nsvg__addShape(p);
 }
 
+static void nsvg__parseText(NSVGparser* p, const char** attr)
+{
+	float x = 0.0f;
+	float y = 0.0f;
+	int i;
+
+	for (i = 0; attr[i]; i += 2) {
+		if (!nsvg__parseAttr(p, attr[i], attr[i + 1])) {
+			if (strcmp(attr[i], "x") == 0) x = nsvg__parseCoordinate(p, attr[i+1], nsvg__actualOrigX(p), nsvg__actualWidth(p));
+			if (strcmp(attr[i], "y") == 0) y = nsvg__parseCoordinate(p, attr[i+1], nsvg__actualOrigY(p), nsvg__actualHeight(p));
+		}
+	}
+
+	// Store text position and start collecting text content
+	p->textFlag = 1;
+	p->textBufferLen = 0;
+	p->textBuffer[0] = '\0';
+
+	NSVGattrib* curAttr = nsvg__getAttr(p);
+	// Add text position as translation to existing transform
+	float translate[6];
+	translate[0] = 1.0f; translate[1] = 0.0f;
+	translate[2] = 0.0f; translate[3] = 1.0f;
+	translate[4] = x; translate[5] = y;
+	nsvg__xformPremultiply(curAttr->xform, translate);
+}
+
+static void nsvg__addText(NSVGparser* p)
+{
+	if (p->textBufferLen == 0 || !p->textFlag)
+		return;
+
+	NSVGtext* text = (NSVGtext*)malloc(sizeof(NSVGtext)+p->textBufferLen+1);
+	if (text == NULL) return;
+
+	memset(text, 0, sizeof(NSVGtext)+p->textBufferLen+1);
+
+	NSVGattrib* curAttr = nsvg__getAttr(p);
+
+	// Copy text content
+	strncpy(text->text, p->textBuffer, p->textBufferLen);
+	text->text[p->textBufferLen] = '\0';
+
+	// Copy attributes
+	// Extract x and y from transform matrix
+	text->x = curAttr->xform[4];
+	text->y = curAttr->xform[5];
+	text->fontSize = curAttr->fontSize;
+	strncpy(text->fontFamily, curAttr->fontFamily, 63);
+	text->fontFamily[63] = '\0';
+	text->fontWeight = curAttr->fontWeight;
+	text->fontStyle = curAttr->fontStyle;
+	text->anchor = curAttr->anchor;
+	text->fillColor = curAttr->fillColor;
+	text->opacity = curAttr->opacity;
+	memcpy(text->xform, curAttr->xform, sizeof(float) * 6);
+
+	// Add to linked list
+	if (p->image->texts == NULL) {
+		p->image->texts = text;
+	} else {
+		p->textsTail->next = text;
+	}
+	p->textsTail = text;
+
+	p->textFlag = 0;
+	p->textBufferLen = 0;
+	p->textBuffer[0] = '\0';
+}
+
 static void nsvg__parsePoly(NSVGparser* p, const char** attr, int closeFlag)
 {
 	int i;
@@ -2584,7 +2997,7 @@ static void nsvg__parseSVG(NSVGparser* p, const char** attr)
 	}
 }
 
-static void nsvg__parseGradient(NSVGparser* p, const char** attr, char type)
+static void nsvg__parseGradient(NSVGparser* p, const char** attr, signed char type)
 {
 	int i;
 	NSVGgradientData* grad = (NSVGgradientData*)malloc(sizeof(NSVGgradientData));
@@ -2745,6 +3158,9 @@ static void nsvg__startElement(void* ud, const char* el, const char** attr)
 		nsvg__pushAttr(p);
 		nsvg__parsePoly(p, attr, 1);
 		nsvg__popAttr(p);
+	} else if (strcmp(el, "text") == 0) {
+		nsvg__pushAttr(p);
+		nsvg__parseText(p, attr);
 	} else  if (strcmp(el, "linearGradient") == 0) {
 		nsvg__parseGradient(p, attr, NSVG_PAINT_LINEAR_GRADIENT);
 	} else if (strcmp(el, "radialGradient") == 0) {
@@ -2768,14 +3184,40 @@ static void nsvg__endElement(void* ud, const char* el)
 		p->pathFlag = 0;
 	} else if (strcmp(el, "defs") == 0) {
 		p->defsFlag = 0;
+	} else if (strcmp(el, "text") == 0) {
+		nsvg__addText(p);
+		nsvg__popAttr(p);
 	}
 }
 
 static void nsvg__content(void* ud, const char* s)
 {
-	NSVG_NOTUSED(ud);
-	NSVG_NOTUSED(s);
-	// empty
+	NSVGparser* p = (NSVGparser*)ud;
+	
+	if (!p->textFlag)
+		return;
+	
+	// Trim leading whitespace
+	while (*s && nsvg__isspace(*s)) s++;
+	
+	int len = strlen(s);
+	if (len == 0)
+		return;
+	
+	// Trim trailing whitespace
+	while (len > 0 && nsvg__isspace(s[len-1])) len--;
+	
+	if (len == 0)
+		return;
+	
+	// Append text content to buffer
+	int remaining = 1023 - p->textBufferLen;
+	if (remaining > 0) {
+		int toCopy = len < remaining ? len : remaining;
+		memcpy(p->textBuffer + p->textBufferLen, s, toCopy);
+		p->textBufferLen += toCopy;
+		p->textBuffer[p->textBufferLen] = '\0';
+	}
 }
 
 static void nsvg__imageBounds(NSVGparser* p, float* bounds)
@@ -2909,6 +3351,36 @@ static void nsvg__scaleToViewbox(NSVGparser* p, const char* units)
 	}
 }
 
+static void nsvg__createGradients(NSVGparser* p)
+{
+	NSVGshape* shape;
+
+	for (shape = p->image->shapes; shape != NULL; shape = shape->next) {
+		if (shape->fill.type == NSVG_PAINT_UNDEF) {
+			if (shape->fillGradient[0] != '\0') {
+				float inv[6], localBounds[4];
+				nsvg__xformInverse(inv, shape->xform);
+				nsvg__getLocalBounds(localBounds, shape, inv);
+				shape->fill.gradient = nsvg__createGradient(p, shape->fillGradient, localBounds, shape->xform, &shape->fill.type);
+			}
+			if (shape->fill.type == NSVG_PAINT_UNDEF) {
+				shape->fill.type = NSVG_PAINT_NONE;
+			}
+		}
+		if (shape->stroke.type == NSVG_PAINT_UNDEF) {
+			if (shape->strokeGradient[0] != '\0') {
+				float inv[6], localBounds[4];
+				nsvg__xformInverse(inv, shape->xform);
+				nsvg__getLocalBounds(localBounds, shape, inv);
+				shape->stroke.gradient = nsvg__createGradient(p, shape->strokeGradient, localBounds, shape->xform, &shape->stroke.type);
+			}
+			if (shape->stroke.type == NSVG_PAINT_UNDEF) {
+				shape->stroke.type = NSVG_PAINT_NONE;
+			}
+		}
+	}
+}
+
 NSVGimage* nsvgParse(char* input, const char* units, float dpi)
 {
 	NSVGparser* p;
@@ -2921,6 +3393,9 @@ NSVGimage* nsvgParse(char* input, const char* units, float dpi)
 	p->dpi = dpi;
 
 	nsvg__parseXML(input, nsvg__startElement, nsvg__endElement, nsvg__content, p);
+
+	// Create gradients after all definitions have been parsed
+	nsvg__createGradients(p);
 
 	// Scale to viewBox
 	nsvg__scaleToViewbox(p, units);
@@ -2995,7 +3470,14 @@ error:
 void nsvgDelete(NSVGimage* image)
 {
 	NSVGshape *snext, *shape;
+	NSVGtext*tnext, *text;
 	if (image == NULL) return;
+	text = image->texts;
+	while (text != NULL) {
+		tnext = text->next;
+		free(text);
+		text = tnext;
+	}
 	shape = image->shapes;
 	while (shape != NULL) {
 		snext = shape->next;
@@ -3008,4 +3490,6 @@ void nsvgDelete(NSVGimage* image)
 	free(image);
 }
 
-#endif
+#endif // NANOSVG_IMPLEMENTATION
+
+#endif // NANOSVG_H

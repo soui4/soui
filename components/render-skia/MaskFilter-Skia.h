@@ -27,7 +27,7 @@ SNSBEGIN
 
 		STDMETHOD_(void*,GetPtr)(THIS) OVERRIDE;
 		
-		STDMETHOD_(void,Init)(THIS_ float direction[3], float ambient, float specular, float blurRadius) OVERRIDE;
+		STDMETHOD_(void,Init)(THIS_ float blurSigma,float direction[3], float ambient, float specular) OVERRIDE;
 
 	private:
         SkMaskFilter *m_skEmbossMaskFilter;

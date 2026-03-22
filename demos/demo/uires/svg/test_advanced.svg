@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="500" height="500" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background -->
+    <rect x="0" y="0" width="500" height="500" fill="#ffffff" />
+
+    <!-- Title -->
+    <text x="250" y="30" font-size="22" font-family="Arial" fill="#ff0000" text-anchor="middle" font-weight="bold">SVG Advanced Test</text>
+
+    <!-- Test 1: Opacity -->
+    <g transform="translate(20, 50)">
+        <rect x="0" y="0" width="80" height="80" fill="#e74c3c" opacity="1.0" />
+        <rect x="90" y="0" width="80" height="80" fill="#e74c3c" opacity="0.75" />
+        <rect x="180" y="0" width="80" height="80" fill="#e74c3c" opacity="0.5" />
+        <rect x="270" y="0" width="80" height="80" fill="#e74c3c" opacity="0.25" />
+        <text x="175" y="100" font-size="12" fill="#333" text-anchor="middle">Opacity: 1.0, 0.75, 0.5, 0.25</text>
+    </g>
+
+    <!-- Test 2: Stroke Properties -->
+    <g transform="translate(20, 130)">
+        <line x1="0" y1="10" x2="100" y2="10" stroke="#3498db" stroke-width="1" stroke-linecap="butt" />
+        <line x1="0" y1="30" x2="100" y2="30" stroke="#3498db" stroke-width="3" stroke-linecap="round" />
+        <line x1="0" y1="50" x2="100" y2="50" stroke="#3498db" stroke-width="5" stroke-linecap="square" />
+        <text x="50" y="75" font-size="12" fill="#333" text-anchor="middle">Stroke Caps</text>
+
+        <polyline points="150,10 170,50 190,10 210,50 230,10" fill="none" stroke="#9b59b6" stroke-width="3" stroke-linejoin="miter" />
+        <polyline points="250,10 270,50 290,10 310,50 330,10" fill="none" stroke="#9b59b6" stroke-width="3" stroke-linejoin="round" />
+        <polyline points="350,10 370,50 390,10 410,50 430,10" fill="none" stroke="#9b59b6" stroke-width="3" stroke-linejoin="bevel" />
+        <text x="290" y="75" font-size="12" fill="#333" text-anchor="middle">Stroke Joins</text>
+    </g>
+
+    <!-- Test 3: Transformations -->
+    <g transform="translate(20, 230)">
+        <!-- Original -->
+        <rect x="0" y="0" width="50" height="50" fill="#f39c12" />
+        <text x="25" y="65" font-size="10" fill="#333" text-anchor="middle">Original</text>
+
+        <!-- Translate -->
+        <rect x="0" y="0" width="50" height="50" fill="#f39c12" transform="translate(70, 0)" />
+        <text x="95" y="65" font-size="10" fill="#333" text-anchor="middle">Translate</text>
+
+        <!-- Rotate -->
+        <rect x="0" y="0" width="50" height="50" fill="#f39c12" transform="translate(150, 25) rotate(45)" />
+        <text x="175" y="65" font-size="10" fill="#333" text-anchor="middle">Rotate</text>
+
+        <!-- Scale -->
+        <rect x="0" y="0" width="50" height="50" fill="#f39c12" transform="translate(220, 0) scale(1.5)" />
+        <text x="255" y="65" font-size="10" fill="#333" text-anchor="middle">Scale</text>
+
+        <!-- Skew -->
+        <rect x="0" y="0" width="50" height="50" fill="#f39c12" transform="translate(300, 0) skewX(20)" />
+        <text x="325" y="65" font-size="10" fill="#333" text-anchor="middle">Skew</text>
+    </g>
+
+    <!-- Test 4: Color Formats -->
+    <g transform="translate(20, 330)">
+        <circle cx="30" cy="30" r="25" fill="#e74c3c" />
+        <text x="30" y="70" font-size="10" fill="#333" text-anchor="middle">#e74c3c</text>
+
+        <circle cx="100" cy="30" r="25" fill="rgb(46, 204, 113)" />
+        <text x="100" y="70" font-size="10" fill="#333" text-anchor="middle">rgb()</text>
+
+        <circle cx="170" cy="30" r="25" fill="rgba(52, 152, 219, 0.7)" />
+        <text x="170" y="70" font-size="10" fill="#333" text-anchor="middle">rgba()</text>
+
+        <circle cx="240" cy="30" r="25" fill="orange" />
+        <text x="240" y="70" font-size="10" fill="#333" text-anchor="middle">orange</text>
+
+        <circle cx="310" cy="30" r="25" fill="purple" />
+        <text x="310" y="70" font-size="10" fill="#333" text-anchor="middle">purple</text>
+    </g>
+
+    <!-- Test 5: Fill Rules -->
+    <g transform="translate(20, 430)">
+        <polygon points="0,0 50,50 0,50 50,0" fill="#1abc9c" fill-rule="nonzero" />
+        <text x="25" y="65" font-size="10" fill="#333" text-anchor="middle">nonzero</text>
+
+        <polygon points="70,0 120,50 70,50 120,0" fill="#1abc9c" fill-rule="evenodd" />
+        <text x="95" y="65" font-size="10" fill="#333" text-anchor="middle">evenodd</text>
+    </g>
+
+    <!-- Test 6: Complex Path -->
+    <g transform="translate(200, 430)">
+        <path d="M 0 0 L 20 0 L 20 20 L 0 20 Z" fill="#e67e22" />
+        <path d="M 30 0 Q 50 0 50 20 T 70 20" fill="none" stroke="#2ecc71" stroke-width="3" />
+        <path d="M 80 0 C 90 0 100 10 100 20 S 110 40 120 40" fill="none" stroke="#9b59b6" stroke-width="3" />
+        <text x="60" y="65" font-size="10" fill="#333" text-anchor="middle">Path Commands</text>
+    </g>
+</svg>

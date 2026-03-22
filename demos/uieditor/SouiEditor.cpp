@@ -139,7 +139,14 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
     #else
     // 加载扩展控件
     WIN32_FIND_DATA fd;
+    #ifdef __APPLE__
+    char szBunblePath[1024];
+    GetAppleBundlePath(szBunblePath, sizeof(szBunblePath));
+    SStringT strExCtrlPath = S_CA2T(szBunblePath) + _T("/Contents/Frameworks");
+    HANDLE hFind = FindFirstFile((strExCtrlPath + _T("/*.exctrl")).c_str(), &fd);
+    #else
     HANDLE hFind = FindFirstFile((appDir + _T("/*.exctrl")).c_str(), &fd);
+    #endif//__APPLE__
     if(hFind != INVALID_HANDLE_VALUE)
     {
         do

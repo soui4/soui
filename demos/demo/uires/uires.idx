@@ -205,6 +205,9 @@
   </valueAni>
   <svg>
     <file name="tiger" path="svg\tiger.svg"/>
+    <file name="elements" path="svg\test_elements.svg"/>
+    <file name="advanced" path="svg\test_advanced.svg"/>
+    <file name="comprehensive" path="svg\test_comprehensive.svg"/>
   </svg>
 	<xml>
 		<file name="roomlist" path="xml\roomlist.xml"/>

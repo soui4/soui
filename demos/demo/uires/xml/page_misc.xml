@@ -84,6 +84,19 @@
       </freeMoveWindow>
     </page>
   <page title="svg">
-    <img skin="svg_tiger"/>
+    <tabctrl tabHeight="30" size="-2,-2" tabAlign="middle" animateSteps="20">
+      <page title="tiger">
+        <img name="svg_test" pos="|0,|0" offset="-0.5,-0.5" skin="svg_tiger"/>
+      </page>
+      <page title="elements">
+        <img name="svg_test" pos="|0,|0" offset="-0.5,-0.5" skin="svg_elements"/>
+      </page>
+      <page title="advanced">
+        <img name="svg_test" pos="|0,|0" offset="-0.5,-0.5" skin="svg_advanced"/>
+      </page>
+      <page title="comprehensive">
+        <img name="svg_test" pos="|0,|0" offset="-0.5,-0.5" skin="svg_comprehensive"/>
+      </page>
+    </tabctrl>
   </page>
   </tabctrl>

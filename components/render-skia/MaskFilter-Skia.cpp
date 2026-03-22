@@ -40,10 +40,10 @@ SNSBEGIN
 		return m_skEmbossMaskFilter;
 	}
 
-	void SMaskFilter_Emboss::Init(float direction[3], float ambient, float specular, float blurRadius)
+	void SMaskFilter_Emboss::Init(float blurSigma,float direction[3], float ambient, float specular)
 	{
 		if(m_skEmbossMaskFilter) m_skEmbossMaskFilter->unref();
-		m_skEmbossMaskFilter = SkBlurMaskFilter::CreateEmboss(direction,ambient,specular,blurRadius);
+		m_skEmbossMaskFilter = SkBlurMaskFilter::CreateEmboss(blurSigma,direction,ambient,specular);
 	}
 
 SNSEND

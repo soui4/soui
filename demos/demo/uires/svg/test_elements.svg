@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background -->
+    <rect x="0" y="0" width="400" height="400" fill="#f0f0f0" />
+
+    <!-- Title -->
+    <text x="200" y="30" font-size="20" font-family="Arial" fill="#333" text-anchor="middle">SVG Elements Test</text>
+
+    <!-- Rectangle with fill and stroke -->
+    <rect x="20" y="50" width="100" height="60" fill="#ff6b6b" stroke="#333" stroke-width="2" />
+    <text x="70" y="130" font-size="12" fill="#333" text-anchor="middle">Rectangle</text>
+
+    <!-- Circle with fill -->
+    <circle cx="250" cy="80" r="40" fill="#4ecdc4" />
+    <text x="250" y="140" font-size="12" fill="#333" text-anchor="middle">Circle</text>
+
+    <!-- Ellipse with stroke -->
+    <ellipse cx="70" cy="200" rx="50" ry="30" fill="none" stroke="#ff9f43" stroke-width="3" />
+    <text x="70" y="250" font-size="12" fill="#333" text-anchor="middle">Ellipse</text>
+
+    <!-- Line -->
+    <line x1="150" y1="170" x2="350" y2="230" stroke="#5f27cd" stroke-width="4" stroke-linecap="round" />
+    <text x="250" y="250" font-size="12" fill="#333" text-anchor="middle">Line</text>
+
+    <!-- Polyline -->
+    <polyline points="20,300 50,270 80,300 110,270 140,300" fill="none" stroke="#00d2d3" stroke-width="3" stroke-linejoin="round" />
+    <text x="80" y="330" font-size="12" fill="#333" text-anchor="middle">Polyline</text>
+
+    <!-- Polygon with fill -->
+    <polygon points="200,280 240,320 280,280 320,320 360,280" fill="#ff9ff3" stroke="#333" stroke-width="2" />
+    <text x="280" y="340" font-size="12" fill="#333" text-anchor="middle">Polygon</text>
+
+    <!-- Path with fill and stroke -->
+    <path d="M 20 360 Q 70 340 120 360 T 220 360" fill="none" stroke="#54a0ff" stroke-width="3" />
+    <text x="120" y="390" font-size="12" fill="#333" text-anchor="middle">Path (Curve)</text>
+
+    <!-- Text with different colors -->
+    <text x="250" y="370" font-size="14" fill="#ee5253" font-weight="bold">Red Text</text>
+    <text x="250" y="390" font-size="14" fill="#10ac84">Green Text</text>
+</svg>

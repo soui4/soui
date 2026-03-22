@@ -13,6 +13,7 @@ SNSBEGIN
 namespace STreeView_style
 {
 static const LPCWSTR kStyle_template = L"template";
+static const LPCWSTR kStyle_defItemHeight = L"height";
 }
 
 /**
@@ -79,6 +80,12 @@ class SOUI_EXP STreeViewItemLocator : public TObjRefImpl<ITreeViewItemLocator> {
      * @return Handle to the item.
      */
     STDMETHOD_(HSTREEITEM, Position2Item)(THIS_ int position) SCONST OVERRIDE;
+
+    /**
+     * @brief Sets the default item height.
+     * @param nHeight New default height.
+     */
+    STDMETHOD_(void, SetDefItemHeight)(THIS_ int nHeight) OVERRIDE;
 
     /**
      * @brief Gets the scroll line size.

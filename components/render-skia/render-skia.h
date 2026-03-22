@@ -12,6 +12,9 @@
 #include <string/strcpcvt.h>
 #include <souicoll.h>
 #include <core/SkShader.h>
+
+struct NSVGimage;
+
 SNSBEGIN
 
 //////////////////////////////////////////////////////////////////////////
@@ -488,6 +491,7 @@ public:
     STDMETHOD_(BOOL,GetAntiAlias)(THIS) SCONST OVERRIDE;
     STDMETHOD_(void, SetImageFilter)(THIS_ IImageFilter * pImageEffect) OVERRIDE;
     STDMETHOD_(IImageFilter *, GetImageFilter)(CTHIS) SCONST OVERRIDE;
+    STDMETHOD_(HRESULT, DrawSVG)(THIS_ ISvgObj*  pSvg, LPCRECT pRect, BYTE byAlpha = 0xFF) OVERRIDE;
 public:
 	SkCanvas *GetCanvas(){return m_SkCanvas;}
 

@@ -529,6 +529,8 @@ public:
 	STDMETHOD_(BOOL,GetAntiAlias)(THIS) SCONST OVERRIDE;
     STDMETHOD_(void, SetImageFilter)(THIS_ IImageFilter * pImageEffect) OVERRIDE{}
     STDMETHOD_(IImageFilter *, GetImageFilter)(CTHIS) SCONST OVERRIDE{return NULL;}
+    STDMETHOD_(HRESULT, DrawSVG)(THIS_ ISvgObj*  pSvg, LPCRECT pRect, BYTE byAlpha = 0xFF) OVERRIDE;
+
 protected:
 	HDC               m_hdc;
 	SColor            m_curColor;

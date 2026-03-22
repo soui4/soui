@@ -1,5 +1,6 @@
 include_directories(${PROJECT_SOURCE_DIR}/utilities/include)
 include_directories(${PROJECT_SOURCE_DIR}/SOUI/include)
+include_directories(${PROJECT_SOURCE_DIR}/third-part/nanosvg)
 
 set(render-skia_header
 	stdafx.h
@@ -59,6 +60,8 @@ target_include_directories(render-skia
   PRIVATE ${PROJECT_SOURCE_DIR}/third-part/skia/include
   PRIVATE ${PROJECT_SOURCE_DIR}/third-part/skia/include/config
   PRIVATE ${PROJECT_SOURCE_DIR}/third-part/skia/include/core
+  PRIVATE ${PROJECT_SOURCE_DIR}/third-part/skia/include/xml
+  PRIVATE ${PROJECT_SOURCE_DIR}/third-part/skia/include/svg
   PRIVATE ${PROJECT_SOURCE_DIR}/third-part/skia/src/core
 )
 

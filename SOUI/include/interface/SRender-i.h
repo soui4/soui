@@ -12,6 +12,89 @@
 
 SNSBEGIN
 
+#undef INTERFACE
+#define INTERFACE ISvgObj
+DECLARE_INTERFACE_(ISvgObj, IObjRef)
+{
+    /**
+     * @brief Increments the reference count for the object.
+     *
+     * @details This method is used to increase the reference count of the object,
+     * ensuring it remains valid as long as references exist.
+     *
+     * @return long The new reference count after incrementing.
+     */
+    STDMETHOD_(long, AddRef)(THIS) PURE;
+
+    /**
+     * @brief Decrements the reference count for the object.
+     *
+     * @details This method decreases the reference count of the object.
+     * When the count reaches zero, the object may be released.
+     *
+     * @return long The new reference count after decrementing.
+     */
+    STDMETHOD_(long, Release)(THIS) PURE;
+
+    /**
+     * @brief Called when the final release of the object occurs.
+     *
+     * @details This method is invoked when the reference count reaches zero,
+     * allowing for any necessary cleanup before the object is destroyed.
+     */
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+
+    //-------------------------------------------------------------
+
+    /**
+     * @brief Loads an SVG file from a string.
+     *
+     * @details This method loads an SVG file from a string.
+     *
+     * @param strSvg The string containing the SVG file content. 
+     *
+     * @return BOOL TRUE if the SVG file was successfully loaded, FALSE otherwise.
+     * @note The string must be null-terminated. string will modified by this method.
+     */
+    STDMETHOD_(BOOL,Load)(THIS_ char* strSvg) PURE;
+
+    /**
+     * @brief Frees the SVG object.
+     *
+     * @details This method frees the SVG object, releasing any associated resources.
+     */
+    STDMETHOD_(void,Free)(THIS) PURE;
+
+    /**
+     * @brief Returns a pointer to the underlying object.
+     *
+     * @details This method returns a pointer to the underlying object.
+     *
+     * @return void* Pointer to the underlying object.
+     */
+    STDMETHOD_(void *, GetPtr)(CTHIS) SCONST PURE;
+
+    /**
+     * @brief Returns the width of the SVG image.
+     *
+     * @details This method returns the width of the SVG image.
+     *
+     * @return int The width of the SVG image.
+     */
+    STDMETHOD_(int, GetWidth)(THIS) SCONST PURE;
+
+    /**
+     * @brief Returns the height of the SVG image.
+     *
+     * @details This method returns the height of the SVG image.
+     *
+     * @return int The height of the SVG image.
+     */
+    STDMETHOD_(int, GetHeight)(THIS) SCONST PURE;
+};
+
+typedef ISvgObj *ISvgObjPtr;
+
 typedef struct IRenderFactory IRenderFactory;
 
 // Enumerations
@@ -2107,6 +2190,15 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
      * @return IImageFilter* Current image effect object.
      */
     STDMETHOD_(IImageFilter *, GetImageFilter)(CTHIS) SCONST PURE;
+
+    /**
+     * @brief Draw a parsed SVG object to the render target.
+     * @param hSvg Handle to the parsed SVG object.
+     * @param pRect Destination rectangle for rendering SVG.
+     * @param byAlpha Alpha value for blending (default is 0xFF).
+     * @return HRESULT indicating success or failure.
+     */
+    STDMETHOD_(HRESULT, DrawSVG)(THIS_ ISvgObj*  pSvg, LPCRECT pRect, BYTE byAlpha DEF_VAL(0xFF)) PURE;
 };
 
 /**
@@ -2219,6 +2311,7 @@ DECLARE_INTERFACE_(IRenderFactory, IObjRef)
      * @return BOOL - TRUE if successful, FALSE otherwise.
      */
     STDMETHOD_(BOOL, CreateImageFilter)(THIS_ REFGUID guidEffect, IImageFilter * *ppImageFilter) PURE;
+
     /**
      * @brief Retrieves the default font object.
      * @return IFontS* - Pointer to the default font object.

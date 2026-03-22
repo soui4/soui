@@ -14,15 +14,9 @@ using namespace SNS;
 
 static SStringT getResourceDir()
 {
-#ifdef __APPLE__
-    char szBunblePath[1024];
-    GetAppleBundlePath(szBunblePath, sizeof(szBunblePath));
-    return S_CA2T(szBunblePath) + _T("/Contents/Resources/");
-#else
     SStringA strFile = __FILE__;
     strFile = strFile.Left(strFile.ReverseFind(PATH_SLASH));
     return S_CA2T(strFile);
-#endif
 }
 
 int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lpstrCmdLine, int /*nCmdShow*/)
@@ -33,11 +27,12 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
     SApplication app(hInstance);
     SAppCfg cfg;
     SStringT srcDir = getResourceDir();
+    SStringT appDir = app.GetAppDir();
     cfg.SetRender(Render_Skia).SetImgDecoder(ImgDecoder_Stb).SetAppDir(srcDir).SetLog(TRUE);
 #ifdef _WIN32
     cfg.SetSysResPeFile(SYS_NAMED_RESOURCE);
 #else
-    cfg.SetSysResZip(srcDir+_T("data/soui-sys-resource.zip"));
+    cfg.SetSysResZip(appDir+_T("/soui-sys-resource.zip"));
 #endif //_WIN32
 #if !defined(_WIN32) || defined(_DEBUG)
     cfg.SetAppResFile(srcDir+_T("/uires"));

@@ -41,7 +41,7 @@
 #include "animation/STranslateAnimation.h"
 #include "valueAnimator/SValueAnimator.h"
 #include "core/SHostPresenter.h"
-
+#include "core/Svg.h"
 SNSBEGIN
 
 static void SouiLog_Callback(const char *tag, const char *pLogStr, int level, const char *file, int line, const char *fun, void *retAddr)
@@ -202,7 +202,9 @@ void SObjectDefaultRegister::RegisterSkins(SObjectFactoryMgr *objFactory) const
     objFactory->TplRegisterFactory<SSkinColorRect>();
     objFactory->TplRegisterFactory<SSkinShape>();
     objFactory->TplRegisterFactory<SSKinGroup>();
+    objFactory->TplRegisterFactory<SSKinGroup2>();
     objFactory->TplRegisterFactory<SSkinTreeLines>();
+    objFactory->TplRegisterFactory<SSkinSvg>();
 }
 
 void SObjectDefaultRegister::RegisterLayouts(SObjectFactoryMgr *objFactory) const

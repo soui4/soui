@@ -113,7 +113,14 @@ DECLARE_INTERFACE_(IMaskFilterEmboss, IMaskFilter)
      */
     STDMETHOD_(void *, GetPtr)(THIS) PURE;
 
-    STDMETHOD_(void, Init)(THIS_ float direction[3], float ambient, float specular, float blurRadius) PURE;
+    /**
+     * @brief 初始化
+     * @param blurSigma 模糊sigma
+     * @param direction 模糊方向
+     * @param ambient 环境光
+     * @param specular 镜面光
+     */
+    STDMETHOD_(void, Init)(THIS_ float blurSigma,float direction[3], float ambient, float specular) PURE;
 };
 
 

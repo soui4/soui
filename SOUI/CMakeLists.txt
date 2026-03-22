@@ -20,11 +20,13 @@ file(GLOB_RECURSE CURRENT_HEADERS  *.h *.hpp)
 file(GLOB_RECURSE CURRENT_SRCS  *.cpp)
 file(GLOB_RECURSE CURRENT_UIRES  *.xml *.idx *.ico)
 file(GLOB_RECURSE CURRENT_RC *.rc *.rc2)
+file(GLOB_RECURSE NANOSVG_HEADERS  ${PROJECT_SOURCE_DIR}/third-part/nanosvg/*.h)
 
 source_group("Header Files" FILES ${CURRENT_HEADERS})
 source_group("Source Files" FILES ${CURRENT_SRCS})
 source_group("SoUI Resource" FILES ${CURRENT_UIRES})
 source_group("Resource Files" FILES ${CURRENT_RC})
+source_group("nanosvg" FILES ${NANOSVG_HEADERS})
 
 
 if (NOT CMAKE_SYSTEM_NAME MATCHES Windows)
@@ -34,7 +36,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fpermissive")
 add_compile_options(-Wno-conversion-null -Wno-pointer-arith -Wno-format)
 endif()
  
-set(source ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_UIRES})
+set(source ${CURRENT_HEADERS} ${NANOSVG_HEADERS} ${CURRENT_SRCS} ${CURRENT_UIRES})
 
 if (NOT SOUI_ENABLE_CORE_LIB)
     if (CMAKE_SYSTEM_NAME MATCHES Windows)
@@ -52,6 +54,7 @@ target_include_directories(soui4
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/interface
   PUBLIC ${PROJECT_SOURCE_DIR}/utilities/include
   PUBLIC ${PROJECT_SOURCE_DIR}/components
+  PUBLIC ${PROJECT_SOURCE_DIR}/third-part/nanosvg
 )
 
 add_dependencies(soui4 utilities4)

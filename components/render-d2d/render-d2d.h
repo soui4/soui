@@ -588,6 +588,7 @@ public:
     {
         return NULL;
     }
+	STDMETHOD_(HRESULT, DrawSVG)(THIS_ ISvgObj*  pSvg, LPCRECT pRect, BYTE byAlpha = 0xFF) OVERRIDE;
 
   protected:
 	// 辅助函数：应用混合模式到位图绘制

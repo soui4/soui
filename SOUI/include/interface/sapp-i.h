@@ -22,6 +22,8 @@
 
 SNSBEGIN
 
+
+
 typedef enum _SingletonType
 {
     SINGLETON_UIDEF = 0,
