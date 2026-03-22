@@ -1,4 +1,4 @@
-//stamp:01dcac44ac0f2a2f
+//stamp:01dcb9e90d740f3e
 /*<------------------------------------------------------------------------------------------------->*/
 #define DEFINE_UIRES(name, type, file_path)\
     name type file_path
@@ -164,4 +164,7 @@ DEFINE_UIRES(alpha_out,	anim,	"uires/anim/alpha_out.xml")
 DEFINE_UIRES(alphaAni,	valueAni,	"uires/valueAni/alpha.xml")
 DEFINE_UIRES(colorAni,	valueAni,	"uires/valueAni/color.xml")
 DEFINE_UIRES(tiger,	svg,	"uires/svg/tiger.svg")
+DEFINE_UIRES(elements,	svg,	"uires/svg/test_elements.svg")
+DEFINE_UIRES(advanced,	svg,	"uires/svg/test_advanced.svg")
+DEFINE_UIRES(comprehensive,	svg,	"uires/svg/test_comprehensive.svg")
 DEFINE_UIRES(roomlist,	xml,	"uires/xml/roomlist.xml")
