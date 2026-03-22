@@ -26,7 +26,10 @@
 #define NANOSVGRAST_H
 
 #include "nanosvg.h"
-
+#ifdef _WIN32
+#include <float.h>
+#define isnan(x) _isnan(x)
+#endif//_WIN32
 #ifndef NANOSVGRAST_CPLUSPLUS
 #ifdef __cplusplus
 extern "C" {
