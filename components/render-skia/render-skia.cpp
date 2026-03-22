@@ -32,7 +32,6 @@
 #include <windows.h>
 #include <string/strcpcvt.h>
 #include <helper/SAutoBuf.h>
-#define NANOSVG_IMPLEMENTATION
 #include <src/nanosvg.h>
 
 #define getTotalClip internal_private_getTotalClip
