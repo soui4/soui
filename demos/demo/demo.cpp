@@ -57,6 +57,8 @@ static const TCHAR *kPath_UiRes = _T("/uires");
 
 #ifdef _WIN32
 #define SYS_NAMED_RESOURCE _T("soui-sys-resource.dll")
+#elif defined(__APPLE__)
+#define SYS_NAMED_RESOURCE _T("soui-sys-resource.dylib")
 #else
 #define SYS_NAMED_RESOURCE _T("soui-sys-resource.so")
 #endif

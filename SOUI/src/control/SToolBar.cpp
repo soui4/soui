@@ -111,7 +111,7 @@ CSize SToolBar::GetItemSize(const CRect &rcWnd, IRenderTarget *pRT, int iItem) c
             CSize szIcon;
             if (item.icon)
                 szIcon = item.icon->Size();
-            else if (m_skinIcons)
+            else if (m_skinIcons[0])
                 szIcon = m_skinIcons[0]->GetSkinSize();
             if (m_nItemSize.isWrapContent())
                 szRet.cy = szIcon.cy;
@@ -144,7 +144,7 @@ CSize SToolBar::GetItemSize(const CRect &rcWnd, IRenderTarget *pRT, int iItem) c
             CSize szIcon;
             if (item.icon)
                 szIcon = item.icon->Size();
-            else if (m_skinIcons)
+            else if (m_skinIcons[0])
                 szIcon = m_skinIcons[0]->GetSkinSize();
 
             if (m_bTextIconVertical && (item.dwStyle & BTNS_SHOWTEXT))
@@ -342,7 +342,7 @@ void SToolBar::DrawItem(IRenderTarget *pRT, const CRect &rcItem, const ToolBarIt
         CSize szIcon;
         if (pItem->icon)
             szIcon = pItem->icon->Size();
-        else if (m_skinIcons)
+        else if (m_skinIcons[0])
             szIcon = m_skinIcons[0]->GetSkinSize();
 
         // Calculate content area, reserve space for dropdown arrow if needed
