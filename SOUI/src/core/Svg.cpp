@@ -1,15 +1,16 @@
 #include <souistd.h>
 #include "core/Svg.h"
+
+#ifdef SOUI_ENABLE_SVG
 #define NANOSVG_IMPLEMENTATION
 #define NANOSVG_ALL_COLOR_KEYWORDS
 #include <src/nanosvg.h>
 #include <helper/obj-ref-impl.hpp>
-#include <soui_exp.h>
 SNSBEGIN
 
 /**
  * @class SvgObj
- * @brief svg对象
+ * @brief svg 对象
  */
 class SvgObj : public TObjRefImpl<ISvgObj> {
     void *m_ptr;
@@ -108,9 +109,9 @@ static ISvgObjPtr CreateSvgFromFILE(FILE *f)
     return pSvg;
 }
 
-EXTERN_C ISvgObjPtr CreateSvgFromFileA(LPCSTR resId)
+EXTERN_C ISvgObjPtr CreateSvgFromFileA(LPCSTR pszSvgFile)
 {
-    FILE *fp = fopen(resId, "rb");
+    FILE *fp = fopen(pszSvgFile, "rb");
     if (!fp)
         return NULL;
     ISvgObjPtr pSvg = CreateSvgFromFILE(fp);
@@ -118,9 +119,9 @@ EXTERN_C ISvgObjPtr CreateSvgFromFileA(LPCSTR resId)
     return pSvg;
 }
 
-EXTERN_C ISvgObjPtr CreateSvgFromFileW(LPCWSTR resId)
+EXTERN_C ISvgObjPtr CreateSvgFromFileW(LPCWSTR pszSvgFile)
 {
-    FILE *fp = _wfopen(resId, L"rb");
+    FILE *fp = _wfopen(pszSvgFile, L"rb");
     if (!fp)
         return NULL;
     ISvgObjPtr pSvg = CreateSvgFromFILE(fp);
@@ -129,3 +130,36 @@ EXTERN_C ISvgObjPtr CreateSvgFromFileW(LPCWSTR resId)
 }
 
 SNSEND
+
+#else // !SOUI_ENABLE_SVG
+
+// When SVG is disabled, provide stub implementations that return NULL
+SNSBEGIN
+
+EXTERN_C ISvgObjPtr CreateSvgObj(char *strSvg)
+{
+    (void)strSvg; // unused parameter
+    return NULL;
+}
+
+EXTERN_C ISvgObjPtr CreateSvgFromResId(LPCTSTR resId)
+{
+    (void)resId; // unused parameter
+    return NULL;
+}
+
+EXTERN_C ISvgObjPtr CreateSvgFromFileA(LPCSTR pszSvgFile)
+{
+    (void)pszSvgFile; // unused parameter
+    return NULL;
+}
+
+EXTERN_C ISvgObjPtr CreateSvgFromFileW(LPCWSTR pszSvgFile)
+{
+    (void)pszSvgFile; // unused parameter
+    return NULL;
+}
+
+SNSEND
+
+#endif // SOUI_ENABLE_SVG

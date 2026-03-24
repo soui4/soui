@@ -78,6 +78,10 @@ option(SOUI_ENABLE_SPECTRE "Enable Spectre Mitigation" OFF)
 #
 option(SOUI_BUILD_DEMOS "Build builtin demos" ON)
 
+#
+#
+option(SOUI_ENABLE_SVG "Enable SVG support" ON)
+
 message(STATUS "MSVC_VERSION: ${MSVC_VERSION}")
 if(MSVC AND MSVC_VERSION LESS 1800)
 set(SOUI_BUILD_WS OFF)

@@ -11,8 +11,10 @@
 #include <helper/SAutoBuf.h>
 
 #include <src/nanosvg.h>
+#ifdef SOUI_ENABLE_SVG
 #define NANOSVGRAST_IMPLEMENTATION
 #include <src/nanosvgrast.h>
+#endif // SOUI_ENABLE_SVG
 
 SNSBEGIN
 
@@ -2534,6 +2536,7 @@ SNSBEGIN
 		return FALSE;
 	}
 
+    #ifdef SOUI_ENABLE_SVG
 	HRESULT SRenderTarget_GDI::DrawSVG(ISvgObj*  pSvgObj, LPCRECT pRect, BYTE byAlpha)
 	{
 		if (!pSvgObj || !pRect)
@@ -2723,7 +2726,15 @@ SNSBEGIN
 
 		return S_OK;
 	}
-
+    #else
+    HRESULT SRenderTarget_GDI::DrawSVG(ISvgObj *pSvg, LPCRECT pRect, BYTE byAlpha)
+    {
+        (void)pSvg;
+        (void)pRect;
+        (void)byAlpha;
+        return E_NOTIMPL;
+    }
+    #endif // SOUI_ENABLE_SVG
 	COLORREF SRenderTarget_GDI::GetTextColor()
 	{
 		return m_curColor.toCOLORREF();

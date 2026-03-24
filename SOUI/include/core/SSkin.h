@@ -1413,6 +1413,7 @@ class SOUI_EXP SSkinTreeLines : public SSkinObjBase {
  * Description: Represents a skin that renders SVG data. The SVG is rasterized to a memory bitmap
  * and cached. When the rendering size changes, the cache is automatically updated.
  */
+#ifdef SOUI_ENABLE_SVG
 class SOUI_EXP SSkinSvg : public SSkinObjBase {
     DEF_SOBJECT(SSkinObjBase, L"svg")
 
@@ -1485,6 +1486,7 @@ class SOUI_EXP SSkinSvg : public SSkinObjBase {
         ATTR_BOOL(L"cache", m_bEnableCache, TRUE) // Enable caching
     SOUI_ATTRS_END()
 };
+#endif // SOUI_ENABLE_SVG
 
 SNSEND
 #endif // __SSKIN__H__

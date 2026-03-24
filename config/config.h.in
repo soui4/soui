@@ -8,6 +8,7 @@
 #cmakedefine SOUI_ENABLE_CORE_LIB
 #cmakedefine SOUI_ENABLE_ACC
 #cmakedefine SOUI_ENABLE_SPY
+#cmakedefine SOUI_ENABLE_SVG
 
 #ifdef _WIN32
 #ifdef SOUI_ENABLE_SPY
