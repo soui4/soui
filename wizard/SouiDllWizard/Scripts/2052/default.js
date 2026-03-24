@@ -51,6 +51,8 @@ function CreateCustomProject(strProjectName, strProjectPath) {
                     strProjTemplatePath += '\\2019';
                 else if (WizardVersion == 17.0)
                     strProjTemplatePath += '\\2022';
+                else if (WizardVersion == 18.0)
+                    strProjTemplatePath += '\\2026';
             }
             else {
                 strProjTemplatePath = wizard.FindSymbol('TEMPLATES_PATH');
@@ -69,6 +71,8 @@ function CreateCustomProject(strProjectName, strProjectPath) {
                     strProjTemplatePath += '\\2019';
                 else if (WizardVersion == 17.0)
                     strProjTemplatePath += '\\2022';
+                else if (WizardVersion == 18.0)
+                    strProjTemplatePath += '\\2026';
             }
         }
 
@@ -220,10 +224,10 @@ function AddConfig(proj, strProjectName) {
         resCplTool.Culture = 0x804;
         resCplTool.PreprocessorDefinitions += ';_DEBUG';
         if (SysResBuiltin && (ResLoadType == 0)) {
-            resCplTool.AdditionalIncludeDirectories = '"$(SOUI4PATH)\\soui-sys-resource"';
+            resCplTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_32)\\config";"$(SOUI4PATH)\\soui-sys-resource"';
         }
         else {
-            resCplTool.PreprocessorDefinitions += ';_DEBUG';
+            resCplTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_32)\\config"';
         }
 		// Release设置
         var config = proj.Object.Configurations('Release|Win32');
@@ -268,9 +272,11 @@ function AddConfig(proj, strProjectName) {
         var resCplTool = config.Tools('VCResourceCompilerTool');
         resCplTool.Culture = 0x804;
         if (SysResBuiltin && (ResLoadType == 0)) {
-            resCplTool.AdditionalIncludeDirectories = '"$(SOUI4PATH)\\soui-sys-resource"';
+            resCplTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_32)\\config";"$(SOUI4PATH)\\soui-sys-resource"';
         }
-
+        else {
+            resCplTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_32)\\config"';
+        }
         //x64配置,默认情况15以前的版本是没有X64的配置的
         wcharSet = wizard.FindSymbol('WCHAR_64');
         mtSet = wizard.FindSymbol('MT_64');
@@ -321,7 +327,10 @@ function AddConfig(proj, strProjectName) {
             resCplTool_64.Culture = 0x804;
             resCplTool_64.PreprocessorDefinitions += ';_DEBUG';
             if (SysResBuiltin && (ResLoadType == 0)) {
-                resCplTool_64.AdditionalIncludeDirectories = '"$(SOUI4PATH)\\soui-sys-resource"';
+                resCplTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_64)\\config";"$(SOUI4PATH)\\soui-sys-resource"';
+            }
+            else {
+                resCplTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_64)\\config"';
             }
             var config_64 = proj.Object.Configurations('Release|x64');
             config_64.DebugSettings.Environment = 'PATH=%SOUI4_INSTALL_64%\\bin\\Release\\;%PATH%';
@@ -364,7 +373,10 @@ function AddConfig(proj, strProjectName) {
             var resCplTool_64 = config_64.Tools('VCResourceCompilerTool');
             resCplTool_64.Culture = 0x804;
             if (SysResBuiltin && (ResLoadType == 0)) {
-                resCplTool_64.AdditionalIncludeDirectories = '"$(SOUI4PATH)\\soui-sys-resource"';
+                resCplTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_64)\\config";"$(SOUI4PATH)\\soui-sys-resource"';
+            }
+            else {
+                resCplTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_64)\\config"';
             }
         }
     }

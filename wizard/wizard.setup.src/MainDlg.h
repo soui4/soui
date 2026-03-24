@@ -18,6 +18,8 @@ const LPCTSTR kEntryFiles[]={
 	_T("Soui5DllWizard.vsdir"),
 	_T("Soui5Wizard.ico"),
 	_T("Soui5Wizard.vsdir"),
+	_T("Soui5DllWizard.vsz"),
+	_T("Soui5Wizard.vsz"),
 };
 
 class CMainDlg : public CDialogImpl<CMainDlg>
@@ -79,8 +81,8 @@ public:
 
 	CString GetVSDir(LPCTSTR pszEnvName)
 	{
-        static const LPCTSTR kVsVer[3]
-            = { _T("[15.0,16.0]"), _T("[16.0,17.0]"), _T("[17.0,18.0]") };
+        static const LPCTSTR kVsVer[4]
+            = { _T("[15.0,16.0]"), _T("[16.0,17.0]"), _T("[17.0,18.0]"), _T("[18.0,19.0]") };
 
 		if (_tcscmp(_T("VS141COMNTOOLS"), pszEnvName) == 0)
 			return GetVs2017OrLaterDir(kVsVer[0]);
@@ -89,6 +91,8 @@ public:
 			return GetVs2017OrLaterDir(kVsVer[1]);
         if (_tcscmp(_T("VS143COMNTOOLS"), pszEnvName) == 0)
             return GetVs2017OrLaterDir(kVsVer[2]);
+        if (_tcscmp(_T("VS145COMNTOOLS"), pszEnvName) == 0)
+            return GetVs2017OrLaterDir(kVsVer[3]);
 		CString strRet;
 		strRet.GetEnvironmentVariable(pszEnvName);
 		if (!strRet.IsEmpty()) strRet = strRet.Left(strRet.GetLength() - 14);//14=length("Common7\Tools\")
