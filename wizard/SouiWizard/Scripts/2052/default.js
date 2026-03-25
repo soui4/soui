@@ -176,7 +176,7 @@ function AddConfig(proj, strProjectName) {
         var mtSet = wizard.FindSymbol('MT_32');
         var charSetUNICODE = wizard.FindSymbol('UNICODE_32');
         
-        // Debug����
+        // Debug
         var config = proj.Object.Configurations('Debug|Win32');
         config.DebugSettings.Environment = 'PATH=%SOUI4_INSTALL_32%\\bin\\Debug\\;%PATH%';
         config.CharacterSet = charSetUNICODE;
@@ -222,14 +222,9 @@ function AddConfig(proj, strProjectName) {
         var resCplTool = config.Tools('VCResourceCompilerTool');
         resCplTool.Culture = 0x804;
         resCplTool.PreprocessorDefinitions += ';_DEBUG';
-        if (SysResBuiltin && (ResLoadType == 0)) {
-            resCplTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_32)\\config";"$(SOUI4PATH)\\soui-sys-resource"';
-        }
-        else {
-            resCplTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_32)\\config"';
-        }
-
-		// Release设置
+        resCplTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_32)\\include\\config";"$(SOUI4PATH)\\soui-sys-resource"';
+        
+	// Release设置
         var config = proj.Object.Configurations('Release|Win32');
         config.DebugSettings.Environment = 'PATH=%SOUI4_INSTALL_32%\\bin\\Release\\;%PATH%';
         config.CharacterSet = charSetUNICODE;
@@ -254,7 +249,7 @@ function AddConfig(proj, strProjectName) {
         }
         CLTool.PreprocessorDefinitions = 'WIN32;_WINDOWS;NDEBUG';
         CLTool.RuntimeLibrary = (mtSet == 1) ? 0 : 2;; // 0=MT, 1=MTd, 2=MD (DLL), 3=MDd
-		CLTool.WholeProgramOptimization = true;	//全程序优化：启动链接时代码生成
+        CLTool.WholeProgramOptimization = true;	//全程序优化：启动链接时代码生成
 
         var LinkTool = config.Tools('VCLinkerTool');
         LinkTool.GenerateDebugInformation = true;
@@ -270,12 +265,7 @@ function AddConfig(proj, strProjectName) {
 
         var resCplTool = config.Tools('VCResourceCompilerTool');
         resCplTool.Culture = 0x804;
-        if (SysResBuiltin && (ResLoadType == 0)) {
-            resCplTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_32)\\config";"$(SOUI4PATH)\\soui-sys-resource"';
-        }
-        else {
-            resCplTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_32)\\config"';
-        }
+        resCplTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_32)\\include\\config";"$(SOUI4PATH)\\soui-sys-resource"';
         //x64配置,默认情况15以前的版本是没有X64的配置的
         wcharSet = wizard.FindSymbol('WCHAR_64');
         mtSet = wizard.FindSymbol('MT_64');
@@ -325,12 +315,8 @@ function AddConfig(proj, strProjectName) {
             var resCplTool_64 = config_x64.Tools('VCResourceCompilerTool');
             resCplTool_64.Culture = 0x804;
             resCplTool_64.PreprocessorDefinitions += ';_DEBUG';
-            if (SysResBuiltin && (ResLoadType == 0)) {
-                resCplTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_64)\\config";"$(SOUI4PATH)\\soui-sys-resource"';
-            }
-            else {
-                resCplTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_64)\\config"';
-            }
+            resCplTool_64.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_64)\\include\\config";"$(SOUI4PATH)\\soui-sys-resource"';
+
             var config_64 = proj.Object.Configurations('Release|x64');
             config_64.DebugSettings.Environment = 'PATH=%SOUI4_INSTALL_64%\\bin\\Release\\;%PATH%';
             config_64.CharacterSet = charSetUNICODE;
@@ -371,12 +357,7 @@ function AddConfig(proj, strProjectName) {
 
             var resCplTool_64 = config_64.Tools('VCResourceCompilerTool');
             resCplTool_64.Culture = 0x804;
-            if (SysResBuiltin && (ResLoadType == 0)) {
-                resCplTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_64)\\config";"$(SOUI4PATH)\\soui-sys-resource"';
-            }
-            else {
-                resCplTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_64)\\config"';
-            }
+            resCplTool_64.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_64)\\include\\config";"$(SOUI4PATH)\\soui-sys-resource"';
         }
     }
     catch (e) {
