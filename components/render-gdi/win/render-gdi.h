@@ -52,6 +52,10 @@ public:
 protected:
 	SAutoRefPtr<IImgDecoderFactory> m_imgDecoderFactory;
 	SAutoRefPtr<IFontS> m_defFont;
+#ifdef SOUI_ENABLE_SVG
+	// Global GDI+ token
+	ULONG_PTR g_gdiplusToken;
+#endif // SOUI_ENABLE_SVG
 };
 
 
@@ -538,7 +542,7 @@ public:
 	STDMETHOD_(HRESULT,SetXfermode)(THIS_ int mode,int *pOldMode=NULL) OVERRIDE;
 	STDMETHOD_(BOOL,SetAntiAlias)(THIS_ BOOL bAntiAlias) OVERRIDE;
 	STDMETHOD_(BOOL,GetAntiAlias)(THIS) SCONST OVERRIDE;
-	STDMETHOD_(HRESULT, DrawSVG)(THIS_ ISvgObj*  pSvg, LPCRECT pRect, BYTE byAlpha = 0xFF) OVERRIDE;
+	STDMETHOD_(HRESULT, DrawSVG)(THIS_ ISvgObj * pSvg, LPCRECT pRect, LPCRECT prcSrc DEF_VAL(NULL), BYTE byAlpha DEF_VAL(0xFF)) OVERRIDE;
 protected:
 	HDC               m_hdc;
 	SColor            m_curColor;

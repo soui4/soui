@@ -2195,10 +2195,11 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
      * @brief Draw a parsed SVG object to the render target.
      * @param hSvg Handle to the parsed SVG object.
      * @param pRect Destination rectangle for rendering SVG.
+     * @param prcSrc Source rectangle in SVG coordinates (optional, if NULL use entire SVG).
      * @param byAlpha Alpha value for blending (default is 0xFF).
      * @return HRESULT indicating success or failure.
      */
-    STDMETHOD_(HRESULT, DrawSVG)(THIS_ ISvgObj * pSvg, LPCRECT pRect, BYTE byAlpha DEF_VAL(0xFF)) PURE;
+    STDMETHOD_(HRESULT, DrawSVG)(THIS_ ISvgObj * pSvg, LPCRECT pRect, LPCRECT prcSrc DEF_VAL(NULL), BYTE byAlpha DEF_VAL(0xFF)) PURE;
 };
 
 /**

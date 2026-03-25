@@ -1427,7 +1427,7 @@ SNSBEGIN
 	}
 
     #ifdef SOUI_ENABLE_SVG
-	HRESULT SRenderTarget_GDI::DrawSVG(ISvgObj*  pSvgObj, LPCRECT pRect, BYTE byAlpha)
+	HRESULT SRenderTarget_GDI::DrawSVG(ISvgObj*  pSvgObj, LPCRECT pRect, LPCRECT prcSrc, BYTE byAlpha)
 	{
 		if (!pSvgObj || !pRect)
 			return E_INVALIDARG;
@@ -1441,17 +1441,30 @@ SNSBEGIN
 		if (nWid <= 0 || nHei <= 0)
 			return E_INVALIDARG;
 
-		float svgWidth = pSvg->width;
-		float svgHeight = pSvg->height;
-		if (svgWidth <= 0 || svgHeight <= 0)
+		// Calculate source rectangle
+		float srcX = 0, srcY = 0, srcWidth, srcHeight;
+		if (prcSrc)
 		{
-			svgWidth = (float)nWid;
-			svgHeight = (float)nHei;
+			srcX = (float)prcSrc->left;
+			srcY = (float)prcSrc->top;
+			srcWidth = (float)(prcSrc->right - prcSrc->left);
+			srcHeight = (float)(prcSrc->bottom - prcSrc->top);
+		}
+		else
+		{
+			srcWidth = pSvg->width;
+			srcHeight = pSvg->height;
 		}
 
-		float scaleX = nWid / svgWidth;
-		float scaleY = nHei / svgHeight;
-		float scale = scaleX < scaleY ? scaleX : scaleY;
+		if (srcWidth <= 0 || srcHeight <= 0)
+		{
+			srcWidth = (float)nWid;
+			srcHeight = (float)nHei;
+		}
+
+		// Calculate scale for both X and Y
+		float scaleX = nWid / srcWidth;
+		float scaleY = nHei / srcHeight;
 
 		float tx = (float)(pRect->left);
 		float ty = (float)(pRect->top);
@@ -1483,7 +1496,11 @@ SNSBEGIN
 		NSVGrasterizer* rast = nsvgCreateRasterizer();
 		if (rast)
 		{
-			nsvgRasterize(rast, pSvg, tx, ty, scale, rgbaBuffer, nWid, nHei, nWid * 4);
+			// Rasterize with source rectangle support
+			float rasterTx = tx - srcX * scaleX;
+			float rasterTy = ty - srcY * scaleY;
+			
+			nsvgRasterize(rast, pSvg, rasterTx, rasterTy, scaleX, rgbaBuffer, nWid, nHei, nWid * 4);
 			nsvgDeleteRasterizer(rast);
 		}
 
@@ -1492,8 +1509,8 @@ SNSBEGIN
 			if (text->text[0] == '\0')
 				continue;
 
-			float fontSize = text->fontSize * scale;
-			if (fontSize <= 0) fontSize = 16.0f * scale;
+			float fontSize = text->fontSize * scaleX;
+			if (fontSize <= 0) fontSize = 16.0f * scaleX;
 
 			LOGFONTW lf = {0};
 			lf.lfHeight = -(int)fontSize;
@@ -1519,8 +1536,9 @@ SNSBEGIN
 			COLORREF crText = RGB(r, g, b);
 			COLORREF crOldText = ::SetTextColor(hMemDC, crText);
 
-			float x = text->x * scale + tx;
-			float y = text->y * scale + ty;
+			// Apply source rectangle offset and scaling
+			float x = (text->x - srcX) * scaleX + tx;
+			float y = (text->y - srcY) * scaleY + ty;
 
 			SIZE textSize = {0};
             int len = strlen(text->text);
@@ -1544,12 +1562,12 @@ SNSBEGIN
 			y -= tm.tmAscent;
 
 			XFORM xform = {0};
-			xform.eM11 = text->xform[0] * scale;
-			xform.eM12 = text->xform[2] * scale;
-			xform.eM21 = text->xform[1] * scale;
-			xform.eM22 = text->xform[3] * scale;
-			xform.eDx = text->xform[4] * scale + tx;
-			xform.eDy = text->xform[5] * scale + ty;
+			xform.eM11 = text->xform[0] * scaleX;
+			xform.eM12 = text->xform[2] * scaleX;
+			xform.eM21 = text->xform[1] * scaleX;
+			xform.eM22 = text->xform[3] * scaleX;
+			xform.eDx = (text->xform[4] - srcX) * scaleX + tx;
+			xform.eDy = (text->xform[5] - srcY) * scaleY + ty;
 
 			BOOL hasTransform = (xform.eM11 != 1.0f || xform.eM12 != 0.0f || 
 			                      xform.eM21 != 0.0f || xform.eM22 != 1.0f || 

@@ -1,5 +1,5 @@
 ﻿//////////////////////////////////////////////////////////////////////////
-//   File Name: SSkinPool
+//   File Name: SSkin.cpp
 //////////////////////////////////////////////////////////////////////////
 #include "souistd.h"
 #include "core/SSkin.h"
@@ -7,7 +7,114 @@
 #include "helper/SplitString.h"
 #include <core/SGradient.h>
 #include "core/Svg.h"
+#ifdef SOUI_ENABLE_SVG
+#include <src/nanosvg.h>
+#endif
+
 SNSBEGIN
+
+// 辅助函数：绘制SVG九宫格
+static void DrawSVG9Patch(IRenderTarget *pRT, ISvgObj *pSvg, LPCRECT pRect, LPCRECT prcSrc, LPCRECT prcMargin, BYTE byAlpha)
+{
+    if (!pRT || !pSvg || !pRect || !prcMargin) return;
+
+    float srcX = 0, srcY = 0, srcWidth, srcHeight;
+    if (prcSrc) {
+        srcX = (float)prcSrc->left;
+        srcY = (float)prcSrc->top;
+        srcWidth = (float)(prcSrc->right - prcSrc->left);
+        srcHeight = (float)(prcSrc->bottom - prcSrc->top);
+    } else {
+#ifdef SOUI_ENABLE_SVG
+        NSVGimage* pImg = (NSVGimage*)pSvg->GetPtr();
+        srcWidth = pImg->width;
+        srcHeight = pImg->height;
+#else
+        return;
+#endif
+    }
+
+    float marginL = (float)prcMargin->left;
+    float marginT = (float)prcMargin->top;
+    float marginR = (float)prcMargin->right;
+    float marginB = (float)prcMargin->bottom;
+
+    // 计算源区域的9个部分
+    float srcMidX = srcX + marginL;
+    float srcMidY = srcY + marginT;
+    float srcMidW = srcWidth - marginL - marginR;
+    float srcMidH = srcHeight - marginT - marginB;
+
+    // 计算目标区域的9个部分
+    float dstMidX = (float)pRect->left + marginL;
+    float dstMidY = (float)pRect->top + marginT;
+    float dstMidW = (float)(pRect->right - pRect->left) - marginL - marginR;
+    float dstMidH = (float)(pRect->bottom - pRect->top) - marginT - marginB;
+
+    // 绘制9个部分
+    // 左上角
+    if (marginL > 0 && marginT > 0) {
+        RECT rcSrc = {(LONG)srcX, (LONG)srcY, (LONG)(srcX + marginL), (LONG)(srcY + marginT)};
+        RECT rcDst = {pRect->left, pRect->top, (LONG)(pRect->left + marginL), (LONG)(pRect->top + marginT)};
+        pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
+    }
+
+    // 上边
+    if (marginT > 0 && dstMidW > 0) {
+        RECT rcSrc = {(LONG)srcMidX, (LONG)srcY, (LONG)(srcMidX + srcMidW), (LONG)(srcY + marginT)};
+        RECT rcDst = {(LONG)dstMidX, pRect->top, (LONG)(dstMidX + dstMidW), (LONG)(pRect->top + marginT)};
+        pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
+    }
+
+    // 右上角
+    if (marginR > 0 && marginT > 0) {
+        RECT rcSrc = {(LONG)(srcX + srcWidth - marginR), (LONG)srcY, (LONG)(srcX + srcWidth), (LONG)(srcY + marginT)};
+        RECT rcDst = {(LONG)(pRect->right - marginR), pRect->top, pRect->right, (LONG)(pRect->top + marginT)};
+        pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
+    }
+
+    // 左边
+    if (marginL > 0 && dstMidH > 0) {
+        RECT rcSrc = {(LONG)srcX, (LONG)srcMidY, (LONG)(srcX + marginL), (LONG)(srcMidY + srcMidH)};
+        RECT rcDst = {pRect->left, (LONG)dstMidY, (LONG)(pRect->left + marginL), (LONG)(dstMidY + dstMidH)};
+        pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
+    }
+
+    // 中间
+    if (dstMidW > 0 && dstMidH > 0) {
+        RECT rcSrc = {(LONG)srcMidX, (LONG)srcMidY, (LONG)(srcMidX + srcMidW), (LONG)(srcMidY + srcMidH)};
+        RECT rcDst = {(LONG)dstMidX, (LONG)dstMidY, (LONG)(dstMidX + dstMidW), (LONG)(dstMidY + dstMidH)};
+        pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
+    }
+
+    // 右边
+    if (marginR > 0 && dstMidH > 0) {
+        RECT rcSrc = {(LONG)(srcX + srcWidth - marginR), (LONG)srcMidY, (LONG)(srcX + srcWidth), (LONG)(srcMidY + srcMidH)};
+        RECT rcDst = {(LONG)(pRect->right - marginR), (LONG)dstMidY, pRect->right, (LONG)(dstMidY + dstMidH)};
+        pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
+    }
+
+    // 左下角
+    if (marginL > 0 && marginB > 0) {
+        RECT rcSrc = {(LONG)srcX, (LONG)(srcY + srcHeight - marginB), (LONG)(srcX + marginL), (LONG)(srcY + srcHeight)};
+        RECT rcDst = {pRect->left, (LONG)(pRect->bottom - marginB), (LONG)(pRect->left + marginL), pRect->bottom};
+        pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
+    }
+
+    // 下边
+    if (marginB > 0 && dstMidW > 0) {
+        RECT rcSrc = {(LONG)srcMidX, (LONG)(srcY + srcHeight - marginB), (LONG)(srcMidX + srcMidW), (LONG)(srcY + srcHeight)};
+        RECT rcDst = {(LONG)dstMidX, (LONG)(pRect->bottom - marginB), (LONG)(dstMidX + dstMidW), pRect->bottom};
+        pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
+    }
+
+    // 右下角
+    if (marginR > 0 && marginB > 0) {
+        RECT rcSrc = {(LONG)(srcX + srcWidth - marginR), (LONG)(srcY + srcHeight - marginB), (LONG)(srcX + srcWidth), (LONG)(srcY + srcHeight)};
+        RECT rcDst = {(LONG)(pRect->right - marginR), (LONG)(pRect->bottom - marginB), pRect->right, pRect->bottom};
+        pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
+    }
+}
 
 //////////////////////////////////////////////////////////////////////////
 // SSkinImgList
@@ -28,8 +135,15 @@ SSkinImgList::~SSkinImgList()
 SIZE SSkinImgList::GetSkinSize() const
 {
     SIZE ret = { 0, 0 };
-    if (GetImage())
+    if (GetSvg())
+    {
+        ret.cx = GetSvg()->GetWidth();
+        ret.cy = GetSvg()->GetHeight();
+    }
+    else if (GetImage())
+    {
         ret = GetImage()->Size();
+    }
     if (m_bVertical)
         ret.cy /= m_nStates;
     else
@@ -42,18 +156,40 @@ int SSkinImgList::GetStates() const
     return m_nStates;
 }
 
-void SSkinImgList::OnInitFinished(IXmlNode *xmlNode)
+void SSkinImgList::LoadSrcImage() const
 {
-    __baseCls::OnInitFinished(xmlNode);
-    if (!m_bLazyLoad && !m_strSrc.IsEmpty())
+    if (m_strSrc.IsEmpty())
+        return;
+    SStringWList list;
+    SplitString(m_strSrc, L':', list);
+    if (list.GetCount() == 1)
+    {
+        list.InsertAt(0, L"file");
+    }
+    list[0].MakeLower();
+    list[1].MakeLower();
+    if (list[0] == L"svg" || (list[0] == L"file" && list[1].EndsWith(L"svg") == 0))
+    {
+        m_pSvg.Attach(CreateSvgFromResId(S_CW2T(m_strSrc)));
+    }
+    else
     {
         m_pImg.Attach(LOADIMAGE2(m_strSrc));
     }
 }
 
+void SSkinImgList::OnInitFinished(IXmlNode *xmlNode)
+{
+    __baseCls::OnInitFinished(xmlNode);
+    if (!m_bLazyLoad && !m_strSrc.IsEmpty())
+    {
+        LoadSrcImage();
+    }
+}
+
 void SSkinImgList::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const
 {
-    if (!GetImage())
+    if (!GetImage() && !GetSvg())
         return;
     SIZE sz = GetSkinSize();
     RECT rcSrc = { 0, 0, sz.cx, sz.cy };
@@ -61,18 +197,25 @@ void SSkinImgList::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, 
         OffsetRect(&rcSrc, 0, iState * sz.cy);
     else
         OffsetRect(&rcSrc, iState * sz.cx, 0);
-    if (m_bTile)
+    if(GetImage())
     {
-        SAutoRefPtr<IBrushS> brush, oldBrush;
-        pRT->CreateBitmapBrush(GetImage(), kRepeat_TileMode, kRepeat_TileMode, &brush);
-        pRT->SelectObject(brush, (IRenderObj **)&oldBrush);
-        pRT->FillRectangle(rcDraw);
-        pRT->SelectObject(oldBrush, NULL);
+        if (m_bTile)
+        {
+            SAutoRefPtr<IBrushS> brush, oldBrush;
+            pRT->CreateBitmapBrush(GetImage(), kRepeat_TileMode, kRepeat_TileMode, &brush);
+            pRT->SelectObject(brush, (IRenderObj **)&oldBrush);
+            pRT->FillRectangle(rcDraw);
+            pRT->SelectObject(oldBrush, NULL);
+        }
+        else
+        {
+            pRT->DrawBitmapEx(rcDraw, GetImage(), &rcSrc, GetExpandMode(), byAlpha);
+        }
+    }else{
+        //svg don't support tile mode.
+        pRT->DrawSVG(GetSvg(), rcDraw, &rcSrc, byAlpha);
     }
-    else
-    {
-        pRT->DrawBitmapEx(rcDraw, GetImage(), &rcSrc, GetExpandMode(), byAlpha);
-    }
+
 }
 
 UINT SSkinImgList::GetExpandMode() const
@@ -86,12 +229,9 @@ UINT SSkinImgList::GetExpandMode() const
 HRESULT SSkinImgList::OnAttrSrc(const SStringW &value, BOOL bLoading)
 {
     m_strSrc = value;
-#ifndef _WIN32
-    m_strSrc.ReplaceChar('\\', '/');
-#endif //_WIN32
     if (!bLoading)
     {
-        m_pImg.Attach(LOADIMAGE2(m_strSrc));
+        LoadSrcImage();
     }
     return S_OK;
 }
@@ -99,19 +239,40 @@ HRESULT SSkinImgList::OnAttrSrc(const SStringW &value, BOOL bLoading)
 bool SSkinImgList::SetImage(IBitmapS *pImg)
 {
     m_pImg = pImg;
-    m_strSrc.Empty();
+    m_bLazyLoad = FALSE;
+    m_pSvg = NULL;
+    return true;
+}
+
+bool SSkinImgList::SetSvg(ISvgObj *pSvg)
+{
+    m_pSvg = pSvg;
+    m_pImg = NULL;
     m_bLazyLoad = FALSE;
     return true;
 }
 
+ISvgObj *SSkinImgList::GetSvg() const
+{
+    if (m_pSvg)
+        return m_pSvg;
+    if(m_pImg)
+        return NULL;
+    if (m_bLazyLoad && !m_strSrc.IsEmpty())
+    {
+        LoadSrcImage();
+    }
+    return m_pSvg;
+}
 IBitmapS *SSkinImgList::GetImage() const
 {
     if (m_pImg)
         return m_pImg;
+    if (m_pSvg)
+        return NULL;
     if (m_bLazyLoad && !m_strSrc.IsEmpty())
     {
-        m_pImg.Attach(LOADIMAGE2(m_strSrc));
-        m_strSrc.Empty();
+        LoadSrcImage();
     }
     return m_pImg;
 }
@@ -125,25 +286,33 @@ void SSkinImgList::OnColorize(COLORREF cr)
     m_crColorize = cr;
 
     IBitmapS *pImg = GetImage();
-    if (m_imgBackup)
-    { // restore
-        LPCVOID pSrc = m_imgBackup->GetPixelBits();
-        LPVOID pDst = pImg->LockPixelBits();
-        memcpy(pDst, pSrc, pImg->Width() * pImg->Height() * 4);
-        pImg->UnlockPixelBits(pDst);
-    }
-    else
+    if (pImg)
     {
-        if (!pImg)
-            return;
-        if (S_OK != pImg->Clone(&m_imgBackup))
-            return;
-    }
+        if (m_imgBackup)
+        { // restore
+            LPCVOID pSrc = m_imgBackup->GetPixelBits();
+            LPVOID pDst = pImg->LockPixelBits();
+            memcpy(pDst, pSrc, pImg->Width() * pImg->Height() * 4);
+            pImg->UnlockPixelBits(pDst);
+        }
+        else
+        {
+            if (S_OK != pImg->Clone(&m_imgBackup))
+                return;
+        }
 
-    if (cr != 0)
-        SDIBHelper::Colorize(pImg, cr);
-    else
-        m_imgBackup = NULL; // free backup
+        if (cr != 0)
+            SDIBHelper::Colorize(pImg, cr);
+        else
+            m_imgBackup = NULL; // free backup
+    }
+    else if (GetSvg())
+    {
+        #ifdef SOUI_ENABLE_SVG
+        NSVGimage* pImg = (NSVGimage*)GetSvg()->GetPtr();
+        nsvgColorize(pImg, cr);
+        #endif
+    }
 }
 
 void SSkinImgList::_Scale(ISkinObj *skinObj, int nScale)
@@ -158,26 +327,34 @@ void SSkinImgList::_Scale(ISkinObj *skinObj, int nScale)
     pRet->m_state2Index = m_state2Index;
     pRet->m_bLazyLoad = FALSE;
 
-    CSize szSkin = SSkinImgList::GetSkinSize(); // add SSkinImgList:: to avoid call function implemented in derived class
-    szSkin.cx = MulDiv(szSkin.cx, nScale, GetScale());
-    szSkin.cy = MulDiv(szSkin.cy, nScale, GetScale());
-    if (m_bVertical)
+    if (GetImage())
     {
-        szSkin.cy *= m_nStates;
-    }
-    else
-    {
-        szSkin.cx *= m_nStates;
-    }
+        CSize szSkin = SSkinImgList::GetSkinSize(); // add SSkinImgList:: to avoid call function implemented in derived class
+        szSkin.cx = MulDiv(szSkin.cx, nScale, GetScale());
+        szSkin.cy = MulDiv(szSkin.cy, nScale, GetScale());
+        if (m_bVertical)
+        {
+            szSkin.cy *= m_nStates;
+        }
+        else
+        {
+            szSkin.cx *= m_nStates;
+        }
 
-    if (m_imgBackup)
-    {
-        m_imgBackup->Scale2(&pRet->m_imgBackup, szSkin.cx, szSkin.cy, kHigh_FilterLevel);
+        if (m_imgBackup)
+        {
+            m_imgBackup->Scale2(&pRet->m_imgBackup, szSkin.cx, szSkin.cy, kHigh_FilterLevel);
+        }
+        IBitmapS *pImg = GetImage();
+        if (pImg)
+        {
+            m_pImg->Scale2(&pRet->m_pImg, szSkin.cx, szSkin.cy, kHigh_FilterLevel);
+        }
     }
-    IBitmapS *pImg = GetImage();
-    if (pImg)
+    else if (GetSvg())
     {
-        m_pImg->Scale2(&pRet->m_pImg, szSkin.cx, szSkin.cy, kHigh_FilterLevel);
+        // SVG scaling is handled in DrawSVG method
+        pRet->m_pSvg = m_pSvg;
     }
 }
 
@@ -185,6 +362,8 @@ void SSkinImgList::_Scale(ISkinObj *skinObj, int nScale)
 //  SSkinImgCenter
 void SSkinImgCenter::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const
 {
+    if (!GetImage() && !GetSvg())
+        return;
     SIZE szSkin = GetSkinSize();
     CRect rcTarget = *rcDraw;
     CPoint pt;
@@ -199,7 +378,12 @@ void SSkinImgCenter::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState
     else
         OffsetRect(&rcSrc, iState * szSkin.cx, 0);
 
-    pRT->DrawBitmapEx(rcTarget, GetImage(), &rcSrc, GetExpandMode(), byAlpha);
+    if(GetImage())
+    {
+        pRT->DrawBitmapEx(rcTarget, GetImage(), &rcSrc, GetExpandMode(), byAlpha);
+    }else{
+        pRT->DrawSVG(GetSvg(), &rcTarget, &rcSrc, byAlpha);
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -210,8 +394,6 @@ SSkinImgFrame::SSkinImgFrame()
 
 void SSkinImgFrame::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const
 {
-    if (!GetImage())
-        return;
     SIZE sz = GetSkinSize();
     CPoint pt;
     if (IsVertical())
@@ -219,7 +401,13 @@ void SSkinImgFrame::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState,
     else
         pt.x = sz.cx * iState;
     CRect rcSour(pt, sz);
-    pRT->DrawBitmap9Patch(rcDraw, GetImage(), &rcSour, &m_rcMargin, GetExpandMode(), byAlpha);
+    if(GetImage())
+    {
+        pRT->DrawBitmap9Patch(rcDraw, GetImage(), &rcSour, &m_rcMargin, GetExpandMode(), byAlpha);
+    }else if(GetSvg()){
+        // SVG supports 9-patch now
+        DrawSVG9Patch(pRT, GetSvg(), rcDraw, &rcSour, &m_rcMargin, byAlpha);
+    }
 }
 
 UINT SSkinImgFrame::GetExpandMode() const
@@ -323,16 +511,16 @@ void SSkinButton::OnColorize(COLORREF cr)
     else
     {
         if (m_crColorize != 0)
-        { //从备份里获取数据
+        { // 从备份里获取数据
             memcpy(&m_colors, &m_colorsBackup, sizeof(BTNCOLORS));
         }
         else
-        { //将数据备份
+        { // 将数据备份
             memcpy(&m_colorsBackup, &m_colors, sizeof(BTNCOLORS));
         }
         m_crColorize = cr;
 
-        //调整颜色值
+        // 调整颜色值
         for (int i = 0; i < 4; i++)
         {
             SDIBHelper::Colorize(m_colors.m_crBorder[i], m_crColorize);
@@ -498,7 +686,7 @@ CRect SSkinScrollbar::GetPartRect(int nSbCode, int nState, BOOL bVertical) const
 
 void SSkinScrollbar::_DrawByState(IRenderTarget *pRT, LPCRECT prcDraw, DWORD dwState, BYTE byAlpha) const
 {
-    if (!GetImage())
+    if (!GetImage() && !GetSvg())
         return;
     int nSbCode = LOWORD(dwState);
     int nState = LOBYTE(HIWORD(dwState));
@@ -511,18 +699,36 @@ void SSkinScrollbar::_DrawByState(IRenderTarget *pRT, LPCRECT prcDraw, DWORD dwS
 
     CRect rcSour = GetPartRect(nSbCode, nState, bVertical);
 
-    pRT->DrawBitmap9Patch(prcDraw, GetImage(), &rcSour, &rcMargin, m_bTile ? EM_TILE : EM_STRETCH, byAlpha);
-
-    if (nSbCode == SB_THUMBTRACK && m_bHasGripper)
+    if(GetImage())
     {
-        rcSour = GetPartRect(SB_THUMBGRIPPER, 0, bVertical);
-        CRect rcDraw = *prcDraw;
+        pRT->DrawBitmap9Patch(prcDraw, GetImage(), &rcSour, &rcMargin, m_bTile ? EM_TILE : EM_STRETCH, byAlpha);
 
-        if (bVertical)
-            rcDraw.top += (rcDraw.Height() - rcSour.Height()) / 2, rcDraw.bottom = rcDraw.top + rcSour.Height();
-        else
-            rcDraw.left += (rcDraw.Width() - rcSour.Width()) / 2, rcDraw.right = rcDraw.left + rcSour.Width();
-        pRT->DrawBitmap9Patch(&rcDraw, GetImage(), &rcSour, &rcMargin, m_bTile ? EM_TILE : EM_STRETCH, byAlpha);
+        if (nSbCode == SB_THUMBTRACK && m_bHasGripper)
+        {
+            rcSour = GetPartRect(SB_THUMBGRIPPER, 0, bVertical);
+            CRect rcDraw = *prcDraw;
+
+            if (bVertical)
+                rcDraw.top += (rcDraw.Height() - rcSour.Height()) / 2, rcDraw.bottom = rcDraw.top + rcSour.Height();
+            else
+                rcDraw.left += (rcDraw.Width() - rcSour.Width()) / 2, rcDraw.right = rcDraw.left + rcSour.Width();
+            pRT->DrawBitmap9Patch(&rcDraw, GetImage(), &rcSour, &rcMargin, m_bTile ? EM_TILE : EM_STRETCH, byAlpha);
+        }
+    }else{
+        // SVG supports 9-patch now
+        DrawSVG9Patch(pRT, GetSvg(), prcDraw, &rcSour, &rcMargin, byAlpha);
+
+        if (nSbCode == SB_THUMBTRACK && m_bHasGripper)
+        {
+            rcSour = GetPartRect(SB_THUMBGRIPPER, 0, bVertical);
+            CRect rcDraw = *prcDraw;
+
+            if (bVertical)
+                rcDraw.top += (rcDraw.Height() - rcSour.Height()) / 2, rcDraw.bottom = rcDraw.top + rcSour.Height();
+            else
+                rcDraw.left += (rcDraw.Width() - rcSour.Width()) / 2, rcDraw.right = rcDraw.left + rcSour.Width();
+            DrawSVG9Patch(pRT, GetSvg(), &rcDraw, &rcSour, &rcMargin, byAlpha);
+        }
     }
 }
 
@@ -538,9 +744,11 @@ void SSkinScrollbar::_Scale(ISkinObj *skinObj, int nScale)
 
 int SSkinScrollbar::GetIdealSize() const
 {
-    if (!GetImage())
-        return 0;
-    return GetImage()->Width() / 9;
+    if (GetImage())
+        return GetImage()->Width() / 9;
+    else if (GetSvg())
+        return GetSvg()->GetWidth() / 9;
+    return 0;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1187,7 +1395,7 @@ HRESULT SSkinImgFrame2::OnAttrSrc(const SStringW &strValue, BOOL bLoading)
     LPBYTE pBuf = (LPBYTE)pImg->LockPixelBits();
 
     int left, right, top, bottom;
-    //检测第一扫描行中定义的left,right位置
+    // 检测第一扫描行中定义的left,right位置
     LPBYTE p = pBuf;
     int i = 1;
     while (i < nWid - 1 && p[3] == 0)
@@ -1198,7 +1406,7 @@ HRESULT SSkinImgFrame2::OnAttrSrc(const SStringW &strValue, BOOL bLoading)
         i++, p += 4;
     right = i - 1;
 
-    //检测第一列中定义的top,bottom位置
+    // 检测第一列中定义的top,bottom位置
     i = 1;
     p = pBuf + (nWid * 4);
     while (i < nHei - 1 && p[3] == 0)
@@ -1445,137 +1653,4 @@ void SSkinTreeLines::_Scale(ISkinObj *skinObj, int nScale)
         pRet->m_nLineWidth = MulDiv(m_nLineWidth, nScale, 100);
     }
 }
-
-//////////////////////////////////////////////////////////////////////////
-// SSkinSvg
-#ifdef SOUI_ENABLE_SVG
-SSkinSvg::SSkinSvg()
-    : m_bEnableCache(TRUE)
-    , m_svgObj(NULL)
-{
-    m_cacheSize.cx = m_cacheSize.cy = 0;
-}
-
-SSkinSvg::~SSkinSvg()
-{
-}
-
-SIZE SSkinSvg::GetSkinSize() const
-{
-    if (m_svgObj && (m_cacheSize.cx == 0 || m_cacheSize.cy == 0))
-    {
-        SIZE sz;
-        sz.cx = m_svgObj->GetWidth();
-        sz.cy = m_svgObj->GetHeight();
-        m_cacheSize = sz;
-    }
-    return m_cacheSize;
-}
-
-int SSkinSvg::GetStates() const
-{
-    return 1;
-}
-
-void SSkinSvg::OnInitFinished(IXmlNode *xmlNode)
-{
-    LoadSvg();
-}
-
-void SSkinSvg::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const
-{
-    if (!m_svgObj)
-        return;
-
-    int nWidth = rcDraw->right - rcDraw->left;
-    int nHeight = rcDraw->bottom - rcDraw->top;
-
-    if (nWidth <= 0 || nHeight <= 0)
-        return;
-
-    if (m_bEnableCache)
-    {
-        // Try to use cached bitmap if size matches
-        if (!m_cacheBitmap || (m_cacheSize.cx != nWidth || m_cacheSize.cy != nHeight))
-        {
-            m_cacheBitmap = NULL;
-            // Size changed or cache not initialized - update cache
-            RECT rcMem = { 0, 0, nWidth, nHeight };
-            IRenderFactory *pRenderFactory = GETRENDERFACTORY;
-            if (pRenderFactory)
-            {
-                // Create memory render target
-                SAutoRefPtr<IRenderTarget> pMemRT;
-                if (pRenderFactory->CreateRenderTarget(&pMemRT, nWidth, nHeight))
-                {
-                    // Render SVG object to memory bitmap
-                    pMemRT->BeginDraw();
-                    pMemRT->ClearRect(&rcMem, RGBA(0, 0, 0, 0));
-                    HRESULT hr = pMemRT->DrawSVG(m_svgObj, &rcMem, 0xFF);
-                    pMemRT->EndDraw();
-                    if (S_OK == hr)
-                    {
-                        // Get current bitmap from memory render target
-                        IBitmapS *pNewBitmap = (IBitmapS *)pMemRT->GetCurrentObject(OT_BITMAP);
-                        if (pNewBitmap)
-                        {
-                            // Update cache
-                            m_cacheBitmap = pNewBitmap;
-                            m_cacheSize.cx = nWidth;
-                            m_cacheSize.cy = nHeight;
-                        }
-                    }
-                }
-            }
-        }
-        if (m_cacheBitmap)
-        {
-            RECT rcSrc = { 0, 0, nWidth, nHeight };
-            pRT->DrawBitmapEx(rcDraw, m_cacheBitmap, &rcSrc, MAKELONG(EM_NULL, kLow_FilterLevel), byAlpha);
-        }
-    }
-    else
-    {
-        // Direct rendering without cache
-        pRT->DrawSVG(m_svgObj, rcDraw, byAlpha);
-    }
-}
-
-BOOL SSkinSvg::LoadSvg()
-{
-    m_svgObj.Attach(CreateSvgFromResId(S_CW2T(m_strSrc)));
-    return m_svgObj != NULL;
-}
-
-HRESULT SSkinSvg::OnAttrSrc(const SStringW &value, BOOL bLoading)
-{
-    m_strSrc = value;
-
-    if (!bLoading)
-    {
-        LoadSvg();
-
-        // Clear cache so it will be regenerated
-        m_cacheBitmap = NULL;
-        m_cacheSize.cx = m_cacheSize.cy = 0;
-    }
-    return S_OK;
-}
-
-void SSkinSvg::_Scale(ISkinObj *skinObj, int nScale)
-{
-    __baseCls::_Scale(skinObj, nScale);
-    SSkinSvg *pRet = sobj_cast<SSkinSvg>(skinObj);
-    if (pRet)
-    {
-        pRet->m_strSrc = m_strSrc;
-        pRet->m_svgObj = m_svgObj;
-        pRet->m_bEnableCache = m_bEnableCache;
-        // Clear cache so it will be regenerated at new scale
-        pRet->m_cacheBitmap = NULL;
-        pRet->m_cacheSize.cx = pRet->m_cacheSize.cy = 0;
-    }
-}
-#endif // SOUI_ENABLE_SVG
-
 SNSEND

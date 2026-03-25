@@ -19,7 +19,6 @@
 #include <helper/SplitString.h>
 #include <matrix/SPoint.h>
 #include <sobject/Sobject.hpp>
-#include <interface/SImageFilter-i.h>
 
 SNSBEGIN
 
@@ -82,6 +81,19 @@ class SOUI_EXP SSkinImgList : public SSkinObjBase {
      * @return Pointer to the bitmap source.
      */
     virtual IBitmapS *GetImage() const;
+
+    /**
+     * @brief Sets the SVG object for the skin.
+     * @param pSvg Pointer to the SVG object.
+     * @return TRUE if successful, FALSE otherwise.
+     */
+    virtual bool SetSvg(ISvgObj *pSvg);
+
+    /**
+     * @brief Gets the SVG object used by the skin.
+     * @return Pointer to the SVG object.
+     */
+    virtual ISvgObj *GetSvg() const;
 
     /**
      * @brief Sets whether the image should be tiled.
@@ -158,11 +170,13 @@ class SOUI_EXP SSkinImgList : public SSkinObjBase {
     FilterLevel m_filterLevel;         // Filter level for image scaling
 
   protected:
+    mutable SAutoRefPtr<ISvgObj> m_pSvg;  // Pointer to the SVG object
     mutable SAutoRefPtr<IBitmapS> m_pImg; // Pointer to the bitmap source
     mutable SStringW m_strSrc;            // Source string for the image
     BOOL m_bLazyLoad;                     // Flag to indicate lazy loading
 
   protected:
+    void LoadSrcImage() const;
     /**
      * @brief Handles the 'src' attribute.
      * @param value Source string.
@@ -1406,87 +1420,6 @@ class SOUI_EXP SSkinTreeLines : public SSkinObjBase {
     SOUI_ATTRS_END()
 };
 
-/**
- * @class      SSkinSvg
- * @brief      SVG Skin with rasterization caching
- *
- * Description: Represents a skin that renders SVG data. The SVG is rasterized to a memory bitmap
- * and cached. When the rendering size changes, the cache is automatically updated.
- */
-#ifdef SOUI_ENABLE_SVG
-class SOUI_EXP SSkinSvg : public SSkinObjBase {
-    DEF_SOBJECT(SSkinObjBase, L"svg")
-
-  public:
-    /**
-     * @brief Constructor for SSkinSvg.
-     */
-    SSkinSvg();
-
-    /**
-     * @brief Destructor for SSkinSvg.
-     */
-    virtual ~SSkinSvg();
-
-    /**
-     * @brief Gets the size of the skin.
-     * @return Size of the skin.
-     */
-    STDMETHOD_(SIZE, GetSkinSize)(THIS) SCONST OVERRIDE;
-
-    /**
-     * @brief Gets the number of states in the skin.
-     * @return Number of states (always 1 for SVG).
-     */
-    STDMETHOD_(int, GetStates)(THIS) SCONST OVERRIDE;
-
-  protected:
-    /**
-     * @brief Called when initialization is finished.
-     * @param pNode Pointer to the XML node.
-     */
-    STDMETHOD_(void, OnInitFinished)(THIS_ IXmlNode *pNode) OVERRIDE;
-
-    /**
-     * @brief Draws the skin by index.
-     * @param pRT Pointer to the render target.
-     * @param rcDraw Rectangle to draw in.
-     * @param iState State index.
-     * @param byAlpha Alpha value for transparency.
-     */
-    void _DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const override;
-
-    /**
-     * @brief Scales the skin.
-     * @param skinObj Pointer to the skin object.
-     * @param nScale Scale factor.
-     */
-    void _Scale(ISkinObj *skinObj, int nScale) override;
-
-  protected:
-    /**
-     * @brief Handles the 'src' attribute.
-     * @param value Source string (file path).
-     * @param bLoading TRUE if loading, FALSE otherwise.
-     * @return Result of the attribute handling.
-     */
-    HRESULT OnAttrSrc(const SStringW &value, BOOL bLoading);
-
-    BOOL LoadSvg();
-
-  protected:
-    mutable SAutoRefPtr<IBitmapS> m_cacheBitmap; // Cached rasterized bitmap
-    mutable SIZE m_cacheSize;                    // Size of the cached bitmap
-    mutable SAutoRefPtr<ISvgObj> m_svgObj;       // Parsed SVG object
-    SStringW m_strSrc;                           // SVG source file path
-    BOOL m_bEnableCache;                         // Cache enable flag
-
-    SOUI_ATTRS_BEGIN()
-        ATTR_CUSTOM(L"src", OnAttrSrc)            // SVG file path
-        ATTR_BOOL(L"cache", m_bEnableCache, TRUE) // Enable caching
-    SOUI_ATTRS_END()
-};
-#endif // SOUI_ENABLE_SVG
 
 SNSEND
 #endif // __SSKIN__H__

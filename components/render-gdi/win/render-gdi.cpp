@@ -14,6 +14,9 @@
 #ifdef SOUI_ENABLE_SVG
 #define NANOSVGRAST_IMPLEMENTATION
 #include <src/nanosvgrast.h>
+
+// GDI+ headers for SVG rendering with alpha channel support
+#include <gdiplus.h>
 #endif // SOUI_ENABLE_SVG
 
 SNSBEGIN
@@ -22,7 +25,11 @@ SNSBEGIN
     // SRenderFactory_GDI
     SRenderFactory_GDI::SRenderFactory_GDI()
 	{
-
+        #ifdef SOUI_ENABLE_SVG
+        // Initialize GDI+ for SVG rendering with alpha channel support
+        Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+        Gdiplus::GdiplusStartup(&g_gdiplusToken, &gdiplusStartupInput, NULL);
+        #endif // SOUI_ENABLE_SVG
 		LOGFONT lf={0};
 		lf.lfHeight=20;
         _tcscpy(lf.lfFaceName, _T("宋体"));
@@ -32,6 +39,13 @@ SNSBEGIN
 	SRenderFactory_GDI::~SRenderFactory_GDI()
 	{
         m_defFont=NULL;
+        #ifdef SOUI_ENABLE_SVG
+        // Shutdown GDI+
+        if (g_gdiplusToken != 0) {
+            Gdiplus::GdiplusShutdown(g_gdiplusToken);
+            g_gdiplusToken = 0;
+        }
+        #endif // SOUI_ENABLE_SVG
 	}
 
     BOOL SRenderFactory_GDI::CreateRenderTarget( IRenderTarget ** ppRenderTarget ,int nWid,int nHei)
@@ -2537,200 +2551,406 @@ SNSBEGIN
 	}
 
     #ifdef SOUI_ENABLE_SVG
-	HRESULT SRenderTarget_GDI::DrawSVG(ISvgObj*  pSvgObj, LPCRECT pRect, BYTE byAlpha)
-	{
-		if (!pSvgObj || !pRect)
-			return E_INVALIDARG;
 
-		if (!m_hdc)
-			return E_FAIL;
-		NSVGimage *pSvg = (NSVGimage *)pSvgObj->GetPtr();
-
-		int nWid = pRect->right - pRect->left;
-		int nHei = pRect->bottom - pRect->top;
-		if (nWid <= 0 || nHei <= 0)
-			return E_INVALIDARG;
-
-		float svgWidth = pSvg->width;
-		float svgHeight = pSvg->height;
-		if (svgWidth <= 0 || svgHeight <= 0)
+		static Gdiplus::Color nsvgColorToGdipColor(unsigned int color, float opacity)
 		{
-			svgWidth = (float)nWid;
-			svgHeight = (float)nHei;
-		}
-
-		float scaleX = nWid / svgWidth;
-		float scaleY = nHei / svgHeight;
-		float scale = scaleX < scaleY ? scaleX : scaleY;
-
-		float tx = (float)(pRect->left + m_ptOrg.x);
-		float ty = (float)(pRect->top + m_ptOrg.y);
-
-		BITMAPINFO bmi = {0};
-		bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-		bmi.bmiHeader.biWidth = nWid;
-		bmi.bmiHeader.biHeight = -nHei;
-		bmi.bmiHeader.biPlanes = 1;
-		bmi.bmiHeader.biBitCount = 32;
-		bmi.bmiHeader.biCompression = BI_RGB;
-
-		HDC hMemDC = CreateCompatibleDC(m_hdc);
-		if (!hMemDC)
-			return E_OUTOFMEMORY;
-
-		unsigned char* rgbaBuffer = NULL;
-		HBITMAP hMemBmp = CreateDIBSection(hMemDC, &bmi, DIB_RGB_COLORS, (void**)&rgbaBuffer, NULL, 0);
-		if (!hMemBmp || !rgbaBuffer)
-		{
-			DeleteDC(hMemDC);
-			return E_OUTOFMEMORY;
-		}
-
-		HBITMAP hOldBmp = (HBITMAP)::SelectObject(hMemDC, hMemBmp);
-        SetBkMode(hMemDC, TRANSPARENT);
-		memset(rgbaBuffer, 0, nWid * nHei * 4);
-
-		NSVGrasterizer* rast = nsvgCreateRasterizer();
-		if (rast)
-		{
-			nsvgRasterize(rast, pSvg, tx, ty, scale, rgbaBuffer, nWid, nHei, nWid * 4);
-			nsvgDeleteRasterizer(rast);
-		}
-        RECT rcMem = {0,0,nWid,nHei};
-        ALPHAINFO alphaInfo;
-        CGdiAlpha::AlphaBackup(hMemDC, &rcMem, alphaInfo);
-		for (NSVGtext* text = pSvg->texts; text != NULL; text = text->next)
-		{
-			if (text->text[0] == '\0')
-				continue;
-
-			float fontSize = text->fontSize * scale;
-			if (fontSize <= 0) fontSize = 16.0f * scale;
-
-			LOGFONTW lf = {0};
-			lf.lfHeight = -(int)fontSize;
-			MultiByteToWideChar(CP_UTF8, 0, text->fontFamily, -1, lf.lfFaceName, LF_FACESIZE);
-
-			if (text->fontWeight >= 7)
-				lf.lfWeight = FW_BOLD;
-			else
-				lf.lfWeight = FW_NORMAL;
-
-			if (text->fontStyle == 1 || text->fontStyle == 2)
-				lf.lfItalic = TRUE;
-
-			HFONT hFont = ::CreateFontIndirectW(&lf);
-			HGDIOBJ hOldFont = ::SelectObject(hMemDC, hFont);
-
-			unsigned int color = text->fillColor;
-			float opacity = text->opacity * (byAlpha / 255.0f);
-			unsigned char a = (unsigned char)(((color >> 24) & 0xFF) * opacity);
+			unsigned char a = (unsigned char)((color >> 24) & 0xFF);
 			unsigned char r = (unsigned char)(color & 0xFF);
 			unsigned char g = (unsigned char)((color >> 8) & 0xFF);
 			unsigned char b = (unsigned char)((color >> 16) & 0xFF);
-			COLORREF crText = RGB(r, g, b);
-			COLORREF crOldText = ::SetTextColor(hMemDC, crText);
+			a = (unsigned char)(a * opacity);
+			return Gdiplus::Color(a, r, g, b);
+		}
 
-			float x = text->x * scale + tx;
-			float y = text->y * scale + ty;
+		static Gdiplus::Color nsvgPaintToGdipColor(const NSVGpaint* paint, float opacity)
+		{
+			if (paint && paint->type == NSVG_PAINT_COLOR)
+				return nsvgColorToGdipColor(paint->color, opacity);
+			return nsvgColorToGdipColor(0xFF000000, opacity);
+		}
 
-			SIZE textSize = {0};
-            wchar_t szText[1024] = { 0 };
-            int len = MultiByteToWideChar(CP_UTF8, 0, text->text, -1, szText, 1024);
-            if (szText[len - 1] == 0)
-            {
-                len--;
-            }
-            ::GetTextExtentPoint32W(hMemDC, szText, len, &textSize);
+		static bool nsvgIntersectsSrcRect(float left, float top, float right, float bottom, LPCRECT prcSrc)
+		{
+			if (!prcSrc)
+				return true;
 
-			TEXTMETRIC tm = {0};
-			::GetTextMetrics(hMemDC, &tm);
+			return right > (float)prcSrc->left && left < (float)prcSrc->right &&
+				bottom > (float)prcSrc->top && top < (float)prcSrc->bottom;
+		}
 
+		static bool nsvgShapeIntersectsSrcRect(const NSVGshape* shape, LPCRECT prcSrc)
+		{
+			if (!shape)
+				return false;
+
+			float inflate = 0.0f;
+			if (shape->stroke.type != NSVG_PAINT_NONE && shape->strokeWidth > 0)
+				inflate = shape->strokeWidth * 0.5f + 1.0f;
+
+			return nsvgIntersectsSrcRect(
+				shape->bounds[0] - inflate,
+				shape->bounds[1] - inflate,
+				shape->bounds[2] + inflate,
+				shape->bounds[3] + inflate,
+				prcSrc);
+		}
+
+		static Gdiplus::LineCap nsvgCapToGdipCap(int cap)
+		{
+			switch (cap)
+			{
+			case NSVG_CAP_ROUND: return Gdiplus::LineCapRound;
+			case NSVG_CAP_SQUARE: return Gdiplus::LineCapSquare;
+			default: return Gdiplus::LineCapFlat;
+			}
+		}
+
+		static Gdiplus::LineJoin nsvgJoinToGdipJoin(int join)
+		{
+			switch (join)
+			{
+			case NSVG_JOIN_ROUND: return Gdiplus::LineJoinRound;
+			case NSVG_JOIN_BEVEL: return Gdiplus::LineJoinBevel;
+			default: return Gdiplus::LineJoinMiter;
+			}
+		}
+
+		static bool nsvgPathToGraphicsPath(const NSVGpath* path, Gdiplus::FillMode fillMode, Gdiplus::GraphicsPath& gp)
+		{
+			if (!path || !path->pts || path->npts < 2)
+				return false;
+
+			gp.SetFillMode(fillMode);
+			gp.StartFigure();
+			gp.AddLine((Gdiplus::REAL)path->pts[0], (Gdiplus::REAL)path->pts[1],
+				(Gdiplus::REAL)path->pts[0], (Gdiplus::REAL)path->pts[1]);
+
+			for (int i = 0; i < path->npts - 1; i += 3)
+			{
+				if (i + 6 > path->npts * 2)
+					break;
+
+				float x0 = path->pts[i * 2 + 0];
+				float y0 = path->pts[i * 2 + 1];
+				float x1 = path->pts[i * 2 + 2];
+				float y1 = path->pts[i * 2 + 3];
+				float x2 = path->pts[i * 2 + 4];
+				float y2 = path->pts[i * 2 + 5];
+				float x3 = path->pts[i * 2 + 6];
+				float y3 = path->pts[i * 2 + 7];
+				gp.AddBezier((Gdiplus::REAL)x0, (Gdiplus::REAL)y0,
+					(Gdiplus::REAL)x1, (Gdiplus::REAL)y1,
+					(Gdiplus::REAL)x2, (Gdiplus::REAL)y2,
+					(Gdiplus::REAL)x3, (Gdiplus::REAL)y3);
+			}
+
+			if (path->closed)
+				gp.CloseFigure();
+			return true;
+		}
+
+			static float nsvgGetTextBaseline(const Gdiplus::FontFamily& fontFamily, INT fontStyle, float fontSize)
+			{
+				int emHeight = fontFamily.GetEmHeight((Gdiplus::FontStyle)fontStyle);
+				if (emHeight <= 0)
+					return fontSize;
+
+				int cellAscent = fontFamily.GetCellAscent((Gdiplus::FontStyle)fontStyle);
+				return fontSize * cellAscent / (float)emHeight;
+			}
+
+			static const Gdiplus::FontFamily* nsvgResolveFontFamily(const char* pszFontFamily, Gdiplus::FontFamily** ppCustomFamily)
+			{
+				if (ppCustomFamily)
+					*ppCustomFamily = NULL;
+
+				if (!pszFontFamily || !pszFontFamily[0] || lstrcmpiA(pszFontFamily, "sans-serif") == 0 || lstrcmpiA(pszFontFamily, "sans serif") == 0)
+					return Gdiplus::FontFamily::GenericSansSerif();
+
+				if (lstrcmpiA(pszFontFamily, "serif") == 0)
+					return Gdiplus::FontFamily::GenericSerif();
+
+				if (lstrcmpiA(pszFontFamily, "monospace") == 0 || lstrcmpiA(pszFontFamily, "monospace,") == 0)
+					return Gdiplus::FontFamily::GenericMonospace();
+
+				wchar_t fontFamilyName[LF_FACESIZE] = { 0 };
+				if (MultiByteToWideChar(CP_UTF8, 0, pszFontFamily, -1, fontFamilyName, LF_FACESIZE) <= 0)
+					return Gdiplus::FontFamily::GenericSansSerif();
+
+				Gdiplus::FontFamily* pCustomFamily = new Gdiplus::FontFamily(fontFamilyName);
+				if (!pCustomFamily)
+					return Gdiplus::FontFamily::GenericSansSerif();
+
+				if (pCustomFamily->GetLastStatus() != Gdiplus::Ok)
+				{
+					delete pCustomFamily;
+					return Gdiplus::FontFamily::GenericSansSerif();
+				}
+
+				if (ppCustomFamily)
+					*ppCustomFamily = pCustomFamily;
+
+				return pCustomFamily;
+			}
+
+			static bool nsvgBuildTextPath(const NSVGtext* text, const wchar_t* szText, INT len,
+				const Gdiplus::FontFamily& fontFamily, INT fontStyle, float fontSize,
+				Gdiplus::GraphicsPath& textPath, Gdiplus::RectF* pBounds)
+		{
+				if (!text || !szText || len <= 0 || !pBounds)
+					return false;
+
+				const Gdiplus::StringFormat* pFormat = Gdiplus::StringFormat::GenericTypographic();
+				float baseline = nsvgGetTextBaseline(fontFamily, fontStyle, fontSize);
+				if (textPath.AddString(szText, len, &fontFamily, fontStyle, fontSize,
+					Gdiplus::PointF(0.0f, -baseline), pFormat) != Gdiplus::Ok)
+					return false;
+
+				if (textPath.GetBounds(pBounds) != Gdiplus::Ok)
+					return false;
+
+			float offsetX = 0.0f;
 			switch (text->anchor)
 			{
 			case NSVG_ANCHOR_MIDDLE:
-				x -= textSize.cx / 2.0f;
+					offsetX = -pBounds->Width / 2.0f;
 				break;
 			case NSVG_ANCHOR_END:
-				x -= textSize.cx;
+					offsetX = -pBounds->Width;
 				break;
 			default:
 				break;
 			}
 
-			y -= tm.tmAscent;
+				if (offsetX != 0.0f)
+				{
+					Gdiplus::Matrix offsetMatrix;
+					offsetMatrix.Translate(offsetX, 0.0f);
+					textPath.Transform(&offsetMatrix);
+					if (textPath.GetBounds(pBounds) != Gdiplus::Ok)
+						return false;
+				}
 
-			XFORM xform = {0};
-			xform.eM11 = text->xform[0] * scale;
-			xform.eM12 = text->xform[2] * scale;
-			xform.eM21 = text->xform[1] * scale;
-			xform.eM22 = text->xform[3] * scale;
-			xform.eDx = text->xform[4] * scale + tx;
-			xform.eDy = text->xform[5] * scale + ty;
+				return true;
+			}
 
-			BOOL hasTransform = (xform.eM11 != 1.0f || xform.eM12 != 0.0f || 
-			                      xform.eM21 != 0.0f || xform.eM22 != 1.0f || 
-			                      xform.eDx != 0.0f || xform.eDy != 0.0f);
+			static bool nsvgTextIntersectsSrcRect(const NSVGtext* text, const Gdiplus::RectF& bounds,
+				const Gdiplus::Matrix& textMatrix, LPCRECT prcSrc)
+			{
+				if (!text || !prcSrc)
+					return true;
+
+				float localLeft = bounds.X;
+				float localTop = bounds.Y;
+				float localRight = bounds.GetRight();
+				float localBottom = bounds.GetBottom();
+
+			Gdiplus::PointF pts[4] = {
+				Gdiplus::PointF(localLeft, localTop),
+				Gdiplus::PointF(localRight, localTop),
+				Gdiplus::PointF(localRight, localBottom),
+				Gdiplus::PointF(localLeft, localBottom),
+			};
+			textMatrix.TransformPoints(pts, 4);
+
+			bool hasTransform = textMatrix.IsIdentity() ? false : true;
+			float minX = pts[0].X;
+			float minY = pts[0].Y;
+			float maxX = minX;
+			float maxY = minY;
+			for (int i = 1; i < 4; ++i)
+			{
+				minX = (std::min)(minX, pts[i].X);
+				minY = (std::min)(minY, pts[i].Y);
+				maxX = (std::max)(maxX, pts[i].X);
+				maxY = (std::max)(maxY, pts[i].Y);
+			}
+
+			if (!hasTransform)
+			{
+				minX += text->x;
+				minY += text->y;
+				maxX += text->x;
+				maxY += text->y;
+			}
+
+			return nsvgIntersectsSrcRect(minX, minY, maxX, maxY, prcSrc);
+		}
+
+		static void renderNSVGshape(Gdiplus::Graphics& graphics, const NSVGshape* shape,
+			BYTE byAlpha, LPCRECT prcSrc)
+		{
+			if (!shape)
+				return;
+			if (!(shape->flags & NSVG_FLAGS_VISIBLE))
+				return;
+			if (!nsvgShapeIntersectsSrcRect(shape, prcSrc))
+				return;
+
+			float opacity = shape->opacity * (byAlpha / 255.0f);
+			Gdiplus::FillMode fillMode = shape->fillRule == NSVG_FILLRULE_EVENODD ?
+				Gdiplus::FillModeAlternate : Gdiplus::FillModeWinding;
+
+			for (const NSVGpath* path = shape->paths; path != NULL; path = path->next)
+			{
+				Gdiplus::GraphicsPath gp(fillMode);
+				if (!nsvgPathToGraphicsPath(path, fillMode, gp))
+					continue;
+
+				unsigned char paintOrder = shape->paintOrder;
+				for (int j = 0; j < 3; ++j)
+				{
+					unsigned char order = (paintOrder >> (2 * j)) & 0x03;
+
+					if (order == NSVG_PAINT_FILL && shape->fill.type != NSVG_PAINT_NONE)
+					{
+						Gdiplus::SolidBrush brush(nsvgPaintToGdipColor(&shape->fill, opacity));
+						graphics.FillPath(&brush, &gp);
+					}
+					else if (order == NSVG_PAINT_STROKE && shape->stroke.type != NSVG_PAINT_NONE && shape->strokeWidth > 0)
+					{
+						Gdiplus::Pen pen(nsvgPaintToGdipColor(&shape->stroke, opacity), (Gdiplus::REAL)shape->strokeWidth);
+						pen.SetLineCap(nsvgCapToGdipCap(shape->strokeLineCap), nsvgCapToGdipCap(shape->strokeLineCap), Gdiplus::DashCapFlat);
+						pen.SetLineJoin(nsvgJoinToGdipJoin(shape->strokeLineJoin));
+						pen.SetMiterLimit((Gdiplus::REAL)shape->miterLimit);
+						graphics.DrawPath(&pen, &gp);
+					}
+				}
+			}
+		}
+
+		static void renderNSVGtext(Gdiplus::Graphics& graphics, const NSVGtext* text,
+			BYTE byAlpha, LPCRECT prcSrc)
+		{
+			if (!text || text->text[0] == '\0')
+				return;
+
+			Gdiplus::FontFamily* pCustomFontFamily = NULL;
+			const Gdiplus::FontFamily* pFontFamily = nsvgResolveFontFamily(text->fontFamily, &pCustomFontFamily);
+			if (!pFontFamily)
+				return;
+
+			int fontStyle = Gdiplus::FontStyleRegular;
+			if (text->fontWeight >= 7)
+				fontStyle |= Gdiplus::FontStyleBold;
+			if (text->fontStyle == 1 || text->fontStyle == 2)
+				fontStyle |= Gdiplus::FontStyleItalic;
+
+			float fontSize = text->fontSize > 0 ? text->fontSize : 16.0f;
+
+			wchar_t szText[1024] = { 0 };
+			int len = MultiByteToWideChar(CP_UTF8, 0, text->text, -1, szText, 1024);
+			if (len <= 0)
+				return;
+			if (szText[len - 1] == 0)
+				len--;
+			if (len <= 0)
+				return;
+
+				Gdiplus::GraphicsPath textPath;
+				Gdiplus::RectF bounds;
+				if (!nsvgBuildTextPath(text, szText, len, *pFontFamily, fontStyle, fontSize, textPath, &bounds))
+				{
+					delete pCustomFontFamily;
+					return;
+				}
+
+			Gdiplus::Matrix textMatrix(
+				text->xform[0], text->xform[1],
+				text->xform[2], text->xform[3],
+				text->xform[4], text->xform[5]);
+				if (!nsvgTextIntersectsSrcRect(text, bounds, textMatrix, prcSrc))
+				return;
+
+			float x = text->x;
+			float y = text->y;
+
+			float opacity = text->opacity * (byAlpha / 255.0f);
+			Gdiplus::SolidBrush brush(nsvgColorToGdipColor(text->fillColor, opacity));
+			bool hasTransform = textMatrix.IsIdentity() ? false : true;
+			Gdiplus::GraphicsPath drawPath;
+			drawPath.AddPath(&textPath, FALSE);
 
 			if (hasTransform)
 			{
-				::SetGraphicsMode(hMemDC, GM_ADVANCED);
-				::SetWorldTransform(hMemDC, &xform);
-
-				float localX = 0;
-				float localY = 0;
-
-				SIZE localTextSize = {0};
-				::GetTextExtentPoint32W(hMemDC, szText, len, &localTextSize);
-
-				switch (text->anchor)
-				{
-				case NSVG_ANCHOR_MIDDLE:
-					localX -= localTextSize.cx / 2.0f;
-					break;
-				case NSVG_ANCHOR_END:
-					localX -= localTextSize.cx;
-					break;
-				default:
-					break;
-				}
-
-				TEXTMETRIC localTm = {0};
-				::GetTextMetrics(hMemDC, &localTm);
-				localY -= localTm.tmAscent;
-
-				::TextOutW(hMemDC, (int)localX, (int)localY, szText,len);
-
-				XFORM identity = {1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f};
-				::SetWorldTransform(hMemDC, &identity);
-				::SetGraphicsMode(hMemDC, GM_COMPATIBLE);
+				drawPath.Transform(&textMatrix);
+				graphics.FillPath(&brush, &drawPath);
 			}
 			else
 			{
-                ::TextOutW(hMemDC, (int)x, (int)y, szText, len);
+				Gdiplus::Matrix translateMatrix;
+				translateMatrix.Translate(x, y);
+				drawPath.Transform(&translateMatrix);
+				graphics.FillPath(&brush, &drawPath);
 			}
 
-			::SetTextColor(hMemDC, crOldText);
-			::SelectObject(hMemDC, hOldFont);
-			::DeleteObject(hFont);
+				delete pCustomFontFamily;
 		}
-        CGdiAlpha::AlphaRestore(alphaInfo);
 
-		BLENDFUNCTION bf = {AC_SRC_OVER, 0, byAlpha, AC_SRC_ALPHA};
-		::AlphaBlend(m_hdc, pRect->left + m_ptOrg.x, pRect->top + m_ptOrg.y, nWid, nHei,
-			hMemDC, 0, 0, nWid, nHei, bf);
+		HRESULT SRenderTarget_GDI::DrawSVG(ISvgObj* pSvgObj, LPCRECT pRect, LPCRECT prcSrc, BYTE byAlpha)
+		{
+			if (!pSvgObj || !pRect)
+				return E_INVALIDARG;
+			if (!m_hdc)
+				return E_FAIL;
 
-		::SelectObject(hMemDC, hOldBmp);
-		DeleteObject(hMemBmp);
-		DeleteDC(hMemDC);
+			NSVGimage* pSvg = (NSVGimage*)pSvgObj->GetPtr();
+			if (!pSvg)
+				return E_INVALIDARG;
 
-		return S_OK;
-	}
-    #else
-    HRESULT SRenderTarget_GDI::DrawSVG(ISvgObj *pSvg, LPCRECT pRect, BYTE byAlpha)
+			int nWid = pRect->right - pRect->left;
+			int nHei = pRect->bottom - pRect->top;
+			if (nWid <= 0 || nHei <= 0)
+				return E_INVALIDARG;
+
+			float srcX = 0.0f, srcY = 0.0f;
+			float srcWidth = pSvg->width;
+			float srcHeight = pSvg->height;
+			if (prcSrc)
+			{
+				srcX = (float)prcSrc->left;
+				srcY = (float)prcSrc->top;
+				srcWidth = (float)(prcSrc->right - prcSrc->left);
+				srcHeight = (float)(prcSrc->bottom - prcSrc->top);
+			}
+
+			if (srcWidth <= 0 || srcHeight <= 0)
+			{
+				srcWidth = (float)nWid;
+				srcHeight = (float)nHei;
+			}
+
+			float scaleX = nWid / srcWidth;
+			float scaleY = nHei / srcHeight;
+			float tx = (float)pRect->left;
+			float ty = (float)pRect->top;
+
+			Gdiplus::Graphics graphics(m_hdc);
+			Gdiplus::GraphicsState state = graphics.Save();
+			graphics.SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
+			graphics.SetPixelOffsetMode(Gdiplus::PixelOffsetModeHighQuality);
+			graphics.SetClip(Gdiplus::Rect((INT)tx, (INT)ty, nWid, nHei), Gdiplus::CombineModeIntersect);
+
+			Gdiplus::Matrix globalTransform((Gdiplus::REAL)scaleX, 0.0f, 0.0f, (Gdiplus::REAL)scaleY,
+				(Gdiplus::REAL)(tx - srcX * scaleX), (Gdiplus::REAL)(ty - srcY * scaleY));
+			graphics.SetTransform(&globalTransform);
+
+			for (NSVGshape* shape = pSvg->shapes; shape != NULL; shape = shape->next)
+				renderNSVGshape(graphics, shape, byAlpha, prcSrc);
+
+			for (NSVGtext* text = pSvg->texts; text != NULL; text = text->next)
+				renderNSVGtext(graphics, text, byAlpha, prcSrc);
+
+			graphics.Restore(state);
+			return S_OK;
+		}
+
+#else
+    HRESULT SRenderTarget_GDI::DrawSVG(ISvgObj *pSvg, LPCRECT pRect, LPCRECT prcSrc, BYTE byAlpha)
     {
         (void)pSvg;
         (void)pRect;
+        (void)prcSrc;
         (void)byAlpha;
         return E_NOTIMPL;
     }

@@ -117,8 +117,8 @@
       <state index="5" value="pushdown&checked"/>
     </states>
   </imglist>
-    <svg name="svg_tiger" src="svg:tiger"/>
-    <svg name="svg_elements" src="svg:elements"/>
-    <svg name="svg_advanced" src="svg:advanced"/>
-    <svg name="svg_comprehensive" src="svg:comprehensive"/>
+  <imglist name="svg_tiger" src="svg:tiger"/>
+  <imglist name="svg_elements" src="svg:elements"/>
+  <imglist name="svg_advanced" src="svg:advanced"/>
+  <imglist name="svg_comprehensive" src="svg:comprehensive"/>
 </skin>

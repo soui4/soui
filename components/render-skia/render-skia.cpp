@@ -1936,13 +1936,108 @@ SNSBEGIN
         }
     }
 
-    static void renderNSVGshape(SkCanvas* canvas, const NSVGshape* shape, float scale, float tx, float ty, BYTE byAlpha)
+	    static bool nsvgIntersectsSrcRect(float left, float top, float right, float bottom, LPCRECT prcSrc)
+	    {
+	        if (!prcSrc)
+	            return true;
+
+	        return right > (float)prcSrc->left && left < (float)prcSrc->right &&
+	            bottom > (float)prcSrc->top && top < (float)prcSrc->bottom;
+	    }
+
+	    static bool nsvgShapeIntersectsSrcRect(const NSVGshape* shape, LPCRECT prcSrc)
+	    {
+	        if (!shape)
+	            return false;
+
+	        float inflate = 0.0f;
+	        if (shape->stroke.type != NSVG_PAINT_NONE && shape->strokeWidth > 0)
+	            inflate = shape->strokeWidth * 0.5f + 1.0f;
+
+	        return nsvgIntersectsSrcRect(
+	            shape->bounds[0] - inflate,
+	            shape->bounds[1] - inflate,
+	            shape->bounds[2] + inflate,
+	            shape->bounds[3] + inflate,
+	            prcSrc);
+	    }
+
+	    static bool nsvgTextIntersectsSrcRect(const NSVGtext* text, const SkPaint& paint, size_t textLen, LPCRECT prcSrc)
+	    {
+	        if (!text || !prcSrc)
+	            return true;
+
+	        SkRect bounds;
+	        paint.measureText(text->text, textLen, &bounds);
+
+	        float offsetX = 0.0f;
+	        switch (text->anchor)
+	        {
+	        case NSVG_ANCHOR_MIDDLE:
+	            offsetX = -bounds.width() / 2.0f;
+	            break;
+	        case NSVG_ANCHOR_END:
+	            offsetX = -bounds.width();
+	            break;
+	        default:
+	            break;
+	        }
+
+	        float localLeft = offsetX + bounds.fLeft;
+	        float localTop = bounds.fTop;
+	        float localRight = offsetX + bounds.fRight;
+	        float localBottom = bounds.fBottom;
+
+	        SkMatrix textMatrix;
+	        textMatrix.setAll(
+	            text->xform[0], text->xform[2], text->xform[4],
+	            text->xform[1], text->xform[3], text->xform[5],
+	            0, 0, 1);
+
+	        SkPoint pts[4];
+	        pts[0].set(localLeft, localTop);
+	        pts[1].set(localRight, localTop);
+	        pts[2].set(localRight, localBottom);
+	        pts[3].set(localLeft, localBottom);
+
+	        textMatrix.mapPoints(pts, 4);
+	        bool hasTransform = !textMatrix.isIdentity();
+
+	        float minX = pts[0].fX;
+	        float minY = pts[0].fY;
+	        float maxX = minX;
+	        float maxY = minY;
+	        for (int i = 1; i < 4; i++)
+	        {
+	            float x = pts[i].fX;
+	            float y = pts[i].fY;
+	            minX = (std::min)(minX, x);
+	            minY = (std::min)(minY, y);
+	            maxX = (std::max)(maxX, x);
+	            maxY = (std::max)(maxY, y);
+	        }
+
+	        if (!hasTransform)
+	        {
+	            minX += text->x;
+	            minY += text->y;
+	            maxX += text->x;
+	            maxY += text->y;
+	        }
+
+	        return nsvgIntersectsSrcRect(minX, minY, maxX, maxY, prcSrc);
+	    }
+
+	    static void renderNSVGshape(SkCanvas* canvas, const NSVGshape* shape, BYTE byAlpha, LPCRECT prcSrc)
     {
         if (!shape || !canvas)
             return;
 
         if (!(shape->flags & NSVG_FLAGS_VISIBLE))
             return;
+
+	        if (!nsvgShapeIntersectsSrcRect(shape, prcSrc))
+	            return;
 
         SkPaint fillPaint;
         fillPaint.setAntiAlias(true);
@@ -1951,8 +2046,8 @@ SNSBEGIN
         SkPaint strokePaint;
         strokePaint.setAntiAlias(true);
         strokePaint.setStyle(SkPaint::kStroke_Style);
-        strokePaint.setStrokeWidth(shape->strokeWidth * scale);
-        strokePaint.setStrokeMiter(shape->miterLimit * scale);
+	        strokePaint.setStrokeWidth(shape->strokeWidth);
+	        strokePaint.setStrokeMiter(shape->miterLimit);
 
         switch (shape->strokeLineCap)
         {
@@ -1975,12 +2070,6 @@ SNSBEGIN
             SkPath skPath;
             nsvgPathToSkPath(path, skPath);
 
-            SkPath transformedPath;
-            SkMatrix matrix;
-            matrix.setScale(scale, scale);
-            matrix.postTranslate(tx, ty);
-            skPath.transform(matrix, &transformedPath);
-
             unsigned char paintOrder = shape->paintOrder;
             for (int j = 0; j < 3; j++)
             {
@@ -1990,31 +2079,35 @@ SNSBEGIN
                 {
                     nsvgPaintToSkPaint(&shape->fill, opacity, fillPaint, shape->xform);
                     if (shape->fillRule == NSVG_FILLRULE_EVENODD)
-                        transformedPath.setFillType(SkPath::kEvenOdd_FillType);
+	                        skPath.setFillType(SkPath::kEvenOdd_FillType);
                     else
-                        transformedPath.setFillType(SkPath::kWinding_FillType);
-                    canvas->drawPath(transformedPath, fillPaint);
+	                        skPath.setFillType(SkPath::kWinding_FillType);
+	                    canvas->drawPath(skPath, fillPaint);
                 }
                 else if (order == NSVG_PAINT_STROKE && shape->stroke.type != NSVG_PAINT_NONE && shape->strokeWidth > 0)
                 {
                     nsvgPaintToSkPaint(&shape->stroke, opacity, strokePaint, shape->xform);
-                    canvas->drawPath(transformedPath, strokePaint);
+	                    canvas->drawPath(skPath, strokePaint);
                 }
             }
         }
     }
 
-    static void renderNSVGtext(SkCanvas* canvas, const NSVGtext* text, float scale, float tx, float ty, BYTE byAlpha)
+	    static void renderNSVGtext(SkCanvas* canvas, const NSVGtext* text, BYTE byAlpha, LPCRECT prcSrc)
     {
         if (!text || !canvas || text->text[0] == '\0')
             return;
+
+	        size_t textLen = strlen(text->text);
+	        if (textLen == 0)
+	            return;
 
         SkPaint paint;
         paint.setAntiAlias(true);
         paint.setTextEncoding(SkPaint::kUTF8_TextEncoding);
 
-        float fontSize = text->fontSize * scale;
-        if (fontSize <= 0) fontSize = 16.0f * scale;
+	        float fontSize = text->fontSize;
+	        if (fontSize <= 0) fontSize = 16.0f;
         paint.setTextSize(fontSize);
 
         SkTypeface::Style style = SkTypeface::kNormal;
@@ -2034,11 +2127,14 @@ SNSBEGIN
         float opacity = text->opacity * (byAlpha / 255.0f);
         paint.setColor(nsvgColorToSkColor(text->fillColor, opacity));
 
-        float x = text->x * scale + tx;
-        float y = text->y * scale + ty;
+	        if (!nsvgTextIntersectsSrcRect(text, paint, textLen, prcSrc))
+	            return;
+
+	        float x = text->x;
+	        float y = text->y;
 
         SkRect bounds;
-        paint.measureText(text->text, strlen(text->text), &bounds);
+	        paint.measureText(text->text, textLen, &bounds);
 
         switch (text->anchor)
         {
@@ -2054,8 +2150,8 @@ SNSBEGIN
 
         SkMatrix textMatrix;
         textMatrix.setAll(
-            text->xform[0] * scale, text->xform[2] * scale, text->xform[4] * scale + tx,
-            text->xform[1] * scale, text->xform[3] * scale, text->xform[5] * scale + ty,
+	            text->xform[0], text->xform[2], text->xform[4],
+	            text->xform[1], text->xform[3], text->xform[5],
             0, 0, 1);
 
         bool hasTransform = !textMatrix.isIdentity();
@@ -2069,7 +2165,7 @@ SNSBEGIN
             float localY = 0;
 
             SkRect localBounds;
-            paint.measureText(text->text, strlen(text->text), &localBounds);
+	            paint.measureText(text->text, textLen, &localBounds);
 
             switch (text->anchor)
             {
@@ -2083,16 +2179,16 @@ SNSBEGIN
                 break;
             }
 
-            canvas->drawText(text->text, strlen(text->text), localX, localY, paint);
+	            canvas->drawText(text->text, textLen, localX, localY, paint);
             canvas->restore();
         }
         else
         {
-            canvas->drawText(text->text, strlen(text->text), x, y, paint);
+	            canvas->drawText(text->text, textLen, x, y, paint);
         }
     }
 
-    HRESULT SRenderTarget_Skia::DrawSVG(THIS_ ISvgObj*  pSvgObj, LPCRECT pRect, BYTE byAlpha)
+    HRESULT SRenderTarget_Skia::DrawSVG(THIS_ ISvgObj*  pSvgObj, LPCRECT pRect,LPCRECT prcSrc, BYTE byAlpha)
     {
         if (!pSvgObj || !pRect)
             return E_INVALIDARG;
@@ -2105,32 +2201,43 @@ SNSBEGIN
         SkRect skRect = toSkRect(pRect);
         skRect.offset(m_ptOrg);
 
-        float svgWidth = pSvg->width;
-        float svgHeight = pSvg->height;
-        if (svgWidth <= 0 || svgHeight <= 0)
-        {
-            svgWidth = (float)(pRect->right - pRect->left);
-            svgHeight = (float)(pRect->bottom - pRect->top);
-        }
+	        float srcX = 0.0f, srcY = 0.0f;
+	        float srcWidth = pSvg->width;
+	        float srcHeight = pSvg->height;
+	        if (prcSrc)
+	        {
+	            srcX = (float)prcSrc->left;
+	            srcY = (float)prcSrc->top;
+	            srcWidth = (float)(prcSrc->right - prcSrc->left);
+	            srcHeight = (float)(prcSrc->bottom - prcSrc->top);
+	        }
 
-        float scaleX = (pRect->right - pRect->left) / svgWidth;
-        float scaleY = (pRect->bottom - pRect->top) / svgHeight;
-        float scale = scaleX < scaleY ? scaleX : scaleY;
+	        if (srcWidth <= 0 || srcHeight <= 0)
+	        {
+	            srcWidth = (float)(pRect->right - pRect->left);
+	            srcHeight = (float)(pRect->bottom - pRect->top);
+	        }
+
+	        float scaleX = (pRect->right - pRect->left) / srcWidth;
+	        float scaleY = (pRect->bottom - pRect->top) / srcHeight;
 
         float tx = skRect.fLeft;
         float ty = skRect.fTop;
 
         m_SkCanvas->save();
         m_SkCanvas->clipRect(skRect);
+	        m_SkCanvas->translate(tx, ty);
+	        m_SkCanvas->scale(scaleX, scaleY);
+	        m_SkCanvas->translate(-srcX, -srcY);
 
         for (NSVGshape* shape = pSvg->shapes; shape != NULL; shape = shape->next)
         {
-            renderNSVGshape(m_SkCanvas, shape, scale, tx, ty, byAlpha);
+	            renderNSVGshape(m_SkCanvas, shape, byAlpha, prcSrc);
         }
 
         for (NSVGtext* text = pSvg->texts; text != NULL; text = text->next)
         {
-            renderNSVGtext(m_SkCanvas, text, scale, tx, ty, byAlpha);
+	            renderNSVGtext(m_SkCanvas, text, byAlpha, prcSrc);
         }
 
         m_SkCanvas->restore();

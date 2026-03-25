@@ -2973,31 +2973,59 @@ SNSBEGIN
 		return cf;
 	}
 
-	static D2D1::Matrix3x2F nsvgXformToD2DMatrix(const float* xform, float scale, float tx, float ty)
+		static D2D1_COLOR_F nsvgPaintToD2DColor(const NSVGpaint* paint, float opacity)
 	{
-		D2D1::Matrix3x2F matrix;
-		matrix._11 = xform[0] * scale;
-		matrix._12 = xform[2] * scale;
-		matrix._21 = xform[1] * scale;
-		matrix._22 = xform[3] * scale;
-		matrix._31 = xform[4] * scale + tx;
-		matrix._32 = xform[5] * scale + ty;
-		return matrix;
+			if (paint && paint->type == NSVG_PAINT_COLOR)
+				return nsvgColorToD2DColor(paint->color, opacity);
+			return nsvgColorToD2DColor(0xFF000000, opacity);
 	}
 
-	static void nsvgPathToD2DGeometry(const NSVGpath* nsvgPath, ID2D1Factory* pFactory, ID2D1PathGeometry** ppGeometry)
+		static bool nsvgIntersectsSrcRect(float left, float top, float right, float bottom, LPCRECT prcSrc)
+		{
+			if (!prcSrc)
+				return true;
+
+			return right > (float)prcSrc->left && left < (float)prcSrc->right &&
+				bottom > (float)prcSrc->top && top < (float)prcSrc->bottom;
+		}
+
+		static bool nsvgShapeIntersectsSrcRect(const NSVGshape* shape, LPCRECT prcSrc)
+		{
+			if (!shape)
+				return false;
+
+			float inflate = 0.0f;
+			if (shape->stroke.type != NSVG_PAINT_NONE && shape->strokeWidth > 0)
+				inflate = shape->strokeWidth * 0.5f + 1.0f;
+
+			return nsvgIntersectsSrcRect(
+				shape->bounds[0] - inflate,
+				shape->bounds[1] - inflate,
+				shape->bounds[2] + inflate,
+				shape->bounds[3] + inflate,
+				prcSrc);
+		}
+
+		static void nsvgPathToD2DGeometry(const NSVGpath* nsvgPath, ID2D1Factory* pFactory, D2D1_FILL_MODE fillMode, ID2D1PathGeometry** ppGeometry)
 	{
+			*ppGeometry = NULL;
 		if (!nsvgPath || !nsvgPath->pts || nsvgPath->npts < 1 || !pFactory || !ppGeometry)
 			return;
 
-		HRESULT hr = pFactory->CreatePathGeometry(ppGeometry);
+			ID2D1PathGeometry* pGeometry = NULL;
+			HRESULT hr = pFactory->CreatePathGeometry(&pGeometry);
 		if (FAILED(hr))
 			return;
 
 		SComPtr<ID2D1GeometrySink> pSink;
-		hr = (*ppGeometry)->Open(&pSink);
+			hr = pGeometry->Open(&pSink);
 		if (FAILED(hr))
+			{
+				pGeometry->Release();
 			return;
+			}
+
+			pSink->SetFillMode(fillMode);
 
 		const float* pts = nsvgPath->pts;
 		int npts = nsvgPath->npts;
@@ -3027,33 +3055,183 @@ SNSBEGIN
 		else
 			pSink->EndFigure(D2D1_FIGURE_END_OPEN);
 
-		pSink->Close();
+			hr = pSink->Close();
+			if (FAILED(hr))
+			{
+				pGeometry->Release();
+				return;
+			}
+
+			*ppGeometry = pGeometry;
 	}
 
-	static void renderNSVGshape(ID2D1RenderTarget* pRT, ID2D1Factory* pFactory, const NSVGshape* shape, float scale, float tx, float ty, BYTE byAlpha)
-	{
-		if (!shape || !pRT)
-			return;
+		static float nsvgGetTextBaseline(IDWriteTextLayout* pTextLayout, const DWRITE_TEXT_METRICS& metrics)
+		{
+			if (!pTextLayout)
+				return metrics.height;
 
+			DWRITE_LINE_METRICS lineMetrics = {};
+			UINT32 actualLineCount = 0;
+			if (FAILED(pTextLayout->GetLineMetrics(&lineMetrics, 1, &actualLineCount)) ||
+				actualLineCount == 0 || lineMetrics.baseline <= 0.0f)
+				return metrics.height;
+
+			return lineMetrics.baseline;
+		}
+
+		static bool nsvgGetTextHitTestBounds(IDWriteTextLayout* pTextLayout, UINT32 textLength,
+			const DWRITE_TEXT_METRICS& metrics, float originX, float originY, D2D1_RECT_F* pBounds)
+		{
+			if (!pTextLayout || !pBounds || textLength == 0)
+				return false;
+
+			UINT32 maxHitTestMetricsCount = metrics.lineCount * metrics.maxBidiReorderingDepth;
+			if (maxHitTestMetricsCount == 0)
+				maxHitTestMetricsCount = 1;
+
+			std::vector<DWRITE_HIT_TEST_METRICS> hitTestMetrics(maxHitTestMetricsCount);
+			UINT32 actualHitTestMetricsCount = 0;
+			HRESULT hr = pTextLayout->HitTestTextRange(
+				0, textLength, originX, originY,
+				&hitTestMetrics[0], maxHitTestMetricsCount, &actualHitTestMetricsCount);
+
+			if (hr == HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER) && actualHitTestMetricsCount > maxHitTestMetricsCount)
+			{
+				hitTestMetrics.resize(actualHitTestMetricsCount);
+				maxHitTestMetricsCount = actualHitTestMetricsCount;
+				hr = pTextLayout->HitTestTextRange(
+					0, textLength, originX, originY,
+					&hitTestMetrics[0], maxHitTestMetricsCount, &actualHitTestMetricsCount);
+			}
+
+			if (FAILED(hr) || actualHitTestMetricsCount == 0)
+				return false;
+
+			float minX = hitTestMetrics[0].left;
+			float minY = hitTestMetrics[0].top;
+			float maxX = hitTestMetrics[0].left + hitTestMetrics[0].width;
+			float maxY = hitTestMetrics[0].top + hitTestMetrics[0].height;
+
+			for (UINT32 i = 1; i < actualHitTestMetricsCount; ++i)
+			{
+				const DWRITE_HIT_TEST_METRICS& hit = hitTestMetrics[i];
+				minX = (std::min)(minX, hit.left);
+				minY = (std::min)(minY, hit.top);
+				maxX = (std::max)(maxX, hit.left + hit.width);
+				maxY = (std::max)(maxY, hit.top + hit.height);
+			}
+
+			*pBounds = D2D1::RectF(minX, minY, maxX, maxY);
+			return true;
+		}
+
+		static bool nsvgTextIntersectsSrcRect(const NSVGtext* text, IDWriteTextLayout* pTextLayout, UINT32 textLength, LPCRECT prcSrc)
+	{
+			if (!text || !prcSrc || !pTextLayout)
+				return true;
+
+			DWRITE_TEXT_METRICS metrics = {};
+			if (FAILED(pTextLayout->GetMetrics(&metrics)))
+				return true;
+
+			float baseline = nsvgGetTextBaseline(pTextLayout, metrics);
+
+			float offsetX = 0.0f;
+			switch (text->anchor)
+			{
+			case NSVG_ANCHOR_MIDDLE:
+				offsetX = -metrics.widthIncludingTrailingWhitespace / 2.0f;
+				break;
+			case NSVG_ANCHOR_END:
+				offsetX = -metrics.widthIncludingTrailingWhitespace;
+				break;
+			default:
+				break;
+			}
+
+			float localLeft = 0.0f;
+			float localTop = 0.0f;
+			float localRight = 0.0f;
+			float localBottom = 0.0f;
+
+			D2D1_RECT_F hitTestBounds = {};
+			if (nsvgGetTextHitTestBounds(pTextLayout, textLength, metrics, offsetX, -baseline, &hitTestBounds))
+			{
+				localLeft = hitTestBounds.left;
+				localTop = hitTestBounds.top;
+				localRight = hitTestBounds.right;
+				localBottom = hitTestBounds.bottom;
+			}
+			else
+			{
+				DWRITE_OVERHANG_METRICS overhang = {};
+				pTextLayout->GetOverhangMetrics(&overhang);
+				localLeft = offsetX - overhang.left;
+				localTop = -baseline - overhang.top;
+				localRight = offsetX + metrics.widthIncludingTrailingWhitespace + overhang.right;
+				localBottom = -baseline + metrics.height + overhang.bottom;
+			}
+
+			D2D1::Matrix3x2F textMatrix(
+				text->xform[0], text->xform[2],
+				text->xform[1], text->xform[3],
+				text->xform[4], text->xform[5]);
+
+			D2D1_POINT_2F pts[4] = {
+				D2D1::Point2F(localLeft, localTop),
+				D2D1::Point2F(localRight, localTop),
+				D2D1::Point2F(localRight, localBottom),
+				D2D1::Point2F(localLeft, localBottom),
+			};
+
+			for (int i = 0; i < 4; ++i)
+				pts[i] = textMatrix.TransformPoint(pts[i]);
+
+			bool hasTransform = textMatrix.IsIdentity() ? false : true;
+			float minX = pts[0].x;
+			float minY = pts[0].y;
+			float maxX = minX;
+			float maxY = minY;
+			for (int i = 1; i < 4; ++i)
+			{
+				minX = (std::min)(minX, pts[i].x);
+				minY = (std::min)(minY, pts[i].y);
+				maxX = (std::max)(maxX, pts[i].x);
+				maxY = (std::max)(maxY, pts[i].y);
+			}
+
+			if (!hasTransform)
+			{
+				minX += text->x;
+				minY += text->y;
+				maxX += text->x;
+				maxY += text->y;
+			}
+
+			const float inflate = 1.0f;
+			return nsvgIntersectsSrcRect(minX - inflate, minY - inflate, maxX + inflate, maxY + inflate, prcSrc);
+	}
+
+	static void renderNSVGshape(ID2D1RenderTarget* pRT, ID2D1Factory* pFactory,
+		const NSVGshape* shape, BYTE byAlpha, LPCRECT prcSrc)
+	{
+		if (!shape || !pRT || !pFactory)
+			return;
 		if (!(shape->flags & NSVG_FLAGS_VISIBLE))
+			return;
+		if (!nsvgShapeIntersectsSrcRect(shape, prcSrc))
 			return;
 
 		float opacity = shape->opacity * (byAlpha / 255.0f);
+		D2D1_FILL_MODE fillMode = shape->fillRule == NSVG_FILLRULE_EVENODD ?
+			D2D1_FILL_MODE_ALTERNATE : D2D1_FILL_MODE_WINDING;
 
 		for (const NSVGpath* path = shape->paths; path != NULL; path = path->next)
 		{
 			SComPtr<ID2D1PathGeometry> pGeometry;
-			nsvgPathToD2DGeometry(path, pFactory, &pGeometry);
-
-			SComPtr<ID2D1TransformedGeometry> pTransformedGeometry;
-			D2D1::Matrix3x2F transformMatrix;
-			transformMatrix._11 = scale;
-			transformMatrix._12 = 0;
-			transformMatrix._21 = 0;
-			transformMatrix._22 = scale;
-			transformMatrix._31 = tx;
-			transformMatrix._32 = ty;
-			pFactory->CreateTransformedGeometry(pGeometry, &transformMatrix, &pTransformedGeometry);
+			nsvgPathToD2DGeometry(path, pFactory, fillMode, &pGeometry);
+			if (!pGeometry)
+				continue;
 
 			unsigned char paintOrder = shape->paintOrder;
 			for (int j = 0; j < 3; j++)
@@ -3062,20 +3240,13 @@ SNSBEGIN
 
 				if (order == NSVG_PAINT_FILL && shape->fill.type != NSVG_PAINT_NONE)
 				{
-					D2D1_COLOR_F fillColor = nsvgColorToD2DColor(shape->fill.color, opacity);
 					SComPtr<ID2D1SolidColorBrush> pFillBrush;
-					pRT->CreateSolidColorBrush(fillColor, &pFillBrush);
-
-					D2D1_FILL_MODE fillMode = (shape->fillRule == NSVG_FILLRULE_EVENODD) ?
-						D2D1_FILL_MODE_ALTERNATE : D2D1_FILL_MODE_WINDING;
-					pRT->FillGeometry(pTransformedGeometry, pFillBrush, NULL);
+					pRT->CreateSolidColorBrush(nsvgPaintToD2DColor(&shape->fill, opacity), &pFillBrush);
+					if (pFillBrush)
+						pRT->FillGeometry(pGeometry, pFillBrush, NULL);
 				}
 				else if (order == NSVG_PAINT_STROKE && shape->stroke.type != NSVG_PAINT_NONE && shape->strokeWidth > 0)
 				{
-					D2D1_COLOR_F strokeColor = nsvgColorToD2DColor(shape->stroke.color, opacity);
-					SComPtr<ID2D1SolidColorBrush> pStrokeBrush;
-					pRT->CreateSolidColorBrush(strokeColor, &pStrokeBrush);
-
 					D2D1_CAP_STYLE capStyle = D2D1_CAP_STYLE_FLAT;
 					switch (shape->strokeLineCap)
 					{
@@ -3097,163 +3268,187 @@ SNSBEGIN
 					strokeProps.endCap = capStyle;
 					strokeProps.dashCap = capStyle;
 					strokeProps.lineJoin = joinStyle;
-					strokeProps.miterLimit = 10.0f;
+					strokeProps.miterLimit = shape->miterLimit;
 					strokeProps.dashStyle = D2D1_DASH_STYLE_SOLID;
 					strokeProps.dashOffset = 0.0f;
 
 					SComPtr<ID2D1StrokeStyle> pStrokeStyle;
 					pFactory->CreateStrokeStyle(&strokeProps, NULL, 0, &pStrokeStyle);
-					pRT->DrawGeometry(pTransformedGeometry, pStrokeBrush, shape->strokeWidth * scale, pStrokeStyle);
+
+					SComPtr<ID2D1SolidColorBrush> pStrokeBrush;
+					pRT->CreateSolidColorBrush(nsvgPaintToD2DColor(&shape->stroke, opacity), &pStrokeBrush);
+					if (pStrokeBrush)
+						pRT->DrawGeometry(pGeometry, pStrokeBrush, shape->strokeWidth, pStrokeStyle);
 				}
 			}
 		}
 	}
 
-	static void renderNSVGtext(ID2D1RenderTarget* pRT, ID2D1Factory* pFactory, IDWriteFactory* pWriteFactory, const NSVGtext* text, float scale, float tx, float ty, BYTE byAlpha)
+	static void renderNSVGtext(ID2D1RenderTarget* pRT, IDWriteFactory* pWriteFactory,
+		const NSVGtext* text, BYTE byAlpha, LPCRECT prcSrc)
 	{
-		if (!text || !pRT || text->text[0] == '\0')
+		if (!text || !pRT || !pWriteFactory || text->text[0] == '\0')
 			return;
 
-		float fontSize = text->fontSize * scale;
-		if (fontSize <= 0) fontSize = 16.0f * scale;
+		float fontSize = text->fontSize;
+		if (fontSize <= 0)
+			fontSize = 16.0f;
 
-		DWRITE_FONT_WEIGHT fontWeight = DWRITE_FONT_WEIGHT_NORMAL;
-		if (text->fontWeight >= 7)
-			fontWeight = DWRITE_FONT_WEIGHT_BOLD;
-
-		DWRITE_FONT_STYLE fontStyle = DWRITE_FONT_STYLE_NORMAL;
-		if (text->fontStyle == 1 || text->fontStyle == 2)
-			fontStyle = DWRITE_FONT_STYLE_ITALIC;
-
-		float opacity = text->opacity * (byAlpha / 255.0f);
-		D2D1_COLOR_F textColor = nsvgColorToD2DColor(text->fillColor, opacity);
-		SComPtr<ID2D1SolidColorBrush> pTextBrush;
-		pRT->CreateSolidColorBrush(textColor, &pTextBrush);
+		DWRITE_FONT_WEIGHT fontWeight = text->fontWeight >= 7 ? DWRITE_FONT_WEIGHT_BOLD : DWRITE_FONT_WEIGHT_NORMAL;
+		DWRITE_FONT_STYLE fontStyle = (text->fontStyle == 1 || text->fontStyle == 2) ?
+			DWRITE_FONT_STYLE_ITALIC : DWRITE_FONT_STYLE_NORMAL;
 
 		SComPtr<IDWriteTextFormat> pTextFormat;
 		HRESULT hr = pWriteFactory->CreateTextFormat(
 			S_CA2W(text->fontFamily), NULL, fontWeight, fontStyle, DWRITE_FONT_STRETCH_NORMAL,
 			fontSize, L"", &pTextFormat);
-		if (FAILED(hr))
+		if (FAILED(hr) || !pTextFormat)
 			return;
 
 		pTextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
 		pTextFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 
-		float x = text->x * scale + tx;
-		float y = text->y * scale + ty;
+		SStringW strText = S_CA2W(text->text, CP_UTF8);
+		if (strText.IsEmpty())
+			return;
 
-		DWRITE_TEXT_METRICS metrics;
-        SStringW strText = S_CA2W(text->text, CP_UTF8);
-		IDWriteTextLayout* pTextLayout = NULL;
-        hr = pWriteFactory->CreateTextLayout(strText, strText.GetLength(), pTextFormat, FLT_MAX, FLT_MAX, &pTextLayout);
-		if (SUCCEEDED(hr))
+		SComPtr<IDWriteTextLayout> pTextLayout;
+		hr = pWriteFactory->CreateTextLayout(strText, strText.GetLength(), pTextFormat,
+			10000.0f, 10000.0f, &pTextLayout);
+		if (FAILED(hr) || !pTextLayout)
+			return;
+
+			UINT32 textLength = (UINT32)strText.GetLength();
+			if (!nsvgTextIntersectsSrcRect(text, pTextLayout, textLength, prcSrc))
+				return;
+
+		DWRITE_TEXT_METRICS metrics = {};
+		if (FAILED(pTextLayout->GetMetrics(&metrics)))
+			return;
+
+			float baseline = nsvgGetTextBaseline(pTextLayout, metrics);
+
+		float x = text->x;
+		float y = text->y;
+		switch (text->anchor)
 		{
-			pTextLayout->GetMetrics(&metrics);
+		case NSVG_ANCHOR_MIDDLE:
+			x -= metrics.widthIncludingTrailingWhitespace / 2.0f;
+			break;
+		case NSVG_ANCHOR_END:
+			x -= metrics.widthIncludingTrailingWhitespace;
+			break;
+		default:
+			break;
+		}
 
-			DWRITE_LINE_METRICS lineMetrics;
-			UINT32 lineCount = 0;
-			pTextLayout->GetLineMetrics(&lineMetrics, 1, &lineCount);
-            y -= lineMetrics.baseline;
+		float opacity = text->opacity * (byAlpha / 255.0f);
+		SComPtr<ID2D1SolidColorBrush> pTextBrush;
+		pRT->CreateSolidColorBrush(nsvgColorToD2DColor(text->fillColor, opacity), &pTextBrush);
+		if (!pTextBrush)
+			return;
 
+		D2D1::Matrix3x2F textMatrix(
+			text->xform[0], text->xform[2],
+			text->xform[1], text->xform[3],
+			text->xform[4], text->xform[5]);
+		bool hasTransform = textMatrix.IsIdentity() ? false : true;
+
+		if (hasTransform)
+		{
+			float localX = 0.0f;
+				float localY = -baseline;
 			switch (text->anchor)
 			{
 			case NSVG_ANCHOR_MIDDLE:
-				x -= metrics.widthIncludingTrailingWhitespace / 2.0f;
+				localX -= metrics.widthIncludingTrailingWhitespace / 2.0f;
 				break;
 			case NSVG_ANCHOR_END:
-				x -= metrics.widthIncludingTrailingWhitespace;
+				localX -= metrics.widthIncludingTrailingWhitespace;
 				break;
 			default:
 				break;
 			}
 
-			D2D1::Matrix3x2F textMatrix = nsvgXformToD2DMatrix(text->xform, scale, tx, ty);
-
-			bool hasTransform = !(textMatrix._11 == 1.0f && textMatrix._12 == 0.0f &&
-				textMatrix._21 == 0.0f && textMatrix._22 == 1.0f &&
-				textMatrix._31 == tx && textMatrix._32 == ty);
-
-			if (hasTransform)
-			{
-				pRT->SetTransform(textMatrix);
-
-				float localX = 0;
-                float localY = -lineMetrics.baseline;
-
-				DWRITE_TEXT_METRICS localMetrics;
-				pTextLayout->GetMetrics(&localMetrics);
-
-				switch (text->anchor)
-				{
-				case NSVG_ANCHOR_MIDDLE:
-					localX -= localMetrics.widthIncludingTrailingWhitespace / 2.0f;
-					break;
-				case NSVG_ANCHOR_END:
-					localX -= localMetrics.widthIncludingTrailingWhitespace;
-					break;
-				default:
-					break;
-				}
+			D2D1_MATRIX_3X2_F oldTransform;
+			pRT->GetTransform(&oldTransform);
+				pRT->SetTransform(textMatrix * oldTransform);
 				pRT->DrawTextLayout(D2D1::Point2F(localX, localY), pTextLayout, pTextBrush);
-				pRT->SetTransform(D2D1::Matrix3x2F::Identity());
-			}
-			else
-			{
-				pRT->DrawTextLayout(D2D1::Point2F(x, y), pTextLayout, pTextBrush);
-			}
-
-			pTextLayout->Release();
+			pRT->SetTransform(oldTransform);
+		}
+		else
+		{
+				pRT->DrawTextLayout(D2D1::Point2F(x, y - baseline), pTextLayout, pTextBrush);
 		}
 	}
 
-	HRESULT SRenderTarget_D2D::DrawSVG(ISvgObj*  pSvgObj, LPCRECT pRect, BYTE byAlpha)
+	HRESULT SRenderTarget_D2D::DrawSVG(ISvgObj* pSvgObj, LPCRECT pRect, LPCRECT prcSrc, BYTE byAlpha)
 	{
 		if (!pSvgObj || !pRect)
 			return E_INVALIDARG;
-
 		if (!m_rt)
 			return E_FAIL;
-		NSVGimage *pSvg = (NSVGimage *)pSvgObj->GetPtr();
 
-		int nWid = pRect->right - pRect->left;
-		int nHei = pRect->bottom - pRect->top;
-		if (nWid <= 0 || nHei <= 0)
+		NSVGimage* pSvg = (NSVGimage*)pSvgObj->GetPtr();
+		if (!pSvg)
 			return E_INVALIDARG;
 
-		float svgWidth = pSvg->width;
-		float svgHeight = pSvg->height;
-		if (svgWidth <= 0 || svgHeight <= 0)
+		float srcX = 0.0f, srcY = 0.0f;
+		float srcWidth = pSvg->width;
+		float srcHeight = pSvg->height;
+		if (prcSrc)
 		{
-			svgWidth = (float)nWid;
-			svgHeight = (float)nHei;
+			srcX = (float)prcSrc->left;
+			srcY = (float)prcSrc->top;
+			srcWidth = (float)(prcSrc->right - prcSrc->left);
+			srcHeight = (float)(prcSrc->bottom - prcSrc->top);
 		}
 
-		float scaleX = nWid / svgWidth;
-		float scaleY = nHei / svgHeight;
-		float scale = scaleX < scaleY ? scaleX : scaleY;
+		if (srcWidth <= 0 || srcHeight <= 0)
+		{
+			srcWidth = (float)(pRect->right - pRect->left);
+			srcHeight = (float)(pRect->bottom - pRect->top);
+		}
 
-		float tx = (float)(pRect->left + m_ptOrg.x);
-		float ty = (float)(pRect->top + m_ptOrg.y);
+		float dstWidth = (float)(pRect->right - pRect->left);
+		float dstHeight = (float)(pRect->bottom - pRect->top);
+		float scaleX = dstWidth / srcWidth;
+		float scaleY = dstHeight / srcHeight;
+			float tx = (float)pRect->left;
+			float ty = (float)pRect->top;
 
-		SRenderFactory_D2D *pFac = (SRenderFactory_D2D *)(IRenderFactory*)m_pRenderFactory;
-		ID2D1Factory* pFactory = pFac->GetD2D1Factory();
-		IDWriteFactory* pWriteFactory = pFac->GetDWriteFactory();
+		SComPtr<ID2D1DrawingStateBlock> stateBlock;
+		ID2D1Factory* pFactory = toD2DFac(m_pRenderFactory);
+		pFactory->CreateDrawingStateBlock(NULL, NULL, &stateBlock);
+		m_rt->SaveDrawingState(stateBlock);
 
-		D2D1_RECT_F clipRect = D2D1::RectF(tx, ty, tx + nWid, ty + nHei);
-		m_rt->PushAxisAlignedClip(&clipRect, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
+		D2D1_RECT_F clipRect = D2D1::RectF(tx, ty, tx + dstWidth, ty + dstHeight);
+		m_rt->PushAxisAlignedClip(clipRect, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
+
+			D2D1_MATRIX_3X2_F oldTransform;
+			m_rt->GetTransform(&oldTransform);
+			D2D1::Matrix3x2F oldTransformMatrix(
+				oldTransform._11, oldTransform._12,
+				oldTransform._21, oldTransform._22,
+				oldTransform._31, oldTransform._32);
+			D2D1::Matrix3x2F globalTransform =
+				D2D1::Matrix3x2F::Translation(-srcX, -srcY) *
+				D2D1::Matrix3x2F::Scale(scaleX, scaleY) *
+				D2D1::Matrix3x2F::Translation(tx, ty) *
+				oldTransformMatrix;
+		m_rt->SetTransform(globalTransform);
+
+		SRenderFactory_D2D* pFactoryD2D = (SRenderFactory_D2D*)(IRenderFactory*)m_pRenderFactory;
+		IDWriteFactory* pWriteFactory = pFactoryD2D->GetDWriteFactory();
 
 		for (NSVGshape* shape = pSvg->shapes; shape != NULL; shape = shape->next)
-		{
-			renderNSVGshape(m_rt, pFactory, shape, scale, tx, ty, byAlpha);
-		}
+			renderNSVGshape(m_rt, pFactory, shape, byAlpha, prcSrc);
 
 		for (NSVGtext* text = pSvg->texts; text != NULL; text = text->next)
-		{
-			renderNSVGtext(m_rt, pFactory, pWriteFactory, text, scale, tx, ty, byAlpha);
-		}
+			renderNSVGtext(m_rt, pWriteFactory, text, byAlpha, prcSrc);
 
 		m_rt->PopAxisAlignedClip();
+		m_rt->RestoreDrawingState(stateBlock);
 		return S_OK;
 	}
 

@@ -1,4 +1,4 @@
-#include "souistd.h"
+﻿#include "souistd.h"
 #include "SApp.h"
 #include <core/SNativeWnd.h>
 #include "core/SWindowMgr.h"
@@ -204,9 +204,6 @@ void SObjectDefaultRegister::RegisterSkins(SObjectFactoryMgr *objFactory) const
     objFactory->TplRegisterFactory<SSKinGroup>();
     objFactory->TplRegisterFactory<SSKinGroup2>();
     objFactory->TplRegisterFactory<SSkinTreeLines>();
-#ifdef SOUI_ENABLE_SVG
-    objFactory->TplRegisterFactory<SSkinSvg>();
-#endif
 }
 
 void SObjectDefaultRegister::RegisterLayouts(SObjectFactoryMgr *objFactory) const
