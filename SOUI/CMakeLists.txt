@@ -20,7 +20,7 @@ file(GLOB_RECURSE CURRENT_HEADERS  *.h *.hpp)
 file(GLOB_RECURSE CURRENT_SRCS  *.cpp)
 file(GLOB_RECURSE CURRENT_UIRES  *.xml *.idx *.ico)
 file(GLOB_RECURSE CURRENT_RC *.rc *.rc2)
-file(GLOB_RECURSE NANOSVG_HEADERS  ${PROJECT_SOURCE_DIR}/third-part/nanosvg/*.h)
+file(GLOB_RECURSE NANOSVG_HEADERS  ${PROJECT_SOURCE_DIR}/third-part/nanosvg/nanosvg.h)
 
 source_group("Header Files" FILES ${CURRENT_HEADERS})
 source_group("Source Files" FILES ${CURRENT_SRCS})

@@ -191,6 +191,8 @@ add_subdirectory(components)
 add_subdirectory(SOUI)
 add_subdirectory(soui-sys-resource)
 add_subdirectory(soui-sys-resource2)
+add_subdirectory(soui-sys-resource-dark)
+
 add_subdirectory(tools)
 add_subdirectory(controls.extend)
 if(SOUI_BUILD_DEMOS)

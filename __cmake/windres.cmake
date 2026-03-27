@@ -53,7 +53,7 @@ endif()
 
 # 函数：windres_compile_rc
 # 将 .rc 编译为适合当前平台的目标文件（ELF on Linux, Mach-O on macOS）
-function(windres_compile_rc output_var rc_file)
+function(windres_compile_rc target output_var rc_file)
     cmake_parse_arguments(ARG "" "" "INCLUDE_DIRS" ${ARGN})
     get_filename_component(rc_name "${rc_file}" NAME_WE)
     get_filename_component(rc_abs_path "${rc_file}" ABSOLUTE)
@@ -63,7 +63,7 @@ function(windres_compile_rc output_var rc_file)
     # 准备包含路径
     set(include_flags)
     list(APPEND include_flags "-I${PROJECT_BINARY_DIR}/config")
-    list(APPEND include_flags "-I${PROJECT_SOURCE_DIR}/soui-sys-resource")
+    #list(APPEND include_flags "-I${PROJECT_SOURCE_DIR}/soui-sys-resource")
     foreach(dir ${ARG_INCLUDE_DIRS})
         if(NOT dir STREQUAL "" AND NOT dir MATCHES "\\$<")
             list(APPEND include_flags "-I${dir}")
@@ -151,9 +151,8 @@ function(windres_compile_rc output_var rc_file)
                 COMMENT "Listing final global symbols for ${rc_name}"
                 VERBATIM
             )
-
             # Add all outputs as targets to ensure they're built
-            add_custom_target(${rc_name}_res_target ALL
+            add_custom_target("${target}_${rc_name}_res_target" ALL
                 DEPENDS ${final_obj} ${final_symbols}
                 COMMENT "Resource compilation target for ${rc_file}"
             )
@@ -181,7 +180,7 @@ function(target_compile_resources target)
             if(NOT rc_ext_lower STREQUAL ".rc")
                 continue()
             endif()
-            windres_compile_rc(rc_obj ${rc_file} ${ARG_INCLUDE_DIRS})
+            windres_compile_rc(${target} rc_obj ${rc_file} ${ARG_INCLUDE_DIRS})
             list(APPEND resource_objects ${rc_obj})
         endforeach()
         if(resource_objects)

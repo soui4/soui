@@ -55,13 +55,7 @@
 static const TCHAR *kPath_SysRes = _T("/../../soui-sys-resource");
 static const TCHAR *kPath_UiRes = _T("/uires");
 
-#ifdef _WIN32
-#define SYS_NAMED_RESOURCE _T("soui-sys-resource.dll")
-#elif defined(__APPLE__)
-#define SYS_NAMED_RESOURCE _T("soui-sys-resource.dylib")
-#else
-#define SYS_NAMED_RESOURCE _T("soui-sys-resource.so")
-#endif
+#define SYS_NAMED_RESOURCE _T("soui-sys-resource")
 
 #include <controls.extend/smiley/SSmileyCtrl.h>
 #include "skin/SSkinLoader.h"
@@ -220,7 +214,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
     // 演示R.color.xxx,R.string.xxx在代码中的使用。
     COLORREF crRed = GETCOLOR(R.color.red);
     SStringW strTitle = GETSTRING(R.string.title);
-
+    COLORREF crTxtTheme = GETCOLOR(SNamedColor::THEME_COLOR_TXT_NORMAL);
     app.EnableNotifyCenter(TRUE);
     {
 #if defined(_WIN32) && !defined(__MINGW32__)

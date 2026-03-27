@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 13 13">
+  <linearGradient id="prog-bar-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#668866"/>
+    <stop offset="100%" stop-color="#446644"/>
+  </linearGradient>
+  <rect width="13" height="13" fill="url(#prog-bar-gradient)" rx="1" ry="1"/>
+  <rect x="1" y="1" width="11" height="11" fill="#557755" rx="0.5" ry="0.5"/>
+</svg>

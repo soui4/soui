@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="20" viewBox="0 0 200 20">
+  <!-- 正常状态 -->
+  <g id="normal" transform="translate(0, 0)">
+    <linearGradient id="header-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#555555"/>
+      <stop offset="100%" stop-color="#444444"/>
+    </linearGradient>
+    <rect width="50" height="20" fill="url(#header-gradient)"/>
+    <rect x="0" y="19" width="50" height="1" fill="#333333"/>
+    <rect x="0" y="0" width="50" height="20" fill="none" stroke="#666666" stroke-width="1"/>
+  </g>
+  <!-- 悬停状态 -->
+  <g id="hover" transform="translate(50, 0)">
+    <linearGradient id="header-hover-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#666666"/>
+      <stop offset="100%" stop-color="#555555"/>
+    </linearGradient>
+    <rect width="50" height="20" fill="url(#header-hover-gradient)"/>
+    <rect x="0" y="19" width="50" height="1" fill="#444444"/>
+    <rect x="0" y="0" width="50" height="20" fill="none" stroke="#777777" stroke-width="1"/>
+  </g>
+  <!-- 按下状态 -->
+  <g id="pressed" transform="translate(100, 0)">
+    <linearGradient id="header-pressed-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#444444"/>
+      <stop offset="100%" stop-color="#333333"/>
+    </linearGradient>
+    <rect width="50" height="20" fill="url(#header-pressed-gradient)"/>
+    <rect x="0" y="19" width="50" height="1" fill="#222222"/>
+    <rect x="0" y="0" width="50" height="20" fill="none" stroke="#555555" stroke-width="1"/>
+  </g>
+  <!-- 禁用状态 -->
+  <g id="disabled" transform="translate(150, 0)">
+    <linearGradient id="header-disabled-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#444444"/>
+      <stop offset="100%" stop-color="#333333"/>
+    </linearGradient>
+    <rect width="50" height="20" fill="url(#header-disabled-gradient)"/>
+    <rect x="0" y="19" width="50" height="1" fill="#222222"/>
+    <rect x="0" y="0" width="50" height="20" fill="none" stroke="#444444" stroke-width="1"/>
+  </g>
+</svg>

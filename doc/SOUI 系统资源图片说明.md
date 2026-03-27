@@ -48,22 +48,23 @@
 - **sys_checkbox.png** (129x17) - 复选框
   - 用途：标准复选框皮肤（`_skin.sys.checkbox`）
   - 特性：8 种状态，不支持按下即选中（checkAsPushdown="0"）
-  - 状态包括：正常/悬停/按下/禁用的未选中/选中状态组合
+  - 状态包括：(正常/悬停/按下/禁用)*(未选中/选中)
   - 使用场景：表单中的多选控件
 
 - **sys_radio.png** (129x17) - 单选框
   - 用途：标准单选框皮肤（`_skin.sys.radio`）
-  - 特性：8 种状态，不支持按下即选中
+  - 特性：8 种状态，不支持按下即选中（checkAsPushdown="0"）
+  - 状态包括：(正常/悬停/按下/禁用)*(未选中/选中)
   - 使用场景：表单中的单选控件组
 
 - **sys_focus_checkbox.png** (17x17) - 焦点复选框
   - 用途：带焦点状态的复选框（`_skin.sys.focuscheckbox`）
-  - 特性：显示键盘焦点指示
+  - 特性：1种状态, 叠加显示在复选框上
   - 使用场景：需要键盘导航的复选框
 
 - **sys_focus_radio.png** (17x17) - 焦点单选框
   - 用途：带焦点状态的单选框（`_skin.sys.focusradio`）
-  - 特性：显示键盘焦点指示
+  - 特性：1种状态, 叠加显示在单选框上
   - 使用场景：需要键盘导航的单选框
 
 ### 2. 下拉按钮
@@ -103,13 +104,13 @@
 
 - **sys_tree_checkbox.png** (145x16) - 树节点复选框
   - 用途：树节点的复选框（`_skin.sys.tree.checkbox`）
-  - 特性：9 种状态（包含三级状态：未选中/选中/半选）
+  - 特性：9 种状态 (正常/悬停/按下)*(未选中/选中/半选) 
   - 使用场景：支持复选的树形控件
 
 ### 2. 列表头
-- **sys_header.png** (361x36) - 列表头
+- **sys_header.png** (200x20) - 列表头
   - 用途：列表控件的列头皮肤（`_skin.sys.header`）
-  - 特性：4 种状态（可能包含排序指示）
+  - 特性：4 种状态 (正常/悬停/按下/禁用)
   - 使用场景：ListCtrl、TableCtrl 的列头
 
 ## 四、滚动与进度条相关图片
@@ -163,12 +164,12 @@
 ### 1. 菜单项装饰
 - **sys_menu_check.png** (49x17) - 菜单勾选标记
   - 用途：菜单项的勾选标记（`_skin.sys.menu.check`）
-  - 特性：3 种状态（未选中/悬停/选中）
+  - 特性：3 种状态: checked, radio unchecked, radio checked
   - 使用场景：可勾选菜单项的左侧标记
 
 - **sys_menu_arrow.png** (33x17) - 菜单箭头
   - 用途：子菜单指示箭头（`_skin.sys.menu.arrow`）
-  - 特性：2 种状态
+  - 特性：2 种状态: normal, hover
   - 使用场景：有子菜单的菜单项右侧箭头
 
 - **sys_menu_sep.png** (50x2) - 菜单分隔线
@@ -184,21 +185,21 @@
 
 - **sys_menu_skin.png** (200x26) - 菜单皮肤
   - 用途：菜单项的背景皮肤（`_skin.sys.menu.skin`）
-  - 特性：2 种状态，左侧留白 26 像素用于放置勾选标记
+  - 特性：2 种状态: normal, hover.  其中normal左侧留白 26 像素用于放置勾选标记
   - 使用场景：菜单项的背景（包含勾选区域）
 
 ## 六、标签页与选项卡
 
-- **sys_tab_page.png** (300x30) - 标签页背景
+- **sys_tab_page.png** (200x30) - 标签页背景
   - 用途：TabCtrl 的页面背景（`_skin.sys.tab.page`）
-  - 特性：3 种状态，非对称 margin（5,2,5,7）
+  - 特性：4 种状态 (正常/悬停/按下/禁用), 使用九宫格拉伸,注意表达出选中状态和未选中状态的区别
   - 使用场景：TabControl 的内容区域背景
 
 ## 七、开关控件
 
 - **sys_switch.png** (304x19) - 开关前景
   - 用途：开关控件的滑动按钮（`_skin.sys.switch`）
-  - 特性：8 种状态
+  - 特性：8 种状态: (normal, hover, pressed, disabled)*(ON, OFF)
   - 使用场景：Switch  Toggle 控件的前景按钮
 
 - **sys_switch_bg.png** (60x19) - 开关背景
@@ -210,15 +211,26 @@
 
 - **sys_icons.png** (192x16) - 系统图标集合
   - 用途：通用系统图标集（`_skin.sys.icons`）
-  - 特性：12 种状态（包含多个图标）
+  - 特性：12 种状态: 文件新建, 文件打开, 文件保存, CUT, COPY, PASTE, PRINT, 大图标模式, 小图标模式, 列表模式,详细模式, 帮助图标
   - 使用场景：编辑菜单、上下文菜单中的功能图标（剪切/复制/粘贴等）
 
 ## 九、其他辅助图片
 
 - **sys_tree_lines.png** - 树形控件连线
   - 用途：树形控件的节点连线（`_skin.sys.tree.lines`）
-  - 特性：定义连线颜色和交叉颜色
+  - 特性：9 种状态, 每种状态显示参考SSkinTreeLines::_DrawByIndex实现.
   - 使用场景：TreeCtrl 的层级关系连线显示
+
+- **sys_settting.png** - 设置按钮
+  - 用途：设置按钮（`_skin.sys.setting`）
+  - 特性：4种状态: normal, hover, pressed, disabled
+  - 使用场景：设置按钮的显示状态
+
+- **sys_mini_close.png** - 工具类窗口的关闭按钮
+  - 用途：工具类窗口的关闭按钮（`_skin.sys.mini.close`）
+  - 特性：4种状态: normal, hover, pressed, disabled
+  - 使用场景：工具类窗口的关闭按钮的显示状态
+
 
 ## 十、使用说明
 

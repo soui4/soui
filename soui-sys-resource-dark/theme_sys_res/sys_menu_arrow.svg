@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="33" height="17" viewBox="0 0 33 17">
+  <!-- 正常状态 -->
+  <g id="normal" transform="translate(0, 0)">
+    <rect width="16" height="16" fill="transparent"/>
+    <path d="M6,6 L10,8 L6,10" stroke="#cccccc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <!-- 悬停状态 -->
+  <g id="hover" transform="translate(17, 0)">
+    <rect width="16" height="16" fill="transparent"/>
+    <path d="M6,6 L10,8 L6,10" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

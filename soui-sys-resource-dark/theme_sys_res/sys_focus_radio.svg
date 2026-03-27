@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
+  <!-- 焦点单选框 - 1种状态 -->
+  <g id="focus">
+    <circle cx="8.5" cy="8.5" r="7.5" fill="none" stroke="#88cccc" stroke-width="1" stroke-dasharray="2,1"/>
+  </g>
+</svg>

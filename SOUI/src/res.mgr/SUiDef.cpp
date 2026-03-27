@@ -508,8 +508,49 @@ ISkinObj *SUiDef::GetSkin(const SStringW &strSkinName, int nScale)
     return NULL;
 }
 
-static const wchar_t *BUILDIN_SKIN_NAMES[] = {
-    L"_skin.sys.checkbox", L"_skin.sys.radio", L"_skin.sys.focuscheckbox", L"_skin.sys.focusradio", L"_skin.sys.btn.normal", L"_skin.sys.scrollbar", L"_skin.sys.border", L"_skin.sys.dropbtn", L"_skin.sys.tree.toggle", L"_skin.sys.tree.checkbox", L"_skin.sys.tree.lines", L"_skin.sys.tab.page", L"_skin.sys.header", L"_skin.sys.split.vert", L"_skin.sys.split.horz", L"_skin.sys.prog.bkgnd", L"_skin.sys.prog.bar", L"_skin.sys.vert.prog.bkgnd", L"_skin.sys.vert.prog.bar", L"_skin.sys.slider.thumb", L"_skin.sys.btn.close", L"_skin.sys.btn.minimize", L"_skin.sys.btn.maxmize", L"_skin.sys.btn.restore", L"_skin.sys.menu.check", L"_skin.sys.menu.sep", L"_skin.sys.menu.arrow", L"_skin.sys.menu.border", L"_skin.sys.menu.skin", L"_skin.sys.icons", L"_skin.sys.wnd.bkgnd", L"_skin.sys.btn.prev", L"_skin.sys.btn.next", L"_skin.sys.spin.down", L"_skin.sys.spin.up", L"_skin.sys.switch", L"_skin.sys.switch_bg",
+static const wchar_t *BUILDIN_SKIN_NAMES[] = 
+{
+    L"_skin.sys.checkbox",
+    L"_skin.sys.radio",
+    L"_skin.sys.focuscheckbox",
+    L"_skin.sys.focusradio",
+    L"_skin.sys.btn.normal",
+    L"_skin.sys.scrollbar",
+    L"_skin.sys.border",
+    L"_skin.sys.dropbtn",
+    L"_skin.sys.tree.toggle",
+    L"_skin.sys.tree.checkbox",
+    L"_skin.sys.tree.lines",
+    L"_skin.sys.tab.page",
+    L"_skin.sys.header",
+    L"_skin.sys.split.vert",
+    L"_skin.sys.split.horz",
+    L"_skin.sys.prog.bkgnd",
+    L"_skin.sys.prog.bar",
+    L"_skin.sys.vert.prog.bkgnd",
+    L"_skin.sys.vert.prog.bar",
+    L"_skin.sys.slider.thumb",
+    L"_skin.sys.btn.close",
+    L"_skin.sys.btn.minimize",
+    L"_skin.sys.btn.maxmize",
+    L"_skin.sys.btn.restore",
+    L"_skin.sys.menu.check",
+    L"_skin.sys.menu.sep",
+    L"_skin.sys.menu.arrow",
+    L"_skin.sys.menu.border",
+    L"_skin.sys.menu.skin",
+    L"_skin.sys.icons",
+    L"_skin.sys.wnd.bkgnd",
+    L"_skin.sys.btn.prev",
+    L"_skin.sys.btn.next",
+    L"_skin.sys.spin.down",
+    L"_skin.sys.spin.up",
+    L"_skin.sys.switch",
+    L"_skin.sys.switch_bg",
+    L"_skin.sys.btn.setting",
+    L"_skin.sys.btn.skin",
+    L"_skin.sys.btn.mini.close",
+    L"_skin.sys.list.item",
 };
 
 ISkinObj *SUiDef::GetBuiltinSkin(SYS_SKIN uID, int nScale)
@@ -578,6 +619,7 @@ IGradient *SUiDef::GetGradient(const SStringW &strName)
 COLORREF SUiDef::GetColor(const SStringW &strColor)
 {
     SAutoLock autolock(m_cs);
+    
     COLORREF cr = CR_INVALID;
     SPOSITION pos = m_lstUiDefInfo.GetTailPosition();
     while (pos)
@@ -585,6 +627,9 @@ COLORREF SUiDef::GetColor(const SStringW &strColor)
         IUiDefInfo *pUiDefInfo = m_lstUiDefInfo.GetPrev(pos);
         if (pUiDefInfo->GetNamedColor().Get(strColor, cr))
             return cr;
+    }
+    if(cr == CR_INVALID){
+        m_themeColor.Get(strColor, cr);
     }
     return cr;
 }
@@ -683,6 +728,12 @@ FontInfo SUiDef::GetDefFontInfo() const
 {
     SAutoLock lock(m_cs);
     return SFontPool::_GetDefFontInfo();
+}
+
+void SUiDef::InitThemeColors(SXmlNode xmlColors)
+{
+    SAutoLock lock(m_cs);
+    m_themeColor.Init(xmlColors);
 }
 
 SNSEND

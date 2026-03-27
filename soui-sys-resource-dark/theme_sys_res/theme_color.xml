@@ -1,0 +1,6 @@
+<color>
+  <thm_txt_normal value="rgb(220,220,220)"/>
+  <thm_txt_hover value="rgb(255,255,255)"/>
+  <thm_txt_pressed value="rgb(200,200,200)"/>
+  <thm_txt_disabled value="rgb(128,128,128)"/>
+</color> 

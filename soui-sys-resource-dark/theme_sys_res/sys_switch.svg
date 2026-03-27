@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="19" viewBox="0 0 480 19">
+  <!-- 正常开启 -->
+  <g id="on_normal" transform="translate(0, 0)">
+    <rect width="60" height="19" fill="#446644" rx="9" ry="9"/>
+    <circle cx="50" cy="9.5" r="8" fill="#88cc88"/>
+  </g>
+  <!-- 悬停开启 -->
+  <g id="on_hover" transform="translate(60, 0)">
+    <rect width="60" height="19" fill="#557755" rx="9" ry="9"/>
+    <circle cx="50" cy="9.5" r="8" fill="#99dd99"/>
+  </g>
+  <!-- 按下开启 -->
+  <g id="on_pressed" transform="translate(120, 0)">
+    <rect width="60" height="19" fill="#335533" rx="9" ry="9"/>
+    <circle cx="50" cy="9.5" r="8" fill="#77bb77"/>
+  </g>
+  <!-- 禁用开启 -->
+  <g id="on_disabled" transform="translate(180, 0)">
+    <rect width="60" height="19" fill="#223322" rx="9" ry="9"/>
+    <circle cx="50" cy="9.5" r="8" fill="#557755"/>
+  </g>
+
+  <!-- 正常关闭 -->
+  <g id="off_normal" transform="translate(240, 0)">
+    <rect width="60" height="19" fill="#444444" rx="9" ry="9"/>
+    <circle cx="10" cy="9.5" r="8" fill="#666666"/>
+  </g>
+  <!-- 悬停关闭 -->
+  <g id="off_hover" transform="translate(300, 0)">
+    <rect width="60" height="19" fill="#555555" rx="9" ry="9"/>
+    <circle cx="10" cy="9.5" r="8" fill="#777777"/>
+  </g>
+  <!-- 按下关闭 -->
+  <g id="off_pressed" transform="translate(360, 0)">
+    <rect width="60" height="19" fill="#333333" rx="9" ry="9"/>
+    <circle cx="10" cy="9.5" r="8" fill="#555555"/>
+  </g>
+  <!-- 禁用关闭 -->
+  <g id="off_disabled" transform="translate(420, 0)">
+    <rect width="60" height="19" fill="#222222" rx="9" ry="9"/>
+    <circle cx="10" cy="9.5" r="8" fill="#444444"/>
+  </g>
+</svg>

@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="144" height="16" viewBox="0 0 144 16">
+  <!-- 1: 正常状态 - 未选中 -->
+  <g id="normal_unchecked" transform="translate(0, 0)">
+    <rect width="16" height="16" fill="#444444" stroke="#666666" stroke-width="1"/>
+  </g>
+  <!-- 4: 悬停状态 - 未选中 -->
+  <g id="hover_unchecked" transform="translate(16, 0)">
+    <rect width="16" height="16" fill="#555555" stroke="#777777" stroke-width="1"/>
+  </g>
+  <!-- 7: 按下状态 - 未选中 -->
+  <g id="pressed_unchecked" transform="translate(32, 0)">
+    <rect width="16" height="16" fill="#333333" stroke="#555555" stroke-width="1"/>
+  </g>
+  <!-- 2: 正常状态 - 选中 -->
+  <g id="normal_checked" transform="translate(48, 0)">
+    <rect width="16" height="16" fill="#444444" stroke="#666666" stroke-width="1"/>
+    <path d="M4,8 L7,11 L12,5" stroke="#88cc88" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <!-- 5: 悬停状态 - 选中 -->
+  <g id="hover_checked" transform="translate(64, 0)">
+    <rect width="16" height="16" fill="#555555" stroke="#777777" stroke-width="1"/>
+    <path d="M4,8 L7,11 L12,5" stroke="#99dd99" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <!-- 8: 按下状态 - 选中 -->
+  <g id="pressed_checked" transform="translate(80, 0)">
+    <rect width="16" height="16" fill="#333333" stroke="#555555" stroke-width="1"/>
+    <path d="M4,8 L7,11 L12,5" stroke="#77bb77" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <!-- 3: 正常状态 - 半选 -->
+  <g id="normal_halfchecked" transform="translate(96, 0)">
+    <rect width="16" height="16" fill="#444444" stroke="#666666" stroke-width="1"/>
+    <rect x="4" y="6" width="8" height="4" fill="#88cc88"/>
+  </g>
+  <!-- 6: 悬停状态 - 半选 -->
+  <g id="hover_halfchecked" transform="translate(112, 0)">
+    <rect width="16" height="16" fill="#555555" stroke="#777777" stroke-width="1"/>
+    <rect x="4" y="6" width="8" height="4" fill="#99dd99"/>
+  </g>
+  <!-- 9: 按下状态 - 半选 -->
+  <g id="pressed_halfchecked" transform="translate(128, 0)">
+    <rect width="16" height="16" fill="#333333" stroke="#555555" stroke-width="1"/>
+    <rect x="4" y="6" width="8" height="4" fill="#77bb77"/>
+  </g>
+</svg>

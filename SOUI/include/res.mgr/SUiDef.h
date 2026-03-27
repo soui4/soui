@@ -338,11 +338,17 @@ class SOUI_EXP SUiDef
      */
     FontInfo GetDefFontInfo() const;
 
+    /**
+     * @brief Initializes the theme colors from an XML node.
+     * @param xmlColors XML node containing theme colors.
+     */
+    void InitThemeColors(SXmlNode xmlColors);    
   protected:
     SAutoRefPtr<IUiDefInfo> m_defUiDefInfo;   // Default UI definition information
     SList<IUiDefInfo *> m_lstUiDefInfo;       // List of UI definition information objects
     SList<ISkinPool *> m_lstSkinPools;        // List of skin pools
     SAutoRefPtr<ISkinPool> m_bulitinSkinPool; // Built-in skin pool
+    SNamedColor m_themeColor;                 // Theme color pool
     mutable SCriticalSection m_cs;            // Critical section for thread safety
 };
 

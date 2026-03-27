@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="7" height="86" viewBox="0 0 7 86">
+  <linearGradient id="split-vert-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" stop-color="#333333"/>
+    <stop offset="50%" stop-color="#555555"/>
+    <stop offset="100%" stop-color="#333333"/>
+  </linearGradient>
+  <rect width="7" height="86" fill="url(#split-vert-gradient)"/>
+  <rect x="3" y="0" width="1" height="86" fill="#444444"/>
+</svg>

@@ -21,2969 +21,3098 @@
 
 SNSBEGIN
 
-    //////////////////////////////////////////////////////////////////////////
-    // SRenderFactory_GDI
-    SRenderFactory_GDI::SRenderFactory_GDI()
-	{
-        #ifdef SOUI_ENABLE_SVG
-        // Initialize GDI+ for SVG rendering with alpha channel support
-        Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-        Gdiplus::GdiplusStartup(&g_gdiplusToken, &gdiplusStartupInput, NULL);
-        #endif // SOUI_ENABLE_SVG
-		LOGFONT lf={0};
-		lf.lfHeight=20;
-        _tcscpy(lf.lfFaceName, _T("宋体"));
-		CreateFont(&m_defFont,&lf);
-	}
-
-	SRenderFactory_GDI::~SRenderFactory_GDI()
-	{
-        m_defFont=NULL;
-        #ifdef SOUI_ENABLE_SVG
-        // Shutdown GDI+
-        if (g_gdiplusToken != 0) {
-            Gdiplus::GdiplusShutdown(g_gdiplusToken);
-            g_gdiplusToken = 0;
-        }
-        #endif // SOUI_ENABLE_SVG
-	}
-
-    BOOL SRenderFactory_GDI::CreateRenderTarget( IRenderTarget ** ppRenderTarget ,int nWid,int nHei)
-    {
-        *ppRenderTarget = new SRenderTarget_GDI(this, nWid, nHei);
-        return TRUE;
-    }
-
-	BOOL SRenderFactory_GDI::CreateRenderTarget2(THIS_ IRenderTarget ** ppRenderTarget,HWND hWnd)
-	{
-		RECT rc;
-		::GetClientRect(hWnd,&rc);
-		return CreateRenderTarget(ppRenderTarget,rc.right,rc.bottom);
-	}
-
-    BOOL SRenderFactory_GDI::CreateFont( IFontS ** ppFont , const LOGFONT *lf)
-    {
-        *ppFont = new SFont_GDI(this,lf);
-        return TRUE;
-    }
-
-    BOOL SRenderFactory_GDI::CreateBitmap( IBitmapS ** ppBitmap )
-    {
-        *ppBitmap = new SBitmap_GDI(this);
-        return TRUE;
-    }
-
-    BOOL SRenderFactory_GDI::CreateRegion( IRegionS **ppRgn )
-    {
-        *ppRgn = new SRegion_GDI(this);
-        return TRUE;
-    }
-
-	BOOL SRenderFactory_GDI::CreatePath(IPathS ** ppPath)
-	{
-		*ppPath = new SPath_GDI(this);
-		return TRUE;
-	}
-
-	BOOL SRenderFactory_GDI::CreatePathEffect(REFGUID guidEffect,IPathEffect ** ppPathEffect)
-	{
-		return FALSE;
-	}
-
-	void SRenderFactory_GDI::SetImgDecoderFactory(IImgDecoderFactory *pImgDecoderFac)
-	{
-		m_imgDecoderFactory=pImgDecoderFac;
-	}
-
-	IImgDecoderFactory * SRenderFactory_GDI::GetImgDecoderFactory()
-	{
-		return m_imgDecoderFactory;
-	}
-
-
-	//////////////////////////////////////////////////////////////////////////
-
-	HPEN SPen_GDI::GetPen()
-	{
-		return m_hPen;
-	}
-
-	STDMETHODIMP_(void) SPen_GDI::SetColor(THIS_ COLORREF cr)
-	{
-		m_cr = cr;
-		UpdatePen();
-	}
-
-	STDMETHODIMP_(COLORREF) SPen_GDI::GetColor(THIS) SCONST
-	{
-		return m_cr;
-	}
-
-	STDMETHODIMP_(void) SPen_GDI::SetStyle(THIS_ int nStyle)
-	{
-		m_style = nStyle;
-		UpdatePen();
-	}
-
-	STDMETHODIMP_(int) SPen_GDI::GetStyle(THIS) SCONST
-	{
-		return m_style;
-	}
-
-	STDMETHODIMP_(void) SPen_GDI::SetWidth(THIS_ int nWid)
-	{
-		m_nWidth=nWid;
-		UpdatePen();
-	}
-
-	STDMETHODIMP_(int) SPen_GDI::GetWidth(THIS) SCONST
-	{
-		return m_nWidth;
-	}
-
-
-	SPen_GDI::SPen_GDI(IRenderFactory * pRenderFac,int iStyle/*=PS_SOLID*/,COLORREF cr/*=0*/,int cWidth/*=1*/) :TGdiRenderObjImpl<IPenS,OT_PEN>(pRenderFac)
-		,m_nWidth(cWidth),m_style(iStyle),m_cr(cr)
-		,m_hPen(NULL)
-	{
-		UpdatePen();
-	}
-
-	SPen_GDI::~SPen_GDI()
-	{
-		DeleteObject(m_hPen);
-	}
-
-	void SPen_GDI::UpdatePen()
-	{
-		if(m_hPen)
-		{
-			DeleteObject(m_hPen);
-			m_hPen=NULL;
-		}
-
-		if (m_style & PS_GEOMETRIC)
-		{
-			LOGBRUSH lb;
-			lb.lbStyle = BS_SOLID;
-			lb.lbColor = m_cr & 0x00ffffff;
-			lb.lbHatch = 0;
-			m_hPen = ::ExtCreatePen(m_style | PS_GEOMETRIC, m_nWidth, &lb, 0, NULL);
-		}
-		else
-		{
-			m_hPen = ::CreatePen(m_style , m_nWidth, m_cr & 0x00ffffff);
-		}
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-
-	const LOGFONT * SFont_GDI::LogFont()  SCONST
-	{
-		return &m_lf;
-	}
-
-	LPCTSTR SFont_GDI::FamilyName() SCONST
-	{
-		return m_lf.lfFaceName;
-	}
-
-	int SFont_GDI::TextSize() SCONST
-	{
-		return m_lf.lfHeight;
-	}
-
-	BOOL SFont_GDI::IsBold() SCONST
-	{
-		return m_lf.lfWeight == FW_BOLD;
-	}
-
-	BOOL SFont_GDI::IsItalic() SCONST
-	{
-		return m_lf.lfItalic;
-	}
-
-	BOOL SFont_GDI::IsUnderline() SCONST
-	{
-		return m_lf.lfUnderline;
-	}
-
-	BOOL SFont_GDI::IsStrikeOut() SCONST
-	{
-		return m_lf.lfStrikeOut;
-	}
-
-	BOOL SFont_GDI::UpdateFont(const LOGFONT *pLogFont)
-	{
-		if(!m_hFont) return FALSE;
-		DeleteObject(m_hFont);
-		memcpy(&m_lf,pLogFont,sizeof(LOGFONT));
-		m_hFont = CreateFontIndirect(&m_lf);
-		return TRUE;
-	}
-
-	void SFont_GDI::SetProp(IXmlNode *pXmlNode)
-	{
-
-	}
-
-	SFont_GDI::SFont_GDI(IRenderFactory * pRenderFac,const LOGFONT * plf) 
-		:TGdiRenderObjImpl<IFontS,OT_FONT>(pRenderFac)
-		,m_hFont(NULL)
-	{
-		memcpy(&m_lf,plf,sizeof(LOGFONT));
-		m_hFont=CreateFontIndirect(&m_lf);
-	}
-
-	SFont_GDI::~SFont_GDI()
-	{
-		if(m_hFont) 
-			DeleteObject(m_hFont);
-	}
-
-
-	//////////////////////////////////////////////////////////////////////////
-
-	SBrush_GDI::SBrush_GDI(IRenderFactory * pRenderFac,HBITMAP hBmp) :TGdiRenderObjImpl<IBrushS,OT_BRUSH>(pRenderFac),m_brushType(Brush_Bitmap)
-	{
-		BITMAP bmp;
-		::GetObject(hBmp,sizeof(bmp),&bmp);
-		if(bmp.bmBits){
-			BITMAPINFO *pBuf = (BITMAPINFO*)malloc(sizeof(BITMAPINFO)+bmp.bmWidthBytes * bmp.bmHeight);
-	
-			BITMAPINFO &bmpInfo = *pBuf;
-			memset(&bmpInfo, 0, sizeof(BITMAPINFO));
-			bmpInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-			bmpInfo.bmiHeader.biWidth = bmp.bmWidth;
-			bmpInfo.bmiHeader.biHeight = -bmp.bmHeight;
-			bmpInfo.bmiHeader.biPlanes = bmp.bmPlanes;
-			bmpInfo.bmiHeader.biBitCount = bmp.bmBitsPixel;
-			bmpInfo.bmiHeader.biCompression = BI_RGB;
-			bmpInfo.bmiHeader.biSizeImage = bmp.bmWidthBytes * bmp.bmHeight;
-			COLORREF *crTable= (COLORREF*)(pBuf+1);
-			memcpy(crTable,bmp.bmBits,bmpInfo.bmiHeader.biSizeImage);
-			//需要下面这一段，清空颜色表的alpha，GDI才支持。
-			for(int i=0;i<bmp.bmHeight;i++){
-				for(int j=0;j<bmp.bmWidth;j++){
-					*crTable &= 0x00ffffff;
-					crTable++;
-				}
-			}
-			m_hBrush = CreateDIBPatternBrushPt(pBuf,DIB_RGB_COLORS);
-			free(pBuf);
-		}else{
-			m_hBrush=NULL;
-		}
-	}
-
-	SBrush_GDI::SBrush_GDI(IRenderFactory * pRenderFac,COLORREF cr) :TGdiRenderObjImpl<IBrushS,OT_BRUSH>(pRenderFac),m_cr(cr),m_brushType(Brush_Color)
-	{
-		m_hBrush = ::CreateSolidBrush(m_cr&0x00ffffff);
-	}
-
-	SBrush_GDI::~SBrush_GDI()
-	{
-		if(m_hBrush) DeleteObject(m_hBrush);
-	}
-
-    //////////////////////////////////////////////////////////////////////////
-    //  SBitmap_GDI
-    HBITMAP SBitmap_GDI::CreateGDIBitmap( int nWid,int nHei,void ** ppBits )
-    {
-        BITMAPINFO bmi;
-        memset(&bmi, 0, sizeof(bmi));
-        bmi.bmiHeader.biSize        = sizeof(BITMAPINFOHEADER);
-        bmi.bmiHeader.biWidth       = nWid;
-        bmi.bmiHeader.biHeight      = -nHei; // top-down image 
-        bmi.bmiHeader.biPlanes      = 1;
-        bmi.bmiHeader.biBitCount    = 32;
-        bmi.bmiHeader.biCompression = BI_RGB;
-        bmi.bmiHeader.biSizeImage   = 0;
-
-        HDC hdc=GetDC(NULL);
-        HBITMAP hBmp=CreateDIBSection(hdc,&bmi,DIB_RGB_COLORS,ppBits,0,0);
-        ReleaseDC(NULL,hdc);
-        return hBmp;
-    }
-
-    HRESULT SBitmap_GDI::Init( int nWid,int nHei ,const LPVOID pBits/*=NULL*/)
-    {
-        if(m_hBmp) DeleteObject(m_hBmp);
-        LPVOID pBmpBits=NULL;
-        m_hBmp = CreateGDIBitmap(nWid,nHei,&pBmpBits);
-        if(m_hBmp)
-        {
-            m_sz.cx=nWid,m_sz.cy=nHei;
-            const int stride = m_sz.cx*4;
-            if(pBits)
-            {
-                memcpy(pBmpBits,pBits,stride*m_sz.cy);
-            }else
-            {
-                memset(pBmpBits,0,stride*m_sz.cy);
-            }
-        }
-        return m_hBmp?S_OK:E_OUTOFMEMORY;
-    }
-
-    HRESULT SBitmap_GDI::Init2(IImgFrame *pFrame )
-    {
-        UINT nWid,nHei;
-        pFrame->GetSize(&nWid,&nHei);
-
-        if(m_hBmp) DeleteObject(m_hBmp);
-        m_hBmp = CreateGDIBitmap(nWid,nHei,NULL);
-        if(!m_hBmp) return E_OUTOFMEMORY;
-
-        m_sz.cx=nWid,m_sz.cy=nHei;
-        const int stride = m_sz.cx*4;
-        UpdateDIBPixmap(m_hBmp, m_sz.cx, m_sz.cy, 32, stride, pFrame->GetPixels());
-        return S_OK;
-    }
-
-    HRESULT SBitmap_GDI::LoadFromFile( LPCTSTR pszFileName)
-    {
-        SAutoRefPtr<IImgX> imgDecoder;
-        GetRenderFactory()->GetImgDecoderFactory()->CreateImgX(&imgDecoder);
-#ifdef _UNICODE
-		if(imgDecoder->LoadFromFileW(pszFileName)==0) 
-            return E_FAIL;
-#else
-		if(imgDecoder->LoadFromFileA(pszFileName)==0) 
-            return E_FAIL;
-#endif
-        return ImgFromDecoder(imgDecoder);
-    }
-
-    HRESULT SBitmap_GDI::LoadFromMemory(LPBYTE pBuf,size_t szLen)
-    {
-        SAutoRefPtr<IImgX> imgDecoder;
-        GetRenderFactory()->GetImgDecoderFactory()->CreateImgX(&imgDecoder);
-        if(imgDecoder->LoadFromMemory(pBuf,szLen)==0) return S_FALSE;
-        return ImgFromDecoder(imgDecoder);
-    }
-
-    HRESULT SBitmap_GDI::ImgFromDecoder(IImgX *imgDecoder)
-    {
-        IImgFrame *pFrame=imgDecoder->GetFrame(0);
-        UINT nWid,nHei;
-        pFrame->GetSize(&nWid,&nHei);
-        m_sz.cx=nWid,m_sz.cy=nHei;
-        
-        if(m_hBmp) DeleteObject(m_hBmp);
-        void * pBits=NULL;
-        m_hBmp = CreateGDIBitmap(m_sz.cx,m_sz.cy,&pBits);
-
-        if(!m_hBmp) return E_OUTOFMEMORY;
-        const int stride = m_sz.cx*4;
-		UpdateDIBPixmap(m_hBmp,m_sz.cx,m_sz.cy,32,stride,pFrame->GetPixels());
-        return S_OK;
-    }
-
-    UINT SBitmap_GDI::Width() const
-    {
-        return m_sz.cx;
-    }
-
-    UINT SBitmap_GDI::Height() const
-    {
-        return m_sz.cy;
-    }
-
-    SIZE SBitmap_GDI::Size() const
-    {
-        return m_sz;
-    }
-
-    LPVOID SBitmap_GDI::LockPixelBits()
-    {
-        BITMAP bm;
-        GetObject(m_hBmp,sizeof(bm),&bm);
-        return bm.bmBits;
-    }
-
-    void SBitmap_GDI::UnlockPixelBits( LPVOID pBuf)
-    {
-
-    }
-
-    const LPVOID SBitmap_GDI::GetPixelBits() const
-    {
-        BITMAP bm;
-        GetObject(m_hBmp,sizeof(bm),&bm);
-        return bm.bmBits;
-    }
-
-	HRESULT SBitmap_GDI::Clone(IBitmapS **ppClone) const 
-	{
-		HRESULT hr = E_UNEXPECTED;
-        if (!m_hBmp)
-            return hr;
-		BOOL bOK = GetRenderFactory()->CreateBitmap(ppClone);
-		if(bOK)
-		{
-			hr=(*ppClone)->Init(Width(),Height(),GetPixelBits());
-			if(S_OK != hr)
-			{
-				(*ppClone)->Release();
-				(*ppClone) = NULL;
-			}
-		}
-		return hr;
-	}
-
-	HRESULT SBitmap_GDI::Scale(IBitmapS **ppOutput,int nScale,FilterLevel filterLevel) SCONST
-	{
-		int wid = MulDiv(Width(),nScale,100);
-		int hei = MulDiv(Height(),nScale,100);
-		return Scale2(ppOutput,wid,hei,filterLevel);
-	}
-
-	HRESULT SBitmap_GDI::Scale2(IBitmapS **pOutput,int nWid,int nHei,FilterLevel filterLevel) SCONST
-	{
-		if(nWid == Width() && nHei == Height())
-		{
-			return Clone(pOutput);
-		}
-		HRESULT hr = E_UNEXPECTED;
-		IRenderTarget *pRT=NULL;
-		if(GetRenderFactory()->CreateRenderTarget(&pRT,nWid,nHei))
-		{
-			RECT rcSrc = {0,0,(long)Width(),(long)Height()};
-			RECT rcDst ={0,0,nWid,nHei};
-			hr = pRT->DrawBitmapEx(&rcDst,this,&rcSrc,MAKELONG(EM_STRETCH,filterLevel),255);
-			if(hr == S_OK)
-			{
-				*pOutput = (IBitmapS*)pRT->GetCurrentObject(OT_BITMAP);
-				(*pOutput)->AddRef();
-			}
-			pRT->Release();
-		}else
-		{
-			hr = E_OUTOFMEMORY;
-		}
-		return hr;
-	}
-
-    static void premultiply_to_non_premultiply(unsigned char *data, int width, int height)
-    {
-        for (int y = 0; y < height; ++y)
-        {
-            for (int x = 0; x < width; ++x)
-            {
-                int idx = (y * width + x) * 4;
-                unsigned char alpha = data[idx + 3];
-                if (alpha != 0)
-                {
-                    data[idx + 0] = (data[idx + 0] * 255) / alpha; // R
-                    data[idx + 1] = (data[idx + 1] * 255) / alpha; // G
-                    data[idx + 2] = (data[idx + 2] * 255) / alpha; // B
-                }
-                else
-                {
-                    data[idx + 0] = 0; // R
-                    data[idx + 1] = 0; // G
-                    data[idx + 2] = 0; // B
-                }
-            }
-        }
-    }
-
-
-	HRESULT SBitmap_GDI::Save(LPCWSTR pszFileName,const LPVOID pFormat) SCONST
-	{
-		LPBYTE pBits = (LPBYTE)GetPixelBits();
-        int nWid = Width();
-        int nHei = Height();
-        SAutoBuf buf(nWid*4*nHei);
-        if (!buf)
-            return E_OUTOFMEMORY;
-        memcpy(buf, pBits, nWid * 4 * nHei);
-        premultiply_to_non_premultiply((unsigned char *)(char*)buf, nWid, nHei);
-		return GetRenderFactory()->GetImgDecoderFactory()->SaveImage((BYTE*)(char*)buf, nWid, nHei,pszFileName, pFormat);
-	}
-
-	HRESULT SBitmap_GDI::Save2(CTHIS_ LPCWSTR pszFileName, ImgFmt imgFmt) SCONST
-	{
-        LPBYTE pBits = (LPBYTE)GetPixelBits();
-        int nWid = Width();
-        int nHei = Height();
-        SAutoBuf buf(nWid * 4 * nHei);
-        if (!buf)
-            return E_OUTOFMEMORY;
-        memcpy(buf, pBits, nWid * 4 * nHei);
-        premultiply_to_non_premultiply((unsigned char *)(char *)buf, nWid, nHei);
-
-		return GetRenderFactory()->GetImgDecoderFactory()->SaveImage2((BYTE *)(char *)buf, nWid, nHei, pszFileName, imgFmt);
-	}
-
-    HBITMAP SBitmap_GDI::ToHBITMAP() const
-    {
-		const LPBYTE pSrcBits = (const LPBYTE)GetPixelBits();
-		LPVOID pDstBits = NULL;
-		int nWid = Width();
-		int nHei = Height();
-		HBITMAP hRet= CreateGDIBitmap(nWid,nHei,&pDstBits);
-		memcpy(pDstBits,pSrcBits,nWid*4*nHei);
-		return hRet;
-    }
-
-    //////////////////////////////////////////////////////////////////////////
-    //	SRegion_GDI
-    SRegion_GDI::SRegion_GDI( IRenderFactory *pRenderFac )
-        :TGdiRenderObjImpl<IRegionS,OT_RGN>(pRenderFac)
-    {
-        m_hRgn = ::CreateRectRgn(0,0,0,0);
-    }
-
-	SRegion_GDI::~SRegion_GDI()
-	{
-		DeleteObject(m_hRgn);
-	}
-
-
-    /*
-    int CombineRgn(  HRGN hrgnDest,      // handle to destination region
-    HRGN hrgnSrc1,      // handle to source region
-    HRGN hrgnSrc2,      // handle to source region
-    int fnCombineMode   // region combining mode);
-    
-    RGN_AND Creates the intersection of the two combined regions. 
-    RGN_COPY Creates a copy of the region identified by hrgnSrc1. 
-    RGN_DIFF Combines the parts of hrgnSrc1 that are not part of hrgnSrc2. 
-    RGN_OR Creates the union of two combined regions. 
-    RGN_XOR Creates the union of two combined regions except for any overlapping areas. 
-    
-    注意 RGN_DIFF 和 RGN_COPY对于hrgnSrc1的使用差异
-    */
-    void SRegion_GDI::CombineRect( LPCRECT lprect,int nCombineMode )
-    {
-        HRGN hRgn=::CreateRectRgnIndirect(lprect);
-        _CombineRgn(hRgn,nCombineMode);
-        DeleteObject(hRgn);
-    }
-
-	void SRegion_GDI::CombinePolygon(const POINT * pts, int count, int nPolygonMode, int nCombineMode)
-	{
-		HRGN hRgn = ::CreatePolygonRgn(pts, count, nPolygonMode);
-		_CombineRgn(hRgn, nCombineMode);
-		DeleteObject(hRgn);
-	}
-
-    void SRegion_GDI::CombineRgn(const IRegionS * pRgnSrc,int nCombineMode)
-    {
-        const SRegion_GDI *pRgnSrcGdi = (const SRegion_GDI*)pRgnSrc;
-        HRGN hRgn = pRgnSrcGdi->GetRegion();
-        _CombineRgn(hRgn,nCombineMode);
-    }
-
-
-    void SRegion_GDI::_CombineRgn(HRGN hRgn,int nCombineMode)
-    {
-        if(nCombineMode == RGN_DIFF)
-        {
-            ::CombineRgn(m_hRgn,m_hRgn,hRgn,RGN_DIFF);
-        }else
-        {
-            ::CombineRgn(m_hRgn,hRgn,m_hRgn,nCombineMode);
-        }
-
-    }
-
-    BOOL SRegion_GDI::PtInRegion( POINT pt ) const
-    {
-        return ::PtInRegion(m_hRgn,pt.x,pt.y);
-    }
-
-    BOOL SRegion_GDI::RectInRegion( LPCRECT lprect ) const
-    {
-        SASSERT(lprect);
-        return ::RectInRegion(m_hRgn,lprect);
-    }
-
-    void SRegion_GDI::GetRgnBox( LPRECT lprect ) const
-    {
-        SASSERT(lprect);
-        ::GetRgnBox(m_hRgn,lprect);
-    }
-
-    BOOL SRegion_GDI::IsEmpty() const
-    {
-        RECT rcBox;
-        GetRgnBox(&rcBox);
-        return (rcBox.left == rcBox.right) || (rcBox.top== rcBox.bottom);
-    }
-
-    void SRegion_GDI::Offset( POINT pt )
-    {
-        ::OffsetRgn(m_hRgn,pt.x,pt.y);
-    }
-
-    HRGN SRegion_GDI::GetRegion() const
-    {
-        return m_hRgn;
-    }
-
-    void SRegion_GDI::Clear()
-    {
-        ::SetRectRgn(m_hRgn,0,0,0,0);
-    }
-
-	void SRegion_GDI::CombineRoundRect(LPCRECT lprect, POINT ptRadius, int nCombineMode)
-	{
-		HRGN hRgn = ::CreateRoundRectRgn(lprect->left,lprect->top,lprect->right,lprect->bottom,ptRadius.x*2,ptRadius.y*2);
-		::CombineRgn(m_hRgn,hRgn,NULL,nCombineMode);
-		DeleteObject(hRgn);
-	}
-
-	void SRegion_GDI::CombineEllipse(LPCRECT lprect , int nCombineMode)
-	{
-		HRGN hRgn = ::CreateEllipticRgnIndirect(lprect);
-		::CombineRgn(m_hRgn,hRgn,NULL,nCombineMode);
-		DeleteObject(hRgn);
-	}
-
-    //////////////////////////////////////////////////////////////////////////
-    //  SPath_GDI
-    //////////////////////////////////////////////////////////////////////////
-    SPath_GDI::SPath_GDI(IRenderFactory *pRenderFac)
-        : TGdiRenderObjImpl<IPathS,OT_PATH>(pRenderFac)
-        , m_fillType(kWinding_FillType)
-        , m_bBoundsValid(FALSE)
-        , m_bHasLastPoint(FALSE)
-    {
-        SetRect(&m_bounds, 0, 0, 0, 0);
-        m_lastPoint.fX = m_lastPoint.fY = 0.0f;
-    }
-
-    SPath_GDI::~SPath_GDI()
-    {
-        // Commands will be automatically cleaned up by SArray destructor
-    }
-
-    FillType SPath_GDI::getFillType() const
-    {
-        return m_fillType;
-    }
-
-    void SPath_GDI::setFillType(FillType ft)
-    {
-        m_fillType = ft;
-    }
-
-    void SPath_GDI::reset()
-    {
-        m_commands.RemoveAll();
-        m_bHasLastPoint = FALSE;
-        m_bBoundsValid = FALSE;
-        SetRect(&m_bounds, 0, 0, 0, 0);
-    }
-
-    BOOL SPath_GDI::isEmpty() const
-    {
-        return m_commands.GetCount() == 0;
-    }
-
-    void SPath_GDI::getBounds(LPRECT prc) const
-    {
-        if (!m_bBoundsValid)
-        {
-            const_cast<SPath_GDI*>(this)->UpdateBounds();
-        }
-        *prc = m_bounds;
-    }
-
-    void SPath_GDI::moveTo(float x, float y)
-    {
-        PathCommand cmd;
-        cmd.type = PATH_CMD_MOVETO;
-        cmd.data.moveTo.x = x;
-        cmd.data.moveTo.y = y;
-        AddCommand(cmd);
-
-        m_lastPoint.fX = x;
-        m_lastPoint.fY = y;
-        m_bHasLastPoint = TRUE;
-        m_bBoundsValid = FALSE;
-    }
-
-    void SPath_GDI::rMoveTo(float dx, float dy)
-    {
-        if (m_bHasLastPoint)
-        {
-            moveTo(m_lastPoint.fX + dx, m_lastPoint.fY + dy);
-        }
-        else
-        {
-            moveTo(dx, dy);
-        }
-    }
-
-    void SPath_GDI::lineTo(float x, float y)
-    {
-        PathCommand cmd;
-        cmd.type = PATH_CMD_LINETO;
-        cmd.data.lineTo.x = x;
-        cmd.data.lineTo.y = y;
-        AddCommand(cmd);
-
-        m_lastPoint.fX = x;
-        m_lastPoint.fY = y;
-        m_bHasLastPoint = TRUE;
-        m_bBoundsValid = FALSE;
-    }
-
-    void SPath_GDI::rLineTo(float dx, float dy)
-    {
-        if (m_bHasLastPoint)
-        {
-            lineTo(m_lastPoint.fX + dx, m_lastPoint.fY + dy);
-        }
-        else
-        {
-            lineTo(dx, dy);
-        }
-    }
-
-    void SPath_GDI::quadTo(float x1, float y1, float x2, float y2)
-    {
-        // GDI doesn't have native quadratic Bezier support, so we approximate with cubic
-        // Convert quadratic to cubic Bezier
-        if (!m_bHasLastPoint) return;
-
-        float x0 = m_lastPoint.fX;
-        float y0 = m_lastPoint.fY;
-
-        // Cubic control points for quadratic approximation
-        float cx1 = x0 + 2.0f/3.0f * (x1 - x0);
-        float cy1 = y0 + 2.0f/3.0f * (y1 - y0);
-        float cx2 = x2 + 2.0f/3.0f * (x1 - x2);
-        float cy2 = y2 + 2.0f/3.0f * (y1 - y2);
-
-        cubicTo(cx1, cy1, cx2, cy2, x2, y2);
-    }
-
-    void SPath_GDI::rQuadTo(float dx1, float dy1, float dx2, float dy2)
-    {
-        if (m_bHasLastPoint)
-        {
-            quadTo(m_lastPoint.fX + dx1, m_lastPoint.fY + dy1,
-                   m_lastPoint.fX + dx2, m_lastPoint.fY + dy2);
-        }
-    }
-
-    void SPath_GDI::conicTo(float x1, float y1, float x2, float y2, float w)
-    {
-        // GDI doesn't support conic curves, approximate with quadratic
-        quadTo(x1, y1, x2, y2);
-    }
-
-    void SPath_GDI::rConicTo(float dx1, float dy1, float dx2, float dy2, float w)
-    {
-        if (m_bHasLastPoint)
-        {
-            conicTo(m_lastPoint.fX + dx1, m_lastPoint.fY + dy1,
-                    m_lastPoint.fX + dx2, m_lastPoint.fY + dy2, w);
-        }
-    }
-
-    void SPath_GDI::cubicTo(float x1, float y1, float x2, float y2, float x3, float y3)
-    {
-        if (!m_bHasLastPoint) return;
-
-        PathCommand cmd;
-        cmd.type = PATH_CMD_CUBICTO;
-        cmd.data.cubicTo.x1 = x1;
-        cmd.data.cubicTo.y1 = y1;
-        cmd.data.cubicTo.x2 = x2;
-        cmd.data.cubicTo.y2 = y2;
-        cmd.data.cubicTo.x3 = x3;
-        cmd.data.cubicTo.y3 = y3;
-        AddCommand(cmd);
-
-        m_lastPoint.fX = x3;
-        m_lastPoint.fY = y3;
-        m_bBoundsValid = FALSE;
-    }
-
-    void SPath_GDI::rCubicTo(float x1, float y1, float x2, float y2, float x3, float y3)
-    {
-        if (m_bHasLastPoint)
-        {
-            cubicTo(m_lastPoint.fX + x1, m_lastPoint.fY + y1,
-                    m_lastPoint.fX + x2, m_lastPoint.fY + y2,
-                    m_lastPoint.fX + x3, m_lastPoint.fY + y3);
-        }
-    }
-
-    void SPath_GDI::addRect(const RECT *rect, Direction dir)
-    {
-        addRect2((float)rect->left, (float)rect->top,
-                 (float)rect->right, (float)rect->bottom, dir);
-    }
-
-    void SPath_GDI::addRect2(float left, float top, float right, float bottom, Direction dir)
-    {
-        PathCommand cmd;
-        cmd.type = PATH_CMD_ADDRECT;
-        cmd.data.addRect.left = left;
-        cmd.data.addRect.top = top;
-        cmd.data.addRect.right = right;
-        cmd.data.addRect.bottom = bottom;
-        cmd.data.addRect.dir = dir;
-        AddCommand(cmd);
-
-        m_bBoundsValid = FALSE;
-    }
-
-    void SPath_GDI::addOval(const RECT *oval, Direction dir)
-    {
-        addOval2((float)oval->left, (float)oval->top,
-                 (float)oval->right, (float)oval->bottom, dir);
-    }
-
-    void SPath_GDI::addOval2(float left, float top, float right, float bottom, Direction dir)
-    {
-        PathCommand cmd;
-        cmd.type = PATH_CMD_ADDOVAL;
-        cmd.data.addOval.left = left;
-        cmd.data.addOval.top = top;
-        cmd.data.addOval.right = right;
-        cmd.data.addOval.bottom = bottom;
-        cmd.data.addOval.dir = dir;
-        AddCommand(cmd);
-
-        // Update last point to bottom of ellipse
-        m_lastPoint.fX = (left + right) / 2.0f;
-        m_lastPoint.fY = bottom;
-        m_bHasLastPoint = TRUE;
-        m_bBoundsValid = FALSE;
-    }
-
-    void SPath_GDI::addCircle(float x, float y, float radius, Direction dir)
-    {
-        addOval2(x - radius, y - radius, x + radius, y + radius, dir);
-    }
-
-    void SPath_GDI::addArc(const RECT *oval, float startAngle, float sweepAngle)
-    {
-        addArc2((float)oval->left, (float)oval->top,
-                (float)oval->right, (float)oval->bottom, startAngle, sweepAngle);
-    }
-
-    void SPath_GDI::addArc2(float left, float top, float right, float bottom, float startAngle, float sweepAngle)
-    {
-        PathCommand cmd;
-        cmd.type = PATH_CMD_ADDARC;
-        cmd.data.addArc.left = left;
-        cmd.data.addArc.top = top;
-        cmd.data.addArc.right = right;
-        cmd.data.addArc.bottom = bottom;
-        cmd.data.addArc.startAngle = startAngle;
-        cmd.data.addArc.sweepAngle = sweepAngle;
-        AddCommand(cmd);
-
-        // Calculate end point for last point tracking
-        float centerX = (left + right) / 2.0f;
-        float centerY = (top + bottom) / 2.0f;
-        float radiusX = (right - left) / 2.0f;
-        float radiusY = (bottom - top) / 2.0f;
-        float endRad = (startAngle + sweepAngle) * 3.14159f / 180.0f;
-
-        m_lastPoint.fX = centerX + radiusX * cos(endRad);
-        m_lastPoint.fY = centerY - radiusY * sin(endRad);
-        m_bHasLastPoint = TRUE;
-        m_bBoundsValid = FALSE;
-    }
-
-    void SPath_GDI::addRoundRect(const RECT *rect, float rx, float ry, Direction dir)
-    {
-        addRoundRect2((float)rect->left, (float)rect->top,
-                      (float)rect->right, (float)rect->bottom, rx, ry, dir);
-    }
-
-    void SPath_GDI::addRoundRect2(float left, float top, float right, float bottom, float rx, float ry, Direction dir)
-    {
-        PathCommand cmd;
-        cmd.type = PATH_CMD_ADDROUNDRECT;
-        cmd.data.addRoundRect.left = left;
-        cmd.data.addRoundRect.top = top;
-        cmd.data.addRoundRect.right = right;
-        cmd.data.addRoundRect.bottom = bottom;
-        cmd.data.addRoundRect.rx = rx;
-        cmd.data.addRoundRect.ry = ry;
-        cmd.data.addRoundRect.dir = dir;
-        AddCommand(cmd);
-
-        // Update last point
-        m_lastPoint.fX = left;
-        m_lastPoint.fY = top;
-        m_bHasLastPoint = TRUE;
-        m_bBoundsValid = FALSE;
-    }
-
-    void SPath_GDI::addPoly(const POINT pts[], int count, BOOL close)
-    {
-        if (count < 2) return;
-
-        PathCommand cmd;
-        cmd.type = PATH_CMD_ADDPOLY;
-        cmd.addPoly.reset(new PathCommand::AddPolyData());
-        cmd.addPoly->close = close;
-        for (int i = 0; i < count; i++)
-        {
-            cmd.addPoly->points.Add(pts[i]);
-        }
-        AddCommand(cmd);
-
-        m_lastPoint.fX = (float)pts[count-1].x;
-        m_lastPoint.fY = (float)pts[count-1].y;
-        m_bHasLastPoint = TRUE;
-        m_bBoundsValid = FALSE;
-    }
-
-    void SPath_GDI::transform(const IxForm *matrix)
-    {
-        if (!matrix) return;
-
-        PathCommand cmd;
-        cmd.type = PATH_CMD_TRANSFORM;
-        for (int i = 0; i < 9; i++)
-        {
-            cmd.data.transform.matrix[i] = matrix->fMat[i];
-        }
-        AddCommand(cmd);
-
-        m_bBoundsValid = FALSE;
-    }
-
-    BOOL SPath_GDI::getLastPt(fPoint * lastPt) const
-    {
-        if (!m_bHasLastPoint) return FALSE;
-        *lastPt = m_lastPoint;
-        return TRUE;
-    }
-
-    void SPath_GDI::addString(LPCTSTR pszText, int nLen, float x, float y, const IFontS *pFont)
-    {
-        if (!pszText || !pFont) return;
-
-        PathCommand cmd;
-        cmd.type = PATH_CMD_ADDSTRING;
-        cmd.addString.reset(new PathCommand::AddStringData());
-        cmd.addString->stringText = pszText;
-        cmd.addString->stringX = x;
-        cmd.addString->stringY = y;
-        cmd.addString->stringFont = const_cast<IFontS*>(pFont);
-        AddCommand(cmd);
-
-        m_bBoundsValid = FALSE;
-    }
-
-    IPathS * SPath_GDI::clone() const
-    {
-        SPath_GDI* pClone = new SPath_GDI(m_pRenderFactory);
-        pClone->m_fillType = m_fillType;
-        pClone->m_bounds = m_bounds;
-        pClone->m_bBoundsValid = m_bBoundsValid;
-        pClone->m_lastPoint = m_lastPoint;
-        pClone->m_bHasLastPoint = m_bHasLastPoint;
-
-        // Copy path data would require more complex implementation
-        // For now, return empty clone
-        return pClone;
-    }
-
-    BOOL SPath_GDI::beginFigure(float x, float y, BOOL bFill)
-    {
-        PathCommand cmd;
-        cmd.type = PATH_CMD_BEGINFIGURE;
-        cmd.data.beginFigure.x = x;
-        cmd.data.beginFigure.y = y;
-        cmd.data.beginFigure.bFill = bFill;
-        AddCommand(cmd);
-
-        moveTo(x, y);
-        return TRUE;
-    }
-
-    BOOL SPath_GDI::endFigure(BOOL bClose)
-    {
-        PathCommand cmd;
-        cmd.type = PATH_CMD_ENDFIGURE;
-        cmd.data.endFigure.bClose = bClose;
-        AddCommand(cmd);
-
-        return TRUE;
-    }
-
-    float SPath_GDI::getLength() const
-    {
-        // GDI doesn't provide direct path length calculation
-        // This would require complex implementation
-        return 0.0f;
-    }
-
-    BOOL SPath_GDI::getPosTan(float distance, fPoint *pos, fPoint *vec) const
-    {
-        // GDI doesn't provide direct path position/tangent calculation
-        return FALSE;
-    }
-
-    void SPath_GDI::close()
-    {
-        PathCommand cmd;
-        cmd.type = PATH_CMD_CLOSE;
-        AddCommand(cmd);
-    }
-
-    BOOL SPath_GDI::hitTest(float x, float y) const
-    {
-        HRGN hRgn = CreateRegionFromCommands();
-        if (!hRgn) return FALSE;
-
-        BOOL bHit = PtInRegion(hRgn, (int)x, (int)y);
-        DeleteObject(hRgn);
-        return bHit;
-    }
-
-    BOOL SPath_GDI::hitTestStroke(float x, float y, float strokeSize) const
-    {
-        // For stroke hit testing, we'd need to widen the path
-        // Simplified implementation using region
-        return hitTest(x, y);
-    }
-
-    BOOL SPath_GDI::op(const IPathS * other, PathOP op, IPathS * out) const
-    {
-        // GDI doesn't provide direct path operations
-        return FALSE;
-    }
-
-    // Protected helper methods
-    void SPath_GDI::AddCommand(const PathCommand& cmd)
-    {
-        m_commands.Add(cmd);
-    }
-
-    HRGN SPath_GDI::CreateRegionFromCommands() const
-    {
-        // Create a temporary memory DC to execute commands and create region
-        HDC hMemDC = CreateCompatibleDC(NULL);
-        if (!hMemDC) return NULL;
-
-        ExecuteCommands(hMemDC);
-        HRGN hRgn = ::PathToRegion(hMemDC);
-
-        DeleteDC(hMemDC);
-        return hRgn;
-    }
-
-    void SPath_GDI::ExecuteCommands(HDC hdc) const
-    {
-        if (!hdc) return;
-
-        // Set fill mode based on current fill type
-        int fillMode = (m_fillType == kWinding_FillType) ? WINDING : ALTERNATE;
-        SetPolyFillMode(hdc, fillMode);
-
-        ::BeginPath(hdc);
-
-        for (int i = 0; i < m_commands.GetCount(); i++)
-        {
-            const PathCommand& cmd = m_commands[i];
-
-            switch (cmd.type)
-            {
-            case PATH_CMD_RESET:
-                ::AbortPath(hdc);
-                ::BeginPath(hdc);
-                break;
-
-            case PATH_CMD_MOVETO:
-                ::MoveToEx(hdc, (int)cmd.data.moveTo.x, (int)cmd.data.moveTo.y, NULL);
-                break;
-
-            case PATH_CMD_LINETO:
-                ::LineTo(hdc, (int)cmd.data.lineTo.x, (int)cmd.data.lineTo.y);
-                break;
-
-            case PATH_CMD_QUADTO:
-                {
-                    // Convert quadratic to cubic Bezier
-                    POINT currentPos;
-                    GetCurrentPositionEx(hdc, &currentPos);
-
-                    float x0 = (float)currentPos.x;
-                    float y0 = (float)currentPos.y;
-                    float x1 = cmd.data.quadTo.x1;
-                    float y1 = cmd.data.quadTo.y1;
-                    float x2 = cmd.data.quadTo.x2;
-                    float y2 = cmd.data.quadTo.y2;
-
-                    // Cubic control points for quadratic approximation
-                    float cx1 = x0 + 2.0f/3.0f * (x1 - x0);
-                    float cy1 = y0 + 2.0f/3.0f * (y1 - y0);
-                    float cx2 = x2 + 2.0f/3.0f * (x1 - x2);
-                    float cy2 = y2 + 2.0f/3.0f * (y1 - y2);
-
-                    POINT pts[3];
-                    pts[0].x = (LONG)cx1; pts[0].y = (LONG)cy1;
-                    pts[1].x = (LONG)cx2; pts[1].y = (LONG)cy2;
-                    pts[2].x = (LONG)x2; pts[2].y = (LONG)y2;
-                    ::PolyBezierTo(hdc, pts, 3);
-                }
-                break;
-
-            case PATH_CMD_CUBICTO:
-                {
-                    POINT pts[3];
-                    pts[0].x = (LONG)cmd.data.cubicTo.x1; pts[0].y = (LONG)cmd.data.cubicTo.y1;
-                    pts[1].x = (LONG)cmd.data.cubicTo.x2; pts[1].y = (LONG)cmd.data.cubicTo.y2;
-                    pts[2].x = (LONG)cmd.data.cubicTo.x3; pts[2].y = (LONG)cmd.data.cubicTo.y3;
-                    ::PolyBezierTo(hdc, pts, 3);
-                }
-                break;
-
-            case PATH_CMD_ADDRECT:
-                {
-                    float left = cmd.data.addRect.left;
-                    float top = cmd.data.addRect.top;
-                    float right = cmd.data.addRect.right;
-                    float bottom = cmd.data.addRect.bottom;
-                    Direction dir = cmd.data.addRect.dir;
-
-                    if (dir == kCW_Direction)
-                    {
-                        ::MoveToEx(hdc, (int)left, (int)top, NULL);
-                        ::LineTo(hdc, (int)right, (int)top);
-                        ::LineTo(hdc, (int)right, (int)bottom);
-                        ::LineTo(hdc, (int)left, (int)bottom);
-                        ::LineTo(hdc, (int)left, (int)top);
-                    }
-                    else
-                    {
-                        ::MoveToEx(hdc, (int)left, (int)top, NULL);
-                        ::LineTo(hdc, (int)left, (int)bottom);
-                        ::LineTo(hdc, (int)right, (int)bottom);
-                        ::LineTo(hdc, (int)right, (int)top);
-                        ::LineTo(hdc, (int)left, (int)top);
-                    }
-                }
-                break;
-
-            case PATH_CMD_ADDOVAL:
-                ::Ellipse(hdc, (int)cmd.data.addOval.left, (int)cmd.data.addOval.top,
-                         (int)cmd.data.addOval.right, (int)cmd.data.addOval.bottom);
-                break;
-
-            case PATH_CMD_ADDCIRCLE:
-                {
-                    float x = cmd.data.addCircle.x;
-                    float y = cmd.data.addCircle.y;
-                    float r = cmd.data.addCircle.radius;
-                    ::Ellipse(hdc, (int)(x-r), (int)(y-r), (int)(x+r), (int)(y+r));
-                }
-                break;
-
-            case PATH_CMD_ADDARC:
-                {
-                    float left = cmd.data.addArc.left;
-                    float top = cmd.data.addArc.top;
-                    float right = cmd.data.addArc.right;
-                    float bottom = cmd.data.addArc.bottom;
-                    float startAngle = cmd.data.addArc.startAngle;
-                    float sweepAngle = cmd.data.addArc.sweepAngle;
-
-                    // Convert angles and calculate points
-                    float centerX = (left + right) / 2.0f;
-                    float centerY = (top + bottom) / 2.0f;
-                    float radiusX = (right - left) / 2.0f;
-                    float radiusY = (bottom - top) / 2.0f;
-
-                    float startRad = startAngle * 3.14159f / 180.0f;
-                    float endRad = (startAngle + sweepAngle) * 3.14159f / 180.0f;
-
-                    int xStart = (int)(centerX + radiusX * cos(startRad));
-                    int yStart = (int)(centerY - radiusY * sin(startRad));
-                    int xEnd = (int)(centerX + radiusX * cos(endRad));
-                    int yEnd = (int)(centerY - radiusY * sin(endRad));
-
-                    ::Arc(hdc, (int)left, (int)top, (int)right, (int)bottom,
-                         xStart, yStart, xEnd, yEnd);
-                }
-                break;
-
-            case PATH_CMD_ADDROUNDRECT:
-                ::RoundRect(hdc, (int)cmd.data.addRoundRect.left, (int)cmd.data.addRoundRect.top,
-                           (int)cmd.data.addRoundRect.right, (int)cmd.data.addRoundRect.bottom,
-                           (int)(cmd.data.addRoundRect.rx * 2), (int)(cmd.data.addRoundRect.ry * 2));
-                break;
-
-            case PATH_CMD_ADDPOLY:
-                if (cmd.addPoly && cmd.addPoly->points.GetCount() >= 2)
-                {
-                    ::MoveToEx(hdc, cmd.addPoly->points[0].x, cmd.addPoly->points[0].y, NULL);
-                    for (int j = 1; j < cmd.addPoly->points.GetCount(); j++)
-                    {
-                        ::LineTo(hdc, cmd.addPoly->points[j].x, cmd.addPoly->points[j].y);
-                    }
-                    if (cmd.addPoly->close)
-                    {
-                        ::LineTo(hdc, cmd.addPoly->points[0].x, cmd.addPoly->points[0].y);
-                    }
-                }
-                break;
-
-            case PATH_CMD_ADDSTRING:
-                if (cmd.addString && !cmd.addString->stringText.IsEmpty() && cmd.addString->stringFont)
-                {
-                    const SFont_GDI* pGdiFont = static_cast<const SFont_GDI*>((IFontS*)cmd.addString->stringFont);
-                    HFONT hOldFont = (HFONT)SelectObject(hdc, pGdiFont->GetFont());
-
-                    TextOut(hdc, (int)cmd.addString->stringX, (int)cmd.addString->stringY,
-                           cmd.addString->stringText, cmd.addString->stringText.GetLength());
-
-                    SelectObject(hdc, hOldFont);
-                }
-                break;
-
-            case PATH_CMD_TRANSFORM:
-                {
-                    XFORM xform;
-                    xform.eM11 = cmd.data.transform.matrix[0];  // scaleX
-                    xform.eM12 = cmd.data.transform.matrix[1];  // skewY
-                    xform.eM21 = cmd.data.transform.matrix[3];  // skewX
-                    xform.eM22 = cmd.data.transform.matrix[4];  // scaleY
-                    xform.eDx = cmd.data.transform.matrix[6];   // translateX
-                    xform.eDy = cmd.data.transform.matrix[7];   // translateY
-
-                    SetGraphicsMode(hdc, GM_ADVANCED);
-                    SetWorldTransform(hdc, &xform);
-                }
-                break;
-
-            case PATH_CMD_BEGINFIGURE:
-                // Begin figure is handled by the path system automatically
-                break;
-
-            case PATH_CMD_ENDFIGURE:
-                if (cmd.data.endFigure.bClose)
-                {
-                    ::CloseFigure(hdc);
-                }
-                break;
-
-            case PATH_CMD_CLOSE:
-                ::CloseFigure(hdc);
-                break;
-            }
-        }
-
-        ::EndPath(hdc);
-    }
-
-    void SPath_GDI::UpdateBounds()
-    {
-        HRGN hRgn = CreateRegionFromCommands();
-        if (hRgn)
-        {
-            GetRgnBox(hRgn, &m_bounds);
-            DeleteObject(hRgn);
-        }
-        else
-        {
-            SetRect(&m_bounds, 0, 0, 0, 0);
-        }
-
-        m_bBoundsValid = TRUE;
-    }
-
-    void SPath_GDI::offset(float dx, float dy)
-    {
-        for (UINT i = 0; i < m_commands.GetCount(); i++) {
-            PathCommand& cmd = m_commands[i];
-            
-            switch (cmd.type) {
-            case PATH_CMD_MOVETO:
-                cmd.data.moveTo.x += dx;
-                cmd.data.moveTo.y += dy;
-                break;
-                
-            case PATH_CMD_LINETO:
-                cmd.data.lineTo.x += dx;
-                cmd.data.lineTo.y += dy;
-                break;
-                
-            case PATH_CMD_QUADTO:
-                cmd.data.quadTo.x1 += dx;
-                cmd.data.quadTo.y1 += dy;
-                cmd.data.quadTo.x2 += dx;
-                cmd.data.quadTo.y2 += dy;
-                break;
-                
-            case PATH_CMD_CUBICTO:
-                cmd.data.cubicTo.x1 += dx;
-                cmd.data.cubicTo.y1 += dy;
-                cmd.data.cubicTo.x2 += dx;
-                cmd.data.cubicTo.y2 += dy;
-                cmd.data.cubicTo.x3 += dx;
-                cmd.data.cubicTo.y3 += dy;
-                break;
-                
-            case PATH_CMD_ADDRECT:
-                cmd.data.addRect.left += dx;
-                cmd.data.addRect.top += dy;
-                cmd.data.addRect.right += dx;
-                cmd.data.addRect.bottom += dy;
-                break;
-                
-            case PATH_CMD_ADDOVAL:
-                cmd.data.addOval.left += dx;
-                cmd.data.addOval.top += dy;
-                cmd.data.addOval.right += dx;
-                cmd.data.addOval.bottom += dy;
-                break;
-                
-            case PATH_CMD_ADDCIRCLE:
-                cmd.data.addCircle.x += dx;
-                cmd.data.addCircle.y += dy;
-                break;
-                
-            case PATH_CMD_ADDARC:
-                cmd.data.addArc.left += dx;
-                cmd.data.addArc.top += dy;
-                cmd.data.addArc.right += dx;
-                cmd.data.addArc.bottom += dy;
-                break;
-                
-            case PATH_CMD_ADDROUNDRECT:
-                cmd.data.addRoundRect.left += dx;
-                cmd.data.addRoundRect.top += dy;
-                cmd.data.addRoundRect.right += dx;
-                cmd.data.addRoundRect.bottom += dy;
-                break;
-                
-            case PATH_CMD_ADDPOLY:
-                if (cmd.addPoly) {
-                    for (int j = 0; j < cmd.addPoly->points.GetCount(); j++) {
-                        cmd.addPoly->points[j].x += (LONG)dx;
-                        cmd.addPoly->points[j].y += (LONG)dy;
-                    }
-                }
-                break;
-                
-            case PATH_CMD_ADDSTRING:
-                if (cmd.addString) {
-                    cmd.addString->stringX += dx;
-                    cmd.addString->stringY += dy;
-                }
-                break;
-                
-            case PATH_CMD_BEGINFIGURE:
-                cmd.data.beginFigure.x += dx;
-                cmd.data.beginFigure.y += dy;
-                break;
-                
-            // 其他命令类型不需要处理坐标偏移
-            case PATH_CMD_RESET:
-            case PATH_CMD_TRANSFORM:
-            case PATH_CMD_ENDFIGURE:
-            case PATH_CMD_CLOSE:
-            case PATH_CMD_UNKNOWN:
-            default:
-                break;
-            }
-        }
-        
-        // 更新最后点坐标
-        if (m_bHasLastPoint) {
-            m_lastPoint.fX += dx;
-            m_lastPoint.fY += dy;
-        }
-        
-        // 如果边界已计算，则也需要更新
-        if (m_bBoundsValid) {
-            OffsetRect(&m_bounds, (int)dx, (int)dy);
-        }
-    }
-
-    //////////////////////////////////////////////////////////////////////////
-    //  DCBuffer
-    //////////////////////////////////////////////////////////////////////////
-    class DCBuffer
-    {
-    public:
-        DCBuffer(HDC hdc,LPCRECT pRect,BYTE byAlpha,BOOL bCopyBits=TRUE)
-            :m_hdc(hdc)
-            ,m_byAlpha(byAlpha)
-            ,m_pRc(pRect)
-            ,m_bCopyBits(bCopyBits)
-        {
-            m_nWid = pRect->right-pRect->left;
-            m_nHei = pRect->bottom-pRect->top;
-            m_hBmp = SBitmap_GDI::CreateGDIBitmap(m_nWid,m_nHei,(void**)&m_pBits);
-            m_hMemDC = ::CreateCompatibleDC(hdc);
-            ::SetBkMode(m_hMemDC,TRANSPARENT);
-            ::SelectObject(m_hMemDC,m_hBmp);
-            ::SetViewportOrgEx(m_hMemDC,-pRect->left,-pRect->top,NULL);
-            //从原DC中获得画笔，画刷，字体，颜色等
-            m_hCurPen = ::SelectObject(hdc,GetStockObject(BLACK_PEN));
-            m_hCurBrush = ::SelectObject(hdc,GetStockObject(BLACK_BRUSH));
-            m_hCurFont = ::SelectObject(hdc,GetStockObject(DEFAULT_GUI_FONT));
-            COLORREF crCur = ::GetTextColor(hdc);
-
-            //将画笔，画刷，字体设置到memdc里
-            ::SelectObject(m_hMemDC,m_hCurPen);
-            ::SelectObject(m_hMemDC,m_hCurBrush);
-            ::SelectObject(m_hMemDC,m_hCurFont);
-            ::SetTextColor(m_hMemDC,crCur);
-
-            if(m_bCopyBits) ::BitBlt(m_hMemDC,pRect->left,pRect->top,m_nWid,m_nHei,m_hdc,pRect->left,pRect->top,SRCCOPY);
-            //将alpha全部强制修改为0xFF。
-            BYTE * p= m_pBits+3;
-            for(int i=0;i<m_nHei;i++)for(int j=0;j<m_nWid;j++,p+=4) *p=0xFF;
-        }
-
-        ~DCBuffer()
-        {
-            //将alpha为0xFF的改为0,同时将rgb值也清0(XP系统下不清0会导致背景变成白色）,为0的改为0xFF
-            BYTE * p= m_pBits+3;
-            for(int i=0;i<m_nHei;i++)for(int j=0;j<m_nWid;j++,p+=4)
-			{
-				if(*p==0) *p=0xff;
-				else
-				{
-					memset(p-3,0,4);
-				}
-			}
-            BLENDFUNCTION bf={AC_SRC_OVER,0,m_byAlpha,AC_SRC_ALPHA };
-            BOOL bRet=::AlphaBlend(m_hdc,m_pRc->left,m_pRc->top,m_nWid,m_nHei,m_hMemDC,m_pRc->left,m_pRc->top,m_nWid,m_nHei,bf);
-			(void)bRet;
-            ::DeleteDC(m_hMemDC);
-            ::DeleteObject(m_hBmp);
-            
-            //恢复原DC的画笔，画刷，字体
-            ::SelectObject(m_hdc,m_hCurPen);
-            ::SelectObject(m_hdc,m_hCurBrush);
-            ::SelectObject(m_hdc,m_hCurFont);
-        }
-
-        operator HDC()
-        {
-            return m_hMemDC;
-        }
-
-    protected:
-        HDC m_hdc;
-        HDC m_hMemDC;
-        HBITMAP m_hBmp; 
-        LPBYTE  m_pBits;
-        BYTE    m_byAlpha;
-        LPCRECT m_pRc;
-        int     m_nWid,m_nHei;
-        BOOL    m_bCopyBits;
-
-        HGDIOBJ m_hCurPen;
-        HGDIOBJ m_hCurBrush;
-        HGDIOBJ m_hCurFont;
-    };
-
-    //////////////////////////////////////////////////////////////////////////
-    //	SRenderTarget_GDI
-    //////////////////////////////////////////////////////////////////////////
-    
-    SRenderTarget_GDI::SRenderTarget_GDI( IRenderFactory* pRenderFactory ,int nWid,int nHei)
-        :m_hdc(NULL)
-        ,m_curColor(0xFF000000)//默认黑色
-        ,m_uGetDCFlag(0)
-    {
-		m_pRenderFactory = pRenderFactory;
-
-        m_ptOrg.x=m_ptOrg.y=0;
-                
-        HDC hdc=::GetDC(NULL);
-        m_hdc = CreateCompatibleDC(hdc);
-        ::ReleaseDC(NULL,hdc);
-        ::SetBkMode(m_hdc,TRANSPARENT);
-        ::SetGraphicsMode(m_hdc,GM_ADVANCED);
-        CreatePen(PS_SOLID,SColor(0,0,0).toCOLORREF(),1,&m_defPen);
-        SelectObject(m_defPen,NULL);
-
-        CreateSolidColorBrush(SColor(0,0,0).toCOLORREF(),&m_defBrush);
-        SelectObject(m_defBrush,NULL);
-
-        m_defFont = pRenderFactory->GetDefFont();
-        SelectObject(m_defFont,NULL);
-
-        pRenderFactory->CreateBitmap(&m_defBmp);
-        m_defBmp->Init(nWid,nHei,NULL);
-        SelectObject(m_defBmp,NULL);
-    }
-
-    SRenderTarget_GDI::~SRenderTarget_GDI()
-    {
-        DeleteDC(m_hdc);
-    }
-
-    HRESULT SRenderTarget_GDI::CreatePen( int iStyle,COLORREF cr,int cWidth,IPenS ** ppPen )
-    {
-		*ppPen = new SPen_GDI(m_pRenderFactory,iStyle,cr,cWidth);
-        return S_OK;
-    }
-
-    HRESULT SRenderTarget_GDI::CreateSolidColorBrush( COLORREF cr,IBrushS ** ppBrush )
-    {
-        *ppBrush = new SBrush_GDI(m_pRenderFactory,cr);
-        return S_OK;
-    }
-
-    HRESULT SRenderTarget_GDI::CreateBitmapBrush( IBitmapS *pBmp,TileMode xtm,TileMode ytm,IBrushS ** ppBrush )
-    {
-        SBitmap_GDI *pBmpSkia = (SBitmap_GDI*)pBmp;
-		(xtm),(ytm);
-        *ppBrush = new SBrush_GDI(m_pRenderFactory,pBmpSkia->GetBitmap());
-        return S_OK;
-    }
-
-	HRESULT SRenderTarget_GDI::CreateGradientBrush(THIS_ const GradientItem *pGradients, int nCount, const GradientInfo *info, BYTE byAlpha,TileMode tileMode, IBrushS * *ppBrush)
-	{
-		return E_NOTIMPL;//todo:hjx
-	}
-
-    HRESULT SRenderTarget_GDI::Resize( SIZE sz )
-    {
-        HBITMAP hBmp=CreateCompatibleBitmap(m_hdc,0,0);
-        ::SelectObject(m_hdc,hBmp);
-        m_curBmp->Init(sz.cx,sz.cy,NULL);
-        ::SelectObject(m_hdc,m_curBmp->GetBitmap());
-        ::DeleteObject(hBmp);
-        return S_OK;
-    }
-
-    HRESULT SRenderTarget_GDI::PushClipRect( LPCRECT pRect ,UINT mode/*=RGN_AND*/)
-    {
-        RECT rc=*pRect;
-        ::OffsetRect(&rc,m_ptOrg.x,m_ptOrg.y);
-        HRGN hRgn=::CreateRectRgnIndirect(&rc);
-        ::SaveDC(m_hdc);
-        ::ExtSelectClipRgn(m_hdc,hRgn,mode);
-        ::DeleteObject(hRgn);
-        return S_OK;
-    }
-
-    HRESULT SRenderTarget_GDI::PopClip()
-    {
-        ::RestoreDC(m_hdc,-1);
-        return S_OK;
-    }
-
-    HRESULT SRenderTarget_GDI::ExcludeClipRect( LPCRECT pRc )
-    {
-        ::ExcludeClipRect(m_hdc,pRc->left,pRc->top,pRc->right,pRc->bottom);
-        return S_OK;
-    }
-
-    HRESULT SRenderTarget_GDI::SaveClip( int *pnState )
-    {
-        int nState=::SaveDC(m_hdc);
-        if(pnState) *pnState=nState;
-        return S_OK;
-    }
-
-    HRESULT SRenderTarget_GDI::RestoreClip( int nState/*=-1*/ )
-    {
-        ::RestoreDC(m_hdc,nState);
-        return S_OK;
-    }
-
-    HRESULT SRenderTarget_GDI::PushClipRegion( IRegionS *pRegion ,UINT mode/*=RGN_AND*/)
-    {
-        SRegion_GDI *pRgnGDI=(SRegion_GDI*)pRegion;
-        HRGN hRgn=::CreateRectRgn(0,0,0,0);
-        ::CombineRgn(hRgn,pRgnGDI->GetRegion(),NULL,RGN_COPY);
-        ::OffsetRgn(hRgn,m_ptOrg.x,m_ptOrg.y);
-        ::SaveDC(m_hdc);
-        ::ExtSelectClipRgn(m_hdc,hRgn,mode);
-        ::DeleteObject(hRgn);
-        return S_OK;
-    }
-
-    HRESULT SRenderTarget_GDI::GetClipRegion( IRegionS **ppRegion )
-    {
-        SRegion_GDI *pRgn=new SRegion_GDI(m_pRenderFactory);
-        ::GetClipRgn(m_hdc,pRgn->GetRegion());
-        POINT pt={-m_ptOrg.x,-m_ptOrg.y};
-        pRgn->Offset(pt);
-        *ppRegion = pRgn;
-        return S_OK;
-    }
-
-    HRESULT SRenderTarget_GDI::GetClipBox(LPRECT prc)
-    {
-        ::GetClipBox(m_hdc,prc);
-        return S_OK;
-    }
-
-
-    HRESULT SRenderTarget_GDI::BitBlt( LPCRECT pRcDest,IRenderTarget *pRTSour,int xSrc,int ySrc,DWORD dwRop/*=SRCCOPY*/)
-    {
-		switch(dwRop)
-		{
-		case kSrcCopy:
-		case kDstInvert:
-		case kSrcInvert:
-		case kSrcAnd:
-			break;
-		default:
-			return E_INVALIDARG;
-		}
-        SRenderTarget_GDI *pRTSrc_GDI=(SRenderTarget_GDI*)pRTSour;
-
-        ALPHAINFO ai;
-//        if(dwRop!=SRCCOPY)
-            CGdiAlpha::AlphaBackup(m_hdc,pRcDest,ai);
-        ::BitBlt(m_hdc,pRcDest->left,pRcDest->top,pRcDest->right-pRcDest->left,pRcDest->bottom-pRcDest->top,pRTSrc_GDI->m_hdc,xSrc,ySrc,dwRop);
-//        if(dwRop!=SRCCOPY)
-            CGdiAlpha::AlphaRestore(ai);
-        return S_OK;
-    }
-
-    HRESULT SRenderTarget_GDI::DrawText( LPCTSTR pszText,int cchLen,LPRECT pRc,UINT uFormat)
-    {
-        if(uFormat & DT_CALCRECT)
-        {
-            int nRet = ::DrawText(m_hdc,pszText,cchLen,pRc,uFormat);
-			if(!nRet)
-			{
-				pRc->right = pRc->left;
-				pRc->bottom = pRc->top;
-			}
-            return S_OK;
-        }
-        
-        if(cchLen == 0) return S_OK;
-
-        {
-            DCBuffer dcBuf(m_hdc,pRc,m_curColor.a);
-            ::DrawText(dcBuf,pszText,cchLen,pRc,uFormat);
-        }
-
-        return S_OK;
-    }
-
-    HRESULT SRenderTarget_GDI::MeasureText( LPCTSTR pszText,int cchLen, SIZE *psz )
-    {
-        if(cchLen<0) cchLen = (int)_tcslen(pszText);
-        ::GetTextExtentPoint32(m_hdc,pszText,cchLen,psz);
-        return S_OK;
-    }
-
-    HRESULT SRenderTarget_GDI::GetFontMetrics( TEXTMETRIC *ptm )
-    {
-        ::GetTextMetrics(m_hdc, ptm);
-        return S_OK;
-    }
-
-    HRESULT SRenderTarget_GDI::DrawRectangle(LPCRECT pRect)
-    {
-		if(!m_curPen) return E_INVALIDARG;
-
-		RECT rcBuf = *pRect;
-		if (m_curPen->GetWidth() == 1)
-		{
-			rcBuf.right--;
-			rcBuf.bottom--;
-		}
-		else
-		{
-			::InflateRect(&rcBuf, -m_curPen->GetWidth() / 2, -m_curPen->GetWidth() / 2);
-		}
-        ALPHAINFO ai;
-        CGdiAlpha::AlphaBackup(m_hdc, pRect,ai);
-        HGDIOBJ oldBr=::SelectObject(m_hdc,GetStockObject(NULL_BRUSH));
-        ::Rectangle(m_hdc, rcBuf.left, rcBuf.top, rcBuf.right, rcBuf.bottom);
-        CGdiAlpha::AlphaRestore(ai);
-        ::SelectObject(m_hdc,oldBr);
-        return S_OK;
-    }
-
-    HRESULT SRenderTarget_GDI::FillRectangle(LPCRECT pRect)
-    {
-        BYTE byAlpha=0xFF;
-        if(m_curBrush->GetBrushType() == Brush_Color) byAlpha = GetAValue(m_curBrush->GetColor());
-
-        DCBuffer dcBuf(m_hdc,pRect,byAlpha,FALSE);
-        
-        HGDIOBJ oldPen=::SelectObject(dcBuf,GetStockObject(NULL_PEN));
-        ::Rectangle(dcBuf,pRect->left,pRect->top,pRect->right,pRect->bottom);
-        ::SelectObject(dcBuf,oldPen);
-        return S_OK;
-    }
-
-    HRESULT SRenderTarget_GDI::DrawRoundRect( LPCRECT pRect,POINT pt )
-    {
-        DCBuffer dcBuf(m_hdc,pRect,GetAValue(m_curPen->GetColor()));
-        HGDIOBJ oldBr=::SelectObject(dcBuf,GetStockObject(NULL_BRUSH));
-        ::RoundRect(dcBuf,pRect->left,pRect->top,pRect->right,pRect->bottom,pt.x*2,pt.y*2);
-        ::SelectObject(dcBuf,oldBr);
-        return S_OK;
-    }
-
-    HRESULT SRenderTarget_GDI::FillRoundRect( LPCRECT pRect,POINT pt )
-    {
-        BYTE byAlpha=0xFF;
-        if(m_curBrush->GetBrushType() == Brush_Color) byAlpha = GetAValue(m_curBrush->GetColor());
-        DCBuffer dcBuf(m_hdc,pRect,byAlpha);
-
-        HGDIOBJ oldPen=::SelectObject(dcBuf,GetStockObject(NULL_PEN));
-        ::RoundRect(dcBuf,pRect->left,pRect->top,pRect->right,pRect->bottom,pt.x*2,pt.y*2);
-        ::SelectObject(dcBuf,oldPen);
-        return S_OK;
-    }
-
-    HRESULT SRenderTarget_GDI::FillSolidRoundRect(LPCRECT pRect,POINT pt,COLORREF cr)
-    {
-        DCBuffer dcBuf(m_hdc,pRect,GetAValue(cr),FALSE);
-        HBRUSH br=::CreateSolidBrush(cr&0x00ffffff);
-		HGDIOBJ oldObj=::SelectObject(dcBuf,br);
-		HGDIOBJ oldPen = ::SelectObject(dcBuf, GetStockObject(NULL_PEN));
-		::RoundRect(dcBuf,pRect->left,pRect->top,pRect->right,pRect->bottom,pt.x*2,pt.y*2);
-		::SelectObject(dcBuf, oldPen);
-		::SelectObject(dcBuf,oldObj);
-        ::DeleteObject(br);
-        return S_OK;    
-    }
-
-    HRESULT SRenderTarget_GDI::DrawLines(LPPOINT pPt,size_t nCount)
-    {
-        RECT rc={100000,100000,0,0};
-        for(size_t i=0;i<nCount;i++)
-        {
-            if(pPt[i].x<rc.left) rc.left=pPt[i].x;
-            if(pPt[i].x>rc.right) rc.right=pPt[i].x;
-            if(pPt[i].y<rc.top) rc.top=pPt[i].y;
-            if(pPt[i].y>rc.bottom) rc.bottom=pPt[i].y;
-        }
-        rc.left -= 1;
-        rc.top -=1;
-        int nPenWidth = 1;
-        if(m_curPen) nPenWidth = m_curPen->GetWidth();
-        rc.bottom+=nPenWidth;
-        rc.right+=nPenWidth;
-
-        DCBuffer dcBuf(m_hdc,&rc,GetAValue(m_curPen->GetColor()));
-        ::Polyline(dcBuf,pPt,(int)nCount);
-        return S_OK;
-    }
-
-    HRESULT SRenderTarget_GDI::DrawPolygon(LPPOINT pPt,size_t nCount)
-    {
-        if(!pPt || nCount < 3) return E_INVALIDARG;
-
-        RECT rc={100000,100000,0,0};
-        for(size_t i=0;i<nCount;i++)
-        {
-            if(pPt[i].x<rc.left) rc.left=pPt[i].x;
-            if(pPt[i].x>rc.right) rc.right=pPt[i].x;
-            if(pPt[i].y<rc.top) rc.top=pPt[i].y;
-            if(pPt[i].y>rc.bottom) rc.bottom=pPt[i].y;
-        }
-        rc.left -= 1;
-        rc.top -=1;
-        int nPenWidth = 1;
-        if(m_curPen) nPenWidth = m_curPen->GetWidth();
-        rc.bottom+=nPenWidth;
-        rc.right+=nPenWidth;
-
-        DCBuffer dcBuf(m_hdc,&rc,GetAValue(m_curPen->GetColor()));
-
-        // Select null brush to draw outline only
-        HBRUSH hOldBrush = (HBRUSH)::SelectObject(dcBuf, ::GetStockObject(NULL_BRUSH));
-        ::Polygon(dcBuf,pPt,(int)nCount);
-        ::SelectObject(dcBuf, hOldBrush);
-
-        return S_OK;
-    }
-
-    HRESULT SRenderTarget_GDI::FillPolygon(LPPOINT pPt,size_t nCount)
-    {
-        if(!pPt || nCount < 3) return E_INVALIDARG;
-
-        RECT rc={100000,100000,0,0};
-        for(size_t i=0;i<nCount;i++)
-        {
-            if(pPt[i].x<rc.left) rc.left=pPt[i].x;
-            if(pPt[i].x>rc.right) rc.right=pPt[i].x;
-            if(pPt[i].y<rc.top) rc.top=pPt[i].y;
-            if(pPt[i].y>rc.bottom) rc.bottom=pPt[i].y;
-        }
-        rc.left -= 1;
-        rc.top -=1;
-        rc.bottom+=1;
-        rc.right+=1;
-
-        DCBuffer dcBuf(m_hdc,&rc,GetAValue(m_curBrush->GetColor()));
-
-        // Select null pen to fill without outline
-        HPEN hOldPen = (HPEN)::SelectObject(dcBuf, ::GetStockObject(NULL_PEN));
-        ::Polygon(dcBuf,pPt,(int)nCount);
-        ::SelectObject(dcBuf, hOldPen);
-
-        return S_OK;
-    }
-
-    HRESULT SRenderTarget_GDI::TextOut( int x, int y, LPCTSTR lpszString, int nCount)
-    {
-        if(nCount<0) nCount = (int)_tcslen(lpszString);
-		SIZE sz;
-		MeasureText(lpszString,nCount,&sz);
-		int escape = m_curFont->LogFont()->lfEscapement;
-		if(escape != 0){
-			//calc bound rect
-			RECT rc;
-			if(escape == 900){
-				RECT rc2 = {x, y-sz.cx, x+sz.cy, y};
-				rc = rc2;
-			}else if(escape == 1800){
-				RECT rc2 = {x-sz.cx, y-sz.cy, x, y};
-				rc = rc2;
-			}else if(escape == 2700){
-				RECT rc2 = {x-sz.cy, y, x, y+sz.cx};
-				rc = rc2;
-			}else{
-				RECT rc2 = {0,0, (long)m_curBmp->Width(),(long)m_curBmp->Height()};
-				rc = rc2;
-			}
-			DCBuffer dcBuf(m_hdc,&rc,m_curColor.a);
-			::TextOut(dcBuf,x,y,lpszString,nCount);
-		}else{
-			RECT rc={x,y,x+sz.cx,y+sz.cy};
-			DCBuffer dcBuf(m_hdc,&rc,m_curColor.a);
-			::TextOut(dcBuf,x,y,lpszString,nCount);
-		}
-		return S_OK;
-    }
-
-    HRESULT SRenderTarget_GDI::DrawIconEx( int xLeft, int yTop, HICON hIcon, int cxWidth,int cyWidth,UINT diFlags )
-    {
-        ICONINFO ii={0};
-        ::GetIconInfo(hIcon,&ii);
-        SASSERT(ii.hbmColor);
-        BITMAP bm;
-        ::GetObject(ii.hbmColor,sizeof(bm),&bm);
-        
-        ALPHAINFO ai;
-        RECT rc={xLeft,yTop,xLeft+cxWidth,yTop+cyWidth};
-        if(bm.bmBitsPixel!=32)
-        {
-            CGdiAlpha::AlphaBackup(m_hdc,&rc,ai);
-        }
-        BOOL bRet=::DrawIconEx(m_hdc,xLeft,yTop,hIcon,cxWidth,cyWidth,0,NULL,diFlags);
-        
-        if(bm.bmBitsPixel!=32)
-        {
-            CGdiAlpha::AlphaRestore(ai);
-        }
-        
-        if(ii.hbmColor) DeleteObject(ii.hbmColor);
-        if(ii.hbmMask) DeleteObject(ii.hbmMask);
-        
-        return bRet?S_OK:S_FALSE;
-    }
-
-    HRESULT SRenderTarget_GDI::DrawBitmap(LPCRECT pRcDest,const IBitmapS *pBitmap,int xSrc,int ySrc,BYTE byAlpha/*=0xFF*/ )
-    {
-        SBitmap_GDI *pBmp = (SBitmap_GDI*)pBitmap;
-        HBITMAP bmp=pBmp->GetBitmap();
-        HDC hmemdc=CreateCompatibleDC(m_hdc);
-        ::SelectObject(hmemdc,bmp);
-        SIZE szBmp = pBmp->Size();
-        
-        BLENDFUNCTION bf={ AC_SRC_OVER,0,byAlpha,AC_SRC_ALPHA};
-        int nWid= (std::min)(pRcDest->right-pRcDest->left,szBmp.cx);
-        int nHei= (std::min)(pRcDest->bottom-pRcDest->top,szBmp.cy);
-        
-        BOOL bOK=::AlphaBlend(m_hdc,pRcDest->left,pRcDest->top,nWid,nHei,
-                   hmemdc,xSrc,ySrc,nWid,nHei,bf);
-        DeleteDC(hmemdc);
-        
-        return bOK?S_OK:E_FAIL;
-    }
-
-    HRESULT SRenderTarget_GDI::AlphaBlend( LPCRECT pRcDest,IRenderTarget *pRTSrc,LPCRECT pRcSrc,BYTE byAlpha )
-    {
-        BLENDFUNCTION bf={ AC_SRC_OVER,0,byAlpha,AC_SRC_ALPHA};
-        SRenderTarget_GDI *pRTGdiSrc=(SRenderTarget_GDI*)pRTSrc;
-        BOOL bOK=::AlphaBlend(m_hdc,pRcDest->left,pRcDest->top,pRcDest->right-pRcDest->left,pRcDest->bottom-pRcDest->top,
-                              pRTGdiSrc->m_hdc,pRcSrc->left,pRcSrc->top,pRcSrc->right-pRcSrc->left,pRcSrc->bottom-pRcSrc->top,
-                              bf);
-        return bOK?S_OK:E_FAIL;
-    }
-
-    HRESULT SRenderTarget_GDI::DrawBitmapEx( LPCRECT pRcDest,const IBitmapS *pBitmap,LPCRECT pRcSrc,UINT expendMode, BYTE byAlpha/*=0xFF*/ )
-    {
-        UINT expandModeLow = LOWORD(expendMode);
-        
-        if(expandModeLow == EM_NULL)
-            return DrawBitmap(pRcDest,pBitmap,pRcSrc->left,pRcSrc->top,byAlpha);
-
-        SBitmap_GDI *pBmp = (SBitmap_GDI*)pBitmap;
-        HBITMAP bmp=pBmp->GetBitmap();
-        HDC hmemdc=CreateCompatibleDC(m_hdc);
-        ::SelectObject(hmemdc,bmp);
-
-        BLENDFUNCTION bf={ AC_SRC_OVER,0,byAlpha,AC_SRC_ALPHA};
-        if(expandModeLow == EM_STRETCH)
-        {
-            ::AlphaBlend(m_hdc,pRcDest->left,pRcDest->top,pRcDest->right-pRcDest->left,pRcDest->bottom-pRcDest->top,
-                hmemdc,pRcSrc->left,pRcSrc->top,pRcSrc->right-pRcSrc->left,pRcSrc->bottom-pRcSrc->top,bf);
-        }else
-        {
-            ::SaveDC(m_hdc);
-            ::IntersectClipRect(m_hdc,pRcDest->left,pRcDest->top,pRcDest->right,pRcDest->bottom);
-            int nWid=pRcSrc->right-pRcSrc->left;
-            int nHei=pRcSrc->bottom-pRcSrc->top;
-            for(int y=pRcDest->top ;y<pRcDest->bottom;y+=nHei)
-            {
-                for(int x=pRcDest->left; x<pRcDest->right; x+=nWid)
-                {
-                    ::AlphaBlend(m_hdc,x,y,nWid,nHei,
-                        hmemdc,pRcSrc->left,pRcSrc->top,nWid,nHei,
-                        bf);                    
-                }
-            }
-            ::RestoreDC(m_hdc,-1);
-        }
-        DeleteDC(hmemdc);
-        return S_OK;
-
-    }
-
-
-    HRESULT SRenderTarget_GDI::DrawBitmap9Patch( LPCRECT pRcDest,const IBitmapS *pBitmap,LPCRECT pRcSrc,LPCRECT pRcSourMargin,UINT expendMode,BYTE byAlpha/*=0xFF*/ )
-    {
-        int xDest[4] = {pRcDest->left,pRcDest->left+pRcSourMargin->left,pRcDest->right-pRcSourMargin->right,pRcDest->right};
-        int xSrc[4] = {pRcSrc->left,pRcSrc->left+pRcSourMargin->left,pRcSrc->right-pRcSourMargin->right,pRcSrc->right};
-        int yDest[4] = {pRcDest->top,pRcDest->top+pRcSourMargin->top,pRcDest->bottom-pRcSourMargin->bottom,pRcDest->bottom};
-        int ySrc[4] = {pRcSrc->top,pRcSrc->top+pRcSourMargin->top,pRcSrc->bottom-pRcSourMargin->bottom,pRcSrc->bottom};
-
-        //首先保证九宫分割正常
-        if(!(xSrc[0] <= xSrc[1] && xSrc[1] <= xSrc[2] && xSrc[2] <= xSrc[3])) return S_FALSE;
-        if(!(ySrc[0] <= ySrc[1] && ySrc[1] <= ySrc[2] && ySrc[2] <= ySrc[3])) return S_FALSE;
-
-        //调整目标位置
-        int nDestWid=pRcDest->right-pRcDest->left;
-        int nDestHei=pRcDest->bottom-pRcDest->top;
-
-        if((pRcSourMargin->left + pRcSourMargin->right) > nDestWid)
-        {//边缘宽度大于目标宽度的处理
-            if(pRcSourMargin->left >= nDestWid)
-            {//只绘制左边部分
-                xSrc[1] = xSrc[2] = xSrc[3] = xSrc[0]+nDestWid;
-                xDest[1] = xDest[2] = xDest[3] = xDest[0]+nDestWid;
-            }else if(pRcSourMargin->right >= nDestWid)
-            {//只绘制右边部分
-                xSrc[0] = xSrc[1] = xSrc[2] = xSrc[3]-nDestWid;
-                xDest[0] = xDest[1] = xDest[2] = xDest[3]-nDestWid;
-            }else
-            {//先绘制左边部分，剩余的用右边填充
-                int nRemain=xDest[3]-xDest[1];
-                xSrc[2] = xSrc[3]-nRemain;
-                xDest[2] = xDest[3]-nRemain;
-            }
-        }
-
-        if(pRcSourMargin->top + pRcSourMargin->bottom > nDestHei)
-        {
-            if(pRcSourMargin->top >= nDestHei)
-            {//只绘制上边部分
-                ySrc[1] = ySrc[2] = ySrc[3] = ySrc[0]+nDestHei;
-                yDest[1] = yDest[2] = yDest[3] = yDest[0]+nDestHei;
-            }else if(pRcSourMargin->bottom >= nDestHei)
-            {//只绘制下边部分
-                ySrc[0] = ySrc[1] = ySrc[2] = ySrc[3]-nDestHei;
-                yDest[0] = yDest[1] = yDest[2] = yDest[3]-nDestHei;
-            }else
-            {//先绘制左边部分，剩余的用右边填充
-                int nRemain=yDest[3]-yDest[1];
-                ySrc[2] = ySrc[3]-nRemain;
-                yDest[2] = yDest[3]-nRemain;
-            }
-        }
-
-        //定义绘制模式
-        UINT mode[3][3]={
-            {EM_NULL,expendMode,EM_NULL},
-            {expendMode,expendMode,expendMode},
-            {EM_NULL,expendMode,EM_NULL}
-        };
-
-        for(int y=0;y<3;y++)
-        {
-            if(ySrc[y] == ySrc[y+1]) continue;
-            for(int x=0;x<3;x++)
-            {
-                if(xSrc[x] == xSrc[x+1]) continue;
-                RECT rcSrc = {xSrc[x],ySrc[y],xSrc[x+1],ySrc[y+1]};
-                RECT rcDest ={xDest[x],yDest[y],xDest[x+1],yDest[y+1]};
-                DrawBitmapEx(&rcDest,pBitmap,&rcSrc,mode[y][x],byAlpha);
-            }
-        }
-
-        return S_OK;
-    }
-
-    IRenderObj * SRenderTarget_GDI::GetCurrentObject( OBJTYPE uType )
-    {
-        IRenderObj *pRet=NULL;
-        switch(uType)
-        {
-        case OT_BITMAP: 
-            pRet=m_curBmp;
-            break;
-        case OT_PEN:
-            pRet=m_curPen;
-            break;
-        case OT_BRUSH:
-            pRet=m_curBrush;
-            break;
-        case OT_FONT:
-            pRet=m_curFont;
-            break;
-        }
-        return pRet;
-    }
-
-    HRESULT SRenderTarget_GDI::SelectDefaultObject(OBJTYPE objType, IRenderObj ** ppOldObj)
-    {
-        IRenderObj *pDefObj = NULL;
-        switch(objType)
-        {
-        case OT_BITMAP: pDefObj = m_defBmp;break;
-        case OT_PEN: pDefObj = m_defPen;break;
-        case OT_BRUSH: pDefObj = m_defBrush;break;
-        case OT_FONT: pDefObj = m_defFont;break;
-        default:return E_INVALIDARG;
-        }
-        if(pDefObj == GetCurrentObject(objType)) 
-            return S_FALSE;
-        return SelectObject(pDefObj,ppOldObj);
-    }
-
-    HRESULT SRenderTarget_GDI::SelectObject( IRenderObj *pObj,IRenderObj ** ppOldObj /*= NULL*/ )
-    {
-        SAutoRefPtr<IRenderObj> pRet;
-        switch(pObj->ObjectType())
-        {
-        case OT_BITMAP: 
-            pRet=m_curBmp;
-            m_curBmp=(SBitmap_GDI*)pObj;
-            ::SelectObject(m_hdc,m_curBmp->GetBitmap());
-            break;
-        case OT_PEN:
-            pRet=m_curPen;
-            m_curPen=(SPen_GDI*)pObj;
-            ::SelectObject(m_hdc,m_curPen->GetPen());
-            break;
-        case OT_BRUSH:
-            pRet=m_curBrush;
-            m_curBrush=(SBrush_GDI*)pObj;
-            ::SelectObject(m_hdc,m_curBrush->GetBrush());
-            break;
-        case OT_FONT:
-            pRet=m_curFont;
-            m_curFont=(SFont_GDI*)pObj;
-            ::SelectObject(m_hdc,m_curFont->GetFont());
-            break;
-        }
-        if(pRet && ppOldObj)
-        {//由调用者调用Release释放该RenderObj
-            pRet->AddRef();
-            *ppOldObj = pRet;
-        }
-        return S_OK;
-    }
-
-    HRESULT SRenderTarget_GDI::OffsetViewportOrg( int xOff, int yOff, LPPOINT lpPoint )
-    {
-        if(lpPoint)
-        {
-            *lpPoint=m_ptOrg;
-        }
-        m_ptOrg.x+=xOff;
-        m_ptOrg.y+=yOff;
-        ::SetViewportOrgEx(m_hdc,m_ptOrg.x,m_ptOrg.y,NULL);
-        return S_OK;
-    }
-
-    HRESULT SRenderTarget_GDI::GetViewportOrg( LPPOINT lpPoint )
-    {
-        if(lpPoint)
-        {
-            *lpPoint=m_ptOrg;
-        }
-        return S_OK;
-    }
-
-    HRESULT SRenderTarget_GDI::SetViewportOrg( POINT pt )
-    {
-        m_ptOrg = pt;
-        ::SetViewportOrgEx(m_hdc,m_ptOrg.x,m_ptOrg.y,NULL);
-        return S_OK;
-    }
-
-    HDC SRenderTarget_GDI::GetDC( UINT uFlag )
-    {
-        m_uGetDCFlag = uFlag;
-        return m_hdc;
-    }
-
-    void SRenderTarget_GDI::ReleaseDC( HDC hdc ,LPCRECT pRc)
-    {
-        if(hdc == m_hdc)
-        {
-            m_uGetDCFlag =0;
-        }
-    }
-
-
-    HRESULT SRenderTarget_GDI::DrawGradientRect(THIS_ LPCRECT pRect,  BOOL bVert, POINT ptRoundCorner, const GradientItem *pGradients, int nCount, BYTE byAlpha)
-    {
-		DCBuffer dcBuf(m_hdc,pRect,byAlpha,FALSE);
-		if (ptRoundCorner.x == 0 && ptRoundCorner.y == 0)
-		{
-			GradientFillRect(dcBuf,pRect,pGradients,nCount,bVert,0xFF);
-		}
-		else{
-			int wid = pRect->right-pRect->left;
-			int hei = pRect->bottom-pRect->top;
-			HBITMAP hBmp = SBitmap_GDI::CreateGDIBitmap(wid,hei,NULL);
-			HDC hMemDC = ::CreateCompatibleDC(m_hdc);
-			::SetBkMode(hMemDC,TRANSPARENT);
-			HGDIOBJ hOldBmp = ::SelectObject(hMemDC,hBmp);	
-			::SetViewportOrgEx(hMemDC,-pRect->left,-pRect->top,NULL);
-			GradientFillRect(hMemDC,pRect,pGradients,nCount,bVert,0xFF);
-			::SelectObject(hMemDC,hOldBmp);
-			DeleteDC(hMemDC);
-
-			HBRUSH hbr = ::CreatePatternBrush(hBmp);
-
-			HGDIOBJ oldBr = ::SelectObject(dcBuf,hbr);
-			::SelectObject(dcBuf,GetStockObject(NULL_PEN));
-			::RoundRect(dcBuf,pRect->left,pRect->top,pRect->right,pRect->bottom,ptRoundCorner.x*2,ptRoundCorner.y*2);
-			::SelectObject(dcBuf,oldBr);
-			::DeleteObject(hbr);
-			::DeleteObject(hBmp);
-		}
-        return S_OK;
-    }
-
-    //通过一个内存位图来填充位置的alpha值
-    HRESULT SRenderTarget_GDI::FillSolidRect( LPCRECT pRect,COLORREF cr )
-    {
-        DCBuffer dcBuf(m_hdc,pRect,GetAValue(cr),FALSE);
-        HBRUSH br=::CreateSolidBrush(cr&0x00ffffff);
-        ::FillRect(dcBuf,pRect,br);
-        ::DeleteObject(br);
-        return S_OK;    
-    }
-
-    HRESULT SRenderTarget_GDI::ClearRect( LPCRECT pRect,COLORREF cr )
-    {
-        int nWid=pRect->right-pRect->left;
-        int nHei=pRect->bottom-pRect->top;
-		if(nWid == 0 || nHei == 0)
-			return S_OK;
-
-        LPDWORD pBits;
-        HBITMAP hBmp=SBitmap_GDI::CreateGDIBitmap(nWid,nHei,(void**)&pBits);
-        HDC hMemDC=CreateCompatibleDC(m_hdc);
-        ::SelectObject(hMemDC,hBmp);
-
-        SColor color(cr);
-        DWORD dwColor=color.toARGB();
-
-		for(int i=0;i<nHei;i++)for(int j=0;j<nWid;j++) 
-			*pBits++ = dwColor;
-
-        ::BitBlt(m_hdc,pRect->left,pRect->top,nWid,nHei,hMemDC,0,0,SRCCOPY);
-        ::DeleteDC(hMemDC);
-        ::DeleteObject(hBmp);
-        return S_OK;    
-    }
-
-    HRESULT SRenderTarget_GDI::InvertRect(LPCRECT pRect)
-    {
-        return ::InvertRect(m_hdc,pRect)?S_OK:E_UNEXPECTED;
-    }
-
-    HRESULT SRenderTarget_GDI::DrawEllipse( LPCRECT pRect )
-    {
-		if(!m_curPen) return E_INVALIDARG;
-		RECT rcBuf = *pRect;
-		::InflateRect(&rcBuf,m_curPen->GetWidth()/2,m_curPen->GetWidth()/2);
-		DCBuffer dcBuf(m_hdc,&rcBuf,GetAValue(m_curPen->GetColor()));
-        ::SelectObject(dcBuf, (HBRUSH)GetStockObject(NULL_BRUSH));
-        ::Ellipse(dcBuf,pRect->left,pRect->top,pRect->right,pRect->bottom);
-        return S_OK;
-    }
-
-    HRESULT SRenderTarget_GDI::FillEllipse( LPCRECT pRect )
-    {
-        BYTE byAlpha=0xFF;
-        if(m_curBrush->GetBrushType() == Brush_Color) byAlpha = GetAValue(m_curBrush->GetColor());
-        DCBuffer dcBuf(m_hdc,pRect,byAlpha);
-		HGDIOBJ oldPen =::SelectObject(dcBuf,GetStockObject(NULL_PEN));
-        ::Ellipse(dcBuf,pRect->left,pRect->top,pRect->right,pRect->bottom);
-		::SelectObject(dcBuf,oldPen);
-        return S_OK;
-    }
-
-    HRESULT SRenderTarget_GDI::FillSolidEllipse(LPCRECT pRect,COLORREF cr)
-    {
-		DCBuffer dcBuf(m_hdc,pRect,GetAValue(cr),FALSE);
-		HBRUSH br=::CreateSolidBrush(cr&0x00ffffff);
-		HGDIOBJ oldObj=::SelectObject(dcBuf,br);
-		HGDIOBJ oldPen = ::SelectObject(dcBuf, GetStockObject(NULL_PEN));
-		::Ellipse(dcBuf,pRect->left,pRect->top,pRect->right,pRect->bottom);
-		::SelectObject(dcBuf, oldPen);
-		::SelectObject(dcBuf,oldObj);
-		::DeleteObject(br);
-		return S_OK;    
-    }
-
-    const float PI = 3.1415926f;
-
-    HRESULT SRenderTarget_GDI::DrawArc( LPCRECT pRect,float startAngle,float sweepAngle,BOOL useCenter )
-    {
-		if(!m_curPen) return E_INVALIDARG;
-        if(sweepAngle==0)
-            return S_OK;
-		RECT rcBuf = *pRect;
-		::InflateRect(&rcBuf,m_curPen->GetWidth()/2,m_curPen->GetWidth()/2);
-        DCBuffer dcBuf(m_hdc,&rcBuf,GetAValue(m_curPen->GetColor()));
-
-        HGDIOBJ oldBr=::SelectObject(dcBuf,GetStockObject(NULL_BRUSH));
-        POINT ptCenter = {(pRect->left+pRect->right)/2,(pRect->top+pRect->bottom)/2};
-        int   a=ptCenter.x-pRect->left,b=ptCenter.y-pRect->top;
-        POINT pt1,pt2;
-        float startAngle2 =startAngle*PI/180.0f;
-        float endAngle2 = (startAngle+sweepAngle)*PI/180.0f;
-        pt1.x=ptCenter.x+(int)(a*cos(startAngle2));
-        pt1.y=ptCenter.y+(int)(b*sin(startAngle2));
-        pt2.x=ptCenter.x+(int)(a*cos(endAngle2));
-        pt2.y=ptCenter.y+(int)(b*sin(endAngle2));
-		if (useCenter)
-			::Pie(dcBuf, pRect->left, pRect->top, pRect->right, pRect->bottom, pt2.x, pt2.y, pt1.x, pt1.y);
-        else
-			::Arc(dcBuf,pRect->left,pRect->top,pRect->right,pRect->bottom,pt2.x,pt2.y,pt1.x,pt1.y);
-        ::SelectObject(dcBuf,oldBr);
-        return S_OK;
-    }
-
-    HRESULT SRenderTarget_GDI::DrawArc2(LPCRECT pRect, float startAngle, float sweepAngle, int width) {
-        if(!m_curPen) return E_INVALIDARG;
-        RECT rcBuf = *pRect;
-		::InflateRect(&rcBuf,width/2,width/2);
-        HPEN hPen = ::CreatePen(m_curPen->GetStyle(),width,m_curPen->GetColor());
-
-        DCBuffer dcBuf(m_hdc,&rcBuf,GetAValue(m_curPen->GetColor()));
-        HGDIOBJ oldPen = ::SelectObject(dcBuf,hPen);
-        HGDIOBJ oldBr=::SelectObject(dcBuf,GetStockObject(NULL_BRUSH));
-        POINT ptCenter = {(pRect->left+pRect->right)/2,(pRect->top+pRect->bottom)/2};
-        int   a=ptCenter.x-pRect->left,b=ptCenter.y-pRect->top;
-        POINT pt1,pt2;
-        float startAngle2 =startAngle*PI/180.0f;
-        float endAngle2 = (startAngle+sweepAngle)*PI/180.0f;
-        pt1.x=ptCenter.x+(int)(a*cos(startAngle2));
-        pt1.y=ptCenter.y+(int)(b*sin(startAngle2));
-        pt2.x=ptCenter.x+(int)(a*cos(endAngle2));
-        pt2.y=ptCenter.y+(int)(b*sin(endAngle2));
-		::Arc(dcBuf,pRect->left,pRect->top,pRect->right,pRect->bottom,pt2.x,pt2.y,pt1.x,pt1.y);
-        ::SelectObject(dcBuf,oldBr);
-        ::SelectObject(dcBuf,oldPen);
-        return S_OK;
-    }
-
-    HRESULT SRenderTarget_GDI::FillArc( LPCRECT pRect,float startAngle,float sweepAngle )
-    {
-        BYTE byAlpha=0xFF;
-        if(m_curBrush->GetBrushType() == Brush_Color) byAlpha = GetAValue(m_curBrush->GetColor());
-        DCBuffer dcBuf(m_hdc,pRect,byAlpha);
-
-        HGDIOBJ oldPen=::SelectObject(dcBuf,GetStockObject(NULL_PEN));
-        POINT ptCenter = {(pRect->left+pRect->right)/2,(pRect->top+pRect->bottom)/2};
-        int   a=ptCenter.x-pRect->left,b=ptCenter.y-pRect->top;
-        POINT pt1,pt2;
-        float startAngle2 =startAngle*PI/180.0f;
-        float endAngle2 = (startAngle+sweepAngle)*PI/180.0f;
-        pt1.x=ptCenter.x+(int)(a*cos(startAngle2));
-        pt1.y=ptCenter.y+(int)(b*sin(startAngle2));
-        pt2.x=ptCenter.x+(int)(a*cos(endAngle2));
-        pt2.y=ptCenter.y+(int)(b*sin(endAngle2));
-        ::Pie(dcBuf,pRect->left,pRect->top,pRect->right,pRect->bottom,pt2.x,pt2.y,pt1.x,pt1.y);
-        ::SelectObject(dcBuf,oldPen);
-        return S_OK;
-    }
-
-    HRESULT SRenderTarget_GDI::SetTransform(const float matrix[9], float oldMatrix[9])
-    {
-		XFORM xForm = { matrix[kMScaleX],matrix[kMSkewY],
-			matrix[kMSkewX],matrix[kMScaleY],
-			matrix[kMTransX],matrix[kMTransY] };
-        if(oldMatrix)
-        {
-			GetTransform(oldMatrix);
-        }
-        return ::SetWorldTransform(m_hdc,&xForm)?S_OK:E_FAIL;
-    }
-
-    HRESULT SRenderTarget_GDI::GetTransform( float matrix[9]) const
-    {
-		SASSERT(matrix);
-		XFORM xForm;
-		if(!::GetWorldTransform(m_hdc,&xForm))
-			return E_FAIL;
-
-		matrix[kMScaleX]=xForm.eM11; 
-		matrix[kMSkewX]=xForm.eM21;
-		matrix[kMTransX]=xForm.eDx;
-		matrix[kMSkewY]=xForm.eM12;		
-		matrix[kMScaleY]=xForm.eM22;
-		matrix[kMTransY] = xForm.eDy;
-
-		matrix[kMPersp0] = 0.0f;
-		matrix[kMPersp1] = 0.0f;
-		matrix[kMPersp2] = 1.0f;
-		return S_OK;
-	}
-
-	COLORREF SRenderTarget_GDI::GetPixel( int x, int y )
-	{
-		if(!m_curBmp) return CR_INVALID;
-		const COLORREF *pBits = (const COLORREF*)m_curBmp->GetPixelBits();
-		POINT pt;
-		GetViewportOrg(&pt);
-		x += pt.x;
-		y += pt.y;
-		if(x<0 || x >= (int)m_curBmp->Width() || y<0 || y>= (int)m_curBmp->Height())
-			return CR_INVALID;
-
-		return pBits[y*m_curBmp->Width()+x];
-	}
-
-	COLORREF SRenderTarget_GDI::SetPixel( int x, int y, COLORREF cr )
-	{
-		if(!m_curBmp) return CR_INVALID;
-		COLORREF *pBits = (COLORREF*)m_curBmp->LockPixelBits();
-		POINT pt;
-		GetViewportOrg(&pt);
-		x += pt.x;
-		y += pt.y;
-		
-		if(x >= (int)m_curBmp->Width() || y>= (int)m_curBmp->Height())
-			return CR_INVALID;
-
-		COLORREF crRet = pBits[y*m_curBmp->Width()+x];
-	
-		pBits[y*m_curBmp->Width()+x] = cr;
-		
-		m_curBmp->UnlockPixelBits(pBits);
-
-		return crRet;
-	}
-
-	HRESULT SRenderTarget_GDI::DrawGradientRectEx(THIS_ LPCRECT pRect, POINT ptRoundCorner, const GradientItem *pGradients, int nCount, const GradientInfo *info, BYTE byAlpha){
-			if(info->type == linear){
-				if(info->angle == 0.f)
-					return DrawGradientRect(pRect,FALSE,ptRoundCorner,pGradients,nCount,byAlpha);
-				else if(info->angle == 90.f)
-					return DrawGradientRect(pRect,TRUE,ptRoundCorner,pGradients,nCount,byAlpha);
-			}
-			return E_NOTIMPL;
-	}
-
-
-	HRESULT SRenderTarget_GDI::DrawGradientPath(THIS_ const IPathS* path, const GradientItem *pGradients, int nCount,const GradientInfo *info, BYTE byAlpha)
-	{
-		if (!path || !pGradients || nCount < 2) return E_INVALIDARG;
-
-		const SPath_GDI* pGdiPath = static_cast<const SPath_GDI*>(path);
-		HRGN hRgn = pGdiPath->CreateRegionFromCommands();
-		if (!hRgn) return E_FAIL;
-
-		// Get path bounds for gradient calculation
-		RECT rcBounds;
-		GetRgnBox(hRgn, &rcBounds);
-
-		// Use existing gradient rectangle implementation with path clipping
-		HRGN hOldClip = CreateRectRgn(0, 0, 0, 0);
-		int clipResult = GetClipRgn(m_hdc, hOldClip);
-
-		// Set path as clipping region
-		SelectClipRgn(m_hdc, hRgn);
-
-		// Draw gradient rectangle over the path bounds
-		POINT ptCorner={0,0};
-		HRESULT hr = DrawGradientRectEx(&rcBounds,ptCorner, pGradients, nCount, info, byAlpha);
-
-		// Restore original clipping
-		if (clipResult == 1)
-		{
-			SelectClipRgn(m_hdc, hOldClip);
-		}
-		else
-		{
-			SelectClipRgn(m_hdc, NULL);
-		}
-
-		DeleteObject(hOldClip);
-		DeleteObject(hRgn);
-
-		return hr;
-	}
-
-	HRESULT SRenderTarget_GDI::CreateRegion(IRegionS ** ppRegion)
-	{
-		return m_pRenderFactory->CreateRegion(ppRegion)?S_OK:E_OUTOFMEMORY;
-	}
-
-	HRESULT SRenderTarget_GDI::PushClipPath(const IPathS * path, UINT mode, BOOL doAntiAlias /*= false*/)
-	{
-		if (!path) return E_INVALIDARG;
-
-		const SPath_GDI* pGdiPath = static_cast<const SPath_GDI*>(path);
-		HRGN hRgn = pGdiPath->CreateRegionFromCommands();
-		if (!hRgn) return E_FAIL;
-
-		// Convert path to region and use existing region clipping
-		SAutoRefPtr<IRegionS> pRegion;
-		if (SUCCEEDED(CreateRegion(&pRegion)))
-		{
-			SRegion_GDI* pGdiRegion = static_cast<SRegion_GDI*>(pRegion.Get());
-			pGdiRegion->_CombineRgn(hRgn, RGN_COPY);
-			HRESULT hr = PushClipRegion(pRegion, mode);
-			DeleteObject(hRgn);
-			return hr;
-		}
-
-		DeleteObject(hRgn);
-		return S_OK;
-	}
-
-	HRESULT SRenderTarget_GDI::DrawPath(const IPathS * path,IPathEffect * pathEffect)
-	{
-		if (!path) return E_INVALIDARG;
-
-		const SPath_GDI* pGdiPath = static_cast<const SPath_GDI*>(path);
-        RECT rcBox;
-        pGdiPath->getBounds(&rcBox);
-        DCBuffer dcBuf(m_hdc,&rcBox,0xff);
-		// Execute path commands on current HDC and stroke
-		pGdiPath->ExecuteCommands(dcBuf);
-		::StrokePath(dcBuf);
-
-		return S_OK;
-	}
-
-    HRESULT SRenderTarget_GDI::MoveToEx(POINT pt,LPPOINT lpPointRet){
-        if(lpPointRet){
-            ::GetCurrentPositionEx(m_hdc,lpPointRet);
-        }
-        ::MoveToEx(m_hdc,pt.x,pt.y,NULL);
-        return S_OK;
-    }
-    HRESULT SRenderTarget_GDI::LineTo(POINT pt){
-        POINT ptStart;
-        ::GetCurrentPositionEx(m_hdc,&ptStart);
-        RECT rc={ptStart.x,ptStart.y,pt.x+1,pt.y+1};
-        DCBuffer dcBuf(m_hdc,&rc,0xff);
-        ::LineTo(dcBuf,pt.x,pt.y);
-        return S_OK;
-    }
-
-    HRESULT SRenderTarget_GDI::GetCurrentPositionEx(LPPOINT lpPoint){
-        ::GetCurrentPositionEx(m_hdc,lpPoint);
-        return S_OK;
-    }
-
-	HRESULT SRenderTarget_GDI::FillPath(const IPathS * path)
-	{
-		if (!path) return E_INVALIDARG;
-
-		const SPath_GDI* pGdiPath = static_cast<const SPath_GDI*>(path);
-        RECT rcBox;
-        pGdiPath->getBounds(&rcBox);
-        DCBuffer dcBuf(m_hdc,&rcBox,0xff);
-		// Execute path commands on current HDC and fill
-		pGdiPath->ExecuteCommands(dcBuf);
-		::FillPath(dcBuf);
-
-		return S_OK;
-	}
-
-	HRESULT SRenderTarget_GDI::SetXfermode(int mode,int *pOldMode)
-	{
-		switch (mode)
-		{
-		case kSrcCopy:
-		case kDstInvert:
-		case kSrcInvert:
-		case kSrcAnd:
-			break;
-		default:
-			return E_INVALIDARG;
-		}
-		int nOldMode = ::SetROP2(m_hdc,mode);
-		if(pOldMode) *pOldMode = nOldMode;
-		return S_OK;
-	}
-
-	BOOL SRenderTarget_GDI::SetAntiAlias(BOOL bAntiAlias)
-	{
-		return FALSE;
-	}
-
-	BOOL SRenderTarget_GDI::GetAntiAlias() SCONST
-	{
-		return FALSE;
-	}
-
-    #ifdef SOUI_ENABLE_SVG
-
-		static Gdiplus::Color nsvgColorToGdipColor(unsigned int color, float opacity)
-		{
-			unsigned char a = (unsigned char)((color >> 24) & 0xFF);
-			unsigned char r = (unsigned char)(color & 0xFF);
-			unsigned char g = (unsigned char)((color >> 8) & 0xFF);
-			unsigned char b = (unsigned char)((color >> 16) & 0xFF);
-			a = (unsigned char)(a * opacity);
-			return Gdiplus::Color(a, r, g, b);
-		}
-
-		static Gdiplus::Color nsvgPaintToGdipColor(const NSVGpaint* paint, float opacity)
-		{
-			if (paint && paint->type == NSVG_PAINT_COLOR)
-				return nsvgColorToGdipColor(paint->color, opacity);
-			return nsvgColorToGdipColor(0xFF000000, opacity);
-		}
-
-		static bool nsvgIntersectsSrcRect(float left, float top, float right, float bottom, LPCRECT prcSrc)
-		{
-			if (!prcSrc)
-				return true;
-
-			return right > (float)prcSrc->left && left < (float)prcSrc->right &&
-				bottom > (float)prcSrc->top && top < (float)prcSrc->bottom;
-		}
-
-		static bool nsvgShapeIntersectsSrcRect(const NSVGshape* shape, LPCRECT prcSrc)
-		{
-			if (!shape)
-				return false;
-
-			float inflate = 0.0f;
-			if (shape->stroke.type != NSVG_PAINT_NONE && shape->strokeWidth > 0)
-				inflate = shape->strokeWidth * 0.5f + 1.0f;
-
-			return nsvgIntersectsSrcRect(
-				shape->bounds[0] - inflate,
-				shape->bounds[1] - inflate,
-				shape->bounds[2] + inflate,
-				shape->bounds[3] + inflate,
-				prcSrc);
-		}
-
-		static Gdiplus::LineCap nsvgCapToGdipCap(int cap)
-		{
-			switch (cap)
-			{
-			case NSVG_CAP_ROUND: return Gdiplus::LineCapRound;
-			case NSVG_CAP_SQUARE: return Gdiplus::LineCapSquare;
-			default: return Gdiplus::LineCapFlat;
-			}
-		}
-
-		static Gdiplus::LineJoin nsvgJoinToGdipJoin(int join)
-		{
-			switch (join)
-			{
-			case NSVG_JOIN_ROUND: return Gdiplus::LineJoinRound;
-			case NSVG_JOIN_BEVEL: return Gdiplus::LineJoinBevel;
-			default: return Gdiplus::LineJoinMiter;
-			}
-		}
-
-		static bool nsvgPathToGraphicsPath(const NSVGpath* path, Gdiplus::FillMode fillMode, Gdiplus::GraphicsPath& gp)
-		{
-			if (!path || !path->pts || path->npts < 2)
-				return false;
-
-			gp.SetFillMode(fillMode);
-			gp.StartFigure();
-			gp.AddLine((Gdiplus::REAL)path->pts[0], (Gdiplus::REAL)path->pts[1],
-				(Gdiplus::REAL)path->pts[0], (Gdiplus::REAL)path->pts[1]);
-
-			for (int i = 0; i < path->npts - 1; i += 3)
-			{
-				if (i + 6 > path->npts * 2)
-					break;
-
-				float x0 = path->pts[i * 2 + 0];
-				float y0 = path->pts[i * 2 + 1];
-				float x1 = path->pts[i * 2 + 2];
-				float y1 = path->pts[i * 2 + 3];
-				float x2 = path->pts[i * 2 + 4];
-				float y2 = path->pts[i * 2 + 5];
-				float x3 = path->pts[i * 2 + 6];
-				float y3 = path->pts[i * 2 + 7];
-				gp.AddBezier((Gdiplus::REAL)x0, (Gdiplus::REAL)y0,
-					(Gdiplus::REAL)x1, (Gdiplus::REAL)y1,
-					(Gdiplus::REAL)x2, (Gdiplus::REAL)y2,
-					(Gdiplus::REAL)x3, (Gdiplus::REAL)y3);
-			}
-
-			if (path->closed)
-				gp.CloseFigure();
-			return true;
-		}
-
-			static float nsvgGetTextBaseline(const Gdiplus::FontFamily& fontFamily, INT fontStyle, float fontSize)
-			{
-				int emHeight = fontFamily.GetEmHeight((Gdiplus::FontStyle)fontStyle);
-				if (emHeight <= 0)
-					return fontSize;
-
-				int cellAscent = fontFamily.GetCellAscent((Gdiplus::FontStyle)fontStyle);
-				return fontSize * cellAscent / (float)emHeight;
-			}
-
-			static const Gdiplus::FontFamily* nsvgResolveFontFamily(const char* pszFontFamily, Gdiplus::FontFamily** ppCustomFamily)
-			{
-				if (ppCustomFamily)
-					*ppCustomFamily = NULL;
-
-				if (!pszFontFamily || !pszFontFamily[0] || lstrcmpiA(pszFontFamily, "sans-serif") == 0 || lstrcmpiA(pszFontFamily, "sans serif") == 0)
-					return Gdiplus::FontFamily::GenericSansSerif();
-
-				if (lstrcmpiA(pszFontFamily, "serif") == 0)
-					return Gdiplus::FontFamily::GenericSerif();
-
-				if (lstrcmpiA(pszFontFamily, "monospace") == 0 || lstrcmpiA(pszFontFamily, "monospace,") == 0)
-					return Gdiplus::FontFamily::GenericMonospace();
-
-				wchar_t fontFamilyName[LF_FACESIZE] = { 0 };
-				if (MultiByteToWideChar(CP_UTF8, 0, pszFontFamily, -1, fontFamilyName, LF_FACESIZE) <= 0)
-					return Gdiplus::FontFamily::GenericSansSerif();
-
-				Gdiplus::FontFamily* pCustomFamily = new Gdiplus::FontFamily(fontFamilyName);
-				if (!pCustomFamily)
-					return Gdiplus::FontFamily::GenericSansSerif();
-
-				if (pCustomFamily->GetLastStatus() != Gdiplus::Ok)
-				{
-					delete pCustomFamily;
-					return Gdiplus::FontFamily::GenericSansSerif();
-				}
-
-				if (ppCustomFamily)
-					*ppCustomFamily = pCustomFamily;
-
-				return pCustomFamily;
-			}
-
-			static bool nsvgBuildTextPath(const NSVGtext* text, const wchar_t* szText, INT len,
-				const Gdiplus::FontFamily& fontFamily, INT fontStyle, float fontSize,
-				Gdiplus::GraphicsPath& textPath, Gdiplus::RectF* pBounds)
-		{
-				if (!text || !szText || len <= 0 || !pBounds)
-					return false;
-
-				const Gdiplus::StringFormat* pFormat = Gdiplus::StringFormat::GenericTypographic();
-				float baseline = nsvgGetTextBaseline(fontFamily, fontStyle, fontSize);
-				if (textPath.AddString(szText, len, &fontFamily, fontStyle, fontSize,
-					Gdiplus::PointF(0.0f, -baseline), pFormat) != Gdiplus::Ok)
-					return false;
-
-				if (textPath.GetBounds(pBounds) != Gdiplus::Ok)
-					return false;
-
-			float offsetX = 0.0f;
-			switch (text->anchor)
-			{
-			case NSVG_ANCHOR_MIDDLE:
-					offsetX = -pBounds->Width / 2.0f;
-				break;
-			case NSVG_ANCHOR_END:
-					offsetX = -pBounds->Width;
-				break;
-			default:
-				break;
-			}
-
-				if (offsetX != 0.0f)
-				{
-					Gdiplus::Matrix offsetMatrix;
-					offsetMatrix.Translate(offsetX, 0.0f);
-					textPath.Transform(&offsetMatrix);
-					if (textPath.GetBounds(pBounds) != Gdiplus::Ok)
-						return false;
-				}
-
-				return true;
-			}
-
-			static bool nsvgTextIntersectsSrcRect(const NSVGtext* text, const Gdiplus::RectF& bounds,
-				const Gdiplus::Matrix& textMatrix, LPCRECT prcSrc)
-			{
-				if (!text || !prcSrc)
-					return true;
-
-				float localLeft = bounds.X;
-				float localTop = bounds.Y;
-				float localRight = bounds.GetRight();
-				float localBottom = bounds.GetBottom();
-
-			Gdiplus::PointF pts[4] = {
-				Gdiplus::PointF(localLeft, localTop),
-				Gdiplus::PointF(localRight, localTop),
-				Gdiplus::PointF(localRight, localBottom),
-				Gdiplus::PointF(localLeft, localBottom),
-			};
-			textMatrix.TransformPoints(pts, 4);
-
-			bool hasTransform = textMatrix.IsIdentity() ? false : true;
-			float minX = pts[0].X;
-			float minY = pts[0].Y;
-			float maxX = minX;
-			float maxY = minY;
-			for (int i = 1; i < 4; ++i)
-			{
-				minX = (std::min)(minX, pts[i].X);
-				minY = (std::min)(minY, pts[i].Y);
-				maxX = (std::max)(maxX, pts[i].X);
-				maxY = (std::max)(maxY, pts[i].Y);
-			}
-
-			if (!hasTransform)
-			{
-				minX += text->x;
-				minY += text->y;
-				maxX += text->x;
-				maxY += text->y;
-			}
-
-			return nsvgIntersectsSrcRect(minX, minY, maxX, maxY, prcSrc);
-		}
-
-		static void renderNSVGshape(Gdiplus::Graphics& graphics, const NSVGshape* shape,
-			BYTE byAlpha, LPCRECT prcSrc)
-		{
-			if (!shape)
-				return;
-			if (!(shape->flags & NSVG_FLAGS_VISIBLE))
-				return;
-			if (!nsvgShapeIntersectsSrcRect(shape, prcSrc))
-				return;
-
-			float opacity = shape->opacity * (byAlpha / 255.0f);
-			Gdiplus::FillMode fillMode = shape->fillRule == NSVG_FILLRULE_EVENODD ?
-				Gdiplus::FillModeAlternate : Gdiplus::FillModeWinding;
-
-			for (const NSVGpath* path = shape->paths; path != NULL; path = path->next)
-			{
-				Gdiplus::GraphicsPath gp(fillMode);
-				if (!nsvgPathToGraphicsPath(path, fillMode, gp))
-					continue;
-
-				unsigned char paintOrder = shape->paintOrder;
-				for (int j = 0; j < 3; ++j)
-				{
-					unsigned char order = (paintOrder >> (2 * j)) & 0x03;
-
-					if (order == NSVG_PAINT_FILL && shape->fill.type != NSVG_PAINT_NONE)
-					{
-						Gdiplus::SolidBrush brush(nsvgPaintToGdipColor(&shape->fill, opacity));
-						graphics.FillPath(&brush, &gp);
-					}
-					else if (order == NSVG_PAINT_STROKE && shape->stroke.type != NSVG_PAINT_NONE && shape->strokeWidth > 0)
-					{
-						Gdiplus::Pen pen(nsvgPaintToGdipColor(&shape->stroke, opacity), (Gdiplus::REAL)shape->strokeWidth);
-						pen.SetLineCap(nsvgCapToGdipCap(shape->strokeLineCap), nsvgCapToGdipCap(shape->strokeLineCap), Gdiplus::DashCapFlat);
-						pen.SetLineJoin(nsvgJoinToGdipJoin(shape->strokeLineJoin));
-						pen.SetMiterLimit((Gdiplus::REAL)shape->miterLimit);
-						graphics.DrawPath(&pen, &gp);
-					}
-				}
-			}
-		}
-
-		static void renderNSVGtext(Gdiplus::Graphics& graphics, const NSVGtext* text,
-			BYTE byAlpha, LPCRECT prcSrc)
-		{
-			if (!text || text->text[0] == '\0')
-				return;
-
-			Gdiplus::FontFamily* pCustomFontFamily = NULL;
-			const Gdiplus::FontFamily* pFontFamily = nsvgResolveFontFamily(text->fontFamily, &pCustomFontFamily);
-			if (!pFontFamily)
-				return;
-
-			int fontStyle = Gdiplus::FontStyleRegular;
-			if (text->fontWeight >= 7)
-				fontStyle |= Gdiplus::FontStyleBold;
-			if (text->fontStyle == 1 || text->fontStyle == 2)
-				fontStyle |= Gdiplus::FontStyleItalic;
-
-			float fontSize = text->fontSize > 0 ? text->fontSize : 16.0f;
-
-			wchar_t szText[1024] = { 0 };
-			int len = MultiByteToWideChar(CP_UTF8, 0, text->text, -1, szText, 1024);
-			if (len <= 0)
-				return;
-			if (szText[len - 1] == 0)
-				len--;
-			if (len <= 0)
-				return;
-
-				Gdiplus::GraphicsPath textPath;
-				Gdiplus::RectF bounds;
-				if (!nsvgBuildTextPath(text, szText, len, *pFontFamily, fontStyle, fontSize, textPath, &bounds))
-				{
-					delete pCustomFontFamily;
-					return;
-				}
-
-			Gdiplus::Matrix textMatrix(
-				text->xform[0], text->xform[1],
-				text->xform[2], text->xform[3],
-				text->xform[4], text->xform[5]);
-				if (!nsvgTextIntersectsSrcRect(text, bounds, textMatrix, prcSrc))
-				return;
-
-			float x = text->x;
-			float y = text->y;
-
-			float opacity = text->opacity * (byAlpha / 255.0f);
-			Gdiplus::SolidBrush brush(nsvgColorToGdipColor(text->fillColor, opacity));
-			bool hasTransform = textMatrix.IsIdentity() ? false : true;
-			Gdiplus::GraphicsPath drawPath;
-			drawPath.AddPath(&textPath, FALSE);
-
-			if (hasTransform)
-			{
-				drawPath.Transform(&textMatrix);
-				graphics.FillPath(&brush, &drawPath);
-			}
-			else
-			{
-				Gdiplus::Matrix translateMatrix;
-				translateMatrix.Translate(x, y);
-				drawPath.Transform(&translateMatrix);
-				graphics.FillPath(&brush, &drawPath);
-			}
-
-				delete pCustomFontFamily;
-		}
-
-		HRESULT SRenderTarget_GDI::DrawSVG(ISvgObj* pSvgObj, LPCRECT pRect, LPCRECT prcSrc, BYTE byAlpha)
-		{
-			if (!pSvgObj || !pRect)
-				return E_INVALIDARG;
-			if (!m_hdc)
-				return E_FAIL;
-
-			NSVGimage* pSvg = (NSVGimage*)pSvgObj->GetPtr();
-			if (!pSvg)
-				return E_INVALIDARG;
-
-			int nWid = pRect->right - pRect->left;
-			int nHei = pRect->bottom - pRect->top;
-			if (nWid <= 0 || nHei <= 0)
-				return E_INVALIDARG;
-
-			float srcX = 0.0f, srcY = 0.0f;
-			float srcWidth = pSvg->width;
-			float srcHeight = pSvg->height;
-			if (prcSrc)
-			{
-				srcX = (float)prcSrc->left;
-				srcY = (float)prcSrc->top;
-				srcWidth = (float)(prcSrc->right - prcSrc->left);
-				srcHeight = (float)(prcSrc->bottom - prcSrc->top);
-			}
-
-			if (srcWidth <= 0 || srcHeight <= 0)
-			{
-				srcWidth = (float)nWid;
-				srcHeight = (float)nHei;
-			}
-
-			float scaleX = nWid / srcWidth;
-			float scaleY = nHei / srcHeight;
-			float tx = (float)pRect->left;
-			float ty = (float)pRect->top;
-
-			Gdiplus::Graphics graphics(m_hdc);
-			Gdiplus::GraphicsState state = graphics.Save();
-			graphics.SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
-			graphics.SetPixelOffsetMode(Gdiplus::PixelOffsetModeHighQuality);
-			graphics.SetClip(Gdiplus::Rect((INT)tx, (INT)ty, nWid, nHei), Gdiplus::CombineModeIntersect);
-
-			Gdiplus::Matrix globalTransform((Gdiplus::REAL)scaleX, 0.0f, 0.0f, (Gdiplus::REAL)scaleY,
-				(Gdiplus::REAL)(tx - srcX * scaleX), (Gdiplus::REAL)(ty - srcY * scaleY));
-			graphics.SetTransform(&globalTransform);
-
-			for (NSVGshape* shape = pSvg->shapes; shape != NULL; shape = shape->next)
-				renderNSVGshape(graphics, shape, byAlpha, prcSrc);
-
-			for (NSVGtext* text = pSvg->texts; text != NULL; text = text->next)
-				renderNSVGtext(graphics, text, byAlpha, prcSrc);
-
-			graphics.Restore(state);
-			return S_OK;
-		}
-
-#else
-    HRESULT SRenderTarget_GDI::DrawSVG(ISvgObj *pSvg, LPCRECT pRect, LPCRECT prcSrc, BYTE byAlpha)
-    {
-        (void)pSvg;
-        (void)pRect;
-        (void)prcSrc;
-        (void)byAlpha;
-        return E_NOTIMPL;
-    }
-    #endif // SOUI_ENABLE_SVG
-	COLORREF SRenderTarget_GDI::GetTextColor()
-	{
-		return m_curColor.toCOLORREF();
-	}
-
-	COLORREF SRenderTarget_GDI::SetTextColor(COLORREF color)
-	{
-		COLORREF crOld=m_curColor.toCOLORREF();
-		m_curColor.setRGB(color);
-		::SetTextColor(m_hdc,color&0x00ffffff);
-		return crOld;
-	}
-
-
-    //////////////////////////////////////////////////////////////////////////
-    namespace RENDER_GDI
-    {
-        SOUI_COM_C BOOL SOUI_COM_API SCreateInstance(IObjRef ** ppRenderFactory)
-        {
-            *ppRenderFactory = new SRenderFactory_GDI;
-            return TRUE;
-        }
-    }
-SNSEND
-
-EXTERN_C BOOL Render_Gdi_SCreateInstance(IObjRef ** ppRenderFactory)
+//////////////////////////////////////////////////////////////////////////
+// SRenderFactory_GDI
+SRenderFactory_GDI::SRenderFactory_GDI()
 {
-	return SNS::RENDER_GDI::SCreateInstance(ppRenderFactory);
+#ifdef SOUI_ENABLE_SVG
+    // Initialize GDI+ for SVG rendering with alpha channel support
+    Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+    Gdiplus::GdiplusStartup(&g_gdiplusToken, &gdiplusStartupInput, NULL);
+#endif // SOUI_ENABLE_SVG
+    LOGFONT lf = { 0 };
+    lf.lfHeight = 20;
+    _tcscpy(lf.lfFaceName, _T("宋体"));
+    CreateFont(&m_defFont, &lf);
 }
 
+SRenderFactory_GDI::~SRenderFactory_GDI()
+{
+    m_defFont = NULL;
+#ifdef SOUI_ENABLE_SVG
+    // Shutdown GDI+
+    if (g_gdiplusToken != 0)
+    {
+        Gdiplus::GdiplusShutdown(g_gdiplusToken);
+        g_gdiplusToken = 0;
+    }
+#endif // SOUI_ENABLE_SVG
+}
 
+BOOL SRenderFactory_GDI::CreateRenderTarget(IRenderTarget **ppRenderTarget, int nWid, int nHei)
+{
+    *ppRenderTarget = new SRenderTarget_GDI(this, nWid, nHei);
+    return TRUE;
+}
 
+BOOL SRenderFactory_GDI::CreateRenderTarget2(THIS_ IRenderTarget **ppRenderTarget, HWND hWnd)
+{
+    RECT rc;
+    ::GetClientRect(hWnd, &rc);
+    return CreateRenderTarget(ppRenderTarget, rc.right, rc.bottom);
+}
+
+BOOL SRenderFactory_GDI::CreateFont(IFontS **ppFont, const LOGFONT *lf)
+{
+    *ppFont = new SFont_GDI(this, lf);
+    return TRUE;
+}
+
+BOOL SRenderFactory_GDI::CreateBitmap(IBitmapS **ppBitmap)
+{
+    *ppBitmap = new SBitmap_GDI(this);
+    return TRUE;
+}
+
+BOOL SRenderFactory_GDI::CreateRegion(IRegionS **ppRgn)
+{
+    *ppRgn = new SRegion_GDI(this);
+    return TRUE;
+}
+
+BOOL SRenderFactory_GDI::CreatePath(IPathS **ppPath)
+{
+    *ppPath = new SPath_GDI(this);
+    return TRUE;
+}
+
+BOOL SRenderFactory_GDI::CreatePathEffect(REFGUID guidEffect, IPathEffect **ppPathEffect)
+{
+    return FALSE;
+}
+
+void SRenderFactory_GDI::SetImgDecoderFactory(IImgDecoderFactory *pImgDecoderFac)
+{
+    m_imgDecoderFactory = pImgDecoderFac;
+}
+
+IImgDecoderFactory *SRenderFactory_GDI::GetImgDecoderFactory()
+{
+    return m_imgDecoderFactory;
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+HPEN SPen_GDI::GetPen()
+{
+    return m_hPen;
+}
+
+STDMETHODIMP_(void) SPen_GDI::SetColor(THIS_ COLORREF cr)
+{
+    m_cr = cr;
+    UpdatePen();
+}
+
+STDMETHODIMP_(COLORREF) SPen_GDI::GetColor(THIS) SCONST
+{
+    return m_cr;
+}
+
+STDMETHODIMP_(void) SPen_GDI::SetStyle(THIS_ int nStyle)
+{
+    m_style = nStyle;
+    UpdatePen();
+}
+
+STDMETHODIMP_(int) SPen_GDI::GetStyle(THIS) SCONST
+{
+    return m_style;
+}
+
+STDMETHODIMP_(void) SPen_GDI::SetWidth(THIS_ int nWid)
+{
+    m_nWidth = nWid;
+    UpdatePen();
+}
+
+STDMETHODIMP_(int) SPen_GDI::GetWidth(THIS) SCONST
+{
+    return m_nWidth;
+}
+
+SPen_GDI::SPen_GDI(IRenderFactory *pRenderFac, int iStyle /*=PS_SOLID*/, COLORREF cr /*=0*/, int cWidth /*=1*/)
+    : TGdiRenderObjImpl<IPenS, OT_PEN>(pRenderFac)
+    , m_nWidth(cWidth)
+    , m_style(iStyle)
+    , m_cr(cr)
+    , m_hPen(NULL)
+{
+    UpdatePen();
+}
+
+SPen_GDI::~SPen_GDI()
+{
+    DeleteObject(m_hPen);
+}
+
+void SPen_GDI::UpdatePen()
+{
+    if (m_hPen)
+    {
+        DeleteObject(m_hPen);
+        m_hPen = NULL;
+    }
+
+    if (m_style & PS_GEOMETRIC)
+    {
+        LOGBRUSH lb;
+        lb.lbStyle = BS_SOLID;
+        lb.lbColor = m_cr & 0x00ffffff;
+        lb.lbHatch = 0;
+        m_hPen = ::ExtCreatePen(m_style | PS_GEOMETRIC, m_nWidth, &lb, 0, NULL);
+    }
+    else
+    {
+        m_hPen = ::CreatePen(m_style, m_nWidth, m_cr & 0x00ffffff);
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+const LOGFONT *SFont_GDI::LogFont() SCONST
+{
+    return &m_lf;
+}
+
+LPCTSTR SFont_GDI::FamilyName() SCONST
+{
+    return m_lf.lfFaceName;
+}
+
+int SFont_GDI::TextSize() SCONST
+{
+    return m_lf.lfHeight;
+}
+
+BOOL SFont_GDI::IsBold() SCONST
+{
+    return m_lf.lfWeight == FW_BOLD;
+}
+
+BOOL SFont_GDI::IsItalic() SCONST
+{
+    return m_lf.lfItalic;
+}
+
+BOOL SFont_GDI::IsUnderline() SCONST
+{
+    return m_lf.lfUnderline;
+}
+
+BOOL SFont_GDI::IsStrikeOut() SCONST
+{
+    return m_lf.lfStrikeOut;
+}
+
+BOOL SFont_GDI::UpdateFont(const LOGFONT *pLogFont)
+{
+    if (!m_hFont)
+        return FALSE;
+    DeleteObject(m_hFont);
+    memcpy(&m_lf, pLogFont, sizeof(LOGFONT));
+    m_hFont = CreateFontIndirect(&m_lf);
+    return TRUE;
+}
+
+void SFont_GDI::SetProp(IXmlNode *pXmlNode)
+{
+}
+
+SFont_GDI::SFont_GDI(IRenderFactory *pRenderFac, const LOGFONT *plf)
+    : TGdiRenderObjImpl<IFontS, OT_FONT>(pRenderFac)
+    , m_hFont(NULL)
+{
+    memcpy(&m_lf, plf, sizeof(LOGFONT));
+    m_hFont = CreateFontIndirect(&m_lf);
+}
+
+SFont_GDI::~SFont_GDI()
+{
+    if (m_hFont)
+        DeleteObject(m_hFont);
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+SBrush_GDI::SBrush_GDI(IRenderFactory *pRenderFac, HBITMAP hBmp)
+    : TGdiRenderObjImpl<IBrushS, OT_BRUSH>(pRenderFac)
+    , m_brushType(Brush_Bitmap)
+{
+    BITMAP bmp;
+    ::GetObject(hBmp, sizeof(bmp), &bmp);
+    if (bmp.bmBits)
+    {
+        BITMAPINFO *pBuf = (BITMAPINFO *)malloc(sizeof(BITMAPINFO) + bmp.bmWidthBytes * bmp.bmHeight);
+
+        BITMAPINFO &bmpInfo = *pBuf;
+        memset(&bmpInfo, 0, sizeof(BITMAPINFO));
+        bmpInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+        bmpInfo.bmiHeader.biWidth = bmp.bmWidth;
+        bmpInfo.bmiHeader.biHeight = -bmp.bmHeight;
+        bmpInfo.bmiHeader.biPlanes = bmp.bmPlanes;
+        bmpInfo.bmiHeader.biBitCount = bmp.bmBitsPixel;
+        bmpInfo.bmiHeader.biCompression = BI_RGB;
+        bmpInfo.bmiHeader.biSizeImage = bmp.bmWidthBytes * bmp.bmHeight;
+        COLORREF *crTable = (COLORREF *)(pBuf + 1);
+        memcpy(crTable, bmp.bmBits, bmpInfo.bmiHeader.biSizeImage);
+        // 需要下面这一段，清空颜色表的alpha，GDI才支持。
+        for (int i = 0; i < bmp.bmHeight; i++)
+        {
+            for (int j = 0; j < bmp.bmWidth; j++)
+            {
+                *crTable &= 0x00ffffff;
+                crTable++;
+            }
+        }
+        m_hBrush = CreateDIBPatternBrushPt(pBuf, DIB_RGB_COLORS);
+        free(pBuf);
+    }
+    else
+    {
+        m_hBrush = NULL;
+    }
+}
+
+SBrush_GDI::SBrush_GDI(IRenderFactory *pRenderFac, COLORREF cr)
+    : TGdiRenderObjImpl<IBrushS, OT_BRUSH>(pRenderFac)
+    , m_cr(cr)
+    , m_brushType(Brush_Color)
+{
+    m_hBrush = ::CreateSolidBrush(m_cr & 0x00ffffff);
+}
+
+SBrush_GDI::~SBrush_GDI()
+{
+    if (m_hBrush)
+        DeleteObject(m_hBrush);
+}
+
+//////////////////////////////////////////////////////////////////////////
+//  SBitmap_GDI
+HBITMAP SBitmap_GDI::CreateGDIBitmap(int nWid, int nHei, void **ppBits)
+{
+    BITMAPINFO bmi;
+    memset(&bmi, 0, sizeof(bmi));
+    bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bmi.bmiHeader.biWidth = nWid;
+    bmi.bmiHeader.biHeight = -nHei; // top-down image
+    bmi.bmiHeader.biPlanes = 1;
+    bmi.bmiHeader.biBitCount = 32;
+    bmi.bmiHeader.biCompression = BI_RGB;
+    bmi.bmiHeader.biSizeImage = 0;
+
+    HDC hdc = GetDC(NULL);
+    HBITMAP hBmp = CreateDIBSection(hdc, &bmi, DIB_RGB_COLORS, ppBits, 0, 0);
+    ReleaseDC(NULL, hdc);
+    return hBmp;
+}
+
+HRESULT SBitmap_GDI::Init(int nWid, int nHei, const LPVOID pBits /*=NULL*/)
+{
+    if (m_hBmp)
+        DeleteObject(m_hBmp);
+    LPVOID pBmpBits = NULL;
+    m_hBmp = CreateGDIBitmap(nWid, nHei, &pBmpBits);
+    if (m_hBmp)
+    {
+        m_sz.cx = nWid, m_sz.cy = nHei;
+        const int stride = m_sz.cx * 4;
+        if (pBits)
+        {
+            memcpy(pBmpBits, pBits, stride * m_sz.cy);
+        }
+        else
+        {
+            memset(pBmpBits, 0, stride * m_sz.cy);
+        }
+    }
+    return m_hBmp ? S_OK : E_OUTOFMEMORY;
+}
+
+HRESULT SBitmap_GDI::Init2(IImgFrame *pFrame)
+{
+    UINT nWid, nHei;
+    pFrame->GetSize(&nWid, &nHei);
+
+    if (m_hBmp)
+        DeleteObject(m_hBmp);
+    m_hBmp = CreateGDIBitmap(nWid, nHei, NULL);
+    if (!m_hBmp)
+        return E_OUTOFMEMORY;
+
+    m_sz.cx = nWid, m_sz.cy = nHei;
+    const int stride = m_sz.cx * 4;
+    UpdateDIBPixmap(m_hBmp, m_sz.cx, m_sz.cy, 32, stride, pFrame->GetPixels());
+    return S_OK;
+}
+
+HRESULT SBitmap_GDI::LoadFromFile(LPCTSTR pszFileName)
+{
+    SAutoRefPtr<IImgX> imgDecoder;
+    GetRenderFactory()->GetImgDecoderFactory()->CreateImgX(&imgDecoder);
+#ifdef _UNICODE
+    if (imgDecoder->LoadFromFileW(pszFileName) == 0)
+        return E_FAIL;
+#else
+    if (imgDecoder->LoadFromFileA(pszFileName) == 0)
+        return E_FAIL;
+#endif
+    return ImgFromDecoder(imgDecoder);
+}
+
+HRESULT SBitmap_GDI::LoadFromMemory(LPBYTE pBuf, size_t szLen)
+{
+    SAutoRefPtr<IImgX> imgDecoder;
+    GetRenderFactory()->GetImgDecoderFactory()->CreateImgX(&imgDecoder);
+    if (imgDecoder->LoadFromMemory(pBuf, szLen) == 0)
+        return S_FALSE;
+    return ImgFromDecoder(imgDecoder);
+}
+
+HRESULT SBitmap_GDI::ImgFromDecoder(IImgX *imgDecoder)
+{
+    IImgFrame *pFrame = imgDecoder->GetFrame(0);
+    UINT nWid, nHei;
+    pFrame->GetSize(&nWid, &nHei);
+    m_sz.cx = nWid, m_sz.cy = nHei;
+
+    if (m_hBmp)
+        DeleteObject(m_hBmp);
+    void *pBits = NULL;
+    m_hBmp = CreateGDIBitmap(m_sz.cx, m_sz.cy, &pBits);
+
+    if (!m_hBmp)
+        return E_OUTOFMEMORY;
+    const int stride = m_sz.cx * 4;
+    UpdateDIBPixmap(m_hBmp, m_sz.cx, m_sz.cy, 32, stride, pFrame->GetPixels());
+    return S_OK;
+}
+
+UINT SBitmap_GDI::Width() const
+{
+    return m_sz.cx;
+}
+
+UINT SBitmap_GDI::Height() const
+{
+    return m_sz.cy;
+}
+
+SIZE SBitmap_GDI::Size() const
+{
+    return m_sz;
+}
+
+LPVOID SBitmap_GDI::LockPixelBits()
+{
+    BITMAP bm;
+    GetObject(m_hBmp, sizeof(bm), &bm);
+    return bm.bmBits;
+}
+
+void SBitmap_GDI::UnlockPixelBits(LPVOID pBuf)
+{
+}
+
+const LPVOID SBitmap_GDI::GetPixelBits() const
+{
+    BITMAP bm;
+    GetObject(m_hBmp, sizeof(bm), &bm);
+    return bm.bmBits;
+}
+
+HRESULT SBitmap_GDI::Clone(IBitmapS **ppClone) const
+{
+    HRESULT hr = E_UNEXPECTED;
+    if (!m_hBmp)
+        return hr;
+    BOOL bOK = GetRenderFactory()->CreateBitmap(ppClone);
+    if (bOK)
+    {
+        hr = (*ppClone)->Init(Width(), Height(), GetPixelBits());
+        if (S_OK != hr)
+        {
+            (*ppClone)->Release();
+            (*ppClone) = NULL;
+        }
+    }
+    return hr;
+}
+
+HRESULT SBitmap_GDI::Scale(IBitmapS **ppOutput, int nScale, FilterLevel filterLevel) SCONST
+{
+    int wid = MulDiv(Width(), nScale, 100);
+    int hei = MulDiv(Height(), nScale, 100);
+    return Scale2(ppOutput, wid, hei, filterLevel);
+}
+
+HRESULT SBitmap_GDI::Scale2(IBitmapS **pOutput, int nWid, int nHei, FilterLevel filterLevel) SCONST
+{
+    if (nWid == Width() && nHei == Height())
+    {
+        return Clone(pOutput);
+    }
+    HRESULT hr = E_UNEXPECTED;
+    IRenderTarget *pRT = NULL;
+    if (GetRenderFactory()->CreateRenderTarget(&pRT, nWid, nHei))
+    {
+        RECT rcSrc = { 0, 0, (long)Width(), (long)Height() };
+        RECT rcDst = { 0, 0, nWid, nHei };
+        hr = pRT->DrawBitmapEx(&rcDst, this, &rcSrc, MAKELONG(EM_STRETCH, filterLevel), 255);
+        if (hr == S_OK)
+        {
+            *pOutput = (IBitmapS *)pRT->GetCurrentObject(OT_BITMAP);
+            (*pOutput)->AddRef();
+        }
+        pRT->Release();
+    }
+    else
+    {
+        hr = E_OUTOFMEMORY;
+    }
+    return hr;
+}
+
+static void premultiply_to_non_premultiply(unsigned char *data, int width, int height)
+{
+    for (int y = 0; y < height; ++y)
+    {
+        for (int x = 0; x < width; ++x)
+        {
+            int idx = (y * width + x) * 4;
+            unsigned char alpha = data[idx + 3];
+            if (alpha != 0)
+            {
+                data[idx + 0] = (data[idx + 0] * 255) / alpha; // R
+                data[idx + 1] = (data[idx + 1] * 255) / alpha; // G
+                data[idx + 2] = (data[idx + 2] * 255) / alpha; // B
+            }
+            else
+            {
+                data[idx + 0] = 0; // R
+                data[idx + 1] = 0; // G
+                data[idx + 2] = 0; // B
+            }
+        }
+    }
+}
+
+HRESULT SBitmap_GDI::Save(LPCWSTR pszFileName, const LPVOID pFormat) SCONST
+{
+    LPBYTE pBits = (LPBYTE)GetPixelBits();
+    int nWid = Width();
+    int nHei = Height();
+    SAutoBuf buf(nWid * 4 * nHei);
+    if (!buf)
+        return E_OUTOFMEMORY;
+    memcpy(buf, pBits, nWid * 4 * nHei);
+    premultiply_to_non_premultiply((unsigned char *)(char *)buf, nWid, nHei);
+    return GetRenderFactory()->GetImgDecoderFactory()->SaveImage((BYTE *)(char *)buf, nWid, nHei, pszFileName, pFormat);
+}
+
+HRESULT SBitmap_GDI::Save2(CTHIS_ LPCWSTR pszFileName, ImgFmt imgFmt) SCONST
+{
+    LPBYTE pBits = (LPBYTE)GetPixelBits();
+    int nWid = Width();
+    int nHei = Height();
+    SAutoBuf buf(nWid * 4 * nHei);
+    if (!buf)
+        return E_OUTOFMEMORY;
+    memcpy(buf, pBits, nWid * 4 * nHei);
+    premultiply_to_non_premultiply((unsigned char *)(char *)buf, nWid, nHei);
+
+    return GetRenderFactory()->GetImgDecoderFactory()->SaveImage2((BYTE *)(char *)buf, nWid, nHei, pszFileName, imgFmt);
+}
+
+HBITMAP SBitmap_GDI::ToHBITMAP() const
+{
+    const LPBYTE pSrcBits = (const LPBYTE)GetPixelBits();
+    LPVOID pDstBits = NULL;
+    int nWid = Width();
+    int nHei = Height();
+    HBITMAP hRet = CreateGDIBitmap(nWid, nHei, &pDstBits);
+    memcpy(pDstBits, pSrcBits, nWid * 4 * nHei);
+    return hRet;
+}
+
+//////////////////////////////////////////////////////////////////////////
+//	SRegion_GDI
+SRegion_GDI::SRegion_GDI(IRenderFactory *pRenderFac)
+    : TGdiRenderObjImpl<IRegionS, OT_RGN>(pRenderFac)
+{
+    m_hRgn = ::CreateRectRgn(0, 0, 0, 0);
+}
+
+SRegion_GDI::~SRegion_GDI()
+{
+    DeleteObject(m_hRgn);
+}
+
+/*
+int CombineRgn(  HRGN hrgnDest,      // handle to destination region
+HRGN hrgnSrc1,      // handle to source region
+HRGN hrgnSrc2,      // handle to source region
+int fnCombineMode   // region combining mode);
+
+RGN_AND Creates the intersection of the two combined regions.
+RGN_COPY Creates a copy of the region identified by hrgnSrc1.
+RGN_DIFF Combines the parts of hrgnSrc1 that are not part of hrgnSrc2.
+RGN_OR Creates the union of two combined regions.
+RGN_XOR Creates the union of two combined regions except for any overlapping areas.
+
+注意 RGN_DIFF 和 RGN_COPY对于hrgnSrc1的使用差异
+*/
+void SRegion_GDI::CombineRect(LPCRECT lprect, int nCombineMode)
+{
+    HRGN hRgn = ::CreateRectRgnIndirect(lprect);
+    _CombineRgn(hRgn, nCombineMode);
+    DeleteObject(hRgn);
+}
+
+void SRegion_GDI::CombinePolygon(const POINT *pts, int count, int nPolygonMode, int nCombineMode)
+{
+    HRGN hRgn = ::CreatePolygonRgn(pts, count, nPolygonMode);
+    _CombineRgn(hRgn, nCombineMode);
+    DeleteObject(hRgn);
+}
+
+void SRegion_GDI::CombineRgn(const IRegionS *pRgnSrc, int nCombineMode)
+{
+    const SRegion_GDI *pRgnSrcGdi = (const SRegion_GDI *)pRgnSrc;
+    HRGN hRgn = pRgnSrcGdi->GetRegion();
+    _CombineRgn(hRgn, nCombineMode);
+}
+
+void SRegion_GDI::_CombineRgn(HRGN hRgn, int nCombineMode)
+{
+    if (nCombineMode == RGN_DIFF)
+    {
+        ::CombineRgn(m_hRgn, m_hRgn, hRgn, RGN_DIFF);
+    }
+    else
+    {
+        ::CombineRgn(m_hRgn, hRgn, m_hRgn, nCombineMode);
+    }
+}
+
+BOOL SRegion_GDI::PtInRegion(POINT pt) const
+{
+    return ::PtInRegion(m_hRgn, pt.x, pt.y);
+}
+
+BOOL SRegion_GDI::RectInRegion(LPCRECT lprect) const
+{
+    SASSERT(lprect);
+    return ::RectInRegion(m_hRgn, lprect);
+}
+
+void SRegion_GDI::GetRgnBox(LPRECT lprect) const
+{
+    SASSERT(lprect);
+    ::GetRgnBox(m_hRgn, lprect);
+}
+
+BOOL SRegion_GDI::IsEmpty() const
+{
+    RECT rcBox;
+    GetRgnBox(&rcBox);
+    return (rcBox.left == rcBox.right) || (rcBox.top == rcBox.bottom);
+}
+
+void SRegion_GDI::Offset(POINT pt)
+{
+    ::OffsetRgn(m_hRgn, pt.x, pt.y);
+}
+
+HRGN SRegion_GDI::GetRegion() const
+{
+    return m_hRgn;
+}
+
+void SRegion_GDI::Clear()
+{
+    ::SetRectRgn(m_hRgn, 0, 0, 0, 0);
+}
+
+void SRegion_GDI::CombineRoundRect(LPCRECT lprect, POINT ptRadius, int nCombineMode)
+{
+    HRGN hRgn = ::CreateRoundRectRgn(lprect->left, lprect->top, lprect->right, lprect->bottom, ptRadius.x * 2, ptRadius.y * 2);
+    ::CombineRgn(m_hRgn, hRgn, NULL, nCombineMode);
+    DeleteObject(hRgn);
+}
+
+void SRegion_GDI::CombineEllipse(LPCRECT lprect, int nCombineMode)
+{
+    HRGN hRgn = ::CreateEllipticRgnIndirect(lprect);
+    ::CombineRgn(m_hRgn, hRgn, NULL, nCombineMode);
+    DeleteObject(hRgn);
+}
+
+//////////////////////////////////////////////////////////////////////////
+//  SPath_GDI
+//////////////////////////////////////////////////////////////////////////
+SPath_GDI::SPath_GDI(IRenderFactory *pRenderFac)
+    : TGdiRenderObjImpl<IPathS, OT_PATH>(pRenderFac)
+    , m_fillType(kWinding_FillType)
+    , m_bBoundsValid(FALSE)
+    , m_bHasLastPoint(FALSE)
+{
+    SetRect(&m_bounds, 0, 0, 0, 0);
+    m_lastPoint.fX = m_lastPoint.fY = 0.0f;
+}
+
+SPath_GDI::~SPath_GDI()
+{
+    // Commands will be automatically cleaned up by SArray destructor
+}
+
+FillType SPath_GDI::getFillType() const
+{
+    return m_fillType;
+}
+
+void SPath_GDI::setFillType(FillType ft)
+{
+    m_fillType = ft;
+}
+
+void SPath_GDI::reset()
+{
+    m_commands.RemoveAll();
+    m_bHasLastPoint = FALSE;
+    m_bBoundsValid = FALSE;
+    SetRect(&m_bounds, 0, 0, 0, 0);
+}
+
+BOOL SPath_GDI::isEmpty() const
+{
+    return m_commands.GetCount() == 0;
+}
+
+void SPath_GDI::getBounds(LPRECT prc) const
+{
+    if (!m_bBoundsValid)
+    {
+        const_cast<SPath_GDI *>(this)->UpdateBounds();
+    }
+    *prc = m_bounds;
+}
+
+void SPath_GDI::moveTo(float x, float y)
+{
+    PathCommand cmd;
+    cmd.type = PATH_CMD_MOVETO;
+    cmd.data.moveTo.x = x;
+    cmd.data.moveTo.y = y;
+    AddCommand(cmd);
+
+    m_lastPoint.fX = x;
+    m_lastPoint.fY = y;
+    m_bHasLastPoint = TRUE;
+    m_bBoundsValid = FALSE;
+}
+
+void SPath_GDI::rMoveTo(float dx, float dy)
+{
+    if (m_bHasLastPoint)
+    {
+        moveTo(m_lastPoint.fX + dx, m_lastPoint.fY + dy);
+    }
+    else
+    {
+        moveTo(dx, dy);
+    }
+}
+
+void SPath_GDI::lineTo(float x, float y)
+{
+    PathCommand cmd;
+    cmd.type = PATH_CMD_LINETO;
+    cmd.data.lineTo.x = x;
+    cmd.data.lineTo.y = y;
+    AddCommand(cmd);
+
+    m_lastPoint.fX = x;
+    m_lastPoint.fY = y;
+    m_bHasLastPoint = TRUE;
+    m_bBoundsValid = FALSE;
+}
+
+void SPath_GDI::rLineTo(float dx, float dy)
+{
+    if (m_bHasLastPoint)
+    {
+        lineTo(m_lastPoint.fX + dx, m_lastPoint.fY + dy);
+    }
+    else
+    {
+        lineTo(dx, dy);
+    }
+}
+
+void SPath_GDI::quadTo(float x1, float y1, float x2, float y2)
+{
+    // GDI doesn't have native quadratic Bezier support, so we approximate with cubic
+    // Convert quadratic to cubic Bezier
+    if (!m_bHasLastPoint)
+        return;
+
+    float x0 = m_lastPoint.fX;
+    float y0 = m_lastPoint.fY;
+
+    // Cubic control points for quadratic approximation
+    float cx1 = x0 + 2.0f / 3.0f * (x1 - x0);
+    float cy1 = y0 + 2.0f / 3.0f * (y1 - y0);
+    float cx2 = x2 + 2.0f / 3.0f * (x1 - x2);
+    float cy2 = y2 + 2.0f / 3.0f * (y1 - y2);
+
+    cubicTo(cx1, cy1, cx2, cy2, x2, y2);
+}
+
+void SPath_GDI::rQuadTo(float dx1, float dy1, float dx2, float dy2)
+{
+    if (m_bHasLastPoint)
+    {
+        quadTo(m_lastPoint.fX + dx1, m_lastPoint.fY + dy1, m_lastPoint.fX + dx2, m_lastPoint.fY + dy2);
+    }
+}
+
+void SPath_GDI::conicTo(float x1, float y1, float x2, float y2, float w)
+{
+    // GDI doesn't support conic curves, approximate with quadratic
+    quadTo(x1, y1, x2, y2);
+}
+
+void SPath_GDI::rConicTo(float dx1, float dy1, float dx2, float dy2, float w)
+{
+    if (m_bHasLastPoint)
+    {
+        conicTo(m_lastPoint.fX + dx1, m_lastPoint.fY + dy1, m_lastPoint.fX + dx2, m_lastPoint.fY + dy2, w);
+    }
+}
+
+void SPath_GDI::cubicTo(float x1, float y1, float x2, float y2, float x3, float y3)
+{
+    if (!m_bHasLastPoint)
+        return;
+
+    PathCommand cmd;
+    cmd.type = PATH_CMD_CUBICTO;
+    cmd.data.cubicTo.x1 = x1;
+    cmd.data.cubicTo.y1 = y1;
+    cmd.data.cubicTo.x2 = x2;
+    cmd.data.cubicTo.y2 = y2;
+    cmd.data.cubicTo.x3 = x3;
+    cmd.data.cubicTo.y3 = y3;
+    AddCommand(cmd);
+
+    m_lastPoint.fX = x3;
+    m_lastPoint.fY = y3;
+    m_bBoundsValid = FALSE;
+}
+
+void SPath_GDI::rCubicTo(float x1, float y1, float x2, float y2, float x3, float y3)
+{
+    if (m_bHasLastPoint)
+    {
+        cubicTo(m_lastPoint.fX + x1, m_lastPoint.fY + y1, m_lastPoint.fX + x2, m_lastPoint.fY + y2, m_lastPoint.fX + x3, m_lastPoint.fY + y3);
+    }
+}
+
+void SPath_GDI::addRect(const RECT *rect, Direction dir)
+{
+    addRect2((float)rect->left, (float)rect->top, (float)rect->right, (float)rect->bottom, dir);
+}
+
+void SPath_GDI::addRect2(float left, float top, float right, float bottom, Direction dir)
+{
+    PathCommand cmd;
+    cmd.type = PATH_CMD_ADDRECT;
+    cmd.data.addRect.left = left;
+    cmd.data.addRect.top = top;
+    cmd.data.addRect.right = right;
+    cmd.data.addRect.bottom = bottom;
+    cmd.data.addRect.dir = dir;
+    AddCommand(cmd);
+
+    m_bBoundsValid = FALSE;
+}
+
+void SPath_GDI::addOval(const RECT *oval, Direction dir)
+{
+    addOval2((float)oval->left, (float)oval->top, (float)oval->right, (float)oval->bottom, dir);
+}
+
+void SPath_GDI::addOval2(float left, float top, float right, float bottom, Direction dir)
+{
+    PathCommand cmd;
+    cmd.type = PATH_CMD_ADDOVAL;
+    cmd.data.addOval.left = left;
+    cmd.data.addOval.top = top;
+    cmd.data.addOval.right = right;
+    cmd.data.addOval.bottom = bottom;
+    cmd.data.addOval.dir = dir;
+    AddCommand(cmd);
+
+    // Update last point to bottom of ellipse
+    m_lastPoint.fX = (left + right) / 2.0f;
+    m_lastPoint.fY = bottom;
+    m_bHasLastPoint = TRUE;
+    m_bBoundsValid = FALSE;
+}
+
+void SPath_GDI::addCircle(float x, float y, float radius, Direction dir)
+{
+    addOval2(x - radius, y - radius, x + radius, y + radius, dir);
+}
+
+void SPath_GDI::addArc(const RECT *oval, float startAngle, float sweepAngle)
+{
+    addArc2((float)oval->left, (float)oval->top, (float)oval->right, (float)oval->bottom, startAngle, sweepAngle);
+}
+
+void SPath_GDI::addArc2(float left, float top, float right, float bottom, float startAngle, float sweepAngle)
+{
+    PathCommand cmd;
+    cmd.type = PATH_CMD_ADDARC;
+    cmd.data.addArc.left = left;
+    cmd.data.addArc.top = top;
+    cmd.data.addArc.right = right;
+    cmd.data.addArc.bottom = bottom;
+    cmd.data.addArc.startAngle = startAngle;
+    cmd.data.addArc.sweepAngle = sweepAngle;
+    AddCommand(cmd);
+
+    // Calculate end point for last point tracking
+    float centerX = (left + right) / 2.0f;
+    float centerY = (top + bottom) / 2.0f;
+    float radiusX = (right - left) / 2.0f;
+    float radiusY = (bottom - top) / 2.0f;
+    float endRad = (startAngle + sweepAngle) * 3.14159f / 180.0f;
+
+    m_lastPoint.fX = centerX + radiusX * cos(endRad);
+    m_lastPoint.fY = centerY - radiusY * sin(endRad);
+    m_bHasLastPoint = TRUE;
+    m_bBoundsValid = FALSE;
+}
+
+void SPath_GDI::addRoundRect(const RECT *rect, float rx, float ry, Direction dir)
+{
+    addRoundRect2((float)rect->left, (float)rect->top, (float)rect->right, (float)rect->bottom, rx, ry, dir);
+}
+
+void SPath_GDI::addRoundRect2(float left, float top, float right, float bottom, float rx, float ry, Direction dir)
+{
+    PathCommand cmd;
+    cmd.type = PATH_CMD_ADDROUNDRECT;
+    cmd.data.addRoundRect.left = left;
+    cmd.data.addRoundRect.top = top;
+    cmd.data.addRoundRect.right = right;
+    cmd.data.addRoundRect.bottom = bottom;
+    cmd.data.addRoundRect.rx = rx;
+    cmd.data.addRoundRect.ry = ry;
+    cmd.data.addRoundRect.dir = dir;
+    AddCommand(cmd);
+
+    // Update last point
+    m_lastPoint.fX = left;
+    m_lastPoint.fY = top;
+    m_bHasLastPoint = TRUE;
+    m_bBoundsValid = FALSE;
+}
+
+void SPath_GDI::addPoly(const POINT pts[], int count, BOOL close)
+{
+    if (count < 2)
+        return;
+
+    PathCommand cmd;
+    cmd.type = PATH_CMD_ADDPOLY;
+    cmd.addPoly.reset(new PathCommand::AddPolyData());
+    cmd.addPoly->close = close;
+    for (int i = 0; i < count; i++)
+    {
+        cmd.addPoly->points.Add(pts[i]);
+    }
+    AddCommand(cmd);
+
+    m_lastPoint.fX = (float)pts[count - 1].x;
+    m_lastPoint.fY = (float)pts[count - 1].y;
+    m_bHasLastPoint = TRUE;
+    m_bBoundsValid = FALSE;
+}
+
+void SPath_GDI::transform(const IxForm *matrix)
+{
+    if (!matrix)
+        return;
+
+    PathCommand cmd;
+    cmd.type = PATH_CMD_TRANSFORM;
+    for (int i = 0; i < 9; i++)
+    {
+        cmd.data.transform.matrix[i] = matrix->fMat[i];
+    }
+    AddCommand(cmd);
+
+    m_bBoundsValid = FALSE;
+}
+
+BOOL SPath_GDI::getLastPt(fPoint *lastPt) const
+{
+    if (!m_bHasLastPoint)
+        return FALSE;
+    *lastPt = m_lastPoint;
+    return TRUE;
+}
+
+void SPath_GDI::addString(LPCTSTR pszText, int nLen, float x, float y, const IFontS *pFont)
+{
+    if (!pszText || !pFont)
+        return;
+
+    PathCommand cmd;
+    cmd.type = PATH_CMD_ADDSTRING;
+    cmd.addString.reset(new PathCommand::AddStringData());
+    cmd.addString->stringText = pszText;
+    cmd.addString->stringX = x;
+    cmd.addString->stringY = y;
+    cmd.addString->stringFont = const_cast<IFontS *>(pFont);
+    AddCommand(cmd);
+
+    m_bBoundsValid = FALSE;
+}
+
+IPathS *SPath_GDI::clone() const
+{
+    SPath_GDI *pClone = new SPath_GDI(m_pRenderFactory);
+    pClone->m_fillType = m_fillType;
+    pClone->m_bounds = m_bounds;
+    pClone->m_bBoundsValid = m_bBoundsValid;
+    pClone->m_lastPoint = m_lastPoint;
+    pClone->m_bHasLastPoint = m_bHasLastPoint;
+
+    // Copy path data would require more complex implementation
+    // For now, return empty clone
+    return pClone;
+}
+
+BOOL SPath_GDI::beginFigure(float x, float y, BOOL bFill)
+{
+    PathCommand cmd;
+    cmd.type = PATH_CMD_BEGINFIGURE;
+    cmd.data.beginFigure.x = x;
+    cmd.data.beginFigure.y = y;
+    cmd.data.beginFigure.bFill = bFill;
+    AddCommand(cmd);
+
+    moveTo(x, y);
+    return TRUE;
+}
+
+BOOL SPath_GDI::endFigure(BOOL bClose)
+{
+    PathCommand cmd;
+    cmd.type = PATH_CMD_ENDFIGURE;
+    cmd.data.endFigure.bClose = bClose;
+    AddCommand(cmd);
+
+    return TRUE;
+}
+
+float SPath_GDI::getLength() const
+{
+    // GDI doesn't provide direct path length calculation
+    // This would require complex implementation
+    return 0.0f;
+}
+
+BOOL SPath_GDI::getPosTan(float distance, fPoint *pos, fPoint *vec) const
+{
+    // GDI doesn't provide direct path position/tangent calculation
+    return FALSE;
+}
+
+void SPath_GDI::close()
+{
+    PathCommand cmd;
+    cmd.type = PATH_CMD_CLOSE;
+    AddCommand(cmd);
+}
+
+BOOL SPath_GDI::hitTest(float x, float y) const
+{
+    HRGN hRgn = CreateRegionFromCommands();
+    if (!hRgn)
+        return FALSE;
+
+    BOOL bHit = PtInRegion(hRgn, (int)x, (int)y);
+    DeleteObject(hRgn);
+    return bHit;
+}
+
+BOOL SPath_GDI::hitTestStroke(float x, float y, float strokeSize) const
+{
+    // For stroke hit testing, we'd need to widen the path
+    // Simplified implementation using region
+    return hitTest(x, y);
+}
+
+BOOL SPath_GDI::op(const IPathS *other, PathOP op, IPathS *out) const
+{
+    // GDI doesn't provide direct path operations
+    return FALSE;
+}
+
+// Protected helper methods
+void SPath_GDI::AddCommand(const PathCommand &cmd)
+{
+    m_commands.Add(cmd);
+}
+
+HRGN SPath_GDI::CreateRegionFromCommands() const
+{
+    // Create a temporary memory DC to execute commands and create region
+    HDC hMemDC = CreateCompatibleDC(NULL);
+    if (!hMemDC)
+        return NULL;
+
+    ExecuteCommands(hMemDC);
+    HRGN hRgn = ::PathToRegion(hMemDC);
+
+    DeleteDC(hMemDC);
+    return hRgn;
+}
+
+void SPath_GDI::ExecuteCommands(HDC hdc) const
+{
+    if (!hdc)
+        return;
+
+    // Set fill mode based on current fill type
+    int fillMode = (m_fillType == kWinding_FillType) ? WINDING : ALTERNATE;
+    SetPolyFillMode(hdc, fillMode);
+
+    ::BeginPath(hdc);
+
+    for (int i = 0; i < m_commands.GetCount(); i++)
+    {
+        const PathCommand &cmd = m_commands[i];
+
+        switch (cmd.type)
+        {
+        case PATH_CMD_RESET:
+            ::AbortPath(hdc);
+            ::BeginPath(hdc);
+            break;
+
+        case PATH_CMD_MOVETO:
+            ::MoveToEx(hdc, (int)cmd.data.moveTo.x, (int)cmd.data.moveTo.y, NULL);
+            break;
+
+        case PATH_CMD_LINETO:
+            ::LineTo(hdc, (int)cmd.data.lineTo.x, (int)cmd.data.lineTo.y);
+            break;
+
+        case PATH_CMD_QUADTO:
+        {
+            // Convert quadratic to cubic Bezier
+            POINT currentPos;
+            GetCurrentPositionEx(hdc, &currentPos);
+
+            float x0 = (float)currentPos.x;
+            float y0 = (float)currentPos.y;
+            float x1 = cmd.data.quadTo.x1;
+            float y1 = cmd.data.quadTo.y1;
+            float x2 = cmd.data.quadTo.x2;
+            float y2 = cmd.data.quadTo.y2;
+
+            // Cubic control points for quadratic approximation
+            float cx1 = x0 + 2.0f / 3.0f * (x1 - x0);
+            float cy1 = y0 + 2.0f / 3.0f * (y1 - y0);
+            float cx2 = x2 + 2.0f / 3.0f * (x1 - x2);
+            float cy2 = y2 + 2.0f / 3.0f * (y1 - y2);
+
+            POINT pts[3];
+            pts[0].x = (LONG)cx1;
+            pts[0].y = (LONG)cy1;
+            pts[1].x = (LONG)cx2;
+            pts[1].y = (LONG)cy2;
+            pts[2].x = (LONG)x2;
+            pts[2].y = (LONG)y2;
+            ::PolyBezierTo(hdc, pts, 3);
+        }
+        break;
+
+        case PATH_CMD_CUBICTO:
+        {
+            POINT pts[3];
+            pts[0].x = (LONG)cmd.data.cubicTo.x1;
+            pts[0].y = (LONG)cmd.data.cubicTo.y1;
+            pts[1].x = (LONG)cmd.data.cubicTo.x2;
+            pts[1].y = (LONG)cmd.data.cubicTo.y2;
+            pts[2].x = (LONG)cmd.data.cubicTo.x3;
+            pts[2].y = (LONG)cmd.data.cubicTo.y3;
+            ::PolyBezierTo(hdc, pts, 3);
+        }
+        break;
+
+        case PATH_CMD_ADDRECT:
+        {
+            float left = cmd.data.addRect.left;
+            float top = cmd.data.addRect.top;
+            float right = cmd.data.addRect.right;
+            float bottom = cmd.data.addRect.bottom;
+            Direction dir = cmd.data.addRect.dir;
+
+            if (dir == kCW_Direction)
+            {
+                ::MoveToEx(hdc, (int)left, (int)top, NULL);
+                ::LineTo(hdc, (int)right, (int)top);
+                ::LineTo(hdc, (int)right, (int)bottom);
+                ::LineTo(hdc, (int)left, (int)bottom);
+                ::LineTo(hdc, (int)left, (int)top);
+            }
+            else
+            {
+                ::MoveToEx(hdc, (int)left, (int)top, NULL);
+                ::LineTo(hdc, (int)left, (int)bottom);
+                ::LineTo(hdc, (int)right, (int)bottom);
+                ::LineTo(hdc, (int)right, (int)top);
+                ::LineTo(hdc, (int)left, (int)top);
+            }
+        }
+        break;
+
+        case PATH_CMD_ADDOVAL:
+            ::Ellipse(hdc, (int)cmd.data.addOval.left, (int)cmd.data.addOval.top, (int)cmd.data.addOval.right, (int)cmd.data.addOval.bottom);
+            break;
+
+        case PATH_CMD_ADDCIRCLE:
+        {
+            float x = cmd.data.addCircle.x;
+            float y = cmd.data.addCircle.y;
+            float r = cmd.data.addCircle.radius;
+            ::Ellipse(hdc, (int)(x - r), (int)(y - r), (int)(x + r), (int)(y + r));
+        }
+        break;
+
+        case PATH_CMD_ADDARC:
+        {
+            float left = cmd.data.addArc.left;
+            float top = cmd.data.addArc.top;
+            float right = cmd.data.addArc.right;
+            float bottom = cmd.data.addArc.bottom;
+            float startAngle = cmd.data.addArc.startAngle;
+            float sweepAngle = cmd.data.addArc.sweepAngle;
+
+            // Convert angles and calculate points
+            float centerX = (left + right) / 2.0f;
+            float centerY = (top + bottom) / 2.0f;
+            float radiusX = (right - left) / 2.0f;
+            float radiusY = (bottom - top) / 2.0f;
+
+            float startRad = startAngle * 3.14159f / 180.0f;
+            float endRad = (startAngle + sweepAngle) * 3.14159f / 180.0f;
+
+            int xStart = (int)(centerX + radiusX * cos(startRad));
+            int yStart = (int)(centerY - radiusY * sin(startRad));
+            int xEnd = (int)(centerX + radiusX * cos(endRad));
+            int yEnd = (int)(centerY - radiusY * sin(endRad));
+
+            ::Arc(hdc, (int)left, (int)top, (int)right, (int)bottom, xStart, yStart, xEnd, yEnd);
+        }
+        break;
+
+        case PATH_CMD_ADDROUNDRECT:
+            ::RoundRect(hdc, (int)cmd.data.addRoundRect.left, (int)cmd.data.addRoundRect.top, (int)cmd.data.addRoundRect.right, (int)cmd.data.addRoundRect.bottom, (int)(cmd.data.addRoundRect.rx * 2), (int)(cmd.data.addRoundRect.ry * 2));
+            break;
+
+        case PATH_CMD_ADDPOLY:
+            if (cmd.addPoly && cmd.addPoly->points.GetCount() >= 2)
+            {
+                ::MoveToEx(hdc, cmd.addPoly->points[0].x, cmd.addPoly->points[0].y, NULL);
+                for (int j = 1; j < cmd.addPoly->points.GetCount(); j++)
+                {
+                    ::LineTo(hdc, cmd.addPoly->points[j].x, cmd.addPoly->points[j].y);
+                }
+                if (cmd.addPoly->close)
+                {
+                    ::LineTo(hdc, cmd.addPoly->points[0].x, cmd.addPoly->points[0].y);
+                }
+            }
+            break;
+
+        case PATH_CMD_ADDSTRING:
+            if (cmd.addString && !cmd.addString->stringText.IsEmpty() && cmd.addString->stringFont)
+            {
+                const SFont_GDI *pGdiFont = static_cast<const SFont_GDI *>((IFontS *)cmd.addString->stringFont);
+                HFONT hOldFont = (HFONT)SelectObject(hdc, pGdiFont->GetFont());
+
+                TextOut(hdc, (int)cmd.addString->stringX, (int)cmd.addString->stringY, cmd.addString->stringText, cmd.addString->stringText.GetLength());
+
+                SelectObject(hdc, hOldFont);
+            }
+            break;
+
+        case PATH_CMD_TRANSFORM:
+        {
+            XFORM xform;
+            xform.eM11 = cmd.data.transform.matrix[0]; // scaleX
+            xform.eM12 = cmd.data.transform.matrix[1]; // skewY
+            xform.eM21 = cmd.data.transform.matrix[3]; // skewX
+            xform.eM22 = cmd.data.transform.matrix[4]; // scaleY
+            xform.eDx = cmd.data.transform.matrix[6];  // translateX
+            xform.eDy = cmd.data.transform.matrix[7];  // translateY
+
+            SetGraphicsMode(hdc, GM_ADVANCED);
+            SetWorldTransform(hdc, &xform);
+        }
+        break;
+
+        case PATH_CMD_BEGINFIGURE:
+            // Begin figure is handled by the path system automatically
+            break;
+
+        case PATH_CMD_ENDFIGURE:
+            if (cmd.data.endFigure.bClose)
+            {
+                ::CloseFigure(hdc);
+            }
+            break;
+
+        case PATH_CMD_CLOSE:
+            ::CloseFigure(hdc);
+            break;
+        }
+    }
+
+    ::EndPath(hdc);
+}
+
+void SPath_GDI::UpdateBounds()
+{
+    HRGN hRgn = CreateRegionFromCommands();
+    if (hRgn)
+    {
+        GetRgnBox(hRgn, &m_bounds);
+        DeleteObject(hRgn);
+    }
+    else
+    {
+        SetRect(&m_bounds, 0, 0, 0, 0);
+    }
+
+    m_bBoundsValid = TRUE;
+}
+
+void SPath_GDI::offset(float dx, float dy)
+{
+    for (UINT i = 0; i < m_commands.GetCount(); i++)
+    {
+        PathCommand &cmd = m_commands[i];
+
+        switch (cmd.type)
+        {
+        case PATH_CMD_MOVETO:
+            cmd.data.moveTo.x += dx;
+            cmd.data.moveTo.y += dy;
+            break;
+
+        case PATH_CMD_LINETO:
+            cmd.data.lineTo.x += dx;
+            cmd.data.lineTo.y += dy;
+            break;
+
+        case PATH_CMD_QUADTO:
+            cmd.data.quadTo.x1 += dx;
+            cmd.data.quadTo.y1 += dy;
+            cmd.data.quadTo.x2 += dx;
+            cmd.data.quadTo.y2 += dy;
+            break;
+
+        case PATH_CMD_CUBICTO:
+            cmd.data.cubicTo.x1 += dx;
+            cmd.data.cubicTo.y1 += dy;
+            cmd.data.cubicTo.x2 += dx;
+            cmd.data.cubicTo.y2 += dy;
+            cmd.data.cubicTo.x3 += dx;
+            cmd.data.cubicTo.y3 += dy;
+            break;
+
+        case PATH_CMD_ADDRECT:
+            cmd.data.addRect.left += dx;
+            cmd.data.addRect.top += dy;
+            cmd.data.addRect.right += dx;
+            cmd.data.addRect.bottom += dy;
+            break;
+
+        case PATH_CMD_ADDOVAL:
+            cmd.data.addOval.left += dx;
+            cmd.data.addOval.top += dy;
+            cmd.data.addOval.right += dx;
+            cmd.data.addOval.bottom += dy;
+            break;
+
+        case PATH_CMD_ADDCIRCLE:
+            cmd.data.addCircle.x += dx;
+            cmd.data.addCircle.y += dy;
+            break;
+
+        case PATH_CMD_ADDARC:
+            cmd.data.addArc.left += dx;
+            cmd.data.addArc.top += dy;
+            cmd.data.addArc.right += dx;
+            cmd.data.addArc.bottom += dy;
+            break;
+
+        case PATH_CMD_ADDROUNDRECT:
+            cmd.data.addRoundRect.left += dx;
+            cmd.data.addRoundRect.top += dy;
+            cmd.data.addRoundRect.right += dx;
+            cmd.data.addRoundRect.bottom += dy;
+            break;
+
+        case PATH_CMD_ADDPOLY:
+            if (cmd.addPoly)
+            {
+                for (int j = 0; j < cmd.addPoly->points.GetCount(); j++)
+                {
+                    cmd.addPoly->points[j].x += (LONG)dx;
+                    cmd.addPoly->points[j].y += (LONG)dy;
+                }
+            }
+            break;
+
+        case PATH_CMD_ADDSTRING:
+            if (cmd.addString)
+            {
+                cmd.addString->stringX += dx;
+                cmd.addString->stringY += dy;
+            }
+            break;
+
+        case PATH_CMD_BEGINFIGURE:
+            cmd.data.beginFigure.x += dx;
+            cmd.data.beginFigure.y += dy;
+            break;
+
+        // 其他命令类型不需要处理坐标偏移
+        case PATH_CMD_RESET:
+        case PATH_CMD_TRANSFORM:
+        case PATH_CMD_ENDFIGURE:
+        case PATH_CMD_CLOSE:
+        case PATH_CMD_UNKNOWN:
+        default:
+            break;
+        }
+    }
+
+    // 更新最后点坐标
+    if (m_bHasLastPoint)
+    {
+        m_lastPoint.fX += dx;
+        m_lastPoint.fY += dy;
+    }
+
+    // 如果边界已计算，则也需要更新
+    if (m_bBoundsValid)
+    {
+        OffsetRect(&m_bounds, (int)dx, (int)dy);
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////
+//  DCBuffer
+//////////////////////////////////////////////////////////////////////////
+class DCBuffer {
+  public:
+    DCBuffer(HDC hdc, LPCRECT pRect, BYTE byAlpha, BOOL bCopyBits = TRUE)
+        : m_hdc(hdc)
+        , m_byAlpha(byAlpha)
+        , m_pRc(pRect)
+        , m_bCopyBits(bCopyBits)
+    {
+        m_nWid = pRect->right - pRect->left;
+        m_nHei = pRect->bottom - pRect->top;
+        m_hBmp = SBitmap_GDI::CreateGDIBitmap(m_nWid, m_nHei, (void **)&m_pBits);
+        m_hMemDC = ::CreateCompatibleDC(hdc);
+        ::SetBkMode(m_hMemDC, TRANSPARENT);
+        ::SelectObject(m_hMemDC, m_hBmp);
+        ::SetViewportOrgEx(m_hMemDC, -pRect->left, -pRect->top, NULL);
+        // 从原DC中获得画笔，画刷，字体，颜色等
+        m_hCurPen = ::SelectObject(hdc, GetStockObject(BLACK_PEN));
+        m_hCurBrush = ::SelectObject(hdc, GetStockObject(BLACK_BRUSH));
+        m_hCurFont = ::SelectObject(hdc, GetStockObject(DEFAULT_GUI_FONT));
+        COLORREF crCur = ::GetTextColor(hdc);
+
+        // 将画笔，画刷，字体设置到memdc里
+        ::SelectObject(m_hMemDC, m_hCurPen);
+        ::SelectObject(m_hMemDC, m_hCurBrush);
+        ::SelectObject(m_hMemDC, m_hCurFont);
+        ::SetTextColor(m_hMemDC, crCur);
+
+        if (m_bCopyBits)
+            ::BitBlt(m_hMemDC, pRect->left, pRect->top, m_nWid, m_nHei, m_hdc, pRect->left, pRect->top, SRCCOPY);
+        // 将alpha全部强制修改为0xFF。
+        BYTE *p = m_pBits + 3;
+        for (int i = 0; i < m_nHei; i++)
+            for (int j = 0; j < m_nWid; j++, p += 4)
+                *p = 0xFF;
+    }
+
+    ~DCBuffer()
+    {
+        // 将alpha为0xFF的改为0,同时将rgb值也清0(XP系统下不清0会导致背景变成白色）,为0的改为0xFF
+        BYTE *p = m_pBits + 3;
+        for (int i = 0; i < m_nHei; i++)
+            for (int j = 0; j < m_nWid; j++, p += 4)
+            {
+                if (*p == 0)
+                    *p = 0xff;
+                else
+                {
+                    memset(p - 3, 0, 4);
+                }
+            }
+        BLENDFUNCTION bf = { AC_SRC_OVER, 0, m_byAlpha, AC_SRC_ALPHA };
+        BOOL bRet = ::AlphaBlend(m_hdc, m_pRc->left, m_pRc->top, m_nWid, m_nHei, m_hMemDC, m_pRc->left, m_pRc->top, m_nWid, m_nHei, bf);
+        (void)bRet;
+        ::DeleteDC(m_hMemDC);
+        ::DeleteObject(m_hBmp);
+
+        // 恢复原DC的画笔，画刷，字体
+        ::SelectObject(m_hdc, m_hCurPen);
+        ::SelectObject(m_hdc, m_hCurBrush);
+        ::SelectObject(m_hdc, m_hCurFont);
+    }
+
+    operator HDC()
+    {
+        return m_hMemDC;
+    }
+
+  protected:
+    HDC m_hdc;
+    HDC m_hMemDC;
+    HBITMAP m_hBmp;
+    LPBYTE m_pBits;
+    BYTE m_byAlpha;
+    LPCRECT m_pRc;
+    int m_nWid, m_nHei;
+    BOOL m_bCopyBits;
+
+    HGDIOBJ m_hCurPen;
+    HGDIOBJ m_hCurBrush;
+    HGDIOBJ m_hCurFont;
+};
+
+//////////////////////////////////////////////////////////////////////////
+//	SRenderTarget_GDI
+//////////////////////////////////////////////////////////////////////////
+
+SRenderTarget_GDI::SRenderTarget_GDI(IRenderFactory *pRenderFactory, int nWid, int nHei)
+    : m_hdc(NULL)
+    , m_curColor(0xFF000000) // 默认黑色
+    , m_uGetDCFlag(0)
+{
+    m_pRenderFactory = pRenderFactory;
+
+    m_ptOrg.x = m_ptOrg.y = 0;
+
+    HDC hdc = ::GetDC(NULL);
+    m_hdc = CreateCompatibleDC(hdc);
+    ::ReleaseDC(NULL, hdc);
+    ::SetBkMode(m_hdc, TRANSPARENT);
+    ::SetGraphicsMode(m_hdc, GM_ADVANCED);
+    CreatePen(PS_SOLID, SColor(0, 0, 0).toCOLORREF(), 1, &m_defPen);
+    SelectObject(m_defPen, NULL);
+
+    CreateSolidColorBrush(SColor(0, 0, 0).toCOLORREF(), &m_defBrush);
+    SelectObject(m_defBrush, NULL);
+
+    m_defFont = pRenderFactory->GetDefFont();
+    SelectObject(m_defFont, NULL);
+
+    pRenderFactory->CreateBitmap(&m_defBmp);
+    m_defBmp->Init(nWid, nHei, NULL);
+    SelectObject(m_defBmp, NULL);
+}
+
+SRenderTarget_GDI::~SRenderTarget_GDI()
+{
+    DeleteDC(m_hdc);
+}
+
+HRESULT SRenderTarget_GDI::CreatePen(int iStyle, COLORREF cr, int cWidth, IPenS **ppPen)
+{
+    *ppPen = new SPen_GDI(m_pRenderFactory, iStyle, cr, cWidth);
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::CreateSolidColorBrush(COLORREF cr, IBrushS **ppBrush)
+{
+    *ppBrush = new SBrush_GDI(m_pRenderFactory, cr);
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::CreateBitmapBrush(IBitmapS *pBmp, TileMode xtm, TileMode ytm, IBrushS **ppBrush)
+{
+    SBitmap_GDI *pBmpSkia = (SBitmap_GDI *)pBmp;
+    (xtm), (ytm);
+    *ppBrush = new SBrush_GDI(m_pRenderFactory, pBmpSkia->GetBitmap());
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::CreateGradientBrush(THIS_ const GradientItem *pGradients, int nCount, const GradientInfo *info, BYTE byAlpha, TileMode tileMode, IBrushS **ppBrush)
+{
+    return E_NOTIMPL; // todo:hjx
+}
+
+HRESULT SRenderTarget_GDI::Resize(SIZE sz)
+{
+    HBITMAP hBmp = CreateCompatibleBitmap(m_hdc, 0, 0);
+    ::SelectObject(m_hdc, hBmp);
+    m_curBmp->Init(sz.cx, sz.cy, NULL);
+    ::SelectObject(m_hdc, m_curBmp->GetBitmap());
+    ::DeleteObject(hBmp);
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::PushClipRect(LPCRECT pRect, UINT mode /*=RGN_AND*/)
+{
+    RECT rc = *pRect;
+    ::OffsetRect(&rc, m_ptOrg.x, m_ptOrg.y);
+    HRGN hRgn = ::CreateRectRgnIndirect(&rc);
+    ::SaveDC(m_hdc);
+    ::ExtSelectClipRgn(m_hdc, hRgn, mode);
+    ::DeleteObject(hRgn);
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::PopClip()
+{
+    ::RestoreDC(m_hdc, -1);
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::ExcludeClipRect(LPCRECT pRc)
+{
+    ::ExcludeClipRect(m_hdc, pRc->left, pRc->top, pRc->right, pRc->bottom);
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::SaveClip(int *pnState)
+{
+    int nState = ::SaveDC(m_hdc);
+    if (pnState)
+        *pnState = nState;
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::RestoreClip(int nState /*=-1*/)
+{
+    ::RestoreDC(m_hdc, nState);
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::PushClipRegion(IRegionS *pRegion, UINT mode /*=RGN_AND*/)
+{
+    SRegion_GDI *pRgnGDI = (SRegion_GDI *)pRegion;
+    HRGN hRgn = ::CreateRectRgn(0, 0, 0, 0);
+    ::CombineRgn(hRgn, pRgnGDI->GetRegion(), NULL, RGN_COPY);
+    ::OffsetRgn(hRgn, m_ptOrg.x, m_ptOrg.y);
+    ::SaveDC(m_hdc);
+    ::ExtSelectClipRgn(m_hdc, hRgn, mode);
+    ::DeleteObject(hRgn);
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::GetClipRegion(IRegionS **ppRegion)
+{
+    SRegion_GDI *pRgn = new SRegion_GDI(m_pRenderFactory);
+    ::GetClipRgn(m_hdc, pRgn->GetRegion());
+    POINT pt = { -m_ptOrg.x, -m_ptOrg.y };
+    pRgn->Offset(pt);
+    *ppRegion = pRgn;
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::GetClipBox(LPRECT prc)
+{
+    ::GetClipBox(m_hdc, prc);
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::BitBlt(LPCRECT pRcDest, IRenderTarget *pRTSour, int xSrc, int ySrc, DWORD dwRop /*=SRCCOPY*/)
+{
+    switch (dwRop)
+    {
+    case kSrcCopy:
+    case kDstInvert:
+    case kSrcInvert:
+    case kSrcAnd:
+        break;
+    default:
+        return E_INVALIDARG;
+    }
+    SRenderTarget_GDI *pRTSrc_GDI = (SRenderTarget_GDI *)pRTSour;
+
+    ALPHAINFO ai;
+    //        if(dwRop!=SRCCOPY)
+    CGdiAlpha::AlphaBackup(m_hdc, pRcDest, ai);
+    ::BitBlt(m_hdc, pRcDest->left, pRcDest->top, pRcDest->right - pRcDest->left, pRcDest->bottom - pRcDest->top, pRTSrc_GDI->m_hdc, xSrc, ySrc, dwRop);
+    //        if(dwRop!=SRCCOPY)
+    CGdiAlpha::AlphaRestore(ai);
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::DrawText(LPCTSTR pszText, int cchLen, LPRECT pRc, UINT uFormat)
+{
+    if (uFormat & DT_CALCRECT)
+    {
+        int nRet = ::DrawText(m_hdc, pszText, cchLen, pRc, uFormat);
+        if (!nRet)
+        {
+            pRc->right = pRc->left;
+            pRc->bottom = pRc->top;
+        }
+        return S_OK;
+    }
+
+    if (cchLen == 0)
+        return S_OK;
+
+    {
+        DCBuffer dcBuf(m_hdc, pRc, m_curColor.a);
+        ::DrawText(dcBuf, pszText, cchLen, pRc, uFormat);
+    }
+
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::MeasureText(LPCTSTR pszText, int cchLen, SIZE *psz)
+{
+    if (cchLen < 0)
+        cchLen = (int)_tcslen(pszText);
+    ::GetTextExtentPoint32(m_hdc, pszText, cchLen, psz);
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::GetFontMetrics(TEXTMETRIC *ptm)
+{
+    ::GetTextMetrics(m_hdc, ptm);
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::DrawRectangle(LPCRECT pRect)
+{
+    if (!m_curPen)
+        return E_INVALIDARG;
+
+    RECT rcBuf = *pRect;
+    if (m_curPen->GetWidth() == 1)
+    {
+        rcBuf.right--;
+        rcBuf.bottom--;
+    }
+    else
+    {
+        ::InflateRect(&rcBuf, -m_curPen->GetWidth() / 2, -m_curPen->GetWidth() / 2);
+    }
+    ALPHAINFO ai;
+    CGdiAlpha::AlphaBackup(m_hdc, pRect, ai);
+    HGDIOBJ oldBr = ::SelectObject(m_hdc, GetStockObject(NULL_BRUSH));
+    ::Rectangle(m_hdc, rcBuf.left, rcBuf.top, rcBuf.right, rcBuf.bottom);
+    CGdiAlpha::AlphaRestore(ai);
+    ::SelectObject(m_hdc, oldBr);
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::FillRectangle(LPCRECT pRect)
+{
+    BYTE byAlpha = 0xFF;
+    if (m_curBrush->GetBrushType() == Brush_Color)
+        byAlpha = GetAValue(m_curBrush->GetColor());
+
+    DCBuffer dcBuf(m_hdc, pRect, byAlpha, FALSE);
+
+    HGDIOBJ oldPen = ::SelectObject(dcBuf, GetStockObject(NULL_PEN));
+    ::Rectangle(dcBuf, pRect->left, pRect->top, pRect->right, pRect->bottom);
+    ::SelectObject(dcBuf, oldPen);
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::DrawRoundRect(LPCRECT pRect, POINT pt)
+{
+    DCBuffer dcBuf(m_hdc, pRect, GetAValue(m_curPen->GetColor()));
+    HGDIOBJ oldBr = ::SelectObject(dcBuf, GetStockObject(NULL_BRUSH));
+    ::RoundRect(dcBuf, pRect->left, pRect->top, pRect->right, pRect->bottom, pt.x * 2, pt.y * 2);
+    ::SelectObject(dcBuf, oldBr);
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::FillRoundRect(LPCRECT pRect, POINT pt)
+{
+    BYTE byAlpha = 0xFF;
+    if (m_curBrush->GetBrushType() == Brush_Color)
+        byAlpha = GetAValue(m_curBrush->GetColor());
+    DCBuffer dcBuf(m_hdc, pRect, byAlpha);
+
+    HGDIOBJ oldPen = ::SelectObject(dcBuf, GetStockObject(NULL_PEN));
+    ::RoundRect(dcBuf, pRect->left, pRect->top, pRect->right, pRect->bottom, pt.x * 2, pt.y * 2);
+    ::SelectObject(dcBuf, oldPen);
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::FillSolidRoundRect(LPCRECT pRect, POINT pt, COLORREF cr)
+{
+    DCBuffer dcBuf(m_hdc, pRect, GetAValue(cr), FALSE);
+    HBRUSH br = ::CreateSolidBrush(cr & 0x00ffffff);
+    HGDIOBJ oldObj = ::SelectObject(dcBuf, br);
+    HGDIOBJ oldPen = ::SelectObject(dcBuf, GetStockObject(NULL_PEN));
+    ::RoundRect(dcBuf, pRect->left, pRect->top, pRect->right, pRect->bottom, pt.x * 2, pt.y * 2);
+    ::SelectObject(dcBuf, oldPen);
+    ::SelectObject(dcBuf, oldObj);
+    ::DeleteObject(br);
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::DrawLines(LPPOINT pPt, size_t nCount)
+{
+    RECT rc = { 100000, 100000, 0, 0 };
+    for (size_t i = 0; i < nCount; i++)
+    {
+        if (pPt[i].x < rc.left)
+            rc.left = pPt[i].x;
+        if (pPt[i].x > rc.right)
+            rc.right = pPt[i].x;
+        if (pPt[i].y < rc.top)
+            rc.top = pPt[i].y;
+        if (pPt[i].y > rc.bottom)
+            rc.bottom = pPt[i].y;
+    }
+    rc.left -= 1;
+    rc.top -= 1;
+    int nPenWidth = 1;
+    if (m_curPen)
+        nPenWidth = m_curPen->GetWidth();
+    rc.bottom += nPenWidth;
+    rc.right += nPenWidth;
+
+    DCBuffer dcBuf(m_hdc, &rc, GetAValue(m_curPen->GetColor()));
+    ::Polyline(dcBuf, pPt, (int)nCount);
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::DrawPolygon(LPPOINT pPt, size_t nCount)
+{
+    if (!pPt || nCount < 3)
+        return E_INVALIDARG;
+
+    RECT rc = { 100000, 100000, 0, 0 };
+    for (size_t i = 0; i < nCount; i++)
+    {
+        if (pPt[i].x < rc.left)
+            rc.left = pPt[i].x;
+        if (pPt[i].x > rc.right)
+            rc.right = pPt[i].x;
+        if (pPt[i].y < rc.top)
+            rc.top = pPt[i].y;
+        if (pPt[i].y > rc.bottom)
+            rc.bottom = pPt[i].y;
+    }
+    rc.left -= 1;
+    rc.top -= 1;
+    int nPenWidth = 1;
+    if (m_curPen)
+        nPenWidth = m_curPen->GetWidth();
+    rc.bottom += nPenWidth;
+    rc.right += nPenWidth;
+
+    DCBuffer dcBuf(m_hdc, &rc, GetAValue(m_curPen->GetColor()));
+
+    // Select null brush to draw outline only
+    HBRUSH hOldBrush = (HBRUSH)::SelectObject(dcBuf, ::GetStockObject(NULL_BRUSH));
+    ::Polygon(dcBuf, pPt, (int)nCount);
+    ::SelectObject(dcBuf, hOldBrush);
+
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::FillPolygon(LPPOINT pPt, size_t nCount)
+{
+    if (!pPt || nCount < 3)
+        return E_INVALIDARG;
+
+    RECT rc = { 100000, 100000, 0, 0 };
+    for (size_t i = 0; i < nCount; i++)
+    {
+        if (pPt[i].x < rc.left)
+            rc.left = pPt[i].x;
+        if (pPt[i].x > rc.right)
+            rc.right = pPt[i].x;
+        if (pPt[i].y < rc.top)
+            rc.top = pPt[i].y;
+        if (pPt[i].y > rc.bottom)
+            rc.bottom = pPt[i].y;
+    }
+    rc.left -= 1;
+    rc.top -= 1;
+    rc.bottom += 1;
+    rc.right += 1;
+
+    DCBuffer dcBuf(m_hdc, &rc, GetAValue(m_curBrush->GetColor()));
+
+    // Select null pen to fill without outline
+    HPEN hOldPen = (HPEN)::SelectObject(dcBuf, ::GetStockObject(NULL_PEN));
+    ::Polygon(dcBuf, pPt, (int)nCount);
+    ::SelectObject(dcBuf, hOldPen);
+
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::TextOut(int x, int y, LPCTSTR lpszString, int nCount)
+{
+    if (nCount < 0)
+        nCount = (int)_tcslen(lpszString);
+    SIZE sz;
+    MeasureText(lpszString, nCount, &sz);
+    int escape = m_curFont->LogFont()->lfEscapement;
+    if (escape != 0)
+    {
+        // calc bound rect
+        RECT rc;
+        if (escape == 900)
+        {
+            RECT rc2 = { x, y - sz.cx, x + sz.cy, y };
+            rc = rc2;
+        }
+        else if (escape == 1800)
+        {
+            RECT rc2 = { x - sz.cx, y - sz.cy, x, y };
+            rc = rc2;
+        }
+        else if (escape == 2700)
+        {
+            RECT rc2 = { x - sz.cy, y, x, y + sz.cx };
+            rc = rc2;
+        }
+        else
+        {
+            RECT rc2 = { 0, 0, (long)m_curBmp->Width(), (long)m_curBmp->Height() };
+            rc = rc2;
+        }
+        DCBuffer dcBuf(m_hdc, &rc, m_curColor.a);
+        ::TextOut(dcBuf, x, y, lpszString, nCount);
+    }
+    else
+    {
+        RECT rc = { x, y, x + sz.cx, y + sz.cy };
+        DCBuffer dcBuf(m_hdc, &rc, m_curColor.a);
+        ::TextOut(dcBuf, x, y, lpszString, nCount);
+    }
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::DrawIconEx(int xLeft, int yTop, HICON hIcon, int cxWidth, int cyWidth, UINT diFlags)
+{
+    ICONINFO ii = { 0 };
+    ::GetIconInfo(hIcon, &ii);
+    SASSERT(ii.hbmColor);
+    BITMAP bm;
+    ::GetObject(ii.hbmColor, sizeof(bm), &bm);
+
+    ALPHAINFO ai;
+    RECT rc = { xLeft, yTop, xLeft + cxWidth, yTop + cyWidth };
+    if (bm.bmBitsPixel != 32)
+    {
+        CGdiAlpha::AlphaBackup(m_hdc, &rc, ai);
+    }
+    BOOL bRet = ::DrawIconEx(m_hdc, xLeft, yTop, hIcon, cxWidth, cyWidth, 0, NULL, diFlags);
+
+    if (bm.bmBitsPixel != 32)
+    {
+        CGdiAlpha::AlphaRestore(ai);
+    }
+
+    if (ii.hbmColor)
+        DeleteObject(ii.hbmColor);
+    if (ii.hbmMask)
+        DeleteObject(ii.hbmMask);
+
+    return bRet ? S_OK : S_FALSE;
+}
+
+HRESULT SRenderTarget_GDI::DrawBitmap(LPCRECT pRcDest, const IBitmapS *pBitmap, int xSrc, int ySrc, BYTE byAlpha /*=0xFF*/)
+{
+    SBitmap_GDI *pBmp = (SBitmap_GDI *)pBitmap;
+    HBITMAP bmp = pBmp->GetBitmap();
+    HDC hmemdc = CreateCompatibleDC(m_hdc);
+    ::SelectObject(hmemdc, bmp);
+    SIZE szBmp = pBmp->Size();
+
+    BLENDFUNCTION bf = { AC_SRC_OVER, 0, byAlpha, AC_SRC_ALPHA };
+    int nWid = smin(pRcDest->right - pRcDest->left, szBmp.cx);
+    int nHei = smin(pRcDest->bottom - pRcDest->top, szBmp.cy);
+
+    BOOL bOK = ::AlphaBlend(m_hdc, pRcDest->left, pRcDest->top, nWid, nHei, hmemdc, xSrc, ySrc, nWid, nHei, bf);
+    DeleteDC(hmemdc);
+
+    return bOK ? S_OK : E_FAIL;
+}
+
+HRESULT SRenderTarget_GDI::AlphaBlend(LPCRECT pRcDest, IRenderTarget *pRTSrc, LPCRECT pRcSrc, BYTE byAlpha)
+{
+    BLENDFUNCTION bf = { AC_SRC_OVER, 0, byAlpha, AC_SRC_ALPHA };
+    SRenderTarget_GDI *pRTGdiSrc = (SRenderTarget_GDI *)pRTSrc;
+    BOOL bOK = ::AlphaBlend(m_hdc, pRcDest->left, pRcDest->top, pRcDest->right - pRcDest->left, pRcDest->bottom - pRcDest->top, pRTGdiSrc->m_hdc, pRcSrc->left, pRcSrc->top, pRcSrc->right - pRcSrc->left, pRcSrc->bottom - pRcSrc->top, bf);
+    return bOK ? S_OK : E_FAIL;
+}
+
+HRESULT SRenderTarget_GDI::DrawBitmapEx(LPCRECT pRcDest, const IBitmapS *pBitmap, LPCRECT pRcSrc, UINT expendMode, BYTE byAlpha /*=0xFF*/)
+{
+    UINT expandModeLow = LOWORD(expendMode);
+
+    if (expandModeLow == EM_NULL)
+        return DrawBitmap(pRcDest, pBitmap, pRcSrc->left, pRcSrc->top, byAlpha);
+
+    SBitmap_GDI *pBmp = (SBitmap_GDI *)pBitmap;
+    HBITMAP bmp = pBmp->GetBitmap();
+    HDC hmemdc = CreateCompatibleDC(m_hdc);
+    ::SelectObject(hmemdc, bmp);
+
+    BLENDFUNCTION bf = { AC_SRC_OVER, 0, byAlpha, AC_SRC_ALPHA };
+    if (expandModeLow == EM_STRETCH)
+    {
+        ::AlphaBlend(m_hdc, pRcDest->left, pRcDest->top, pRcDest->right - pRcDest->left, pRcDest->bottom - pRcDest->top, hmemdc, pRcSrc->left, pRcSrc->top, pRcSrc->right - pRcSrc->left, pRcSrc->bottom - pRcSrc->top, bf);
+    }
+    else
+    {
+        ::SaveDC(m_hdc);
+        ::IntersectClipRect(m_hdc, pRcDest->left, pRcDest->top, pRcDest->right, pRcDest->bottom);
+        int nWid = pRcSrc->right - pRcSrc->left;
+        int nHei = pRcSrc->bottom - pRcSrc->top;
+        for (int y = pRcDest->top; y < pRcDest->bottom; y += nHei)
+        {
+            for (int x = pRcDest->left; x < pRcDest->right; x += nWid)
+            {
+                ::AlphaBlend(m_hdc, x, y, nWid, nHei, hmemdc, pRcSrc->left, pRcSrc->top, nWid, nHei, bf);
+            }
+        }
+        ::RestoreDC(m_hdc, -1);
+    }
+    DeleteDC(hmemdc);
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::DrawBitmap9Patch(LPCRECT pRcDest, const IBitmapS *pBitmap, LPCRECT pRcSrc, LPCRECT pRcSourMargin, UINT expendMode, BYTE byAlpha /*=0xFF*/)
+{
+    int xDest[4] = { pRcDest->left, pRcDest->left + pRcSourMargin->left, pRcDest->right - pRcSourMargin->right, pRcDest->right };
+    int xSrc[4] = { pRcSrc->left, pRcSrc->left + pRcSourMargin->left, pRcSrc->right - pRcSourMargin->right, pRcSrc->right };
+    int yDest[4] = { pRcDest->top, pRcDest->top + pRcSourMargin->top, pRcDest->bottom - pRcSourMargin->bottom, pRcDest->bottom };
+    int ySrc[4] = { pRcSrc->top, pRcSrc->top + pRcSourMargin->top, pRcSrc->bottom - pRcSourMargin->bottom, pRcSrc->bottom };
+
+    // 首先保证九宫分割正常
+    if (!(xSrc[0] <= xSrc[1] && xSrc[1] <= xSrc[2] && xSrc[2] <= xSrc[3]))
+        return S_FALSE;
+    if (!(ySrc[0] <= ySrc[1] && ySrc[1] <= ySrc[2] && ySrc[2] <= ySrc[3]))
+        return S_FALSE;
+
+    // 调整目标位置
+    int nDestWid = pRcDest->right - pRcDest->left;
+    int nDestHei = pRcDest->bottom - pRcDest->top;
+
+    if ((pRcSourMargin->left + pRcSourMargin->right) > nDestWid)
+    { // 边缘宽度大于目标宽度的处理
+        if (pRcSourMargin->left >= nDestWid)
+        { // 只绘制左边部分
+            xSrc[1] = xSrc[2] = xSrc[3] = xSrc[0] + nDestWid;
+            xDest[1] = xDest[2] = xDest[3] = xDest[0] + nDestWid;
+        }
+        else if (pRcSourMargin->right >= nDestWid)
+        { // 只绘制右边部分
+            xSrc[0] = xSrc[1] = xSrc[2] = xSrc[3] - nDestWid;
+            xDest[0] = xDest[1] = xDest[2] = xDest[3] - nDestWid;
+        }
+        else
+        { // 先绘制左边部分，剩余的用右边填充
+            int nRemain = xDest[3] - xDest[1];
+            xSrc[2] = xSrc[3] - nRemain;
+            xDest[2] = xDest[3] - nRemain;
+        }
+    }
+
+    if (pRcSourMargin->top + pRcSourMargin->bottom > nDestHei)
+    {
+        if (pRcSourMargin->top >= nDestHei)
+        { // 只绘制上边部分
+            ySrc[1] = ySrc[2] = ySrc[3] = ySrc[0] + nDestHei;
+            yDest[1] = yDest[2] = yDest[3] = yDest[0] + nDestHei;
+        }
+        else if (pRcSourMargin->bottom >= nDestHei)
+        { // 只绘制下边部分
+            ySrc[0] = ySrc[1] = ySrc[2] = ySrc[3] - nDestHei;
+            yDest[0] = yDest[1] = yDest[2] = yDest[3] - nDestHei;
+        }
+        else
+        { // 先绘制左边部分，剩余的用右边填充
+            int nRemain = yDest[3] - yDest[1];
+            ySrc[2] = ySrc[3] - nRemain;
+            yDest[2] = yDest[3] - nRemain;
+        }
+    }
+
+    // 定义绘制模式
+    UINT mode[3][3] = { { EM_NULL, expendMode, EM_NULL }, { expendMode, expendMode, expendMode }, { EM_NULL, expendMode, EM_NULL } };
+
+    for (int y = 0; y < 3; y++)
+    {
+        if (ySrc[y] == ySrc[y + 1])
+            continue;
+        for (int x = 0; x < 3; x++)
+        {
+            if (xSrc[x] == xSrc[x + 1])
+                continue;
+            RECT rcSrc = { xSrc[x], ySrc[y], xSrc[x + 1], ySrc[y + 1] };
+            RECT rcDest = { xDest[x], yDest[y], xDest[x + 1], yDest[y + 1] };
+            DrawBitmapEx(&rcDest, pBitmap, &rcSrc, mode[y][x], byAlpha);
+        }
+    }
+
+    return S_OK;
+}
+
+IRenderObj *SRenderTarget_GDI::GetCurrentObject(OBJTYPE uType)
+{
+    IRenderObj *pRet = NULL;
+    switch (uType)
+    {
+    case OT_BITMAP:
+        pRet = m_curBmp;
+        break;
+    case OT_PEN:
+        pRet = m_curPen;
+        break;
+    case OT_BRUSH:
+        pRet = m_curBrush;
+        break;
+    case OT_FONT:
+        pRet = m_curFont;
+        break;
+    }
+    return pRet;
+}
+
+HRESULT SRenderTarget_GDI::SelectDefaultObject(OBJTYPE objType, IRenderObj **ppOldObj)
+{
+    IRenderObj *pDefObj = NULL;
+    switch (objType)
+    {
+    case OT_BITMAP:
+        pDefObj = m_defBmp;
+        break;
+    case OT_PEN:
+        pDefObj = m_defPen;
+        break;
+    case OT_BRUSH:
+        pDefObj = m_defBrush;
+        break;
+    case OT_FONT:
+        pDefObj = m_defFont;
+        break;
+    default:
+        return E_INVALIDARG;
+    }
+    if (pDefObj == GetCurrentObject(objType))
+        return S_FALSE;
+    return SelectObject(pDefObj, ppOldObj);
+}
+
+HRESULT SRenderTarget_GDI::SelectObject(IRenderObj *pObj, IRenderObj **ppOldObj /*= NULL*/)
+{
+    SAutoRefPtr<IRenderObj> pRet;
+    switch (pObj->ObjectType())
+    {
+    case OT_BITMAP:
+        pRet = m_curBmp;
+        m_curBmp = (SBitmap_GDI *)pObj;
+        ::SelectObject(m_hdc, m_curBmp->GetBitmap());
+        break;
+    case OT_PEN:
+        pRet = m_curPen;
+        m_curPen = (SPen_GDI *)pObj;
+        ::SelectObject(m_hdc, m_curPen->GetPen());
+        break;
+    case OT_BRUSH:
+        pRet = m_curBrush;
+        m_curBrush = (SBrush_GDI *)pObj;
+        ::SelectObject(m_hdc, m_curBrush->GetBrush());
+        break;
+    case OT_FONT:
+        pRet = m_curFont;
+        m_curFont = (SFont_GDI *)pObj;
+        ::SelectObject(m_hdc, m_curFont->GetFont());
+        break;
+    }
+    if (pRet && ppOldObj)
+    { // 由调用者调用Release释放该RenderObj
+        pRet->AddRef();
+        *ppOldObj = pRet;
+    }
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::OffsetViewportOrg(int xOff, int yOff, LPPOINT lpPoint)
+{
+    if (lpPoint)
+    {
+        *lpPoint = m_ptOrg;
+    }
+    m_ptOrg.x += xOff;
+    m_ptOrg.y += yOff;
+    ::SetViewportOrgEx(m_hdc, m_ptOrg.x, m_ptOrg.y, NULL);
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::GetViewportOrg(LPPOINT lpPoint)
+{
+    if (lpPoint)
+    {
+        *lpPoint = m_ptOrg;
+    }
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::SetViewportOrg(POINT pt)
+{
+    m_ptOrg = pt;
+    ::SetViewportOrgEx(m_hdc, m_ptOrg.x, m_ptOrg.y, NULL);
+    return S_OK;
+}
+
+HDC SRenderTarget_GDI::GetDC(UINT uFlag)
+{
+    m_uGetDCFlag = uFlag;
+    return m_hdc;
+}
+
+void SRenderTarget_GDI::ReleaseDC(HDC hdc, LPCRECT pRc)
+{
+    if (hdc == m_hdc)
+    {
+        m_uGetDCFlag = 0;
+    }
+}
+
+HRESULT SRenderTarget_GDI::DrawGradientRect(THIS_ LPCRECT pRect, BOOL bVert, POINT ptRoundCorner, const GradientItem *pGradients, int nCount, BYTE byAlpha)
+{
+    DCBuffer dcBuf(m_hdc, pRect, byAlpha, FALSE);
+    if (ptRoundCorner.x == 0 && ptRoundCorner.y == 0)
+    {
+        GradientFillRect(dcBuf, pRect, pGradients, nCount, bVert, 0xFF);
+    }
+    else
+    {
+        int wid = pRect->right - pRect->left;
+        int hei = pRect->bottom - pRect->top;
+        HBITMAP hBmp = SBitmap_GDI::CreateGDIBitmap(wid, hei, NULL);
+        HDC hMemDC = ::CreateCompatibleDC(m_hdc);
+        ::SetBkMode(hMemDC, TRANSPARENT);
+        HGDIOBJ hOldBmp = ::SelectObject(hMemDC, hBmp);
+        ::SetViewportOrgEx(hMemDC, -pRect->left, -pRect->top, NULL);
+        GradientFillRect(hMemDC, pRect, pGradients, nCount, bVert, 0xFF);
+        ::SelectObject(hMemDC, hOldBmp);
+        DeleteDC(hMemDC);
+
+        HBRUSH hbr = ::CreatePatternBrush(hBmp);
+
+        HGDIOBJ oldBr = ::SelectObject(dcBuf, hbr);
+        ::SelectObject(dcBuf, GetStockObject(NULL_PEN));
+        ::RoundRect(dcBuf, pRect->left, pRect->top, pRect->right, pRect->bottom, ptRoundCorner.x * 2, ptRoundCorner.y * 2);
+        ::SelectObject(dcBuf, oldBr);
+        ::DeleteObject(hbr);
+        ::DeleteObject(hBmp);
+    }
+    return S_OK;
+}
+
+// 通过一个内存位图来填充位置的alpha值
+HRESULT SRenderTarget_GDI::FillSolidRect(LPCRECT pRect, COLORREF cr)
+{
+    DCBuffer dcBuf(m_hdc, pRect, GetAValue(cr), FALSE);
+    HBRUSH br = ::CreateSolidBrush(cr & 0x00ffffff);
+    ::FillRect(dcBuf, pRect, br);
+    ::DeleteObject(br);
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::ClearRect(LPCRECT pRect, COLORREF cr)
+{
+    int nWid = pRect->right - pRect->left;
+    int nHei = pRect->bottom - pRect->top;
+    if (nWid == 0 || nHei == 0)
+        return S_OK;
+
+    LPDWORD pBits;
+    HBITMAP hBmp = SBitmap_GDI::CreateGDIBitmap(nWid, nHei, (void **)&pBits);
+    HDC hMemDC = CreateCompatibleDC(m_hdc);
+    ::SelectObject(hMemDC, hBmp);
+
+    SColor color(cr);
+    DWORD dwColor = color.toARGB();
+
+    for (int i = 0; i < nHei; i++)
+        for (int j = 0; j < nWid; j++)
+            *pBits++ = dwColor;
+
+    ::BitBlt(m_hdc, pRect->left, pRect->top, nWid, nHei, hMemDC, 0, 0, SRCCOPY);
+    ::DeleteDC(hMemDC);
+    ::DeleteObject(hBmp);
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::InvertRect(LPCRECT pRect)
+{
+    return ::InvertRect(m_hdc, pRect) ? S_OK : E_UNEXPECTED;
+}
+
+HRESULT SRenderTarget_GDI::DrawEllipse(LPCRECT pRect)
+{
+    if (!m_curPen)
+        return E_INVALIDARG;
+    RECT rcBuf = *pRect;
+    ::InflateRect(&rcBuf, m_curPen->GetWidth() / 2, m_curPen->GetWidth() / 2);
+    DCBuffer dcBuf(m_hdc, &rcBuf, GetAValue(m_curPen->GetColor()));
+    ::SelectObject(dcBuf, (HBRUSH)GetStockObject(NULL_BRUSH));
+    ::Ellipse(dcBuf, pRect->left, pRect->top, pRect->right, pRect->bottom);
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::FillEllipse(LPCRECT pRect)
+{
+    BYTE byAlpha = 0xFF;
+    if (m_curBrush->GetBrushType() == Brush_Color)
+        byAlpha = GetAValue(m_curBrush->GetColor());
+    DCBuffer dcBuf(m_hdc, pRect, byAlpha);
+    HGDIOBJ oldPen = ::SelectObject(dcBuf, GetStockObject(NULL_PEN));
+    ::Ellipse(dcBuf, pRect->left, pRect->top, pRect->right, pRect->bottom);
+    ::SelectObject(dcBuf, oldPen);
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::FillSolidEllipse(LPCRECT pRect, COLORREF cr)
+{
+    DCBuffer dcBuf(m_hdc, pRect, GetAValue(cr), FALSE);
+    HBRUSH br = ::CreateSolidBrush(cr & 0x00ffffff);
+    HGDIOBJ oldObj = ::SelectObject(dcBuf, br);
+    HGDIOBJ oldPen = ::SelectObject(dcBuf, GetStockObject(NULL_PEN));
+    ::Ellipse(dcBuf, pRect->left, pRect->top, pRect->right, pRect->bottom);
+    ::SelectObject(dcBuf, oldPen);
+    ::SelectObject(dcBuf, oldObj);
+    ::DeleteObject(br);
+    return S_OK;
+}
+
+const float PI = 3.1415926f;
+
+HRESULT SRenderTarget_GDI::DrawArc(LPCRECT pRect, float startAngle, float sweepAngle, BOOL useCenter)
+{
+    if (!m_curPen)
+        return E_INVALIDARG;
+    if (sweepAngle == 0)
+        return S_OK;
+    RECT rcBuf = *pRect;
+    ::InflateRect(&rcBuf, m_curPen->GetWidth() / 2, m_curPen->GetWidth() / 2);
+    DCBuffer dcBuf(m_hdc, &rcBuf, GetAValue(m_curPen->GetColor()));
+
+    HGDIOBJ oldBr = ::SelectObject(dcBuf, GetStockObject(NULL_BRUSH));
+    POINT ptCenter = { (pRect->left + pRect->right) / 2, (pRect->top + pRect->bottom) / 2 };
+    int a = ptCenter.x - pRect->left, b = ptCenter.y - pRect->top;
+    POINT pt1, pt2;
+    float startAngle2 = startAngle * PI / 180.0f;
+    float endAngle2 = (startAngle + sweepAngle) * PI / 180.0f;
+    pt1.x = ptCenter.x + (int)(a * cos(startAngle2));
+    pt1.y = ptCenter.y + (int)(b * sin(startAngle2));
+    pt2.x = ptCenter.x + (int)(a * cos(endAngle2));
+    pt2.y = ptCenter.y + (int)(b * sin(endAngle2));
+    if (useCenter)
+        ::Pie(dcBuf, pRect->left, pRect->top, pRect->right, pRect->bottom, pt2.x, pt2.y, pt1.x, pt1.y);
+    else
+        ::Arc(dcBuf, pRect->left, pRect->top, pRect->right, pRect->bottom, pt2.x, pt2.y, pt1.x, pt1.y);
+    ::SelectObject(dcBuf, oldBr);
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::DrawArc2(LPCRECT pRect, float startAngle, float sweepAngle, int width)
+{
+    if (!m_curPen)
+        return E_INVALIDARG;
+    RECT rcBuf = *pRect;
+    ::InflateRect(&rcBuf, width / 2, width / 2);
+    HPEN hPen = ::CreatePen(m_curPen->GetStyle(), width, m_curPen->GetColor());
+
+    DCBuffer dcBuf(m_hdc, &rcBuf, GetAValue(m_curPen->GetColor()));
+    HGDIOBJ oldPen = ::SelectObject(dcBuf, hPen);
+    HGDIOBJ oldBr = ::SelectObject(dcBuf, GetStockObject(NULL_BRUSH));
+    POINT ptCenter = { (pRect->left + pRect->right) / 2, (pRect->top + pRect->bottom) / 2 };
+    int a = ptCenter.x - pRect->left, b = ptCenter.y - pRect->top;
+    POINT pt1, pt2;
+    float startAngle2 = startAngle * PI / 180.0f;
+    float endAngle2 = (startAngle + sweepAngle) * PI / 180.0f;
+    pt1.x = ptCenter.x + (int)(a * cos(startAngle2));
+    pt1.y = ptCenter.y + (int)(b * sin(startAngle2));
+    pt2.x = ptCenter.x + (int)(a * cos(endAngle2));
+    pt2.y = ptCenter.y + (int)(b * sin(endAngle2));
+    ::Arc(dcBuf, pRect->left, pRect->top, pRect->right, pRect->bottom, pt2.x, pt2.y, pt1.x, pt1.y);
+    ::SelectObject(dcBuf, oldBr);
+    ::SelectObject(dcBuf, oldPen);
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::FillArc(LPCRECT pRect, float startAngle, float sweepAngle)
+{
+    BYTE byAlpha = 0xFF;
+    if (m_curBrush->GetBrushType() == Brush_Color)
+        byAlpha = GetAValue(m_curBrush->GetColor());
+    DCBuffer dcBuf(m_hdc, pRect, byAlpha);
+
+    HGDIOBJ oldPen = ::SelectObject(dcBuf, GetStockObject(NULL_PEN));
+    POINT ptCenter = { (pRect->left + pRect->right) / 2, (pRect->top + pRect->bottom) / 2 };
+    int a = ptCenter.x - pRect->left, b = ptCenter.y - pRect->top;
+    POINT pt1, pt2;
+    float startAngle2 = startAngle * PI / 180.0f;
+    float endAngle2 = (startAngle + sweepAngle) * PI / 180.0f;
+    pt1.x = ptCenter.x + (int)(a * cos(startAngle2));
+    pt1.y = ptCenter.y + (int)(b * sin(startAngle2));
+    pt2.x = ptCenter.x + (int)(a * cos(endAngle2));
+    pt2.y = ptCenter.y + (int)(b * sin(endAngle2));
+    ::Pie(dcBuf, pRect->left, pRect->top, pRect->right, pRect->bottom, pt2.x, pt2.y, pt1.x, pt1.y);
+    ::SelectObject(dcBuf, oldPen);
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::SetTransform(const float matrix[9], float oldMatrix[9])
+{
+    XFORM xForm = { matrix[kMScaleX], matrix[kMSkewY], matrix[kMSkewX], matrix[kMScaleY], matrix[kMTransX], matrix[kMTransY] };
+    if (oldMatrix)
+    {
+        GetTransform(oldMatrix);
+    }
+    return ::SetWorldTransform(m_hdc, &xForm) ? S_OK : E_FAIL;
+}
+
+HRESULT SRenderTarget_GDI::GetTransform(float matrix[9]) const
+{
+    SASSERT(matrix);
+    XFORM xForm;
+    if (!::GetWorldTransform(m_hdc, &xForm))
+        return E_FAIL;
+
+    matrix[kMScaleX] = xForm.eM11;
+    matrix[kMSkewX] = xForm.eM21;
+    matrix[kMTransX] = xForm.eDx;
+    matrix[kMSkewY] = xForm.eM12;
+    matrix[kMScaleY] = xForm.eM22;
+    matrix[kMTransY] = xForm.eDy;
+
+    matrix[kMPersp0] = 0.0f;
+    matrix[kMPersp1] = 0.0f;
+    matrix[kMPersp2] = 1.0f;
+    return S_OK;
+}
+
+COLORREF SRenderTarget_GDI::GetPixel(int x, int y)
+{
+    if (!m_curBmp)
+        return CR_INVALID;
+    const COLORREF *pBits = (const COLORREF *)m_curBmp->GetPixelBits();
+    POINT pt;
+    GetViewportOrg(&pt);
+    x += pt.x;
+    y += pt.y;
+    if (x < 0 || x >= (int)m_curBmp->Width() || y < 0 || y >= (int)m_curBmp->Height())
+        return CR_INVALID;
+
+    return pBits[y * m_curBmp->Width() + x];
+}
+
+COLORREF SRenderTarget_GDI::SetPixel(int x, int y, COLORREF cr)
+{
+    if (!m_curBmp)
+        return CR_INVALID;
+    COLORREF *pBits = (COLORREF *)m_curBmp->LockPixelBits();
+    POINT pt;
+    GetViewportOrg(&pt);
+    x += pt.x;
+    y += pt.y;
+
+    if (x >= (int)m_curBmp->Width() || y >= (int)m_curBmp->Height())
+        return CR_INVALID;
+
+    COLORREF crRet = pBits[y * m_curBmp->Width() + x];
+
+    pBits[y * m_curBmp->Width() + x] = cr;
+
+    m_curBmp->UnlockPixelBits(pBits);
+
+    return crRet;
+}
+
+HRESULT SRenderTarget_GDI::DrawGradientRectEx(THIS_ LPCRECT pRect, POINT ptRoundCorner, const GradientItem *pGradients, int nCount, const GradientInfo *info, BYTE byAlpha)
+{
+    if (info->type == linear)
+    {
+        if (info->angle == 0.f)
+            return DrawGradientRect(pRect, FALSE, ptRoundCorner, pGradients, nCount, byAlpha);
+        else if (info->angle == 90.f)
+            return DrawGradientRect(pRect, TRUE, ptRoundCorner, pGradients, nCount, byAlpha);
+    }
+    return E_NOTIMPL;
+}
+
+HRESULT SRenderTarget_GDI::DrawGradientPath(THIS_ const IPathS *path, const GradientItem *pGradients, int nCount, const GradientInfo *info, BYTE byAlpha)
+{
+    if (!path || !pGradients || nCount < 2)
+        return E_INVALIDARG;
+
+    const SPath_GDI *pGdiPath = static_cast<const SPath_GDI *>(path);
+    HRGN hRgn = pGdiPath->CreateRegionFromCommands();
+    if (!hRgn)
+        return E_FAIL;
+
+    // Get path bounds for gradient calculation
+    RECT rcBounds;
+    GetRgnBox(hRgn, &rcBounds);
+
+    // Use existing gradient rectangle implementation with path clipping
+    HRGN hOldClip = CreateRectRgn(0, 0, 0, 0);
+    int clipResult = GetClipRgn(m_hdc, hOldClip);
+
+    // Set path as clipping region
+    SelectClipRgn(m_hdc, hRgn);
+
+    // Draw gradient rectangle over the path bounds
+    POINT ptCorner = { 0, 0 };
+    HRESULT hr = DrawGradientRectEx(&rcBounds, ptCorner, pGradients, nCount, info, byAlpha);
+
+    // Restore original clipping
+    if (clipResult == 1)
+    {
+        SelectClipRgn(m_hdc, hOldClip);
+    }
+    else
+    {
+        SelectClipRgn(m_hdc, NULL);
+    }
+
+    DeleteObject(hOldClip);
+    DeleteObject(hRgn);
+
+    return hr;
+}
+
+HRESULT SRenderTarget_GDI::CreateRegion(IRegionS **ppRegion)
+{
+    return m_pRenderFactory->CreateRegion(ppRegion) ? S_OK : E_OUTOFMEMORY;
+}
+
+HRESULT SRenderTarget_GDI::PushClipPath(const IPathS *path, UINT mode, BOOL doAntiAlias /*= false*/)
+{
+    if (!path)
+        return E_INVALIDARG;
+
+    const SPath_GDI *pGdiPath = static_cast<const SPath_GDI *>(path);
+    HRGN hRgn = pGdiPath->CreateRegionFromCommands();
+    if (!hRgn)
+        return E_FAIL;
+
+    // Convert path to region and use existing region clipping
+    SAutoRefPtr<IRegionS> pRegion;
+    if (SUCCEEDED(CreateRegion(&pRegion)))
+    {
+        SRegion_GDI *pGdiRegion = static_cast<SRegion_GDI *>(pRegion.Get());
+        pGdiRegion->_CombineRgn(hRgn, RGN_COPY);
+        HRESULT hr = PushClipRegion(pRegion, mode);
+        DeleteObject(hRgn);
+        return hr;
+    }
+
+    DeleteObject(hRgn);
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::DrawPath(const IPathS *path, IPathEffect *pathEffect)
+{
+    if (!path)
+        return E_INVALIDARG;
+
+    const SPath_GDI *pGdiPath = static_cast<const SPath_GDI *>(path);
+    RECT rcBox;
+    pGdiPath->getBounds(&rcBox);
+    DCBuffer dcBuf(m_hdc, &rcBox, 0xff);
+    // Execute path commands on current HDC and stroke
+    pGdiPath->ExecuteCommands(dcBuf);
+    ::StrokePath(dcBuf);
+
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::MoveToEx(POINT pt, LPPOINT lpPointRet)
+{
+    if (lpPointRet)
+    {
+        ::GetCurrentPositionEx(m_hdc, lpPointRet);
+    }
+    ::MoveToEx(m_hdc, pt.x, pt.y, NULL);
+    return S_OK;
+}
+HRESULT SRenderTarget_GDI::LineTo(POINT pt)
+{
+    POINT ptStart;
+    ::GetCurrentPositionEx(m_hdc, &ptStart);
+    RECT rc = { ptStart.x, ptStart.y, pt.x + 1, pt.y + 1 };
+    DCBuffer dcBuf(m_hdc, &rc, 0xff);
+    ::LineTo(dcBuf, pt.x, pt.y);
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::GetCurrentPositionEx(LPPOINT lpPoint)
+{
+    ::GetCurrentPositionEx(m_hdc, lpPoint);
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::FillPath(const IPathS *path)
+{
+    if (!path)
+        return E_INVALIDARG;
+
+    const SPath_GDI *pGdiPath = static_cast<const SPath_GDI *>(path);
+    RECT rcBox;
+    pGdiPath->getBounds(&rcBox);
+    DCBuffer dcBuf(m_hdc, &rcBox, 0xff);
+    // Execute path commands on current HDC and fill
+    pGdiPath->ExecuteCommands(dcBuf);
+    ::FillPath(dcBuf);
+
+    return S_OK;
+}
+
+HRESULT SRenderTarget_GDI::SetXfermode(int mode, int *pOldMode)
+{
+    switch (mode)
+    {
+    case kSrcCopy:
+    case kDstInvert:
+    case kSrcInvert:
+    case kSrcAnd:
+        break;
+    default:
+        return E_INVALIDARG;
+    }
+    int nOldMode = ::SetROP2(m_hdc, mode);
+    if (pOldMode)
+        *pOldMode = nOldMode;
+    return S_OK;
+}
+
+BOOL SRenderTarget_GDI::SetAntiAlias(BOOL bAntiAlias)
+{
+    return FALSE;
+}
+
+BOOL SRenderTarget_GDI::GetAntiAlias() SCONST
+{
+    return FALSE;
+}
+
+#ifdef SOUI_ENABLE_SVG
+
+static Gdiplus::Color nsvgColorToGdipColor(unsigned int color, float opacity)
+{
+    unsigned char a = (unsigned char)((color >> 24) & 0xFF);
+    unsigned char r = (unsigned char)(color & 0xFF);
+    unsigned char g = (unsigned char)((color >> 8) & 0xFF);
+    unsigned char b = (unsigned char)((color >> 16) & 0xFF);
+    a = (unsigned char)(a * opacity);
+    return Gdiplus::Color(a, r, g, b);
+}
+
+static Gdiplus::Color nsvgPaintToGdipColor(const NSVGpaint *paint, float opacity)
+{
+    if (paint && paint->type == NSVG_PAINT_COLOR)
+        return nsvgColorToGdipColor(paint->color, opacity);
+    return nsvgColorToGdipColor(0xFF000000, opacity);
+}
+
+static bool nsvgIntersectsSrcRect(float left, float top, float right, float bottom, LPCRECT prcSrc)
+{
+    if (!prcSrc)
+        return true;
+
+    return right > (float)prcSrc->left && left < (float)prcSrc->right && bottom > (float)prcSrc->top && top < (float)prcSrc->bottom;
+}
+
+static bool nsvgShapeIntersectsSrcRect(const NSVGshape *shape, LPCRECT prcSrc)
+{
+    if (!shape)
+        return false;
+
+    float inflate = 0.0f;
+    if (shape->stroke.type != NSVG_PAINT_NONE && shape->strokeWidth > 0)
+        inflate = shape->strokeWidth * 0.5f + 1.0f;
+
+    return nsvgIntersectsSrcRect(shape->bounds[0] - inflate, shape->bounds[1] - inflate, shape->bounds[2] + inflate, shape->bounds[3] + inflate, prcSrc);
+}
+
+static Gdiplus::LineCap nsvgCapToGdipCap(int cap)
+{
+    switch (cap)
+    {
+    case NSVG_CAP_ROUND:
+        return Gdiplus::LineCapRound;
+    case NSVG_CAP_SQUARE:
+        return Gdiplus::LineCapSquare;
+    default:
+        return Gdiplus::LineCapFlat;
+    }
+}
+
+static Gdiplus::LineJoin nsvgJoinToGdipJoin(int join)
+{
+    switch (join)
+    {
+    case NSVG_JOIN_ROUND:
+        return Gdiplus::LineJoinRound;
+    case NSVG_JOIN_BEVEL:
+        return Gdiplus::LineJoinBevel;
+    default:
+        return Gdiplus::LineJoinMiter;
+    }
+}
+
+static bool nsvgPathToGraphicsPath(const NSVGpath *path, Gdiplus::FillMode fillMode, Gdiplus::GraphicsPath &gp)
+{
+    if (!path || !path->pts || path->npts < 2)
+        return false;
+
+    gp.SetFillMode(fillMode);
+    gp.StartFigure();
+    gp.AddLine((Gdiplus::REAL)path->pts[0], (Gdiplus::REAL)path->pts[1], (Gdiplus::REAL)path->pts[0], (Gdiplus::REAL)path->pts[1]);
+
+    for (int i = 0; i < path->npts - 1; i += 3)
+    {
+        if (i + 6 > path->npts * 2)
+            break;
+
+        float x0 = path->pts[i * 2 + 0];
+        float y0 = path->pts[i * 2 + 1];
+        float x1 = path->pts[i * 2 + 2];
+        float y1 = path->pts[i * 2 + 3];
+        float x2 = path->pts[i * 2 + 4];
+        float y2 = path->pts[i * 2 + 5];
+        float x3 = path->pts[i * 2 + 6];
+        float y3 = path->pts[i * 2 + 7];
+        gp.AddBezier((Gdiplus::REAL)x0, (Gdiplus::REAL)y0, (Gdiplus::REAL)x1, (Gdiplus::REAL)y1, (Gdiplus::REAL)x2, (Gdiplus::REAL)y2, (Gdiplus::REAL)x3, (Gdiplus::REAL)y3);
+    }
+
+    if (path->closed)
+        gp.CloseFigure();
+    return true;
+}
+
+static float nsvgGetTextBaseline(const Gdiplus::FontFamily &fontFamily, INT fontStyle, float fontSize)
+{
+    int emHeight = fontFamily.GetEmHeight((Gdiplus::FontStyle)fontStyle);
+    if (emHeight <= 0)
+        return fontSize;
+
+    int cellAscent = fontFamily.GetCellAscent((Gdiplus::FontStyle)fontStyle);
+    return fontSize * cellAscent / (float)emHeight;
+}
+
+static const Gdiplus::FontFamily *nsvgResolveFontFamily(const char *pszFontFamily, Gdiplus::FontFamily **ppCustomFamily)
+{
+    if (ppCustomFamily)
+        *ppCustomFamily = NULL;
+
+    if (!pszFontFamily || !pszFontFamily[0] || lstrcmpiA(pszFontFamily, "sans-serif") == 0 || lstrcmpiA(pszFontFamily, "sans serif") == 0)
+        return Gdiplus::FontFamily::GenericSansSerif();
+
+    if (lstrcmpiA(pszFontFamily, "serif") == 0)
+        return Gdiplus::FontFamily::GenericSerif();
+
+    if (lstrcmpiA(pszFontFamily, "monospace") == 0 || lstrcmpiA(pszFontFamily, "monospace,") == 0)
+        return Gdiplus::FontFamily::GenericMonospace();
+
+    wchar_t fontFamilyName[LF_FACESIZE] = { 0 };
+    if (MultiByteToWideChar(CP_UTF8, 0, pszFontFamily, -1, fontFamilyName, LF_FACESIZE) <= 0)
+        return Gdiplus::FontFamily::GenericSansSerif();
+
+    Gdiplus::FontFamily *pCustomFamily = new Gdiplus::FontFamily(fontFamilyName);
+    if (!pCustomFamily)
+        return Gdiplus::FontFamily::GenericSansSerif();
+
+    if (pCustomFamily->GetLastStatus() != Gdiplus::Ok)
+    {
+        delete pCustomFamily;
+        return Gdiplus::FontFamily::GenericSansSerif();
+    }
+
+    if (ppCustomFamily)
+        *ppCustomFamily = pCustomFamily;
+
+    return pCustomFamily;
+}
+
+static bool nsvgBuildTextPath(const NSVGtext *text, const wchar_t *szText, INT len, const Gdiplus::FontFamily &fontFamily, INT fontStyle, float fontSize, Gdiplus::GraphicsPath &textPath, Gdiplus::RectF *pBounds)
+{
+    if (!text || !szText || len <= 0 || !pBounds)
+        return false;
+
+    const Gdiplus::StringFormat *pFormat = Gdiplus::StringFormat::GenericTypographic();
+    float baseline = nsvgGetTextBaseline(fontFamily, fontStyle, fontSize);
+    if (textPath.AddString(szText, len, &fontFamily, fontStyle, fontSize, Gdiplus::PointF(0.0f, -baseline), pFormat) != Gdiplus::Ok)
+        return false;
+
+    if (textPath.GetBounds(pBounds) != Gdiplus::Ok)
+        return false;
+
+    float offsetX = 0.0f;
+    switch (text->anchor)
+    {
+    case NSVG_ANCHOR_MIDDLE:
+        offsetX = -pBounds->Width / 2.0f;
+        break;
+    case NSVG_ANCHOR_END:
+        offsetX = -pBounds->Width;
+        break;
+    default:
+        break;
+    }
+
+    if (offsetX != 0.0f)
+    {
+        Gdiplus::Matrix offsetMatrix;
+        offsetMatrix.Translate(offsetX, 0.0f);
+        textPath.Transform(&offsetMatrix);
+        if (textPath.GetBounds(pBounds) != Gdiplus::Ok)
+            return false;
+    }
+
+    return true;
+}
+
+static bool nsvgTextIntersectsSrcRect(const NSVGtext *text, const Gdiplus::RectF &bounds, const Gdiplus::Matrix &textMatrix, LPCRECT prcSrc)
+{
+    if (!text || !prcSrc)
+        return true;
+
+    float localLeft = bounds.X;
+    float localTop = bounds.Y;
+    float localRight = bounds.GetRight();
+    float localBottom = bounds.GetBottom();
+
+    Gdiplus::PointF pts[4] = {
+        Gdiplus::PointF(localLeft, localTop),
+        Gdiplus::PointF(localRight, localTop),
+        Gdiplus::PointF(localRight, localBottom),
+        Gdiplus::PointF(localLeft, localBottom),
+    };
+    textMatrix.TransformPoints(pts, 4);
+
+    bool hasTransform = textMatrix.IsIdentity() ? false : true;
+    float minX = pts[0].X;
+    float minY = pts[0].Y;
+    float maxX = minX;
+    float maxY = minY;
+    for (int i = 1; i < 4; ++i)
+    {
+        minX = smin(minX, pts[i].X);
+        minY = smin(minY, pts[i].Y);
+        maxX = smax(maxX, pts[i].X);
+        maxY = smax(maxY, pts[i].Y);
+    }
+
+    if (!hasTransform)
+    {
+        minX += text->x;
+        minY += text->y;
+        maxX += text->x;
+        maxY += text->y;
+    }
+
+    return nsvgIntersectsSrcRect(minX, minY, maxX, maxY, prcSrc);
+}
+
+static void renderNSVGshape(Gdiplus::Graphics &graphics, const NSVGshape *shape, BYTE byAlpha, LPCRECT prcSrc)
+{
+    if (!shape)
+        return;
+    if (!(shape->flags & NSVG_FLAGS_VISIBLE))
+        return;
+    if (!nsvgShapeIntersectsSrcRect(shape, prcSrc))
+        return;
+
+    float opacity = shape->opacity * (byAlpha / 255.0f);
+    Gdiplus::FillMode fillMode = shape->fillRule == NSVG_FILLRULE_EVENODD ? Gdiplus::FillModeAlternate : Gdiplus::FillModeWinding;
+
+    for (const NSVGpath *path = shape->paths; path != NULL; path = path->next)
+    {
+        Gdiplus::GraphicsPath gp(fillMode);
+        if (!nsvgPathToGraphicsPath(path, fillMode, gp))
+            continue;
+
+        unsigned char paintOrder = shape->paintOrder;
+        for (int j = 0; j < 3; ++j)
+        {
+            unsigned char order = (paintOrder >> (2 * j)) & 0x03;
+
+            if (order == NSVG_PAINT_FILL && shape->fill.type != NSVG_PAINT_NONE)
+            {
+                if (shape->fill.type == NSVG_PAINT_COLOR)
+                {
+                    Gdiplus::SolidBrush brush(nsvgPaintToGdipColor(&shape->fill, opacity));
+                    graphics.FillPath(&brush, &gp);
+                }
+                else if (shape->fill.type == NSVG_PAINT_LINEAR_GRADIENT || shape->fill.type == NSVG_PAINT_RADIAL_GRADIENT)
+                {
+                    NSVGgradient *grad = shape->fill.gradient;
+                    if (grad && grad->nstops > 0)
+                    {
+                        int nstops = grad->nstops > 8 ? 8 : grad->nstops;
+                        Gdiplus::Color colors[8];
+                        Gdiplus::REAL pos[8];
+                        for (int i = 0; i < nstops; i++)
+                        {
+                            pos[i] = grad->stops[i].offset;
+                            colors[i] = nsvgColorToGdipColor(grad->stops[i].color, opacity);
+                        }
+                        
+                        Gdiplus::Matrix gradMatrix(grad->xform[0], grad->xform[1], grad->xform[2], grad->xform[3], grad->xform[4], grad->xform[5]);
+                        
+                        // Get path bounds for gradient calculation
+                        Gdiplus::RectF bounds;
+                        gp.GetBounds(&bounds);
+                        float width = bounds.Width;
+                        float height = bounds.Height;
+
+                        if (shape->fill.type == NSVG_PAINT_LINEAR_GRADIENT)
+                        {
+                            // Calculate gradient points based on transform
+                            float x1 = nsvgConvertToPixels(grad->linear.x1, bounds.X, width, 0);
+                            float y1 = nsvgConvertToPixels(grad->linear.y1, bounds.Y, height, 0);
+                            float x2 = nsvgConvertToPixels(grad->linear.x2, bounds.X, width, 0);
+                            float y2 = nsvgConvertToPixels(grad->linear.y2, bounds.Y, height, 0);
+
+                            Gdiplus::PointF pt1(x1, y1);
+                            Gdiplus::PointF pt2(x2, y2);
+                            Gdiplus::LinearGradientBrush brush(pt1, pt2, colors[0], colors[nstops - 1]);
+                            brush.SetInterpolationColors(colors, pos, nstops);
+                            brush.SetWrapMode((Gdiplus::WrapMode)grad->spread);
+                            graphics.FillPath(&brush, &gp);
+                        }
+                        else
+                        {
+                            float cx = nsvgConvertToPixels(grad->radial.cx, bounds.X, width, 0);
+                            float cy = nsvgConvertToPixels(grad->radial.cy, bounds.Y, height, 0);
+                            float radius = nsvgConvertToPixels(grad->radial.r, 0, (width + height)/2, 25);            
+
+                            Gdiplus::PointF center(cx, cy);
+                            Gdiplus::GraphicsPath path;
+                            path.AddEllipse(center.X - radius, center.Y - radius, radius * 2, radius * 2);
+                            Gdiplus::PathGradientBrush brush(&path);
+                            brush.SetInterpolationColors(colors, pos, nstops);
+                            brush.SetWrapMode((Gdiplus::WrapMode)grad->spread);
+                            graphics.FillPath(&brush, &gp);
+                        }
+                    }
+                }
+            }
+            else if (order == NSVG_PAINT_STROKE && shape->stroke.type != NSVG_PAINT_NONE && shape->strokeWidth > 0)
+            {
+                Gdiplus::Pen pen(nsvgPaintToGdipColor(&shape->stroke, opacity), (Gdiplus::REAL)shape->strokeWidth);
+                pen.SetLineCap(nsvgCapToGdipCap(shape->strokeLineCap), nsvgCapToGdipCap(shape->strokeLineCap), Gdiplus::DashCapFlat);
+                pen.SetLineJoin(nsvgJoinToGdipJoin(shape->strokeLineJoin));
+                pen.SetMiterLimit((Gdiplus::REAL)shape->miterLimit);
+                
+                // Set dash pattern if specified
+                if (shape->strokeDashCount > 0)
+                {
+                    pen.SetDashStyle(Gdiplus::DashStyleCustom);
+                    pen.SetDashOffset((Gdiplus::REAL)shape->strokeDashOffset);
+                    pen.SetDashPattern(shape->strokeDashArray, shape->strokeDashCount);
+                }
+                
+                graphics.DrawPath(&pen, &gp);
+            }
+        }
+    }
+}
+
+static void renderNSVGtext(Gdiplus::Graphics &graphics, const NSVGtext *text, BYTE byAlpha, LPCRECT prcSrc)
+{
+    if (!text || text->text[0] == '\0')
+        return;
+
+    Gdiplus::FontFamily *pCustomFontFamily = NULL;
+    const Gdiplus::FontFamily *pFontFamily = nsvgResolveFontFamily(text->fontFamily, &pCustomFontFamily);
+    if (!pFontFamily)
+        return;
+
+    int fontStyle = Gdiplus::FontStyleRegular;
+    if (text->fontWeight >= 7)
+        fontStyle |= Gdiplus::FontStyleBold;
+    if (text->fontStyle == 1 || text->fontStyle == 2)
+        fontStyle |= Gdiplus::FontStyleItalic;
+
+    float fontSize = text->fontSize > 0 ? text->fontSize : 16.0f;
+
+    wchar_t szText[1024] = { 0 };
+    int len = MultiByteToWideChar(CP_UTF8, 0, text->text, -1, szText, 1024);
+    if (len <= 0)
+        return;
+    if (szText[len - 1] == 0)
+        len--;
+    if (len <= 0)
+        return;
+
+    Gdiplus::GraphicsPath textPath;
+    Gdiplus::RectF bounds;
+    if (!nsvgBuildTextPath(text, szText, len, *pFontFamily, fontStyle, fontSize, textPath, &bounds))
+    {
+        delete pCustomFontFamily;
+        return;
+    }
+
+    Gdiplus::Matrix textMatrix(text->xform[0], text->xform[1], text->xform[2], text->xform[3], text->xform[4], text->xform[5]);
+    if (!nsvgTextIntersectsSrcRect(text, bounds, textMatrix, prcSrc))
+        return;
+
+    float x = text->x;
+    float y = text->y;
+
+    float opacity = text->opacity * (byAlpha / 255.0f);
+    Gdiplus::SolidBrush brush(nsvgColorToGdipColor(text->fillColor, opacity));
+    bool hasTransform = textMatrix.IsIdentity() ? false : true;
+    Gdiplus::GraphicsPath drawPath;
+    drawPath.AddPath(&textPath, FALSE);
+
+    //todo:hjx
+    if (hasTransform)
+    {
+        drawPath.Transform(&textMatrix);
+        graphics.FillPath(&brush, &drawPath);
+    }
+    else
+    {
+        Gdiplus::Matrix translateMatrix;
+        translateMatrix.Translate(x, y);
+        drawPath.Transform(&translateMatrix);
+        graphics.FillPath(&brush, &drawPath);
+    }
+
+    delete pCustomFontFamily;
+}
+
+HRESULT SRenderTarget_GDI::DrawSVG(ISvgObj *pSvgObj, LPCRECT pRect, LPCRECT prcSrc, BYTE byAlpha)
+{
+    if (!pSvgObj || !pRect)
+        return E_INVALIDARG;
+    if (!m_hdc)
+        return E_FAIL;
+
+    NSVGimage *pSvg = (NSVGimage *)pSvgObj->GetPtr();
+    if (!pSvg)
+        return E_INVALIDARG;
+
+    int nWid = pRect->right - pRect->left;
+    int nHei = pRect->bottom - pRect->top;
+    if (nWid <= 0 || nHei <= 0)
+        return E_INVALIDARG;
+
+    float srcX = 0.0f, srcY = 0.0f;
+    float srcWidth = pSvg->width;
+    float srcHeight = pSvg->height;
+    if (prcSrc)
+    {
+        srcX = (float)prcSrc->left;
+        srcY = (float)prcSrc->top;
+        srcWidth = (float)(prcSrc->right - prcSrc->left);
+        srcHeight = (float)(prcSrc->bottom - prcSrc->top);
+    }
+
+    float scaleX = nWid / srcWidth;
+    float scaleY = nHei / srcHeight;
+    float tx = (float)pRect->left;
+    float ty = (float)pRect->top;
+
+    Gdiplus::Graphics graphics(m_hdc);
+    Gdiplus::GraphicsState state = graphics.Save();
+    graphics.SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
+    graphics.SetPixelOffsetMode(Gdiplus::PixelOffsetModeHighQuality);
+    graphics.SetClip(Gdiplus::Rect((INT)tx, (INT)ty, nWid, nHei), Gdiplus::CombineModeIntersect);
+
+    Gdiplus::Matrix globalTransform((Gdiplus::REAL)scaleX, 0.0f, 0.0f, (Gdiplus::REAL)scaleY, (Gdiplus::REAL)(tx - srcX * scaleX), (Gdiplus::REAL)(ty - srcY * scaleY));
+    graphics.SetTransform(&globalTransform);
+
+    for (NSVGshape *shape = pSvg->shapes; shape != NULL; shape = shape->next)
+        renderNSVGshape(graphics, shape, byAlpha, prcSrc);
+
+    for (NSVGtext *text = pSvg->texts; text != NULL; text = text->next)
+        renderNSVGtext(graphics, text, byAlpha, prcSrc);
+
+    graphics.Restore(state);
+    return S_OK;
+}
+
+#else
+HRESULT SRenderTarget_GDI::DrawSVG(ISvgObj *pSvg, LPCRECT pRect, LPCRECT prcSrc, BYTE byAlpha)
+{
+    (void)pSvg;
+    (void)pRect;
+    (void)prcSrc;
+    (void)byAlpha;
+    return E_NOTIMPL;
+}
+#endif // SOUI_ENABLE_SVG
+COLORREF SRenderTarget_GDI::GetTextColor()
+{
+    return m_curColor.toCOLORREF();
+}
+
+COLORREF SRenderTarget_GDI::SetTextColor(COLORREF color)
+{
+    COLORREF crOld = m_curColor.toCOLORREF();
+    m_curColor.setRGB(color);
+    ::SetTextColor(m_hdc, color & 0x00ffffff);
+    return crOld;
+}
+
+//////////////////////////////////////////////////////////////////////////
+namespace RENDER_GDI
+{
+SOUI_COM_C BOOL SOUI_COM_API SCreateInstance(IObjRef **ppRenderFactory)
+{
+    *ppRenderFactory = new SRenderFactory_GDI;
+    return TRUE;
+}
+} // namespace RENDER_GDI
+SNSEND
+
+EXTERN_C BOOL Render_Gdi_SCreateInstance(IObjRef **ppRenderFactory)
+{
+    return SNS::RENDER_GDI::SCreateInstance(ppRenderFactory);
+}

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="27" height="27" viewBox="0 0 27 27">
+  <linearGradient id="menu-border-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#555555"/>
+    <stop offset="100%" stop-color="#333333"/>
+  </linearGradient>
+  <rect width="27" height="27" fill="url(#menu-border-gradient)" rx="2" ry="2"/>
+  <rect x="1" y="1" width="25" height="25" fill="#2a2a2a" rx="1" ry="1"/>
+</svg>

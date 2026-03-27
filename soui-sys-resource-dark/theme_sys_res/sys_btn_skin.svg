@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="30" viewBox="0 0 120 30">
+  <!-- 正常状态 -->
+  <g id="normal" transform="translate(0, 0)">
+    <rect width="30" height="30" fill="transparent"/>
+    <circle cx="15" cy="15" r="7" fill="none" stroke="#cccccc" stroke-width="2"/>
+    <circle cx="11" cy="11" r="2" fill="#cccccc"/>
+    <circle cx="19" cy="11" r="2" fill="#cccccc"/>
+    <circle cx="11" cy="19" r="2" fill="#cccccc"/>
+    <circle cx="19" cy="19" r="2" fill="#cccccc"/>
+    <circle cx="15" cy="15" r="2" fill="#cccccc"/>
+  </g>
+  <!-- 悬停状态 -->
+  <g id="hover" transform="translate(30, 0)">
+    <rect width="30" height="30" fill="transparent"/>
+    <circle cx="15" cy="15" r="7" fill="none" stroke="#ffffff" stroke-width="2"/>
+    <circle cx="11" cy="11" r="2" fill="#ffffff"/>
+    <circle cx="19" cy="11" r="2" fill="#ffffff"/>
+    <circle cx="11" cy="19" r="2" fill="#ffffff"/>
+    <circle cx="19" cy="19" r="2" fill="#ffffff"/>
+    <circle cx="15" cy="15" r="2" fill="#ffffff"/>
+  </g>
+  <!-- 按下状态 -->
+  <g id="pressed" transform="translate(60, 0)">
+    <rect width="30" height="30" fill="transparent"/>
+    <circle cx="15" cy="15" r="7" fill="none" stroke="#cccccc" stroke-width="2"/>
+    <circle cx="11" cy="11" r="2" fill="#cccccc"/>
+    <circle cx="19" cy="11" r="2" fill="#cccccc"/>
+    <circle cx="11" cy="19" r="2" fill="#cccccc"/>
+    <circle cx="19" cy="19" r="2" fill="#cccccc"/>
+    <circle cx="15" cy="15" r="2" fill="#cccccc"/>
+  </g>
+  <!-- 禁用状态 -->
+  <g id="disabled" transform="translate(90, 0)">
+    <rect width="30" height="30" fill="transparent"/>
+    <circle cx="15" cy="15" r="7" fill="none" stroke="#555555" stroke-width="2"/>
+    <circle cx="11" cy="11" r="2" fill="#555555"/>
+    <circle cx="19" cy="11" r="2" fill="#555555"/>
+    <circle cx="11" cy="19" r="2" fill="#555555"/>
+    <circle cx="19" cy="19" r="2" fill="#555555"/>
+    <circle cx="15" cy="15" r="2" fill="#555555"/>
+  </g>
+</svg>

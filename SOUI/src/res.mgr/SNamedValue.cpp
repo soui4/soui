@@ -68,7 +68,10 @@ BOOL SNamedFont::Get(const SStringW &strValue, SStringW &ret) const
     }
 }
 //////////////////////////////////////////////////////////////////////////
-
+const wchar_t *SNamedColor::THEME_COLOR_TXT_NORMAL = L"@color/thm_txt_normal";
+const wchar_t *SNamedColor::THEME_COLOR_TXT_HOVER = L"@color/thm_txt_hover";
+const wchar_t *SNamedColor::THEME_COLOR_TXT_PRESSED = L"@color/thm_txt_pressed";
+const wchar_t *SNamedColor::THEME_COLOR_TXT_DISABLE = L"@color/thm_txt_disable";
 COLORREF SColorParser::GetNullValue()
 {
     return CR_INVALID;

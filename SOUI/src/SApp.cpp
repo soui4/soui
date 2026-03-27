@@ -562,6 +562,15 @@ UINT SApplication::LoadSystemNamedResource(IResProvider *pResProvider)
             uRet |= 0x04;
         }
     }
+    //load 4 theme color
+    {
+        SXmlDoc xmlDoc;
+        if (_LoadXmlDocment(_T("THEME_COLOR"), _T("XML"), xmlDoc, pResProvider))
+        {
+            GETUIDEF->InitThemeColors(xmlDoc.root().child(L"color"));
+            uRet |= 0x08;
+        }
+    }
     RemoveResProvider(pResProvider);
     return uRet;
 }

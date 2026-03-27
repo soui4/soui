@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="53" height="27" viewBox="0 0 53 27">
+  <defs>
+    <linearGradient id="border-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#555555"/>
+      <stop offset="100%" stop-color="#333333"/>
+    </linearGradient>
+  </defs>
+  <!-- 正常状态 -->
+  <g id="normal">
+    <rect width="26" height="27" fill="url(#border-gradient)" rx="2" ry="2"/>
+    <rect x="1" y="1" width="24" height="25" fill="#2a2a2a" rx="1" ry="1"/>
+  </g>
+  <!-- 悬停状态 -->
+  <g id="hover" transform="translate(27, 0)">
+    <rect width="26" height="27" fill="url(#border-gradient)" rx="2" ry="2"/>
+    <rect x="1" y="1" width="24" height="25" fill="#3a3a3a" rx="1" ry="1"/>
+  </g>
+</svg>

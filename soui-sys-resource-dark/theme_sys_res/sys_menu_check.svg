@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="49" height="17" viewBox="0 0 49 17">
+  <!-- 勾选状态 -->
+  <g id="checked" transform="translate(0, 0)">
+    <path d="M4,8 L7,11 L12,5" stroke="#88cc88" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <!-- radio unchecked -->
+  <g id="radio_unchecked" transform="translate(17, 0)">
+    <circle cx="8" cy="8" r="6" fill="none" stroke="#cccccc" stroke-width="2"/>
+  </g>
+  <!-- radio checked -->
+  <g id="radio_checked" transform="translate(33, 0)">
+    <circle cx="8" cy="8" r="6" fill="none" stroke="#88cc88" stroke-width="2"/>
+    <circle cx="8" cy="8" r="3" fill="#88cc88"/>
+  </g>
+</svg>
