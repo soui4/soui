@@ -228,12 +228,6 @@ NSVGpath* nsvgDuplicatePath(NSVGpath* p);
 // Deletes an image.
 void nsvgDelete(NSVGimage* image);
 
-// Colorizes an SVG image by modifying all colors in the image.
-// The colorize process adjusts the hue, saturation, and lightness of each color
-// to match the target color.
-void nsvgColorize(NSVGimage* image, unsigned int color);
-
-
 #define NSVG_MAX_DASHES 8
 
 enum NSVGunits
@@ -3503,74 +3497,6 @@ error:
         free(res);
     }
     return NULL;
-}
-
-// Helper function to adjust color based on target color
-static unsigned int nsvg__adjustColor(unsigned int original, unsigned int target)
-{
-	// Extract components from original color
-	unsigned int o_r = (original >> 0) & 0xFF;
-	unsigned int o_g = (original >> 8) & 0xFF;
-	unsigned int o_b = (original >> 16) & 0xFF;
-	unsigned int o_a = (original >> 24) & 0xFF;
-
-	// Extract components from target color
-	unsigned int tr = (target >> 0) & 0xFF;
-	unsigned int tg = (target >> 8) & 0xFF;
-	unsigned int tb = (target >> 16) & 0xFF;
-
-	// Simple colorization: replace original color with target color
-	// while preserving alpha channel
-	return NSVG_RGBA(tr, tg, tb, o_a);
-}
-
-// Colorizes an SVG image by modifying all colors in the image.
-void nsvgColorize(NSVGimage* image, unsigned int color)
-{
-	if (!image) return;
-
-	// Process shapes
-	NSVGshape* shape = image->shapes;
-	while (shape) {
-		// Process fill color
-		if (shape->fill.type == NSVG_PAINT_COLOR) {
-			shape->fill.color = nsvg__adjustColor(shape->fill.color, color);
-		} else if (shape->fill.type == NSVG_PAINT_LINEAR_GRADIENT || 
-				 shape->fill.type == NSVG_PAINT_RADIAL_GRADIENT) {
-			// Process gradient stops
-			NSVGgradient* grad = shape->fill.gradient;
-			if (grad) {
-				int i;
-				for (i = 0; i < grad->nstops; i++) {
-					grad->stops[i].color = nsvg__adjustColor(grad->stops[i].color, color);
-				}
-			}
-		}
-
-		// Process stroke color
-		if (shape->stroke.type == NSVG_PAINT_COLOR) {
-			shape->stroke.color = nsvg__adjustColor(shape->stroke.color, color);
-		} else if (shape->stroke.type == NSVG_PAINT_LINEAR_GRADIENT || 
-				 shape->stroke.type == NSVG_PAINT_RADIAL_GRADIENT) {
-			// Process gradient stops
-			NSVGgradient* grad = shape->stroke.gradient;
-			if (grad) {
-				int i;
-				for (i = 0; i < grad->nstops; i++) {
-					grad->stops[i].color = nsvg__adjustColor(grad->stops[i].color, color);
-				}
-			}
-		}
-
-		shape = shape->next;
-	}
-
-	// Process text elements
-	NSVGtext* text = image->texts;
-	while (text) {
-		text->fillColor = nsvg__adjustColor(text->fillColor, color);
-		text = text->next;
-	}
 }
 
 void nsvgDelete(NSVGimage* image)

@@ -7,11 +7,67 @@
 #include "helper/SplitString.h"
 #include <core/SGradient.h>
 #include "core/Svg.h"
-#ifdef SOUI_ENABLE_SVG
 #include <src/nanosvg.h>
-#endif
 
 SNSBEGIN
+
+typedef bool (* Fun_Colorize)(COLORREF &crTarget, COLORREF crRef);
+
+/**
+ * Colorizes an SVG image by modifying all colors in the image.
+ * @param image The image to colorize.
+ * @param fun The function to use to colorize the image.
+ * @param color The color to colorize the image to.
+ * @return True if the image was colorized successfully, false otherwise.
+ * @see Fun_Colorize
+ */
+static void ColorizeSVG(NSVGimage* image, Fun_Colorize fun, COLORREF color)
+{
+	if (!image) return;
+
+	// Process shapes
+	NSVGshape* shape = image->shapes;
+	while (shape) {
+		// Process fill color
+		if (shape->fill.type == NSVG_PAINT_COLOR) {
+			fun((COLORREF&)shape->fill.color, color);
+		} else if (shape->fill.type == NSVG_PAINT_LINEAR_GRADIENT || 
+				 shape->fill.type == NSVG_PAINT_RADIAL_GRADIENT) {
+			// Process gradient stops
+			NSVGgradient* grad = shape->fill.gradient;
+			if (grad) {
+				int i;
+				for (i = 0; i < grad->nstops; i++) {
+                    fun((COLORREF&)grad->stops[i].color, color);
+				}
+			}
+		}
+
+		// Process stroke color
+		if (shape->stroke.type == NSVG_PAINT_COLOR) {
+            fun((COLORREF &)shape->stroke.color, color);
+		} else if (shape->stroke.type == NSVG_PAINT_LINEAR_GRADIENT || 
+				 shape->stroke.type == NSVG_PAINT_RADIAL_GRADIENT) {
+			// Process gradient stops
+			NSVGgradient* grad = shape->stroke.gradient;
+			if (grad) {
+				int i;
+				for (i = 0; i < grad->nstops; i++) {
+                    fun((COLORREF&)grad->stops[i].color, color);
+				}
+			}
+		}
+
+		shape = shape->next;
+	}
+
+	// Process text elements
+	NSVGtext* text = image->texts;
+	while (text) {
+        fun((COLORREF&)text->fillColor, color);
+		text = text->next;
+	}
+}
 
 // 辅助函数：绘制SVG九宫格
 static void DrawSVG9Patch(IRenderTarget *pRT, ISvgObj *pSvg, LPCRECT pRect, LPCRECT prcSrc, LPCRECT prcMargin, BYTE byAlpha)
@@ -25,13 +81,9 @@ static void DrawSVG9Patch(IRenderTarget *pRT, ISvgObj *pSvg, LPCRECT pRect, LPCR
         srcWidth = (float)(prcSrc->right - prcSrc->left);
         srcHeight = (float)(prcSrc->bottom - prcSrc->top);
     } else {
-#ifdef SOUI_ENABLE_SVG
         NSVGimage* pImg = (NSVGimage*)pSvg->GetPtr();
         srcWidth = pImg->width;
         srcHeight = pImg->height;
-#else
-        return;
-#endif
     }
 
     float marginL = (float)prcMargin->left;
@@ -139,6 +191,8 @@ SIZE SSkinImgList::GetSkinSize() const
     {
         ret.cx = GetSvg()->GetWidth();
         ret.cy = GetSvg()->GetHeight();
+        ret.cx = ret.cx* GetScale() / 100;
+        ret.cy = ret.cy* GetScale() / 100;
     }
     else if (GetImage())
     {
@@ -192,6 +246,11 @@ void SSkinImgList::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, 
     if (!GetImage() && !GetSvg())
         return;
     SIZE sz = GetSkinSize();
+    if(GetSvg() && GetScale()!=100){
+        //restore sz to original size
+        sz.cx = MulDiv(sz.cx, 100, GetScale());
+        sz.cy = MulDiv(sz.cy, 100, GetScale());
+    }
     RECT rcSrc = { 0, 0, sz.cx, sz.cy };
     if (m_bVertical)
         OffsetRect(&rcSrc, 0, iState * sz.cy);
@@ -212,7 +271,6 @@ void SSkinImgList::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, 
             pRT->DrawBitmapEx(rcDraw, GetImage(), &rcSrc, GetExpandMode(), byAlpha);
         }
     }else{
-        //svg don't support tile mode.
         pRT->DrawSVG(GetSvg(), rcDraw, &rcSrc, byAlpha);
     }
 
@@ -308,10 +366,8 @@ void SSkinImgList::OnColorize(COLORREF cr)
     }
     else if (GetSvg())
     {
-        #ifdef SOUI_ENABLE_SVG
         NSVGimage* pImg = (NSVGimage*)GetSvg()->GetPtr();
-        nsvgColorize(pImg, cr);
-        #endif
+        ColorizeSVG(pImg,SDIBHelper::Colorize, cr);
     }
 }
 
@@ -382,6 +438,13 @@ void SSkinImgCenter::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState
     {
         pRT->DrawBitmapEx(rcTarget, GetImage(), &rcSrc, GetExpandMode(), byAlpha);
     }else{
+        if(GetScale()!=100){
+            //restore rcSrc to original size
+            rcSrc.left = MulDiv(rcSrc.left, 100, GetScale());
+            rcSrc.top = MulDiv(rcSrc.top, 100, GetScale());
+            rcSrc.right = MulDiv(rcSrc.right, 100, GetScale());
+            rcSrc.bottom = MulDiv(rcSrc.bottom, 100, GetScale());
+        }
         pRT->DrawSVG(GetSvg(), &rcTarget, &rcSrc, byAlpha);
     }
 }
@@ -395,6 +458,11 @@ SSkinImgFrame::SSkinImgFrame()
 void SSkinImgFrame::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const
 {
     SIZE sz = GetSkinSize();
+    if(GetSvg() && GetScale()!=100){
+        //restore sz to original size
+        sz.cx = MulDiv(sz.cx, 100, GetScale());
+        sz.cy = MulDiv(sz.cy, 100, GetScale());
+    }
     CPoint pt;
     if (IsVertical())
         pt.y = sz.cy * iState;
@@ -405,7 +473,6 @@ void SSkinImgFrame::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState,
     {
         pRT->DrawBitmap9Patch(rcDraw, GetImage(), &rcSour, &m_rcMargin, GetExpandMode(), byAlpha);
     }else if(GetSvg()){
-        // SVG supports 9-patch now
         DrawSVG9Patch(pRT, GetSvg(), rcDraw, &rcSour, &m_rcMargin, byAlpha);
     }
 }
@@ -633,7 +700,7 @@ void SSkinGradation2::OnInitFinished(THIS_ IXmlNode *xmlNode)
 }
 
 //////////////////////////////////////////////////////////////////////////
-// SScrollbarSkin
+// SSkinScrollbar
 SSkinScrollbar::SSkinScrollbar()
     : m_nMargin(0)
     , m_bHasGripper(FALSE)
@@ -644,6 +711,11 @@ SSkinScrollbar::SSkinScrollbar()
 CRect SSkinScrollbar::GetPartRect(int nSbCode, int nState, BOOL bVertical) const
 {
     CSize sz = GetSkinSize();
+    if(GetSvg() && GetScale()!=100){
+        //restore sz to original size
+        sz.cx = MulDiv(sz.cx, 100, GetScale());
+        sz.cy = MulDiv(sz.cy, 100, GetScale());
+    }
     CSize szFrame(sz.cx / 9, sz.cx / 9);
     if (nSbCode == SB_CORNOR)
     {
@@ -747,7 +819,10 @@ int SSkinScrollbar::GetIdealSize() const
     if (GetImage())
         return GetImage()->Width() / 9;
     else if (GetSvg())
-        return GetSvg()->GetWidth() / 9;
+    {
+        int ret = GetSvg()->GetWidth() / 9;
+        return ret * GetScale() / 100;
+    }    
     return 0;
 }
 
