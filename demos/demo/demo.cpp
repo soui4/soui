@@ -55,7 +55,7 @@
 static const TCHAR *kPath_SysRes = _T("/../../soui-sys-resource");
 static const TCHAR *kPath_UiRes = _T("/uires");
 
-#define SYS_NAMED_RESOURCE _T("soui-sys-resource")
+#define SYS_NAMED_RESOURCE _T("soui-sys-resource-dark")
 
 #include <controls.extend/smiley/SSmileyCtrl.h>
 #include "skin/SSkinLoader.h"

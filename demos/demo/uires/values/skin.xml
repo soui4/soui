@@ -21,9 +21,7 @@
 	<imglist name="skin_message" src="imgx:message" states="3"  />
 	<imglist name="skin_contacts" src="imgx:contacts" states="3"  />
 	<imglist name="skin_group" src="imgx:group" states="3"  />
-	<imgframe name="skin_tab_left" src="imgx:png_tab_left" states="3" margin="1,1,1,1" />
 	<imglist name="skin_tab_left_splitter" src="imgx:png_tab_left_splitter" />
-	<imglist name="skin_tab_main" src="imgx:png_tab_main" states="3" />
 	<imglist name="skin_btn_menu" src="imgx:btn_menu" states="3" />
 	<imglist name="skin_propswitch" src="imgx:png_propswitch" states="4" />
 	<imglist name="skin_bkgnd" src="IMGX:jpg_bkgnd" />
@@ -38,7 +36,6 @@
 	<imgframe name="cal_arrow_left" src="img.calendar2:cal_arrow_left" states="3" />
 	<imgframe name="cal_arrow_right" src="img.calendar2:cal_arrow_right" states="3" />
 	<imgframe name="cal_btn_day" src="img.calendar2:cal_btn_day" states="3" />
-	<imgframe name="skin_lcex_header" src="imgx:png_lcex_header" states="4" margin-x="2" margin-y="2" />
 	<imgframe name="skin_lcex_header_arrow" src="imgx:png_lcex_header_arrow" states="2" />
 	<imgframe name="skin_lcex_selectrange" src="imgx:png_lcex_selectrange" margin-x="1" margin-y="1" />
 	<imgframe name="skin_icon1" src="imgx:png_icon1" />
@@ -49,7 +46,6 @@
 	<imgframe name="skin_icon6" src="imgx:png_icon6" />
 	<imgframe name="skin_icon7" src="imgx:png_icon7" />
 	<imgframe name="skin_star1" src="imgx:png_star1" states="2" />
-	<imgframe name="skin_install" src="imgx:png_install" states="3" />
 	<gif name="gif_horse" src="img.game:gif_horse" />
 	<gif name="gif_win" src="img.game:gif_win" />
 	<imglist name="img_coin" src="img.game:img_coin" />
@@ -70,7 +66,6 @@
 	<imglist name="skin_avatar_low" src="imgx:png_avatar" filterLevel="low" />
 	<imglist name="skin_avatar_medium" src="imgx:png_avatar" filterLevel="medium" />
 	<imglist name="skin_avatar_high" src="imgx:png_avatar" filterLevel="high" />
-	<imgframe name="skin_item_bk" src="imgx:png_img_bk" states="3" margin="3,3,3,3" />
 	<imglist name="skin_btn_skin" src="imgx:png_btn_skin" states="3" />
 	<!--背景图不允许调色-->
 	<imglist name="skin_bkimg_0" src="bkimg:skin_pic_0" colorizeEnable="0" autoFit="0" />
@@ -100,7 +95,6 @@
 	<gradation name="skin_caption" colorFrom="#0000bb" colorTo="#0000ff" vertical="0" />
 	<imgframe name="skin_btn_skin1_png" src="IMGX:btn_skin1_png" states="4" autoFit="1" margin-x="1" margin-y="1" />
   <imglist name="skin_icons"	src="imgx:icons.png" states="11"/>
-  <imgframe name="skin_category" src="imgx:btn_catetory.png" states="3" margin="3,3,3,3"/>
 
   <imglist name="clock.background" src="img.clock:background"/>
 

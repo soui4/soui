@@ -115,7 +115,7 @@ class SOUI_EXP SComboView : public TComboBaseProxy<IComboView> {
      * @brief Get the height of the list view
      * @return Height of the list view
      */
-    virtual int GetListBoxHeight();
+    virtual int GetListBoxHeight() override;
 
     /**
      * @brief Handle creation of the dropdown window

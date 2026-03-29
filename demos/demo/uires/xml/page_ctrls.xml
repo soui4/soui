@@ -8,7 +8,7 @@
 			</button>
 			<aniwindow name="container" layout="vbox" size="-2,-1" Interpolator="Accelerate" factor="1.0" steps="10" gravity="center" />
 		</groupTemplate>
-		<itemTemplate size="-2,30" layout="hbox" gravity="center" class_name="check2" skin="skin_category">
+		<itemTemplate size="-2,30" layout="hbox" gravity="center" class_name="check2" skin="_skin.sys.list.item">
 			<img skin="skin_ctrl_icons" name="img_indicator" size="20,20" iconIndex="0" />
 			<text name="txt_label" extend_left="10" />
 		</itemTemplate>
@@ -45,8 +45,8 @@
 	</grouplist>
 	<tabctrl pos="[0,0,-0,-0" name="tab_ctrls" font="style:StrokeAndFill,blurStyle:solid,blurRadius:3" animateSteps="10" animateType="1" tabHeight="0">
     <page title="mclistview">
-      <mclistview name="mclv_test" multiSel="1" colorBkgnd="@color/white" pos="10,10,-10,-10" headerHeight="30" colorGrid="@color/red">
-        <headerStyle wndclass="header" align="center" name="mclv_test_header" sortSkin="skin_lcex_header_arrow" itemSkin="skin_lcex_header" itemSwapEnable="1" fixWidth="0" font="underline:0,adding:-3" sortHeader="1" colorBkgnd="#ffffff">
+      <mclistview name="mclv_test" multiSel="1" colorBkgnd="@color/white" pos="10,10,-10,-10" headerHeight="30" dividerSize="1">
+        <headerStyle wndclass="header" align="center" name="mclv_test_header" sortSkin="skin_lcex_header_arrow" itemSwapEnable="1" fixWidth="0" font="underline:0,adding:-3" sortHeader="1" colorBkgnd="#ffffff">
           <items>
             <item weight="480" align="left">@string/mccol_1</item>
             <item weight="95" >@string/mccol_2</item>
@@ -80,13 +80,13 @@
             <animateimg pos="|0,|0" offset="-0.5,-0.5" skin="skin_busy" name="ani_test" tip="animateimg is used here" msgTransparent="0" />
           </window>
           <window name="col6" clipClient="1">
-            <imgbtn animate="1" pos="|-35,|-14" font="adding:-3" align="center" skin="skin_install" name="btn_uninstall">卸载</imgbtn>
+            <button animate="1" pos="|-35,|-14,@60,@26" font="adding:-3" align="center" name="btn_uninstall">卸载</button>
           </window>
         </template>
       </mclistview>
     </page>
     <page title="listctrl">
-			<listctrl name="lc_test" hotTrack="1" pos="10,0,-10,-10" itemHeight="20" headerHeight="30" cursor="CUR_TST" font="underline:1" itemSkin="skin_tab_left" sbSkin="skin_new_scrollbar">
+			<listctrl name="lc_test" hotTrack="1" pos="10,0,-10,-10" itemHeight="20" headerHeight="30" cursor="CUR_TST" font="underline:1" sbSkin="skin_new_scrollbar">
 				<headerStyle align="left" itemSwapEnable="1" fixWidth="0" sortHeader="1">
 					<items>
 						<item width="150" weight="1">name</item>
@@ -99,25 +99,23 @@
 		</page>
 		<page title="listview(fix)" layout="vbox" interval="10">
       <listview size="-2,100" name="lv_test_fix_horz" dividerSize="5" wantTab="1" sbFadeFrames="30" vertical="0">
-        <template itemWidth="100" colorHover="#cccccc" colorSelected="#0000ff" trackMouseEvent="1">
-          <imgbtn size="-2,-2" skin="skin_tab_main" layout="vbox" gravity="center" interval="10">
+        <template itemWidth="100" trackMouseEvent="1">
+          <imgbtn size="-2,-2" layout="vbox" gravity="center" interval="10">
             <img size="-1,-1" name="btn_icon" skin="skin_page_icons" iconIndex="0"/>
             <text size="-1,-1" name="btn_text" text="hello"/>
           </imgbtn>
         </template>
       </listview>
-      
 			<listview size="-2,0" weight="1" name="lv_test_fix" dividerSize="5" wantTab="1" sbFadeFrames="30">
-				<template itemHeight="50" colorHover="#cccccc" colorSelected="#0000ff" trackMouseEvent="1">
+				<template itemHeight="50" trackMouseEvent="1">
 					<button pos="10,5,@150,@25" name="btn_test" tip="click the button to see how to writing the response function">btn</button>
 					<animateimg pos="[10,{0" skin="skin_busy" name="ani_test" tip="animateimg is used here" msgTransparent="0" />
-          
 					<combobox name="cbx_in_lv" pos="[10,{0,@200,@30" dropDown="1" dropHeight="300" class="cls_edit" dotted="0" animateTime="200" curSel="2">
 						<dropdownStyle>
 							<root colorBkgnd="#ffffff"/>
 						</dropdownStyle>
-						<liststyle class="cls_edit" iconSkin="skin_menuicon" itemSkin="skin_tab_left" itemHeight="30" colorText="#000000" colorSelText="#FFFFFF" colorItemBkgnd="#FFFFFF" colorItemSelBkgnd="#000088" />
-						<editstyle inset="5,0,5,0" margin="0" colorText="#000000" align="left" colorBkgnd="#FFFFFF" />
+						<liststyle class="cls_edit" iconSkin="skin_menuicon" itemHeight="30"/>
+						<editstyle inset="5,0,5,0" margin="0" align="left"/>
 						<items>
 							<item text="combobox.item1" icon="1" data="100" />
 							<item text="combobox.item2" icon="2" data="100" />
@@ -127,22 +125,22 @@
 							<item text="combobox.item6" icon="0" data="100" />
 						</items>
 					</combobox>
-					<text pos="-20,{0" offset="-1,0" colorText="#ff0000">text item</text>
+					<text pos="-20,{0" offset="-1,0">text item</text>
 				</template>
 			</listview>
 		</page>
 		<page title="listview(flex)">
 			<listview pos="5,0,-5,-5" name="lv_test_flex" dividerSize="5" sbFadeFrames="30">
 				<template defHeight="50" oddHeight="50" evenHeight="60" evenSelHeight="90">
-					<itemOdd colorHover="#cccccc" colorSelected="#0000ff">
+					<itemOdd>
 						<button pos="10,5,@150,@25" name="btn_test" tip="click the button to see how to writing the response function">btn</button>
 						<text pos="10,[0" multiLines="1" maxWidth="500" colorText="@color/red">text in odd item</text>
 					</itemOdd>
-					<itemEven colorHover="#cccccc" colorSelected="#0000ff">
+					<itemEven>
 						<button pos="10,5,@150,@25" name="btn_test" tip="click the button to see how to writing the response function">btn</button>
 						<text pos="20,[0" colorText="#000000">text in even item</text>
 					</itemEven>
-					<itemEvenHover colorHover="#cccccc" colorSelected="#0000ff">
+					<itemEvenHover>
 						<button pos="10,5,@150,@25" name="btn_test" tip="click the button to see how to writing the response function">btn</button>
 						<text pos="20,[0" colorText="#000000" multilines="1">text in even item been hovered.\n the second line</text>
 					</itemEvenHover>
@@ -150,8 +148,8 @@
 			</listview>
 		</page>
 		<page title="tileview">
-			<tileview pos="5,0,-5,-5" name="lv_test_tile" wantTab="1" marginSize="5" colorBkgnd="#FFFFFF" sbFadeFrames="30">
-				<template itemHeight="130" itemWidth="135" colorHover="#cccccc" colorSelected="#0000ff" trackMouseEvent="1" skin="skin_item_bk">
+			<tileview pos="5,0,-5,-5" name="lv_test_tile" wantTab="1" marginSize="5" sbFadeFrames="30">
+				<template itemHeight="130" itemWidth="135" trackMouseEvent="1">
 					<img pos="|0,0,@100,@100" offset="-0.5,0" name="img_file_icon" />
 					<button pos="|0,[5,@115,@22" offset="-0.5,0" name="btn_test" tip="click the button to see how to writing the response function">btn</button>
 				</template>
@@ -159,7 +157,7 @@
 		</page>
 		<page title="mclistviewex">
 			<mclistviewex name="musiclist" headerHeight="48" colorSwapLine="rgb(0,0,255)" colorDropBk="rgb(0,0,255)" pos="20,20,-20,-20" sbTop="48" sbFadeFrames="30">
-				<headerStyle wndclass="header2" align="center" matchParent="1" sortSkin="skin_lcex_header_arrow" itemSkin="skin_lcex_header" cursor="hand" itemSwapEnable="1" sortHeader="0" colorText="#000000ff">
+				<headerStyle wndclass="header2" align="center" matchParent="1" sortSkin="skin_lcex_header_arrow"  cursor="hand" itemSwapEnable="1" sortHeader="0" colorText="#000000ff">
 					<items>
 						<item width="150">歌曲</item>
 						<item width="120">歌手</item>
@@ -364,7 +362,7 @@
           <dropdownStyle>
             <root colorBkgnd="#ffffff"/>
           </dropdownStyle>
-          <liststyle class="cls_edit" iconSkin="skin_menuicon" itemSkin="skin_tab_left" itemHeight="30" colorText="#000000" colorSelText="#FFFFFF" colorItemBkgnd="#FFFFFF" colorItemSelBkgnd="#000088" />
+          <liststyle class="cls_edit" iconSkin="skin_menuicon" itemHeight="30" />
 					<editstyle inset="5,0,5,0" margin="0" colorText="#000000" align="left" colorBkgnd="#FFFFFF" />
 					<items>
 						<item text="combobox.item1" icon="1" data="100" />
@@ -378,7 +376,7 @@
 				<button size="-2,25" extend_top="10" on_command="on_btn_select_cbx">setcursel(-1)</button>
 			</group>
 			<group text="listbox" size="-1,-2" layout="vbox" extend_left="20" padding="10,10,10,10">
-				<listbox name="lb_test" size="250,0" weight="1" hotTrack="1" itemSkin="skin_tab_left" class="cls_edit" iconSkin="skin_menuicon" itemHeight="30" colorText="#000000" colorSelText="#FFFFFF" colorItemBkgnd="#FFFFFF" colorItemSelBkgnd="#000088">
+				<listbox name="lb_test" size="250,0" weight="1" hotTrack="1" class="cls_edit" iconSkin="skin_menuicon" itemHeight="30">
 					<items>
 						<item text="item1" icon="1" data="100" />
 						<item text="item2" icon="2" data="100" />

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="20" viewBox="0 0 80 20">
+  <!-- 正常状态 -->
+  <g id="normal" transform="translate(0, 0)">
+    <rect width="20" height="20" fill="#f0f0f0" stroke="#cccccc" stroke-width="1" rx="2" ry="2"/>
+    <rect x="8" y="8" width="4" height="4" fill="#888888"/>
+  </g>
+  <!-- 悬停状态 -->
+  <g id="hover" transform="translate(20, 0)">
+    <rect width="20" height="20" fill="#e0e0e0" stroke="#bbbbbb" stroke-width="1" rx="2" ry="2"/>
+    <rect x="8" y="8" width="4" height="4" fill="#777777"/>
+  </g>
+  <!-- 按下状态 -->
+  <g id="pressed" transform="translate(40, 0)">
+    <rect width="20" height="20" fill="#d0d0d0" stroke="#aaaaaa" stroke-width="1" rx="2" ry="2"/>
+    <rect x="8" y="8" width="4" height="4" fill="#999999"/>
+  </g>
+  <!-- 禁用状态 -->
+  <g id="disabled" transform="translate(60, 0)">
+    <rect width="20" height="20" fill="#e8e8e8" stroke="#bbbbbb" stroke-width="1" rx="2" ry="2"/>
+    <rect x="8" y="8" width="4" height="4" fill="#aaaaaa"/>
+  </g>
+</svg>

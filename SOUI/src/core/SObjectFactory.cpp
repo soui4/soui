@@ -105,20 +105,20 @@ SObjectInfo SObjectFactoryMgr::BaseObjectInfoFromObjectInfo(const SObjectInfo &o
 
 void SObjectFactoryMgr::SetSwndDefAttr(IObject *pObject) const
 {
-    LPCWSTR pszClassName = pObject->GetObjectClass();
-
     if (pObject->GetObjectType() != Window)
         return;
-
     //检索并设置类的默认属性
-    SXmlNode defAttr;
     SObjDefAttr *pDefObjAttr = GETUIDEF->GetUiDef()->GetObjDefAttr();
-    if (pDefObjAttr)
-        defAttr = pDefObjAttr->GetDefAttribute(pszClassName);
-
-    if (defAttr)
+    if (!pDefObjAttr)
+        return;
+    wchar_t szClassNameList[20][50] = { 0 };
+    int lens = pObject->GetClassNameList(szClassNameList, 20);
+    for (int i = lens-1; i>=0; i--)
     {
-        //优先处理"class"属性
+        SXmlNode defAttr = pDefObjAttr->GetDefAttribute(szClassNameList[i]);
+        if (!defAttr)
+            continue;
+        // 优先处理"class"属性
         SXmlAttr attrClass = defAttr.attribute(L"class");
         if (attrClass)
         {

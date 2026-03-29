@@ -66,7 +66,7 @@
         <imgbtn id="1" skin="_skin.sys.btn.close"  tip="close" animate="1"/>
       </frame>
     </caption>
-    <tabctrl name="tab_main" pos="5,30,-5,-5" interpolator="Decelerate" curSel="0" focusable="0" animateSteps="30" animateType="1" tabHeight="75" tabSkin="skin_tab_main" text-y="50" iconSkin="skin_page_icons" icon-x="10" colorTextHover="#ff0000" fontHover="italic:1">
+    <tabctrl name="tab_main" pos="5,30,-5,-5" interpolator="Decelerate" curSel="0" focusable="0" animateSteps="30" animateType="1" tabHeight="75" text-y="50" iconSkin="skin_page_icons" icon-x="10" colorTextHover="#ff0000" fontHover="italic:1">
       <page title="soui ctrl">
         <include src="layout:page_ctrls"/>
       </page>

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-	<tabctrl pos="0,0,-0,-0" animateSteps="20" tabAlign="left" tabSkin="skin_tab_left" tabInterSkin="skin_tab_left_splitter" tabInterSize="2" tabWidth="150" iconSkin="skin_small_icons" icon-x="5" icon-y="8" colorText="#000000bb" curSel="0">
+	<tabctrl pos="0,0,-0,-0" animateSteps="20" tabAlign="left" tabInterSize="2" tabWidth="150" iconSkin="skin_small_icons" icon-x="5" icon-y="8" colorText="#000000bb" curSel="0">
 		<page title="soui layout">
 			<group pos="0,0,-0,-0" id="10000">
 				I'm a group
@@ -51,7 +51,7 @@
 			</window>
 		</page>
 		<page title="grid layout">
-			<tabctrl pos="0,0,-0,-0" tabAlign="bottom" tabSkin="skin_tab_left" tabInterSkin="skin_tab_left_splitter" tabInterSize="2" tabWidth="200" curSel="0">
+			<tabctrl pos="0,0,-0,-0" tabAlign="bottom" tabInterSize="2" tabWidth="200" curSel="0">
 				<page title="calc">
 					<text pos="|0,10" offset="-0.5,0" text="soui grid layout calc" />
 					<window pos="10,[5,@350,-10" layout="gridLayout" columnCount="4" rowCount="6" xInterval="5" yInterval="5" xGravity="fill" yGravity="fill">

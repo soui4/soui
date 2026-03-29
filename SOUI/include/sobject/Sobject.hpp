@@ -234,6 +234,15 @@ public:
     }
 
     /**
+     * @brief Gets the class names of the object.
+     * @return Number of names copied to the buffer.
+     */
+    STDMETHOD_(int, GetClassNameList)(CTHIS_ wchar_t ppClassNameList[][50], int nMaxCount) SCONST OVERRIDE
+    {
+        return 0;
+    }
+
+    /**
      * @brief Retrieves an attribute value.
      * @param strAttr Attribute name.
      * @param pValue Pointer to store the attribute value.

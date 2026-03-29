@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="136" height="17" viewBox="0 0 136 17">
+  <!-- 未选中 - 正常 -->
+  <g id="unchecked_normal" transform="translate(0, 0)">
+    <rect width="16" height="16" fill="#f0f0f0" stroke="#cccccc" stroke-width="1"/>
+  </g>
+  <!-- 未选中 - 悬停 -->
+  <g id="unchecked_hover" transform="translate(17, 0)">
+    <rect width="16" height="16" fill="#e0e0e0" stroke="#bbbbbb" stroke-width="1"/>
+  </g>
+  <!-- 未选中 - 按下 -->
+  <g id="unchecked_pressed" transform="translate(34, 0)">
+    <rect width="16" height="16" fill="#d0d0d0" stroke="#aaaaaa" stroke-width="1"/>
+  </g>
+  <!-- 未选中 - 禁用 -->
+  <g id="unchecked_disabled" transform="translate(51, 0)">
+    <rect width="16" height="16" fill="#e8e8e8" stroke="#bbbbbb" stroke-width="1"/>
+  </g>
+  <!-- 选中 - 正常 -->
+  <g id="checked_normal" transform="translate(68, 0)">
+    <rect width="16" height="16" fill="#f0f0f0" stroke="#cccccc" stroke-width="1"/>
+    <path d="M4,8 L7,11 L12,5" stroke="#448844" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <!-- 选中 - 悬停 -->
+  <g id="checked_hover" transform="translate(85, 0)">
+    <rect width="16" height="16" fill="#e0e0e0" stroke="#bbbbbb" stroke-width="1"/>
+    <path d="M4,8 L7,11 L12,5" stroke="#559955" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <!-- 选中 - 按下 -->
+  <g id="checked_pressed" transform="translate(102, 0)">
+    <rect width="16" height="16" fill="#d0d0d0" stroke="#aaaaaa" stroke-width="1"/>
+    <path d="M4,8 L7,11 L12,5" stroke="#337733" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <!-- 选中 - 禁用 -->
+  <g id="checked_disabled" transform="translate(119, 0)">
+    <rect width="16" height="16" fill="#e8e8e8" stroke="#bbbbbb" stroke-width="1"/>
+    <path d="M4,8 L7,11 L12,5" stroke="#336633" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

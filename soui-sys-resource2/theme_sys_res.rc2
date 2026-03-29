@@ -38,6 +38,7 @@ SYS_SPIN_DOWN           PNG                     "theme_sys_res/sys_spin_down.png
 SYS_SPIN_UP             PNG                     "theme_sys_res/sys_spin_up.png"
 SYS_SWITCH              PNG                     "theme_sys_res/sys_switch.png"
 SYS_SWITCH_BG           PNG                     "theme_sys_res/sys_switch_bg.png"
+SYS_LIST_ITEM           PNG                     "theme_sys_res/sys_list_item.png"
 /////////////////////////////////////////////////////////////////////////////
 //
 // XML
@@ -46,3 +47,4 @@ SYS_SWITCH_BG           PNG                     "theme_sys_res/sys_switch_bg.png
 SYS_XML_SKIN            XML                     "theme_sys_res/sys_xml_skin.xml"
 SYS_XML_EDITMENU        XML                     "theme_sys_res/sys_xml_editmenu.xml"
 SYS_XML_MSGBOX          XML                     "theme_sys_res/sys_xml_msgbox.xml"
+THEME_COLOR             XML                     "theme_sys_res/theme_color.xml"

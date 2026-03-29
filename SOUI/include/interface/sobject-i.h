@@ -77,7 +77,13 @@ SNSBEGIN
         if (wcscmp(GetClassName(), lpszName) == 0)      \
             return TRUE;                                \
         return __baseCls::IsClass(lpszName);            \
-    }
+    }                                                   \
+    virtual int WINAPI GetClassNameList(wchar_t ppClassNameList[][50], int nMaxCount) const\
+    {                                                   \
+        if(nMaxCount>0 && ppClassNameList) wcscpy_s(ppClassNameList[0],50, GetClassName()); \
+        return __baseCls::GetClassNameList(ppClassNameList?(ppClassNameList+1):NULL, nMaxCount-1) +1; \
+    }                                                   
+
 
 #define DEF_SOBJECT(baseCls, clsName) DEF_SOBJECT_EX(baseCls, clsName, NULL)
 

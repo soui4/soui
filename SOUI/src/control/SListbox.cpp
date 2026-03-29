@@ -22,7 +22,7 @@ SListBox::SListBox()
     , m_crItemHotBg(RGBA(57, 145, 209, 128))
     , m_crText(CR_INVALID)
     , m_crSelText(CR_INVALID)
-    , m_pItemSkin(NULL)
+    , m_pItemSkin(GETBUILTINSKIN(SKIN_SYS_LIST_ITEM))
     , m_pIconSkin(NULL)
     , m_bHotTrack(FALSE)
 {

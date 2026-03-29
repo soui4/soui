@@ -48,7 +48,7 @@ static const float ps_dash[] = { 12.0f, 6.0f };
 static const float ps_dot[] = { 3.0f, 3.0f };
 static const float ps_dashdot[] = { 12.0f, 3.0f, 3.0f, 6.0f };
 static const float ps_dashdotdot[] = { 12.0f, 3.0f, 3.0f, 3.0f, 3.0f, 6.0f };
-
+#define MAX_DASH_SEGS  ARRAYSIZE(ps_dashdotdot)
 const struct LineDashEffect
 {
     const float *fDash;
@@ -120,16 +120,15 @@ class SLineDashEffect {
         : pDashPathEffect(NULL)
     {
         iStyle = iStyle & PS_STYLE_MASK;
-        if (iStyle >= PS_SOLID && iStyle <= PS_DASHDOTDOT)
+        if (iStyle > PS_SOLID && iStyle <= PS_DASHDOTDOT)
         {
             const LineDashEffect *pEff = &LINEDASHEFFECT[iStyle];
-            float *pDash = new float[pEff->nCount];
+            float pDash[MAX_DASH_SEGS];
             for (int i = 0; i < pEff->nCount; i++)
             {
-                pDash[i] = pEff->fDash[i] / nLineWidth;
+                pDash[i] = pEff->fDash[i] * nLineWidth;
             }
             pDashPathEffect = SkDashPathEffect::Create(pDash, pEff->nCount, 0.0f);
-            delete[] pDash;
         }
     }
     ~SLineDashEffect()

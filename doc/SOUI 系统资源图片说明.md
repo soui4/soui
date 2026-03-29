@@ -1,10 +1,10 @@
-# SOUI 系统资源图片说明文档
+# SOUI 系统资源说明文档
 
-本文档基于 `soui-sys-resource/theme_sys_res/sys_xml_skin.xml` 配置文件，详细说明 SOUI 框架系统主题资源图片的功能和用途。
+## 系统皮肤配置文件: sys_xml_skin.xml - 皮肤定义文件
+该文件件定义了 SOUI 系统的皮肤，包括窗口、按钮、组合框、滚动条、菜单等widget需要的皮肤资源.
+### 一、窗口与对话框相关图片
 
-## 一、窗口与对话框相关图片
-
-### 1. 窗口背景与边框
+#### 1. 窗口背景与边框
 - **sys_wnd_bkgnd.png** (14x86) - 窗口背景皮肤
   - 用途：用作窗口默认背景皮肤（`_skin.sys.wnd.bkgnd`）
   - 特性：支持九宫格拉伸（left="5" right="5" top="5" bottom="5"）
@@ -15,7 +15,7 @@
   - 特性：2 种状态，支持 margin 拉伸
   - 使用场景：需要边框装饰的 UI 元素
 
-### 2. 窗口控制按钮（标题栏按钮）
+#### 2. 窗口控制按钮（标题栏按钮）
 - **sys_btn_close.png** (91x31) - 关闭按钮
   - 用途：窗口关闭按钮皮肤（`_skin.sys.btn.close`）
   - 特性：3 种状态（正常/悬停/按下）
@@ -36,15 +36,15 @@
   - 特性：3 种状态
   - 使用场景：caption 中的还原按钮（与最大化按钮切换使用）
 
-### 3. 消息框图标
+#### 3. 消息框图标
 - **sys_msgicon.png** (241x49) - 消息框图标
   - 用途：消息框中的提示图标（`_skin.sys.msgicon`）
   - 特性：5 种状态（完成|done/警告|warning/信息|info/错误stop/问题确认|question）
   - 使用场景：MessageBox 等对话框中的图标显示
 
-## 二、表单控件相关图片
+### 二、表单控件相关图片
 
-### 1. 复选框与单选框
+#### 1. 复选框与单选框
 - **sys_checkbox.png** (129x17) - 复选框
   - 用途：标准复选框皮肤（`_skin.sys.checkbox`）
   - 特性：8 种状态，不支持按下即选中（checkAsPushdown="0"）
@@ -67,13 +67,13 @@
   - 特性：1种状态, 叠加显示在单选框上
   - 使用场景：需要键盘导航的单选框
 
-### 2. 下拉按钮
+#### 2. 下拉按钮
 - **sys_dropbtn.png** (49x17) - 下拉按钮
   - 用途：下拉框的下拉箭头按钮（`_skin.sys.dropbtn`）
   - 特性：3 种状态（正常/悬停/按下）
   - 使用场景：ComboBox、下拉选择器等
 
-### 3. 自旋按钮（上下调节按钮）
+#### 3. 自旋按钮（上下调节按钮）
 - **sys_spin_up.png** (17x48) - 向上按钮
   - 用途：数值调节的向上按钮（`_skin.sys.spin.up`）
   - 特性：3 种状态，垂直排列
@@ -94,9 +94,9 @@
   - 特性：3 种状态
   - 使用场景：分页器、列表导航等
 
-## 三、列表与树形控件相关图片
+### 三、列表与树形控件相关图片
 
-### 1. 树形控件专用
+#### 1. 树形控件专用
 - **sys_tree_toggle.png** (103x18) - 树节点展开/折叠切换器
   - 用途：树节点的展开/折叠按钮（`_skin.sys.tree.toggle`）
   - 特性：6 种状态（正常/悬停/按下）×（展开/折叠）
@@ -107,27 +107,27 @@
   - 特性：9 种状态 (正常/悬停/按下)*(未选中/选中/半选) 
   - 使用场景：支持复选的树形控件
 
-### 2. 列表头
+#### 2. 列表头
 - **sys_header.png** (200x20) - 列表头
   - 用途：列表控件的列头皮肤（`_skin.sys.header`）
   - 特性：4 种状态 (正常/悬停/按下/禁用)
   - 使用场景：ListCtrl、TableCtrl 的列头
 
-## 四、滚动与进度条相关图片
+### 四、滚动与进度条相关图片
 
-### 1. 滚动条
+#### 1. 滚动条
 - **sys_scrollbar.png** (145x49) - 滚动条
   - 用途：标准滚动条皮肤（`_skin.sys.scrollbar`）
   - 特性：支持 margin 设置, 支持九宫格拉伸, 滚动条图片是一个复合图片,它包含4行9列,每一列包含一种滚动条元素的4种状态: 正常/悬停/按下/禁用, 第一列代表一个滚动条元素,前面8列分别为: 垂直滚动条lineup, linedown, thumbtrack, rail, 水平滚动条lineleft, lineright, thumbtrack, rail. 最后一列只有上面3个是有效状态: 控件有横竖两种滚动条时,显示在右下角的交点的代表拉伸块图片, 垂直滚动条的thumbtrack上的grip块图片, 水平滚动条的thumbtrack上的grip块图片.
   - 使用场景：ScrollView、ListBox 等可滚动控件
 
-### 2. 滑块
+#### 2. 滑块
 - **sys_slider_thumb.png** (80x20) - 滑块拇指
   - 用途：滑动条的拖动块（`_skin.sys.slider.thumb`）
   - 特性：4 种状态
   - 使用场景：Slider 控件的拖动部分
 
-### 3. 分割线
+#### 3. 分割线
 - **sys_split_horz.png** (86x7) - 水平分割线
   - 用途：水平方向的分隔线（`_skin.sys.split.horz`）
   - 特性：支持 margin 拉伸
@@ -138,7 +138,7 @@
   - 特性：支持 margin 拉伸
   - 使用场景：垂直布局分隔
 
-### 4. 进度条
+#### 4. 进度条
 - **sys_prog_bkgnd.png** (17x17) - 进度条背景（水平）
   - 用途：水平进度条的背景槽（`_skin.sys.prog.bkgnd`）
   - 特性：支持九宫格拉伸
@@ -159,9 +159,9 @@
   - 特性：支持九宫格拉伸
   - 使用场景：ProgressBar 垂直模式的进度指示
 
-## 五、菜单相关图片
+### 五、菜单相关图片
 
-### 1. 菜单项装饰
+#### 1. 菜单项装饰
 - **sys_menu_check.png** (49x17) - 菜单勾选标记
   - 用途：菜单项的勾选标记（`_skin.sys.menu.check`）
   - 特性：3 种状态: checked, radio unchecked, radio checked
@@ -177,7 +177,7 @@
   - 特性：左侧留白 26 像素用于对齐菜单项
   - 使用场景：菜单分组分隔
 
-### 2. 菜单背景
+#### 2. 菜单背景
 - **sys_menu_border.png** (27x27) - 菜单边框
   - 用途：菜单弹出框的边框（`_skin.sys.menu.border`）
   - 特性：支持 margin 拉伸
@@ -188,14 +188,14 @@
   - 特性：2 种状态: normal, hover.  其中normal左侧留白 26 像素用于放置勾选标记
   - 使用场景：菜单项的背景（包含勾选区域）
 
-## 六、标签页与选项卡
+### 六、标签页与选项卡
 
 - **sys_tab_page.png** (200x30) - 标签页背景
   - 用途：TabCtrl 的页面背景（`_skin.sys.tab.page`）
   - 特性：4 种状态 (正常/悬停/按下/禁用), 使用九宫格拉伸,注意表达出选中状态和未选中状态的区别
   - 使用场景：TabControl 的内容区域背景
 
-## 七、开关控件
+### 七、开关控件
 
 - **sys_switch.png** (304x19) - 开关前景
   - 用途：开关控件的滑动按钮（`_skin.sys.switch`）
@@ -207,14 +207,14 @@
   - 特性：1 种状态
   - 使用场景：Switch 控件的背景轨道
 
-## 八、图标集合
+### 八、图标集合
 
 - **sys_icons.png** (192x16) - 系统图标集合
   - 用途：通用系统图标集（`_skin.sys.icons`）
   - 特性：12 种状态: 文件新建, 文件打开, 文件保存, CUT, COPY, PASTE, PRINT, 大图标模式, 小图标模式, 列表模式,详细模式, 帮助图标
   - 使用场景：编辑菜单、上下文菜单中的功能图标（剪切/复制/粘贴等）
 
-## 九、其他辅助图片
+### 九、其他辅助图片
 
 - **sys_tree_lines.png** - 树形控件连线
   - 用途：树形控件的节点连线（`_skin.sys.tree.lines`）
@@ -232,21 +232,21 @@
   - 使用场景：工具类窗口的关闭按钮的显示状态
 
 
-## 十、使用说明
+### 十、使用说明
 
-### 图片命名规范
+#### 图片命名规范
 所有系统图片遵循以下命名规则：
 - 前缀：`sys_` 表示系统资源
 - 功能描述：如 `btn_` 表示按钮，`menu_` 表示菜单
 - 状态描述：如 `close` 关闭，`maximize` 最大化
 
-### Skin 引用方式
+#### Skin 引用方式
 在 XML 中通过 `_skin.sys.xxx` 名称引用对应的皮肤定义，例如：
 ```xml
 <imgbtn skin="_skin.sys.btn.close" pos="-45,0" tip="close"/>
 ```
 
-### 多状态支持
+#### 多状态支持
 大部分交互性图片支持多种状态（states），常见的状态包括：
 - 正常（normal）
 - 悬停（hover）
@@ -255,49 +255,16 @@
 - 选中（checked）
 - 组合状态（如 hover&checked）
 
-### 九宫格拉伸
+#### 九宫格拉伸
 对于需要适应不同尺寸的背景图片（如窗口背景、进度条背景），采用九宫格拉伸技术，通过 margin 属性定义不变形的区域。
 
-### SVG 支持
+#### SVG 支持
+从 SOUI 5.2 开始，系统支持 SVG 图片资源
+- **src** - 资源id, TYPE:ID形式, 如 `PNG:MY_IMAGE`, `FILE:icon.svg`, 当type为FILE时，则表示文件路径。type为svg时，则表示svg资源。
 
-从 SOUI4 开始，系统移除了独立的 `svg` skin 类型，改为在 `imglist`、`imgframe`、`imgcenter` 等图片类 skin 中直接支持 SVG。
+- 使用svg资源需要确保编译时启用了 `SOUI_ENABLE_SVG` 宏
 
-#### 使用方式
-
-**1. 使用位图图片（默认方式）**
-```xml
-<imglist name="mySkin" src="PNG:MY_IMAGE" states="3"/>
-```
-
-**2. 使用 SVG 图片**
-```xml
-<!-- 方式 1：使用 svg 属性 -->
-<imglist name="mySkin" src="FILE:icon.svg" svg="true"/>
-
-<!-- 方式 2：直接使用 svgSrc 属性 -->
-<imglist name="mySkin" svgSrc="FILE:icon.svg"/>
-```
-
-#### 支持的 Skin 类型
-以下 skin 类型都支持 SVG：
-- `imglist` - 图片列表皮肤
-- `imgframe` - 图片帧皮肤（支持九宫格）
-- `imgcenter` - 居中图片皮肤
-- `imgbtnex` - 扩展图片按钮皮肤
-
-#### SVG 属性说明
-- **svg** - 布尔值，设置为 `true` 或 `1` 时启用 SVG 模式
-- **svgSrc** - SVG 文件路径，当设置了此属性时自动启用 SVG 模式
-- **src** - 资源路径，配合 `svg` 属性使用
-
-#### 注意事项
-1. SVG 文件必须使用 `FILE:` 前缀指定文件路径
-2. SVG 不支持多状态（states 属性对 SVG 无效）
-3. SVG 会自动缩放到绘制区域大小
-4. SVG 不支持平铺（tile 属性对 SVG 无效）
-5. 需要确保编译时启用了 `SOUI_ENABLE_SVG` 宏
-
-#### 示例代码
+### 示例代码
 
 ```xml
 <skin>
@@ -315,53 +282,140 @@
 </skin>
 ```
 
-## 十一、典型应用场景
+## theme_color.xml - 颜色主题文件
 
-### 1. 主窗口框架
+**文件路径**：`theme_sys_res/theme_color.xml`
+
+**功能说明**：
+定义系统主题的文字颜色，用于不同状态下的文本显示, 在app的ui中使用@color/thm_txt_normal等引用这些颜色定义。
+
+**颜色定义**：
+
+- **thm_txt_normal**：正常状态文字颜色 `rgb(220,220,220)`
+- **thm_txt_hover**：悬停状态文字颜色 `rgb(255,255,255)`
+- **thm_txt_push**：按下状态文字颜色 `rgb(200,200,200)`
+- **thm_txt_disabled**：禁用状态文字颜色 `rgb(128,128,128)`
+
+**使用场景**：
+- 按钮文字
+- 菜单项文字
+- 其他需要状态变化的文本元素
+
+**配置示例**：
 ```xml
-<SOUI>
-  <root skin="_skin.sys.wnd.bkgnd">
-    <caption>
-      <imgbtn skin="_skin.sys.btn.close"/>
-      <imgbtn skin="_skin.sys.btn.minimize"/>
-      <imgbtn skin="_skin.sys.btn.maximize"/>
-    </caption>
-  </root>
-</SOUI>
+<color>
+  <thm_txt_normal value="rgb(220,220,220)"/>
+  <thm_txt_hover value="rgb(255,255,255)"/>
+  <thm_txt_push value="rgb(200,200,200)"/>
+  <thm_txt_disabled value="rgb(128,128,128)"/>
+</color>
 ```
 
-### 2. 消息对话框
+## sys_xml_msgbox.xml - 消息框布局文件
+
+**文件路径**：`theme_sys_res/sys_xml_msgbox.xml`
+
+**功能说明**：
+定义系统消息框（MessageBox）的布局结构和样式配置。
+
+**主要组件**：
+
+- **窗口属性**
+  - 标题：mesagebox
+  - 尺寸：自适应（width="-1" height="-1"）
+  - 最小尺寸：300x132
+  - 不可调整大小（resize="0"）
+  - 支持透明（translucent="1"）
+
+- **样式定义（style）**
+  - 标题文字颜色：`#e3e7eb`
+  - 消息文字颜色：`#c1c3c5`
+  - 按钮样式类：`normalbtn`
+    - 皮肤：`_skin.sys.btn.normal`
+    - 文字颜色：正常`#e3e7eb`，禁用`#91a7c0`
+    - 文本模式：`0x25`（居中对齐）
+    - 光标：手型（hand）
+
+- **按钮文本定义（buttonText）**
+  - 确定(&O) - 快捷键Ctrl+O
+  - 取消(&C) - 快捷键Ctrl+C
+  - 中止(&A) - 快捷键Ctrl+A
+  - 重试(&R) - 快捷键Ctrl+R
+  - 是(&Y) - 快捷键Ctrl+Y
+  - 否(&N) - 快捷键Ctrl+N
+  - 忽略(&I) - 快捷键Ctrl+I
+
+- **布局结构**
+  - 根容器：使用`_skin.sys.wnd.bkgnd`皮肤，垂直布局（vbox）
+  - 标题栏：高度29像素
+    - 标题文字：位置(9,9)，宽度100
+    - 关闭按钮：皮肤`_skin.sys.btn.close`，位置(-45,0)
+  - 内容区域：水平布局（hbox），间距5，内边距10
+    - 消息图标：50x50，皮肤`_skin.sys.msgicon`
+    - 消息文字：多行显示，垂直对齐顶部，最大宽度300
+  - 按钮区域：TabCtrl容器，高度50
+    - 支持单按钮、双按钮、三按钮三种布局
+
+**使用场景**：
+- 系统消息提示
+- 确认对话框
+- 警告对话框
+- 错误对话框
+
+## sys_xml_editmenu.xml - 编辑菜单文件
+
+**文件路径**：`theme_sys_res/sys_xml_editmenu.xml`
+
+**功能说明**：
+定义系统编辑菜单的结构和内容，用于文本编辑相关的右键菜单或编辑菜单。
+
+**菜单配置**：
+
+- **菜单属性**
+  - 图标皮肤：`_skin.sys.icons`
+  - 菜单项高度：26像素
+  - 图标边距：4像素
+  - 文字边距：8像素
+
+- **菜单项定义**
+  - 剪切（cut）- 图标索引1
+  - 复制（copy）- 图标索引0
+  - 粘贴（paste）- 图标索引2
+  - 删除（delete）- 图标索引3
+  - 分隔线（sep）
+  - 全选（select all）- 图标索引4
+
+**配置示例**：
 ```xml
-<window>
-  <img skin="_skin.sys.msgicon"/>
-  <text name="msgtext"/>
-  <button skin="_skin.sys.btn.normal"/>
-</window>
+<?xml version="1.0" encoding="utf-8"?>
+<editmenu trCtx="editmenu" iconSkin="_skin.sys.icons" itemHeight="26" iconMargin="4" textMargin="8" >
+  <item id="1" icon="1">cut</item>
+  <item id="2" icon="0">copy</item>
+  <item id="3" icon="2">paste</item>
+  <item id="4" icon="3">delete</item>
+  <sep/>
+  <item id="5" icon="4">select all</item>
+</editmenu>
 ```
 
-### 3. 表单界面
-```xml
-<check skin="_skin.sys.checkbox"/>
-<radio skin="_skin.sys.radio"/>
-<combobox dropBtnSkin="_skin.sys.dropbtn"/>
-```
+**使用场景**：
+- 文本编辑框的右键菜单
+- 编辑菜单的下拉菜单
+- 富文本编辑器的快捷菜单
 
-### 4. 数据列表
-```xml
-<listctrl headerSkin="_skin.sys.header"/>
-<scrollbar skin="_skin.sys.scrollbar"/>
-```
+## 配置文件之间的关系
 
-### 5. SVG 图标应用
-```xml
-<button skin="_skin.sys.btn.normal">
-  <img src="FILE:icons/edit.svg" svg="true"/>
-</button>
-```
+这四个配置文件共同构成了SOUI系统主题的完整配置：
+
+1. **sys_xml_skin.xml**：定义所有皮肤资源的映射关系
+2. **theme_color.xml**：定义主题颜色方案
+3. **sys_xml_msgbox.xml**：定义消息框的布局和样式
+4. **sys_xml_editmenu.xml**：定义编辑菜单的结构
+
+这些文件通过资源名称（如`_skin.sys.btn.close`）相互引用，形成统一的主题系统。
 
 ---
 
-**文档版本**: 1.1  
-**更新日期**: 2026-03-24  
-**适用版本**: SOUI4  
-**SVG 支持**: 需要启用 SOUI_ENABLE_SVG 宏
+**文档版本**: 1.2  
+**更新日期**: 2026-03-28  
+**适用版本**: SOUI5 

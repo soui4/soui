@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-  <tabctrl size="-2,-2" animateSteps="10" animateType="1" tabAlign="left" tabSkin="skin_tab_left" tabInterSkin="skin_tab_left_splitter" tabInterSize="2" tabWidth="150" iconSkin="skin_small_icons" icon-x="5" icon-y="8" colorText="#000000bb">
+  <tabctrl size="-2,-2" animateSteps="10" animateType="1" tabAlign="left" tabInterSize="2" tabWidth="150" iconSkin="skin_small_icons" icon-x="5" icon-y="8" colorText="#000000bb">
     <page title="controls">
       <gifplayer pos="10,10" skin="gif_horse" name="giftest" show="1"/>
       <button width="250" height="30" name="btnSelectGif">load gif file</button>
@@ -14,7 +14,7 @@
 		  <dropdownStyle>
 			  <root colorBkgnd="#ffffff"/>
 		  </dropdownStyle>
-        <liststyle class="cls_edit" iconSkin="skin_menuicon" itemSkin="skin_tab_left" itemHeight="30" colorText="#000000" colorSelText="#FFFFFF" colorItemBkgnd="#FFFFFF" colorItemSelBkgnd="#000088"/>
+        <liststyle class="cls_edit" iconSkin="skin_menuicon" itemHeight="30"/>
         <items>
           <item text="SLinearInterpolator" icon="1" data="100"/>
           <item text="SAccelerateInterpolator" icon="2" data="100"/>

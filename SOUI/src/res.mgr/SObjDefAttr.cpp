@@ -21,55 +21,13 @@ BOOL SObjDefAttr::Init(SXmlNode xmlNode)
         xmlObjAttr = xmlObjAttr.next_sibling();
     }
 
-    SPOSITION pos = m_mapNamedObj->GetStartPosition();
-    while (pos)
-    {
-        SMap<SStringW, SXmlNode>::CPair *p = m_mapNamedObj->GetNext(pos);
-        BuildClassAttribute(p->m_value, p->m_key);
-    }
-
     return TRUE;
-}
-
-void SObjDefAttr::BuildClassAttribute(SXmlNode &xmlNode, LPCWSTR pszClassName)
-{
-    SObjectInfo info;
-    ObjInfo_New(&info, pszClassName, Window);
-    SObjectInfo baseClassInfo = SApplication::getSingleton().BaseObjectInfoFromObjectInfo(info);
-    if (!ObjInfo_IsValid(&baseClassInfo))
-        return;
-
-    if (HasKey(baseClassInfo.szName))
-    {
-        SXmlNode xmlNodeAttrs = GetKeyObject(baseClassInfo.szName);
-        SXmlAttr attr = xmlNodeAttrs.first_attribute();
-        while (attr)
-        {
-            if (!xmlNode.attribute(attr.name()))
-                xmlNode.append_attribute(attr.name()).set_value(attr.value());
-            attr = attr.next_attribute();
-        }
-    }
-    BuildClassAttribute(xmlNode, baseClassInfo.szName);
 }
 
 SXmlNode SObjDefAttr::GetDefAttribute(LPCWSTR pszClassName)
 {
     SASSERT(pszClassName);
-    if (!HasKey(pszClassName))
-    {
-        SObjectInfo info;
-        ObjInfo_New(&info, pszClassName, Window);
-        SObjectInfo baseClassInfo = SApplication::getSingleton().BaseObjectInfoFromObjectInfo(info);
-        if (!ObjInfo_IsValid(&baseClassInfo))
-            return SXmlNode();
-
-        return GetDefAttribute(baseClassInfo.szName);
-    }
-    else
-    {
-        return GetKeyObject(pszClassName);
-    }
+    return GetKeyObject(pszClassName);
 }
 
 SNSEND

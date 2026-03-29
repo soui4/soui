@@ -20,6 +20,7 @@ SOsrPanel::SOsrPanel(IHostProxy *pFrameHost, IItemContainer *pItemContainer)
     SwndContainerImpl::SetRoot(this);
     SASSERT(m_pHostProxy);
     SASSERT(m_pItemContainer);
+    m_pBgSkin = GETBUILTINSKIN(SKIN_SYS_LIST_ITEM);
     m_evtSet.addEvent(EVENTID(EventItemPanelClick));
     m_evtSet.addEvent(EVENTID(EventItemPanelRclick));
     m_evtSet.addEvent(EVENTID(EventItemPanelClickUp));

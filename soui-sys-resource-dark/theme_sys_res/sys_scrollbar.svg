@@ -63,38 +63,38 @@
     <rect width="16" height="16" fill="#222222"/>
   </g>
 
-  <!-- 列5: 水平滚动条 lineleft -->
-  <g id="h_lineleft_normal" transform="translate(64, 0)">
+  <!-- 列6: 水平滚动条 lineleft -->
+  <g id="h_lineleft_normal" transform="translate(80, 0)">
     <rect width="16" height="16" fill="#444444" stroke="#666666" stroke-width="1"/>
     <path d="M10,8 L6,12 L6,4 Z" stroke="#cccccc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   </g>
-  <g id="h_lineleft_hover" transform="translate(64, 16)">
+  <g id="h_lineleft_hover" transform="translate(80, 16)">
     <rect width="16" height="16" fill="#555555" stroke="#777777" stroke-width="1"/>
     <path d="M10,8 L6,12 L6,4 Z" stroke="#ffffff" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   </g>
-  <g id="h_lineleft_pressed" transform="translate(64, 32)">
+  <g id="h_lineleft_pressed" transform="translate(80, 32)">
     <rect width="16" height="16" fill="#333333" stroke="#555555" stroke-width="1"/>
     <path d="M10,8 L6,12 L6,4 Z" stroke="#cccccc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   </g>
-  <g id="h_lineleft_disabled" transform="translate(64, 48)">
+  <g id="h_lineleft_disabled" transform="translate(80, 48)">
     <rect width="16" height="16" fill="#333333" stroke="#555555" stroke-width="1"/>
     <path d="M10,8 L6,12 L6,4 Z" stroke="#666666" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   </g>
 
-  <!-- 列6: 水平滚动条 lineright -->
-  <g id="h_lineright_normal" transform="translate(80, 0)">
+  <!-- 列5: 水平滚动条 lineright -->
+  <g id="h_lineright_normal" transform="translate(64, 0)">
     <rect width="16" height="16" fill="#444444" stroke="#666666" stroke-width="1"/>
     <path d="M6,8 L10,12 L10,4 Z" stroke="#cccccc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   </g>
-  <g id="h_lineright_hover" transform="translate(80, 16)">
+  <g id="h_lineright_hover" transform="translate(64, 16)">
     <rect width="16" height="16" fill="#555555" stroke="#777777" stroke-width="1"/>
     <path d="M6,8 L10,12 L10,4 Z" stroke="#ffffff" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   </g>
-  <g id="h_lineright_pressed" transform="translate(80, 32)">
+  <g id="h_lineright_pressed" transform="translate(64, 32)">
     <rect width="16" height="16" fill="#333333" stroke="#555555" stroke-width="1"/>
     <path d="M6,8 L10,12 L10,4 Z" stroke="#cccccc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   </g>
-  <g id="h_lineright_disabled" transform="translate(80, 48)">
+  <g id="h_lineright_disabled" transform="translate(64, 48)">
     <rect width="16" height="16" fill="#333333" stroke="#555555" stroke-width="1"/>
     <path d="M6,8 L10,12 L10,4 Z" stroke="#666666" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   </g>

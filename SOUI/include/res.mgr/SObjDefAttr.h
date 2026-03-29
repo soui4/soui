@@ -54,12 +54,6 @@ class SOUI_EXP SObjDefAttr
     SXmlNode GetDefAttribute(LPCWSTR pszClassName);
 
   protected:
-    /**
-     * @brief Builds the class attributes from an XML node.
-     * @param xmlNode XML node containing the class attributes.
-     * @param pszClassName Name of the class.
-     */
-    void BuildClassAttribute(SXmlNode &xmlNode, LPCWSTR pszClassName);
 
     SXmlDoc m_xmlRoot; // XML document containing the default attributes
 };

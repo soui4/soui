@@ -1,8 +1,8 @@
 ﻿<include>
-  <tabctrl pos="0,[10,-0,-0" tabAlign="top" tabSkin="skin_tab_left" tabInterSkin="skin_tab_left_splitter" tabInterSize="2" tabHeight="30">
+  <tabctrl pos="0,[10,-0,-0" tabAlign="top" tabInterSize="2" tabHeight="30">
 
     <page title="filter level">
-      <tabctrl pos="0,[10,-0,-0" tabAlign="top" tabSkin="skin_tab_left" tabInterSkin="skin_tab_left_splitter" tabInterSize="2" tabHeight="30">
+      <tabctrl pos="0,[10,-0,-0" tabAlign="top" tabInterSize="2" tabHeight="30">
         <page title="none">
           <img pos="0,0,-0,-0" skin="skin_avatar_none"/>
         </page>

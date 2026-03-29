@@ -74,7 +74,6 @@
 		<file name="png_menu_border" path="image\menuborder.png" />
 		<file name="png_vscroll" path="image\vscrollbar.png" />
 		<file name="png_hscroll" path="image\hscrollbar.png" />
-		<file name="png_tab_left" path="image\tab_left.png" />
 		<file name="png_tab_left_splitter" path="image\tab_left_splitter.png" />
 		<file name="png_tab_main" path="image\tab_main.png" />
 		<file name="btn_menu" path="image\btn_menu.png" />
@@ -82,7 +81,6 @@
 		<file name="png_animode" path="image\animode.png" />
 		<file name="png_chrome_tab_new" path="image\chromeTabNew.png" />
 		<file name="png_chrome_tab_close" path="image\chromeTabClose.png" />
-		<file name="png_lcex_header" path="image\lcex_header.png" />
 		<file name="png_lcex_header_arrow" path="image\lcex_header_arrow.png" />
 		<file name="png_lcex_selectrange" path="image\lcex_selectrange.png" />
 		<file name="png_icon1" path="image\icon\1.png" />
@@ -93,10 +91,8 @@
 		<file name="png_icon6" path="image\icon\6.png" />
 		<file name="png_icon7" path="image\icon\7.png" />
 		<file name="png_star1" path="image\icon\star_green.png" />
-		<file name="png_install" path="image\icon\button_install.png" />
 		<file name="png_mask" path="image\mask.png" />
 		<file name="png_avatar" path="image\avatar.png" />
-		<file name="png_img_bk" path="image\item_bk.png" />
 		<file name="png_btn_skin" path="image\btn_skin.png" />
 		<file name="tip_bg" path="image\tip_bg.png" />
 		<file name="message" path="image\message.png" />
@@ -104,7 +100,6 @@
 		<file name="group" path="image\group.png" />
 		<file name="btn_skin1_png" path="image\btn_skin1.png" />
     <file name="icons.png" path="image\icons.png"/>
-    <file name="btn_catetory.png" path="image\btn_catetory.png"/>
     <file name="png_girl" path="image\girl.png"/>
     <file name="png_love" path="image\love.png"/>
     <file name="png_soui" path="image\soui.png"/>

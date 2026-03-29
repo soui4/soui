@@ -1,4 +1,4 @@
-﻿//stamp:34191971c696d668
+﻿//stamp:341b16e64db71cb5
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -78,7 +78,6 @@
 			const TCHAR * png_menu_border;
 			const TCHAR * png_vscroll;
 			const TCHAR * png_hscroll;
-			const TCHAR * png_tab_left;
 			const TCHAR * png_tab_left_splitter;
 			const TCHAR * png_tab_main;
 			const TCHAR * btn_menu;
@@ -86,7 +85,6 @@
 			const TCHAR * png_animode;
 			const TCHAR * png_chrome_tab_new;
 			const TCHAR * png_chrome_tab_close;
-			const TCHAR * png_lcex_header;
 			const TCHAR * png_lcex_header_arrow;
 			const TCHAR * png_lcex_selectrange;
 			const TCHAR * png_icon1;
@@ -97,10 +95,8 @@
 			const TCHAR * png_icon6;
 			const TCHAR * png_icon7;
 			const TCHAR * png_star1;
-			const TCHAR * png_install;
 			const TCHAR * png_mask;
 			const TCHAR * png_avatar;
-			const TCHAR * png_img_bk;
 			const TCHAR * png_btn_skin;
 			const TCHAR * tip_bg;
 			const TCHAR * message;
@@ -108,7 +104,6 @@
 			const TCHAR * group;
 			const TCHAR * btn_skin1_png;
 			const TCHAR * icons_png;
-			const TCHAR * btn_catetory_png;
 			const TCHAR * png_girl;
 			const TCHAR * png_love;
 			const TCHAR * png_soui;
@@ -293,7 +288,6 @@ struct _UIRES UIRES={
 			_T("IMGX:png_menu_border"),
 			_T("IMGX:png_vscroll"),
 			_T("IMGX:png_hscroll"),
-			_T("IMGX:png_tab_left"),
 			_T("IMGX:png_tab_left_splitter"),
 			_T("IMGX:png_tab_main"),
 			_T("IMGX:btn_menu"),
@@ -301,7 +295,6 @@ struct _UIRES UIRES={
 			_T("IMGX:png_animode"),
 			_T("IMGX:png_chrome_tab_new"),
 			_T("IMGX:png_chrome_tab_close"),
-			_T("IMGX:png_lcex_header"),
 			_T("IMGX:png_lcex_header_arrow"),
 			_T("IMGX:png_lcex_selectrange"),
 			_T("IMGX:png_icon1"),
@@ -312,10 +305,8 @@ struct _UIRES UIRES={
 			_T("IMGX:png_icon6"),
 			_T("IMGX:png_icon7"),
 			_T("IMGX:png_star1"),
-			_T("IMGX:png_install"),
 			_T("IMGX:png_mask"),
 			_T("IMGX:png_avatar"),
-			_T("IMGX:png_img_bk"),
 			_T("IMGX:png_btn_skin"),
 			_T("IMGX:tip_bg"),
 			_T("IMGX:message"),
@@ -323,7 +314,6 @@ struct _UIRES UIRES={
 			_T("IMGX:group"),
 			_T("IMGX:btn_skin1_png"),
 			_T("IMGX:icons.png"),
-			_T("IMGX:btn_catetory.png"),
 			_T("IMGX:png_girl"),
 			_T("IMGX:png_love"),
 			_T("IMGX:png_soui"),

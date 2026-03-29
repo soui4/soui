@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="91" height="31" viewBox="0 0 91 31">
+  <!-- 正常状态 -->
+  <g id="normal">
+    <path d="M9,9 L21,21 M9,21 L21,9" stroke="#666666" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <!-- 悬停状态 -->
+  <g id="hover" transform="translate(30, 0)">
+    <path d="M9,9 L21,21 M9,21 L21,9" stroke="#333333" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <!-- 按下状态 -->
+  <g id="pressed" transform="translate(61, 0)">
+    <path d="M9,9 L21,21 M9,21 L21,9" stroke="#666666" stroke-width="2" stroke-linecap="round"/>
+  </g>
+</svg>

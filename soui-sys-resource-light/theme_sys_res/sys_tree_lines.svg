@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="153" height="18" viewBox="0 0 153 18">
+  <!-- 状态 0: 无连接线 -->
+  <g id="state_0" transform="translate(0, 0)">
+    <rect width="17" height="18" fill="transparent"/>
+  </g>
+  <!-- 状态 1: 垂直线 -->
+  <g id="state_1" transform="translate(17, 0)">
+    <rect width="17" height="18" fill="transparent"/>
+    <line x1="8" y1="0" x2="8" y2="18" stroke="#e0e0e0" stroke-width="1"/>
+  </g>
+  <!-- 状态 2: 垂直线 + 右连接线 -->
+  <g id="state_2" transform="translate(34, 0)">
+    <rect width="17" height="18" fill="transparent"/>
+    <line x1="8" y1="0" x2="8" y2="18" stroke="#e0e0e0" stroke-width="1"/>
+    <line x1="8" y1="9" x2="17" y2="9" stroke="#e0e0e0" stroke-width="1"/>
+  </g>
+  <!-- 状态 3: 垂直线 + 右下连接线 -->
+  <g id="state_3" transform="translate(51, 0)">
+    <rect width="17" height="18" fill="transparent"/>
+    <line x1="8" y1="0" x2="8" y2="9" stroke="#e0e0e0" stroke-width="1"/>
+    <line x1="8" y1="9" x2="17" y2="9" stroke="#e0e0e0" stroke-width="1"/>
+  </g>
+  <!-- 状态 4: 左连接线 -->
+  <g id="state_4" transform="translate(68, 0)">
+    <rect width="17" height="18" fill="transparent"/>
+    <line x1="0" y1="9" x2="8" y2="9" stroke="#e0e0e0" stroke-width="1"/>
+  </g>
+  <!-- 状态 5: 左连接线 + 垂直线 -->
+  <g id="state_5" transform="translate(85, 0)">
+    <rect width="17" height="18" fill="transparent"/>
+    <line x1="0" y1="9" x2="8" y2="9" stroke="#e0e0e0" stroke-width="1"/>
+    <line x1="8" y1="0" x2="8" y2="18" stroke="#e0e0e0" stroke-width="1"/>
+  </g>
+  <!-- 状态 6: 左连接线 + 垂直线 + 右连接线 -->
+  <g id="state_6" transform="translate(102, 0)">
+    <rect width="17" height="18" fill="transparent"/>
+    <line x1="0" y1="9" x2="8" y2="9" stroke="#e0e0e0" stroke-width="1"/>
+    <line x1="8" y1="0" x2="8" y2="18" stroke="#e0e0e0" stroke-width="1"/>
+    <line x1="8" y1="9" x2="17" y2="9" stroke="#e0e0e0" stroke-width="1"/>
+  </g>
+  <!-- 状态 7: 左连接线 + 垂直线 + 右下连接线 -->
+  <g id="state_7" transform="translate(119, 0)">
+    <rect width="17" height="18" fill="transparent"/>
+    <line x1="0" y1="9" x2="8" y2="9" stroke="#e0e0e0" stroke-width="1"/>
+    <line x1="8" y1="0" x2="8" y2="9" stroke="#e0e0e0" stroke-width="1"/>
+    <line x1="8" y1="9" x2="17" y2="9" stroke="#e0e0e0" stroke-width="1"/>
+  </g>
+  <!-- 状态 8: 左连接线 + 右下连接线 -->
+  <g id="state_8" transform="translate(136, 0)">
+    <rect width="17" height="18" fill="transparent"/>
+    <line x1="0" y1="9" x2="8" y2="9" stroke="#e0e0e0" stroke-width="1"/>
+    <line x1="8" y1="9" x2="17" y2="9" stroke="#e0e0e0" stroke-width="1"/>
+  </g>
+</svg>

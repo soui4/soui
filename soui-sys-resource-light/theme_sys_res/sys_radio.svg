@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="136" height="17" viewBox="0 0 136 17">
+  <!-- 未选中 - 正常 -->
+  <g id="unchecked_normal" transform="translate(0, 0)">
+    <circle cx="8" cy="8" r="7" fill="#f0f0f0" stroke="#cccccc" stroke-width="1"/>
+  </g>
+  <!-- 未选中 - 悬停 -->
+  <g id="unchecked_hover" transform="translate(17, 0)">
+    <circle cx="8" cy="8" r="7" fill="#e0e0e0" stroke="#bbbbbb" stroke-width="1"/>
+  </g>
+  <!-- 未选中 - 按下 -->
+  <g id="unchecked_pressed" transform="translate(34, 0)">
+    <circle cx="8" cy="8" r="7" fill="#d0d0d0" stroke="#aaaaaa" stroke-width="1"/>
+  </g>
+  <!-- 未选中 - 禁用 -->
+  <g id="unchecked_disabled" transform="translate(51, 0)">
+    <circle cx="8" cy="8" r="7" fill="#e8e8e8" stroke="#bbbbbb" stroke-width="1"/>
+  </g>
+  <!-- 选中 - 正常 -->
+  <g id="checked_normal" transform="translate(68, 0)">
+    <circle cx="8" cy="8" r="7" fill="#f0f0f0" stroke="#cccccc" stroke-width="1"/>
+    <circle cx="8" cy="8" r="3" fill="#448844"/>
+  </g>
+  <!-- 选中 - 悬停 -->
+  <g id="checked_hover" transform="translate(85, 0)">
+    <circle cx="8" cy="8" r="7" fill="#e0e0e0" stroke="#bbbbbb" stroke-width="1"/>
+    <circle cx="8" cy="8" r="3" fill="#559955"/>
+  </g>
+  <!-- 选中 - 按下 -->
+  <g id="checked_pressed" transform="translate(102, 0)">
+    <circle cx="8" cy="8" r="7" fill="#d0d0d0" stroke="#aaaaaa" stroke-width="1"/>
+    <circle cx="8" cy="8" r="3" fill="#337733"/>
+  </g>
+  <!-- 选中 - 禁用 -->
+  <g id="checked_disabled" transform="translate(119, 0)">
+    <circle cx="8" cy="8" r="7" fill="#e8e8e8" stroke="#bbbbbb" stroke-width="1"/>
+    <circle cx="8" cy="8" r="3" fill="#336633"/>
+  </g>
+</svg>

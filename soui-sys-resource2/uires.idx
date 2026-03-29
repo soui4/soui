@@ -37,10 +37,12 @@
         <file name="SYS_SPIN_UP" path="theme_sys_res\sys_spin_up.png"/>
         <file name="SYS_SWITCH" path="theme_sys_res\sys_switch.png"/>
         <file name="SYS_SWITCH_BG" path="theme_sys_res\sys_switch_bg.png"/>
+        <file name="SYS_LIST_ITEM" path="theme_sys_res\sys_list_item.png"/>
     </PNG>
     <XML>
         <file name="SYS_XML_SKIN" path="theme_sys_res\sys_xml_skin.xml"/>
         <file name="SYS_XML_EDITMENU" path="theme_sys_res\sys_xml_editmenu.xml"/>
         <file name="SYS_XML_MSGBOX" path="theme_sys_res\sys_xml_msgbox.xml"/>
+        <file name="THEME_COLOR" path="theme_sys_res\theme_color.xml"/>
     </XML>
 </resource>
