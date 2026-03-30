@@ -1,5 +1,6 @@
-#include "souistd.h"
+﻿#include "souistd.h"
 #include "msaa/SAccProxyWindow.h"
+#include "control/SCmnCtrl.h"
 
 SNSBEGIN
 #ifdef SOUI_ENABLE_ACC
@@ -71,6 +72,18 @@ STDMETHODIMP SAccProxyWindow::get_accHelpTopic(BSTR *pszHelpFile, long *pidTopic
 }
 STDMETHODIMP SAccProxyWindow::get_accKeyboardShortcut(BSTR *pszKeyboardShortcut)
 {
+    // 检查是否为SButton控件，因为只有SButton支持快捷键
+    SButton *pButton = sobj_cast<SButton>(m_pWnd);
+    if (pButton)
+    {
+        // 获取SButton的m_accel成员
+        DWORD dwAccel = pButton->GetAccel();
+        if (dwAccel == 0)
+            return E_NOTIMPL;
+        SAccelerator accel(dwAccel);
+        *pszKeyboardShortcut = ::SysAllocString(S_CT2W(accel.FormatHotkey()));
+        return S_OK;
+    }
     return E_NOTIMPL;
 }
 STDMETHODIMP SAccProxyWindow::get_accDefaultAction(BSTR *pszDefaultAction)

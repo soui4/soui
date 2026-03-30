@@ -32,6 +32,7 @@
 
 #include "msaa/SAccProxyWindow.h"
 #include "msaa/SAccProxyCmnCtrl.h"
+#include "control/SCmnCtrl.h"
 
 #include "animation/SAnimation.h"
 #include "animation/SAnimationSet.h"
@@ -397,6 +398,111 @@ IAccProxy *SApplication::CreateAccProxy(IWindow *pWnd) const
     else if (pWnd->IsClass(SRadioBox::GetClassName()))
     {
         return new SAccProxyRadioButton(pWnd);
+    }
+    else if (pWnd->IsClass(SStatic::GetClassName()))
+    {
+        return new SAccProxyStatic(pWnd);
+    }
+    else if (pWnd->IsClass(SLink::GetClassName()))
+    {
+        return new SAccProxyLink(pWnd);
+    }
+    else if (pWnd->IsClass(SImageWnd::GetClassName()))
+    {
+        return new SAccProxyImage(pWnd);
+    }
+    else if (pWnd->IsClass(SIconWnd::GetClassName()))
+    {
+        return new SAccProxyIcon(pWnd);
+    }
+    else if (pWnd->IsClass(SHrLine::GetClassName()))
+    {
+        return new SAccProxyHrLine(pWnd);
+    }
+    else if (pWnd->IsClass(SGroup::GetClassName()))
+    {
+        return new SAccProxyGroup(pWnd);
+    }
+    else if (pWnd->IsClass(SActiveX::GetClassName()))
+    {
+        return new SAccProxyActiveX(pWnd);
+    }
+    else if (pWnd->IsClass(SCalendar::GetClassName()))
+    {
+        return new SAccProxyCalendar(pWnd);
+    }
+    else if (pWnd->IsClass(SCaption::GetClassName()))
+    {
+        return new SAccProxyCaption(pWnd);
+    }
+    else if (pWnd->IsClass(SListCtrl::GetClassName())) {
+        return new SAccProxyListCtrl(pWnd);
+    }
+    else if (pWnd->IsClass(SDateTimePicker::GetClassName())) {
+        return new SAccProxyDateTimePicker(pWnd);
+    }
+    else if (pWnd->IsClass(SDockBar::GetClassName())) {
+        return new SAccProxyDockBar(pWnd);
+    }
+    else if (pWnd->IsClass(SComboBase::GetClassName())) {
+        return new SAccProxyDropDown(pWnd);
+    }
+    else if (pWnd->IsClass(SFrame::GetClassName())) {
+        return new SAccProxyFrame(pWnd);
+    }
+    else if (pWnd->IsClass(SHeaderCtrl::GetClassName())) {
+        return new SAccProxyHeaderCtrl(pWnd);
+    }
+    else if (pWnd->IsClass(SHotKeyCtrl::GetClassName())) {
+        return new SAccProxyHotKeyCtrl(pWnd);
+    }
+    else if (pWnd->IsClass(SListView::GetClassName())) {
+        return new SAccProxyListView(pWnd);
+    }
+    else if (pWnd->IsClass(SListBox::GetClassName())) {
+        return new SAccProxyListBox(pWnd);
+    }
+    else if (pWnd->IsClass(SMCListView::GetClassName())) {
+        return new SAccProxyMCListView(pWnd);
+    }
+    else if (pWnd->IsClass(SMenuBar::GetClassName())) {
+        return new SAccProxyMenuBar(pWnd);
+    }
+    else if (pWnd->IsClass(SRealWnd::GetClassName())) {
+        return new SAccProxyRealWnd(pWnd);
+    }
+    else if (pWnd->IsClass(SScrollBar::GetClassName())) {
+        return new SAccProxyScrollBar(pWnd);
+    }
+    else if (pWnd->IsClass(SSearchDropdownList::GetClassName())) {
+        return new SAccProxySearchDropdownList(pWnd);
+    }
+    else if (pWnd->IsClass(SSpinButtonCtrl::GetClassName())) {
+        return new SAccProxySpinButtonCtrl(pWnd);
+    }
+    else if (pWnd->IsClass(SSplitWnd::GetClassName())) {
+        return new SAccProxySplitWnd(pWnd);
+    }
+    else if (pWnd->IsClass(SStackView::GetClassName())) {
+        return new SAccProxyStackView(pWnd);
+    }
+    else if (pWnd->IsClass(SSwitch::GetClassName())) {
+        return new SAccProxySwitch(pWnd);
+    }
+    else if (pWnd->IsClass(STabCtrl::GetClassName())) {
+        return new SAccProxyTabCtrl(pWnd);
+    }
+    else if (pWnd->IsClass(STileView::GetClassName())) {
+        return new SAccProxyTileView(pWnd);
+    }
+    else if (pWnd->IsClass(SToolBar::GetClassName())) {
+        return new SAccProxyToolBar(pWnd);
+    }
+    else if (pWnd->IsClass(STreeCtrl::GetClassName())) {
+        return new SAccProxyTreeCtrl(pWnd);
+    }
+    else if (pWnd->IsClass(STreeView::GetClassName())) {
+        return new SAccProxyTreeView(pWnd);
     }
 
     return new SAccProxyWindow(pWnd);

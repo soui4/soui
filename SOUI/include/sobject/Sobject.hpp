@@ -233,14 +233,16 @@ public:
         return wcscmp(lpszName, GetClassName()) == 0;
     }
 
-    /**
-     * @brief Gets the class names of the object.
-     * @return Number of names copied to the buffer.
-     */
-    STDMETHOD_(int, GetClassNameList)(CTHIS_ wchar_t ppClassNameList[][50], int nMaxCount) SCONST OVERRIDE
-    {
-        return 0;
-    }
+	/**
+	 * @brief Retrieves the class name list of the object.
+	 *
+	 * @param ppClassName Pointer to a buffer that receives the class name list.
+	 * @param nMaxCount Maximum number of strings to copy to the buffer.
+	 * @return int The number of strings copied to the buffer.
+	 */
+	STDMETHOD_(int, GetClassNameList)(CTHIS_ wchar_t ppClassNameList[][50], int nMaxCount) SCONST{
+		return 0;
+	}
 
     /**
      * @brief Retrieves an attribute value.

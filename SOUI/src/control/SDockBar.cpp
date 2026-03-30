@@ -12,6 +12,7 @@ SDockBar::SDockBar(void)
     , m_bResizable(FALSE)
     , m_nResizeHitTest(0)
     , m_bIsResizing(FALSE)
+    , m_skinCloseBtn(GETBUILTINSKIN(SKIN_SYS_BTN_MINI_CLOSE))
 {
     m_bFocusable = TRUE;
 }

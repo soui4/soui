@@ -202,6 +202,11 @@ class SOUI_EXP SButton
      */
     SButton();
 
+    /**
+     * @brief 获取加速键
+     * @return 加速键
+     */
+    DWORD GetAccel() const{return m_accel;}
   protected:
     /**
      * @brief 状态变化需要重画

@@ -282,6 +282,32 @@ public:
     }
 };
 
+template <typename T>
+class CSafeElementTraitsBase : public CElementTraitsBase<T>
+{
+public:
+    static void RelocateElements(T* pDest, T* pSrc, size_t nElements)
+    {
+        if (pDest == pSrc || nElements == 0) return;
+        if (pDest < pSrc)
+        {
+            for (size_t i = 0; i < nElements; i++)
+            {
+                ::new(pDest + i) T(pSrc[i]); 
+                pSrc[i].~T();                           
+            }
+        }
+        else
+        {
+            for (ptrdiff_t i = nElements - 1; i >= 0; i--)
+            {
+                ::new(pDest + i) T(pSrc[i]);
+                pSrc[i].~T();
+            }
+        }
+    }
+};
+
 template< typename T >
 class CDefaultHashTraits
 {
@@ -328,8 +354,16 @@ class CDefaultElementTraits :
 };
 
 template< typename T >
+class CSafeElementTraits :
+	public CSafeElementTraitsBase< T >,
+	public CDefaultHashTraits< T >,
+	public CDefaultCompareTraits< T >
+{
+};
+
+template< typename T >
 class CElementTraits :
-    public CDefaultElementTraits< T >
+    public CSafeElementTraits< T >
 {
 };
 
@@ -371,39 +405,6 @@ public:
     }
 };
  
-
-template< typename T >
-class SStringRefElementTraits :
-    public CElementTraitsBase< T >
-{
-public:
-    static ULONG Hash(typename CElementTraitsBase<T>::INARGTYPE str )
-    {
-        ULONG nHash = 0;
-
-        const typename T::XCHAR* pch = str;
-
-        SENSURE( pch != NULL );
-
-        while( *pch != 0 )
-        {
-            nHash = (nHash<<5)+nHash+(*pch);
-            pch++;
-        }
-
-        return( nHash );
-    }
-
-    static bool CompareElements(typename CElementTraitsBase<T>::INARGTYPE element1, typename CElementTraitsBase<T>::INARGTYPE element2 )
-    {
-        return( element1 == element2 );
-    }
-
-    static int CompareElementsOrdered(typename CElementTraitsBase<T>::INARGTYPE str1, typename CElementTraitsBase<T>::INARGTYPE str2 )
-    {
-        return( str1.Compare( str2 ) );
-    }
-};
 
 template< typename T >
 class CPrimitiveElementTraits :

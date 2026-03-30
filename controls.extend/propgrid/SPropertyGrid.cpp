@@ -256,6 +256,14 @@ void SPropertyGrid::CollapseChildren(const IPropertyItem *pItem, int idx)
     }
 }
 
+void SPropertyGrid::BeforePaint(IRenderTarget *pRT, SPainter &painter) const{
+    IFontPtr pFont = GetStyle().GetTextFont(0);
+    if (pFont)
+        pRT->SelectObject(pFont, (IRenderObj **)&painter.oldFont);
+    COLORREF crTxt = GetStyle().GetTextColor(0);
+    if (crTxt != CR_INVALID)
+        painter.oldTextColor = pRT->SetTextColor(crTxt);
+}
 void SPropertyGrid::DrawItem(IRenderTarget *pRT, CRect &rc, int iItem)
 {
     IPropertyItem *pItem = (IPropertyItem *)GetItemData(iItem);

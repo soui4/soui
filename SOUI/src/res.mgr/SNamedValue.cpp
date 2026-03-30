@@ -68,6 +68,7 @@ BOOL SNamedFont::Get(const SStringW &strValue, SStringW &ret) const
     }
 }
 //////////////////////////////////////////////////////////////////////////
+const wchar_t *SNamedColor::THEME_COLOR = L"@color/thm_color";
 const wchar_t *SNamedColor::THEME_COLOR_TXT_NORMAL = L"@color/thm_txt_normal";
 const wchar_t *SNamedColor::THEME_COLOR_TXT_HOVER = L"@color/thm_txt_hover";
 const wchar_t *SNamedColor::THEME_COLOR_TXT_PUSH = L"@color/thm_txt_push";

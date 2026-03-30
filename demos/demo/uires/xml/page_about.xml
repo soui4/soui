@@ -9,21 +9,21 @@
 
   <window size="-1,-1" layout="gridlayout" interval="10" columnCount="3" gravity="fill">
       <text >QQ群#1(2000人)：</text>
-      <edit readOnly="1">229313785</edit>
+      <edit readOnly="1" padding="1" margin="1">229313785</edit>
       <link href="http://jq.qq.com/?_wv=1027&k=PxXh59"  class="cls_btn_weblink">申请群#1</link>
 
     <text>QQ群#2(500人)：</text>
-      <edit readOnly="1">385438344</edit>
+      <edit readOnly="1" padding="1" margin="1">385438344</edit>
       <link href="http://jq.qq.com/?_wv=1027&k=VRATCo"  class="cls_btn_weblink">申请群#2</link>
   </window>
 	<window size="-1,-1" layout="hbox" gravity="center" interval="20">
 		<window size="-1,-1" layout="gridlayout" interval="10" columnCount="2" gravity="fill">
 			<text >github：</text>
-			<edit readOnly="1">https://github.com/soui4/soui</edit>
+			<edit readOnly="1" padding="1" margin="1">https://github.com/soui4/soui</edit>
 			<text>gitee：</text>
-			<edit readOnly="1">https://gitee.com/setousoft/soui4</edit>
+			<edit readOnly="1" padding="1" margin="1">https://gitee.com/setousoft/soui4</edit>
 			<text>gitcode：</text>
-			<edit readOnly="1">https://gitcode.com/setousoft/soui4</edit>
+			<edit readOnly="1" padding="1" margin="1">https://gitcode.com/setousoft/soui4</edit>
 		</window>
 		<qrctrl size="100,100" text="Using Soui, UI just so so!"/>
 	</window>

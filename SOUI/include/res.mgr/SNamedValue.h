@@ -236,10 +236,28 @@ class SOUI_EXP SColorParser {
  */
 class SOUI_EXP SNamedColor : public SNamedValue<COLORREF, SColorParser> {
   public:
+    /**
+     * @brief Theme color name.
+     */
+    static const wchar_t *THEME_COLOR; // = L"@color/thm_color";
+    /**
+     * @brief Theme text normal color name.
+     */
     static const wchar_t *THEME_COLOR_TXT_NORMAL;// = L"@color/txt_normal";
-    static const wchar_t *THEME_COLOR_TXT_DISABLE;// = L"@color/txt_disable";
-    static const wchar_t *THEME_COLOR_TXT_PUSH;// = L"@color/txt_push";
+    /**
+     * @brief Theme text hover color name.
+     */
     static const wchar_t *THEME_COLOR_TXT_HOVER;// = L"@color/txt_hover";
+    /**
+     * @brief Theme text push color name.
+     */
+    static const wchar_t *THEME_COLOR_TXT_PUSH;// = L"@color/txt_push";
+    /**
+     * @brief Theme text disable color name.
+     */
+    static const wchar_t *THEME_COLOR_TXT_DISABLE;// = L"@color/txt_disable";
+
+    
     /**
      * @brief Retrieves a color value by name, automatically converting named colors.
      * @param strValue Name of the color.

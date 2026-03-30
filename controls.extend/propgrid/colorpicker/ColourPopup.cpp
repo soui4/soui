@@ -602,18 +602,65 @@ void CColourPopup::SetWindowSize()
         m_WindowRect.bottom += m_CustomTextRect.Height() + 2 * m_nMargin;
     }
 
-    // Need to check it'll fit on screen: Too far right?
-    CSize ScreenSize(::GetSystemMetrics(SM_CXSCREEN), ::GetSystemMetrics(SM_CYSCREEN));
-    if (m_WindowRect.right > ScreenSize.cx)
-        m_WindowRect.OffsetRect(-(m_WindowRect.right - ScreenSize.cx), 0);
-
-    // Too far left?
-    if (m_WindowRect.left < 0)
-        m_WindowRect.OffsetRect(-m_WindowRect.left, 0);
-
-    // Bottom falling out of screen?
-    if (m_WindowRect.bottom > ScreenSize.cy)
+    // Get the monitor that contains the popup window's initial position
+    POINT pt = { m_WindowRect.left, m_WindowRect.top };
+    HMONITOR hMonitor = MonitorFromPoint(pt, MONITOR_DEFAULTTONEAREST);
+    
+    // Get monitor info to get the working area
+    MONITORINFO mi;
+    mi.cbSize = sizeof(MONITORINFO);
+    if (GetMonitorInfo(hMonitor, &mi))
     {
+        // Need to check it'll fit on screen: Too far right?
+        if (m_WindowRect.right > mi.rcWork.right)
+            m_WindowRect.OffsetRect(-(m_WindowRect.right - mi.rcWork.right), 0);
+
+        // Too far left?
+        if (m_WindowRect.left < mi.rcWork.left)
+            m_WindowRect.OffsetRect(-(m_WindowRect.left - mi.rcWork.left), 0);
+
+        // Bottom falling out of screen?
+        if (m_WindowRect.bottom > mi.rcWork.bottom)
+        {
+            // Try to move up
+            int nOffset = m_WindowRect.bottom - mi.rcWork.bottom;
+            m_WindowRect.OffsetRect(0, -nOffset);
+            
+            // If still out of bounds, move to top of monitor
+            if (m_WindowRect.top < mi.rcWork.top)
+                m_WindowRect.top = mi.rcWork.top;
+        }
+        
+        // Top falling out of screen?
+        if (m_WindowRect.top < mi.rcWork.top)
+            m_WindowRect.top = mi.rcWork.top;
+    }
+    else
+    {
+        // Fallback to primary monitor if monitor info not available
+        CSize ScreenSize(::GetSystemMetrics(SM_CXSCREEN), ::GetSystemMetrics(SM_CYSCREEN));
+        if (m_WindowRect.right > ScreenSize.cx)
+            m_WindowRect.OffsetRect(-(m_WindowRect.right - ScreenSize.cx), 0);
+
+        // Too far left?
+        if (m_WindowRect.left < 0)
+            m_WindowRect.OffsetRect(-m_WindowRect.left, 0);
+
+        // Bottom falling out of screen?
+        if (m_WindowRect.bottom > ScreenSize.cy)
+        {
+            // Try to move up
+            int nOffset = m_WindowRect.bottom - ScreenSize.cy;
+            m_WindowRect.OffsetRect(0, -nOffset);
+            
+            // If still out of bounds, move to top of screen
+            if (m_WindowRect.top < 0)
+                m_WindowRect.top = 0;
+        }
+        
+        // Top falling out of screen?
+        if (m_WindowRect.top < 0)
+            m_WindowRect.top = 0;
     }
 
     // Set the window size and position

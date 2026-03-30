@@ -1,4 +1,5 @@
 <color>
+  <thm_color value="#333333"/>
   <thm_txt_normal value="rgb(220,220,220)"/>
   <thm_txt_hover value="rgb(255,255,255)"/>
   <thm_txt_push value="rgb(200,200,200)"/>

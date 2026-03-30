@@ -86,7 +86,7 @@ class SPropCombobox: public SComboBox
 			if(!inplaceStyle)
 			{
 				wchar_t szXml[]=L"<combobox dropDown=\"1\" colorBkgnd=\"#ffffff\" drawFocusRect=\"0\">\
-					<liststyle colorBorder=\"#000000\" margin-x=\"1\" margin-y=\"1\" colorText=\"#000000\" colorSelText=\"#FFFFFF\" colorItemBkgnd=\"#FFFFFF\" colorItemSelBkgnd=\"#000088\"/>\
+					<liststyle colorBorder=\"#000000\" margin-x=\"1\" margin-y=\"1\" colorBkgnd=\"@color/thm_color\" colorText=\"@color/thm_txt_normal\" colorSelText=\"@color/thm_txt_push\" hotTrack=\"1\"/>\
 					</combobox>";
 				xmlDoc.load_buffer(szXml,sizeof(szXml));
 			}else

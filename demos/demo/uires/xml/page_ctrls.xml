@@ -14,9 +14,9 @@
 		</itemTemplate>
 		<data>
 			<group text="列表控件" id="1000" tip="列表控件TIP">
-        <item text="多列列表" icon="0" name="page_mclistview" id="100" tip="多列列表TIP"/>
-        <item text="基础列表" icon="1" name="page_listctrl" id="101" />
-        <item text="固定高度列表" icon="2" name="page_fix_height_listview" id="102" />
+				<item text="多列列表" icon="0" name="page_mclistview" id="100" tip="多列列表TIP"/>
+				<item text="基础列表" icon="1" name="page_listctrl" id="101" />
+				<item text="固定高度列表" icon="2" name="page_fix_height_listview" id="102" />
 				<item text="可变高度列表" icon="3" name="page_flex_height_listview" id="103" />
 				<item text="TileView" icon="4" name="page_tileview" id="104" />
 				<item text="扩展多列列表" icon="5" name="page_mclistview_ex" id="105" />
@@ -44,48 +44,48 @@
 		</data>
 	</grouplist>
 	<tabctrl pos="[0,0,-0,-0" name="tab_ctrls" font="style:StrokeAndFill,blurStyle:solid,blurRadius:3" animateSteps="10" animateType="1" tabHeight="0">
-    <page title="mclistview">
-      <mclistview name="mclv_test" multiSel="1" colorBkgnd="@color/white" pos="10,10,-10,-10" headerHeight="30" dividerSize="1">
-        <headerStyle wndclass="header" align="center" name="mclv_test_header" sortSkin="skin_lcex_header_arrow" itemSwapEnable="1" fixWidth="0" font="underline:0,adding:-3" sortHeader="1" colorBkgnd="#ffffff">
-          <items>
-            <item weight="480" align="left">@string/mccol_1</item>
-            <item weight="95" >@string/mccol_2</item>
-            <item weight="100" >@string/mccol_3</item>
-            <item weight="100" align="right">@string/mccol_4</item>
-            <item weight="100">@string/mccol_5</item>
-            <item weight="100">@string/mccol_6</item>
-          </items>
-          <check name="chk_mclv_sel" text="全选" />
-        </headerStyle>
-        <template itemHeight="80" colorHover="#cccccc" colorSelected="#0000ff">
-          <window name="col1" clipClient="1">
-            <img name="img_icon" skin="skin_icon6" pos="10,8,@64,@64" />
-            <text name="txt_name" pos="[5,16" font="bold:1,adding:-1">火狐浏览器</text>
-            <text name="txt_desc" pos="{0,36,-10,-10" font="bold:1,adding:-4" dotted="1">速度最快的浏览器</text>
-            <text name="txt_index" pos="|0,|0" offset="-0.5,-0.5" font="adding:10" colorText="#ff000088">10</text>
-          </window>
-          <window name="col2" clipClient="1">
-            <ratingbar name="rating_score" starSkin="skin_star1" starNum="5" value="3.5" pos="10,16" />
-            <text name="txt_score" pos="10,36" font="adding:-5">8.5分</text>
-            <link pos="[5,36" cursor="hand" colorText="#1e78d5" href="www.163.com" font="adding:-5">投票</link>
-          </window>
-          <window name="col3" clipClient="1">
-            <text name="txt_size" pos="0,26,-0,-26" font="adding:-4" align="center">85.92M</text>
-          </window>
-          <window name="col4" clipClient="1">
-            <text name="txt_installtime" pos="0,26,-0,-26" font="adding:-4" align="center">2015-01-09</text>
-          </window>
-          <window name="col5" clipClient="1">
-            <text name="txt_usetime" pos="0,26,-0,-26" font="adding:-4" align="center">今天</text>
-            <animateimg pos="|0,|0" offset="-0.5,-0.5" skin="skin_busy" name="ani_test" tip="animateimg is used here" msgTransparent="0" />
-          </window>
-          <window name="col6" clipClient="1">
-            <button animate="1" pos="|-35,|-14,@60,@26" font="adding:-3" align="center" name="btn_uninstall">卸载</button>
-          </window>
-        </template>
-      </mclistview>
-    </page>
-    <page title="listctrl">
+		<page title="mclistview">
+			<mclistview name="mclv_test" multiSel="1" colorBkgnd="@color/white" pos="10,10,-10,-10" headerHeight="30" dividerSize="1">
+				<headerStyle wndclass="header" align="center" name="mclv_test_header" sortSkin="skin_lcex_header_arrow" itemSwapEnable="1" fixWidth="0" font="underline:0,adding:-3" sortHeader="1" colorBkgnd="#ffffff">
+					<items>
+						<item weight="480" align="left">@string/mccol_1</item>
+						<item weight="95" >@string/mccol_2</item>
+						<item weight="100" >@string/mccol_3</item>
+						<item weight="100" align="right">@string/mccol_4</item>
+						<item weight="100">@string/mccol_5</item>
+						<item weight="100">@string/mccol_6</item>
+					</items>
+					<check name="chk_mclv_sel" text="全选" />
+				</headerStyle>
+				<template itemHeight="80" colorHover="#cccccc" colorSelected="#0000ff">
+					<window name="col1" clipClient="1">
+						<img name="img_icon" skin="skin_icon6" pos="10,8,@64,@64" />
+						<text name="txt_name" pos="[5,16" font="bold:1,adding:-1">火狐浏览器</text>
+						<text name="txt_desc" pos="{0,36,-10,-10" font="bold:1,adding:-4" dotted="1">速度最快的浏览器</text>
+						<text name="txt_index" pos="|0,|0" offset="-0.5,-0.5" font="adding:10" colorText="#ff000088">10</text>
+					</window>
+					<window name="col2" clipClient="1">
+						<ratingbar name="rating_score" starSkin="skin_star1" starNum="5" value="3.5" pos="10,16" />
+						<text name="txt_score" pos="10,36" font="adding:-5">8.5分</text>
+						<link pos="[5,36" cursor="hand" colorText="#1e78d5" href="www.163.com" font="adding:-5">投票</link>
+					</window>
+					<window name="col3" clipClient="1">
+						<text name="txt_size" pos="0,26,-0,-26" font="adding:-4" align="center">85.92M</text>
+					</window>
+					<window name="col4" clipClient="1">
+						<text name="txt_installtime" pos="0,26,-0,-26" font="adding:-4" align="center">2015-01-09</text>
+					</window>
+					<window name="col5" clipClient="1">
+						<text name="txt_usetime" pos="0,26,-0,-26" font="adding:-4" align="center">今天</text>
+						<animateimg pos="|0,|0" offset="-0.5,-0.5" skin="skin_busy" name="ani_test" tip="animateimg is used here" msgTransparent="0" />
+					</window>
+					<window name="col6" clipClient="1">
+						<button animate="1" pos="|-35,|-14,@60,@26" font="adding:-3" align="center" name="btn_uninstall">卸载</button>
+					</window>
+				</template>
+			</mclistview>
+		</page>
+		<page title="listctrl">
 			<listctrl name="lc_test" hotTrack="1" pos="10,0,-10,-10" itemHeight="20" headerHeight="30" cursor="CUR_TST" font="underline:1" sbSkin="skin_new_scrollbar">
 				<headerStyle align="left" itemSwapEnable="1" fixWidth="0" sortHeader="1">
 					<items>
@@ -98,14 +98,14 @@
 			</listctrl>
 		</page>
 		<page title="listview(fix)" layout="vbox" interval="10">
-      <listview size="-2,100" name="lv_test_fix_horz" dividerSize="5" wantTab="1" sbFadeFrames="30" vertical="0">
-        <template itemWidth="100" trackMouseEvent="1">
-          <imgbtn size="-2,-2" layout="vbox" gravity="center" interval="10">
-            <img size="-1,-1" name="btn_icon" skin="skin_page_icons" iconIndex="0"/>
-            <text size="-1,-1" name="btn_text" text="hello"/>
-          </imgbtn>
-        </template>
-      </listview>
+			<listview size="-2,100" name="lv_test_fix_horz" dividerSize="5" wantTab="1" sbFadeFrames="30" vertical="0">
+				<template itemWidth="100" trackMouseEvent="1">
+					<imgbtn size="-2,-2" layout="vbox" gravity="center" interval="10">
+						<img size="-1,-1" name="btn_icon" skin="skin_page_icons" iconIndex="0"/>
+						<text size="-1,-1" name="btn_text" text="hello"/>
+					</imgbtn>
+				</template>
+			</listview>
 			<listview size="-2,0" weight="1" name="lv_test_fix" dividerSize="5" wantTab="1" sbFadeFrames="30">
 				<template itemHeight="50" trackMouseEvent="1">
 					<button pos="10,5,@150,@25" name="btn_test" tip="click the button to see how to writing the response function">btn</button>
@@ -176,8 +176,8 @@
 						<text name="artist" size="-1,0" weight="1">卖炭翁</text>
 					</window>
 					<window name="col3" clipClient="1"  layout="vbox" gravity="center">
-            <hr size="-2,1" colorLine="#666666" />
-            <text name="album" size="-1,0" weight="1">SOUI就是棒</text>
+						<hr size="-2,1" colorLine="#666666" />
+						<text name="album" size="-1,0" weight="1">SOUI就是棒</text>
 					</window>
 					<window name="col4" clipClient="1">
 						<hr pos="0,0,-0,1" colorLine="#666666" />
@@ -213,7 +213,7 @@
 			<text >ip address control:</text>
 			<ipctrl name="ip_test" width="200" height="25" class="cls_edit" ip="192.168.0.130"/>
 			<text multiLines="1">hexedit</text>
-            <hexedit name="ctrl_hexedit" size="-2,0" weight="1" AutoBytesPerRow="1" HexBkColor="#ffff80" AsciiBkColor="#78ebe6" clipClient="1"/>			
+			<hexedit name="ctrl_hexedit" size="-2,0" weight="1" AutoBytesPerRow="1" HexBkColor="#ffff80" AsciiBkColor="#78ebe6" clipClient="1"/>
 		</page>
 		<page title="richedit" layout="vbox" interval="10">
 			<window size="-2,30" layout="hbox" interval="10">
@@ -341,9 +341,9 @@
 		<page title="split">
 			<splitrow name="split_row" pos="10,0,-10,-10" sepSize="6">
 				<pane idealSize="250" minSize="30" priority="2" colorBkgnd="#880000" clipClient="1">
-          <text pos="|0,|-20" offset="-0.5,0" colorText="#ffffff">pane1 priority=2</text>
-          <text2 pos="|0,[20" offset="-0.5,0" font="face:微软雅黑,adding:10" colorText="@color/red">GDI+渲染文字,render by gdiplus</text2>
-        </pane>
+					<text pos="|0,|-20" offset="-0.5,0" colorText="#ffffff">pane1 priority=2</text>
+					<text2 pos="|0,[20" offset="-0.5,0" font="face:微软雅黑,adding:10" colorText="@color/red">GDI+渲染文字,render by gdiplus</text2>
+				</pane>
 				<pane idealSize="400" minSize="30" priority="1">
 					<splitcol name="split_col" pos="0,0,-0,-0" sepSize="6">
 						<pane idealSize="200" minSize="30" priority="0" colorBkgnd="#000088" clipClient="1">
@@ -359,10 +359,10 @@
 		<page title="combobox and listbox" layout="hbox" padding="10,10,10,10">
 			<group text="combobox" size="-1,-1" layout="vbox" padding="10,10,10,10">
 				<combobox name="cbx_test" cueText="tip" cueColor="#909399FF" size="250,30" dropDown="0" dropHeight="100" class="cls_edit" dotted="0" animateTime="200" curSel="2">
-          <dropdownStyle>
-            <root colorBkgnd="#ffffff"/>
-          </dropdownStyle>
-          <liststyle class="cls_edit" iconSkin="skin_menuicon" itemHeight="30" />
+					<dropdownStyle>
+						<root colorBkgnd="#ffffff"/>
+					</dropdownStyle>
+					<liststyle class="cls_edit" iconSkin="skin_menuicon" itemHeight="30" />
 					<editstyle inset="5,0,5,0" margin="0" colorText="#000000" align="left" colorBkgnd="#FFFFFF" />
 					<items>
 						<item text="combobox.item1" icon="1" data="100" />
@@ -401,7 +401,7 @@
 			</window>
 			<propgrid name="prop_test" size="-2,0" weight="1" titleWidth="180" orderType="group" switchSkin="skin_propswitch" colorBkgnd="#ffffff" itemHeight="30">
 				<cmdbtnstyle skin="_skin.sys.btn.normal">...</cmdbtnstyle>
-        <editStyle colorBkgnd="#ffffff"/>
+				<editStyle colorBkgnd="#ffffff"/>
 				<groups>
 					<propgroup name="group1" description="desc of group1">
 						<proptext name="text1.1" value="value 1.1">

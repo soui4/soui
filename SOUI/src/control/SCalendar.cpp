@@ -232,7 +232,6 @@ SCalendar::SCalendar(WORD iYeay, WORD iMonth, WORD iDay)
     Init();
     if (!SetDate(iYeay, iMonth, iDay))
     {
-        // STime tm = STime::GetCurrentTime();
         SetDate(m_Today.wYear, m_Today.wMonth, m_Today.wDay);
     }
 }
@@ -272,13 +271,10 @@ void SCalendar::Init()
     m_nWeekHeight.setSize(20.f, dp);
     m_nFooterHeight.setSize(20.f, dp);
 
+    GetStyle().m_crBg = GETCOLOR(SNamedColor::THEME_COLOR);
     m_crSelText = RGBA(0xFF, 0xFF, 0xFF, 255);
     m_crSelDayBack = RGBA(0x0, 0x7A, 0xCC, 255);
     m_crOtherDayText = RGBA(0xA0, 0xA0, 0xA0, 255);
-
-    // 设置 默认 的 背景色  和 悬浮 字体颜色
-    GetStyle().m_crBg = RGBA(255, 255, 255, 255);
-    m_crHoverText = RGBA(0, 0x7A, 0xCC, 255);
 
     m_pSkinDay = NULL;
     m_pSkinWeek = NULL;

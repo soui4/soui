@@ -40,6 +40,7 @@ class SDummyWnd : public SNativeWnd {
 
     virtual void OnFinalMessage(HWND hWnd)
     {
+        SNativeWnd::OnFinalMessage(hWnd);
         delete this;
     }
 

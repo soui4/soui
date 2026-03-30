@@ -205,6 +205,13 @@ SNativeWnd::SNativeWnd()
 
 SNativeWnd::~SNativeWnd(void)
 {
+#if ENABLE_THUNK
+    if (m_pThunk)
+    {
+        HeapFree(SNativeWndHelper::instance()->GetHeap(), 0, m_pThunk);
+        m_pThunk = NULL;
+    }
+#endif
 }
 
 ATOM SNativeWnd::RegisterSimpleWnd(HINSTANCE hInst, LPCTSTR pszSimpleWndName, BOOL bImeWnd)
@@ -302,7 +309,6 @@ LRESULT CALLBACK SNativeWnd::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
     {
         // clear out window handle
         HWND hWndThis = pThis->m_hWnd;
-        pThis->m_hWnd = 0;
         pThis->m_bDestoryed = FALSE;
         // clean up after window is destroyed
         pThis->m_pCurrentMsg = pOldMsg;

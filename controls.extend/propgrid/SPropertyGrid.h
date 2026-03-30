@@ -138,11 +138,11 @@ SNSBEGIN
 
 		virtual BOOL CreateChildren(SXmlNode xmlNode) override;
 		virtual BOOL WINAPI FireEvent(IEvtArgs *evt) override;
-		virtual UINT WINAPI OnGetDlgCode() const{return SC_WANTALLKEYS;}
-
-		virtual void DrawItem(IRenderTarget *pRT, CRect &rc, int iItem);
-		virtual BOOL OnSetCursor(const CPoint &pt);
-		virtual BOOL OnScroll(BOOL bVertical,UINT uCode,int nPos);
+		virtual UINT WINAPI OnGetDlgCode() const override{return SC_WANTALLKEYS;}
+		virtual void BeforePaint(IRenderTarget *pRT, SPainter &painter) const override;
+		virtual void DrawItem(IRenderTarget *pRT, CRect &rc, int iItem) override;
+		virtual BOOL OnSetCursor(const CPoint &pt) override;
+		virtual BOOL OnScroll(BOOL bVertical,UINT uCode,int nPos) override;
 
 		void OnLButtonDown(UINT nFlags,CPoint pt);
 		void OnLButtonUp(UINT nFlags,CPoint pt);
