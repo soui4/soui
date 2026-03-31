@@ -49,4 +49,5 @@
   <imglist name="_skin.sys.switch" src="PNG:SYS_SWITCH" states="8" checkAsPushdown="0"/>
   <imglist name="_skin.sys.switch_bg" src="PNG:SYS_SWITCH_BG" states="1"/>
   <imgframe name="_skin.sys.list.item" src="PNG:SYS_LIST_ITEM" states="3" margin="3,3,3,3"/>
+  <imglist name="_skin.sys.btn.mini.close" src="PNG:SYS_BTN_MINI_CLOSE" states="3"/>
 </skin>

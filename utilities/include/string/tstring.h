@@ -3,7 +3,7 @@
 
 
 #include <utilities-def.h>
-#include <souicoll.h>
+
 #include "sstringa.h"
 #include "sstringw.h"
 
@@ -17,12 +17,25 @@ SNSBEGIN
 
 
     template< typename T >
-    class SStringElementTraits : public CSafeElementTraitsBase<T>
+    class SStringElementTraits
     {
     public:
         typedef typename T::pctstr INARGTYPE;
         typedef T& OUTARGTYPE;
 
+        static void __cdecl CopyElements(T* pDest, const T* pSrc, size_t nElements)
+        {
+            for (size_t iElement = 0; iElement < nElements; iElement++)
+            {
+                pDest[iElement] = pSrc[iElement];
+            }
+        }
+
+        static void __cdecl RelocateElements(T* pDest, T* pSrc, size_t nElements)
+        {
+            //memmove_s is safe for SStringT 
+            memmove_s((void*)pDest, nElements * sizeof(T), (const void*)pSrc, nElements * sizeof(T));
+        }
 
         static ULONG __cdecl Hash(INARGTYPE  str)
         {
@@ -48,6 +61,9 @@ SNSBEGIN
             return (T::_tchar_traits::Compare(str1,str2));
         }
     };
+
+    template< typename T >
+    class CElementTraits;
 
     template<>
     class CElementTraits< SStringA > :

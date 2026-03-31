@@ -39,6 +39,7 @@ SYS_SPIN_UP             PNG                     "theme_sys_res/sys_spin_up.png"
 SYS_SWITCH              PNG                     "theme_sys_res/sys_switch.png"
 SYS_SWITCH_BG           PNG                     "theme_sys_res/sys_switch_bg.png"
 SYS_LIST_ITEM           PNG                     "theme_sys_res/sys_list_item.png"
+SYS_BTN_MINI_CLOSE      PNG                     "theme_sys_res/sys_btn_mini_close.png"
 
 /////////////////////////////////////////////////////////////////////////////
 //

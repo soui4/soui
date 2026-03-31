@@ -23,6 +23,7 @@
         <file name="SYS_BTN_MINIMIZE" path="theme_sys_res\sys_btn_minimize.png"/>
         <file name="SYS_BTN_RESTORE" path="theme_sys_res\sys_btn_restore.png"/>
         <file name="SYS_BTN_CLOSE" path="theme_sys_res\sys_btn_close.png"/>
+        <file name="SYS_BTN_MINI_CLOSE" path="theme_sys_res\sys_btn_mini_close.png"/>
         <file name="SYS_BTN_MAXIMIZE" path="theme_sys_res\sys_btn_maximize.png"/>
         <file name="SYS_MENU_CHECK" path="theme_sys_res\sys_menu_check.png"/>
         <file name="SYS_MENU_ARROW" path="theme_sys_res\sys_menu_arrow.png"/>
