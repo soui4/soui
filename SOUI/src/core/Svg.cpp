@@ -82,8 +82,10 @@ EXTERN_C ISvgObjPtr CreateSvgObj(char *strSvg)
 EXTERN_C ISvgObjPtr CreateSvgFromResId(LPCTSTR resId)
 {
     SStringTList strLst = ParseResID(resId);
-    if (strLst.GetCount() != 2)
-        return NULL;
+    if (strLst.GetCount() == 1)
+    {
+        strLst.InsertAt(0, _T("file"));
+    }
     SApplication *pApp = SApplication::getSingletonPtr();
     int sz = pApp->GetRawBufferSize(strLst[0], strLst[1]);
     if (sz == 0)

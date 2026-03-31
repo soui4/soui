@@ -71,11 +71,12 @@ template size_t SplitString<SStringW, wchar_t>(const SStringW &str, wchar_t cSep
 inline int ParseResID(const SStringT &str, SStringTList &strLst)
 {
     int nPos = str.FindChar(_T(':'));
-    if (nPos == -1)
+    if (nPos == -1 || nPos == 1)
     {
+        // resid with nPos==1 will treat as an obsolute path for windows OS, so we don't split it.
         strLst.Add(str);
     }
-    else
+    else if (nPos>1)
     {
         strLst.Add(str.Left(nPos));
         strLst.Add(str.Right(str.GetLength() - nPos - 1));

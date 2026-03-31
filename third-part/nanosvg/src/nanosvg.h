@@ -490,6 +490,7 @@ typedef struct NSVGgradientData
 typedef struct NSVGattrib
 {
 	char id[64];
+	char className[64];
 	float xform[6];
 	unsigned int fillColor;
 	unsigned int strokeColor;
@@ -523,6 +524,13 @@ typedef struct NSVGattrib
     float wordSpacing;
 } NSVGattrib;
 
+// CSS rule
+typedef struct NSVGcssRule {
+	char selector[128];
+	NSVGattrib style;
+	struct NSVGcssRule* next;
+} NSVGcssRule;
+
 typedef struct NSVGparser
 {
 	NSVGattrib attr[NSVG_MAX_ATTR];
@@ -533,6 +541,7 @@ typedef struct NSVGparser
 	NSVGpath* plist;
 	NSVGimage* image;
 	NSVGgradientData* gradients;
+	NSVGcssRule* cssRules;
 	NSVGshape* shapesTail;
 	NSVGtext* textsTail;
 	float viewMinx, viewMiny, viewWidth, viewHeight;
@@ -541,8 +550,11 @@ typedef struct NSVGparser
 	char pathFlag;
 	char defsFlag;
 	char textFlag;
+	char styleFlag;
 	char textBuffer[1024];
+	char styleBuffer[4096];
 	int textBufferLen;
+	int styleBufferLen;
 } NSVGparser;
 
 static void nsvg__xformIdentity(float* t)
@@ -720,6 +732,7 @@ static NSVGparser* nsvg__createParser(void)
 	// Init style
 	nsvg__xformIdentity(p->attr[0].xform);
 	memset(p->attr[0].id, 0, sizeof p->attr[0].id);
+	memset(p->attr[0].className, 0, sizeof p->attr[0].className);
 	p->attr[0].fillColor = NSVG_RGB(0,0,0);
 	p->attr[0].strokeColor = NSVG_RGB(0,0,0);
 	p->attr[0].opacity = 1;
@@ -742,6 +755,12 @@ static NSVGparser* nsvg__createParser(void)
     p->attr[0].letterSpacing = 0;
     p->attr[0].wordSpacing = 0;
 	p->attr[0].anchor = NSVG_ANCHOR_START;
+	
+	// Init CSS
+	p->cssRules = NULL;
+	p->styleFlag = 0;
+	p->styleBufferLen = 0;
+	p->styleBuffer[0] = '\0';
 	return p;
 
 error:
@@ -780,11 +799,22 @@ static void nsvg__deleteGradientData(NSVGgradientData* grad)
 	}
 }
 
+static void nsvg__deleteCssRules(NSVGcssRule* rule)
+{
+	NSVGcssRule* next;
+	while (rule != NULL) {
+		next = rule->next;
+		free(rule);
+		rule = next;
+	}
+}
+
 static void nsvg__deleteParser(NSVGparser* p)
 {
 	if (p != NULL) {
 		nsvg__deletePaths(p->plist);
 		nsvg__deleteGradientData(p->gradients);
+		nsvg__deleteCssRules(p->cssRules);
 		nsvgDelete(p->image);
 		free(p->pts);
 		free(p);
@@ -1031,78 +1061,95 @@ static void nsvg__getLocalBounds(float* bounds, NSVGshape *shape, float* xform)
 	}
 }
 
+static void nsvg__applyShapeAttr(NSVGshape *shape, NSVGattrib *attr)
+{
+    float scale = 1.0f;
+    NSVGpath *path;
+    int i;
+    if (!attr)
+        return;
+    memcpy(shape->fillGradient, attr->fillGradient, sizeof shape->fillGradient);
+    memcpy(shape->strokeGradient, attr->strokeGradient, sizeof shape->strokeGradient);
+    memcpy(shape->xform, attr->xform, sizeof shape->xform);
+    scale = nsvg__getAverageScale(attr->xform);
+    shape->strokeWidth = attr->strokeWidth * scale;
+    shape->strokeDashOffset = attr->strokeDashOffset * scale;
+    shape->strokeDashCount = (char)attr->strokeDashCount;
+    for (i = 0; i < attr->strokeDashCount; i++)
+        shape->strokeDashArray[i] = attr->strokeDashArray[i] * scale;
+    shape->strokeLineJoin = attr->strokeLineJoin;
+    shape->strokeLineCap = attr->strokeLineCap;
+    shape->miterLimit = attr->miterLimit;
+    shape->fillRule = attr->fillRule;
+    shape->opacity = attr->opacity;
+    shape->paintOrder = attr->paintOrder;
+
+    // Calculate shape bounds
+    shape->bounds[0] = shape->paths->bounds[0];
+    shape->bounds[1] = shape->paths->bounds[1];
+    shape->bounds[2] = shape->paths->bounds[2];
+    shape->bounds[3] = shape->paths->bounds[3];
+    for (path = shape->paths->next; path != NULL; path = path->next)
+    {
+        shape->bounds[0] = nsvg__minf(shape->bounds[0], path->bounds[0]);
+        shape->bounds[1] = nsvg__minf(shape->bounds[1], path->bounds[1]);
+        shape->bounds[2] = nsvg__maxf(shape->bounds[2], path->bounds[2]);
+        shape->bounds[3] = nsvg__maxf(shape->bounds[3], path->bounds[3]);
+    }
+
+    // Set fill
+    if (attr->hasFill == 0)
+    {
+        shape->fill.type = NSVG_PAINT_NONE;
+    }
+    else if (attr->hasFill == 1)
+    {
+        shape->fill.type = NSVG_PAINT_COLOR;
+        shape->fill.color = attr->fillColor;
+        shape->fill.color |= (unsigned int)(attr->fillOpacity * 255) << 24;
+    }
+    else if (attr->hasFill == 2)
+    {
+        shape->fill.type = NSVG_PAINT_UNDEF;
+    }
+
+    // Set stroke
+    if (attr->hasStroke == 0)
+    {
+        shape->stroke.type = NSVG_PAINT_NONE;
+    }
+    else if (attr->hasStroke == 1)
+    {
+        shape->stroke.type = NSVG_PAINT_COLOR;
+        shape->stroke.color = attr->strokeColor;
+        shape->stroke.color |= (unsigned int)(attr->strokeOpacity * 255) << 24;
+    }
+    else if (attr->hasStroke == 2)
+    {
+        shape->stroke.type = NSVG_PAINT_UNDEF;
+    }
+
+    // Set flags
+    shape->flags = (attr->visible ? NSVG_FLAGS_VISIBLE : 0x00);
+}
+static NSVGattrib *nsvg_findCssStyle(NSVGparser *p, const char *cssName);
+
 static void nsvg__addShape(NSVGparser* p)
 {
-	NSVGattrib* attr = nsvg__getAttr(p);
-	float scale = 1.0f;
-	NSVGshape* shape;
-	NSVGpath* path;
-	int i;
-
+    NSVGshape *shape;
+    NSVGattrib *attr = nsvg__getAttr(p);
+    NSVGattrib *attrCss = nsvg_findCssStyle(p,attr->className);
 	if (p->plist == NULL)
 		return;
-
-	shape = (NSVGshape*)malloc(sizeof(NSVGshape));
+    shape = (NSVGshape *)malloc(sizeof(NSVGshape));
 	if (shape == NULL) goto error;
 	memset(shape, 0, sizeof(NSVGshape));
 
 	memcpy(shape->id, attr->id, sizeof shape->id);
-	memcpy(shape->fillGradient, attr->fillGradient, sizeof shape->fillGradient);
-	memcpy(shape->strokeGradient, attr->strokeGradient, sizeof shape->strokeGradient);
-	memcpy(shape->xform, attr->xform, sizeof shape->xform);
-	scale = nsvg__getAverageScale(attr->xform);
-	shape->strokeWidth = attr->strokeWidth * scale;
-	shape->strokeDashOffset = attr->strokeDashOffset * scale;
-	shape->strokeDashCount = (char)attr->strokeDashCount;
-	for (i = 0; i < attr->strokeDashCount; i++)
-		shape->strokeDashArray[i] = attr->strokeDashArray[i] * scale;
-	shape->strokeLineJoin = attr->strokeLineJoin;
-	shape->strokeLineCap = attr->strokeLineCap;
-	shape->miterLimit = attr->miterLimit;
-	shape->fillRule = attr->fillRule;
-	shape->opacity = attr->opacity;
-    shape->paintOrder = attr->paintOrder;
-
-	shape->paths = p->plist;
-	p->plist = NULL;
-
-	// Calculate shape bounds
-	shape->bounds[0] = shape->paths->bounds[0];
-	shape->bounds[1] = shape->paths->bounds[1];
-	shape->bounds[2] = shape->paths->bounds[2];
-	shape->bounds[3] = shape->paths->bounds[3];
-	for (path = shape->paths->next; path != NULL; path = path->next) {
-		shape->bounds[0] = nsvg__minf(shape->bounds[0], path->bounds[0]);
-		shape->bounds[1] = nsvg__minf(shape->bounds[1], path->bounds[1]);
-		shape->bounds[2] = nsvg__maxf(shape->bounds[2], path->bounds[2]);
-		shape->bounds[3] = nsvg__maxf(shape->bounds[3], path->bounds[3]);
-	}
-
-	// Set fill
-	if (attr->hasFill == 0) {
-		shape->fill.type = NSVG_PAINT_NONE;
-	} else if (attr->hasFill == 1) {
-		shape->fill.type = NSVG_PAINT_COLOR;
-		shape->fill.color = attr->fillColor;
-		shape->fill.color |= (unsigned int)(attr->fillOpacity*255) << 24;
-	} else if (attr->hasFill == 2) {
-		shape->fill.type = NSVG_PAINT_UNDEF;
-	}
-
-	// Set stroke
-	if (attr->hasStroke == 0) {
-		shape->stroke.type = NSVG_PAINT_NONE;
-	} else if (attr->hasStroke == 1) {
-		shape->stroke.type = NSVG_PAINT_COLOR;
-		shape->stroke.color = attr->strokeColor;
-		shape->stroke.color |= (unsigned int)(attr->strokeOpacity*255) << 24;
-	} else if (attr->hasStroke == 2) {
-		shape->stroke.type = NSVG_PAINT_UNDEF;
-	}
-
-	// Set flags
-	shape->flags = (attr->visible ? NSVG_FLAGS_VISIBLE : 0x00);
-
+    shape->paths = p->plist;
+    p->plist = NULL;
+	nsvg__applyShapeAttr(shape,attr);
+    nsvg__applyShapeAttr(shape, attrCss);
 	// Add to tail
 	if (p->image->shapes == NULL)
 		p->image->shapes = shape;
@@ -2166,6 +2213,9 @@ static int nsvg__parseAttr(NSVGparser* p, const char* name, const char* value)
 	} else if (stricmp(name, "id") == 0) {
 		strncpy(attr->id, value, 63);
 		attr->id[63] = '\0';
+	} else if (stricmp(name, "class") == 0) {
+		strncpy(attr->className, value, 63);
+		attr->className[63] = '\0';
 	} else {
 		return 0;
 	}
@@ -2223,6 +2273,50 @@ static void nsvg__parseStyle(NSVGparser* p, const char* str)
 		nsvg__parseNameValue(p, start, end);
 		if (*str) ++str;
 	}
+}
+
+static NSVGattrib *nsvg_findCssStyle(NSVGparser *p, const char *cssName)
+{
+    if (!cssName || !cssName[0])
+        return NULL;
+
+    // Iterate through all CSS rules
+    NSVGcssRule *rule = p->cssRules;
+    while (rule)
+    {
+        // Check if the rule is a class selector
+        if (rule->selector[0] == '.')
+        {
+            // Extract class name from selector
+            const char *className = rule->selector + 1;
+
+            // Check if the element has this class
+            const char *elementClass = cssName;
+            while (*elementClass)
+            {
+                // Skip whitespace
+                while (*elementClass && nsvg__isspace(*elementClass))
+                    elementClass++;
+                if (!*elementClass)
+                    break;
+
+                // Find end of current class name
+                const char *classEnd = elementClass;
+                while (*classEnd && !nsvg__isspace(*classEnd) && *classEnd != ',')
+                    classEnd++;
+
+                // Compare class names
+                int len = (int)(classEnd - elementClass);
+                if (strncmp(elementClass, className, len) == 0 && className[len] == '\0')
+                {
+                    return &rule->style;
+                }
+                elementClass = classEnd;
+            }
+        }
+        rule = rule->next;
+    }
+    return NULL;
 }
 
 static void nsvg__parseAttribs(NSVGparser* p, const char** attr)
@@ -3140,19 +3234,24 @@ static void nsvg__parseGradientStop(NSVGparser* p, const char** attr)
 	stop->color |= (unsigned int)(curAttr->stopOpacity*255) << 24;
 	stop->offset = curAttr->stopOffset;
 }
+static void nsvg__parseCssRule(NSVGparser *p, const char *rule);
 
 static void nsvg__startElement(void* ud, const char* el, const char** attr)
 {
 	NSVGparser* p = (NSVGparser*)ud;
 
 	if (p->defsFlag) {
-		// Skip everything but gradients in defs
+		// Skip everything but gradients and style in defs
 		if (stricmp(el, "linearGradient") == 0) {
 			nsvg__parseGradient(p, attr, NSVG_PAINT_LINEAR_GRADIENT);
 		} else if (stricmp(el, "radialGradient") == 0) {
 			nsvg__parseGradient(p, attr, NSVG_PAINT_RADIAL_GRADIENT);
 		} else if (stricmp(el, "stop") == 0) {
 			nsvg__parseGradientStop(p, attr);
+		} else if (stricmp(el, "style") == 0) {
+			p->styleFlag = 1;
+			p->styleBufferLen = 0;
+			p->styleBuffer[0] = '\0';
 		}
 		return;
 	}
@@ -3199,11 +3298,65 @@ static void nsvg__startElement(void* ud, const char* el, const char** attr)
 		nsvg__parseGradient(p, attr, NSVG_PAINT_RADIAL_GRADIENT);
 	} else if (stricmp(el, "stop") == 0) {
 		nsvg__parseGradientStop(p, attr);
+	} else if (stricmp(el, "style") == 0) {
+		p->styleFlag = 1;
+		p->styleBufferLen = 0;
+		p->styleBuffer[0] = '\0';
 	} else if (stricmp(el, "defs") == 0) {
 		p->defsFlag = 1;
 	} else if (stricmp(el, "svg") == 0) {
 		nsvg__parseSVG(p, attr);
 	}
+}
+
+static void nsvg__parseCssRule(NSVGparser* p, const char* rule)
+{
+	// Find selector and style parts
+	const char* colon = strchr(rule, '{');
+	if (!colon) return;
+	
+	// Create new CSS rule
+	NSVGcssRule* cssRule = (NSVGcssRule*)malloc(sizeof(NSVGcssRule));
+	if (!cssRule) return;
+	
+	// Initialize style with default values
+	memcpy(&cssRule->style, &p->attr[0], sizeof(NSVGattrib));
+	
+	// Parse selector
+	int selectorLen = (int)(colon - rule);
+	while (selectorLen > 0 && nsvg__isspace(rule[selectorLen-1])) selectorLen--;
+	if (selectorLen > 0) {
+		strncpy(cssRule->selector, rule, selectorLen);
+		cssRule->selector[selectorLen] = '\0';
+	} else {
+		free(cssRule);
+		return;
+	}
+	
+	// Parse style declarations
+	const char* styleStart = colon + 1;
+	const char* styleEnd = strchr(styleStart, '}');
+	if (!styleEnd) {
+		free(cssRule);
+		return;
+	}
+	
+	// Create a temporary buffer for the style content
+	char styleBuffer[4096];
+	int styleLen = (int)(styleEnd - styleStart);
+	if (styleLen > 4095) styleLen = 4095;
+	strncpy(styleBuffer, styleStart, styleLen);
+	styleBuffer[styleLen] = '\0';
+	
+	// Parse the style using existing nsvg__parseStyle function
+	nsvg__parseStyle(p, styleBuffer);
+	
+	// Copy the parsed style to the CSS rule
+	memcpy(&cssRule->style, &p->attr[0], sizeof(NSVGattrib));
+	
+	// Add the rule to the list
+	cssRule->next = p->cssRules;
+	p->cssRules = cssRule;
 }
 
 static void nsvg__endElement(void* ud, const char* el)
@@ -3214,6 +3367,33 @@ static void nsvg__endElement(void* ud, const char* el)
 		nsvg__popAttr(p);
 	} else if (stricmp(el, "path") == 0) {
 		p->pathFlag = 0;
+	} else if (stricmp(el, "style") == 0) {
+		p->styleFlag = 0;
+		// Parse CSS rules from style buffer
+		const char* str = p->styleBuffer;
+		const char* start;
+		const char* end;
+		
+		while (*str) {
+			// Skip whitespace
+			while (*str && nsvg__isspace(*str)) str++;
+			if (!*str) break;
+			
+			start = str;
+			// Find end of rule (closing brace)
+			while (*str && *str != '}') str++;
+			if (!*str) break;
+			end = str + 1;
+			
+			// Parse the rule
+			nsvg__parseCssRule(p, start);
+			
+			str = end;
+		}
+		
+		// Reset style buffer
+		p->styleBufferLen = 0;
+		p->styleBuffer[0] = '\0';
 	} else if (stricmp(el, "defs") == 0) {
 		p->defsFlag = 0;
 	} else if (stricmp(el, "text") == 0) {
@@ -3226,29 +3406,32 @@ static void nsvg__content(void* ud, const char* s)
 {
 	NSVGparser* p = (NSVGparser*)ud;
 	
-	if (!p->textFlag)
-		return;
-	
-	// Trim leading whitespace
-	while (*s && nsvg__isspace(*s)) s++;
-	
-	int len = strlen(s);
-	if (len == 0)
-		return;
-	
-	// Trim trailing whitespace
-	while (len > 0 && nsvg__isspace(s[len-1])) len--;
-	
-	if (len == 0)
-		return;
-	
-	// Append text content to buffer
-	int remaining = 1023 - p->textBufferLen;
-	if (remaining > 0) {
-		int toCopy = len < remaining ? len : remaining;
-		memcpy(p->textBuffer + p->textBufferLen, s, toCopy);
-		p->textBufferLen += toCopy;
-		p->textBuffer[p->textBufferLen] = '\0';
+	if (p->textFlag) {
+		// Trim leading whitespace
+		while (*s && nsvg__isspace(*s)) s++;
+		
+		int len = strlen(s);
+		if (len == 0)
+			return;
+		
+		// Trim trailing whitespace
+		while (len > 0 && nsvg__isspace(s[len-1])) len--;
+		
+		if (len == 0)
+			return;
+		
+		// Append text content to buffer
+		int remaining = 1023 - p->textBufferLen;
+		if (remaining > 0) {
+			int toCopy = len < remaining ? len : remaining;
+			memcpy(p->textBuffer + p->textBufferLen, s, toCopy);
+			p->textBufferLen += toCopy;
+			p->textBuffer[p->textBufferLen] = '\0';
+		}
+	} else if (p->styleFlag) {
+		// For style content, we don't trim whitespace
+		strncat(p->styleBuffer, s, 4095 - p->styleBufferLen);
+		p->styleBufferLen = (int)strlen(p->styleBuffer);
 	}
 }
 

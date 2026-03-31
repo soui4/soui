@@ -214,14 +214,14 @@ void SSkinImgList::LoadSrcImage() const
 {
     if (m_strSrc.IsEmpty())
         return;
-    SStringWList list;
-    SplitString(m_strSrc, L':', list);
-    if (list.GetCount() == 1)
+    SStringTList list;
+    int segs = ParseResID(S_CW2T(m_strSrc), list);
+    for (int i = 0; i < segs; i++)
     {
-        list.InsertAt(0, L"file");
+        list[i].MakeLower();
     }
-    list[0].MakeLower();
-    list[1].MakeLower();
+    if (segs == 1)
+        list.InsertAt(0, _T("file"));
     if (list[0] == L"svg" || (list[0] == L"file" && list[1].EndsWith(L"svg")))
     {
         m_pSvg.Attach(CreateSvgFromResId(S_CW2T(m_strSrc)));
