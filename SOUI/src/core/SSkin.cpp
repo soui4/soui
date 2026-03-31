@@ -222,7 +222,7 @@ void SSkinImgList::LoadSrcImage() const
     }
     list[0].MakeLower();
     list[1].MakeLower();
-    if (list[0] == L"svg" || (list[0] == L"file" && list[1].EndsWith(L"svg") == 0))
+    if (list[0] == L"svg" || (list[0] == L"file" && list[1].EndsWith(L"svg")))
     {
         m_pSvg.Attach(CreateSvgFromResId(S_CW2T(m_strSrc)));
     }
