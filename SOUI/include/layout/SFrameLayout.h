@@ -74,6 +74,12 @@ class SOUI_EXP SFrameLayoutParam
     HRESULT OnAttrDockPosition(const SStringW &strValue, BOOL bLoading);
 };
 
+struct FrameLayoutItemInfo : SFrameLayoutParamStruct
+{
+    SStringW strName;
+    BOOL     bVisible;
+};
+
 class SOUI_EXP SFrameLayout : public TObjRefImpl<SObjectImpl<ILayout>> {
     DEF_SOBJECT_EX(SObjectImpl<ILayout>, L"frameLayout", L"frame")
 
@@ -81,9 +87,33 @@ class SOUI_EXP SFrameLayout : public TObjRefImpl<SObjectImpl<ILayout>> {
     SFrameLayout(void);
     ~SFrameLayout(void);
 
+    /**
+     * @brief 设置允许停靠的边
+     * @param mode 停靠模式
+     */
     void SetEnableDockMode(DockMode mode);
+
+    /**
+     * @brief 获取允许停靠的边
+     * @return 停靠模式
+     */
     DockMode GetEnableDockMode() const;
 
+    /**
+     * @brief 保存当前布局配置
+     * @param pParent 父窗口指针
+     * @param lstItems 返回布局项信息列表
+     * @return 成功返回TRUE，失败返回FALSE
+     */
+    BOOL SaveLayout(IWindow *pParent, SArray<FrameLayoutItemInfo> &lstItems) const;
+
+    /**
+     * @brief 恢复布局配置
+     * @param pParent 父窗口指针
+     * @param lstItems 布局项信息列表
+     * @return 成功返回TRUE，失败返回FALSE
+     */
+    BOOL RestoreLayout(IWindow *pParent, const SArray<FrameLayoutItemInfo> &lstItems);
   protected:
     static DockMode parseDockMode(const SStringW &strValue);
     DockMode m_enableDockMode;

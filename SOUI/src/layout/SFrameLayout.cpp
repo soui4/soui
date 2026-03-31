@@ -878,4 +878,56 @@ void SFrameLayout::LayoutChildren(IWindow *pParent)
     }
 }
 
+BOOL SFrameLayout::SaveLayout(IWindow *pParent, SArray<FrameLayoutItemInfo> &lstItems) const
+{
+    if (!pParent)
+        return FALSE;
+
+    lstItems.RemoveAll();
+
+    SList<ChildInfo> lstChildren;
+    CollectChildren(pParent, lstChildren);
+
+    int nOrder = 0;
+    SPOSITION pos = lstChildren.GetHeadPosition();
+    while (pos)
+    {
+        ChildInfo &info = lstChildren.GetNext(pos);
+        FrameLayoutItemInfo item;
+        SFrameLayoutParamStruct *pSrc = (SFrameLayoutParamStruct *)info.pParam;
+        SFrameLayoutParamStruct *pDst = (SFrameLayoutParamStruct *)&item;
+        *pDst = *pSrc;
+        item.strName = info.pWnd->GetName();
+        lstItems.Add(item);
+    }
+
+    return TRUE;
+}
+
+BOOL SFrameLayout::RestoreLayout(IWindow *pParent, const SArray<FrameLayoutItemInfo> &lstItems)
+{
+    if (!pParent)
+        return FALSE;
+
+    for (int i = 0; i < lstItems.GetCount(); i++)
+    {
+        const FrameLayoutItemInfo &item = lstItems[i];
+        IWindow *pChild = pParent->FindIChildByName(item.strName);
+        if (!pChild)
+            continue;
+                        // 更新布局参数
+        SFrameLayoutParam *pParam = (SFrameLayoutParam *)pChild->GetLayoutParam();
+        if (pParam)
+        {
+            SFrameLayoutParamStruct *pStruct = (SFrameLayoutParamStruct *)pParam;
+            *pStruct = item;
+            // 更新可见性
+            pChild->SetVisible(item.bVisible,FALSE);
+        }        
+    }
+    // 重新布局
+    LayoutChildren(pParent);
+    return TRUE;
+}
+
 SNSEND
