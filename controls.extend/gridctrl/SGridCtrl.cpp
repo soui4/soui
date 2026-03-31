@@ -2460,6 +2460,17 @@ void SGridCtrl::ClearCells()
     m_RowData.RemoveAll();
 }
 
+void SGridCtrl::BeforePaint(IRenderTarget *pRT, SPainter &painter) const
+{
+    IFontPtr pFont = GetStyle().GetTextFont(0);
+    if (pFont)
+        pRT->SelectObject(pFont, (IRenderObj **)&painter.oldFont);
+
+    COLORREF crTxt = GetStyle().GetTextColor(0);
+    if (crTxt != CR_INVALID)
+        painter.oldTextColor = pRT->SetTextColor(crTxt);
+}
+
 // Drawing implementation
 void SGridCtrl::OnPaint(IRenderTarget *pRT)
 {

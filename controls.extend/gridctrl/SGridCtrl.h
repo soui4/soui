@@ -856,7 +856,7 @@ protected:
     void ResetSelectedRange();
 
     BOOL OnSetCursor(const CPoint &pt) override;
-
+    void BeforePaint(IRenderTarget *pRT, SPainter &painter) const override;
     SOUI_MSG_MAP_BEGIN()
         MSG_WM_PAINT_EX(OnPaint)
         MSG_WM_SIZE(OnSize)
