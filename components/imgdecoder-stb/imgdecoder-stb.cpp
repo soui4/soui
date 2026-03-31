@@ -158,6 +158,7 @@ SImgFrame_STB::SImgFrame_STB(const BYTE *data, int w, int h, int nDelay,BOOL bMo
         fread(buf, 1, len, f);
         int ret = LoadFromMemory(buf, len);
         fclose(f);
+        free(buf);
         return ret;
 #else
         char szFileName[MAX_PATH]={0};
@@ -189,6 +190,7 @@ SImgFrame_STB::SImgFrame_STB(const BYTE *data, int w, int h, int nDelay,BOOL bMo
             return 0;
         }
         int ret = LoadFromMemory(buf, len);
+        free(buf);
         return ret;
         #endif//_WIN32
     }
