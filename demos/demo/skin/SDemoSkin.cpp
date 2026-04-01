@@ -2,10 +2,11 @@
 #include "SDemoSkin.h"
 #include "helper/SDIBHelper.h"
 
-namespace SOUI
-{	
+SNSBEGIN
+
 	SDemoSkin::SDemoSkin():m_csSize(0, 0),m_bkColor(RGBA(255, 255, 255,255)), m_bIsColor(false), m_ISetOrLoadSkinHandler(NULL)
-	{
+{
+    m_bEnableScale = false;
 	}
 
 	SDemoSkin::SDemoSkin(ISetOrLoadSkinHandler *handle) : m_csSize(0, 0), m_bkColor(RGBA(255, 255, 255,255)), m_bIsColor(false), m_ISetOrLoadSkinHandler(handle)
@@ -126,4 +127,4 @@ namespace SOUI
 			return CR_INVALID;
 	}
 
-}
+SNSEND

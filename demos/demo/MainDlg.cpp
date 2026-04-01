@@ -165,7 +165,7 @@ void LoadSkinFormXml(SDemoSkin *skin, SkinType *skinType, SkinLoadInf *skininf)
 }
 bool CMainDlg::LoadSkin()
 {
-	SDemoSkin *skin = (SDemoSkin *)GETSKIN(L"demoskinbk",GetScale());
+	SDemoSkin *skin = (SDemoSkin *)GETSKIN(L"demoskinbk",100);
 	if (skin)
 	{
 		SkinLoadInf loadInf;
@@ -230,7 +230,7 @@ void CMainDlg::OnDestory()
             delete pst;
         }
     }
-	SDemoSkin *skin = (SDemoSkin *)GETSKIN(L"demoskinbk",GetScale());
+	SDemoSkin *skin = (SDemoSkin *)GETSKIN(L"demoskinbk",100);
 	if (skin)
 	{
 		skin->SaveSkin();
@@ -275,7 +275,7 @@ HRESULT CMainDlg::OnSkinChangeMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, B
 		pMainTab->SetAttribute(L"iconSkin",L"skin_page_icons");
 	}
 	FindChildByID(9527)->Invalidate();
-	SDemoSkin *skin = (SDemoSkin *) GETSKIN(L"demoskinbk",GetScale());
+	SDemoSkin *skin = (SDemoSkin *) GETSKIN(L"demoskinbk",100);
 
 	DWORD tm1=GetTickCount();
 	COLORREF crTheme = skin->GetThemeColor();

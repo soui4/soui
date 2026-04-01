@@ -1,7 +1,6 @@
 ﻿#pragma once
 
-namespace SOUI
-{
+SNSBEGIN
 	enum SkinType
 	{
 		color,
@@ -53,7 +52,7 @@ namespace SOUI
 		{}
 	protected:
         void _DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int idx, BYTE byAlpha) const override;
-		
+
 		ISetOrLoadSkinHandler *m_ISetOrLoadSkinHandler;		
 		CSize m_csSize;		
 		bool m_bIsColor;
@@ -61,4 +60,4 @@ namespace SOUI
 		bool m_bAdaptiveImg;		
 		SStringW m_FilePath;	
 	};
-}
+SNSEND
