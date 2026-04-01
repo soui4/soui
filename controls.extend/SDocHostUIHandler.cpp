@@ -13,8 +13,8 @@ SDocHostUIHandler::SDocHostUIHandler(IScriptCaller *sc)
     , m_bDisableScrollBar(FALSE)
     , m_bDisable3DBorder(FALSE)
     , m_bDisableTextSelect(FALSE)
+	, m_disp(new SJsCallCppIDispatch(sc),FALSE)
 {
-    m_disp = new SJsCallCppIDispatch(sc);
 }
 
 SDocHostUIHandler::~SDocHostUIHandler(void)

@@ -85,7 +85,7 @@ if(CMAKE_DEBUG_POSTFIX)
 endif()
 
 add_dependencies(demo ${COM_LIBS})
-target_link_libraries(demo soui4 utilities4 ExtendCtrls)
+target_link_libraries(demo soui4 utilities4 ExtendCtrls render-gdi render-skia render-d2d)
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
 	add_dependencies(demo soui-sys-resource)
 	if(MSVC)

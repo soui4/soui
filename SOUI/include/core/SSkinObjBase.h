@@ -82,6 +82,8 @@ class SOUI_EXP SSkinObjBase : public TObjRefImpl<SObjectImpl<ISkinObj>> {
      */
     SSkinObjBase();
 
+	virtual ~SSkinObjBase();
+
     /**
      * @brief Gets the name of the skin object.
      * @return Name of the skin object.

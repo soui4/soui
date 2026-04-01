@@ -1,6 +1,9 @@
 ﻿#include <souistd.h>
 #include <core/SSkinObjBase.h>
 #include <core/SWnd.h>
+#include <helper/slog.h>
+#define kLogTag "skinbase"
+
 SNSBEGIN
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -122,6 +125,11 @@ SSkinObjBase::SSkinObjBase()
     , m_nScale(100)
     , m_checkAsPushdown(true)
 {
+}
+
+SSkinObjBase::~SSkinObjBase()
+{
+	//SLOGI()<<"skin free, name="<<GetName();
 }
 
 void SSkinObjBase::OnInitFinished(IXmlNode *pNode)

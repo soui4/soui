@@ -1,7 +1,6 @@
 # UIEditor 技术架构详解
 ![main](../docimage/1.png)
-## 1. 基于STreeVie
-w的资源管理框架
+## 1. 基于STreeView的资源管理框架
 
 UIEditor采用STreeView控件实现了一套强大的资源管理框架，主要通过`CFileTreeAdapter`类来管理文件系统的显示和操作。
 

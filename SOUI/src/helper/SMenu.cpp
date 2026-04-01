@@ -311,7 +311,7 @@ BOOL SMenu::LoadMenu2(IXmlNode *pXmlNode)
     if (!pXmlNode)
         return FALSE;
     SXmlNode xmlMenu(pXmlNode);
-    SAutoRefPtr<SMenuAttr> pMenuAttr(new SMenuAttr, TRUE);
+    SAutoRefPtr<SMenuAttr> pMenuAttr(new SMenuAttr, FALSE);
     pMenuAttr->InitFromXml(&xmlMenu);
     if (!pMenuAttr->m_pItemSkin)
     {
