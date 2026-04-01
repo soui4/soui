@@ -1,4 +1,16 @@
 ﻿# ChangeLog file for SOUI
+## 5.2
+- 增加flowlayout
+- 增加framelayout
+- 完善uieditor
+- 解决.rc文件的跨平台编译
+- 全面支持svg
+
+## 5.1
+- 增加anchor layout
+- 增加窗口属性动画
+- 增加3个棋牌游戏示例。
+
 ## 5.0 链接swinx库，实现对跨平台的支持，同时完善了部分控件。
 
 ## 4.0 使用类COM技术导致SOUI核心对象，方便C语言调用。
