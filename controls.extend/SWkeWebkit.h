@@ -19,6 +19,10 @@ class SWkeLoader {
 
     BOOL Init(LPCTSTR pszDll);
 
+    BOOL IsLoaded() const
+    {
+        return m_hModWke != NULL;
+    }
     static SWkeLoader *GetInstance();
 
   public:

@@ -31,7 +31,6 @@
 #include <controls.extend/SImageMaskWnd.h>
 #include <controls.extend/SRatingBar.h>
 #include <controls.extend/SChromeTabCtrl.h>
-#include <controls.extend/smiley/SSmileyCtrl.h>
 #include <controls.extend/SChatEdit.h>
 #include <controls.extend/SFreeMoveWindow.h>
 #include <controls.extend/TipWnd.h>

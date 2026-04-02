@@ -1,6 +1,9 @@
 ﻿#include "stdafx.h"
 #include "SmileyCreateHook.h"
 #include <detours.h>
+#if defined(_WIN32) && !defined(_ARM64_) && !defined(_ARM_) && !defined(__MINGW32__)
+#include <smiley/SSmileyCtrl.h>
+#endif
 
 typedef HRESULT (STDAPICALLTYPE *_CoCreateInstance)(REFCLSID rclsid, LPUNKNOWN pUnkOuter, DWORD dwClsContext, REFIID riid, LPVOID FAR* ppv);
 

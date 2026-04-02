@@ -3,27 +3,9 @@
 #include <SouiFactory.h>
 #include <helper/SMenuWndHook.h>
 #include <helper/SAutoBuf.h>
-#include <controls.extend/SFadeFrame.h>
-#include <controls.extend/SRadioBox2.h>
-#include <controls.extend/SVscrollbar.h>
-#include <controls.extend/SSkinNewScrollBar.h>
-#include <controls.extend/SChromeTabCtrl.h>
-
-#include <controls.extend/SChatEdit.h>
-#include <controls.extend/SScrollText.h>
-#include <controls.extend/SCalendar2.h>
-#include <controls.extend/SHexEdit.h>
-#include <controls.extend/SRoundImage.h>
-#include <controls.extend/SStaticGdip.h>
-#include <controls.extend/SRoundWnd.h>
-#include <controls.extend/SImageKnob.h>
-#include <controls.extend/SMcListViewEx/SHeaderCtrlEx.h>
-#include <controls.extend/SMcListViewEx/SMCListViewEx.h>
-#include <controls.extend/SWaveProgress.h>
-#include <controls.extend/SVerificationCodeEdit.h>
+#include <SCtrlsRegister.h>
 
 #if defined(_WIN32) && !defined(__MINGW32__)
-#include <controls.extend/SIECtrl.h>
 #include "uianimation/UiAnimationWnd.h"
 #include "SmileyCreateHook.h"
 #endif
@@ -57,7 +39,6 @@ static const TCHAR *kPath_UiRes = _T("/uires");
 
 #define SYS_NAMED_RESOURCE _T("soui-sys-resource")
 
-#include <controls.extend/smiley/SSmileyCtrl.h>
 #include "skin/SSkinLoader.h"
 #include "trayicon/SShellTray.h"
 #include "qrcode/SQrCtrl.h"
@@ -143,32 +124,18 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 #endif
 
     // 向SApplication系统中注册由外部扩展的控件及SkinObj类
-    app.RegisterSkinClass<SSkinAni>();          // 注册SkinGif
-    app.RegisterSkinClass<SSkinVScrollbar>();   // 注册纵向滚动条皮肤
-    app.RegisterSkinClass<SSkinNewScrollbar>(); // 注册纵向滚动条皮肤
+    SWkeLoader wkeLoader;
+    wkeLoader.Init(_T("wke.dll"));
+
+    SCtrlsRegister::RegisterCtrls(&app);
     app.RegisterSkinClass<SDemoSkin>();
 
-    SWkeLoader wkeLoader;
-    if (wkeLoader.Init(_T("wke.dll")))
-    {
-        app.RegisterWindowClass<SWkeWebkit>(); // 注册WKE浏览器
-    }
     app.RegisterWindowClass<SMatrixWindow>();   //
     app.RegisterWindowClass<S3dWindow>();       //
     app.RegisterWindowClass<SFreeMoveWindow>(); //
     app.RegisterWindowClass<SClock>();          //
-    app.RegisterWindowClass<SGifPlayer>();      // theApp中增加方法：RegisterWindowClass,替换RegisterWndFactory(TplSWindowFactory<SGifPlayer>())
+    app.RegisterWindowClass<SDesktopDock>(); // 注册SDesktopDock
 
-    app.RegisterWindowClass<SMCListViewEx>();
-    app.RegisterWindowClass<SHeaderCtrlEx>();
-    app.RegisterWindowClass<SIPAddressCtrl>(); // 注册IP控件
-    app.RegisterWindowClass<SPropertyGrid>();  // 注册属性表控件
-    app.RegisterWindowClass<SChromeTabCtrl>(); // 注册ChromeTabCtrl
-    app.RegisterWindowClass<SChatEdit>();      // 注册ChatEdit
-    app.RegisterWindowClass<SScrollText>();    // 注册SScrollText
-    app.RegisterWindowClass<SDesktopDock>();   // 注册SDesktopDock
-    app.RegisterWindowClass<SImageMaskWnd>();  // 注册SImageMaskWnd
-    app.RegisterWindowClass<SRatingBar>();     // 注册SRatingBar
     app.RegisterWindowClass<SInterpolatorView>();
     app.RegisterWindowClass<SPathView>();
     app.RegisterWindowClass<SQrCtrl>();
@@ -176,21 +143,10 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
     app.RegisterWindowClass<SCheckBox2>();
     app.RegisterWindowClass<SAniWindow>();
     app.RegisterWindowClass<SGroupList>();
-    app.RegisterWindowClass<SRoundImage>();
-    app.RegisterWindowClass<SRoundWnd>();
-    app.RegisterWindowClass<SHexEdit>();
-    app.RegisterWindowClass<SImageKnob>();
-    app.RegisterWindowClass<SFadeFrame>(); // 注册渐显隐动画控件
-    app.RegisterWindowClass<SRadioBox2>(); // 注册RadioBox2
-    app.RegisterWindowClass<SCalendar2>(); // 注册SCalendar2
 
     app.RegisterWindowClass<SShellTray>();
     app.RegisterWindowClass<FpsWnd>();
-    app.RegisterWindowClass<SWaveProgress>();
-    app.RegisterWindowClass<SVerificationCodeEdit>();
 #if defined(_WIN32) && !defined(__MINGW32__)
-    app.RegisterWindowClass<SIECtrl>(); // 注册IECtrl
-    app.RegisterWindowClass<SStaticGdip>();
     if (SUCCEEDED(CUiAnimation::Init()))
     {
         app.RegisterWindowClass<SUiAnimationWnd>(); // 注册动画控件

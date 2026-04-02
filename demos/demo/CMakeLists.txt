@@ -8,6 +8,7 @@ include_directories(${PROJECT_SOURCE_DIR}/third-part/wke/include)
 include_directories(${PROJECT_SOURCE_DIR}/third-part/Detours/include)
 include_directories(${PROJECT_SOURCE_DIR}/third-part/nanosvg/src)
 include_directories(${PROJECT_SOURCE_DIR}/third-part/stb)
+include_directories(${PROJECT_SOURCE_DIR}/controls.extend)
 
 include_directories(${PROJECT_SOURCE_DIR}/soui-sys-resource)
 if (NOT CMAKE_SYSTEM_NAME MATCHES Windows)

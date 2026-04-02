@@ -17,7 +17,13 @@ add_library(ExtendCtrls STATIC ${CTRLS_SRC})
 
 target_link_libraries(ExtendCtrls soui4 utilities4)
 
-if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
+if(CMAKE_SYSTEM_NAME MATCHES Windows)
+target_link_libraries(ExtendCtrls gdiplus Msimg32)
+if(NOT MINGW)
+    target_link_libraries(ExtendCtrls smiley)
+endif()
+
+else()
 target_compile_options(ExtendCtrls PRIVATE -fPIC)
 target_link_libraries(ExtendCtrls swinx)
 endif()

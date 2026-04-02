@@ -95,7 +95,10 @@ void SWkeWebkit::OnSize(UINT nType, CSize size)
 
 int SWkeWebkit::OnCreate(void *)
 {
-    m_pWebView = SWkeLoader::GetInstance()->m_funWkeCreateWebView();
+    SWkeLoader *pWkeLoader = SWkeLoader::GetInstance();
+    if (!pWkeLoader || !pWkeLoader->IsLoaded())
+        return 1;
+    m_pWebView = pWkeLoader->m_funWkeCreateWebView();
     if (!m_pWebView)
         return 1;
     m_pWebView->setBufHandler(this);
@@ -110,6 +113,7 @@ void SWkeWebkit::OnDestroy()
 {
     if (m_pWebView)
         SWkeLoader::GetInstance()->m_funWkeDestroyWebView(m_pWebView);
+    __baseCls::OnDestroy();
 }
 
 LRESULT SWkeWebkit::OnMouseEvent(UINT message, WPARAM wParam, LPARAM lParam)

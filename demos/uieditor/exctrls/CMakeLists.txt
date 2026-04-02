@@ -5,7 +5,7 @@ include_directories(${PROJECT_SOURCE_DIR}/utilities/include)
 include_directories(${PROJECT_SOURCE_DIR}/SOUI/include)
 include_directories(${PROJECT_SOURCE_DIR}/soui-sys-resource)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${CMAKE_SOURCE_DIR}/controls.extend)
+include_directories(${PROJECT_SOURCE_DIR}/controls.extend)
 
 file(GLOB_RECURSE CURRENT_SRCS  *.cpp)
 
