@@ -51,10 +51,10 @@ target_precompile_headers(soui4 PRIVATE "include/souistd.h")
 target_include_directories(soui4
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
-  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/interface
   PUBLIC ${PROJECT_SOURCE_DIR}/utilities/include
   PUBLIC ${PROJECT_SOURCE_DIR}/components
-  PUBLIC ${PROJECT_SOURCE_DIR}/third-part/nanosvg
+  PUBLIC ${PROJECT_SOURCE_DIR}/controls.extend
+  PRIVATE ${PROJECT_SOURCE_DIR}/third-part/nanosvg
 )
 
 add_dependencies(soui4 utilities4)
@@ -73,6 +73,10 @@ if (SOUI_ENABLE_CORE_LIB AND SOUI_BUILD_RICHEDIT)
     target_link_libraries(soui4 PUBLIC msftedit)
 endif()
 
+target_include_directories(soui4
+  INTERFACE
+    "${PROJECT_BINARY_DIR}/config"
+)
 
 set(CORE_LIBS ${CORE_LIBS} soui4 CACHE INTERNAL "core_lib")
 
