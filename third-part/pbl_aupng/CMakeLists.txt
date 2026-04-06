@@ -1,11 +1,9 @@
-cmake_minimum_required (VERSION 3.10 FATAL_ERROR)
-project(aupng)
 
 ###################################################################
 # aupng
 ###################################################################
 
-add_library(aupng
+add_library(aupng STATIC
     include/upng.h
     include/upng_config.h
     src/upng_internal.h
