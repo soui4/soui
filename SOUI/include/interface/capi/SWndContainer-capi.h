@@ -121,6 +121,10 @@ extern "C" {
 #define ISwndContainer_EnableHostPrivateUiDef(This, bEnable) \
     ((This)->lpVtbl->EnableHostPrivateUiDef(This, bEnable))
 
+#define ISwndContainer_OnDropdownState(This, pDropdownWnd, bCreate) \
+    ((This)->lpVtbl->OnDropdownState(This, pDropdownWnd, bCreate))
+
+
 #define ISwndContainer_PostTask(This, runable, bAsync) \
     ((This)->lpVtbl->PostTask(This, runable, bAsync))
 

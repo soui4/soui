@@ -46,7 +46,7 @@ typedef enum GrtFlag
  */
 
 typedef struct IRegionS IRegionS;
-
+typedef struct IHostWnd IHostWnd;
 #undef INTERFACE
 #define INTERFACE ISwndContainer
 DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
@@ -332,6 +332,14 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
      * @return TRUE if designer mode is enabled, FALSE otherwise.
      */
     STDMETHOD_(BOOL, IsDesignerMode)(CTHIS) SCONST PURE;
+
+    /**
+     * @brief Notifies the container about the dropdown state.
+     * @param pDropdown Pointer to the dropdown window.
+     * @param bCreate TRUE if the dropdown window is being created, FALSE if it is being destroyed.
+     * @return void
+     */
+    STDMETHOD_(void, OnDropdownState)(THIS_ IHostWnd *pDropdown, BOOL bCreate) PURE;
 };
 
 SNSEND

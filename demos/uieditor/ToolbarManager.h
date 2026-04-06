@@ -28,31 +28,19 @@ public:
     // 获取工具栏
     SToolBar* GetWidgetToolbar() const { return m_tbWidget; }
     SToolBar* GetSkinToolbar() const { return m_tbSkin; }
-    SStringW GetWidgetContent(const SStringT &strText) const
-    {
-        const SMap<SStringT, SStringW>::CPair *pair = m_mapWidget.Lookup(strText);
-        if (pair)
-        {
-            return pair->m_value;
-        }
-        else
-        {
-            return SStringW();
-        }
-    }
 
   private:
     struct IconInfo
     {
         int iIcon;
-        SStringT strTxt;
-        SStringT strTip;
+        SStringW strTxt;
+        SStringW strTip;
     };
 
     SSkinPool* m_pSkinPool;
     SToolBar* m_tbWidget;
     SToolBar* m_tbSkin;
-    SMap<SStringT, SStringW> m_mapWidget;
+    SMap<SStringW, SStringW> m_mapWidget;
 
     // 辅助函数
     void LoadToolbarIcons(SXmlNode xmlIconSkin, ISkinObj*& pSkin);

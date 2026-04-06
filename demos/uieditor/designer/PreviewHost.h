@@ -13,7 +13,7 @@ struct IListener{
 class CPreviewHost : public SHostWnd
 {
 public:
-	CPreviewHost(IListener *pListener,LPCTSTR pszLayoutId, HWND hEditor = 0);
+	CPreviewHost(IListener *pListener,LPCTSTR pszLayoutId, HWND hEditor, IUiDefInfo *pUiDef);
 	~CPreviewHost();
 
 	HWND GetEditor() const { return m_hOwner; }
@@ -27,7 +27,7 @@ public:
   protected:
 	BOOL OnLoadLayoutFromResourceID(SXmlDoc& xmlDoc) override;
     void OnFinalMessage(HWND hWnd) override;
-
+    STDMETHOD_(void, OnDropdownState)(THIS_ IHostWnd *pDropdownWnd, BOOL bCreate) OVERRIDE;
 protected:
 	void GetSwndIndex(SWindow *pWnd,SList<int> &lstIndex);
 	void Reload();
@@ -38,7 +38,7 @@ protected:
 	BOOL	  m_bVirtualRoot;
 	HWND	  m_hOwner;
     XmlParseResult m_GetXmlParseResult;
-
+	SAutoRefPtr<IUiDefInfo> m_pUiDef, m_oldUiDef;
   protected:
 	void OnSwndInitFinish(IEvtArgs *e);
 	void OnFrameMoved(IEvtArgs *e);

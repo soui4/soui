@@ -794,7 +794,6 @@ DEF_EVT(EventDropdownListSelected, EVT_DROPDOWN_LIST_SELECTED, on_dropdown_list_
 DEF_EVT(EventToolBarCmd, EVT_TB_ITEMCLICK, on_toolbar_cmd, {
     int iItem;
     int nCmdId;
-    const IStringT *strText;
     LPARAM lParam;
     BOOL bDropDown;
 })

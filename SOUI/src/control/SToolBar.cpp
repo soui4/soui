@@ -41,8 +41,8 @@ BOOL SToolBar::CreateChildren(SXmlNode xmlNode)
             item.iIcon = xmlItem.attribute(SToolBar_style::kStyle_iconIndex).as_int(0);
             item.nId = xmlItem.attribute(SToolBar_style::kStyle_id).as_int(0);
             item.lParam = xmlItem.attribute(SToolBar_style::kStyle_dataAttr).as_uint(0);
-            item.strText = S_CW2T(GETSTRING(xmlItem.attribute(SToolBar_style::kStyle_text).as_string()));
-            item.strTip = S_CW2T(GETSTRING(xmlItem.attribute(SToolBar_style::kStyle_tip).as_string()));
+            item.strText = GETSTRING(xmlItem.attribute(SToolBar_style::kStyle_text).as_string());
+            item.strTip = GETSTRING(xmlItem.attribute(SToolBar_style::kStyle_tip).as_string());
             item.dwState = xmlItem.attribute(SToolBar_style::kStyle_disable).as_bool(false) ? WndState_Disable : WndState_Normal;
 
             // Parse style attributes
@@ -96,6 +96,7 @@ CSize SToolBar::GetItemSize(const CRect &rcWnd, IRenderTarget *pRT, int iItem) c
     if (iItem < 0 || iItem >= m_arrItems.GetCount())
         return szRet;
     const ToolBarItem &item = m_arrItems[iItem];
+    SStringT strText = S_CW2T(m_strText.TranslateText2(item.strText));
     if (m_bVert)
     {
         if (IsSeparator(&item))
@@ -123,7 +124,7 @@ CSize SToolBar::GetItemSize(const CRect &rcWnd, IRenderTarget *pRT, int iItem) c
             if ((item.dwStyle & BTNS_SHOWTEXT))
             {
                 CSize szText;
-                pRT->MeasureText(item.strText, item.strText.GetLength(), &szText);
+                pRT->MeasureText(strText, strText.GetLength(), &szText);
                 szRet.cy += szText.cy + m_nTextIconInterval;
             }
         }
@@ -151,7 +152,7 @@ CSize SToolBar::GetItemSize(const CRect &rcWnd, IRenderTarget *pRT, int iItem) c
             {
                 // For vertical text-icon arrangement, height should be larger to accommodate both
                 CSize szTxt;
-                pRT->MeasureText(item.strText, item.strText.GetLength(), &szTxt);
+                pRT->MeasureText(strText, strText.GetLength(), &szTxt);
                 szRet.cx = smax(rcWnd.Height(), szIcon.cx);
                 szRet.cy = szIcon.cy + szTxt.cy + m_nTextIconInterval * 2;
             }
@@ -168,7 +169,7 @@ CSize SToolBar::GetItemSize(const CRect &rcWnd, IRenderTarget *pRT, int iItem) c
                 if ((item.dwStyle & BTNS_SHOWTEXT))
                 {
                     CSize szTxt;
-                    pRT->MeasureText(item.strText, item.strText.GetLength(), &szTxt);
+                    pRT->MeasureText(strText, strText.GetLength(), &szTxt);
                     szTxt.cx = smin(szTxt.cx, m_nMaxItemWidth);
                     szRet.cx += szTxt.cx + m_nTextIconInterval;
                 }
@@ -431,9 +432,9 @@ void SToolBar::DrawItem(IRenderTarget *pRT, const CRect &rcItem, const ToolBarIt
             COLORREF crOld = pRT->GetTextColor();
             if (crTxt != CR_INVALID)
                 pRT->SetTextColor(crTxt);
-
+            SStringT strText = S_CW2T(m_strText.TranslateText2(pItem->strText));
             CSize szTxt;
-            pRT->MeasureText(pItem->strText, pItem->strText.GetLength(), &szTxt);
+            pRT->MeasureText(strText, strText.GetLength(), &szTxt);
 
             if (m_bTextIconVertical)
             {
@@ -450,7 +451,7 @@ void SToolBar::DrawItem(IRenderTarget *pRT, const CRect &rcItem, const ToolBarIt
                 CRect rcTxt(rcContent.CenterPoint(), szTxt);
                 rcTxt.OffsetRect(-szTxt.cx / 2, 0);
                 rcTxt.MoveToY(rcIcon.bottom + nInter);
-                pRT->TextOut(rcTxt.left, rcTxt.top, pItem->strText.c_str(), pItem->strText.GetLength());
+                pRT->TextOut(rcTxt.left, rcTxt.top, strText.c_str(), strText.GetLength());
             }
             else
             {
@@ -463,7 +464,7 @@ void SToolBar::DrawItem(IRenderTarget *pRT, const CRect &rcItem, const ToolBarIt
                     _skinIcons->DrawByIndex(pRT, rcIcon, pItem->iIcon);
 
                 CRect rcTxt(rcIcon.right + m_nTextIconInterval, rcContent.top + nInter, rcContent.right - nInter, rcContent.bottom - nInter);
-                pRT->TextOut(rcTxt.left, rcTxt.top, pItem->strText.c_str(), pItem->strText.GetLength());
+                pRT->TextOut(rcTxt.left, rcTxt.top, strText.c_str(), strText.GetLength());
             }
             pRT->SetTextColor(crOld);
         }
@@ -631,7 +632,6 @@ void SToolBar::OnLButtonUp(UINT nFlags, CPoint pt)
                 EventToolBarCmd evt(this);
                 evt.iItem = iOldClick;
                 evt.nCmdId = item.nId;
-                evt.strText = &item.strText;
                 evt.lParam = item.lParam;
                 evt.bDropDown = FALSE;
                 FireEvent(evt);
@@ -738,9 +738,12 @@ BOOL SToolBar::UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo)
         return FALSE;
     tipInfo.dwCookie = iItem;
     tipInfo.rcTarget = GetItemRect(iItem);
-    tipInfo.strTip = m_arrItems[iItem].strTip;
-    if (tipInfo.strTip.IsEmpty())
-        tipInfo.strTip = m_arrItems[iItem].strText;
+    if (!m_arrItems[iItem].strTip.IsEmpty())
+    {
+        tipInfo.strTip = S_CW2T(m_strText.TranslateText2(m_arrItems[iItem].strTip));
+    }else{
+        tipInfo.strTip = S_CW2T(m_strText.TranslateText2(m_arrItems[iItem].strText));
+    }
     tipInfo.swnd = m_swnd;
     return TRUE;
 }
@@ -918,7 +921,6 @@ void SToolBar::ShowItemDropDownMenu(const CRect &rc, int iItem)
     EventToolBarCmd evt(this);
     evt.iItem = iItem;
     evt.nCmdId = item.nId;
-    evt.strText = &item.strText;
     evt.lParam = item.lParam;
     evt.bDropDown = TRUE;
     FireEvent(evt);
@@ -939,7 +941,8 @@ void SToolBar::ShowDropDownMenu(const CRect &rc)
             uFlag |= MF_CHECKED;
         if (m_arrItems[i].dwState & WndState_Disable)
             uFlag |= MF_GRAYED;
-        menu.AppendMenu(uFlag, i, m_arrItems[i].strText, m_arrItems[i].iIcon);
+        SStringT strText = S_CW2T(m_strText.TranslateText2(m_arrItems[i].strText));
+        menu.AppendMenu(uFlag, i, strText, m_arrItems[i].iIcon);
     }
     CRect rcHost(rc);
     GetContainer()->FrameToHost(rcHost);
@@ -953,7 +956,6 @@ void SToolBar::ShowDropDownMenu(const CRect &rc)
         EventToolBarCmd evt(this);
         evt.iItem = uCmd;
         evt.nCmdId = item.nId;
-        evt.strText = &item.strText;
         evt.lParam = item.lParam;
         evt.bDropDown = FALSE;
         FireEvent(evt);
@@ -1061,12 +1063,13 @@ BOOL SToolBar::SetItemInfo(int nIndex, const ToolBarItem *pItem)
     return TRUE;
 }
 
-void SToolBar::AddButton(int nID, int nImage, LPCTSTR lpszText, int dwStyle)
+void SToolBar::AddButton(int nID, int nImage, LPCWSTR lpszText, LPCWSTR lpszTip, int dwStyle)
 {
     ToolBarItem item;
     item.nId = nID;
     item.iIcon = nImage;
-    item.strText = lpszText ? lpszText : _T("");
+    item.strText = lpszText ? lpszText : L"";
+    item.strTip = lpszTip ? lpszTip : L"";
     item.dwStyle = dwStyle;
     item.dwState = WndState_Normal;
     InsertItem(item, -1);
@@ -1197,10 +1200,13 @@ BOOL SToolBar::OnItemHover(int iItem)
     EventUpdateCmdTip evt(this);
     evt.iIndex = iItem;
     evt.nCmdId = item.nId;
-    if (!item.strTip.IsEmpty())
-        evt.strTip = &item.strTip;
-    else
-        evt.strTip = &item.strText;
+    SStringT strTip;
+    if (!item.strTip.IsEmpty()){
+        strTip = S_CW2T(m_strText.TranslateText2(item.strTip));
+    }else{
+        strTip = S_CW2T(m_strText.TranslateText2(item.strText));
+    }
+    evt.strTip = &strTip;
     FireEvent(&evt);
     return ret;
 }

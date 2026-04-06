@@ -2177,6 +2177,10 @@ void SHostWnd::EnableHostPrivateUiDef(THIS_ BOOL bEnable)
     EnablePrivateUiDef(bEnable);
 }
 
+void SHostWnd::OnDropdownState(IHostWnd *pDropdownWnd, BOOL bCreate){
+    EnablePrivateUiDef(bCreate);
+}
+
 BOOL SHostWnd::PostTask(THIS_ IRunnable *runable, BOOL bAsync /*DEF_VAL(TRUE)*/)
 {
     m_cs.Enter();

@@ -845,26 +845,12 @@ void CMainDlg::OnBtnPreview()
 
 void CMainDlg::OnTbWidgetClick(IEvtArgs *e)
 {
-	EventToolBarCmd *e2=sobj_cast<EventToolBarCmd>(e);
-	ToolBarItem item;
-	m_pToolbarManager->GetWidgetToolbar()->GetItemInfo(e2->iItem,&item);
-    SStringW strContent = m_pToolbarManager->GetWidgetContent(item.strText);
-    if (!strContent.IsEmpty())
-    {
-        m_pXmlEdtior->InsertWidget(S_CW2A(strContent, CP_UTF8));
-	}
+    m_pToolbarManager->OnTbWidgetClick(e, m_pXmlEdtior);
 }
 
 void CMainDlg::OnTbSkinClick(IEvtArgs *e)
 {
-	EventToolBarCmd *e2=sobj_cast<EventToolBarCmd>(e);
-	ToolBarItem item;
-    m_pToolbarManager->GetSkinToolbar()->GetItemInfo(e2->iItem, &item);
-    DlgInsertXmlElement dlg(&m_UIResFileMgr, CSysDataMgr::getSingleton().getSkinDefNode().child(L"skins"), S_CT2W(item.strText));
-	if(IDOK==dlg.DoModal())
-	{
-		m_pXmlEdtior->InsertElement(dlg.GetXml());
-	}
+    m_pToolbarManager->OnTbSkinClick(e, &m_UIResFileMgr, m_pXmlEdtior);
 }
 
 void CMainDlg::OnUpdateCmdUI(IEvtArgs *e){

@@ -15,15 +15,18 @@ CDesignWnd::~CDesignWnd(void)
 {
 }
 
-BOOL CDesignWnd::Init(LPCTSTR pszLayoutId,HWND hWndParent)
+BOOL CDesignWnd::Init(LPCTSTR pszLayoutId,HWND hWndParent, IUiDefInfo *pUiDef)
 {
 	if(m_previewHost != NULL)
 	{
 		Close();
 	}
-	m_previewHost = new CPreviewHost(this,pszLayoutId,hWndParent);
+	SAutoRefPtr<IUiDefInfo> pOldUiDef = GETUIDEF->GetUiDef();
+	GETUIDEF->SetUiDef(pUiDef,false);
+	m_previewHost = new CPreviewHost(this,pszLayoutId,hWndParent,pUiDef);
 	m_previewHost->CreateEx(m_hWnd,WS_CHILD|WS_VISIBLE|WS_CLIPCHILDREN,0,0,0,0,0,NULL);
 	UpdateViewPos();
+	GETUIDEF->SetUiDef(pOldUiDef,false);
     return TRUE;
 }
 

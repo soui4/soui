@@ -49,7 +49,6 @@ void CXmlEditor::SetProjectPath(const SStringT & strProjPath)
 
 BOOL CXmlEditor::CloseXml()
 {
-    m_strProPath.Empty();
     m_strXmlFile.Empty();
 	m_strLayoutName.Empty();
 	m_bValidXml = false;
@@ -78,10 +77,7 @@ void CXmlEditor::UpdatePreview()
 	m_pPropGrid->RemoveAllItems();
 	m_vecSelectOrder.clear();
 	SApplication::getSingletonPtr()->AddResProvider(m_pResManger->m_pResProvider,NULL);
-	SAutoRefPtr<IUiDefInfo> pUiDef = GETUIDEF->GetUiDef();
-	GETUIDEF->SetUiDef(m_pResManger->m_pUiDef,false);
-	m_pDesignWnd->Init(m_strLayoutName,m_pMainDlg->m_hWnd);
-	GETUIDEF->SetUiDef(pUiDef,false);
+	m_pDesignWnd->Init(m_strLayoutName,m_pMainDlg->m_hWnd,m_pResManger->m_pUiDef);
 	SApplication::getSingletonPtr()->RemoveResProvider(m_pResManger->m_pResProvider);
     XmlParseResult res = m_pDesignWnd->GetXmlParseResult();
     if (res.status != xml_ok)

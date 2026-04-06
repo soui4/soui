@@ -139,7 +139,7 @@ class SOUI_EXP SOsrPanel
     STDMETHOD_(void, OnUpdateCursor)() OVERRIDE;
 
     STDMETHOD_(void, EnableHostPrivateUiDef)(THIS_ BOOL bEnable) OVERRIDE;
-
+    STDMETHOD_(void, OnDropdownState)(THIS_ IHostWnd *pDropdownWnd, BOOL bCreate) OVERRIDE;
     STDMETHOD_(BOOL, PostTask)(THIS_ IRunnable *runable, BOOL bAsync DEF_VAL(TRUE)) OVERRIDE;
     STDMETHOD_(int, RemoveTasksForObject)(THIS_ void *pObj) OVERRIDE;
     STDMETHOD_(BOOL, IsTimelineEnabled)(CTHIS) SCONST OVERRIDE;

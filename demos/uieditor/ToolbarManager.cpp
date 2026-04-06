@@ -40,11 +40,10 @@ void CToolbarManager::InitWidgetToolbar(SWindow* pParent, CXmlEditor* pXmlEditor
     {
         IconInfo info;
         info.iIcon = xmlWidget.attribute(L"iconIndex").as_int(0);
-        SStringW strTxt = xmlWidget.attribute(L"name").as_string();
-        info.strTxt = S_CW2T(strTxt);
-        info.strTip = S_CW2T(xmlWidget.attribute(L"tip").as_string());
+        info.strTxt = GETSTRING(xmlWidget.attribute(L"name").as_string());
+        info.strTip = GETSTRING(xmlWidget.attribute(L"tip").as_string());
         SStringW strContent;
-        xmlWidget.child(strTxt).ToString(&strContent);
+        xmlWidget.first_child().ToString(&strContent);
         arrIcons.Add(info);
         m_mapWidget[info.strTxt] = strContent;
         xmlWidget = xmlWidget.next_sibling();
@@ -56,7 +55,7 @@ void CToolbarManager::InitWidgetToolbar(SWindow* pParent, CXmlEditor* pXmlEditor
         pToolBar->SetIconsSkin(pSkin);
         for(int i = 0; i < arrIcons.GetCount(); i++)
         {
-            pToolBar->AddButton(i, arrIcons[i].iIcon, arrIcons[i].strTxt);
+            pToolBar->AddButton(i, arrIcons[i].iIcon, arrIcons[i].strTxt, arrIcons[i].strTip);
         }
         m_tbWidget = pToolBar;
     }
@@ -75,8 +74,8 @@ void CToolbarManager::InitSkinToolbar(SWindow* pParent)
     {
         IconInfo info;
         info.iIcon = xmlSkin.attribute(L"iconIndex").as_int(0);
-        info.strTxt = S_CW2T(xmlSkin.attribute(L"name").as_string());
-        info.strTip = S_CW2T(xmlSkin.attribute(L"tip").as_string());
+        info.strTxt = xmlSkin.attribute(L"name").as_string();
+        info.strTip = xmlSkin.attribute(L"tip").as_string();
         arrIcons.Add(info);
         xmlSkin = xmlSkin.next_sibling();
     }
@@ -87,7 +86,7 @@ void CToolbarManager::InitSkinToolbar(SWindow* pParent)
         pToolBar->SetIconsSkin(pSkin);
         for (int i = 0; i < arrIcons.GetCount(); i++)
         {
-            pToolBar->AddButton(i, arrIcons[i].iIcon, arrIcons[i].strTxt);
+            pToolBar->AddButton(i, arrIcons[i].iIcon, arrIcons[i].strTxt,arrIcons[i].strTip);
         }
         m_tbSkin = pToolBar;
     }
@@ -116,7 +115,7 @@ void CToolbarManager::OnTbWidgetClick(IEvtArgs *e, CXmlEditor* pXmlEditor)
     
     ToolBarItem item;
     m_tbWidget->GetItemInfo(e2->iItem, &item);
-    if (SMap<SStringT, SStringW>::CPair *pair = m_mapWidget.Lookup(item.strText))
+    if (SMap<SStringW, SStringW>::CPair *pair = m_mapWidget.Lookup(item.strText))
     {
         pXmlEditor->InsertWidget(S_CW2A(pair->m_value, CP_UTF8));
     }
@@ -133,7 +132,7 @@ void CToolbarManager::OnTbSkinClick(IEvtArgs *e, ResManger* pResManger, CXmlEdit
     
     ToolBarItem item;
     m_tbSkin->GetItemInfo(e2->iItem, &item);
-    DlgInsertXmlElement dlg(pResManger, CSysDataMgr::getSingleton().getSkinDefNode().child(L"skins"), S_CT2W(item.strText));
+    DlgInsertXmlElement dlg(pResManger, CSysDataMgr::getSingleton().getSkinDefNode().child(L"skins"), item.strText);
     if(IDOK == dlg.DoModal(NULL))
     {
         pXmlEditor->InsertElement(dlg.GetXml());

@@ -186,7 +186,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
                 return -1;
             }
             SStringT strPage = cmdLine.GetParam(4);
-            CPreviewHost *pPreviewHost = new CPreviewHost(NULL, strPage.c_str());
+            CPreviewHost *pPreviewHost = new CPreviewHost(NULL, strPage.c_str(),0,NULL);
             pPreviewHost->CreateEx(GetActiveWindow(),WS_OVERLAPPEDWINDOW,WS_EX_APPWINDOW,0,0,0,0,NULL);
             pPreviewHost->ShowWindow(SW_SHOWNORMAL);
             nRet = theApp.Run(pPreviewHost->m_hWnd);

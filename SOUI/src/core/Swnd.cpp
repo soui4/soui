@@ -50,6 +50,16 @@ void STrText::TranslateText()
     strTr = S_CW2T(str);
 }
 
+SStringW STrText::TranslateText2(const SStringW & _strRaw) const
+{
+    if (pOwner == NULL)
+        return _strRaw;
+    SStringW str = pOwner->tr(_strRaw);
+    if (bAutoEscape)
+        str = EscapeString(str);
+    return str;
+}
+
 SStringW STrText::EscapeString(const SStringW &strValue)
 {
     if (strValue.IsEmpty())

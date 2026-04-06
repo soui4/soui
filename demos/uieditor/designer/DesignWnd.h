@@ -16,7 +16,7 @@ public:
 	void SetXmlEditor(CXmlEditor *pXmlEditor){
 		m_pXmlEditor = pXmlEditor;
 	}
-	BOOL Init(LPCTSTR pszLayoutId,HWND hWndParent);
+	BOOL Init(LPCTSTR pszLayoutId,HWND hWndParent, IUiDefInfo *pUiDef);
 	void UpdateLayoutBuf(SStringA strUtf8);
 	void SelectCtrlByOrder(const int *pOrder,int nLen);
 	void Close();

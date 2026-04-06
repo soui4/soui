@@ -94,10 +94,10 @@
       <item name="hotkey" iconIndex="30">
 		  <hotkey size="96,24" hotKey="ctrl+a" />
       </item>
-      <item name="hr" iconIndex="28">
+      <item name="hr-horz" iconIndex="28" tip="horizontal hr">
 		  <hr pos="0,0" size="200,1" mode="horizontal" colorLine="#ffFFFF" />
       </item>
-      <item name="hr" iconIndex="29">
+      <item name="hr-vert" iconIndex="29" tip="vertical hr">
 		  <hr pos="0,0" size="1,200" mode="vertical" colorLine="#ffFFFF" />
       </item>
       <item name="icon" iconIndex="27">

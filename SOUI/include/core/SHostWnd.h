@@ -1265,6 +1265,14 @@ class SOUI_EXP SHostWnd
     STDMETHOD_(void, EnableHostPrivateUiDef)(THIS_ BOOL bEnable) OVERRIDE;
 
     /**
+     * @brief Notifies the container about a dropdown state change.
+     *
+     * @param pDropdownWnd Pointer to the dropdown window.
+     * @param bCreate Flag indicating whether the dropdown window was created.
+     */
+    STDMETHOD_(void, OnDropdownState)(THIS_ IHostWnd *pDropdownWnd, BOOL bCreate) OVERRIDE;
+
+    /**
      * @brief Gets the script module for the container.
      *
      * @return Pointer to the script module.

@@ -318,6 +318,13 @@ class SOUI_EXP STrText {
     void TranslateText();
 
     /**
+     * @brief Translates a string.
+     * @param _strRaw String to translate.
+     * @return Translated string.
+     */
+    SStringW TranslateText2(const SStringW & _strRaw) const;
+
+    /**
      * @brief Escapes a string.
      * @param str String to escape.
      * @return Escaped string.

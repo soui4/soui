@@ -15,7 +15,7 @@
 #define kLogTag "CPreviewHost"
 
 
-CPreviewHost::CPreviewHost(IListener *pListener,LPCTSTR pszLayoutId, HWND hEditor/* = NULL*/)
+CPreviewHost::CPreviewHost(IListener *pListener,LPCTSTR pszLayoutId, HWND hEditor, IUiDefInfo *pUiDef)
 : SHostWnd(pszLayoutId)
 ,m_pHover(NULL)
 ,m_pSel(NULL)
@@ -24,6 +24,7 @@ CPreviewHost::CPreviewHost(IListener *pListener,LPCTSTR pszLayoutId, HWND hEdito
 ,m_iRootIndex(0)
 ,m_hOwner(hEditor)
 ,m_pListener(pListener)
+,m_pUiDef(pUiDef)
 {
 }
 
@@ -41,6 +42,19 @@ void CPreviewHost::OnFinalMessage(HWND hWnd)
     {
         PostQuitMessage(0);
     }
+}
+
+void CPreviewHost::OnDropdownState(IHostWnd *pDropdownWnd, BOOL bCreate){
+	if(m_pUiDef){
+		if(bCreate)
+		{
+			m_oldUiDef = GETUIDEF->GetUiDef();
+			GETUIDEF->SetUiDef(m_pUiDef,false);
+		}else{
+			GETUIDEF->SetUiDef(m_oldUiDef,false);
+		}
+	}
+	SHostWnd::OnDropdownState(pDropdownWnd,bCreate);
 }
 
 LRESULT CPreviewHost::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
