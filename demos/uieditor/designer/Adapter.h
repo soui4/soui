@@ -31,16 +31,10 @@ public:
 
 class CBaseAdapterFix : public SAdapterBase
 {	
-	const wchar_t*  KAttrName_Height[3];
-	SArray<SStringW> m_TemplateNames;
-	int m_nItemHeight[3];
 public:
 
 	CBaseAdapterFix()
 	{
-		KAttrName_Height[0] = L"oddHeight";
-		KAttrName_Height[1] = L"evenHeight";
-		KAttrName_Height[2] = L"evenSelHeight";
 	}
 
 	~CBaseAdapterFix()
@@ -52,16 +46,6 @@ public:
 		return DEFAULT_LINE;
 	}
 	
-	int IniTemplateNames(SXmlNode xmlTemplate);
-
-	virtual void WINAPI InitByTemplate(SXmlNode xmlTemplate);
-
-	virtual int WINAPI getViewTypeCount();
-
-	virtual int WINAPI getItemViewType(int position, DWORD dwState);
-
-	virtual SIZE WINAPI getViewDesiredSize(int position, SItemPanel *pItem, int wid,int hei);
-
 	virtual void WINAPI getView(int position, SItemPanel * pItem, SXmlNode xmlTemplate);
 };
 
