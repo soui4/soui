@@ -9,7 +9,7 @@ include_directories(include)
 set(RCS_MAIN soui-sys-resource2.rc)
 set(SRC_MAIN resource.h null.cpp)
 
-source_group("Header Files" FILES ${SRC_MAIN})
+source_group("Source Files" FILES ${SRC_MAIN})
 source_group("Resource Files" FILES ${RCS_MAIN})
 
 add_library(soui-sys-resource2 SHARED  ${SRC_MAIN} ${RCS_MAIN})

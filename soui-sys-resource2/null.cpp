@@ -1,2 +1,2 @@
 
-void NullFun() {}
+// Null file for CMake compilation
