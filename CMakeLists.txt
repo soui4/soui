@@ -78,6 +78,7 @@ option(SOUI_ENABLE_SPECTRE "Enable Spectre Mitigation" OFF)
 #
 option(SOUI_BUILD_DEMOS "Build builtin demos" ON)
 
+option(SOUI_BUILD_GAMES "Build soui games" ON)
 #
 #
 option(SOUI_ENABLE_SVG "Enable SVG support" ON)
@@ -199,7 +200,7 @@ add_subdirectory(controls.extend)
 if(SOUI_BUILD_DEMOS)
 add_subdirectory(demos)
 endif(SOUI_BUILD_DEMOS)
-if(TARGET websockets)
+if(SOUI_BUILD_GAMES AND TARGET websockets)
         add_subdirectory(games) 
 endif()
 if(NOT CMAKE_SYSTEM_NAME MATCHES Windows)
