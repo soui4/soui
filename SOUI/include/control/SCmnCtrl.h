@@ -809,11 +809,13 @@ class SOUI_EXP SProgress : public TWindowProxy<IProgress> {
         MSG_WM_CREATE(OnCreate)
     SOUI_MSG_MAP_END()
 
+    HRESULT OnAttrRange(const SStringW & strValue, BOOL bLoading);
     SOUI_ATTRS_BEGIN()
         ATTR_SKIN(L"bkgndSkin", m_pSkinBg, TRUE)
         ATTR_SKIN(L"posSkin", m_pSkinPos, TRUE)
         ATTR_INT(L"min", m_nMinValue, FALSE)
         ATTR_INT(L"max", m_nMaxValue, FALSE)
+        ATTR_CUSTOM(L"range", OnAttrRange)
         ATTR_INT(L"value", m_nValue, FALSE)
         ATTR_BOOL(L"vertical", m_bVertical, FALSE)
         ATTR_BOOL(L"showPercent", m_bShowPercent, FALSE)

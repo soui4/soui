@@ -1019,6 +1019,14 @@ void SProgress::OnScaleChanged(int scale)
     GetScaleSkin(m_pSkinPos, scale);
 }
 
+HRESULT SProgress::OnAttrRange(const SStringW & strValue,BOOL bLoading){
+    int nMin, nMax;
+    if(2==swscanf_s(strValue, L"%d,%d", &nMin, &nMax)){
+        SetRange(nMin, nMax);
+    }
+    return bLoading?S_FALSE:S_OK;
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Line Control
 // Simple HTML "HR" tag
