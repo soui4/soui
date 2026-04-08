@@ -189,7 +189,7 @@ function(target_compile_resources target)
                 # Set linker options to export symbols
                 target_link_options(${target} PRIVATE 
                     -rdynamic
-                    -Wl,--version-script=${PROJECT_SOURCE_DIR}/__cmake/export_res_sym.lst
+                    -Wl,--version-script=${SOUI_CMAKE_DIR}/export_res_sym.lst
                 )
                 # 保持资源段不被 GC 删除
                 target_link_options(${target} PRIVATE -Wl,--no-gc-sections)
