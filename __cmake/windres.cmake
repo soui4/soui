@@ -63,17 +63,22 @@ function(windres_compile_rc target output_var rc_file)
     # 准备包含路径
     set(include_flags)
     list(APPEND include_flags "-I${PROJECT_BINARY_DIR}/config")
-    #list(APPEND include_flags "-I${PROJECT_SOURCE_DIR}/soui-sys-resource")
     foreach(dir ${ARG_INCLUDE_DIRS})
         if(NOT dir STREQUAL "" AND NOT dir MATCHES "\\$<")
             list(APPEND include_flags "-I${dir}")
         endif()
     endforeach()
 
+    get_target_property(TARGET_DEFS ${target} COMPILE_DEFINITIONS)
+    set(def_flags)
+    foreach(def ${TARGET_DEFS})
+        list(APPEND def_flags "-D ${def}")
+    endforeach()
+    message(STATUS "Compiling resource ${rc_file} with def_flags: ${def_flags}")
     # Step 1: 生成 COFF 目标文件
     add_custom_command(
             OUTPUT ${coff_obj}
-            COMMAND ${WINDRES_EXE} --target=pe-x86-64 ${include_flags} -i "${rc_abs_path}" -o "${coff_obj}" -O coff
+            COMMAND ${WINDRES_EXE} ${def_flags} --target=pe-x86-64 ${include_flags} -i "${rc_abs_path}" -o "${coff_obj}" -O coff
             DEPENDS ${rc_abs_path}
             COMMENT "Compiling ${rc_file} to COFF"
     )
