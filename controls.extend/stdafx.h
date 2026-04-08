@@ -13,4 +13,3 @@
 #include <control/SMessageBox.h>
 #include <control/SouiCtrls.h>
 #include <res.mgr/SObjDefAttr.h>
-#include <com-cfg.h>
