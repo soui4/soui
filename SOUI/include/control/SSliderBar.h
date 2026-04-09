@@ -13,6 +13,7 @@
 #ifndef __SSLIDERBAR__H__
 #define __SSLIDERBAR__H__
 #include "SCmnCtrl.h"
+#include "interface/sinterpolator-i.h"
 
 SNSBEGIN
 /**
@@ -49,8 +50,8 @@ class SOUI_EXP SSliderBar : public SProgress {
 
     enum
     {
-        SC_RAIL,
-        SC_SELECT,
+        SC_RAIL = PC_RAIL,
+        SC_SELECT = PC_SELECT,
         SC_THUMB,
         SC_RAILBACK,
     };
@@ -77,6 +78,9 @@ class SOUI_EXP SSliderBar : public SProgress {
     BOOL m_bThumbInRail;                /**< 滑块包含在轨道中 */
     BOOL m_bDrawRail;                   /**< 绘制轨道 */
     BOOL m_bDragTip;                    /**< 拖动滑块时在tip中显示数值 */
+
+    BYTE m_byThumbAlphaAni;
+    SAutoRefPtr<SByteAnimator> m_thumbAni;
   protected:
     void ShowValueInTip(int nValue);
     /**
@@ -100,9 +104,17 @@ class SOUI_EXP SSliderBar : public SProgress {
      */
     STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int nParentWid, int nParentHei);
 
-    virtual void OnColorize(COLORREF cr);
+    STDMETHOD_(void, onAnimationUpdate)(IValueAnimator *p) OVERRIDE;
 
-    virtual void OnScaleChanged(int scale);
+    virtual void OnColorize(COLORREF cr) override;
+
+    virtual void OnScaleChanged(int scale) override;
+    void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer) override;
+
+    void OnSetAnimateStep(int nStep) override;
+
+    void DrawPos(IRenderTarget *pRT, const CRect& rcClient) override;
+    void DrawExtend(IRenderTarget *pRT, const CRect& rcClient) override;
 
     /**
      * SSliderBar::GetPartRect
@@ -111,18 +123,9 @@ class SOUI_EXP SSliderBar : public SProgress {
      *
      * Describe
      */
-    CRect GetPartRect(UINT uSBCode);
-
-    RANGE _GetPartRange(int nLength, int nThumbSize, BOOL bThumbInRail, int nMin, int nMax, int nValue, UINT uSBCode);
-
-    /**
-     * SSliderBar::OnPaint
-     * @brief    绘制
-     * @param    IRenderTarget * pRT  -- 绘画设备
-     *
-     * Describe  绘制
-     */
-    void OnPaint(IRenderTarget *pRT);
+    CRect GetPartRect(const CRect &rcClient, UINT uSBCode) const override;
+    CRect GetPartRect(UINT uSBCode) const;
+    RANGE _GetPartRange(int nLength, int nThumbSize, BOOL bThumbInRail, int nMin, int nMax, int nValue, UINT uSBCode) const;
 
     /**
      * SSliderBar::OnLButtonUp
@@ -161,13 +164,15 @@ class SOUI_EXP SSliderBar : public SProgress {
      * Describe  消息响应函数
      */
     void OnMouseLeave();
+    
+    void OnDestroy();
 
     SOUI_MSG_MAP_BEGIN()
         MSG_WM_LBUTTONDOWN(OnLButtonDown)
         MSG_WM_LBUTTONUP(OnLButtonUp)
         MSG_WM_MOUSEMOVE(OnMouseMove)
         MSG_WM_MOUSELEAVE(OnMouseLeave)
-        MSG_WM_PAINT_EX(OnPaint)
+        MSG_WM_DESTROY(OnDestroy)
     SOUI_MSG_MAP_END()
 
     SOUI_ATTRS_BEGIN()
@@ -175,6 +180,7 @@ class SOUI_EXP SSliderBar : public SProgress {
         ATTR_BOOL(L"thumbInRail", m_bThumbInRail, TRUE)
         ATTR_BOOL(L"drawRail", m_bDrawRail, TRUE)
         ATTR_BOOL(L"dragTip", m_bDragTip, TRUE)
+        ATTR_CHAIN_PTR(m_thumbAni, 0)
     SOUI_ATTRS_END()
 };
 

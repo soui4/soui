@@ -13,6 +13,7 @@ namespace SOUI
 
 	void SInterpolatorView::OnNextFrame()
 	{
+		__baseCls::OnNextFrame();
 		if(m_interpolator && IsVisible(TRUE))
 		{
 			m_iFrame++;

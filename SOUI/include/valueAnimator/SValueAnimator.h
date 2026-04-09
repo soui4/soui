@@ -620,6 +620,32 @@ class SOUI_EXP SIntAnimator : public TValueAnimator<int> {
 };
 
 /**
+ * @class SIntAnimator
+ * @brief Animator for integer values.
+ */
+class SOUI_EXP SByteAnimator : public TValueAnimator<BYTE> {
+    DEF_SOBJECT(TValueAnimator<BYTE>, L"byteAnimator")
+
+  public:
+    /**
+     * @brief Constructor.
+     */
+    SByteAnimator()
+        : TValueAnimator<BYTE>(0, 255)
+    {
+    }
+
+  public:
+    /**
+     * @brief Defines the attributes for SIntAnimator.
+     */
+    SOUI_ATTRS_BEGIN()
+        ATTR_UINT(L"valueFrom", mValueEvaluator.mStart, FALSE)
+        ATTR_UINT(L"valueTo", mValueEvaluator.mEnd, FALSE)
+    SOUI_ATTRS_END()
+};
+
+/**
  * @class SSizeAnimator
  * @brief Animator for SIZE values.
  */

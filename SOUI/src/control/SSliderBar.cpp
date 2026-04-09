@@ -1,5 +1,6 @@
 ﻿#include "souistd.h"
 #include "control/SSliderBar.h"
+#include "animation/SInterpolatorImpl.h"
 SNSBEGIN
 
 #define TIMERID_NOTIFY1 1
@@ -14,9 +15,12 @@ SSliderBar::SSliderBar()
     , m_bThumbInRail(FALSE)
     , m_bDrawRail(TRUE)
     , m_bDragTip(FALSE)
+    , m_byThumbAlphaAni(0xFF)
 {
     m_evtSet.addEvent(EVENTID(EventSliderPos));
     m_evtSet.addEvent(EVENTID(EventSliderValueTip));
+    m_thumbAni.Attach(new SByteAnimator);
+    m_thumbAni->addUpdateListener(this);
 }
 
 SSliderBar::~SSliderBar()
@@ -26,23 +30,23 @@ SSliderBar::~SSliderBar()
 int SSliderBar::HitTest(CPoint pt)
 {
     CRect rc;
-
-    rc = GetPartRect(SC_THUMB);
+    CRect rcClient = GetClientRect();
+    rc = GetPartRect(rcClient,SC_THUMB);
     if (rc.PtInRect(pt))
         return SC_THUMB;
 
-    rc = GetPartRect(SC_SELECT);
+    rc = GetPartRect(rcClient,SC_SELECT);
     if (rc.PtInRect(pt))
         return SC_SELECT;
 
-    rc = GetPartRect(SC_RAIL);
+    rc = GetPartRect(rcClient,SC_RAIL);
     if (rc.PtInRect(pt))
         return SC_RAIL;
 
     return -1;
 }
 
-SSliderBar::RANGE SSliderBar::_GetPartRange(int nLength, int nThumbSize, BOOL bThumbInRail, int nMin, int nMax, int nValue, UINT uSBCode)
+SSliderBar::RANGE SSliderBar::_GetPartRange(int nLength, int nThumbSize, BOOL bThumbInRail, int nMin, int nMax, int nValue, UINT uSBCode) const
 {
     int64_t nRailLen = nLength - nThumbSize;
 
@@ -85,18 +89,22 @@ SSliderBar::RANGE SSliderBar::_GetPartRange(int nLength, int nThumbSize, BOOL bT
     return rRet;
 }
 
-CRect SSliderBar::GetPartRect(UINT uSBCode)
+CRect SSliderBar::GetPartRect(UINT uSBCode) const
 {
-    CRect rcClient;
-    GetClientRect(&rcClient);
+    CRect rcClient = GetClientRect();
+    return GetPartRect(rcClient, uSBCode);
+}
 
+CRect SSliderBar::GetPartRect(const CRect &rcClient, UINT uSBCode) const
+{
+    int nValue = GetValue();
     SIZE szThumb = { 0 };
     SIZE szRail = m_pSkinBg->GetSkinSize();
     if (m_pSkinThumb)
         szThumb = m_pSkinThumb->GetSkinSize();
     if (IsVertical())
     {
-        RANGE r = _GetPartRange(rcClient.Height(), szThumb.cy, m_bThumbInRail, m_nMinValue, m_nMaxValue, m_nValue, uSBCode);
+        RANGE r = _GetPartRange(rcClient.Height(), szThumb.cy, m_bThumbInRail, m_nMinValue, m_nMaxValue, nValue, uSBCode);
         CRect rc(rcClient.left, rcClient.Height() - r.value2, rcClient.right, rcClient.Height() - r.value1);
         rc.OffsetRect(0, rcClient.top);
         int nSliderSize = smax(szThumb.cx, szRail.cx);
@@ -109,7 +117,7 @@ CRect SSliderBar::GetPartRect(UINT uSBCode)
     }
     else
     {
-        RANGE r = _GetPartRange(rcClient.Width(), szThumb.cx, m_bThumbInRail, m_nMinValue, m_nMaxValue, m_nValue, uSBCode);
+        RANGE r = _GetPartRange(rcClient.Width(), szThumb.cx, m_bThumbInRail, m_nMinValue, m_nMaxValue, nValue, uSBCode);
         CRect rc(r.value1, rcClient.top, r.value2, rcClient.bottom);
         rc.OffsetRect(rcClient.left, 0);
         int nSliderSize = smax(szThumb.cy, szRail.cy);
@@ -122,26 +130,16 @@ CRect SSliderBar::GetPartRect(UINT uSBCode)
     }
 }
 
-void SSliderBar::OnPaint(IRenderTarget *pRT)
-{
-    SPainter painter;
-
-    BeforePaint(pRT, painter);
-
-    if (m_bDrawRail)
+void SSliderBar::DrawPos(IRenderTarget *pRT, const CRect& rcClient){
+    if(!m_bDrawRail) 
+        return;
+    __baseCls::DrawPos(pRT,rcClient);
+}
+void SSliderBar::DrawExtend(IRenderTarget *pRT, const CRect& rcClient){
+   if (!m_pSkinThumb)
+        return;
     {
-        CRect rcRail = GetPartRect(SC_RAILBACK);
-        if (m_pSkinBg)
-            m_pSkinBg->DrawByIndex(pRT, rcRail, 0);
-        if (m_nValue != m_nMinValue && m_pSkinPos)
-        {
-            CRect rcSel = GetPartRect(SC_SELECT);
-            m_pSkinPos->DrawByIndex(pRT, rcSel, 0);
-        }
-    }
-    if (m_pSkinThumb)
-    {
-        CRect rcThumb = GetPartRect(SC_THUMB);
+       CRect rcThumb = GetPartRect(rcClient,SC_THUMB);
         int nState = 0; // normal
         if (IsDisabled(TRUE) && m_pSkinThumb->GetStates() > 3)
             nState = 3;
@@ -149,9 +147,28 @@ void SSliderBar::OnPaint(IRenderTarget *pRT)
             nState = 2; // pushback
         else if (m_uHtPrev == SC_THUMB)
             nState = 1; // hover
-        m_pSkinThumb->DrawByIndex(pRT, rcThumb, nState);
+        
+        if (m_byThumbAlphaAni == 0xFF)
+        { //不在动画过程中
+            m_pSkinThumb->DrawByIndex(pRT, rcThumb, nState);
+        }
+        else
+        { //在动画过程中
+            BYTE byNewAlpha = (BYTE)(((UINT)m_byThumbAlphaAni * m_pSkinThumb->GetAlpha()) >> 8);
+            if (m_uHtPrev == SC_THUMB)
+            {
+                // enter hover
+                m_pSkinThumb->DrawByIndex2(pRT, rcThumb, 0, m_pSkinThumb->GetAlpha());
+                m_pSkinThumb->DrawByIndex2(pRT, rcThumb, 1, byNewAlpha);
+            }
+            else
+            {
+                // leave hover
+                m_pSkinThumb->DrawByIndex2(pRT, rcThumb, 0, m_pSkinThumb->GetAlpha());
+                m_pSkinThumb->DrawByIndex2(pRT, rcThumb, 1, m_pSkinThumb->GetAlpha() - byNewAlpha);
+            }
+        }
     }
-    AfterPaint(pRT, painter);
 }
 
 void SSliderBar::OnLButtonUp(UINT nFlags, CPoint point)
@@ -240,9 +257,10 @@ void SSliderBar::OnMouseMove(UINT nFlags, CPoint point)
         int uHit = HitTest(point);
         if (uHit != m_uHtPrev && (m_uHtPrev == SC_THUMB || uHit == SC_THUMB))
         {
+            // 悬停状态改变，启动动画
             m_uHtPrev = uHit;
-            CRect rcThumb = GetPartRect(SC_THUMB);
-            InvalidateRect(rcThumb);
+            m_thumbAni->setRange(50, 255);
+            m_thumbAni->start(GetContainer());
         }
     }
 }
@@ -251,10 +269,10 @@ void SSliderBar::OnMouseLeave()
 {
     if (!m_bDrag && m_uHtPrev == SC_THUMB)
     {
-        CRect rcThumb = GetPartRect(SC_THUMB);
-        InvalidateRect(rcThumb);
-        Invalidate();
+        // 悬停状态改变，启动动画
         m_uHtPrev = -1;
+        m_thumbAni->setRange(50, 255);
+        m_thumbAni->start(GetContainer());
     }
 }
 
@@ -268,7 +286,7 @@ LRESULT SSliderBar::NotifyPos(SliderBarAction action, int nPos)
 
 SIZE SSliderBar::GetDesiredSize(int wid, int hei)
 {
-    if (!m_pBgSkin)
+    if (!m_pSkinBg)
         return CSize();
     CSize szRet;
     SIZE sizeBg = m_pSkinBg->GetSkinSize();
@@ -302,10 +320,23 @@ void SSliderBar::OnScaleChanged(int scale)
     GetScaleSkin(m_pSkinThumb, scale);
 }
 
+void SSliderBar::OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer){
+    if(pOldContainer){
+        m_thumbAni->end();
+    }
+    __baseCls::OnContainerChanged(pOldContainer,pNewContainer);
+}
+void SSliderBar::OnSetAnimateStep(int nStep){
+    __baseCls::OnSetAnimateStep(nStep);
+    m_thumbAni->setDuration(nStep*10);
+}
+
 BOOL SSliderBar::SetValue(THIS_ int nValue)
 {
     if (m_bDrag)
         return FALSE;
+    
+    // 调用基类实现，基类现在处理动画
     return __baseCls::SetValue(nValue);
 }
 
@@ -323,6 +354,24 @@ void SSliderBar::ShowValueInTip(int nValue)
         UINT tipAlign = IsVertical() ? (TA_X_RIGHT | TA_Y_CENTER) : (TA_X_CENTER | TA_Y_TOP);
         GetContainer()->SetToolTip(&rcThumb, tipAlign, buf);
     }
+}
+
+void SSliderBar::onAnimationUpdate(IValueAnimator *pAnimator){
+    __baseCls::onAnimationUpdate(pAnimator);
+    if(pAnimator == m_thumbAni){
+        BYTE byAlpha = m_thumbAni->getValue();
+        if(byAlpha == m_byThumbAlphaAni)
+            return;
+        m_byThumbAlphaAni = byAlpha;
+        CRect rcThumb = GetPartRect(SC_THUMB);
+        InvalidateRect(rcThumb);
+    }
+}
+
+void SSliderBar::OnDestroy()
+{
+    m_thumbAni->end();
+    __baseCls::OnDestroy();
 }
 
 SNSEND

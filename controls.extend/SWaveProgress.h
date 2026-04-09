@@ -7,7 +7,7 @@
 
 SNSBEGIN
 
-class SWaveProgress : public SProgress , public ITimelineHandler{
+class SWaveProgress : public SProgress {
     DEF_SOBJECT(SProgress, L"waveProgress")
   public:
     SWaveProgress(void);

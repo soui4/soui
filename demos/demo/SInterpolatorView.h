@@ -4,7 +4,6 @@
 namespace SOUI
 {
 	class SInterpolatorView : public SSliderBar
-		,protected ITimelineHandler
 	{
 		DEF_SOBJECT(SSliderBar,L"interpolatorView")
 	public:

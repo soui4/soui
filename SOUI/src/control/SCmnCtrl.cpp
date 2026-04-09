@@ -4,6 +4,7 @@
 
 #include "souistd.h"
 #include "control/SCmnCtrl.h"
+#include "animation/SInterpolatorImpl.h"
 
 SNSBEGIN
 
@@ -378,11 +379,15 @@ SButton::SButton()
     : m_accel(0)
     , m_bAnimate(FALSE)
     , m_byAlphaAni(0xFF)
-    , m_nAniStep(25)
     , m_bDisableAccelIfInvisible(FALSE)
 {
     m_pBgSkin = GETBUILTINSKIN(SKIN_SYS_BTN_NORMAL);
     m_bFocusable = TRUE;
+    
+    // 创建 Hover 状态动画器，管理 alpha 从 50-255
+    m_pHoverAni.Attach(new SByteAnimator());
+    m_pHoverAni->setDuration(250);
+    m_pHoverAni->addUpdateListener(this);
 }
 
 void SButton::OnPaint(IRenderTarget *pRT)
@@ -513,9 +518,19 @@ void SButton::OnStateChanged(DWORD dwOldState, DWORD dwNewState)
         return;
 
     if (m_bAnimate && ((dwOldState == WndState_Normal && dwNewState == WndState_Hover) || (dwOldState == WndState_Hover && dwNewState == WndState_Normal)))
-    {                      //启动动画
-        m_byAlphaAni = 50; // ani alpha from 50 to 255
-        GetContainer()->RegisterTimelineHandler(this);
+    {
+        // 启动动画
+        if (dwNewState == WndState_Hover)
+        {
+            // 进入 hover，从 50 到 255
+            m_pHoverAni->setRange(50, 255);
+        }
+        else
+        {
+            // 离开 hover，从 255 到 50
+            m_pHoverAni->setRange(255, 50);
+        }
+        m_pHoverAni->start(GetContainer());
     }
 }
 
@@ -528,29 +543,33 @@ void SButton::OnSize(UINT nType, CSize size)
 //中止原来的动画
 void SButton::StopCurAnimate()
 {
-    if (GetContainer())
-        GetContainer()->UnregisterTimelineHandler(this);
+    m_pHoverAni->end();
     m_byAlphaAni = 0xFF;
 }
 
-void SButton::OnNextFrame()
+void SButton::onAnimationUpdate(IValueAnimator *p)
 {
-    m_byAlphaAni += m_nAniStep;
-    if (m_byAlphaAni >= 0xFF)
-    {
-        m_byAlphaAni = 0xFF;
-        StopCurAnimate();
+    if (p != m_pHoverAni)
+        return;
+    BYTE byAlpha = m_pHoverAni->getValue(); // 范围 50-255
+    if(byAlpha != m_byAlphaAni){
+        m_byAlphaAni = byAlpha;
+        Invalidate();
     }
-    Invalidate();
 }
 
 void SButton::OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer)
 {
-    if (pOldContainer)
-        pOldContainer->UnregisterTimelineHandler(this);
+    if (m_pHoverAni)
+        m_pHoverAni->end();
     SWindow::OnContainerChanged(pOldContainer, pNewContainer);
 }
 
+LRESULT SButton::OnAttrAnimateStep(const SStringW &strValue, BOOL bLoading){
+    int steps = _wtoi(strValue);
+    m_pHoverAni->setDuration(steps*10);
+    return S_FALSE;
+}
 //////////////////////////////////////////////////////////////////////////
 SImageButton::SImageButton()
 {
@@ -887,8 +906,17 @@ SProgress::SProgress()
     , m_pSkinBg(NULL)
     , m_pSkinPos(NULL)
     , m_bVertical(FALSE)
+    , m_pSkinWaveEffect(NULL)
+    , m_pValueAnimator(NULL)
+    , m_fWaveEffectPos(0.0f)
+    , m_nWaveEffectDir(1)
+    , m_bEnableAnimate(TRUE)
 {
     m_bFocusable = TRUE;
+    // 创建默认的 SIntAnimator
+    m_pValueAnimator.Attach(new SIntAnimator());
+    m_pValueAnimator->setDuration(250);
+    m_pValueAnimator->addUpdateListener(this);
 }
 
 void SProgress::GetDesiredSize(SIZE *psz, int wid, int hei)
@@ -923,59 +951,158 @@ void SProgress::GetDesiredSize(SIZE *psz, int wid, int hei)
     *psz = szRet;
 }
 
-void SProgress::OnPaint(IRenderTarget *pRT)
+CRect SProgress::GetPartRect(const CRect &rcClient, UINT uSBCode) const
 {
-    SPainter painter;
-
-    BeforePaint(pRT, painter);
-
-    CRect rcClient;
-    GetClientRect(&rcClient);
-    if (m_pSkinBg)
-        m_pSkinBg->DrawByState(pRT, rcClient, WndState_Normal);
-    CRect rcValue = rcClient;
-
-    if (IsVertical())
+    if(uSBCode == PC_RAIL)
+        return rcClient;
+    else if(uSBCode == PC_SELECT)
     {
-        rcValue.bottom = rcClient.bottom;
-        rcValue.top = rcValue.bottom - (int)(((__int64)rcValue.Height()) * (m_nValue - m_nMinValue) / (__int64)(m_nMaxValue - m_nMinValue));
+         CRect rcValue = rcClient;
+         int value = GetValue();
+        if (IsVertical())
+        {
+            rcValue.top = rcValue.bottom - (int)(((__int64)rcValue.Height()) * (value - m_nMinValue) / (__int64)(m_nMaxValue - m_nMinValue));
+        }
+        else
+        {
+            rcValue.right = rcValue.left + (int)(((__int64)rcValue.Width()) * (value - m_nMinValue) / (__int64)(m_nMaxValue - m_nMinValue));
+        }
+        return rcValue;       
     }
     else
     {
-        rcValue.right = rcValue.left + (int)(((__int64)rcValue.Width()) * (m_nValue - m_nMinValue) / (__int64)(m_nMaxValue - m_nMinValue));
+        SASSERT(FALSE);
+        return CRect();
     }
-    if (m_nValue > m_nMinValue && m_pSkinPos)
+}
+
+void SProgress::DrawRail(IRenderTarget *pRT,const CRect & rcClient){
+    CRect rcRail = GetPartRect(rcClient, PC_RAIL);
+    if (m_pSkinBg)
+        m_pSkinBg->DrawByState(pRT, rcRail, WndState_Normal);
+}
+void SProgress::DrawPos(IRenderTarget *pRT,const CRect & rcClient){
+    int value = GetValue();
+    if(value<=m_nMinValue)
+        return;
+    CRect rcValue = GetPartRect(rcClient, PC_SELECT);
+    if (m_pSkinPos)
     {
         m_pSkinPos->DrawByState(pRT, rcValue, WndState_Normal);
     }
+    
+    // 绘制波动特效
+    if (m_pSkinWaveEffect)
+    {
+        CRect rcWave = rcValue;
+        if (IsVertical())
+        {
+            rcWave.bottom = rcWave.top + (int)(rcWave.Height() * m_fWaveEffectPos);
+        }
+        else
+        {
+            rcWave.right = rcWave.left + (int)(rcWave.Width() * m_fWaveEffectPos);
+        }
+        m_pSkinWaveEffect->DrawByState(pRT, rcWave, WndState_Normal);
+    }
+}
 
+void SProgress::DrawExtend(IRenderTarget *pRT, const CRect &rcClient){
     if (m_bShowPercent && !IsVertical())
     {
         SStringT strPercent;
         strPercent.Format(_T("%d%%"), (int)((m_nValue - m_nMinValue) * 100 / (m_nMaxValue - m_nMinValue)));
         pRT->DrawText(strPercent, strPercent.GetLength(), GetWindowRect(), DT_SINGLELINE | DT_CENTER | DT_VCENTER);
     }
+}
+
+void SProgress::OnPaint(IRenderTarget *pRT)
+{
+    SPainter painter;
+    BeforePaint(pRT, painter);
+    CRect rcClient = GetClientRect();
+    DrawRail(pRT, rcClient);
+    DrawPos(pRT, rcClient);
+    DrawExtend(pRT, rcClient);
     AfterPaint(pRT, painter);
 }
 
 int SProgress::OnCreate(void *)
 {
+    int nRet = __baseCls::OnCreate(NULL);
+    if(nRet !=0)
+        return nRet;
     if (!m_pSkinBg)
         m_pSkinBg = GETBUILTINSKIN(IsVertical() ? SKIN_SYS_VERT_PROG_BKGND : SKIN_SYS_PROG_BKGND);
     if (!m_pSkinPos)
         m_pSkinPos = GETBUILTINSKIN(IsVertical() ? SKIN_SYS_VERT_PROG_BAR : SKIN_SYS_PROG_BAR);
+    if(m_pSkinWaveEffect)
+        GetContainer()->RegisterTimelineHandler(this);
     return 0;
 }
 
-BOOL SProgress::SetValue(int dwValue)
+void SProgress::OnDestroy()
 {
-    if (dwValue < m_nMinValue)
-        dwValue = m_nMinValue;
-    if (dwValue > m_nMaxValue)
-        dwValue = m_nMaxValue;
-    m_nValue = dwValue;
+    if(m_pSkinWaveEffect)
+        GetContainer()->UnregisterTimelineHandler(this);
+    m_pValueAnimator->end();
+    __baseCls::OnDestroy();
+}
 
-    Invalidate();
+void SProgress::onAnimationUpdate(IValueAnimator *p){
+    if(p != m_pValueAnimator)
+        return;
+    int nAniValue = m_pValueAnimator->getValue();
+    if (nAniValue != m_nValue)
+    {
+        m_nValue = nAniValue;
+        Invalidate();
+    }
+}
+
+void SProgress::OnNextFrame()
+{
+    BOOL bNeedInvalidate = FALSE;
+    
+    // 处理波动特效
+    if (m_pSkinWaveEffect)
+    {
+        m_fWaveEffectPos += 0.02f * m_nWaveEffectDir;
+        if (m_fWaveEffectPos >= 1.0f || m_fWaveEffectPos <= 0.0f)
+        {
+            m_nWaveEffectDir *= -1;
+        }
+        m_fWaveEffectPos = smax(0.0f, smin(1.0f, m_fWaveEffectPos));
+        bNeedInvalidate = TRUE;
+    }
+    
+    if (bNeedInvalidate)
+    {
+        Invalidate();
+    }
+}
+
+BOOL SProgress::SetValue(int nValue)
+{
+    if (nValue < m_nMinValue)
+        nValue = m_nMinValue;
+    if (nValue > m_nMaxValue)
+        nValue = m_nMaxValue;
+    if(nValue == m_nValue)
+        return TRUE;
+    ISwndContainer *pContainer = GetContainer();
+    if (m_bEnableAnimate && pContainer)
+    {
+        m_pValueAnimator->setRange(m_nValue, nValue);
+        // 注册到时间轴处理器并启动动画
+        m_pValueAnimator->start(pContainer);
+    }
+    else
+    {
+        // 不启用动画，直接设置值
+        m_nValue = nValue;
+        Invalidate();
+    }
     return TRUE;
 }
 
@@ -1019,6 +1146,20 @@ void SProgress::OnScaleChanged(int scale)
     GetScaleSkin(m_pSkinPos, scale);
 }
 
+void SProgress::OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer){
+    if (pOldContainer)
+    {
+        pOldContainer->UnregisterTimelineHandler(this);
+        m_pValueAnimator->end();
+    }    
+    if(pNewContainer){
+        if(m_pSkinWaveEffect){
+            pNewContainer->RegisterTimelineHandler(this);
+        }
+    }
+    __baseCls::OnContainerChanged(pOldContainer, pNewContainer);
+}
+
 HRESULT SProgress::OnAttrRange(const SStringW & strValue,BOOL bLoading){
     int nMin, nMax;
     if(2==swscanf_s(strValue, L"%d,%d", &nMin, &nMax)){
@@ -1026,7 +1167,16 @@ HRESULT SProgress::OnAttrRange(const SStringW & strValue,BOOL bLoading){
     }
     return bLoading?S_FALSE:S_OK;
 }
+HRESULT SProgress::OnAttrAnimateStep(const SStringW &strValue, BOOL bLoading)
+{
+    int nSteps = _wtoi(strValue);
+    OnSetAnimateStep(nSteps);
+    return S_FALSE;
+}
 
+void SProgress::OnSetAnimateStep(int nStep){
+    m_pValueAnimator->setDuration(nStep*10);
+}
 //////////////////////////////////////////////////////////////////////////
 // Line Control
 // Simple HTML "HR" tag

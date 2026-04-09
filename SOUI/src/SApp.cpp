@@ -264,6 +264,7 @@ void SObjectDefaultRegister::RegisterAnimation(SObjectFactoryMgr *objFactory) co
 void SObjectDefaultRegister::RegisterValueAnimator(SObjectFactoryMgr *objFactory) const
 {
     objFactory->TplRegisterFactory<SIntAnimator>();
+    objFactory->TplRegisterFactory<SByteAnimator>();
     objFactory->TplRegisterFactory<SFloatAnimator>();
     objFactory->TplRegisterFactory<SColorAnimator>();
     objFactory->TplRegisterFactory<SPointAnimator>();

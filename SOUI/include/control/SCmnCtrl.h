@@ -14,7 +14,9 @@
 #include <core/SAccelerator.h>
 #include <core/SFocusManager.h>
 #include <interface/SCtrls-i.h>
+#include <interface/sinterpolator-i.h>
 #include <proxy/SWindowProxy.h>
+#include <valueAnimator/SValueAnimator.h>
 
 SNSBEGIN
 
@@ -193,7 +195,7 @@ class SOUI_EXP SLink : public SWindow {
 class SOUI_EXP SButton
     : public SWindow
     , public IAcceleratorTarget
-    , public ITimelineHandler {
+    , public IAnimatorUpdateListener{
     DEF_SOBJECT(SWindow, L"button")
 
   public:
@@ -311,11 +313,6 @@ class SOUI_EXP SButton
 
   protected:
     /**
-     * @brief 处理下一帧事件
-     */
-    STDMETHOD_(void, OnNextFrame)(THIS_) OVERRIDE;
-
-    /**
      * @brief 停止动画
      */
     void StopCurAnimate();
@@ -331,24 +328,38 @@ class SOUI_EXP SButton
     BOOL m_bAnimate;
 
     /**
-     * @brief 动画状态
+     * @brief 当前 hover 动画的 alpha 值
      */
-    WORD m_byAlphaAni;
+    BYTE m_byAlphaAni;
 
-    /**
-     * @brief alpha for animate step
-     */
-    BYTE m_nAniStep;
 
     /**
      * @brief 禁用不可见时的加速键
      */
     BOOL m_bDisableAccelIfInvisible;
+    
+    /**
+     * @brief 动画时长(ms)
+     */
+    int m_nAnimDuration;
 
+    /**
+     * @brief Hover 状态动画器（管理 alpha 从 50-255）
+     */
+    SAutoRefPtr<SByteAnimator> m_pHoverAni;
+
+  protected:
+    /**
+     * @brief 处理动画更新回调
+     */
+    STDMETHOD_(void, onAnimationUpdate)(THIS_ IValueAnimator *p) OVERRIDE;
+
+    LRESULT OnAttrAnimateStep(const SStringW &strValue, BOOL bLoading);
     SOUI_ATTRS_BEGIN()
         ATTR_CUSTOM(L"accel", OnAttrAccel)
         ATTR_BOOL(L"animate", m_bAnimate, FALSE)
-        ATTR_INT(L"animateStep", m_nAniStep, FALSE)
+        ATTR_CUSTOM(L"animateStep", OnAttrAnimateStep)
+        ATTR_CHAIN_PTR(m_pHoverAni, 0)
         ATTR_BOOL(L"disableAccelIfInvisible", m_bDisableAccelIfInvisible, FALSE)
     SOUI_ATTRS_END()
 
@@ -687,10 +698,15 @@ class SOUI_EXP SAnimateImgWnd
  * @details 进度条控件。
  * @usage `<progress bgskin=xx posskin=xx min=0 max=100 value=10,showpercent=0/>`
  */
-class SOUI_EXP SProgress : public TWindowProxy<IProgress> {
+class SOUI_EXP SProgress : public TWindowProxy<IProgress>, public IAnimatorUpdateListener, public ITimelineHandler{
     DEF_SOBJECT(SWindow, L"progress")
 
   public:
+    enum{
+      PC_RAIL = 0,
+      PC_SELECT,
+    };
+
     /**
      * @brief 构造函数
      */
@@ -737,6 +753,17 @@ class SOUI_EXP SProgress : public TWindowProxy<IProgress> {
 
   protected:
     /**
+     * @brief onAnimationUpdate
+     * @param pAnimator 动画对象
+     */
+    STDMETHOD_(void, onAnimationUpdate)(THIS_ IValueAnimator * pAnimator) OVERRIDE;
+
+    /**
+     * @brief 处理下一帧事件（ITimelineHandler接口实现）
+     */
+    STDMETHOD_(void, OnNextFrame)() OVERRIDE;
+  protected:
+    /**
      * @brief 获取预期大小
      * @param psz 输出大小
      * @param wid 父容器宽度
@@ -748,26 +775,21 @@ class SOUI_EXP SProgress : public TWindowProxy<IProgress> {
      * @brief 处理颜色化事件
      * @param cr 颜色
      */
-    virtual void OnColorize(COLORREF cr);
+    virtual void OnColorize(COLORREF cr) override;
 
     /**
      * @brief 处理缩放变化事件
      * @param scale 缩放比例
      */
-    virtual void OnScaleChanged(int scale);
+    virtual void OnScaleChanged(int scale) override;
 
-    /**
-     * @brief 绘制控件
-     * @param pRT 绘制设备句柄
-     */
-    void OnPaint(IRenderTarget *pRT);
+    virtual void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer) override;
 
-    /**
-     * @brief 处理创建事件
-     * @param lp 创建参数
-     * @return 成功--0
-     */
-    int OnCreate(void *);
+    virtual void DrawRail(IRenderTarget *pRT,const CRect & rcClient);
+    virtual void DrawPos(IRenderTarget *pRT,const CRect & rcClient);
+    virtual void DrawExtend(IRenderTarget *pRT,const CRect & rcClient);
+    virtual CRect GetPartRect(const CRect &rcClient,UINT uSBCode) const;
+  protected:
 
     /**
      * @brief 进度最小值
@@ -803,22 +825,93 @@ class SOUI_EXP SProgress : public TWindowProxy<IProgress> {
      * @brief 前景资源
      */
     SAutoRefPtr<ISkinObj> m_pSkinPos;
+    
+    /**
+     * @brief 波动特效皮肤
+     */
+    SAutoRefPtr<ISkinObj> m_pSkinWaveEffect;
+    
+    /**
+     * @brief SetValue动画值动画器
+     * @details 集中管理所有SetValue动画的状态和逻辑
+     */
+    SAutoRefPtr<SIntAnimator> m_pValueAnimator;
+    
+    /**
+     * @brief 波动特效当前位置(0-1之间)
+     */
+    float m_fWaveEffectPos;
+    
+    /**
+     * @brief 波动特效移动方向(1=增加, -1=减少)
+     */
+    int m_nWaveEffectDir;
+
+    /**
+     * @brief 启动动画标志
+     */
+    BOOL m_bEnableAnimate;
+  protected:
+    /**
+     * @brief 获取值动画的当前值（供派生类使用）
+     * @return 动画当前值
+     */
+    int GetValueAniCurr() const
+    {
+        return m_pValueAnimator->getValue();
+    }
+
+    /**
+     * @brief 判断是否正在进行值动画（供派生类使用）
+     * @return TRUE表示动画中，FALSE表示未动画
+     */
+    BOOL IsValueAnimating() const
+    {
+        return m_pValueAnimator->isRunning();
+    }
+
+    /**
+     * @brief 绘制控件
+     * @param pRT 绘制设备句柄
+     */
+    void OnPaint(IRenderTarget *pRT);
+
+    /**
+     * @brief 处理创建事件
+     * @param lp 创建参数
+     * @return 成功--0
+     */
+    int OnCreate(void *);
+
+    /**
+     * @brief 处理销毁事件
+     */
+    void OnDestroy();
 
     SOUI_MSG_MAP_BEGIN()
         MSG_WM_PAINT_EX(OnPaint)
         MSG_WM_CREATE(OnCreate)
+        MSG_WM_DESTROY(OnDestroy)
     SOUI_MSG_MAP_END()
 
     HRESULT OnAttrRange(const SStringW & strValue, BOOL bLoading);
+    HRESULT OnAttrAnimateStep(const SStringW & strValue, BOOL bLoading);
+
+    virtual void OnSetAnimateStep(int nStep);
+
     SOUI_ATTRS_BEGIN()
         ATTR_SKIN(L"bkgndSkin", m_pSkinBg, TRUE)
         ATTR_SKIN(L"posSkin", m_pSkinPos, TRUE)
+        ATTR_SKIN(L"waveSkin", m_pSkinWaveEffect, TRUE)
         ATTR_INT(L"min", m_nMinValue, FALSE)
         ATTR_INT(L"max", m_nMaxValue, FALSE)
         ATTR_CUSTOM(L"range", OnAttrRange)
         ATTR_INT(L"value", m_nValue, FALSE)
         ATTR_BOOL(L"vertical", m_bVertical, FALSE)
         ATTR_BOOL(L"showPercent", m_bShowPercent, FALSE)
+        ATTR_BOOL(L"animate", m_bEnableAnimate, FALSE)
+        ATTR_CUSTOM(L"animateStep",OnAttrAnimateStep)
+        ATTR_CHAIN_PTR(m_pValueAnimator, 0)
     SOUI_ATTRS_END()
 };
 
