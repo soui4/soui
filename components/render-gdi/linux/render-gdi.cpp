@@ -1571,10 +1571,8 @@ static COLORREF nsvgPaintToCOLORREF(const NSVGpaint *paint, BYTE byAlpha)
     }
 }
 
-static void buildShapePath(HDC hdc, const NSVGpath *path)
+static void buildShapePath2(HDC hdc, const NSVGpath *path)
 {
-    // 开始路径
-    BeginPath(hdc);
     // 移动到第一个点
     ::MoveToEx(hdc, (int)path->pts[0], (int)path->pts[1], NULL);
     // 添加三次贝塞尔曲线段
@@ -1595,6 +1593,13 @@ static void buildShapePath(HDC hdc, const NSVGpath *path)
     {
         CloseFigure(hdc);
     }
+}
+
+static void buildShapePath(HDC hdc, const NSVGpath *path)
+{
+    // 开始路径
+    BeginPath(hdc);
+    buildShapePath2(hdc, path);
     EndPath(hdc);
 }
 
@@ -1641,18 +1646,40 @@ static COLORREF nsvgColorToCOLORREF(unsigned int color, BYTE byAlpha)
     return (color & 0x00ffffff) | (a << 24);
 }
 
-static void renderNSVGshape(HDC hdc, const NSVGshape *shape, BYTE byAlpha, LPCRECT prcSrc)
+static void renderNSVGshape(HDC hdc, const NSVGimage *image, const NSVGshape *shape, BYTE byAlpha, LPCRECT prcSrc)
 {
     if (!(shape->flags & NSVG_FLAGS_VISIBLE))
         return;
     if (!nsvgShapeIntersectsSrcRect(shape, prcSrc))
         return;
 
+    // Save the device context state
+    int state = SaveDC(hdc);
     // 计算形状的最终透明度
     float opacity = shape->opacity * (byAlpha / 255.0f);
     BYTE shapeAlpha = (BYTE)(opacity * 255.0f + 0.5f);
     if (shapeAlpha == 0)
+    {
+        RestoreDC(hdc, state);
         return;
+    }
+
+    // Check if the shape has a clipPath
+    if (image && shape->clipPath[0] != '\0')
+    {
+        NSVGclipPathData* clipPath = nsvgFindClipPath(image, shape->clipPath);
+        if (clipPath && clipPath->paths)
+        {
+            BeginPath(hdc);
+            // Apply clip paths
+            for (const NSVGpath* clipPathItem = clipPath->paths; clipPathItem != NULL; clipPathItem = clipPathItem->next)
+            {
+                buildShapePath2(hdc, clipPathItem);
+            }
+            EndPath(hdc);
+            SelectClipPath(hdc, RGN_AND);
+        }
+    }
 
     // 设置填充模式
     int fillMode = (shape->fillRule == NSVG_FILLRULE_EVENODD) ? ALTERNATE : WINDING;
@@ -1804,6 +1831,9 @@ static void renderNSVGshape(HDC hdc, const NSVGshape *shape, BYTE byAlpha, LPCRE
             }
         }
     }
+
+    // Restore the device context state if a clipPath was applied
+    RestoreDC(hdc, state);
 }
 
 static void renderNSVGtext(HDC hdc, const NSVGtext *text, BYTE byAlpha, LPCRECT prcSrc)
@@ -2013,7 +2043,7 @@ HRESULT SRenderTarget_GDI::DrawSVG(ISvgObj *pSvgObj, LPCRECT pRect, LPCRECT prcS
     // 遍历所有形状
     for (NSVGshape *shape = pSvg->shapes; shape != NULL; shape = shape->next)
     {
-        renderNSVGshape(hdc, shape, byAlpha, prcSrc);
+        renderNSVGshape(hdc, pSvg, shape, byAlpha, prcSrc);
     }
 
     // 渲染文本（简化版，使用 DrawText）

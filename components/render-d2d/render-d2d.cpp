@@ -3251,7 +3251,7 @@ static bool nsvgTextIntersectsSrcRect(const NSVGtext *text, IDWriteTextLayout *p
     return nsvgIntersectsSrcRect(minX - inflate, minY - inflate, maxX + inflate, maxY + inflate, prcSrc);
 }
 
-static void renderNSVGshape(ID2D1RenderTarget *pRT, ID2D1Factory *pFactory, const NSVGshape *shape, BYTE byAlpha, LPCRECT prcSrc)
+static void renderNSVGshape(ID2D1RenderTarget *pRT, ID2D1Factory *pFactory, const NSVGimage *image, const NSVGshape *shape, BYTE byAlpha, LPCRECT prcSrc)
 {
     if (!shape || !pRT || !pFactory)
         return;
@@ -3262,6 +3262,58 @@ static void renderNSVGshape(ID2D1RenderTarget *pRT, ID2D1Factory *pFactory, cons
 
     float opacity = shape->opacity * (byAlpha / 255.0f);
     D2D1_FILL_MODE fillMode = shape->fillRule == NSVG_FILLRULE_EVENODD ? D2D1_FILL_MODE_ALTERNATE : D2D1_FILL_MODE_WINDING;
+
+    // Check if the shape has a clipPath
+    SComPtr<ID2D1Geometry> pClipGeometry;
+    bool hasClipPath = false;
+    if (image && shape->clipPath[0] != '\0')
+    {
+        NSVGclipPathData* clipPath = nsvgFindClipPath(image, shape->clipPath);
+        if (clipPath && clipPath->paths)
+        {
+            // Create a geometry group for all clip paths
+            D2D1_FILL_MODE clipFillMode = D2D1_FILL_MODE_WINDING;
+            bool isFirstClipPath = true;
+            
+            for (const NSVGpath* clipPathItem = clipPath->paths; clipPathItem != NULL; clipPathItem = clipPathItem->next)
+            {
+                SComPtr<ID2D1PathGeometry> pClipPathGeometry;
+                nsvgPathToD2DGeometry(clipPathItem, pFactory, clipFillMode, &pClipPathGeometry);
+                if (!pClipPathGeometry)
+                    continue;
+
+                if (isFirstClipPath)
+                {
+                    pClipGeometry = pClipPathGeometry;
+                    isFirstClipPath = false;
+                }
+                else
+                {
+                    SComPtr<ID2D1PathGeometry> pCombinePath;
+                    pFactory->CreatePathGeometry(&pCombinePath);
+                    SComPtr<ID2D1GeometrySink> pSink;
+                    HRESULT hr = pCombinePath->Open(&pSink);
+                    pClipGeometry->CombineWithGeometry(pClipPathGeometry, D2D1_COMBINE_MODE_UNION, NULL, pSink);
+                    pSink->Close();
+                    pClipGeometry = pCombinePath;
+                }
+            }
+
+            if (pClipGeometry)
+            {
+                hasClipPath = true;
+                D2D1_LAYER_PARAMETERS layerParams = D2D1::LayerParameters();
+                layerParams.geometricMask = pClipGeometry;
+                layerParams.maskAntialiasMode = D2D1_ANTIALIAS_MODE_PER_PRIMITIVE;
+                layerParams.contentBounds = D2D1::InfiniteRect();
+                
+                SComPtr<ID2D1Layer> pLayer;
+                pRT->CreateLayer(NULL, &pLayer);
+                if (pLayer)
+                    pRT->PushLayer(layerParams, pLayer);
+            }
+        }
+    }
 
     for (const NSVGpath *path = shape->paths; path != NULL; path = path->next)
     {
@@ -3412,6 +3464,12 @@ static void renderNSVGshape(ID2D1RenderTarget *pRT, ID2D1Factory *pFactory, cons
             }
         }
     }
+
+    // Restore the render target state if a clipPath was applied
+    if (hasClipPath)
+    {
+        pRT->PopLayer();
+    }
 }
 
 static void renderNSVGtext(ID2D1RenderTarget *pRT, IDWriteFactory *pWriteFactory, const NSVGtext *text, BYTE byAlpha, LPCRECT prcSrc)
@@ -3557,7 +3615,7 @@ HRESULT SRenderTarget_D2D::DrawSVG(ISvgObj *pSvgObj, LPCRECT pRect, LPCRECT prcS
     IDWriteFactory *pWriteFactory = pFactoryD2D->GetDWriteFactory();
 
     for (NSVGshape *shape = pSvg->shapes; shape != NULL; shape = shape->next)
-        renderNSVGshape(m_rt, pFactory, shape, byAlpha, prcSrc);
+        renderNSVGshape(m_rt, pFactory, pSvg, shape, byAlpha, prcSrc);
 
     for (NSVGtext *text = pSvg->texts; text != NULL; text = text->next)
         renderNSVGtext(m_rt, pWriteFactory, text, byAlpha, prcSrc);

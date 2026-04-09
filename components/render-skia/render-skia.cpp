@@ -1965,7 +1965,7 @@ static SkColor nsvgColorToSkColor(unsigned int color, float opacity)
     return SkColorSetARGB(a, r, g, b);
 }
 
-static void nsvgPaintToSkPaint(const NSVGpaint *paint, float opacity, SkPaint &skPaint, const float *xform, SkPath & skPath)
+static void nsvgPaintToSkPaint(const NSVGpaint *paint, float opacity, SkPaint &skPaint, SkPath & skPath)
 {
     if (!paint)
     {
@@ -2113,7 +2113,7 @@ static bool nsvgTextIntersectsSrcRect(const NSVGtext *text, const SkPaint &paint
     return nsvgIntersectsSrcRect(minX, minY, maxX, maxY, prcSrc);
 }
 
-static void renderNSVGshape(const SkPaint &paint, SkCanvas *canvas, const NSVGshape *shape, BYTE byAlpha, LPCRECT prcSrc)
+static void renderNSVGshape(const SkPaint &paint, SkCanvas *canvas, const NSVGimage *image, const NSVGshape *shape, BYTE byAlpha, LPCRECT prcSrc)
 {
     if (!shape || !canvas)
         return;
@@ -2123,6 +2123,31 @@ static void renderNSVGshape(const SkPaint &paint, SkCanvas *canvas, const NSVGsh
 
     if (!nsvgShapeIntersectsSrcRect(shape, prcSrc))
         return;
+
+    // Check if the shape has a clipPath
+    bool hasClipPath = false;
+    if (shape->clipPath[0] != '\0')
+    {
+        NSVGclipPathData* clipPath = nsvgFindClipPath(image, shape->clipPath);
+        if (clipPath && clipPath->paths)
+        {
+            // Save the current canvas state
+            canvas->save();
+            
+            // Create a clipping path
+            SkPath clipSkPath;
+            for (const NSVGpath* path = clipPath->paths; path != NULL; path = path->next)
+            {
+                SkPath pathSkPath;
+                nsvgPathToSkPath(path, pathSkPath);
+                clipSkPath.addPath(pathSkPath);
+            }
+            
+            // Apply the clipping path
+            canvas->clipPath(clipSkPath, SkRegion::kIntersect_Op, true);
+            hasClipPath = true;
+        }
+    }
 
     SkPaint fillPaint = paint;
     fillPaint.setAntiAlias(true);
@@ -2180,7 +2205,7 @@ static void renderNSVGshape(const SkPaint &paint, SkCanvas *canvas, const NSVGsh
 
             if (order == NSVG_PAINT_FILL && shape->fill.type != NSVG_PAINT_NONE)
             {
-                nsvgPaintToSkPaint(&shape->fill, opacity, fillPaint, shape->xform, skPath);
+                nsvgPaintToSkPaint(&shape->fill, opacity, fillPaint,skPath);
                 if (shape->fillRule == NSVG_FILLRULE_EVENODD)
                     skPath.setFillType(SkPath::kEvenOdd_FillType);
                 else
@@ -2189,10 +2214,16 @@ static void renderNSVGshape(const SkPaint &paint, SkCanvas *canvas, const NSVGsh
             }
             else if (order == NSVG_PAINT_STROKE && shape->stroke.type != NSVG_PAINT_NONE && shape->strokeWidth > 0)
             {
-                nsvgPaintToSkPaint(&shape->stroke, opacity, strokePaint, shape->xform, skPath);
+                nsvgPaintToSkPaint(&shape->stroke, opacity, strokePaint, skPath);
                 canvas->drawPath(skPath, strokePaint);
             }
         }
+    }
+    
+    // Restore the canvas state if a clipPath was applied
+    if (hasClipPath)
+    {
+        canvas->restore();
     }
 }
 
@@ -2328,7 +2359,7 @@ HRESULT SRenderTarget_Skia::DrawSVG(THIS_ ISvgObj *pSvgObj, LPCRECT pRect, LPCRE
 
     for (NSVGshape *shape = pSvg->shapes; shape != NULL; shape = shape->next)
     {
-        renderNSVGshape(m_paint, m_SkCanvas, shape, byAlpha, prcSrc);
+        renderNSVGshape(m_paint, m_SkCanvas, pSvg, shape, byAlpha, prcSrc);
     }
 
     for (NSVGtext *text = pSvg->texts; text != NULL; text = text->next)

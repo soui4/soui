@@ -2857,7 +2857,7 @@ static bool nsvgTextIntersectsSrcRect(const NSVGtext *text, const Gdiplus::RectF
     return nsvgIntersectsSrcRect(minX, minY, maxX, maxY, prcSrc);
 }
 
-static void renderNSVGshape(Gdiplus::Graphics &graphics, const NSVGshape *shape, BYTE byAlpha, LPCRECT prcSrc)
+static void renderNSVGshape(Gdiplus::Graphics &graphics, const NSVGimage *image, const NSVGshape *shape, BYTE byAlpha, LPCRECT prcSrc)
 {
     if (!shape)
         return;
@@ -2868,6 +2868,28 @@ static void renderNSVGshape(Gdiplus::Graphics &graphics, const NSVGshape *shape,
 
     float opacity = shape->opacity * (byAlpha / 255.0f);
     Gdiplus::FillMode fillMode = shape->fillRule == NSVG_FILLRULE_EVENODD ? Gdiplus::FillModeAlternate : Gdiplus::FillModeWinding;
+
+    // Save the current graphics state
+    Gdiplus::GraphicsState savedState = graphics.Save();
+
+    // Check if the shape has a clipPath
+    if (shape->clipPath[0] != '\0')
+    {
+        NSVGclipPathData* clipPath = nsvgFindClipPath(image, shape->clipPath);
+        if (clipPath && clipPath->paths)
+        {
+            // Create and apply clip path
+            Gdiplus::GraphicsPath clipRegion;
+            for (const NSVGpath* clipPathItem = clipPath->paths; clipPathItem != NULL; clipPathItem = clipPathItem->next)
+            {
+                Gdiplus::GraphicsPath clipGraphicsPath;
+                if (!nsvgPathToGraphicsPath(clipPathItem, fillMode, clipGraphicsPath))
+                    continue;
+                clipRegion.AddPath(&clipGraphicsPath,FALSE);
+            }
+            graphics.SetClip(&clipRegion, Gdiplus::CombineModeIntersect);
+        }
+    }
 
     for (const NSVGpath *path = shape->paths; path != NULL; path = path->next)
     {
@@ -2960,6 +2982,9 @@ static void renderNSVGshape(Gdiplus::Graphics &graphics, const NSVGshape *shape,
             }
         }
     }
+
+    // Restore the graphics state if a clipPath was applied
+    graphics.Restore(savedState);
 }
 
 static void renderNSVGtext(Gdiplus::Graphics &graphics, const NSVGtext *text, BYTE byAlpha, LPCRECT prcSrc)
@@ -3069,7 +3094,7 @@ HRESULT SRenderTarget_GDI::DrawSVG(ISvgObj *pSvgObj, LPCRECT pRect, LPCRECT prcS
     graphics.SetTransform(&globalTransform);
 
     for (NSVGshape *shape = pSvg->shapes; shape != NULL; shape = shape->next)
-        renderNSVGshape(graphics, shape, byAlpha, prcSrc);
+        renderNSVGshape(graphics, pSvg, shape, byAlpha, prcSrc);
 
     for (NSVGtext *text = pSvg->texts; text != NULL; text = text->next)
         renderNSVGtext(graphics, text, byAlpha, prcSrc);
