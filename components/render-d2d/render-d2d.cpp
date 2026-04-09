@@ -799,7 +799,9 @@ HRESULT SBitmap_D2D::Scale2(IBitmapS **pOutput, int nWid, int nHei, FilterLevel 
     {
         RECT rcSrc = { 0, 0, (long)Width(), (long)Height() };
         RECT rcDst = { 0, 0, nWid, nHei };
+        pRT->BeginDraw();
         hr = pRT->DrawBitmapEx(&rcDst, this, &rcSrc, MAKELONG(EM_STRETCH, filterLevel), 255);
+        pRT->EndDraw();
         if (hr == S_OK)
         {
             *pOutput = (IBitmapS *)pRT->GetCurrentObject(OT_BITMAP);
