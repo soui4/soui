@@ -322,7 +322,7 @@ class SOUI_EXP STrText {
      * @param _strRaw String to translate.
      * @return Translated string.
      */
-    SStringW TranslateText2(const SStringW & _strRaw) const;
+    SStringW TranslateText2(const SStringW &_strRaw) const;
 
     /**
      * @brief Escapes a string.
@@ -1683,6 +1683,12 @@ class SOUI_EXP SWindow
      * @brief Handle tooltip updates
      */
     virtual BOOL UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo);
+
+    /**
+     * GetTooltip
+     * @brief Get tooltip text
+     */
+    virtual SStringT GetTooltip(CPoint pt) const;
 
     /**
      * GetSelectedSiblingInGroup

@@ -113,7 +113,7 @@ void SObjectFactoryMgr::SetSwndDefAttr(IObject *pObject) const
         return;
     wchar_t szClassNameList[20][50] = { 0 };
     int lens = pObject->GetClassNameList(szClassNameList, 20);
-    for (int i = lens-1; i>=0; i--)
+    for (int i = lens - 1; i >= 0; i--)
     {
         SXmlNode defAttr = pDefObjAttr->GetDefAttribute(szClassNameList[i]);
         if (!defAttr)

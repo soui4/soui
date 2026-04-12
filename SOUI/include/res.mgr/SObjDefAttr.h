@@ -54,7 +54,6 @@ class SOUI_EXP SObjDefAttr
     SXmlNode GetDefAttribute(LPCWSTR pszClassName);
 
   protected:
-
     SXmlDoc m_xmlRoot; // XML document containing the default attributes
 };
 

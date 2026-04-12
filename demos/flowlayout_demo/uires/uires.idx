@@ -12,8 +12,9 @@
   	<file name="skin" path="values\skin.xml"/>
   </values>
 
-  <IMG>
-  </IMG>
+  <svg>
+    <file name="svg_xmusic"  path="svg\xmusic_icon.svg"/>
+  </svg>
   <ICON>
     <file name="ICON_LOGO"  path="image\soui.ico"/>
   </ICON>

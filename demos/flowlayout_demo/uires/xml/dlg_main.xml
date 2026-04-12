@@ -80,6 +80,9 @@ translucent="1"
           <button columnSpan="2" text="bottom line" height="50"/>
         </scrollview>
       </page>
+      <page title="svg test" layout="vbox" interval="10dp"> 
+        <img size="200,200" skin="svg_xmusic"/>
+      </page>
     </tabctrl>
 
   </root>

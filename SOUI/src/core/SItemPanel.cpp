@@ -384,7 +384,8 @@ void SOsrPanel::EnableHostPrivateUiDef(THIS_ BOOL bEnable)
     return m_pHostProxy->GetHostContainer()->EnableHostPrivateUiDef(bEnable);
 }
 
-void SOsrPanel::OnDropdownState(IHostWnd *pDropdownWnd, BOOL bCreate){
+void SOsrPanel::OnDropdownState(IHostWnd *pDropdownWnd, BOOL bCreate)
+{
     m_pHostProxy->GetHostContainer()->OnDropdownState(pDropdownWnd, bCreate);
 }
 BOOL SOsrPanel::IsItemInClip(const SMatrix &mtx, const CRect &rcClip, const IRegionS *clipRgn, const CRect &rcItem)

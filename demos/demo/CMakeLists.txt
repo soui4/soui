@@ -19,7 +19,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 file(GLOB_RECURSE CURRENT_HEADERS *.h *.hpp)
 file(GLOB_RECURSE CURRENT_SRCS  *.cpp)
-file(GLOB_RECURSE CURRENT_SOUIS  *.xml *.idx *.ico)
+file(GLOB_RECURSE CURRENT_SOUIS  uires/*.*)
 file(GLOB_RECURSE CURRENT_RC *.rc *.rc2)
 
 if (NOT CMAKE_SYSTEM_NAME MATCHES Windows)
@@ -108,9 +108,9 @@ if (CMAKE_SYSTEM_NAME MATCHES Windows)
 
 else()
 	target_link_libraries(demo dl)
+endif()
 if(SOUI_ENABLE_COM_LIB)
     target_link_libraries(demo ${COM_LIBS})
-endif()
 endif()
 target_precompile_headers(demo PRIVATE "stdafx.h")
 

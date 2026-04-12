@@ -436,73 +436,96 @@ IAccProxy *SApplication::CreateAccProxy(IWindow *pWnd) const
     {
         return new SAccProxyCaption(pWnd);
     }
-    else if (pWnd->IsClass(SListCtrl::GetClassName())) {
+    else if (pWnd->IsClass(SListCtrl::GetClassName()))
+    {
         return new SAccProxyListCtrl(pWnd);
     }
-    else if (pWnd->IsClass(SDateTimePicker::GetClassName())) {
+    else if (pWnd->IsClass(SDateTimePicker::GetClassName()))
+    {
         return new SAccProxyDateTimePicker(pWnd);
     }
-    else if (pWnd->IsClass(SDockBar::GetClassName())) {
+    else if (pWnd->IsClass(SDockBar::GetClassName()))
+    {
         return new SAccProxyDockBar(pWnd);
     }
-    else if (pWnd->IsClass(SComboBase::GetClassName())) {
+    else if (pWnd->IsClass(SComboBase::GetClassName()))
+    {
         return new SAccProxyDropDown(pWnd);
     }
-    else if (pWnd->IsClass(SFrame::GetClassName())) {
+    else if (pWnd->IsClass(SFrame::GetClassName()))
+    {
         return new SAccProxyFrame(pWnd);
     }
-    else if (pWnd->IsClass(SHeaderCtrl::GetClassName())) {
+    else if (pWnd->IsClass(SHeaderCtrl::GetClassName()))
+    {
         return new SAccProxyHeaderCtrl(pWnd);
     }
-    else if (pWnd->IsClass(SHotKeyCtrl::GetClassName())) {
+    else if (pWnd->IsClass(SHotKeyCtrl::GetClassName()))
+    {
         return new SAccProxyHotKeyCtrl(pWnd);
     }
-    else if (pWnd->IsClass(SListView::GetClassName())) {
+    else if (pWnd->IsClass(SListView::GetClassName()))
+    {
         return new SAccProxyListView(pWnd);
     }
-    else if (pWnd->IsClass(SListBox::GetClassName())) {
+    else if (pWnd->IsClass(SListBox::GetClassName()))
+    {
         return new SAccProxyListBox(pWnd);
     }
-    else if (pWnd->IsClass(SMCListView::GetClassName())) {
+    else if (pWnd->IsClass(SMCListView::GetClassName()))
+    {
         return new SAccProxyMCListView(pWnd);
     }
-    else if (pWnd->IsClass(SMenuBar::GetClassName())) {
+    else if (pWnd->IsClass(SMenuBar::GetClassName()))
+    {
         return new SAccProxyMenuBar(pWnd);
     }
-    else if (pWnd->IsClass(SRealWnd::GetClassName())) {
+    else if (pWnd->IsClass(SRealWnd::GetClassName()))
+    {
         return new SAccProxyRealWnd(pWnd);
     }
-    else if (pWnd->IsClass(SScrollBar::GetClassName())) {
+    else if (pWnd->IsClass(SScrollBar::GetClassName()))
+    {
         return new SAccProxyScrollBar(pWnd);
     }
-    else if (pWnd->IsClass(SSearchDropdownList::GetClassName())) {
+    else if (pWnd->IsClass(SSearchDropdownList::GetClassName()))
+    {
         return new SAccProxySearchDropdownList(pWnd);
     }
-    else if (pWnd->IsClass(SSpinButtonCtrl::GetClassName())) {
+    else if (pWnd->IsClass(SSpinButtonCtrl::GetClassName()))
+    {
         return new SAccProxySpinButtonCtrl(pWnd);
     }
-    else if (pWnd->IsClass(SSplitWnd::GetClassName())) {
+    else if (pWnd->IsClass(SSplitWnd::GetClassName()))
+    {
         return new SAccProxySplitWnd(pWnd);
     }
-    else if (pWnd->IsClass(SStackView::GetClassName())) {
+    else if (pWnd->IsClass(SStackView::GetClassName()))
+    {
         return new SAccProxyStackView(pWnd);
     }
-    else if (pWnd->IsClass(SSwitch::GetClassName())) {
+    else if (pWnd->IsClass(SSwitch::GetClassName()))
+    {
         return new SAccProxySwitch(pWnd);
     }
-    else if (pWnd->IsClass(STabCtrl::GetClassName())) {
+    else if (pWnd->IsClass(STabCtrl::GetClassName()))
+    {
         return new SAccProxyTabCtrl(pWnd);
     }
-    else if (pWnd->IsClass(STileView::GetClassName())) {
+    else if (pWnd->IsClass(STileView::GetClassName()))
+    {
         return new SAccProxyTileView(pWnd);
     }
-    else if (pWnd->IsClass(SToolBar::GetClassName())) {
+    else if (pWnd->IsClass(SToolBar::GetClassName()))
+    {
         return new SAccProxyToolBar(pWnd);
     }
-    else if (pWnd->IsClass(STreeCtrl::GetClassName())) {
+    else if (pWnd->IsClass(STreeCtrl::GetClassName()))
+    {
         return new SAccProxyTreeCtrl(pWnd);
     }
-    else if (pWnd->IsClass(STreeView::GetClassName())) {
+    else if (pWnd->IsClass(STreeView::GetClassName()))
+    {
         return new SAccProxyTreeView(pWnd);
     }
 
@@ -669,7 +692,7 @@ UINT SApplication::LoadSystemNamedResource(IResProvider *pResProvider)
             uRet |= 0x04;
         }
     }
-    //load 4 theme color
+    // load 4 theme color
     {
         SXmlDoc xmlDoc;
         if (_LoadXmlDocment(_T("THEME_COLOR"), _T("XML"), xmlDoc, pResProvider))

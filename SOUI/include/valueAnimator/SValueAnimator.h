@@ -578,11 +578,19 @@ class TValueAnimator : public SValueAnimator {
     }
 
   public:
+    HRESULT OnAttrAniSteps(const SStringW &strValue, BOOL bLoading)
+    {
+        int nSteps = _wtoi(strValue);
+        mDuration = nSteps * 10;
+        return S_FALSE;
+    }
+
     /**
      * @brief Defines the attributes for TValueAnimator.
      */
     SOUI_ATTRS_BEGIN()
         ATTR_INT(L"duration", mDuration, FALSE)
+        ATTR_CUSTOM(L"animateSteps", OnAttrAniSteps)
         ATTR_INT(L"repeatCount", mRepeatCount, FALSE)
         ATTR_ENUM_BEGIN(L"repeatMode", RepeatMode, FALSE)
             ATTR_ENUM_VALUE(L"reverse", REVERSE)

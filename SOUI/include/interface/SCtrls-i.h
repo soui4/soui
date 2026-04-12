@@ -363,6 +363,7 @@ DECLARE_INTERFACE_(IProgress, ICtrl)
      * Describe  设置进度条进度值
      */
     STDMETHOD_(BOOL, SetValue)(THIS_ int nValue) PURE;
+
     /**
      * SProgress::GetValue
      * @brief    获取进度值
@@ -398,6 +399,126 @@ DECLARE_INTERFACE_(IProgress, ICtrl)
      * Describe  获取进度值
      */
     STDMETHOD_(BOOL, IsVertical)(CTHIS) SCONST PURE;
+};
+
+#define MAX_SEGMENT_LENGTH 100
+/**
+ * @brief 分段信息结构体
+ */
+typedef struct _SEGMENT
+{
+    int value;                            /**< 分段起始值 */
+    TCHAR szDesc[MAX_SEGMENT_LENGTH + 1]; /**< 分段描述 */
+} SEGMENT;
+
+// {0A572106-14E0-48d7-85C3-3E08B9DA85B8}
+DEFINE_SGUID(IID_ISliderBar, 0xa572106, 0x14e0, 0x48d7, 0x85, 0xc3, 0x3e, 0x8, 0xb9, 0xda, 0x85, 0xB8);
+
+#undef INTERFACE
+#define INTERFACE ISliderBar
+DECLARE_INTERFACE_(ISliderBar, IProgress)
+{
+    DECLARE_CLASS_SIID(IID_ISliderBar)
+    /**
+     * @brief 增加引用计数
+     * @return 新引用计数
+     */
+    STDMETHOD_(long, AddRef)(THIS) PURE;
+
+    /**
+     * @brief 减少引用计数
+     * @return 新引用计数
+     */
+    STDMETHOD_(long, Release)(THIS) PURE;
+
+    /**
+     * @brief 释放对象
+     * @return void
+     */
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+
+    //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 转换为IWindow*接口
+     * @return IWindow*接口
+     */
+    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
+    /**
+     * SProgress::SetValue
+     * @brief    设置进度条进度值
+     * @param    int nValue  --  进度值
+     * @return   返回值是 TRUE -- 设置成功
+     *
+     * Describe  设置进度条进度值
+     */
+    STDMETHOD_(BOOL, SetValue)(THIS_ int nValue) PURE;
+
+    /**
+     * SProgress::GetValue
+     * @brief    获取进度值
+     * @return   返回值是int
+     *
+     * Describe  获取进度值
+     */
+    STDMETHOD_(int, GetValue)(CTHIS) SCONST PURE;
+
+    /**
+     * SProgress::SetRange
+     * @param    int nMin  --  进度最小值
+     * @param    int nMax  --  进度最大值
+     * @brief    设置进度值最小大值
+     *
+     * Describe  设置进度值
+     */
+    STDMETHOD_(void, SetRange)(THIS_ int nMin, int nMax) PURE;
+    /**
+     * SProgress::GetRange
+     * @param    int nMin  --  进度最小值
+     * @param    int nMax  --  进度最大值
+     * @brief    获取进度值最小大值
+     *
+     * Describe  获取进度值
+     */
+    STDMETHOD_(void, GetRange)(CTHIS_ int *pMin, int *pMax) SCONST PURE;
+    /**
+     * SProgress::IsVertical
+     * @brief    判断进度条是否为竖直状态
+     * @return   返回值是 TRUE -- 竖直状态
+     *
+     * Describe  获取进度值
+     */
+    STDMETHOD_(BOOL, IsVertical)(CTHIS) SCONST PURE;
+    //////////////////////////////////////////////////////////////////////////
+    /**
+     * @brief 设置分段信息
+     * @param segments 分段数组
+     * @param count 分段数量
+     * @details 分段必须从小到大排列
+     */
+    STDMETHOD_(void, SetSegments)(THIS_ const SEGMENT *segments, int count) PURE;
+
+    /**
+     * @brief 获取分段数
+     * @return 分段数量
+     */
+    STDMETHOD_(int, GetSegmentCount)(CTHIS) SCONST PURE;
+
+    /**
+     * @brief 获取指定索引的分段信息
+     * @param index 分段索引
+     * @param pSegment 输出分段信息
+     * @return 成功返回TRUE
+     */
+    STDMETHOD_(BOOL, GetSegment)(CTHIS_ int index, SEGMENT *pSegment) SCONST PURE;
+
+    /**
+     * @brief 根据值查找所在的分段
+     * @param value 进度值
+     * @return 分段索引，-1表示未找到
+     */
+    STDMETHOD_(int, FindSegmentByValue)(CTHIS_ int value) SCONST PURE;
 };
 
 typedef enum _ScrollBarID

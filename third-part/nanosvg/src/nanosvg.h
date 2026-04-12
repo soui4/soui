@@ -1184,8 +1184,7 @@ static void nsvg__applyShapeAttr(NSVGshape *shape, NSVGattrib *attr)
     else if (attr->hasFill == 1)
     {
         shape->fill.type = NSVG_PAINT_COLOR;
-        shape->fill.color = attr->fillColor;
-        shape->fill.color |= (unsigned int)(attr->fillOpacity * 255) << 24;
+        shape->fill.color = ((unsigned int)(attr->fillOpacity * GetAValue(attr->fillColor)) << 24) | (attr->fillColor & 0x00FFFFFF);
     }
     else if (attr->hasFill == 2)
     {
@@ -1200,8 +1199,7 @@ static void nsvg__applyShapeAttr(NSVGshape *shape, NSVGattrib *attr)
     else if (attr->hasStroke == 1)
     {
         shape->stroke.type = NSVG_PAINT_COLOR;
-        shape->stroke.color = attr->strokeColor;
-        shape->stroke.color |= (unsigned int)(attr->strokeOpacity * 255) << 24;
+        shape->stroke.color = ((unsigned int)(attr->strokeOpacity * GetAValue(attr->strokeColor)) << 24) | (attr->strokeColor & 0x00FFFFFF);
     }
     else if (attr->hasStroke == 2)
     {
@@ -3318,8 +3316,7 @@ static void nsvg__parseGradientStop(NSVGparser* p, const char** attr)
 	}
 
 	stop = &grad->stops[idx];
-	stop->color = curAttr->stopColor;
-	stop->color |= (unsigned int)(curAttr->stopOpacity*255) << 24;
+	stop->color = ((unsigned int)(curAttr->stopOpacity * GetAValue(curAttr->stopColor)) << 24) | (curAttr->stopColor & 0x00FFFFFF);
 	stop->offset = curAttr->stopOffset;
 }
 static void nsvg__parseCssRule(NSVGparser *p, const char *rule);

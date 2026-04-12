@@ -741,7 +741,9 @@ BOOL SToolBar::UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo)
     if (!m_arrItems[iItem].strTip.IsEmpty())
     {
         tipInfo.strTip = S_CW2T(m_strText.TranslateText2(m_arrItems[iItem].strTip));
-    }else{
+    }
+    else
+    {
         tipInfo.strTip = S_CW2T(m_strText.TranslateText2(m_arrItems[iItem].strText));
     }
     tipInfo.swnd = m_swnd;
@@ -1201,9 +1203,12 @@ BOOL SToolBar::OnItemHover(int iItem)
     evt.iIndex = iItem;
     evt.nCmdId = item.nId;
     SStringT strTip;
-    if (!item.strTip.IsEmpty()){
+    if (!item.strTip.IsEmpty())
+    {
         strTip = S_CW2T(m_strText.TranslateText2(item.strTip));
-    }else{
+    }
+    else
+    {
         strTip = S_CW2T(m_strText.TranslateText2(item.strText));
     }
     evt.strTip = &strTip;

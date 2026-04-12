@@ -915,15 +915,15 @@ BOOL SFrameLayout::RestoreLayout(IWindow *pParent, const SArray<FrameLayoutItemI
         IWindow *pChild = pParent->FindIChildByName(item.strName);
         if (!pChild)
             continue;
-                        // 更新布局参数
+        // 更新布局参数
         SFrameLayoutParam *pParam = (SFrameLayoutParam *)pChild->GetLayoutParam();
         if (pParam)
         {
             SFrameLayoutParamStruct *pStruct = (SFrameLayoutParamStruct *)pParam;
             *pStruct = item;
             // 更新可见性
-            pChild->SetVisible(item.bVisible,FALSE);
-        }        
+            pChild->SetVisible(item.bVisible, FALSE);
+        }
     }
     // 重新布局
     LayoutChildren(pParent);

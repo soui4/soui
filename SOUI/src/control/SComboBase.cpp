@@ -352,7 +352,7 @@ SWindow *SComboBase::GetDropDownOwner()
 
 void SComboBase::OnCreateDropDown(SDropDownWnd *pDropDown)
 {
-    GetContainer()->OnDropdownState(pDropDown,TRUE);
+    GetContainer()->OnDropdownState(pDropDown, TRUE);
     SXmlNode xmlDropdownStyleNode = m_xmlDropdownStyle.root().child(SComboBase_style::kStyle_Dropdown);
     if (xmlDropdownStyleNode)
     {
@@ -374,7 +374,7 @@ void SComboBase::OnCreateDropDown(SDropDownWnd *pDropDown)
 
 void SComboBase::OnDestroyDropDown(SDropDownWnd *pDropDown)
 {
-    GetContainer()->OnDropdownState(pDropDown,FALSE);
+    GetContainer()->OnDropdownState(pDropDown, FALSE);
     if (!m_bDropdown)
     {
         m_pEdit->SetFocus();

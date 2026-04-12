@@ -48,7 +48,7 @@ void SProgressRing::OnPaint(IRenderTarget *pRT)
     pRT->DrawArc(&rcArc, fStart, fEnd, false);
     pRT->SelectObject(oldPen, NULL);
 
-    if (m_bShowPercent)
+    if (m_bShowText)
     {
         SStringT strPercent;
         strPercent.Format(_T("%d%%"),

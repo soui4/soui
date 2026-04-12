@@ -77,7 +77,7 @@ class SOUI_EXP SFrameLayoutParam
 struct FrameLayoutItemInfo : SFrameLayoutParamStruct
 {
     SStringW strName;
-    BOOL     bVisible;
+    BOOL bVisible;
 };
 
 class SOUI_EXP SFrameLayout : public TObjRefImpl<SObjectImpl<ILayout>> {
@@ -114,6 +114,7 @@ class SOUI_EXP SFrameLayout : public TObjRefImpl<SObjectImpl<ILayout>> {
      * @return 成功返回TRUE，失败返回FALSE
      */
     BOOL RestoreLayout(IWindow *pParent, const SArray<FrameLayoutItemInfo> &lstItems);
+
   protected:
     static DockMode parseDockMode(const SStringW &strValue);
     DockMode m_enableDockMode;

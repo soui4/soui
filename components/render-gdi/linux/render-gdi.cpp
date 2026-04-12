@@ -1774,11 +1774,84 @@ static void renderNSVGshape(HDC hdc, const NSVGimage *image, const NSVGshape *sh
             else if (order == NSVG_PAINT_STROKE && shape->stroke.type != NSVG_PAINT_NONE && shape->strokeWidth > 0)
             {
                 buildShapePath(hdc, path);
-                COLORREF strokeColor = nsvgPaintToCOLORREF(&shape->stroke, shapeAlpha);
+                
                 LOGBRUSH lb;
                 lb.lbStyle = BS_SOLID;
-                lb.lbColor = strokeColor;
                 lb.lbHatch = 0;
+
+                // Handle stroke with gradient support
+                HBRUSH hStrokeBrush = NULL;
+                
+                if (shape->stroke.type == NSVG_PAINT_COLOR)
+                {
+                    lb.lbColor = nsvgPaintToCOLORREF(&shape->stroke, shapeAlpha);
+                }
+                else if (shape->stroke.type == NSVG_PAINT_LINEAR_GRADIENT || shape->stroke.type == NSVG_PAINT_RADIAL_GRADIENT)
+                {
+                    NSVGgradient *grad = shape->stroke.gradient;
+                    if (grad && grad->nstops > 0)
+                    {
+                        // Get path bounds for gradient calculation
+                        RECT rcBounds;
+                        GetPathBounds(hdc, &rcBounds);
+                        float width = rcBounds.right - rcBounds.left;
+                        float height = rcBounds.bottom - rcBounds.top;
+
+                        int nstops = grad->nstops > 8 ? 8 : grad->nstops;
+                        
+                        // Create gradient items
+                        std::vector<GRADIENTITEM> gradientItems(nstops);
+                        for (int i = 0; i < nstops; i++)
+                        {
+                            gradientItems[i].cr = nsvgColorToCOLORREF(grad->stops[i].color, shapeAlpha);
+                            gradientItems[i].pos = grad->stops[i].offset;
+                        }
+                        
+                        // Create gradient info
+                        GRADIENTINFO gradInfo;
+                        if (shape->stroke.type == NSVG_PAINT_LINEAR_GRADIENT)
+                        {
+                            gradInfo.type = grad_linear;
+                            float x1 = nsvgConvertToPixels(grad->linear.x1, rcBounds.left, width, 0);
+                            float y1 = nsvgConvertToPixels(grad->linear.y1, rcBounds.top, height, 0);
+                            float x2 = nsvgConvertToPixels(grad->linear.x2, rcBounds.left, width, 0);
+                            float y2 = nsvgConvertToPixels(grad->linear.y2, rcBounds.top, height, 0);
+                            float dx = x2 - x1;
+                            float dy = y2 - y1;
+                            if(fabs(dy) < 1e-6f)
+                                gradInfo.angle = 0.0f;
+                            else if(fabs(dx) < 1e-6f)
+                                gradInfo.angle = 90.0f;
+                            else
+                                gradInfo.angle = atan2f(dy, dx) * 180.0f / M_PI;
+                        }
+                        else
+                        {
+                            gradInfo.type = grad_radial;
+                            float cx = nsvgConvertToPixels(grad->radial.cx, 0, width, 0);
+                            float cy = nsvgConvertToPixels(grad->radial.cy, 0, height, 0);
+                            float radius = nsvgConvertToPixels(grad->radial.r, 0, (width + height)/2, 25);
+
+                            gradInfo.radial.centerX = cx/width;
+                            gradInfo.radial.centerY = cy/height;
+                            gradInfo.radial.radius = radius;
+                        }
+                        
+                        // Create gradient brush
+                        hStrokeBrush = CreateGradientBrush(&gradientItems[0], nstops, &gradInfo, shapeAlpha, (TILEMODE)grad->spread);
+                        if (hStrokeBrush)
+                        {
+                            lb.lbStyle = BS_BRUSH;
+                            lb.lbHatch = (LONG_PTR)hStrokeBrush;
+                        }
+                    }
+                }
+                
+                // If gradient brush creation failed or it's a solid color, use solid brush
+                if (!hStrokeBrush && shape->stroke.type == NSVG_PAINT_COLOR)
+                {
+                    lb.lbColor = nsvgPaintToCOLORREF(&shape->stroke, shapeAlpha);
+                }
 
                 int capStyle = PS_ENDCAP_FLAT;
                 switch (shape->strokeLineCap)
@@ -1828,6 +1901,8 @@ static void renderNSVGshape(HDC hdc, const NSVGimage *image, const NSVGshape *sh
                 StrokePath(hdc);
                 ::SelectObject(hdc, oldPen);
                 DeleteObject(hPen);
+                if (hStrokeBrush)
+                    DeleteObject(hStrokeBrush);
             }
         }
     }

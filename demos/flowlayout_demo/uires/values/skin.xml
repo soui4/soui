@@ -22,4 +22,5 @@
       <corners radius="5"/>
       <blur sigmaX="5" sigmaY="5"/>
     </shape>
+    <imglist name="svg_xmusic" src="svg:svg_xmusic"/>
 </skin>

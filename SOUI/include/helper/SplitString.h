@@ -76,7 +76,7 @@ inline int ParseResID(const SStringT &str, SStringTList &strLst)
         // resid with nPos==1 will treat as an obsolute path for windows OS, so we don't split it.
         strLst.Add(str);
     }
-    else if (nPos>1)
+    else if (nPos > 1)
     {
         strLst.Add(str.Left(nPos));
         strLst.Add(str.Right(str.GetLength() - nPos - 1));

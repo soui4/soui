@@ -342,7 +342,8 @@ class SOUI_EXP SUiDef
      * @brief Initializes the theme colors from an XML node.
      * @param xmlColors XML node containing theme colors.
      */
-    void InitThemeColors(SXmlNode xmlColors);    
+    void InitThemeColors(SXmlNode xmlColors);
+
   protected:
     SAutoRefPtr<IUiDefInfo> m_defUiDefInfo;   // Default UI definition information
     SList<IUiDefInfo *> m_lstUiDefInfo;       // List of UI definition information objects

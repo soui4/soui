@@ -60,7 +60,7 @@ class SOUI_EXP SToolBar
 
   public:
     void InsertItem(const ToolBarItem &item, int nPos = -1);
-    void AddButton(int nID, int nImage, LPCWSTR lpszText = NULL,LPCWSTR lpszTip =NULL,  int dwStyle = TBSTYLE_BUTTON);
+    void AddButton(int nID, int nImage, LPCWSTR lpszText = NULL, LPCWSTR lpszTip = NULL, int dwStyle = TBSTYLE_BUTTON);
     BOOL DeleteButton(int nIndex);
 
     // Item query methods

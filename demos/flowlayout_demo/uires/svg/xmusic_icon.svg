@@ -1,0 +1,122 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  
+  <defs>
+    <!-- 1. 背景主渐变：深邃的紫水晶基底 -->
+    <radialGradient id="bg_crystal" cx="40%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#2a1a2e" />
+      <stop offset="40%" stop-color="#181122" />
+      <stop offset="100%" stop-color="#0a0610" />
+    </radialGradient>
+    
+    <!-- 2. 顶部高光渐变：模拟玻璃顶部的强烈反光 -->
+    <linearGradient id="top_highlight" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.4" />
+      <stop offset="30%" stop-color="#ffffff" stop-opacity="0.05" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+    </linearGradient>
+
+    <!-- 3. 左上角折射光晕（青色/蓝） -->
+    <linearGradient id="refract_left" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00ffff" stop-opacity="0.2" />
+      <stop offset="50%" stop-color="#00ffff" stop-opacity="0" />
+    </linearGradient>
+
+    <!-- 4. 右下角折射光晕（品红/红） -->
+    <linearGradient id="refract_right" x1="100%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#e60026" stop-opacity="0.25" />
+      <stop offset="60%" stop-color="#e60026" stop-opacity="0" />
+    </linearGradient>
+
+    <!-- 5. 平台渐变外环（用户原有） -->
+    <linearGradient id="gradient_platform" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e60026" />
+      <stop offset="50%" stop-color="#ff6b6b" />
+      <stop offset="100%" stop-color="#e60026" />
+    </linearGradient>
+    
+    <!-- 6. 内部圆形渐变背景（用户原有） -->
+    <radialGradient id="inner_circle_glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#2d2d2d" />
+      <stop offset="100%" stop-color="#222222" />
+    </radialGradient>
+    
+    <!-- 7. 裁剪路径：只在四个对角线方向显示（用户原有） -->
+    <clipPath id="x-shape-clip">
+      <path d="M0 0 L128 128 L0 128 Z"/>
+      <path d="M128 0 L256 0 L128 128 Z"/>
+      <path d="M0 128 L128 128 L0 256 Z"/>
+      <path d="M128 128 L256 128 L256 256 Z"/>
+    </clipPath>
+  </defs>
+  
+  <!-- ================= 背景层（增强水晶质感） ================= -->
+  
+  <!-- 基础水晶背景 -->
+  <rect x="16" y="16" width="224" height="224" rx="48" fill="url(#bg_crystal)"/>
+  
+  <!-- 内部深度阴影 -->
+  <rect x="16" y="16" width="224" height="224" rx="48" fill="none" stroke="#000000" stroke-width="8" opacity="0.4"/>
+  <rect x="20" y="20" width="216" height="216" rx="44" fill="none" stroke="#000000" stroke-width="4" opacity="0.6"/>
+  
+  <!-- 光线折射：左上角青色光晕 -->
+  <rect x="16" y="16" width="224" height="224" rx="48" fill="url(#refract_left)" style="mix-blend-mode: screen;" />
+  
+  <!-- 光线折射：右下角品红光晕 -->
+  <rect x="16" y="16" width="224" height="224" rx="48" fill="url(#refract_right)" style="mix-blend-mode: screen;" />
+  
+  <!-- 顶部高光层 -->
+  <rect x="16" y="16" width="224" height="224" rx="48" fill="url(#top_highlight)"/>
+  
+  <!-- 水晶顶部圆弧形高光（模拟玻璃厚度） -->
+  <path d="M 48 24 C 100 16 156 16 208 24 C 210 30 210 40 200 45 C 160 35 96 35 56 45 C 48 40 46 30 48 24 Z" fill="#ffffff" opacity="0.3" />
+  
+  <!-- 边缘光泽（外圈） -->
+  <rect x="18" y="18" width="220" height="220" rx="46" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.15" fill="none"/>
+  
+  <!-- ================= 前景层（保持原有设计） ================= -->
+  
+  <!-- 渐变外环 - 体现跨平台特性（多色渐变） -->
+  <circle cx="128" cy="128" r="95" stroke="url(#gradient_platform)" stroke-width="18" fill="none"/>
+  
+  <!-- 内部圆形背景 -->
+  <circle cx="128" cy="128" r="95" fill="url(#inner_circle_glow)"/>
+  <ellipse cx="128" cy="115" rx="82" ry="78" fill="#ffffff" fill-opacity="0.03"/>
+  
+  <!-- 主视觉：立体音符组合 -->
+  <g transform="translate(128, 128)">
+    <!-- 大音符（四分音符） -->
+    <g transform="translate(-18, 8)">
+      <ellipse cx="0" cy="28" rx="20" ry="16" fill="#e60026" transform="rotate(-12)"/>
+      <ellipse cx="-2" cy="26" rx="16" ry="12" fill="#ffffff" fill-opacity="0.15" transform="rotate(-12)"/>
+      <line x1="18" y1="25" x2="18" y2="-40" stroke="#e60026" stroke-width="8" stroke-linecap="round"/>
+      <path d="M18 -40C28 -34 32 -24 30 -16" stroke="#e60026" stroke-width="7" stroke-linecap="round" fill="none"/>
+    </g>
+    
+    <!-- 小音符（八分音符）- 优化为红色系，与主音符协调 -->
+    <g transform="translate(28, -25) scale(0.7)">
+      <ellipse cx="0" cy="22" rx="14" ry="11" fill="#ff4757" transform="rotate(-15)"/>
+      <ellipse cx="-1" cy="20" rx="11" ry="8" fill="#ffffff" fill-opacity="0.2" transform="rotate(-15)"/>
+      <line x1="12" y1="19" x2="12" y2="-25" stroke="#ff4757" stroke-width="5" stroke-linecap="round"/>
+      <path d="M12 -25C20 -20 24 -10 20 0" stroke="#ff4757" stroke-width="5" stroke-linecap="round" fill="none"/>
+    </g>
+  </g>
+  
+  <!-- SOUI框架标识 -->
+  <text x="128" y="215" 
+        font-family="Arial, Microsoft YaHei, sans-serif" 
+        font-size="16" 
+        font-weight="bold" 
+        fill="#666666" 
+        text-anchor="middle" 
+        letter-spacing="2">Soui</text>
+  
+  <!-- 同心圆声波（应用X形裁剪）- 优化为3个圆圈，加粗线条以提高小尺寸下的可见性 -->
+  <g clip-path="url(#x-shape-clip)" opacity="0.4" stroke="#e60026" stroke-linecap="round" fill="none">
+    <!-- 第一层同心圆 - 加粗 -->
+    <circle cx="128" cy="128" r="60" stroke-width="5"/>
+    <!-- 第二层同心圆 - 加粗 -->
+    <circle cx="128" cy="128" r="72" stroke-width="6"/>
+    <!-- 第三层同心圆 - 加粗 -->
+    <circle cx="128" cy="128" r="84" stroke-width="7"/>
+  </g>
+</svg>

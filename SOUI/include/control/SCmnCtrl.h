@@ -195,7 +195,7 @@ class SOUI_EXP SLink : public SWindow {
 class SOUI_EXP SButton
     : public SWindow
     , public IAcceleratorTarget
-    , public IAnimatorUpdateListener{
+    , public IAnimatorUpdateListener {
     DEF_SOBJECT(SWindow, L"button")
 
   public:
@@ -208,7 +208,11 @@ class SOUI_EXP SButton
      * @brief 获取加速键
      * @return 加速键
      */
-    DWORD GetAccel() const{return m_accel;}
+    DWORD GetAccel() const
+    {
+        return m_accel;
+    }
+
   protected:
     /**
      * @brief 状态变化需要重画
@@ -332,12 +336,11 @@ class SOUI_EXP SButton
      */
     BYTE m_byAlphaAni;
 
-
     /**
      * @brief 禁用不可见时的加速键
      */
     BOOL m_bDisableAccelIfInvisible;
-    
+
     /**
      * @brief 动画时长(ms)
      */
@@ -354,11 +357,9 @@ class SOUI_EXP SButton
      */
     STDMETHOD_(void, onAnimationUpdate)(THIS_ IValueAnimator *p) OVERRIDE;
 
-    LRESULT OnAttrAnimateStep(const SStringW &strValue, BOOL bLoading);
     SOUI_ATTRS_BEGIN()
         ATTR_CUSTOM(L"accel", OnAttrAccel)
         ATTR_BOOL(L"animate", m_bAnimate, FALSE)
-        ATTR_CUSTOM(L"animateStep", OnAttrAnimateStep)
         ATTR_CHAIN_PTR(m_pHoverAni, 0)
         ATTR_BOOL(L"disableAccelIfInvisible", m_bDisableAccelIfInvisible, FALSE)
     SOUI_ATTRS_END()
@@ -698,13 +699,16 @@ class SOUI_EXP SAnimateImgWnd
  * @details 进度条控件。
  * @usage `<progress bgskin=xx posskin=xx min=0 max=100 value=10,showpercent=0/>`
  */
-class SOUI_EXP SProgress : public TWindowProxy<IProgress>, public IAnimatorUpdateListener, public ITimelineHandler{
+class SOUI_EXP SProgress
+    : public TWindowProxy<IProgress>
+    , public ITimelineHandler {
     DEF_SOBJECT(SWindow, L"progress")
 
   public:
-    enum{
-      PC_RAIL = 0,
-      PC_SELECT,
+    enum
+    {
+        PC_RAIL = 0,
+        PC_SELECT,
     };
 
     /**
@@ -716,6 +720,7 @@ class SOUI_EXP SProgress : public TWindowProxy<IProgress>, public IAnimatorUpdat
      * @brief 设置进度条进度值
      * @param nValue 进度值
      * @return 设置成功--TRUE
+     * @note 对于需要动画效果的SetValue，请使用SSliderBar
      */
     STDMETHOD_(BOOL, SetValue)(THIS_ int nValue) OVERRIDE;
 
@@ -753,15 +758,11 @@ class SOUI_EXP SProgress : public TWindowProxy<IProgress>, public IAnimatorUpdat
 
   protected:
     /**
-     * @brief onAnimationUpdate
-     * @param pAnimator 动画对象
-     */
-    STDMETHOD_(void, onAnimationUpdate)(THIS_ IValueAnimator * pAnimator) OVERRIDE;
-
-    /**
      * @brief 处理下一帧事件（ITimelineHandler接口实现）
+     * @note 仅用于处理波动特效
      */
     STDMETHOD_(void, OnNextFrame)() OVERRIDE;
+
   protected:
     /**
      * @brief 获取预期大小
@@ -785,12 +786,14 @@ class SOUI_EXP SProgress : public TWindowProxy<IProgress>, public IAnimatorUpdat
 
     virtual void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer) override;
 
-    virtual void DrawRail(IRenderTarget *pRT,const CRect & rcClient);
-    virtual void DrawPos(IRenderTarget *pRT,const CRect & rcClient);
-    virtual void DrawExtend(IRenderTarget *pRT,const CRect & rcClient);
-    virtual CRect GetPartRect(const CRect &rcClient,UINT uSBCode) const;
-  protected:
+    virtual void DrawRail(IRenderTarget *pRT, const CRect &rcClient);
+    virtual void DrawPos(IRenderTarget *pRT, const CRect &rcClient);
+    virtual void DrawOthers(IRenderTarget *pRT, const CRect &rcClient);
+    CRect GetPartRect2(UINT uSBCode) const;
+    virtual CRect GetPartRect(const CRect &rcClient, UINT uSBCode) const;
+    virtual void OnValueChanged(int nValue, int reason);
 
+  protected:
     /**
      * @brief 进度最小值
      */
@@ -807,9 +810,9 @@ class SOUI_EXP SProgress : public TWindowProxy<IProgress>, public IAnimatorUpdat
     int m_nValue;
 
     /**
-     * @brief 是否显示百分比
+     * @brief 是否显示进度值
      */
-    BOOL m_bShowPercent;
+    BOOL m_bShowText;
 
     /**
      * @brief 是否竖直状态
@@ -825,51 +828,23 @@ class SOUI_EXP SProgress : public TWindowProxy<IProgress>, public IAnimatorUpdat
      * @brief 前景资源
      */
     SAutoRefPtr<ISkinObj> m_pSkinPos;
-    
+
     /**
      * @brief 波动特效皮肤
      */
     SAutoRefPtr<ISkinObj> m_pSkinWaveEffect;
-    
-    /**
-     * @brief SetValue动画值动画器
-     * @details 集中管理所有SetValue动画的状态和逻辑
-     */
-    SAutoRefPtr<SIntAnimator> m_pValueAnimator;
-    
+
     /**
      * @brief 波动特效当前位置(0-1之间)
      */
     float m_fWaveEffectPos;
-    
+
     /**
      * @brief 波动特效移动方向(1=增加, -1=减少)
      */
     int m_nWaveEffectDir;
 
-    /**
-     * @brief 启动动画标志
-     */
-    BOOL m_bEnableAnimate;
   protected:
-    /**
-     * @brief 获取值动画的当前值（供派生类使用）
-     * @return 动画当前值
-     */
-    int GetValueAniCurr() const
-    {
-        return m_pValueAnimator->getValue();
-    }
-
-    /**
-     * @brief 判断是否正在进行值动画（供派生类使用）
-     * @return TRUE表示动画中，FALSE表示未动画
-     */
-    BOOL IsValueAnimating() const
-    {
-        return m_pValueAnimator->isRunning();
-    }
-
     /**
      * @brief 绘制控件
      * @param pRT 绘制设备句柄
@@ -894,11 +869,7 @@ class SOUI_EXP SProgress : public TWindowProxy<IProgress>, public IAnimatorUpdat
         MSG_WM_DESTROY(OnDestroy)
     SOUI_MSG_MAP_END()
 
-    HRESULT OnAttrRange(const SStringW & strValue, BOOL bLoading);
-    HRESULT OnAttrAnimateStep(const SStringW & strValue, BOOL bLoading);
-
-    virtual void OnSetAnimateStep(int nStep);
-
+    HRESULT OnAttrRange(const SStringW &strValue, BOOL bLoading);
     SOUI_ATTRS_BEGIN()
         ATTR_SKIN(L"bkgndSkin", m_pSkinBg, TRUE)
         ATTR_SKIN(L"posSkin", m_pSkinPos, TRUE)
@@ -908,10 +879,7 @@ class SOUI_EXP SProgress : public TWindowProxy<IProgress>, public IAnimatorUpdat
         ATTR_CUSTOM(L"range", OnAttrRange)
         ATTR_INT(L"value", m_nValue, FALSE)
         ATTR_BOOL(L"vertical", m_bVertical, FALSE)
-        ATTR_BOOL(L"showPercent", m_bShowPercent, FALSE)
-        ATTR_BOOL(L"animate", m_bEnableAnimate, FALSE)
-        ATTR_CUSTOM(L"animateStep",OnAttrAnimateStep)
-        ATTR_CHAIN_PTR(m_pValueAnimator, 0)
+        ATTR_BOOL(L"showText", m_bShowText, FALSE)
     SOUI_ATTRS_END()
 };
 

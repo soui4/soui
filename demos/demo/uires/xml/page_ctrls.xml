@@ -43,7 +43,7 @@
 			</group>
 		</data>
 	</grouplist>
-	<tabctrl pos="[0,0,-0,-0" name="tab_ctrls" font="style:StrokeAndFill,blurStyle:solid,blurRadius:3" animateSteps="10" animateType="1" tabHeight="0">
+	<tabctrl pos="[0,0,-0,-0" name="tab_ctrls" font="style:StrokeAndFill,blurStyle:solid,blurRadius:3" animateSteps="20" tabAlign="left" tabWidth="0">
 		<page title="mclistview">
 			<mclistview name="mclv_test" multiSel="1" colorBkgnd="@color/white" pos="10,10,-10,-10" headerHeight="30" dividerSize="1">
 				<headerStyle wndclass="header" align="center" name="mclv_test_header" sortSkin="skin_lcex_header_arrow" itemSwapEnable="1" fixWidth="0" font="underline:0,adding:-3" sortHeader="1" colorBkgnd="#ffffff">
@@ -316,7 +316,7 @@
 			</group>
 		</page>
 		<page title="prog and slider" layout="vbox" interval="50" padding="50">
-			<window size="-2,-1" layout="vbox" interval="20" >
+			<window size="-2,-1" layout="vbox" interval="20" id="5000">
 				<progress name="prog_test" size="-2,15" font="adding:-8" value="20" min="0" max="100" showPercent="1" />
 				<sliderbar name="slider_test" size="-2,-1" thumbInRail="0" alpha="200" value="20" min="0" max="100" />
 				<scrollbar name="sb_test1" size="-2,16" min="0" max="100" value="10" page="10" />

@@ -619,7 +619,7 @@ IGradient *SUiDef::GetGradient(const SStringW &strName)
 COLORREF SUiDef::GetColor(const SStringW &strColor)
 {
     SAutoLock autolock(m_cs);
-    
+
     COLORREF cr = CR_INVALID;
     SPOSITION pos = m_lstUiDefInfo.GetTailPosition();
     while (pos)
@@ -628,7 +628,8 @@ COLORREF SUiDef::GetColor(const SStringW &strColor)
         if (pUiDefInfo->GetNamedColor().Get(strColor, cr))
             return cr;
     }
-    if(cr == CR_INVALID){
+    if (cr == CR_INVALID)
+    {
         m_themeColor.Get(strColor, cr);
     }
     return cr;

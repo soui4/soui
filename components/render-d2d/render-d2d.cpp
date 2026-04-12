@@ -490,6 +490,109 @@ SBrush_D2D::~SBrush_D2D()
 }
 const float PI = 3.1415926f;
 
+static bool fequal(float a, float b)
+{
+    return fabs(a - b) < 0.0000001f;
+}
+
+struct SkPoint{
+    float fX, fY;
+    void set(float x, float y)
+    {
+        fX = x;
+        fY = y;
+    }
+    void offset(float dx, float dy)
+    {
+        fX += dx;
+        fY += dy;
+    }
+};
+
+static void calc_linear_endpoint(float angle, double wid, double hei, SkPoint skPts[2])
+{
+    double halfWid = wid / 2;
+    double halfHei = hei / 2;
+
+    // 1. 归一化角度到 [0, 360)
+    float a = fmodf(angle, 360.0f);
+    if (a < 0)
+        a += 360.0f;
+
+    // 2. 处理轴对齐的特殊情况（0°, 90°, 180°, 270°）
+    if (fequal(a, 90.0f) || fequal(a, 270.0f))
+    {
+        skPts[0].set((float)halfWid, 0.0f);
+        skPts[1].set((float)halfWid, (float)hei);
+        return;
+    }
+    if (fequal(a, 0.0f) || fequal(a, 180.0f))
+    {
+        skPts[0].set(0.0f, (float)halfHei);
+        skPts[1].set((float)wid, (float)halfHei);
+        return;
+    }
+
+    // 3. 确定象限，并计算参考角度（第一象限 0~90°）
+    int quadrant = (int)(a / 90.0f);
+    float ref_angle = a - quadrant * 90.0f; // 0~90°
+    float rad = ref_angle * PI / 180.0f;
+    float tan_angle = tan(rad);
+    float cot_angle = 1.0f / tan_angle; // 避免除零（ref_angle不会是0或90）
+
+    // 4. 计算第一象限下的两个交点（相对于矩形中心，中心为(0,0)）
+    SkPoint p1, p2;
+    // 与左右边（x = -halfWid 和 x = halfWid）的交点 y 坐标
+    float y_left = -halfWid * tan_angle;
+    float y_right = halfWid * tan_angle;
+
+    // 与上下边（y = -halfHei 和 y = halfHei）的交点 x 坐标
+    float x_top = -halfHei * cot_angle;
+    float x_bottom = halfHei * cot_angle;
+
+    // 根据 y_right 是否在 [-halfHei, halfHei] 内选择使用哪一组交点
+    if (fabs(y_right) <= halfHei + 1e-9f)
+    {
+        // 直线与左右边相交
+        p1.set((float)-halfWid, (float)y_left);
+        p2.set((float)halfWid, (float)y_right);
+    }
+    else
+    {
+        // 直线与上下边相交
+        p1.set((float)x_top, (float)-halfHei);
+        p2.set((float)x_bottom, (float)halfHei);
+    }
+
+    // 5. 根据实际象限对交点坐标进行镜像变换
+    SkPoint transformed[2];
+    switch (quadrant)
+    {
+    case 0: // 0° ~ 90°
+        transformed[0] = p1;
+        transformed[1] = p2;
+        break;
+    case 1: // 90° ~ 180°
+        transformed[0].set(-p1.fX, p1.fY);
+        transformed[1].set(-p2.fX, p2.fY);
+        break;
+    case 2: // 180° ~ 270°
+        transformed[0].set(-p1.fX, -p1.fY);
+        transformed[1].set(-p2.fX, -p2.fY);
+        break;
+    case 3: // 270° ~ 360°
+    default:
+        transformed[0].set(p1.fX, -p1.fY);
+        transformed[1].set(p2.fX, -p2.fY);
+        break;
+    }
+
+    // 6. 将交点平移到实际矩形坐标系（左上角为原点）
+    skPts[0].set((float)(transformed[0].fX + halfWid), (float)(transformed[0].fY + halfHei));
+    skPts[1].set((float)(transformed[1].fX + halfWid), (float)(transformed[1].fY + halfHei));
+}
+
+
 SComPtr<ID2D1Brush> SBrush_D2D::toBrush(ID2D1RenderTarget *pRT, LPCRECT pRect) const
 {
     switch (m_brushType)
@@ -534,56 +637,14 @@ SComPtr<ID2D1Brush> SBrush_D2D::toBrush(ID2D1RenderTarget *pRT, LPCRECT pRect) c
             SComPtr<ID2D1LinearGradientBrush> brush;
             D2D1_LINEAR_GRADIENT_BRUSH_PROPERTIES properties;
             CRect rc(pRect);
-            D2D1_POINT_2F skPts[2];
-            float halfWid = rc.Width() / 2;
-            float halfHei = rc.Height() / 2;
-            if (m_gradInfo.angle == 90.0f || m_gradInfo.angle == 270.0f)
-            { // 90度
-                skPts[0].x = skPts[1].x = halfWid;
-                skPts[0].y = 0.0f;
-                skPts[1].y = rc.Height();
-            }
-            else if (m_gradInfo.angle == 0.0f || m_gradInfo.angle == 180.0f)
-            { // 水平方向
-                skPts[0].y = skPts[1].y = halfHei;
-                skPts[0].x = 0.0f;
-                skPts[1].x = rc.Width();
-            }
-            else
-            { // 其它角度
-
-                float angleInRadians = PI * m_gradInfo.angle / 180;
-                double tanAngle = tan(angleInRadians);
-
-                D2D1_POINT_2F pt1a, pt2a; // 与左右两条边相交的位置
-                D2D1_POINT_2F pt1b, pt2b; // 与上下两条边相关的位置
-
-                pt1a.x = -halfWid, pt2a.x = halfWid;
-                pt1b.y = -halfHei, pt2b.y = halfHei;
-
-                pt1a.y = (float)(-halfWid * tanAngle);
-                pt2a.y = -pt1a.y;
-
-                pt1b.x = (float)(-halfHei / tanAngle);
-                pt2b.x = -pt1b.x;
-
-                if (pt2a.y > halfHei)
-                { // using pt1a,pt2a
-                    skPts[0] = pt1a;
-                    skPts[1] = pt2a;
-                }
-                else
-                { // using pt1b,pt2b
-                    skPts[0] = pt1b;
-                    skPts[1] = pt2b;
-                }
-            }
-            skPts[0].x += rc.left;
-            skPts[1].x += rc.left;
-            skPts[0].y += rc.top;
-            skPts[1].y += rc.top;
-            properties.startPoint = skPts[0];
-            properties.endPoint = skPts[1];
+            SkPoint skPts[2];
+            calc_linear_endpoint(m_gradInfo.angle, rc.Width(), rc.Height(), skPts);
+            skPts[0].offset(rc.left, rc.top);
+            skPts[1].offset(rc.left,rc.top);
+            properties.startPoint.x = skPts[0].fX;
+            properties.startPoint.y = skPts[0].fY;
+            properties.endPoint.x = skPts[1].fX;
+            properties.endPoint.y = skPts[1].fY;
             if (SUCCEEDED(hr = pRT->CreateLinearGradientBrush(properties, collection, &brush)))
                 return (ID2D1Brush *)brush;
         }
@@ -3457,10 +3518,81 @@ static void renderNSVGshape(ID2D1RenderTarget *pRT, ID2D1Factory *pFactory, cons
                 SComPtr<ID2D1StrokeStyle> pStrokeStyle;
                 pFactory->CreateStrokeStyle(&strokeProps, dashes, dashCount, &pStrokeStyle);
 
-                SComPtr<ID2D1SolidColorBrush> pStrokeBrush;
-                pRT->CreateSolidColorBrush(nsvgPaintToD2DColor(&shape->stroke, opacity), &pStrokeBrush);
-                if (pStrokeBrush)
-                    pRT->DrawGeometry(pGeometry, pStrokeBrush, shape->strokeWidth, pStrokeStyle);
+                // Handle stroke with gradient support
+                if (shape->stroke.type == NSVG_PAINT_COLOR)
+                {
+                    SComPtr<ID2D1SolidColorBrush> pStrokeBrush;
+                    pRT->CreateSolidColorBrush(nsvgPaintToD2DColor(&shape->stroke, opacity), &pStrokeBrush);
+                    if (pStrokeBrush)
+                        pRT->DrawGeometry(pGeometry, pStrokeBrush, shape->strokeWidth, pStrokeStyle);
+                }
+                else if (shape->stroke.type == NSVG_PAINT_LINEAR_GRADIENT || shape->stroke.type == NSVG_PAINT_RADIAL_GRADIENT)
+                {
+                    NSVGgradient *grad = shape->stroke.gradient;
+                    if (grad && grad->nstops > 0)
+                    {
+                        int nstops = grad->nstops > 8 ? 8 : grad->nstops;
+                        D2D1_GRADIENT_STOP stops[8];
+                        for (int i = 0; i < nstops; i++)
+                        {
+                            stops[i].position = grad->stops[i].offset;
+                            stops[i].color = nsvgColorToD2DColor(grad->stops[i].color, opacity);
+                        }
+
+                        // Get path bounds for gradient calculation
+                        D2D1_RECT_F bounds;
+                        pGeometry->GetBounds(NULL, &bounds);
+                        float width = bounds.right - bounds.left;
+                        float height = bounds.bottom - bounds.top;
+
+                        if (shape->stroke.type == NSVG_PAINT_LINEAR_GRADIENT)
+                        {
+                            // Calculate gradient points based on transform
+                            float x1 = nsvgConvertToPixels(grad->linear.x1, bounds.left, width, 0);
+                            float y1 = nsvgConvertToPixels(grad->linear.y1, bounds.top, height, 0);
+                            float x2 = nsvgConvertToPixels(grad->linear.x2, bounds.left, width, 0);
+                            float y2 = nsvgConvertToPixels(grad->linear.y2, bounds.top, height, 0);
+                            D2D1_LINEAR_GRADIENT_BRUSH_PROPERTIES linearProps = {};
+                            linearProps.startPoint = D2D1::Point2F(x1, y1);
+                            linearProps.endPoint = D2D1::Point2F(x2, y2);
+
+                            SComPtr<ID2D1GradientStopCollection> pGradientStops;
+                            pRT->CreateGradientStopCollection(stops, nstops, &pGradientStops);
+                            if (pGradientStops)
+                            {
+                                SComPtr<ID2D1LinearGradientBrush> pLinearBrush;
+                                pRT->CreateLinearGradientBrush(&linearProps, NULL, pGradientStops, &pLinearBrush);
+                                if (pLinearBrush)
+                                {
+                                    pRT->DrawGeometry(pGeometry, pLinearBrush, shape->strokeWidth, pStrokeStyle);
+                                }
+                            }
+                        }
+                        else // RADIAL_GRADIENT
+                        {
+                            float cx = nsvgConvertToPixels(grad->radial.cx, bounds.left, width, 0);
+                            float cy = nsvgConvertToPixels(grad->radial.cy, bounds.top, height, 0);
+                            float radius = nsvgConvertToPixels(grad->radial.r, 0, (width + height)/2, 25);
+
+                            D2D1_RADIAL_GRADIENT_BRUSH_PROPERTIES radialProps = {};
+                            radialProps.center = D2D1::Point2F(cx, cy);
+                            radialProps.radiusX = radius;
+                            radialProps.radiusY = radius;
+
+                            SComPtr<ID2D1GradientStopCollection> pGradientStops;
+                            pRT->CreateGradientStopCollection(stops, nstops, &pGradientStops);
+                            if (pGradientStops)
+                            {
+                                SComPtr<ID2D1RadialGradientBrush> pRadialBrush;
+                                pRT->CreateRadialGradientBrush(&radialProps, NULL, pGradientStops, &pRadialBrush);
+                                if (pRadialBrush)
+                                {
+                                    pRT->DrawGeometry(pGeometry, pRadialBrush, shape->strokeWidth, pStrokeStyle);
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }

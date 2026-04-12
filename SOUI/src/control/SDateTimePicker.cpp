@@ -97,7 +97,7 @@ SWindow *SDateTimePicker::GetDropDownOwner()
 
 void SDateTimePicker::OnCreateDropDown(SDropDownWnd *pDropDown)
 {
-    GetContainer()->OnDropdownState(pDropDown,TRUE);
+    GetContainer()->OnDropdownState(pDropDown, TRUE);
     m_pCalendar->SetShowType(SHOW_MONTH);
     m_pCalendar->SetDate(m_sysTime.wYear, m_sysTime.wMonth, m_sysTime.wDay);
     // pDropDown->SetAttribute(L"sendWheel2Hover", L"1", TRUE);
@@ -115,7 +115,7 @@ void SDateTimePicker::OnCreateDropDown(SDropDownWnd *pDropDown)
 
 void SDateTimePicker::OnDestroyDropDown(SDropDownWnd *pDropDown)
 {
-    GetContainer()->OnDropdownState(pDropDown,FALSE);
+    GetContainer()->OnDropdownState(pDropDown, FALSE);
 
     pDropDown->GetRoot()->RemoveChild(m_pCalendar);
 

@@ -36,7 +36,7 @@ SValueAnimator::SValueAnimator()
 
     mAnimationEndRequested = false;
 
-    mDuration = 300;
+    mDuration = 200;
 
     mStartDelay = 0;
 
@@ -359,10 +359,6 @@ void SValueAnimator::start(ITimelineHandlersMgr *pContainer)
 void SValueAnimator::start(bool playBackwards)
 {
     SASSERT(mInterpolator);
-    if(mRunning)
-    {
-        end();
-    }    
     mReversing = playBackwards;
     // Special case: reversing from seek-to-0 should act as if not seeked at all.
     if (playBackwards && mSeekFraction != -1 && mSeekFraction != 0)

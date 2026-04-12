@@ -12,17 +12,87 @@
  */
 #ifndef __SSLIDERBAR__H__
 #define __SSLIDERBAR__H__
-#include "SCmnCtrl.h"
-#include "interface/sinterpolator-i.h"
-
+#include <control/SCmnCtrl.h>
+#include <valueAnimator/SValueAnimator.h>
+#include <interface/SCtrls-i.h>
 SNSBEGIN
+
+template <class T>
+class TProgressProxy
+    : public T
+    , public SProgress {
+  public:
+    TProgressProxy()
+    {
+    }
+
+    STDMETHOD_(long, AddRef)(THIS) OVERRIDE
+    {
+        return SProgress::AddRef();
+    }
+    STDMETHOD_(long, Release)(THIS) OVERRIDE
+    {
+        return SProgress::Release();
+    }
+    STDMETHOD_(void, OnFinalRelease)(THIS) OVERRIDE
+    {
+        SProgress::OnFinalRelease();
+    }
+
+    STDMETHOD_(IWindow *, ToIWindow)(THIS) OVERRIDE
+    {
+        return this;
+    }
+
+    STDMETHOD_(HRESULT, QueryInterface)(REFGUID id, IObjRef **ppRet) OVERRIDE
+    {
+        if (id == T::GetIID())
+        {
+            *ppRet = (T *)this;
+            AddRef();
+            return S_OK;
+        }
+        else
+        {
+            return SProgress::QueryInterface(id, ppRet);
+        }
+    }
+    STDMETHOD_(BOOL, SetValue)(THIS_ int nValue)
+    {
+        return SProgress::SetValue(nValue);
+    }
+
+    STDMETHOD_(int, GetValue)(CTHIS) SCONST
+    {
+        return SProgress::GetValue();
+    }
+
+    STDMETHOD_(void, SetRange)(THIS_ int nMin, int nMax)
+    {
+        SProgress::SetRange(nMin, nMax);
+    }
+
+    STDMETHOD_(void, GetRange)(CTHIS_ int *pMin, int *pMax) SCONST
+    {
+        SProgress::GetRange(pMin, pMax);
+    }
+
+    STDMETHOD_(BOOL, IsVertical)(CTHIS) SCONST
+    {
+        return SProgress::IsVertical();
+    }
+};
+
 /**
  * @class     SSliderBar
  * @brief     滑块工具条
  *
  * Describe   滑块工具条
  */
-class SOUI_EXP SSliderBar : public SProgress {
+class SOUI_EXP SSliderBar
+    : public TProgressProxy<ISliderBar>
+    , public IAnimatorUpdateListener
+    , public SAnimatorListener {
     DEF_SOBJECT(SProgress, L"sliderbar")
 
     struct RANGE
@@ -54,19 +124,39 @@ class SOUI_EXP SSliderBar : public SProgress {
         SC_SELECT = PC_SELECT,
         SC_THUMB,
         SC_RAILBACK,
+        SC_NULL = -1,
     };
 
     STDMETHOD_(BOOL, SetValue)(THIS_ int nValue) OVERRIDE;
 
-  protected:
     /**
-     * SSliderBar::HitTest
-     * @brief    测试点
-     * @param    CPoint pt  --  坐标
-     *
-     * Describe  测试某个点是否在滚动条上
+     * @brief 设置分段信息
+     * @param segments 分段数组
+     * @param count 分段数量
+     * @details 分段必须从小到大排列
      */
-    int HitTest(CPoint pt);
+    STDMETHOD_(void, SetSegments)(THIS_ const SEGMENT *segments, int count) OVERRIDE;
+
+    /**
+     * @brief 获取分段数
+     * @return 分段数量
+     */
+    STDMETHOD_(int, GetSegmentCount)(CTHIS) SCONST OVERRIDE;
+
+    /**
+     * @brief 获取指定索引的分段信息
+     * @param index 分段索引
+     * @param pSegment 输出分段信息
+     * @return 成功返回TRUE
+     */
+    STDMETHOD_(BOOL, GetSegment)(CTHIS_ int index, SEGMENT *pSegment) SCONST OVERRIDE;
+
+    /**
+     * @brief 根据值查找所在的分段
+     * @param value 进度值
+     * @return 分段索引，-1表示未找到
+     */
+    STDMETHOD_(int, FindSegmentByValue)(CTHIS_ int value) SCONST OVERRIDE;
 
   protected:
     BOOL m_bDrag;     /**< 是否允许拖动 */
@@ -79,54 +169,39 @@ class SOUI_EXP SSliderBar : public SProgress {
     BOOL m_bDrawRail;                   /**< 绘制轨道 */
     BOOL m_bDragTip;                    /**< 拖动滑块时在tip中显示数值 */
 
-    BYTE m_byThumbAlphaAni;
-    SAutoRefPtr<SByteAnimator> m_thumbAni;
-  protected:
-    void ShowValueInTip(int nValue);
-    /**
-     * SSliderBar::NotifyPos
-     * @brief    通知
-     * @param    SliderBarAction action  -- 消息码
-     * @param    int value  -- 值
-     *
-     * Describe  自定义消息响应函数
-     */
-    LRESULT NotifyPos(SliderBarAction action, int value);
+    BYTE m_byThumbAlphaAni;                /**< 滑块透明度动画值 */
+    SAutoRefPtr<SByteAnimator> m_thumbAni; /**< 滑块透明度动画器 */
+    SAutoRefPtr<SIntAnimator> m_valueAni;  /**< 数值动画器 */
 
-    /**
-     * SSliderBar::GetDesiredSize
-     * @brief    获取大小
-     * @param    int wid -- 容器宽度
-     * @param    int hei -- 容器高度
-     * @return   返回CSize
-     *
-     * Describe  获取大小
-     */
+    BOOL m_bEnableAnimate;      /**< 启用动画标志 */
+    SArray<SEGMENT> m_segments; /**< 分段数组 */
+    COLORREF m_crSep;           /**< 分割线颜色 */
+  protected:
+    STDMETHOD_(void, onAnimationEnd)(THIS_ IValueAnimator *pAnimator) OVERRIDE;
+    STDMETHOD_(void, onAnimationUpdate)(THIS_ IValueAnimator *pAnimator) OVERRIDE;
+
+  protected:
     STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int nParentWid, int nParentHei);
 
-    STDMETHOD_(void, onAnimationUpdate)(IValueAnimator *p) OVERRIDE;
-
-    virtual void OnColorize(COLORREF cr) override;
-
-    virtual void OnScaleChanged(int scale) override;
+    void OnColorize(COLORREF cr) override;
+    void OnScaleChanged(int scale) override;
+    SStringT GetTooltip(CPoint pt) const override;
     void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer) override;
 
-    void OnSetAnimateStep(int nStep) override;
+    void DrawPos(IRenderTarget *pRT, const CRect &rcClient) override;
+    void DrawOthers(IRenderTarget *pRT, const CRect &rcClient) override;
+    void OnValueChanged(int nValue, int reason) override;
 
-    void DrawPos(IRenderTarget *pRT, const CRect& rcClient) override;
-    void DrawExtend(IRenderTarget *pRT, const CRect& rcClient) override;
-
-    /**
-     * SSliderBar::GetPartRect
-     * @brief
-     * @param    UINT uSBCode
-     *
-     * Describe
-     */
     CRect GetPartRect(const CRect &rcClient, UINT uSBCode) const override;
-    CRect GetPartRect(UINT uSBCode) const;
     RANGE _GetPartRange(int nLength, int nThumbSize, BOOL bThumbInRail, int nMin, int nMax, int nValue, UINT uSBCode) const;
 
+    int HitTest(CPoint pt);
+
+    void ShowValueInTip(int nValue);
+
+    LRESULT NotifyPos(SliderBarAction action, int value);
+
+  protected:
     /**
      * SSliderBar::OnLButtonUp
      * @brief    左键抬起
@@ -158,19 +233,30 @@ class SOUI_EXP SSliderBar : public SProgress {
     void OnMouseMove(UINT nFlags, CPoint point);
 
     /**
+     * SSliderBar::OnMouseHover
+     * @brief    鼠标移动事件
+     * @param    UINT nFlags --  虚拟键标志
+     * @param    CPoint point -- 坐标
+     *
+     * Describe  消息响应函数
+     */
+    void OnMouseHover(UINT nFlags, CPoint point);
+
+    /**
      * SSliderBar::OnMouseLeave
      * @brief    鼠标移动事件
      *
      * Describe  消息响应函数
      */
     void OnMouseLeave();
-    
+
     void OnDestroy();
 
     SOUI_MSG_MAP_BEGIN()
         MSG_WM_LBUTTONDOWN(OnLButtonDown)
         MSG_WM_LBUTTONUP(OnLButtonUp)
         MSG_WM_MOUSEMOVE(OnMouseMove)
+        MSG_WM_MOUSEHOVER(OnMouseHover)
         MSG_WM_MOUSELEAVE(OnMouseLeave)
         MSG_WM_DESTROY(OnDestroy)
     SOUI_MSG_MAP_END()
@@ -180,7 +266,10 @@ class SOUI_EXP SSliderBar : public SProgress {
         ATTR_BOOL(L"thumbInRail", m_bThumbInRail, TRUE)
         ATTR_BOOL(L"drawRail", m_bDrawRail, TRUE)
         ATTR_BOOL(L"dragTip", m_bDragTip, TRUE)
-        ATTR_CHAIN_PTR(m_thumbAni, 0)
+        ATTR_BOOL(L"animate", m_bEnableAnimate, FALSE)
+        ATTR_COLOR(L"sepColor", m_crSep, TRUE)
+        ATTR_CHAIN_PREFIX(*m_thumbAni, 0, L"thumb:")
+        ATTR_CHAIN_PREFIX(*m_valueAni, 0, L"value:")
     SOUI_ATTRS_END()
 };
 

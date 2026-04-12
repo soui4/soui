@@ -117,7 +117,7 @@ SWindow *SSearchDropdownList::GetDropDownOwner()
 
 void SSearchDropdownList::OnCreateDropDown(SDropDownWnd *pDropDown)
 {
-    GetContainer()->OnDropdownState(pDropDown,TRUE);
+    GetContainer()->OnDropdownState(pDropDown, TRUE);
     pDropDown->GetRoot()->InsertChild(m_pListBox);
     pDropDown->GetRoot()->UpdateChildrenPosition();
     m_pListBox->SetVisible(TRUE);
@@ -126,7 +126,7 @@ void SSearchDropdownList::OnCreateDropDown(SDropDownWnd *pDropDown)
 
 void SSearchDropdownList::OnDestroyDropDown(SDropDownWnd *pDropDown)
 {
-    GetContainer()->OnDropdownState(pDropDown,FALSE);
+    GetContainer()->OnDropdownState(pDropDown, FALSE);
     if (pDropDown->GetExitCode() == IDOK)
     {
         // selected item

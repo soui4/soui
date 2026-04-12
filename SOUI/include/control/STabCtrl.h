@@ -149,9 +149,7 @@ class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
         Text_Horz,
         Text_Vert,
     } m_txtDir;
-    int m_nAnimateSteps; /**< Number of animation steps. */
-    int m_nAniamteType;  /**< Animation style. */
-    SAutoRefPtr<IInterpolator> m_aniInterpolator;
+    SAutoRefPtr<SFloatAnimator> m_aniSlider;
 
   public:
     /**
@@ -458,10 +456,7 @@ class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
             ATTR_ENUM_VALUE(L"vert", Text_Vert)       /**< Vertical text direction. */
             ATTR_ENUM_VALUE(L"vertical", Text_Vert)   /**< Vertical text direction. */
         ATTR_ENUM_END(m_txtDir)
-        ATTR_INT(L"animateSteps", m_nAnimateSteps, FALSE)            /**< Number of animation steps. */
-        ATTR_INT(L"animateType", m_nAniamteType, FALSE)              /**< Animation style. */
-        ATTR_INTERPOLATOR(L"interpolator", m_aniInterpolator, FALSE) /**< Interpolator for animations. */
-        ATTR_CHAIN_PTR(m_aniInterpolator, 0)                         /**< Chain attributes to interpolator. */
+        ATTR_CHAIN_PTR(m_aniSlider, 0) /**< Chain attributes to slider animator. */
     SOUI_ATTRS_END()
 };
 

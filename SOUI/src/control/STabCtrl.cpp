@@ -6,21 +6,20 @@ SNSBEGIN
 
 class STabSlider
     : public SWindow
-    , public ITimelineHandler {
+    , public IAnimatorUpdateListener
+    , public SAnimatorListener {
     DEF_SOBJECT(SWindow, L"tabslider")
 
   public:
-    STabSlider(STabCtrl *pTabCtrl, int iFrom, int iTo, int nSteps, int nType, IInterpolator *pInterpolator)
+    STabSlider(STabCtrl *pTabCtrl, int iFrom, int iTo)
         : m_pTabCtrl(pTabCtrl)
-        , m_aniInterpoloator(pInterpolator)
-        , m_nSteps(nSteps)
-        , m_iStep(0)
         , m_iFrom(iFrom)
         , m_iTo(iTo)
     {
         SASSERT(pTabCtrl);
-        SASSERT(pInterpolator);
         m_bClipClient = TRUE;
+        pTabCtrl->m_aniSlider->addListener(this);
+        pTabCtrl->m_aniSlider->addUpdateListener(this);
 
         m_bVertical = pTabCtrl->m_nTabAlign == STabCtrl::AlignLeft || pTabCtrl->m_nTabAlign == STabCtrl::AlignRight;
         pTabCtrl->GetRoot()->UpdateLayout();
@@ -56,7 +55,6 @@ class STabSlider
         m_rtPageFrom->EndDraw();
         m_rtPageFrom->SetViewportOrg(CPoint());
         IBitmapS *pBmp = (IBitmapS *)m_rtPageFrom->GetCurrentObject(OT_BITMAP);
-        // pBmp->Save2(L"d:/pagefrom.png",Img_PNG);
 
         // render page to content to m_rtPageTo
         GETRENDERFACTORY->CreateRenderTarget(&m_rtPageTo, rcPage.Width(), rcPage.Height());
@@ -72,29 +70,17 @@ class STabSlider
         m_rtPageTo->SetViewportOrg(CPoint());
 
         pBmp = (IBitmapS *)m_rtPageTo->GetCurrentObject(OT_BITMAP);
-        // pBmp->Save2(L"d:/pageTo.png",Img_PNG);
         // hide page from and page to
         pageFrom->SetVisible(FALSE);
         pageTo->SetVisible(FALSE);
-
-        GetContainer()->RegisterTimelineHandler(this);
+        pTabCtrl->m_aniSlider->start(GetContainer());
         SetVisible(TRUE, TRUE);
     }
 
     virtual ~STabSlider()
     {
-    }
-
-    STDMETHOD_(void, OnNextFrame)(THIS_) OVERRIDE
-    {
-        if (++m_iStep > m_nSteps)
-        {
-            Stop();
-        }
-        else
-        {
-            InvalidateRect(NULL);
-        }
+        m_pTabCtrl->m_aniSlider->removeListener(this);
+        m_pTabCtrl->m_aniSlider->removeUpdateListener(this);
     }
 
     void Stop()
@@ -103,12 +89,21 @@ class STabSlider
     }
 
   protected:
-    virtual void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer)
+    STDMETHOD_(void, onAnimationUpdate)(THIS_ IValueAnimator *pAnimator) OVERRIDE
+    {
+        Invalidate();
+    }
+    STDMETHOD_(void, onAnimationEnd)(THIS_ IValueAnimator *pAnimator) OVERRIDE
+    {
+        Stop();
+    }
+
+    void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer) override
     {
         if (pOldContainer)
-            pOldContainer->UnregisterTimelineHandler(this);
-        if (pNewContainer)
-            pNewContainer->RegisterTimelineHandler(this);
+        {
+            m_pTabCtrl->m_aniSlider->end();
+        }
         SWindow::OnContainerChanged(pOldContainer, pNewContainer);
     }
 
@@ -124,7 +119,7 @@ class STabSlider
     void OnPaint(IRenderTarget *pRT)
     {
         CRect rcWnd = GetClientRect();
-        float fraction = m_aniInterpoloator->getInterpolation(m_iStep / (float)m_nSteps);
+        float fraction = m_pTabCtrl->m_aniSlider->getAnimatedFraction();
         if (m_pTabCtrl->m_nTabAlign == STabCtrl::AlignMiddle)
         {
             int nHeight = rcWnd.Height();
@@ -242,16 +237,13 @@ class STabSlider
 
     void OnDestroy()
     {
-        GetContainer()->UnregisterTimelineHandler(this);
+        m_pTabCtrl->m_aniSlider->end();
         SWindow::OnDestroy();
     }
 
     SAutoRefPtr<IRenderTarget> m_rtPageFrom, m_rtPageTo;
     int m_iFrom, m_iTo;
-    int m_nSteps;
-    int m_iStep;
     bool m_bVertical;
-    SAutoRefPtr<IInterpolator> m_aniInterpoloator;
     STabCtrl *m_pTabCtrl;
     SOUI_MSG_MAP_BEGIN()
         MSG_WM_PAINT_EX(OnPaint)
@@ -273,18 +265,15 @@ STabCtrl::STabCtrl()
     , m_nTabPos(0, px)
     , m_nHoverTabItem(-1)
     , m_nTabAlign(AlignTop)
-    , m_nAnimateSteps(0)
     , m_tabSlider(NULL)
     , m_txtDir(Text_Horz)
-    , m_nAniamteType(0)
 {
     m_ptText[0] = m_ptText[1] = SLayoutSize(-1.f, px);
     m_szTab[0] = m_szTab[1] = SLayoutSize(-1.f, px);
 
     m_bFocusable = TRUE;
-    // create a linear animation interpolator
-    m_aniInterpolator.Attach(SApplication::getSingleton().CreateInterpolatorByName(SLinearInterpolator::GetClassName()));
-
+    m_aniSlider.Attach(new SFloatAnimator);
+    m_aniSlider->setDuration(0); // default no animation
     m_evtSet.addEvent(EVENTID(EventTabSelChanging));
     m_evtSet.addEvent(EVENTID(EventTabSelChanged));
     m_evtSet.addEvent(EVENTID(EventTabItemHover));
@@ -570,9 +559,9 @@ BOOL STabCtrl::SetCurSel(int nIndex)
     {
         m_tabSlider->Stop();
     }
-    if (m_nAnimateSteps && IsVisible(TRUE) && nOldPage != -1 && nIndex != -1)
+    if (m_aniSlider->getDuration() > 0 && IsVisible(TRUE) && nOldPage != -1 && nIndex != -1)
     {
-        m_tabSlider = new STabSlider(this, nOldPage, nIndex, m_nAnimateSteps, m_nAniamteType, m_aniInterpolator);
+        m_tabSlider = new STabSlider(this, nOldPage, nIndex);
     }
     else
     {

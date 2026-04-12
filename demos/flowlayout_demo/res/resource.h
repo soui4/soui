@@ -1,4 +1,4 @@
-﻿//stamp:07727d508de39ad3
+﻿//stamp:077320decfdc5231
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -16,6 +16,9 @@
 			const TCHAR * color;
 			const TCHAR * skin;
 			}values;
+		struct _svg{
+			const TCHAR * svg_xmusic;
+			}svg;
 		struct _ICON{
 			const TCHAR * ICON_LOGO;
 			}ICON;
@@ -33,6 +36,9 @@ struct _UIRES UIRES={
 			_T("values:string"),
 			_T("values:color"),
 			_T("values:skin"),
+		},
+		{
+			_T("svg:svg_xmusic"),
 		},
 		{
 			_T("ICON:ICON_LOGO"),

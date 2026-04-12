@@ -28,7 +28,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
     SAppCfg cfg;
     SStringT srcDir = getResourceDir();
     SStringT appDir = app.GetAppDir();
-    cfg.SetRender(Render_Skia).SetImgDecoder(ImgDecoder_Stb).SetAppDir(srcDir).SetLog(TRUE);
+    cfg.SetRender(Render_Gdi).SetImgDecoder(ImgDecoder_Stb).SetAppDir(srcDir).SetLog(TRUE);
 #ifdef _WIN32
     cfg.SetSysResPeFile(SYS_NAMED_RESOURCE);
 #else

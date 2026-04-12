@@ -339,7 +339,7 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
      * @param bCreate TRUE if the dropdown window is being created, FALSE if it is being destroyed.
      * @return void
      */
-    STDMETHOD_(void, OnDropdownState)(THIS_ IHostWnd *pDropdown, BOOL bCreate) PURE;
+    STDMETHOD_(void, OnDropdownState)(THIS_ IHostWnd * pDropdown, BOOL bCreate) PURE;
 };
 
 SNSEND

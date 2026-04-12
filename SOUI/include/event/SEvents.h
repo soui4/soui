@@ -623,7 +623,7 @@ typedef enum _SliderBarAction
 {
     SBA_MOUSE_DOWN = 0,
     SBA_MOUSE_MOVING,
-    SBA_MOUSE_UP
+    SBA_MOUSE_UP,
 } SliderBarAction;
 
 DEF_EVT(EventSliderPos, EVT_SLIDER_POS, on_slider_pos, {

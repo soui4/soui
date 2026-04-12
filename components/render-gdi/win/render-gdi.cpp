@@ -2922,9 +2922,7 @@ static void renderNSVGshape(Gdiplus::Graphics &graphics, const NSVGimage *image,
                             pos[i] = grad->stops[i].offset;
                             colors[i] = nsvgColorToGdipColor(grad->stops[i].color, opacity);
                         }
-                        
-                        Gdiplus::Matrix gradMatrix(grad->xform[0], grad->xform[1], grad->xform[2], grad->xform[3], grad->xform[4], grad->xform[5]);
-                        
+                                                
                         // Get path bounds for gradient calculation
                         Gdiplus::RectF bounds;
                         gp.GetBounds(&bounds);
@@ -2953,8 +2951,23 @@ static void renderNSVGshape(Gdiplus::Graphics &graphics, const NSVGimage *image,
                             float radius = nsvgConvertToPixels(grad->radial.r, 0, (width + height)/2, 25);            
 
                             Gdiplus::PointF center(cx, cy);
+                            
+                            // Calculate minimum radius to cover the entire target shape
+                            // Find max distance from center to corners of bounds rectangle
+                            float dx1 = bounds.X - center.X;
+                            float dy1 = bounds.Y - center.Y;
+                            float dx2 = (bounds.X + width) - center.X;
+                            float dy2 = (bounds.Y + height) - center.Y;
+                            
+                            float dist1 = sqrt(dx1 * dx1 + dy1 * dy1);
+                            float dist2 = sqrt(dx2 * dx2 + dy1 * dy1);
+                            float dist3 = sqrt(dx1 * dx1 + dy2 * dy2);
+                            float dist4 = sqrt(dx2 * dx2 + dy2 * dy2);
+                            
+                            float minRadius = max(radius, max(dist1, max(dist2, max(dist3, dist4))));
+                            
                             Gdiplus::GraphicsPath path;
-                            path.AddEllipse(center.X - radius, center.Y - radius, radius * 2, radius * 2);
+                            path.AddEllipse(center.X - minRadius, center.Y - minRadius, minRadius * 2, minRadius * 2);
                             Gdiplus::PathGradientBrush brush(&path);
                             brush.SetInterpolationColors(colors, pos, nstops);
                             brush.SetWrapMode((Gdiplus::WrapMode)grad->spread);
@@ -2965,20 +2978,101 @@ static void renderNSVGshape(Gdiplus::Graphics &graphics, const NSVGimage *image,
             }
             else if (order == NSVG_PAINT_STROKE && shape->stroke.type != NSVG_PAINT_NONE && shape->strokeWidth > 0)
             {
-                Gdiplus::Pen pen(nsvgPaintToGdipColor(&shape->stroke, opacity), (Gdiplus::REAL)shape->strokeWidth);
-                pen.SetLineCap(nsvgCapToGdipCap(shape->strokeLineCap), nsvgCapToGdipCap(shape->strokeLineCap), Gdiplus::DashCapFlat);
-                pen.SetLineJoin(nsvgJoinToGdipJoin(shape->strokeLineJoin));
-                pen.SetMiterLimit((Gdiplus::REAL)shape->miterLimit);
+                Gdiplus::Pen *pPen = NULL;
                 
-                // Set dash pattern if specified
-                if (shape->strokeDashCount > 0)
+                // Handle stroke with gradient support
+                if (shape->stroke.type == NSVG_PAINT_COLOR)
                 {
-                    pen.SetDashStyle(Gdiplus::DashStyleCustom);
-                    pen.SetDashOffset((Gdiplus::REAL)shape->strokeDashOffset);
-                    pen.SetDashPattern(shape->strokeDashArray, shape->strokeDashCount);
+                    pPen = new Gdiplus::Pen(nsvgPaintToGdipColor(&shape->stroke, opacity), (Gdiplus::REAL)shape->strokeWidth);
+                }
+                else if (shape->stroke.type == NSVG_PAINT_LINEAR_GRADIENT || shape->stroke.type == NSVG_PAINT_RADIAL_GRADIENT)
+                {
+                    NSVGgradient *grad = shape->stroke.gradient;
+                    if (grad && grad->nstops > 0)
+                    {
+                        int nstops = grad->nstops > 8 ? 8 : grad->nstops;
+                        Gdiplus::Color colors[8];
+                        Gdiplus::REAL pos[8];
+                        for (int i = 0; i < nstops; i++)
+                        {
+                            pos[i] = grad->stops[i].offset;
+                            colors[i] = nsvgColorToGdipColor(grad->stops[i].color, opacity);
+                        }
+                        
+                        // Get path bounds for gradient calculation
+                        Gdiplus::RectF bounds;
+                        gp.GetBounds(&bounds);
+                        float width = bounds.Width;
+                        float height = bounds.Height;
+
+                        if (shape->stroke.type == NSVG_PAINT_LINEAR_GRADIENT)
+                        {
+                            // Calculate gradient points based on transform
+                            float x1 = nsvgConvertToPixels(grad->linear.x1, bounds.X, width, 0);
+                            float y1 = nsvgConvertToPixels(grad->linear.y1, bounds.Y, height, 0);
+                            float x2 = nsvgConvertToPixels(grad->linear.x2, bounds.X, width, 0);
+                            float y2 = nsvgConvertToPixels(grad->linear.y2, bounds.Y, height, 0);
+
+                            Gdiplus::PointF pt1(x1, y1);
+                            Gdiplus::PointF pt2(x2, y2);
+                            Gdiplus::LinearGradientBrush *pBrush = new Gdiplus::LinearGradientBrush(pt1, pt2, colors[0], colors[nstops - 1]);
+                            pBrush->SetInterpolationColors(colors, pos, nstops);
+                            pBrush->SetWrapMode((Gdiplus::WrapMode)grad->spread);
+                            
+                            pPen = new Gdiplus::Pen(pBrush, (Gdiplus::REAL)shape->strokeWidth);
+                            delete pBrush; // Pen copies the brush
+                        }
+                        else // RADIAL_GRADIENT
+                        {
+                            float cx = nsvgConvertToPixels(grad->radial.cx, bounds.X, width, 0);
+                            float cy = nsvgConvertToPixels(grad->radial.cy, bounds.Y, height, 0);
+                            float radius = nsvgConvertToPixels(grad->radial.r, 0, (width + height)/2, 25);
+
+                            Gdiplus::PointF center(cx, cy);
+                            
+                            // Calculate minimum radius to cover the entire target shape
+                            // Find max distance from center to corners of bounds rectangle
+                            float dx1 = bounds.X - center.X;
+                            float dy1 = bounds.Y - center.Y;
+                            float dx2 = (bounds.X + width) - center.X;
+                            float dy2 = (bounds.Y + height) - center.Y;
+                            
+                            float dist1 = sqrt(dx1 * dx1 + dy1 * dy1);
+                            float dist2 = sqrt(dx2 * dx2 + dy1 * dy1);
+                            float dist3 = sqrt(dx1 * dx1 + dy2 * dy2);
+                            float dist4 = sqrt(dx2 * dx2 + dy2 * dy2);
+                            
+                            float minRadius = max(radius, max(dist1, max(dist2, max(dist3, dist4))));
+                            
+                            Gdiplus::GraphicsPath ellipsePath;
+                            ellipsePath.AddEllipse(center.X - minRadius, center.Y - minRadius, minRadius * 2, minRadius * 2);
+                            Gdiplus::PathGradientBrush *pBrush = new Gdiplus::PathGradientBrush(&ellipsePath);
+                            pBrush->SetInterpolationColors(colors, pos, nstops);
+                            pBrush->SetWrapMode((Gdiplus::WrapMode)grad->spread);
+                            
+                            pPen = new Gdiplus::Pen(pBrush, (Gdiplus::REAL)shape->strokeWidth);
+                            delete pBrush; // Pen copies the brush
+                        }
+                    }
                 }
                 
-                graphics.DrawPath(&pen, &gp);
+                if (pPen)
+                {
+                    pPen->SetLineCap(nsvgCapToGdipCap(shape->strokeLineCap), nsvgCapToGdipCap(shape->strokeLineCap), Gdiplus::DashCapFlat);
+                    pPen->SetLineJoin(nsvgJoinToGdipJoin(shape->strokeLineJoin));
+                    pPen->SetMiterLimit((Gdiplus::REAL)shape->miterLimit);
+                    
+                    // Set dash pattern if specified
+                    if (shape->strokeDashCount > 0)
+                    {
+                        pPen->SetDashStyle(Gdiplus::DashStyleCustom);
+                        pPen->SetDashOffset((Gdiplus::REAL)shape->strokeDashOffset);
+                        pPen->SetDashPattern(shape->strokeDashArray, shape->strokeDashCount);
+                    }
+                    
+                    graphics.DrawPath(pPen, &gp);
+                    delete pPen;
+                }
             }
         }
     }

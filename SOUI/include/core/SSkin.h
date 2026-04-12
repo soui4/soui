@@ -1420,6 +1420,5 @@ class SOUI_EXP SSkinTreeLines : public SSkinObjBase {
     SOUI_ATTRS_END()
 };
 
-
 SNSEND
 #endif // __SSKIN__H__

@@ -134,9 +134,9 @@ STDMETHODIMP SAccProxyActiveX::get_accRole(VARIANT *pvarRole)
 
 STDMETHODIMP SAccProxyCalendar::get_accRole(VARIANT *pvarRole)
 {
-    //todo:hjx
+    // todo:hjx
     pvarRole->vt = VT_I4;
-    //pvarRole->lVal = ROLE_SYSTEM_CALENDAR;
+    // pvarRole->lVal = ROLE_SYSTEM_CALENDAR;
     return S_OK;
 }
 
@@ -184,9 +184,9 @@ STDMETHODIMP SAccProxyFrame::get_accRole(VARIANT *pvarRole)
 
 STDMETHODIMP SAccProxyHeaderCtrl::get_accRole(VARIANT *pvarRole)
 {
-    //todo:hjx
+    // todo:hjx
     pvarRole->vt = VT_I4;
-    //pvarRole->lVal = ROLE_SYSTEM_LISTHEADER;
+    // pvarRole->lVal = ROLE_SYSTEM_LISTHEADER;
     return S_OK;
 }
 

@@ -129,7 +129,7 @@ SSkinObjBase::SSkinObjBase()
 
 SSkinObjBase::~SSkinObjBase()
 {
-	//SLOGI()<<"skin free, name="<<GetName();
+    // SLOGI()<<"skin free, name="<<GetName();
 }
 
 void SSkinObjBase::OnInitFinished(IXmlNode *pNode)

@@ -50,7 +50,7 @@ void STrText::TranslateText()
     strTr = S_CW2T(str);
 }
 
-SStringW STrText::TranslateText2(const SStringW & _strRaw) const
+SStringW STrText::TranslateText2(const SStringW &_strRaw) const
 {
     if (pOwner == NULL)
         return _strRaw;
@@ -746,6 +746,11 @@ int SWindow::GetWindowText(TCHAR *pBuf, int nBufLen, BOOL bRawText) const
     return nRet;
 }
 
+SStringT SWindow::GetTooltip(CPoint pt) const
+{
+    return m_strToolTipText.GetText(FALSE);
+}
+
 BOOL SWindow::UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo)
 {
     tipInfo.swnd = m_swnd;
@@ -773,9 +778,10 @@ BOOL SWindow::UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo)
     }
     else
     {
-        if (m_strToolTipText.GetText(FALSE).IsEmpty())
+        strTip = GetToolTipText();
+        if (strTip.IsEmpty())
             return FALSE;
-        tipInfo.strTip = m_strToolTipText.GetText(FALSE);
+        tipInfo.strTip = strTip;
     }
     return TRUE;
 }

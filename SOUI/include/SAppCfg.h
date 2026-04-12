@@ -340,16 +340,6 @@ SAppCfg &SAppCfg::EnableMultiLang(const SStringT &langResId, BOOL bEnable)
 
 BOOL SAppCfg::DoConfig(SApplication *pApp) const
 {
-    if (m_appResDesc->m_type == ResType_Unknown)
-    {
-        SSLOGW() << "app resource file not specified";
-        return FALSE;
-    }
-    if (m_sysResDesc->m_type == ResType_Unknown)
-    {
-        SSLOGW() << "system resource file not specified";
-        return FALSE;
-    }
     if (!m_appDir.IsEmpty() && GetFileAttributes(m_appDir) != INVALID_FILE_ATTRIBUTES)
     {
         pApp->SetAppDir(m_appDir);
@@ -402,7 +392,7 @@ BOOL SAppCfg::DoConfig(SApplication *pApp) const
     pRendFac->SetImgDecoderFactory(pImgDecoderFac);
     pApp->SetRenderFactory(pRendFac);
 
-    {
+    if(m_sysResDesc->m_type !=ResType_Unknown){
         HMODULE hModResource = 0;
         // load system resource
         SResLoader resLoader(pRendFac);
@@ -442,7 +432,7 @@ BOOL SAppCfg::DoConfig(SApplication *pApp) const
         }
     }
 
-    {
+    if(ResType_Unknown!=m_appResDesc->m_type){
         // load application resource.
         SResLoader resLoader(pRendFac);
         BOOL bLoaded = FALSE;

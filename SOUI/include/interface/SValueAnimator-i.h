@@ -320,5 +320,19 @@ DECLARE_INTERFACE_(IAnimatorGroup, IObjRef)
     STDMETHOD_(void, SetListener)(THIS_ IAnimatorGroupListerer * listener) PURE;
 };
 
+#ifdef __cplusplus
+class SAnimatorListener : public IAnimatorListener {
+    STDMETHOD_(void, onAnimationStart)(THIS_ IValueAnimator *pAnimator)
+    {
+    }
+    STDMETHOD_(void, onAnimationEnd)(THIS_ IValueAnimator *pAnimator)
+    {
+    }
+    STDMETHOD_(void, onAnimationRepeat)(THIS_ IValueAnimator *pAnimator)
+    {
+    }
+};
+#endif //__cplusplus
+
 SNSEND
 #endif // __SVALUEANIMATOR_I__H__

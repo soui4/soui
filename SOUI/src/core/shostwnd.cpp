@@ -2177,7 +2177,8 @@ void SHostWnd::EnableHostPrivateUiDef(THIS_ BOOL bEnable)
     EnablePrivateUiDef(bEnable);
 }
 
-void SHostWnd::OnDropdownState(IHostWnd *pDropdownWnd, BOOL bCreate){
+void SHostWnd::OnDropdownState(IHostWnd *pDropdownWnd, BOOL bCreate)
+{
     EnablePrivateUiDef(bCreate);
 }
 

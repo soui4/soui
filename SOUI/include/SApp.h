@@ -93,6 +93,52 @@ interface SOUI_EXP ISystemObjectRegister
 };
 
 /**
+ * @class SObjectEmptyRegister
+ * @brief Empty implementation of ISystemObjectRegister.
+ *
+ * This class provides an empty implementation for registering various system
+ * objects into the object factory by implementing the ISystemObjectRegister interface.
+ */
+class SOUI_EXP SObjectEmptyRegister : public ISystemObjectRegister {
+  public:
+    /**
+     * @brief Register window objects into the object factory.
+     * @param objFactory Pointer to the object factory manager.
+     */
+    void RegisterWindows(SObjectFactoryMgr *objFactory) const{}
+
+    /**
+     * @brief Register skin objects into the object factory.
+     * @param objFactory Pointer to the object factory manager.
+     */
+    void RegisterSkins(SObjectFactoryMgr *objFactory) const{}
+
+    /**
+     * @brief Register layout objects into the object factory.
+     * @param objFactory Pointer to the object factory manager.
+     */
+    void RegisterLayouts(SObjectFactoryMgr *objFactory) const{}
+
+    /**
+     * @brief Register interpolator objects into the object factory.
+     * @param objFactory Pointer to the object factory manager.
+     */
+    void RegisterInterpolator(SObjectFactoryMgr *objFactory) const{}
+
+    /**
+     * @brief Register animation objects into the object factory.
+     * @param objFactory Pointer to the object factory manager.
+     */
+    void RegisterAnimation(SObjectFactoryMgr *objFactory) const{}
+
+    /**
+     * @brief Register value animator objects into the object factory.
+     * @param objFactory Pointer to the object factory manager.
+     */
+    void RegisterValueAnimator(SObjectFactoryMgr *objFactory) const{}
+};
+
+/**
  * @class SObjectDefaultRegister
  * @brief Default implementation of ISystemObjectRegister.
  *

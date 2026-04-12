@@ -11,7 +11,7 @@
 
 SNSBEGIN
 
-typedef bool (* Fun_Colorize)(COLORREF &crTarget, COLORREF crRef);
+typedef bool (*Fun_Colorize)(COLORREF &crTarget, COLORREF crRef);
 
 /**
  * Colorizes an SVG image by modifying all colors in the image.
@@ -21,67 +21,82 @@ typedef bool (* Fun_Colorize)(COLORREF &crTarget, COLORREF crRef);
  * @return True if the image was colorized successfully, false otherwise.
  * @see Fun_Colorize
  */
-static void ColorizeSVG(NSVGimage* image, Fun_Colorize fun, COLORREF color)
+static void ColorizeSVG(NSVGimage *image, Fun_Colorize fun, COLORREF color)
 {
-	if (!image) return;
+    if (!image)
+        return;
 
-	// Process shapes
-	NSVGshape* shape = image->shapes;
-	while (shape) {
-		// Process fill color
-		if (shape->fill.type == NSVG_PAINT_COLOR) {
-			fun((COLORREF&)shape->fill.color, color);
-		} else if (shape->fill.type == NSVG_PAINT_LINEAR_GRADIENT || 
-				 shape->fill.type == NSVG_PAINT_RADIAL_GRADIENT) {
-			// Process gradient stops
-			NSVGgradient* grad = shape->fill.gradient;
-			if (grad) {
-				int i;
-				for (i = 0; i < grad->nstops; i++) {
-                    fun((COLORREF&)grad->stops[i].color, color);
-				}
-			}
-		}
+    // Process shapes
+    NSVGshape *shape = image->shapes;
+    while (shape)
+    {
+        // Process fill color
+        if (shape->fill.type == NSVG_PAINT_COLOR)
+        {
+            fun((COLORREF &)shape->fill.color, color);
+        }
+        else if (shape->fill.type == NSVG_PAINT_LINEAR_GRADIENT || shape->fill.type == NSVG_PAINT_RADIAL_GRADIENT)
+        {
+            // Process gradient stops
+            NSVGgradient *grad = shape->fill.gradient;
+            if (grad)
+            {
+                int i;
+                for (i = 0; i < grad->nstops; i++)
+                {
+                    fun((COLORREF &)grad->stops[i].color, color);
+                }
+            }
+        }
 
-		// Process stroke color
-		if (shape->stroke.type == NSVG_PAINT_COLOR) {
+        // Process stroke color
+        if (shape->stroke.type == NSVG_PAINT_COLOR)
+        {
             fun((COLORREF &)shape->stroke.color, color);
-		} else if (shape->stroke.type == NSVG_PAINT_LINEAR_GRADIENT || 
-				 shape->stroke.type == NSVG_PAINT_RADIAL_GRADIENT) {
-			// Process gradient stops
-			NSVGgradient* grad = shape->stroke.gradient;
-			if (grad) {
-				int i;
-				for (i = 0; i < grad->nstops; i++) {
-                    fun((COLORREF&)grad->stops[i].color, color);
-				}
-			}
-		}
+        }
+        else if (shape->stroke.type == NSVG_PAINT_LINEAR_GRADIENT || shape->stroke.type == NSVG_PAINT_RADIAL_GRADIENT)
+        {
+            // Process gradient stops
+            NSVGgradient *grad = shape->stroke.gradient;
+            if (grad)
+            {
+                int i;
+                for (i = 0; i < grad->nstops; i++)
+                {
+                    fun((COLORREF &)grad->stops[i].color, color);
+                }
+            }
+        }
 
-		shape = shape->next;
-	}
+        shape = shape->next;
+    }
 
-	// Process text elements
-	NSVGtext* text = image->texts;
-	while (text) {
-        fun((COLORREF&)text->fillColor, color);
-		text = text->next;
-	}
+    // Process text elements
+    NSVGtext *text = image->texts;
+    while (text)
+    {
+        fun((COLORREF &)text->fillColor, color);
+        text = text->next;
+    }
 }
 
 // 辅助函数：绘制SVG九宫格
 static void DrawSVG9Patch(IRenderTarget *pRT, ISvgObj *pSvg, LPCRECT pRect, LPCRECT prcSrc, LPCRECT prcMargin, BYTE byAlpha)
 {
-    if (!pRT || !pSvg || !pRect || !prcMargin) return;
+    if (!pRT || !pSvg || !pRect || !prcMargin)
+        return;
 
     float srcX = 0, srcY = 0, srcWidth, srcHeight;
-    if (prcSrc) {
+    if (prcSrc)
+    {
         srcX = (float)prcSrc->left;
         srcY = (float)prcSrc->top;
         srcWidth = (float)(prcSrc->right - prcSrc->left);
         srcHeight = (float)(prcSrc->bottom - prcSrc->top);
-    } else {
-        NSVGimage* pImg = (NSVGimage*)pSvg->GetPtr();
+    }
+    else
+    {
+        NSVGimage *pImg = (NSVGimage *)pSvg->GetPtr();
         srcWidth = pImg->width;
         srcHeight = pImg->height;
     }
@@ -105,65 +120,74 @@ static void DrawSVG9Patch(IRenderTarget *pRT, ISvgObj *pSvg, LPCRECT pRect, LPCR
 
     // 绘制9个部分
     // 左上角
-    if (marginL > 0 && marginT > 0) {
-        RECT rcSrc = {(LONG)srcX, (LONG)srcY, (LONG)(srcX + marginL), (LONG)(srcY + marginT)};
-        RECT rcDst = {pRect->left, pRect->top, (LONG)(pRect->left + marginL), (LONG)(pRect->top + marginT)};
+    if (marginL > 0 && marginT > 0)
+    {
+        RECT rcSrc = { (LONG)srcX, (LONG)srcY, (LONG)(srcX + marginL), (LONG)(srcY + marginT) };
+        RECT rcDst = { pRect->left, pRect->top, (LONG)(pRect->left + marginL), (LONG)(pRect->top + marginT) };
         pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
     }
 
     // 上边
-    if (marginT > 0 && dstMidW > 0) {
-        RECT rcSrc = {(LONG)srcMidX, (LONG)srcY, (LONG)(srcMidX + srcMidW), (LONG)(srcY + marginT)};
-        RECT rcDst = {(LONG)dstMidX, pRect->top, (LONG)(dstMidX + dstMidW), (LONG)(pRect->top + marginT)};
+    if (marginT > 0 && dstMidW > 0)
+    {
+        RECT rcSrc = { (LONG)srcMidX, (LONG)srcY, (LONG)(srcMidX + srcMidW), (LONG)(srcY + marginT) };
+        RECT rcDst = { (LONG)dstMidX, pRect->top, (LONG)(dstMidX + dstMidW), (LONG)(pRect->top + marginT) };
         pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
     }
 
     // 右上角
-    if (marginR > 0 && marginT > 0) {
-        RECT rcSrc = {(LONG)(srcX + srcWidth - marginR), (LONG)srcY, (LONG)(srcX + srcWidth), (LONG)(srcY + marginT)};
-        RECT rcDst = {(LONG)(pRect->right - marginR), pRect->top, pRect->right, (LONG)(pRect->top + marginT)};
+    if (marginR > 0 && marginT > 0)
+    {
+        RECT rcSrc = { (LONG)(srcX + srcWidth - marginR), (LONG)srcY, (LONG)(srcX + srcWidth), (LONG)(srcY + marginT) };
+        RECT rcDst = { (LONG)(pRect->right - marginR), pRect->top, pRect->right, (LONG)(pRect->top + marginT) };
         pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
     }
 
     // 左边
-    if (marginL > 0 && dstMidH > 0) {
-        RECT rcSrc = {(LONG)srcX, (LONG)srcMidY, (LONG)(srcX + marginL), (LONG)(srcMidY + srcMidH)};
-        RECT rcDst = {pRect->left, (LONG)dstMidY, (LONG)(pRect->left + marginL), (LONG)(dstMidY + dstMidH)};
+    if (marginL > 0 && dstMidH > 0)
+    {
+        RECT rcSrc = { (LONG)srcX, (LONG)srcMidY, (LONG)(srcX + marginL), (LONG)(srcMidY + srcMidH) };
+        RECT rcDst = { pRect->left, (LONG)dstMidY, (LONG)(pRect->left + marginL), (LONG)(dstMidY + dstMidH) };
         pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
     }
 
     // 中间
-    if (dstMidW > 0 && dstMidH > 0) {
-        RECT rcSrc = {(LONG)srcMidX, (LONG)srcMidY, (LONG)(srcMidX + srcMidW), (LONG)(srcMidY + srcMidH)};
-        RECT rcDst = {(LONG)dstMidX, (LONG)dstMidY, (LONG)(dstMidX + dstMidW), (LONG)(dstMidY + dstMidH)};
+    if (dstMidW > 0 && dstMidH > 0)
+    {
+        RECT rcSrc = { (LONG)srcMidX, (LONG)srcMidY, (LONG)(srcMidX + srcMidW), (LONG)(srcMidY + srcMidH) };
+        RECT rcDst = { (LONG)dstMidX, (LONG)dstMidY, (LONG)(dstMidX + dstMidW), (LONG)(dstMidY + dstMidH) };
         pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
     }
 
     // 右边
-    if (marginR > 0 && dstMidH > 0) {
-        RECT rcSrc = {(LONG)(srcX + srcWidth - marginR), (LONG)srcMidY, (LONG)(srcX + srcWidth), (LONG)(srcMidY + srcMidH)};
-        RECT rcDst = {(LONG)(pRect->right - marginR), (LONG)dstMidY, pRect->right, (LONG)(dstMidY + dstMidH)};
+    if (marginR > 0 && dstMidH > 0)
+    {
+        RECT rcSrc = { (LONG)(srcX + srcWidth - marginR), (LONG)srcMidY, (LONG)(srcX + srcWidth), (LONG)(srcMidY + srcMidH) };
+        RECT rcDst = { (LONG)(pRect->right - marginR), (LONG)dstMidY, pRect->right, (LONG)(dstMidY + dstMidH) };
         pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
     }
 
     // 左下角
-    if (marginL > 0 && marginB > 0) {
-        RECT rcSrc = {(LONG)srcX, (LONG)(srcY + srcHeight - marginB), (LONG)(srcX + marginL), (LONG)(srcY + srcHeight)};
-        RECT rcDst = {pRect->left, (LONG)(pRect->bottom - marginB), (LONG)(pRect->left + marginL), pRect->bottom};
+    if (marginL > 0 && marginB > 0)
+    {
+        RECT rcSrc = { (LONG)srcX, (LONG)(srcY + srcHeight - marginB), (LONG)(srcX + marginL), (LONG)(srcY + srcHeight) };
+        RECT rcDst = { pRect->left, (LONG)(pRect->bottom - marginB), (LONG)(pRect->left + marginL), pRect->bottom };
         pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
     }
 
     // 下边
-    if (marginB > 0 && dstMidW > 0) {
-        RECT rcSrc = {(LONG)srcMidX, (LONG)(srcY + srcHeight - marginB), (LONG)(srcMidX + srcMidW), (LONG)(srcY + srcHeight)};
-        RECT rcDst = {(LONG)dstMidX, (LONG)(pRect->bottom - marginB), (LONG)(dstMidX + dstMidW), pRect->bottom};
+    if (marginB > 0 && dstMidW > 0)
+    {
+        RECT rcSrc = { (LONG)srcMidX, (LONG)(srcY + srcHeight - marginB), (LONG)(srcMidX + srcMidW), (LONG)(srcY + srcHeight) };
+        RECT rcDst = { (LONG)dstMidX, (LONG)(pRect->bottom - marginB), (LONG)(dstMidX + dstMidW), pRect->bottom };
         pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
     }
 
     // 右下角
-    if (marginR > 0 && marginB > 0) {
-        RECT rcSrc = {(LONG)(srcX + srcWidth - marginR), (LONG)(srcY + srcHeight - marginB), (LONG)(srcX + srcWidth), (LONG)(srcY + srcHeight)};
-        RECT rcDst = {(LONG)(pRect->right - marginR), (LONG)(pRect->bottom - marginB), pRect->right, pRect->bottom};
+    if (marginR > 0 && marginB > 0)
+    {
+        RECT rcSrc = { (LONG)(srcX + srcWidth - marginR), (LONG)(srcY + srcHeight - marginB), (LONG)(srcX + srcWidth), (LONG)(srcY + srcHeight) };
+        RECT rcDst = { (LONG)(pRect->right - marginR), (LONG)(pRect->bottom - marginB), pRect->right, pRect->bottom };
         pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
     }
 }
@@ -191,8 +215,8 @@ SIZE SSkinImgList::GetSkinSize() const
     {
         ret.cx = GetSvg()->GetWidth();
         ret.cy = GetSvg()->GetHeight();
-        ret.cx = ret.cx* GetScale() / 100;
-        ret.cy = ret.cy* GetScale() / 100;
+        ret.cx = ret.cx * GetScale() / 100;
+        ret.cy = ret.cy * GetScale() / 100;
     }
     else if (GetImage())
     {
@@ -246,8 +270,9 @@ void SSkinImgList::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, 
     if (!GetImage() && !GetSvg())
         return;
     SIZE sz = GetSkinSize();
-    if(GetSvg() && GetScale()!=100){
-        //restore sz to original size
+    if (GetSvg() && GetScale() != 100)
+    {
+        // restore sz to original size
         sz.cx = MulDiv(sz.cx, 100, GetScale());
         sz.cy = MulDiv(sz.cy, 100, GetScale());
     }
@@ -256,7 +281,7 @@ void SSkinImgList::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, 
         OffsetRect(&rcSrc, 0, iState * sz.cy);
     else
         OffsetRect(&rcSrc, iState * sz.cx, 0);
-    if(GetImage())
+    if (GetImage())
     {
         if (m_bTile)
         {
@@ -270,10 +295,11 @@ void SSkinImgList::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, 
         {
             pRT->DrawBitmapEx(rcDraw, GetImage(), &rcSrc, GetExpandMode(), byAlpha);
         }
-    }else{
+    }
+    else
+    {
         pRT->DrawSVG(GetSvg(), rcDraw, &rcSrc, byAlpha);
     }
-
 }
 
 UINT SSkinImgList::GetExpandMode() const
@@ -314,7 +340,7 @@ ISvgObj *SSkinImgList::GetSvg() const
 {
     if (m_pSvg)
         return m_pSvg;
-    if(m_pImg)
+    if (m_pImg)
         return NULL;
     if (m_bLazyLoad && !m_strSrc.IsEmpty())
     {
@@ -366,8 +392,8 @@ void SSkinImgList::OnColorize(COLORREF cr)
     }
     else if (GetSvg())
     {
-        NSVGimage* pImg = (NSVGimage*)GetSvg()->GetPtr();
-        ColorizeSVG(pImg,SDIBHelper::Colorize, cr);
+        NSVGimage *pImg = (NSVGimage *)GetSvg()->GetPtr();
+        ColorizeSVG(pImg, SDIBHelper::Colorize, cr);
     }
 }
 
@@ -434,12 +460,15 @@ void SSkinImgCenter::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState
     else
         OffsetRect(&rcSrc, iState * szSkin.cx, 0);
 
-    if(GetImage())
+    if (GetImage())
     {
         pRT->DrawBitmapEx(rcTarget, GetImage(), &rcSrc, GetExpandMode(), byAlpha);
-    }else{
-        if(GetScale()!=100){
-            //restore rcSrc to original size
+    }
+    else
+    {
+        if (GetScale() != 100)
+        {
+            // restore rcSrc to original size
             rcSrc.left = MulDiv(rcSrc.left, 100, GetScale());
             rcSrc.top = MulDiv(rcSrc.top, 100, GetScale());
             rcSrc.right = MulDiv(rcSrc.right, 100, GetScale());
@@ -458,8 +487,9 @@ SSkinImgFrame::SSkinImgFrame()
 void SSkinImgFrame::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const
 {
     SIZE sz = GetSkinSize();
-    if(GetSvg() && GetScale()!=100){
-        //restore sz to original size
+    if (GetSvg() && GetScale() != 100)
+    {
+        // restore sz to original size
         sz.cx = MulDiv(sz.cx, 100, GetScale());
         sz.cy = MulDiv(sz.cy, 100, GetScale());
     }
@@ -469,10 +499,12 @@ void SSkinImgFrame::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState,
     else
         pt.x = sz.cx * iState;
     CRect rcSour(pt, sz);
-    if(GetImage())
+    if (GetImage())
     {
         pRT->DrawBitmap9Patch(rcDraw, GetImage(), &rcSour, &m_rcMargin, GetExpandMode(), byAlpha);
-    }else if(GetSvg()){
+    }
+    else if (GetSvg())
+    {
         DrawSVG9Patch(pRT, GetSvg(), rcDraw, &rcSour, &m_rcMargin, byAlpha);
     }
 }
@@ -711,8 +743,9 @@ SSkinScrollbar::SSkinScrollbar()
 CRect SSkinScrollbar::GetPartRect(int nSbCode, int nState, BOOL bVertical) const
 {
     CSize sz = GetSkinSize();
-    if(GetSvg() && GetScale()!=100){
-        //restore sz to original size
+    if (GetSvg() && GetScale() != 100)
+    {
+        // restore sz to original size
         sz.cx = MulDiv(sz.cx, 100, GetScale());
         sz.cy = MulDiv(sz.cy, 100, GetScale());
     }
@@ -771,7 +804,7 @@ void SSkinScrollbar::_DrawByState(IRenderTarget *pRT, LPCRECT prcDraw, DWORD dwS
 
     CRect rcSour = GetPartRect(nSbCode, nState, bVertical);
 
-    if(GetImage())
+    if (GetImage())
     {
         pRT->DrawBitmap9Patch(prcDraw, GetImage(), &rcSour, &rcMargin, m_bTile ? EM_TILE : EM_STRETCH, byAlpha);
 
@@ -786,7 +819,9 @@ void SSkinScrollbar::_DrawByState(IRenderTarget *pRT, LPCRECT prcDraw, DWORD dwS
                 rcDraw.left += (rcDraw.Width() - rcSour.Width()) / 2, rcDraw.right = rcDraw.left + rcSour.Width();
             pRT->DrawBitmap9Patch(&rcDraw, GetImage(), &rcSour, &rcMargin, m_bTile ? EM_TILE : EM_STRETCH, byAlpha);
         }
-    }else{
+    }
+    else
+    {
         // SVG supports 9-patch now
         DrawSVG9Patch(pRT, GetSvg(), prcDraw, &rcSour, &rcMargin, byAlpha);
 
@@ -822,7 +857,7 @@ int SSkinScrollbar::GetIdealSize() const
     {
         int ret = GetSvg()->GetWidth() / 9;
         return ret * GetScale() / 100;
-    }    
+    }
     return 0;
 }
 
