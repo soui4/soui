@@ -2964,7 +2964,7 @@ static void renderNSVGshape(Gdiplus::Graphics &graphics, const NSVGimage *image,
                             float dist3 = sqrt(dx1 * dx1 + dy2 * dy2);
                             float dist4 = sqrt(dx2 * dx2 + dy2 * dy2);
                             
-                            float minRadius = max(radius, max(dist1, max(dist2, max(dist3, dist4))));
+                            float minRadius = smax(radius, smax(dist1, smax(dist2, smax(dist3, dist4))));
                             
                             Gdiplus::GraphicsPath path;
                             path.AddEllipse(center.X - minRadius, center.Y - minRadius, minRadius * 2, minRadius * 2);
@@ -3042,7 +3042,7 @@ static void renderNSVGshape(Gdiplus::Graphics &graphics, const NSVGimage *image,
                             float dist3 = sqrt(dx1 * dx1 + dy2 * dy2);
                             float dist4 = sqrt(dx2 * dx2 + dy2 * dy2);
                             
-                            float minRadius = max(radius, max(dist1, max(dist2, max(dist3, dist4))));
+                            float minRadius = smax(radius, smax(dist1, smax(dist2, smax(dist3, dist4))));
                             
                             Gdiplus::GraphicsPath ellipsePath;
                             ellipsePath.AddEllipse(center.X - minRadius, center.Y - minRadius, minRadius * 2, minRadius * 2);
