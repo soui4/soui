@@ -455,6 +455,13 @@ class SOUI_EXP SImageWnd : public TWindowProxy<IImageWnd> {
      */
     STDMETHOD_(BOOL, SetIcon)(THIS_ int nSubID) OVERRIDE;
 
+
+    /**
+     * @brief 获取图标
+     * @return 图标索引
+     */
+    STDMETHOD_(int, GetIcon)(CTHIS) SCONST OVERRIDE;
+    
     /**
      * @brief 获取期望大小
      * @param pSize 期望大小

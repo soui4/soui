@@ -258,6 +258,12 @@ DECLARE_INTERFACE_(IImageWnd, ICtrl)
      * Describe  设置图标
      */
     STDMETHOD_(BOOL, SetIcon)(THIS_ int nSubID) PURE;
+
+    /**
+     * @brief 获取当前设置的图标
+     * @return IBitmapS * -- 当前设置的图标
+     */
+    STDMETHOD_(BOOL, GetIcon)(CTHIS) SCONST PURE;
 };
 
 // {C2378093-CB34-4811-98D1-A721637B3B87}

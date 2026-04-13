@@ -697,6 +697,11 @@ BOOL SImageWnd::SetIcon(int nSubID)
     return TRUE;
 }
 
+int SImageWnd::GetIcon() const
+{
+    return m_iIcon;
+}
+
 SIZE SImageWnd::MeasureContent(int wid, int hei)
 {
     CSize szRet;
