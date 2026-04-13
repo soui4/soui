@@ -21,7 +21,7 @@ source_group("Resource Files" FILES ${CURRENT_RC})
 
 set(current_project "uieditor")
 add_soui_exe(${current_project} ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${CURRENT_RC})
-target_compile_resources(${current_project} ${CURRENT_RC})
+target_compile_resources(${current_project} ${CURRENT_RC} INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/soui-sys-resource)
 
 if(CMAKE_SYSTEM_NAME MATCHES Darwin)
     # 配置代码签名

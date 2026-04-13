@@ -42,7 +42,7 @@ BEGIN
     "#pragma code_page(936)\r\n"
     "#include ""res/soui_res.rc2""\r\n"
 #if (defined(LIB_CORE) && defined(LIB_SOUI_COM))
-    "#include ""../../soui-sys-resource/theme_sys_res.rc2"" //SOUI SYS Resource\r\n"
+    "#include ""theme_sys_res.rc2"" //SOUI SYS Resource\r\n"
 #endif
     "#endif\r\0"
 END
@@ -112,7 +112,7 @@ LANGUAGE 4, 2
 #pragma code_page(936)
 #include "res/soui_res.rc2"
 #if (defined(LIB_CORE) && defined(LIB_SOUI_COM))
-#include "../../soui-sys-resource/theme_sys_res.rc2" //SOUI SYS Resource
+#include "theme_sys_res.rc2" //SOUI SYS Resource
 #endif
 #endif
 
