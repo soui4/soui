@@ -903,36 +903,17 @@ SProgress::SProgress()
     m_bFocusable = TRUE;
 }
 
-void SProgress::GetDesiredSize(SIZE *psz, int wid, int hei)
-{
-    CSize szRet;
-    SIZE sizeBg = m_pSkinBg->GetSkinSize();
-    CRect rcMargin = GetStyle().GetMargin();
-    if (IsVertical())
-    {
-        szRet.cx = sizeBg.cx + rcMargin.left + rcMargin.right;
-        if (GetLayoutParam()->IsSpecifiedSize(Vert))
-        {
-            SLayoutSize layoutSize;
-            GetLayoutParam()->GetSpecifiedSize(Vert, &layoutSize);
-            szRet.cy = layoutSize.toPixelSize(GetScale());
-        }
-        else
-            szRet.cy = sizeBg.cy + rcMargin.top + rcMargin.bottom;
+SIZE SProgress::MeasureContent(int nParentWid, int nParentHei){
+    if(!m_pSkinBg){
+        return CSize(0,0);
     }
-    else
-    {
-        szRet.cy = sizeBg.cy + rcMargin.top + rcMargin.bottom;
-        if (GetLayoutParam()->IsSpecifiedSize(Horz))
-        {
-            SLayoutSize layoutSize;
-            GetLayoutParam()->GetSpecifiedSize(Horz, &layoutSize);
-            szRet.cx = layoutSize.toPixelSize(GetScale());
-        }
-        else
-            szRet.cx = sizeBg.cx + rcMargin.left + rcMargin.right;
+    SIZE szRet = m_pSkinBg->GetSkinSize();
+    if(IsVertical()){
+        szRet.cy = 100;
+    }else{
+        szRet.cx = 100;
     }
-    *psz = szRet;
+    return szRet;
 }
 
 CRect SProgress::GetPartRect2(UINT uSBCode) const

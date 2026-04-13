@@ -182,17 +182,13 @@ void SSliderBar::DrawOthers(IRenderTarget *pRT, const CRect &rcClient)
     if (!m_pSkinThumb)
         return;
     CRect rcThumb = GetPartRect(rcClient, SC_THUMB);
-    int nState = 0; // normal
-    if (IsDisabled(TRUE) && m_pSkinThumb->GetStates() > 3)
-        nState = 3;
-    else if (m_bDrag)
-        nState = 2; // pushback
-    else if (m_uHtPrev == SC_THUMB)
-        nState = 1; // hover
-
+    DWORD dwState = GetState();
+    if((dwState & WndState_PushDown) && m_uHtPrev != SC_THUMB){
+        dwState &= ~WndState_PushDown;
+    }
     if (m_byThumbAlphaAni == 0xFF)
     { // 不在动画过程中
-        m_pSkinThumb->DrawByIndex(pRT, rcThumb, nState);
+        m_pSkinThumb->DrawByState(pRT, rcThumb, dwState);
     }
     else
     { // 在动画过程中
@@ -283,6 +279,7 @@ void SSliderBar::OnLButtonDown(UINT nFlags, CPoint point)
 
 void SSliderBar::OnMouseMove(UINT nFlags, CPoint point)
 {
+    __baseCls::OnMouseMove(nFlags, point);
     if (m_bDrag)
     {
         CRect rcRail = GetPartRect2(SC_RAIL);
@@ -310,6 +307,7 @@ void SSliderBar::OnMouseMove(UINT nFlags, CPoint point)
 
 void SSliderBar::OnMouseHover(UINT uHitTest, CPoint point)
 {
+    __baseCls::OnMouseHover(uHitTest, point);
     if (m_bDrag)
         return;
     int uHit = HitTest(point);
@@ -321,6 +319,7 @@ void SSliderBar::OnMouseHover(UINT uHitTest, CPoint point)
 
 void SSliderBar::OnMouseLeave()
 {
+    __baseCls::OnMouseLeave();
     if (m_bDrag)
         return;
     // 悬停状态改变，启动动画
@@ -345,7 +344,7 @@ LRESULT SSliderBar::NotifyPos(SliderBarAction action, int nPos)
     return FireEvent(evt);
 }
 
-SIZE SSliderBar::GetDesiredSize(int wid, int hei)
+SIZE SSliderBar::MeasureContent(int wid, int hei)
 {
     if (!m_pSkinBg)
         return CSize();

@@ -25,6 +25,9 @@ class SOUI_EXP SAppDir {
     SStringT m_strAppPath; ///< 应用程序目录路径字符串
 };
 
+SStringT SOUI_EXP SSelectFolder(LPCTSTR pszTitle, LPCTSTR initPath);
+SStringT SOUI_EXP SGetSpecialPath(LPCTSTR pszType);
+
 SNSEND
 
 #endif // __SAPPDIR__H__

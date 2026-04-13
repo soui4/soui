@@ -181,8 +181,7 @@ class SOUI_EXP SSliderBar
     STDMETHOD_(void, onAnimationUpdate)(THIS_ IValueAnimator *pAnimator) OVERRIDE;
 
   protected:
-    STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int nParentWid, int nParentHei);
-
+    SIZE MeasureContent(int nParentWid, int nParentHei) override;
     void OnColorize(COLORREF cr) override;
     void OnScaleChanged(int scale) override;
     SStringT GetTooltip(CPoint pt) const override;

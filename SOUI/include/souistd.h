@@ -3,7 +3,7 @@
 #define WINVER       0x0500
 #endif // WINVER
 #ifndef _WIN32_WINNT
-#define _WIN32_WINNT 0x0502
+#define _WIN32_WINNT 0x0600
 #endif//_WIN32_WINNT
 
 #ifndef _WIN32_IE

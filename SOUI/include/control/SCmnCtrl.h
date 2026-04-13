@@ -772,14 +772,6 @@ class SOUI_EXP SProgress
 
   protected:
     /**
-     * @brief 获取预期大小
-     * @param psz 输出大小
-     * @param wid 父容器宽度
-     * @param hei 父容器高度
-     */
-    STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *psz, int wid, int hei) OVERRIDE;
-
-    /**
      * @brief 处理颜色化事件
      * @param cr 颜色
      */
@@ -790,7 +782,7 @@ class SOUI_EXP SProgress
      * @param scale 缩放比例
      */
     virtual void OnScaleChanged(int scale) override;
-
+    SIZE MeasureContent(int nParentWid, int nParentHei) override;
     virtual void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer) override;
 
     virtual void DrawRail(IRenderTarget *pRT, const CRect &rcClient);
