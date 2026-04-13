@@ -3,7 +3,7 @@
 #include "propgrid/propitem/SPropertyItem-Option.h"
 #include <vector>
 #ifdef _WIN32
-#include <dlghelp/souidlgs.h>
+#include <helper/souidlgs.h>
 #endif//_WIN32
 #include "AutoCompleteAdapter.h"
 
