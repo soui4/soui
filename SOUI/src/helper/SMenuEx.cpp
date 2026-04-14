@@ -1387,7 +1387,7 @@ BOOL SMenuEx::CheckMenuItem(UINT uPos, UINT uFlag)
 {
     SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot());
     SASSERT(pMenuRoot);
-    SWindow *pItemRef = FindItem(uPos, uFlag & MF_BYPOSITION);
+    SWindow *pItemRef = FindItem(uPos, uFlag);
     if (!pItemRef)
         return FALSE;
 
@@ -1406,7 +1406,7 @@ BOOL SMenuEx::EnableMenuItem(UINT uIDEnableItem, UINT uEnable)
 {
     SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot());
     SASSERT(pMenuRoot);
-    SWindow *pItemRef = FindItem(uIDEnableItem, uEnable & MF_BYPOSITION);
+    SWindow *pItemRef = FindItem(uIDEnableItem, uEnable);
     if (!pItemRef)
         return FALSE;
 
