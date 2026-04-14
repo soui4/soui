@@ -81,7 +81,7 @@ SSliderBar::RANGE SSliderBar::_GetPartRange(int nLength, int nThumbSize, BOOL bT
     case SC_SELECT:
         rRet.value1 = 0;
         rRet.value2 = (int)nSelect;
-        if (!bThumbInRail)
+        if (bThumbInRail)
         {
             rRet.value1 += nHalfThumb;
         }
