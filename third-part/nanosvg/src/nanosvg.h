@@ -3209,7 +3209,16 @@ static void nsvg__parseSVG(NSVGparser* p, const char** attr)
 	}
 }
 
-static void nsvg__parseGradient(NSVGparser* p, const char** attr, signed char type)
+static void nsvg__setCoordPercent(NSVGcoordinate &coord)
+{
+    if (coord.units == NSVG_UNITS_USER)
+    {
+        coord.units = NSVG_UNITS_PERCENT;
+        coord.value *= 100.0f;
+	}
+}
+
+static void nsvg__parseGradient(NSVGparser *p, const char **attr, signed char type)
 {
 	int i;
 	NSVGgradientData* grad = (NSVGgradientData*)malloc(sizeof(NSVGgradientData));
@@ -3273,6 +3282,21 @@ static void nsvg__parseGradient(NSVGparser* p, const char** attr, signed char ty
 				grad->ref[62] = '\0';
 			}
 		}
+	}
+	if (grad->units != NSVG_USER_SPACE) {
+        if (grad->type == NSVG_PAINT_LINEAR_GRADIENT)
+        {
+            nsvg__setCoordPercent(grad->linear.x1);
+            nsvg__setCoordPercent(grad->linear.y1);
+            nsvg__setCoordPercent(grad->linear.x2);
+            nsvg__setCoordPercent(grad->linear.y2);
+        }
+        else if (grad->type == NSVG_PAINT_RADIAL_GRADIENT)
+        {
+            nsvg__setCoordPercent(grad->radial.cx);
+            nsvg__setCoordPercent(grad->radial.cy);
+            nsvg__setCoordPercent(grad->radial.r);
+        }
 	}
 
 	grad->next = p->gradients;
