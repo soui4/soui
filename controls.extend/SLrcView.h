@@ -1,0 +1,131 @@
+﻿#pragma once
+#include <list>
+#include <vector>
+SNSBEGIN
+
+struct ILrcProvider : IObjRef{
+	virtual BOOL load(LPCTSTR pszLrc, int durationMs) = 0;
+	virtual float getLineIndexFromTimeMs(int timeMs) const = 0;
+	virtual float getWordRatio(int iLine, int timeMs) const = 0;
+	virtual int getLineCount() const = 0;
+	virtual SStringT getLineText(int iLine) const = 0;
+	virtual int getTsEndMs() const = 0;
+	virtual bool isHeadLine(int iLine) const = 0;
+};
+
+class SYYLrcProvider : public TObjRefImpl<ILrcProvider> {
+	struct Tone {
+		int nOffset;
+		int nLength;
+		int tsBeginMs;
+		int tsEndMs;
+		int pitch;
+	};
+	struct Sentence {
+		int tsBeginMs;
+		int tsEndMs;
+		SStringT strSent;
+		bool isHead;
+		std::list<Tone> tones;
+	};
+
+	std::vector<Sentence> m_lstSents;
+	SStringT m_strName;
+	SStringT m_strSinger;
+public:
+	SYYLrcProvider() {}
+	
+public:
+	// 通过 TObjRefImpl 继承
+	BOOL load(LPCTSTR pszLrc, int durationMs) override;
+	float getLineIndexFromTimeMs(int timeMs) const override;
+	float getWordRatio(int iLine, int timeMs) const override;
+	int getLineCount() const override;
+	SStringT getLineText(int iLine) const override;
+	int getTsEndMs() const override;
+	bool isHeadLine(int iLine) const override;
+
+protected:
+	int ts2line(int iFirst, int iLast, int timeMs) const;
+};
+
+/**
+ * @brief 传统LRC格式歌词提供者
+ * 
+ * 支持标准LRC格式：
+ * [ti:歌曲名]
+ * [ar:歌手]
+ * [al:专辑]
+ * [mm:ss.xx]歌词内容
+ */
+class SLrcProvider : public TObjRefImpl<ILrcProvider> {
+	struct LrcLine {
+		int tsBeginMs;      // 开始时间（毫秒）
+		int tsEndMs;        // 结束时间（毫秒）
+		SStringT strText;   // 歌词文本
+	};
+
+	std::vector<LrcLine> m_lines;
+	SStringT m_strTitle;
+	SStringT m_strArtist;
+	SStringT m_strAlbum;
+	int m_durationMs;       // 歌曲总时长
+
+public:
+	SLrcProvider();
+
+public:
+	// ILrcProvider 接口实现
+	BOOL load(LPCTSTR pszLrc, int durationMs) override;
+	float getLineIndexFromTimeMs(int timeMs) const override;
+	float getWordRatio(int iLine, int timeMs) const override;
+	int getLineCount() const override;
+	SStringT getLineText(int iLine) const override;
+	int getTsEndMs() const override;
+	bool isHeadLine(int iLine) const override;
+
+protected:
+	// 解析时间标签 [mm:ss.xx] 为毫秒
+	static int parseTimeTag(const SStringA& timeTag);
+	
+	// 二分查找时间对应的行索引
+	int findLineByTime(int timeMs) const;
+};
+
+class SLrcView : public SWindow, protected IAnimatorUpdateListener 
+{
+	DEF_SOBJECT(SWindow,L"lrcView")
+public:
+	SLrcView();
+
+	void SetLrc(ILrcProvider* pProvider);
+	BOOL SetTimeMs(int nPos);
+protected:
+	STDMETHOD_(void, onAnimationUpdate)(THIS_ IValueAnimator * pAnimator) OVERRIDE;
+protected:
+	void drawLine(IRenderTarget* pRT, CRect rc, int iLine, bool bHighlight);
+protected:
+	void OnPaint(IRenderTarget* pRT);
+	SOUI_MSG_MAP_BEGIN()
+		MSG_WM_PAINT_EX(OnPaint)
+	SOUI_MSG_MAP_END()
+
+	SOUI_ATTRS_BEGIN()
+		ATTR_COLOR(L"colorHighlight", m_crHighlight, TRUE)
+		ATTR_COLOR(L"colorText", m_crText, TRUE)
+		ATTR_LAYOUTSIZE(L"lineHeight",m_lineHei,TRUE)
+	SOUI_ATTRS_END()
+private:
+	SAutoRefPtr<ILrcProvider> m_provider;
+	SAutoRefPtr<SIntAnimator> m_animator;
+	COLORREF m_crText;
+	COLORREF m_crHighlight;
+
+	SLayoutSize m_lineHei;
+	int m_nLength;
+	int m_timeAniMs;
+	int m_timeMs;
+};
+
+SNSEND
+

@@ -38,6 +38,8 @@
 #include "SImageKnob.h"
 #include "SFadeFrame.h"
 #include "SCalendar2.h"
+#include "SColorizeText.h"
+#include "SLrcView.h"
 #ifdef _WIN32
 #include "SWkeWebkit.h"
 #include "SStaticGdip.h"
@@ -79,6 +81,9 @@ void SCtrlsRegister::RegisterCtrls(SApplication *theApp)
     theApp->RegisterWindowClass<SImageKnob>();
     theApp->RegisterWindowClass<SFadeFrame>(); // 注册渐显隐动画控件
     theApp->RegisterWindowClass<SCalendar2>(); // 注册SCalendar2
+
+	theApp->RegisterWindowClass<SColorizeText>();
+	theApp->RegisterWindowClass<SLrcView>();
 #ifdef _WIN32
     theApp->RegisterWindowClass<SWkeWebkit>(); // 注册WKE浏览器
     theApp->RegisterWindowClass<SStaticGdip>();
