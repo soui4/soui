@@ -1461,9 +1461,6 @@ BOOL SWindow::InitFromXml(IXmlNode *pNode)
     m_isLoading = true;
     if (xmlNode)
     {
-        if (m_pLayoutParam)
-            m_pLayoutParam->Clear();
-
         // 优先处理"layout"属性
         SXmlAttr attrLayout = xmlNode.attribute(L"layout");
         if (attrLayout)
