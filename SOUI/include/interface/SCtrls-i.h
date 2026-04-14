@@ -251,19 +251,19 @@ DECLARE_INTERFACE_(IImageWnd, ICtrl)
 
     /**
      * SImageWnd::SetIcon
-     * @param    int nSubID -- 子图在Skin中的索引号
+     * @param    int iIcon -- 子图在Skin中的索引号
      * @brief    设置图标
      * @return   返回值BOOL 成功--TRUE 失败--FALSE
      *
      * Describe  设置图标
      */
-    STDMETHOD_(BOOL, SetIcon)(THIS_ int nSubID) PURE;
+    STDMETHOD_(BOOL, SetIcon)(THIS_ int iIcon) PURE;
 
     /**
      * @brief 获取当前设置的图标
-     * @return IBitmapS * -- 当前设置的图标
+     * @return int -- 当前设置子图在Skin中的索引号
      */
-    STDMETHOD_(BOOL, GetIcon)(CTHIS) SCONST PURE;
+    STDMETHOD_(int, GetIcon)(CTHIS) SCONST PURE;
 };
 
 // {C2378093-CB34-4811-98D1-A721637B3B87}
