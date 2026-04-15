@@ -260,7 +260,7 @@ static BOOL ConvertFileToUtf8(LPCTSTR pszFilePath, std::string& outUtf8Text)
 	}
 	
 	std::vector<char> fileBuffer(fileSize);
-	size_t bytesRead = fread(fileBuffer.data(), 1, fileSize, fp);
+	size_t bytesRead = fread(&fileBuffer[0], 1, fileSize, fp);
 	fclose(fp);
 	
 	if (bytesRead == 0)
@@ -269,7 +269,7 @@ static BOOL ConvertFileToUtf8(LPCTSTR pszFilePath, std::string& outUtf8Text)
 		return FALSE;
 	}
 	
-	const char* pData = fileBuffer.data();
+	const char* pData = &fileBuffer[0];
 	size_t dataSize = bytesRead;
 	size_t dataOffset = 0;
 	
@@ -306,14 +306,14 @@ static BOOL ConvertFileToUtf8(LPCTSTR pszFilePath, std::string& outUtf8Text)
 		}
 		
 		// UTF-16 -> UTF-8
-		int utf8Len = WideCharToMultiByte(CP_UTF8, 0, wideBuffer.data(), 
+		int utf8Len = WideCharToMultiByte(CP_UTF8, 0, &wideBuffer[0], 
 										  static_cast<int>(wideCharCount),
 										  NULL, 0, NULL, NULL);
 		if (utf8Len <= 0)
 			return FALSE;
 		
 		outUtf8Text.resize(utf8Len);
-		WideCharToMultiByte(CP_UTF8, 0, wideBuffer.data(), 
+		WideCharToMultiByte(CP_UTF8, 0, &wideBuffer[0], 
 						   static_cast<int>(wideCharCount),
 						   &outUtf8Text[0], utf8Len, NULL, NULL);
 		
@@ -339,7 +339,7 @@ static BOOL ConvertFileToUtf8(LPCTSTR pszFilePath, std::string& outUtf8Text)
 			std::vector<wchar_t> wideBuffer(wideLen);
 			MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS,
 							  pData, static_cast<int>(dataSize),
-							  wideBuffer.data(), wideLen);
+							  &wideBuffer[0], wideLen);
 			
 			// 验证转换后的内容是否合理（检查是否有替换字符）
 			bool hasReplacementChar = false;
@@ -370,16 +370,16 @@ static BOOL ConvertFileToUtf8(LPCTSTR pszFilePath, std::string& outUtf8Text)
 		
 		std::vector<wchar_t> wideBuffer(wideLen);
 		MultiByteToWideChar(CP_ACP, 0, pData, static_cast<int>(dataSize),
-						   wideBuffer.data(), wideLen);
+						   &wideBuffer[0], wideLen);
 		
 		// WideChar -> UTF-8
-		int utf8Len = WideCharToMultiByte(CP_UTF8, 0, wideBuffer.data(),
+		int utf8Len = WideCharToMultiByte(CP_UTF8, 0, &wideBuffer[0],
 										  wideLen, NULL, 0, NULL, NULL);
 		if (utf8Len <= 0)
 			return FALSE;
 		
 		outUtf8Text.resize(utf8Len);
-		WideCharToMultiByte(CP_UTF8, 0, wideBuffer.data(), wideLen,
+		WideCharToMultiByte(CP_UTF8, 0, &wideBuffer[0], wideLen,
 						   &outUtf8Text[0], utf8Len, NULL, NULL);
 		
 		return TRUE;
@@ -465,6 +465,14 @@ int SLrcProvider::parseTimeTag(const SStringA& timeTag)
 	return minutes * 60 * 1000 + seconds * 1000 + milliseconds;
 }
 
+struct TimedLine {
+	int timeMs;
+	SStringT text;
+};
+static bool TimedLineCmp(const TimedLine& a, const TimedLine& b) {
+	return a.timeMs < b.timeMs;
+}
+
 /**
  * @brief 加载LRC歌词文件
  * @param pszLrc LRC文件路径
@@ -500,15 +508,13 @@ BOOL SLrcProvider::load(LPCTSTR pszLrc, int durationMs)
 	SLOGI() << "Successfully loaded " << fileLines.size() << " lines from LRC file";
 	
 	// 临时存储所有带时间的歌词行
-	struct TimedLine {
-		int timeMs;
-		SStringT text;
-	};
+
 	std::vector<TimedLine> timedLines;
 	
 	// 步骤3: 解析每一行（与原有逻辑保持一致）
-	for (const auto& strLine : fileLines)
+	for (std::vector<SStringA>::iterator it=fileLines.begin();it!=fileLines.end();it++)
 	{
+		SStringA & strLine = *it;
 		if (strLine.IsEmpty())
 			continue;
 		
@@ -560,10 +566,7 @@ BOOL SLrcProvider::load(LPCTSTR pszLrc, int durationMs)
 	}
 	
 	// 按时间排序（有些LRC文件可能不是严格排序的）
-	std::sort(timedLines.begin(), timedLines.end(),
-		[](const TimedLine& a, const TimedLine& b) {
-			return a.timeMs < b.timeMs;
-		});
+	std::sort(timedLines.begin(), timedLines.end(),TimedLineCmp);
 	
 	// 构建歌词行，计算每行的结束时间
 	for (size_t i = 0; i < timedLines.size(); ++i)
@@ -665,7 +668,7 @@ float SLrcProvider::getWordRatio(int iLine, int timeMs) const
 	
 	// LRC格式不支持逐字高亮，简单线性插值
 	float ratio = (float)(timeMs - line.tsBeginMs) / (line.tsEndMs - line.tsBeginMs);
-	return std::min(1.0f, std::max(0.0f, ratio));
+	return smin(1.0f, smax(0.0f, ratio));
 }
 
 /**

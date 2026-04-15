@@ -32,7 +32,7 @@ const SStringT &SAppDir::AppDir()
 
 typedef HRESULT(WINAPI* FunSHCreateItemFromParsingName)(PCWSTR, IBindCtx*, REFIID, void**);
 
-SStringT SOUI_EXP SSelectFolder(LPCTSTR pszTitle, LPCTSTR initPath) {
+BOOL SOUI_EXP SSelectFolder(TCHAR szPath[MAX_PATH], LPCTSTR pszTitle, LPCTSTR initPath) {
 #ifdef WIN32
 	SStringT defPath(initPath);
 	SStringT ret;
@@ -76,16 +76,17 @@ SStringT SOUI_EXP SSelectFolder(LPCTSTR pszTitle, LPCTSTR initPath) {
 			ret = folderDialog.GetFolderPath();
 		}
 	}
-	return ret;
+	if(ret.IsEmpty())
+		return FALSE;
+	_tcscpy(szPath,ret);
+	return TRUE;
 #else
 	BROWSEINFO info={0};
-	TCHAR szPath[MAX_PATH]={0};
 	info.nMaxPath = MAX_PATH;
 	info.lpszPath=szPath;
 	info.strlRoot = initPath;
     info.lpszTitle = pszTitle;
-	PickFolder(&info);
-	return szPath;
+	return PickFolder(&info);
 #endif
 }
 SNSEND

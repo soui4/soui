@@ -72,6 +72,11 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
     }
     int nWid = pSvg->GetWidth();
     int nHei = pSvg->GetHeight();
+	if(nWid<=0 || nHei<=0){
+		_ftprintf(stderr,_T("invalid image size, width=%d,height=%d! input=%s\n"),nWid, nHei,strInput.c_str());
+		pSvg->Release();
+		return -3;
+	}
     float fRatio = (float)nHei/nWid;
     int cx = nSize==-1?nWid:nSize;
     int cy = cx * fRatio;

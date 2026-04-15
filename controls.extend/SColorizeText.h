@@ -11,7 +11,7 @@ public:
 	~SColorizeText(void);
 
 	void SetKeyText(LPCTSTR pszKey);
-	void SetWindowText(LPCTSTR pszText) override;
+	STDMETHOD_(void,SetWindowText)(THIS_ LPCTSTR pszText) OVERRIDE;
 protected:
 	virtual void DrawText(IRenderTarget* pRT, LPCTSTR pszBuf, int cchText, LPRECT pRect, UINT uFormat);
 
