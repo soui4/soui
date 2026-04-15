@@ -673,7 +673,7 @@ HRESULT SRenderTarget_Skia::MeasureText(LPCTSTR pszText, int cchLen, SIZE *psz)
 
     SkPaint::FontMetrics metrics;
     txtPaint.getFontMetrics(&metrics);
-    psz->cy = (int)(metrics.fBottom - metrics.fTop);
+    psz->cy = (int)(metrics.fDescent - metrics.fAscent);
     return S_OK;
 }
 

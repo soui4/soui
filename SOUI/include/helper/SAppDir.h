@@ -26,7 +26,6 @@ class SOUI_EXP SAppDir {
 };
 
 SStringT SOUI_EXP SSelectFolder(LPCTSTR pszTitle, LPCTSTR initPath);
-SStringT SOUI_EXP SGetSpecialPath(LPCTSTR pszType);
 
 SNSEND
 

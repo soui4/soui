@@ -88,41 +88,4 @@ SStringT SOUI_EXP SSelectFolder(LPCTSTR pszTitle, LPCTSTR initPath) {
 	return szPath;
 #endif
 }
-
-SStringT SOUI_EXP SGetSpecialPath(LPCTSTR pszType) {
-#ifdef WIN32
-	SStringT type(pszType);
-	type.MakeLower();
-	int ClsId = -1;
-	if (type == _T("video")) {
-		ClsId = CSIDL_MYVIDEO;
-	}
-	else if (type == _T("music"))
-	{
-		ClsId = CSIDL_MYMUSIC;
-	}
-	else if (type == _T("document")) {
-		ClsId = CSIDL_MYDOCUMENTS;
-	}
-	else if (type == _T("appdata")) {
-		ClsId = CSIDL_APPDATA;
-	}
-	else if (type == _T("desktop")) {
-		ClsId = CSIDL_DESKTOP;
-	}
-	if (ClsId == -1)
-		return SStringT();
-	wchar_t buf[MAX_PATH] = { 0 };
-	SHGetSpecialFolderPath(NULL, buf, ClsId, TRUE);
-	SStringT ret= S_CW2T(buf);
-    return ret;
-#else
-	BROWSEINFO info={0};
-	TCHAR szPath[MAX_PATH]={0};
-	info.nMaxPath = MAX_PATH;
-	info.lpszPath=szPath;
-	PickFolder(&info);
-	return szPath;
-#endif
-}
 SNSEND

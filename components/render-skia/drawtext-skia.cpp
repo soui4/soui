@@ -188,7 +188,7 @@ SkRect SkTextLayoutEx::draw( SkCanvas* canvas )
 {
     SkPaint::FontMetrics metrics;
     m_paint->getFontMetrics(&metrics);
-    float lineSpan = metrics.fBottom-metrics.fTop;
+    float lineSpan = metrics.fDescent-metrics.fAscent;
 
     SkRect rcDraw = m_rcBound;
 
@@ -212,7 +212,7 @@ SkRect SkTextLayoutEx::draw( SkCanvas* canvas )
     canvas->clipRect(m_rcBound);
 
     float height = m_rcBound.height();
-    float y=m_rcBound.fTop - metrics.fTop;
+    float y=m_rcBound.fTop - metrics.fAscent;
     if(m_uFormat & DT_SINGLELINE)
     {//单行显示
         rcDraw.fBottom = rcDraw.fTop + lineSpan;
@@ -237,7 +237,7 @@ SkRect SkTextLayoutEx::draw( SkCanvas* canvas )
         int iLine = 0;
         while(iLine<m_lines.count())
         {
-            if(y + lineSpan + metrics.fTop >= m_rcBound.fBottom) 
+            if(y + lineSpan + metrics.fAscent >= m_rcBound.fBottom) 
                 break;  //the last visible line
             int iBegin=m_lines[iLine].nOffset;
             int iEnd = iBegin + m_lines[iLine].nLen;
@@ -262,7 +262,7 @@ SkRect SkTextLayoutEx::draw( SkCanvas* canvas )
             y += lineSpan;
         }
         rcDraw.fRight = rcDraw.fLeft + maxLineWid;
-        rcDraw.fBottom = y + metrics.fTop;
+        rcDraw.fBottom = y + metrics.fAscent;
     }
     canvas->restore();
     return rcDraw;
