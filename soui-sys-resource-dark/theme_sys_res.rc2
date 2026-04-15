@@ -1,4 +1,4 @@
-//stamp:01dcbcfe8012365b
+//stamp:01dccc89182a3769
 /*<------------------------------------------------------------------------------------------------->*/
 #define DEFINE_UIRES(name, type, file_path)\
     name type file_path
@@ -24,6 +24,7 @@ DEFINE_UIRES(SYS_VERT_PROG_BKGND,	SVG,	"theme_sys_res/sys_vert_prog_bkgnd.svg")
 DEFINE_UIRES(SYS_VERT_PROG_BAR,	SVG,	"theme_sys_res/sys_vert_prog_bar.svg")
 DEFINE_UIRES(SYS_SLIDER_THUMB,	SVG,	"theme_sys_res/sys_slider_thumb.svg")
 DEFINE_UIRES(SYS_TAB_PAGE,	SVG,	"theme_sys_res/sys_tab_page.svg")
+DEFINE_UIRES(SYS_TAB_HEADER,	SVG,	"theme_sys_res/sys_tab_header.svg")
 DEFINE_UIRES(SYS_BTN_MINIMIZE,	SVG,	"theme_sys_res/sys_btn_minimize.svg")
 DEFINE_UIRES(SYS_BTN_RESTORE,	SVG,	"theme_sys_res/sys_btn_restore.svg")
 DEFINE_UIRES(SYS_BTN_CLOSE,	SVG,	"theme_sys_res/sys_btn_close.svg")
@@ -45,8 +46,7 @@ DEFINE_UIRES(SYS_BTN_MINI_CLOSE,	SVG,	"theme_sys_res/sys_btn_mini_close.svg")
 DEFINE_UIRES(SYS_BTN_SETTING,	SVG,	"theme_sys_res/sys_btn_setting.svg")
 DEFINE_UIRES(SYS_BTN_SKIN,	SVG,	"theme_sys_res/sys_btn_skin.svg")
 DEFINE_UIRES(SYS_LIST_ITEM,	SVG,	"theme_sys_res/sys_list_item.svg")
+DEFINE_UIRES(THEME_COLOR,	XML,	"theme_sys_res/theme_color.xml")
 DEFINE_UIRES(SYS_XML_SKIN,	XML,	"theme_sys_res/sys_xml_skin.xml")
 DEFINE_UIRES(SYS_XML_EDITMENU,	XML,	"theme_sys_res/sys_xml_editmenu.xml")
 DEFINE_UIRES(SYS_XML_MSGBOX,	XML,	"theme_sys_res/sys_xml_msgbox.xml")
-DEFINE_UIRES(THEME_COLOR,	XML,	"theme_sys_res/theme_color.xml")
-

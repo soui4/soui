@@ -1,50 +1,47 @@
-/////////////////////////////////////////////////////////////////////////////
-//
-// PNG
-//
-SYS_MSGICON             PNG                     "theme_sys_res/msgicon.png"
-SYS_BORDER              PNG                     "theme_sys_res/sys_border.png"
-SYS_CHECKBOX            PNG                     "theme_sys_res/sys_checkbox.png"
-SYS_RADIO               PNG                     "theme_sys_res/sys_radio.png"
-SYS_FOCUS_CHECKBOX      PNG                     "theme_sys_res/sys_focus_checkbox.png"
-SYS_FOCUS_RADIO         PNG                     "theme_sys_res/sys_focus_radio.png"
-SYS_DROPBTN             PNG                     "theme_sys_res/sys_dropbtn.png"
-SYS_SCROLLBAR           PNG                     "theme_sys_res/sys_scrollbar.png"
-SYS_TREE_CHECKBOX       PNG                     "theme_sys_res/sys_tree_checkbox.png"
-SYS_TREE_TOGGLE         PNG                     "theme_sys_res/sys_tree_toggle.png"
-SYS_HEADER              PNG                     "theme_sys_res/sys_header.png"
-SYS_SPLIT_VERT          PNG                     "theme_sys_res/sys_split_vert.png"
-SYS_SPLIT_HORZ          PNG                     "theme_sys_res/sys_split_horz.png"
-SYS_PROG_BKGND          PNG                     "theme_sys_res/sys_prog_bkgnd.png"
-SYS_PROG_BAR            PNG                     "theme_sys_res/sys_prog_bar.png"
-SYS_VERT_PROG_BKGND     PNG                     "theme_sys_res/sys_vert_prog_bkgnd.png"
-SYS_VERT_PROG_BAR       PNG                     "theme_sys_res/sys_vert_prog_bar.png"
-SYS_SLIDER_THUMB        PNG                     "theme_sys_res/sys_slider_thumb.png"
-SYS_TAB_PAGE            PNG                     "theme_sys_res/sys_tab_page.png"
-SYS_BTN_MINIMIZE        PNG                     "theme_sys_res/sys_btn_minimize.png"
-SYS_BTN_RESTORE         PNG                     "theme_sys_res/sys_btn_restore.png"
-SYS_BTN_CLOSE           PNG                     "theme_sys_res/sys_btn_close.png"
-SYS_BTN_MAXIMIZE        PNG                     "theme_sys_res/sys_btn_maximize.png"
-SYS_MENU_CHECK          PNG                     "theme_sys_res/sys_menu_check.png"
-SYS_MENU_ARROW          PNG                     "theme_sys_res/sys_menu_arrow.png"
-SYS_MENU_SEP            PNG                     "theme_sys_res/sys_menu_sep.png"
-SYS_MENU_BORDER         PNG                     "theme_sys_res/sys_menu_border.png"
-SYS_MENU_SKIN           PNG                     "theme_sys_res/sys_menu_skin.png"
-SYS_ICONS               PNG                     "theme_sys_res/sys_icons.png"
-SYS_WND_BKGND           PNG                     "theme_sys_res/sys_wnd_bkgnd.png"
-SYS_BTN_PREV           	PNG                     "theme_sys_res/sys_btn_prev.png"
-SYS_BTN_NEXT           	PNG                     "theme_sys_res/sys_btn_next.png"
-SYS_SPIN_DOWN           PNG                     "theme_sys_res/sys_spin_down.png"
-SYS_SPIN_UP             PNG                     "theme_sys_res/sys_spin_up.png"
-SYS_SWITCH              PNG                     "theme_sys_res/sys_switch.png"
-SYS_SWITCH_BG           PNG                     "theme_sys_res/sys_switch_bg.png"
-SYS_LIST_ITEM           PNG                     "theme_sys_res/sys_list_item.png"
-/////////////////////////////////////////////////////////////////////////////
-//
-// XML
-//
+//stamp:01dccc8a00f68639
+/*<------------------------------------------------------------------------------------------------->*/
+#define DEFINE_UIRES(name, type, file_path)\
+    name type file_path
 
-SYS_XML_SKIN            XML                     "theme_sys_res/sys_xml_skin.xml"
-SYS_XML_EDITMENU        XML                     "theme_sys_res/sys_xml_editmenu.xml"
-SYS_XML_MSGBOX          XML                     "theme_sys_res/sys_xml_msgbox.xml"
-THEME_COLOR             XML                     "theme_sys_res/theme_color.xml"
+DEFINE_UIRES(SYS_MSGICON,	PNG,	"theme_sys_res/msgicon.png")
+DEFINE_UIRES(SYS_BORDER,	PNG,	"theme_sys_res/sys_border.png")
+DEFINE_UIRES(SYS_CHECKBOX,	PNG,	"theme_sys_res/sys_checkbox.png")
+DEFINE_UIRES(SYS_RADIO,	PNG,	"theme_sys_res/sys_radio.png")
+DEFINE_UIRES(SYS_FOCUS_CHECKBOX,	PNG,	"theme_sys_res/sys_focus_checkbox.png")
+DEFINE_UIRES(SYS_FOCUS_RADIO,	PNG,	"theme_sys_res/sys_focus_radio.png")
+DEFINE_UIRES(SYS_DROPBTN,	PNG,	"theme_sys_res/sys_dropbtn.png")
+DEFINE_UIRES(SYS_SCROLLBAR,	PNG,	"theme_sys_res/sys_scrollbar.png")
+DEFINE_UIRES(SYS_TREE_CHECKBOX,	PNG,	"theme_sys_res/sys_tree_checkbox.png")
+DEFINE_UIRES(SYS_TREE_TOGGLE,	PNG,	"theme_sys_res/sys_tree_toggle.png")
+DEFINE_UIRES(SYS_HEADER,	PNG,	"theme_sys_res/sys_header.png")
+DEFINE_UIRES(SYS_SPLIT_VERT,	PNG,	"theme_sys_res/sys_split_vert.png")
+DEFINE_UIRES(SYS_SPLIT_HORZ,	PNG,	"theme_sys_res/sys_split_horz.png")
+DEFINE_UIRES(SYS_PROG_BKGND,	PNG,	"theme_sys_res/sys_prog_bkgnd.png")
+DEFINE_UIRES(SYS_PROG_BAR,	PNG,	"theme_sys_res/sys_prog_bar.png")
+DEFINE_UIRES(SYS_VERT_PROG_BKGND,	PNG,	"theme_sys_res/sys_vert_prog_bkgnd.png")
+DEFINE_UIRES(SYS_VERT_PROG_BAR,	PNG,	"theme_sys_res/sys_vert_prog_bar.png")
+DEFINE_UIRES(SYS_SLIDER_THUMB,	PNG,	"theme_sys_res/sys_slider_thumb.png")
+DEFINE_UIRES(SYS_TAB_PAGE,	PNG,	"theme_sys_res/sys_tab_page.png")
+DEFINE_UIRES(SYS_TAB_HEADER,	PNG,	"theme_sys_res/sys_tab_header.png")
+DEFINE_UIRES(SYS_BTN_MINIMIZE,	PNG,	"theme_sys_res/sys_btn_minimize.png")
+DEFINE_UIRES(SYS_BTN_RESTORE,	PNG,	"theme_sys_res/sys_btn_restore.png")
+DEFINE_UIRES(SYS_BTN_CLOSE,	PNG,	"theme_sys_res/sys_btn_close.png")
+DEFINE_UIRES(SYS_BTN_MAXIMIZE,	PNG,	"theme_sys_res/sys_btn_maximize.png")
+DEFINE_UIRES(SYS_MENU_CHECK,	PNG,	"theme_sys_res/sys_menu_check.png")
+DEFINE_UIRES(SYS_MENU_ARROW,	PNG,	"theme_sys_res/sys_menu_arrow.png")
+DEFINE_UIRES(SYS_MENU_SEP,	PNG,	"theme_sys_res/sys_menu_sep.png")
+DEFINE_UIRES(SYS_MENU_BORDER,	PNG,	"theme_sys_res/sys_menu_border.png")
+DEFINE_UIRES(SYS_MENU_SKIN,	PNG,	"theme_sys_res/sys_menu_skin.png")
+DEFINE_UIRES(SYS_ICONS,	PNG,	"theme_sys_res/sys_icons.png")
+DEFINE_UIRES(SYS_WND_BKGND,	PNG,	"theme_sys_res/sys_wnd_bkgnd.png")
+DEFINE_UIRES(SYS_BTN_PREV,	PNG,	"theme_sys_res/sys_btn_prev.png")
+DEFINE_UIRES(SYS_BTN_NEXT,	PNG,	"theme_sys_res/sys_btn_next.png")
+DEFINE_UIRES(SYS_SPIN_DOWN,	PNG,	"theme_sys_res/sys_spin_down.png")
+DEFINE_UIRES(SYS_SPIN_UP,	PNG,	"theme_sys_res/sys_spin_up.png")
+DEFINE_UIRES(SYS_SWITCH,	PNG,	"theme_sys_res/sys_switch.png")
+DEFINE_UIRES(SYS_SWITCH_BG,	PNG,	"theme_sys_res/sys_switch_bg.png")
+DEFINE_UIRES(SYS_LIST_ITEM,	PNG,	"theme_sys_res/sys_list_item.png")
+DEFINE_UIRES(SYS_XML_SKIN,	XML,	"theme_sys_res/sys_xml_skin.xml")
+DEFINE_UIRES(SYS_XML_EDITMENU,	XML,	"theme_sys_res/sys_xml_editmenu.xml")
+DEFINE_UIRES(SYS_XML_MSGBOX,	XML,	"theme_sys_res/sys_xml_msgbox.xml")
+DEFINE_UIRES(THEME_COLOR,	XML,	"theme_sys_res/theme_color.xml")

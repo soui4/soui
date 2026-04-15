@@ -23,6 +23,7 @@
         <file name="SYS_VERT_PROG_BAR" path="theme_sys_res\sys_vert_prog_bar.svg"/>
         <file name="SYS_SLIDER_THUMB" path="theme_sys_res\sys_slider_thumb.svg"/>
         <file name="SYS_TAB_PAGE" path="theme_sys_res\sys_tab_page.svg"/>
+        <file name="SYS_TAB_HEADER" path="theme_sys_res\sys_tab_header.svg"/>
         <file name="SYS_BTN_MINIMIZE" path="theme_sys_res\sys_btn_minimize.svg"/>
         <file name="SYS_BTN_RESTORE" path="theme_sys_res\sys_btn_restore.svg"/>
         <file name="SYS_BTN_CLOSE" path="theme_sys_res\sys_btn_close.svg"/>

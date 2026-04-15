@@ -20,6 +20,7 @@
   <imglist name="_skin.sys.tree.checkbox" src="SVG:SYS_TREE_CHECKBOX" states="9"/>
   <treelines name="_skin.sys.tree.lines" lineWidth="1" colorLine="rgba(128,128,128,255)" colorCross="rgba(0,0,0,255)"/>
   <imgframe name="_skin.sys.tab.page" src="SVG:SYS_TAB_PAGE" margin="5,2,5,7" states="4"/>
+  <imgframe name="_skin.sys.tab.header" src="SVG:SYS_TAB_HEADER" margin="3,3,3,3" states="4"/>
   <imgframe name="_skin.sys.header" src="SVG:SYS_HEADER" margin-x="2" margin-y="2" states="4"/>
   <imgframe name="_skin.sys.split.vert" src="SVG:SYS_SPLIT_VERT" margin-x="2" margin-y="2"/>
   <imgframe name="_skin.sys.split.horz" src="SVG:SYS_SPLIT_HORZ" margin-x="2" margin-y="2"/>

@@ -522,6 +522,7 @@ static const wchar_t *BUILDIN_SKIN_NAMES[] =
     L"_skin.sys.tree.checkbox",
     L"_skin.sys.tree.lines",
     L"_skin.sys.tab.page",
+    L"_skin.sys.tab.header",
     L"_skin.sys.header",
     L"_skin.sys.split.vert",
     L"_skin.sys.split.horz",

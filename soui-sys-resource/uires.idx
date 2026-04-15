@@ -10,7 +10,6 @@
         <file name="SYS_SCROLLBAR" path="theme_sys_res\sys_scrollbar.png"/>
         <file name="SYS_TREE_CHECKBOX" path="theme_sys_res\sys_tree_checkbox.png"/>
         <file name="SYS_TREE_TOGGLE" path="theme_sys_res\sys_tree_toggle.png"/>
-        <file name="SYS_TREE_LINES" path="theme_sys_res\sys_tree_lines.png"/>
         <file name="SYS_HEADER" path="theme_sys_res\sys_header.png"/>
         <file name="SYS_SPLIT_VERT" path="theme_sys_res\sys_split_vert.png"/>
         <file name="SYS_SPLIT_HORZ" path="theme_sys_res\sys_split_horz.png"/>
@@ -20,6 +19,7 @@
         <file name="SYS_VERT_PROG_BAR" path="theme_sys_res\sys_vert_prog_bar.png"/>
         <file name="SYS_SLIDER_THUMB" path="theme_sys_res\sys_slider_thumb.png"/>
         <file name="SYS_TAB_PAGE" path="theme_sys_res\sys_tab_page.png"/>
+        <file name="SYS_TAB_HEADER" path="theme_sys_res\sys_tab_header.png"/>
         <file name="SYS_BTN_MINIMIZE" path="theme_sys_res\sys_btn_minimize.png"/>
         <file name="SYS_BTN_RESTORE" path="theme_sys_res\sys_btn_restore.png"/>
         <file name="SYS_BTN_CLOSE" path="theme_sys_res\sys_btn_close.png"/>

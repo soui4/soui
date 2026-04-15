@@ -45,7 +45,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
         argv[i]=(TCHAR*)strArgs[i].c_str();
     }
     SStringT strInput, strOutput;
-    int nSize = 32;
+    int nSize = -1;
     int c;
 	while ((c = xgetopt(argc, argv, _T(":i:s:o:"))) != EOF || optarg!=NULL)
 	{
@@ -70,13 +70,19 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
         _ftprintf(stderr,_T("load svg failed! input=%s\n"),strInput.c_str());
         return -2;
     }
+    int nWid = pSvg->GetWidth();
+    int nHei = pSvg->GetHeight();
+    float fRatio = (float)nHei/nWid;
+    int cx = nSize==-1?nWid:nSize;
+    int cy = cx * fRatio;
+
     if(strOutput.IsEmpty()){
-        strOutput = strInput.Left(strInput.GetLength()-4)+SStringT().Format(_T("_%d.png"),nSize);
+        strOutput = strInput.Left(strInput.GetLength()-4)+SStringT().Format(_T("_%d.png"),cx);
     }
     IRenderTarget *pRT=NULL;
-    GETRENDERFACTORY->CreateRenderTarget(&pRT,nSize,nSize);
+    GETRENDERFACTORY->CreateRenderTarget(&pRT,cx,cy);
     pRT->BeginDraw();
-    CRect rcDst(0,0,nSize,nSize);
+    CRect rcDst(0,0,cx,cy);
     pRT->DrawSVG(pSvg,&rcDst);
     pRT->EndDraw();
     IBitmapS *pBmp=(IBitmapS*)pRT->GetCurrentObject(OT_BITMAP);
