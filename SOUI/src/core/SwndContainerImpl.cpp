@@ -216,7 +216,7 @@ void SwndContainerImpl::OnFrameMouseMove(UINT uFlag, CPoint pt)
                     pOldHover->TransformPointEx(pt3);
                     bLeave = !pOldHover->IsContainPoint(pt3, FALSE);
                 }
-                if (bLeave)
+                if (bLeave && !pOldHover->IsDisabled(TRUE))
                 {
                     if (m_uNcHitTest != HTCLIENT)
                         pOldHover->SSendMessage(WM_NCMOUSELEAVE, m_uNcHitTest, 0);

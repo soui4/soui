@@ -193,7 +193,7 @@ void SSliderBar::DrawOthers(IRenderTarget *pRT, const CRect &rcClient)
     else
     { // 在动画过程中
         BYTE byAlpha = m_byThumbAlphaAni;
-        if (m_uHtPrev != SC_NULL)
+        if(GetState()&WndState_Hover)
         {
             // enter hover
             m_pSkinThumb->DrawByIndex2(pRT, rcThumb, 0, 255 - byAlpha);
@@ -310,10 +310,13 @@ void SSliderBar::OnMouseHover(UINT uHitTest, CPoint point)
     __baseCls::OnMouseHover(uHitTest, point);
     if (m_bDrag)
         return;
-    int uHit = HitTest(point);
+    m_uHtPrev = HitTest(point);
     // 悬停状态改变，启动动画
-    m_uHtPrev = uHit;
-    m_thumbAni->setRange(50, 255);
+    if(m_byThumbAlphaAni == 255){
+        m_thumbAni->setRange(50, 255);
+    }else{
+        m_thumbAni->setRange(m_byThumbAlphaAni, 255);
+    }
     m_thumbAni->start(GetContainer());
 }
 
@@ -324,7 +327,11 @@ void SSliderBar::OnMouseLeave()
         return;
     // 悬停状态改变，启动动画
     m_uHtPrev = SC_NULL;
-    m_thumbAni->setRange(50, 255);
+    if(m_byThumbAlphaAni == 255){
+        m_thumbAni->setRange(50, 255);
+    }else{
+        m_thumbAni->setRange(m_byThumbAlphaAni, 255);
+    }
     m_thumbAni->start(GetContainer());
 }
 

@@ -51,7 +51,7 @@ BOOL SOsrPanel::InitFromXml(THIS_ IXmlNode *pNode)
 LRESULT SOsrPanel::DoFrameEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     AddRef();
-
+    BOOL bBubble = TRUE;
     if (!IsDisabled())
     {
         switch (uMsg)
@@ -63,6 +63,7 @@ LRESULT SOsrPanel::DoFrameEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
             evt.wParam = wParam;
             evt.lParam = lParam;
             FireEvent(evt);
+            bBubble = evt.bubbleUp;
             break;
         }
         case WM_MOUSELEAVE:
@@ -70,6 +71,7 @@ LRESULT SOsrPanel::DoFrameEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
             ModifyState(0, WndState_Hover, TRUE);
             EventItemPanelLeave evt(this);
             FireEvent(evt);
+            bBubble = evt.bubbleUp;
             break;
         }
         case WM_LBUTTONDOWN:
@@ -78,6 +80,7 @@ LRESULT SOsrPanel::DoFrameEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
             evt.wParam = wParam;
             evt.lParam = lParam;
             FireEvent(evt);
+            bBubble = evt.bubbleUp;
             break;
         }
         case WM_RBUTTONDOWN:
@@ -86,6 +89,7 @@ LRESULT SOsrPanel::DoFrameEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
             evt.wParam = wParam;
             evt.lParam = lParam;
             FireEvent(evt);
+            bBubble = evt.bubbleUp;
             break;
         }
         case WM_LBUTTONDBLCLK:
@@ -94,6 +98,7 @@ LRESULT SOsrPanel::DoFrameEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
             evt.wParam = wParam;
             evt.lParam = lParam;
             FireEvent(evt);
+            bBubble = evt.bubbleUp;
             break;
         }
         case WM_LBUTTONUP:
@@ -102,6 +107,7 @@ LRESULT SOsrPanel::DoFrameEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
             evt.wParam = wParam;
             evt.lParam = lParam;
             FireEvent(evt);
+            bBubble = evt.bubbleUp;
             break;
         }
         case WM_RBUTTONUP:
@@ -110,25 +116,28 @@ LRESULT SOsrPanel::DoFrameEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
             evt.wParam = wParam;
             evt.lParam = lParam;
             FireEvent(evt);
+            bBubble = evt.bubbleUp;
             break;
         }
         }
     }
 
     SetMsgHandled(FALSE);
-
-    BOOL isMute = GetEventSet()->isMuted();
-    if (uMsg == WM_LBUTTONUP && !isMute)
+    LRESULT lRet = 0;
+    if (bBubble)
     {
-        GetEventSet()->setMutedState(true);
+        BOOL isMute = GetEventSet()->isMuted();
+        if (uMsg == WM_LBUTTONUP && !isMute)
+        {
+            GetEventSet()->setMutedState(true);
+        }
+        lRet = SwndContainerImpl::DoFrameEvent(uMsg, wParam, lParam);
+        if (uMsg == WM_LBUTTONUP && !isMute)
+        {
+            GetEventSet()->setMutedState(false);
+            FireCommand();
+        }
     }
-    LRESULT lRet = SwndContainerImpl::DoFrameEvent(uMsg, wParam, lParam);
-    if (uMsg == WM_LBUTTONUP && !isMute)
-    {
-        GetEventSet()->setMutedState(false);
-        FireCommand();
-    }
-
     Release();
     return lRet;
 }
