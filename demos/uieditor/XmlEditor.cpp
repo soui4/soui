@@ -26,6 +26,7 @@ CXmlEditor::CXmlEditor(CMainDlg *pMainDlg)
 :m_bValidXml(TRUE)
 ,m_bUpdateDesigner(TRUE)
 ,m_pFindDlg(NULL)
+,m_tsSave(0)
 {
 	m_pMainDlg = pMainDlg;
 	m_pResManger = &pMainDlg->m_UIResFileMgr;
@@ -63,6 +64,9 @@ BOOL CXmlEditor::CloseXml()
 }
 
 void CXmlEditor::Reload(){
+    DWORD now = ::GetTickCount();
+    if (now - m_tsSave < 1000) // 如果距离上次保存不到1秒，直接返回
+        return;
     SXmlDoc xmlDoc;
     if (!xmlDoc.load_file(m_strXmlFile))
         return;
@@ -125,6 +129,7 @@ BOOL CXmlEditor::LoadXml(SStringT strFileName, SStringT layoutName)
     {
         m_strXmlFile = m_strProPath + _T("/") + strFileName;
     }
+    m_tsSave = 0;
     m_pScintillaWnd->OpenFile(m_strXmlFile);
 	m_nCaretPos = m_pScintillaWnd->SendEditor(SCI_GETCURRENTPOS);
     m_bSetCaretPos = FALSE;
@@ -181,7 +186,6 @@ bool CXmlEditor::SaveFile()
 	{
 		return false;
 	}
-	
 	return m_pScintillaWnd->SaveFile(m_strXmlFile);
 }
 
@@ -901,6 +905,7 @@ void CXmlEditor::onScintillaSave(CScintillaWnd *pSci, LPCTSTR pszFileName)
 {
 	// Handle save event - could trigger XML validation or UI update
 	SLOGI() << "XML saved: " << pszFileName;
+    m_tsSave = ::GetTickCount();
 	UpdateXmlData();
 }
 

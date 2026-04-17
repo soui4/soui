@@ -264,6 +264,10 @@ DECLARE_INTERFACE_(IImageWnd, ICtrl)
      * @return int -- 当前设置子图在Skin中的索引号
      */
     STDMETHOD_(int, GetIcon)(CTHIS) SCONST PURE;
+
+    STDMETHOD_(void, SetSvg)(THIS_ ISvgObj * pSvg) PURE;
+
+    STDMETHOD_(ISvgObj *, GetSvg)(CTHIS) SCONST PURE;
 };
 
 // {C2378093-CB34-4811-98D1-A721637B3B87}

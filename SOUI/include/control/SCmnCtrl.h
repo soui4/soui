@@ -470,6 +470,9 @@ class SOUI_EXP SImageWnd : public TWindowProxy<IImageWnd> {
      */
     STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *pSize, int nParentWid, int nParentHei) OVERRIDE;
 
+    STDMETHOD_(void, SetSvg)(THIS_ ISvgObj *pSvg) OVERRIDE;
+
+    STDMETHOD_(ISvgObj *, GetSvg)(CTHIS) SCONST OVERRIDE;
   protected:
     /**
      * @brief 处理颜色化事件
@@ -493,11 +496,6 @@ class SOUI_EXP SImageWnd : public TWindowProxy<IImageWnd> {
 
   protected:
     /**
-     * @brief 绘制是否平铺, 0--位伸（默认），1--不变常规绘制, 2--平铺
-     */
-    int m_iTile;
-
-    /**
      * @brief 是否要自动释放当前的m_pSkin对象
      */
     BOOL m_bManaged;
@@ -518,6 +516,11 @@ class SOUI_EXP SImageWnd : public TWindowProxy<IImageWnd> {
     SAutoRefPtr<IBitmapS> m_pImg;
 
     /**
+     * @brief 使用代码设定的SVG对象
+     */
+    SAutoRefPtr<ISvgObj> m_pSvg;
+
+    /**
      * @brief 绘制图片的放大精度
      */
     FilterLevel m_fl;
@@ -535,7 +538,6 @@ class SOUI_EXP SImageWnd : public TWindowProxy<IImageWnd> {
     SOUI_ATTRS_BEGIN()
         ATTR_SKIN(L"skin", m_pSkin, TRUE)
         ATTR_INT(L"iconIndex", m_iIcon, FALSE)
-        ATTR_INT(L"tile", m_iTile, TRUE)
         ATTR_BOOL(L"keepAspect", m_bKeepAspect, TRUE)
         ATTR_BOOL(L"fitImage", m_bFitImage, TRUE)
     SOUI_ATTRS_END()

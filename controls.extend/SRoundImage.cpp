@@ -12,9 +12,14 @@ namespace SOUI
 	{
 	}
 
+	void SRoundImage::OnContentChanged()
+	{
+		m_img = GetRoundImage();
+		__baseCls::OnContentChanged();
+    }
+
 	SAutoRefPtr<IBitmapS> SRoundImage::GetRoundImage() const
 	{
-		if (!m_pSkin) return NULL;
 		SAutoRefPtr<IRenderTarget> pRT; 
 		CRect rc = GetClientRect();
 		GETRENDERFACTORY->CreateRenderTarget(&pRT, rc.Width(), rc.Height());
@@ -30,7 +35,20 @@ namespace SOUI
 			pRT->FillRoundRect(&rc,CPoint(m_cornerSize,m_cornerSize));
 		}
 		pRT->SetXfermode(kSrcIn_Mode,NULL);
-		m_pSkin->DrawByIndex(pRT, rc, 0);
+
+        if (m_pImg)
+        {
+            CRect rcImg(CPoint(0, 0), m_pImg->Size());
+            pRT->DrawBitmapEx(rc, m_pImg, &rcImg, MAKELONG(EM_STRETCH, m_fl), 0xff);
+        }
+        else if (m_pSvg)
+        {
+            pRT->DrawSVG(m_pSvg, &rc, NULL);
+        }
+        else if (m_pSkin)
+        {
+            m_pSkin->DrawByIndex(pRT, rc, m_iIcon);
+        }
 		pRT->EndDraw();
 		return (IBitmapS*)pRT->GetCurrentObject(OT_BITMAP);
 	}

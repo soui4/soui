@@ -91,6 +91,15 @@ DECLARE_INTERFACE_(ISvgObj, IObjRef)
      * @return int The height of the SVG image.
      */
     STDMETHOD_(int, GetHeight)(THIS) SCONST PURE;
+
+    /**
+     * @brief Returns the size of the SVG image.
+     *
+     * @details This method returns the size of the SVG image as a SIZE structure.
+     *
+     * @return SIZE The size of the SVG image.
+     */
+    STDMETHOD_(SIZE, Size)(CTHIS) SCONST PURE;
 };
 
 typedef ISvgObj *ISvgObjPtr;

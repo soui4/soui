@@ -18,7 +18,7 @@ namespace SOUI
 		SOUI_ATTRS_END()
 	protected:
 		SAutoRefPtr<IBitmapS> GetRoundImage() const;
-
+		void OnContentChanged() override;
 		void OnPaint(IRenderTarget *pRT);
 		void OnSize(UINT nType, CSize size);
 		SOUI_MSG_MAP_BEGIN()

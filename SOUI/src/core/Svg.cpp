@@ -28,6 +28,11 @@ class SvgObj : public TObjRefImpl<ISvgObj> {
     STDMETHOD_(void *, GetPtr)(CTHIS) SCONST OVERRIDE;
     STDMETHOD_(int, GetWidth)(CTHIS) SCONST OVERRIDE;
     STDMETHOD_(int, GetHeight)(CTHIS) SCONST OVERRIDE;
+    STDMETHOD_(SIZE, Size)(CTHIS) SCONST OVERRIDE
+    {
+        SIZE sz = {GetWidth(), GetHeight()};
+        return sz;
+    }
 };
 
 SvgObj::~SvgObj()

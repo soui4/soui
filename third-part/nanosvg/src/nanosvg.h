@@ -334,6 +334,13 @@ static float nsvgConvertToPixels(NSVGcoordinate c, float orig, float length, flo
 #define NSVG_RGBA(r, g, b, a) (((unsigned int)r)| ((unsigned int)g << 8)| ((unsigned int)b << 16) | ((unsigned int)a << 24)  )
 #define NSVG_RGB(r, g, b) NSVG_RGBA((r), (g), (b), 255)
 
+// NSVGattrib invalid/sentinel values (used to detect if attribute was explicitly set)
+#define NSVG_INVALID_COLOR           0x00FFFFFFU    // Color: all bits set
+#define NSVG_INVALID_FLOAT           -1.0f          // Float values: -1.0f
+#define NSVG_INVALID_INT             -1             // Int values: -1
+#define NSVG_INVALID_CHAR            -1             // Char values: -1
+#define NSVG_INVALID_UCHAR           0xFFU          // Unsigned char: 0xFF
+
 #ifdef _MSC_VER
 	#pragma warning (disable: 4996) // Switch off security warnings
 	#pragma warning (disable: 4100) // Switch off unreferenced formal parameter warnings
@@ -589,6 +596,63 @@ static void nsvg__xformIdentity(float* t)
 	t[0] = 1.0f; t[1] = 0.0f;
 	t[2] = 0.0f; t[3] = 1.0f;
 	t[4] = 0.0f; t[5] = 0.0f;
+}
+
+static int nsvg__xformIsIdentity(float* t)
+{
+	return t[0] == 1.0f && t[1] == 0.0f &&
+	       t[2] == 0.0f && t[3] == 1.0f &&
+	       t[4] == 0.0f && t[5] == 0.0f;
+}
+
+// Initialize attrib with invalid sentinel values (indicating not explicitly set)
+static void nsvg__initAttrib(NSVGattrib* attr)
+{
+	if (!attr) return;
+	
+	memset(attr->id, 0, sizeof(attr->id));
+	memset(attr->className, 0, sizeof(attr->className));
+	// Initialize xform to identity
+	nsvg__xformIdentity(attr->xform);
+	
+	attr->fillColor = NSVG_INVALID_COLOR;
+	attr->strokeColor = NSVG_INVALID_COLOR;
+	attr->stopColor = NSVG_INVALID_COLOR;
+	
+	attr->opacity = NSVG_INVALID_FLOAT;
+	attr->fillOpacity = 1.0f;
+	attr->strokeOpacity = 1.0f;
+	attr->stopOpacity = 1.0f;
+	
+	memset(attr->fillGradient, 0, sizeof(attr->fillGradient));
+	memset(attr->strokeGradient, 0, sizeof(attr->strokeGradient));
+	memset(attr->clipPath, 0, sizeof(attr->clipPath));
+	
+	attr->strokeWidth = NSVG_INVALID_FLOAT;
+	attr->strokeDashOffset = NSVG_INVALID_FLOAT;
+	memset(attr->strokeDashArray, 0, sizeof(attr->strokeDashArray));
+	attr->strokeDashCount = 0;
+	
+	attr->strokeLineJoin = NSVG_INVALID_CHAR;
+	attr->strokeLineCap = NSVG_INVALID_CHAR;
+	attr->miterLimit = NSVG_INVALID_FLOAT;
+	attr->fillRule = NSVG_INVALID_CHAR;
+	
+	attr->fontSize = NSVG_INVALID_FLOAT;
+	memset(attr->fontFamily, 0, sizeof(attr->fontFamily));
+	attr->fontWeight = NSVG_INVALID_CHAR;
+	attr->fontStyle = NSVG_INVALID_CHAR;
+	
+	attr->hasFill = NSVG_INVALID_CHAR;
+	attr->hasStroke = NSVG_INVALID_CHAR;
+	attr->visible = NSVG_INVALID_CHAR;
+	
+	attr->paintOrder = NSVG_INVALID_UCHAR;
+	attr->anchor = (NSGAnchorText)NSVG_INVALID_INT;
+	
+	attr->textDecoration = NSVG_INVALID_CHAR;
+	attr->letterSpacing = NSVG_INVALID_FLOAT;
+	attr->wordSpacing = NSVG_INVALID_FLOAT;
 }
 
 static void nsvg__xformSetTranslation(float* t, float tx, float ty)
@@ -1142,74 +1206,142 @@ static void nsvg__getLocalBounds(float* bounds, NSVGshape *shape, float* xform)
 static void nsvg__applyShapeAttr(NSVGshape *shape, NSVGattrib *attr)
 {
     float scale = 1.0f;
-    NSVGpath *path;
     int i;
     if (!attr)
         return;
-    memcpy(shape->fillGradient, attr->fillGradient, sizeof shape->fillGradient);
-    memcpy(shape->strokeGradient, attr->strokeGradient, sizeof shape->strokeGradient);
-    memcpy(shape->clipPath, attr->clipPath, sizeof shape->clipPath);
-    memcpy(shape->xform, attr->xform, sizeof shape->xform);
-    scale = nsvg__getAverageScale(attr->xform);
-    shape->strokeWidth = attr->strokeWidth * scale;
-    shape->strokeDashOffset = attr->strokeDashOffset * scale;
-    shape->strokeDashCount = (char)attr->strokeDashCount;
-    for (i = 0; i < attr->strokeDashCount; i++)
-        shape->strokeDashArray[i] = attr->strokeDashArray[i] * scale;
-    shape->strokeLineJoin = attr->strokeLineJoin;
-    shape->strokeLineCap = attr->strokeLineCap;
-    shape->miterLimit = attr->miterLimit;
-    shape->fillRule = attr->fillRule;
-    shape->opacity = attr->opacity;
-    shape->paintOrder = attr->paintOrder;
+    
+    // Apply fillGradient only if explicitly set (non-empty string)
+    if (attr->fillGradient[0])
+		memcpy(shape->fillGradient, attr->fillGradient, sizeof shape->fillGradient);
+    
+    // Apply strokeGradient only if explicitly set (non-empty string)
+    if (attr->strokeGradient[0])
+		memcpy(shape->strokeGradient, attr->strokeGradient, sizeof shape->strokeGradient);
+    
+    // Apply clipPath only if explicitly set (non-empty string)
+    if (attr->clipPath[0])
+		memcpy(shape->clipPath, attr->clipPath, sizeof shape->clipPath);
+    
+    // Apply xform only if not identity matrix
+    if (!nsvg__xformIsIdentity(attr->xform))
+		memcpy(shape->xform, attr->xform, sizeof shape->xform);
+    
+    scale = nsvg__getAverageScale(shape->xform);
+    // Apply opacity only if explicitly set (not invalid sentinel)
+    if (attr->opacity != NSVG_INVALID_FLOAT)
+        shape->opacity = attr->opacity;
+        
+    // Apply strokeDashOffset only if explicitly set (not invalid sentinel)
+    if (attr->strokeDashOffset != NSVG_INVALID_FLOAT)
+        shape->strokeDashOffset = attr->strokeDashOffset * scale;
+    
+    // Apply strokeDashArray only if explicitly set (strokeDashCount != invalid)
+    if (attr->strokeDashCount > 0)
+    {
+        shape->strokeDashCount = (char)attr->strokeDashCount;
+        for (i = 0; i < attr->strokeDashCount; i++)
+            shape->strokeDashArray[i] = attr->strokeDashArray[i] * scale;
+    }
+    
+    // Apply strokeLineJoin only if explicitly set (not invalid sentinel)
+    if (attr->strokeLineJoin != NSVG_INVALID_CHAR)
+        shape->strokeLineJoin = attr->strokeLineJoin;
+    
+    // Apply strokeLineCap only if explicitly set (not invalid sentinel)
+    if (attr->strokeLineCap != NSVG_INVALID_CHAR)
+        shape->strokeLineCap = attr->strokeLineCap;
+    
+    // Apply miterLimit only if explicitly set (not invalid sentinel)
+    if (attr->miterLimit != NSVG_INVALID_FLOAT)
+        shape->miterLimit = attr->miterLimit;
+    
+    // Apply fillRule only if explicitly set (not invalid sentinel)
+    if (attr->fillRule != NSVG_INVALID_CHAR)
+        shape->fillRule = attr->fillRule;
+    
+    // Apply paintOrder only if explicitly set (not invalid sentinel)
+    if (attr->paintOrder != NSVG_INVALID_UCHAR)
+        shape->paintOrder = attr->paintOrder;
 
-    // Calculate shape bounds
-    shape->bounds[0] = shape->paths->bounds[0];
-    shape->bounds[1] = shape->paths->bounds[1];
-    shape->bounds[2] = shape->paths->bounds[2];
-    shape->bounds[3] = shape->paths->bounds[3];
-    for (path = shape->paths->next; path != NULL; path = path->next)
+
+
+    // Set fill only if hasFill explicitly set (not invalid sentinel)
+    if (attr->hasFill != NSVG_INVALID_CHAR)
     {
-        shape->bounds[0] = nsvg__minf(shape->bounds[0], path->bounds[0]);
-        shape->bounds[1] = nsvg__minf(shape->bounds[1], path->bounds[1]);
-        shape->bounds[2] = nsvg__maxf(shape->bounds[2], path->bounds[2]);
-        shape->bounds[3] = nsvg__maxf(shape->bounds[3], path->bounds[3]);
+        if (attr->hasFill == 0)
+        {
+            shape->fill.type = NSVG_PAINT_NONE;
+        }
+        else if (attr->hasFill == 1)
+        {
+            shape->fill.type = NSVG_PAINT_COLOR;
+            if (attr->fillColor != NSVG_INVALID_COLOR)
+                shape->fill.color = ((unsigned int)(attr->fillOpacity * GetAValue(attr->fillColor)) << 24) | (attr->fillColor & 0x00FFFFFF);
+        }
+        else if (attr->hasFill == 2)
+        {
+            shape->fill.type = NSVG_PAINT_UNDEF;
+        }
     }
 
-    // Set fill
-    if (attr->hasFill == 0)
+    // Set stroke only if hasStroke explicitly set (not invalid sentinel)
+    if (attr->hasStroke != NSVG_INVALID_CHAR)
     {
-        shape->fill.type = NSVG_PAINT_NONE;
+        if (attr->hasStroke == 0)
+        {
+            shape->stroke.type = NSVG_PAINT_NONE;
+        }
+        else if (attr->hasStroke == 1)
+        {
+            shape->stroke.type = NSVG_PAINT_COLOR;
+            if (attr->strokeColor != NSVG_INVALID_COLOR)
+                shape->stroke.color = ((unsigned int)(attr->strokeOpacity * GetAValue(attr->strokeColor)) << 24) | (attr->strokeColor & 0x00FFFFFF);
+        }
+        else if (attr->hasStroke == 2)
+        {
+            shape->stroke.type = NSVG_PAINT_UNDEF;
+        }
     }
-    else if (attr->hasFill == 1)
+    // Apply strokeWidth only if explicitly set (not invalid sentinel)
+    if (attr->strokeWidth != NSVG_INVALID_FLOAT)
+        shape->strokeWidth = attr->strokeWidth * scale;
+
+    // Set visible flag only if explicitly set (not invalid sentinel)
+    if (attr->visible != NSVG_INVALID_CHAR)
     {
-        shape->fill.type = NSVG_PAINT_COLOR;
-        shape->fill.color = ((unsigned int)(attr->fillOpacity * GetAValue(attr->fillColor)) << 24) | (attr->fillColor & 0x00FFFFFF);
-    }
-    else if (attr->hasFill == 2)
-    {
-        shape->fill.type = NSVG_PAINT_UNDEF;
+        if (attr->visible)
+            shape->flags |= NSVG_FLAGS_VISIBLE;
+        else
+            shape->flags &= ~NSVG_FLAGS_VISIBLE;
     }
 
-    // Set stroke
-    if (attr->hasStroke == 0)
-    {
-        shape->stroke.type = NSVG_PAINT_NONE;
-    }
-    else if (attr->hasStroke == 1)
-    {
-        shape->stroke.type = NSVG_PAINT_COLOR;
-        shape->stroke.color = ((unsigned int)(attr->strokeOpacity * GetAValue(attr->strokeColor)) << 24) | (attr->strokeColor & 0x00FFFFFF);
-    }
-    else if (attr->hasStroke == 2)
-    {
-        shape->stroke.type = NSVG_PAINT_UNDEF;
-    }
-
-    // Set flags
-    shape->flags = (attr->visible ? NSVG_FLAGS_VISIBLE : 0x00);
+    //todo:hjx
+    // Apply fontSize only if explicitly set (not invalid sentinel)
+    // (fontSize is primarily used for text rendering)
+    
+    // Apply fontFamily only if explicitly set (non-empty string)
+    // (fontFamily is primarily used for text rendering)
+    
+    // Apply fontWeight only if explicitly set (not invalid sentinel)
+    // (fontWeight is primarily used for text rendering)
+    
+    // Apply fontStyle only if explicitly set (not invalid sentinel)
+    // (fontStyle is primarily used for text rendering)
+    
+    // Apply anchor only if explicitly set (not invalid sentinel)
+    // (anchor is primarily used for text rendering)
+    
+    // Apply textDecoration only if explicitly set (not invalid sentinel)
+    // (textDecoration is primarily used for text rendering)
+    
+    // Apply letterSpacing only if explicitly set (not invalid sentinel)
+    // (letterSpacing is primarily used for text rendering)
+    
+    // Apply wordSpacing only if explicitly set (not invalid sentinel)
+    // (wordSpacing is primarily used for text rendering)
 }
 static NSVGattrib *nsvg_findCssStyle(NSVGparser *p, const char *cssName);
+static void nsvg__applyAllCssClassStyles(NSVGparser *p, NSVGshape *shape, const char *classNames);
 
 static void nsvg__addShape(NSVGparser* p)
 {
@@ -1220,18 +1352,33 @@ static void nsvg__addShape(NSVGparser* p)
         
     NSVGshape *shape;
     NSVGattrib *attr = nsvg__getAttr(p);
-    NSVGattrib *attrCss = nsvg_findCssStyle(p,attr->className);
 	if (p->plist == NULL)
 		return;
     shape = (NSVGshape *)malloc(sizeof(NSVGshape));
 	if (shape == NULL) goto error;
 	memset(shape, 0, sizeof(NSVGshape));
-
-	memcpy(shape->id, attr->id, sizeof shape->id);
+    memcpy(shape->id, attr->id, sizeof shape->id);
     shape->paths = p->plist;
     p->plist = NULL;
-	nsvg__applyShapeAttr(shape,attr);
-    nsvg__applyShapeAttr(shape, attrCss);
+    nsvg__xformIdentity(shape->xform);
+    // init default shape attributes
+    nsvg__applyShapeAttr(shape, &p->attr[0]);
+    // apply shape attributes from current attribute state
+    nsvg__applyShapeAttr(shape, attr);
+    // Apply all CSS class styles (supports multi-class format like class="cls_a cls_b cls_c")
+    nsvg__applyAllCssClassStyles(p, shape, attr->className);
+    // Calculate shape bounds
+    shape->bounds[0] = shape->paths->bounds[0];
+    shape->bounds[1] = shape->paths->bounds[1];
+    shape->bounds[2] = shape->paths->bounds[2];
+    shape->bounds[3] = shape->paths->bounds[3];
+    for (NSVGpath *path = shape->paths->next; path != NULL; path = path->next)
+    {
+        shape->bounds[0] = nsvg__minf(shape->bounds[0], path->bounds[0]);
+        shape->bounds[1] = nsvg__minf(shape->bounds[1], path->bounds[1]);
+        shape->bounds[2] = nsvg__maxf(shape->bounds[2], path->bounds[2]);
+        shape->bounds[3] = nsvg__maxf(shape->bounds[3], path->bounds[3]);
+    }
 	// Add to tail
 	if (p->image->shapes == NULL)
 		p->image->shapes = shape;
@@ -2346,18 +2493,67 @@ static void nsvg__parseStyle(NSVGparser* p, const char* str)
 	const char* end;
 
 	while (*str) {
-		// Left Trim
-		while(*str && nsvg__isspace(*str)) ++str;
+		// Left Trim and skip comments
+		while (*str) {
+			// Skip whitespace
+			if (nsvg__isspace(*str)) {
+				++str;
+			}
+			// Skip multi-line comments
+			else if (str[0] == '/' && str[1] == '*') {
+				str += 2;
+				while (*str && !(str[0] == '*' && str[1] == '/'))
+					++str;
+				if (str[0] == '*' && str[1] == '/')
+					str += 2;
+			}
+			// Skip single-line comments
+			else if (str[0] == '/' && str[1] == '/') {
+				while (*str && *str != '\n')
+					++str;
+				if (*str == '\n')
+					++str;
+			}
+			else {
+				break;
+			}
+		}
+		
+		if (!*str)
+			break;
+		
 		start = str;
-		while(*str && *str != ';') ++str;
+		// Find end of declaration (semicolon), skip any comments in between
+		while (*str) {
+			if (*str == ';') {
+				break;
+			}
+			// Skip multi-line comments
+			else if (str[0] == '/' && str[1] == '*') {
+				str += 2;
+				while (*str && !(str[0] == '*' && str[1] == '/'))
+					++str;
+				if (str[0] == '*' && str[1] == '/')
+					str += 2;
+			}
+			// Skip single-line comments
+			else if (str[0] == '/' && str[1] == '/') {
+				while (*str && *str != '\n')
+					++str;
+				if (*str == '\n')
+					++str;
+			}
+			else {
+				++str;
+			}
+		}
 		end = str;
 
-		// Right Trim
-		while (end > start &&  (*end == ';' || nsvg__isspace(*end))) --end;
-		++end;
-
+		// Right Trim (remove trailing whitespace and semicolons)
+		while (end > start && (end[-1] == ';' || nsvg__isspace(end[-1]))) --end;
 		nsvg__parseNameValue(p, start, end);
-		if (*str) ++str;
+        if (*str)
+            ++str;
 	}
 }
 
@@ -2403,6 +2599,44 @@ static NSVGattrib *nsvg_findCssStyle(NSVGparser *p, const char *cssName)
         rule = rule->next;
     }
     return NULL;
+}
+
+// Apply all CSS class styles for multi-class support (e.g., class="cls_a cls_b cls_c")
+static void nsvg__applyAllCssClassStyles(NSVGparser *p, NSVGshape *shape, const char *classNames)
+{
+    if (!classNames || !classNames[0])
+        return;
+
+    // Parse each class name separated by whitespace
+    const char *classPtr = classNames;
+    while (*classPtr)
+    {
+        // Skip whitespace
+        while (*classPtr && nsvg__isspace(*classPtr))
+            classPtr++;
+        if (!*classPtr)
+            break;
+
+        // Find end of current class name
+        const char *classEnd = classPtr;
+        while (*classEnd && !nsvg__isspace(*classEnd))
+            classEnd++;
+
+        // Extract class name
+        int classLen = (int)(classEnd - classPtr);
+        if (classLen > 0)
+        {
+            // Build selector string ".classname"
+            char selector[64];
+            strncpy(selector, classPtr,classLen);
+            selector[classLen] = 0;
+			NSVGattrib *attrCss = nsvg_findCssStyle(p,selector);
+			if(attrCss){
+				nsvg__applyShapeAttr(shape, attrCss);
+			}
+        }
+        classPtr = classEnd;
+    }
 }
 
 static void nsvg__parseAttribs(NSVGparser* p, const char** attr)
@@ -3430,6 +3664,67 @@ static void nsvg__startElement(void* ud, const char* el, const char** attr)
 	}
 }
 
+// Remove CSS comments (/* ... */) from CSS content
+static void nsvg__removeComments(const char* input, char* output, int maxLen)
+{
+	if (!input || !output || maxLen <= 0)
+		return;
+	
+	const char* src = input;
+	char* dst = output;
+	int remaining = maxLen - 1;  // Reserve space for null terminator
+	
+	while (*src && remaining > 0)
+	{
+		// Check for start of multi-line comment
+		if (src[0] == '/' && src[1] == '*')
+		{
+			// Skip to end of comment
+			src += 2;
+			while (*src)
+			{
+				if (src[0] == '*' && src[1] == '/')
+				{
+					src += 2;
+					break;
+				}
+				src++;
+			}
+			// Replace comment with a space to preserve separation
+			if (remaining > 0)
+			{
+				*dst++ = ' ';
+				remaining--;
+			}
+		}
+		// Check for single-line comment (if needed)
+		else if (src[0] == '/' && src[1] == '/')
+		{
+			// Skip to end of line
+			while (*src && *src != '\n')
+				src++;
+			if (*src == '\n')
+			{
+				// Preserve newline for multi-line CSS
+				if (remaining > 0)
+				{
+					*dst++ = '\n';
+					remaining--;
+				}
+				src++;
+			}
+		}
+		else
+		{
+			// Copy regular character
+			*dst++ = *src++;
+			remaining--;
+		}
+	}
+	
+	*dst = '\0';
+}
+
 static void nsvg__parseCssRule(NSVGparser* p, const char* rule)
 {
 	// Find selector and style parts
@@ -3441,7 +3736,9 @@ static void nsvg__parseCssRule(NSVGparser* p, const char* rule)
 	if (!cssRule) return;
 	
 	// Initialize style with default values
-	memcpy(&cssRule->style, &p->attr[0], sizeof(NSVGattrib));
+	NSVGattrib defaultStyle;
+    memcpy(&defaultStyle, &p->attr[0], sizeof(NSVGattrib));
+	nsvg__initAttrib(&p->attr[0]);
 	
 	// Parse selector
 	int selectorLen = (int)(colon - rule);
@@ -3474,7 +3771,7 @@ static void nsvg__parseCssRule(NSVGparser* p, const char* rule)
 	
 	// Copy the parsed style to the CSS rule
 	memcpy(&cssRule->style, &p->attr[0], sizeof(NSVGattrib));
-	
+	memcpy(&p->attr[0], &defaultStyle, sizeof(NSVGattrib));
 	// Add the rule to the list
 	cssRule->next = p->cssRules;
 	p->cssRules = cssRule;
@@ -3490,8 +3787,12 @@ static void nsvg__endElement(void* ud, const char* el)
 		p->pathFlag = 0;
 	} else if (stricmp(el, "style") == 0) {
 		p->styleFlag = 0;
-		// Parse CSS rules from style buffer
-		const char* str = p->styleBuffer;
+		// Remove CSS comments from style buffer
+		char cleanBuffer[4096];
+		nsvg__removeComments(p->styleBuffer, cleanBuffer, sizeof(cleanBuffer));
+		
+		// Parse CSS rules from cleaned style buffer
+		const char* str = cleanBuffer;
 		const char* start;
 		const char* end;
 		

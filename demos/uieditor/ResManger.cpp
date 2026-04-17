@@ -79,7 +79,6 @@ void ResManger::UpdateProject()
 	m_mapStrings.RemoveAll();
 	m_mapColors.RemoveAll();
 	m_mapStyles.RemoveAll();
-	m_mapLayoutFile.RemoveAll();
 	m_mapDimensions.RemoveAll();
 	m_mapFonts.RemoveAll();
 
@@ -924,7 +923,6 @@ BOOL ResManger::AddToUIRes(SStringT strPath)
 		return FALSE;
 	}
 	m_pResProvider->Init((WPARAM)m_strProPath.c_str(),0);
-	m_xmlNodeUiRes = resRoot;
 	return TRUE;
 }
 
@@ -969,8 +967,7 @@ int ResManger::GetFileType(SStringT strPath) const
     }
 
     // 检查是否为图片文件
-    if (strExt == _T(".png") || strExt == _T(".jpg") || strExt == _T(".jpeg") ||
-        strExt == _T(".bmp") || strExt == _T(".gif") || strExt == _T(".ico"))
+    if (strExt == _T(".png") || strExt == _T(".jpg") || strExt == _T(".jpeg") || strExt == _T(".bmp") || strExt == _T(".gif") || strExt == _T(".ico") || strExt == _T(".svg"))
     {
         return FT_IMAGE;
     }

@@ -36,6 +36,12 @@ EXTERN_C ISvgObjPtr SOUI_EXP CreateSvgFromFileA(LPCSTR resId);
  */
 EXTERN_C ISvgObjPtr SOUI_EXP CreateSvgFromFileW(LPCWSTR resId);
 
+#ifdef UNICODE
+#define CreateSvgFromFile CreateSvgFromFileW
+#else
+#define CreateSvgFromFile CreateSvgFromFileA
+#endif // UNICODE
+
 SNSEND
 
 #endif // !__SVG__H__

@@ -111,6 +111,7 @@ SNSBEGIN
 
 		SStringT m_strLayoutName; //当前打开的窗体名  XML_MAINDLG
 		SStringT m_strXmlFile; //当前打开的XML文件名  xml\main.xml
+        DWORD m_tsSave;           // save timestamp, 用于监控文件变化		
 		BOOL	 m_bChanged;
 		BOOL     m_bUpdateDesigner;
 		BOOL	 m_bValidXml;	

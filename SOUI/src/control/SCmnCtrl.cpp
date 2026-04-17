@@ -578,7 +578,6 @@ SImageWnd::SImageWnd()
     , m_pSkin(NULL)
     , m_fl(kNone_FilterLevel)
     , m_bManaged(FALSE)
-    , m_iTile(0)
     , m_bKeepAspect(FALSE)
     , m_bFitImage(FALSE)
 {
@@ -604,6 +603,8 @@ void SImageWnd::OnPaint(IRenderTarget *pRT)
         CSize szImg;
         if (m_pImg)
             szImg = m_pImg->Size();
+        else if (m_pSvg)
+            szImg = m_pSvg->Size();
         else if (m_pSkin)
             szImg = m_pSkin->GetSkinSize();
         if (szImg.cx == 0 || szImg.cy == 0)
@@ -626,12 +627,11 @@ void SImageWnd::OnPaint(IRenderTarget *pRT)
     if (m_pImg)
     {
         CRect rcImg(CPoint(0, 0), m_pImg->Size());
-        if (m_iTile == 0)
-            pRT->DrawBitmapEx(rcWnd, m_pImg, &rcImg, MAKELONG(EM_STRETCH, m_fl), 0xff);
-        else if (m_iTile == 1)
-            pRT->DrawBitmapEx(rcWnd, m_pImg, &rcImg, MAKELONG(EM_NULL, m_fl), 0xff);
-        else if (m_iTile == 2)
-            pRT->DrawBitmapEx(rcWnd, m_pImg, &rcImg, MAKELONG(EM_TILE, m_fl), 0xff);
+        pRT->DrawBitmapEx(rcWnd, m_pImg, &rcImg, MAKELONG(EM_STRETCH, m_fl), 0xff);
+    }
+    else if (m_pSvg)
+    {
+        pRT->DrawSVG(m_pSvg, &rcWnd, NULL);
     }
     else if (m_pSkin)
     {
@@ -654,6 +654,7 @@ BOOL SImageWnd::SetSkin(ISkinObj *pSkin, int iFrame /*=0*/, BOOL bAutoFree /*=TR
     m_pSkin = pSkin;
     m_iIcon = iFrame;
     m_pImg = NULL;
+    m_pSvg = NULL;
     if (bAutoFree)
     {
         m_pSkin->AddRef();
@@ -678,6 +679,7 @@ void SImageWnd::SetImage(IBitmapS *pBitmap, FilterLevel fl)
 {
     m_pImg = pBitmap;
     m_fl = fl;
+    m_pSvg = NULL;
     OnContentChanged();
 }
 
@@ -707,6 +709,8 @@ SIZE SImageWnd::MeasureContent(int wid, int hei)
     CSize szRet;
     if (m_pImg)
         szRet = m_pImg->Size();
+    else if (m_pSvg)
+        szRet = m_pSvg->Size();
     else if (m_pSkin)
         szRet = m_pSkin->GetSkinSize();
     CRect rcPadding = GetStyle().GetPadding();
@@ -745,6 +749,19 @@ ISkinObj *SImageWnd::GetSkin() const
 {
     return m_pSkin;
 }
+
+ISvgObj * SImageWnd::GetSvg() const
+{
+    return m_pSvg;
+}
+
+void SImageWnd::SetSvg(ISvgObj *pSvg)
+{
+    m_pSvg = pSvg;
+    m_pImg = NULL;
+    OnContentChanged();
+}
+
 
 SAnimateImgWnd::SAnimateImgWnd()
     : m_pSkin(NULL)

@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "MainDlg.h"
 #include "ImageViewer.h"
+#include <core/Svg.h>
 
 CImageViewer::CImageViewer(CMainDlg *pMainDlg)
 	: m_pMainDlg(pMainDlg)
@@ -39,6 +40,15 @@ void CImageViewer::LoadImage(const SStringT &strImagePath)
         pBitmap->Release();
         SetZoom(100);
     }
+    else
+    {
+        ISvgObj *pSvg = CreateSvgFromFile(strImagePath);
+        if (pSvg) {
+			m_pImage->SetSvg(pSvg);
+			pSvg->Release();
+			SetZoom(100);
+        }
+    }
 }
 
 void CImageViewer::SetZoom(int nZoom)
@@ -63,6 +73,15 @@ void CImageViewer::SetZoom(int nZoom)
             sz.cx *= m_nZoom*1.0f/100;
             sz.cy *= m_nZoom*1.0f/100;
             m_pImage->SetAttribute(L"size",SStringW().Format(L"%dpx,%dpx",sz.cx,sz.cy));
+        }
+        else {
+            ISvgObj *pSvg = m_pImage->GetSvg();
+            if(pSvg){
+                CSize sz = pSvg->Size();
+                sz.cx *= m_nZoom*1.0f/100;
+                sz.cy *= m_nZoom*1.0f/100;
+                m_pImage->SetAttribute(L"size",SStringW().Format(L"%dpx,%dpx",sz.cx,sz.cy));
+            }
         }
     }
 }
