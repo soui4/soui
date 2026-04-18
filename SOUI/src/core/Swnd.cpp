@@ -488,14 +488,14 @@ STransformation SAnimatorHandler::GetTransformation(AnimatorHolder *pHolder, int
         {
             SLayoutSize translate;
             pHolder->holder->GetAnimatedValue(pHolder->fraction, &translate);
-            tmp.GetMatrix()->setTranslate(translate.toPixelSize(nScale), translate.toPixelSize(nScale));
+            tmp.GetMatrix()->setTranslate((float)translate.toPixelSize(nScale), (float)translate.toPixelSize(nScale));
             tmp.SetTransformationType(TYPE_MATRIX);
         }
         else if (pHolder->holder->GetValueType() == PROP_TYPE_INT)
         {
             int nValue;
             pHolder->holder->GetAnimatedValue(pHolder->fraction, &nValue);
-            tmp.GetMatrix()->setTranslate(nValue, nValue);
+            tmp.GetMatrix()->setTranslate((float)nValue, (float)nValue);
             tmp.SetTransformationType(TYPE_MATRIX);
         }
     }
@@ -513,14 +513,14 @@ STransformation SAnimatorHandler::GetTransformation(AnimatorHolder *pHolder, int
         {
             SLayoutSize translate;
             pHolder->holder->GetAnimatedValue(pHolder->fraction, &translate);
-            tmp.GetMatrix()->setTranslate(translate.toPixelSize(nScale), 0.0f);
+            tmp.GetMatrix()->setTranslate((float)translate.toPixelSize(nScale), 0.0f);
             tmp.SetTransformationType(TYPE_MATRIX);
         }
         else if (pHolder->holder->GetValueType() == PROP_TYPE_INT)
         {
             int nValue;
             pHolder->holder->GetAnimatedValue(pHolder->fraction, &nValue);
-            tmp.GetMatrix()->setTranslate(nValue, 0.0f);
+            tmp.GetMatrix()->setTranslate((float)nValue, 0.0f);
             tmp.SetTransformationType(TYPE_MATRIX);
         }
     }
@@ -538,14 +538,14 @@ STransformation SAnimatorHandler::GetTransformation(AnimatorHolder *pHolder, int
         {
             SLayoutSize translate;
             pHolder->holder->GetAnimatedValue(pHolder->fraction, &translate);
-            tmp.GetMatrix()->setTranslate(0.0f, translate.toPixelSize(nScale));
+            tmp.GetMatrix()->setTranslate(0.0f, (float)translate.toPixelSize(nScale));
             tmp.SetTransformationType(TYPE_MATRIX);
         }
         else if (pHolder->holder->GetValueType() == PROP_TYPE_INT)
         {
             int nValue;
             pHolder->holder->GetAnimatedValue(pHolder->fraction, &nValue);
-            tmp.GetMatrix()->setTranslate(0.0f, nValue);
+            tmp.GetMatrix()->setTranslate(0.0f, (float)nValue);
             tmp.SetTransformationType(TYPE_MATRIX);
         }
     }

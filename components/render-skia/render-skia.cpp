@@ -900,10 +900,10 @@ HRESULT SRenderTarget_Skia::MoveToEx(POINT pt, LPPOINT lpPoint)
 {
     if (lpPoint)
     {
-        lpPoint->x = m_ptCur.fX;
-        lpPoint->y = m_ptCur.fY;
+        lpPoint->x = (LONG)m_ptCur.fX;
+        lpPoint->y = (LONG)m_ptCur.fY;
     }
-    m_ptCur.set(pt.x, pt.y);
+    m_ptCur.set((SkScalar)pt.x, (SkScalar)pt.y);
     return S_OK;
 }
 
@@ -915,7 +915,7 @@ HRESULT SRenderTarget_Skia::LineTo(POINT pt)
     paint.setPathEffect(skDash.Get());
     paint.setStyle(SkPaint::kStroke_Style);
     m_SkCanvas->drawLine(m_ptCur.fX + m_ptOrg.fX, m_ptCur.fY + m_ptOrg.fY, pt.x + m_ptOrg.fX, pt.y + m_ptOrg.fY, paint);
-    m_ptCur.set(pt.x, pt.y);
+    m_ptCur.set((SkScalar)pt.x, (SkScalar)pt.y);
     return S_OK;
 }
 
@@ -923,8 +923,8 @@ HRESULT SRenderTarget_Skia::GetCurrentPositionEx(LPPOINT lpPoint)
 {
     if (lpPoint)
     {
-        lpPoint->x = m_ptCur.fX;
-        lpPoint->y = m_ptCur.fY;
+        lpPoint->x = (LONG)m_ptCur.fX;
+        lpPoint->y = (LONG)m_ptCur.fY;
     }
     return S_OK;
 }
@@ -1368,10 +1368,10 @@ static bool fequal(float a, float b)
     return fabs(a - b) < 0.0000001f;
 }
 
-static void calc_linear_endpoint(float angle, double wid, double hei, SkPoint skPts[2])
+static void calc_linear_endpoint(float angle, float wid, float hei, SkPoint skPts[2])
 {
-    double halfWid = wid / 2;
-    double halfHei = hei / 2;
+    float halfWid = wid / 2;
+    float halfHei = hei / 2;
 
     // 1. 归一化角度到 [0, 360)
     float a = fmodf(angle, 360.0f);
@@ -1396,7 +1396,7 @@ static void calc_linear_endpoint(float angle, double wid, double hei, SkPoint sk
     int quadrant = (int)(a / 90.0f);
     float ref_angle = a - quadrant * 90.0f; // 0~90°
     float rad = ref_angle * PI / 180.0f;
-    float tan_angle = tan(rad);
+    float tan_angle = (float)tan(rad);
     float cot_angle = 1.0f / tan_angle; // 避免除零（ref_angle不会是0或90）
 
     // 4. 计算第一象限下的两个交点（相对于矩形中心，中心为(0,0)）
@@ -3055,7 +3055,7 @@ void SBrush_Skia::InitPaint(SkPaint &paint, const SkRect &skrc)
     }
     else // if(m_brushType == Brush_Shader)
     {
-        SkShader *pShader = CreateShader(skrc, &m_gradInfo, m_arrGradItem.GetData(), m_arrGradItem.GetCount(), m_byAlpha, m_tileMode);
+        SkShader *pShader = CreateShader(skrc, &m_gradInfo, m_arrGradItem.GetData(), (int)m_arrGradItem.GetCount(), m_byAlpha, m_tileMode);
         if (!pShader)
             return;
         paint.setShader(pShader)->unref();

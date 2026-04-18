@@ -389,7 +389,7 @@ int SPropertyValuesHolder::InterpolateInt(float fraction) const
     fraction = Fraction2Index(fraction, idx);
     if (idx[0] == idx[1])
         return m_value.nValue[idx[0]];
-    return m_value.nValue[idx[0]] + (m_value.nValue[idx[1]] - m_value.nValue[idx[0]]) * fraction;
+    return m_value.nValue[idx[0]] + (int)((m_value.nValue[idx[1]] - m_value.nValue[idx[0]]) * fraction);
 }
 
 static SLayoutSize _InterpolateLayoutSize(const LAYOUTSIZE &start, const LAYOUTSIZE &end, float fraction)

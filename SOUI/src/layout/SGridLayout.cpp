@@ -658,7 +658,7 @@ SIZE SGridLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeigh
 
                 // 更新行高
                 float newCellHeight = (float)szCell_Remeasure.cy / iCellRowSpan;
-                pCellsSize[y * nCols + x].cy = newCellHeight;
+                pCellsSize[y * nCols + x].cy = (LONG)newCellHeight;
                 state.UpdateRowHeight(y);
             }
             // 如果行权重被分配了，用分配的行高重新测量宽度
@@ -1004,7 +1004,7 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
 
                 // 更新行高
                 float newCellHeight = (float)szCell_Remeasure.cy / iCellRowSpan;
-                pCellsSize[y * nCols + x].cy = newCellHeight;
+                pCellsSize[y * nCols + x].cy = (LONG)newCellHeight;
                 state.UpdateRowHeight(y);
             }
             // 如果行权重被分配了，用分配的行高重新测量宽度

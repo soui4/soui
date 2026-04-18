@@ -1493,9 +1493,9 @@ class SOUI_EXP SWindow
     {
         SStringW strName(pszName);
         SStringWList lstName;
-        UINT nCount = SplitString(strName, L'/', lstName);
+        size_t nCount = SplitString(strName, L'/', lstName);
         SWindow *pRet = this;
-        for (UINT i = 0; i < nCount; i++)
+        for (size_t i = 0; i < nCount; i++)
         {
             SWindow *pFind = pRet->FindChildByName(lstName[i], -1);
             if (pFind == NULL)

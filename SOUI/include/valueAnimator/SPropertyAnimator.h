@@ -127,7 +127,7 @@ class SOUI_EXP SPropertyAnimator
     STDMETHOD_(IPropertyValuesHolder *, GetPropertyValuesHolderByIndex)(CTHIS_ int index) SCONST OVERRIDE;
     STDMETHOD_(int, GetPropertyValuesHolderCount)(CTHIS) SCONST OVERRIDE
     {
-        return m_propertyHolders.GetCount();
+        return (int)m_propertyHolders.GetCount();
     }
 
   public:

@@ -54,6 +54,7 @@ class SOUI_EXP SStylePool
 class SOUI_EXP STemplatePool
     : public SCmnMap<SStringW, SStringW>
     , public TObjRefImpl<IObjRef> {
+    SXmlDoc m_templateDoc;
   public:
     /**
      * @brief Initializes the template pool from an XML node.
@@ -68,6 +69,12 @@ class SOUI_EXP STemplatePool
      * @return Template string, or an empty string if not found.
      */
     SStringW GetTemplateString(const SStringW &strName) const;
+
+    /**
+     * @brief Retrieves a template xmlnode by name.
+     * @return template xmlnode
+     */
+    SXmlNode GetTemplate(const SStringW &strName) const;
 };
 
 SNSEND

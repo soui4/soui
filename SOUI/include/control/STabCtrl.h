@@ -433,7 +433,7 @@ class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
         MSG_WM_KEYDOWN(OnKeyDown)
     SOUI_MSG_MAP_END()
 
-    LRESULT OnAttrTabAlign(const SStringW &strValue, BOOL bLoading);
+    HRESULT OnAttrTabAlign(const SStringW &strValue, BOOL bLoading);
     SOUI_ATTRS_BEGIN()
         ATTR_INT(L"curSel", m_nCurrentPage, FALSE)               /**< Index of the currently selected page. */
         ATTR_LAYOUTSIZE2(L"tabSize", m_szTab, TRUE)              /**< Size of the tab pages. */

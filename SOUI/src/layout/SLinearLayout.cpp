@@ -355,7 +355,7 @@ void SLinearLayout::LayoutChildren(IWindow *pParent)
                     if (pLinearLayoutParam->IsWrapContent(orienOther))
                     {
                         ILayoutParam *backup = pLinearLayoutParam->Clone();
-                        SLayoutSize layoutSize(szChild, dp);
+                        SLayoutSize layoutSize((float)szChild, dp);
                         pLinearLayoutParam->SetSpecifiedSize(m_orientation, &layoutSize);
                         int nWid = pSize[iChild].cx, nHei = pSize[iChild].cy;
 

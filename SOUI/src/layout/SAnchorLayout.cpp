@@ -110,7 +110,7 @@ BOOL SAnchorLayoutParam::ParsePosition(const SStringW &strValue, AnchorPos &aniP
         return FALSE;
     }
     SStringWList posStr;
-    int ret = SplitString(strValue, L',', posStr);
+    size_t ret = SplitString(strValue, L',', posStr);
     if (ret < 2)
     {
         aniPos.type = APT_Invalid;

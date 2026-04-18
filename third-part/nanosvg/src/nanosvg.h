@@ -1061,7 +1061,7 @@ static float nsvg__actualLength(NSVGparser* p)
 static float nsvg__convertToPixels(NSVGparser* p, NSVGcoordinate c, float orig, float length)
 {
 	NSVGattrib* attr = nsvg__getAttr(p);
-	return nsvgConvertToPixels(c, orig, length, attr->fontSize, p->dpi);
+	return nsvgConvertToPixels(c, orig, length, attr->fontSize, (int)p->dpi);
 }
 
 static NSVGgradientData* nsvg__findGradientData(NSVGparser* p, const char* id)
@@ -1622,7 +1622,7 @@ static unsigned int nsvg__parseColorRGB(const char* str)
 			while (*str && (nsvg__isspace(*str))) str++; 	// skip leading spaces
 			if (*str == '+') str++;				// skip '+' (don't allow '-')
 			if (!*str) break;
-			rgbf[i] = nsvg__atof(str);
+			rgbf[i] = (float)nsvg__atof(str);
 
 			// Note 1: it would be great if nsvg__atof() returned how many
 			// bytes it consumed but it doesn't. We need to skip the number,
@@ -1674,7 +1674,7 @@ static unsigned int nsvg__parseColorRGBA(const char* str)
 			while (*str && (nsvg__isspace(*str))) str++; 	// skip leading spaces
 			if (i < 3 && *str == '+') str++; 			// skip '+' (don't allow '-') for RGB
 			if (!*str) break;
-			rgbf[i] = nsvg__atof(str);
+			rgbf[i] = (float)nsvg__atof(str);
 
 			// Note 1: it would be great if nsvg__atof() returned how many
 			// bytes it consumed but it doesn't. We need to skip the number,
@@ -1741,7 +1741,6 @@ static void nsvg__hslToRgb(float h, float s, float l, unsigned int* r, unsigned 
 // This function returns gray (hsl(0, 0%, 50%) == '#808080') on parse errors
 static unsigned int nsvg__parseColorHSL(const char* str)
 {
-	int i;
 	float hsl[3];
 	unsigned int r, g, b;
 	
@@ -1773,7 +1772,6 @@ static unsigned int nsvg__parseColorHSL(const char* str)
 // This function returns gray (hsla(0, 0%, 50%, 1) == '#808080') on parse errors
 static unsigned int nsvg__parseColorHSLA(const char* str)
 {
-	int i;
 	float hsla[4];
 	unsigned int r, g, b, a;
 	
@@ -1998,7 +1996,7 @@ static unsigned int nsvg__parseColor(const char* str)
 
 static float nsvg__parseOpacity(const char* str)
 {
-	float val = nsvg__atof(str);
+	float val = (float)nsvg__atof(str);
 	if (val < 0.0f) val = 0.0f;
 	if (val > 1.0f) val = 1.0f;
 	return val;
@@ -2006,7 +2004,7 @@ static float nsvg__parseOpacity(const char* str)
 
 static float nsvg__parseMiterLimit(const char* str)
 {
-	float val = nsvg__atof(str);
+	float val = (float)nsvg__atof(str);
 	if (val < 0.0f) val = 0.0f;
 	return val;
 }
@@ -2048,7 +2046,7 @@ static NSVGcoordinate nsvg__parseCoordinateRaw(const char* str)
 	NSVGcoordinate coord = {0, NSVG_UNITS_USER};
 	char buf[64];
 	coord.units = nsvg__parseUnits(nsvg__parseNumber(str, buf, 64));
-	coord.value = nsvg__atof(buf);
+	coord.value = (float)nsvg__atof(buf);
 	return coord;
 }
 
@@ -3401,19 +3399,19 @@ static void nsvg__parseSVG(NSVGparser* p, const char** attr)
 				const char *s = attr[i + 1];
 				char buf[64];
 				s = nsvg__parseNumber(s, buf, 64);
-				p->viewMinx = nsvg__atof(buf);
+				p->viewMinx = (float)nsvg__atof(buf);
 				while (*s && (nsvg__isspace(*s) || *s == '%' || *s == ',')) s++;
 				if (!*s) return;
 				s = nsvg__parseNumber(s, buf, 64);
-				p->viewMiny = nsvg__atof(buf);
+				p->viewMiny = (float)nsvg__atof(buf);
 				while (*s && (nsvg__isspace(*s) || *s == '%' || *s == ',')) s++;
 				if (!*s) return;
 				s = nsvg__parseNumber(s, buf, 64);
-				p->viewWidth = nsvg__atof(buf);
+				p->viewWidth = (float)nsvg__atof(buf);
 				while (*s && (nsvg__isspace(*s) || *s == '%' || *s == ',')) s++;
 				if (!*s) return;
 				s = nsvg__parseNumber(s, buf, 64);
-				p->viewHeight = nsvg__atof(buf);
+				p->viewHeight = (float)nsvg__atof(buf);
 			} else if (stricmp(attr[i], "preserveAspectRatio") == 0) {
 				if (strstr(attr[i + 1], "none") != 0) {
 					// No uniform scaling
@@ -3841,7 +3839,7 @@ static void nsvg__content(void* ud, const char* s)
 		// Trim leading whitespace
 		while (*s && nsvg__isspace(*s)) s++;
 		
-		int len = strlen(s);
+		size_t len = strlen(s);
 		if (len == 0)
 			return;
 		
@@ -3854,7 +3852,7 @@ static void nsvg__content(void* ud, const char* s)
 		// Append text content to buffer
 		int remaining = 1023 - p->textBufferLen;
 		if (remaining > 0) {
-			int toCopy = len < remaining ? len : remaining;
+			int toCopy = len < remaining ? (int)len : remaining;
 			memcpy(p->textBuffer + p->textBufferLen, s, toCopy);
 			p->textBufferLen += toCopy;
 			p->textBuffer[p->textBufferLen] = '\0';

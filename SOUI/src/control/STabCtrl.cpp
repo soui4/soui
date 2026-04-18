@@ -991,7 +991,7 @@ int STabCtrl::GetItemCount(THIS) const
     return (int)m_lstPages.GetCount();
 }
 
-LRESULT STabCtrl::OnAttrTabAlign(const SStringW &strValue, BOOL bLoading)
+HRESULT STabCtrl::OnAttrTabAlign(const SStringW &strValue, BOOL bLoading)
 {
     int nAlign = AlignTop;
     if (strValue.CompareNoCase(L"top") == 0)

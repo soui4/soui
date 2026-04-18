@@ -1209,8 +1209,8 @@ void SSkinShape::DrawShapeInternal(IRenderTarget *pRT, LPCRECT rcDraw, BYTE byAl
                 int hei = rcDraw->bottom - rcDraw->top;
                 for (int i = 0; i < m_polygon->GetPoints(); i++)
                 {
-                    pts[i].x = m_polygon->m_points[i].fX * wid + rcDraw->left;
-                    pts[i].y = m_polygon->m_points[i].fY * hei + rcDraw->top;
+                    pts[i].x = (int)(m_polygon->m_points[i].fX * wid) + rcDraw->left;
+                    pts[i].y = (int)(m_polygon->m_points[i].fY * hei) + rcDraw->top;
                 }
                 if (m_polygon->IsClosed())
                     pRT->FillPolygon(pts, m_polygon->GetPoints());

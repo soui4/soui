@@ -250,7 +250,14 @@ class SOUI_EXP SUiDef
      * @param strName Name of the template.
      * @return Template string, or an empty string if not found.
      */
-    SStringW GetTemplateString(const SStringW &strName);
+    SStringW GetTemplateString(const SStringW &strName) const;
+
+    /**
+     * @brief Retrieves a template node by name.
+     * @param strName Name of the template.
+     * @return XML node containing the template, or an invalid node if not found.
+    */
+    SXmlNode GetTemplate(const SStringW &strName) const;
 
     /**
      * @brief Retrieves a gradient object by name.

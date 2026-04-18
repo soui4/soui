@@ -58,6 +58,7 @@ BOOL STemplatePool::Init(SXmlNode xmlNode)
         }
         AddKeyObject(strTempName, strValue);
     }
+    m_templateDoc.root().append_copy(xmlNode);
     return TRUE;
 }
 
@@ -68,4 +69,8 @@ SStringW STemplatePool::GetTemplateString(const SStringW &strName) const
     return strRet;
 }
 
+SXmlNode STemplatePool::GetTemplate(const SStringW &strName) const
+{
+    return m_templateDoc.root().first_child().child(strName);
+}
 SNSEND

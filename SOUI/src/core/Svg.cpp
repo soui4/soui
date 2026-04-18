@@ -92,7 +92,7 @@ EXTERN_C ISvgObjPtr CreateSvgFromResId(LPCTSTR resId)
         strLst.InsertAt(0, _T("file"));
     }
     SApplication *pApp = SApplication::getSingletonPtr();
-    int sz = pApp->GetRawBufferSize(strLst[0], strLst[1]);
+    size_t sz = pApp->GetRawBufferSize(strLst[0], strLst[1]);
     if (sz == 0)
         return NULL;
     char *pBuf = (char *)malloc(sz + 1);

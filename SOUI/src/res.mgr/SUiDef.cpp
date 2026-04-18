@@ -583,7 +583,7 @@ SXmlNode SUiDef::GetStyle(const SStringW &strName)
     return SXmlNode();
 }
 
-SStringW SUiDef::GetTemplateString(const SStringW &strName)
+SStringW SUiDef::GetTemplateString(const SStringW &strName) const
 {
     SAutoLock autolock(m_cs);
     SPOSITION pos = m_lstUiDefInfo.GetTailPosition();
@@ -600,6 +600,22 @@ SStringW SUiDef::GetTemplateString(const SStringW &strName)
     return SStringW();
 }
 
+SXmlNode SUiDef::GetTemplate(const SStringW &strName) const
+{
+    SAutoLock autolock(m_cs);
+    SPOSITION pos = m_lstUiDefInfo.GetTailPosition();
+    while (pos)
+    {
+        IUiDefInfo *pUiInfo = m_lstUiDefInfo.GetPrev(pos);
+        STemplatePool *pPool = pUiInfo->GetTemplatePool();
+        if (!pPool)
+            continue;
+        SXmlNode xmlTemp = pPool->GetTemplate(strName);
+        if (xmlTemp)
+            return xmlTemp;
+    }
+    return SXmlNode();
+}
 IGradient *SUiDef::GetGradient(const SStringW &strName)
 {
     SAutoLock autolock(m_cs);
