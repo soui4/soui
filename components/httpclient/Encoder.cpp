@@ -22,6 +22,11 @@ string Encoder::UrlEncode(const string &str)
         {
             strResult.append("+");
         }
+        else if (str[i] == '?' || str[i] == '&' || str[i] == '=' || str[i] == '/' || str[i] == '-' || str[i] == '_' || str[i] == '.' || str[i] == '~')
+        {
+            sprintf_s(szAlnum, sizeof(szAlnum), "%c", str[i]);
+            strResult.append(szAlnum);
+        }
         else
         {
             sprintf_s(szOther, sizeof(szOther), "%%%X%X", pBytes[i] >> 4, pBytes[i] % 16);
