@@ -9,12 +9,10 @@ include_directories(${PROJECT_SOURCE_DIR}/SOUI/include)
 
 set(headers
 	define.h
-	Encoder.h
 	httpHeader.h
 )
 
 set(srcs 
-	Encoder.cpp
 	httpHeader.cpp
 )
 

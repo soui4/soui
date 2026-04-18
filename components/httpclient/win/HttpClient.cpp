@@ -5,7 +5,6 @@
 #include <string/sstringa.h>
 #include <string/sstringw.h>
 #include <string/strcpcvt.h>
-#include <Encoder.h>
 using namespace std;
 
 #pragma comment(lib, "Winhttp")
@@ -313,8 +312,6 @@ static void ParseUrl( LPCSTR lpUrl, string& strHostName, string& strPage, WORD& 
 	if ( string::npos == nPos )
 		return ;
 	strPage=strTemp.substr(nPos, strTemp.size()-nPos);
-	//auto encode url page
-	strPage = Encoder::UrlEncode(strPage);
 }
 
 BOOL CWinHttp::InitConnect( LPCSTR lpUrl, RequestType type, LPCSTR lpHeader, LPVOID lpPostData,DWORD dwDataLen )
