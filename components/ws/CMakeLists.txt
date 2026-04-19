@@ -31,6 +31,20 @@ set_target_properties (${PROJECT_NAME} PROPERTIES
     FOLDER components
 )
 
+install(TARGETS ${PROJECT_NAME}
+    CONFIGURATIONS Release
+    RUNTIME DESTINATION bin/Release
+    LIBRARY DESTINATION lib/Release
+    ARCHIVE DESTINATION lib/Release
+)
+
+install(TARGETS ${PROJECT_NAME}
+    CONFIGURATIONS Debug
+    RUNTIME DESTINATION bin/Debug
+    LIBRARY DESTINATION lib/Debug
+    ARCHIVE DESTINATION lib/Debug
+)
+
 
 if(0)
 project(ServerTest)

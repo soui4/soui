@@ -220,7 +220,7 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/__cmake
         DESTINATION ${CMAKE_INSTALL_PREFIX}
         FILES_MATCHING PATTERN "*.cmake"
 )
-install(FILES ${PROJECT_SOURCE_DIR}/__cmake/plist.in
+install(FILES ${PROJECT_SOURCE_DIR}/__cmake/plist.in ${PROJECT_SOURCE_DIR}/__cmake/dpi_aware.manifest ${PROJECT_SOURCE_DIR}/__cmake/export_res_sym.lst
         DESTINATION ${CMAKE_INSTALL_PREFIX}/__cmake
 )
 

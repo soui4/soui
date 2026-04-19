@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.16)
 set(project_name "soui5_app")
 project(${project_name})
+
+options(BUILD_SOUI_SYS_RESOURCE "Build SOUI system resource" ON)
+
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
@@ -87,6 +90,10 @@ add_custom_command(
 set_source_files_properties(${UIRES_RES_HEADER} PROPERTIES GENERATED TRUE)
 
 add_soui_exe(${project_name} WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${UIRES_RES_HEADER} ${CURRENT_RC})
+if(BUILD_SOUI_SYS_RESOURCE)
+	target_compile_definitions(${project_name} PRIVATE BUILD_SYS_RES)
+	target_compile_resources(${project_name} ${CURRENT_RC} INCLUDE_DIRS ${SOUI_INSTALL_DIR}/include/config ${SOUI_SRC_DIR}/soui-sys-resource-dark)
+endif()
 if(CMAKE_SYSTEM_NAME MATCHES Darwin)
 	set(MACOSX_BUNDLE_HIGH_RESOLUTION_CAPABLE "true")
 	set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.soui.app")

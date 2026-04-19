@@ -63,6 +63,20 @@ set_target_properties (${PROJECT_NAME} PROPERTIES
     FOLDER components
 )
 
+install(TARGETS ${PROJECT_NAME}
+    CONFIGURATIONS Release
+    RUNTIME DESTINATION bin/Release
+    LIBRARY DESTINATION lib/Release
+    ARCHIVE DESTINATION lib/Release
+)
+
+install(TARGETS ${PROJECT_NAME}
+    CONFIGURATIONS Debug
+    RUNTIME DESTINATION bin/Debug
+    LIBRARY DESTINATION lib/Debug
+    ARCHIVE DESTINATION lib/Debug
+)
+
 # Add test project
 option(SOUI_BUILD_NETWORK_TEST "Build network test" OFF)
 if(SOUI_BUILD_NETWORK_TEST)
