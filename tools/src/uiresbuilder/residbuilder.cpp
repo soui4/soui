@@ -1,4 +1,4 @@
-﻿// residbuilder.cpp : 定义控制台应用程序的入口点。
+// residbuilder.cpp : 定义控制台应用程序的入口点。
 //
 
 #include "stdafx.h"
@@ -6,6 +6,13 @@
 #include <algorithm>
 #ifndef _WIN32
 #define swprintf_s swprintf
+#include <wchar.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <errno.h>
 #endif//_WIN32
 
 const wchar_t  RB_HEADER_RC[]=
@@ -41,6 +48,7 @@ const wchar_t KXML_UIDEF[] = L"uidef";
 //自动编号开始ID
 const int KStartID = 0x00010000; 
 
+#ifdef _WIN32
 //获得文件的最后修改时间
 __int64 GetLastWriteTime(LPCSTR pszFileName)
 {
@@ -68,6 +76,215 @@ __int64 GetLastWriteTime(LPCWSTR pszFileName)
     }
     return tmFile;
 }
+#else
+
+// Convert a single UTF-8 character to Unicode code point
+static int utf8_to_unicode(const char *utf8, int len, unsigned int *codepoint) {
+	if (!utf8 || !codepoint || len <= 0) {
+		return 0;
+	}
+	
+	unsigned char c = (unsigned char)utf8[0];
+	
+	if (c < 0x80) {
+		// 1-byte sequence: 0xxxxxxx
+		*codepoint = c;
+		return 1;
+	} else if ((c & 0xE0) == 0xC0) {
+		// 2-byte sequence: 110xxxxx 10xxxxxx
+		if (len < 2) return 0;
+		if (((unsigned char)utf8[1] & 0xC0) != 0x80) return 0;
+		*codepoint = ((c & 0x1F) << 6) | ((unsigned char)utf8[1] & 0x3F);
+		return 2;
+	} else if ((c & 0xF0) == 0xE0) {
+		// 3-byte sequence: 1110xxxx 10xxxxxx 10xxxxxx
+		if (len < 3) return 0;
+		if (((unsigned char)utf8[1] & 0xC0) != 0x80) return 0;
+		if (((unsigned char)utf8[2] & 0xC0) != 0x80) return 0;
+		*codepoint = ((c & 0x0F) << 12) | (((unsigned char)utf8[1] & 0x3F) << 6) | ((unsigned char)utf8[2] & 0x3F);
+		return 3;
+	} else if ((c & 0xF8) == 0xF0) {
+		// 4-byte sequence: 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+		if (len < 4) return 0;
+		if (((unsigned char)utf8[1] & 0xC0) != 0x80) return 0;
+		if (((unsigned char)utf8[2] & 0xC0) != 0x80) return 0;
+		if (((unsigned char)utf8[3] & 0xC0) != 0x80) return 0;
+		*codepoint = ((c & 0x07) << 18) | (((unsigned char)utf8[1] & 0x3F) << 12) | 
+		             (((unsigned char)utf8[2] & 0x3F) << 6) | ((unsigned char)utf8[3] & 0x3F);
+		return 4;
+	}
+	
+	return 0; // Invalid UTF-8
+}
+
+// Convert a single Unicode code point to UTF-8
+static int unicode_to_utf8(unsigned int codepoint, char *utf8, int maxLen) {
+	if (!utf8 || maxLen <= 0) {
+		return 0;
+	}
+	
+	if (codepoint < 0x80) {
+		// 1-byte sequence
+		if (maxLen < 1) return 0;
+		utf8[0] = (char)codepoint;
+		return 1;
+	} else if (codepoint < 0x800) {
+		// 2-byte sequence
+		if (maxLen < 2) return 0;
+		utf8[0] = (char)(0xC0 | (codepoint >> 6));
+		utf8[1] = (char)(0x80 | (codepoint & 0x3F));
+		return 2;
+	} else if (codepoint < 0x10000) {
+		// 3-byte sequence
+		if (maxLen < 3) return 0;
+		utf8[0] = (char)(0xE0 | (codepoint >> 12));
+		utf8[1] = (char)(0x80 | ((codepoint >> 6) & 0x3F));
+		utf8[2] = (char)(0x80 | (codepoint & 0x3F));
+		return 3;
+	} else if (codepoint < 0x110000) {
+		// 4-byte sequence
+		if (maxLen < 4) return 0;
+		utf8[0] = (char)(0xF0 | (codepoint >> 18));
+		utf8[1] = (char)(0x80 | ((codepoint >> 12) & 0x3F));
+		utf8[2] = (char)(0x80 | ((codepoint >> 6) & 0x3F));
+		utf8[3] = (char)(0x80 | (codepoint & 0x3F));
+		return 4;
+	}
+	
+	return 0; // Invalid code point
+}
+
+// Convert UTF-8 multibyte string to wide character string
+int MultiByteToWideChar(int cp, int flags, const char *src, int len, wchar_t *dst, int dstLen){
+	if (!src || !dst || dstLen <= 0) {
+		return 0;
+	}
+	
+	// Only support UTF-8 (CP_UTF8 = 65001)
+	if (cp != 65001) {
+		return 0;
+	}
+	
+	// If len is -1 or 0, calculate string length
+	if (len <= 0) {
+		len = strlen(src);
+	}
+	
+	int srcPos = 0;
+	int dstPos = 0;
+	
+	while (srcPos < len && dstPos < dstLen - 1) {
+		unsigned int codepoint;
+		int bytesUsed = utf8_to_unicode(src + srcPos, len - srcPos, &codepoint);
+		
+		if (bytesUsed <= 0) {
+			break; // Invalid UTF-8 sequence
+		}
+		
+		dst[dstPos++] = (wchar_t)codepoint;
+		srcPos += bytesUsed;
+	}
+	
+	// Null-terminate
+	dst[dstPos] = L'\0';
+	
+	return dstPos;
+}
+
+// Convert wide character string to UTF-8 multibyte string
+int WideCharToMultiByte(int cp, int flags, const wchar_t *src, int len, char *dst, int dstLen, LPCSTR p1, BOOL *p2){
+	if (!src || !dst || dstLen <= 0) {
+		return 0;
+	}
+	
+	// Only support UTF-8 (CP_UTF8 = 65001)
+	if (cp != 65001) {
+		return 0;
+	}
+	
+	// If len is -1 or 0, calculate string length
+	if (len <= 0) {
+		len = wcslen(src);
+	}
+	
+	int srcPos = 0;
+	int dstPos = 0;
+	
+	while (srcPos < len) {
+		unsigned int codepoint = (unsigned int)src[srcPos];
+		char utf8Buf[4];
+		int bytesNeeded = unicode_to_utf8(codepoint, utf8Buf, sizeof(utf8Buf));
+		
+		if (bytesNeeded <= 0 || dstPos + bytesNeeded >= dstLen) {
+			break; // Not enough space or invalid code point
+		}
+		
+		memcpy(dst + dstPos, utf8Buf, bytesNeeded);
+		dstPos += bytesNeeded;
+		srcPos++;
+	}
+	
+	// Null-terminate
+	dst[dstPos] = '\0';
+	
+	return dstPos;
+}
+
+// Open file with wide character path and mode (POSIX implementation)
+FILE * _wfopen(const wchar_t *path, const wchar_t *mode){
+	if (!path || !mode) {
+		return NULL;
+	}
+	
+	// Convert wide char path to UTF-8
+	char path_utf8[4096];
+	int pathLen = WideCharToMultiByte(65001, 0, path, -1, path_utf8, sizeof(path_utf8), NULL, NULL);
+	if (pathLen <= 0) {
+		return NULL;
+	}
+	
+	// Convert wide char mode to UTF-8
+	char mode_utf8[256];
+	int modeLen = WideCharToMultiByte(65001, 0, mode, -1, mode_utf8, sizeof(mode_utf8), NULL, NULL);
+	if (modeLen <= 0) {
+		return NULL;
+	}
+	
+	// Open file using standard fopen with UTF-8 paths
+	return fopen(path_utf8, mode_utf8);
+}
+
+// Get last write time of file (ANSI version)
+__int64 GetLastWriteTime(LPCSTR pszFileName){
+	if (!pszFileName) {
+		return 0;
+	}
+	
+	struct stat fileStat;
+	if (stat(pszFileName, &fileStat) != 0) {
+		return 0;
+	}
+	
+	// Return modification time as 64-bit value (seconds since epoch)
+	return (__int64)fileStat.st_mtime;
+}
+
+// Get last write time of file (Wide char version)
+__int64 GetLastWriteTime(LPCWSTR pszFileName){
+	if (!pszFileName) {
+		return 0;
+	}
+	
+	// Convert wide char filename to UTF-8
+	char filename_utf8[4096];
+	int len = WideCharToMultiByte(65001, 0, pszFileName, -1, filename_utf8, sizeof(filename_utf8), NULL, NULL);
+	if (len <= 0) {
+		return 0;
+	}
+	return GetLastWriteTime(filename_utf8);
+}
+
+#endif//_WIN32
 
 //将反斜扛转换成正斜扛
 wstring BuildPath(LPCWSTR pszPath)
@@ -563,8 +780,8 @@ int _tmain(int argc, TCHAR* argv[])
 	string strJsFile;//js name and id file
     BOOL bBuildIDMap=FALSE;  //Build ID map
 	int c;
-	LPSTR cmdLine = GetCommandLineA();
-	printf("%s\n",cmdLine);
+	// LPSTR cmdLine = GetCommandLineA();
+	// printf("%s\n",cmdLine);
 	while ((c = xgetopt(argc, argv, "i:r:p:h:j:")) != EOF || optarg!=NULL)
 	{
 		switch (c)

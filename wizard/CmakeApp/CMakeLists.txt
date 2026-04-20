@@ -50,7 +50,7 @@ if ("${SOUI_ROOT}" STREQUAL "")
 	message(FATAL_ERROR "FATAL:can't find env variable SOUI4_INSTALL_64, clone soui core and install wizard first, please.")
 endif()
 
-set(RESBUILD_EXE ${SOUI_ROOT}/bin/Release/uiresbuilder)
+set(RESBUILD_EXE ${SOUI_ROOT}/bin/${CMAKE_BUILD_TYPE}/uiresbuilder)
 
 include(${SOUI_PREFIX}/__cmake/internal_utils.cmake)
 include(${SOUI_PREFIX}/__cmake/global.cmake)
