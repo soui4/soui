@@ -34,6 +34,10 @@ endif()
 add_dependencies(resprovider-zip ${LIBS})
 
 set(COM_LIBS ${COM_LIBS} resprovider-zip CACHE INTERNAL "com_lib")
+if(SOUI_ENABLE_COM_LIB)
+    set(COM_DEP_LIBS ${COM_DEP_LIBS} zlib CACHE INTERNAL "com_dep_libs")
+endif()
+
 set_target_properties (resprovider-zip PROPERTIES
     FOLDER components
 )

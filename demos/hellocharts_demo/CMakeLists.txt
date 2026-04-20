@@ -29,7 +29,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
 endif()
 
 if(SOUI_ENABLE_COM_LIB)
-    target_link_libraries(${current_project} ${COM_LIBS})
+    target_link_libraries(${current_project} ${COM_LIBS} ${COM_DEP_LIBS})
 endif()
 
 set_target_properties (${current_project} PROPERTIES

@@ -25,8 +25,7 @@ add_library(Scintilla STATIC ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_RC})
 if (NOT CMAKE_SYSTEM_NAME MATCHES Windows)
    add_dependencies(Scintilla swinx)
 endif()
-
-set(COM_LIBS ${COM_LIBS} Scintilla CACHE INTERNAL "com_lib")
+set(OPTION_LIBS ${OPTION_LIBS} Scintilla CACHE INTERNAL "option_lib")
 set_target_properties (Scintilla PROPERTIES
     FOLDER third-part
 )

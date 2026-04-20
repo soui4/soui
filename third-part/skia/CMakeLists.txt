@@ -1047,7 +1047,6 @@ if (NOT CMAKE_SYSTEM_NAME MATCHES Windows)
     target_compile_options(skia PRIVATE -fPIC)
 endif()
 
-set(COM_LIBS ${COM_LIBS} skia CACHE INTERNAL "com_lib")
 set_target_properties (skia PROPERTIES
     FOLDER third-part
 )

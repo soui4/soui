@@ -22,12 +22,42 @@ add_subdirectory(Scintilla)
 add_subdirectory(skia)
 add_subdirectory(7z)
 add_subdirectory(stdint)
-if(SOUI_BUILD_WS)
+if(SOUI_BUILD_WS OR (SOUI_BUILD_HTTPCLIENT AND NOT CMAKE_SYSTEM_NAME MATCHES Windows))
         add_subdirectory(openssl-cmake)
-
-        get_target_property(OPENSSL_INCLUDE_DIRS crypto INTERFACE_INCLUDE_DIRECTORIES)
         message(STATUS "OpenSSL include directories: ${OPENSSL_INCLUDE_DIRS}")
         set(OPENSSL_LIBRARIES crypto ssl)
+endif()
+if(SOUI_BUILD_HTTPCLIENT AND NOT CMAKE_SYSTEM_NAME MATCHES Windows)
+        message("---Building with libcurl for HTTP client")
+        set(BUILD_CURL_EXE OFF CACHE BOOL "Build curl executable" FORCE)
+        set(BUILD_TESTING OFF CACHE BOOL "Build curl tests" FORCE)
+        set(BUILD_EXAMPLES OFF CACHE BOOL "Build libcurl examples" FORCE)
+        set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries" FORCE)
+        set(BUILD_STATIC_LIBS ON CACHE BOOL "Build static libraries" FORCE)
+        set(CURL_STATICLIB ON CACHE BOOL "Build static libcurl" FORCE)
+        set(HTTP_ONLY ON CACHE BOOL "Only build HTTP protocol support" FORCE)
+        set(ENABLE_THREADED_RESOLVER ON CACHE BOOL "Enable threaded resolver" FORCE)
+        
+        # Enable OpenSSL support using locally compiled openssl-cmake
+        get_target_property(OPENSSL_INCLUDE_DIRS crypto INTERFACE_INCLUDE_DIRECTORIES)
+        set(CMAKE_USE_OPENSSL ON CACHE BOOL "Use OpenSSL" FORCE)
+        
+        # Ensure libcurl uses our local OpenSSL
+        set(OPENSSL_FOUND TRUE CACHE BOOL "OpenSSL found" FORCE)
+        set(OPENSSL_INCLUDE_DIR ${OPENSSL_INCLUDE_DIRS} CACHE PATH "OpenSSL include directory" FORCE)
+        set(OPENSSL_CRYPTO_LIBRARY crypto CACHE STRING "OpenSSL crypto library" FORCE)
+        set(OPENSSL_SSL_LIBRARY ssl CACHE STRING "OpenSSL SSL library" FORCE)
+        set(OPENSSL_LIBRARIES crypto;ssl CACHE STRING "OpenSSL libraries" FORCE)
+        
+        # Set prefix path so check_symbol_exists can find OpenSSL targets
+        list(APPEND CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}/third-part/openssl-cmake")
+        
+        set(CURL_USE_LIBPSL OFF CACHE BOOL "Use libpsl" FORCE)
+        set(CURL_ENABLE_EXPORT_TARGET OFF CACHE BOOL "Enable CMake export target" FORCE)
+        add_subdirectory(libcurl)
+endif()
+if(SOUI_BUILD_WS)
+        get_target_property(OPENSSL_INCLUDE_DIRS crypto INTERFACE_INCLUDE_DIRECTORIES)
 
         set(LWS_OPENSSL_INCLUDE_DIRS ${OPENSSL_INCLUDE_DIRS} CACHE PATH "Path to the OpenSSL include directory" FORCE)
         set(LWS_OPENSSL_LIBRARIES ${OPENSSL_LIBRARIES} CACHE PATH "Path to the OpenSSL library" FORCE)

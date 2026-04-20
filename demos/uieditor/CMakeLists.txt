@@ -84,7 +84,7 @@ else()
     target_link_libraries(${current_project} dl)
 endif()
 if(SOUI_ENABLE_COM_LIB)
-    target_link_libraries(${current_project} ${COM_LIBS})
+    target_link_libraries(${current_project} ${COM_LIBS} ${COM_DEP_LIBS})
 endif()
 
 target_precompile_headers(${current_project} PRIVATE "stdafx.h")

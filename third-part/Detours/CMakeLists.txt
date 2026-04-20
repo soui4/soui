@@ -16,7 +16,8 @@ source_group("Header Files" FILES ${headers})
 source_group("Source Files" FILES ${sources})
 
 add_library(detours STATIC ${sources} ${headers})
-set(COM_LIBS ${COM_LIBS} detours CACHE INTERNAL "com_lib")
+set(OPTION_LIBS ${OPTION_LIBS} detours CACHE INTERNAL "option_lib")
+
 set_target_properties (detours PROPERTIES
     FOLDER third-part
 )

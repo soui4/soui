@@ -1,7 +1,7 @@
 // Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
-#incude <config.h>
+#include <config.h>
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
@@ -106,6 +106,9 @@ LANGUAGE 4, 2
 #ifndef _DEBUG
 #include "res/soui_res.rc2" //SOUI Resource\r\n"
 #endif
+#ifdef BUILD_SYS_RES
+#include <theme_sys_res.rc2>
+#endif//BUILD_SYS_RES
 #endif
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED

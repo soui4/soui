@@ -15,6 +15,23 @@ if (NOT CMAKE_SYSTEM_NAME MATCHES Windows)
 	target_compile_options(msls31 PRIVATE -fPIC)
 endif()
 
+if(SOUI_ENABLE_CORE_LIB)
+    set(CORE_LIBS ${CORE_LIBS} msls31 CACHE INTERNAL "core_lib") 
+endif()
 set_target_properties (msls31 PROPERTIES
     FOLDER third-part
+)
+
+install(TARGETS msls31
+    CONFIGURATIONS Release
+    RUNTIME DESTINATION bin/Release
+    LIBRARY DESTINATION lib/Release
+    ARCHIVE DESTINATION lib/Release
+)
+
+install(TARGETS msls31
+    CONFIGURATIONS Debug
+    RUNTIME DESTINATION bin/Debug
+    LIBRARY DESTINATION lib/Debug
+    ARCHIVE DESTINATION lib/Debug
 )

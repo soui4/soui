@@ -37,8 +37,7 @@ else()
 target_link_libraries(utilities4  Gdi32 shlwapi version)
 endif()
 
-set(CORE_LIBS ${CORE_LIBS} utilities4)
-set(CORE_LIBS ${CORE_LIBS} utilities4 CACHE INTERNAL "core_lib")
+set(SOUI_UTILITIES ${SOUI_UTILITIES} utilities4 CACHE INTERNAL "utilities_lib")
 
 install(TARGETS utilities4
     CONFIGURATIONS Release

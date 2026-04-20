@@ -120,6 +120,10 @@ else()
 	target_link_libraries(msftedit swinx msls31)
 endif()
 
+if(SOUI_ENABLE_CORE_LIB)
+    set(CORE_LIBS msftedit ${CORE_LIBS} CACHE INTERNAL "core_lib") 
+endif()
+
 set_target_properties (msftedit PROPERTIES
     FOLDER third-part
 )

@@ -110,7 +110,7 @@ else()
 	target_link_libraries(demo dl)
 endif()
 if(SOUI_ENABLE_COM_LIB)
-    target_link_libraries(demo ${COM_LIBS})
+    target_link_libraries(demo ${COM_LIBS} ${COM_DEP_LIBS})
 endif()
 target_precompile_headers(demo PRIVATE "stdafx.h")
 

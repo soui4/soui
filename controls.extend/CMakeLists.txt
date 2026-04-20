@@ -14,6 +14,7 @@ file(GLOB_RECURSE CTRLS_SRC ${PROJECT_SOURCE_DIR}/controls.extend/*.*)
 
 
 add_library(ExtendCtrls STATIC ${CTRLS_SRC})
+set(OPTION_LIBS ${OPTION_LIBS} ExtendCtrls CACHE INTERNAL "option_lib")
 
 target_link_libraries(ExtendCtrls soui4 utilities4)
 

@@ -9,3 +9,6 @@
 [submodule "third-part/openssl-cmake"]
 	path = third-part/openssl-cmake
 	url = https://gitee.com/setoutsoft/openssl-cmake.git
+[submodule "third-part/libcurl"]
+	path = third-part/libcurl
+	url = https://gitee.com/setoutsoft/curl.git

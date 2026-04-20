@@ -81,6 +81,11 @@ option(SOUI_BUILD_DEMOS "Build builtin demos" ON)
 option(SOUI_BUILD_GAMES "Build soui games" ON)
 
 option(SOUI_BUILD_TOOLS "Build soui tools" ON)
+
+#
+#
+option(SOUI_BUILD_HTTPCLIENT "Build HTTP client component" ON)
+
 #
 #
 option(SOUI_ENABLE_SVG "Enable SVG support" ON)

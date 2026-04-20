@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 set(project_name "soui5_app")
 project(${project_name})
 
-options(BUILD_SOUI_SYS_RESOURCE "Build SOUI system resource" ON)
+option(BUILD_SOUI_SYS_RESOURCE "Build SOUI system resource" ON)
 
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
@@ -90,6 +90,7 @@ add_custom_command(
 set_source_files_properties(${UIRES_RES_HEADER} PROPERTIES GENERATED TRUE)
 
 add_soui_exe(${project_name} WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${UIRES_RES_HEADER} ${CURRENT_RC})
+include(${SOUI_INSTALL_DIR}/__cmake/windres.cmake)
 if(BUILD_SOUI_SYS_RESOURCE)
 	target_compile_definitions(${project_name} PRIVATE BUILD_SYS_RES)
 	target_compile_resources(${project_name} ${CURRENT_RC} INCLUDE_DIRS ${SOUI_INSTALL_DIR}/include/config ${SOUI_SRC_DIR}/soui-sys-resource-dark)
@@ -147,6 +148,12 @@ else()
 endif()
 
 target_link_libraries(${project_name} ${SOUI_LIBRARIES})
+
+# Link component dependencies if using static libraries
+if(SOUI_ENABLE_COM_LIB AND DEFINED SOUI_COM_DEPS)
+    message(STATUS "Linking SOUI component dependencies: ${SOUI_COM_DEPS}")
+    target_link_libraries(${project_name} ${SOUI_COM_DEPS})
+endif()
 
 target_precompile_headers(${project_name} PRIVATE "stdafx.h")
  

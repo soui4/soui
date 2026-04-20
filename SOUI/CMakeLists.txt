@@ -78,7 +78,7 @@ target_include_directories(soui4
     "${PROJECT_BINARY_DIR}/config"
 )
 
-set(CORE_LIBS ${CORE_LIBS} soui4 CACHE INTERNAL "core_lib")
+set(CORE_LIBS soui4 ${CORE_LIBS} CACHE INTERNAL "core_lib")
 
 install(TARGETS soui4
     CONFIGURATIONS Release

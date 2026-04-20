@@ -22,6 +22,9 @@ else()
     )
 endif()
 target_link_libraries(imgdecoder-stb utilities4 aupng)
+if(SOUI_ENABLE_COM_LIB)
+    set(COM_DEP_LIBS ${COM_DEP_LIBS} aupng CACHE INTERNAL "com_dep_libs")
+endif()
 
 target_compile_definitions(imgdecoder-stb
   PUBLIC SOUI_IMAGE_DECODER_USE_STB

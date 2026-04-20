@@ -36,7 +36,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
 endif()
 
 if(SOUI_ENABLE_COM_LIB)
-    target_link_libraries(lightbutton_demo ${COM_LIBS})
+    target_link_libraries(lightbutton_demo ${COM_LIBS} ${COM_DEP_LIBS})
 endif()
 
 target_precompile_headers(lightbutton_demo PRIVATE "stdafx.h")

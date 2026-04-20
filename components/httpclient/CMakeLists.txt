@@ -29,14 +29,15 @@ if (CMAKE_SYSTEM_NAME MATCHES Windows)
         win/HttpClient.cpp
     )
 else()
-    find_package(CURL)
-    # 检查是否找到 libcurl
-    if(CURL_FOUND)
-        set(enable_http ON)
-        message(STATUS "building with httpclient using libcurl ${CURL_INCLUDE_DIRS}")
-        include_directories(${CURL_INCLUDE_DIRS})
-
-        set(headers
+    message(STATUS "building with httpclient using libcurl")
+    if(NOT TARGET libcurl_static)
+    message(FATAL_ERROR "curl not found. Please build curl at first")
+    endif()
+    get_target_property(CURL_INCLUDE_DIRS libcurl_static INTERFACE_INCLUDE_DIRECTORIES)
+    message(STATUS "building with httpclient using libcurl ${CURL_INCLUDE_DIRS}")
+    set(CURL_LIBRARIES libcurl_static)
+    
+    set(headers
             ${headers}
             linux/HttpClient.h
         )
@@ -45,13 +46,8 @@ else()
             ${srcs}
             linux/HttpClient.cpp
         )
-    else()
-        message(STATUS "libcurl not found. Disabling httpclient")
-        set(enable_http OFF)
-    endif()
 endif()
 
-if(enable_http)
 
 source_group("Header Files" FILES ${headers})
 source_group("Source Files" FILES ${srcs})
@@ -73,6 +69,14 @@ else()
 endif()
 
 set(COM_LIBS ${COM_LIBS} httpclient CACHE INTERNAL "com_lib")
+if(SOUI_ENABLE_COM_LIB)
+    if (CMAKE_SYSTEM_NAME MATCHES Windows)
+        set(COM_DEP_LIBS ${COM_DEP_LIBS} Winhttp.lib CACHE INTERNAL "com_dep_libs")
+    else()
+        set(COM_DEP_LIBS ${COM_DEP_LIBS} curl ssl_1_1 crypto_1_1 CACHE INTERNAL "com_dep_libs")
+    endif()
+endif()
+
 set_target_properties (httpclient PROPERTIES
     FOLDER components
 )
@@ -90,5 +94,3 @@ install(TARGETS httpclient
     LIBRARY DESTINATION lib/Debug
     ARCHIVE DESTINATION lib/Debug
 )
-
-endif(enable_http)

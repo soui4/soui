@@ -31,7 +31,7 @@ else()
 endif()
 
 if(SOUI_ENABLE_COM_LIB)
-    target_link_libraries(ipc_client ${COM_LIBS})
+    target_link_libraries(ipc_client ${COM_LIBS} ${COM_DEP_LIBS})
 endif()
 
 set_target_properties (ipc_client PROPERTIES
@@ -49,7 +49,7 @@ else()
 endif()
 
 if(SOUI_ENABLE_COM_LIB)
-    target_link_libraries(ipc_server ${COM_LIBS})
+    target_link_libraries(ipc_server ${COM_LIBS} ${COM_DEP_LIBS})
 endif()
 
 set_target_properties (ipc_server PROPERTIES

@@ -34,7 +34,7 @@ else()
     target_link_libraries(wxDemo dl)
 endif()
 if(SOUI_ENABLE_COM_LIB)
-    target_link_libraries(wxDemo ${COM_LIBS})
+    target_link_libraries(wxDemo ${COM_LIBS} ${COM_DEP_LIBS})
 endif()
 target_precompile_headers(wxDemo PRIVATE "stdafx.h")
 set_target_properties (wxDemo PROPERTIES

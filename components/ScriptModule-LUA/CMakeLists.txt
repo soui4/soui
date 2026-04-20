@@ -61,6 +61,9 @@ else()
 endif()
 
 set(COM_LIBS ${COM_LIBS} scriptmodule-lua CACHE INTERNAL "com_lib")
+if(SOUI_ENABLE_COM_LIB)
+    set(COM_DEP_LIBS ${COM_DEP_LIBS} lua-54 CACHE INTERNAL "com_dep_libs")
+endif()
 
 set_target_properties (scriptmodule-lua PROPERTIES
     FOLDER components

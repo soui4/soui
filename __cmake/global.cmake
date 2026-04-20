@@ -50,7 +50,11 @@ endmacro()
 
 set(CORE_LIBS CACHE INTERNAL "core_lib")
 set(COM_LIBS CACHE INTERNAL "com_lib")
-
+set(COM_DEP_LIBS CACHE INTERNAL "com_dep_libs")
+set(OPTION_LIBS CACHE INTERNAL "option_lib")
+set(SOUI_SWINX CACHE INTERNAL "swinx_lib")
+set(SOUI_UTILITIES CACHE INTERNAL "utilities_lib")
+set(SWINX_DEP_LIBS CACHE INTERNAL "swinx_dep_libs")
 
 macro(add_soui_exe exe_name)
 if (WIN32)

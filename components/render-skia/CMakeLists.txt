@@ -31,8 +31,9 @@ else()
 endif()
 add_dependencies(render-skia skia utilities4)
 target_link_libraries(render-skia skia utilities4 soui4)
+set(GL_LIB )
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
-    target_link_libraries(render-skia Usp10 opengl32)
+    set(GL_LIB Usp10 opengl32)
 else()
     # 通过swinx间接获取fontconfig和freetype支持
     # swinx已经包含了这些库，不需要直接链接
@@ -41,12 +42,15 @@ else()
             # 查找GLEW和GLFW包
         find_package(GLEW REQUIRED)
         find_package(glfw3 REQUIRED)
-        target_link_libraries(render-skia swinx GLEW::GLEW glfw)
+        set(GL_LIB GLEW::GLEW glfw)
     else()
-        target_link_libraries(render-skia swinx GL)
+        set(GL_LIB GL)
     endif()
 endif()
-
+target_link_libraries(render-skia ${GL_LIB})
+if(SOUI_ENABLE_COM_LIB)
+    set(COM_DEP_LIBS ${COM_DEP_LIBS} skia ${GL_LIB} CACHE INTERNAL "com_dep_libs")
+endif()
 
 target_compile_definitions(render-skia
   PUBLIC SOUI_RENDER_USE_SKIA

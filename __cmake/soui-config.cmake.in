@@ -1,4 +1,6 @@
 #Name: libsoui
+# SOUI CMake Configuration File
+# This file is used to import SOUI into external projects
 
 set(prefix @CMAKE_INSTALL_PREFIX@)
 set(exec_prefix ${prefix})
@@ -8,6 +10,8 @@ set(includedir ${prefix}/include)
 set(SOUI_VER "@SOUI_VER1@.@SOUI_VER2@.@SOUI_VER3@.@SOUI_VER4@")
 set(SOUI_SRC_DIR @CMAKE_SOURCE_DIR@)
 set(SOUI_PREFIX ${prefix})
+
+# Include directories
 set(SOUI_INCLUDE_DIRS 
     ${includedir}/config 
     ${includedir}/components 
@@ -15,11 +19,37 @@ set(SOUI_INCLUDE_DIRS
     ${includedir}/SOUI/include 
     ${includedir}/controls.extend 
     ${includedir}/@SWINX_CFLAGS@)
+
+# Library directories
 set(SOUI_LIBRARY_DIRS ${libdir} ${libdir}/${CMAKE_BUILD_TYPE})
-set(SOUI_LIBRARIES soui4 utilities4 @SWINX_LIBS@)
+
+# Static library configuration
 set(SOUI_ENABLE_CORE_LIB @SOUI_ENABLE_CORE_LIB@)
 set(SOUI_ENABLE_COM_LIB @SOUI_ENABLE_COM_LIB@)
-set(COM_LIBS @COM_LIBS@)
-if(SOUI_ENABLE_COM_LIB)
-    list(APPEND SOUI_LIBRARIES ${COM_LIBS})
-endif()
+
+# Core libraries (always required)
+set(SOUI_CORE_LIBS @CORE_LIBS@)
+set(SOUI_COM_LIBS @COM_LIBS@)
+set(SOUI_COM_DEP_LIBS @COM_DEP_LIBS@)
+set(SOUI_OPTION_LIBS @OPTION_LIBS@)
+set(SOUI_UTILITIES @SOUI_UTILITIES@)
+set(SOUI_SWINX @SOUI_SWINX@)
+set(SOUI_SWINX_DEP_LIBS @SWINX_DEP_LIBS@)
+
+set(SOUI_LIBRARIES 
+    ${SOUI_COM_LIBS} 
+    ${SOUI_CORE_LIBS} 
+    ${SOUI_COM_DEP_LIBS} 
+    ${SOUI_OPTION_LIBS}
+    ${SOUI_UTILITIES}
+    ${SOUI_SWINX}
+    ${SOUI_SWINX_DEP_LIBS}
+)
+
+# Print configuration summary
+message(STATUS "SOUI Version: ${SOUI_VER}")
+message(STATUS "SOUI Include Dirs: ${SOUI_INCLUDE_DIRS}")
+message(STATUS "SOUI Library Dirs: ${SOUI_LIBRARY_DIRS}")
+message(STATUS "SOUI Libraries: ${SOUI_LIBRARIES}")
+message(STATUS "SOUI Enable Core Lib: ${SOUI_ENABLE_CORE_LIB}")
+message(STATUS "SOUI Enable Com Lib: ${SOUI_ENABLE_COM_LIB}")

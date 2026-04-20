@@ -35,7 +35,7 @@ else()
 endif()
 
 if(SOUI_ENABLE_COM_LIB)
-    target_link_libraries(fun_test ${COM_LIBS})
+    target_link_libraries(fun_test ${COM_LIBS} ${COM_DEP_LIBS})
 endif()
 
 set_target_properties (fun_test PROPERTIES
