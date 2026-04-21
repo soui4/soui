@@ -65,7 +65,7 @@ void SPropertyItemColor::SetValue(const SStringT &strValue)
     }
 }
 
-LRESULT SPropertyItemColor::OnAttrColor(const SStringW &value, BOOL bLoading)
+HRESULT SPropertyItemColor::OnAttrColor(const SStringW &value, BOOL bLoading)
 {
     SetValue(S_CW2T(value));
     return bLoading ? S_OK : S_FALSE;

@@ -26,7 +26,7 @@ SNSBEGIN
 		virtual BOOL HasValue() const ;
 		virtual void ClearValue() ;
 
-        LRESULT OnAttrColor(const SStringW &value, BOOL bLoading);
+        HRESULT OnAttrColor(const SStringW &value, BOOL bLoading);
         SOUI_ATTRS_BEGIN()
             ATTR_STRINGT(L"format",m_strFormat,TRUE)
             ATTR_CUSTOM(L"value", OnAttrColor)
