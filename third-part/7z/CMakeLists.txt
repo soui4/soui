@@ -5,7 +5,7 @@
 #-----------------------------------------------------------------------------
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
+option(SOUI_7Z_ENABLE_ASM_OPT "enable 7z ams opt" ON)
 add_definitions(
 	-D_CRT_SECURE_NO_WARNINGS
 	-DEXTERNAL_CODECS
@@ -490,7 +490,7 @@ else()
     set(ENABLE_7Z_ASM 0)
 endif()
 
-if(ENABLE_7Z_ASM)
+if(ENABLE_7Z_ASM AND SOUI_7Z_ENABLE_ASM_OPT)
     # Only enable ASM_MASM language when we actually need it
     ENABLE_LANGUAGE(ASM_MASM)
     set(7ZIP_ASMS
