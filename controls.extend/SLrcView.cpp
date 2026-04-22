@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "SLrcView.h"
 #include <algorithm>
 #include <string>
@@ -751,7 +751,13 @@ int SLrcProvider::findLineByTime(int timeMs) const
 	return left < (int)m_lines.size() ? left : m_lines.size() - 1;
 }
 ///////////////////////////////////////////////////////////////////////
-SLrcView::SLrcView():m_lineHei(50), m_crText(RGBA(0,0,0,255)),m_crHighlight(RGBA(255,255,255,255))
+SLrcView::SLrcView()
+	: m_lineHei(50)
+	, m_crText(RGBA(180,180,180,255))
+	, m_crHighlight(RGBA(255,255,255,255))
+	, m_nFontSizeNormal(16)
+	, m_nFontSizeCurrent(24)
+	, m_fScaleDuration(0.3f)
 {
 	m_animator.Attach((SIntAnimator*)SApplication::getSingleton().CreateValueAnimatorByName(SIntAnimator::GetClassName()));
 	m_animator->addUpdateListener(this);
@@ -797,34 +803,103 @@ void SLrcView::onAnimationUpdate(IValueAnimator* pAnimator)
 	Invalidate();
 }
 
-void SLrcView::drawLine(IRenderTarget* pRT, CRect rc, int iLine, bool bHighlight)
+void SLrcView::drawLine(IRenderTarget* pRT, CRect rc, int iLine, float fProgress, bool bIsCurrent)
 {
 	if (iLine < 0 || iLine >= m_provider->getLineCount())
 		return;
+	
 	SStringT strText = m_provider->getLineText(iLine);
+	if (strText.IsEmpty())
+		return;
+	
 	bool bHead = m_provider->isHeadLine(iLine);
-	CRect rc2 = rc;
-	pRT->DrawText(strText, strText.GetLength(), &rc2, DT_CALCRECT);
-	rc.DeflateRect((rc.Width()-rc2.Width())/2, (rc.Height() - rc2.Height())/2);
-	if (bHead || m_animator->isRunning() || !bHighlight) {
-		pRT->SetTextColor(bHighlight ? m_crHighlight : m_crText);
-		pRT->DrawText(strText, strText.GetLength(), &rc, DT_CENTER);
+	
+	// 计算透明度和字号（仅当前行使用大字号）
+	int nFontSize = bIsCurrent ? m_nFontSizeCurrent : m_nFontSizeNormal;
+	BYTE byAlpha = 255;
+	
+	if (!bIsCurrent)
+	{
+		// 非当前行：根据距离计算透明度（保持字号不变）
+		float fDistance = fabsf((float)iLine - fProgress);
+		if (fDistance <= 1.0f)
+		{
+			// 相邻行：透明度 40%-100%
+			byAlpha = (BYTE)(255 * (0.4f + 0.6f * (1.0f - fDistance)));
+		}
+		else
+		{
+			// 远处行：固定较低透明度
+			byAlpha = (BYTE)(255 * 0.3f);
+		}
 	}
-	else {
+	
+	// 使用 SOUI 字体 API 设置字号
+	SAutoRefPtr<IFontS> pOldFont;
+	{
+		SAutoRefPtr<IFontS> pCurFont = (IFontS*)pRT->GetCurrentObject(OT_FONT);
+		SASSERT(pCurFont);
+		const LOGFONT *plf = pCurFont->LogFont();
+		LOGFONT lf;
+		memcpy(&lf, plf, sizeof(LOGFONT));
+		lf.lfHeight = -nFontSize;
+		
+		SAutoRefPtr<IFontS> pNewFont;
+		GETRENDERFACTORY->CreateFont(&pNewFont, &lf);
+		pRT->SelectObject(pNewFont, (IRenderObj**)&pOldFont);
+	}
+	
+	// 应用透明度到颜色
+	COLORREF crText = bIsCurrent ? m_crHighlight : m_crText;
+	BYTE r = GetRValue(crText);
+	BYTE g = GetGValue(crText);
+	BYTE b = GetBValue(crText);
+	COLORREF crFinal = RGBA(r, g, b, byAlpha);
+	
+	pRT->SetTextColor(crFinal);
+	
+	// 从窗口样式获取水平对齐方式
+    UINT uAlignFlags = DT_WORDBREAK | GetStyle().GetTextAlign(); // 默认支持换行
+	// 计算文本实际尺寸
+	CRect rcText = rc;
+	pRT->DrawText(strText, strText.GetLength(), &rcText, uAlignFlags | DT_CALCRECT);
+	// 调整垂直位置以保持居中
+	int nOffsetY = (rc.Height() - rcText.Height()) / 2;
+	rcText.OffsetRect(0, nOffsetY);
+    rcText.left = rc.left, rcText.right = rc.right; // 水平占满整行，垂直居中
+	// 如果是当前行且正在逐字高亮
+	if (bIsCurrent && !bHead && !m_animator->isRunning())
+	{
 		float ratio = m_provider->getWordRatio(iLine, m_timeMs);
-		int width = rc.Width() * ratio;
-		rc2 = rc;
-		rc2.right = rc2.left + width;
-		pRT->PushClipRect(rc2, RGN_AND);
+		int width = rcText.Width() * ratio;
+		
+		// 绘制已唱部分（高亮色）
+		CRect rcHighlighted = rcText;
+		rcHighlighted.right = rcHighlighted.left + width;
+		pRT->PushClipRect(rcHighlighted, RGN_AND);
 		pRT->SetTextColor(m_crHighlight);
-		pRT->DrawText(strText, strText.GetLength(), &rc, DT_CENTER);
+		pRT->DrawText(strText, strText.GetLength(), &rcText, uAlignFlags);
 		pRT->PopClip();
-		rc2.left = rc2.right;
-		rc2.right = rc.right;
-		pRT->PushClipRect(rc2, RGN_AND);
-		pRT->SetTextColor(m_crText);
-		pRT->DrawText(strText, strText.GetLength(), &rc, DT_CENTER);
+		
+		// 绘制未唱部分（普通色带透明度）
+		CRect rcUnhighlighted = rcText;
+		rcUnhighlighted.left = rcHighlighted.right;
+		rcUnhighlighted.right = rcText.right;
+		pRT->PushClipRect(rcUnhighlighted, RGN_AND);
+		pRT->SetTextColor(crFinal);
+		pRT->DrawText(strText, strText.GetLength(), &rcText, uAlignFlags);
 		pRT->PopClip();
+	}
+	else
+	{
+		// 普通绘制
+		pRT->DrawText(strText, strText.GetLength(), &rcText, uAlignFlags);
+	}
+	
+	// 恢复旧字体
+	if (pOldFont)
+	{
+		pRT->SelectObject(pOldFont, NULL);
 	}
 }
 
@@ -832,35 +907,58 @@ void SLrcView::OnPaint(IRenderTarget* pRT)
 {
 	SPainter painter;
 	BeforePaint(pRT, painter);
+	
 	CRect rc = GetClientRect();
-	if (m_provider)
+	if (m_provider && m_provider->getLineCount() > 0)
 	{
 		int nLines = m_provider->getLineCount();
 		int nLineHei = m_lineHei.toPixelSize(GetScale());
+		
+		// 获取当前播放进度（行索引，可能带小数）
+		float fCurrentProgress = m_provider->getLineIndexFromTimeMs(
+			m_animator->isRunning() ? m_timeAniMs : m_timeMs);
+		
+		// 计算可见区域
 		int nTotalHeight = nLines * nLineHei;
-		float lineIndex = m_provider->getLineIndexFromTimeMs(m_animator->isRunning() ? m_timeAniMs : m_timeMs);
-		if (!m_animator->isRunning())
-			lineIndex = floorf(lineIndex);
 		nTotalHeight += rc.Height();
-
-		int visibleLines = rc.Height() / nLineHei;
-		float firstLine = lineIndex - visibleLines / 2;
-		float lastLine = firstLine + visibleLines;
-
-		int iFirstLine = (int)floorf(firstLine);
-		int iLastLine = (int)ceilf(lastLine);
-		int nOffset = (firstLine - iFirstLine) * nLineHei;
+		
+		int visibleLines = rc.Height() / nLineHei + 2;  // 多显示几行以确保平滑滚动
+		
+		// 计算第一行和最后一行的索引
+		float fFirstLine = fCurrentProgress - visibleLines / 2.0f;
+		float fLastLine = fFirstLine + visibleLines;
+		
+		int iFirstLine = (int)floorf(fFirstLine);
+		int iLastLine = (int)ceilf(fLastLine);
+		
+		// 边界检查
+		iFirstLine = smax(0, iFirstLine);
+		iLastLine = smin(nLines - 1, iLastLine);
+		
+		// 计算垂直偏移以实现平滑滚动
+		int nOffset = (int)((fFirstLine - iFirstLine) * nLineHei);
+		
+		// 绘制每一行
 		CRect rcLine(rc.left, rc.top, rc.right, rc.top + nLineHei);
 		rcLine.OffsetRect(0, -nOffset);
-		for (int i = iFirstLine; i <= iLastLine; i++) {
-			drawLine(pRT, rcLine, i, i == (int)lineIndex && !m_animator->isRunning());
+		
+		for (int i = iFirstLine; i <= iLastLine; i++)
+		{
+			// 判断是否是当前播放行
+			bool bIsCurrent = (i == (int)fCurrentProgress && !m_animator->isRunning());
+			
+			drawLine(pRT, rcLine, i, fCurrentProgress, bIsCurrent);
+			
 			rcLine.OffsetRect(0, nLineHei);
 		}
 	}
-	else {
+	else
+	{
+		// 无歌词时显示提示
 		pRT->SetTextColor(m_crText);
-		pRT->DrawText(_T("No Lyrics"), -1, &rc, DT_CENTER | DT_VCENTER |DT_SINGLELINE);
+		pRT->DrawText(_T("No Lyrics"), -1, &rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	}
+	
 	AfterPaint(pRT, painter);
 }
 

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <list>
 #include <vector>
 SNSBEGIN
@@ -103,8 +103,7 @@ public:
 protected:
 	STDMETHOD_(void, onAnimationUpdate)(THIS_ IValueAnimator * pAnimator) OVERRIDE;
 protected:
-	void drawLine(IRenderTarget* pRT, CRect rc, int iLine, bool bHighlight);
-protected:
+	void drawLine(IRenderTarget* pRT, CRect rc, int iLine, float fProgress, bool bIsCurrent);
 	void OnPaint(IRenderTarget* pRT);
 	SOUI_MSG_MAP_BEGIN()
 		MSG_WM_PAINT_EX(OnPaint)
@@ -114,6 +113,9 @@ protected:
 		ATTR_COLOR(L"colorHighlight", m_crHighlight, TRUE)
 		ATTR_COLOR(L"colorText", m_crText, TRUE)
 		ATTR_LAYOUTSIZE(L"lineHeight",m_lineHei,TRUE)
+		ATTR_INT(L"fontSizeNormal", m_nFontSizeNormal, TRUE)
+		ATTR_INT(L"fontSizeCurrent", m_nFontSizeCurrent, TRUE)
+		ATTR_FLOAT(L"scaleDuration", m_fScaleDuration, TRUE)
 	SOUI_ATTRS_END()
 private:
 	SAutoRefPtr<ILrcProvider> m_provider;
@@ -125,6 +127,11 @@ private:
 	int m_nLength;
 	int m_timeAniMs;
 	int m_timeMs;
+	
+	// 字体大小配置
+	int m_nFontSizeNormal;      // 普通行字号
+	int m_nFontSizeCurrent;     // 当前行字号
+	float m_fScaleDuration;     // 缩放动画持续时间（秒）
 };
 
 SNSEND
