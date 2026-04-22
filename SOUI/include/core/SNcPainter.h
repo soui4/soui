@@ -166,6 +166,10 @@ class SOUI_EXP SNcPainter
      */
     virtual void OnLayoutDirty();
 
+    virtual LPCWSTR GetTrCtx() const
+    {
+        return NULL;
+    }
   protected:
     /**
      * @brief Gets the scale factor.

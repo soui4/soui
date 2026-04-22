@@ -1450,6 +1450,8 @@ SWindow *SWindow::CreateChildByName(LPCWSTR pszName)
 
 SStringW SWindow::tr(const SStringW &strSrc) const
 {
+    if (strSrc.IsEmpty())
+        return strSrc;
     return TR(strSrc, GetTrCtx());
 }
 
@@ -4023,10 +4025,14 @@ void SWindow::SetToolTipTextU8(LPCSTR pszText)
 
 LPCWSTR SWindow::GetTrCtx() const
 {
-    if (GetContainer() && m_strTrCtx.IsEmpty())
+    if(!m_strTrCtx.IsEmpty())
+        return m_strTrCtx;
+    if(GetParent())
+        return GetParent()->GetTrCtx();
+    else if(GetContainer())
         return GetContainer()->GetTranslatorContext();
     else
-        return m_strTrCtx;
+        return NULL;
 }
 
 int SWindow::GetScale() const

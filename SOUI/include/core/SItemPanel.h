@@ -35,6 +35,7 @@ struct IHostProxy
     virtual void InvalidateHostRect(LPCRECT pRc, BOOL bClip) = 0;
     virtual ISwndContainer *GetHostContainer() = 0;
     virtual void OnLayoutDirty() = 0;
+    virtual LPCWSTR GetTrCtx() const = 0;
 };
 
 class SHostProxy : public IHostProxy {
@@ -78,6 +79,10 @@ class SHostProxy : public IHostProxy {
     {
     }
 
+    virtual LPCWSTR GetTrCtx() const
+    {
+        return m_pHost->GetTrCtx();
+    }
   protected:
     SWindow *m_pHost;
 };
@@ -159,6 +164,7 @@ class SOUI_EXP SOsrPanel
     virtual BOOL UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo);
     virtual void RequestRelayout(SWND hSource, BOOL bSourceResizable);
 
+    virtual LPCWSTR GetTrCtx() const override;
     CRect GetItemRect() const;
     void SetItemCapture(BOOL bCapture);
 

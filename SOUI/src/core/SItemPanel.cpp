@@ -442,6 +442,13 @@ void SOsrPanel::RequestRelayout(SWND hSource, BOOL bSourceResizable)
     }
 }
 
+LPCWSTR SOsrPanel::GetTrCtx() const
+{
+    if(!m_strTrCtx.IsEmpty())
+        return m_strTrCtx;
+    return m_pHostProxy->GetTrCtx();
+}
+
 BOOL SOsrPanel::PostTask(THIS_ IRunnable *runable, BOOL bAsync)
 {
     return m_pHostProxy->GetHostContainer()->PostTask(runable, bAsync);
