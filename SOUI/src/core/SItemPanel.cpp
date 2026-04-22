@@ -209,7 +209,7 @@ HWND SOsrPanel::GetHostHwnd() const
 
 LPCWSTR SOsrPanel::GetTranslatorContext() const
 {
-    return m_pHostProxy->GetHostContainer()->GetTranslatorContext();
+    return m_pHostProxy->GetTrCtx();
 }
 
 BOOL SOsrPanel::IsTranslucent() const
@@ -440,13 +440,6 @@ void SOsrPanel::RequestRelayout(SWND hSource, BOOL bSourceResizable)
     {
         m_pHostProxy->OnLayoutDirty();
     }
-}
-
-LPCWSTR SOsrPanel::GetTrCtx() const
-{
-    if(!m_strTrCtx.IsEmpty())
-        return m_strTrCtx;
-    return m_pHostProxy->GetTrCtx();
 }
 
 BOOL SOsrPanel::PostTask(THIS_ IRunnable *runable, BOOL bAsync)

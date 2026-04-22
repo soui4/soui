@@ -164,7 +164,6 @@ class SOUI_EXP SOsrPanel
     virtual BOOL UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo);
     virtual void RequestRelayout(SWND hSource, BOOL bSourceResizable);
 
-    virtual LPCWSTR GetTrCtx() const override;
     CRect GetItemRect() const;
     void SetItemCapture(BOOL bCapture);
 
