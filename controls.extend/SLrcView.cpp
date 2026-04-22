@@ -99,35 +99,41 @@ BOOL SYYLrcProvider::load(LPCTSTR pszLrc, int durationMs)
 
 float SYYLrcProvider::getLineIndexFromTimeMs(int timeMs) const
 {
-	int iLine = ts2line(0, m_lstSents.size(), timeMs);
+	// 应用偏移量：实际查找时间 = 播放时间 - 偏移量
+	int adjustedTimeMs = timeMs - m_nOffsetMs;
+	
+	int iLine = ts2line(0, m_lstSents.size(), adjustedTimeMs);
 	const Sentence& sent = m_lstSents[iLine];
 	if (iLine == m_lstSents.size() - 1) {
 		//last line
 		int duration = sent.tsEndMs - sent.tsBeginMs;
-		int fraction = timeMs - sent.tsBeginMs;
+		int fraction = adjustedTimeMs - sent.tsBeginMs;
 		return iLine + (float)fraction / duration;
 	}
 	else {
 		const Sentence& sent2 = m_lstSents[iLine+1];
-		if (timeMs < sent.tsBeginMs) {
+		if (adjustedTimeMs < sent.tsBeginMs) {
 			return iLine;
 		}
 		int duration = sent2.tsBeginMs - sent.tsBeginMs;
-		int fraction = timeMs - sent.tsBeginMs;
+		int fraction = adjustedTimeMs - sent.tsBeginMs;
 		return iLine + (float)fraction / duration;
 	}
 }
 
 float SYYLrcProvider::getWordRatio(int iLine, int timeMs) const
 {
+	// 应用偏移量
+	int adjustedTimeMs = timeMs - m_nOffsetMs;
+	
 	const Sentence& sent = m_lstSents[iLine];
-	if(timeMs <= sent.tsBeginMs)
+	if(adjustedTimeMs <= sent.tsBeginMs)
 		return 0.0f;
-	if (timeMs >= sent.tsEndMs)
+	if (adjustedTimeMs >= sent.tsEndMs)
 		return 1.0f;
 	for (std::list<Tone>::const_iterator it = sent.tones.begin(); it != sent.tones.end();it++) {
-		if (timeMs >= it->tsBeginMs) {
-			float ratioOfWord = float(timeMs - it->tsBeginMs) / (it->tsEndMs - it->tsBeginMs);
+		if (adjustedTimeMs >= it->tsBeginMs) {
+			float ratioOfWord = float(adjustedTimeMs - it->tsBeginMs) / (it->tsEndMs - it->tsBeginMs);
 			return (float(it->nOffset) + ratioOfWord) / sent.strSent.GetLength();
 		}
 	}
@@ -157,6 +163,19 @@ bool SYYLrcProvider::isHeadLine(int iLine) const
 	return m_lstSents[iLine].isHead;
 }
 
+SYYLrcProvider::SYYLrcProvider()
+{
+	m_nOffsetMs = 0;
+}
+SYYLrcProvider::~SYYLrcProvider()
+{
+	// YY格式不支持保存偏移，直接放弃
+	if (m_nOffsetMs != 0)
+	{
+		SLOGI() << "SYYLrcProvider destructor: discarding offset " << m_nOffsetMs << "ms (YY format not supported)";
+	}
+}
+
 int SYYLrcProvider::ts2line(int iFirst, int iLast, int timeMs) const
 {
 	int iMid = (iFirst + iLast) / 2;
@@ -182,7 +201,18 @@ int SYYLrcProvider::ts2line(int iFirst, int iLast, int timeMs) const
 
 SLrcProvider::SLrcProvider()
 	: m_durationMs(0)
+	, m_nOffsetMs(0)
 {
+}
+
+SLrcProvider::~SLrcProvider()
+{
+	// 析构时如果有偏移量，自动应用到文件
+	if (m_nOffsetMs != 0 && !m_strLrcPath.IsEmpty())
+	{
+		SLOGI() << "SLrcProvider destructor: applying offset " << m_nOffsetMs << "ms to file";
+		applyOffsetToFile();
+	}
 }
 
 /**
@@ -603,6 +633,9 @@ BOOL SLrcProvider::load(LPCTSTR pszLrc, int durationMs)
 		m_lines.insert(m_lines.begin(), headLine);
 	}
 	
+	// 保存歌词文件路径
+	m_strLrcPath = pszLrc;
+		
 	SLOGI() << "Loaded LRC: " << m_lines.size() << " lines, title=" 
 	               << m_strTitle.c_str() << ", artist=" << m_strArtist.c_str();
 	
@@ -617,7 +650,10 @@ float SLrcProvider::getLineIndexFromTimeMs(int timeMs) const
 	if (m_lines.empty())
 		return 0.0f;
 	
-	int lineIndex = findLineByTime(timeMs);
+	// 应用偏移量：实际查找时间 = 播放时间 - 偏移量
+	int adjustedTimeMs = timeMs - m_nOffsetMs;
+	
+	int lineIndex = findLineByTime(adjustedTimeMs);
 	
 	if (lineIndex < 0 || lineIndex >= (int)m_lines.size())
 		return 0.0f;
@@ -631,21 +667,21 @@ float SLrcProvider::getLineIndexFromTimeMs(int timeMs) const
 		if (duration <= 0)
 			return (float)lineIndex;
 		
-		int fraction = timeMs - line.tsBeginMs;
+		int fraction = adjustedTimeMs - line.tsBeginMs;
 		return lineIndex + (float)fraction / duration;
 	}
 	else
 	{
 		// 使用下一行的开始时间计算进度
 		const LrcLine& nextLine = m_lines[lineIndex + 1];
-		if (timeMs < line.tsBeginMs)
+		if (adjustedTimeMs < line.tsBeginMs)
 			return (float)lineIndex;
 		
 		int duration = nextLine.tsBeginMs - line.tsBeginMs;
 		if (duration <= 0)
 			return (float)lineIndex;
 		
-		int fraction = timeMs - line.tsBeginMs;
+		int fraction = adjustedTimeMs - line.tsBeginMs;
 		return lineIndex + (float)fraction / duration;
 	}
 }
@@ -658,16 +694,19 @@ float SLrcProvider::getWordRatio(int iLine, int timeMs) const
 	if (iLine < 0 || iLine >= (int)m_lines.size())
 		return 0.0f;
 	
+	// 应用偏移量
+	int adjustedTimeMs = timeMs - m_nOffsetMs;
+	
 	const LrcLine& line = m_lines[iLine];
 	
-	if (timeMs <= line.tsBeginMs)
+	if (adjustedTimeMs <= line.tsBeginMs)
 		return 0.0f;
 	
-	if (timeMs >= line.tsEndMs)
+	if (adjustedTimeMs >= line.tsEndMs)
 		return 1.0f;
 	
 	// LRC格式不支持逐字高亮，简单线性插值
-	float ratio = (float)(timeMs - line.tsBeginMs) / (line.tsEndMs - line.tsBeginMs);
+	float ratio = (float)(adjustedTimeMs - line.tsBeginMs) / (line.tsEndMs - line.tsBeginMs);
 	return smin(1.0f, smax(0.0f, ratio));
 }
 
@@ -750,6 +789,94 @@ int SLrcProvider::findLineByTime(int timeMs) const
 	
 	return left < (int)m_lines.size() ? left : m_lines.size() - 1;
 }
+
+// 私有方法：将偏移应用到 LRC 文件并保存
+void SLrcProvider::applyOffsetToFile()
+{
+	if (m_strLrcPath.IsEmpty() || m_nOffsetMs == 0)
+		return;
+	
+	SLOGI() << "Applying offset " << m_nOffsetMs << "ms to LRC file: " << m_strLrcPath;
+	
+	// 读取原始 LRC 文件内容
+	FILE* fpRead = _tfopen(m_strLrcPath, _T("r"));
+	if (!fpRead)
+	{
+		SLOGW() << "Failed to open LRC file for reading: " << m_strLrcPath;
+		return;
+	}
+	
+	// 逐行读取并处理
+	std::vector<SStringA> lines;
+	char line[2048];
+	while (fgets(line, sizeof(line), fpRead))
+	{
+		SStringA strLine(line);
+		strLine.TrimRight();
+		
+		// 跳过已有的 offset 标签（如果存在）
+		if (strLine.Left(8) == "[offset:")
+			continue;
+		
+		// 处理时间标签行
+		if (strLine[0] == '[' && strLine.GetLength() > 9)
+		{
+			int endBracket = strLine.FindChar(']', 1);
+			if (endBracket > 0)
+			{
+				SStringA timeTag = strLine.Mid(1, endBracket - 1);
+				
+				// 检查是否是时间标签格式 [mm:ss.xx]
+				if (timeTag.GetLength() >= 8 && timeTag[2] == ':' && timeTag[5] == '.')
+				{
+					// 解析原时间
+					int minutes = atoi(timeTag.Mid(0, 2));
+					int seconds = atoi(timeTag.Mid(3, 2));
+					int centiseconds = atoi(timeTag.Mid(6, 2));
+					
+					// 转换为毫秒并应用偏移
+					int originalMs = minutes * 60000 + seconds * 1000 + centiseconds * 10;
+					int adjustedMs = originalMs + m_nOffsetMs;
+					
+					// 确保时间不为负
+					if (adjustedMs < 0)
+						adjustedMs = 0;
+					
+					// 转换回 [mm:ss.xx] 格式
+					int newMinutes = adjustedMs / 60000;
+					int newSeconds = (adjustedMs % 60000) / 1000;
+					int newCentiseconds = (adjustedMs % 1000) / 10;
+					
+					SStringA newTimeTag;
+					newTimeTag.Format("[%02d:%02d.%02d]", newMinutes, newSeconds, newCentiseconds);
+					
+					// 替换时间标签
+					strLine = newTimeTag + strLine.Mid(endBracket + 1);
+				}
+			}
+		}
+		
+		lines.push_back(strLine);
+	}
+	fclose(fpRead);
+	
+	// 写回文件
+	FILE* fpWrite = _tfopen(m_strLrcPath, _T("w"));
+	if (!fpWrite)
+	{
+		SLOGW() << "Failed to open LRC file for writing: " << m_strLrcPath;
+		return;
+	}
+	
+	for (size_t i = 0; i < lines.size(); ++i)
+	{
+		fprintf(fpWrite, "%s\n", lines[i].c_str());
+	}
+	fclose(fpWrite);
+	
+	SLOGI() << "Successfully saved LRC file with offset applied";
+}
+
 ///////////////////////////////////////////////////////////////////////
 SLrcView::SLrcView()
 	: m_lineHei(50)
@@ -857,28 +984,37 @@ void SLrcView::drawLine(IRenderTarget* pRT, CRect rc, int iLine, float fProgress
 	COLORREF crFinal = RGBA(r, g, b, byAlpha);
 	
 	pRT->SetTextColor(crFinal);
-	
-	// 从窗口样式获取水平对齐方式
-    UINT uAlignFlags = DT_WORDBREAK | GetStyle().GetTextAlign(); // 默认支持换行
 	// 计算文本实际尺寸
-	CRect rcText = rc;
-	pRT->DrawText(strText, strText.GetLength(), &rcText, uAlignFlags | DT_CALCRECT);
+	CRect rcMeasure = rc;
+	pRT->DrawText(strText, strText.GetLength(), &rcMeasure, DT_CALCRECT|DT_WORDBREAK);
 	// 调整垂直位置以保持居中
-	int nOffsetY = (rc.Height() - rcText.Height()) / 2;
-	rcText.OffsetRect(0, nOffsetY);
-    rcText.left = rc.left, rcText.right = rc.right; // 水平占满整行，垂直居中
+	int nOffsetY = (rc.Height() - rcMeasure.Height()) / 2;
+	int nOffsetX = 0;
+	switch(GetStyle().GetAlign()&SwndStyle::Align_MaskX){
+		case SwndStyle::Align_Center:
+		nOffsetX = (rc.Width() - rcMeasure.Width()) / 2;
+		break;
+		case SwndStyle::Align_Right:
+		nOffsetX = rc.Width() - rcMeasure.Width();
+		break;
+	}
+	CRect rcText = rc;
+	rcText.OffsetRect(nOffsetX, nOffsetY);
+	rcText.right = rcText.left + rcMeasure.Width();
+	rcText.bottom = rcText.top + rcMeasure.Height();
+
 	// 如果是当前行且正在逐字高亮
 	if (bIsCurrent && !bHead && !m_animator->isRunning())
 	{
 		float ratio = m_provider->getWordRatio(iLine, m_timeMs);
-		int width = rcText.Width() * ratio;
+		int width = rcMeasure.Width() * ratio;
 		
 		// 绘制已唱部分（高亮色）
 		CRect rcHighlighted = rcText;
 		rcHighlighted.right = rcHighlighted.left + width;
 		pRT->PushClipRect(rcHighlighted, RGN_AND);
 		pRT->SetTextColor(m_crHighlight);
-		pRT->DrawText(strText, strText.GetLength(), &rcText, uAlignFlags);
+		pRT->DrawText(strText, strText.GetLength(), &rcText, DT_WORDBREAK);
 		pRT->PopClip();
 		
 		// 绘制未唱部分（普通色带透明度）
@@ -886,14 +1022,15 @@ void SLrcView::drawLine(IRenderTarget* pRT, CRect rc, int iLine, float fProgress
 		rcUnhighlighted.left = rcHighlighted.right;
 		rcUnhighlighted.right = rcText.right;
 		pRT->PushClipRect(rcUnhighlighted, RGN_AND);
-		pRT->SetTextColor(crFinal);
-		pRT->DrawText(strText, strText.GetLength(), &rcText, uAlignFlags);
+        COLORREF crUnhighlighted = RGBA(r, g, b, byAlpha / 2); // 未唱部分更淡
+        pRT->SetTextColor(crUnhighlighted);
+		pRT->DrawText(strText, strText.GetLength(), &rcText, DT_WORDBREAK);
 		pRT->PopClip();
 	}
 	else
 	{
 		// 普通绘制
-		pRT->DrawText(strText, strText.GetLength(), &rcText, uAlignFlags);
+		pRT->DrawText(strText, strText.GetLength(), &rcText, DT_WORDBREAK);
 	}
 	
 	// 恢复旧字体
@@ -918,15 +1055,13 @@ void SLrcView::OnPaint(IRenderTarget* pRT)
 		float fCurrentProgress = m_provider->getLineIndexFromTimeMs(
 			m_animator->isRunning() ? m_timeAniMs : m_timeMs);
 		
-		// 计算可见区域
-		int nTotalHeight = nLines * nLineHei;
-		nTotalHeight += rc.Height();
-		
+		// 计算可见行数
 		int visibleLines = rc.Height() / nLineHei + 2;  // 多显示几行以确保平滑滚动
 		
-		// 计算第一行和最后一行的索引
-		float fFirstLine = fCurrentProgress - visibleLines / 2.0f;
-		float fLastLine = fFirstLine + visibleLines;
+		// 计算第一行和最后一行的索引，确保当前行始终在视图正中间
+		// 关键：使用 fCurrentProgress 作为中心点，上下各扩展 visibleLines/2
+		float fFirstLine = fCurrentProgress - (float)visibleLines / 2.0f;
+		float fLastLine = fCurrentProgress + (float)visibleLines / 2.0f;
 		
 		int iFirstLine = (int)floorf(fFirstLine);
 		int iLastLine = (int)ceilf(fLastLine);
@@ -936,7 +1071,11 @@ void SLrcView::OnPaint(IRenderTarget* pRT)
 		iLastLine = smin(nLines - 1, iLastLine);
 		
 		// 计算垂直偏移以实现平滑滚动
-		int nOffset = (int)((fFirstLine - iFirstLine) * nLineHei);
+		// 关键：让当前行的精确位置（包括小数部分）对齐到视图中心
+		float fCenterOffset = fCurrentProgress - (float)iFirstLine;
+		int nCenterPixel = (int)(fCenterOffset * nLineHei);
+		int nViewCenter = rc.Height() / 2;
+		int nOffset = nCenterPixel - nViewCenter;
 		
 		// 绘制每一行
 		CRect rcLine(rc.left, rc.top, rc.right, rc.top + nLineHei);

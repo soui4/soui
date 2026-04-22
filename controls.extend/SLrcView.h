@@ -11,6 +11,10 @@ struct ILrcProvider : IObjRef{
 	virtual SStringT getLineText(int iLine) const = 0;
 	virtual int getTsEndMs() const = 0;
 	virtual bool isHeadLine(int iLine) const = 0;
+	
+	// 歌词偏移控制
+	virtual void setOffset(int nOffsetMs) = 0;
+	virtual int getOffset() const = 0;
 };
 
 class SYYLrcProvider : public TObjRefImpl<ILrcProvider> {
@@ -30,10 +34,12 @@ class SYYLrcProvider : public TObjRefImpl<ILrcProvider> {
 	};
 
 	std::vector<Sentence> m_lstSents;
+	int m_nOffsetMs;        // 歌词时间偏移（毫秒）
 	SStringT m_strName;
-	SStringT m_strSinger;
+	SStringT m_strSinger;	
 public:
-	SYYLrcProvider() {}
+	SYYLrcProvider();
+	~SYYLrcProvider();
 	
 public:
 	// 通过 TObjRefImpl 继承
@@ -44,7 +50,14 @@ public:
 	SStringT getLineText(int iLine) const override;
 	int getTsEndMs() const override;
 	bool isHeadLine(int iLine) const override;
-
+	
+	// 歌词偏移控制
+	void setOffset(int nOffsetMs) override{
+		m_nOffsetMs = nOffsetMs;
+	}
+	int getOffset() const override{
+		return m_nOffsetMs;
+	}
 protected:
 	int ts2line(int iFirst, int iLast, int timeMs) const;
 };
@@ -70,9 +83,12 @@ class SLrcProvider : public TObjRefImpl<ILrcProvider> {
 	SStringT m_strArtist;
 	SStringT m_strAlbum;
 	int m_durationMs;       // 歌曲总时长
+	SStringT m_strLrcPath;  // 歌词文件路径
+	int m_nOffsetMs;        // 歌词时间偏移（毫秒）
 
 public:
 	SLrcProvider();
+	~SLrcProvider();
 
 public:
 	// ILrcProvider 接口实现
@@ -83,6 +99,14 @@ public:
 	SStringT getLineText(int iLine) const override;
 	int getTsEndMs() const override;
 	bool isHeadLine(int iLine) const override;
+	
+	// 歌词偏移控制
+	void setOffset(int nOffsetMs) override{
+		m_nOffsetMs = nOffsetMs;
+	}
+	int getOffset() const override{
+		return m_nOffsetMs;
+	}
 
 protected:
 	// 解析时间标签 [mm:ss.xx] 为毫秒
@@ -90,6 +114,9 @@ protected:
 	
 	// 二分查找时间对应的行索引
 	int findLineByTime(int timeMs) const;
+	
+	// 将偏移应用到 LRC 文件并保存（析构时调用）
+	void applyOffsetToFile();
 };
 
 class SLrcView : public SWindow, protected IAnimatorUpdateListener 
@@ -100,6 +127,8 @@ public:
 
 	void SetLrc(ILrcProvider* pProvider);
 	BOOL SetTimeMs(int nPos);
+	ILrcProvider* GetLrcProvider() const { return m_provider; }  // 添加获取 Provider 的方法
+	
 protected:
 	STDMETHOD_(void, onAnimationUpdate)(THIS_ IValueAnimator * pAnimator) OVERRIDE;
 protected:

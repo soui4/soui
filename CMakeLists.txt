@@ -49,11 +49,10 @@ if (CMAKE_SYSTEM_NAME MATCHES Windows)
   option(SOUI_USE_UNICODE "Use Unicode" ON)
 else()
   option(SOUI_USE_UNICODE "Use Unicode" OFF)
-  if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_definitions(-D_DEBUG)
-  endif()
 endif()
-
+if (NOT MSVC AND CMAKE_BUILD_TYPE STREQUAL "Debug")
+  add_definitions(-D_DEBUG)
+endif()
 # When other libraries are using a shared version of runtime libraries,
 # Google Test also has to use one.
 option(SOUI_SHARED_CRT "Use shared crt runtime library." ON)

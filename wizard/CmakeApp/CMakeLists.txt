@@ -33,7 +33,7 @@ set(CMAKE_BUILD_TYPE "Debug")
 endif()
 message(STATUS "build type is ${CMAKE_BUILD_TYPE}")
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+if (NOT MSVC AND CMAKE_BUILD_TYPE STREQUAL "Debug")
   add_definitions(-D_DEBUG)
 endif()
 
