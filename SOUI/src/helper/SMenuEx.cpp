@@ -11,9 +11,7 @@ SNSBEGIN
 #define WIDTH_MENU_MAX  2000
 #define WIDTH_MENU_MIN  100.f
 
-#define Y_MIDFLAG  L"-1000px"
-#define Y_IMIDFLAG (-1000)
-
+static const float INVALID_POS = -1000.f;
 //////////////////////////////////////////////////////////////////////////
 class SMenuExRoot : public SRootWindow {
     DEF_SOBJECT(SWindow, L"menuRoot")
@@ -90,6 +88,8 @@ class SMenuExRoot : public SRootWindow {
         SetHostWnd(pMenuEx);
         m_nItemHei.setSize(26.f, dp);
         m_nIconBarWidth.setSize(24.f, dp);
+        m_iconX.setSize(INVALID_POS, px);
+        m_iconY.setSize(INVALID_POS, px);
         m_nMinWidth.setSize(WIDTH_MENU_MIN, dp);
         OnAttrLayout(SVBox::GetClassName(), TRUE); // set layout to vbox
         GetLayoutParam()->SetWrapContent(Both);
@@ -174,7 +174,7 @@ HRESULT SMenuExRoot::OnAttrIconPos(const SStringW &strValue, BOOL bLoading)
     {
         //只设置X时，让Y方向自动居中
         m_iconX = GETLAYOUTSIZE(values[0]);
-        m_iconY.parseString(Y_MIDFLAG);
+        m_iconY.setSize(INVALID_POS, px);
         return S_OK;
     }
     else if (2 != values.GetCount())
@@ -272,10 +272,13 @@ void SMenuExItem::OnPaint(IRenderTarget *pRT)
     CRect rc = GetClientRect();
     SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot());
     SASSERT(pMenuRoot);
-    rc.right = rc.left + pMenuRoot->m_nIconBarWidth.toPixelSize(GetScale());
-    rc.left += pMenuRoot->m_iconX.toPixelSize(GetScale());
-    int icoY = pMenuRoot->m_iconY.toPixelSize(GetScale());
-
+    int nBarWidth = pMenuRoot->m_nIconBarWidth.toPixelSize(GetScale());
+    rc.right = rc.left + nBarWidth;
+    int icoX = -1, icoY = -1;
+    if (pMenuRoot->m_iconX.fSize != INVALID_POS)
+        icoX = pMenuRoot->m_iconX.toPixelSize(GetScale());
+    if (pMenuRoot->m_iconY.fSize != INVALID_POS)
+        icoY = pMenuRoot->m_iconY.toPixelSize(GetScale());
     if (m_bCheck || m_bRadio)
     {
         if (pMenuRoot->m_pCheckSkin)
@@ -285,23 +288,60 @@ void SMenuExItem::OnPaint(IRenderTarget *pRT)
             {
                 nState = m_bCheck ? 1 : 2;
             }
-            if (icoY == Y_IMIDFLAG)
-            {
-                icoY = (rc.Height() - pMenuRoot->m_pCheckSkin->GetSkinSize().cy) / 2;
+            CSize szIcon = pMenuRoot->m_pCheckSkin->GetSkinSize();
+            if(szIcon.cy>rc.Height()-4){
+                int hei = rc.Height() - 4;
+                int wid = szIcon.cx / szIcon.cy * hei;
+                szIcon.cx = wid;
+                szIcon.cy = hei;
             }
-            rc.top += icoY;
-            CRect rcIcon(rc.TopLeft(), pMenuRoot->m_pCheckSkin->GetSkinSize());
+            if (icoY == -1)
+            {
+                rc.DeflateRect(0, (rc.Height() - szIcon.cy) / 2);
+            }
+            else
+            {
+                rc.top += icoY;
+            }
+            if (icoX == -1)
+            {
+                rc.DeflateRect((rc.Width() - szIcon.cx) / 2, 0);
+            }
+            else
+            {
+                rc.left += icoX;
+            }
+            CRect rcIcon(rc.TopLeft(), szIcon);
             pMenuRoot->m_pCheckSkin->DrawByIndex(pRT, rcIcon, nState);
         }
     }
     else if (pMenuRoot->m_pIconSkin)
     {
-        if (icoY == Y_IMIDFLAG)
+        CSize szIcon = pMenuRoot->m_pIconSkin->GetSkinSize();
+        if(szIcon.cy > rc.Height()-4)
         {
-            icoY = (rc.Height() - pMenuRoot->m_pIconSkin->GetSkinSize().cy) / 2;
+            int hei = rc.Height() - 4;
+            int wid = szIcon.cx / szIcon.cy * hei;
+            szIcon.cx = wid;
+            szIcon.cy = hei;
         }
-        rc.top += icoY;
-        CRect rcIcon(rc.TopLeft(), pMenuRoot->m_pIconSkin->GetSkinSize());
+        if (icoY == -1)
+        {
+            rc.DeflateRect(0, (rc.Height() - szIcon.cy) / 2);
+        }
+        else
+        {
+            rc.top += icoY;
+        }
+        if (icoX == -1)
+        {
+            rc.DeflateRect((rc.Width() - szIcon.cx) / 2, 0);
+        }
+        else
+        {
+            rc.left += icoX;
+        }
+        CRect rcIcon(rc.TopLeft(), szIcon);
         pMenuRoot->m_pIconSkin->DrawByIndex(pRT, rcIcon, m_iIcon);
     }
 

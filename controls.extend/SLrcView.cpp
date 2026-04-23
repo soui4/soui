@@ -1262,7 +1262,8 @@ void SLrcView::OnPaint(IRenderTarget* pRT)
 	{
 		// 无歌词时显示提示
 		pRT->SetTextColor(m_crText);
-		pRT->DrawText(_T("No Lyrics"), -1, &rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+		SStringT strTip = m_strToolTipText.GetText();
+		pRT->DrawText(strTip, strTip.GetLength(), &rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	}
 	
 	AfterPaint(pRT, painter);
