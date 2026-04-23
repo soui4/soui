@@ -208,20 +208,28 @@ SSkinImgList::~SSkinImgList()
 {
 }
 
-SIZE SSkinImgList::GetSkinSize() const
+SIZE SSkinImgList::GetImageSize(BOOL bRaw) const
 {
     SIZE ret = { 0, 0 };
     if (GetSvg())
     {
-        ret.cx = GetSvg()->GetWidth();
-        ret.cy = GetSvg()->GetHeight();
-        ret.cx = ret.cx * GetScale() / 100;
-        ret.cy = ret.cy * GetScale() / 100;
+        ret = GetSvg()->Size();
+        if (!bRaw)
+        {
+            ret.cx = ret.cx * GetScale() / 100;
+            ret.cy = ret.cy * GetScale() / 100;
+        }
     }
     else if (GetImage())
     {
         ret = GetImage()->Size();
     }
+    return ret;
+}
+
+SIZE SSkinImgList::GetSkinSize() const
+{
+    SIZE ret = GetImageSize();
     if (m_bVertical)
         ret.cy /= m_nStates;
     else

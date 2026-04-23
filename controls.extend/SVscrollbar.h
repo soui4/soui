@@ -16,6 +16,9 @@ class SSkinVScrollbar : public SSkinScrollbar {
         m_nStates = 4;
     }
 
+    ~SSkinVScrollbar()
+    {
+    }
     //不支持显示上下箭头
     virtual BOOL HasArrow() const override
     {
@@ -23,12 +26,12 @@ class SSkinVScrollbar : public SSkinScrollbar {
     }
     virtual int GetIdealSize() const override
     {
-        if (!GetImage())
-            return 0;
-        return GetImage()->Width() / m_nStates;
+        SIZE sz = GetImageSize();
+        return sz.cx / m_nStates;
     }
 
   protected:
+
     //返回源指定部分在原位图上的位置。
     virtual CRect GetPartRect(int nSbCode, int nState, BOOL bVertical) const override
     {
@@ -41,10 +44,9 @@ class SSkinVScrollbar : public SSkinScrollbar {
         {
             nState = SBST_NORMAL;
         }
-
-        SASSERT(GetImage());
-        rc.right = GetImage()->Width() / m_nStates;
-        rc.bottom = GetImage()->Height() / 2;
+        SIZE sz = GetImageSize(TRUE);
+        rc.right = sz.cx / m_nStates;
+        rc.bottom = sz.cy / 2;
 
         rc.OffsetRect(rc.Width() * nState, 0);
         if (nSbCode == SB_PAGEUP || nSbCode == SB_PAGEDOWN)

@@ -167,6 +167,7 @@ class SOUI_EXP SSliderBar
     SAutoRefPtr<ISkinObj> m_pSkinThumb; /**< 皮肤对象 */
     BOOL m_bThumbInRail;                /**< 滑块包含在轨道中 */
     BOOL m_bDrawRail;                   /**< 绘制轨道 */
+    BOOL m_bDrawValue;                  /**< 绘制滑块数值 */
     BOOL m_bDragTip;                    /**< 拖动滑块时在tip中显示数值 */
 
     BYTE m_byThumbAlphaAni;                /**< 滑块透明度动画值 */
@@ -187,6 +188,7 @@ class SOUI_EXP SSliderBar
     SStringT GetTooltip(CPoint pt) const override;
     void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer) override;
 
+    void DrawRail(IRenderTarget *pRT, const CRect &rcClient) override;
     void DrawPos(IRenderTarget *pRT, const CRect &rcClient) override;
     void DrawOthers(IRenderTarget *pRT, const CRect &rcClient) override;
     void OnValueChanged(int nValue, int reason) override;
@@ -264,6 +266,7 @@ class SOUI_EXP SSliderBar
         ATTR_SKIN(L"thumbSkin", m_pSkinThumb, TRUE)
         ATTR_BOOL(L"thumbInRail", m_bThumbInRail, TRUE)
         ATTR_BOOL(L"drawRail", m_bDrawRail, TRUE)
+        ATTR_BOOL(L"drawValue", m_bDrawValue, TRUE)
         ATTR_BOOL(L"dragTip", m_bDragTip, TRUE)
         ATTR_BOOL(L"animate", m_bEnableAnimate, FALSE)
         ATTR_COLOR(L"sepColor", m_crSep, TRUE)

@@ -14,6 +14,7 @@ SSliderBar::SSliderBar()
     , m_pSkinThumb(GETBUILTINSKIN(SKIN_SYS_SLIDER_THUMB))
     , m_bThumbInRail(FALSE)
     , m_bDrawRail(TRUE)
+    , m_bDrawValue(TRUE)
     , m_bDragTip(FALSE)
     , m_crSep(RGBA(0, 0, 0, 255))
     , m_byThumbAlphaAni(0xFF)
@@ -131,9 +132,16 @@ CRect SSliderBar::GetPartRect(const CRect &rcClient, UINT uSBCode) const
     }
 }
 
-void SSliderBar::DrawPos(IRenderTarget *pRT, const CRect &rcClient)
+void SSliderBar::DrawRail(IRenderTarget *pRT, const CRect &rcClient)
 {
     if (!m_bDrawRail)
+        return;
+    __baseCls::DrawRail(pRT, rcClient);
+}
+
+void SSliderBar::DrawPos(IRenderTarget *pRT, const CRect &rcClient)
+{
+    if (!m_bDrawValue)
         return;
     __baseCls::DrawPos(pRT, rcClient);
 }

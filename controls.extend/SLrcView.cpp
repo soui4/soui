@@ -885,9 +885,14 @@ SLrcView::SLrcView()
 	, m_nFontSizeNormal(16)
 	, m_nFontSizeCurrent(24)
 	, m_fScaleDuration(0.3f)
+	, m_nCurrentLineIndex(-1)
+	, m_nLastLineIndex(-1)
+	, m_fTransitionProgress(0.0f)
+	, m_bIsTransitioning(false)
+	, m_nTransitionStartTimeMs(0)
+	, m_nLastScrollOffset(0)
+	, m_nCurrentScrollOffset(0)
 {
-	m_animator.Attach((SIntAnimator*)SApplication::getSingleton().CreateValueAnimatorByName(SIntAnimator::GetClassName()));
-	m_animator->addUpdateListener(this);
 }
 
 void SLrcView::SetLrc(ILrcProvider* pProvider)
@@ -896,6 +901,18 @@ void SLrcView::SetLrc(ILrcProvider* pProvider)
 	m_nLength = pProvider?pProvider->getTsEndMs():0;
 	m_timeMs = 0;
 	m_timeAniMs = 0;
+	
+	// 重置动画状态
+	m_nCurrentLineIndex = -1;
+	m_nLastLineIndex = -1;
+	m_fTransitionProgress = 0.0f;
+	m_bIsTransitioning = false;
+	m_nTransitionStartTimeMs = 0;
+	
+	// 重置滚动偏移
+	m_nLastScrollOffset = 0;
+	m_nCurrentScrollOffset = 0;
+	
 	Invalidate();
 }
 
@@ -903,31 +920,47 @@ BOOL SLrcView::SetTimeMs(int timeMs)
 {
 	if(!m_provider)
 		return FALSE;
-	if (m_animator->isRunning())
-		return FALSE;
+	
 	if (timeMs < 0)
 		timeMs = 0;
 	else if(timeMs > m_nLength)
 		timeMs = m_nLength;
-	float lineNow = m_provider->getLineIndexFromTimeMs(m_timeAniMs);
-	float lineNew = m_provider->getLineIndexFromTimeMs(timeMs);
-	if (floorf(lineNow) != floorf(lineNew)) {
-		//different line
-		m_animator->setRange(m_timeAniMs, timeMs);
-		m_animator->start(GetContainer());
+	
+	// 获取当前行索引
+	int currentLineIndex = (int)m_provider->getLineIndexFromTimeMs(timeMs);
+	
+	// 检测是否切换到新行
+	if (currentLineIndex != m_nCurrentLineIndex)
+	{
+		if (m_nCurrentLineIndex >= 0)  // 不是首次
+		{
+			// 行号变化，启动过渡动画
+			m_bIsTransitioning = true;
+			m_nLastLineIndex = m_nCurrentLineIndex;
+			m_nTransitionStartTimeMs = timeMs;
+			m_fTransitionProgress = 0.0f;
+		}
+		
+		m_nCurrentLineIndex = currentLineIndex;
 	}
-	else{
-		//update same line progress
-		m_timeMs = timeMs;
-		Invalidate();
+	
+	// 如果在过渡中，更新过渡进度
+	if (m_bIsTransitioning)
+	{
+		float durationMs = m_fScaleDuration * 1000.0f;
+		float elapsedMs = (float)(timeMs - m_nTransitionStartTimeMs);
+		m_fTransitionProgress = elapsedMs / durationMs;
+		
+		if (m_fTransitionProgress >= 1.0f)
+		{
+			m_fTransitionProgress = 1.0f;
+			m_bIsTransitioning = false;
+		}
 	}
-	return TRUE;
-}
-
-void SLrcView::onAnimationUpdate(IValueAnimator* pAnimator)
-{
-	m_timeMs = m_timeAniMs = m_animator->getValue();
+	
+	m_timeMs = timeMs;
 	Invalidate();
+	return TRUE;
 }
 
 void SLrcView::drawLine(IRenderTarget* pRT, CRect rc, int iLine, float fProgress, bool bIsCurrent)
@@ -1004,7 +1037,7 @@ void SLrcView::drawLine(IRenderTarget* pRT, CRect rc, int iLine, float fProgress
 	rcText.bottom = rcText.top + rcMeasure.Height();
 
 	// 如果是当前行且正在逐字高亮
-	if (bIsCurrent && !bHead && !m_animator->isRunning())
+	if (bIsCurrent && !bHead)
 	{
 		float ratio = m_provider->getWordRatio(iLine, m_timeMs);
 		int width = rcMeasure.Width() * ratio;
@@ -1040,6 +1073,119 @@ void SLrcView::drawLine(IRenderTarget* pRT, CRect rc, int iLine, float fProgress
 	}
 }
 
+/**
+ * @brief 绘制带切换动画效果的歌词行（缩放+淡入淡出）
+ */
+void SLrcView::drawLineWithTransition(IRenderTarget* pRT, CRect rc, int iLine, bool bIsCurrent)
+{
+	if (iLine < 0 || iLine >= m_provider->getLineCount())
+		return;
+	
+	SStringT strText = m_provider->getLineText(iLine);
+	if (strText.IsEmpty())
+		return;
+	
+	bool bHead = m_provider->isHeadLine(iLine);
+	
+	// 计算透明度
+	BYTE byAlpha = 255;
+	if (m_bIsTransitioning)
+	{
+		if (iLine == m_nLastLineIndex)
+		{
+			// 上一行：逐渐淡出并缩小
+			float fadeOut = 1.0f - m_fTransitionProgress;
+			byAlpha = (BYTE)(255 * fadeOut);
+		}
+		else if (iLine == (int)m_provider->getLineIndexFromTimeMs(m_timeMs))
+		{
+			// 新行：逐渐淡入并放大
+			float fadeIn = m_fTransitionProgress;
+			byAlpha = (BYTE)(255 * fadeIn);
+		}
+	}
+	
+	if (byAlpha == 0)
+		return; // 完全透明，不绘制
+	
+	// 计算字体大小（带动画）
+	int nFontSize = m_nFontSizeNormal;
+	if (bIsCurrent || (!m_bIsTransitioning && iLine == (int)m_provider->getLineIndexFromTimeMs(m_timeMs)))
+	{
+		if (m_bIsTransitioning && iLine == (int)m_provider->getLineIndexFromTimeMs(m_timeMs))
+		{
+			// 新行：从小变大
+			float scale = 0.7f + 0.3f * m_fTransitionProgress; // 从70%到100%
+			nFontSize = (int)(m_nFontSizeCurrent * scale);
+		}
+		else if (!m_bIsTransitioning)
+		{
+			// 正常状态：当前行使用大字号
+			nFontSize = m_nFontSizeCurrent;
+		}
+	}
+	else if (m_bIsTransitioning && iLine == m_nLastLineIndex)
+	{
+		// 上一行：从大变小
+		float scale = 1.0f - 0.3f * m_fTransitionProgress; // 从100%到70%
+		nFontSize = (int)(m_nFontSizeCurrent * scale);
+	}
+	
+	// 使用 SOUI 字体 API 设置字号
+	SAutoRefPtr<IFontS> pOldFont;
+	{
+		SAutoRefPtr<IFontS> pCurFont = (IFontS*)pRT->GetCurrentObject(OT_FONT);
+		SASSERT(pCurFont);
+		const LOGFONT *plf = pCurFont->LogFont();
+		LOGFONT lf;
+		memcpy(&lf, plf, sizeof(LOGFONT));
+		lf.lfHeight = -nFontSize;
+		
+		SAutoRefPtr<IFontS> pNewFont;
+		GETRENDERFACTORY->CreateFont(&pNewFont, &lf);
+		pRT->SelectObject(pNewFont, (IRenderObj**)&pOldFont);
+	}
+	
+	// 设置颜色
+	COLORREF crText = bIsCurrent ? m_crHighlight : m_crText;
+	BYTE r = GetRValue(crText);
+	BYTE g = GetGValue(crText);
+	BYTE b = GetBValue(crText);
+	COLORREF crFinal = RGBA(r, g, b, byAlpha);
+	
+	pRT->SetTextColor(crFinal);
+	
+	// 计算文本实际尺寸
+	CRect rcMeasure = rc;
+	pRT->DrawText(strText, strText.GetLength(), &rcMeasure, DT_CALCRECT|DT_WORDBREAK);
+	
+	// 调整垂直位置以保持居中
+	int nOffsetY = (rc.Height() - rcMeasure.Height()) / 2;
+	int nOffsetX = 0;
+	switch(GetStyle().GetAlign()&SwndStyle::Align_MaskX){
+		case SwndStyle::Align_Center:
+			nOffsetX = (rc.Width() - rcMeasure.Width()) / 2;
+			break;
+		case SwndStyle::Align_Right:
+			nOffsetX = rc.Width() - rcMeasure.Width();
+			break;
+	}
+	
+	CRect rcText = rc;
+	rcText.OffsetRect(nOffsetX, nOffsetY);
+	rcText.right = rcText.left + rcMeasure.Width();
+	rcText.bottom = rcText.top + rcMeasure.Height();
+	
+	// 普通绘制（切换时不使用逐字高亮）
+	pRT->DrawText(strText, strText.GetLength(), &rcText, DT_WORDBREAK);
+	
+	// 恢复旧字体
+	if (pOldFont)
+	{
+		pRT->SelectObject(pOldFont, NULL);
+	}
+}
+
 void SLrcView::OnPaint(IRenderTarget* pRT)
 {
 	SPainter painter;
@@ -1051,17 +1197,12 @@ void SLrcView::OnPaint(IRenderTarget* pRT)
 		int nLines = m_provider->getLineCount();
 		int nLineHei = m_lineHei.toPixelSize(GetScale());
 		
-		// 获取当前播放进度（行索引，可能带小数）
-		float fCurrentProgress = m_provider->getLineIndexFromTimeMs(
-			m_animator->isRunning() ? m_timeAniMs : m_timeMs);
-		
 		// 计算可见行数
-		int visibleLines = rc.Height() / nLineHei + 2;  // 多显示几行以确保平滑滚动
+		int visibleLines = rc.Height() / nLineHei + 2;
 		
 		// 计算第一行和最后一行的索引，确保当前行始终在视图正中间
-		// 关键：使用 fCurrentProgress 作为中心点，上下各扩展 visibleLines/2
-		float fFirstLine = fCurrentProgress - (float)visibleLines / 2.0f;
-		float fLastLine = fCurrentProgress + (float)visibleLines / 2.0f;
+		float fFirstLine = (float)m_nCurrentLineIndex - (float)visibleLines / 2.0f;
+		float fLastLine = (float)m_nCurrentLineIndex + (float)visibleLines / 2.0f;
 		
 		int iFirstLine = (int)floorf(fFirstLine);
 		int iLastLine = (int)ceilf(fLastLine);
@@ -1070,12 +1211,30 @@ void SLrcView::OnPaint(IRenderTarget* pRT)
 		iFirstLine = smax(0, iFirstLine);
 		iLastLine = smin(nLines - 1, iLastLine);
 		
-		// 计算垂直偏移以实现平滑滚动
-		// 关键：让当前行的精确位置（包括小数部分）对齐到视图中心
-		float fCenterOffset = fCurrentProgress - (float)iFirstLine;
-		int nCenterPixel = (int)(fCenterOffset * nLineHei);
+		// 计算当前行的Y偏移（用于滚动动画）
+		int nCurrentLineOffset = m_nCurrentLineIndex - iFirstLine;
+		int nCenterPixel = nCurrentLineOffset * nLineHei;
 		int nViewCenter = rc.Height() / 2;
-		int nOffset = nCenterPixel - nViewCenter;
+		int nCurrentOffset = nCenterPixel - nViewCenter;
+		
+		// 计算前一行的Y偏移（用于滚动动画插值）
+		int nLastOffset = nCurrentOffset;
+		if (m_bIsTransitioning && m_nLastLineIndex >= 0)
+		{
+			// 计算前一行的位置
+			int nLastLineOffset = m_nLastLineIndex - iFirstLine;
+			int nLastCenterPixel = nLastLineOffset * nLineHei;
+			nLastOffset = nLastCenterPixel - nViewCenter;
+		}
+		
+		// 根据过渡进度插值Y偏移（平滑滚动）
+		int nOffset = nCurrentOffset;
+		if (m_bIsTransitioning && m_fTransitionProgress < 1.0f)
+		{
+			// 线性插值：从上一行的偏移到当前行的偏移
+			float progress = m_fTransitionProgress;
+			nOffset = (int)(nLastOffset * (1.0f - progress) + nCurrentOffset * progress);
+		}
 		
 		// 绘制每一行
 		CRect rcLine(rc.left, rc.top, rc.right, rc.top + nLineHei);
@@ -1084,9 +1243,17 @@ void SLrcView::OnPaint(IRenderTarget* pRT)
 		for (int i = iFirstLine; i <= iLastLine; i++)
 		{
 			// 判断是否是当前播放行
-			bool bIsCurrent = (i == (int)fCurrentProgress && !m_animator->isRunning());
+			bool bIsCurrent = (i == m_nCurrentLineIndex);
 			
-			drawLine(pRT, rcLine, i, fCurrentProgress, bIsCurrent);
+			// 如果是切换动画中的上一行或新行，应用特殊效果
+			if (m_bIsTransitioning && (i == m_nLastLineIndex || i == m_nCurrentLineIndex))
+			{
+				drawLineWithTransition(pRT, rcLine, i, bIsCurrent);
+			}
+			else
+			{
+				drawLine(pRT, rcLine, i, 0.0f, bIsCurrent);
+			}
 			
 			rcLine.OffsetRect(0, nLineHei);
 		}

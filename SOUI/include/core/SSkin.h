@@ -176,6 +176,8 @@ class SOUI_EXP SSkinImgList : public SSkinObjBase {
     BOOL m_bLazyLoad;                     // Flag to indicate lazy loading
 
   protected:
+    SIZE GetImageSize(BOOL bRaw=FALSE) const;
+
     void LoadSrcImage() const;
     /**
      * @brief Handles the 'src' attribute.

@@ -119,7 +119,7 @@ protected:
 	void applyOffsetToFile();
 };
 
-class SLrcView : public SWindow, protected IAnimatorUpdateListener 
+class SLrcView : public SWindow
 {
 	DEF_SOBJECT(SWindow,L"lrcView")
 public:
@@ -128,11 +128,10 @@ public:
 	void SetLrc(ILrcProvider* pProvider);
 	BOOL SetTimeMs(int nPos);
 	ILrcProvider* GetLrcProvider() const { return m_provider; }  // 添加获取 Provider 的方法
-	
-protected:
-	STDMETHOD_(void, onAnimationUpdate)(THIS_ IValueAnimator * pAnimator) OVERRIDE;
+
 protected:
 	void drawLine(IRenderTarget* pRT, CRect rc, int iLine, float fProgress, bool bIsCurrent);
+	void drawLineWithTransition(IRenderTarget* pRT, CRect rc, int iLine, bool bIsCurrent);  // 带切换动画的绘制
 	void OnPaint(IRenderTarget* pRT);
 	SOUI_MSG_MAP_BEGIN()
 		MSG_WM_PAINT_EX(OnPaint)
@@ -148,7 +147,6 @@ protected:
 	SOUI_ATTRS_END()
 private:
 	SAutoRefPtr<ILrcProvider> m_provider;
-	SAutoRefPtr<SIntAnimator> m_animator;
 	COLORREF m_crText;
 	COLORREF m_crHighlight;
 
@@ -161,6 +159,17 @@ private:
 	int m_nFontSizeNormal;      // 普通行字号
 	int m_nFontSizeCurrent;     // 当前行字号
 	float m_fScaleDuration;     // 缩放动画持续时间（秒）
+	
+	// 歌词切换动画状态
+	int m_nCurrentLineIndex;     // 当前行索引
+	int m_nLastLineIndex;        // 上一行索引（用于切换动画绘制）
+	float m_fTransitionProgress; // 切换动画进度 (0.0 - 1.0)
+	bool m_bIsTransitioning;     // 是否正在切换动画中
+	int m_nTransitionStartTimeMs; // 切换动画开始时的播放时间（毫秒）
+	
+	// Y坐标滚动动画
+	int m_nLastScrollOffset;    // 上一行的Y偏移
+	int m_nCurrentScrollOffset; // 当前行的Y偏移
 };
 
 SNSEND
