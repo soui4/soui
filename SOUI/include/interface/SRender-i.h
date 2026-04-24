@@ -561,7 +561,7 @@ DECLARE_INTERFACE_(IBitmapS, IRenderObj)
      * @param szLen Size of the memory buffer.
      * @return HRESULT indicating success or failure.
      */
-    STDMETHOD_(HRESULT, LoadFromMemory)(THIS_ LPBYTE pBuf, size_t szLen) PURE;
+    STDMETHOD_(HRESULT, LoadFromMemory)(THIS_ const LPBYTE pBuf, size_t szLen) PURE;
 
     /**
      * @brief Retrieves the width of the bitmap.

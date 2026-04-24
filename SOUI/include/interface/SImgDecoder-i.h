@@ -82,7 +82,7 @@ DECLARE_INTERFACE_(IImgX, IObjRef)
      * @param bufLen - Size of the buffer.
      * @return int - Result of the operation.
      */
-    STDMETHOD_(int, LoadFromMemory)(THIS_ void *pBuf, size_t bufLen) PURE;
+    STDMETHOD_(int, LoadFromMemory)(THIS_ const void *pBuf, size_t bufLen) PURE;
 
     /**
      * @brief Load image data from a file (Unicode encoding).

@@ -306,7 +306,7 @@ HRESULT SBitmap_GDI::LoadFromFile(LPCTSTR pszFileName)
     return ImgFromDecoder(imgDecoder);
 }
 
-HRESULT SBitmap_GDI::LoadFromMemory(LPBYTE pBuf, size_t szLen)
+HRESULT SBitmap_GDI::LoadFromMemory(const LPBYTE pBuf, size_t szLen)
 {
     SAutoRefPtr<IImgX> imgDecoder;
     GetRenderFactory()->GetImgDecoderFactory()->CreateImgX(&imgDecoder);

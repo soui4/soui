@@ -27,9 +27,6 @@ get_target_property(websockets_includes websockets INTERFACE_INCLUDE_DIRECTORIES
 target_include_directories(${PROJECT_NAME} PRIVATE ${websockets_includes})
 
 set(COM_LIBS ${COM_LIBS} ${PROJECT_NAME} CACHE INTERNAL "com_lib")
-if(SOUI_ENABLE_COM_LIB)
-    set(COM_DEP_LIBS ${COM_DEP_LIBS} websockets ssl_1_1 crypto_1_1 CACHE INTERNAL "com_dep_libs")
-endif()
 
 set_target_properties (${PROJECT_NAME} PROPERTIES
     FOLDER components

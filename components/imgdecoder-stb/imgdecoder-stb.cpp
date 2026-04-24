@@ -56,7 +56,7 @@ SImgFrame_STB::SImgFrame_STB(const BYTE *data, int w, int h, int nDelay,BOOL bMo
     }
     //////////////////////////////////////////////////////////////////////////
     // SImgX_STB
-    int SImgX_STB::LoadFromMemory( void *pBuf,size_t bufLen )
+    int SImgX_STB::LoadFromMemory(const void *pBuf,size_t bufLen )
     {
         if(!pBuf) return 0;
 

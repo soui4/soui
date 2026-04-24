@@ -31,7 +31,7 @@ SNSBEGIN
     {
         friend class SImgDecoderFactory_STB;
     public:
-		STDMETHOD_(int,LoadFromMemory)(THIS_ void *pBuf,size_t bufLen) OVERRIDE;
+		STDMETHOD_(int,LoadFromMemory)(THIS_ const void *pBuf,size_t bufLen) OVERRIDE;
 		STDMETHOD_(int,LoadFromFileW)(THIS_ LPCWSTR pszFileName) OVERRIDE;
 		STDMETHOD_(int,LoadFromFileA)(THIS_ LPCSTR pszFileName) OVERRIDE;
 		STDMETHOD_(UINT,GetFrameCount)(THIS) OVERRIDE;

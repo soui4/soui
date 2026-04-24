@@ -270,7 +270,7 @@ public:
 
 	STDMETHOD_(HRESULT,LoadFromFile)(THIS_ LPCTSTR pszFileName) OVERRIDE;
 
-	STDMETHOD_(HRESULT,LoadFromMemory)(THIS_ LPBYTE pBuf,size_t szLen) OVERRIDE;
+	STDMETHOD_(HRESULT,LoadFromMemory)(THIS_ const LPBYTE pBuf,size_t szLen) OVERRIDE;
 
 	STDMETHOD_(UINT,Width)(THIS) SCONST OVERRIDE;
 

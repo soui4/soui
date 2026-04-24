@@ -1211,20 +1211,31 @@ void SLrcView::OnPaint(IRenderTarget* pRT)
 		iFirstLine = smax(0, iFirstLine);
 		iLastLine = smin(nLines - 1, iLastLine);
 		
-		// 计算当前行的Y偏移（用于滚动动画）
-		int nCurrentLineOffset = m_nCurrentLineIndex - iFirstLine;
-		int nCenterPixel = nCurrentLineOffset * nLineHei;
-		int nViewCenter = rc.Height() / 2;
-		int nCurrentOffset = nCenterPixel - nViewCenter;
+		// 计算当前行应该位于的像素位置（相对于第一行）
+		// 要让当前行居中，需要计算从第一行到当前行的距离
+		int nCurrentLineIndexFromFirst = m_nCurrentLineIndex - iFirstLine;
 		
-		// 计算前一行的Y偏移（用于滚动动画插值）
+		// 当前行应该在的位置（从顶部开始）
+		int nCurrentLineTop = nCurrentLineIndexFromFirst * nLineHei;
+		
+		// 当前行的中心位置
+		int nCurrentLineCenter = nCurrentLineTop + nLineHei / 2;
+		
+		// 视图的中心位置
+		int nViewCenter = rc.Height() / 2;
+		
+		// 计算需要的滚动偏移量，使当前行居中
+		int nCurrentOffset = nCurrentLineCenter - nViewCenter;
+		
+		// 计算前一行的Y偏移（用于滚动动画）
 		int nLastOffset = nCurrentOffset;
 		if (m_bIsTransitioning && m_nLastLineIndex >= 0)
 		{
-			// 计算前一行的位置
-			int nLastLineOffset = m_nLastLineIndex - iFirstLine;
-			int nLastCenterPixel = nLastLineOffset * nLineHei;
-			nLastOffset = nLastCenterPixel - nViewCenter;
+			// 计算前一行相对于第一行的位置
+			int nLastLineIndexFromFirst = m_nLastLineIndex - iFirstLine;
+			int nLastLineTop = nLastLineIndexFromFirst * nLineHei;
+			int nLastLineCenter = nLastLineTop + nLineHei / 2;
+			nLastOffset = nLastLineCenter - nViewCenter;
 		}
 		
 		// 根据过渡进度插值Y偏移（平滑滚动）

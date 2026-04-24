@@ -19,13 +19,13 @@ const TCHAR KTypeIcon[] = _T("ICON");
 const TCHAR KTypeHtml[] = _T("HTML");
 
 //////////////////////////////////////////////////////////////////////////
-IBitmapS *SResLoadFromMemory::LoadImage(LPVOID pBuf, size_t size)
+IBitmapS *SResLoadFromMemory::LoadImage(const LPVOID pBuf, size_t size)
 {
     IBitmapS *pImg = NULL;
     GETRENDERFACTORY->CreateBitmap(&pImg);
     if (!pImg)
         return NULL;
-    HRESULT hr = pImg->LoadFromMemory((LPBYTE)pBuf, size);
+    HRESULT hr = pImg->LoadFromMemory((const LPBYTE)pBuf, size);
 
     if (!SUCCEEDED(hr))
     {
@@ -36,7 +36,7 @@ IBitmapS *SResLoadFromMemory::LoadImage(LPVOID pBuf, size_t size)
     return pImg;
 }
 
-IImgX *SResLoadFromMemory::LoadImgX(LPVOID pBuf, size_t size)
+IImgX *SResLoadFromMemory::LoadImgX(const LPVOID pBuf, size_t size)
 {
     IImgX *pImgX = NULL;
     GETRENDERFACTORY->GetImgDecoderFactory()->CreateImgX(&pImgX);

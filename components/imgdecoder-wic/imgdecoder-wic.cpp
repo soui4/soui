@@ -70,7 +70,7 @@ SNSBEGIN
         m_pImgArray = NULL;
     }
 
-    int SImgX_WIC::LoadFromMemory(void *pBuf,size_t bufLen )
+    int SImgX_WIC::LoadFromMemory(const void *pBuf,size_t bufLen )
     {
         SASSERT(m_pImgArray == NULL);
 

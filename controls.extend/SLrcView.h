@@ -130,6 +130,10 @@ public:
 	ILrcProvider* GetLrcProvider() const { return m_provider; }  // 添加获取 Provider 的方法
 
 protected:
+	BOOL UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo) override{
+		// 禁用 ToolTip
+		return FALSE;
+	}
 	void drawLine(IRenderTarget* pRT, CRect rc, int iLine, float fProgress, bool bIsCurrent);
 	void drawLineWithTransition(IRenderTarget* pRT, CRect rc, int iLine, bool bIsCurrent);  // 带切换动画的绘制
 	void OnPaint(IRenderTarget* pRT);

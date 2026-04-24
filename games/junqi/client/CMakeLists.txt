@@ -38,7 +38,7 @@ add_executable(${current_project} WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CUR
 add_dependencies(${current_project} soui4 ExtendCtrls)
 target_link_libraries(${current_project} soui4 utilities4 ExtendCtrls junqi_algorithm)
 if(SOUI_ENABLE_COM_LIB)
-    target_link_libraries(${current_project} ${COM_LIBS})
+    target_link_libraries(${current_project} ${COM_LIBS}  ${COM_DEP_LIBS})
 endif()
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     # Link win32 audio library on Windows

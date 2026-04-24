@@ -72,7 +72,7 @@ SNSBEGIN
 
     //////////////////////////////////////////////////////////////////////////
     // SImgX_PNG
-    int SImgX_GDIP::LoadFromMemory( void *pBuf,size_t bufLen )
+    int SImgX_GDIP::LoadFromMemory(const void *pBuf, size_t bufLen)
     {
         HGLOBAL hMem = ::GlobalAlloc(GMEM_FIXED, bufLen);
         BYTE* pMem = (BYTE*)::GlobalLock(hMem);

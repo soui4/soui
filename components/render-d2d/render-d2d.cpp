@@ -752,7 +752,7 @@ HRESULT SBitmap_D2D::LoadFromFile(LPCTSTR pszFileName)
     return ImgFromDecoder(imgDecoder);
 }
 
-HRESULT SBitmap_D2D::LoadFromMemory(LPBYTE pBuf, size_t szLen)
+HRESULT SBitmap_D2D::LoadFromMemory(const LPBYTE pBuf, size_t szLen)
 {
     SAutoRefPtr<IImgX> imgDecoder;
     GetRenderFactory()->GetImgDecoderFactory()->CreateImgX(&imgDecoder);
