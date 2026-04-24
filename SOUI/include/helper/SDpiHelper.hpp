@@ -67,11 +67,11 @@ class SDpiHandler {
         CRect rc;
         ::GetWindowRect(hWnd, (RECT *)&rc);
         CSize sz = rc.Size();
+        CPoint center = rc.CenterPoint();
         sz.cx = sz.cx * nScale / 100;
         sz.cy = sz.cy * nScale / 100;
-        CPoint ntl = rc.CenterPoint();
-        ntl.Offset((-sz.cx + rc.Size().cx) / 2, (-sz.cy + rc.Size().cy) / 2);
-        rc = CRect(ntl, sz);
+        rc = CRect(center, sz);
+        rc.OffsetRect(-sz.cx/2, -sz.cy/2);
         HandleScaleChange(nScale, &rc);
     }
 
