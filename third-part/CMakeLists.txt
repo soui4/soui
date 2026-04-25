@@ -29,6 +29,10 @@ if(SOUI_BUILD_WS OR (SOUI_BUILD_HTTPCLIENT AND NOT CMAKE_SYSTEM_NAME MATCHES Win
 endif()
 if(SOUI_BUILD_HTTPCLIENT AND NOT CMAKE_SYSTEM_NAME MATCHES Windows)
         message("---Building with libcurl for HTTP client")
+        
+        # Disable debug postfix to avoid "-d" suffix on debug builds
+        set(CMAKE_DEBUG_POSTFIX "" CACHE STRING "Disable Debug postfix for library names" FORCE)
+        
         set(BUILD_CURL_EXE OFF CACHE BOOL "Build curl executable" FORCE)
         set(BUILD_TESTING OFF CACHE BOOL "Build curl tests" FORCE)
         set(BUILD_EXAMPLES OFF CACHE BOOL "Build libcurl examples" FORCE)
