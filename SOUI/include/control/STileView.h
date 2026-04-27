@@ -162,6 +162,13 @@ class SOUI_EXP STileView
      * @return Pointer to the item panel at the specified point.
      */
     SItemPanel *HitTest(CPoint &pt) const;
+    
+    /**
+     * @brief Gets the item panel by index.
+     * @param iItem Index of the item.
+     * @return Pointer to the item panel.
+     */
+    SItemPanel *GetItemPanel(int iItem);
 
   protected:
     /**
@@ -213,13 +220,6 @@ class SOUI_EXP STileView
      * @brief Updates the scroll bars.
      */
     void UpdateScrollBar();
-
-    /**
-     * @brief Gets the item panel by index.
-     * @param iItem Index of the item.
-     * @return Pointer to the item panel.
-     */
-    SItemPanel *GetItemPanel(int iItem);
 
     /**
      * @brief Updates the visible items.

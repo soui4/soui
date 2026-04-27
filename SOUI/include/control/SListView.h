@@ -140,6 +140,13 @@ class SOUI_EXP SListView
 
   public:
     /**
+     * @brief Get the item panel for a specific item
+     * @param iItem Index of the item
+     * @return Pointer to the item panel
+     */
+    SItemPanel *GetItemPanel(int iItem) override;
+
+    /**
      * @brief Hit test to determine the item under the mouse
      * @param pt Mouse coordinates
      * @return Pointer to the item panel if found, NULL otherwise
@@ -206,12 +213,6 @@ class SOUI_EXP SListView
      */
     void UpdateScrollBar();
 
-    /**
-     * @brief Get the item panel for a specific item
-     * @param iItem Index of the item
-     * @return Pointer to the item panel
-     */
-    SItemPanel *GetItemPanel(int iItem) override;
 
     /**
      * @brief Update visible items

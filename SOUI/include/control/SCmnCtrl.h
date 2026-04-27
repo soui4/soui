@@ -88,9 +88,15 @@ class SOUI_EXP SStatic : public SWindow {
      */
     bool m_bWordbreak;
 
+    /** 
+     * @brief 是否不显示前缀
+     */
+    bool m_bNoPrefix;
+
     SOUI_ATTRS_BEGIN()
         ATTR_INT(L"interHeight", m_nLineInter, TRUE)
         ATTR_BOOL(L"wordBreak", m_bWordbreak, TRUE)
+        ATTR_BOOL(L"noPrefix", m_bNoPrefix, TRUE)
     SOUI_ATTRS_END()
 };
 /**

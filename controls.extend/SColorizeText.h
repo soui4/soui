@@ -11,22 +11,25 @@ public:
 	~SColorizeText(void);
 
 	void SetKeyText(LPCTSTR pszKey);
-	STDMETHOD_(void,SetWindowText)(THIS_ LPCTSTR pszText) OVERRIDE;
 protected:
 	virtual void DrawText(IRenderTarget* pRT, LPCTSTR pszBuf, int cchText, LPRECT pRect, UINT uFormat);
+	virtual void OnContentChanged();
 
 	void ClearColorizeInfo();
 	void AddColorizeInfo(int iBegin, int iEnd, COLORREF cr);
 	void UpdateTextColors();
-public:
+    HRESULT OnAttrKey(const SStringW &strValue, BOOL bLoading);
+
+  public:
 	SOUI_ATTRS_BEGIN()
 		ATTR_COLOR(L"colorKey", m_crKey, TRUE)
 		ATTR_BOOL(L"caseSensitive", m_bCaseSensitive,TRUE)
+        ATTR_CUSTOM(L"key", OnAttrKey)
 	SOUI_ATTRS_END()
 
 private:
 	COLORREF m_crKey;
-	SStringT m_strKey;
+	STrText m_strKey;
 	BOOL m_bCaseSensitive;
 
 	struct COLORIZEINFO

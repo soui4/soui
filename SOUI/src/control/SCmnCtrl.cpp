@@ -15,6 +15,7 @@ SNSBEGIN
 SStatic::SStatic()
     : m_nLineInter(5)
     , m_bWordbreak(false)
+    , m_bNoPrefix(false)
 {
     m_bMsgTransparent = TRUE;
     m_style.SetAlign(DT_LEFT);
@@ -22,6 +23,8 @@ SStatic::SStatic()
 
 void SStatic::DrawText(IRenderTarget *pRT, LPCTSTR pszBuf, int cchText, LPRECT pRect, UINT uFormat)
 {
+    if(m_bNoPrefix)
+        uFormat |= DT_NOPREFIX;
     if (!GetStyle().GetMultiLines())
     {
         OnDrawLine(pRT, pszBuf, 0, cchText, pRect, uFormat);
@@ -173,6 +176,11 @@ void SStatic::DrawMultiLine(IRenderTarget *pRT, LPCTSTR pszBuf, int cchText, LPR
             pPrev = p1;
             p1 = p2;
             pLineTail = pLineHead = p2;
+            continue;
+        }
+        if(*p1=='&' && (uFormat & DT_NOPREFIX)==0)
+        {// skip the & if DT_NOPREFIX is not set
+            p1 = p2;
             continue;
         }
         szWord = OnMeasureText(pRT, p1, (int)(p2 - p1));

@@ -398,6 +398,13 @@ class SOUI_EXP STreeView
      * @return Pointer to the item panel at the specified position.
      */
     SItemPanel *HitTest(CPoint &pt) const;
+    
+    /**
+     * @brief Gets the item panel for a given item handle.
+     * @param hItem Handle to the item.
+     * @return Pointer to the item panel.
+     */
+    SItemPanel *GetItemPanel(HSTREEITEM hItem);
 
   protected:
     /**
@@ -671,13 +678,6 @@ class SOUI_EXP STreeView
      * @param pItem Pointer to the item panel.
      */
     void RedrawItem(SItemPanel *pItem);
-
-    /**
-     * @brief Gets the item panel for a given item handle.
-     * @param hItem Handle to the item.
-     * @return Pointer to the item panel.
-     */
-    SItemPanel *GetItemPanel(HSTREEITEM hItem);
 
     /**
      * @brief Dispatches a message to items.

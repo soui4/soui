@@ -198,6 +198,14 @@ class SOUI_EXP SMCListView
     SHeaderCtrl *GetHeaderCtrl() const;
 
     /**
+     * @brief Get the item panel for a specific item
+     * @param iItem Index of the item
+     * @return Pointer to the item panel
+     */
+    SItemPanel *GetItemPanel(int iItem);
+
+  protected:
+    /**
      * @brief Update visible items
      */
     void UpdateVisibleItems();
@@ -208,7 +216,6 @@ class SOUI_EXP SMCListView
      */
     void UpdateVisibleItem(int iItem);
 
-  protected:
     /**
      * @brief Handle scroll event
      * @param bVertical Whether the scroll is vertical
@@ -260,12 +267,6 @@ class SOUI_EXP SMCListView
      */
     void UpdateScrollBar();
 
-    /**
-     * @brief Get the item panel for a specific item
-     * @param iItem Index of the item
-     * @return Pointer to the item panel
-     */
-    SItemPanel *GetItemPanel(int iItem);
 
     /**
      * @brief Paint the control

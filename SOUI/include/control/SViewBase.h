@@ -103,13 +103,6 @@ class SOUI_EXP SViewBase
     void DispatchMessage2Items(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
     /**
-     * @brief Get the item panel for a specific item
-     * @param iItem Index of the item
-     * @return Pointer to the item panel
-     */
-    virtual SItemPanel *GetItemPanel(int iItem) = 0;
-
-    /**
      * @brief Update visible items
      */
     virtual void UpdateVisibleItems() = 0;
@@ -182,6 +175,14 @@ class SOUI_EXP SViewBase
      * @param nNewSel Index of the newly selected item.
      */
     void HandleSelectionChange(int nOldSel, int nNewSel);
+
+  public:
+      /**
+     * @brief Get the item panel for a specific item
+     * @param iItem Index of the item
+     * @return Pointer to the item panel
+     */
+    virtual SItemPanel *GetItemPanel(int iItem) = 0;
 
     SOUI_ATTRS_BEGIN()
         ATTR_BOOL(L"wantTab", m_bWantTab, FALSE)
