@@ -207,7 +207,7 @@ class SOUI_EXP SEventSet {
     template <typename T>
     BOOL subscribeEvent(DWORD dwEventID, BOOL (T::*pFn)(IEvtArgs *), T *pObject)
     {
-        return subscribeEvent(dwEventID, Subscriber(pFn, this));
+        return subscribeEvent(dwEventID, Subscriber(pFn, pObject));
     }
 
     /**
@@ -265,7 +265,7 @@ class SOUI_EXP SEventSet {
     template <typename T>
     BOOL unsubscribeEvent(DWORD dwEventID, BOOL (T::*pFn)(IEvtArgs *), T *pObject)
     {
-        return unsubscribeEvent(dwEventID, Subscriber(pFn, this));
+        return unsubscribeEvent(dwEventID, Subscriber(pFn, pObject));
     }
 
     /**
