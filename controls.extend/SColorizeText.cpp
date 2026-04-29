@@ -14,60 +14,54 @@ SColorizeText::~SColorizeText(void)
 {
 }
 
-void SColorizeText::DrawText(IRenderTarget *pRT, LPCTSTR pszBuf, int cchText, LPRECT pRect, UINT uFormat)
-{
+void SColorizeText::OnDrawLine(IRenderTarget *pRT, LPCTSTR pszBuf, int iBegin, int cchText, LPRECT pRect, UINT uFormat){
     if (uFormat & DT_CALCRECT)
     {
-        __baseCls::DrawText(pRT, pszBuf, cchText, pRect, uFormat);
-        return;
-    }
-
-    if (!(uFormat & DT_SINGLELINE))
-        return;
-
-    if (cchText == -1)
-        cchText = _tcslen(pszBuf);
-
-    COLORREF crDef = pRT->GetTextColor();
-    SArray<COLORIZEINFO> lstInfo;
-
-    int iBegin = 0;
-    for (int i = 0; i < (int)m_lstColorizeInfo.GetCount(); i++)
-    {
-        COLORIZEINFO info = m_lstColorizeInfo[i];
-        if (info.iBegin > iBegin)
+        __baseCls::OnDrawLine(pRT, pszBuf, iBegin, cchText, pRect, uFormat);
+    }else{
+        COLORREF crDef = pRT->GetTextColor();
+        SArray<COLORIZEINFO> lstInfo;
+        int iEnd = iBegin + cchText;
+        int iBegin2 = iBegin;
+        for (int i = 0; i < (int)m_lstColorizeInfo.GetCount(); i++)
         {
-            COLORIZEINFO infoDef = { iBegin, info.iBegin, crDef };
-            lstInfo.Add(infoDef);
+            COLORIZEINFO info = m_lstColorizeInfo[i];
+            if (info.iBegin > iBegin2)
+            {
+                COLORIZEINFO infoDef = { iBegin2, info.iBegin, crDef };
+                lstInfo.Add(infoDef);
+            }
+            lstInfo.Add(info);
+            iBegin2 = info.iEnd;
+            if(iBegin2 >= iEnd)
+                break;
         }
-        lstInfo.Add(info);
-        iBegin = info.iEnd;
-    }
 
-    if (iBegin < cchText)
-    {
-        COLORIZEINFO info = { iBegin, cchText, crDef };
-        lstInfo.Add(info);
-    }
+        if (iBegin2 < iEnd)
+        {
+            COLORIZEINFO info = { iBegin2, iEnd, crDef };
+            lstInfo.Add(info);
+        }
 
-    int x = pRect->left;
-    int y = pRect->top;
-    for (int i = 0; i < (int)lstInfo.GetCount(); i++)
-    {
-        const COLORIZEINFO &info = lstInfo[i];
-        pRT->SetTextColor(info.cr);
-        LPCTSTR p1 = pszBuf + info.iBegin;
-        SIZE szSeg = { 0 };
-        pRT->MeasureText(p1, info.iEnd - info.iBegin, &szSeg);
-        pRT->TextOut(x, y, p1, info.iEnd - info.iBegin);
-        x += szSeg.cx;
-    }
+        int x = pRect->left;
+        int y = pRect->top;
+        for (int i = 0; i < (int)lstInfo.GetCount(); i++)
+        {
+            const COLORIZEINFO &info = lstInfo[i];
+            pRT->SetTextColor(info.cr);
+            LPCTSTR p1 = pszBuf + info.iBegin;
+            SIZE szSeg = { 0 };
+            pRT->MeasureText(p1, info.iEnd - info.iBegin, &szSeg);
+            pRT->TextOut(x, y, p1, info.iEnd - info.iBegin);
+            x += szSeg.cx;
+        }
 
-    pRT->SetTextColor(crDef);
+        pRT->SetTextColor(crDef);
+    }
 }
-
 void SColorizeText::OnContentChanged()
 {
+    __baseCls::OnContentChanged();
     UpdateTextColors();
 }
 

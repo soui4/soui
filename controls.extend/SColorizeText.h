@@ -3,29 +3,29 @@
 
 SNSBEGIN
 
-class SColorizeText : public SWindow
+class SColorizeText : public SStatic
 {
-	DEF_SOBJECT(SWindow, L"colorizeText")
+	DEF_SOBJECT(SStatic, L"colorizeText")
 public:
 	SColorizeText(void);
 	~SColorizeText(void);
 
 	void SetKeyText(LPCTSTR pszKey);
 protected:
-	virtual void DrawText(IRenderTarget* pRT, LPCTSTR pszBuf, int cchText, LPRECT pRect, UINT uFormat);
-	virtual void OnContentChanged();
+  void OnDrawLine(IRenderTarget *pRT, LPCTSTR pszBuf, int iBegin, int cchText, LPRECT pRect, UINT uFormat) override;
+  void OnContentChanged() override;
 
-	void ClearColorizeInfo();
-	void AddColorizeInfo(int iBegin, int iEnd, COLORREF cr);
-	void UpdateTextColors();
-    HRESULT OnAttrKey(const SStringW &strValue, BOOL bLoading);
+  void ClearColorizeInfo();
+  void AddColorizeInfo(int iBegin, int iEnd, COLORREF cr);
+  void UpdateTextColors();
+  HRESULT OnAttrKey(const SStringW &strValue, BOOL bLoading);
 
-  public:
-	SOUI_ATTRS_BEGIN()
-		ATTR_COLOR(L"colorKey", m_crKey, TRUE)
-		ATTR_BOOL(L"caseSensitive", m_bCaseSensitive,TRUE)
-        ATTR_CUSTOM(L"key", OnAttrKey)
-	SOUI_ATTRS_END()
+public:
+  SOUI_ATTRS_BEGIN()
+      ATTR_COLOR(L"colorKey", m_crKey, TRUE)
+      ATTR_BOOL(L"caseSensitive", m_bCaseSensitive, TRUE)
+      ATTR_CUSTOM(L"key", OnAttrKey)
+  SOUI_ATTRS_END()
 
 private:
 	COLORREF m_crKey;

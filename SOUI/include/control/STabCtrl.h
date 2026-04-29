@@ -341,11 +341,12 @@ class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
 
     STDMETHOD_(void, OnInitFinished)(THIS_ IXmlNode *xmlNode) OVERRIDE;
 
-    virtual void OnColorize(COLORREF cr);
-    virtual void OnScaleChanged(int nScale);
+    virtual void OnColorize(COLORREF cr) override;
+    virtual void OnScaleChanged(int nScale) override;
 
-    virtual HRESULT OnLanguageChanged();
+    virtual HRESULT OnLanguageChanged() override;
 
+    virtual void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer) override;
   protected:
     /**
      * @brief Performs a hit test on the tab control.

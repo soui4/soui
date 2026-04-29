@@ -98,14 +98,6 @@ class STabSlider
         Stop();
     }
 
-    void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer) override
-    {
-        if (pOldContainer)
-        {
-            m_pTabCtrl->m_aniSlider->end();
-        }
-        SWindow::OnContainerChanged(pOldContainer, pNewContainer);
-    }
 
     int GetItemState(int iItem) const
     {
@@ -235,11 +227,6 @@ class STabSlider
         Stop();
     }
 
-    void OnDestroy()
-    {
-        m_pTabCtrl->m_aniSlider->end();
-        SWindow::OnDestroy();
-    }
 
     SAutoRefPtr<IRenderTarget> m_rtPageFrom, m_rtPageTo;
     int m_iFrom, m_iTo;
@@ -248,7 +235,6 @@ class STabSlider
     SOUI_MSG_MAP_BEGIN()
         MSG_WM_PAINT_EX(OnPaint)
         MSG_WM_SIZE(OnSize)
-        MSG_WM_DESTROY(OnDestroy)
     SOUI_MSG_MAP_END()
 };
 
@@ -472,6 +458,10 @@ void STabCtrl::OnMouseMove(UINT nFlags, CPoint point)
 
 void STabCtrl::OnDestroy()
 {
+    if (m_tabSlider)
+    {
+        m_tabSlider->Stop();
+    }
     for (int i = GetItemCount() - 1; i >= 0; i--)
     {
         DestroyChild(m_lstPages[i]);
@@ -979,6 +969,13 @@ HRESULT STabCtrl::OnLanguageChanged()
     }
     InvalidateRect(GetTitleRect());
     return HRESULT(3);
+}
+
+void STabCtrl::OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer)
+{
+    if(m_aniSlider->isRunning())
+        m_aniSlider->end();
+    __baseCls::OnContainerChanged(pOldContainer, pNewContainer);
 }
 
 int STabCtrl::GetCurSel() const

@@ -191,9 +191,11 @@ void SSliderBar::DrawOthers(IRenderTarget *pRT, const CRect &rcClient)
         return;
     CRect rcThumb = GetPartRect(rcClient, SC_THUMB);
     DWORD dwState = GetState();
-    if((dwState & WndState_PushDown) && m_uHtPrev != SC_THUMB){
+    if(m_bDrag)
+        dwState |= WndState_PushDown;
+    else if((dwState & WndState_PushDown) && m_uHtPrev != SC_THUMB)
         dwState &= ~WndState_PushDown;
-    }
+
     if (m_byThumbAlphaAni == 0xFF)
     { // 不在动画过程中
         m_pSkinThumb->DrawByState(pRT, rcThumb, dwState);

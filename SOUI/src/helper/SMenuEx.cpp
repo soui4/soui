@@ -772,15 +772,19 @@ UINT SMenuEx::TrackPopupMenu(UINT flag, int x, int y, HWND hOwner, int nScale)
     if (!hOwner || !::IsWindowEnabled(hOwner))
         hActive = ::GetActiveWindow();
 
-    HWND hRoot = hActive;
-    while ((::GetWindowLong(hRoot, GWL_STYLE) & WS_CHILD) && ::GetParent(hRoot))
+    HWND hForeground = GetForegroundWindow();
+    if (!hForeground)
     {
-        hRoot = ::GetParent(hRoot);
+        hForeground = hActive;
+        while ((::GetWindowLong(hForeground, GWL_STYLE) & WS_CHILD) && ::GetParent(hForeground))
+        {
+            hForeground = ::GetParent(hForeground);
+        }
+        SetForegroundWindow(hForeground);
     }
-    SetForegroundWindow(hRoot);
 
     ShowMenu(flag, x, y);
-    RunMenu(hRoot);
+    RunMenu(hForeground);
     HideMenu(FALSE);
     OnMenuEnd();
 

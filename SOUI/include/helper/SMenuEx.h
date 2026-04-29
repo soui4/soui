@@ -136,7 +136,7 @@ class SOUI_EXP SMenuExItem : public SWindow {
  * @brief 扩展菜单类
  */
 class SOUI_EXP SMenuEx
-    : protected SHostWnd
+    : public SHostWnd
     , public IMenuEx {
     friend class SMenuExItem;
     friend class SMenuExRunData;
