@@ -54,7 +54,7 @@ endif()
 # 函数：windres_compile_rc
 # 将 .rc 编译为适合当前平台的目标文件（ELF on Linux, Mach-O on macOS）
 function(windres_compile_rc target output_var rc_file)
-    cmake_parse_arguments(ARG "" "" "INCLUDE_DIRS" ${ARGN})
+    cmake_parse_arguments(ARG "" "" "INCLUDE_DIRS;DEPENDS" ${ARGN})
     get_filename_component(rc_name "${rc_file}" NAME_WE)
     get_filename_component(rc_abs_path "${rc_file}" ABSOLUTE)
 
@@ -79,7 +79,7 @@ function(windres_compile_rc target output_var rc_file)
     add_custom_command(
             OUTPUT ${coff_obj}
             COMMAND ${WINDRES_EXE} ${def_flags} --target=pe-x86-64 ${include_flags} -i "${rc_abs_path}" -o "${coff_obj}" -O coff
-            DEPENDS ${rc_abs_path}
+            DEPENDS ${rc_abs_path} ${ARG_DEPENDS}
             COMMENT "Compiling ${rc_file} to COFF"
     )
 
@@ -176,7 +176,7 @@ function(target_compile_resources target)
     if(NOT TARGET ${target})
         message(FATAL_ERROR "target_compile_resources: target '${target}' does not exist")
     endif()
-    cmake_parse_arguments(ARG "" "" "INCLUDE_DIRS" ${ARGN})
+    cmake_parse_arguments(ARG "" "" "INCLUDE_DIRS;DEPENDS" ${ARGN})
     if(NOT CMAKE_SYSTEM_NAME MATCHES Windows)
         set(resource_objects)
         foreach(rc_file ${ARG_UNPARSED_ARGUMENTS})
@@ -185,7 +185,7 @@ function(target_compile_resources target)
             if(NOT rc_ext_lower STREQUAL ".rc")
                 continue()
             endif()
-            windres_compile_rc(${target} rc_obj ${rc_file} INCLUDE_DIRS ${ARG_INCLUDE_DIRS})
+            windres_compile_rc(${target} rc_obj ${rc_file} INCLUDE_DIRS ${ARG_INCLUDE_DIRS} DEPENDS ${ARG_DEPENDS})
             list(APPEND resource_objects ${rc_obj})
         endforeach()
         if(resource_objects)
