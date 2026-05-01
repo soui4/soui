@@ -905,6 +905,8 @@ BOOL SNativeWnd::IsWindow() SCONST
 
 BOOL SNativeWnd::DestroyWindow()
 {
+    if (!m_hWnd)
+        return FALSE;
     SASSERT(::IsWindow(m_hWnd));
     return ::DestroyWindow(m_hWnd);
 }
