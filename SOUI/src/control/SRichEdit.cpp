@@ -1873,7 +1873,8 @@ LRESULT SRichEdit::OnSetText(UINT uMsg, WPARAM wparam, LPARAM lparam)
 {
     // For RichEdit 1.0, the max text length would be reset by a settext so
     // we follow pattern here as well.
-
+    if (!m_pTxtHost)
+        return 0;
     HRESULT hr = m_pTxtHost->GetTextService()->TxSendMessage(uMsg, wparam, lparam, 0);
 
     if (FAILED(hr))

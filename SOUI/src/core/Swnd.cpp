@@ -3717,7 +3717,9 @@ HRESULT SWindow::OnAttrText(const SStringW &strValue, BOOL bLoading)
 {
     SStringW strText = GETSTRING(strValue);
     SStringT strCvt2 = S_CW2T(strText);
-    SetWindowText(strCvt2);
+    m_strText.SetText(strCvt2);
+    if (!bLoading)
+        SetWindowText(strCvt2);
     return S_OK;
 }
 
