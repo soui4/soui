@@ -1614,7 +1614,7 @@ void SSkinTreeLines::_DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iStat
         return;
 
     // 保存当前使用的对象
-    IRenderObj *pOldPen = NULL;
+    SAutoRefPtr<IRenderObj> pOldPen;
     pRT->SelectObject(pPen, &pOldPen);
 
     BOOL oldAntiAlias = pRT->SetAntiAlias(FALSE);

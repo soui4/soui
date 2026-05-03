@@ -36,6 +36,7 @@ class SkGlyphCache_Globals;
 */
 class SkGlyphCache {
 public:
+    static SkTypeface *SkGlyphCacheFallbackFont(SkTypeface *typeface, SkUnichar character);
     /** Returns a glyph with valid fAdvance and fDevKern fields.
         The remaining fields may be valid, but that is not guaranteed. If you
         require those, call getUnicharMetrics or getGlyphIDMetrics instead.
@@ -185,6 +186,7 @@ private:
     };
 
     SkGlyph* lookupMetrics(uint32_t id, MetricsType);
+    SkGlyph* lookupMetricsWithCtx(uint32_t id, MetricsType, SkScalerContext* ctx);
     static bool DetachProc(const SkGlyphCache*, void*) { return true; }
 
     SkGlyphCache*       fNext, *fPrev;

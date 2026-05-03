@@ -34,6 +34,7 @@
 #include <tchar.h>
 #include <usp10.h>
 #include <objbase.h>
+#include <climits>  // For INT_MAX
 
 static void (*gEnsureLOGFONTAccessibleProc)(const LOGFONT&);
 
@@ -2552,6 +2553,11 @@ protected:
         SkAutoTUnref<SkFontStyleSet> sset(this->matchFamily(familyName));
         return sset->matchStyle(fontstyle);
     }
+#ifdef SK_FM_NEW_MATCH_FAMILY_STYLE_CHARACTER
+    virtual SkTypeface *onMatchFamilyStyleCharacter(const char familyName[], const SkFontStyle &, const char *bcp47[], int bcp47Count, SkUnichar character) const SK_OVERRIDE;
+#else
+    virtual SkTypeface *onMatchFamilyStyleCharacter(const char familyName[], const SkFontStyle &, const char bcp47[], SkUnichar character) const SK_OVERRIDE;
+#endif
 
     virtual SkTypeface* onMatchFaceStyle(const SkTypeface* familyMember,
                                          const SkFontStyle& fontstyle) const SK_OVERRIDE {
@@ -2593,6 +2599,184 @@ protected:
 private:
     SkTDArray<ENUMLOGFONTEX> fLogFontArray;
 };
+
+///////////////////////////////////////////////////////////////////////////////
+
+static bool FontHasCharacter2(HDC hdc, const LOGFONT &lf, WCHAR ch)
+{
+    HFONT hFont = ::CreateFontIndirect(&lf);
+    HFONT hOldFont = (HFONT)::SelectObject(hdc, hFont);
+
+    WORD glyphIndex = 0;
+    BOOL result = ::GetGlyphIndices(hdc, &ch, 1, &glyphIndex, GGI_MARK_NONEXISTING_GLYPHS);
+
+    ::SelectObject(hdc, hOldFont);
+    ::DeleteObject(hFont);
+    if (result == 0)
+    {
+        return false;
+    }
+    return (glyphIndex != 0xFFFF);
+}
+
+static bool FontHasCharacter(const LOGFONT& lf, WCHAR ch) {
+    HDC hdc = ::CreateCompatibleDC(NULL);
+    bool result = FontHasCharacter2(hdc, lf, ch);
+    ::DeleteDC(hdc);
+    return result;
+}
+
+// Helper to calculate font match score (lower is better)
+static int CalculateFontScore(const LOGFONT &lf, const SkFontStyle &targetStyle, BYTE byCharset)
+{
+    int score = 0;
+
+    // Weight matching (max difference: 800 points)
+    int targetWeight = targetStyle.weight();
+    int actualWeight = lf.lfWeight;
+    score += abs(targetWeight - actualWeight);
+
+    // Slant matching (max difference: 1000 points)
+    bool targetItalic = targetStyle.isItalic();
+    bool actualItalic = (lf.lfItalic != 0);
+    if (targetItalic != actualItalic)
+    {
+        score += 1000; // Heavy penalty for wrong slant
+    }
+
+    // Character set matching (prefer same charset)
+    // ANSI_CHARSET = 0, DEFAULT_CHARSET = 1, SYMBOL_CHARSET = 2, etc.
+    // Small penalty for different charset
+    if (lf.lfCharSet == byCharset)
+    {
+        score += 100;
+    }
+
+    return score;
+};
+
+// Helper function to check if character is an emoji/symbol
+static bool IsEmojiOrSymbol(SkUnichar ch)
+{
+    // Emoji ranges (based on Unicode Standard)
+    if ((ch >= 0x1F300 && ch <= 0x1F5FF) || // Miscellaneous Symbols and Pictographs
+        (ch >= 0x1F600 && ch <= 0x1F64F) || // Emoticons
+        (ch >= 0x1F680 && ch <= 0x1F6FF) || // Transport and Map Symbols
+        (ch >= 0x1F700 && ch <= 0x1F77F) || // Alchemical Symbols
+        (ch >= 0x1F900 && ch <= 0x1F9FF) || // Supplemental Symbols and Pictographs
+        (ch >= 0x1FA00 && ch <= 0x1FA6F) || // Chess Symbols
+        (ch >= 0x1FA70 && ch <= 0x1FAFF) || // Symbols and Pictographs Extended-A
+        (ch >= 0x2600 && ch <= 0x26FF) ||   // Miscellaneous Symbols
+        (ch >= 0x2700 && ch <= 0x27BF) ||   // Dingbats
+        (ch >= 0xFE00 && ch <= 0xFE0F) ||   // Variation Selectors
+        (ch >= 0x200D && ch <= 0x200D))
+    { // Zero Width Joiner
+        return true;
+    }
+    return false;
+};
+
+#ifdef SK_FM_NEW_MATCH_FAMILY_STYLE_CHARACTER
+SkTypeface *SkFontMgrGDI::onMatchFamilyStyleCharacter(const char familyName[], const SkFontStyle &fontstyle, const char *bcp47[], int bcp47Count, SkUnichar character) const
+#else
+SkTypeface *SkFontMgrGDI::onMatchFamilyStyleCharacter(const char familyName[], const SkFontStyle &fontstyle, const char bcp47[], SkUnichar character) const
+#endif
+{
+    // Step 0: Special handling for emoji/symbols - try Windows emoji fonts first
+    if (IsEmojiOrSymbol(character)) {
+        // Try Segoe UI Emoji first (best for modern emoji)
+        SkAutoTUnref<SkFontStyleSet> emojiSet(this->matchFamily("Segoe UI Emoji"));
+        if (emojiSet.get()) {
+            SkTypeface* emojiTf = emojiSet->matchStyle(fontstyle);
+            if (emojiTf) {
+                const LOGFONT& lf = ((LogFontTypeface*)emojiTf)->fLogFont;
+                HDC hdc = ::CreateCompatibleDC(NULL);
+                bool hasChar = FontHasCharacter2(hdc, lf, (WCHAR)character);
+                DeleteDC(hdc);
+                
+                if (hasChar) {
+                    return emojiTf;  // Found in Segoe UI Emoji
+                }
+                emojiTf->unref();
+            }
+        }
+        
+        // Fallback to Segoe UI Symbol (older symbols)
+        SkAutoTUnref<SkFontStyleSet> symbolSet(this->matchFamily("Segoe UI Symbol"));
+        if (symbolSet.get()) {
+            SkTypeface* symbolTf = symbolSet->matchStyle(fontstyle);
+            if (symbolTf) {
+                const LOGFONT& lf = ((LogFontTypeface*)symbolTf)->fLogFont;
+                HDC hdc = ::CreateCompatibleDC(NULL);
+                bool hasChar = FontHasCharacter2(hdc, lf, (WCHAR)character);
+                DeleteDC(hdc);
+                
+                if (hasChar) {
+                    return symbolTf;  // Found in Segoe UI Symbol
+                }
+                symbolTf->unref();
+            }
+        }
+    }
+    
+    // Step 1: Try to find a matching style in the requested family
+    SkAutoTUnref<SkFontStyleSet> sset(this->matchFamily(familyName));
+    SkTypeface* tf = sset->matchStyle(fontstyle);
+    BYTE byCharset = DEFAULT_CHARSET; // Assume ANSI_CHARSET for character support check    
+    if (tf) {
+        const LOGFONT& lf = ((LogFontTypeface*)tf)->fLogFont;
+        byCharset = lf.lfCharSet;
+        if (FontHasCharacter(lf, (WCHAR)character)) {
+            return tf;  // Perfect match: right family, right style, has character
+        }
+        tf->unref();
+        tf = NULL;
+    }
+    
+    // Step 2: Search all available fonts and find the best match
+    HDC hdc = ::CreateCompatibleDC(NULL);
+    
+    int bestScore = INT_MAX;
+    int bestIndex = -1;
+    LOGFONT bestLogFont;
+    
+    for (int i = 0; i < fLogFontArray.count(); ++i) {
+        LOGFONT lf = fLogFontArray[i].elfLogFont;
+        
+        // First check if this font has the required character
+        if (!FontHasCharacter2(hdc, lf, (WCHAR)character)) {
+            continue;  // Skip fonts that don't have the character
+        }
+        
+        // Calculate match score
+        int score = CalculateFontScore(lf, fontstyle, byCharset);
+        
+        if (score < bestScore) {
+            bestScore = score;
+            bestIndex = i;
+            bestLogFont = lf;
+        }
+    }
+    
+    DeleteDC(hdc);
+    
+    // Step 3: Create typeface from the best matching font
+    if (bestIndex >= 0) {
+        // Adjust weight and slant to match target style as closely as possible
+        int weight = fontstyle.weight();
+        SkFontStyle::Slant slant = fontstyle.slant();
+        
+        // Only adjust if the adjustment doesn't change the font family significantly
+        // For example, don't force italic on a font that doesn't support it well
+        bestLogFont.lfWeight = (weight == SkFontStyle::kNormal_Weight) ? FW_NORMAL :
+                              (weight == SkFontStyle::kBold_Weight) ? FW_BOLD : weight;
+        bestLogFont.lfItalic = (slant == SkFontStyle::kItalic_Slant) ? 1 : 0;
+        
+        tf = SkCreateTypefaceFromLOGFONT(bestLogFont);
+    }
+    
+    return tf;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 

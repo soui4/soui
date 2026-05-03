@@ -17,7 +17,7 @@
 #include "SkTemplates.h"
 #include "SkTLS.h"
 #include "SkTypeface.h"
-
+#include "SkFontMgr.h"
 //#define SPEW_PURGE_STATUS
 //#define RECORD_HASH_EFFICIENCY
 
@@ -143,6 +143,27 @@ SkGlyphCache::~SkGlyphCache() {
 #define VALIDATE()
 #endif
 
+SkTypeface *SkGlyphCache::SkGlyphCacheFallbackFont(SkTypeface *typeface, SkUnichar character)
+{
+    SkFontMgr* fontMgr = SkFontMgr::RefDefault();
+    if (!fontMgr) return NULL;
+
+    SkString familyName;
+    typeface->getFamilyName(&familyName);
+
+    SkTypeface::Style tfStyle = typeface->style();
+    int weight = (tfStyle & SkTypeface::kBold) ? SkFontStyle::kBold_Weight : SkFontStyle::kNormal_Weight;
+    SkFontStyle::Slant slant = (tfStyle & SkTypeface::kItalic) ? SkFontStyle::kItalic_Slant : SkFontStyle::kUpright_Slant;
+    SkFontStyle style(weight, SkFontStyle::kNormal_Width, slant);
+#ifdef SK_FM_NEW_MATCH_FAMILY_STYLE_CHARACTER
+    SkTypeface *fallback = fontMgr->matchFamilyStyleCharacter(familyName.c_str(), style, NULL, 0, character);
+#else
+    SkTypeface *fallback = fontMgr->matchFamilyStyleCharacter(familyName.c_str(), style, 0, character);
+#endif
+    fontMgr->unref();
+    return fallback;
+}
+
 uint16_t SkGlyphCache::unicharToGlyph(SkUnichar charCode) {
     VALIDATE();
     uint32_t id = SkGlyph::MakeID(charCode);
@@ -173,9 +194,21 @@ const SkGlyph& SkGlyphCache::getUnicharAdvance(SkUnichar charCode) {
     if (rec->fID != id) {
         // this ID is based on the UniChar
         rec->fID = id;
+        
+        // Get glyph ID and track which context was used
+        uint16_t glyphID = fScalerContext->charToGlyphID(charCode);
+        
+        // Get the actual context that was used (may be a fallback context)
+        SkScalerContext* usedCtx = fScalerContext->getLastUsedFallbackContext();
+        if (!usedCtx) {
+            usedCtx = fScalerContext;  // No fallback was used, use primary context
+        }
+        
         // this ID is based on the glyph index
-        id = SkGlyph::MakeID(fScalerContext->charToGlyphID(charCode));
-        rec->fGlyph = this->lookupMetrics(id, kJustAdvance_MetricsType);
+        id = SkGlyph::MakeID(glyphID);
+        
+        // Query metrics from the correct scaler context
+        rec->fGlyph = this->lookupMetricsWithCtx(id, kJustAdvance_MetricsType, usedCtx);
     }
     return *rec->fGlyph;
 }
@@ -204,9 +237,19 @@ const SkGlyph& SkGlyphCache::getUnicharMetrics(SkUnichar charCode) {
         RecordHashCollisionIf(rec->fGlyph != NULL);
         // this ID is based on the UniChar
         rec->fID = id;
+        
+        // Try primary font first
+        uint16_t glyphID = fScalerContext->charToGlyphID(charCode);
+        
+        // Get the actual context that was used (may be a fallback context)
+        SkScalerContext* usedCtx = fScalerContext->getLastUsedFallbackContext();
+        if (!usedCtx) {
+            usedCtx = fScalerContext;  // No fallback was used, use primary context
+        }
+        
         // this ID is based on the glyph index
-        id = SkGlyph::MakeID(fScalerContext->charToGlyphID(charCode));
-        rec->fGlyph = this->lookupMetrics(id, kFull_MetricsType);
+        id = SkGlyph::MakeID(glyphID);
+        rec->fGlyph = this->lookupMetricsWithCtx(id, kFull_MetricsType, usedCtx);
     } else {
         RecordHashSuccess();
         if (rec->fGlyph->isJustAdvance()) {
@@ -227,9 +270,19 @@ const SkGlyph& SkGlyphCache::getUnicharMetrics(SkUnichar charCode,
         RecordHashCollisionIf(rec->fGlyph != NULL);
         // this ID is based on the UniChar
         rec->fID = id;
+        
+        // Get glyph ID and track which context was used
+        uint16_t glyphID = fScalerContext->charToGlyphID(charCode);
+        
+        // Get the actual context that was used (may be a fallback context)
+        SkScalerContext* usedCtx = fScalerContext->getLastUsedFallbackContext();
+        if (!usedCtx) {
+            usedCtx = fScalerContext;  // No fallback was used, use primary context
+        }
+        
         // this ID is based on the glyph index
-        id = SkGlyph::MakeID(fScalerContext->charToGlyphID(charCode), x, y);
-        rec->fGlyph = this->lookupMetrics(id, kFull_MetricsType);
+        id = SkGlyph::MakeID(glyphID, x, y);
+        rec->fGlyph = this->lookupMetricsWithCtx(id, kFull_MetricsType, usedCtx);
     } else {
         RecordHashSuccess();
         if (rec->fGlyph->isJustAdvance()) {
@@ -282,6 +335,10 @@ const SkGlyph& SkGlyphCache::getGlyphIDMetrics(uint16_t glyphID,
 }
 
 SkGlyph* SkGlyphCache::lookupMetrics(uint32_t id, MetricsType mtype) {
+    return this->lookupMetricsWithCtx(id, mtype, fScalerContext);
+}
+
+SkGlyph* SkGlyphCache::lookupMetricsWithCtx(uint32_t id, MetricsType mtype, SkScalerContext* ctx) {
     SkGlyph* glyph;
 
     int     hi = 0;
@@ -303,7 +360,7 @@ SkGlyph* SkGlyphCache::lookupMetrics(uint32_t id, MetricsType mtype) {
         glyph = gptr[hi];
         if (glyph->fID == id) {
             if (kFull_MetricsType == mtype && glyph->isJustAdvance()) {
-                fScalerContext->getMetrics(glyph);
+                ctx->getMetrics(glyph);
             }
             return glyph;
         }
@@ -320,13 +377,14 @@ SkGlyph* SkGlyphCache::lookupMetrics(uint32_t id, MetricsType mtype) {
     glyph = (SkGlyph*)fGlyphAlloc.alloc(sizeof(SkGlyph),
                                         SkChunkAlloc::kThrow_AllocFailType);
     glyph->init(id);
+    glyph->fSourceContext = ctx;  // Record the source context for this glyph
     *fGlyphArray.insert(hi) = glyph;
 
     if (kJustAdvance_MetricsType == mtype) {
-        fScalerContext->getAdvance(glyph);
+        ctx->getAdvance(glyph);
     } else {
         SkASSERT(kFull_MetricsType == mtype);
-        fScalerContext->getMetrics(glyph);
+        ctx->getMetrics(glyph);
     }
 
     return glyph;
@@ -340,7 +398,12 @@ const void* SkGlyphCache::findImage(const SkGlyph& glyph) {
                                         SkChunkAlloc::kReturnNil_AllocFailType);
             // check that alloc() actually succeeded
             if (glyph.fImage) {
-                fScalerContext->getImage(glyph);
+                // Use the source context that was recorded when this glyph was created
+                SkScalerContext* ctx = glyph.fSourceContext;
+                if (!ctx) {
+                    ctx = fScalerContext;  // Fallback to primary context for compatibility
+                }
+                ctx->getImage(glyph);
                 // TODO: the scaler may have changed the maskformat during
                 // getImage (e.g. from AA or LCD to BW) which means we may have
                 // overallocated the buffer. Check if the new computedImageSize
@@ -356,7 +419,13 @@ const SkPath* SkGlyphCache::findPath(const SkGlyph& glyph) {
     if (glyph.fWidth) {
         if (glyph.fPath == NULL) {
             const_cast<SkGlyph&>(glyph).fPath = SkNEW(SkPath);
-            fScalerContext->getPath(glyph, glyph.fPath);
+            
+            // Use the source context that was recorded when this glyph was created
+            SkScalerContext* ctx = glyph.fSourceContext;
+            if (!ctx) {
+                ctx = fScalerContext;  // Fallback to primary context for compatibility
+            }
+            ctx->getPath(glyph, glyph.fPath);
             fMemoryUsed += sizeof(SkPath) +
                     glyph.fPath->countPoints() * sizeof(SkPoint);
         }

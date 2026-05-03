@@ -26,7 +26,6 @@
 #include "SkTextFormatParams.h"
 #include "SkTLazy.h"
 #include "SkUtils.h"
-#include "SkTypeface.h"
 
 #if SK_SUPPORT_GPU
 #include "GrRenderTarget.h"
@@ -2212,66 +2211,11 @@ void SkCanvas::onDrawTextBlob(const SkTextBlob* blob, SkScalar x, SkScalar y,
     LOOPER_END
 }
 
-static const int  kLocalSize = 100;
-FunFontFallback SkCanvas::s_fontFallback = NULL;
-
-void SkCanvas::SetFontFallback(FunFontFallback fun)
-{
-	s_fontFallback = fun;
-}
-
 // These will become non-virtual, so they always call the (virtual) onDraw... method
-void SkCanvas::drawText(const void* text, size_t byteLength, SkScalar x, SkScalar y,const SkPaint& paint) {
-	SkTypeface *pfont = paint.getTypeface();
-    SkASSERT(pfont);
-	pfont->ref();
-	uint16_t  glyphs_[kLocalSize];
-	size_t length = byteLength/sizeof(wchar_t);
-	const wchar_t *wText = (const wchar_t*)text;
-	uint16_t* glyphs = length<=kLocalSize ? glyphs_: (new uint16_t[length]);
-#if WCHAR_SIZE==4
-	int nValids=pfont->charsToGlyphs(wText,SkTypeface::kUTF32_Encoding,glyphs,(int)length);
-#else
-    int nValids = pfont->charsToGlyphs(wText, SkTypeface::kUTF16_Encoding, glyphs, (int)length);
-#endif
-    if(nValids==length || !s_fontFallback)
-	{
-		onDrawText(text,byteLength,x,y,paint);
-	}else
-	{
-		SkPaint *pPaint = (SkPaint*)&paint;
-		const wchar_t*pEnd = wText+length;
-		int iWord = 0;
-		while(wText<pEnd){
-			SkTypeface * font2=NULL;
-            const wchar_t*pWord = wText;
-#if WCHAR_SIZE==4
-            wText++;
-#else
-            SkUTF16_NextUnichar((const uint16_t**)&wText);
-#endif
-            size_t sizeofutfchar = (wText-pWord)*sizeof(wchar_t);
-			if(glyphs[iWord]==0)
-			{
-				font2 = s_fontFallback(pfont,(const wchar_t*)pWord,(wText-pWord));
-				if(font2)
-					pPaint->setTypeface(font2);
-			}
-            onDrawText(pWord, sizeofutfchar, x, y, paint);
-            x += paint.measureText(pWord, sizeofutfchar);
-			if(font2)
-			{
-				pPaint->setTypeface(pfont);
-				font2->unref();
-            }
-			iWord++;
-		}
-	}
-	pfont->unref();
-	if(length>kLocalSize)
-		delete []glyphs;
+void SkCanvas::drawText(const void* text, size_t byteLength, SkScalar x, SkScalar y,
+                        const SkPaint& paint) {
+    this->onDrawText(text, byteLength, x, y, paint);
 }
-
 void SkCanvas::drawPosText(const void* text, size_t byteLength, const SkPoint pos[],
                            const SkPaint& paint) {
     this->onDrawPosText(text, byteLength, pos, paint);

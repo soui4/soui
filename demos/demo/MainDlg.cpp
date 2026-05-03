@@ -240,6 +240,9 @@ void CMainDlg::OnDestory()
 		delete m_pTabBinder;
 	if (m_pTabBinder2)
 		delete m_pTabBinder2;
+#ifdef _WIN32
+    CSmileySource::GdiplusShutdown();
+#endif //_WIN32
 }
 
 
@@ -253,7 +256,10 @@ protected:
     //获对ID对应的图片路径
     virtual SStringW ImageID2Path(UINT nID)
     {
-        return SStringW().Format(L"./gif/%d.gif",nID);
+        SStringA filePath = __FILE__;
+        filePath = filePath.Left(filePath.ReverseFind('\\'));
+        filePath += SStringA().Format("/gif/%d.gif", nID);
+        return S_CA2W(filePath);
     }
 };
 
@@ -291,7 +297,9 @@ HRESULT CMainDlg::OnSkinChangeMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, B
 LRESULT CMainDlg::OnInitDialog( HWND hWnd, LPARAM lParam )
 {
 	SLOGI()<<"OnInitDialog";
-
+#ifdef _WIN32
+    CSmileySource::GdiplusStartup();
+#endif//_WIN32
 	m_bLayoutInited=TRUE;
 	FindChildByID2<SGroupList>(R.id.gl_catalog)->SelectPage(R.id.page_mclistview);
 

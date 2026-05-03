@@ -107,6 +107,8 @@ struct SkScalerContextRec {
 //the Chrome UI) turned out too green.
 typedef SkTMaskGamma<3, 3, 3> SkMaskGamma;
 
+typedef SkTypeface *(*FunFontFallback)(SkTypeface *font, SkUnichar unichar);
+
 class SkScalerContext {
 public:
     typedef SkScalerContextRec Rec;
@@ -165,7 +167,33 @@ public:
         base-glyph-count to know how to translate back into local glyph space.
      */
     uint16_t charToGlyphID(SkUnichar uni) {
-        return generateCharToGlyph(uni);
+        // Try primary font first
+        uint16_t glyphID = generateCharToGlyph(uni);
+        
+        // Reset fallback context tracker
+        fLastUsedFallbackCtx = NULL;
+        
+        //Font fallback: if primary font doesn't support this character
+        if (glyphID == 0 && uni != 0) {
+            // Try to find or create a fallback context
+            SkScalerContext* fallbackCtx = findOrCreateFallbackContext(uni);
+            if (fallbackCtx) {
+                glyphID = fallbackCtx->generateCharToGlyph(uni);
+                if (glyphID != 0) {
+                    fLastUsedFallbackCtx = fallbackCtx;  // Track which context was used
+                }
+            }
+        }
+        
+        return glyphID;
+    }
+    
+    /** Return the scaler context that was actually used for the last charToGlyphID call.
+        Returns NULL if the primary context was used.
+        Caller should NOT unref() the returned pointer.
+     */
+    SkScalerContext* getLastUsedFallbackContext() const {
+        return fLastUsedFallbackCtx;
     }
 
     /** Map the glyphID to its glyph index, and then to its char code. Unmapped
@@ -198,7 +226,10 @@ public:
     static inline void PostMakeRec(const SkPaint&, Rec*);
 
     static SkMaskGamma::PreBlend GetMaskPreBlend(const Rec& rec);
-
+    static FunFontFallback s_funFontFallback; /**< Functor for font fallback */
+    static void SetFontFallback(FunFontFallback fun){
+        s_funFontFallback = fun;
+    }
 protected:
     Rec         fRec;
 
@@ -274,6 +305,20 @@ private:
     // set to the glyphID that maps to the provided char.
     SkScalerContext* getContextFromChar(SkUnichar uni, uint16_t* glyphID);
 
+    //Font fallback cache: stores fallback typefaces and their scaler contexts
+    struct FallbackFont {
+        SkTypeface*           fTypeface;       /**< Fallback typeface (owned) */
+        SkScalerContext*      fScalerContext;  /**< Scaler context for this fallback (owned) */
+    };
+
+    static const int kMaxFallbackFonts = 8;  /**< Maximum number of cached fallback fonts */
+    FallbackFont          fFallbackFonts[kMaxFallbackFonts];  /**< Array of cached fallback fonts */
+    int                   fFallbackCount;    /**< Number of active fallback fonts */
+    
+    // Helper methods for fallback management
+    SkScalerContext* findOrCreateFallbackContext(SkUnichar uni);  /**< Find or create fallback context for character */
+    int findFallbackByTypeface(SkTypeface* typeface) const;  /**< Find fallback font index by typeface */
+
     // SkMaskGamma::PreBlend converts linear masks to gamma correcting masks.
 protected:
     // Visible to subclasses so that generateImage can apply the pre-blend directly.
@@ -282,6 +327,9 @@ private:
     // When there is a filter, previous steps must create a linear mask
     // and the pre-blend applied as a final step.
     const SkMaskGamma::PreBlend fPreBlendForFilter;
+
+    // Track the last used fallback context
+    SkScalerContext* fLastUsedFallbackCtx;
 };
 
 #define kRec_SkDescriptorTag            SkSetFourByteTag('s', 'r', 'e', 'c')

@@ -11,8 +11,6 @@ public:
     void init(const wchar_t text[], size_t length,SkRect rc,  SkPaint &paint,UINT uFormat);
 
     SkRect draw(SkCanvas* canvas);
-
-	static void SetFontFallback(FunFontFallback fun);
 private:
     SkScalar drawLineEndWithEllipsis(SkCanvas *canvas, SkScalar x, SkScalar y, int iBegin,int iEnd,SkScalar maxWidth);
 

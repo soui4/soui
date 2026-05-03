@@ -15,7 +15,7 @@
 
 #include "clock/sclock.h"
 #include "FpsWnd.h"
-
+//#include <vld.h>
 //<--定一个tag="demo"的slog输出
 #define kLogTag "demo"
 //-->

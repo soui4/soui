@@ -11,6 +11,7 @@
 #include <core/SkGraphics.h>
 #include <core/SkPathMeasure.h>
 #include <core/SkImageFilter.h>
+#include <src/core/SkScalerContext.h>
 #include <src/effects/SkBlurMask.h>
 #include <pathops/SkPathOps.h>
 #include <svg/SkSVGParser.h>
@@ -3539,7 +3540,7 @@ EXTERN_C BOOL Render_Skia_SCreateInstance(IObjRef **ppRenderFactory)
 }
 
 static FontFallback s_fontFallback = NULL;
-SkTypeface *SkiaFontFallback(SkTypeface *font, const wchar_t *text, size_t len)
+SkTypeface *SkiaFontFallback(SkTypeface *font, SkUnichar uniChar)
 {
     if (!s_fontFallback)
         return NULL;
@@ -3548,7 +3549,7 @@ SkTypeface *SkiaFontFallback(SkTypeface *font, const wchar_t *text, size_t len)
 
     char fontName[100] = { 0 };
     int nCharSet = DEFAULT_CHARSET;
-    if (!s_fontFallback(curFontName.c_str(), text, len, fontName, &nCharSet))
+    if (!s_fontFallback(curFontName.c_str(), (const wchar_t*)&uniChar, 1, fontName, &nCharSet))
         return NULL;
     return SkTypeface::CreateFromName(fontName, font->style(), nCharSet);
 }
@@ -3558,10 +3559,10 @@ EXTERN_C void Render_Skia_SetFontFallback(FontFallback fontFallback)
     s_fontFallback = fontFallback;
     if (fontFallback)
     {
-        SkCanvas::SetFontFallback(SkiaFontFallback);
+        SkScalerContext::SetFontFallback(SkiaFontFallback);
     }
     else
     {
-        SkCanvas::SetFontFallback(NULL);
+        SkScalerContext::SetFontFallback(NULL);
     }
 }

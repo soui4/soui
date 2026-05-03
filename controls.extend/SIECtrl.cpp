@@ -35,11 +35,14 @@ HRESULT SIECtrl::RegisterEventHandler(BOOL inAdvise)
     HRESULT hr = S_FALSE;
     if (inAdvise)
     {
+        SASSERT(m_dwCookie == 0);
         hr = pCP->Advise(&m_eventDispatch, &m_dwCookie);
     }
     else
     {
+        SASSERT(m_dwCookie != 0);
         hr = pCP->Unadvise(m_dwCookie);
+        m_dwCookie = 0;
     }
     return hr;
 }

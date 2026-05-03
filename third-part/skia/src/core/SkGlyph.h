@@ -33,6 +33,12 @@ struct SkGlyph {
     uint8_t     fMaskFormat;
     int8_t      fRsbDelta, fLsbDelta;  // used by auto-kerning
     int8_t      fForceBW;
+    
+    /** The scaler context that was used to create this glyph.
+        May be different from the primary context if font fallback was used.
+        This is a borrowed pointer, do NOT unref() or delete it.
+     */
+    class SkScalerContext* fSourceContext;
 
     void init(uint32_t id) {
         fID             = id;
@@ -41,6 +47,7 @@ struct SkGlyph {
         fDistanceField  = NULL;
         fMaskFormat     = MASK_FORMAT_UNKNOWN;
         fForceBW        = 0;
+        fSourceContext  = NULL;
     }
 
     /**

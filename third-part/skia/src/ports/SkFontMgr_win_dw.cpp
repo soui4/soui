@@ -270,6 +270,11 @@ protected:
     virtual SkFontStyleSet* onMatchFamily(const char familyName[]) const SK_OVERRIDE;
     virtual SkTypeface* onMatchFamilyStyle(const char familyName[],
                                            const SkFontStyle& fontstyle) const SK_OVERRIDE;
+#ifdef SK_FM_NEW_MATCH_FAMILY_STYLE_CHARACTER
+    virtual SkTypeface *onMatchFamilyStyleCharacter(const char familyName[], const SkFontStyle &, const char *bcp47[], int bcp47Count, SkUnichar character) const SK_OVERRIDE;
+#else
+    virtual SkTypeface *onMatchFamilyStyleCharacter(const char familyName[], const SkFontStyle &, const char bcp47[], SkUnichar character) const SK_OVERRIDE;
+#endif
     virtual SkTypeface* onMatchFaceStyle(const SkTypeface* familyMember,
                                          const SkFontStyle& fontstyle) const SK_OVERRIDE;
     virtual SkTypeface* onCreateFromStream(SkStream* stream, int ttcIndex) const SK_OVERRIDE;
@@ -481,6 +486,64 @@ SkTypeface* SkFontMgr_DirectWrite::onMatchFamilyStyle(const char familyName[],
                                                       const SkFontStyle& fontstyle) const {
     SkAutoTUnref<SkFontStyleSet> sset(this->matchFamily(familyName));
     return sset->matchStyle(fontstyle);
+}
+
+#ifdef SK_FM_NEW_MATCH_FAMILY_STYLE_CHARACTER
+    SkTypeface *SkFontMgr_DirectWrite::onMatchFamilyStyleCharacter(const char familyName[], const SkFontStyle &fontstyle, const char *bcp47[], int bcp47Count, SkUnichar character) const 
+#else
+    SkTypeface *SkFontMgr_DirectWrite::onMatchFamilyStyleCharacter(const char familyName[], const SkFontStyle &fontstyle, const char bcp47[], SkUnichar character) const
+#endif
+{
+    SkTScopedComPtr<IDWriteFontFamily> fontFamily;
+    
+    if (familyName && *familyName) {
+        SkSMallocWCHAR wideFamilyName;
+        if (SUCCEEDED(sk_cstring_to_wchar(familyName, &wideFamilyName))) {
+            this->getByFamilyName(wideFamilyName, &fontFamily);
+        }
+    }
+    
+    if (fontFamily.get()) {
+        UINT32 fontCount = fontFamily->GetFontCount();
+        for (UINT32 fontIndex = 0; fontIndex < fontCount; ++fontIndex) {
+            SkTScopedComPtr<IDWriteFont> font;
+            if (SUCCEEDED(fontFamily->GetFont(fontIndex, &font))) {
+                BOOL exists=FALSE;
+                font->HasCharacter(character, &exists);
+                if (exists) {
+                    SkTScopedComPtr<IDWriteFontFace> fontFace;
+                    if (SUCCEEDED(font->CreateFontFace(&fontFace))) {
+                        return createTypefaceFromDWriteFont(fontFace.get(), font.get(), fontFamily.get());
+                    }
+                }
+            }
+        }
+    }
+    
+    UINT32 familyCount = fFontCollection->GetFontFamilyCount();
+    for (UINT32 familyIndex = 0; familyIndex < familyCount; ++familyIndex) {
+        SkTScopedComPtr<IDWriteFontFamily> family;
+        if (FAILED(fFontCollection->GetFontFamily(familyIndex, &family))) {
+            continue;
+        }
+        
+        UINT32 fontCount = family->GetFontCount();
+        for (UINT32 fontIndex = 0; fontIndex < fontCount; ++fontIndex) {
+            SkTScopedComPtr<IDWriteFont> font;
+            if (SUCCEEDED(family->GetFont(fontIndex, &font))) {
+                BOOL exists=FALSE;
+                font->HasCharacter(character, &exists);
+                if (exists) {
+                    SkTScopedComPtr<IDWriteFontFace> fontFace;
+                    if (SUCCEEDED(font->CreateFontFace(&fontFace))) {
+                        return createTypefaceFromDWriteFont(fontFace.get(), font.get(), family.get());
+                    }
+                }
+            }
+        }
+    }
+    
+    return NULL;
 }
 
 SkTypeface* SkFontMgr_DirectWrite::onMatchFaceStyle(const SkTypeface* familyMember,

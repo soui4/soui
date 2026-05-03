@@ -22,6 +22,7 @@
 #include "SkRasterClip.h"
 #include "SkStroke.h"
 #include "SkThread.h"
+#include "SkFontMgr.h"
 
 #define ComputeBWRowBytes(width)        (((unsigned)(width) + 7) >> 3)
 
@@ -92,6 +93,10 @@ SkScalerContext::SkScalerContext(SkTypeface* typeface, const SkDescriptor* desc)
     , fPreBlend(fMaskFilter ? SkMaskGamma::PreBlend() : SkScalerContext::GetMaskPreBlend(fRec))
     , fPreBlendForFilter(fMaskFilter ? SkScalerContext::GetMaskPreBlend(fRec)
                                      : SkMaskGamma::PreBlend())
+    
+    //Initialize font fallback cache
+    , fFallbackCount(0)
+    , fLastUsedFallbackCtx(NULL)
 {
 #ifdef DUMP_REC
     desc->assertChecksum();
@@ -107,12 +112,25 @@ SkScalerContext::SkScalerContext(SkTypeface* typeface, const SkDescriptor* desc)
              desc->findEntry(kPathEffect_SkDescriptorTag, NULL),
         desc->findEntry(kMaskFilter_SkDescriptorTag, NULL));
 #endif
+    
+    // Initialize fallback cache entries to NULL
+    memset(fFallbackFonts, 0, sizeof(fFallbackFonts));
 }
 
 SkScalerContext::~SkScalerContext() {
     SkSafeUnref(fPathEffect);
     SkSafeUnref(fMaskFilter);
     SkSafeUnref(fRasterizer);
+    
+    //Cleanup fallback font cache
+    for (int i = 0; i < fFallbackCount; ++i) {
+        if (fFallbackFonts[i].fScalerContext) {
+            SkDELETE(fFallbackFonts[i].fScalerContext);
+        }
+        if (fFallbackFonts[i].fTypeface) {
+            fFallbackFonts[i].fTypeface->unref();
+        }
+    }
 }
 
 void SkScalerContext::getAdvance(SkGlyph* glyph) {
@@ -786,6 +804,107 @@ protected:
         }
     }
 };
+
+///////////////////////////////////////////////////////////////////////////////
+// Font Fallback Cache Implementation
+///////////////////////////////////////////////////////////////////////////////
+
+int SkScalerContext::findFallbackByTypeface(SkTypeface* typeface) const {
+    for (int i = 0; i < fFallbackCount; ++i) {
+        if (fFallbackFonts[i].fTypeface == typeface) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+FunFontFallback SkScalerContext::s_funFontFallback = NULL;
+SkScalerContext* SkScalerContext::findOrCreateFallbackContext(SkUnichar uni) {
+    // First, try to find a fallback font that supports this character
+    SkTypeface* primaryTypeface = fTypeface.get();
+    
+    // Query system font manager for a fallback font
+    SkTypeface* fallbackTypeface = NULL;
+    if(s_funFontFallback)
+    {
+        fallbackTypeface = s_funFontFallback(primaryTypeface, uni);
+    }
+    if (!fallbackTypeface){
+        SkFontMgr* fontMgr = SkFontMgr::RefDefault();
+        if (fontMgr) {
+            SkString familyName;
+            primaryTypeface->getFamilyName(&familyName);
+            
+            SkTypeface::Style tfStyle = primaryTypeface->style();
+            int weight = (tfStyle & SkTypeface::kBold) ? SkFontStyle::kBold_Weight : SkFontStyle::kNormal_Weight;
+            SkFontStyle::Slant slant = (tfStyle & SkTypeface::kItalic) ? SkFontStyle::kItalic_Slant : SkFontStyle::kUpright_Slant;
+            SkFontStyle style(weight, SkFontStyle::kNormal_Width, slant);
+            
+#ifdef SK_FM_NEW_MATCH_FAMILY_STYLE_CHARACTER
+            fallbackTypeface = fontMgr->matchFamilyStyleCharacter(familyName.c_str(), style, NULL, 0, uni);
+#else
+            fallbackTypeface = fontMgr->matchFamilyStyleCharacter(familyName.c_str(), style, 0, uni);
+#endif
+            fontMgr->unref();
+        }
+    }
+    
+    if (!fallbackTypeface) {
+        return NULL;  // No fallback font found
+    }
+    
+    // Check if we already have this fallback font cached
+    int existingIndex = findFallbackByTypeface(fallbackTypeface);
+    if (existingIndex >= 0) {
+        // Found in cache, return existing context
+        fallbackTypeface->unref();  // Release the reference from matchFamilyStyleCharacter
+        return fFallbackFonts[existingIndex].fScalerContext;
+    }
+    
+    // Not in cache, need to add it
+    // If cache is full, evict the first entry (simple LRU strategy)
+    if (fFallbackCount >= kMaxFallbackFonts) {
+        // Evict first entry
+        if (fFallbackFonts[0].fScalerContext) {
+            SkDELETE(fFallbackFonts[0].fScalerContext);
+        }
+        if (fFallbackFonts[0].fTypeface) {
+            fFallbackFonts[0].fTypeface->unref();
+        }
+        
+        // Shift remaining entries forward
+        for (int i = 0; i < fFallbackCount - 1; ++i) {
+            fFallbackFonts[i] = fFallbackFonts[i + 1];
+        }
+        fFallbackCount--;
+    }
+    
+    // Create new scaler context for the fallback font
+    // We need to get the descriptor - use the same descriptor as primary font
+    size_t descSize = SkDescriptor::ComputeOverhead(1) + sizeof(Rec);
+    SkDescriptor *desc = SkDescriptor::Alloc(descSize);
+    if (desc) {
+        desc->init();  // Initialize descriptor members before adding entries
+        desc->addEntry(kRec_SkDescriptorTag, sizeof(Rec), &fRec);
+        desc->computeChecksum();
+        
+        SkScalerContext* fallbackCtx = fallbackTypeface->createScalerContext(desc);
+        SkDescriptor::Free(desc);
+        
+        if (fallbackCtx) {
+            // Store in cache at the end
+            int newIndex = fFallbackCount++;
+            fFallbackFonts[newIndex].fTypeface = fallbackTypeface;  // Takes ownership
+            fFallbackFonts[newIndex].fScalerContext = fallbackCtx;
+            
+            return fallbackCtx;
+        }
+    }
+    
+    // Failed to create context
+    fallbackTypeface->unref();
+    return NULL;
+}
 
 extern SkScalerContext* SkCreateColorScalerContext(const SkDescriptor* desc);
 
