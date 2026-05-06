@@ -187,7 +187,6 @@ class LvAdatperImpl : public BaseClass {
      */
     STDMETHOD_(int, getItemViewType)(int position)
     {
-        (position);
         return 0;
     }
 
@@ -199,7 +198,6 @@ class LvAdatperImpl : public BaseClass {
      */
     STDMETHOD_(int, getItemViewType)(THIS_ int position, DWORD dwState) OVERRIDE
     {
-        (dwState);
         return getItemViewType(position);
     }
 
@@ -254,7 +252,6 @@ class LvAdatperImpl : public BaseClass {
      */
     STDMETHOD_(void, InitByTemplate)(SXmlNode xmlTemplate)
     {
-        (xmlTemplate);
     }
 
     /**
@@ -359,9 +356,6 @@ class SMcAdapterBase : public TObjRefImpl<LvAdatperImpl<IMcAdapter>> {
      */
     STDMETHOD_(BOOL, OnSort)(int iCol, UINT *pFmts, int nCols) OVERRIDE
     {
-        (iCol);
-        (pFmts);
-        (nCols);
         return FALSE;
     }
 
@@ -393,7 +387,6 @@ class SMcAdapterBase : public TObjRefImpl<LvAdatperImpl<IMcAdapter>> {
      */
     STDMETHOD_(BOOL, IsColumnVisible)(THIS_ int iCol) SCONST OVERRIDE
     {
-        (iCol);
         return TRUE;
     }
 
@@ -422,8 +415,6 @@ class SMcAdapterBase : public TObjRefImpl<LvAdatperImpl<IMcAdapter>> {
      */
     STDMETHOD_(void, SetColumnsWidth)(THIS_ int *pColWid, int nCols) OVERRIDE
     {
-        (pColWid);
-        (nCols);
     }
 };
 

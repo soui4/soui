@@ -418,6 +418,9 @@ BOOL SAppCfg::DoConfig(SApplication *pApp) const
                 bLoaded = resLoader.LoadResFromRes(hModResource);
             }
             break;
+        default:
+            SSLOGW() << "Invalid system resource type: " << m_sysResDesc->m_type;
+            break;
         }
         SASSERT(bLoaded);
         if (!bLoaded)
@@ -459,6 +462,8 @@ BOOL SAppCfg::DoConfig(SApplication *pApp) const
             }
         }
         break;
+        default:
+            SSLOGW() << "Invalid application resource type: " << m_appResDesc->m_type;
         }
         SASSERT(bLoaded);
         if (!bLoaded)
