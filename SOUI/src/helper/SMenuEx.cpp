@@ -1098,11 +1098,11 @@ void SMenuEx::OnSelItemChanged(SMenuExItem *pMenuItem, BOOL bByMouse)
             nFlag |= pMenuItem->IsDisabled() ? MF_GRAYED : 0;
         }
         if (s_MenuData)
-            ::SendMessage(s_MenuData->GetOwner(), WM_MENUSELECT, MAKEWPARAM(idx, nFlag), (LPARAM)this);
+            ::SendMessage(s_MenuData->GetOwner(), WM_MENUSELECT_EX, MAKEWPARAM(idx, nFlag), (LPARAM)this);
     }
     else if (s_MenuData)
     {
-        ::SendMessage(s_MenuData->GetOwner(), WM_MENUSELECT, MAKEWPARAM(0, 0xffff), 0);
+        ::SendMessage(s_MenuData->GetOwner(), WM_MENUSELECT_EX, MAKEWPARAM(0, 0xffff), 0);
     }
 }
 
@@ -1535,7 +1535,7 @@ void SMenuEx::SendInitPopupMenu2Owner(int idx)
 
     if (::IsWindow(s_MenuData->GetOwner()))
     {
-        ::SendMessage(s_MenuData->GetOwner(), WM_INITMENUPOPUP, (WPARAM)this, (LPARAM)idx);
+        ::SendMessage(s_MenuData->GetOwner(), WM_INITMENUPOPUP_EX, (WPARAM)this, (LPARAM)idx);
     }
     m_bMenuInitialized = TRUE;
 }

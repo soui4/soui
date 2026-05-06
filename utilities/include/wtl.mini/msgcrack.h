@@ -980,10 +980,20 @@ public: \
         if(IsMsgHandled()) \
             return TRUE; \
     }
+// void OnMenuSelect(UINT nItemID, UINT nFlags, HMENU menu)
+#define MSG_WM_MENUSELECT(func)                                          \
+    if (uMsg == WM_MENUSELECT)                                           \
+    {                                                                    \
+        SetMsgHandled(TRUE);                                             \
+        func((UINT)LOWORD(wParam), (UINT)HIWORD(wParam), (HMENU)lParam); \
+        lResult = 0;                                                     \
+        if (IsMsgHandled())                                              \
+            return TRUE;                                                 \
+    }
 
 // void OnInitMenuExPopup(SMenuEx* menuPopup, UINT nIndex)
 #define MSG_WM_INITMENUPOPUP_EX(func) \
-    if (uMsg == WM_INITMENUPOPUP) \
+    if (uMsg == WM_INITMENUPOPUP_EX) \
     { \
         SetMsgHandled(TRUE); \
         func((SMenuEx*)wParam, (int)(lParam)); \
@@ -992,15 +1002,15 @@ public: \
             return TRUE; \
     }
 
-// void OnMenuSelect(UINT nItemID, UINT nFlags, HMENU menu)
-#define MSG_WM_MENUSELECT(func) \
-    if (uMsg == WM_MENUSELECT) \
-    { \
-        SetMsgHandled(TRUE); \
-        func((UINT)LOWORD(wParam), (UINT)HIWORD(wParam), (HMENU)lParam); \
-        lResult = 0; \
-        if(IsMsgHandled()) \
-            return TRUE; \
+// void OnMenuSelectEx(UINT nItemID, UINT nFlags, HMENU menu)
+#define MSG_WM_MENUSELECT_EX(func)                                          \
+    if (uMsg == WM_MENUSELECT_EX)                                           \
+    {                                                                    \
+        SetMsgHandled(TRUE);                                             \
+        func((UINT)LOWORD(wParam), (UINT)HIWORD(wParam), (SMenuEx*)lParam); \
+        lResult = 0;                                                     \
+        if (IsMsgHandled())                                              \
+            return TRUE;                                                 \
     }
 
 // LRESULT OnMenuChar(UINT nChar, UINT nFlags, HMENU menu)

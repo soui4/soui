@@ -8,6 +8,8 @@
 
 SNSBEGIN
 
+#define WM_INITMENUPOPUP_EX (WM_USER + 0x4004) //!< 菜单弹出前的消息，发送给菜单所属窗口
+#define WM_MENUSELECT_EX    (WM_USER + 0x4005) //!< 菜单项被选中时的消息，发送给菜单所属窗口
 #undef INTERFACE
 #define INTERFACE IMenuEx
 DECLARE_INTERFACE_(IMenuEx, IObjRef)
