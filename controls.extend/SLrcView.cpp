@@ -975,7 +975,7 @@ void SLrcView::drawLine(IRenderTarget* pRT, CRect rc, int iLine, float fProgress
 	bool bHead = m_provider->isHeadLine(iLine);
 	
 	// 计算透明度和字号（仅当前行使用大字号）
-	int nFontSize = bIsCurrent ? m_nFontSizeCurrent : m_nFontSizeNormal;
+	int nFontSize = bIsCurrent ? m_nFontSizeCurrent.toPixelSize(GetScale()) : m_nFontSizeNormal.toPixelSize(GetScale());
 	BYTE byAlpha = 255;
 	
 	if (!bIsCurrent)
@@ -1109,26 +1109,21 @@ void SLrcView::drawLineWithTransition(IRenderTarget* pRT, CRect rc, int iLine, b
 		return; // 完全透明，不绘制
 	
 	// 计算字体大小（带动画）
-	int nFontSize = m_nFontSizeNormal;
+	int nFontSize = m_nFontSizeNormal.toPixelSize(GetScale());
 	if (bIsCurrent || (!m_bIsTransitioning && iLine == (int)m_provider->getLineIndexFromTimeMs(m_timeMs)))
 	{
 		if (m_bIsTransitioning && iLine == (int)m_provider->getLineIndexFromTimeMs(m_timeMs))
 		{
 			// 新行：从小变大
 			float scale = 0.7f + 0.3f * m_fTransitionProgress; // 从70%到100%
-			nFontSize = (int)(m_nFontSizeCurrent * scale);
-		}
-		else if (!m_bIsTransitioning)
-		{
-			// 正常状态：当前行使用大字号
-			nFontSize = m_nFontSizeCurrent;
+			nFontSize *= scale;
 		}
 	}
 	else if (m_bIsTransitioning && iLine == m_nLastLineIndex)
 	{
 		// 上一行：从大变小
 		float scale = 1.0f - 0.3f * m_fTransitionProgress; // 从100%到70%
-		nFontSize = (int)(m_nFontSizeCurrent * scale);
+		nFontSize *= scale;
 	}
 	
 	// 使用 SOUI 字体 API 设置字号

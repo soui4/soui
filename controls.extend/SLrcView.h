@@ -145,8 +145,8 @@ protected:
 		ATTR_COLOR(L"colorHighlight", m_crHighlight, TRUE)
 		ATTR_COLOR(L"colorText", m_crText, TRUE)
 		ATTR_LAYOUTSIZE(L"lineHeight",m_lineHei,TRUE)
-		ATTR_INT(L"fontSizeNormal", m_nFontSizeNormal, TRUE)
-		ATTR_INT(L"fontSizeCurrent", m_nFontSizeCurrent, TRUE)
+		ATTR_LAYOUTSIZE(L"fontSizeNormal", m_nFontSizeNormal, TRUE)
+		ATTR_LAYOUTSIZE(L"fontSizeCurrent", m_nFontSizeCurrent, TRUE)
 		ATTR_FLOAT(L"scaleDuration", m_fScaleDuration, TRUE)
 	SOUI_ATTRS_END()
 private:
@@ -160,8 +160,8 @@ private:
 	int m_timeMs;
 	
 	// 字体大小配置
-	int m_nFontSizeNormal;      // 普通行字号
-	int m_nFontSizeCurrent;     // 当前行字号
+	SLayoutSize m_nFontSizeNormal;      // 普通行字号
+	SLayoutSize m_nFontSizeCurrent;     // 当前行字号
 	float m_fScaleDuration;     // 缩放动画持续时间（秒）
 	
 	// 歌词切换动画状态
