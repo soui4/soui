@@ -81,7 +81,7 @@ static void ColorizeSVG(NSVGimage *image, Fun_Colorize fun, COLORREF color)
 }
 
 // 辅助函数：绘制SVG九宫格
-static void DrawSVG9Patch(IRenderTarget *pRT, ISvgObj *pSvg, LPCRECT pRect, LPCRECT prcSrc, LPCRECT prcMargin, BYTE byAlpha)
+static void DrawSVG9Patch(IRenderTarget *pRT, ISvgObj *pSvg, LPCRECT pRect, LPCRECT prcSrc, LPCRECT prcMargin, BYTE byAlpha,int nScale)
 {
     if (!pRT || !pSvg || !pRect || !prcMargin)
         return;
@@ -112,18 +112,24 @@ static void DrawSVG9Patch(IRenderTarget *pRT, ISvgObj *pSvg, LPCRECT pRect, LPCR
     float srcMidW = srcWidth - marginL - marginR;
     float srcMidH = srcHeight - marginT - marginB;
 
+    float fScale = (float)nScale/100;
+    float dst_marginL = marginL*fScale;
+    float dst_marginT = marginT*fScale;
+    float dst_marginR = marginR*fScale;
+    float dst_marginB = marginB*fScale;
+
     // 计算目标区域的9个部分
-    float dstMidX = (float)pRect->left + marginL;
-    float dstMidY = (float)pRect->top + marginT;
-    float dstMidW = (float)(pRect->right - pRect->left) - marginL - marginR;
-    float dstMidH = (float)(pRect->bottom - pRect->top) - marginT - marginB;
+    float dstMidX = (float)pRect->left + dst_marginL;
+    float dstMidY = (float)pRect->top + dst_marginT;
+    float dstMidW = (float)(pRect->right - pRect->left) - dst_marginL - dst_marginR;
+    float dstMidH = (float)(pRect->bottom - pRect->top) - dst_marginT - dst_marginB;
 
     // 绘制9个部分
     // 左上角
     if (marginL > 0 && marginT > 0)
     {
         RECT rcSrc = { (LONG)srcX, (LONG)srcY, (LONG)(srcX + marginL), (LONG)(srcY + marginT) };
-        RECT rcDst = { pRect->left, pRect->top, (LONG)(pRect->left + marginL), (LONG)(pRect->top + marginT) };
+        RECT rcDst = { pRect->left, pRect->top, (LONG)(pRect->left + dst_marginL), (LONG)(pRect->top + dst_marginT) };
         pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
     }
 
@@ -131,7 +137,7 @@ static void DrawSVG9Patch(IRenderTarget *pRT, ISvgObj *pSvg, LPCRECT pRect, LPCR
     if (marginT > 0 && dstMidW > 0)
     {
         RECT rcSrc = { (LONG)srcMidX, (LONG)srcY, (LONG)(srcMidX + srcMidW), (LONG)(srcY + marginT) };
-        RECT rcDst = { (LONG)dstMidX, pRect->top, (LONG)(dstMidX + dstMidW), (LONG)(pRect->top + marginT) };
+        RECT rcDst = { (LONG)dstMidX, pRect->top, (LONG)(dstMidX + dstMidW), (LONG)(pRect->top + dst_marginT) };
         pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
     }
 
@@ -139,7 +145,7 @@ static void DrawSVG9Patch(IRenderTarget *pRT, ISvgObj *pSvg, LPCRECT pRect, LPCR
     if (marginR > 0 && marginT > 0)
     {
         RECT rcSrc = { (LONG)(srcX + srcWidth - marginR), (LONG)srcY, (LONG)(srcX + srcWidth), (LONG)(srcY + marginT) };
-        RECT rcDst = { (LONG)(pRect->right - marginR), pRect->top, pRect->right, (LONG)(pRect->top + marginT) };
+        RECT rcDst = { (LONG)(pRect->right - dst_marginR), pRect->top, pRect->right, (LONG)(pRect->top + dst_marginT) };
         pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
     }
 
@@ -147,7 +153,7 @@ static void DrawSVG9Patch(IRenderTarget *pRT, ISvgObj *pSvg, LPCRECT pRect, LPCR
     if (marginL > 0 && dstMidH > 0)
     {
         RECT rcSrc = { (LONG)srcX, (LONG)srcMidY, (LONG)(srcX + marginL), (LONG)(srcMidY + srcMidH) };
-        RECT rcDst = { pRect->left, (LONG)dstMidY, (LONG)(pRect->left + marginL), (LONG)(dstMidY + dstMidH) };
+        RECT rcDst = { pRect->left, (LONG)dstMidY, (LONG)(pRect->left + dst_marginL), (LONG)(dstMidY + dstMidH) };
         pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
     }
 
@@ -163,7 +169,7 @@ static void DrawSVG9Patch(IRenderTarget *pRT, ISvgObj *pSvg, LPCRECT pRect, LPCR
     if (marginR > 0 && dstMidH > 0)
     {
         RECT rcSrc = { (LONG)(srcX + srcWidth - marginR), (LONG)srcMidY, (LONG)(srcX + srcWidth), (LONG)(srcMidY + srcMidH) };
-        RECT rcDst = { (LONG)(pRect->right - marginR), (LONG)dstMidY, pRect->right, (LONG)(dstMidY + dstMidH) };
+        RECT rcDst = { (LONG)(pRect->right - dst_marginR), (LONG)dstMidY, pRect->right, (LONG)(dstMidY + dstMidH) };
         pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
     }
 
@@ -171,7 +177,7 @@ static void DrawSVG9Patch(IRenderTarget *pRT, ISvgObj *pSvg, LPCRECT pRect, LPCR
     if (marginL > 0 && marginB > 0)
     {
         RECT rcSrc = { (LONG)srcX, (LONG)(srcY + srcHeight - marginB), (LONG)(srcX + marginL), (LONG)(srcY + srcHeight) };
-        RECT rcDst = { pRect->left, (LONG)(pRect->bottom - marginB), (LONG)(pRect->left + marginL), pRect->bottom };
+        RECT rcDst = { pRect->left, (LONG)(pRect->bottom - dst_marginB), (LONG)(pRect->left + dst_marginL), pRect->bottom };
         pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
     }
 
@@ -179,7 +185,7 @@ static void DrawSVG9Patch(IRenderTarget *pRT, ISvgObj *pSvg, LPCRECT pRect, LPCR
     if (marginB > 0 && dstMidW > 0)
     {
         RECT rcSrc = { (LONG)srcMidX, (LONG)(srcY + srcHeight - marginB), (LONG)(srcMidX + srcMidW), (LONG)(srcY + srcHeight) };
-        RECT rcDst = { (LONG)dstMidX, (LONG)(pRect->bottom - marginB), (LONG)(dstMidX + dstMidW), pRect->bottom };
+        RECT rcDst = { (LONG)dstMidX, (LONG)(pRect->bottom - dst_marginB), (LONG)(dstMidX + dstMidW), pRect->bottom };
         pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
     }
 
@@ -187,7 +193,7 @@ static void DrawSVG9Patch(IRenderTarget *pRT, ISvgObj *pSvg, LPCRECT pRect, LPCR
     if (marginR > 0 && marginB > 0)
     {
         RECT rcSrc = { (LONG)(srcX + srcWidth - marginR), (LONG)(srcY + srcHeight - marginB), (LONG)(srcX + srcWidth), (LONG)(srcY + srcHeight) };
-        RECT rcDst = { (LONG)(pRect->right - marginR), (LONG)(pRect->bottom - marginB), pRect->right, pRect->bottom };
+        RECT rcDst = { (LONG)(pRect->right - dst_marginR), (LONG)(pRect->bottom - dst_marginB), pRect->right, pRect->bottom };
         pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
     }
 }
@@ -229,7 +235,12 @@ SIZE SSkinImgList::GetImageSize(BOOL bRaw) const
 
 SIZE SSkinImgList::GetSkinSize() const
 {
-    SIZE ret = GetImageSize();
+    return _GetSkinSize(FALSE);
+}
+
+SIZE SSkinImgList::_GetSkinSize(BOOL bRaw) const
+{
+    SIZE ret = GetImageSize(bRaw);
     if (m_bVertical)
         ret.cy /= m_nStates;
     else
@@ -277,13 +288,7 @@ void SSkinImgList::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, 
 {
     if (!GetImage() && !GetSvg())
         return;
-    SIZE sz = GetSkinSize();
-    if (GetSvg() && GetScale() != 100)
-    {
-        // restore sz to original size
-        sz.cx = MulDiv(sz.cx, 100, GetScale());
-        sz.cy = MulDiv(sz.cy, 100, GetScale());
-    }
+    SIZE sz = _GetSkinSize(GetSvg()!=NULL);
     RECT rcSrc = { 0, 0, sz.cx, sz.cy };
     if (m_bVertical)
         OffsetRect(&rcSrc, 0, iState * sz.cy);
@@ -454,7 +459,7 @@ void SSkinImgCenter::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState
 {
     if (!GetImage() && !GetSvg())
         return;
-    SIZE szSkin = GetSkinSize();
+    SIZE szSkin = _GetSkinSize(GetSvg()!=NULL);
     CRect rcTarget = *rcDraw;
     CPoint pt;
     pt.x = rcTarget.left + (rcTarget.Width() - szSkin.cx) / 2;
@@ -494,13 +499,7 @@ SSkinImgFrame::SSkinImgFrame()
 
 void SSkinImgFrame::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const
 {
-    SIZE sz = GetSkinSize();
-    if (GetSvg() && GetScale() != 100)
-    {
-        // restore sz to original size
-        sz.cx = MulDiv(sz.cx, 100, GetScale());
-        sz.cy = MulDiv(sz.cy, 100, GetScale());
-    }
+    SIZE sz = _GetSkinSize(GetSvg()!=NULL);
     CPoint pt;
     if (IsVertical())
         pt.y = sz.cy * iState;
@@ -513,7 +512,7 @@ void SSkinImgFrame::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState,
     }
     else if (GetSvg())
     {
-        DrawSVG9Patch(pRT, GetSvg(), rcDraw, &rcSour, &m_rcMargin, byAlpha);
+        DrawSVG9Patch(pRT, GetSvg(), rcDraw, &rcSour, &m_rcMargin, byAlpha,GetScale());
     }
 }
 
@@ -527,10 +526,14 @@ void SSkinImgFrame::_Scale(ISkinObj *skinObj, int nScale)
     SSkinImgList::_Scale(skinObj, nScale);
     SSkinImgFrame *pClone = sobj_cast<SSkinImgFrame>(skinObj);
     int nSrcScale = GetScale();
-    pClone->m_rcMargin.left = MulDiv(m_rcMargin.left, nScale, nSrcScale);
-    pClone->m_rcMargin.top = MulDiv(m_rcMargin.top, nScale, nSrcScale);
-    pClone->m_rcMargin.right = MulDiv(m_rcMargin.right, nScale, nSrcScale);
-    pClone->m_rcMargin.bottom = MulDiv(m_rcMargin.bottom, nScale, nSrcScale);
+    if(GetSvg()){
+        pClone->m_rcMargin = m_rcMargin;
+    }else{
+        pClone->m_rcMargin.left = MulDiv(m_rcMargin.left, nScale, nSrcScale);
+        pClone->m_rcMargin.top = MulDiv(m_rcMargin.top, nScale, nSrcScale);
+        pClone->m_rcMargin.right = MulDiv(m_rcMargin.right, nScale, nSrcScale);
+        pClone->m_rcMargin.bottom = MulDiv(m_rcMargin.bottom, nScale, nSrcScale);
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -831,7 +834,7 @@ void SSkinScrollbar::_DrawByState(IRenderTarget *pRT, LPCRECT prcDraw, DWORD dwS
     else
     {
         // SVG supports 9-patch now
-        DrawSVG9Patch(pRT, GetSvg(), prcDraw, &rcSour, &rcMargin, byAlpha);
+        DrawSVG9Patch(pRT, GetSvg(), prcDraw, &rcSour, &rcMargin, byAlpha,GetScale());
 
         if (nSbCode == SB_THUMBTRACK && m_bHasGripper)
         {
@@ -842,7 +845,7 @@ void SSkinScrollbar::_DrawByState(IRenderTarget *pRT, LPCRECT prcDraw, DWORD dwS
                 rcDraw.top += (rcDraw.Height() - rcSour.Height()) / 2, rcDraw.bottom = rcDraw.top + rcSour.Height();
             else
                 rcDraw.left += (rcDraw.Width() - rcSour.Width()) / 2, rcDraw.right = rcDraw.left + rcSour.Width();
-            DrawSVG9Patch(pRT, GetSvg(), &rcDraw, &rcSour, &rcMargin, byAlpha);
+            DrawSVG9Patch(pRT, GetSvg(), &rcDraw, &rcSour, &rcMargin, byAlpha,GetScale());
         }
     }
 }

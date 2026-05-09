@@ -161,6 +161,7 @@ class SOUI_EXP SSkinImgList : public SSkinObjBase {
      */
     void _Scale(ISkinObj *skinObj, int nScale) override;
 
+    SIZE _GetSkinSize(BOOL bRaw) const;
   protected:
     int m_nStates;                     // Number of skin states
     BOOL m_bTile;                      // Flag to indicate if the image is tiled

@@ -1024,10 +1024,8 @@ BOOL SHostWnd::OnSetCursor(HWND hwnd, UINT nHitTest, UINT message)
         return FALSE;
     if (nHitTest == HTCLIENT)
     {
-        CPoint pt;
-        GetCursorPos(&pt);
-        ScreenToClient(&pt);
-        return DoFrameEvent(WM_SETCURSOR, 0, MAKELPARAM(pt.x, pt.y)) != 0;
+
+        return DoFrameEvent(WM_SETCURSOR, 0, m_msgMouse.lParam) != 0;
     }
     return DefWindowProc() != 0;
 }
@@ -1142,8 +1140,8 @@ LRESULT SHostWnd::OnActivateApp(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 BOOL SHostWnd::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
-    ScreenToClient(&pt);
-    return DoFrameEvent(WM_MOUSEWHEEL, MAKEWPARAM(nFlags, zDelta), MAKELPARAM(pt.x, pt.y)) != 0;
+
+    return DoFrameEvent(WM_MOUSEWHEEL, MAKEWPARAM(nFlags, zDelta), m_msgMouse.lParam) != 0;
 }
 
 void SHostWnd::OnActivate(UINT nState, BOOL bMinimized, HWND wndOther)
@@ -1237,10 +1235,8 @@ BOOL SHostWnd::OnReleaseSwndCapture()
         return FALSE;
     if (GetCapture() == m_hWnd)
         ReleaseCapture();
-    CPoint pt;
-    GetCursorPos(&pt);
-    ScreenToClient(&pt);
-    PostMessage(WM_MOUSEMOVE, 0, MAKELPARAM(pt.x, pt.y));
+
+    PostMessage(WM_MOUSEMOVE, 0, m_msgMouse.lParam);
     return TRUE;
 }
 
@@ -1963,9 +1959,7 @@ void SHostWnd::EnableIME(BOOL bEnable)
 
 void SHostWnd::OnUpdateCursor()
 {
-    CPoint pt;
-    GetCursorPos(&pt);
-    UINT ht = m_pNcPainter->OnNcHitTest(pt);
+    UINT ht = m_pNcPainter->OnNcHitTest(m_pNcPainter->m_ptNcHittest);
     PostMessage(WM_SETCURSOR, (WPARAM)m_hWnd, MAKELPARAM(ht, WM_MOUSEMOVE));
 }
 

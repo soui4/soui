@@ -232,6 +232,7 @@ BOOL SNcPainter::OnNcActivate(BOOL bActive)
 
 UINT SNcPainter::OnNcHitTest(CPoint point)
 {
+    m_ptNcHittest = point;
     if (m_pHost->IsIconic())
         return 0;
     UINT uRet = HTCLIENT;
@@ -684,8 +685,7 @@ void SNcPainter::OnSize(UINT nType, CSize size)
 
 void SNcPainter::UpdateToolTip()
 {
-    CPoint pt;
-    GetCursorPos(&pt);
+    CPoint pt =m_ptNcHittest;
     CRect rcWnd = m_pHost->GetWindowRect();
     pt -= rcWnd.TopLeft();
 

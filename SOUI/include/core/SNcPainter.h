@@ -368,6 +368,7 @@ class SOUI_EXP SNcPainter
     SNcPanel *m_root;
     // Invalid rectangle
     CRect m_rcInvalid;
+    CPoint m_ptNcHittest;
 };
 
 /**

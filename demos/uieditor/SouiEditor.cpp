@@ -166,7 +166,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
     #endif//SOUI_ENABLE_CORE_LIB
     CSysDataMgr *pSysDataMgr = new CSysDataMgr;
 #ifdef __APPLE__
-    SStringT strCfgDir = srcDir + _T("/Config");
+    SStringT strCfgDir = srcDir + _T("/data/Config");
 #else
     SStringT strCfgDir = appDir + _T("/Config");
 #endif
