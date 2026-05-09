@@ -42,7 +42,7 @@ else()
             # 查找GLEW和GLFW包
         find_package(GLEW REQUIRED)
         find_package(glfw3 REQUIRED)
-        set(GL_LIB glew glfw)
+        set(GL_LIB GLEW::GLEW glfw)
     else()
         set(GL_LIB GL)
     endif()
