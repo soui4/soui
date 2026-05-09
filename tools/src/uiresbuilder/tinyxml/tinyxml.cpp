@@ -31,7 +31,9 @@ distribution.
 
 #include "tinyxml.h"
 
+#ifndef _WIN32
 FILE * _wfopen(const wchar_t *path, const wchar_t *mode);
+#endif//_WIN32
 FILE* TiXmlFOpen( const char* filename, const char* mode );
 
 bool TiXmlBase::condenseWhiteSpace = true;

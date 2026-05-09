@@ -12,6 +12,8 @@ source_group("Header Files" FILES ${SMILEY_HEADERS})
 source_group("Source Files" FILES ${SMILEY_SRCS})
 
 ADD_LIBRARY (smiley STATIC ${SMILEY_SRCS} ${SMILEY_HEADERS})
+set(OPTION_LIBS ${OPTION_LIBS} smiley CACHE INTERNAL "option_lib")
+
 set_target_properties (smiley PROPERTIES
     FOLDER third-part
 )
