@@ -188,7 +188,7 @@ SkRect SkTextLayoutEx::draw( SkCanvas* canvas )
 {
     SkPaint::FontMetrics metrics;
     m_paint->getFontMetrics(&metrics);
-    float lineSpan = metrics.fDescent-metrics.fAscent;
+    float lineSpan = m_paint->getFontSpacing();
 
     SkRect rcDraw = m_rcBound;
 

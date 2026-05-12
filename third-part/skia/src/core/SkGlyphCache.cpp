@@ -143,27 +143,6 @@ SkGlyphCache::~SkGlyphCache() {
 #define VALIDATE()
 #endif
 
-SkTypeface *SkGlyphCache::SkGlyphCacheFallbackFont(SkTypeface *typeface, SkUnichar character)
-{
-    SkFontMgr* fontMgr = SkFontMgr::RefDefault();
-    if (!fontMgr) return NULL;
-
-    SkString familyName;
-    typeface->getFamilyName(&familyName);
-
-    SkTypeface::Style tfStyle = typeface->style();
-    int weight = (tfStyle & SkTypeface::kBold) ? SkFontStyle::kBold_Weight : SkFontStyle::kNormal_Weight;
-    SkFontStyle::Slant slant = (tfStyle & SkTypeface::kItalic) ? SkFontStyle::kItalic_Slant : SkFontStyle::kUpright_Slant;
-    SkFontStyle style(weight, SkFontStyle::kNormal_Width, slant);
-#ifdef SK_FM_NEW_MATCH_FAMILY_STYLE_CHARACTER
-    SkTypeface *fallback = fontMgr->matchFamilyStyleCharacter(familyName.c_str(), style, NULL, 0, character);
-#else
-    SkTypeface *fallback = fontMgr->matchFamilyStyleCharacter(familyName.c_str(), style, 0, character);
-#endif
-    fontMgr->unref();
-    return fallback;
-}
-
 uint16_t SkGlyphCache::unicharToGlyph(SkUnichar charCode) {
     VALIDATE();
     uint32_t id = SkGlyph::MakeID(charCode);

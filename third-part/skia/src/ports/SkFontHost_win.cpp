@@ -122,9 +122,8 @@ static void dcfontname_to_skstring(HDC deviceContext, const LOGFONT& lf, SkStrin
 
 static void make_canonical(LOGFONT* lf) {
     lf->lfHeight = -64;
+    lf->lfWidth = 0;                   // force default width for given height
     lf->lfQuality = CLEARTYPE_QUALITY;//PROOF_QUALITY;
-//    lf->lfCharSet = DEFAULT_CHARSET;
-//    lf->lfClipPrecision = 64;
 }
 
 static SkTypeface::Style get_style(const LOGFONT& lf) {
@@ -2503,8 +2502,45 @@ public:
     }
 
     virtual SkTypeface* matchStyle(const SkFontStyle& pattern) SK_OVERRIDE {
-        // todo:
-        return SkCreateTypefaceFromLOGFONT(fArray[0].elfLogFont);
+        // Find the best matching font by calculating scores
+        int bestIndex = 0;
+        int bestScore = INT_MAX;
+
+        for (int i = 0; i < fArray.count(); ++i) {
+            const LOGFONT& lf = fArray[i].elfLogFont;
+            SkFontStyle candidateStyle = compute_fontstyle(lf);
+            
+            // Calculate match score (lower is better)
+            int score = 0;
+            
+            // Weight difference (weight ranges from 0-1000, typically 100-900)
+            // Give moderate penalty for weight differences
+            int weightDiff = abs(pattern.weight() - candidateStyle.weight());
+            score += weightDiff;
+            
+            // Slant mismatch (italic vs upright)
+            // Heavy penalty for wrong slant type
+            if (pattern.slant() != candidateStyle.slant()) {
+                score += 1000;
+            }
+            
+            // Width difference (width ranges from 0-1000, typically 500 normal)
+            // Light penalty for width differences
+            int widthDiff = abs(pattern.width() - candidateStyle.width());
+            score += widthDiff / 2;
+            
+            if (score < bestScore) {
+                bestScore = score;
+                bestIndex = i;
+                
+                // Perfect match found
+                if (score == 0) {
+                    break;
+                }
+            }
+        }
+
+        return SkCreateTypefaceFromLOGFONT(fArray[bestIndex].elfLogFont);
     }
 
 private:

@@ -671,10 +671,9 @@ HRESULT SRenderTarget_Skia::MeasureText(LPCTSTR pszText, int cchLen, SIZE *psz)
     txtPaint.setTextSize(SkIntToScalar(abs(m_curFont->TextSize())));
     SStringW strW = S_CT2W(SStringT(pszText, cchLen));
     psz->cx = (int)txtPaint.measureText(strW, strW.GetLength() * sizeof(wchar_t));
-
     SkPaint::FontMetrics metrics;
     txtPaint.getFontMetrics(&metrics);
-    psz->cy = (int)(metrics.fDescent - metrics.fAscent);
+    psz->cy = (int)txtPaint.getFontSpacing();
     return S_OK;
 }
 
@@ -691,7 +690,7 @@ HRESULT SRenderTarget_Skia::GetFontMetrics(TEXTMETRIC *ptm)
     memset(ptm, 0, sizeof(TEXTMETRIC));
     ptm->tmAscent = (LONG)ceilf(-m.fAscent);
     ptm->tmDescent = (LONG)ceilf(m.fDescent);
-    ptm->tmHeight = ptm->tmAscent + ptm->tmDescent;
+    ptm->tmHeight = (LONG)txtPaint.getFontSpacing();
     ptm->tmInternalLeading = (LONG)ceilf(m.fLeading);
     SIZE sz = { 0, 0 };
     MeasureText(_T("x"), 1, &sz);

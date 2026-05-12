@@ -36,7 +36,6 @@ class SkGlyphCache_Globals;
 */
 class SkGlyphCache {
 public:
-    static SkTypeface *SkGlyphCacheFallbackFont(SkTypeface *typeface, SkUnichar character);
     /** Returns a glyph with valid fAdvance and fDevKern fields.
         The remaining fields may be valid, but that is not guaranteed. If you
         require those, call getUnicharMetrics or getGlyphIDMetrics instead.

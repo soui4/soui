@@ -820,7 +820,13 @@ int SkScalerContext::findFallbackByTypeface(SkTypeface* typeface) const {
 
 FunFontFallback SkScalerContext::s_funFontFallback = NULL;
 SkScalerContext* SkScalerContext::findOrCreateFallbackContext(SkUnichar uni) {
-    // First, try to find a fallback font that supports this character
+    // First, try to find the char from existed fallback fonts
+    for(int i=0; i<fFallbackCount; ++i){
+        FallbackFont & context = fFallbackFonts[i];
+        if(context.fScalerContext->generateCharToGlyph(uni))
+            return context.fScalerContext;
+    }
+    // Second, try to find a fallback font that supports this character
     SkTypeface* primaryTypeface = fTypeface.get();
     
     // Query system font manager for a fallback font
@@ -851,17 +857,7 @@ SkScalerContext* SkScalerContext::findOrCreateFallbackContext(SkUnichar uni) {
     
     if (!fallbackTypeface) {
         return NULL;  // No fallback font found
-    }
-    
-    // Check if we already have this fallback font cached
-    int existingIndex = findFallbackByTypeface(fallbackTypeface);
-    if (existingIndex >= 0) {
-        // Found in cache, return existing context
-        fallbackTypeface->unref();  // Release the reference from matchFamilyStyleCharacter
-        return fFallbackFonts[existingIndex].fScalerContext;
-    }
-    
-    // Not in cache, need to add it
+    }    
     // If cache is full, evict the first entry (simple LRU strategy)
     if (fFallbackCount >= kMaxFallbackFonts) {
         // Evict first entry
