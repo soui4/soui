@@ -34,9 +34,6 @@
 #define RES_TYPE RESTYPE_PE		//从PE资源中加载UI资源
 #endif
 
-static const TCHAR *kPath_SysRes = _T("/../../soui-sys-resource");
-static const TCHAR *kPath_UiRes = _T("/uires");
-
 #define SYS_NAMED_RESOURCE _T("soui-sys-resource")
 
 #include "skin/SSkinLoader.h"
