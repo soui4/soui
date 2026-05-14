@@ -125,16 +125,23 @@ class SLrcView : public SWindow
 public:
 	SLrcView();
 
+	void CopyFormOther(SLrcView *otherView);
+
 	void SetLrc(ILrcProvider* pProvider);
 	BOOL SetTimeMs(int nPos);
 	ILrcProvider* GetLrcProvider() const { return m_provider; }  // 添加获取 Provider 的方法
-
-protected:
+    void SetLrcDeskMode(BOOL bDeskMode)
+    {
+        m_bLrcDeskMode = bDeskMode;
+        Invalidate();
+    } // 设置桌面模式
+  protected:
 	BOOL UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo) override{
 		// 禁用 ToolTip
 		return FALSE;
 	}
-	void drawLine(IRenderTarget* pRT, CRect rc, int iLine, float fProgress, bool bIsCurrent);
+    void drawLine(IRenderTarget *pRT, CRect rc, int iLine, float fProgress, bool bIsCurrent);
+    void drawLine2(IRenderTarget *pRT, CRect rc, int iLine, float fProgress, bool bIsCurrent);
 	void drawLineWithTransition(IRenderTarget* pRT, CRect rc, int iLine, bool bIsCurrent);  // 带切换动画的绘制
 	void OnPaint(IRenderTarget* pRT);
 	SOUI_MSG_MAP_BEGIN()
@@ -153,6 +160,8 @@ private:
 	SAutoRefPtr<ILrcProvider> m_provider;
 	COLORREF m_crText;
 	COLORREF m_crHighlight;
+
+	BOOL m_bLrcDeskMode; // 歌词是显示桌面模式（不显示窗口边框）
 
 	SLayoutSize m_lineHei;
 	int m_nLength;
