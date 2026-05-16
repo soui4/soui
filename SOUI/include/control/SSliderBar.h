@@ -185,7 +185,7 @@ class SOUI_EXP SSliderBar
     SIZE MeasureContent(int nParentWid, int nParentHei) override;
     void OnColorize(COLORREF cr) override;
     void OnScaleChanged(int scale) override;
-    SStringT GetTooltip(CPoint pt) const override;
+    BOOL UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo) override;
     void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer) override;
 
     void DrawRail(IRenderTarget *pRT, const CRect &rcClient) override;
@@ -195,7 +195,8 @@ class SOUI_EXP SSliderBar
 
     CRect GetPartRect(const CRect &rcClient, UINT uSBCode) const override;
     RANGE _GetPartRange(int nLength, int nThumbSize, BOOL bThumbInRail, int nMin, int nMax, int nValue, UINT uSBCode) const;
-
+    BOOL GetSegmentRect(int iSeg, RECT &rc) const;
+    CRect _GetSegmentRect(const CRect &rcRail,int r1,int r2) const;
     int HitTest(CPoint pt);
 
     void ShowValueInTip(int nValue);

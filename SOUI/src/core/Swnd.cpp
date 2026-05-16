@@ -748,7 +748,7 @@ int SWindow::GetWindowText(TCHAR *pBuf, int nBufLen, BOOL bRawText) const
 
 SStringT SWindow::GetTooltip(CPoint pt) const
 {
-    return m_strToolTipText.GetText(FALSE);
+    return GetToolTipText();
 }
 
 BOOL SWindow::UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo)
@@ -778,7 +778,7 @@ BOOL SWindow::UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo)
     }
     else
     {
-        strTip = GetToolTipText();
+        strTip = GetTooltip(pt);
         if (strTip.IsEmpty())
             return FALSE;
         tipInfo.strTip = strTip;
@@ -4000,7 +4000,7 @@ HRESULT SWindow::OnLanguageChanged()
     return GetLayoutParam()->IsWrapContent(Any) ? S_OK : S_FALSE;
 }
 
-SStringT SWindow::GetToolTipText()
+SStringT SWindow::GetToolTipText() const
 {
     return m_strToolTipText.GetText(FALSE);
 }

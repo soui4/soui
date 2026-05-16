@@ -1338,7 +1338,7 @@ class SOUI_EXP SWindow
      * @brief Retrieves the tooltip text of the window.
      * @return SStringT Tooltip text as a string.
      */
-    virtual SStringT GetToolTipText();
+    virtual SStringT GetToolTipText() const;
 
     /**
      * @brief Retrieves the event set associated with the window.

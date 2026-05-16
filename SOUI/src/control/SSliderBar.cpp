@@ -149,17 +149,7 @@ void SSliderBar::DrawOthers(IRenderTarget *pRT, const CRect &rcClient)
 {
     if (!m_segments.IsEmpty())
     {
-        SIZE szThumb = { 0 };
-        if (m_pSkinThumb)
-            szThumb = m_pSkinThumb->GetSkinSize();
-        int length = IsVertical() ? rcClient.Height() : rcClient.Width();
-        int thumbSize = IsVertical() ? szThumb.cy : szThumb.cx;
         CRect rcRail = GetPartRect(rcClient, SC_RAIL);
-        CRect rcSeg = rcRail;
-        if (IsVertical())
-            rcSeg.top = rcSeg.bottom;
-        else
-            rcSeg.right = rcSeg.left;
         SAutoRefPtr<IPenS> pen;
         SAutoRefPtr<IRenderObj> oldPen;
         pRT->CreatePen(PS_SOLID, m_crSep, 1, (IPenS **)&pen);
@@ -167,17 +157,15 @@ void SSliderBar::DrawOthers(IRenderTarget *pRT, const CRect &rcClient)
         for (int i = 0; i < m_segments.GetCount(); i++)
         {
             SEGMENT &segment = m_segments.GetAt(i);
-            RANGE r = _GetPartRange(length, thumbSize, FALSE, m_nMinValue, m_nMaxValue, segment.value, SC_SELECT);
+            int r1 = segment.value;
+            int r2 = i<m_segments.GetCount()-1?m_segments.GetAt(i+1).value:m_nMaxValue;
+            CRect rcSeg = _GetSegmentRect(rcRail,r1,r2);
             if (IsVertical())
             {
-                rcSeg.bottom = rcSeg.top;
-                rcSeg.top = rcRail.bottom - r.value2;
                 pRT->DrawLine(rcSeg.TopLeft(), CPoint(rcSeg.right, rcSeg.top));
             }
             else
             {
-                rcSeg.left = rcSeg.right;
-                rcSeg.right = rcRail.left + r.value2;
                 pRT->DrawLine(CPoint(rcSeg.right, rcSeg.top), rcSeg.BottomRight());
                 if (m_bShowText)
                 {
@@ -397,15 +385,57 @@ void SSliderBar::OnScaleChanged(int scale)
     GetScaleSkin(m_pSkinThumb, scale);
 }
 
-SStringT SSliderBar::GetTooltip(CPoint pt) const
+CRect SSliderBar::_GetSegmentRect(const CRect &rcRail,int r1,int r2) const{
+    CRect rc = rcRail;
+    if(IsVertical()){
+        rc.top = rcRail.top + MulDiv(r1 , rcRail.Height(), m_nMaxValue - m_nMinValue + 1);
+        rc.bottom = rcRail.top + MulDiv(r2 , rcRail.Height(), m_nMaxValue - m_nMinValue + 1);
+    }else{
+        rc.left = rcRail.left + MulDiv(r1 , rcRail.Width(), m_nMaxValue - m_nMinValue + 1);
+        rc.right = rcRail.left + MulDiv(r2 , rcRail.Width(), m_nMaxValue - m_nMinValue + 1);
+    }
+    return rc;
+}
+
+BOOL SSliderBar::GetSegmentRect(int iSeg, RECT &rc) const
+{
+    if(iSeg >= m_segments.GetCount())
+        return FALSE;
+    CRect rcClient = GetClientRect();
+    CRect rcRail = GetPartRect(rcClient, SC_RAIL);
+    rc = rcRail;
+    const SEGMENT &seg = m_segments[iSeg];
+    int r1 = seg.value;
+    int r2 = iSeg < m_segments.GetCount() - 1 ? m_segments[iSeg + 1].value : m_nMaxValue;
+    rc = _GetSegmentRect(rcRail,r1,r2);
+    return TRUE;
+}
+
+BOOL SSliderBar::UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo)
 {
     if (m_segments.IsEmpty())
-        return __baseCls::GetTooltip(pt);
-    int iSegment = FindSegmentByValue(m_nValue);
+        return __baseCls::UpdateToolTip(pt,tipInfo);
+    CRect rcRail = GetPartRect2(PC_RAIL);
+    int nValue = 0;
+    if (IsVertical())
+    {
+        nValue = ((int64_t)(rcRail.bottom - pt.y)) * (m_nMaxValue - m_nMinValue + 1) / rcRail.Height() + m_nMinValue;
+    }
+    else
+    {
+        nValue = ((int64_t)(pt.x - rcRail.left)) * (m_nMaxValue - m_nMinValue + 1) / rcRail.Width() + m_nMinValue;
+    }
+    int iSegment = FindSegmentByValue(nValue);
     if (iSegment == -1)
-        return SStringT();
-    return m_segments[iSegment].szDesc;
+        return FALSE;
+
+    tipInfo.swnd = m_swnd;
+    tipInfo.dwCookie = iSegment+1;
+    GetSegmentRect(iSegment, tipInfo.rcTarget);
+    tipInfo.strTip = m_segments[iSegment].szDesc;
+    return tipInfo.rcTarget.PtInRect(pt);
 }
+
 
 void SSliderBar::OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer)
 {

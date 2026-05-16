@@ -892,7 +892,37 @@ SLrcView::SLrcView()
 	, m_nTransitionStartTimeMs(0)
 	, m_nLastScrollOffset(0)
 	, m_nCurrentScrollOffset(0)
+    , m_bLrcDeskMode(FALSE)
 {
+}
+
+void SLrcView::CopyFormOther(SLrcView *otherView)
+{
+    this->m_provider = otherView->m_provider;
+    this->m_crText = otherView->m_crText;
+    this->m_crHighlight = otherView->m_crHighlight;
+    this->m_bLrcDeskMode = otherView->m_bLrcDeskMode;
+    this->m_lineHei = otherView->m_lineHei;
+    this->m_nLength = otherView->m_nLength;
+    this->m_timeAniMs = otherView->m_timeAniMs;
+    this->m_timeMs = otherView->m_timeMs;
+
+    // 字体大小配置
+    this->m_nFontSizeNormal = otherView->m_nFontSizeNormal;  // 普通行字号
+    this->m_nFontSizeCurrent = otherView->m_nFontSizeCurrent; // 当前行字号
+    this->m_fScaleDuration = otherView->m_fScaleDuration;         // 缩放动画持续时间（秒）
+
+    // 歌词切换动画状态
+    this->m_nCurrentLineIndex = otherView->m_nCurrentLineIndex;      // 当前行索引
+    this->m_nLastLineIndex = otherView->m_nLastLineIndex;         // 上一行索引（用于切换动画绘制）
+    this->m_fTransitionProgress = otherView->m_fTransitionProgress;  // 切换动画进度 (0.0 - 1.0)
+    this->m_bIsTransitioning = otherView->m_bIsTransitioning;      // 是否正在切换动画中
+    this->m_nTransitionStartTimeMs = otherView->m_nTransitionStartTimeMs; // 切换动画开始时的播放时间（毫秒）
+
+    // Y坐标滚动动画
+    this->m_nLastScrollOffset = otherView->m_nLastScrollOffset;    // 上一行的Y偏移
+    this->m_nCurrentScrollOffset = otherView->m_nCurrentScrollOffset; // 当前行的Y偏移
+
 }
 
 void SLrcView::SetLrc(ILrcProvider* pProvider)
@@ -1073,6 +1103,158 @@ void SLrcView::drawLine(IRenderTarget* pRT, CRect rc, int iLine, float fProgress
 	}
 }
 
+void SLrcView::drawLine2(IRenderTarget *pRT, CRect rc, int iLine, float fProgress, bool bIsCurrent)
+{
+    if (iLine < 0 || iLine >= m_provider->getLineCount())
+        return;
+
+    SStringT strText = m_provider->getLineText(iLine);
+    if (strText.IsEmpty())
+        return;
+
+    bool bHead = m_provider->isHeadLine(iLine);
+
+    // 计算透明度和字号（仅当前行使用大字号）
+    int nFontSize = bIsCurrent ? m_nFontSizeCurrent.toPixelSize(GetScale()) : m_nFontSizeNormal.toPixelSize(GetScale());
+    BYTE byAlpha = 255;
+
+    if (!bIsCurrent)
+    {
+        // 非当前行：根据距离计算透明度（保持字号不变）
+        float fDistance = fabsf((float)iLine - fProgress);
+        if (fDistance <= 1.0f)
+        {
+            // 相邻行：透明度 40%-100%
+            byAlpha = (BYTE)(255 * (0.4f + 0.6f * (1.0f - fDistance)));
+        }
+        else
+        {
+            // 远处行：固定较低透明度
+            byAlpha = (BYTE)(255 * 0.3f);
+        }
+    }
+
+    // 使用 SOUI 字体 API 设置字号
+    SAutoRefPtr<IFontS> pOldFont;
+    {
+        SAutoRefPtr<IFontS> pCurFont = (IFontS *)pRT->GetCurrentObject(OT_FONT);
+        SASSERT(pCurFont);
+        const LOGFONT *plf = pCurFont->LogFont();
+        LOGFONT lf;
+        memcpy(&lf, plf, sizeof(LOGFONT));
+        lf.lfHeight = -nFontSize;
+
+        SAutoRefPtr<IFontS> pNewFont;
+        GETRENDERFACTORY->CreateFont(&pNewFont, &lf);
+        pRT->SelectObject(pNewFont, (IRenderObj **)&pOldFont);
+    }
+
+    // 基础颜色（当前行/非当前行）
+    COLORREF crBase = bIsCurrent ? m_crHighlight : m_crText;
+    BYTE r = GetRValue(crBase);
+    BYTE g = GetGValue(crBase);
+    BYTE b = GetBValue(crBase);
+    COLORREF crFill = RGBA(r, g, b, byAlpha);
+
+    // 计算文本实际尺寸
+    CRect rcMeasure = rc;
+    pRT->DrawText(strText, strText.GetLength(), &rcMeasure, DT_CALCRECT | DT_WORDBREAK);
+
+    // 调整垂直位置以保持居中
+    int nOffsetY = (rc.Height() - rcMeasure.Height()) / 2;
+    int nOffsetX = 0;
+    switch (GetStyle().GetAlign() & SwndStyle::Align_MaskX)
+    {
+    case SwndStyle::Align_Center:
+        nOffsetX = (rc.Width() - rcMeasure.Width()) / 2;
+        break;
+    case SwndStyle::Align_Right:
+        nOffsetX = rc.Width() - rcMeasure.Width();
+        break;
+    }
+
+    CRect rcText = rc;
+    rcText.OffsetRect(nOffsetX, nOffsetY);
+    rcText.right = rcText.left + rcMeasure.Width();
+    rcText.bottom = rcText.top + rcMeasure.Height();
+
+    // 在文本后绘制半透明背景框，提高任意背景下的可读性
+    const int padX = GetScale() > 1.0f ? 10 : 8;
+    const int padY = GetScale() > 1.0f ? 6 : 4;
+    CRect rcBg = rcText;
+    rcBg.InflateRect(padX, padY);
+    // 半透明黑色背景
+    //pRT->FillSolidRect(&rcBg, RGBA(0, 0, 0, 120));
+
+    // 绘制阴影与描边（采用多次偏移模拟柔和阴影与描边）
+    // 阴影颜色（黑色半透明）
+    COLORREF crShadow = RGBA(0, 0, 0, 160);
+    // 描边颜色（深色）
+    COLORREF crStroke = RGBA(0, 0, 0, 200);
+
+    // 阴影偏移（较大的偏移以模拟投影）
+    CRect rcShadow = rcText;
+    rcShadow.OffsetRect(2, 2);
+    pRT->SetTextColor(crShadow);
+    pRT->DrawText(strText, strText.GetLength(), &rcShadow, DT_WORDBREAK);
+
+    // 细柔阴影（再绘一次更小透明度）
+    CRect rcShadow2 = rcText;
+    rcShadow2.OffsetRect(1, 1);
+    pRT->SetTextColor(RGBA(0, 0, 0, 96));
+    pRT->DrawText(strText, strText.GetLength(), &rcShadow2, DT_WORDBREAK);
+
+    // 描边：八方向叠加（模拟描边效果）
+    pRT->SetTextColor(crStroke);
+    CRect rcTmp;
+    rcTmp = rcText; rcTmp.OffsetRect(-1, 0); pRT->DrawText(strText, strText.GetLength(), &rcTmp, DT_WORDBREAK);
+    rcTmp = rcText; rcTmp.OffsetRect(1, 0);  pRT->DrawText(strText, strText.GetLength(), &rcTmp, DT_WORDBREAK);
+    rcTmp = rcText; rcTmp.OffsetRect(0, -1); pRT->DrawText(strText, strText.GetLength(), &rcTmp, DT_WORDBREAK);
+    rcTmp = rcText; rcTmp.OffsetRect(0, 1);  pRT->DrawText(strText, strText.GetLength(), &rcTmp, DT_WORDBREAK);
+    rcTmp = rcText; rcTmp.OffsetRect(-1, -1); pRT->DrawText(strText, strText.GetLength(), &rcTmp, DT_WORDBREAK);
+    rcTmp = rcText; rcTmp.OffsetRect(1, 1);   pRT->DrawText(strText, strText.GetLength(), &rcTmp, DT_WORDBREAK);
+    rcTmp = rcText; rcTmp.OffsetRect(-1, 1);  pRT->DrawText(strText, strText.GetLength(), &rcTmp, DT_WORDBREAK);
+    rcTmp = rcText; rcTmp.OffsetRect(1, -1);  pRT->DrawText(strText, strText.GetLength(), &rcTmp, DT_WORDBREAK);
+
+    // 最后绘制文字填充（如果是当前行并支持逐字高亮，保持原有逻辑）
+    if (bIsCurrent && !bHead)
+    {
+        float ratio = m_provider->getWordRatio(iLine, m_timeMs);
+        int width = rcMeasure.Width() * ratio;
+
+        // 已唱部分（使用高亮色，保证不受描边影响）
+        CRect rcHighlighted = rcText;
+        rcHighlighted.right = rcHighlighted.left + width;
+        pRT->PushClipRect(rcHighlighted, RGN_AND);
+        pRT->SetTextColor(m_crHighlight);
+        pRT->DrawText(strText, strText.GetLength(), &rcText, DT_WORDBREAK);
+        pRT->PopClip();
+
+        // 未唱部分（使用基础色，带透明度）
+        CRect rcUnhighlighted = rcText;
+        rcUnhighlighted.left = rcHighlighted.right;
+        rcUnhighlighted.right = rcText.right;
+        pRT->PushClipRect(rcUnhighlighted, RGN_AND);
+        COLORREF crUnhighlighted = RGBA(r, g, b, byAlpha / 2); // 未唱部分更淡
+        pRT->SetTextColor(crUnhighlighted);
+        pRT->DrawText(strText, strText.GetLength(), &rcText, DT_WORDBREAK);
+        pRT->PopClip();
+    }
+    else
+    {
+        // 普通绘制：使用最终颜色填充
+        pRT->SetTextColor(crFill);
+        pRT->DrawText(strText, strText.GetLength(), &rcText, DT_WORDBREAK);
+    }
+
+    // 恢复旧字体
+    if (pOldFont)
+    {
+        pRT->SelectObject(pOldFont, NULL);
+    }
+}
+
+
 /**
  * @brief 绘制带切换动画效果的歌词行（缩放+淡入淡出）
  */
@@ -1189,87 +1371,127 @@ void SLrcView::OnPaint(IRenderTarget* pRT)
 	CRect rc = GetClientRect();
 	if (m_provider && m_provider->getLineCount() > 0)
 	{
-		int nLines = m_provider->getLineCount();
-		int nLineHei = m_lineHei.toPixelSize(GetScale());
-		
-		// 计算可见行数
-		int visibleLines = rc.Height() / nLineHei + 2;
-		
-		// 计算第一行和最后一行的索引，确保当前行始终在视图正中间
-		float fFirstLine = (float)m_nCurrentLineIndex - (float)visibleLines / 2.0f;
-		float fLastLine = (float)m_nCurrentLineIndex + (float)visibleLines / 2.0f;
-		
-		int iFirstLine = (int)floorf(fFirstLine);
-		int iLastLine = (int)ceilf(fLastLine);
-		
-		// 边界检查
-		iFirstLine = smax(0, iFirstLine);
-		iLastLine = smin(nLines - 1, iLastLine);
-		
-		// 计算当前行应该位于的像素位置（相对于第一行）
-		// 要让当前行居中，需要计算从第一行到当前行的距离
-		int nCurrentLineIndexFromFirst = m_nCurrentLineIndex - iFirstLine;
-		
-		// 当前行应该在的位置（从顶部开始）
-		int nCurrentLineTop = nCurrentLineIndexFromFirst * nLineHei;
-		
-		// 当前行的中心位置
-		int nCurrentLineCenter = nCurrentLineTop + nLineHei / 2;
-		
-		// 视图的中心位置
-		int nViewCenter = rc.Height() / 2;
-		
-		// 计算需要的滚动偏移量，使当前行居中
-		int nCurrentOffset = nCurrentLineCenter - nViewCenter;
-		
-		// 计算前一行的Y偏移（用于滚动动画）
-		int nLastOffset = nCurrentOffset;
-		if (m_bIsTransitioning && m_nLastLineIndex >= 0)
+		if (m_bLrcDeskMode)
 		{
-			// 计算前一行相对于第一行的位置
-			int nLastLineIndexFromFirst = m_nLastLineIndex - iFirstLine;
-			int nLastLineTop = nLastLineIndexFromFirst * nLineHei;
-			int nLastLineCenter = nLastLineTop + nLineHei / 2;
-			nLastOffset = nLastLineCenter - nViewCenter;
+            drawLine2(pRT, rc, m_nCurrentLineIndex, 0.0f, TRUE);
 		}
-		
-		// 根据过渡进度插值Y偏移（平滑滚动）
-		int nOffset = nCurrentOffset;
-		if (m_bIsTransitioning && m_fTransitionProgress < 1.0f)
-		{
-			// 线性插值：从上一行的偏移到当前行的偏移
-			float progress = m_fTransitionProgress;
-			nOffset = (int)(nLastOffset * (1.0f - progress) + nCurrentOffset * progress);
-		}
-		
-		// 绘制每一行
-		CRect rcLine(rc.left, rc.top, rc.right, rc.top + nLineHei);
-		rcLine.OffsetRect(0, -nOffset);
-		
-		for (int i = iFirstLine; i <= iLastLine; i++)
-		{
-			// 判断是否是当前播放行
-			bool bIsCurrent = (i == m_nCurrentLineIndex);
-			
-			// 如果是切换动画中的上一行或新行，应用特殊效果
-			if (m_bIsTransitioning && (i == m_nLastLineIndex || i == m_nCurrentLineIndex))
-			{
-				drawLineWithTransition(pRT, rcLine, i, bIsCurrent);
-			}
-			else
-			{
-				drawLine(pRT, rcLine, i, 0.0f, bIsCurrent);
-			}
-			
-			rcLine.OffsetRect(0, nLineHei);
-		}
+        else
+        {
+            int nLines = m_provider->getLineCount();
+            int nLineHei = m_lineHei.toPixelSize(GetScale());
+
+            // 计算可见行数
+            int visibleLines = rc.Height() / nLineHei + 2;
+
+            // 计算第一行和最后一行的索引，确保当前行始终在视图正中间
+            float fFirstLine = (float)m_nCurrentLineIndex - (float)visibleLines / 2.0f;
+            float fLastLine = (float)m_nCurrentLineIndex + (float)visibleLines / 2.0f;
+
+            int iFirstLine = (int)floorf(fFirstLine);
+            int iLastLine = (int)ceilf(fLastLine);
+
+            // 边界检查
+            iFirstLine = smax(0, iFirstLine);
+            iLastLine = smin(nLines - 1, iLastLine);
+
+            // 计算当前行应该位于的像素位置（相对于第一行）
+            // 要让当前行居中，需要计算从第一行到当前行的距离
+            int nCurrentLineIndexFromFirst = m_nCurrentLineIndex - iFirstLine;
+
+            // 当前行应该在的位置（从顶部开始）
+            int nCurrentLineTop = nCurrentLineIndexFromFirst * nLineHei;
+
+            // 当前行的中心位置
+            int nCurrentLineCenter = nCurrentLineTop + nLineHei / 2;
+
+            // 视图的中心位置
+            int nViewCenter = rc.Height() / 2;
+
+            // 计算需要的滚动偏移量，使当前行居中
+            int nCurrentOffset = nCurrentLineCenter - nViewCenter;
+
+            // 计算前一行的Y偏移（用于滚动动画）
+            int nLastOffset = nCurrentOffset;
+            if (m_bIsTransitioning && m_nLastLineIndex >= 0)
+            {
+                // 计算前一行相对于第一行的位置
+                int nLastLineIndexFromFirst = m_nLastLineIndex - iFirstLine;
+                int nLastLineTop = nLastLineIndexFromFirst * nLineHei;
+                int nLastLineCenter = nLastLineTop + nLineHei / 2;
+                nLastOffset = nLastLineCenter - nViewCenter;
+            }
+
+            // 根据过渡进度插值Y偏移（平滑滚动）
+            int nOffset = nCurrentOffset;
+            if (m_bIsTransitioning && m_fTransitionProgress < 1.0f)
+            {
+                // 线性插值：从上一行的偏移到当前行的偏移
+                float progress = m_fTransitionProgress;
+                nOffset = (int)(nLastOffset * (1.0f - progress) + nCurrentOffset * progress);
+            }
+
+            // 绘制每一行
+            CRect rcLine(rc.left, rc.top, rc.right, rc.top + nLineHei);
+            rcLine.OffsetRect(0, -nOffset);
+
+            for (int i = iFirstLine; i <= iLastLine; i++)
+            {
+                // 判断是否是当前播放行
+                bool bIsCurrent = (i == m_nCurrentLineIndex);
+
+                // 如果是切换动画中的上一行或新行，应用特殊效果
+                if (m_bIsTransitioning && (i == m_nLastLineIndex || i == m_nCurrentLineIndex))
+                {
+                    drawLineWithTransition(pRT, rcLine, i, bIsCurrent);
+                }
+                else
+                {
+                    drawLine(pRT, rcLine, i, 0.0f, bIsCurrent);
+                }
+
+                rcLine.OffsetRect(0, nLineHei);
+            }
+        }
 	}
 	else
 	{
-		// 无歌词时显示提示
-		pRT->SetTextColor(m_crText);
-		SStringT strTip = m_strToolTipText.GetText();
-		pRT->DrawText(strTip, strTip.GetLength(), &rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+        if (m_bLrcDeskMode)
+        {
+            // 绘制阴影提示
+            SStringT strTip = m_strToolTipText.GetText();
+            // 使用较大字号和半透明白色
+            int nFontSize = m_nFontSizeCurrent.toPixelSize(GetScale());
+			SAutoRefPtr<IFontS> pOldFont;
+			{
+				SAutoRefPtr<IFontS> pCurFont = (IFontS *)pRT->GetCurrentObject(OT_FONT);
+				SASSERT(pCurFont);
+				const LOGFONT *plf = pCurFont->LogFont();
+				LOGFONT lf;
+				memcpy(&lf, plf, sizeof(LOGFONT));
+				lf.lfHeight = -nFontSize;
+				SAutoRefPtr<IFontS> pNewFont;
+				GETRENDERFACTORY->CreateFont(&pNewFont, &lf);
+				pRT->SelectObject(pNewFont, (IRenderObj **)&pOldFont);
+            }
+            // 半透明白色
+            pRT->SetTextColor(RGBA(0, 0, 0, 200));
+            // 绘制带阴影的文本
+            CRect rcText = rc;
+
+			rcText.OffsetRect(2, 2); // 阴影偏移
+            pRT->DrawText(strTip, strTip.GetLength(), &rcText, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+            rcText.OffsetRect(-2, -2); // 回到原位置
+            pRT->SetTextColor(m_crHighlight); // 正文颜色
+            pRT->DrawText(strTip, strTip.GetLength(), &rcText, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+
+        }
+        else
+        {
+            // 无歌词时显示提示
+            pRT->SetTextColor(m_crText);
+            SStringT strTip = m_strToolTipText.GetText();
+            pRT->DrawText(strTip, strTip.GetLength(), &rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+        }
 	}
 	
 	AfterPaint(pRT, painter);

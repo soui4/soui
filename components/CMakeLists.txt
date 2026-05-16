@@ -11,7 +11,7 @@ endif()
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
 add_subdirectory(imgdecoder-wic)
 add_subdirectory(imgdecoder-gdip)
-add_subdirectory(render-d2d)
+# add_subdirectory(render-d2d)
 endif()
 
 add_subdirectory(SIpcObject)
