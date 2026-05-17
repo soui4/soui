@@ -8,93 +8,110 @@
 
 SNSBEGIN
 
+BOOL SYYLrcProvider::loadXml(SXmlNode root, int durationMs)
+{
+    SXmlNode xmlSong = root.child(L"song");
+    if (!xmlSong)
+        return FALSE;
+    m_strName = S_CW2T(xmlSong.child(L"general").child(L"name").Text());
+    m_strSinger = S_CW2T(xmlSong.child(L"general").child(L"singer").Text());
+    SXmlNode xmlLrc = xmlSong.child(L"midi_lrc");
+    SXmlNode xmlComment = xmlSong.child(L"comment");
+    if (!xmlLrc && !xmlComment)
+    {
+        return FALSE;
+    }
+    if (xmlLrc)
+    {
+        SXmlNode xmlPara = xmlLrc.child(L"paragraph");
+
+        while (xmlPara)
+        {
+            SXmlNode xmlSent = xmlPara.child(L"sentence");
+            while (xmlSent)
+            {
+                SXmlNode xmlTone = xmlSent.child(L"tone");
+                int nOffset = 0;
+                Sentence sent;
+                sent.isHead = false;
+                while (xmlTone)
+                {
+                    Tone tone;
+                    tone.nOffset = nOffset;
+                    tone.tsBeginMs = xmlTone.attribute(L"begin").as_float() * 1000;
+                    tone.tsEndMs = xmlTone.attribute(L"end").as_float() * 1000;
+                    tone.pitch = xmlTone.attribute(L"pitch").AsInt();
+                    SStringT strWord = S_CW2T(xmlTone.child(L"word").Text());
+                    tone.nLength = strWord.GetLength();
+                    nOffset += tone.nLength;
+                    sent.strSent.Append(strWord);
+                    sent.tones.push_back(tone);
+
+                    xmlTone = xmlTone.next_sibling(L"tone");
+                }
+                if (!sent.tones.empty())
+                {
+                    sent.tsBeginMs = sent.tones.front().tsBeginMs;
+                    sent.tsEndMs = sent.tones.back().tsEndMs;
+                    m_lstSents.push_back(sent);
+                }
+                xmlSent = xmlSent.next_sibling(L"sentence");
+            }
+            xmlPara = xmlPara.next_sibling(L"paragraph");
+        }
+
+        if (m_lstSents.empty())
+            return FALSE;
+        // insert title as the first sent
+        Sentence sent;
+        sent.isHead = true;
+        sent.tsBeginMs = 0;
+        sent.strSent = SStringT().Format(_T("%s\n%s"), m_strName.c_str(), m_strSinger.c_str());
+        Tone tone;
+        tone.nLength = sent.strSent.GetLength();
+        tone.pitch = 0;
+        tone.nOffset = 0;
+        tone.tsBeginMs = 0;
+        tone.tsEndMs = m_lstSents.front().tsBeginMs;
+        sent.tsEndMs = tone.tsEndMs;
+        sent.tones.push_back(tone);
+        m_lstSents.insert(m_lstSents.begin(), sent);
+        return TRUE;
+    }
+    else
+    {
+        SStringT strComment = S_CW2T(xmlComment.Text());
+        Sentence sent;
+        sent.isHead = true;
+        sent.tsBeginMs = 0;
+        sent.strSent = strComment;
+        Tone tone;
+        tone.nLength = sent.strSent.GetLength();
+        tone.pitch = 0;
+        tone.nOffset = 0;
+        tone.tsBeginMs = 0;
+        tone.tsEndMs = durationMs;
+        sent.tsEndMs = tone.tsEndMs;
+        sent.tones.push_back(tone);
+        m_lstSents.push_back(sent);
+        return TRUE;
+    }
+}
+
 BOOL SYYLrcProvider::load(LPCTSTR pszLrc, int durationMs)
 {
 	SXmlDoc xmlDoc;
 	if (!xmlDoc.load_file(pszLrc))
 		return FALSE;
-	SXmlNode xmlSong = xmlDoc.root().child(L"song");
-	if (!xmlSong)
-		return FALSE;
-	m_strName = S_CW2T(xmlSong.child(L"general").child(L"name").Text());
-	m_strSinger = S_CW2T(xmlSong.child(L"general").child(L"singer").Text());
-	SXmlNode xmlLrc = xmlSong.child(L"midi_lrc");
-	SXmlNode xmlComment = xmlSong.child(L"comment");
-	if (!xmlLrc && !xmlComment)
-	{
-		return FALSE;
-	}
-	if (xmlLrc)
-	{
-		SXmlNode xmlPara = xmlLrc.child(L"paragraph");
+    return loadXml(xmlDoc.root(), durationMs);
+}
 
-		while (xmlPara) {
-			SXmlNode xmlSent = xmlPara.child(L"sentence");
-			while (xmlSent) {
-				SXmlNode xmlTone = xmlSent.child(L"tone");
-				int nOffset = 0;
-				Sentence sent;
-				sent.isHead = false;
-				while (xmlTone) {
-					Tone tone;
-					tone.nOffset = nOffset;
-					tone.tsBeginMs = xmlTone.attribute(L"begin").as_float() * 1000;
-					tone.tsEndMs = xmlTone.attribute(L"end").as_float() * 1000;
-					tone.pitch = xmlTone.attribute(L"pitch").AsInt();
-					SStringT strWord = S_CW2T(xmlTone.child(L"word").Text());
-					tone.nLength = strWord.GetLength();
-					nOffset += tone.nLength;
-					sent.strSent.Append(strWord);
-					sent.tones.push_back(tone);
-
-					xmlTone = xmlTone.next_sibling(L"tone");
-				}
-				if (!sent.tones.empty()) {
-					sent.tsBeginMs = sent.tones.front().tsBeginMs;
-					sent.tsEndMs = sent.tones.back().tsEndMs;
-					m_lstSents.push_back(sent);
-				}
-				xmlSent = xmlSent.next_sibling(L"sentence");
-			}
-			xmlPara = xmlPara.next_sibling(L"paragraph");
-		}
-
-		if (m_lstSents.empty())
-			return FALSE;
-		//insert title as the first sent
-		Sentence sent;
-		sent.isHead = true;
-		sent.tsBeginMs = 0;
-		sent.strSent = SStringT().Format(_T("%s\n%s"), m_strName.c_str(), m_strSinger.c_str());
-		Tone tone;
-		tone.nLength = sent.strSent.GetLength();
-		tone.pitch = 0;
-		tone.nOffset = 0;
-		tone.tsBeginMs = 0;
-		tone.tsEndMs = m_lstSents.front().tsBeginMs;
-		sent.tsEndMs = tone.tsEndMs;
-		sent.tones.push_back(tone);
-		m_lstSents.insert(m_lstSents.begin(), sent);
-		return TRUE;
-	}
-	else {
-		SStringT strComment = S_CW2T(xmlComment.Text());
-		Sentence sent;
-		sent.isHead = true;
-		sent.tsBeginMs = 0;
-		sent.strSent = strComment;
-		Tone tone;
-		tone.nLength = sent.strSent.GetLength();
-		tone.pitch = 0;
-		tone.nOffset = 0;
-		tone.tsBeginMs = 0;
-		tone.tsEndMs = durationMs;
-		sent.tsEndMs = tone.tsEndMs;
-		sent.tones.push_back(tone);
-		m_lstSents.push_back(sent);
-		return TRUE;
-	}
-
+BOOL SYYLrcProvider::LoadBuffer(LPCSTR pszLrcU8, int durationMs)
+{
+    SXmlDoc xmlDoc;
+    if (!xmlDoc.load_buffer(pszLrcU8,strlen(pszLrcU8),0,enc_utf8))
+        return FALSE;
+    return loadXml(xmlDoc.root(), durationMs);
 }
 
 float SYYLrcProvider::getLineIndexFromTimeMs(int timeMs) const
@@ -511,11 +528,6 @@ static bool TimedLineCmp(const TimedLine& a, const TimedLine& b) {
  */
 BOOL SLrcProvider::load(LPCTSTR pszLrc, int durationMs)
 {
-	m_lines.clear();
-	m_strTitle.Empty();
-	m_strArtist.Empty();
-	m_strAlbum.Empty();
-	m_durationMs = durationMs;
 	
 	// 步骤1: 读取文件并转换为UTF-8
 	std::string utf8Text;
@@ -524,122 +536,136 @@ BOOL SLrcProvider::load(LPCTSTR pszLrc, int durationMs)
 		SLOGW() << "Failed to read or convert LRC file: " << pszLrc;
 		return FALSE;
 	}
-	
-	// 步骤2: 将UTF-8文本分割为行
-	std::vector<SStringA> fileLines;
-	SplitUtf8TextToLines(utf8Text, fileLines);
-	
-	if (fileLines.empty())
-	{
-		SLOGW() << "Empty LRC file";
-		return FALSE;
-	}
-	
-	SLOGI() << "Successfully loaded " << fileLines.size() << " lines from LRC file";
-	
-	// 临时存储所有带时间的歌词行
+    BOOL bRet = LoadBuffer(utf8Text.c_str(), durationMs);
+    if (bRet)
+    {
+        m_strLrcPath = pszLrc;
+    }
+    return bRet;
+}
 
-	std::vector<TimedLine> timedLines;
-	
-	// 步骤3: 解析每一行（与原有逻辑保持一致）
-	for (std::vector<SStringA>::iterator it=fileLines.begin();it!=fileLines.end();it++)
-	{
-		SStringA & strLine = *it;
-		if (strLine.IsEmpty())
-			continue;
-		
-		// 检查是否是元数据标签
-		if (strLine.Left(4) == "[ti:")
-		{
-			int endPos = strLine.FindChar(']');
-			if (endPos > 0)
-				m_strTitle = S_CA2T(strLine.Mid(4, endPos - 4),CP_UTF8, CP_ACP);
-		}
-		else if (strLine.Left(4) == "[ar:")
-		{
-			int endPos = strLine.FindChar(_T(']'));
-			if (endPos > 0)
-				m_strArtist = S_CA2T(strLine.Mid(4, endPos - 4),CP_UTF8, CP_ACP);;
-		}
-		else if (strLine.Left(4) == "[al:")
-		{
-			int endPos = strLine.FindChar(_T(']'));
-			if (endPos > 0)
-				m_strAlbum = S_CA2T(strLine.Mid(4, endPos - 4),CP_UTF8, CP_ACP);;
-		}
-		else if (strLine[0] == _T('['))
-		{
-			// 解析时间标签和歌词文本
-			int endBracket = strLine.FindChar(_T(']'));
-			if (endBracket > 0)
-			{
-				SStringA timeTag = strLine.Mid(1, endBracket - 1);
-				SStringA lyricText = strLine.Mid(endBracket + 1);
-				lyricText.TrimLeft();
-				
-				int timeMs = parseTimeTag(timeTag);
-				if (timeMs >= 0 && !lyricText.IsEmpty())
-				{
-					TimedLine tl;
-					tl.timeMs = timeMs;
-					tl.text = S_CA2T(lyricText,CP_UTF8,CP_ACP);
-					timedLines.push_back(tl);
-				}
-			}
-		}
-	}
-	
-	if (timedLines.empty())
-	{
-		SLOGW() << "No valid lyrics found in LRC file";
-		return FALSE;
-	}
-	
-	// 按时间排序（有些LRC文件可能不是严格排序的）
-	std::sort(timedLines.begin(), timedLines.end(),TimedLineCmp);
-	
-	// 构建歌词行，计算每行的结束时间
-	for (size_t i = 0; i < timedLines.size(); ++i)
-	{
-		LrcLine line;
-		line.tsBeginMs = timedLines[i].timeMs;
-		line.strText = timedLines[i].text;
-		
-		// 下一行的开始时间作为当前行的结束时间
-		if (i + 1 < timedLines.size())
-		{
-			line.tsEndMs = timedLines[i + 1].timeMs;
-		}
-		else
-		{
-			// 最后一行使用歌曲总时长
-			line.tsEndMs = m_durationMs > 0 ? m_durationMs : (line.tsBeginMs + 5000);
-		}
-		
-		m_lines.push_back(line);
-	}
-	
-	// 在第一行之前插入标题行
-	if (!m_lines.empty())
-	{
-		LrcLine headLine;
-		headLine.tsBeginMs = 0;
-		headLine.tsEndMs = m_lines.front().tsBeginMs;
-		headLine.strText = m_strTitle;
-		if (!m_strArtist.IsEmpty())
-		{
-			headLine.strText += _T("\n") + m_strArtist;
-		}
-		m_lines.insert(m_lines.begin(), headLine);
-	}
-	
-	// 保存歌词文件路径
-	m_strLrcPath = pszLrc;
-		
-	SLOGI() << "Loaded LRC: " << m_lines.size() << " lines, title=" 
-	               << m_strTitle.c_str() << ", artist=" << m_strArtist.c_str();
-	
-	return !m_lines.empty();
+BOOL SLrcProvider::LoadBuffer(LPCSTR pszLrcU8, int durationMs)
+{
+    m_lines.clear();
+    m_strTitle.Empty();
+    m_strArtist.Empty();
+    m_strAlbum.Empty();
+    m_durationMs = durationMs;
+
+	std::string utf8Text = pszLrcU8;
+    // 步骤2: 将UTF-8文本分割为行
+    std::vector<SStringA> fileLines;
+    SplitUtf8TextToLines(utf8Text, fileLines);
+
+    if (fileLines.empty())
+    {
+        SLOGW() << "Empty LRC file";
+        return FALSE;
+    }
+
+    SLOGI() << "Successfully loaded " << fileLines.size() << " lines from LRC file";
+
+    // 临时存储所有带时间的歌词行
+
+    std::vector<TimedLine> timedLines;
+
+    // 步骤3: 解析每一行（与原有逻辑保持一致）
+    for (std::vector<SStringA>::iterator it = fileLines.begin(); it != fileLines.end(); it++)
+    {
+        SStringA &strLine = *it;
+        if (strLine.IsEmpty())
+            continue;
+
+        // 检查是否是元数据标签
+        if (strLine.Left(4) == "[ti:")
+        {
+            int endPos = strLine.FindChar(']');
+            if (endPos > 0)
+                m_strTitle = S_CA2T(strLine.Mid(4, endPos - 4), CP_UTF8, CP_ACP);
+        }
+        else if (strLine.Left(4) == "[ar:")
+        {
+            int endPos = strLine.FindChar(_T(']'));
+            if (endPos > 0)
+                m_strArtist = S_CA2T(strLine.Mid(4, endPos - 4), CP_UTF8, CP_ACP);
+            ;
+        }
+        else if (strLine.Left(4) == "[al:")
+        {
+            int endPos = strLine.FindChar(_T(']'));
+            if (endPos > 0)
+                m_strAlbum = S_CA2T(strLine.Mid(4, endPos - 4), CP_UTF8, CP_ACP);
+            ;
+        }
+        else if (strLine[0] == _T('['))
+        {
+            // 解析时间标签和歌词文本
+            int endBracket = strLine.FindChar(_T(']'));
+            if (endBracket > 0)
+            {
+                SStringA timeTag = strLine.Mid(1, endBracket - 1);
+                SStringA lyricText = strLine.Mid(endBracket + 1);
+                lyricText.TrimLeft();
+
+                int timeMs = parseTimeTag(timeTag);
+                if (timeMs >= 0 && !lyricText.IsEmpty())
+                {
+                    TimedLine tl;
+                    tl.timeMs = timeMs;
+                    tl.text = S_CA2T(lyricText, CP_UTF8, CP_ACP);
+                    timedLines.push_back(tl);
+                }
+            }
+        }
+    }
+
+    if (timedLines.empty())
+    {
+        SLOGW() << "No valid lyrics found in LRC file";
+        return FALSE;
+    }
+
+    // 按时间排序（有些LRC文件可能不是严格排序的）
+    std::sort(timedLines.begin(), timedLines.end(), TimedLineCmp);
+
+    // 构建歌词行，计算每行的结束时间
+    for (size_t i = 0; i < timedLines.size(); ++i)
+    {
+        LrcLine line;
+        line.tsBeginMs = timedLines[i].timeMs;
+        line.strText = timedLines[i].text;
+
+        // 下一行的开始时间作为当前行的结束时间
+        if (i + 1 < timedLines.size())
+        {
+            line.tsEndMs = timedLines[i + 1].timeMs;
+        }
+        else
+        {
+            // 最后一行使用歌曲总时长
+            line.tsEndMs = m_durationMs > 0 ? m_durationMs : (line.tsBeginMs + 5000);
+        }
+
+        m_lines.push_back(line);
+    }
+
+    // 在第一行之前插入标题行
+    if (!m_lines.empty())
+    {
+        LrcLine headLine;
+        headLine.tsBeginMs = 0;
+        headLine.tsEndMs = m_lines.front().tsBeginMs;
+        headLine.strText = m_strTitle;
+        if (!m_strArtist.IsEmpty())
+        {
+            headLine.strText += _T("\n") + m_strArtist;
+        }
+        m_lines.insert(m_lines.begin(), headLine);
+    }
+
+    SLOGI() << "Loaded LRC: " << m_lines.size() << " lines, title=" << m_strTitle.c_str() << ", artist=" << m_strArtist.c_str();
+
+    return !m_lines.empty();
 }
 
 /**

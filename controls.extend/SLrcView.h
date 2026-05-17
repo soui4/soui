@@ -5,6 +5,7 @@ SNSBEGIN
 
 struct ILrcProvider : IObjRef{
 	virtual BOOL load(LPCTSTR pszLrc, int durationMs) = 0;
+    virtual BOOL LoadBuffer(LPCSTR pszLrcU8, int duration) = 0;
 	virtual float getLineIndexFromTimeMs(int timeMs) const = 0;
 	virtual float getWordRatio(int iLine, int timeMs) const = 0;
 	virtual int getLineCount() const = 0;
@@ -42,8 +43,9 @@ public:
 	~SYYLrcProvider();
 	
 public:
-	// 通过 TObjRefImpl 继承
+    // 通过 TObjRefImpl 继承
 	BOOL load(LPCTSTR pszLrc, int durationMs) override;
+	BOOL LoadBuffer(LPCSTR pszLrcU8, int duration) override;
 	float getLineIndexFromTimeMs(int timeMs) const override;
 	float getWordRatio(int iLine, int timeMs) const override;
 	int getLineCount() const override;
@@ -59,7 +61,8 @@ public:
 		return m_nOffsetMs;
 	}
 protected:
-	int ts2line(int iFirst, int iLast, int timeMs) const;
+    BOOL loadXml(SXmlNode root, int duration);
+    int ts2line(int iFirst, int iLast, int timeMs) const;
 };
 
 /**
@@ -93,6 +96,7 @@ public:
 public:
 	// ILrcProvider 接口实现
 	BOOL load(LPCTSTR pszLrc, int durationMs) override;
+	BOOL LoadBuffer(LPCSTR pszLrcU8, int durationMs) override;
 	float getLineIndexFromTimeMs(int timeMs) const override;
 	float getWordRatio(int iLine, int timeMs) const override;
 	int getLineCount() const override;

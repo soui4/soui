@@ -6,7 +6,7 @@
   <imglist name="_skin.sys.focusradio" src="SVG:SYS_FOCUS_RADIO"/>
   <scrollbar name="_skin.sys.scrollbar" src="SVG:SYS_SCROLLBAR" margin="3" hasgripper="0"/>
   <imgframe name="_skin.sys.border" src="SVG:SYS_BORDER" states="2" margin-x="3" margin-y="3"/>
-  <imgcenter name="_skin.sys.dropbtn" src="SVG:SYS_DROPBTN" states="3"/>
+  <imglist name="_skin.sys.dropbtn" src="SVG:SYS_DROPBTN" states="3"/>
   <imglist name="_skin.sys.tree.toggle" src="SVG:SYS_TREE_TOGGLE" states="6">
     <states>
       <state index="0" value="normal"/>
