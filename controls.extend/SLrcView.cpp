@@ -896,35 +896,6 @@ SLrcView::SLrcView()
 {
 }
 
-void SLrcView::CopyFormOther(SLrcView *otherView)
-{
-    this->m_provider = otherView->m_provider;
-    this->m_crText = otherView->m_crText;
-    this->m_crHighlight = otherView->m_crHighlight;
-    this->m_bLrcDeskMode = otherView->m_bLrcDeskMode;
-    this->m_lineHei = otherView->m_lineHei;
-    this->m_nLength = otherView->m_nLength;
-    this->m_timeAniMs = otherView->m_timeAniMs;
-    this->m_timeMs = otherView->m_timeMs;
-
-    // 字体大小配置
-    this->m_nFontSizeNormal = otherView->m_nFontSizeNormal;  // 普通行字号
-    this->m_nFontSizeCurrent = otherView->m_nFontSizeCurrent; // 当前行字号
-    this->m_fScaleDuration = otherView->m_fScaleDuration;         // 缩放动画持续时间（秒）
-
-    // 歌词切换动画状态
-    this->m_nCurrentLineIndex = otherView->m_nCurrentLineIndex;      // 当前行索引
-    this->m_nLastLineIndex = otherView->m_nLastLineIndex;         // 上一行索引（用于切换动画绘制）
-    this->m_fTransitionProgress = otherView->m_fTransitionProgress;  // 切换动画进度 (0.0 - 1.0)
-    this->m_bIsTransitioning = otherView->m_bIsTransitioning;      // 是否正在切换动画中
-    this->m_nTransitionStartTimeMs = otherView->m_nTransitionStartTimeMs; // 切换动画开始时的播放时间（毫秒）
-
-    // Y坐标滚动动画
-    this->m_nLastScrollOffset = otherView->m_nLastScrollOffset;    // 上一行的Y偏移
-    this->m_nCurrentScrollOffset = otherView->m_nCurrentScrollOffset; // 当前行的Y偏移
-
-}
-
 void SLrcView::SetLrc(ILrcProvider* pProvider)
 {
 	m_provider = pProvider;

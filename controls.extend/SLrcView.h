@@ -125,16 +125,9 @@ class SLrcView : public SWindow
 public:
 	SLrcView();
 
-	void CopyFormOther(SLrcView *otherView);
-
 	void SetLrc(ILrcProvider* pProvider);
 	BOOL SetTimeMs(int nPos);
 	ILrcProvider* GetLrcProvider() const { return m_provider; }  // 添加获取 Provider 的方法
-    void SetLrcDeskMode(BOOL bDeskMode)
-    {
-        m_bLrcDeskMode = bDeskMode;
-        Invalidate();
-    } // 设置桌面模式
   protected:
 	BOOL UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo) override{
 		// 禁用 ToolTip
@@ -155,6 +148,7 @@ public:
 		ATTR_LAYOUTSIZE(L"fontSizeNormal", m_nFontSizeNormal, TRUE)
 		ATTR_LAYOUTSIZE(L"fontSizeCurrent", m_nFontSizeCurrent, TRUE)
 		ATTR_FLOAT(L"scaleDuration", m_fScaleDuration, TRUE)
+		ATTR_BOOL(L"deskMode", m_bLrcDeskMode, TRUE)
 	SOUI_ATTRS_END()
 private:
 	SAutoRefPtr<ILrcProvider> m_provider;
