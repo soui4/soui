@@ -40,6 +40,7 @@
 #include "SCalendar2.h"
 #include "SColorizeText.h"
 #include "SLrcView.h"
+#include "SSpeedMeter.h"
 #ifdef _WIN32
 #include "SWkeWebkit.h"
 #include "SStaticGdip.h"
@@ -84,6 +85,7 @@ void SCtrlsRegister::RegisterCtrls(SApplication *theApp)
 
 	theApp->RegisterWindowClass<SColorizeText>();
 	theApp->RegisterWindowClass<SLrcView>();
+	theApp->RegisterWindowClass<SSpeedMeter>();
 #ifdef _WIN32
     theApp->RegisterWindowClass<SWkeWebkit>(); // 注册WKE浏览器
     theApp->RegisterWindowClass<SStaticGdip>();
