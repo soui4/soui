@@ -2482,7 +2482,7 @@ HRESULT SRenderTarget_GDI::DrawGradientRectEx(THIS_ LPCRECT pRect, POINT ptRound
     return E_NOTIMPL;
 }
 
-HRESULT SRenderTarget_GDI::DrawGradientPath(THIS_ const IPathS *path, const GradientItem *pGradients, int nCount, const GradientInfo *info, BYTE byAlpha)
+HRESULT SRenderTarget_GDI::DrawGradientPath(THIS_ const IPathS *path, const GradientItem *pGradients, int nCount, const GradientInfo *info, BYTE byAlpha, LPCRECT pRcBox)
 {
     if (!path || !pGradients || nCount < 2)
         return E_INVALIDARG;
@@ -2494,7 +2494,14 @@ HRESULT SRenderTarget_GDI::DrawGradientPath(THIS_ const IPathS *path, const Grad
 
     // Get path bounds for gradient calculation
     RECT rcBounds;
-    GetRgnBox(hRgn, &rcBounds);
+    if (pRcBox)
+    {
+        rcBounds = *pRcBox;
+    }
+    else
+    {
+        GetRgnBox(hRgn, &rcBounds);
+    }
 
     // Use existing gradient rectangle implementation with path clipping
     HRGN hOldClip = CreateRectRgn(0, 0, 0, 0);
