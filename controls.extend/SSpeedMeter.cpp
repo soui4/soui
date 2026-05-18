@@ -128,7 +128,7 @@ void SSpeedMeter::DrawTicksAndNumbers(IRenderTarget* pRT, const CPoint& center, 
 		int x = center.x + (int)((radius - textOffset) * cos(rad));
 		int y = center.y + (int)((radius - textOffset) * sin(rad));
 
-		SStringW strText = SStringW().Format(L"%.0f", val);
+		SStringT strText = SStringT().Format(_T("%.0f"), val);
 		CRect rcText(x - 20, y - 10, x + 20, y + 10);
 		pRT->DrawText(strText, strText.GetLength(), rcText, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	}
@@ -208,11 +208,11 @@ void SSpeedMeter::DrawPointer(IRenderTarget* pRT, const CPoint& center, int radi
 	// 绘制下方速度数值文字
 	pRT->SetTextColor(GETCOLOR(L"#333333"));
 	CRect rcVal(center.x - 50, center.y + 20, center.x + 50, center.y + 60);
-	pRT->DrawText(SStringW().Format(L"%.0f", m_fValue), -1, rcVal, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	pRT->DrawText(SStringT().Format(_T("%.0f"), m_fValue), -1, rcVal, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 
 	CRect rcUnit(center.x - 40, center.y + 60, center.x + 40, center.y + 80);
 	pRT->SetTextColor(GETCOLOR(L"#999999"));
-	pRT->DrawText(L"m/min", -1, rcUnit, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	pRT->DrawText(_T("m/min"), -1, rcUnit, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 }
 
 void SSpeedMeter::onAnimationUpdate(IValueAnimator* pAnimator)
