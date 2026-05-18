@@ -922,35 +922,6 @@ SLrcView::SLrcView()
 {
 }
 
-void SLrcView::CopyFormOther(SLrcView *otherView)
-{
-    this->m_provider = otherView->m_provider;
-    this->m_crText = otherView->m_crText;
-    this->m_crHighlight = otherView->m_crHighlight;
-    this->m_bLrcDeskMode = otherView->m_bLrcDeskMode;
-    this->m_lineHei = otherView->m_lineHei;
-    this->m_nLength = otherView->m_nLength;
-    this->m_timeAniMs = otherView->m_timeAniMs;
-    this->m_timeMs = otherView->m_timeMs;
-
-    // 字体大小配置
-    this->m_nFontSizeNormal = otherView->m_nFontSizeNormal;  // 普通行字号
-    this->m_nFontSizeCurrent = otherView->m_nFontSizeCurrent; // 当前行字号
-    this->m_fScaleDuration = otherView->m_fScaleDuration;         // 缩放动画持续时间（秒）
-
-    // 歌词切换动画状态
-    this->m_nCurrentLineIndex = otherView->m_nCurrentLineIndex;      // 当前行索引
-    this->m_nLastLineIndex = otherView->m_nLastLineIndex;         // 上一行索引（用于切换动画绘制）
-    this->m_fTransitionProgress = otherView->m_fTransitionProgress;  // 切换动画进度 (0.0 - 1.0)
-    this->m_bIsTransitioning = otherView->m_bIsTransitioning;      // 是否正在切换动画中
-    this->m_nTransitionStartTimeMs = otherView->m_nTransitionStartTimeMs; // 切换动画开始时的播放时间（毫秒）
-
-    // Y坐标滚动动画
-    this->m_nLastScrollOffset = otherView->m_nLastScrollOffset;    // 上一行的Y偏移
-    this->m_nCurrentScrollOffset = otherView->m_nCurrentScrollOffset; // 当前行的Y偏移
-
-}
-
 void SLrcView::SetLrc(ILrcProvider* pProvider)
 {
 	m_provider = pProvider;
@@ -1182,35 +1153,68 @@ void SLrcView::drawLine2(IRenderTarget *pRT, CRect rc, int iLine, float fProgres
     BYTE b = GetBValue(crBase);
     COLORREF crFill = RGBA(r, g, b, byAlpha);
 
-    // 计算文本实际尺寸
+    // 计算文本实际尺寸（单行）
     CRect rcMeasure = rc;
-    pRT->DrawText(strText, strText.GetLength(), &rcMeasure, DT_CALCRECT | DT_WORDBREAK);
+    pRT->DrawText(strText, strText.GetLength(), &rcMeasure, DT_CALCRECT | DT_SINGLELINE);
+
+    int fullTextWidth = rcMeasure.Width();
+    int textHeight = rcMeasure.Height();
 
     // 调整垂直位置以保持居中
-    int nOffsetY = (rc.Height() - rcMeasure.Height()) / 2;
+    int nOffsetY = (rc.Height() - textHeight) / 2;
     int nOffsetX = 0;
     switch (GetStyle().GetAlign() & SwndStyle::Align_MaskX)
     {
     case SwndStyle::Align_Center:
-        nOffsetX = (rc.Width() - rcMeasure.Width()) / 2;
+        nOffsetX = (rc.Width() - smin(rc.Width(), fullTextWidth)) / 2;
         break;
     case SwndStyle::Align_Right:
-        nOffsetX = rc.Width() - rcMeasure.Width();
+        nOffsetX = rc.Width() - smin(rc.Width(), fullTextWidth);
         break;
     }
 
-    CRect rcText = rc;
-    rcText.OffsetRect(nOffsetX, nOffsetY);
-    rcText.right = rcText.left + rcMeasure.Width();
-    rcText.bottom = rcText.top + rcMeasure.Height();
+    // 计算高亮比例和高亮位置（在全文宽度上的像素位置）
+    float ratio = 0.0f;
+    if (bIsCurrent && !bHead)
+    {
+        ratio = m_provider->getWordRatio(iLine, m_timeMs);
+        ratio = smax(0.0f, smin(1.0f, ratio));
+    }
 
-    // 在文本后绘制半透明背景框，提高任意背景下的可读性
-    const int padX = GetScale() > 1.0f ? 10 : 8;
-    const int padY = GetScale() > 1.0f ? 6 : 4;
-    CRect rcBg = rcText;
-    rcBg.InflateRect(padX, padY);
-    // 半透明黑色背景
-    //pRT->FillSolidRect(&rcBg, RGBA(0, 0, 0, 120));
+    int highlightedPixel = (int)(fullTextWidth * ratio + 0.5f);
+    // 计算水平偏移（当文本宽度超出可见宽度时，尽量让高亮位置可见）
+    int availWidth = rc.Width();
+    int dx = 0;
+    if (fullTextWidth > availWidth)
+    {
+        // 希望高亮位置出现在视口中心
+        int wantLeft = highlightedPixel - availWidth / 2;
+        if (wantLeft < 0) wantLeft = 0;
+        if (wantLeft > fullTextWidth - availWidth) wantLeft = fullTextWidth - availWidth;
+        dx = wantLeft;
+    }
+    else
+    {
+        dx = 0;
+    }
+
+    // 构造文本绘制矩形（完整文本区域，相对于窗口坐标）
+    CRect rcText;
+    rcText.left = rc.left + nOffsetX - dx;
+    rcText.top = rc.top + nOffsetY;
+    rcText.right = rcText.left + fullTextWidth;
+    rcText.bottom = rcText.top + textHeight;
+
+    // 原始可见区域，用于裁剪，防止阴影/描边越界
+    CRect rcVisible = rc;
+
+    // 在文本后绘制半透明背景框（保留注释，按需启用）
+    // CRect rcBg = rcText;
+    // rcBg.InflateRect(padX, padY);
+    // pRT->FillSolidRect(&rcBg, RGBA(0, 0, 0, 120));
+
+    // 开始对可见区裁剪，所有后续绘制都限制在可见区域
+    pRT->PushClipRect(rcVisible, RGN_AND);
 
     // 绘制阴影与描边（采用多次偏移模拟柔和阴影与描边）
     // 阴影颜色（黑色半透明）
@@ -1219,61 +1223,64 @@ void SLrcView::drawLine2(IRenderTarget *pRT, CRect rc, int iLine, float fProgres
     COLORREF crStroke = RGBA(0, 0, 0, 200);
 
     // 阴影偏移（较大的偏移以模拟投影）
-    CRect rcShadow = rcText;
-    rcShadow.OffsetRect(2, 2);
+    CRect rcShadow = rcText; rcShadow.OffsetRect(2, 2);
     pRT->SetTextColor(crShadow);
-    pRT->DrawText(strText, strText.GetLength(), &rcShadow, DT_WORDBREAK);
+    pRT->DrawText(strText, strText.GetLength(), &rcShadow, DT_SINGLELINE);
 
     // 细柔阴影（再绘一次更小透明度）
-    CRect rcShadow2 = rcText;
-    rcShadow2.OffsetRect(1, 1);
+    CRect rcShadow2 = rcText; rcShadow2.OffsetRect(1, 1);
     pRT->SetTextColor(RGBA(0, 0, 0, 96));
-    pRT->DrawText(strText, strText.GetLength(), &rcShadow2, DT_WORDBREAK);
+    pRT->DrawText(strText, strText.GetLength(), &rcShadow2, DT_SINGLELINE);
 
     // 描边：八方向叠加（模拟描边效果）
     pRT->SetTextColor(crStroke);
     CRect rcTmp;
-    rcTmp = rcText; rcTmp.OffsetRect(-1, 0); pRT->DrawText(strText, strText.GetLength(), &rcTmp, DT_WORDBREAK);
-    rcTmp = rcText; rcTmp.OffsetRect(1, 0);  pRT->DrawText(strText, strText.GetLength(), &rcTmp, DT_WORDBREAK);
-    rcTmp = rcText; rcTmp.OffsetRect(0, -1); pRT->DrawText(strText, strText.GetLength(), &rcTmp, DT_WORDBREAK);
-    rcTmp = rcText; rcTmp.OffsetRect(0, 1);  pRT->DrawText(strText, strText.GetLength(), &rcTmp, DT_WORDBREAK);
-    rcTmp = rcText; rcTmp.OffsetRect(-1, -1); pRT->DrawText(strText, strText.GetLength(), &rcTmp, DT_WORDBREAK);
-    rcTmp = rcText; rcTmp.OffsetRect(1, 1);   pRT->DrawText(strText, strText.GetLength(), &rcTmp, DT_WORDBREAK);
-    rcTmp = rcText; rcTmp.OffsetRect(-1, 1);  pRT->DrawText(strText, strText.GetLength(), &rcTmp, DT_WORDBREAK);
-    rcTmp = rcText; rcTmp.OffsetRect(1, -1);  pRT->DrawText(strText, strText.GetLength(), &rcTmp, DT_WORDBREAK);
+    rcTmp = rcText; rcTmp.OffsetRect(-1, 0); pRT->DrawText(strText, strText.GetLength(), &rcTmp, DT_SINGLELINE);
+    rcTmp = rcText; rcTmp.OffsetRect(1, 0);  pRT->DrawText(strText, strText.GetLength(), &rcTmp, DT_SINGLELINE);
+    rcTmp = rcText; rcTmp.OffsetRect(0, -1); pRT->DrawText(strText, strText.GetLength(), &rcTmp, DT_SINGLELINE);
+    rcTmp = rcText; rcTmp.OffsetRect(0, 1);  pRT->DrawText(strText, strText.GetLength(), &rcTmp, DT_SINGLELINE);
+    rcTmp = rcText; rcTmp.OffsetRect(-1, -1); pRT->DrawText(strText, strText.GetLength(), &rcTmp, DT_SINGLELINE);
+    rcTmp = rcText; rcTmp.OffsetRect(1, 1);   pRT->DrawText(strText, strText.GetLength(), &rcTmp, DT_SINGLELINE);
+    rcTmp = rcText; rcTmp.OffsetRect(-1, 1);  pRT->DrawText(strText, strText.GetLength(), &rcTmp, DT_SINGLELINE);
+    rcTmp = rcText; rcTmp.OffsetRect(1, -1);  pRT->DrawText(strText, strText.GetLength(), &rcTmp, DT_SINGLELINE);
 
-    // 最后绘制文字填充（如果是当前行并支持逐字高亮，保持原有逻辑）
+    // 最后绘制文字填充（如果是当前行并支持逐字高亮）
     if (bIsCurrent && !bHead)
     {
-        float ratio = m_provider->getWordRatio(iLine, m_timeMs);
-        int width = rcMeasure.Width() * ratio;
+        int width = (int)(fullTextWidth * ratio + 0.5f);
 
         // 已唱部分（使用高亮色，保证不受描边影响）
         CRect rcHighlighted = rcText;
         rcHighlighted.right = rcHighlighted.left + width;
+        // 与可见区域相交后再裁剪绘制（PushClip 已保证）
         pRT->PushClipRect(rcHighlighted, RGN_AND);
         pRT->SetTextColor(m_crHighlight);
-        pRT->DrawText(strText, strText.GetLength(), &rcText, DT_WORDBREAK);
+        pRT->DrawText(strText, strText.GetLength(), &rcText, DT_SINGLELINE);
         pRT->PopClip();
 
         // 未唱部分（使用基础色，带透明度）
         CRect rcUnhighlighted = rcText;
         rcUnhighlighted.left = rcHighlighted.right;
         rcUnhighlighted.right = rcText.right;
-        pRT->PushClipRect(rcUnhighlighted, RGN_AND);
-        COLORREF crUnhighlighted = RGBA(r, g, b, byAlpha / 2); // 未唱部分更淡
-        pRT->SetTextColor(crUnhighlighted);
-        pRT->DrawText(strText, strText.GetLength(), &rcText, DT_WORDBREAK);
-        pRT->PopClip();
+        if (rcUnhighlighted.left < rcUnhighlighted.right)
+        {
+            pRT->PushClipRect(rcUnhighlighted, RGN_AND);
+            COLORREF crUnhighlighted = RGBA(r, g, b, byAlpha / 2); // 未唱部分更淡
+            pRT->SetTextColor(crUnhighlighted);
+            pRT->DrawText(strText, strText.GetLength(), &rcText, DT_SINGLELINE);
+            pRT->PopClip();
+        }
     }
     else
     {
         // 普通绘制：使用最终颜色填充
         pRT->SetTextColor(crFill);
-        pRT->DrawText(strText, strText.GetLength(), &rcText, DT_WORDBREAK);
+        pRT->DrawText(strText, strText.GetLength(), &rcText, DT_SINGLELINE);
     }
 
-    // 恢复旧字体
+    // 恢复裁剪和旧字体
+    pRT->PopClip();
+
     if (pOldFont)
     {
         pRT->SelectObject(pOldFont, NULL);
