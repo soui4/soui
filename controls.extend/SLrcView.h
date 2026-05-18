@@ -141,6 +141,7 @@ public:
     void drawLine2(IRenderTarget *pRT, CRect rc, int iLine, float fProgress, bool bIsCurrent);
 	void drawLineWithTransition(IRenderTarget* pRT, CRect rc, int iLine, bool bIsCurrent);  // 带切换动画的绘制
 	void OnPaint(IRenderTarget* pRT);
+    STDMETHOD_(void, GetDesiredSize)(SIZE *psz, int nParentWid, int nParentHei) override;
 	SOUI_MSG_MAP_BEGIN()
 		MSG_WM_PAINT_EX(OnPaint)
 	SOUI_MSG_MAP_END()

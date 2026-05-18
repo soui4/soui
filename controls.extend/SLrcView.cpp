@@ -1494,4 +1494,79 @@ void SLrcView::OnPaint(IRenderTarget* pRT)
 	AfterPaint(pRT, painter);
 }
 
+void SLrcView::GetDesiredSize(SIZE *psz, int nParentWid, int nParentHei)
+{
+    CSize szRet(-1, -1);
+    if (GetLayoutParam()->IsSpecifiedSize(Horz))
+    { // 检查设置大小
+        SLayoutSize layoutSize;
+        GetLayoutParam()->GetSpecifiedSize(Horz, &layoutSize);
+        szRet.cx = layoutSize.toPixelSize(GetScale());
+    }
+    else if (GetLayoutParam()->IsMatchParent(Horz))
+    {
+        szRet.cx = nParentWid;
+    }
+
+    if (GetLayoutParam()->IsSpecifiedSize(Vert))
+    { // 检查设置大小
+        SLayoutSize layoutSize;
+        GetLayoutParam()->GetSpecifiedSize(Vert, &layoutSize);
+        szRet.cy = layoutSize.toPixelSize(GetScale());
+    }
+    else if (GetLayoutParam()->IsMatchParent(Vert))
+    {
+        szRet.cy = nParentHei;
+    }
+
+    if (szRet.cx != -1 && szRet.cy != -1)
+    {
+        *psz = szRet;
+        return;
+    }
+    int nTestDrawMode = GetTextAlign() & ~(DT_CENTER | DT_RIGHT | DT_VCENTER | DT_BOTTOM);
+
+    CRect rcPadding = GetStyle().GetPadding();
+    // 计算文本大小
+    CRect rcTest(0, 0, 100000, 100000);
+
+	if (m_bLrcDeskMode)
+    {
+        SAutoRefPtr<IRenderTarget> pRT;
+        GETRENDERFACTORY->CreateRenderTarget(&pRT, 0, 0);
+
+        int nFontSize = m_nFontSizeCurrent.toPixelSize(GetScale());
+        SAutoRefPtr<IFontS> pOldFont;
+        {
+            SAutoRefPtr<IFontS> pCurFont = (IFontS *)pRT->GetCurrentObject(OT_FONT);
+            SASSERT(pCurFont);
+            const LOGFONT *plf = pCurFont->LogFont();
+            LOGFONT lf;
+            memcpy(&lf, plf, sizeof(LOGFONT));
+            lf.lfHeight = -nFontSize;
+            SAutoRefPtr<IFontS> pNewFont;
+            GETRENDERFACTORY->CreateFont(&pNewFont, &lf);
+            pRT->SelectObject(pNewFont, (IRenderObj **)&pOldFont);
+        }
+        SStringT strText = _T("XMusic享你所听");
+        DrawText(pRT, strText, strText.GetLength(), rcTest, nTestDrawMode | DT_CALCRECT);
+        rcTest.InflateRect(2, 2, 2, 2); // 额外增加一点阴影空间
+    }
+    else
+    {
+        rcTest.right = rcTest.left + 222; // 预留两行的空间用于动画滚动
+        rcTest.bottom = rcTest.top+ m_lineHei.toPixelSize(GetScale()) * 3; // 预留两行的空间用于动画滚动
+	}
+
+	rcTest.InflateRect(m_style.GetMargin());
+    rcTest.InflateRect(rcPadding);
+
+    if (GetLayoutParam()->IsWrapContent(Horz))
+        szRet.cx = rcTest.Width();
+    if (GetLayoutParam()->IsWrapContent(Vert))
+        szRet.cy = rcTest.Height();
+
+    *psz = szRet;
+}
+
 SNSEND
