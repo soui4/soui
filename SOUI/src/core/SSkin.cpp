@@ -674,7 +674,7 @@ SGradientDesc::SGradientDesc()
     m_centerX = m_centerY = 0.5f;
     m_radius.setInvalid();
     m_ratio_radius = 0.5f;
-    m_bFullArc = TRUE;
+    m_startAngle = 0.0f;
     m_gradient.Attach(new SGradient());
 }
 
@@ -698,7 +698,7 @@ GradientInfo SGradientDesc::GetGradientInfo(int nScale, int wid, int hei) const
     case sweep:
         ret.sweep.centerX = m_centerX;
         ret.sweep.centerY = m_centerY;
-        ret.sweep.bFullArc = m_bFullArc;
+        ret.sweep.startAngle = m_startAngle;
         break;
     }
     return ret;

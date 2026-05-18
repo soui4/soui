@@ -512,7 +512,7 @@ class SOUI_EXP SGradientDesc {
     float m_angle;                     // Angle for linear gradients
     float m_centerX;                   // Center X for radial and sweep gradients
     float m_centerY;                   // Center Y for radial and sweep gradients
-    BOOL m_bFullArc;                   // Flag to indicate full arc for sweep gradients
+    float m_startAngle;                // start angle for sweep gradients.
 
   public:
     /**
@@ -545,7 +545,7 @@ class SOUI_EXP SGradientDesc {
         ATTR_FLOAT(L"angle", m_angle, TRUE)
         ATTR_FLOAT(L"centerX", m_centerX, TRUE)
         ATTR_FLOAT(L"centerY", m_centerY, TRUE)
-        ATTR_BOOL(L"fullArc", m_bFullArc, TRUE)
+        ATTR_FLOAT(L"stargAngle", m_startAngle, TRUE)
         ATTR_GRADIENT(L"gradient", m_gradient, TRUE)
         ATTR_CHAIN_PTR(m_gradient, 0)
     SOUI_ATTRS_BREAK()

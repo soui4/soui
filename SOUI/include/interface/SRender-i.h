@@ -1512,7 +1512,7 @@ typedef struct _GradientInfo
         } radial;          // Parameters for radial gradient.
         struct
         {
-            BOOL bFullArc; // True if the sweep gradient is rendered for a full circle.
+            float startAngle; // True if the sweep gradient is rendered for a full circle.
             float centerX; // X-coordinate of the center (0.0 -> 1.0, 0.5 is center).
             float centerY; // Y-coordinate of the center (0.0 -> 1.0, 0.5 is center).
         } sweep;           // Parameters for sweep gradient.
@@ -1931,9 +1931,10 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
      * @param nCount Number of gradient items.
      * @param info Gradient information.
      * @param byAlpha Alpha value for the gradient.
+     * @param pRcBox Optional rectangle to use as gradient bounds instead of path bounds. If NULL, uses path bounds.
      * @return HRESULT indicating success or failure.
      */
-    STDMETHOD_(HRESULT, DrawGradientPath)(THIS_ const IPathS *path, const GradientItem *pGradients, int nCount, const GradientInfo *info, BYTE byAlpha DEF_VAL(0xFF)) PURE;
+    STDMETHOD_(HRESULT, DrawGradientPath)(THIS_ const IPathS *path, const GradientItem *pGradients, int nCount, const GradientInfo *info, BYTE byAlpha DEF_VAL(0xFF), LPCRECT pRcBox DEF_VAL(NULL)) PURE;
 
     /**
      * @brief Draw an icon.

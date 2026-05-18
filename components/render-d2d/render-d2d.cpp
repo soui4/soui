@@ -2336,13 +2336,20 @@ HRESULT SRenderTarget_D2D::DrawGradientRectEx(LPCRECT pRect, POINT ptRoundCorner
     return hr;
 }
 
-HRESULT SRenderTarget_D2D::DrawGradientPath(THIS_ const IPathS *path, const GradientItem *pGradients, int nCount, const GradientInfo *info, BYTE byAlpha)
+HRESULT SRenderTarget_D2D::DrawGradientPath(THIS_ const IPathS *path, const GradientItem *pGradients, int nCount, const GradientInfo *info, BYTE byAlpha, LPCRECT pRcBox)
 {
     SPath_D2D *path2 = (SPath_D2D *)path;
     SAutoRefPtr<SBrush_D2D> br;
     CreateGradientBrush(pGradients, nCount, info, byAlpha, kClamp_TileMode, (IBrushS **)&br);
     CRect rcBox;
-    path->getBounds(&rcBox);
+    if (pRcBox)
+    {
+        rcBox = *pRcBox;
+    }
+    else
+    {
+        path->getBounds(&rcBox);
+    }
     SComPtr<ID2D1Brush> d2dBr = br->toBrush(m_rt, &rcBox);
     SPen_D2D *pen = (SPen_D2D *)(IPenS *)m_curPen;
     SComPtr<ID2D1Brush> penBr = pen->GetColorBrush(m_rt);
