@@ -460,13 +460,6 @@ void SSkinImgCenter::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState
     if (!GetImage() && !GetSvg())
         return;
     SIZE szSkin = _GetSkinSize(GetSvg()!=NULL);
-    CRect rcTarget = *rcDraw;
-    CPoint pt;
-    pt.x = rcTarget.left + (rcTarget.Width() - szSkin.cx) / 2;
-    pt.y = rcTarget.top + (rcTarget.Height() - szSkin.cy) / 2;
-
-    rcTarget = CRect(pt, szSkin);
-
     RECT rcSrc = { 0, 0, szSkin.cx, szSkin.cy };
     if (m_bVertical)
         OffsetRect(&rcSrc, 0, iState * szSkin.cy);
@@ -475,18 +468,16 @@ void SSkinImgCenter::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState
 
     if (GetImage())
     {
+        CRect rcTarget = *rcDraw;
+        rcTarget.DeflateRect((rcTarget.Width() - szSkin.cx) / 2,(rcTarget.Height() - szSkin.cy) / 2);
         pRT->DrawBitmapEx(rcTarget, GetImage(), &rcSrc, GetExpandMode(), byAlpha);
     }
     else
     {
-        if (GetScale() != 100)
-        {
-            // restore rcSrc to original size
-            rcSrc.left = MulDiv(rcSrc.left, 100, GetScale());
-            rcSrc.top = MulDiv(rcSrc.top, 100, GetScale());
-            rcSrc.right = MulDiv(rcSrc.right, 100, GetScale());
-            rcSrc.bottom = MulDiv(rcSrc.bottom, 100, GetScale());
-        }
+        CRect rcTarget = *rcDraw;
+        szSkin.cx = MulDiv(szSkin.cx, GetScale(), 100);
+        szSkin.cy = MulDiv(szSkin.cy, GetScale(), 100);
+        rcTarget.DeflateRect((rcTarget.Width() - szSkin.cx) / 2,(rcTarget.Height() - szSkin.cy) / 2);
         pRT->DrawSVG(GetSvg(), &rcTarget, &rcSrc, byAlpha);
     }
 }
