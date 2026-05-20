@@ -9,6 +9,7 @@
 #include <controls.extend/SChatEdit.h>
 #include <controls.extend/reole/RichEditOle.h>
 #include <controls.extend/SHexEdit.h>
+#include <controls.extend/SSpeedMeter.h>
 #include "SMatrixWindow.h"
 #include "FormatMsgDlg.h"
 #include <math.h>
@@ -1200,4 +1201,20 @@ void CMainDlg::OnGetCaret(IEvtArgs* e)
 {
 	EventGetCaret *e2=sobj_cast<EventGetCaret>(e);
 	e2->strCaret->Assign(L"<caret color=\"rgb(0,0,255)\" animate=\"true\" fadeTime=\"20\" showTime=\"10\" interpolator=\"Accelerate\"/>");
+}
+
+void CMainDlg::OnSpeedInc()
+{
+	SSpeedMeter *pSpeedMeter=FindChildByName2<SSpeedMeter>("speed_ctrl");
+	if(pSpeedMeter){
+		pSpeedMeter->SetValue(pSpeedMeter->GetValue()+rand()%50+10);
+	}
+}
+
+void CMainDlg::OnSpeedDec()
+{
+	SSpeedMeter *pSpeedMeter=FindChildByName2<SSpeedMeter>("speed_ctrl");
+	if(pSpeedMeter){
+		pSpeedMeter->SetValue(pSpeedMeter->GetValue()-rand()%50-10);
+	}
 }

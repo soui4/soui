@@ -9,7 +9,6 @@ SNSBEGIN
 SSpeedMeter::SSpeedMeter() {
 	m_fValue = 0.0f;
 	m_fMinValue = 0.0f;
-	m_fTargetValue = 0.0f;
 	m_nRingWidth = 20;
 	m_fMaxValue = 200.0f;
 	m_ani.Attach(new SFloatAnimator);
@@ -25,27 +24,23 @@ void SSpeedMeter::SetValue(float value)
 		value = m_fMaxValue;
 	if (value < m_fMinValue)
 		value = m_fMinValue;
-	if (value == m_fTargetValue)
+	if (value == m_fValue)
 		return;
-	m_ani->setRange(m_fValue, value);
-	m_fTargetValue = value;
+	float start = m_fValue;
 	if (m_ani->isRunning()) {
+		start = m_ani->getValue();
 		m_ani->end();
 	}
+	m_ani->setRange(start, value);
 	m_ani->start(GetContainer());
+	m_fValue = value;
+	Invalidate();
 }
 
 float SSpeedMeter::GetValue() const {
-	if (m_ani->isRunning()) {
-		return m_fTargetValue;
-	}
-	else {
-		return m_fValue;
-	}
+	return m_fValue;
 }
 void SSpeedMeter::OnPaint(IRenderTarget* pRT) {
-	pRT->SetAntiAlias(TRUE);
-
 	CRect rcClient = GetClientRect();
 	int nAdj = (rcClient.Width() - rcClient.Height()) / 2;
 	if (nAdj > 0) rcClient.DeflateRect(nAdj, 0);
@@ -75,7 +70,7 @@ void SSpeedMeter::OnPaint(IRenderTarget* pRT) {
 		pRT->DrawArc(&rcPro, 150.f, 240, false); // 覆盖一层白色或亮色的当前进度
 	}
 
-	float fSweep = (m_fValue / m_fMaxValue) * 240.f;
+	float fSweep = ((m_fValue-m_fMinValue) / (m_fMaxValue - m_fMinValue)) * 240.f;
 	if (0) {
 		SAutoRefPtr<IPenS> pPen;
 		pRT->CreatePen(PS_SOLID | PS_GEOMETRIC | PS_ENDCAP_ROUND, GETCOLOR(L"#0000FF70"), nProWid, &pPen);
@@ -121,7 +116,7 @@ void SSpeedMeter::DrawTicksAndNumbers(IRenderTarget* pRT, const CPoint& center, 
 	int textOffset = arcWid + m_nRingWidth;
 	// 绘制数字与大刻度
 	for (int i = 0; i <= 4; ++i) {
-		float val = i * (m_fMaxValue / 4.0f);
+		float val = m_fMinValue + i * ((m_fMaxValue - m_fMinValue) / 4.0f);
 		float angle = 150.f + (i * 60.f);
 		float rad = angle * PI / 180.f;
 
@@ -152,12 +147,13 @@ void SSpeedMeter::DrawTicksAndNumbers(IRenderTarget* pRT, const CPoint& center, 
 }
 
 void SSpeedMeter::DrawPointer(IRenderTarget* pRT, const CPoint& center, int radius, int arcWid) {
-	float fSweep = (m_fValue / m_fMaxValue) * 240.f;
+	float fValue = m_ani->isRunning()?m_ani->getValue():m_fValue;
+	float fSweep = ((fValue-m_fMinValue) /(m_fMaxValue - m_fMinValue)) * 240.f;
 	float fAngle = 150.f + fSweep;
 	float fRad = fAngle * PI / 180.f;
 
 	//绘制半透明扇形阴影 ---
-	CAutoRefPtr<IBrushS> pBrush;
+	SAutoRefPtr<IBrushS> pBrush;
 	pRT->CreateSolidColorBrush(GETCOLOR(L"rgba(255,165,0,15)"), &pBrush);
 	pRT->SelectObject(pBrush, NULL);
 	int shadowR = radius - arcWid;
@@ -185,7 +181,7 @@ void SSpeedMeter::DrawPointer(IRenderTarget* pRT, const CPoint& center, int radi
 	pts[2].y = center.y + (int)(nArrowWidth * sin(fRadRight));
 
 	// 创建画刷填充箭头颜色
-	CAutoRefPtr<IBrushS> pPtrBrush;
+	SAutoRefPtr<IBrushS> pPtrBrush;
 	pRT->CreateSolidColorBrush(GETCOLOR(L"#FF4500"), &pPtrBrush);
 	pRT->SelectObject(pPtrBrush, NULL);
 
@@ -199,7 +195,7 @@ void SSpeedMeter::DrawPointer(IRenderTarget* pRT, const CPoint& center, int radi
 	pRT->DrawPolygon(pts, 3); // TRUE 表示闭合路径
 
 	// 绘制中心圆盖 (Hub) ---
-	CAutoRefPtr<IBrushS> pBrush1;
+	SAutoRefPtr<IBrushS> pBrush1;
 	pRT->CreateSolidColorBrush(GETCOLOR(L"#DCDCDC"), &pBrush1);
 	pRT->SelectObject(pBrush1, NULL);
 	CRect rcHub(center.x - 10, center.y - 10, center.x + 10, center.y + 10);
@@ -208,7 +204,7 @@ void SSpeedMeter::DrawPointer(IRenderTarget* pRT, const CPoint& center, int radi
 	// 绘制下方速度数值文字
 	pRT->SetTextColor(GETCOLOR(L"#333333"));
 	CRect rcVal(center.x - 50, center.y + 20, center.x + 50, center.y + 60);
-	pRT->DrawText(SStringT().Format(_T("%.0f"), m_fValue), -1, rcVal, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	pRT->DrawText(SStringT().Format(_T("%.0f"), fValue), -1, rcVal, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 
 	CRect rcUnit(center.x - 40, center.y + 60, center.x + 40, center.y + 80);
 	pRT->SetTextColor(GETCOLOR(L"#999999"));
@@ -218,7 +214,6 @@ void SSpeedMeter::DrawPointer(IRenderTarget* pRT, const CPoint& center, int radi
 void SSpeedMeter::onAnimationUpdate(IValueAnimator* pAnimator)
 {
 	SASSERT(pAnimator == m_ani);
-	m_fValue = m_ani->getValue();
 	Invalidate();
 }
 

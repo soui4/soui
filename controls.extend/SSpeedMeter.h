@@ -1,4 +1,4 @@
-#ifndef _SPEED_METER_H_
+ï»¿#ifndef _SPEED_METER_H_
 #define _SPEED_METER_H_
 #include <valueAnimator/SValueAnimator.h>
 
@@ -19,25 +19,25 @@ protected:
 protected:
 	SOUI_MSG_MAP_BEGIN()
 		MSG_WM_PAINT_EX(OnPaint)
-		SOUI_MSG_MAP_END()
+	SOUI_MSG_MAP_END()
 
-		SOUI_ATTRS_BEGIN()
+	SOUI_ATTRS_BEGIN()
 		ATTR_FLOAT(L"value", m_fValue, FALSE)
+		ATTR_FLOAT(L"minValue", m_fMinValue, FALSE)
 		ATTR_FLOAT(L"maxValue", m_fMaxValue, FALSE)
 		ATTR_FLOAT(L"RingWidth", m_nRingWidth, FALSE)
 		ATTR_CHAIN(*m_ani,0)
-		SOUI_ATTRS_END()
+	SOUI_ATTRS_END()
 
 private:
-	float m_fValue;			// µ±Ç°ËÙ¶È
+	float m_fValue;			// å½“å‰é€Ÿåº¦
 	float m_fMinValue;
-	float m_fMaxValue;		// MAXËÙ¶È
-	int m_nRingWidth;		// »·µÄ¿í¶È
+	float m_fMaxValue;		// MAXé€Ÿåº¦
+	int m_nRingWidth;		// ç¯çš„å®½åº¦
 
-	float m_fTargetValue; // Ä¿±êËÙ¶È
 	SAutoRefPtr<SFloatAnimator> m_ani;
 private:
-	// ÄÚ²¿»æÖÆ¸¨Öúº¯Êı
+	// å†…éƒ¨ç»˜åˆ¶è¾…åŠ©å‡½æ•°
 	void DrawColorArcs(IRenderTarget* pRT, const CRect& rcArc);
 	void DrawTicksAndNumbers(IRenderTarget* pRT, const CPoint& center, int radius, int arcWid);
 	void DrawPointer(IRenderTarget* pRT, const CPoint& center, int radius, int arcWid);

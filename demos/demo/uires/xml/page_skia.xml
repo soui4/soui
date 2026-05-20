@@ -29,5 +29,12 @@
         演示path
       </pathView>
     </page>
+    <page title="SpeedMeter" layout="vbox">
+        <window size="-1,-1" layout="hbox"> 
+          <button name="btn_speed_dec" text="-" size="50,30"/>
+          <button name="btn_speed_inc" text="+" size="50,30"/>
+        </window>
+        <SpeedMeter size="200,200" name="speed_ctrl" value="200" minValue="0" maxValue="300" RingWidth="16" />
+    </page>
   </tabctrl>
 </include>

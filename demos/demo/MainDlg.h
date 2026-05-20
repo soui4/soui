@@ -189,7 +189,8 @@ protected:
 	void OnAnimationStop(IEvtArgs *e);
 
 	void OnGetCaret(IEvtArgs* e);
-
+	void OnSpeedDec();
+	void OnSpeedInc();
     //UI控件的事件及响应函数映射表
 	EVENT_MAP_BEGIN()
 		EVENT_ID_HANDLER(R.id.tray_008,EventTrayNotify::EventID,OnShellTrayNotify)
@@ -248,6 +249,8 @@ protected:
 		EVENT_NAME_COMMAND(L"img_soui",OnSouiClick)
 		EVENT_HANDLER(EventSwndAnimationStop::EventID,OnAnimationStop)
 		EVENT_NAME_HANDLER(L"ctrl_hk1",EventGetCaret::EventID,OnGetCaret)
+		EVENT_NAME_COMMAND(L"btn_speed_dec", OnSpeedDec)
+		EVENT_NAME_COMMAND(L"btn_speed_inc", OnSpeedInc)
 	EVENT_MAP_END2(SHostWnd)	
 
     //HOST消息及响应函数映射表
