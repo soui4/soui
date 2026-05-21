@@ -62,7 +62,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
     delete []argv;
     if(strInput.IsEmpty() || !strInput.EndsWith(_T(".svg"),true))
     {
-        _ftprintf(stderr,_T("Usage: svg2png -i input.xml -o output.png -s size\n"));
+        _ftprintf(stderr,_T("Usage: svg2png -i input.svg -o output.png -s size\n"));
         return -1;
     }
     ISvgObj * pSvg = CreateSvgFromFile(strInput);
