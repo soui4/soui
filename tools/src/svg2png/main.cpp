@@ -34,9 +34,9 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
     SStringT cmdLine(lpstrCmdLine);
     SStringTList strArgs;
     int argc = SplitString(cmdLine, _T(' '), strArgs);
-    if (strArgs[0].Find(_T("svg2png.exe")) == -1)
+    if (strArgs[0].Find(_T("svg2png")) == -1)
     {
-        strArgs.InsertAt(0, _T("svg2png.exe"));
+        strArgs.InsertAt(0, _T("svg2png"));
         argc++;
     }
     TCHAR **argv = new TCHAR *[argc];
