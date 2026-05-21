@@ -18,6 +18,9 @@ set(SQLITE_SRC
 	sqlite3secure.c
 )
 
+set(SQLITE_HEADER
+    sqlite3.h
+)
 source_group("Source Files" FILES ${SQLITE_SRC})
 
 add_library(sqlite3 STATIC ${SQLITE_HEADER} ${SQLITE_SRC})
@@ -25,6 +28,8 @@ add_library(sqlite3 STATIC ${SQLITE_HEADER} ${SQLITE_SRC})
 set_target_properties (sqlite3 PROPERTIES
     FOLDER third-part
 )
+
+install(FILES ${SQLITE_HEADER} DESTINATION include/third-part/sqlite3)
 
 install(TARGETS sqlite3
     CONFIGURATIONS Release

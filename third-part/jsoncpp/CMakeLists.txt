@@ -44,6 +44,8 @@ set_target_properties (jsoncpp PROPERTIES
     FOLDER third-part
 )
 
+install( FILES ${JSONCPP_HEADERS} DESTINATION include/third-part/jsoncpp )
+
 install(TARGETS jsoncpp
     CONFIGURATIONS Release
     RUNTIME DESTINATION bin/Release

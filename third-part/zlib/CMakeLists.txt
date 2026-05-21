@@ -46,6 +46,9 @@ if (NOT CMAKE_SYSTEM_NAME MATCHES Windows)
 target_compile_options(zlib PRIVATE -fPIC)
 endif()
 
+file( GLOB PUBLIC_HEADERS "${CMAKE_CURRENT_LIST_DIR}/*.h" )
+install( FILES ${PUBLIC_HEADERS} DESTINATION include/third-part/zlib )
+
 install(TARGETS zlib
     CONFIGURATIONS Release
     RUNTIME DESTINATION bin/Release
