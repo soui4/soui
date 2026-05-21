@@ -22,6 +22,10 @@ add_dependencies(${current_project} soui4 ${COM_LIBS})
 target_link_libraries(${current_project} soui4)
 
 if(SOUI_ENABLE_COM_LIB)
+    if(CMAKE_SYSTEM_NAME MATCHES Darwin)
+        find_package(GLEW REQUIRED)
+        find_package(glfw3 REQUIRED)
+    endif()
     target_link_libraries(${current_project} ${COM_LIBS} ${COM_DEP_LIBS})
 endif()
 set_target_properties (${current_project} PROPERTIES
