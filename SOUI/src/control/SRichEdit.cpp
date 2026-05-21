@@ -1136,9 +1136,6 @@ int SRichEdit::OnCreate(LPVOID)
         m_pTxtHost = NULL;
         return 1;
     }
-
-    if (!m_fTransparent && m_style.m_crBg == CR_INVALID && !m_pBgSkin)
-        m_style.m_crBg = RGB(0xff, 0xff, 0xff);
     // inplace activate
     m_pTxtHost->GetTextService()->OnTxInPlaceActivate(NULL);
     //默认没有焦点
