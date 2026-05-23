@@ -21,10 +21,50 @@ BOOL RemoveElementFromArray(SArray<T> &arr, T ele)
     return TRUE;
 }
 
+class SMsgLoopWnd : public SNativeWnd
+{
+    BOOL m_hasTimer;
+    IMessageLoop *m_pMsgLoop;
+  public:
+    SMsgLoopWnd(IMessageLoop *pMsgLoop): m_pMsgLoop(pMsgLoop),m_hasTimer(FALSE)
+    {
+    }
+    ~SMsgLoopWnd() {}
+    void OnTimer(UINT_PTR nIDEvent)
+    {
+        if (nIDEvent == TM_POSTTASK)
+        {
+            StopTimer();
+            m_pMsgLoop->ExecutePendingTask();
+        }
+    }
+
+    void StartTimer(){
+        if(!m_hasTimer)
+        {
+            m_hasTimer = TRUE;
+            SetTimer(TM_POSTTASK, 20);
+        }
+    }
+
+    void StopTimer(){
+        if(m_hasTimer)
+        {
+            m_hasTimer = FALSE;
+            KillTimer(TM_POSTTASK);
+        }
+    }
+    BEGIN_MSG_MAP_EX(SMsgLoopWnd)
+        MSG_WM_TIMER(OnTimer)
+        CHAIN_MSG_MAP(SNativeWnd)
+    END_MSG_MAP()
+};
+
 class SMessageLoopPriv {
   public:
-    SMessageLoopPriv(IMessageLoop *pParentLoop = NULL)
+    SMessageLoopPriv(IMessageLoop *pOwner, IMessageLoop *pParentLoop = NULL)
         : m_parentLoop(pParentLoop)
+        , m_msgWnd(pOwner)
     {
     }
     SArray<IMsgFilter *> m_aMsgFilter;
@@ -33,7 +73,7 @@ class SMessageLoopPriv {
     SList<IRunnable *> m_runningQueue;
     SAutoRefPtr<IMessageLoop> m_parentLoop;
     // Window handle for the message loop, used for handling WM_TIMER messages
-    SNativeWnd m_msgWnd;
+    SMsgLoopWnd m_msgWnd;
 };
 
 SMessageLoop::SMessageLoop(IMessageLoop *pParentLoop)
@@ -43,7 +83,7 @@ SMessageLoop::SMessageLoop(IMessageLoop *pParentLoop)
     , m_bDoIdle(FALSE)
     , m_nIdleCount(0)
 {
-    m_priv = new SMessageLoopPriv(pParentLoop);
+    m_priv = new SMessageLoopPriv(this,pParentLoop);
 }
 
 SMessageLoop::~SMessageLoop()
@@ -188,13 +228,6 @@ BOOL SMessageLoop::AddMessageFilter(IMsgFilter *pMessageFilter)
     return TRUE;
 }
 
-static void CALLBACK OnTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
-{
-    KillTimer(hwnd, idEvent);
-    tid_t tid = GetCurrentThreadId();
-    PostThreadMessage(tid, WM_NULL, 0, 0);
-}
-
 BOOL SMessageLoop::PostTask(IRunnable *runable)
 {
     SAutoLock lock(m_cs);
@@ -203,13 +236,9 @@ BOOL SMessageLoop::PostTask(IRunnable *runable)
         SSLOGW() << "msg loop not running now! pending task size:" << m_priv->m_runnables.GetCount();
     }
     m_priv->m_runnables.AddTail(runable->clone());
-    if (m_priv->m_runnables.GetCount() > 5)
+    if (m_bRunning)
     {
-        PostThreadMessage(m_tid, WM_NULL, 0, 0);
-    }
-    else if (m_bRunning)
-    {
-        m_priv->m_msgWnd.SetTimer(TM_POSTTASK, 100, OnTimer); // set max waitting time to 100ms.
+        m_priv->m_msgWnd.StartTimer();
     }
     return TRUE;
 }
@@ -272,7 +301,7 @@ void SMessageLoop::ExecutePendingTask()
     }
     if (m_bRunning)
     {
-        m_priv->m_msgWnd.KillTimer(TM_POSTTASK);
+        m_priv->m_msgWnd.StopTimer();
     }
 }
 
