@@ -806,6 +806,7 @@ void SWindow::SetEventMute(BOOL bMute)
 
 void SWindow::OnContentChanged()
 {
+    MarkCacheDirty(true);
     if (IsVisible(TRUE))
         Invalidate();
     if (GetLayoutParam()->IsWrapContent(Any))

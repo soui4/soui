@@ -1,4 +1,4 @@
-﻿// render-gdi.cpp : Defines the exported functions for the DLL application.
+// render-gdi.cpp : Defines the exported functions for the DLL application.
 //
 
 #include "render-d2d.h"
@@ -677,17 +677,12 @@ SComPtr<ID2D1Brush> SBrush_D2D::toBrush(ID2D1RenderTarget *pRT, LPCRECT pRect) c
 SBitmap_D2D::SBitmap_D2D(IRenderFactory *pRenderFac)
     : TD2DRenderObjImpl<IBitmapS, OT_BITMAP>(pRenderFac)
     , m_lock(NULL)
-    , m_cachedRTForBitmap(NULL)
 {
     m_sz.cx = m_sz.cy = 0;
 }
 
 HRESULT SBitmap_D2D::Init(int nWid, int nHei, const LPVOID pBits /*=NULL*/)
 {
-    // 优化: 清空缓存
-    m_cachedD2DBitmap = NULL;
-    m_cachedRTForBitmap = NULL;
-
     m_bmp2 = NULL;
     m_sz.cx = nWid;
     m_sz.cy = nHei;
@@ -930,20 +925,8 @@ HRESULT SBitmap_D2D::Save2(CTHIS_ LPCWSTR pszFileName, ImgFmt imgFmt) SCONST
 
 SComPtr<ID2D1Bitmap> SBitmap_D2D::toD2D1Bitmap(ID2D1RenderTarget *pRT) const
 {
-    // 优化: 缓存D2D1Bitmap，避免每次都调用CreateBitmapFromWicBitmap
-    // 只有当RenderTarget改变时才重新创建
-    if (m_cachedD2DBitmap && m_cachedRTForBitmap == pRT)
-    {
-        return m_cachedD2DBitmap;
-    }
-
     SComPtr<ID2D1Bitmap> ret;
     pRT->CreateBitmapFromWicBitmap(m_bmp2, &ret);
-
-    // 缓存结果
-    m_cachedD2DBitmap = ret;
-    m_cachedRTForBitmap = pRT;
-
     return ret;
 }
 
@@ -1615,9 +1598,11 @@ HRESULT SRenderTarget_D2D::DrawText(LPCTSTR pszText, int cchLen, LPRECT pRc, UIN
             }
             else
             {
-                // 正常字符，直接添加
-                processedText += SStringW(wstrPtr + i, currentLen);
-                processedLen += currentLen;
+                if(!(uFormat & DT_SINGLELINE) || (wstrPtr[i] != L'\n' && wstrPtr[i] != L'\r')){
+                    // 正常字符，直接添加
+                    processedText += SStringW(wstrPtr + i, currentLen);
+                    processedLen += currentLen;
+                }
                 i += currentLen;
             }
         }

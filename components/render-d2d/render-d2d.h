@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <interface/SRender-i.h>
 
 #include <helper/SColor.h>
@@ -308,9 +308,6 @@ protected:
 	SIZE        m_sz;
 	SComPtr<IWICBitmap> m_bmp2;
 	IWICBitmapLock* m_lock;
-	// 优化: 缓存D2D1Bitmap以避免重复创建
-	mutable SComPtr<ID2D1Bitmap> m_cachedD2DBitmap;
-	mutable ID2D1RenderTarget* m_cachedRTForBitmap;
 };
 
 //////////////////////////////////////////////////////////////////////////

@@ -1199,7 +1199,7 @@ void SRichEdit::OnPaint(IRenderTarget *pRT)
         if (!SUCCEEDED(rt->BitBlt(&rcClient, pRT, rcClient.left, rcClient.top)))
         {
             //从ID2D1HwndRenderTarget复制背景会失败，重新生成背景
-            rt->ClearRect(&rcClient, RGBA(255, 255, 255, 255));
+            rt->ClearRect(&rcClient, RGBA(255, 255, 255, 0));
             SSendMessage(WM_ERASEBKGND, (WPARAM)(IRenderTarget *)rt);
         }
     }
