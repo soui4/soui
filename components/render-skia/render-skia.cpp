@@ -746,7 +746,6 @@ HRESULT SRenderTarget_Skia::FillRectangle(LPCRECT pRect)
 HRESULT SRenderTarget_Skia::DrawRoundRect(LPCRECT pRect, POINT pt)
 {
     SkPaint paint = m_paint;
-    SetPaintXferMode(paint, m_xferMode);
     paint.setColor(SColor(m_curPen->GetColor()).toARGB());
     SLineDashEffect skDash(m_curPen->GetStyle(), m_curPen->GetWidth());
     paint.setPathEffect(skDash.Get());

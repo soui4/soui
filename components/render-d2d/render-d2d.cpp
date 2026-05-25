@@ -1,4 +1,4 @@
-// render-gdi.cpp : Defines the exported functions for the DLL application.
+﻿// render-gdi.cpp : Defines the exported functions for the DLL application.
 //
 
 #include "render-d2d.h"
@@ -3696,56 +3696,76 @@ HRESULT SRenderTarget_D2D::DrawSVG(ISvgObj *pSvgObj, LPCRECT pRect, LPCRECT prcS
     NSVGimage *pSvg = (NSVGimage *)pSvgObj->GetPtr();
     if (!pSvg)
         return E_INVALIDARG;
+    int nDstWidth = pRect->right - pRect->left;
+    int nDstHeight = pRect->bottom - pRect->top;
+    float dstWidth = (float)nDstWidth;
+    float dstHeight = (float)nDstHeight;
 
-    float srcX = 0.0f, srcY = 0.0f;
-    float srcWidth = pSvg->width;
-    float srcHeight = pSvg->height;
-    if (prcSrc)
+    if (m_xferMode == kSrcOver_Mode)
     {
-        srcX = (float)prcSrc->left;
-        srcY = (float)prcSrc->top;
-        srcWidth = (float)(prcSrc->right - prcSrc->left);
-        srcHeight = (float)(prcSrc->bottom - prcSrc->top);
-    }
 
-    if (srcWidth <= 0 || srcHeight <= 0)
+        float srcX = 0.0f, srcY = 0.0f;
+        float srcWidth = pSvg->width;
+        float srcHeight = pSvg->height;
+        if (prcSrc)
+        {
+            srcX = (float)prcSrc->left;
+            srcY = (float)prcSrc->top;
+            srcWidth = (float)(prcSrc->right - prcSrc->left);
+            srcHeight = (float)(prcSrc->bottom - prcSrc->top);
+        }
+
+        if (srcWidth <= 0 || srcHeight <= 0)
+        {
+            srcWidth = (float)(pRect->right - pRect->left);
+            srcHeight = (float)(pRect->bottom - pRect->top);
+        }
+
+        float scaleX = dstWidth / srcWidth;
+        float scaleY = dstHeight / srcHeight;
+        float tx = (float)pRect->left;
+        float ty = (float)pRect->top;
+
+        SRenderFactory_D2D *pFactoryD2D = (SRenderFactory_D2D *)(IRenderFactory *)m_pRenderFactory;
+        ID2D1Factory *pFactory = toD2DFac(m_pRenderFactory);
+        IDWriteFactory *pWriteFactory = pFactoryD2D->GetDWriteFactory();
+
+        SComPtr<ID2D1DrawingStateBlock> stateBlock;
+        pFactory->CreateDrawingStateBlock(NULL, NULL, &stateBlock);
+        m_rt->SaveDrawingState(stateBlock);
+
+        D2D1_RECT_F clipRect = D2D1::RectF(tx, ty, tx + dstWidth, ty + dstHeight);
+        m_rt->PushAxisAlignedClip(clipRect, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
+
+        D2D1_MATRIX_3X2_F oldTransform;
+        m_rt->GetTransform(&oldTransform);
+        D2D1::Matrix3x2F oldTransformMatrix(oldTransform._11, oldTransform._12, oldTransform._21, oldTransform._22, oldTransform._31, oldTransform._32);
+        D2D1::Matrix3x2F globalTransform = D2D1::Matrix3x2F::Translation(-srcX, -srcY) * D2D1::Matrix3x2F::Scale(scaleX, scaleY) * D2D1::Matrix3x2F::Translation(tx, ty) * oldTransformMatrix;
+        m_rt->SetTransform(globalTransform);
+
+        for (NSVGshape *shape = pSvg->shapes; shape != NULL; shape = shape->next)
+            renderNSVGshape(m_rt, pFactory, pSvg, shape, byAlpha, prcSrc);
+
+        for (NSVGtext *text = pSvg->texts; text != NULL; text = text->next)
+            renderNSVGtext(m_rt, pWriteFactory, text, byAlpha, prcSrc);
+
+        m_rt->PopAxisAlignedClip();
+        m_rt->RestoreDrawingState(stateBlock);
+    }
+    else
     {
-        srcWidth = (float)(pRect->right - pRect->left);
-        srcHeight = (float)(pRect->bottom - pRect->top);
+        IRenderTarget *pTempRT = NULL;
+        if (!m_pRenderFactory->CreateRenderTarget(&pTempRT, nDstWidth, nDstHeight))
+            return E_FAIL;
+        SRenderTarget_D2D *pTempRT_D2D = static_cast<SRenderTarget_D2D *>(pTempRT);
+        pTempRT_D2D->BeginDraw();
+        RECT rcDst = { 0, 0, nDstWidth, nDstHeight };
+        pTempRT_D2D->DrawSVG(pSvgObj, &rcDst, prcSrc, 0xFF);
+        pTempRT_D2D->EndDraw();
+        SBitmap_D2D *pTempBmp = static_cast<SBitmap_D2D *>(pTempRT_D2D->m_curBmp);
+        DrawBitmap(pRect,pTempBmp,0,0,byAlpha);
+        pTempRT->Release();
     }
-
-    float dstWidth = (float)(pRect->right - pRect->left);
-    float dstHeight = (float)(pRect->bottom - pRect->top);
-    float scaleX = dstWidth / srcWidth;
-    float scaleY = dstHeight / srcHeight;
-    float tx = (float)pRect->left;
-    float ty = (float)pRect->top;
-
-    SComPtr<ID2D1DrawingStateBlock> stateBlock;
-    ID2D1Factory *pFactory = toD2DFac(m_pRenderFactory);
-    pFactory->CreateDrawingStateBlock(NULL, NULL, &stateBlock);
-    m_rt->SaveDrawingState(stateBlock);
-
-    D2D1_RECT_F clipRect = D2D1::RectF(tx, ty, tx + dstWidth, ty + dstHeight);
-    m_rt->PushAxisAlignedClip(clipRect, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
-
-    D2D1_MATRIX_3X2_F oldTransform;
-    m_rt->GetTransform(&oldTransform);
-    D2D1::Matrix3x2F oldTransformMatrix(oldTransform._11, oldTransform._12, oldTransform._21, oldTransform._22, oldTransform._31, oldTransform._32);
-    D2D1::Matrix3x2F globalTransform = D2D1::Matrix3x2F::Translation(-srcX, -srcY) * D2D1::Matrix3x2F::Scale(scaleX, scaleY) * D2D1::Matrix3x2F::Translation(tx, ty) * oldTransformMatrix;
-    m_rt->SetTransform(globalTransform);
-
-    SRenderFactory_D2D *pFactoryD2D = (SRenderFactory_D2D *)(IRenderFactory *)m_pRenderFactory;
-    IDWriteFactory *pWriteFactory = pFactoryD2D->GetDWriteFactory();
-
-    for (NSVGshape *shape = pSvg->shapes; shape != NULL; shape = shape->next)
-        renderNSVGshape(m_rt, pFactory, pSvg, shape, byAlpha, prcSrc);
-
-    for (NSVGtext *text = pSvg->texts; text != NULL; text = text->next)
-        renderNSVGtext(m_rt, pWriteFactory, text, byAlpha, prcSrc);
-
-    m_rt->PopAxisAlignedClip();
-    m_rt->RestoreDrawingState(stateBlock);
     return S_OK;
 }
 
