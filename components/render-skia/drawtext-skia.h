@@ -36,3 +36,4 @@ private:
 
 
 SkRect DrawText_Skia(SkCanvas* canvas,const wchar_t *text,int len,SkRect box, SkPaint& paint,UINT uFormat);
+SkScalar GetTextHeight_Skia(SkPaint& paint);

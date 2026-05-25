@@ -44,6 +44,28 @@ SkRect DrawText_Skia(SkCanvas* canvas,const wchar_t *text,int len,SkRect box, Sk
     return layout.draw(canvas);
 }
 
+static SkScalar GetTextHeightFromMetrics(SkPaint::FontMetrics &metrics)
+{
+    SkScalar heiGraph = -metrics.fAscent + metrics.fDescent;
+    SkScalar heiAll = -metrics.fTop + metrics.fBottom;
+    if (heiAll > 0 && heiAll <= heiGraph * 1.2f)
+    {
+        return heiAll;
+    }
+    else
+    {
+        static const SkScalar kAddHeight = 4.0f;//添加4个像素的高度
+        return heiGraph + kAddHeight;
+    }
+}
+
+SkScalar GetTextHeight_Skia(SkPaint& paint)
+{
+    SkPaint::FontMetrics metrics;
+    paint.getFontMetrics(&metrics);
+    return GetTextHeightFromMetrics(metrics);
+}
+
 //////////////////////////////////////////////////////////////////////////
 void SkTextLayoutEx::init( const wchar_t text[], size_t length,SkRect rc,  SkPaint &paint,UINT uFormat )
 {
@@ -188,8 +210,7 @@ SkRect SkTextLayoutEx::draw( SkCanvas* canvas )
 {
     SkPaint::FontMetrics metrics;
     m_paint->getFontMetrics(&metrics);
-    float lineSpan = m_paint->getFontSpacing();
-
+    float lineSpan = GetTextHeightFromMetrics(metrics);
     SkRect rcDraw = m_rcBound;
 
     float  x;
