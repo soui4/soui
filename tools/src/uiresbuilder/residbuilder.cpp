@@ -161,7 +161,7 @@ int MultiByteToWideChar(int cp, int flags, const char *src, int len, wchar_t *ds
 	}
 	
 	// Only support UTF-8 (CP_UTF8 = 65001)
-	if (cp != 65001) {
+	if (cp != 65001 && cp != CP_ACP) {
 		return 0;
 	}
 	
@@ -193,12 +193,12 @@ int MultiByteToWideChar(int cp, int flags, const char *src, int len, wchar_t *ds
 
 // Convert wide character string to UTF-8 multibyte string
 int WideCharToMultiByte(int cp, int flags, const wchar_t *src, int len, char *dst, int dstLen, LPCSTR p1, BOOL *p2){
-	if (!src || !dst || dstLen <= 0) {
+	if (!src) {
 		return 0;
 	}
 	
 	// Only support UTF-8 (CP_UTF8 = 65001)
-	if (cp != 65001) {
+	if (cp != 65001 && cp != CP_ACP) {
 		return 0;
 	}
 	
@@ -209,23 +209,32 @@ int WideCharToMultiByte(int cp, int flags, const wchar_t *src, int len, char *ds
 	
 	int srcPos = 0;
 	int dstPos = 0;
-	
-	while (srcPos < len) {
-		unsigned int codepoint = (unsigned int)src[srcPos];
+	const wchar_t *wSrc = src;
+	const wchar_t *wSrcEnd = src + len;
+	for(;wSrc < wSrcEnd;) {
+		unsigned int codepoint = (unsigned int)*wSrc++;
 		char utf8Buf[4];
 		int bytesNeeded = unicode_to_utf8(codepoint, utf8Buf, sizeof(utf8Buf));
 		
-		if (bytesNeeded <= 0 || dstPos + bytesNeeded >= dstLen) {
-			break; // Not enough space or invalid code point
+		if (bytesNeeded <= 0) {
+			break; //invalid code point
 		}
 		
-		memcpy(dst + dstPos, utf8Buf, bytesNeeded);
+		if(dst)
+		{
+			if(dstPos + bytesNeeded <= dstLen)
+			{
+				memcpy(dst + dstPos, utf8Buf, bytesNeeded);
+			}else{
+				break;
+			}
+		}
 		dstPos += bytesNeeded;
-		srcPos++;
 	}
 	
 	// Null-terminate
-	dst[dstPos] = '\0';
+	if (dst && dstPos < dstLen)
+		dst[dstPos] = '\0';
 	
 	return dstPos;
 }
@@ -633,7 +642,7 @@ void ParseLayout(TiXmlElement *xmlNode,map<wstring,int> &vecName2ID,int & nStart
 			}
 		}else
 		{
-			printf("Warning!!! a empty name was assigned to a window object!\n");
+			printf("Warning!!! an empty name was assigned to a window object!\n");
 		}
     }
     TiXmlElement *pChild = xmlNode->FirstChildElement();
