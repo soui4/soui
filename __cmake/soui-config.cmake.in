@@ -21,6 +21,7 @@ set(SOUI_INCLUDE_DIRS
     ${includedir}/@SWINX_CFLAGS@)
 
 # Library directories
+set(SOUI_LIBRARY_PATH ${libdir})
 set(SOUI_LIBRARY_DIRS ${libdir} ${libdir}/${CMAKE_BUILD_TYPE})
 
 # Static library configuration

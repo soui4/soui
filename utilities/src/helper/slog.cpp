@@ -51,12 +51,8 @@ SLog::~SLog()
         const int kMaxLog = SLog::MAX_LOGLEN + 100;
         char *logbuf2 = (char *)malloc(kMaxLog + 1);
         uint32_t tid = (uint32_t)GetCurrentThreadId();
-#ifdef _WIN32
         int nLen = _snprintf(logbuf2, kMaxLog, "tid=%u,%04d-%02d-%02d %02d:%02d:%02d %03dms %s,%s %s %s:%d\n", tid, wtm.wYear, wtm.wMonth, wtm.wDay, wtm.wHour, wtm.wMinute, wtm.wSecond, wtm.wMilliseconds, m_tag, m_logBuf, m_func, m_file, m_line);
-#else
-        int nLen = _snprintf(logbuf2, kMaxLog, "tid=%u,%04d-%02d-%02d %02d:%02d:%02d %03dms %s,%s %s %s:%d\n", tid, wtm.wYear, wtm.wMonth, wtm.wDay, wtm.wHour, wtm.wMinute, wtm.wSecond, wtm.wMilliseconds, m_tag, m_logBuf, m_func, m_file, m_line);
-#endif //_WIN32
-        if (nLen > 0)
+        if (nLen > 0 && nLen <= kMaxLog)
         {
             logbuf2[nLen] = 0;
             if (IsConsoleProgram())
@@ -196,7 +192,7 @@ SLogStream &SLogStream::writeFormat(const wchar_t *fmt2, ...)
     const wchar_t *fmt = fmt2;
 #endif //_WIN32
 
-    wchar_t logbuf[SNS::SLog::MAX_LOGLEN] = { 0 };
+    wchar_t logbuf[SNS::SLog::MAX_LOGLEN+1] = { 0 };
     va_list args;
     va_start(args, fmt2);
     int ret = vswprintf(logbuf, SNS::SLog::MAX_LOGLEN, fmt, args);
@@ -204,6 +200,8 @@ SLogStream &SLogStream::writeFormat(const wchar_t *fmt2, ...)
 #ifndef _WIN32
     free(fmt);
 #endif //_WIN32
+    if (ret < 0  || ret > SNS::SLog::MAX_LOGLEN)
+        return *this;
     return writeWString(logbuf, ret);
 }
 
@@ -216,7 +214,7 @@ SLogStream &SLogStream::writeFormat(const char *fmt, ...)
         int len = 0;
         int count = (int)(_end - _cur) - 1;
         len = vsnprintf(_cur, count, fmt, args);
-        if (len == count || (len == -1 && errno == E_RANGE))
+        if (len >= count || (len == -1 && errno == E_RANGE))
         {
             len = count;
             *(_end - 1) = '\0';
