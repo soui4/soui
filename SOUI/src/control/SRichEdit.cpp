@@ -2190,6 +2190,10 @@ void SRichEdit::OnRebuildFont()
 {
     __baseCls::OnRebuildFont();
     OnSetFont(NULL, FALSE); //更新默认字体
+    if (!IsRichScale())
+    {
+        SSendMessage(WM_NCCALCSIZE); // 更新内边距
+    }
 }
 
 void SRichEdit::OnEnable(BOOL bEnable, UINT nStatus)
