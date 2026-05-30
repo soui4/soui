@@ -123,6 +123,7 @@ SkScalerContext::~SkScalerContext() {
     SkSafeUnref(fRasterizer);
     
     //Cleanup fallback font cache
+    SkAutoMutexAcquire ac(fFallbackMutex);
     for (int i = 0; i < fFallbackCount; ++i) {
         if (fFallbackFonts[i].fScalerContext) {
             SkDELETE(fFallbackFonts[i].fScalerContext);
@@ -808,18 +809,9 @@ protected:
 ///////////////////////////////////////////////////////////////////////////////
 // Font Fallback Cache Implementation
 ///////////////////////////////////////////////////////////////////////////////
-
-int SkScalerContext::findFallbackByTypeface(SkTypeface* typeface) const {
-    for (int i = 0; i < fFallbackCount; ++i) {
-        if (fFallbackFonts[i].fTypeface == typeface) {
-            return i;
-        }
-    }
-    return -1;
-}
-
 FunFontFallback SkScalerContext::s_funFontFallback = NULL;
 SkScalerContext* SkScalerContext::findOrCreateFallbackContext(SkUnichar uni) {
+    SkAutoMutexAcquire ac(fFallbackMutex);
     // First, try to find the char from existed fallback fonts
     for(int i=0; i<fFallbackCount; ++i){
         FallbackFont & context = fFallbackFonts[i];

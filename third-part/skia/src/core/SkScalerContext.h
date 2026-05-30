@@ -12,6 +12,7 @@
 #include "SkMaskGamma.h"
 #include "SkMatrix.h"
 #include "SkPaint.h"
+#include "SkThread.h"
 #include "SkTypeface.h"
 
 struct SkGlyph;
@@ -314,11 +315,10 @@ private:
     static const int kMaxFallbackFonts = 8;  /**< Maximum number of cached fallback fonts */
     FallbackFont          fFallbackFonts[kMaxFallbackFonts];  /**< Array of cached fallback fonts */
     int                   fFallbackCount;    /**< Number of active fallback fonts */
+    mutable SkMutex       fFallbackMutex;    /**< Mutex for thread-safe access to fallback fonts */
     
     // Helper methods for fallback management
     SkScalerContext* findOrCreateFallbackContext(SkUnichar uni);  /**< Find or create fallback context for character */
-    int findFallbackByTypeface(SkTypeface* typeface) const;  /**< Find fallback font index by typeface */
-
     // SkMaskGamma::PreBlend converts linear masks to gamma correcting masks.
 protected:
     // Visible to subclasses so that generateImage can apply the pre-blend directly.
