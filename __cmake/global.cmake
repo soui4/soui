@@ -24,8 +24,6 @@ endif()
 macro( readSettingFile CFG_FILE KEY DEFAULT_RESULT STRING_RESULT_OUT)
 
     unset(STRING_RESULT)
-
-    file (TO_CMAKE_PATH "$ENV{SOUI4PATH}" SOUIROOTPATH)
     file(STRINGS "${CFG_FILE}" CONFIGSTRING )
 
     foreach(LINE ${CONFIGSTRING})
@@ -248,8 +246,7 @@ macro(add_app_res_folder_with_deps app_name res_path dest_path)
                 "$<TARGET_FILE_DIR:${app_name}>/${dest_path}/${relative_dir}"
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
                 "${res_file}"
-                "$<TARGET_FILE_DIR:${app_name}>/${dest_path}/${relative_dir}"
-            DEPENDS ${res_file}
+                "$<TARGET_FILE_DIR:${app_name}>/${dest_path}/${relative_file}"
             COMMENT "Copying ${relative_file}"
         )
     endforeach()

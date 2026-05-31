@@ -704,6 +704,12 @@ BOOL SNativeWnd::ShowWindow(int nCmdShow)
     return ::ShowWindow(m_hWnd, nCmdShow);
 }
 
+BOOL SNativeWnd::UpdateWindow()
+{
+    SASSERT(::IsWindow(m_hWnd));
+    return ::UpdateWindow(m_hWnd);
+}
+
 BOOL SNativeWnd::MoveWindow2(LPCRECT lpRect, BOOL bRepaint /*= TRUE*/)
 {
     SASSERT(::IsWindow(m_hWnd));

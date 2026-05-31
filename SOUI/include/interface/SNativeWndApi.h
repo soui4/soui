@@ -465,6 +465,11 @@ STDMETHOD_(BOOL, MoveWindow2)(THIS_ LPCRECT lpRect, BOOL bRepaint /*= TRUE*/) PU
 STDMETHOD_(BOOL, ShowWindow)(THIS_ int nCmdShow) PURE;
 
 /**
+ * @brief Updates the window.
+ */
+STDMETHOD_(BOOL, UpdateWindow)(THIS) PURE;
+
+/**
  * @brief Sets the window region.
  *
  * @param hRgn Handle to the region.

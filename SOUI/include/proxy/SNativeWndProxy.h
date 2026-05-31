@@ -257,6 +257,12 @@ public:
 	{
 		return SNativeWnd::ShowWindow(nCmdShow);
 	}
+
+	STDMETHOD_(BOOL, UpdateWindow)(THIS) OVERRIDE
+	{
+		return SNativeWnd::UpdateWindow();
+    }
+
 	STDMETHOD_(int, SetWindowRgn)(THIS_ HRGN hRgn, BOOL bRedraw = TRUE) OVERRIDE
 	{
 		return SNativeWnd::SetWindowRgn(hRgn, bRedraw);

@@ -272,6 +272,12 @@ public:
 	{
 		return SHostWnd::ShowWindow(nCmdShow);
 	}
+
+	STDMETHOD_(BOOL, UpdateWindow)(THIS) OVERRIDE
+	{
+		return SHostWnd::UpdateWindow();
+    }
+
 	STDMETHOD_(int, SetWindowRgn)(THIS_ HRGN hRgn, BOOL bRedraw = TRUE) OVERRIDE
 	{
 		return SHostWnd::SetWindowRgn(hRgn, bRedraw);

@@ -92,6 +92,10 @@ public:
 	 * @remark task loop will hold a clone of the pTask.
      */
 	STDMETHOD_(void,setHeartBeatTask)(THIS_ IRunnable *pTask, int intervel) OVERRIDE;
+
+	STDMETHOD_(void,setListener)(THIS_ ITaskLoopListener *listener) OVERRIDE;
+	STDMETHOD_(ITaskLoopListener*,getListener)(THIS) OVERRIDE;
+
 private:
 	class TaskItem
 	{
@@ -129,11 +133,12 @@ private:
 	std::string m_runingItemInfo;
 	TaskItem m_runningItem;
 	long m_nextTaskID;
-
 	SCriticalSection m_csHeartBeatTask;
 	SAutoRefPtr<IRunnable> m_heartBeatTask;
 	unsigned int	m_nHeartBeatInterval;
 	unsigned int	m_tsTick;
+
+	ITaskLoopListener *m_listener;
 };
 
 namespace TASKLOOP

@@ -1,4 +1,4 @@
-﻿#include <windows.h>
+#include <windows.h>
 #include "TaskLoop.h"
 #include <helper/obj-ref-impl.hpp>
 #include <algorithm>
@@ -19,7 +19,9 @@ SNSBEGIN
 		m_hasRunningItem(false),
 		m_runningItem(NULL,0),
 		m_nextTaskID(0),
-		m_nHeartBeatInterval(INFINITE)
+		m_nHeartBeatInterval(INFINITE),
+		m_tsTick(-1),
+		m_listener(NULL)
 	{
 	}
 
@@ -112,6 +114,11 @@ SNSBEGIN
 
 	void STaskLoop::runLoopProc()
 	{
+		if (m_listener)
+		{
+			m_listener->onStart(this);
+		}
+
 		unsigned int interval=INFINITE;
 		{
 			SAutoLock autoLock(m_csHeartBeatTask);
@@ -206,6 +213,11 @@ SNSBEGIN
 		}
 
 		m_items.clear();
+
+		if (m_listener)
+		{
+			m_listener->onStop(this);
+		}
 	}
 
 	BOOL STaskLoop::getName(char * pszBuf, int nBufLen)
@@ -318,6 +330,16 @@ SNSBEGIN
 			timeEndPeriod(1);
 			#endif//_WIN32
 		}
+	}
+
+	void STaskLoop::setListener(ITaskLoopListener *listener)
+	{
+		m_listener = listener;
+	}
+
+	ITaskLoopListener* STaskLoop::getListener()
+	{
+		return m_listener;
 	}
 
 

@@ -618,6 +618,11 @@ class SOUI_EXP SNativeWnd : public TObjRefImpl<INativeWnd> {
     STDMETHOD_(BOOL, ShowWindow)(THIS_ int nCmdShow) OVERRIDE;
 
     /**
+     * @brief Updates the window.
+     */
+    STDMETHOD_(BOOL, UpdateWindow)(THIS) OVERRIDE;
+
+    /**
      * @brief Sets the window region.
      *
      * @param hRgn Handle to the region.

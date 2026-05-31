@@ -12,6 +12,24 @@ typedef enum Priority
     Low = -1,
 } Priority;
 
+typedef struct ITaskLoop ITaskLoop;
+#undef INTERFACE
+#define INTERFACE ITaskLoopListener
+DECLARE_INTERFACE(ITaskLoopListener)
+{
+    /**
+     * @brief 任务循环启动前回调
+     * @param taskLoop ITaskLoop* -- 任务循环对象
+     */
+    STDMETHOD_(void, onStart)(THIS_ ITaskLoop *taskLoop) PURE;
+
+    /**
+     * @brief 任务循环退出前回调
+     * @param taskLoop ITaskLoop* -- 任务循环对象
+     */
+    STDMETHOD_(void, onStop)(THIS_ ITaskLoop *taskLoop) PURE;
+};
+
 #undef INTERFACE
 #define INTERFACE ITaskLoop
 DECLARE_INTERFACE_(ITaskLoop, IObjRef)
@@ -108,6 +126,20 @@ DECLARE_INTERFACE_(ITaskLoop, IObjRef)
      * @remark 任务循环将持有pTask的克隆。将pTask设置为null以停止心跳。
      */
     STDMETHOD_(void, setHeartBeatTask)(THIS_ IRunnable * pTask, int intervel) PURE;
+
+    /**
+     * @brief 设置任务循环监听器
+     * @param listener ITaskLoopListener* -- 监听器对象
+     * @return void
+     * @remark 任务循环不拥有listener，调用者需要自行管理生命周期
+     */
+    STDMETHOD_(void, setListener)(THIS_ ITaskLoopListener *listener) PURE;
+
+    /**
+     * @brief 获取任务循环监听器
+     * @return ITaskLoopListener* -- 监听器对象
+     */
+    STDMETHOD_(ITaskLoopListener*, getListener)(THIS) PURE;
 };
 
 SNSEND
