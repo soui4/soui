@@ -870,7 +870,6 @@ int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
     {
         m_presenter.Attach(new SHostPresenter(this));
     }
-    m_presenter->OnHostCreate();
     m_dwThreadID = GetCurrentThreadId();
     SHostMgr::getSingletonPtr()->AddHostMsgHandler(m_hWnd);
     UpdateAutoSizeCount(true);
@@ -892,6 +891,7 @@ int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
     m_pRoot->SetContainer(this);
     SwndContainerImpl::SetRoot(m_pRoot);
 
+    m_presenter->OnHostCreate();
     // load xml resource
     SXmlDoc xmlDoc;
     SXmlNode xmlRoot;

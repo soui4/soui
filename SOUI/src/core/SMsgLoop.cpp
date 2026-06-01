@@ -43,7 +43,7 @@ class SMsgLoopWnd : public SNativeWnd
         if(!m_hasTimer)
         {
             m_hasTimer = TRUE;
-            SetTimer(TM_POSTTASK, 20);
+            SetTimer(TM_POSTTASK, 0);
         }
     }
 
@@ -93,6 +93,7 @@ SMessageLoop::~SMessageLoop()
 
 void SMessageLoop::OnMsg(LPMSG pMsg)
 {
+    ExecutePendingTask();
     if (!PreTranslateMessage(pMsg))
     {
         ::TranslateMessage(pMsg);
@@ -349,7 +350,6 @@ int SMessageLoop::HandleMsg(THIS)
             m_bQuit = TRUE;
             break;
         }
-        ExecutePendingTask();
         OnMsg(&msg);
         m_bDoIdle = IsIdleMessage(&msg);
         if (m_bDoIdle)

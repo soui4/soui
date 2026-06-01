@@ -162,8 +162,8 @@ STileImageFilter::~STileImageFilter(void)
 
 STDMETHODIMP_(void) STileImageFilter::Init(THIS_ RECT srcRect, RECT dstRect, IImageFilter *input)
 {
-    SkRect skSrcRect = SkRect::MakeXYWH(srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top);
-    SkRect skDstRect = SkRect::MakeXYWH(dstRect.left, dstRect.top, dstRect.right - dstRect.left, dstRect.bottom - dstRect.top);
+    SkRect skSrcRect = SkRect::MakeXYWH((SkScalar)srcRect.left, (SkScalar)srcRect.top, (SkScalar)(srcRect.right - srcRect.left),(SkScalar)(srcRect.bottom - srcRect.top));
+    SkRect skDstRect = SkRect::MakeXYWH((SkScalar)dstRect.left, (SkScalar)dstRect.top, (SkScalar)(dstRect.right - dstRect.left), (SkScalar)(dstRect.bottom - dstRect.top));
 
     SkImageFilter *inputFilter = NULL;
     if (input)
