@@ -308,7 +308,7 @@ class SAnimatorHandler {
     void UpdateTransformation();
     STransformation GetTransformation(AnimatorHolder *pHolder, int wid, int hei, int nScale) const;
 
-    SList<SAutoRefPtr<AnimatorHolder>> m_lstAnimator;
+    SList<SAutoRefPtr<AnimatorHolder> > m_lstAnimator;
 };
 
 SAnimatorHandler::SAnimatorHandler(SWindow *pOwner)

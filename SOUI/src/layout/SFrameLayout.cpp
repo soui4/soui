@@ -183,7 +183,7 @@ void *SFrameLayoutParam::GetRawData()
 ILayoutParam *SFrameLayoutParam::Clone() const
 {
     SFrameLayoutParam *pRet = new SFrameLayoutParam();
-    memcpy(pRet->GetRawData(), (SFrameLayoutParamStruct *)this, sizeof(SFrameLayoutParamStruct));
+    memcpy(pRet->GetRawData(), (void*)(SFrameLayoutParamStruct *)this, sizeof(SFrameLayoutParamStruct));
     return pRet;
 }
 
@@ -405,7 +405,7 @@ void SFrameLayout::LayoutDockTopBottom(IWindow *pParent, SList<ChildInfo *> &lst
 
     // 将窗口分组到不同的行中
     // 规则：如果窗口没有dockRelativeTo，或者其dockRelativeTo引用的是前一行的最后一个窗口，则另起一行
-    SList<SList<ChildInfo *>> lstRows;
+    SList<SList<ChildInfo *> > lstRows;
 
     SPOSITION pos = lstOrdered.GetHeadPosition();
     while (pos)
@@ -632,7 +632,7 @@ void SFrameLayout::LayoutDockLeftRight(IWindow *pParent, SList<ChildInfo *> &lst
 
     // 将窗口分组到不同的列中
     // 规则：如果窗口没有dockRelativeTo，或者其dockRelativeTo引用的是前一列的最后一个窗口，则另起一列
-    SList<SList<ChildInfo *>> lstColumns;
+    SList<SList<ChildInfo *> > lstColumns;
 
     SPOSITION pos = lstOrdered.GetHeadPosition();
     while (pos)

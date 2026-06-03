@@ -1361,7 +1361,7 @@ class SOUI_EXP SSKinGroup2 : public SSkinObjBase {
     void _Scale(ISkinObj *skinObj, int nScale) override;
 
   protected:
-    SArray<SAutoRefPtr<ISkinObj>> m_skins; // Array of skins for different states.
+    SArray<SAutoRefPtr<ISkinObj> > m_skins; // Array of skins for different states.
 };
 
 /**

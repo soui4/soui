@@ -119,7 +119,7 @@ void *SFlowLayoutParam::GetRawData()
 ILayoutParam *SFlowLayoutParam::Clone() const
 {
     SFlowLayoutParam *pClone = new SFlowLayoutParam();
-    memcpy(pClone->GetRawData(), (SFlowLayoutParamStruct*)this, sizeof(SFlowLayoutParamStruct));
+    memcpy(pClone->GetRawData(), (void*)(SFlowLayoutParamStruct*)this, sizeof(SFlowLayoutParamStruct));
     return pClone;
 }
 

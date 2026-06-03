@@ -7,7 +7,7 @@
 
 SNSBEGIN
 
-typedef TObjRefImpl<SObjectImpl<IInterpolator>> SInterpolatorBase;
+typedef TObjRefImpl<SObjectImpl<IInterpolator> > SInterpolatorBase;
 
 /**
  * @class SLinearInterpolator

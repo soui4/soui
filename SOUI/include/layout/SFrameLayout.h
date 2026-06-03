@@ -30,7 +30,7 @@ static const LPCWSTR kDockMode_All = L"all";
 } // namespace FrameLayout_DockMode
 
 class SOUI_EXP SFrameLayoutParam
-    : public TObjRefImpl<SObjectImpl<ILayoutParam>>
+    : public TObjRefImpl<SObjectImpl<ILayoutParam> >
     , public SFrameLayoutParamStruct {
     DEF_SOBJECT(SObjectImpl<ILayoutParam>, L"FrameLayoutParam")
 
@@ -80,7 +80,7 @@ struct FrameLayoutItemInfo : SFrameLayoutParamStruct
     BOOL bVisible;
 };
 
-class SOUI_EXP SFrameLayout : public TObjRefImpl<SObjectImpl<ILayout>> {
+class SOUI_EXP SFrameLayout : public TObjRefImpl<SObjectImpl<ILayout> > {
     DEF_SOBJECT_EX(SObjectImpl<ILayout>, L"frameLayout", L"frame")
 
   public:

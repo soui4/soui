@@ -72,7 +72,7 @@ void STimerlineHandlerMgr::OnNextFrame()
         pHandlers[i]->OnNextFrame();
     }
     delete[] pHandlers;
-    SList<SAutoRefPtr<IValueAnimator>> lstAnimators;
+    SList<SAutoRefPtr<IValueAnimator> > lstAnimators;
     lstAnimators.Copy(m_lstAnimators);
     pos = lstAnimators.GetHeadPosition();
     while (pos)

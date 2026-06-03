@@ -12,7 +12,7 @@ SNSBEGIN
  * @brief 流式布局参数类
  */
 class SOUI_EXP SFlowLayoutParam
-    : public TObjRefImpl<SObjectImpl<ILayoutParam>>
+    : public TObjRefImpl<SObjectImpl<ILayoutParam> >
     , public SFlowLayoutParamStruct {
     DEF_SOBJECT(SObjectImpl<ILayoutParam>, L"FlowLayoutParam")
 
@@ -134,7 +134,7 @@ class SOUI_EXP SFlowLayoutParam
  * 水平方向：元素从左到右排列，当达到容器宽度时换行到下一行
  * 垂直方向：元素从上到下排列，当达到容器高度时换到下一列
  */
-class SOUI_EXP SFlowLayout : public TObjRefImpl<SObjectImpl<ILayout>> {
+class SOUI_EXP SFlowLayout : public TObjRefImpl<SObjectImpl<ILayout> > {
     DEF_SOBJECT_EX(SObjectImpl<ILayout>, L"flowLayout", L"flow")
 
   public:

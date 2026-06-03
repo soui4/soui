@@ -154,7 +154,7 @@ class SOUI_EXP SPropertyAnimator
 
   private:
     SAutoRefPtr<IWindow> m_pTarget;
-    SArray<SAutoRefPtr<IPropertyValuesHolder>> m_propertyHolders;
+    SArray<SAutoRefPtr<IPropertyValuesHolder> > m_propertyHolders;
 };
 
 SNSEND

@@ -297,7 +297,7 @@ void *SGridLayoutParam::GetRawData()
 ILayoutParam *SGridLayoutParam::Clone() const
 {
     SGridLayoutParam *pRet = new SGridLayoutParam();
-    memcpy(pRet->GetRawData(), (SGridLayoutParamStruct *)this, sizeof(SGridLayoutParamStruct));
+    memcpy(pRet->GetRawData(), (void*)(SGridLayoutParamStruct *)this, sizeof(SGridLayoutParamStruct));
     return pRet;
 }
 

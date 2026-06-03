@@ -2290,7 +2290,7 @@ LRESULT SRichEdit::OnGetRect(UINT uMsg, WPARAM wp, LPARAM lp)
 
 BOOL SRichEdit::OnTxSetTimer(UINT idTimer, UINT uTimeout)
 {
-    SMap<UINT, SAutoRefPtr<ITimer>>::CPair *p = m_mapTimer.Lookup(idTimer);
+    SMap<UINT, SAutoRefPtr<ITimer> >::CPair *p = m_mapTimer.Lookup(idTimer);
     if (p)
     {
         p->m_value->KillTimer();

@@ -12,7 +12,7 @@ SNSBEGIN
  * @brief 9锚点布局参数类
  */
 class SOUI_EXP SAnchorLayoutParam
-    : public TObjRefImpl<SObjectImpl<ILayoutParam>>
+    : public TObjRefImpl<SObjectImpl<ILayoutParam> >
     , public SAnchorLayoutParamStruct {
     DEF_SOBJECT(SObjectImpl<ILayoutParam>, L"AnchorLayoutParam")
 
@@ -144,7 +144,7 @@ class SOUI_EXP SAnchorLayoutParam
  * @class SouiLayout
  * @brief Soui布局类
  */
-class SOUI_EXP SAnchorLayout : public TObjRefImpl<SObjectImpl<ILayout>> {
+class SOUI_EXP SAnchorLayout : public TObjRefImpl<SObjectImpl<ILayout> > {
     DEF_SOBJECT(SObjectImpl<ILayout>, L"Anchor")
 
   public:

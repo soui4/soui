@@ -191,7 +191,7 @@ void *SLinearLayoutParam::GetRawData()
 ILayoutParam *SLinearLayoutParam::Clone() const
 {
     SLinearLayoutParam *pRet = new SLinearLayoutParam();
-    memcpy(pRet->GetRawData(), (SLinearLayoutParamStruct *)this, sizeof(SLinearLayoutParamStruct));
+    memcpy(pRet->GetRawData(), (void*)(SLinearLayoutParamStruct *)this, sizeof(SLinearLayoutParamStruct));
     return pRet;
 }
 
