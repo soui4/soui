@@ -48,7 +48,7 @@ static SkScalar GetTextHeightFromMetrics(SkPaint::FontMetrics &metrics)
 {
     SkScalar heiGraph = -metrics.fAscent + metrics.fDescent;
     SkScalar heiAll = -metrics.fTop + metrics.fBottom;
-    if (heiAll > 0 && heiAll <= heiGraph * 1.2f)
+    if (heiAll > 0 && heiAll <= heiGraph * 1.5f)
     {
         return heiAll;
     }
