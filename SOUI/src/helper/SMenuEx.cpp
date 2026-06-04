@@ -946,6 +946,8 @@ void SMenuEx::RunMenu(HWND hRoot)
 
     SAutoRefPtr<IMessageLoop> msgLoop;
     SApplication::getSingletonPtr()->GetMsgLoopFactory()->CreateMsgLoop(&msgLoop, GetMsgLoop());
+    if(s_MenuData->GetOwner())
+        ::SendMessage(s_MenuData->GetOwner(), WM_ENTERMENULOOP, 0, 0);
     for (;;)
     {
 
@@ -1041,6 +1043,8 @@ void SMenuEx::RunMenu(HWND hRoot)
             break;
         }
     }
+    if(s_MenuData->GetOwner())
+        ::SendMessage(s_MenuData->GetOwner(), WM_EXITMENULOOP, 0, 0);
 }
 
 class SMenuExEventOwner {
