@@ -879,7 +879,9 @@ class SOUI_EXP SProgress
     HRESULT OnAttrRange(const SStringW &strValue, BOOL bLoading);
     SOUI_ATTRS_BEGIN()
         ATTR_SKIN(L"bkgndSkin", m_pSkinBg, TRUE)
+		ATTR_SKIN(L"trackSkin", m_pSkinBg, TRUE)
         ATTR_SKIN(L"posSkin", m_pSkinPos, TRUE)
+        ATTR_SKIN(L"filledSkin", m_pSkinPos, TRUE)
         ATTR_SKIN(L"waveSkin", m_pSkinWaveEffect, TRUE)
         ATTR_INT(L"min", m_nMinValue, FALSE)
         ATTR_INT(L"max", m_nMaxValue, FALSE)

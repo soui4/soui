@@ -30,7 +30,11 @@ SNSBEGIN
  */
 class SOUI_EXP SSkinImgList : public SSkinObjBase {
     DEF_SOBJECT(SSkinObjBase, L"imglist")
-
+    enum TileMode{
+		TM_Horz = 0,    // Images are arranged horizontally
+		TM_Vert = 1,    // Images are arranged vertically
+		TM_Both = 2     // Images are arranged in a grid
+    };
   public:
     /**
      * @brief Constructor for SSkinImgList.
@@ -169,7 +173,7 @@ class SOUI_EXP SSkinImgList : public SSkinObjBase {
     BOOL m_bVertical;                  // Flag to indicate if images are arranged vertically
     SAutoRefPtr<IBitmapS> m_imgBackup; // Backup of the image before colorization
     FilterLevel m_filterLevel;         // Filter level for image scaling
-
+	TileMode m_tileMode;             // Tile mode for the image
   protected:
     mutable SAutoRefPtr<ISvgObj> m_pSvg;  // Pointer to the SVG object
     mutable SAutoRefPtr<IBitmapS> m_pImg; // Pointer to the bitmap source
@@ -191,6 +195,11 @@ class SOUI_EXP SSkinImgList : public SSkinObjBase {
     SOUI_ATTRS_BEGIN()
         ATTR_CUSTOM(L"src", OnAttrSrc)
         ATTR_BOOL(L"tile", m_bTile, FALSE)         // Draw whether to tile, 0--stretch (default), other--tile
+        ATTR_ENUM_BEGIN(L"tileMode", TileMode, FALSE)         // Tile mode for image scaling
+            ATTR_ENUM_VALUE(L"horz", TM_Horz)
+            ATTR_ENUM_VALUE(L"low", TM_Vert)
+            ATTR_ENUM_VALUE(L"both", TM_Both)
+        ATTR_ENUM_END(m_tileMode)
         ATTR_BOOL(L"autoFit", m_bAutoFit, FALSE)   // autoFit is 0, do not automatically fit to drawing area
         ATTR_BOOL(L"vertical", m_bVertical, FALSE) // Sub-images are vertically arranged, 0--horizontal (default), other--vertical
         ATTR_INT(L"states", m_nStates, FALSE)      // Number of sub-images, default is 1

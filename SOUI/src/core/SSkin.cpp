@@ -206,6 +206,7 @@ SSkinImgList::SSkinImgList()
     , m_bVertical(FALSE)
     , m_filterLevel(kUndef_FilterLevel)
     , m_bAutoFit(TRUE)
+    , m_tileMode(TM_Both)
     , m_bLazyLoad(FALSE)
 {
 }
@@ -294,24 +295,39 @@ void SSkinImgList::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, 
         OffsetRect(&rcSrc, 0, iState * sz.cy);
     else
         OffsetRect(&rcSrc, iState * sz.cx, 0);
-    if (GetImage())
-    {
-        if (m_bTile)
-        {
+    if (m_bTile) {
+        if (GetImage() && m_tileMode == TM_Both) {
             SAutoRefPtr<IBrushS> brush, oldBrush;
             pRT->CreateBitmapBrush(GetImage(), kRepeat_TileMode, kRepeat_TileMode, &brush);
-            pRT->SelectObject(brush, (IRenderObj **)&oldBrush);
+            pRT->SelectObject(brush, (IRenderObj**)&oldBrush);
             pRT->FillRectangle(rcDraw);
             pRT->SelectObject(oldBrush, NULL);
         }
-        else
+        else {
+			int wid = m_tileMode != TM_Vert ? sz.cx : rcDraw->right - rcDraw->left;
+			int hei = m_tileMode != TM_Horz ? sz.cy : rcDraw->bottom - rcDraw->top;
+            for (int y = rcDraw->top; y < rcDraw->bottom; y += hei) {
+                for (int x = rcDraw->left; x < rcDraw->right; x += wid) {
+                    RECT rcTile = { x, y, x + wid, y + hei };
+                    if (GetImage()) {
+                        pRT->DrawBitmapEx(&rcTile, GetImage(), &rcSrc, GetExpandMode(), byAlpha);
+                    }
+                    else {
+                        pRT->DrawSVG(GetSvg(), &rcTile, &rcSrc, byAlpha);
+                    }
+                }
+            }
+        }
+    }
+    else {
+        if (GetImage())
         {
             pRT->DrawBitmapEx(rcDraw, GetImage(), &rcSrc, GetExpandMode(), byAlpha);
         }
-    }
-    else
-    {
-        pRT->DrawSVG(GetSvg(), rcDraw, &rcSrc, byAlpha);
+        else
+        {
+            pRT->DrawSVG(GetSvg(), rcDraw, &rcSrc, byAlpha);
+        }
     }
 }
 
@@ -416,6 +432,7 @@ void SSkinImgList::_Scale(ISkinObj *skinObj, int nScale)
     SSkinImgList *pRet = sobj_cast<SSkinImgList>(skinObj);
     pRet->m_nStates = m_nStates;
     pRet->m_bTile = m_bTile;
+    pRet->m_tileMode = m_tileMode;
     pRet->m_bVertical = m_bVertical;
     pRet->m_filterLevel = m_filterLevel;
     pRet->m_bAutoFit = m_bAutoFit;
