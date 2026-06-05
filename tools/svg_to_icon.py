@@ -9,10 +9,10 @@
     pip install Pillow
 
 使用方法:
-    python svg_to_icon_v2.py input.svg                    # 单个文件转换
-    python svg_to_icon_v2.py input.svg -o output          # 指定输出路径（不含扩展名）
-    python svg_to_icon_v2.py --batch ./icons/             # 批量转换目录下的所有 SVG
-    python svg_to_icon_v2.py input.svg --size 512         # 指定 PNG 渲染尺寸
+    python svg_to_icon.py input.svg                    # 单个文件转换
+    python svg_to_icon.py input.svg -o output          # 指定输出路径（不含扩展名）
+    python svg_to_icon.py --batch ./icons/             # 批量转换目录下的所有 SVG
+    python svg_to_icon.py input.svg --size 512         # 指定 PNG 渲染尺寸
 
 输出:
     - input.ico   : Windows ICO 图标（包含多尺寸：16, 32, 48, 64, 128, 256）
@@ -469,10 +469,10 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 示例:
-  python svg_to_icon_v2.py icon.svg                  # 单个文件转换
-  python svg_to_icon_v2.py icon.svg -o myapp         # 指定输出名称
-  python svg_to_icon_v2.py --batch ./icons/          # 批量转换
-  python svg_to_icon_v2.py icon.svg --size 512       # 指定渲染尺寸
+  python svg_to_icon.py icon.svg                  # 单个文件转换
+  python svg_to_icon.py icon.svg -o myapp         # 指定输出名称
+  python svg_to_icon.py --batch ./icons/          # 批量转换
+  python svg_to_icon.py icon.svg --size 512       # 指定渲染尺寸
         """
     )
     
