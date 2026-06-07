@@ -7,7 +7,7 @@
 #define WM_SYSTIMER 0x0118 //(caret blink)
 #endif                     // WM_SYSTIMER
 
-#define TM_POSTTASK -50
+#define TM_POSTTASK 200   // Timer ID for posting tasks to the message loop
 
 SNSBEGIN
 
