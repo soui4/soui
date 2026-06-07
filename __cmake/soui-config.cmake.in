@@ -8,7 +8,7 @@ set(libdir ${exec_prefix}/lib)
 set(includedir ${prefix}/include)
 
 set(SOUI_VER "@SOUI_VER1@.@SOUI_VER2@.@SOUI_VER3@.@SOUI_VER4@")
-set(SOUI_SRC_DIR @CMAKE_SOURCE_DIR@)
+set(SOUI_SRC_DIR @CMAKE_CURRENT_LIST_DIR@)
 set(SOUI_PREFIX ${prefix})
 
 # Include directories
