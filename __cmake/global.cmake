@@ -86,24 +86,40 @@ endif(APPLE)
 endmacro()
 
 macro(add_app_res_files app_name res_files dest_path)
+    # 创建目标目录（所有文件共享）
     add_custom_command(TARGET ${app_name} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory
             "$<TARGET_FILE_DIR:${app_name}>/${dest_path}"
-        COMMENT "Creating Frameworks directory in ${app_name}"
+        COMMENT "Creating directory ${dest_path} in ${app_name}"
     )
+
     foreach(res_file ${res_files})
-        # 检查文件是否存在（在配置时检查）
         if(EXISTS "${res_file}")
-            #message(STATUS "resource file found: ${res_file}")
             get_filename_component(res_id "${res_file}" NAME)
-            add_custom_command(TARGET ${app_name} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                    "${res_file}"
-                    "$<TARGET_FILE_DIR:${app_name}>/${dest_path}/${res_id}"
-                COMMENT "Copying ${res_file} to ${app_name} "
-            )
+            set(target_file "$<TARGET_FILE_DIR:${app_name}>/${dest_path}/${res_id}")
+
+            # 判断是否为符号链接（仅限 Unix-like 系统）
+            if(UNIX AND NOT APPLE AND IS_SYMLINK "${res_file}")
+                # 获取链接指向的目标路径
+                file(READ_SYMLINK "${res_file}" link_target)
+                add_custom_command(TARGET ${app_name} POST_BUILD
+                    # 确保目标目录存在（重复创建无害）
+                    COMMAND ${CMAKE_COMMAND} -E make_directory
+                        "$<TARGET_FILE_DIR:${app_name}>/${dest_path}"
+                    COMMAND ${CMAKE_COMMAND} -E create_symlink
+                        "${link_target}" "${target_file}"
+                    COMMENT "Creating symlink ${res_id} -> ${link_target}"
+                )
+            else()
+                # 普通文件：直接复制
+                add_custom_command(TARGET ${app_name} POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                        "${res_file}" "${target_file}"
+                    COMMENT "Copying ${res_file} to ${app_name}"
+                )
+            endif()
         else()
-            message(WARNING "resource file not found: ${res_file}")
+            message(WARNING "Resource file not found: ${res_file}")
         endif()
     endforeach()
 endmacro()
