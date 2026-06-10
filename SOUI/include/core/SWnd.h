@@ -1880,6 +1880,16 @@ class SOUI_EXP SWindow
     void BeforePaintEx(IRenderTarget *pRT) const;
 
     /**
+     * BuildPainter
+     * @brief    Builds a painter object for the current window.
+     * @param    SPainter & painter -- Painter object.
+     * @return   void
+     *
+     * Describe  Typically used in conjunction with IDropDownHost.
+     */ 
+    virtual void BuildPainter(SPainter &painter) const;
+
+    /**
      * TransformPoint
      * @brief    Transforms a point based on the current window's transformation matrix.
      * @param    CPoint &pt -- Point to transform.

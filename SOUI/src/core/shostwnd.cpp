@@ -205,24 +205,16 @@ void SRootWindow::OnAnimationStop(IAnimation *pAni)
 
 void SRootWindow::BeforePaint(IRenderTarget *pRT, SPainter &painter) const
 {
-    int iState = SState2Index::GetDefIndex(GetState(), true);
-    const SwndStyle &style = SWindow::GetStyle();
-    IFontPtr pFont = style.GetTextFont(iState);
-    if (pFont)
-        pRT->SelectObject(pFont, (IRenderObj **)&painter.oldFont);
-    else
-        pRT->SelectObject(GETUIDEF->GetFont(FF_DEFAULTFONT, GetScale()), NULL);
-
-    COLORREF crTxt = style.GetTextColor(iState);
-    if (crTxt != CR_INVALID)
-        painter.oldTextColor = pRT->SetTextColor(crTxt);
-    else
-        pRT->SetTextColor(RGBA(0, 0, 0, 255));
+    m_pHostWnd->OnRootBeforePaint(this, pRT, painter);
 }
 
 void SRootWindow::AfterPaint(IRenderTarget *pRT, SPainter &painter) const
 {
-    pRT->SelectDefaultObject(OT_FONT, NULL);
+    m_pHostWnd->OnRootAfterPaint(this, pRT, painter);
+}
+
+void SRootWindow::BuildPainter(SPainter &painter) const{
+    m_pHostWnd->OnRootBuildPainter(this,painter);
 }
 
 void SRootWindow::UpdateLayout()
@@ -312,6 +304,41 @@ void SRootWindow::FireMenuCmd(int menuID)
 
 BOOL SHostWnd::s_HideLocalUiDef = TRUE;
 int SHostWnd::s_TaskQueueBufSize = 5;
+
+void SHostWnd::OnRootBuildPainter(const SRootWindow *pRoot,SPainter & painter) const
+{
+    int iState = SState2Index::GetDefIndex(pRoot->GetState(), true);
+    const SwndStyle &style = pRoot->GetStyle();
+    IFontPtr pFont = style.GetTextFont(iState);
+    if (pFont)
+        painter.oldFont = pFont;
+    COLORREF crTxt = style.GetTextColor(iState);
+    if (crTxt != CR_INVALID)
+        painter.oldTextColor = crTxt;
+}
+
+void SHostWnd::OnRootBeforePaint(const SRootWindow *pRoot,IRenderTarget *pRT, SPainter &painter) const
+{
+    int iState = SState2Index::GetDefIndex(pRoot->GetState(), true);
+    const SwndStyle &style = pRoot->GetStyle();
+    IFontPtr pFont = style.GetTextFont(iState);
+    if (pFont)
+        pRT->SelectObject(pFont, (IRenderObj **)&painter.oldFont);
+    else
+        pRT->SelectObject(GETUIDEF->GetFont(FF_DEFAULTFONT, GetScale()), NULL);
+
+    COLORREF crTxt = style.GetTextColor(iState);
+    if (crTxt != CR_INVALID)
+        painter.oldTextColor = pRT->SetTextColor(crTxt);
+    else
+        pRT->SetTextColor(RGBA(0, 0, 0, 255));
+}
+
+void SHostWnd::OnRootAfterPaint(const SRootWindow *pRoot,IRenderTarget *pRT, SPainter &painter) const
+{
+    pRT->SelectDefaultObject(OT_FONT, NULL);
+}
+
 
 void SHostWnd::SetHideLocalUiDef(BOOL bHide)
 {

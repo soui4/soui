@@ -2427,6 +2427,21 @@ BOOL SWindow::OnEraseBkgnd(IRenderTarget *pRT)
     return TRUE;
 }
 
+
+void SWindow::BuildPainter(SPainter &painter) const
+{
+    SWindow *pParent = GetParent();
+    if (pParent)
+        pParent->BuildPainter(painter);
+    int iState = SState2Index::GetDefIndex(GetState(), true);
+    IFontPtr pFont = GetStyle().GetTextFont(iState);
+    if (pFont)
+        painter.oldFont = pFont;
+    COLORREF crTxt = GetStyle().GetTextColor(iState);
+    if (crTxt != CR_INVALID)
+        painter.oldTextColor = crTxt;     
+}
+
 void SWindow::BeforePaint(IRenderTarget *pRT, SPainter &painter) const
 {
     int iState = SState2Index::GetDefIndex(GetState(), true);
@@ -2447,6 +2462,7 @@ void SWindow::BeforePaintEx(IRenderTarget *pRT) const
     SPainter painter;
     BeforePaint(pRT, painter);
 }
+
 
 void SWindow::AfterPaint(IRenderTarget *pRT, SPainter &painter) const
 {

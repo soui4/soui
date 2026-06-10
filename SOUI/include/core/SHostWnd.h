@@ -282,6 +282,11 @@ class SOUI_EXP SRootWindow : public SWindow {
     void AfterPaint(IRenderTarget *pRT, SPainter &painter) const override;
 
     /**
+     * @brief Builds the painter object.
+     */
+    void BuildPainter(SPainter &painter) const override;
+
+    /**
      * @brief Checks if the window is a layered window.
      *
      * @return TRUE if the window is a layered window, FALSE otherwise.
@@ -1366,6 +1371,20 @@ class SOUI_EXP SHostWnd
      * */
     virtual void OnScaleChanged(int nScale);
 
+    /**
+     * @brief init root painter
+     */
+    virtual void OnRootBeforePaint(const SRootWindow *pRoot,IRenderTarget *pRT, SPainter &painter) const;
+
+    /**
+     * @brief uninit root painter.
+     */
+    virtual void OnRootAfterPaint(const SRootWindow *pRoot,IRenderTarget *pRT, SPainter &painter) const;
+
+    /**
+     * @brief init root panter
+     */
+    virtual void OnRootBuildPainter(const SRootWindow *pRoot,SPainter & painter) const;
   public:
     /**
      * @brief Handles the resize event of the root window.

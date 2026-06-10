@@ -34,6 +34,24 @@ void SDropDownWnd::OnFinalMessage(HWND hWnd)
     delete this;
 }
 
+void SDropDownWnd::OnRootBeforePaint(const SRootWindow *pRoot,IRenderTarget *pRT, SPainter &painter) const{
+    SHostWnd::OnRootBeforePaint(pRoot,pRT,painter);
+    if(painter.oldFont == NULL && painter.oldTextColor == CR_INVALID){
+        //no font or color setted, use owner font and color
+        if(SWindow *pOwnerWindow = m_pOwner->GetDropDownOwner())
+        {
+            SPainter ownerPainter;
+            pOwnerWindow->BuildPainter(ownerPainter);
+            if(ownerPainter.oldFont){
+                pRT->SelectObject(ownerPainter.oldFont,(IRenderObj**)&painter.oldFont);
+            }
+            if(ownerPainter.oldTextColor != CR_INVALID){
+                painter.oldTextColor = pRT->SetTextColor(ownerPainter.oldTextColor);
+            }
+        }
+    }
+}
+
 void SDropDownWnd::OnKillFocus(HWND wndFocus)
 {
     if (wndFocus != m_hWnd)

@@ -80,8 +80,15 @@ translucent="1"
           <button columnSpan="2" text="bottom line" height="50"/>
         </scrollview>
       </page>
-      <page title="svg test" layout="vbox" interval="10dp"> 
+      <page title="svg test" layout="vbox" interval="10dp" font="size:20,underline:1"> 
         <img size="200,200" skin="svg_xmusic"/>
+		  <combobox size="100,30" dropdown="1">
+			  <items>
+				  <item text="item1"/>
+				  <item text="item1"/>
+				  <item text="item1"/>
+			  </items>
+		  </combobox>
       </page>
     </tabctrl>
 

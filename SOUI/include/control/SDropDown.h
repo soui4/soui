@@ -180,6 +180,10 @@ class SOUI_EXP SDropDownWnd
      */
     virtual void OnFinalMessage(HWND hwnd);
 
+    /**
+     * @brief init root painter
+     */
+    void OnRootBeforePaint(const SRootWindow *pRoot,IRenderTarget *pRT, SPainter &painter) const override;
   protected:
     ISDropDownOwner *m_pOwner; /**< Pointer to the dropdown owner */
     BOOL m_bClick;             /**< Click state */

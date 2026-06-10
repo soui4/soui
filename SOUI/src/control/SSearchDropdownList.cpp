@@ -220,7 +220,14 @@ BOOL SSearchDropdownList::CreateListBox(SXmlNode xmlNode)
     m_pListBox.Attach(pListBox);
 
     m_pListBox->SetContainer(GetContainer());
-    m_pListBox->InitFromXml(&listStyle);
+    if (listStyle)
+        m_pListBox->InitFromXml(&listStyle);
+    else {
+        m_pListBox->GetStyle().m_crBg = GETCOLOR(SNamedColor::THEME_COLOR);
+        m_pListBox->GetStyle().m_crBorder = GETCOLOR(SNamedColor::THEME_BORDER);
+        m_pListBox->SetAttribute(L"margin", L"1,1,1,1");
+        m_pListBox->SetAttribute(L"hotTrack", L"1", TRUE);
+    }    
     m_pListBox->SetAttribute(L"pos", L"0,0,-0,-0", TRUE);
     m_pListBox->SetOwner(this); // chain notify message to combobox
     m_pListBox->SetVisible(FALSE);
