@@ -244,7 +244,7 @@ class SOUI_EXP SNamedColor : public SNamedValue<COLORREF, SColorParser> {
     /**
      * @brief Theme border color name.
      */
-    static const wchar_t* SNamedColor::THEME_BORDER;// = L"@color/thm_border";
+    static const wchar_t* THEME_BORDER;// = L"@color/thm_border";
     /**
      * @brief Theme text normal color name.
      */

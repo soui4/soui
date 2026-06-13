@@ -54,7 +54,7 @@ ISkinObj *SSkinPool::_LoadSkin(SXmlNode xmlSkin, int nScale)
         SkinKey key = { strSkinName, pSkin->GetScale() };
         if (HasKey(key))
         {
-            SSLOGW() << "load skin duplicated found,type=" << strTypeName << "name=" << strSkinName;
+            SSLOGW() << "load skin duplicated found,type=" << strTypeName << " name=" << strSkinName;
             pSkin->Release();
             return NULL;
         }
@@ -62,7 +62,7 @@ ISkinObj *SSkinPool::_LoadSkin(SXmlNode xmlSkin, int nScale)
     }
     else
     {
-        SSLOGW() << "load skin error,type=" << strTypeName << "name=" << strSkinName;
+        SSLOGW() << "load skin error,type=" << strTypeName << " name=" << strSkinName;
     }
     return pSkin;
 }

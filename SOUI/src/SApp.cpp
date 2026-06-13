@@ -43,6 +43,7 @@
 #include "valueAnimator/SValueAnimator.h"
 #include "core/SHostPresenter.h"
 #include "core/Svg.h"
+
 SNSBEGIN
 
 static void SouiLog_Callback(const char *tag, const char *pLogStr, int level, const char *file, int line, const char *fun, void *retAddr)
@@ -185,6 +186,8 @@ void SObjectDefaultRegister::RegisterWindows(SObjectFactoryMgr *objFactory) cons
     objFactory->TplRegisterFactory<SSearchDropdownList>();
     objFactory->TplRegisterFactory<SToolBar>();
     objFactory->TplRegisterFactory<SDockBar>();
+    objFactory->TplRegisterFactory<SRebar>();
+
 #if defined(_WIN32) && !defined(__MINGW32__)
     objFactory->TplRegisterFactory<SActiveX>();
 #endif //_WIN32

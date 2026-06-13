@@ -31,6 +31,7 @@
 #include <control/SSearchDropdownList.h>
 #include <control/SToolBar.h>
 #include <control/SDockBar.h>
+#include <control/SRebar.h>
 #ifdef _WIN32
 #include <control/SActiveX.h>
 #endif //_WIN32
