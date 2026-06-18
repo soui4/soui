@@ -6,7 +6,7 @@
 |恒星播放器|StellarPlayer.exe|1.1.0.147|购买|冷湖科技(武汉)有限公司|https://www.stellarplayer.com/|购买授权|
 |壹加点图软件|YJApp.arx|1.0.2.0|贡献代码|壹加软件|适于于AutoCAD2010~2020|
 |山竹远程控制软件|Quick.exe|2.0|购买|苏州小庭花数字科技有限公司|无|购买授权|
-
+|简连|LinkViewer.exe|1.0.0.27|贡献代码|厦门铠甲网络股份有限公司|https://www.janelink.top/|提供demo,TXMgr|
 
 |购买授权企业|日期|备注|
 |:-|:-:|:-:|
