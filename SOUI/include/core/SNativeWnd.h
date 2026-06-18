@@ -12,11 +12,11 @@
 #ifndef __SNATIVEWND__H__
 #define __SNATIVEWND__H__
 
+#include <soui_exp.h>
 #include <interface/SNativeWnd-i.h>
 #include <helper/SCriticalSection.h>
-#include <helper/obj-ref-impl.hpp>
+#include <sobject/Sobject.hpp>
 #include <windows.h>
-#include <soui_exp.h>
 
 SNSBEGIN
 
@@ -119,6 +119,37 @@ class SOUI_EXP SNativeWndHelper {
     HINSTANCE m_hInst;     //!< Handle to the application instance.
 };
 
+
+template <class T, class Base>
+class TObjRefProxy
+    : public T
+    , public Base {
+public:
+    //!添加引用
+    /*!
+     */
+    STDMETHOD_(long, AddRef)(THIS) OVERRIDE
+    {
+        return Base::AddRef();
+    }
+
+    //!释放引用
+    /*!
+     */
+    STDMETHOD_(long, Release)(THIS) OVERRIDE
+    {
+        return Base::Release();
+    }
+
+    //!释放对象
+    /*!
+     */
+    STDMETHOD_(void, OnFinalRelease)(THIS) OVERRIDE
+    {
+        return Base::OnFinalRelease();
+    }
+};
+
 struct tagThunk;
 
 /**
@@ -127,8 +158,8 @@ struct tagThunk;
  *
  * @details This class provides methods for creating, subclassing, and managing native Windows,
  * as well as handling window messages and notifications.
- */
-class SOUI_EXP SNativeWnd : public TObjRefImpl<INativeWnd> {
+ */class SOUI_EXP SNativeWnd : public TObjRefImpl<SObjectImpl<INativeWnd> > {
+    DEF_SOBJECT(SObjectImpl<INativeWnd>, L"SNativeWnd")
   public:
     SNativeWnd();
     virtual ~SNativeWnd(void);

@@ -348,7 +348,7 @@ class SOUI_EXP SHostWnd
     friend class SDummyWnd;   /**< Friend class used for handling WM_PAINT messages in translucent windows. */
     friend class SRootWindow; /**< Friend class representing the root window. */
     friend class SNcPainter;  /**< Friend class for non-client area painting. */
-
+	DEF_SOBJECT(SNativeWnd, L"SHostWnd")
   protected:
     SDummyWnd *m_dummyWnd;   /**< A dummy window used to handle WM_PAINT messages for translucent windows. */
     SHostWndAttr m_hostAttr; /**< Host attributes corresponding to the SOUI node in XML. */

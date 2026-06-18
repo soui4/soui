@@ -28,6 +28,7 @@ SNSBEGIN
  *             and provides methods for handling dialog messages and events.
  */
 class SOUI_EXP SHostDialog : public THostWndProxy<IHostDialog> {
+	DEF_SOBJECT(SHostWnd, L"SHostDialog")
   public:
     /**
      * @brief    Constructor

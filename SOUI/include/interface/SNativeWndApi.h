@@ -1,26 +1,4 @@
-﻿//! Add reference
-/*!
- * @brief Increments the reference count of the object.
- *
- * @return long The new reference count.
- */
-STDMETHOD_(long, AddRef)(THIS) PURE;
-
-//! Release reference
-/*!
- * @brief Decrements the reference count of the object.
- *
- * @return long The new reference count.
- */
-STDMETHOD_(long, Release)(THIS) PURE;
-
-//! Final release of the object
-/*!
- * @brief Final release of the object, performing cleanup if necessary.
- */
-STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
-
-//////////////////////////////////////////////////////////////////////////
+﻿//////////////////////////////////////////////////////////////////////////
 
 /**
  * @brief Creates a Native window.

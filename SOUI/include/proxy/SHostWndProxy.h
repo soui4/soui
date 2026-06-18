@@ -6,40 +6,18 @@ SNSBEGIN
 
 template <class T>
 class THostWndProxy
-	: public T
-	, public SHostWnd {
+	: public TNativeWndProxy<T,SHostWnd> {
 public:
 	THostWndProxy(LPCWSTR pszResId)
-		: SHostWnd(pszResId)
+		: TNativeWndProxy<T, SHostWnd>(pszResId)
 	{
 	}
 	THostWndProxy(LPCSTR pszResId)
-		: SHostWnd(pszResId)
+		: TNativeWndProxy<T, SHostWnd>(pszResId)
 	{
 	}
 
 public:
-	STDMETHOD_(long, AddRef)(THIS)
-	{
-		return SHostWnd::AddRef();
-	}
-	STDMETHOD_(long, Release)(THIS)
-	{
-		return SHostWnd::Release();
-	}
-	STDMETHOD_(void, OnFinalRelease)(THIS)
-	{
-		SHostWnd::OnFinalRelease();
-	}
-	STDMETHOD_(int, GetID)(THIS) SCONST
-	{
-		return SHostWnd::GetID();
-	}
-	STDMETHOD_(void, SetID)(THIS_ int nID)
-	{
-		return SHostWnd::SetID(nID);
-	}
-
 	STDMETHOD_(HWND, CreateNative)
 		(THIS_ LPCTSTR lpWindowName,
 		DWORD dwStyle,

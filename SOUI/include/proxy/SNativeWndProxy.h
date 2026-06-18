@@ -1,32 +1,182 @@
-﻿#ifndef __SNATIVEWNDPROXY__H__
-#define __SNATIVEWNDPROXY__H__
+﻿#ifndef __NativeWndImlPROXY__H__
+#define __NativeWndImlPROXY__H__
 
 SNSBEGIN
 
-template <class T>
+template <class T,class NativeWndIml = SNativeWnd>
 class TNativeWndProxy
 	: public T
-	, public SNativeWnd {
+	, public NativeWndIml {
 public:
+	TNativeWndProxy() {
+
+	}
+	template<typename P>
+	TNativeWndProxy(P p1):NativeWndIml(p1){
+	}
+
 	STDMETHOD_(long, AddRef)(THIS)
 	{
-		return SNativeWnd::AddRef();
+		return NativeWndIml::AddRef();
 	}
 	STDMETHOD_(long, Release)(THIS)
 	{
-		return SNativeWnd::Release();
+		return NativeWndIml::Release();
 	}
 	STDMETHOD_(void, OnFinalRelease)(THIS)
 	{
-		SNativeWnd::OnFinalRelease();
+		NativeWndIml::OnFinalRelease();
 	}
-	STDMETHOD_(int, GetID)(THIS) SCONST
-	{
-		return SNativeWnd::GetID();
+	
+	STDMETHOD_(BOOL, InitFromXml)(THIS_ IXmlNode * pXmlNode) OVERRIDE {
+		return NativeWndIml::InitFromXml(pXmlNode);
 	}
-	STDMETHOD_(void, SetID)(THIS_ int nID)
-	{
-		return SNativeWnd::SetID(nID);
+
+	/**
+	 * @brief Retrieves the object's name.
+	 * @return Object's name as a wide string.
+	 */
+	STDMETHOD_(LPCWSTR, GetName)(THIS) SCONST OVERRIDE {
+		return NativeWndIml::GetName();
+	}
+
+	/**
+	 * @brief Retrieves the object's name in ANSI format.
+	 * @return Object's name as an ANSI string.
+	 */
+	STDMETHOD_(LPCSTR, GetNameA)(THIS) SCONST OVERRIDE {
+		return NativeWndIml::GetNameA();
+	}
+
+	/**
+	 * @brief Sets the object's name.
+	 * @param pszName Name to set.
+	 */
+	STDMETHOD_(void, SetName)(THIS_ LPCWSTR pszName) OVERRIDE {
+		NativeWndIml::SetName(pszName);
+	}
+
+	/**
+	 * @brief Retrieves the object's ID.
+	 * @return Object's ID.
+	 */
+	STDMETHOD_(int, GetID)(THIS) SCONST OVERRIDE {
+		return NativeWndIml::GetID();
+	}
+
+	/**
+	 * @brief Sets the object's ID.
+	 * @param nID ID to set.
+	 */
+	STDMETHOD_(void, SetID)(THIS_ int nID) OVERRIDE {
+		NativeWndIml::SetID(nID);
+	}
+
+	/**
+	 * @brief Handles attribute processing after setting an attribute.
+	 * @param strAttribName Attribute name.
+	 * @param strValue Attribute value.
+	 * @param bLoading TRUE if the object is being loaded, FALSE otherwise.
+	 * @param hr Result of the attribute setting.
+	 * @return Result of the attribute processing.
+	 */
+	STDMETHOD_(HRESULT, AfterAttribute)(THIS_ LPCWSTR strAttribName, LPCWSTR strValue, BOOL bLoading, HRESULT hr) OVERRIDE {
+		return NativeWndIml::AfterAttribute(strAttribName, strValue, bLoading, hr);
+	}
+
+	/**
+	 * @brief Sets an attribute using ANSI strings.
+	 * @param pszAttr Attribute name.
+	 * @param pszValue Attribute value.
+	 * @param bLoading TRUE if the object is being loaded, FALSE otherwise.
+	 * @return Result of setting the attribute.
+	 */
+	STDMETHOD_(HRESULT, SetAttributeA)(THIS_ LPCSTR pszAttr, LPCSTR pszValue, BOOL bLoading) OVERRIDE {
+		return NativeWndIml::SetAttributeA(pszAttr,pszValue, bLoading);
+	}
+
+	/**
+	 * @brief Sets an attribute using wide strings.
+	 * @param pszAttr Attribute name.
+	 * @param pszValue Attribute value.
+	 * @param bLoading TRUE if the object is being loaded, FALSE otherwise.
+	 * @return Result of setting the attribute.
+	 */
+	STDMETHOD_(HRESULT, SetAttribute)(THIS_ LPCWSTR pszAttr, LPCWSTR pszValue, BOOL bLoading) OVERRIDE {
+		return NativeWndIml::SetAttribute(pszAttr, pszValue, bLoading);
+	}
+
+	/**
+	 * @brief Sets an attribute using IStringW objects.
+	 * @param strAttr Attribute name.
+	 * @param strValue Attribute value.
+	 * @param bLoading TRUE if the object is being loaded, FALSE otherwise.
+	 * @return Result of setting the attribute.
+	 */
+	STDMETHOD_(HRESULT, ISetAttribute)(THIS_ const IStringW* strAttr, const IStringW* strValue, BOOL bLoading) OVERRIDE {
+		return NativeWndIml::ISetAttribute(strAttr, strValue, bLoading);
+	}
+
+	/**
+	 * @brief Retrieves the object's class name.
+	 * @return Class name as a wide string.
+	 */
+	/*STDMETHOD_(LPCWSTR, GetObjectClass)(THIS_) SCONST OVERRIDE {
+		return NativeWndIml::GetOjbectClass();
+	}*/
+
+	/**
+	 * @brief Retrieves the object's type.
+	 * @return Object type identifier.
+	 */
+	STDMETHOD_(int, GetObjectType)(THIS) SCONST OVERRIDE {
+		return NativeWndIml::GetObjectType();
+	}
+
+	/**
+	 * @brief Checks if the object is of a specific class.
+	 * @param lpszName Class name to check.
+	 * @return TRUE if the object is of the specified class, FALSE otherwise.
+	 */
+	STDMETHOD_(BOOL, IsClass)(THIS_ LPCWSTR lpszName) SCONST OVERRIDE {
+		return NativeWndIml::IsClass(lpszName);
+	}
+
+	/**
+	 * @brief Retrieves the class name list of the object.
+	 *
+	 * @param ppClassName Pointer to a buffer that receives the class name list.
+	 * @param nMaxCount Maximum number of strings to copy to the buffer.
+	 * @return int The number of strings copied to the buffer.
+	 */
+	STDMETHOD_(int, GetClassNameList)(CTHIS_ wchar_t ppClassNameList[][50], int nMaxCount) SCONST {
+		return NativeWndIml::GetClassNameList(ppClassNameList, nMaxCount);
+	}
+
+	/**
+	 * @brief Retrieves an attribute value.
+	 * @param strAttr Attribute name.
+	 * @param pValue Pointer to store the attribute value.
+	 * @return TRUE if the attribute is retrieved successfully, FALSE otherwise.
+	 */
+	STDMETHOD_(BOOL, GetAttribute)(THIS_ LPCWSTR strAttr, IStringW* pValue) SCONST OVERRIDE {
+		return NativeWndIml::GetAttribute(strAttr, pValue);
+	}
+
+	/**
+	 * @brief Handles initialization completion.
+	 * @param xmlNode XML node containing the object's attributes.
+	 */
+	STDMETHOD_(void, OnInitFinished)(THIS_ IXmlNode* xmlNode) OVERRIDE {
+		return NativeWndIml::OnInitFinished(xmlNode);
+	}
+
+	/**
+	 * @brief Sets the attribute handler.
+	 * @param attrHandler Function pointer to the attribute handler.
+	 */
+	STDMETHOD_(void, SetAttrHandler)(THIS_ FunAttrHandler attrHandler) OVERRIDE {
+		return NativeWndIml::SetAttrHandler(attrHandler);
 	}
 
 	STDMETHOD_(HWND, CreateNative)
@@ -41,87 +191,87 @@ public:
 		int nID,
 		LPVOID lpParam) OVERRIDE
 	{
-		return SNativeWnd::CreateNative(lpWindowName, dwStyle, dwExStyle, x, y, nWidth, nHeight,
+		return NativeWndIml::CreateNative(lpWindowName, dwStyle, dwExStyle, x, y, nWidth, nHeight,
 			hWndParent,nID, lpParam);
 	}
 
 	STDMETHOD_(HWND, GetHwnd)(THIS) OVERRIDE
 	{
-		return SNativeWnd::GetHwnd();
+		return NativeWndIml::GetHwnd();
 	}
 
 	STDMETHOD_(BOOL, SubclassWindow)(THIS_ HWND hWnd) OVERRIDE
 	{
-		return SNativeWnd::SubclassWindow(hWnd);
+		return NativeWndIml::SubclassWindow(hWnd);
 	}
 	STDMETHOD_(HWND, UnsubclassWindow)(THIS_ BOOL bForce /*= FALSE*/) OVERRIDE
 	{
-		return SNativeWnd::UnsubclassWindow(bForce);
+		return NativeWndIml::UnsubclassWindow(bForce);
 	}
 	STDMETHOD_(const MSG *, GetCurrentMessage)(THIS) SCONST OVERRIDE
 	{
-		return SNativeWnd::GetCurrentMessage();
+		return NativeWndIml::GetCurrentMessage();
 	}
 	STDMETHOD_(int, GetDlgCtrlID)(THIS) SCONST OVERRIDE
 	{
-		return SNativeWnd::GetDlgCtrlID();
+		return NativeWndIml::GetDlgCtrlID();
 	}
 	STDMETHOD_(DWORD, GetStyle)(THIS) SCONST OVERRIDE
 	{
-		return SNativeWnd::GetStyle();
+		return NativeWndIml::GetStyle();
 	}
 	STDMETHOD_(DWORD, GetExStyle)(THIS) SCONST OVERRIDE
 	{
-		return SNativeWnd::GetExStyle();
+		return NativeWndIml::GetExStyle();
 	}
 	STDMETHOD_(LONG_PTR, GetWindowLongPtr)(THIS_ int nIndex) SCONST OVERRIDE
 	{
-		return SNativeWnd::GetWindowLongPtr(nIndex);
+		return NativeWndIml::GetWindowLongPtr(nIndex);
 	}
 	STDMETHOD_(LONG_PTR, SetWindowLongPtr)(THIS_ int nIndex, LONG_PTR dwNewLong) OVERRIDE
 	{
-		return SNativeWnd::SetWindowLongPtr(nIndex, dwNewLong);
+		return NativeWndIml::SetWindowLongPtr(nIndex, dwNewLong);
 	}
 	STDMETHOD_(HWND, GetParent)(THIS) OVERRIDE
 	{
-		return SNativeWnd::GetParent();
+		return NativeWndIml::GetParent();
 	}
 	STDMETHOD_(HWND, SetParent)(THIS_ HWND hWndNewParent) OVERRIDE
 	{
-		return SNativeWnd::SetParent(hWndNewParent);
+		return NativeWndIml::SetParent(hWndNewParent);
 	}
 	STDMETHOD_(BOOL, IsWindowEnabled)(THIS) SCONST OVERRIDE
 	{
-		return SNativeWnd::IsWindowEnabled();
+		return NativeWndIml::IsWindowEnabled();
 	}
 	STDMETHOD_(BOOL, ModifyStyle)(THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags = 0) OVERRIDE
 	{
-		return SNativeWnd::ModifyStyle(dwRemove, dwAdd, nFlags);
+		return NativeWndIml::ModifyStyle(dwRemove, dwAdd, nFlags);
 	}
 	STDMETHOD_(BOOL, ModifyStyleEx)(THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags = 0) OVERRIDE
 	{
-		return SNativeWnd::ModifyStyleEx(dwRemove, dwAdd, nFlags);
+		return NativeWndIml::ModifyStyleEx(dwRemove, dwAdd, nFlags);
 	}
 	STDMETHOD_(BOOL, SetWindowPos)
 		(THIS_ HWND hWndInsertAfter, int x, int y, int cx, int cy, UINT nFlags) OVERRIDE
 	{
-		return SNativeWnd::SetWindowPos(hWndInsertAfter, x, y, cx, cy, nFlags);
+		return NativeWndIml::SetWindowPos(hWndInsertAfter, x, y, cx, cy, nFlags);
 	}
 	STDMETHOD_(BOOL, CenterWindow)(THIS_ HWND hWndCenter DEF_VAL(0)) OVERRIDE
 	{
-		return SNativeWnd::CenterWindow(hWndCenter);
+		return NativeWndIml::CenterWindow(hWndCenter);
 	}
 	STDMETHOD_(BOOL, IsWindow)(CTHIS) SCONST OVERRIDE
 	{
-		return SNativeWnd::IsWindow();
+		return NativeWndIml::IsWindow();
 	}
 	STDMETHOD_(BOOL, Invalidate)(THIS_ BOOL bErase = TRUE) OVERRIDE
 	{
-		return SNativeWnd::Invalidate(bErase);
+		return NativeWndIml::Invalidate(bErase);
 	}
 	STDMETHOD_(BOOL, InvalidateRect)(THIS_ LPCRECT lpRect, BOOL bErase = TRUE) OVERRIDE
 	{
-		return SNativeWnd::InvalidateRect(lpRect, bErase);
+		return NativeWndIml::InvalidateRect(lpRect, bErase);
 	}
 	STDMETHOD_(BOOL, GetWindowRect)(THIS_ LPRECT lpRect) SCONST OVERRIDE
 	{
@@ -133,144 +283,144 @@ public:
 	}
 	STDMETHOD_(BOOL, ClientToScreen)(THIS_ LPPOINT lpPoint) SCONST OVERRIDE
 	{
-		return SNativeWnd::ClientToScreen(lpPoint);
+		return NativeWndIml::ClientToScreen(lpPoint);
 	}
 	STDMETHOD_(BOOL, ClientToScreen2)(THIS_ LPRECT lpRect) SCONST OVERRIDE
 	{
-		return SNativeWnd::ClientToScreen2(lpRect);
+		return NativeWndIml::ClientToScreen2(lpRect);
 	}
 	STDMETHOD_(BOOL, ScreenToClient)(THIS_ LPPOINT lpPoint) SCONST OVERRIDE
 	{
-		return SNativeWnd::ScreenToClient(lpPoint);
+		return NativeWndIml::ScreenToClient(lpPoint);
 	}
 	STDMETHOD_(BOOL, ScreenToClient2)(THIS_ LPRECT lpRect) SCONST OVERRIDE
 	{
-		return SNativeWnd::ScreenToClient2(lpRect);
+		return NativeWndIml::ScreenToClient2(lpRect);
 	}
 	STDMETHOD_(int, MapWindowPoints)
 		(THIS_ HWND hWndTo, LPPOINT lpPoint, UINT nCount) SCONST OVERRIDE
 	{
-		return SNativeWnd::MapWindowPoints(hWndTo, lpPoint, nCount);
+		return NativeWndIml::MapWindowPoints(hWndTo, lpPoint, nCount);
 	}
 	STDMETHOD_(int, MapWindowRect)(THIS_ HWND hWndTo, LPRECT lpRect) SCONST OVERRIDE
 	{
-		return SNativeWnd::MapWindowRect(hWndTo, lpRect);
+		return NativeWndIml::MapWindowRect(hWndTo, lpRect);
 	}
 	STDMETHOD_(UINT_PTR, SetTimer)
 		(THIS_ UINT_PTR nIDEvent,
 		UINT nElapse,
 		void(CALLBACK *lpfnTimer)(HWND, UINT, UINT_PTR, DWORD) = NULL) OVERRIDE
 	{
-		return SNativeWnd::SetTimer(nIDEvent, nElapse, lpfnTimer);
+		return NativeWndIml::SetTimer(nIDEvent, nElapse, lpfnTimer);
 	}
 	STDMETHOD_(BOOL, KillTimer)(THIS_ UINT_PTR nIDEvent) OVERRIDE
 	{
-		return SNativeWnd::KillTimer(nIDEvent);
+		return NativeWndIml::KillTimer(nIDEvent);
 	}
 	STDMETHOD_(HDC, GetDC)(THIS) OVERRIDE
 	{
-		return SNativeWnd::GetDC();
+		return NativeWndIml::GetDC();
 	}
 	STDMETHOD_(HDC, GetWindowDC)(THIS) OVERRIDE
 	{
-		return SNativeWnd::GetWindowDC();
+		return NativeWndIml::GetWindowDC();
 	}
 	STDMETHOD_(int, ReleaseDC)(THIS_ HDC hDC) OVERRIDE
 	{
-		return SNativeWnd::ReleaseDC(hDC);
+		return NativeWndIml::ReleaseDC(hDC);
 	}
     STDMETHOD_(BOOL, CreateCaret)(THIS_ HBITMAP hBitmap, int nWidth, int nHeight) OVERRIDE
 	{
-        return SNativeWnd::CreateCaret(hBitmap, nWidth, nHeight);
+        return NativeWndIml::CreateCaret(hBitmap, nWidth, nHeight);
 	}
 	STDMETHOD_(BOOL, HideCaret)(THIS) OVERRIDE
 	{
-		return SNativeWnd::HideCaret();
+		return NativeWndIml::HideCaret();
 	}
 	STDMETHOD_(BOOL, ShowCaret)(THIS) OVERRIDE
 	{
-		return SNativeWnd::ShowCaret();
+		return NativeWndIml::ShowCaret();
 	}
 	STDMETHOD_(HWND, SetCapture)(THIS) OVERRIDE
 	{
-		return SNativeWnd::SetCapture();
+		return NativeWndIml::SetCapture();
 	}
 
 	STDMETHOD_(HWND, GetCapture)(THIS) OVERRIDE
 	{
-		return SNativeWnd::GetCapture();
+		return NativeWndIml::GetCapture();
 	}
 
 	STDMETHOD_(BOOL, ReleaseCapture)(THIS) OVERRIDE
 	{
-		return SNativeWnd::ReleaseCapture();
+		return NativeWndIml::ReleaseCapture();
 	}
 
 	STDMETHOD_(HWND, SetFocus)(THIS) OVERRIDE
 	{
-		return SNativeWnd::SetFocus();
+		return NativeWndIml::SetFocus();
 	}
 	STDMETHOD_(LRESULT, SendMessage)
 		(THIS_ UINT message, WPARAM wParam = 0, LPARAM lParam = 0) OVERRIDE
 	{
-		return SNativeWnd::SendMessage(message, wParam, lParam);
+		return NativeWndIml::SendMessage(message, wParam, lParam);
 	}
 	STDMETHOD_(BOOL, PostMessage)(THIS_ UINT message, WPARAM wParam = 0, LPARAM lParam = 0) OVERRIDE
 	{
-		return SNativeWnd::PostMessage(message, wParam, lParam);
+		return NativeWndIml::PostMessage(message, wParam, lParam);
 	}
 	STDMETHOD_(BOOL, SendNotifyMessage)
 		(THIS_ UINT message, WPARAM wParam = 0, LPARAM lParam = 0) OVERRIDE
 	{
-		return SNativeWnd::SendNotifyMessage(message, wParam, lParam);
+		return NativeWndIml::SendNotifyMessage(message, wParam, lParam);
 	}
 	STDMETHOD_(BOOL, SetWindowText)(THIS_ LPCTSTR lpszString) OVERRIDE
 	{
-		return SNativeWnd::SetWindowText(lpszString);
+		return NativeWndIml::SetWindowText(lpszString);
 	}
 	STDMETHOD_(int, GetWindowText)(THIS_ LPTSTR lpszStringBuf, int nMaxCount) SCONST OVERRIDE
 	{
-		return SNativeWnd::GetWindowText(lpszStringBuf, nMaxCount);
+		return NativeWndIml::GetWindowText(lpszStringBuf, nMaxCount);
 	}
 	STDMETHOD_(BOOL, IsIconic)(THIS) SCONST OVERRIDE
 	{
-		return SNativeWnd::IsIconic();
+		return NativeWndIml::IsIconic();
 	}
 	STDMETHOD_(BOOL, IsZoomed)(THIS) SCONST OVERRIDE
 	{
-		return SNativeWnd::IsZoomed();
+		return NativeWndIml::IsZoomed();
 	}
 	STDMETHOD_(BOOL, IsWindowVisible)(THIS) SCONST OVERRIDE
 	{
-		return SNativeWnd::IsWindowVisible();
+		return NativeWndIml::IsWindowVisible();
 	}
 	STDMETHOD_(BOOL, MoveWindow)
 		(THIS_ int x, int y, int nWidth, int nHeight, BOOL bRepaint = TRUE) OVERRIDE
 	{
-		return SNativeWnd::MoveWindow(x, y, nWidth, nHeight, bRepaint);
+		return NativeWndIml::MoveWindow(x, y, nWidth, nHeight, bRepaint);
 	}
 	STDMETHOD_(BOOL, MoveWindow2)(THIS_ LPCRECT lpRect, BOOL bRepaint = TRUE) OVERRIDE
 	{
-		return SNativeWnd::MoveWindow2(lpRect, bRepaint);
+		return NativeWndIml::MoveWindow2(lpRect, bRepaint);
 	}
 	STDMETHOD_(BOOL, ShowWindow)(THIS_ int nCmdShow) OVERRIDE
 	{
-		return SNativeWnd::ShowWindow(nCmdShow);
+		return NativeWndIml::ShowWindow(nCmdShow);
 	}
 
 	STDMETHOD_(BOOL, UpdateWindow)(THIS) OVERRIDE
 	{
-		return SNativeWnd::UpdateWindow();
+		return NativeWndIml::UpdateWindow();
     }
 
 	STDMETHOD_(int, SetWindowRgn)(THIS_ HRGN hRgn, BOOL bRedraw = TRUE) OVERRIDE
 	{
-		return SNativeWnd::SetWindowRgn(hRgn, bRedraw);
+		return NativeWndIml::SetWindowRgn(hRgn, bRedraw);
 	}
 	STDMETHOD_(BOOL, SetLayeredWindowAttributes)
 		(THIS_ COLORREF crKey, BYTE byAlpha, DWORD dwFlags) OVERRIDE
 	{
-		return SNativeWnd::SetLayeredWindowAttributes(crKey, byAlpha, dwFlags);
+		return NativeWndIml::SetLayeredWindowAttributes(crKey, byAlpha, dwFlags);
 	}
 	STDMETHOD_(BOOL, UpdateLayeredWindow)
 		(THIS_ HDC hdcDst,
@@ -282,20 +432,20 @@ public:
 		BLENDFUNCTION *pblend,
 		DWORD dwFlags)
 	{
-		return SNativeWnd::UpdateLayeredWindow(hdcDst, pptDst, psize, hdcSrc, pptSrc, crKey, pblend,
+		return NativeWndIml::UpdateLayeredWindow(hdcDst, pptDst, psize, hdcSrc, pptSrc, crKey, pblend,
 			dwFlags);
 	}
 
 	STDMETHOD_(void, SetMsgHandler)(THIS_ FunMsgHandler fun, void *ctx) OVERRIDE
 	{
-		return SNativeWnd::SetMsgHandler(fun, ctx);
+		return NativeWndIml::SetMsgHandler(fun, ctx);
 	}
 
 	STDMETHOD_(MsgHandlerInfo *, GetMsgHandler)(THIS) OVERRIDE{
-		return SNativeWnd::GetMsgHandler();
+		return NativeWndIml::GetMsgHandler();
 	}
 
 };
 
 SNSEND
-#endif // __SNATIVEWNDPROXY__H__
+#endif // __NativeWndImlPROXY__H__

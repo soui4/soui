@@ -20,7 +20,8 @@ typedef struct _EventHandlerInfo
 #define INTERFACE IHostWnd
 DECLARE_INTERFACE_(IHostWnd, INativeWnd)
 {
-#include "SNativeWndApi.h"
+#include <interface/SobjectApi.h>
+#include <interface/SNativeWndApi.h>
     //////////////////////////////////////////////////////////////////////////
 
     /**
@@ -56,13 +57,6 @@ DECLARE_INTERFACE_(IHostWnd, INativeWnd)
      * @return
      */
     STDMETHOD_(void, SetLayoutId)(THIS_ LPCTSTR pszLayoutId) PURE;
-
-    /**
-     * @brief 从XML初始化窗口
-     * @param pNode XML数据
-     * @return TRUE-成功
-     */
-    STDMETHOD_(BOOL, InitFromXml)(THIS_ IXmlNode * pNode) PURE;
 
     /**
      * @brief 获取Dui Root
@@ -183,8 +177,8 @@ DECLARE_INTERFACE_(IHostWnd, INativeWnd)
 #define INTERFACE IHostDialog
 DECLARE_INTERFACE_(IHostDialog, IHostWnd)
 {
-#include "SNativeWndApi.h"
-
+#include <interface/SobjectApi.h>
+#include <interface/SNativeWndApi.h>
     //////////////////////////////////////////////////////////////////////////
 
     /**
@@ -220,13 +214,6 @@ DECLARE_INTERFACE_(IHostDialog, IHostWnd)
      * @return
      */
     STDMETHOD_(void, SetLayoutId)(THIS_ LPCTSTR pszLayoutId) PURE;
-
-    /**
-     * @brief 从XML初始化窗口
-     * @param pNode XML数据
-     * @return TRUE-成功
-     */
-    STDMETHOD_(BOOL, InitFromXml)(THIS_ IXmlNode * pNode) PURE;
 
     /**
      * @brief 获取Dui Root

@@ -49,8 +49,10 @@ typedef struct _MsgHandlerInfo
  */
 #undef INTERFACE
 #define INTERFACE INativeWnd
-DECLARE_INTERFACE_(INativeWnd, IObjRef){
-#include "SNativeWndApi.h"
+DECLARE_INTERFACE_(INativeWnd, IObject){
+    DEF_OBJ_BASE(INativeWnd, Window)
+#include <interface/SobjectApi.h>
+#include <interface/SNativeWndApi.h>
 };
 
 SNSEND
