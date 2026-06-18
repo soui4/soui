@@ -79,11 +79,11 @@ jobs:
 
     - name: Configure CMake (Windows)
       if: matrix.os == 'Windows' && matrix.platform == ''
-      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -G Ninja
+      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -G "Visual Studio 16 2019"
 
     - name: Configure CMake (Win32, WOA)
       if: matrix.os == 'Windows' && matrix.platform != ''
-      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -A ${{ matrix.platform }} -G "Visual Studio 18 2026"
+      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -A ${{ matrix.platform }} -G "Visual Studio 16 2019"
 
     - name: Configure CMake (macOS x64)
       if: matrix.os == 'macOS' && matrix.arch == 'x64'
