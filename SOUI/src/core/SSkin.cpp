@@ -130,6 +130,7 @@ static void DrawSVG9Patch(IRenderTarget *pRT, ISvgObj *pSvg, LPCRECT pRect, LPCR
     {
         RECT rcSrc = { (LONG)srcX, (LONG)srcY, (LONG)(srcX + marginL), (LONG)(srcY + marginT) };
         RECT rcDst = { pRect->left, pRect->top, (LONG)(pRect->left + dst_marginL), (LONG)(pRect->top + dst_marginT) };
+        IntersectRect(&rcDst, &rcDst, pRect);
         pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
     }
 
@@ -138,6 +139,7 @@ static void DrawSVG9Patch(IRenderTarget *pRT, ISvgObj *pSvg, LPCRECT pRect, LPCR
     {
         RECT rcSrc = { (LONG)srcMidX, (LONG)srcY, (LONG)(srcMidX + srcMidW), (LONG)(srcY + marginT) };
         RECT rcDst = { (LONG)dstMidX, pRect->top, (LONG)(dstMidX + dstMidW), (LONG)(pRect->top + dst_marginT) };
+        IntersectRect(&rcDst, &rcDst, pRect);
         pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
     }
 
@@ -146,6 +148,7 @@ static void DrawSVG9Patch(IRenderTarget *pRT, ISvgObj *pSvg, LPCRECT pRect, LPCR
     {
         RECT rcSrc = { (LONG)(srcX + srcWidth - marginR), (LONG)srcY, (LONG)(srcX + srcWidth), (LONG)(srcY + marginT) };
         RECT rcDst = { (LONG)(pRect->right - dst_marginR), pRect->top, pRect->right, (LONG)(pRect->top + dst_marginT) };
+        IntersectRect(&rcDst, &rcDst, pRect);
         pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
     }
 
@@ -154,6 +157,7 @@ static void DrawSVG9Patch(IRenderTarget *pRT, ISvgObj *pSvg, LPCRECT pRect, LPCR
     {
         RECT rcSrc = { (LONG)srcX, (LONG)srcMidY, (LONG)(srcX + marginL), (LONG)(srcMidY + srcMidH) };
         RECT rcDst = { pRect->left, (LONG)dstMidY, (LONG)(pRect->left + dst_marginL), (LONG)(dstMidY + dstMidH) };
+        IntersectRect(&rcDst, &rcDst, pRect);
         pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
     }
 
@@ -162,6 +166,7 @@ static void DrawSVG9Patch(IRenderTarget *pRT, ISvgObj *pSvg, LPCRECT pRect, LPCR
     {
         RECT rcSrc = { (LONG)srcMidX, (LONG)srcMidY, (LONG)(srcMidX + srcMidW), (LONG)(srcMidY + srcMidH) };
         RECT rcDst = { (LONG)dstMidX, (LONG)dstMidY, (LONG)(dstMidX + dstMidW), (LONG)(dstMidY + dstMidH) };
+        IntersectRect(&rcDst, &rcDst, pRect);
         pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
     }
 
@@ -170,6 +175,7 @@ static void DrawSVG9Patch(IRenderTarget *pRT, ISvgObj *pSvg, LPCRECT pRect, LPCR
     {
         RECT rcSrc = { (LONG)(srcX + srcWidth - marginR), (LONG)srcMidY, (LONG)(srcX + srcWidth), (LONG)(srcMidY + srcMidH) };
         RECT rcDst = { (LONG)(pRect->right - dst_marginR), (LONG)dstMidY, pRect->right, (LONG)(dstMidY + dstMidH) };
+        IntersectRect(&rcDst, &rcDst, pRect);
         pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
     }
 
@@ -178,6 +184,7 @@ static void DrawSVG9Patch(IRenderTarget *pRT, ISvgObj *pSvg, LPCRECT pRect, LPCR
     {
         RECT rcSrc = { (LONG)srcX, (LONG)(srcY + srcHeight - marginB), (LONG)(srcX + marginL), (LONG)(srcY + srcHeight) };
         RECT rcDst = { pRect->left, (LONG)(pRect->bottom - dst_marginB), (LONG)(pRect->left + dst_marginL), pRect->bottom };
+        IntersectRect(&rcDst, &rcDst, pRect);
         pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
     }
 
@@ -186,6 +193,7 @@ static void DrawSVG9Patch(IRenderTarget *pRT, ISvgObj *pSvg, LPCRECT pRect, LPCR
     {
         RECT rcSrc = { (LONG)srcMidX, (LONG)(srcY + srcHeight - marginB), (LONG)(srcMidX + srcMidW), (LONG)(srcY + srcHeight) };
         RECT rcDst = { (LONG)dstMidX, (LONG)(pRect->bottom - dst_marginB), (LONG)(dstMidX + dstMidW), pRect->bottom };
+        IntersectRect(&rcDst, &rcDst, pRect);
         pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
     }
 
@@ -194,6 +202,7 @@ static void DrawSVG9Patch(IRenderTarget *pRT, ISvgObj *pSvg, LPCRECT pRect, LPCR
     {
         RECT rcSrc = { (LONG)(srcX + srcWidth - marginR), (LONG)(srcY + srcHeight - marginB), (LONG)(srcX + srcWidth), (LONG)(srcY + srcHeight) };
         RECT rcDst = { (LONG)(pRect->right - dst_marginR), (LONG)(pRect->bottom - dst_marginB), pRect->right, pRect->bottom };
+        IntersectRect(&rcDst, &rcDst, pRect);
         pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
     }
 }
