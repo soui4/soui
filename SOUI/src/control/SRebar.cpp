@@ -651,7 +651,7 @@ BOOL SRebar::OnMouseMove(UINT nFlags, CPoint point)
             {
                 m_bands[m_nDragBand + 1].bNewRow = true;
             }
-            auto curBand = m_bands[m_nDragBand];
+            const BandInfo &curBand = m_bands[m_nDragBand];
             m_bands.RemoveAt(m_nDragBand);
             m_bands.InsertAt(0, curBand);
             m_nDragBand = 0;
@@ -675,7 +675,7 @@ BOOL SRebar::OnMouseMove(UINT nFlags, CPoint point)
         }
         if (m_nDragBand != (int)m_bands.GetCount() - 1)
         {
-            auto curBand = m_bands[m_nDragBand];
+            const BandInfo & curBand = m_bands[m_nDragBand];
             m_bands.RemoveAt(m_nDragBand);
             m_bands.Add(curBand); // append
             m_nDragBand = (int)m_bands.GetCount() - 1;
@@ -735,7 +735,7 @@ BOOL SRebar::OnMouseMove(UINT nFlags, CPoint point)
     }
 
     // 做真正的移除与插入（注意索引变化）
-    auto curBand = m_bands[m_nDragBand];
+    const BandInfo & curBand = m_bands[m_nDragBand];
     m_bands.RemoveAt(m_nDragBand);
     // 调整 insertIndex：如果 insertIndex 在被移除项之后，移除后索引会左移 1
     if (insertIndex > m_nDragBand)
