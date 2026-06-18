@@ -96,6 +96,14 @@ void SColorMask::MakeCacheApha()
     //从mask的指定channel中获得alpha通道，与cache按位运算
     LPBYTE pBitCache = (LPBYTE)m_bmpSkin->LockPixelBits();
     LPBYTE pBitMask = (LPBYTE)m_bmpMask->LockPixelBits();
+    if (!pBitCache || !pBitMask)
+    {
+        if (pBitCache)
+            m_bmpSkin->UnlockPixelBits(pBitCache);
+        if (pBitMask)
+            m_bmpMask->UnlockPixelBits(pBitMask);
+        return;
+    }
 
     int cx = m_bmpMask->Width() < m_bmpSkin->Width() ? m_bmpMask->Width() : m_bmpSkin->Width();
     int cy = m_bmpMask->Height() < m_bmpSkin->Height() ? m_bmpMask->Height() : m_bmpSkin->Height();
@@ -112,9 +120,10 @@ void SColorMask::MakeCacheApha()
                 BYTE byAlpha = *pSrc;
                 pSrc += 4;
 
-                *pDst++ = ((*pDst) * byAlpha) >> 8; //做premutiply
-                *pDst++ = ((*pDst) * byAlpha) >> 8; //做premutiply
-                *pDst++ = ((*pDst) * byAlpha) >> 8; //做premutiply
+                pDst[0] = (pDst[0] * byAlpha) >> 8; //做premutiply
+                pDst[1] = (pDst[1] * byAlpha) >> 8; //做premutiply
+                pDst[2] = (pDst[2] * byAlpha) >> 8; //做premutiply
+                pDst += 3;
                 *pDst++ = byAlpha;
             }
         }

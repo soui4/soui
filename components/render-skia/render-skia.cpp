@@ -30,6 +30,10 @@
 #include <algorithm>
 #include <vector>
 #include <map>
+#ifdef __OHOS__
+#include <fontconfig/fontconfig.h>
+#include <mutex>
+#endif
 #include <windows.h>
 #include <string/strcpcvt.h>
 #include <helper/SAutoBuf.h>
@@ -43,6 +47,101 @@
 #endif
 
 SNSBEGIN
+#ifdef __OHOS__
+static void InitOhosSkiaFontConfig()
+{
+    static std::once_flag s_once;
+    std::call_once(s_once, []() {
+        FcInit();
+        FcConfig *config = FcConfigGetCurrent();
+        if (!config)
+            return;
+
+        const char *fontDirs[] = {
+            "/system/fonts",
+            "/system/font",
+            "/vendor/fonts",
+            "/hw_product/fonts",
+        };
+        for (const char *dir : fontDirs)
+            FcConfigAppFontAddDir(config, (const FcChar8 *)dir);
+        FcConfigBuildFonts(config);
+    });
+}
+
+static bool OhosEqualsNoCase(const char *lhs, const char *rhs)
+{
+    if (!lhs || !rhs)
+        return lhs == rhs;
+    while (*lhs && *rhs)
+    {
+        char a = *lhs++;
+        char b = *rhs++;
+        if (a >= 'A' && a <= 'Z')
+            a = char(a - 'A' + 'a');
+        if (b >= 'A' && b <= 'Z')
+            b = char(b - 'A' + 'a');
+        if (a != b)
+            return false;
+    }
+    return *lhs == 0 && *rhs == 0;
+}
+
+static bool OhosContainsNonAscii(const char *text)
+{
+    if (!text)
+        return false;
+    for (const unsigned char *p = (const unsigned char *)text; *p; ++p)
+    {
+        if ((*p) & 0x80)
+            return true;
+    }
+    return false;
+}
+
+static const char *OhosNormalizeSkiaFontFamily(const char *family)
+{
+    if (!family || !family[0])
+        return "HarmonyOS Sans SC";
+
+    const char *aliases[] = {
+        "simsun",
+        "nsimsun",
+        "simhei",
+        "microsoft yahei",
+        "microsoft jhenghei",
+        "arial",
+    };
+    for (const char *alias : aliases)
+    {
+        if (OhosEqualsNoCase(family, alias))
+            return "HarmonyOS Sans SC";
+    }
+    if (OhosContainsNonAscii(family))
+        return "HarmonyOS Sans SC";
+    return family;
+}
+
+static SkTypeface *CreateOhosSkiaTypeface(const char *family, SkTypeface::Style style, BYTE charSet)
+{
+    InitOhosSkiaFontConfig();
+    const char *families[] = {
+        OhosNormalizeSkiaFontFamily(family),
+        "HarmonyOS Sans SC",
+        "FZHeiT-SC",
+        "FZHeiT-SC-Regular",
+        "sans-serif",
+    };
+    for (const char *candidate : families)
+    {
+        SkTypeface *typeface = SkTypeface::CreateFromName(candidate, style, charSet);
+        if (typeface)
+            return typeface;
+    }
+    return SkTypeface::RefDefault(style);
+}
+#endif
+
 // PS_SOLID
 static const float ps_solid[] = { 1.0f, 0.0f };
 static const float ps_dash[] = { 12.0f, 6.0f };
@@ -215,6 +314,8 @@ SRenderFactory_Skia::SRenderFactory_Skia()
     lf.lfHeight = 20;
 #ifdef _WIN32
     _tcscpy(lf.lfFaceName, _T("宋体"));
+#elif defined(__OHOS__)
+    _tcscpy(lf.lfFaceName, _T("HarmonyOS Sans SC"));
 #else
     _tcscpy(lf.lfFaceName, _T("simsun"));
 #endif //_WIN32
@@ -467,7 +568,9 @@ HRESULT SRenderTarget_Skia::CreateRegion(IRegionS **ppRegion)
 
 HRESULT SRenderTarget_Skia::Resize(SIZE sz)
 {
-    m_curBmp->Init(sz.cx, sz.cy, NULL);
+    HRESULT hr = m_curBmp->Init(sz.cx, sz.cy, NULL);
+    if (FAILED(hr))
+        return hr;
     delete m_SkCanvas;
     m_SkCanvas = new SkCanvas(m_curBmp->GetSkBitmap());
     return S_OK;
@@ -2482,24 +2585,35 @@ HBITMAP SBitmap_Skia::CreateGDIBitmap(int nWid, int nHei, void **ppBits)
 
 HRESULT SBitmap_Skia::Init(int nWid, int nHei, const LPVOID pBits /*=NULL*/)
 {
-    m_bitmap.reset();
-    m_bitmap.setInfo(SkImageInfo::Make(nWid, nHei, kN32_SkColorType, kPremul_SkAlphaType));
-    if (m_hBmp)
-        DeleteObject(m_hBmp);
+    if (nWid <= 0 || nHei <= 0)
+        return E_INVALIDARG;
 
     LPVOID pBmpBits = NULL;
-    m_hBmp = CreateGDIBitmap(nWid, nHei, &pBmpBits);
-    if (!m_hBmp)
+    HBITMAP hBmp = CreateGDIBitmap(nWid, nHei, &pBmpBits);
+    if (!hBmp || !pBmpBits)
+    {
+        if (hBmp)
+            DeleteObject(hBmp);
         return E_OUTOFMEMORY;
+    }
+
+    SkBitmap bitmap;
+    bitmap.setInfo(SkImageInfo::Make(nWid, nHei, kN32_SkColorType, kPremul_SkAlphaType));
     if (pBits)
     {
-        memcpy(pBmpBits, pBits, nWid * nHei * 4);
+        memcpy(pBmpBits, pBits, (size_t)nWid * nHei * 4);
     }
     else
     {
-        memset(pBmpBits, 0, nWid * nHei * 4);
+        memset(pBmpBits, 0, (size_t)nWid * nHei * 4);
     }
-    m_bitmap.setPixels(pBmpBits);
+    bitmap.setPixels(pBmpBits);
+
+    if (m_hBmp)
+        DeleteObject(m_hBmp);
+    m_hBmp = hBmp;
+    m_bitmap.reset();
+    m_bitmap = bitmap;
     return S_OK;
 }
 
@@ -2515,8 +2629,13 @@ HRESULT SBitmap_Skia::Init2(IImgFrame *pFrame)
     void *pBits = NULL;
     m_hBmp = CreateGDIBitmap(uWid, uHei, &pBits);
 
-    if (!m_hBmp)
+    if (!m_hBmp || !pBits)
+    {
+        if (m_hBmp)
+            DeleteObject(m_hBmp);
+        m_hBmp = NULL;
         return E_OUTOFMEMORY;
+    }
     m_bitmap.setPixels(pBits);
 
     memcpy(m_bitmap.getPixels(), pFrame->GetPixels(), m_bitmap.rowBytes() * uHei);
@@ -2590,9 +2709,8 @@ LPVOID SBitmap_Skia::LockPixelBits()
 
 void SBitmap_Skia::UnlockPixelBits(LPVOID pBuf)
 {
-    BITMAP bm;
-    GetObject(m_hBmp, sizeof(bm), &bm);
-    memcpy(bm.bmBits, pBuf, Width() * Height() * 4);
+    if (!pBuf || pBuf != m_bitmap.getPixels())
+        return;
 #ifndef _WIN32
     MarkDirty();
 #endif
@@ -2906,7 +3024,11 @@ SFont_Skia::SFont_Skia(IRenderFactory *pRenderFac, const LOGFONT *plf)
         style |= SkTypeface::kItalic;
     if (plf->lfWeight == FW_BOLD)
         style |= SkTypeface::kBold;
+#ifdef __OHOS__
+    m_skFont = CreateOhosSkiaTypeface(strFace, (SkTypeface::Style)style, plf->lfCharSet);
+#else
     m_skFont = SkTypeface::CreateFromName(strFace, (SkTypeface::Style)style, plf->lfCharSet);
+#endif
     //         STRACE(L"font new: objects = %d", ++s_cFont);
 }
 
@@ -3001,7 +3123,11 @@ BOOL SFont_Skia::UpdateFont(const LOGFONT *plf)
     if (plf->lfWeight == FW_BOLD)
         style |= SkTypeface::kBold;
     m_skFont->unref();
+#ifdef __OHOS__
+    m_skFont = CreateOhosSkiaTypeface(strFace, (SkTypeface::Style)style, plf->lfCharSet);
+#else
     m_skFont = SkTypeface::CreateFromName(strFace, (SkTypeface::Style)style, plf->lfCharSet);
+#endif
 
     return TRUE;
 }

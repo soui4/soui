@@ -48,6 +48,21 @@ else()
 endif()
 target_precompile_headers(soui4 PRIVATE "include/souistd.h")
 
+if(IS_OHOS)
+    target_include_directories(soui4 PRIVATE ${PROJECT_SOURCE_DIR}/swinx/include)
+    find_library(OHOS_ACE_NAPI ace_napi.z)
+    find_library(OHOS_ACE_NDK ace_ndk.z)
+    find_library(OHOS_HILOG hilog_ndk.z)
+    foreach(_ohos_lib IN ITEMS OHOS_ACE_NAPI OHOS_ACE_NDK)
+        if(${_ohos_lib})
+            target_link_libraries(soui4 PRIVATE ${${_ohos_lib}})
+        endif()
+    endforeach()
+    if(OHOS_HILOG)
+        target_link_libraries(soui4 PRIVATE ${OHOS_HILOG})
+    endif()
+endif()
+
 target_include_directories(soui4
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include

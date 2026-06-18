@@ -22,6 +22,11 @@ file(GLOB_RECURSE CURRENT_SRCS  *.cpp)
 file(GLOB_RECURSE CURRENT_SOUIS  uires/*.*)
 file(GLOB_RECURSE CURRENT_RC *.rc *.rc2)
 
+set(OHOS_DEMO_ENTRY ${CMAKE_CURRENT_SOURCE_DIR}/ohos_demo_entry.cpp)
+if(IS_OHOS)
+    list(REMOVE_ITEM CURRENT_SRCS ${OHOS_DEMO_ENTRY})
+endif()
+
 if (NOT CMAKE_SYSTEM_NAME MATCHES Windows)
 # 添加 -fpermissive 选项到 C++ 编译器标志
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive" )
@@ -117,3 +122,42 @@ target_precompile_headers(demo PRIVATE "stdafx.h")
 set_target_properties (demo PROPERTIES
     FOLDER demos
 )
+
+if(IS_OHOS)
+    set(OHOS_DEMO_SRCS ${CURRENT_SRCS})
+    list(REMOVE_ITEM OHOS_DEMO_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/demo.cpp)
+
+    add_library(souidemo SHARED ${CURRENT_HEADERS} ${OHOS_DEMO_SRCS} ${OHOS_DEMO_ENTRY})
+    target_include_directories(souidemo PRIVATE
+        ${PROJECT_SOURCE_DIR}
+        ${PROJECT_SOURCE_DIR}/components
+        ${PROJECT_SOURCE_DIR}/utilities/include
+        ${PROJECT_SOURCE_DIR}/SOUI/include
+        ${PROJECT_SOURCE_DIR}/swinx/include
+        ${PROJECT_SOURCE_DIR}/soui-sys-resource
+        ${PROJECT_SOURCE_DIR}/controls.extend
+        ${PROJECT_SOURCE_DIR}/third-part/wke/include
+        ${PROJECT_SOURCE_DIR}/third-part/Detours/include
+        ${PROJECT_SOURCE_DIR}/third-part/nanosvg/src
+        ${PROJECT_SOURCE_DIR}/third-part/stb
+        ${CMAKE_CURRENT_SOURCE_DIR}
+    )
+    target_link_libraries(souidemo PRIVATE soui4 utilities4 ExtendCtrls swinx dl)
+    target_compile_resources(souidemo ${CURRENT_RC} INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/soui-sys-resource)
+    add_dependencies(souidemo render-skia)
+    target_link_libraries(souidemo PRIVATE render-skia)
+    if(SOUI_BUILD_RICHEDIT)
+        add_dependencies(souidemo msftedit)
+        target_link_libraries(souidemo PRIVATE msftedit)
+    endif()
+    find_library(OHOS_ACE_NAPI ace_napi.z)
+    find_library(OHOS_ACE_NDK ace_ndk.z)
+    find_library(OHOS_HILOG hilog_ndk.z)
+    foreach(_ohos_lib IN ITEMS OHOS_ACE_NAPI OHOS_ACE_NDK OHOS_HILOG)
+        if(${_ohos_lib})
+            target_link_libraries(souidemo PRIVATE ${${_ohos_lib}})
+        endif()
+    endforeach()
+    target_precompile_headers(souidemo PRIVATE "stdafx.h")
+    set_target_properties(souidemo PROPERTIES FOLDER demos)
+endif()

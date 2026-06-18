@@ -12,8 +12,36 @@
  */
 #include "souistd.h"
 #include "control/SCaption.h"
+#include "control/SCmnCtrl.h"
+#include "core/SWindowMgr.h"
 
 SNSBEGIN
+
+namespace
+{
+bool IsCaptionInteractiveChild(SWindow *pWnd)
+{
+    if (!pWnd)
+        return false;
+
+    return pWnd->IsClass(SButton::GetClassName()) ||
+        pWnd->IsClass(SLink::GetClassName()) ||
+        pWnd->IsClass(SCheckBox::GetClassName()) ||
+        pWnd->IsClass(SRadioBox::GetClassName()) ||
+        pWnd->IsClass(L"combobase") ||
+        pWnd->IsClass(L"spinButton") ||
+        pWnd->IsClass(L"edit") ||
+        pWnd->IsClass(L"menuItem");
+}
+
+bool HitCaptionDragArea(const SCaption *pCaption, CPoint point)
+{
+    CPoint ptHit(point);
+    SWND swndHit = pCaption->SwndFromPoint(ptHit, TRUE);
+    SWindow *pHit = SWindowMgr::GetWindow(swndHit);
+    return !IsCaptionInteractiveChild(pHit);
+}
+} // namespace
 
 SCaption::SCaption(void)
     : m_bIsMaxDown(FALSE)
@@ -44,6 +72,12 @@ void SCaption::OnMouseMove(UINT nFlags, CPoint point)
 }
 void SCaption::OnLButtonDown(UINT nFlags, CPoint point)
 {
+    if (!HitCaptionDragArea(this, point))
+    {
+        m_bIsMaxDown = FALSE;
+        return;
+    }
+
     if (IsFocusable())
         SetFocus();
     HWND hHost = GetContainer()->GetHostHwnd();
@@ -58,6 +92,11 @@ void SCaption::OnLButtonDown(UINT nFlags, CPoint point)
 
 void SCaption::OnLButtonDblClk(UINT nFlags, CPoint point)
 {
+    if (!HitCaptionDragArea(this, point))
+    {
+        return;
+    }
+
     HWND hHost = GetContainer()->GetHostHwnd();
 
     if ((GetWindowLong(hHost, GWL_STYLE) & WS_THICKFRAME) && GetWindowLong(hHost, GWL_STYLE) & WS_MAXIMIZEBOX)

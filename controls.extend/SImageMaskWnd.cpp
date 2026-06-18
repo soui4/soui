@@ -101,6 +101,14 @@ void SImageMaskWnd::MakeCacheAlpha()
     //从mask的指定channel中获得alpha通道
     LPBYTE pBitCache = (LPBYTE)m_bmpCache->LockPixelBits();
     LPBYTE pBitMask = (LPBYTE)m_bmpMask->LockPixelBits();
+    if (!pBitCache || !pBitMask)
+    {
+        if (pBitCache)
+            m_bmpCache->UnlockPixelBits(pBitCache);
+        if (pBitMask)
+            m_bmpMask->UnlockPixelBits(pBitMask);
+        return;
+    }
     LPBYTE pDst = pBitCache;
     LPBYTE pSrc = pBitMask + m_iMaskChannel;
     int nPixels = m_bmpCache->Width() * m_bmpCache->Height();
@@ -118,7 +126,7 @@ void SImageMaskWnd::MakeCacheAlpha()
         }
         else
         {
-            *pDst += 4;
+            pDst += 4;
         }
     }
     m_bmpCache->UnlockPixelBits(pBitCache);

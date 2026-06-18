@@ -375,7 +375,7 @@ void SComboBase::OnCreateDropDown(SDropDownWnd *pDropDown)
 void SComboBase::OnDestroyDropDown(SDropDownWnd *pDropDown)
 {
     GetContainer()->OnDropdownState(pDropDown, FALSE);
-    if (!m_bDropdown)
+    if (!m_bDropdown && m_pEdit)
     {
         m_pEdit->SetFocus();
     }
@@ -547,7 +547,7 @@ BOOL SComboBase::FireEvent(IEvtArgs *evt)
     if (evt->GetID() == EventRENotify::EventID)
     {
         EventRENotify *evtRe = (EventRENotify *)evt;
-        if (evtRe->iNotify == EN_CHANGE && !m_pEdit->GetEventSet()->isMuted())
+        if (evtRe->iNotify == EN_CHANGE && m_pEdit && !m_pEdit->GetEventSet()->isMuted())
         {
             m_pEdit->GetEventSet()->setMutedState(true);
             SStringT strTxt = m_pEdit->GetWindowText();
@@ -677,7 +677,8 @@ SStringT SComboBase::GetWindowText(BOOL bRawText /*=TRUE*/) const
 void SComboBase::SetWindowText(LPCTSTR pszText)
 {
     SWindow::SetWindowText(pszText);
-    m_pEdit->SetWindowText(pszText);
+    if (m_pEdit)
+        m_pEdit->SetWindowText(pszText);
     m_nTextLength = (int)_tcslen(pszText);
 }
 
@@ -690,9 +691,15 @@ void SComboBase::OnKillFocus(SWND wndFocus)
 HRESULT SComboBase::OnAttrDropDown(const SStringW &strValue, BOOL bLoading)
 {
     m_bDropdown = STRINGASBOOL(strValue);
+    if (!m_pEdit)
+    {
+        m_bDropdown = TRUE;
+        return S_OK;
+    }
     if (bLoading)
         return S_OK;
-    m_pEdit->SetVisible(!m_bDropdown, TRUE);
+    if (m_pEdit)
+        m_pEdit->SetVisible(!m_bDropdown, TRUE);
     return S_OK;
 }
 
@@ -705,7 +712,8 @@ void SComboBase::UpdateChildrenPosition()
     CRect rcBtn;
     GetDropBtnRect(&rcBtn);
     rcEdit.right = rcBtn.left;
-    m_pEdit->Move(rcEdit);
+    if (m_pEdit)
+        m_pEdit->Move(rcEdit);
 }
 
 void SComboBase::OnColorize(COLORREF cr)
@@ -747,7 +755,10 @@ BOOL SComboBase::IsDropdown() const
 void SComboBase::SetDropdown(BOOL bDropdown)
 {
     m_bDropdown = bDropdown;
-    m_pEdit->SetVisible(!m_bDropdown, TRUE);
+    if (m_pEdit)
+        m_pEdit->SetVisible(!m_bDropdown, TRUE);
+    else
+        m_bDropdown = TRUE;
 }
 
 SStringT SComboBase::GetCueText(BOOL bRawText) const
@@ -757,7 +768,7 @@ SStringT SComboBase::GetCueText(BOOL bRawText) const
 
 void SComboBase::SetFocus()
 {
-    if (!m_bDropdown)
+    if (!m_bDropdown && m_pEdit)
         m_pEdit->SetFocus();
     else
         __baseCls::SetFocus();

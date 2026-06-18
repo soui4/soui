@@ -291,6 +291,8 @@ static void ColorizeMode(BYTE *pArgb, const COLORIZEPARAM &param)
 
 bool SDIBHelper::Colorize(IBitmapS *pBmp, COLORREF crRef)
 {
+    if (!pBmp || pBmp->Width() == 0 || pBmp->Height() == 0)
+        return false;
     RGBQUAD color = RGBtoRGBQUAD(crRef);
     RGBQUAD hsl = RGBtoHSL(color);
     COLORIZEPARAM param;
@@ -302,6 +304,8 @@ bool SDIBHelper::Colorize(IBitmapS *pBmp, COLORREF crRef)
     FillColorizeParam(param, hsl.rgbRed, hsl.rgbGreen, fBlend);
 
     DIBINFO di = { (LPBYTE)pBmp->LockPixelBits(), pBmp->Width(), pBmp->Height() };
+    if (!di.pBits)
+        return false;
 
     bool bRet = ColorTransform(&di, ColorizeMode, param);
 
@@ -330,7 +334,11 @@ bool SDIBHelper::Colorize(COLORREF &crTarget, COLORREF crRef)
 
 bool SDIBHelper::GrayImage(IBitmapS *pBmp)
 {
+    if (!pBmp || pBmp->Width() == 0 || pBmp->Height() == 0)
+        return false;
     DIBINFO di = { (LPBYTE)pBmp->LockPixelBits(), pBmp->Width(), pBmp->Height() };
+    if (!di.pBits)
+        return false;
     bool bRet = ColorTransform(&di, GrayMode, 0);
     pBmp->UnlockPixelBits(di.pBits);
     return bRet;
@@ -338,7 +346,11 @@ bool SDIBHelper::GrayImage(IBitmapS *pBmp)
 
 bool SDIBHelper::DisabledStyleImage(IBitmapS *pBmp)
 {
+    if (!pBmp || pBmp->Width() == 0 || pBmp->Height() == 0)
+        return false;
     DIBINFO di = { (LPBYTE)pBmp->LockPixelBits(), pBmp->Width(), pBmp->Height() };
+    if (!di.pBits)
+        return false;
     bool bRet = ColorTransform(&di, DisabledStyleMode, 0);
     pBmp->UnlockPixelBits(di.pBits);
     return bRet;
@@ -386,7 +398,11 @@ static int RgbCmp(const void *p1, const void *p2)
 
 COLORREF SDIBHelper::CalcAvarageColor(IBitmapS *pBmp, int nPercent, int nBlockSize /*=5*/)
 {
+    if (!pBmp || pBmp->Width() == 0 || pBmp->Height() == 0 || nBlockSize <= 0)
+        return CR_INVALID;
     DIBINFO di = { (LPBYTE)pBmp->LockPixelBits(), pBmp->Width(), pBmp->Height() };
+    if (!di.pBits)
+        return CR_INVALID;
 
     int xBlocks = (di.nWid + nBlockSize - 1) / nBlockSize;
     int yBlocks = (di.nHei + nBlockSize - 1) / nBlockSize;

@@ -320,6 +320,14 @@ UINT SNcPainter::OnNcHitTest(CPoint point)
             m_pHost->ScreenToClient(&point);
             CRect rcMargin = m_pHost->m_hostAttr.GetMargin(GetScale());
             CRect rcWnd = m_pHost->GetRoot()->GetWindowRect();
+#if defined(__OHOS__)
+            int nCaptionHit = rcMargin.top + (32 * GetScale() + 50) / 100;
+            if (point.y < nCaptionHit)
+            {
+                uRet = HTCLIENT;
+                break;
+            }
+#endif
             if (point.x > rcWnd.right - rcMargin.right)
             {
                 if (point.y > rcWnd.bottom - rcMargin.bottom)

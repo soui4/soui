@@ -13,6 +13,18 @@ set(SOUI_CMAKE_DIR "${CMAKE_CURRENT_LIST_DIR}" CACHE INTERNAL "Current directory
 # 工具查找
 if(CMAKE_SYSTEM_NAME MATCHES Windows)
     set(ENABLE_RESOURCES_BUILD ON)
+elseif(IS_OHOS)
+    find_program(WINDRES_EXE NAMES llvm-rc)
+    if(WINDRES_EXE AND CMAKE_C_COMPILER)
+        message(STATUS "OHOS resource tools: llvm-rc=${WINDRES_EXE}, cc=${CMAKE_C_COMPILER}")
+        set(ENABLE_RESOURCES_BUILD ON)
+        set(SOUI_RC_COMPAT_INCLUDE_DIR "${CMAKE_BINARY_DIR}/soui-rc-compat")
+        file(MAKE_DIRECTORY "${SOUI_RC_COMPAT_INCLUDE_DIR}")
+        file(WRITE "${SOUI_RC_COMPAT_INCLUDE_DIR}/winresrc.h" "#ifndef SOUI_OHOS_WINRESRC_H\n#define SOUI_OHOS_WINRESRC_H\n#define LANG_CHINESE 0x04\n#define SUBLANG_CHINESE_SIMPLIFIED 0x02\n#define VS_VERSION_INFO 1\n#define VOS__WINDOWS32 0x00000004L\n#define VFT_APP 0x00000001L\n#define VFT_DLL 0x00000002L\n#endif\n")
+    else()
+        message(STATUS "OHOS resource tools not found. Resource files (.rc) will not be compiled.")
+        set(ENABLE_RESOURCES_BUILD OFF)
+    endif()
 else()
     # 1. 查找 MinGW windres
     find_program(WINDRES_EXE NAMES x86_64-w64-mingw32-windres)
@@ -57,8 +69,9 @@ function(windres_compile_rc target output_var rc_file)
     cmake_parse_arguments(ARG "" "" "INCLUDE_DIRS;DEPENDS" ${ARGN})
     get_filename_component(rc_name "${rc_file}" NAME_WE)
     get_filename_component(rc_abs_path "${rc_file}" ABSOLUTE)
+    string(MAKE_C_IDENTIFIER "${target}_${rc_name}" rc_output_name)
 
-    set(coff_obj "${CMAKE_CURRENT_BINARY_DIR}/${rc_name}_res.coff.o")
+    set(coff_obj "${CMAKE_CURRENT_BINARY_DIR}/${rc_output_name}_res.coff.o")
 
     # 准备包含路径
     set(include_flags)
@@ -70,23 +83,81 @@ function(windres_compile_rc target output_var rc_file)
     endforeach()
 
     get_target_property(TARGET_DEFS ${target} COMPILE_DEFINITIONS)
+    if(NOT TARGET_DEFS)
+        set(TARGET_DEFS)
+    endif()
     set(def_flags)
     foreach(def ${TARGET_DEFS})
-        list(APPEND def_flags "-D ${def}")
+        if(IS_OHOS)
+            list(APPEND def_flags "/D${def}")
+        else()
+            list(APPEND def_flags "-D ${def}")
+        endif()
     endforeach()
     message(STATUS "Compiling resource ${rc_file} with def_flags: ${def_flags}")
     # Step 1: 生成 COFF 目标文件
+    if(IS_OHOS)
+        set(res_file "${CMAKE_CURRENT_BINARY_DIR}/${rc_output_name}_res.res")
+        set(elf_obj "${CMAKE_CURRENT_BINARY_DIR}/${rc_output_name}_res.o")
+        set(asm_file "${CMAKE_CURRENT_BINARY_DIR}/${rc_output_name}_res.S")
+        set(ohos_include_flags)
+        foreach(include_dir ${include_flags})
+            string(REGEX REPLACE "^-I" "" include_path "${include_dir}")
+            list(APPEND ohos_include_flags "/I${include_path}")
+        endforeach()
+        list(APPEND ohos_include_flags "/I${SOUI_RC_COMPAT_INCLUDE_DIR}")
+
+        file(TO_CMAKE_PATH "${res_file}" res_file_asm)
+        set(asm_content "
+            .section .rodata,\"a\",@progbits
+            .globl _binary_soui_coff_o_start
+            .globl _binary_soui_coff_o_end
+
+            _binary_soui_coff_o_start:
+                .incbin \"${res_file_asm}\"
+            _binary_soui_coff_o_end:
+                .byte 0
+        ")
+        file(GENERATE OUTPUT ${asm_file} CONTENT "${asm_content}")
+        separate_arguments(OHOS_C_FLAGS NATIVE_COMMAND "${CMAKE_C_FLAGS}")
+        set(OHOS_ASM_TARGET_FLAGS)
+        if(OHOS_SDK_NATIVE)
+            list(APPEND OHOS_ASM_TARGET_FLAGS
+                --target=aarch64-linux-ohos
+                "--gcc-toolchain=${OHOS_SDK_NATIVE}/llvm"
+                "--sysroot=${OHOS_SDK_NATIVE}/sysroot"
+            )
+        endif()
+
+        add_custom_command(
+                OUTPUT ${res_file}
+                COMMAND ${WINDRES_EXE} ${def_flags} ${ohos_include_flags} /FO "${res_file}" "${rc_abs_path}"
+                DEPENDS ${rc_abs_path} ${ARG_DEPENDS}
+                COMMENT "Compiling ${rc_file} to RES"
+                VERBATIM
+        )
+        add_custom_command(
+                OUTPUT ${elf_obj}
+                COMMAND ${CMAKE_C_COMPILER} ${OHOS_ASM_TARGET_FLAGS} ${OHOS_C_FLAGS} -x assembler-with-cpp -c "${asm_file}" -o "${elf_obj}"
+                DEPENDS ${asm_file} ${res_file}
+                COMMENT "Embedding RES into ELF object: ${rc_name}"
+                VERBATIM
+        )
+        set(${output_var} ${elf_obj} PARENT_SCOPE)
+        return()
+    else()
     add_custom_command(
             OUTPUT ${coff_obj}
             COMMAND ${WINDRES_EXE} ${def_flags} --target=pe-x86-64 ${include_flags} -i "${rc_abs_path}" -o "${coff_obj}" -O coff
             DEPENDS ${rc_abs_path} ${ARG_DEPENDS}
             COMMENT "Compiling ${rc_file} to COFF"
     )
+    endif()
 
     if(APPLE)
         # macOS: 编译为 Mach-O 对象文件
-        set(macho_obj "${CMAKE_CURRENT_BINARY_DIR}/${rc_name}_res.o")
-        set(asm_file "${CMAKE_CURRENT_BINARY_DIR}/${rc_name}.s")
+        set(macho_obj "${CMAKE_CURRENT_BINARY_DIR}/${rc_output_name}_res.o")
+        set(asm_file "${CMAKE_CURRENT_BINARY_DIR}/${rc_output_name}.s")
 
         # Step 2: 生成汇编文件，嵌入整个 COFF 文件
         set(asm_content "
@@ -111,10 +182,10 @@ function(windres_compile_rc target output_var rc_file)
         set(${output_var} ${macho_obj} PARENT_SCOPE)
 
     else()
-        set(elf_obj "${CMAKE_CURRENT_BINARY_DIR}/${rc_name}_res.o")
-        set(final_obj "${CMAKE_CURRENT_BINARY_DIR}/${rc_name}_res.final.o")
-        set(symbol_list "${CMAKE_CURRENT_BINARY_DIR}/${rc_name}_symbols.txt")
-        set(rename_script "${CMAKE_CURRENT_BINARY_DIR}/${rc_name}_rename.txt")
+        set(elf_obj "${CMAKE_CURRENT_BINARY_DIR}/${rc_output_name}_res.o")
+        set(final_obj "${CMAKE_CURRENT_BINARY_DIR}/${rc_output_name}_res.final.o")
+        set(symbol_list "${CMAKE_CURRENT_BINARY_DIR}/${rc_output_name}_symbols.txt")
+        set(rename_script "${CMAKE_CURRENT_BINARY_DIR}/${rc_output_name}_rename.txt")
             # Step 2: Link COFF to ELF format using ld
             add_custom_command(
                 OUTPUT ${elf_obj}
@@ -148,7 +219,7 @@ function(windres_compile_rc target output_var rc_file)
             )
             
             # Optional: Verify the renamed symbols with nm -g
-            set(final_symbols "${CMAKE_CURRENT_BINARY_DIR}/${rc_name}_symbols_final.txt")
+            set(final_symbols "${CMAKE_CURRENT_BINARY_DIR}/${rc_output_name}_symbols_final.txt")
             add_custom_command(
                 OUTPUT ${final_symbols}
                 COMMAND ${NM_EXECUTABLE} -g ${final_obj} > ${final_symbols}
@@ -190,7 +261,7 @@ function(target_compile_resources target)
         endforeach()
         if(resource_objects)
             target_sources(${target} PRIVATE ${resource_objects})
-            if(CMAKE_SYSTEM_NAME MATCHES Linux)
+            if(CMAKE_SYSTEM_NAME MATCHES Linux OR IS_OHOS)
                 # Set linker options to export symbols
                 target_link_options(${target} PRIVATE 
                     -rdynamic

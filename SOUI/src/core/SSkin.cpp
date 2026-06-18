@@ -414,8 +414,20 @@ void SSkinImgList::OnColorize(COLORREF cr)
         { // restore
             LPCVOID pSrc = m_imgBackup->GetPixelBits();
             LPVOID pDst = pImg->LockPixelBits();
-            memcpy(pDst, pSrc, pImg->Width() * pImg->Height() * 4);
-            pImg->UnlockPixelBits(pDst);
+            UINT nWid = pImg->Width();
+            UINT nHei = pImg->Height();
+            if (pSrc && pDst && nWid == m_imgBackup->Width() && nHei == m_imgBackup->Height())
+            {
+                memcpy(pDst, pSrc, (size_t)nWid * nHei * 4);
+                pImg->UnlockPixelBits(pDst);
+            }
+            else
+            {
+                if (pDst)
+                    pImg->UnlockPixelBits(pDst);
+                m_imgBackup = NULL;
+                return;
+            }
         }
         else
         {

@@ -424,7 +424,7 @@ class SOUI_EXP SComboBase
      */
     SStringT GetEditText() const
     {
-        if (!m_bDropdown)
+        if (!m_bDropdown && m_pEdit)
         {
             return m_pEdit->GetWindowText();
         }

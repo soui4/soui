@@ -55,6 +55,7 @@ config/
 build
 /out
 output*/
+/ohos_demo2/entry/libs/
 skin_config.xml
 xcode/
 

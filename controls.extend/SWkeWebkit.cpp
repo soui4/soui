@@ -1,8 +1,10 @@
 ﻿#include "stdafx.h"
 #include "SWkeWebkit.h"
 #include <imm.h>
+#ifdef _WIN32
 #pragma comment(lib, "imm32.lib")
 #pragma comment(lib, "msimg32.lib")
+#endif
 
 SNSBEGIN
 

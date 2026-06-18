@@ -73,6 +73,14 @@ namespace SOUI
 		//从mask的指定channel中获得alpha通道
 		LPBYTE pBitCache = (LPBYTE)cache->LockPixelBits();
 		LPBYTE pBitMask = (LPBYTE)m_bmpMaskTemp->LockPixelBits();
+		if (!pBitCache || !pBitMask)
+		{
+			if (pBitCache)
+				cache->UnlockPixelBits(pBitCache);
+			if (pBitMask)
+				m_bmpMaskTemp->UnlockPixelBits(pBitMask);
+			return;
+		}
 		LPBYTE pDst = pBitCache;
 		LPBYTE pSrc = pBitMask + m_iMaskChannel;
 		int nPixels = cache->Width() * cache->Height();
@@ -90,7 +98,7 @@ namespace SOUI
 			}
 			else
 			{
-				*pDst += 4;
+				pDst += 4;
 			}
 		}
 		cache->UnlockPixelBits(pBitCache);

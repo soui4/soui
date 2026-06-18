@@ -847,6 +847,8 @@ void SHostWnd::OnPaint(HDC dc)
     dc = ::BeginPaint(m_hWnd, &ps);
 #ifdef _WIN32
     OnPrint(m_hostAttr.m_bTranslucent ? NULL : dc);
+#elif defined(__OHOS__)
+    OnPrint(m_hostAttr.m_bTranslucent ? NULL : dc);
 #else
     OnPrint(dc);
 #endif //_WIN32

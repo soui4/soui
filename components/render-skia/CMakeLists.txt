@@ -38,7 +38,11 @@ else()
     # 通过swinx间接获取fontconfig和freetype支持
     # swinx已经包含了这些库，不需要直接链接
     add_dependencies(render-skia swinx)
-    if(CMAKE_SYSTEM_NAME MATCHES Darwin)
+    if(CMAKE_SYSTEM_NAME MATCHES "OHOS|OpenHarmony|HarmonyOS")
+        find_library(OHOS_EGL EGL REQUIRED)
+        find_library(OHOS_GLES GLESv3 REQUIRED)
+        set(GL_LIB ${OHOS_EGL} ${OHOS_GLES} fontconfig)
+    elseif(CMAKE_SYSTEM_NAME MATCHES Darwin)
             # 查找GLEW和GLFW包
         find_package(GLEW REQUIRED)
         find_package(glfw3 REQUIRED)

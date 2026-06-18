@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "SFadeFrame.h"
+#include <core/SWindowMgr.h>
 
 #define TIMER_SHOW 1
 #define TIMER_HIDE 2
@@ -23,6 +24,12 @@ SFadeFrame::~SFadeFrame(void)
 void SFadeFrame::OnMouseLeave()
 {
     SWindow::OnMouseLeave();
+#ifdef __OHOS__
+    SWindow *pTarget = GetRoot()->FindChildByName(m_strTargetName);
+    SWindow *pFocus = GetContainer() ? SWindowMgr::GetWindow(GetContainer()->GetFocus()) : NULL;
+    if (pTarget && pFocus && (pFocus == pTarget || pFocus->IsDescendant(pTarget)))
+        return;
+#endif
     KillTimer(TIMER_SHOW);
     SetTimer(TIMER_HIDE, m_nDelayTime);
 }

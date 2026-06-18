@@ -1,0 +1,8 @@
+{
+  "name": "libswinx.so",
+  "version": "1.0.0",
+  "description": "SOUI SwinX HarmonyOS XComponent native module.",
+  "main": "Index.d.ts",
+  "author": "",
+  "license": ""
+}
