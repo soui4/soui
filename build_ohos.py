@@ -113,12 +113,6 @@ def parse_args():
     parser.add_argument("--with-demos", action="store_true", help="Build SOUI demos")
     parser.add_argument("--with-games", action="store_true", help="Build SOUI games")
     parser.add_argument("--static-components", action="store_true", help="Build SOUI components as static libraries")
-    parser.add_argument(
-        "--rc-compiler",
-        default="AUTO",
-        choices=("AUTO", "MINGW", "LLVMRC", "OFF", "auto", "mingw", "llvmrc", "off"),
-        help="Resource compiler backend for OHOS .rc files, default: AUTO",
-    )
     parser.add_argument("--extra-cmake-arg", action="append", default=[], help="Extra argument forwarded to CMake configure")
     return parser.parse_args()
 
@@ -193,7 +187,6 @@ def main():
         "-DCMAKE_EXE_LINKER_FLAGS=-Wl,--gc-sections -Wl,--exclude-libs,ALL",
         "-DTOOLCHAIN_SUPPORTS_ATTRIBUTE_CONSTRUCTOR_EXITCODE=0",
         "-DTOOLCHAIN_SUPPORTS_ATTRIBUTE_DESTRUCTOR_EXITCODE=0",
-        f"-DSOUI_RC_COMPILER={args.rc_compiler.upper()}",
         "--no-warn-unused-cli",
     ]
     cmake_args.extend(args.extra_cmake_arg)

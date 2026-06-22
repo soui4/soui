@@ -3,7 +3,9 @@
 #include <map>
 #ifdef _WIN32
 #include <Psapi.h>
+#ifdef _MSC_VER
 #pragma comment(lib,"psapi.lib")
+#endif
 BOOL EnablePrivilege()
 {
 

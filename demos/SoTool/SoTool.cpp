@@ -7,7 +7,9 @@
 #include "STabCtrlEx.h"
 #include <SouiFactory.h>
 #include <commgr2.h>
+#ifdef _MSC_VER
 #pragma comment(lib,"shlwapi.lib")
+#endif
 
 //从PE文件加载，注意从文件加载路径位置
 #define RES_TYPE 1
