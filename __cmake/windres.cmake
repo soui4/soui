@@ -9,20 +9,47 @@
 #
 # The compiled resources will be linked into the target as object files.
 set(SOUI_CMAKE_DIR "${CMAKE_CURRENT_LIST_DIR}" CACHE INTERNAL "Current directory for windres.cmake")
+set(SOUI_RC_COMPILER "AUTO" CACHE STRING "Resource compiler backend for OHOS: AUTO, MINGW, LLVMRC, OFF")
+set_property(CACHE SOUI_RC_COMPILER PROPERTY STRINGS AUTO MINGW LLVMRC OFF)
+string(TOUPPER "${SOUI_RC_COMPILER}" SOUI_RC_COMPILER)
 
 # 工具查找
 if(CMAKE_SYSTEM_NAME MATCHES Windows)
     set(ENABLE_RESOURCES_BUILD ON)
 elseif(IS_OHOS)
-    find_program(WINDRES_EXE NAMES llvm-rc)
-    if(WINDRES_EXE AND CMAKE_C_COMPILER)
-        message(STATUS "OHOS resource tools: llvm-rc=${WINDRES_EXE}, cc=${CMAKE_C_COMPILER}")
+    set(ENABLE_RESOURCES_BUILD OFF)
+    set(SOUI_RC_BACKEND "")
+
+    if(NOT SOUI_RC_COMPILER STREQUAL "OFF")
+        if(SOUI_RC_COMPILER STREQUAL "AUTO" OR SOUI_RC_COMPILER STREQUAL "MINGW")
+            find_program(SOUI_MINGW_WINDRES_EXE NAMES x86_64-w64-mingw32-windres windres)
+            if(SOUI_MINGW_WINDRES_EXE)
+                set(WINDRES_EXE "${SOUI_MINGW_WINDRES_EXE}")
+                set(SOUI_RC_BACKEND "MINGW")
+            elseif(SOUI_RC_COMPILER STREQUAL "MINGW")
+                message(FATAL_ERROR "SOUI_RC_COMPILER=MINGW was requested, but MinGW windres was not found")
+            endif()
+        endif()
+
+        if(NOT SOUI_RC_BACKEND AND (SOUI_RC_COMPILER STREQUAL "AUTO" OR SOUI_RC_COMPILER STREQUAL "LLVMRC"))
+            find_program(SOUI_LLVM_RC_EXE NAMES llvm-rc)
+            if(SOUI_LLVM_RC_EXE)
+                set(WINDRES_EXE "${SOUI_LLVM_RC_EXE}")
+                set(SOUI_RC_BACKEND "LLVMRC")
+            elseif(SOUI_RC_COMPILER STREQUAL "LLVMRC")
+                message(FATAL_ERROR "SOUI_RC_COMPILER=LLVMRC was requested, but llvm-rc was not found")
+            endif()
+        endif()
+    endif()
+
+    if(SOUI_RC_BACKEND AND CMAKE_C_COMPILER)
+        message(STATUS "OHOS resource tools: backend=${SOUI_RC_BACKEND}, rc=${WINDRES_EXE}, cc=${CMAKE_C_COMPILER}")
         set(ENABLE_RESOURCES_BUILD ON)
         set(SOUI_RC_COMPAT_INCLUDE_DIR "${CMAKE_BINARY_DIR}/soui-rc-compat")
         file(MAKE_DIRECTORY "${SOUI_RC_COMPAT_INCLUDE_DIR}")
         file(WRITE "${SOUI_RC_COMPAT_INCLUDE_DIR}/winresrc.h" "#ifndef SOUI_OHOS_WINRESRC_H\n#define SOUI_OHOS_WINRESRC_H\n#define LANG_CHINESE 0x04\n#define SUBLANG_CHINESE_SIMPLIFIED 0x02\n#define VS_VERSION_INFO 1\n#define VOS__WINDOWS32 0x00000004L\n#define VFT_APP 0x00000001L\n#define VFT_DLL 0x00000002L\n#endif\n")
     else()
-        message(STATUS "OHOS resource tools not found. Resource files (.rc) will not be compiled.")
+        message(STATUS "OHOS resource tools not found or disabled. Resource files (.rc) will not be compiled.")
         set(ENABLE_RESOURCES_BUILD OFF)
     endif()
 else()
@@ -88,59 +115,78 @@ function(windres_compile_rc target output_var rc_file)
     endif()
     set(def_flags)
     foreach(def ${TARGET_DEFS})
-        if(IS_OHOS)
+        if(IS_OHOS AND SOUI_RC_BACKEND STREQUAL "LLVMRC")
             list(APPEND def_flags "/D${def}")
         else()
-            list(APPEND def_flags "-D ${def}")
+            list(APPEND def_flags "-D" "${def}")
         endif()
     endforeach()
     message(STATUS "Compiling resource ${rc_file} with def_flags: ${def_flags}")
     # Step 1: 生成 COFF 目标文件
     if(IS_OHOS)
-        set(res_file "${CMAKE_CURRENT_BINARY_DIR}/${rc_output_name}_res.res")
         set(elf_obj "${CMAKE_CURRENT_BINARY_DIR}/${rc_output_name}_res.o")
         set(asm_file "${CMAKE_CURRENT_BINARY_DIR}/${rc_output_name}_res.S")
-        set(ohos_include_flags)
-        foreach(include_dir ${include_flags})
-            string(REGEX REPLACE "^-I" "" include_path "${include_dir}")
-            list(APPEND ohos_include_flags "/I${include_path}")
-        endforeach()
-        list(APPEND ohos_include_flags "/I${SOUI_RC_COMPAT_INCLUDE_DIR}")
+        set(resource_blob "${coff_obj}")
+        set(resource_compile_comment "Compiling ${rc_file} to COFF")
+        set(resource_compile_command
+            ${WINDRES_EXE} ${def_flags} --target=pe-x86-64 ${include_flags}
+            "-I${SOUI_RC_COMPAT_INCLUDE_DIR}" -i "${rc_abs_path}" -o "${resource_blob}" -O coff
+        )
 
-        file(TO_CMAKE_PATH "${res_file}" res_file_asm)
+        if(SOUI_RC_BACKEND STREQUAL "LLVMRC")
+            set(resource_blob "${CMAKE_CURRENT_BINARY_DIR}/${rc_output_name}_res.res")
+            set(resource_compile_comment "Compiling ${rc_file} to RES")
+            set(ohos_include_flags)
+            foreach(include_dir ${include_flags})
+                string(REGEX REPLACE "^-I" "" include_path "${include_dir}")
+                list(APPEND ohos_include_flags "/I${include_path}")
+            endforeach()
+            list(APPEND ohos_include_flags "/I${SOUI_RC_COMPAT_INCLUDE_DIR}")
+            set(resource_compile_command
+                ${WINDRES_EXE} ${def_flags} ${ohos_include_flags} /FO "${resource_blob}" "${rc_abs_path}"
+            )
+        endif()
+
+        file(TO_CMAKE_PATH "${resource_blob}" resource_blob_asm)
         set(asm_content "
             .section .rodata,\"a\",@progbits
             .globl _binary_soui_coff_o_start
             .globl _binary_soui_coff_o_end
 
             _binary_soui_coff_o_start:
-                .incbin \"${res_file_asm}\"
+                .incbin \"${resource_blob_asm}\"
             _binary_soui_coff_o_end:
                 .byte 0
         ")
         file(GENERATE OUTPUT ${asm_file} CONTENT "${asm_content}")
         separate_arguments(OHOS_C_FLAGS NATIVE_COMMAND "${CMAKE_C_FLAGS}")
         set(OHOS_ASM_TARGET_FLAGS)
+        set(OHOS_ASM_TARGET "aarch64-linux-ohos")
+        if(OHOS_ARCH STREQUAL "armeabi-v7a" OR CMAKE_OHOS_ARCH_ABI STREQUAL "armeabi-v7a")
+            set(OHOS_ASM_TARGET "arm-linux-ohos")
+        elseif(OHOS_ARCH STREQUAL "x86_64" OR CMAKE_OHOS_ARCH_ABI STREQUAL "x86_64")
+            set(OHOS_ASM_TARGET "x86_64-linux-ohos")
+        endif()
         if(OHOS_SDK_NATIVE)
             list(APPEND OHOS_ASM_TARGET_FLAGS
-                --target=aarch64-linux-ohos
+                "--target=${OHOS_ASM_TARGET}"
                 "--gcc-toolchain=${OHOS_SDK_NATIVE}/llvm"
                 "--sysroot=${OHOS_SDK_NATIVE}/sysroot"
             )
         endif()
 
         add_custom_command(
-                OUTPUT ${res_file}
-                COMMAND ${WINDRES_EXE} ${def_flags} ${ohos_include_flags} /FO "${res_file}" "${rc_abs_path}"
+                OUTPUT ${resource_blob}
+                COMMAND ${resource_compile_command}
                 DEPENDS ${rc_abs_path} ${ARG_DEPENDS}
-                COMMENT "Compiling ${rc_file} to RES"
+                COMMENT "${resource_compile_comment}"
                 VERBATIM
         )
         add_custom_command(
                 OUTPUT ${elf_obj}
                 COMMAND ${CMAKE_C_COMPILER} ${OHOS_ASM_TARGET_FLAGS} ${OHOS_C_FLAGS} -x assembler-with-cpp -c "${asm_file}" -o "${elf_obj}"
-                DEPENDS ${asm_file} ${res_file}
-                COMMENT "Embedding RES into ELF object: ${rc_name}"
+                DEPENDS ${asm_file} ${resource_blob}
+                COMMENT "Embedding resource blob into ELF object: ${rc_name}"
                 VERBATIM
         )
         set(${output_var} ${elf_obj} PARENT_SCOPE)
