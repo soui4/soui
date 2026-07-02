@@ -2094,6 +2094,33 @@ static bool nsvgShapeIntersectsSrcRect(const NSVGshape *shape, LPCRECT prcSrc)
     return nsvgIntersectsSrcRect(shape->bounds[0] - inflate, shape->bounds[1] - inflate, shape->bounds[2] + inflate, shape->bounds[3] + inflate, prcSrc);
 }
 
+
+static bool nsvgBuildCombinedSkPath(const NSVGshape *shape, SkPath &combinedPath)
+{
+    if (!shape)
+        return false;
+
+    bool hasPath = false;
+    for (const NSVGpath *path = shape->paths; path != NULL; path = path->next)
+    {
+        SkPath subPath;
+        nsvgPathToSkPath(path, subPath);
+        if (subPath.isEmpty())
+            continue;
+        combinedPath.addPath(subPath);
+        hasPath = true;
+    }
+
+    if (!hasPath)
+        return false;
+
+    if (shape->fillRule == NSVG_FILLRULE_EVENODD)
+        combinedPath.setFillType(SkPath::kEvenOdd_FillType);
+    else
+        combinedPath.setFillType(SkPath::kWinding_FillType);
+    return true;
+}
+
 static bool nsvgTextIntersectsSrcRect(const NSVGtext *text, const SkPaint &paint, size_t textLen, LPCRECT prcSrc)
 {
     if (!text || !prcSrc)
@@ -2236,6 +2263,9 @@ static void renderNSVGshape(const SkPaint &paint, SkCanvas *canvas, const NSVGim
     }
 
     float opacity = shape->opacity * (byAlpha / 255.0f);
+	SkPath combinedFillPath;
+    bool hasCombinedFillPath = nsvgBuildCombinedSkPath(shape, combinedFillPath);
+    bool fillDrawn = false;
 
     for (const NSVGpath *path = shape->paths; path != NULL; path = path->next)
     {
@@ -2249,12 +2279,14 @@ static void renderNSVGshape(const SkPaint &paint, SkCanvas *canvas, const NSVGim
 
             if (order == NSVG_PAINT_FILL && shape->fill.type != NSVG_PAINT_NONE)
             {
-                nsvgPaintToSkPaint(&shape->fill, opacity, fillPaint,skPath);
-                if (shape->fillRule == NSVG_FILLRULE_EVENODD)
-                    skPath.setFillType(SkPath::kEvenOdd_FillType);
-                else
-                    skPath.setFillType(SkPath::kWinding_FillType);
-                canvas->drawPath(skPath, fillPaint);
+                if (fillDrawn)
+                    continue;
+                if (hasCombinedFillPath)
+                {
+                    nsvgPaintToSkPaint(&shape->fill, opacity, fillPaint, combinedFillPath);
+                    canvas->drawPath(combinedFillPath, fillPaint);
+                    fillDrawn = true;
+                }
             }
             else if (order == NSVG_PAINT_STROKE && shape->stroke.type != NSVG_PAINT_NONE && shape->strokeWidth > 0)
             {

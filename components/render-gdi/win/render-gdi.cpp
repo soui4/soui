@@ -2740,6 +2740,24 @@ static bool nsvgPathToGraphicsPath(const NSVGpath *path, Gdiplus::FillMode fillM
     return true;
 }
 
+static bool nsvgBuildCombinedGraphicsPath(const NSVGshape *shape, Gdiplus::FillMode fillMode, Gdiplus::GraphicsPath &gp)
+{
+    if (!shape)
+        return false;
+
+    gp.SetFillMode(fillMode);
+    bool hasPath = false;
+    for (const NSVGpath *path = shape->paths; path != NULL; path = path->next)
+    {
+        Gdiplus::GraphicsPath subPath(fillMode);
+        if (!nsvgPathToGraphicsPath(path, fillMode, subPath))
+            continue;
+        gp.AddPath(&subPath, FALSE);
+        hasPath = true;
+    }
+    return hasPath;
+}
+
 static float nsvgGetTextBaseline(const Gdiplus::FontFamily &fontFamily, INT fontStyle, float fontSize)
 {
     int emHeight = fontFamily.GetEmHeight((Gdiplus::FontStyle)fontStyle);
@@ -2875,7 +2893,10 @@ static void renderNSVGshape(Gdiplus::Graphics &graphics, const NSVGimage *image,
 
     float opacity = shape->opacity * (byAlpha / 255.0f);
     Gdiplus::FillMode fillMode = shape->fillRule == NSVG_FILLRULE_EVENODD ? Gdiplus::FillModeAlternate : Gdiplus::FillModeWinding;
-
+    Gdiplus::GraphicsPath combinedFillPath(fillMode);
+    bool hasCombinedFillPath = nsvgBuildCombinedGraphicsPath(shape, fillMode, combinedFillPath);
+    bool fillDrawn = false;
+	
     // Save the current graphics state
     Gdiplus::GraphicsState savedState = graphics.Save();
 
@@ -2911,10 +2932,15 @@ static void renderNSVGshape(Gdiplus::Graphics &graphics, const NSVGimage *image,
 
             if (order == NSVG_PAINT_FILL && shape->fill.type != NSVG_PAINT_NONE)
             {
+                if (fillDrawn)
+                    continue;
+                if (!hasCombinedFillPath)
+                    continue;
                 if (shape->fill.type == NSVG_PAINT_COLOR)
                 {
                     Gdiplus::SolidBrush brush(nsvgPaintToGdipColor(&shape->fill, opacity));
-                    graphics.FillPath(&brush, &gp);
+                    graphics.FillPath(&brush, &combinedFillPath);
+                    fillDrawn = true;
                 }
                 else if (shape->fill.type == NSVG_PAINT_LINEAR_GRADIENT || shape->fill.type == NSVG_PAINT_RADIAL_GRADIENT)
                 {
@@ -2932,7 +2958,7 @@ static void renderNSVGshape(Gdiplus::Graphics &graphics, const NSVGimage *image,
                                                 
                         // Get path bounds for gradient calculation
                         Gdiplus::RectF bounds;
-                        gp.GetBounds(&bounds);
+                        combinedFillPath.GetBounds(&bounds);
                         float width = bounds.Width;
                         float height = bounds.Height;
 
@@ -2949,7 +2975,8 @@ static void renderNSVGshape(Gdiplus::Graphics &graphics, const NSVGimage *image,
                             Gdiplus::LinearGradientBrush brush(pt1, pt2, colors[0], colors[nstops - 1]);
                             brush.SetInterpolationColors(colors, pos, nstops);
                             brush.SetWrapMode((Gdiplus::WrapMode)grad->spread);
-                            graphics.FillPath(&brush, &gp);
+                            graphics.FillPath(&brush, &combinedFillPath);
+                            fillDrawn = true;
                         }
                         else
                         {
@@ -2978,7 +3005,8 @@ static void renderNSVGshape(Gdiplus::Graphics &graphics, const NSVGimage *image,
                             Gdiplus::PathGradientBrush brush(&path);
                             brush.SetInterpolationColors(colors, pos, nstops);
                             brush.SetWrapMode((Gdiplus::WrapMode)grad->spread);
-                            graphics.FillPath(&brush, &gp);
+                            graphics.FillPath(&brush, &combinedFillPath);
+                            fillDrawn = true;
                         }
                     }
                 }
