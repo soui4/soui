@@ -3166,6 +3166,73 @@ static void nsvgPathToD2DGeometry(const NSVGpath *nsvgPath, ID2D1Factory *pFacto
     *ppGeometry = pGeometry;
 }
 
+
+static bool nsvgAppendPathToD2DGeometrySink(const NSVGpath *nsvgPath, ID2D1GeometrySink *pSink)
+{
+    if (!nsvgPath || !nsvgPath->pts || nsvgPath->npts < 1 || !pSink)
+        return false;
+
+    const float *pts = nsvgPath->pts;
+    int npts = nsvgPath->npts;
+
+    pSink->BeginFigure(D2D1::Point2F(pts[0], pts[1]), D2D1_FIGURE_BEGIN_FILLED);
+
+    for (int i = 0; i < npts - 1; i += 3)
+    {
+        if (i + 6 <= npts * 2)
+        {
+            float cp1x = pts[i * 2 + 2];
+            float cp1y = pts[i * 2 + 3];
+            float cp2x = pts[i * 2 + 4];
+            float cp2y = pts[i * 2 + 5];
+            float endx = pts[i * 2 + 6];
+            float endy = pts[i * 2 + 7];
+            pSink->AddBezier(D2D1::BezierSegment(D2D1::Point2F(cp1x, cp1y), D2D1::Point2F(cp2x, cp2y), D2D1::Point2F(endx, endy)));
+        }
+    }
+
+    pSink->EndFigure(nsvgPath->closed ? D2D1_FIGURE_END_CLOSED : D2D1_FIGURE_END_OPEN);
+    return true;
+}
+
+static void nsvgShapeToD2DGeometry(const NSVGshape *shape, ID2D1Factory *pFactory, D2D1_FILL_MODE fillMode, ID2D1PathGeometry **ppGeometry)
+{
+    *ppGeometry = NULL;
+    if (!shape || !pFactory || !ppGeometry)
+        return;
+
+    ID2D1PathGeometry *pGeometry = NULL;
+    HRESULT hr = pFactory->CreatePathGeometry(&pGeometry);
+    if (FAILED(hr))
+        return;
+
+    SComPtr<ID2D1GeometrySink> pSink;
+    hr = pGeometry->Open(&pSink);
+    if (FAILED(hr))
+    {
+        pGeometry->Release();
+        return;
+    }
+
+    pSink->SetFillMode(fillMode);
+    bool hasPath = false;
+    for (const NSVGpath *path = shape->paths; path != NULL; path = path->next)
+    {
+        hasPath = nsvgAppendPathToD2DGeometrySink(path, pSink) || hasPath;
+    }
+
+    hr = pSink->Close();
+    if (FAILED(hr) || !hasPath)
+    {
+        pGeometry->Release();
+        return;
+    }
+
+    *ppGeometry = pGeometry;
+}
+
+
+
 static float nsvgGetTextBaseline(IDWriteTextLayout *pTextLayout, const DWRITE_TEXT_METRICS &metrics)
 {
     if (!pTextLayout)
@@ -3315,7 +3382,10 @@ static void renderNSVGshape(ID2D1RenderTarget *pRT, ID2D1Factory *pFactory, cons
 
     float opacity = shape->opacity * (byAlpha / 255.0f);
     D2D1_FILL_MODE fillMode = shape->fillRule == NSVG_FILLRULE_EVENODD ? D2D1_FILL_MODE_ALTERNATE : D2D1_FILL_MODE_WINDING;
-
+    SComPtr<ID2D1PathGeometry> pCombinedFillGeometry;
+    nsvgShapeToD2DGeometry(shape, pFactory, fillMode, &pCombinedFillGeometry);
+    bool fillDrawn = false;
+	
     // Check if the shape has a clipPath
     SComPtr<ID2D1Geometry> pClipGeometry;
     bool hasClipPath = false;
@@ -3382,12 +3452,19 @@ static void renderNSVGshape(ID2D1RenderTarget *pRT, ID2D1Factory *pFactory, cons
 
             if (order == NSVG_PAINT_FILL && shape->fill.type != NSVG_PAINT_NONE)
             {
+                if (fillDrawn)
+                    continue;
+                if (!pCombinedFillGeometry)
+                    continue;
                 if (shape->fill.type == NSVG_PAINT_COLOR)
                 {
                     SComPtr<ID2D1SolidColorBrush> pFillBrush;
                     pRT->CreateSolidColorBrush(nsvgPaintToD2DColor(&shape->fill, opacity), &pFillBrush);
                     if (pFillBrush)
-                        pRT->FillGeometry(pGeometry, pFillBrush, NULL);
+                    {
+                        pRT->FillGeometry(pCombinedFillGeometry, pFillBrush, NULL);
+                        fillDrawn = true;
+                    }
                 }
                 else if (shape->fill.type == NSVG_PAINT_LINEAR_GRADIENT || shape->fill.type == NSVG_PAINT_RADIAL_GRADIENT)
                 {
@@ -3406,7 +3483,7 @@ static void renderNSVGshape(ID2D1RenderTarget *pRT, ID2D1Factory *pFactory, cons
 
                         // Get path bounds for gradient calculation
                         D2D1_RECT_F bounds;
-                        pGeometry->GetBounds(NULL, &bounds);
+                        pCombinedFillGeometry->GetBounds(NULL, &bounds);
                         float width = bounds.right - bounds.left;
                         float height = bounds.bottom - bounds.top;
 
@@ -3429,7 +3506,8 @@ static void renderNSVGshape(ID2D1RenderTarget *pRT, ID2D1Factory *pFactory, cons
                                 pRT->CreateLinearGradientBrush(&linearProps, NULL, pGradientStops, &pLinearBrush);
                                 if (pLinearBrush)
                                 {
-                                    pRT->FillGeometry(pGeometry, pLinearBrush, NULL);
+                                    pRT->FillGeometry(pCombinedFillGeometry, pLinearBrush, NULL);
+                                    fillDrawn = true;
                                 }
                             }
                         }
@@ -3452,7 +3530,8 @@ static void renderNSVGshape(ID2D1RenderTarget *pRT, ID2D1Factory *pFactory, cons
                                 pRT->CreateRadialGradientBrush(&radialProps, NULL, pGradientStops, &pRadialBrush);
                                 if (pRadialBrush)
                                 {
-                                    pRT->FillGeometry(pGeometry, pRadialBrush, NULL);
+                                    pRT->FillGeometry(pCombinedFillGeometry, pRadialBrush, NULL);
+                                    fillDrawn = true;
                                 }
                             }
                         }

@@ -1692,94 +1692,112 @@ static void renderNSVGshape(HDC hdc, const NSVGimage *image, const NSVGshape *sh
     int fillMode = (shape->fillRule == NSVG_FILLRULE_EVENODD) ? ALTERNATE : WINDING;
     SetPolyFillMode(hdc, fillMode);
 
-    // 对每个路径进行绘制
-    for (NSVGpath *path = shape->paths; path != NULL; path = path->next)
+    // 构建合并填充路径
+    bool hasFill = (shape->fill.type != NSVG_PAINT_NONE);
+    bool fillPathBuilt = false;
+    if (hasFill)
     {
-        if (path->npts < 2)
-            continue;
-        // 按 paintOrder 顺序绘制填充和描边
-        unsigned char paintOrder = shape->paintOrder;
-        for (int j = 0; j < 3; ++j)
+        BeginPath(hdc);
+        for (NSVGpath *path = shape->paths; path != NULL; path = path->next)
         {
-            unsigned char order = (paintOrder >> (2 * j)) & 0x03;
-            if (order == NSVG_PAINT_FILL && shape->fill.type != NSVG_PAINT_NONE)
+            if (path->npts < 2)
+                continue;
+            buildShapePath2(hdc, path);
+        }
+        EndPath(hdc);
+        fillPathBuilt = true;
+    }
+
+    // 按 paintOrder 顺序绘制填充和描边
+    bool fillDrawn = false;
+    unsigned char paintOrder = shape->paintOrder;
+    for (int j = 0; j < 3; ++j)
+    {
+        unsigned char order = (paintOrder >> (2 * j)) & 0x03;
+        if (order == NSVG_PAINT_FILL && hasFill)
+        {
+            if (fillDrawn || !fillPathBuilt)
+                continue;
+            if (shape->fill.type == NSVG_PAINT_COLOR)
             {
-                buildShapePath(hdc, path);
-                
-                if (shape->fill.type == NSVG_PAINT_COLOR)
+                COLORREF fillColor = nsvgPaintToCOLORREF(&shape->fill, shapeAlpha);
+                HBRUSH hBrush = CreateSolidBrush(fillColor);
+                HGDIOBJ oldBrush = ::SelectObject(hdc, hBrush);
+                ::FillPath(hdc);
+                ::SelectObject(hdc, oldBrush);
+                DeleteObject(hBrush);
+                fillDrawn = true;
+            }
+            else if (shape->fill.type == NSVG_PAINT_LINEAR_GRADIENT || shape->fill.type == NSVG_PAINT_RADIAL_GRADIENT)
+            {
+                NSVGgradient *grad = shape->fill.gradient;
+                if (grad && grad->nstops > 0)
                 {
-                    COLORREF fillColor = nsvgPaintToCOLORREF(&shape->fill, shapeAlpha);
-                    HBRUSH hBrush = CreateSolidBrush(fillColor);
-                    HGDIOBJ oldBrush = ::SelectObject(hdc, hBrush);
-                    ::FillPath(hdc);
-                    ::SelectObject(hdc, oldBrush);
-                    DeleteObject(hBrush);
-                }
-                else if (shape->fill.type == NSVG_PAINT_LINEAR_GRADIENT || shape->fill.type == NSVG_PAINT_RADIAL_GRADIENT)
-                {
-                    NSVGgradient *grad = shape->fill.gradient;
-                    if (grad && grad->nstops > 0)
+                    // Get path bounds for gradient calculation
+                    RECT rcBounds;
+                    GetPathBounds(hdc, &rcBounds);
+                    float width = rcBounds.right - rcBounds.left;
+                    float height = rcBounds.bottom - rcBounds.top;
+
+                    int nstops = grad->nstops > 8 ? 8 : grad->nstops;
+                    
+                    // Create gradient items
+                    std::vector<GRADIENTITEM> gradientItems(nstops);
+                    for (int i = 0; i < nstops; i++)
                     {
-                        // Get path bounds for gradient calculation
-                        RECT rcBounds;
-                        GetPathBounds(hdc, &rcBounds);
-                        float width = rcBounds.right - rcBounds.left;
-                        float height = rcBounds.bottom - rcBounds.top;
-
-                        int nstops = grad->nstops > 8 ? 8 : grad->nstops;
-                        
-                        // Create gradient items
-                        std::vector<GRADIENTITEM> gradientItems(nstops);
-                        for (int i = 0; i < nstops; i++)
-                        {
-                            gradientItems[i].cr = nsvgColorToCOLORREF(grad->stops[i].color, shapeAlpha);
-                            gradientItems[i].pos = grad->stops[i].offset;
-                        }
-                        
-                        // Create gradient info
-                        GRADIENTINFO gradInfo;
-                        if (shape->fill.type == NSVG_PAINT_LINEAR_GRADIENT)
-                        {
-                            gradInfo.type = grad_linear;
-                            float x1 = nsvgConvertToPixels(grad->linear.x1, rcBounds.left, width, 0);
-                            float y1 = nsvgConvertToPixels(grad->linear.y1, rcBounds.top, height, 0);
-                            float x2 = nsvgConvertToPixels(grad->linear.x2, rcBounds.left, width, 0);
-                            float y2 = nsvgConvertToPixels(grad->linear.y2, rcBounds.top, height, 0);
-                            float dx = x2 - x1;
-                            float dy = y2 - y1;
-                            if(fabs(dy) < 1e-6f)
-                                gradInfo.angle = 0.0f;
-                            else if(fabs(dx) < 1e-6f)
-                                gradInfo.angle = 90.0f;
-                            else
-                                gradInfo.angle = atan2f(dy, dx) * 180.0f / M_PI;
-                        }
+                        gradientItems[i].cr = nsvgColorToCOLORREF(grad->stops[i].color, shapeAlpha);
+                        gradientItems[i].pos = grad->stops[i].offset;
+                    }
+                    
+                    // Create gradient info
+                    GRADIENTINFO gradInfo;
+                    if (shape->fill.type == NSVG_PAINT_LINEAR_GRADIENT)
+                    {
+                        gradInfo.type = grad_linear;
+                        float x1 = nsvgConvertToPixels(grad->linear.x1, rcBounds.left, width, 0);
+                        float y1 = nsvgConvertToPixels(grad->linear.y1, rcBounds.top, height, 0);
+                        float x2 = nsvgConvertToPixels(grad->linear.x2, rcBounds.left, width, 0);
+                        float y2 = nsvgConvertToPixels(grad->linear.y2, rcBounds.top, height, 0);
+                        float dx = x2 - x1;
+                        float dy = y2 - y1;
+                        if(fabs(dy) < 1e-6f)
+                            gradInfo.angle = 0.0f;
+                        else if(fabs(dx) < 1e-6f)
+                            gradInfo.angle = 90.0f;
                         else
-                        {
-                            gradInfo.type = grad_radial;
-                            float cx = nsvgConvertToPixels(grad->radial.cx, 0, width, 0);
-                            float cy = nsvgConvertToPixels(grad->radial.cy, 0, height, 0);
-                            float radius = nsvgConvertToPixels(grad->radial.r, 0, (width + height)/2, 25);            
+                            gradInfo.angle = atan2f(dy, dx) * 180.0f / M_PI;
+                    }
+                    else
+                    {
+                        gradInfo.type = grad_radial;
+                        float cx = nsvgConvertToPixels(grad->radial.cx, 0, width, 0);
+                        float cy = nsvgConvertToPixels(grad->radial.cy, 0, height, 0);
+                        float radius = nsvgConvertToPixels(grad->radial.r, 0, (width + height)/2, 25);            
 
-                            gradInfo.radial.centerX = cx/width;
-                            gradInfo.radial.centerY = cy/height;
-                            gradInfo.radial.radius = radius;
-                        }
-                        
-                        // Create gradient brush
-                        HBRUSH hGradientBrush = CreateGradientBrush(&gradientItems[0], nstops, &gradInfo, shapeAlpha, (TILEMODE)grad->spread);
-                        if (hGradientBrush)
-                        {
-                            HGDIOBJ oldBrush = ::SelectObject(hdc, hGradientBrush);
-                            ::FillPath(hdc);
-                            ::SelectObject(hdc, oldBrush);
-                            DeleteObject(hGradientBrush);
-                        }
+                        gradInfo.radial.centerX = cx/width;
+                        gradInfo.radial.centerY = cy/height;
+                        gradInfo.radial.radius = radius;
+                    }
+                    
+                    // Create gradient brush
+                    HBRUSH hGradientBrush = CreateGradientBrush(&gradientItems[0], nstops, &gradInfo, shapeAlpha, (TILEMODE)grad->spread);
+                    if (hGradientBrush)
+                    {
+                        HGDIOBJ oldBrush = ::SelectObject(hdc, hGradientBrush);
+                        ::FillPath(hdc);
+                        ::SelectObject(hdc, oldBrush);
+                        DeleteObject(hGradientBrush);
+                        fillDrawn = true;
                     }
                 }
             }
-            else if (order == NSVG_PAINT_STROKE && shape->stroke.type != NSVG_PAINT_NONE && shape->strokeWidth > 0)
+        }
+        else if (order == NSVG_PAINT_STROKE && shape->stroke.type != NSVG_PAINT_NONE && shape->strokeWidth > 0)
+        {
+            for (NSVGpath *path = shape->paths; path != NULL; path = path->next)
             {
+                if (path->npts < 2)
+                    continue;
                 buildShapePath(hdc, path);
                 
                 LOGBRUSH lb;
