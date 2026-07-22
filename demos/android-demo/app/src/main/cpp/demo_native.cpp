@@ -16,14 +16,28 @@
 
 using namespace SNS;
 
-static SApplication* s_souiApp = nullptr;
 
 void (SwinxLogCallback)(const char *pLogStr, int level){
     SLOG("swinx",level)<<pLogStr;
 }
 
-extern SNS::SApplication * SouiInitApp(AAssetManager* assetMgr, LPCSTR pszAssetDir){
-    s_souiApp = new SApplication((HINSTANCE) nullptr);
+class SouiAndroidApp : public Soui4AndroidEntry{
+    SApplication* m_souiApp = nullptr;
+    std::map<long,SAutoRefPtr<SHostWnd> > m_screenHostMap;
+public:
+    SouiAndroidApp(){
+        InitSoui4AndroidEntry(this);
+    }
+    HWND Startup(long screenId, LPCSTR pszLayout) override;
+    void Shutdown(long screenId) override;
+    void UninitApp(SNS::SApplication *pApp) override;
+    SNS::SApplication * InitApp(AAssetManager* assetMgr, LPCSTR pszAssetDir) override;
+};
+
+static SouiAndroidApp theApp;
+
+SNS::SApplication * SouiAndroidApp::InitApp(AAssetManager* assetMgr, LPCSTR pszAssetDir){
+    m_souiApp = new SApplication((HINSTANCE) nullptr);
 
     SetSwinxLogCallback(SwinxLogCallback,0);
     SAppCfg cfg;
@@ -32,37 +46,35 @@ extern SNS::SApplication * SouiInitApp(AAssetManager* assetMgr, LPCSTR pszAssetD
             .SetAppDir(S_CA2T(pszAssetDir, CP_UTF8))
             .SetSysResAndroidAsset(assetMgr,_T("soui_sys_res"))
             .SetAppResAndroidAsset(assetMgr,_T("uires"));
-    BOOL ok = cfg.DoConfig(s_souiApp);
+    BOOL ok = cfg.DoConfig(m_souiApp);
     if(!ok){
-        delete s_souiApp;
+        delete m_souiApp;
         return nullptr;
     }
     SAutoRefPtr<IRealWndHandler> realWndHander(new CSouiRealWndHandler,FALSE);
-    s_souiApp->SetRealWndHandler(realWndHander);
-    return s_souiApp;
+    m_souiApp->SetRealWndHandler(realWndHander);
+    return m_souiApp;
 }
 
-extern void SouiUninitApp(SNS::SApplication *pApp){
-    SASSERT(s_souiApp == pApp);
-    s_souiApp->Release();
-    s_souiApp = nullptr;
+void SouiAndroidApp::UninitApp(SNS::SApplication *pApp){
+    SASSERT(m_souiApp == pApp);
+    m_souiApp->Release();
+    m_souiApp = nullptr;
 }
 
-static std::map<long,SAutoRefPtr<SHostWnd> > s_screenHostMap;
-
-HWND SouiStartup(long screenId, LPCSTR pszLayout) {
-    SASSERT(s_souiApp);
-    if (screenId == 0 || !s_souiApp) {
-        SLOGE()<<"SouiStartup: invalid args (screenId="<<screenId<<", s_souiApp="<<(void*)s_souiApp<<")";
+HWND SouiAndroidApp::Startup(long screenId, LPCSTR pszLayout) {
+    SASSERT(m_souiApp);
+    if (screenId == 0 || !m_souiApp) {
+        SLOGE() << "SouiStartup: invalid args (screenId=" << screenId << ", m_souiApp=" << (void*)m_souiApp << ")";
         return 0;
     }
     AndroidPlatformAPI& api = AndroidPlatformAPI::instance();
     LPCSTR layout = pszLayout;
-    auto existing = s_screenHostMap.find(screenId);
-    if (existing != s_screenHostMap.end()) {
+    auto existing = m_screenHostMap.find(screenId);
+    if (existing != m_screenHostMap.end()) {
         SLOGW()<<"SouiStartup: re-entering screenId="<<screenId<<", destroying previous SHostWnd first";
         existing->second->DestroyWindow();
-        s_screenHostMap.erase(existing);
+        m_screenHostMap.erase(existing);
     }
 
     SHostWnd* pDlg = nullptr;
@@ -82,22 +94,22 @@ HWND SouiStartup(long screenId, LPCSTR pszLayout) {
     pDlg->ShowWindow(SW_SHOW);
 
     HWND ret = pDlg->m_hWnd;
-    s_screenHostMap.insert(std::make_pair(screenId, pDlg));
+    m_screenHostMap.insert(std::make_pair(screenId, pDlg));
     pDlg->Release();
 
     SLOGI()<<"SouiStartup: OK screenId="<<screenId<<" layout="<<(layout ? layout : "(null)")<<" hMainWnd="<<(int)ret;
     return ret;
 }
 
-void SouiShutdown(long screenId) {
+void SouiAndroidApp::Shutdown(long screenId) {
     if (screenId == 0) return;
-    auto it = s_screenHostMap.find(screenId);
-    if (it == s_screenHostMap.end()) {
-        SLOGW()<<"SouiShutdown: screenId="<<screenId<<" NOT found in s_screenHostMap "
+    auto it = m_screenHostMap.find(screenId);
+    if (it == m_screenHostMap.end()) {
+        SLOGW()<<"SouiShutdown: screenId="<<screenId<<" NOT found in m_screenHostMap "
                "(already destroyed? never started?)";
         return;
     }
     SLOGI()<<"SouiShutdown: screenId="<<screenId<<", calling SHostWnd::DestroyWindow()";
     it->second->DestroyWindow();
-    s_screenHostMap.erase(it);
+    m_screenHostMap.erase(it);
 }

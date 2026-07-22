@@ -5,9 +5,12 @@
 SOUI 是一款面向 C++/Win32 的轻量级 DirectUI 框架，核心围绕 Win32 HWND 句柄模型、SHostWnd（顶层窗口宿主）与消息循环构建。**SOUI for Android 适配方案** 的目标，是让一套基于 SWinx（SOUI 的跨平台 Win32 API 仿真层）编写的 SOUI C++ 业务代码，以 **几乎零改动** 的方式运行在 Android 设备上，并同时实现：
 
 - 与 **Android 原生 Java/Kotlin View 系统无缝互嵌**：原生 View 可作为 SOUI 的"子窗口"，SOUI 的桌面容器（SouiScreen）也可以是任意原生布局（FrameLayout/LinearLayout/CoordinatorLayout...）的普通子 View。
-- **严格对齐 Win32 语义**：`CreateWindowEx`、`SetCapture`/`ReleaseCapture`、`SetTimer`/`KillTimer`、`moveWindow`、`showWindow` 等核心 API 在 C++ 层的行为、参数、返回值与 Win32 一致，业务代码无需"Android 特判"。
+- **严格对齐 Win32 语义**：`CreateWindowEx`、`SetCapture`/`ReleaseCapture`、`SetTimer`/`KillTimer`、`moveWindow`、`showWindow`、剪贴板操作、RawInput 设备枚举等核心 API 在 C++ 层的行为、参数、返回值与 Win32 一致，业务代码无需"Android 特判"。
 - **单 SurfaceView 粒度的渲染**：每个 HWND 对应一个独立的 Android View（SouiSurface），独立测量、独立失效、独立合成，走系统 SurfaceFlinger 正常合成管线，而不是把所有 UI 画到一张全屏 Texture 上。
 - **多 Activity / 多 Screen 支持**：通过 screenId 机制，支持在多个 Activity 中独立承载不同的 SOUI 窗口系统。
+- **SIMD 优化的颜色通道转换**：使用 NEON/AArch64/SSSE3 指令加速 BGRA→RGBA 转换，大幅提升渲染性能。
+- **完整的 IME 输入支持**：支持软键盘字符输入、键盘高度同步、输入连接管理。
+- **HWND_MESSAGE 支持**：创建不可见的消息占位窗口，用于定时器消息处理等场景。
 
 本文档从实现机制、竞品对比（Qt/Flutter）、原生集成优势、Demo 编译与测试四个维度完整介绍该方案。
 
@@ -47,8 +50,7 @@ SOUI 是一款面向 C++/Win32 的轻量级 DirectUI 框架，核心围绕 Win32
 │  │(Win32 API   │──│   API 实现     │──│  (SHostWnd/SNativeWnd/ │ │
 │  │ 仿真抽象层) │  │               │  │   SWnd/Skin/Xml 资源)  │ │
 │  └─────────────┘  └───────────────┘  └────────────────────────┘ │
-│  SouiSurfaceProxy：每个 Surface 的输入渲染 native 实现            │
-└──────────────────────────────────────────────────────────────────┘
+│  SouiSurfaceProxy：每个 Surface 的输入渲染 native 实现（含 SIMD）    │
 ```
 
 **关键设计决策：C++ 业务代码不启独立渲染线程，完全跑在 Android 主线程。** 这一点和 Qt（独立 QtThread）、Flutter（独立 UI/Raster/IO 线程池）形成鲜明对比，带来的直接收益是 **JNI 调用无需跨线程调度、View 操作无需 post、与原生生命周期天然对齐**。
@@ -77,24 +79,33 @@ SOUI 的"HWND 树"在 Android 上直接映射为标准的 Android `View / ViewGr
 
 | C++ 语义 | Java 对应类 | 职责 |
 |---|---|---|
-| `GetDesktopWindow()` 桌面 | `SouiScreen`（继承 `SouiWindow`） | 桌面级容器；挂在 Activity 布局里，作为所有顶级窗口的父。**不做绘制**，只承载 `SouiWindow` 子节点与屏幕尺寸同步。详见 [SouiScreen.java](../demos/android-demo/app/src/main/java/com/soui/android/SouiScreen.java) |
+| `GetDesktopWindow()` 桌面 | `SouiScreen`（继承 `SouiWindow`） | 桌面级容器；挂在 Activity 布局里，作为所有顶级窗口的父。创建自身的 `SouiBaseSurface`（不做绘制，仅作为 HWND 占位），只承载 `SouiWindow` 子节点与屏幕尺寸同步。详见 [SouiScreen.java](../demos/android-demo/app/src/main/java/com/soui/android/SouiScreen.java) |
 | 一个 HWND 窗口（SHostWnd / SNativeWnd） | `SouiWindow`（继承 `SouiAbsWindow`） | 对应一个 C++ 窗口的 ViewGroup 容器：index=0 是该窗口的主 Surface，其余 index≥1 是子 HWND 子容器。见 [SouiWindow.java](../demos/android-demo/app/src/main/java/com/soui/android/SouiWindow.java) |
 | HWND 的像素绘制面（客户区） | `SouiSurface`（继承 `SouiBaseSurface`） | 继承自 `View`，实现 `INativeWindow`；`onDraw` 内把 C++ 层用 Skia 画好的离屏 Bitmap 用 `canvas.drawBitmap` 贴到自己区域。每个 HWND 一张 Surface，独立 invalidate，独立 draw。 |
 | 原生 EditText/Button 等控件作为 SOUI 子控件 | 由 `registerViewFactory("edit", NativeEditView::new)` 注册工厂 | className 命中即创建原生 View，同样包装 INativeWindow，获得同等 HWND 句柄，支持 `SetDlgItemText/EnableWindow` 等语义。 |
+| 消息占位窗口（HWND_MESSAGE） | `SouiBaseSurface`（不挂视觉树） | 不可见的 0x0 占位窗口，用于消息处理（如定时器），不参与布局和绘制。 |
 
 `SouiAbsLayout`（见 [SouiAbsLayout.java](../demos/android-demo/app/src/main/java/com/soui/android/SouiAbsLayout.java)）是 `SouiAbsWindow` 的父类，提供统一的绝对定位 measure/layout：子 View 的 `LayoutParams(x, y, width, height)` 直接使用 SWinx `RECT` 语义。`SouiScreen` 通过 `SouiWindow` → `SouiAbsWindow` 间接继承 `SouiAbsLayout`。关键细节：
 
 - `SouiAbsLayout.LayoutParams extends ViewGroup.MarginLayoutParams`：**兼容被外层 FrameLayout/LinearLayout 等原生容器托管时的 `measureChildWithMargins` ClassCastException**。
 - `SouiAbsWindow.measureChild` 重载：强制 index=0 的主 Surface MATCH_PARENT 填满容器（HWND 客户区与容器等价）。
 - `SouiAbsLayout.updateChildFrame / setChildPosition / setChildSize`：提供原子性的子 View 位置和尺寸更新。
+- `SouiScreen.createSurface` 重载：创建 `SouiBaseSurface`（而非 `SouiSurface`），因为 SouiScreen 本身不做绘制。
 
-### 2.4 Surface 渲染流程（离屏 Bitmap + Skia）
+### 2.4 Surface 渲染流程（离屏 Bitmap + Skia + SIMD 颜色通道转换）
 
 每个 `SouiSurface` 的 `onDraw(Canvas canvas)` 流程：
 
-1. **懒初始化离屏 Bitmap**：首次有效尺寸或尺寸变化时，`createOffscreenBitmap(w, h)` 创建 `ARGB_8888` Bitmap，并调用 `nativeOnSizeChanged` 通知 C++ 更新 SWinx VirtualHWND Rect。
-2. **C++ Skia 渲染**：`nativeRender(nativeId, offscreenBitmap)` 将 `Bitmap` 的像素缓冲区（通过 `AndroidBitmap_lockPixels`）绑定 Skia `SkPixmap`，SOUI 完成当前窗口的所有 DirectUI 控件绘制（Skin、文字、SVG、渐变等），写入到这块 bitmap。
-3. **合成到屏幕**：`canvas.drawBitmap(offscreenBitmap, 0, 0, paint)`。Android 系统把该 View 的内容作为一个 Layer，交给 SurfaceFlinger 与状态栏、导航栏、其他原生 View 一起合成。
+1. **懒初始化离屏 Bitmap**：首次有效尺寸或尺寸变化时，`createOffscreenBitmap(w, h)` 创建 `ARGB_8888` Bitmap，并调用 `nativeOnSizeChanged` 通知 C++ 更新 SWinx VirtualHWND Rect。尺寸匹配时复用现有 Bitmap，避免内存抖动。
+2. **C++ Skia 渲染**：`nativeRender(nativeId, offscreenBitmap)` 将 `Bitmap` 的像素缓冲区（通过 `AndroidBitmap_lockPixels`）绑定为 `CreateDIBSectionEx` 的 DIB Section，SOUI 完成当前窗口的所有 DirectUI 控件绘制（Skin、文字、SVG、渐变等），通过 `SendMessage(hWnd, WM_PAINT)` 写入到这块 bitmap。
+3. **SIMD 颜色通道转换**：Cairo/Skia 渲染输出为 BGRA 格式，而 Android Bitmap 期望 RGBA 格式。`SouiSurfaceProxy::render` 使用 SIMD 指令（NEON/AArch64/SSSE3）批量交换 R/B 通道，一次处理 4 像素，大幅提升转换效率。
+4. **合成到屏幕**：`canvas.drawBitmap(offscreenBitmap, 0, 0, paint)`。Android 系统把该 View 的内容作为一个 Layer，交给 SurfaceFlinger 与状态栏、导航栏、其他原生 View 一起合成。
+
+**SIMD 优化策略**：
+- **AArch64 NEON**：使用 `vqtbl1q_u8` 查表指令，一次处理 16 字节（4 像素）
+- **ARMv7-A NEON**：使用 `vtbl1_u8` 查表指令，双半区并行处理
+- **SSSE3**：使用 `_mm_shuffle_epi8` 指令，一次处理 16 字节
+- **标量兜底**：通用路径使用逐像素交换，确保兼容性
 
 **和 Flutter/Qt 的本质不同**：SOUI 不独占一个全屏 Surface；每个 SOUI 窗口在 View 树里是一个独立节点，可与原生 Button、Toolbar、RecyclerView 交叉混合布局，Z-order 由父 ViewGroup addView 顺序天然决定。
 
@@ -105,8 +116,15 @@ SOUI 的"HWND 树"在 Android 上直接映射为标准的 Android `View / ViewGr
 1. Android 系统按正常 `onInterceptTouchEvent`/`dispatchTouchEvent` 把事件派到被命中的 `SouiSurface` View。
 2. Java 层先调用 `SouiPlatformBridge.tryDispatchCapturedMotion`：**如果当前有 SetCapture，并且事件来源 Surface ≠ 捕获目标 Surface，则做坐标变换（源 View 屏幕坐标 → 目标 View 客户区坐标）后，直接投递给捕获目标的 `nativeOnMotionEventEx`**，返回 Boolean.TRUE 表示"已消费重定向"。
 3. 未被 Capture 拦截时，正常投递 `nativeOnMotionEventEx(action, x, y, pointerId, buttonState, vscroll, hscroll, metaState, timestamp)` 到当前 Surface。
-4. C++ `onMotionEventEx` 根据 action 派发到 `WM_LBUTTONDOWN / WM_MOUSEMOVE / WM_MOUSEWHEEL / WM_POINTER...`，完全对齐 Win32 MSG 格式，`SendMessage(hHost, ...)` 进入 SOUI 消息循环。
+4. C++ `onMotionEventEx` 根据 action 派发到 `WM_LBUTTONDOWN / WM_LBUTTONDBLCLK / WM_MOUSEMOVE / WM_RBUTTONDOWN / WM_MOUSEWHEEL / WM_MOUSEHWHEEL / WM_XBUTTONDOWN / WM_POINTER...`，完全对齐 Win32 MSG 格式，`SendMessage(hHost, ...)` 进入 SOUI 消息循环。
 5. 遇到 `ACTION_UP / ACTION_CANCEL`：投递完后自动 `ReleaseCapture`（对应 Win32 "最后一个鼠标按键弹起时系统自动释放捕获"语义），保证滚动条拖拽、标题栏拖拽等控件交互与 Win32 表现一致。
+
+**扩展输入支持**：
+- **双击检测**：记录上次按下时间和坐标，若两次按下时间间隔小于系统双击阈值（默认 500ms）且坐标距离在阈值内，触发 `WM_LBUTTONDBLCLK`
+- **右键菜单**：长按事件转换为 `WM_RBUTTONDOWN`，支持上下文菜单弹出
+- **滚轮事件**：支持垂直滚轮（`WM_MOUSEWHEEL`）和水平滚轮（`WM_MOUSEHWHEEL`），外接鼠标时正常工作
+- **悬停事件**：支持 `TrackMouseEvent` 语义，`WM_MOUSEHOVER`/`WM_MOUSELEAVE` 消息正确投递
+- **XButton 支持**：鼠标侧键转换为 `WM_XBUTTONDOWN`/`WM_XBUTTONUP`
 
 `SouiPlatformBridge.setCapture / releaseCapture / getCapture` 三个方法（JNI 暴露给 C++ `AndroidPlatformAPI`）是该机制的状态总控。
 
@@ -118,8 +136,10 @@ SOUI 的"HWND 树"在 Android 上直接映射为标准的 Android `View / ViewGr
 - **Java → C++ 同步**：`SouiBaseSurface` 在获得焦点时调用 `nativeNotifyFocusGained(hwnd)`，触发 C++ 层 `::SetFocus`，投递 `WM_SETFOCUS`/`WM_KILLFOCUS` 消息
 
 **IME 策略**：
-- `EditText` 子类（`NativeEditView` → className="edit"）自动弹出 IME
+- `EditText` 子类（`NativeEditView` → className="edit"）自动弹出 IME，支持光标位置查询（`EM_GETSEL`）和文本设置（`WM_SETTEXT`）
 - 其他 `SouiBaseSurface`：SOUI 自己实现了 SEdit 等控件，用离屏渲染绘制文本，但仍依赖 Android IME 把按键输入转成字符，也弹出 IME
+- **输入连接管理**：`SouiBaseSurface.onCreateInputConnection` 创建 `SouiInputConnection`，处理字符提交（`commitText` → `sendImeString` → `WM_IME_CHAR`）
+- **IME 选项**：设置 `IME_FLAG_NO_FULLSCREEN`，避免横屏时全屏输入法遮挡内容
 
 ### 2.7 定时器：`SetTimer/KillTimer` 语义 100% 对齐 Win32
 
@@ -137,11 +157,23 @@ SOUI 的"HWND 树"在 Android 上直接映射为标准的 Android `View / ViewGr
 
 - **激活栈机制**：`AndroidPlatformAPI` 维护 `m_activeScreenStack`（vector<jlong>），`souiStartup` 时 push，`souiShutdown` 时 pop。创建窗口遇到 `hWndParent=HWND_DESKTOP(0)` 时，从栈顶取当前激活的 screenId。
 - **Screen Context 映射**：`m_screenContexts`（map<jlong, HWND>）存储 screenId 到其 Surface HWND 的映射。
-- **原子启动**：Java 层 `SouiPlatformBridge.souiStartup(screenId, screenHwnd, layout)` 一次 JNI 调用完成三件事：
+- **原子启动**：Java 层 `SouiPlatformBridge.souiStartup(screenId, screenHwnd, layout)` 一次 JNI 调用完成四件事：
   1. `RegisterVirtualHWND` 注册虚拟 HWND
   2. `setScreenHwnd` 写入 screenId → HWND 映射
-  3. `pushActiveScreen` 压入激活栈，然后调用 `SouiStartup` 创建主窗口
-- **原子销毁**：`souiShutdown(screenId)` 调用 `SouiShutdown` → `popActiveScreen` → `eraseScreen` → `UnregisterVirtualHWND`。
+  3. `pushActiveScreen` 压入激活栈
+  4. 调用 `s_entry->Startup(screenId, layout)` 创建主窗口（通过 `Soui4AndroidEntry` 虚函数接口）
+- **原子销毁**：`souiShutdown(screenId)` 调用 `s_entry->Shutdown(screenId)` → `popActiveScreen` → `eraseScreen` → `UnregisterVirtualHWND`。
+- **启动流程优化**：`SouiScreen.onAttachedToWindow` 中，若 `mScreenId != 0` 才调用 `souiStartup`，避免未配置 screenId 时的误启动。
+
+**启动参数传递**：
+- `screenId`：唯一标识当前 Screen，用于多 Activity 场景下的窗口路由
+- `screenHwnd`：Screen 对应的 Surface HWND，作为桌面窗口的 HWND
+- `layout`：SOUI 布局文件名（如 `"layout:dlg_main"`），指定启动时加载的 XML 布局
+
+**创建窗口时的路由逻辑**：
+1. 若 `hWndParent == HWND_DESKTOP(0)`：从激活栈顶获取当前 screenId，查找对应的 Screen HWND 作为实际父窗口
+2. 若 `hWndParent == HWND_MESSAGE(-1)`：创建消息占位窗口，不挂视觉树
+3. 其他情况：直接使用指定的父窗口 HWND
 
 ### 2.9 屏幕旋转与生命周期管理
 
@@ -214,10 +246,79 @@ Android 的配置变更（如屏幕旋转）会触发 Activity 重建，导致�
 
 每个 `SouiSurface` 在 C++ 层对应一个 `SouiSurfaceProxy` 对象：
 
-- **生命周期管理**：通过 `std::shared_ptr` 管理，`nativeViewInsert`/`nativeViewLookup`/`nativeViewErase` 提供线程安全的访问
-- **输入事件转换**：`onMotionEventEx` 将 Android MotionEvent 转换为 Win32 风格消息（`WM_LBUTTONDOWN`、`WM_MOUSEMOVE`、`WM_MOUSEWHEEL` 等）
-- **键盘事件转换**：`onKeyEventEx` 将 Android KeyEvent 转换为 Win32 键盘消息，支持 `repeatCount`、`scanCode`、`unicodeChar` 等参数
-- **渲染**：`render` 方法将 C++ 层绘制结果绑定到 Java Bitmap
+- **生命周期管理**：通过 `std::shared_ptr` 管理，`nativeViewInsert`/`nativeViewLookup`/`nativeViewErase` 提供线程安全的访问。`NativeDestroy` 时先从 map 移除，再让局部 `shared_ptr` 出作用域析构，确保其他线程正在持有的引用安全完成。
+- **输入事件转换**：`onMotionEventEx` 将 Android MotionEvent 转换为 Win32 风格消息（`WM_LBUTTONDOWN`、`WM_MOUSEMOVE`、`WM_MOUSEWHEEL`、`WM_XBUTTONDOWN` 等），支持双击检测、右键菜单、滚轮（垂直+水平）、悬停事件。
+- **键盘事件转换**：`onKeyEventEx` 将 Android KeyEvent 转换为 Win32 键盘消息，支持 `repeatCount`、`scanCode`、`unicodeChar`、`metaState` 等参数，正确处理 ALT 修饰键生成 `WM_SYSKEYDOWN/SYSKEYUP`。
+- **渲染**：`render` 方法将 C++ 层绘制结果绑定到 Java Bitmap，包含 SIMD 优化的 BGRA→RGBA 颜色通道转换。
+- **鼠标状态跟踪**：维护 `m_buttonsDown`、`m_lastDownTime/X/Y`、`m_hoverTracked` 等状态，支持 `TrackMouseEvent` 语义。
+
+### 2.13 剪贴板 API：Win32 语义完整实现
+
+剪贴板操作在 Java 层通过 `ClipboardManager` 实现，C++ 层通过 JNI 桥接调用，**直接使用 String Object 交换数据，不再使用 string slot 技术**：
+
+**C++ 层 API**（见 [AndroidPlatformAPI.h](../demos/android-demo/app/src/main/cpp/AndroidPlatformAPI.h)）：
+- `clipboardOpen(hWndNewOwner)`：打开剪贴板，设置所有者
+- `clipboardClose()`：关闭剪贴板
+- `clipboardEmpty()`：清空剪贴板
+- `clipboardGetData(uFormat)`：获取剪贴板数据，支持 `CF_TEXT` 和 `CF_UNICODETEXT`，直接从 Java 返回 `jstring`
+- `clipboardSetData(uFormat, hMem)`：设置剪贴板数据，直接传递 `jstring` 到 Java
+- `clipboardIsFormatAvailable(format)`：检查指定格式是否可用
+- `clipboardRegisterFormat(pszName)`：注册自定义格式
+- `clipboardGetOwner()`：获取剪贴板所有者
+- `clipboardHasFormat(format)`：检查剪贴板是否包含指定格式
+
+**数据交换方式**：
+- `clipboardGetData`：Java 返回 `String`，C++ 使用 `GetStringUTFChars` 读取，`ReleaseStringUTFChars` 释放
+- `clipboardSetData`：C++ 使用 `NewStringUTF` 创建 `jstring`，Java 直接使用参数
+
+### 2.14 RawInput 设备枚举：跨平台输入设备检测
+
+Android 平台通过 JNI 调用 `SouiPlatformBridge.getInputDevices()` 获取系统输入设备列表：
+
+**实现流程**：
+1. Java 层枚举 `InputDevice.getDeviceIds()`，获取每个设备的名称和类型
+2. 设备类型映射：`SOURCE_KEYBOARD`/`SOURCE_DPAD` → `RIM_TYPEKEYBOARD`，`SOURCE_MOUSE`/`SOURCE_TOUCHPAD` → `RIM_TYPEMOUSE`，其他 → `RIM_TYPEHID`
+3. C++ 层 `getRawInputDeviceList` 接收设备数组，填充 `RAWINPUTDEVICELIST` 结构
+4. `getRawInputDeviceInfoA/W` 提供设备名称和设备信息查询
+
+**设备信息结构**（`RID_DEVICE_INFO`）：
+- 鼠标：按钮数量、采样率、是否支持水平滚轮
+- 键盘：类型、功能键数量、指示灯数量、总键数
+- HID：厂商 ID、产品 ID、版本号、使用页、使用值
+
+### 2.15 键盘高度同步：IME 弹出时自动调整布局
+
+`SouiScreen` 通过 `WindowInsetsAnimation.Callback` 监听软键盘弹出/收起事件：
+
+```java
+// API ≥ 30 时注册监听器
+rootView.setWindowInsetsAnimationCallback(new WindowInsetsAnimation.Callback(DISPATCH_MODE_CONTINUE_ON_SUBTREE) {
+    @Override
+    public WindowInsets onProgress(@NonNull WindowInsets insets, ...) {
+        int imeHeight = insets.getInsets(WindowInsets.Type.ime()).bottom;
+        SouiPlatformBridge.nativeSetKeyboardHeight(imeHeight);
+        return insets;
+    }
+});
+```
+
+C++ 层接收到键盘高度后，通过 `WM_KEYBOARD_HEIGHT` 消息通知根窗口，业务层可据此调整布局。
+
+### 2.16 IME 输入支持：软键盘字符输入
+
+`SouiBaseSurface` 实现 `onCreateInputConnection`，支持 Android 输入法：
+
+- **输入类型**：`TYPE_CLASS_TEXT | TYPE_TEXT_VARIATION_NORMAL`
+- **IME 选项**：`IME_FLAG_NO_FULLSCREEN`，避免横屏时全屏输入法遮挡内容
+- **字符提交**：`SouiInputConnection.commitText` 通过 `sendImeString` 将字符投递到 C++ 层，转换为 `WM_IME_CHAR` 消息
+
+### 2.17 HWND_MESSAGE 支持：消息占位窗口
+
+支持 Win32 的 `HWND_MESSAGE` 语义，创建不可见的消息占位窗口：
+
+- **创建流程**：`createWindow` 检测到 `hWndParent == HWND_MESSAGE` 时，创建 `SouiBaseSurface`（不挂视觉树），尺寸强制为 0x0，可见性为 `GONE`
+- **存储机制**：单独存储在 `mMessageOnlyWindows` 集合中，与普通窗口分离
+- **用途**：用于定时器消息处理等不需要视觉呈现的场景
 
 ---
 
@@ -367,6 +468,8 @@ cd d:\work\soui4\demos\android-demo
 
 **C++ 编译说明（重要）**：Demo 的 CMake 不把 SOUI 当预建 AAR 依赖，而是**直接 `add_subdirectory`** 了 `SWINX_DIR`、`UTILITIES_DIR`、`SOUI_SOURCE_DIR`、`THIRD_PART_DIR`、`COMPONENTS_DIR` 五个子目录（见 [CMakeLists.txt](../demos/android-demo/app/src/main/cpp/CMakeLists.txt#L101-L112)），全部与 demo 业务代码 (`AndroidPlatformAPI.cpp / SouiSurfaceProxy.cpp / MainDlg.cpp / demo_native.cpp`) 编译进单体 `libsoui-android-demo.so`。好处是便于在 Android Studio 里单步调试 C++ 层。生产 SDK 形式可以拆分：SOUI 核心 → AAR（`libsoui-android.so`），业务层单独 link。
 
+**C++ 入口方式**：采用 `Soui4AndroidEntry` 抽象类 + 虚函数调用模式。用户实现 `Soui4AndroidEntry` 的四个虚函数（`InitApp`、`UninitApp`、`Startup`、`Shutdown`），通过全局静态变量注册到系统。`AndroidPlatformAPI` 内部通过 `s_entry` 指针调用这些虚函数，实现平台层与业务层的解耦。见 [demo_native.cpp](../demos/android-demo/app/src/main/cpp/demo_native.cpp)。
+
 ### 5.3 Demo 功能结构
 
 启动 App 后进入 `HomeActivity`（见 [HomeActivity.java](../demos/android-demo/app/src/main/java/com/soui/demo/HomeActivity.java)），提供两个按钮对应两种启动方式：
@@ -400,7 +503,7 @@ cd d:\work\soui4\demos\android-demo
    - info 文本不被裁切；Toast 出现无黑边。
 3. **点击计数 + 原生 Toast**：
    - 点按钮 1001，N 递增；Android Toast 正常弹，中文不乱码（验证 S_CW2A UTF-8 + NewStringUTF 链路）。
-4. **主题色切换**：点 1002 五次，颜色循环回到首色；每次切换立即生效（验证 `SetAttribute("colorText")` → 局部 Invalidate → Skia 局部绘制。
+4. **主题色切换**：点 1002 五次，颜色循环回到首色；每次切换立即生效（验证 `SetAttribute("colorText")` → 局部 Invalidate → Skia 局部绘制）。
 5. **定时器**：info 文本里的"运行时长"每秒 +1，不跳秒不暂停（验证 `SetTimer → Handler.postDelayed → nativeOnTimerExpired → WM_TIMER` 全链路）。
 6. **关闭 / 窗口销毁**：
    - 点 1003 或标题栏"×"，Activity 立即 finish（验证 Screen 下子窗口全销毁 → onEmpty → finish 流程）。
@@ -412,11 +515,25 @@ cd d:\work\soui4\demos\android-demo
 9. **焦点与 IME**：
    - 点击 NativeEditView，自动弹出软键盘；
    - 点击其他控件，键盘自动收起；
-   - 输入文本正确显示。
+   - 输入文本正确显示；
+   - 键盘高度变化时布局正确调整（API ≥ 30）。
 10. **字符串 Slot 机制**：
     - `SetDlgItemText` 正常设置文本；
     - `GetDlgItemText` 正常读取文本；
     - 多次操作后无内存泄漏。
+11. **剪贴板操作**：
+    - `SetClipboardText` 设置文本后，系统剪贴板能读取到；
+    - `GetClipboardText` 能读取系统剪贴板内容；
+    - 多次操作后无内存泄漏。
+12. **RawInput 设备枚举**：
+    - 连接外部键盘/鼠标后，`getRawInputDeviceList` 能正确返回设备列表；
+    - 设备类型映射正确（键盘→RIM_TYPEKEYBOARD，鼠标→RIM_TYPEMOUSE）。
+13. **HWND_MESSAGE 窗口**：
+    - 创建消息占位窗口成功，不影响其他窗口布局；
+    - 定时器消息能正确投递到消息窗口。
+14. **双击检测**：快速连续点击同一位置，触发 `WM_LBUTTONDBLCLK` 消息。
+15. **右键菜单**：长按弹出上下文菜单，触发 `WM_RBUTTONDOWN` 消息。
+16. **滚轮事件**：外接鼠标滚轮操作，触发 `WM_MOUSEWHEEL`/`WM_MOUSEHWHEEL` 消息。
 
 ---
 
@@ -427,30 +544,32 @@ Java 层（`app/src/main/java/com/soui/`）：
 | 文件 | 角色 |
 |---|---|
 | [INativeWindow.java](../demos/android-demo/app/src/main/java/com/soui/android/INativeWindow.java) | HWND 真身接口；HWND=实现该接口的 jobject GlobalRef。 |
-| [SouiPlatformBridge.java](../demos/android-demo/app/src/main/java/com/soui/android/SouiPlatformBridge.java) | 全局 JNI 桥单例：createWindow、View 工厂、SetCapture、焦点管理、定时器、screen 生命周期。 |
+| [SouiPlatformBridge.java](../demos/android-demo/app/src/main/java/com/soui/android/SouiPlatformBridge.java) | 全局 JNI 桥单例：createWindow、View 工厂、SetCapture、焦点管理、定时器、screen 生命周期、剪贴板、RawInput、键盘高度同步。 |
 | [SouiAbsLayout.java](../demos/android-demo/app/src/main/java/com/soui/android/SouiAbsLayout.java) | 绝对布局基类；提供 measure/layout 引擎 + MarginLayoutParams 兼容 + 子 View 位置/尺寸更新方法。 |
 | [SouiAbsWindow.java](../demos/android-demo/app/src/main/java/com/soui/android/SouiAbsWindow.java) | 单 HWND 容器的抽象：主 Surface MATCH_PARENT 规则。 |
 | [SouiWindow.java](../demos/android-demo/app/src/main/java/com/soui/android/SouiWindow.java) | 单 HWND 具体容器：`newSurface` 创建主 Surface、设置自身 LayoutParams、可见性/禁用初始值。 |
-| [SouiScreen.java](../demos/android-demo/app/src/main/java/com/soui/android/SouiScreen.java) | 桌面容器（GetDesktopWindow），继承自 SouiWindow：screenId 启动参数、生命周期管理（onAttached→souiStartup/onDetached→souiShutdown）、尺寸同步、空状态监听。 |
-| [SouiBaseSurface.java](../demos/android-demo/app/src/main/java/com/soui/android/SouiBaseSurface.java) | Surface 基类：输入事件分发 → Capture 重定向 → nativeOnMotionEventEx。 |
-| [SouiSurface.java](../demos/android-demo/app/src/main/java/com/soui/android/SouiSurface.java) | 具体渲染 Surface：离屏 Bitmap + nativeRender → canvas.drawBitmap。 |
-| [NativeWindowDelegate.java](../demos/android-demo/app/src/main/java/com/soui/android/NativeWindowDelegate.java) | INativeWindow 的通用委托实现：窗口状态操作集中处理。 |
+| [SouiScreen.java](../demos/android-demo/app/src/main/java/com/soui/android/SouiScreen.java) | 桌面容器（GetDesktopWindow），继承自 SouiWindow：screenId 启动参数、生命周期管理（onAttached→souiStartup/onDetached→souiShutdown）、尺寸同步、空状态监听、键盘高度监听。 |
+| [SouiBaseSurface.java](../demos/android-demo/app/src/main/java/com/soui/android/SouiBaseSurface.java) | Surface 基类：输入事件分发 → Capture 重定向 → nativeOnMotionEventEx，IME 输入支持。 |
+| [SouiSurface.java](../demos/android-demo/app/src/main/java/com/soui/android/SouiSurface.java) | 具体渲染 Surface：离屏 Bitmap + nativeRender → canvas.drawBitmap，SIMD 颜色通道转换。 |
+| [NativeWindowDelegate.java](../demos/android-demo/app/src/main/java/com/soui/android/NativeWindowDelegate.java) | INativeWindow 的通用委托实现：窗口状态操作集中处理，支持 message-only 窗口。 |
 | [SouiNativeHandle.java](../demos/android-demo/app/src/main/java/com/soui/android/SouiNativeHandle.java) | JNI 句柄包装工具（NativeCreate/NativeDestroy）。 |
-| [NativeEditView.java](../demos/android-demo/app/src/main/java/com/soui/android/NativeEditView.java) | 原生 EditText 控件实现，处理 Win32 编辑控件消息（WM_SETTEXT/EM_GETSEL 等）。 |
+| [NativeEditView.java](../demos/android-demo/app/src/main/java/com/soui/android/NativeEditView.java) | 原生 EditText 控件实现，处理 Win32 编辑控件消息（WM_SETTEXT/EM_GETSEL 等），支持 IME 输入。 |
 | [UiThreadUtils.java](../demos/android-demo/app/src/main/java/com/soui/android/UiThreadUtils.java) | UI 线程工具类，提供线程安全的 UI 操作方法。 |
+| [SouiInputConnection.java](../demos/android-demo/app/src/main/java/com/soui/android/SouiInputConnection.java) | IME 输入连接实现，处理字符提交和输入状态管理。 |
 
 C++ 层（`app/src/main/cpp/`）：
 
 | 文件 | 角色 |
 |---|---|
-| [AndroidPlatformAPI.h](../demos/android-demo/app/src/main/cpp/AndroidPlatformAPI.h) / [.cpp](../demos/android-demo/app/src/main/cpp/AndroidPlatformAPI.cpp) | SWinx Android 平台实现；JNI 调 Java 桥；screen 生命周期（激活栈+Context映射）；SetCapture/焦点/定时器/窗口操作；字符串槽管理。 |
+| [AndroidPlatformAPI.h](../demos/android-demo/app/src/main/cpp/AndroidPlatformAPI.h) / [.cpp](../demos/android-demo/app/src/main/cpp/AndroidPlatformAPI.cpp) | SWinx Android 平台实现；JNI 调 Java 桥；screen 生命周期（激活栈+Context映射）；SetCapture/焦点/定时器/窗口操作；字符串槽管理；剪贴板 API；RawInput 设备枚举；键盘高度同步；HWND_MESSAGE 支持。 |
 | [AndroidPlatformAPIReg.cpp](../demos/android-demo/app/src/main/cpp/AndroidPlatformAPIReg.cpp) | PlatformAPI 注册（RegisterAndroidPlatformAPI）。 |
-| [SouiSurfaceProxy.h](../demos/android-demo/app/src/main/cpp/SouiSurfaceProxy.h) / [.cpp](../demos/android-demo/app/src/main/cpp/SouiSurfaceProxy.cpp) | 每个 Surface 的 native 侧对应：Motion 事件 → Win32 MSG 派发；Bitmap 像素锁 + Skia 渲染；键盘事件转换。 |
+| [SouiSurfaceProxy.h](../demos/android-demo/app/src/main/cpp/SouiSurfaceProxy.h) / [.cpp](../demos/android-demo/app/src/main/cpp/SouiSurfaceProxy.cpp) | 每个 Surface 的 native 侧对应：Motion 事件 → Win32 MSG 派发（支持双击、右键、滚轮、悬停）；Bitmap 像素锁 + Skia 渲染；键盘事件转换（支持 ALT 修饰键）；SIMD BGRA→RGBA 颜色通道转换。 |
 | [Soui4Android.cpp](../demos/android-demo/app/src/main/cpp/Soui4Android.cpp) | JNI 方法实现：NativeCreate/NativeDestroy/nativeOnMotionEventEx/nativeOnKeyEventEx/nativeSouiStartup/nativeSouiShutdown/字符串槽读写等。 |
-| [demo_native.cpp](../demos/android-demo/app/src/main/cpp/demo_native.cpp) | Demo 启动实现：SouiInitApp/SouiStartup/SouiShutdown。 |
+| [demo_native.cpp](../demos/android-demo/app/src/main/cpp/demo_native.cpp) | Demo 启动实现：`Soui4AndroidEntry` 抽象类实现，通过 `InitSoui4AndroidEntry` 注册入口，提供 `InitApp/UninitApp/Startup/Shutdown` 虚函数接口。 |
 | [MainDlg.h](../demos/android-demo/app/src/main/cpp/MainDlg.h) / [.cpp](../demos/android-demo/app/src/main/cpp/MainDlg.cpp) | 顶层 SHostWnd 业务：按钮点击计数、主题色、定时器、ShowToastAndroid。 |
 | [SouiRealWndHandler.h](../demos/android-demo/app/src/main/cpp/SouiRealWndHandler.h) / [.cpp](../demos/android-demo/app/src/main/cpp/SouiRealWndHandler.cpp) | SOUI 真实窗口处理器：OnRealWndCreate/OnRealWndDestroy。 |
-| [Android_Edit.cpp](../demos/android-demo/app/src/main/cpp/Android_Edit.cpp) | 原生 EDIT 控件 WNDPROC，处理字符串消息的 Slot 化转换。 |
+| [Android_Edit.cpp](../demos/android-demo/app/src/main/cpp/Android_Edit.cpp) | 原生 EDIT 控件 WNDPROC，处理字符串消息的 Slot 化转换，支持 IME 输入。 |
+| [CMemDC_Android.cpp](../demos/android-demo/app/src/main/cpp/CMemDC_Android.cpp) | Android 平台的 CMemDC 实现，支持离屏渲染和 DIB Section 管理。 |
 | [CMakeLists.txt](../demos/android-demo/app/src/main/cpp/CMakeLists.txt) | 单体 so 构建脚本；五个大目录 add_subdirectory；cxx flags、include dirs、link libs。 |
 
 Java Demo 入口（`app/src/main/java/com/soui/demo/`）：

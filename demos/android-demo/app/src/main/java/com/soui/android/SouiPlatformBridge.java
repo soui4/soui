@@ -1122,35 +1122,29 @@ public class SouiPlatformBridge {
     }
 
     @SuppressWarnings("unused")
-    public int clipboardGetData(int format) {
-        if (mContext == null) return 0;
+    public String clipboardGetData(int format) {
+        if (mContext == null) return null;
         ClipboardManager cm = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
-        if (cm == null || !cm.hasPrimaryClip()) return 0;
+        if (cm == null || !cm.hasPrimaryClip()) return null;
 
         ClipData clipData = cm.getPrimaryClip();
-        if (clipData == null || clipData.getItemCount() == 0) return 0;
+        if (clipData == null || clipData.getItemCount() == 0) return null;
 
         ClipData.Item item = clipData.getItemAt(0);
-        if (item == null) return 0;
+        if (item == null) return null;
 
         CharSequence text = item.getText();
-        if (text == null) return 0;
+        if (text == null) return null;
 
-        // Write to string slot and return the slot ID
-        int slotId = nativeAllocStringSlot();
-        if (slotId > 0) {
-            nativeWriteCxxStringSlot(slotId, text.toString());
-        }
-        return slotId;
+        return text.toString();
     }
 
     @SuppressWarnings("unused")
-    public boolean clipboardSetData(int format, int slotId) {
+    public boolean clipboardSetData(int format, String text) {
         if (mContext == null) return false;
         ClipboardManager cm = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
         if (cm == null) return false;
 
-        String text = nativeReadCxxStringSlot(slotId);
         if (text == null || text.isEmpty()) return false;
 
         cm.setPrimaryClip(ClipData.newPlainText("", text));

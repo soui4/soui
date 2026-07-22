@@ -10,10 +10,10 @@
 using namespace SNS;
 extern JavaVM *g_javaVM;
 
-extern HWND SouiStartup(long screenId,const char* pszLayout);
-extern void SouiShutdown(long screenId);
-extern SNS::SApplication * SouiInitApp(AAssetManager* assetMgr, LPCSTR pszAssetDir);
-extern void SouiUninitApp(SNS::SApplication *pApp);
+static Soui4AndroidEntry * s_entry=nullptr;
+void InitSoui4AndroidEntry(Soui4AndroidEntry * entry){
+    s_entry = entry;
+}
 
 namespace {
     inline void ClearEx(JNIEnv *env) {
@@ -85,8 +85,8 @@ void AndroidPlatformAPI::init(JNIEnv *env, jobject bridge, jobject ctx) {
         m_clipboardOpenMethod = env->GetMethodID(clsBridge, "clipboardOpen", "(J)Z");
         m_clipboardCloseMethod = env->GetMethodID(clsBridge, "clipboardClose", "()Z");
         m_clipboardEmptyMethod = env->GetMethodID(clsBridge, "clipboardEmpty", "()Z");
-        m_clipboardGetDataMethod = env->GetMethodID(clsBridge, "clipboardGetData", "(I)I");
-        m_clipboardSetDataMethod = env->GetMethodID(clsBridge, "clipboardSetData", "(II)Z");
+        m_clipboardGetDataMethod = env->GetMethodID(clsBridge, "clipboardGetData", "(I)Ljava/lang/String;");
+        m_clipboardSetDataMethod = env->GetMethodID(clsBridge, "clipboardSetData", "(ILjava/lang/String;)Z");
         m_clipboardIsFormatAvailableMethod = env->GetMethodID(clsBridge, "clipboardIsFormatAvailable", "(I)Z");
         m_clipboardGetOwnerMethod = env->GetMethodID(clsBridge, "clipboardGetOwner", "()J");
         m_clipboardHasFormatMethod = env->GetMethodID(clsBridge, "clipboardHasFormat", "(I)Z");
@@ -774,12 +774,14 @@ HWND AndroidPlatformAPI::souiStartup(JNIEnv* env, jlong screenId,const char* lay
     if (!env || screenId == 0)
         return 0;
     pushActiveScreen(screenId);
-    return SouiStartup(screenId, layout);
+    SASSERT(s_entry);
+    return s_entry->Startup(screenId, layout);
 }
 
 void AndroidPlatformAPI::souiShutdown(JNIEnv* env, jlong screenId) {
     if (!env || screenId == 0) return;
-    SouiShutdown(screenId);
+    SASSERT(s_entry);
+    s_entry->Shutdown(screenId);
     popActiveScreen(screenId);
 }
 
@@ -802,7 +804,8 @@ bool AndroidPlatformAPI::initSouiApp(JNIEnv *env, jobject assetManagerJ, jstring
 
     const char* appFilesDir = env->GetStringUTFChars(appFilesDirJ, nullptr);
     SLOGI()<<"nativeInitSouiApp: AAssetManager*="<<assetMgr<<" filesDir="<<appFilesDir;
-    m_theApp = SouiInitApp(assetMgr,appFilesDir);
+    SASSERT(s_entry);
+    m_theApp = s_entry->InitApp(assetMgr,appFilesDir);
     env->ReleaseStringUTFChars(appFilesDirJ,appFilesDir);
     if(!m_theApp)
         return false;
@@ -811,8 +814,9 @@ bool AndroidPlatformAPI::initSouiApp(JNIEnv *env, jobject assetManagerJ, jstring
 }
 
 void AndroidPlatformAPI::uninitSouiApp(JNIEnv *env) {
+    SASSERT(s_entry);
     if(m_theApp){
-        SouiUninitApp(m_theApp);
+        s_entry->UninitApp(m_theApp);
         m_theApp->GetMsgLoop()->OnStop();
         m_theApp=nullptr;
     }
@@ -874,40 +878,42 @@ HANDLE AndroidPlatformAPI::clipboardGetData(UINT uFormat) {
     if (!env || !m_javaBridge || !m_clipboardGetDataMethod) {
         return NULL;
     }
-    jint slotId = env->CallIntMethod(m_javaBridge, m_clipboardGetDataMethod, (jint)uFormat);
+    jstring jText = (jstring)env->CallObjectMethod(m_javaBridge, m_clipboardGetDataMethod, (jint)uFormat);
     ClearEx(env);
-    if (slotId <= 0) {
+    if (!jText) {
         return NULL;
     }
     
-    std::string text = ReadString(slotId);
-    stringSlotFree(slotId);
-    
-    if (text.empty()) {
+    const char *text = env->GetStringUTFChars(jText, nullptr);
+    if (!text) {
+        env->DeleteLocalRef(jText);
         return NULL;
     }
     
     HGLOBAL hMem;
     if (uFormat == CF_UNICODETEXT) {
-        int wlen = (int)text.length() + 1;
+        int wlen = (int)strlen(text) + 1;
         hMem = GlobalAlloc(GMEM_MOVEABLE, wlen * sizeof(wchar_t));
         if (hMem) {
             wchar_t *buf = (wchar_t *)GlobalLock(hMem);
             if (buf) {
-                MultiByteToWideChar(CP_UTF8, 0, text.c_str(), -1, buf, wlen);
+                MultiByteToWideChar(CP_UTF8, 0, text, -1, buf, wlen);
                 GlobalUnlock(hMem);
             }
         }
     } else {
-        hMem = GlobalAlloc(GMEM_MOVEABLE, text.length() + 1);
+        hMem = GlobalAlloc(GMEM_MOVEABLE, strlen(text) + 1);
         if (hMem) {
             char *buf = (char *)GlobalLock(hMem);
             if (buf) {
-                strcpy(buf, text.c_str());
+                strcpy(buf, text);
                 GlobalUnlock(hMem);
             }
         }
     }
+    
+    env->ReleaseStringUTFChars(jText, text);
+    env->DeleteLocalRef(jText);
     return hMem;
 }
 
@@ -916,44 +922,42 @@ HANDLE AndroidPlatformAPI::clipboardSetData(UINT uFormat, HANDLE hMem) {
         return NULL;
     }
     
-    const char *text = nullptr;
-    int len = 0;
+    std::string text;
     if (uFormat == CF_UNICODETEXT) {
         wchar_t *wbuf = (wchar_t *)GlobalLock(hMem);
         if (wbuf) {
-            len = WideCharToMultiByte(CP_UTF8, 0, wbuf, -1, nullptr, 0, nullptr, nullptr);
-            char *buf = new char[len];
-            if (buf) {
-                WideCharToMultiByte(CP_UTF8, 0, wbuf, -1, buf, len, nullptr, nullptr);
-                text = buf;
+            int len = WideCharToMultiByte(CP_UTF8, 0, wbuf, -1, nullptr, 0, nullptr, nullptr);
+            if (len > 0) {
+                text.resize(len);
+                WideCharToMultiByte(CP_UTF8, 0, wbuf, -1, &text[0], len, nullptr, nullptr);
             }
             GlobalUnlock(hMem);
         }
     } else {
-        text = (const char *)GlobalLock(hMem);
-        if (text) {
-            len = (int)strlen(text) + 1;
-            char *buf = new char[len];
-            strcpy(buf, text);
+        char *buf = (char *)GlobalLock(hMem);
+        if (buf) {
             text = buf;
             GlobalUnlock(hMem);
         }
     }
     
-    if (!text || !len) {
-        delete[] text;
+    if (text.empty()) {
         return NULL;
     }
-    
-    AutoStringSlot slot(text);
-    delete[] text;
     
     JNIEnv *env = getJNIEnv();
     if (!env || !m_javaBridge || !m_clipboardSetDataMethod) {
         return NULL;
     }
-    jboolean result = env->CallBooleanMethod(m_javaBridge, m_clipboardSetDataMethod, (jint)uFormat, (jint)slot.id());
+    
+    jstring jText = env->NewStringUTF(text.c_str());
+    if (!jText) {
+        return NULL;
+    }
+    
+    jboolean result = env->CallBooleanMethod(m_javaBridge, m_clipboardSetDataMethod, (jint)uFormat, jText);
     ClearEx(env);
+    env->DeleteLocalRef(jText);
     return (BOOL)result ? hMem : NULL;
 }
 
