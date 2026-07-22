@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="53" height="27" viewBox="0 0 53 27">
+  <!-- 正常状态 -->
+  <g id="normal">
+    <rect width="26" height="27" fill="#f6f6f6" rx="2" ry="2"/>
+  </g>
+  <!-- 悬停状态 -->
+  <g id="hover" transform="translate(27, 0)">
+    <rect width="26" height="27" fill="#c8c8c8" rx="2" ry="2"/>
+  </g>
+</svg>

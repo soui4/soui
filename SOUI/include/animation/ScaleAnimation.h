@@ -75,6 +75,12 @@ class SOUI_EXP SScaleAnimation : public SAnimation {
     STDMETHOD_(void, initialize)
     (THIS_ int width, int height, int parentWidth, int parentHeight, int nScale) OVERRIDE;
 
+    /**
+     * @brief Creates and returns a deep copy of this scale animation.
+     * @return Pointer to a new SScaleAnimation with the same from/to scales and pivot settings.
+     */
+    STDMETHOD_(IAnimation *, clone)(THIS) SCONST OVERRIDE;
+
   public:
     /**
      * @brief Attributes for SScaleAnimation

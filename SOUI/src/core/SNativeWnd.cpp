@@ -1,7 +1,8 @@
 ﻿#include <souistd.h>
 #include <helper/SCriticalSection.h>
 #include <core/SNativeWnd.h>
-
+#include <helper/slog.h>
+#define kLogTag "nativeWnd"
 SNSBEGIN
 
 #ifndef ENABLE_THUNK
@@ -540,7 +541,7 @@ LRESULT SNativeWnd::DefWindowProc()
 
 BOOL SNativeWnd::CenterWindow(HWND hWndCenter /*= NULL*/)
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
 
     // determine owner window to center against
     DWORD dwStyle = GetStyle();
@@ -636,7 +637,7 @@ BOOL SNativeWnd::CenterWindow(HWND hWndCenter /*= NULL*/)
 
 BOOL SNativeWnd::ModifyStyle(DWORD dwRemove, DWORD dwAdd, UINT nFlags /*= 0*/)
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
 
     DWORD dwStyle = (DWORD)::GetWindowLongPtr(m_hWnd, GWL_STYLE);
     DWORD dwNewStyle = (dwStyle & ~dwRemove) | dwAdd;
@@ -655,7 +656,7 @@ BOOL SNativeWnd::ModifyStyle(DWORD dwRemove, DWORD dwAdd, UINT nFlags /*= 0*/)
 BOOL SNativeWnd::ModifyStyleEx(DWORD dwRemove, DWORD dwAdd, UINT nFlags /*= 0*/)
 {
     // todo:hjx to support ws_ex_composite change during running.
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
 
     DWORD dwStyle = (DWORD)::GetWindowLongPtr(m_hWnd, GWL_EXSTYLE);
     DWORD dwNewStyle = (dwStyle & ~dwRemove) | dwAdd;
@@ -678,7 +679,7 @@ BOOL SNativeWnd::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 
 BOOL SNativeWnd::UpdateLayeredWindow(HDC hdcDst, POINT *pptDst, SIZE *psize, HDC hdcSrc, POINT *pptSrc, COLORREF crKey, BLENDFUNCTION *pblend, DWORD dwFlags)
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
 #ifdef _WIN32
     return ::UpdateLayeredWindow(m_hWnd, hdcDst, pptDst, psize, hdcSrc, pptSrc, crKey, pblend, dwFlags);
 #else
@@ -688,97 +689,97 @@ BOOL SNativeWnd::UpdateLayeredWindow(HDC hdcDst, POINT *pptDst, SIZE *psize, HDC
 
 BOOL SNativeWnd::SetLayeredWindowAttributes(COLORREF crKey, BYTE bAlpha, DWORD dwFlags)
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::SetLayeredWindowAttributes(m_hWnd, crKey, bAlpha, dwFlags);
 }
 
 int SNativeWnd::SetWindowRgn(HRGN hRgn, BOOL bRedraw /*=TRUE*/)
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::SetWindowRgn(m_hWnd, hRgn, bRedraw);
 }
 
 BOOL SNativeWnd::ShowWindow(int nCmdShow)
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::ShowWindow(m_hWnd, nCmdShow);
 }
 
 BOOL SNativeWnd::UpdateWindow()
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::UpdateWindow(m_hWnd);
 }
 
 BOOL SNativeWnd::MoveWindow2(LPCRECT lpRect, BOOL bRepaint /*= TRUE*/)
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::MoveWindow(m_hWnd, lpRect->left, lpRect->top, lpRect->right - lpRect->left, lpRect->bottom - lpRect->top, bRepaint);
 }
 
 BOOL SNativeWnd::MoveWindow(int x, int y, int nWidth, int nHeight, BOOL bRepaint /*= TRUE*/)
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::MoveWindow(m_hWnd, x, y, nWidth, nHeight, bRepaint);
 }
 
 BOOL SNativeWnd::IsWindowVisible() const
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::IsWindowVisible(m_hWnd);
 }
 
 BOOL SNativeWnd::IsZoomed() const
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::IsZoomed(m_hWnd);
 }
 
 BOOL SNativeWnd::IsIconic() const
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::IsIconic(m_hWnd);
 }
 
 int SNativeWnd::GetWindowText(LPTSTR lpszStringBuf, int nMaxCount) const
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::GetWindowText(m_hWnd, lpszStringBuf, nMaxCount);
 }
 
 BOOL SNativeWnd::SetWindowText(LPCTSTR lpszString)
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::SetWindowText(m_hWnd, lpszString);
 }
 
 BOOL SNativeWnd::SendNotifyMessage(UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/)
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::SendNotifyMessage(m_hWnd, message, wParam, lParam);
 }
 
 BOOL SNativeWnd::PostMessage(UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/)
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::PostMessage(m_hWnd, message, wParam, lParam);
 }
 
 LRESULT SNativeWnd::SendMessage(UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/)
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::SendMessage(m_hWnd, message, wParam, lParam);
 }
 
 HWND SNativeWnd::SetFocus()
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::SetFocus(m_hWnd);
 }
 
 HWND SNativeWnd::SetCapture()
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::SetCapture(m_hWnd);
 }
 
@@ -794,67 +795,67 @@ BOOL SNativeWnd::ReleaseCapture()
 
 BOOL SNativeWnd::ShowCaret()
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::ShowCaret(m_hWnd);
 }
 
 BOOL SNativeWnd::HideCaret()
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::HideCaret(m_hWnd);
 }
 
 BOOL SNativeWnd::CreateCaret(HBITMAP hBitmap, int nWidth, int nHeight)
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::CreateCaret(m_hWnd, hBitmap, nWidth, nHeight);
 }
 
 int SNativeWnd::ReleaseDC(HDC hDC)
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::ReleaseDC(m_hWnd, hDC);
 }
 
 HDC SNativeWnd::GetWindowDC()
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::GetWindowDC(m_hWnd);
 }
 
 HDC SNativeWnd::GetDC()
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::GetDC(m_hWnd);
 }
 
 BOOL SNativeWnd::KillTimer(UINT_PTR nIDEvent)
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::KillTimer(m_hWnd, nIDEvent);
 }
 
 UINT_PTR SNativeWnd::SetTimer(UINT_PTR nIDEvent, UINT nElapse, void(CALLBACK *lpfnTimer)(HWND, UINT, UINT_PTR, DWORD) /*= NULL*/)
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::SetTimer(m_hWnd, nIDEvent, nElapse, (TIMERPROC)lpfnTimer);
 }
 
 int SNativeWnd::MapWindowRect(HWND hWndTo, LPRECT lpRect) const
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::MapWindowPoints(m_hWnd, hWndTo, (LPPOINT)lpRect, 2);
 }
 
 int SNativeWnd::MapWindowPoints(HWND hWndTo, LPPOINT lpPoint, UINT nCount) const
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::MapWindowPoints(m_hWnd, hWndTo, lpPoint, nCount);
 }
 
 BOOL SNativeWnd::ScreenToClient2(LPRECT lpRect) const
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     if (!::ScreenToClient(m_hWnd, (LPPOINT)lpRect))
         return FALSE;
     return ::ScreenToClient(m_hWnd, ((LPPOINT)lpRect) + 1);
@@ -862,13 +863,13 @@ BOOL SNativeWnd::ScreenToClient2(LPRECT lpRect) const
 
 BOOL SNativeWnd::ScreenToClient(LPPOINT lpPoint) const
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::ScreenToClient(m_hWnd, lpPoint);
 }
 
 BOOL SNativeWnd::ClientToScreen2(LPRECT lpRect) const
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     if (!::ClientToScreen(m_hWnd, (LPPOINT)lpRect))
         return FALSE;
     return ::ClientToScreen(m_hWnd, ((LPPOINT)lpRect) + 1);
@@ -876,31 +877,31 @@ BOOL SNativeWnd::ClientToScreen2(LPRECT lpRect) const
 
 BOOL SNativeWnd::ClientToScreen(LPPOINT lpPoint) const
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::ClientToScreen(m_hWnd, lpPoint);
 }
 
 BOOL SNativeWnd::GetClientRect(LPRECT lpRect) const
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::GetClientRect(m_hWnd, lpRect);
 }
 
 BOOL SNativeWnd::GetWindowRect(LPRECT lpRect) const
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::GetWindowRect(m_hWnd, lpRect);
 }
 
 BOOL SNativeWnd::InvalidateRect(LPCRECT lpRect, BOOL bErase /*= TRUE*/)
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::InvalidateRect(m_hWnd, lpRect, bErase);
 }
 
 BOOL SNativeWnd::Invalidate(BOOL bErase /*= TRUE*/)
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::InvalidateRect(m_hWnd, NULL, bErase);
 }
 
@@ -913,61 +914,61 @@ BOOL SNativeWnd::DestroyWindow()
 {
     if (!m_hWnd)
         return FALSE;
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::DestroyWindow(m_hWnd);
 }
 
 BOOL SNativeWnd::SetWindowPos(HWND hWndInsertAfter, int x, int y, int cx, int cy, UINT nFlags)
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::SetWindowPos(m_hWnd, hWndInsertAfter, x, y, cx, cy, nFlags);
 }
 
 BOOL SNativeWnd::IsWindowEnabled() const
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::IsWindowEnabled(m_hWnd);
 }
 
 HWND SNativeWnd::SetParent(HWND hWndNewParent)
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::SetParent(m_hWnd, hWndNewParent);
 }
 
 HWND SNativeWnd::GetParent()
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::GetParent(m_hWnd);
 }
 
 LONG_PTR SNativeWnd::SetWindowLongPtr(int nIndex, LONG_PTR dwNewLong)
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::SetWindowLongPtr(m_hWnd, nIndex, dwNewLong);
 }
 
 LONG_PTR SNativeWnd::GetWindowLongPtr(int nIndex) const
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::GetWindowLongPtr(m_hWnd, nIndex);
 }
 
 DWORD SNativeWnd::GetExStyle() const
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return (DWORD)::GetWindowLongPtr(m_hWnd, GWL_EXSTYLE);
 }
 
 DWORD SNativeWnd::GetStyle() const
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return (DWORD)::GetWindowLongPtr(m_hWnd, GWL_STYLE);
 }
 
 int SNativeWnd::GetDlgCtrlID() const
 {
-    SASSERT(::IsWindow(m_hWnd));
+    SASSERT(IsWindow());
     return ::GetDlgCtrlID(m_hWnd);
 }
 

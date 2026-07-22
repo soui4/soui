@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- 基础权限（按需添加；SOUI 本身只需要 INTERNET 如果你要加载远程资源，这里示例不加） -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <application
+        android:name=".DemoApplication"
+        android:allowBackup="true"
+        android:icon="@drawable/ic_app_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@drawable/ic_app_launcher"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.SouiDemo"
+        android:usesCleartextTraffic="true">
+
+        <!-- 主页：选择使用默认 SHostWnd 还是自定义 CMainDlg 两种模式 -->
+        <activity
+            android:name=".HomeActivity"
+            android:exported="true"
+            android:theme="@style/Theme.SouiDemo.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- 演示 1：使用默认 SHostWnd，仅通过 SOUI XML 布局渲染（代码方式启动） -->
+        <activity
+            android:name=".DefaultHostActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustNothing"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_default_host"
+            android:theme="@style/Theme.SouiDemo.NoActionBar" />
+
+        <!-- 演示 2：使用 XML 自定义属性声明 SouiScreen + 属性，onAttachedToWindow 自动启动 -->
+        <activity
+            android:name=".XmlHostActivity"
+            android:exported="false"
+            android:label="@string/title_xml_host"
+            android:theme="@style/Theme.SouiDemo.NoActionBar" />
+
+    </application>
+
+</manifest>

@@ -51,6 +51,34 @@ DECLARE_INTERFACE_(IHostWnd, INativeWnd)
     (THIS_ HWND hWndParent, int x DEF_VAL(0), int y DEF_VAL(0), int nWidth DEF_VAL(0), int nHeight DEF_VAL(0)) PURE;
 
     /**
+     * @brief Attaches the host window to an existing external HWND.
+     *
+     * Instead of creating a new HWND via Create/CreateEx, this method subclasses the
+     * provided external HWND and runs the same SOUI initialization flow (loading the
+     * layout XML, building the SOUI window tree, and hooking up the message map so
+     * that SOUI messages are routed correctly).
+     *
+     * Unlike Create/CreateEx, when the SHostWnd is later destroyed via DestroyWindow,
+     * it only unsubclasses the external HWND and performs internal SOUI cleanup. The
+     * external HWND itself is NOT destroyed and remains fully owned by its original
+     * creator.
+     *
+     * @param hWnd Handle to an existing, valid window to attach SOUI to.
+     * @param xmlInit Optional XML node used for initialization. Same semantics as the
+     *                xmlInit parameter of CreateEx. If NULL, the layout configured via
+     *                SetLayoutId / the constructor is used instead.
+     * @return The attached HWND (same as @p hWnd) on success, or NULL on failure.
+     *         Failures include an invalid @p hWnd, the SHostWnd already being bound
+     *         to a window, or a failure during subclassing or SOUI initialization.
+     */
+    STDMETHOD_(BOOL, Attach)(THIS_ HWND hWnd, IXmlNode * xmlInit DEF_VAL(NULL)) PURE;
+
+    /**
+    * @brief detach from external HWND
+    */
+    STDMETHOD_(BOOL, Detach)(THIS) PURE;
+
+    /**
      * @brief 设置窗口布局资源ID
      * @param pszLayoutId 布局资源ID
      * @return

@@ -57,6 +57,12 @@ class SOUI_EXP SRotateAnimation : public SAnimation {
     STDMETHOD_(void, initialize)
     (THIS_ int width, int height, int parentWidth, int parentHeight, int nScale) OVERRIDE;
 
+    /**
+     * @brief Creates and returns a deep copy of this rotate animation.
+     * @return Pointer to a new SRotateAnimation with same angles and pivot settings.
+     */
+    STDMETHOD_(IAnimation *, clone)(THIS) SCONST OVERRIDE;
+
   protected:
     /**
      * @brief Applies the transformation at a specific interpolated time.

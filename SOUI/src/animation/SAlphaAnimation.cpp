@@ -37,4 +37,11 @@ void SAlphaAnimation::copy(const IAnimation *src)
     mToAlpha = src2->mToAlpha;
 }
 
+IAnimation *SAlphaAnimation::clone() const
+{
+    SAlphaAnimation *pRet = new SAlphaAnimation();
+    pRet->copy(this);
+    return pRet;
+}
+
 SNSEND

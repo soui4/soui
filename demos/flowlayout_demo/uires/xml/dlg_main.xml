@@ -18,7 +18,7 @@ translucent="1"
       </window>
       <imgbtn name="btn_close" skin="_skin.sys.btn.close"     tip="close" animate="1"/>
     </caption>
-    <tabctrl size="-2,0" weight="1" tabHeight="30" curSel="0">
+    <tabctrl size="-2,0" weight="1" tabHeight="30" curSel="2" duration="200" id="1000">
       <page title="page1" layout="vbox" interval="10dp">
         <window size="-2,-1" layout="hflow" interval="10dp" gravity="center">
           <button text="Button 1" class="demo_btn" />
@@ -82,13 +82,14 @@ translucent="1"
       </page>
       <page title="svg test" layout="vbox" interval="10dp" font="size:20,underline:1"> 
         <img size="200,200" skin="svg_xmusic"/>
-		  <combobox size="100,30" dropdown="1">
-			  <items>
-				  <item text="item1"/>
-				  <item text="item1"/>
-				  <item text="item1"/>
-			  </items>
-		  </combobox>
+        <combobox size="100,30" dropdown="1" margin="1" colorBorder="#ff0000">
+          <items>
+            <item text="item1"/>
+            <item text="item2"/>
+            <item text="item3"/>
+          </items>
+        </combobox>
+        <button name="btn_test" text="test" size="100,30"/>
       </page>
     </tabctrl>
 

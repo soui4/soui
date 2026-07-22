@@ -27,6 +27,9 @@ static int nth_set_cpu(unsigned int n, cpu_set_t* cpuSet) {
 }
 
 bool SkThread::setProcessorAffinity(unsigned int processor) {
+#ifdef __ANDROID__
+    return false;
+#else
     SkThread_PThreadData* pthreadData = static_cast<SkThread_PThreadData*>(fData);
     if (!pthreadData->fValidPThread) {
         return false;
@@ -43,4 +46,5 @@ bool SkThread::setProcessorAffinity(unsigned int processor) {
     return 0 == pthread_setaffinity_np(pthreadData->fPThread,
                                        sizeof(cpu_set_t),
                                        &cpuset);
+#endif//__ANDROID__
 }

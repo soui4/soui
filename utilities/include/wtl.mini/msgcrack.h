@@ -2496,4 +2496,19 @@ public: \
     }
 
 
+// void OnKeyboardHeight(int keyboardHeight)
+#ifndef WM_KEYBOARD_HEIGHT
+#define WM_KEYBOARD_HEIGHT (-1) //mark it as unknown message
+#endif//WM_KEYBOARD_HEIGHT
+
+#define MSG_KEYBOARD_HEIGHT(func) \
+    if (uMsg == WM_KEYBOARD_HEIGHT) \
+    { \
+        SetMsgHandled(TRUE); \
+        func((int)wParam); \
+        lResult = 0; \
+        if(IsMsgHandled()) \
+            return TRUE; \
+    }
+
 #endif // __SWNDMSGCRACK_H__

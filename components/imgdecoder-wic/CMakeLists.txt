@@ -25,8 +25,8 @@ target_compile_definitions(imgdecoder-wic
 )
 target_include_directories(imgdecoder-wic
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
-  PRIVATE ${PROJECT_SOURCE_DIR}/utilities/include
-  PRIVATE ${PROJECT_SOURCE_DIR}/SOUI/include
+  PRIVATE ${SOUI_ROOT_DIR}/utilities/include
+  PRIVATE ${SOUI_ROOT_DIR}/SOUI/include
 )
 
 set(COM_LIBS ${COM_LIBS} imgdecoder-wic CACHE INTERNAL "com_lib")

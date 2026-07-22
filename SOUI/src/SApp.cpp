@@ -26,6 +26,7 @@
 #include "layout/SAnchorLayout.h"
 #include "layout/SFlowLayout.h"
 #include "layout/SFrameLayout.h"
+#include "core/SModalViewSession.h"
 
 #include "animation/SInterpolatorImpl.h"
 #include "core/SWndAccessible.h"
@@ -187,6 +188,10 @@ void SObjectDefaultRegister::RegisterWindows(SObjectFactoryMgr *objFactory) cons
     objFactory->TplRegisterFactory<SToolBar>();
     objFactory->TplRegisterFactory<SDockBar>();
     objFactory->TplRegisterFactory<SRebar>();
+    objFactory->TplRegisterFactory<SKeyboardSpacer>();
+
+    objFactory->TplRegisterFactory<SModalRoot>();
+    objFactory->TplRegisterFactory<SModalView>();
 
 #if defined(_WIN32) && !defined(__MINGW32__)
     objFactory->TplRegisterFactory<SActiveX>();

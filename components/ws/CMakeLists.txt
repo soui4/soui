@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
-include_directories(${PROJECT_SOURCE_DIR}/utilities/include)
-include_directories(${PROJECT_SOURCE_DIR}/SOUI/include)
+include_directories(${SOUI_ROOT_DIR}/utilities/include)
+include_directories(${SOUI_ROOT_DIR}/SOUI/include)
 
 file(GLOB HEADERS src/*.h)
 file(GLOB SOURCES src/*.cpp)
@@ -10,7 +10,7 @@ source_group("Header Files" FILES ${HEADERS})
 source_group("Source Files" FILES ${SOURCES})
 
 project(ws)
-include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(${SOUI_ROOT_DIR}/include)
 
 if (NOT SOUI_ENABLE_COM_LIB)
     add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS} ws.rc)

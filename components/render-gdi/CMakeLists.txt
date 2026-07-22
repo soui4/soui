@@ -1,4 +1,5 @@
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+set(SOUI_ROOT_DIR "${SOUI_COM_DIR}/..")
 
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
 set(render-gdi_header
@@ -45,9 +46,9 @@ target_compile_definitions(render-gdi
 )
 target_include_directories(render-gdi
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
-  PRIVATE ${PROJECT_SOURCE_DIR}/utilities/include
-  PRIVATE ${PROJECT_SOURCE_DIR}/SOUI/include
-  PRIVATE ${PROJECT_SOURCE_DIR}/third-part/nanosvg
+  PRIVATE ${SOUI_ROOT_DIR}/utilities/include
+  PRIVATE ${SOUI_ROOT_DIR}/SOUI/include
+  PRIVATE ${SOUI_ROOT_DIR}/third-part/nanosvg
 )
 
 set(COM_LIBS ${COM_LIBS} render-gdi CACHE INTERNAL "com_lib")

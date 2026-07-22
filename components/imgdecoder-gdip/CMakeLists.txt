@@ -23,9 +23,9 @@ target_compile_definitions(imgdecoder-gdip
   PUBLIC SOUI_IMAGE_DECODER_USE_GDIPLUS
 )
 target_include_directories(imgdecoder-gdip
-  PRIVATE ${PROJECT_SOURCE_DIR}/utilities/include
-  PRIVATE ${PROJECT_SOURCE_DIR}/SOUI/include
-  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
+  PRIVATE ${SOUI_ROOT_DIR}/utilities/include
+  PRIVATE ${SOUI_ROOT_DIR}/SOUI/include
+  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}    
 )
 
 set(COM_LIBS ${COM_LIBS} imgdecoder-gdip CACHE INTERNAL "com_lib")

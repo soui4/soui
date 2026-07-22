@@ -166,6 +166,8 @@ typedef enum _SOUI_EVENTS
     EVT_UPDATE_ITEMTIP = 22190, ///< 更新项提示事件
     EVT_UPDATE_CMDUI = 22191,   ///< 更新命令UI事件
 
+    EVT_EXIT_MODALVIEW = 22100,
+
     EVT_EXTERNAL_BEGIN = 10000000, ///< 外部事件开始ID
 } SOUI_EVENTS;
 
@@ -809,6 +811,10 @@ DEF_EVT(EventUpdateCmdUI, EVT_UPDATE_CMDUI, on_update_cmd_ui, {
     int nCmdId;
     BOOL bEnable;
     BOOL bChecked;
+})
+
+DEF_EVT(EventExitModalView, EVT_EXIT_MODALVIEW, on_exit_modal_view,{
+    int exitCode;
 })
 
 SNSEND

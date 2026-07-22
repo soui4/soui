@@ -297,6 +297,8 @@ void SComboBase::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
                     iStart++;
                 }
             }
+        }else{
+            SetMsgHandled(FALSE);
         }
     }
     }
@@ -381,7 +383,6 @@ void SComboBase::OnDestroyDropDown(SDropDownWnd *pDropDown)
     }
 
     m_dwBtnState = WndState_Normal;
-    m_pDropDownWnd = NULL;
     CRect rcBtn;
     GetDropBtnRect(&rcBtn);
     InvalidateRect(rcBtn);
@@ -395,30 +396,20 @@ void SComboBase::OnDestroyDropDown(SDropDownWnd *pDropDown)
     {
         OnSelChanged();
     }
+    m_pDropDownWnd = NULL;
 }
 
 BOOL SComboBase::CalcPopupRect(int nHeight, CRect &rcPopup)
 {
     CRect rcWnd = GetWindowRect();
     GetContainer()->FrameToHost(&rcWnd);
-
-    ClientToScreen(GetContainer()->GetHostHwnd(), (LPPOINT)&rcWnd);
-    ClientToScreen(GetContainer()->GetHostHwnd(), ((LPPOINT)&rcWnd) + 1);
-
-    HMONITOR hMonitor = ::MonitorFromWindow(GetContainer()->GetHostHwnd(), MONITOR_DEFAULTTONULL);
-    CRect rcMonitor;
-    if (hMonitor)
-    {
-        MONITORINFO mi = { sizeof(MONITORINFO) };
-        ::GetMonitorInfo(hMonitor, &mi);
-        rcMonitor = mi.rcMonitor;
-    }
-    else
-    {
-        rcMonitor.right = GetSystemMetrics(SM_CXSCREEN);
-        rcMonitor.bottom = GetSystemMetrics(SM_CYSCREEN);
-    }
-    if (rcWnd.bottom + nHeight <= rcMonitor.bottom)
+	CPoint pt = rcWnd.TopLeft();
+	::ClientToScreen(GetContainer()->GetHostHwnd(), &pt);
+	rcWnd.MoveToXY(pt.x, pt.y);
+	HMONITOR hMonitor = MonitorFromWindow(GetContainer()->GetHostHwnd(), MONITOR_DEFAULTTONEAREST);
+	MONITORINFO mi = { sizeof(MONITORINFO) };
+	GetMonitorInfo(hMonitor, &mi);
+    if (rcWnd.bottom + nHeight <= mi.rcMonitor.bottom)
     {
         rcPopup = CRect(rcWnd.left, rcWnd.bottom, rcWnd.right, rcWnd.bottom + nHeight);
         return TRUE;
@@ -434,74 +425,38 @@ void SComboBase::DropDown()
 {
     if (m_dwBtnState == WndState_PushDown)
         return;
-
-    if (!m_pDropDownWnd)
-    {
-        m_pDropDownWnd = new SDropDownWnd_ComboBox(this);
-    }
-
-    EventCBDropdown evt(this);
-    evt.pDropDown = m_pDropDownWnd;
-    SStringT strInput = GetWindowText(TRUE);
-    evt.strInput = NULL;
-    FireEvent(&evt);
-    m_pDropDownWnd->Create(CRect(0, 0, 100, 100), 0);
-    m_pDropDownWnd->GetRoot()->SDispatchMessage(UM_SETSCALE, GetScale(), 0);
-
-    CRect rcPadding = m_pDropDownWnd->GetRoot()->GetStyle().GetPadding();
-    CRect rcMargin = m_pDropDownWnd->GetRoot()->GetStyle().GetMargin();
-    int nDropHeight = GetListBoxHeight() + rcPadding.top + rcPadding.bottom + rcMargin.top + rcMargin.bottom;
-
-    CRect rcPopup;
-    BOOL bDown = CalcPopupRect(nDropHeight, rcPopup);
-    m_pDropDownWnd->MoveWindow(rcPopup.left, rcPopup.top, rcPopup.Width(), rcPopup.Height());
-    m_pDropDownWnd->GetRoot()->UpdateChildrenPosition();
-
-#ifdef _WIN32
-    if (m_nAnimTime > 0)
-        m_pDropDownWnd->AnimateHostWindow(m_nAnimTime, AW_SLIDE | (bDown ? AW_VER_POSITIVE : AW_VER_NEGATIVE));
-    else
-        m_pDropDownWnd->SetWindowPos(HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
-#else
-    m_pDropDownWnd->SetWindowPos(HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
-#endif
-    m_pDropDownWnd->SNativeWnd::SetCapture();
+    SASSERT(!m_pDropDownWnd);
+    UpdateDropdown(GetWindowText(TRUE));
 }
 
 void SComboBase::UpdateDropdown(const SStringT &strInput)
 {
+    BOOL bFirst = FALSE;
     if (!m_pDropDownWnd)
     {
         m_pDropDownWnd = new SDropDownWnd_ComboBox(this);
+        m_pDropDownWnd->Create(CRect(0, 0, 100, 100), 0);
         m_pDropDownWnd->GetRoot()->SDispatchMessage(UM_SETSCALE, GetScale(), 0);
+        m_pDropDownWnd->GetRoot()->SDispatchMessage(UM_SETCOLORIZE, m_crColorize, 0);
+        bFirst = TRUE;
     }
 
     EventCBDropdown evt(this);
     evt.pDropDown = m_pDropDownWnd;
     evt.strInput = &strInput;
     FireEvent(&evt);
-    BOOL bNewPopup = !m_pDropDownWnd->IsWindow();
-    if (bNewPopup)
-        m_pDropDownWnd->Create(CRect(0, 0, 100, 100), 0);
 
-    CRect rcPadding = m_pDropDownWnd->GetRoot()->GetStyle().GetPadding();
-    CRect rcMargin = m_pDropDownWnd->GetRoot()->GetStyle().GetMargin();
+    SWindow* pDropRoot = (SWindow*)m_pDropDownWnd->GetRoot();
+    CRect rcPadding = pDropRoot->GetStyle().GetPadding();
+    CRect rcMargin = pDropRoot->GetStyle().GetMargin();
     int nDropHeight = GetListBoxHeight() + rcPadding.top + rcPadding.bottom + rcMargin.top + rcMargin.bottom;
 
     CRect rcPopup;
     BOOL bDown = CalcPopupRect(nDropHeight, rcPopup);
-    m_pDropDownWnd->MoveWindow(rcPopup.left, rcPopup.top, rcPopup.Width(), rcPopup.Height());
-    m_pDropDownWnd->GetRoot()->UpdateChildrenPosition();
-
-#ifdef _WIN32
-    if (m_nAnimTime > 0 && bNewPopup)
-        m_pDropDownWnd->AnimateHostWindow(m_nAnimTime, AW_SLIDE | (bDown ? AW_VER_POSITIVE : AW_VER_NEGATIVE));
+    if(bFirst)
+        m_pDropDownWnd->ShowWindow(rcPopup.left, rcPopup.top, rcPopup.Width(), rcPopup.Height(), m_nAnimTime, bDown);
     else
-        m_pDropDownWnd->SetWindowPos(HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
-#else
-    m_pDropDownWnd->SetWindowPos(HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
-#endif
-    m_pDropDownWnd->SNativeWnd::SetCapture();
+        m_pDropDownWnd->MoveWindow(rcPopup.left, rcPopup.top, rcPopup.Width(), rcPopup.Height());
 }
 
 void SComboBase::CloseUp()

@@ -5,7 +5,7 @@
 #include "souistd.h"
 #include "res.mgr/SNamedValue.h"
 #include "core/SWndStyle.h"
-
+#include <shlwapi.h>
 SNSBEGIN
 
 //////////////////////////////////////////////////////////////////////////
@@ -108,12 +108,41 @@ bool SColorParser::ParseValue(const SStringW &strValue, COLORREF &value)
         }
     }
     else if (strValueL.Left(4).CompareNoCase(L"rgba") == 0)
-    {
-        nSeg = swscanf(strValueL, L"rgba(%d,%d,%d,%d)", &r, &g, &b, &a);
+    {//rgba(r,g,b,a%), rgba(r,g,b,a) with a range from 0 to 1.0 and rgba(r,g,b, a) with a range from 0 to 255
+        SStringWList strValues;
+		strValueL = strValueL.Mid(5, strValueL.GetLength() - 6);
+        SplitString(strValueL, L',', strValues);
+        if (strValues.GetCount() == 4)
+        {
+            nSeg = 4;
+            StrToIntExW(strValues[0],STIF_SUPPORT_HEX,&r);
+            StrToIntExW(strValues[1],STIF_SUPPORT_HEX,&g);
+            StrToIntExW(strValues[2],STIF_SUPPORT_HEX,&b);
+            if(strValues[3].EndsWith(L"%")){
+                a = (int)(_wtof(strValues[3]) * 255 / 100);
+            }else if(strValues[3].StartsWith(L"0x")){
+                StrToIntExW(strValues[3],STIF_SUPPORT_HEX,&a);
+            }else{
+                float ratio = _wtof(strValues[3]);
+                if(ratio <= 1.0f)
+                    a = (int)(ratio * 255);
+                else
+                    a = (int)floor(ratio);
+            }
+        }
     }
     else if (strValueL.Left(3).CompareNoCase(L"rgb") == 0)
     {
-        nSeg = swscanf(strValueL, L"rgb(%d,%d,%d)", &r, &g, &b);
+        SStringWList strValues;
+        strValueL = strValueL.Mid(4, strValueL.GetLength() - 5);
+        SplitString(strValueL, L',', strValues);
+        if (strValues.GetCount() == 3)
+        {
+            nSeg = 3;
+            StrToIntExW(strValues[0], STIF_SUPPORT_HEX, &r);
+            StrToIntExW(strValues[1], STIF_SUPPORT_HEX, &g);
+            StrToIntExW(strValues[2], STIF_SUPPORT_HEX, &b);
+        }
     }
     if (nSeg != 3 && nSeg != 4)
     {

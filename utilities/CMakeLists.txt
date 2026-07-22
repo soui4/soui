@@ -27,14 +27,13 @@ target_include_directories(utilities4
 
 )
 if (NOT CMAKE_SYSTEM_NAME MATCHES Windows)
-add_dependencies(utilities4  swinx)
-target_link_libraries(utilities4  swinx)
-if(NOT CMAKE_SYSTEM_NAME MATCHES Darwin)
-    target_link_libraries(utilities4  rt)
-endif()
-
+    add_dependencies(utilities4  swinx)
+    target_link_libraries(utilities4  swinx)
+    if(CMAKE_SYSTEM_NAME MATCHES Linux)
+        target_link_libraries(utilities4  rt)
+    endif()
 else()
-target_link_libraries(utilities4  Gdi32 shlwapi version)
+    target_link_libraries(utilities4  Gdi32 shlwapi version)
 endif()
 
 set(SOUI_UTILITIES ${SOUI_UTILITIES} utilities4 CACHE INTERNAL "utilities_lib")

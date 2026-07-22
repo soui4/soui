@@ -16,7 +16,7 @@ source_group("Source Files" FILES ${CURRENT_SRCS})
 
 set(current_project "svg2png")
 
-add_executable(${current_project} WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS})
+add_executable(${current_project} ${CURRENT_HEADERS} ${CURRENT_SRCS})
 
 add_dependencies(${current_project} soui4 ${COM_LIBS})
 target_link_libraries(${current_project} soui4)

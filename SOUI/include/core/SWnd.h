@@ -352,15 +352,12 @@ class SOUI_EXP SWindow
     , protected IAnimationListener {
     DEF_SOBJECT(SObjectImpl<IWindow>, L"window")
 
-    friend class SwndLayoutBuilder;
-    friend class SWindowRepos;
     friend class SHostWnd;
     friend class SwndContainerImpl;
-    friend class FocusSearch;
     friend class SHostProxy;
     friend class SAnimatorHandler;
     friend class SAnimationHandler;
-
+    friend class SRootWindow;
   public:
     /**
      * @brief Constructor.
@@ -414,6 +411,12 @@ class SOUI_EXP SWindow
     {
         return m_pLayout;
     }
+
+    /**
+     * @brief Sets the layout object for the window.
+     * @param pLayout Pointer to the layout object.
+	 */
+	STDMETHOD_(void, SetLayout)(THIS_ ILayout* pLayout) OVERRIDE;
 
     /**
      * @brief Retrieves the layout parameter object associated with the window.
@@ -737,8 +740,9 @@ class SOUI_EXP SWindow
     /**
      * @brief Starts an animation for the window.
      * @param animation Pointer to the animation object.
+	 * @param bStartNow Flag to start the animation immediately.
      */
-    STDMETHOD_(void, StartAnimation)(THIS_ IAnimation *animation) OVERRIDE;
+    STDMETHOD_(void, StartAnimation)(THIS_ IAnimation *animation,BOOL bStartNow DEF_VAL(FALSE)) OVERRIDE;
 
     /**
      * @brief Clears the animation for the window.
@@ -1023,6 +1027,13 @@ class SOUI_EXP SWindow
     STDMETHOD_(BOOL, InitFromXml)(THIS_ IXmlNode *pNode) OVERRIDE;
 
     /**
+     * @brief Initializes the window from a resource ID.
+     * @param pszResId Resource ID of the XML string containing window initialization data.
+     * @return TRUE if successful, FALSE otherwise.
+     */
+    STDMETHOD_(BOOL, InitFromResId)(THIS_ LPCTSTR pszResId) OVERRIDE;
+
+    /**
      * @brief Retrieves an attribute value from the window.
      * @param pszName Name of the attribute.
      * @param strValue String object to receive the attribute value.
@@ -1083,6 +1094,20 @@ class SOUI_EXP SWindow
      * @return TRUE if successful, FALSE otherwise.
      */
     STDMETHOD_(BOOL, SubscribeEvent)(THIS_ DWORD evtId, const IEvtSlot *pSlot) OVERRIDE;
+
+#if ENABLE_STDFUNCTOR
+    /**
+     * @brief Subscribes to an event using a std::function callback.
+     * @param evtId Event ID.
+     * @param callback Callback that receives IEvtArgs* and returns TRUE if the event was handled.
+     * @return TRUE if successful, FALSE otherwise.
+     */
+    BOOL SubscribeEvent(DWORD evtId, const StdFunCallback &callback)
+    {
+        StdFunctionSlot slot(callback);
+        return SWindow::SubscribeEvent(evtId, &slot);
+    }
+#endif // ENABLE_STDFUNCTOR
 
     /**
      * @brief Unsubscribes from an event.
@@ -1661,6 +1686,8 @@ class SOUI_EXP SWindow
      * @return BOOL TRUE if the relayout was handled successfully; otherwise, FALSE.
      */
     virtual BOOL OnRelayout(const CRect &rcWnd);
+
+	virtual void OnLayoutFloatChild(SWindow* pChild, const CRect& rcWnd);
 
     /**
      * @brief Measures the size of the content within the window.

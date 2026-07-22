@@ -67,7 +67,8 @@ struct MSGBTN_TEXT
         UINT uBtnID;      //按钮ID
         WCHAR szText[20]; //按钮字符
     } btnInfo[3];
-} g_msgBtnText[] = {
+};
+static const MSGBTN_TEXT g_msgBtnText[] = {
     // MB_OK
     { 1, { { IDOK, L"ok" }, { 0, L"" }, { 0, L"" } } },
     // MB_OKCANCEL
@@ -82,7 +83,7 @@ struct MSGBTN_TEXT
     { 2, { { IDRETRY, L"retry" }, { IDCANCEL, L"cancel" }, { 0, L"" } } }
 };
 
-const WCHAR *g_wcsNameOfBtns[] = { NAME_MSGBOX_BTN1, NAME_MSGBOX_BTN2, NAME_MSGBOX_BTN3 };
+static const WCHAR *g_wcsNameOfBtns[] = { NAME_MSGBOX_BTN1, NAME_MSGBOX_BTN2, NAME_MSGBOX_BTN3 };
 
 SStringT SMessageBoxImpl::OnGetButtonText(int nBtnID) const
 {

@@ -1,8 +1,8 @@
 add_definitions(-DSTBIW_WINDOWS_UTF8)
 set(imgdecoder-stb_header
 	imgdecoder-stb.h
-	${PROJECT_SOURCE_DIR}/third-part/stb/stb_image.h
-    ${PROJECT_SOURCE_DIR}/third-part/pbl_aupng/include/upng.h
+	${SOUI_ROOT_DIR}/third-part/stb/stb_image.h
+    ${SOUI_ROOT_DIR}/third-part/pbl_aupng/include/upng.h
 )
 
 set(imgdecoder-stb_src
@@ -29,12 +29,13 @@ endif()
 target_compile_definitions(imgdecoder-stb
   PUBLIC SOUI_IMAGE_DECODER_USE_STB
 )
+
 target_include_directories(imgdecoder-stb
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
-  PRIVATE ${PROJECT_SOURCE_DIR}/utilities/include
-  PRIVATE ${PROJECT_SOURCE_DIR}/SOUI/include
-  PRIVATE ${PROJECT_SOURCE_DIR}/third-part/stb
-  PRIVATE ${PROJECT_SOURCE_DIR}/third-part/pbl_aupng/include
+  PRIVATE ${SOUI_ROOT_DIR}/utilities/include
+  PRIVATE ${SOUI_ROOT_DIR}/SOUI/include
+  PRIVATE ${SOUI_ROOT_DIR}/third-part/stb
+  PRIVATE ${SOUI_ROOT_DIR}/third-part/pbl_aupng/include
 )
 
 set(COM_LIBS ${COM_LIBS} imgdecoder-stb CACHE INTERNAL "com_lib")

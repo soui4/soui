@@ -73,6 +73,8 @@ class SOUI_EXP SDropDownWnd
      */
     BOOL Create(LPCRECT lpRect, IXmlNode *pInitXml, DWORD dwStyle = WS_POPUP, DWORD dwExStyle = WS_EX_TOOLWINDOW | WS_EX_TOPMOST);
 
+    void ShowWindow(int x, int y, int nWidth, int nHeight, int nAniMs, BOOL bDropDown);
+
     /**
      * @brief End the dropdown window
      * @param uCode Exit code for the dropdown window

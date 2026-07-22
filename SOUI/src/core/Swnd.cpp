@@ -1536,6 +1536,14 @@ BOOL SWindow::InitFromXml(IXmlNode *pNode)
     return TRUE;
 }
 
+BOOL SWindow::InitFromResId(THIS_ LPCTSTR pszResId){
+    SXmlDoc xmlDoc;
+    if (!LOADXML(xmlDoc, pszResId))
+        return FALSE;
+    SXmlNode xmlRoot = xmlDoc.root().first_child();
+    return InitFromXml(&xmlRoot);
+}
+
 BOOL SWindow::CreateChildrenFromXml(LPCWSTR pszXml)
 {
     SXmlDoc xmlDoc;
@@ -2098,19 +2106,28 @@ BOOL SWindow::FireEvent(IEvtArgs *evt)
             bRet = GetOwner()->FireEvent(evt);
             break;
         }
-        bRet = GetContainer()->OnFireEvent(evt);
+        if (GetContainer())
+        {
+            bRet = GetContainer()->OnFireEvent(evt);
+        }
     } while (false);
     Release();
     return bRet;
+}
+
+void SWindow::OnLayoutFloatChild(SWindow* pChild, const CRect& rcLayout) {
+    CRect rcChild = pChild->GetWindowRect();
+    CPoint ptRelative(rcChild.left - rcLayout.left, rcChild.top - rcLayout.top); // relative pos
+    rcChild.MoveToXY(rcLayout.left + ptRelative.x, rcLayout.top + ptRelative.y);
+    pChild->Move(rcChild);
 }
 
 BOOL SWindow::OnRelayout(const CRect &rcWnd)
 {
     if (m_rcWindow.EqualRect(&rcWnd) && m_layoutDirty == dirty_clean)
         return FALSE;
-    CRect rcLayout;
-    GetChildrenLayoutRect(&rcLayout);
-    CPoint ptDiff = (rcWnd.left - m_rcWindow.left, rcWnd.top - m_rcWindow.top);
+    CRect rcLayout1;
+    GetChildrenLayoutRect(&rcLayout1);
     if (!m_rcWindow.EqualRect(&rcWnd))
     {
         InvalidateRect(m_rcWindow);
@@ -2124,26 +2141,20 @@ BOOL SWindow::OnRelayout(const CRect &rcWnd)
             m_rcWindow.bottom = m_rcWindow.top;
 
         InvalidateRect(m_rcWindow);
-
         SSendMessage(WM_NCCALCSIZE); // 计算非客户区大小
     }
-    // keep relative position of float children
-    if (ptDiff.x != 0 || ptDiff.y != 0)
-    {
-        CRect rcLayout2;
-        GetChildrenLayoutRect(&rcLayout2);
-
+    CRect rcLayout2;
+    GetChildrenLayoutRect(&rcLayout2);
+    if(rcLayout1!=rcLayout2){
         SWindow *pChild = GetWindow(GSW_FIRSTCHILD);
         while (pChild)
         {
+			SWindow* pNextChild = pChild->GetWindow(GSW_NEXTSIBLING);
             if (pChild->IsFloat())
             {
-                CRect rcChild = pChild->GetWindowRect();
-                CPoint ptRelative(rcChild.left - rcLayout.left, rcChild.top - rcLayout.top); // relative pos
-                rcChild.MoveToXY(rcLayout2.left + ptRelative.x, rcLayout2.top + ptRelative.y);
-                pChild->Move(rcChild);
+				OnLayoutFloatChild(pChild, rcLayout2);
             }
-            pChild = pChild->GetWindow(GSW_NEXTSIBLING);
+            pChild = pNextChild;
         }
     }
 
@@ -2996,6 +3007,7 @@ void SWindow::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
     evt.nRepCnt = nRepCnt;
     evt.nFlags = nFlags;
     FireEvent(evt);
+    SetMsgHandled(evt.handled>0);
 }
 void SWindow::OnKeyUp(UINT nChar, UINT nFlagsCnt, UINT nFlags)
 {
@@ -3004,6 +3016,7 @@ void SWindow::OnKeyUp(UINT nChar, UINT nFlagsCnt, UINT nFlags)
     evt.nRepCnt = nFlagsCnt;
     evt.nFlags = nFlags;
     FireEvent(evt);
+    SetMsgHandled(evt.handled>0);
 }
 void SWindow::OnChar(UINT nChar, UINT nFlagsCnt, UINT nFlags)
 {
@@ -3012,6 +3025,7 @@ void SWindow::OnChar(UINT nChar, UINT nFlagsCnt, UINT nFlags)
     evt.nRepCnt = nFlagsCnt;
     evt.nFlags = nFlags;
     FireEvent(evt);
+    SetMsgHandled(evt.handled>0);
 }
 void SWindow::OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
@@ -3020,6 +3034,7 @@ void SWindow::OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
     evt.nRepCnt = nRepCnt;
     evt.nFlags = nFlags;
     FireEvent(evt);
+    SetMsgHandled(evt.handled>0);
 }
 void SWindow::OnSysKeyUp(UINT nChar, UINT nFlagsCnt, UINT nFlags)
 {
@@ -3028,6 +3043,7 @@ void SWindow::OnSysKeyUp(UINT nChar, UINT nFlagsCnt, UINT nFlags)
     evt.nRepCnt = nFlagsCnt;
     evt.nFlags = nFlags;
     FireEvent(evt);
+    SetMsgHandled(evt.handled>0);
 }
 LRESULT SWindow::OnSetScale(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -3296,11 +3312,14 @@ IAnimation *SWindow::GetAnimation() const
  * @param animation the animation to start now
  */
 
-void SWindow::StartAnimation(IAnimation *animation)
+void SWindow::StartAnimation(IAnimation *animation,BOOL bStartNow)
 {
     SASSERT(animation);
     animation->setStartTime(START_ON_FIRST_FRAME);
     SetAnimation(animation);
+    if (bStartNow) {
+        m_pAnimationHandler->OnNextFrame();
+    }
 }
 
 /**
@@ -3946,13 +3965,17 @@ LRESULT SWindow::OnUpdateFont(UINT uMsg, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
+void SWindow::SetLayout(ILayout *pLayout)
+{
+    m_pLayout = pLayout;
+}
+
 HRESULT SWindow::OnAttrLayout(const SStringW &strValue, BOOL bLoading)
 {
     ILayout *pLayout = (ILayout *)SApplication::getSingleton().CreateObject(strValue, Layout);
     if (pLayout == NULL)
         return E_INVALIDARG;
-
-    m_pLayout = pLayout;
+    SetLayout(pLayout);
     pLayout->Release();
     return S_OK;
 }

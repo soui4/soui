@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  attrs.xml —— 自定义 View 可样式属性 (declare-styleable) 集中声明处。
+
+  目前为 SouiScreen 定义了 2 个启动属性：
+    · app:screenId  —— 非零整数。与 C++ AndroidPlatformAPI::m_screenContexts 的
+                            screenId 主键完全一致，约定每个 SouiScreen / Activity
+                            分配一个稳定全局唯一的 id。
+                            例：app:screenId="0x0000D002" 或
+                                app:screenId="@integer/screen_id_xml_host"。
+    · app:souiLayout—— SOUI 布局资源字符串，格式 "type:name"，与
+                            assets/uires/uires.idx 中的条目一致（例 "layout:demo_layout"）。
+                            空串/未设置时走 C++ 默认布局选择逻辑。
+
+  这两个属性一旦在 XML 里设置，SouiScreen 会在构造阶段读入成员 mScreenId /
+  mSouiLayout，随后 onAttachedToWindow() 自动把它们 + 已测量宽高作为参数
+  调用 startSoui(...)，不需要 Activity 再写一行启动代码，实现"纯 XML 声明即可启动 SOUI"。
+-->
+<resources>
+    <declare-styleable name="SouiScreen">
+        <!--
+          SouiScreen 绑定的 screenId（非 0 才会自动启动）。
+          直接写数字：0x0000D003、65539；
+          或引用整数资源：@integer/screen_id_xxx（推荐）。
+        -->
+        <attr name="screenId" format="integer" />
+        <!--
+          SOUI 布局资源字符串，如 "layout:demo_layout"。
+          直接写字符串："layout:demo_layout"；
+          或引用字符串资源：@string/layout_demo（推荐，可复用）。
+        -->
+        <attr name="souiLayout" format="string" />
+    </declare-styleable>
+</resources>

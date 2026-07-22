@@ -1,0 +1,29 @@
+﻿<resource>
+  <UIDEF>
+    <file name="XML_INIT" path="uidef\init.xml"/>
+  </UIDEF>
+  <LAYOUT>
+    <!-- DefaultHostActivity 使用：默认 SHostWnd + 纯 XML，无 C++ 业务逻辑 -->
+    <file name="demo_layout" path="xml\demo_layout.xml"/>
+    <!-- CustomHostActivity / CMainDlg 使用：自定义 SHostWnd + C++ EVENT_MAP -->
+    <file name="dlg_main" path="xml\dlg_main.xml"/>
+    <file name="model_view" path="xml\model_view.xml"/>
+  </LAYOUT>
+  
+  <values>
+  	<file name="string" path="values\string.xml"/>
+  	<file name="color" path="values\color.xml"/>
+  	<file name="skin" path="values\skin.xml"/>
+  </values>
+
+  <anim>
+    <file name="modal_in"  path="anim\modal_in.xml"/>
+    <file name="modal_out" path="anim\modal_out.xml"/>
+  </anim>
+  <ICON>
+    <file name="ICON_LOGO"  path="image\soui.ico"/>
+  </ICON>
+  <svg>
+    <file name="btn_primary" path="svg\btn_primary.svg"/>
+  </svg>
+</resource>

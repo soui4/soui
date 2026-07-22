@@ -45,6 +45,12 @@ class SOUI_EXP STranslateAnimation : public SAnimation {
      */
     void init(const SValueDescription &fromX, const SValueDescription &toX, const SValueDescription &fromY, const SValueDescription &toY);
 
+    /**
+     * @brief Creates and returns a deep copy of this translate animation.
+     * @return Pointer to a new STranslateAnimation with the same from/to value descriptors.
+     */
+    STDMETHOD_(IAnimation *, clone)(THIS) SCONST OVERRIDE;
+
   protected:
     /**
      * @brief Applies the transformation at a specific interpolated time.
@@ -53,6 +59,12 @@ class SOUI_EXP STranslateAnimation : public SAnimation {
      */
     STDMETHOD_(void, applyTransformation)
     (THIS_ float interpolatedTime, ITransformation *t) OVERRIDE;
+
+    /**
+     * @brief Copies the properties of another animation to this animation.
+     * @param src Pointer to the source animation to copy from.
+     */
+    STDMETHOD_(void, copy)(THIS_ const IAnimation *src) OVERRIDE;
 
   public:
     /**

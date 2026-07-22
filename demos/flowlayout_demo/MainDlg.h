@@ -16,9 +16,11 @@ public:
 	void OnMinimize();
 	void OnSize(UINT nType, CSize size);
 	BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam);
+	BOOL OnModalViewResult(IEvtArgs *e);
 	void OnCkgArea(IEvtArgs *e);
 	void OnCkgType(IEvtArgs *e);
-
+	void OnTest();
+	BOOL OnModalViewBtnClick(IEvtArgs *e);
 protected:
 	//soui消息
 	EVENT_MAP_BEGIN()
@@ -26,6 +28,7 @@ protected:
 		EVENT_NAME_COMMAND(L"btn_min", OnMinimize)
 		EVENT_NAME_COMMAND(L"btn_max", OnMaximize)
 		EVENT_NAME_COMMAND(L"btn_restore", OnRestore)
+		EVENT_NAME_COMMAND(L"btn_test", OnTest)
         EVENT_ID_HANDLER(R.id.ckg_area, EventGroupCheck::EventID, OnCkgArea)
         EVENT_ID_HANDLER(R.id.ckg_type, EventGroupCheck::EventID, OnCkgType)
 	EVENT_MAP_END2(SHostWnd)

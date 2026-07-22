@@ -15,8 +15,8 @@ else()
             set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=armv8-a+simd")
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv8-a+simd")
         else()
-            set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=armv7-a+neon")
-            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv7-a+neon")
+            set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=armv7-a -mfpu=neon -mfloat-abi=softfp")
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv7-a -mfpu=neon -mfloat-abi=softfp")
         endif()
     else(BUILD_FOR_ARM)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.1")
@@ -968,7 +968,7 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "OHOS|OpenHarmony|HarmonyOS")
         "src/ports/SkFontHost_FreeType.cpp"
         "src/gpu/gl/android/GrGLCreateNativeInterface_android.cpp"
     )
-else()
+elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
     set(srcs
         ${srcs}
         "src/ports/SkFontMgr_fontconfig.cpp"
@@ -981,6 +981,20 @@ else()
         "src/ports/SkFontHost_FreeType_common.cpp"
         "src/ports/SkFontHost_FreeType.cpp"
         "src/gpu/gl/unix/GrGLCreateNativeInterface_unix.cpp"
+    )
+elseif(CMAKE_SYSTEM_NAME MATCHES "Android")
+    set(srcs
+        ${srcs}
+        "src/ports/SkFontMgr_fontconfig.cpp"
+        "src/ports/SkFontHost_fontconfig.cpp"
+        "src/ports/SkOSFile_posix.cpp" 
+        "src/ports/SkTLS_pthread.cpp" 
+        "src/utils/SkThreadUtils_pthread.cpp" 
+        "src/utils/SkThreadUtils_pthread_linux.cpp" 
+        "src/ports/SkTime_Unix.cpp" 
+        "src/ports/SkFontHost_FreeType_common.cpp"
+        "src/ports/SkFontHost_FreeType.cpp"
+        "src/gpu/gl/android/GrGLCreateNativeInterface_android.cpp"
     )
 endif()
 #message("...........plat....${CMAKE_GENERATOR_PLATFORM}")

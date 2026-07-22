@@ -82,7 +82,7 @@ SWindow *FocusSearch::FindNextFocusableViewImpl(SWindow *starting_view, bool che
     }
 
     // First let's try the left child.
-    if (can_go_down)
+    if (can_go_down && starting_view->IsVisible(TRUE) && !starting_view->IsDisabled(TRUE))
     {
         SWindow *pChild = starting_view->GetWindow(GSW_FIRSTCHILD);
         if (pChild)

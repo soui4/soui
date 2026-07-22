@@ -26,11 +26,7 @@ class SHexEditAction {
   public:
     SHexEditAction();
     ~SHexEditAction();
-    BOOL set(ActionType type,
-             UINT position,
-             const SByteArray &replaceData,
-             const SByteArray &insertData,
-             SHexEditAction *next = 0);
+    BOOL set(ActionType type, UINT position, const SByteArray &replaceData, const SByteArray &insertData, SHexEditAction *next = 0);
     void setNext(SHexEditAction *next)
     {
         this->next = next;
@@ -78,11 +74,7 @@ SHexEditAction::~SHexEditAction()
     delete next;
 }
 
-BOOL SHexEditAction::set(ActionType type,
-                         UINT position,
-                         const SByteArray &replaceData,
-                         const SByteArray &insertData,
-                         SHexEditAction *next)
+BOOL SHexEditAction::set(ActionType type, UINT position, const SByteArray &replaceData, const SByteArray &insertData, SHexEditAction *next)
 {
     this->type = type;
     this->position = position;
@@ -128,8 +120,7 @@ BOOL SHexEditAction::append(const SByteArray &replaceData, const SByteArray &ins
         beg = tmp;                    \
     }
 
-const TCHAR tabHexCharacters[16]
-    = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+const TCHAR tabHexCharacters[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
 SHexEdit::SHexEdit()
     : m_nAdrSize(8)
@@ -160,9 +151,11 @@ SHexEdit::SHexEdit()
     , m_undo(0)
     , m_redo(0)
     , m_dwZeroAddr(0)
+    , m_nColNumberSize(2)
+    , m_bShowColNumber(true)
 {
     m_bFocusable = TRUE;
-	memset(&m_tPaintDetails,0,sizeof(m_tPaintDetails));
+    memset(&m_tPaintDetails, 0, sizeof(m_tPaintDetails));
     m_bCaretAtLineEnd = false;
 
     m_tAdrTxtCol = RGBA(0x00, 0x00, 0xBF, 0xFF);
@@ -197,9 +190,8 @@ void SHexEdit::OnDestroy()
 
 void SHexEdit::OnSize(UINT nType, CSize size)
 {
-    __baseCls::OnSize(nType, size);
     m_bRecalc = true;
-    SetScrollbarRanges();
+    __baseCls::OnSize(nType, size);
 }
 
 void SHexEdit::ReInitialize()
@@ -274,6 +266,20 @@ void SHexEdit::SetBytesPerRow(UINT nBytesPerRow, bool bAuto, bool bUpdate)
         m_nBytesPerRow = nBytesPerRow;
         m_bRecalc = true;
 
+        SetEditCaretPos(m_nCurrentAddress, m_bHighBits);
+        if (bUpdate)
+        {
+            Invalidate();
+        }
+    }
+}
+
+void SHexEdit::SetShowColNumber(bool bShow, bool bUpdate)
+{
+    if (m_bShowColNumber != bShow)
+    {
+        m_bShowColNumber = bShow;
+        m_bRecalc = true;
         SetEditCaretPos(m_nCurrentAddress, m_bHighBits);
         if (bUpdate)
         {
@@ -388,9 +394,7 @@ void SHexEdit::SetHexCol(COLORREF tHexBkgCol, COLORREF tHexTxtCol, bool bUpdate)
     }
 }
 
-void SHexEdit::SetSelectedNoFocusCol(COLORREF tSelectedNoFocusBkgCol,
-                                     COLORREF tSelectedNoFocusTxtCol,
-                                     bool bUpdate)
+void SHexEdit::SetSelectedNoFocusCol(COLORREF tSelectedNoFocusBkgCol, COLORREF tSelectedNoFocusTxtCol, bool bUpdate)
 {
     m_tSelectedNoFocusBkgCol = tSelectedNoFocusBkgCol;
     m_tSelectedNoFocusTxtCol = tSelectedNoFocusTxtCol;
@@ -400,9 +404,7 @@ void SHexEdit::SetSelectedNoFocusCol(COLORREF tSelectedNoFocusBkgCol,
     }
 }
 
-void SHexEdit::SetSelectedFocusCol(COLORREF tSelectedFousTxtCol,
-                                   COLORREF tSelectedFousBkgCol,
-                                   bool bUpdate)
+void SHexEdit::SetSelectedFocusCol(COLORREF tSelectedFousTxtCol, COLORREF tSelectedFousBkgCol, bool bUpdate)
 {
     m_tSelectedFousTxtCol = tSelectedFousTxtCol;
     m_tSelectedFousBkgCol = tSelectedFousBkgCol;
@@ -434,12 +436,16 @@ void SHexEdit::OnPaint(IRenderTarget *pRT)
 
     pRT->FillSolidRect(m_tPaintDetails.cPaintingRect, m_tAdrBkgCol);
 
+    pRT->PushClipRect(m_tPaintDetails.cPaintingRect);
+
+    if (m_bShowColNumber)
+        PaintColNumber(pRT);
     if (m_bShowAddress)
         PaintAddresses(pRT);
     PaintHexData(pRT);
     if (m_bShowAscii)
         PaintAsciiData(pRT);
-
+    pRT->PopClip();
     AfterPaint(pRT, painter);
 }
 
@@ -505,8 +511,7 @@ void SHexEdit::CalculatePaintingDetails(IRenderTarget *pRT)
     GetClientRect(m_tPaintDetails.cPaintingRect);
     if (true)
     {
-        m_tPaintDetails.cPaintingRect.InflateRect(-CONTROL_BORDER_SPACEH, -CONTROL_BORDER_SPACEV,
-                                                  -CONTROL_BORDER_SPACEH, -CONTROL_BORDER_SPACEV);
+        m_tPaintDetails.cPaintingRect.InflateRect(-CONTROL_BORDER_SPACEH, -CONTROL_BORDER_SPACEV, -CONTROL_BORDER_SPACEH, -CONTROL_BORDER_SPACEV);
         if (m_tPaintDetails.cPaintingRect.right < m_tPaintDetails.cPaintingRect.left)
         {
             m_tPaintDetails.cPaintingRect.right = m_tPaintDetails.cPaintingRect.left;
@@ -516,10 +521,22 @@ void SHexEdit::CalculatePaintingDetails(IRenderTarget *pRT)
             m_tPaintDetails.cPaintingRect.bottom = m_tPaintDetails.cPaintingRect.top;
         }
     }
-    m_tPaintDetails.nVisibleLines
-        = m_tPaintDetails.cPaintingRect.Height() / m_tPaintDetails.nLineHeight;
-    m_tPaintDetails.nLastLineHeight
-        = m_tPaintDetails.cPaintingRect.Height() % m_tPaintDetails.nLineHeight;
+    
+    if (m_bShowColNumber)
+    {
+        m_tPaintDetails.nColNumberPos = m_tPaintDetails.nLineHeight;
+    }
+    else
+    {
+        m_tPaintDetails.nColNumberPos = 0;
+    }
+    int relHeight = m_tPaintDetails.cPaintingRect.Height() - m_tPaintDetails.nColNumberPos; 
+    if (relHeight < 0)
+    {
+        relHeight = 0;
+    }
+    m_tPaintDetails.nVisibleLines = relHeight / m_tPaintDetails.nLineHeight;
+    m_tPaintDetails.nLastLineHeight = relHeight % m_tPaintDetails.nLineHeight;
     if (m_tPaintDetails.nLastLineHeight > 0)
     {
         m_tPaintDetails.nFullVisibleLines = m_tPaintDetails.nVisibleLines;
@@ -530,6 +547,8 @@ void SHexEdit::CalculatePaintingDetails(IRenderTarget *pRT)
         m_tPaintDetails.nFullVisibleLines = m_tPaintDetails.nVisibleLines;
         m_tPaintDetails.nLastLineHeight = m_tPaintDetails.nLineHeight;
     }
+
+   
 
     // position & size of the address
     if (m_bShowAddress)
@@ -556,10 +575,8 @@ void SHexEdit::CalculatePaintingDetails(IRenderTarget *pRT)
             }
             else
             {
-                m_tPaintDetails.nBytesPerRow = iFreeSpace
-                    / (4 * m_tPaintDetails.nCharacterWidth); // 2(HEXDATA)+1(Space)+1(Ascii) = 4
-                if ((iFreeSpace % (4 * m_tPaintDetails.nCharacterWidth))
-                    >= (3 * m_tPaintDetails.nCharacterWidth))
+                m_tPaintDetails.nBytesPerRow = iFreeSpace / (4 * m_tPaintDetails.nCharacterWidth); // 2(HEXDATA)+1(Space)+1(Ascii) = 4
+                if ((iFreeSpace % (4 * m_tPaintDetails.nCharacterWidth)) >= (3 * m_tPaintDetails.nCharacterWidth))
                 {
                     m_tPaintDetails.nBytesPerRow++; // we actually only need n-1 spaces not n (n =
                                                     // nBytesPerRow)
@@ -574,10 +591,8 @@ void SHexEdit::CalculatePaintingDetails(IRenderTarget *pRT)
             }
             else
             {
-                m_tPaintDetails.nBytesPerRow
-                    = iFreeSpace / (3 * m_tPaintDetails.nCharacterWidth); // 2(HEXDATA)+1(Space) = 3
-                if ((iFreeSpace % (3 * m_tPaintDetails.nCharacterWidth))
-                    >= (2 * m_tPaintDetails.nCharacterWidth))
+                m_tPaintDetails.nBytesPerRow = iFreeSpace / (3 * m_tPaintDetails.nCharacterWidth); // 2(HEXDATA)+1(Space) = 3
+                if ((iFreeSpace % (3 * m_tPaintDetails.nCharacterWidth)) >= (2 * m_tPaintDetails.nCharacterWidth))
                 {
                     m_tPaintDetails.nBytesPerRow++; // we actually only need n-1 spaces not n (n =
                                                     // nBytesPerRow)
@@ -598,8 +613,7 @@ void SHexEdit::CalculatePaintingDetails(IRenderTarget *pRT)
 
     // position & size of the hex-data
     m_tPaintDetails.nHexPos = m_tPaintDetails.nAddressPos + m_tPaintDetails.nAddressLen;
-    m_tPaintDetails.nHexLen = (m_tPaintDetails.nBytesPerRow * 2 + m_tPaintDetails.nBytesPerRow - 1)
-        * m_tPaintDetails.nCharacterWidth;
+    m_tPaintDetails.nHexLen = (m_tPaintDetails.nBytesPerRow * 2 + m_tPaintDetails.nBytesPerRow - 1) * m_tPaintDetails.nCharacterWidth;
     // 2(HEXData) + 1(Space) (only n-1 spaces needed)
     int iWidth = m_tPaintDetails.nHexPos + m_tPaintDetails.nHexLen;
     m_tPaintDetails.nHexLen += DATA_ASCII_SPACE;
@@ -652,6 +666,35 @@ void SHexEdit::CalculatePaintingDetails(IRenderTarget *pRT)
     SetScrollbarRanges();
 }
 
+void SHexEdit::PaintColNumber(IRenderTarget *pRT)
+{
+    if (GetDataSize() == 0)
+        return;
+    UINT nColNumber = 0;
+    UINT nEndColNumber = m_tPaintDetails.nBytesPerRow;
+    SStringT cAdrFormatString;
+    CRect cAdrRect(m_tPaintDetails.cPaintingRect);
+    TCHAR pBuf[32];
+
+    // create the format string
+    cAdrFormatString.Format(_T("%%0%uX"), m_nColNumberSize);
+    // the Rect for painting & background
+    cAdrRect.left += m_tPaintDetails.nAddressLen - m_nScrollPostionX;
+    cAdrRect.right = cAdrRect.left + m_tPaintDetails.nAddressLen - ADR_DATA_SPACE; // without border
+    pRT->FillSolidRect(cAdrRect, m_tAdrBkgCol);
+    cAdrRect.bottom = cAdrRect.top + m_tPaintDetails.nLineHeight;
+
+    //  paint
+    pRT->SetTextColor(m_tAdrTxtCol);
+    for (UINT nColNumber = 0; nColNumber < nEndColNumber; nColNumber++)
+    {
+        _sntprintf(pBuf, 32, (LPCTSTR)cAdrFormatString,
+                   nColNumber); // slightly faster then CString::Format
+        pRT->DrawText(pBuf, -1, (LPRECT)cAdrRect, DT_LEFT | DT_TOP | DT_SINGLELINE | DT_NOPREFIX);
+        cAdrRect.OffsetRect(3 * m_tPaintDetails.nCharacterWidth, 0);
+    }
+}
+
 void SHexEdit::PaintAddresses(IRenderTarget *pRT)
 {
     UINT nAdr;
@@ -662,7 +705,7 @@ void SHexEdit::PaintAddresses(IRenderTarget *pRT)
 
     // create the format string
     cAdrFormatString.Format(_T("%%0%uX"), m_nAdrSize);
-
+    cAdrRect.top += m_tPaintDetails.nColNumberPos;
     // the Rect for painting & background
     cAdrRect.left += m_tPaintDetails.nAddressPos - m_nScrollPostionX;
     cAdrRect.right = cAdrRect.left + m_tPaintDetails.nAddressLen - ADR_DATA_SPACE; // without border
@@ -714,7 +757,7 @@ void SHexEdit::PaintHexData(IRenderTarget *pRT)
     // prepare the buffer for the formated hex-data
     memset(pBuf, 0, m_tPaintDetails.nBytesPerRow * 3); // fill with spaces
     pBuf[m_tPaintDetails.nBytesPerRow * 3 - 1] = '\0'; // zero-terminate
-
+    cHexRect.top += m_tPaintDetails.nColNumberPos;
     // the Rect for painting & background
     cHexRect.left += m_tPaintDetails.nHexPos - m_nScrollPostionX;
     cHexRect.right = cHexRect.left + m_tPaintDetails.nHexLen - DATA_ASCII_SPACE;
@@ -744,7 +787,7 @@ void SHexEdit::PaintHexData(IRenderTarget *pRT)
     pEndDataPtr = m_xData.GetData(nEndAdr);
 
     //  paint
-    while (pDataPtr < pEndDataPtr + 1)
+    while (pDataPtr < pEndDataPtr)
     {
         pEndLineDataPtr = pDataPtr + m_tPaintDetails.nBytesPerRow;
         if (pEndLineDataPtr > pEndDataPtr)
@@ -778,7 +821,7 @@ void SHexEdit::PaintHexData(IRenderTarget *pRT)
             *pBufPtr++ = tabHexCharacters[*pDataPtr & 0xf];
             *pBufPtr++ = ' ';
         }
-        *(-- pBufPtr) = '\0';
+        *(--pBufPtr) = '\0';
         // set end-pointers
 
         if (pSelectionBufPtrEnd == NULL)
@@ -796,16 +839,13 @@ void SHexEdit::PaintHexData(IRenderTarget *pRT)
 
             CRect cRect(cHexRect);
             cRect.left += (pSelectionBufPtrBegin - pBuf) * m_tPaintDetails.nCharacterWidth;
-            cRect.right -= (pBuf - 1 + m_tPaintDetails.nBytesPerRow * 3 - pSelectionBufPtrEnd)
-                * m_tPaintDetails.nCharacterWidth;
+            cRect.right -= (pBuf - 1 + m_tPaintDetails.nBytesPerRow * 3 - pSelectionBufPtrEnd) * m_tPaintDetails.nCharacterWidth;
             CRect cSelectionRect(cRect);
             cSelectionRect.InflateRect(0, -1, +1, +1);
             *pSelectionBufPtrEnd = '\0'; // set "end-mark"
-            pRT->FillSolidRect(cSelectionRect,
-                               !m_bCaretAscii ? m_tSelectedFousBkgCol : m_tSelectedNoFocusBkgCol);
+            pRT->FillSolidRect(cSelectionRect, !m_bCaretAscii ? m_tSelectedFousBkgCol : m_tSelectedNoFocusBkgCol);
             pRT->SetTextColor(!m_bCaretAscii ? m_tSelectedFousTxtCol : m_tSelectedNoFocusTxtCol);
-            pRT->DrawText(pSelectionBufPtrBegin, -1, (LPRECT)cRect,
-                          DT_LEFT | DT_TOP | DT_SINGLELINE | DT_NOPREFIX);
+            pRT->DrawText(pSelectionBufPtrBegin, -1, (LPRECT)cRect, DT_LEFT | DT_TOP | DT_SINGLELINE | DT_NOPREFIX);
             *pSelectionBufPtrEnd = ' '; // restore the buffer
         }
         cHexRect.OffsetRect(0, m_tPaintDetails.nLineHeight);
@@ -835,7 +875,7 @@ void SHexEdit::PaintAsciiData(IRenderTarget *pRT)
     char *pSelectionBufPtrEnd;
 
     memset(pBuf, 0, m_tPaintDetails.nBytesPerRow + 1);
-
+    cAsciiRect.top += m_tPaintDetails.nColNumberPos;
     // the Rect for painting & background
     cAsciiRect.left += m_tPaintDetails.nAsciiPos - m_nScrollPostionX;
     cAsciiRect.right = cAsciiRect.left + m_tPaintDetails.nAsciiLen;
@@ -869,7 +909,7 @@ void SHexEdit::PaintAsciiData(IRenderTarget *pRT)
 
     //  paint
 
-    for (; nAdr <= nEndAdr; nAdr += m_tPaintDetails.nBytesPerRow)
+    for (; nAdr < nEndAdr; nAdr += m_tPaintDetails.nBytesPerRow)
     {
         pDataPtrEnd = pDataPtr + m_tPaintDetails.nBytesPerRow;
         if (pDataPtrEnd > pEndDataPtr)
@@ -915,8 +955,7 @@ void SHexEdit::PaintAsciiData(IRenderTarget *pRT)
 
         pRT->SetTextColor(m_tAsciiTxtCol);
         SStringT outText = S_CA2T(pBuf);
-        pRT->DrawText(outText, -1, (LPRECT)cAsciiRect,
-                      DT_LEFT | DT_TOP | DT_SINGLELINE | DT_NOPREFIX);
+        pRT->DrawText(outText, -1, (LPRECT)cAsciiRect, DT_LEFT | DT_TOP | DT_SINGLELINE | DT_NOPREFIX);
 
         // highlighted section now
 
@@ -927,17 +966,14 @@ void SHexEdit::PaintAsciiData(IRenderTarget *pRT)
 
             CRect cRect(cAsciiRect);
             cRect.left += (pSelectionBufPtrBegin - pBuf) * m_tPaintDetails.nCharacterWidth;
-            cRect.right -= (pBuf + m_tPaintDetails.nBytesPerRow - pSelectionBufPtrEnd)
-                * m_tPaintDetails.nCharacterWidth;
+            cRect.right -= (pBuf + m_tPaintDetails.nBytesPerRow - pSelectionBufPtrEnd) * m_tPaintDetails.nCharacterWidth;
             CRect cSelectionRect(cRect);
             cSelectionRect.InflateRect(0, -1, +1, +1);
             *pSelectionBufPtrEnd = '\0'; // set "end-mark"
-            pRT->FillSolidRect(cSelectionRect,
-                               m_bCaretAscii ? m_tSelectedFousBkgCol : m_tSelectedNoFocusBkgCol);
+            pRT->FillSolidRect(cSelectionRect, m_bCaretAscii ? m_tSelectedFousBkgCol : m_tSelectedNoFocusBkgCol);
             pRT->SetTextColor(m_bCaretAscii ? m_tSelectedFousTxtCol : m_tSelectedNoFocusTxtCol);
             SStringT outText = S_CA2T(pSelectionBufPtrBegin);
-            pRT->DrawText(outText, -1, (LPRECT)cRect,
-                          DT_LEFT | DT_TOP | DT_SINGLELINE | DT_NOPREFIX);
+            pRT->DrawText(outText, -1, (LPRECT)cRect, DT_LEFT | DT_TOP | DT_SINGLELINE | DT_NOPREFIX);
             *pSelectionBufPtrEnd = ' '; // restore the buffer
         }
 
@@ -957,9 +993,7 @@ void SHexEdit::SetEditCaretPos(UINT nOffset, bool bHighBits)
     if (m_nCurrentAddress >= GetDataSize())
         m_nCurrentAddress--;
 
-    if (m_nCurrentAddress < m_nScrollPostionY * m_tPaintDetails.nBytesPerRow
-        || (m_nCurrentAddress
-            >= (m_nScrollPostionY + m_tPaintDetails.nVisibleLines) * m_tPaintDetails.nBytesPerRow))
+    if (m_nCurrentAddress < m_nScrollPostionY * m_tPaintDetails.nBytesPerRow || (m_nCurrentAddress >= (m_nScrollPostionY + m_tPaintDetails.nVisibleLines) * m_tPaintDetails.nBytesPerRow))
     {
         // not in the visible range
         DestoyEditCaret();
@@ -985,17 +1019,14 @@ void SHexEdit::SetEditCaretPos(UINT nOffset, bool bHighBits)
     if (m_bCaretAscii)
         xpos += m_tPaintDetails.nAsciiPos + nColumn * m_tPaintDetails.nCharacterWidth;
     else
-        xpos += m_tPaintDetails.nHexPos
-            + (nColumn * 3 + (bHighBits ? 0 : 1)) * m_tPaintDetails.nCharacterWidth;
+        xpos += m_tPaintDetails.nHexPos + (nColumn * 3 + (bHighBits ? 0 : 1)) * m_tPaintDetails.nCharacterWidth;
     if (m_bCaretAtLineEnd)
         xpos += (bHighBits && !m_bCaretAscii ? 2 : 1) * m_tPaintDetails.nCharacterWidth;
 
-    UINT ypos = m_tPaintDetails.cPaintingRect.top + 1 + nRow * m_tPaintDetails.nLineHeight;
+    UINT ypos = m_tPaintDetails.cPaintingRect.top + (m_bShowColNumber ? m_tPaintDetails.nLineHeight : 0) + 1 + nRow * m_tPaintDetails.nLineHeight;
     CPoint cCarretPoint(xpos, ypos);
 
-    if ((cCarretPoint.x + (short)m_tPaintDetails.nCharacterWidth
-         <= m_tPaintDetails.cPaintingRect.left - 2)
-        || (cCarretPoint.x > m_tPaintDetails.cPaintingRect.right))
+    if ((cCarretPoint.x + (short)m_tPaintDetails.nCharacterWidth <= m_tPaintDetails.cPaintingRect.left - 2) || (cCarretPoint.x > m_tPaintDetails.cPaintingRect.right))
     {
         // we can't see it
         DestoyEditCaret();
@@ -1167,9 +1198,7 @@ void SHexEdit::MakeVisible(UINT nBegin, UINT nEnd, bool bUpdate)
             }
             else if (nAdrEnd > nEnd)
             {
-                SetScrollPositionY((nEnd - nFullBytesPerScreen + m_tPaintDetails.nBytesPerRow)
-                                       / m_tPaintDetails.nBytesPerRow,
-                                   false);
+                SetScrollPositionY((nEnd - nFullBytesPerScreen + m_tPaintDetails.nBytesPerRow) / m_tPaintDetails.nBytesPerRow, false);
             }
         }
         else
@@ -1180,28 +1209,20 @@ void SHexEdit::MakeVisible(UINT nBegin, UINT nEnd, bool bUpdate)
             }
             else if (nAdrEnd < nEnd)
             {
-                SetScrollPositionY((nEnd - nFullBytesPerScreen + m_tPaintDetails.nBytesPerRow)
-                                       / m_tPaintDetails.nBytesPerRow,
-                                   false);
+                SetScrollPositionY((nEnd - nFullBytesPerScreen + m_tPaintDetails.nBytesPerRow) / m_tPaintDetails.nBytesPerRow, false);
             }
         }
     }
 
-    int iLineX = (int)((nBegin % m_tPaintDetails.nBytesPerRow) * 3 * m_tPaintDetails.nCharacterWidth
-                       + m_tPaintDetails.nHexPos + m_tPaintDetails.cPaintingRect.left)
-        - (int)m_nScrollPostionX;
-    int iLineX2
-        = (int)((2 + (nEnd % m_tPaintDetails.nBytesPerRow) * 3) * m_tPaintDetails.nCharacterWidth
-                + m_tPaintDetails.nHexPos + m_tPaintDetails.cPaintingRect.left)
-        - (int)m_nScrollPostionX;
+    int iLineX = (int)((nBegin % m_tPaintDetails.nBytesPerRow) * 3 * m_tPaintDetails.nCharacterWidth + m_tPaintDetails.nHexPos + m_tPaintDetails.cPaintingRect.left) - (int)m_nScrollPostionX;
+    int iLineX2 = (int)((2 + (nEnd % m_tPaintDetails.nBytesPerRow) * 3) * m_tPaintDetails.nCharacterWidth + m_tPaintDetails.nHexPos + m_tPaintDetails.cPaintingRect.left) - (int)m_nScrollPostionX;
     if (iLineX > iLineX2)
     {
         int iTemp = iLineX;
         iLineX = iLineX2;
         iLineX2 = iTemp;
     }
-    if ((iLineX <= m_tPaintDetails.cPaintingRect.left)
-        && (iLineX2 >= m_tPaintDetails.cPaintingRect.right))
+    if ((iLineX <= m_tPaintDetails.cPaintingRect.left) && (iLineX2 >= m_tPaintDetails.cPaintingRect.right))
     {
         // nothing to do here...
     }
@@ -1211,8 +1232,7 @@ void SHexEdit::MakeVisible(UINT nBegin, UINT nEnd, bool bUpdate)
     }
     else if (iLineX2 >= m_tPaintDetails.cPaintingRect.right)
     {
-        SetScrollPositionX(m_nScrollPostionX + iLineX2 - m_tPaintDetails.cPaintingRect.Width(),
-                           false);
+        SetScrollPositionX(m_nScrollPostionX + iLineX2 - m_tPaintDetails.cPaintingRect.Width(), false);
     }
 
     if (bUpdate)
@@ -1299,9 +1319,8 @@ void SHexEdit::GetAddressFromPoint(const CPoint &cPt, UINT &nAddress, bool &bHig
     CPoint cPoint(cPt);
     cPoint.x += m_nScrollPostionX;
     cPoint.x += (m_tPaintDetails.nCharacterWidth >> 1);
-    cPoint.y -= m_tPaintDetails.cPaintingRect.top;
-    cPoint.x -= m_tPaintDetails.cPaintingRect.left + CONTROL_BORDER_SPACEH
-        + 3; // 3 determined experimentally :-(
+    cPoint.y -= m_tPaintDetails.cPaintingRect.top + (m_bShowColNumber ? m_tPaintDetails.nLineHeight : 0);
+    cPoint.x -= m_tPaintDetails.cPaintingRect.left + CONTROL_BORDER_SPACEH + 3; // 3 determined experimentally :-(
 
     if (cPoint.y < 0)
     {
@@ -1470,7 +1489,7 @@ void SHexEdit::OnMouseMove(UINT nFlags, CPoint point)
         {
             int iRepSpeed = 0;
             int iDelta = 0;
-            if (point.y < m_tPaintDetails.cPaintingRect.top)
+            if (point.y < m_tPaintDetails.cPaintingRect.top + (m_bShowColNumber ? m_tPaintDetails.nLineHeight : 0))
             {
                 iDelta = -1;
                 iRepSpeed = (int)m_tPaintDetails.cPaintingRect.top + 1 - (int)point.y;
@@ -1531,8 +1550,7 @@ void SHexEdit::OnLButtonDown(UINT nFlags, CPoint pt)
     int iDragCX = GetSystemMetrics(SM_CXDRAG);
     int iDragCY = GetSystemMetrics(SM_CYDRAG);
     m_cDragRect = CRect(pt.x - (iDragCX >> 1), pt.y - (iDragCY >> 1),
-                        pt.x + (iDragCX >> 1)
-                            + (iDragCX & 1), //(we don't want to loose a pixel, when it's so small)
+                        pt.x + (iDragCX >> 1) + (iDragCX & 1), //(we don't want to loose a pixel, when it's so small)
                         pt.y + (iDragCY >> 1) + (iDragCY & 1));
 
     m_nSelectingEnd = NOSECTION_VAL;
@@ -1707,8 +1725,7 @@ void SHexEdit::OnEditPaste()
     else
         pasteData.Append((BYTE *)clipText.c_str(), clipText.length());
 
-    SaveUndoAction(SHexEditAction::paste, nPasteAdr, m_xData.Mid(nPasteAdr, nReplaceLength),
-                   pasteData);
+    SaveUndoAction(SHexEditAction::paste, nPasteAdr, m_xData.Mid(nPasteAdr, nReplaceLength), pasteData);
 
     if (nReplaceLength > 0)
         m_xData.Remove(nPasteAdr, nReplaceLength);
@@ -1741,8 +1758,7 @@ void SHexEdit::OnEditCut()
 
         if (nCutLength > 0)
         {
-            SaveUndoAction(SHexEditAction::cut, m_nSelectionBegin,
-                           m_xData.Mid(m_nSelectionBegin, nCutLength), SByteArray());
+            SaveUndoAction(SHexEditAction::cut, m_nSelectionBegin, m_xData.Mid(m_nSelectionBegin, nCutLength), SByteArray());
 
             m_xData.Remove(m_nSelectionBegin, nCutLength);
             m_bRecalc = true;
@@ -1870,8 +1886,7 @@ bool SHexEdit::OnEditInput(WORD nInput)
             nValue = (nValue << 4) | (m_xData[m_nCurrentAddress] & 0x0f);
         else
             nValue = (m_xData[m_nCurrentAddress] & 0xf0) | nValue;
-    SaveUndoAction(SHexEditAction::input, m_nCurrentAddress,
-                   m_xData.Mid(m_nCurrentAddress, replaceLen), SByteArray(&nValue, 1));
+    SaveUndoAction(SHexEditAction::input, m_nCurrentAddress, m_xData.Mid(m_nCurrentAddress, replaceLen), SByteArray(&nValue, 1));
     m_xData[m_nCurrentAddress] = nValue;
     if (m_bCaretAscii)
         MoveCurrentAddress(1, true, true);
@@ -1969,8 +1984,7 @@ BOOL SHexEdit::PressKeyDown(UINT nChar)
         case VK_LEFT:
             if (IsSelection())
             {
-                MoveCurrentAddress(m_nSelectionBegin - m_nCurrentAddress - 1,
-                                   m_nSelectionBegin == 0);
+                MoveCurrentAddress(m_nSelectionBegin - m_nCurrentAddress - 1, m_nSelectionBegin == 0);
             }
             else if (m_bCaretAscii)
             {
@@ -1987,13 +2001,10 @@ BOOL SHexEdit::PressKeyDown(UINT nChar)
             }
             return TRUE;
         case VK_PRIOR:
-            MoveCurrentAddress(
-                -(int)(m_tPaintDetails.nBytesPerRow * (m_tPaintDetails.nVisibleLines - 1)),
-                m_bHighBits);
+            MoveCurrentAddress(-(int)(m_tPaintDetails.nBytesPerRow * (m_tPaintDetails.nVisibleLines - 1)), m_bHighBits);
             return TRUE;
         case VK_NEXT:
-            MoveCurrentAddress(m_tPaintDetails.nBytesPerRow * (m_tPaintDetails.nVisibleLines - 1),
-                               m_bHighBits);
+            MoveCurrentAddress(m_tPaintDetails.nBytesPerRow * (m_tPaintDetails.nVisibleLines - 1), m_bHighBits);
             return TRUE;
         case VK_HOME:
             if (m_nCurrentAddress == GetDataSize())
@@ -2002,9 +2013,7 @@ BOOL SHexEdit::PressKeyDown(UINT nChar)
             return TRUE;
         case VK_END:
             m_bCaretAtLineEnd = true;
-            MoveCurrentAddress(m_tPaintDetails.nBytesPerRow - 1
-                                   - (m_nCurrentAddress % m_tPaintDetails.nBytesPerRow),
-                               false);
+            MoveCurrentAddress(m_tPaintDetails.nBytesPerRow - 1 - (m_nCurrentAddress % m_tPaintDetails.nBytesPerRow), false);
             return TRUE;
         case VK_INSERT:
             m_overwriteMode = !m_overwriteMode;
@@ -2071,15 +2080,11 @@ HRESULT SHexEdit::OnAttrAsciiBkColor(const SStringW &strValue, BOOL bLoading)
     return S_OK;
 }
 
-BOOL SHexEdit::SaveUndoAction(UINT type,
-                              UINT position,
-                              const SByteArray &replaceData,
-                              const SByteArray &insertData)
+BOOL SHexEdit::SaveUndoAction(UINT type, UINT position, const SByteArray &replaceData, const SByteArray &insertData)
 {
     delete m_redo; // m_pData will change invalidating m_redo
     m_redo = NULL;
-    if (type == SHexEditAction::input && m_undo != 0 && m_undo->getType() == SHexEditAction::input
-        && m_undo->getPosition() + m_undo->getInsertLen() == position)
+    if (type == SHexEditAction::input && m_undo != 0 && m_undo->getType() == SHexEditAction::input && m_undo->getPosition() + m_undo->getInsertLen() == position)
     {
         // merge input actions
         if (!m_undo->append(replaceData, insertData))
@@ -2092,8 +2097,7 @@ BOOL SHexEdit::SaveUndoAction(UINT type,
     {
         // new action can't be merged with previous
         SHexEditAction *action = new SHexEditAction();
-        if (action == NULL
-            || !action->set(SHexEditAction::input, position, replaceData, insertData, m_undo))
+        if (action == NULL || !action->set(SHexEditAction::input, position, replaceData, insertData, m_undo))
         {
             delete action;
             // cant save undo

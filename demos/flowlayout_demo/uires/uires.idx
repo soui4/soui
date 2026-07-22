@@ -1,9 +1,10 @@
-﻿<resource>
+<resource>
   <UIDEF>
     <file name="XML_INIT" path="uidef\init.xml"/>
   </UIDEF>
   <LAYOUT>
     <file name="XML_MAINWND" path="xml\dlg_main.xml"/>
+    <file name="model_view" path="xml\model_view.xml"/>
   </LAYOUT>
   
   <values>
@@ -18,4 +19,8 @@
   <ICON>
     <file name="ICON_LOGO"  path="image\soui.ico"/>
   </ICON>
+  <anim>
+    <file name="modal_in"  path="anim\modal_in.xml"/>
+    <file name="modal_out" path="anim\modal_out.xml"/>
+  </anim>
 </resource>

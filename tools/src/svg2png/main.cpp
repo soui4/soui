@@ -20,29 +20,17 @@ using namespace SNS;
 #define CreateSvgFromFile CreateSvgFromFileA
 #endif
 
-int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lpstrCmdLine, int /*nCmdShow*/)
+int _tmain(int argc, TCHAR* argv[]) 
 {
     int nRet = 0;
-    SApplication app(hInstance,_T("soui4host"),SObjectEmptyRegister());
+    HINSTANCE hInst = GetModuleHandle(NULL);
+    SApplication app(hInst,_T("soui4host"),SObjectEmptyRegister());
     SAppCfg cfg;
     cfg.SetRender(Render_Gdi).SetImgDecoder(ImgDecoder_Stb);
 
     if (!cfg.DoConfig(&app))
     {
         return -1;
-    }
-    SStringT cmdLine(lpstrCmdLine);
-    SStringTList strArgs;
-    int argc = SplitString(cmdLine, _T(' '), strArgs);
-    if (strArgs[0].Find(_T("svg2png")) == -1)
-    {
-        strArgs.InsertAt(0, _T("svg2png"));
-        argc++;
-    }
-    TCHAR **argv = new TCHAR *[argc];
-    for(int i=0;i<argc;i++){
-        strArgs[i].Trim('\"');
-        argv[i]=(TCHAR*)strArgs[i].c_str();
     }
     SStringT strInput, strOutput;
     int nSize = -1;
@@ -59,7 +47,6 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
             break;
         }
 	}
-    delete []argv;
     if(strInput.IsEmpty() || !strInput.EndsWith(_T(".svg"),true))
     {
         _ftprintf(stderr,_T("Usage: svg2png -i input.svg -o output.png -s size\n"));
@@ -100,7 +87,6 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 #if !defined(_WIN32) || defined(__MINGW32__)
 int main(int argc, char **argv)
 {
-    HINSTANCE hInst = GetModuleHandle(NULL);
-    return _tWinMain(hInst, 0, GetCommandLine(), SW_SHOWNORMAL);
+    return _tmain(argc,argv);
 }
 #endif //_WIN32

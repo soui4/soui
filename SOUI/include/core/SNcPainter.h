@@ -324,11 +324,6 @@ class SOUI_EXP SNcPainter
     BOOL IsDrawNc() const;
 
     /**
-     * @brief Paints the caption.
-     */
-    void PaintCaption();
-
-    /**
      * @brief Updates the tooltip.
      */
     void UpdateToolTip();
@@ -356,8 +351,6 @@ class SOUI_EXP SNcPainter
     SAutoRefPtr<IRenderTarget> m_memTop;
     // Memory render target for the bottom side
     SAutoRefPtr<IRenderTarget> m_memBottom;
-    // Hit test part
-    UINT m_htPart;
     // Flag indicating if painting is in progress
     BOOL m_bInPaint;
     // Flag indicating if the left mouse button is down

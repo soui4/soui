@@ -33,7 +33,8 @@ BOOL SComboBoxEx::CreateListBox(SXmlNode xmlNode)
     m_pListBox->SetAttribute(L"hotTrack", L"1", TRUE);
     m_pListBox->SetOwner(this); // chain notify message to combobox
     m_pListBox->SetID(IDC_DROPDOWN_LIST);
-
+	m_pListBox->SSendMessage(UM_SETSCALE, GetScale());
+    m_pListBox->SSendMessage(WM_CREATE);
     //初始化列表数据
     SXmlNode xmlNode_Items = xmlNode.child(L"items");
     if (xmlNode_Items)
@@ -99,7 +100,7 @@ int SComboBoxEx::GetListBoxHeight()
 void SComboBoxEx::OnCreateDropDown(SDropDownWnd *pDropDown)
 {
     __baseCls::OnCreateDropDown(pDropDown);
-    pDropDown->GetRoot()->InsertChild(m_pListBox);
+    pDropDown->GetRoot()->InsertIChild(m_pListBox);
     pDropDown->GetRoot()->UpdateChildrenPosition();
 
     m_pListBox->SetVisible(TRUE);
@@ -109,7 +110,7 @@ void SComboBoxEx::OnCreateDropDown(SDropDownWnd *pDropDown)
 
 void SComboBoxEx::OnDestroyDropDown(SDropDownWnd *pDropDown)
 {
-    pDropDown->GetRoot()->RemoveChild(m_pListBox);
+    pDropDown->GetRoot()->RemoveIChild(m_pListBox);
     m_pListBox->SetVisible(FALSE);
     m_pListBox->SetContainer(GetContainer());
     __baseCls::OnDestroyDropDown(pDropDown);

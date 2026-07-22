@@ -398,7 +398,9 @@ protected:
 private:
 
     static const int gMIN_ALLOC_COUNT = 8;
-
+    // 关键友元声明
+    template<typename TT, bool MEM>
+    friend void* operator new(size_t, SkTArray<TT, MEM>*, int atIndex);
     // Helper function that makes space for n objects, adjusts the count, but does not initialize
     // the new objects.
     void* push_back_raw(int n) {

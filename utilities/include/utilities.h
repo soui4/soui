@@ -184,6 +184,8 @@ HANDLE UTILITIES_API LoadIconFromMemory(const void* buf, UINT cbSize, BOOL fIcon
  */
 HRGN UTILITIES_API CreateRegionFromBitmap(HBITMAP hBmp, COLORREF cr, COLORREF crMask);
 
+BOOL UTILITIES_API IsPhysicalKeyboardPresent(BOOL filterVirtual DEF_VAL(TRUE));
+
 #ifdef __cplusplus
 }
 #endif//__cplusplus

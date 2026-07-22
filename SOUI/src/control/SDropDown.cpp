@@ -77,6 +77,19 @@ BOOL SDropDownWnd::Create(LPCRECT lpRect, IXmlNode *pInitXml, DWORD dwStyle, DWO
     return TRUE;
 }
 
+void SDropDownWnd::ShowWindow(int x, int y, int nWidth, int nHeight, int nAniMs, BOOL bDropDown) {
+    MoveWindow(x, y, nWidth, nHeight, FALSE);
+#ifdef _WIN32
+    if (nAniMs > 0)
+        AnimateHostWindow(nAniMs, AW_SLIDE | (bDropDown ? AW_VER_POSITIVE : AW_VER_NEGATIVE));
+    else
+        SetWindowPos(HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
+#else
+    SetWindowPos(HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
+#endif
+    SetCapture();
+}
+
 void SDropDownWnd::OnLButtonDown(UINT nFlags, CPoint point)
 {
     CRect rcWnd;

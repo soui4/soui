@@ -23,7 +23,9 @@ size_t SplitString(const T &str, TC cSep, SArray<T> &strLst)
         {
             if (nEnd > nBegin)
             {
-                strLst.Add(str.Mid(nBegin, nEnd - nBegin));
+                T subStr = str.Mid(nBegin, nEnd - nBegin);
+                subStr.Trim();
+                strLst.Add(subStr);
             }
             nBegin = nEnd + 1;
         }

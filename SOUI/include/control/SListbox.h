@@ -351,6 +351,7 @@ class SOUI_EXP SListBox : public TPanelProxy<IListBox> {
      */
     void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
 
+    int OnCreate(LPVOID);
     /**
      * @brief Handle destroy event
      */
@@ -407,8 +408,6 @@ class SOUI_EXP SListBox : public TPanelProxy<IListBox> {
     SOUI_ATTRS_END()
 
     SOUI_MSG_MAP_BEGIN()
-        MSG_WM_DESTROY(OnDestroy)
-        MSG_WM_SIZE(OnSize)
         MSG_WM_PAINT_EX(OnPaint)
         MSG_WM_LBUTTONDOWN(OnLButtonDown)
         MSG_WM_LBUTTONDBLCLK(OnLButtonDbClick)
@@ -419,6 +418,9 @@ class SOUI_EXP SListBox : public TPanelProxy<IListBox> {
         MSG_WM_CHAR(OnChar)
         MSG_WM_SHOWWINDOW(OnShowWindow)
         MSG_WM_MOUSELEAVE(OnMouseLeave)
+        MSG_WM_DESTROY(OnDestroy)
+        MSG_WM_CREATE(OnCreate)
+        MSG_WM_SIZE(OnSize)
     SOUI_MSG_MAP_END()
 };
 

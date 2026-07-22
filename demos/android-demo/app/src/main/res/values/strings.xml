@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SOUI4 Android Demo</string>
+    <string name="home_title">SOUI4 Android 演示</string>
+    <string name="home_intro">本 demo 演示基于 soui-android-lib 的使用</string>
+    <string name="home_btn_default">默认 SHostWnd（代码方式）</string>
+    <string name="home_btn_xml">XML 声明 SouiScreen</string>
+    <string name="title_default_host">默认 SHostWnd 演示</string>
+    <string name="title_xml_host">XML 声明 SouiScreen 演示</string>
+    <!-- SOUI 布局资源字符串：格式 "type:name"，与 assets/uires/uires.idx 一致。
+         可以在任何地方引用（attrs、Java 代码），统一修改，避免多处硬编码。-->
+    <string name="layout_demo">layout:demo_layout</string>
+</resources>

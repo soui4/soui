@@ -45,6 +45,13 @@ void SRotateAnimation::copy(const IAnimation *src)
     mPivotYDesc = src2->mPivotYDesc;
 }
 
+IAnimation *SRotateAnimation::clone() const
+{
+    SRotateAnimation *pRet = new SRotateAnimation();
+    pRet->copy(this);
+    return pRet;
+}
+
 void SRotateAnimation::init(float fromDegrees, float toDegrees, const SValueDescription &pivotX, const SValueDescription &pivotY)
 {
     mFromDegrees = fromDegrees;

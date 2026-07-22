@@ -108,8 +108,7 @@ void SMessageLoop::Quit(int exitCode)
     PostThreadMessage(m_tid, WM_QUIT, (WPARAM)exitCode, 0);
 }
 
-int SMessageLoop::Run()
-{
+void SMessageLoop::OnStart(){
     m_bDoIdle = TRUE;
     m_nIdleCount = 0;
     m_tid = GetCurrentThreadId();
@@ -117,6 +116,24 @@ int SMessageLoop::Run()
     SASSERT(m_priv->m_msgWnd.IsWindow());
     m_bRunning = TRUE;
     m_bQuit = FALSE;
+}
+
+void SMessageLoop::OnStop(){
+    SAutoLock lock(m_cs);
+    SPOSITION pos = m_priv->m_runnables.GetHeadPosition();
+    while (pos)
+    {
+        IRunnable *pRunnable = m_priv->m_runnables.GetNext(pos);
+        pRunnable->Release();
+    }
+    m_priv->m_runnables.RemoveAll();
+    m_bRunning = FALSE;
+    m_priv->m_msgWnd.DestroyWindow();
+}
+
+int SMessageLoop::Run()
+{
+    OnStart();
     int nRet = 0;
     do
     {
@@ -133,18 +150,7 @@ int SMessageLoop::Run()
         nRet = HandleMsg();
     } while (!m_bQuit);
 
-    {
-        SAutoLock lock(m_cs);
-        SPOSITION pos = m_priv->m_runnables.GetHeadPosition();
-        while (pos)
-        {
-            IRunnable *pRunnable = m_priv->m_runnables.GetNext(pos);
-            pRunnable->Release();
-        }
-        m_priv->m_runnables.RemoveAll();
-    }
-    m_bRunning = FALSE;
-    m_priv->m_msgWnd.DestroyWindow();
+    OnStop();
     return nRet;
 }
 

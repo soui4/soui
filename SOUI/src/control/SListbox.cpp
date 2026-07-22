@@ -13,7 +13,7 @@
 SNSBEGIN
 
 SListBox::SListBox()
-    : m_itemHeight(20.f, dp)
+    : m_itemHeight(SIZE_WRAP_CONTENT, dp)
     , m_iSelItem(-1)
     , m_iHoverItem(-1)
     , m_crItemBg(CR_INVALID)
@@ -569,6 +569,21 @@ void SListBox::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 UINT SListBox::OnGetDlgCode() const
 {
     return SC_WANTARROWS | SC_WANTCHARS;
+}
+
+int SListBox::OnCreate(LPVOID p) {
+    int ret = __baseCls::OnCreate(p);
+    if(ret != 0)
+        return ret;
+    if(m_itemHeight.isWrapContent()){
+        SAutoRefPtr<IRenderTarget> pRT;
+        GETRENDERFACTORY->CreateRenderTarget(&pRT);
+        BeforePaintEx(pRT);
+        SIZE sz;
+        pRT->MeasureText(_T("A"),1,&sz);
+        m_itemHeight=SLayoutSize(sz.cy+2,px);
+    }
+    return 0;
 }
 
 void SListBox::OnDestroy()

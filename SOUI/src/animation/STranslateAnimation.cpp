@@ -27,6 +27,25 @@ void STranslateAnimation::applyTransformation(float interpolatedTime, ITransform
     t->SetTransformationType(TYPE_MATRIX);
 }
 
+void STranslateAnimation::copy(const IAnimation *src)
+{
+    const STranslateAnimation *src2 = sobj_cast<const STranslateAnimation>(src);
+    if (!src2)
+        return;
+    SAnimation::copy(src);
+    mFromXValue = src2->mFromXValue;
+    mToXValue   = src2->mToXValue;
+    mFromYValue = src2->mFromYValue;
+    mToYValue   = src2->mToYValue;
+}
+
+IAnimation *STranslateAnimation::clone() const
+{
+    STranslateAnimation *pRet = new STranslateAnimation();
+    pRet->copy(this);
+    return pRet;
+}
+
 void STranslateAnimation::init(const SValueDescription &fromX, const SValueDescription &toX, const SValueDescription &fromY, const SValueDescription &toY)
 {
     mFromXValue = fromX;

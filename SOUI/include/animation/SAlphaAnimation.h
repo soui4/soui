@@ -1,4 +1,4 @@
-﻿#ifndef __SALPHAANIMATION__H__
+#ifndef __SALPHAANIMATION__H__
 #define __SALPHAANIMATION__H__
 
 #include <animation/SAnimation.h>
@@ -61,6 +61,12 @@ class SOUI_EXP SAlphaAnimation : public SAnimation {
      * @hide
      */
     STDMETHOD_(BOOL, hasAlpha)(THIS) SCONST OVERRIDE;
+
+    /**
+     * @brief Creates and returns a deep copy of this alpha animation.
+     * @return Pointer to a new SAlphaAnimation with the same fromAlpha/toAlpha and base properties.
+     */
+    STDMETHOD_(IAnimation *, clone)(THIS) SCONST OVERRIDE;
 };
 
 SNSEND

@@ -1,4 +1,7 @@
 ﻿# ChangeLog file for SOUI
+## 5.3
+- 初步完成Android适配. (5.3.0.0)
+
 ## 5.2
 - 增加flowlayout
 - 增加framelayout

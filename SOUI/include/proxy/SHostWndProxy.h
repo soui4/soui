@@ -320,6 +320,14 @@ public:
 		return SHostWnd::Create(hWndParent, x, y, nWidth, nHeight);
 	}
 
+	STDMETHOD_(BOOL, Attach)(THIS_ HWND hWnd, IXmlNode* xmlInit DEF_VAL(NULL)) OVERRIDE {
+		return SHostWnd::Attach(hWnd, xmlInit);
+	}
+
+	STDMETHOD_(BOOL, Detach)(THIS) OVERRIDE {
+		return SHostWnd::Detach();
+	}
+
 	STDMETHOD_(BOOL, InitFromXml)(THIS_ IXmlNode *pNode) OVERRIDE{
 		return SHostWnd::InitFromXml(pNode);
 	}

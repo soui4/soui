@@ -91,10 +91,10 @@ STextServiceHelper::STextServiceHelper()
 #else // INIT_RICHEDIT
 #ifdef _WIN32
     m_rich20 = LoadLibrary(_T("Msftedit.dll"));
-#elif defined(__OHOS__)
-    m_rich20 = LoadLibrary(_T("libmsftedit.so"));
+#elif defined(__APPPLE__)
+    m_rich20 = LoadLibrary(_T("libmsftedit.dylib"));
 #else
-    m_rich20 = LoadLibrary(_T("libmsftedit"));
+    m_rich20 = LoadLibrary(_T("libmsftedit.so"));
 #endif
 
     if (m_rich20)
@@ -248,9 +248,6 @@ EXTERN_C SELECT_ANY const IID IID_ITextServices = // 8d33f740-cf58-11ce-a89d-00a
 EXTERN_C SELECT_ANY const IID IID_ITextHost = /* c5bdd8d0-d26e-11ce-a89e-00aa006cadc5 */
     { 0xc5bdd8d0, 0xd26e, 0x11ce, { 0xa8, 0x9e, 0x00, 0xaa, 0x00, 0x6c, 0xad, 0xc5 } };
 
-EXTERN_C SELECT_ANY const IID IID_ITextHost2 = /* 13e670f5-1a5a-11cf-abeb-00aa00b65ea1 */
-    { 0x13e670f5, 0x1a5a, 0x11cf, { 0xab, 0xeb, 0x00, 0xaa, 0x00, 0xb6, 0x5e, 0xa1 } };
-
 // Convert Device Pixels to Himetric
 LONG DtoHimetric(LONG d, LONG dPerInch)
 {
@@ -264,36 +261,12 @@ LONG HimetrictoD(LONG lHimetric, LONG dPerInch)
 }
 
 /**
- * @class      ITextHost2_Re41
- * @brief      RichEdit 4.1 compatible ITextHost2 ABI.
- *
- * The bundled richedit41/msftedit code uses its private textsrv2.h layout,
- * which differs from newer ITextHost2 declarations in swinx/include/textserv.h.
- * Keep the exact vtable order expected by that implementation.
- */
-class ITextHost2_Re41 : public ITextHost {
-  public:
-    virtual BOOL TxIsDoubleClickPending() = 0;
-    virtual HRESULT TxGetWindow(HWND *phwnd) = 0;
-    virtual HRESULT TxSetForegroundWindow() = 0;
-    virtual HPALETTE TxGetPalette() = 0;
-    virtual HRESULT TxGetFEFlags(LONG *pFlags) = 0;
-    virtual HCURSOR TxSetCursor2(HCURSOR hcur, BOOL bText) = 0;
-    virtual void TxFreeTextServicesNotification() = 0;
-    virtual HRESULT TxGetEditStyle(DWORD dwItem, DWORD *pdwData) = 0;
-    virtual HRESULT TxGetWindowStyles(DWORD *pdwStyle, DWORD *pdwExStyle) = 0;
-    virtual HRESULT TxEBookLoadImage(LPWSTR lpszName, LPARAM *pID, SIZE *psize, DWORD *pdwFlags) = 0;
-    virtual HRESULT TxEBookImageDraw(LPARAM ID, HDC hdc, POINT *topLeft, RECT *prcRendering, BOOL fSelected) = 0;
-    virtual HRESULT TxGetHorzExtent(LONG *plHorzExtent) = 0;
-};
-
-/**
  * @class      STextHost
  * @brief
  *
  * Describe
  */
-class STextHost : public SUnkImpl<ITextHost2_Re41> {
+class STextHost : public SUnkImpl<ITextHost> {
     friend class SRichEdit;
 
   public:
@@ -331,32 +304,8 @@ class STextHost : public SUnkImpl<ITextHost2_Re41> {
     }
 
   protected:
-    STDMETHODIMP_(ULONG) AddRef(void)
-    {
-        return _AddRef();
-    }
-
-    STDMETHODIMP_(ULONG) Release(void)
-    {
-        return _Release();
-    }
-
-    STDMETHODIMP QueryInterface(REFIID riid, void **ppvObj)
-    {
-        if (!ppvObj)
-            return E_INVALIDARG;
-        *ppvObj = NULL;
-        if (IsEqualIID(riid, IID_IUnknown) || IsEqualIID(riid, IID_ITextHost2))
-            *ppvObj = static_cast<ITextHost2_Re41 *>(this);
-        else if (IsEqualIID(riid, IID_ITextHost))
-            *ppvObj = static_cast<ITextHost *>(this);
-        if (*ppvObj)
-        {
-            AddRef();
-            return S_OK;
-        }
-        return E_NOINTERFACE;
-    }
+    IUNKNOWN_BEGIN(ITextHost)
+    IUNKNOWN_END()
 
     /**
      * STextHost::TxGetDC
@@ -759,19 +708,6 @@ class STextHost : public SUnkImpl<ITextHost2_Re41> {
      */
     virtual HRESULT TxGetSelectionBarWidth(LONG *plSelBarWidth);
 
-    virtual BOOL TxIsDoubleClickPending();
-    virtual HRESULT TxGetWindow(HWND *phwnd);
-    virtual HRESULT TxSetForegroundWindow();
-    virtual HPALETTE TxGetPalette();
-    virtual HRESULT TxGetFEFlags(LONG *pFlags);
-    virtual HCURSOR TxSetCursor2(HCURSOR hcur, BOOL bText);
-    virtual void TxFreeTextServicesNotification();
-    virtual HRESULT TxGetEditStyle(DWORD dwItem, DWORD *pdwData);
-    virtual HRESULT TxGetWindowStyles(DWORD *pdwStyle, DWORD *pdwExStyle);
-    virtual HRESULT TxEBookLoadImage(LPWSTR lpszName, LPARAM *pID, SIZE *psize, DWORD *pdwFlags);
-    virtual HRESULT TxEBookImageDraw(LPARAM ID, HDC hdc, POINT *topLeft, RECT *prcRendering, BOOL fSelected);
-    virtual HRESULT TxGetHorzExtent(LONG *plHorzExtent);
-
   protected:
     BOOL m_fUiActive;       /**< Whether control is inplace active */
     ITextServices *pserv;   /**< pointer to Text Services object */
@@ -1130,107 +1066,6 @@ HRESULT STextHost::TxGetSelectionBarWidth(LONG *plSelBarWidth)
     return S_OK;
 }
 
-BOOL STextHost::TxIsDoubleClickPending()
-{
-    MSG msg = { 0 };
-    HWND hwnd = m_pRichEdit && m_pRichEdit->GetContainer() ? m_pRichEdit->GetContainer()->GetHostHwnd() : NULL;
-    return PeekMessage(&msg, hwnd, WM_LBUTTONDBLCLK, WM_LBUTTONDBLCLK, PM_NOREMOVE | PM_NOYIELD);
-}
-
-HRESULT STextHost::TxGetWindow(HWND *phwnd)
-{
-    if (!phwnd)
-        return E_INVALIDARG;
-    *phwnd = m_pRichEdit && m_pRichEdit->GetContainer() ? m_pRichEdit->GetContainer()->GetHostHwnd() : NULL;
-    return *phwnd ? S_OK : E_FAIL;
-}
-
-HRESULT STextHost::TxSetForegroundWindow()
-{
-    HWND hwnd = m_pRichEdit && m_pRichEdit->GetContainer() ? m_pRichEdit->GetContainer()->GetHostHwnd() : NULL;
-    if (!hwnd)
-        return E_FAIL;
-    if (!SetForegroundWindow(hwnd))
-        SetFocus(hwnd);
-    return S_OK;
-}
-
-HPALETTE STextHost::TxGetPalette()
-{
-    return NULL;
-}
-
-HRESULT STextHost::TxGetFEFlags(LONG *pFlags)
-{
-    if (!pFlags)
-        return E_INVALIDARG;
-    *pFlags = 0;
-    return S_OK;
-}
-
-HCURSOR STextHost::TxSetCursor2(HCURSOR hcur, BOOL bText)
-{
-    UNREFERENCED_PARAMETER(bText);
-    return SetCursor(hcur);
-}
-
-void STextHost::TxFreeTextServicesNotification()
-{
-    pserv = NULL;
-}
-
-HRESULT STextHost::TxGetEditStyle(DWORD dwItem, DWORD *pdwData)
-{
-    if (!pdwData)
-        return E_INVALIDARG;
-    *pdwData = 0;
-    if (dwItem == TXES_ISDIALOG)
-        *pdwData = 0;
-    return S_OK;
-}
-
-HRESULT STextHost::TxGetWindowStyles(DWORD *pdwStyle, DWORD *pdwExStyle)
-{
-    if (pdwStyle)
-        *pdwStyle = m_pRichEdit ? m_pRichEdit->m_dwStyle : 0;
-    if (pdwExStyle)
-        *pdwExStyle = 0;
-    return S_OK;
-}
-
-HRESULT STextHost::TxEBookLoadImage(LPWSTR lpszName, LPARAM *pID, SIZE *psize, DWORD *pdwFlags)
-{
-    UNREFERENCED_PARAMETER(lpszName);
-    if (pID)
-        *pID = 0;
-    if (psize)
-    {
-        psize->cx = 0;
-        psize->cy = 0;
-    }
-    if (pdwFlags)
-        *pdwFlags = 0;
-    return E_NOTIMPL;
-}
-
-HRESULT STextHost::TxEBookImageDraw(LPARAM ID, HDC hdc, POINT *topLeft, RECT *prcRendering, BOOL fSelected)
-{
-    UNREFERENCED_PARAMETER(ID);
-    UNREFERENCED_PARAMETER(hdc);
-    UNREFERENCED_PARAMETER(topLeft);
-    UNREFERENCED_PARAMETER(prcRendering);
-    UNREFERENCED_PARAMETER(fSelected);
-    return E_NOTIMPL;
-}
-
-HRESULT STextHost::TxGetHorzExtent(LONG *plHorzExtent)
-{
-    if (!plHorzExtent)
-        return E_INVALIDARG;
-    *plHorzExtent = 0;
-    return E_NOTIMPL;
-}
-
 BOOL STextHost::Init(SRichEdit *pRichEdit)
 {
     IUnknown *pUnk;
@@ -1299,6 +1134,7 @@ int SRichEdit::OnCreate(LPVOID)
     m_pTxtHost = new STextHost;
     if (!m_pTxtHost->Init(this))
     {
+        SSLOGE()<<"init ITextHost Failed!";
         m_pTxtHost->Release();
         m_pTxtHost = NULL;
         return 1;
@@ -1326,7 +1162,7 @@ int SRichEdit::OnCreate(LPVOID)
     else
         SetAttribute(L"rtf", m_strRtfSrc, FALSE);
     // register droptarget
-    OnEnableDragDrop(((m_dwStyle & ES_READONLY) == 0) && m_fEnableDragDrop);
+    OnEnableDragDrop(!(m_dwStyle & ES_READONLY) & m_fEnableDragDrop);
     return 0;
 }
 
@@ -1432,6 +1268,10 @@ void SRichEdit::OnSetFocus(SWND wndOld)
     if (ES_PASSWORD & m_dwStyle || ES_NUMBER & m_dwStyle)
     {
         GetContainer()->EnableIME(FALSE);
+    }else{
+#ifdef __ANDROID__
+        ShowSoftKeyboard(GetContainer()->GetHostHwnd(),TRUE);
+#endif//__ANDROID__
     }
 }
 
@@ -1441,7 +1281,9 @@ void SRichEdit::OnKillFocus(SWND wndFocus)
     {
         GetContainer()->EnableIME(TRUE);
     }
-
+#ifdef __ANDROID__
+    ShowSoftKeyboard(GetContainer()->GetHostHwnd(),FALSE);
+#endif//__ANDROID__
     __baseCls::OnKillFocus(wndFocus);
     if (m_pTxtHost)
     {
@@ -2444,7 +2286,7 @@ HRESULT SRichEdit::OnAttrEnableDragdrop(const SStringW &strValue, BOOL bLoading)
     m_fEnableDragDrop = STRINGASBOOL(strValue);
     if (!bLoading)
     {
-        OnEnableDragDrop(((m_dwStyle & ES_READONLY) == 0) && m_fEnableDragDrop);
+        OnEnableDragDrop(!(m_dwStyle & ES_READONLY) & m_fEnableDragDrop);
     }
     return S_FALSE;
 }
@@ -2457,21 +2299,16 @@ LRESULT SRichEdit::OnGetRect(UINT uMsg, WPARAM wp, LPARAM lp)
 
 BOOL SRichEdit::OnTxSetTimer(UINT idTimer, UINT uTimeout)
 {
-    if (!m_pTxtHost || !m_pTxtHost->GetTextService())
-        return FALSE;
     SMap<UINT, SAutoRefPtr<ITimer> >::CPair *p = m_mapTimer.Lookup(idTimer);
     if (p)
     {
         p->m_value->KillTimer();
-        return p->m_value->StartTimer(uTimeout, TRUE, idTimer);
+        p->m_value->StartTimer(uTimeout, TRUE, idTimer);
+        return TRUE;
     }
     MemberFunctionSlot<SRichEdit, IEvtArgs> slot = Subscriber(&SRichEdit::OnTimeout, this);
     STimer *timer = new STimer(&slot);
-    if (!timer->StartTimer(uTimeout, TRUE, idTimer))
-    {
-        timer->Release();
-        return FALSE;
-    }
+    timer->StartTimer(uTimeout, TRUE, idTimer);
     m_mapTimer[idTimer] = timer;
     timer->Release();
 
@@ -2480,26 +2317,13 @@ BOOL SRichEdit::OnTxSetTimer(UINT idTimer, UINT uTimeout)
 
 void SRichEdit::OnTxKillTimer(UINT idTimer)
 {
-    SMap<UINT, SAutoRefPtr<ITimer> >::CPair *p = m_mapTimer.Lookup(idTimer);
-    if (p)
-        p->m_value->KillTimer();
     m_mapTimer.RemoveKey(idTimer);
 }
 
 BOOL SRichEdit::OnTimeout(IEvtArgs *e)
 {
     EventTimer *e2 = sobj_cast<EventTimer>(e);
-    if (!e2)
-        return TRUE;
-
-    if (!m_mapTimer.Lookup((UINT)e2->uData))
-        return TRUE;
-
-    ITextServices *pTextService = m_pTxtHost ? m_pTxtHost->GetTextService() : NULL;
-    if (!pTextService)
-        return TRUE;
-
-    pTextService->TxSendMessage(WM_TIMER, e2->uData, 0, NULL);
+    m_pTxtHost->GetTextService()->TxSendMessage(WM_TIMER, e2->uData, 0, NULL);
     return TRUE;
 }
 

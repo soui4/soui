@@ -51,6 +51,13 @@ void SScaleAnimation::copy(const IAnimation *src)
     mPivotYDesc = src2->mPivotYDesc;
 }
 
+IAnimation *SScaleAnimation::clone() const
+{
+    SScaleAnimation *pRet = new SScaleAnimation();
+    pRet->copy(this);
+    return pRet;
+}
+
 void SScaleAnimation::init(float fromX, float toX, float fromY, float toY, const SValueDescription &pivotX, const SValueDescription &pivotY)
 {
     mFromX = fromX;

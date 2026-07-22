@@ -1560,6 +1560,18 @@ class SOUI_EXP SGroup : public SWindow {
     SOUI_ATTRS_END()
 };
 
+class SOUI_EXP SKeyboardSpacer : public SWindow {
+DEF_SOBJECT(SWindow, L"keyboardSpacer")
+public:
+    SKeyboardSpacer();
+
+protected:
+    void OnKeyboardHeight(int height);
+    SOUI_MSG_MAP_BEGIN()
+        MSG_KEYBOARD_HEIGHT(OnKeyboardHeight)
+    SOUI_MSG_MAP_END()
+};
+
 SNSEND
 
 #endif // __SCMNCTRL__H__

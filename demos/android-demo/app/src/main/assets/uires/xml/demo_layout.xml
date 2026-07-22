@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Example SOUI layout for Android SouiView -->
+<SOUI trCtx="soui_android_demo">
+    <root layout="vbox" gravity="center" width="400" height="400">
+        <realwnd id="100" wndclass="edit" wndname="test edit" size="-2,150"/>
+        <window size="-2,0" weight="1" layout="hbox">
+            <window size="0,-2" weight="1" colorBkgnd="#ff0000"/>
+            <window size="0,-2" weight="1" colorBkgnd="#00ff00"/>
+            <window size="0,-2" weight="1" colorBkgnd="#0000ff"/>
+        </window>
+    </root>
+</SOUI>

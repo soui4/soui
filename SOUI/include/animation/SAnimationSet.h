@@ -1,4 +1,4 @@
-﻿#ifndef __SANIMATIONSET__H__
+#ifndef __SANIMATIONSET__H__
 #define __SANIMATIONSET__H__
 
 #include <animation/SAnimation.h>
@@ -149,6 +149,14 @@ class SOUI_EXP SAnimationSet : public SAnimation {
      * @brief Resumes the animation.
      */
     STDMETHOD_(void, resume)(THIS) OVERRIDE;
+
+    /**
+     * @brief Creates and returns a deep copy of this animation set.
+     * Every child animation is cloned independently so that source and clone
+     * do not share any mutable sub-animation state.
+     * @return Pointer to a new SAnimationSet with a deep-copied child list.
+     */
+    STDMETHOD_(IAnimation *, clone)(THIS) SCONST OVERRIDE;
 
   protected:
     /**

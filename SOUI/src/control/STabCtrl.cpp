@@ -840,6 +840,8 @@ void STabCtrl::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
     else if (nChar == VK_END)
     {
         SetCurSel(GetItemCount() - 1);
+    }else{
+        SetMsgHandled(FALSE);
     }
 }
 

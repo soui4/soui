@@ -1,6 +1,6 @@
-include_directories(${PROJECT_SOURCE_DIR}/utilities/include)
-include_directories(${PROJECT_SOURCE_DIR}/SOUI/include)
-include_directories(${PROJECT_SOURCE_DIR}/third-part/nanosvg)
+include_directories(${SOUI_ROOT_DIR}/utilities/include)
+include_directories(${SOUI_ROOT_DIR}/SOUI/include)
+include_directories(${SOUI_ROOT_DIR}/third-part/nanosvg)
 
 set(render-skia_header
 	stdafx.h
@@ -47,6 +47,8 @@ else()
         find_package(GLEW REQUIRED)
         find_package(glfw3 REQUIRED)
         set(GL_LIB GLEW::GLEW glfw)
+    elseif(CMAKE_SYSTEM_NAME MATCHES Android)
+        set(GL_LIB EGL GLESv2)
     else()
         set(GL_LIB GL)
     endif()
@@ -61,16 +63,16 @@ target_compile_definitions(render-skia
 )
 target_include_directories(render-skia
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
-  PRIVATE ${PROJECT_SOURCE_DIR}/config
-  PRIVATE ${PROJECT_SOURCE_DIR}/utilities/include
-  PRIVATE ${PROJECT_SOURCE_DIR}/SOUI/include
-  PRIVATE ${PROJECT_SOURCE_DIR}/third-part/skia
-  PRIVATE ${PROJECT_SOURCE_DIR}/third-part/skia/include
-  PRIVATE ${PROJECT_SOURCE_DIR}/third-part/skia/include/config
-  PRIVATE ${PROJECT_SOURCE_DIR}/third-part/skia/include/core
-  PRIVATE ${PROJECT_SOURCE_DIR}/third-part/skia/include/xml
-  PRIVATE ${PROJECT_SOURCE_DIR}/third-part/skia/include/svg
-  PRIVATE ${PROJECT_SOURCE_DIR}/third-part/skia/src/core
+  PRIVATE ${SOUI_ROOT_DIR}/config
+  PRIVATE ${SOUI_ROOT_DIR}/utilities/include
+  PRIVATE ${SOUI_ROOT_DIR}/SOUI/include
+  PRIVATE ${SOUI_ROOT_DIR}/third-part/skia
+  PRIVATE ${SOUI_ROOT_DIR}/third-part/skia/include
+  PRIVATE ${SOUI_ROOT_DIR}/third-part/skia/include/config
+  PRIVATE ${SOUI_ROOT_DIR}/third-part/skia/include/core
+  PRIVATE ${SOUI_ROOT_DIR}/third-part/skia/include/xml
+  PRIVATE ${SOUI_ROOT_DIR}/third-part/skia/include/svg
+  PRIVATE ${SOUI_ROOT_DIR}/third-part/skia/src/core
 )
 
 set(COM_LIBS ${COM_LIBS} render-skia CACHE INTERNAL "com_lib")

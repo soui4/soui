@@ -369,3 +369,59 @@ BOOL IsFilePathValid(LPCTSTR strPath) {
         return FALSE;
     return (dwAttr & FILE_ATTRIBUTE_DIRECTORY)==0;
 }
+
+BOOL IsPhysicalKeyboardPresent(BOOL filterVirtual) {
+    UINT deviceCount = 0;
+
+    // 第一次调用：获取实际需要的设备数量
+    if (GetRawInputDeviceList(NULL, &deviceCount, sizeof(RAWINPUTDEVICELIST)) != 0) {
+        // 如果返回非0，表示失败（但也有可能设备数为0时返回0）
+        if (GetLastError() != ERROR_INSUFFICIENT_BUFFER) {
+            return FALSE;
+        }
+    }
+    if (deviceCount == 0) {
+        return FALSE;
+    }
+
+    // 分配缓冲区
+    SNS::SArray<RAWINPUTDEVICELIST> deviceList;
+	deviceList.SetCount(deviceCount);
+    UINT actualCount = GetRawInputDeviceList(deviceList.GetData(), &deviceCount, sizeof(RAWINPUTDEVICELIST));
+    if (actualCount == (UINT)-1) {
+        return FALSE;
+    }
+    for (UINT i = 0; i < actualCount; ++i) {
+        const RAWINPUTDEVICELIST& device = deviceList[i];
+        if (device.dwType == RIM_TYPEKEYBOARD) {
+            // 可选：获取更多信息用于过滤
+            if (filterVirtual) {
+                // 也可以检查按键总数（可选）
+                RID_DEVICE_INFO info;
+                UINT infoSize = sizeof(info);
+                if (GetRawInputDeviceInfoA(device.hDevice, RIDI_DEVICEINFO, &info, &infoSize) != (UINT)-1) {
+                    if (info.dwType == RIM_TYPEKEYBOARD) {
+                        int keyCount = info.keyboard.dwNumberOfKeysTotal;
+                        if (keyCount < 30) { // 启发式：按键太少可能不是主键盘
+                            //too few keys, skipping
+                            continue;
+                        }
+                    }
+                }
+            }
+            //printf(" -> ACCEPTED as physical keyboard.\n");
+            return TRUE;
+        }
+        else if (device.dwType == RIM_TYPEMOUSE) {
+            //printf("MOUSE\n");
+        }
+        else if (device.dwType == RIM_TYPEHID) {
+            //printf("HID (Human Interface Device)\n");
+        }
+        else {
+            //printf("UNKNOWN (%u)\n", device.dwType);
+        }
+    }
+    //printf("No physical keyboard detected.\n");
+    return FALSE;
+}

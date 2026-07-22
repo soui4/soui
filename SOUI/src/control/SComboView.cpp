@@ -37,11 +37,12 @@ BOOL SComboView::CreateListBox(SXmlNode xmlNode)
         m_pListBox->SetAttribute(L"margin", L"1,1,1,1");
         m_pListBox->SetAttribute(L"hotTrack", L"1", TRUE);
     }
-    m_pListBox->SetAttribute(L"hotTrack", L"1", TRUE);
+    m_pListBox->SetAttribute(L"pos", L"0,0,-0,-0", TRUE);
     m_pListBox->SetOwner(this); // chain notify message to combobox
     m_pListBox->SetVisible(FALSE);
     m_pListBox->SetID(IDC_DROPDOWN_LIST);
-
+    m_pListBox->SSendMessage(UM_SETSCALE, GetScale());
+    m_pListBox->SSendMessage(WM_CREATE);
     return TRUE;
 }
 

@@ -61,3 +61,10 @@ xcode/
 
 dugon
 .claude/settings.local.json
+vstgui/
+.gradle/
+.idea/
+local.properties
+gradle-wrapper.jar
+demos/android-demo2/
+.cxx/

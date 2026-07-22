@@ -85,6 +85,13 @@ DECLARE_INTERFACE_(IWindow, IObject)
     STDMETHOD_(ILayout *, GetLayout)(THIS) PURE;
 
     /**
+     * @brief 设置布局对象
+     * @param pLayout ILayout *--布局对象
+     * @return
+	 */
+	STDMETHOD_(void, SetLayout)(THIS_ ILayout * pLayout) PURE;
+
+    /**
      * @brief 获取布局参数对象
      * @return ILayoutParam *--布局参数对象
      */
@@ -422,10 +429,11 @@ DECLARE_INTERFACE_(IWindow, IObject)
     /**
      * @brief 立即启动一个动画对象
      * @param animation IAnimation *--动画对象
+	 * @param bStartNow BOOL--立即启动标志
      * @return
      * @remark 和setAnimation不同在于立即启动，而不是等待动画对象中的延时启动时间
      */
-    STDMETHOD_(void, StartAnimation)(THIS_ IAnimation * animation) PURE;
+    STDMETHOD_(void, StartAnimation)(THIS_ IAnimation * animation, BOOL bStartNow DEF_VAL(FALSE)) PURE;
 
     /**
      * @brief 获取当前正在运行的动画对象
@@ -610,6 +618,16 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * Describe
      */
     STDMETHOD_(BOOL, CreateChildrenFromResId)(THIS_ LPCTSTR pszResId) PURE;
+
+    /**
+     * InitFromResId
+     * @brief    从XML资源创建子窗口
+     * @param    LPCTSTR pszResId --  XML资源ID
+     * @return   BOOL 是否创建成功
+     *
+     * Describe
+     */
+    STDMETHOD_(BOOL, InitFromResId)(THIS_ LPCTSTR pszResId) PURE;
 
     /**
      * @brief 根据ID查找子窗口

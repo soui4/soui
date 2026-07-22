@@ -106,3 +106,26 @@ void CMainDlg::OnCkgType(IEvtArgs *e)
 	int item = e2->iItem;
 	SLOGI()<<"OnCkgType:"<<item;
 }
+
+BOOL CMainDlg::OnModalViewResult(IEvtArgs *e){
+	EventExitModalView *e2 = sobj_cast<EventExitModalView>(e);
+	SLOGI()<<"OnTest:EventExitModalView:"<<e2->exitCode;
+	return TRUE;
+}
+
+BOOL CMainDlg::OnModalViewBtnClick(IEvtArgs *e){
+	EndModalViewSession(0,e->IdFrom());
+	return TRUE;
+}
+
+void CMainDlg::OnTest()
+{
+	SModalRoot*pModal = (SModalRoot*)SApplication::getSingleton().CreateWindowByName(SModalRoot::GetClassName());
+    pModal->InitFromResId(_T("layout:model_view"));
+    ModalViewSessionID session_id = BeginModalViewSession(pModal);
+	MemberFunctionSlot<CMainDlg,IEvtArgs> slot = Subscriber(&CMainDlg::OnModalViewBtnClick,this);
+	pModal->FindChildByName("btn_ok")->SubscribeEvent(EventCmd::EventID,&slot);
+	pModal->FindChildByName("btn_cancel")->SubscribeEvent(EventCmd::EventID,&slot);
+	slot = Subscriber(&CMainDlg::OnModalViewResult,this);
+	pModal->SubscribeEvent(EventExitModalView::EventID,&slot);
+}

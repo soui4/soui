@@ -18,10 +18,12 @@
 #define _CRT_NON_CONFORMING_SWPRINTFS
 #endif //_CRT_NON_CONFORMING_SWPRINTFS
 
+#ifdef _MSC_VER
 #pragma warning(disable : 4661)
 #pragma warning(disable : 4251)
 #pragma warning(disable : 4100) // unreferenced formal parameter
 #pragma warning(disable : 4355)
+#endif//_MSC_VER
 
 #include <config.h>
 #include <soui-version.h>

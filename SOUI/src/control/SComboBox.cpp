@@ -43,7 +43,7 @@ BOOL SComboBox::CreateListBox(SXmlNode xmlNode)
     m_pListBox->SetVisible(FALSE);
     m_pListBox->SetID(IDC_DROPDOWN_LIST);
     m_pListBox->SSendMessage(UM_SETSCALE, GetScale());
-
+    m_pListBox->SSendMessage(WM_CREATE);
     //初始化列表数据
     SXmlNode xmlNode_Items = xmlNode.child(SComboBox_style::kStyle_items);
     if (xmlNode_Items)
@@ -84,10 +84,12 @@ int SComboBox::GetListBoxHeight()
 void SComboBox::OnCreateDropDown(SDropDownWnd *pDropDown)
 {
     __baseCls::OnCreateDropDown(pDropDown);
-    pDropDown->GetRoot()->InsertChild(m_pListBox);
-    pDropDown->GetRoot()->UpdateChildrenPosition();
-    pDropDown->GetRoot()->SDispatchMessage(UM_SETSCALE, GetScale(), 0);
-    pDropDown->GetRoot()->SDispatchMessage(UM_SETCOLORIZE, m_crColorize, 0);
+    SWindow *pRoot = pDropDown->GetRoot();
+    SASSERT(pRoot);
+    pRoot->InsertChild(m_pListBox);
+    pRoot->UpdateChildrenPosition();
+    pRoot->SDispatchMessage(UM_SETSCALE, GetScale(), 0);
+    pRoot->SDispatchMessage(UM_SETCOLORIZE, m_crColorize, 0);
 
     m_pListBox->SetVisible(TRUE);
     m_pListBox->SetFocus();

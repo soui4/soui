@@ -1,4 +1,4 @@
-﻿//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
 //  Class Name: SHostWnd
 //    Description: Real Container of SWindow
 //////////////////////////////////////////////////////////////////////////
@@ -9,6 +9,7 @@
 #include <core/SWndContainerImpl.h>
 #include <core/SNativeWnd.h>
 #include <core/SDropTargetDispatcher.h>
+#include <core/SModalViewSession.h>
 #include <event/SEventCrack.h>
 #include <interface/stooltip-i.h>
 #include <interface/shostwnd-i.h>
@@ -19,7 +20,7 @@
 #include <helper/swndspy.h>
 #include <helper/STimerGenerator.h>
 #include <proxy/SNativeWndProxy.h>
-
+#include <core/SRootWindow.h>
 SNSBEGIN
 
 /**
@@ -180,157 +181,6 @@ class SOUI_EXP SHostWndAttr : public TObjRefImpl<SObject> {
     HICON m_hAppIconBig;
 };
 
-enum
-{
-    ROOT_ID = -100, // The ID of the root window
-};
-
-/**
- * @class SRootWindow
- * @brief Root window class derived from SWindow.
- *
- * This class represents the root window in the SOUI framework and manages various window behaviors and events.
- */
-class SOUI_EXP SRootWindow : public SWindow {
-    // DEF_SOBJECT macro defines the type name of the class
-    DEF_SOBJECT(SWindow, L"root")
-    // Declare SHostWnd as a friend class to allow access to private members
-    friend class SHostWnd;
-
-  public:
-    /**
-     * @brief Constructor for SRootWindow.
-     *
-     * Initializes the SRootWindow object with a pointer to the host window.
-     *
-     * @param pHostWnd Pointer to the host window.
-     */
-    SRootWindow();
-
-  public:
-    /**
-     * @brief Sets the pointer to the host window.
-     *
-     * @param pHostWnd Pointer to the host window.
-     */
-    void SetHostWnd(SHostWnd *pHostWnd);
-
-    /**
-     * @brief Gets the pointer to the host window.
-     *
-     * @return Pointer to the host window.
-     */
-    SHostWnd *GetHostWnd() const;
-
-    /**
-     * @brief Fires a menu command event.
-     *
-     * @param menuID ID of the menu command to trigger.
-     */
-    void FireMenuCmd(int menuID);
-
-  public:
-    /**
-     * @brief Updates the layout of the window.
-     *
-     * Overrides the base class method to update the layout.
-     */
-    STDMETHOD_(void, UpdateLayout)(THIS) OVERRIDE;
-
-    /**
-     * @brief Gets the ID of the window.
-     *
-     * @return ID of the window.
-     */
-    STDMETHOD_(int, GetID)(CTHIS) SCONST OVERRIDE
-    {
-        return ROOT_ID;
-    }
-
-  protected:
-    /**
-     * @brief Called when an animation stops.
-     *
-     * Overrides the base class method to handle animation stop events.
-     *
-     * @param pAni Pointer to the animation object.
-     */
-    STDMETHOD_(void, OnAnimationStop)(THIS_ IAnimation *pAni) OVERRIDE;
-
-    /**
-     * @brief Called when an animation is invalidated.
-     *
-     * @param bErase Flag indicating whether to erase the animation.
-     */
-    virtual void OnAnimationInvalidate(bool bErase);
-
-  protected: // SWindow virtual methods
-    /**
-     * @brief Called before painting the window.
-     *
-     * @param pRT Pointer to the render target.
-     * @param painter Painter object.
-     */
-    void BeforePaint(IRenderTarget *pRT, SPainter &painter) const override;
-
-    /**
-     * @brief Called after painting the window.
-     *
-     * @param pRT Pointer to the render target.
-     * @param painter Painter object.
-     */
-    void AfterPaint(IRenderTarget *pRT, SPainter &painter) const override;
-
-    /**
-     * @brief Builds the painter object.
-     */
-    void BuildPainter(SPainter &painter) const override;
-
-    /**
-     * @brief Checks if the window is a layered window.
-     *
-     * @return TRUE if the window is a layered window, FALSE otherwise.
-     */
-    virtual BOOL IsLayeredWindow() const
-    {
-        return FALSE;
-    }
-
-    /**
-     * @brief Called when the language changes.
-     *
-     * @return HRESULT indicating the success or failure of the operation.
-     */
-    virtual HRESULT OnLanguageChanged();
-
-    /**
-     * @brief Called when the scale changes.
-     *
-     * @param scale New scale factor.
-     */
-    virtual void OnScaleChanged(int scale);
-
-    /**
-     * @brief Requests a relayout of the window.
-     *
-     * @param hSource Source window handle.
-     * @param bSourceResizable Flag indicating if the source window is resizable.
-     */
-    virtual void RequestRelayout(SWND hSource, BOOL bSourceResizable);
-
-  public:
-    // Define attributes for enter and exit animations
-    SOUI_ATTRS_BEGIN()
-        ATTR_ANIMATION(L"enterAnimation", m_aniEnter, FALSE)
-        ATTR_ANIMATION(L"exitAnimation", m_aniExit, FALSE)
-    SOUI_ATTRS_END()
-
-  protected:
-    // Auto-managed pointers for enter and exit animations
-    SAutoRefPtr<IAnimation> m_aniEnter, m_aniExit;
-    // Pointer to the host window
-    SHostWnd *m_pHostWnd;
-};
 class SDummyWnd;
 class SMenuEx;
 /**
@@ -344,11 +194,12 @@ class SMenuEx;
  */
 class SOUI_EXP SHostWnd
     : public TNativeWndProxy<IHostWnd>
-    , public SwndContainerImpl {
+    , public SwndContainerImpl
+{
     friend class SDummyWnd;   /**< Friend class used for handling WM_PAINT messages in translucent windows. */
     friend class SRootWindow; /**< Friend class representing the root window. */
     friend class SNcPainter;  /**< Friend class for non-client area painting. */
-
+    friend class SModalRootFinishCallback;
   protected:
     SDummyWnd *m_dummyWnd;   /**< A dummy window used to handle WM_PAINT messages for translucent windows. */
     SHostWndAttr m_hostAttr; /**< Host attributes corresponding to the SOUI node in XML. */
@@ -387,9 +238,27 @@ class SOUI_EXP SHostWnd
     SCriticalSection m_csRunningQueue; /**< Critical section for running queue synchronization. */
     SList<IRunnable *> m_runningQueue; /**< Queue of currently running tasks. */
     IXmlNode *m_xmlInit;               /**< Initial XML node. */
+    BOOL m_bAttached;                  /**< TRUE if attached to an external HWND (not created by SHostWnd). */
     static BOOL s_HideLocalUiDef;      /**< Global flag to hide local UI definitions. */
     static int s_TaskQueueBufSize;     /**< Buffer size for asynchronous task queues (default: 5). */
 
+    //////////////////////////////////////////////////////////////////////////
+    // Modal View Session support
+    // Note: the session stack holds SModalRoot pointers directly; each
+    // SModalRoot carries its session id and exit callback. There is no
+    // separate SModalViewSession wrapper object anymore.
+
+    typedef SAutoRefPtr<SModalRoot> SModalRootPtr;
+	typedef SList<SModalRootPtr> ModalRootStack;
+
+    ModalRootStack m_modalRootStack; /**< Stack of active modal root windows. */
+
+    /**
+     * @brief Initializes a modal root window (cancel capture, set focus, relayout, redraw).
+     *
+     * @param pModalRoot Pointer to the modal root window to initialize.
+     */
+    void initModalRoot(SModalRoot *pModalRoot);
   public:
     /**
      * @brief Constructs a SHostWnd object with an optional resource name.
@@ -537,6 +406,39 @@ class SOUI_EXP SHostWnd
     STDMETHOD_(BOOL, ShowWindow)(THIS_ int nCmdShow) OVERRIDE;
 
     /**
+     * @brief Begins a new modal view session.
+     *
+     * A modal view session is active until endModalViewSession is called. Message
+     * interception for the modal view is achieved by inserting the passed SWindow
+     * (wrapped in an SModalRoot when not already one) into SRootWindow::m_pModalContainer
+     * as a full-screen mask; the normal window tree hit-testing then naturally
+     * routes events to the top-most modal window. Modal view sessions can be
+     * stacked but must be ended in the same order.
+     *
+     * @param pView The modal view to be displayed. Typically an SModalRoot (or
+     *              any SWindow). If it is not already an SModalRoot, it is
+     *              reparented inside a newly created SModalRoot automatically.
+     *              The window must not already be attached to a parent.
+     * @return A unique session identifier if successful, 0 otherwise.
+     *
+     * @note To receive notification when the modal session ends, subscribe to
+     *       EventExitModalView on the SModalRoot window.
+     */
+    ModalViewSessionID BeginModalViewSession(SModalRoot* pView);
+
+    /**
+     * @brief Ends a modal view session.
+     *
+     * @param sessionID The session identifier returned by beginModalViewSession.
+     * @param exitCode The result code that will be included in the EventExitModalView event.
+     * @return TRUE if successful, FALSE otherwise (e.g., invalid session ID or wrong order).
+     */
+    BOOL EndModalViewSession(ModalViewSessionID sessionID=0, int exitCode = 0);
+
+
+	ModalViewSessionID GetLastModalViewSessionID() const;
+
+    /**
      * @brief Creates the host window with extended styles.
      *
      * @param hWndParent Handle to the parent window.
@@ -564,6 +466,31 @@ class SOUI_EXP SHostWnd
      */
     STDMETHOD_(HWND, Create)
     (THIS_ HWND hWndParent, int x = 0, int y = 0, int nWidth = 0, int nHeight = 0) OVERRIDE;
+
+    /**
+     * @brief Attaches the host window to an existing external HWND.
+     *
+     * Instead of creating a new HWND via Create/CreateEx, this method subclasses the
+     * provided external HWND and runs the same SOUI initialization flow (loading the
+     * layout XML, building the SOUI window tree, and hooking up the message map so
+     * that SOUI messages are routed correctly).
+     *
+     * Unlike Create/CreateEx, when the SHostWnd is later destroyed via DestroyWindow,
+     * it only unsubclasses the external HWND and performs internal SOUI cleanup. The
+     * external HWND itself is NOT destroyed and remains fully owned by its original
+     * creator.
+     *
+     * @param hWnd Handle to an existing, valid window to attach SOUI to.
+     * @param xmlInit Optional XML node used for initialization. Same semantics as the
+     *                xmlInit parameter of CreateEx. If NULL, the layout configured via
+     *                SetLayoutId / the constructor is used instead.
+     * @return The attached HWND (same as @p hWnd) on success, or NULL on failure.
+     *         Failures include an invalid @p hWnd, the SHostWnd already being bound
+     *         to a window, or a failure during subclassing or SOUI initialization.
+     */
+    STDMETHOD_(BOOL, Attach)(THIS_ HWND hWnd, IXmlNode *xmlInit DEF_VAL(NULL)) OVERRIDE;
+
+    STDMETHOD_(BOOL, Detach)(THIS) OVERRIDE;
 
     /**
      * @brief Sets the event handler for the host window.
@@ -1093,6 +1020,7 @@ class SOUI_EXP SHostWnd
      */
     void OnCommand(UINT uNotifyCode, int nID, HWND wndCtl);
 
+    void OnModalViewFinish(SModalRoot *pModalRoot);
 #if (!DISABLE_SWNDSPY)
   protected:
     /**
@@ -1463,6 +1391,8 @@ class SOUI_EXP SHostWnd
      */
     LRESULT OnRunTasks(UINT uMsg, WPARAM wp, LPARAM lp);
 
+    void OnKeyBoardHeight(int keyboardHeight);
+
     BEGIN_MSG_MAP_EX(SHostWnd)
         MSG_WM_SIZE(OnSize)
         MSG_WM_PRINT(OnPrint)
@@ -1497,6 +1427,7 @@ class SOUI_EXP SHostWnd
         MESSAGE_HANDLER_EX(UM_UPDATEFONT, OnUpdateFont)
         MESSAGE_HANDLER_EX(UM_SETLANGUAGE, OnSetLanguage)
         MESSAGE_HANDLER_EX(UM_RUN_TASKS, OnRunTasks)
+        MSG_KEYBOARD_HEIGHT(OnKeyBoardHeight)
         CHAIN_MSG_MAP_MEMBER(*m_pNcPainter)
 #if (!DISABLE_SWNDSPY)
         MESSAGE_HANDLER_EX(SPYMSG_SETSPY, OnSpyMsgSetSpy)

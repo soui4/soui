@@ -16,11 +16,12 @@ message("---disable thunk in soui")
 add_definitions(-DENABLE_THUNK=0)
 endif()
 
+set(SOUI_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/..")
 file(GLOB_RECURSE CURRENT_HEADERS  *.h *.hpp)
 file(GLOB_RECURSE CURRENT_SRCS  *.cpp)
 file(GLOB_RECURSE CURRENT_UIRES  *.xml *.idx *.ico)
 file(GLOB_RECURSE CURRENT_RC *.rc *.rc2)
-file(GLOB_RECURSE NANOSVG_HEADERS  ${PROJECT_SOURCE_DIR}/third-part/nanosvg/nanosvg.h)
+file(GLOB_RECURSE NANOSVG_HEADERS  ${SOUI_ROOT_DIR}/third-part/nanosvg/nanosvg.h)
 
 source_group("Header Files" FILES ${CURRENT_HEADERS})
 source_group("Source Files" FILES ${CURRENT_SRCS})
@@ -66,10 +67,10 @@ endif()
 target_include_directories(soui4
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
-  PUBLIC ${PROJECT_SOURCE_DIR}/utilities/include
-  PUBLIC ${PROJECT_SOURCE_DIR}/components
-  PUBLIC ${PROJECT_SOURCE_DIR}/controls.extend
-  PRIVATE ${PROJECT_SOURCE_DIR}/third-part/nanosvg
+  PUBLIC ${SOUI_ROOT_DIR}/utilities/include
+  PUBLIC ${SOUI_ROOT_DIR}/components
+  PUBLIC ${SOUI_ROOT_DIR}/controls.extend
+  PRIVATE ${SOUI_ROOT_DIR}/third-part/nanosvg
 )
 
 add_dependencies(soui4 utilities4)

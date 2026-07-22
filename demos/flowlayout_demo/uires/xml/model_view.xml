@@ -1,0 +1,7 @@
+<modalroot layout="anchor" colorBkgnd="rgba(0,0,0,0.5)">
+    <modalview size="-2,-1" pos="0,0,6" offset="0,-1" layout="vbox" interval="20"
+               enterAnimation="anim:modal_in" exitAnimation="anim:modal_out">
+        <button size="-2,50" name="btn_ok" text="OK"/>
+        <button size="-2,50" name="btn_cancel" text="Cancel"/>
+    </modalview>
+</modalroot>

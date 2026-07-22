@@ -1,4 +1,4 @@
-﻿#ifndef __SMSGLOOP__H__
+#ifndef __SMSGLOOP__H__
 #define __SMSGLOOP__H__
 
 #include <soui_exp.h>
@@ -135,6 +135,15 @@ class SOUI_EXP SMessageLoop : public TObjRefImpl<IMessageLoop> {
      */
     STDMETHOD_(int, HandleMsg)(THIS) OVERRIDE;
 
+    /**
+     * @brief 
+     */
+    STDMETHOD_(void, OnStart)(THIS) OVERRIDE;
+    
+    /**
+     * @brief 
+     */
+    STDMETHOD_(void, OnStop)(THIS) OVERRIDE;
   public:
     /**
      * @brief Checks if a message is an idle message.

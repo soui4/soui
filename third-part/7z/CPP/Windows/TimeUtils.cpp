@@ -5,6 +5,9 @@
 #include <stdint.h>
 #include "Defs.h"
 #include "TimeUtils.h"
+#ifndef _WIN32
+#include <sys/time.h>
+#endif//_WIN32
 
 namespace NWindows {
 namespace NTime {
@@ -188,22 +191,6 @@ void GetCurUtc_FiTime(CFiTime &ft) throw()
  #else
   
   FiTime_Clear(ft);
-#ifdef ZIP7_USE_timespec_get
-  timespec_get(&ft, TIME_UTC);
-#elif defined ZIP7_USE_clock_gettime
-
-#if defined(_AIX)
-  {
-    timespec ts;
-    clock_gettime(CLOCK_REALTIME, &ts);
-    ft.tv_sec = ts.tv_sec;
-    ft.tv_nsec = ts.tv_nsec;
-  }
-#else
-  clock_gettime(CLOCK_REALTIME, &ft);
-#endif
-
-#else
   struct timeval now;
   if (gettimeofday(&now, NULL) == 0)
   {
@@ -214,7 +201,6 @@ void GetCurUtc_FiTime(CFiTime &ft) throw()
       (Int32) // to eliminate compiler conversion error
       (now.tv_usec * 1000);
   }
-#endif
 
  #endif
 }
@@ -226,11 +212,7 @@ void GetCurUtcFileTime(FILETIME &ft) throw()
 #if defined(ZIP7_USE_timespec_get) || \
     defined(ZIP7_USE_clock_gettime)
   timespec ts;
-#if defined(ZIP7_USE_timespec_get)
-  if (timespec_get(&ts, TIME_UTC))
-#else
   if (clock_gettime(CLOCK_REALTIME, &ts) == 0)
-#endif
   {
     v = ((UInt64)ts.tv_sec + kUnixTimeOffset) *
       kNumTimeQuantumsInSecond + (UInt64)ts.tv_nsec / 100;

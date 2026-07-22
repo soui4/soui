@@ -1,4 +1,4 @@
-﻿#ifndef __SMSGLOOP_I__H__
+#ifndef __SMSGLOOP_I__H__
 #define __SMSGLOOP_I__H__
 
 #include <windows.h>
@@ -172,6 +172,16 @@ DECLARE_INTERFACE_(IMessageLoop, IObjRef)
      * @return Return value of message handling.
      */
     STDMETHOD_(int, HandleMsg)(THIS) PURE;
+
+    /**
+     * @brief 
+     */
+    STDMETHOD_(void, OnStart)(THIS) PURE;
+    
+    /**
+     * @brief 
+     */
+    STDMETHOD_(void, OnStop)(THIS) PURE;
 };
 
 #undef INTERFACE

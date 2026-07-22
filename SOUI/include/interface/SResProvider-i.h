@@ -45,6 +45,7 @@ typedef enum BUILTIN_RESTYPE
 {
     RES_PE = 0,
     RES_FILE,
+    RES_ANDROID_ASSET,
 } BUILTIN_RESTYPE;
 
 typedef BOOL(CALLBACK *EnumResCallback)(LPCTSTR pszType, LPCTSTR pszName, LPARAM lp);

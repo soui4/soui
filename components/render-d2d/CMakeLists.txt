@@ -44,9 +44,9 @@ endif()
 
 target_include_directories(render-d2d
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
-  PRIVATE ${PROJECT_SOURCE_DIR}/utilities/include
-  PRIVATE ${PROJECT_SOURCE_DIR}/SOUI/include
-  PRIVATE ${PROJECT_SOURCE_DIR}/third-part/nanosvg
+  PRIVATE ${SOUI_ROOT_DIR}/utilities/include
+  PRIVATE ${SOUI_ROOT_DIR}/SOUI/include
+  PRIVATE ${SOUI_ROOT_DIR}/third-part/nanosvg
 )
 
   

@@ -1817,4 +1817,18 @@ void SGroup::GetDesiredSize(SIZE *psz, int nParentWid, int nParentHei)
         psz->cy += m_nHeaderHeight.toPixelSize(GetScale());
 }
 
+//-------------------------------------------------------------------
+SKeyboardSpacer::SKeyboardSpacer() {
+    m_bFocusable=FALSE;
+    m_bVisible=FALSE;
+}
+
+void SKeyboardSpacer::OnKeyboardHeight(int height)
+{
+    SLayoutSize hei(height,px);
+    m_pLayoutParam->SetSpecifiedSize(Vert,&hei);
+    GetParent()->RequestRelayout();
+}
+
+
 SNSEND

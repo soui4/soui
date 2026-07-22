@@ -113,6 +113,16 @@ void SAnimationSet::copy(const IAnimation *src)
     }
 }
 
+IAnimation *SAnimationSet::clone() const
+{
+    // Preserve the shareInterpolator flag from the source flags so new child
+    // animations inherit the same share-interpolator behavior as the original.
+    bool shareInterpolator = (mFlags & PROPERTY_SHARE_INTERPOLATOR_MASK) != 0;
+    SAnimationSet *pRet = new SAnimationSet(shareInterpolator);
+    pRet->copy(this);
+    return pRet;
+}
+
 void SAnimationSet::scaleCurrentDuration(float scale)
 {
     int count = (int)mAnimations.GetCount();

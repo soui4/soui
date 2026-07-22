@@ -7,6 +7,9 @@
 #include <helper/slog.h>
 #include <resprovider-7zip/zip7resprovider-param.h>
 #include <resprovider-zip/zipresprovider-param.h>
+#ifdef __ANDROID__
+#include <android/asset_manager.h>
+#endif//__ANDROID__
 SNSBEGIN
 
 
@@ -32,6 +35,7 @@ typedef enum _ResType
     ResType_PeFile,   // 资源模块名称
     ResType_ZipFile,  // zip压缩包
     ResType_7zFile,   // 7z压缩包
+    ResType_AndroidAsset,// android assets
 } ResType;
 
 
@@ -69,6 +73,10 @@ public:
     SAppCfg & SetAppResFile(LPCTSTR pszPath);
     SAppCfg & SetAppResZip(LPCTSTR pszZipFile, LPCSTR pszPwd = NULL);
     SAppCfg & SetAppRes7z(LPCTSTR psz7zFile, LPCSTR pszPwd = NULL);
+#ifdef __ANDROID__
+    SAppCfg& SetSysResAndroidAsset(AAssetManager* assetMgr, LPCTSTR pszPath);
+    SAppCfg& SetAppResAndroidAsset(AAssetManager* assetMgr, LPCTSTR pszPath);
+#endif//__ANDROID__
     SAppCfg & SetUidefId(const SStringT &strUidefId);
     SAppCfg & SetLog(BOOL bLogEnable, int nLogLevel = LOG_LEVEL_INFO, LPCSTR pszLogName = NULL);
     SAppCfg & SetAppDir(LPCTSTR pszAppDir);
@@ -84,11 +92,16 @@ class SResDesc {
     SStringT m_szFile;    // 资源文件名
     SStringA m_szPwd;     // 压缩包密码
     HMODULE m_hResModule; // 资源模块句柄
-
+#ifdef __ANDROID__
+    AAssetManager *m_assetMgr;
+#endif//__ANDROID__
     SResDesc()
     {
         m_type = ResType_Unknown;
         m_hResModule = NULL;
+#ifdef __ANDROID__
+        m_assetMgr = NULL;
+#endif//__ANDROID__
     }
 };
 
@@ -122,7 +135,9 @@ class SResLoader {
     BOOL LoadResFromZip(LPCTSTR pszZipFile, LPCSTR pszZipPwd = NULL);
     BOOL LoadResFrom7z(LPCTSTR pszZipFile, LPCSTR pszZipPwd = NULL);
     BOOL LoadResFromRes(HMODULE hResModule);
-
+#ifdef __ANDROID__
+    BOOL LoadResFromAndroidAsset(AAssetManager *assetMgr, LPCTSTR pszPath);
+#endif//__ANDROID__
     SAutoRefPtr<IResProvider> GetResProvider(void) const
     {
         return m_pResProvider;
@@ -187,6 +202,14 @@ BOOL SResLoader::LoadResFromRes(HMODULE hResModule)
     return m_pResProvider->Init((WPARAM)hResModule, 0);
 }
 
+#ifdef __ANDROID__
+BOOL SResLoader::LoadResFromAndroidAsset(AAssetManager *assetMgr, LPCTSTR pszPath)
+{
+    SouiFactory souiFac;
+    m_pResProvider.Attach(souiFac.CreateResProvider(RES_ANDROID_ASSET));
+    return m_pResProvider->Init((WPARAM)assetMgr, (LPARAM)pszPath);
+}
+#endif//__ANDROID__
 //-------------------------------------------------------------
 
 SAppCfg::SAppCfg()
@@ -264,6 +287,24 @@ SAppCfg &SAppCfg::SetSysRes7z(LPCTSTR psz7zFile, LPCSTR pszPwd)
         m_sysResDesc->m_szPwd = pszPwd;
     return *this;
 }
+
+#ifdef __ANDROID__
+SAppCfg& SAppCfg::SetSysResAndroidAsset(AAssetManager* assetMgr, LPCTSTR pszPath)
+{
+    m_sysResDesc->m_type = ResType_AndroidAsset;
+	m_sysResDesc->m_assetMgr = assetMgr;
+    m_sysResDesc->m_szFile = pszPath;
+    return *this;
+}
+
+SAppCfg& SAppCfg::SetAppResAndroidAsset(AAssetManager* assetMgr, LPCTSTR pszPath)
+{
+    m_appResDesc->m_type = ResType_AndroidAsset;
+    m_appResDesc->m_assetMgr = assetMgr;
+    m_appResDesc->m_szFile = pszPath;
+    return *this;
+}
+#endif
 
 SAppCfg &SAppCfg::SetAppResPeHandle(HMODULE hResModule)
 {
@@ -418,6 +459,11 @@ BOOL SAppCfg::DoConfig(SApplication *pApp) const
                 bLoaded = resLoader.LoadResFromRes(hModResource);
             }
             break;
+#ifdef __ANDROID__
+        case ResType_AndroidAsset:
+            bLoaded = resLoader.LoadResFromAndroidAsset(m_sysResDesc->m_assetMgr, m_sysResDesc->m_szFile);
+            break;
+#endif//__ANDROID__
         default:
             SSLOGW() << "Invalid system resource type: " << m_sysResDesc->m_type;
             break;
@@ -462,6 +508,11 @@ BOOL SAppCfg::DoConfig(SApplication *pApp) const
             }
         }
         break;
+#ifdef __ANDROID__
+        case ResType_AndroidAsset:
+            bLoaded = resLoader.LoadResFromAndroidAsset(m_appResDesc->m_assetMgr, m_appResDesc->m_szFile);
+            break;
+#endif
         default:
             SSLOGW() << "Invalid application resource type: " << m_appResDesc->m_type;
         }

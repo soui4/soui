@@ -6,7 +6,13 @@
 #ifndef E_RANGE
 #define E_RANGE 9944
 #endif
-
+#ifdef __ANDROID__
+#include <android/log.h>
+#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
+#define LOGW(...) __android_log_print(ANDROID_LOG_WARN, LOG_TAG, __VA_ARGS__)
+#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+#endif//__ANDROID__
 SNSBEGIN
 
 //////////////////////////////////////////////////////////////////////////
@@ -48,9 +54,21 @@ SLog::~SLog()
     {
         SYSTEMTIME wtm;
         GetLocalTime(&wtm);
+        uint32_t tid = (uint32_t)GetCurrentThreadId();
+#ifdef __ANDROID__
+        int level = ANDROID_LOG_DEBUG;
+        switch(m_level){
+            case LOG_LEVEL_DEBUG: level = ANDROID_LOG_DEBUG; break;
+            case LOG_LEVEL_INFO: level = ANDROID_LOG_INFO; break;
+            case LOG_LEVEL_WARN: level = ANDROID_LOG_WARN; break;
+            case LOG_LEVEL_ERROR: level = ANDROID_LOG_ERROR; break;
+            case LOG_LEVEL_ALARM: level = ANDROID_LOG_ERROR; break;
+            case LOG_LEVEL_FATAL: level = ANDROID_LOG_FATAL; break;
+        }
+        __android_log_print(level, m_tag, "tid=%u,%04d-%02d-%02d %02d:%02d:%02d %03dms %s,%s %s %s:%d", tid, wtm.wYear, wtm.wMonth, wtm.wDay, wtm.wHour, wtm.wMinute, wtm.wSecond, wtm.wMilliseconds, m_tag, m_logBuf, m_func, m_file, m_line);
+#else
         const int kMaxLog = SLog::MAX_LOGLEN + 100;
         char *logbuf2 = (char *)malloc(kMaxLog + 1);
-        uint32_t tid = (uint32_t)GetCurrentThreadId();
         int nLen = _snprintf(logbuf2, kMaxLog, "tid=%u,%04d-%02d-%02d %02d:%02d:%02d %03dms %s,%s %s %s:%d\n", tid, wtm.wYear, wtm.wMonth, wtm.wDay, wtm.wHour, wtm.wMinute, wtm.wSecond, wtm.wMilliseconds, m_tag, m_logBuf, m_func, m_file, m_line);
         if (nLen > 0 && nLen <= kMaxLog)
         {
@@ -66,6 +84,7 @@ SLog::~SLog()
             }
         }
         free(logbuf2);
+#endif//__ANDROID__
     }
 }
 

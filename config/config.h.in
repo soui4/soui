@@ -9,6 +9,7 @@
 #cmakedefine SOUI_ENABLE_ACC
 #cmakedefine SOUI_ENABLE_SPY
 #cmakedefine SOUI_ENABLE_SVG
+#cmakedefine SOUI_ENABLE_SINGLE_HOST
 
 #ifdef _WIN32
 #ifdef SOUI_ENABLE_SPY

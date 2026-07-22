@@ -140,165 +140,6 @@ void SHostWndAttr::SetSendWheel2Hover(bool value)
 }
 
 //////////////////////////////////////////////////////////////////////////
-// SRootWindow
-//////////////////////////////////////////////////////////////////////////
-
-enum
-{
-    kAni4Destroy = 1,
-    kAni4Hide = 2,
-};
-
-enum AniState
-{
-    Ani_none = 0,
-    Ani_win_enter = 1,
-    Ani_win_exit = 2,
-    Ani_win = (Ani_win_enter | Ani_win_exit),
-    Ani_host = 4,
-    Ani_All = (Ani_win | Ani_host),
-};
-
-SRootWindow::SRootWindow()
-    : m_pHostWnd(NULL)
-{
-    GetEventSet()->addEvent(EVENTID(EventInit));
-    GetEventSet()->addEvent(EVENTID(EventExit));
-    GetEventSet()->addEvent(EVENTID(EventMenuCmd));
-    GetEventSet()->addEvent(EVENTID(EventUpdateCmdUI));
-    GetEventSet()->addEvent(EVENTID(EventUpdateCmdTip));
-}
-
-void SRootWindow::OnAnimationInvalidate(bool bErase)
-{
-    if (bErase)
-    {
-        CRect rcWnd = GetClientRect();
-        m_pHostWnd->m_memRT->BeginDraw();
-        m_pHostWnd->m_memRT->ClearRect(rcWnd, 0);
-        m_pHostWnd->m_memRT->EndDraw();
-    }
-    SWindow::OnAnimationInvalidate(bErase);
-    if (!bErase)
-        Update();
-}
-
-void SRootWindow::OnAnimationStop(IAnimation *pAni)
-{
-    SWindow::OnAnimationStop(pAni);
-    if (pAni == m_aniEnter || pAni == m_aniExit)
-    {
-        m_pHostWnd->m_AniState &= ~Ani_win;
-        if (pAni == m_aniExit)
-        {
-            ULONG_PTR data = pAni->getUserData();
-            if (data == kAni4Destroy)
-                m_pHostWnd->SNativeWnd::DestroyWindow();
-            else if (data == kAni4Hide)
-            {
-                m_pHostWnd->SNativeWnd::SetWindowPos(NULL, 0, 0, 0, 0, SWP_HIDEWINDOW | SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOZORDER);
-            }
-            pAni->setUserData(0);
-        }
-    }
-}
-
-void SRootWindow::BeforePaint(IRenderTarget *pRT, SPainter &painter) const
-{
-    m_pHostWnd->OnRootBeforePaint(this, pRT, painter);
-}
-
-void SRootWindow::AfterPaint(IRenderTarget *pRT, SPainter &painter) const
-{
-    m_pHostWnd->OnRootAfterPaint(this, pRT, painter);
-}
-
-void SRootWindow::BuildPainter(SPainter &painter) const{
-    m_pHostWnd->OnRootBuildPainter(this,painter);
-}
-
-void SRootWindow::UpdateLayout()
-{
-    if (!IsLayoutDirty())
-        return;
-    SIZE szAppSet = m_pHostWnd->m_szAppSetted;
-    if ((szAppSet.cx <= 0 || szAppSet.cy <= 0) && GetLayoutParam()->IsWrapContent(Any))
-    {
-        int nWid = szAppSet.cx;
-        if (nWid <= 0)
-        {
-            SLayoutSize layoutSize;
-            GetLayoutParam()->GetSpecifiedSize(Horz, &layoutSize);
-            nWid = layoutSize.toPixelSize(GetScale());
-        }
-        int nHei = szAppSet.cy;
-        if (nHei <= 0)
-        {
-            SLayoutSize layoutSize;
-            GetLayoutParam()->GetSpecifiedSize(Vert, &layoutSize);
-            nHei = layoutSize.toPixelSize(GetScale());
-        }
-        CSize szRoot;
-        GetDesiredSize(&szRoot, nWid, nHei);
-        OnRelayout(CRect(CPoint(), szRoot));
-    }
-    else
-    {
-        SWindow::UpdateLayout();
-    }
-}
-
-HRESULT SRootWindow::OnLanguageChanged()
-{
-    SStringT str = S_CW2T(tr(m_pHostWnd->m_hostAttr.m_strTitle));
-    m_pHostWnd->SetWindowText(str);
-    return 3;
-}
-
-void SRootWindow::OnScaleChanged(int scale)
-{
-    m_layoutDirty = dirty_self;
-    SWindow::OnScaleChanged(scale);
-    SWindow::InvalidateRect(NULL);
-}
-
-void SRootWindow::RequestRelayout(SWND hSource, BOOL bSourceResizable)
-{
-    SWindow *pSource = SWindowMgr::GetWindow(hSource);
-    SASSERT(pSource);
-
-    if (m_layoutDirty != dirty_self)
-        m_layoutDirty = (hSource == m_swnd || bSourceResizable) ? dirty_self : dirty_child;
-
-    CRect rcSour = pSource->GetWindowRect();
-    while (rcSour.IsRectEmpty())
-    {
-        pSource = pSource->GetParent();
-        if (!pSource)
-            break;
-        rcSour = pSource->GetWindowRect();
-    }
-    m_pHostWnd->OnRedraw(rcSour, FALSE);
-}
-
-void SRootWindow::SetHostWnd(SHostWnd *pHostWnd)
-{
-    m_pHostWnd = pHostWnd;
-}
-
-SHostWnd *SRootWindow::GetHostWnd() const
-{
-    return m_pHostWnd;
-}
-
-void SRootWindow::FireMenuCmd(int menuID)
-{
-    EventMenuCmd evt(this);
-    evt.menuId = menuID;
-    FireEvent(evt);
-}
-
-//////////////////////////////////////////////////////////////////////////
 // SHostWnd
 //////////////////////////////////////////////////////////////////////////
 
@@ -386,10 +227,12 @@ void SHostWnd::_Init()
     m_evtHandler.ctx = NULL;
     m_cEnableUiDefCount = 0;
     m_xmlInit = NULL;
+    m_bAttached = FALSE;
 }
 
 SHostWnd::~SHostWnd()
 {
+    SASSERT(!m_hWnd);
     if (m_pRoot)
     {
         m_pRoot->Release();
@@ -445,6 +288,68 @@ HWND SHostWnd::Create(HWND hWndParent, int x, int y, int nWidth, int nHeight)
     if (hWndParent)
         dwStyle |= WS_TABSTOP;
     return CreateEx(hWndParent, dwStyle, 0, x, y, nWidth, nHeight);
+}
+
+BOOL SHostWnd::Attach(HWND hWnd, IXmlNode *xmlInit /*= NULL*/)
+{
+    // 不允许重复绑定：已经有创建/Attach的HWND时直接失败
+    if (NULL != m_hWnd)
+        return FALSE;
+    if (!::IsWindow(hWnd))
+        return NULL;
+    BOOL bSubclassed = SNativeWnd::SubclassWindow(hWnd);
+    if (!bSubclassed)
+        return FALSE;
+    SXmlDoc xmlDoc;
+    SXmlNode xmlRoot;
+    if (!xmlInit)
+    {
+        xmlRoot = OnGetInitXmlNode(xmlDoc);
+        if (!xmlRoot)
+        {
+            if (!m_strXmlLayout.IsEmpty())
+            {
+                SSLOGW() << "OnGetInitXmlNode return empty xml";
+            }
+        }
+        else
+        {
+            xmlInit = &xmlRoot;
+        }
+    }
+    // 读取SOUI窗口属性（与CreateEx保持一致）
+    m_hostAttr.Init();
+    m_hostAttr.InitFromXml(xmlInit);
+    m_xmlInit = xmlInit;
+
+    // 构造CREATESTRUCT模拟WM_CREATE场景，让OnCreate复用初始化流程。
+    // 注意：OnCreate只读取cx/cy两个字段（参见SHostWnd::OnCreate第870-871行），
+    // 其余字段初始化为0/NULL即可，避免引用跨平台不存在的API（如GetMenu）。
+    CREATESTRUCT cs;
+    memset(&cs, 0, sizeof(cs));
+    CRect rcClient;
+    ::GetClientRect(hWnd, &rcClient);
+    cs.cx = rcClient.Width();
+    cs.cy = rcClient.Height();
+    if (SendMessage(WM_CREATE,0, (LPARAM)&cs)!=0) {
+        SNativeWnd::UnsubclassWindow();
+        m_xmlInit=NULL;
+        return FALSE;
+    }
+    m_xmlInit = NULL;
+    OnSize(0,rcClient.Size());
+    m_bAttached = TRUE;
+    return TRUE;
+}
+
+BOOL SHostWnd::Detach() {
+    if (!m_bAttached)
+        return FALSE;
+    SASSERT(::IsWindow(m_hWnd));
+    OnDestroy();
+    m_bAttached = FALSE;
+    HWND hDetached = SNativeWnd::UnsubclassWindow();
+    return (hDetached != NULL);
 }
 
 BOOL SHostWnd::onRootResize(IEvtArgs *e)
@@ -952,13 +857,22 @@ int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 void SHostWnd::OnDestroy()
 {
+    // Clear all modal view sessions before destroying the window
+    while (!m_modalRootStack.IsEmpty())
+    {
+        EndModalViewSession(m_modalRootStack.GetTail()->GetSessionID());
+    }
+
     m_presenter->OnHostDestroy();
     m_presenter = NULL;
-    EventExit evt(GetRoot());
-    GetRoot()->FireEvent(evt);
 
-    GetRoot()->SSendMessage(WM_DESTROY);
-    GetRoot()->SSendMessage(UM_SETSCALE, 100);
+    m_pRoot->LockUpdate();
+    EventExit evt(m_pRoot);
+    m_pRoot->FireEvent(evt);
+    m_pRoot->SSendMessage(WM_DESTROY);
+    m_pRoot->SSendMessage(UM_SETSCALE, 100);
+    m_pRoot->UnlockUpdate();
+
     if (m_pTipCtrl)
     {
         if (m_hostAttr.m_bHasMsgLoop)
@@ -1137,7 +1051,11 @@ LRESULT SHostWnd::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
         break;
     }
 
-    DoFrameEvent(uMsg, wParam, lParam); //将鼠标消息转发到SWindow处理
+    // Message routing for the modal layer is handled by the normal window tree:
+    // the top-most SModalRoot is inserted into SRootWindow::m_pModalContainer
+    // as a full-screen last child, so hit-testing in DoFrameEvent naturally
+    // prefers it over any non-modal windows. No modal-specific dispatch here.
+    DoFrameEvent(uMsg, wParam, lParam);
 
     UpdateTooltip();
 
@@ -1153,6 +1071,15 @@ LRESULT SHostWnd::OnKeyEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
         {
             SetMsgHandled(FALSE);
             return 0;
+        }
+    }
+    if(!m_modalRootStack.IsEmpty()){
+        SModalRoot *pModalRoot = m_modalRootStack.GetTail();
+        if(!pModalRoot->IsFocused()){
+            BOOL bMsgHandled = FALSE;
+            LRESULT lRet = pModalRoot->SSendMessage(uMsg,wParam,lParam,&bMsgHandled);
+            if(bMsgHandled)
+                return lRet;
         }
     }
     LRESULT lRet = DoFrameEvent(uMsg, wParam, lParam);
@@ -1776,6 +1703,10 @@ BOOL SHostWnd::DestroyWindow()
     }
     else
     {
+        if (m_bAttached)
+        {
+            return Detach();
+        }
         return SNativeWnd::DestroyWindow();
     }
 }
@@ -2463,6 +2394,130 @@ void SHostWnd::SHostAnimationHandler::OnNextFrame()
         m_pHostWnd->UnregisterTimelineHandler(this);
         m_pHostWnd->OnHostAnimationStoped(pAni);
     }
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Modal View Session Implementation
+//////////////////////////////////////////////////////////////////////////
+
+/**
+ * @brief Callback for modal view session cleanup.
+ *
+ * This callback is invoked when the modal view's exit animation has completed,
+ * allowing SHostWnd to remove the modal root from the view tree and destroy it.
+ */
+class SModalRootFinishCallback : public TObjRefImpl<IModalViewExitCallback>
+{
+    SHostWnd* m_pHostWnd;
+public:
+    SModalRootFinishCallback(SHostWnd *pHostWnd) : m_pHostWnd(pHostWnd) {}
+
+    void OnModalViewExit(SModalRoot* pModalRoot) override
+    {
+        m_pHostWnd->OnModalViewFinish(pModalRoot);
+    }
+};
+
+/**
+ * @brief Starts a new modal view session.
+ *
+ * @param pModalRoot The modal root window to display.
+ * @return Session ID on success, 0 on failure.
+ */
+ModalViewSessionID SHostWnd::BeginModalViewSession(SModalRoot* pModalRoot)
+{
+    if (!pModalRoot)
+        return 0;
+
+    if (pModalRoot->GetParent())
+    {
+        // The view must not be attached when used for beginModalViewSession
+        return 0;
+    }
+
+    // Bind the session id and exit callback directly to the modal root.
+    pModalRoot->AssignSessionID();
+
+    // Add the modal root tree to the SRootWindow modal container. This call
+    // lazily creates m_pModalContainer if this is the first modal session.
+    SASSERT(m_pRoot != NULL);
+    m_pRoot->InsertChild(pModalRoot);
+	CRect rcLayout;
+    m_pRoot->GetChildrenLayoutRect(&rcLayout);
+    pModalRoot->Move(&rcLayout);
+    // Push the modal root onto the stack (AddRef is handled by SAutoRefPtr).
+    SModalRootPtr ptr(pModalRoot);
+    m_modalRootStack.AddTail(ptr);
+
+    // Initialize focus / capture / relayout / redraw.
+    initModalRoot(pModalRoot);
+
+    return pModalRoot->GetSessionID();
+}
+
+void SHostWnd::OnModalViewFinish(SModalRoot *pModalRoot)
+{
+    m_pRoot->RemoveChild(pModalRoot);
+    pModalRoot->Destroy();
+    // If there's another modal session active under us, reinitialize it
+    // (restore focus to the now top-most modal view).
+    if (!m_modalRootStack.IsEmpty())
+    {
+        initModalRoot(m_modalRootStack.GetTail());
+    }
+}
+
+BOOL SHostWnd::EndModalViewSession(ModalViewSessionID sessionID, int exitCode)
+{
+    if (m_modalRootStack.IsEmpty())
+        return FALSE;
+
+    if (sessionID!=0 && m_modalRootStack.GetTail()->GetSessionID() != sessionID)
+        return FALSE;
+
+    // Grab the top-most modal root and remove it from the stack.
+    SModalRootPtr pModalRoot = m_modalRootStack.GetTail();
+    m_modalRootStack.RemoveTail();
+
+    SASSERT(m_pRoot);
+    SModalRootFinishCallback* pCallback = new SModalRootFinishCallback(this);
+    pModalRoot->endModalViewSession(pCallback, exitCode);
+    pCallback->Release();
+    return TRUE;
+}
+
+ModalViewSessionID SHostWnd::GetLastModalViewSessionID() const
+{
+	if (m_modalRootStack.IsEmpty())
+		return 0;
+	return m_modalRootStack.GetTail()->GetSessionID();
+}
+
+
+
+void SHostWnd::initModalRoot(SModalRoot *pModalRoot)
+{
+    if (!pModalRoot)
+        return;
+    SWindow *pRootWnd = pModalRoot;
+    // Cancel any ongoing mouse operations
+    if (GetCapture())
+    {
+        ReleaseCapture();
+    }
+    SModalView *pTarget = pModalRoot->GetModalView();
+    SASSERT(pTarget);
+    if (pTarget && pTarget->IsFocusable())
+    {
+        pTarget->SetFocus();
+    }
+    pRootWnd->RequestRelayout();
+    pTarget->PlayEnterAnimation();
+    pRootWnd->Invalidate();
+}
+
+void SHostWnd::OnKeyBoardHeight(int keyboardHeight) {
+    GetRoot()->SDispatchMessage(WM_KEYBOARD_HEIGHT, keyboardHeight);
 }
 
 SNSEND

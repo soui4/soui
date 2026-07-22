@@ -5,6 +5,7 @@
 #include <helper/STimer.h>
 #include <core/SHostDialog.h>
 #include <valueAnimator/SValueAnimator.h>
+#include <res.mgr/SResProviderAndroidAsset.h>
 
 SNSBEGIN
 
@@ -62,14 +63,17 @@ IResProvider *SouiFactory::CreateResProvider(THIS_ BUILTIN_RESTYPE resType)
     IResProvider *pObj = NULL;
     switch (resType)
     {
-#ifndef __apple__
     case RES_PE:
         pObj = new SResProviderPE;
         break;
-#endif //__apple__
     case RES_FILE:
         pObj = new SResProviderFiles;
         break;
+    #ifdef __ANDROID__
+    case RES_ANDROID_ASSET:
+        pObj = new SResProviderAndroidAsset;
+        break;
+    #endif//__ANDROID__
     default:
         break;
     }

@@ -278,7 +278,7 @@ void SAnimation::startNow()
 
 void SAnimation::start()
 {
-    setStartTime(-1);
+    setStartTime(START_ON_FIRST_FRAME);
 }
 
 void SAnimation::setStartTime(int64_t startTimeMillis)

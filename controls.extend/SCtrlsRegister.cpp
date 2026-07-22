@@ -10,7 +10,6 @@
 #include "gif/SSkinAni.h"
 #include "gif/SGifPlayer.h"
 #include "SScrollText.h"
-#include "ExtendSkins.h"
 #include "SRatingBar.h"
 #include "SListCtrlEx.h"
 #include "SIPAddressCtrl.h"
@@ -42,6 +41,8 @@
 #include "SColorizeText.h"
 #include "SLrcView.h"
 #include "SSpeedMeter.h"
+#include "SColorMask.h"
+#include "qrcode/SQrCtrl.h"
 #ifdef _WIN32
 #include "SWkeWebkit.h"
 #include "SStaticGdip.h"
@@ -87,6 +88,7 @@ void SCtrlsRegister::RegisterCtrls(SApplication *theApp)
 	theApp->RegisterWindowClass<SColorizeText>();
 	theApp->RegisterWindowClass<SLrcView>();
 	theApp->RegisterWindowClass<SSpeedMeter>();
+	theApp->RegisterWindowClass<SQrCtrl>();
 #ifdef _WIN32
     theApp->RegisterWindowClass<SWkeWebkit>(); // 注册WKE浏览器
     theApp->RegisterWindowClass<SStaticGdip>();

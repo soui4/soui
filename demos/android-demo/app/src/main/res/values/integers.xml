@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Screen ID 常量集中管理。约定：
+    0x0000_D001 — DefaultHostActivity（代码方式启动）
+    0x0000_D002 — XmlHostActivity（XML 方式启动）
+    0x0000_Dxxx — 后续新增 Activity 自行往下顺延
+  这样多 Activity 场景下 ID 全局唯一，不会和 C++ m_screenContexts 其他键冲突。
+-->
+<resources>
+    <integer name="screen_id_default_host">0x0000D001</integer>
+    <integer name="screen_id_xml_host">0x0000D002</integer>
+</resources>

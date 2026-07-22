@@ -32,6 +32,7 @@ class SHexEdit : public SPanel {
     bool IsInsert() const;
     bool GetSelection(UINT &nBegin, UINT &nEnd) const;
     void SetBytesPerRow(UINT nBytesPerRow, bool bAuto, bool bUpdate = false);
+    void SetShowColNumber(bool bShow, bool bUpdate);
     void SetShowAddress(bool bShow, bool bUpdate = false);
     void SetShowAscii(bool bShow, bool bUpdate = false);
     void SetSelection(UINT nBegin, UINT nEnd, bool bMakeVisible, bool bUpdate = false);
@@ -104,6 +105,7 @@ class SHexEdit : public SPanel {
 
     void SetScrollbarRanges();
     void CalculatePaintingDetails(IRenderTarget *pRT);
+    void PaintColNumber(IRenderTarget *pRT);
     void PaintAddresses(IRenderTarget *pRT);
     void PaintHexData(IRenderTarget *pRT);
     void PaintAsciiData(IRenderTarget *pRT);
@@ -167,6 +169,7 @@ class SHexEdit : public SPanel {
         UINT nAsciiLen;
         UINT nAddressPos;
         UINT nAddressLen;
+        UINT nColNumberPos;
         CRect cPaintingRect;
     };
 
@@ -185,6 +188,7 @@ class SHexEdit : public SPanel {
 
     UINT m_nBytesPerRow;
     UINT m_nAdrSize;
+    UINT m_nColNumberSize;
     bool m_bAutoBytesPerRow;
     DWORD m_dwZeroAddr;
     UINT m_nHighlightedEnd;
@@ -211,6 +215,7 @@ class SHexEdit : public SPanel {
 
     bool m_overwriteMode;
     bool m_bShowAddress;
+    bool m_bShowColNumber;
     bool m_bShowAscii;
     bool m_bReadOnly;
 

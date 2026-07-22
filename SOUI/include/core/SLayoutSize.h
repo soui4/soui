@@ -2,7 +2,7 @@
 #define __SLAYOUTSIZE__H__
 
 #include <interface/slayout-i.h>
-
+#include <string/tstring.h>
 SNSBEGIN
 
 namespace LayoutSize_Style

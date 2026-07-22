@@ -519,13 +519,92 @@ void SAnimatorSet::onEvaluateValue(float fraction)
 
 IValueAnimator *SAnimatorSet::clone() const
 {
-    // Return NULL for now - cloning AnimatorSet is complex
-    return NULL;
+    SAnimatorSet *pRet = new SAnimatorSet();
+    // 多继承下存在两条 IValueAnimator 虚基类路径，显式先转成 IAnimatorSet* 消除歧义
+    pRet->copy(static_cast<const IAnimatorSet *>(this));
+    return static_cast<IValueAnimator *>(static_cast<IAnimatorSet *>(pRet));
 }
 
 void SAnimatorSet::copy(const IValueAnimator *src)
 {
-    // Copy implementation would go here if needed
+    // 注意：SAnimatorSet 通过 TValueAnimatorProxy<IAnimatorSet> 有两条 IValueAnimator 子对象
+    // （SValueAnimator 一条，IAnimatorSet 一条）。因此 sobj_cast 不能直接 cast 到 SAnimatorSet
+    // （IObject* → SAnimatorSet* 有歧义）。正确做法：先 sobj_cast 到接口 IAnimatorSet*
+    // （接口继承是唯一的：IValueAnimator → IAnimatorSet），再向下 static_cast 到 SAnimatorSet。
+    const IAnimatorSet *pIASrc = sobj_cast<const IAnimatorSet>(src);
+    if (!pIASrc)
+        return;
+    const SAnimatorSet *src2 = static_cast<const SAnimatorSet *>(pIASrc);
+
+    // 1. 复制 SValueAnimator 基类的配置属性（duration/startDelay/repeat/interpolator 等）
+    SValueAnimator::copy(src);
+
+    // 2. 复制 AnimatorSet 自身属性
+    mPlayMode = src2->mPlayMode;
+
+    // 清空现有子节点（释放旧的 AnimatorNode 及其映射）
+    cleanup();
+
+    // 3. 为每个源 AnimatorNode 创建克隆的 Animator 和 新的 AnimatorNode，
+    //    并建立 [源AnimatorNode指针 -> 目标AnimatorNode指针] 映射表以重建依赖关系。
+    SMap<AnimatorNode *, AnimatorNode *> nodeMap;
+    int count = (int)src2->mAnimatorNodes.GetCount();
+    nodeMap.InitHashTable(smax(17, count * 2 + 1));
+    for (int i = 0; i < count; i++)
+    {
+        AnimatorNode *srcNode = src2->mAnimatorNodes[i];
+        SAutoRefPtr<IValueAnimator> clonedAni;
+        clonedAni.Attach(srcNode->animator->clone());
+        if (!clonedAni)
+            continue;  // 子 animator 无法克隆时跳过，确保克隆流程不崩溃
+
+        AnimatorNode *dstNode = new AnimatorNode(clonedAni);
+        // 保留 startTime（因为 startTime 由 calculateStartTimes 基于依赖算出；但 started 这类运行态标志应保持默认 false）
+        dstNode->startTime = srcNode->startTime;
+
+        // clonedAni.Get() 返回 IValueAnimator* 是经过 IValueAnimator::clone() 标准偏移的指针，
+        // 可直接用作 Map 键，不存在基类路径歧义。
+        mAnimatorToNodeMap[clonedAni.Get()] = dstNode;
+        mAnimatorNodes.Add(dstNode);
+        nodeMap[srcNode] = dstNode;
+    }
+
+    // 4. 用映射表重建 afterNodes / withNodes / beforeNodes 依赖关系
+    for (int i = 0; i < count; i++)
+    {
+        AnimatorNode *srcNode = src2->mAnimatorNodes[i];
+        AnimatorNode *dstNode = NULL;
+        if (!nodeMap.Lookup(srcNode, dstNode) || !dstNode)
+            continue;
+
+        // afterNodes
+        for (int j = 0; j < (int)srcNode->afterNodes.GetCount(); j++)
+        {
+            AnimatorNode *srcAfter = srcNode->afterNodes[j];
+            AnimatorNode *dstAfter = NULL;
+            if (nodeMap.Lookup(srcAfter, dstAfter) && dstAfter)
+                dstNode->afterNodes.Add(dstAfter);
+        }
+        // withNodes
+        for (int j = 0; j < (int)srcNode->withNodes.GetCount(); j++)
+        {
+            AnimatorNode *srcWith = srcNode->withNodes[j];
+            AnimatorNode *dstWith = NULL;
+            if (nodeMap.Lookup(srcWith, dstWith) && dstWith)
+                dstNode->withNodes.Add(dstWith);
+        }
+        // beforeNodes
+        for (int j = 0; j < (int)srcNode->beforeNodes.GetCount(); j++)
+        {
+            AnimatorNode *srcBefore = srcNode->beforeNodes[j];
+            AnimatorNode *dstBefore = NULL;
+            if (nodeMap.Lookup(srcBefore, dstBefore) && dstBefore)
+                dstNode->beforeNodes.Add(dstBefore);
+        }
+    }
+
+    // mCurrentPlayTime/mSetStartTime/mAnimatedFraction/mRunningAnimators 都是运行期状态，
+    // 保持默认（0/-1/空）即可，克隆只复制「配置属性+结构+依赖」，不复制运行状态。
 }
 
 SNSEND
