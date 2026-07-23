@@ -17,3 +17,4 @@ dependencyResolutionManagement {
 rootProject.name = "soui-android-demo"
 
 include ':app'
+include ':soui-android-lib'

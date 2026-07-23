@@ -16,7 +16,7 @@ import android.view.WindowInsetsAnimation;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.soui.demo.R;
+import com.soui.android.R;
 
 import java.util.List;
 

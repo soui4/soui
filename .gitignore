@@ -66,5 +66,5 @@ vstgui/
 .idea/
 local.properties
 gradle-wrapper.jar
-demos/android-demo2/
 .cxx/
+demos/android-demo/soui-android-lib/assets

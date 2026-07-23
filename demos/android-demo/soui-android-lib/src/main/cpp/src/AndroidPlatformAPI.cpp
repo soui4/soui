@@ -5,10 +5,10 @@
 #include <souistd.h>
 #include <map>
 #include <helper/slog.h>
+#include <soui4android.h>
 #define kLogTag "AndroidPlatformAPI"
 
 using namespace SNS;
-extern JavaVM *g_javaVM;
 
 static Soui4AndroidEntry * s_entry=nullptr;
 void InitSoui4AndroidEntry(Soui4AndroidEntry * entry){

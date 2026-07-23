@@ -6,9 +6,8 @@
 #include <souistd.h>
 #include <SAppCfg.h>
 #include <logdef.h>
-#include "AndroidPlatformAPI.h"
+#include <soui4android.h>
 #include "SouiRealWndHandler.h"
-#include "SouiSurfaceProxy.h"
 #include "MainDlg.h"
 #include <helper/slog.h>
 
@@ -68,7 +67,7 @@ HWND SouiAndroidApp::ScreenStartup(long screenId, LPCSTR pszLayout) {
         SLOGE() << "SouiStartup: invalid args (screenId=" << screenId << ", m_souiApp=" << (void*)m_souiApp << ")";
         return 0;
     }
-    AndroidPlatformAPI& api = AndroidPlatformAPI::instance();
+    //AndroidPlatformAPI& api = AndroidPlatformAPI::instance();
     LPCSTR layout = pszLayout;
     auto existing = m_screenHostMap.find(screenId);
     if (existing != m_screenHostMap.end()) {
@@ -89,8 +88,8 @@ HWND SouiAndroidApp::ScreenStartup(long screenId, LPCSTR pszLayout) {
         return 0;
     }
     pDlg->SendMessage(WM_INITDIALOG);
-    int wid = api.getScreenWidth();
-    int hei = api.getScreenHeight();
+    //int wid = api.getScreenWidth();
+    //int hei = api.getScreenHeight();
     pDlg->ShowWindow(SW_SHOW);
 
     HWND ret = pDlg->m_hWnd;

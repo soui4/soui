@@ -19,27 +19,19 @@ android {
         externalNativeBuild {
             cmake {
                 cppFlags "-std=c++17 -fexceptions -frtti"
-                arguments "-DANDROID_STL=c++_shared",
-                          // 把 SOUI 根目录注入给 CMake：
-                          //   - SOUI/swinx/utilities 的公共头（SHostWnd 等）
-                          //   - soui-android-lib/src/main/cpp 的 SouiViewNative.h
-                          // （不触发任何编译，仅 demo 自身的 CMainDlg.cpp 需要这些头）
-                          "-DSOUI_ROOT_DIR=${rootDir}/../.."
+                arguments "-DANDROID_STL=c++_shared"
             }
         }
         ndk {
             abiFilters 'x86', 'arm64-v8a','x86_64', 'armeabi-v7a'
         }
-        // soui-android-lib 的 Android 资源（res/soui/layout/demo_layout.xml）是放在
-        // library 的 res 里的，AAR 会传递到 app，所以 DefaultHostActivity 用
-        // "demo_layout" 名能找到；如果要自定义 uires.idx 打包方式，再启用下面合并：
-        // sourceSets { main.assets.srcDirs += '../../soui-android-lib/src/main/assets' }
     }
 
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
         }
     }
 
@@ -62,6 +54,9 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.11.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+
+    // 引用 soui-android-lib 模块
+    implementation project(':soui-android-lib')
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
