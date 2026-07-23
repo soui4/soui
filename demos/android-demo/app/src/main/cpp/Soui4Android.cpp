@@ -154,10 +154,10 @@ Java_com_soui_android_SouiPlatformBridge_nativeViewFromHwnd(JNIEnv *env, jclass 
 
 
 JNIEXPORT jlong JNICALL
-Java_com_soui_android_SouiPlatformBridge_nativeSouiStartup(JNIEnv *env, jobject thiz,
-                                                   jlong screenId,
-                                                   jlong screenHwnd,
-                                                   jstring jLayout) {
+Java_com_soui_android_SouiPlatformBridge_nativeScreenStartup(JNIEnv *env, jobject thiz,
+                                                             jlong screenId,
+                                                             jlong screenHwnd,
+                                                             jstring jLayout) {
     (void)thiz;
     if (screenId == 0L) {
         SLOGW()<<"nativeSouiStartup: ignored (screenId="<<(long long)screenId<<")";
@@ -175,7 +175,7 @@ Java_com_soui_android_SouiPlatformBridge_nativeSouiStartup(JNIEnv *env, jobject 
         layout = env->GetStringUTFChars(jLayout, nullptr);
     }
     // 一个入口 = 注册 + 启动 原子完成。
-    HWND hWnd = AndroidPlatformAPI::instance().souiStartup(env, screenId, layout);
+    HWND hWnd = AndroidPlatformAPI::instance().screenStartup(env, screenId, layout);
 
     if (layout) {
         env->ReleaseStringUTFChars(jLayout, layout);
@@ -184,8 +184,8 @@ Java_com_soui_android_SouiPlatformBridge_nativeSouiStartup(JNIEnv *env, jobject 
 }
 
 JNIEXPORT void JNICALL
-Java_com_soui_android_SouiPlatformBridge_nativeSouiShutdown(JNIEnv *env, jobject thiz,
-                                                   jlong screenId) {
+Java_com_soui_android_SouiPlatformBridge_nativeScreenShutdown(JNIEnv *env, jobject thiz,
+                                                              jlong screenId) {
     (void)thiz;
     if (screenId == 0L) {
         SLOGW()<<"nativeSouiShutdown: screenId==0 ignored";
@@ -194,7 +194,7 @@ Java_com_soui_android_SouiPlatformBridge_nativeSouiShutdown(JNIEnv *env, jobject
     HWND hwndScreen = AndroidPlatformAPI::instance().getScreenHwnd(screenId);
     SLOGI()<<"nativeSouiShutdown, screenId="<<screenId<<" screen hwnd="<<hwndScreen;
     // 一个入口 = 业务销毁 + unregister（DeleteGlobalRef / 擦 bookkeeping / 擦 Context）原子完成。
-    AndroidPlatformAPI::instance().souiShutdown(env, screenId);
+    AndroidPlatformAPI::instance().screenShutdown(env, screenId);
     AndroidPlatformAPI::instance().eraseScreen(screenId);
     UnregisterVirtualHWND(hwndScreen);
 }

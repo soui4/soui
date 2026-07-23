@@ -24,7 +24,7 @@ namespace {
     }
 }
 
-AndroidPlatformAPI::AndroidPlatformAPI():m_theApp(NULL) {
+AndroidPlatformAPI::AndroidPlatformAPI() {
     SLOGI()<<"AndroidPlatformAPI created";
 }
 
@@ -135,7 +135,7 @@ void AndroidPlatformAPI::init(JNIEnv *env, jobject bridge, jobject ctx) {
         env->DeleteLocalRef(clsNativeWnd);
     }
 
-    // 3) SouiWindow.getSurfaceView（souiStartup/souiShutdown 辅助取 Surface）
+    // 3) SouiWindow.getSurfaceView（screenStartup/screenShutdown 辅助取 Surface）
     {
         jclass clsNwg = env->FindClass("com/soui/android/SouiWindow");
         if (clsNwg) {
@@ -770,26 +770,22 @@ jlong AndroidPlatformAPI::getActiveScreenId() const {
     return m_activeScreenStack.empty() ? 0 : m_activeScreenStack.back();
 }
 
-HWND AndroidPlatformAPI::souiStartup(JNIEnv* env, jlong screenId,const char* layout) {
+HWND AndroidPlatformAPI::screenStartup(JNIEnv* env, jlong screenId, const char* layout) {
     if (!env || screenId == 0)
         return 0;
     pushActiveScreen(screenId);
     SASSERT(s_entry);
-    return s_entry->Startup(screenId, layout);
+    return s_entry->ScreenStartup(screenId, layout);
 }
 
-void AndroidPlatformAPI::souiShutdown(JNIEnv* env, jlong screenId) {
+void AndroidPlatformAPI::screenShutdown(JNIEnv* env, jlong screenId) {
     if (!env || screenId == 0) return;
     SASSERT(s_entry);
-    s_entry->Shutdown(screenId);
+    s_entry->ScreenShutdown(screenId);
     popActiveScreen(screenId);
 }
 
 bool AndroidPlatformAPI::initSouiApp(JNIEnv *env, jobject assetManagerJ, jstring appFilesDirJ) {
-    if (m_theApp) {
-        SLOGW()<<"AndroidPlatformAPI::initSouiApp, SApplication already initialized, skip";
-        return false;
-    }
     // ---- 参数解析 ----
     AAssetManager* assetMgr = AAssetManager_fromJava(env, assetManagerJ);
     if (!assetMgr) {
@@ -805,20 +801,20 @@ bool AndroidPlatformAPI::initSouiApp(JNIEnv *env, jobject assetManagerJ, jstring
     const char* appFilesDir = env->GetStringUTFChars(appFilesDirJ, nullptr);
     SLOGI()<<"nativeInitSouiApp: AAssetManager*="<<assetMgr<<" filesDir="<<appFilesDir;
     SASSERT(s_entry);
-    m_theApp = s_entry->InitApp(assetMgr,appFilesDir);
+    BOOL ret = s_entry->InitApp(assetMgr,appFilesDir);
     env->ReleaseStringUTFChars(appFilesDirJ,appFilesDir);
-    if(!m_theApp)
-        return false;
-    m_theApp->GetMsgLoop()->OnStart();
-    return true;
+    if(ret){
+        SApplication::getSingletonPtr()->GetMsgLoop()->OnStart();
+    }
+    return ret;
 }
 
 void AndroidPlatformAPI::uninitSouiApp(JNIEnv *env) {
     SASSERT(s_entry);
-    if(m_theApp){
-        s_entry->UninitApp(m_theApp);
-        m_theApp->GetMsgLoop()->OnStop();
-        m_theApp=nullptr;
+    SApplication *theApp = SApplication::getSingletonPtr();
+    if(theApp){
+        theApp->GetMsgLoop()->OnStop();
+        s_entry->UninitApp();
     }
 }
 

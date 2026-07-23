@@ -26,7 +26,7 @@ Compared to traditional cross-platform development frameworks (such as Qt, GTK),
 
 - **Smaller Size**: SOUI's core compiles to approximately 2MB, compared to Qt's hundreds of MB, taking up less space and offering easier deployment
 - **Shallower API Wrapping**: SOUI provides closer-to-native API wrapping (events are passed to SOUI for processing after system events are captured, requiring only one forwarding), meaning higher runtime efficiency and lower performance overhead
-- **Faster Startup Speed**: Due to its smaller size, SOUI applications start faster
+- **Faster ScreenStartup Speed**: Due to its smaller size, SOUI applications start faster
 
 ### Comparison with GTK
 

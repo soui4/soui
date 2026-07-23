@@ -155,15 +155,15 @@ SOUI 的"HWND 树"在 Android 上直接映射为标准的 Android `View / ViewGr
 
 一个 Android App 里往往有多个 Activity，每个 Activity 都可能承载自己的 SouiScreen；C++ 需要知道"创建一个顶级窗口（WS_POPUP/WS_OVERLAPPED）时，应该把它加到哪个 SouiScreen 的 View 树里"。方案：
 
-- **激活栈机制**：`AndroidPlatformAPI` 维护 `m_activeScreenStack`（vector<jlong>），`souiStartup` 时 push，`souiShutdown` 时 pop。创建窗口遇到 `hWndParent=HWND_DESKTOP(0)` 时，从栈顶取当前激活的 screenId。
+- **激活栈机制**：`AndroidPlatformAPI` 维护 `m_activeScreenStack`（vector<jlong>），`screenStartup` 时 push，`screenShutdown` 时 pop。创建窗口遇到 `hWndParent=HWND_DESKTOP(0)` 时，从栈顶取当前激活的 screenId。
 - **Screen Context 映射**：`m_screenContexts`（map<jlong, HWND>）存储 screenId 到其 Surface HWND 的映射。
-- **原子启动**：Java 层 `SouiPlatformBridge.souiStartup(screenId, screenHwnd, layout)` 一次 JNI 调用完成四件事：
+- **原子启动**：Java 层 `SouiPlatformBridge.screenStartup(screenId, screenHwnd, layout)` 一次 JNI 调用完成四件事：
   1. `RegisterVirtualHWND` 注册虚拟 HWND
   2. `setScreenHwnd` 写入 screenId → HWND 映射
   3. `pushActiveScreen` 压入激活栈
-  4. 调用 `s_entry->Startup(screenId, layout)` 创建主窗口（通过 `Soui4AndroidEntry` 虚函数接口）
-- **原子销毁**：`souiShutdown(screenId)` 调用 `s_entry->Shutdown(screenId)` → `popActiveScreen` → `eraseScreen` → `UnregisterVirtualHWND`。
-- **启动流程优化**：`SouiScreen.onAttachedToWindow` 中，若 `mScreenId != 0` 才调用 `souiStartup`，避免未配置 screenId 时的误启动。
+  4. 调用 `s_entry->ScreenStartup(screenId, layout)` 创建主窗口（通过 `Soui4AndroidEntry` 虚函数接口）
+- **原子销毁**：`screenShutdown(screenId)` 调用 `s_entry->ScreenShutdown(screenId)` → `popActiveScreen` → `eraseScreen` → `UnregisterVirtualHWND`。
+- **启动流程优化**：`SouiScreen.onAttachedToWindow` 中，若 `mScreenId != 0` 才调用 `screenStartup`，避免未配置 screenId 时的误启动。
 
 **启动参数传递**：
 - `screenId`：唯一标识当前 Screen，用于多 Activity 场景下的窗口路由
@@ -180,13 +180,13 @@ SOUI 的"HWND 树"在 Android 上直接映射为标准的 Android `View / ViewGr
 Android 的配置变更（如屏幕旋转）会触发 Activity 重建，导致所有 View 被销毁后重新创建。由于 SOUI 的所有 HWND 都映射到 Java 层的 View 对象（`SouiSurface` / `SouiWindow`），这些 HWND 也会随之销毁和重建。
 
 **生命周期绑定**：
-- `SouiScreen.onAttachedToWindow()`：调用 `souiStartup` 创建 C++ 窗口系统
-- `SouiScreen.onDetachedFromWindow()`：调用 `souiShutdown` 销毁 C++ 窗口系统
+- `SouiScreen.onAttachedToWindow()`：调用 `screenStartup` 创建 C++ 窗口系统
+- `SouiScreen.onDetachedFromWindow()`：调用 `screenShutdown` 销毁 C++ 窗口系统
 - `SouiScreen.onSizeChanged()`：调用 `moveWindow` 和 `updateScreenSize` 更新窗口尺寸
 
 **旋转行为**：
-1. Activity 销毁 → `onDetachedFromWindow` → `souiShutdown` → 所有 C++ HWND 销毁
-2. Activity 重建 → `onAttachedToWindow` → `souiStartup` → 重新创建 C++ 窗口系统
+1. Activity 销毁 → `onDetachedFromWindow` → `screenShutdown` → 所有 C++ HWND 销毁
+2. Activity 重建 → `onAttachedToWindow` → `screenStartup` → 重新创建 C++ 窗口系统
 
 **注意事项**：
 - C++ 层窗口状态（如控件内容、滚动位置）在旋转时会丢失，需要业务层自行保存和恢复
@@ -398,7 +398,7 @@ Qt 传统 Android 适配（Android QPA 插件）：<sup>[\[1\]](https://doc-snap
 </FrameLayout>
 ```
 
-`SouiScreen.Init` 在构造阶段读取属性 → `onAttachedToWindow` 自动调用 `souiStartup`。Activity 的 `onCreate` 只需一行 `setContentView(R.layout.activity_xml_host)`（见 [XmlHostActivity.java](../demos/android-demo/app/src/main/java/com/soui/demo/XmlHostActivity.java)），**零 SOUI 相关样板代码**。
+`SouiScreen.Init` 在构造阶段读取属性 → `onAttachedToWindow` 自动调用 `screenStartup`。Activity 的 `onCreate` 只需一行 `setContentView(R.layout.activity_xml_host)`（见 [XmlHostActivity.java](../demos/android-demo/app/src/main/java/com/soui/demo/XmlHostActivity.java)），**零 SOUI 相关样板代码**。
 
 ### 4.4 JNI 双向调用天然友好：C++ 直接调 Android 原生 API 示例
 
@@ -468,7 +468,7 @@ cd d:\work\soui4\demos\android-demo
 
 **C++ 编译说明（重要）**：Demo 的 CMake 不把 SOUI 当预建 AAR 依赖，而是**直接 `add_subdirectory`** 了 `SWINX_DIR`、`UTILITIES_DIR`、`SOUI_SOURCE_DIR`、`THIRD_PART_DIR`、`COMPONENTS_DIR` 五个子目录（见 [CMakeLists.txt](../demos/android-demo/app/src/main/cpp/CMakeLists.txt#L101-L112)），全部与 demo 业务代码 (`AndroidPlatformAPI.cpp / SouiSurfaceProxy.cpp / MainDlg.cpp / demo_native.cpp`) 编译进单体 `libsoui-android-demo.so`。好处是便于在 Android Studio 里单步调试 C++ 层。生产 SDK 形式可以拆分：SOUI 核心 → AAR（`libsoui-android.so`），业务层单独 link。
 
-**C++ 入口方式**：采用 `Soui4AndroidEntry` 抽象类 + 虚函数调用模式。用户实现 `Soui4AndroidEntry` 的四个虚函数（`InitApp`、`UninitApp`、`Startup`、`Shutdown`），通过全局静态变量注册到系统。`AndroidPlatformAPI` 内部通过 `s_entry` 指针调用这些虚函数，实现平台层与业务层的解耦。见 [demo_native.cpp](../demos/android-demo/app/src/main/cpp/demo_native.cpp)。
+**C++ 入口方式**：采用 `Soui4AndroidEntry` 抽象类 + 虚函数调用模式。用户实现 `Soui4AndroidEntry` 的四个虚函数（`InitApp`、`UninitApp`、`ScreenStartup`、`ScreenShutdown`），通过全局静态变量注册到系统。`AndroidPlatformAPI` 内部通过 `s_entry` 指针调用这些虚函数，实现平台层与业务层的解耦。见 [demo_native.cpp](../demos/android-demo/app/src/main/cpp/demo_native.cpp)。
 
 ### 5.3 Demo 功能结构
 
@@ -476,7 +476,7 @@ cd d:\work\soui4\demos\android-demo
 
 **入口 A：DefaultHostActivity（代码方式）**
 - `SCREEN_ID = 0x0000_D001L`，`LAYOUT_DEMO = "layout:dlg_main"`（对应 assets/uires/xml/dlg_main.xml）。
-- `mScreen = new SouiScreen(this)` → `setScreenId / setSouiLayout` → `FrameLayout.addView(mScreen, MATCH_PARENT)` → `onAttachedToWindow` 自动调用 `souiStartup` → C++ 调 `SHostWnd::Create(NULL)` 创建主窗口。
+- `mScreen = new SouiScreen(this)` → `setScreenId / setSouiLayout` → `FrameLayout.addView(mScreen, MATCH_PARENT)` → `onAttachedToWindow` 自动调用 `screenStartup` → C++ 调 `SHostWnd::Create(NULL)` 创建主窗口。
 - `setOnEmptyListener`：当所有子 SOUI 窗口都被销毁（只剩 Screen 自己的 Surface）时 `finish()` Activity，对应"关闭最后一个窗口自动退出"语义。
 
 **入口 B：XmlHostActivity（XML 声明方式）**
@@ -548,7 +548,7 @@ Java 层（`app/src/main/java/com/soui/`）：
 | [SouiAbsLayout.java](../demos/android-demo/app/src/main/java/com/soui/android/SouiAbsLayout.java) | 绝对布局基类；提供 measure/layout 引擎 + MarginLayoutParams 兼容 + 子 View 位置/尺寸更新方法。 |
 | [SouiAbsWindow.java](../demos/android-demo/app/src/main/java/com/soui/android/SouiAbsWindow.java) | 单 HWND 容器的抽象：主 Surface MATCH_PARENT 规则。 |
 | [SouiWindow.java](../demos/android-demo/app/src/main/java/com/soui/android/SouiWindow.java) | 单 HWND 具体容器：`newSurface` 创建主 Surface、设置自身 LayoutParams、可见性/禁用初始值。 |
-| [SouiScreen.java](../demos/android-demo/app/src/main/java/com/soui/android/SouiScreen.java) | 桌面容器（GetDesktopWindow），继承自 SouiWindow：screenId 启动参数、生命周期管理（onAttached→souiStartup/onDetached→souiShutdown）、尺寸同步、空状态监听、键盘高度监听。 |
+| [SouiScreen.java](../demos/android-demo/app/src/main/java/com/soui/android/SouiScreen.java) | 桌面容器（GetDesktopWindow），继承自 SouiWindow：screenId 启动参数、生命周期管理（onAttached→screenStartup/onDetached→screenShutdown）、尺寸同步、空状态监听、键盘高度监听。 |
 | [SouiBaseSurface.java](../demos/android-demo/app/src/main/java/com/soui/android/SouiBaseSurface.java) | Surface 基类：输入事件分发 → Capture 重定向 → nativeOnMotionEventEx，IME 输入支持。 |
 | [SouiSurface.java](../demos/android-demo/app/src/main/java/com/soui/android/SouiSurface.java) | 具体渲染 Surface：离屏 Bitmap + nativeRender → canvas.drawBitmap，SIMD 颜色通道转换。 |
 | [NativeWindowDelegate.java](../demos/android-demo/app/src/main/java/com/soui/android/NativeWindowDelegate.java) | INativeWindow 的通用委托实现：窗口状态操作集中处理，支持 message-only 窗口。 |
@@ -565,7 +565,7 @@ C++ 层（`app/src/main/cpp/`）：
 | [AndroidPlatformAPIReg.cpp](../demos/android-demo/app/src/main/cpp/AndroidPlatformAPIReg.cpp) | PlatformAPI 注册（RegisterAndroidPlatformAPI）。 |
 | [SouiSurfaceProxy.h](../demos/android-demo/app/src/main/cpp/SouiSurfaceProxy.h) / [.cpp](../demos/android-demo/app/src/main/cpp/SouiSurfaceProxy.cpp) | 每个 Surface 的 native 侧对应：Motion 事件 → Win32 MSG 派发（支持双击、右键、滚轮、悬停）；Bitmap 像素锁 + Skia 渲染；键盘事件转换（支持 ALT 修饰键）；SIMD BGRA→RGBA 颜色通道转换。 |
 | [Soui4Android.cpp](../demos/android-demo/app/src/main/cpp/Soui4Android.cpp) | JNI 方法实现：NativeCreate/NativeDestroy/nativeOnMotionEventEx/nativeOnKeyEventEx/nativeSouiStartup/nativeSouiShutdown/字符串槽读写等。 |
-| [demo_native.cpp](../demos/android-demo/app/src/main/cpp/demo_native.cpp) | Demo 启动实现：`Soui4AndroidEntry` 抽象类实现，通过 `InitSoui4AndroidEntry` 注册入口，提供 `InitApp/UninitApp/Startup/Shutdown` 虚函数接口。 |
+| [demo_native.cpp](../demos/android-demo/app/src/main/cpp/demo_native.cpp) | Demo 启动实现：`Soui4AndroidEntry` 抽象类实现，通过 `InitSoui4AndroidEntry` 注册入口，提供 `InitApp/UninitApp/ScreenStartup/ScreenShutdown` 虚函数接口。 |
 | [MainDlg.h](../demos/android-demo/app/src/main/cpp/MainDlg.h) / [.cpp](../demos/android-demo/app/src/main/cpp/MainDlg.cpp) | 顶层 SHostWnd 业务：按钮点击计数、主题色、定时器、ShowToastAndroid。 |
 | [SouiRealWndHandler.h](../demos/android-demo/app/src/main/cpp/SouiRealWndHandler.h) / [.cpp](../demos/android-demo/app/src/main/cpp/SouiRealWndHandler.cpp) | SOUI 真实窗口处理器：OnRealWndCreate/OnRealWndDestroy。 |
 | [Android_Edit.cpp](../demos/android-demo/app/src/main/cpp/Android_Edit.cpp) | 原生 EDIT 控件 WNDPROC，处理字符串消息的 Slot 化转换，支持 IME 输入。 |

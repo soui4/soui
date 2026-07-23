@@ -129,7 +129,7 @@
 > 1. **零 ART GC 压力**：Java 原生每一个 View/Compose Node/LazyList Item 都是 ART 堆对象（ViewHolder 里 1 个 ConstraintLayout + 1 个 ImageView + 3 个 TextView = 5 个对象，长列表一次滑过 = 成百上千次分配/回收），直接触发 GC 卡顿（`ART : Background young concurrent copying GC freed 123840(6MB) AllocSpace objects, 2(128KB) LOS objects, 33% free`）。**SOUI 的 SWindow/SHostWnd 是 C++ `new/delete` / `std::unique_ptr`，不走 ART 堆，永远不会因为 UI 对象分配触发 Java GC。** 这在工业 App 长时间运行（7x24 小时开机不杀进程）、列表高频滑动场景是决定性的稳定性优势。
 > 2. **跨语言调用边界收敛、往返次数少**：一次触摸事件从 `MotionEvent` → JNI `onTouchEvent` 一次进入 C++，之后在 C++ 里跑完 HitTest + EventMap + InvalidateRect，最后通过一次 `view.invalidate()` 回调 Java 上屏。全程**一次进 + 一次出 = 2 次 JNI**。原生 Java 写一个列表 Item 点击，事件路径是：DecorView → ViewGroup dispatch → ItemView onTouch → clickListener → Adapter.notifyItemChanged → ViewHolder bind → 多次 getter/setter 访问跨模块 → 触发 Choreographer 下一帧重绘，跨方法/跨类调用几十次以上，且伴随大量临时对象分配。
 > 3. **数据内存布局 CPU cache 友好**：SOUI SWindow 的状态（位置/大小/颜色/字体/可见性）是 C++ POD 字段连续布局，遍历 SWindow 树做 Layout/Paint 时 CPU L1/L2 cache hit 率高。Java View 每个对象都有对象头 + klass 指针 + 字段分散在堆上，做一次 requestLayout 遍历树 cache miss 率非常高。
-> 4. **DEX 方法数压力小**：SOUI 所有控件（SButton/SEdit/SList/SGrid/STabCtrl）都是 C++ 方法，不占 Android 65536 DEX 方法数配额，不需要配置 multidex 对 5.0 以下机型做分包。原生 Java 项目稍微写大一点就要 Multidex + App Startup 优化类加载。
+> 4. **DEX 方法数压力小**：SOUI 所有控件（SButton/SEdit/SList/SGrid/STabCtrl）都是 C++ 方法，不占 Android 65536 DEX 方法数配额，不需要配置 multidex 对 5.0 以下机型做分包。原生 Java 项目稍微写大一点就要 Multidex + App ScreenStartup 优化类加载。
 
 ### 3.3 启动速度 & 内存占用
 

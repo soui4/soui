@@ -162,14 +162,14 @@ public class SouiScreen extends SouiWindow {
             }
         }
         if (mScreenId != 0L) {
-            mSouiMainHwnd = SouiPlatformBridge.getInstance().souiStartup(mScreenId, getSurfaceHwnd(), mSouiLayout);
+            mSouiMainHwnd = SouiPlatformBridge.getInstance().screenStartup(mScreenId, getSurfaceHwnd(), mSouiLayout);
         }
     }
 
     @Override
     protected void onDetachedFromWindow() {
         if (mScreenId != 0L) {
-            SouiPlatformBridge.getInstance().souiShutdown(mScreenId);
+            SouiPlatformBridge.getInstance().screenShutdown(mScreenId);
         }
         Activity activity = getActivity();
         if(activity != null){

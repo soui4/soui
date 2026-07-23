@@ -347,9 +347,9 @@ public class SouiPlatformBridge {
      * @param layout      SOUI 布局资源 ID（如 "layout:dlg_main"）
      * @return 主窗口 HWND
      */
-    public long souiStartup(long screenId, long screenHwnd, String layout) {
+    public long screenStartup(long screenId, long screenHwnd, String layout) {
         if (screenId == 0L) {
-            Log.w(TAG, "souiStartup: screenId==0 ignored");
+            Log.w(TAG, "screenStartup: screenId==0 ignored");
             return 0;
         }
         Looper.myQueue().addIdleHandler(new MessageQueue.IdleHandler() {
@@ -362,7 +362,20 @@ public class SouiPlatformBridge {
                 return ret;
             }
         });
-        return nativeSouiStartup(screenId, screenHwnd, layout);
+        return nativeScreenStartup(screenId, screenHwnd, layout);
+    }
+
+    /**
+     * 关闭 SOUI（与 screenStartup 配对）。
+     * @param screenId 屏幕 ID
+     */
+    public void screenShutdown(long screenId) {
+        if (screenId == 0L) return;
+        try {
+            nativeScreenShutdown(screenId);
+        } catch (Throwable t) {
+            Log.w(TAG, "screenShutdown failed", t);
+        }
     }
 
     /**
@@ -385,19 +398,6 @@ public class SouiPlatformBridge {
      * 原生方法：处理空闲时间任务，调用 SOUI 的 OnIdle 处理器。
      */
     private native boolean nativeProcessIdle(int idleCount);
-
-    /**
-     * 关闭 SOUI（与 souiStartup 配对）。
-     * @param screenId 屏幕 ID
-     */
-    void souiShutdown(long screenId) {
-        if (screenId == 0L) return;
-        try {
-            nativeSouiShutdown(screenId);
-        } catch (Throwable t) {
-            Log.w(TAG, "souiShutdown failed", t);
-        }
-    }
 
     /**
      * 按 HWND 注册 View 到 fallback map。新架构下一般不需要调用。
@@ -1064,9 +1064,9 @@ public class SouiPlatformBridge {
     private native void nativeOnTimerExpired(long hWnd, long timerId);
 
     /** C++ SOUI 启动入口。一次调用完成 screen 注册、布局加载和主窗口创建。 */
-    private native long nativeSouiStartup(long screenId, long screenHwnd, String layout);
+    private native long nativeScreenStartup(long screenId, long screenHwnd, String layout);
 
-    private native void nativeSouiShutdown(long screenId);
+    private native void nativeScreenShutdown(long screenId);
 
     /** Java 焦点变化同步到 C++，投递 WM_SETFOCUS/WM_KILLFOCUS。 */
     private static native void nativeNotifyFocusGained(long hwnd);

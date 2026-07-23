@@ -28,15 +28,15 @@ public:
     SouiAndroidApp(){
         InitSoui4AndroidEntry(this);
     }
-    HWND Startup(long screenId, LPCSTR pszLayout) override;
-    void Shutdown(long screenId) override;
-    void UninitApp(SNS::SApplication *pApp) override;
-    SNS::SApplication * InitApp(AAssetManager* assetMgr, LPCSTR pszAssetDir) override;
+    HWND ScreenStartup(long screenId, LPCSTR pszLayout) override;
+    void ScreenShutdown(long screenId) override;
+    void UninitApp() override;
+    BOOL InitApp(AAssetManager* assetMgr, LPCSTR pszAssetDir) override;
 };
 
 static SouiAndroidApp theApp;
 
-SNS::SApplication * SouiAndroidApp::InitApp(AAssetManager* assetMgr, LPCSTR pszAssetDir){
+BOOL SouiAndroidApp::InitApp(AAssetManager* assetMgr, LPCSTR pszAssetDir){
     m_souiApp = new SApplication((HINSTANCE) nullptr);
 
     SetSwinxLogCallback(SwinxLogCallback,0);
@@ -49,20 +49,20 @@ SNS::SApplication * SouiAndroidApp::InitApp(AAssetManager* assetMgr, LPCSTR pszA
     BOOL ok = cfg.DoConfig(m_souiApp);
     if(!ok){
         delete m_souiApp;
-        return nullptr;
+        return FALSE;
     }
     SAutoRefPtr<IRealWndHandler> realWndHander(new CSouiRealWndHandler,FALSE);
     m_souiApp->SetRealWndHandler(realWndHander);
-    return m_souiApp;
+    return TRUE;
 }
 
-void SouiAndroidApp::UninitApp(SNS::SApplication *pApp){
-    SASSERT(m_souiApp == pApp);
+void SouiAndroidApp::UninitApp(){
+    SASSERT(m_souiApp);
     m_souiApp->Release();
     m_souiApp = nullptr;
 }
 
-HWND SouiAndroidApp::Startup(long screenId, LPCSTR pszLayout) {
+HWND SouiAndroidApp::ScreenStartup(long screenId, LPCSTR pszLayout) {
     SASSERT(m_souiApp);
     if (screenId == 0 || !m_souiApp) {
         SLOGE() << "SouiStartup: invalid args (screenId=" << screenId << ", m_souiApp=" << (void*)m_souiApp << ")";
@@ -101,7 +101,7 @@ HWND SouiAndroidApp::Startup(long screenId, LPCSTR pszLayout) {
     return ret;
 }
 
-void SouiAndroidApp::Shutdown(long screenId) {
+void SouiAndroidApp::ScreenShutdown(long screenId) {
     if (screenId == 0) return;
     auto it = m_screenHostMap.find(screenId);
     if (it == m_screenHostMap.end()) {

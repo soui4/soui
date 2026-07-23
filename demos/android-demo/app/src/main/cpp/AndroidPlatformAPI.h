@@ -34,13 +34,13 @@ struct Soui4AndroidEntry{
      * @param pszAssetDir 应用资源目录路径（UTF-8）
      * @return 创建的 SApplication 对象，失败返回 nullptr
      */
-    virtual SNS::SApplication * InitApp(AAssetManager* assetMgr, LPCSTR pszAssetDir) = 0;
+    virtual BOOL InitApp(AAssetManager* assetMgr, LPCSTR pszAssetDir) = 0;
 
     /**
      * 反初始化 SOUI 应用。
      * @param pApp 需要释放的 SApplication 对象
      */
-    virtual void UninitApp(SNS::SApplication *pApp) = 0;
+    virtual void UninitApp() = 0;
 
     /**
      * 启动指定 screenId 的 SOUI 窗口系统。
@@ -48,13 +48,13 @@ struct Soui4AndroidEntry{
      * @param pszLayout 布局文件名（如 "layout:dlg_main"）
      * @return 创建的主窗口 HWND，失败返回 0
      */
-    virtual HWND Startup(long screenId,const char* pszLayout) = 0;
+    virtual HWND ScreenStartup(long screenId, LPCSTR pszLayout) = 0;
 
     /**
      * 关闭指定 screenId 的 SOUI 窗口系统。
      * @param screenId 需要关闭的屏幕标识
      */
-    virtual void Shutdown(long screenId) = 0;
+    virtual void ScreenShutdown(long screenId) = 0;
 };
 
 /**
@@ -158,10 +158,10 @@ public:
     void stringSlotFree(int id);
 
     /** SOUI 启动入口（激活栈压栈 → SouiStartup）。 */
-    HWND souiStartup(JNIEnv* env, jlong screenId, const char* layout);
+    HWND screenStartup(JNIEnv* env, jlong screenId, const char* layout);
 
     /** SOUI 销毁入口（SouiShutdown → 激活栈弹栈）。 */
-    void souiShutdown(JNIEnv* env, jlong screenId);
+    void screenShutdown(JNIEnv* env, jlong screenId);
 
     /** 压入激活 screen，SHostWnd::Create(NULL) 据此路由到正确 screen。 */
     jlong pushActiveScreen(jlong screenId);
@@ -250,7 +250,6 @@ private:
 
     POINT m_lastCursorPos;
     int   m_density = 96;
-    SNS::SAutoRefPtr<SNS::SApplication>  m_theApp;
     mutable std::mutex m_mutex;
     // -------- String slot storage (并发读写互斥；与窗口定时器/screen map 分锁避免互扰) --------
     mutable std::mutex m_slotMtx;

@@ -20,7 +20,7 @@ import androidx.appcompat.app.AppCompatActivity;
  * </table>
  *
  * <p>onDestroy 无需清理：SouiScreen.onDetachedFromWindow() 会自动调用
- * {@code bridge.souiShutdown(screenId)}，释放 C++ 侧 GlobalRef 与窗口。
+ * {@code bridge.screenShutdown(screenId)}，释放 C++ 侧 GlobalRef 与窗口。
  * View 树拆离即可触发，无需 Activity 手动介入。
  */
 public class XmlHostActivity extends AppCompatActivity {
