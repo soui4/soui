@@ -316,9 +316,12 @@ void SScrollBarHandler::OnMouseUp(CPoint pt)
 
     if (iClickPart == SB_THUMBTRACK)
     {
-        const SCROLLINFO *psi = m_pSbHost->GetScrollBarInfo(m_bVert);
+        SCROLLINFO *psi = const_cast<SCROLLINFO *>(m_pSbHost->GetScrollBarInfo(m_bVert));
         if (psi->nTrackPos != -1)
+        {
             m_pSbHost->OnScrollCommand(m_bVert, SB_THUMBPOSITION, psi->nTrackPos);
+            psi->nTrackPos = -1;
+        }
     }
 
     if (iClickPart != -1 && m_iHitPart == -1)

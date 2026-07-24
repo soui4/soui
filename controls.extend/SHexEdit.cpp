@@ -458,7 +458,7 @@ void SHexEdit::SetScrollbarRanges()
     {
         ShowScrollBar(SSB_VERT, TRUE);
         EnableScrollBar(SSB_VERT, TRUE);
-        tScrollInfo.fMask = SIF_ALL;
+        tScrollInfo.fMask = SIF_RANGE | SIF_PAGE | SIF_POS;
         tScrollInfo.nPage = m_tPaintDetails.nFullVisibleLines;
         tScrollInfo.nMax = m_nScrollRangeY + tScrollInfo.nPage - 1;
         if (m_nScrollPostionY > m_nScrollRangeY)
@@ -477,7 +477,7 @@ void SHexEdit::SetScrollbarRanges()
     {
         EnableScrollBar(SSB_HORZ, TRUE);
         ShowScrollBar(SSB_HORZ, TRUE);
-        tScrollInfo.fMask = SIF_ALL;
+        tScrollInfo.fMask = SIF_RANGE | SIF_PAGE | SIF_POS;
         tScrollInfo.nPage = m_tPaintDetails.cPaintingRect.Width();
         tScrollInfo.nMax = m_nScrollRangeX + tScrollInfo.nPage - 1;
         if (m_nScrollPostionX > m_nScrollRangeX)
@@ -1387,6 +1387,10 @@ BOOL SHexEdit::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 
 BOOL SHexEdit::OnScroll(BOOL bVertical, UINT uCode, int nPos)
 {
+    if (GetDataSize() == 0)
+    {
+        return FALSE;
+    }
     if (m_dragSb != SSB_NULL)
     {
         if (bVertical)
@@ -1401,11 +1405,6 @@ BOOL SHexEdit::OnScroll(BOOL bVertical, UINT uCode, int nPos)
 
 void SHexEdit::OnVScroll(UINT nSBCode, UINT nPos, HWND)
 {
-    if (GetDataSize() == 0)
-    {
-        return;
-    }
-
     switch (nSBCode)
     {
     case SB_LINEDOWN:

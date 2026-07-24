@@ -532,7 +532,6 @@ BOOL SPanel::OnScroll(BOOL bVertical, UINT uCode, int nPos)
         break;
     case SB_THUMBPOSITION:
         nNewPos = nPos;
-        psi->nTrackPos = -1;
         break;
     case SB_TOP:
         nNewPos = psi->nMin;
