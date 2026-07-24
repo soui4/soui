@@ -14,7 +14,8 @@ android {
 
         externalNativeBuild {
             cmake {
-                cppFlags "-std=c++17 -fexceptions -frtti"
+                cppFlags "-std=c++17 -fexceptions -frtti -w"
+                cFlags "-w"
                 arguments "-DANDROID_STL=c++_shared",
                           "-DSOUI_ROOT_DIR=${rootDir}/../.."
             }
@@ -94,8 +95,22 @@ task collectComponentsHeaders(type: Copy) {
     from "${souiRootDir}/components"
     into "${targetIncludeDir}/components"
     include '*.h'
+    include 'resprovider-7zip/zip7resprovider-param.h'
+    include 'resprovider-zip/zipresprovider-param.h'
     duplicatesStrategy = 'exclude'
 }
+
+// 收集 config 自己的头文件
+task collectSouiConfig(type: Copy) {
+    description '收集 config 自己的头文件到 assets'
+
+    delete "${targetIncludeDir}/"
+    from "${projectDir}/src/main/cpp/soui4/config"
+    into "${targetIncludeDir}/config"
+    include '*.h'
+    duplicatesStrategy = 'exclude'
+}
+
 
 // 收集 soui-android-lib 自己的头文件
 task collectAndroidHeaders(type: Copy) {
@@ -111,59 +126,12 @@ task collectAndroidHeaders(type: Copy) {
 // 总收集任务
 task collectHeaders {
     description '收集所有头文件到 assets/soui4 目录'
-    dependsOn collectSouiHeaders, collectSwinxHeaders, collectUtilitiesHeaders, collectComponentsHeaders, collectAndroidHeaders
+    dependsOn collectSouiHeaders, collectSwinxHeaders, collectUtilitiesHeaders, collectComponentsHeaders,collectSouiConfig, collectAndroidHeaders
 }
 
 // 在构建前执行头文件收集（不包含 config.h，因为 config.h 需要在 CMake 配置后才能生成）
 preBuild.dependsOn collectHeaders
 
-// 复制 CMake 生成的 config.h 到 assets 目录
-task copyConfigHeader(type: Copy) {
-    description '复制 CMake 生成的 config.h 到 assets/soui4/config 目录'
-    
-    delete "${targetIncludeDir}/config"
-    
-    def buildTypes = ['Debug', 'RelWithDebInfo', 'Release']
-    def abiFilters = ['x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a']
-    
-    buildTypes.each { buildType ->
-        abiFilters.each { abi ->
-            def configDir = "${projectDir}/.cxx/${buildType}"
-            def dirs = new File(configDir).listFiles()
-            if (dirs) {
-                dirs.each { hashDir ->
-                    def configFile = new File("${hashDir}/${abi}/config/config.h")
-                    if (configFile.exists()) {
-                        from configFile.parent
-                        into "${targetIncludeDir}/config"
-                        include 'config.h'
-                        duplicatesStrategy = 'exclude'
-                        return true
-                    }
-                }
-            }
-        }
-    }
-}
-
-// 确保 config.h 在 aar 打包之前被复制到 assets 目录
-// 使用 afterEvaluate 在所有任务创建完成后建立依赖关系
-afterEvaluate {
-    // 1. 找到所有 externalNativeBuild 任务，让它们完成后执行 copyConfigHeader
-    tasks.findAll { task ->
-        task.name.startsWith('externalNativeBuild')
-    }.each { task ->
-        task.finalizedBy copyConfigHeader
-    }
-    
-    // 2. 找到所有 bundle 相关任务，让它们依赖 copyConfigHeader
-    // 这样 config.h 会在 aar 打包之前被复制到 assets/soui4/config 目录
-    tasks.findAll { task ->
-        task.name.contains('bundle')
-    }.each { task ->
-        task.dependsOn copyConfigHeader
-    }
-}
 
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'

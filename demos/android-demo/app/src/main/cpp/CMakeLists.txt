@@ -23,6 +23,13 @@ set( TOOLCHAIN_SUPPORTS_ATTRIBUTE_DESTRUCTOR_EXITCODE__TRYRUN_OUTPUT
 # SOUI_LIB_DIR 指向解压后的 jni 库目录
 message(STATUS "SOUI_INCLUDE_DIR: ${SOUI_INCLUDE_DIR}")
 message(STATUS "SOUI_LIB_DIR: ${SOUI_LIB_DIR}")
+message(STATUS "SOUI4ANDROID_INCLUDE_DIR:${SOUI4ANDROID_INCLUDE_DIR}")
+if(NOT EXISTS  ${SOUI_INCLUDE_DIR})
+        message(FATAL_ERROR "SOUI_INCLUDE_DIR: ${SOUI_INCLUDE_DIR} is not existed")
+endif()
+if(NOT EXISTS  ${SOUI4ANDROID_INCLUDE_DIR})
+        message(FATAL_ERROR "SOUI4ANDROID_INCLUDE_DIR: ${SOUI4ANDROID_INCLUDE_DIR} is not existed")
+endif()
 #=============================================================================
 # Compile Definitions for Android
 #=============================================================================
@@ -57,8 +64,6 @@ add_compile_options(-Wno-macro-redefined)
 #=============================================================================
 # Include Directories
 #=============================================================================
-set(SOUI_INCLUDE_DIR "D:/work/soui4-android-lib/assets/soui4")
-set(SOUI_LIB_DIR "D:/work/soui4-android-lib/jni")
 # 添加库搜索路径（从 aar 解压出来的 jni 库目录）
 link_directories(
         ${SOUI_LIB_DIR}/${ANDROID_ABI}
@@ -78,7 +83,6 @@ message(STATUS "===========================================")
 #=============================================================================
 # soui-android-demo Library
 #=============================================================================
-include_directories("D:/work/soui4/demos/android-demo/app/build/soui4-android-lib/assets/soui4/SOUI/include")
 file(GLOB_RECURSE SOUI_ANDROID_DEMO_SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
         )
@@ -95,12 +99,12 @@ target_include_directories(
         PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${SOUI_INCLUDE_DIR}
+        ${SOUI_INCLUDE_DIR}/config
         ${SOUI_INCLUDE_DIR}/SOUI/include
         ${SOUI_INCLUDE_DIR}/swinx/include
         ${SOUI_INCLUDE_DIR}/utilities/include
         ${SOUI_INCLUDE_DIR}/components
-        ${SOUI_INCLUDE_DIR}/soui-android/include
-        ${SOUI_INCLUDE_DIR}/config
+        ${SOUI4ANDROID_INCLUDE_DIR}
 )
 
 # 链接所有需要的库
