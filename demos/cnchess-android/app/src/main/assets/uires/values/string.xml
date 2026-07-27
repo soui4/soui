@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<string>
+  <title value="棋牌游戏demo" />
+  <ver value="1.0" />
+  <login value="登录" />
+  <lobby value="大厅" />
+  <cnchess value="开心象棋" />
+  <about value="关于" />
+  <peace_req value="求和" />
+  <peace_ack value="同意" />
+  <surrender value="认输" />
+  <regret value="悔棋" />
+</string>

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme name="default">
+    <skin>
+        <gif name="ani_conn" src="file:Sprite/connect.gif"/>
+        <imglist name="skin_ready" src="file:image/ready.png"/>
+        <gif name="gif_chair" src="file:avatar/chair.gif"/>
+        <gif name="gif_avatar_male" src="file:avatar/male.gif"/>
+        <gif name="gif_avatar_female" src="file:avatar/female.gif"/>
+
+        <apng name="ani_vectory_1" src="file:Sprite/礼花1.png"/>
+        <apng name="ani_vectory_2" src="file:Sprite/礼花2.png"/>
+        <apng name="ani_vectory_3" src="file:Sprite/礼花3.png"/>
+
+        <imglist name="skin_background" src="file:image/老头乐-底.png"/>"
+        <piece name="skin_pieces" src="file:image/pieces.png"  filterLevel="high" size="76,76" center="38,38"/>
+        <board name="skin_chessboard" src="file:image/chessboard.png" filterLevel="high" margin="64,68,67,71"/>
+        <imglist name="skin_pos_flag" src="file:image/posflag.png" states="3"/>
+        <imglist name="skin_piece_shadow" src="file:image/piece_shadow.png"/>
+
+        <imglist name="skin_digit" src="file:image/digital_score.png" states="12"/>
+        <imglist name="skin_clock" src="file:image/闹钟.png"/>
+        <imglist name="skin_clock_digital" src="file:image/闹钟数字.png" states="10"/>
+
+        <imglist name="skin_btn_start" src="file:image/btn_start.png" states="4"/>
+        <imglist name="skin_btn_regret" src="file:image/btn_regret.png" states="4"/>
+        <imglist name="skin_btn_study" src="file:image/btn_study.png" states="4"/>
+        <imglist name="skin_btn_surrender" src="file:image/btn_surrender.png" states="4"/>
+        <imglist name="skin_btn_peace" src="file:image/btn_peace.png" states="4"/>
+
+        <imglist name="skin_flag_pos_from" src="file:image/flag_pos_from.png"/>
+        <apng name="ani_flag_pos_to" src="file:Sprite/flag_pos_to.png"/>"
+    </skin>
+    <template>
+        <tip wndclass="text" colorText="#FF0000FF" ownerLayout="anchor" pos="0,100,4" offset="-0.5,-0.5" layer="300000"/>
+        <avatar wndclass="window" ownerLayout="anchor" layout="vbox" size="-1,-1" interval="5" gravity="center" layer="-1">
+            <window size="150,190">
+                <gifplayer pos="0,0" name="gif_avatar" skin="gif_chair" />
+                <img pos="|0,|0" offset="-0.5,-0.5" name="flag_ready" skin="skin_ready" visible="0"/>
+            </window>
+            <text name="txt_name" text=" " font="size:16"/>
+        </avatar>
+        <piece  wndClass="chesspiece" skin="skin_pieces" ownerLayout="anchor" offset="-0.5,-0.5" layer="10" size="76,76"/>
+        <shadow wndClass="img" skin="skin_piece_shadow" ownerLayout="anchor" pos="0,0,11" offset="-0.5,-0.4" layer="5" size="76,86"/>
+        <posflag wndClass="imgbtn" skin="skin_pos_flag" ownerLayout="anchor" pos="0,0,10" offset="-0.5,-0.5" layer="5" size="27,26"/>
+        <clock wndClass="img"  ownerLayout="anchor" skin="skin_clock" fitImage="1" layout="hbox" gravity="center" layer="100000">
+            <window size="0,0" weight="1"/>
+            <include src="file:xml/clock_digit.xml" name="digit1" pos="0,0,4" size="-1,-1" offset="-0.5,-0.5"/>
+            <include src="file:xml/clock_digit.xml" name="digit2" pos="0,0,4" size="-1,-1" offset="-0.5,-0.5"/>
+            <window size="0,0" weight="1"/>
+        </clock>
+
+    </template>
+    <widgets>
+        <gifplayer name="sprite_connecting" skin="ani_conn" ownerLayout="anchor" pos="0,-50,4" offset="-0.5,-0.5" layer="100" />
+        <gifplayer name="sprite_vectory" skin="ani_vectory_0" ownerLayout="anchor" pos="0,-50,4" offset="-0.5,-0.5" layer="1000" loopCount="1" msgTransparent="1" />
+        <img name="img_background" skin="skin_background" ownerLayout="anchor" pos="0,0,0" size="-2,-2" layer="-2"/>
+        <img name="board_main" skin="skin_chessboard" layout="anchor" ownerLayout="anchor" pos="0,0,4" offset="-0.5,-0.5" fitImage="1"/>
+        
+        <gifplayer name="sprite_flag_pos_to" skin="ani_flag_pos_to" ownerLayout="anchor" pos="0,1,10" size="90,90" offset="-0.5,-0.5" layer="50" msgTransparent="1" visible="0" />
+        <img name="img_flag_pos_from" skin="skin_flag_pos_from" ownerLayout="anchor" pos="0,0,10" size="55,55" offset="-0.5,-0.5" layer="4" msgTransparent="1" visible="0"/>
+        <tabctrl name="tab_toolbar" curSel="0" ownerLayout="anchor" pos="0,0,5" offset="-1,-0.5" tabHeight="0" size="100,200" animateSteps="20" layer="100">
+            <page title="start">
+                <imgbtn name="btn_start" pos="|0,|0" offset="-0.5,-0.5" skin="skin_btn_start"/>
+            </page>
+            <page title="playing" layout="vbox" interval="5">
+                <imgbtn name="btn_req_peace" skin="skin_btn_peace"/>
+                <imgbtn name="btn_req_surrender" skin="skin_btn_surrender"/>
+                <imgbtn name="btn_req_regret" skin="skin_btn_regret"/>
+            </page>
+            <page title="local" layout="vbox" interval="5">
+                <imgbtn name="btn_local_load" skin="skin_btn_study"/>
+                <button name="btn_local_next" size="100,30" text="next"/> 
+                <button name="btn_local_prev" size="100,30" text="prev"/>
+            </page>
+        </tabctrl>
+    </widgets>
+    <anchors>
+        <!-- 0号用户头像位置 -->
+        <avatar_self pos="0,0,8" offsetX="-1" offsetY="-1"/>
+        <!-- 1号用户头像位置 -->
+        <avatar_enemy pos="0,0,0" offsetX="0" offsetY="0"/>
+
+
+        <!-- 时钟位置 -->
+        <clock_self pos="-75,-220,8" offsetX="-0.5" offsetY="-1"/>
+        <clock_enemy pos="75,220,0" offsetX="-0.5" offsetY="0"/>"
+
+    </anchors>
+    <anims>
+        <anim name="clock_alarm" src="file:anim/clock_alarm.xml"/>
+    </anims>
+    <sounds>
+        <!--音效, processes分为男女声音，weight可以控制播放频率-->
+        <effects>
+            <file name="进入游戏" src="Sound/effect/ty_进入游戏-01.wav"/>
+            <file name="退出游戏" src="Sound/effect/ty_退出游戏-01.wav"/>
+            <file name="开始游戏" src="Sound/effect/Sj_开始-01.wav"/>
+            <file name="倒计时" src="Sound/effect/ty_倒计时-02.wav"/>
+
+            <file name="将军" src="Sound/effect/jiang.wav"/>
+            <file name="走子" src="Sound/effect/go.wav"/>
+            <file name="吃子" src="Sound/effect/eat.wav"/>
+            <file name="danger" src="Sound/effect/danger.wav"/>
+            <file name="焰火" src="Sound/effect/ty_焰火-02.wav"/>
+        </effects>
+    </sounds>
+</theme>

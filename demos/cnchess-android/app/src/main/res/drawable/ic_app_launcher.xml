@@ -1,0 +1,16 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- 背景：红色圆角矩形 -->
+    <path
+        android:fillColor="#C62828"
+        android:pathData="M8,8h92a8,8 0,0 1,8 8v76a8,8 0,0 1,-8 8h-92a8,8 0,0 1,-8 -8v-76a8,8 0,0 1,8 -8z" />
+
+    <!-- 前景：象棋"帥"字简化图标 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,28 C44,28 36,36 36,46 C36,54 41,60 48,63 L48,70 L40,70 L40,78 L48,78 L48,86 L60,86 L60,78 L68,78 L68,70 L60,70 L60,63 C67,60 72,54 72,46 C72,36 64,28 54,28 Z M54,38 C58,38 62,42 62,46 C62,50 58,54 54,54 C50,54 46,50 46,46 C46,42 50,38 54,38 Z" />
+</vector>

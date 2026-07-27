@@ -1,0 +1,80 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.soui.cnchess'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.soui.cnchess"
+        minSdk 28
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+
+        externalNativeBuild {
+            cmake {
+                cppFlags "-std=c++17 -fexceptions -frtti"
+                arguments "-DANDROID_STL=c++_shared",
+                        "-DSOUI_INCLUDE_DIR=${project(':soui-android-lib').projectDir.absolutePath.replace('\\', '/')}/src/main/assets/soui4",
+                        "-DSOUI4ANDROID_INCLUDE_DIR=${project(':soui-android-lib').projectDir.absolutePath.replace('\\', '/')}/src/main/cpp/include",
+                        "-DSOUI_LIB_DIR=${project(':soui-android-lib').buildDir.absolutePath.replace('\\', '/')}/intermediates/library_jni/debug/jni",
+                        "-DSOUI_CONTROLS_EXTEND_DIR=${rootDir.absolutePath.replace('\\', '/')}/../../controls.extend"
+            }
+        }
+        ndk {
+            abiFilters 'x86', 'arm64-v8a', 'x86_64', 'armeabi-v7a'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path "src/main/cpp/CMakeLists.txt"
+            version "3.18.1"
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+}
+
+// 确保 soui-android-lib 的头文件收集任务在 CMake 配置和编译前执行
+afterEvaluate {
+    def collectHeadersTask = project(':soui-android-lib').tasks.findByName('collectHeaders')
+    if (collectHeadersTask != null) {
+        tasks.matching { it.name ==~ /(?:configure|build)CMake.*/ }.configureEach {
+            dependsOn collectHeadersTask
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.11.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+
+    // 引用 soui-android-lib 模块
+    implementation project(':soui-android-lib')
+
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}

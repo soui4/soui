@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SOUI name="login" title="@string/login" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" margin="5,5,5,5"  resizable="1" wndType="normal"
+translucent="1" 
+>
+  <root skin="_skin.sys.wnd.bkgnd" cache="1"  width="300" height="-1" layout="vbox" padding="5,5,5,5" interval="5">
+    <caption size="-2,30" layout="hbox" interval="0" gravity="center">
+      <icon src="ICON_LOGO:16"/>
+      <text >@string/login</text>
+      <window size="0,0" weight="1"/>
+      <imgbtn name="btn_close" skin="_skin.sys.btn.close"     tip="close" animate="1"/>
+    </caption>
+    <window size="-2,-1" layout="gridlayout" columnCount="2" interval="5" gravity="fill">
+        <text text="服务器地址:"/>
+        <window layout="hbox" interval="5" gravity="center">        
+            <edit name="edt_svr" text="soui.com.cn:3311" columnWeight="1" margin="2"/>
+            <button name="btn_svr_local" size="50,30" text="本地"/>
+        </window>
+        <text text="用户名:"/>
+        <edit name="edt_name" text="张三" margin="2"/>
+        <text text="性别:"/>
+        <combobox name="cbx_sex" curSel="0" margin="2" ncskin="_skin.sys.border">
+          <items>
+            <item text="男" data="0"/>
+            <item text="女" data="1"/>
+            <item text="人妖" data="2"/>
+          </items>
+        </combobox>
+    </window>
+    <window size="-2,-1" layout="vbox" interval="5" gravity="right">
+        <button name="btn_login" size="80,30" text="登录"/>
+    </window>
+  </root>
+</SOUI>

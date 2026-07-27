@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<stack size="-1,-1" curSel="0" aniType="push" vertical="1" duration="200">
+    <img size="-1,-1" skin="skin_clock_digital" iconIndex="0" />
+    <img size="-1,-1" skin="skin_clock_digital" iconIndex="1" />
+    <img size="-1,-1" skin="skin_clock_digital" iconIndex="2" />
+    <img size="-1,-1" skin="skin_clock_digital" iconIndex="3" />
+    <img size="-1,-1" skin="skin_clock_digital" iconIndex="4" />
+    <img size="-1,-1" skin="skin_clock_digital" iconIndex="5" />
+    <img size="-1,-1" skin="skin_clock_digital" iconIndex="6" />
+    <img size="-1,-1" skin="skin_clock_digital" iconIndex="7" />
+    <img size="-1,-1" skin="skin_clock_digital" iconIndex="8" />
+    <img size="-1,-1" skin="skin_clock_digital" iconIndex="9" />
+</stack>
