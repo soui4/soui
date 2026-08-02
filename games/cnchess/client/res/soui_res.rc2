@@ -1,4 +1,4 @@
-//stamp:01dc753cd2cefa88
+//stamp:01dd200ad9faf98e
 /*<------------------------------------------------------------------------------------------------->*/
 #define DEFINE_UIRES(name, type, file_path)\
     name type file_path
@@ -21,3 +21,13 @@ DEFINE_UIRES(PNG_HANDUP,	image,	"uires/image/handup.png")
 DEFINE_UIRES(PNG_PLAYING,	image,	"uires/image/playing.png")
 DEFINE_UIRES(PNG_MUTE,	image,	"uires/image/mute.png")
 DEFINE_UIRES(PNG_UNMUTE,	image,	"uires/image/unmute.png")
+DEFINE_UIRES(btn_primary,	svg,	"uires/svg/btn_primary.svg")
+DEFINE_UIRES(btn_login,	svg,	"uires/svg/btn_login.svg")
+DEFINE_UIRES(cnchess_logo,	svg,	"uires/svg/cnchess_logo.svg")
+DEFINE_UIRES(edit_border,	svg,	"uires/svg/edit_border.svg")
+DEFINE_UIRES(form_icons,	svg,	"uires/svg/form_icons.svg")
+DEFINE_UIRES(login_bg,	svg,	"uires/svg/login_bg.svg")
+DEFINE_UIRES(lobby_table_bk,	svg,	"uires/svg/lobby_table_bk.svg")
+DEFINE_UIRES(chess_table,	svg,	"uires/svg/chess_table.svg")
+DEFINE_UIRES(playing_icon,	svg,	"uires/svg/playing_icon.svg")
+DEFINE_UIRES(seat_states,	svg,	"uires/svg/seat_states.svg")

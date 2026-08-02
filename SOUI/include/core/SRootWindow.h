@@ -70,7 +70,6 @@ class SOUI_EXP SRootWindow : public SWindow {
      */
     void FireMenuCmd(int menuID);
 
-    void OnLayoutFloatChild(SWindow* pChild, const CRect& rcLayout) override;
   public:
     /**
      * @brief Updates the layout of the window.

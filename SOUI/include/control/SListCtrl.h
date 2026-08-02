@@ -414,6 +414,13 @@ class SOUI_EXP SListCtrl : public SPanel {
     void OnLButtonDown(UINT nFlags, CPoint pt);
 
     /**
+     * @brief Handle left mouse button up event
+     * @param nFlags Flags
+     * @param pt Mouse coordinates
+     */
+    void OnLButtonUp(UINT nFlags, CPoint pt);
+
+    /**
      * @brief Handle left mouse button double-click event
      * @param nFlags Flags
      * @param pt Mouse coordinates
@@ -534,6 +541,7 @@ class SOUI_EXP SListCtrl : public SPanel {
         MSG_WM_SIZE(OnSize)
         MSG_WM_LBUTTONDBLCLK(OnLButtonDbClick)
         MSG_WM_LBUTTONDOWN(OnLButtonDown)
+        MSG_WM_LBUTTONUP(OnLButtonUp)
         MSG_WM_RBUTTONUP(OnRButtonUp)
         MSG_WM_MOUSEMOVE(OnMouseMove)
         MSG_WM_MOUSELEAVE(OnMouseLeave)

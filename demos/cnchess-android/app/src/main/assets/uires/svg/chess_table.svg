@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="60" viewBox="0 0 80 60">
+    <defs>
+        <linearGradient id="tableWood" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#8B7355"/>
+            <stop offset="50%" stop-color="#6B5D47"/>
+            <stop offset="100%" stop-color="#5D4E37"/>
+        </linearGradient>
+    </defs>
+    
+    <!-- 桌面椭圆 (透视效果) -->
+    <ellipse cx="40" cy="35" rx="38" ry="22" fill="url(#tableWood)" stroke="#3D2F1F" stroke-width="1.5"/>
+    <ellipse cx="40" cy="33" rx="36" ry="20" fill="#7B6B53" stroke="#5D4E37" stroke-width="0.5"/>
+    
+    <!-- 象棋盘简化图 -->
+    <g transform="translate(40, 33)" fill="none" stroke="#3D2F1F" stroke-width="0.8" opacity="0.6">
+        <!-- 外框 -->
+        <rect x="-25" y="-14" width="50" height="28" rx="2"/>
+        <!-- 横线 -->
+        <line x1="-25" y1="-7" x2="25" y2="-7"/>
+        <line x1="-25" y1="0" x2="25" y2="0"/>
+        <line x1="-25" y1="7" x2="25" y2="7"/>
+        <!-- 竖线 (河界断开) -->
+        <line x1="-15" y1="-14" x2="-15" y2="-7"/>
+        <line x1="-15" y1="7" x2="-15" y2="14"/>
+        <line x1="-5" y1="-14" x2="-5" y2="-7"/>
+        <line x1="-5" y1="7" x2="-5" y2="14"/>
+        <line x1="5" y1="-14" x2="5" y2="-7"/>
+        <line x1="5" y1="7" x2="5" y2="14"/>
+        <line x1="15" y1="-14" x2="15" y2="-7"/>
+        <line x1="15" y1="7" x2="15" y2="14"/>
+        <!-- 九宫斜线 -->
+        <line x1="-15" y1="-14" x2="-5" y2="-7"/>
+        <line x1="15" y1="-14" x2="5" y2="-7"/>
+        <line x1="-15" y1="14" x2="-5" y2="7"/>
+        <line x1="15" y1="14" x2="5" y2="7"/>
+        <!-- 河界文字 -->
+        <text x="-8" y="-3" text-anchor="middle" fill="#8B7355" font-size="4" opacity="0.5">楚河</text>
+        <text x="8" y="-3" text-anchor="middle" fill="#8B7355" font-size="4" opacity="0.5">汉界</text>
+    </g>
+    
+    <!-- 上方棋子 (红方) -->
+    <g transform="translate(20, 18)">
+        <circle cx="0" cy="0" r="5" fill="#DC143C" stroke="#FFD700" stroke-width="0.8"/>
+        <text x="0" y="1.5" text-anchor="middle" fill="#FFD700" font-size="5" font-weight="bold">帥</text>
+    </g>
+    
+    <!-- 下方棋子 (黑方) -->
+    <g transform="translate(60, 48)">
+        <circle cx="0" cy="0" r="5" fill="#1F1208" stroke="#8B7355" stroke-width="0.8"/>
+        <text x="0" y="1.5" text-anchor="middle" fill="#C0C0C0" font-size="5" font-weight="bold">將</text>
+    </g>
+</svg>

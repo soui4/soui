@@ -183,6 +183,11 @@ static BOOL androidClipboard_hasFormat(UINT format) {
     return AndroidPlatformAPI::instance().clipboardHasFormat(format);
 }
 
+// Audio API wrapper
+static BOOL androidAudio_playSound(LPCSTR pszSound, HMODULE hmod, DWORD fdwSound) {
+    return AndroidPlatformAPI::instance().playSound(pszSound, hmod, fdwSound);
+}
+
 extern "C" void RegisterAndroidPlatformAPI() {
     PlatformAPI api = {};
     api.version = PLATFORM_API_VERSION;
@@ -229,6 +234,9 @@ extern "C" void RegisterAndroidPlatformAPI() {
     api.clipboard.registerClipboardFormat = androidClipboard_registerClipboardFormat;
     api.clipboard.getClipboardOwner = androidClipboard_getClipboardOwner;
     api.clipboard.hasFormat = androidClipboard_hasFormat;
+
+    // Audio API
+    api.audio.playSound = androidAudio_playSound;
 
     PlatformAPI_Init(&api);
     SLOGI()<<"Android platform window API registered";

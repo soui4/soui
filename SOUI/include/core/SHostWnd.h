@@ -258,7 +258,7 @@ class SOUI_EXP SHostWnd
      *
      * @param pModalRoot Pointer to the modal root window to initialize.
      */
-    void initModalRoot(SModalRoot *pModalRoot);
+    void InitModalRoot(SModalRoot *pModalRoot);
   public:
     /**
      * @brief Constructs a SHostWnd object with an optional resource name.
@@ -424,7 +424,7 @@ class SOUI_EXP SHostWnd
      * @note To receive notification when the modal session ends, subscribe to
      *       EventExitModalView on the SModalRoot window.
      */
-    ModalViewSessionID BeginModalViewSession(SModalRoot* pView);
+    ModalViewSessionID BeginModalViewSession(SModalRoot* pView,SWindow *pRoot=NULL);
 
     /**
      * @brief Ends a modal view session.

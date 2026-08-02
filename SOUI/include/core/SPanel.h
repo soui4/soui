@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Copyright (C) 2014-2050
  * All rights reserved.
  *
@@ -18,6 +18,9 @@
 #include <core/SScrollBarHandler.h>
 #include <interface/SCtrls-i.h>
 #include <proxy/SWindowProxy.h>
+#include <valueAnimator/SValueAnimator.h>
+#include <interface/SValueAnimator-i.h>
+#include <animation/SInterpolatorImpl.h>
 
 SNSBEGIN
 
@@ -26,10 +29,13 @@ SNSBEGIN
  * @brief     Panel with Scrollbar Support
  *
  * Description: Implements a panel with support for scrollbars in the non-client area.
+ *              Includes drag-to-scroll and fling animation support.
  */
 class SOUI_EXP SPanel
     : public TWindowProxy<IPanel>
-    , protected IScrollBarHost {
+    , protected IScrollBarHost
+    , public IAnimatorUpdateListener
+    , public SAnimatorListener {
     DEF_SOBJECT(SWindow, L"div")
 
   public:
@@ -117,6 +123,25 @@ class SOUI_EXP SPanel
      * @return TRUE if the scrollbar is present, FALSE otherwise.
      */
     STDMETHOD_(BOOL, HasScrollBar)(THIS_ BOOL bVertical) SCONST OVERRIDE;
+
+    /**
+     * @brief Scroll to specified position via OnScroll(SB_THUMBTRACK).
+     * @param bVertical TRUE for vertical, FALSE for horizontal.
+     * @param nPos Target scroll position.
+     * @return TRUE if scrolled, FALSE otherwise.
+     */
+    BOOL ScrollToPos(BOOL bVertical, int nPos);
+
+    /**
+     * @brief Notify scrollbar of scroll activity (show and reset auto-hide timer).
+     * @param bVertical TRUE for vertical scrollbar, FALSE for horizontal.
+     */
+    void NotifyScrollBarActivity(BOOL bVertical);
+
+    BOOL HandleMouseDrag(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lRet);
+    BOOL IsItemDragScrollEnabled() const { return m_bItemDragScrollEnabled; }
+    void StartDragPending(const CPoint &pt);
+    void SetDragPending(BOOL bPending) { m_bDragPending = bPending; }
 
   public:
     /**
@@ -239,6 +264,14 @@ class SOUI_EXP SPanel
      */
     virtual BOOL OnScroll(BOOL bVertical, UINT uCode, int nPos);
 
+    virtual void OnDragScrollStart();
+    virtual void OnDragScroll(BOOL bVert, int delta);
+    virtual void OnDragScrollEnd();
+    virtual void OnFlingScroll();
+    virtual BOOL OnDragCancelCapture(int reason);
+    virtual void OnDragClearItemCapture();
+    virtual BOOL CancelCaptureMode(int reason) override;
+
     /**
      * @brief Handles colorization events.
      * @param cr Color reference.
@@ -271,13 +304,37 @@ class SOUI_EXP SPanel
     void ScrollUpdate();
 
     /**
+     * @brief start fling animation
+     * @param fVelocityX X velocity of the fling.
+     * @param fVelocityY Y velocity of the fling.
+     */
+    void StartFlingAnimation(float fVelocityX, float fVelocityY);
+
+    /**
+     * @brief Stops fling animation.
+     */
+    void StopFlingAnimation();
+
+    /**
+     * @brief Scrolls by drag.
+     * @param bVert TRUE for vertical scrollbar, FALSE for horizontal scrollbar.
+     * @param delta Delta value for the scroll.
+     * @param fVelocity Velocity of the scroll.
+     */
+    void ScrollByDrag(BOOL bVert, int delta, float fVelocity);
+
+    /**
+     * @brief Clears the drag state.
+     */
+    void ClearDragState();
+
+    /**
      * @brief Handles the scrollbar skin attribute.
      * @param strValue String value of the attribute.
      * @param bLoading TRUE if loading, FALSE otherwise.
      * @return Result of the attribute handling.
      */
     HRESULT OnAttrScrollbarSkin(SStringW strValue, BOOL bLoading);
-
   protected:
     SCROLLINFO m_siVer, m_siHoz;           // Vertical and horizontal scroll information
     SAutoRefPtr<SSkinScrollbar> m_pSkinSb; // Scrollbar skin
@@ -311,6 +368,27 @@ class SOUI_EXP SPanel
     int m_fadeFrames;                                      // Number of fade frames
     BYTE m_bySbThumbTrackMinAlpha;                         // Minimum alpha value for thumb track
 
+    // Drag scroll state
+    BOOL m_bDragPending;       /**< TRUE when mouse down, waiting for drag threshold */
+    BOOL m_bDragScrolling;     /**< TRUE when drag scrolling is active */
+    BOOL m_bDragStarted;      /**< TRUE when m_ptDragStart has been initialized */
+    CPoint m_ptDragStart;      /**< Mouse position when drag started */
+    CPoint m_ptDragLast;       /**< Last mouse position during drag */
+    BOOL m_bItemDragScrollEnabled; /**< Enable drag-scroll */
+
+    // Velocity tracking
+    float m_fLastVelocityX;    /**< Instantaneous velocity X in pixels/ms */
+    float m_fLastVelocityY;    /**< Instantaneous velocity Y in pixels/ms */
+    uint64_t m_nLastMoveTime;  /**< Timestamp of last MOUSEMOVE (ms) */
+
+    // Fling animation
+    SAutoRefPtr<SFloatAnimator> m_pFlingAnimatorV;
+    float m_fFlingVStartPos;
+    float m_fFlingVTargetPos;
+    SAutoRefPtr<SFloatAnimator> m_pFlingAnimatorH;
+    float m_fFlingHStartPos;
+    float m_fFlingHTargetPos;
+
     SOUI_ATTRS_BEGIN()
         ATTR_CUSTOM(L"sbSkin", OnAttrScrollbarSkin)
         ATTR_LAYOUTSIZE(L"sbArrowSize", m_nSbArrowSize, FALSE)
@@ -328,6 +406,7 @@ class SOUI_EXP SPanel
         ATTR_INT(L"sbTrumbTrackMinAlpha", m_bySbThumbTrackMinAlpha, FALSE)
         ATTR_INTERPOLATOR(L"sbFadeInterpolator", m_fadeInterpolator, FALSE)
         ATTR_CHAIN_PTR(m_fadeInterpolator, 0)
+        ATTR_BOOL(L"enableDragScroll", m_bItemDragScrollEnabled, FALSE)
     SOUI_ATTRS_END()
 
   protected:
@@ -435,6 +514,16 @@ class SOUI_EXP SPanel
      */
     void OnHScroll(UINT nSBCode, UINT nPos, HWND hwnd);
 
+    // IAnimatorUpdateListener
+    STDMETHOD_(void, onAnimationUpdate)(THIS_ IValueAnimator *pAnimator) OVERRIDE;
+    // SAnimatorListener
+    STDMETHOD_(void, onAnimationEnd)(THIS_ IValueAnimator *pAnimator) OVERRIDE;
+
+    // Drag scroll mouse handlers (for plain SPanel)
+    void OnLButtonDown(UINT nFlags, CPoint pt);
+    void OnMouseMove(UINT nFlags, CPoint pt);
+    void OnLButtonUp(UINT nFlags, CPoint pt);
+
     SOUI_MSG_MAP_BEGIN()
         MSG_WM_CREATE(OnCreate)
         MSG_WM_DESTROY(OnDestroy)
@@ -451,6 +540,9 @@ class SOUI_EXP SPanel
         MSG_WM_ENABLE_EX(OnEnable)
         MSG_WM_VSCROLL(OnVScroll)
         MSG_WM_HSCROLL(OnHScroll)
+        MSG_WM_LBUTTONDOWN(OnLButtonDown)
+        MSG_WM_MOUSEMOVE(OnMouseMove)
+        MSG_WM_LBUTTONUP(OnLButtonUp)
     SOUI_MSG_MAP_END()
 };
 

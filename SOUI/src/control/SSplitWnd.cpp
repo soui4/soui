@@ -150,6 +150,13 @@ void SSplitWnd::OnLButtonUp(UINT nFlags, CPoint pt)
     m_iDragSep = -1;
 }
 
+BOOL SSplitWnd::CancelCaptureMode(int reason)
+{
+    if (reason == CANCEL_REASON_SCROLL && m_iDragSep >= 0)
+        return FALSE;
+    return __baseCls::CancelCaptureMode(reason);
+}
+
 void SSplitWnd::OnMouseMove(UINT nFlags, CPoint pt)
 {
     if (-1 == m_iDragSep)

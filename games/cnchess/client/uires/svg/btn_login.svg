@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="40" viewBox="0 0 240 40">
+    <defs>
+        <linearGradient id="btnGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#D4A017"/>
+            <stop offset="50%" stop-color="#B8860B"/>
+            <stop offset="100%" stop-color="#8B6914"/>
+        </linearGradient>
+        <linearGradient id="btnHover" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#FFD700"/>
+            <stop offset="50%" stop-color="#DAA520"/>
+            <stop offset="100%" stop-color="#B8860B"/>
+        </linearGradient>
+        <linearGradient id="btnPressed" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#8B6914"/>
+            <stop offset="50%" stop-color="#6B4F10"/>
+            <stop offset="100%" stop-color="#4A3808"/>
+        </linearGradient>
+        <linearGradient id="btnDisabled" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#808080"/>
+            <stop offset="50%" stop-color="#606060"/>
+            <stop offset="100%" stop-color="#404040"/>
+        </linearGradient>
+    </defs>
+    
+    <!-- State 1: Normal (0-60) -->
+    <rect x="0" y="0" width="60" height="40" rx="8" ry="8" fill="url(#btnGradient)" stroke="#FFD700" stroke-width="1"/>
+    <rect x="2" y="2" width="56" height="16" rx="6" ry="6" fill="#FFFFFF" opacity="0.2"/>
+    
+    <!-- State 2: Hover (60-120) -->
+    <rect x="60" y="0" width="60" height="40" rx="8" ry="8" fill="url(#btnHover)" stroke="#FFD700" stroke-width="1.5"/>
+    <rect x="62" y="2" width="56" height="16" rx="6" ry="6" fill="#FFFFFF" opacity="0.3"/>
+    
+    <!-- State 3: Pressed (120-180) -->
+    <rect x="120" y="0" width="60" height="40" rx="8" ry="8" fill="url(#btnPressed)" stroke="#8B6914" stroke-width="1"/>
+    <rect x="122" y="2" width="56" height="16" rx="6" ry="6" fill="#000000" opacity="0.2"/>
+    
+    <!-- State 4: Disabled (180-240) -->
+    <rect x="180" y="0" width="60" height="40" rx="8" ry="8" fill="url(#btnDisabled)" stroke="#606060" stroke-width="1"/>
+</svg>

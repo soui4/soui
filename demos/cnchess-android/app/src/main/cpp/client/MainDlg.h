@@ -1,4 +1,4 @@
-﻿// MainDlg.h : interface of the CMainDlg class
+// MainDlg.h : interface of the CMainDlg class
 //
 /////////////////////////////////////////////////////////////////////////////
 #pragma once
@@ -26,6 +26,9 @@ public:
     BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam);
 
     void PlayWave(LPCTSTR pszSound);
+    
+    // 登录成功回调（模态视图方式）
+    void OnLoginSuccess(SStringT strSvr, SStringT strName, char cSex);
 
   protected:
     void OnScaleChanged(int nScale) override;

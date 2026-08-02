@@ -14,6 +14,7 @@ SNSBEGIN
 
 SListBox::SListBox()
     : m_itemHeight(SIZE_WRAP_CONTENT, dp)
+    , m_nItemHeight(-1)
     , m_iSelItem(-1)
     , m_iHoverItem(-1)
     , m_crItemBg(CR_INVALID)
@@ -137,6 +138,17 @@ BOOL SListBox::GetIText(int nIndex, BOOL bRawText, IStringT *str) const
 
 int SListBox::GetItemHeight() const
 {
+    if(m_itemHeight.isWrapContent()){
+		if (m_nItemHeight != -1) 
+            return m_nItemHeight;
+        SAutoRefPtr<IRenderTarget> pRT;
+        GETRENDERFACTORY->CreateRenderTarget(&pRT);
+        BeforePaintEx(pRT);
+        SIZE sz;
+        pRT->MeasureText(_T("A"),1,&sz);
+		m_nItemHeight = sz.cy + 2;
+        return m_nItemHeight;
+    }
     return m_itemHeight.toPixelSize(GetScale());
 }
 
@@ -210,7 +222,7 @@ void SListBox::EnsureVisible(int nIndex)
     CRect rcClient;
     GetClientRect(&rcClient);
 
-    int nItemHei = m_itemHeight.toPixelSize(GetScale());
+    int nItemHei = GetItemHeight();
     int iFirstVisible = (m_siVer.nPos + nItemHei - 1) / nItemHei;
     int nVisibleItems = rcClient.Height() / nItemHei;
     if (nIndex < iFirstVisible || nIndex > iFirstVisible + nVisibleItems - 1)
@@ -235,7 +247,7 @@ int SListBox::HitTest(CPoint &pt)
 
     CPoint pt2 = pt;
     pt2.y -= rcClient.top - m_siVer.nPos;
-    int nItemHei = m_itemHeight.toPixelSize(GetScale());
+    int nItemHei = GetItemHeight();
     int nRet = pt2.y / nItemHei;
     if (nRet >= GetCount())
         nRet = -1;
@@ -325,7 +337,7 @@ void SListBox::RedrawItem(int iItem)
     CRect rcClient;
     GetClientRect(&rcClient);
     int iFirstVisible = GetTopIndex();
-    int nItemHei = m_itemHeight.toPixelSize(GetScale());
+    int nItemHei = GetItemHeight();
     int nPageItems = (rcClient.Height() + nItemHei - 1) / nItemHei + 1;
 
     if (iItem >= iFirstVisible && iItem < GetCount() && iItem < iFirstVisible + nPageItems)
@@ -389,7 +401,7 @@ void SListBox::DrawItem(IRenderTarget *pRT, CRect &rc, int iItem)
         crOldText = pRT->SetTextColor(crText);
     }
 
-    int nItemHei = m_itemHeight.toPixelSize(GetScale());
+    int nItemHei = GetItemHeight();
     if (pItem->nImage != -1 && m_pIconSkin)
     {
         int nOffsetX = m_ptIcon[0].toPixelSize(GetScale()), nOffsetY = m_ptIcon[1].toPixelSize(GetScale());
@@ -454,7 +466,7 @@ void SListBox::OnPaint(IRenderTarget *pRT)
     SPainter painter;
     BeforePaint(pRT, painter);
 
-    int nItemHei = m_itemHeight.toPixelSize(GetScale());
+    int nItemHei = GetItemHeight();
     int iFirstVisible = GetTopIndex();
     int nPageItems = (m_rcClient.Height() + nItemHei - 1) / nItemHei + 1;
 
@@ -477,7 +489,18 @@ void SListBox::OnSize(UINT nType, CSize size)
 
 void SListBox::OnLButtonDown(UINT nFlags, CPoint pt)
 {
-    __baseCls::OnLButtonDown(nFlags, pt);
+    LRESULT lRet = 0;
+    if (HandleMouseDrag(WM_LBUTTONDOWN, nFlags, MAKELPARAM(pt.x, pt.y), lRet))
+    {
+        SetMsgHandled(TRUE);
+        return;
+    }
+    if (m_bItemDragScrollEnabled && (HasScrollBar(TRUE) || HasScrollBar(FALSE)))
+    {
+        StartDragPending(pt);
+    }else{
+        __baseCls::OnLButtonDown(nFlags, pt);
+	}
     if (!m_bHotTrack)
     {
         m_iHoverItem = HitTest(pt);
@@ -488,6 +511,12 @@ void SListBox::OnLButtonDown(UINT nFlags, CPoint pt)
 
 void SListBox::OnLButtonUp(UINT nFlags, CPoint pt)
 {
+    LRESULT lRet = 0;
+    if (HandleMouseDrag(WM_LBUTTONUP, nFlags, MAKELPARAM(pt.x, pt.y), lRet))
+    {
+        SetMsgHandled(TRUE);
+        return;
+    }
     if (m_bHotTrack)
     {
         CPoint pt2(pt);
@@ -500,6 +529,12 @@ void SListBox::OnLButtonUp(UINT nFlags, CPoint pt)
 
 void SListBox::OnRButtonUp(UINT nFlags, CPoint pt)
 {
+    LRESULT lRet = 0;
+    if (HandleMouseDrag(WM_RBUTTONUP, nFlags, MAKELPARAM(pt.x, pt.y), lRet))
+    {
+        SetMsgHandled(TRUE);
+        return;
+    }
     EventLBRClick evt2(this);
     evt2.nCurSel = HitTest(pt);
     evt2.pt = pt;
@@ -522,6 +557,13 @@ void SListBox::OnLButtonDbClick(UINT nFlags, CPoint pt)
 
 void SListBox::OnMouseMove(UINT nFlags, CPoint pt)
 {
+    LRESULT lRet = 0;
+    if (HandleMouseDrag(WM_MOUSEMOVE, nFlags, MAKELPARAM(pt.x, pt.y), lRet))
+    {
+        SetMsgHandled(TRUE);
+        return;
+    }
+
     int nOldHover = m_iHoverItem;
     m_iHoverItem = HitTest(pt);
 
@@ -538,6 +580,10 @@ void SListBox::OnMouseMove(UINT nFlags, CPoint pt)
 
 void SListBox::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
 {
+    if(nChar == VK_ESCAPE){
+        SetMsgHandled(FALSE);
+        return;
+    }
     int nNewSelItem = -1;
     int iCurSel = m_iSelItem;
     if (m_bHotTrack && m_iHoverItem != -1)
@@ -569,21 +615,6 @@ void SListBox::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 UINT SListBox::OnGetDlgCode() const
 {
     return SC_WANTARROWS | SC_WANTCHARS;
-}
-
-int SListBox::OnCreate(LPVOID p) {
-    int ret = __baseCls::OnCreate(p);
-    if(ret != 0)
-        return ret;
-    if(m_itemHeight.isWrapContent()){
-        SAutoRefPtr<IRenderTarget> pRT;
-        GETRENDERFACTORY->CreateRenderTarget(&pRT);
-        BeforePaintEx(pRT);
-        SIZE sz;
-        pRT->MeasureText(_T("A"),1,&sz);
-        m_itemHeight=SLayoutSize(sz.cy+2,px);
-    }
-    return 0;
 }
 
 void SListBox::OnDestroy()
@@ -628,6 +659,7 @@ void SListBox::OnScaleChanged(int nScale)
     __baseCls::OnScaleChanged(nScale);
     GetScaleSkin(m_pItemSkin, nScale);
     GetScaleSkin(m_pIconSkin, nScale);
+	m_nItemHeight = -1;
 }
 
 void SListBox::UpdateScrollBar()

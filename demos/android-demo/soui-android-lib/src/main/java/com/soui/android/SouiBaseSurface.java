@@ -53,12 +53,7 @@ public class SouiBaseSurface extends View implements INativeWindow {
                 SouiPlatformBridge.notifyFocusGained(nativeId);
             }
         });
-        nativeId = SouiNativeHandle.NativeCreate(this);
-    }
-
-    /** 请求完整重绘。 */
-    public void requestFullInvalidate() {
-        invalidate();
+        nativeId = SouiPlatformBridge.getInstance().createNative(this);
     }
 
     /**
@@ -118,7 +113,7 @@ public class SouiBaseSurface extends View implements INativeWindow {
                         this, nativeId, event, actionMasked, pIdx,
                         buttonState, 0.f, 0.f, metaState, eventTime);
                 if (captured != null) return true;
-                nativeOnMotionEventEx(nativeId, actionMasked,
+                nativeOnMotionEvent(nativeId, actionMasked,
                         event.getX(pIdx), event.getY(pIdx), event.getPointerId(pIdx),
                         buttonState,
                         /*vscroll=*/0.f, /*hscroll=*/0.f,
@@ -131,7 +126,7 @@ public class SouiBaseSurface extends View implements INativeWindow {
                             this, nativeId, event, MotionEvent.ACTION_MOVE, i,
                             buttonState, 0.f, 0.f, metaState, eventTime);
                     if (captured != null) continue; // 已重定向，本指针跳过自己的 HWND
-                    nativeOnMotionEventEx(nativeId, MotionEvent.ACTION_MOVE,
+                    nativeOnMotionEvent(nativeId, MotionEvent.ACTION_MOVE,
                             event.getX(i), event.getY(i), event.getPointerId(i),
                             buttonState,
                             0.f, 0.f, metaState, eventTime);
@@ -146,7 +141,7 @@ public class SouiBaseSurface extends View implements INativeWindow {
                         buttonState, 0.f, 0.f, metaState, eventTime);
                 if (captured != null) return true;
                 final int pId = event.getPointerId(pIdx);
-                nativeOnMotionEventEx(nativeId, actionMasked,
+                nativeOnMotionEvent(nativeId, actionMasked,
                         event.getX(pIdx), event.getY(pIdx), pId,
                         buttonState,
                         0.f, 0.f, metaState, eventTime);
@@ -187,7 +182,7 @@ public class SouiBaseSurface extends View implements INativeWindow {
                         this, nativeId, event, action, idx,
                         buttonState, 0.f, 0.f, metaState, eventTime);
                 if (captured != null) return true;
-                nativeOnMotionEventEx(nativeId, action,
+                nativeOnMotionEvent(nativeId, action,
                         x, y, pId, buttonState,
                         0.f, 0.f, metaState, eventTime);
                 return true;
@@ -201,7 +196,7 @@ public class SouiBaseSurface extends View implements INativeWindow {
                             this, nativeId, event, MotionEvent.ACTION_SCROLL, idx,
                             buttonState, vScroll, hScroll, metaState, eventTime);
                     if (captured == null) {
-                        nativeOnMotionEventEx(nativeId, MotionEvent.ACTION_SCROLL,
+                        nativeOnMotionEvent(nativeId, MotionEvent.ACTION_SCROLL,
                                 x, y, pId, buttonState,
                                 vScroll, hScroll, metaState, eventTime);
                     }
@@ -216,7 +211,7 @@ public class SouiBaseSurface extends View implements INativeWindow {
                         this, nativeId, event, action, idx,
                         buttonState, 0.f, 0.f, metaState, eventTime);
                 if (captured != null) return true;
-                nativeOnMotionEventEx(nativeId, action,
+                nativeOnMotionEvent(nativeId, action,
                         x, y, pId, buttonState,
                         0.f, 0.f, metaState, eventTime);
                 return true;
@@ -262,7 +257,7 @@ public class SouiBaseSurface extends View implements INativeWindow {
             if (cppRepeat < 1) cppRepeat = 1;
         }
 
-        boolean handled = nativeOnKeyEventEx(nativeId, keyCode, cppAction, metaState,
+        boolean handled = nativeOnKeyEvent(nativeId, keyCode, cppAction, metaState,
                 cppRepeat, scanCode, unicodeChar, /*flags=*/0L, eventTime);
         if (!handled) {
             try {
@@ -303,14 +298,7 @@ public class SouiBaseSurface extends View implements INativeWindow {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         if (nativeId != 0) {
-            final SouiPlatformBridge bridge = SouiPlatformBridge.getInstance();
-            if (nativeId == bridge.getCapture()) {
-                bridge.releaseCapture();
-            }
-            if (nativeId == bridge.getFocus()) {
-                bridge.setFocus(0L);
-            }
-            SouiNativeHandle.NativeDestroy(nativeId);
+            SouiPlatformBridge.getInstance().destroyNative(nativeId);
             nativeId = 0;
         }
     }
@@ -383,14 +371,14 @@ public class SouiBaseSurface extends View implements INativeWindow {
     public native void nativeOnSizeChanged(long nativeId, int width, int height);
 
     /** 输入事件扩展入口（鼠标/触摸/悬停/滚轮统一走这里）。 */
-    public native void nativeOnMotionEventEx(long nativeId, int action,
-                                              float x, float y, int pointerId,
-                                              int buttonState,
-                                              float vscroll, float hscroll,
-                                              int metaState, long timestamp);
+    public native void nativeOnMotionEvent(long nativeId, int action,
+                                           float x, float y, int pointerId,
+                                           int buttonState,
+                                           float vscroll, float hscroll,
+                                           int metaState, long timestamp);
 
     /** 键盘事件扩展入口（携带 repeatCount/scanCode/unicodeChar）。 */
-    public native boolean nativeOnKeyEventEx(long nativeId, int keyCode, int action,
+    public native boolean nativeOnKeyEvent(long nativeId, int keyCode, int action,
                                            int metaState, int repeatCount, int scanCode,
                                            int unicodeChar, long flags, long timestamp);
 

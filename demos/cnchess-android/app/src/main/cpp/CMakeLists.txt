@@ -76,13 +76,16 @@ link_directories(
 # Source Files
 #=============================================================================
 
-# 客户端源文件（排除 main.cpp, stdafx.cpp, .rc 文件）
+# 客户端源文件（排除 main.cpp, stdafx.cpp, .rc 文件以及不再使用的 SHostDialog 对话框）
 file(GLOB_RECURSE CNCHESS_CLIENT_SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/client/*.cpp
 )
 list(REMOVE_ITEM CNCHESS_CLIENT_SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/client/main.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/client/stdafx.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/client/LoginDlg.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/client/PeaceAckDlg.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/client/PeaceReqDlg.cpp
 )
 
 # 算法源文件（排除 stdafx.cpp）
@@ -96,7 +99,6 @@ list(REMOVE_ITEM CNCHESS_ALGORITHM_SRC
 # 入口和桥接源文件
 set(CNCHESS_NATIVE_SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/cnchess_native.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/SouiRealWndHandler.cpp
 )
 
 # SOUI controls.extend/gif 源文件（cnchess 依赖 SSkinAni 和 SGifPlayer）

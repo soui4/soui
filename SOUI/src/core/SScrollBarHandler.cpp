@@ -169,10 +169,29 @@ void SScrollBarHandler::OnTimer(char id)
             m_pSbHost->OnScrollCommand(m_bVert, m_iClickPart, 0);
         }
     }
+    else if (id == IScrollBarHost::Timer_WheelHide)
+    {
+        m_pSbHost->OnScrollKillTimer(m_bVert, IScrollBarHost::Timer_WheelHide);
+        // Only hide if not being dragged, not hovered, and currently visible
+        if (m_iClickPart == -1 && m_iHitPart == -1 && m_iFrame > 0 && m_fadeMode != FADEOUT)
+        {
+            if (m_fadeMode == FADEIN)
+            {
+                m_fadeMode = FADEOUT; // reverse from current position
+            }
+            else
+            {
+                m_iFrame = m_pSbHost->GetScrollFadeFrames() - 1;
+                m_fadeMode = FADEOUT;
+                GetContainer()->RegisterTimelineHandler(this);
+            }
+        }
+    }
 }
 
 void SScrollBarHandler::OnDestroy()
 {
+    m_pSbHost->OnScrollKillTimer(m_bVert, IScrollBarHost::Timer_WheelHide);
     if (m_fadeMode != FADE_STOP)
     {
         m_fadeMode = FADE_STOP;
@@ -192,6 +211,8 @@ void SScrollBarHandler::OnMouseHover(CPoint pt)
     {
         if (m_pSbHost->GetScrollFadeFrames() > 0)
         {
+            // Kill pending wheel hide timer when hovering
+            m_pSbHost->OnScrollKillTimer(m_bVert, IScrollBarHost::Timer_WheelHide);
             m_iFrame = 1;
             m_fadeMode = FADEIN; // to show
             GetContainer()->RegisterTimelineHandler(this);
@@ -202,6 +223,37 @@ void SScrollBarHandler::OnMouseHover(CPoint pt)
         m_iHitPart = HitTest(pt); // update hit part.
         m_pSbHost->OnScrollUpdatePart(m_bVert, m_iClickPart);
     }
+}
+
+void SScrollBarHandler::OnMouseWheel()
+{
+    if (!m_pSbHost->IsScrollBarEnable(m_bVert))
+        return;
+
+    if (m_iClickPart == SB_THUMBTRACK)
+        return;
+
+    if (m_pSbHost->GetScrollFadeFrames() <= 0)
+        return;
+
+    // Kill pending hide timer
+    m_pSbHost->OnScrollKillTimer(m_bVert, IScrollBarHost::Timer_WheelHide);
+
+    // Fade in if not fully visible
+    if (m_fadeMode == FADEOUT)
+    {
+        m_fadeMode = FADEIN; // reverse direction, keep current frame
+    }
+    else if (m_fadeMode == FADE_STOP && m_iFrame < m_pSbHost->GetScrollFadeFrames())
+    {
+        m_iFrame = 1;
+        m_fadeMode = FADEIN;
+        GetContainer()->RegisterTimelineHandler(this);
+    }
+    // else: already fading in or fully visible
+
+    // Restart hide timer (2s after last wheel event)
+    m_pSbHost->OnScrollSetTimer(m_bVert, IScrollBarHost::Timer_WheelHide, IScrollBarHost::kTime_WheelHide);
 }
 
 void SScrollBarHandler::OnMouseLeave()
@@ -217,6 +269,8 @@ void SScrollBarHandler::OnMouseLeave()
 
     if (m_iClickPart == -1)
     {
+        // Kill pending wheel hide timer, mouse leave takes over
+        m_pSbHost->OnScrollKillTimer(m_bVert, IScrollBarHost::Timer_WheelHide);
         if (m_pSbHost->GetScrollFadeFrames() == 0)
         {
             if (iOldHit != -1)

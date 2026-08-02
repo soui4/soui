@@ -488,20 +488,6 @@ BOOL STileView::OnItemGetRect(const SOsrPanel *pItem, CRect &rcItem) const
     return TRUE;
 }
 
-void STileView::OnItemSetCapture(SOsrPanel *pItem, BOOL bCapture)
-{
-    if (bCapture)
-    {
-        GetContainer()->OnSetSwndCapture(m_swnd);
-        m_itemCapture = pItem;
-    }
-    else
-    {
-        GetContainer()->OnReleaseSwndCapture();
-        m_itemCapture = NULL;
-    }
-}
-
 void STileView::RedrawItem(SOsrPanel *pItem)
 {
     pItem->InvalidateRect(NULL);
@@ -543,6 +529,14 @@ LRESULT STileView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
     LRESULT lRet = 0;
     CPoint pt(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 
+    // === 1. 先尝试SPanel的拖动处理 ===
+    if (HandleMouseDrag(uMsg, wParam, lParam, lRet))
+    {
+        SetMsgHandled(TRUE);
+        return 0;
+    }
+
+    // === 2. 如果有item capture，转发给item ===
     if (m_itemCapture)
     {
         CRect rcItem = m_itemCapture->GetItemRect();
@@ -557,6 +551,13 @@ LRESULT STileView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
         }
 
         SItemPanel *pHover = HitTest(pt);
+
+        // Start drag tracking on blank space (no item, scrollable content)
+        if (uMsg == WM_LBUTTONDOWN && pHover == NULL && IsItemDragScrollEnabled() && (HasScrollBar(TRUE) || HasScrollBar(FALSE)))
+        {
+            StartDragPending(pt);
+        }
+
         if (pHover != m_pHoverItem)
         {
             SOsrPanel *nOldHover = m_pHoverItem;
@@ -612,11 +613,17 @@ void STileView::OnMouseLeave()
         m_pHoverItem->DoFrameEvent(WM_MOUSELEAVE, 0, 0);
         m_pHoverItem = NULL;
     }
+
+    // Cancel drag pending if mouse leaves (capture lost or window deactivated)
+    if (m_bDragPending)
+    {
+        m_bDragPending = FALSE;
+    }
 }
 
 void STileView::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
 {
-    if (!m_adapter)
+    if (!m_adapter || nChar == VK_ESCAPE)
     {
         SetMsgHandled(FALSE);
         return;
@@ -1121,5 +1128,24 @@ int STileView::GetSelItemCount() const
 int STileView::GetSelItems(int *items, int nMaxCount) const
 {
     return SViewBase::GetSelItems(items, nMaxCount);
+}
+
+BOOL STileView::OnDragCancelCapture(int reason)
+{
+    if (m_itemCapture)
+    {
+        if (m_itemCapture->CancelCaptureMode(reason))
+        {
+            m_itemCapture = NULL;
+            return TRUE;
+        }
+        return FALSE;
+    }
+    return TRUE;
+}
+
+void STileView::OnDragClearItemCapture()
+{
+    m_itemCapture = NULL;
 }
 SNSEND

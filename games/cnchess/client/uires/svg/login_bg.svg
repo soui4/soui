@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="500" viewBox="0 0 400 500" preserveAspectRatio="none">
+    <defs>
+        <linearGradient id="bgGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#2C1810"/>
+            <stop offset="50%" stop-color="#4A2818"/>
+            <stop offset="100%" stop-color="#2C1810"/>
+        </linearGradient>
+        <filter id="softShadow" x="-5%" y="-5%" width="110%" height="110%">
+            <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.5"/>
+        </filter>
+    </defs>
+    
+    <!-- 圆角背景 -->
+    <rect x="0" y="0" width="400" height="500" rx="16" ry="16" fill="url(#bgGradient)" filter="url(#softShadow)"/>
+    
+    <!-- 顶部装饰线 -->
+    <line x1="30" y1="80" x2="370" y2="80" stroke="#FFD700" stroke-width="1" opacity="0.3"/>
+    <line x1="30" y1="420" x2="370" y2="420" stroke="#FFD700" stroke-width="1" opacity="0.3"/>
+    
+    <!-- 角落装饰 -->
+    <g stroke="#FFD700" stroke-width="1.5" fill="none" opacity="0.4">
+        <!-- 左上角 -->
+        <polyline points="20,30 20,50 40,50"/>
+        <!-- 右上角 -->
+        <polyline points="380,30 380,50 360,50"/>
+        <!-- 左下角 -->
+        <polyline points="20,470 20,450 40,450"/>
+        <!-- 右下角 -->
+        <polyline points="380,470 380,450 360,450"/>
+    </g>
+</svg>

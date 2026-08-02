@@ -836,20 +836,6 @@ CRect SMCListView::_OnItemGetRect(int iPosition) const
     return rcItem;
 }
 
-void SMCListView::OnItemSetCapture(SOsrPanel *pItem, BOOL bCapture)
-{
-    if (bCapture)
-    {
-        GetContainer()->OnSetSwndCapture(m_swnd);
-        m_itemCapture = pItem;
-    }
-    else
-    {
-        GetContainer()->OnReleaseSwndCapture();
-        m_itemCapture = NULL;
-    }
-}
-
 void SMCListView::RedrawItem(SOsrPanel *pItem)
 {
     pItem->InvalidateRect(NULL);
@@ -892,6 +878,13 @@ LRESULT SMCListView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
     LRESULT lRet = 0;
     CPoint pt(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 
+    // === 1. 先尝试SPanel的拖动处理 ===
+    if (HandleMouseDrag(uMsg, wParam, lParam, lRet))
+    {
+        SetMsgHandled(TRUE);
+        return 0;
+    }
+
     if (m_itemCapture)
     {
         CRect rcItem = m_itemCapture->GetItemRect();
@@ -906,6 +899,13 @@ LRESULT SMCListView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
         }
 
         SItemPanel *pHover = HitTest(pt);
+
+        // Start drag tracking on blank space
+        if (uMsg == WM_LBUTTONDOWN && pHover == NULL && IsItemDragScrollEnabled() && (HasScrollBar(TRUE) || HasScrollBar(FALSE)))
+        {
+            StartDragPending(pt);
+        }
+
         if (pHover != m_pHoverItem)
         {
             SOsrPanel *nOldHover = m_pHoverItem;
@@ -968,7 +968,7 @@ void SMCListView::OnMouseLeave()
 
 void SMCListView::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
 {
-    if (!m_adapter)
+    if (!m_adapter || nChar == VK_ESCAPE)
     {
         SetMsgHandled(FALSE);
         return;
@@ -1486,5 +1486,24 @@ int SMCListView::GetSelItemCount() const
 int SMCListView::GetSelItems(int *items, int nMaxCount) const
 {
     return SViewBase::GetSelItems(items, nMaxCount);
+}
+
+BOOL SMCListView::OnDragCancelCapture(int reason)
+{
+    if (m_itemCapture)
+    {
+        if (m_itemCapture->CancelCaptureMode(reason))
+        {
+            m_itemCapture = NULL;
+            return TRUE;
+        }
+        return FALSE;
+    }
+    return TRUE;
+}
+
+void SMCListView::OnDragClearItemCapture()
+{
+    m_itemCapture = NULL;
 }
 SNSEND

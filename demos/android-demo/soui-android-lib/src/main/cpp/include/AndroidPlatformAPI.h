@@ -181,6 +181,9 @@ public:
 
     BOOL showSoftKeyboard(HWND hWnd,BOOL bShow);
 
+    /** Play sound via Android platform (SoundPool/MediaPlayer). */
+    BOOL playSound(LPCSTR pszSound, HMODULE hmod, DWORD fdwSound);
+
     bool getCursorPos(LPPOINT ppt) const{
         if(!ppt)
             return false;
@@ -240,6 +243,7 @@ private:
     jmethodID m_postMessageMethod{nullptr};
     jmethodID m_getInputDevicesMethod{nullptr};
     jmethodID m_showSoftKeyboard{nullptr};
+    jmethodID m_playSoundMethod{nullptr};
     jmethodID m_getSystemServiceMethod{nullptr};
     // Clipboard methods
     jmethodID m_clipboardOpenMethod{nullptr};

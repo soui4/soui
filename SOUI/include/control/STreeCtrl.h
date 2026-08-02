@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file       STreeCtrl.h
  * @brief      Definition of the STreeCtrl class.
  * @version    2012.12.16 - 1.1
@@ -879,6 +879,9 @@ class SOUI_EXP STreeCtrl
      * @param size New size.
      */
     void OnSize(UINT nType, CSize size);
+
+    virtual BOOL OnDragCancelCapture(int reason) override;
+    virtual void OnDragClearItemCapture() override;
 
     SOUI_MSG_MAP_BEGIN()
         MSG_WM_PAINT_EX(OnPaint)

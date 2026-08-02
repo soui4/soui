@@ -3,24 +3,11 @@
 appWnd="1"
 translucent="1" 
 >
-  <root skin="_skin.sys.wnd.bkgnd" cache="1"  width="1000" height="800" layout="vbox" padding="5,5,5,5">
-    <caption size="-2,30" layout="hbox" interval="0" gravity="center">
-      <icon src="ICON_LOGO:16"/>
-      <text >@string/title</text>
-      <text name="txt_title" colorText="@color/red"/>
-      <window size="0,0" weight="1"/>
-      <window>
-        <imgbtn pos="0,0" name="btn_mute" skin="skin_btn_mute" show="0" animate="1" />
-        <imgbtn pos="0,0" name="btn_unmute" skin="skin_btn_unmute" animate="1" />
-      </window>
-      <imgbtn name="btn_min" skin="_skin.sys.btn.minimize"  animate="1" />
-      <window>
-        <imgbtn pos="0,0" name="btn_max" skin="_skin.sys.btn.maximize"   animate="1" />
-        <imgbtn pos="0,0" name="btn_restore" skin="_skin.sys.btn.restore"   show="0" animate="1" />
-      </window>
-      <imgbtn name="btn_close" skin="_skin.sys.btn.close"     tip="close" animate="1"/>
-    </caption>
-    <tabctrl size="-2,0" weight="1" tabHeight="30">
+  <root skin="_skin.sys.wnd.bkgnd" cache="1"  width="1000" height="800" layout="vbox">
+    <tabctrl size="-2,0" weight="1" tabHeight="36" duration="200" tabAlign="middle"
+             tabSkin="skin_tab_bg"
+             colorText="@color/text_light" colorTextHover="@color/gold" colorTextPush="@color/text_dark"
+             font="size:14,bold">
       <include src="layout:page_lobby"/>
       <include src="layout:page_game"/>
       <include src="layout:page_about"/>

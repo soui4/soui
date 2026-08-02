@@ -120,7 +120,7 @@ CRect SPropertyGrid::GetItemRect(IPropertyItem *pItem) const
 	}
     int iTopIdx = GetTopIndex();
 
-    int nItemHei = m_itemHeight.toPixelSize(GetScale());
+    int nItemHei = GetItemHeight();
     int nPageItems = (m_rcClient.Height() + nItemHei - 1) / nItemHei + 1;
     if (iTopIdx + nPageItems > GetCount())
         nPageItems = GetCount() - iTopIdx;
@@ -440,7 +440,7 @@ void SPropertyGrid::OnLButtonDown(UINT nFlags, CPoint pt)
 {
     CRect rcClient;
     GetClientRect(&rcClient);
-    int nItemHei = m_itemHeight.toPixelSize(GetScale());
+    int nItemHei = GetItemHeight();
     if (pt.x - rcClient.left >= nItemHei + m_nTitleWidth - 1
         && pt.x - rcClient.left <= nItemHei + m_nTitleWidth + 1)
     {
@@ -527,7 +527,7 @@ BOOL SPropertyGrid::OnSetCursor(const CPoint &pt)
 {
     CRect rcClient;
     GetClientRect(&rcClient);
-    int nItemHei = m_itemHeight.toPixelSize(GetScale());
+    int nItemHei = GetItemHeight();
     if (m_bDraging
         || (pt.x - rcClient.left >= nItemHei + m_nTitleWidth - 1
             && pt.x - rcClient.left <= nItemHei + m_nTitleWidth + 1))

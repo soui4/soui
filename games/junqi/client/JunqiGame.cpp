@@ -1004,8 +1004,8 @@ void CJunqiGame::OnTableInfo(IEvtArgs *e)
 void CJunqiGame::OnGameBoardSizeChanged(IEvtArgs *e)
 {
     EventSwndSize *evt = sobj_cast<EventSwndSize>(e);
-    SSkinBoard * pSkin = sobj_cast<SSkinBoard>(m_pChessBoard->GetSkin());
-    CSize szBoard = m_pChessBoard->GetSkin()->GetSkinSize();
+    SSkinBoard * pSkin = sobj_cast<SSkinBoard>(GETSKIN(L"skin_junqi_board",100));
+    CSize szBoard = pSkin->GetSkinSize();
     CRect rcGameGoard = m_pGameBoard->GetClientRect();
     CSize szGameBoard = evt->szWnd;
     float fRatio1 = (float)szGameBoard.cx / szGameBoard.cy;
@@ -1018,23 +1018,16 @@ void CJunqiGame::OnGameBoardSizeChanged(IEvtArgs *e)
         int nWid = (int)(szGameBoard.cy * fRatio2);
         rcBoard.DeflateRect((szGameBoard.cx - nWid) / 2, 0);
         scale = (float)nWid / szBoard.cx;
-        m_pChessBoard->Move(rcBoard);
     }
     else
     {
         int nHei = (int)(szGameBoard.cx / fRatio2);
         rcBoard.DeflateRect(0, (szGameBoard.cy - nHei) / 2);
         scale = (float)nHei / szBoard.cy;
-        m_pChessBoard->Move(rcBoard);
     }
+    m_pChessBoard->Move(rcBoard);
     m_pChessBoard->GetEventSet()->setMutedState(false);
     CRect rcMargin = pSkin->GetMargin();
-    CSize szCellAll = szBoard - CSize(rcMargin.left + rcMargin.right,rcMargin.top+rcMargin.bottom);
-
-    //calc cell size
-    m_cellWidth = szCellAll.cx * scale / 17;
-    m_cellHeight = szCellAll.cy * scale / 17;
-
     rcMargin.left *= scale;
     rcMargin.top *= scale;
     rcMargin.right *= scale;
@@ -1042,7 +1035,9 @@ void CJunqiGame::OnGameBoardSizeChanged(IEvtArgs *e)
     rcBoard.DeflateRect(rcMargin);
     m_ptBoardOrigin.x = rcBoard.left;
     m_ptBoardOrigin.y = rcBoard.bottom;
-
+    //calc cell size
+    m_cellWidth = rcBoard.Width() * 1.f / 17;
+    m_cellHeight = rcBoard.Height() * 1.f / 17;
     m_pGameBoard->SDispatchMessage(UM_SETSCALE, scale*100, 1);
 }
 

@@ -657,13 +657,11 @@ BOOL SImageWnd::SetSkin(ISkinObj *pSkin, int iFrame /*=0*/, BOOL bAutoFree /*=TR
         m_pSkin = NULL;
         m_bManaged = FALSE;
     }
-    if (!pSkin)
-        return FALSE;
     m_pSkin = pSkin;
     m_iIcon = iFrame;
     m_pImg = NULL;
     m_pSvg = NULL;
-    if (bAutoFree)
+    if (bAutoFree && m_pSkin)
     {
         m_pSkin->AddRef();
         m_bManaged = TRUE;
@@ -1298,6 +1296,8 @@ void SCheckBox::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
             ModifyState(WndState_Check, 0, TRUE);
 
         FireCommand();
+    }else if(nChar == VK_ESCAPE){
+        SetMsgHandled(FALSE);
     }
 }
 

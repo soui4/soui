@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Copyright (C) 2014-2050 SOUI团队
  * All rights reserved.
  *
@@ -244,6 +244,8 @@ class SOUI_EXP SScrollBar
      * Describe  Cleans up resources when the control is destroyed.
      */
     void OnDestroy();
+
+    virtual BOOL CancelCaptureMode(int reason) override;
 
     SOUI_MSG_MAP_BEGIN()
         MSG_WM_LBUTTONDOWN(OnLButtonDown)

@@ -572,6 +572,13 @@ BOOL SRebar::OnLButtonUp(UINT nFlags, CPoint point)
     return TRUE;
 }
 
+BOOL SRebar::CancelCaptureMode(int reason)
+{
+    if (reason == CANCEL_REASON_SCROLL && m_bDragging)
+        return FALSE;
+    return __baseCls::CancelCaptureMode(reason);
+}
+
 BOOL SRebar::OnMouseMove(UINT nFlags, CPoint point)
 {
     if (!m_bDragging || m_nDragBand < 0)

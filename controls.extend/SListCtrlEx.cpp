@@ -12,8 +12,7 @@
 #pragma warning(disable : 4018)
 #pragma warning(disable : 4267)
 
-namespace SOUI
-{
+SNSBEGIN
 
 SListCtrlEx::SListCtrlEx()
     : m_nItemHeight(30)
@@ -711,12 +710,34 @@ void SListCtrlEx::OnItemSetCapture(SOsrPanel *pItem, BOOL bCapture)
     {
         SetCapture();
         m_pCapturedFrame = pItem;
+        if (IsItemDragScrollEnabled())
+            StartDragPending(CPoint(0, 0));
     }
     else if (pItem == m_pCapturedFrame)
     {
         ReleaseCapture();
         m_pCapturedFrame = NULL;
+        SetDragPending(FALSE);
     }
+}
+
+BOOL SListCtrlEx::OnDragCancelCapture(int reason)
+{
+    if (m_pCapturedFrame)
+    {
+        if (m_pCapturedFrame->CancelCaptureMode(reason))
+        {
+            m_pCapturedFrame = NULL;
+            return TRUE;
+        }
+        return FALSE;
+    }
+    return TRUE;
+}
+
+void SListCtrlEx::OnDragClearItemCapture()
+{
+    m_pCapturedFrame = NULL;
 }
 
 CRect SListCtrlEx::GetItemRect(int iItem) const
@@ -732,9 +753,18 @@ CRect SListCtrlEx::GetItemRect(int iItem) const
 
 LRESULT SListCtrlEx::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+    SetMsgHandled(FALSE);
 
     LRESULT lRet = 0;
     CPoint pt(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+
+    // Try drag scroll first
+    if (HandleMouseDrag(uMsg, wParam, lParam, lRet))
+    {
+        SetMsgHandled(TRUE);
+        return 0;
+    }
+
     switch (uMsg)
     {
     case WM_LBUTTONDOWN:
@@ -1160,4 +1190,4 @@ BOOL SListCtrlEx::SortItems(PFNLVCOMPAREEX pfnCompare, void *pContext)
     InvalidateRect(GetListRect());
     return TRUE;
 }
-} // namespace SOUI
+SNSEND

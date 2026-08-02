@@ -1,10 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <color>
+  <!-- 基础色 -->
   <blue value="rgb(0,0,255)"/>
   <red value="rgb(255,0,0)"/>
   <green value="rgb(0,128,0)"/>
   <gray value="rgb(128,128,128)"/>
   <white value="rgb(255,255,255)"/>
   <black value="rgb(0,0,0)"/>
-  <mask_select value="rgba(128,0,128,100)"/>
+  <mask_select value="rgba(128,0,128,0.5)"/>
+
+  <!-- 背景色 -->
+  <bg_dark value="#1F1208"/>
+  <bg_panel value="#2C1810"/>
+  <bg_edit value="#3D2F1F"/>
+  <bg_modal value="#2A1A0E"/>
+
+  <!-- 边框/分隔线 -->
+  <border_dark value="#5D4E37"/>
+  <divider value="#8B7355"/>
+
+  <!-- 金色系 -->
+  <gold value="#FFD700"/>
+  <gold_light value="#FFE066"/>
+  <gold_dark value="#B8860B"/>
+
+  <!-- 文字色 -->
+  <text_light value="#CCCCCC"/>
+  <text_muted value="#8B7355"/>
+  <text_dark value="#2C1810"/>
+  <text_cancel value="#222222"/>
+  <!-- 按钮色 -->
+  <btn_red value="#e60026"/>
+  <btn_red_hover value="#ff1744"/>
+  <btn_red_pressed value="#cc0022"/>
+
+  <!-- 遮罩 -->
+  <modal_mask value="rgba(0,0,0,0.5)"/>
+  <modal_mask_light value="rgba(255,255,255,0.9)"/>
 </color>

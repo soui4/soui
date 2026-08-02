@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file       SSplitWnd.h
  * @brief      Definition of the SSplitWnd and related classes.
  * @version    v1.0
@@ -210,6 +210,8 @@ class SOUI_EXP SSplitWnd : public SWindow {
      * @param pt The mouse position.
      */
     void OnMouseMove(UINT nFlags, CPoint pt);
+
+    virtual BOOL CancelCaptureMode(int reason) override;
 
   protected:
     /**

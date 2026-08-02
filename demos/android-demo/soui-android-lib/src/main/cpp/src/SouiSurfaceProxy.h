@@ -18,20 +18,16 @@ public:
 
     void onSizeChanged(int width, int height);
 
-    // 旧版 API（保留向后兼容）
-    void onTouchEvent(int action, float x, float y, int pointerId, long timestamp);
-    void onKeyEvent(int keyCode, int action, int metaState, long timestamp);
-
     // 新版扩展 API：统一鼠标/悬停/滚轮/触摸事件
-    void onMotionEventEx(int action, float x, float y, int pointerId,
-                         int buttonState, float vscroll, float hscroll,
-                         int metaState, long timestamp);
+    void onMotionEvent(int action, float x, float y, int pointerId,
+                       int buttonState, float vscroll, float hscroll,
+                       int metaState, long timestamp);
 
     // 新版扩展键盘 API：携带 repeatCount/scanCode/unicodeChar/flags
     // @return true SOUI 已消费；false 未处理，交给系统
-    bool onKeyEventEx(int keyCode, int action, int metaState,
-                      int repeatCount, int scanCode, int unicodeChar,
-                      long flags, long timestamp);
+    bool onKeyEvent(int keyCode, int action, int metaState,
+                    int repeatCount, int scanCode, int unicodeChar,
+                    long flags, long timestamp);
 
     void render(JNIEnv* env, jobject bitmap);
 

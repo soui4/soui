@@ -327,6 +327,13 @@ void SHeaderCtrl::OnLButtonUp(UINT nFlags, CPoint pt)
     ReleaseCapture();
 }
 
+BOOL SHeaderCtrl::CancelCaptureMode(int reason)
+{
+    if (reason == CANCEL_REASON_SCROLL && m_bDragging)
+        return FALSE;
+    return __baseCls::CancelCaptureMode(reason);
+}
+
 void SHeaderCtrl::OnMouseMove(UINT nFlags, CPoint pt)
 {
     if (m_bDragging || nFlags & MK_LBUTTON)

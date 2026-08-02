@@ -4,6 +4,7 @@
 #include <cnchessProtocol.h>
 #include <helper/slog.h>
 #include <helper/SAdapterBase.h>
+#include <control/SCmnCtrl.h>
 #include <map>
 #include <memory>
 #include "events.h"
@@ -62,17 +63,31 @@ public:
         {
             pItem->InitFromXml(&xmlTemplate);
         }
-        pItem->FindChildByName(L"txt_table_id")->SetWindowText(SStringT().Format(_T("%d"), position));
+
+        // 更新桌子ID显示
+        SStringT strTableId = SStringT().Format(_T("桌号: %d"), position);
+        pItem->FindChildByName(L"txt_table_id")->SetWindowText(strTableId);
+
         auto slot = Subscriber(&CTableAdapter::OnButtonClick, this);
 
+        // 初始化座位显示
         for (int i = 0; i < PLAYER_COUNT; i++)
         {
             SStringW strSeat = SStringW().Format(L"seat_%d", i);
-            SWindow *pSeat = pItem->FindChildByName(strSeat);
-            pSeat->SubscribeEvent(EventCmd::EventID, &slot);
-            pSeat->SetWindowText(_T("-"));
-            pSeat->FindChildByName(L"seat_ready")->SetVisible(FALSE, TRUE);
+            SWindow *pSeatWnd = pItem->FindChildByName(strSeat);
+            SImageWnd *pSeatImg = sobj_cast<SImageWnd>(pSeatWnd);
+
+            // 设置座位图标（使用 seat_states SVG 资源）
+            pSeatImg->SetIcon(i == 0 ? 0 : 3);  // 红方座位(0)或黑方座位(3)
+
+            // 订阅事件
+            pSeatWnd->SubscribeEvent(EventCmd::EventID, &slot);
+
+            // 更新座位文本
+            SStringW strSeatText = SStringW().Format(L"txt_seat_%d", i);
+            pItem->FindChildByName(strSeatText)->SetWindowText(SStringT(_T("空位")));
         }
+
         auto it = m_tables.find(position);
         if(it != m_tables.end()){
             GAME_TABLE_INFO * table = it->second.get();
@@ -81,20 +96,54 @@ public:
                 int nSeat = seatInfo->nIndex;
                 SStringW strSeat = SStringW().Format(L"seat_%d", nSeat);
                 SStringT strName = S_CA2T(seatInfo->stUserInfo.szName, CP_UTF8);
-                SWindow *pSeat = pItem->FindChildByName(strSeat);
-                pSeat->SetWindowText(strName);
-                pSeat->FindChildByName(L"seat_ready")->SetVisible(seatInfo->bReady, TRUE);
+                SWindow *pSeatWnd = pItem->FindChildByName(strSeat);
+                SImageWnd *pSeatImg = sobj_cast<SImageWnd>(pSeatWnd);
+
+                // 设置座位状态图标
+                int nIconIndex = nSeat == 0 ? 1 : 4;  // 红方占据(1)或黑方占据(4)
+                if(seatInfo->bReady){
+                    nIconIndex = nSeat == 0 ? 2 : 5;  // 红方准备(2)或黑方准备(5)
+                }
+                pSeatImg->SetIcon(nIconIndex);
+
+                // 更新座位名称
+                SStringW strSeatText = SStringW().Format(L"txt_seat_%d", nSeat);
+                pItem->FindChildByName(strSeatText)->SetWindowText(strName);
+
                 seatInfo++;
             }
-            pItem->FindChildByName(L"img_playing")->SetVisible(table->tableState == TABLE_STATE_PLAYING, TRUE);
+
+            // 更新游戏状态显示
+            bool bPlaying = table->tableState == TABLE_STATE_PLAYING;
+            pItem->FindChildByName(L"img_playing")->SetVisible(bPlaying, TRUE);
+
+            // 更新状态文本
+            SStringT strStatus;
+            if(bPlaying){
+                strStatus = _T("游戏进行中");
+            }else{
+                // 检查是否所有玩家都准备就绪
+                bool allReady = true;
+                SEAT_INFO *checkSeat = table->seatInfo;
+                for(int i=0;i<table->nPlayers;i++){
+                    if(!checkSeat->bReady){
+                        allReady = false;
+                        break;
+                    }
+                    checkSeat++;
+                }
+                strStatus = allReady ? _T("等待开始") : _T("等待准备");
+            }
+            pItem->FindChildByName(L"txt_status")->SetWindowText(strStatus);
         }else{
             pItem->FindChildByName(L"img_playing")->SetVisible(FALSE, TRUE);
+            pItem->FindChildByName(L"txt_status")->SetWindowText(_T("等待入座"));
         }
     }
 
     BOOL OnButtonClick(IEvtArgs *e)
     {
-        SWindow *pBtn = sobj_cast<SButton>(e->Sender());
+        SWindow *pBtn = sobj_cast<SWindow>(e->Sender());
         SItemPanel *pItem = sobj_cast<SItemPanel>(pBtn->GetRoot());
         int nTableId = pItem->GetItemIndex();
         int id = pBtn->GetID()-10;
@@ -223,14 +272,14 @@ BOOL LobbyHandler::OnLoginAck(const void *lpData, int nSize)
         return FALSE;
     MyProfile *pMyProfile = MyProfile::getSingletonPtr();
     pMyProfile->SetUID(pAck->uid);
+
+    // 格式化游戏规则信息
     SStringT strInfo;
-    strInfo = _T("步时: ") + SStringT().Format(_T("%d"), pAck->dwProps[PROPID_TIME_STEP]);
-    strInfo = _T("最小步数限制: ") + SStringT().Format(_T("%d"), pAck->dwProps[PROPID_MIN_STEPS]);
-    strInfo = _T("悔棋次数: ") + SStringT().Format(_T("%d"), pAck->dwProps[PROPID_REGRET]);
-    strInfo = _T("长捉次数: ") + SStringT().Format(_T("%d"), pAck->dwProps[PROPID_MAX_STP_CATCH]);
-    strInfo = _T("长将次数: ") + SStringT().Format(_T("%d"), pAck->dwProps[PROPID_MAX_STP_JIANG]);
-    strInfo = _T("不吃子步数: ") + SStringT().Format(_T("%d"), pAck->dwProps[PROPID_MAX_STP_PEACE]);
-    strInfo = _T("局时: ") + SStringT().Format(_T("%d"), pAck->dwProps[PROPID_TIME_ROUND]);
+    strInfo.Format(_T("步时: %d | 最小步数: %d | 悔棋: %d | 局时: %d"),
+        pAck->dwProps[PROPID_TIME_STEP],
+        pAck->dwProps[PROPID_MIN_STEPS],
+        pAck->dwProps[PROPID_REGRET],
+        pAck->dwProps[PROPID_TIME_ROUND]);
 
     m_pRoot->FindChildByName(L"txt_table_info")->SetWindowText(strInfo);
     return TRUE;

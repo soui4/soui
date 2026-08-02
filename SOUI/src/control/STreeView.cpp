@@ -455,6 +455,7 @@ STreeView::STreeView()
 
 STreeView::~STreeView()
 {
+    StopFlingAnimation();
     delete m_pVisibleMap;
 }
 
@@ -750,7 +751,7 @@ void STreeView::SetSel(HSTREEITEM hItem, BOOL bNotify /*=FALSE*/)
 
 void STreeView::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
 {
-    if (!m_adapter)
+    if (!m_adapter || nChar == VK_ESCAPE)
     {
         SetMsgHandled(FALSE);
         return;
@@ -1177,11 +1178,14 @@ void STreeView::OnItemSetCapture(SOsrPanel *pItem, BOOL bCapture)
     {
         GetContainer()->OnSetSwndCapture(m_swnd);
         m_itemCapture = pItem;
+        if (IsItemDragScrollEnabled())
+            StartDragPending(CPoint(0, 0));
     }
     else
     {
         GetContainer()->OnReleaseSwndCapture();
         m_itemCapture = NULL;
+        SetDragPending(FALSE);
     }
 }
 
@@ -1340,6 +1344,13 @@ LRESULT STreeView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
     LRESULT lRet = 0;
     CPoint pt(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 
+    // === 1. 先尝试拖动处理 ===
+    if (HandleMouseDrag(uMsg, wParam, lParam, lRet))
+    {
+        SetMsgHandled(TRUE);
+        return 0;
+    }
+
     if (m_itemCapture)
     {
         CRect rcItem = m_itemCapture->GetItemRect();
@@ -1361,6 +1372,12 @@ LRESULT STreeView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
             }
 
             __baseCls::ProcessSwndMessage(uMsg, wParam, lParam, lRet);
+
+            // Start drag tracking on blank space
+            if (uMsg == WM_LBUTTONDOWN && pPanel == NULL && IsItemDragScrollEnabled())
+            {
+                StartDragPending(pt);
+            }
         }
 
         SOsrPanel *pHover = HitTest(pt);
@@ -1953,6 +1970,25 @@ void STreeView::OnLButtonDown(UINT nFlags, CPoint pt)
         }
     }
     SetMsgHandled(FALSE);
+}
+
+BOOL STreeView::OnDragCancelCapture(int reason)
+{
+    if (m_itemCapture)
+    {
+        if (m_itemCapture->CancelCaptureMode(reason))
+        {
+            m_itemCapture = NULL;
+            return TRUE;
+        }
+        return FALSE;
+    }
+    return TRUE;
+}
+
+void STreeView::OnDragClearItemCapture()
+{
+    m_itemCapture = NULL;
 }
 
 SNSEND

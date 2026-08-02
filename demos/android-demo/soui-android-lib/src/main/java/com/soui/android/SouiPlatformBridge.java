@@ -16,6 +16,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.content.ClipboardManager;
 import android.content.ClipData;
+import android.media.MediaPlayer;
 
 import androidx.annotation.Nullable;
 
@@ -30,13 +31,15 @@ import java.util.function.Function;
  */
 public class SouiPlatformBridge {
     static {
-        System.loadLibrary("soui-android-demo");
+        System.loadLibrary("soui4android");
     }
 
     private static final String TAG = "SouiPlatformBridge";
     private static SouiPlatformBridge sInstance;
 
     private Context mContext;
+    private MediaPlayer mCurrentMediaPlayer;
+    private final HashMap<String, MediaPlayer> mActivePlayers = new HashMap<>();
 
     /** Windows WS_* 风格位常量（值与 Win32 完全一致） */
     public static final int WS_OVERLAPPED    = 0x00000000;
@@ -221,7 +224,7 @@ public class SouiPlatformBridge {
         final int pId = event.getPointerId(pIdx);
 
         // --- 投递到目标 HWND（完全对齐原分发的 nativeOnMotionEventEx 调用签名）---
-        ((SouiBaseSurface) captureView).nativeOnMotionEventEx(
+        ((SouiBaseSurface) captureView).nativeOnMotionEvent(
                 captureHwnd, actionMasked, localX, localY, pId,
                 buttonState, vscroll, hscroll, metaState, eventTime);
         return Boolean.TRUE;
@@ -1056,6 +1059,18 @@ public class SouiPlatformBridge {
             return imm.hideSoftInputFromWindow(v.getWindowToken(),0);
     }
 
+    public  long createNative(INativeWindow wnd){
+        return nativeCreate(wnd);
+    }
+
+    public  void destroyNative(long nativeId){
+        // 清理捕获/焦点，避免残留指向已销毁的 HWND
+        if (nativeId == getCapture()) releaseCapture();
+        if (nativeId == getFocus()) setFocus(0L);
+        killWindowTimers(nativeId);
+        nativeDestroy(nativeId);
+    }
+
     private native void nativeRegisterPlatformAPI(Context ctx);
 
     private native void nativeUnregisterPlatformAPI();
@@ -1093,6 +1108,9 @@ public class SouiPlatformBridge {
     public static native void nativeSetKeyboardHeight(long keyboardHeight);
     private static native boolean nativeInitSouiApp(AssetManager am, String appFilesDir);
     private static native void nativeUninitSouiApp();
+
+    private static native long nativeCreate(INativeWindow wnd);
+    private static native void nativeDestroy(long nativeId);
 
     // Clipboard API constants (matching Win32 CF_* values)
     private static final int CF_TEXT = 1;
@@ -1180,4 +1198,101 @@ public class SouiPlatformBridge {
     }
 
     private static native void nativeSendImeString(long hwnd, int slotid);
+
+    /**
+     * Play sound file via Android platform.
+     * @param pszSound Sound file path
+     * @param fdwSound Sound flags (SND_*)
+     * @return true if sound started playing successfully
+     */
+    @SuppressWarnings("unused")
+    public synchronized boolean playSound(String pszSound, int fdwSound) {
+        if (mContext == null || pszSound == null || pszSound.isEmpty()) {
+            return false;
+        }
+
+        // SND_PURGE: Stop all playing sounds
+        if ((fdwSound & 0x00000040) != 0) { // SND_PURGE
+            stopAllSounds();
+            return true;
+        }
+
+        // Check if sound file exists
+        java.io.File soundFile = new java.io.File(pszSound);
+        if (!soundFile.exists()) {
+            Log.w(TAG, "playSound: file not found: " + pszSound);
+            return false;
+        }
+
+        try {
+            // Stop previous sound if playing
+            if (mCurrentMediaPlayer != null) {
+                try {
+                    mCurrentMediaPlayer.stop();
+                    mCurrentMediaPlayer.release();
+                } catch (Exception e) {
+                    // Ignore
+                }
+                mCurrentMediaPlayer = null;
+            }
+
+            MediaPlayer mediaPlayer = new MediaPlayer();
+            mediaPlayer.setDataSource(pszSound);
+
+            final boolean loop = (fdwSound & 0x00000008) != 0; // SND_LOOP
+            mediaPlayer.setLooping(loop);
+
+            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    if (mp == mCurrentMediaPlayer) {
+                        mCurrentMediaPlayer = null;
+                    }
+                    mp.release();
+                }
+            });
+
+            mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+                @Override
+                public boolean onError(MediaPlayer mp, int what, int extra) {
+                    Log.e(TAG, "playSound error: what=" + what + " extra=" + extra);
+                    if (mp == mCurrentMediaPlayer) {
+                        mCurrentMediaPlayer = null;
+                    }
+                    mp.release();
+                    return true;
+                }
+            });
+
+            mediaPlayer.prepare();
+            mediaPlayer.start();
+            mCurrentMediaPlayer = mediaPlayer;
+
+            return true;
+        } catch (Exception e) {
+            Log.e(TAG, "playSound failed: " + pszSound, e);
+            return false;
+        }
+    }
+
+    private void stopAllSounds() {
+        if (mCurrentMediaPlayer != null) {
+            try {
+                mCurrentMediaPlayer.stop();
+                mCurrentMediaPlayer.release();
+            } catch (Exception e) {
+                // Ignore
+            }
+            mCurrentMediaPlayer = null;
+        }
+        for (MediaPlayer player : mActivePlayers.values()) {
+            try {
+                player.stop();
+                player.release();
+            } catch (Exception e) {
+                // Ignore
+            }
+        }
+        mActivePlayers.clear();
+    }
 }

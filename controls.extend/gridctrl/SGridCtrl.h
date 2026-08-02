@@ -857,6 +857,7 @@ protected:
 
     BOOL OnSetCursor(const CPoint &pt) override;
     void BeforePaint(IRenderTarget *pRT, SPainter &painter) const override;
+    virtual BOOL CancelCaptureMode(int reason) override;
     SOUI_MSG_MAP_BEGIN()
         MSG_WM_PAINT_EX(OnPaint)
         MSG_WM_SIZE(OnSize)

@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "LobbyHandler.h"
 #include "myprofile.h"
 #include <cnchessProtocol.h>
@@ -12,13 +12,16 @@
 
 class CTableAdapter: public SAdapterBase
 {
-    std::map<int, std::shared_ptr<GAME_TABLE_INFO> > m_tables;
+    typedef std::map<int, std::shared_ptr<GAME_TABLE_INFO> > TABLE_MAP;
+    TABLE_MAP m_tables;
     int m_nTableCount;
     LobbyHandler * m_pLobby;
+    int m_nPlayerCount;
 public:
     CTableAdapter(LobbyHandler *pLobby)
         : m_pLobby(pLobby)
       , m_nTableCount(0)
+      , m_nPlayerCount(0)
     {
     }
     ~CTableAdapter()
@@ -31,6 +34,7 @@ public:
         int dwTableMax = *(DWORD *)p;
         p += sizeof(DWORD);
         m_nTableCount = dwTableMax;
+        m_nPlayerCount = 0;
         GAME_ROOM_INFO *pRoomInfo = (GAME_ROOM_INFO *)p;
         GAME_TABLE_INFO *pTableInfo = (GAME_TABLE_INFO*)pRoomInfo->tableInfo;
         for(int i=0;i<pRoomInfo->nTableCount;i++){
@@ -40,16 +44,23 @@ public:
             m_pLobby->OnTableInfo(table, length);
             m_tables.insert(std::make_pair(pTableInfo->nTableId, std::shared_ptr<GAME_TABLE_INFO>(table, free)));
             pTableInfo = (GAME_TABLE_INFO *)((BYTE *)pTableInfo + length);
+            m_nPlayerCount += table->nPlayers;
         }
         notifyDataSetChanged();
     }
 
     void SetTableInfo(GAME_TABLE_INFO *pTableInfo, int dwLen){
-        m_tables.erase(pTableInfo->nTableId);
+        TABLE_MAP::iterator  it = m_tables.find(pTableInfo->nTableId);
+        if(it!=m_tables.end()){
+            m_nPlayerCount -= it->second->nPlayers;
+            m_tables.erase(it);
+        }
         GAME_TABLE_INFO *pTableInfo2 = (GAME_TABLE_INFO *)malloc(dwLen);
         memcpy(pTableInfo2, pTableInfo, dwLen);
+        m_nPlayerCount += pTableInfo2->nPlayers;
         m_tables.insert(std::make_pair(pTableInfo2->nTableId, std::shared_ptr<GAME_TABLE_INFO>(pTableInfo2, free)));
         notifyItemDataChanged(pTableInfo2->nTableId);
+        m_pLobby->UpdatePlayerCount(m_nPlayerCount);
     }
 
     STDMETHOD_(int, getCount)() override
@@ -62,39 +73,75 @@ public:
         {
             pItem->InitFromXml(&xmlTemplate);
         }
-        pItem->FindChildByName(L"txt_table_id")->SetWindowText(SStringT().Format(_T("%d"), position));
+        pItem->FindChildByName(L"txt_table_id")->SetWindowText(SStringT().Format(_T("桌号: %d"), position));
         auto slot = Subscriber(&CTableAdapter::OnButtonClick, this);
 
+        // 初始化所有座位为空状态
         for (int i = 0; i < PLAYER_COUNT; i++)
         {
             SStringW strSeat = SStringW().Format(L"seat_%d", i);
-            SWindow *pSeat = pItem->FindChildByName(strSeat);
+            SStringW strTxtSeat = SStringW().Format(L"txt_seat_%d", i);
+            SImageWnd *pSeat = pItem->FindChildByName2<SImageWnd>(strSeat);
+            SWindow *pTxtSeat = pItem->FindChildByName(strTxtSeat);
             pSeat->SubscribeEvent(EventCmd::EventID, &slot);
-            pSeat->SetWindowText(_T("-"));
-            pSeat->FindChildByName(L"seat_ready")->SetVisible(FALSE, TRUE);
+            
+            // 空座位状态: iconIndex = 座位索引 * 3 + 0
+            pSeat->SetIcon(i * 3 + 0);
+            if(pTxtSeat){
+                pTxtSeat->SetWindowText(_T("空位"));
+                pTxtSeat->SetTextColor(RGBA(0xFF, 0xCC, 0xCC, 0xFF));
+            }
         }
+        
+        // 默认状态: 等待入座
+        pItem->FindChildByName(L"img_playing")->SetVisible(FALSE, TRUE);
+        pItem->FindChildByName(L"txt_status")->SetWindowText(_T("等待入座"));
+        pItem->FindChildByName(L"txt_status")->SetTextColor(RGBA(0xFF, 0x8B, 0x73, 0x55));
+        
         auto it = m_tables.find(position);
         if(it != m_tables.end()){
             GAME_TABLE_INFO * table = it->second.get();
             SEAT_INFO * seatInfo = table->seatInfo;
+            int nReadyCount = 0;
+            
             for(int i=0;i<table->nPlayers;i++){
                 int nSeat = seatInfo->nIndex;
                 SStringW strSeat = SStringW().Format(L"seat_%d", nSeat);
+                SStringW strTxtSeat = SStringW().Format(L"txt_seat_%d", nSeat);
                 SStringT strName = S_CA2T(seatInfo->stUserInfo.szName, CP_UTF8);
-                SWindow *pSeat = pItem->FindChildByName(strSeat);
-                pSeat->SetWindowText(strName);
-                pSeat->FindChildByName(L"seat_ready")->SetVisible(seatInfo->bReady, TRUE);
+                SImageWnd *pSeat = pItem->FindChildByName2<SImageWnd>(strSeat);
+                SWindow *pTxtSeat = pItem->FindChildByName(strTxtSeat);
+                
+                // 占座状态: iconIndex = 座位索引 * 3 + 1 (已占) 或 +2 (准备)
+                int nIconIndex = nSeat * 3 + (seatInfo->bReady ? 2 : 1);
+                pSeat->SetIcon(nIconIndex);
+                if(pTxtSeat){
+                    pTxtSeat->SetWindowText(strName);
+                    pTxtSeat->SetTextColor(seatInfo->bReady ? RGBA(0xFF, 0x32, 0xCD, 0x32) : RGBA(0xFF, 0xFF, 0xFF, 0xFF));
+                }
+                
+                if(seatInfo->bReady) nReadyCount++;
                 seatInfo++;
             }
-            pItem->FindChildByName(L"img_playing")->SetVisible(table->tableState == TABLE_STATE_PLAYING, TRUE);
-        }else{
-            pItem->FindChildByName(L"img_playing")->SetVisible(FALSE, TRUE);
+            
+            // 根据桌子状态更新UI
+            if(table->tableState == TABLE_STATE_PLAYING){
+                pItem->FindChildByName(L"img_playing")->SetVisible(TRUE, TRUE);
+                pItem->FindChildByName(L"txt_status")->SetWindowText(_T("对战进行中"));
+                pItem->FindChildByName(L"txt_status")->SetTextColor(RGBA(0xFF, 0x6B, 0x35, 0xFF));
+            } else if(table->nPlayers == PLAYER_COUNT && nReadyCount == PLAYER_COUNT){
+                pItem->FindChildByName(L"txt_status")->SetWindowText(_T("准备完毕,开始对局"));
+                pItem->FindChildByName(L"txt_status")->SetTextColor(RGBA(0xFF, 0x32, 0xCD, 0x32));
+            } else if(table->nPlayers > 0){
+                pItem->FindChildByName(L"txt_status")->SetWindowText(_T("等待其他玩家"));
+                pItem->FindChildByName(L"txt_status")->SetTextColor(RGBA(0xFF, 0xD7, 0x00, 0xFF));
+            }
         }
     }
 
     BOOL OnButtonClick(IEvtArgs *e)
     {
-        SWindow *pBtn = sobj_cast<SButton>(e->Sender());
+        SWindow *pBtn = sobj_cast<SWindow>(e->Sender());
         SItemPanel *pItem = sobj_cast<SItemPanel>(pBtn->GetRoot());
         int nTableId = pItem->GetItemIndex();
         int id = pBtn->GetID()-10;
@@ -238,4 +285,8 @@ BOOL LobbyHandler::OnLoginAck(const void *lpData, int nSize)
 
 void LobbyHandler::OnDisconnected()
 {
+}
+
+void LobbyHandler::UpdatePlayerCount(int nPlayerCount) {
+    m_pRoot->FindChildByName("txt_online")->SetWindowText(SStringT().Format(_T("在线:%d"),nPlayerCount));
 }

@@ -351,7 +351,6 @@ class SOUI_EXP SListBox : public TPanelProxy<IListBox> {
      */
     void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
 
-    int OnCreate(LPVOID);
     /**
      * @brief Handle destroy event
      */
@@ -369,10 +368,12 @@ class SOUI_EXP SListBox : public TPanelProxy<IListBox> {
      */
     void OnMouseLeave();
 
+  private:
+    SLayoutSize m_itemHeight; /**< Height of the items */
+    mutable int m_nItemHeight; /**< Height of the items in pixels */
+
   protected:
     SArray<LPLBITEM> m_arrItems; /**< Array of items */
-
-    SLayoutSize m_itemHeight; /**< Height of the items */
     int m_iSelItem;           /**< Index of the selected item */
     int m_iHoverItem;         /**< Index of the item under the mouse */
     int m_iScrollSpeed;       /**< Scroll speed */
@@ -419,7 +420,6 @@ class SOUI_EXP SListBox : public TPanelProxy<IListBox> {
         MSG_WM_SHOWWINDOW(OnShowWindow)
         MSG_WM_MOUSELEAVE(OnMouseLeave)
         MSG_WM_DESTROY(OnDestroy)
-        MSG_WM_CREATE(OnCreate)
         MSG_WM_SIZE(OnSize)
     SOUI_MSG_MAP_END()
 };

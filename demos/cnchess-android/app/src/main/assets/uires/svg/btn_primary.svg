@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="20" viewBox="0 0 200 20">
+    <!-- 
+        批量转换对话框 - 主按钮皮肤 (4种状态)
+        用于: 开始转换等主要操作按钮
+        状态1: Normal (0-50px) - 红色背景 #e60026, 无边框
+        状态2: Hover (50-100px) - 悬停背景 #ff1744 (更亮的红色)
+        状态3: Pressed (100-150px) - 按下背景 #cc0022 (更深的红色)
+        状态4: Disabled (150-200px) - 禁用状态灰色 #cccccc
+    -->
+    
+    <!-- State 1: Normal -->
+    <rect x="0" y="0" width="50" height="20" rx="3" ry="3" fill="#e60026"/>
+    
+    <!-- State 2: Hover -->
+    <rect x="50" y="0" width="50" height="20" rx="3" ry="3" fill="#ff1744"/>
+    
+    <!-- State 3: Pressed -->
+    <rect x="100" y="0" width="50" height="20" rx="3" ry="3" fill="#cc0022"/>
+    
+    <!-- State 4: Disabled -->
+    <rect x="150" y="0" width="50" height="20" rx="3" ry="3" fill="#cccccc"/>
+</svg>

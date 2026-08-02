@@ -1,4 +1,4 @@
-﻿#ifndef __SMCLISTVIEW__H__
+#ifndef __SMCLISTVIEW__H__
 #define __SMCLISTVIEW__H__
 
 #include "core/SPanel.h"
@@ -409,13 +409,6 @@ class SOUI_EXP SMCListView
     virtual BOOL OnItemGetRect(const SOsrPanel *pItem, CRect &rcItem) const;
 
     /**
-     * @brief Sets or releases capture on an item
-     * @param pItem Pointer to the item panel
-     * @param bCapture TRUE to set capture, FALSE to release
-     */
-    virtual void OnItemSetCapture(SOsrPanel *pItem, BOOL bCapture);
-
-    /**
      * @brief Redraws an item
      * @param pItem Pointer to the item panel
      */
@@ -452,6 +445,18 @@ class SOUI_EXP SMCListView
      * @brief Handles font rebuild event
      */
     virtual void OnRebuildFont();
+
+    /**
+     * @brief Cancel item capture during drag
+     * @param reason Reason for cancellation
+     * @return TRUE if capture was released, FALSE otherwise
+     */
+    virtual BOOL OnDragCancelCapture(int reason) override;
+
+    /**
+     * @brief Clear item capture during drag
+     */
+    virtual void OnDragClearItemCapture() override;
 
   protected:
     SAutoRefPtr<IMcAdapter> m_adapter;                 /**< Pointer to the multi-column adapter */

@@ -96,6 +96,7 @@ void WebSocketSvrListener::onConnError(ISvrConnection* pConn, const char* errStr
 
 void WebSocketSvrListener::onDisconnect(ISvrConnection* pConn)
 {
+	SLOGI() << "Client disconnected: " << pConn;
 	if (m_pGame && pConn)
 	{
 		m_pGame->RemoveClient(pConn);

@@ -1,4 +1,4 @@
-﻿#ifndef __SLISTVIEW__H__
+#ifndef __SLISTVIEW__H__
 #define __SLISTVIEW__H__
 
 #include <core/SPanel.h>
@@ -364,13 +364,6 @@ class SOUI_EXP SListView
     virtual BOOL OnItemGetRect(const SOsrPanel *pItem, CRect &rcItem) const;
 
     /**
-     * @brief Sets or releases capture on an item
-     * @param pItem Pointer to the item panel
-     * @param bCapture TRUE to set capture, FALSE to release
-     */
-    virtual void OnItemSetCapture(SOsrPanel *pItem, BOOL bCapture);
-
-    /**
      * @brief Redraws an item
      * @param pItem Pointer to the item panel
      */
@@ -407,6 +400,18 @@ class SOUI_EXP SListView
      * @brief Handles font rebuild event
      */
     virtual void OnRebuildFont();
+
+    /**
+     * @brief Cancel capture when drag scrolling takes over
+     * @param reason Reason for cancelling capture
+     * @return TRUE if capture was cancelled (or none to cancel), FALSE otherwise
+     */
+    virtual BOOL OnDragCancelCapture(int reason) override;
+
+    /**
+     * @brief Clear item capture reference when drag is cancelled
+     */
+    virtual void OnDragClearItemCapture() override;
 
   protected:
     SAutoRefPtr<ILvAdapter> m_adapter;                 /**< Pointer to the list view adapter */

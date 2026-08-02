@@ -78,7 +78,7 @@ public class NativeEditView extends EditText implements INativeWindow {
         if (initialText != null) {
             setText(initialText);
         }
-        nativeId = SouiNativeHandle.NativeCreate(this);
+        nativeId = SouiPlatformBridge.getInstance().createNative(this);
         // 默认给 EditText 聚焦能力，确保 IME 可弹起；实际 (x,y,w,h) 会由 NativeMove/SetSize 再覆盖。
         setFocusable(true);
         setFocusableInTouchMode(true);
@@ -184,11 +184,7 @@ public class NativeEditView extends EditText implements INativeWindow {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         if (nativeId != 0) {
-            final SouiPlatformBridge bridge = SouiPlatformBridge.getInstance();
-            // 清理捕获/焦点，避免残留指向已销毁的 HWND
-            if (nativeId == bridge.getCapture()) bridge.releaseCapture();
-            if (nativeId == bridge.getFocus()) bridge.setFocus(0L);
-            SouiNativeHandle.NativeDestroy(nativeId);
+            SouiPlatformBridge.getInstance().destroyNative(nativeId);
             nativeId = 0;
         }
     }

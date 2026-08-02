@@ -1,23 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<page name="room_container" title="@string/lobby" layout="vbox">
- <tileview name="tileview_lobby" size="-2,0" weight="1" wantTab="1" marginSize="5" sbFadeFrames="30" align="center">
-    <template itemWidth="200" itemHeight="180" layout="vbox" gravity="center" skin="skin_item_bk">
-        <window size="-2,0" weight="1"  layout="hbox" gravity="center">
-            <button size="0,-2" weight="1" name="seat_0" id="10" text="0" cursor="hand">
-                <img name="seat_ready" skin="skin_handup" visible="0"/>
-            </button>
-            <img skin="skin_table">
-                <img name="img_playing" pos="|0,|-10" offset="-0.5,-0.5" skin="skin_playing" visible="0"/>
-            </img>
-            <button size="0,-2" weight="1" name="seat_1" id="11" text="1" cursor="hand">
-                <img name="seat_ready" skin="skin_handup" visible="0"/>
-            </button>
-        </window>
-        <text name="txt_table_id" text="table id" />
-    </template>
- </tileview>
- <window size="-2,-1" layout="hbox" interval="5">
-    <text text="游戏规则:"/>
-    <text name="txt_table_info" size="-2,-1"/>
- </window>
+<page name="room_container" title="@string/lobby" layout="vbox" colorBkgnd="@color/bg_dark">
+    <!-- 顶部栏 -->
+    <window size="-2,50" layout="hbox" interval="10" gravity="center_vertical" padding="15,0,15,0">
+        <img skin="skin_cnchess_logo" size="80,40"/>
+        <window size="0,0" weight="1"/>
+        <text name="txt_online" text="在线: 0" colorText="@color/gold" font="size:14"/>
+    </window>
+    
+    <!-- 游戏桌列表 -->
+    <tileview name="tileview_lobby" size="-2,0" weight="1" wantTab="1" marginSize="8" sbFadeFrames="30" align="center">
+        <template itemWidth="220" itemHeight="180" layout="vbox" gravity="center" skin="skin_item_bk">
+            <!-- 顶部: 桌子ID和状态 -->
+            <window size="-2,30" layout="hbox" interval="5" gravity="center_vertical" padding="10,5,10,0">
+                <text name="txt_table_id" text="桌号: 0" colorText="@color/gold" font="size:12,bold"/>
+                <window size="0,0" weight="1"/>
+                <img name="img_playing" skin="skin_playing" visible="0" size="30,20"/>
+            </window>
+            
+            <!-- 中间: 座位区域 -->
+            <window size="-2,0" weight="1" layout="hbox" interval="5" gravity="center">
+                <!-- 左座位 (红方) -->
+                <window size="0,-1" weight="1" layout="vbox" interval="3" gravity="center">
+                    <img name="seat_0" msgTransparent="0" size="50,60" id="10" cursor="hand" skin="skin_seat" iconIndex="0"/>
+                    <text name="txt_seat_0" text="空位" colorText="@color/text_light" font="size:10" gravity="center"/>
+                </window>
+                
+                <!-- 中间桌面 -->
+                <img skin="skin_table" size="50,40"/>
+                
+                <!-- 右座位 (黑方) -->
+                <window size="0,-1" weight="1" layout="vbox" interval="3" gravity="center">
+                    <img name="seat_1" msgTransparent="0" size="50,60" id="11" cursor="hand" skin="skin_seat" iconIndex="3"/>
+                    <text name="txt_seat_1" text="空位" colorText="@color/text_light" font="size:10" gravity="center"/>
+                </window>
+            </window>
+            
+            <!-- 底部: 分隔线和状态提示 -->
+            <window size="-2,1" colorBkgnd="@color/divider" opacity="0.3" margin="10,0,10,0"/>
+            <window size="-2,25" layout="hbox" interval="5" gravity="center_vertical" padding="10,0,10,5">
+                <text name="txt_status" text="等待入座" colorText="@color/text_muted" font="size:10" gravity="center" size="-2,-1"/>
+            </window>
+        </template>
+    </tileview>
+    
+    <!-- 底部信息栏 -->
+    <window size="-2,60" layout="vbox" interval="3" padding="15,5,15,10" colorBkgnd="@color/bg_panel">
+        <text text="游戏规则" colorText="@color/gold" font="size:12,bold"/>
+        <text name="txt_table_info" size="-2,-1" colorText="@color/text_muted" font="size:10" text="步时: 60 秒"/>
+    </window>
 </page>

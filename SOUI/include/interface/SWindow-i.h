@@ -36,6 +36,9 @@ enum
     UM_SOUI_END,
 };
 
+// CancelCaptureMode reason constants
+#define CANCEL_REASON_SCROLL    1  //父容器开始滚动，通知子控件取消触摸操作
+
 typedef BOOL (*FunSwndProc)(IWindow *pSwnd, UINT uMsg, WPARAM wp, LPARAM lp, LRESULT *pbHandled);
 
 #define ICWND_FIRST ((SWindow *)-1) /* 子窗口插入在开头 */

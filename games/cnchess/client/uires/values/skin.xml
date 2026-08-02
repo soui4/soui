@@ -1,9 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-  <skin>
-    <imgframe name="skin_item_bk" src="image:PNG_ITEM_BK" states="3" margin="5,5,5,5"/>
-    <imglist name="skin_table" src="image:PNG_TABLE"/>
-    <imglist name="skin_handup" src="image:PNG_HANDUP"/>"
-    <imglist name="skin_playing" src="image:PNG_PLAYING"/>"
+<skin>
+    <imgframe name="skin_item_bk" src="svg:lobby_table_bk" states="3" margin="5,5,5,5"/>
+    <imglist name="skin_table" src="svg:chess_table"/>
+    <imglist name="skin_playing" src="svg:playing_icon"/>
     <imglist name="skin_btn_mute" src="image:PNG_MUTE" states="4"/>
     <imglist name="skin_btn_unmute" src="image:PNG_UNMUTE" states="4"/>
-  </skin>
+    <imgframe name="btn_primary" src="svg:btn_primary" states="4" margin="5,5,5,5"/>
+    <!-- 中国象棋Logo SVG -->
+    <imglist name="skin_cnchess_logo" src="svg:cnchess_logo"/>
+    <!-- 登录界面背景装饰 -->
+    <imgframe name="skin_login_bg" src="svg:login_bg" margin="10,10,10,10"/>
+    <!-- 登录按钮 -->
+    <imgframe name="btn_login" src="svg:btn_login" states="4" margin="8,8,8,8"/>
+    <!-- 输入框边框 -->
+    <imgframe name="skin_edit" src="svg:edit_border" states="2" margin="4,4,4,4"/>
+    <!-- 表单图标(服务器/用户/性别) -->
+    <imglist name="skin_form_icons" src="svg:form_icons" states="3"/>
+    <!-- 大厅座位 (6态: 红空/红占/红准备/黑空/黑占/黑准备) -->
+    <imglist name="skin_seat" src="svg:seat_states" states="6"/>
+</skin>

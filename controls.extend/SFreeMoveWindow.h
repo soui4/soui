@@ -19,6 +19,8 @@ class SFreeMoveWindow : public SWindow {
     DWORD HitTest(CPoint pt);
     void SetCursorWrapper(DWORD dwHit);
 
+    virtual BOOL CancelCaptureMode(int reason) override;
+
     SOUI_MSG_MAP_BEGIN()
     MSG_WM_NCLBUTTONDOWN(OnNcLButtonDown)
     MSG_WM_NCLBUTTONUP(OnNcLButtonUp)

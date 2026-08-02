@@ -16,8 +16,7 @@
 #include <core/SItemPanel.h>
 #include <control/SHeaderCtrl.h>
 
-namespace SOUI
-{
+SNSBEGIN
 /**
  * @class     SListBox
  * @brief     扩展列表框
@@ -447,6 +446,9 @@ class SListCtrlEx
      */
     void Relayout();
 
+    virtual BOOL OnDragCancelCapture(int reason) override;
+    virtual void OnDragClearItemCapture() override;
+
   protected:
     SArray<SItemPanel *> m_arrItems; /**< 保存条目的数组 */
     int m_nItemHeight;               /**< 高度          */
@@ -518,4 +520,4 @@ class SListCtrlEx
     SOUI_MSG_MAP_END()
 };
 
-} // namespace SOUI
+SNSEND

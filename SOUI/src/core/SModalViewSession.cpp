@@ -53,8 +53,10 @@ void SModalRoot::OnFinish()
 {
     if(m_exitCallback)
     {
+        AddRef();
         FireExitCallback(m_exitCode);
         m_exitCallback->OnModalViewExit(this);
+        Release();
     }
 }
 
@@ -63,7 +65,7 @@ SModalView*SModalRoot::GetModalView() const
     return sobj_cast<SModalView>(GetWindow(GSW_FIRSTCHILD));
 }
 
-void SModalRoot::endModalViewSession(IModalViewExitCallback* pCb, int exitCode)
+void SModalRoot::EndModalViewSession(IModalViewExitCallback* pCb, int exitCode)
 {
     m_exitCallback = pCb;
     m_exitCode = exitCode;

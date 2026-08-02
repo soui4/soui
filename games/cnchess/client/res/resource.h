@@ -1,4 +1,4 @@
-﻿//stamp:129c88c0792cf0ff
+﻿//stamp:129ff3fa941b2837
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -33,6 +33,18 @@
 			const TCHAR * PNG_MUTE;
 			const TCHAR * PNG_UNMUTE;
 			}image;
+		struct _svg{
+			const TCHAR * btn_primary;
+			const TCHAR * btn_login;
+			const TCHAR * cnchess_logo;
+			const TCHAR * edit_border;
+			const TCHAR * form_icons;
+			const TCHAR * login_bg;
+			const TCHAR * lobby_table_bk;
+			const TCHAR * chess_table;
+			const TCHAR * playing_icon;
+			const TCHAR * seat_states;
+			}svg;
 	};
 #endif//_UIRES_H_
 #ifdef INIT_R_DATA
@@ -65,6 +77,18 @@ struct _UIRES UIRES={
 			_T("image:PNG_MUTE"),
 			_T("image:PNG_UNMUTE"),
 		},
+		{
+			_T("svg:btn_primary"),
+			_T("svg:btn_login"),
+			_T("svg:cnchess_logo"),
+			_T("svg:edit_border"),
+			_T("svg:form_icons"),
+			_T("svg:login_bg"),
+			_T("svg:lobby_table_bk"),
+			_T("svg:chess_table"),
+			_T("svg:playing_icon"),
+			_T("svg:seat_states"),
+		},
 	};
 #else
 extern struct _UIRES UIRES;
@@ -93,7 +117,6 @@ struct _R{
 		 const wchar_t * room_container;
 		 const wchar_t * seat_0;
 		 const wchar_t * seat_1;
-		 const wchar_t * seat_ready;
 		 const wchar_t * tileview_lobby;
 		 const wchar_t * txt_anchor_detail;
 		 const wchar_t * txt_anchor_layout;
@@ -102,11 +125,15 @@ struct _R{
 		 const wchar_t * txt_desc;
 		 const wchar_t * txt_info;
 		 const wchar_t * txt_new_features;
+		 const wchar_t * txt_online;
 		 const wchar_t * txt_path_animation;
 		 const wchar_t * txt_path_detail;
 		 const wchar_t * txt_prop_detail;
 		 const wchar_t * txt_property_animation;
 		 const wchar_t * txt_qq_group;
+		 const wchar_t * txt_seat_0;
+		 const wchar_t * txt_seat_1;
+		 const wchar_t * txt_status;
 		 const wchar_t * txt_table_id;
 		 const wchar_t * txt_table_info;
 		 const wchar_t * txt_thanks;
@@ -133,7 +160,6 @@ struct _R{
 		int room_container;
 		int seat_0;
 		int seat_1;
-		int seat_ready;
 		int tileview_lobby;
 		int txt_anchor_detail;
 		int txt_anchor_layout;
@@ -142,11 +168,15 @@ struct _R{
 		int txt_desc;
 		int txt_info;
 		int txt_new_features;
+		int txt_online;
 		int txt_path_animation;
 		int txt_path_detail;
 		int txt_prop_detail;
 		int txt_property_animation;
 		int txt_qq_group;
+		int txt_seat_0;
+		int txt_seat_1;
+		int txt_status;
 		int txt_table_id;
 		int txt_table_info;
 		int txt_thanks;
@@ -199,7 +229,6 @@ struct _R R={
 		L"room_container",
 		L"seat_0",
 		L"seat_1",
-		L"seat_ready",
 		L"tileview_lobby",
 		L"txt_anchor_detail",
 		L"txt_anchor_layout",
@@ -208,11 +237,15 @@ struct _R R={
 		L"txt_desc",
 		L"txt_info",
 		L"txt_new_features",
+		L"txt_online",
 		L"txt_path_animation",
 		L"txt_path_detail",
 		L"txt_prop_detail",
 		L"txt_property_animation",
 		L"txt_qq_group",
+		L"txt_seat_0",
+		L"txt_seat_1",
+		L"txt_status",
 		L"txt_table_id",
 		L"txt_table_info",
 		L"txt_thanks",
@@ -228,37 +261,40 @@ struct _R R={
 		65537,
 		65541,
 		65544,
-		65556,
+		65559,
 		65538,
 		65546,
-		65555,
-		65571,
+		65558,
+		65574,
 		65545,
 		65543,
-		65554,
-		65551,
+		65557,
+		65552,
 		65548,
 		10,
 		11,
 		65550,
-		65549,
-		65560,
-		65559,
-		65565,
-		65570,
-		65557,
-		65568,
-		65558,
 		65563,
-		65564,
 		65562,
+		65568,
+		65573,
+		65560,
+		65571,
 		65561,
+		65549,
 		65566,
-		65552,
-		65553,
+		65567,
+		65565,
+		65564,
 		65569,
+		65553,
+		65554,
+		65555,
+		65551,
+		65556,
+		65572,
 		65536,
-		65567
+		65570
 	}
 	,
 	{

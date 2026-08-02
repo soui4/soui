@@ -102,7 +102,7 @@ public:
      * @param pCb Optional callback invoked when exit animation completes.
      * @param exitCode The exit code to pass to subscribers of EventExitModalView.
      */
-    void endModalViewSession(IModalViewExitCallback * pCb,int exitCode);
+    void EndModalViewSession(IModalViewExitCallback * pCb,int exitCode);
 public:
     SOUI_ATTRS_BEGIN()
         ATTR_BOOL(L"quitOnClick", m_bQuitOnClick, FALSE)

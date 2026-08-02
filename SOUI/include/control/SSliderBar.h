@@ -254,6 +254,8 @@ class SOUI_EXP SSliderBar
 
     void OnDestroy();
 
+    virtual BOOL CancelCaptureMode(int reason) override;
+
     SOUI_MSG_MAP_BEGIN()
         MSG_WM_LBUTTONDOWN(OnLButtonDown)
         MSG_WM_LBUTTONUP(OnLButtonUp)

@@ -1,0 +1,14 @@
+<modalroot layout="anchor" colorBkgnd="@color/modal_mask">
+    <modalview size="-2,-1" pos="0,0,0" layout="vbox" colorBkgnd="@color/bg_modal" interval="0" padding="0,0,0,0" enterAnimation="anim:modal_up_in" exitAnimation="anim:modal_up_out">
+        <!-- 顶部金色装饰条 -->
+        <window size="-2,3" colorBkgnd="@color/gold"/>
+        <!-- 内容区 -->
+        <window size="-2,-1" layout="vbox" interval="12" padding="20,15,20,15">
+            <text name="txt_message" text="确定要执行此操作吗？" font="size:16" colorText="@color/text_light" gravity="center"/>
+            <window size="-2,-1" layout="hbox" interval="10" gravity="center">
+                <button name="btn_cancel" size="0,36" weight="1" text="取消" font="size:14" colorText="@color/text_cancel" colorBkgnd="@color/bg_edit" cursor="hand"/>
+                <button name="btn_ok" size="0,36" weight="1" text="确定" font="size:14,bold" skin="btn_primary" cursor="hand"/>
+            </window>
+        </window>
+    </modalview>
+</modalroot>

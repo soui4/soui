@@ -157,6 +157,9 @@ class SOUI_EXP SRebar : public SWindow {
     // 重载方法
     virtual BOOL CreateChildren(SXmlNode xmlNode) OVERRIDE;
     STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *pSize, int nParentWid, int nParentHei) OVERRIDE;
+
+    virtual BOOL CancelCaptureMode(int reason) override;
+
     // 消息映射
     SOUI_MSG_MAP_BEGIN()
         MSG_WM_PAINT_EX(OnPaint)

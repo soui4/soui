@@ -7,6 +7,9 @@
 #include <interface/SAdapter-i.h>
 #include <interface/STreeViewItemLocator-i.h>
 #include <proxy/SPanelProxy.h>
+#include <valueAnimator/SValueAnimator.h>
+#include <interface/SValueAnimator-i.h>
+#include <animation/SInterpolatorImpl.h>
 
 SNSBEGIN
 
@@ -653,6 +656,9 @@ class SOUI_EXP STreeView
     virtual BOOL IsItemRedrawDelay() const;
 
     virtual BOOL IsTimelineEnabled() const;
+
+    virtual BOOL OnDragCancelCapture(int reason) override;
+    virtual void OnDragClearItemCapture() override;
 
     /**
      * @brief Draws lines for an item.

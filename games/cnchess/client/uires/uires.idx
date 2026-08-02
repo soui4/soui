@@ -22,10 +22,22 @@
   </ICON>
   <image>
     <file name="PNG_TABLE" path="image\table.png"/>
-    <file name="PNG_ITEM_BK" path="image\item_bk.png"/>"
-    <file name="PNG_HANDUP" path="image\handup.png"/>"
+    <file name="PNG_ITEM_BK" path="image\item_bk.png"/>
+    <file name="PNG_HANDUP" path="image\handup.png"/>
     <file name="PNG_PLAYING" path="image\playing.png"/>
     <file name="PNG_MUTE" path="image\mute.png"/>
     <file name="PNG_UNMUTE" path="image\unmute.png"/>
   </image>
+  <svg>
+    <file name="btn_primary" path="svg\btn_primary.svg"/>
+    <file name="btn_login" path="svg\btn_login.svg"/>
+    <file name="cnchess_logo" path="svg\cnchess_logo.svg"/>
+    <file name="edit_border" path="svg\edit_border.svg"/>
+    <file name="form_icons" path="svg\form_icons.svg"/>
+    <file name="login_bg" path="svg\login_bg.svg"/>
+    <file name="lobby_table_bk" path="svg\lobby_table_bk.svg"/>
+    <file name="chess_table" path="svg\chess_table.svg"/>
+    <file name="playing_icon" path="svg\playing_icon.svg"/>
+    <file name="seat_states" path="svg\seat_states.svg"/>
+  </svg>
 </resource>

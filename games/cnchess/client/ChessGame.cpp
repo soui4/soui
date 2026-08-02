@@ -840,38 +840,32 @@ void CChessGame::StopWatingAnimation()
     }
 }
 
-void CChessGame::OnGameBoardSizeChanged(IEvtArgs *e)
+void CChessGame::OnGameBoardSizeChanged(IEvtArgs* e)
 {
-    EventSwndSize *evt = sobj_cast<EventSwndSize>(e);
-    SSkinBoard * pSkin = sobj_cast<SSkinBoard>(m_pChessBoard->GetSkin());
-    CSize szBoard = m_pChessBoard->GetSkin()->GetSkinSize();
+    EventSwndSize* evt = sobj_cast<EventSwndSize>(e);
+    SSkinBoard* pSkin = sobj_cast<SSkinBoard>(GETSKIN(L"skin_chessboard", 100));
+    CSize szBoard = pSkin->GetSkinSize();
     CRect rcGameGoard = m_pGameBoard->GetClientRect();
     CSize szGameBoard = evt->szWnd;
     float fRatio1 = (float)szGameBoard.cx / szGameBoard.cy;
     float fRatio2 = (float)szBoard.cx / szBoard.cy;
-    CRect rcBoard =  rcGameGoard;
+    CRect rcBoard = rcGameGoard;
     float scale = 1.0f;
-    if(fRatio1 > fRatio2)
+    if (fRatio1 > fRatio2)
     {
         int nWid = (int)(szGameBoard.cy * fRatio2);
         rcBoard.DeflateRect((szGameBoard.cx - nWid) / 2, 0);
         scale = (float)nWid / szBoard.cx;
-        m_pChessBoard->Move(rcBoard);
     }
     else
     {
         int nHei = (int)(szGameBoard.cx / fRatio2);
         rcBoard.DeflateRect(0, (szGameBoard.cy - nHei) / 2);
         scale = (float)nHei / szBoard.cy;
-        m_pChessBoard->Move(rcBoard);
     }
+
+    m_pChessBoard->Move(rcBoard);
     CRect rcMargin = pSkin->GetMargin();
-    CSize szCellAll = szBoard - CSize(rcMargin.left + rcMargin.right,rcMargin.top+rcMargin.bottom);
-
-    //calc cell size
-    m_cellWidth = szCellAll.cx * scale / 8;
-    m_cellHeight = szCellAll.cy * scale / 9;
-
     rcMargin.left *= scale;
     rcMargin.top *= scale;
     rcMargin.right *= scale;
@@ -879,8 +873,10 @@ void CChessGame::OnGameBoardSizeChanged(IEvtArgs *e)
     rcBoard.DeflateRect(rcMargin);
     m_ptBoardOrigin.x = rcBoard.left;
     m_ptBoardOrigin.y = rcBoard.bottom;
-
-    m_pGameBoard->SDispatchMessage(UM_SETSCALE, scale*100, 1);
+    //calc cell size
+    m_cellWidth = rcBoard.Width() * 1.f / 8;
+    m_cellHeight = rcBoard.Height() * 1.f / 9;
+    m_pGameBoard->SDispatchMessage(UM_SETSCALE, scale * 100, 1);
 }
 
 void CChessGame::OnBtnTest()

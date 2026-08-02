@@ -215,6 +215,7 @@ int WsServer::handler(lws *websocket, lws_callback_reasons reasons,
             break;
         if (m_pListener)
         {
+            SLOGI() << "connection closed, conn=" << conn;
             lock_guard_rev rev(m_mutex);
             m_pListener->onDisconnect(conn); 
         }

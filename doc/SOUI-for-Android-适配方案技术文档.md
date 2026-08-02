@@ -111,12 +111,12 @@ SOUI 的"HWND 树"在 Android 上直接映射为标准的 Android `View / ViewGr
 
 ### 2.5 输入事件分发：严格对齐 Win32 `SetCapture`
 
-输入路径（见 [SouiBaseSurface.java](../demos/android-demo/app/src/main/java/com/soui/android/SouiBaseSurface.java) `dispatchTouchEventToNative` 与 C++ [SouiSurfaceProxy.cpp](../demos/android-demo/app/src/main/cpp/SouiSurfaceProxy.cpp) `onMotionEventEx`）：
+输入路径（见 [SouiBaseSurface.java](../demos/android-demo/app/src/main/java/com/soui/android/SouiBaseSurface.java) `dispatchTouchEventToNative` 与 C++ [SouiSurfaceProxy.cpp](../demos/android-demo/app/src/main/cpp/SouiSurfaceProxy.cpp) `onMotionEvent`）：
 
 1. Android 系统按正常 `onInterceptTouchEvent`/`dispatchTouchEvent` 把事件派到被命中的 `SouiSurface` View。
 2. Java 层先调用 `SouiPlatformBridge.tryDispatchCapturedMotion`：**如果当前有 SetCapture，并且事件来源 Surface ≠ 捕获目标 Surface，则做坐标变换（源 View 屏幕坐标 → 目标 View 客户区坐标）后，直接投递给捕获目标的 `nativeOnMotionEventEx`**，返回 Boolean.TRUE 表示"已消费重定向"。
 3. 未被 Capture 拦截时，正常投递 `nativeOnMotionEventEx(action, x, y, pointerId, buttonState, vscroll, hscroll, metaState, timestamp)` 到当前 Surface。
-4. C++ `onMotionEventEx` 根据 action 派发到 `WM_LBUTTONDOWN / WM_LBUTTONDBLCLK / WM_MOUSEMOVE / WM_RBUTTONDOWN / WM_MOUSEWHEEL / WM_MOUSEHWHEEL / WM_XBUTTONDOWN / WM_POINTER...`，完全对齐 Win32 MSG 格式，`SendMessage(hHost, ...)` 进入 SOUI 消息循环。
+4. C++ `onMotionEvent` 根据 action 派发到 `WM_LBUTTONDOWN / WM_LBUTTONDBLCLK / WM_MOUSEMOVE / WM_RBUTTONDOWN / WM_MOUSEWHEEL / WM_MOUSEHWHEEL / WM_XBUTTONDOWN / WM_POINTER...`，完全对齐 Win32 MSG 格式，`SendMessage(hHost, ...)` 进入 SOUI 消息循环。
 5. 遇到 `ACTION_UP / ACTION_CANCEL`：投递完后自动 `ReleaseCapture`（对应 Win32 "最后一个鼠标按键弹起时系统自动释放捕获"语义），保证滚动条拖拽、标题栏拖拽等控件交互与 Win32 表现一致。
 
 **扩展输入支持**：
@@ -247,8 +247,8 @@ Android 的配置变更（如屏幕旋转）会触发 Activity 重建，导致�
 每个 `SouiSurface` 在 C++ 层对应一个 `SouiSurfaceProxy` 对象：
 
 - **生命周期管理**：通过 `std::shared_ptr` 管理，`nativeViewInsert`/`nativeViewLookup`/`nativeViewErase` 提供线程安全的访问。`NativeDestroy` 时先从 map 移除，再让局部 `shared_ptr` 出作用域析构，确保其他线程正在持有的引用安全完成。
-- **输入事件转换**：`onMotionEventEx` 将 Android MotionEvent 转换为 Win32 风格消息（`WM_LBUTTONDOWN`、`WM_MOUSEMOVE`、`WM_MOUSEWHEEL`、`WM_XBUTTONDOWN` 等），支持双击检测、右键菜单、滚轮（垂直+水平）、悬停事件。
-- **键盘事件转换**：`onKeyEventEx` 将 Android KeyEvent 转换为 Win32 键盘消息，支持 `repeatCount`、`scanCode`、`unicodeChar`、`metaState` 等参数，正确处理 ALT 修饰键生成 `WM_SYSKEYDOWN/SYSKEYUP`。
+- **输入事件转换**：`onMotionEvent` 将 Android MotionEvent 转换为 Win32 风格消息（`WM_LBUTTONDOWN`、`WM_MOUSEMOVE`、`WM_MOUSEWHEEL`、`WM_XBUTTONDOWN` 等），支持双击检测、右键菜单、滚轮（垂直+水平）、悬停事件。
+- **键盘事件转换**：`onKeyEvent` 将 Android KeyEvent 转换为 Win32 键盘消息，支持 `repeatCount`、`scanCode`、`unicodeChar`、`metaState` 等参数，正确处理 ALT 修饰键生成 `WM_SYSKEYDOWN/SYSKEYUP`。
 - **渲染**：`render` 方法将 C++ 层绘制结果绑定到 Java Bitmap，包含 SIMD 优化的 BGRA→RGBA 颜色通道转换。
 - **鼠标状态跟踪**：维护 `m_buttonsDown`、`m_lastDownTime/X/Y`、`m_hoverTracked` 等状态，支持 `TrackMouseEvent` 语义。
 

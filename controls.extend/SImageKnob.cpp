@@ -209,6 +209,13 @@ void SImageKnob::OnLButtonUp(UINT nFlags, CPoint pt)
 
 }
 
+BOOL SImageKnob::CancelCaptureMode(int reason)
+{
+	if (reason == CANCEL_REASON_SCROLL && m_state)
+		return FALSE;
+	return __baseCls::CancelCaptureMode(reason);
+}
+
 void SImageKnob::OnMouseMove(UINT nFlags, CPoint where)
 {
 	if (m_state)

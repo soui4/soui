@@ -391,11 +391,11 @@ class SOUI_EXP SWindow
     static SStringW GetXmlText(const SXmlNode &xmlNode);
 
   public:
-  public:
     /**
      * @brief Called when the last reference to the object is released.
      */
     STDMETHOD_(void, OnFinalRelease)(THIS);
+
 
     /**
      * @brief Retrieves the window handle.
@@ -1382,6 +1382,22 @@ class SOUI_EXP SWindow
     SwndStyle &GetStyle();
 
     /**
+     * @brief Retrieves the text color of the window.
+     * @param iState State of the text color to retrieve.
+     * @return COLORREF Text color as a COLORREF value.
+     * @remark iState must in [0,4)
+     */
+    COLORREF GetTextColor(int iState = 0) const;
+
+    /**
+     * @brief Sets the text color of the window.
+     * @param cr Text color as a COLORREF value.
+     * @param iState State of the text color to set.
+     * @remark iState must in [0,4)
+     */
+    void SetTextColor(COLORREF cr, int iState = 0);
+
+    /**
      * @brief Sets the owner of the window.
      * @param pOwner Pointer to the new owner window.
      */
@@ -1411,6 +1427,14 @@ class SOUI_EXP SWindow
      */
     virtual CRect GetClientRect() const;
 
+    /**
+     * @brief 取消控件的鼠标Captrue
+     * @param reason 取消原因(CANCEL_REASON_xxx)
+     * @return TRUE表示已取消，FALSE表示不需要取消(如sliderbar正在拖拽)
+     * @details 当父容器开始滚动时，会调用此方法通知子控件释放模态状态。
+     *          子类可重写此方法决定是否取消。
+     */
+    virtual BOOL CancelCaptureMode(int reason);
   public: // Window tree structure-related methods
     /**
      * @brief Finds a child window by its ID.

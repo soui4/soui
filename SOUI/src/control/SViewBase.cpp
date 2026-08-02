@@ -45,11 +45,16 @@ void SViewBase::OnItemSetCapture(SOsrPanel *pItem, BOOL bCapture)
 {
     if (bCapture)
     {
+        m_pHost->GetContainer()->OnSetSwndCapture(m_pHost->GetSwnd());
         m_itemCapture = pItem;
+        if (m_pView->IsItemDragScrollEnabled())
+            m_pView->StartDragPending(CPoint(0, 0));
     }
     else
     {
+        m_pHost->GetContainer()->OnReleaseSwndCapture();
         m_itemCapture = NULL;
+        m_pView->SetDragPending(FALSE);
     }
 }
 

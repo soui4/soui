@@ -7,8 +7,6 @@
 #include <SAppCfg.h>
 #include <logdef.h>
 #include <soui4android.h>
-#include "SouiRealWndHandler.h"
-
 using namespace SOUI;
 
 #include "MainDlg.h"
@@ -68,11 +66,7 @@ BOOL CnchessAndroidApp::InitApp(AAssetManager* assetMgr, LPCSTR pszAssetDir) {
     m_souiApp->RegisterWindowClass<CChessBoard>();
     m_souiApp->RegisterWindowClass<CChessPiece>();
 
-    SAutoRefPtr<IRealWndHandler> realWndHandler(new CSouiRealWndHandler, FALSE);
-    m_souiApp->SetRealWndHandler(realWndHandler);
-
     // def_theme 和 avatar 已由 Java 侧 (CnchessApplication) 从 assets 复制到 filesDir
-
     SLOGI() << "CnchessAndroidApp::InitApp completed, assetDir=" << pszAssetDir;
     return TRUE;
 }
@@ -147,4 +141,5 @@ void CnchessAndroidApp::ScreenShutdown(long screenId) {
     SLOGI() << "ScreenShutdown: screenId=" << screenId;
     it->second->DestroyWindow();
     m_screenHostMap.erase(it);
+    delete MyProfile::getSingletonPtr();
 }

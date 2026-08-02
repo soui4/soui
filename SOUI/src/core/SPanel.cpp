@@ -159,6 +159,17 @@ SPanel::SPanel()
     , m_sbHorz(this, false)
     , m_fadeFrames(0)
     , m_bySbThumbTrackMinAlpha(128)
+    , m_bDragPending(FALSE)
+    , m_bDragScrolling(FALSE)
+    , m_bDragStarted(FALSE)
+    , m_bItemDragScrollEnabled(TRUE)
+    , m_fLastVelocityX(0.0f)
+    , m_fLastVelocityY(0.0f)
+    , m_nLastMoveTime(0)
+    , m_fFlingVStartPos(0.0f)
+    , m_fFlingVTargetPos(0.0f)
+    , m_fFlingHStartPos(0.0f)
+    , m_fFlingHTargetPos(0.0f)
 {
     m_nSbWid.setInvalid();
     m_nSbArrowSize.setInvalid();
@@ -300,6 +311,19 @@ BOOL SPanel::HasScrollBar(BOOL bVertical) const
     return m_wBarVisible & (bVertical ? SSB_VERT : SSB_HORZ);
 }
 
+BOOL SPanel::ScrollToPos(BOOL bVertical, int nPos)
+{
+    return OnScroll(bVertical, SB_THUMBTRACK, nPos);
+}
+
+void SPanel::NotifyScrollBarActivity(BOOL bVertical)
+{
+    if (bVertical)
+        m_sbVert.OnMouseWheel();
+    else
+        m_sbHorz.OnMouseWheel();
+}
+
 int SPanel::OnCreate(LPVOID)
 {
     int nRet = __baseCls::OnCreate(NULL);
@@ -310,6 +334,7 @@ int SPanel::OnCreate(LPVOID)
 
 void SPanel::OnDestroy()
 {
+    ClearDragState();
     m_sbHorz.OnDestroy();
     m_sbVert.OnDestroy();
     SWindow::OnDestroy();
@@ -502,6 +527,12 @@ BOOL SPanel::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
     }
     if (nLines != 0)
     {
+        // Show scrollbar with fade-in and auto-hide on wheel scroll
+        if (bVertScroll)
+            m_sbVert.OnMouseWheel();
+        else if (HasScrollBar(FALSE))
+            m_sbHorz.OnMouseWheel();
+
         HWND hHost = GetContainer()->GetHostHwnd();
         ::SendMessage(hHost, WM_MOUSEMOVE, nFlags, MAKELPARAM(pt.x, pt.y));
         ::SendMessage(hHost, WM_SETCURSOR, WPARAM(hHost), MAKELPARAM(HTCLIENT, WM_MOUSEMOVE));
@@ -568,6 +599,12 @@ void SPanel::OnTimer(char cTimerID)
         SScrollBarHandler &sbHandler = m_dragSb == SSB_VERT ? m_sbVert : m_sbHorz;
         sbHandler.OnTimer(cTimerID);
     }
+    else if (cTimerID == IScrollBarHost::Timer_WheelHide)
+    {
+        // Route to both handlers; each decides whether to fade out
+        m_sbVert.OnTimer(cTimerID);
+        m_sbHorz.OnTimer(cTimerID);
+    }
 }
 
 void SPanel::ScrollUpdate()
@@ -580,21 +617,36 @@ void SPanel::ScrollUpdate()
     }
 }
 
+void SPanel::ClearDragState(){
+    if (m_dragSb != SSB_NULL)
+    {
+        OnNcLButtonUp(0, CPoint(-1, -1));
+    }
+    StopFlingAnimation();
+    if (m_bDragPending || m_bDragScrolling)
+    {
+        m_bDragPending = FALSE;
+        m_bDragScrolling = FALSE;
+        m_bDragStarted = FALSE;
+        ReleaseCapture();
+    }
+}
+
 void SPanel::OnShowWindow(BOOL bShow, UINT nStatus)
 {
     SWindow::OnShowWindow(bShow, nStatus);
-    if (!IsVisible(TRUE) && m_dragSb != SSB_NULL)
-    { //隐藏窗口时正有可能正在拖动滚动条，需要处理一下。
-        OnNcLButtonUp(0, CPoint(-1, -1));
+    if (!IsVisible(TRUE))
+    {
+        ClearDragState();
     }
 }
 
 void SPanel::OnEnable(BOOL bEnable, UINT uStatus)
 {
     SWindow::OnEnable(bEnable, uStatus);
-    if (IsDisabled(TRUE) && m_dragSb != SSB_NULL)
+    if (IsDisabled(TRUE))
     {
-        OnNcLButtonUp(0, CPoint(-1, -1));
+        ClearDragState();
     }
 }
 
@@ -952,6 +1004,364 @@ void SScrollView::UpdateChildrenPosition()
 {
     UpdateViewSize();
     __baseCls::UpdateChildrenPosition();
+}
+
+// === Drag scroll implementation ===
+
+void SPanel::StartDragPending(const CPoint &pt)
+{
+    m_bDragPending = TRUE;
+    m_ptDragStart = pt;
+    m_bDragStarted = FALSE;
+    SetCapture();
+}
+
+BOOL SPanel::HandleMouseDrag(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lRet)
+{
+    CPoint pt(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+
+    // === Drag scrolling active: consume all mouse events ===
+    if (m_bDragScrolling)
+    {
+        if (uMsg == WM_MOUSEMOVE)
+        {
+            int dx = 0, dy = 0;
+            if (m_ptDragLast == CPoint(0, 0))
+            {
+                m_ptDragLast = pt;
+                m_nLastMoveTime = 0;
+                m_fLastVelocityX = 0.0f;
+                m_fLastVelocityY = 0.0f;
+            }
+            else
+            {
+                dx = pt.x - m_ptDragLast.x;
+                dy = pt.y - m_ptDragLast.y;
+                m_ptDragLast = pt;
+
+                if (m_nLastMoveTime > 0)
+                {
+                    uint64_t now = GetTickCount64();
+                    uint64_t dt = now - m_nLastMoveTime;
+                    if (dt > 0)
+                    {
+                        m_fLastVelocityX = (float)dx / (float)dt;
+                        m_fLastVelocityY = (float)dy / (float)dt;
+                    }
+                }
+                m_nLastMoveTime = GetTickCount64();
+            }
+            if (dy != 0)
+                ScrollByDrag(TRUE, dy, m_fLastVelocityY);
+            if (dx != 0)
+                ScrollByDrag(FALSE, dx, m_fLastVelocityX);
+        }
+        else if (uMsg == WM_LBUTTONUP || uMsg == WM_RBUTTONUP)
+        {
+            m_bDragScrolling = FALSE;
+            m_ptDragLast = CPoint(0, 0);
+
+            float fReleaseVX = 0.0f, fReleaseVY = 0.0f;
+            if (m_nLastMoveTime > 0)
+            {
+                uint64_t now = GetTickCount64();
+                if (now - m_nLastMoveTime < 100)
+                {
+                    fReleaseVX = m_fLastVelocityX;
+                    fReleaseVY = m_fLastVelocityY;
+                }
+            }
+
+            OnDragScrollEnd();
+            ReleaseCapture();
+
+            if (fabs(fReleaseVX) > 0.01f || fabs(fReleaseVY) > 0.01f)
+                StartFlingAnimation(fReleaseVX, fReleaseVY);
+            m_nLastMoveTime = 0;
+            return TRUE;
+        }
+        return TRUE;
+    }
+
+    // === Fling animation running: consume mouse events to stop fling ===
+    BOOL bFlingRunning = (m_pFlingAnimatorV && m_pFlingAnimatorV->isRunning())
+                         || (m_pFlingAnimatorH && m_pFlingAnimatorH->isRunning());
+    if (bFlingRunning)
+    {
+        if (uMsg == WM_LBUTTONDOWN || uMsg == WM_RBUTTONDOWN)
+        {
+            StopFlingAnimation();
+        }
+        else if (uMsg == WM_MOUSEMOVE)
+        {
+            if (wParam & MK_LBUTTON)
+            {
+                StopFlingAnimation();
+                m_bDragPending = FALSE;
+                m_bDragScrolling = TRUE;
+                m_ptDragLast = pt;
+                m_ptDragStart = pt;
+                m_bDragStarted = TRUE;
+                m_nLastMoveTime = 0;
+                m_fLastVelocityX = 0.0f;
+                m_fLastVelocityY = 0.0f;
+                OnDragScrollStart();
+            }
+        }
+        return TRUE;
+    }
+
+    // === Waiting for drag threshold ===
+    if (m_bDragPending)
+    {
+        if (!m_bDragStarted)
+        {
+            m_ptDragStart = pt;
+            m_bDragStarted = TRUE;
+        }
+
+        if (uMsg == WM_MOUSEMOVE)
+        {
+            int dx = abs(pt.x - m_ptDragStart.x);
+            int dy = abs(pt.y - m_ptDragStart.y);
+            if (dx > 8 || dy > 8)
+            {
+                if (OnDragCancelCapture(CANCEL_REASON_SCROLL))
+                {
+                    m_bDragPending = FALSE;
+                    m_bDragScrolling = TRUE;
+                    m_ptDragLast = pt;
+                    m_nLastMoveTime = 0;
+                    m_fLastVelocityX = 0.0f;
+                    m_fLastVelocityY = 0.0f;
+                    SetCapture();
+                    OnDragScrollStart();
+                    return TRUE;
+                }
+                else
+                {
+                    m_bDragPending = FALSE;
+                    m_bDragStarted = FALSE;
+                    return FALSE;
+                }
+            }
+        }
+        else if (uMsg == WM_LBUTTONUP || uMsg == WM_RBUTTONUP)
+        {
+            m_bDragPending = FALSE;
+            m_bDragStarted = FALSE;
+            ReleaseCapture();
+        }
+    }
+
+    return FALSE;
+}
+
+void SPanel::ScrollByDrag(BOOL bVert, int delta, float fVelocity)
+{
+    float fMultiplier = 1.0f;
+    float fAbsV = (float)fabs(fVelocity);
+
+    if (fAbsV > 5.0f)
+        fMultiplier = 2.5f;
+    else if (fAbsV > 3.0f)
+        fMultiplier = 1.8f;
+    else if (fAbsV > 1.5f)
+        fMultiplier = 1.2f;
+    else if (fAbsV < 0.3f && fAbsV > 0.0f)
+        fMultiplier = 0.7f;
+
+    OnDragScroll(bVert, (int)(delta * fMultiplier));
+}
+
+void SPanel::OnDragScrollStart()
+{
+    if (HasScrollBar(TRUE))
+        NotifyScrollBarActivity(TRUE);
+    if (HasScrollBar(FALSE))
+        NotifyScrollBarActivity(FALSE);
+}
+
+void SPanel::OnDragScroll(BOOL bVert, int delta)
+{
+    if (HasScrollBar(bVert))
+    {
+        int nNewPos = GetScrollPos(bVert) - delta;
+        ScrollToPos(bVert, nNewPos);
+        OnScrollUpdatePart(bVert, -1);
+        NotifyScrollBarActivity(bVert);
+    }
+}
+
+void SPanel::OnDragScrollEnd()
+{
+}
+
+BOOL SPanel::CancelCaptureMode(int reason)
+{
+    if (reason == CANCEL_REASON_SCROLL && (HasScrollBar(TRUE) || HasScrollBar(FALSE)))
+        return FALSE;
+    return __baseCls::CancelCaptureMode(reason);
+}
+
+void SPanel::OnFlingScroll()
+{
+    if (HasScrollBar(TRUE))
+        NotifyScrollBarActivity(TRUE);
+    if (HasScrollBar(FALSE))
+        NotifyScrollBarActivity(FALSE);
+}
+
+BOOL SPanel::OnDragCancelCapture(int reason)
+{
+    return TRUE;
+}
+
+void SPanel::OnDragClearItemCapture()
+{
+}
+
+void SPanel::StartFlingAnimation(float fVelocityX, float fVelocityY)
+{
+    StopFlingAnimation();
+
+    int nVMin = 0, nVMax = 0, nHMin = 0, nHMax = 0;
+    int nCurV = GetScrollPos(TRUE);
+    int nCurH = GetScrollPos(FALSE);
+    GetScrollRange(TRUE, &nVMin, &nVMax);
+    GetScrollRange(FALSE, &nHMin, &nHMax);
+
+    const float kDecelFactor = 2.0f;
+    const long kMinDuration = 150;
+    const long kMaxDuration = 500;
+
+    if (fabs(fVelocityY) > 0.01f)
+    {
+        long nDuration = (long)(fabs(fVelocityY) * 200.0f);
+        if (nDuration < kMinDuration) nDuration = kMinDuration;
+        if (nDuration > kMaxDuration) nDuration = kMaxDuration;
+
+        float fDistance = fVelocityY * (float)nDuration / kDecelFactor;
+        m_fFlingVStartPos = (float)nCurV;
+        m_fFlingVTargetPos = m_fFlingVStartPos - fDistance;
+
+        if (m_fFlingVTargetPos < (float)nVMin) m_fFlingVTargetPos = (float)nVMin;
+        if (m_fFlingVTargetPos > (float)nVMax) m_fFlingVTargetPos = (float)nVMax;
+
+        if (fabs(m_fFlingVTargetPos - m_fFlingVStartPos) >= 1.0f)
+        {
+            SFloatAnimator *pAni = new SFloatAnimator();
+            pAni->setRange(m_fFlingVStartPos, m_fFlingVTargetPos);
+            pAni->setDuration(nDuration);
+            pAni->setInterpolator(new SDecelerateInterpolator(kDecelFactor));
+            pAni->addUpdateListener(this);
+            pAni->addListener(this);
+            m_pFlingAnimatorV.Attach(pAni);
+            m_pFlingAnimatorV->start(GetTimelineHandlersMgr());
+        }
+    }
+
+    if (fabs(fVelocityX) > 0.01f)
+    {
+        long nDuration = (long)(fabs(fVelocityX) * 200.0f);
+        if (nDuration < kMinDuration) nDuration = kMinDuration;
+        if (nDuration > kMaxDuration) nDuration = kMaxDuration;
+
+        float fDistance = fVelocityX * (float)nDuration / kDecelFactor;
+        m_fFlingHStartPos = (float)nCurH;
+        m_fFlingHTargetPos = m_fFlingHStartPos - fDistance;
+
+        if (m_fFlingHTargetPos < (float)nHMin) m_fFlingHTargetPos = (float)nHMin;
+        if (m_fFlingHTargetPos > (float)nHMax) m_fFlingHTargetPos = (float)nHMax;
+
+        if (fabs(m_fFlingHTargetPos - m_fFlingHStartPos) >= 1.0f)
+        {
+            SFloatAnimator *pAni = new SFloatAnimator();
+            pAni->setRange(m_fFlingHStartPos, m_fFlingHTargetPos);
+            pAni->setDuration(nDuration);
+            pAni->setInterpolator(new SDecelerateInterpolator(kDecelFactor));
+            pAni->addUpdateListener(this);
+            pAni->addListener(this);
+            m_pFlingAnimatorH.Attach(pAni);
+            m_pFlingAnimatorH->start(GetTimelineHandlersMgr());
+        }
+    }
+
+    OnFlingScroll();
+}
+
+void SPanel::StopFlingAnimation()
+{
+    if (m_pFlingAnimatorV && m_pFlingAnimatorV->isRunning())
+        m_pFlingAnimatorV->end();
+    m_pFlingAnimatorV = NULL;
+
+    if (m_pFlingAnimatorH && m_pFlingAnimatorH->isRunning())
+        m_pFlingAnimatorH->end();
+    m_pFlingAnimatorH = NULL;
+}
+
+void SPanel::onAnimationUpdate(IValueAnimator *pAnimator)
+{
+    if (pAnimator == m_pFlingAnimatorV)
+    {
+        ScrollToPos(TRUE, (int)m_pFlingAnimatorV->getValue());
+        if (HasScrollBar(TRUE))
+            OnScrollUpdatePart(TRUE, -1);
+        OnFlingScroll();
+    }
+    else if (pAnimator == m_pFlingAnimatorH)
+    {
+        ScrollToPos(FALSE, (int)m_pFlingAnimatorH->getValue());
+        if (HasScrollBar(FALSE))
+            OnScrollUpdatePart(FALSE, -1);
+        OnFlingScroll();
+    }
+}
+
+void SPanel::onAnimationEnd(IValueAnimator *pAnimator)
+{
+    if (pAnimator == m_pFlingAnimatorV)
+        m_pFlingAnimatorV = NULL;
+    else if (pAnimator == m_pFlingAnimatorH)
+        m_pFlingAnimatorH = NULL;
+}
+
+void SPanel::OnLButtonDown(UINT nFlags, CPoint pt)
+{
+    LRESULT lRet = 0;
+    if (HandleMouseDrag(WM_LBUTTONDOWN, nFlags, MAKELPARAM(pt.x, pt.y), lRet))
+    {
+        SetMsgHandled(TRUE);
+        return;
+    }
+    if (m_bItemDragScrollEnabled && (HasScrollBar(TRUE) || HasScrollBar(FALSE)))
+    {
+        StartDragPending(pt);
+    }
+    SetMsgHandled(FALSE);
+}
+
+void SPanel::OnMouseMove(UINT nFlags, CPoint pt)
+{
+    LRESULT lRet = 0;
+    if (HandleMouseDrag(WM_MOUSEMOVE, nFlags, MAKELPARAM(pt.x, pt.y), lRet))
+    {
+        SetMsgHandled(TRUE);
+        return;
+    }
+    SetMsgHandled(FALSE);
+}
+
+void SPanel::OnLButtonUp(UINT nFlags, CPoint pt)
+{
+    LRESULT lRet = 0;
+    if (HandleMouseDrag(WM_LBUTTONUP, nFlags, MAKELPARAM(pt.x, pt.y), lRet))
+    {
+        SetMsgHandled(TRUE);
+        return;
+    }
+    SetMsgHandled(FALSE);
 }
 
 SNSEND

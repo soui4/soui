@@ -300,6 +300,31 @@ void SOsrPanel::SetItemCapture(BOOL bCapture)
     m_pItemContainer->OnItemSetCapture(this, bCapture);
 }
 
+BOOL SOsrPanel::CancelCaptureMode(int reason)
+{
+    SWND hCapture = m_hCapture;
+    BOOL bCancelled = TRUE;
+    if (hCapture)
+    {
+        if (hCapture != m_swnd) {
+            SWindow* pCapture = SWindowMgr::GetWindow(hCapture);
+            if (pCapture)
+            {
+                bCancelled = pCapture->CancelCaptureMode(reason);
+            }
+        }
+        else {
+			__baseCls::CancelCaptureMode(reason);
+        }
+    }
+    // 2. 如果子控件同意取消，释放自身的Pressed/Hover状态
+    if (bCancelled)
+    {
+        ModifyState(0, WndState_PushDown | WndState_Hover, TRUE);
+    }
+    return bCancelled;
+}
+
 BOOL SOsrPanel::UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo)
 {
     CRect rcItem = GetItemRect();

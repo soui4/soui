@@ -573,6 +573,9 @@ void SDateTimePicker::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
         TimeWheel(true);
     else if (40 == nChar)
         TimeWheel(false);
+    else if(nChar == VK_ESCAPE){
+        SetMsgHandled(FALSE);
+    }
 }
 
 void SDateTimePicker::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)

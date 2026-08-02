@@ -43,6 +43,7 @@ set(SOUI_ENABLE_SVG ON)
 set(SOUI_BUILD_RICHEDIT  ON)
 set(SOUI_ENABLE_ACC  OFF)
 set(SOUI_ENABLE_SPY  OFF)
+set(SOUI_BUILD_WS ON)
 
 configure_file("${SOUI_ROOT_DIR}/__cmake/soui-config.cmake.in" "${PROJECT_BINARY_DIR}/soui-config.cmake" @ONLY)
 configure_file("${SOUI_ROOT_DIR}/config/config.h.in" "${PROJECT_BINARY_DIR}/config/config.h" @ONLY)

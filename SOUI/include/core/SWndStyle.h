@@ -123,7 +123,8 @@ class SOUI_EXP SwndStyle {
      */
     void SetTextColor(int iState, COLORREF cr)
     {
-        m_crText[iState] = cr;
+        if(iState>=0 && iState<4)
+            m_crText[iState] = cr;
     }
 
     /**

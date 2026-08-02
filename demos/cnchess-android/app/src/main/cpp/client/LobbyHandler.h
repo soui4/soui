@@ -62,7 +62,8 @@ public:
      * @return 是否处理成功
      */
     BOOL OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE> > data) override;
-    
+
+    void UpdatePlayerCount(int nPlayerCount);
 private:
     /**
      * @brief 处理房间信息消息

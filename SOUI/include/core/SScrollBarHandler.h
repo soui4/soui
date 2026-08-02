@@ -15,8 +15,10 @@ struct IScrollBarHost
     {
         Timer_Wait = 100,
         Timer_Go = 101,
+        Timer_WheelHide = 102,
         kTime_Wait = 200,
         kTime_Go = 100,
+        kTime_WheelHide = 2000,
     };
 
     /**
@@ -177,6 +179,12 @@ class SOUI_EXP SScrollBarHandler : public ITimelineHandler {
      * @param pt Point where the mouse is hovering.
      */
     void OnMouseHover(CPoint pt);
+
+    /**
+     * @brief Handles mouse wheel scroll events to show scrollbar with auto-hide.
+     * Fades in the scrollbar and starts a delay timer to fade out.
+     */
+    void OnMouseWheel();
 
     /**
      * @brief Handles mouse down events.

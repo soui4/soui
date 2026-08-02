@@ -12,6 +12,7 @@
 #include "animation/STransformation.h"
 #include "core/SCaret.h"
 #include <atl.mini/SComCli.h>
+#include <core/SModalViewSession.h>
 SNSBEGIN
 
 //////////////////////////////////////////////////////////////////////////
@@ -955,12 +956,16 @@ ULONG_PTR SWindow::SetUserData(ULONG_PTR uData)
 
 BOOL SWindow::SetTimer(char id, UINT uElapse)
 {
+    if (!GetContainer())
+        return FALSE;
     STimerID timerID(m_swnd, id);
     return (BOOL)::SetTimer(GetContainer()->GetHostHwnd(), DWORD(timerID), uElapse, NULL);
 }
 
 BOOL SWindow::KillTimer(char id)
 {
+    if (!GetContainer())
+        return FALSE;
     STimerID timerID(m_swnd, id);
     return ::KillTimer(GetContainer()->GetHostHwnd(), DWORD(timerID));
 }
@@ -1226,6 +1231,15 @@ const SwndStyle &SWindow::GetStyle() const
 SwndStyle &SWindow::GetStyle()
 {
     return m_style;
+}
+
+COLORREF SWindow::GetTextColor(int iState) const{
+    return m_style.GetTextColor(iState);
+}
+
+void SWindow::SetTextColor(COLORREF cr,int iState){
+    m_style.SetTextColor(iState,cr);
+    Invalidate();
 }
 
 SWindow *SWindow::_FindChildByID(int id, int nDeep)
@@ -2116,10 +2130,16 @@ BOOL SWindow::FireEvent(IEvtArgs *evt)
 }
 
 void SWindow::OnLayoutFloatChild(SWindow* pChild, const CRect& rcLayout) {
-    CRect rcChild = pChild->GetWindowRect();
-    CPoint ptRelative(rcChild.left - rcLayout.left, rcChild.top - rcLayout.top); // relative pos
-    rcChild.MoveToXY(rcLayout.left + ptRelative.x, rcLayout.top + ptRelative.y);
-    pChild->Move(rcChild);
+    if (pChild->IsClass(SModalRoot::GetClassName()))
+    {
+        pChild->Move(rcLayout);
+    }
+    else {
+        CRect rcChild = pChild->GetWindowRect();
+        CPoint ptRelative(rcChild.left - rcLayout.left, rcChild.top - rcLayout.top); // relative pos
+        rcChild.MoveToXY(rcLayout.left + ptRelative.x, rcLayout.top + ptRelative.y);
+        pChild->Move(rcChild);
+    }
 }
 
 BOOL SWindow::OnRelayout(const CRect &rcWnd)
@@ -2376,6 +2396,7 @@ void SWindow::DestroyAllChildren()
     {
         SWindow *pNextChild = pChild->m_pNextSibling;
         pChild->SSendMessage(WM_DESTROY);
+        pChild->m_pParent = NULL;
         pChild->Release();
 
         pChild = pNextChild;
@@ -3245,6 +3266,15 @@ void SWindow::OnCaptureChanged(BOOL bCaptured)
     EventSwndCaptureChanged evt(this);
     evt.bCaptured = bCaptured;
     FireEvent(&evt);
+}
+
+BOOL SWindow::CancelCaptureMode(int reason)
+{
+    if (GetCapture() == m_swnd) {
+		ReleaseCapture();
+    }
+    ModifyState(0, WndState_PushDown|WndState_Hover, TRUE);
+    return TRUE;
 }
 
 SWND SWindow::SetCapture()

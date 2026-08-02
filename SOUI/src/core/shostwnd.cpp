@@ -2424,7 +2424,7 @@ public:
  * @param pModalRoot The modal root window to display.
  * @return Session ID on success, 0 on failure.
  */
-ModalViewSessionID SHostWnd::BeginModalViewSession(SModalRoot* pModalRoot)
+ModalViewSessionID SHostWnd::BeginModalViewSession(SModalRoot* pModalRoot, SWindow* pRoot)
 {
     if (!pModalRoot)
         return 0;
@@ -2438,32 +2438,35 @@ ModalViewSessionID SHostWnd::BeginModalViewSession(SModalRoot* pModalRoot)
     // Bind the session id and exit callback directly to the modal root.
     pModalRoot->AssignSessionID();
 
+    if (!pRoot)
+        pRoot = m_pRoot;
     // Add the modal root tree to the SRootWindow modal container. This call
     // lazily creates m_pModalContainer if this is the first modal session.
-    SASSERT(m_pRoot != NULL);
-    m_pRoot->InsertChild(pModalRoot);
+    SASSERT(pRoot != NULL);
+    pRoot->InsertChild(pModalRoot);
 	CRect rcLayout;
-    m_pRoot->GetChildrenLayoutRect(&rcLayout);
+    pRoot->GetChildrenLayoutRect(&rcLayout);
     pModalRoot->Move(&rcLayout);
     // Push the modal root onto the stack (AddRef is handled by SAutoRefPtr).
     SModalRootPtr ptr(pModalRoot);
     m_modalRootStack.AddTail(ptr);
 
     // Initialize focus / capture / relayout / redraw.
-    initModalRoot(pModalRoot);
+    InitModalRoot(pModalRoot);
 
     return pModalRoot->GetSessionID();
 }
 
 void SHostWnd::OnModalViewFinish(SModalRoot *pModalRoot)
 {
-    m_pRoot->RemoveChild(pModalRoot);
-    pModalRoot->Destroy();
+    SWindow* pParent = pModalRoot->GetParent();
+    if(pParent->RemoveChild(pModalRoot))
+        pModalRoot->Destroy();
     // If there's another modal session active under us, reinitialize it
     // (restore focus to the now top-most modal view).
     if (!m_modalRootStack.IsEmpty())
     {
-        initModalRoot(m_modalRootStack.GetTail());
+        InitModalRoot(m_modalRootStack.GetTail());
     }
 }
 
@@ -2481,7 +2484,7 @@ BOOL SHostWnd::EndModalViewSession(ModalViewSessionID sessionID, int exitCode)
 
     SASSERT(m_pRoot);
     SModalRootFinishCallback* pCallback = new SModalRootFinishCallback(this);
-    pModalRoot->endModalViewSession(pCallback, exitCode);
+    pModalRoot->EndModalViewSession(pCallback, exitCode);
     pCallback->Release();
     return TRUE;
 }
@@ -2495,11 +2498,10 @@ ModalViewSessionID SHostWnd::GetLastModalViewSessionID() const
 
 
 
-void SHostWnd::initModalRoot(SModalRoot *pModalRoot)
+void SHostWnd::InitModalRoot(SModalRoot *pModalRoot)
 {
     if (!pModalRoot)
         return;
-    SWindow *pRootWnd = pModalRoot;
     // Cancel any ongoing mouse operations
     if (GetCapture())
     {
@@ -2511,9 +2513,9 @@ void SHostWnd::initModalRoot(SModalRoot *pModalRoot)
     {
         pTarget->SetFocus();
     }
-    pRootWnd->RequestRelayout();
+    pModalRoot->RequestRelayout();
     pTarget->PlayEnterAnimation();
-    pRootWnd->Invalidate();
+    pModalRoot->Invalidate();
 }
 
 void SHostWnd::OnKeyBoardHeight(int keyboardHeight) {

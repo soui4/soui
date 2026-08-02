@@ -167,6 +167,8 @@ class SOUI_EXP SOsrPanel
     CRect GetItemRect() const;
     void SetItemCapture(BOOL bCapture);
 
+    virtual BOOL CancelCaptureMode(int reason);  // 取消鼠标点击操作，chain到capture子控件
+
   protected:
     void OnShowWindow(BOOL bShow, UINT nStatus);
     void OnDestroy();

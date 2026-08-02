@@ -1,13 +1,12 @@
 ﻿#include "stdafx.h"
 #include "ChessGame.h"
 #include "MainDlg.h"
+#include <core/SModalViewSession.h>
 #include <helper/SFunctor.hpp>
 #include <cnchessProtocol.h>
 #include "CnchessSkin.h"
 #include "ChessPiece.h"
 #include "utils.h"
-#include "PeaceReqDlg.h"
-#include "PeaceAckDlg.h"
 #include <valueAnimator/SPropertyAnimator.h>
 #include <algorithm>
 #include <helper/slog.h>
@@ -42,7 +41,7 @@ POINT CChessGame::ChessAnchor2Pos(const AnchorPos &pos, const CRect &rcParent, c
         pt.x += pThis->m_cellWidth * pos.x.fSize;
         pt.y -= pThis->m_cellHeight * pos.y.fSize;
         pt.x += pos.fOffsetX * szChild.cx;
-        pt.y += pos.fOffsetY * szChild.cx;//
+        pt.y += pos.fOffsetY * szChild.cy;
         return pt;
     }
     else{
@@ -614,25 +613,57 @@ void CChessGame::OnBtnStart()
 
 void CChessGame::OnBtnReqPeace()
 {
-    CPeaceReqDlg dlg;
-    if(dlg.DoModal(m_pMainDlg->m_hWnd) == IDOK){
+    SModalRoot *pModal = (SModalRoot*)SApplication::getSingleton().CreateWindowByName(SModalRoot::GetClassName());
+    pModal->InitFromResId("layout:dlg_peace_req_modal");
+    
+    SEdit *pEdtDesc = pModal->FindChildByName2<SEdit>(L"edit_desc");
+    
+    ModalViewSessionID session_id = m_pMainDlg->BeginModalViewSession(pModal);
+    
+    pModal->FindChildByName(L"btn_ok")->SubscribeEvent(EventCmd::EventID, [=](IEvtArgs *e){
         MSG_PEACE msg;
         msg.iIndex = m_iSelfIndex; 
-        SStringA strDesc = S_CT2A(dlg.m_strDesc,CP_UTF8);
-        strcpy_s(msg.szMsg,100,strDesc);
+        SStringA strDesc = S_CT2A(pEdtDesc->GetWindowText(), CP_UTF8);
+        strcpy_s(msg.szMsg, 100, strDesc);
         wsSendMsg(MSG_REQ_PEACE, &msg, sizeof(msg));
         PlayTip(_T("已发送求和请求"));
-    }
+        m_pMainDlg->EndModalViewSession(session_id, IDOK);
+        return TRUE;
+    });
+
+    pModal->FindChildByName(L"btn_cancel")->SubscribeEvent(EventCmd::EventID, [=](IEvtArgs *e){
+        m_pMainDlg->EndModalViewSession(session_id, IDCANCEL);
+        return TRUE;
+    });
 }
 
 void CChessGame::OnBtnReqSurrender()
 {
-    if(SMessageBox(m_pMainDlg->m_hWnd,_T("确定要认输吗？"),_T("提示"),MB_YESNO) == IDYES){
+    SModalRoot *pModal = (SModalRoot*)SApplication::getSingleton().CreateWindowByName(SModalRoot::GetClassName());
+    pModal->InitFromResId("layout:dlg_confirm_modal");
+    
+    pModal->FindChildByName(L"txt_message")->SetWindowText(_T("确定要认输吗？"));
+    
+    ModalViewSessionID session_id = m_pMainDlg->BeginModalViewSession(pModal);
+    
+    pModal->FindChildByName(L"btn_ok")->SubscribeEvent(EventCmd::EventID, [=](IEvtArgs *e){
         MSG_SURRENDER msg;
         msg.iIndex = m_iSelfIndex; 
         wsSendMsg(MSG_REQ_SURRENDER, &msg, sizeof(msg));
         PlayTip(_T("已发送投降请求"));
-    }
+        m_pMainDlg->EndModalViewSession(session_id, IDOK);
+        return TRUE;
+    });
+    
+    pModal->FindChildByName(L"btn_cancel")->SubscribeEvent(EventCmd::EventID, [=](IEvtArgs *e){
+        m_pMainDlg->EndModalViewSession(session_id, IDCANCEL);
+        return TRUE;
+    });
+    
+    pModal->SubscribeEvent(EventExitModalView::EventID, [=](IEvtArgs *e){
+        // Modal view closed, no action needed
+        return TRUE;
+    });
 }
 
 void CChessGame::OnBtnReqRegret()
@@ -840,38 +871,32 @@ void CChessGame::StopWatingAnimation()
     }
 }
 
-void CChessGame::OnGameBoardSizeChanged(IEvtArgs *e)
+void CChessGame::OnGameBoardSizeChanged(IEvtArgs* e)
 {
-    EventSwndSize *evt = sobj_cast<EventSwndSize>(e);
-    SSkinBoard * pSkin = sobj_cast<SSkinBoard>(m_pChessBoard->GetSkin());
-    CSize szBoard = m_pChessBoard->GetSkin()->GetSkinSize();
+    EventSwndSize* evt = sobj_cast<EventSwndSize>(e);
+    SSkinBoard* pSkin = sobj_cast<SSkinBoard>(GETSKIN(L"skin_chessboard", 100));
+    CSize szBoard = pSkin->GetSkinSize();
     CRect rcGameGoard = m_pGameBoard->GetClientRect();
     CSize szGameBoard = evt->szWnd;
     float fRatio1 = (float)szGameBoard.cx / szGameBoard.cy;
     float fRatio2 = (float)szBoard.cx / szBoard.cy;
-    CRect rcBoard =  rcGameGoard;
+    CRect rcBoard = rcGameGoard;
     float scale = 1.0f;
-    if(fRatio1 > fRatio2)
+    if (fRatio1 > fRatio2)
     {
         int nWid = (int)(szGameBoard.cy * fRatio2);
         rcBoard.DeflateRect((szGameBoard.cx - nWid) / 2, 0);
         scale = (float)nWid / szBoard.cx;
-        m_pChessBoard->Move(rcBoard);
     }
     else
     {
         int nHei = (int)(szGameBoard.cx / fRatio2);
         rcBoard.DeflateRect(0, (szGameBoard.cy - nHei) / 2);
         scale = (float)nHei / szBoard.cy;
-        m_pChessBoard->Move(rcBoard);
     }
+    rcBoard.OffsetRect(0,-100);
+    m_pChessBoard->Move(rcBoard);
     CRect rcMargin = pSkin->GetMargin();
-    CSize szCellAll = szBoard - CSize(rcMargin.left + rcMargin.right,rcMargin.top+rcMargin.bottom);
-
-    //calc cell size
-    m_cellWidth = szCellAll.cx * scale / 8;
-    m_cellHeight = szCellAll.cy * scale / 9;
-
     rcMargin.left *= scale;
     rcMargin.top *= scale;
     rcMargin.right *= scale;
@@ -879,8 +904,10 @@ void CChessGame::OnGameBoardSizeChanged(IEvtArgs *e)
     rcBoard.DeflateRect(rcMargin);
     m_ptBoardOrigin.x = rcBoard.left;
     m_ptBoardOrigin.y = rcBoard.bottom;
-
-    m_pGameBoard->SDispatchMessage(UM_SETSCALE, scale*100, 1);
+    //calc cell size
+    m_cellWidth = rcBoard.Width()*1.f / 8;
+    m_cellHeight = rcBoard.Height()*1.f / 9;
+    m_pGameBoard->SDispatchMessage(UM_SETSCALE, scale * 100, 1);
 }
 
 void CChessGame::OnBtnTest()
@@ -1156,11 +1183,33 @@ void CChessGame::OnReqPeace(const void *pData, int nSize){
     if(pPeace->iIndex == m_iSelfIndex)
         return;
     SLOGI() << "Peace request, desc: " << pPeace->szMsg;
-    CPeaceAckDlg ackDlg(pPeace->szMsg);
-    MSG_PEACE msg;
-    msg.iIndex = m_iSelfIndex;  
-    msg.nResult = ackDlg.DoModal(m_pMainDlg->m_hWnd)==IDOK?1:0;
-    wsSendMsg(MSG_ACK_PEACE, &msg, sizeof(msg));
+    
+    SModalRoot *pModal = (SModalRoot*)SApplication::getSingleton().CreateWindowByName(SModalRoot::GetClassName());
+    pModal->InitFromResId("layout:dlg_peace_ack_modal");
+    
+    SEdit *pEdtDesc = pModal->FindChildByName2<SEdit>(L"edit_desc");
+    pEdtDesc->SetWindowText(S_CA2T(pPeace->szMsg, CP_UTF8));
+    
+    ModalViewSessionID session_id = m_pMainDlg->BeginModalViewSession(pModal);
+    
+    pModal->FindChildByName(L"btn_ok")->SubscribeEvent(EventCmd::EventID, [=](IEvtArgs *e){
+        m_pMainDlg->EndModalViewSession(session_id, IDOK);
+        return TRUE;
+    });
+    
+    pModal->FindChildByName(L"btn_cancel")->SubscribeEvent(EventCmd::EventID, [=](IEvtArgs *e){
+        m_pMainDlg->EndModalViewSession(session_id, IDCANCEL);
+        return TRUE;
+    });
+
+    pModal->SubscribeEvent(EventExitModalView::EventID, [=](IEvtArgs *e){
+        EventExitModalView *e2 = sobj_cast<EventExitModalView>(e);
+        MSG_PEACE msg;
+        msg.iIndex = m_iSelfIndex;  
+        msg.nResult = (e2->exitCode == IDOK) ? 1 : 0;
+        wsSendMsg(MSG_ACK_PEACE, &msg, sizeof(msg));
+        return TRUE;
+    });
 }
 
 void CChessGame::OnAckPeace(const void *pData, int nSize)

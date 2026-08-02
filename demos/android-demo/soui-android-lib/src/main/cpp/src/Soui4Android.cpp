@@ -36,48 +36,6 @@ Java_com_soui_android_SouiPlatformBridge_nativeOnTimerExpired(JNIEnv *env, jobje
         static_cast<UINT_PTR>(timerId));
 }
 
-JNIEXPORT jlong JNICALL
-Java_com_soui_android_SouiNativeHandle_NativeCreate(JNIEnv *env, jclass cls, jobject obj) {
-    SouiSurfaceProxy* rawNative = nullptr;
-    try {
-        rawNative = new SouiSurfaceProxy(
-            env, obj);
-        jlong nativeId = rawNative->getNativeId();
-        std::shared_ptr<SouiSurfaceProxy> nativeView(rawNative);
-        rawNative = nullptr; // 所有权交给 shared_ptr
-
-        if (!AndroidPlatformAPI::instance().nativeViewInsert(nativeId, nativeView)) {
-            SLOGE()<<"SouiView_nativeCreate duplicate nativeId="<<(long long)nativeId<<", aborting";
-            nativeView.reset(); // 立即释放，走析构
-            return 0;
-        }
-        SLOGI()<<"SouiView_nativeCreate succeeded, nativeId="<<reinterpret_cast<void*>(nativeId)<<" (HWND==GlobalRef)";
-        return nativeId;
-    } catch (const std::exception& e) {
-        SLOGE()<<"SouiView_nativeCreate exception: "<<e.what();
-        delete rawNative;
-        rawNative = nullptr;
-        return 0;
-    }
-}
-
-JNIEXPORT void JNICALL
-Java_com_soui_android_SouiNativeHandle_NativeDestroy(JNIEnv *env, jclass cls, jlong nativeId) {
-    SLOGI()<<"SouiView_nativeDestroy called, nativeId="<<(long long)nativeId;
-
-    // 先从 map 移除（此时 map 不再持有引用），再让局部 shared_ptr 出作用域时析构
-    // 这样即使 onSizeChanged/onTouchEvent 等正在其它线程持有 lookup 返回的 shared_ptr，
-    // 它们仍然能安全地完成本次调用，不会 UAF。
-    std::shared_ptr<SouiSurfaceProxy> nativeView = AndroidPlatformAPI::instance().nativeViewLookup(nativeId);
-    if (!nativeView) {
-        SLOGW()<<"SouiView_nativeDestroy called with invalid/already-destroyed nativeId="<<(long long)nativeId;
-        return;
-    }
-    AndroidPlatformAPI::instance().nativeViewErase(nativeId);
-    // nativeView 在这里仍持有 1 个引用计数，等函数退出会自动析构（包括 m_hostWnd.reset()）
-    SLOGI()<<"SouiView_nativeDestroy completed, nativeId="<<(long long)nativeId;
-}
-
 JNIEXPORT void JNICALL
 Java_com_soui_android_SouiBaseSurface_nativeOnSizeChanged(JNIEnv *env, jobject thiz, jlong nativeId, jint width, jint height) {
     SLOGD()<<"SouiView_nativeOnSizeChanged called, nativeId="<<(long long)nativeId<<", width="<<width<<", height="<<height;
@@ -91,36 +49,36 @@ Java_com_soui_android_SouiBaseSurface_nativeOnSizeChanged(JNIEnv *env, jobject t
 }
 
 JNIEXPORT void JNICALL
-Java_com_soui_android_SouiBaseSurface_nativeOnMotionEventEx(JNIEnv *env, jobject thiz, jlong nativeId,
-                                                jint action,
-                                                jfloat x, jfloat y, jint pointerId,
-                                                jint buttonState,
-                                                jfloat vscroll, jfloat hscroll,
-                                                jint metaState, jlong timestamp) {
+Java_com_soui_android_SouiBaseSurface_nativeOnMotionEvent(JNIEnv *env, jobject thiz, jlong nativeId,
+                                                          jint action,
+                                                          jfloat x, jfloat y, jint pointerId,
+                                                          jint buttonState,
+                                                          jfloat vscroll, jfloat hscroll,
+                                                          jint metaState, jlong timestamp) {
     (void)env; (void)thiz;
     auto nativeView = AndroidPlatformAPI::instance().nativeViewLookup(nativeId);
     if (nativeView) {
-        nativeView->onMotionEventEx(
-            (int)action, (float)x, (float)y, (int)pointerId,
-            (int)buttonState, (float)vscroll, (float)hscroll,
-            (int)metaState, (long)timestamp);
+        nativeView->onMotionEvent(
+                (int) action, (float) x, (float) y, (int) pointerId,
+                (int) buttonState, (float) vscroll, (float) hscroll,
+                (int) metaState, (long) timestamp);
     } else {
         SLOGW()<<"SouiView_nativeOnMotionEventEx: unknown nativeId="<<(long long)nativeId<<" action="<<(int)action;
     }
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_soui_android_SouiBaseSurface_nativeOnKeyEventEx(JNIEnv *env, jobject thiz, jlong nativeId,
-                                             jint keyCode, jint action,
-                                             jint metaState, jint repeatCount, jint scanCode,
-                                             jint unicodeChar, jlong flags, jlong timestamp) {
+Java_com_soui_android_SouiBaseSurface_nativeOnKeyEvent(JNIEnv *env, jobject thiz, jlong nativeId,
+                                                       jint keyCode, jint action,
+                                                       jint metaState, jint repeatCount, jint scanCode,
+                                                       jint unicodeChar, jlong flags, jlong timestamp) {
     (void)env; (void)thiz;
     auto nativeView = AndroidPlatformAPI::instance().nativeViewLookup(nativeId);
     if (nativeView) {
-        bool handled = nativeView->onKeyEventEx(
-            (int)keyCode, (int)action, (int)metaState,
-            (int)repeatCount, (int)scanCode, (int)unicodeChar,
-            (long)flags, (long)timestamp);
+        bool handled = nativeView->onKeyEvent(
+                (int) keyCode, (int) action, (int) metaState,
+                (int) repeatCount, (int) scanCode, (int) unicodeChar,
+                (long) flags, (long) timestamp);
         SLOGI()<<"SouiView_nativeOnKeyEventEx, keyCode="<<keyCode<<",handled="<<(int)handled;
         return handled ? JNI_TRUE : JNI_FALSE;
     } else {
@@ -246,13 +204,11 @@ JNIEXPORT void JNICALL
 Java_com_soui_android_SouiPlatformBridge_nativeNotifyFocusGained(JNIEnv *env, jclass clazz,
                                                          jlong hwnd) {
     (void)env; (void)clazz;
-    if (hwnd == 0L) return;
-    HWND h = reinterpret_cast<HWND>(static_cast<UINT_PTR>(hwnd));
     // 走 SWinx 全局 SetFocus：内部既更新 m_hFocus、投递 WM_SETFOCUS/WM_KILLFOCUS，
     // 又会再调用 g_platformAPI.window.setFocus → bridge.setFocus。
     // 此时 Java 端 old==new（我们就是从 Java View.focus=true 来的），
     // bridge.setFocus 快速返回，不会死循环。
-    ::SetFocus(h);
+    ::SetFocus(hwnd);
 }
 
 JNIEXPORT void JNICALL
@@ -314,6 +270,49 @@ Java_com_soui_android_SouiPlatformBridge_nativeFreeStringSlot(JNIEnv *env, jclas
 extern "C" JNIEXPORT void JNICALL
 Java_com_soui_android_SouiPlatformBridge_nativeSendImeString(JNIEnv *env, jclass clazz, jlong hwnd, jint slotid) {
     AndroidPlatformAPI::instance().sendImeString((UINT_PTR) hwnd, slotid);
+}
+
+
+JNIEXPORT jlong JNICALL
+Java_com_soui_android_SouiPlatformBridge_nativeCreate(JNIEnv *env, jclass cls, jobject obj) {
+    SouiSurfaceProxy* rawNative = nullptr;
+    try {
+        rawNative = new SouiSurfaceProxy(
+                env, obj);
+        jlong nativeId = rawNative->getNativeId();
+        std::shared_ptr<SouiSurfaceProxy> nativeView(rawNative);
+        rawNative = nullptr; // 所有权交给 shared_ptr
+
+        if (!AndroidPlatformAPI::instance().nativeViewInsert(nativeId, nativeView)) {
+            SLOGE()<<"SouiView_nativeCreate duplicate nativeId="<<(long long)nativeId<<", aborting";
+            nativeView.reset(); // 立即释放，走析构
+            return 0;
+        }
+        SLOGI()<<"SouiView_nativeCreate succeeded, nativeId="<<reinterpret_cast<void*>(nativeId)<<" (HWND==GlobalRef)";
+        return nativeId;
+    } catch (const std::exception& e) {
+        SLOGE()<<"SouiView_nativeCreate exception: "<<e.what();
+        delete rawNative;
+        rawNative = nullptr;
+        return 0;
+    }
+}
+
+JNIEXPORT void JNICALL
+Java_com_soui_android_SouiPlatformBridge_nativeDestroy(JNIEnv *env, jclass cls, jlong nativeId) {
+    SLOGI()<<"SouiView_nativeDestroy called, nativeId="<<(long long)nativeId;
+
+    // 先从 map 移除（此时 map 不再持有引用），再让局部 shared_ptr 出作用域时析构
+    // 这样即使 onSizeChanged/onTouchEvent 等正在其它线程持有 lookup 返回的 shared_ptr，
+    // 它们仍然能安全地完成本次调用，不会 UAF。
+    std::shared_ptr<SouiSurfaceProxy> nativeView = AndroidPlatformAPI::instance().nativeViewLookup(nativeId);
+    if (!nativeView) {
+        SLOGW()<<"SouiView_nativeDestroy called with invalid/already-destroyed nativeId="<<(long long)nativeId;
+        return;
+    }
+    AndroidPlatformAPI::instance().nativeViewErase(nativeId);
+    // nativeView 在这里仍持有 1 个引用计数，等函数退出会自动析构（包括 m_hostWnd.reset()）
+    SLOGI()<<"SouiView_nativeDestroy completed, nativeId="<<(long long)nativeId;
 }
 
 }//extern "C"

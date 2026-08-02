@@ -153,16 +153,4 @@ void SRootWindow::FireMenuCmd(int menuID)
     FireEvent(evt);
 }
 
-void SRootWindow::OnLayoutFloatChild(SWindow* pChild, const CRect& rcLayout) {
-    if(pChild->IsClass(SModalRoot::GetClassName()))
-    {
-        SModalRoot* pModalRoot = sobj_cast<SModalRoot>(pChild);
-        pModalRoot->Move(rcLayout);
-    }
-    else
-    {
-		SWindow::OnLayoutFloatChild(pChild, rcLayout);
-    }
-}
-
 SNSEND

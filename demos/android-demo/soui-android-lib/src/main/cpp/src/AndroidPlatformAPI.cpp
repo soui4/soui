@@ -81,6 +81,11 @@ void AndroidPlatformAPI::init(JNIEnv *env, jobject bridge, jobject ctx) {
         m_postMessageMethod = env->GetMethodID(clsBridge, "scheduleMessageProcessing", "()V");
         m_getInputDevicesMethod = env->GetMethodID(clsBridge, "getInputDevices", "()[[Ljava/lang/String;");
         m_showSoftKeyboard = env->GetMethodID(clsBridge, "showSoftKeyboard", "(Landroid/view/View;Z)Z");
+        m_playSoundMethod = env->GetMethodID(clsBridge, "playSound", "(Ljava/lang/String;I)Z");
+        if (!m_playSoundMethod) {
+            SLOGE()<<"init: failed to resolve SouiPlatformBridge.playSound";
+            ClearEx(env);
+        }
         // Clipboard methods
         m_clipboardOpenMethod = env->GetMethodID(clsBridge, "clipboardOpen", "(J)Z");
         m_clipboardCloseMethod = env->GetMethodID(clsBridge, "clipboardClose", "()Z");
@@ -167,6 +172,7 @@ void AndroidPlatformAPI::deinit() {
     m_setCaptureMethod = m_releaseCaptureMethod = nullptr;
     m_setFocusMethod = m_getFocusMethod = nullptr;
     m_postMessageMethod = nullptr;
+    m_playSoundMethod = nullptr;
     m_nativeSendMessageMethod = nullptr;
     m_nwDestroy = m_nwInvalidate = m_nwShow = m_nwMove = m_nwSetSize = m_nwSetPosition = nullptr;
     m_nwIsVisible = m_nwEnable = m_nwIsEnabled = m_nwGetWindow = m_nwAsView = nullptr;
@@ -1240,6 +1246,20 @@ BOOL AndroidPlatformAPI::showSoftKeyboard(HWND hWnd,BOOL bShow){
         return FALSE;
     }
     jboolean ret = env->CallBooleanMethod(m_javaBridge, m_showSoftKeyboard, v, (jboolean)bShow);
+    return ret;
+}
+
+BOOL AndroidPlatformAPI::playSound(LPCSTR pszSound, HMODULE hmod, DWORD fdwSound) {
+    JNIEnv *env = getJNIEnv();
+    if (!env || !m_javaBridge || !m_playSoundMethod) {
+        return FALSE;
+    }
+    jstring jSound = env->NewStringUTF(pszSound);
+    if (!jSound) {
+        return FALSE;
+    }
+    jboolean ret = env->CallBooleanMethod(m_javaBridge, m_playSoundMethod, jSound, (jint)fdwSound);
+    env->DeleteLocalRef(jSound);
     return ret;
 }
 

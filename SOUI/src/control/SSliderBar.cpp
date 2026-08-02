@@ -224,6 +224,13 @@ void SSliderBar::OnLButtonUp(UINT nFlags, CPoint point)
     OnMouseMove(nFlags, point);
 }
 
+BOOL SSliderBar::CancelCaptureMode(int reason)
+{
+    if (reason == CANCEL_REASON_SCROLL && m_bDrag)
+        return FALSE;
+    return __baseCls::CancelCaptureMode(reason);
+}
+
 void SSliderBar::OnLButtonDown(UINT nFlags, CPoint point)
 {
     SetCapture();

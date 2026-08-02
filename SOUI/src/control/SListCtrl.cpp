@@ -875,7 +875,19 @@ BOOL SListCtrl::OnScroll(BOOL bVertical, UINT uCode, int nPos)
 
 void SListCtrl::OnLButtonDown(UINT nFlags, CPoint pt)
 {
-    __baseCls::OnLButtonDown(nFlags, pt);
+    LRESULT lRet = 0;
+    if (HandleMouseDrag(WM_LBUTTONDOWN, nFlags, MAKELPARAM(pt.x, pt.y), lRet))
+    {
+        SetMsgHandled(TRUE);
+        return;
+    }
+    if (m_bItemDragScrollEnabled && (HasScrollBar(TRUE) || HasScrollBar(FALSE)))
+    {
+        StartDragPending(pt);
+    }else{
+        __baseCls::OnLButtonDown(nFlags, pt);
+    }
+
     int nSubItem = -1;
     m_nHoverItem = HitTest(pt, &nSubItem);
     BOOL hitCheckBox = HitCheckBox(pt);
@@ -888,8 +900,19 @@ void SListCtrl::OnLButtonDown(UINT nFlags, CPoint pt)
         NotifySelChange(m_nSelectItem, m_nHoverItem);
 }
 
+void SListCtrl::OnLButtonUp(UINT nFlags, CPoint pt)
+{
+    LRESULT lRet = 0;
+    if (HandleMouseDrag(WM_LBUTTONUP, nFlags, MAKELPARAM(pt.x, pt.y), lRet))
+    {
+        return;
+    }
+    __baseCls::OnLButtonUp(nFlags, pt);
+}
+
 void SListCtrl::OnLButtonDbClick(UINT nFlags, CPoint pt)
 {
+    __baseCls::OnLButtonDbClick(nFlags, pt);
     int nSubItem = -1;
     m_nHoverItem = HitTest(pt, &nSubItem);
 
@@ -907,12 +930,17 @@ void SListCtrl::OnLButtonDbClick(UINT nFlags, CPoint pt)
 
 void SListCtrl::OnRButtonUp(UINT nFlags, CPoint pt)
 {
+    LRESULT lRet = 0;
+    if (HandleMouseDrag(WM_RBUTTONUP, nFlags, MAKELPARAM(pt.x, pt.y), lRet))
+    {
+        SetMsgHandled(TRUE);
+        return;
+    }
     EventLCRClick evt2(this);
     evt2.nCurSel = HitTest(pt);
     evt2.pt = pt;
-    ;
-    if (!FireEvent(evt2))
-        __baseCls::OnRButtonUp(nFlags, pt);
+    FireEvent(evt2);
+    __baseCls::OnRButtonUp(nFlags, pt);
 }
 
 void SListCtrl::UpdateChildrenPosition()
@@ -950,6 +978,13 @@ BOOL SListCtrl::OnHeaderSwap(IEvtArgs *pEvt)
 
 void SListCtrl::OnMouseMove(UINT nFlags, CPoint pt)
 {
+    LRESULT lRet = 0;
+    if (HandleMouseDrag(WM_MOUSEMOVE, nFlags, MAKELPARAM(pt.x, pt.y), lRet))
+    {
+        SetMsgHandled(TRUE);
+        return;
+    }
+
     int nHoverItem = HitTest(pt);
     if (m_bHotTrack && nHoverItem != m_nHoverItem)
     {

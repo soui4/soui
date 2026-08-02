@@ -4,14 +4,13 @@
 
 #include "stdafx.h"
 #include "MainDlg.h"    
-#include "LoginDlg.h"
+#include <core/SModalViewSession.h>
 #include <helper/SMenuEx.h>
 #include <helper/SFunctor.hpp>
 #include <helper/slog.h>
 #define kLogTag "MainDlg"
-
-#ifdef _WIN32
 #include <mmsystem.h>
+#ifdef _WIN32
 #include "win32_audio.h"
 #endif
 CMainDlg::CMainDlg(SGameTheme* pTheme) 
@@ -30,26 +29,90 @@ CMainDlg::~CMainDlg()
     delete m_pLobbyHandler;
 }
 
-BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
+void CMainDlg::OnLoginSuccess(SStringT strSvr, SStringT strName, char cSex)
 {
-    CLoginDlg dlgLogin;
-    if (dlgLogin.DoModal() != IDOK) {
-        OnClose();
-        return FALSE;
-    }
     MyProfile* myProfile = MyProfile::getSingletonPtr();
-    myProfile->SetSex(dlgLogin.m_cSex);
-    myProfile->SetName(dlgLogin.m_strName);
+    myProfile->SetSex(cSex);
+    myProfile->SetName(strName);
 
-    SStringT strTitle = SStringT().Format(_T("用户:%s"), myProfile->GetName().c_str());
-    FindChildByName(L"txt_title")->SetWindowText(strTitle);
-    SetWindowText(strTitle);
     m_pLobbyHandler->Init(FindChildByName(L"room_container"), &m_webSocketClient);
     m_pGame->Init(FindChildByName(L"game_container"), &m_webSocketClient);
 
-    SStringA svr = S_CT2A(dlgLogin.m_strSvr);
+    SStringA svr = S_CT2A(strSvr);
     BOOL bRet = m_webSocketClient.ConnectToServer(svr, "");
     SLOGI()<<"connect to server ret:"<<bRet;
+}
+
+BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
+{
+    // 使用 SModalRoot/SModalView 替代 SHostDialog::DoModal()
+    // Android 平台不支持独立消息循环，必须使用模态视图方式
+    SModalRoot *pModal = (SModalRoot*)SApplication::getSingleton().CreateWindowByName(SModalRoot::GetClassName());
+    pModal->InitFromResId("layout:dlg_login_modal");
+    
+    // 预先读取配置填充表单
+    SWindow *pEdtSvr = pModal->FindChildByName2<SEdit>(L"edt_svr");
+    SWindow *pEdtName = pModal->FindChildByName2<SEdit>(L"edt_name");
+    SComboBox *pComboSex = pModal->FindChildByName2<SComboBox>(L"cbx_sex");
+    
+    SStringT strCfg = SApplication::getSingleton().GetAppDir() + _T("/cnchess_cfg.xml");
+    if(GetFileAttributes(strCfg) != INVALID_FILE_ATTRIBUTES)
+    {
+        SXmlDoc doc;
+        if(doc.load_file(strCfg))
+        {
+            SXmlNode node = doc.root().child(L"config");
+            if(node)
+            {
+                pEdtSvr->SetWindowText(S_CW2T(node.attribute(L"svr").as_string()));
+                pEdtName->SetWindowText(S_CW2T(node.attribute(L"name").as_string()));
+                pComboSex->SetCurSel(node.attribute(L"sex").as_int(0));
+            }
+        }
+    }
+
+    ModalViewSessionID session_id = BeginModalViewSession(pModal);
+    
+    // 登录按钮事件
+    pModal->FindChildByName(L"btn_login")->SubscribeEvent(EventCmd::EventID, [=](IEvtArgs *e){
+        SStringT strSvr = pEdtSvr->GetWindowText();
+        SStringT strName = pEdtName->GetWindowText();
+        int iSel = pComboSex->GetCurSel();
+        char cSex = pComboSex->GetItemData(iSel);
+        
+        // 保存配置
+        SXmlDoc doc;
+        SXmlNode node = doc.root().child2(L"config");
+        if (node)
+        {
+            node.attribute2(L"svr").set_value(S_CT2W(strSvr));
+            node.attribute2(L"name").set_value(S_CT2W(strName));
+            node.attribute2(L"sex").set_value(cSex);
+        }
+        SStringT strCfg = SApplication::getSingleton().GetAppDir() + _T("/cnchess_cfg.xml");
+        doc.save_file(strCfg);
+        
+        EndModalViewSession(session_id, IDOK);
+        return TRUE;
+    });
+
+    // 模态视图退出事件
+    pModal->SubscribeEvent(EventExitModalView::EventID, [=](IEvtArgs *e){
+        EventExitModalView *e2 = sobj_cast<EventExitModalView>(e);
+        if(e2->exitCode == IDOK) {
+            // 登录成功，继续初始化
+            SStringT strSvr = pEdtSvr->GetWindowText();
+            SStringT strName = pEdtName->GetWindowText();
+            int iSel = pComboSex->GetCurSel();
+            char cSex = pComboSex->GetItemData(iSel);
+            OnLoginSuccess(strSvr, strName, cSex);
+        } else {
+            // 登录取消，关闭窗口
+            OnClose();
+        }
+        return TRUE;
+    });
+    
     return TRUE;
 }
 
@@ -171,10 +234,9 @@ void CMainDlg::OnBtnUnmute()
 void CMainDlg::PlayWave(LPCTSTR pszSound)
 {
     if(m_bMute) return;
-
 #ifdef _WIN32
     Win32PlaySound(pszSound, NULL, SND_ASYNC | SND_NOSTOP | SND_FILENAME);
-#elif !defined(SOUI_ANDROID)
+#else
     // Use the default PlaySound implementation on other platforms
     ::PlaySound(pszSound, NULL, SND_ASYNC | SND_NOSTOP | SND_FILENAME);
 #endif

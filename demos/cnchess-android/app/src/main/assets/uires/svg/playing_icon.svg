@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="60" height="40" viewBox="0 0 60 40">
+    <defs>
+        <filter id="battleGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="#FF4500" flood-opacity="0.8"/>
+        </filter>
+    </defs>
+    
+    <g transform="translate(30, 20)" filter="url(#battleGlow)">
+        <!-- 交叉棋子 -->
+        <!-- 红方棋子 -->
+        <g transform="translate(-10, -8)">
+            <circle cx="0" cy="0" r="7" fill="#DC143C" stroke="#FFD700" stroke-width="1"/>
+            <text x="0" y="2" text-anchor="middle" fill="#FFD700" font-size="8" font-weight="bold">帥</text>
+        </g>
+        
+        <!-- 黑方棋子 -->
+        <g transform="translate(10, 8)">
+            <circle cx="0" cy="0" r="7" fill="#1F1208" stroke="#8B7355" stroke-width="1"/>
+            <text x="0" y="2" text-anchor="middle" fill="#C0C0C0" font-size="8" font-weight="bold">將</text>
+        </g>
+        
+        <!-- 交叉光效 -->
+        <line x1="-15" y1="-12" x2="15" y2="12" stroke="#FFD700" stroke-width="1.5" opacity="0.6"/>
+        <line x1="15" y1="-12" x2="-15" y2="12" stroke="#FF4500" stroke-width="1.5" opacity="0.6"/>
+        
+        <!-- 碰撞火花 -->
+        <circle cx="0" cy="0" r="3" fill="#FFD700" opacity="0.9"/>
+        <circle cx="0" cy="0" r="5" fill="#FF4500" opacity="0.4"/>
+    </g>
+</svg>

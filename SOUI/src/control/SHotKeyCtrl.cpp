@@ -125,6 +125,10 @@ void SHotKeyCtrl::UpdateModifier()
 
 void SHotKeyCtrl::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
+    if(nChar == VK_ESCAPE){
+        SetMsgHandled(FALSE);
+        return;
+    }
     if (!m_bInSetting)
     {
         m_bInSetting = TRUE;

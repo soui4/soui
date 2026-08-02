@@ -8,6 +8,8 @@
 #include <gdialpha.h>
 #include <helper/STimer.h>
 #include <helper/SUnkImpl.h>
+#define kLogTag "SRichEdit"
+
 #ifndef LY_PER_INCH
 #define LY_PER_INCH 1440
 #endif
@@ -836,7 +838,7 @@ BOOL STextHost::TxShowCaret(BOOL fShow)
 
 BOOL STextHost::TxCreateCaret(HBITMAP hbmp, INT xWidth, INT yHeight)
 {
-    return m_pRichEdit->CreateCaret(hbmp, xWidth, yHeight);
+    return m_pRichEdit->CreateCaret(hbmp, xWidth*m_pRichEdit->GetScale()/100, yHeight);
 }
 
 HDC STextHost::TxGetDC()
@@ -887,7 +889,20 @@ BOOL STextHost::TxEnableScrollBar(INT fuSBFlags, INT fuArrowflags)
 
 BOOL STextHost::TxSetScrollRange(INT fnBar, LONG nMinPos, INT nMaxPos, BOOL fRedraw)
 {
+	//SLOGI() << "TxSetScrollRange: fnBar=" << fnBar << ", nMinPos=" << nMinPos << ", nMaxPos=" << nMaxPos << ", fRedraw=" << fRedraw;
     return m_pRichEdit->SetScrollRange(fnBar != SB_HORZ, nMinPos, nMaxPos, fRedraw);
+}
+
+
+// 窗口大小变化后，page 改变会导致原有 pos 可能超出新的合法范围
+// 主动把 pos 限制到 [nMin, nMax - nPage + 1]，避免滚动条卡在越界位置
+static BOOL ClampPos(SCROLLINFO* psi) {
+    BOOL pos = psi->nPos;
+    if (psi->nPos < psi->nMin) psi->nPos = psi->nMin;
+    LONG maxPos = psi->nMax - (LONG)psi->nPage + 1;
+    if (maxPos < psi->nMin) maxPos = psi->nMin;
+    if (psi->nPos > maxPos) psi->nPos = maxPos;
+    return pos != psi->nPos;
 }
 
 BOOL SRichEdit::OnTxSetScrollPos(INT fnBar, INT nPos, BOOL fRedraw)
@@ -900,6 +915,7 @@ BOOL SRichEdit::OnTxSetScrollPos(INT fnBar, INT nPos, BOOL fRedraw)
     if (psi->nPos != nPos)
     {
         psi->nPos = nPos;
+        ClampPos(psi);
         CRect rcSb = GetScrollBarRect(!!bVertical);
         InvalidateRect(rcSb);
     }
@@ -1701,6 +1717,11 @@ void SRichEdit::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
         SetMsgHandled(FALSE);
         return;
     }
+    if(nChar == VK_ESCAPE)
+    {
+        SetMsgHandled(FALSE);
+        return;
+	}
     m_pTxtHost->GetTextService()->TxSendMessage(GetCurMsg()->uMsg, GetCurMsg()->wParam, GetCurMsg()->lParam, NULL);
 }
 
@@ -1774,6 +1795,15 @@ LRESULT SRichEdit::OnNcCalcSize(BOOL bCalcValidRects, LPARAM lParam)
     m_siHoz.nPage = m_rcClient.Width() - rcInsetPixel.left - rcInsetPixel.right;
     m_siVer.nPage = m_rcClient.Height() - rcInsetPixel.top - rcInsetPixel.bottom;
 
+
+    BOOL bClampV = ClampPos(&m_siVer);
+    BOOL bClampH = ClampPos(&m_siHoz);
+    if (bClampH || bClampV)
+    {
+        POINT scrollPos = { m_siHoz.nPos,m_siVer.nPos };
+        m_pTxtHost->GetTextService()->TxSendMessage(EM_SETSCROLLPOS, 0, reinterpret_cast<LPARAM>(&scrollPos), NULL);
+    }
+    //SLOGI() << "OnNcCalcSize: m_siVer.nPage=" << m_siVer.nPage << ", pos=" << m_siVer.nPos;
     if (m_pTxtHost)
     {
         HDC hdc = GetDC(NULL);

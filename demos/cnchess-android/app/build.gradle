@@ -15,14 +15,13 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
-
         externalNativeBuild {
             cmake {
                 cppFlags "-std=c++17 -fexceptions -frtti"
                 arguments "-DANDROID_STL=c++_shared",
                         "-DSOUI_INCLUDE_DIR=${project(':soui-android-lib').projectDir.absolutePath.replace('\\', '/')}/src/main/assets/soui4",
                         "-DSOUI4ANDROID_INCLUDE_DIR=${project(':soui-android-lib').projectDir.absolutePath.replace('\\', '/')}/src/main/cpp/include",
-                        "-DSOUI_LIB_DIR=${project(':soui-android-lib').buildDir.absolutePath.replace('\\', '/')}/intermediates/library_jni/debug/jni",
+                        "-DSOUI_LIB_DIR=${project(':soui-android-lib').buildDir.absolutePath.replace('\\', '/')}/library_jni/debug/jni",
                         "-DSOUI_CONTROLS_EXTEND_DIR=${rootDir.absolutePath.replace('\\', '/')}/../../controls.extend"
             }
         }
@@ -36,6 +35,7 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.debug
+
         }
     }
 

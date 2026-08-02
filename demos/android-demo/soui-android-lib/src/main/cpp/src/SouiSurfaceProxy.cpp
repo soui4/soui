@@ -291,9 +291,9 @@ void SouiSurfaceProxy::dispatchMouseButton(int action, int btnIdx, int ix, int i
     }
 }
 
-void SouiSurfaceProxy::onMotionEventEx(int action, float x, float y, int pointerId,
-                                       int buttonState, float vscroll, float hscroll,
-                                       int metaState, long timestamp) {
+void SouiSurfaceProxy::onMotionEvent(int action, float x, float y, int pointerId,
+                                     int buttonState, float vscroll, float hscroll,
+                                     int metaState, long timestamp) {
     HWND hHost = (HWND)getNativeId();
     const int ix = static_cast<int>(x);
     const int iy = static_cast<int>(y);
@@ -355,7 +355,7 @@ void SouiSurfaceProxy::onMotionEventEx(int action, float x, float y, int pointer
         case AMOTION_EVENT_ACTION_BUTTON_RELEASE: {
             int idx = buttonIndexFromButtonState(buttonState);
             if (idx < 0) {
-                SLOGW()<<"onMotionEventEx: unknown buttonState=0x"<<buttonState<<", skip";
+                SLOGW()<<"onMotionEvent: unknown buttonState=0x"<<buttonState<<", skip";
                 return;
             }
             dispatchMouseButton(action, idx, ix, iy, mkModsOnly, timestamp);
@@ -416,16 +416,10 @@ void SouiSurfaceProxy::onMotionEventEx(int action, float x, float y, int pointer
             return;
         }
         default: {
-            SLOGW()<<"onMotionEventEx: unknown action="<<action<<" x="<<ix<<" y="<<iy;
+            SLOGW()<<"onMotionEvent: unknown action="<<action<<" x="<<ix<<" y="<<iy;
             return;
         }
     }
-}
-
-void SouiSurfaceProxy::onTouchEvent(int action, float x, float y, int pointerId, long timestamp) {
-    onMotionEventEx(action, x, y, pointerId, /*buttonState=*/0,
-                    /*vscroll=*/0.f, /*hscroll=*/0.f,
-                    /*metaState=*/0, timestamp);
 }
 
 int SouiSurfaceProxy::convertKeyCode(int kc) {
@@ -559,9 +553,9 @@ int SouiSurfaceProxy::convertKeyCode(int kc) {
     }
 }
 
-bool SouiSurfaceProxy::onKeyEventEx(int keyCode, int action, int metaState,
-                                    int repeatCount, int scanCode, int unicodeChar,
-                                    long flags, long timestamp) {
+bool SouiSurfaceProxy::onKeyEvent(int keyCode, int action, int metaState,
+                                  int repeatCount, int scanCode, int unicodeChar,
+                                  long flags, long timestamp) {
     (void)flags; (void)timestamp;
     // action: 0=DOWN, 1=UP, 2=MULTIPLE（长按重复）
     if (action < 0 || action > 2) return false;
@@ -635,25 +629,6 @@ bool SouiSurfaceProxy::onKeyEventEx(int keyCode, int action, int metaState,
         return handled != 0;
     }
     return false;
-}
-
-void SouiSurfaceProxy::onKeyEvent(int keyCode, int action, int metaState, long timestamp) {
-    int unicodeChar = 0;
-    int repeatCount = (action == 2) ? 2 : 1;
-    int scanCode = 0;
-
-    // 旧版接口简单 WM_CHAR 推导（纯 ASCII 可用）
-    if (action == 0 || action == 2) {
-        if (keyCode >= 7 && keyCode <= 16) {
-            unicodeChar = '0' + (keyCode - 7);
-        } else if (keyCode >= 29 && keyCode <= 54) {
-            bool shift = (metaState & (AMETA_SHIFT_ON|AMETA_CAPS_LOCK_ON|AMETA_SYM_ON)) != 0;
-            unicodeChar = (shift ? 'A' : 'a') + (keyCode - 29);
-        } else if (keyCode == 66) unicodeChar = VK_RETURN;
-        else if (keyCode == 67) unicodeChar = VK_BACK;
-        else if (keyCode == 62) unicodeChar = ' ';
-    }
-    onKeyEventEx(keyCode, action, metaState, repeatCount, scanCode, unicodeChar, /*flags=*/0, timestamp);
 }
 
 void SouiSurfaceProxy::render(JNIEnv* env, jobject bitmap) {

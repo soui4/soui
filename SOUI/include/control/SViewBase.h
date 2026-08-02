@@ -13,6 +13,7 @@ SNSBEGIN
  * @brief Base class for view controls that use adapters
  * @details This class provides common functionality for view controls that use adapters,
  *          such as SListView, STileView, SMcListView, and SMcListViewEx.
+ *          Drag scroll and fling animation are handled by SPanel.
  */
 class SOUI_EXP SViewBase
     : protected SHostProxy

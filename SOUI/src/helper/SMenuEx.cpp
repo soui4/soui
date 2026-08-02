@@ -761,8 +761,11 @@ void SMenuEx::OnMenuEnd()
 
 UINT SMenuEx::TrackPopupMenu(UINT flag, int x, int y, HWND hOwner, int nScale)
 {
+#ifdef __ANDROID__
+    return 0;
+#endif//__ANDROID__
     if (!IsWindow() || GetMenuItemCount() == 0)
-        return (UINT)-1;
+        return 0;
     if (!s_MenuData)
         s_MenuData = new SMenuExRunData(hOwner, nScale);
     else

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="180" viewBox="0 0 600 180">
+    <defs>
+        <linearGradient id="woodNormal" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#3D2F1F"/>
+            <stop offset="50%" stop-color="#2C1810"/>
+            <stop offset="100%" stop-color="#1F1208"/>
+        </linearGradient>
+        <linearGradient id="woodHover" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#5D4E37"/>
+            <stop offset="50%" stop-color="#4A3826"/>
+            <stop offset="100%" stop-color="#3D2F1F"/>
+        </linearGradient>
+        <linearGradient id="woodSelected" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#6B5D47"/>
+            <stop offset="50%" stop-color="#5D4E37"/>
+            <stop offset="100%" stop-color="#4A3826"/>
+        </linearGradient>
+        <filter id="cardShadow" x="-2%" y="-5%" width="104%" height="110%">
+            <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.5"/>
+        </filter>
+    </defs>
+
+    <!-- ========== State 0: Normal (0,0 - 200,180) ========== -->
+    <g transform="translate(0,0)" filter="url(#cardShadow)">
+        <rect x="5" y="5" width="190" height="170" rx="12" ry="12" fill="url(#woodNormal)" stroke="#5D4E37" stroke-width="2"/>
+        <rect x="10" y="10" width="180" height="160" rx="8" ry="8" fill="none" stroke="#8B7355" stroke-width="0.5" opacity="0.4"/>
+        <g stroke="#FFD700" stroke-width="1" fill="none" opacity="0.5">
+            <path d="M15,15 L15,25 L25,25"/>
+            <path d="M185,15 L185,25 L175,25"/>
+            <path d="M15,165 L15,155 L25,155"/>
+            <path d="M185,165 L185,155 L175,155"/>
+        </g>
+    </g>
+
+    <!-- ========== State 1: Hover (200,0 - 400,180) ========== -->
+    <g transform="translate(200,0)" filter="url(#cardShadow)">
+        <rect x="5" y="5" width="190" height="170" rx="12" ry="12" fill="url(#woodHover)" stroke="#DAA520" stroke-width="2"/>
+        <rect x="10" y="10" width="180" height="160" rx="8" ry="8" fill="none" stroke="#FFD700" stroke-width="0.5" opacity="0.5"/>
+        <g stroke="#FFD700" stroke-width="1.5" fill="none" opacity="0.7">
+            <path d="M15,15 L15,28 L28,28"/>
+            <path d="M185,15 L185,28 L172,28"/>
+            <path d="M15,165 L15,152 L28,152"/>
+            <path d="M185,165 L185,152 L172,152"/>
+        </g>
+    </g>
+
+    <!-- ========== State 2: Selected (400,0 - 600,180) ========== -->
+    <g transform="translate(400,0)" filter="url(#cardShadow)">
+        <rect x="5" y="5" width="190" height="170" rx="12" ry="12" fill="url(#woodSelected)" stroke="#FF4500" stroke-width="2.5"/>
+        <rect x="10" y="10" width="180" height="160" rx="8" ry="8" fill="none" stroke="#FF6B35" stroke-width="1" opacity="0.6"/>
+        <g stroke="#FF4500" stroke-width="1.5" fill="none" opacity="0.8">
+            <path d="M15,15 L15,28 L28,28"/>
+            <path d="M185,15 L185,28 L172,28"/>
+            <path d="M15,165 L15,152 L28,152"/>
+            <path d="M185,165 L185,152 L172,152"/>
+        </g>
+    </g>
+</svg>

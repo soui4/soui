@@ -2970,6 +2970,15 @@ void SGridCtrl::OnLButtonUp(UINT nFlags, CPoint pt)
         }
 
     }
+
+}
+
+BOOL SGridCtrl::CancelCaptureMode(int reason)
+{
+    if (reason == CANCEL_REASON_SCROLL &&
+        (m_MouseMode == MOUSE_SIZING_ROW || m_MouseMode == MOUSE_SIZING_COL || m_MouseMode == MOUSE_DRAGGING))
+        return FALSE;
+    return __baseCls::CancelCaptureMode(reason);
 }
 
 void SGridCtrl::OnLButtonDbClick(UINT nFlags, CPoint pt)

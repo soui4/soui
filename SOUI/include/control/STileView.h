@@ -379,13 +379,6 @@ class SOUI_EXP STileView
     virtual BOOL OnItemGetRect(const SOsrPanel *pItem, CRect &rcItem) const;
 
     /**
-     * @brief Sets or releases capture on an item
-     * @param pItem Pointer to the item panel
-     * @param bCapture TRUE to set capture, FALSE to release
-     */
-    virtual void OnItemSetCapture(SOsrPanel *pItem, BOOL bCapture);
-
-    /**
      * @brief Redraws an item
      * @param pItem Pointer to the item panel
      */
@@ -430,6 +423,18 @@ class SOUI_EXP STileView
      * @param lParam Additional message parameter
      */
     virtual void DispatchMessage2Items(UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+    /**
+     * @brief Cancel item capture during drag
+     * @param reason Reason for cancellation
+     * @return TRUE if capture was released, FALSE otherwise
+     */
+    virtual BOOL OnDragCancelCapture(int reason) override;
+
+    /**
+     * @brief Clear item capture during drag
+     */
+    virtual void OnDragClearItemCapture() override;
 
   protected:
     SAutoRefPtr<ILvAdapter> m_adapter;                 /**< Adapter for the tile view. */

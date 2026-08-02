@@ -134,6 +134,13 @@ void SFreeMoveWindow::OnNcLButtonUp(UINT nFlags, CPoint pt)
     }
 }
 
+BOOL SFreeMoveWindow::CancelCaptureMode(int reason)
+{
+    if (reason == CANCEL_REASON_SCROLL && m_bDraging)
+        return FALSE;
+    return __baseCls::CancelCaptureMode(reason);
+}
+
 void SFreeMoveWindow::OnNcMouseMove(UINT nFlags, CPoint pt)
 {
     if (!m_bDraging)
