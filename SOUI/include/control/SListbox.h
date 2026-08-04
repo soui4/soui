@@ -301,13 +301,6 @@ class SOUI_EXP SListBox : public TPanelProxy<IListBox> {
     void OnPaint(IRenderTarget *pRT);
 
     /**
-     * @brief Handle left mouse button down event
-     * @param nFlags Flags
-     * @param pt Mouse coordinates
-     */
-    void OnLButtonDown(UINT nFlags, CPoint pt);
-
-    /**
      * @brief Handle left mouse button double-click event
      * @param nFlags Flags
      * @param pt Mouse coordinates
@@ -319,21 +312,7 @@ class SOUI_EXP SListBox : public TPanelProxy<IListBox> {
      * @param nFlags Flags
      * @param pt Mouse coordinates
      */
-    void OnLButtonUp(UINT nFlags, CPoint pt);
-
-    /**
-     * @brief Handle left mouse button up event
-     * @param nFlags Flags
-     * @param pt Mouse coordinates
-     */
     void OnRButtonUp(UINT nFlags, CPoint pt);
-
-    /**
-     * @brief Handle mouse move event
-     * @param nFlags Flags
-     * @param pt Mouse coordinates
-     */
-    void OnMouseMove(UINT nFlags, CPoint pt);
 
     /**
      * @brief Handle key down event
@@ -368,6 +347,29 @@ class SOUI_EXP SListBox : public TPanelProxy<IListBox> {
      */
     void OnMouseLeave();
 
+  protected:
+    /**
+     * @brief Handle left mouse button down when not drag scrolling
+     * @param nFlags Flags
+     * @param pt Mouse coordinates
+     */
+    void OnLButtonDownEx(UINT nFlags, CPoint pt) override;
+
+    /**
+     * @brief Handle mouse move when not drag scrolling
+     * @param nFlags Flags
+     * @param pt Mouse coordinates
+     */
+    void OnMouseMoveEx(UINT nFlags, CPoint pt) override;
+
+    /**
+     * @brief Handle left mouse button up when not drag scrolling
+     * @param nFlags Flags
+     * @param pt Mouse coordinates
+     */
+    void OnLButtonUpEx(UINT nFlags, CPoint pt) override;
+
+	BOOL IsEnableDragMode() const override;
   private:
     SLayoutSize m_itemHeight; /**< Height of the items */
     mutable int m_nItemHeight; /**< Height of the items in pixels */
@@ -410,11 +412,8 @@ class SOUI_EXP SListBox : public TPanelProxy<IListBox> {
 
     SOUI_MSG_MAP_BEGIN()
         MSG_WM_PAINT_EX(OnPaint)
-        MSG_WM_LBUTTONDOWN(OnLButtonDown)
         MSG_WM_LBUTTONDBLCLK(OnLButtonDbClick)
-        MSG_WM_LBUTTONUP(OnLButtonUp)
         MSG_WM_RBUTTONUP(OnRButtonUp)
-        MSG_WM_MOUSEMOVE(OnMouseMove)
         MSG_WM_KEYDOWN(OnKeyDown)
         MSG_WM_CHAR(OnChar)
         MSG_WM_SHOWWINDOW(OnShowWindow)

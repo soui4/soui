@@ -827,20 +827,6 @@ class SOUI_EXP STreeCtrl
     void OnPaint(IRenderTarget *pRT);
 
     /**
-     * @brief Handles the left mouse button down event.
-     * @param nFlags Flags associated with the mouse event.
-     * @param pt Mouse position.
-     */
-    void OnLButtonDown(UINT nFlags, CPoint pt);
-
-    /**
-     * @brief Handles the left mouse button up event.
-     * @param nFlags Flags associated with the mouse event.
-     * @param pt Mouse position.
-     */
-    void OnLButtonUp(UINT nFlags, CPoint pt);
-
-    /**
      * @brief Handles the left mouse button double-click event.
      * @param nFlags Flags associated with the mouse event.
      * @param pt Mouse position.
@@ -862,13 +848,6 @@ class SOUI_EXP STreeCtrl
     void OnRButtonUp(UINT nFlags, CPoint pt);
 
     /**
-     * @brief Handles the mouse move event.
-     * @param nFlags Flags associated with the mouse event.
-     * @param pt Mouse position.
-     */
-    void OnMouseMove(UINT nFlags, CPoint pt);
-
-    /**
      * @brief Handles the mouse leave event.
      */
     void OnMouseLeave();
@@ -883,15 +862,34 @@ class SOUI_EXP STreeCtrl
     virtual BOOL OnDragCancelCapture(int reason) override;
     virtual void OnDragClearItemCapture() override;
 
+  protected:
+    /**
+     * @brief Handles left mouse button down when not drag scrolling.
+     * @param nFlags Flags associated with the mouse event.
+     * @param pt Mouse position.
+     */
+    void OnLButtonDownEx(UINT nFlags, CPoint pt) override;
+
+    /**
+     * @brief Handles mouse move when not drag scrolling.
+     * @param nFlags Flags associated with the mouse event.
+     * @param pt Mouse position.
+     */
+    void OnMouseMoveEx(UINT nFlags, CPoint pt) override;
+
+    /**
+     * @brief Handles left mouse button up when not drag scrolling.
+     * @param nFlags Flags associated with the mouse event.
+     * @param pt Mouse position.
+     */
+    void OnLButtonUpEx(UINT nFlags, CPoint pt) override;
+
     SOUI_MSG_MAP_BEGIN()
         MSG_WM_PAINT_EX(OnPaint)
         MSG_WM_DESTROY(OnDestroy)
-        MSG_WM_LBUTTONDOWN(OnLButtonDown)
         MSG_WM_LBUTTONDBLCLK(OnLButtonDbClick)
-        MSG_WM_LBUTTONUP(OnLButtonUp)
         MSG_WM_RBUTTONDOWN(OnRButtonDown);
         MSG_WM_RBUTTONUP(OnRButtonUp);
-        MSG_WM_MOUSEMOVE(OnMouseMove)
         MSG_WM_MOUSELEAVE(OnMouseLeave)
         MSG_WM_SIZE(OnSize)
     SOUI_MSG_MAP_END()

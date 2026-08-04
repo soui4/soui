@@ -1020,7 +1020,7 @@ BOOL SPanel::HandleMouseDrag(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &l
 {
     CPoint pt(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 
-    // === Drag scrolling active: consume all mouse events ===
+    // === Drag scrolling active: consume left button events ===
     if (m_bDragScrolling)
     {
         if (uMsg == WM_MOUSEMOVE)
@@ -1056,7 +1056,7 @@ BOOL SPanel::HandleMouseDrag(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &l
             if (dx != 0)
                 ScrollByDrag(FALSE, dx, m_fLastVelocityX);
         }
-        else if (uMsg == WM_LBUTTONUP || uMsg == WM_RBUTTONUP)
+        else if (uMsg == WM_LBUTTONUP)
         {
             m_bDragScrolling = FALSE;
             m_ptDragLast = CPoint(0, 0);
@@ -1080,15 +1080,19 @@ BOOL SPanel::HandleMouseDrag(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &l
             m_nLastMoveTime = 0;
             return TRUE;
         }
-        return TRUE;
+
+        // 拖动滚动中仅消费左键拖动相关消息
+        if (uMsg == WM_MOUSEMOVE || uMsg == WM_LBUTTONUP)
+            return TRUE;
+        return FALSE;
     }
 
-    // === Fling animation running: consume mouse events to stop fling ===
+    // === Fling animation running: consume left button events to stop fling ===
     BOOL bFlingRunning = (m_pFlingAnimatorV && m_pFlingAnimatorV->isRunning())
                          || (m_pFlingAnimatorH && m_pFlingAnimatorH->isRunning());
     if (bFlingRunning)
     {
-        if (uMsg == WM_LBUTTONDOWN || uMsg == WM_RBUTTONDOWN)
+        if (uMsg == WM_LBUTTONDOWN)
         {
             StopFlingAnimation();
         }
@@ -1108,7 +1112,11 @@ BOOL SPanel::HandleMouseDrag(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &l
                 OnDragScrollStart();
             }
         }
-        return TRUE;
+
+        // fling运行中仅消费左键相关消息
+        if (uMsg == WM_LBUTTONDOWN || uMsg == WM_MOUSEMOVE)
+            return TRUE;
+        return FALSE;
     }
 
     // === Waiting for drag threshold ===
@@ -1146,7 +1154,7 @@ BOOL SPanel::HandleMouseDrag(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &l
                 }
             }
         }
-        else if (uMsg == WM_LBUTTONUP || uMsg == WM_RBUTTONUP)
+        else if (uMsg == WM_LBUTTONUP)
         {
             m_bDragPending = FALSE;
             m_bDragStarted = FALSE;
@@ -1327,19 +1335,25 @@ void SPanel::onAnimationEnd(IValueAnimator *pAnimator)
         m_pFlingAnimatorH = NULL;
 }
 
+BOOL SPanel::IsEnableDragMode() const {
+	return  m_bItemDragScrollEnabled && (HasScrollBar(TRUE) || HasScrollBar(FALSE));
+}
+
 void SPanel::OnLButtonDown(UINT nFlags, CPoint pt)
 {
     LRESULT lRet = 0;
     if (HandleMouseDrag(WM_LBUTTONDOWN, nFlags, MAKELPARAM(pt.x, pt.y), lRet))
     {
-        SetMsgHandled(TRUE);
         return;
     }
-    if (m_bItemDragScrollEnabled && (HasScrollBar(TRUE) || HasScrollBar(FALSE)))
+
+    if (IsEnableDragMode())
     {
         StartDragPending(pt);
+        return;
     }
-    SetMsgHandled(FALSE);
+
+    OnLButtonDownEx(nFlags, pt);
 }
 
 void SPanel::OnMouseMove(UINT nFlags, CPoint pt)
@@ -1347,10 +1361,10 @@ void SPanel::OnMouseMove(UINT nFlags, CPoint pt)
     LRESULT lRet = 0;
     if (HandleMouseDrag(WM_MOUSEMOVE, nFlags, MAKELPARAM(pt.x, pt.y), lRet))
     {
-        SetMsgHandled(TRUE);
         return;
     }
-    SetMsgHandled(FALSE);
+
+    OnMouseMoveEx(nFlags, pt);
 }
 
 void SPanel::OnLButtonUp(UINT nFlags, CPoint pt)
@@ -1358,10 +1372,25 @@ void SPanel::OnLButtonUp(UINT nFlags, CPoint pt)
     LRESULT lRet = 0;
     if (HandleMouseDrag(WM_LBUTTONUP, nFlags, MAKELPARAM(pt.x, pt.y), lRet))
     {
-        SetMsgHandled(TRUE);
         return;
     }
-    SetMsgHandled(FALSE);
+
+    OnLButtonUpEx(nFlags, pt);
+}
+
+void SPanel::OnLButtonDownEx(UINT nFlags, CPoint pt)
+{
+    __baseCls::OnLButtonDown(nFlags, pt);
+}
+
+void SPanel::OnMouseMoveEx(UINT nFlags, CPoint pt)
+{
+    __baseCls::OnMouseMove(nFlags, pt);
+}
+
+void SPanel::OnLButtonUpEx(UINT nFlags, CPoint pt)
+{
+    __baseCls::OnLButtonUp(nFlags, pt);
 }
 
 SNSEND

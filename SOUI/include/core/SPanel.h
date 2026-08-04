@@ -524,6 +524,35 @@ class SOUI_EXP SPanel
     void OnMouseMove(UINT nFlags, CPoint pt);
     void OnLButtonUp(UINT nFlags, CPoint pt);
 
+    /**
+     * @brief Called when left mouse button is pressed and drag scroll is not active.
+     *        Derived classes should override this to handle their own click logic.
+     * @param nFlags Flags for the message.
+     * @param pt Point where the button was pressed.
+     */
+    virtual void OnLButtonDownEx(UINT nFlags, CPoint pt);
+
+    /**
+     * @brief Called when mouse moves and drag scroll is not active.
+     *        Derived classes should override this to handle their own mouse move logic.
+     * @param nFlags Flags for the message.
+     * @param pt Point where the mouse moved.
+     */
+    virtual void OnMouseMoveEx(UINT nFlags, CPoint pt);
+
+    /**
+     * @brief Called when left mouse button is released and drag scroll is not active.
+     *        Derived classes should override this to handle their own button up logic.
+     * @param nFlags Flags for the message.
+     * @param pt Point where the button was released.
+     */
+    virtual void OnLButtonUpEx(UINT nFlags, CPoint pt);
+
+    /**
+     * @brief Checks if drag mode is enabled.
+    */
+    virtual BOOL IsEnableDragMode() const;
+
     SOUI_MSG_MAP_BEGIN()
         MSG_WM_CREATE(OnCreate)
         MSG_WM_DESTROY(OnDestroy)

@@ -487,21 +487,14 @@ void SListBox::OnSize(UINT nType, CSize size)
     UpdateScrollBar();
 }
 
-void SListBox::OnLButtonDown(UINT nFlags, CPoint pt)
+BOOL SListBox::IsEnableDragMode() const {
+	return m_bHotTrack && __baseCls::IsEnableDragMode(); 
+}
+
+void SListBox::OnLButtonDownEx(UINT nFlags, CPoint pt)
 {
-    LRESULT lRet = 0;
-    if (HandleMouseDrag(WM_LBUTTONDOWN, nFlags, MAKELPARAM(pt.x, pt.y), lRet))
-    {
-        SetMsgHandled(TRUE);
-        return;
-    }
-    if (m_bItemDragScrollEnabled && (HasScrollBar(TRUE) || HasScrollBar(FALSE)))
-    {
-        StartDragPending(pt);
-    }else{
-        __baseCls::OnLButtonDown(nFlags, pt);
-	}
-    if (!m_bHotTrack)
+    __baseCls::OnLButtonDownEx(nFlags, pt);
+    if (!IsEnableDragMode())
     {
         m_iHoverItem = HitTest(pt);
         if (m_iHoverItem != m_iSelItem)
@@ -509,32 +502,20 @@ void SListBox::OnLButtonDown(UINT nFlags, CPoint pt)
     }
 }
 
-void SListBox::OnLButtonUp(UINT nFlags, CPoint pt)
+void SListBox::OnLButtonUpEx(UINT nFlags, CPoint pt)
 {
-    LRESULT lRet = 0;
-    if (HandleMouseDrag(WM_LBUTTONUP, nFlags, MAKELPARAM(pt.x, pt.y), lRet))
-    {
-        SetMsgHandled(TRUE);
-        return;
-    }
-    if (m_bHotTrack)
+    if (IsEnableDragMode())
     {
         CPoint pt2(pt);
         m_iHoverItem = HitTest(pt2);
         if (m_iHoverItem != m_iSelItem)
             NotifySelChange(m_iSelItem, m_iHoverItem);
     }
-    __baseCls::OnLButtonUp(nFlags, pt);
+    __baseCls::OnLButtonUpEx(nFlags, pt);
 }
 
 void SListBox::OnRButtonUp(UINT nFlags, CPoint pt)
 {
-    LRESULT lRet = 0;
-    if (HandleMouseDrag(WM_RBUTTONUP, nFlags, MAKELPARAM(pt.x, pt.y), lRet))
-    {
-        SetMsgHandled(TRUE);
-        return;
-    }
     EventLBRClick evt2(this);
     evt2.nCurSel = HitTest(pt);
     evt2.pt = pt;
@@ -555,15 +536,9 @@ void SListBox::OnLButtonDbClick(UINT nFlags, CPoint pt)
     FireEvent(evt2);
 }
 
-void SListBox::OnMouseMove(UINT nFlags, CPoint pt)
+void SListBox::OnMouseMoveEx(UINT nFlags, CPoint pt)
 {
-    LRESULT lRet = 0;
-    if (HandleMouseDrag(WM_MOUSEMOVE, nFlags, MAKELPARAM(pt.x, pt.y), lRet))
-    {
-        SetMsgHandled(TRUE);
-        return;
-    }
-
+    __baseCls::OnMouseMoveEx(nFlags, pt);
     int nOldHover = m_iHoverItem;
     m_iHoverItem = HitTest(pt);
 

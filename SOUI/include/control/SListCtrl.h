@@ -407,20 +407,6 @@ class SOUI_EXP SListCtrl : public SPanel {
     virtual BOOL OnScroll(BOOL bVertical, UINT uCode, int nPos);
 
     /**
-     * @brief Handle left mouse button down event
-     * @param nFlags Flags
-     * @param pt Mouse coordinates
-     */
-    void OnLButtonDown(UINT nFlags, CPoint pt);
-
-    /**
-     * @brief Handle left mouse button up event
-     * @param nFlags Flags
-     * @param pt Mouse coordinates
-     */
-    void OnLButtonUp(UINT nFlags, CPoint pt);
-
-    /**
      * @brief Handle left mouse button double-click event
      * @param nFlags Flags
      * @param pt Mouse coordinates
@@ -435,13 +421,6 @@ class SOUI_EXP SListCtrl : public SPanel {
     void OnRButtonUp(UINT nFlags, CPoint pt);
 
     /**
-     * @brief Handle mouse move event
-     * @param nFlags Flags
-     * @param pt Mouse coordinates
-     */
-    void OnMouseMove(UINT nFlags, CPoint pt);
-
-    /**
      * @brief Handle mouse leave event
      */
     void OnMouseLeave();
@@ -452,6 +431,28 @@ class SOUI_EXP SListCtrl : public SPanel {
      * @param size New size
      */
     void OnSize(UINT nType, CSize size);
+
+  protected:
+    /**
+     * @brief Handle left mouse button down when not drag scrolling
+     * @param nFlags Flags
+     * @param pt Mouse coordinates
+     */
+    void OnLButtonDownEx(UINT nFlags, CPoint pt) override;
+
+    /**
+     * @brief Handle mouse move when not drag scrolling
+     * @param nFlags Flags
+     * @param pt Mouse coordinates
+     */
+    void OnMouseMoveEx(UINT nFlags, CPoint pt) override;
+
+    /**
+     * @brief Handle left mouse button up when not drag scrolling
+     * @param nFlags Flags
+     * @param pt Mouse coordinates
+     */
+    void OnLButtonUpEx(UINT nFlags, CPoint pt) override;
 
     /**
      * @brief Update the position of child items
@@ -540,10 +541,7 @@ class SOUI_EXP SListCtrl : public SPanel {
         MSG_WM_DESTROY(OnDestroy)
         MSG_WM_SIZE(OnSize)
         MSG_WM_LBUTTONDBLCLK(OnLButtonDbClick)
-        MSG_WM_LBUTTONDOWN(OnLButtonDown)
-        MSG_WM_LBUTTONUP(OnLButtonUp)
         MSG_WM_RBUTTONUP(OnRButtonUp)
-        MSG_WM_MOUSEMOVE(OnMouseMove)
         MSG_WM_MOUSELEAVE(OnMouseLeave)
     SOUI_MSG_MAP_END()
 };

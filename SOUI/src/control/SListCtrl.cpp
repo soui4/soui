@@ -1,4 +1,4 @@
-﻿#include "souistd.h"
+#include "souistd.h"
 
 #include "control/SListCtrl.h"
 
@@ -873,21 +873,9 @@ BOOL SListCtrl::OnScroll(BOOL bVertical, UINT uCode, int nPos)
     return bRet;
 }
 
-void SListCtrl::OnLButtonDown(UINT nFlags, CPoint pt)
+void SListCtrl::OnLButtonDownEx(UINT nFlags, CPoint pt)
 {
-    LRESULT lRet = 0;
-    if (HandleMouseDrag(WM_LBUTTONDOWN, nFlags, MAKELPARAM(pt.x, pt.y), lRet))
-    {
-        SetMsgHandled(TRUE);
-        return;
-    }
-    if (m_bItemDragScrollEnabled && (HasScrollBar(TRUE) || HasScrollBar(FALSE)))
-    {
-        StartDragPending(pt);
-    }else{
-        __baseCls::OnLButtonDown(nFlags, pt);
-    }
-
+    __baseCls::OnLButtonDownEx(nFlags, pt);
     int nSubItem = -1;
     m_nHoverItem = HitTest(pt, &nSubItem);
     BOOL hitCheckBox = HitCheckBox(pt);
@@ -900,14 +888,9 @@ void SListCtrl::OnLButtonDown(UINT nFlags, CPoint pt)
         NotifySelChange(m_nSelectItem, m_nHoverItem);
 }
 
-void SListCtrl::OnLButtonUp(UINT nFlags, CPoint pt)
+void SListCtrl::OnLButtonUpEx(UINT nFlags, CPoint pt)
 {
-    LRESULT lRet = 0;
-    if (HandleMouseDrag(WM_LBUTTONUP, nFlags, MAKELPARAM(pt.x, pt.y), lRet))
-    {
-        return;
-    }
-    __baseCls::OnLButtonUp(nFlags, pt);
+    __baseCls::OnLButtonUpEx(nFlags, pt);
 }
 
 void SListCtrl::OnLButtonDbClick(UINT nFlags, CPoint pt)
@@ -930,12 +913,6 @@ void SListCtrl::OnLButtonDbClick(UINT nFlags, CPoint pt)
 
 void SListCtrl::OnRButtonUp(UINT nFlags, CPoint pt)
 {
-    LRESULT lRet = 0;
-    if (HandleMouseDrag(WM_RBUTTONUP, nFlags, MAKELPARAM(pt.x, pt.y), lRet))
-    {
-        SetMsgHandled(TRUE);
-        return;
-    }
     EventLCRClick evt2(this);
     evt2.nCurSel = HitTest(pt);
     evt2.pt = pt;
@@ -976,15 +953,9 @@ BOOL SListCtrl::OnHeaderSwap(IEvtArgs *pEvt)
     return true;
 }
 
-void SListCtrl::OnMouseMove(UINT nFlags, CPoint pt)
+void SListCtrl::OnMouseMoveEx(UINT nFlags, CPoint pt)
 {
-    LRESULT lRet = 0;
-    if (HandleMouseDrag(WM_MOUSEMOVE, nFlags, MAKELPARAM(pt.x, pt.y), lRet))
-    {
-        SetMsgHandled(TRUE);
-        return;
-    }
-
+    __baseCls::OnMouseMoveEx(nFlags, pt);
     int nHoverItem = HitTest(pt);
     if (m_bHotTrack && nHoverItem != m_nHoverItem)
     {

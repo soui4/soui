@@ -1,4 +1,4 @@
-﻿//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
 //  Class Name: STreeCtrl
 //     Creator: JinHui
 //     Version: 2012.12.16 - 1.1 - Create
@@ -1189,21 +1189,9 @@ void STreeCtrl::OnPaint(IRenderTarget *pRT)
     AfterPaint(pRT, painter);
 }
 
-void STreeCtrl::OnLButtonDown(UINT nFlags, CPoint pt)
+void STreeCtrl::OnLButtonDownEx(UINT nFlags, CPoint pt)
 {
-    LRESULT lRet = 0;
-    if (HandleMouseDrag(WM_LBUTTONDOWN, nFlags, MAKELPARAM(pt.x, pt.y), lRet))
-    {
-        SetMsgHandled(TRUE);
-        return;
-    }
-    if (m_bItemDragScrollEnabled && (HasScrollBar(TRUE) || HasScrollBar(FALSE)))
-    {
-        StartDragPending(pt);
-    }else{
-        __baseCls::OnLButtonDown(nFlags, pt);
-    }
-
+    __baseCls::OnLButtonDownEx(nFlags, pt);
     m_hHoverItem = HitTest(pt);
 
     if (m_hHoverItem != m_hSelItem && m_hHoverItem)
@@ -1218,11 +1206,6 @@ void STreeCtrl::OnLButtonDown(UINT nFlags, CPoint pt)
 
 void STreeCtrl::OnRButtonDown(UINT nFlags, CPoint pt)
 {
-    LRESULT lRet = 0;
-    if (HandleMouseDrag(WM_RBUTTONDOWN, nFlags, MAKELPARAM(pt.x, pt.y), lRet))
-    {
-        return;
-    }
     CPoint pt2 = pt;
     if (!m_bRightClickSel)
     {
@@ -1237,12 +1220,6 @@ void STreeCtrl::OnRButtonDown(UINT nFlags, CPoint pt)
 
 void STreeCtrl::OnRButtonUp(UINT nFlags, CPoint pt)
 {
-    LRESULT lRet = 0;
-    if (HandleMouseDrag(WM_RBUTTONUP, nFlags, MAKELPARAM(pt.x, pt.y), lRet))
-    {
-        SetMsgHandled(TRUE);
-        return;
-    }
     EventTCRClick evt(this);
     evt.pt = pt;
     evt.hItem = HitTest(pt);
@@ -1250,15 +1227,9 @@ void STreeCtrl::OnRButtonUp(UINT nFlags, CPoint pt)
     __baseCls::OnRButtonUp(nFlags, pt);
 }
 
-void STreeCtrl::OnLButtonUp(UINT nFlags, CPoint pt)
+void STreeCtrl::OnLButtonUpEx(UINT nFlags, CPoint pt)
 {
-    LRESULT lRet = 0;
-    if (HandleMouseDrag(WM_LBUTTONUP, nFlags, MAKELPARAM(pt.x, pt.y), lRet))
-    {
-        SetMsgHandled(TRUE);
-        return;
-    }
-
+    __baseCls::OnLButtonUpEx(nFlags, pt);
     m_hHoverItem = HitTest(pt);
 
     if (m_hCaptureItem)
@@ -1268,7 +1239,6 @@ void STreeCtrl::OnLButtonUp(UINT nFlags, CPoint pt)
     }
     else if (m_hHoverItem)
         ItemLButtonUp(m_hHoverItem, nFlags, pt);
-    __baseCls::OnLButtonUp(nFlags, pt);
 }
 
 void STreeCtrl::OnLButtonDbClick(UINT nFlags, CPoint pt)
@@ -1278,15 +1248,9 @@ void STreeCtrl::OnLButtonDbClick(UINT nFlags, CPoint pt)
     ItemLButtonDbClick(m_hHoverItem, nFlags, pt);
 }
 
-void STreeCtrl::OnMouseMove(UINT nFlags, CPoint pt)
+void STreeCtrl::OnMouseMoveEx(UINT nFlags, CPoint pt)
 {
-    LRESULT lRet = 0;
-    if (HandleMouseDrag(WM_MOUSEMOVE, nFlags, MAKELPARAM(pt.x, pt.y), lRet))
-    {
-        SetMsgHandled(TRUE);
-        return;
-    }
-
+    __baseCls::OnMouseMoveEx(nFlags, pt);
     HSTREEITEM hHitTest = HitTest(pt);
 
     if (hHitTest != m_hHoverItem)
