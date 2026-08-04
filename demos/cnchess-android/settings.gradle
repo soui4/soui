@@ -19,4 +19,4 @@ rootProject.name = "cnchess-android"
 include ':app'
 // 复用 android-demo 中的 soui-android-lib 模块
 include ':soui-android-lib'
-project(':soui-android-lib').projectDir = new File('../android-demo/soui-android-lib')
+project(':soui-android-lib').projectDir = new File('../../soui-android-lib')

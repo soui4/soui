@@ -18,3 +18,4 @@ rootProject.name = "soui-android-demo"
 
 include ':app'
 include ':soui-android-lib'
+project(':soui-android-lib').projectDir = new File('../../soui-android-lib')

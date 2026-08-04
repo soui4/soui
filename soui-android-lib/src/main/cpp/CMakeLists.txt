@@ -25,8 +25,7 @@ set( TOOLCHAIN_SUPPORTS_ATTRIBUTE_DESTRUCTOR_EXITCODE__TRYRUN_OUTPUT
 # ============================================================================
 
 # SOUI_ROOT_DIR: 通过 Gradle 的 cmake.arguments 传入，兜底用相对路径回退
-set(SOUI_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/../../../../../../")
-get_filename_component(SOUI_ROOT_DIR "${SOUI_ROOT_DIR}" ABSOLUTE)
+message(STATUS "SOUI_ROOT_DIR: ${SOUI_ROOT_DIR}")
 
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${SOUI_ROOT_DIR}/__cmake/")
 include(${CMAKE_MODULE_PATH}/internal_utils.cmake)

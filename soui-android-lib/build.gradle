@@ -1,7 +1,8 @@
 plugins {
     id 'com.android.library'
 }
-
+// SOUI 根目录路径
+def souiRootDir = "${projectDir.absolutePath.replace('\\', '/')}/.."
 android {
     namespace 'com.soui.android'
     compileSdk 34
@@ -17,7 +18,7 @@ android {
                 cppFlags "-std=c++17 -fexceptions -frtti -w"
                 cFlags "-w"
                 arguments "-DANDROID_STL=c++_shared",
-                          "-DSOUI_ROOT_DIR=${rootDir}/../.."
+                          "-DSOUI_ROOT_DIR=${souiRootDir}"
             }
         }
         ndk {
@@ -45,8 +46,7 @@ android {
     }
 }
 
-// SOUI 根目录路径
-def souiRootDir = "${rootDir}/../.."
+
 
 // 目标头文件输出目录（assets 目录）
 def targetIncludeDir = "${projectDir}/src/main/assets/soui4"
