@@ -17,6 +17,10 @@ android {
         consumerProguardFiles "consumer-rules.pro"
         externalNativeBuild {
             cmake {
+                //编译说明：由于需要链接soui-android-lib编译出来的so，直接从soui-android-lib的build/intermediates/library_jni的时机好像不对。
+                //现在我的方法是先编译soui-android-lib模块，再手动将soui-android-lib/build/intermediates/library_jni复制到soui-android-lib的build/library_jni
+                //经过这样处理就可以正常链接到soui的so了。
+                //启程软件 2026-8-4
                 cppFlags "-std=c++17 -fexceptions -frtti"
                 arguments "-DANDROID_STL=c++_shared",
                         "-DSOUI_INCLUDE_DIR=${project(':soui-android-lib').projectDir.absolutePath.replace('\\', '/')}/src/main/assets/soui4",
