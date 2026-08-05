@@ -239,7 +239,7 @@ install(FILES ${PROJECT_SOURCE_DIR}/__cmake/plist.in ${PROJECT_SOURCE_DIR}/__cma
 )
 
 install(FILES 
-        ${PROJECT_SOURCE_DIR}/simsun.ttc
+        #${PROJECT_SOURCE_DIR}/simsun.ttc
         ${PROJECT_SOURCE_DIR}/soui-sys-resource.zip
         DESTINATION ${CMAKE_INSTALL_PREFIX}/resources
 )
