@@ -115,7 +115,7 @@ if(CMAKE_SYSTEM_NAME MATCHES Darwin)
 	copy_frameworks_to_bundle(${project_name} "${DYLIB_SOUI}")
 
 	add_macos_res_file(${project_name} ${SOUI_ROOT}/resources/soui-sys-resource.zip data) 
-	add_macos_res_file(${project_name} ${SOUI_ROOT}/resources/simsun.ttc fonts) 
+	#add_macos_res_file(${project_name} ${SOUI_ROOT}/resources/simsun.ttc fonts) 
 	add_macos_res_folder_with_deps(${project_name} ${CMAKE_CURRENT_SOURCE_DIR}/uires data/uires)
 	set_macos_icon(${project_name} ${CMAKE_CURRENT_SOURCE_DIR}/res/soui-app.icns ${SOUI_ROOT}/__cmake/plist.in)
 else()
