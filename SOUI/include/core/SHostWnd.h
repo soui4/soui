@@ -406,48 +406,6 @@ class SOUI_EXP SHostWnd
     STDMETHOD_(BOOL, ShowWindow)(THIS_ int nCmdShow) OVERRIDE;
 
     /**
-     * @brief Begins a new modal view session.
-     *
-     * A modal view session is active until endModalViewSession is called. Message
-     * interception for the modal view is achieved by inserting the passed SWindow
-     * (wrapped in an SModalRoot when not already one) into SRootWindow::m_pModalContainer
-     * as a full-screen mask; the normal window tree hit-testing then naturally
-     * routes events to the top-most modal window. Modal view sessions can be
-     * stacked but must be ended in the same order.
-     *
-     * @param pView The modal view to be displayed. Typically an SModalRoot (or
-     *              any SWindow). If it is not already an SModalRoot, it is
-     *              reparented inside a newly created SModalRoot automatically.
-     *              The window must not already be attached to a parent.
-     * @return A unique session identifier if successful, 0 otherwise.
-     *
-     * @note To receive notification when the modal session ends, subscribe to
-     *       EventExitModalView on the SModalRoot window.
-     */
-    ModalViewSessionID BeginModalViewSession(SModalRoot* pView,SWindow *pRoot=NULL);
-
-    /**
-     * @brief Begins a new modal view session with a layout resource.
-     *
-     * @param pszLayout Layout resource identifier.
-     * @param pRoot Optional parent window for the modal view.
-     * @return Pointer to the created modal view window, or NULL if failed.
-     */
-    SModalRoot * BeginModalViewSession(LPCTSTR pszLayout, SWindow *pRoot = NULL);
-
-    /**
-     * @brief Ends a modal view session.
-     *
-     * @param sessionID The session identifier returned by beginModalViewSession.
-     * @param exitCode The result code that will be included in the EventExitModalView event.
-     * @return TRUE if successful, FALSE otherwise (e.g., invalid session ID or wrong order).
-     */
-    BOOL EndModalViewSession(ModalViewSessionID sessionID=0, int exitCode = 0);
-
-
-	ModalViewSessionID GetLastModalViewSessionID() const;
-
-    /**
      * @brief Creates the host window with extended styles.
      *
      * @param hWndParent Handle to the parent window.
@@ -719,6 +677,53 @@ class SOUI_EXP SHostWnd
      * @param bInc TRUE to increment, FALSE to decrement.
      */
     void UpdateAutoSizeCount(bool bInc);
+
+  public:
+      /**
+     * @brief Begins a new modal view session.
+     *
+     * A modal view session is active until endModalViewSession is called. Message
+     * interception for the modal view is achieved by inserting the passed SWindow
+     * (wrapped in an SModalRoot when not already one) into SRootWindow::m_pModalContainer
+     * as a full-screen mask; the normal window tree hit-testing then naturally
+     * routes events to the top-most modal window. Modal view sessions can be
+     * stacked but must be ended in the same order.
+     *
+     * @param pView The modal view to be displayed. Typically an SModalRoot (or
+     *              any SWindow). If it is not already an SModalRoot, it is
+     *              reparented inside a newly created SModalRoot automatically.
+     *              The window must not already be attached to a parent.
+     * @return A unique session identifier if successful, 0 otherwise.
+     *
+     * @note To receive notification when the modal session ends, subscribe to
+     *       EventExitModalView on the SModalRoot window.
+     */
+    ModalViewSessionID BeginModalViewSession(SModalRoot* pView,SWindow *pRoot=NULL);
+
+    /**
+     * @brief Begins a new modal view session with a layout resource.
+     *
+     * @param pszLayout Layout resource identifier.
+     * @param pRoot Optional parent window for the modal view.
+     * @return Pointer to the created modal view window, or NULL if failed.
+     */
+    SModalRoot * BeginModalViewSession(LPCTSTR pszLayout, SWindow *pRoot = NULL);
+
+    /**
+     * @brief Ends a modal view session.
+     *
+     * @param sessionID The session identifier returned by beginModalViewSession.
+     * @param exitCode The result code that will be included in the EventExitModalView event.
+     * @return TRUE if successful, FALSE otherwise (e.g., invalid session ID or wrong order).
+     */
+    BOOL EndModalViewSession(ModalViewSessionID sessionID=0, int exitCode = 0);
+
+    /**
+     * @brief Gets the last modal view session identifier.
+     *
+     * @return The last modal view session identifier.
+     */
+	  ModalViewSessionID GetLastModalViewSessionID() const;
 
   protected:
     /**
