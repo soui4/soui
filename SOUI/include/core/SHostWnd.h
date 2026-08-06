@@ -427,6 +427,15 @@ class SOUI_EXP SHostWnd
     ModalViewSessionID BeginModalViewSession(SModalRoot* pView,SWindow *pRoot=NULL);
 
     /**
+     * @brief Begins a new modal view session with a layout resource.
+     *
+     * @param pszLayout Layout resource identifier.
+     * @param pRoot Optional parent window for the modal view.
+     * @return Pointer to the created modal view window, or NULL if failed.
+     */
+    SModalRoot * BeginModalViewSession(LPCTSTR pszLayout, SWindow *pRoot = NULL);
+
+    /**
      * @brief Ends a modal view session.
      *
      * @param sessionID The session identifier returned by beginModalViewSession.

@@ -275,4 +275,8 @@ EventCmd *e2 = sobj_cast<EventCmd>(evt);
 
 象棋 Demo 的视频已经在上面展示，源代码位于 SOUI 仓库的 `demos/cnchess-android`，桌面版在 `games/cnchess`，感兴趣的可以直接对比两份代码感受复用度。SOUI 框架本体在 `SOUI/` 目录，引用计数接口与实现分别在 `utilities/include/interface/obj-ref-i.h` 和 `utilities/include/helper/obj-ref-impl.hpp`，智能指针 `SAutoRefPtr` 也在同一文件；类 RTTI 与 `sobj_cast` 定义在 `SOUI/include/interface/sobject-i.h`，对象实现模板 `SObjectImpl` 在 `SOUI/include/sobject/Sobject.hpp`；`SPanel` 的滚动与惯性动画支持见 `SOUI/include/core/SPanel.h`。
 
+## 代码获取
+### gitee: https://gitee.com/setoutsoft/soui4
+### github: https://github.com/soui4/soui
+
 欢迎在评论区交流。

@@ -2426,12 +2426,16 @@ public:
  */
 ModalViewSessionID SHostWnd::BeginModalViewSession(SModalRoot* pModalRoot, SWindow* pRoot)
 {
-    if (!pModalRoot)
-        return 0;
-
+    SASSERT(pModalRoot);
     if (pModalRoot->GetParent())
     {
         // The view must not be attached when used for beginModalViewSession
+        SSLOGE()<<"pModalRoot must be root window";
+        return 0;
+    }
+    SModalView * pView = sobj_cast<SModalView>(pModalRoot->GetWindow(GSW_FIRSTCHILD));
+    if(!pView){
+        SSLOGE()<<"the first child of modalroot is not modalview object";
         return 0;
     }
 
@@ -2455,6 +2459,17 @@ ModalViewSessionID SHostWnd::BeginModalViewSession(SModalRoot* pModalRoot, SWind
     InitModalRoot(pModalRoot);
 
     return pModalRoot->GetSessionID();
+}
+
+SModalRoot * SHostWnd::BeginModalViewSession(LPCTSTR pszLayout, SWindow *pRoot){
+    SModalRoot * pModal = (SModalRoot*)SApplication::getSingletonPtr()->CreateWindowByName(SModalRoot::GetClassName());
+    pModal->InitFromResId(pszLayout);
+    ModalViewSessionID session_id = BeginModalViewSession(pModal);
+    if(session_id==0){
+        pModal->Release();
+        return NULL;
+    }
+    return pModal;
 }
 
 void SHostWnd::OnModalViewFinish(SModalRoot *pModalRoot)
