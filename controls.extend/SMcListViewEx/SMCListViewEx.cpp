@@ -22,8 +22,8 @@ DEFINE_GUID(IID_IMcListViewEx, 0x15398C65, 0x1A58, 0x4074, 0xA5, 0x83, 0xF8, 0x2
 #define ITEM_MARGIN 4
 
 #define SCROLL_TIMER_ID 110
-namespace SOUI
-{
+SNSBEGIN
+
 	class SMCListViewDataSetObserverEx : public TObjRefImpl<ILvDataSetObserver>
 	{
 	public:
@@ -118,7 +118,7 @@ namespace SOUI
 				while (pos)
 				{
 					SItemPanel* pItemPanel = lstItemPanels->GetNext(pos);
-					pItemPanel->Destroy();
+					pItemPanel->Release();
 				}
 				delete lstItemPanels;
 			}
@@ -1815,4 +1815,4 @@ void SMCListViewEx::onItemDataChanged(int iItem)
 		return GetHeaderCtrl();
 	}
 
-}//end of namespace 
+SNSEND

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Log4z License
  * -----------
  * 
@@ -61,7 +61,6 @@
 
 #ifdef __APPLE__
 #include <dispatch/dispatch.h>
-#include <libproc.h>
 #endif
 
 #include <algorithm>
@@ -828,7 +827,6 @@ std::string getProcessName()
 {
     std::string name = "MainLog";
     char buf[260] = {0};
-#if defined (WIN32) || defined(_WIN64)
     if (GetModuleFileNameA(NULL, buf, 259) > 0)
     {
         name = buf;
@@ -843,31 +841,6 @@ std::string getProcessName()
     {
         name = name.substr(0, pos-0);
     }
-
-#elif defined(__APPLE__)
-
-    proc_name(getpid(), buf, 260);
-    name = buf;
-    return name;;
-#else
-    sprintf(buf, "/proc/%d/cmdline", (int)getpid());
-    Log4zFileHandler i;
-    i.open(buf, "rb");
-    if (!i.isOpen())
-    {
-        return name;
-    }
-    name = i.readLine();
-    i.close();
-
-    std::string::size_type pos = name.rfind("/");
-    if (pos != std::string::npos)
-    {
-        name = name.substr(pos+1, std::string::npos);
-    }
-#endif
-
-
     return name;
 }
 

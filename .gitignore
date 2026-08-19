@@ -68,3 +68,4 @@ local.properties
 gradle-wrapper.jar
 .cxx/
 demos/android-demo/soui-android-lib/assets
+ios/

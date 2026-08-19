@@ -1,4 +1,4 @@
-#include <stdio.h>
+﻿#include <stdio.h>
 #include <tchar.h>
 
 #pragma warning(disable:4800)
@@ -648,7 +648,7 @@ TEST_F(PathAPITest, BezierWithPathRecording) {
 #endif//!_WIN32
 int run_window();
 TEST(demo,window){
-    //EXPECT_EQ(run_window(), 1);
+    EXPECT_EQ(run_window(), 1);
 }
 
 int run_app(HINSTANCE hInst);

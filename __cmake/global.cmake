@@ -4,6 +4,13 @@
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+# 设置 NSPrincipalClass：iOS 用 UIApplication，macOS 用 NSApplication
+if(CMAKE_SYSTEM_NAME MATCHES iOS)
+    set(MACOSX_BUNDLE_PRINCIPAL_CLASS "UIApplication" CACHE STRING "Principal class")
+else()
+    set(MACOSX_BUNDLE_PRINCIPAL_CLASS "NSApplication" CACHE STRING "Principal class")
+endif()
+
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -61,8 +68,13 @@ elseif (UNIX AND NOT APPLE)
     add_executable(${exe_name} ${ARGN})
 elseif (APPLE)
     add_executable(${exe_name} MACOSX_BUNDLE ${ARGN})
+    if(CMAKE_SYSTEM_NAME MATCHES iOS)
+        set(_EXE_RPATH "@executable_path/Frameworks;@loader_path/Frameworks")
+    else()
+        set(_EXE_RPATH "@executable_path/../Frameworks;@loader_path/../Frameworks")
+    endif()
     set_target_properties(${exe_name} PROPERTIES
-        INSTALL_RPATH "@executable_path/../Frameworks;@loader_path/../Frameworks"
+        INSTALL_RPATH "${_EXE_RPATH}"
         BUILD_WITH_INSTALL_RPATH TRUE
         MACOSX_RPATH TRUE
     )
@@ -191,6 +203,21 @@ get_filename_component(APP_ICON_FILE ${icon} NAME)
 set(MACOSX_BUNDLE_ICON_FILE ${APP_ICON_FILE})
 
 
+if(NOT DEFINED MACOSX_BUNDLE_BUNDLE_VERSION)
+    set(MACOSX_BUNDLE_BUNDLE_VERSION "1")
+endif()
+if(NOT DEFINED MACOSX_BUNDLE_SHORT_VERSION_STRING)
+    set(MACOSX_BUNDLE_SHORT_VERSION_STRING "1.0")
+endif()
+if(NOT DEFINED MACOSX_BUNDLE_LONG_VERSION_STRING)
+    set(MACOSX_BUNDLE_LONG_VERSION_STRING "1.0")
+endif()
+if(NOT DEFINED MACOSX_BUNDLE_INFO_STRING)
+    set(MACOSX_BUNDLE_INFO_STRING "1.0")
+endif()
+if(NOT DEFINED MACOSX_BUNDLE_COPYRIGHT)
+    set(MACOSX_BUNDLE_COPYRIGHT "Copyright (c) soui4. All rights reserved.")
+endif()
 if(NOT DEFINED MACOSX_BUNDLE_HIGH_RESOLUTION_CAPABLE)
     set(MACOSX_BUNDLE_HIGH_RESOLUTION_CAPABLE "false")
 endif()
@@ -210,10 +237,15 @@ endmacro()
 #   dylib_list - 要复制的dylib文件路径列表
 macro(copy_frameworks_to_bundle app_name framework_list)
 if(APPLE)
+    if(CMAKE_SYSTEM_NAME MATCHES iOS)
+        set(_FW_DIR "$<TARGET_BUNDLE_DIR:${app_name}>/Frameworks")
+    else()
+        set(_FW_DIR "$<TARGET_BUNDLE_DIR:${app_name}>/Contents/Frameworks")
+    endif()
     # 创建Frameworks目录
     add_custom_command(TARGET ${app_name} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory
-            "$<TARGET_BUNDLE_DIR:${app_name}>/Contents/Frameworks"
+            "${_FW_DIR}"
         COMMENT "Creating Frameworks directory in ${app_name} bundle"
     )
 
@@ -226,7 +258,7 @@ if(APPLE)
             add_custom_command(TARGET ${app_name} POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different
                     "${dylib_path}"
-                    "$<TARGET_BUNDLE_DIR:${app_name}>/Contents/Frameworks/"
+                    "${_FW_DIR}/"
                 COMMENT "Copying ${dylib_name} to ${app_name} bundle"
             )
         else()
@@ -293,10 +325,15 @@ endmacro()
 #   target_list - CMake目标名称列表
 macro(copy_targets_to_bundle app_name target_list)
 if(APPLE)
+    if(CMAKE_SYSTEM_NAME MATCHES iOS)
+        set(_FW_DIR "$<TARGET_BUNDLE_DIR:${app_name}>/Frameworks")
+    else()
+        set(_FW_DIR "$<TARGET_BUNDLE_DIR:${app_name}>/Contents/Frameworks")
+    endif()
     # 创建Frameworks目录
     add_custom_command(TARGET ${app_name} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory
-            "$<TARGET_BUNDLE_DIR:${app_name}>/Contents/Frameworks"
+            "${_FW_DIR}"
         COMMENT "Creating Frameworks directory in ${app_name} bundle"
     )
 
@@ -310,7 +347,7 @@ if(APPLE)
                 add_custom_command(TARGET ${app_name} POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E copy_if_different
                         "$<TARGET_FILE:${target_name}>"
-                        "$<TARGET_BUNDLE_DIR:${app_name}>/Contents/Frameworks/"
+                        "${_FW_DIR}/"
                     COMMENT "Copying ${target_name} library to ${app_name} bundle"
                 )
             else()

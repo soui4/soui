@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <!-- ====== iOS 通用 Bundle 元数据（由 CMake 通过 set(MACOSX_BUNDLE_*) 注入）====== -->
+  <key>CFBundleDevelopmentRegion</key>
+  <string>en</string>
+  <key>CFBundleName</key>
+  <string>${MACOSX_BUNDLE_BUNDLE_NAME}</string>
+  <key>CFBundleDisplayName</key>
+  <string>${MACOSX_BUNDLE_BUNDLE_NAME}</string>
+  <key>CFBundleExecutable</key>
+  <string>${MACOSX_BUNDLE_EXECUTABLE_NAME}</string>
+  <key>CFBundleIdentifier</key>
+  <string>${MACOSX_BUNDLE_GUI_IDENTIFIER}</string>
+  <key>CFBundleInfoDictionaryVersion</key>
+  <string>6.0</string>
+  <key>CFBundlePackageType</key>
+  <string>APPL</string>
+  <key>CFBundleShortVersionString</key>
+  <string>${MACOSX_BUNDLE_SHORT_VERSION_STRING}</string>
+  <key>CFBundleSignature</key>
+  <string>????</string>
+  <key>CFBundleVersion</key>
+  <string>${MACOSX_BUNDLE_BUNDLE_VERSION}</string>
+
+  <!-- ====== iOS 最低版本（由 CMake IPHONEOS_DEPLOYMENT_TARGET 决定） ====== -->
+  <key>MinimumOSVersion</key>
+  <string>${IPHONEOS_DEPLOYMENT_TARGET}</string>
+
+  <!-- ====== UIApplication 主类（默认 UIApplication），delegate 在 code 中注册 ====== -->
+  <key>UIPrincipalClass</key>
+  <string>UIApplication</string>
+
+  <!-- ====== 状态栏样式 / 设备方向 / 隐藏状态栏按需调整 ====== -->
+  <key>UIStatusBarStyle</key>
+  <string>UIStatusBarStyleDefault</string>
+  <key>UIViewControllerBasedStatusBarAppearance</key>
+  <false/>
+  <key>UISupportedInterfaceOrientations</key>
+  <array>
+    <string>UIInterfaceOrientationPortrait</string>
+    <string>UIInterfaceOrientationLandscapeLeft</string>
+    <string>UIInterfaceOrientationLandscapeRight</string>
+  </array>
+  <key>UISupportedInterfaceOrientations~ipad</key>
+  <array>
+    <string>UIInterfaceOrientationPortrait</string>
+    <string>UIInterfaceOrientationPortraitUpsideDown</string>
+    <string>UIInterfaceOrientationLandscapeLeft</string>
+    <string>UIInterfaceOrientationLandscapeRight</string>
+  </array>
+
+  <!-- ====== 要求全屏（不使用 UIScene，避免 SceneConfiguration 告警） ====== -->
+  <key>UIRequiresFullScreen</key>
+  <true/>
+
+  <!-- ====== 版权信息 ====== -->
+  <key>NSHumanReadableCopyright</key>
+  <string>${MACOSX_BUNDLE_COPYRIGHT}</string>
+</dict>
+</plist>

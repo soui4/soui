@@ -48,23 +48,20 @@ add_soui_exe(demo ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${CURRENT_
 # Compile resource files with windres on Linux
 target_compile_resources(demo ${CURRENT_RC} INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/soui-sys-resource)
 
-if(CMAKE_SYSTEM_NAME MATCHES Darwin)
-# 配置代码签名
+if(APPLE)
 set(MACOSX_CODESIGN_IDENTITY "Apple Development")
-set(MACOSX_TEAM_ID "XXXXXXXXXXXX")
+set(MACOSX_TEAM_ID 2YL33QR3KY)#replace with your team id
 
 # 设置 Xcode 特定的签名属性
 set_target_properties(demo PROPERTIES
-    XCODE_ATTRIBUTE_DEVELOPMENT_TEAM "${MACOSX_TEAM_ID}"
-    XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "${MACOSX_CODESIGN_IDENTITY}"
+    XCODE_ATTRIBUTE_DEVELOPMENT_TEAM ${MACOSX_TEAM_ID}
+    XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY ${MACOSX_CODESIGN_IDENTITY}
     XCODE_ATTRIBUTE_CODE_SIGN_STYLE "Automatic"
     XCODE_ATTRIBUTE_PROVISIONING_PROFILE_SPECIFIER ""
 )
-endif()
 
 # 准备要复制的目标列表
 set(DEMO_TARGET_LIST
-	cairo
     swinx
     soui4
 	msftedit
@@ -85,6 +82,9 @@ add_macos_res_folder(demo ${PROJECT_SOURCE_DIR}/soui-sys-resource soui-sys-resou
 add_macos_res_folder(demo ${CMAKE_CURRENT_SOURCE_DIR}/uires uires)
 #add_macos_res_file(demo ${PROJECT_SOURCE_DIR}/simsun.ttc fonts)
 set_macos_icon(demo ${CMAKE_CURRENT_SOURCE_DIR}/demo.icns ${PROJECT_SOURCE_DIR}/__cmake/plist.in)
+else()
+add_app_res_folder(demo ${CMAKE_CURRENT_SOURCE_DIR}/uires demo_res/uires)
+endif(APPLE)
 add_dependencies(demo resprovider-zip)
 if(CMAKE_DEBUG_POSTFIX)
     set_target_properties(demo PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})

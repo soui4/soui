@@ -42,6 +42,10 @@ else()
         find_library(OHOS_EGL EGL REQUIRED)
         find_library(OHOS_GLES GLESv3 REQUIRED)
         set(GL_LIB ${OHOS_EGL} ${OHOS_GLES} fontconfig)
+    elseif(CMAKE_SYSTEM_NAME MATCHES iOS)
+        # iOS 使用 OpenGL ES 框架，非桌面 GL
+        # 用 -framework 避免 find_library 缓存设备 SDK 路径（模拟器缺切片）
+        set(GL_LIB "-framework OpenGLES")
     elseif(CMAKE_SYSTEM_NAME MATCHES Darwin)
             # 查找GLEW和GLFW包
         find_package(GLEW REQUIRED)

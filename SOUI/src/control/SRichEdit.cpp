@@ -93,7 +93,7 @@ STextServiceHelper::STextServiceHelper()
 #else // INIT_RICHEDIT
 #ifdef _WIN32
     m_rich20 = LoadLibrary(_T("Msftedit.dll"));
-#elif defined(__APPPLE__)
+#elif defined(__APPLE__)
     m_rich20 = LoadLibrary(_T("libmsftedit.dylib"));
 #else
     m_rich20 = LoadLibrary(_T("libmsftedit.so"));
@@ -1285,9 +1285,9 @@ void SRichEdit::OnSetFocus(SWND wndOld)
     {
         GetContainer()->EnableIME(FALSE);
     }else{
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(__IOS__)
         ShowSoftKeyboard(GetContainer()->GetHostHwnd(),TRUE);
-#endif//__ANDROID__
+#endif
     }
 }
 
@@ -1297,9 +1297,9 @@ void SRichEdit::OnKillFocus(SWND wndFocus)
     {
         GetContainer()->EnableIME(TRUE);
     }
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(__IOS__)
     ShowSoftKeyboard(GetContainer()->GetHostHwnd(),FALSE);
-#endif//__ANDROID__
+#endif
     __baseCls::OnKillFocus(wndFocus);
     if (m_pTxtHost)
     {

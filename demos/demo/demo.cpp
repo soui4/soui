@@ -8,6 +8,8 @@
 #if defined(_WIN32) && !defined(__MINGW32__)
 #include "uianimation/UiAnimationWnd.h"
 #include "SmileyCreateHook.h"
+#elif defined(__IOS__)
+#include <ios_entry.h>
 #endif
 
 #include "appledock/SDesktopDock.h"
@@ -35,6 +37,11 @@
 #endif
 
 #define SYS_NAMED_RESOURCE _T("soui-sys-resource")
+#ifdef __APPLE__
+    static const TCHAR *kPath_SysRes = _T("/soui-sys-resource");
+#else
+    static const TCHAR *kPath_SysRes = _T("/../../soui-sys-resource");
+#endif //__APPLE__
 
 #include "skin/SSkinLoader.h"
 #include "trayicon/SShellTray.h"
@@ -47,19 +54,23 @@
 static SStringT getSourceDir()
 {
 #ifdef __APPLE__
-    char szBunblePath[1024];
-    GetAppleBundlePath(szBunblePath, sizeof(szBunblePath));
-    return S_CA2T(szBunblePath) + _T("/Contents/Resources");
-#else
-    SStringA file(__FILE__);
-    file = file.Left(file.ReverseFind(PATH_SLASH));
-	if(*__FILE__=='.'){
-		char absPath[MAX_PATH]={0};
-		GetFullPathNameA(file,MAX_PATH,absPath,NULL);
-		file = absPath;
-	}
-    return S_CA2T(file);
-#endif
+    char szBundlePath[1024] = {0};
+    GetAppleBundlePath(szBundlePath, sizeof(szBundlePath));
+#  ifdef __IOS__
+    // iOS .app 结构：MyApp.app
+    return S_CA2T(szBundlePath);
+#  else
+    // macOS .app 结构：MyApp.app/Contents/Resources/...
+    return S_CA2T(szBundlePath) + _T("/Contents/Resources");
+#  endif
+#else//__APPLE__
+    TCHAR szModule[MAX_PATH] = {0};
+    GetModuleFileName(NULL, szModule, MAX_PATH);
+    SStringT str = szModule;
+    int slash = str.ReverseFind(PATH_SLASH);
+    if (slash >= 0) str = str.Left(slash + 1);
+    return str + _T("demo_res");
+#endif//__APPLE__
 }
 
 int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*lpstrCmdLine*/, int /*nCmdShow*/)
@@ -102,11 +113,6 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
     cfg.SetSysResPeFile(SYS_NAMED_RESOURCE);
 #endif
 #else
-#ifdef __APPLE__
-    static const TCHAR *kPath_SysRes = _T("/soui-sys-resource");
-#else
-    static const TCHAR *kPath_SysRes = _T("/../../soui-sys-resource");
-#endif //__APPLE__
     cfg.SetSysResFile(appDir + kPath_SysRes);
 #endif//ENABLE_BUILD_RESOURCE
 
@@ -198,10 +204,14 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
     return nRet;
 }
 
-#if !defined(_WIN32) || defined(__MINGW32__) 
+#if defined(__IOS__)
 int main(int argc, char **argv)
 {
-    HINSTANCE hInst = GetModuleHandle(NULL);
-    return _tWinMain(hInst, 0, NULL, SW_SHOWNORMAL);
+    return swinx_ios_entry(argc,argv,_tWinMain);
 }
-#endif //_WIN32
+#elif !defined(_WIN32) || defined(__MINGW32__) 
+int main(int argc, char ** argv){
+	HINSTANCE hInst = GetModuleHandle(NULL);
+	return _tWinMain(hInst,0,NULL,SW_SHOWNORMAL);
+}
+#endif

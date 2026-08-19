@@ -2810,7 +2810,7 @@ class SOUI_EXP SWindow
     BOOL m_bEnableLayer;      /**< Indicates if the layer is enabled. */
     int m_nUpdateLockCnt;     /**< Update lock count. Prevents Invalidate messages to the host when locked. */
 
-    BOOL m_dwState;         /**< State of the window during rendering. */
+    DWORD m_dwState;         /**< State of the window during rendering. */
     BOOL m_bVisible;        /**< Visibility state of the window. */
     BOOL m_bDisable;        /**< Disabled state of the window. */
     BOOL m_bDisplay;        /**< Indicates if the window occupies space when hidden. */

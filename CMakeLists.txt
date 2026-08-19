@@ -85,8 +85,12 @@ option(SOUI_BUILD_DEMOS "Build builtin demos" ON)
 
 option(SOUI_BUILD_GAMES "Build soui games" ON)
 
+if(CMAKE_SYSTEM_NAME MATCHES "iOS")
+set(SOUI_BUILD_TOOLS OFF)
+add_definitions(-D__IOS__) #//add __IOS__ for ios build.
+else()
 option(SOUI_BUILD_TOOLS "Build soui tools" ON)
-
+endif()
 #
 #
 option(SOUI_BUILD_HTTPCLIENT "Build HTTP client component" ON)
@@ -201,7 +205,9 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 add_definitions(-D_CRT_NONSTDC_NO_WARNINGS -D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
 link_directories(${CMAKE_BINARY_DIR}/bin)
-
+if(NOT CMAKE_SYSTEM_NAME MATCHES Windows)
+        set(CMAKE_CXX_STANDARD 11)
+endif()
 add_subdirectory(third-part)
 add_subdirectory(utilities)
 add_subdirectory(components)

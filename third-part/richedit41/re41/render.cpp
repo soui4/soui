@@ -595,7 +595,7 @@ void CRenderer::EraseTextOut(
  */
 void CRenderer::DrawWrappedObjects(CLine *pliFirst, CLine *pliLast, LONG cpFirst, const POINTUV &ptFirst)
 {
-	for (BOOL fLeft = 0; fLeft != 2; fLeft ++) //For left and right sides...
+	for (int fLeft = 0; fLeft != 2; fLeft ++) //For left and right sides...
 	{
 		CLine *pli = pliFirst;
 		LONG cp = cpFirst;

@@ -38,7 +38,7 @@ else()
         src/private/posix/socket_posix.cpp 
         src/private/posix/system_util_posix.cpp
         )
-    if(NOT CMAKE_SYSTEM_NAME MATCHES "Darwin")
+    if(CMAKE_SYSTEM_NAME MATCHES "Linux")
         set(SOURCES ${SOURCES} 
             src/private/linux/ifaddrs.c
             )

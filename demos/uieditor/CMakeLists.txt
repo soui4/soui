@@ -38,7 +38,6 @@ if(CMAKE_SYSTEM_NAME MATCHES Darwin)
 
     # 准备要复制的目标列表
     set(TARGET_LIST
-        cairo
         swinx
         soui4
         msftedit

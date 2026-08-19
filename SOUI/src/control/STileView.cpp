@@ -82,7 +82,7 @@ BOOL STileView::SetAdapter(ILvAdapter *adapter)
             while (pos)
             {
                 SItemPanel *pItemPanel = lstItemPanels->GetNext(pos);
-                pItemPanel->Destroy();
+                pItemPanel->Release();
             }
             delete lstItemPanels;
         }

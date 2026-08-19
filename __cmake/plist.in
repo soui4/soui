@@ -38,9 +38,11 @@
   <string>${MACOSX_BUNDLE_COPYRIGHT}</string>
   <key>LSMinimumSystemVersion</key>
   <string>${MACOSX_DEPLOYMENT_TARGET}</string>
-  <key>NSPrincipalClass</key>
-  <string>NSApplication</string>
+<key>NSPrincipalClass</key>
+<string>${MACOSX_BUNDLE_PRINCIPAL_CLASS}</string>
   <key>ATSApplicationFontsPath</key>
   <string>fonts</string>
+  <key>UILaunchScreen</key>
+  <dict/>
 </dict>
 </plist>

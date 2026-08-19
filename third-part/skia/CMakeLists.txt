@@ -954,6 +954,21 @@ elseif(CMAKE_SYSTEM_NAME MATCHES Darwin)
         "src/ports/SkFontHost_FreeType.cpp"
         "src/gpu/gl/mac/GrGLCreateNativeInterface_mac.cpp"
     )
+elseif(CMAKE_SYSTEM_NAME MATCHES iOS)
+    set(srcs
+        ${srcs}
+        "src/ports/SkFontMgr_fontconfig.cpp"
+        "src/ports/SkFontHost_fontconfig.cpp"
+        "src/ports/SkOSFile_posix.cpp"
+        "src/ports/SkTLS_pthread.cpp"
+        "src/utils/SkThreadUtils_pthread.cpp"
+        "src/utils/SkThreadUtils_pthread_mach.cpp"
+        "src/ports/SkTime_Unix.cpp"
+        "src/ports/SkFontHost_FreeType_common.cpp"
+        "src/ports/SkFontHost_FreeType.cpp"
+        "src/gpu/gl/iOS/GrGLCreateNativeInterface_iOS.cpp"
+        "src/gpu/gl/iOS/SkNativeGLContext_iOS.mm"
+    )
 elseif(CMAKE_SYSTEM_NAME MATCHES "OHOS|OpenHarmony|HarmonyOS")
     set(srcs
         ${srcs}
