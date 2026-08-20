@@ -1620,7 +1620,9 @@ SSkinTreeLines::SSkinTreeLines()
 SIZE SSkinTreeLines::GetSkinSize() const
 {
     // 返回一个合适的默认大小
-    return CSize(16, 16);
+    #define kDefTreeNodeSize  16
+    int wid = MulDiv(kDefTreeNodeSize, GetScale(), 100);
+    return CSize(wid, wid);
 }
 
 int SSkinTreeLines::GetStates() const
@@ -1658,6 +1660,7 @@ void SSkinTreeLines::_DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iStat
     int boxSize = m_nBoxSize;
     CRect rcBox(centerX - boxSize / 2, centerY - boxSize / 2, centerX + boxSize / 2, centerY + boxSize / 2);
     rcBox.OffsetRect(-m_nLineWidth / 2, -m_nLineWidth / 2);
+    const int kHalfLineLength = MulDiv(2,GetScale(),100);
     // 定义10个状态的绘制逻辑
     switch (iState)
     {
@@ -1668,8 +1671,8 @@ void SSkinTreeLines::_DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iStat
         pRT->DrawRectangle(&rcBox);
         // 绘制+号
         pRT->SelectObject(pPenCross, NULL);
-        pRT->DrawLine(CPoint(centerX, centerY - 2), CPoint(centerX, centerY + 2));
-        pRT->DrawLine(CPoint(centerX - 2, centerY), CPoint(centerX + 2, centerY));
+        pRT->DrawLine(CPoint(centerX, centerY - kHalfLineLength), CPoint(centerX, centerY + kHalfLineLength));
+        pRT->DrawLine(CPoint(centerX - kHalfLineLength, centerY), CPoint(centerX + kHalfLineLength, centerY));
         // 绘制右边连接虚线
         pRT->SelectObject(pPenDash, NULL);
         pRT->DrawLine(CPoint(centerX + boxSize / 2, centerY), CPoint(rcDraw.right, centerY));
@@ -1682,8 +1685,8 @@ void SSkinTreeLines::_DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iStat
         pRT->DrawRectangle(&rcBox);
         // 绘制+号
         pRT->SelectObject(pPenCross, NULL);
-        pRT->DrawLine(CPoint(centerX, centerY - 2), CPoint(centerX, centerY + 2));
-        pRT->DrawLine(CPoint(centerX - 2, centerY), CPoint(centerX + 2, centerY));
+        pRT->DrawLine(CPoint(centerX, centerY - kHalfLineLength), CPoint(centerX, centerY + kHalfLineLength));
+        pRT->DrawLine(CPoint(centerX - kHalfLineLength, centerY), CPoint(centerX + kHalfLineLength, centerY));
         // 绘制上右连接虚线
         pRT->SelectObject(pPenDash, NULL);
         pRT->DrawLine(CPoint(centerX, rcDraw.top), CPoint(centerX, centerY - boxSize / 2));    // top line
@@ -1698,8 +1701,8 @@ void SSkinTreeLines::_DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iStat
         pRT->DrawRectangle(&rcBox);
         // 绘制+号
         pRT->SelectObject(pPenCross, NULL);
-        pRT->DrawLine(CPoint(centerX, centerY - 2), CPoint(centerX, centerY + 2));
-        pRT->DrawLine(CPoint(centerX - 2, centerY), CPoint(centerX + 2, centerY));
+        pRT->DrawLine(CPoint(centerX, centerY - kHalfLineLength), CPoint(centerX, centerY + kHalfLineLength));
+        pRT->DrawLine(CPoint(centerX - kHalfLineLength, centerY), CPoint(centerX + kHalfLineLength, centerY));
         // 绘制上右连接虚线
         pRT->SelectObject(pPenDash, NULL);
         pRT->DrawLine(CPoint(centerX, rcDraw.top), CPoint(centerX, centerY - boxSize / 2));   // top line
@@ -1713,7 +1716,7 @@ void SSkinTreeLines::_DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iStat
         pRT->DrawRectangle(&rcBox);
         // 绘制-号
         pRT->SelectObject(pPenCross, NULL);
-        pRT->DrawLine(CPoint(centerX - 2, centerY), CPoint(centerX + 2, centerY));
+        pRT->DrawLine(CPoint(centerX - kHalfLineLength, centerY), CPoint(centerX + kHalfLineLength, centerY));
         // 绘制右边连接虚线
         pRT->SelectObject(pPenDash, NULL);
         pRT->DrawLine(CPoint(centerX + boxSize / 2, centerY), CPoint(rcDraw.right, centerY)); // right line
@@ -1726,7 +1729,7 @@ void SSkinTreeLines::_DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iStat
         pRT->DrawRectangle(&rcBox);
         // 绘制-号
         pRT->SelectObject(pPenCross, NULL);
-        pRT->DrawLine(CPoint(centerX - 2, centerY), CPoint(centerX + 2, centerY));
+        pRT->DrawLine(CPoint(centerX - kHalfLineLength, centerY), CPoint(centerX + kHalfLineLength, centerY));
         // 绘制上右下连接虚线
         pRT->SelectObject(pPenDash, NULL);
         pRT->DrawLine(CPoint(centerX, rcDraw.top), CPoint(centerX, centerY - boxSize / 2));    // top line
@@ -1741,7 +1744,7 @@ void SSkinTreeLines::_DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iStat
         pRT->DrawRectangle(&rcBox);
         // 绘制-号
         pRT->SelectObject(pPenCross, NULL);
-        pRT->DrawLine(CPoint(centerX - 2, centerY), CPoint(centerX + 2, centerY));
+        pRT->DrawLine(CPoint(centerX - kHalfLineLength, centerY), CPoint(centerX + kHalfLineLength, centerY));
         // 绘制上右连接虚线
         pRT->SelectObject(pPenDash, NULL);
         pRT->DrawLine(CPoint(centerX, rcDraw.top), CPoint(centerX, centerY - boxSize / 2));   // top line
@@ -1801,6 +1804,7 @@ void SSkinTreeLines::_Scale(ISkinObj *skinObj, int nScale)
     if (pRet)
     {
         pRet->m_nLineWidth = MulDiv(m_nLineWidth, nScale, 100);
+        pRet->m_nBoxSize = MulDiv(m_nBoxSize, nScale, 100);
     }
 }
 SNSEND
