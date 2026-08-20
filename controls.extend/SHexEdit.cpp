@@ -1,4 +1,4 @@
-﻿/*
+/*
  * 2022.1.29  by 小新
  */
 
@@ -521,7 +521,7 @@ void SHexEdit::CalculatePaintingDetails(IRenderTarget *pRT)
             m_tPaintDetails.cPaintingRect.bottom = m_tPaintDetails.cPaintingRect.top;
         }
     }
-    
+
     if (m_bShowColNumber)
     {
         m_tPaintDetails.nColNumberPos = m_tPaintDetails.nLineHeight;
@@ -530,7 +530,7 @@ void SHexEdit::CalculatePaintingDetails(IRenderTarget *pRT)
     {
         m_tPaintDetails.nColNumberPos = 0;
     }
-    int relHeight = m_tPaintDetails.cPaintingRect.Height() - m_tPaintDetails.nColNumberPos; 
+    int relHeight = m_tPaintDetails.cPaintingRect.Height() - m_tPaintDetails.nColNumberPos;
     if (relHeight < 0)
     {
         relHeight = 0;
@@ -547,8 +547,6 @@ void SHexEdit::CalculatePaintingDetails(IRenderTarget *pRT)
         m_tPaintDetails.nFullVisibleLines = m_tPaintDetails.nVisibleLines;
         m_tPaintDetails.nLastLineHeight = m_tPaintDetails.nLineHeight;
     }
-
-   
 
     // position & size of the address
     if (m_bShowAddress)
@@ -1118,7 +1116,6 @@ void SHexEdit::SetScrollPositionY(UINT nPosition, bool bUpdate)
     {
         nPosition = m_nScrollRangeY;
     }
-    SetScrollPos(SSB_VERT, (int)nPosition, TRUE);
     if ((nPosition != m_nScrollPostionY) && bUpdate)
     {
         m_nScrollPostionY = nPosition;
@@ -1134,7 +1131,6 @@ void SHexEdit::SetScrollPositionX(UINT nPosition, bool bUpdate)
     {
         nPosition = m_nScrollRangeX;
     }
-    SetScrollPos(SSB_HORZ, (int)nPosition, TRUE);
     if ((nPosition != m_nScrollPostionX) && bUpdate)
     {
         m_nScrollPostionX = nPosition;
@@ -1398,9 +1394,7 @@ BOOL SHexEdit::OnScroll(BOOL bVertical, UINT uCode, int nPos)
         else
             OnHScroll(uCode, nPos, 0);
     }
-    else
-        __baseCls::OnScroll(bVertical, uCode, nPos);
-    return TRUE;
+    return __baseCls::OnScroll(bVertical, uCode, nPos);
 }
 
 void SHexEdit::OnVScroll(UINT nSBCode, UINT nPos, HWND)
