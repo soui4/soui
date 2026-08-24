@@ -5,6 +5,7 @@ SNSBEGIN
 
 
 SGameTheme::SGameTheme()
+    : m_bLoaded(FALSE)
 {
     m_pSkinPool.Attach(SUiDef::CreateSkinPool(TRUE));
     GETUIDEF->PushSkinPool(m_pSkinPool);
@@ -90,7 +91,8 @@ BOOL SGameTheme::Load(LPCTSTR pszThemeDir)
     SASSERT(xmlSounds);
     m_docSounds.root().append_copy(xmlSounds);
 
-    return ret > 0 ;
+    m_bLoaded = (ret > 0);
+    return m_bLoaded;
 }
 
 IWindow *SGameTheme::GetWidget(LPCWSTR pszName)

@@ -1,0 +1,22 @@
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.name = "cnchess-android"
+
+include ':app'
+// 复用 demos 中的 soui-android-lib 模块
+include ':soui-android-lib'
+project(':soui-android-lib').projectDir = new File('../../../../soui-android-lib')

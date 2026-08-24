@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="42" viewBox="0 0 400 42">
+  <defs>
+    <linearGradient id="n" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#e03535"/><stop offset="100%" stop-color="#a81d1d"/>
+    </linearGradient>
+    <linearGradient id="h" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ef4444"/><stop offset="100%" stop-color="#b92020"/>
+    </linearGradient>
+    <linearGradient id="p" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#901616"/><stop offset="100%" stop-color="#700f0f"/>
+    </linearGradient>
+    <linearGradient id="d" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#8a5555"/><stop offset="100%" stop-color="#6b3f3f"/>
+    </linearGradient>
+  </defs>
+  <!-- State 1: Normal (无文字, 由XML的text属性提供) -->
+  <g>
+    <rect x="0.5" y="0.5" width="99" height="39" rx="7" ry="7" fill="url(#n)" stroke="#7a1212" stroke-width="1.5"/>
+    <line x1="0.5" y1="40.5" x2="99.5" y2="40.5" stroke="#6f0f0f" stroke-width="2" opacity="0.7"/>
+  </g>
+  <!-- State 2: Hover -->
+  <g transform="translate(100,0)">
+    <rect x="0.5" y="-0.5" width="99" height="40" rx="7" ry="7" fill="url(#h)" stroke="#8a1616" stroke-width="1.5"/>
+    <rect x="0.5" y="-0.5" width="99" height="40" rx="7" ry="7" fill="none" stroke="#ffd700" stroke-width="1" opacity="0.55"/>
+    <line x1="0.5" y1="40.5" x2="99.5" y2="40.5" stroke="#6f0f0f" stroke-width="2" opacity="0.7"/>
+  </g>
+  <!-- State 3: Active/Pressed (下沉2px) -->
+  <g transform="translate(200,0)">
+    <rect x="0.5" y="2.5" width="99" height="37" rx="7" ry="7" fill="url(#p)" stroke="#5a0c0c" stroke-width="1.5"/>
+    <line x1="0.5" y1="40.5" x2="99.5" y2="40.5" stroke="#5a0c0c" stroke-width="1" opacity="0.8"/>
+  </g>
+  <!-- State 4: Disabled -->
+  <g transform="translate(300,0)">
+    <rect x="0.5" y="0.5" width="99" height="39" rx="7" ry="7" fill="url(#d)" stroke="#5c3a3a" stroke-width="1.5"/>
+    <line x1="0.5" y1="40.5" x2="99.5" y2="40.5" stroke="#4a2f2f" stroke-width="2" opacity="0.55"/>
+  </g>
+</svg>

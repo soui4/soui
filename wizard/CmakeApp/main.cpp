@@ -1,4 +1,4 @@
-﻿// dui-demo.cpp : main source file
+// dui-demo.cpp : main source file
 //
 
 #include "stdafx.h"
@@ -14,9 +14,10 @@ using namespace SNS;
 static SStringT getResourceDir()
 {
 #ifdef __APPLE__
+    // macOS 和 iOS 统一：资源安装在 .app/<res_name>/ 下（由 CMake add_macos_res_folder 处理）
     char szBunblePath[1024];
     GetAppleBundlePath(szBunblePath, sizeof(szBunblePath));
-    return S_CA2T(szBunblePath) + _T("/Contents/Resources/");
+    return S_CA2T(szBunblePath) + _T("/");
 #else
     TCHAR szModule[MAX_PATH];
     ::GetModuleFileName(NULL, szModule, MAX_PATH);

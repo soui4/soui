@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="30" viewBox="0 0 400 30">
+  <defs>
+    <linearGradient id="n" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="rgba(93,78,55,0.55)"/>
+      <stop offset="100%" stop-color="rgba(61,47,31,0.65)"/>
+    </linearGradient>
+    <linearGradient id="h" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="rgba(255,215,0,0.18)"/>
+      <stop offset="100%" stop-color="rgba(184,134,11,0.22)"/>
+    </linearGradient>
+    <linearGradient id="p" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="rgba(184,134,11,0.30)"/>
+      <stop offset="100%" stop-color="rgba(122,95,36,0.35)"/>
+    </linearGradient>
+    <linearGradient id="d" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="rgba(60,50,38,0.45)"/>
+      <stop offset="100%" stop-color="rgba(40,34,26,0.50)"/>
+    </linearGradient>
+  </defs>
+  <!-- State 1: Normal (0-100) -->
+  <rect x="0.5" y="0.5" width="99" height="29" rx="5" ry="5" fill="url(#n)" stroke="#5D4E37" stroke-width="1"/>
+  <!-- State 2: Hover (100-200) -->
+  <rect x="100.5" y="0.5" width="99" height="29" rx="5" ry="5" fill="url(#h)" stroke="#FFD700" stroke-width="1" stroke-opacity="0.7"/>
+  <!-- State 3: Pressed (200-300) -->
+  <rect x="200.5" y="0.5" width="99" height="29" rx="5" ry="5" fill="url(#p)" stroke="#FFD700" stroke-width="1" stroke-opacity="0.9"/>
+  <!-- State 4: Disabled (300-400) -->
+  <rect x="300.5" y="0.5" width="99" height="29" rx="5" ry="5" fill="url(#d)" stroke="#5D4E37" stroke-width="1" stroke-opacity="0.5"/>
+</svg>

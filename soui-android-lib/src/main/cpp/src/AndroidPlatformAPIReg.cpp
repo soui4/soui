@@ -188,6 +188,15 @@ static BOOL androidAudio_playSound(LPCSTR pszSound, HMODULE hmod, DWORD fdwSound
     return AndroidPlatformAPI::instance().playSound(pszSound, hmod, fdwSound);
 }
 
+// Path API wrapper
+static DWORD androidPath_getTempPathA(DWORD nBufferLength, LPSTR lpBuffer) {
+    return AndroidPlatformAPI::instance().getTempPathA(nBufferLength, lpBuffer);
+}
+
+static BOOL androidPath_getSpecialFolderPathA(HWND hwndOwner, LPSTR lpszPath, int nFolder, BOOL fCreate) {
+    return AndroidPlatformAPI::instance().getSpecialFolderPathA(hwndOwner, lpszPath, nFolder, fCreate);
+}
+
 extern "C" void RegisterAndroidPlatformAPI() {
     PlatformAPI api = {};
     api.version = PLATFORM_API_VERSION;
@@ -237,6 +246,10 @@ extern "C" void RegisterAndroidPlatformAPI() {
 
     // Audio API
     api.audio.playSound = androidAudio_playSound;
+
+    // Path API
+    api.path.getTempPathA = androidPath_getTempPathA;
+    api.path.getSpecialFolderPathA = androidPath_getSpecialFolderPathA;
 
     PlatformAPI_Init(&api);
     SLOGI()<<"Android platform window API registered";

@@ -12,7 +12,7 @@ namespace SevenZip
     {  
 		if (m_fileName.length()>0)
 		{
-			std::string file_name = ToPathNativeStr(m_fileName);
+			std::string file_name = ToPathUtf8(m_fileName);
 			m_streams.PutFile(file_name.c_str(), m_blob); 			
 		}
     }  

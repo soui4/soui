@@ -88,6 +88,10 @@ LRESULT CPreviewHost::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 				{
 					lstIndex.RemoveHead();
 				}
+				if(lstIndex.GetCount() == 0)
+				{
+					return TRUE;
+				}
 				int *pOrder = new int[lstIndex.GetCount()];
 				SPOSITION pos = lstIndex.GetHeadPosition();
 				for(int i=0;i<lstIndex.GetCount();i++)
@@ -243,7 +247,11 @@ BOOL CPreviewHost::OnLoadLayoutFromResourceID(SXmlDoc& xmlDoc) {
 			{
 				m_bVirtualRoot = TRUE;
 				SXmlNode xmlRoot2 = xmlDoc2.root().first_child().first_child();
-				xmlRoot2.append_copy(xmlDoc.root().first_child());
+				SXmlNode xmlRoot = xmlDoc.root().first_child();
+				if (wcsicmp(xmlRoot.name(), SModalRoot::GetClassName()) == 0 || wcsicmp(xmlRoot.name(), STabPage::GetClassName()) == 0) {
+					xmlRoot.attribute2(L"size").set_value(L"-2,-2");
+				}
+				xmlRoot2.append_copy(xmlRoot);
                 xmlDoc.Reset();
                 xmlDoc.root().append_copy(xmlDoc2.root().first_child());	
 			}
@@ -261,6 +269,10 @@ int CPreviewHost::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	int nRet = SHostWnd::OnCreate(lpCreateStruct);
 	if(nRet==0 && m_pListener)
 	{
+		SWindow *pChild = GetRoot()->GetWindow(GSW_FIRSTCHILD);
+		if (pChild) {
+			pChild->SetVisible(TRUE);
+		}
 		const WCHAR *pszXml=L"<sizingframe name=\"_preview_sel_frame\" float=\"1\"/>"
 			L"<window float=\"1\" name=\"_preview_hover_frame\" msgTransparent=\"1\" margin=\"1,1,1,1\" colorBorder=\"#0000ff\"/>";
 		GetRoot()->CreateChildrenFromXml(pszXml);

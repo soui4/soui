@@ -73,6 +73,9 @@ class SOUI_EXP SDropDownWnd
      */
     BOOL Create(LPCRECT lpRect, IXmlNode *pInitXml, DWORD dwStyle = WS_POPUP, DWORD dwExStyle = WS_EX_TOOLWINDOW | WS_EX_TOPMOST);
 
+    /**
+     * @brief show window
+     */
     void ShowWindow(int x, int y, int nWidth, int nHeight, int nAniMs, BOOL bDropDown);
 
     /**
@@ -117,7 +120,7 @@ class SOUI_EXP SDropDownWnd
      * @param pMsg Pointer to the message
      * @return TRUE if the message is handled, FALSE otherwise
      */
-    virtual BOOL WINAPI PreTranslateMessage(MSG *pMsg);
+    STDMETHOD_(BOOL,PreTranslateMessage)(MSG *pMsg);
 
     /**
      * @brief Handle left mouse button down event
@@ -125,13 +128,6 @@ class SOUI_EXP SDropDownWnd
      * @param point Mouse coordinates
      */
     void OnLButtonDown(UINT nFlags, CPoint point);
-
-    /**
-     * @brief Handle left mouse button up event
-     * @param nFlags Flags
-     * @param point Mouse coordinates
-     */
-    void OnLButtonUp(UINT nFlags, CPoint point);
 
     /**
      * @brief Handle key down event
@@ -180,7 +176,7 @@ class SOUI_EXP SDropDownWnd
      * @brief Handle final message
      * @param hwnd Handle to the window
      */
-    virtual void OnFinalMessage(HWND hwnd);
+    void OnFinalMessage(HWND hwnd) override;
 
     /**
      * @brief init root painter
@@ -188,12 +184,10 @@ class SOUI_EXP SDropDownWnd
     void OnRootBeforePaint(const SRootWindow *pRoot,IRenderTarget *pRT, SPainter &painter) const override;
   protected:
     ISDropDownOwner *m_pOwner; /**< Pointer to the dropdown owner */
-    BOOL m_bClick;             /**< Click state */
     UINT m_uExitCode;          /**< Exit code */
 
     BEGIN_MSG_MAP_EX(SDropDownWnd)
         MSG_WM_LBUTTONDOWN(OnLButtonDown)
-        MSG_WM_LBUTTONUP(OnLButtonUp)
         MSG_WM_KEYDOWN(OnKeyDown)
         MSG_WM_KILLFOCUS(OnKillFocus)
         MSG_WM_DESTROY(OnDestroy)

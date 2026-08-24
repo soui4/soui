@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>中国象棋 - 登录界面设计预览</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #1a0d06 0%, #2a1810 100%);
+  font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+  padding: 40px 20px;
+}
+:root {
+  --bg-wood-1: #4a2c18;
+  --bg-wood-2: #6b3a1f;
+  --panel-bg: rgba(30, 16, 8, 0.88);
+  --panel-border: #5d4e37;
+  --gold: #ffd700;
+  --gold-light: #ffe45e;
+  --gold-dark: #b8860b;
+  --red-piece: #c62828;
+  --text-main: #f5e6c8;
+  --text-sub: #a89070;
+  --input-bg: rgba(61, 47, 31, 0.9);
+  --input-border: #5d4e37;
+  --input-focus: #ffd700;
+  --btn-login: #c62828;
+  --btn-login-h: #d32f2f;
+}
+.login-card {
+  position: relative;
+  width: 460px;
+  background: var(--panel-bg);
+  border: 1.5px solid var(--panel-border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,215,0,0.08);
+}
+.card-deco-top, .card-deco-bot {
+  height: 3px;
+  background: linear-gradient(90deg, transparent 0%, var(--gold) 20%, var(--gold-light) 50%, var(--gold) 80%, transparent 100%);
+  opacity: 0.6;
+}
+.card-body { padding: 28px 36px 32px; }
+.header {
+  position: relative;
+  text-align: center;
+  margin-bottom: 20px;
+}
+.header .corner {
+  position: absolute;
+  width: 32px; height: 32px;
+  opacity: 0.7;
+}
+.header .corner.tl { top: -6px; left: -6px; }
+.header .corner.tr { top: -6px; right: -6px; transform: scaleX(-1); }
+.game-title {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 6px;
+  background: linear-gradient(180deg, var(--gold-light) 0%, var(--gold) 60%, var(--gold-dark) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0 0 2px;
+}
+.game-sub {
+  font-size: 11px;
+  color: var(--text-sub);
+  letter-spacing: 3px;
+  margin: 0;
+}
+.deco-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0 20px;
+}
+.deco-line {
+  width: 60px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0.5;
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 14px 12px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+.label {
+  font-size: 13px;
+  color: var(--text-sub);
+  text-align: right;
+  letter-spacing: 1px;
+}
+.input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 6px;
+  padding: 0 10px;
+  height: 36px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.input-wrap:hover { border-color: #7d6e57; }
+.input-wrap.focused {
+  border-color: var(--input-focus);
+  box-shadow: 0 0 0 2px rgba(255,215,0,0.15);
+}
+.input-ico { width: 18px; height: 18px; margin-right: 8px; opacity: 0.65; flex-shrink: 0; }
+.input-el {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 13px;
+  color: var(--text-main);
+  font-family: inherit;
+}
+.input-el::placeholder { color: #6a5a45; }
+.btn-local {
+  margin-left: 6px;
+  padding: 0 10px;
+  height: 26px;
+  font-size: 11px;
+  background: rgba(93,78,55,0.5);
+  border: 1px solid var(--input-border);
+  color: var(--text-sub);
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn-local:hover { color: var(--gold); border-color: var(--gold); }
+.sex-select {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 13px;
+  color: var(--text-main);
+  font-family: inherit;
+}
+.avatar-section {
+  border: 1px solid rgba(93,78,55,0.6);
+  border-radius: 8px;
+  padding: 12px 12px 14px;
+  margin-bottom: 20px;
+  background: rgba(44,24,16,0.5);
+}
+.avatar-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.avatar-title { font-size: 12px; color: var(--gold); letter-spacing: 1px; }
+.avatar-row {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.avatar-slot {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: #3d2f1f;
+  border: 2px solid #5d4e37;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+.avatar-slot:hover { border-color: var(--gold); transform: translateY(-1px); }
+.avatar-slot.selected {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(255,215,0,0.25);
+}
+.avatar-slot.selected::after {
+  content: "";
+  position: absolute;
+  bottom: 2px; right: 2px;
+  width: 14px; height: 14px;
+  background: var(--gold);
+  border-radius: 50%;
+  border: 2px solid #2a1810;
+  box-sizing: border-box;
+}
+.avatar-preview-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.preview-label { font-size: 12px; color: var(--text-sub); }
+.preview-box {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  border: 2px solid var(--gold);
+  background: #3d2f1f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.4);
+}
+.btn-ext {
+  padding: 0 12px;
+  height: 30px;
+  font-size: 11px;
+  background: rgba(93,78,55,0.4);
+  border: 1px solid var(--input-border);
+  color: var(--text-sub);
+  border-radius: 5px;
+  cursor: pointer;
+}
+.btn-ext:hover { color: var(--gold); border-color: var(--gold); }
+.btn-login-row { display: flex; justify-content: center; }
+.btn-login {
+  width: 100%;
+  height: 42px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 8px;
+  color: #fff7e6;
+  background: linear-gradient(180deg, #d32f2f 0%, #a81d1d 100%);
+  border: 1.5px solid #7a1212;
+  border-radius: 7px;
+  cursor: pointer;
+  box-shadow: 0 3px 0 #6f0f0f, 0 6px 14px rgba(168,29,29,0.45);
+  transition: all 0.1s;
+  font-family: inherit;
+}
+.btn-login:hover {
+  background: linear-gradient(180deg, #e03535 0%, #b52020 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 0 #6f0f0f, 0 8px 18px rgba(168,29,29,0.55);
+}
+.btn-login:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #6f0f0f, 0 2px 6px rgba(168,29,29,0.4);
+}
+.footer {
+  margin-top: 14px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-sub);
+  letter-spacing: 1px;
+  opacity: 0.7;
+}
+.bg-piece {
+  position: absolute;
+  width: 60px; height: 60px;
+  opacity: 0.12;
+  pointer-events: none;
+}
+.bg-piece.bl { left: 10px; bottom: 10px; transform: rotate(-15deg); }
+.bg-piece.br { right: 10px; bottom: 14px; transform: rotate(18deg); opacity: 0.1; }
+.bg-piece.tl { left: 14px; top: 10px; opacity: 0.08; width: 50px; height: 50px; transform: rotate(8deg); }
+.bg-piece.tr { right: 12px; top: 14px; opacity: 0.08; width: 50px; height: 50px; transform: rotate(-10deg); }
+.piece-avatar { width: 44px; height: 44px; }
+.piece-preview { width: 38px; height: 38px; }
+</style>
+</head>
+<body>
+<div class="login-card">
+  <!-- 背景装饰棋子 -->
+  <svg class="bg-piece tl" viewBox="0 0 100 100">
+    <circle cx="50" cy="50" r="46" fill="none" stroke="#c62828" stroke-width="3"/>
+    <circle cx="50" cy="50" r="38" fill="none" stroke="#c62828" stroke-width="1"/>
+    <text x="50" y="64" text-anchor="middle" font-size="44" font-weight="bold" fill="#c62828" font-family="serif">車</text>
+  </svg>
+  <svg class="bg-piece tr" viewBox="0 0 100 100">
+    <circle cx="50" cy="50" r="46" fill="none" stroke="#1a1a1a" stroke-width="3"/>
+    <circle cx="50" cy="50" r="38" fill="none" stroke="#1a1a1a" stroke-width="1"/>
+    <text x="50" y="64" text-anchor="middle" font-size="44" font-weight="bold" fill="#1a1a1a" font-family="serif">馬</text>
+  </svg>
+  <svg class="bg-piece bl" viewBox="0 0 100 100">
+    <circle cx="50" cy="50" r="46" fill="none" stroke="#c62828" stroke-width="3"/>
+    <circle cx="50" cy="50" r="38" fill="none" stroke="#c62828" stroke-width="1"/>
+    <text x="50" y="64" text-anchor="middle" font-size="44" font-weight="bold" fill="#c62828" font-family="serif">炮</text>
+  </svg>
+  <svg class="bg-piece br" viewBox="0 0 100 100">
+    <circle cx="50" cy="50" r="46" fill="none" stroke="#1a1a1a" stroke-width="3"/>
+    <circle cx="50" cy="50" r="38" fill="none" stroke="#1a1a1a" stroke-width="1"/>
+    <text x="50" y="64" text-anchor="middle" font-size="44" font-weight="bold" fill="#1a1a1a" font-family="serif">象</text>
+  </svg>
+
+  <div class="card-deco-top"></div>
+  <div class="card-body">
+    <div class="header">
+      <svg class="corner tl" viewBox="0 0 32 32">
+        <path d="M2 2 L2 14 L2 2 L14 2" fill="none" stroke="#ffd700" stroke-width="2" stroke-linecap="round"/>
+        <path d="M2 2 L8 2 L2 8 Z" fill="#ffd700" opacity="0.5"/>
+      </svg>
+      <svg class="corner tr" viewBox="0 0 32 32">
+        <path d="M2 2 L2 14 L2 2 L14 2" fill="none" stroke="#ffd700" stroke-width="2" stroke-linecap="round"/>
+        <path d="M2 2 L8 2 L2 8 Z" fill="#ffd700" opacity="0.5"/>
+      </svg>
+      <h1 class="game-title">中国象棋</h1>
+      <p class="game-sub">CHINESE  CHESS  ·  智 者 之 战</p>
+    </div>
+
+    <div class="deco-row">
+      <div class="deco-line"></div>
+      <svg width="22" height="22" viewBox="0 0 22 22">
+        <circle cx="11" cy="11" r="8" fill="none" stroke="#ffd700" stroke-width="1.2" opacity="0.8"/>
+        <circle cx="11" cy="11" r="3" fill="#ffd700" opacity="0.9"/>
+        <line x1="11" y1="2" x2="11" y2="6" stroke="#ffd700" stroke-width="1" opacity="0.7"/>
+        <line x1="11" y1="16" x2="11" y2="20" stroke="#ffd700" stroke-width="1" opacity="0.7"/>
+        <line x1="2" y1="11" x2="6" y2="11" stroke="#ffd700" stroke-width="1" opacity="0.7"/>
+        <line x1="16" y1="11" x2="20" y2="11" stroke="#ffd700" stroke-width="1" opacity="0.7"/>
+      </svg>
+      <div class="deco-line"></div>
+    </div>
+
+    <div class="form-grid">
+      <div class="label">服务器</div>
+      <div class="input-wrap focused">
+        <svg class="input-ico" viewBox="0 0 24 24" fill="none" stroke="#ffd700" stroke-width="1.8" stroke-linecap="round">
+          <rect x="3" y="5" width="18" height="14" rx="2"/>
+          <path d="M3 9h18"/>
+          <circle cx="8" cy="14" r="1" fill="#ffd700"/>
+          <circle cx="12" cy="14" r="1" fill="#ffd700"/>
+          <circle cx="16" cy="14" r="1" fill="#ffd700"/>
+        </svg>
+        <input class="input-el" value="124.222.50.176:3311" placeholder="输入服务器地址"/>
+        <button class="btn-local">本地</button>
+      </div>
+
+      <div class="label">用户名</div>
+      <div class="input-wrap">
+        <svg class="input-ico" viewBox="0 0 24 24" fill="none" stroke="#ffd700" stroke-width="1.8" stroke-linecap="round">
+          <circle cx="12" cy="8" r="4"/>
+          <path d="M4 21c0-4 4-7 8-7s8 3 8 7"/>
+        </svg>
+        <input class="input-el" value="张三" placeholder="请输入用户名"/>
+      </div>
+
+      <div class="label">性别</div>
+      <div class="input-wrap">
+        <svg class="input-ico" viewBox="0 0 24 24" fill="none" stroke="#ffd700" stroke-width="1.8" stroke-linecap="round">
+          <circle cx="8" cy="10" r="4"/>
+          <circle cx="17" cy="7" r="3"/>
+          <path d="M15 13l5-5M14 6h4v4"/>
+          <path d="M11 14l-3 3M11 19l-5-5"/>
+        </svg>
+        <select class="sex-select">
+          <option>男</option>
+          <option>女</option>
+          <option>保密</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="avatar-section">
+      <div class="avatar-title-row">
+        <svg width="14" height="14" viewBox="0 0 14 14">
+          <circle cx="7" cy="7" r="5" fill="none" stroke="#ffd700" stroke-width="1.2"/>
+          <circle cx="7" cy="7" r="2" fill="#ffd700"/>
+        </svg>
+        <span class="avatar-title">选择头像</span>
+        <div class="deco-line" style="flex:1;"></div>
+      </div>
+      <div class="avatar-row">
+        <div class="avatar-slot selected">
+          <svg class="piece-avatar" viewBox="0 0 100 100">
+            <defs><radialGradient id="g1" cx="50%" cy="40%"><stop offset="0%" stop-color="#ffeaea"/><stop offset="60%" stop-color="#e57373"/><stop offset="100%" stop-color="#a81d1d"/></radialGradient></defs>
+            <circle cx="50" cy="50" r="46" fill="url(#g1)" stroke="#ffd700" stroke-width="2.5"/>
+            <circle cx="50" cy="50" r="38" fill="none" stroke="#ffd700" stroke-width="0.8" opacity="0.6"/>
+            <text x="50" y="62" text-anchor="middle" font-size="36" font-weight="bold" fill="#fff7e6" font-family="serif" stroke="#7a1212" stroke-width="0.8">帥</text>
+          </svg>
+        </div>
+        <div class="avatar-slot">
+          <svg class="piece-avatar" viewBox="0 0 100 100">
+            <defs><radialGradient id="g2" cx="50%" cy="40%"><stop offset="0%" stop-color="#ffeaea"/><stop offset="60%" stop-color="#e57373"/><stop offset="100%" stop-color="#a81d1d"/></radialGradient></defs>
+            <circle cx="50" cy="50" r="46" fill="url(#g2)" stroke="#ffd700" stroke-width="2.5"/>
+            <circle cx="50" cy="50" r="38" fill="none" stroke="#ffd700" stroke-width="0.8" opacity="0.6"/>
+            <text x="50" y="62" text-anchor="middle" font-size="36" font-weight="bold" fill="#fff7e6" font-family="serif" stroke="#7a1212" stroke-width="0.8">仕</text>
+          </svg>
+        </div>
+        <div class="avatar-slot">
+          <svg class="piece-avatar" viewBox="0 0 100 100">
+            <defs><radialGradient id="g3" cx="50%" cy="40%"><stop offset="0%" stop-color="#f5e6c8"/><stop offset="60%" stop-color="#8d6e63"/><stop offset="100%" stop-color="#3e2723"/></radialGradient></defs>
+            <circle cx="50" cy="50" r="46" fill="url(#g3)" stroke="#ffd700" stroke-width="2.5"/>
+            <circle cx="50" cy="50" r="38" fill="none" stroke="#ffd700" stroke-width="0.8" opacity="0.6"/>
+            <text x="50" y="62" text-anchor="middle" font-size="36" font-weight="bold" fill="#f5e6c8" font-family="serif" stroke="#1a0d06" stroke-width="1">將</text>
+          </svg>
+        </div>
+        <div class="avatar-slot">
+          <svg class="piece-avatar" viewBox="0 0 100 100">
+            <defs><radialGradient id="g4" cx="50%" cy="40%"><stop offset="0%" stop-color="#ffeaea"/><stop offset="60%" stop-color="#e57373"/><stop offset="100%" stop-color="#a81d1d"/></radialGradient></defs>
+            <circle cx="50" cy="50" r="46" fill="url(#g4)" stroke="#ffd700" stroke-width="2.5"/>
+            <circle cx="50" cy="50" r="38" fill="none" stroke="#ffd700" stroke-width="0.8" opacity="0.6"/>
+            <text x="50" y="62" text-anchor="middle" font-size="36" font-weight="bold" fill="#fff7e6" font-family="serif" stroke="#7a1212" stroke-width="0.8">車</text>
+          </svg>
+        </div>
+        <div class="avatar-slot">
+          <svg class="piece-avatar" viewBox="0 0 100 100">
+            <defs><radialGradient id="g5" cx="50%" cy="40%"><stop offset="0%" stop-color="#f5e6c8"/><stop offset="60%" stop-color="#8d6e63"/><stop offset="100%" stop-color="#3e2723"/></radialGradient></defs>
+            <circle cx="50" cy="50" r="46" fill="url(#g5)" stroke="#ffd700" stroke-width="2.5"/>
+            <circle cx="50" cy="50" r="38" fill="none" stroke="#ffd700" stroke-width="0.8" opacity="0.6"/>
+            <text x="50" y="62" text-anchor="middle" font-size="36" font-weight="bold" fill="#f5e6c8" font-family="serif" stroke="#1a0d06" stroke-width="1">馬</text>
+          </svg>
+        </div>
+      </div>
+      <div class="avatar-preview-row">
+        <span class="preview-label">当前头像</span>
+        <div class="preview-box">
+          <svg class="piece-preview" viewBox="0 0 100 100">
+            <defs><radialGradient id="pg" cx="50%" cy="40%"><stop offset="0%" stop-color="#ffeaea"/><stop offset="60%" stop-color="#e57373"/><stop offset="100%" stop-color="#a81d1d"/></radialGradient></defs>
+            <circle cx="50" cy="50" r="46" fill="url(#pg)" stroke="#ffd700" stroke-width="2.5"/>
+            <circle cx="50" cy="50" r="38" fill="none" stroke="#ffd700" stroke-width="0.8" opacity="0.6"/>
+            <text x="50" y="62" text-anchor="middle" font-size="36" font-weight="bold" fill="#fff7e6" font-family="serif" stroke="#7a1212" stroke-width="0.8">帥</text>
+          </svg>
+        </div>
+        <button class="btn-ext">外部图片...</button>
+      </div>
+    </div>
+
+    <div class="btn-login-row">
+      <button class="btn-login">登 录</button>
+    </div>
+
+    <div class="footer">点击登录，开启对弈之旅</div>
+  </div>
+  <div class="card-deco-bot"></div>
+</div>
+<script>
+  // 头像选择交互
+  const slots = document.querySelectorAll('.avatar-slot');
+  const previewBox = document.querySelector('.preview-box');
+  const previews = [
+    '<defs><radialGradient id="pg" cx="50%" cy="40%"><stop offset="0%" stop-color="#ffeaea"/><stop offset="60%" stop-color="#e57373"/><stop offset="100%" stop-color="#a81d1d"/></radialGradient></defs><circle cx="50" cy="50" r="46" fill="url(#pg)" stroke="#ffd700" stroke-width="2.5"/><circle cx="50" cy="50" r="38" fill="none" stroke="#ffd700" stroke-width="0.8" opacity="0.6"/><text x="50" y="62" text-anchor="middle" font-size="36" font-weight="bold" fill="#fff7e6" font-family="serif" stroke="#7a1212" stroke-width="0.8">帥</text>',
+    '<defs><radialGradient id="pg" cx="50%" cy="40%"><stop offset="0%" stop-color="#ffeaea"/><stop offset="60%" stop-color="#e57373"/><stop offset="100%" stop-color="#a81d1d"/></radialGradient></defs><circle cx="50" cy="50" r="46" fill="url(#pg)" stroke="#ffd700" stroke-width="2.5"/><circle cx="50" cy="50" r="38" fill="none" stroke="#ffd700" stroke-width="0.8" opacity="0.6"/><text x="50" y="62" text-anchor="middle" font-size="36" font-weight="bold" fill="#fff7e6" font-family="serif" stroke="#7a1212" stroke-width="0.8">仕</text>',
+    '<defs><radialGradient id="pg" cx="50%" cy="40%"><stop offset="0%" stop-color="#f5e6c8"/><stop offset="60%" stop-color="#8d6e63"/><stop offset="100%" stop-color="#3e2723"/></radialGradient></defs><circle cx="50" cy="50" r="46" fill="url(#pg)" stroke="#ffd700" stroke-width="2.5"/><circle cx="50" cy="50" r="38" fill="none" stroke="#ffd700" stroke-width="0.8" opacity="0.6"/><text x="50" y="62" text-anchor="middle" font-size="36" font-weight="bold" fill="#f5e6c8" font-family="serif" stroke="#1a0d06" stroke-width="1">將</text>',
+    '<defs><radialGradient id="pg" cx="50%" cy="40%"><stop offset="0%" stop-color="#ffeaea"/><stop offset="60%" stop-color="#e57373"/><stop offset="100%" stop-color="#a81d1d"/></radialGradient></defs><circle cx="50" cy="50" r="46" fill="url(#pg)" stroke="#ffd700" stroke-width="2.5"/><circle cx="50" cy="50" r="38" fill="none" stroke="#ffd700" stroke-width="0.8" opacity="0.6"/><text x="50" y="62" text-anchor="middle" font-size="36" font-weight="bold" fill="#fff7e6" font-family="serif" stroke="#7a1212" stroke-width="0.8">車</text>',
+    '<defs><radialGradient id="pg" cx="50%" cy="40%"><stop offset="0%" stop-color="#f5e6c8"/><stop offset="60%" stop-color="#8d6e63"/><stop offset="100%" stop-color="#3e2723"/></radialGradient></defs><circle cx="50" cy="50" r="46" fill="url(#pg)" stroke="#ffd700" stroke-width="2.5"/><circle cx="50" cy="50" r="38" fill="none" stroke="#ffd700" stroke-width="0.8" opacity="0.6"/><text x="50" y="62" text-anchor="middle" font-size="36" font-weight="bold" fill="#f5e6c8" font-family="serif" stroke="#1a0d06" stroke-width="1">馬</text>'
+  ];
+  slots.forEach((slot, i) => {
+    slot.addEventListener('click', () => {
+      slots.forEach(s => s.classList.remove('selected'));
+      slot.classList.add('selected');
+      const svg = previewBox.querySelector('svg');
+      if (svg) svg.innerHTML = previews[i];
+    });
+  });
+  const wraps = document.querySelectorAll('.input-wrap');
+  wraps.forEach(w => {
+    w.addEventListener('click', () => {
+      wraps.forEach(x => x.classList.remove('focused'));
+      w.classList.add('focused');
+    });
+  });
+</script>
+</body>
+</html>

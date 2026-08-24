@@ -81,7 +81,8 @@ elseif (APPLE)
 endif()
 endmacro()
 
-# 添加macOS资源文件夹, app为可执行文件名, res_path为资源路径, res_name为资源名
+# 添加macOS/iOS资源文件夹, app为可执行文件名, res_path为资源路径, res_name为资源名
+# 统一安装到 .app/<res_name>/ 下，macOS和iOS使用相同的相对路径
 macro(add_macos_res_folder app res_path res_name)
 if (APPLE)
 # 添加整个文件夹作为资源
@@ -91,7 +92,14 @@ foreach(file ${DATA_FILES})
     target_sources(${app} PRIVATE ${file})
     file(RELATIVE_PATH relative_file "${res_path}" "${file}")
     get_filename_component(relative_dir ${relative_file} DIRECTORY)
-    set_source_files_properties(${file} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/${res_name}/${relative_dir})
+    # 使用 post-build copy 统一安装到 .app/<res_name>/<relative_dir>/，
+    # 避免 MACOSX_PACKAGE_LOCATION 在 macOS(Contents/Resources/) 和 iOS(根目录) 的路径差异
+    set(_dest_dir "$<TARGET_BUNDLE_DIR:${app}>/${res_name}/${relative_dir}")
+    add_custom_command(TARGET ${app} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${_dest_dir}"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${file}" "${_dest_dir}/"
+        COMMENT "Copying ${file} to ${app} bundle"
+    )
 endforeach()
 
 endif(APPLE)
@@ -186,11 +194,15 @@ macro(add_macos_res_file app res_file dest_path)
     if(APPLE)
         message(STATUS "Adding resource file: ${res_file}")
         target_sources(${app} PRIVATE ${res_file})
-        set_source_files_properties(${res_file} 
-            PROPERTIES 
-            MACOSX_PACKAGE_LOCATION "Resources/${dest_path}"
+        # 使用 post-build copy 统一安装到 .app/<dest_path>/，
+        # 避免 MACOSX_PACKAGE_LOCATION 在 macOS(Contents/Resources/) 和 iOS(根目录) 的路径差异
+        add_custom_command(TARGET ${app} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E make_directory
+                "$<TARGET_BUNDLE_DIR:${app}>/${dest_path}"
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${res_file}" "$<TARGET_BUNDLE_DIR:${app}>/${dest_path}/"
+            COMMENT "Copying ${res_file} to ${app} bundle"
         )
-
     endif()
 endmacro()
 
@@ -300,7 +312,8 @@ macro(add_app_res_folder_with_deps app_name res_path dest_path)
     endforeach()
 endmacro()
 
-# 添加macOS资源文件夹，能检测文件变化, app为可执行文件名, res_path为资源路径, res_name为资源名
+# 添加macOS/iOS资源文件夹，能检测文件变化, app为可执行文件名, res_path为资源路径, res_name为资源名
+# 统一安装到 .app/<res_name>/ 下，macOS和iOS使用相同的相对路径
 macro(add_macos_res_folder_with_deps app res_path res_name)
 if (APPLE)
     # 添加整个文件夹作为资源
@@ -310,10 +323,15 @@ if (APPLE)
         target_sources(${app} PRIVATE ${file})
         file(RELATIVE_PATH relative_file "${res_path}" "${file}")
         get_filename_component(relative_dir ${relative_file} DIRECTORY)
-        set_source_files_properties(${file} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/${res_name}/${relative_dir})
-        # 添加对文件的依赖，确保文件变化时重新构建
-        set_source_files_properties(${file} PROPERTIES 
-            OBJECT_DEPENDS ${file})
+        # 使用 post-build copy 统一安装到 .app/<res_name>/<relative_dir>/，
+        # 避免 MACOSX_PACKAGE_LOCATION 在 macOS(Contents/Resources/) 和 iOS(根目录) 的路径差异
+        set(_dest_dir "$<TARGET_BUNDLE_DIR:${app}>/${res_name}/${relative_dir}")
+        add_custom_command(TARGET ${app} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E make_directory "${_dest_dir}"
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different "${file}" "${_dest_dir}/"
+            COMMENT "Copying ${file} to ${app} bundle"
+            DEPENDS ${file}
+        )
     endforeach()
 
 endif(APPLE)

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 100 100">
+  <circle cx="50" cy="50" r="46" fill="none" stroke="#1a1a1a" stroke-width="2.5" opacity="0.12"/>
+  <circle cx="50" cy="50" r="38" fill="none" stroke="#1a1a1a" stroke-width="0.8" opacity="0.10"/>
+  <text x="50" y="64" text-anchor="middle" font-size="44" font-weight="bold" fill="#1a1a1a" font-family="serif" opacity="0.12">馬</text>
+</svg>

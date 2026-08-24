@@ -60,8 +60,7 @@ void SPropertyItemColor::SetValue(const SStringT &strValue)
     if (m_crValue != crTmp)
     {
         m_crValue = crTmp;
-        SStringT value = SStringT().Format(m_strFormat.c_str(), GetRValue(m_crValue), GetGValue(m_crValue), GetBValue(m_crValue), GetAValue(m_crValue));
-        __baseCls::SetValue(value);
+        __baseCls::SetValue(strValue);
     }
 }
 

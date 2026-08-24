@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+  <!-- 右上角花：X 镜像版本 -->
+  <path d="M98 2 L98 40" fill="none" stroke="#ffd700" stroke-width="3" stroke-linecap="round"/>
+  <path d="M98 2 L60 2" fill="none" stroke="#ffd700" stroke-width="3" stroke-linecap="round"/>
+  <path d="M98 2 L76 2 L98 24 Z" fill="#ffd700" opacity="0.55"/>
+</svg>

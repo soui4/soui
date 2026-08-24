@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <skin>
     <imgframe name="skin_item_bk" src="svg:lobby_table_bk" states="3" margin="5,5,5,5"/>
     <imglist name="skin_table" src="svg:chess_table"/>
@@ -10,12 +10,50 @@
     <imglist name="skin_cnchess_logo" src="svg:cnchess_logo"/>
     <!-- 登录界面背景装饰 -->
     <imgframe name="skin_login_bg" src="svg:login_bg" margin="10,10,10,10"/>
-    <!-- 登录按钮 -->
-    <imgframe name="btn_login" src="svg:btn_login" states="4" margin="8,8,8,8"/>
-    <!-- 输入框边框 -->
+    <!-- 登录面板背景(9-patch圆角木纹+边框) -->
+    <imgframe name="skin_login_panel" src="svg:login_panel_bg" margin="14,14,14,14"/>
+    <!-- 角花装饰 -->
+    <imglist name="skin_login_corner" src="svg:login_corner"/>
+    <imglist name="skin_login_corner_rtl" src="svg:login_corner_rtl"/>
+    <!-- 横向渐变金线 (3px高,顶部/底部装饰条) -->
+    <imgframe name="skin_login_gold_line" src="svg:login_gold_line" margin="0,0,0,0"/>
+    <!-- 金线分隔(1px高) -->
+    <imgframe name="skin_login_divider_line" src="svg:login_divider_line" margin="0,0,0,0"/>
+    <!-- 装饰圆点图标 -->
+    <imglist name="skin_login_deco_dot" src="svg:login_deco_dot"/>
+    <!-- 背景装饰棋子(半透明) -->
+    <imglist name="skin_bg_piece_ju" src="svg:bg_piece_ju"/>
+    <imglist name="skin_bg_piece_ma" src="svg:bg_piece_ma"/>
+    <imglist name="skin_bg_piece_pao" src="svg:bg_piece_pao"/>
+    <imglist name="skin_bg_piece_xiang" src="svg:bg_piece_xiang"/>
+    <!-- 新登录按钮 (4态: normal/hover/active/disabled, 无文字) -->
+    <imgframe name="btn_login" src="svg:login_btn_login" states="4" margin="7,2,7,4"/>
+    <!-- 输入框边框 (2态: normal/focus高亮背景) -->
     <imgframe name="skin_edit" src="svg:edit_border" states="2" margin="4,4,4,4"/>
+    <imgframe name="skin_edit_bg" src="svg:edit_bg" margin="4,4,4,4"/>
     <!-- 表单图标(服务器/用户/性别) -->
     <imglist name="skin_form_icons" src="svg:form_icons" states="3"/>
+    <!-- 小按钮 (本地/外部图片, 4态) -->
+    <imgframe name="skin_btn_small" src="svg:btn_small" states="4" margin="4,2,4,2"/>
+    <!-- 下拉列表按钮 (3态: normal/hover/pressed) -->
+    <imglist name="skin_dropbtn" src="svg:combobox_dropbtn" states="3"/>
+    <!-- 头像选择面板 (9patch 圆角8+边框+半透明底色) -->
+    <imgframe name="skin_avatar_section" src="svg:avatar_section_border" margin="9,9,9,9"/>
+    <!-- 圆形头像槽 (4态: normal/hover/selected/disabled) - 56x56 -->
+    <imgframe name="skin_avatar_slot" src="svg:avatar_slot" states="4" margin="4,4,4,4"/>
+    <!-- 头像预览外框 (金边圆形) 48x48 -->
+    <imglist name="skin_avatar_preview" src="svg:avatar_preview"/>
     <!-- 大厅座位 (6态: 红空/红占/红准备/黑空/黑占/黑准备) -->
     <imglist name="skin_seat" src="svg:seat_states" states="6"/>
+    <!-- 下拉列表项背景 (4态: normal/hover/selected/disabled) -->
+    <imgframe name="skin_list_item" src="svg:list_item" states="4" margin="5,2,2,2"/>
+    <!-- 进度条皮肤 -->
+    <imglist name="skin_progress_bg" src="svg:progress_bar"/>
+    <imglist name="skin_progress_pos" src="svg:progress_pos"/>
+    <!-- 内置头像皮肤 (ID对应BuiltinAvatar枚举值: 0=CHAIR, 1=MALE, 2=FEMALE, 3=AVATAR1, 4=AVATAR2) -->
+    <gif name="gif_avatar_builtin_0" src="gif:GIF_AVATAR_CHAIR"/>
+    <gif name="gif_avatar_builtin_1" src="gif:GIF_AVATAR_MALE"/>
+    <gif name="gif_avatar_builtin_2" src="gif:GIF_AVATAR_FEMALE"/>
+    <gif name="gif_avatar_builtin_3" src="gif:GIF_AVATAR_01"/>
+    <gif name="gif_avatar_builtin_4" src="gif:GIF_AVATAR_02"/>
 </skin>

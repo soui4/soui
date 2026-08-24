@@ -43,13 +43,14 @@ typedef struct tagGS_USERINFO
 	uint32_t uid;	//用户ID, login时分配
 	char szName[50];//玩家名称,utf8
 	int	nSex;		//性别
+	int nAvatarId;	//内置头像ID(>=0: 0=chair,1=male,2=female,3=24991,4=24993,5=myshow; <0:未设置或使用自定义二进制)
 }GS_USERINFO;
 
 
 //用户登录请求，上传用户信息及头像数据
 #define GMT_LOGIN_REQ			100
 typedef struct tagGAME_LOGIN_REQ : GS_USERINFO{
-	DWORD dwLen;
+	DWORD dwLen;	//头像二进制数据长度；为0时使用nAvatarId指定的内置头像
 	BYTE byData[1];
 }GAME_LOGIN_REQ;
 
@@ -149,6 +150,35 @@ typedef struct tagGAME_AVATAR_ACK
 
 //游戏桌内通知消息, utf8
 #define GMT_GAME_MSG			116
+
+//主题资源请求 (Client -> Server)
+#define GMT_THEME_REQ			117
+
+// 操作系统 ID，用于服务器下发不同平台主题资源包
+#define OS_ID_UNKNOWN	0	// 未知平台，回退到桌面主题
+#define OS_ID_WINDOWS	1	// Windows / macOS / Linux 桌面端
+#define OS_ID_ANDROID	2	// Android 移动端
+#define OS_ID_IOS		3	// iOS 移动端
+
+typedef struct tagTHEME_REQ {
+	BYTE  md5[16];	// 本地主题MD5，全0表示没有本地主题
+	DWORD dwOSId;	// 客户端操作系统ID（OS_ID_*），服务器据此下发对应平台主题
+} THEME_REQ;
+
+//主题资源应答 (Server -> Client)
+#define GMT_THEME_ACK			118
+typedef struct tagTHEME_ACK {
+	BYTE md5[16];		// 服务器主题MD5
+	DWORD dwTotalSize;	// 主题zip总大小，0表示MD5匹配无需下载
+} THEME_ACK;
+
+//主题资源数据块 (Server -> Client)
+#define GMT_THEME_DATA			119
+typedef struct tagTHEME_DATA {
+	DWORD dwOffset;		// 在zip中的偏移
+	DWORD dwDataLen;	// 数据长度
+	BYTE byData[1];		// 数据
+} THEME_DATA;
 
 //其它游戏的消息ID从GMT_GAMEBASE+1开始
 #define	GMT_GAMEBASE		1000

@@ -184,6 +184,15 @@ public:
     /** Play sound via Android platform (SoundPool/MediaPlayer). */
     BOOL playSound(LPCSTR pszSound, HMODULE hmod, DWORD fdwSound);
 
+    /** 获取临时目录路径（UTF-8）。委托 Java 层 getCacheDir() 实现。
+     *  返回值约定与 Win32 GetTempPathA 一致：成功为写入 lpBuffer 的字节数（含结尾 '\0"），失败/缓冲区不足返回 0 */
+    DWORD getTempPathA(DWORD nBufferLength, LPSTR lpBuffer);
+
+    /** 获取特殊文件夹路径（UTF-8）。委托 Java 层 getSpecialFolderPath(int) 实现。
+     *  语义与 Win32 SHGetSpecialFolderPathA 一致：nFolder 为 CSIDL_* 常量，fCreate 指示是否创建目录。
+     *  成功返回 TRUE 并将含结尾 '\0" 的路径写入 lpszPath，失败返回 FALSE */
+    BOOL getSpecialFolderPathA(HWND hwndOwner, LPSTR lpszPath, int nFolder, BOOL fCreate);
+
     bool getCursorPos(LPPOINT ppt) const{
         if(!ppt)
             return false;
@@ -244,6 +253,8 @@ private:
     jmethodID m_getInputDevicesMethod{nullptr};
     jmethodID m_showSoftKeyboard{nullptr};
     jmethodID m_playSoundMethod{nullptr};
+    jmethodID m_getTempPathMethod{nullptr};
+    jmethodID m_getSpecialFolderPathMethod{nullptr};
     jmethodID m_getSystemServiceMethod{nullptr};
     // Clipboard methods
     jmethodID m_clipboardOpenMethod{nullptr};

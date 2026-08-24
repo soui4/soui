@@ -1,14 +1,28 @@
 ﻿#include "stdafx.h"
 #include "ChessGame.h"
 #include "MainDlg.h"
+#if defined(SOUI_ANDROID) || defined(__IOS__)
+#include <core/SModalViewSession.h>
+#else
+#include "PeaceReqDlg.h"
+#include "PeaceAckDlg.h"
+#endif
 #include <helper/SFunctor.hpp>
 #include <cnchessProtocol.h>
 #include "CnchessSkin.h"
 #include "ChessPiece.h"
 #include "utils.h"
-#include "PeaceReqDlg.h"
-#include "PeaceAckDlg.h"
 #include <valueAnimator/SPropertyAnimator.h>
+
+namespace {
+    SSkinAni* GetBuiltinAvatarSkin(int nAvatarId, int scale)
+    {
+        if (nAvatarId < 0 || nAvatarId >= BuiltinAvatar::COUNT) return NULL;
+        SStringW strSkin;
+        strSkin.Format(L"gif_avatar_builtin_%d", nAvatarId);
+        return sobj_cast<SSkinAni>(GETSKIN(strSkin, scale));
+    }
+}
 #include <algorithm>
 #include <helper/slog.h>
 #define kLogTag "ChessGame"
@@ -42,7 +56,7 @@ POINT CChessGame::ChessAnchor2Pos(const AnchorPos &pos, const CRect &rcParent, c
         pt.x += pThis->m_cellWidth * pos.x.fSize;
         pt.y -= pThis->m_cellHeight * pos.y.fSize;
         pt.x += pos.fOffsetX * szChild.cx;
-        pt.y += pos.fOffsetY * szChild.cx;//
+        pt.y += pos.fOffsetY * szChild.cy;
         return pt;
     }
     else{
@@ -543,9 +557,14 @@ void CChessGame::Init(SWindow *pGameHost, WebSocketClient *pWs)
         m_pGameBoard->InsertChild(pAvatar);
 
         pAvatar->FindChildByName(L"txt_name")->SetWindowText(pMyProfile->GetName());
+        SGifPlayer *pGifSelf = pAvatar->FindChildByName2<SGifPlayer>(L"gif_avatar");
         if(pMyProfile->GetAvatarData()){
-            SGifPlayer *pGif = pAvatar->FindChildByName2<SGifPlayer>(L"gif_avatar");
-            pGif->LoadFromMemory((LPVOID)pMyProfile->GetAvatarData()->data(), pMyProfile->GetAvatarData()->size());
+            pGifSelf->LoadFromMemory((LPVOID)pMyProfile->GetAvatarData()->data(), pMyProfile->GetAvatarData()->size());
+        }else{
+            SSkinAni *pSelfSkin = GetBuiltinAvatarSkin(pMyProfile->GetAvatarId(), GetScale());
+            if (!pSelfSkin)
+                pSelfSkin = GetBuiltinAvatarSkin((pMyProfile->GetSex()==SEX_FEMALE)?BuiltinAvatar::FEMALE:BuiltinAvatar::MALE, GetScale());
+            if (pSelfSkin) pGifSelf->SetAniSkin(pSelfSkin);
         }
     }
     {
@@ -614,25 +633,77 @@ void CChessGame::OnBtnStart()
 
 void CChessGame::OnBtnReqPeace()
 {
+#if defined(SOUI_ANDROID) || defined(__IOS__)
+    SModalRoot *pModal = (SModalRoot*)SApplication::getSingleton().CreateWindowByName(SModalRoot::GetClassName());
+    pModal->InitFromResId("layout:dlg_peace_req_modal");
+
+    SEdit *pEdtDesc = pModal->FindChildByName2<SEdit>(L"edit_desc");
+
+    ModalViewSessionID session_id = m_pMainDlg->BeginModalViewSession(pModal,m_pMainDlg->getModalRoot());
+
+    pModal->FindChildByName(L"btn_ok")->SubscribeEvent(EventCmd::EventID, [=](IEvtArgs *e){
+        MSG_PEACE msg;
+        msg.iIndex = m_iSelfIndex;
+        SStringA strDesc = S_CT2A(pEdtDesc->GetWindowText(), CP_UTF8);
+        strcpy_s(msg.szMsg, 100, strDesc);
+        wsSendMsg(MSG_REQ_PEACE, &msg, sizeof(msg));
+        PlayTip(_T("已发送求和请求"));
+        m_pMainDlg->EndModalViewSession(session_id, IDOK);
+        return TRUE;
+    });
+
+    pModal->FindChildByName(L"btn_cancel")->SubscribeEvent(EventCmd::EventID, [=](IEvtArgs *e){
+        m_pMainDlg->EndModalViewSession(session_id, IDCANCEL);
+        return TRUE;
+    });
+#else
     CPeaceReqDlg dlg;
     if(dlg.DoModal(m_pMainDlg->m_hWnd) == IDOK){
         MSG_PEACE msg;
-        msg.iIndex = m_iSelfIndex; 
+        msg.iIndex = m_iSelfIndex;
         SStringA strDesc = S_CT2A(dlg.m_strDesc,CP_UTF8);
         strcpy_s(msg.szMsg,100,strDesc);
         wsSendMsg(MSG_REQ_PEACE, &msg, sizeof(msg));
         PlayTip(_T("已发送求和请求"));
     }
+#endif
 }
 
 void CChessGame::OnBtnReqSurrender()
 {
+#if defined(SOUI_ANDROID) || defined(__IOS__)
+    SModalRoot *pModal = (SModalRoot*)SApplication::getSingleton().CreateWindowByName(SModalRoot::GetClassName());
+    pModal->InitFromResId("layout:dlg_confirm_modal");
+
+    pModal->FindChildByName(L"txt_message")->SetWindowText(_T("确定要认输吗？"));
+
+    ModalViewSessionID session_id = m_pMainDlg->BeginModalViewSession(pModal,m_pMainDlg->getModalRoot());
+
+    pModal->FindChildByName(L"btn_ok")->SubscribeEvent(EventCmd::EventID, [=](IEvtArgs *e){
+        MSG_SURRENDER msg;
+        msg.iIndex = m_iSelfIndex;
+        wsSendMsg(MSG_REQ_SURRENDER, &msg, sizeof(msg));
+        PlayTip(_T("已发送投降请求"));
+        m_pMainDlg->EndModalViewSession(session_id, IDOK);
+        return TRUE;
+    });
+
+    pModal->FindChildByName(L"btn_cancel")->SubscribeEvent(EventCmd::EventID, [=](IEvtArgs *e){
+        m_pMainDlg->EndModalViewSession(session_id, IDCANCEL);
+        return TRUE;
+    });
+
+    pModal->SubscribeEvent(EventExitModalView::EventID, [=](IEvtArgs *e){
+        return TRUE;
+    });
+#else
     if(SMessageBox(m_pMainDlg->m_hWnd,_T("确定要认输吗？"),_T("提示"),MB_YESNO) == IDYES){
         MSG_SURRENDER msg;
-        msg.iIndex = m_iSelfIndex; 
+        msg.iIndex = m_iSelfIndex;
         wsSendMsg(MSG_REQ_SURRENDER, &msg, sizeof(msg));
         PlayTip(_T("已发送投降请求"));
     }
+#endif
 }
 
 void CChessGame::OnBtnReqRegret()
@@ -785,8 +856,7 @@ void CChessGame::OnTableInfo(IEvtArgs *e)
         if(!m_pUserInfo[j]){
             pAvatar->FindChildByName(L"txt_name")->SetWindowText(_T(""));
             pAvatar->FindChildByName(L"flag_ready")->SetVisible(FALSE, TRUE);
-            ISkinObj *pSkin = GETSKIN(L"gif_chair", GetScale());
-            SSkinAni *pAniSkin = sobj_cast<SSkinAni>(pSkin);
+            SSkinAni *pAniSkin = GetBuiltinAvatarSkin(BuiltinAvatar::CHAIR, GetScale());
             pGif->SetAniSkin(pAniSkin);
         }else if(j!=0)  //don't update self name and avatar
         {
@@ -799,11 +869,14 @@ void CChessGame::OnTableInfo(IEvtArgs *e)
                     pGif->SetUserData(m_pUserInfo[j]->uid);
                 }
             }else{
-                if(m_pUserInfo[j]->nSex == 1){
-                    pGif->SetAniSkin((SSkinAni*)GETSKIN(L"gif_avatar_female", GetScale()));
-                }else{
-                    pGif->SetAniSkin((SSkinAni*)GETSKIN(L"gif_avatar_male", GetScale()));
+                // 优先使用 nAvatarId 匹配内置头像
+                SSkinAni *pAniSkin = GetBuiltinAvatarSkin(m_pUserInfo[j]->nAvatarId, GetScale());
+                if (!pAniSkin)
+                {
+                    // 未设置头像ID时，按性别回退到默认
+                    pAniSkin = GetBuiltinAvatarSkin((m_pUserInfo[j]->nSex == SEX_FEMALE)? BuiltinAvatar::FEMALE : BuiltinAvatar::MALE, GetScale());
                 }
+                if (pAniSkin) pGif->SetAniSkin(pAniSkin);
             }
         }
         if(pTableInfo->tableState == TABLE_STATE_WAIT){
@@ -1152,11 +1225,40 @@ void CChessGame::OnReqPeace(const void *pData, int nSize){
     if(pPeace->iIndex == m_iSelfIndex)
         return;
     SLOGI() << "Peace request, desc: " << pPeace->szMsg;
+#if defined(SOUI_ANDROID) || defined(__IOS__)
+    SModalRoot *pModal = (SModalRoot*)SApplication::getSingleton().CreateWindowByName(SModalRoot::GetClassName());
+    pModal->InitFromResId("layout:dlg_peace_ack_modal");
+
+    SEdit *pEdtDesc = pModal->FindChildByName2<SEdit>(L"edit_desc");
+    pEdtDesc->SetWindowText(S_CA2T(pPeace->szMsg, CP_UTF8));
+
+    ModalViewSessionID session_id = m_pMainDlg->BeginModalViewSession(pModal,m_pMainDlg->getModalRoot());
+
+    pModal->FindChildByName(L"btn_ok")->SubscribeEvent(EventCmd::EventID, [=](IEvtArgs *e){
+        m_pMainDlg->EndModalViewSession(session_id, IDOK);
+        return TRUE;
+    });
+
+    pModal->FindChildByName(L"btn_cancel")->SubscribeEvent(EventCmd::EventID, [=](IEvtArgs *e){
+        m_pMainDlg->EndModalViewSession(session_id, IDCANCEL);
+        return TRUE;
+    });
+
+    pModal->SubscribeEvent(EventExitModalView::EventID, [=](IEvtArgs *e){
+        EventExitModalView *e2 = sobj_cast<EventExitModalView>(e);
+        MSG_PEACE msg;
+        msg.iIndex = m_iSelfIndex;
+        msg.nResult = (e2->exitCode == IDOK) ? 1 : 0;
+        wsSendMsg(MSG_ACK_PEACE, &msg, sizeof(msg));
+        return TRUE;
+    });
+#else
     CPeaceAckDlg ackDlg(pPeace->szMsg);
     MSG_PEACE msg;
-    msg.iIndex = m_iSelfIndex;  
+    msg.iIndex = m_iSelfIndex;
     msg.nResult = ackDlg.DoModal(m_pMainDlg->m_hWnd)==IDOK?1:0;
     wsSendMsg(MSG_ACK_PEACE, &msg, sizeof(msg));
+#endif
 }
 
 void CChessGame::OnAckPeace(const void *pData, int nSize)

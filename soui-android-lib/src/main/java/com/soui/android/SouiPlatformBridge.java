@@ -291,6 +291,68 @@ public class SouiPlatformBridge {
     public Context getContext(){
         return mContext;
     }
+
+    /**
+     * 获取应用临时目录路径（对应 Win32 GetTempPathA）。
+     * Android 无标准 /tmp，使用应用私有缓存目录 getCacheDir()，系统可在低内存时自动清理。
+     * @return 缓存目录绝对路径
+     */
+    @SuppressWarnings("unused") // 被 C++ AndroidPlatformAPI::getTempPathA 经由 JNI 调用
+    public String getTempPath() {
+        java.io.File cacheDir = mContext.getCacheDir();
+        return cacheDir == null ? null : cacheDir.getAbsolutePath();
+    }
+
+    // ---- CSIDL_* 常量（值与 Win32 shlobj.h 一致）----
+    private static final int CSIDL_PERSONAL        = 0x0005; // 文档目录
+    private static final int CSIDL_MYMUSIC          = 0x000d;
+    private static final int CSIDL_MYVIDEO          = 0x000e;
+    private static final int CSIDL_DESKTOPDIRECTORY = 0x0010;
+    private static final int CSIDL_APPDATA          = 0x001a; // 应用数据目录
+    private static final int CSIDL_LOCAL_APPDATA    = 0x001c; // 应用缓存目录
+    private static final int CSIDL_MYPICTURES       = 0x0027;
+    private static final int CSIDL_PROFILE          = 0x0028; // 用户主目录
+
+    /**
+     * 获取特殊文件夹路径（对应 Win32 SHGetSpecialFolderPathA）。
+     * 关键映射：CSIDL_LOCAL_APPDATA -> getCacheDir()（应用缓存目录，可被系统清理）。
+     * @param nFolder CSIDL_* 常量
+     * @return 目录绝对路径；context 未初始化或无对应项返回 null
+     */
+    @SuppressWarnings("unused") // 被 C++ AndroidPlatformAPI::getSpecialFolderPathA 经由 JNI 调用
+    public String getSpecialFolderPath(int nFolder) {
+        if (mContext == null) return null;
+        java.io.File dir;
+        switch (nFolder) {
+            case CSIDL_LOCAL_APPDATA:      // 应用缓存目录
+                dir = mContext.getCacheDir();
+                break;
+            case CSIDL_APPDATA:            // 应用数据目录
+                dir = mContext.getFilesDir();
+                break;
+            case CSIDL_PERSONAL:           // 文档目录（外部存储应用专属）
+                dir = mContext.getExternalFilesDir(null);
+                break;
+            case CSIDL_MYPICTURES:
+                dir = mContext.getExternalFilesDir(android.os.Environment.DIRECTORY_PICTURES);
+                break;
+            case CSIDL_MYMUSIC:
+                dir = mContext.getExternalFilesDir(android.os.Environment.DIRECTORY_MUSIC);
+                break;
+            case CSIDL_MYVIDEO:
+                dir = mContext.getExternalFilesDir(android.os.Environment.DIRECTORY_MOVIES);
+                break;
+            case CSIDL_DESKTOPDIRECTORY:    // Android 无桌面概念，回退到外部存储根
+                dir = mContext.getExternalFilesDir(null);
+                break;
+            case CSIDL_PROFILE:            // 用户主目录（应用数据根）
+                dir = mContext.getFilesDir().getParentFile();
+                break;
+            default:
+                return null;
+        }
+        return dir == null ? null : dir.getAbsolutePath();
+    }
     /** 获取单例实例。使用前必须先调用 init()。 */
     public static SouiPlatformBridge getInstance() {
         if (sInstance == null) {

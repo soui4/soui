@@ -223,7 +223,8 @@ void SResProvider7Zip::EnumFile(THIS_ EnumFileCallback funEnumCB, LPARAM lp)
 	unsigned int pos = m_zipFile->GetFirstFilePos();
 	while(!m_zipFile->Eof(pos)){
 		std::string name = m_zipFile->GetFileName(pos);
-		SStringT str = S_CA2T(name.c_str());
+		SStringW strW = S_CA2W(name.c_str(),CP_UTF8);
+		SStringT str = S_CW2T(strW,CP_ACP);
 		if(!funEnumCB(str.c_str(),lp))
 			break;
 		pos = m_zipFile->GetNextFilePos(pos);

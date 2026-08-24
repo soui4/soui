@@ -1,4 +1,4 @@
-﻿//stamp:129ff3fa941b2837
+﻿//stamp:147e080ffdfcf259
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -16,6 +16,7 @@
 			const TCHAR * page_about;
 			const TCHAR * dlg_peace_req;
 			const TCHAR * dlg_peace_ack;
+			const TCHAR * dlg_theme_progress;
 			}LAYOUT;
 		struct _values{
 			const TCHAR * string;
@@ -33,6 +34,13 @@
 			const TCHAR * PNG_MUTE;
 			const TCHAR * PNG_UNMUTE;
 			}image;
+		struct _gif{
+			const TCHAR * GIF_AVATAR_CHAIR;
+			const TCHAR * GIF_AVATAR_MALE;
+			const TCHAR * GIF_AVATAR_FEMALE;
+			const TCHAR * GIF_AVATAR_01;
+			const TCHAR * GIF_AVATAR_02;
+			}gif;
 		struct _svg{
 			const TCHAR * btn_primary;
 			const TCHAR * btn_login;
@@ -44,6 +52,27 @@
 			const TCHAR * chess_table;
 			const TCHAR * playing_icon;
 			const TCHAR * seat_states;
+			const TCHAR * progress_bar;
+			const TCHAR * progress_pos;
+			const TCHAR * login_panel_bg;
+			const TCHAR * login_corner;
+			const TCHAR * login_corner_rtl;
+			const TCHAR * login_divider;
+			const TCHAR * login_btn_login;
+			const TCHAR * login_gold_line;
+			const TCHAR * login_divider_line;
+			const TCHAR * login_deco_dot;
+			const TCHAR * bg_piece_ju;
+			const TCHAR * bg_piece_ma;
+			const TCHAR * bg_piece_pao;
+			const TCHAR * bg_piece_xiang;
+			const TCHAR * avatar_section_border;
+			const TCHAR * avatar_slot;
+			const TCHAR * avatar_preview;
+			const TCHAR * btn_small;
+			const TCHAR * combobox_dropbtn;
+			const TCHAR * edit_bg;
+			const TCHAR * list_item;
 			}svg;
 	};
 #endif//_UIRES_H_
@@ -60,6 +89,7 @@ struct _UIRES UIRES={
 			_T("LAYOUT:page_about"),
 			_T("LAYOUT:dlg_peace_req"),
 			_T("LAYOUT:dlg_peace_ack"),
+			_T("LAYOUT:dlg_theme_progress"),
 		},
 		{
 			_T("values:string"),
@@ -78,6 +108,13 @@ struct _UIRES UIRES={
 			_T("image:PNG_UNMUTE"),
 		},
 		{
+			_T("gif:GIF_AVATAR_CHAIR"),
+			_T("gif:GIF_AVATAR_MALE"),
+			_T("gif:GIF_AVATAR_FEMALE"),
+			_T("gif:GIF_AVATAR_01"),
+			_T("gif:GIF_AVATAR_02"),
+		},
+		{
 			_T("svg:btn_primary"),
 			_T("svg:btn_login"),
 			_T("svg:cnchess_logo"),
@@ -88,6 +125,27 @@ struct _UIRES UIRES={
 			_T("svg:chess_table"),
 			_T("svg:playing_icon"),
 			_T("svg:seat_states"),
+			_T("svg:progress_bar"),
+			_T("svg:progress_pos"),
+			_T("svg:login_panel_bg"),
+			_T("svg:login_corner"),
+			_T("svg:login_corner_rtl"),
+			_T("svg:login_divider"),
+			_T("svg:login_btn_login"),
+			_T("svg:login_gold_line"),
+			_T("svg:login_divider_line"),
+			_T("svg:login_deco_dot"),
+			_T("svg:bg_piece_ju"),
+			_T("svg:bg_piece_ma"),
+			_T("svg:bg_piece_pao"),
+			_T("svg:bg_piece_xiang"),
+			_T("svg:avatar_section_border"),
+			_T("svg:avatar_slot"),
+			_T("svg:avatar_preview"),
+			_T("svg:btn_small"),
+			_T("svg:combobox_dropbtn"),
+			_T("svg:edit_bg"),
+			_T("svg:list_item"),
 		},
 	};
 #else
@@ -98,6 +156,11 @@ extern struct _UIRES UIRES;
 #define _R_H_
 struct _R{
 	struct _name{
+		 const wchar_t * btn_avatar_1;
+		 const wchar_t * btn_avatar_2;
+		 const wchar_t * btn_avatar_3;
+		 const wchar_t * btn_avatar_4;
+		 const wchar_t * btn_avatar_ext;
 		 const wchar_t * btn_close;
 		 const wchar_t * btn_login;
 		 const wchar_t * btn_max;
@@ -113,7 +176,9 @@ struct _R{
 		 const wchar_t * edt_name;
 		 const wchar_t * edt_svr;
 		 const wchar_t * game_container;
+		 const wchar_t * gp_preview;
 		 const wchar_t * img_playing;
+		 const wchar_t * progress_bar;
 		 const wchar_t * room_container;
 		 const wchar_t * seat_0;
 		 const wchar_t * seat_1;
@@ -141,6 +206,11 @@ struct _R{
 		 const wchar_t * txt_website;
 	}name;
 	struct _id{
+		int btn_avatar_1;
+		int btn_avatar_2;
+		int btn_avatar_3;
+		int btn_avatar_4;
+		int btn_avatar_ext;
 		int btn_close;
 		int btn_login;
 		int btn_max;
@@ -156,7 +226,9 @@ struct _R{
 		int edt_name;
 		int edt_svr;
 		int game_container;
+		int gp_preview;
 		int img_playing;
+		int progress_bar;
 		int room_container;
 		int seat_0;
 		int seat_1;
@@ -188,6 +260,16 @@ struct _R{
 		int blue;
 		int gray;
 		int green;
+		int login_avatar_border;
+		int login_border;
+		int login_gold;
+		int login_gold_dark;
+		int login_gold_light;
+		int login_input_bg;
+		int login_panel;
+		int login_panel_dark;
+		int login_text;
+		int login_text_sub;
 		int mask_select;
 		int red;
 		int white;
@@ -210,6 +292,11 @@ struct _R{
 #ifdef INIT_R_DATA
 struct _R R={
 	{
+		L"btn_avatar_1",
+		L"btn_avatar_2",
+		L"btn_avatar_3",
+		L"btn_avatar_4",
+		L"btn_avatar_ext",
 		L"btn_close",
 		L"btn_login",
 		L"btn_max",
@@ -225,7 +312,9 @@ struct _R R={
 		L"edt_name",
 		L"edt_svr",
 		L"game_container",
+		L"gp_preview",
 		L"img_playing",
+		L"progress_bar",
 		L"room_container",
 		L"seat_0",
 		L"seat_1",
@@ -254,47 +343,54 @@ struct _R R={
 	}
 	,
 	{
-		65542,
 		65547,
+		65548,
+		65549,
+		65550,
+		65552,
+		65542,
+		65553,
 		65540,
 		65539,
 		65537,
 		65541,
 		65544,
-		65559,
+		65565,
 		65538,
 		65546,
-		65558,
-		65574,
+		65564,
+		65580,
 		65545,
 		65543,
-		65557,
-		65552,
-		65548,
+		65563,
+		65551,
+		65558,
+		65581,
+		65554,
 		10,
 		11,
-		65550,
-		65563,
-		65562,
-		65568,
-		65573,
-		65560,
-		65571,
-		65561,
-		65549,
-		65566,
-		65567,
-		65565,
-		65564,
-		65569,
-		65553,
-		65554,
-		65555,
-		65551,
 		65556,
+		65569,
+		65568,
+		65574,
+		65579,
+		65566,
+		65577,
+		65567,
+		65555,
 		65572,
+		65573,
+		65571,
+		65570,
+		65575,
+		65559,
+		65560,
+		65561,
+		65557,
+		65562,
+		65578,
 		65536,
-		65570
+		65576
 	}
 	,
 	{
@@ -304,7 +400,17 @@ struct _R R={
 		3,
 		4,
 		5,
-		6
+		6,
+		7,
+		8,
+		9,
+		10,
+		11,
+		12,
+		13,
+		14,
+		15,
+		16
 	}
 	,
 	{

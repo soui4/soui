@@ -58,7 +58,7 @@ protected:
     BOOL ClientLogin(PWSCLIENT pClient, LPVOID pData, DWORD dwSize);
     BOOL ClientSeatDown(PWSCLIENT pClient, LPVOID pData, DWORD dwSize);
 	BOOL ClientGetUp(PWSCLIENT pClient, LPVOID pData, DWORD dwSize);
-	
+	BOOL ClientThemeReq(PWSCLIENT pClient, LPVOID pData, DWORD dwSize);
 
     BOOL OnQuerySeat(SeatID *pSeatID);
 	BOOL OnMsg(PWSCLIENT pClient, DWORD dwType, LPVOID pData, DWORD dwSize);

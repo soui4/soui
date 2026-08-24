@@ -1017,8 +1017,8 @@ void STreeView::UpdateScrollBar()
 
 void STreeView::UpdateVisibleItems()
 {
-    if (!m_adapter)
-        return;
+	if (!m_adapter || !GetContainer())
+		return;
     SAutoEnableHostPrivUiDef enableUiDef(this);
     HSTREEITEM hItem = m_tvItemLocator->Position2Item(m_siVer.nPos);
     if (hItem == ITEM_NULL)
@@ -1178,14 +1178,11 @@ void STreeView::OnItemSetCapture(SOsrPanel *pItem, BOOL bCapture)
     {
         GetContainer()->OnSetSwndCapture(m_swnd);
         m_itemCapture = pItem;
-        if (IsItemDragScrollEnabled())
-            StartDragPending(CPoint(0, 0));
     }
     else
     {
         GetContainer()->OnReleaseSwndCapture();
         m_itemCapture = NULL;
-        SetDragPending(FALSE);
     }
 }
 
@@ -1368,16 +1365,10 @@ LRESULT STreeView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
                 SItemPanel *pSelItem = GetItemPanel(m_hSelected);
                 if (pSelItem)
                     pSelItem->DoFrameEvent(WM_KILLFOCUS, 0, 0);
-                // m_hSelected = NULL;
+                m_hSelected = NULL;
             }
 
             __baseCls::ProcessSwndMessage(uMsg, wParam, lParam, lRet);
-
-            // Start drag tracking on blank space
-            if (uMsg == WM_LBUTTONDOWN && pPanel == NULL && IsItemDragScrollEnabled())
-            {
-                StartDragPending(pt);
-            }
         }
 
         SOsrPanel *pHover = HitTest(pt);

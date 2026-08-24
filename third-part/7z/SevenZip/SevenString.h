@@ -22,7 +22,7 @@ namespace SevenZip
 }
 namespace SevenZip
 {
-	std::string ToPathNativeStr(const std::wstring& str);
+	std::string ToPathUtf8(const std::wstring& str);
 
 	std::string ToString(const std::wstring& wstring, int cp=CP_ACP);
 	std::wstring ToWstring(const std::string& string, int cp=CP_ACP);

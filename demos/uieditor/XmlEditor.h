@@ -27,7 +27,7 @@ SNSBEGIN
 		// 打开工程
 		void SetProjectPath(const SStringT & strProjPath);
         BOOL LoadXml(SStringT strFileName, SStringT layoutName);   //加载布局
-		BOOL CloseXml();
+		BOOL CloseXml(BOOL bCloseProject=FALSE);
 		void Reload(); // 重新加载xml文件
 		bool SaveFile();
 		bool isValidXml();

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+  <defs>
+    <radialGradient id="blkPiece5" cx="50%" cy="40%">
+      <stop offset="0%" stop-color="#f5e6c8"/>
+      <stop offset="60%" stop-color="#8d6e63"/>
+      <stop offset="100%" stop-color="#3e2723"/>
+    </radialGradient>
+  </defs>
+  <circle cx="50" cy="50" r="46" fill="url(#blkPiece5)" stroke="#ffd700" stroke-width="3"/>
+  <circle cx="50" cy="50" r="38" fill="none" stroke="#ffd700" stroke-width="1" opacity="0.6"/>
+  <text x="50" y="62" text-anchor="middle" font-size="36" font-weight="bold" fill="#f5e6c8" font-family="serif" stroke="#1a0d06" stroke-width="1.2">馬</text>
+</svg>

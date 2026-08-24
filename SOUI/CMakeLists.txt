@@ -1,5 +1,3 @@
-
-
 add_definitions(-DSOUI_EXPORTS -D_CRT_SECURE_NO_WARNINGS)
 
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
@@ -14,6 +12,10 @@ add_definitions(-DENABLE_THUNK=1)
 else()
 message("---disable thunk in soui")
 add_definitions(-DENABLE_THUNK=0)
+endif()
+
+if(CMAKE_SYSTEM_NAME MATCHES "iOS|Android")
+    add_definitions(-DDISABLE_TOOLTIP)
 endif()
 
 set(SOUI_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/..")

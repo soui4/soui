@@ -38,13 +38,13 @@ class SLogBinary {
      * @param buf 二进制数据缓冲区
      * @param len 二进制数据长度
      */
-    SLogBinary(const char *buf, int len)
+    SLogBinary(const void *buf, int len)
         : _buf(buf)
         , _len(len)
     {
     }
 
-    const char *_buf; ///< 二进制数据缓冲区
+    const void *_buf; ///< 二进制数据缓冲区
     int _len;         ///< 二进制数据长度
 };
 
@@ -86,6 +86,7 @@ class UTILITIES_API SLogStream {
 
     SLogStream &operator<<(const RECT &rc);
     SLogStream &operator<<(const POINT &pt);
+    SLogStream &operator<<(const SIZE &sz);
     /**
      * @brief 格式化输出日志
      * @param format 格式字符串

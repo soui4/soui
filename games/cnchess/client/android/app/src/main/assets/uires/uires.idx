@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resource>
+  <UIDEF>
+    <file name="XML_INIT" path="uidef\init.xml"/>
+  </UIDEF>
+  <LAYOUT>
+    <file name="XML_MAINWND" path="xml\dlg_main.xml"/>
+    <file name="page_lobby" path="xml\page_lobby.xml"/>
+    <file name="page_game" path="xml\page_game.xml"/>
+    <file name="page_about" path="xml\page_about.xml"/>
+    <file name="dlg_peace_req_modal" path="xml\dlg_peace_req_modal.xml"/>
+    <file name="dlg_peace_ack_modal" path="xml\dlg_peace_ack_modal.xml"/>
+    <file name="dlg_login_modal" path="xml\dlg_login_modal.xml"/>
+    <file name="dlg_confirm_modal" path="xml\dlg_confirm_modal.xml"/>
+    <file name="dlg_theme_progress" path="xml\dlg_theme_progress.xml"/>
+  </LAYOUT>
+  <values>
+    <file name="string" path="values\string.xml"/>
+    <file name="color" path="values\color.xml"/>
+    <file name="skin" path="values\skin.xml"/>
+  </values>
+  <ICON>
+    <file name="ICON_LOGO" path="icon\logo.ico"/>
+  </ICON>
+  <image>
+    <file name="PNG_TABLE" path="image\table.png"/>
+    <file name="PNG_ITEM_BK" path="image\item_bk.png"/>"
+    <file name="PNG_HANDUP" path="image\handup.png"/>"
+    <file name="PNG_PLAYING" path="image\playing.png"/>
+    <file name="PNG_MUTE" path="image\mute.png"/>
+    <file name="PNG_UNMUTE" path="image\unmute.png"/>
+  </image>
+  <anim>
+    <file name="modal_in" path="anim\modal_in.xml"/>
+    <file name="modal_out" path="anim\modal_out.xml"/>
+    <file name="modal_up_in" path="anim\modal_up_in.xml"/>
+    <file name="modal_up_out" path="anim\modal_up_out.xml"/>
+  </anim>
+  <gif>
+    <file name="GIF_AVATAR_CHAIR" path="avatar\chair.gif"/>
+    <file name="GIF_AVATAR_MALE" path="avatar\male.gif"/>
+    <file name="GIF_AVATAR_FEMALE" path="avatar\female.gif"/>
+    <file name="GIF_AVATAR_01" path="avatar\24991.gif"/>
+    <file name="GIF_AVATAR_02" path="avatar\24993.gif"/>
+  </gif>
+  <svg>
+    <file name="btn_primary" path="svg\btn_primary.svg"/>
+    <file name="btn_login" path="svg\btn_login.svg"/>
+    <file name="cnchess_logo" path="svg\cnchess_logo.svg"/>
+    <file name="edit_border" path="svg\edit_border.svg"/>
+    <file name="form_icons" path="svg\form_icons.svg"/>
+    <file name="login_bg" path="svg\login_bg.svg"/>
+    <file name="lobby_table_bk" path="svg\lobby_table_bk.svg"/>
+    <file name="chess_table" path="svg\chess_table.svg"/>
+    <file name="playing_icon" path="svg\playing_icon.svg"/>
+    <file name="seat_states" path="svg\seat_states.svg"/>
+    <file name="tab_bg" path="svg\tab_bg.svg"/>
+    <file name="progress_bar" path="svg\progress_bar.svg"/>
+    <file name="progress_pos" path="svg\progress_pos.svg"/>
+
+    <file name="list_item" path="svg\list_item.svg"/>
+  </svg>
+</resource>

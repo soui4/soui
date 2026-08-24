@@ -6,6 +6,8 @@
 #include <map>
 #include <helper/slog.h>
 #include <soui4android.h>
+#include <sys/stat.h>
+#include <string.h>
 #define kLogTag "AndroidPlatformAPI"
 
 using namespace SNS;
@@ -82,10 +84,8 @@ void AndroidPlatformAPI::init(JNIEnv *env, jobject bridge, jobject ctx) {
         m_getInputDevicesMethod = env->GetMethodID(clsBridge, "getInputDevices", "()[[Ljava/lang/String;");
         m_showSoftKeyboard = env->GetMethodID(clsBridge, "showSoftKeyboard", "(Landroid/view/View;Z)Z");
         m_playSoundMethod = env->GetMethodID(clsBridge, "playSound", "(Ljava/lang/String;I)Z");
-        if (!m_playSoundMethod) {
-            SLOGE()<<"init: failed to resolve SouiPlatformBridge.playSound";
-            ClearEx(env);
-        }
+        m_getTempPathMethod = env->GetMethodID(clsBridge, "getTempPath", "()Ljava/lang/String;");
+        m_getSpecialFolderPathMethod = env->GetMethodID(clsBridge, "getSpecialFolderPath", "(I)Ljava/lang/String;");
         // Clipboard methods
         m_clipboardOpenMethod = env->GetMethodID(clsBridge, "clipboardOpen", "(J)Z");
         m_clipboardCloseMethod = env->GetMethodID(clsBridge, "clipboardClose", "()Z");
@@ -173,6 +173,8 @@ void AndroidPlatformAPI::deinit() {
     m_setFocusMethod = m_getFocusMethod = nullptr;
     m_postMessageMethod = nullptr;
     m_playSoundMethod = nullptr;
+    m_getTempPathMethod = nullptr;
+    m_getSpecialFolderPathMethod = nullptr;
     m_nativeSendMessageMethod = nullptr;
     m_nwDestroy = m_nwInvalidate = m_nwShow = m_nwMove = m_nwSetSize = m_nwSetPosition = nullptr;
     m_nwIsVisible = m_nwEnable = m_nwIsEnabled = m_nwGetWindow = m_nwAsView = nullptr;
@@ -1261,6 +1263,67 @@ BOOL AndroidPlatformAPI::playSound(LPCSTR pszSound, HMODULE hmod, DWORD fdwSound
     jboolean ret = env->CallBooleanMethod(m_javaBridge, m_playSoundMethod, jSound, (jint)fdwSound);
     env->DeleteLocalRef(jSound);
     return ret;
+}
+
+DWORD AndroidPlatformAPI::getTempPathA(DWORD nBufferLength, LPSTR lpBuffer) {
+    JNIEnv *env = getJNIEnv();
+    if (!env || !m_javaBridge || !m_getTempPathMethod || !lpBuffer) {
+        return 0;
+    }
+    jstring jPath = (jstring) env->CallObjectMethod(m_javaBridge, m_getTempPathMethod);
+    if (env->ExceptionCheck()) {
+        env->ExceptionClear();
+    }
+    if (!jPath) {
+        return 0;
+    }
+    DWORD nRet = 0;
+    const char *path = env->GetStringUTFChars(jPath, nullptr);
+    if (path) {
+        DWORD nLen = (DWORD)strlen(path) + 1; // 含结尾 '\0'
+        if (nBufferLength >= nLen) {
+            memcpy(lpBuffer, path, nLen);
+            nRet = nLen;
+        }
+        env->ReleaseStringUTFChars(jPath, path);
+    }
+    env->DeleteLocalRef(jPath);
+    return nRet;
+}
+
+BOOL AndroidPlatformAPI::getSpecialFolderPathA(HWND hwndOwner, LPSTR lpszPath, int nFolder, BOOL fCreate) {
+    JNIEnv *env = getJNIEnv();
+    if (!env || !m_javaBridge || !m_getSpecialFolderPathMethod || !lpszPath) {
+        return FALSE;
+    }
+    jstring jPath = (jstring) env->CallObjectMethod(m_javaBridge, m_getSpecialFolderPathMethod, (jint)nFolder);
+    if (env->ExceptionCheck()) {
+        env->ExceptionClear();
+    }
+    if (!jPath) {
+        return FALSE;
+    }
+    BOOL bRet = FALSE;
+    const char *path = env->GetStringUTFChars(jPath, nullptr);
+    if (path) {
+        size_t nLen = strlen(path) + 1; // 含结尾 '\0"
+        if (nLen <= MAX_PATH) {
+            memcpy(lpszPath, path, nLen);
+            bRet = TRUE;
+        }
+        env->ReleaseStringUTFChars(jPath, path);
+    }
+    env->DeleteLocalRef(jPath);
+    // Java 层返回的 getCacheDir()/getFilesDir() 等系统目录通常已存在；
+    // fCreate 为真时按 Win32 语义做幂等创建（兼容外部存储子目录场景）
+    if (bRet && fCreate) {
+        struct stat st;
+        if (stat(lpszPath, &st) != 0 || !S_ISDIR(st.st_mode)) {
+            if (0 != mkdir(lpszPath, 0755))
+                bRet = FALSE;
+        }
+    }
+    return bRet;
 }
 
 void AndroidPlatformAPI::executePendingTask() {

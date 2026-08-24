@@ -155,6 +155,12 @@ public:
      * @return 是否加载成功
      */
     BOOL Load(LPCTSTR pszThemeDir);
+
+    /**
+     * @brief 主题是否已加载
+     * @return 是否已成功加载
+     */
+    BOOL IsLoaded() const { return m_bLoaded; }
     
     /**
      * @brief 获取窗口部件
@@ -198,6 +204,7 @@ public:
     std::map<SStringW, SAutoRefPtr<IAnimation> > m_mapAnimations;            ///< 动画映射表
     SXmlDoc m_docTemplate;                                                   ///< 模板XML文档
     SXmlDoc m_docSounds;                                                     ///< 音效XML文档
+    BOOL m_bLoaded;                                                          ///< 是否已加载
 };
 
 SNSEND

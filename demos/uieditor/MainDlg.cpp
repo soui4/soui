@@ -337,7 +337,7 @@ bool CMainDlg::CloseProject()
 {
 	if(!CheckSave())
 		return false;
-	m_pXmlEdtior->CloseXml();
+	m_pXmlEdtior->CloseXml(TRUE);
 	m_pImageViewer->Clear();
 	m_pFileTreeAdapter->Clear();
 	m_UIResFileMgr.CloseProject();	

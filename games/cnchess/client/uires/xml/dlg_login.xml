@@ -1,33 +1,153 @@
-<?xml version="1.0" encoding="utf-8"?>
-<SOUI name="login" title="@string/login" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" margin="5,5,5,5"  resizable="1" wndType="normal"
-translucent="1" 
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SOUI name="login" title="@string/login" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" margin="1,1,1,1"  resizable="0" wndType="normal"
+translucent="1"
 >
-  <root skin="_skin.sys.wnd.bkgnd" cache="1"  width="300" height="-1" layout="vbox" padding="5,5,5,5" interval="5">
-    <caption size="-2,30" layout="hbox" interval="0" gravity="center">
-      <icon src="ICON_LOGO:16"/>
-      <text >@string/login</text>
-      <window size="0,0" weight="1"/>
-      <imgbtn name="btn_close" skin="_skin.sys.btn.close"     tip="close" animate="1"/>
-    </caption>
-    <window size="-2,-1" layout="gridlayout" columnCount="2" interval="5" gravity="fill">
-        <text text="服务器地址:"/>
-        <window layout="hbox" interval="5" gravity="center">        
-            <edit name="edt_svr" text="soui.com.cn:3311" columnWeight="1" margin="2"/>
-            <button name="btn_svr_local" size="50,30" text="本地"/>
-        </window>
-        <text text="用户名:"/>
-        <edit name="edt_name" text="张三" margin="2"/>
-        <text text="性别:"/>
-        <combobox name="cbx_sex" curSel="0" margin="2" ncskin="_skin.sys.border">
-          <items>
-            <item text="男" data="0"/>
-            <item text="女" data="1"/>
-            <item text="人妖" data="2"/>
-          </items>
-        </combobox>
-    </window>
-    <window size="-2,-1" layout="vbox" interval="5" gravity="right">
-        <button name="btn_login" size="80,30" text="登录"/>
-    </window>
-  </root>
+	<root skin="skin_login_panel" cache="1" width="460" height="540"
+		  layout="vbox" padding="0,0,0,2">
+		<img size="-2,3" skin="skin_login_divider_line"/>
+		<caption size="-2,0" weight="1">
+
+			<!--  2.a 四角半透明装饰棋子 (RELATIVE 2坐标定位)  -->
+			<img pos="14,10"   size="50,50" skin="skin_bg_piece_ju"/>
+			<!-- 左上 車 -->
+			<img pos="-64,10"  size="50,50" skin="skin_bg_piece_ma"/>
+			<!-- 右上 馬: x=-64 = 父宽 - 50 - 14 -->
+			<img pos="14,-74"  size="60,60" skin="skin_bg_piece_pao"/>
+			<!-- 左下 炮: y=-74 = 父高 - 60 - 14 -->
+			<img pos="-74,-74" size="60,60" skin="skin_bg_piece_xiang"/>
+			<!-- 右下 象 -->
+
+			<!--  2.b 主内容容器（RELATIVE 4坐标 铺满父）  -->
+			<caption pos="0,0,-0,-0" layout="vbox" interval="0">
+
+				<!-- 顶部渐变金线 (margin 左右各留 30) -->
+				<img size="-2,3" skin="skin_login_gold_line" margin="30,0,30,0"/>
+
+				<!-- ============ 主体 PADDING： 上28 右36 下32 左36  VBOX ============ -->
+				<caption size="-2,-1" padding="28,36,32,36" layout="vbox" interval="0">
+
+					<window size="-2,56" msgTransparent="1">
+						<img pos="0,0"   size="32,32" skin="skin_login_corner"/>
+						<img pos="-32,0"  size="32,32" skin="skin_login_corner_rtl"/>
+						<window pos="0,0,-0,-0" layout="vbox" interval="2" gravity="center">
+							<text text="开心象棋" font="size:26,bold" letterSpace="6"
+								  align="center" colorText="@color/login_gold"/>
+							<text text="CHINESE  CHESS  ·  智 者 之 战"
+								  font="size:11" align="center" colorText="@color/login_text_sub" />
+						</window>
+					</window>
+
+					<!--  2.b.2 分隔装饰 deco-row：HBOX 线性居中  -->
+					<window size="-2,28" layout="hbox" interval="12" gravity="center" padding="0,4,0,4"  msgTransparent="1">
+						<window size="0,0" weight="1"/>
+						<img size="60,1" skin="skin_login_divider_line"/>
+						<img size="22,22" skin="skin_login_deco_dot"/>
+						<img size="60,1" skin="skin_login_divider_line"/>
+						<window size="0,0" weight="1"/>
+					</window>
+
+					<!--  2.b.3 表单：GRIDLAYOUT 网格 (label 72 + 1fr 输入)  -->
+					<window size="-2,-1" layout="gridlayout"
+							columnCount="2" columnWidth="72,0" columnWeight="0,1"
+							interval="14,12" padding="0,2,0,18" gravity="fill">
+						<!-- 服务器 -->
+						<text text="服务器:" font="size:13" align="right" valign="center" colorText="@color/login_text_sub" width="72"/>
+						<window ncskin="skin_edit" skin="skin_edit_bg"  layout="hbox" interval="6" gravity="center" margin="2,2,2,2" columnWeight="1" height="32" trackMouseEvent="1">
+							<img size="18,18" skin="skin_form_icons" iconIndex="0" opacity="0.7"/>
+							<edit name="edt_svr" text="124.222.50.176:3311"
+								  size="0,-2" weight="1" colorText="@color/login_text" font="size:13" transparent="1"/>
+							<button name="btn_svr_local" size="50,26" text="本地"
+									font="size:11" colorText="@color/login_text_sub"
+									skin="skin_btn_small" animate="1"/>
+						</window>
+						<!-- 用户名 -->
+						<text text="用户名:" font="size:13" align="right" valign="center" colorText="@color/login_text_sub"/>
+						<window ncskin="skin_edit" skin="skin_edit_bg" layout="hbox" interval="6" gravity="center" margin="2,2,2,2"  height="32"  trackMouseEvent="1">
+							<img size="18,18" skin="skin_form_icons" iconIndex="1" opacity="0.7"/>
+							<edit name="edt_name" text="张三" size="0,-2" weight="1"
+								  colorText="@color/login_text" font="size:13" transparent="1"/>
+						</window>
+						<!-- 性别 -->
+						<text text="性别:" font="size:13" align="right" valign="center" colorText="@color/login_text_sub"/>
+						<window ncskin="skin_edit" skin="skin_edit_bg" layout="hbox" interval="6" gravity="center" margin="2,2,2,2"  height="32"  trackMouseEvent="1">
+							<img size="18,18" skin="skin_form_icons" iconIndex="2" opacity="0.7"/>
+							<combobox name="cbx_sex" curSel="0" size="0,-2" weight="1"
+									  colorText="@color/login_text" font="size:13" btnSkin="skin_dropbtn">
+								<liststyle itemSkin="skin_list_item" colorBorder="@color/login_border"
+										   colorText="@color/login_text" colorSelText="@color/login_gold"
+										   hotTrack="1" margin="2,2,2,2" text-x="6"/>
+								<items>
+									<item text="男" data="0"/>
+									<item text="女" data="1"/>
+									<item text="保密" data="2"/>
+								</items>
+							</combobox>
+						</window>
+					</window>
+
+					<!--  2.b.4 头像选择面板：VBOX + ncskin(圆角8+半透明底色)  -->
+					<window size="-2,-1" skin="skin_avatar_section"
+							padding="12,12,14,12" layout="vbox" interval="10">
+						<!-- 标题行：HBOX (圆点 + 文字 + 金线延伸至末端) -->
+						<window size="-2,-1" layout="hbox" interval="6" gravity="center">
+							<img size="14,14" skin="skin_login_deco_dot"/>
+							<text text="选择头像" colorText="@color/login_gold" font="size:12,bold" letterSpace="1"/>
+							<img size="0,1" weight="1" skin="skin_login_divider_line"/>
+						</window>
+						<!-- 5 个圆形头像槽：HBOX 居中, 间距 10 -->
+						<window size="-2,56" layout="hbox" interval="10" gravity="center">
+							<window size="0,0" weight="1"/>
+							<!-- 头像 1 (BuiltinAvatar 1 = MALE) -->
+							<window size="56,56" skin="skin_avatar_slot"
+									padding="7,7,7,7" layout="vbox" gravity="center">
+								<imgbtn name="btn_avatar_1" size="-2,-2"
+										skin="gif_avatar_builtin_1" tip="头像1" animate="1"/>
+							</window>
+							<!-- 头像 2 (BuiltinAvatar 2 = FEMALE) -->
+							<window size="56,56" skin="skin_avatar_slot"
+									padding="7,7,7,7" layout="vbox" gravity="center">
+								<imgbtn name="btn_avatar_2" size="-2,-2"
+										skin="gif_avatar_builtin_2" tip="头像2" animate="1"/>
+							</window>
+							<!-- 头像 3 (BuiltinAvatar 3 = AVATAR1) -->
+							<window size="56,56" skin="skin_avatar_slot"
+									padding="7,7,7,7" layout="vbox" gravity="center">
+								<imgbtn name="btn_avatar_3" size="-2,-2"
+										skin="gif_avatar_builtin_3" tip="头像3" animate="1"/>
+							</window>
+							<!-- 头像 4 (BuiltinAvatar 4 = AVATAR2) -->
+							<window size="56,56" skin="skin_avatar_slot"
+									padding="7,7,7,7" layout="vbox" gravity="center">
+								<imgbtn name="btn_avatar_4" size="-2,-2"
+										skin="gif_avatar_builtin_4" tip="头像4" animate="1"/>
+							</window>
+							<window size="0,0" weight="1"/>
+						</window>
+						<!-- 预览行：HBOX 居中 ("当前头像:" + 金边圆形预览框 + 外部图片按钮) -->
+						<window size="-2,-1" layout="hbox" interval="10" gravity="center">
+							<window size="0,0" weight="1"/>
+							<text text="当前头像:" colorText="@color/login_text_sub" font="size:12"/>
+							<window size="48,48" skin="skin_avatar_preview"
+									padding="6,6,6,6" layout="vbox" gravity="center">
+								<gifplayer name="gp_preview" size="-2,-2" skin="gif_avatar_builtin_1" mode="zoom"/>
+							</window>
+							<button name="btn_avatar_ext" size="100,30" text="外部图片..."
+									font="size:11" colorText="@color/login_text_sub"
+									skin="skin_btn_small" animate="1"/>
+							<window size="0,0" weight="1"/>
+						</window>
+					</window>
+
+					<!--  2.b.5 登录按钮 + 底部文字：VBOX  -->
+					<window size="-2,-1" layout="vbox" interval="14" gravity="center" padding="0,20,0,0">
+						<button name="btn_login" size="-2,42"  skin="btn_login" text="登 录" colorText="#fff7e6" font="size:15,bold"  animate="1"/>
+						<text text="点击登录，开启对弈之旅" font="size:11"
+							  align="center" colorText="@color/login_text_sub" opacity="0.7"/>
+					</window>
+
+				</caption>
+			</caption>
+		</caption>
+		<img size="-2,3" skin="skin_login_divider_line"/>
+	</root>
 </SOUI>

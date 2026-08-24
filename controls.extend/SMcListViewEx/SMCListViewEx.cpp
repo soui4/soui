@@ -749,7 +749,8 @@ void SMCListViewEx::onItemDataChanged(int iItem)
 
 	void SMCListViewEx::UpdateVisibleItems()
 	{
-		if (!m_adapter) return;
+		if (!m_adapter || !GetContainer())
+			return;
 		SAutoEnableHostPrivUiDef enableUiDef(this);
 		int iOldFirstVisible = m_iFirstVisible;
 		int iOldLastVisible = m_iFirstVisible + m_lstItems.GetCount();

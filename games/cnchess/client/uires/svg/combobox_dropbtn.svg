@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="16" viewBox="0 0 48 16">
+  <defs>
+    <linearGradient id="n" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="rgba(93,78,55,0.50)"/>
+      <stop offset="100%" stop-color="rgba(61,47,31,0.60)"/>
+    </linearGradient>
+    <linearGradient id="h" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="rgba(255,215,0,0.20)"/>
+      <stop offset="100%" stop-color="rgba(184,134,11,0.25)"/>
+    </linearGradient>
+    <linearGradient id="p" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="rgba(184,134,11,0.35)"/>
+      <stop offset="100%" stop-color="rgba(122,95,36,0.40)"/>
+    </linearGradient>
+  </defs>
+  <!-- State 1: Normal (0-16) -->
+  <g>
+    <rect x="0.5" y="0.5" width="15" height="15" rx="3" ry="3" fill="url(#n)" stroke="#5D4E37" stroke-width="0.8"/>
+    <path d="M4,6 L8,10 L12,6" stroke="#A89070" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <!-- State 2: Hover (16-32) -->
+  <g transform="translate(16,0)">
+    <rect x="0.5" y="0.5" width="15" height="15" rx="3" ry="3" fill="url(#h)" stroke="#FFD700" stroke-width="0.8" stroke-opacity="0.7"/>
+    <path d="M4,6 L8,10 L12,6" stroke="#FFD700" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <!-- State 3: Pressed (32-48) -->
+  <g transform="translate(32,0)">
+    <rect x="0.5" y="0.5" width="15" height="15" rx="3" ry="3" fill="url(#p)" stroke="#FFD700" stroke-width="0.8" stroke-opacity="0.9"/>
+    <path d="M4,7 L8,11 L12,7" stroke="#FFE45E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

@@ -333,7 +333,7 @@ BOOL SListView::OnScroll(BOOL bVertical, UINT uCode, int nPos)
 
 void SListView::UpdateVisibleItems()
 {
-    if (!m_adapter)
+    if (!m_adapter || ! GetContainer())
         return;
     SAutoEnableHostPrivUiDef enableUiDef(this);
     int iOldFirstVisible = m_iFirstVisible;
@@ -643,12 +643,6 @@ LRESULT SListView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
         }
 
         SItemPanel *pHover = HitTest(pt);
-
-        // Start drag tracking on blank space
-        if (uMsg == WM_LBUTTONDOWN && pHover == NULL && IsItemDragScrollEnabled() && (HasScrollBar(TRUE) || HasScrollBar(FALSE)))
-        {
-            StartDragPending(pt);
-        }
 
         if (pHover != m_pHoverItem)
         {

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+  <defs>
+    <radialGradient id="pvBg" cx="50%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#4a3723"/>
+      <stop offset="100%" stop-color="#2b1e11"/>
+    </radialGradient>
+    <radialGradient id="pvShade" cx="50%" cy="0%" r="70%">
+      <stop offset="0%" stop-color="rgba(0,0,0,0)"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,0.4)"/>
+    </radialGradient>
+  </defs>
+  <!-- 外金边 -->
+  <circle cx="24" cy="24" r="22.5" fill="url(#pvBg)" stroke="#ffd700" stroke-width="2.5"/>
+  <!-- 内细金线 -->
+  <circle cx="24" cy="24" r="18.5" fill="none" stroke="#ffd700" stroke-width="0.7" opacity="0.6"/>
+  <!-- 内阴影（上浅下深） -->
+  <circle cx="24" cy="24" r="22" fill="url(#pvShade)"/>
+</svg>

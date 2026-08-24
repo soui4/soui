@@ -12,6 +12,7 @@
 #include <sstream>
 #include "CnChess.h"
 #include "PropBag.h"
+#include "ThemeResourceProvider.h"
 #include <helper/slog.h>
 #define kLogTag "WebSocketGame"
 
@@ -561,6 +562,8 @@ BOOL CWebSocketGame::OnMsg(PWSCLIENT pClient, DWORD dwType, LPVOID pData, DWORD 
 		return ClientAvatar(pClient, pData, dwSize);
 	case GMT_READY:
 		return ClientReady(pClient, pData, dwSize);
+	case GMT_THEME_REQ:
+		return ClientThemeReq(pClient, pData, dwSize);
 	default:
 		{
 			//转发到游戏桌处理
@@ -772,5 +775,77 @@ BOOL CWebSocketGame::ClientReady(PWSCLIENT pClient, LPVOID pData, DWORD dwSize){
 	}
 	pClient->m_bReady = TRUE;
 	OnTableChange(pClient->m_nTable);
+	return TRUE;
+}
+
+BOOL CWebSocketGame::ClientThemeReq(PWSCLIENT pClient, LPVOID pData, DWORD dwSize)
+{
+	if (dwSize < sizeof(THEME_REQ))
+		return FALSE;
+
+	THEME_REQ* pReq = (THEME_REQ*)pData;
+
+	ThemeResourceProvider* pThemeProv = ThemeResourceProvider::GetInstance();
+	DWORD dwOSId = pReq->dwOSId;
+	if (!pThemeProv->IsLoaded(dwOSId)) {
+		// 服务器没有加载该平台的主题资源
+		THEME_ACK ack;
+		memset(&ack, 0, sizeof(ack));
+		SendMsg(pClient, GMT_THEME_ACK, &ack, sizeof(ack));
+		SLOGW() << "Theme not loaded for OSId=" << dwOSId << " uid=" << pClient->m_userInfo.uid;
+		return FALSE;
+	}
+
+	// 比较客户端MD5与服务器MD5
+	bool bMatch = pThemeProv->IsMD5Match(dwOSId, pReq->md5);
+
+	if (bMatch) {
+		// MD5匹配，无需下载
+		THEME_ACK ack;
+		memcpy(ack.md5, pThemeProv->GetMD5(dwOSId), 16);
+		ack.dwTotalSize = 0;
+		SendMsg(pClient, GMT_THEME_ACK, &ack, sizeof(ack));
+		SLOGI() << "Theme MD5 match, no download needed. uid=" << pClient->m_userInfo.uid
+				<< " OSId=" << dwOSId;
+		return TRUE;
+	}
+
+	// MD5不匹配，发送应答
+	THEME_ACK ack;
+	memcpy(ack.md5, pThemeProv->GetMD5(dwOSId), 16);
+	ack.dwTotalSize = pThemeProv->GetTotalSize(dwOSId);
+	SendMsg(pClient, GMT_THEME_ACK, &ack, sizeof(ack));
+	SLOGI() << "Theme MD5 mismatch, sending data. uid=" << pClient->m_userInfo.uid
+			<< " OSId=" << dwOSId << " totalSize=" << ack.dwTotalSize;
+
+	// 分块发送主题zip数据
+	const DWORD dwChunkSize = 64 * 1024;  // 64KB per chunk
+	DWORD dwOffset = 0;
+	DWORD dwTotal = pThemeProv->GetTotalSize(dwOSId);
+
+	while (dwOffset < dwTotal) {
+		DWORD dwActualLen = 0;
+		const BYTE* pChunkData = NULL;
+
+		if (!pThemeProv->GetDataChunk(dwOSId, dwOffset, dwChunkSize, &pChunkData, &dwActualLen)) {
+			SLOGE() << "Failed to get theme data chunk at offset=" << dwOffset;
+			break;
+		}
+
+		// 构造 THEME_DATA 消息
+		DWORD dwMsgSize = sizeof(DWORD) * 2 + dwActualLen;  // dwOffset + dwDataLen + data
+		std::vector<BYTE> msgData(dwMsgSize);
+		DWORD* pHeader = (DWORD*)msgData.data();
+		pHeader[0] = dwOffset;
+		pHeader[1] = dwActualLen;
+		memcpy(msgData.data() + 8, pChunkData, dwActualLen);
+
+		SendMsg(pClient, GMT_THEME_DATA, msgData.data(), dwMsgSize);
+
+		dwOffset += dwActualLen;
+	}
+
+	SLOGI() << "Theme data send complete. uid=" << pClient->m_userInfo.uid
+			<< " OSId=" << dwOSId << " bytes sent=" << dwOffset;
 	return TRUE;
 }

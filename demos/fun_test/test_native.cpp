@@ -1142,11 +1142,11 @@ protected:
         plbl.Format("#56 Set/GetPixel: R=0x%06X G=0x%06X B=0x%06X (zoomed 3px)", p1, p2, p3);
         // Enlarge pixels for visibility
         HBRUSH hR = CreateSolidBrush(RGB(255, 0, 0));
-        RECT rcp = { x0 + 8, y4 + 30, x0 + 28, y4 + 50 }; FillRect(hdc, &rcp, hR); DeleteObject(hR);
+        RECT rcp =  CRect( x0 + 8, y4 + 30, x0 + 28, y4 + 50 ); FillRect(hdc, &rcp, hR); DeleteObject(hR);
         HBRUSH hG = CreateSolidBrush(RGB(0, 255, 0));
-        rcp = { x0 + 28, y4 + 30, x0 + 48, y4 + 50 }; FillRect(hdc, &rcp, hG); DeleteObject(hG);
+        rcp = CRect( x0 + 28, y4 + 30, x0 + 48, y4 + 50 ); FillRect(hdc, &rcp, hG); DeleteObject(hG);
         HBRUSH hB = CreateSolidBrush(RGB(0, 0, 255));
-        rcp = { x0 + 48, y4 + 30, x0 + 68, y4 + 50 }; FillRect(hdc, &rcp, hB); DeleteObject(hB);
+        rcp = CRect(x0 + 48, y4 + 30, x0 + 68, y4 + 50 ); FillRect(hdc, &rcp, hB); DeleteObject(hB);
         DrawLabel(hdc, x0 + 80, y4 + 25, plbl);
 
         // 57. GetDeviceCaps

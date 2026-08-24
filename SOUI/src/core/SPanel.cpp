@@ -1311,6 +1311,10 @@ void SPanel::StopFlingAnimation()
 
 void SPanel::onAnimationUpdate(IValueAnimator *pAnimator)
 {
+    if (!IsVisible(TRUE))
+    {
+        return;
+    }
     if (pAnimator == m_pFlingAnimatorV)
     {
         ScrollToPos(TRUE, (int)m_pFlingAnimatorV->getValue());
@@ -1346,14 +1350,11 @@ void SPanel::OnLButtonDown(UINT nFlags, CPoint pt)
     {
         return;
     }
-
+    OnLButtonDownEx(nFlags, pt);
     if (IsEnableDragMode())
     {
         StartDragPending(pt);
-        return;
     }
-
-    OnLButtonDownEx(nFlags, pt);
 }
 
 void SPanel::OnMouseMove(UINT nFlags, CPoint pt)

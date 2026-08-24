@@ -767,12 +767,18 @@ BOOL SHostWnd::OnEraseBkgnd(HDC dc)
 
 IToolTip *SHostWnd::CreateTooltip() const
 {
-    return GETTOOLTIPFACTORY->CreateToolTip(m_hWnd);
+    #ifdef DISABLE_TOOLTIP
+        return NULL;
+    #else
+        return GETTOOLTIPFACTORY->CreateToolTip(m_hWnd);
+    #endif
 }
 
 void SHostWnd::DestroyTooltip(IToolTip *pTooltip) const
 {
-    GETTOOLTIPFACTORY->DestroyToolTip(pTooltip);
+    #ifndef DISABLE_TOOLTIP
+        GETTOOLTIPFACTORY->DestroyToolTip(pTooltip);
+    #endif
 }
 
 SXmlNode SHostWnd::OnGetInitXmlNode(SXmlDoc &xmlDoc)

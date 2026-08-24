@@ -145,15 +145,16 @@ SLogStream &SLogStream::writeString(const char *t)
 SLogStream &SLogStream::writeBinary(const SLogBinary &t)
 {
     writeFormat("%s", "\r\n\t[");
+	const unsigned char * p = (const unsigned char*)t._buf;
     for (int i = 0; i < t._len; i++)
     {
         if (i % 16 == 0)
         {
             writeFormat("%s", "\r\n\t");
-            *this << (void *)(t._buf + i);
+            *this << (const void *)(p + i);
             writeFormat("%s", ": ");
         }
-        writeFormat("%02x ", (unsigned char)t._buf[i]);
+        writeFormat("%02x ", p[i]);
     }
     writeFormat("%s", "\r\n\t]\r\n\t");
     return *this;
@@ -343,6 +344,11 @@ SLogStream &SLogStream::operator<<(const void *t)
 SLogStream &SLogStream::operator<<(const POINT &pt)
 {
     return writeFormat("{%d,%d}", pt.x, pt.y);
+}
+
+SLogStream &SLogStream::operator<<(const SIZE &sz)
+{
+    return writeFormat("{%d,%d}", sz.cx, sz.cy);
 }
 
 SLogStream &SLogStream::operator<<(const RECT &rc)

@@ -710,14 +710,11 @@ void SListCtrlEx::OnItemSetCapture(SOsrPanel *pItem, BOOL bCapture)
     {
         SetCapture();
         m_pCapturedFrame = pItem;
-        if (IsItemDragScrollEnabled())
-            StartDragPending(CPoint(0, 0));
     }
     else if (pItem == m_pCapturedFrame)
     {
         ReleaseCapture();
         m_pCapturedFrame = NULL;
-        SetDragPending(FALSE);
     }
 }
 

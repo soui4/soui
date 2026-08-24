@@ -54,15 +54,10 @@
 static SStringT getSourceDir()
 {
 #ifdef __APPLE__
+    // macOS 和 iOS 统一：资源安装在 .app/<res_name>/ 下（由 CMake add_macos_res_folder 处理）
     char szBundlePath[1024] = {0};
     GetAppleBundlePath(szBundlePath, sizeof(szBundlePath));
-#  ifdef __IOS__
-    // iOS .app 结构：MyApp.app
     return S_CA2T(szBundlePath);
-#  else
-    // macOS .app 结构：MyApp.app/Contents/Resources/...
-    return S_CA2T(szBundlePath) + _T("/Contents/Resources");
-#  endif
 #else//__APPLE__
     TCHAR szModule[MAX_PATH] = {0};
     GetModuleFileName(NULL, szModule, MAX_PATH);

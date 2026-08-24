@@ -282,10 +282,8 @@ BOOL STileView::OnScroll(BOOL bVertical, UINT uCode, int nPos)
 
 void STileView::UpdateVisibleItems()
 {
-    if (!m_adapter)
-    {
-        return;
-    }
+	if (!m_adapter || !GetContainer())
+		return;
     SAutoEnableHostPrivUiDef enableUiDef(this);
     int iOldFirstVisible = m_iFirstVisible;
     int iOldLastVisible = m_iFirstVisible + (int)m_lstItems.GetCount();
@@ -551,12 +549,6 @@ LRESULT STileView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
         }
 
         SItemPanel *pHover = HitTest(pt);
-
-        // Start drag tracking on blank space (no item, scrollable content)
-        if (uMsg == WM_LBUTTONDOWN && pHover == NULL && IsItemDragScrollEnabled() && (HasScrollBar(TRUE) || HasScrollBar(FALSE)))
-        {
-            StartDragPending(pt);
-        }
 
         if (pHover != m_pHoverItem)
         {

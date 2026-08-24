@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="20" viewBox="0 0 100 20">
+    <defs>
+        <linearGradient id="posGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#FFD700"/>
+            <stop offset="100%" stop-color="#B8860B"/>
+        </linearGradient>
+    </defs>
+    <rect x="0" y="0" width="100" height="20" rx="4" ry="4" fill="url(#posGrad)"/>
+</svg>

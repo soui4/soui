@@ -217,6 +217,7 @@ SSkinImgList::SSkinImgList()
     , m_bAutoFit(TRUE)
     , m_tileMode(TM_Both)
     , m_bLazyLoad(FALSE)
+    , m_bCacheSvg(TRUE)
 {
 }
 
@@ -232,8 +233,8 @@ SIZE SSkinImgList::GetImageSize(BOOL bRaw) const
         ret = GetSvg()->Size();
         if (!bRaw)
         {
-            ret.cx = ret.cx * GetScale() / 100;
-            ret.cy = ret.cy * GetScale() / 100;
+            ret.cx = MulDiv(ret.cx , GetScale() , 100);
+            ret.cy = MulDiv(ret.cy , GetScale() , 100);
         }
     }
     else if (GetImage())
@@ -278,6 +279,9 @@ void SSkinImgList::LoadSrcImage() const
     if (list[0] == _T("svg") || (list[0] == _T("file") && list[1].EndsWith(_T("svg"))))
     {
         m_pSvg.Attach(CreateSvgFromResId(S_CW2T(m_strSrc)));
+        // SVG源发生变更(含首次加载)，光栅化缓存失效，按需重建
+        m_pCacheBmp = NULL;
+        m_szPerStateCache.cx = m_szPerStateCache.cy = 0;
     }
     else
     {
@@ -294,47 +298,150 @@ void SSkinImgList::OnInitFinished(IXmlNode *xmlNode)
     }
 }
 
+IBitmapS *SSkinImgList::GetSvgCacheBitmap(IRenderTarget *pRT, int cxPerState, int cyPerState) const
+{
+    ISvgObj *pSvg = GetSvg();
+    SASSERT(pSvg);
+    if (cxPerState <= 0 || cyPerState <= 0)
+        return NULL;
+
+    // Cache hit: same per-state dimensions (skin's states/layout are immutable)
+    if (m_pCacheBmp && m_szPerStateCache.cx == cxPerState && m_szPerStateCache.cy == cyPerState)
+        return m_pCacheBmp;
+
+    IRenderFactory *pRenderFactory = GETRENDERFACTORY;
+    if (!pRenderFactory)
+        return NULL;
+
+    // Compute the entire bitmap size (all states laid out like the original SVG)
+    int wholeCx, wholeCy;
+    if (m_bVertical)
+    {
+        wholeCx = cxPerState;
+        wholeCy = cyPerState * m_nStates;
+    }
+    else
+    {
+        wholeCx = cxPerState * m_nStates;
+        wholeCy = cyPerState;
+    }
+
+    SAutoRefPtr<IRenderTarget> pMemRT;
+    if (!pRenderFactory->CreateRenderTarget(&pMemRT, wholeCx, wholeCy))
+        return NULL;
+
+    // One-shot: rasterize the ENTIRE SVG to fill the whole bitmap (all states).
+    // DrawSVG without prcSrc == draw the full SVG into rcDst.
+    CRect rcDst(0, 0, wholeCx, wholeCy);
+    pMemRT->BeginDraw();
+    pMemRT->DrawSVG(pSvg, &rcDst);
+    pMemRT->EndDraw();
+
+    IBitmapS *pNewBmp = (IBitmapS *)pMemRT->GetCurrentObject(OT_BITMAP);
+    if (pNewBmp)
+    {
+        m_pCacheBmp = pNewBmp;
+        m_szPerStateCache.cx = cxPerState;
+        m_szPerStateCache.cy = cyPerState;
+    }
+    return m_pCacheBmp;
+}
+
 void SSkinImgList::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const
 {
     if (!GetImage() && !GetSvg())
         return;
-    SIZE sz = _GetSkinSize(GetSvg()!=NULL);
-    RECT rcSrc = { 0, 0, sz.cx, sz.cy };
-    if (m_bVertical)
-        OffsetRect(&rcSrc, 0, iState * sz.cy);
-    else
-        OffsetRect(&rcSrc, iState * sz.cx, 0);
-    if (m_bTile) {
-        if (GetImage() && m_tileMode == TM_Both) {
-            SAutoRefPtr<IBrushS> brush, oldBrush;
-            pRT->CreateBitmapBrush(GetImage(), kRepeat_TileMode, kRepeat_TileMode, &brush);
-            pRT->SelectObject(brush, (IRenderObj**)&oldBrush);
-            pRT->FillRectangle(rcDraw);
-            pRT->SelectObject(oldBrush, NULL);
+
+    IBitmapS *pImg = GetImage();
+    SIZE szSrc; // size of one state in the source image's coordinate space
+    bool bFromCache = false;
+
+    if (pImg)
+    {
+        // Regular bitmap: all states in one image
+        szSrc = _GetSkinSize(FALSE);
+    }
+    else if (GetSvg())
+    {
+        if (m_bCacheSvg)
+        {
+            int cxPerState, cyPerState;
+            if (m_bTile)
+            {
+                // Tile mode: cache at scaled skin size (natural tile size)
+                SIZE sz = _GetSkinSize(FALSE);
+                cxPerState = sz.cx;
+                cyPerState = sz.cy;
+            }
+            else
+            {
+                // Stretch mode: cache at draw rect size per-state (high precision 1:1)
+                cxPerState = rcDraw->right - rcDraw->left;
+                cyPerState = rcDraw->bottom - rcDraw->top;
+            }
+            pImg = GetSvgCacheBitmap(pRT, cxPerState, cyPerState);
+            if (pImg)
+            {
+                szSrc.cx = cxPerState;
+                szSrc.cy = cyPerState;
+                bFromCache = true;
+            }
         }
-        else {
-			int wid = m_tileMode != TM_Vert ? sz.cx : rcDraw->right - rcDraw->left;
-			int hei = m_tileMode != TM_Horz ? sz.cy : rcDraw->bottom - rcDraw->top;
-            for (int y = rcDraw->top; y < rcDraw->bottom; y += hei) {
-                for (int x = rcDraw->left; x < rcDraw->right; x += wid) {
-                    RECT rcTile = { x, y, x + wid, y + hei };
-                    if (GetImage()) {
-                        pRT->DrawBitmapEx(&rcTile, GetImage(), &rcSrc, GetExpandMode(), byAlpha);
-                    }
-                    else {
-                        pRT->DrawSVG(GetSvg(), &rcTile, &rcSrc, byAlpha);
+    }
+
+    if (pImg)
+    {
+        // Bitmap drawing path. Cache bitmap has the SAME multi-state layout as a regular
+        // bitmap, so selecting a state via offset works identically for both.
+        RECT rcSrc = { 0, 0, szSrc.cx, szSrc.cy };
+        if (m_bVertical)
+            OffsetRect(&rcSrc, 0, iState * szSrc.cy);
+        else
+            OffsetRect(&rcSrc, iState * szSrc.cx, 0);
+
+        if (m_bTile) {
+            if (m_tileMode == TM_Both) {
+                SAutoRefPtr<IBrushS> brush, oldBrush;
+                pRT->CreateBitmapBrush(pImg, kRepeat_TileMode, kRepeat_TileMode, &brush);
+                pRT->SelectObject(brush, (IRenderObj**)&oldBrush);
+                pRT->FillRectangle(rcDraw);
+                pRT->SelectObject(oldBrush, NULL);
+            }
+            else {
+                int wid = m_tileMode != TM_Vert ? szSrc.cx : rcDraw->right - rcDraw->left;
+                int hei = m_tileMode != TM_Horz ? szSrc.cy : rcDraw->bottom - rcDraw->top;
+                for (int y = rcDraw->top; y < rcDraw->bottom; y += hei) {
+                    for (int x = rcDraw->left; x < rcDraw->right; x += wid) {
+                        RECT rcTile = { x, y, x + wid, y + hei };
+                        pRT->DrawBitmapEx(&rcTile, pImg, &rcSrc, GetExpandMode(), byAlpha);
                     }
                 }
             }
         }
-    }
-    else {
-        if (GetImage())
-        {
-            pRT->DrawBitmapEx(rcDraw, GetImage(), &rcSrc, GetExpandMode(), byAlpha);
+        else {
+            pRT->DrawBitmapEx(rcDraw, pImg, &rcSrc, GetExpandMode(), byAlpha);
         }
+    }
+    else if (GetSvg())
+    {
+        // Direct SVG drawing (cache disabled or failed)
+        SIZE sz = _GetSkinSize(TRUE); // raw SVG coordinates
+        RECT rcSrc = { 0, 0, sz.cx, sz.cy };
+        if (m_bVertical)
+            OffsetRect(&rcSrc, 0, iState * sz.cy);
         else
-        {
+            OffsetRect(&rcSrc, iState * sz.cx, 0);
+        if (m_bTile) {
+            int wid = m_tileMode != TM_Vert ? sz.cx : rcDraw->right - rcDraw->left;
+            int hei = m_tileMode != TM_Horz ? sz.cy : rcDraw->bottom - rcDraw->top;
+            for (int y = rcDraw->top; y < rcDraw->bottom; y += hei) {
+                for (int x = rcDraw->left; x < rcDraw->right; x += wid) {
+                    RECT rcTile = { x, y, x + wid, y + hei };
+                    pRT->DrawSVG(GetSvg(), &rcTile, &rcSrc, byAlpha);
+                }
+            }
+        }
+        else {
             pRT->DrawSVG(GetSvg(), rcDraw, &rcSrc, byAlpha);
         }
     }
@@ -363,6 +470,8 @@ bool SSkinImgList::SetImage(IBitmapS *pImg)
     m_pImg = pImg;
     m_bLazyLoad = FALSE;
     m_pSvg = NULL;
+    m_pCacheBmp = NULL;
+    m_szPerStateCache.cx = m_szPerStateCache.cy = 0;
     return true;
 }
 
@@ -371,6 +480,8 @@ bool SSkinImgList::SetSvg(ISvgObj *pSvg)
     m_pSvg = pSvg;
     m_pImg = NULL;
     m_bLazyLoad = FALSE;
+    m_pCacheBmp = NULL;
+    m_szPerStateCache.cx = m_szPerStateCache.cy = 0;
     return true;
 }
 
@@ -442,6 +553,8 @@ void SSkinImgList::OnColorize(COLORREF cr)
     }
     else if (GetSvg())
     {
+        m_pCacheBmp = NULL;//reset cache.
+        m_szPerStateCache.cx = m_szPerStateCache.cy = 0;
         NSVGimage *pImg = (NSVGimage *)GetSvg()->GetPtr();
         ColorizeSVG(pImg, SDIBHelper::Colorize, cr);
     }
@@ -525,23 +638,66 @@ void SSkinImgCenter::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState
 SSkinImgFrame::SSkinImgFrame()
 {
 }
-
 void SSkinImgFrame::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const
 {
-    SIZE sz = _GetSkinSize(GetSvg()!=NULL);
-    CPoint pt;
-    if (IsVertical())
-        pt.y = sz.cy * iState;
-    else
-        pt.x = sz.cx * iState;
-    CRect rcSour(pt, sz);
-    if (GetImage())
+    IBitmapS *pImg = GetImage();
+    bool bFromCache = false;
+    SIZE szPerState;
+
+    if (pImg)
     {
-        pRT->DrawBitmap9Patch(rcDraw, GetImage(), &rcSour, &m_rcMargin, GetExpandMode(), byAlpha);
+        szPerState = _GetSkinSize(FALSE);
+    }
+    else if (GetSvg() && m_bCacheSvg)
+    {
+        // Cache at scaled per-state size (natural corner size for 9-patch).
+        // The cache bitmap contains ALL states arranged in the same layout as the SVG.
+        szPerState = _GetSkinSize(FALSE);
+        pImg = GetSvgCacheBitmap(pRT, szPerState.cx, szPerState.cy);
+        if (pImg)
+            bFromCache = true;
+    }
+
+    if (pImg)
+    {
+        // Compute source rect for the requested state (works for regular
+        // bitmap and cache bitmap equally since both have the same layout).
+        CPoint pt;
+        if (IsVertical())
+            pt.y = szPerState.cy * iState;
+        else
+            pt.x = szPerState.cx * iState;
+        CRect rcSour(pt, szPerState);
+
+        if (bFromCache)
+        {
+            // Cache bitmap was built at scaled per-state size, so margins
+            // must be scaled to match the bitmap's pixel coordinate space.
+            int nScale = GetScale();
+            CRect rcMargin(
+                MulDiv(m_rcMargin.left, nScale, 100),
+                MulDiv(m_rcMargin.top, nScale, 100),
+                MulDiv(m_rcMargin.right, nScale, 100),
+                MulDiv(m_rcMargin.bottom, nScale, 100));
+            pRT->DrawBitmap9Patch(rcDraw, pImg, &rcSour, &rcMargin, GetExpandMode(), byAlpha);
+        }
+        else
+        {
+            // Regular bitmap: margins are already in source bitmap pixel space
+            pRT->DrawBitmap9Patch(rcDraw, pImg, &rcSour, &m_rcMargin, GetExpandMode(), byAlpha);
+        }
     }
     else if (GetSvg())
     {
-        DrawSVG9Patch(pRT, GetSvg(), rcDraw, &rcSour, &m_rcMargin, byAlpha,GetScale());
+        // Direct SVG 9-patch (cache disabled or failed)
+        SIZE sz = _GetSkinSize(TRUE);
+        CPoint pt;
+        if (IsVertical())
+            pt.y = sz.cy * iState;
+        else
+            pt.x = sz.cx * iState;
+        CRect rcSour(pt, sz);
+        DrawSVG9Patch(pRT, GetSvg(), rcDraw, &rcSour, &m_rcMargin, byAlpha, GetScale());
     }
 }
 

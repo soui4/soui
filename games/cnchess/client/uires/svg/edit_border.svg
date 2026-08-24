@@ -10,13 +10,17 @@
             <stop offset="50%" stop-color="#DAA520"/>
             <stop offset="100%" stop-color="#B8860B"/>
         </linearGradient>
+        <linearGradient id="bgFocus" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#4A3723"/>
+            <stop offset="100%" stop-color="#3D2F1F"/>
+        </linearGradient>
     </defs>
-    
+
     <!-- State 1: Normal (0-100) -->
     <rect x="0" y="0" width="100" height="40" rx="6" ry="6" fill="#2C1810" stroke="url(#borderNormal)" stroke-width="1.5"/>
     <rect x="1" y="1" width="98" height="38" rx="5" ry="5" fill="none" stroke="#5D4E37" stroke-width="0.5" opacity="0.5"/>
-    
-    <!-- State 2: Focus (100-200) -->
-    <rect x="100" y="0" width="100" height="40" rx="6" ry="6" fill="#2C1810" stroke="url(#borderFocus)" stroke-width="2"/>
+
+    <!-- State 2: Focus (100-200) - 高亮背景色 -->
+    <rect x="100" y="0" width="100" height="40" rx="6" ry="6" fill="url(#bgFocus)" stroke="url(#borderFocus)" stroke-width="2"/>
     <rect x="102" y="1" width="96" height="38" rx="5" ry="5" fill="none" stroke="#FFD700" stroke-width="0.5" opacity="0.8"/>
 </svg>

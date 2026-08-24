@@ -15,6 +15,7 @@
 #include "WebSocketGame.h"
 
 #include "PropBag.h"
+#include "ThemeResourceProvider.h"
 #define kLogTag "CnChessServer"
 
 #ifdef _WIN32
@@ -80,6 +81,47 @@ int run(LPCTSTR pszCfg){
         propBag->Init(pszCfg);
         int nPort = propBag->GetPort();
         SLOGI() << "start chess server on port " << nPort;
+
+        // 加载多平台主题资源包
+        ThemeResourceProvider* pThemeProv = ThemeResourceProvider::GetInstance();
+        char szExePath[MAX_PATH];
+        GetModuleFileNameA(NULL, szExePath, MAX_PATH);
+        char* pSlash = strrchr(szExePath, '\\');
+        if (!pSlash) pSlash = strrchr(szExePath, '/');
+
+        // 桌面端主题（OS_ID_WINDOWS）
+        char szPcThemeZip[MAX_PATH];
+        if (pSlash) {
+            strcpy(pSlash + 1, "pc_theme.zip");
+            strcpy(szPcThemeZip, szExePath);
+        } else {
+            strcpy(szPcThemeZip, "pc_theme.zip");
+        }
+        if (pThemeProv->Init(OS_ID_WINDOWS, szPcThemeZip)) {
+            char szMD5[33] = { 0 };
+            MD5_ToHexString(pThemeProv->GetMD5(OS_ID_WINDOWS), szMD5);
+            SLOGI() << "PC theme loaded: " << szPcThemeZip << " md5=" << szMD5;
+        } else {
+            SLOGW() << "PC theme not found: " << szPcThemeZip;
+        }
+
+        // 移动端主题（OS_ID_ANDROID / OS_ID_IOS 共用同一资源包）
+        char szMobileThemeZip[MAX_PATH];
+        if (pSlash) {
+            strcpy(pSlash + 1, "mobile_theme.zip");
+            strcpy(szMobileThemeZip, szExePath);
+        } else {
+            strcpy(szMobileThemeZip, "mobile_theme.zip");
+        }
+        if (pThemeProv->Init(OS_ID_ANDROID, szMobileThemeZip)) {
+            char szMD5[33] = { 0 };
+            MD5_ToHexString(pThemeProv->GetMD5(OS_ID_ANDROID), szMD5);
+            SLOGI() << "Mobile theme loaded: " << szMobileThemeZip << " md5=" << szMD5;
+        } else {
+            SLOGW() << "Mobile theme not found: " << szMobileThemeZip;
+        }
+        // iOS 复用 Android 主题（同一资源包）
+        pThemeProv->Init(OS_ID_IOS, szMobileThemeZip);
         CWebSocketGame game;
         g_game = &game;
         

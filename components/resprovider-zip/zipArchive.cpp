@@ -596,7 +596,29 @@ CZipFile::CZipFile(DWORD dwSize/*=0*/)
 			// Extract filename and match with pattern
 			ZipDirFileHeader* fh = m_Files[pFF->nPos];
 			TCHAR szFile[MAX_PATH] = { 0 };
-			::OemToCharBuff(fh->GetName(), szFile, fh->fnameLen);
+
+			// ZIP规范: flag bit 11 (0x0800) 为语言编码标志，置位时文件名为UTF-8编码
+			if (fh->flag & 0x0800)
+			{
+				#ifdef UNICODE
+				int nLen = ::MultiByteToWideChar(CP_UTF8, 0, fh->GetName(), fh->fnameLen, szFile, MAX_PATH);
+				szFile[nLen]=0;
+				#elif defined(_WIN32)
+				wchar_t wFile[MAX_PATH];
+				int nLen = ::MultiByteToWideChar(CP_UTF8, 0, fh->GetName(), fh->fnameLen, wFile, MAX_PATH);
+				nLen = ::WideCharToMuiltByte(CP_ACP,0,wFile,nLen,szFile,MAX_PATH);
+				szFile[nLen]=0;
+				#else
+				strncpy(szFile,fh->GetName(),fh->fnameLen);
+				szFile[fh->fnameLen]=0;
+				#endif
+			}
+			else
+			{
+				// CP437(OEM)编码的文件名
+				::OemToCharBuff(fh->GetName(), szFile, fh->fnameLen);
+				szFile[fh->fnameLen] = _T('\0');
+			}
 
 #ifndef ZIP_DISABLE_WILDCARD
 			if (::PathMatchSpec(szFile, pFF->szSearch) != 0)

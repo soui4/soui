@@ -3334,7 +3334,7 @@ static bool nsvgTextIntersectsSrcRect(const NSVGtext *text, IDWriteTextLayout *p
         localBottom = -baseline + metrics.height + overhang.bottom;
     }
 
-    D2D1::Matrix3x2F textMatrix(text->xform[0], text->xform[2], text->xform[1], text->xform[3], text->xform[4], text->xform[5]);
+    D2D1::Matrix3x2F textMatrix(text->xform[0], text->xform[1], text->xform[2], text->xform[3], text->xform[4], text->xform[5]);
 
     D2D1_POINT_2F pts[4] = {
         D2D1::Point2F(localLeft, localTop),
@@ -3734,7 +3734,7 @@ static void renderNSVGtext(ID2D1RenderTarget *pRT, IDWriteFactory *pWriteFactory
     if (!pTextBrush)
         return;
 
-    D2D1::Matrix3x2F textMatrix(text->xform[0], text->xform[2], text->xform[1], text->xform[3], text->xform[4], text->xform[5]);
+    D2D1::Matrix3x2F textMatrix(text->xform[0], text->xform[1], text->xform[2], text->xform[3], text->xform[4], text->xform[5]);
     bool hasTransform = textMatrix.IsIdentity() ? false : true;
 
     if (hasTransform)

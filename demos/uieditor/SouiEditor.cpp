@@ -36,9 +36,10 @@ static const TCHAR *kPath_SysRes = _T("/soui-sys-resource.zip");
 static SStringT getSourceDir()
 {
 #ifdef __APPLE__
+    // macOS 和 iOS 统一：资源安装在 .app/<res_name>/ 下（由 CMake add_macos_res_folder 处理）
     char szBunblePath[1024];
     GetAppleBundlePath(szBunblePath, sizeof(szBunblePath));
-    return S_CA2T(szBunblePath) + _T("/Contents/Resources");
+    return S_CA2T(szBunblePath);
 #else
     SStringA file(__FILE__);
     file = file.Left(file.ReverseFind(PATH_SLASH));
@@ -142,7 +143,12 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
     #ifdef __APPLE__
     char szBunblePath[1024];
     GetAppleBundlePath(szBunblePath, sizeof(szBunblePath));
+    // macOS: Frameworks 在 Contents/Frameworks/，iOS: Frameworks 在 Frameworks/
+    #ifdef __IOS__
+    SStringT strExCtrlPath = S_CA2T(szBunblePath) + _T("/Frameworks");
+    #else
     SStringT strExCtrlPath = S_CA2T(szBunblePath) + _T("/Contents/Frameworks");
+    #endif
     HANDLE hFind = FindFirstFile((strExCtrlPath + _T("/*.exctrl")).c_str(), &fd);
     #else
     HANDLE hFind = FindFirstFile((appDir + _T("/*.exctrl")).c_str(), &fd);

@@ -166,6 +166,22 @@ class SOUI_EXP SSkinImgList : public SSkinObjBase {
     void _Scale(ISkinObj *skinObj, int nScale) override;
 
     SIZE _GetSkinSize(BOOL bRaw) const;
+
+    /**
+     * @brief Lazily rasterizes the entire SVG (all states) into a single cached bitmap.
+     * @details When the data source is SVG and m_bCacheSvg is enabled, the entire SVG
+     *          (all states) is rendered once into an offscreen IBitmapS. Each state
+     *          occupies a (cxPerState, cyPerState) region in the bitmap arranged in the
+     *          same layout (horizontal/vertical) as the SVG. This is O(1) SVG rasterization
+     *          per cache key; subsequent draws of any state just copy from the bitmap.
+     *          The cache is keyed by (cxPerState, cyPerState) and invalidated when the
+     *          SVG source is reloaded or colorized.
+     * @param pRT Render target used to obtain the render factory.
+     * @param cxPerState Width of one state's tile in the output bitmap (pixels).
+     * @param cyPerState Height of one state's tile in the output bitmap (pixels).
+     * @return IBitmapS* Pointer to the cached bitmap (borrowed; may be NULL on failure).
+     */
+    IBitmapS *GetSvgCacheBitmap(IRenderTarget *pRT, int cxPerState, int cyPerState) const;
   protected:
     int m_nStates;                     // Number of skin states
     BOOL m_bTile;                      // Flag to indicate if the image is tiled
@@ -173,12 +189,15 @@ class SOUI_EXP SSkinImgList : public SSkinObjBase {
     BOOL m_bVertical;                  // Flag to indicate if images are arranged vertically
     SAutoRefPtr<IBitmapS> m_imgBackup; // Backup of the image before colorization
     FilterLevel m_filterLevel;         // Filter level for image scaling
-	TileMode m_tileMode;             // Tile mode for the image
+	  TileMode m_tileMode;             // Tile mode for the image
   protected:
     mutable SAutoRefPtr<ISvgObj> m_pSvg;  // Pointer to the SVG object
     mutable SAutoRefPtr<IBitmapS> m_pImg; // Pointer to the bitmap source
+    mutable SAutoRefPtr<IBitmapS> m_pCacheBmp; // Rasterized SVG cache bitmap (contains all states)
+    mutable CSize m_szPerStateCache;       // Per-state size used to generate the cache bitmap (cache key)
     mutable SStringW m_strSrc;            // Source string for the image
     BOOL m_bLazyLoad;                     // Flag to indicate lazy loading
+    BOOL m_bCacheSvg;                     // Cache SVG as bitmap for drawing (enabled by default)
 
   protected:
     SIZE GetImageSize(BOOL bRaw=FALSE) const;
@@ -204,6 +223,7 @@ class SOUI_EXP SSkinImgList : public SSkinObjBase {
         ATTR_BOOL(L"vertical", m_bVertical, FALSE) // Sub-images are vertically arranged, 0--horizontal (default), other--vertical
         ATTR_INT(L"states", m_nStates, FALSE)      // Number of sub-images, default is 1
         ATTR_BOOL(L"lazyLoad", m_bLazyLoad, FALSE)
+        ATTR_BOOL(L"cacheSvg", m_bCacheSvg, TRUE)        // Whether to cache SVG as bitmap when drawing (default on)
         ATTR_ENUM_BEGIN(L"filterLevel", FilterLevel, FALSE)
             ATTR_ENUM_VALUE(L"none", kNone_FilterLevel)
             ATTR_ENUM_VALUE(L"low", kLow_FilterLevel)
@@ -298,7 +318,7 @@ class SOUI_EXP SSkinImgFrame : public SSkinImgList {
     void _DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const override;
 
   protected:
-    CRect m_rcMargin; // Margin rectangle for the image frame
+    CRect m_rcMargin;                       // Margin rectangle for the image frame
 
     SOUI_ATTRS_BEGIN()
         ATTR_RECT(L"margin", m_rcMargin, FALSE)                          // Nine-grid margins

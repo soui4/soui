@@ -488,13 +488,13 @@ void SListBox::OnSize(UINT nType, CSize size)
 }
 
 BOOL SListBox::IsEnableDragMode() const {
-	return m_bHotTrack && __baseCls::IsEnableDragMode(); 
+	return __baseCls::IsEnableDragMode(); 
 }
 
 void SListBox::OnLButtonDownEx(UINT nFlags, CPoint pt)
 {
     __baseCls::OnLButtonDownEx(nFlags, pt);
-    if (!IsEnableDragMode())
+    if (!m_bHotTrack)
     {
         m_iHoverItem = HitTest(pt);
         if (m_iHoverItem != m_iSelItem)
@@ -504,7 +504,7 @@ void SListBox::OnLButtonDownEx(UINT nFlags, CPoint pt)
 
 void SListBox::OnLButtonUpEx(UINT nFlags, CPoint pt)
 {
-    if (IsEnableDragMode())
+    if (m_bHotTrack)
     {
         CPoint pt2(pt);
         m_iHoverItem = HitTest(pt2);

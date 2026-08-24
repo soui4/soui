@@ -581,8 +581,8 @@ BOOL SMCListView::OnScroll(BOOL bVertical, UINT uCode, int nPos)
 
 void SMCListView::UpdateVisibleItems()
 {
-    if (!m_adapter)
-        return;
+	if (!m_adapter || !GetContainer())
+		return;
     SAutoEnableHostPrivUiDef enableUiDef(this);
     int iOldFirstVisible = m_iFirstVisible;
     int iOldLastVisible = m_iFirstVisible + m_lstItems.GetCount();
@@ -899,12 +899,6 @@ LRESULT SMCListView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
         }
 
         SItemPanel *pHover = HitTest(pt);
-
-        // Start drag tracking on blank space
-        if (uMsg == WM_LBUTTONDOWN && pHover == NULL && IsItemDragScrollEnabled() && (HasScrollBar(TRUE) || HasScrollBar(FALSE)))
-        {
-            StartDragPending(pt);
-        }
 
         if (pHover != m_pHoverItem)
         {

@@ -7,4 +7,15 @@
   <white value="rgb(255,255,255)"/>
   <black value="rgb(0,0,0)"/>
   <mask_select value="rgba(128,0,128,100)"/>
+  <!-- 登录主题色 -->
+  <login_gold value="#FFD700"/>
+  <login_gold_light value="#FFE45E"/>
+  <login_gold_dark value="#B8860B"/>
+  <login_text value="#F5E6C8"/>
+  <login_text_sub value="#A89070"/>
+  <login_border value="#5D4E37"/>
+  <login_input_bg value="#3D2F1F"/>
+  <login_panel_dark value="#1A0D06"/>
+  <login_panel value="#2A1810"/>
+  <login_avatar_border value="#5D4E37"/>
 </color>

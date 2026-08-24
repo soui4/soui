@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+  <defs>
+    <radialGradient id="redPiece4" cx="50%" cy="40%">
+      <stop offset="0%" stop-color="#ffeaea"/>
+      <stop offset="60%" stop-color="#e57373"/>
+      <stop offset="100%" stop-color="#a81d1d"/>
+    </radialGradient>
+  </defs>
+  <circle cx="50" cy="50" r="46" fill="url(#redPiece4)" stroke="#ffd700" stroke-width="3"/>
+  <circle cx="50" cy="50" r="38" fill="none" stroke="#ffd700" stroke-width="1" opacity="0.6"/>
+  <text x="50" y="62" text-anchor="middle" font-size="36" font-weight="bold" fill="#fff7e6" font-family="serif" stroke="#7a1212" stroke-width="1">車</text>
+</svg>

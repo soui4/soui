@@ -19,7 +19,6 @@ SNSBEGIN
 
 SDropDownWnd::SDropDownWnd(ISDropDownOwner *pOwner)
     : m_pOwner(pOwner)
-    , m_bClick(FALSE)
     , m_uExitCode((UINT)IDINIT)
 {
 }
@@ -108,22 +107,7 @@ void SDropDownWnd::OnLButtonDown(UINT nFlags, CPoint point)
     }
     else
     {
-        m_bClick = TRUE;
         SetMsgHandled(FALSE);
-    }
-}
-
-void SDropDownWnd::OnLButtonUp(UINT nFlags, CPoint point)
-{
-    if (m_bClick)
-    {
-        LRESULT lRes = 0;
-        HWND hWnd = m_hWnd;
-        CRect rcWnd;
-        SNativeWnd::GetClientRect(&rcWnd);
-        SHostWnd::ProcessWindowMessage(m_hWnd, WM_LBUTTONUP, nFlags, MAKELPARAM(point.x, point.y), lRes);
-        if (::IsWindow(hWnd) && !rcWnd.PtInRect(point))
-            EndDropDown(); //强制关闭弹出窗口
     }
 }
 

@@ -48,7 +48,7 @@ void CXmlEditor::SetProjectPath(const SStringT & strProjPath)
         m_strProPath = m_strProPath.Left(pos);
 }
 
-BOOL CXmlEditor::CloseXml()
+BOOL CXmlEditor::CloseXml(BOOL bCloseProject)
 {
     m_strXmlFile.Empty();
 	m_strLayoutName.Empty();
@@ -60,6 +60,9 @@ BOOL CXmlEditor::CloseXml()
 	m_pPropGrid->RemoveAllItems();
 	m_vecSelectOrder.clear();
 	m_pDesignWnd->Close();
+	if (bCloseProject) {
+		m_strProPath.Empty();
+	}
 	return TRUE;
 }
 
