@@ -1057,10 +1057,6 @@ LRESULT SHostWnd::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
         break;
     }
 
-    // Message routing for the modal layer is handled by the normal window tree:
-    // the top-most SModalRoot is inserted into SRootWindow::m_pModalContainer
-    // as a full-screen last child, so hit-testing in DoFrameEvent naturally
-    // prefers it over any non-modal windows. No modal-specific dispatch here.
     DoFrameEvent(uMsg, wParam, lParam);
 
     UpdateTooltip();

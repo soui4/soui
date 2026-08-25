@@ -184,8 +184,8 @@ public:
      * the session cleanup.
      */
     void PlayExitAnimation();
-
 protected:
+    SWND SwndFromPoint(CPoint& pt, BOOL bIncludeMsgTransparent) const override;
     STDMETHOD_(void, OnAnimationStop)(THIS_ IAnimation *pAni) OVERRIDE;
 
     /**

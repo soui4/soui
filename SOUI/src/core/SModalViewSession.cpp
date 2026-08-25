@@ -140,4 +140,11 @@ void SModalView::OnAnimationStop(IAnimation *pAni)
     }
 }
 
+SWND SModalView::SwndFromPoint(CPoint& pt, BOOL bIncludeMsgTransparent) const
+{
+    if (m_isAnimating)
+        return m_swnd;
+    return __baseCls::SwndFromPoint(pt, bIncludeMsgTransparent);
+}
+
 SNSEND
