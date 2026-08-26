@@ -7,6 +7,12 @@
 extern "C" {
 #endif
 
+/*
+ * C API Helper Macros for ICaret Interface
+ * These macros provide C-style function call syntax for C++ interface methods
+ * ICaret inherits from IObject.
+ */
+
 /* IObjRef base interface macros */
 #define ICaret_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
@@ -18,86 +24,62 @@ extern "C" {
     ((This)->lpVtbl->OnFinalRelease(This))
 
 /* IObject base interface macros */
+#define ICaret_IsClass(This, lpszName) \
+    ((This)->lpVtbl->IsClass(This, lpszName))
+
+#define ICaret_GetClassNameList(This, ppClassNameList, nMaxCount) \
+    ((This)->lpVtbl->GetClassNameList(This, ppClassNameList, nMaxCount))
+
 #define ICaret_GetObjectClass(This) \
     ((This)->lpVtbl->GetObjectClass(This))
 
 #define ICaret_GetObjectType(This) \
     ((This)->lpVtbl->GetObjectType(This))
 
-#define ICaret_GetObjectInfo(This, pInfo) \
-    ((This)->lpVtbl->GetObjectInfo(This, pInfo))
-
-#define ICaret_OnLanguageChange(This) \
-    ((This)->lpVtbl->OnLanguageChange(This))
-
-#define ICaret_SetLanguage(This, lang) \
-    ((This)->lpVtbl->SetLanguage(This, lang))
-
-#define ICaret_GetLanguage(This) \
-    ((This)->lpVtbl->GetLanguage(This))
-
-#define ICaret_GetTranslator(This) \
-    ((This)->lpVtbl->GetTranslator(This))
-
-#define ICaret_InitTranslator(This) \
-    ((This)->lpVtbl->InitTranslator(This))
-
-#define ICaret_GetScale(This) \
-    ((This)->lpVtbl->GetScale(This))
-
-#define ICaret_SetScale(This, scale) \
-    ((This)->lpVtbl->SetScale(This, scale))
-
-#define ICaret_InitEventMap(This) \
-    ((This)->lpVtbl->InitEventMap(This))
-
-#define ICaret_FireEvent(This, e) \
-    ((This)->lpVtbl->FireEvent(This, e))
-
-#define ICaret_SubscribeEvent(This, evtId, subscriber) \
-    ((This)->lpVtbl->SubscribeEvent(This, evtId, subscriber))
-
-#define ICaret_UnsubscribeEvent(This, evtId, subscriber) \
-    ((This)->lpVtbl->UnsubscribeEvent(This, evtId, subscriber))
-
-#define ICaret_SetAttribute(This, pAttr) \
-    ((This)->lpVtbl->SetAttribute(This, pAttr))
-
-#define ICaret_SetAttributeW(This, attr, value) \
-    ((This)->lpVtbl->SetAttributeW(This, attr, value))
-
-#define ICaret_GetAttributeW(This, attr, value, nBufLen) \
-    ((This)->lpVtbl->GetAttributeW(This, attr, value, nBufLen))
-
-#define ICaret_OnAttribute(This, attr, value) \
-    ((This)->lpVtbl->OnAttribute(This, attr, value))
-
-#define ICaret_OnAttributeValue(This, attr, value) \
-    ((This)->lpVtbl->OnAttributeValue(This, attr, value))
-
-#define ICaret_OnParsed(This) \
-    ((This)->lpVtbl->OnParsed(This))
-
-#define ICaret_InitFromXml(This, xmlNode) \
-    ((This)->lpVtbl->InitFromXml(This, xmlNode))
-
 #define ICaret_GetID(This) \
     ((This)->lpVtbl->GetID(This))
 
-#define ICaret_SetID(This, id) \
-    ((This)->lpVtbl->SetID(This, id))
+#define ICaret_SetID(This, nID) \
+    ((This)->lpVtbl->SetID(This, nID))
 
 #define ICaret_GetName(This) \
     ((This)->lpVtbl->GetName(This))
 
-#define ICaret_SetName(This, name) \
-    ((This)->lpVtbl->SetName(This, name))
+#define ICaret_GetNameA(This) \
+    ((This)->lpVtbl->GetNameA(This))
 
-#define ICaret_GetObjectTypeName(This) \
-    ((This)->lpVtbl->GetObjectTypeName(This))
+#define ICaret_SetName(This, pszName) \
+    ((This)->lpVtbl->SetName(This, pszName))
 
-#define ICaret_Destroy(This) \
-    ((This)->lpVtbl->Destroy(This))
+#define ICaret_InitFromXml(This, xmlNode) \
+    ((This)->lpVtbl->InitFromXml(This, xmlNode))
+
+#define ICaret_OnInitFinished(This, xmlNode) \
+    ((This)->lpVtbl->OnInitFinished(This, xmlNode))
+
+#define ICaret_ISetAttribute(This, strAttribName, strValue, bLoading) \
+    ((This)->lpVtbl->ISetAttribute(This, strAttribName, strValue, bLoading))
+
+#define ICaret_SetAttributeA(This, pszAttr, pszValue, bLoading) \
+    ((This)->lpVtbl->SetAttributeA(This, pszAttr, pszValue, bLoading))
+
+#define ICaret_SetAttribute(This, pszAttr, pszValue, bLoading) \
+    ((This)->lpVtbl->SetAttribute(This, pszAttr, pszValue, bLoading))
+
+#define ICaret_SetAttribute_Default(This, pszAttr, pszValue) \
+    ((This)->lpVtbl->SetAttribute(This, pszAttr, pszValue, FALSE))
+
+#define ICaret_SetAttributeA_Default(This, pszAttr, pszValue) \
+    ((This)->lpVtbl->SetAttributeA(This, pszAttr, pszValue, FALSE))
+
+#define ICaret_GetAttribute(This, strAttr, pValue) \
+    ((This)->lpVtbl->GetAttribute(This, strAttr, pValue))
+
+#define ICaret_AfterAttribute(This, pszAttr, pszValue, bLoading, hr) \
+    ((This)->lpVtbl->AfterAttribute(This, pszAttr, pszValue, bLoading, hr))
+
+#define ICaret_SetAttrHandler(This, attrHandler) \
+    ((This)->lpVtbl->SetAttrHandler(This, attrHandler))
 
 /* ICaret specific interface macros */
 #define ICaret_Init(This, hBmp, nWid, nHei) \

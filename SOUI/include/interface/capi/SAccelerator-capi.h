@@ -8,8 +8,10 @@ extern "C" {
 #endif
 
 /*
- * C API Helper Macros for IAccelerator Interface
+ * C API Helper Macros for SAccelerator Interfaces
  * These macros provide C-style function call syntax for C++ interface methods
+ * IAccelerator, IAcceleratorTarget and IAcceleratorMgr are declared with DECLARE_INTERFACE
+ * (no parent interface, no AddRef/Release/OnFinalRelease).
  */
 
 /* IAccelerator C API Macros */
@@ -35,49 +37,6 @@ extern "C" {
 
 #define IAcceleratorMgr_UnregisterAccelerators(This, target) \
     ((This)->lpVtbl->UnregisterAccelerators(This, target))
-
-/*
- * C API Helper Functions (Optional - for more C-like usage)
- * These functions provide an alternative C-style API
- */
-
-/* IAccelerator Helper Functions */
-static inline WORD IAccelerator_GetModifier_C(IAccelerator* pThis)
-{
-    return IAccelerator_GetModifier(pThis);
-}
-
-static inline WORD IAccelerator_GetKey_C(IAccelerator* pThis)
-{
-    return IAccelerator_GetKey(pThis);
-}
-
-static inline DWORD IAccelerator_GetAcc_C(IAccelerator* pThis)
-{
-    return IAccelerator_GetAcc(pThis);
-}
-
-/* IAcceleratorTarget Helper Functions */
-static inline BOOL IAcceleratorTarget_OnAcceleratorPressed_C(IAcceleratorTarget* pThis, const IAccelerator* acc)
-{
-    return IAcceleratorTarget_OnAcceleratorPressed(pThis, acc);
-}
-
-/* IAcceleratorMgr Helper Functions */
-static inline void IAcceleratorMgr_RegisterAccelerator_C(IAcceleratorMgr* pThis, const IAccelerator* pAcc, IAcceleratorTarget* target)
-{
-    IAcceleratorMgr_RegisterAccelerator(pThis, pAcc, target);
-}
-
-static inline void IAcceleratorMgr_UnregisterAccelerator_C(IAcceleratorMgr* pThis, const IAccelerator* pAcc, IAcceleratorTarget* target)
-{
-    IAcceleratorMgr_UnregisterAccelerator(pThis, pAcc, target);
-}
-
-static inline void IAcceleratorMgr_UnregisterAccelerators_C(IAcceleratorMgr* pThis, IAcceleratorTarget* target)
-{
-    IAcceleratorMgr_UnregisterAccelerators(pThis, target);
-}
 
 #ifdef __cplusplus
 }

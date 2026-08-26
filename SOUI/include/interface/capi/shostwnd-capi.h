@@ -8,12 +8,12 @@ extern "C" {
 #endif
 
 /*
- * C API Helper Macros for shostwnd Interface
+ * C API Helper Macros for IHostWnd / IHostDialog Interface
  * These macros provide C-style function call syntax for C++ interface methods
- * Note: This covers the main methods from shostwnd-i.h (364 lines total)
+ * IHostWnd inherits from INativeWnd; IHostDialog inherits from IHostWnd.
  */
 
-/* IHostWnd C API Macros (inherits from INativeWnd) */
+/* IObjRef base interface macros */
 #define IHostWnd_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -23,6 +23,7 @@ extern "C" {
 #define IHostWnd_OnFinalRelease(This) \
     ((This)->lpVtbl->OnFinalRelease(This))
 
+/* INativeWnd base interface macros */
 #define IHostWnd_CreateNative(This, lpWindowName, dwStyle, dwExStyle, x, y, nWidth, nHeight, hWndParent, nID, lpParam) \
     ((This)->lpVtbl->CreateNative(This, lpWindowName, dwStyle, dwExStyle, x, y, nWidth, nHeight, hWndParent, nID, lpParam))
 
@@ -35,6 +36,169 @@ extern "C" {
 #define IHostWnd_UnsubclassWindow(This, bForce) \
     ((This)->lpVtbl->UnsubclassWindow(This, bForce))
 
+#define IHostWnd_GetCurrentMessage(This) \
+    ((This)->lpVtbl->GetCurrentMessage(This))
+
+#define IHostWnd_GetDlgCtrlID(This) \
+    ((This)->lpVtbl->GetDlgCtrlID(This))
+
+#define IHostWnd_GetStyle(This) \
+    ((This)->lpVtbl->GetStyle(This))
+
+#define IHostWnd_GetExStyle(This) \
+    ((This)->lpVtbl->GetExStyle(This))
+
+#define IHostWnd_GetWindowLongPtr(This, nIndex) \
+    ((This)->lpVtbl->GetWindowLongPtr(This, nIndex))
+
+#define IHostWnd_SetWindowLongPtr(This, nIndex, dwNewLong) \
+    ((This)->lpVtbl->SetWindowLongPtr(This, nIndex, dwNewLong))
+
+#define IHostWnd_GetParent(This) \
+    ((This)->lpVtbl->GetParent(This))
+
+#define IHostWnd_SetParent(This, hWndNewParent) \
+    ((This)->lpVtbl->SetParent(This, hWndNewParent))
+
+#define IHostWnd_IsWindowEnabled(This) \
+    ((This)->lpVtbl->IsWindowEnabled(This))
+
+#define IHostWnd_ModifyStyle(This, dwRemove, dwAdd, nFlags) \
+    ((This)->lpVtbl->ModifyStyle(This, dwRemove, dwAdd, nFlags))
+
+#define IHostWnd_ModifyStyleEx(This, dwRemove, dwAdd, nFlags) \
+    ((This)->lpVtbl->ModifyStyleEx(This, dwRemove, dwAdd, nFlags))
+
+#define IHostWnd_SetWindowPos(This, hWndInsertAfter, x, y, cx, cy, nFlags) \
+    ((This)->lpVtbl->SetWindowPos(This, hWndInsertAfter, x, y, cx, cy, nFlags))
+
+#define IHostWnd_CenterWindow(This, hWndCenter) \
+    ((This)->lpVtbl->CenterWindow(This, hWndCenter))
+
+#define IHostWnd_DestroyWindow(This) \
+    ((This)->lpVtbl->DestroyWindow(This))
+
+#define IHostWnd_IsWindow(This) \
+    ((This)->lpVtbl->IsWindow(This))
+
+#define IHostWnd_Invalidate(This, bErase) \
+    ((This)->lpVtbl->Invalidate(This, bErase))
+
+#define IHostWnd_InvalidateRect(This, lpRect, bErase) \
+    ((This)->lpVtbl->InvalidateRect(This, lpRect, bErase))
+
+#define IHostWnd_GetWindowRect(This, lpRect) \
+    ((This)->lpVtbl->GetWindowRect(This, lpRect))
+
+#define IHostWnd_GetClientRect(This, lpRect) \
+    ((This)->lpVtbl->GetClientRect(This, lpRect))
+
+#define IHostWnd_ClientToScreen(This, lpPoint) \
+    ((This)->lpVtbl->ClientToScreen(This, lpPoint))
+
+#define IHostWnd_ClientToScreen2(This, lpRect) \
+    ((This)->lpVtbl->ClientToScreen2(This, lpRect))
+
+#define IHostWnd_ScreenToClient(This, lpPoint) \
+    ((This)->lpVtbl->ScreenToClient(This, lpPoint))
+
+#define IHostWnd_ScreenToClient2(This, lpRect) \
+    ((This)->lpVtbl->ScreenToClient2(This, lpRect))
+
+#define IHostWnd_MapWindowPoints(This, hWndTo, lpPoint, nCount) \
+    ((This)->lpVtbl->MapWindowPoints(This, hWndTo, lpPoint, nCount))
+
+#define IHostWnd_MapWindowRect(This, hWndTo, lpRect) \
+    ((This)->lpVtbl->MapWindowRect(This, hWndTo, lpRect))
+
+#define IHostWnd_SetTimer(This, nIDEvent, nElapse, lpfnTimer) \
+    ((This)->lpVtbl->SetTimer(This, nIDEvent, nElapse, lpfnTimer))
+
+#define IHostWnd_KillTimer(This, nIDEvent) \
+    ((This)->lpVtbl->KillTimer(This, nIDEvent))
+
+#define IHostWnd_GetDC(This) \
+    ((This)->lpVtbl->GetDC(This))
+
+#define IHostWnd_GetWindowDC(This) \
+    ((This)->lpVtbl->GetWindowDC(This))
+
+#define IHostWnd_ReleaseDC(This, hDC) \
+    ((This)->lpVtbl->ReleaseDC(This, hDC))
+
+#define IHostWnd_CreateCaret(This, hBitmap, nWidth, nHeight) \
+    ((This)->lpVtbl->CreateCaret(This, hBitmap, nWidth, nHeight))
+
+#define IHostWnd_HideCaret(This) \
+    ((This)->lpVtbl->HideCaret(This))
+
+#define IHostWnd_ShowCaret(This) \
+    ((This)->lpVtbl->ShowCaret(This))
+
+#define IHostWnd_GetCapture(This) \
+    ((This)->lpVtbl->GetCapture(This))
+
+#define IHostWnd_SetCapture(This) \
+    ((This)->lpVtbl->SetCapture(This))
+
+#define IHostWnd_ReleaseCapture(This) \
+    ((This)->lpVtbl->ReleaseCapture(This))
+
+#define IHostWnd_SetFocus(This) \
+    ((This)->lpVtbl->SetFocus(This))
+
+#define IHostWnd_SendMessage(This, message, wParam, lParam) \
+    ((This)->lpVtbl->SendMessage(This, message, wParam, lParam))
+
+#define IHostWnd_PostMessage(This, message, wParam, lParam) \
+    ((This)->lpVtbl->PostMessage(This, message, wParam, lParam))
+
+#define IHostWnd_SendNotifyMessage(This, message, wParam, lParam) \
+    ((This)->lpVtbl->SendNotifyMessage(This, message, wParam, lParam))
+
+#define IHostWnd_SetWindowText(This, lpszString) \
+    ((This)->lpVtbl->SetWindowText(This, lpszString))
+
+#define IHostWnd_GetWindowText(This, lpszStringBuf, nMaxCount) \
+    ((This)->lpVtbl->GetWindowText(This, lpszStringBuf, nMaxCount))
+
+#define IHostWnd_IsIconic(This) \
+    ((This)->lpVtbl->IsIconic(This))
+
+#define IHostWnd_IsZoomed(This) \
+    ((This)->lpVtbl->IsZoomed(This))
+
+#define IHostWnd_IsWindowVisible(This) \
+    ((This)->lpVtbl->IsWindowVisible(This))
+
+#define IHostWnd_MoveWindow(This, x, y, nWidth, nHeight, bRepaint) \
+    ((This)->lpVtbl->MoveWindow(This, x, y, nWidth, nHeight, bRepaint))
+
+#define IHostWnd_MoveWindow2(This, lpRect, bRepaint) \
+    ((This)->lpVtbl->MoveWindow2(This, lpRect, bRepaint))
+
+#define IHostWnd_ShowWindow(This, nCmdShow) \
+    ((This)->lpVtbl->ShowWindow(This, nCmdShow))
+
+#define IHostWnd_UpdateWindow(This) \
+    ((This)->lpVtbl->UpdateWindow(This))
+
+#define IHostWnd_SetWindowRgn(This, hRgn, bRedraw) \
+    ((This)->lpVtbl->SetWindowRgn(This, hRgn, bRedraw))
+
+#define IHostWnd_SetLayeredWindowAttributes(This, crKey, bAlpha, dwFlags) \
+    ((This)->lpVtbl->SetLayeredWindowAttributes(This, crKey, bAlpha, dwFlags))
+
+#define IHostWnd_UpdateLayeredWindow(This, hdcDst, pptDst, psize, hdcSrc, pptSrc, crKey, pblend, dwFlags) \
+    ((This)->lpVtbl->UpdateLayeredWindow(This, hdcDst, pptDst, psize, hdcSrc, pptSrc, crKey, pblend, dwFlags))
+
+#define IHostWnd_SetMsgHandler(This, fun, ctx) \
+    ((This)->lpVtbl->SetMsgHandler(This, fun, ctx))
+
+#define IHostWnd_GetMsgHandler(This) \
+    ((This)->lpVtbl->GetMsgHandler(This))
+
+/* IHostWnd specific interface macros */
 #define IHostWnd_CreateEx(This, hWndParent, dwStyle, dwExStyle, x, y, nWidth, nHeight, xmlInit) \
     ((This)->lpVtbl->CreateEx(This, hWndParent, dwStyle, dwExStyle, x, y, nWidth, nHeight, xmlInit))
 
@@ -46,6 +210,15 @@ extern "C" {
 
 #define IHostWnd_Create_Default(This, hWndParent) \
     ((This)->lpVtbl->Create(This, hWndParent, 0, 0, 0, 0))
+
+#define IHostWnd_Attach(This, hWnd, xmlInit) \
+    ((This)->lpVtbl->Attach(This, hWnd, xmlInit))
+
+#define IHostWnd_Attach_Default(This, hWnd) \
+    ((This)->lpVtbl->Attach(This, hWnd, NULL))
+
+#define IHostWnd_Detach(This) \
+    ((This)->lpVtbl->Detach(This))
 
 #define IHostWnd_SetLayoutId(This, pszLayoutId) \
     ((This)->lpVtbl->SetLayoutId(This, pszLayoutId))
@@ -68,328 +241,53 @@ extern "C" {
 #define IHostWnd_GetMsgLoop(This) \
     ((This)->lpVtbl->GetMsgLoop(This))
 
-/*
- * C API Helper Functions (Optional - for more C-like usage)
- */
+#define IHostWnd_FindIChildByID(This, nId) \
+    ((This)->lpVtbl->FindIChildByID(This, nId))
 
-/* IHostWnd Helper Functions */
-static inline long IHostWnd_AddRef_C(IHostWnd* pThis)
-{
-    return IHostWnd_AddRef(pThis);
-}
+#define IHostWnd_FindIChildByName(This, pszName) \
+    ((This)->lpVtbl->FindIChildByName(This, pszName))
 
-static inline long IHostWnd_Release_C(IHostWnd* pThis)
-{
-    return IHostWnd_Release(pThis);
-}
+#define IHostWnd_FindIChildByNameA(This, pszName) \
+    ((This)->lpVtbl->FindIChildByNameA(This, pszName))
 
-static inline HWND IHostWnd_CreateEx_C(IHostWnd* pThis, HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight, IXmlNode* xmlInit)
-{
-    return IHostWnd_CreateEx(pThis, hWndParent, dwStyle, dwExStyle, x, y, nWidth, nHeight, xmlInit);
-}
+#define IHostWnd_GetNcPainter(This) \
+    ((This)->lpVtbl->GetNcPainter(This))
 
-static inline HWND IHostWnd_Create_C(IHostWnd* pThis, HWND hWndParent, int x, int y, int nWidth, int nHeight)
-{
-    return IHostWnd_Create(pThis, hWndParent, x, y, nWidth, nHeight);
-}
+#define IHostWnd_SetEventHandler(This, fun, ctx) \
+    ((This)->lpVtbl->SetEventHandler(This, fun, ctx))
 
-static inline void IHostWnd_SetLayoutId_C(IHostWnd* pThis, LPCTSTR pszLayoutId)
-{
-    IHostWnd_SetLayoutId(pThis, pszLayoutId);
-}
+#define IHostWnd_GetEventHandler(This) \
+    ((This)->lpVtbl->GetEventHandler(This))
 
-static inline BOOL IHostWnd_InitFromXml_C(IHostWnd* pThis, IXmlNode* pNode)
-{
-    return IHostWnd_InitFromXml(pThis, pNode);
-}
+#define IHostWnd_AnimateHostWindow(This, dwTime, dwFlags) \
+    ((This)->lpVtbl->AnimateHostWindow(This, dwTime, dwFlags))
 
-static inline IWindow* IHostWnd_GetIRoot_C(IHostWnd* pThis)
-{
-    return IHostWnd_GetIRoot(pThis);
-}
+#define IHostWnd_EnableDragDrop(This) \
+    ((This)->lpVtbl->EnableDragDrop(This))
 
-static inline BOOL IHostWnd_IsTranslucent_C(const IHostWnd* pThis)
-{
-    return IHostWnd_IsTranslucent(pThis);
-}
+#define IHostWnd_ShowHostWnd(This, uShowCmd, bWaitAniDone) \
+    ((This)->lpVtbl->ShowHostWnd(This, uShowCmd, bWaitAniDone))
 
-static inline IHostPresenter* IHostWnd_GetPresenter_C(IHostWnd* pThis)
-{
-    return IHostWnd_GetPresenter(pThis);
-}
+#define IHostWnd_EnablePrivateUiDef(This, bEnable) \
+    ((This)->lpVtbl->EnablePrivateUiDef(This, bEnable))
 
-static inline void IHostWnd_SetPresenter_C(IHostWnd* pThis, IHostPresenter* pPresenter)
-{
-    IHostWnd_SetPresenter(pThis, pPresenter);
-}
-
-static inline IMessageLoop* IHostWnd_GetMsgLoop_C(IHostWnd* pThis)
-{
-    return IHostWnd_GetMsgLoop(pThis);
-}
-
-static inline HWND IHostWnd_GetHwnd_C(IHostWnd* pThis)
-{
-    return IHostWnd_GetHwnd(pThis);
-}
+#define IHostWnd_SetScale(This, nScale, pDestRect) \
+    ((This)->lpVtbl->SetScale(This, nScale, pDestRect))
 
 /*
- * Convenience macros for common host window operations
+ * IHostDialog interface macros
+ * IHostDialog inherits from IHostWnd; use IHostWnd_ macros for inherited methods.
  */
 
-/* Window creation shortcuts */
-#define IHostWnd_CreateSimple(This, parent, x, y, width, height) \
-    IHostWnd_Create(This, parent, x, y, width, height)
+/* IHostDialog specific interface macros */
+#define IHostDialog_DoModal(This, hParent, dwStyle, dwExStyle) \
+    ((This)->lpVtbl->DoModal(This, hParent, dwStyle, dwExStyle))
 
-#define IHostWnd_CreateWithStyle(This, parent, style, exStyle, x, y, width, height) \
-    IHostWnd_CreateEx_Default(This, parent, style, exStyle, x, y, width, height)
+#define IHostDialog_DoModal_Default(This) \
+    ((This)->lpVtbl->DoModal(This, NULL, WS_POPUP | WS_CLIPCHILDREN, 0))
 
-#define IHostWnd_CreateWithXml(This, parent, style, exStyle, x, y, width, height, xml) \
-    IHostWnd_CreateEx(This, parent, style, exStyle, x, y, width, height, xml)
-
-#define IHostWnd_CreateChild(This, parent) \
-    IHostWnd_Create_Default(This, parent)
-
-/* Layout and initialization shortcuts */
-#define IHostWnd_SetLayout(This, layoutId) \
-    IHostWnd_SetLayoutId(This, layoutId)
-
-#define IHostWnd_LoadFromXml(This, xmlNode) \
-    IHostWnd_InitFromXml(This, xmlNode)
-
-#define IHostWnd_Initialize(This, xmlNode) \
-    IHostWnd_InitFromXml(This, xmlNode)
-
-/* Root window shortcuts */
-#define IHostWnd_GetRoot(This) \
-    IHostWnd_GetIRoot(This)
-
-#define IHostWnd_GetRootWindow(This) \
-    IHostWnd_GetIRoot(This)
-
-#define IHostWnd_GetDuiRoot(This) \
-    IHostWnd_GetIRoot(This)
-
-/* Presenter shortcuts */
-#define IHostWnd_GetHostPresenter(This) \
-    IHostWnd_GetPresenter(This)
-
-#define IHostWnd_SetHostPresenter(This, presenter) \
-    IHostWnd_SetPresenter(This, presenter)
-
-/* Message loop shortcuts */
-#define IHostWnd_GetMessageLoop(This) \
-    IHostWnd_GetMsgLoop(This)
-
-/* Transparency shortcuts */
-#define IHostWnd_IsTransparent(This) \
-    IHostWnd_IsTranslucent(This)
-
-#define IHostWnd_HasTransparency(This) \
-    IHostWnd_IsTranslucent(This)
-
-/* Safe host window operations */
-#define IHostWnd_SafeCreateEx(This, parent, style, exStyle, x, y, width, height, xml, phWnd) \
-    do { \
-        if ((This) && (phWnd)) { \
-            *(phWnd) = IHostWnd_CreateEx(This, parent, style, exStyle, x, y, width, height, xml); \
-        } else if (phWnd) { \
-            *(phWnd) = NULL; \
-        } \
-    } while(0)
-
-#define IHostWnd_SafeCreate(This, parent, x, y, width, height, phWnd) \
-    do { \
-        if ((This) && (phWnd)) { \
-            *(phWnd) = IHostWnd_Create(This, parent, x, y, width, height); \
-        } else if (phWnd) { \
-            *(phWnd) = NULL; \
-        } \
-    } while(0)
-
-#define IHostWnd_SafeSetLayoutId(This, layoutId) \
-    do { \
-        if ((This) && (layoutId)) { \
-            IHostWnd_SetLayoutId(This, layoutId); \
-        } \
-    } while(0)
-
-#define IHostWnd_SafeInitFromXml(This, xmlNode) \
-    ((This) && (xmlNode) ? IHostWnd_InitFromXml(This, xmlNode) : FALSE)
-
-#define IHostWnd_SafeGetRoot(This, ppRoot) \
-    do { \
-        if ((This) && (ppRoot)) { \
-            *(ppRoot) = IHostWnd_GetIRoot(This); \
-        } else if (ppRoot) { \
-            *(ppRoot) = NULL; \
-        } \
-    } while(0)
-
-#define IHostWnd_SafeSetPresenter(This, presenter) \
-    do { \
-        if ((This) && (presenter)) { \
-            IHostWnd_SetPresenter(This, presenter); \
-        } \
-    } while(0)
-
-/*
- * Host window helper functions
- */
-static inline BOOL IHostWnd_IsValid_C(IHostWnd* pThis)
-{
-    return (pThis != NULL);
-}
-
-static inline BOOL IHostWnd_HasValidHwnd_C(IHostWnd* pThis)
-{
-    if (!pThis) return FALSE;
-    
-    HWND hwnd = IHostWnd_GetHwnd(pThis);
-    return (hwnd != NULL && IsWindow(hwnd));
-}
-
-static inline BOOL IHostWnd_HasRoot_C(IHostWnd* pThis)
-{
-    if (!pThis) return FALSE;
-    
-    return (IHostWnd_GetIRoot(pThis) != NULL);
-}
-
-static inline BOOL IHostWnd_HasPresenter_C(IHostWnd* pThis)
-{
-    if (!pThis) return FALSE;
-    
-    return (IHostWnd_GetPresenter(pThis) != NULL);
-}
-
-static inline BOOL IHostWnd_HasMsgLoop_C(IHostWnd* pThis)
-{
-    if (!pThis) return FALSE;
-    
-    return (IHostWnd_GetMsgLoop(pThis) != NULL);
-}
-
-/*
- * Host window state management
- */
-typedef struct HostWndState {
-    IHostWnd* hostWnd;
-    HWND hwnd;
-    IWindow* rootWindow;
-    IHostPresenter* presenter;
-    IMessageLoop* msgLoop;
-    BOOL isTranslucent;
-    BOOL isValid;
-    BOOL hasValidHwnd;
-    BOOL hasRoot;
-    BOOL hasPresenter;
-    BOOL hasMsgLoop;
-} HostWndState;
-
-static inline void HostWndState_Init(HostWndState* state, IHostWnd* hostWnd)
-{
-    if (state) {
-        state->hostWnd = hostWnd;
-        if (hostWnd) {
-            state->hwnd = IHostWnd_GetHwnd(hostWnd);
-            state->rootWindow = IHostWnd_GetIRoot(hostWnd);
-            state->presenter = IHostWnd_GetPresenter(hostWnd);
-            state->msgLoop = IHostWnd_GetMsgLoop(hostWnd);
-            state->isTranslucent = IHostWnd_IsTranslucent(hostWnd);
-            state->isValid = TRUE;
-            state->hasValidHwnd = IHostWnd_HasValidHwnd_C(hostWnd);
-            state->hasRoot = (state->rootWindow != NULL);
-            state->hasPresenter = (state->presenter != NULL);
-            state->hasMsgLoop = (state->msgLoop != NULL);
-        } else {
-            memset(state, 0, sizeof(HostWndState));
-        }
-    }
-}
-
-static inline void HostWndState_Update(HostWndState* state)
-{
-    if (state && state->hostWnd) {
-        HostWndState_Init(state, state->hostWnd);
-    }
-}
-
-static inline HWND HostWndState_CreateWindow(HostWndState* state, HWND parent, int x, int y, int width, int height)
-{
-    if (!state || !state->hostWnd) return NULL;
-    
-    HWND hwnd = IHostWnd_Create(state->hostWnd, parent, x, y, width, height);
-    if (hwnd) {
-        HostWndState_Update(state);
-    }
-    return hwnd;
-}
-
-static inline BOOL HostWndState_InitFromXml(HostWndState* state, IXmlNode* xmlNode)
-{
-    if (!state || !state->hostWnd || !xmlNode) return FALSE;
-    
-    BOOL result = IHostWnd_InitFromXml(state->hostWnd, xmlNode);
-    if (result) {
-        HostWndState_Update(state);
-    }
-    return result;
-}
-
-/*
- * Reference counting helpers
- */
-#define IHostWnd_SafeAddRef(This) \
-    IObjRef_SafeAddRef((IUnknown*)(This))
-
-#define IHostWnd_SafeRelease(This) \
-    IObjRef_SafeRelease((IUnknown**)(This))
-
-/*
- * Debugging helpers
- */
-#ifdef _DEBUG
-static inline void IHostWnd_DebugInfo_C(IHostWnd* pThis)
-{
-    if (!pThis) {
-        printf("HostWnd: NULL\n");
-        return;
-    }
-    
-    printf("HostWnd: %p\n", pThis);
-    printf("  HWND: %p\n", IHostWnd_GetHwnd(pThis));
-    printf("  Has Valid HWND: %s\n", IHostWnd_HasValidHwnd_C(pThis) ? "Yes" : "No");
-    printf("  Root Window: %p\n", IHostWnd_GetIRoot(pThis));
-    printf("  Has Root: %s\n", IHostWnd_HasRoot_C(pThis) ? "Yes" : "No");
-    printf("  Presenter: %p\n", IHostWnd_GetPresenter(pThis));
-    printf("  Has Presenter: %s\n", IHostWnd_HasPresenter_C(pThis) ? "Yes" : "No");
-    printf("  Message Loop: %p\n", IHostWnd_GetMsgLoop(pThis));
-    printf("  Has MsgLoop: %s\n", IHostWnd_HasMsgLoop_C(pThis) ? "Yes" : "No");
-    printf("  Is Translucent: %s\n", IHostWnd_IsTranslucent(pThis) ? "Yes" : "No");
-}
-
-static inline void HostWndState_DebugInfo(const HostWndState* state)
-{
-    if (!state) {
-        printf("HostWndState: NULL\n");
-        return;
-    }
-    
-    printf("HostWndState: %p\n", state);
-    printf("  HostWnd: %p\n", state->hostWnd);
-    printf("  HWND: %p\n", state->hwnd);
-    printf("  Valid: %s\n", state->isValid ? "Yes" : "No");
-    printf("  Has Valid HWND: %s\n", state->hasValidHwnd ? "Yes" : "No");
-    printf("  Has Root: %s\n", state->hasRoot ? "Yes" : "No");
-    printf("  Has Presenter: %s\n", state->hasPresenter ? "Yes" : "No");
-    printf("  Has MsgLoop: %s\n", state->hasMsgLoop ? "Yes" : "No");
-    printf("  Is Translucent: %s\n", state->isTranslucent ? "Yes" : "No");
-}
-#else
-#define IHostWnd_DebugInfo_C(This) ((void)0)
-#define HostWndState_DebugInfo(state) ((void)0)
-#endif
+#define IHostDialog_EndDialog(This, nResult) \
+    ((This)->lpVtbl->EndDialog(This, nResult))
 
 #ifdef __cplusplus
 }

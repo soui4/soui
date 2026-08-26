@@ -10,6 +10,13 @@ extern "C" {
 /*
  * C API Helper Macros for SValueAnimator Interfaces
  * These macros provide C-style function call syntax for C++ interface methods
+ *
+ * Interfaces covered:
+ *   IAnimatorUpdateListener  (no base interface)
+ *   IAnimatorListener        (no base interface)
+ *   IValueAnimator           (inherits IObject)
+ *   IAnimatorGroupListerer   (no base interface)
+ *   IAnimatorGroup           (inherits IObjRef)
  */
 
 /* IAnimatorUpdateListener C API Macros */
@@ -26,7 +33,7 @@ extern "C" {
 #define IAnimatorListener_onAnimationRepeat(This, pAnimator) \
     ((This)->lpVtbl->onAnimationRepeat(This, pAnimator))
 
-/* IValueAnimator C API Macros */
+/* IValueAnimator C API Macros (IObject base interface) */
 #define IValueAnimator_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -36,6 +43,58 @@ extern "C" {
 #define IValueAnimator_OnFinalRelease(This) \
     ((This)->lpVtbl->OnFinalRelease(This))
 
+#define IValueAnimator_IsClass(This, lpszName) \
+    ((This)->lpVtbl->IsClass(This, lpszName))
+
+#define IValueAnimator_GetClassNameList(This, ppClassNameList, nMaxCount) \
+    ((This)->lpVtbl->GetClassNameList(This, ppClassNameList, nMaxCount))
+
+#define IValueAnimator_GetObjectClass(This) \
+    ((This)->lpVtbl->GetObjectClass(This))
+
+#define IValueAnimator_GetObjectType(This) \
+    ((This)->lpVtbl->GetObjectType(This))
+
+#define IValueAnimator_GetID(This) \
+    ((This)->lpVtbl->GetID(This))
+
+#define IValueAnimator_SetID(This, nID) \
+    ((This)->lpVtbl->SetID(This, nID))
+
+#define IValueAnimator_GetName(This) \
+    ((This)->lpVtbl->GetName(This))
+
+#define IValueAnimator_GetNameA(This) \
+    ((This)->lpVtbl->GetNameA(This))
+
+#define IValueAnimator_SetName(This, pszName) \
+    ((This)->lpVtbl->SetName(This, pszName))
+
+#define IValueAnimator_InitFromXml(This, xmlNode) \
+    ((This)->lpVtbl->InitFromXml(This, xmlNode))
+
+#define IValueAnimator_OnInitFinished(This, xmlNode) \
+    ((This)->lpVtbl->OnInitFinished(This, xmlNode))
+
+#define IValueAnimator_ISetAttribute(This, strAttribName, strValue, bLoading) \
+    ((This)->lpVtbl->ISetAttribute(This, strAttribName, strValue, bLoading))
+
+#define IValueAnimator_SetAttributeA(This, pszAttr, pszValue, bLoading) \
+    ((This)->lpVtbl->SetAttributeA(This, pszAttr, pszValue, bLoading))
+
+#define IValueAnimator_SetAttribute(This, pszAttr, pszValue, bLoading) \
+    ((This)->lpVtbl->SetAttribute(This, pszAttr, pszValue, bLoading))
+
+#define IValueAnimator_GetAttribute(This, strAttr, pValue) \
+    ((This)->lpVtbl->GetAttribute(This, strAttr, pValue))
+
+#define IValueAnimator_AfterAttribute(This, pszAttr, pszValue, bLoading, hr) \
+    ((This)->lpVtbl->AfterAttribute(This, pszAttr, pszValue, bLoading, hr))
+
+#define IValueAnimator_SetAttrHandler(This, attrHandler) \
+    ((This)->lpVtbl->SetAttrHandler(This, attrHandler))
+
+/* IValueAnimator specific interface macros */
 #define IValueAnimator_setDuration(This, duration) \
     ((This)->lpVtbl->setDuration(This, duration))
 
@@ -123,11 +182,20 @@ extern "C" {
 #define IValueAnimator_onEvaluateValue(This, fraction) \
     ((This)->lpVtbl->onEvaluateValue(This, fraction))
 
-/* IAnimatorGroupListerer C API Macros */
-#define IAnimatorGroupListerer_OnAnimatorGroupEnd(This, pGroup) \
-    ((This)->lpVtbl->OnAnimatorGroupEnd(This, pGroup))
+#define IValueAnimator_GetTimelineHandler(This) \
+    ((This)->lpVtbl->GetTimelineHandler(This))
 
-/* IAnimatorGroup C API Macros */
+#define IValueAnimator_GetUserData(This) \
+    ((This)->lpVtbl->GetUserData(This))
+
+#define IValueAnimator_SetUserData(This, pUserData) \
+    ((This)->lpVtbl->SetUserData(This, pUserData))
+
+/* IAnimatorGroupListerer C API Macros */
+#define IAnimatorGroupListerer_OnAnimatorGroupEnd(This, pGroup, nID) \
+    ((This)->lpVtbl->OnAnimatorGroupEnd(This, pGroup, nID))
+
+/* IAnimatorGroup C API Macros (IObjRef base interface) */
 #define IAnimatorGroup_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -145,223 +213,6 @@ extern "C" {
 
 #define IAnimatorGroup_SetListener(This, listener) \
     ((This)->lpVtbl->SetListener(This, listener))
-
-/*
- * C API Helper Functions (Optional - for more C-like usage)
- */
-
-/* IValueAnimator Helper Functions */
-static inline long IValueAnimator_AddRef_C(IValueAnimator* pThis)
-{
-    return IValueAnimator_AddRef(pThis);
-}
-
-static inline long IValueAnimator_Release_C(IValueAnimator* pThis)
-{
-    return IValueAnimator_Release(pThis);
-}
-
-static inline void IValueAnimator_setDuration_C(IValueAnimator* pThis, long duration)
-{
-    IValueAnimator_setDuration(pThis, duration);
-}
-
-static inline long IValueAnimator_getDuration_C(IValueAnimator* pThis)
-{
-    return IValueAnimator_getDuration(pThis);
-}
-
-static inline void IValueAnimator_start_C(IValueAnimator* pThis, ITimelineHandlersMgr* pContainer)
-{
-    IValueAnimator_start(pThis, pContainer);
-}
-
-static inline void IValueAnimator_end_C(IValueAnimator* pThis)
-{
-    IValueAnimator_end(pThis);
-}
-
-static inline BOOL IValueAnimator_isRunning_C(IValueAnimator* pThis)
-{
-    return IValueAnimator_isRunning(pThis);
-}
-
-static inline float IValueAnimator_getAnimatedFraction_C(IValueAnimator* pThis)
-{
-    return IValueAnimator_getAnimatedFraction(pThis);
-}
-
-static inline IValueAnimator* IValueAnimator_clone_C(IValueAnimator* pThis)
-{
-    return IValueAnimator_clone(pThis);
-}
-
-/* IAnimatorGroup Helper Functions */
-static inline long IAnimatorGroup_AddRef_C(IAnimatorGroup* pThis)
-{
-    return IAnimatorGroup_AddRef(pThis);
-}
-
-static inline long IAnimatorGroup_Release_C(IAnimatorGroup* pThis)
-{
-    return IAnimatorGroup_Release(pThis);
-}
-
-static inline BOOL IAnimatorGroup_AddAnimator_C(IAnimatorGroup* pThis, IValueAnimator* ani)
-{
-    return IAnimatorGroup_AddAnimator(pThis, ani);
-}
-
-static inline BOOL IAnimatorGroup_RemoveAnimator_C(IAnimatorGroup* pThis, IValueAnimator* ani)
-{
-    return IAnimatorGroup_RemoveAnimator(pThis, ani);
-}
-
-/*
- * Convenience macros for common animator operations
- */
-
-/* Duration shortcuts */
-#define IValueAnimator_SetDurationSeconds(This, seconds) \
-    IValueAnimator_setDuration(This, (seconds) * 1000)
-
-#define IValueAnimator_SetDurationMillis(This, millis) \
-    IValueAnimator_setDuration(This, millis)
-
-#define IValueAnimator_GetDurationSeconds(This) \
-    (IValueAnimator_getDuration(This) / 1000.0f)
-
-/* Playback control shortcuts */
-#define IValueAnimator_Play(This, container) \
-    IValueAnimator_start(This, container)
-
-#define IValueAnimator_Stop(This) \
-    IValueAnimator_end(This)
-
-#define IValueAnimator_Pause(This) \
-    IValueAnimator_end(This)
-
-#define IValueAnimator_Resume(This, container) \
-    IValueAnimator_start(This, container)
-
-/* Progress control shortcuts */
-#define IValueAnimator_SetProgress(This, progress) \
-    IValueAnimator_setCurrentFraction(This, progress)
-
-#define IValueAnimator_GetProgress(This) \
-    IValueAnimator_getAnimatedFraction(This)
-
-#define IValueAnimator_SetProgressPercent(This, percent) \
-    IValueAnimator_setCurrentFraction(This, (percent) / 100.0f)
-
-#define IValueAnimator_GetProgressPercent(This) \
-    (IValueAnimator_getAnimatedFraction(This) * 100.0f)
-
-/* Repeat control shortcuts */
-#define IValueAnimator_SetInfiniteRepeat(This) \
-    IValueAnimator_setRepeatCount(This, -1)
-
-#define IValueAnimator_SetNoRepeat(This) \
-    IValueAnimator_setRepeatCount(This, 0)
-
-#define IValueAnimator_SetRepeatOnce(This) \
-    IValueAnimator_setRepeatCount(This, 1)
-
-/* State checking shortcuts */
-#define IValueAnimator_IsActive(This) \
-    (IValueAnimator_isRunning(This) || IValueAnimator_isStarted(This))
-
-#define IValueAnimator_IsStopped(This) \
-    (!IValueAnimator_isRunning(This) && !IValueAnimator_isStarted(This))
-
-#define IValueAnimator_IsCompleted(This) \
-    (IValueAnimator_getAnimatedFraction(This) >= 1.0f)
-
-#define IValueAnimator_IsAtStart(This) \
-    (IValueAnimator_getAnimatedFraction(This) <= 0.0f)
-
-/* Safe animator operations */
-#define IValueAnimator_SafeStart(This, container) \
-    do { \
-        if ((This) && (container) && !IValueAnimator_isRunning(This)) { \
-            IValueAnimator_start(This, container); \
-        } \
-    } while(0)
-
-#define IValueAnimator_SafeEnd(This) \
-    do { \
-        if ((This) && IValueAnimator_isRunning(This)) { \
-            IValueAnimator_end(This); \
-        } \
-    } while(0)
-
-#define IValueAnimator_SafeSetDuration(This, duration) \
-    do { \
-        if ((This) && (duration) > 0) { \
-            IValueAnimator_setDuration(This, duration); \
-        } \
-    } while(0)
-
-/* Listener management shortcuts */
-#define IValueAnimator_ClearUpdateListeners(This) \
-    IValueAnimator_removeAllUpdateListeners(This)
-
-#define IValueAnimator_SafeAddUpdateListener(This, listener) \
-    do { \
-        if ((This) && (listener)) { \
-            IValueAnimator_addUpdateListener(This, listener); \
-        } \
-    } while(0)
-
-#define IValueAnimator_SafeRemoveUpdateListener(This, listener) \
-    do { \
-        if ((This) && (listener)) { \
-            IValueAnimator_removeUpdateListener(This, listener); \
-        } \
-    } while(0)
-
-#define IValueAnimator_SafeAddListener(This, listener) \
-    do { \
-        if ((This) && (listener)) { \
-            IValueAnimator_addListener(This, listener); \
-        } \
-    } while(0)
-
-#define IValueAnimator_SafeRemoveListener(This, listener) \
-    do { \
-        if ((This) && (listener)) { \
-            IValueAnimator_removeListener(This, listener); \
-        } \
-    } while(0)
-
-/* Animator group shortcuts */
-#define IAnimatorGroup_SafeAddAnimator(This, animator) \
-    ((This) && (animator) ? IAnimatorGroup_AddAnimator(This, animator) : FALSE)
-
-#define IAnimatorGroup_SafeRemoveAnimator(This, animator) \
-    ((This) && (animator) ? IAnimatorGroup_RemoveAnimator(This, animator) : FALSE)
-
-#define IAnimatorGroup_SafeSetListener(This, listener) \
-    do { \
-        if ((This) && (listener)) { \
-            IAnimatorGroup_SetListener(This, listener); \
-        } \
-    } while(0)
-
-/*
- * Reference counting helpers
- */
-#define IValueAnimator_SafeAddRef(This) \
-    IObjRef_SafeAddRef((IUnknown*)(This))
-
-#define IValueAnimator_SafeRelease(This) \
-    IObjRef_SafeRelease((IUnknown**)(This))
-
-#define IAnimatorGroup_SafeAddRef(This) \
-    IObjRef_SafeAddRef((IUnknown*)(This))
-
-#define IAnimatorGroup_SafeRelease(This) \
-    IObjRef_SafeRelease((IUnknown**)(This))
 
 #ifdef __cplusplus
 }

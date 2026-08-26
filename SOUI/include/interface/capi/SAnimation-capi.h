@@ -10,6 +10,10 @@ extern "C" {
 /*
  * C API Helper Macros for SAnimation Interfaces
  * These macros provide C-style function call syntax for C++ interface methods
+ *
+ * Interfaces covered:
+ *   IAnimationListener (no base interface)
+ *   IAnimation         (inherits IObject)
  */
 
 /* IAnimationListener C API Macros */
@@ -25,7 +29,7 @@ extern "C" {
 #define IAnimationListener_OnAnimationPauseChange(This, animation, bPaused) \
     ((This)->lpVtbl->OnAnimationPauseChange(This, animation, bPaused))
 
-/* IAnimation C API Macros */
+/* IAnimation C API Macros (IObject base interface) */
 #define IAnimation_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -35,27 +39,58 @@ extern "C" {
 #define IAnimation_OnFinalRelease(This) \
     ((This)->lpVtbl->OnFinalRelease(This))
 
+#define IAnimation_IsClass(This, lpszName) \
+    ((This)->lpVtbl->IsClass(This, lpszName))
+
+#define IAnimation_GetClassNameList(This, ppClassNameList, nMaxCount) \
+    ((This)->lpVtbl->GetClassNameList(This, ppClassNameList, nMaxCount))
+
 #define IAnimation_GetObjectClass(This) \
     ((This)->lpVtbl->GetObjectClass(This))
 
 #define IAnimation_GetObjectType(This) \
     ((This)->lpVtbl->GetObjectType(This))
 
-#define IAnimation_IsClass(This, lpszName) \
-    ((This)->lpVtbl->IsClass(This, lpszName))
-
 #define IAnimation_GetID(This) \
     ((This)->lpVtbl->GetID(This))
 
-#define IAnimation_SetID(This, uID) \
-    ((This)->lpVtbl->SetID(This, uID))
+#define IAnimation_SetID(This, nID) \
+    ((This)->lpVtbl->SetID(This, nID))
 
-#define IAnimation_InitFromXml(This, pNode) \
-    ((This)->lpVtbl->InitFromXml(This, pNode))
+#define IAnimation_GetName(This) \
+    ((This)->lpVtbl->GetName(This))
 
-#define IAnimation_OnInitFinished(This, pNode) \
-    ((This)->lpVtbl->OnInitFinished(This, pNode))
+#define IAnimation_GetNameA(This) \
+    ((This)->lpVtbl->GetNameA(This))
 
+#define IAnimation_SetName(This, pszName) \
+    ((This)->lpVtbl->SetName(This, pszName))
+
+#define IAnimation_InitFromXml(This, xmlNode) \
+    ((This)->lpVtbl->InitFromXml(This, xmlNode))
+
+#define IAnimation_OnInitFinished(This, xmlNode) \
+    ((This)->lpVtbl->OnInitFinished(This, xmlNode))
+
+#define IAnimation_ISetAttribute(This, strAttribName, strValue, bLoading) \
+    ((This)->lpVtbl->ISetAttribute(This, strAttribName, strValue, bLoading))
+
+#define IAnimation_SetAttributeA(This, pszAttr, pszValue, bLoading) \
+    ((This)->lpVtbl->SetAttributeA(This, pszAttr, pszValue, bLoading))
+
+#define IAnimation_SetAttribute(This, pszAttr, pszValue, bLoading) \
+    ((This)->lpVtbl->SetAttribute(This, pszAttr, pszValue, bLoading))
+
+#define IAnimation_GetAttribute(This, strAttr, pValue) \
+    ((This)->lpVtbl->GetAttribute(This, strAttr, pValue))
+
+#define IAnimation_AfterAttribute(This, pszAttr, pszValue, bLoading, hr) \
+    ((This)->lpVtbl->AfterAttribute(This, pszAttr, pszValue, bLoading, hr))
+
+#define IAnimation_SetAttrHandler(This, attrHandler) \
+    ((This)->lpVtbl->SetAttrHandler(This, attrHandler))
+
+/* IAnimation specific interface macros */
 #define IAnimation_clone(This) \
     ((This)->lpVtbl->clone(This))
 
@@ -116,41 +151,8 @@ extern "C" {
 #define IAnimation_setZAdjustment(This, zAdjustment) \
     ((This)->lpVtbl->setZAdjustment(This, zAdjustment))
 
-#define IAnimation_setBackgroundColor(This, bg) \
-    ((This)->lpVtbl->setBackgroundColor(This, bg))
-
-#define IAnimation_setDetachWallpaper(This, detachWallpaper) \
-    ((This)->lpVtbl->setDetachWallpaper(This, detachWallpaper))
-
-#define IAnimation_getDetachWallpaper(This) \
-    ((This)->lpVtbl->getDetachWallpaper(This))
-
-#define IAnimation_willChangeTransformationMatrix(This) \
-    ((This)->lpVtbl->willChangeTransformationMatrix(This))
-
-#define IAnimation_willChangeBounds(This) \
-    ((This)->lpVtbl->willChangeBounds(This))
-
-#define IAnimation_setAnimationListener(This, listener) \
-    ((This)->lpVtbl->setAnimationListener(This, listener))
-
-#define IAnimation_ensureInterpolator(This) \
-    ((This)->lpVtbl->ensureInterpolator(This))
-
-#define IAnimation_computeDurationHint(This) \
-    ((This)->lpVtbl->computeDurationHint(This))
-
-#define IAnimation_getTransformation(This, currentTime, outTransformation, scale) \
-    ((This)->lpVtbl->getTransformation(This, currentTime, outTransformation, scale))
-
-#define IAnimation_getTransformation2(This, currentTime, outTransformation) \
-    ((This)->lpVtbl->getTransformation2(This, currentTime, outTransformation))
-
-#define IAnimation_hasStarted(This) \
-    ((This)->lpVtbl->hasStarted(This))
-
-#define IAnimation_hasEnded(This) \
-    ((This)->lpVtbl->hasEnded(This))
+#define IAnimation_getInterpolator(This) \
+    ((This)->lpVtbl->getInterpolator(This))
 
 #define IAnimation_getStartTime(This) \
     ((This)->lpVtbl->getStartTime(This))
@@ -170,155 +172,44 @@ extern "C" {
 #define IAnimation_getZAdjustment(This) \
     ((This)->lpVtbl->getZAdjustment(This))
 
-#define IAnimation_getBackgroundColor(This) \
-    ((This)->lpVtbl->getBackgroundColor(This))
+#define IAnimation_setAnimationListener(This, listener) \
+    ((This)->lpVtbl->setAnimationListener(This, listener))
 
-#define IAnimation_getScaleFactor(This) \
-    ((This)->lpVtbl->getScaleFactor(This))
+#define IAnimation_computeDurationHint(This) \
+    ((This)->lpVtbl->computeDurationHint(This))
 
-#define IAnimation_getInvalidateRegion(This, left, top, right, bottom, invalidate, transformation) \
-    ((This)->lpVtbl->getInvalidateRegion(This, left, top, right, bottom, invalidate, transformation))
+#define IAnimation_getTransformation2(This, currentTime, outTransformation, scale) \
+    ((This)->lpVtbl->getTransformation2(This, currentTime, outTransformation, scale))
 
-#define IAnimation_initializeInvalidateRegion(This, left, top, right, bottom) \
-    ((This)->lpVtbl->initializeInvalidateRegion(This, left, top, right, bottom))
+#define IAnimation_getTransformation(This, currentTime, outTransformation) \
+    ((This)->lpVtbl->getTransformation(This, currentTime, outTransformation))
 
-/*
- * C API Helper Functions (Optional - for more C-like usage)
- */
+#define IAnimation_hasStarted(This) \
+    ((This)->lpVtbl->hasStarted(This))
 
-/* IAnimationListener Helper Functions */
-static inline void IAnimationListener_OnAnimationStart_C(IAnimationListener* pThis, IAnimation* animation)
-{
-    IAnimationListener_OnAnimationStart(pThis, animation);
-}
+#define IAnimation_hasEnded(This) \
+    ((This)->lpVtbl->hasEnded(This))
 
-static inline void IAnimationListener_OnAnimationStop_C(IAnimationListener* pThis, IAnimation* animation)
-{
-    IAnimationListener_OnAnimationStop(pThis, animation);
-}
+#define IAnimation_applyTransformation(This, interpolatedTime, t) \
+    ((This)->lpVtbl->applyTransformation(This, interpolatedTime, t))
 
-static inline void IAnimationListener_OnAnimationRepeat_C(IAnimationListener* pThis, IAnimation* animation)
-{
-    IAnimationListener_OnAnimationRepeat(pThis, animation);
-}
+#define IAnimation_hasAlpha(This) \
+    ((This)->lpVtbl->hasAlpha(This))
 
-static inline void IAnimationListener_OnAnimationPauseChange_C(IAnimationListener* pThis, IAnimation* animation, BOOL bPaused)
-{
-    IAnimationListener_OnAnimationPauseChange(pThis, animation, bPaused);
-}
+#define IAnimation_initialize(This, width, height, parentWidth, parentHeight, nScale) \
+    ((This)->lpVtbl->initialize(This, width, height, parentWidth, parentHeight, nScale))
 
-/* IAnimation Helper Functions */
-static inline long IAnimation_AddRef_C(IAnimation* pThis)
-{
-    return IAnimation_AddRef(pThis);
-}
+#define IAnimation_setUserData(This, data) \
+    ((This)->lpVtbl->setUserData(This, data))
 
-static inline long IAnimation_Release_C(IAnimation* pThis)
-{
-    return IAnimation_Release(pThis);
-}
+#define IAnimation_getUserData(This) \
+    ((This)->lpVtbl->getUserData(This))
 
-static inline IAnimation* IAnimation_clone_C(IAnimation* pThis)
-{
-    return IAnimation_clone(pThis);
-}
+#define IAnimation_pause(This) \
+    ((This)->lpVtbl->pause(This))
 
-static inline void IAnimation_copy_C(IAnimation* pThis, const IAnimation* src)
-{
-    IAnimation_copy(pThis, src);
-}
-
-static inline void IAnimation_reset_C(IAnimation* pThis)
-{
-    IAnimation_reset(pThis);
-}
-
-static inline void IAnimation_cancel_C(IAnimation* pThis)
-{
-    IAnimation_cancel(pThis);
-}
-
-static inline void IAnimation_start_C(IAnimation* pThis)
-{
-    IAnimation_start(pThis);
-}
-
-static inline void IAnimation_startNow_C(IAnimation* pThis)
-{
-    IAnimation_startNow(pThis);
-}
-
-static inline void IAnimation_setDuration_C(IAnimation* pThis, long durationMillis)
-{
-    IAnimation_setDuration(pThis, durationMillis);
-}
-
-static inline long IAnimation_getDuration_C(IAnimation* pThis)
-{
-    return IAnimation_getDuration(pThis);
-}
-
-static inline void IAnimation_setRepeatCount_C(IAnimation* pThis, int repeatCount)
-{
-    IAnimation_setRepeatCount(pThis, repeatCount);
-}
-
-static inline int IAnimation_getRepeatCount_C(IAnimation* pThis)
-{
-    return IAnimation_getRepeatCount(pThis);
-}
-
-static inline void IAnimation_setRepeatMode_C(IAnimation* pThis, RepeatMode repeatMode)
-{
-    IAnimation_setRepeatMode(pThis, repeatMode);
-}
-
-static inline RepeatMode IAnimation_getRepeatMode_C(IAnimation* pThis)
-{
-    return IAnimation_getRepeatMode(pThis);
-}
-
-static inline BOOL IAnimation_hasStarted_C(IAnimation* pThis)
-{
-    return IAnimation_hasStarted(pThis);
-}
-
-static inline BOOL IAnimation_hasEnded_C(IAnimation* pThis)
-{
-    return IAnimation_hasEnded(pThis);
-}
-
-static inline void IAnimation_setAnimationListener_C(IAnimation* pThis, IAnimationListener* listener)
-{
-    IAnimation_setAnimationListener(pThis, listener);
-}
-
-/*
- * Convenience macros for common animation operations
- */
-#define IAnimation_StartAnimation(This) \
-    IAnimation_start(This)
-
-#define IAnimation_StopAnimation(This) \
-    IAnimation_cancel(This)
-
-#define IAnimation_SetDurationMs(This, ms) \
-    IAnimation_setDuration(This, ms)
-
-#define IAnimation_SetDurationSec(This, sec) \
-    IAnimation_setDuration(This, (sec) * 1000)
-
-#define IAnimation_SetRepeatForever(This) \
-    IAnimation_setRepeatCount(This, -1)
-
-#define IAnimation_SetRepeatOnce(This) \
-    IAnimation_setRepeatCount(This, 0)
-
-#define IAnimation_SetRepeatTimes(This, times) \
-    IAnimation_setRepeatCount(This, times)
-
-#define IAnimation_IsRunning(This) \
-    (IAnimation_hasStarted(This) && !IAnimation_hasEnded(This))
+#define IAnimation_resume(This) \
+    ((This)->lpVtbl->resume(This))
 
 #ifdef __cplusplus
 }

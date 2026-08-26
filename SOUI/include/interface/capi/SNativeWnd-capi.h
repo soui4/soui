@@ -10,12 +10,12 @@ extern "C" {
 /*
  * C API Helper Macros for SNativeWnd Interface
  * These macros provide C-style function call syntax for C++ interface methods
- * 
- * Note: This covers the main methods from SNativeWndApi.h (517 lines total)
- * Additional methods can be added following the same pattern.
+ *
+ * Interfaces covered:
+ *   INativeWnd (inherits IObjRef)
  */
 
-/* INativeWnd C API Macros */
+/* INativeWnd C API Macros (IObjRef base interface) */
 #define INativeWnd_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -25,6 +25,7 @@ extern "C" {
 #define INativeWnd_OnFinalRelease(This) \
     ((This)->lpVtbl->OnFinalRelease(This))
 
+/* INativeWnd specific interface macros */
 #define INativeWnd_CreateNative(This, lpWindowName, dwStyle, dwExStyle, x, y, nWidth, nHeight, hWndParent, nID, lpParam) \
     ((This)->lpVtbl->CreateNative(This, lpWindowName, dwStyle, dwExStyle, x, y, nWidth, nHeight, hWndParent, nID, lpParam))
 
@@ -36,9 +37,6 @@ extern "C" {
 
 #define INativeWnd_UnsubclassWindow(This, bForce) \
     ((This)->lpVtbl->UnsubclassWindow(This, bForce))
-
-#define INativeWnd_UnsubclassWindow_Default(This) \
-    ((This)->lpVtbl->UnsubclassWindow(This, FALSE))
 
 #define INativeWnd_GetCurrentMessage(This) \
     ((This)->lpVtbl->GetCurrentMessage(This))
@@ -70,23 +68,14 @@ extern "C" {
 #define INativeWnd_ModifyStyle(This, dwRemove, dwAdd, nFlags) \
     ((This)->lpVtbl->ModifyStyle(This, dwRemove, dwAdd, nFlags))
 
-#define INativeWnd_ModifyStyle_Default(This, dwRemove, dwAdd) \
-    ((This)->lpVtbl->ModifyStyle(This, dwRemove, dwAdd, 0))
-
 #define INativeWnd_ModifyStyleEx(This, dwRemove, dwAdd, nFlags) \
     ((This)->lpVtbl->ModifyStyleEx(This, dwRemove, dwAdd, nFlags))
-
-#define INativeWnd_ModifyStyleEx_Default(This, dwRemove, dwAdd) \
-    ((This)->lpVtbl->ModifyStyleEx(This, dwRemove, dwAdd, 0))
 
 #define INativeWnd_SetWindowPos(This, hWndInsertAfter, x, y, cx, cy, nFlags) \
     ((This)->lpVtbl->SetWindowPos(This, hWndInsertAfter, x, y, cx, cy, nFlags))
 
 #define INativeWnd_CenterWindow(This, hWndCenter) \
     ((This)->lpVtbl->CenterWindow(This, hWndCenter))
-
-#define INativeWnd_CenterWindow_Default(This) \
-    ((This)->lpVtbl->CenterWindow(This, NULL))
 
 #define INativeWnd_DestroyWindow(This) \
     ((This)->lpVtbl->DestroyWindow(This))
@@ -97,234 +86,119 @@ extern "C" {
 #define INativeWnd_Invalidate(This, bErase) \
     ((This)->lpVtbl->Invalidate(This, bErase))
 
-#define INativeWnd_Invalidate_Default(This) \
-    ((This)->lpVtbl->Invalidate(This, TRUE))
+#define INativeWnd_InvalidateRect(This, lpRect, bErase) \
+    ((This)->lpVtbl->InvalidateRect(This, lpRect, bErase))
 
-/*
- * C API Helper Functions (Optional - for more C-like usage)
- */
+#define INativeWnd_GetWindowRect(This, lpRect) \
+    ((This)->lpVtbl->GetWindowRect(This, lpRect))
 
-/* INativeWnd Helper Functions */
-static inline long INativeWnd_AddRef_C(INativeWnd* pThis)
-{
-    return INativeWnd_AddRef(pThis);
-}
+#define INativeWnd_GetClientRect(This, lpRect) \
+    ((This)->lpVtbl->GetClientRect(This, lpRect))
 
-static inline long INativeWnd_Release_C(INativeWnd* pThis)
-{
-    return INativeWnd_Release(pThis);
-}
+#define INativeWnd_ClientToScreen(This, lpPoint) \
+    ((This)->lpVtbl->ClientToScreen(This, lpPoint))
 
-static inline HWND INativeWnd_CreateNative_C(INativeWnd* pThis, LPCTSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle, 
-                                             int x, int y, int nWidth, int nHeight, HWND hWndParent, int nID, LPVOID lpParam)
-{
-    return INativeWnd_CreateNative(pThis, lpWindowName, dwStyle, dwExStyle, x, y, nWidth, nHeight, hWndParent, nID, lpParam);
-}
+#define INativeWnd_ClientToScreen2(This, lpRect) \
+    ((This)->lpVtbl->ClientToScreen2(This, lpRect))
 
-static inline HWND INativeWnd_GetHwnd_C(INativeWnd* pThis)
-{
-    return INativeWnd_GetHwnd(pThis);
-}
+#define INativeWnd_ScreenToClient(This, lpPoint) \
+    ((This)->lpVtbl->ScreenToClient(This, lpPoint))
 
-static inline BOOL INativeWnd_SubclassWindow_C(INativeWnd* pThis, HWND hWnd)
-{
-    return INativeWnd_SubclassWindow(pThis, hWnd);
-}
+#define INativeWnd_ScreenToClient2(This, lpRect) \
+    ((This)->lpVtbl->ScreenToClient2(This, lpRect))
 
-static inline HWND INativeWnd_UnsubclassWindow_C(INativeWnd* pThis, BOOL bForce)
-{
-    return INativeWnd_UnsubclassWindow(pThis, bForce);
-}
+#define INativeWnd_MapWindowPoints(This, hWndTo, lpPoint, nCount) \
+    ((This)->lpVtbl->MapWindowPoints(This, hWndTo, lpPoint, nCount))
 
-static inline const MSG* INativeWnd_GetCurrentMessage_C(INativeWnd* pThis)
-{
-    return INativeWnd_GetCurrentMessage(pThis);
-}
+#define INativeWnd_MapWindowRect(This, hWndTo, lpRect) \
+    ((This)->lpVtbl->MapWindowRect(This, hWndTo, lpRect))
 
-static inline int INativeWnd_GetDlgCtrlID_C(INativeWnd* pThis)
-{
-    return INativeWnd_GetDlgCtrlID(pThis);
-}
+#define INativeWnd_SetTimer(This, nIDEvent, nElapse, lpfnTimer) \
+    ((This)->lpVtbl->SetTimer(This, nIDEvent, nElapse, lpfnTimer))
 
-static inline DWORD INativeWnd_GetStyle_C(INativeWnd* pThis)
-{
-    return INativeWnd_GetStyle(pThis);
-}
+#define INativeWnd_KillTimer(This, nIDEvent) \
+    ((This)->lpVtbl->KillTimer(This, nIDEvent))
 
-static inline DWORD INativeWnd_GetExStyle_C(INativeWnd* pThis)
-{
-    return INativeWnd_GetExStyle(pThis);
-}
+#define INativeWnd_GetDC(This) \
+    ((This)->lpVtbl->GetDC(This))
 
-static inline BOOL INativeWnd_SetWindowPos_C(INativeWnd* pThis, HWND hWndInsertAfter, int x, int y, int cx, int cy, UINT nFlags)
-{
-    return INativeWnd_SetWindowPos(pThis, hWndInsertAfter, x, y, cx, cy, nFlags);
-}
+#define INativeWnd_GetWindowDC(This) \
+    ((This)->lpVtbl->GetWindowDC(This))
 
-static inline BOOL INativeWnd_DestroyWindow_C(INativeWnd* pThis)
-{
-    return INativeWnd_DestroyWindow(pThis);
-}
+#define INativeWnd_ReleaseDC(This, hDC) \
+    ((This)->lpVtbl->ReleaseDC(This, hDC))
 
-/*
- * Convenience macros for common native window operations
- */
+#define INativeWnd_CreateCaret(This, hBitmap, nWidth, nHeight) \
+    ((This)->lpVtbl->CreateCaret(This, hBitmap, nWidth, nHeight))
 
-/* Window creation shortcuts */
-#define INativeWnd_CreateSimple(This, name, style, x, y, width, height, parent) \
-    INativeWnd_CreateNative(This, name, style, 0, x, y, width, height, parent, 0, NULL)
+#define INativeWnd_HideCaret(This) \
+    ((This)->lpVtbl->HideCaret(This))
 
-#define INativeWnd_CreateChild(This, name, style, x, y, width, height, parent, id) \
-    INativeWnd_CreateNative(This, name, style | WS_CHILD, 0, x, y, width, height, parent, id, NULL)
+#define INativeWnd_ShowCaret(This) \
+    ((This)->lpVtbl->ShowCaret(This))
 
-#define INativeWnd_CreatePopup(This, name, style, x, y, width, height) \
-    INativeWnd_CreateNative(This, name, style | WS_POPUP, 0, x, y, width, height, NULL, 0, NULL)
+#define INativeWnd_GetCapture(This) \
+    ((This)->lpVtbl->GetCapture(This))
 
-/* Window positioning shortcuts */
-#define INativeWnd_MoveWindow(This, x, y, width, height) \
-    INativeWnd_SetWindowPos(This, NULL, x, y, width, height, SWP_NOZORDER | SWP_NOACTIVATE)
+#define INativeWnd_SetCapture(This) \
+    ((This)->lpVtbl->SetCapture(This))
 
-#define INativeWnd_ResizeWindow(This, width, height) \
-    INativeWnd_SetWindowPos(This, NULL, 0, 0, width, height, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE)
+#define INativeWnd_ReleaseCapture(This) \
+    ((This)->lpVtbl->ReleaseCapture(This))
 
-#define INativeWnd_MoveToTop(This) \
-    INativeWnd_SetWindowPos(This, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE)
+#define INativeWnd_SetFocus(This) \
+    ((This)->lpVtbl->SetFocus(This))
 
-#define INativeWnd_MoveToBottom(This) \
-    INativeWnd_SetWindowPos(This, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE)
+#define INativeWnd_SendMessage(This, message, wParam, lParam) \
+    ((This)->lpVtbl->SendMessage(This, message, wParam, lParam))
 
-#define INativeWnd_BringToFront(This) \
-    INativeWnd_SetWindowPos(This, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE)
+#define INativeWnd_PostMessage(This, message, wParam, lParam) \
+    ((This)->lpVtbl->PostMessage(This, message, wParam, lParam))
 
-/* Style modification shortcuts */
-#define INativeWnd_AddStyle(This, style) \
-    INativeWnd_ModifyStyle_Default(This, 0, style)
+#define INativeWnd_SendNotifyMessage(This, message, wParam, lParam) \
+    ((This)->lpVtbl->SendNotifyMessage(This, message, wParam, lParam))
 
-#define INativeWnd_RemoveStyle(This, style) \
-    INativeWnd_ModifyStyle_Default(This, style, 0)
+#define INativeWnd_SetWindowText(This, lpszString) \
+    ((This)->lpVtbl->SetWindowText(This, lpszString))
 
-#define INativeWnd_AddExStyle(This, style) \
-    INativeWnd_ModifyStyleEx_Default(This, 0, style)
+#define INativeWnd_GetWindowText(This, lpszStringBuf, nMaxCount) \
+    ((This)->lpVtbl->GetWindowText(This, lpszStringBuf, nMaxCount))
 
-#define INativeWnd_RemoveExStyle(This, style) \
-    INativeWnd_ModifyStyleEx_Default(This, style, 0)
+#define INativeWnd_IsIconic(This) \
+    ((This)->lpVtbl->IsIconic(This))
 
-/* Window state shortcuts */
-#define INativeWnd_Show(This) \
-    ShowWindow(INativeWnd_GetHwnd(This), SW_SHOW)
+#define INativeWnd_IsZoomed(This) \
+    ((This)->lpVtbl->IsZoomed(This))
 
-#define INativeWnd_Hide(This) \
-    ShowWindow(INativeWnd_GetHwnd(This), SW_HIDE)
+#define INativeWnd_IsWindowVisible(This) \
+    ((This)->lpVtbl->IsWindowVisible(This))
 
-#define INativeWnd_Minimize(This) \
-    ShowWindow(INativeWnd_GetHwnd(This), SW_MINIMIZE)
+#define INativeWnd_MoveWindow(This, x, y, nWidth, nHeight, bRepaint) \
+    ((This)->lpVtbl->MoveWindow(This, x, y, nWidth, nHeight, bRepaint))
 
-#define INativeWnd_Maximize(This) \
-    ShowWindow(INativeWnd_GetHwnd(This), SW_MAXIMIZE)
+#define INativeWnd_MoveWindow2(This, lpRect, bRepaint) \
+    ((This)->lpVtbl->MoveWindow2(This, lpRect, bRepaint))
 
-#define INativeWnd_Restore(This) \
-    ShowWindow(INativeWnd_GetHwnd(This), SW_RESTORE)
+#define INativeWnd_ShowWindow(This, nCmdShow) \
+    ((This)->lpVtbl->ShowWindow(This, nCmdShow))
 
-/* Invalidation shortcuts */
-#define INativeWnd_Refresh(This) \
-    INativeWnd_Invalidate_Default(This)
+#define INativeWnd_UpdateWindow(This) \
+    ((This)->lpVtbl->UpdateWindow(This))
 
-#define INativeWnd_RefreshNoErase(This) \
-    INativeWnd_Invalidate(This, FALSE)
+#define INativeWnd_SetWindowRgn(This, hRgn, bRedraw) \
+    ((This)->lpVtbl->SetWindowRgn(This, hRgn, bRedraw))
 
-#define INativeWnd_Update(This) \
-    UpdateWindow(INativeWnd_GetHwnd(This))
+#define INativeWnd_SetLayeredWindowAttributes(This, crKey, bAlpha, dwFlags) \
+    ((This)->lpVtbl->SetLayeredWindowAttributes(This, crKey, bAlpha, dwFlags))
 
-/* Safe native window operations */
-#define INativeWnd_SafeGetHwnd(This) \
-    ((This) ? INativeWnd_GetHwnd(This) : NULL)
+#define INativeWnd_UpdateLayeredWindow(This, hdcDst, pptDst, psize, hdcSrc, pptSrc, crKey, pblend, dwFlags) \
+    ((This)->lpVtbl->UpdateLayeredWindow(This, hdcDst, pptDst, psize, hdcSrc, pptSrc, crKey, pblend, dwFlags))
 
-#define INativeWnd_SafeDestroy(This) \
-    ((This) && INativeWnd_IsWindow(This) ? INativeWnd_DestroyWindow(This) : FALSE)
+#define INativeWnd_SetMsgHandler(This, fun, ctx) \
+    ((This)->lpVtbl->SetMsgHandler(This, fun, ctx))
 
-#define INativeWnd_SafeSubclass(This, hWnd) \
-    ((This) && IsWindow(hWnd) ? INativeWnd_SubclassWindow(This, hWnd) : FALSE)
-
-#define INativeWnd_SafeUnsubclass(This, bForce) \
-    ((This) && INativeWnd_IsWindow(This) ? INativeWnd_UnsubclassWindow(This, bForce) : NULL)
-
-#define INativeWnd_SafeSetParent(This, parent) \
-    ((This) && INativeWnd_IsWindow(This) ? INativeWnd_SetParent(This, parent) : NULL)
-
-#define INativeWnd_SafeCenterWindow(This, center) \
-    ((This) && INativeWnd_IsWindow(This) ? INativeWnd_CenterWindow(This, center) : FALSE)
-
-/*
- * Message handler function type and helpers
- */
-typedef BOOL (*FunMsgHandler_C)(const LPMSG pMsg, LRESULT* pRes, void* ctx);
-
-static inline MsgHandlerInfo MsgHandlerInfo_Create(FunMsgHandler_C handler, void* context)
-{
-    MsgHandlerInfo info;
-    info.fun = (FunMsgHandler)handler;
-    info.ctx = context;
-    return info;
-}
-
-/*
- * Reference counting helpers
- */
-#define INativeWnd_SafeAddRef(This) \
-    IObjRef_SafeAddRef((IUnknown*)(This))
-
-#define INativeWnd_SafeRelease(This) \
-    IObjRef_SafeRelease((IUnknown**)(This))
-
-/*
- * Native window state management
- */
-typedef struct NativeWndState {
-    INativeWnd* nativeWnd;
-    HWND hwnd;
-    DWORD style;
-    DWORD exStyle;
-    HWND parent;
-    int ctrlId;
-    BOOL isValid;
-    BOOL isEnabled;
-} NativeWndState;
-
-static inline void NativeWndState_Init(NativeWndState* state, INativeWnd* nativeWnd)
-{
-    if (state) {
-        state->nativeWnd = nativeWnd;
-        if (nativeWnd) {
-            state->hwnd = INativeWnd_GetHwnd(nativeWnd);
-            state->style = INativeWnd_GetStyle(nativeWnd);
-            state->exStyle = INativeWnd_GetExStyle(nativeWnd);
-            state->parent = INativeWnd_GetParent(nativeWnd);
-            state->ctrlId = INativeWnd_GetDlgCtrlID(nativeWnd);
-            state->isValid = INativeWnd_IsWindow(nativeWnd);
-            state->isEnabled = INativeWnd_IsWindowEnabled(nativeWnd);
-        } else {
-            memset(state, 0, sizeof(NativeWndState));
-        }
-    }
-}
-
-static inline void NativeWndState_Update(NativeWndState* state)
-{
-    if (state && state->nativeWnd) {
-        NativeWndState_Init(state, state->nativeWnd);
-    }
-}
-
-static inline BOOL NativeWndState_IsValid(const NativeWndState* state)
-{
-    return state && state->isValid && state->hwnd && IsWindow(state->hwnd);
-}
-
-/*
- * Note: Additional methods from SNativeWndApi.h can be added here
- * The file contains 517 lines with many more window management methods
- * including message handling, drawing, focus management, etc.
- */
+#define INativeWnd_GetMsgHandler(This) \
+    ((This)->lpVtbl->GetMsgHandler(This))
 
 #ifdef __cplusplus
 }

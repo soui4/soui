@@ -22,26 +22,56 @@ extern "C" {
 #define IEvtArgs_OnFinalRelease(This) \
     ((This)->lpVtbl->OnFinalRelease(This))
 
+#define IEvtArgs_IsClass(This, lpszName) \
+    ((This)->lpVtbl->IsClass(This, lpszName))
+
+#define IEvtArgs_GetClassNameList(This, ppClassNameList, nMaxCount) \
+    ((This)->lpVtbl->GetClassNameList(This, ppClassNameList, nMaxCount))
+
 #define IEvtArgs_GetObjectClass(This) \
     ((This)->lpVtbl->GetObjectClass(This))
 
 #define IEvtArgs_GetObjectType(This) \
     ((This)->lpVtbl->GetObjectType(This))
 
-#define IEvtArgs_IsClass(This, lpszName) \
-    ((This)->lpVtbl->IsClass(This, lpszName))
-
 #define IEvtArgs_GetID(This) \
     ((This)->lpVtbl->GetID(This))
 
-#define IEvtArgs_SetID(This, uID) \
-    ((This)->lpVtbl->SetID(This, uID))
+#define IEvtArgs_SetID(This, nID) \
+    ((This)->lpVtbl->SetID(This, nID))
 
-#define IEvtArgs_InitFromXml(This, pNode) \
-    ((This)->lpVtbl->InitFromXml(This, pNode))
+#define IEvtArgs_GetName(This) \
+    ((This)->lpVtbl->GetName(This))
 
-#define IEvtArgs_OnInitFinished(This, pNode) \
-    ((This)->lpVtbl->OnInitFinished(This, pNode))
+#define IEvtArgs_GetNameA(This) \
+    ((This)->lpVtbl->GetNameA(This))
+
+#define IEvtArgs_SetName(This, pszName) \
+    ((This)->lpVtbl->SetName(This, pszName))
+
+#define IEvtArgs_InitFromXml(This, xmlNode) \
+    ((This)->lpVtbl->InitFromXml(This, xmlNode))
+
+#define IEvtArgs_OnInitFinished(This, xmlNode) \
+    ((This)->lpVtbl->OnInitFinished(This, xmlNode))
+
+#define IEvtArgs_ISetAttribute(This, strAttribName, strValue, bLoading) \
+    ((This)->lpVtbl->ISetAttribute(This, strAttribName, strValue, bLoading))
+
+#define IEvtArgs_SetAttributeA(This, pszAttr, pszValue, bLoading) \
+    ((This)->lpVtbl->SetAttributeA(This, pszAttr, pszValue, bLoading))
+
+#define IEvtArgs_SetAttribute(This, pszAttr, pszValue, bLoading) \
+    ((This)->lpVtbl->SetAttribute(This, pszAttr, pszValue, bLoading))
+
+#define IEvtArgs_GetAttribute(This, strAttr, pValue) \
+    ((This)->lpVtbl->GetAttribute(This, strAttr, pValue))
+
+#define IEvtArgs_AfterAttribute(This, pszAttr, pszValue, bLoading, hr) \
+    ((This)->lpVtbl->AfterAttribute(This, pszAttr, pszValue, bLoading, hr))
+
+#define IEvtArgs_SetAttrHandler(This, attrHandler) \
+    ((This)->lpVtbl->SetAttrHandler(This, attrHandler))
 
 #define IEvtArgs_Sender(This) \
     ((This)->lpVtbl->Sender(This))
@@ -94,176 +124,6 @@ extern "C" {
 
 #define IEvtSlot_GetSlotType(This) \
     ((This)->lpVtbl->GetSlotType(This))
-
-/*
- * C API Helper Functions (Optional - for more C-like usage)
- */
-
-/* IEvtArgs Helper Functions */
-static inline long IEvtArgs_AddRef_C(IEvtArgs* pThis)
-{
-    return IEvtArgs_AddRef(pThis);
-}
-
-static inline long IEvtArgs_Release_C(IEvtArgs* pThis)
-{
-    return IEvtArgs_Release(pThis);
-}
-
-static inline IObject* IEvtArgs_Sender_C(IEvtArgs* pThis)
-{
-    return IEvtArgs_Sender(pThis);
-}
-
-static inline int IEvtArgs_IdFrom_C(IEvtArgs* pThis)
-{
-    return IEvtArgs_IdFrom(pThis);
-}
-
-static inline void IEvtArgs_SetIdFrom_C(IEvtArgs* pThis, int id)
-{
-    IEvtArgs_SetIdFrom(pThis, id);
-}
-
-static inline LPCWSTR IEvtArgs_NameFrom_C(IEvtArgs* pThis)
-{
-    return IEvtArgs_NameFrom(pThis);
-}
-
-static inline void IEvtArgs_SetNameFrom_C(IEvtArgs* pThis, LPCWSTR name)
-{
-    IEvtArgs_SetNameFrom(pThis, name);
-}
-
-static inline BOOL IEvtArgs_IsBubbleUp_C(IEvtArgs* pThis)
-{
-    return IEvtArgs_IsBubbleUp(pThis);
-}
-
-static inline void IEvtArgs_SetBubbleUp_C(IEvtArgs* pThis, BOOL bBubbleUp)
-{
-    IEvtArgs_SetBubbleUp(pThis, bBubbleUp);
-}
-
-static inline UINT IEvtArgs_HandleCount_C(IEvtArgs* pThis)
-{
-    return IEvtArgs_HandleCount(pThis);
-}
-
-static inline void IEvtArgs_IncreaseHandleCount_C(IEvtArgs* pThis)
-{
-    IEvtArgs_IncreaseHandleCount(pThis);
-}
-
-static inline LPVOID IEvtArgs_Data_C(IEvtArgs* pThis)
-{
-    return IEvtArgs_Data(pThis);
-}
-
-/* IEvtSlot Helper Functions */
-static inline long IEvtSlot_AddRef_C(IEvtSlot* pThis)
-{
-    return IEvtSlot_AddRef(pThis);
-}
-
-static inline long IEvtSlot_Release_C(IEvtSlot* pThis)
-{
-    return IEvtSlot_Release(pThis);
-}
-
-static inline BOOL IEvtSlot_Run_C(IEvtSlot* pThis, IEvtArgs* pArg)
-{
-    return IEvtSlot_Run(pThis, pArg);
-}
-
-static inline IEvtSlot* IEvtSlot_Clone_C(IEvtSlot* pThis)
-{
-    return IEvtSlot_Clone(pThis);
-}
-
-static inline BOOL IEvtSlot_Equal_C(IEvtSlot* pThis, const IEvtSlot* sour)
-{
-    return IEvtSlot_Equal(pThis, sour);
-}
-
-static inline UINT IEvtSlot_GetSlotType_C(IEvtSlot* pThis)
-{
-    return IEvtSlot_GetSlotType(pThis);
-}
-
-/*
- * Convenience macros for common event operations
- */
-
-/* Event bubble control */
-#define IEvtArgs_StopBubble(This) \
-    IEvtArgs_SetBubbleUp(This, FALSE)
-
-#define IEvtArgs_AllowBubble(This) \
-    IEvtArgs_SetBubbleUp(This, TRUE)
-
-/* Event data access with type casting */
-#define IEvtArgs_GetDataAs(This, Type) \
-    ((Type*)IEvtArgs_Data(This))
-
-/* Event source information */
-#define IEvtArgs_GetSenderId(This) \
-    IEvtArgs_IdFrom(This)
-
-#define IEvtArgs_GetSenderName(This) \
-    IEvtArgs_NameFrom(This)
-
-#define IEvtArgs_SetSenderId(This, id) \
-    IEvtArgs_SetIdFrom(This, id)
-
-#define IEvtArgs_SetSenderName(This, name) \
-    IEvtArgs_SetNameFrom(This, name)
-
-/* Event handling status */
-#define IEvtArgs_IsHandled(This) \
-    (IEvtArgs_HandleCount(This) > 0)
-
-#define IEvtArgs_MarkHandled(This) \
-    IEvtArgs_IncreaseHandleCount(This)
-
-/* Safe event slot operations */
-#define IEvtSlot_SafeRun(This, pArg) \
-    (IObjRef_IsValidInterface(This) && (pArg) ? IEvtSlot_Run(This, pArg) : FALSE)
-
-#define IEvtSlot_SafeClone(This, ppClone) \
-    do { \
-        if (IObjRef_IsValidInterface(This) && (ppClone)) { \
-            *(ppClone) = IEvtSlot_Clone(This); \
-        } else if (ppClone) { \
-            *(ppClone) = NULL; \
-        } \
-    } while(0)
-
-/*
- * Event callback function wrapper
- */
-static inline BOOL IEvtArgs_RunCallback_C(IEvtArgs* pEvt, FunCallback callback, void* ctx)
-{
-    if (callback && pEvt) {
-        return callback(pEvt, ctx);
-    }
-    return FALSE;
-}
-
-/*
- * Reference counting helpers
- */
-#define IEvtArgs_SafeAddRef(This) \
-    IObjRef_SafeAddRef((IUnknown*)(This))
-
-#define IEvtArgs_SafeRelease(This) \
-    IObjRef_SafeRelease((IUnknown**)(This))
-
-#define IEvtSlot_SafeAddRef(This) \
-    IObjRef_SafeAddRef((IUnknown*)(This))
-
-#define IEvtSlot_SafeRelease(This) \
-    IObjRef_SafeRelease((IUnknown**)(This))
 
 #ifdef __cplusplus
 }

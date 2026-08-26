@@ -8,23 +8,11 @@ extern "C" {
 #endif
 
 /*
- * Application singleton type constants
- */
-#define APP_SINGLETON_UIDEF             SINGLETON_UIDEF
-#define APP_SINGLETON_SWNDMGR           SINGLETON_SWNDMGR
-#define APP_SINGLETON_TIMERGENERATOR    SINGLETON_TIMERGENERATOR
-#define APP_SINGLETON_WINDOWFINDER      SINGLETON_WINDOWFINDER
-#define APP_SINGLETON_RICHEDITMENUDEF   SINGLETON_RICHEDITMENUDEF
-#define APP_SINGLETON_HOSTMGR           SINGLETON_HOSTMGR
-#define APP_SINGLETON_NOTIFYCENTER      SINGLETON_NOTIFYCENTER
-
-/*
- * C API Helper Macros for sapp Interface
+ * C API Helper Macros for IApplication Interface
  * These macros provide C-style function call syntax for C++ interface methods
- * Note: This covers the main methods from sapp-i.h (387 lines total)
  */
 
-/* IApplication C API Macros */
+/* IObjRef base interface macros */
 #define IApplication_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -34,6 +22,7 @@ extern "C" {
 #define IApplication_OnFinalRelease(This) \
     ((This)->lpVtbl->OnFinalRelease(This))
 
+/* IApplication specific interface macros */
 #define IApplication_GetModule(This) \
     ((This)->lpVtbl->GetModule(This))
 
@@ -100,298 +89,122 @@ extern "C" {
 #define IApplication_GetRealWndHander(This) \
     ((This)->lpVtbl->GetRealWndHander(This))
 
-/*
- * C API Helper Functions (Optional - for more C-like usage)
- */
+#define IApplication_SetRealWndHandler(This, pRealHandler) \
+    ((This)->lpVtbl->SetRealWndHandler(This, pRealHandler))
 
-/* IApplication Helper Functions */
-static inline long IApplication_AddRef_C(IApplication* pThis)
-{
-    return IApplication_AddRef(pThis);
-}
+#define IApplication_GetRenderFactory(This) \
+    ((This)->lpVtbl->GetRenderFactory(This))
 
-static inline long IApplication_Release_C(IApplication* pThis)
-{
-    return IApplication_Release(pThis);
-}
+#define IApplication_SetRenderFactory(This, renderFac) \
+    ((This)->lpVtbl->SetRenderFactory(This, renderFac))
 
-static inline HMODULE IApplication_GetModule_C(const IApplication* pThis)
-{
-    return IApplication_GetModule(pThis);
-}
+#define IApplication_SetScriptFactory(This, pScriptModule) \
+    ((This)->lpVtbl->SetScriptFactory(This, pScriptModule))
 
-static inline UINT IApplication_LoadSystemNamedResource_C(IApplication* pThis, IResProvider* pResProvider)
-{
-    return IApplication_LoadSystemNamedResource(pThis, pResProvider);
-}
+#define IApplication_InitXmlNamedID(This, pNames, nIds, nCount) \
+    ((This)->lpVtbl->InitXmlNamedID(This, pNames, nIds, nCount))
 
-static inline ITranslatorMgr* IApplication_GetTranslator_C(IApplication* pThis)
-{
-    return IApplication_GetTranslator(pThis);
-}
+#define IApplication_LoadXmlDocment(This, strResId) \
+    ((This)->lpVtbl->LoadXmlDocment(This, strResId))
 
-static inline void IApplication_SetTranslator_C(IApplication* pThis, ITranslatorMgr* pTrans)
-{
-    IApplication_SetTranslator(pThis, pTrans);
-}
+#define IApplication_LoadXmlDocmentU8(This, strResId) \
+    ((This)->lpVtbl->LoadXmlDocmentU8(This, strResId))
 
-static inline IToolTipFactory* IApplication_GetToolTipFactory_C(IApplication* pThis)
-{
-    return IApplication_GetToolTipFactory(pThis);
-}
+#define IApplication_LoadAnimation(This, strResId) \
+    ((This)->lpVtbl->LoadAnimation(This, strResId))
 
-static inline void IApplication_SetToolTipFactory_C(IApplication* pThis, IToolTipFactory* pToolTipFac)
-{
-    IApplication_SetToolTipFactory(pThis, pToolTipFac);
-}
+#define IApplication_LoadAnimationU8(This, strResId) \
+    ((This)->lpVtbl->LoadAnimationU8(This, strResId))
 
-static inline BOOL IApplication_SetMsgLoopFactory_C(IApplication* pThis, IMsgLoopFactory* pMsgLoopFac)
-{
-    return IApplication_SetMsgLoopFactory(pThis, pMsgLoopFac);
-}
+#define IApplication_LoadValueAnimator(This, strResId) \
+    ((This)->lpVtbl->LoadValueAnimator(This, strResId))
 
-static inline IMsgLoopFactory* IApplication_GetMsgLoopFactory_C(IApplication* pThis)
-{
-    return IApplication_GetMsgLoopFactory(pThis);
-}
+#define IApplication_LoadValueAnimatorU8(This, strResId) \
+    ((This)->lpVtbl->LoadValueAnimatorU8(This, strResId))
 
-static inline void IApplication_SetLogManager_C(IApplication* pThis, ILogMgr* pLogMgr)
-{
-    IApplication_SetLogManager(pThis, pLogMgr);
-}
+#define IApplication_LoadImage(This, strResId) \
+    ((This)->lpVtbl->LoadImage(This, strResId))
 
-static inline ILogMgr* IApplication_GetLogManager_C(IApplication* pThis)
-{
-    return IApplication_GetLogManager(pThis);
-}
+#define IApplication_LoadImageU8(This, strResId) \
+    ((This)->lpVtbl->LoadImageU8(This, strResId))
 
-static inline void IApplication_SetAttrStorageFactory_C(IApplication* pThis, IAttrStorageFactory* pAttrStorageFactory)
-{
-    IApplication_SetAttrStorageFactory(pThis, pAttrStorageFactory);
-}
+#define IApplication_LoadTranslator(This, strResId) \
+    ((This)->lpVtbl->LoadTranslator(This, strResId))
 
-static inline IAttrStorageFactory* IApplication_GetAttrStorageFactory_C(IApplication* pThis)
-{
-    return IApplication_GetAttrStorageFactory(pThis);
-}
+#define IApplication_LoadTranslatorU8(This, strResId) \
+    ((This)->lpVtbl->LoadTranslatorU8(This, strResId))
 
-static inline int IApplication_Run_C(IApplication* pThis, HWND hMainWnd)
-{
-    return IApplication_Run(pThis, hMainWnd);
-}
+#define IApplication_InstallTranslator(This, trModule) \
+    ((This)->lpVtbl->InstallTranslator(This, trModule))
 
-static inline void IApplication_Quit_C(IApplication* pThis, int nCode)
-{
-    IApplication_Quit(pThis, nCode);
-}
+#define IApplication_UnnstallTranslator(This, langId) \
+    ((This)->lpVtbl->UnnstallTranslator(This, langId))
 
-static inline HWND IApplication_GetMainWnd_C(IApplication* pThis)
-{
-    return IApplication_GetMainWnd(pThis);
-}
+#define IApplication_EnableNotifyCenter(This, bEnable, interval) \
+    ((This)->lpVtbl->EnableNotifyCenter(This, bEnable, interval))
 
-static inline BOOL IApplication_AddMsgLoop_C(IApplication* pThis, IMessageLoop* pMsgLoop, BOOL bReplace)
-{
-    return IApplication_AddMsgLoop(pThis, pMsgLoop, bReplace);
-}
+#define IApplication_EnableNotifyCenter_Default(This, bEnable) \
+    ((This)->lpVtbl->EnableNotifyCenter(This, bEnable, 20))
 
-static inline BOOL IApplication_RemoveMsgLoop_C(IApplication* pThis)
-{
-    return IApplication_RemoveMsgLoop(pThis);
-}
+#define IApplication_GetInnerSingleton(This, type) \
+    ((This)->lpVtbl->GetInnerSingleton(This, type))
 
-static inline IMessageLoop* IApplication_GetMsgLoop_C(const IApplication* pThis, tid_t dwThreadID)
-{
-    return IApplication_GetMsgLoop(pThis, dwThreadID);
-}
+#define IApplication_CreateObject(This, pszName, nType) \
+    ((This)->lpVtbl->CreateObject(This, pszName, nType))
 
-static inline IResProviderMgr* IApplication_GetResProviderMgr_C(IApplication* pThis)
-{
-    return IApplication_GetResProviderMgr(pThis);
-}
+#define IApplication_SetCreateObjectCallback(This, cbCreateObj) \
+    ((This)->lpVtbl->SetCreateObjectCallback(This, cbCreateObj))
 
-static inline IRealWndHandler* IApplication_GetRealWndHander_C(IApplication* pThis)
-{
-    return IApplication_GetRealWndHander(pThis);
-}
+#define IApplication_RegisterObjFactory(This, objFac, bReplace) \
+    ((This)->lpVtbl->RegisterObjFactory(This, objFac, bReplace))
 
-/*
- * Convenience macros for common application operations
- */
+#define IApplication_RegisterObjFactory_Default(This, objFac) \
+    ((This)->lpVtbl->RegisterObjFactory(This, objFac, FALSE))
 
-/* Application lifecycle shortcuts */
-#define IApplication_Start(This, mainWnd) \
-    IApplication_Run(This, mainWnd)
+#define IApplication_UnregisterObjFactory(This, objFac) \
+    ((This)->lpVtbl->UnregisterObjFactory(This, objFac))
 
-#define IApplication_Exit(This, code) \
-    IApplication_Quit(This, code)
+#define IApplication_SetDefaultFontInfo(This, pszFontInfo) \
+    ((This)->lpVtbl->SetDefaultFontInfo(This, pszFontInfo))
 
-#define IApplication_ExitSuccess(This) \
-    IApplication_Quit(This, 0)
+#define IApplication_CreateTaskLoop(This, nCount, priority, bAutoStart) \
+    ((This)->lpVtbl->CreateTaskLoop(This, nCount, priority, bAutoStart))
 
-#define IApplication_ExitFailure(This) \
-    IApplication_Quit(This, -1)
+#define IApplication_CreateTaskLoop_Default(This, nCount, priority) \
+    ((This)->lpVtbl->CreateTaskLoop(This, nCount, priority, TRUE))
 
-/* Module and window shortcuts */
-#define IApplication_GetAppModule(This) \
-    IApplication_GetModule(This)
+#define IApplication_GetTaskLoop(This, iTaskLoop) \
+    ((This)->lpVtbl->GetTaskLoop(This, iTaskLoop))
 
-#define IApplication_GetMainWindow(This) \
-    IApplication_GetMainWnd(This)
+#define IApplication_GetTaskLoop_Default(This) \
+    ((This)->lpVtbl->GetTaskLoop(This, 0))
 
-/* Factory management shortcuts */
-#define IApplication_GetTooltipFactory(This) \
-    IApplication_GetToolTipFactory(This)
+#define IApplication_SetCreateTaskLoopCallback(This, cbCreateTaskLoop) \
+    ((This)->lpVtbl->SetCreateTaskLoopCallback(This, cbCreateTaskLoop))
 
-#define IApplication_SetTooltipFactory(This, factory) \
-    IApplication_SetToolTipFactory(This, factory)
+#define IApplication_CreateScriptModule(This, ppScriptModule) \
+    ((This)->lpVtbl->CreateScriptModule(This, ppScriptModule))
 
-#define IApplication_GetMsgFactory(This) \
-    IApplication_GetMsgLoopFactory(This)
+#define IApplication_SetEditCtxMenuTemplateResId(This, resId, pResProvider) \
+    ((This)->lpVtbl->SetEditCtxMenuTemplateResId(This, resId, pResProvider))
 
-#define IApplication_SetMsgFactory(This, factory) \
-    IApplication_SetMsgLoopFactory(This, factory)
+#define IApplication_SetEditCtxMenuTemplateResId_Default(This, resId) \
+    ((This)->lpVtbl->SetEditCtxMenuTemplateResId(This, resId, NULL))
 
-/* Resource and provider shortcuts */
-#define IApplication_LoadSystemResource(This, provider) \
-    IApplication_LoadSystemNamedResource(This, provider)
+#define IApplication_SetMessageBoxTemplateResId(This, resId, pResProvider) \
+    ((This)->lpVtbl->SetMessageBoxTemplateResId(This, resId, pResProvider))
 
-#define IApplication_GetResourceMgr(This) \
-    IApplication_GetResProviderMgr(This)
+#define IApplication_SetMessageBoxTemplateResId_Default(This, resId) \
+    ((This)->lpVtbl->SetMessageBoxTemplateResId(This, resId, NULL))
 
-#define IApplication_GetRealWndHandler(This) \
-    IApplication_GetRealWndHander(This)
+#define IApplication_SetAttrAlias(This, pAttrAlias) \
+    ((This)->lpVtbl->SetAttrAlias(This, pAttrAlias))
 
-/* Message loop shortcuts */
-#define IApplication_AddCurrentMsgLoop(This, msgLoop) \
-    IApplication_AddMsgLoop_Default(This, msgLoop)
+#define IApplication_GetAttrAlias(This) \
+    ((This)->lpVtbl->GetAttrAlias(This))
 
-#define IApplication_GetCurrentMsgLoop(This) \
-    IApplication_GetMsgLoop_Current(This)
-
-/* Safe application operations */
-#define IApplication_SafeRun(This, mainWnd) \
-    ((This) ? IApplication_Run(This, mainWnd) : -1)
-
-#define IApplication_SafeQuit(This, code) \
-    do { \
-        if (This) { \
-            IApplication_Quit(This, code); \
-        } \
-    } while(0)
-
-#define IApplication_SafeLoadSystemResource(This, provider) \
-    ((This) && (provider) ? IApplication_LoadSystemNamedResource(This, provider) : 1)
-
-#define IApplication_SafeSetTranslator(This, translator) \
-    do { \
-        if ((This) && (translator)) { \
-            IApplication_SetTranslator(This, translator); \
-        } \
-    } while(0)
-
-#define IApplication_SafeAddMsgLoop(This, msgLoop, replace) \
-    ((This) && (msgLoop) ? IApplication_AddMsgLoop(This, msgLoop, replace) : FALSE)
-
-/*
- * Application helper functions
- */
-static inline BOOL IApplication_IsValid_C(IApplication* pThis)
-{
-    return (pThis != NULL);
-}
-
-static inline BOOL IApplication_HasMainWindow_C(IApplication* pThis)
-{
-    if (!pThis) return FALSE;
-    
-    HWND mainWnd = IApplication_GetMainWnd(pThis);
-    return (mainWnd != NULL && IsWindow(mainWnd));
-}
-
-static inline BOOL IApplication_IsRunning_C(IApplication* pThis)
-{
-    if (!pThis) return FALSE;
-    
-    // Check if we have a main window and current message loop
-    HWND mainWnd = IApplication_GetMainWnd(pThis);
-    IMessageLoop* msgLoop = IApplication_GetMsgLoop_Current(pThis);
-    
-    return (mainWnd != NULL && msgLoop != NULL);
-}
-
-/*
- * Application state management
- */
-typedef struct ApplicationState {
-    IApplication* application;
-    HMODULE appModule;
-    HWND mainWindow;
-    IMessageLoop* currentMsgLoop;
-    ITranslatorMgr* translator;
-    IResProviderMgr* resProviderMgr;
-    IRealWndHandler* realWndHandler;
-    BOOL isValid;
-    BOOL isRunning;
-} ApplicationState;
-
-static inline void ApplicationState_Init(ApplicationState* state, IApplication* application)
-{
-    if (state) {
-        state->application = application;
-        if (application) {
-            state->appModule = IApplication_GetModule(application);
-            state->mainWindow = IApplication_GetMainWnd(application);
-            state->currentMsgLoop = IApplication_GetMsgLoop_Current(application);
-            state->translator = IApplication_GetTranslator(application);
-            state->resProviderMgr = IApplication_GetResProviderMgr(application);
-            state->realWndHandler = IApplication_GetRealWndHander(application);
-            state->isValid = TRUE;
-            state->isRunning = IApplication_IsRunning_C(application);
-        } else {
-            memset(state, 0, sizeof(ApplicationState));
-        }
-    }
-}
-
-static inline void ApplicationState_Update(ApplicationState* state)
-{
-    if (state && state->application) {
-        ApplicationState_Init(state, state->application);
-    }
-}
-
-/*
- * Reference counting helpers
- */
-#define IApplication_SafeAddRef(This) \
-    IObjRef_SafeAddRef((IUnknown*)(This))
-
-#define IApplication_SafeRelease(This) \
-    IObjRef_SafeRelease((IUnknown**)(This))
-
-/*
- * Debugging helpers
- */
-#ifdef _DEBUG
-static inline void IApplication_DebugInfo_C(IApplication* pThis)
-{
-    if (!pThis) {
-        printf("Application: NULL\n");
-        return;
-    }
-    
-    printf("Application: %p\n", pThis);
-    printf("  Module: %p\n", IApplication_GetModule(pThis));
-    printf("  Main Window: %p\n", IApplication_GetMainWnd(pThis));
-    printf("  Has Main Window: %s\n", IApplication_HasMainWindow_C(pThis) ? "Yes" : "No");
-    printf("  Is Running: %s\n", IApplication_IsRunning_C(pThis) ? "Yes" : "No");
-    printf("  Translator: %p\n", IApplication_GetTranslator(pThis));
-    printf("  Resource Manager: %p\n", IApplication_GetResProviderMgr(pThis));
-}
-#else
-#define IApplication_DebugInfo_C(This) ((void)0)
-#endif
+#define IApplication_GetBaseClassName(This, pszClassName, objType, pszBaseClassName) \
+    ((This)->lpVtbl->GetBaseClassName(This, pszClassName, objType, pszBaseClassName))
 
 #ifdef __cplusplus
 }

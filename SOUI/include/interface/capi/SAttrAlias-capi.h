@@ -7,6 +7,12 @@
 extern "C" {
 #endif
 
+/*
+ * C API Helper Macros for SAttrAlias Interface
+ * These macros provide C-style function call syntax for C++ interface methods
+ * IAttrAlias inherits from IObjRef.
+ */
+
 /* IObjRef base interface macros */
 #define IAttrAlias_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
@@ -18,11 +24,8 @@ extern "C" {
     ((This)->lpVtbl->OnFinalRelease(This))
 
 /* IAttrAlias specific interface macros */
-#define IAttrAlias_GetAliasPtr(This, strName) \
-    ((This)->lpVtbl->GetAliasPtr(This, strName))
-
-#define IAttrAlias_GetAliasValue(This, strName) \
-    ((This)->lpVtbl->GetAliasValue(This, strName))
+#define IAttrAlias_GetAttrAlias(This, pszAttr, pszClsName, objType) \
+    ((This)->lpVtbl->GetAttrAlias(This, pszAttr, pszClsName, objType))
 
 #ifdef __cplusplus
 }

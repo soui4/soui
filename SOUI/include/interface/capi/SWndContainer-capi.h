@@ -10,15 +10,25 @@ extern "C" {
 /*
  * C API Helper Macros for SWndContainer Interface
  * These macros provide C-style function call syntax for C++ interface methods
+ *
+ * Interfaces covered:
+ *   ISwndContainer (inherits ITimelineHandlersMgr)
  */
 
-/* ISwndContainer C API Macros */
+/* ISwndContainer C API Macros (ITimelineHandlersMgr base interface) */
 #define ISwndContainer_RegisterTimelineHandler(This, pHandler) \
     ((This)->lpVtbl->RegisterTimelineHandler(This, pHandler))
 
 #define ISwndContainer_UnregisterTimelineHandler(This, pHandler) \
     ((This)->lpVtbl->UnregisterTimelineHandler(This, pHandler))
 
+#define ISwndContainer_RegisterValueAnimator(This, pAnimator) \
+    ((This)->lpVtbl->RegisterValueAnimator(This, pAnimator))
+
+#define ISwndContainer_UnregisterValueAnimator(This, pAnimator) \
+    ((This)->lpVtbl->UnregisterValueAnimator(This, pAnimator))
+
+/* ISwndContainer specific interface macros */
 #define ISwndContainer_RegisterDragDrop(This, swnd, pDropTarget) \
     ((This)->lpVtbl->RegisterDragDrop(This, swnd, pDropTarget))
 
@@ -79,9 +89,6 @@ extern "C" {
 #define ISwndContainer_UpdateWindow(This, bForce) \
     ((This)->lpVtbl->UpdateWindow(This, bForce))
 
-#define ISwndContainer_UpdateWindow_Default(This) \
-    ((This)->lpVtbl->UpdateWindow(This, TRUE))
-
 #define ISwndContainer_UpdateTooltip(This) \
     ((This)->lpVtbl->UpdateTooltip(This))
 
@@ -121,188 +128,23 @@ extern "C" {
 #define ISwndContainer_EnableHostPrivateUiDef(This, bEnable) \
     ((This)->lpVtbl->EnableHostPrivateUiDef(This, bEnable))
 
-#define ISwndContainer_OnDropdownState(This, pDropdownWnd, bCreate) \
-    ((This)->lpVtbl->OnDropdownState(This, pDropdownWnd, bCreate))
-
+#define ISwndContainer_OnDropdownState(This, pDropdown, bCreate) \
+    ((This)->lpVtbl->OnDropdownState(This, pDropdown, bCreate))
 
 #define ISwndContainer_PostTask(This, runable, bAsync) \
     ((This)->lpVtbl->PostTask(This, runable, bAsync))
 
-#define ISwndContainer_PostTask_Default(This, runable) \
-    ((This)->lpVtbl->PostTask(This, runable, TRUE))
-
 #define ISwndContainer_RemoveTasksForObject(This, pObj) \
     ((This)->lpVtbl->RemoveTasksForObject(This, pObj))
 
-/*
- * C API Helper Functions (Optional - for more C-like usage)
- */
+#define ISwndContainer_GetSwndFinder(This) \
+    ((This)->lpVtbl->GetSwndFinder(This))
 
-/* Timeline Handler Management */
-static inline BOOL ISwndContainer_RegisterTimelineHandler_C(ISwndContainer* pThis, ITimelineHandler* pHandler)
-{
-    return ISwndContainer_RegisterTimelineHandler(pThis, pHandler);
-}
+#define ISwndContainer_IsTimelineEnabled(This) \
+    ((This)->lpVtbl->IsTimelineEnabled(This))
 
-static inline BOOL ISwndContainer_UnregisterTimelineHandler_C(ISwndContainer* pThis, ITimelineHandler* pHandler)
-{
-    return ISwndContainer_UnregisterTimelineHandler(pThis, pHandler);
-}
-
-/* Drag and Drop Management */
-static inline BOOL ISwndContainer_RegisterDragDrop_C(ISwndContainer* pThis, SWND swnd, IDropTarget* pDropTarget)
-{
-    return ISwndContainer_RegisterDragDrop(pThis, swnd, pDropTarget);
-}
-
-static inline BOOL ISwndContainer_UnregisterDragDrop_C(ISwndContainer* pThis, SWND swnd)
-{
-    return ISwndContainer_UnregisterDragDrop(pThis, swnd);
-}
-
-/* Event Management */
-static inline BOOL ISwndContainer_OnFireEvent_C(ISwndContainer* pThis, IEvtArgs* evt)
-{
-    return ISwndContainer_OnFireEvent(pThis, evt);
-}
-
-/* Container Properties */
-static inline IMessageLoop* ISwndContainer_GetMsgLoop_C(ISwndContainer* pThis)
-{
-    return ISwndContainer_GetMsgLoop(pThis);
-}
-
-static inline IScriptModule* ISwndContainer_GetScriptModule_C(ISwndContainer* pThis)
-{
-    return ISwndContainer_GetScriptModule(pThis);
-}
-
-static inline HWND ISwndContainer_GetHostHwnd_C(ISwndContainer* pThis)
-{
-    return ISwndContainer_GetHostHwnd(pThis);
-}
-
-static inline BOOL ISwndContainer_IsTranslucent_C(ISwndContainer* pThis)
-{
-    return ISwndContainer_IsTranslucent(pThis);
-}
-
-static inline int ISwndContainer_GetScale_C(ISwndContainer* pThis)
-{
-    return ISwndContainer_GetScale(pThis);
-}
-
-static inline LPCWSTR ISwndContainer_GetTranslatorContext_C(ISwndContainer* pThis)
-{
-    return ISwndContainer_GetTranslatorContext(pThis);
-}
-
-static inline void ISwndContainer_GetContainerRect_C(ISwndContainer* pThis, RECT* ret)
-{
-    ISwndContainer_GetContainerRect(pThis, ret);
-}
-
-/* Drawing and Update */
-static inline void ISwndContainer_UpdateRegion_C(ISwndContainer* pThis, IRegionS* rgn)
-{
-    ISwndContainer_UpdateRegion(pThis, rgn);
-}
-
-static inline void ISwndContainer_OnRedraw_C(ISwndContainer* pThis, LPCRECT rc, BOOL bClip)
-{
-    ISwndContainer_OnRedraw(pThis, rc, bClip);
-}
-
-static inline BOOL ISwndContainer_UpdateWindow_C(ISwndContainer* pThis, BOOL bForce)
-{
-    return ISwndContainer_UpdateWindow(pThis, bForce);
-}
-
-/* Focus and Capture Management */
-static inline SWND ISwndContainer_GetFocus_C(ISwndContainer* pThis)
-{
-    return ISwndContainer_GetFocus(pThis);
-}
-
-static inline void ISwndContainer_OnSetSwndFocus_C(ISwndContainer* pThis, SWND swnd)
-{
-    ISwndContainer_OnSetSwndFocus(pThis, swnd);
-}
-
-static inline SWND ISwndContainer_OnGetSwndCapture_C(ISwndContainer* pThis)
-{
-    return ISwndContainer_OnGetSwndCapture(pThis);
-}
-
-static inline SWND ISwndContainer_OnSetSwndCapture_C(ISwndContainer* pThis, SWND swnd)
-{
-    return ISwndContainer_OnSetSwndCapture(pThis, swnd);
-}
-
-static inline BOOL ISwndContainer_OnReleaseSwndCapture_C(ISwndContainer* pThis)
-{
-    return ISwndContainer_OnReleaseSwndCapture(pThis);
-}
-
-/* Task Management */
-static inline BOOL ISwndContainer_PostTask_C(ISwndContainer* pThis, IRunnable* runable, BOOL bAsync)
-{
-    return ISwndContainer_PostTask(pThis, runable, bAsync);
-}
-
-static inline int ISwndContainer_RemoveTasksForObject_C(ISwndContainer* pThis, void* pObj)
-{
-    return ISwndContainer_RemoveTasksForObject(pThis, pObj);
-}
-
-/*
- * Convenience macros for common container operations
- */
-
-/* Window update shortcuts */
-#define ISwndContainer_ForceUpdate(This) \
-    ISwndContainer_UpdateWindow(This, TRUE)
-
-#define ISwndContainer_ConditionalUpdate(This) \
-    ISwndContainer_UpdateWindow(This, FALSE)
-
-#define ISwndContainer_Invalidate(This, rc) \
-    ISwndContainer_OnRedraw(This, rc, TRUE)
-
-#define ISwndContainer_InvalidateAll(This) \
-    ISwndContainer_OnRedraw(This, NULL, FALSE)
-
-/* Focus management shortcuts */
-#define ISwndContainer_HasFocus(This) \
-    (ISwndContainer_GetFocus(This) != 0)
-
-#define ISwndContainer_ClearFocus(This) \
-    ISwndContainer_OnSetSwndFocus(This, 0)
-
-/* Capture management shortcuts */
-#define ISwndContainer_HasCapture(This) \
-    (ISwndContainer_OnGetSwndCapture(This) != 0)
-
-#define ISwndContainer_ReleaseCapture(This) \
-    ISwndContainer_OnReleaseSwndCapture(This)
-
-/* IME shortcuts */
-#define ISwndContainer_EnableIME_On(This) \
-    ISwndContainer_EnableIME(This, TRUE)
-
-#define ISwndContainer_EnableIME_Off(This) \
-    ISwndContainer_EnableIME(This, FALSE)
-
-/* Tooltip shortcuts */
-#define ISwndContainer_HideToolTip(This) \
-    ISwndContainer_SetToolTip(This, NULL, 0, NULL)
-
-/* Task posting shortcuts */
-#define ISwndContainer_PostAsyncTask(This, runable) \
-    ISwndContainer_PostTask(This, runable, TRUE)
-
-#define ISwndContainer_PostSyncTask(This, runable) \
-    ISwndContainer_PostTask(This, runable, FALSE)
+#define ISwndContainer_IsDesignerMode(This) \
+    ((This)->lpVtbl->IsDesignerMode(This))
 
 #ifdef __cplusplus
 }
