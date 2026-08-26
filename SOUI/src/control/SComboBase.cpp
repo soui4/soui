@@ -40,7 +40,7 @@ void SComboEdit::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 BOOL SComboEdit::FireEvent(IEvtArgs *evt)
 {
     if (evt->GetID() == EVT_RE_NOTIFY)
-    { //转发richedit的txNotify消息
+    { // 转发richedit的txNotify消息
         evt->SetIdFrom(GetOwner()->GetID());
         evt->SetNameFrom(GetOwner()->GetName());
     }
@@ -60,7 +60,7 @@ BOOL SDropDownWnd_ComboBox::PreTranslateMessage(MSG *pMsg)
     if (SDropDownWnd::PreTranslateMessage(pMsg))
         return TRUE;
     if (pMsg->message == WM_MOUSEWHEEL || ((pMsg->message == WM_KEYDOWN || pMsg->message == WM_KEYUP) && (pMsg->wParam == VK_UP || pMsg->wParam == VK_DOWN || pMsg->wParam == VK_RETURN || pMsg->wParam == VK_ESCAPE)))
-    { //截获滚轮及上下键消息
+    { // 截获滚轮及上下键消息
         SNativeWnd::SendMessage(pMsg->message, pMsg->wParam, pMsg->lParam);
         return TRUE;
     }
@@ -103,7 +103,7 @@ SComboBase::~SComboBase(void)
 BOOL SComboBase::CreateChildren(SXmlNode xmlNode)
 {
     m_xmlDropdownStyle.root().append_copy(xmlNode.child(SComboBase_style::kStyle_Dropdown));
-    //创建edit对象
+    // 创建edit对象
     SXmlNode xmlEditStyle = xmlNode.child(SComboBase_style::kStyle_Edit);
     SStringW strEditClass = xmlEditStyle.attribute(L"wndclass").as_string(SComboEdit::GetClassName());
     m_pEdit = sobj_cast<SComboEdit>(CreateChildByName(strEditClass));
@@ -237,7 +237,7 @@ void SComboBase::OnMouseLeave()
 
 void SComboBase::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
 {
-    //方向键改变当前选项
+    // 方向键改变当前选项
     switch (nChar)
     {
     case VK_DOWN:
@@ -297,7 +297,9 @@ void SComboBase::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
                     iStart++;
                 }
             }
-        }else{
+        }
+        else
+        {
             SetMsgHandled(FALSE);
         }
     }
@@ -306,7 +308,7 @@ void SComboBase::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
 
 BOOL SComboBase::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
-    //鼠标滚轮改变当前选项
+    // 鼠标滚轮改变当前选项
     if (zDelta > 0) // 上滚
     {
         int iSel = GetCurSel();
@@ -403,12 +405,12 @@ BOOL SComboBase::CalcPopupRect(int nHeight, CRect &rcPopup)
 {
     CRect rcWnd = GetWindowRect();
     GetContainer()->FrameToHost(&rcWnd);
-	CPoint pt = rcWnd.TopLeft();
-	::ClientToScreen(GetContainer()->GetHostHwnd(), &pt);
-	rcWnd.MoveToXY(pt.x, pt.y);
-	HMONITOR hMonitor = MonitorFromWindow(GetContainer()->GetHostHwnd(), MONITOR_DEFAULTTONEAREST);
-	MONITORINFO mi = { sizeof(MONITORINFO) };
-	GetMonitorInfo(hMonitor, &mi);
+    CPoint pt = rcWnd.TopLeft();
+    ::ClientToScreen(GetContainer()->GetHostHwnd(), &pt);
+    rcWnd.MoveToXY(pt.x, pt.y);
+    HMONITOR hMonitor = MonitorFromWindow(GetContainer()->GetHostHwnd(), MONITOR_DEFAULTTONEAREST);
+    MONITORINFO mi = { sizeof(MONITORINFO) };
+    GetMonitorInfo(hMonitor, &mi);
     if (rcWnd.bottom + nHeight <= mi.rcMonitor.bottom)
     {
         rcPopup = CRect(rcWnd.left, rcWnd.bottom, rcWnd.right, rcWnd.bottom + nHeight);
@@ -435,7 +437,15 @@ void SComboBase::UpdateDropdown(const SStringT &strInput)
     if (!m_pDropDownWnd)
     {
         m_pDropDownWnd = new SDropDownWnd_ComboBox(this);
-        m_pDropDownWnd->Create(CRect(0, 0, 100, 100), 0);
+
+        GetContainer()->EnableHostPrivateUiDef(TRUE);
+        SXmlNode xmlDropdownStyleNode = m_xmlDropdownStyle.root().child(SComboBase_style::kStyle_Dropdown);
+        if (xmlDropdownStyleNode)
+            m_pDropDownWnd->Create(CRect(0, 0, 100, 100), &xmlDropdownStyleNode);
+        else
+            m_pDropDownWnd->Create(CRect(0, 0, 100, 100), 0);
+        GetContainer()->EnableHostPrivateUiDef(FALSE);
+
         m_pDropDownWnd->GetRoot()->SDispatchMessage(UM_SETSCALE, GetScale(), 0);
         m_pDropDownWnd->GetRoot()->SDispatchMessage(UM_SETCOLORIZE, m_crColorize, 0);
         bFirst = TRUE;
@@ -446,14 +456,14 @@ void SComboBase::UpdateDropdown(const SStringT &strInput)
     evt.strInput = &strInput;
     FireEvent(&evt);
 
-    SWindow* pDropRoot = (SWindow*)m_pDropDownWnd->GetRoot();
+    SWindow *pDropRoot = (SWindow *)m_pDropDownWnd->GetRoot();
     CRect rcPadding = pDropRoot->GetStyle().GetPadding();
     CRect rcMargin = pDropRoot->GetStyle().GetMargin();
     int nDropHeight = GetListBoxHeight() + rcPadding.top + rcPadding.bottom + rcMargin.top + rcMargin.bottom;
 
     CRect rcPopup;
     BOOL bDown = CalcPopupRect(nDropHeight, rcPopup);
-    if(bFirst)
+    if (bFirst)
         m_pDropDownWnd->ShowWindow(rcPopup.left, rcPopup.top, rcPopup.Width(), rcPopup.Height(), m_nAnimTime, bDown);
     else
         m_pDropDownWnd->MoveWindow(rcPopup.left, rcPopup.top, rcPopup.Width(), rcPopup.Height());
@@ -561,7 +571,7 @@ void SComboBase::GetDesiredSize(SIZE *psz, int nParentWid, int nParentHei)
 {
     CSize szRet(-1, -1);
     if (GetLayoutParam()->IsSpecifiedSize(Horz))
-    { //检查设置大小
+    { // 检查设置大小
         SLayoutSize layoutSize;
         GetLayoutParam()->GetSpecifiedSize(Horz, &layoutSize);
         szRet.cx = layoutSize.toPixelSize(GetScale());
@@ -572,7 +582,7 @@ void SComboBase::GetDesiredSize(SIZE *psz, int nParentWid, int nParentHei)
     }
 
     if (GetLayoutParam()->IsSpecifiedSize(Vert))
-    { //检查设置大小
+    { // 检查设置大小
         SLayoutSize layoutSize;
         GetLayoutParam()->GetSpecifiedSize(Vert, &layoutSize);
         szRet.cy = layoutSize.toPixelSize(GetScale());
@@ -590,7 +600,7 @@ void SComboBase::GetDesiredSize(SIZE *psz, int nParentWid, int nParentHei)
     int nTestDrawMode = GetTextAlign() & ~(DT_CENTER | DT_RIGHT | DT_VCENTER | DT_BOTTOM);
 
     CRect rcPadding = GetStyle().GetPadding();
-    //计算文本大小
+    // 计算文本大小
     CRect rcTest(0, 0, 100000, 100000);
 
     SAutoRefPtr<IRenderTarget> pRT;
