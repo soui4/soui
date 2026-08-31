@@ -19,7 +19,7 @@ set( TOOLCHAIN_SUPPORTS_ATTRIBUTE_DESTRUCTOR_EXITCODE__TRYRUN_OUTPUT
         CACHE STRING "Output from TRY_RUN" FORCE)
 
 # ============================================================================
-# 路径计算：本工程位于 <SOUI_ROOT>/games/cnchess/client/ohos-demo
+# 路径计算：本工程位于 <SOUI_ROOT>/games/cnchess/client/ohos
 # ============================================================================
 set(SOUI_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../../../)
 get_filename_component(SOUI_ROOT_DIR "${SOUI_ROOT_DIR}" ABSOLUTE)

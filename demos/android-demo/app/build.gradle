@@ -20,9 +20,9 @@ android {
             cmake {
                 cppFlags "-std=c++17 -fexceptions -frtti"
                 arguments "-DANDROID_STL=c++_shared",
-                        "-DSOUI_INCLUDE_DIR=${project(':soui-android-lib').projectDir}/src/main/assets/soui4",
-                        "-DSOUI4ANDROID_INCLUDE_DIR=${project(':soui-android-lib').projectDir}/src/main/cpp/include",
-                        "-DSOUI_LIB_DIR=${project(':soui-android-lib').buildDir}/intermediates/library_jni/debug/jni"
+                        "-DSOUI_ROOT_DIR=${rootDir.absolutePath.replace('\\', '/')}/../..",
+                        "-DSOUI_ANDROID_LIB_CPP_DIR=${project(':soui-android-lib').projectDir.absolutePath.replace('\\', '/')}/src/main/cpp",
+                        "-DSOUI_BUILD_WS=OFF"
             }
         }
         ndk {
@@ -38,8 +38,6 @@ android {
         }
     }
 
-    // app 侧也带了 C++ 代码（ISHostWndFactory + CMainDlg 自定义 SHostWnd），
-    // 如果不需要自定义 SHostWnd，可以把整段 externalNativeBuild 去掉。
     externalNativeBuild {
         cmake {
             path "src/main/cpp/CMakeLists.txt"

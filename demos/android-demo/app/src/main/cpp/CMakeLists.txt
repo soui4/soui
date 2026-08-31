@@ -18,74 +18,36 @@ set( TOOLCHAIN_SUPPORTS_ATTRIBUTE_DESTRUCTOR_EXITCODE__TRYRUN_OUTPUT
         ""
         CACHE STRING "Output from TRY_RUN" FORCE)
 
-# SOUI_INCLUDE_DIR 和 SOUI_LIB_DIR 从 Gradle 的 externalNativeBuild.cmake.arguments 传递进来
-# SOUI_INCLUDE_DIR 指向解压后的 soui4 头文件目录
-# SOUI_LIB_DIR 指向解压后的 jni 库目录
-message(STATUS "SOUI_INCLUDE_DIR: ${SOUI_INCLUDE_DIR}")
-message(STATUS "SOUI_LIB_DIR: ${SOUI_LIB_DIR}")
-message(STATUS "SOUI4ANDROID_INCLUDE_DIR:${SOUI4ANDROID_INCLUDE_DIR}")
-if(NOT EXISTS  ${SOUI_INCLUDE_DIR})
-        message(FATAL_ERROR "SOUI_INCLUDE_DIR: ${SOUI_INCLUDE_DIR} is not existed")
+# 以下变量从 Gradle 的 externalNativeBuild.cmake.arguments 传递进来
+# SOUI_ROOT_DIR            - soui4 仓库根目录
+# SOUI_ANDROID_LIB_CPP_DIR - soui-android-lib/src/main/cpp 目录（提供 native 源码与头文件）
+message(STATUS "SOUI_ROOT_DIR: ${SOUI_ROOT_DIR}")
+message(STATUS "SOUI_ANDROID_LIB_CPP_DIR:${SOUI_ANDROID_LIB_CPP_DIR}")
+if(NOT EXISTS ${SOUI_ROOT_DIR})
+    message(FATAL_ERROR "SOUI_ROOT_DIR: ${SOUI_ROOT_DIR} is not existed")
 endif()
-if(NOT EXISTS  ${SOUI4ANDROID_INCLUDE_DIR})
-        message(FATAL_ERROR "SOUI4ANDROID_INCLUDE_DIR: ${SOUI4ANDROID_INCLUDE_DIR} is not existed")
+if(NOT EXISTS ${SOUI_ANDROID_LIB_CPP_DIR})
+    message(FATAL_ERROR "SOUI_ANDROID_LIB_CPP_DIR: ${SOUI_ANDROID_LIB_CPP_DIR} is not existed")
 endif()
+
 #=============================================================================
-# Compile Definitions for Android
+# 引入可复用的 SOUI Android native 构建片段
+# 该片段会 add_subdirectory 编译 SOUI 核心，并 add_library(soui4android SHARED)
+# 编译 Android JNI 桥。业务侧只需链接 soui4android 即可。
+#=============================================================================
+include(${SOUI_ANDROID_LIB_CPP_DIR}/soui4_android.cmake)
+
+#=============================================================================
+# Source Files
 #=============================================================================
 
-add_definitions(
-        -DSOUI_ANDROID
-        -DANDROID
-        -D__ANDROID__
-        -DWCHAR_SIZE=4
-        -DSOUI_EXPORTS
-        -D_CRT_SECURE_NO_WARNINGS
-        -DSOUI_RENDER_USE_SKIA
-        -DSOUI_IMAGE_DECODER_USE_STB
-        -DENABLE_VIRTUAL_HWND
+file(GLOB SOUI_ANDROID_DEMO_SRC
+        ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
 )
-
-
-#=============================================================================
-# Compiler Options
-#=============================================================================
-
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-add_compile_options(-fexceptions)
-add_compile_options(-fPIC)
-add_compile_options(-Wall)
-add_compile_options(-Wextra)
-add_compile_options(-Wno-unused-parameter)
-add_compile_options(-Wno-macro-redefined)
-
-#=============================================================================
-# Include Directories
-#=============================================================================
-# 添加库搜索路径（从 aar 解压出来的 jni 库目录）
-link_directories(
-        ${SOUI_LIB_DIR}/${ANDROID_ABI}
-)
-
-#=============================================================================
-# Configuration Summary
-#=============================================================================
-
-
-message(STATUS "===========================================")
-message(STATUS "SOUI Android Demo Configuration")
-message(STATUS "===========================================")
-message(STATUS "SOUI Include Dir: ${SOUI_INCLUDE_DIR}")
-message(STATUS "===========================================")
 
 #=============================================================================
 # soui-android-demo Library
 #=============================================================================
-file(GLOB_RECURSE SOUI_ANDROID_DEMO_SRC
-        ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
-        )
 
 add_library(
         soui-android-demo
@@ -93,22 +55,20 @@ add_library(
         ${SOUI_ANDROID_DEMO_SRC}
 )
 
-
 target_include_directories(
         soui-android-demo
         PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
-        ${SOUI_INCLUDE_DIR}
-        ${SOUI_INCLUDE_DIR}/config
-        ${SOUI_INCLUDE_DIR}/SOUI/include
-        ${SOUI_INCLUDE_DIR}/swinx/include
-        ${SOUI_INCLUDE_DIR}/utilities/include
-        ${SOUI_INCLUDE_DIR}/components
-        ${SOUI4ANDROID_INCLUDE_DIR}
+        ${SOUI_ANDROID_LIB_CPP_DIR}/include
+        ${SOUI_ROOT_DIR}/SOUI/include
+        ${SOUI_ROOT_DIR}/swinx/include
+        ${SOUI_ROOT_DIR}/utilities/include
+        ${SOUI_ROOT_DIR}/components
+        ${PROJECT_BINARY_DIR}/config
 )
 
-# 链接所有需要的库
-# soui4android 依赖 soui4, utilities4, swinx 等动态库，需要显式链接
+# 链接所有需要的库（soui4android 由 soui4_android.cmake 提供，
+# 其内部已 PUBLIC 链接 soui4/utilities4/swinx 等，这里再次列出无害以便显式化）
 target_link_libraries(
         soui-android-demo
         PUBLIC

@@ -13,16 +13,11 @@ android {
         versionCode 1
         versionName "1.0"
 
-        externalNativeBuild {
-            cmake {
-                cppFlags "-std=c++17 -fexceptions -frtti -w"
-                cFlags "-w"
-                arguments "-DANDROID_STL=c++_shared",
-                          "-DSOUI_ROOT_DIR=${souiRootDir}"
-            }
-        }
+        // 注：本模块不再编译 native。SOUI 核心与 Android JNI 桥（libsoui4android.so）
+        // 由各业务 app 在其自己的 CMake 中通过 soui4_android.cmake 统一编译，
+        // 以避免跨模块的 .so 产物依赖。
         ndk {
-            abiFilters 'x86', 'arm64-v8a','x86_64', 'armeabi-v7a'
+            abiFilters 'x86', 'arm64-v8a', 'x86_64', 'armeabi-v7a'
         }
     }
 
@@ -33,104 +28,11 @@ android {
         }
     }
 
-    externalNativeBuild {
-        cmake {
-            path "src/main/cpp/CMakeLists.txt"
-            version "3.18.1"
-        }
-    }
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
 }
-
-
-
-// 目标头文件输出目录（assets 目录）
-def targetIncludeDir = "${projectDir}/src/main/assets/soui4"
-
-// 收集 SOUI 核心头文件
-task collectSouiHeaders(type: Copy) {
-    description '收集 SOUI 核心头文件到 assets'
-
-    doFirst { delete "${targetIncludeDir}/SOUI" }
-    from "${souiRootDir}/SOUI/include"
-    into "${targetIncludeDir}/SOUI/include"
-    include '**/*.h'
-    include '**/*.hpp'
-    duplicatesStrategy = 'exclude'
-}
-
-// 收集 swinx 头文件
-task collectSwinxHeaders(type: Copy) {
-    description '收集 swinx 头文件到 assets'
-
-    doFirst { delete "${targetIncludeDir}/swinx" }
-    from "${souiRootDir}/swinx/include"
-    into "${targetIncludeDir}/swinx/include"
-    include '**/*.h'
-    include '**/*.hpp'
-    duplicatesStrategy = 'exclude'
-}
-
-// 收集 utilities 头文件
-task collectUtilitiesHeaders(type: Copy) {
-    description '收集 utilities 头文件到 assets'
-
-    doFirst { delete "${targetIncludeDir}/utilities" }
-    from "${souiRootDir}/utilities/include"
-    into "${targetIncludeDir}/utilities/include"
-    include '**/*.h'
-    include '**/*.hpp'
-    duplicatesStrategy = 'exclude'
-}
-
-// 收集 components 头文件
-task collectComponentsHeaders(type: Copy) {
-    description '收集 components 头文件到 assets'
-
-    doFirst { delete "${targetIncludeDir}/components" }
-    from "${souiRootDir}/components"
-    into "${targetIncludeDir}/components"
-    include '*.h'
-    include 'resprovider-7zip/zip7resprovider-param.h'
-    include 'resprovider-zip/zipresprovider-param.h'
-    duplicatesStrategy = 'exclude'
-}
-
-// 收集 config 自己的头文件
-task collectSouiConfig(type: Copy) {
-    description '收集 config 自己的头文件到 assets'
-
-    doFirst { delete "${targetIncludeDir}/config" }
-    from "${projectDir}/src/main/cpp/soui4/config"
-    into "${targetIncludeDir}/config"
-    include '*.h'
-    duplicatesStrategy = 'exclude'
-}
-
-
-// 收集 soui-android-lib 自己的头文件
-task collectAndroidHeaders(type: Copy) {
-    description '收集 soui-android-lib 自己的头文件到 assets'
-
-    doFirst { delete "${targetIncludeDir}/soui-android" }
-    from "${projectDir}/src/main/cpp/include"
-    into "${targetIncludeDir}/soui-android/include"
-    include '**/*.h'
-    duplicatesStrategy = 'exclude'
-}
-
-// 总收集任务
-task collectHeaders {
-    description '收集所有头文件到 assets/soui4 目录'
-    dependsOn collectSouiHeaders, collectSwinxHeaders, collectUtilitiesHeaders, collectComponentsHeaders,collectSouiConfig, collectAndroidHeaders
-}
-
-// 在构建前执行头文件收集（不包含 config.h，因为 config.h 需要在 CMake 配置后才能生成）
-preBuild.dependsOn collectHeaders
 
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'

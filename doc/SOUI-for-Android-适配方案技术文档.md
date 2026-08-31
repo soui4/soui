@@ -1,24 +1,86 @@
-# SOUI for Android 适配方案技术文档
+# SOUI 移动端（Android / OHOS / iOS）适配方案技术文档
 
 ## 1. 概述
 
-SOUI 是一款面向 C++/Win32 的轻量级 DirectUI 框架，核心围绕 Win32 HWND 句柄模型、SHostWnd（顶层窗口宿主）与消息循环构建。**SOUI for Android 适配方案** 的目标，是让一套基于 SWinx（SOUI 的跨平台 Win32 API 仿真层）编写的 SOUI C++ 业务代码，以 **几乎零改动** 的方式运行在 Android 设备上，并同时实现：
+SOUI 是一款面向 C++ 的轻量级 DirectUI 框架，核心围绕 Win32 HWND 句柄模型、SHostWnd（顶层窗口宿主）与消息循环构建。为了让一套基于 SWinx（SOUI 的跨平台 Win32 API 仿真层）编写的 SOUI C++ 业务代码以**几乎零改动**的方式运行在移动端，SOUI 提供了三套对等（peer）的原生适配方案：
 
-- 与 **Android 原生 Java/Kotlin View 系统无缝互嵌**：原生 View 可作为 SOUI 的"子窗口"，SOUI 的桌面容器（SouiScreen）也可以是任意原生布局（FrameLayout/LinearLayout/CoordinatorLayout...）的普通子 View。
-- **严格对齐 Win32 语义**：`CreateWindowEx`、`SetCapture`/`ReleaseCapture`、`SetTimer`/`KillTimer`、`moveWindow`、`showWindow`、剪贴板操作、RawInput 设备枚举等核心 API 在 C++ 层的行为、参数、返回值与 Win32 一致，业务代码无需"Android 特判"。
-- **单 SurfaceView 粒度的渲染**：每个 HWND 对应一个独立的 Android View（SouiSurface），独立测量、独立失效、独立合成，走系统 SurfaceFlinger 正常合成管线，而不是把所有 UI 画到一张全屏 Texture 上。
-- **多 Activity / 多 Screen 支持**：通过 screenId 机制，支持在多个 Activity 中独立承载不同的 SOUI 窗口系统。
-- **SIMD 优化的颜色通道转换**：使用 NEON/AArch64/SSSE3 指令加速 BGRA→RGBA 转换，大幅提升渲染性能。
-- **完整的 IME 输入支持**：支持软键盘字符输入、键盘高度同步、输入连接管理。
-- **HWND_MESSAGE 支持**：创建不可见的消息占位窗口，用于定时器消息处理等场景。
+- **SOUI for Android**：业务代码跑在 Android 主线程，通过 JNI 桥接 Java/Kotlin View 系统；渲染后端为离屏 Bitmap + Skia（SIMD BGRA→RGBA）。
+- **SOUI for OHOS（鸿蒙）**：业务代码跑在 UIAbility 主线程（JS 线程），通过 N-API 桥接 ArkUI 组件；渲染后端为离屏 PixelMap + Skia，脏矩形回传局部上屏。
+- **SOUI for iOS**：业务代码通过 Objective-C++ 直接接入 UIKit / Core Graphics，无桥接层；定时器由 C++ 消息循环直接驱动。
 
-本文档从实现机制、竞品对比（Qt/Flutter）、原生集成优势、Demo 编译与测试四个维度完整介绍该方案。
+三套方案共享同一套 SWinx 跨平台抽象，仅在"原生窗口体系 / 桥接技术 / 渲染后端 / 线程模型"上存在平台差异；业务层 SWinx C++ 代码（`CreateWindowEx` / `SetTimer` / `SetCapture` / 消息循环 …）完全复用。同一份业务代码（如 `games/cnchess/client`）即可同时构建出 Android、OHOS、iOS 安装包，以及 Windows / Linux / macOS 桌面程序——只需切换入口函数与平台层。
+
+本文档从**总体架构（三端共享机制）→ 各平台适配实现（Android / OHOS / iOS）→ 竞品对比（Qt/Flutter）→ 原生集成优势 → 编译与测试**五个维度完整介绍这套移动端适配技术。
 
 ---
 
-## 2. 核心架构与实现机制
+## 2. 总体架构：三端共享的核心设计机制
 
-### 2.1 三层架构总览
+尽管三个平台使用不同的原生 UI 体系与桥接技术，它们在底层设计上高度一致。理解以下六条共享机制，是阅读后续各平台章节的前提。
+
+### 2.1 SWinx：Win32 API 跨平台仿真层
+
+SWinx 是 SOUI 的跨平台抽象核心，把 Win32 的 `CreateWindowEx / SetTimer / SetCapture / GetMessage / SendMessage / 剪贴板 / RawInput` 等 API 抽象为与平台无关的接口。各平台在 `swinx/src/platform/<os>`（或各 `soui-*-lib`）下提供具体实现，业务层只依赖 SWinx 头文件，不感知平台差异。详见各平台章节的"平台层"小节。
+
+### 2.2 HWND = 原生对象指针（零查表映射）
+
+三端均采用同一思路：**HWND 即原生窗口对象的指针，不做 Handle → Object 的 Map 查表**。
+
+- Android：HWND = `jobject` 的 `NewGlobalRef` 指针值（见 §3.2）。
+- OHOS：HWND = `napi_ref` 指针值（见 §4.2）。
+- iOS：HWND = `SUIView`（UIView 子类）对象指针（见 §5.2）。
+
+任意窗口状态操作都直接对指针解引用调用原生接口，**无哈希开销、无类型转换**。
+
+### 2.3 Windows 消息语义严格对齐
+
+三端都保证 Win32 消息语义一致：`WM_LBUTTONDOWN/UP/DBLCLK/MOVE`、`WM_RBUTTONDOWN`、`WM_MOUSEWHEEL/WM_MOUSEHWHEEL`、`WM_XBUTTON*`、`WM_TIMER`、`WM_SETFOCUS/WM_KILLFOCUS`、`WM_KEYBOARD_HEIGHT` 等在不同平台上的行为、参数、返回值一致，业务代码无需"平台特判"。
+
+### 2.4 线程与消息循环模型
+
+- **iOS** 最彻底：C++ 业务跑在主线程 runloop（`CFRunLoopRunInMode`），定时器由 C++ 消息循环 tick 直接驱动，无独立调度层（见 §5.7）。
+- **Android / OHOS**：C++ 业务跑在原生主线程（UI 线程 / JS 线程）。主线程调用走"快路径"直接调原生桥；**仅当调用发生在工作线程时**，才经跨线程机制（Android `Handler.post`、OHOS `napi_threadsafe_function`）投递回主线程执行——根因是 JNIEnv / napi_env 不能跨线程使用。
+
+### 2.5 String Slot 字符串交换机制(Android,鸿蒙)
+
+跨层字符串参数（如 `WM_SETTEXT`）通过 Slot 机制交换：C++ 侧 `AutoStringSlot`（RAII）分配 1~65535 环形复用的槽 ID（0 保留无效），原生层按槽 ID 读写字符串数据，避免每次 JNI/N-API 字符串拷贝与编码转换开销。
+
+### 2.6 screenId 多窗口路由（激活栈）
+
+当 App 存在多个 Activity / Ability / Window 时，创建顶层窗口（`hWndParent=HWND_DESKTOP`）需要知道挂到哪个"桌面容器"。三端均以 `screenId` 激活栈实现：`screenStartup` push、`screenShutdown` pop，创建窗口从栈顶取当前激活 screenId。详见各平台"多 Screen"小节。
+
+### 2.7 三端横向对比总表
+
+| 维度 | SOUI for Android | SOUI for OHOS | SOUI for iOS |
+|---|---|---|---|
+| 原生 UI 体系 | Android View/ViewGroup（Java/Kotlin） | ArkUI 组件（ArkTS） | UIKit UIView/UIWindow（Obj-C/Swift） |
+| 桥接技术 | JNI（JavaVM 全局引用） | N-API（node_api，弱符号链接 OH NDK） | Objective-C++ 直接调用（无桥接层） |
+| HWND 真身 | jobject GlobalRef 指针 | napi_ref 指针 | SUIView（UIView 子类）指针 |
+| 渲染后端 | 离屏 Bitmap + Skia，SIMD BGRA→RGBA | 离屏 PixelMap + Skia，脏矩形回传局部上屏 | Core Graphics（CGContextRef） |
+| 上屏方式 | canvas.drawBitmap | Canvas writePixelsSync + drawImage（局部脏矩形） | UIView drawRect → CGContext 提交 |
+| 线程模型 | 共用主线程，JNI 零跨线程 | 主线程 callBridge 快路径；工作线程 napi_threadsafe_function 投递 | 主线程 CFRunLoop；C++ 消息循环直接驱动定时器 |
+| 定时器 | Handler(Looper.getMainLooper) | setInterval/clearInterval | C++ TimerInfo 链表 + 消息循环 tick |
+| 入口 | Soui4AndroidEntry（JNI_OnLoad） | Soui4OhosEntry（N-API 模块注册） | swinx_ios_entry() C API + AppDelegate |
+| IME | EditText / InputConnection | inputMethod.InputMethodController | UIKeyInput / UIResponder |
+| 剪贴板 | ClipboardManager | @ohos.pasteboard | UIPasteboard |
+| 构建系统 | Gradle + CMake（AGP/NDK） | hvigor + CMake（OHOS SDK） | CMake（CMAKE_SYSTEM_NAME=iOS，定义 __IOS__） |
+| 独立适配库 | soui-android-lib | soui-ohos-lib | swinx/src/platform/ios（平台层，业务经 swinx_ios_entry 直连） |
+
+### 2.8 三端架构总览
+
+- **Android（JNI）**：见 §3.1 架构图。C++ 与 Java 同线程，每个 `SouiSurface` 对应一个 Android `View`。
+- **OHOS（N-API）**：见 §4.1 架构图。C++ 与 ArkTS 同线程，每个 `SouiSurface` 对应一个 ArkUI `Canvas` 组件。
+- **iOS（Obj-C++）**：见 §5.1 架构图。C++ 经 `swinx_ios_entry` 接入 UIKit，每个 HWND 对应一个 `SUIView`。
+
+三端共同保证：HWND 即原生窗口对象指针（零查表）、Windows 消息语义严格对齐、SetCapture/ReleaseCapture 一致、String Slot 字符串交换机制一致、多 Screen（screenId 激活栈）一致。
+
+---
+
+## 3. SOUI for Android 适配方案
+
+Android 是三套方案中的参考实现：C++ 业务代码**不启独立渲染线程，完全跑在 Android 主线程**，与 Qt（独立 QtThread）、Flutter（独立 UI/Raster/IO 线程池）形成鲜明对比。其直接收益是 JNI 调用无需跨线程调度、View 操作无需 post、与原生生命周期天然对齐。
+
+### 3.1 三层架构总览
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
@@ -53,9 +115,7 @@ SOUI 是一款面向 C++/Win32 的轻量级 DirectUI 框架，核心围绕 Win32
 │  SouiSurfaceProxy：每个 Surface 的输入渲染 native 实现（含 SIMD）    │
 ```
 
-**关键设计决策：C++ 业务代码不启独立渲染线程，完全跑在 Android 主线程。** 这一点和 Qt（独立 QtThread）、Flutter（独立 UI/Raster/IO 线程池）形成鲜明对比，带来的直接收益是 **JNI 调用无需跨线程调度、View 操作无需 post、与原生生命周期天然对齐**。
-
-### 2.2 HWND = INativeWindow GlobalRef：零查表映射机制
+### 3.2 HWND = INativeWindow GlobalRef：零查表映射机制
 
 传统跨平台 UI 框架通常维护一张 `Handle → Object` 的 Map（从整型句柄查表得到底层对象）。SOUI for Android 采用更直接的策略：
 
@@ -73,7 +133,7 @@ jmethodID midShow        = env->GetMethodID(clsNativeWnd, "nativeShow", "(I)Z");
 env->CallVoidMethod((jobject)hWnd, midShow, SW_SHOW);  // 零中间层
 ```
 
-### 2.3 窗口层级与容器模型
+### 3.3 窗口层级与容器模型
 
 SOUI 的"HWND 树"在 Android 上直接映射为标准的 Android `View / ViewGroup` 树（而非画到一张全屏位图里再合成）：
 
@@ -92,7 +152,7 @@ SOUI 的"HWND 树"在 Android 上直接映射为标准的 Android `View / ViewGr
 - `SouiAbsLayout.updateChildFrame / setChildPosition / setChildSize`：提供原子性的子 View 位置和尺寸更新。
 - `SouiScreen.createSurface` 重载：创建 `SouiBaseSurface`（而非 `SouiSurface`），因为 SouiScreen 本身不做绘制。
 
-### 2.4 Surface 渲染流程（离屏 Bitmap + Skia + SIMD 颜色通道转换）
+### 3.4 Surface 渲染流程（离屏 Bitmap + Skia + SIMD 颜色通道转换）
 
 每个 `SouiSurface` 的 `onDraw(Canvas canvas)` 流程：
 
@@ -109,7 +169,7 @@ SOUI 的"HWND 树"在 Android 上直接映射为标准的 Android `View / ViewGr
 
 **和 Flutter/Qt 的本质不同**：SOUI 不独占一个全屏 Surface；每个 SOUI 窗口在 View 树里是一个独立节点，可与原生 Button、Toolbar、RecyclerView 交叉混合布局，Z-order 由父 ViewGroup addView 顺序天然决定。
 
-### 2.5 输入事件分发：严格对齐 Win32 `SetCapture`
+### 3.5 输入事件分发：严格对齐 Win32 `SetCapture`
 
 输入路径（见 [SouiBaseSurface.java](../demos/android-demo/app/src/main/java/com/soui/android/SouiBaseSurface.java) `dispatchTouchEventToNative` 与 C++ [SouiSurfaceProxy.cpp](../demos/android-demo/app/src/main/cpp/SouiSurfaceProxy.cpp) `onMotionEvent`）：
 
@@ -128,7 +188,7 @@ SOUI 的"HWND 树"在 Android 上直接映射为标准的 Android `View / ViewGr
 
 `SouiPlatformBridge.setCapture / releaseCapture / getCapture` 三个方法（JNI 暴露给 C++ `AndroidPlatformAPI`）是该机制的状态总控。
 
-### 2.6 焦点管理：SetFocus/GetFocus 双向同步
+### 3.6 焦点管理：SetFocus/GetFocus 双向同步
 
 `SouiPlatformBridge` 维护全局焦点状态 `mFocusHwnd`（volatile long），实现 Win32 `SetFocus`/`GetFocus` 语义：
 
@@ -141,7 +201,7 @@ SOUI 的"HWND 树"在 Android 上直接映射为标准的 Android `View / ViewGr
 - **输入连接管理**：`SouiBaseSurface.onCreateInputConnection` 创建 `SouiInputConnection`，处理字符提交（`commitText` → `sendImeString` → `WM_IME_CHAR`）
 - **IME 选项**：设置 `IME_FLAG_NO_FULLSCREEN`，避免横屏时全屏输入法遮挡内容
 
-### 2.7 定时器：`SetTimer/KillTimer` 语义 100% 对齐 Win32
+### 3.7 定时器：`SetTimer/KillTimer` 语义 100% 对齐 Win32
 
 `SouiPlatformBridge` 内部用 `Handler(Looper.getMainLooper())` + 嵌套 Map `Map<hWnd, Map<timerId, TimerRunnable>>` 实现：
 
@@ -151,7 +211,7 @@ SOUI 的"HWND 树"在 Android 上直接映射为标准的 Android `View / ViewGr
 - `TimerRunnable.run`：一次触发后，若仍注册且 active，则 `postDelayed(self, interval)`，完成"默认循环"行为；同时 JNI 调用 `nativeOnTimerExpired(hWnd, timerId)` → C++ `AndroidPlatformAPI::onTimerExpired` → `PostMessage WM_TIMER` 或直接调 `TIMERPROC`。
 - C++ 层 `m_timerEntries` 镜像 Java 层的定时器状态，仅记录 `TIMERPROC` 回调与元数据，真正调度由 Java Handler 完成。
 
-### 2.8 多 Activity / 多 Screen（screenId 机制）
+### 3.8 多 Activity / 多 Screen（screenId 机制）
 
 一个 Android App 里往往有多个 Activity，每个 Activity 都可能承载自己的 SouiScreen；C++ 需要知道"创建一个顶级窗口（WS_POPUP/WS_OVERLAPPED）时，应该把它加到哪个 SouiScreen 的 View 树里"。方案：
 
@@ -175,7 +235,7 @@ SOUI 的"HWND 树"在 Android 上直接映射为标准的 Android `View / ViewGr
 2. 若 `hWndParent == HWND_MESSAGE(-1)`：创建消息占位窗口，不挂视觉树
 3. 其他情况：直接使用指定的父窗口 HWND
 
-### 2.9 屏幕旋转与生命周期管理
+### 3.9 屏幕旋转与生命周期管理
 
 Android 的配置变更（如屏幕旋转）会触发 Activity 重建，导致所有 View 被销毁后重新创建。由于 SOUI 的所有 HWND 都映射到 Java 层的 View 对象（`SouiSurface` / `SouiWindow`），这些 HWND 也会随之销毁和重建。
 
@@ -193,7 +253,7 @@ Android 的配置变更（如屏幕旋转）会触发 Activity 重建，导致�
 - `mSouiMainHwnd` 在旋转后会变为新值，需要重新获取
 - 尺寸同步通过 `onSizeChanged` 自动处理，确保 C++ 窗口尺寸与新屏幕尺寸一致
 
-### 2.10 String Slot 机制：JNI 字符串参数交换
+### 3.10 String Slot 机制：JNI 字符串参数交换
 
 由于 JNI 字符串传递涉及内存管理和编码转换，采用 Slot 机制进行字符串交换：
 
@@ -234,7 +294,7 @@ Android 的配置变更（如屏幕旋转）会触发 Activity 重建，导致�
 - `AutoStringSlot`（[AndroidPlatformAPI.h](../demos/android-demo/app/src/main/cpp/AndroidPlatformAPI.h)）：RAII 包装类，构造时分配槽，析构时释放槽
 - `stringSlotAlloc / WriteString / ReadString / stringSlotFree`：槽管理方法
 
-### 2.11 消息转发机制：统一消息路由
+### 3.11 消息转发机制：统一消息路由
 
 `INativeWindow.nativeSendMessage(int msg, long wParam, long lParam)` 提供了统一的消息转发接口：
 
@@ -242,7 +302,7 @@ Android 的配置变更（如屏幕旋转）会触发 Activity 重建，导致�
 - **纯数值消息**：按 Win32 语义直接传递
 - **特殊处理**：`EM_GETSEL` 返回值编码为 `(start << 32) | end`，C++ 层解码后写入用户缓冲区
 
-### 2.12 SouiSurfaceProxy：输入事件转换与渲染代理
+### 3.12 SouiSurfaceProxy：输入事件转换与渲染代理
 
 每个 `SouiSurface` 在 C++ 层对应一个 `SouiSurfaceProxy` 对象：
 
@@ -252,7 +312,7 @@ Android 的配置变更（如屏幕旋转）会触发 Activity 重建，导致�
 - **渲染**：`render` 方法将 C++ 层绘制结果绑定到 Java Bitmap，包含 SIMD 优化的 BGRA→RGBA 颜色通道转换。
 - **鼠标状态跟踪**：维护 `m_buttonsDown`、`m_lastDownTime/X/Y`、`m_hoverTracked` 等状态，支持 `TrackMouseEvent` 语义。
 
-### 2.13 剪贴板 API：Win32 语义完整实现
+### 3.13 剪贴板 API：Win32 语义完整实现
 
 剪贴板操作在 Java 层通过 `ClipboardManager` 实现，C++ 层通过 JNI 桥接调用，**直接使用 String Object 交换数据，不再使用 string slot 技术**：
 
@@ -271,7 +331,7 @@ Android 的配置变更（如屏幕旋转）会触发 Activity 重建，导致�
 - `clipboardGetData`：Java 返回 `String`，C++ 使用 `GetStringUTFChars` 读取，`ReleaseStringUTFChars` 释放
 - `clipboardSetData`：C++ 使用 `NewStringUTF` 创建 `jstring`，Java 直接使用参数
 
-### 2.14 RawInput 设备枚举：跨平台输入设备检测
+### 3.14 RawInput 设备枚举：跨平台输入设备检测
 
 Android 平台通过 JNI 调用 `SouiPlatformBridge.getInputDevices()` 获取系统输入设备列表：
 
@@ -286,7 +346,7 @@ Android 平台通过 JNI 调用 `SouiPlatformBridge.getInputDevices()` 获取系
 - 键盘：类型、功能键数量、指示灯数量、总键数
 - HID：厂商 ID、产品 ID、版本号、使用页、使用值
 
-### 2.15 键盘高度同步：IME 弹出时自动调整布局
+### 3.15 键盘高度同步：IME 弹出时自动调整布局
 
 `SouiScreen` 通过 `WindowInsetsAnimation.Callback` 监听软键盘弹出/收起事件：
 
@@ -304,7 +364,7 @@ rootView.setWindowInsetsAnimationCallback(new WindowInsetsAnimation.Callback(DIS
 
 C++ 层接收到键盘高度后，通过 `WM_KEYBOARD_HEIGHT` 消息通知根窗口，业务层可据此调整布局。
 
-### 2.16 IME 输入支持：软键盘字符输入
+### 3.16 IME 输入支持：软键盘字符输入
 
 `SouiBaseSurface` 实现 `onCreateInputConnection`，支持 Android 输入法：
 
@@ -312,7 +372,7 @@ C++ 层接收到键盘高度后，通过 `WM_KEYBOARD_HEIGHT` 消息通知根窗
 - **IME 选项**：`IME_FLAG_NO_FULLSCREEN`，避免横屏时全屏输入法遮挡内容
 - **字符提交**：`SouiInputConnection.commitText` 通过 `sendImeString` 将字符投递到 C++ 层，转换为 `WM_IME_CHAR` 消息
 
-### 2.17 HWND_MESSAGE 支持：消息占位窗口
+### 3.17 HWND_MESSAGE 支持：消息占位窗口
 
 支持 Win32 的 `HWND_MESSAGE` 语义，创建不可见的消息占位窗口：
 
@@ -322,9 +382,251 @@ C++ 层接收到键盘高度后，通过 `WM_KEYBOARD_HEIGHT` 消息通知根窗
 
 ---
 
-## 3. 与 Qt / Flutter 方案对比
+## 4. SOUI for OHOS（鸿蒙）适配方案
 
-### 3.1 Qt for Android 架构要点
+### 4.1 三层架构总览（ArkTS + N-API）
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  ArkTS 层（UIAbility 主线程 = JS 线程）                       │
+│  ┌──────────────┐  ┌────────────┐  ┌──────────────────────┐  │
+│  │ UIAbility /  │  │ ArkUI 组件 │  │ SouiPlatformBridge    │  │
+│  │ Page         │  │ (SouiScreen│  │  - 单例 N-API 桥      │  │
+│  │              │  │  SouiSurface│ │  - createWindow/定时器/│ │
+│  │              │  │  NativeEdit│  │    SetCapture/焦点工厂 │  │
+│  └──────┬───────┘  └─────┬──────┘  └──────────┬───────────┘  │
+│  ┌──────▼────────────────▼─────────────────────▼──────────┐  │
+│  │ ArkUI 组件树（SouiAbsLayout → SouiWindow → SouiScreen → │  │
+│  │   SouiSurface / NativeEditView，均实现 INativeWindow）  │  │
+│  └─────────────────────────────────────────────────────────┘ │
+├──────────────────────────────────────────────────────────────┤
+│  N-API 层（双向；方法句柄在 init 时一次性缓存，弱符号链接 OH NDK）│
+│  C++ → ArkTS: OhosPlatformAPI（callBridge / invokeBridge）   │
+│  ArkTS → C++: Soui4Ohos_NAPI（surf_render / surf_onMotion…） │
+├──────────────────────────────────────────────────────────────┤
+│  C++ Native 层（运行在 UIAbility 主线程；工作线程经 tsfn 回投）  │
+│  ┌─────────────┐  ┌───────────────┐  ┌────────────────────┐ │
+│  │   SWinx     │  │ OhosPlatformAPI│  │    SOUI Core        │ │
+│  │(Win32 API   │──│  实现（N-API） │──│  (SHostWnd/SNativeWnd│ │
+│  │ 仿真抽象层) │  │               │  │   /SWnd/Skin/Xml)   │ │
+│  └─────────────┘  └───────────────┘  └────────────────────┘ │
+│  SouiSurfaceProxy：每个 Surface 的输入渲染 native 实现         │
+└──────────────────────────────────────────────────────────────┘
+```
+
+与 Android 方案完全同构：仅把 JNI 替换为 N-API、jobject GlobalRef 替换为 napi_ref、Handler 替换为 setInterval、Android Bitmap 替换为 ArkUI PixelMap/Canvas。业务层 SWinx C++ 代码（`CreateWindowEx` / `SetTimer` / `SetCapture` …）语义不变。
+
+### 4.2 HWND = napi_ref 指针：零查表映射
+
+- ArkTS 定义接口 `INativeWindow`（见 [INativeWindow.ets](../soui-ohos-lib/src/main/ets/INativeWindow.ets)）：`nativeDestroy / nativeInvalidate / nativeShow / nativeMove / nativeIsVisible / nativeSendMessage` 等。
+- 每个窗口对应的 Surface 组件（`SouiSurface` 或原生包装 `NativeEditView`）实现该接口。
+- C++ 层对 ArkTS 对象调用 `napi_create_reference` 锁定；**引用指针值（int64 / napi_ref）就是 SWinx 的 HWND**。
+- 任意窗口操作：`napi_get_reference_value` 还原 local ref → `callBridge(methodRef, …)` 直接调用，**无需 Map 查表、无哈希开销**（与 Android 一致）。
+
+### 4.3 窗口层级与容器模型
+
+SOUI 的"HWND 树"直接映射为 ArkUI 组件树（而非画到一张全屏位图）：
+
+| C++ 语义 | ArkTS 对应 | 职责 |
+|---|---|---|
+| `GetDesktopWindow()` 桌面 | `SouiScreen`（自定义组件） | 桌面级容器；挂在某 Ability 的页面布局里，作为所有顶级窗口的父；承载 screenId 启动参数与生命周期。见 [SouiScreen.ets](../soui-ohos-lib/src/main/ets/SouiScreen.ets) |
+| 一个 HWND 窗口 | `SouiWindow`（基于 `SouiAbsLayout`） | 单 HWND 容器；index=0 是主 Surface，其余是子 HWND 子容器。 |
+| HWND 的像素绘制面 | `SouiSurface`（基于 Canvas 自绘） | 实现 `INativeWindow`；`doRender` 调 C++ 渲染并把结果 writePixelsSync 到自身 PixelMap 再 drawImage 上屏。独立失效、独立绘制。见 [SouiSurface.ets](../soui-ohos-lib/src/main/ets/SouiSurface.ets) |
+| 原生输入控件作为子控件 | `NativeEditView`（包装 ArkUI TextInput） | className 命中即创建原生输入控件，包装 INativeWindow，支持 SetDlgItemText/EnableWindow 等语义。 |
+| 消息占位窗口（HWND_MESSAGE） | 占位 Surface | 不可见 0×0 占位窗口，用于定时器消息处理等。 |
+
+`SouiAbsLayout`（见 [SouiAbsLayout.ets](../soui-ohos-lib/src/main/ets/SouiAbsLayout.ets)）提供绝对定位布局引擎，子组件位置/尺寸直接使用 SWinx RECT 语义，与 Android `SouiAbsLayout` 对应。
+
+### 4.4 Surface 渲染（离屏 PixelMap + Skia + 脏矩形回传）
+
+每个 `SouiSurface` 的 `doRender` 流程：
+
+1. **尺寸同步**：Component 尺寸变化时，ArkTS 侧创建/复用离屏 `PixelMap`（RGBA_8888），并通知 C++ 更新 SWinx VirtualHWND Rect。
+2. **C++ Skia 渲染**：`surf_render(pixelBuffer, w, h)` → `SouiSurfaceProxy::render` 把 PixelMap 的像素缓冲区绑定为 `CreateDIBSectionEx` 的 DIB Section，SOUI 完成当前窗口所有 DirectUI 控件绘制（Skin/文字/SVG/渐变），通过 `SendMessage(hWnd, WM_PAINT)` 写入缓冲。
+3. **脏矩形回传（单一数据源）**：`render` 从 `GetUpdateRgn` 的包围盒（`GetRgnBox`，客户区物理像素坐标，WM_PAINT 之前读取）得到 `rcUpdate` 返回 ArkTS；`doRender` 仅对该矩形 `writePixelsSync` + `drawImage` 局部上屏，**不再由 TS 层维护脏矩形列表**。空矩形（l>=r）表示本次无需上屏。
+4. **合成**：ArkUI 把该组件作为正常节点交给系统合成，可与原生 Toolbar/List 等组件交叉混合。
+
+
+### 4.5 输入事件分发（对齐 SetCapture）
+
+输入路径（见 [SouiSurface.ets](../soui-ohos-lib/src/main/ets/SouiSurface.ets) 触摸回调与 C++ [SouiSurfaceProxy.cpp](../soui-ohos-lib/src/main/cpp/src/SouiSurfaceProxy.cpp) `onMotionEvent`）：
+
+1. ArkUI 按正常事件派发命中 `SouiSurface` 组件。
+2. `SouiPlatformBridge` 先判断 `getCapture`：若已 SetCapture 且事件来源 Surface ≠ 捕获目标，则做坐标变换后重定向投递（与 Android 一致）。
+3. 未命中 Capture 时，正常 `surf_onMotionEvent(action, x, y, pointerId, buttonState, vscroll, hscroll, metaState, ts)`。
+4. C++ `onMotionEvent` 派发 `WM_LBUTTONDOWN/UP/DBLCLK/MOVE`、`WM_RBUTTONDOWN`、`WM_MOUSEWHEEL/WM_MOUSEHWHEEL`、`WM_XBUTTON*` 等，完全对齐 Win32 MSG。
+5. `ACTION_UP/CANCEL` 后自动 `releaseCapture`（与 Win32 语义一致）。
+
+键盘：`surf_onKeyEvent` → `onKeyEvent`，多模输入 `KeyCode`（HarmonyOS 值 2000+，区别于 Android 7-67）经 `convertKeyCode` 表映射到 Win32 `VK_*`，正确处理 ALT 修饰键生成 `WM_SYSKEYDOWN/UP`。
+
+### 4.6 焦点与 IME
+
+- `setFocus/getFocus` 双向同步（C++→ArkTS 焦点+IME；ArkTS→C++ `WM_SETFOCUS/KILLFOCUS`），与 Android 一致。
+- IME 经 `inputMethod.InputMethodController`；原生 `NativeEditView` 自动弹键盘，SOUI 自绘输入控件依赖 ArkTS 把按键转字符，亦弹键盘。
+- IME 字符经 **String Slot** 机制跨层传递（见 4.10）。
+
+### 4.7 定时器：主线程快路径 + 工作线程跨线程回退
+
+`SouiPlatformBridge` 用 `setInterval/clearInterval`（`TimerEntry`，repeat 语义对齐 Win32 `SetTimer`）。C++ 侧 `OhosPlatformAPI`：
+
+- **先判线程**：`setTimer/killTimer/killWindowTimers` 开头 `if (isJsThread())` 走主线程快路径——直接 `callBridge` 调 ArkTS（与 `createWindow` 等同构），省去跨线程 `BridgeArg`/`BridgeTask` 构造与结果回传开销。
+- **工作线程才跨线程**：`else` 分支走 `invokeBridge`，经 `napi_threadsafe_function` 把调用投递回 JS 线程执行（**根因：`napi_env` 只属于创建它的 JS 线程，工作线程直接 `napi_call_function` 会崩溃**）。`invokeBridge` 带同步超时（默认 `kBridgeWaitMs=2000ms`），避免 JS 线程阻塞时永久挂起工作线程。
+- C++ 层 `m_timerEntries` 镜像 ArkTS 定时器状态，仅记录 `TIMERPROC` 回调；加锁记录保持在调用之后，避免持锁等待 JS 线程造成 `onTimerExpired` 死锁。
+
+### 4.8 多 Ability / 多 Screen（screenId 机制）
+
+与 Android 激活栈同构：`OhosPlatformAPI` 维护 `m_activeScreenStack`，`screenStartup` push / `screenShutdown` pop；创建窗口遇 `hWndParent=HWND_DESKTOP(0)` 从栈顶取当前 screenId。`SouiScreen` 在 `aboutToAppear` 调 `screenStartup`，`aboutToDisappear` 调 `screenShutdown`。
+
+### 4.9 生命周期管理
+
+- `UIAbility.onCreate` → `SouiPlatformBridge.init`：加载 `libsoui4ohos.so` 并 N-API 注册（对应 Android `JNI_OnLoad`）。
+- `SouiScreen` 组件 `aboutToAppear` → `screenStartup` 创建 C++ 窗口系统；`aboutToDisappear` → `screenShutdown` 销毁。
+- 尺寸变化：`onSizeChanged` → `moveWindow` + 更新屏幕尺寸。
+
+### 4.10 String Slot / 剪贴板 / RawInput / 键盘高度
+
+- **String Slot**：ID 范围 1~65535 环形复用（0 保留无效），RAII `AutoStringSlot`；与 Android 完全一致，用于 WM_SETTEXT 等字符串参数交换。
+- **剪贴板**：`@ohos.pasteboard`（ClipboardManager 等价），`clipboardOpen/Close/GetData/SetData` 对齐 Win32。
+- **RawInput**：OHOS 暂不枚举物理设备（返回 0），保持接口一致以兼容业务层。
+- **键盘高度**：`inputMethod` 监听键盘高度变化 → `WM_KEYBOARD_HEIGHT` 通知根窗口调整布局。
+
+### 4.11 附录：OHOS 核心文件索引
+
+ArkTS 层（`soui-ohos-lib/src/main/ets/`）：
+
+| 文件 | 角色 |
+|---|---|
+| [SouiPlatformBridge.ets](../soui-ohos-lib/src/main/ets/SouiPlatformBridge.ets) | 全局 N-API 桥单例：createWindow/View 工厂/SetCapture/焦点/定时器/screen 生命周期/剪贴板/键盘高度/字符串槽。 |
+| [INativeWindow.ets](../soui-ohos-lib/src/main/ets/INativeWindow.ets) | HWND 真身接口；HWND = 实现该接口的 ArkTS 对象 napi_ref 指针。 |
+| [SouiScreen.ets](../soui-ohos-lib/src/main/ets/SouiScreen.ets) | 桌面容器（GetDesktopWindow），screenId 启动、生命周期、尺寸同步。 |
+| [SouiAbsLayout.ets](../soui-ohos-lib/src/main/ets/SouiAbsLayout.ets) | 绝对布局基类，提供 measure/layout + 子组件位置/尺寸更新。 |
+| [SouiSurface.ets](../soui-ohos-lib/src/main/ets/SouiSurface.ets) | Canvas 自绘 Surface：doRender → surf_render → writePixelsSync + drawImage（局部脏矩形）。 |
+| [SouiSurfaceView.ets](../soui-ohos-lib/src/main/ets/SouiSurfaceView.ets) | Surface 视图组件包装。 |
+| [NativeEditView.ets](../soui-ohos-lib/src/main/ets/NativeEditView.ets) / [NativeEditViewView.ets](../soui-ohos-lib/src/main/ets/NativeEditViewView.ets) | 原生输入控件实现，处理 Win32 编辑控件消息，支持 IME。 |
+| [NativeWindowDelegate.ets](../soui-ohos-lib/src/main/ets/NativeWindowDelegate.ets) | INativeWindow 通用委托实现。 |
+| [AudioPlayer.ets](../soui-ohos-lib/src/main/ets/AudioPlayer.ets) | playSound 委托 ArkTS AudioPlayer。 |
+| [UiThreadUtils.ets](../soui-ohos-lib/src/main/ets/UiThreadUtils.ets) | UI 线程工具类（对应 Android UiThreadUtils）。 |
+
+C++ 层（`soui-ohos-lib/src/main/cpp/`）：
+
+| 文件 | 角色 |
+|---|---|
+| [OhosPlatformAPI.h](../soui-ohos-lib/src/main/cpp/include/OhosPlatformAPI.h) / [.cpp](../soui-ohos-lib/src/main/cpp/src/OhosPlatformAPI.cpp) | SWinx OHOS 平台实现（N-API）；screen 生命周期激活栈；SetCapture/焦点/定时器（主线程快路径 + invokeBridge 跨线程）/窗口操作/字符串槽/剪贴板/RawInput/键盘高度/HWND_MESSAGE。 |
+| [OhosPlatformAPIReg.cpp](../soui-ohos-lib/src/main/cpp/src/OhosPlatformAPIReg.cpp) | PlatformAPI 注册（RegisterOhosPlatformAPI）。 |
+| [Soui4Ohos_NAPI.cpp](../soui-ohos-lib/src/main/cpp/src/Soui4Ohos_NAPI.cpp) | N-API 入口：surf_render / surf_onMotionEvent / surf_onKeyEvent 等；napi_module_register 替代 JNI_OnLoad。 |
+| [SouiSurfaceProxy.h](../soui-ohos-lib/src/main/cpp/src/SouiSurfaceProxy.h) / [.cpp](../soui-ohos-lib/src/main/cpp/src/SouiSurfaceProxy.cpp) | 每个 Surface 的 native 对应：Motion 事件 → Win32 MSG（双击/右键/滚轮/悬停）；键盘事件（KeyCode→VK_*）；render 离屏 PixelMap + Skia + BGRA→RGBA + rcUpdate 脏矩形。 |
+| [OhosBridge.cpp](../soui-ohos-lib/src/main/cpp/src/OhosBridge.cpp) | N-API 桥接辅助（弱符号链接 OH NDK）。 |
+| [ohos_napi_bridge.h](../soui-ohos-lib/src/main/cpp/ohos_napi_bridge.h) / [ohos_ime_bridge.h](../soui-ohos-lib/src/main/cpp/ohos_ime_bridge.h) | N-API / IME 桥接头文件。 |
+| [CMakeLists.txt](../soui-ohos-lib/src/main/cpp/CMakeLists.txt) | 单体 so 构建脚本。 |
+
+---
+
+## 5. SOUI for iOS 适配方案
+
+### 5.1 架构总览（UIKit + Core Graphics + Objective-C++）
+
+iOS 适配位于 `swinx/src/platform/ios`，与 macOS cocoa 分支同构（UIKit 取代 AppKit）。它不依赖 JNI/N-API 桥，而是用 **Objective-C++（.mm）** 直接调用 UIKit/Foundation，HWND 即 `SUIView`（UIView 子类）的桥接指针。
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  iOS 原生（UIApplication / UIWindow / UIView）                │
+│  ┌──────────────┐  ┌──────────────────────────────────────┐  │
+│  │ UIApplication │  │ SUIView（UIView 子类，1 HWND = 1 View） │ │
+│  │ Delegate      │  │  drawRect → CGContextRef → SOUI 绘制   │ │
+│  └──────┬───────┘  └───────────────┬──────────────────────┘  │
+├──────────┼────────────────────────────────────────────────────┤
+│  swinx SConnection（Objective-C++）：消息循环 + 窗口管理        │
+│  ├─ OnDrawRect(HWND, RECT, CGContextRef) 渲染提交              │
+│  ├─ OnNsEvent → WM_LBUTTON*/WM_TIMER/WM_SETFOCUS…              │
+│  ├─ TimerInfo 链表（消息循环 tick 驱动 SetTimer）             │
+│  ├─ CFRunLoopSourceRef 唤醒（postMsg → signal wake source）   │
+│  └─ SClipboard(UIPasteboard) / STrayIconMgr / SetCapture      │
+├──────────────────────────────────────────────────────────────┤
+│  SOUI Core（SWindow/SNativeWnd/SWnd/Skin/Xml 资源）—— 业务层   │
+│  C++ 代码通过 swinx_ios_entry() 接入，几乎零改动               │
+└──────────────────────────────────────────────────────────────┘
+```
+
+**入口机制**（`ios_main.mm`）：`UIApplicationMain` 是阻塞调用且永不返回，因此 `SwinxAppDelegate.didFinishLaunchingWithOptions` 用 `dispatch_async(dispatch_get_main_queue(), …)` 异步调用宿主 `_tWinMain`；`_tWinMain` 内的 `GetMessage` 循环通过 `CFRunLoopRunInMode` 运行主线程 runloop，从而接收 UIKit 触摸事件。对外暴露 C API `swinx_ios_entry(argc, argv, funIosMain)`，应用层纯 C++ 通过 `ios_entry.h` 调用。
+
+### 5.2 HWND = SUIView 指针：零查表映射
+
+- `createUiWindow` 创建 `SUIView`（UIView 子类）并登记；**其对象指针即 HWND**（与 Android jobject GlobalRef、OHOS napi_ref 同思路：零 Map 查表）。
+- `getHwndFromUiView(view)` 反向还原 HWND。
+- 窗口状态操作（`showUiWindow / setUiWindowPos / setUiWindowSize / invalidateUiWindow / setUiWindowCapture …`）直接操作 UIView，见 [SUIWindow.h](../swinx/src/platform/ios/SUIWindow.h)。
+
+### 5.3 窗口层级（UIView/UIWindow 树）
+
+每个 HWND = 一个 `SUIView`，作为 iOS 原生视图层级的节点，独立 measure/layout/失效/合成（与 Android View 树思路一致）。系统把各 UIView 作为独立 Layer 交给渲染合成，可与原生 UITableView/UIButton 等交叉混合。
+
+### 5.4 渲染（Core Graphics）
+
+- `SConnection::OnDrawRect(HWND, const RECT &rc, CGContextRef ctx)` 由 UIView 的 `drawRect:` 触发；SOUI 把当前窗口所有 DirectUI 控件绘制进该 `CGContextRef`（Core Graphics 渲染后端），`commitCanvas/updateWindow` 提交。
+- 颜色空间：iOS 使用设备 RGBA/广色域，SOUI 绘制后端做相应映射。
+- 每个 HWND 独立 UIView、独立失效、独立 `setNeedsDisplay`，系统正常合成。
+
+### 5.5 消息循环与 UIKit 集成
+
+- `GetMessage` 循环经由 `CFRunLoopRunInMode` 运行在主线程 runloop；触摸/键盘由 UIResponder 体系转发到 `SUIView`，再经 `OnNsEvent` 投递 Win32 MSG。
+- **唤醒机制**：`SConnection` 持有 `CFRunLoopSourceRef m_wakeSource` 与 `m_wakeRunLoop`；`postMsg` 后 signal 该 source 唤醒主 runloop（跨线程/异步消息驱动），见 [SConnection.h](../swinx/src/platform/ios/SConnection.h)。
+
+### 5.6 输入与 SetCapture / IME
+
+- `SUIView` 触摸事件 → `OnNsEvent` → `WM_LBUTTONDOWN/UP/MOVE/DBLCLK`、`WM_RBUTTONDOWN`、`WM_MOUSEWHEEL/HWHEEL`、`WM_XBUTTON*`；`SetCapture/ReleaseCapture` 经 `setUiWindowCapture/releaseUiWindowCapture`。
+- 键盘/IME：`keyboard.mm` / `imm.mm` 处理 `UIKeyInput`/`UIResponder` 转发与软键盘：`showUiSoftKeyboard(bShow)`、`isUiSoftKeyboardVisible()`、`getUiSoftKeyboardHeight()`（iOS 无直接 API，靠全局标记 + 通知维护）。
+
+### 5.7 定时器（消息循环直接驱动）
+
+- `SConnection` 内部 `std::list<TimerInfo> m_lstTimer`，每条含 `id/hWnd/elapse/fireRemain/proc`；随消息循环 tick 递减 `fireRemain`，到 0 触发 `SetTimer` 回调（repeat 语义，与 Win32 一致）。
+- 与 Android（`Handler`）、OHOS（`setInterval`）不同：**iOS 定时器由 C++ 消息循环直接驱动，无独立 JS/ArkTS 调度层**，因此天然无跨线程桥接开销（见 §2.4）。
+
+### 5.8 剪贴板 / 拖放 / 托盘 / 焦点
+
+- `SClipboard`（见 [SClipboard.h](../swinx/src/platform/ios/SClipboard.h)）封装 `UIPasteboard`，采用 Win32 OLE `IDataObject/IDropSource` 风格接口（`GetData/SetData/EnumFormatEtc`）。
+- `DoDragDrop` 经 UIKit 拖放（`EnableDragDrop`）；`STrayIconMgr` 管理（iOS 无系统托盘，降级/忽略）。
+- 焦点/激活窗口：`SetActiveWindow/SetForegroundWindow/BringWindowToTop` 映射到 `UIWindow` 层级（`setUiActiveWindow/getUiActiveWindow`）。
+
+### 5.9 生命周期
+
+- `UIApplicationDelegate` 接收前后台切换（`OnNsActive`）；与 SOUI screen 创建/销毁绑定。
+- 窗口创建/销毁：`OnWindowCreate/OnWindowDestroy` 维护 HWND 与 `SUIView` 映射。
+
+### 5.10 构建与示例客户端
+
+iOS 与桌面（Windows / macOS）共用**同一份业务代码**，由 CMake 按目标平台切换入口：
+
+- **构建**：主 `CMakeLists.txt` 在 `CMAKE_SYSTEM_NAME MATCHES "iOS"` 时设置`add_definitions(-D__IOS__)`；swinx 平台层 `swinx/src/platform/ios` 全部以 Objective-C++ 编入。iOS / macOS 走 Apple bundle，资源经 `add_macos_res_folder` 拷入 `.app`（iOS 与 Android 共享同一套移动版 `uires`，见 `games/cnchess/client/CMakeLists.txt`）。
+- **示例客户端 `games/cnchess/client`**：这是一份同时支持 **Windows / macOS / iOS / Android / OHOS** 的跨端业务工程，无需为 iOS 单独建壳：
+  - `main.cc` 的统一入口：`_tWinMain` 是业务主函数；`#if defined(__IOS__)` 分支下 `int main` 直接调用 `swinx_ios_entry(argc, argv, _tWinMain)` 接入 iOS 平台层；非 Windows 桌面（macOS）则 `int main` → `_tWinMain`。
+  - `android_entry.cc` / `ohos_entry.cc` 仅因 Android（JNI）、OHOS（N-API）需要在桥接模块内注册入口而单独存在；**iOS 不需要独立的 `ios_entry.cc`——`main.cc` 已通过 `swinx_ios_entry()` 直接接管**。
+  - 资源路径：iOS 下 `getResourceDir()` 走 `GetAppleBundlePath` 取 `.app` 内资源；`MainDlg.cpp` 对 `pane_ios_header` 等 iOS 专属 UI 做平台可见性控制。
+- 业务层通过 `swinx_ios_entry()` 接入 `swinx/src/platform/ios`，复用同一套 SWinx C++ 业务代码。
+
+### 5.11 附录：iOS 核心文件索引
+
+`swinx/src/platform/ios/`（Objective-C++）：
+
+| 文件 | 角色 |
+|---|---|
+| [SConnection.h](../swinx/src/platform/ios/SConnection.h) / [SConnection.mm](../swinx/src/platform/ios/SConnection.mm) | 平台连接：消息循环（CFRunLoop 唤醒）、窗口管理、定时器、SetCapture、剪贴板、RawInput、Caret。 |
+| [SUIWindow.h](../swinx/src/platform/ios/SUIWindow.h) / [SUIWindow.mm](../swinx/src/platform/ios/SUIWindow.mm) | UIView/UIWindow 封装，对应 macOS SNsWindow；HWND = SUIView 指针。 |
+| [ios_main.mm](../swinx/src/platform/ios/ios_main.mm) | iOS 应用入口：AppDelegate + dispatch_async 调 _tWinMain + CFRunLoopRunInMode 驱动消息循环；暴露 swinx_ios_entry()。 |
+| [SClipboard.h](../swinx/src/platform/ios/SClipboard.h) / [SClipboard.mm](../swinx/src/platform/ios/SClipboard.mm) | 剪贴板：UIPasteboard + IDataObject OLE 风格接口。 |
+| [keyboard.h](../swinx/src/platform/ios/keyboard.h) / [keyboard.mm](../swinx/src/platform/ios/keyboard.mm) | 软键盘显隐与高度维护。 |
+| [imm.mm](../swinx/src/platform/ios/imm.mm) | IME 输入法集成（UIKeyInput/UIResponder）。 |
+| [ole2.mm](../swinx/src/platform/ios/ole2.mm) | OLE/拖放数据对象支持。 |
+| [os_state.h](../swinx/src/platform/ios/os_state.h) / [os_state.mm](../swinx/src/platform/ios/os_state.mm) | 系统状态（DPI/屏幕/工作区）。 |
+| [STrayIconMgr.h](../swinx/src/platform/ios/STrayIconMgr.h) / [STrayIconMgr.mm](../swinx/src/platform/ios/STrayIconMgr.mm) | 托盘图标管理（iOS 降级）。 |
+| [SUIDataObjectProxy.h](../swinx/src/platform/ios/SUIDataObjectProxy.h) / [SUIDataObjectProxy.mm](../swinx/src/platform/ios/SUIDataObjectProxy.mm) | 拖放数据对象代理。 |
+| [atoms.h](../swinx/src/platform/ios/atoms.h) / [atoms.mm](../swinx/src/platform/ios/atoms.mm) | 原子/注册消息。 |
+| [utils.mm](../swinx/src/platform/ios/utils.mm) / [dlghelper.mm](../swinx/src/platform/ios/dlghelper.mm) | 平台工具与对话框辅助。 |
+| [ios_entry.h](../swinx/include/ios_entry.h) | 应用层 iOS 入口函数原型（与 Win32 WinMain 一致）。 |
+
+---
+
+## 6. 与 Qt / Flutter 方案对比
+
+### 6.1 Qt for Android 架构要点
 
 Qt 传统 Android 适配（Android QPA 插件）：<sup>[\[1\]](https://doc-snapshot.qt-project.org/qt6-dev/android-how-it-works.html)</sup>
 
@@ -333,14 +635,14 @@ Qt 传统 Android 适配（Android QPA 插件）：<sup>[\[1\]](https://doc-snap
 - **单 Activity 单顶层窗口** 传统模式；Qt 6.7+ "Novel Approach" 才提供把 QML 作为 `QtQuickView`（本质一个 `FrameLayout + Surface + JNI 双向绑定`）嵌入到已有 Android App 的能力，但仍要求 QML 场景由 Qt Quick 管理，控件与原生控件不混排。<sup>[\[2\]](https://www.qt.io/blog/qt-for-android-a-novel-approach)</sup>
 - **渲染路径**：Qt Quick 场景栅格化到 OpenGL FBO 或 `ANativeWindow`（QAndroidSurfaceRenderEngine 方式：headless QQuickWindow → 纹理转发到多个 Surface View）<sup>[\[3\]](https://doc.qt.io/QtAndroidAutomotive/qandroidsurfacerenderengine.html)</sup>，不是原生 View 粒度。
 
-### 3.2 Flutter for Android 架构要点
+### 6.2 Flutter for Android 架构要点
 
 - **三层架构**：Dart Framework（Widget/Element/RenderObject）、Dart VM（AOT 编译 Release）、Engine（C++：Skia 2024→Impeller 图形、HarfBuzz 文本、Dart Runtime）<sup>[\[4\]](https://blog.csdn.net/2302_80693444/article/details/155980501)</sup>。
 - **自绘引擎**：Flutter 不把 Widget 映射成原生 View，而是通过 Skia/Impeller 把整棵 RenderObject 树画到**一个或少数几个全屏 FlutterView Surface** 上，SurfaceFlinger 只把它当一个 Layer 合成<sup>[\[5\]](https://juejin.cn/post/7572480736362266630)</sup>。
 - **与原生互操作靠 Platform View**：`AndroidView` / `PlatformViewLink`（Surface 级别）把原生控件"贴"到 Flutter 渲染结果上；本质是两个独立 Surface 的合成，Z-order、裁剪、手势消歧都有历史兼容性坑，且列表内复用成本高。
 - **独立线程池**：UI 线程（Dart 构建 Widget/Layout）、Raster 线程（Skia/Impeller 提交 GL/Vulkan）、IO 线程（图片解码、字体加载）都独立跑，与主线程通过 Port Channel 通信。
 
-### 3.3 三维对比总表
+### 6.3 三维对比总表
 
 | 维度 | SOUI for Android | Qt for Android (QPA) | Flutter for Android |
 |---|---|---|---|
@@ -358,11 +660,11 @@ Qt 传统 Android 适配（Android QPA 插件）：<sup>[\[1\]](https://doc-snap
 
 ---
 
-## 4. 核心优势：与原生 Java/Kotlin 开发无缝集成
+## 7. 核心优势：与原生开发无缝集成
 
-"**无缝**"在这里不是宣传语，而是三个具体事实的总和：
+"**无缝**"在这里不是宣传语，而是三个具体事实的总和（以下以 Android 为例说明，OHOS / iOS 同理）。
 
-### 4.1 原生 View 可直接成为 SOUI 的一个"子控件"
+### 7.1 原生 View 可直接成为 SOUI 的一个"子控件"
 
 `SouiPlatformBridge.registerViewFactory(className, Function<String,View>)`：C++ 层 `CreateWindow("edit")` 会走到 Java 查表 → 创建 `NativeEditView`（继承 `AppCompatEditText` + 包装 `INativeWindow`）→ 返回 HWND。从此：
 
@@ -372,7 +674,7 @@ Qt 传统 Android 适配（Android QPA 插件）：<sup>[\[1\]](https://doc-snap
 
 这是 Qt/Flutter 做不到或做起来代价极高的点：**SOUI 的子控件是"原生控件真身"，不是画出来的外观仿真**。对需要调用 Android 系统原生键盘、文字选择、辅助服务（TalkBack）、厂商对 Edit 的特殊优化等场景，天然 100% 兼容。
 
-### 4.2 SouiScreen 能嵌入**任意**原生 ViewGroup
+### 7.2 SouiScreen 能嵌入**任意**原生 ViewGroup
 
 `SouiScreen extends SouiWindow extends SouiAbsWindow extends SouiAbsLayout extends ViewGroup`。你可以：
 
@@ -382,7 +684,7 @@ Qt 传统 Android 适配（Android QPA 插件）：<sup>[\[1\]](https://doc-snap
 
 `SouiAbsLayout.LayoutParams extends MarginLayoutParams` 这一行保证被外层标准容器 `measureChildWithMargins` 调用时无 ClassCastException。
 
-### 4.3 XML 一行声明即可启动 SOUI
+### 7.3 XML 一行声明即可启动 SOUI
 
 支持通过 `attrs.xml` 自定义属性（见 [attrs.xml](../demos/android-demo/app/src/main/res/values/attrs.xml) 的 `SouiScreen_screenId` 与 `SouiScreen_souiLayout`），在 XML 中直接：
 
@@ -400,7 +702,7 @@ Qt 传统 Android 适配（Android QPA 插件）：<sup>[\[1\]](https://doc-snap
 
 `SouiScreen.Init` 在构造阶段读取属性 → `onAttachedToWindow` 自动调用 `screenStartup`。Activity 的 `onCreate` 只需一行 `setContentView(R.layout.activity_xml_host)`（见 [XmlHostActivity.java](../demos/android-demo/app/src/main/java/com/soui/demo/XmlHostActivity.java)），**零 SOUI 相关样板代码**。
 
-### 4.4 JNI 双向调用天然友好：C++ 直接调 Android 原生 API 示例
+### 7.4 JNI 双向调用天然友好：C++ 直接调 Android 原生 API 示例
 
 Demo 的 `CMainDlg::ShowToastAndroid`（见 [MainDlg.cpp](../demos/android-demo/app/src/main/cpp/MainDlg.cpp#L115-L157)）是典型例子：
 
@@ -418,7 +720,7 @@ void CMainDlg::ShowToastAndroid(const std::wstring& text) {
 
 因为 C++ 和 Java UI **共用同一线程**，任何 JNI 回调、任何系统服务（WindowManager / NotificationManager / MediaCodec / ContentResolver）都可以像普通 Android App 一样同步调用，不需要"跨线程消息队列 + Future 等待"模式。
 
-### 4.5 NativeWindowDelegate：窗口状态操作的集中委托
+### 7.5 NativeWindowDelegate：窗口状态操作的集中委托
 
 `NativeWindowDelegate` 提供了 `INativeWindow` 接口的公共实现，让不同基类的 Surface View 共享同一套行为：
 
@@ -428,11 +730,13 @@ void CMainDlg::ShowToastAndroid(const std::wstring& text) {
 
 ---
 
-## 5. Demo 编译与测试
+## 8. Demo 编译与测试
+
+### 8.1 Android（demos/android-demo）
 
 Demo 工程位于：`demos/android-demo/`。
 
-### 5.1 环境要求
+**环境要求**：
 
 | 组件 | 版本要求 | 说明 |
 |---|---|---|
@@ -444,7 +748,7 @@ Demo 工程位于：`demos/android-demo/`。
 | 硬件/模拟器 | armeabi-v7a / arm64-v8a / x86 / x86_64 任一种 | `ndk.abiFilters` 四者都编；按需裁剪。 |
 | Git 子模块（如有） | 确保 `soui4/` 下所有子模块已初始化 | 若 SOUI 目录缺 `third-part/` 或 `components/` 内容，先 `git submodule update --init --recursive`。 |
 
-### 5.2 编译步骤
+**编译步骤**
 
 **方式 A：Android Studio（推荐）**
 
@@ -470,7 +774,7 @@ cd d:\work\soui4\demos\android-demo
 
 **C++ 入口方式**：采用 `Soui4AndroidEntry` 抽象类 + 虚函数调用模式。用户实现 `Soui4AndroidEntry` 的四个虚函数（`InitApp`、`UninitApp`、`ScreenStartup`、`ScreenShutdown`），通过全局静态变量注册到系统。`AndroidPlatformAPI` 内部通过 `s_entry` 指针调用这些虚函数，实现平台层与业务层的解耦。见 [demo_native.cpp](../demos/android-demo/app/src/main/cpp/demo_native.cpp)。
 
-### 5.3 Demo 功能结构
+**Demo 功能结构**
 
 启动 App 后进入 `HomeActivity`（见 [HomeActivity.java](../demos/android-demo/app/src/main/java/com/soui/demo/HomeActivity.java)），提供两个按钮对应两种启动方式：
 
@@ -493,7 +797,7 @@ cd d:\work\soui4\demos\android-demo
 | 1003 按钮（"关闭窗口"） | 直接 `OnClose`。 |
 | info 文本（`kInfoName` 命名 SStatic） | 每秒由 `WM_TIMER(kTimerIdTick)` 更新：`点击次数: N | 运行时长: Ms`。 |
 
-### 5.4 测试要点清单
+**测试要点清单**
 
 以下是回归该适配方案核心功能的最小必过测试集合：
 
@@ -535,9 +839,63 @@ cd d:\work\soui4\demos\android-demo
 15. **右键菜单**：长按弹出上下文菜单，触发 `WM_RBUTTONDOWN` 消息。
 16. **滚轮事件**：外接鼠标滚轮操作，触发 `WM_MOUSEWHEEL`/`WM_MOUSEHWHEEL` 消息。
 
+### 8.2 OHOS（games/cnchess/client/ohos）
+
+适配模块：`soui-ohos-lib/`（ArkTS + C++ N-API，被业务工程 `add_subdirectory` 编入单体 `libsoui4ohos.so`）。示例工程：`games/cnchess/client/ohos`（基于 `ohos_entry.cc` 实现 `Soui4OhosEntry` 的 `InitApp/UninitApp/ScreenStartup/ScreenShutdown`）。
+
+**环境要求**：
+
+- DevEco Studio + OHOS SDK（API 匹配）；hvigor 构建。
+- CMake 交叉编译（OHOS clang），启用 SVG/RichEdit。
+- 联网权限：`module.json5` 声明 `ohos.permission.INTERNET`（normal/system_grant，安装时授予；变更需卸载重装生效）。
+- 命令行构建示例（本机）：
+  ```powershell
+  env -u NODE_OPTIONS DEVECO_SDK_HOME="C:/Program Files/Huawei/DevEco Studio/sdk" `
+    "C:/Program Files/Huawei/DevEco Studio/tools/node/node.exe" hvigorw.js assembleHap
+  ```
+
+**测试要点清单**（核心回归集合）：
+
+1. 两种入口启动后退出/重进多次无崩溃、无零尺寸、无 nativeId=0。
+2. 尺寸同步：页面旋转/分屏后主窗口跟随新尺寸。
+3. 点击计数 + 原生 Toast（通过 C++→ArkTS 调用链）。
+4. 主题色切换局部重绘生效（`SetAttribute` → Invalidate → 脏矩形局部上屏）。
+5. 定时器：运行时长每秒 +1（验证 `SetTimer → setInterval → onTimerExpired → WM_TIMER`）。
+6. 关闭/窗口销毁：子窗口全销毁 → finish Ability。
+7. SetCapture/拖拽：DOWN 后滑出控件仍收 MOVE；UP 后自动释放。
+8. 跨线程：在工作线程创建/销毁定时器不崩溃（验证 invokeBridge tsfn 路径）。
+9. 焦点/IME：点 NativeEditView 弹键盘、输入正确、键盘高度调整布局。
+10. 剪贴板：SetClipboardText/GetClipboardText 正常。
+11. 多 Ability：返回桌面再进新 Ability 用新 screenId 不串台。
+
+### 8.3 iOS / 桌面（games/cnchess/client）
+
+`games/cnchess/client` 是同一份业务代码，覆盖 **iOS / macOS / Windows / Android / OHOS** 五端（见 §5.10）。iOS 与桌面（Windows/macOS）共用 `main.cc` 入口，无需独立壳工程：
+
+- **iOS**：`CMAKE_SYSTEM_NAME=iOS` 时定义 `__IOS__`，`main.cc` 的 `int main` 调 `swinx_ios_entry(argc, argv, _tWinMain)`（见 [main.cc](../games/cnchess/client/main.cc)）。资源经 CMake `add_macos_res_folder` 拷入 `.app`；iOS 与 Android 共享同一套移动版 `uires`（见 [CMakeLists.txt](../games/cnchess/client/CMakeLists.txt)）。
+- **Windows / macOS**：非 iOS 时 `int main` → `_tWinMain`；Windows 额外链接 `win32_audio`，Apple 平台走 bundle + 签名。
+
+**构建要点**：
+
+- iOS：主 `CMakeLists.txt` 在 `CMAKE_SYSTEM_NAME MATCHES "iOS"` 设 `SOUI_BUILD_TOOLS OFF` 并 `add_definitions(-D__IOS__)`；swinx iOS 平台层以 Obj-C++ 编入。需配置 Apple 团队/签名（`MACOSX_TEAM_ID`）。
+- macOS：与 iOS 共享 `getResourceDir()` 的 `__APPLE__` 分支，资源落在 `.app` 内；`icon.icns` 作为 bundle 图标。
+- 资源：iOS 用 `android/app/src/main/assets/uires`（移动版布局），桌面用 `client/uires`。
+
+**测试要点清单**（iOS / 桌面回归集合）：
+
+1. 启动后 `CMainDlg` 正常显示，iOS 下 `ShowWindow(SW_MAXIMIZE)` 全屏、桌面下 `SW_SHOWNORMAL`。
+2. 点击计数 / 主题色切换 / 定时器（每秒 +1）全链路（验证 iOS TimerInfo 链表由消息循环驱动）。
+3. SetCapture / 拖拽：DOWN 滑出控件仍收 MOVE；UP 自动释放。
+4. 输入 / IME：iOS 软键盘显隐与高度（`getUiSoftKeyboardHeight`）正确；桌面直接键入。
+5. 焦点 / 剪贴板：UIPasteboard 读写正常。
+6. 资源路径：iOS / macOS 经 `GetAppleBundlePath` 正确定位 `soui-sys-resource` 与 `uires`，无缺失资源崩溃。
+7. 旋转 / 前后台切换：iOS 前后台切换（`OnNsActive`）窗口不丢失、不崩溃。
+
 ---
 
-## 6. 附录：核心文件索引
+## 9. 附录：核心文件索引
+
+### 9.1 Android 核心文件索引（demos/android-demo）
 
 Java 层（`app/src/main/java/com/soui/`）：
 
@@ -583,6 +941,14 @@ Java Demo 入口（`app/src/main/java/com/soui/demo/`）：
 
 - `app/src/main/assets/soui_sys_res/`：SOUI 系统皮肤资源（sys_btn_*.svg、skin.xml、msgbox.xml），对应 Win32 端的 soui-sys-resource。
 - `app/src/main/assets/uires/`：Demo 业务资源（image/soui.ico、values/{color,skin,string}.xml、xml/{demo_layout,dlg_main}.xml、uires.idx 索引）。
+
+### 9.2 OHOS 核心文件索引（soui-ohos-lib）
+
+见 §4.11。
+
+### 9.3 iOS 核心文件索引（swinx/src/platform/ios）
+
+见 §5.11。
 
 ---
 
