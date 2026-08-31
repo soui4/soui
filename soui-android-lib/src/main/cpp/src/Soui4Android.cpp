@@ -268,8 +268,13 @@ Java_com_soui_android_SouiPlatformBridge_nativeFreeStringSlot(JNIEnv *env, jclas
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_soui_android_SouiPlatformBridge_nativeSendImeString(JNIEnv *env, jclass clazz, jlong hwnd, jint slotid) {
-    AndroidPlatformAPI::instance().sendImeString((UINT_PTR) hwnd, slotid);
+Java_com_soui_android_SouiPlatformBridge_nativeSendImeString(JNIEnv *env, jclass clazz, jlong hwnd, jstring text) {
+    if (hwnd == 0 || !text) return;
+    const char *utf8 = env->GetStringUTFChars(text, nullptr);
+    if (!utf8) return;
+    jsize utf8Len = env->GetStringUTFLength(text);
+    AndroidPlatformAPI::instance().sendImeString((UINT_PTR) hwnd, utf8, (size_t)utf8Len);
+    env->ReleaseStringUTFChars(text, utf8);
 }
 
 

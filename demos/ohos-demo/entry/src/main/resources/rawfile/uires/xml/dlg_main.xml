@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- SOUI 自定义对话框布局，对应 C++ 里的 CMainDlg（SHostWnd 子类）。
+     id、name 与 C++ EVENT_MAP、OnInitDialog 里 FindChildByName/GetItem等一一对应，
+     与 Windows 端 SOUI 写法完全一致（这就是 SOUI 跨平台的核心：同一套 XML + 同一套 C++）。-->
+<SOUI trCtx="soui_demo_dlg" minSize="320,480" font="size:20">
+  <root layout="vbox" gravity="center" interval="16">
+    <combobox size="200,40" dropdown="1" margin="1" colorBorder="#ff0000">
+      <items>
+        <item text="item1"/>
+        <item text="item2"/>
+        <item text="item3"/>
+      </items>
+    </combobox>
+    <tabctrl size="-2,0" weight="1" tabWidth="100" tabHeight="30" duration="200">
+      <page title="main" layout="vbox" gravity="center"  interval="16">
+        <!-- 标题 -->
+        <text name="title"
+            text="SOUI4 OpenHarmony 自定义对话框"
+            textColor="#222222"
+            textSize="22sp"
+            width="-2"
+            height="-1"
+            gravity="center"/>
+
+        <!-- 一个展示文本，C++ 层 SetTimer 每秒更新一下 -->
+        <text name="info"
+            text="点击次数: 0 | 运行时长: 0s"
+            colorText="#555555"
+            width="-2"
+            height="-1"
+            gravity="center"
+            />
+
+        <!-- 测试结果状态文本（等价 Android Toast 语义，C++ ShowStatus 更新） -->
+        <text name="status"
+            text="SOUI OHOS 测试就绪"
+            colorText="#1e78d5"
+            textSize="16sp"
+            width="-2"
+            height="-1"
+            gravity="center"/>
+
+        <!-- 主按钮：点击计数 + 测试结果状态提示 -->
+        <button name="btn_click"
+            id="1001"
+            text="点击我（C++ 事件处理）"
+            tip="点击我（C++ 事件处理）"
+            width="-2"
+            height="48dp"/>
+        <button name="btn_modal"
+            id="1004"
+            text="Modal Input View"
+            width="-2"
+            height="48dp"/>
+        <!-- 次按钮：切换主题色 -->
+        <button name="btn_theme"
+            id="1002"
+            text="切换文本颜色"
+            width="-2"
+            height="48dp"/>
+        <!-- 关闭按钮（演示自定义 Close，和 Windows 端 OnClose 一致） -->
+        <button name="btn_close"
+            id="1003"
+            text="关闭窗口（演示 IDCANCEL / OnClose）"
+            width="-2"
+            height="48dp"/>
+        <window size="0,0" weight="1"/>
+        <edit name="edit_soui" size="-2,80" text="soui text演示"/>
+        <keyboardspacer size="0,0"/>
+      </page>
+      <page title="test" layout="vbox" interval="20">
+          <text text="Hello, Soui for OpenHarmony"/>
+          <text text="Setoutsoft 2026, All right reserved!"/>
+          <edit size="-2,40" name="edit_test" text="soui edit test" margin="2,2,2,2"/>
+      </page>
+    </tabctrl>
+
+  </root>
+</SOUI>

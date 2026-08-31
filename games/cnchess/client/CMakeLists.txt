@@ -1,3 +1,7 @@
+if(CMAKE_SYSTEM_NAME MATCHES "iOS")
+add_definitions(-D__MOBILE__)
+endif()
+
 # Include directories
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${PROJECT_SOURCE_DIR})
@@ -14,16 +18,11 @@ if(NOT CMAKE_SYSTEM_NAME MATCHES Windows)
 endif()
 
 # Source files
-file(GLOB_RECURSE CURRENT_HEADERS *.h *.hpp)
-file(GLOB_RECURSE CURRENT_SRCS *.cpp)
+file(GLOB CURRENT_HEADERS *.h *.hpp)
+file(GLOB CURRENT_SRCS *.cpp main.cc)
 file(GLOB_RECURSE CURRENT_RC *.rc *.rc2)
 file(GLOB_RECURSE CURRENT_UIRES uires/*.*)
 
-if(CMAKE_SYSTEM_NAME MATCHES Android)
-    list(APPEND CURRENT_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/android_entry.cc)
-else()
-    list(APPEND CURRENT_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/main.cc)
-endif()
 source_group("Header Files" FILES ${CURRENT_HEADERS})
 source_group("Source Files" FILES ${CURRENT_SRCS})
 source_group("Resource Files" FILES ${CURRENT_RC})

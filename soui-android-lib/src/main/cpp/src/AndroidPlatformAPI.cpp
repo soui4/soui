@@ -1013,15 +1013,11 @@ BOOL AndroidPlatformAPI::clipboardHasFormat(UINT format) {
     return (BOOL)result;
 }
 
-void AndroidPlatformAPI::sendImeString(UINT_PTR hwnd, int slotid) {
-    if (hwnd == 0) return;
-    if(slotid == 0) return;
-    std::string str = ReadString(slotid);
-    if(!str.empty()){
-        SStringW strW = S_CA2W(SStringA(str.c_str(),str.length()),CP_UTF8);
-        for(int i=0;i<strW.GetLength();i++){
-            ::SendMessage((HWND)hwnd, WM_IME_CHAR, strW[i], 0);
-        }
+void AndroidPlatformAPI::sendImeString(UINT_PTR hwnd, const char *utf8, size_t len) {
+    if (hwnd == 0 || !utf8 || len == 0) return;
+    SStringW strW = S_CA2W(SStringA(utf8,len), CP_UTF8);
+    for (int i = 0; i < strW.GetLength(); i++) {
+        ::SendMessage((HWND)hwnd, WM_IME_CHAR, (WPARAM)strW[i], 0);
     }
 }
 

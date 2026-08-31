@@ -92,9 +92,9 @@ public class SouiSurface extends SouiBaseSurface {
 
         if (offscreenBitmap != null && !offscreenBitmap.isRecycled()) {
             nativeRender(nativeId, offscreenBitmap);
-            canvas.drawBitmap(offscreenBitmap, 0, 0, paint);
+                canvas.drawBitmap(offscreenBitmap, 0, 0, paint);
+            }
         }
-    }
 
     @Override
     protected void onDetachedFromWindow() {

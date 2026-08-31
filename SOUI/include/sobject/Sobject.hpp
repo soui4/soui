@@ -75,7 +75,7 @@ public:
     /**
      * @brief Constructor.
      */
-    SObjectImpl() : m_attrHandler(NULL), m_nID(0) {}
+    SObjectImpl() : m_nID(0),m_attrHandler(NULL) {}
 
 public:
     /**

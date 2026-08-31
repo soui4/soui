@@ -377,6 +377,7 @@ class SOUI_EXP SListBox : public TPanelProxy<IListBox> {
   protected:
     SArray<LPLBITEM> m_arrItems; /**< Array of items */
     int m_iSelItem;           /**< Index of the selected item */
+    int m_iClickItem;         /**< Index of the clickec item */
     int m_iHoverItem;         /**< Index of the item under the mouse */
     int m_iScrollSpeed;       /**< Scroll speed */
     BOOL m_bHotTrack;         /**< Hot tracking flag */

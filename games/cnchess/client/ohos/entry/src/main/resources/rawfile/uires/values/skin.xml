@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<skin>
+    <imgframe name="skin_item_bk" src="svg:lobby_table_bk" states="3" margin="5,5,5,5"/>
+    <imglist name="skin_table" src="svg:chess_table"/>
+    <imglist name="skin_playing" src="svg:playing_icon"/>
+    <imglist name="skin_btn_mute" src="image:PNG_MUTE" states="4"/>
+    <imglist name="skin_btn_unmute" src="image:PNG_UNMUTE" states="4"/>
+    <imgframe name="btn_primary" src="svg:btn_primary" states="4" margin="5,5,5,5"/>
+    <!-- 中国象棋Logo SVG -->
+    <imglist name="skin_cnchess_logo" src="svg:cnchess_logo"/>
+    <!-- 登录界面背景装饰 -->
+    <imgframe name="skin_login_bg" src="svg:login_bg" margin="10,10,10,10"/>
+    <!-- 登录按钮 -->
+    <imgframe name="btn_login" src="svg:btn_login" states="4" margin="8,8,8,8"/>
+    <!-- 输入框边框 -->
+    <imgframe name="skin_edit" src="svg:edit_border" states="2" margin="4,4,4,4"/>
+    <!-- 表单图标(服务器/用户/性别) -->
+    <imglist name="skin_form_icons" src="svg:form_icons" states="3"/>
+    <!-- 大厅座位 (6态: 红空/红占/红准备/黑空/黑占/黑准备) -->
+    <imglist name="skin_seat" src="svg:seat_states" states="6"/>
+    <!-- 进度条皮肤 -->
+    <imglist name="skin_progress_bg" src="svg:progress_bar"/>
+    <imglist name="skin_progress_pos" src="svg:progress_pos"/>
+    <!-- Tab标签背景 (4态: normal/hover/selected/disabled) -->
+    <imgframe name="skin_tab_bg" src="svg:tab_bg" states="4" margin="5,5,5,3"/>
+    <!-- 下拉列表项背景 (4态: normal/hover/selected/disabled) -->
+    <imgframe name="skin_list_item" src="svg:list_item" states="4" margin="5,2,2,2"/>
+    <!-- 内置头像皮肤 (ID对应BuiltinAvatar枚举值: 0=CHAIR, 1=MALE, 2=FEMALE, 3-5=AVATAR1-3) -->
+    <gif name="gif_avatar_builtin_0" src="gif:GIF_AVATAR_CHAIR"/>
+    <gif name="gif_avatar_builtin_1" src="gif:GIF_AVATAR_MALE"/>
+    <gif name="gif_avatar_builtin_2" src="gif:GIF_AVATAR_FEMALE"/>
+    <gif name="gif_avatar_builtin_3" src="gif:GIF_AVATAR_01"/>
+    <gif name="gif_avatar_builtin_4" src="gif:GIF_AVATAR_02"/>
+</skin>

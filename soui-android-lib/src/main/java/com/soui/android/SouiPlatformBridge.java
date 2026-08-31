@@ -1250,16 +1250,11 @@ public class SouiPlatformBridge {
     }
 
     public void sendImeString(long hwnd, String str) {
-        int slotid = nativeAllocStringSlot();
-        try {
-            nativeWriteCxxStringSlot(slotid, str);
-            nativeSendImeString(hwnd, slotid);
-        } finally {
-            nativeFreeStringSlot(slotid);
-        }
+        if (str == null || hwnd == 0L) return;
+        nativeSendImeString(hwnd, str);
     }
 
-    private static native void nativeSendImeString(long hwnd, int slotid);
+    private static native void nativeSendImeString(long hwnd, String text);
 
     /**
      * Play sound file via Android platform.

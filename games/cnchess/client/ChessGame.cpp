@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "ChessGame.h"
 #include "MainDlg.h"
-#if defined(SOUI_ANDROID) || defined(__IOS__)
+#if defined(__MOBILE__)
 #include <core/SModalViewSession.h>
 #else
 #include "PeaceReqDlg.h"
@@ -633,7 +633,7 @@ void CChessGame::OnBtnStart()
 
 void CChessGame::OnBtnReqPeace()
 {
-#if defined(SOUI_ANDROID) || defined(__IOS__)
+#if defined(__MOBILE__)
     SModalRoot *pModal = (SModalRoot*)SApplication::getSingleton().CreateWindowByName(SModalRoot::GetClassName());
     pModal->InitFromResId("layout:dlg_peace_req_modal");
 
@@ -671,7 +671,7 @@ void CChessGame::OnBtnReqPeace()
 
 void CChessGame::OnBtnReqSurrender()
 {
-#if defined(SOUI_ANDROID) || defined(__IOS__)
+#if defined(__MOBILE__)
     SModalRoot *pModal = (SModalRoot*)SApplication::getSingleton().CreateWindowByName(SModalRoot::GetClassName());
     pModal->InitFromResId("layout:dlg_confirm_modal");
 
@@ -1225,7 +1225,7 @@ void CChessGame::OnReqPeace(const void *pData, int nSize){
     if(pPeace->iIndex == m_iSelfIndex)
         return;
     SLOGI() << "Peace request, desc: " << pPeace->szMsg;
-#if defined(SOUI_ANDROID) || defined(__IOS__)
+#if defined(__MOBILE__)
     SModalRoot *pModal = (SModalRoot*)SApplication::getSingleton().CreateWindowByName(SModalRoot::GetClassName());
     pModal->InitFromResId("layout:dlg_peace_ack_modal");
 

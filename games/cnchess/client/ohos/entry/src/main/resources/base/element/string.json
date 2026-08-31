@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "SOUI for OpenHarmony cnchess module"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "cnchess-ohos entry"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "cnchess-ohos"
+    }
+  ]
+}

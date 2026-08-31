@@ -159,6 +159,7 @@ typedef struct tagGAME_AVATAR_ACK
 #define OS_ID_WINDOWS	1	// Windows / macOS / Linux 桌面端
 #define OS_ID_ANDROID	2	// Android 移动端
 #define OS_ID_IOS		3	// iOS 移动端
+#define OS_ID_OHOS		4   // 鸿蒙 移动端
 
 typedef struct tagTHEME_REQ {
 	BYTE  md5[16];	// 本地主题MD5，全0表示没有本地主题

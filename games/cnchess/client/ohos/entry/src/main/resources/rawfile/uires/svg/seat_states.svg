@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="60" viewBox="0 0 300 60">
+    <defs>
+        <!-- 红色系 (左座位) -->
+        <linearGradient id="redEmpty" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#5D4E37"/>
+            <stop offset="100%" stop-color="#3D2F1F"/>
+        </linearGradient>
+        <linearGradient id="redOccupied" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#DC143C"/>
+            <stop offset="100%" stop-color="#8B0000"/>
+        </linearGradient>
+        <linearGradient id="redReady" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#FFD700"/>
+            <stop offset="50%" stop-color="#DAA520"/>
+            <stop offset="100%" stop-color="#B8860B"/>
+        </linearGradient>
+        <!-- 黑色系 (右座位) -->
+        <linearGradient id="blackEmpty" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#4A4A4A"/>
+            <stop offset="100%" stop-color="#2C2C2C"/>
+        </linearGradient>
+        <linearGradient id="blackOccupied" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#3D3D3D"/>
+            <stop offset="100%" stop-color="#1F1F1F"/>
+        </linearGradient>
+        <linearGradient id="blackReady" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#5D4E37"/>
+            <stop offset="50%" stop-color="#4A3826"/>
+            <stop offset="100%" stop-color="#3D2F1F"/>
+        </linearGradient>
+        <filter id="glowGreen" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#32CD32" flood-opacity="0.8"/>
+        </filter>
+        <filter id="glowGold" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#FFD700" flood-opacity="0.6"/>
+        </filter>
+    </defs>
+    
+    <!-- ========== State 0: 红色空座 (0,0 - 50,60) ========== -->
+    <g transform="translate(25, 30)">
+        <rect x="-15" y="-25" width="30" height="35" rx="8" ry="8" fill="url(#redEmpty)" stroke="#8B7355" stroke-width="1"/>
+        <rect x="-18" y="5" width="36" height="15" rx="8" ry="8" fill="#4A3826" stroke="#8B7355" stroke-width="1"/>
+        <path d="M-10,-20 Q0,-15 10,-20" stroke="#FFD700" stroke-width="0.8" fill="none" opacity="0.5"/>
+        <path d="M-10,-10 L10,-10" stroke="#8B7355" stroke-width="0.5" opacity="0.5"/>
+        <text x="0" y="-2" text-anchor="middle" fill="#8B7355" font-size="16" opacity="0.6">+</text>
+    </g>
+    
+    <!-- ========== State 1: 红色已占座 (50,0 - 100,60) ========== -->
+    <g transform="translate(75, 30)">
+        <rect x="-15" y="-25" width="30" height="35" rx="8" ry="8" fill="url(#redOccupied)" stroke="#FFD700" stroke-width="1"/>
+        <rect x="-18" y="5" width="36" height="15" rx="8" ry="8" fill="#8B0000" stroke="#FFD700" stroke-width="1"/>
+        <circle cx="0" cy="-10" r="8" fill="#FFD700" stroke="#8B4513" stroke-width="1"/>
+        <text x="0" y="-7" text-anchor="middle" fill="#8B4513" font-size="8" font-weight="bold">玩</text>
+        <path d="M-10,-20 Q0,-15 10,-20" stroke="#FFD700" stroke-width="0.8" fill="none" opacity="0.6"/>
+        <rect x="-8" y="-2" width="16" height="8" rx="3" ry="3" fill="#FFD700" opacity="0.8"/>
+    </g>
+    
+    <!-- ========== State 2: 红色准备中 (100,0 - 150,60) ========== -->
+    <g transform="translate(125, 30)" filter="url(#glowGreen)">
+        <rect x="-15" y="-25" width="30" height="35" rx="8" ry="8" fill="url(#redReady)" stroke="#32CD32" stroke-width="2"/>
+        <rect x="-18" y="5" width="36" height="15" rx="8" ry="8" fill="#B8860B" stroke="#32CD32" stroke-width="1"/>
+        <circle cx="0" cy="-10" r="8" fill="#FFD700" stroke="#32CD32" stroke-width="1.5"/>
+        <text x="0" y="-7" text-anchor="middle" fill="#8B4513" font-size="8" font-weight="bold">玩</text>
+        <rect x="-12" y="0" width="24" height="12" rx="4" ry="4" fill="#32CD32"/>
+        <text x="0" y="9" text-anchor="middle" fill="white" font-size="8" font-weight="bold">✓</text>
+    </g>
+    
+    <!-- ========== State 3: 黑色空座 (150,0 - 200,60) ========== -->
+    <g transform="translate(175, 30)">
+        <rect x="-15" y="-25" width="30" height="35" rx="8" ry="8" fill="url(#blackEmpty)" stroke="#666666" stroke-width="1"/>
+        <rect x="-18" y="5" width="36" height="15" rx="8" ry="8" fill="#3D3D3D" stroke="#666666" stroke-width="1"/>
+        <path d="M-10,-20 Q0,-15 10,-20" stroke="#999999" stroke-width="0.8" fill="none" opacity="0.5"/>
+        <path d="M-10,-10 L10,-10" stroke="#666666" stroke-width="0.5" opacity="0.5"/>
+        <text x="0" y="-2" text-anchor="middle" fill="#666666" font-size="16" opacity="0.6">+</text>
+    </g>
+    
+    <!-- ========== State 4: 黑色已占座 (200,0 - 250,60) ========== -->
+    <g transform="translate(225, 30)">
+        <rect x="-15" y="-25" width="30" height="35" rx="8" ry="8" fill="url(#blackOccupied)" stroke="#999999" stroke-width="1"/>
+        <rect x="-18" y="5" width="36" height="15" rx="8" ry="8" fill="#1F1F1F" stroke="#999999" stroke-width="1"/>
+        <circle cx="0" cy="-10" r="8" fill="#C0C0C0" stroke="#666666" stroke-width="1"/>
+        <text x="0" y="-7" text-anchor="middle" fill="#333333" font-size="8" font-weight="bold">玩</text>
+        <path d="M-10,-20 Q0,-15 10,-20" stroke="#999999" stroke-width="0.8" fill="none" opacity="0.6"/>
+        <rect x="-8" y="-2" width="16" height="8" rx="3" ry="3" fill="#999999" opacity="0.8"/>
+    </g>
+    
+    <!-- ========== State 5: 黑色准备中 (250,0 - 300,60) ========== -->
+    <g transform="translate(275, 30)" filter="url(#glowGold)">
+        <rect x="-15" y="-25" width="30" height="35" rx="8" ry="8" fill="url(#blackReady)" stroke="#FFD700" stroke-width="2"/>
+        <rect x="-18" y="5" width="36" height="15" rx="8" ry="8" fill="#3D2F1F" stroke="#FFD700" stroke-width="1"/>
+        <circle cx="0" cy="-10" r="8" fill="#C0C0C0" stroke="#FFD700" stroke-width="1.5"/>
+        <text x="0" y="-7" text-anchor="middle" fill="#333333" font-size="8" font-weight="bold">玩</text>
+        <rect x="-12" y="0" width="24" height="12" rx="4" ry="4" fill="#FFD700"/>
+        <text x="0" y="9" text-anchor="middle" fill="#8B4513" font-size="8" font-weight="bold">✓</text>
+    </g>
+</svg>

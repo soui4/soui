@@ -340,5 +340,4 @@ private:
     int m_nUsedRegretCount;//已使用的悔棋次数
     std::list<MOVESTEP> m_history;
     int  m_nUndoLeft;   //正在执行悔棋过程时，记录剩余需要继续undo的步数
-    BOOL m_bStuding;    //是否处于研究模式
 };

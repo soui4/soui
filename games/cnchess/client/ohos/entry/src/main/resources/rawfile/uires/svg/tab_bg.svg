@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="30" viewBox="0 0 200 30">
+    <defs>
+        <linearGradient id="tabSelected" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#FFD700"/>
+            <stop offset="50%" stop-color="#DAA520"/>
+            <stop offset="100%" stop-color="#B8860B"/>
+        </linearGradient>
+        <linearGradient id="tabHover" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#4A3320"/>
+            <stop offset="100%" stop-color="#3D2F1F"/>
+        </linearGradient>
+        <linearGradient id="tabNormal" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#321E10"/>
+            <stop offset="100%" stop-color="#2C1810"/>
+        </linearGradient>
+    </defs>
+
+    <!-- State 1: Normal (0-50) -->
+    <rect x="0" y="0" width="50" height="30" fill="url(#tabNormal)"/>
+    <rect x="0" y="0" width="50" height="1" fill="#5D4E37" opacity="0.6"/>
+    <rect x="0" y="29" width="50" height="1" fill="#1F1208" opacity="0.8"/>
+
+    <!-- State 2: Hover (50-100) -->
+    <rect x="50" y="0" width="50" height="30" fill="url(#tabHover)"/>
+    <rect x="50" y="0" width="50" height="1" fill="#FFD700" opacity="0.4"/>
+    <rect x="50" y="0" width="2" height="30" fill="#FFD700" opacity="0.3"/>
+
+    <!-- State 3: Selected/PushDown (100-150) -->
+    <rect x="100" y="0" width="50" height="30" fill="url(#tabSelected)"/>
+    <rect x="100" y="0" width="50" height="2" fill="#FFE066" opacity="0.5"/>
+    <rect x="100" y="28" width="50" height="2" fill="#8B6914" opacity="0.6"/>
+
+    <!-- State 4: Disabled (150-200) -->
+    <rect x="150" y="0" width="50" height="30" fill="#2C1810" opacity="0.5"/>
+</svg>

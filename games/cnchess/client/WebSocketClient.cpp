@@ -67,6 +67,9 @@ void WebSocketConnListener::onDataRecv(const void *data, int len, BOOL bBinary)
 	}
 }
 
+static void CnchessLogCallback(int level, const char* line) {
+	SLOG("WebSocket Log [Level %d]: %s", level)<<line;
+}
 //////////////////////////////////////////////////////////////////////
 // WebSocketClient Implementation
 //////////////////////////////////////////////////////////////////////
@@ -106,7 +109,7 @@ BOOL WebSocketClient::ConnectToServer(LPCSTR pszSvr, LPCSTR args)
 	BOOL bOK = m_comLoader.CreateWS((IObjRef**)&m_pWebsocket);
 	if (!bOK || !m_pWebsocket)
 		return FALSE;
-
+	m_pWebsocket->SetLogCallback(CnchessLogCallback);
 	// 创建连接监听器
 	m_pListener = new WebSocketConnListener(this);
 	if (!m_pListener)
@@ -115,7 +118,6 @@ BOOL WebSocketClient::ConnectToServer(LPCSTR pszSvr, LPCSTR args)
 	m_pWsClient = m_pWebsocket->CreateWsClient(m_pListener);
 	if (!m_pWsClient)
 		return FALSE;
-
 	// 连接到服务器
 	ClientOption option = { FALSE, NULL, TRUE, TRUE, TRUE }; // 非安全连接
 	char szPath[256];

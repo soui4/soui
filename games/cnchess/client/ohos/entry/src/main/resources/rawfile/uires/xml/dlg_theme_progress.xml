@@ -1,0 +1,7 @@
+<modalroot layout="anchor" colorBkgnd="rgba(0,0,0,0.5)" quitOnClick="0">
+    <modalview size="-2,-1" pos="0,0,4" offset="-0.5,-0.5" layout="vbox" interval="12" padding="20,15,20,15" enterAnimation="anim:modal_in" exitAnimation="anim:modal_out" bgSkin="skin_login_bg">
+        <text name="txt_title" text="正在更新主题资源..." colorText="#FFD700" font="size:14,bold" gravity="center"/>
+        <progress name="progress_bar" bkgndSkin="skin_progress_bg" posSkin="skin_progress_pos" min="0" max="100" value="0" size="-2,16" showText="1"/>
+        <text name="txt_status" text="准备中..." colorText="#CCCCCC" font="size:11" gravity="center"/>
+    </modalview>
+</modalroot>

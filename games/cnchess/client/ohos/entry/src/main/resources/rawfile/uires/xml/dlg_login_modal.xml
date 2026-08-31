@@ -1,0 +1,47 @@
+<modalroot layout="anchor" colorBkgnd="rgba(255,255,255,0.9)" quitOnClick="0">
+    <modalview size="-2,-1" pos="0,0,4" offset="-0.5,-0.5" layout="vbox" interval="15" padding="25,20,25,20" enterAnimation="anim:modal_in" exitAnimation="anim:modal_out" bgSkin="skin_login_bg">
+        <!-- Logo区域 -->
+        <window size="-2,-1" layout="vbox" interval="5" gravity="center">
+            <img name="img_logo" skin="skin_cnchess_logo" size="-1,-1" gravity="center"/>
+            <text name="txt_version" text="v1.0" colorText="@color/gold" font="size:10" gravity="center" opacity="0.7"/>
+        </window>
+        
+        <!-- 分隔线 -->
+        <window size="-2,1" colorBkgnd="@color/gold" opacity="0.3"/>
+        
+        <!-- 登录表单区域 -->
+        <window size="-2,-1" layout="vbox" interval="12" gravity="fill">
+            <!-- 服务器地址 -->
+            <window size="-2,-1" layout="hbox" interval="8" gravity="center">
+                <img name="img_icon_server" size="24,24" skin="skin_form_icons" iconIndex="0" opacity="0.8"/>
+                <edit name="edt_svr" size="0,-1" weight="1" text="124.222.50.176:3311" font="size:14" colorText="@color/gold" colorBkgnd="@color/bg_edit" colorBorder="@color/border_dark" margin="1,1,1,1"/>
+            </window>
+            
+            <!-- 用户名 -->
+            <window size="-2,-1" layout="hbox" interval="8" gravity="center">
+                <img name="img_icon_user" size="24,24" skin="skin_form_icons" iconIndex="1" opacity="0.8"/>
+                <edit name="edt_name" size="0,-1" weight="1" text="张三" font="size:14" colorText="@color/gold" colorBkgnd="@color/bg_edit"  colorBorder="@color/border_dark" margin="1,1,1,1"/>
+            </window>
+            
+            <!-- 性别选择 -->
+            <window size="-2,-1" layout="hbox" interval="8" gravity="center">
+                <img name="img_icon_gender" size="24,24" skin="skin_form_icons" iconIndex="2" opacity="0.8"/>
+                <combobox name="cbx_sex" size="0,-1" weight="1" curSel="0" font="size:14" colorText="@color/gold" colorBkgnd="@color/bg_edit"  colorBorder="@color/border_dark" margin="1,1,1,1" ncskin="skin_edit">
+                    <liststyle itemSkin="skin_list_item" colorBorder="@color/border_dark" colorText="@color/text_light" colorSelText="@color/gold" hotTrack="1" margin="1,1,1,1" text-x="6"/>
+                    <items>
+                        <item text="男" data="0"/>
+                        <item text="女" data="1"/>
+                        <item text="人妖" data="2"/>
+                    </items>
+                </combobox>
+            </window>
+        </window>
+        
+        <!-- 登录按钮 -->
+        <window size="-2,-1" layout="vbox" interval="8" gravity="center">
+            <button name="btn_login" size="-2,44" text="登 录" font="size:18,bold" colorText="#2C1810" bgSkin="btn_login" cursor="hand"/>
+            <text name="txt_hint" text="点击登录开始游戏" colorText="#8B7355" font="size:11" gravity="center" opacity="0.8"/>
+        </window>
+        <window size="0,100" visible="0"/>
+    </modalview>
+</modalroot>

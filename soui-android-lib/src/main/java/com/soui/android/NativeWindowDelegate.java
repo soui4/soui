@@ -139,8 +139,66 @@ public final class NativeWindowDelegate {
         return resolveTarget().isEnabled();
     }
 
-    /** 获取窗口信息（保留占位）。 */
+    /** 获取窗口信息（对应 Win32 GetWindow）。 */
     public long nativeGetWindow(long hWnd, int code) {
+		return 0;
+/* hjx, crash
+        final int GW_HWNDFIRST = 0;
+        final int GW_HWNDLAST  = 1;
+        final int GW_HWNDNEXT  = 2;
+        final int GW_HWNDPREV  = 3;
+        final int GW_OWNER     = 4;
+        final int GW_CHILD     = 5;
+        final int GW_CHILDLAST = 6;
+        final View self = resolveTarget();
+        if (self == null) return 0;
+        final ViewParent vp = self.getParent();
+        final ViewGroup parent = (vp instanceof ViewGroup) ? (ViewGroup) vp : null;
+        switch (code) {
+            case GW_CHILD: {
+                if (self instanceof ViewGroup) {
+                    ViewGroup vg = (ViewGroup) self;
+                    if (vg.getChildCount() > 0) return hwndOfView(vg.getChildAt(0));
+                }
+        return 0;
+    }
+            case GW_CHILDLAST: {
+                if (self instanceof ViewGroup) {
+                    ViewGroup vg = (ViewGroup) self;
+                    final int n = vg.getChildCount();
+                    if (n > 0) return hwndOfView(vg.getChildAt(n - 1));
+                }
+                return 0;
+            }
+            case GW_OWNER:
+                return (parent != null) ? hwndOfView((View) parent) : 0;
+            default: {
+                if (parent == null) return 0;
+                final int count = parent.getChildCount();
+                int myIdx = -1;
+                for (int i = 0; i < count; i++) {
+                    if (parent.getChildAt(i) == self) { myIdx = i; break; }
+                }
+                if (myIdx < 0) return 0;
+                switch (code) {
+                    case GW_HWNDFIRST: return count > 0 ? hwndOfView(parent.getChildAt(0)) : 0;
+                    case GW_HWNDLAST:  return count > 0 ? hwndOfView(parent.getChildAt(count - 1)) : 0;
+                    case GW_HWNDNEXT:  return (myIdx + 1 < count) ? hwndOfView(parent.getChildAt(myIdx + 1)) : 0;
+                    case GW_HWNDPREV:  return (myIdx > 0) ? hwndOfView(parent.getChildAt(myIdx - 1)) : 0;
+                    default: return 0;
+                }
+            }
+        }
+*/
+    }
+
+    /**
+     * View → HWND 句柄转换。若 View 实现了 INativeWindow 接口则直接调用 nativeGetHwnd()。
+     * SOUI 窗口视图（SouiBaseSurface / NativeEditView 等）一律是 INativeWindow 实现，
+     * 因此该调用为 O(1) 直接访问；其他非 SOUI 视图返回 0 作为兜底。
+     */
+    private long hwndOfView(View v) {
+        if (v instanceof INativeWindow) return ((INativeWindow) v).nativeGetHwnd();
         return 0;
     }
 }

@@ -8,6 +8,15 @@
 #include <helper/slog.h>
 #define kLogTag "surfaceproxy"
 
+// 从 m_buttonsDown 位图同步到 AndroidPlatformAPI 的 MK_* 掩码
+static inline void syncGlobalMouseButtons(int buttonsDown) {
+    unsigned int mk = 0;
+    if (buttonsDown & (1 << 0)) mk |= MK_LBUTTON;
+    if (buttonsDown & (1 << 1)) mk |= MK_RBUTTON;
+    if (buttonsDown & (1 << 2)) mk |= MK_MBUTTON;
+    AndroidPlatformAPI::instance().setMouseButtons(mk);
+}
+
 // SIMD 头文件（按架构条件引入）
 #if defined(__aarch64__) || defined(__ARM_NEON) || defined(__ARM_NEON__)
     #define SOUI_SIMD_NEON 1
@@ -255,6 +264,7 @@ void SouiSurfaceProxy::dispatchMouseButton(int action, int btnIdx, int ix, int i
         }
 
         if (btnIdx >= 0 && btnIdx < 31) m_buttonsDown |= (1 << btnIdx);
+        syncGlobalMouseButtons(m_buttonsDown);
 
         // 首次进入开启 TrackMouseEvent(HOVER + LEAVE)
         if (!m_hoverTracked) {
@@ -268,6 +278,7 @@ void SouiSurfaceProxy::dispatchMouseButton(int action, int btnIdx, int ix, int i
         }
     } else if (isRelease) {
         if (btnIdx >= 0 && btnIdx < 31) m_buttonsDown &= ~(1 << btnIdx);
+        syncGlobalMouseButtons(m_buttonsDown);
 
         WPARAM w = (WPARAM)mkExtra; // UP wParam 不含刚抬起的按钮
         if (msgUp == WM_XBUTTONUP) {
@@ -340,6 +351,7 @@ void SouiSurfaceProxy::onMotionEvent(int action, float x, float y, int pointerId
             return;
         case 3: // ACTION_CANCEL → WM_MOUSELEAVE
             m_buttonsDown = 0;
+            syncGlobalMouseButtons(m_buttonsDown);
             ::Android_SendMessage(hHost, WM_MOUSELEAVE, mkModsOnly, 0);
             m_hoverTracked = false;
             return;
@@ -660,6 +672,13 @@ void SouiSurfaceProxy::render(JNIEnv* env, jobject bitmap) {
         return;
     }
     HWND hWnd = (HWND)getNativeId();
+    HRGN hRgn=CreateRectRgn(0, 0, 0, 0);
+    GetUpdateRgn(hWnd, hRgn, FALSE);
+    CRect rcUpdate;
+    GetRgnBox(hRgn, &rcUpdate);
+    DeleteObject(hRgn);
+
+
     const int w = info.width;
     const int h = info.height;
     const int stride = info.stride;   // bytes per row（可能大于 w*4）
@@ -667,99 +686,105 @@ void SouiSurfaceProxy::render(JNIEnv* env, jobject bitmap) {
     HBITMAP hBmp = CreateDIBSectionEx(32,w,h,stride,pixels);
     HDC hdc = ::GetDC(hWnd);
     HGDIOBJ oldBmp = SelectObject(hdc,hBmp);
+    ::IntersectClipRect(hdc, rcUpdate.left, rcUpdate.top, rcUpdate.right, rcUpdate.bottom);
     ::SendMessage(hWnd,WM_PAINT,0,0);
     SelectObject(hdc,oldBmp);
     ::ReleaseDC(hWnd,hdc);
     DeleteObject(hBmp);
-    // 颜色通道交换：Cairo ARGB32 小端 = BGRA，Android ARGB_8888 = RGBA
-    // 对每个 4 字节像素：swap byte0(B) 与 byte2(R)，保留 byte1(G)、byte3(A)。
-    {
-        uint8_t* row = (uint8_t*)pixels;
+    // BGRA→RGBA 通道交换（Cairo ARGB32 小端 = BGRA，ArkUI RGBA_8888 = RGBA）
+    // 仅处理 rcUpdate 指定的脏区域，避免全帧交换的开销
+    if (rcUpdate.Width() > 0 && rcUpdate.Height() > 0) {
+        // 将 rcUpdate 裁剪到缓冲区有效范围
+        int ux0 = rcUpdate.left < 0 ? 0 : rcUpdate.left;
+        int uy0 = rcUpdate.top < 0 ? 0 : rcUpdate.top;
+        int ux1 = rcUpdate.right > w ? w : rcUpdate.right;
+        int uy1 = rcUpdate.bottom > h ? h : rcUpdate.bottom;
+        int uw = ux1 - ux0;
+        int uh = uy1 - uy0;
+        if (uw > 0 && uh > 0) {
+            uint8_t *base = (uint8_t *)pixels;
 #if defined(SOUI_SIMD_NEON)
   #if defined(__aarch64__)
-        // AArch64：单条 Q-reg 128-bit 查表，一次处理 4 像素
-        alignas(16) const uint8_t neonPerm16[16] = {
-             2, 1, 0, 3,   6, 5, 4, 7,
-            10, 9, 8,11,  14,13,12,15
-        };
-        const uint8x16_t vPerm = vld1q_u8(neonPerm16);
-        const int wSimd = w & ~3;
-        for (int y = 0; y < h; ++y) {
-            uint8_t* p = row;
-            int x = 0;
-            for (; x < wSimd; x += 4) {
-                uint8x16_t v   = vld1q_u8(p);
-                uint8x16_t out = vqtbl1q_u8(v, vPerm);
-                vst1q_u8(p, out);
-                p += 16;
+            // AArch64：单条 Q-reg 128-bit 查表，一次处理 4 像素
+            alignas(16) const uint8_t neonPerm16[16] = {
+                 2, 1, 0, 3,   6, 5, 4, 7,
+                10, 9, 8,11,  14,13,12,15
+            };
+            const uint8x16_t vPerm = vld1q_u8(neonPerm16);
+            const int wSimd = uw & ~3;
+            for (int y = 0; y < uh; ++y) {
+                uint8_t *p = base + (size_t)(uy0 + y) * stride + (size_t)ux0 * 4;
+                int x = 0;
+                for (; x < wSimd; x += 4) {
+                    uint8x16_t v = vld1q_u8(p);
+                    uint8x16_t out = vqtbl1q_u8(v, vPerm);
+                    vst1q_u8(p, out);
+                    p += 16;
+                }
+                for (; x < uw; ++x) {
+                    uint8_t tmp = p[0]; p[0] = p[2]; p[2] = tmp;
+                    p += 4;
+                }
             }
-            for (; x < w; ++x) {
-                uint8_t tmp = p[0]; p[0] = p[2]; p[2] = tmp;
-                p += 4;
-            }
-            row += stride;
-        }
   #else
-        // ARMv7-A NEON：D-reg 64-bit 查表 × 双半区，一次处理 4 像素
-        alignas(8) const uint8_t neonPerm8[8] = {
-            2,1,0,3,   6,5,4,7
-        };
-        const uint8x8_t vPerm8 = vld1_u8(neonPerm8);
-        const int wSimd = w & ~3;
-        for (int y = 0; y < h; ++y) {
-            uint8_t* p = row;
-            int x = 0;
-            for (; x < wSimd; x += 4) {
-                uint8x16_t v    = vld1q_u8(p);
-                uint8x8_t  vLo  = vget_low_u8(v);
-                uint8x8_t  vHi  = vget_high_u8(v);
-                uint8x8_t  oLo  = vtbl1_u8(vLo, vPerm8);
-                uint8x8_t  oHi  = vtbl1_u8(vHi, vPerm8);
-                uint8x16_t out  = vcombine_u8(oLo, oHi);
-                vst1q_u8(p, out);
-                p += 16;
+            // ARMv7-A NEON：D-reg 64-bit 查表 × 双半区，一次处理 4 像素
+            alignas(8) const uint8_t neonPerm8[8] = {
+                2,1,0,3,   6,5,4,7
+            };
+            const uint8x8_t vPerm8 = vld1_u8(neonPerm8);
+            const int wSimd = uw & ~3;
+            for (int y = 0; y < uh; ++y) {
+                uint8_t *p = base + (size_t)(uy0 + y) * stride + (size_t)ux0 * 4;
+                int x = 0;
+                for (; x < wSimd; x += 4) {
+                    uint8x16_t v    = vld1q_u8(p);
+                    uint8x8_t  vLo  = vget_low_u8(v);
+                    uint8x8_t  vHi  = vget_high_u8(v);
+                    uint8x8_t  oLo  = vtbl1_u8(vLo, vPerm8);
+                    uint8x8_t  oHi  = vtbl1_u8(vHi, vPerm8);
+                    uint8x16_t out  = vcombine_u8(oLo, oHi);
+                    vst1q_u8(p, out);
+                    p += 16;
+                }
+                for (; x < uw; ++x) {
+                    uint8_t tmp = p[0]; p[0] = p[2]; p[2] = tmp;
+                    p += 4;
+                }
             }
-            for (; x < w; ++x) {
-                uint8_t tmp = p[0]; p[0] = p[2]; p[2] = tmp;
-                p += 4;
-            }
-            row += stride;
-        }
   #endif
 #elif defined(SOUI_SIMD_SSSE3)
-        // SSSE3：16 字节重排掩码 + _mm_shuffle_epi8
-        alignas(16) const char ssePerm[16] = {
-             2, 1, 0, 3,   6, 5, 4, 7,
-            10, 9, 8,11,  14,13,12,15
-        };
-        const __m128i vPerm = _mm_load_si128(reinterpret_cast<const __m128i*>(ssePerm));
-        const int wSimd = w & ~3;
-        for (int y = 0; y < h; ++y) {
-            uint8_t* p = row;
-            int x = 0;
-            for (; x < wSimd; x += 4) {
-                __m128i v = _mm_lddqu_si128(reinterpret_cast<const __m128i*>(p));
-                __m128i out = _mm_shuffle_epi8(v, vPerm);
-                _mm_storeu_si128(reinterpret_cast<__m128i*>(p), out);
-                p += 16;
+            // SSSE3：16 字节重排掩码 + _mm_shuffle_epi8
+            alignas(16) const char ssePerm[16] = {
+                 2, 1, 0, 3,   6, 5, 4, 7,
+                10, 9, 8,11,  14,13,12,15
+            };
+            const __m128i vPerm = _mm_load_si128(reinterpret_cast<const __m128i*>(ssePerm));
+            const int wSimd = uw & ~3;
+            for (int y = 0; y < uh; ++y) {
+                uint8_t *p = base + (size_t)(uy0 + y) * stride + (size_t)ux0 * 4;
+                int x = 0;
+                for (; x < wSimd; x += 4) {
+                    __m128i v = _mm_lddqu_si128(reinterpret_cast<const __m128i*>(p));
+                    __m128i out = _mm_shuffle_epi8(v, vPerm);
+                    _mm_storeu_si128(reinterpret_cast<__m128i*>(p), out);
+                    p += 16;
+                }
+                for (; x < uw; ++x) {
+                    uint8_t tmp = p[0]; p[0] = p[2]; p[2] = tmp;
+                    p += 4;
+                }
             }
-            for (; x < w; ++x) {
-                uint8_t tmp = p[0]; p[0] = p[2]; p[2] = tmp;
-                p += 4;
-            }
-            row += stride;
-        }
 #else
-        // 通用标量兜底
-        for (int y = 0; y < h; ++y) {
-            uint8_t* p = row;
-            for (int x = 0; x < w; ++x) {
-                uint8_t tmp = p[0]; p[0] = p[2]; p[2] = tmp;
-                p += 4;
+            // 通用标量兜底
+            for (int y = 0; y < uh; ++y) {
+                uint8_t *p = base + (size_t)(uy0 + y) * stride + (size_t)ux0 * 4;
+                for (int x = 0; x < uw; ++x) {
+                    uint8_t tmp = p[0]; p[0] = p[2]; p[2] = tmp;
+                    p += 4;
+                }
             }
-            row += stride;
-        }
 #endif
+        }
     }
     AndroidBitmap_unlockPixels(env, bitmap);
     //LOGV("SouiSurfaceProxy::render() leave OK");

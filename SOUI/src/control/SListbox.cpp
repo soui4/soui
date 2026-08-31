@@ -16,6 +16,7 @@ SListBox::SListBox()
     : m_itemHeight(SIZE_WRAP_CONTENT, dp)
     , m_nItemHeight(-1)
     , m_iSelItem(-1)
+    , m_iClickItem(-1)
     , m_iHoverItem(-1)
     , m_crItemBg(CR_INVALID)
     , m_crItemBg2(CR_INVALID)
@@ -499,6 +500,8 @@ void SListBox::OnLButtonDownEx(UINT nFlags, CPoint pt)
         m_iHoverItem = HitTest(pt);
         if (m_iHoverItem != m_iSelItem)
             NotifySelChange(m_iSelItem, m_iHoverItem);
+    }else{
+        m_iClickItem = m_iHoverItem;
     }
 }
 
@@ -508,9 +511,10 @@ void SListBox::OnLButtonUpEx(UINT nFlags, CPoint pt)
     {
         CPoint pt2(pt);
         m_iHoverItem = HitTest(pt2);
-        if (m_iHoverItem != m_iSelItem)
+        if (m_iHoverItem != m_iSelItem && m_iHoverItem == m_iClickItem)
             NotifySelChange(m_iSelItem, m_iHoverItem);
     }
+    m_iClickItem = -1;
     __baseCls::OnLButtonUpEx(nFlags, pt);
 }
 

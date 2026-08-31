@@ -69,3 +69,7 @@ gradle-wrapper.jar
 .cxx/
 demos/android-demo/soui-android-lib/assets
 ios/
+/.workbuddy/memory
+/.lock_cleanup
+/demos/ohos-demo/.clang-tidy
+/demos/ohos-demo/.clangd

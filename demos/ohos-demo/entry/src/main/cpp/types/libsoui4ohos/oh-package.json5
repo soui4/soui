@@ -1,0 +1,6 @@
+{
+  "name": "libsoui4ohos.so",
+  "types": "./Index.d.ts",
+  "version": "1.0.0",
+  "description": "SOUI for OpenHarmony platform adapter native module."
+}

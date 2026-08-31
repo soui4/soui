@@ -6,6 +6,7 @@
 #include <core/SHostDialog.h>
 #include <valueAnimator/SValueAnimator.h>
 #include <res.mgr/SResProviderAndroidAsset.h>
+#include <res.mgr/SResProviderOhosRawFile.h>
 
 SNSBEGIN
 
@@ -74,6 +75,11 @@ IResProvider *SouiFactory::CreateResProvider(THIS_ BUILTIN_RESTYPE resType)
         pObj = new SResProviderAndroidAsset;
         break;
     #endif//__ANDROID__
+    #ifdef __OHOS__
+    case RES_OHOS_RAWFILE:
+        pObj = new SResProviderOhosRawFile;
+        break;
+    #endif//__OHOS__
     default:
         break;
     }

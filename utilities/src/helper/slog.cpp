@@ -1,4 +1,4 @@
-#define _WIN32_WINNT 0x0500
+﻿#define _WIN32_WINNT 0x0500
 #include <windows.h>
 #include <helper/slog.h>
 #include <stdio.h>
@@ -13,6 +13,17 @@
 #define LOGW(...) __android_log_print(ANDROID_LOG_WARN, LOG_TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 #endif//__ANDROID__
+#if defined(__OHOS__)
+// hilog/log.h 定义了全局 LogCallback，与 SOUI 的 SNS::LogCallback 命名不同，
+// 但为安全起见按 SOhosApp.cpp 的既有方式屏蔽后引入。
+#define LogCallback OHOS_HILOG_LogCallback
+#include <hilog/log.h>
+#undef LogCallback
+namespace {
+// 复用 SOhosApp.cpp 使用的日志 domain
+const unsigned int LOG_DOMAIN_SOUI_OHOS = 0x5350;
+}
+#endif//__OHOS__
 SNSBEGIN
 
 //////////////////////////////////////////////////////////////////////////
@@ -66,6 +77,24 @@ SLog::~SLog()
             case LOG_LEVEL_FATAL: level = ANDROID_LOG_FATAL; break;
         }
         __android_log_print(level, m_tag, "tid=%u,%04d-%02d-%02d %02d:%02d:%02d %03dms %s,%s %s %s:%d", tid, wtm.wYear, wtm.wMonth, wtm.wDay, wtm.wHour, wtm.wMinute, wtm.wSecond, wtm.wMilliseconds, m_tag, m_logBuf, m_func, m_file, m_line);
+#elif defined(__OHOS__)
+        // 鸿蒙 hilog 自带时间戳/进程号，此处仅补充线程号与调用位置。
+        // 注意：hilog 格式串需要 %{public} 前缀，否则参数会被脱敏为 <private>。
+        (void)wtm; // 本分支不输出本地时间，避免未使用警告
+        LogLevel level = LOG_DEBUG;
+        switch (m_level)
+        {
+            case LOG_LEVEL_DEBUG: level = LOG_DEBUG; break;
+            case LOG_LEVEL_INFO: level = LOG_INFO; break;
+            case LOG_LEVEL_WARN: level = LOG_WARN; break;
+            case LOG_LEVEL_ERROR: level = LOG_ERROR; break;
+            case LOG_LEVEL_ALARM: level = LOG_FATAL; break;
+            case LOG_LEVEL_FATAL: level = LOG_FATAL; break;
+            default: break;
+        }
+        OH_LOG_Print(LOG_APP, level, LOG_DOMAIN_SOUI_OHOS, m_tag,
+                     "tid=%{public}u %{public}s (%{public}s %{public}s:%{public}d)",
+                     tid, m_logBuf, m_func, m_file, m_line);
 #else
         const int kMaxLog = SLog::MAX_LOGLEN + 100;
         char *logbuf2 = (char *)malloc(kMaxLog + 1);

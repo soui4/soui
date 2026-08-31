@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<page name="room_container" title="@string/about" layout="vbox" colorBkgnd="@color/bg_dark" padding="20">
+    <scrollview size="-2,-2" wantTab="1" sbFadeFrames="30" viewSize="-2,-1" layout="vbox" interval="10" padding="20">
+        <!-- 标题 -->
+        <text name="txt_title" text="象棋游戏" font="size:24,bold" colorText="@color/gold" align="center"/>
+        <text name="txt_desc" text="这是一个使用SOUI框架开发的象棋游戏。" font="size:14" colorText="@color/text_light" align="center"/>
+
+        <!-- 分隔线 -->
+        <window size="-2,1" colorBkgnd="@color/divider" opacity="0.4" margin="10,5,10,5"/>
+
+        <!-- 新特性标题 -->
+        <text name="txt_new_features" text="SOUI 5.3 新特性：" font="size:16,bold" colorText="@color/gold_light" margin="5,5,5,5"/>
+        <text text="实现与Android平台无缝集成" font="size:14,bold" colorText="@color/gold" margin="15,5,5,5"/>
+        <text text="• 原生能干的我能干，原生干不了的我也能干!" font="size:14" colorText="@color/text_light" margin="25,5"/>
+
+        <text text="锚点布局（Anchor Layout）" font="size:14,bold" colorText="@color/gold" margin="15,5,5,5"/>
+        <text text="• 基于9个参考点的新型布局模型;\n• 适用于复杂界面元素精确定位;\n• 游戏类应用的精灵容器推荐使用anchor布局作为宿主容器" multiLines="1" font="size:14" colorText="@color/text_light" margin="25,5"/>
+
+        <text text="属性动画（Property Animation）" font="size:14,bold" colorText="@color/gold" margin="15,5,5,5"/>
+        <text text="• 支持对布局参数和窗口属性的动画控制;\n• 借鉴Android属性动画设计模式;\n• 动画系统参考Android属性动画设计模式" multiLines="1" font="size:14" colorText="@color/text_light" margin="25,5"/>
+
+        <text text="路径动画（Path Animation）" font="size:14,bold" colorText="@color/gold" margin="15,5,5,5"/>
+        <text text="• 使用锚点布局支持数值动画实现;\n• 可实现复杂的曲线运动轨迹;\n• 适用于游戏元素的移动动画效果" font="size:14" multiLines="1" colorText="@color/text_light" margin="25,5"/>
+
+        <!-- 分隔线 -->
+        <window size="-2,1" colorBkgnd="@color/divider" opacity="0.4" margin="10,10,10,5"/>
+
+        <!-- 联系方式 -->
+        <text name="txt_contact" text="联系我们：" font="size:16,bold" colorText="@color/gold_light" margin="5,5,5,5"/>
+        <text name="txt_qq_group" text="SOUI官方QQ群：229313785" font="size:14" colorText="@color/text_light" margin="15,5"/>
+        <text name="txt_website" text="官方网站：https://gitee.com/setoutsoft/soui4" font="size:14" colorText="@color/text_light" margin="15,5"/>
+
+        <!-- 底部信息 -->
+        <window size="-2,1" colorBkgnd="@color/divider" opacity="0.4" margin="10,15,10,5"/>
+        <text name="txt_info" text="SOUI是一套轻量级的Windows客户端UI开发框架，具有高效、稳定、易用的特点。如果您对此项目感兴趣，欢迎加入我们的QQ群交流学习！" font="size:12" colorText="@color/text_muted" align="center" margin="10,5"/>
+        <text name="txt_thanks" text="所有游戏图片资源来自网络，版权归原作者所有。" font="size:12" colorText="@color/text_muted" align="center" margin="10,5"/>
+        <text name="txt_copyright" text="Copyright © 2015-2026 Setoutsoft" font="size:12" colorText="@color/text_muted" align="center"/>
+    </scrollview>
+</page>

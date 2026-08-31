@@ -1,0 +1,12 @@
+{
+  "name": "entry",
+  "version": "1.0.0",
+  "description": "SOUI for OpenHarmony cnchess entry module.",
+  "main": "",
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "libcnchess.so": "file:./src/main/cpp/types/libcnchess",
+    "libsoui4ohos.so": "file:./src/main/cpp/types/libsoui4ohos"
+  }
+}

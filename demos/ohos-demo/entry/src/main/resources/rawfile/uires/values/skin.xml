@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<skin>
+    <imgframe name="btn_primary" src="svg:btn_primary" states="4" margin="5,5,5,5"/>
+</skin>

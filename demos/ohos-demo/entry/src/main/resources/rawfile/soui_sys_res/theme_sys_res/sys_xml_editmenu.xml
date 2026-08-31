@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<editmenu trCtx="editmenu" iconSkin="_skin.sys.icons" itemHeight="26" iconMargin="4" textMargin="8" >
+  <item id="1" icon="1">cut</item>
+  <item id="2" icon="0">copy</item>
+  <item id="3" icon="2">paste</item>
+  <item id="4" icon="3">delete</item>
+  <sep/>
+  <item id="5" icon="4">select all</item>
+</editmenu>

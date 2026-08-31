@@ -52,6 +52,7 @@ add_definitions(
         -DSOUI_ANDROID
         -DANDROID
         -D__ANDROID__
+        -D__MOBILE__
         -DWCHAR_SIZE=4
         -DSOUI_EXPORTS
         -D_CRT_SECURE_NO_WARNINGS
@@ -88,27 +89,15 @@ link_directories(
 #=============================================================================
 
 # 客户端源文件（引用共享源码目录，排除桌面版独有文件）
-file(GLOB_RECURSE CNCHESS_CLIENT_SRC
+file(GLOB CNCHESS_CLIENT_SRC
         ${CNCHESS_CLIENT_DIR}/*.cpp
+        ${CNCHESS_CLIENT_DIR}/android_entry.cc
 )
-#list(REMOVE_ITEM CNCHESS_CLIENT_SRC
-#        ${CNCHESS_CLIENT_DIR}/stdafx.cpp
-#        ${CNCHESS_CLIENT_DIR}/LoginDlg.cpp
-#        ${CNCHESS_CLIENT_DIR}/PeaceAckDlg.cpp
-#        ${CNCHESS_CLIENT_DIR}/PeaceReqDlg.cpp
-#)
+
 
 # 算法源文件（引用共享 algorithm 目录，排除 stdafx.cpp）
 file(GLOB_RECURSE CNCHESS_ALGORITHM_SRC
         ${CNCHESS_ROOT_DIR}/algorithm/*.cpp
-)
-#list(REMOVE_ITEM CNCHESS_ALGORITHM_SRC
-#        ${CNCHESS_ROOT_DIR}/algorithm/stdafx.cpp
-#)
-
-# 入口和桥接源文件（cnchess_native.cpp 在共享 client 目录中）
-set(CNCHESS_NATIVE_SRC
-        ${CNCHESS_CLIENT_DIR}/android_entry.cc
 )
 
 # SOUI controls.extend/gif 源文件（cnchess 依赖 SSkinAni 和 SGifPlayer）

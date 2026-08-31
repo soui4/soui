@@ -1,8 +1,0 @@
-{
-  "name": "libsouidemo.so",
-  "version": "1.0.0",
-  "description": "SOUI demo HarmonyOS XComponent native module.",
-  "main": "Index.d.ts",
-  "author": "",
-  "license": ""
-}

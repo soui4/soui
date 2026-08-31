@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="40" viewBox="0 0 240 40">
+    <!-- State 0: Normal -->
+    <rect x="0" y="0" width="60" height="40" fill="#3D2F1F"/>
+
+    <!-- State 1: Hover -->
+    <rect x="60" y="0" width="60" height="40" fill="#4D3F2F"/>
+    <rect x="60" y="0" width="3" height="40" fill="#FFD700" opacity="0.6"/>
+
+    <!-- State 2: Selected -->
+    <rect x="120" y="0" width="60" height="40" fill="#5D4E37"/>
+    <rect x="120" y="0" width="3" height="40" fill="#FFD700"/>
+
+    <!-- State 3: Disabled -->
+    <rect x="180" y="0" width="60" height="40" fill="#2C1810"/>
+</svg>

@@ -1,0 +1,12 @@
+{
+  "name": "entry",
+  "version": "1.0.0",
+  "description": "SOUI for OpenHarmony demo entry module.",
+  "main": "",
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "libsouidemo.so": "file:./src/main/cpp/types/libsouidemo",
+    "libsoui4ohos.so": "file:./src/main/cpp/types/libsoui4ohos"
+  }
+}

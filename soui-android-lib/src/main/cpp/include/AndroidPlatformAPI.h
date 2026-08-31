@@ -158,7 +158,7 @@ public:
     BOOL clipboardHasFormat(UINT format);
 
     /** 向指定 HWND 发送 WM_IME_CHAR 消息。 */
-    void sendImeString(UINT_PTR hwnd, int slotid);
+    void sendImeString(UINT_PTR hwnd, const char *utf8, size_t len);
 
     /** 将 HWND 转换为 Android View。@return View jobject LocalRef。 */
     jobject hwndAsView(UINT_PTR hWnd);
@@ -204,6 +204,16 @@ public:
         m_lastCursorPos = pt;
     }
 
+    /** 查询当前鼠标按键状态（MK_LBUTTON | MK_RBUTTON | MK_MBUTTON） */
+    DWORD getMouseButtons() const {
+        return m_mouseButtons.load();
+    }
+
+    /** 设置当前鼠标按键状态 */
+    void setMouseButtons(unsigned int mk) {
+        m_mouseButtons.store(mk);
+    }
+
     void executePendingTask();
 private:
     AndroidPlatformAPI();
@@ -220,6 +230,7 @@ private:
     void unregisterWindowTimersInternal(UINT_PTR hWnd);
 
     POINT m_lastCursorPos;
+    std::atomic<DWORD> m_mouseButtons{0};  // MK_LBUTTON | MK_RBUTTON | MK_MBUTTON
     int   m_density = 96;
     mutable std::mutex m_mutex;
     // -------- String slot storage (并发读写互斥；与窗口定时器/screen map 分锁避免互扰) --------

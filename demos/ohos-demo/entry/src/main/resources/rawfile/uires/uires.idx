@@ -1,0 +1,30 @@
+<resource>
+  <UIDEF>
+    <file name="XML_INIT" path="uidef\init.xml"/>
+  </UIDEF>
+  <LAYOUT>
+    <!-- 主布局：CMainDlg 使用，自定义 SHostWnd + C++ EVENT_MAP -->
+    <file name="dlg_main" path="xml\dlg_main.xml"/>
+    <!-- Modal 测试布局：MainDlg::OnBtnModalInput 使用 layout:model_view -->
+    <file name="model_view" path="xml\model_view.xml"/>
+    <!-- 通用 SHostWnd 测试布局：可通过 screenStartup 传入 layout:demo_layout 加载 -->
+    <file name="demo_layout" path="xml\demo_layout.xml"/>
+  </LAYOUT>
+  
+  <values>
+  	<file name="string" path="values\string.xml"/>
+  	<file name="color" path="values\color.xml"/>
+  	<file name="skin" path="values\skin.xml"/>
+  </values>
+
+  <anim>
+    <file name="modal_in"  path="anim\modal_in.xml"/>
+    <file name="modal_out" path="anim\modal_out.xml"/>
+  </anim>
+  <ICON>
+    <file name="ICON_LOGO"  path="image\soui.ico"/>
+  </ICON>
+  <svg>
+    <file name="btn_primary" path="svg\btn_primary.svg"/>
+  </svg>
+</resource>

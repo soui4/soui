@@ -31,7 +31,7 @@ public:
     // 主题是否已加载
     bool IsThemeLoaded() const { return m_bThemeLoaded; }
     SWindow *getModalRoot() const{return m_modalRoot;}
-#if defined(SOUI_ANDROID) || defined(__IOS__)
+#if defined(__MOBILE__)
     // 登录成功回调（模态视图方式，移动平台不支持独立消息循环）
     void OnLoginSuccess(SStringT strSvr, SStringT strName, char cSex);
 #endif

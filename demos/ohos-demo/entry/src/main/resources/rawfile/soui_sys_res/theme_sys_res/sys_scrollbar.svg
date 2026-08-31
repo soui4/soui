@@ -1,0 +1,141 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="144" height="64" viewBox="0 0 144 64">
+  <!-- 列1: 垂直滚动条 lineup -->
+  <g id="v_lineup_normal" transform="translate(0, 0)">
+    <rect width="16" height="16" fill="#f0f0f0" stroke="#e0e0e0" stroke-width="1"/>
+    <path d="M8,6 L12,10 L4,10 Z" stroke="#333333" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <g id="v_lineup_hover" transform="translate(0, 16)">
+    <rect width="16" height="16" fill="#e8e8e8" stroke="#d0d0d0" stroke-width="1"/>
+    <path d="M8,6 L12,10 L4,10 Z" stroke="#000000" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <g id="v_lineup_pressed" transform="translate(0, 32)">
+    <rect width="16" height="16" fill="#d8d8d8" stroke="#c0c0c0" stroke-width="1"/>
+    <path d="M8,6 L12,10 L4,10 Z" stroke="#555555" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <g id="v_lineup_disabled" transform="translate(0, 48)">
+    <rect width="16" height="16" fill="#f5f5f5" stroke="#e0e0e0" stroke-width="1"/>
+    <path d="M8,6 L12,10 L4,10 Z" stroke="#999999" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+
+  <!-- 列2: 垂直滚动条 linedown -->
+  <g id="v_linedown_normal" transform="translate(16, 0)">
+    <rect width="16" height="16" fill="#f0f0f0" stroke="#e0e0e0" stroke-width="1"/>
+    <path d="M8,10 L12,6 L4,6 Z" stroke="#333333" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <g id="v_linedown_hover" transform="translate(16, 16)">
+    <rect width="16" height="16" fill="#e8e8e8" stroke="#d0d0d0" stroke-width="1"/>
+    <path d="M8,10 L12,6 L4,6 Z" stroke="#000000" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <g id="v_linedown_pressed" transform="translate(16, 32)">
+    <rect width="16" height="16" fill="#d8d8d8" stroke="#c0c0c0" stroke-width="1"/>
+    <path d="M8,10 L12,6 L4,6 Z" stroke="#555555" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <g id="v_linedown_disabled" transform="translate(16, 48)">
+    <rect width="16" height="16" fill="#f5f5f5" stroke="#e0e0e0" stroke-width="1"/>
+    <path d="M8,10 L12,6 L4,6 Z" stroke="#999999" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+
+  <!-- 列3: 垂直滚动条 thumbtrack -->
+  <g id="v_thumbtrack_normal" transform="translate(32, 0)">
+    <rect width="16" height="16" fill="#e0e0e0" stroke="#d0d0d0" stroke-width="1"/>
+  </g>
+  <g id="v_thumbtrack_hover" transform="translate(32, 16)">
+    <rect width="16" height="16" fill="#d8d8d8" stroke="#c0c0c0" stroke-width="1"/>
+  </g>
+  <g id="v_thumbtrack_pressed" transform="translate(32, 32)">
+    <rect width="16" height="16" fill="#c8c8c8" stroke="#b0b0b0" stroke-width="1"/>
+  </g>
+  <g id="v_thumbtrack_disabled" transform="translate(32, 48)">
+    <rect width="16" height="16" fill="#f5f5f5" stroke="#e0e0e0" stroke-width="1"/>
+  </g>
+
+  <!-- 列4: 垂直滚动条 rail -->
+  <g id="v_rail_normal" transform="translate(48, 0)">
+    <rect width="16" height="16" fill="#f5f5f5"/>
+  </g>
+  <g id="v_rail_hover" transform="translate(48, 16)">
+    <rect width="16" height="16" fill="#e8e8e8"/>
+  </g>
+  <g id="v_rail_pressed" transform="translate(48, 32)">
+    <rect width="16" height="16" fill="#d8d8d8"/>
+  </g>
+  <g id="v_rail_disabled" transform="translate(48, 48)">
+    <rect width="16" height="16" fill="#f5f5f5"/>
+  </g>
+
+  <!-- 列6: 水平滚动条 lineleft -->
+  <g id="h_lineleft_normal" transform="translate(80, 0)">
+    <rect width="16" height="16" fill="#f0f0f0" stroke="#e0e0e0" stroke-width="1"/>
+    <path d="M10,8 L6,12 L6,4 Z" stroke="#333333" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <g id="h_lineleft_hover" transform="translate(80, 16)">
+    <rect width="16" height="16" fill="#e8e8e8" stroke="#d0d0d0" stroke-width="1"/>
+    <path d="M10,8 L6,12 L6,4 Z" stroke="#000000" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <g id="h_lineleft_pressed" transform="translate(80, 32)">
+    <rect width="16" height="16" fill="#d8d8d8" stroke="#c0c0c0" stroke-width="1"/>
+    <path d="M10,8 L6,12 L6,4 Z" stroke="#555555" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <g id="h_lineleft_disabled" transform="translate(80, 48)">
+    <rect width="16" height="16" fill="#f5f5f5" stroke="#e0e0e0" stroke-width="1"/>
+    <path d="M10,8 L6,12 L6,4 Z" stroke="#999999" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+
+  <!-- 列5: 水平滚动条 lineright -->
+  <g id="h_lineright_normal" transform="translate(64, 0)">
+    <rect width="16" height="16" fill="#f0f0f0" stroke="#e0e0e0" stroke-width="1"/>
+    <path d="M6,8 L10,12 L10,4 Z" stroke="#333333" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <g id="h_lineright_hover" transform="translate(64, 16)">
+    <rect width="16" height="16" fill="#e8e8e8" stroke="#d0d0d0" stroke-width="1"/>
+    <path d="M6,8 L10,12 L10,4 Z" stroke="#000000" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <g id="h_lineright_pressed" transform="translate(64, 32)">
+    <rect width="16" height="16" fill="#d8d8d8" stroke="#c0c0c0" stroke-width="1"/>
+    <path d="M6,8 L10,12 L10,4 Z" stroke="#555555" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <g id="h_lineright_disabled" transform="translate(64, 48)">
+    <rect width="16" height="16" fill="#f5f5f5" stroke="#e0e0e0" stroke-width="1"/>
+    <path d="M6,8 L10,12 L10,4 Z" stroke="#999999" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+
+  <!-- 列7: 水平滚动条 thumbtrack -->
+  <g id="h_thumbtrack_normal" transform="translate(96, 0)">
+    <rect width="16" height="16" fill="#e0e0e0" stroke="#d0d0d0" stroke-width="1"/>
+  </g>
+  <g id="h_thumbtrack_hover" transform="translate(96, 16)">
+    <rect width="16" height="16" fill="#d8d8d8" stroke="#c0c0c0" stroke-width="1"/>
+  </g>
+  <g id="h_thumbtrack_pressed" transform="translate(96, 32)">
+    <rect width="16" height="16" fill="#c8c8c8" stroke="#b0b0b0" stroke-width="1"/>
+  </g>
+  <g id="h_thumbtrack_disabled" transform="translate(96, 48)">
+    <rect width="16" height="16" fill="#f5f5f5" stroke="#e0e0e0" stroke-width="1"/>
+  </g>
+
+  <!-- 列8: 水平滚动条 rail -->
+  <g id="h_rail_normal" transform="translate(112, 0)">
+    <rect width="16" height="16" fill="#f5f5f5"/>
+  </g>
+  <g id="h_rail_hover" transform="translate(112, 16)">
+    <rect width="16" height="16" fill="#e8e8e8"/>
+  </g>
+  <g id="h_rail_pressed" transform="translate(112, 32)">
+    <rect width="16" height="16" fill="#d8d8d8"/>
+  </g>
+  <g id="h_rail_disabled" transform="translate(112, 48)">
+    <rect width="16" height="16" fill="#f5f5f5"/>
+  </g>
+
+  <!-- 列9: 右下角交点 (只有3种状态) -->
+  <g id="corner_normal" transform="translate(128, 0)">
+    <rect width="16" height="16" fill="#f0f0f0" stroke="#e0e0e0" stroke-width="1"/>
+  </g>
+  <g id="corner_hover" transform="translate(128, 16)">
+    <rect width="16" height="16" fill="#e8e8e8" stroke="#d0d0d0" stroke-width="1"/>
+  </g>
+  <g id="corner_pressed" transform="translate(128, 32)">
+    <rect width="16" height="16" fill="#d8d8d8" stroke="#c0c0c0" stroke-width="1"/>
+  </g>
+  <!-- corner_disabled 留空 -->
+</svg>

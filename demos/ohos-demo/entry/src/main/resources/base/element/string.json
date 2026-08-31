@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "SOUI for OpenHarmony demo module"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "SOUI OHOS demo entry"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "SOUI OHOS Demo"
+    }
+  ]
+}

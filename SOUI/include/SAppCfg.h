@@ -10,6 +10,9 @@
 #ifdef __ANDROID__
 #include <android/asset_manager.h>
 #endif//__ANDROID__
+#ifdef __OHOS__
+#include <rawfile/raw_file_manager.h>
+#endif//__OHOS__
 SNSBEGIN
 
 
@@ -36,6 +39,7 @@ typedef enum _ResType
     ResType_ZipFile,  // zip压缩包
     ResType_7zFile,   // 7z压缩包
     ResType_AndroidAsset,// android assets
+    ResType_OhosRawFile, // ohos rawfile
 } ResType;
 
 
@@ -77,6 +81,10 @@ public:
     SAppCfg& SetSysResAndroidAsset(AAssetManager* assetMgr, LPCTSTR pszPath);
     SAppCfg& SetAppResAndroidAsset(AAssetManager* assetMgr, LPCTSTR pszPath);
 #endif//__ANDROID__
+#ifdef __OHOS__
+    SAppCfg& SetSysResOhosRawFile(NativeResourceManager* resMgr, LPCTSTR pszPath);
+    SAppCfg& SetAppResOhosRawFile(NativeResourceManager* resMgr, LPCTSTR pszPath);
+#endif//__OHOS__
     SAppCfg & SetUidefId(const SStringT &strUidefId);
     SAppCfg & SetLog(BOOL bLogEnable, int nLogLevel = LOG_LEVEL_INFO, LPCSTR pszLogName = NULL);
     SAppCfg & SetAppDir(LPCTSTR pszAppDir);
@@ -95,6 +103,9 @@ class SResDesc {
 #ifdef __ANDROID__
     AAssetManager *m_assetMgr;
 #endif//__ANDROID__
+#ifdef __OHOS__
+    NativeResourceManager *m_rawFileMgr;
+#endif//__OHOS__
     SResDesc()
     {
         m_type = ResType_Unknown;
@@ -102,6 +113,9 @@ class SResDesc {
 #ifdef __ANDROID__
         m_assetMgr = NULL;
 #endif//__ANDROID__
+#ifdef __OHOS__
+        m_rawFileMgr = NULL;
+#endif//__OHOS__
     }
 };
 
@@ -138,6 +152,9 @@ class SResLoader {
 #ifdef __ANDROID__
     BOOL LoadResFromAndroidAsset(AAssetManager *assetMgr, LPCTSTR pszPath);
 #endif//__ANDROID__
+#ifdef __OHOS__
+    BOOL LoadResFromOhosRawFile(NativeResourceManager *resMgr, LPCTSTR pszPath);
+#endif//__OHOS__
     SAutoRefPtr<IResProvider> GetResProvider(void) const
     {
         return m_pResProvider;
@@ -210,6 +227,15 @@ BOOL SResLoader::LoadResFromAndroidAsset(AAssetManager *assetMgr, LPCTSTR pszPat
     return m_pResProvider->Init((WPARAM)assetMgr, (LPARAM)pszPath);
 }
 #endif//__ANDROID__
+
+#ifdef __OHOS__
+BOOL SResLoader::LoadResFromOhosRawFile(NativeResourceManager *resMgr, LPCTSTR pszPath)
+{
+    SouiFactory souiFac;
+    m_pResProvider.Attach(souiFac.CreateResProvider(RES_OHOS_RAWFILE));
+    return m_pResProvider->Init((WPARAM)resMgr, (LPARAM)pszPath);
+}
+#endif//__OHOS__
 //-------------------------------------------------------------
 
 SAppCfg::SAppCfg()
@@ -301,6 +327,24 @@ SAppCfg& SAppCfg::SetAppResAndroidAsset(AAssetManager* assetMgr, LPCTSTR pszPath
 {
     m_appResDesc->m_type = ResType_AndroidAsset;
     m_appResDesc->m_assetMgr = assetMgr;
+    m_appResDesc->m_szFile = pszPath;
+    return *this;
+}
+#endif
+
+#ifdef __OHOS__
+SAppCfg& SAppCfg::SetSysResOhosRawFile(NativeResourceManager* resMgr, LPCTSTR pszPath)
+{
+    m_sysResDesc->m_type = ResType_OhosRawFile;
+    m_sysResDesc->m_rawFileMgr = resMgr;
+    m_sysResDesc->m_szFile = pszPath;
+    return *this;
+}
+
+SAppCfg& SAppCfg::SetAppResOhosRawFile(NativeResourceManager* resMgr, LPCTSTR pszPath)
+{
+    m_appResDesc->m_type = ResType_OhosRawFile;
+    m_appResDesc->m_rawFileMgr = resMgr;
     m_appResDesc->m_szFile = pszPath;
     return *this;
 }
@@ -464,6 +508,11 @@ BOOL SAppCfg::DoConfig(SApplication *pApp) const
             bLoaded = resLoader.LoadResFromAndroidAsset(m_sysResDesc->m_assetMgr, m_sysResDesc->m_szFile);
             break;
 #endif//__ANDROID__
+#ifdef __OHOS__
+        case ResType_OhosRawFile:
+            bLoaded = resLoader.LoadResFromOhosRawFile(m_sysResDesc->m_rawFileMgr, m_sysResDesc->m_szFile);
+            break;
+#endif//__OHOS__
         default:
             SSLOGW() << "Invalid system resource type: " << m_sysResDesc->m_type;
             break;
@@ -511,6 +560,11 @@ BOOL SAppCfg::DoConfig(SApplication *pApp) const
 #ifdef __ANDROID__
         case ResType_AndroidAsset:
             bLoaded = resLoader.LoadResFromAndroidAsset(m_appResDesc->m_assetMgr, m_appResDesc->m_szFile);
+            break;
+#endif
+#ifdef __OHOS__
+        case ResType_OhosRawFile:
+            bLoaded = resLoader.LoadResFromOhosRawFile(m_appResDesc->m_rawFileMgr, m_appResDesc->m_szFile);
             break;
 #endif
         default:

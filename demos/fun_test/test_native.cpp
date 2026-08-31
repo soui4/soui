@@ -16,7 +16,7 @@ class SGdiTestWnd : public SNativeWnd {
     HBITMAP m_yyBmp;
 
 public:
-    SGdiTestWnd() : m_groupIndex(7), m_testBmp(0), m_yyBmp(0) {}
+    SGdiTestWnd() : m_groupIndex(12), m_testBmp(0), m_yyBmp(0) {}
     ~SGdiTestWnd() {}
 
 protected:
@@ -1062,9 +1062,9 @@ protected:
         FrameRect(hdc, &rcTest2, (HBRUSH)GetStockObject(GRAY_BRUSH));
         DrawLabel(hdc, x0 + 490, y0 + 15, "#51 FrameRect");
 
-        // 52. InvertRect (twice to show effect, expect red color inversion)
+        // 52. InvertRect (twice to show effect)
         int y1 = y0 + 70;
-        HBRUSH hBgBr = CreateSolidBrush(RGB(0, 255, 255));
+        HBRUSH hBgBr = CreateSolidBrush(RGB(100, 200, 255));
         RECT rcInv = { x0, y1, x0 + 180, y1 + 50 };
         FillRect(hdc, &rcInv, hBgBr);
         DeleteObject(hBgBr);
@@ -1074,7 +1074,7 @@ protected:
         hBgBr = CreateSolidBrush(RGB(100, 200, 255));
         FillRect(hdc, &rcInv2, hBgBr);
         DeleteObject(hBgBr);
-        DrawLabel(hdc, x0 + 190, y1 + 15, "#52 InvertRect,expect red color inversion");
+        DrawLabel(hdc, x0 + 190, y1 + 15, "#52 InvertRect");
         DrawLabel(hdc, x0 + 190, y1 + 75, "(original for compare)");
 
         // 53. DrawFocusRect

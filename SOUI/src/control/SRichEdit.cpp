@@ -1285,7 +1285,7 @@ void SRichEdit::OnSetFocus(SWND wndOld)
     {
         GetContainer()->EnableIME(FALSE);
     }else{
-#if defined(__ANDROID__) || defined(__IOS__)
+#if defined(__ANDROID__) || defined(__IOS__) || defined(__OHOS__)
         ShowSoftKeyboard(GetContainer()->GetHostHwnd(),TRUE);
 #endif
     }
@@ -1297,7 +1297,7 @@ void SRichEdit::OnKillFocus(SWND wndFocus)
     {
         GetContainer()->EnableIME(TRUE);
     }
-#if defined(__ANDROID__) || defined(__IOS__)
+#if defined(__ANDROID__) || defined(__IOS__)|| defined(__OHOS__)
     ShowSoftKeyboard(GetContainer()->GetHostHwnd(),FALSE);
 #endif
     __baseCls::OnKillFocus(wndFocus);

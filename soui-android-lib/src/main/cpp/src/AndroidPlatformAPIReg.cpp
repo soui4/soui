@@ -127,6 +127,10 @@ static BOOL androidWindow_getCursorPos(LPPOINT ppt){
     return AndroidPlatformAPI::instance().getCursorPos(ppt);
 }
 
+static DWORD androidWindow_getMouseButtons(void) {
+    return AndroidPlatformAPI::instance().getMouseButtons();
+}
+
 static UINT androidWindow_getRawInputDeviceList(PRAWINPUTDEVICELIST pRawInputDeviceList,PUINT puiNumDevices,UINT cbSize){
     return AndroidPlatformAPI::instance().getRawInputDeviceList(pRawInputDeviceList, puiNumDevices,
                                                                 cbSize);
@@ -228,6 +232,7 @@ extern "C" void RegisterAndroidPlatformAPI() {
     api.window.postMessage = androidWindow_postMessage;
     api.window.getDpi = androidWindow_getDpi;
     api.window.getCursorPos = androidWindow_getCursorPos;
+    api.window.getMouseButtons = androidWindow_getMouseButtons;
     api.window.getRawInputDeviceList = androidWindow_getRawInputDeviceList;
     api.window.getRawInputDeviceInfoA = androidWindow_getRawInputDeviceInfoA;
     api.window.getRawInputDeviceInfoW = androidWindow_getRawInputDeviceInfoW;

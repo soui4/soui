@@ -227,10 +227,8 @@ bool ThemeDownloadManager::RequestTheme(WebSocketClient* pWs)
     memset(&req, 0, sizeof(req));
     memcpy(req.md5, localMD5, 16);
     // 根据编译平台设置 OS ID，服务器据此下发对应主题资源包
-#if defined(__ANDROID__)
+#if defined(__MOBILE__)
     req.dwOSId = OS_ID_ANDROID;
-#elif defined(__IOS__)
-    req.dwOSId = OS_ID_IOS;
 #else
     req.dwOSId = OS_ID_WINDOWS;
 #endif

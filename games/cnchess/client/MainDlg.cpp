@@ -5,14 +5,19 @@
 #include "stdafx.h"
 #include "MainDlg.h"
 #include <core/SModalViewSession.h>
-#if !(defined(__ANDROID__) || defined(__IOS__))
+#if !defined(__MOBILE__)
 #include "LoginDlg.h"
+#else
+#include <shlobj.h>
+#include <mmsystem.h>
 #endif
 #include <helper/SMenuEx.h>
 #include <helper/SFunctor.hpp>
 #include <helper/slog.h>
+#ifdef _WIN32
 #include <mmsystem.h>
 #include <shlobj.h>
+#endif
 #define kLogTag "MainDlg"
 
 #ifdef _WIN32
@@ -49,7 +54,7 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
     FindChildByName("pane_ios_header")->SetVisible(TRUE,TRUE);
     #endif
     // 初始化主题下载缓存目录
-    #if defined(__ANDROID__) || defined (__IOS__)
+    #if defined(__MOBILE__)
         TCHAR szCachePath[MAX_PATH]={0};
         SHGetSpecialFolderPath(0,szCachePath,CSIDL_PERSONAL,TRUE);
         m_strThemeCacheDir = szCachePath;
@@ -61,7 +66,7 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 
     // 主题不在此加载，等待连接服务器成功后由 ThemeDownloadManager 下载加载
 
-#if defined(__ANDROID__) || defined(__IOS__)
+#if defined(__MOBILE__)
     // 移动平台：使用 SModalRoot/SModalView 替代 SHostDialog::DoModal()
     // Android/iOS 平台不支持独立消息循环，必须使用模态视图方式
     SModalRoot *pModal = (SModalRoot*)SApplication::getSingleton().CreateWindowByName(SModalRoot::GetClassName());
@@ -165,7 +170,7 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 #endif
 }
 
-#if defined(__ANDROID__) || defined(__IOS__)
+#if defined(__MOBILE__)
 void CMainDlg::OnLoginSuccess(SStringT strSvr, SStringT strName, char cSex)
 {
     MyProfile* myProfile = MyProfile::getSingletonPtr();

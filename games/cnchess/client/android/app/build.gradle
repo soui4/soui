@@ -62,16 +62,6 @@ android {
     }
 }
 
-// 确保 soui-android-lib 的头文件收集任务在 CMake 配置和编译前执行
-afterEvaluate {
-    def collectHeadersTask = project(':soui-android-lib').tasks.findByName('collectHeaders')
-    if (collectHeadersTask != null) {
-        tasks.matching { it.name ==~ /(?:configure|build)CMake.*/ }.configureEach {
-            dependsOn collectHeadersTask
-        }
-    }
-}
-
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.11.0'
