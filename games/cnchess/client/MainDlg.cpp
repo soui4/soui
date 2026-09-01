@@ -7,17 +7,12 @@
 #include <core/SModalViewSession.h>
 #if !defined(__MOBILE__)
 #include "LoginDlg.h"
-#else
-#include <shlobj.h>
-#include <mmsystem.h>
 #endif
 #include <helper/SMenuEx.h>
 #include <helper/SFunctor.hpp>
 #include <helper/slog.h>
-#ifdef _WIN32
 #include <mmsystem.h>
 #include <shlobj.h>
-#endif
 #define kLogTag "MainDlg"
 
 #ifdef _WIN32

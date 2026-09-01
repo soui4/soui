@@ -66,8 +66,6 @@ SOUI 的渲染工厂（`Render_Gdi` / `Render_Skia` / `Render_D2d`）在各平�
 
 如果您初次了解此库，可以下载自动化静态编译的 [demo.exe](https://github.com/soui4/soui/actions) 进行尝鲜体验（无需下载源代码和其他依赖，直接下载运行）。
 
-[![CMake Build](https://github.com/soui4/soui/actions/workflows/build.yml/badge.svg)](https://github.com/soui4/soui/actions/workflows/build.yml)
-
 具体方法：
 
 ```
@@ -94,12 +92,6 @@ SOUI 的渲染工厂（`Render_Gdi` / `Render_Skia` / `Render_D2d`）在各平�
 - [国内 Gitee](https://gitee.com/setoutsoft/soui4)
 - [国内 gitcode](https://gitcode.com/setoutsoft/soui4)
 
-### [编译](./doc/build.md)
-
-[![CMake Build](https://github.com/soui4/soui/actions/workflows/build.yml/badge.svg)](https://github.com/soui4/soui/actions/workflows/build.yml)
-
-使用 cmake 生成对应版本 VS 工程再编译，配置在 cmake 中统一修改。具体编译方法查看附带 [编译文档](./doc/build.md)。
-
 ### UI 可视化设计
 
 最新版本 souieditor 已经集成到这个代码库的 demos 中，选择编译 demo 就可以获得 souieditor。
@@ -124,7 +116,8 @@ SOUI 的渲染工厂（`Render_Gdi` / `Render_Skia` / `Render_D2d`）在各平�
 - SOUI 讨论 #1: [点击加入](http://shang.qq.com/wpa/qunwpa?idkey=9653a811a72365d798a5247d6ba6885a568bdcf51c624f906c8ce7b8fd9e4eda)
 - SOUI 讨论 #2: [点击加入](http://shang.qq.com/wpa/qunwpa?idkey=03d3294a2551beb1b54b4012086cec14b3f66d5c253debaeed241d9c623966e0)
 
-##  编译
+##  [![编译](https://github.com/soui4/soui/actions/workflows/build.yml/badge.svg)](https://github.com/soui4/soui/actions/workflows/build.yml)
+
 ###  Windows 编译
 - 直接使用 cmake 生成工程文件，然后使用 Visual Studio 打开工程文件，编译即可。
 - 使用 mingw32/64 编译：`mkdir build && cd build && cmake .. && make -j8`

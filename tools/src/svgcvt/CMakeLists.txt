@@ -1,6 +1,7 @@
 
 
 include_directories(${PROJECT_SOURCE_DIR}/components)
+include_directories(${PROJECT_SOURCE_DIR}/third-part/stb)
 include_directories(${PROJECT_SOURCE_DIR}/utilities/include)
 include_directories(${PROJECT_SOURCE_DIR}/SOUI/include)
 include_directories(${PROJECT_SOURCE_DIR}/soui-sys-resource)
@@ -14,7 +15,7 @@ source_group("Header Files" FILES ${CURRENT_HEADERS})
 source_group("Source Files" FILES ${CURRENT_SRCS}) 
 
 
-set(current_project "svg2png")
+set(current_project "svgcvt")
 
 add_executable(${current_project} ${CURRENT_HEADERS} ${CURRENT_SRCS})
 

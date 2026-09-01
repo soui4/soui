@@ -65,8 +65,6 @@ The SOUI render factory (`Render_Gdi` / `Render_Skia` / `Render_D2d`) is uniform
 
 If you are new to SOUI, you can download the statically compiled [demo.exe](https://github.com/soui4/soui/actions) for a quick try (no need for source code or dependencies, just download and run).
 
-[![CMake Build](https://github.com/soui4/soui/actions/workflows/build.yml/badge.svg)](https://github.com/soui4/soui/actions/workflows/build.yml)
-
 Steps:
 1. Click the badge above to enter the page
 2. Click any link after the green circle
@@ -86,12 +84,6 @@ For more details, see the [official documentation](http://doc.soui.com.cn/).
 - [GitHub](https://github.com/soui4/soui)
 - [Gitee](https://gitee.com/setoutsoft/soui4)
 - [GitCode](https://gitcode.com/setoutsoft/soui4)
-
-### [Build Instructions](./doc/build.md)
-
-[![CMake Build](https://github.com/soui4/soui/actions/workflows/build.yml/badge.svg)](https://github.com/soui4/soui/actions/workflows/build.yml)
-
-Use CMake to generate Visual Studio projects, then compile. All configuration is managed in CMake. For details, see [build documentation](./doc/build.md).
 
 ### UI Visual Designer
 The latest souieditor is integrated in the demos folder. Build the demo to get souieditor.
@@ -114,7 +106,8 @@ The latest souieditor is integrated in the demos folder. Build the demo to get s
 - SOUI Discussion #1: [Join](http://shang.qq.com/wpa/qunwpa?idkey=9653a811a72365d798a5247d6ba6885a568bdcf51c624f906c8ce7b8fd9e4eda)
 - SOUI Discussion #2: [Join](http://shang.qq.com/wpa/qunwpa?idkey=03d3294a2551beb1b54b4012086cec14b3f66d5c253debaeed241d9c623966e0)
 
-## Build Instructions
+## [![Build Instructions](https://github.com/soui4/soui/actions/workflows/build.yml/badge.svg)](https://github.com/soui4/soui/actions/workflows/build.yml)
+
 ### Windows
 - Use CMake to generate project files, open with Visual Studio, and compile
 - Or use mingw32/64: `mkdir build && cd build && cmake .. && make -j8`

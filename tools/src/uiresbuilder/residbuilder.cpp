@@ -955,7 +955,8 @@ int _tmain(int argc, TCHAR* argv[])
         }
 
 		wstring strNameStruct, strNameData,	//.name
-		        strIdStruct,strIdData ;     //.id
+		        strIdStruct,strIdData ,
+		        strIdEnum;                     //ID常量枚举体(无id_前缀, 收在struct _R::ID内, C++专用)
 		
 		int nNames = mapNameID.size();
 		strNameStruct = L"\tstruct _name{\r\n";
@@ -999,6 +1000,9 @@ int _tmain(int argc, TCHAR* argv[])
 				strNameData += szBuf;
 				swprintf_s(szBuf,2000, L"\t\t%d\r\n",it->second);
 				strIdData += szBuf;
+				swprintf_s(szBuf,2000, L"\t\t%d\r\n",it->second);
+				swprintf_s(szBuf,2000, L"\t\t\t%ls = %d\r\n",szName,it->second);
+				strIdEnum += szBuf;
 
 				#ifdef _WIN32
 				swprintf_s(szBuf,2000,L"\t\t%s:\"%s\"\r\n",it->first.c_str(),it->first.c_str());
@@ -1027,6 +1031,9 @@ int _tmain(int argc, TCHAR* argv[])
 				strNameData += szBuf;
 				swprintf_s(szBuf,2000, L"\t\t%d,\r\n",it->second);
 				strIdData += szBuf;
+				swprintf_s(szBuf,2000, L"\t\t%d,\r\n",it->second);
+				swprintf_s(szBuf,2000, L"\t\t\t%ls = %d,\r\n",szName,it->second);
+				strIdEnum += szBuf;
 
 				#ifdef _WIN32
 				swprintf_s(szBuf,2000,L"\t\t%s:\"%s\",\r\n",it->first.c_str(),it->first.c_str());
@@ -1079,10 +1086,17 @@ int _tmain(int argc, TCHAR* argv[])
                 strStringStruct += szBuf;
 
 				if(idx == nStrings-1)
+				{
 					swprintf_s(szBuf,2000, L"\t\t%d\r\n", idx);
+					strStringData += szBuf;
+					swprintf_s(szBuf,2000, L"\t\t%d\r\n", idx);
+				}
 				else
+				{
 					swprintf_s(szBuf,2000, L"\t\t%d,\r\n", idx);
-				strStringData += szBuf;
+					strStringData += szBuf;
+					swprintf_s(szBuf,2000, L"\t\t%d,\r\n", idx);
+				}
 				idx ++;
                 it ++;
             }
@@ -1108,10 +1122,17 @@ int _tmain(int argc, TCHAR* argv[])
 				#endif//_WIN32
                 strColorStruct += szBuf;
 				if(idx == nColors-1)
+				{
 					swprintf_s(szBuf, 2000,L"\t\t%d\r\n", idx);
+					strColorData += szBuf;
+					swprintf_s(szBuf, 2000,L"\t\t%d\r\n", idx);
+				}
 				else
+				{
 					swprintf_s(szBuf,2000, L"\t\t%d,\r\n", idx);
-				strColorData += szBuf;
+					strColorData += szBuf;
+					swprintf_s(szBuf,2000, L"\t\t%d,\r\n", idx);
+				}
 				idx ++;
                 it ++;
             }
@@ -1124,21 +1145,23 @@ int _tmain(int argc, TCHAR* argv[])
 			wstring strOut = RB_HEADER_ID;
 
 			wstring strRStructAll;
-			wstring strRDataAll;
+	wstring strRData;
+	wstring strIDEnum;    //常量枚举体, 收在 struct _R::ID 内, 仅C++
 			if(nNames)
 			{
 				strRStructAll += strNameStruct + strIdStruct;
-				strRDataAll += strNameData + L"\t,\r\n" + strIdData + L"\t,\r\n";
+				strRData  += strNameData + L"\t,\r\n" + strIdData  + L"\t,\r\n";
+			strIDEnum += strIdEnum;
 			}
 			if(nColors)
 			{
 				strRStructAll += strColorStruct;
-				strRDataAll += strColorData + L"\t,\r\n";
+				strRData  += strColorData  + L"\t,\r\n";
 			}
 			if(nStrings)
 			{
 				strRStructAll += strStringStruct;
-				strRDataAll += strStringData + L"\t\r\n";
+				strRData  += strStringData  + L"\t\r\n";
 			}
 
 			strOut += strFiles;
@@ -1146,11 +1169,23 @@ int _tmain(int argc, TCHAR* argv[])
 
 			strOut += L"#ifndef _R_H_\r\n"
 				L"#define _R_H_\r\n";
-			strOut += L"struct _R{\r\n" + strRStructAll + L"\r\n};\r\n";
-			strOut += L"#endif//_R_H_\r\n";
+						/* 资源常量:
+			运行期(读值)用 R.name.xxx / R.id.xxx / R.color.xxx / R.string.xxx —— C/C++通用。
+			C++下额外生成 struct _R::ID (匿名struct内含enum), 提供常量表达式 R.ID.xxx,
+			可用于 switch/case / 数组维度 / 模板参数。
+			C版本不含 ID, 与原版 resource.h 完全一致。*/
 
+			strOut += L"struct _R{\r\n" + strRStructAll;
+			if(!strIDEnum.empty())
+			strOut += L"#ifdef __cplusplus\r\n"
+				L"\tstruct {\r\n"
+				L"\t\tenum {\r\n" + strIDEnum +
+				L"\t\t};\r\n"
+				L"\t}ID;\r\n"				L"#endif//__cplusplus\r\n";
+			strOut += L"\r\n};\r\n";
+			strOut += L"#endif//_R_H_\r\n";
 			strOut += L"#ifdef INIT_R_DATA\r\n";
-			strOut += L"struct _R R={\r\n"+strRDataAll + L"};\r\n";
+			strOut += L"struct _R R={\r\n" + strRData + L"};\r\n";
 			strOut += L"#else\r\n";
 			strOut += L"extern struct _R R;\r\n";
 			strOut += L"#endif//INIT_R_DATA\r\n";

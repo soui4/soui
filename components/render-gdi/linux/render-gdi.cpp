@@ -1954,7 +1954,7 @@ static void renderNSVGtext(HDC hdc, const NSVGtext *text, BYTE byAlpha, LPCRECT 
     lf.lfHeight = (int)(text->fontSize);
     // 字体名称：UTF-8 转 ANSI
     char szFace[LF_FACESIZE] = { 0 };
-    if (text->fontFamily && text->fontFamily[0])
+    if (text->fontFamily[0])
     {
         // 简单拷贝，可能需要更复杂的转换
         strncpy(szFace, text->fontFamily, LF_FACESIZE - 1);
@@ -2007,10 +2007,18 @@ static void renderNSVGtext(HDC hdc, const NSVGtext *text, BYTE byAlpha, LPCRECT 
     }
 
     // 检查文本是否与源矩形相交
+    // nanosvg xform 语义 (行向量约定, 见 nsvg__xformPoint):
+    //   dx = x*xform[0] + y*xform[2] + xform[4]
+    //   dy = x*xform[1] + y*xform[3] + xform[5]
+    // 即 a=xform[0], b=xform[1], c=xform[2], d=xform[3], tx=xform[4], ty=xform[5]
+    // Windows XFORM (列向量约定, MSDN):
+    //   x' = eM11*x + eM21*y + eDx
+    //   y' = eM12*x + eM22*y + eDy
+    // 因此: eM11=a, eM12=b, eM21=c, eM22=d, eDx=tx, eDy=ty.
     XFORM textXForm;
     textXForm.eM11 = text->xform[0];
-    textXForm.eM12 = text->xform[2];
-    textXForm.eM21 = text->xform[1];
+    textXForm.eM12 = text->xform[1];
+    textXForm.eM21 = text->xform[2];
     textXForm.eM22 = text->xform[3];
     textXForm.eDx = text->xform[4];
     textXForm.eDy = text->xform[5];
@@ -2025,8 +2033,8 @@ static void renderNSVGtext(HDC hdc, const NSVGtext *text, BYTE byAlpha, LPCRECT 
     // 保存当前变换矩阵
     XFORM oldXForm;
     GetWorldTransform(hdc, &oldXForm);
-    
-    // 应用文本的变换矩阵（附加到当前矩阵）
+
+    // 应用文本的变换矩阵。
     ModifyWorldTransform(hdc, &textXForm, MWT_LEFTMULTIPLY);
 
     // 计算文本位置

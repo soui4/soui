@@ -2596,9 +2596,14 @@ HRESULT SBitmap_Skia::Init(int nWid, int nHei, const LPVOID pBits /*=NULL*/)
             DeleteObject(hBmp);
         return E_OUTOFMEMORY;
     }
-
-    SkBitmap bitmap;
-    bitmap.setInfo(SkImageInfo::Make(nWid, nHei, kN32_SkColorType, kPremul_SkAlphaType));
+    //clear old bitmap
+    m_bitmap.reset();
+    if (m_hBmp)
+    {
+	    DeleteObject(m_hBmp);
+        m_hBmp=NULL;
+    }
+    m_bitmap.setInfo(SkImageInfo::Make(nWid, nHei, kN32_SkColorType, kPremul_SkAlphaType));
     if (pBits)
     {
         memcpy(pBmpBits, pBits, (size_t)nWid * nHei * 4);
@@ -2607,13 +2612,9 @@ HRESULT SBitmap_Skia::Init(int nWid, int nHei, const LPVOID pBits /*=NULL*/)
     {
         memset(pBmpBits, 0, (size_t)nWid * nHei * 4);
     }
-    bitmap.setPixels(pBmpBits);
+    m_bitmap.setPixels(pBmpBits);
 
-    if (m_hBmp)
-        DeleteObject(m_hBmp);
     m_hBmp = hBmp;
-    m_bitmap.reset();
-    m_bitmap = bitmap;
     return S_OK;
 }
 
