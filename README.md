@@ -78,7 +78,7 @@ Each demo is in a separate repository, clone as needed.
 ## Getting Started
 
 SOUI requires basic knowledge of C++ and Win32. Please ensure you are familiar with these skills.
-For more details, see the [official documentation](http://doc.soui.com.cn/).
+For more details, see the [official documentation](http://124.222.50.176:4043/).
 
 ### Git Repositories
 - [GitHub](https://github.com/soui4/soui)
