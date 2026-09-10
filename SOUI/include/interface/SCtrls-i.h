@@ -409,6 +409,42 @@ DECLARE_INTERFACE_(IProgress, ICtrl)
      * Describe  获取进度值
      */
     STDMETHOD_(BOOL, IsVertical)(CTHIS) SCONST PURE;
+
+#ifdef __cplusplus
+    /*
+     * @brief    设置为不定进度状态
+     * @param    bIndeterminate  --  是否为不定进度状态
+     * Describe  设置为不定进度状态
+    */
+    STDMETHOD_(void, SetIndeterminate)(THIS_ BOOL bIndeterminate)
+    {
+        (void)bIndeterminate;
+    }
+    /**
+     * @brief    获取是否为不定进度状态
+     * @return   返回值是 TRUE -- 不定进度状态
+     *
+     * Describe  获取是否为不定进度状态
+     */
+    STDMETHOD_(BOOL, IsIndeterminate)(CTHIS) SCONST
+    {
+        return FALSE;
+    }
+#else
+    /*
+     * @brief    设置为不定进度状态
+     * @param    bIndeterminate  --  是否为不定进度状态
+     * Describe  设置为不定进度状态
+    */
+    STDMETHOD_(void, SetIndeterminate)(THIS_ BOOL bIndeterminate) PURE;
+    /**
+     * @brief    获取是否为不定进度状态
+     * @return   返回值是 TRUE -- 不定进度状态
+     *
+     * Describe  获取是否为不定进度状态
+     */
+    STDMETHOD_(BOOL, IsIndeterminate)(CTHIS) SCONST PURE;
+#endif
 };
 
 #define MAX_SEGMENT_LENGTH 100

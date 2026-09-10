@@ -922,8 +922,38 @@ SProgress::SProgress()
     , m_pSkinWaveEffect(NULL)
     , m_fWaveEffectPos(0.0f)
     , m_nWaveEffectDir(1)
+    , m_bIndeterminate(FALSE)
+    , m_fIndeterminatePos(0.0f)
+    , m_fIndeterminateSpeed(0.02f)
 {
     m_bFocusable = TRUE;
+}
+
+void SProgress::SetIndeterminate(BOOL bIndeterminate)
+{
+    if (bIndeterminate == m_bIndeterminate)
+        return;
+
+    m_bIndeterminate = bIndeterminate;
+
+    // 如果有自定义 indeterminate 动画资源，保留该资源（由 m_pIndeterminateAni 表示）
+    // 我们仍使用 timeline handler 来每帧更新位置与重绘
+    if (m_bIndeterminate)
+    {
+        // 注册 timeline handler（每帧回调 OnNextFrame）
+        GetContainer()->RegisterTimelineHandler(this);
+        // 确保位置正确并请求重绘
+        m_fIndeterminatePos = 0.0f;
+        Invalidate();
+    }
+    else
+    {
+        // 取消注册 timeline handler（如果波动特效也存在则保持注册）
+        // 只有当没有其他需要 timeline 的效果时才注销，这里简单处理：如果没有波动皮肤注销
+        if (!m_pSkinWaveEffect)
+            GetContainer()->UnregisterTimelineHandler(this);
+        Invalidate();
+    }
 }
 
 SIZE SProgress::MeasureContent(int nParentWid, int nParentHei){
@@ -976,8 +1006,62 @@ void SProgress::DrawRail(IRenderTarget *pRT, const CRect &rcClient)
     if (m_pSkinBg)
         m_pSkinBg->DrawByState(pRT, rcRail, WndState_Normal);
 }
+
 void SProgress::DrawPos(IRenderTarget *pRT, const CRect &rcClient)
 {
+    if (m_bIndeterminate)
+    {
+        if (!m_pSkinPos)
+            return;
+
+        CRect rcRail = GetPartRect(rcClient, PC_RAIL);
+        int totalLen = IsVertical() ? rcRail.Height() : rcRail.Width();
+
+        const float blockFrac = 0.26f;
+        int blockLen = (int)(totalLen * blockFrac);
+        blockLen = smax(1, blockLen);
+
+        // 计算移动范围：从 -blockLen (完全在左/底外) 到 totalLen (完全穿出右/顶外)
+        int travelRange = totalLen + blockLen;
+
+        // 当前位置映射到偏移（-blockLen .. totalLen）
+        int offset = (int)(m_fIndeterminatePos * travelRange) - blockLen;
+
+        CRect rcBlock = rcRail;
+        if (IsVertical())
+        {
+            int top = rcRail.bottom - offset - blockLen;
+            int bottom = top + blockLen;
+            rcBlock.top = top;
+            rcBlock.bottom = bottom;
+        }
+        else
+        {
+            int left = rcRail.left + offset;
+            int right = left + blockLen;
+            rcBlock.left = left;
+            rcBlock.right = right;
+        }
+        rcBlock = rcBlock & rcRail;
+        m_pSkinPos->DrawByState(pRT, rcBlock, WndState_Normal);
+
+        // 波动特效仍可在不定状态下显示（如果配置了 wave skin）
+        if (m_pSkinWaveEffect)
+        {
+            CRect rcWave = rcBlock;
+            if (IsVertical())
+            {
+                rcWave.bottom = rcWave.top + (int)(rcWave.Height() * m_fWaveEffectPos);
+            }
+            else
+            {
+                rcWave.right = rcWave.left + (int)(rcWave.Width() * m_fWaveEffectPos);
+            }
+            m_pSkinWaveEffect->DrawByState(pRT, rcWave, WndState_Normal);
+        }
+
+        return;
+    }
     int value = GetValue();
     if (value <= m_nMinValue)
         return;
@@ -1033,15 +1117,16 @@ int SProgress::OnCreate(void *)
         m_pSkinBg = GETBUILTINSKIN(IsVertical() ? SKIN_SYS_VERT_PROG_BKGND : SKIN_SYS_PROG_BKGND);
     if (!m_pSkinPos)
         m_pSkinPos = GETBUILTINSKIN(IsVertical() ? SKIN_SYS_VERT_PROG_BAR : SKIN_SYS_PROG_BAR);
-    if (m_pSkinWaveEffect)
+    if (m_pSkinWaveEffect || m_bIndeterminate)
         GetContainer()->RegisterTimelineHandler(this);
     return 0;
 }
 
 void SProgress::OnDestroy()
 {
-    if (m_pSkinWaveEffect)
+    if (m_pSkinWaveEffect || m_bIndeterminate)
         GetContainer()->UnregisterTimelineHandler(this);
+    
     __baseCls::OnDestroy();
 }
 
@@ -1049,7 +1134,7 @@ void SProgress::OnNextFrame()
 {
     BOOL bNeedInvalidate = FALSE;
 
-    // 处理波动特效
+    // 处理波动特效（已有）
     if (m_pSkinWaveEffect)
     {
         m_fWaveEffectPos += 0.02f * m_nWaveEffectDir;
@@ -1058,6 +1143,17 @@ void SProgress::OnNextFrame()
             m_nWaveEffectDir *= -1;
         }
         m_fWaveEffectPos = smax(0.0f, smin(1.0f, m_fWaveEffectPos));
+        bNeedInvalidate = TRUE;
+    }
+
+    // 处理不定进度动画
+    if (m_bIndeterminate)
+    {
+        m_fIndeterminatePos += m_fIndeterminateSpeed;
+        if (m_fIndeterminatePos >= 1.0f)
+            m_fIndeterminatePos -= 1.0f; // 循环
+        if (m_fIndeterminatePos < 0.0f)
+            m_fIndeterminatePos = 0.0f;
         bNeedInvalidate = TRUE;
     }
 
