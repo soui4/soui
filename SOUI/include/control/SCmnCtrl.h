@@ -88,7 +88,7 @@ class SOUI_EXP SStatic : public SWindow {
      */
     bool m_bWordbreak;
 
-    /** 
+    /**
      * @brief 是否不显示前缀
      */
     bool m_bNoPrefix;
@@ -461,13 +461,12 @@ class SOUI_EXP SImageWnd : public TWindowProxy<IImageWnd> {
      */
     STDMETHOD_(BOOL, SetIcon)(THIS_ int nSubID) OVERRIDE;
 
-
     /**
      * @brief 获取图标
      * @return 图标索引
      */
     STDMETHOD_(int, GetIcon)(CTHIS) SCONST OVERRIDE;
-    
+
     /**
      * @brief 获取期望大小
      * @param pSize 期望大小
@@ -479,6 +478,7 @@ class SOUI_EXP SImageWnd : public TWindowProxy<IImageWnd> {
     STDMETHOD_(void, SetSvg)(THIS_ ISvgObj *pSvg) OVERRIDE;
 
     STDMETHOD_(ISvgObj *, GetSvg)(CTHIS) SCONST OVERRIDE;
+
   protected:
     /**
      * @brief 处理颜色化事件
@@ -732,6 +732,23 @@ class SOUI_EXP SProgress
     SProgress();
 
     /**
+     * @brief    设置为不定进度状态
+     * @param    bIndeterminate  --  是否为不定进度状态
+     * @return   返回值是 TRUE -- 设置成功
+     **/
+    STDMETHOD_(void, SetIndeterminate)(THIS_ BOOL bIndeterminate) OVERRIDE;
+    /**
+     * @brief    获取是否为不定进度状态
+     * @return   返回值是 TRUE -- 不定进度状态
+     *
+     * Describe  获取是否为不定进度状态
+     */
+    STDMETHOD_(BOOL, IsIndeterminate)(CTHIS) SCONST OVERRIDE
+    {
+        return m_bIndeterminate;
+    }
+
+    /**
      * @brief 设置进度条进度值
      * @param nValue 进度值
      * @return 设置成功--TRUE
@@ -801,6 +818,18 @@ class SOUI_EXP SProgress
     virtual void OnValueChanged(int nValue, int reason);
 
   protected:
+    /**
+     * @brief 不定进度当前位置（0..1）
+     */
+    float m_fIndeterminatePos;
+
+    /**
+     * @brief 不定进度移动速度（每帧增量）
+     */
+    float m_fIndeterminateSpeed;
+
+    BOOL m_bIndeterminate; // 是否为不定进度状态
+    
     /**
      * @brief 进度最小值
      */
@@ -879,7 +908,7 @@ class SOUI_EXP SProgress
     HRESULT OnAttrRange(const SStringW &strValue, BOOL bLoading);
     SOUI_ATTRS_BEGIN()
         ATTR_SKIN(L"bkgndSkin", m_pSkinBg, TRUE)
-		ATTR_SKIN(L"trackSkin", m_pSkinBg, TRUE)
+        ATTR_SKIN(L"trackSkin", m_pSkinBg, TRUE)
         ATTR_SKIN(L"posSkin", m_pSkinPos, TRUE)
         ATTR_SKIN(L"filledSkin", m_pSkinPos, TRUE)
         ATTR_SKIN(L"waveSkin", m_pSkinWaveEffect, TRUE)
@@ -889,6 +918,8 @@ class SOUI_EXP SProgress
         ATTR_INT(L"value", m_nValue, FALSE)
         ATTR_BOOL(L"vertical", m_bVertical, FALSE)
         ATTR_BOOL(L"showText", m_bShowText, FALSE)
+        ATTR_BOOL(L"indeterminate", m_bIndeterminate, FALSE)
+        ATTR_FLOAT(L"indeterminateSpeed", m_fIndeterminateSpeed, FALSE)
     SOUI_ATTRS_END()
 };
 
@@ -1561,11 +1592,11 @@ class SOUI_EXP SGroup : public SWindow {
 };
 
 class SOUI_EXP SKeyboardSpacer : public SWindow {
-DEF_SOBJECT(SWindow, L"keyboardSpacer")
-public:
+    DEF_SOBJECT(SWindow, L"keyboardSpacer")
+  public:
     SKeyboardSpacer();
 
-protected:
+  protected:
     void OnKeyboardHeight(int height);
     SOUI_MSG_MAP_BEGIN()
         MSG_KEYBOARD_HEIGHT(OnKeyboardHeight)
