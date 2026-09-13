@@ -1,11 +1,5 @@
-#include <helper/STls.h>
-#include <stdlib.h>
-
-#ifdef _WIN32
 #include <windows.h>
-#else
-#include <pthread.h>
-#endif
+#include <helper/STls.h>
 
 SNSBEGIN
 
@@ -36,11 +30,10 @@ struct STlsNode
 
 // Global state
 static STlsNode *g_tls_list = NULL;
-static long g_tls_id_counter = 0;
+static LONG g_tls_id_counter = 0;
 
 // ---- Platform primitives ----
 
-#ifdef _WIN32
 
 static CRITICAL_SECTION g_tls_mutex;
 static INIT_ONCE g_tls_init_once = INIT_ONCE_STATIC_INIT;
@@ -62,61 +55,25 @@ static void TlsUnlock()
     LeaveCriticalSection(&g_tls_mutex);
 }
 
-static unsigned long long TlsGetThreadId()
+static tid_t TlsGetThreadId()
 {
-    return (unsigned long long)GetCurrentThreadId();
+    return GetCurrentThreadId();
 }
 
-static long TlsAtomicIncrement(long volatile *val)
+static LONG TlsAtomicIncrement(LONG volatile *val)
 {
     return InterlockedIncrement(val);
 }
 
-static long TlsAtomicCompareExchange(long volatile *dest, long exchange, long comparand)
+static LONG TlsAtomicCompareExchange(LONG volatile *dest, LONG exchange, LONG comparand)
 {
     return InterlockedCompareExchange(dest, exchange, comparand);
 }
 
-static long TlsAtomicGet(long volatile *val)
+static LONG TlsAtomicGet(LONG volatile *val)
 {
     return InterlockedExchangeAdd(val, 0);
 }
-
-#else // POSIX
-
-static pthread_mutex_t g_tls_mutex = PTHREAD_MUTEX_INITIALIZER;
-
-static void TlsLock()
-{
-    pthread_mutex_lock(&g_tls_mutex);
-}
-
-static void TlsUnlock()
-{
-    pthread_mutex_unlock(&g_tls_mutex);
-}
-
-static unsigned long long TlsGetThreadId()
-{
-    return (unsigned long long)pthread_self();
-}
-
-static long TlsAtomicIncrement(long volatile *val)
-{
-    return __sync_add_and_fetch(val, 1);
-}
-
-static long TlsAtomicCompareExchange(long volatile *dest, long exchange, long comparand)
-{
-    return __sync_val_compare_and_swap(dest, comparand, exchange);
-}
-
-static long TlsAtomicGet(long volatile *val)
-{
-    return __sync_add_and_fetch(val, 0);
-}
-
-#endif
 
 // ---- STls implementation ----
 

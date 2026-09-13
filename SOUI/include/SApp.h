@@ -1,5 +1,5 @@
 ﻿/**
- * Copyright (C) 2014-2050 SOUI团队
+ * Copyright (C) 2014-2050 SOUI Team
  * All rights reserved.
  *
  * @file       sapp.h
@@ -8,7 +8,7 @@
  * @author     soui
  * @date       2022-06-20
  *
- * Describe    SOUI应用程序入口
+ * Describe    SOUI application entry point
  */
 
 #ifndef __SAPP__H__
@@ -599,27 +599,27 @@ class SOUI_EXP SObjectDefaultRegister : public ISystemObjectRegister {
      STDMETHOD_(BOOL,SetMessageBoxTemplateResId)(THIS_ LPCTSTR resId,IResProvider *pResProvider DEF_VAL(NULL)) OVERRIDE;
  
     /**
-     * @brief 设置属性别名获取接口
-     * @param pAttrAlias IAttrAlias* -- 属性别名接口
+     * @brief Set attribute alias retrieval interface
+     * @param pAttrAlias IAttrAlias* -- attribute alias interface
      * @return void
      */
     STDMETHOD_(void, SetAttrAlias)(THIS_ IAttrAlias * pAttrAlias) OVERRIDE;
 
     /**
-     * @brief 获取属性别名
-     * @param pszAttr LPCWSTR -- 属性名
-     * @param pszClsName LPCWSTR -- 类名
-     * @param objType int -- 对象类型
-     * @return LPCWSTR -- 属性别名
+     * @brief Get attribute alias
+     * @param pszAttr LPCWSTR -- attribute name
+     * @param pszClsName LPCWSTR -- class name
+     * @param objType int -- object type
+     * @return LPCWSTR -- attribute alias
      */
     STDMETHOD_(const IAttrAlias *, GetAttrAlias)(CTHIS) SCONST OVERRIDE;
 
     /**
-     * @brief 获取基类名
-     * @param pszClassName LPCWSTR -- 类名
-     * @param objType int -- 对象类型
-     * @param pszBaseClassName[MAX_OBJNAME] wchar_t -- 基类名称
-     * @return BOOL -- TRUE: 成功
+     * @brief Get base class name
+     * @param pszClassName LPCWSTR -- class name
+     * @param objType int -- object type
+     * @param pszBaseClassName[MAX_OBJNAME] wchar_t -- base class name
+     * @return BOOL -- TRUE: success
      */
     STDMETHOD_(BOOL, GetBaseClassName)(CTHIS_ LPCWSTR pszClassName, int objType, wchar_t pszBaseClassName[MAX_OBJNAME]) SCONST OVERRIDE;
    public:
@@ -766,7 +766,8 @@ class SOUI_EXP SObjectDefaultRegister : public ISystemObjectRegister {
      */
     virtual IValueAnimator *CreateValueAnimatorByName(LPCWSTR pszName) const;
 
-#ifdef _WIN32
+
+#ifdef SOUI_ENABLE_ACC
     /**
      * @brief Create an accessibility proxy for a window
      * @param pWnd Pointer to the window
@@ -780,7 +781,7 @@ class SOUI_EXP SObjectDefaultRegister : public ISystemObjectRegister {
      * @return Pointer to the created accessible object
      */
     virtual IAccessible *CreateAccessible(IWindow *pWnd) const;
-#endif
+#endif /**< SOUI_ENABLE_ACC */
   protected:
     void _InitApp(const ISystemObjectRegister &sysObjRegister);
     /**
@@ -842,7 +843,7 @@ class SOUI_EXP SObjectDefaultRegister : public ISystemObjectRegister {
     /**
      * @brief Pointer to the log manager.
      */
-    SAutoRefPtr<ILogMgr> m_logManager; // log manager
+    SAutoRefPtr<ILogMgr> m_logManager; /**< log manager */
 
     /**
      * @brief Pointer to the attribute storage factory.
@@ -919,4 +920,4 @@ class SOUI_EXP SObjectDefaultRegister : public ISystemObjectRegister {
 };
 
 SNSEND
-#endif // __SAPP__H__
+#endif /**< __SAPP__H__ */

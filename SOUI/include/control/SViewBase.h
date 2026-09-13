@@ -178,12 +178,34 @@ class SOUI_EXP SViewBase
     void HandleSelectionChange(int nOldSel, int nNewSel);
 
   public:
-      /**
+    /**
      * @brief Get the item panel for a specific item
      * @param iItem Index of the item
      * @return Pointer to the item panel
      */
     virtual SItemPanel *GetItemPanel(int iItem) = 0;
+
+    /**
+     * @brief Number of Accessible children (currently visible items).
+     * @return Current visible SItemPanel count
+     */
+    int GetVisibleAccChildCount() const
+    {
+        return static_cast<int>(m_lstItems.GetCount());
+    }
+
+    /**
+     * @brief Get the currently visible SItemPanel as the Accessible child by 1-based index.
+     * @param iChild Index (1-based)
+     * @return Corresponding SItemPanel (SWindow*), returns NULL if out of range
+     */
+    SWindow *GetVisibleAccChild(int iChild) const;
+
+    /**
+     * @brief Compute the visible SItemPanel index (1-based, Accessible child index) for the currently selected item.
+     * @return Selected item index (1-based), returns 0 if not matched
+     */
+    int GetVisibleAccSelIndex() const;
 
     SOUI_ATTRS_BEGIN()
         ATTR_BOOL(L"wantTab", m_bWantTab, FALSE)
@@ -227,4 +249,4 @@ class SOUI_EXP SViewBase
 
 SNSEND
 
-#endif // __SVIEWBASE__H__
+#endif /**< __SVIEWBASE__H__ */

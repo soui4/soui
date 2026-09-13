@@ -170,4 +170,4 @@ class SCmnMap {
 
 SNSEND
 
-#endif // __SCMNMAP__H__
+#endif /**< __SCMNMAP__H__ */

@@ -111,7 +111,7 @@ class SOUI_EXP SCalendarCore {
     static SStringT FormatDay(WORD iDay);
 };
 
-// Button macro definitions
+/** Button macro definitions */
 #define HIT_NULL   -1  /**< No Hit */
 #define HIT_LEFT   -10 /**< Left button (previous month) */
 #define HIT_RIGHT  -11 /**< Right button (next month) */
@@ -121,7 +121,7 @@ class SOUI_EXP SCalendarCore {
 #define HIT_YEAR_3 -15 /**< Year-month button (not used yet)*/
 #define HIT_TODAY  42  /**< Today button */
 
-// Calendar display states
+/** Calendar display states */
 #define SHOW_MONTH        -101 /**< Show month */
 #define SHOW_YEAR         -102 /**< Show year */
 #define SHOW_YEAR_DECADE  -103 /**< Show decade */
@@ -473,8 +473,8 @@ class SOUI_EXP SCalendar : public SWindow {
      */
     struct wDayInfo
     {
-        WORD iDay; // Calendar day
-        int nType; // -1 previous month, 0 current month, 1 next month
+        WORD iDay; /**< Calendar day */
+        int nType; /**< -1 previous month, 0 current month, 1 next month */
     };
 
     /**
@@ -532,8 +532,8 @@ class SOUI_EXP SCalendar : public SWindow {
      */
     struct wMonthOrYearInfo
     {
-        WORD iMonthOrYear; // Calendar month-year-decade-century
-        int nType;         // -1 previous, 0 current, 1 next
+        WORD iMonthOrYear; /**< Calendar month-year-decade-century */
+        int nType;         /**< -1 previous, 0 current, 1 next */
     };
 
     /**
@@ -544,4 +544,4 @@ class SOUI_EXP SCalendar : public SWindow {
 
 SNSEND
 
-#endif // __SCALENDAR__H__
+#endif /**< __SCALENDAR__H__ */

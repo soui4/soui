@@ -7,13 +7,13 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for IHostWnd / IHostDialog Interface
  * These macros provide C-style function call syntax for C++ interface methods
  * IHostWnd inherits from INativeWnd; IHostDialog inherits from IHostWnd.
  */
 
-/* IObjRef base interface macros */
+/** IObjRef base interface macros */
 #define IHostWnd_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -23,7 +23,7 @@ extern "C" {
 #define IHostWnd_OnFinalRelease(This) \
     ((This)->lpVtbl->OnFinalRelease(This))
 
-/* INativeWnd base interface macros */
+/** INativeWnd base interface macros */
 #define IHostWnd_CreateNative(This, lpWindowName, dwStyle, dwExStyle, x, y, nWidth, nHeight, hWndParent, nID, lpParam) \
     ((This)->lpVtbl->CreateNative(This, lpWindowName, dwStyle, dwExStyle, x, y, nWidth, nHeight, hWndParent, nID, lpParam))
 
@@ -198,7 +198,7 @@ extern "C" {
 #define IHostWnd_GetMsgHandler(This) \
     ((This)->lpVtbl->GetMsgHandler(This))
 
-/* IHostWnd specific interface macros */
+/** IHostWnd specific interface macros */
 #define IHostWnd_CreateEx(This, hWndParent, dwStyle, dwExStyle, x, y, nWidth, nHeight, xmlInit) \
     ((This)->lpVtbl->CreateEx(This, hWndParent, dwStyle, dwExStyle, x, y, nWidth, nHeight, xmlInit))
 
@@ -274,12 +274,12 @@ extern "C" {
 #define IHostWnd_SetScale(This, nScale, pDestRect) \
     ((This)->lpVtbl->SetScale(This, nScale, pDestRect))
 
-/*
+/**
  * IHostDialog interface macros
  * IHostDialog inherits from IHostWnd; use IHostWnd_ macros for inherited methods.
  */
 
-/* IHostDialog specific interface macros */
+/** IHostDialog specific interface macros */
 #define IHostDialog_DoModal(This, hParent, dwStyle, dwExStyle) \
     ((This)->lpVtbl->DoModal(This, hParent, dwStyle, dwExStyle))
 
@@ -293,4 +293,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SHOSTWND_CAPI_H__ */
+#endif /**< __SHOSTWND_CAPI_H__ */

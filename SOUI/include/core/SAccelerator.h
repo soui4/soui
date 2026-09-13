@@ -127,4 +127,4 @@ class SOUI_EXP SAccelerator : public IAccelerator {
 };
 
 SNSEND
-#endif // __SACCELERATOR__H__
+#endif /**< __SACCELERATOR__H__ */

@@ -1,4 +1,4 @@
-#ifndef __SLISTVIEW__H__
+﻿#ifndef __SLISTVIEW__H__
 #define __SLISTVIEW__H__
 
 #include <core/SPanel.h>
@@ -213,7 +213,6 @@ class SOUI_EXP SListView
      */
     void UpdateScrollBar();
 
-
     /**
      * @brief Update visible items
      */
@@ -425,4 +424,4 @@ class SOUI_EXP SListView
 
 SNSEND
 
-#endif // __SLISTVIEW__H__
+#endif /**< __SLISTVIEW__H__ */

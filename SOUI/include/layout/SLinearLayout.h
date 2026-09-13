@@ -7,7 +7,7 @@
 
 SNSBEGIN
 
-// Int = %d StringA
+/** Int = %d StringA */
 #define ATTR_GRAVITY(attribname, varname, allredraw)          \
     if (0 == strAttribName.CompareNoCase(attribname))         \
     {                                                         \
@@ -18,10 +18,10 @@ SNSBEGIN
 
 /**
  * @class SLinearLayoutParam
- * @brief 线性布局参数类
+ * @brief Linear layout parameter class
  */
 class SLinearLayoutParam
-    : public TObjRefImpl<SObjectImpl<ILayoutParam> >
+    : public TObjRefImpl<SObjectImpl<ILayoutParam>>
     , public SLinearLayoutParamStruct {
     DEF_SOBJECT(SObjectImpl<ILayoutParam>, L"LinearLayoutParam")
 
@@ -32,211 +32,211 @@ class SLinearLayoutParam
 
   public:
     /**
-     * @brief 构造函数
+     * @brief Constructor
      */
     SLinearLayoutParam();
 
     /**
-     * @brief 清除布局参数
+     * @brief Clear layout parameters
      */
     STDMETHOD_(void, Clear)(THIS) OVERRIDE;
 
     /**
-     * @brief 检查是否匹配父容器大小
-     * @param orientation 方向（水平或垂直）
-     * @return 如果匹配父容器大小返回TRUE，否则返回FALSE
+     * @brief Check whether it matches parent container size
+     * @param orientation direction (horizontal or vertical)
+     * @return Returns TRUE if it matches parent container size, otherwise FALSE
      */
     STDMETHOD_(BOOL, IsMatchParent)(THIS_ ORIENTATION orientation) SCONST OVERRIDE;
 
     /**
-     * @brief 检查是否包裹内容大小
-     * @param orientation 方向（水平或垂直）
-     * @return 如果包裹内容大小返回TRUE，否则返回FALSE
+     * @brief Check whether it wraps content size
+     * @param orientation direction (horizontal or vertical)
+     * @return Returns TRUE if it wraps content size, otherwise FALSE
      */
     STDMETHOD_(BOOL, IsWrapContent)(THIS_ ORIENTATION orientation) SCONST OVERRIDE;
 
     /**
-     * @brief 检查是否指定大小
-     * @param orientation 方向（水平或垂直）
-     * @return 如果指定大小返回TRUE，否则返回FALSE
+     * @brief Check whether a specific size is specified
+     * @param orientation direction (horizontal or vertical)
+     * @return Returns TRUE if a specific size is specified, otherwise FALSE
      */
     STDMETHOD_(BOOL, IsSpecifiedSize)(THIS_ ORIENTATION orientation) SCONST OVERRIDE;
 
     /**
-     * @brief 获取指定大小
-     * @param orientation 方向（水平或垂直）
-     * @return 指定大小
+     * @brief Get the specified size
+     * @param orientation direction (horizontal or vertical)
+     * @return specified size
      */
     STDMETHOD_(BOOL, GetSpecifiedSize)(THIS_ ORIENTATION orientation, LAYOUTSIZE *pLayoutSize) SCONST OVERRIDE;
 
     /**
-     * @brief 设置匹配父容器大小
-     * @param orientation 方向（水平或垂直）
+     * @brief Set to match parent container size
+     * @param orientation direction (horizontal or vertical)
      */
     STDMETHOD_(void, SetMatchParent)(THIS_ ORIENTATION orientation) OVERRIDE;
 
     /**
-     * @brief 设置包裹内容大小
-     * @param orientation 方向（水平或垂直）
+     * @brief Set to wrap content size
+     * @param orientation direction (horizontal or vertical)
      */
     STDMETHOD_(void, SetWrapContent)(THIS_ ORIENTATION orientation) OVERRIDE;
 
     /**
-     * @brief 设置指定大小
-     * @param orientation 方向（水平或垂直）
-     * @param layoutSize 指定大小
+     * @brief Set the specified size
+     * @param orientation direction (horizontal or vertical)
+     * @param layoutSize specified size
      */
     STDMETHOD_(void, SetSpecifiedSize)(THIS_ ORIENTATION orientation, const LAYOUTSIZE *pLayoutSize) OVERRIDE;
 
     /**
-     * @brief 获取原始数据指针
-     * @return 原始数据指针
+     * @brief Get raw data pointer
+     * @return raw data pointer
      */
     STDMETHOD_(void *, GetRawData)(THIS) OVERRIDE;
 
     /**
-     * @brief 克隆布局参数
-     * @return 克隆的布局参数对象指针
+     * @brief Clone layout parameters
+     * @return pointer to the cloned layout parameter object
      */
     STDMETHOD_(ILayoutParam *, Clone)(THIS) SCONST OVERRIDE;
 
     /**
-     * @brief 更新属性动画器状态
-     * @param pHolder IPropertyValuesHolder*--属性值持有者
-     * @param fraction float--动画进度（0.0-1.0）
-     * @param state ANI_STATE--动画状态（ANI_START/ANI_PROGRESS/ANI_END）
+     * @brief Update the property animator state
+     * @param pHolder IPropertyValuesHolder*--property value holder
+     * @param fraction float--animation progress (0.0-1.0)
+     * @param state ANI_STATE--animation state (ANI_START/ANI_PROGRESS/ANI_END)
      */
     STDMETHOD_(BOOL, SetAnimatorValue)(THIS_ IPropertyValuesHolder *pHolder, float fraction, ANI_STATE state) OVERRIDE;
 
   public:
     SOUI_ATTRS_BEGIN()
-        ATTR_LAYOUTSIZE(L"width", width, TRUE)                  // 宽度
-        ATTR_LAYOUTSIZE(L"height", height, TRUE)                // 高度
-        ATTR_CUSTOM(L"size", OnAttrSize)                        // 大小
-        ATTR_FLOAT(L"weight", weight, FALSE)                    // 权重
-        ATTR_GRAVITY(L"layout_gravity", gravity, FALSE)         // 对齐方式
-        ATTR_CUSTOM(L"extend", OnAttrExtend)                    // 扩展属性
-        ATTR_LAYOUTSIZE(L"extend_left", extend_left, FALSE)     // 左侧扩展
-        ATTR_LAYOUTSIZE(L"extend_top", extend_top, FALSE)       // 顶部扩展
-        ATTR_LAYOUTSIZE(L"extend_right", extend_right, FALSE)   // 右侧扩展
-        ATTR_LAYOUTSIZE(L"extend_bottom", extend_bottom, FALSE) // 底部扩展
+        ATTR_LAYOUTSIZE(L"width", width, TRUE)                  /**< Width */
+        ATTR_LAYOUTSIZE(L"height", height, TRUE)                /**< Height */
+        ATTR_CUSTOM(L"size", OnAttrSize)                        /**< Size */
+        ATTR_FLOAT(L"weight", weight, FALSE)                    /**< Weight */
+        ATTR_GRAVITY(L"layout_gravity", gravity, FALSE)         /**< Alignment */
+        ATTR_CUSTOM(L"extend", OnAttrExtend)                    /**< Expansion attribute */
+        ATTR_LAYOUTSIZE(L"extend_left", extend_left, FALSE)     /**< Left expansion */
+        ATTR_LAYOUTSIZE(L"extend_top", extend_top, FALSE)       /**< Top expansion */
+        ATTR_LAYOUTSIZE(L"extend_right", extend_right, FALSE)   /**< Right expansion */
+        ATTR_LAYOUTSIZE(L"extend_bottom", extend_bottom, FALSE) /**< Bottom expansion */
     SOUI_ATTRS_BREAK()
 
   protected:
     /**
-     * @brief 处理大小属性
-     * @param strValue 属性值字符串
-     * @param bLoading 是否正在加载
-     * @return 处理结果
+     * @brief Process size attribute
+     * @param strValue attribute value string
+     * @param bLoading whether loading
+     * @return processing result
      */
     HRESULT OnAttrSize(const SStringW &strValue, BOOL bLoading);
 
     /**
-     * @brief 处理扩展属性
-     * @param strValue 属性值字符串
-     * @param bLoading 是否正在加载
-     * @return 处理结果
+     * @brief Process expansion attribute
+     * @param strValue attribute value string
+     * @param bLoading whether loading
+     * @return processing result
      */
     HRESULT OnAttrExtend(const SStringW &strValue, BOOL bLoading);
 };
 
 /**
  * @class SLinearLayout
- * @brief 线性布局类
+ * @brief Linear layout class
  */
-class SOUI_EXP SLinearLayout : public TObjRefImpl<SObjectImpl<ILayout> > {
+class SOUI_EXP SLinearLayout : public TObjRefImpl<SObjectImpl<ILayout>> {
     DEF_SOBJECT(SObjectImpl<ILayout>, L"linearLayout")
 
   public:
     /**
-     * @brief 构造函数
+     * @brief Constructor
      */
     SLinearLayout(void);
 
     /**
-     * @brief 析构函数
+     * @brief Destructor
      */
     ~SLinearLayout(void);
 
     /**
-     * @brief 检查布局参数是否可接受
-     * @param pLayoutParam 布局参数对象指针
-     * @return 如果可接受返回TRUE，否则返回FALSE
+     * @brief Check whether the layout parameter is acceptable
+     * @param pLayoutParam layout parameter object pointer
+     * @return Returns TRUE if acceptable, otherwise FALSE
      */
     STDMETHOD_(BOOL, IsParamAcceptable)(THIS_ const ILayoutParam *pLayoutParam) SCONST OVERRIDE;
 
     /**
-     * @brief 布局子窗口
-     * @param pParent 父窗口指针
+     * @brief Layout child windows
+     * @param pParent parent window pointer
      */
     STDMETHOD_(void, LayoutChildren)(THIS_ IWindow *pParent) OVERRIDE;
 
     /**
-     * @brief 创建布局参数对象
-     * @param pOwner IWindow*--布局参数的拥有者窗口对象
-     * @return 布局参数对象指针
+     * @brief Create layout parameter object
+     * @param pOwner IWindow*--owner window object of the layout parameter
+     * @return layout parameter object pointer
      */
     STDMETHOD_(ILayoutParam *, CreateLayoutParam)(CTHIS) SCONST OVERRIDE;
 
     /**
-     * @brief 测量子窗口大小
-     * @param pParent 父窗口指针
-     * @param nWidth 宽度
-     * @param nHeight 高度
-     * @return 测量结果大小
+     * @brief Measure child window size
+     * @param pParent parent window pointer
+     * @param nWidth width
+     * @param nHeight height
+     * @return measured size
      */
     STDMETHOD_(SIZE, MeasureChildren)
     (THIS_ const IWindow *pParent, int nWidth, int nHeight) SCONST OVERRIDE;
 
     SOUI_ATTRS_BEGIN()
-        ATTR_ENUM_BEGIN(L"orientation", ORIENTATION, FALSE) // 方向
-            ATTR_ENUM_VALUE(L"horizontal", Horz)            // 水平方向
-            ATTR_ENUM_VALUE(L"vertical", Vert)              // 垂直方向
+        ATTR_ENUM_BEGIN(L"orientation", ORIENTATION, FALSE) /**< Direction */
+            ATTR_ENUM_VALUE(L"horizontal", Horz)            /**< Horizontal direction */
+            ATTR_ENUM_VALUE(L"vertical", Vert)              /**< Vertical direction */
         ATTR_ENUM_END(m_orientation)
-        ATTR_GRAVITY(L"gravity", m_gravity, FALSE)      // 对齐方式
-        ATTR_LAYOUTSIZE(L"interval", m_interval, FALSE) // 间距
+        ATTR_GRAVITY(L"gravity", m_gravity, FALSE)      /**< Alignment */
+        ATTR_LAYOUTSIZE(L"interval", m_interval, FALSE) /**< Spacing */
     SOUI_ATTRS_BREAK()
 
   protected:
-    ORIENTATION m_orientation; // 方向
-    Gravity m_gravity;         // 对齐方式
-    SLayoutSize m_interval;    // 间距
+    ORIENTATION m_orientation; /**< Direction */
+    Gravity m_gravity;         /**< Alignment */
+    SLayoutSize m_interval;    /**< Spacing */
 };
 
 /**
  * @class SVBox
- * @brief 垂直线性布局类
+ * @brief Vertical linear layout class
  */
 class SVBox : public SLinearLayout {
     DEF_SOBJECT(SLinearLayout, L"vbox")
 
   public:
     /**
-     * @brief 构造函数
+     * @brief Constructor
      */
     SVBox()
     {
-        m_orientation = Vert; // 设置方向为垂直
+        m_orientation = Vert; // Set direction to vertical
     }
 };
 
 /**
  * @class SHBox
- * @brief 水平线性布局类
+ * @brief Horizontal linear layout class
  */
 class SHBox : public SLinearLayout {
     DEF_SOBJECT(SLinearLayout, L"hbox")
 
   public:
     /**
-     * @brief 构造函数
+     * @brief Constructor
      */
     SHBox()
     {
-        m_orientation = Horz; // 设置方向为水平
+        m_orientation = Horz; // Set direction to horizontal
     }
 };
 
 SNSEND
 
-#endif // __SLINEARLAYOUT__H__
+#endif /**< __SLINEARLAYOUT__H__ */

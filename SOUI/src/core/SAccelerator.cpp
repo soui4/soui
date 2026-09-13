@@ -215,10 +215,10 @@ SStringT SAccelerator::FormatAccelKey(DWORD dwAccel)
     return str;
 }
 
-//将字符串翻译为加速键
+/** Translate string to accelerator key */
 DWORD SAccelerator::TranslateAccelKey(LPCTSTR pszAccelKey)
 {
-    TCHAR szBuf[101] = { 0 }; //保证字符串结束有两个结束符
+    TCHAR szBuf[101] = { 0 }; // Ensure the string ends with two terminators
     WORD wModifier = Mod_None;
     WORD wKey = 0;
     int nKeyLen = (int)_tcslen(pszAccelKey);

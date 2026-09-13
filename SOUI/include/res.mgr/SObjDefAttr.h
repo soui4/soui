@@ -54,9 +54,9 @@ class SOUI_EXP SObjDefAttr
     SXmlNode GetDefAttribute(LPCWSTR pszClassName);
 
   protected:
-    SXmlDoc m_xmlRoot; // XML document containing the default attributes
+    SXmlDoc m_xmlRoot; /**< XML document containing the default attributes */
 };
 
 SNSEND
 
-#endif // __SOBJDEFATTR__H__
+#endif /**< __SOBJDEFATTR__H__ */

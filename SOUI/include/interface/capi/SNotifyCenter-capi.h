@@ -7,12 +7,12 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for SNotifyCenter Interface
  * These macros provide C-style function call syntax for C++ interface methods
  */
 
-/* INotifyCenter C API Macros */
+/** INotifyCenter C API Macros */
 #define INotifyCenter_FireEventSync(This, e) \
     ((This)->lpVtbl->FireEventSync(This, e))
 
@@ -35,4 +35,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SNOTIFYCENTER_CAPI_H__ */
+#endif /**< __SNOTIFYCENTER_CAPI_H__ */

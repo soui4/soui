@@ -11,7 +11,7 @@ SNSBEGIN
  * @file SStylePool.h
  * @brief Style Pool Management
  * @version v1.0
- * @author SOUI团队
+ * @author SOUI team
  * @date 2014-05-28
  *
  * @details Manages a pool of styles and templates, providing functionality to load, retrieve, and manage styles and templates from XML.
@@ -42,7 +42,7 @@ class SOUI_EXP SStylePool
     BOOL Init(SXmlNode xmlNode);
 
   protected:
-    SXmlDoc m_xmlDoc; // XML document containing the styles
+    SXmlDoc m_xmlDoc; /**< XML document containing the styles */
 };
 
 /**
@@ -55,6 +55,7 @@ class SOUI_EXP STemplatePool
     : public SCmnMap<SStringW, SStringW>
     , public TObjRefImpl<IObjRef> {
     SXmlDoc m_templateDoc;
+
   public:
     /**
      * @brief Initializes the template pool from an XML node.
@@ -79,4 +80,4 @@ class SOUI_EXP STemplatePool
 
 SNSEND
 
-#endif // __SSTYLEPOOL__H__
+#endif /**< __SSTYLEPOOL__H__ */

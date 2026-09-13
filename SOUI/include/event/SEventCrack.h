@@ -8,7 +8,7 @@
  * @author     SOUI group
  * @date       2014/09/05
  *
- * Describe    SOUI系统中使用的事件映射宏
+ * Describe    Event mapping macros used in the SOUI system
  */
 
 #define EVENT_MAP_BEGIN()                          \
@@ -77,7 +77,7 @@
             return FALSE;                                                  \
     }
 
-// void OnEvent(IEvtArgs *pEvt)
+/** void OnEvent(IEvtArgs *pEvt) */
 #define EVENT_HANDLER(cd, func)   \
     if (cd == uCode)              \
     {                             \
@@ -88,7 +88,7 @@
             return TRUE;          \
     }
 
-// void OnEvent(IEvtArgs *pEvt)
+/** void OnEvent(IEvtArgs *pEvt) */
 #define EVENT_ID_HANDLER(id, cd, func)       \
     if (cd == uCode && id == pEvt->IdFrom()) \
     {                                        \
@@ -99,7 +99,7 @@
             return TRUE;                     \
     }
 
-// void OnEvent(IEvtArgs *pEvt)
+/** void OnEvent(IEvtArgs *pEvt) */
 #define EVENT_ID_RANGE_HANDLER(idMin, idMax, cd, func)                     \
     if (cd == uCode && idMin <= pEvt->IdFrom() && idMax >= pEvt->IdFrom()) \
     {                                                                      \
@@ -110,7 +110,7 @@
             return TRUE;                                                   \
     }
 
-// void OnEvent(IEvtArgs *pEvt)
+/** void OnEvent(IEvtArgs *pEvt) */
 #define EVENT_NAME_HANDLER(name, cd, func)                                              \
     if (cd == uCode && pEvt->NameFrom() != NULL && wcscmp(pEvt->NameFrom(), name) == 0) \
     {                                                                                   \
@@ -121,7 +121,7 @@
             return TRUE;                                                                \
     }
 
-// void OnCommand(IEvtArgs *pEvt)
+/** void OnCommand(IEvtArgs *pEvt) */
 #define EVENT_COMMAND(func)       \
     if (SNS::EVT_CMD == uCode)    \
     {                             \
@@ -132,7 +132,7 @@
             return TRUE;          \
     }
 
-// void OnCommand()
+/** void OnCommand() */
 #define EVENT_ID_COMMAND(id, func)                     \
     if (SNS::EVT_CMD == uCode && id == pEvt->IdFrom()) \
     {                                                  \
@@ -143,7 +143,7 @@
             return TRUE;                               \
     }
 
-// void OnCommand(int magic)
+/** void OnCommand(int magic) */
 #define EVENT_ID_COMMAND_MAGIC(id, func, magic)        \
     if (SNS::EVT_CMD == uCode && id == pEvt->IdFrom()) \
     {                                                  \
@@ -154,7 +154,7 @@
             return TRUE;                               \
     }
 
-// void OnCommand(int nID)
+/** void OnCommand(int nID) */
 #define EVENT_ID_COMMAND_RANGE(idMin, idMax, func)                                   \
     if (SNS::EVT_CMD == uCode && idMin <= pEvt->IdFrom() && idMax >= pEvt->IdFrom()) \
     {                                                                                \
@@ -165,7 +165,7 @@
             return TRUE;                                                             \
     }
 
-// void OnCommand()
+/** void OnCommand() */
 #define EVENT_NAME_COMMAND(name, func)                                                            \
     if (SNS::EVT_CMD == uCode && pEvt->NameFrom() != NULL && wcscmp(pEvt->NameFrom(), name) == 0) \
     {                                                                                             \
@@ -176,7 +176,7 @@
             return TRUE;                                                                          \
     }
 
-// void OnCommand(int magic)
+/** void OnCommand(int magic) */
 #define EVENT_NAME_COMMAND_MAGIC(name, func, magic)                                               \
     if (SNS::EVT_CMD == uCode && pEvt->NameFrom() != NULL && wcscmp(pEvt->NameFrom(), name) == 0) \
     {                                                                                             \
@@ -187,7 +187,7 @@
             return TRUE;                                                                          \
     }
 
-// BOOL OnContextMenu(CPoint pt)
+/** BOOL OnContextMenu(CPoint pt) */
 #define EVENT_ID_CONTEXTMENU(id, func)                              \
     if (SNS::EVT_CTXMENU == uCode && pEvt->IdFrom() == id)          \
     {                                                               \
@@ -199,7 +199,7 @@
             return TRUE;                                            \
     }
 
-// BOOL OnContextMenu(CPoint pt)
+/** BOOL OnContextMenu(CPoint pt) */
 #define EVENT_NAME_CONTEXTMENU(name, func)                                                            \
     if (SNS::EVT_CTXMENU == uCode && pEvt->NameFrom() != NULL && wcscmp(pEvt->NameFrom(), name) == 0) \
     {                                                                                                 \

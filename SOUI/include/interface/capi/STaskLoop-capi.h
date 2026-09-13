@@ -7,19 +7,19 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for STaskLoop Interfaces
  * These macros provide C-style function call syntax for C++ interface methods
  */
 
-/* ITaskLoopListener C API Macros */
+/** ITaskLoopListener C API Macros */
 #define ITaskLoopListener_onStart(This, taskLoop) \
     ((This)->lpVtbl->onStart(This, taskLoop))
 
 #define ITaskLoopListener_onStop(This, taskLoop) \
     ((This)->lpVtbl->onStop(This, taskLoop))
 
-/* ITaskLoop C API Macros */
+/** ITaskLoop C API Macros */
 #define ITaskLoop_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -69,4 +69,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __STASKLOOP_CAPI_H__ */
+#endif /**< __STASKLOOP_CAPI_H__ */

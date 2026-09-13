@@ -1381,7 +1381,7 @@ void CTempBuf::FreeBuf()
 {
 	if (_pv != &_chBuf[0])
 	{
-		delete (BYTE*)_pv;
+		delete[] (BYTE*)_pv;
 	}
 }
 

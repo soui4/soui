@@ -112,11 +112,11 @@ class SOUI_EXP SNativeWndHelper {
     SNativeWndHelper();
     ~SNativeWndHelper();
 
-    HANDLE m_hHeap;        //!< Handle to the heap.
-    SCriticalSection m_cs; //!< Critical section for thread-safe operations.
-    void *m_sharePtr;      //!< Shared pointer.
-    ATOM m_atom;           //!< Atom for the simple window class.
-    HINSTANCE m_hInst;     //!< Handle to the application instance.
+    HANDLE m_hHeap;        /**<  Handle to the heap. */
+    SCriticalSection m_cs; /**<  Critical section for thread-safe operations. */
+    void *m_sharePtr;      /**<  Shared pointer. */
+    ATOM m_atom;           /**<  Atom for the simple window class. */
+    HINSTANCE m_hInst;     /**<  Handle to the application instance. */
 };
 
 struct tagThunk;
@@ -714,7 +714,7 @@ class SOUI_EXP SNativeWnd : public TObjRefImpl<INativeWnd> {
      */
     static BOOL DefaultReflectionHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult);
 
-  public: // EXTRACT FROM BEGIN_MSG_MAP_EX and END_MSG_MAP
+  public: /**< EXTRACT FROM BEGIN_MSG_MAP_EX and END_MSG_MAP */
     /**
      * @brief Processes a window message.
      *
@@ -746,12 +746,12 @@ class SOUI_EXP SNativeWnd : public TObjRefImpl<INativeWnd> {
      */
     virtual void OnFinalMessage(HWND hWnd);
 
-    const MSG *m_pCurrentMsg;        //!< Pointer to the current message.
-    BOOL m_bDestoryed;               //!< Flag indicating if the window is destroyed.
-    MsgHandlerInfo m_msgHandlerInfo; //!< Message handler information.
+    const MSG *m_pCurrentMsg;        /**<  Pointer to the current message. */
+    BOOL m_bDestoryed;               /**<  Flag indicating if the window is destroyed. */
+    MsgHandlerInfo m_msgHandlerInfo; /**<  Message handler information. */
 
   public:
-    HWND m_hWnd; //!< Handle to the window.
+    HWND m_hWnd; /**<  Handle to the window. */
 
   protected:
     /**
@@ -775,9 +775,9 @@ class SOUI_EXP SNativeWnd : public TObjRefImpl<INativeWnd> {
      * @return LRESULT Result of the message processing.
      */
     static LRESULT CALLBACK StartWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-    tagThunk *m_pThunk;           //!< Thunk structure.
-    WNDPROC m_pfnSuperWindowProc; //!< Pointer to the superclass window procedure.
+    tagThunk *m_pThunk;           /**<  Thunk structure. */
+    WNDPROC m_pfnSuperWindowProc; /**<  Pointer to the superclass window procedure. */
 };
 
 SNSEND
-#endif // __SNATIVEWND__H__
+#endif /**< __SNATIVEWND__H__ */

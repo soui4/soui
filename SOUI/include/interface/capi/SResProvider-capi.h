@@ -7,12 +7,12 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for SResProvider Interface
  * These macros provide C-style function call syntax for C++ interface methods
  */
 
-/* IResProvider C API Macros */
+/** IResProvider C API Macros */
 #define IResProvider_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -59,4 +59,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SRESPROVIDER_CAPI_H__ */
+#endif /**< __SRESPROVIDER_CAPI_H__ */

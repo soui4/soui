@@ -7,12 +7,12 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for SScriptModule Interfaces
  * These macros provide C-style function call syntax for C++ interface methods
  */
 
-/* IScriptModule C API Macros */
+/** IScriptModule C API Macros */
 #define IScriptModule_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -43,7 +43,7 @@ extern "C" {
 #define IScriptModule_getIdleHandler(This) \
     ((This)->lpVtbl->getIdleHandler(This))
 
-/* IScriptFactory C API Macros */
+/** IScriptFactory C API Macros */
 #define IScriptFactory_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -60,4 +60,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SSCRIPTMODULE_CAPI_H__ */
+#endif /**< __SSCRIPTMODULE_CAPI_H__ */

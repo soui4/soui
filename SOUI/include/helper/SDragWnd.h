@@ -29,4 +29,4 @@ class SOUI_EXP SDragWnd : public SNativeWnd {
 
 SNSEND
 
-#endif // __SDRAGWND__H__
+#endif /**< __SDRAGWND__H__ */

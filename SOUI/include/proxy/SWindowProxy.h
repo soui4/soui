@@ -43,4 +43,4 @@ public:
 };
 
 SNSEND
-#endif // __SWINDOWPROXY__H__
+#endif /**< __SWINDOWPROXY__H__ */

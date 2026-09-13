@@ -21,9 +21,9 @@ struct IShareBuffer
 {
     enum SEEK
     {
-        seek_set = 0, /* seek to an absolute position */
-        seek_cur,     /* seek relative to current position */
-        seek_end      /* seek relative to end of file */
+        seek_set = 0, /**< seek to an absolute position */
+        seek_cur,     /**< seek relative to current position */
+        seek_end      /**< seek relative to end of file */
     };
     virtual int Write(const void *data, UINT nLen) = 0;
     virtual int Read(void *buf, UINT nLen) = 0;
@@ -130,7 +130,7 @@ struct IIpcConnection : IObjRef
 
 struct IIpcSvrCallback
 {
-    // return value is the HWND of the connection that used to reccive message.
+    /** return value is the HWND of the connection that used to reccive message. */
     virtual ULONG_PTR OnNewConnection(IIpcHandle *pIpcHandle, IIpcConnection **ppConn) = 0;
     virtual void OnConnected(IIpcConnection *pConn) = 0;
     virtual void OnDisconnected(IIpcConnection *pConn) = 0;
@@ -157,4 +157,4 @@ struct IIpcFactory : IObjRef
 };
 
 SNSEND
-#endif // __SIPCOBJ_I__H__
+#endif /**< __SIPCOBJ_I__H__ */

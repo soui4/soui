@@ -548,4 +548,4 @@ class SOUI_EXP SListCtrl : public SPanel {
 
 SNSEND
 
-#endif // __SLISTCTRL__H__
+#endif /**< __SLISTCTRL__H__ */

@@ -1,6 +1,4 @@
-﻿/*
-SOUI窗口布局接口
-*/
+﻿/** SOUI window layout interface */
 #ifndef __SLAYOUT_I__H__
 #define __SLAYOUT_I__H__
 
@@ -28,31 +26,31 @@ enum
 
 /**
  * @enum Unit
- * @brief 布局大小单位枚举
+ * @brief Enumeration of layout size units
  */
 typedef enum _Unit
 {
-    unknow = -1, // 未知单位
-    px = 0,      // 像素
-    dp,          // 设备独立像素
-    dip = dp,    // 设备独立像素（别名）
-    sp           // 缩放像素
+    unknow = -1, /**< Unknown unit */
+    px = 0,      /**< Pixel */
+    dp,          /**< Device-independent pixel */
+    dip = dp,    /**< Device-independent pixel (alias) */
+    sp           /**< Scaled pixel */
 } Unit;
 
 typedef struct _LAYOUTSIZE
 {
-    float fSize; // 大小值
-    Unit unit;   // 大小单位
+    float fSize; /**< Size value */
+    Unit unit;   /**< Size unit */
 } LAYOUTSIZE;
 
 /**
- * @brief 动画状态枚举
+ * @brief Animation state enumeration
  */
 typedef enum _ANI_STATE
 {
-    ANI_START = 0, /**< 动画开始状态 */
-    ANI_PROGRESS,  /**< 动画进行中状态 */
-    ANI_END,       /**< 动画结束状态 */
+    ANI_START = 0, /**< Animation start state */
+    ANI_PROGRESS,  /**< Animation in-progress state */
+    ANI_END,       /**< Animation end state */
 } ANI_STATE;
 
 #undef INTERFACE
@@ -65,79 +63,79 @@ DECLARE_INTERFACE_(ILayoutParam, IObject)
     //----------------------------------------------------------
 
     /**
-     * @brief 清空数据
+     * @brief Clear data
      * @return
      */
     STDMETHOD_(void, Clear)(THIS) PURE;
 
     /**
-     * @brief 布局充满父窗口标志
-     * @param orientation ORIENTATION--布局方向
-     * @return TRUE--布局充满父窗口
+     * @brief Layout fills parent window flag
+     * @param orientation ORIENTATION--layout orientation
+     * @return TRUE--layout fills parent window
      */
     STDMETHOD_(BOOL, IsMatchParent)(CTHIS_ ORIENTATION orientation) SCONST PURE;
 
     /**
-     * @brief 布局适应窗口内容标志
-     * @param orientation ORIENTATION--布局方向
-     * @return TRUE--适应窗口内容标志
+     * @brief Layout fits window content flag
+     * @param orientation ORIENTATION--layout orientation
+     * @return TRUE--fits window content flag
      */
     STDMETHOD_(BOOL, IsWrapContent)(CTHIS_ ORIENTATION orientation) SCONST PURE;
 
     /**
-     * @brief 布局指定大小标志
-     * @param orientation ORIENTATION--布局方向
-     * @return TRUE--指定大小
+     * @brief Layout specified size flag
+     * @param orientation ORIENTATION--layout orientation
+     * @return TRUE--specified size
      */
     STDMETHOD_(BOOL, IsSpecifiedSize)(CTHIS_ ORIENTATION orientation) SCONST PURE;
 
     /**
-     * @brief 获取指定的布局大小
-     * @param orientation ORIENTATION--布局方向
-     * @return SLayoutSize--布局大小
+     * @brief Get specified layout size
+     * @param orientation ORIENTATION--layout orientation
+     * @return SLayoutSize--layout size
      */
     STDMETHOD_(BOOL, GetSpecifiedSize)(CTHIS_ ORIENTATION orientation, LAYOUTSIZE * pLayoutSize) SCONST PURE;
 
     /**
-     * @brief 设定布局大小
-     * @param orientation ORIENTATION--布局方向
-     * @param layoutSize SLayoutSize--布局大小
+     * @brief Set layout size
+     * @param orientation ORIENTATION--layout orientation
+     * @param layoutSize SLayoutSize--layout size
      * @return
      */
     STDMETHOD_(void, SetSpecifiedSize)(THIS_ ORIENTATION orientation, const LAYOUTSIZE *layoutSize) PURE;
 
     /**
-     * @brief 设定布局适应父窗口大小
-     * @param orientation ORIENTATION--布局方向
+     * @brief Set layout to fit parent window size
+     * @param orientation ORIENTATION--layout orientation
      * @return
      */
     STDMETHOD_(void, SetMatchParent)(THIS_ ORIENTATION orientation) PURE;
 
     /**
-     * @brief 设定布局适应内容
-     * @param orientation ORIENTATION--布局方向
+     * @brief Set layout to fit content
+     * @param orientation ORIENTATION--layout orientation
      * @return
      */
     STDMETHOD_(void, SetWrapContent)(THIS_ ORIENTATION orientation) PURE;
 
     /**
-     * @brief 更新属性动画器状态
-     * @param pHolder IPropertyValuesHolder*--属性值持有者
-     * @param fraction float--动画进度（0.0-1.0）
-     * @param state ANI_STATE--动画状态（ANI_START/ANI_PROGRESS/ANI_END）
-     * @note 此方法在动画过程中被调用，用于处理动画状态变化和触发布局更新
+     * @brief Update property animator state
+     * @param pHolder IPropertyValuesHolder*--property value holder
+     * @param fraction float--animation progress (0.0-1.0)
+     * @param state ANI_STATE--animation state (ANI_START/ANI_PROGRESS/ANI_END)
+     * @note This method is called during animation to handle animation state changes and trigger layout updates
      */
     STDMETHOD_(BOOL, SetAnimatorValue)(THIS_ IPropertyValuesHolder * pHolder, float fraction, ANI_STATE state) PURE;
 
     /**
-     * @brief 获取布局结构体数据
-     * @return void*布局结构体
+     * @brief Get layout structure data
+     * @return void* layout structure
      */
     STDMETHOD_(void *, GetRawData)(THIS) PURE;
 
     /**
-     * @brief Clone布局参数
-     * @return ILayoutParam *--布局参数对象
+     * @brief Clone layout parameters
+     * @return ILayoutParam *--layout parameter object
      */
     STDMETHOD_(ILayoutParam *, Clone)(CTHIS) SCONST PURE;
 };
@@ -151,35 +149,35 @@ DECLARE_INTERFACE_(ILayout, IObject)
     //------------------------------------------------------------------------
 
     /**
-     * @brief 判断当前布局类型和布局参数是否匹配
-     * @param pLayoutParam const ILayoutParam *--布局参数
-     * @return TRUE--匹配
+     * @brief Check whether the current layout type matches the layout parameters
+     * @param pLayoutParam const ILayoutParam *--layout parameter
+     * @return TRUE--matched
      */
     STDMETHOD_(BOOL, IsParamAcceptable)(CTHIS_ const ILayoutParam *pLayoutParam) SCONST PURE;
 
     /**
-     * @brief 布局指定控件的子窗口
-     * @param pParent IWindow *--布局控件
+     * @brief Layout child windows of the specified control
+     * @param pParent IWindow *--layout control
      * @return
      */
     STDMETHOD_(void, LayoutChildren)(THIS_ IWindow * pParent) PURE;
 
     /**
-     * @brief 创建和当前布局匹配的布局参数对象
-     * @return ILayoutParam *--布局参数对象
+     * @brief Create a layout parameter object matching the current layout
+     * @return ILayoutParam *--layout parameter object
      */
     STDMETHOD_(ILayoutParam *, CreateLayoutParam)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 计算窗口大小
-     * @param pParent const IWindow*--目标窗口
-     * @param nWidth int--父窗口宽度
-     * @param nHeight int--父窗口高度
-     * @return SIZE--目标窗口大小
+     * @brief Calculate window size
+     * @param pParent const IWindow*--target window
+     * @param nWidth int--parent window width
+     * @param nHeight int--parent window height
+     * @return SIZE--target window size
      */
     STDMETHOD_(SIZE, MeasureChildren)
     (CTHIS_ const IWindow *pParent, int nWidth, int nHeight) SCONST PURE;
 };
 
 SNSEND
-#endif // __SLAYOUT_I__H__
+#endif /**< __SLAYOUT_I__H__ */

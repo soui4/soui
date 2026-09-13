@@ -1,7 +1,7 @@
-﻿//////////////////////////////////////////////////////////////////////////
-//   File Name: sresprovider.cpp
-// Description: Resource Provider
-//////////////////////////////////////////////////////////////////////////
+﻿///////////////////////////////////////////////////////////////////////
+/** File Name: sresprovider.cpp */
+/** Description: Resource Provider */
+///////////////////////////////////////////////////////////////////////
 #include "souistd.h"
 #include "res.mgr/SResProvider.h"
 #ifdef _WIN32
@@ -12,13 +12,13 @@
 #endif
 SNSBEGIN
 
-//定义3种系统资源类型
+/** Define 3 system resource types */
 const TCHAR KTypeBitmap[] = _T("BITMAP");
 const TCHAR KTypeCursor[] = _T("CURSOR");
 const TCHAR KTypeIcon[] = _T("ICON");
 const TCHAR KTypeHtml[] = _T("HTML");
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 IBitmapS *SResLoadFromMemory::LoadImage(const LPVOID pBuf, size_t size)
 {
     IBitmapS *pImg = NULL;
@@ -50,7 +50,7 @@ IImgX *SResLoadFromMemory::LoadImgX(const LPVOID pBuf, size_t size)
     return pImgX;
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 SResProviderPE::SResProviderPE()
     : m_hResInst(0)
     , m_bOwner(FALSE)
@@ -89,7 +89,7 @@ HBITMAP SResProviderPE::LoadBitmap(LPCTSTR pszResName)
     return ::LoadBitmap(m_hResInst, pszResName);
 }
 
-HICON SResProviderPE::LoadIcon(LPCTSTR pszResName, int cx /*=0*/, int cy /*=0*/)
+HICON SResProviderPE::LoadIcon(LPCTSTR pszResName, int cx /**< =0 */, int cy /**< =0 */)
 {
     return (HICON)::LoadImage(m_hResInst, pszResName, IMAGE_ICON, cx, cy, LR_DEFAULTCOLOR);
 }
@@ -266,7 +266,7 @@ void SResProviderPE::EnumFile(THIS_ EnumFileCallback funEnumCB, LPARAM lp)
     EnumResourceTypes(m_hResInst, EnumResTypeProc2, (LONG_PTR)&param);
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 //
 
 HBITMAP SResLoadFromFile::LoadBitmap(LPCTSTR strPath)
@@ -274,7 +274,7 @@ HBITMAP SResLoadFromFile::LoadBitmap(LPCTSTR strPath)
     return (HBITMAP)::LoadImage(NULL, strPath, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);
 }
 
-HICON SResLoadFromFile::LoadIcon(LPCTSTR strPath, int cx /*=0*/, int cy /*=0*/)
+HICON SResLoadFromFile::LoadIcon(LPCTSTR strPath, int cx /**< =0 */, int cy /**< =0 */)
 {
     return (HICON)::LoadImage(NULL, strPath, IMAGE_ICON, cx, cy, LR_LOADFROMFILE);
 }
@@ -345,8 +345,8 @@ BOOL SResLoadFromFile::GetRawBuffer(LPCTSTR strPath, LPVOID pBuf, size_t size)
     return bRet;
 }
 
-//////////////////////////////////////////////////////////////////////////
-// SResProviderFiles
+///////////////////////////////////////////////////////////////////////
+/** SResProviderFiles */
 
 SResProviderFiles::SResProviderFiles()
 {
@@ -380,7 +380,7 @@ HBITMAP SResProviderFiles::LoadBitmap(LPCTSTR pszResName)
     return SResLoadFromFile::LoadBitmap(strPath);
 }
 
-HICON SResProviderFiles::LoadIcon(LPCTSTR pszResName, int cx /*=0*/, int cy /*=0*/)
+HICON SResProviderFiles::LoadIcon(LPCTSTR pszResName, int cx /**< =0 */, int cy /**< =0 */)
 {
     SStringT strPath = GetRes(KTypeIcon, pszResName);
     if (strPath.IsEmpty())
@@ -456,7 +456,7 @@ BOOL SResProviderFiles::Init(WPARAM wParam, LPARAM lParam)
 #if !defined(_WIN32)
             strFile.ReplaceChar(_T('\\'), _T('/'));
 #endif
-            //再次Init时会因为此行代码导致资源无法加载
+            // Re-Init will fail to load resources because of this line of code
             // if(!m_strPath.IsEmpty())
             // strFile.Format(_T("%s\\%s"),(LPCTSTR)m_strPath,(LPCTSTR)strFile);
             m_mapFiles[id] = strFile;
@@ -470,7 +470,7 @@ BOOL SResProviderFiles::Init(WPARAM wParam, LPARAM lParam)
     m_strPath = szFullPath;
 #else
     m_strPath = pszPath;
-#endif //_WIN32
+#endif // _WIN32
     return TRUE;
 }
 

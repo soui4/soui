@@ -1,10 +1,12 @@
-#include "souistd.h"
+﻿#include "souistd.h"
 #include <core/SWndAccessible.h>
 #include <atl.mini/SComCli.h>
 
 SNSBEGIN
 #ifdef SOUI_ENABLE_ACC
+#ifdef _MSC_VER
 #pragma comment(lib, "oleacc.lib")
+#endif /**< _MSC_VER */
 
 SAccessible::SAccessible(IWindow *pWnd)
     : m_pWnd((SWindow *)pWnd)
@@ -13,6 +15,45 @@ SAccessible::SAccessible(IWindow *pWnd)
 
 SAccessible::~SAccessible()
 {
+}
+
+SWindow *SAccessible::GetAccTarget(VARIANT varChild) const
+{
+    if (!m_pWnd || varChild.vt != VT_I4)
+        return NULL;
+    if (varChild.lVal == CHILDID_SELF)
+        return m_pWnd;
+    return (SWindow *)m_pWnd->GetAccProxy()->GetAccChild(varChild.lVal);
+}
+
+int SAccessible::RealChildCount() const
+{
+    return m_pWnd ? m_pWnd->GetAccProxy()->GetAccChildCount() : 0;
+}
+
+int SAccessible::VirtualChildCount() const
+{
+    if (!m_pWnd)
+        return 0;
+    return m_pWnd->GetAccProxy()->GetAccSubItemCount();
+}
+
+long SAccessible::TotalChildCount() const
+{
+    return (long)RealChildCount() + (long)VirtualChildCount();
+}
+
+int SAccessible::VirtualChildIndex(VARIANT varChild) const
+{
+    if (!m_pWnd || varChild.vt != VT_I4)
+        return 0;
+    if (varChild.lVal == CHILDID_SELF)
+        return 0;
+    int real = RealChildCount();
+    int total = (int)TotalChildCount();
+    if (varChild.lVal > real && varChild.lVal <= total)
+        return varChild.lVal - real; // 1-based virtual child index
+    return 0;
 }
 
 HRESULT SAccessible::get_accParent(IDispatch **ppdispParent)
@@ -35,7 +76,12 @@ HRESULT SAccessible::get_accChild(VARIANT varChild, IDispatch **ppdispChild)
         return CO_E_OBJNOTCONNECTED;
     if (varChild.vt != VT_I4 || !ppdispChild)
         return E_INVALIDARG;
-    SWindow *pChild = m_pWnd->GetChild(varChild.lVal);
+    SWindow *pChild = (SWindow *)m_pWnd->GetAccProxy()->GetAccChild(varChild.lVal);
+    // Virtual (simple-element) children share this object's IAccessible:
+    // per MSAA convention return S_FALSE so the caller addresses us via the
+    // same OLEACC_OBJECT with CHILDID_SELF + child id.
+    if (VirtualChildIndex(varChild) > 0)
+        return S_FALSE;
     if (!pChild)
         return E_INVALIDARG;
     SComPtr<IAccessible> pAcc = pChild->GetAccessible();
@@ -48,7 +94,7 @@ HRESULT SAccessible::get_accChildCount(long *pcountChildren)
 {
     if (!m_pWnd)
         return CO_E_OBJNOTCONNECTED;
-    *pcountChildren = m_pWnd->GetChildrenCount();
+    *pcountChildren = TotalChildCount();
     return S_OK;
 }
 
@@ -58,7 +104,7 @@ HRESULT SAccessible::get_accValue(VARIANT varChild, BSTR *pszValue)
         return CO_E_OBJNOTCONNECTED;
     if (varChild.vt != VT_I4 || !pszValue)
         return E_INVALIDARG;
-    SWindow *pChild = m_pWnd->GetChild(varChild.lVal);
+    SWindow *pChild = GetAccTarget(varChild);
     if (!pChild)
         return E_INVALIDARG;
     return pChild->GetAccProxy()->get_accValue(pszValue);
@@ -70,7 +116,7 @@ HRESULT SAccessible::put_accValue(VARIANT varChild, BSTR szValue)
         return CO_E_OBJNOTCONNECTED;
     if (varChild.vt != VT_I4)
         return E_INVALIDARG;
-    SWindow *pChild = m_pWnd->GetChild(varChild.lVal);
+    SWindow *pChild = GetAccTarget(varChild);
     if (!pChild)
         return E_INVALIDARG;
     return pChild->GetAccProxy()->put_accValue(szValue);
@@ -83,7 +129,16 @@ HRESULT SAccessible::get_accName(VARIANT varChild, BSTR *pszName)
     SASSERT(SWindowMgr::GetWindow(m_pWnd->GetSwnd()) == m_pWnd);
     if (varChild.vt != VT_I4)
         return E_INVALIDARG;
-    SWindow *pChild = m_pWnd->GetChild(varChild.lVal);
+    int vi = VirtualChildIndex(varChild);
+    if (vi > 0)
+    {
+        BSTR bstr = m_pWnd->GetAccProxy()->GetAccSubItemName(vi);
+        if (!bstr)
+            return E_INVALIDARG;
+        *pszName = bstr;
+        return S_OK;
+    }
+    SWindow *pChild = GetAccTarget(varChild);
     if (!pChild)
         return E_INVALIDARG;
     return pChild->GetAccProxy()->get_accName(pszName);
@@ -95,7 +150,7 @@ HRESULT SAccessible::put_accName(VARIANT varChild, BSTR szName)
         return CO_E_OBJNOTCONNECTED;
     if (varChild.vt != VT_I4)
         return E_INVALIDARG;
-    SWindow *pChild = m_pWnd->GetChild(varChild.lVal);
+    SWindow *pChild = GetAccTarget(varChild);
     if (!pChild)
         return E_INVALIDARG;
     return pChild->GetAccProxy()->put_accName(szName);
@@ -107,7 +162,10 @@ HRESULT SAccessible::accDoDefaultAction(VARIANT varChild)
         return CO_E_OBJNOTCONNECTED;
     if (varChild.vt != VT_I4)
         return E_INVALIDARG;
-    SWindow *pChild = m_pWnd->GetChild(varChild.lVal);
+    int vi = VirtualChildIndex(varChild);
+    if (vi > 0)
+        return m_pWnd->GetAccProxy()->SetAccSubItemSel(vi);
+    SWindow *pChild = GetAccTarget(varChild);
     if (!pChild)
         return E_INVALIDARG;
     return pChild->GetAccProxy()->accDoDefaultAction();
@@ -119,7 +177,7 @@ HRESULT SAccessible::get_accDefaultAction(VARIANT varChild, BSTR *pszDefaultActi
         return CO_E_OBJNOTCONNECTED;
     if (varChild.vt != VT_I4)
         return E_INVALIDARG;
-    SWindow *pChild = m_pWnd->GetChild(varChild.lVal);
+    SWindow *pChild = GetAccTarget(varChild);
     if (!pChild)
         return E_INVALIDARG;
     return pChild->GetAccProxy()->get_accDefaultAction(pszDefaultAction);
@@ -134,36 +192,46 @@ HRESULT SAccessible::accHitTest(long xLeft, long yTop, VARIANT *pvarChild)
     CPoint pt(xLeft, yTop);
     ScreenToClient(m_pWnd->GetContainer()->GetHostHwnd(), &pt);
     m_pWnd->TransformPointEx(pt);
-    SWindow *pChild = m_pWnd->GetWindow(GSW_LASTCHILD);
-    while (pChild)
+    int nCount = m_pWnd->GetAccProxy()->GetAccChildCount();
+    // z-order: child windows created later by SOUI are drawn on top (GSW_LASTCHILD is the topmost). Hit testing
+    // must traverse from the topmost down, otherwise the full-window background sibling nodes (bottom layer)
+    // appearing earlier in the XML will capture all hit points, and the real controls above them can never be
+    // returned by AccHitTest — keep consistent with the GSW_LASTCHILD→GSW_PREVSIBLING traversal direction of SwndFromPoint.
+    for (int i = nCount; i >= 1; i--)
     {
+        SWindow *pChild = (SWindow *)m_pWnd->GetAccProxy()->GetAccChild(i);
+        if (!pChild)
+            continue;
         CPoint pt2 = pt;
         pChild->TransformPoint(pt2);
         if (pChild->IsVisible(TRUE) && pChild->IsContainPoint(pt2, FALSE))
-            break;
-        pChild = pChild->GetWindow(GSW_PREVSIBLING);
+        {
+            pvarChild->vt = VT_I4;
+            pvarChild->lVal = i;
+            return S_OK;
+        }
     }
-    if (!pChild)
+    // Virtual (simple-element) children share the same object: check them too.
+    int vi = m_pWnd->GetAccProxy()->HitTestAccSubItem(pt.x, pt.y);
+    if (vi > 0)
     {
         pvarChild->vt = VT_I4;
-        pvarChild->lVal = CHILDID_SELF;
+        pvarChild->lVal = nCount + vi;
+        return S_OK;
     }
-    else
-    {
-        pvarChild->vt = VT_DISPATCH;
-        pChild->GetAccessible()->QueryInterface(IID_IDispatch, (void **)&pvarChild->pdispVal);
-    }
+    pvarChild->vt = VT_I4;
+    pvarChild->lVal = CHILDID_SELF;
     return S_OK;
 }
 
-// --------------------------------------------------------------------------
+//--------------------------------------------------------------------------
 //
-//  ValidateChild()
+/** ValidateChild() */
 //
-//  The window children are the OBJID_s of the elements that compose the
-//  frame.  These are NEGATIVE values.  Hence we override the validation.
+/** The window children are the OBJID_s of the elements that compose the */
+/** frame.  These are NEGATIVE values.  Hence we override the validation. */
 //
-// --------------------------------------------------------------------------
+//--------------------------------------------------------------------------
 BOOL SAccessible::accValidateNavStart(VARIANT *pvar) const
 {
     //
@@ -189,7 +257,7 @@ TryAgain:
         pvar->lVal = 0;
         break;
     case VT_I4:
-        if ((pvar->lVal < 0) || (pvar->lVal > (LONG)m_pWnd->GetChildrenCount()))
+        if ((pvar->lVal < 0) || (pvar->lVal > TotalChildCount()))
             return (FALSE);
         break;
 
@@ -208,12 +276,13 @@ HRESULT SAccessible::accNavigate(long navDir, VARIANT varStart, VARIANT *pvarEnd
         return CO_E_OBJNOTCONNECTED;
     HRESULT hr = E_INVALIDARG;
     pvarEndUpAt->vt = VT_EMPTY;
+    long total = TotalChildCount();
     if (!accValidateNavStart(&varStart))
         return hr;
     switch (navDir)
     {
     case NAVDIR_FIRSTCHILD:
-        if (m_pWnd->GetChildrenCount() == 0)
+        if (total == 0)
             break;
         if ((varStart.vt == VT_DISPATCH && varStart.pdispVal == NULL) || (varStart.vt == VT_I4 && varStart.lVal == CHILDID_SELF))
         {
@@ -223,12 +292,12 @@ HRESULT SAccessible::accNavigate(long navDir, VARIANT varStart, VARIANT *pvarEnd
         hr = S_OK;
         break;
     case NAVDIR_LASTCHILD:
-        if (m_pWnd->GetChildrenCount() == 0)
+        if (total == 0)
             break;
         if ((varStart.vt == VT_DISPATCH && varStart.pdispVal == NULL) || (varStart.vt == VT_I4 && varStart.lVal == CHILDID_SELF))
         {
             pvarEndUpAt->vt = VT_I4;
-            pvarEndUpAt->lVal = m_pWnd->GetChildrenCount();
+            pvarEndUpAt->lVal = total;
         }
         hr = S_OK;
         break;
@@ -252,11 +321,11 @@ HRESULT SAccessible::accNavigate(long navDir, VARIANT varStart, VARIANT *pvarEnd
         }
         else if (varStart.vt == VT_I4)
         {
-            if (m_pWnd->GetChildrenCount() == 0)
+            if (total == 0)
                 break;
             pvarEndUpAt->vt = VT_I4;
             pvarEndUpAt->lVal = varStart.lVal + 1;
-            if (pvarEndUpAt->lVal > (int)m_pWnd->GetChildrenCount())
+            if (pvarEndUpAt->lVal > total)
                 pvarEndUpAt->lVal = 1;
             hr = S_OK;
         }
@@ -281,12 +350,12 @@ HRESULT SAccessible::accNavigate(long navDir, VARIANT varStart, VARIANT *pvarEnd
         }
         else if (varStart.vt == VT_I4)
         {
-            if (m_pWnd->GetChildrenCount() == 0)
+            if (total == 0)
                 break;
             pvarEndUpAt->vt = VT_I4;
             pvarEndUpAt->lVal = varStart.lVal - 1;
             if (pvarEndUpAt->lVal < 1)
-                pvarEndUpAt->lVal = m_pWnd->GetChildrenCount();
+                pvarEndUpAt->lVal = total;
             hr = S_OK;
         }
         break;
@@ -300,11 +369,25 @@ HRESULT SAccessible::accLocation(long *pxLeft, long *pyTop, long *pcxWidth, long
         return CO_E_OBJNOTCONNECTED;
     if (!(varChild.vt == VT_I4 && pxLeft && pyTop && pcxWidth && pcyHeight))
         return E_INVALIDARG;
-    SWindow *pChild = m_pWnd->GetChild(varChild.lVal);
+    int vi = VirtualChildIndex(varChild);
+    if (vi > 0)
+    {
+        RECT rc;
+        m_pWnd->GetAccProxy()->GetAccSubItemRect(vi, &rc);
+        CPoint pt(rc.left, rc.top);
+        ClientToScreen(m_pWnd->GetContainer()->GetHostHwnd(), &pt);
+        *pxLeft = pt.x;
+        *pyTop = pt.y;
+        *pcxWidth = rc.right - rc.left;
+        *pcyHeight = rc.bottom - rc.top;
+        return S_OK;
+    }
+    SWindow *pChild = GetAccTarget(varChild);
     if (!pChild)
         return E_INVALIDARG;
 
     CRect rc = pChild->GetWindowRect();
+    pChild->GetContainer()->FrameToHost(&rc);
     CPoint pt = rc.TopLeft();
     ClientToScreen(m_pWnd->GetContainer()->GetHostHwnd(), &pt);
     *pxLeft = pt.x;
@@ -320,7 +403,10 @@ HRESULT SAccessible::accSelect(long flagsSelect, VARIANT varChild)
         return CO_E_OBJNOTCONNECTED;
     if (varChild.vt != VT_I4)
         return E_INVALIDARG;
-    SWindow *pChild = m_pWnd->GetChild(varChild.lVal);
+    int vi = VirtualChildIndex(varChild);
+    if (vi > 0)
+        return m_pWnd->GetAccProxy()->SetAccSubItemSel(vi);
+    SWindow *pChild = GetAccTarget(varChild);
     if (!pChild)
         return E_INVALIDARG;
 
@@ -329,7 +415,25 @@ HRESULT SAccessible::accSelect(long flagsSelect, VARIANT varChild)
 
 HRESULT SAccessible::get_accSelection(VARIANT *pvarChildren)
 {
-    return E_NOTIMPL;
+    if (!m_pWnd || !pvarChildren)
+        return E_INVALIDARG;
+    int d = m_pWnd->GetAccProxy()->GetAccSelIndex();
+    if (d <= 0)
+    {
+        // Fall back to the window proxy's selected sub-item (if any).
+        int vs = m_pWnd->GetAccProxy()->GetAccSubItemSel();
+        if (vs > 0)
+        {
+            pvarChildren->vt = VT_I4;
+            pvarChildren->lVal = RealChildCount() + vs;
+            return S_OK;
+        }
+        pvarChildren->vt = VT_EMPTY;
+        return S_FALSE;
+    }
+    pvarChildren->vt = VT_I4;
+    pvarChildren->lVal = d;
+    return S_OK;
 }
 
 HRESULT SAccessible::get_accFocus(VARIANT *pvarChild)
@@ -385,7 +489,14 @@ HRESULT SAccessible::get_accState(VARIANT varChild, VARIANT *pvarState)
         return CO_E_OBJNOTCONNECTED;
     if (varChild.vt != VT_I4)
         return E_INVALIDARG;
-    SWindow *pChild = m_pWnd->GetChild(varChild.lVal);
+    int vi = VirtualChildIndex(varChild);
+    if (vi > 0)
+    {
+        pvarState->vt = VT_I4;
+        pvarState->lVal = m_pWnd->GetAccProxy()->GetAccSubItemState(vi);
+        return S_OK;
+    }
+    SWindow *pChild = GetAccTarget(varChild);
     if (!pChild)
         return E_INVALIDARG;
 
@@ -398,7 +509,9 @@ STDMETHODIMP SAccessible::get_accHelp(VARIANT varChild, BSTR *pszHelp)
         return CO_E_OBJNOTCONNECTED;
     if (varChild.vt != VT_I4)
         return E_INVALIDARG;
-    SWindow *pChild = m_pWnd->GetChild(varChild.lVal);
+    if (VirtualChildIndex(varChild) > 0)
+        return E_INVALIDARG;
+    SWindow *pChild = GetAccTarget(varChild);
     if (!pChild)
         return E_INVALIDARG;
 
@@ -409,7 +522,9 @@ STDMETHODIMP SAccessible::get_accHelpTopic(BSTR *pszHelpFile, VARIANT varChild, 
 {
     if (varChild.vt != VT_I4)
         return E_INVALIDARG;
-    SWindow *pChild = m_pWnd->GetChild(varChild.lVal);
+    if (VirtualChildIndex(varChild) > 0)
+        return E_INVALIDARG;
+    SWindow *pChild = GetAccTarget(varChild);
     if (!pChild)
         return E_INVALIDARG;
 
@@ -422,7 +537,9 @@ STDMETHODIMP SAccessible::get_accKeyboardShortcut(VARIANT varChild, BSTR *pszKey
         return CO_E_OBJNOTCONNECTED;
     if (varChild.vt != VT_I4)
         return E_INVALIDARG;
-    SWindow *pChild = m_pWnd->GetChild(varChild.lVal);
+    if (VirtualChildIndex(varChild) > 0)
+        return E_INVALIDARG;
+    SWindow *pChild = GetAccTarget(varChild);
     if (!pChild)
         return E_INVALIDARG;
 
@@ -435,7 +552,14 @@ HRESULT SAccessible::get_accRole(VARIANT varChild, VARIANT *pvarRole)
         return CO_E_OBJNOTCONNECTED;
     if (varChild.vt != VT_I4)
         return E_INVALIDARG;
-    SWindow *pChild = m_pWnd->GetChild(varChild.lVal);
+    int vi = VirtualChildIndex(varChild);
+    if (vi > 0)
+    {
+        pvarRole->vt = VT_I4;
+        pvarRole->lVal = m_pWnd->GetAccProxy()->GetAccSubItemRole(vi);
+        return S_OK;
+    }
+    SWindow *pChild = GetAccTarget(varChild);
     if (!pChild)
         return E_INVALIDARG;
     IAccProxy *pAccProxy = pChild->GetAccProxy();
@@ -448,13 +572,15 @@ HRESULT SAccessible::get_accDescription(VARIANT varChild, BSTR *pszDescription)
         return CO_E_OBJNOTCONNECTED;
     if (varChild.vt != VT_I4)
         return E_INVALIDARG;
-    SWindow *pChild = m_pWnd->GetChild(varChild.lVal);
+    if (VirtualChildIndex(varChild) > 0)
+        return E_INVALIDARG;
+    SWindow *pChild = GetAccTarget(varChild);
     if (!pChild)
         return E_INVALIDARG;
     return pChild->GetAccProxy()->get_accDescription(pszDescription);
 }
 
-// Implement IDispatch
+/** Implement IDispatch */
 STDMETHODIMP SAccessible::GetTypeInfoCount(unsigned int *pctinfo)
 {
     return E_NOTIMPL;
@@ -476,5 +602,5 @@ STDMETHODIMP SAccessible::Invoke(DISPID dispIdMember, REFIID riid, LCID lcid, WO
 }
 
 #endif
-// SOUI_ENABLE_ACC
+/** SOUI_ENABLE_ACC */
 SNSEND

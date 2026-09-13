@@ -44,4 +44,4 @@ class SOUI_EXP SMemDC {
 };
 
 SNSEND
-#endif // __SMEMDC__H__
+#endif /**< __SMEMDC__H__ */

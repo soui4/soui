@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-/* ITimelineHandlersMgr interface macros */
+/** ITimelineHandlersMgr interface macros */
 #define ITimelineHandlersMgr_RegisterTimelineHandler(This, pHandler) \
     ((This)->lpVtbl->RegisterTimelineHandler(This, pHandler))
 
@@ -24,4 +24,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __STIMELINEHANDLERSMGR_CAPI_H__ */
+#endif /**< __STIMELINEHANDLERSMGR_CAPI_H__ */

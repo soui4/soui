@@ -6,12 +6,12 @@
 
 SNSBEGIN
 
-// Forward declaration of SHostWnd class
+/** Forward declaration of SHostWnd class */
 class SHostWnd;
 
 #ifdef _WIN32
 
-// Structure to hold information for SUpdateLayeredWindowIndirect function
+/** Structure to hold information for SUpdateLayeredWindowIndirect function */
 struct S_UPDATELAYEREDWINDOWINFO;
 
 /**
@@ -35,7 +35,7 @@ class SWndSurface {
     static BOOL SUpdateLayeredWindowIndirect(HWND hWnd, const S_UPDATELAYEREDWINDOWINFO *pULWInfo);
 };
 
-#endif // _WIN32
+#endif /**< _WIN32 */
 
 /**
  * @brief Presenter class for the host window.
@@ -43,7 +43,7 @@ class SWndSurface {
  */
 class SOUI_EXP SHostPresenter : public TObjRefImpl<IHostPresenter> {
   protected:
-    // Pointer to the host window
+    /** Pointer to the host window */
     SHostWnd *m_pHostWnd;
 
   public:
@@ -96,4 +96,4 @@ class SOUI_EXP SHostPresenter : public TObjRefImpl<IHostPresenter> {
 
 SNSEND
 
-#endif // _SHOSTPRESENTER_H_
+#endif /**< _SHOSTPRESENTER_H_ */

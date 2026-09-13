@@ -168,6 +168,7 @@ void OhosPlatformAPI::init(napi_env env, napi_value bridge, napi_value ctx) {
     m_mGetFocus                   = cacheMethod(env, bridge, "getFocus");
     m_mShowSoftKeyboard           = cacheMethod(env, bridge, "showSoftKeyboard");
     m_mPlaySound                  = cacheMethod(env, bridge, "playSound");
+    m_mMessageBeep                = cacheMethod(env, bridge, "messageBeep");
     m_mScheduleMessageProcessing  = cacheMethod(env, bridge, "scheduleMessageProcessing");
     m_mGetTempPath                = cacheMethod(env, bridge, "getTempPath");
     m_mGetSpecialFolderPath       = cacheMethod(env, bridge, "getSpecialFolderPath");
@@ -830,6 +831,17 @@ BOOL OhosPlatformAPI::playSound(LPCSTR pszSound, HMODULE hmod, DWORD fdwSound) {
     bool ok = false;
     if (r && napi_get_value_bool(m_env, r, &ok) == napi_ok) return ok ? TRUE : FALSE;
     return FALSE;
+}
+
+BOOL OhosPlatformAPI::messageBeep(UINT uType) {
+    if (!m_env || !m_mMessageBeep) return FALSE;
+    // 即发即忘语义（对齐 Win32"声音已入队即返回 TRUE"）。
+    // 用跨线程安全的 invokeBridge 而非 callBridge：MessageBeep 可能被 swinx 的工作线程调用，
+    // 而 callBridge 对非 JS 线程的调用只会记日志并静默丢弃。waitMs=0 表示投递后不等待结果。
+    BridgeArg arg = BridgeArg::fromInt64((int64_t)uType);
+    bool queued = invokeBridge(m_mMessageBeep, std::vector<BridgeArg>{ arg },
+                               BridgeRetType::Bool, nullptr, 0);
+    return queued ? TRUE : FALSE;
 }
 
 // ============================================================

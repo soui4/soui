@@ -18,26 +18,26 @@ SNSBEGIN
 
 /**
  * @enum _SLOTTYPE
- * @brief 定义了事件槽的类型
+ * @brief Defines the types of event slots
  */
 enum _SLOTTYPE
 {
-    SLOT_FUN,        ///< 自由函数槽
-    SLOT_STDFUNCTOR, ///< 标准函数对象槽
-    SLOT_MEMBER,     ///< 成员函数槽
-    SLOT_USER        ///< 用户自定义槽
+    SLOT_FUN,        /**<  Free function slot */
+    SLOT_STDFUNCTOR, /**<  Standard function object slot */
+    SLOT_MEMBER,     /**<  Member function slot */
+    SLOT_USER        /**<  User-defined slot */
 };
 
 /**
  * @class FreeFunctionSlot
- * @brief 通过自由函数指针回调的槽函数类
+ * @brief Slot class invoked via free function pointer callback
  */
 class FreeFunctionSlot : public TObjRefImpl<IEvtSlot> {
   public:
     /**
-     * @brief 构造函数
-     * @param func 自由函数指针
-     * @param ctx 上下文指针
+     * @brief Constructor
+     * @param func free function pointer
+     * @param ctx context pointer
      */
     FreeFunctionSlot(FunCallback func, void *ctx)
         : d_function(func)
@@ -46,9 +46,9 @@ class FreeFunctionSlot : public TObjRefImpl<IEvtSlot> {
     }
 
     /**
-     * @brief 运行槽函数
-     * @param pArg 事件参数对象
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Run the slot function
+     * @param pArg event argument object
+     * @return Returns TRUE on success, FALSE on failure
      */
     STDMETHOD_(BOOL, Run)(THIS_ IEvtArgs *pArg) OVERRIDE
     {
@@ -56,8 +56,8 @@ class FreeFunctionSlot : public TObjRefImpl<IEvtSlot> {
     }
 
     /**
-     * @brief 克隆槽函数对象
-     * @return 克隆的槽函数对象指针
+     * @brief Clone the slot function object
+     * @return pointer to the cloned slot function object
      */
     STDMETHOD_(IEvtSlot *, Clone)(THIS) SCONST OVERRIDE
     {
@@ -65,9 +65,9 @@ class FreeFunctionSlot : public TObjRefImpl<IEvtSlot> {
     }
 
     /**
-     * @brief 比较两个槽函数对象是否相等
-     * @param sour 源槽函数对象指针
-     * @return 相等返回TRUE，不相等返回FALSE
+     * @brief Compare whether two slot function objects are equal
+     * @param sour source slot function object pointer
+     * @return Returns TRUE if equal, FALSE otherwise
      */
     STDMETHOD_(BOOL, Equal)(THIS_ const IEvtSlot *sour) SCONST OVERRIDE
     {
@@ -79,8 +79,8 @@ class FreeFunctionSlot : public TObjRefImpl<IEvtSlot> {
     }
 
     /**
-     * @brief 获取槽函数类型
-     * @return 槽函数类型
+     * @brief Get the slot function type
+     * @return slot function type
      */
     STDMETHOD_(UINT, GetSlotType)(THIS) SCONST OVERRIDE
     {
@@ -88,8 +88,8 @@ class FreeFunctionSlot : public TObjRefImpl<IEvtSlot> {
     }
 
   private:
-    FunCallback d_function; ///< 自由函数指针
-    void *d_ctx;            ///< 上下文指针
+    FunCallback d_function; /**<  Free function pointer */
+    void *d_ctx;            /**<  Context pointer */
 };
 
 #if ENABLE_STDFUNCTOR
@@ -97,13 +97,13 @@ typedef std::function<BOOL(IEvtArgs *)> StdFunCallback;
 
 /**
  * @class StdFunctionSlot
- * @brief 通过标准函数对象回调的槽函数类
+ * @brief Slot class invoked via standard function object callback
  */
 class StdFunctionSlot : public TObjRefImpl<IEvtSlot> {
   public:
     /**
-     * @brief 构造函数
-     * @param fun 标准函数对象
+     * @brief Constructor
+     * @param fun standard function object
      */
     StdFunctionSlot(const StdFunCallback &fun)
         : d_function(fun)
@@ -111,9 +111,9 @@ class StdFunctionSlot : public TObjRefImpl<IEvtSlot> {
     }
 
     /**
-     * @brief 运行槽函数
-     * @param pArg 事件参数对象
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Run the slot function
+     * @param pArg event argument object
+     * @return Returns TRUE on success, FALSE on failure
      */
     STDMETHOD_(BOOL, Run)(THIS_ IEvtArgs *pArg) OVERRIDE
     {
@@ -121,8 +121,8 @@ class StdFunctionSlot : public TObjRefImpl<IEvtSlot> {
     }
 
     /**
-     * @brief 克隆槽函数对象
-     * @return 克隆的槽函数对象指针
+     * @brief Clone the slot function object
+     * @return pointer to the cloned slot function object
      */
     STDMETHOD_(IEvtSlot *, Clone)(THIS) SCONST OVERRIDE
     {
@@ -130,23 +130,23 @@ class StdFunctionSlot : public TObjRefImpl<IEvtSlot> {
     }
 
     /**
-     * @brief 比较两个槽函数对象是否相等
-     * @param sour 源槽函数对象指针
-     * @return 相等返回TRUE，不相等返回FALSE
+     * @brief Compare whether two slot function objects are equal
+     * @param sour source slot function object pointer
+     * @return Returns TRUE if equal, FALSE otherwise
      */
     STDMETHOD_(BOOL, Equal)(THIS_ const IEvtSlot *sour) SCONST OVERRIDE
     {
         SASSERT(sour);
         if (sour->GetSlotType() != SLOT_STDFUNCTOR)
             return FALSE;
-        // Note: as we don't know how to compare two std::function objects, here just return TRUE.
-        // Such a behavior will make it impossible to subscribe an event with two different slots.
+        /** Note: as we don't know how to compare two std::function objects, here just return TRUE. */
+        /** Such a behavior will make it impossible to subscribe an event with two different slots. */
         return TRUE;
     }
 
     /**
-     * @brief 获取槽函数类型
-     * @return 槽函数类型
+     * @brief Get the slot function type
+     * @return slot function type
      */
     STDMETHOD_(UINT, GetSlotType)(THIS) SCONST OVERRIDE
     {
@@ -154,28 +154,28 @@ class StdFunctionSlot : public TObjRefImpl<IEvtSlot> {
     }
 
   private:
-    StdFunCallback d_function; ///< 标准函数对象
+    StdFunCallback d_function; /**<  Standard function object */
 };
-#endif // ENABLE_STDFUNCTOR
+#endif /**< ENABLE_STDFUNCTOR */
 
 /**
  * @class MemberFunctionSlot
- * @brief 通过类成员函数回调的槽函数类模板
- * @tparam T 类型
- * @tparam A 事件参数类型
+ * @brief Slot class template invoked via class member function callback
+ * @tparam T type
+ * @tparam A event argument type
  */
 template <typename T, typename A>
 class MemberFunctionSlot : public TObjRefImpl<IEvtSlot> {
   public:
     /**
-     * @brief 成员函数槽类型
+     * @brief Member function slot type
      */
     typedef BOOL (T::*MemberFunctionType)(A *);
 
     /**
-     * @brief 构造函数
-     * @param func 成员函数指针
-     * @param obj 对象指针
+     * @brief Constructor
+     * @param func member function pointer
+     * @param obj object pointer
      */
     MemberFunctionSlot(MemberFunctionType func, T *obj)
         : d_function(func)
@@ -184,9 +184,9 @@ class MemberFunctionSlot : public TObjRefImpl<IEvtSlot> {
     }
 
     /**
-     * @brief 运行槽函数
-     * @param pArg 事件参数对象
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Run the slot function
+     * @param pArg event argument object
+     * @return Returns TRUE on success, FALSE on failure
      */
     STDMETHOD_(BOOL, Run)(THIS_ IEvtArgs *pArg) OVERRIDE
     {
@@ -194,8 +194,8 @@ class MemberFunctionSlot : public TObjRefImpl<IEvtSlot> {
     }
 
     /**
-     * @brief 克隆槽函数对象
-     * @return 克隆的槽函数对象指针
+     * @brief Clone the slot function object
+     * @return pointer to the cloned slot function object
      */
     STDMETHOD_(IEvtSlot *, Clone)(THIS) SCONST OVERRIDE
     {
@@ -203,9 +203,9 @@ class MemberFunctionSlot : public TObjRefImpl<IEvtSlot> {
     }
 
     /**
-     * @brief 比较两个槽函数对象是否相等
-     * @param sour 源槽函数对象指针
-     * @return 相等返回TRUE，不相等返回FALSE
+     * @brief Compare whether two slot function objects are equal
+     * @param sour source slot function object pointer
+     * @return Returns TRUE if equal, FALSE otherwise
      */
     STDMETHOD_(BOOL, Equal)(THIS_ const IEvtSlot *sour) SCONST OVERRIDE
     {
@@ -218,8 +218,8 @@ class MemberFunctionSlot : public TObjRefImpl<IEvtSlot> {
     }
 
     /**
-     * @brief 获取槽函数类型
-     * @return 槽函数类型
+     * @brief Get the slot function type
+     * @return slot function type
      */
     STDMETHOD_(UINT, GetSlotType)(THIS) SCONST OVERRIDE
     {
@@ -227,20 +227,20 @@ class MemberFunctionSlot : public TObjRefImpl<IEvtSlot> {
     }
 
   private:
-    MemberFunctionType d_function; ///< 成员函数指针
-    T *d_object;                   ///< 对象指针
+    MemberFunctionType d_function; /**<  Member function pointer */
+    T *d_object;                   /**<  Object pointer */
 };
 
 template <typename T, typename A = IEvtArgs>
 class MemberFunctionSlot;
 
 /**
- * @brief 创建成员函数槽对象
- * @tparam T 类型
- * @tparam A 事件参数类型
- * @param pFn 成员函数指针
- * @param pObject 对象指针
- * @return 成员函数槽对象
+ * @brief Create a member function slot object
+ * @tparam T type
+ * @tparam A event argument type
+ * @param pFn member function pointer
+ * @param pObject object pointer
+ * @return member function slot object
  */
 template <class T, class A>
 MemberFunctionSlot<T, A> Subscriber(BOOL (T::*pFn)(A *), T *pObject)
@@ -249,10 +249,10 @@ MemberFunctionSlot<T, A> Subscriber(BOOL (T::*pFn)(A *), T *pObject)
 }
 
 /**
- * @brief 创建自由函数槽对象
- * @param pFn 自由函数指针
- * @param ctx 上下文指针
- * @return 自由函数槽对象
+ * @brief Create a free function slot object
+ * @param pFn free function pointer
+ * @param ctx context pointer
+ * @return free function slot object
  */
 inline FreeFunctionSlot Subscriber(FunCallback pFn, void *ctx)
 {
@@ -260,4 +260,4 @@ inline FreeFunctionSlot Subscriber(FunCallback pFn, void *ctx)
 }
 
 SNSEND
-#endif // __SEVENTSLOT__H__
+#endif /**< __SEVENTSLOT__H__ */

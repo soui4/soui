@@ -51,9 +51,8 @@ struct IModalViewExitCallback : public IObjRef
      * @brief Called when the modal view session has finished (exit animation completed).
      * @param pModalRoot The modal root window that is exiting.
      */
-    virtual void OnModalViewExit(SModalRoot* pModalRoot) = 0;
+    virtual void OnModalViewExit(SModalRoot *pModalRoot) = 0;
 };
-
 
 /**
  * @brief Full-screen container for a single modal view session.
@@ -70,20 +69,23 @@ struct IModalViewExitCallback : public IObjRef
  * SHostWnd manages the modal stack and uses IModalViewExitCallback internally
  * to handle cleanup after the exit animation completes.
  */
-class SOUI_EXP SModalRoot : public SWindow
-{
+class SOUI_EXP SModalRoot : public SWindow {
     DEF_SOBJECT(SWindow, L"modalroot")
     friend class SHostWnd;
-	friend class SModalView;
-public:
+    friend class SModalView;
+
+  public:
     SModalRoot();
     ~SModalRoot();
 
-public:
+  public:
     /**
      * @brief Returns the session ID bound to this modal root.
      */
-    ModalViewSessionID GetSessionID() const { return m_sessionID; }
+    ModalViewSessionID GetSessionID() const
+    {
+        return m_sessionID;
+    }
 
     /**
      * @brief Returns the first SModalView child, or NULL if none found.
@@ -91,7 +93,7 @@ public:
      * Also returns any SModalView-compatible SWindow that has name
      * L"modalview" if a direct SModalView subclass is not used.
      */
-    SModalView* GetModalView() const;
+    SModalView *GetModalView() const;
 
     /**
      * @brief Initiates the modal view session exit process.
@@ -102,8 +104,9 @@ public:
      * @param pCb Optional callback invoked when exit animation completes.
      * @param exitCode The exit code to pass to subscribers of EventExitModalView.
      */
-    void EndModalViewSession(IModalViewExitCallback * pCb,int exitCode);
-public:
+    void EndModalViewSession(IModalViewExitCallback *pCb, int exitCode);
+
+  public:
     SOUI_ATTRS_BEGIN()
         ATTR_BOOL(L"quitOnClick", m_bQuitOnClick, FALSE)
     SOUI_ATTRS_END()
@@ -112,7 +115,7 @@ public:
     SOUI_MSG_MAP_BEGIN()
         MSG_WM_KEYDOWN(OnKeyDown)
     SOUI_MSG_MAP_END()
-protected:
+  protected:
     /**
      * @brief Assigns a session id (called exclusively by SHostWnd when the
      *        root is pushed onto the modal stack).
@@ -139,14 +142,14 @@ protected:
      * Invokes the exit callback (if set) and completes the session cleanup.
      */
     void OnFinish();
-protected:
-    ModalViewSessionID           m_sessionID;        ///< Session ID bound to this root; 0 if unattached.
-    BOOL                         m_bQuitOnClick;     ///< If TRUE, clicking background dismisses modal view.
-    SAutoRefPtr<IModalViewExitCallback> m_exitCallback; ///< Callback invoked when exit animation completes.
-    int                          m_exitCode;         ///< Exit code to pass to EventExitModalView subscribers.
-    static ModalViewSessionID    s_sessionIDCounter; ///< Global counter for generating unique session IDs.
-};
 
+  protected:
+    ModalViewSessionID m_sessionID;                     /**<  Session ID bound to this root; 0 if unattached. */
+    BOOL m_bQuitOnClick;                                /**<  If TRUE, clicking background dismisses modal view. */
+    SAutoRefPtr<IModalViewExitCallback> m_exitCallback; /**<  Callback invoked when exit animation completes. */
+    int m_exitCode;                                     /**<  Exit code to pass to EventExitModalView subscribers. */
+    static ModalViewSessionID s_sessionIDCounter;       /**<  Global counter for generating unique session IDs. */
+};
 
 /**
  * @brief Visible dialog area for a single modal view session.
@@ -159,16 +162,15 @@ protected:
  * destruction until `exitAnimation` completes so the user can observe the
  * fade/scale-out.
  */
-class SOUI_EXP SModalView : public SWindow
-{
+class SOUI_EXP SModalView : public SWindow {
     DEF_SOBJECT(SWindow, L"modalview")
     friend class SHostWnd;
 
-public:
+  public:
     SModalView();
     ~SModalView();
 
-public:
+  public:
     /**
      * @brief Requests the enter animation to be played.
      *
@@ -184,26 +186,28 @@ public:
      * the session cleanup.
      */
     void PlayExitAnimation();
-protected:
-    SWND SwndFromPoint(CPoint& pt, BOOL bIncludeMsgTransparent) const override;
+
+  protected:
+    SWND SwndFromPoint(CPoint &pt, BOOL bIncludeMsgTransparent) const override;
     STDMETHOD_(void, OnAnimationStop)(THIS_ IAnimation *pAni) OVERRIDE;
 
     /**
      * @brief Returns the parent SModalRoot that contains this view.
      * @return Pointer to the parent SModalRoot, or NULL if not found.
      */
-    SModalRoot* GetModalRoot() const;
-public:
+    SModalRoot *GetModalRoot() const;
+
+  public:
     SOUI_ATTRS_BEGIN()
         ATTR_ANIMATION(L"enterAnimation", m_aniEnter, FALSE)
-        ATTR_ANIMATION(L"exitAnimation",  m_aniExit,  FALSE)
+        ATTR_ANIMATION(L"exitAnimation", m_aniExit, FALSE)
     SOUI_ATTRS_END()
 
-protected:
-    SAutoRefPtr<IAnimation> m_aniEnter; ///< Show/enter animation.
-    SAutoRefPtr<IAnimation> m_aniExit;  ///< Hide/exit animation.
+  protected:
+    SAutoRefPtr<IAnimation> m_aniEnter; /**<  Show/enter animation. */
+    SAutoRefPtr<IAnimation> m_aniExit;  /**<  Hide/exit animation. */
 };
 
 SNSEND
 
-#endif // __SMODALVIEWSESSION__H__
+#endif /**< __SMODALVIEWSESSION__H__ */

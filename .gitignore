@@ -73,3 +73,5 @@ ios/
 /.lock_cleanup
 /demos/ohos-demo/.clang-tidy
 /demos/ohos-demo/.clangd
+/.workbuddy
+/.trae

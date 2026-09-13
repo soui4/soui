@@ -2,17 +2,17 @@
 #define _SAPP_CFG_H_
 
 #include <SApp.h>
-#include <commgr2.h>    //define SCOM_MASK to select components
+#include <commgr2.h>    /**< define SCOM_MASK to select components */
 #include <SouiFactory.h>
 #include <helper/slog.h>
 #include <resprovider-7zip/zip7resprovider-param.h>
 #include <resprovider-zip/zipresprovider-param.h>
 #ifdef __ANDROID__
 #include <android/asset_manager.h>
-#endif//__ANDROID__
+#endif /**< __ANDROID__ */
 #ifdef __OHOS__
 #include <rawfile/raw_file_manager.h>
-#endif//__OHOS__
+#endif /**< __OHOS__ */
 SNSBEGIN
 
 
@@ -33,13 +33,13 @@ typedef enum _ImgDecoder
 typedef enum _ResType
 {
     ResType_Unknown = 0,
-    ResType_ResFile,  // 资源文件
-    ResType_PeHandle, // 资源模块
-    ResType_PeFile,   // 资源模块名称
-    ResType_ZipFile,  // zip压缩包
-    ResType_7zFile,   // 7z压缩包
-    ResType_AndroidAsset,// android assets
-    ResType_OhosRawFile, // ohos rawfile
+    ResType_ResFile,  /**< Resource file */
+    ResType_PeHandle, /**< Resource module */
+    ResType_PeFile,   /**< Resource module name */
+    ResType_ZipFile,  /**< zip archive */
+    ResType_7zFile,   /**< 7z archive */
+    ResType_AndroidAsset, /**< android assets */
+    ResType_OhosRawFile, /**< ohos rawfile */
 } ResType;
 
 
@@ -64,7 +64,7 @@ protected:
     BOOL m_enableScript;
     
 public:
-    // C++版本的链式调用方法，返回引用
+    /** C++ style chained call method, returns reference */
     SAppCfg & SetRender(Render render);
     SAppCfg & SetImgDecoder(ImgDecoder decoder);
     SAppCfg & SetSysResPeHandle(HMODULE hResModule);
@@ -80,11 +80,11 @@ public:
 #ifdef __ANDROID__
     SAppCfg& SetSysResAndroidAsset(AAssetManager* assetMgr, LPCTSTR pszPath);
     SAppCfg& SetAppResAndroidAsset(AAssetManager* assetMgr, LPCTSTR pszPath);
-#endif//__ANDROID__
+#endif /**< __ANDROID__ */
 #ifdef __OHOS__
     SAppCfg& SetSysResOhosRawFile(NativeResourceManager* resMgr, LPCTSTR pszPath);
     SAppCfg& SetAppResOhosRawFile(NativeResourceManager* resMgr, LPCTSTR pszPath);
-#endif//__OHOS__
+#endif /**< __OHOS__ */
     SAppCfg & SetUidefId(const SStringT &strUidefId);
     SAppCfg & SetLog(BOOL bLogEnable, int nLogLevel = LOG_LEVEL_INFO, LPCSTR pszLogName = NULL);
     SAppCfg & SetAppDir(LPCTSTR pszAppDir);
@@ -97,32 +97,32 @@ public:
 class SResDesc {
   public:
     ResType m_type;
-    SStringT m_szFile;    // 资源文件名
-    SStringA m_szPwd;     // 压缩包密码
-    HMODULE m_hResModule; // 资源模块句柄
+    SStringT m_szFile;    /**< Resource file name */
+    SStringA m_szPwd;     /**< Archive password */
+    HMODULE m_hResModule; /**< Resource module handle */
 #ifdef __ANDROID__
     AAssetManager *m_assetMgr;
-#endif//__ANDROID__
+#endif /**< __ANDROID__ */
 #ifdef __OHOS__
     NativeResourceManager *m_rawFileMgr;
-#endif//__OHOS__
+#endif /**< __OHOS__ */
     SResDesc()
     {
         m_type = ResType_Unknown;
         m_hResModule = NULL;
 #ifdef __ANDROID__
         m_assetMgr = NULL;
-#endif//__ANDROID__
+#endif // __ANDROID__
 #ifdef __OHOS__
         m_rawFileMgr = NULL;
-#endif//__OHOS__
+#endif // __OHOS__
     }
 };
 
 class SSlogDesc {
   public:
     BOOL m_bLogEnable;
-    SStringA m_strLogName; // default set to app_name
+    SStringA m_strLogName; /**< default set to app_name */
     int m_nLogLevel;
     SSlogDesc()
     {
@@ -151,10 +151,10 @@ class SResLoader {
     BOOL LoadResFromRes(HMODULE hResModule);
 #ifdef __ANDROID__
     BOOL LoadResFromAndroidAsset(AAssetManager *assetMgr, LPCTSTR pszPath);
-#endif//__ANDROID__
+#endif /**< __ANDROID__ */
 #ifdef __OHOS__
     BOOL LoadResFromOhosRawFile(NativeResourceManager *resMgr, LPCTSTR pszPath);
-#endif//__OHOS__
+#endif /**< __OHOS__ */
     SAutoRefPtr<IResProvider> GetResProvider(void) const
     {
         return m_pResProvider;
@@ -226,7 +226,7 @@ BOOL SResLoader::LoadResFromAndroidAsset(AAssetManager *assetMgr, LPCTSTR pszPat
     m_pResProvider.Attach(souiFac.CreateResProvider(RES_ANDROID_ASSET));
     return m_pResProvider->Init((WPARAM)assetMgr, (LPARAM)pszPath);
 }
-#endif//__ANDROID__
+#endif /**< __ANDROID__ */
 
 #ifdef __OHOS__
 BOOL SResLoader::LoadResFromOhosRawFile(NativeResourceManager *resMgr, LPCTSTR pszPath)
@@ -235,7 +235,7 @@ BOOL SResLoader::LoadResFromOhosRawFile(NativeResourceManager *resMgr, LPCTSTR p
     m_pResProvider.Attach(souiFac.CreateResProvider(RES_OHOS_RAWFILE));
     return m_pResProvider->Init((WPARAM)resMgr, (LPARAM)pszPath);
 }
-#endif//__OHOS__
+#endif /**< __OHOS__ */
 //-------------------------------------------------------------
 
 SAppCfg::SAppCfg()
@@ -262,7 +262,7 @@ SAppCfg ::~SAppCfg(void)
         delete m_langDesc;
 }
 
-// C++版本的链式调用方法实现
+/** C++ style chained call method implementation */
 SAppCfg &SAppCfg::SetRender(Render render)
 {
     m_render = render;
@@ -507,12 +507,12 @@ BOOL SAppCfg::DoConfig(SApplication *pApp) const
         case ResType_AndroidAsset:
             bLoaded = resLoader.LoadResFromAndroidAsset(m_sysResDesc->m_assetMgr, m_sysResDesc->m_szFile);
             break;
-#endif//__ANDROID__
+#endif // __ANDROID__
 #ifdef __OHOS__
         case ResType_OhosRawFile:
             bLoaded = resLoader.LoadResFromOhosRawFile(m_sysResDesc->m_rawFileMgr, m_sysResDesc->m_szFile);
             break;
-#endif//__OHOS__
+#endif // __OHOS__
         default:
             SSLOGW() << "Invalid system resource type: " << m_sysResDesc->m_type;
             break;
@@ -580,7 +580,7 @@ BOOL SAppCfg::DoConfig(SApplication *pApp) const
     }
     if (m_logDesc->m_bLogEnable)
     {
-        SAutoRefPtr<ILogMgr> pLogMgr; // log4z对象
+        SAutoRefPtr<ILogMgr> pLogMgr; // log4z object
         if (SResLoader::GetComMgr()->CreateLog4z((IObjRef **)&pLogMgr) && pLogMgr)
         {
             // uncomment next line to disable log mgr to output debug string.
@@ -597,7 +597,7 @@ BOOL SAppCfg::DoConfig(SApplication *pApp) const
         SAutoRefPtr<ITranslatorMgr> trans;
         BOOL bLoaded = SResLoader::GetComMgr()->CreateTranslator((IObjRef **)&trans);
         if (trans && bLoaded)
-        { //加载语言翻译包
+        { // Load language translation package
             pApp->SetTranslator(trans);
             SXmlDoc xmlLang;
             if (pApp->LoadXmlDocment(xmlLang, m_langDesc->langResId))
@@ -624,4 +624,4 @@ BOOL SAppCfg::DoConfig(SApplication *pApp) const
 
 SNSEND
 
-#endif//_SAPP_CFG_H_
+#endif /**< _SAPP_CFG_H_ */

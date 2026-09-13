@@ -256,7 +256,7 @@ class SOUI_EXP SUiDef
      * @brief Retrieves a template node by name.
      * @param strName Name of the template.
      * @return XML node containing the template, or an invalid node if not found.
-    */
+     */
     SXmlNode GetTemplate(const SStringW &strName) const;
 
     /**
@@ -352,14 +352,14 @@ class SOUI_EXP SUiDef
     void InitThemeColors(SXmlNode xmlColors);
 
   protected:
-    SAutoRefPtr<IUiDefInfo> m_defUiDefInfo;   // Default UI definition information
-    SList<IUiDefInfo *> m_lstUiDefInfo;       // List of UI definition information objects
-    SList<ISkinPool *> m_lstSkinPools;        // List of skin pools
-    SAutoRefPtr<ISkinPool> m_bulitinSkinPool; // Built-in skin pool
-    SNamedColor m_themeColor;                 // Theme color pool
-    mutable SCriticalSection m_cs;            // Critical section for thread safety
+    SAutoRefPtr<IUiDefInfo> m_defUiDefInfo;   /**< Default UI definition information */
+    SList<IUiDefInfo *> m_lstUiDefInfo;       /**< List of UI definition information objects */
+    SList<ISkinPool *> m_lstSkinPools;        /**< List of skin pools */
+    SAutoRefPtr<ISkinPool> m_bulitinSkinPool; /**< Built-in skin pool */
+    SNamedColor m_themeColor;                 /**< Theme color pool */
+    mutable SCriticalSection m_cs;            /**< Critical section for thread safety */
 };
 
 SNSEND
 
-#endif // __SUIDEF__H__
+#endif /**< __SUIDEF__H__ */

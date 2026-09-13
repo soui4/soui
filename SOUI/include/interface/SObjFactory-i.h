@@ -17,44 +17,44 @@ SNSBEGIN
 DECLARE_INTERFACE_(IObjectFactory, IObjRef)
 {
     /**
-     * @brief 增加引用计数
-     * @return long - 新引用计数
+     * @brief Increment reference count
+     * @return long - new reference count
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief 减少引用计数
-     * @return long - 新引用计数
+     * @brief Decrement reference count
+     * @return long - new reference count
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief 释放对象
+     * @brief Release object
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
     /**
-     * @brief 创建新对象
-     * @return IObject* - 新创建的对象指针
+     * @brief Create new object
+     * @return IObject* - pointer to newly created object
      */
     STDMETHOD_(IObject *, NewObject)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 获取基类名称
-     * @return LPCWSTR - 基类名称
+     * @brief Get base class name
+     * @return LPCWSTR - base class name
      */
     STDMETHOD_(LPCWSTR, BaseClassName)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 获取对象信息
-     * @return SObjectInfo - 对象信息结构体
+     * @brief Get object info
+     * @return SObjectInfo - object info structure
      */
     STDMETHOD_(void, GetObjectInfo)(CTHIS_ SObjectInfo * info) SCONST PURE;
 
     /**
-     * @brief 克隆对象工厂
-     * @return IObjectFactory* - 克隆的对象工厂指针
+     * @brief Clone object factory
+     * @return IObjectFactory* - pointer to cloned object factory
      */
     STDMETHOD_(IObjectFactory *, Clone)(CTHIS) SCONST PURE;
 };
@@ -62,4 +62,4 @@ SNSEND
 
 EXTERN_C SOUI_EXP void ObjInfo_New(SObjectInfo *pInfo, LPCWSTR name, int type, LPCWSTR alise);
 EXTERN_C SOUI_EXP BOOL ObjInfo_IsValid(const SObjectInfo *pObjInfo);
-#endif // __SOBJFACTORY_I__H__
+#endif /**< __SOBJFACTORY_I__H__ */

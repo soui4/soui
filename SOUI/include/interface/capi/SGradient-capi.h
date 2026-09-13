@@ -7,13 +7,13 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for SGradient Interface
  * These macros provide C-style function call syntax for C++ interface methods
  * IGradient inherits from IObject.
  */
 
-/* IObject base interface macros */
+/** IObject base interface macros */
 #define IGradient_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -74,7 +74,7 @@ extern "C" {
 #define IGradient_SetAttrHandler(This, attrHandler) \
     ((This)->lpVtbl->SetAttrHandler(This, attrHandler))
 
-/* IGradient specific interface macros */
+/** IGradient specific interface macros */
 #define IGradient_GetGradientData(This) \
     ((This)->lpVtbl->GetGradientData(This))
 
@@ -85,4 +85,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SGRADIENT_CAPI_H__ */
+#endif /**< __SGRADIENT_CAPI_H__ */

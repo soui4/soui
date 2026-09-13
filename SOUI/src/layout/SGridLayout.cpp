@@ -5,31 +5,31 @@ SNSBEGIN
 
 /**
  * @class GridLayoutState
- * @brief 网格布局的状态对象，用于存储测量/布局过程中的临时状态变量
+ * @brief State object for grid layout, used to store temporary state variables during measurement/layout
  */
 class GridLayoutState {
   public:
-    // 单元格信息
-    CSize *pCellsSize;              // 每个cell的大小
-    bool *pCellsOccupy;             // cell占用标记
-    SGridLayoutParam **pCellsParam; // cell的布局参数
-    IWindow **pCellsChild;          // cell的窗口指针
-    int *pCellsColSpan;             // cell的列跨度
-    int *pCellsRowSpan;             // cell的行跨度
+    /** Cell info */
+    CSize *pCellsSize;              /**< Size of each cell */
+    bool *pCellsOccupy;             /**< Cell occupancy flag */
+    SGridLayoutParam **pCellsParam; /**< Cell layout params */
+    IWindow **pCellsChild;          /**< Cell window pointer */
+    int *pCellsColSpan;             /**< Cell column span */
+    int *pCellsRowSpan;             /**< Cell row span */
 
-    // 行列信息
-    float *pRowsHeight;          // 每行的高度
-    float *pColsWidth;           // 每列的宽度
-    float *pRowsWeight;          // 每行的权重
-    float *pColsWeight;          // 每列的权重
-    bool *pCols_WeightAllocated; // 列的权重是否被分配
-    bool *pRows_WeightAllocated; // 行的权重是否被分配
+    /** Row/column info */
+    float *pRowsHeight;          /**< Height of each row */
+    float *pColsWidth;           /**< Width of each column */
+    float *pRowsWeight;          /**< Weight of each row */
+    float *pColsWeight;          /**< Weight of each column */
+    bool *pCols_WeightAllocated; /**< Whether column weight has been allocated */
+    bool *pRows_WeightAllocated; /**< Whether row weight has been allocated */
 
-    int nCols; // 列数
-    int nRows; // 行数
+    int nCols; /**< Column count */
+    int nRows; /**< Row count */
 
     /**
-     * @brief 分配状态对象的内存
+     * @brief Allocate memory for the state object
      */
     GridLayoutState(int cols, int rows)
     {
@@ -91,11 +91,11 @@ class GridLayoutState {
 
   private:
     /**
-     * @brief 初始化状态对象的所有字段
+     * @brief Initialize all fields of the state object
      */
     void Initialize()
     {
-        // 初始化单元格数组
+        // Initialize cell array
         for (int i = 0; i < nCols * nRows; i++)
         {
             pCellsOccupy[i] = false;
@@ -106,7 +106,7 @@ class GridLayoutState {
             pCellsRowSpan[i] = 0;
         }
 
-        // 初始化行数组
+        // Initialize row array
         for (int i = 0; i < nRows; i++)
         {
             pRowsHeight[i] = 0;
@@ -114,7 +114,7 @@ class GridLayoutState {
             pRows_WeightAllocated[i] = false;
         }
 
-        // 初始化列数组
+        // Initialize column array
         for (int i = 0; i < nCols; i++)
         {
             pColsWidth[i] = 0;
@@ -297,7 +297,7 @@ void *SGridLayoutParam::GetRawData()
 ILayoutParam *SGridLayoutParam::Clone() const
 {
     SGridLayoutParam *pRet = new SGridLayoutParam();
-    memcpy(pRet->GetRawData(), (void*)(SGridLayoutParamStruct *)this, sizeof(SGridLayoutParamStruct));
+    memcpy(pRet->GetRawData(), (void *)(SGridLayoutParamStruct *)this, sizeof(SGridLayoutParamStruct));
     return pRet;
 }
 
@@ -316,7 +316,7 @@ BOOL SGridLayoutParam::SetAnimatorValue(IPropertyValuesHolder *pHolder, float fr
     }
     return FALSE;
 }
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 SGridLayout::SGridLayout(void)
     : m_GravityX(gCenter)
     , m_GravityY(gCenter)
@@ -341,11 +341,11 @@ ILayoutParam *SGridLayout::CreateLayoutParam() const
 }
 
 /**
- * MeasureChildren 计算gridlayout的子窗口大小
- * 参考Android GridLayout的设计，采用两遍测量方法
+ * MeasureChildren computes the size of gridlayout's child windows
+ * Following Android GridLayout's design, uses a two-pass measurement approach
  *
- * 第一遍：测量所有子元素的自然大小（wrap_content）
- * 第二遍（可选）：根据权重分配剩余空间
+ * Pass 1: measure the natural size of all children (wrap_content)
+ * Pass 2 (optional): distribute remaining space according to weights
  */
 SIZE SGridLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeight) const
 {
@@ -368,10 +368,10 @@ SIZE SGridLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeigh
     if (yInter < 0)
         yInter = 0;
 
-    // 创建并初始化状态对象
+    // Create and initialize the state object
     GridLayoutState state(nCols, nRows);
 
-    // 创建别名以保持代码兼容性
+    // Create an alias to maintain code compatibility
     CSize *&pCellsSize = state.pCellsSize;
     bool *&pCellsOccupy = state.pCellsOccupy;
     SGridLayoutParam **&pCellsParam = state.pCellsParam;
@@ -385,7 +385,7 @@ SIZE SGridLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeigh
     bool *&pCols_WeightAllocated = state.pCols_WeightAllocated;
     bool *&pRows_WeightAllocated = state.pRows_WeightAllocated;
 
-    // 第一遍：测量所有子元素，不加约束
+    // Pass 1: measure all children without constraints
     int iRow = 0, iCol = 0;
     const IWindow *pCell = pParent->GetNextLayoutIChild(NULL);
 
@@ -402,7 +402,7 @@ SIZE SGridLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeigh
         SASSERT(colSpan >= 1);
         SASSERT(rowSpan >= 1);
 
-        // 找到下一个可用位置
+        // Find the next available position
         while (iRow < nRows && pCellsOccupy[iRow * nCols + iCol])
         {
             if (m_orientation == Horz)
@@ -428,11 +428,11 @@ SIZE SGridLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeigh
         if (iRow >= nRows || iCol >= nCols)
             break;
 
-        // 调整span，确保不超出边界
+        // Adjust span to ensure it stays within bounds
         colSpan = smin(colSpan, nCols - iCol);
         rowSpan = smin(rowSpan, nRows - iRow);
 
-        // 检查跨度是否有冲突，有冲突则减少跨度
+        // Check for span conflicts; if conflict, reduce span
         for (int y = 0; y < rowSpan; y++)
             for (int x = 0; x < colSpan; x++)
             {
@@ -446,24 +446,24 @@ SIZE SGridLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeigh
                 }
             }
 
-        // 测量子元素，应用单元格约束
+        // Measure child, apply cell constraints
         CSize szCell(SIZE_WRAP_CONTENT, SIZE_WRAP_CONTENT);
         int nScale = ((IWindow *)pCell)->GetScale();
 
-        // 应用width/height约束
+        // Apply width/height constraints
         if (pLayoutParam->width.isSpecifiedSize())
             szCell.cx = pLayoutParam->width.toPixelSize(nScale);
         if (pLayoutParam->height.isSpecifiedSize())
             szCell.cy = pLayoutParam->height.toPixelSize(nScale);
 
         ((IWindow *)pCell)->GetDesiredSize(&szCell, szCell.cx, szCell.cy);
-        // 记录cell的信息
+        // Record cell info
         pCellsChild[iRow * nCols + iCol] = (IWindow *)pCell;
         pCellsParam[iRow * nCols + iCol] = (SGridLayoutParam *)pLayoutParam;
         pCellsColSpan[iRow * nCols + iCol] = colSpan;
         pCellsRowSpan[iRow * nCols + iCol] = rowSpan;
 
-        // 标记占用并存储大小
+        // Mark occupancy and store size
         for (int y = 0; y < rowSpan; y++)
             for (int x = 0; x < colSpan; x++)
             {
@@ -475,7 +475,7 @@ SIZE SGridLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeigh
                 }
             }
 
-        // 更新行列的最大尺寸和权重（使用float以保留精度）
+        // Update row/column max size and weight (use float to preserve precision)
         float cellWidth = (float)szCell.cx / colSpan;
         float cellHeight = (float)szCell.cy / rowSpan;
         float fColWeight = pLayoutParam->fColWeight / colSpan;
@@ -496,7 +496,7 @@ SIZE SGridLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeigh
                 pRowsWeight[iRow + y] = fRowWeight;
         }
 
-        // 移到下一个cell
+        // Move to the next cell
         if (m_orientation == Horz)
         {
             iCol++;
@@ -519,7 +519,7 @@ SIZE SGridLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeigh
         pCell = pParent->GetNextLayoutIChild(pCell);
     }
 
-    // 第二遍：计算总尺寸
+    // Pass 2: calculate total size
     float totalWidth = 0.0f;
     float totalHeight = 0.0f;
 
@@ -532,8 +532,8 @@ SIZE SGridLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeigh
     totalWidth += xInter * (nCols - 1);
     totalHeight += yInter * (nRows - 1);
 
-    // 处理权重分配（如果父容器有约束）
-    bool bColWeightAllocated = false; // 标记列是否进行了权重分配
+    // Handle weight distribution (if parent container has constraints)
+    bool bColWeightAllocated = false; // Mark whether the column had weight distribution
     if (nWidth > 0)
     {
         float totalColWeight = 0.0f;
@@ -550,13 +550,13 @@ SIZE SGridLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeigh
                 {
                     float extra = remainSpace * pColsWeight[i] / totalColWeight;
                     pColsWidth[i] += extra;
-                    pCols_WeightAllocated[i] = true; // 标记该列参与了分配
+                    pCols_WeightAllocated[i] = true; // Mark this column as participating in distribution
                     remainSpace -= extra;
                     totalColWeight -= pColsWeight[i];
                 }
             }
 
-            // 重新计算总宽度
+            // Recalculate total width
             totalWidth = 0.0f;
             for (int x = 0; x < nCols; x++)
                 totalWidth += pColsWidth[x];
@@ -564,7 +564,7 @@ SIZE SGridLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeigh
         }
     }
 
-    bool bRowWeightAllocated = false; // 标记行是否进行了权重分配
+    bool bRowWeightAllocated = false; // Mark whether the row had weight distribution
 
     if (nHeight > 0)
     {
@@ -582,12 +582,12 @@ SIZE SGridLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeigh
                 {
                     float extra = remainSpace * pRowsWeight[i] / totalRowWeight;
                     pRowsHeight[i] += extra;
-                    pRows_WeightAllocated[i] = true; // 标记该行参与了分配
+                    pRows_WeightAllocated[i] = true; // Mark this row as participating in distribution
                     totalRowWeight -= pRowsWeight[i];
                 }
             }
 
-            // 重新计算总高度
+            // Recalculate total height
             totalHeight = 0;
             for (int y = 0; y < nRows; y++)
                 totalHeight += pRowsHeight[y];
@@ -595,15 +595,15 @@ SIZE SGridLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeigh
         }
     }
 
-    // 第三遍：对于满足条件的单元格，用分配后的尺寸重新测量
-    // 条件：某方向的weight在Pass 2中参与了分配，且单元格那方向的weight不为0，另一方向是WRAP_CONTENT
+    // Pass 3: re-measure cells that meet the condition using the distributed size
+    // Condition: the weight in one direction was distributed in Pass 2, the cell's weight in that direction is non-zero, and the other direction is WRAP_CONTENT
     for (int y = 0; y < nRows; y++)
     {
         for (int x = 0; x < nCols; x++)
         {
             int iCell = y * nCols + x;
 
-            // 跳过非主cell
+            // Skip non-primary cells
             if (!pCellsChild[iCell])
                 continue;
 
@@ -613,11 +613,11 @@ SIZE SGridLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeigh
             int iCellColSpan = pCellsColSpan[iCell];
             int iCellRowSpan = pCellsRowSpan[iCell];
 
-            // 检查列的weight是否被分配了，且cell的colWeight不为0，height是WRAP_CONTENT
+            // Check whether the column's weight was distributed, the cell's colWeight is non-zero, and height is WRAP_CONTENT
             bool bColWeightMatched = false;
             if (bColWeightAllocated && pCell_Param->fColWeight > 0.0f && pCell_Param->height.isWrapContent())
             {
-                // 检查该cell所在列是否参与了weight分配
+                // Check whether the column containing this cell participated in weight distribution
                 for (int xx = 0; xx < iCellColSpan; xx++)
                 {
                     if (pCols_WeightAllocated[x + xx])
@@ -628,11 +628,11 @@ SIZE SGridLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeigh
                 }
             }
 
-            // 检查行的weight是否被分配了，且cell的rowWeight不为0，width是WRAP_CONTENT
+            // Check whether the row's weight was distributed, the cell's rowWeight is non-zero, and width is WRAP_CONTENT
             bool bRowWeightMatched = false;
             if (bRowWeightAllocated && pCell_Param->fRowWeight > 0.0f && pCell_Param->width.isWrapContent())
             {
-                // 检查该cell所在行是否参与了weight分配
+                // Check whether the row containing this cell participated in weight distribution
                 for (int yy = 0; yy < iCellRowSpan; yy++)
                 {
                     if (pRows_WeightAllocated[y + yy])
@@ -643,38 +643,38 @@ SIZE SGridLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeigh
                 }
             }
 
-            // 如果列权重被分配了，用分配的列宽重新测量高度
+            // If column weight was distributed, re-measure height using the distributed column width
             if (bColWeightMatched)
             {
-                // 计算这个cell分配到的总宽度
+                // Calculate the total width allocated to this cell
                 float cellWidth = 0;
                 for (int xx = 0; xx < iCellColSpan; xx++)
                     cellWidth += pColsWidth[x + xx];
                 cellWidth += xInter * (iCellColSpan - 1);
 
-                // 用新的宽度重新测量高度
+                // Re-measure height using the new width
                 CSize szCell_Remeasure((int)(cellWidth + 0.5f), SIZE_WRAP_CONTENT);
                 pCell_Wnd->GetDesiredSize(&szCell_Remeasure, szCell_Remeasure.cx, szCell_Remeasure.cy);
 
-                // 更新行高
+                // Update row height
                 float newCellHeight = (float)szCell_Remeasure.cy / iCellRowSpan;
                 pCellsSize[y * nCols + x].cy = (LONG)newCellHeight;
                 state.UpdateRowHeight(y);
             }
-            // 如果行权重被分配了，用分配的行高重新测量宽度
+            // If row weight was distributed, re-measure width using the distributed row height
             else if (bRowWeightMatched)
             {
-                // 计算这个cell分配到的总高度
+                // Calculate the total height allocated to this cell
                 float cellHeight = 0;
                 for (int yy = 0; yy < iCellRowSpan; yy++)
                     cellHeight += pRowsHeight[y + yy];
                 cellHeight += yInter * (iCellRowSpan - 1);
 
-                // 用新的高度重新测量宽度
+                // Re-measure width using the new height
                 CSize szCell_Remeasure(SIZE_WRAP_CONTENT, (int)(cellHeight + 0.5f));
                 pCell_Wnd->GetDesiredSize(&szCell_Remeasure, szCell_Remeasure.cx, szCell_Remeasure.cy);
 
-                // 更新列宽
+                // Update column width
                 float newCellWidth = (float)szCell_Remeasure.cx / iCellColSpan;
                 pCellsSize[y * nCols + x].cx = newCellWidth;
                 state.UpdateColWidth(x);
@@ -682,7 +682,7 @@ SIZE SGridLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeigh
         }
     }
 
-    // 重新计算总尺寸（在第三遍重新测量后）
+    // Recalculate total size (after pass 3 re-measurement)
     totalWidth = 0.0f;
     totalHeight = 0.0f;
     for (int x = 0; x < nCols; x++)
@@ -692,7 +692,7 @@ SIZE SGridLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeigh
     totalWidth += xInter * (nCols - 1);
     totalHeight += yInter * (nRows - 1);
 
-    // 确保结果不超过约束
+    // Ensure result does not exceed constraints
     if (nWidth > 0)
         totalWidth = smin(totalWidth, nWidth);
     if (nHeight > 0)
@@ -725,10 +725,10 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
     if (yInter < 0)
         yInter = 0;
 
-    // 创建并初始化状态对象
+    // Create and initialize the state object
     GridLayoutState state(nCols, nRows);
 
-    // 创建别名以保持代码兼容性
+    // Create an alias to maintain code compatibility
     bool *&pCellsOccupy = state.pCellsOccupy;
     IWindow **&pCellsChild = state.pCellsChild;
     SGridLayoutParam **&pCellsParam = state.pCellsParam;
@@ -742,7 +742,7 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
     bool *&pRows_WeightAllocated = state.pRows_WeightAllocated;
     CSize *&pCellsSize = state.pCellsSize;
 
-    // 第一遍：测量并记录所有子元素
+    // Pass 1: measure and record all children
     int iRow = 0, iCol = 0;
     IWindow *pCell = pParent->GetNextLayoutIChild(NULL);
 
@@ -759,7 +759,7 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
         SASSERT(colSpan >= 1);
         SASSERT(rowSpan >= 1);
 
-        // 找到下一个可用位置
+        // Find the next available position
         while (iRow < nRows && pCellsOccupy[iRow * nCols + iCol])
         {
             if (m_orientation == Horz)
@@ -785,11 +785,11 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
         if (iRow >= nRows || iCol >= nCols)
             break;
 
-        // 调整span
+        // Adjust span
         colSpan = smin(colSpan, nCols - iCol);
         rowSpan = smin(rowSpan, nRows - iRow);
 
-        // 检查冲突
+        // Check conflicts
         for (int y = 0; y < rowSpan; y++)
             for (int x = 0; x < colSpan; x++)
             {
@@ -803,27 +803,27 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
                 }
             }
 
-        // 测量子元素，应用单元格约束
+        // Measure child, apply cell constraints
         CSize szCell(SIZE_WRAP_CONTENT, SIZE_WRAP_CONTENT);
 
         int nScale = ((IWindow *)pCell)->GetScale();
 
-        // 应用width约束
+        // Apply width constraint
         if (pLayoutParam->width.isSpecifiedSize())
             szCell.cx = pLayoutParam->width.toPixelSize(nScale);
-        // 应用height约束
+        // Apply height constraint
         if (pLayoutParam->height.isSpecifiedSize())
             szCell.cy = pLayoutParam->height.toPixelSize(nScale);
 
         pCell->GetDesiredSize(&szCell, szCell.cx, szCell.cy);
 
-        // 记录cell信息
+        // Record cell info
         pCellsChild[iRow * nCols + iCol] = (IWindow *)pCell;
         pCellsParam[iRow * nCols + iCol] = pLayoutParam;
         pCellsColSpan[iRow * nCols + iCol] = colSpan;
         pCellsRowSpan[iRow * nCols + iCol] = rowSpan;
 
-        // 标记占用并存储大小
+        // Mark occupancy and store size
         for (int y = 0; y < rowSpan; y++)
             for (int x = 0; x < colSpan; x++)
             {
@@ -835,7 +835,7 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
                 }
             }
 
-        // 更新行列尺寸和权重（使用float以保留精度）
+        // Update row/column size and weight (use float to preserve precision)
         float cellWidth = (float)szCell.cx / colSpan;
         float cellHeight = (float)szCell.cy / rowSpan;
         float fColWeight = pLayoutParam->fColWeight / colSpan;
@@ -856,7 +856,7 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
                 pRowsWeight[iRow + y] = fRowWeight;
         }
 
-        // 移到下一个cell
+        // Move to the next cell
         if (m_orientation == Horz)
         {
             iCol++;
@@ -879,7 +879,7 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
         pCell = pParent->GetNextLayoutIChild(pCell);
     }
 
-    // 第二遍：处理权重分配
+    // Pass 2: handle weight distribution
     float totalWidth = 0.0f;
     float totalHeight = 0.0f;
 
@@ -889,8 +889,8 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
     for (int y = 0; y < nRows; y++)
         totalHeight += pRowsHeight[y];
 
-    // 权重分配（水平方向）
-    bool bColWeightAllocated = false; // 标记列是否进行了权重分配
+    // Weight distribution (horizontal)
+    bool bColWeightAllocated = false; // Mark whether the column had weight distribution
     float totalColWeight = 0.0f;
     for (int i = 0; i < nCols; i++)
         totalColWeight += pColsWeight[i];
@@ -907,7 +907,7 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
                 {
                     float extra = remainSpace * pColsWeight[i] / totalColWeight;
                     pColsWidth[i] += extra;
-                    pCols_WeightAllocated[i] = true; // 标记该列参与了分配
+                    pCols_WeightAllocated[i] = true; // Mark this column as participating in distribution
                     remainSpace -= extra;
                     totalColWeight -= pColsWeight[i];
                 }
@@ -915,8 +915,8 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
         }
     }
 
-    // 权重分配（垂直方向）
-    bool bRowWeightAllocated = false; // 标记行是否进行了权重分配
+    // Weight distribution (vertical)
+    bool bRowWeightAllocated = false; // Mark whether the row had weight distribution
     float totalRowWeight = 0.0f;
     for (int i = 0; i < nRows; i++)
         totalRowWeight += pRowsWeight[i];
@@ -933,7 +933,7 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
                 {
                     float extra = remainSpace * pRowsWeight[i] / totalRowWeight;
                     pRowsHeight[i] += extra;
-                    pRows_WeightAllocated[i] = true; // 标记该行参与了分配
+                    pRows_WeightAllocated[i] = true; // Mark this row as participating in distribution
                     remainSpace -= extra;
                     totalRowWeight -= pRowsWeight[i];
                 }
@@ -941,15 +941,15 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
         }
     }
 
-    // 第三遍：对于满足条件的单元格，用分配后的尺寸重新测量
-    // 条件：某方向的weight在Pass 2中参与了分配，且单元格那方向的weight不为0，另一方向是WRAP_CONTENT
+    // Pass 3: re-measure cells that meet the condition using the distributed size
+    // Condition: the weight in one direction was distributed in Pass 2, the cell's weight in that direction is non-zero, and the other direction is WRAP_CONTENT
     for (int y = 0; y < nRows; y++)
     {
         for (int x = 0; x < nCols; x++)
         {
             int iCell = y * nCols + x;
 
-            // 跳过非主cell
+            // Skip non-primary cells
             if (!pCellsChild[iCell])
                 continue;
 
@@ -959,11 +959,11 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
             int iCellColSpan = pCellsColSpan[iCell];
             int iCellRowSpan = pCellsRowSpan[iCell];
 
-            // 检查列的weight是否被分配了，且cell的colWeight不为0，height是WRAP_CONTENT
+            // Check whether the column's weight was distributed, the cell's colWeight is non-zero, and height is WRAP_CONTENT
             bool bColWeightMatched = false;
             if (bColWeightAllocated && pCell_Param->fColWeight > 0.0f && pCell_Param->height.isWrapContent())
             {
-                // 检查该cell所在列是否参与了weight分配
+                // Check whether the column containing this cell participated in weight distribution
                 for (int xx = 0; xx < iCellColSpan; xx++)
                 {
                     if (pCols_WeightAllocated[x + xx])
@@ -974,11 +974,11 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
                 }
             }
 
-            // 检查行的weight是否被分配了，且cell的rowWeight不为0，width是WRAP_CONTENT
+            // Check whether the row's weight was distributed, the cell's rowWeight is non-zero, and width is WRAP_CONTENT
             bool bRowWeightMatched = false;
             if (bRowWeightAllocated && pCell_Param->fRowWeight > 0.0f && pCell_Param->width.isWrapContent())
             {
-                // 检查该cell所在行是否参与了weight分配
+                // Check whether the row containing this cell participated in weight distribution
                 for (int yy = 0; yy < iCellRowSpan; yy++)
                 {
                     if (pRows_WeightAllocated[y + yy])
@@ -989,38 +989,38 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
                 }
             }
 
-            // 如果列权重被分配了，用分配的列宽重新测量高度
+            // If column weight was distributed, re-measure height using the distributed column width
             if (bColWeightMatched && pRowsWeight[y] == 0.f)
             {
-                // 计算这个cell分配到的总宽度
+                // Calculate the total width allocated to this cell
                 float cellWidth = 0;
                 for (int xx = 0; xx < iCellColSpan; xx++)
                     cellWidth += pColsWidth[x + xx];
                 cellWidth += xInter * (iCellColSpan - 1);
 
-                // 用新的宽度重新测量高度
+                // Re-measure height using the new width
                 CSize szCell_Remeasure((int)(cellWidth + 0.5f), SIZE_WRAP_CONTENT);
                 pCell_Wnd->GetDesiredSize(&szCell_Remeasure, szCell_Remeasure.cx, szCell_Remeasure.cy);
 
-                // 更新行高
+                // Update row height
                 float newCellHeight = (float)szCell_Remeasure.cy / iCellRowSpan;
                 pCellsSize[y * nCols + x].cy = (LONG)newCellHeight;
                 state.UpdateRowHeight(y);
             }
-            // 如果行权重被分配了，用分配的行高重新测量宽度
+            // If row weight was distributed, re-measure width using the distributed row height
             else if (bRowWeightMatched && pColsWeight[x] == 0.f)
             {
-                // 计算这个cell分配到的总高度
+                // Calculate the total height allocated to this cell
                 float cellHeight = 0;
                 for (int yy = 0; yy < iCellRowSpan; yy++)
                     cellHeight += pRowsHeight[y + yy];
                 cellHeight += yInter * (iCellRowSpan - 1);
 
-                // 用新的高度重新测量宽度
+                // Re-measure width using the new height
                 CSize szCell_Remeasure(SIZE_WRAP_CONTENT, (int)(cellHeight + 0.5f));
                 pCell_Wnd->GetDesiredSize(&szCell_Remeasure, szCell_Remeasure.cx, szCell_Remeasure.cy);
 
-                // 更新列宽
+                // Update column width
                 float newCellWidth = (float)szCell_Remeasure.cx / iCellColSpan;
                 pCellsSize[y * nCols + x].cx = newCellWidth;
                 state.UpdateColWidth(x);
@@ -1028,7 +1028,7 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
         }
     }
 
-    // 第四遍：计算和应用子窗口位置
+    // Pass 4: calculate and apply child window positions
     CPoint pt = rcParent.TopLeft();
 
     for (int y = 0; y < nRows; y++)
@@ -1037,7 +1037,7 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
         {
             int iCell = y * nCols + x;
 
-            // 跳过空cell或非主cell
+            // Skip empty cells or non-primary cells
             if (!pCellsChild[iCell] || pCellsColSpan[iCell] == 0)
             {
                 pt.x += (int)(pColsWidth[x] + 0.5f) + xInter;
@@ -1049,7 +1049,7 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
             int colSpan = pCellsColSpan[iCell];
             int rowSpan = pCellsRowSpan[iCell];
 
-            // 计算cell的总宽度和高度（从float转换为int）
+            // Calculate cell's total width and height (convert from float to int)
             float szCellWidthF = 0.0f;
             float szCellHeightF = 0.0f;
 
@@ -1062,9 +1062,9 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
             int szCellWidth = (int)(szCellWidthF + 0.5f) + xInter * (colSpan - 1);
             int szCellHeight = (int)(szCellHeightF + 0.5f) + yInter * (rowSpan - 1);
 
-            // 获取子元素的期望尺寸
+            // Get child's desired size
             CSize szDesired = *(pCellsSize + y * nCols + x);
-            // 应用对齐方式
+            // Apply alignment
             CPoint pt2 = pt;
 
             GridGravity gx = pLayoutParam->layoutGravityX;
@@ -1119,20 +1119,20 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
 }
 
 /**
- * 辅助方法：根据排列方向查找下一个可用的网格位置
- * @param pCellsOccupy 网格占用标记数组
- * @param nCols 列数
- * @param nRows 行数
- * @param iRow 当前行（输入/输出）
- * @param iCol 当前列（输入/输出）
- * @param orientation 排列方向
- * @return 是否找到可用位置
+ * Helper: find the next available grid position based on orientation
+ * @param pCellsOccupy Grid occupancy flag array
+ * @param nCols Number of columns
+ * @param nRows Number of rows
+ * @param iRow Current row (input/output)
+ * @param iCol Current column (input/output)
+ * @param orientation Orientation
+ * @return Whether an available position was found
  */
 static BOOL FindNextAvailableCell(bool *pCellsOccupy, int nCols, int nRows, int &iRow, int &iCol, ORIENTATION orientation)
 {
     if (orientation == Horz)
     {
-        // 水平排列：先在当前行查找，再到下面行从0开始查找
+        // Horizontal orientation: search in the current row first, then from 0 in the rows below
         bool bFind = false;
         for (int x = iCol + 1; x < nCols; x++)
         {
@@ -1157,7 +1157,7 @@ static BOOL FindNextAvailableCell(bool *pCellsOccupy, int nCols, int nRows, int 
     }
     else // GRID_LAYOUT_ORIENTATION_VERTICAL
     {
-        // 垂直排列：先在当前列查找，再到右面列从0开始查找
+        // Vertical orientation: search in the current column first, then from 0 in the columns to the right
         bool bFind = false;
         for (int y = iRow + 1; y < nRows; y++)
         {

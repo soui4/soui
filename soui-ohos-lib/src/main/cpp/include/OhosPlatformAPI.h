@@ -150,6 +150,11 @@ public:
     // 播放 WAV 文件，语义对齐 Win32 PlaySound / Android playSound
     BOOL playSound(LPCSTR pszSound, HMODULE hmod, DWORD fdwSound);
 
+    // 播放系统提示音，语义对齐 Win32 MessageBeep / Android messageBeep。
+    // 委托 ArkTS SouiPlatformBridge.messageBeep(uType)：由 AudioPlayer 用 AudioRenderer
+    // 现场合成提示音（鸿蒙 TonePlayer 属系统接口，第三方应用不可用）。
+    BOOL messageBeep(UINT uType);
+
     // ---- 路径：getCacheDir / getFilesDir / getTempPath ----
 
     // 返回应用私有缓存目录（UTF-8），对应 platform_api getTempPathA
@@ -266,6 +271,7 @@ private:
     napi_ref m_mGetFocus{nullptr};
     napi_ref m_mShowSoftKeyboard{nullptr};
     napi_ref m_mPlaySound{nullptr};               // playSound(path, fdwSound): boolean
+    napi_ref m_mMessageBeep{nullptr};             // messageBeep(uType): boolean
     napi_ref m_mScheduleMessageProcessing{nullptr};
     napi_ref m_mGetTempPath{nullptr};
     napi_ref m_mGetSpecialFolderPath{nullptr};

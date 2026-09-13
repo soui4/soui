@@ -43,366 +43,366 @@ typedef ITaskLoop *(*FunCrateTaskLoop)();
 DECLARE_INTERFACE_(IApplication, IObjRef)
 {
     /**
-     * @brief 添加引用
-     * @return long -- 引用计数
+     * @brief Add reference
+     * @return long -- reference count
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief 释放引用
-     * @return long -- 引用计数
+     * @brief Release reference
+     * @return long -- reference count
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief 释放对象
+     * @brief Release object
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
-    //////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief 获取当前app的hModule
-     * @return HMODULE -- 当前app的hModule
+     * @brief Get the current app's hModule
+     * @return HMODULE -- the current app's hModule
      */
     STDMETHOD_(HMODULE, GetModule)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 从指定的ResProvider里加载系统资源
-     * @param pResProvider IResProvider* -- 提供系统资源的资源包
-     * @return UINT -- 0: 成功, 其它: 失败
+     * @brief Load system resources from the specified ResProvider
+     * @param pResProvider IResProvider* -- the resource package providing system resources
+     * @return UINT -- 0: success, otherwise: failure
      */
     STDMETHOD_(UINT, LoadSystemNamedResource)(THIS_ IResProvider * pResProvider) PURE;
 
     /**
-     * @brief 获取翻译接口
-     * @return ITranslatorMgr* -- 翻译接口
+     * @brief Get the translation interface
+     * @return ITranslatorMgr* -- the translation interface
      */
     STDMETHOD_(ITranslatorMgr *, GetTranslator)(THIS) PURE;
 
     /**
-     * @brief 设置翻译接口
-     * @param pTrans ITranslatorMgr* -- 翻译接口
+     * @brief Set the translation interface
+     * @param pTrans ITranslatorMgr* -- the translation interface
      * @return void
      */
     STDMETHOD_(void, SetTranslator)(THIS_ ITranslatorMgr * pTrans) PURE;
 
     /**
-     * @brief 获取ToolTip类厂
-     * @return IToolTipFactory* -- ToolTip类厂
+     * @brief Get the ToolTip factory
+     * @return IToolTipFactory* -- the ToolTip factory
      */
     STDMETHOD_(IToolTipFactory *, GetToolTipFactory)(THIS) PURE;
 
     /**
-     * @brief 设置ToolTip类厂
-     * @param pToolTipFac IToolTipFactory* -- ToolTip类厂
+     * @brief Set the ToolTip factory
+     * @param pToolTipFac IToolTipFactory* -- the ToolTip factory
      * @return void
      */
     STDMETHOD_(void, SetToolTipFactory)(THIS_ IToolTipFactory * pToolTipFac) PURE;
 
     /**
-     * @brief 设置MsgLoop类厂
-     * @param pMsgLoopFac IMsgLoopFactory* -- MsgLoop类厂
-     * @return BOOL -- TRUE: 成功
+     * @brief Set the MsgLoop factory
+     * @param pMsgLoopFac IMsgLoopFactory* -- the MsgLoop factory
+     * @return BOOL -- TRUE: success
      */
     STDMETHOD_(BOOL, SetMsgLoopFactory)(THIS_ IMsgLoopFactory * pMsgLoopFac) PURE;
 
     /**
-     * @brief 获取当前的MsgLoop类厂
-     * @return IMsgLoopFactory* -- MsgLoop类厂
+     * @brief Get the current MsgLoop factory
+     * @return IMsgLoopFactory* -- the MsgLoop factory
      */
     STDMETHOD_(IMsgLoopFactory *, GetMsgLoopFactory)(THIS) PURE;
 
     /**
-     * @brief 设置日志输出模块
-     * @param pLogMgr ILogMgr* -- 日志输出模块
+     * @brief Set the log output module
+     * @param pLogMgr ILogMgr* -- the log output module
      * @return void
      */
     STDMETHOD_(void, SetLogManager)(THIS_ ILogMgr * pLogMgr) PURE;
 
     /**
-     * @brief 获取日志输出模块
-     * @return ILogMgr* -- 日志输出模块
+     * @brief Get the log output module
+     * @return ILogMgr* -- the log output module
      */
     STDMETHOD_(ILogMgr *, GetLogManager)(THIS) PURE;
 
     /**
-     * @brief 设置属性持久化类厂
-     * @param pAttrStorageFactory IAttrStorageFactory* -- 属性持久化类厂
+     * @brief Set the attribute persistence factory
+     * @param pAttrStorageFactory IAttrStorageFactory* -- the attribute persistence factory
      * @return void
      */
     STDMETHOD_(void, SetAttrStorageFactory)(THIS_ IAttrStorageFactory * pAttrStorageFactory) PURE;
 
     /**
-     * @brief 获取属性持久化类厂
-     * @return IAttrStorageFactory* -- 属性持久化类厂
+     * @brief Get the attribute persistence factory
+     * @return IAttrStorageFactory* -- the attribute persistence factory
      */
     STDMETHOD_(IAttrStorageFactory *, GetAttrStorageFactory)(THIS) PURE;
 
     /**
-     * @brief 进入消息循环运行程序
-     * @param hMainWnd HWND -- 主窗口句柄
-     * @return int -- 程序退出的返回值
+     * @brief Enter the message loop to run the program
+     * @param hMainWnd HWND -- main window handle
+     * @return int -- the program's exit return value
      */
     STDMETHOD_(int, Run)(THIS_ HWND hMainWnd) PURE;
 
     /**
-     * @brief 退出消息循环
-     * @param nCode int -- 线程退出代码
+     * @brief Exit the message loop
+     * @param nCode int -- thread exit code
      * @return void
      */
     STDMETHOD_(void, Quit)(THIS_ int nCode) PURE;
 
     /**
-     * @brief 获取程序主窗口
-     * @return HWND -- 在Run方法中设定的窗口
+     * @brief Get the program's main window
+     * @return HWND -- the window set in the Run method
      */
     STDMETHOD_(HWND, GetMainWnd)(THIS) PURE;
 
     /**
-     * @brief 将当前UI线程的msgLoop保存到SApp中
+     * @brief Save the current UI thread's msgLoop into SApp
      * @param pMsgLoop IMessageLoop* -- msgLoop
-     * @param bReplace BOOL -- 替换标志
-     * @return BOOL -- TRUE: 成功
+     * @param bReplace BOOL -- replace flag
+     * @return BOOL -- TRUE: success
      */
     STDMETHOD_(BOOL, AddMsgLoop)(THIS_ IMessageLoop * pMsgLoop, BOOL bReplace DEF_VAL(FALSE)) PURE;
 
     /**
-     * @brief 从SApp中删除当前线程的msgLoop
-     * @return BOOL -- TRUE: 成功
+     * @brief Remove the current thread's msgLoop from SApp
+     * @return BOOL -- TRUE: success
      */
     STDMETHOD_(BOOL, RemoveMsgLoop)(THIS) PURE;
 
     /**
-     * @brief 获取指定UI线程的msgLoop
-     * @param  tid -- 线程ID
-     * @return IMessageLoop* -- 指定线程的msgLoop
+     * @brief Get the specified UI thread's msgLoop
+     * @param  tid -- thread ID
+     * @return IMessageLoop* -- the msgLoop of the specified thread
      */
     STDMETHOD_(IMessageLoop *, GetMsgLoop)(CTHIS_ tid_t dwThreadID DEF_VAL(GetCurrentThreadId())) SCONST PURE;
 
     /**
-     * @brief 获取IResProviderMgr接口
-     * @return IResProviderMgr* -- IResProviderMgr接口
+     * @brief Get the IResProviderMgr interface
+     * @return IResProviderMgr* -- the IResProviderMgr interface
      */
     STDMETHOD_(IResProviderMgr *, GetResProviderMgr)(THIS) PURE;
 
     /**
-     * @brief 获取RealWndHandler
-     * @return IRealWndHandler* -- RealWndHandler
+     * @brief Get the RealWndHandler
+     * @return IRealWndHandler* -- the RealWndHandler
      */
     STDMETHOD_(IRealWndHandler *, GetRealWndHander)(THIS) PURE;
 
     /**
-     * @brief 设置RealWnd处理接口
-     * @param pRealHandler IRealWndHandler* -- RealWnd处理接口
+     * @brief Set the RealWnd handling interface
+     * @param pRealHandler IRealWndHandler* -- the RealWnd handling interface
      * @return void
      */
     STDMETHOD_(void, SetRealWndHandler)(THIS_ IRealWndHandler * pRealHandler) PURE;
 
     /**
-     * @brief 获取当前的渲染模块
-     * @return IRenderFactory* -- 渲染模块指针
+     * @brief Get the current render module
+     * @return IRenderFactory* -- render module pointer
      */
     STDMETHOD_(IRenderFactory *, GetRenderFactory)(THIS) PURE;
 
     /**
-     * @brief 设置渲染模块
-     * @param renderFac IRenderFactory* -- 渲染模块指针
-     * @return BOOL -- TRUE: 成功
+     * @brief Set the render module
+     * @param renderFac IRenderFactory* -- render module pointer
+     * @return BOOL -- TRUE: success
      */
     STDMETHOD_(BOOL, SetRenderFactory)(THIS_ IRenderFactory * renderFac) PURE;
 
     /**
-     * @brief 设置SOUI中使用的脚本模块类厂
-     * @param pScriptModule IScriptFactory* -- 脚本模块类厂
+     * @brief Set the script module factory used in SOUI
+     * @param pScriptModule IScriptFactory* -- the script module factory
      * @return void
      */
     STDMETHOD_(void, SetScriptFactory)(THIS_ IScriptFactory * pScriptModule) PURE;
 
     /**
-     * @brief 初始化XML资源的name-id映射表
-     * @param pNames const LPCWSTR* -- 控件名表
-     * @param nIds const int* -- 控件ID表
-     * @param nCount int -- 控件数量
+     * @brief Initialize the name-id mapping table for XML resources
+     * @param pNames const LPCWSTR* -- control name table
+     * @param nIds const int* -- control ID table
+     * @param nCount int -- control count
      * @return void
      */
     STDMETHOD_(void, InitXmlNamedID)(THIS_ const LPCWSTR *pNames, const int *nIds, int nCount) PURE;
 
     /**
-     * @brief 从资源ID加载XML
-     * @param strResId LPCTSTR -- 资源ID，为type:name格式
+     * @brief Load XML from a resource ID
+     * @param strResId LPCTSTR -- resource ID, in type:name format
      * @return IXmlDoc* -- XML Doc
      */
     STDMETHOD_(IXmlDoc *, LoadXmlDocment)(THIS_ LPCTSTR strResId) PURE;
     STDMETHOD_(IXmlDoc *, LoadXmlDocmentU8)(THIS_ LPCSTR strResId) PURE;
 
     /**
-     * @brief 从资源加载动画资源
-     * @param strResId LPCTSTR -- 动画资源ID
-     * @return IAnimation* -- 动画对象
+     * @brief Load an animation resource from resources
+     * @param strResId LPCTSTR -- animation resource ID
+     * @return IAnimation* -- animation object
      */
     STDMETHOD_(IAnimation *, LoadAnimation)(THIS_ LPCTSTR strResId) PURE;
     STDMETHOD_(IAnimation *, LoadAnimationU8)(THIS_ LPCSTR strResId) PURE;
 
     /**
-     * @brief 从资源加载数值动画资源
-     * @param strResId LPCTSTR -- 动画资源ID
-     * @return IValueAnimator* -- 数值动画对象
+     * @brief Load a value animator resource from resources
+     * @param strResId LPCTSTR -- animation resource ID
+     * @return IValueAnimator* -- value animator object
      */
     STDMETHOD_(IValueAnimator *, LoadValueAnimator)(THIS_ LPCTSTR strResId) PURE;
     STDMETHOD_(IValueAnimator *, LoadValueAnimatorU8)(THIS_ LPCSTR strResId) PURE;
 
     /**
-     * @brief 从资源加载图片
-     * @param strResId LPCTSTR -- 图片资源ID
-     * @return IBitmapS* -- 图片对象
+     * @brief Load an image from resources
+     * @param strResId LPCTSTR -- image resource ID
+     * @return IBitmapS* -- image object
      */
     STDMETHOD_(IBitmapS *, LoadImage)(THIS_ LPCTSTR strResId) PURE;
     STDMETHOD_(IBitmapS *, LoadImageU8)(THIS_ LPCSTR strResId) PURE;
 
     /**
-     * @brief 从资源加载翻译包
-     * @param strResId LPCTSTR -- 翻译包资源ID
-     * @return ITranslator* -- 翻译包对象
+     * @brief Load a translation package from resources
+     * @param strResId LPCTSTR -- translation package resource ID
+     * @return ITranslator* -- translation package object
      */
     STDMETHOD_(ITranslator *, LoadTranslator)(THIS_ LPCTSTR strResId) PURE;
     STDMETHOD_(ITranslator *, LoadTranslatorU8)(THIS_ LPCSTR strResId) PURE;
 
     /**
-     * @brief 使用翻译包
-     * @param trModule ITranslator* -- 翻译包
-     * @return BOOL -- TRUE: 成功
+     * @brief Use the translation package
+     * @param trModule ITranslator* -- the translation package
+     * @return BOOL -- TRUE: success
      */
     STDMETHOD_(BOOL, InstallTranslator)(THIS_ ITranslator * trModule) PURE;
 
     /**
-     * @brief 卸载翻译包
-     * @param langId REFGUID -- 翻译包ID
-     * @return BOOL -- TRUE: 成功
+     * @brief Unload the translation package
+     * @param langId REFGUID -- translation package ID
+     * @return BOOL -- TRUE: success
      */
     STDMETHOD_(BOOL, UnnstallTranslator)(THIS_ REFGUID langId) PURE;
 
     /**
-     * @brief 启用NotifyCenter
-     * @param bEnable BOOL -- 是否启用
-     * @param interval int -- 处理事件时间间隔
+     * @brief Enable NotifyCenter
+     * @param bEnable BOOL -- whether to enable
+     * @param interval int -- event processing interval
      * @return void
      */
     STDMETHOD_(void, EnableNotifyCenter)(THIS_ BOOL bEnable, int interval DEF_VAL(20)) PURE;
 
     /**
-     * @brief 获取SApp内部定义的几个单例对象
-     * @param type SingletonType -- 内部单例类型
-     * @return void* -- 单例类型指针
+     * @brief Get several singleton objects defined internally in SApp
+     * @param type SingletonType -- internal singleton type
+     * @return void* -- singleton type pointer
      */
     STDMETHOD_(void *, GetInnerSingleton)(THIS_ SingletonType type) PURE;
 
     /**
-     * @brief 创建对象
-     * @param pszName LPCWSTR -- 类型在XML中的名字
-     * @param nType SObjectType -- 类型ID
-     * @return IObject* -- 创建的类型
+     * @brief Create an object
+     * @param pszName LPCWSTR -- the type's name in XML
+     * @param nType SObjectType -- type ID
+     * @return IObject* -- the created type
      */
     STDMETHOD_(IObject *, CreateObject)(CTHIS_ LPCWSTR pszName, SObjectType nType) SCONST PURE;
 
     /**
-     * @brief 设置CreateObject的回调
-     * @param cbCreateObj FunCreateObject -- CreateObject的回调函数
+     * @brief Set the callback for CreateObject
+     * @param cbCreateObj FunCreateObject -- the callback function for CreateObject
      * @return void
      */
     STDMETHOD_(void, SetCreateObjectCallback)(THIS_ FunCreateObject cbCreateObj) PURE;
 
     /**
-     * @brief 注册扩展对象
-     * @param objFac const IObjectFactory* -- 对象类厂
-     * @param bReplace BOOL -- 替换已有类厂标志
-     * @return BOOL -- TRUE: 成功
+     * @brief Register an extension object
+     * @param objFac const IObjectFactory* -- object factory
+     * @param bReplace BOOL -- flag to replace an existing factory
+     * @return BOOL -- TRUE: success
      */
     STDMETHOD_(BOOL, RegisterObjFactory)(THIS_ const IObjectFactory *objFac, BOOL bReplace DEF_VAL(FALSE)) PURE;
 
     /**
-     * @brief 反注册扩展对象
-     * @param objFac const IObjectFactory* -- 对象类厂
-     * @return BOOL -- TRUE: 成功
+     * @brief Unregister an extension object
+     * @param objFac const IObjectFactory* -- object factory
+     * @return BOOL -- TRUE: success
      */
     STDMETHOD_(BOOL, UnregisterObjFactory)(THIS_ const IObjectFactory *objFac) PURE;
 
     /**
-     * @brief 设置默认字体
-     * @param pszFontInfo LPCWSTR -- 字体描述，参考fontpool
+     * @brief Set the default font
+     * @param pszFontInfo LPCWSTR -- font description, see fontpool
      * @return void
      */
     STDMETHOD_(void, SetDefaultFontInfo)(THIS_ LPCWSTR pszFontInfo) PURE;
 
     /**
-     * @brief 创建TaskLoop对象
-     * @param nCount int -- taskloop对象数量
-     * @param priority Priority -- taskloop的线程优先级
-     * @param bAutoStart BOOL -- 自动启动标志
-     * @return BOOL -- TRUE: 成功
+     * @brief Create TaskLoop objects
+     * @param nCount int -- number of taskloop objects
+     * @param priority Priority -- thread priority of taskloop
+     * @param bAutoStart BOOL -- auto-start flag
+     * @return BOOL -- TRUE: success
      */
     STDMETHOD_(BOOL, CreateTaskLoop)(THIS_ int nCount, Priority priority, BOOL bAutoStart DEF_VAL(TRUE)) PURE;
 
     /**
-     * @brief 获取TaskLoop对象
-     * @param iTaskLoop int -- taskloop索引
-     * @return ITaskLoop* -- taskloop接口，失败返回NULL
+     * @brief Get a TaskLoop object
+     * @param iTaskLoop int -- taskloop index
+     * @return ITaskLoop* -- taskloop interface, returns NULL on failure
      */
     STDMETHOD_(ITaskLoop *, GetTaskLoop)(THIS_ int iTaskLoop DEF_VAL(0)) PURE;
 
     /**
-     * @brief 设置创建TaskLoop对象的回调接口
-     * @param cbCreateTaskLoop FunCrateTaskLoop -- 创建TaskLoop对象的回调接口
+     * @brief Set the callback interface for creating TaskLoop objects
+     * @param cbCreateTaskLoop FunCrateTaskLoop -- the callback interface for creating TaskLoop objects
      * @return void
      */
     STDMETHOD_(void, SetCreateTaskLoopCallback)(THIS_ FunCrateTaskLoop cbCreateTaskLoop) PURE;
 
     /**
-     * @brief 创建脚本模块对象
-     * @param ppScriptModule IScriptModule** -- 脚本模块对象
-     * @return HRESULT -- S_OK: 创建成功
+     * @brief Create a script module object
+     * @param ppScriptModule IScriptModule** -- script module object
+     * @return HRESULT -- S_OK: created successfully
      */
     STDMETHOD_(HRESULT, CreateScriptModule)(THIS_ IScriptModule * *ppScriptModule) PURE;
 
     /**
-     * @brief 设置编辑上下文菜单模板资源ID
-     * @param resId LPCTSTR -- 资源ID
-     * @param pResProvider IResProvider* -- 资源提供者
-     * @return BOOL -- TRUE: 成功
+     * @brief Set the resource ID of the edit context menu template
+     * @param resId LPCTSTR -- resource ID
+     * @param pResProvider IResProvider* -- resource provider
+     * @return BOOL -- TRUE: success
      */
     STDMETHOD_(BOOL, SetEditCtxMenuTemplateResId)(THIS_ LPCTSTR resId, IResProvider * pResProvider DEF_VAL(NULL)) PURE;
 
     /**
-     * @brief 设置消息框模板资源ID
-     * @param resId LPCTSTR -- 资源ID
-     * @param pResProvider IResProvider* -- 资源提供者
-     * @return BOOL -- TRUE: 成功
+     * @brief Set the resource ID of the message box template
+     * @param resId LPCTSTR -- resource ID
+     * @param pResProvider IResProvider* -- resource provider
+     * @return BOOL -- TRUE: success
      */
     STDMETHOD_(BOOL, SetMessageBoxTemplateResId)(THIS_ LPCTSTR resId, IResProvider * pResProvider DEF_VAL(NULL)) PURE;
 
     /**
-     * @brief 设置属性别名获取接口
-     * @param pAttrAlias IAttrAlias* -- 属性别名接口
+     * @brief Set attribute alias retrieval interface
+     * @param pAttrAlias IAttrAlias* -- attribute alias interface
      * @return void
      */
     STDMETHOD_(void, SetAttrAlias)(THIS_ IAttrAlias * pAttrAlias) PURE;
 
     /**
-     * @brief 获取属性别名接口
-     * @return const IAttrAlias* -- 属性别名接口
+     * @brief Get the attribute alias interface
+     * @return const IAttrAlias* -- the attribute alias interface
      */
     STDMETHOD_(const IAttrAlias *, GetAttrAlias)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 获取对象的基类名称
-     * @param pszClassName LPCWSTR -- 对象类名
-     * @param objType int -- 对象类型
-     * @param pszBaseClassName[MAX_OBJNAME] wchar_t -- 基类名称
-     * @return BOOL -- TRUE: 成功
+     * @brief Get the base class name of an object
+     * @param pszClassName LPCWSTR -- object class name
+     * @param objType int -- object type
+     * @param pszBaseClassName[MAX_OBJNAME] wchar_t -- base class name
+     * @return BOOL -- TRUE: success
      */
     STDMETHOD_(BOOL, GetBaseClassName)(CTHIS_ LPCWSTR pszClassName, int objType, wchar_t pszBaseClassName[MAX_OBJNAME]) SCONST PURE;
 };
 
 SNSEND
-#endif // __SAPP_I__H__
+#endif /**< __SAPP_I__H__ */

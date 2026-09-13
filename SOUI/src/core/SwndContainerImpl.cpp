@@ -1,6 +1,6 @@
-﻿//////////////////////////////////////////////////////////////////////////
-//  Class Name: SwndContainerImpl
-//////////////////////////////////////////////////////////////////////////
+﻿///////////////////////////////////////////////////////////////////////
+/** Class Name: SwndContainerImpl */
+///////////////////////////////////////////////////////////////////////
 #include "souistd.h"
 #include <core/SWndContainerImpl.h>
 
@@ -9,7 +9,7 @@ SNSBEGIN
 #define WM_NCMOUSEFIRST WM_NCMOUSEMOVE
 #define WM_NCMOUSELAST  WM_NCMBUTTONDBLCLK
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 SwndContainerImpl::SwndContainerImpl()
     : m_hCapture(0)
     , m_hHover(0)
@@ -148,7 +148,7 @@ SWND SwndContainerImpl::GetHover() const
 
 void SwndContainerImpl::OnFrameMouseMove(UINT uFlag, CPoint pt)
 {
-    //处理trackMouseEvent属性
+    // Handle the trackMouseEvent attribute
     SPOSITION pos = m_lstTrackMouseEvtWnd.GetHeadPosition();
     while (pos)
     {
@@ -175,12 +175,12 @@ void SwndContainerImpl::OnFrameMouseMove(UINT uFlag, CPoint pt)
     }
     SWindow *pCapture = SWindowMgr::GetWindow(m_hCapture);
     if (pCapture)
-    { //有窗口设置了鼠标捕获,不需要判断是否有TrackMouseEvent属性,也不需要判断客户区与非客户区的变化
+    { // A window has set mouse capture; no need to check for the TrackMouseEvent attribute, nor to check changes between client and non-client areas
         pCapture->TransformPointEx(pt);
         SWindow *pHover = pCapture->IsContainPoint(pt, FALSE) ? pCapture : NULL;
         SWND hHover = pHover ? pHover->GetSwnd() : 0;
         if (hHover != m_hHover)
-        { //检测鼠标是否在捕获窗口间移动
+        { // Detect whether the mouse is moving between captured windows
             SWindow *pOldHover = SWindowMgr::GetWindow(m_hHover);
             m_hHover = hHover;
             if (pOldHover)
@@ -199,19 +199,19 @@ void SwndContainerImpl::OnFrameMouseMove(UINT uFlag, CPoint pt)
         pCapture->SSendMessage(m_uNcHitTest != HTCLIENT ? WM_NCMOUSEMOVE : WM_MOUSEMOVE, m_uNcHitTest != HTCLIENT ? m_uNcHitTest : uFlag, MAKELPARAM(pt.x, pt.y));
     }
     else
-    { //没有设置鼠标捕获
+    { // No mouse capture is set
         CPoint pt2 = pt;
         SWND hHover = m_pRoot->SwndFromPoint(pt2);
         SWindow *pHover = SWindowMgr::GetWindow(hHover);
         if (m_hHover != hHover)
-        { // hover窗口发生了变化
+        { // The hover window has changed
             SWindow *pOldHover = SWindowMgr::GetWindow(m_hHover);
             m_hHover = hHover;
             if (pOldHover)
             {
                 BOOL bLeave = TRUE;
                 if (pOldHover->GetStyle().m_bTrackMouseEvent)
-                { //对于有监视鼠标事件的窗口做特殊处理
+                { // Perform special handling for windows that monitor mouse events
                     CPoint pt3 = pt;
                     pOldHover->TransformPointEx(pt3);
                     bLeave = !pOldHover->IsContainPoint(pt3, FALSE);
@@ -232,7 +232,7 @@ void SwndContainerImpl::OnFrameMouseMove(UINT uFlag, CPoint pt)
             }
         }
         else if (pHover && !pHover->IsDisabled(TRUE))
-        { //窗口内移动，检测客户区和非客户区的变化
+        { // Movement within the window; detect changes between client and non-client areas
             UINT uNcHitTest = pHover->OnNcHitTest(pt2);
             if (uNcHitTest != m_uNcHitTest)
             {
@@ -272,7 +272,7 @@ void SwndContainerImpl::OnFrameMouseLeave()
         }
     }
 
-    //处理trackMouseEvent属性
+    // Handle the trackMouseEvent attribute
     SPOSITION pos = m_lstTrackMouseEvtWnd.GetHeadPosition();
     while (pos)
     {
@@ -311,8 +311,8 @@ void SwndContainerImpl::OnFrameMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lPara
     {
         if (m_uNcHitTest != HTCLIENT)
         {
-            uMsg += (UINT)WM_NCMOUSEFIRST - WM_MOUSEFIRST; //转换成NC对应的消息
-            wParam = m_uNcHitTest;                         // 使用m_uNcHitTest作为wparam
+            uMsg += (UINT)WM_NCMOUSEFIRST - WM_MOUSEFIRST; // Convert to the corresponding NC message
+            wParam = m_uNcHitTest;                         // Use m_uNcHitTest as wparam
         }
         BOOL bMsgHandled = FALSE;
         CPoint pt(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
@@ -331,8 +331,8 @@ void SwndContainerImpl::OnFrameMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lPara
             BOOL bMsgHandled = FALSE;
             if (m_uNcHitTest != HTCLIENT)
             {
-                uMsg += (UINT)WM_NCMOUSEFIRST - WM_MOUSEFIRST; //转换成NC对应的消息
-                wParam = m_uNcHitTest;                         // 使用m_uNcHitTest作为wparam
+                uMsg += (UINT)WM_NCMOUSEFIRST - WM_MOUSEFIRST; // Convert to the corresponding NC message
+                wParam = m_uNcHitTest;                         // Use m_uNcHitTest as wparam
             }
             lParam = MAKELPARAM(pt.x, pt.y);
             pHover->SSendMessage(uMsg, wParam, lParam, &bMsgHandled);
@@ -381,9 +381,9 @@ LRESULT SwndContainerImpl::OnFrameKeyEvent(UINT uMsg, WPARAM wParam, LPARAM lPar
     {
         UINT vKey = (UINT)wParam;
         if (vKey >= 'a' && vKey <= 'z')
-            vKey -= 0x20; //转换成VK
+            vKey -= 0x20; // Convert to VK
         if (m_focusMgr.OnKeyDown(vKey))
-            return lRet; //首先处理焦点切换
+            return lRet; // Handle focus switching first
     }
 
     SWindow *pFocus = SWindowMgr::GetWindow(m_focusMgr.GetFocusedHwnd());
@@ -403,7 +403,7 @@ LRESULT SwndContainerImpl::OnFrameKeyEvent(UINT uMsg, WPARAM wParam, LPARAM lPar
 void SwndContainerImpl::OnFrameKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
     if (m_focusMgr.OnKeyDown(nChar))
-        return; //首先处理焦点切换
+        return; // Handle focus switching first
 
     SWindow *pFocus = SWindowMgr::GetWindow(m_focusMgr.GetFocusedHwnd());
     if (pFocus)

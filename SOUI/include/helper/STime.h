@@ -7,173 +7,173 @@ SNSBEGIN
 
 /**
  * @class STimeSpan
- * @brief 时间间隔类
+ * @brief Time span class
  */
 class SOUI_EXP STimeSpan {
   public:
     /**
-     * @brief 默认构造函数
+     * @brief Default constructor
      */
     STimeSpan();
 
     /**
-     * @brief 构造函数，从时间间隔秒数初始化
-     * @param time 时间间隔秒数
+     * @brief Constructor, initialized from a time span in seconds
+     * @param time Time span in seconds
      */
     STimeSpan(__time64_t time);
 
     /**
-     * @brief 构造函数，从天、小时、分钟、秒初始化
-     * @param lDays 天数
-     * @param nHours 小时数
-     * @param nMins 分钟数
-     * @param nSecs 秒数
+     * @brief Constructor, initialized from days, hours, minutes, seconds
+     * @param lDays Number of days
+     * @param nHours Number of hours
+     * @param nMins Number of minutes
+     * @param nSecs Number of seconds
      */
     STimeSpan(LONG lDays, int nHours, int nMins, int nSecs);
 
     /**
-     * @brief 获取天数
-     * @return 天数
+     * @brief Get the number of days
+     * @return Number of days
      */
     LONGLONG GetDays() const;
 
     /**
-     * @brief 获取总小时数
-     * @return 总小时数
+     * @brief Get the total number of hours
+     * @return Total number of hours
      */
     LONGLONG GetTotalHours() const;
 
     /**
-     * @brief 获取小时数
-     * @return 小时数
+     * @brief Get the number of hours
+     * @return Number of hours
      */
     LONG GetHours() const;
 
     /**
-     * @brief 获取总分钟数
-     * @return 总分钟数
+     * @brief Get the total number of minutes
+     * @return Total number of minutes
      */
     LONGLONG GetTotalMinutes() const;
 
     /**
-     * @brief 获取分钟数
-     * @return 分钟数
+     * @brief Get the number of minutes
+     * @return Number of minutes
      */
     LONG GetMinutes() const;
 
     /**
-     * @brief 获取总秒数
-     * @return 总秒数
+     * @brief Get the total number of seconds
+     * @return Total number of seconds
      */
     LONGLONG GetTotalSeconds() const;
 
     /**
-     * @brief 获取秒数
-     * @return 秒数
+     * @brief Get the number of seconds
+     * @return Number of seconds
      */
     LONG GetSeconds() const;
 
     /**
-     * @brief 获取时间间隔秒数
-     * @return 时间间隔秒数
+     * @brief Get the time span in seconds
+     * @return Time span in seconds
      */
     __time64_t GetTimeSpan() const;
 
     /**
-     * @brief 加法运算符重载
-     * @param span 时间间隔对象
-     * @return 新的时间间隔对象
+     * @brief Addition operator overload
+     * @param span Time span object
+     * @return New time span object
      */
     STimeSpan operator+(STimeSpan span) const;
 
     /**
-     * @brief 减法运算符重载
-     * @param span 时间间隔对象
-     * @return 新的时间间隔对象
+     * @brief Subtraction operator overload
+     * @param span Time span object
+     * @return New time span object
      */
     STimeSpan operator-(STimeSpan span) const;
 
     /**
-     * @brief 加法赋值运算符重载
-     * @param span 时间间隔对象
-     * @return 当前时间间隔对象的引用
+     * @brief Addition-assignment operator overload
+     * @param span Time span object
+     * @return Reference to the current time span object
      */
     STimeSpan &operator+=(STimeSpan span);
 
     /**
-     * @brief 减法赋值运算符重载
-     * @param span 时间间隔对象
-     * @return 当前时间间隔对象的引用
+     * @brief Subtraction-assignment operator overload
+     * @param span Time span object
+     * @return Reference to the current time span object
      */
     STimeSpan &operator-=(STimeSpan span);
 
     /**
-     * @brief 等于运算符重载
-     * @param span 时间间隔对象
-     * @return 如果相等返回true，否则返回false
+     * @brief Equality operator overload
+     * @param span Time span object
+     * @return Returns true if equal, otherwise false
      */
     bool operator==(STimeSpan span) const;
 
     /**
-     * @brief 不等于运算符重载
-     * @param span 时间间隔对象
-     * @return 如果不相等返回true，否则返回false
+     * @brief Inequality operator overload
+     * @param span Time span object
+     * @return Returns true if not equal, otherwise false
      */
     bool operator!=(STimeSpan span) const;
 
     /**
-     * @brief 小于运算符重载
-     * @param span 时间间隔对象
-     * @return 如果小于返回true，否则返回false
+     * @brief Less-than operator overload
+     * @param span Time span object
+     * @return Returns true if less than, otherwise false
      */
     bool operator<(STimeSpan span) const;
 
     /**
-     * @brief 大于运算符重载
-     * @param span 时间间隔对象
-     * @return 如果大于返回true，否则返回false
+     * @brief Greater-than operator overload
+     * @param span Time span object
+     * @return Returns true if greater than, otherwise false
      */
     bool operator>(STimeSpan span) const;
 
     /**
-     * @brief 小于等于运算符重载
-     * @param span 时间间隔对象
-     * @return 如果小于等于返回true，否则返回false
+     * @brief Less-than-or-equal operator overload
+     * @param span Time span object
+     * @return Returns true if less than or equal, otherwise false
      */
     bool operator<=(STimeSpan span) const;
 
     /**
-     * @brief 大于等于运算符重载
-     * @param span 时间间隔对象
-     * @return 如果大于等于返回true，否则返回false
+     * @brief Greater-than-or-equal operator overload
+     * @param span Time span object
+     * @return Returns true if greater than or equal, otherwise false
      */
     bool operator>=(STimeSpan span) const;
 
   private:
-    __time64_t m_timeSpan; // 时间间隔秒数
+    __time64_t m_timeSpan; /**< Time span in seconds */
 };
 
 /**
  * @class STime
- * @brief 时间类
+ * @brief Time class
  */
 class SOUI_EXP STime {
   public:
     /**
-     * @brief 获取当前时间
-     * @return 当前时间对象
+     * @brief Get the current time
+     * @return Current time object
      */
     static STime GetCurrentTime();
 
     /**
-     * @brief 获取当前时间的毫秒数
-     * @return 当前时间的毫秒数
+     * @brief Get the current time in milliseconds
+     * @return Current time in milliseconds
      */
     static uint64_t GetCurrentTimeMs();
 
     /**
-     * @brief 默认构造函数
-     * @param tm 时间秒数（默认为0）
+     * @brief Default constructor
+     * @param tm Time in seconds (default is 0)
      */
     STime(__time64_t tm = 0)
         : m_time(tm)
@@ -181,194 +181,194 @@ class SOUI_EXP STime {
     }
 
     /**
-     * @brief 构造函数，从年、月、日、时、分、秒初始化
-     * @param nYear 年份
-     * @param nMonth 月份
-     * @param nDay 日
-     * @param nHour 小时
-     * @param nMin 分钟
-     * @param nSec 秒
-     * @param nDST 夏令时标志（默认为-1，表示自动检测）
+     * @brief Constructor, initialized from year, month, day, hour, minute, second
+     * @param nYear Year
+     * @param nMonth Month
+     * @param nDay Day
+     * @param nHour Hour
+     * @param nMin Minute
+     * @param nSec Second
+     * @param nDST Daylight saving time flag (default is -1, meaning auto-detect)
      */
     STime(int nYear, int nMonth, int nDay, int nHour, int nMin, int nSec, int nDST = -1);
 
     /**
-     * @brief 设置日期
-     * @param nYear 年份
-     * @param nMonth 月份
-     * @param nDay 日
+     * @brief Set the date
+     * @param nYear Year
+     * @param nMonth Month
+     * @param nDay Day
      */
     void SetDate(int nYear, int nMonth, int nDay);
 
     /**
-     * @brief 设置日期和时间
-     * @param nYear 年份
-     * @param nMonth 月份
-     * @param nDay 日
-     * @param nHour 小时
-     * @param nMin 分钟
-     * @param nSec 秒
-     * @param nDST 夏令时标志（默认为-1，表示自动检测）
+     * @brief Set the date and time
+     * @param nYear Year
+     * @param nMonth Month
+     * @param nDay Day
+     * @param nHour Hour
+     * @param nMin Minute
+     * @param nSec Second
+     * @param nDST Daylight saving time flag (default is -1, meaning auto-detect)
      */
     void SetDateTime(int nYear, int nMonth, int nDay, int nHour, int nMin, int nSec, int nDST = -1);
 
     /**
-     * @brief 获取时间秒数
-     * @return 时间秒数
+     * @brief Get the time in seconds
+     * @return Time in seconds
      */
     __time64_t GetTime() const;
 
     /**
-     * @brief 获取本地时间结构
-     * @param ptm 本地时间结构指针
-     * @return 本地时间结构指针
+     * @brief Get the local time structure
+     * @param ptm Pointer to local time structure
+     * @return Pointer to local time structure
      */
     struct tm *GetLocalTm(struct tm *ptm) const;
 
     /**
-     * @brief 获取系统时间结构
-     * @param timeDest 系统时间结构引用
-     * @return 如果成功返回true，否则返回false
+     * @brief Get the system time structure
+     * @param timeDest Reference to system time structure
+     * @return Returns true on success, otherwise false
      */
     bool GetAsSystemTime(SYSTEMTIME &timeDest) const;
 
     /**
-     * @brief 获取年份
-     * @return 年份
+     * @brief Get the year
+     * @return Year
      */
     int GetYear() const;
 
     /**
-     * @brief 获取月份
-     * @return 月份
+     * @brief Get the month
+     * @return Month
      */
     int GetMonth() const;
 
     /**
-     * @brief 获取日
-     * @return 日
+     * @brief Get the day
+     * @return Day
      */
     int GetDay() const;
 
     /**
-     * @brief 获取小时
-     * @return 小时
+     * @brief Get the hour
+     * @return Hour
      */
     int GetHour() const;
 
     /**
-     * @brief 获取分钟
-     * @return 分钟
+     * @brief Get the minute
+     * @return Minute
      */
     int GetMinute() const;
 
     /**
-     * @brief 获取秒
-     * @return 秒
+     * @brief Get the second
+     * @return Second
      */
     int GetSecond() const;
 
     /**
-     * @brief 获取星期几
-     * @return 星期几（0=星期日，1=星期一，...，6=星期六）
+     * @brief Get the day of the week
+     * @return Day of the week (0=Sunday, 1=Monday, ..., 6=Saturday)
      */
     int GetDayOfWeek() const;
 
     /**
-     * @brief 格式化时间字符串
-     * @param pszFormat 格式字符串
-     * @return 格式化后的时间字符串
+     * @brief Format the time string
+     * @param pszFormat Format string
+     * @return Formatted time string
      */
     SStringT Format(LPCTSTR pszFormat) const;
 
     /**
-     * @brief 赋值运算符重载
-     * @param time 时间秒数
-     * @return 当前时间对象的引用
+     * @brief Assignment operator overload
+     * @param time Time in seconds
+     * @return Reference to the current time object
      */
     STime &operator=(__time64_t time);
 
     /**
-     * @brief 加法赋值运算符重载
-     * @param span 时间间隔对象
-     * @return 当前时间对象的引用
+     * @brief Addition-assignment operator overload
+     * @param span Time span object
+     * @return Reference to the current time object
      */
     STime &operator+=(STimeSpan span);
 
     /**
-     * @brief 减法赋值运算符重载
-     * @param span 时间间隔对象
-     * @return 当前时间对象的引用
+     * @brief Subtraction-assignment operator overload
+     * @param span Time span object
+     * @return Reference to the current time object
      */
     STime &operator-=(STimeSpan span);
 
     /**
-     * @brief 减法运算符重载
-     * @param time 时间对象
-     * @return 时间间隔对象
+     * @brief Subtraction operator overload
+     * @param time Time object
+     * @return Time span object
      */
     STimeSpan operator-(STime time) const;
 
     /**
-     * @brief 减法运算符重载
-     * @param span 时间间隔对象
-     * @return 新的时间对象
+     * @brief Subtraction operator overload
+     * @param span Time span object
+     * @return New time object
      */
     STime operator-(STimeSpan span) const;
 
     /**
-     * @brief 加法运算符重载
-     * @param span 时间间隔对象
-     * @return 新的时间对象
+     * @brief Addition operator overload
+     * @param span Time span object
+     * @return New time object
      */
     STime operator+(STimeSpan span) const;
 
     /**
-     * @brief 等于运算符重载
-     * @param time 时间对象
-     * @return 如果相等返回true，否则返回false
+     * @brief Equality operator overload
+     * @param time Time object
+     * @return Returns true if equal, otherwise false
      */
     bool operator==(STime time) const;
 
     /**
-     * @brief 不等于运算符重载
-     * @param time 时间对象
-     * @return 如果不相等返回true，否则返回false
+     * @brief Inequality operator overload
+     * @param time Time object
+     * @return Returns true if not equal, otherwise false
      */
     bool operator!=(STime time) const;
 
     /**
-     * @brief 小于运算符重载
-     * @param time 时间对象
-     * @return 如果小于返回true，否则返回false
+     * @brief Less-than operator overload
+     * @param time Time object
+     * @return Returns true if less than, otherwise false
      */
     bool operator<(STime time) const;
 
     /**
-     * @brief 大于运算符重载
-     * @param time 时间对象
-     * @return 如果大于返回true，否则返回false
+     * @brief Greater-than operator overload
+     * @param time Time object
+     * @return Returns true if greater than, otherwise false
      */
     bool operator>(STime time) const;
 
     /**
-     * @brief 小于等于运算符重载
-     * @param time 时间对象
-     * @return 如果小于等于返回true，否则返回false
+     * @brief Less-than-or-equal operator overload
+     * @param time Time object
+     * @return Returns true if less than or equal, otherwise false
      */
     bool operator<=(STime time) const;
 
     /**
-     * @brief 大于等于运算符重载
-     * @param time 时间对象
-     * @return 如果大于等于返回true，否则返回false
+     * @brief Greater-than-or-equal operator overload
+     * @param time Time object
+     * @return Returns true if greater than or equal, otherwise false
      */
     bool operator>=(STime time) const;
 
   protected:
-    time_t m_time; // 时间秒数
+    time_t m_time; /**< Time in seconds */
 };
 
 SNSEND
 
-#endif // STime_h__
+#endif /**< STime_h__ */

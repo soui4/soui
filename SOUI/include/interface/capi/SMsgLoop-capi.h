@@ -7,20 +7,20 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for SMsgLoop Interfaces
  * These macros provide C-style function call syntax for C++ interface methods
  */
 
-/* IMsgFilter C API Macros */
+/** IMsgFilter C API Macros */
 #define IMsgFilter_PreTranslateMessage(This, pMsg) \
     ((This)->lpVtbl->PreTranslateMessage(This, pMsg))
 
-/* IIdleHandler C API Macros */
+/** IIdleHandler C API Macros */
 #define IIdleHandler_OnIdle(This, iRun) \
     ((This)->lpVtbl->OnIdle(This, iRun))
 
-/* IMessageLoop C API Macros */
+/** IMessageLoop C API Macros */
 #define IMessageLoop_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -84,7 +84,7 @@ extern "C" {
 #define IMessageLoop_OnStop(This) \
     ((This)->lpVtbl->OnStop(This))
 
-/* IMsgLoopFactory C API Macros */
+/** IMsgLoopFactory C API Macros */
 #define IMsgLoopFactory_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -101,4 +101,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SMSGLOOP_CAPI_H__ */
+#endif /**< __SMSGLOOP_CAPI_H__ */

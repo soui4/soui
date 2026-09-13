@@ -7,12 +7,12 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for SFactory Interfaces
  * These macros provide C-style function call syntax for C++ interface methods
  */
 
-/* ISouiFactory C API Macros */
+/** ISouiFactory C API Macros */
 #define ISouiFactory_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -65,4 +65,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SFACTORY_CAPI_H__ */
+#endif /**< __SFACTORY_CAPI_H__ */

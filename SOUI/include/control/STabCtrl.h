@@ -5,7 +5,7 @@
  * @author     soui
  * @date       2014-07-06
  *
- * @copyright  Copyright (C) 2014-2050 SOUI团队
+ * @copyright  Copyright (C) 2014-2050 SOUI Team
  *             All rights reserved.
  */
 
@@ -117,6 +117,10 @@ class STabSlider;
  */
 class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
     friend class STabSlider;
+#ifdef SOUI_ENABLE_ACC
+    /** Access the protected GetItemRect (tab header item rectangle) to build ACC virtual children. */
+    friend class SAccProxyTabCtrl;
+#endif
     DEF_SOBJECT(SWindow, L"tabctrl")
 
   protected:
@@ -347,6 +351,7 @@ class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
     virtual HRESULT OnLanguageChanged() override;
 
     virtual void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer) override;
+
   protected:
     /**
      * @brief Performs a hit test on the tab control.
@@ -463,4 +468,4 @@ class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
 
 SNSEND
 
-#endif // __STABCTRL__H__
+#endif /**< __STABCTRL__H__ */

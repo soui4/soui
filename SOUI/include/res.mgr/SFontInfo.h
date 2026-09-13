@@ -10,7 +10,7 @@ SNSBEGIN
  * Describes the style of a font using a union of a 64-bit integer and a bitfield structure.
  */
 union FONTSTYLE {
-    uint64_t syle; // DWORD version of the style
+    uint64_t syle; /**< DWORD version of the style */
 
     /**
      * @struct attr
@@ -57,4 +57,4 @@ struct FontInfo
 
 SNSEND
 
-#endif // __SFONTINFO__H__
+#endif /**< __SFONTINFO__H__ */

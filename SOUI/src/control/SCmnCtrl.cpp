@@ -1,6 +1,6 @@
-﻿//////////////////////////////////////////////////////////////////////////
-//   File Name: duicmnctrl.h
-//////////////////////////////////////////////////////////////////////////
+﻿///////////////////////////////////////////////////////////////////////
+/** File Name: duicmnctrl.h */
+///////////////////////////////////////////////////////////////////////
 
 #include "souistd.h"
 #include "control/SCmnCtrl.h"
@@ -8,8 +8,8 @@
 
 SNSBEGIN
 
-//////////////////////////////////////////////////////////////////////////
-// Static Control
+///////////////////////////////////////////////////////////////////////
+/** Static Control */
 //
 
 SStatic::SStatic()
@@ -23,7 +23,7 @@ SStatic::SStatic()
 
 void SStatic::DrawText(IRenderTarget *pRT, LPCTSTR pszBuf, int cchText, LPRECT pRect, UINT uFormat)
 {
-    if(m_bNoPrefix)
+    if (m_bNoPrefix)
         uFormat |= DT_NOPREFIX;
     if (!GetStyle().GetMultiLines())
     {
@@ -33,7 +33,7 @@ void SStatic::DrawText(IRenderTarget *pRT, LPCTSTR pszBuf, int cchText, LPRECT p
     {
         if (uFormat & (DT_VCENTER | DT_BOTTOM) && !(uFormat & DT_CALCRECT))
         {
-            // static 多行控件支持垂直居中及底对齐
+            // static multiline control supports vertical centering and bottom alignment
             CRect rcText = *pRect;
             DrawMultiLine(pRT, pszBuf, cchText, &rcText, uFormat | DT_CALCRECT);
             CSize szTxt = rcText.Size();
@@ -178,14 +178,14 @@ void SStatic::DrawMultiLine(IRenderTarget *pRT, LPCTSTR pszBuf, int cchText, LPR
             pLineTail = pLineHead = p2;
             continue;
         }
-        if(*p1=='&' && (uFormat & DT_NOPREFIX)==0)
-        {// skip the & if DT_NOPREFIX is not set
+        if (*p1 == '&' && (uFormat & DT_NOPREFIX) == 0)
+        { // skip the & if DT_NOPREFIX is not set
             p1 = p2;
             continue;
         }
         szWord = OnMeasureText(pRT, p1, (int)(p2 - p1));
         if (pt.x + szWord.cx > nRight)
-        { //检测到一行超过边界时还要保证当前行不为空
+        { // When a line exceeds the boundary, also ensure the current line is not empty
 
             if (pLineTail > pLineHead)
             {
@@ -196,9 +196,9 @@ void SStatic::DrawMultiLine(IRenderTarget *pRT, LPCTSTR pszBuf, int cchText, LPR
                 }
 
                 // modify by baozi 20190312
-                // 显示多行文本时，如果下一行文字的高度超过了文本框，则不再输出下一行文字内容。
+                // When displaying multi-line text, if the height of the next line exceeds the text box, do not output the next line's text.
                 if (pt.y + nLineHei + m_nLineInter > pRect->bottom)
-                { //将绘制限制在有效区。
+                { // Restrict drawing to the valid region.
                     pLineHead = pLineTail;
                     break;
                 }
@@ -265,10 +265,10 @@ SIZE SStatic::OnMeasureText(IRenderTarget *pRT, LPCTSTR pszBuf, int cchText)
     return szRet;
 }
 
-//////////////////////////////////////////////////////////////////////////
-// Link Control
-// Only For Header Drag Test
-// Usage: <link>inner text example</link>
+///////////////////////////////////////////////////////////////////////
+/** Link Control */
+/** Only For Header Drag Test */
+/** Usage: <link>inner text example</link> */
 //
 
 SLink::SLink()
@@ -376,11 +376,11 @@ void SLink::OnMouseHover(WPARAM wParam, CPoint pt)
         return;
     SWindow::OnMouseHover((UINT)wParam, pt);
 }
-//////////////////////////////////////////////////////////////////////////
-// Button Control
-// Use id attribute to process click event
+///////////////////////////////////////////////////////////////////////
+/** Button Control */
+/** Use id attribute to process click event */
 //
-// Usage: <button name=xx skin=xx>inner text example</button>
+/** Usage: <button name=xx skin=xx>inner text example</button> */
 //
 
 SButton::SButton()
@@ -392,7 +392,7 @@ SButton::SButton()
     m_pBgSkin = GETBUILTINSKIN(SKIN_SYS_BTN_NORMAL);
     m_bFocusable = TRUE;
 
-    // 创建 Hover 状态动画器，管理 alpha 从 50-255
+    // Create Hover state animator, managing alpha from 50-255
     m_pHoverAni.Attach(new SByteAnimator());
     m_pHoverAni->setDuration(250);
     m_pHoverAni->addUpdateListener(this);
@@ -405,11 +405,11 @@ void SButton::OnPaint(IRenderTarget *pRT)
     CRect rcClient;
     GetClientRect(&rcClient);
     if (m_byAlphaAni == 0xFF)
-    { //不在动画过程中
+    { // Not in the animation process
         m_pBgSkin->DrawByState(pRT, rcClient, GetState());
     }
     else
-    { //在动画过程中
+    { // In the animation process
         if (GetState() & WndState_Hover)
         {
             // hovering
@@ -521,7 +521,7 @@ void SButton::OnStateChanged(DWORD dwOldState, DWORD dwNewState)
     __baseCls::OnStateChanged(dwOldState, dwNewState);
     StopCurAnimate();
 
-    if (GetCapture() == m_swnd) //点击中
+    if (GetCapture() == m_swnd) // Clicked
         return;
 
     if (m_bAnimate && ((dwOldState == WndState_Normal && dwNewState == WndState_Hover) || (dwOldState == WndState_Hover && dwNewState == WndState_Normal)))
@@ -537,7 +537,7 @@ void SButton::OnSize(UINT nType, CSize size)
     StopCurAnimate();
 }
 
-//中止原来的动画
+/** Abort the previous animation */
 void SButton::StopCurAnimate()
 {
     m_pHoverAni->end();
@@ -548,7 +548,7 @@ void SButton::onAnimationUpdate(IValueAnimator *p)
 {
     if (p != m_pHoverAni)
         return;
-    BYTE byAlpha = m_pHoverAni->getValue(); // 范围 50-255
+    BYTE byAlpha = m_pHoverAni->getValue(); // Range 50-255
     if (byAlpha != m_byAlphaAni)
     {
         m_byAlphaAni = byAlpha;
@@ -563,7 +563,7 @@ void SButton::OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *
     SWindow::OnContainerChanged(pOldContainer, pNewContainer);
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 SImageButton::SImageButton()
 {
     m_bDrawFocusRect = FALSE;
@@ -575,11 +575,11 @@ SIZE SImageButton::MeasureContent(int wid, int hei)
         return CSize(0, 0);
     return m_pBgSkin->GetSkinSize();
 }
-//////////////////////////////////////////////////////////////////////////
-// Image Control
-// Use src attribute specify a resource id
+///////////////////////////////////////////////////////////////////////
+/** Image Control */
+/** Use src attribute specify a resource id */
 //
-// Usage: <img skin="skin" sub="0"/>
+/** Usage: <img skin="skin" sub="0"/> */
 //
 SImageWnd::SImageWnd()
     : m_iIcon(0)
@@ -647,7 +647,7 @@ void SImageWnd::OnPaint(IRenderTarget *pRT)
     }
 }
 
-BOOL SImageWnd::SetSkin(ISkinObj *pSkin, int iFrame /*=0*/, BOOL bAutoFree /*=TRUE*/)
+BOOL SImageWnd::SetSkin(ISkinObj *pSkin, int iFrame /**< =0 */, BOOL bAutoFree /**< =TRUE */)
 {
     if (IsVisible(TRUE))
         Invalidate();
@@ -673,7 +673,7 @@ BOOL SImageWnd::SetSkin(ISkinObj *pSkin, int iFrame /*=0*/, BOOL bAutoFree /*=TR
 
     if (GetLayoutParam()->IsWrapContent(Any) && GetParent())
     {
-        //重新计算坐标
+        // Recompute coordinates
         RequestRelayout();
     }
     if (IsVisible(TRUE))
@@ -756,7 +756,7 @@ ISkinObj *SImageWnd::GetSkin() const
     return m_pSkin;
 }
 
-ISvgObj * SImageWnd::GetSvg() const
+ISvgObj *SImageWnd::GetSvg() const
 {
     return m_pSvg;
 }
@@ -767,7 +767,6 @@ void SImageWnd::SetSvg(ISvgObj *pSvg)
     m_pImg = NULL;
     OnContentChanged();
 }
-
 
 SAnimateImgWnd::SAnimateImgWnd()
     : m_pSkin(NULL)
@@ -865,7 +864,7 @@ void SAnimateImgWnd::OnNextFrame()
             {
                 m_iCurFrame = 0;
                 if (m_nRepeat != -1 && ++m_iRepeat == m_nRepeat)
-                { //检查重复次数
+                { // Check repeat count
                     Stop();
                 }
                 else
@@ -904,11 +903,11 @@ void SAnimateImgWnd::OnScaleChanged(int scale)
     GetScaleSkin(m_pSkin, scale);
 }
 
-//////////////////////////////////////////////////////////////////////////
-// Progress Control
-// Use id attribute to process click event
+///////////////////////////////////////////////////////////////////////
+/** Progress Control */
+/** Use id attribute to process click event */
 //
-// Usage: <progress bgskin=xx posskin=xx min=0 max=100 value=10,showpercent=0/>
+/** Usage: <progress bgskin=xx posskin=xx min=0 max=100 value=10,showpercent=0/> */
 //
 
 SProgress::SProgress()
@@ -922,48 +921,23 @@ SProgress::SProgress()
     , m_pSkinWaveEffect(NULL)
     , m_fWaveEffectPos(0.0f)
     , m_nWaveEffectDir(1)
-    , m_bIndeterminate(FALSE)
-    , m_fIndeterminatePos(0.0f)
-    , m_fIndeterminateSpeed(0.02f)
 {
     m_bFocusable = TRUE;
 }
 
-void SProgress::SetIndeterminate(BOOL bIndeterminate)
+SIZE SProgress::MeasureContent(int nParentWid, int nParentHei)
 {
-    if (bIndeterminate == m_bIndeterminate)
-        return;
-
-    m_bIndeterminate = bIndeterminate;
-
-    // 如果有自定义 indeterminate 动画资源，保留该资源（由 m_pIndeterminateAni 表示）
-    // 我们仍使用 timeline handler 来每帧更新位置与重绘
-    if (m_bIndeterminate)
+    if (!m_pSkinBg)
     {
-        // 注册 timeline handler（每帧回调 OnNextFrame）
-        GetContainer()->RegisterTimelineHandler(this);
-        // 确保位置正确并请求重绘
-        m_fIndeterminatePos = 0.0f;
-        Invalidate();
+        return CSize(0, 0);
+    }
+    SIZE szRet = m_pSkinBg->GetSkinSize();
+    if (IsVertical())
+    {
+        szRet.cy = 100;
     }
     else
     {
-        // 取消注册 timeline handler（如果波动特效也存在则保持注册）
-        // 只有当没有其他需要 timeline 的效果时才注销，这里简单处理：如果没有波动皮肤注销
-        if (!m_pSkinWaveEffect)
-            GetContainer()->UnregisterTimelineHandler(this);
-        Invalidate();
-    }
-}
-
-SIZE SProgress::MeasureContent(int nParentWid, int nParentHei){
-    if(!m_pSkinBg){
-        return CSize(0,0);
-    }
-    SIZE szRet = m_pSkinBg->GetSkinSize();
-    if(IsVertical()){
-        szRet.cy = 100;
-    }else{
         szRet.cx = 100;
     }
     return szRet;
@@ -1006,62 +980,8 @@ void SProgress::DrawRail(IRenderTarget *pRT, const CRect &rcClient)
     if (m_pSkinBg)
         m_pSkinBg->DrawByState(pRT, rcRail, WndState_Normal);
 }
-
 void SProgress::DrawPos(IRenderTarget *pRT, const CRect &rcClient)
 {
-    if (m_bIndeterminate)
-    {
-        if (!m_pSkinPos)
-            return;
-
-        CRect rcRail = GetPartRect(rcClient, PC_RAIL);
-        int totalLen = IsVertical() ? rcRail.Height() : rcRail.Width();
-
-        const float blockFrac = 0.26f;
-        int blockLen = (int)(totalLen * blockFrac);
-        blockLen = smax(1, blockLen);
-
-        // 计算移动范围：从 -blockLen (完全在左/底外) 到 totalLen (完全穿出右/顶外)
-        int travelRange = totalLen + blockLen;
-
-        // 当前位置映射到偏移（-blockLen .. totalLen）
-        int offset = (int)(m_fIndeterminatePos * travelRange) - blockLen;
-
-        CRect rcBlock = rcRail;
-        if (IsVertical())
-        {
-            int top = rcRail.bottom - offset - blockLen;
-            int bottom = top + blockLen;
-            rcBlock.top = top;
-            rcBlock.bottom = bottom;
-        }
-        else
-        {
-            int left = rcRail.left + offset;
-            int right = left + blockLen;
-            rcBlock.left = left;
-            rcBlock.right = right;
-        }
-        rcBlock = rcBlock & rcRail;
-        m_pSkinPos->DrawByState(pRT, rcBlock, WndState_Normal);
-
-        // 波动特效仍可在不定状态下显示（如果配置了 wave skin）
-        if (m_pSkinWaveEffect)
-        {
-            CRect rcWave = rcBlock;
-            if (IsVertical())
-            {
-                rcWave.bottom = rcWave.top + (int)(rcWave.Height() * m_fWaveEffectPos);
-            }
-            else
-            {
-                rcWave.right = rcWave.left + (int)(rcWave.Width() * m_fWaveEffectPos);
-            }
-            m_pSkinWaveEffect->DrawByState(pRT, rcWave, WndState_Normal);
-        }
-
-        return;
-    }
     int value = GetValue();
     if (value <= m_nMinValue)
         return;
@@ -1071,7 +991,7 @@ void SProgress::DrawPos(IRenderTarget *pRT, const CRect &rcClient)
         m_pSkinPos->DrawByState(pRT, rcValue, WndState_Normal);
     }
 
-    // 绘制波动特效
+    // Draw wave effect
     if (m_pSkinWaveEffect)
     {
         CRect rcWave = rcValue;
@@ -1117,16 +1037,15 @@ int SProgress::OnCreate(void *)
         m_pSkinBg = GETBUILTINSKIN(IsVertical() ? SKIN_SYS_VERT_PROG_BKGND : SKIN_SYS_PROG_BKGND);
     if (!m_pSkinPos)
         m_pSkinPos = GETBUILTINSKIN(IsVertical() ? SKIN_SYS_VERT_PROG_BAR : SKIN_SYS_PROG_BAR);
-    if (m_pSkinWaveEffect || m_bIndeterminate)
+    if (m_pSkinWaveEffect)
         GetContainer()->RegisterTimelineHandler(this);
     return 0;
 }
 
 void SProgress::OnDestroy()
 {
-    if (m_pSkinWaveEffect || m_bIndeterminate)
+    if (m_pSkinWaveEffect)
         GetContainer()->UnregisterTimelineHandler(this);
-    
     __baseCls::OnDestroy();
 }
 
@@ -1134,7 +1053,7 @@ void SProgress::OnNextFrame()
 {
     BOOL bNeedInvalidate = FALSE;
 
-    // 处理波动特效（已有）
+    // Handle wave effect
     if (m_pSkinWaveEffect)
     {
         m_fWaveEffectPos += 0.02f * m_nWaveEffectDir;
@@ -1143,17 +1062,6 @@ void SProgress::OnNextFrame()
             m_nWaveEffectDir *= -1;
         }
         m_fWaveEffectPos = smax(0.0f, smin(1.0f, m_fWaveEffectPos));
-        bNeedInvalidate = TRUE;
-    }
-
-    // 处理不定进度动画
-    if (m_bIndeterminate)
-    {
-        m_fIndeterminatePos += m_fIndeterminateSpeed;
-        if (m_fIndeterminatePos >= 1.0f)
-            m_fIndeterminatePos -= 1.0f; // 循环
-        if (m_fIndeterminatePos < 0.0f)
-            m_fIndeterminatePos = 0.0f;
         bNeedInvalidate = TRUE;
     }
 
@@ -1250,9 +1158,9 @@ HRESULT SProgress::OnAttrRange(const SStringW &strValue, BOOL bLoading)
     return bLoading ? S_FALSE : S_OK;
 }
 
-//////////////////////////////////////////////////////////////////////////
-// Line Control
-// Simple HTML "HR" tag
+///////////////////////////////////////////////////////////////////////
+/** Line Control */
+/** Simple HTML "HR" tag */
 
 SHrLine::SHrLine()
     : m_nLineStyle(PS_SOLID)
@@ -1286,8 +1194,8 @@ void SHrLine::OnPaint(IRenderTarget *pRT)
     pRT->SelectObject(oldPen, NULL);
 }
 
-//////////////////////////////////////////////////////////////////////////
-// Check Box
+///////////////////////////////////////////////////////////////////////
+/** Check Box */
 
 SCheckBox::SCheckBox()
     : m_pSkin(GETBUILTINSKIN(SKIN_SYS_CHECKBOX))
@@ -1392,7 +1300,9 @@ void SCheckBox::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
             ModifyState(WndState_Check, 0, TRUE);
 
         FireCommand();
-    }else if(nChar == VK_ESCAPE){
+    }
+    else if (nChar == VK_ESCAPE)
+    {
         SetMsgHandled(FALSE);
     }
 }
@@ -1423,8 +1333,8 @@ void SCheckBox::OnScaleChanged(int nScale)
     GetScaleSkin(m_pFocusSkin, nScale);
 }
 
-//////////////////////////////////////////////////////////////////////////
-// Icon Control
+///////////////////////////////////////////////////////////////////////
+/** Icon Control */
 
 SIconWnd::SIconWnd()
     : m_theIcon(0)
@@ -1497,10 +1407,10 @@ void SIconWnd::OnScaleChanged(int scale)
     }
 }
 
-//////////////////////////////////////////////////////////////////////////
-// Radio Box
+///////////////////////////////////////////////////////////////////////
+/** Radio Box */
 //
-// Usage: <radio state=1>This is a check-box</radio>
+/** Usage: <radio state=1>This is a check-box</radio> */
 //
 
 SRadioBox::SRadioBox()
@@ -1718,8 +1628,8 @@ void SRadioBox::OnScaleChanged(int nScale)
     GetScaleSkin(m_pFocusSkin, nScale);
 }
 
-//////////////////////////////////////////////////////////////////////////
-// SRadioGroup
+///////////////////////////////////////////////////////////////////////
+/** SRadioGroup */
 SRadioGroup::SRadioGroup()
 {
     GetEventSet()->addEvent(EVENTID(EventRadioGroupCheckChanged));
@@ -1789,15 +1699,15 @@ void SRadioGroup::OnBeforeRemoveChild(SWindow *pChild)
     pChild->SetOwner(NULL);
 }
 
-//////////////////////////////////////////////////////////////////////////
-// SToggle
+///////////////////////////////////////////////////////////////////////
+/** SToggle */
 SToggle::SToggle()
 {
     m_pSkin = GETBUILTINSKIN(SKIN_SYS_TREE_TOGGLE);
     m_nCheckBoxSpacing = 0;
 }
 
-void SToggle::SetToggle(BOOL bToggle, BOOL bUpdate /*=TRUE*/)
+void SToggle::SetToggle(BOOL bToggle, BOOL bUpdate /**< =TRUE */)
 {
     SetCheck(bToggle);
     if (bUpdate)
@@ -1914,17 +1824,17 @@ void SGroup::GetDesiredSize(SIZE *psz, int nParentWid, int nParentHei)
 }
 
 //-------------------------------------------------------------------
-SKeyboardSpacer::SKeyboardSpacer() {
-    m_bFocusable=FALSE;
-    m_bVisible=FALSE;
+SKeyboardSpacer::SKeyboardSpacer()
+{
+    m_bFocusable = FALSE;
+    m_bVisible = FALSE;
 }
 
 void SKeyboardSpacer::OnKeyboardHeight(int height)
 {
-    SLayoutSize hei(height,px);
-    m_pLayoutParam->SetSpecifiedSize(Vert,&hei);
+    SLayoutSize hei(height, px);
+    m_pLayoutParam->SetSpecifiedSize(Vert, &hei);
     GetParent()->RequestRelayout();
 }
-
 
 SNSEND

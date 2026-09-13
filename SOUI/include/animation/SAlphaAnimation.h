@@ -15,16 +15,16 @@ class SOUI_EXP SAlphaAnimation : public SAnimation {
     DEF_SOBJECT(SAnimation, L"alpha")
 
   private:
-    float mFromAlpha; ///< Starting alpha value for the animation, where 1.0 means fully opaque and 0.0 means fully transparent.
-    float mToAlpha;   ///< Ending alpha value for the animation.
+    float mFromAlpha; /**<  Starting alpha value for the animation, where 1.0 means fully opaque and 0.0 means fully transparent. */
+    float mToAlpha;   /**<  Ending alpha value for the animation. */
 
   public:
     /**
      * @brief Attributes for SAlphaAnimation
      */
     SOUI_ATTRS_BEGIN()
-        ATTR_FLOAT(L"fromAlpha", mFromAlpha, FALSE) ///< Starting alpha value attribute.
-        ATTR_FLOAT(L"toAlpha", mToAlpha, FALSE)     ///< Ending alpha value attribute.
+        ATTR_FLOAT(L"fromAlpha", mFromAlpha, FALSE) /**<  Starting alpha value attribute. */
+        ATTR_FLOAT(L"toAlpha", mToAlpha, FALSE)     /**<  Ending alpha value attribute. */
     SOUI_ATTRS_END()
 
     /**
@@ -71,4 +71,4 @@ class SOUI_EXP SAlphaAnimation : public SAnimation {
 
 SNSEND
 
-#endif // __SALPHAANIMATION__H__
+#endif /**< __SALPHAANIMATION__H__ */

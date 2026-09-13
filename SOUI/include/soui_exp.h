@@ -3,7 +3,7 @@
 #define SOUI_EXP __declspec(dllexport)
 #else
 #define SOUI_EXP __declspec(dllimport)
-#endif // SOUI_EXPORTS
+#endif /**< SOUI_EXPORTS */
 #else
 #define SOUI_EXP
 #endif

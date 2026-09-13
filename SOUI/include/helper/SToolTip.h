@@ -9,7 +9,7 @@ SNSBEGIN
 
 /**
  * @class STipCtrl
- * @brief 提示控件类，继承自IToolTip和SNativeWnd
+ * @brief Tooltip control class, derived from IToolTip and SNativeWnd
  */
 class STipCtrl
     : public IToolTip
@@ -17,19 +17,19 @@ class STipCtrl
     , public SNativeWnd {
   public:
     /**
-     * @brief 构造函数
+     * @brief Constructor
      */
     STipCtrl(void);
 
     /**
-     * @brief 析构函数
+     * @brief Destructor
      */
     virtual ~STipCtrl(void);
 
-  public: // IMsgFilter
+  public: /**< IMsgFilter */
     STDMETHOD_(BOOL, PreTranslateMessage)(THIS_ MSG *pMsg) OVERRIDE;
 
-  public: // IToolTip
+  public: /**< IToolTip */
     STDMETHOD_(long, AddRef)(THIS) OVERRIDE
     {
         return SNativeWnd::AddRef();
@@ -52,62 +52,62 @@ class STipCtrl
     STDMETHOD_(BOOL, Destroy)(THIS) OVERRIDE;
 
     /**
-     * @brief 更新提示信息
-     * @param id 提示ID指针
-     * @param rc 目标矩形区域
-     * @param pszTip 提示文本
-     * @param nScale 缩放比例
+     * @brief Update tooltip information
+     * @param id Pointer to tooltip ID
+     * @param rc Target rectangle
+     * @param pszTip Tooltip text
+     * @param nScale Scale ratio
      */
     STDMETHOD_(void, UpdateTip)(THIS_ const TIPID *id, RECT rc, LPCTSTR pszTip, int nScale) OVERRIDE;
 
     /**
-     * @brief 清除提示信息
+     * @brief Clear tooltip information
      */
     STDMETHOD_(void, ClearTip)(THIS) OVERRIDE;
 
     /**
-     * @brief 传递事件
-     * @param pMsg 消息结构指针
+     * @brief Relay event
+     * @param pMsg Pointer to message structure
      */
     STDMETHOD_(void, RelayEvent)(THIS_ const MSG *pMsg) OVERRIDE;
 
     /**
-     * @brief 设置提示信息
-     * @param rc 目标矩形区域
-     * @param tipAlign 提示对齐方式
-     * @param pszTip 提示文本
-     * @param nScale 缩放比例
+     * @brief Set tooltip information
+     * @param rc Target rectangle
+     * @param tipAlign Tooltip alignment
+     * @param pszTip Tooltip text
+     * @param nScale Scale ratio
      */
     STDMETHOD_(void, SetToolTip)(THIS_ LPCRECT rc, UINT tipAlign, LPCTSTR pszTip, int nScale) OVERRIDE;
 
   protected:
     /**
-     * @brief 处理最终消息
-     * @param hWnd 窗口句柄
+     * @brief Handle the final message
+     * @param hWnd Window handle
      */
     virtual void OnFinalMessage(HWND hWnd);
 
     /**
-     * @brief 更新字体
-     * @param nScale 缩放比例
+     * @brief Update font
+     * @param nScale Scale ratio
      */
     void UpdateFont(int nScale);
 
     /**
-     * @brief 处理定时器消息
-     * @param idEvent 定时器ID
+     * @brief Handle timer message
+     * @param idEvent Timer ID
      */
     void OnTimer(UINT_PTR idEvent);
 
     /**
-     * @brief 处理绘制消息
-     * @param dc 设备上下文句柄
+     * @brief Handle paint message
+     * @param dc Device context handle
      */
     void OnPaint(HDC dc);
 
     /**
-     * @brief 显示或隐藏提示
-     * @param bShow 是否显示提示
+     * @brief Show or hide the tooltip
+     * @param bShow Whether to show the tooltip
      */
     void ShowTip(BOOL bShow);
 
@@ -118,18 +118,18 @@ class STipCtrl
     END_MSG_MAP()
 
   protected:
-    int m_nDelay;      // 显示延迟时间（毫秒）
-    int m_nShowSpan;   // 显示持续时间（毫秒）
-    SStringT m_strTip; // 提示文本
-    int m_nScale;      // 缩放比例
-    CRect m_rcTarget;  // 目标矩形区域
-    HFONT m_font;      // 字体句柄
+    int m_nDelay;      /**< Show delay time (milliseconds) */
+    int m_nShowSpan;   /**< Show duration (milliseconds) */
+    SStringT m_strTip; /**< Tooltip text */
+    int m_nScale;      /**< Scale */
+    CRect m_rcTarget;  /**< Target rectangle */
+    HFONT m_font;      /**< Font handle */
 
-    TIPID m_id; // 提示ID
+    TIPID m_id; /**< Tooltip ID */
 
-    UINT m_tipAlign; // 提示对齐方式
+    UINT m_tipAlign; /**< Tooltip alignment */
 };
 
 SNSEND
 
-#endif // __STOOLTIP__H__
+#endif /**< __STOOLTIP__H__ */

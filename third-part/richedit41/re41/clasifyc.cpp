@@ -830,7 +830,15 @@ void BatchClassify (
 	Assert( pch );
 	Assert( kinsokuClassifications );
 
-	W32->GetStringTypes(lcid, pch, cch, pwRes, pcType3);
+	// GetStringTypes can fail (e.g. GetStringTypeEx unavailable): the result
+	// buffers would stay uninitialised and the loop below would branch on
+	// undefined values.  Zero-fill them so every char classifies as plain
+	// "no special class" in that case.
+	if(!W32->GetStringTypes(lcid, pch, cch, pwRes, pcType3))
+	{
+		memset(pwRes, 0, cch * sizeof(WORD));
+		memset(pcType3, 0, cch * sizeof(INT));
+	}
 
 	while ( cch-- )									// For all ch...
 	{

@@ -96,6 +96,13 @@ class SOUI_EXP SAccProxyCombobox : public SAccProxyWindow {
     }
 
     /**
+     * @brief Retrieves the value of the accessible object.
+     * @param pszValue Pointer to receive the value of the accessible object.
+     * @return HRESULT indicating success or failure.
+     */
+    virtual STDMETHODIMP get_accValue(BSTR *pszValue);
+
+    /**
      * @brief Retrieves the role of the accessible object.
      * @param pvarRole Pointer to receive the role of the accessible object.
      * @return HRESULT indicating success or failure.
@@ -183,6 +190,13 @@ class SOUI_EXP SAccProxySlideBar : public SAccProxyProgress {
         : SAccProxyProgress(pWnd)
     {
     }
+
+    /**
+     * @brief Retrieves the value of the accessible object.
+     * @param pszValue Pointer to receive the value of the accessible object.
+     * @return HRESULT indicating success or failure.
+     */
+    virtual STDMETHODIMP get_accValue(BSTR *pszValue);
 
     /**
      * @brief Retrieves the role of the accessible object.
@@ -550,6 +564,16 @@ class SOUI_EXP SAccProxyHeaderCtrl : public SAccProxyWindow {
      * @return HRESULT indicating success or failure.
      */
     virtual STDMETHODIMP get_accRole(VARIANT *pvarRole);
+
+    /** Column headers are drawn sub-items: expose them as AccSubItems. */
+    virtual int STDMETHODCALLTYPE GetAccSubItemCount() override;
+    virtual BSTR STDMETHODCALLTYPE GetAccSubItemName(int iChild) override;
+    virtual long STDMETHODCALLTYPE GetAccSubItemRole(int iChild) override;
+    virtual DWORD STDMETHODCALLTYPE GetAccSubItemState(int iChild) override;
+    virtual void STDMETHODCALLTYPE GetAccSubItemRect(int iChild, RECT *prc) override;
+    virtual int STDMETHODCALLTYPE GetAccSubItemSel() override;
+    virtual STDMETHODIMP SetAccSubItemSel(int iChild) override;
+    virtual int STDMETHODCALLTYPE HitTestAccSubItem(long x, long y) override;
 };
 
 /**
@@ -598,6 +622,11 @@ class SOUI_EXP SAccProxyListView : public SAccProxyWindow {
      * @return HRESULT indicating success or failure.
      */
     virtual STDMETHODIMP get_accRole(VARIANT *pvarRole);
+
+    /** MVC view: expose currently-visible item panels as real child windows. */
+    virtual int STDMETHODCALLTYPE GetAccChildCount() override;
+    virtual IWindow *STDMETHODCALLTYPE GetAccChild(int iChild) override;
+    virtual int STDMETHODCALLTYPE GetAccSelIndex() override;
 };
 
 /**
@@ -622,6 +651,16 @@ class SOUI_EXP SAccProxyListBox : public SAccProxyWindow {
      * @return HRESULT indicating success or failure.
      */
     virtual STDMETHODIMP get_accRole(VARIANT *pvarRole);
+
+    /** List items are drawn sub-items -- expose them as AccSubItems. */
+    virtual int STDMETHODCALLTYPE GetAccSubItemCount() override;
+    virtual BSTR STDMETHODCALLTYPE GetAccSubItemName(int iChild) override;
+    virtual long STDMETHODCALLTYPE GetAccSubItemRole(int iChild) override;
+    virtual DWORD STDMETHODCALLTYPE GetAccSubItemState(int iChild) override;
+    virtual void STDMETHODCALLTYPE GetAccSubItemRect(int iChild, RECT *prc) override;
+    virtual int STDMETHODCALLTYPE GetAccSubItemSel() override;
+    virtual STDMETHODIMP SetAccSubItemSel(int iChild) override;
+    virtual int STDMETHODCALLTYPE HitTestAccSubItem(long x, long y) override;
 };
 
 /**
@@ -646,6 +685,11 @@ class SOUI_EXP SAccProxyMCListView : public SAccProxyWindow {
      * @return HRESULT indicating success or failure.
      */
     virtual STDMETHODIMP get_accRole(VARIANT *pvarRole);
+
+    /** MVC view: expose currently-visible item panels as real child windows. */
+    virtual int STDMETHODCALLTYPE GetAccChildCount() override;
+    virtual IWindow *STDMETHODCALLTYPE GetAccChild(int iChild) override;
+    virtual int STDMETHODCALLTYPE GetAccSelIndex() override;
 };
 
 /**
@@ -761,6 +805,13 @@ class SOUI_EXP SAccProxySpinButtonCtrl : public SAccProxyWindow {
     }
 
     /**
+     * @brief Retrieves the value of the accessible object.
+     * @param pszValue Pointer to receive the value of the accessible object.
+     * @return HRESULT indicating success or failure.
+     */
+    virtual STDMETHODIMP get_accValue(BSTR *pszValue);
+
+    /**
      * @brief Retrieves the role of the accessible object.
      * @param pvarRole Pointer to receive the role of the accessible object.
      * @return HRESULT indicating success or failure.
@@ -862,6 +913,16 @@ class SOUI_EXP SAccProxyTabCtrl : public SAccProxyWindow {
      * @return HRESULT indicating success or failure.
      */
     virtual STDMETHODIMP get_accRole(VARIANT *pvarRole);
+
+    /** Tab headers are drawn sub-items: expose them as AccSubItems. */
+    virtual int STDMETHODCALLTYPE GetAccSubItemCount() override;
+    virtual BSTR STDMETHODCALLTYPE GetAccSubItemName(int iChild) override;
+    virtual long STDMETHODCALLTYPE GetAccSubItemRole(int iChild) override;
+    virtual DWORD STDMETHODCALLTYPE GetAccSubItemState(int iChild) override;
+    virtual void STDMETHODCALLTYPE GetAccSubItemRect(int iChild, RECT *prc) override;
+    virtual int STDMETHODCALLTYPE GetAccSubItemSel() override;
+    virtual STDMETHODIMP SetAccSubItemSel(int iChild) override;
+    virtual int STDMETHODCALLTYPE HitTestAccSubItem(long x, long y) override;
 };
 
 /**
@@ -886,6 +947,11 @@ class SOUI_EXP SAccProxyTileView : public SAccProxyWindow {
      * @return HRESULT indicating success or failure.
      */
     virtual STDMETHODIMP get_accRole(VARIANT *pvarRole);
+
+    /** MVC view: expose currently-visible item panels as real child windows. */
+    virtual int STDMETHODCALLTYPE GetAccChildCount() override;
+    virtual IWindow *STDMETHODCALLTYPE GetAccChild(int iChild) override;
+    virtual int STDMETHODCALLTYPE GetAccSelIndex() override;
 };
 
 /**
@@ -934,6 +1000,16 @@ class SOUI_EXP SAccProxyTreeCtrl : public SAccProxyWindow {
      * @return HRESULT indicating success or failure.
      */
     virtual STDMETHODIMP get_accRole(VARIANT *pvarRole);
+
+    /** Tree items are drawn sub-items: expose them as AccSubItems. */
+    virtual int STDMETHODCALLTYPE GetAccSubItemCount() override;
+    virtual BSTR STDMETHODCALLTYPE GetAccSubItemName(int iChild) override;
+    virtual long STDMETHODCALLTYPE GetAccSubItemRole(int iChild) override;
+    virtual DWORD STDMETHODCALLTYPE GetAccSubItemState(int iChild) override;
+    virtual void STDMETHODCALLTYPE GetAccSubItemRect(int iChild, RECT *prc) override;
+    virtual int STDMETHODCALLTYPE GetAccSubItemSel() override;
+    virtual STDMETHODIMP SetAccSubItemSel(int iChild) override;
+    virtual int STDMETHODCALLTYPE HitTestAccSubItem(long x, long y) override;
 };
 
 /**
@@ -958,10 +1034,15 @@ class SOUI_EXP SAccProxyTreeView : public SAccProxyWindow {
      * @return HRESULT indicating success or failure.
      */
     virtual STDMETHODIMP get_accRole(VARIANT *pvarRole);
+
+    /** MVC view: expose currently-visible item panels as real child windows. */
+    virtual int STDMETHODCALLTYPE GetAccChildCount() override;
+    virtual IWindow *STDMETHODCALLTYPE GetAccChild(int iChild) override;
+    virtual int STDMETHODCALLTYPE GetAccSelIndex() override;
 };
 
-#endif // SOUI_ENABLE_ACC
+#endif /**< SOUI_ENABLE_ACC */
 
 SNSEND
 
-#endif // __SACCPROXYCMNCTRL__H__
+#endif /**< __SACCPROXYCMNCTRL__H__ */

@@ -11,55 +11,55 @@ SNSBEGIN
 DECLARE_INTERFACE_(ISkinPool, IObjRef)
 {
     /**
-     * @brief 添加引用
-     * @return long -- 引用计数
+     * @brief Add reference
+     * @return long -- reference count
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief 释放引用
-     * @return long -- 引用计数
+     * @brief Release reference
+     * @return long -- reference count
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief 释放对象
+     * @brief Release object
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
-    //////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief 获得与指定name匹配的SkinObj
-     * @param strSkinName LPCWSTR -- Skin对象的名称
-     * @param nScale int -- 缩放比例
-     * @return ISkinObj* -- 找到的Skin对象
+     * @brief Get the SkinObj matching the specified name
+     * @param strSkinName LPCWSTR -- Name of the Skin object
+     * @param nScale int -- Scale factor
+     * @return ISkinObj* -- Found Skin object
      */
     STDMETHOD_(ISkinObj *, GetSkin)(THIS_ LPCWSTR strSkinName, int nScale) PURE;
 
     /**
-     * @brief 从XML中加载Skin列表
-     * @param xmlNode IXmlNode* -- 描述SkinObj的XML节点
-     * @return int -- 成功加载的SkinObj数量
+     * @brief Load Skin list from XML
+     * @param xmlNode IXmlNode* -- XML node describing the SkinObj
+     * @return int -- Number of SkinObj loaded successfully
      */
     STDMETHOD_(int, LoadSkins)(THIS_ IXmlNode * xmlNode) PURE;
 
     /**
-     * @brief 增加一个skinObj对象到SkinPool
-     * @param skin ISkinObj* -- Skin对象
-     * @return BOOL -- 加入是否成功，重名加入失败返回FALSE
+     * @brief Add a skinObj object to the SkinPool
+     * @param skin ISkinObj* -- Skin object
+     * @return BOOL -- Whether the addition succeeded; adding a duplicate name fails and returns FALSE
      */
     STDMETHOD_(BOOL, AddSkin)(THIS_ ISkinObj * skin) PURE;
 
     /**
-     * @brief 删除一个skinObj对象
-     * @param skin ISkinObj* -- Skin对象
-     * @return BOOL -- TRUE: 成功，FALSE: 失败
+     * @brief Remove a skinObj object
+     * @param skin ISkinObj* -- Skin object
+     * @return BOOL -- TRUE: success, FALSE: failure
      */
     STDMETHOD_(BOOL, RemoveSkin)(THIS_ ISkinObj * skin) PURE;
 
     /**
-     * @brief 删除全部skin
+     * @brief Delete all skins
      * @return void
      */
     STDMETHOD_(void, RemoveAll)(THIS) PURE;
@@ -67,4 +67,4 @@ DECLARE_INTERFACE_(ISkinPool, IObjRef)
 
 SNSEND
 
-#endif //_SSKINPOOL_I_H__
+#endif /**< _SSKINPOOL_I_H__ */

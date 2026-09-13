@@ -20,7 +20,7 @@ SComboView::~SComboView(void)
 BOOL SComboView::CreateListBox(SXmlNode xmlNode)
 {
     SASSERT(xmlNode);
-    //创建列表控件
+    // Create list control
     SXmlNode listStyle = xmlNode.child(L"listStyle");
     SStringW strListClass = listStyle.attribute(L"wndclass").as_string(SListView::GetClassName());
     SListView *pListBox = sobj_cast<SListView>(CreateChildByName(strListClass));
@@ -31,7 +31,8 @@ BOOL SComboView::CreateListBox(SXmlNode xmlNode)
     m_pListBox->SetContainer(GetContainer());
     if (listStyle)
         m_pListBox->InitFromXml(&listStyle);
-    else {
+    else
+    {
         m_pListBox->GetStyle().m_crBg = GETCOLOR(SNamedColor::THEME_COLOR);
         m_pListBox->GetStyle().m_crBorder = GETCOLOR(SNamedColor::THEME_BORDER);
         m_pListBox->SetAttribute(L"margin", L"1,1,1,1");

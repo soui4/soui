@@ -8,45 +8,45 @@ SNSBEGIN
 
 /**
  * @struct SFindInfo
- * @brief 查找信息结构体
+ * @brief Find information structure
  */
 struct SFindInfo
 {
   public:
     /**
-     * @brief 构造函数，通过名称查找
-     * @param pParent 父窗口指针
-     * @param strName 窗口名称
-     * @param nDeep 查找深度
+     * @brief Constructor, find by name
+     * @param pParent Pointer to parent window
+     * @param strName Window name
+     * @param nDeep Search depth
      */
     SFindInfo(IWindow *pParent, const SStringW &strName, int nDeep);
 
     /**
-     * @brief 构造函数，通过ID查找
-     * @param pParent 父窗口指针
-     * @param nID 窗口ID
-     * @param nDeep 查找深度
+     * @brief Constructor, find by ID
+     * @param pParent Pointer to parent window
+     * @param nID Window ID
+     * @param nDeep Search depth
      */
     SFindInfo(IWindow *pParent, int nID, int nDeep);
 
-    SWND hParent;     // 父窗口句柄
-    bool findByName;  // 是否通过名称查找
-    SStringW strName; // 窗口名称
-    int nID;          // 窗口ID
-    int nDeep;        // 查找深度
+    SWND hParent;     /**< Parent window handle */
+    bool findByName;  /**< Whether to find by name */
+    SStringW strName; /**< Window name */
+    int nID;          /**< Window ID */
+    int nDeep;        /**< Search depth */
 };
 
 /**
  * @class CElementTraits<SFindInfo>
- * @brief SFindInfo的特性类，用于定义哈希和比较操作
+ * @brief Traits class for SFindInfo, defining hash and comparison operations
  */
 template <>
 class CElementTraits<SFindInfo> : public CElementTraitsBase<SFindInfo> {
   public:
     /**
-     * @brief 计算SFindInfo对象的哈希值
-     * @param fi SFindInfo对象
-     * @return 哈希值
+     * @brief Compute the hash value of an SFindInfo object
+     * @param fi SFindInfo object
+     * @return Hash value
      */
     static ULONG Hash(INARGTYPE fi)
     {
@@ -74,10 +74,10 @@ class CElementTraits<SFindInfo> : public CElementTraitsBase<SFindInfo> {
     }
 
     /**
-     * @brief 比较两个SFindInfo对象是否相等
-     * @param element1 第一个SFindInfo对象
-     * @param element2 第二个SFindInfo对象
-     * @return 如果相等返回true，否则返回false
+     * @brief Compare whether two SFindInfo objects are equal
+     * @param element1 First SFindInfo object
+     * @param element2 Second SFindInfo object
+     * @return Returns true if equal, otherwise false
      */
     static bool CompareElements(INARGTYPE element1, INARGTYPE element2)
     {
@@ -95,10 +95,10 @@ class CElementTraits<SFindInfo> : public CElementTraitsBase<SFindInfo> {
     }
 
     /**
-     * @brief 比较两个SFindInfo对象的顺序
-     * @param element1 第一个SFindInfo对象
-     * @param element2 第二个SFindInfo对象
-     * @return 如果element1小于element2返回负数，如果相等返回0，如果element1大于element2返回正数
+     * @brief Compare the order of two SFindInfo objects
+     * @param element1 First SFindInfo object
+     * @param element2 Second SFindInfo object
+     * @return Returns a negative value if element1 is less than element2, 0 if equal, and a positive value if element1 is greater than element2
      */
     static int CompareElementsOrdered(INARGTYPE element1, INARGTYPE element2)
     {
@@ -118,79 +118,79 @@ class CElementTraits<SFindInfo> : public CElementTraitsBase<SFindInfo> {
 
 /**
  * @class SWindowFinder
- * @brief 窗口查找器类
+ * @brief Window finder class
  */
 class SWindowFinder : public TObjRefImpl<ISwndFinder> {
     friend class SWindow;
 
   protected:
     /**
-     * @brief 通过名称查找子窗口
-     * @param pParent 父窗口指针
-     * @param strName 窗口名称
-     * @param nDeep 查找深度
-     * @return 找到的窗口指针，未找到返回NULL
+     * @brief Find a child window by name
+     * @param pParent Pointer to parent window
+     * @param strName Window name
+     * @param nDeep Search depth
+     * @return Pointer to the found window, or NULL if not found
      */
     IWindow *WINAPI FindChildByName(IWindow *pParent, LPCWSTR strName, int nDeep) override;
 
     /**
-     * @brief 通过ID查找子窗口
-     * @param pParent 父窗口指针
-     * @param nID 窗口ID
-     * @param nDeep 查找深度
-     * @return 找到的窗口指针，未找到返回NULL
+     * @brief Find a child window by ID
+     * @param pParent Pointer to parent window
+     * @param nID Window ID
+     * @param nDeep Search depth
+     * @return Pointer to the found window, or NULL if not found
      */
     IWindow *WINAPI FindChildByID(IWindow *pParent, int nID, int nDeep) override;
 
     /**
-     * @brief 缓存通过名称查找的结果
-     * @param pParent 父窗口指针
-     * @param strName 窗口名称
-     * @param nDeep 查找深度
-     * @param pResult 找到的窗口指针
+     * @brief Cache the result of finding by name
+     * @param pParent Pointer to parent window
+     * @param strName Window name
+     * @param nDeep Search depth
+     * @param pResult Pointer to the found window
      */
     void WINAPI CacheResultForName(IWindow *pParent, LPCWSTR strName, int nDeep, IWindow *pResult) override;
 
     /**
-     * @brief 缓存通过ID查找的结果
-     * @param pParent 父窗口指针
-     * @param nID 窗口ID
-     * @param nDeep 查找深度
-     * @param pResult 找到的窗口指针
+     * @brief Cache the result of finding by ID
+     * @param pParent Pointer to parent window
+     * @param nID Window ID
+     * @param nDeep Search depth
+     * @param pResult Pointer to the found window
      */
     void WINAPI CacheResultForID(IWindow *pParent, int nID, int nDeep, IWindow *pResult) override;
 
     /**
-     * @brief 删除缓存
-     * @param pParent 父窗口指针
-     * @param nID 窗口ID
-     * @param nDeep 查找深度
-     * @return 删除成功返回true，否则返回false
+     * @brief Remove cache
+     * @param pParent Pointer to parent window
+     * @param nID Window ID
+     * @param nDeep Search depth
+     * @return Returns true if removed successfully, otherwise false
      */
     BOOL WINAPI EraseCacheForID(IWindow *pParent, int nID, int nDeep) override;
 
     /**
-     * @brief 删除缓存
-     * @param pParent 父窗口指针
-     * @param strName 窗口名称
-     * @param nDeep 查找深度
-     * @return 删除成功返回true，否则返回false
+     * @brief Remove cache
+     * @param pParent Pointer to parent window
+     * @param strName Window name
+     * @param nDeep Search depth
+     * @return Returns true if removed successfully, otherwise false
      */
     BOOL WINAPI EraseCacheForName(IWindow *pParent, LPCWSTR strName, int nDeep) override;
 
   protected:
     /**
-     * @brief 通过查找信息查找子窗口
-     * @param pParent 父窗口指针
-     * @param fi 查找信息对象
-     * @return 找到的窗口指针，未找到返回NULL
+     * @brief Find a child window by find information
+     * @param pParent Pointer to parent window
+     * @param fi Find information object
+     * @return Pointer to the found window, or NULL if not found
      */
     IWindow *FindChildByKey(IWindow *pParent, const SFindInfo &fi);
 
-    typedef SMap<SFindInfo, SWND> FINDCACHE; // 查找缓存类型
-    FINDCACHE m_findCache;                   // 查找缓存
+    typedef SMap<SFindInfo, SWND> FINDCACHE; /**< Find cache type */
+    FINDCACHE m_findCache;                   /**< Find cache */
 };
 
 SNSEND
 
-#endif // __SWNDFINDER__H__
+#endif /**< __SWNDFINDER__H__ */

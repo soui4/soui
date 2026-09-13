@@ -1,5 +1,5 @@
 
-/*
+/**
  * Copyright 2008 The Android Open Source Project
  *
  * Use of this source code is governed by a BSD-style license that can be
@@ -44,7 +44,7 @@ union SkFloatIntUnion {
     int32_t fSignBitInt;
 };
 
-// Helper to see a float as its bit pattern (w/o aliasing warnings)
+/** Helper to see a float as its bit pattern (w/o aliasing warnings) */
 static inline int32_t SkFloat2Bits(float x)
 {
     SkFloatIntUnion data;
@@ -52,7 +52,7 @@ static inline int32_t SkFloat2Bits(float x)
     return data.fSignBitInt;
 }
 
-// Helper to see a bit pattern as a float (w/o aliasing warnings)
+/** Helper to see a bit pattern as a float (w/o aliasing warnings) */
 static inline float SkBits2Float(int32_t floatAsBits)
 {
     SkFloatIntUnion data;
@@ -70,7 +70,7 @@ static inline int32_t SkFloatAs2sCompliment(float x)
     return SkSignBitTo2sCompliment(SkFloat2Bits(x));
 }
 
-//  Scalar wrappers for float-bit routines
+/** Scalar wrappers for float-bit routines */
 
 #define SFloatAs2sCompliment(x)   SkFloatAs2sCompliment(x)
 #define Sk2sComplimentAsScalar(x) Sk2sComplimentAsFloat(x)

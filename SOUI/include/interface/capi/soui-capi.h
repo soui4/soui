@@ -1,7 +1,7 @@
 #ifndef __SOUI_CAPI_H__
 #define __SOUI_CAPI_H__
 
-/*
+/**
  * SOUI C API Helper Macros
  *
  * This header includes all individual C API headers for SOUI interfaces.
@@ -19,7 +19,7 @@
  *   ITimer_Release(timer);
  */
 
-/* Include all individual C API headers
+/** Include all individual C API headers
  * Note: includes are outside extern "C" because interface headers (-i.h) may
  * contain C++ constructs (templates, namespaces). The macro definitions in each
  * capi header are preprocessor-only and do not require C linkage. */
@@ -76,9 +76,7 @@
 #include "sipcobj-capi.h"
 #include "stooltip-capi.h"
 
-/*
- * Common reference counting macros for IObjRef-derived interfaces
- */
+/** Common reference counting macros for IObjRef-derived interfaces */
 #define IObjRef_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -99,9 +97,7 @@
 #define IObjRef_IsValidInterface(This) \
     ((This) != NULL && (This)->lpVtbl != NULL)
 
-/*
- * HRESULT helpers
- */
+/** HRESULT helpers */
 #ifndef SOUI_SUCCEEDED
 #define SOUI_SUCCEEDED(hr) \
     ((HRESULT)(hr) >= 0)
@@ -112,4 +108,4 @@
     ((HRESULT)(hr) < 0)
 #endif
 
-#endif /* __SOUI_CAPI_H__ */
+#endif /**< __SOUI_CAPI_H__ */

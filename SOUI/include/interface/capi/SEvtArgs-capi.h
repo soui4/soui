@@ -7,12 +7,12 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for SEvtArgs Interfaces
  * These macros provide C-style function call syntax for C++ interface methods
  */
 
-/* IEvtArgs C API Macros */
+/** IEvtArgs C API Macros */
 #define IEvtArgs_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -103,7 +103,7 @@ extern "C" {
 #define IEvtArgs_Data(This) \
     ((This)->lpVtbl->Data(This))
 
-/* IEvtSlot C API Macros */
+/** IEvtSlot C API Macros */
 #define IEvtSlot_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -129,4 +129,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SEVTARGS_CAPI_H__ */
+#endif /**< __SEVTARGS_CAPI_H__ */

@@ -7,13 +7,13 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for ICaret Interface
  * These macros provide C-style function call syntax for C++ interface methods
  * ICaret inherits from IObject.
  */
 
-/* IObjRef base interface macros */
+/** IObjRef base interface macros */
 #define ICaret_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -23,7 +23,7 @@ extern "C" {
 #define ICaret_OnFinalRelease(This) \
     ((This)->lpVtbl->OnFinalRelease(This))
 
-/* IObject base interface macros */
+/** IObject base interface macros */
 #define ICaret_IsClass(This, lpszName) \
     ((This)->lpVtbl->IsClass(This, lpszName))
 
@@ -81,7 +81,7 @@ extern "C" {
 #define ICaret_SetAttrHandler(This, attrHandler) \
     ((This)->lpVtbl->SetAttrHandler(This, attrHandler))
 
-/* ICaret specific interface macros */
+/** ICaret specific interface macros */
 #define ICaret_Init(This, hBmp, nWid, nHei) \
     ((This)->lpVtbl->Init(This, hBmp, nWid, nHei))
 
@@ -104,4 +104,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SCARET_CAPI_H__ */
+#endif /**< __SCARET_CAPI_H__ */

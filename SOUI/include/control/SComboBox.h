@@ -206,4 +206,4 @@ class SOUI_EXP SComboBox : public TComboBaseProxy<IComboBox> {
 
 SNSEND
 
-#endif // __SCOMBOBOX__H__
+#endif /**< __SCOMBOBOX__H__ */

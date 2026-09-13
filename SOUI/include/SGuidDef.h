@@ -23,4 +23,4 @@
     EXTERN_C const GUID SOUI_EXP name
 #define DEFINE_SGUID2(name, l, w1, w2, b1, b2, b3, b4, b5, b6, b7, b8) \
         EXTERN_C const GUID  name 
-#endif // INITGUID
+#endif /**< INITGUID */

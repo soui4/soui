@@ -83,4 +83,4 @@ DECLARE_INTERFACE_(IRealWndHandler, IObjRef)
 };
 
 SNSEND
-#endif // __SREALWNDHANDLER_I__H__
+#endif /**< __SREALWNDHANDLER_I__H__ */

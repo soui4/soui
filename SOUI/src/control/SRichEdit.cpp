@@ -26,11 +26,11 @@ extern "C"
     STDAPI InitRichedit(HINSTANCE hInst);
     STDAPI UninitRichedit(HINSTANCE hInst);
 }
-#endif // INIT_RICHEDIT
+#endif /**< INIT_RICHEDIT */
 
 SNSBEGIN
-//////////////////////////////////////////////////////////////////////////
-//  STextServiceHelper
+///////////////////////////////////////////////////////////////////////
+/** STextServiceHelper */
 /**
  * @class      STextServiceHelper
  * @brief
@@ -56,7 +56,7 @@ class STextServiceHelper {
      * @param  IUnknown *punkOuter
      * @param  ITextHost *pITextHost
      * @param  IUnknown **ppUnk
-     * @return 返回HRESULT
+     * @return Return HRESULT
      *
      * Describe
      */
@@ -65,21 +65,21 @@ class STextServiceHelper {
   protected:
     /**
      * STextServiceHelper::STextServiceHelper
-     * @brief    构造函数
+     * @brief    Constructor
      *
-     * Describe  构造函数
+     * Describe  Constructor
      */
     STextServiceHelper();
     /**
      * STextServiceHelper::~STextServiceHelper
-     * @brief    析构函数
+     * @brief    Destructor
      *
-     * Describe  析构函数
+     * Describe  Destructor
      */
     ~STextServiceHelper();
 
     HINSTANCE m_rich20;                          /**< richedit module */
-    PCreateTextServices m_funCreateTextServices; /**< 回调函数 */
+    PCreateTextServices m_funCreateTextServices; /**< Callback function */
 };
 
 STextServiceHelper::STextServiceHelper()
@@ -144,7 +144,7 @@ void SRichEdit::UninitTextService()
     s_textServiceHelper = NULL;
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 //
 class SRicheditDropTarget : public SUnkImpl<IDropTarget> {
   public:
@@ -164,13 +164,13 @@ class SRicheditDropTarget : public SUnkImpl<IDropTarget> {
     IUNKNOWN_BEGIN(IDropTarget)
     IUNKNOWN_END()
 
-    // IDropTarget
+    /** IDropTarget */
     STDMETHOD(DragEnter)
     (
-        /* [unique][in] */ IDataObject *pDataObj,
-        /* [in] */ DWORD grfKeyState,
-        /* [in] */ POINTL pt,
-        /* [out][in] */ DWORD *pdwEffect)
+        /** [unique][in] */ IDataObject *pDataObj,
+        /** [in] */ DWORD grfKeyState,
+        /** [in] */ POINTL pt,
+        /** [out][in] */ DWORD *pdwEffect)
     {
         HRESULT hr = S_FALSE;
         IDropTarget *pDropTarget = NULL;
@@ -186,9 +186,9 @@ class SRicheditDropTarget : public SUnkImpl<IDropTarget> {
 
     STDMETHOD(DragOver)
     (
-        /* [in] */ DWORD grfKeyState,
-        /* [in] */ POINTL pt,
-        /* [out][in] */ DWORD *pdwEffect)
+        /** [in] */ DWORD grfKeyState,
+        /** [in] */ POINTL pt,
+        /** [out][in] */ DWORD *pdwEffect)
     {
         HRESULT hr = S_FALSE;
         IDropTarget *pDropTarget = NULL;
@@ -217,10 +217,10 @@ class SRicheditDropTarget : public SUnkImpl<IDropTarget> {
 
     STDMETHOD(Drop)
     (
-        /* [unique][in] */ IDataObject *pDataObj,
-        /* [in] */ DWORD grfKeyState,
-        /* [in] */ POINTL pt,
-        /* [out][in] */ DWORD *pdwEffect)
+        /** [unique][in] */ IDataObject *pDataObj,
+        /** [in] */ DWORD grfKeyState,
+        /** [in] */ POINTL pt,
+        /** [out][in] */ DWORD *pdwEffect)
     {
         if (*pdwEffect == DROPEFFECT_NONE)
             return S_FALSE;
@@ -236,7 +236,7 @@ class SRicheditDropTarget : public SUnkImpl<IDropTarget> {
     }
 
   protected:
-    ITextServices *pserv; // pointer to Text Services object
+    ITextServices *pserv; /**< pointer to Text Services object */
 };
 
 const LONG cInitTextMax = (32 * 1024) - 1;
@@ -244,19 +244,19 @@ const LONG cInitTextMax = (32 * 1024) - 1;
 #define FValidPF(_ppf)   ((_ppf)->cbSize == sizeof(PARAFORMAT2))
 #define TIMER_INVALIDATE 6
 
-EXTERN_C SELECT_ANY const IID IID_ITextServices = // 8d33f740-cf58-11ce-a89d-00aa006cadc5
+EXTERN_C SELECT_ANY const IID IID_ITextServices = /**< 8d33f740-cf58-11ce-a89d-00aa006cadc5 */
     { 0x8d33f740, 0xcf58, 0x11ce, { 0xa8, 0x9d, 0x00, 0xaa, 0x00, 0x6c, 0xad, 0xc5 } };
 
-EXTERN_C SELECT_ANY const IID IID_ITextHost = /* c5bdd8d0-d26e-11ce-a89e-00aa006cadc5 */
+EXTERN_C SELECT_ANY const IID IID_ITextHost = /**< c5bdd8d0-d26e-11ce-a89e-00aa006cadc5 */
     { 0xc5bdd8d0, 0xd26e, 0x11ce, { 0xa8, 0x9e, 0x00, 0xaa, 0x00, 0x6c, 0xad, 0xc5 } };
 
-// Convert Device Pixels to Himetric
+/** Convert Device Pixels to Himetric */
 LONG DtoHimetric(LONG d, LONG dPerInch)
 {
     return (LONG)MulDiv(d, HIMETRIC_PER_INCH, dPerInch);
 }
 
-// Convert Himetric Device pixels
+/** Convert Himetric Device pixels */
 LONG HimetrictoD(LONG lHimetric, LONG dPerInch)
 {
     return (LONG)MulDiv(lHimetric, dPerInch, HIMETRIC_PER_INCH);
@@ -274,24 +274,24 @@ class STextHost : public SUnkImpl<ITextHost> {
   public:
     /**
      * STextHost::STextHost
-     * @brief    构造函数
+     * @brief    Constructor
      *
-     * Describe  构造函数
+     * Describe  Constructor
      */
     STextHost(void);
     /**
      * STextHost::~STextHost
-     * @brief    析构函数
+     * @brief    Destructor
      *
-     * Describe  析构函数
+     * Describe  Destructor
      */
     ~STextHost(void);
     /**
      * STextHost::Init
-     * @brief    初始化函数
-     * @param    SRichEdit* pRichEdit -- SRichEdit对象
+     * @brief    Initialization function
+     * @param    SRichEdit* pRichEdit -- SRichEdit object
      *
-     * Describe  初始化函数
+     * Describe  Initialization function
      */
     BOOL Init(SRichEdit *pRichEdit);
     /**
@@ -312,7 +312,7 @@ class STextHost : public SUnkImpl<ITextHost> {
     /**
      * STextHost::TxGetDC
      * @brief     Get the DC for the host
-     * @return    返回HDC
+     * @return    Return HDC
      *
      * Describe   Get the DC for the host
      */
@@ -321,7 +321,7 @@ class STextHost : public SUnkImpl<ITextHost> {
     /**
      * STextHost::TxReleaseDC
      * @brief     Release the DC gotten from the host
-     * @return    返回INT
+     * @return    Return INT
      *
      * Describe   Release the DC gotten from the host
      */
@@ -332,7 +332,7 @@ class STextHost : public SUnkImpl<ITextHost> {
      * @brief     Show the scroll bar
      * @param     INT fnBar --
      * @param     BOOL fShow --
-     * @return    返回BOOL
+     * @return    Return BOOL
      *
      * Describe   Show the scroll bar
      */
@@ -343,7 +343,7 @@ class STextHost : public SUnkImpl<ITextHost> {
      * @brief     Enable the scroll bar
      * @param     INT fuSBFlags --
      * @param     INT fuArrowflags --
-     * @return    返回BOOL
+     * @return    Return BOOL
      *
      * Describe   Enable the scroll bar
      */
@@ -356,7 +356,7 @@ class STextHost : public SUnkImpl<ITextHost> {
      * @param     LONG nMinPos --
      * @param     INT nMaxPos --
      * @param     BOOL fRedraw --
-     * @return    返回BOOL
+     * @return    Return BOOL
      *
      * Describe   Set the scroll range
      */
@@ -368,7 +368,7 @@ class STextHost : public SUnkImpl<ITextHost> {
      * @param     INT fnBar --
      * @param     INT nPos --
      * @param     BOOL fRedraw --
-     * @return    返回BOOL
+     * @return    Return BOOL
      *
      * Describe   Set the scroll position
      */
@@ -399,7 +399,7 @@ class STextHost : public SUnkImpl<ITextHost> {
      * @param     HBITMAP hbmp -- caret bitmap
      * @param     INT xWidth -- caret width
      * @param     INT yHeight -- caret height
-     * @return    返回BOOL
+     * @return    Return BOOL
      *
      * Describe   Create the caret
      */
@@ -409,7 +409,7 @@ class STextHost : public SUnkImpl<ITextHost> {
      * STextHost::TxShowCaret
      * @brief     Show the caret
      * @param     BOOL fShow -- true to show the caret
-     * @return    返回BOOL
+     * @return    Return BOOL
      *
      * Describe   Show the caret
      */
@@ -420,7 +420,7 @@ class STextHost : public SUnkImpl<ITextHost> {
      * @brief     Set the caret position
      * @param     INT x -- caret position:x
      * @param     INT y -- caret position:y
-     * @return    返回BOOL
+     * @return    Return BOOL
      *
      * Describe   Set the caret position
      */
@@ -431,7 +431,7 @@ class STextHost : public SUnkImpl<ITextHost> {
      * @brief     Create a timer with the specified timeout
      * @param     UINT idTimer -- timer ID
      * @param     UINT uTimeout -- time interval
-     * @return    返回BOOL
+     * @return    Return BOOL
      *
      * Describe   Create a timer with the specified timeout
      */
@@ -441,7 +441,7 @@ class STextHost : public SUnkImpl<ITextHost> {
      * STextHost::TxSetTimer
      * @brief     Destroy a timer
      * @param     UINT idTimer -- timer id
-     * @return    返回BOOL
+     * @return    Return BOOL
      *
      * Describe   Destroy a timer
      */
@@ -493,7 +493,7 @@ class STextHost : public SUnkImpl<ITextHost> {
      * STextHost::TxScreenToClient
      * @brief     Converts screen coordinates of a specified point to the client coordinates
      * @param     LPPOINT lppt --
-     * @return    返回BOOL
+     * @return    Return BOOL
      *
      * Describe   Converts screen coordinates of a specified point to the client coordinates
      */
@@ -503,7 +503,7 @@ class STextHost : public SUnkImpl<ITextHost> {
      * STextHost::TxClientToScreen
      * @brief     Converts the client coordinates of a specified point to screen coordinates
      * @param     LPPOINT lppt --
-     * @return    返回BOOL
+     * @return    Return BOOL
      *
      * Describe   Converts the client coordinates of a specified point to screen coordinates
      */
@@ -513,7 +513,7 @@ class STextHost : public SUnkImpl<ITextHost> {
      * STextHost::TxActivate
      * @brief     Request host to activate text services
      * @param     LONG * plOldState --
-     * @return    返回HRESULT
+     * @return    Return HRESULT
      *
      * Describe   Request host to activate text services
      */
@@ -523,7 +523,7 @@ class STextHost : public SUnkImpl<ITextHost> {
      * STextHost::TxDeactivate
      * @brief     Request host to deactivate text services
      * @param     LONG lNewState --
-     * @return    返回HRESULT
+     * @return    Return HRESULT
      *
      * Describe   Request host to deactivate text services
      */
@@ -533,7 +533,7 @@ class STextHost : public SUnkImpl<ITextHost> {
      * STextHost::TxGetClientRect
      * @brief     Retrieves the coordinates of a window's client area
      * @param     LPRECT prc --
-     * @return    返回HRESULT
+     * @return    Return HRESULT
      *
      * Describe   Retrieves the coordinates of a window's client area
      */
@@ -543,7 +543,7 @@ class STextHost : public SUnkImpl<ITextHost> {
      * STextHost::TxGetViewInset
      * @brief     Get the view rectangle relative to the inset
      * @param     LPRECT prc --
-     * @return    返回HRESULT
+     * @return    Return HRESULT
      *
      * Describe   Get the view rectangle relative to the inset
      */
@@ -553,7 +553,7 @@ class STextHost : public SUnkImpl<ITextHost> {
      * STextHost::TxGetCharFormat
      * @brief     Get the default character format for the text
      * @param     const CHARFORMATW **ppCF --
-     * @return    返回HRESULT
+     * @return    Return HRESULT
      *
      * Describe   Get the default character format for the text
      */
@@ -563,7 +563,7 @@ class STextHost : public SUnkImpl<ITextHost> {
      * STextHost::TxGetParaFormat
      * @brief     Get the default paragraph format for the text
      * @param     const PARAFORMAT **ppPF --
-     * @return    返回HRESULT
+     * @return    Return HRESULT
      *
      * Describe   Get the default character format for the text
      */
@@ -573,7 +573,7 @@ class STextHost : public SUnkImpl<ITextHost> {
      * STextHost::TxGetSysColor
      * @brief     Get the background color for the window
      * @param     int nIndex --
-     * @return    返回COLORREF
+     * @return    Return COLORREF
      *
      * Describe   Get the background color for the window
      */
@@ -583,7 +583,7 @@ class STextHost : public SUnkImpl<ITextHost> {
      * STextHost::TxGetBackStyle
      * @brief     Get the background (either opaque or transparent)
      * @param     TXTBACKSTYLE *pstyle --
-     * @return    返回HRESULT
+     * @return    Return HRESULT
      *
      * Describe   Get the background (either opaque or transparent)
      */
@@ -593,7 +593,7 @@ class STextHost : public SUnkImpl<ITextHost> {
      * STextHost::TxGetMaxLength
      * @brief     Get the maximum length for the text
      * @param     DWORD *plength --
-     * @return    返回HRESULT
+     * @return    Return HRESULT
      *
      * Describe   Get the maximum length for the text
      */
@@ -603,7 +603,7 @@ class STextHost : public SUnkImpl<ITextHost> {
      * STextHost::TxGetScrollBars
      * @brief     Get the bits representing requested scroll bars for the window
      * @param     DWORD *pdwScrollBar --
-     * @return    返回HRESULT
+     * @return    Return HRESULT
      *
      * Describe   Get the bits representing requested scroll bars for the window
      */
@@ -613,7 +613,7 @@ class STextHost : public SUnkImpl<ITextHost> {
      * STextHost::TxGetPasswordChar
      * @brief     Get the character to display for password input
      * @param     TCHAR *pch --
-     * @return    返回HRESULT
+     * @return    Return HRESULT
      *
      * Describe   Get the character to display for password input
      */
@@ -623,7 +623,7 @@ class STextHost : public SUnkImpl<ITextHost> {
      * STextHost::TxGetAcceleratorPos
      * @brief     Get the accelerator character
      * @param     LONG *pcp --
-     * @return    返回HRESULT
+     * @return    Return HRESULT
      *
      * Describe   Get the accelerator character
      */
@@ -633,7 +633,7 @@ class STextHost : public SUnkImpl<ITextHost> {
      * STextHost::TxGetExtent
      * @brief     Get the native size
      * @param     LPSIZEL lpExtent --
-     * @return    返回HRESULT
+     * @return    Return HRESULT
      *
      * Describe   Get the native size
      */
@@ -643,7 +643,7 @@ class STextHost : public SUnkImpl<ITextHost> {
      * STextHost::OnTxCharFormatChange
      * @brief     Notify host that default character format has changed
      * @param     const CHARFORMATW * pcf --
-     * @return    返回HRESULT
+     * @return    Return HRESULT
      *
      * Describe   Notify host that default character format has changed
      */
@@ -653,7 +653,7 @@ class STextHost : public SUnkImpl<ITextHost> {
      * STextHost::OnTxParaFormatChange
      * @brief     Notify host that default paragraph format has changed
      * @param     const PARAFORMAT * ppf --
-     * @return    返回HRESULT
+     * @return    Return HRESULT
      *
      * Describe   Notify host that default paragraph format has changed
      */
@@ -664,7 +664,7 @@ class STextHost : public SUnkImpl<ITextHost> {
      * @brief     Bulk access to bit properties
      * @param     DWORD dwMask --
      * @param     DWORD *pdwBits --
-     * @return    返回HRESULT
+     * @return    Return HRESULT
      *
      * Describe   Bulk access to bit properties
      */
@@ -675,18 +675,18 @@ class STextHost : public SUnkImpl<ITextHost> {
      * @brief     Notify host of events
      * @param     DWORD iNotify  --
      * @param     void *pv --
-     * @return    返回HRESULT
+     * @return    Return HRESULT
      *
      * Describe   Bulk access to bit properties
      */
     virtual HRESULT TxNotify(DWORD iNotify, void *pv);
 
-    // Far East Methods for getting the Input Context
-    //#ifdef WIN95_IME
+    /** Far East Methods for getting the Input Context */
+    /** #ifdef WIN95_IME */
     /**
      * STextHost::TxImmGetContext
      * @brief
-     * @return     返回HIMC
+     * @return     Return HIMC
      *
      * Describe
      */
@@ -699,7 +699,7 @@ class STextHost : public SUnkImpl<ITextHost> {
      * Describe
      */
     virtual void TxImmReleaseContext(HIMC himc);
-    //#endif
+    /** #endif */
 
     /**
      * STextHost::TxGetSelectionBarWidth
@@ -731,8 +731,8 @@ STextHost::~STextHost(void)
         pserv->Release();
 }
 
-//////////////////////////////////////////////////////////////////////////
-// ITextHost
+///////////////////////////////////////////////////////////////////////
+/** ITextHost */
 HRESULT STextHost::TxGetViewInset(LPRECT prc)
 {
     *prc = m_pRichEdit->m_rcInset;
@@ -838,7 +838,7 @@ BOOL STextHost::TxShowCaret(BOOL fShow)
 
 BOOL STextHost::TxCreateCaret(HBITMAP hbmp, INT xWidth, INT yHeight)
 {
-    return m_pRichEdit->CreateCaret(hbmp, xWidth*m_pRichEdit->GetScale()/100, yHeight);
+    return m_pRichEdit->CreateCaret(hbmp, xWidth * m_pRichEdit->GetScale() / 100, yHeight);
 }
 
 HDC STextHost::TxGetDC()
@@ -889,19 +889,22 @@ BOOL STextHost::TxEnableScrollBar(INT fuSBFlags, INT fuArrowflags)
 
 BOOL STextHost::TxSetScrollRange(INT fnBar, LONG nMinPos, INT nMaxPos, BOOL fRedraw)
 {
-	//SLOGI() << "TxSetScrollRange: fnBar=" << fnBar << ", nMinPos=" << nMinPos << ", nMaxPos=" << nMaxPos << ", fRedraw=" << fRedraw;
+    // SLOGI() << "TxSetScrollRange: fnBar=" << fnBar << ", nMinPos=" << nMinPos << ", nMaxPos=" << nMaxPos << ", fRedraw=" << fRedraw;
     return m_pRichEdit->SetScrollRange(fnBar != SB_HORZ, nMinPos, nMaxPos, fRedraw);
 }
 
-
-// 窗口大小变化后，page 改变会导致原有 pos 可能超出新的合法范围
-// 主动把 pos 限制到 [nMin, nMax - nPage + 1]，避免滚动条卡在越界位置
-static BOOL ClampPos(SCROLLINFO* psi) {
+/** After window resize, page change may cause the original pos to exceed the new valid range */
+/** Actively clamp pos to [nMin, nMax - nPage + 1] to avoid the scrollbar getting stuck out of bounds */
+static BOOL ClampPos(SCROLLINFO *psi)
+{
     BOOL pos = psi->nPos;
-    if (psi->nPos < psi->nMin) psi->nPos = psi->nMin;
+    if (psi->nPos < psi->nMin)
+        psi->nPos = psi->nMin;
     LONG maxPos = psi->nMax - (LONG)psi->nPage + 1;
-    if (maxPos < psi->nMin) maxPos = psi->nMin;
-    if (psi->nPos > maxPos) psi->nPos = maxPos;
+    if (maxPos < psi->nMin)
+        maxPos = psi->nMin;
+    if (psi->nPos > maxPos)
+        psi->nPos = maxPos;
     return pos != psi->nPos;
 }
 
@@ -1100,8 +1103,8 @@ BOOL STextHost::Init(SRichEdit *pRichEdit)
     return SUCCEEDED(hr);
 }
 
-//////////////////////////////////////////////////////////////////////////
-// SRichEdit
+///////////////////////////////////////////////////////////////////////
+/** SRichEdit */
 
 SRichEdit::SRichEdit()
     : m_fTransparent(0)
@@ -1150,14 +1153,14 @@ int SRichEdit::OnCreate(LPVOID)
     m_pTxtHost = new STextHost;
     if (!m_pTxtHost->Init(this))
     {
-        SSLOGE()<<"init ITextHost Failed!";
+        SSLOGE() << "init ITextHost Failed!";
         m_pTxtHost->Release();
         m_pTxtHost = NULL;
         return 1;
     }
     // inplace activate
     m_pTxtHost->GetTextService()->OnTxInPlaceActivate(NULL);
-    //默认没有焦点
+    // No focus by default
     m_pTxtHost->m_fUiActive = FALSE;
     m_pTxtHost->GetTextService()->OnTxUIDeactivate();
     m_pTxtHost->GetTextService()->TxSendMessage(WM_KILLFOCUS, 0, 0, 0);
@@ -1217,7 +1220,7 @@ void SRichEdit::OnPaint(IRenderTarget *pRT)
         rt->SetViewportOrg(-rcClient.TopLeft());
         if (!SUCCEEDED(rt->BitBlt(&rcClient, pRT, rcClient.left, rcClient.top)))
         {
-            //从ID2D1HwndRenderTarget复制背景会失败，重新生成背景
+            // Copying the background from ID2D1HwndRenderTarget fails, regenerate the background
             rt->ClearRect(&rcClient, RGBA(255, 255, 255, 0));
             SSendMessage(WM_ERASEBKGND, (WPARAM)(IRenderTarget *)rt);
         }
@@ -1229,12 +1232,12 @@ void SRichEdit::OnPaint(IRenderTarget *pRT)
     HDC hdc = rt->GetDC(0);
     if (hdc)
     {
-        int nOldMode = ::SetGraphicsMode(hdc, GM_COMPATIBLE); // richedit需要将GraphicMode强制设置为GM_COMPATIBLE
+        int nOldMode = ::SetGraphicsMode(hdc, GM_COMPATIBLE); // richedit needs to force GraphicMode to GM_COMPATIBLE
 
 #ifdef _WIN32
         ALPHAINFO ai;
         CGdiAlpha::AlphaBackup(hdc, &rcClient, ai);
-#endif //_WIN32
+#endif // _WIN32
         LONG lPos = 0;
         m_pTxtHost->GetTextService()->TxGetVScroll(NULL, NULL, &lPos, NULL, NULL);
         RECTL rcL = { rcClient.left, rcClient.top, rcClient.right, rcClient.bottom };
@@ -1252,7 +1255,7 @@ void SRichEdit::OnPaint(IRenderTarget *pRT)
                                              TXTVIEW_ACTIVE);
 #ifdef _WIN32
         CGdiAlpha::AlphaRestore(ai);
-#endif //_WIN32
+#endif // _WIN32
         ::SetGraphicsMode(hdc, nOldMode);
     }
     rt->ReleaseDC(hdc, &rcClient);
@@ -1284,9 +1287,11 @@ void SRichEdit::OnSetFocus(SWND wndOld)
     if (ES_PASSWORD & m_dwStyle || ES_NUMBER & m_dwStyle)
     {
         GetContainer()->EnableIME(FALSE);
-    }else{
+    }
+    else
+    {
 #if defined(__ANDROID__) || defined(__IOS__) || defined(__OHOS__)
-        ShowSoftKeyboard(GetContainer()->GetHostHwnd(),TRUE);
+        ShowSoftKeyboard(GetContainer()->GetHostHwnd(), TRUE);
 #endif
     }
 }
@@ -1297,8 +1302,8 @@ void SRichEdit::OnKillFocus(SWND wndFocus)
     {
         GetContainer()->EnableIME(TRUE);
     }
-#if defined(__ANDROID__) || defined(__IOS__)|| defined(__OHOS__)
-    ShowSoftKeyboard(GetContainer()->GetHostHwnd(),FALSE);
+#if defined(__ANDROID__) || defined(__IOS__) || defined(__OHOS__)
+    ShowSoftKeyboard(GetContainer()->GetHostHwnd(), FALSE);
 #endif
     __baseCls::OnKillFocus(wndFocus);
     if (m_pTxtHost)
@@ -1308,7 +1313,7 @@ void SRichEdit::OnKillFocus(SWND wndFocus)
         m_pTxtHost->GetTextService()->TxSendMessage(WM_KILLFOCUS, 0, 0, 0);
         m_pTxtHost->TxShowCaret(FALSE);
     }
-    //防止正在编辑时隐藏了cursor
+    // Prevent the cursor from being hidden while editing
     GetContainer()->OnUpdateCursor();
 }
 
@@ -1467,7 +1472,7 @@ HRESULT SRichEdit::InitDefaultCharFormat(CHARFORMAT2W *pcf, IFontS *pFont)
     pcf->crTextColor = pRT->GetTextColor() & 0x00ffffff;
 #else
     pcf->crTextColor = pRT->GetTextColor();
-#endif //_WIN32
+#endif // _WIN32
     HDC hdc = GetDC(NULL);
     LONG yPixPerInch = GetDeviceCaps(hdc, LOGPIXELSY);
     ReleaseDC(NULL, hdc);
@@ -1475,7 +1480,7 @@ HRESULT SRichEdit::InitDefaultCharFormat(CHARFORMAT2W *pcf, IFontS *pFont)
     pcf->yHeight = abs(MulDiv(pFont->TextSize(), LY_PER_INCH, yPixPerInch));
     if (SLayoutSize::defUnit != px && IsRichScale())
     {
-        // rich scale 的情况下，edit内部已经对文字进行了放大，不再放大默认字体。
+        // Under rich scale, the edit has already scaled the text, so do not enlarge the default font.
         pcf->yHeight /= (GetScale() / 100);
     }
     pcf->yOffset = 0;
@@ -1526,8 +1531,8 @@ HRESULT SRichEdit::OnTxNotify(DWORD iNotify, LPVOID pv)
     FireEvent(evt);
     return evt.hr;
 }
-//////////////////////////////////////////////////////////////////////////
-//    richedit interfaces
+///////////////////////////////////////////////////////////////////////
+/** richedit interfaces */
 BOOL SRichEdit::GetWordWrap(void) const
 {
     return m_fWordWrap;
@@ -1638,9 +1643,9 @@ LRESULT SRichEdit::OnButtonClick(UINT uMsg, WPARAM wParam, LPARAM lParam)
 void SRichEdit::OnRButtonDown(UINT nFlags, CPoint point)
 {
     if (FireCtxMenu(point))
-        return; //用户自己响应右键
+        return; // User handles the right-click themselves
     SetFocus();
-    //弹出默认编辑窗菜单
+    // Pop up the default edit window menu
     SXmlNode xmlMenu = SApplication::getSingletonPtr()->GetEditCtxMenuTemplate();
     if (xmlMenu)
     {
@@ -1717,11 +1722,11 @@ void SRichEdit::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
         SetMsgHandled(FALSE);
         return;
     }
-    if(nChar == VK_ESCAPE)
+    if (nChar == VK_ESCAPE)
     {
         SetMsgHandled(FALSE);
         return;
-	}
+    }
     m_pTxtHost->GetTextService()->TxSendMessage(GetCurMsg()->uMsg, GetCurMsg()->wParam, GetCurMsg()->lParam, NULL);
 }
 
@@ -1775,7 +1780,7 @@ void SRichEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
             m_byDbcsLeadByte = 0;
             return;
         }
-#endif //_UNICODE
+#endif // _UNICODE
         break;
     }
     m_pTxtHost->GetTextService()->TxSendMessage(msg.uMsg, msg.wParam, msg.lParam, NULL);
@@ -1795,15 +1800,14 @@ LRESULT SRichEdit::OnNcCalcSize(BOOL bCalcValidRects, LPARAM lParam)
     m_siHoz.nPage = m_rcClient.Width() - rcInsetPixel.left - rcInsetPixel.right;
     m_siVer.nPage = m_rcClient.Height() - rcInsetPixel.top - rcInsetPixel.bottom;
 
-
     BOOL bClampV = ClampPos(&m_siVer);
     BOOL bClampH = ClampPos(&m_siHoz);
     if (bClampH || bClampV)
     {
-        POINT scrollPos = { m_siHoz.nPos,m_siVer.nPos };
+        POINT scrollPos = { m_siHoz.nPos, m_siVer.nPos };
         m_pTxtHost->GetTextService()->TxSendMessage(EM_SETSCROLLPOS, 0, reinterpret_cast<LPARAM>(&scrollPos), NULL);
     }
-    //SLOGI() << "OnNcCalcSize: m_siVer.nPage=" << m_siVer.nPage << ", pos=" << m_siVer.nPos;
+    // SLOGI() << "OnNcCalcSize: m_siVer.nPage=" << m_siVer.nPage << ", pos=" << m_siVer.nPos;
     if (m_pTxtHost)
     {
         HDC hdc = GetDC(NULL);
@@ -1819,8 +1823,8 @@ LRESULT SRichEdit::OnNcCalcSize(BOOL bCalcValidRects, LPARAM lParam)
         m_rcInset.top = DtoHimetric(rcInsetPixel.top, yPerInch);
         m_rcInset.bottom = DtoHimetric(rcInsetPixel.bottom, yPerInch);
 
-        //窗口有焦点时，需要更新光标位置：先使edit失活用来关闭光标，再激活edit来显示光标。
-        //此处不应该直接用setfocus和killfocus，因为这两个消息可能会被外面响应。导致逻辑错误
+        // When the window has focus, need to update cursor position: first deactivate the edit to hide the cursor, then activate the edit to show it.
+        // Should not directly use setfocus and killfocus here, because these two messages may be handled externally, causing logic errors
         BOOL bFocus = IsFocused();
         if (bFocus)
         {
@@ -1858,7 +1862,7 @@ LRESULT SRichEdit::OnSetLimitText(UINT uMsg, WPARAM wParam, LPARAM lParam)
 LRESULT SRichEdit::OnSetCharFormat(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     if (wParam == SCF_DEFAULT && !FValidCF((CHARFORMAT2W *)lParam))
-    { //设置默认字体只支持CHARFORMAT2W
+    { // Setting the default font only supports CHARFORMAT2W
         SSLOGI() << "set default char format failed! only CHARFORMAT2W can be set for default char format";
         return 0;
     }
@@ -1899,8 +1903,7 @@ LRESULT SRichEdit::OnSetParaFormat(UINT uMsg, WPARAM wparam, LPARAM lparam)
     }
     else
     {
-        m_pTxtHost->GetTextService()->TxSendMessage(uMsg, wparam, lparam,
-                                                    NULL); // Change selection format
+        m_pTxtHost->GetTextService()->TxSendMessage(uMsg, wparam, lparam, NULL); // Change selection format
     }
     return 1;
 }
@@ -1946,7 +1949,7 @@ void SRichEdit::SetWindowText(LPCTSTR lpszText)
 #endif
     if (IsRichScale())
     {
-        // setwindowtext会导致zoom丢失，需要重新设置。
+        // setwindowtext loses the zoom, need to set it again.
         SSendMessage(EM_SETZOOM, GetScale(), 100);
     }
     Invalidate();
@@ -1994,7 +1997,7 @@ int SRichEdit::GetWindowTextLength() const
 #else
     SStringT strRet = GetWindowText(TRUE);
     return strRet.GetLength();
-#endif //_UNICODE
+#endif // _UNICODE
 }
 
 ITextServices *SRichEdit::GetTextServices()
@@ -2087,7 +2090,7 @@ HRESULT SRichEdit::OnAttrRTF(const SStringW &strValue, BOOL bLoading)
 {
     if (bLoading)
     {
-        m_strRtfSrc = strValue; //将数据保存到控件初始化完成再写入控件
+        m_strRtfSrc = strValue; // Save the data and write it to the control after initialization completes
         return S_FALSE;
     }
     else
@@ -2129,7 +2132,7 @@ COLORREF SRichEdit::SetDefaultTextColor(COLORREF cr)
     m_cfDef.crTextColor = cr & 0x00ffffff;
 #else
     m_cfDef.crTextColor = cr;
-#endif //_WIN32
+#endif // _WIN32
     m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_CHARFORMATCHANGE, TXTBIT_CHARFORMATCHANGE);
     return crOld;
 }
@@ -2220,7 +2223,7 @@ void SRichEdit::OnScaleChanged(int nScale)
         SSendMessage(EM_SETZOOM, nScale, 100);
     }
     else
-    { //单行居中的放大，做特殊处理
+    { // Special handling for centered single-line scaling
         OnSetFont(NULL, FALSE);
     }
 }
@@ -2228,10 +2231,10 @@ void SRichEdit::OnScaleChanged(int nScale)
 void SRichEdit::OnRebuildFont()
 {
     __baseCls::OnRebuildFont();
-    OnSetFont(NULL, FALSE); //更新默认字体
+    OnSetFont(NULL, FALSE); // Update default font
     if (!IsRichScale())
     {
-        SSendMessage(WM_NCCALCSIZE); // 更新内边距
+        SSendMessage(WM_NCCALCSIZE); // Update padding
     }
 }
 
@@ -2329,7 +2332,7 @@ LRESULT SRichEdit::OnGetRect(UINT uMsg, WPARAM wp, LPARAM lp)
 
 BOOL SRichEdit::OnTxSetTimer(UINT idTimer, UINT uTimeout)
 {
-    SMap<UINT, SAutoRefPtr<ITimer> >::CPair *p = m_mapTimer.Lookup(idTimer);
+    SMap<UINT, SAutoRefPtr<ITimer>>::CPair *p = m_mapTimer.Lookup(idTimer);
     if (p)
     {
         p->m_value->KillTimer();

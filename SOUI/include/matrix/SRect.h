@@ -1,5 +1,5 @@
 
-/*
+/**
  * Copyright 2006 The Android Open Source Project
  *
  * Use of this source code is governed by a BSD-style license that can be
@@ -21,7 +21,8 @@ inline void STSwap(T &a, T &b)
     b = c;
 }
 
-/** \struct SkRect
+/**
+ * @struct SkRect
  */
 struct SOUI_EXP SRect : public fRect
 {
@@ -32,9 +33,7 @@ struct SOUI_EXP SRect : public fRect
         return rc;
     }
 
-    /**
-     *  Return true if the rectangle's width or height are <= 0
-     */
+    /** Return true if the rectangle's width or height are <= 0 */
     bool isEmpty() const
     {
         return fLeft >= fRight || fTop >= fBottom;
@@ -122,8 +121,7 @@ struct SOUI_EXP SRect : public fRect
      */
     void toQuad(SPoint quad[4]) const;
 
-    /** Set this rectangle to the empty rectangle (0,0,0,0)
-     */
+    /** Set this rectangle to the empty rectangle (0,0,0,0) */
     void setEmpty()
     {
         memset(this, 0, sizeof(*this));
@@ -178,7 +176,7 @@ struct SOUI_EXP SRect : public fRect
         (void)this->setBoundsCheck(pts, count);
     }
 
-    // alias for set(pts, count)
+    /** alias for set(pts, count) */
     void setBounds(const SPoint pts[], int count)
     {
         (void)this->setBoundsCheck(pts, count);
@@ -215,9 +213,7 @@ struct SOUI_EXP SRect : public fRect
         this->offset(delta.fX, delta.fY);
     }
 
-    /**
-     *  Offset this rect such its new x() and y() will equal newX and newY.
-     */
+    /** Offset this rect such its new x() and y() will equal newX and newY. */
     void offsetTo(float newX, float newY)
     {
         fRight += newX - fLeft;
@@ -257,9 +253,7 @@ struct SOUI_EXP SRect : public fRect
      */
     void sort();
 
-    /**
-     *  cast-safe way to treat the rect as an array of (4) SFloats.
-     */
+    /** cast-safe way to treat the rect as an array of (4) SFloats. */
     const float *asScalars() const
     {
         return &fLeft;

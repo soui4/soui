@@ -6,7 +6,7 @@
 
 SNSBEGIN
 
-const static TCHAR KTypeFile[] = _T("file"); //从文件加载资源时指定的类型
+const static TCHAR KTypeFile[] = _T("file"); /**< Type specified when loading resources from a file */
 
 SResProviderMgr::SResProviderMgr()
 {
@@ -24,7 +24,7 @@ void SResProviderMgr::RemoveAll()
     while (pos)
     {
         IResProvider *pResProvider = m_lstResPackage.GetNext(pos);
-#ifdef _DEBUG //检查资源使用情况
+#ifdef _DEBUG // Check resource usage
         SSLOGD() << "++++begin of check resource usage";
         pResProvider->EnumResource(&SResProviderMgr::CheckUsage, (LPARAM)&m_mapResUsageCount);
         SSLOGD() << "----end of check resource usage";
@@ -263,7 +263,7 @@ IBitmapS *SResProviderMgr::LoadImage(LPCTSTR pszType, LPCTSTR pszResName)
     }
 }
 
-HBITMAP SResProviderMgr::LoadBitmap(LPCTSTR pszResName, BOOL bFromFile /*= FALSE*/)
+HBITMAP SResProviderMgr::LoadBitmap(LPCTSTR pszResName, BOOL bFromFile /**< = FALSE */)
 {
     SAutoLock lock(m_cs);
     if (bFromFile)
@@ -292,7 +292,7 @@ HBITMAP SResProviderMgr::LoadBitmap(LPCTSTR pszResName, BOOL bFromFile /*= FALSE
     }
 }
 
-HCURSOR SResProviderMgr::LoadCursor(LPCTSTR pszResName, BOOL bFromFile /*= FALSE*/)
+HCURSOR SResProviderMgr::LoadCursor(LPCTSTR pszResName, BOOL bFromFile /**< = FALSE */)
 {
     SAutoLock lock(m_cs);
     if (IS_INTRESOURCE(pszResName))
@@ -344,7 +344,7 @@ HCURSOR SResProviderMgr::LoadCursor(LPCTSTR pszResName, BOOL bFromFile /*= FALSE
     return hRet;
 }
 
-HICON SResProviderMgr::LoadIcon(LPCTSTR pszResName, int cx /*=0*/, int cy /*=0*/, BOOL bFromFile /*= FALSE*/)
+HICON SResProviderMgr::LoadIcon(LPCTSTR pszResName, int cx /**< =0 */, int cy /**< =0 */, BOOL bFromFile /**< = FALSE */)
 {
     SAutoLock lock(m_cs);
     if (bFromFile)
@@ -429,7 +429,7 @@ BOOL SResProviderMgr::CheckUsage(LPCTSTR pszName, LPCTSTR pszType, LPARAM lp)
     SStringT key = SStringT().Format(_T("%s:%s"), pszType, pszName);
     key.MakeLower();
     if (!mapResUsageCount->Lookup(key))
-    { //发现未使用资源
+    { // Detect unused resources
         SSLOGD() << _T("resource of [") << key.c_str() << _T("] was not used.");
     }
     return TRUE;

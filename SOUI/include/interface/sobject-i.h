@@ -20,7 +20,7 @@
 #include <stdint.h>
 
 #pragma warning(disable : 4275)
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 SNSBEGIN
 
 #define WIDESTR_HELPER(x) L##x
@@ -45,7 +45,7 @@ SNSBEGIN
 #define DEF_OBJ_BASE(clsName, clsType)
 #endif
 
-// SObject Class Name Declaration
+/** SObject Class Name Declaration */
 #define DEF_SOBJECT_EX(baseCls, clsName, clsAlise)                                                             \
   public:                                                                                                      \
     typedef baseCls __baseCls;                                                                                 \
@@ -108,9 +108,9 @@ typedef enum _SObjectType
 
 /**
  * @class      SObject
- * @brief      SOUI系统中的对象基类
+ * @brief      Object base class in the SOUI system
  *
- * Describe    提供类RTTI机制，实现从XML节点中给派生类对象设置属性
+ * Describe     Provides RTTI mechanism for derived class objects to set properties from XML nodes
  */
 #undef INTERFACE
 #define INTERFACE IObject
@@ -121,10 +121,10 @@ DECLARE_INTERFACE_(IObject, IObjRef){ DEF_OBJ_BASE(IObject, Undef)
 #ifdef __cplusplus
 /**
  * sobj_cast
- * @brief    SOUI Object 的类型安全的类型转换接口
- * @param    SObject * pObj --  源对象
- * @return   T * -- 转换后的对象
- * Describe  如果源对象不是待转换对象类型，返回NULL
+ * @brief    Type-safe type cast interface for SOUI Object
+ * @param    SObject * pObj --  source object
+ * @return   T * -- converted object
+ * Describe  Returns NULL if the source object is not of the target type
  */
 template <class T>
 T *sobj_cast(const IObject *pObj)
@@ -142,4 +142,4 @@ T *sobj_cast(const IObject *pObj)
 
 SNSEND
 
-#endif // __SOBJECT_I__H__
+#endif /**< __SOBJECT_I__H__ */

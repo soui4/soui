@@ -8,263 +8,263 @@ SNSBEGIN
 
 /**
  * @class SListViewItemLocatorFix
- * @brief 固定高度的列表视图项定位器
+ * @brief List view item locator with fixed height
  */
 class SOUI_EXP SListViewItemLocatorFix : public TObjRefImpl<IListViewItemLocator> {
   public:
     /**
-     * @brief 构造函数
-     * @param nItemHei 每个项的高度
-     * @param nDividerSize 分隔符的高度（默认为0）
+     * @brief Constructor
+     * @param nItemHei Height of each item
+     * @param nDividerSize Height of the divider (default is 0)
      */
     SListViewItemLocatorFix(SLayoutSize nItemHei, SLayoutSize nDividerSize = SLayoutSize());
 
   public:
     /**
-     * @brief 设置适配器
-     * @param pAdapter 列表适配器对象指针
+     * @brief Set adapter
+     * @param pAdapter Pointer to the list adapter object
      */
     STDMETHOD_(void, SetAdapter)(THIS_ ILvAdapter *pAdapter) OVERRIDE;
 
     /**
-     * @brief 数据集发生变化时调用
+     * @brief Called when the data set changes
      */
     STDMETHOD_(void, OnDataSetChanged)(THIS) OVERRIDE
     {
     }
 
     /**
-     * @brief 检查是否为固定高度
-     * @return 固定高度返回TRUE，否则返回FALSE
+     * @brief Check whether it is fixed height
+     * @return Returns TRUE for fixed height, otherwise returns FALSE
      */
     STDMETHOD_(BOOL, IsFixHeight)(THIS) SCONST OVERRIDE;
 
     /**
-     * @brief 获取指定项的高度
-     * @param iItem 项索引
-     * @return 项的高度
+     * @brief Get the height of the specified item
+     * @param iItem Item index
+     * @return Item height
      */
     STDMETHOD_(int, GetItemHeight)(THIS_ int iItem) SCONST OVERRIDE;
 
     /**
-     * @brief 设置指定项的高度
-     * @param iItem 项索引
-     * @param nHeight 新的高度
+     * @brief Set the height of the specified item
+     * @param iItem Item index
+     * @param nHeight New height
      */
     STDMETHOD_(void, SetItemHeight)(THIS_ int iItem, int nHeight) OVERRIDE;
 
     /**
-     * @brief 获取总高度
-     * @return 总高度
+     * @brief Get total height
+     * @return Total height
      */
     STDMETHOD_(int, GetTotalHeight)(THIS) OVERRIDE;
 
     /**
-     * @brief 将项索引转换为位置
-     * @param iItem 项索引
-     * @return 位置
+     * @brief Convert item index to position
+     * @param iItem Item index
+     * @return Position
      */
     STDMETHOD_(int, Item2Position)(THIS_ int iItem) OVERRIDE;
 
     /**
-     * @brief 将位置转换为项索引
-     * @param position 位置
-     * @return 项索引
+     * @brief Convert position to item index
+     * @param position Position
+     * @return Item index
      */
     STDMETHOD_(int, Position2Item)(THIS_ int position) OVERRIDE;
 
     /**
-     * @brief 获取滚动行大小
-     * @return 滚动行大小
+     * @brief Get scroll line size
+     * @return Scroll line size
      */
     STDMETHOD_(int, GetScrollLineSize)(THIS) SCONST OVERRIDE;
 
     /**
-     * @brief 获取分隔符大小
-     * @return 分隔符大小
+     * @brief Get divider size
+     * @return Divider size
      */
     STDMETHOD_(int, GetDividerSize)(THIS) SCONST OVERRIDE;
 
     /**
-     * @brief 设置缩放比例
-     * @param nScale 缩放比例
+     * @brief Set scale
+     * @param nScale Scale
      */
     STDMETHOD_(void, SetScale)(THIS_ int nScale) OVERRIDE;
 
   protected:
     /**
-     * @brief 获取固定项的高度
-     * @return 固定项的高度
+     * @brief Get the height of the fixed item
+     * @return Fixed item height
      */
     int GetFixItemHeight() const;
 
-    SLayoutSize m_nItemHeight;         ///< 每个项的高度
-    SLayoutSize m_nDividerSize;        ///< 分隔符的高度
-    int m_nScale;                      ///< 缩放比例
-    SAutoRefPtr<ILvAdapter> m_adapter; ///< 列表适配器对象指针
+    SLayoutSize m_nItemHeight;         /**<  Height of each item */
+    SLayoutSize m_nDividerSize;        /**<  Divider height */
+    int m_nScale;                      /**<  Scale */
+    SAutoRefPtr<ILvAdapter> m_adapter; /**<  Pointer to the list adapter object */
 };
 
 /**
  * @class SListViewItemLocatorFlex
- * @brief 可变高度的列表视图项定位器
+ * @brief List view item locator with variable height
  */
 class SOUI_EXP SListViewItemLocatorFlex : public TObjRefImpl<IListViewItemLocator> {
   public:
     /**
-     * @brief 构造函数
-     * @param nItemHei 每个项的高度
-     * @param nDividerSize 分隔符的高度（默认为0）
+     * @brief Constructor
+     * @param nItemHei Height of each item
+     * @param nDividerSize Height of the divider (default is 0)
      */
     SListViewItemLocatorFlex(SLayoutSize nItemHei, SLayoutSize nDividerSize = SLayoutSize());
 
     /**
-     * @brief 析构函数
+     * @brief Destructor
      */
     ~SListViewItemLocatorFlex();
 
     /**
-     * @brief 设置适配器
-     * @param pAdapter 列表适配器对象指针
+     * @brief Set adapter
+     * @param pAdapter Pointer to the list adapter object
      */
     STDMETHOD_(void, SetAdapter)(THIS_ ILvAdapter *pAdapter) OVERRIDE;
 
     /**
-     * @brief 数据集发生变化时调用
+     * @brief Called when the data set changes
      */
     STDMETHOD_(void, OnDataSetChanged)(THIS) OVERRIDE;
 
     /**
-     * @brief 检查是否为固定高度
-     * @return 固定高度返回TRUE，否则返回FALSE
+     * @brief Check whether it is fixed height
+     * @return Returns TRUE for fixed height, otherwise returns FALSE
      */
     STDMETHOD_(BOOL, IsFixHeight)(THIS) SCONST OVERRIDE;
 
     /**
-     * @brief 获取指定项的高度
-     * @param iItem 项索引
-     * @return 项的高度
+     * @brief Get the height of the specified item
+     * @param iItem Item index
+     * @return Item height
      */
     STDMETHOD_(int, GetItemHeight)(THIS_ int iItem) SCONST OVERRIDE;
 
     /**
-     * @brief 设置指定项的高度
-     * @param iItem 项索引
-     * @param nHeight 新的高度
+     * @brief Set the height of the specified item
+     * @param iItem Item index
+     * @param nHeight New height
      */
     STDMETHOD_(void, SetItemHeight)(THIS_ int iItem, int nHeight) OVERRIDE;
 
     /**
-     * @brief 获取总高度
-     * @return 总高度
+     * @brief Get total height
+     * @return Total height
      */
     STDMETHOD_(int, GetTotalHeight)(THIS) OVERRIDE;
 
     /**
-     * @brief 将项索引转换为位置
-     * @param iItem 项索引
-     * @return 位置
+     * @brief Convert item index to position
+     * @param iItem Item index
+     * @return Position
      */
     STDMETHOD_(int, Item2Position)(THIS_ int iItem) OVERRIDE;
 
     /**
-     * @brief 将位置转换为项索引
-     * @param position 位置
-     * @return 项索引
+     * @brief Convert position to item index
+     * @param position Position
+     * @return Item index
      */
     STDMETHOD_(int, Position2Item)(THIS_ int position) OVERRIDE;
 
     /**
-     * @brief 获取滚动行大小
-     * @return 滚动行大小
+     * @brief Get scroll line size
+     * @return Scroll line size
      */
     STDMETHOD_(int, GetScrollLineSize)(THIS) SCONST OVERRIDE;
 
     /**
-     * @brief 获取分隔符大小
-     * @return 分隔符大小
+     * @brief Get divider size
+     * @return Divider size
      */
     STDMETHOD_(int, GetDividerSize)(THIS) SCONST OVERRIDE;
 
     /**
-     * @brief 设置缩放比例
-     * @param nScale 缩放比例
+     * @brief Set scale
+     * @param nScale Scale
      */
     STDMETHOD_(void, SetScale)(THIS_ int nScale) OVERRIDE;
 
   protected:
     /**
-     * @brief 初始化索引
-     * @param hParent 父项句柄
-     * @param nItems 项数量
-     * @param nSubBranchSize 子分支大小
+     * @brief Initialize index
+     * @param hParent Parent item handle
+     * @param nItems Number of items
+     * @param nSubBranchSize Sub-branch size
      */
     void InitIndex(HSTREEITEM hParent, int nItems, int nSubBranchSize);
 
     /**
-     * @brief 获取固定项的高度
-     * @return 固定项的高度
+     * @brief Get the height of the fixed item
+     * @return Fixed item height
      */
     int GetFixItemHeight() const;
 
     /**
-     * @brief 获取索引深度
-     * @return 索引深度
+     * @brief Get index depth
+     * @return Index depth
      */
     int GetIndexDeep() const;
 
     /**
-     * @brief 清除索引
+     * @brief Clear index
      */
     void Clear();
 
     /**
-     * @brief 将分支转换为偏移量
-     * @param hBranch 分支句柄
-     * @return 偏移量
+     * @brief Convert branch to offset
+     * @param hBranch Branch handle
+     * @return Offset
      */
     int Branch2Offset(HSTREEITEM hBranch) const;
 
     /**
-     * @brief 将分支转换为索引
-     * @param hBranch 分支句柄
-     * @return 索引
+     * @brief Convert branch to index
+     * @param hBranch Branch handle
+     * @return Index
      */
     int Branch2Index(HSTREEITEM hBranch) const;
 
     /**
-     * @brief 将偏移量转换为分支
-     * @param hParent 父项句柄
-     * @param nOffset 偏移量
-     * @return 分支句柄
+     * @brief Convert offset to branch
+     * @param hParent Parent item handle
+     * @param nOffset Offset
+     * @return Branch handle
      */
     HSTREEITEM Offset2Branch(HSTREEITEM hParent, int nOffset);
 
-    SLayoutSize m_nItemHeight;  ///< 每个项的高度
-    SLayoutSize m_nDividerSize; ///< 分隔符的高度
-    int m_nScale;               ///< 缩放比例
+    SLayoutSize m_nItemHeight;  /**<  Height of each item */
+    SLayoutSize m_nDividerSize; /**<  Divider height */
+    int m_nScale;               /**<  Scale */
 
     /**
      * @struct BranchInfo
-     * @brief 分支信息结构
+     * @brief Branch information structure
      */
     struct BranchInfo
     {
-        int nBranchHei;  ///< 分支高度
-        int nBranchSize; ///< 分支中包含的节点数量
+        int nBranchHei;  /**<  Branch height */
+        int nBranchSize; /**<  Number of nodes contained in the branch */
     };
 
-    CSTree<BranchInfo> m_itemPosIndex; ///< 记录分支高度
+    CSTree<BranchInfo> m_itemPosIndex; /**<  Record branch height */
 
     /**
      * @class SegmentInfo
-     * @brief 段信息类
+     * @brief Segment information class
      */
     class SegmentInfo {
       public:
         /**
-         * @brief 构造函数
-         * @param nItems 项数量
-         * @param hBranch 分支句柄
+         * @brief Constructor
+         * @param nItems Number of items
+         * @param hBranch Branch handle
          */
         SegmentInfo(int nItems, HSTREEITEM hBranch)
             : hItem(hBranch)
@@ -275,7 +275,7 @@ class SOUI_EXP SListViewItemLocatorFlex : public TObjRefImpl<IListViewItemLocato
         }
 
         /**
-         * @brief 析构函数
+         * @brief Destructor
          */
         ~SegmentInfo()
         {
@@ -283,15 +283,15 @@ class SOUI_EXP SListViewItemLocatorFlex : public TObjRefImpl<IListViewItemLocato
                 delete[] pItemHeight;
         }
 
-        HSTREEITEM hItem; ///< 分支句柄
-        int nItems;       ///< 项数量
-        int *pItemHeight; ///< 段中每一个项的高度
+        HSTREEITEM hItem; /**<  Branch handle */
+        int nItems;       /**<  Number of items */
+        int *pItemHeight; /**<  Height of each item in the segment */
     };
 
-    SArray<SegmentInfo *> m_segments;  ///< 段信息数组
-    SAutoRefPtr<ILvAdapter> m_adapter; ///< 列表适配器对象指针
+    SArray<SegmentInfo *> m_segments;  /**<  Segment information array */
+    SAutoRefPtr<ILvAdapter> m_adapter; /**<  Pointer to the list adapter object */
 };
 
 SNSEND
 
-#endif // __SLISTVIEWITEMLOCATOR__H__
+#endif /**< __SLISTVIEWITEMLOCATOR__H__ */

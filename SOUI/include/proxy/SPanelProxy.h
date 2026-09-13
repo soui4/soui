@@ -89,4 +89,4 @@ public:
 };
 
 SNSEND
-#endif // __SPANELPROXY__H__
+#endif /**< __SPANELPROXY__H__ */

@@ -98,7 +98,6 @@ class STabSlider
         Stop();
     }
 
-
     int GetItemState(int iItem) const
     {
         DWORD dwState = WndState_Normal;
@@ -227,7 +226,6 @@ class STabSlider
         Stop();
     }
 
-
     SAutoRefPtr<IRenderTarget> m_rtPageFrom, m_rtPageTo;
     int m_iFrom, m_iTo;
     bool m_bVertical;
@@ -238,8 +236,8 @@ class STabSlider
     SOUI_MSG_MAP_END()
 };
 
-//////////////////////////////////////////////////////////////////////////
-// STabCtrl
+///////////////////////////////////////////////////////////////////////
+/** STabCtrl */
 
 STabCtrl::STabCtrl()
     : m_nCurrentPage(0)
@@ -294,7 +292,7 @@ void STabCtrl::OnPaint(IRenderTarget *pRT)
             if (rcItem.IsRectEmpty())
                 continue;
 
-            //画分隔线
+            // Draw separator line
             if (i > 0 && m_pSkinTabInter)
             {
                 rcSplit = rcItem;
@@ -373,7 +371,7 @@ void STabCtrl::OnLButtonDown(UINT nFlags, CPoint point)
     }
 }
 
-BOOL STabCtrl::RemoveItem(int nIndex, int nSelPage /*=0*/)
+BOOL STabCtrl::RemoveItem(int nIndex, int nSelPage /**< =0 */)
 {
     STabPage *pTab = GetItem(nIndex);
     OnItemRemoved(pTab);
@@ -397,6 +395,7 @@ BOOL STabCtrl::RemoveItem(int nIndex, int nSelPage /*=0*/)
     }
     CRect rcTitle = GetTitleRect();
     InvalidateRect(rcTitle);
+    accNotifyEvent(EVENT_OBJECT_REORDER);
     return TRUE;
 }
 
@@ -411,6 +410,7 @@ void STabCtrl::RemoveAllItems(void)
     }
     m_nCurrentPage = -1;
     Invalidate();
+    accNotifyEvent(EVENT_OBJECT_REORDER);
 }
 
 void STabCtrl::OnMouseMove(UINT nFlags, CPoint point)
@@ -499,7 +499,7 @@ int STabCtrl::GetPageIndex(LPCTSTR pszName, BOOL bTitle)
     return -1;
 }
 
-STabPage *STabCtrl::GetPage(LPCTSTR pszName, BOOL bTitle /*=TRUE*/)
+STabPage *STabCtrl::GetPage(LPCTSTR pszName, BOOL bTitle /**< =TRUE */)
 {
     int iPage = GetPageIndex(pszName, bTitle);
     if (iPage == -1)
@@ -574,10 +574,11 @@ BOOL STabCtrl::SetCurSel(int nIndex)
     evt2.uOldSel = nOldPage;
 
     FireEvent(evt2);
+    accNotifyEvent(EVENT_OBJECT_SELECTION);
     return TRUE;
 }
 
-BOOL STabCtrl::SetCurSel(LPCTSTR pszName, BOOL bTitle /*=TRUE */)
+BOOL STabCtrl::SetCurSel(LPCTSTR pszName, BOOL bTitle /**< =TRUE */)
 {
     int iPage = GetPageIndex(pszName, bTitle);
     if (iPage == -1)
@@ -630,7 +631,7 @@ STabPage *STabCtrl::CreatePageFromXml(SXmlNode xmlPage)
     return (STabPage *)CreateChildByName(STabPage::GetClassName());
 }
 
-int STabCtrl::InsertItem(LPCWSTR lpContent, int iInsert /*=-1*/)
+int STabCtrl::InsertItem(LPCWSTR lpContent, int iInsert /**< =-1 */)
 {
     SXmlDoc xmlDoc;
     if (!xmlDoc.load_buffer(lpContent, wcslen(lpContent) * sizeof(wchar_t), xml_parse_default, sizeof(wchar_t) == 2 ? enc_utf16 : enc_utf32))
@@ -638,7 +639,7 @@ int STabCtrl::InsertItem(LPCWSTR lpContent, int iInsert /*=-1*/)
     return InsertItem(xmlDoc.root().first_child(), iInsert);
 }
 
-int STabCtrl::InsertItem(SXmlNode xmlNode, int iInsert /*=-1*/, BOOL bLoading /*=FALSE*/)
+int STabCtrl::InsertItem(SXmlNode xmlNode, int iInsert /**< =-1 */, BOOL bLoading /**< =FALSE */)
 {
     if (_wcsicmp(xmlNode.name(), L"include") == 0)
     { // support include tag
@@ -675,6 +676,7 @@ int STabCtrl::InsertItem(SXmlNode xmlNode, int iInsert /*=-1*/, BOOL bLoading /*
             SetCurSel(iInsert);
     }
     OnItemInserted(pChild);
+    accNotifyEvent(EVENT_OBJECT_REORDER);
     return iInsert;
 }
 
@@ -750,7 +752,7 @@ void STabCtrl::DrawItem(IRenderTarget *pRT, const CRect &rcItem, int iItem, DWOR
     if (m_pSkinTab)
         m_pSkinTab->DrawByState(pRT, rcItem, dwState);
     int iState = SState2Index::GetDefIndex(dwState, true);
-    //根据状态从style中获得字体，颜色
+    // Get font and color from style according to state
     IFontPtr font = m_style.GetTextFont(iState);
     COLORREF crTxt = m_style.GetTextColor(iState);
     SAutoRefPtr<IFontS> oldFont;
@@ -772,7 +774,7 @@ void STabCtrl::DrawItem(IRenderTarget *pRT, const CRect &rcItem, int iItem, DWOR
     }
 
     if (m_ptText[0].toPixelSize(GetScale()) > 0 && m_ptText[1].toPixelSize(GetScale()) > 0)
-    { //从指定位置开始绘制文字
+    { // Draw text starting from the specified position
         if (m_txtDir == Text_Horz)
             pRT->TextOut(rcItem.left + m_ptText[0].toPixelSize(GetScale()), rcItem.top + m_ptText[1].toPixelSize(GetScale()), GetItem(iItem)->GetTitle(), -1);
         else
@@ -784,12 +786,12 @@ void STabCtrl::DrawItem(IRenderTarget *pRT, const CRect &rcItem, int iItem, DWOR
         UINT alignStyle = m_style.GetTextAlign();
         UINT align = alignStyle;
         if (m_ptText[0].toPixelSize(GetScale()) < 0 && m_ptText[1].toPixelSize(GetScale()) > 0)
-        { //指定了Y偏移，X居中
+        { // Y offset specified, X centered
             rcText.top += m_ptText[1].toPixelSize(GetScale());
             align = alignStyle & (DT_CENTER | DT_RIGHT | DT_SINGLELINE | DT_END_ELLIPSIS);
         }
         else if (m_ptText[0].toPixelSize(GetScale()) > 0 && m_ptText[1].toPixelSize(GetScale()) < 0)
-        { //指定了X偏移，Y居中
+        { // X offset specified, Y centered
             rcText.left += m_ptText[0].toPixelSize(GetScale());
             align = alignStyle & (DT_VCENTER | DT_BOTTOM | DT_SINGLELINE | DT_END_ELLIPSIS);
         }
@@ -800,7 +802,7 @@ void STabCtrl::DrawItem(IRenderTarget *pRT, const CRect &rcItem, int iItem, DWOR
             DrawTextV(pRT, rcText, GetItem(iItem)->GetTitle());
     }
 
-    //恢复字体，颜色
+    // Restore font and color
     if (font)
         pRT->SelectObject(oldFont, NULL);
     if (crTxt != CR_INVALID)
@@ -840,7 +842,9 @@ void STabCtrl::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
     else if (nChar == VK_END)
     {
         SetCurSel(GetItemCount() - 1);
-    }else{
+    }
+    else
+    {
         SetMsgHandled(FALSE);
     }
 }
@@ -975,7 +979,7 @@ HRESULT STabCtrl::OnLanguageChanged()
 
 void STabCtrl::OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer)
 {
-    if(m_aniSlider->isRunning())
+    if (m_aniSlider->isRunning())
         m_aniSlider->end();
     __baseCls::OnContainerChanged(pOldContainer, pNewContainer);
 }

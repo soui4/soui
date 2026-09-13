@@ -31,59 +31,59 @@ DECLARE_INTERFACE_(ISwndFinder, IObjRef)
 
     //---------------------------------------------------------------------
     /**
-     * @brief 通过名称查找子窗口
-     * @param pParent 父窗口指针
-     * @param strName 窗口名称
-     * @param nDeep 查找深度
-     * @return 找到的窗口指针，未找到返回NULL
+     * @brief Find a child window by name
+     * @param pParent Pointer to parent window
+     * @param strName Window name
+     * @param nDeep Search depth
+     * @return Pointer to the found window, or NULL if not found
      */
     STDMETHOD_(IWindow *, FindChildByName)(THIS_ IWindow * pParent, LPCWSTR strName, int nDeep) PURE;
 
     /**
-     * @brief 通过ID查找子窗口
-     * @param pParent 父窗口指针
-     * @param nID 窗口ID
-     * @param nDeep 查找深度
-     * @return 找到的窗口指针，未找到返回NULL
+     * @brief Find a child window by ID
+     * @param pParent Pointer to parent window
+     * @param nID Window ID
+     * @param nDeep Search depth
+     * @return Pointer to the found window, or NULL if not found
      */
     STDMETHOD_(IWindow *, FindChildByID)(THIS_ IWindow * pParent, int nID, int nDeep) PURE;
 
     /**
-     * @brief 缓存通过名称查找的结果
-     * @param pParent 父窗口指针
-     * @param strName 窗口名称
-     * @param nDeep 查找深度
-     * @param pResult 找到的窗口指针
+     * @brief Cache the result of finding by name
+     * @param pParent Pointer to parent window
+     * @param strName Window name
+     * @param nDeep Search depth
+     * @param pResult Pointer to the found window
      */
     STDMETHOD_(void, CacheResultForName)(THIS_ IWindow * pParent, LPCWSTR strName, int nDeep, IWindow *pResult) PURE;
 
     /**
-     * @brief 缓存通过ID查找的结果
-     * @param pParent 父窗口指针
-     * @param nID 窗口ID
-     * @param nDeep 查找深度
-     * @param pResult 找到的窗口指针
+     * @brief Cache the result of finding by ID
+     * @param pParent Pointer to parent window
+     * @param nID Window ID
+     * @param nDeep Search depth
+     * @param pResult Pointer to the found window
      */
     STDMETHOD_(void, CacheResultForID)(THIS_ IWindow * pParent, int nID, int nDeep, IWindow *pResult) PURE;
 
     /**
-     * @brief 删除缓存结果
-     * @param pParent 父窗口指针
-     * @param strName 窗口名称
-     * @param nDeep 缓存深度
-     * @return 删除成功返回TRUE，否则返回FALSE
+     * @brief Delete cached result
+     * @param pParent parent window pointer
+     * @param strName window name
+     * @param nDeep cache depth
+     * @return Returns TRUE on success, otherwise FALSE
      */
     STDMETHOD_(BOOL, EraseCacheForName)(THIS_ IWindow * pParent, LPCWSTR strName, int nDeep) PURE;
 
     /**
-     * @brief 删除缓存结果
-     * @param pParent 父窗口指针
-     * @param nID 窗口ID
-     * @param nDeep 缓存深度
-     * @return 删除成功返回TRUE，否则返回FALSE
+     * @brief Delete cached result
+     * @param pParent parent window pointer
+     * @param nID window ID
+     * @param nDeep cache depth
+     * @return Returns TRUE on success, otherwise FALSE
      */
     STDMETHOD_(BOOL, EraseCacheForID)(THIS_ IWindow * pParent, int nID, int nDeep) PURE;
 };
 
 SNSEND
-#endif //__SWNDFINDER_I__H__
+#endif /**< __SWNDFINDER_I__H__ */

@@ -310,7 +310,7 @@ void SAnimationSet::setFlag(int mask, bool value)
     }
 }
 
-SAnimationSet::SAnimationSet(bool shareInterpolator /*=true*/)
+SAnimationSet::SAnimationSet(bool shareInterpolator /**< =true */)
 {
     setFlag(PROPERTY_SHARE_INTERPOLATOR_MASK, shareInterpolator);
     init();

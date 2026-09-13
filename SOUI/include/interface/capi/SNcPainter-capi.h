@@ -7,13 +7,13 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for SNcPainter Interface
  * These macros provide C-style function call syntax for C++ interface methods
  * INcPainter inherits from IObject.
  */
 
-/* IObject base interface macros */
+/** IObject base interface macros */
 #define INcPainter_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -74,7 +74,7 @@ extern "C" {
 #define INcPainter_SetAttrHandler(This, attrHandler) \
     ((This)->lpVtbl->SetAttrHandler(This, attrHandler))
 
-/* INcPainter specific interface macros */
+/** INcPainter specific interface macros */
 #define INcPainter_GetRoot(This) \
     ((This)->lpVtbl->GetRoot(This))
 
@@ -82,4 +82,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SNCPAINTER_CAPI_H__ */
+#endif /**< __SNCPAINTER_CAPI_H__ */

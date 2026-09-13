@@ -6,8 +6,8 @@
 
 SNSBEGIN
 
-//////////////////////////////////////////////////////////////////////////
-// SSkinPool
+///////////////////////////////////////////////////////////////////////
+/** SSkinPool */
 
 SSkinPool::SSkinPool(BOOL bAutoScale)
     : m_bAutoScale(bAutoScale)
@@ -18,7 +18,7 @@ SSkinPool::SSkinPool(BOOL bAutoScale)
 SSkinPool::~SSkinPool()
 {
 #ifdef _DEBUG
-    //查询哪些皮肤运行过程中没有使用过,将结果用输出到Output
+    // Query which skins were never used during runtime, and output the result to Output
     SSLOGD() << "####Detecting Defined Skin Usage BEGIN";
     SPOSITION pos = m_mapNamedObj->GetStartPosition();
     while (pos)
@@ -96,7 +96,7 @@ int SSkinPool::LoadSkins(IXmlNode *xmlNode)
 {
     if (!xmlNode)
         return 0;
-    // loadSkins前把this加入到poolmgr,便于在skin中引用其它skin
+    // Add this to poolmgr before loadSkins, to make it easier to reference other skins within a skin
     GETUIDEF->PushSkinPool(this);
     int nLoaded = _LoadSkins(SXmlNode(xmlNode));
     GETUIDEF->PopSkinPool(this);

@@ -30,5 +30,3 @@ Modification History:
 1.2 2021.12.16
 1.1 2020.6.16
 1.0 2019.10.6
-
-Start Journey Software

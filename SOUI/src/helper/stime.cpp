@@ -111,7 +111,7 @@ bool STimeSpan::operator>=(STimeSpan span) const
     return (m_timeSpan >= span.m_timeSpan);
 }
 
-/////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 
 STime::STime(int nYear, int nMonth, int nDay, int nHour, int nMin, int nSec, int nDST)
 {

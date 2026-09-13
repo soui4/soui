@@ -7,12 +7,12 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for SImgDecoder Interfaces
  * These macros provide C-style function call syntax for C++ interface methods
  */
 
-/* IImgFrame C API Macros */
+/** IImgFrame C API Macros */
 #define IImgFrame_GetSize(This, pWid, pHei) \
     ((This)->lpVtbl->GetSize(This, pWid, pHei))
 
@@ -22,7 +22,7 @@ extern "C" {
 #define IImgFrame_GetDelay(This) \
     ((This)->lpVtbl->GetDelay(This))
 
-/* IImgX C API Macros */
+/** IImgX C API Macros */
 #define IImgX_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -47,7 +47,7 @@ extern "C" {
 #define IImgX_GetFrame(This, iFrame) \
     ((This)->lpVtbl->GetFrame(This, iFrame))
 
-/* IImgDecoderFactory C API Macros */
+/** IImgDecoderFactory C API Macros */
 #define IImgDecoderFactory_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -73,4 +73,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SIMGDECODER_CAPI_H__ */
+#endif /**< __SIMGDECODER_CAPI_H__ */

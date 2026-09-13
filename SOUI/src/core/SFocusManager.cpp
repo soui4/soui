@@ -55,14 +55,14 @@ SWindow *FocusSearch::FindNextFocusableView(SWindow *starting_view, bool reverse
     return pRet;
 }
 
-// Strategy for finding the next focusable view:
-// - keep going down the first child, stop when you find a focusable view or
-//   a focus traversable view (in that case return it) or when you reach a view
-//   with no children.
-// - go to the right sibling and start the search from there (by invoking
-//   FindNextFocusableViewImpl on that view).
-// - if the view has no right sibling, go up the parents until you find a parent
-//   with a right sibling and start the search from there.
+/** Strategy for finding the next focusable view: */
+/** - keep going down the first child, stop when you find a focusable view or */
+/** a focus traversable view (in that case return it) or when you reach a view */
+/** with no children. */
+/** - go to the right sibling and start the search from there (by invoking */
+/** FindNextFocusableViewImpl on that view). */
+/** - if the view has no right sibling, go up the parents until you find a parent */
+/** with a right sibling and start the search from there. */
 SWindow *FocusSearch::FindNextFocusableViewImpl(SWindow *starting_view, bool check_starting_view, bool can_go_up, bool can_go_down, SWindow *pSkipGroupOwner)
 {
     if (check_starting_view)
@@ -125,12 +125,12 @@ SWindow *FocusSearch::FindNextFocusableViewImpl(SWindow *starting_view, bool che
     return NULL;
 }
 
-// Strategy for finding the previous focusable view:
-// - keep going down on the right until you reach a view with no children, if it
-//   it is a good candidate return it.
-// - start the search on the left sibling.
-// - if there are no left sibling, start the search on the parent (without going
-//   down).
+/** Strategy for finding the previous focusable view: */
+/** - keep going down on the right until you reach a view with no children, if it */
+/** it is a good candidate return it. */
+/** - start the search on the left sibling. */
+/** - if there are no left sibling, start the search on the parent (without going */
+/** down). */
 SWindow *FocusSearch::FindPreviousFocusableViewImpl(SWindow *starting_view, bool check_starting_view, bool can_go_up, bool can_go_down, SWindow *pSkipGroupOwner)
 {
     if (can_go_down)
@@ -187,7 +187,7 @@ bool FocusSearch::IsFocusable(const SWindow *view) const
     return view->IsFocusable() && view->IsVisible(TRUE) && !view->IsDisabled(TRUE);
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 SFocusManager::SFocusManager()
     : m_pOwner(NULL)
     , focused_view_(0)
@@ -299,7 +299,7 @@ void SFocusManager::SetFocusedHwndWithReason(SWND swnd, FocusChangeReason reason
     }
 
     if (focused_backup_ != 0)
-    { //当前是在最小化状态,直接修改状态
+    { // Currently in minimized state, modify the state directly
         focused_backup_ = swnd;
         return;
     }
@@ -370,7 +370,7 @@ void SFocusManager::StoreFocusedView()
     }
     else
     {
-        focused_backup_ = -1; //标识一下当前是最小化状态
+        focused_backup_ = -1; // Mark that the current state is minimized
     }
 }
 

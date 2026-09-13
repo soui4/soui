@@ -252,7 +252,6 @@
 			 m_spViewObject->QueryHitPoint(DVASPECT_CONTENT, &m_rcPos, pt, 0, &dwHitResult);
 			 return (dwHitResult == HITRESULT_HIT);
 		 }
-		 // else
 		 return (::PtInRect(&m_rcPos, pt) != FALSE);
 	 }
  
@@ -400,7 +399,7 @@
 	  * @param ppmk Pointer to receive the moniker.
 	  * @return HRESULT indicating success or failure.
 	  */
-	 STDMETHOD(GetMoniker)(DWORD /*dwAssign*/, DWORD dwWhichMoniker, IMoniker** ppmk)
+	 STDMETHOD(GetMoniker)(DWORD /**< dwAssign */, DWORD dwWhichMoniker, IMoniker** ppmk)
 	 {
 		 return E_NOTIMPL;
 	 }
@@ -473,7 +472,7 @@
 	  * @param fLock Boolean indicating if the lock should be set.
 	  * @return HRESULT indicating success or failure.
 	  */
-	 STDMETHOD(LockInPlaceActive)(BOOL /*fLock*/)
+	 STDMETHOD(LockInPlaceActive)(BOOL /**< fLock */)
 	 {
 		 ATLTRACENOTIMPL(_T("ActiveXSite::LockInPlaceActive\n"));
 	 }
@@ -495,7 +494,7 @@
 	  * @param dwFlags Flags specifying the transformation.
 	  * @return HRESULT indicating success or failure.
 	  */
-	 STDMETHOD(TransformCoords)(POINTL* /*pPtlHimetric*/, POINTF* /*pPtfContainer*/, DWORD /*dwFlags*/)
+	 STDMETHOD(TransformCoords)(POINTL* /**< pPtlHimetric */, POINTF* /**< pPtfContainer */, DWORD /**< dwFlags */)
 	 {
 		 ATLTRACENOTIMPL(_T("ActiveXSite::TransformCoords\n"));
 	 }
@@ -506,7 +505,7 @@
 	  * @param grfModifiers Modifiers for the key.
 	  * @return HRESULT indicating success or failure.
 	  */
-	 STDMETHOD(TranslateAccelerator)(MSG* /*pMsg*/, DWORD /*grfModifiers*/)
+	 STDMETHOD(TranslateAccelerator)(MSG* /**< pMsg */, DWORD /**< grfModifiers */)
 	 {
 		 ATLTRACENOTIMPL(_T("ActiveXSite::TranslateAccelerator\n"));
 	 }
@@ -633,7 +632,7 @@
   * @param fErase Boolean indicating if the background should be erased.
   * @return S_OK if the operation is successful.
   */
- STDMETHOD(InvalidateRgn)(HRGN /*hRGN*/, BOOL fErase)
+ STDMETHOD(InvalidateRgn)(HRGN /**< hRGN */, BOOL fErase)
  {
 	 return InvalidateRect(NULL, fErase);
  }
@@ -646,7 +645,7 @@
   * @param pRectClip Clipping rectangle.
   * @return HRESULT indicating success or failure.
   */
- STDMETHOD(ScrollRect)(INT /*dx*/, INT /*dy*/, LPCRECT /*pRectScroll*/, LPCRECT /*pRectClip*/)
+ STDMETHOD(ScrollRect)(INT /**< dx */, INT /**< dy */, LPCRECT /**< pRectScroll */, LPCRECT /**< pRectClip */)
  {
 	 ATLTRACENOTIMPL(_T("ActiveXSite::ScrollRect\n"));
  }
@@ -656,7 +655,7 @@
   * @param prc Rectangle to be adjusted.
   * @return HRESULT indicating success or failure.
   */
- STDMETHOD(AdjustRect)(LPRECT /*prc*/)
+ STDMETHOD(AdjustRect)(LPRECT /**< prc */)
  {
 	 ATLTRACENOTIMPL(_T("ActiveXSite::AdjustRect\n"));
  }
@@ -675,7 +674,6 @@
 	 return S_OK;
  }
  
- // IOleInPlaceSiteEx
  /**
   * @brief Activate the control in-place with extended options.
   * @param pfNoRedraw Pointer to a boolean indicating if redrawing should be suppressed.
@@ -710,7 +708,7 @@
   * @param fNoRedraw Boolean indicating if redrawing should be suppressed.
   * @return S_OK if the control is deactivated successfully.
   */
- STDMETHOD(OnInPlaceDeactivateEx)(BOOL /*fNoRedraw*/)
+ STDMETHOD(OnInPlaceDeactivateEx)(BOOL /**< fNoRedraw */)
  {
 	 m_bInplaceActive = false;
 	 return S_OK;
@@ -725,7 +723,7 @@
 	 return S_OK;
  }
  
- // IOleInPlaceSite
+
  /**
   * @brief Check if the control can be activated in-place.
   * @return S_OK if in-place activation is possible, otherwise an error code.
@@ -794,7 +792,7 @@
   * @param scrollExtant Size of the scroll.
   * @return HRESULT indicating success or failure.
   */
- STDMETHOD(Scroll)(SIZE /*scrollExtant*/)
+ STDMETHOD(Scroll)(SIZE /**< scrollExtant */)
  {
 	 ATLTRACENOTIMPL(_T("ActiveXSite::Scroll\n"));
  }
@@ -804,7 +802,7 @@
   * @param fUndoable Boolean indicating if the deactivation can be undone.
   * @return S_OK if the UI is deactivated successfully.
   */
- STDMETHOD(OnUIDeactivate)(BOOL /*fUndoable*/)
+ STDMETHOD(OnUIDeactivate)(BOOL /**< fUndoable */)
  {
 	 return S_OK;
  }
@@ -860,7 +858,7 @@
 	 return hr;
  }
  
- // IOleWindow
+
  /**
   * @brief Get the window handle for the control.
   * @param phwnd Pointer to receive the window handle.
@@ -877,18 +875,18 @@
   * @param fEnterMode Boolean indicating if help should be entered.
   * @return HRESULT indicating success or failure.
   */
- STDMETHOD(ContextSensitiveHelp)(BOOL /*fEnterMode*/)
+ STDMETHOD(ContextSensitiveHelp)(BOOL /**< fEnterMode */)
  {
 	 ATLTRACENOTIMPL(_T("ActiveXSite::ContextSensitiveHelp\n"));
  }
  
- // IAdviseSink
+
  /**
   * @brief Handle a change in data.
   * @param pFormatetc Format of the data.
   * @param pStgmed Storage medium containing the data.
   */
- STDMETHOD_(void, OnDataChange)(FORMATETC* /*pFormatetc*/, STGMEDIUM* /*pStgmed*/)
+ STDMETHOD_(void, OnDataChange)(FORMATETC* /**< pFormatetc */, STGMEDIUM* /**< pStgmed */)
  {
  }
  
@@ -897,7 +895,7 @@
   * @param dwAspect Aspect of the view.
   * @param lindex Index of the view.
   */
- STDMETHOD_(void, OnViewChange)(DWORD /*dwAspect*/, LONG /*lindex*/)
+ STDMETHOD_(void, OnViewChange)(DWORD /**< dwAspect */, LONG /**< lindex */)
  {
  }
  
@@ -905,7 +903,7 @@
   * @brief Handle a rename of the object.
   * @param pmk Moniker of the object.
   */
- STDMETHOD_(void, OnRename)(IMoniker* /*pmk*/)
+ STDMETHOD_(void, OnRename)(IMoniker* /**< pmk */)
  {
  }
  
@@ -1035,8 +1033,8 @@
 	  */
 	 BOOL CreateControl(REFGUID guid, DWORD dwClsCtx = CLSCTX_INPROC_SERVER);
  
-	 ///////////////////////////////////////////////////////////////////////////
-	 // IOleContainer
+	 ////////////////////////////////////////////////////////////////////////
+	 /** IOleContainer */
  
 	 /**
 	  * @brief Enumerate objects in the container.
@@ -1044,7 +1042,7 @@
 	  * @param ppenum Pointer to the IEnumUnknown interface pointer.
 	  * @return HRESULT indicating success or failure.
 	  */
-	 STDMETHOD(EnumObjects)(DWORD /*grfFlags*/, IEnumUnknown** /*ppenum*/)
+	 STDMETHOD(EnumObjects)(DWORD /**< grfFlags */, IEnumUnknown** /**< ppenum */)
 	 {
 		 ATLTRACENOTIMPL(_T("ActiveXContainerImpl::EnumObjects\n"));
 	 }
@@ -1054,12 +1052,12 @@
 	  * @param fLock TRUE to lock the container, FALSE to unlock.
 	  * @return HRESULT indicating success or failure.
 	  */
-	 STDMETHOD(LockContainer)(BOOL /*fLock*/)
+	 STDMETHOD(LockContainer)(BOOL /**< fLock */)
 	 {
 		 ATLTRACENOTIMPL(_T("ActiveXContainerImpl::LockContainer\n"));
 	 }
  
-	 // IOleContainer::IParseDisplayName
+	 /** IOleContainer::IParseDisplayName */
  
 	 /**
 	  * @brief Parse a display name into a moniker.
@@ -1069,14 +1067,14 @@
 	  * @param ppmkOut Pointer to the IMoniker interface pointer.
 	  * @return HRESULT indicating success or failure.
 	  */
-	 STDMETHOD(ParseDisplayName)(IBindCtx* /*pbc*/, LPOLESTR /*pszDisplayName*/,
-								ULONG* /*pchEaten*/, IMoniker** /*ppmkOut*/)
+	 STDMETHOD(ParseDisplayName)(IBindCtx* /**< pbc */, LPOLESTR /**< pszDisplayName */,
+								ULONG* /**< pchEaten */, IMoniker** /**< ppmkOut */)
 	 {
 		 ATLTRACENOTIMPL(_T("ActiveXContainerImpl::ParseDisplayName\n"));
 	 }
  
-	 ///////////////////////////////////////////////////////////////////////////
-	 // IBindHost
+	 ////////////////////////////////////////////////////////////////////////
+	 /** IBindHost */
  
 	 /**
 	  * @brief Create a moniker from a display name.
@@ -1113,8 +1111,8 @@
 	 STDMETHOD(MonikerBindToObject)(IMoniker* pMk, IBindCtx* pBC,
 									IBindStatusCallback* pBSC, REFIID riid, void** ppvObj);
  
-	 ///////////////////////////////////////////////////////////////////////////
-	 // IServiceProvider
+	 ////////////////////////////////////////////////////////////////////////
+	 /** IServiceProvider */
  
 	 /**
 	  * @brief Query for a service.
@@ -1153,4 +1151,4 @@
  
  SNSEND
  
- #endif //ATLACTIVEXCONTAINER_HPP
+ #endif /**< ATLACTIVEXCONTAINER_HPP */

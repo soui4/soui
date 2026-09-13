@@ -223,4 +223,4 @@ class SOUI_EXP SObjectFactoryMgr : public SCmnMap<SObjectFactoryPtr, SObjectInfo
 
 SNSEND
 
-#endif // __SOBJECTFACTORY__H__
+#endif /**< __SOBJECTFACTORY__H__ */

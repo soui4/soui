@@ -1,6 +1,6 @@
-﻿//////////////////////////////////////////////////////////////////////////
-//   File Name: SSkin.cpp
-//////////////////////////////////////////////////////////////////////////
+﻿///////////////////////////////////////////////////////////////////////
+/** File Name: SSkin.cpp */
+///////////////////////////////////////////////////////////////////////
 #include "souistd.h"
 #include "core/SSkin.h"
 #include "helper/SDIBHelper.h"
@@ -80,8 +80,8 @@ static void ColorizeSVG(NSVGimage *image, Fun_Colorize fun, COLORREF color)
     }
 }
 
-// 辅助函数：绘制SVG九宫格
-static void DrawSVG9Patch(IRenderTarget *pRT, ISvgObj *pSvg, LPCRECT pRect, LPCRECT prcSrc, LPCRECT prcMargin, BYTE byAlpha,int nScale)
+/** Helper function: draw the SVG nine-grid */
+static void DrawSVG9Patch(IRenderTarget *pRT, ISvgObj *pSvg, LPCRECT pRect, LPCRECT prcSrc, LPCRECT prcMargin, BYTE byAlpha, int nScale)
 {
     if (!pRT || !pSvg || !pRect || !prcMargin)
         return;
@@ -106,26 +106,26 @@ static void DrawSVG9Patch(IRenderTarget *pRT, ISvgObj *pSvg, LPCRECT pRect, LPCR
     float marginR = (float)prcMargin->right;
     float marginB = (float)prcMargin->bottom;
 
-    // 计算源区域的9个部分
+    // Calculate the 9 parts of the source region
     float srcMidX = srcX + marginL;
     float srcMidY = srcY + marginT;
     float srcMidW = srcWidth - marginL - marginR;
     float srcMidH = srcHeight - marginT - marginB;
 
-    float fScale = (float)nScale/100;
-    float dst_marginL = marginL*fScale;
-    float dst_marginT = marginT*fScale;
-    float dst_marginR = marginR*fScale;
-    float dst_marginB = marginB*fScale;
+    float fScale = (float)nScale / 100;
+    float dst_marginL = marginL * fScale;
+    float dst_marginT = marginT * fScale;
+    float dst_marginR = marginR * fScale;
+    float dst_marginB = marginB * fScale;
 
-    // 计算目标区域的9个部分
+    // Calculate the 9 parts of the target region
     float dstMidX = (float)pRect->left + dst_marginL;
     float dstMidY = (float)pRect->top + dst_marginT;
     float dstMidW = (float)(pRect->right - pRect->left) - dst_marginL - dst_marginR;
     float dstMidH = (float)(pRect->bottom - pRect->top) - dst_marginT - dst_marginB;
 
-    // 绘制9个部分
-    // 左上角
+    // Draw the 9 parts
+    // Top-left corner
     if (marginL > 0 && marginT > 0)
     {
         RECT rcSrc = { (LONG)srcX, (LONG)srcY, (LONG)(srcX + marginL), (LONG)(srcY + marginT) };
@@ -134,7 +134,7 @@ static void DrawSVG9Patch(IRenderTarget *pRT, ISvgObj *pSvg, LPCRECT pRect, LPCR
         pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
     }
 
-    // 上边
+    // Top edge
     if (marginT > 0 && dstMidW > 0)
     {
         RECT rcSrc = { (LONG)srcMidX, (LONG)srcY, (LONG)(srcMidX + srcMidW), (LONG)(srcY + marginT) };
@@ -143,7 +143,7 @@ static void DrawSVG9Patch(IRenderTarget *pRT, ISvgObj *pSvg, LPCRECT pRect, LPCR
         pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
     }
 
-    // 右上角
+    // Top-right corner
     if (marginR > 0 && marginT > 0)
     {
         RECT rcSrc = { (LONG)(srcX + srcWidth - marginR), (LONG)srcY, (LONG)(srcX + srcWidth), (LONG)(srcY + marginT) };
@@ -152,7 +152,7 @@ static void DrawSVG9Patch(IRenderTarget *pRT, ISvgObj *pSvg, LPCRECT pRect, LPCR
         pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
     }
 
-    // 左边
+    // Left edge
     if (marginL > 0 && dstMidH > 0)
     {
         RECT rcSrc = { (LONG)srcX, (LONG)srcMidY, (LONG)(srcX + marginL), (LONG)(srcMidY + srcMidH) };
@@ -161,7 +161,7 @@ static void DrawSVG9Patch(IRenderTarget *pRT, ISvgObj *pSvg, LPCRECT pRect, LPCR
         pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
     }
 
-    // 中间
+    // Center
     if (dstMidW > 0 && dstMidH > 0)
     {
         RECT rcSrc = { (LONG)srcMidX, (LONG)srcMidY, (LONG)(srcMidX + srcMidW), (LONG)(srcMidY + srcMidH) };
@@ -170,7 +170,7 @@ static void DrawSVG9Patch(IRenderTarget *pRT, ISvgObj *pSvg, LPCRECT pRect, LPCR
         pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
     }
 
-    // 右边
+    // Right edge
     if (marginR > 0 && dstMidH > 0)
     {
         RECT rcSrc = { (LONG)(srcX + srcWidth - marginR), (LONG)srcMidY, (LONG)(srcX + srcWidth), (LONG)(srcMidY + srcMidH) };
@@ -179,7 +179,7 @@ static void DrawSVG9Patch(IRenderTarget *pRT, ISvgObj *pSvg, LPCRECT pRect, LPCR
         pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
     }
 
-    // 左下角
+    // Bottom-left corner
     if (marginL > 0 && marginB > 0)
     {
         RECT rcSrc = { (LONG)srcX, (LONG)(srcY + srcHeight - marginB), (LONG)(srcX + marginL), (LONG)(srcY + srcHeight) };
@@ -188,7 +188,7 @@ static void DrawSVG9Patch(IRenderTarget *pRT, ISvgObj *pSvg, LPCRECT pRect, LPCR
         pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
     }
 
-    // 下边
+    // Bottom edge
     if (marginB > 0 && dstMidW > 0)
     {
         RECT rcSrc = { (LONG)srcMidX, (LONG)(srcY + srcHeight - marginB), (LONG)(srcMidX + srcMidW), (LONG)(srcY + srcHeight) };
@@ -197,7 +197,7 @@ static void DrawSVG9Patch(IRenderTarget *pRT, ISvgObj *pSvg, LPCRECT pRect, LPCR
         pRT->DrawSVG(pSvg, &rcDst, &rcSrc, byAlpha);
     }
 
-    // 右下角
+    // Bottom-right corner
     if (marginR > 0 && marginB > 0)
     {
         RECT rcSrc = { (LONG)(srcX + srcWidth - marginR), (LONG)(srcY + srcHeight - marginB), (LONG)(srcX + srcWidth), (LONG)(srcY + srcHeight) };
@@ -207,8 +207,8 @@ static void DrawSVG9Patch(IRenderTarget *pRT, ISvgObj *pSvg, LPCRECT pRect, LPCR
     }
 }
 
-//////////////////////////////////////////////////////////////////////////
-// SSkinImgList
+///////////////////////////////////////////////////////////////////////
+/** SSkinImgList */
 SSkinImgList::SSkinImgList()
     : m_nStates(1)
     , m_bTile(FALSE)
@@ -233,8 +233,8 @@ SIZE SSkinImgList::GetImageSize(BOOL bRaw) const
         ret = GetSvg()->Size();
         if (!bRaw)
         {
-            ret.cx = MulDiv(ret.cx , GetScale() , 100);
-            ret.cy = MulDiv(ret.cy , GetScale() , 100);
+            ret.cx = MulDiv(ret.cx, GetScale(), 100);
+            ret.cy = MulDiv(ret.cy, GetScale(), 100);
         }
     }
     else if (GetImage())
@@ -279,7 +279,7 @@ void SSkinImgList::LoadSrcImage() const
     if (list[0] == _T("svg") || (list[0] == _T("file") && list[1].EndsWith(_T("svg"))))
     {
         m_pSvg.Attach(CreateSvgFromResId(S_CW2T(m_strSrc)));
-        // SVG源发生变更(含首次加载)，光栅化缓存失效，按需重建
+        // The SVG source changed (including first load); the rasterization cache is invalidated and rebuilt on demand
         m_pCacheBmp = NULL;
         m_szPerStateCache.cx = m_szPerStateCache.cy = 0;
     }
@@ -399,26 +399,32 @@ void SSkinImgList::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, 
         else
             OffsetRect(&rcSrc, iState * szSrc.cx, 0);
 
-        if (m_bTile) {
-            if (m_tileMode == TM_Both) {
+        if (m_bTile)
+        {
+            if (m_tileMode == TM_Both)
+            {
                 SAutoRefPtr<IBrushS> brush, oldBrush;
                 pRT->CreateBitmapBrush(pImg, kRepeat_TileMode, kRepeat_TileMode, &brush);
-                pRT->SelectObject(brush, (IRenderObj**)&oldBrush);
+                pRT->SelectObject(brush, (IRenderObj **)&oldBrush);
                 pRT->FillRectangle(rcDraw);
                 pRT->SelectObject(oldBrush, NULL);
             }
-            else {
+            else
+            {
                 int wid = m_tileMode != TM_Vert ? szSrc.cx : rcDraw->right - rcDraw->left;
                 int hei = m_tileMode != TM_Horz ? szSrc.cy : rcDraw->bottom - rcDraw->top;
-                for (int y = rcDraw->top; y < rcDraw->bottom; y += hei) {
-                    for (int x = rcDraw->left; x < rcDraw->right; x += wid) {
+                for (int y = rcDraw->top; y < rcDraw->bottom; y += hei)
+                {
+                    for (int x = rcDraw->left; x < rcDraw->right; x += wid)
+                    {
                         RECT rcTile = { x, y, x + wid, y + hei };
                         pRT->DrawBitmapEx(&rcTile, pImg, &rcSrc, GetExpandMode(), byAlpha);
                     }
                 }
             }
         }
-        else {
+        else
+        {
             pRT->DrawBitmapEx(rcDraw, pImg, &rcSrc, GetExpandMode(), byAlpha);
         }
     }
@@ -431,17 +437,21 @@ void SSkinImgList::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, 
             OffsetRect(&rcSrc, 0, iState * sz.cy);
         else
             OffsetRect(&rcSrc, iState * sz.cx, 0);
-        if (m_bTile) {
+        if (m_bTile)
+        {
             int wid = m_tileMode != TM_Vert ? sz.cx : rcDraw->right - rcDraw->left;
             int hei = m_tileMode != TM_Horz ? sz.cy : rcDraw->bottom - rcDraw->top;
-            for (int y = rcDraw->top; y < rcDraw->bottom; y += hei) {
-                for (int x = rcDraw->left; x < rcDraw->right; x += wid) {
+            for (int y = rcDraw->top; y < rcDraw->bottom; y += hei)
+            {
+                for (int x = rcDraw->left; x < rcDraw->right; x += wid)
+                {
                     RECT rcTile = { x, y, x + wid, y + hei };
                     pRT->DrawSVG(GetSvg(), &rcTile, &rcSrc, byAlpha);
                 }
             }
         }
-        else {
+        else
+        {
             pRT->DrawSVG(GetSvg(), rcDraw, &rcSrc, byAlpha);
         }
     }
@@ -553,7 +563,7 @@ void SSkinImgList::OnColorize(COLORREF cr)
     }
     else if (GetSvg())
     {
-        m_pCacheBmp = NULL;//reset cache.
+        m_pCacheBmp = NULL; // reset cache.
         m_szPerStateCache.cx = m_szPerStateCache.cy = 0;
         NSVGimage *pImg = (NSVGimage *)GetSvg()->GetPtr();
         ColorizeSVG(pImg, SDIBHelper::Colorize, cr);
@@ -604,13 +614,13 @@ void SSkinImgList::_Scale(ISkinObj *skinObj, int nScale)
     }
 }
 
-//////////////////////////////////////////////////////////////////////////
-//  SSkinImgCenter
+///////////////////////////////////////////////////////////////////////
+/** SSkinImgCenter */
 void SSkinImgCenter::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const
 {
     if (!GetImage() && !GetSvg())
         return;
-    SIZE szSkin = _GetSkinSize(GetSvg()!=NULL);
+    SIZE szSkin = _GetSkinSize(GetSvg() != NULL);
     RECT rcSrc = { 0, 0, szSkin.cx, szSkin.cy };
     if (m_bVertical)
         OffsetRect(&rcSrc, 0, iState * szSkin.cy);
@@ -620,7 +630,7 @@ void SSkinImgCenter::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState
     if (GetImage())
     {
         CRect rcTarget = *rcDraw;
-        rcTarget.DeflateRect((rcTarget.Width() - szSkin.cx) / 2,(rcTarget.Height() - szSkin.cy) / 2);
+        rcTarget.DeflateRect((rcTarget.Width() - szSkin.cx) / 2, (rcTarget.Height() - szSkin.cy) / 2);
         pRT->DrawBitmapEx(rcTarget, GetImage(), &rcSrc, GetExpandMode(), byAlpha);
     }
     else
@@ -628,13 +638,13 @@ void SSkinImgCenter::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState
         CRect rcTarget = *rcDraw;
         szSkin.cx = MulDiv(szSkin.cx, GetScale(), 100);
         szSkin.cy = MulDiv(szSkin.cy, GetScale(), 100);
-        rcTarget.DeflateRect((rcTarget.Width() - szSkin.cx) / 2,(rcTarget.Height() - szSkin.cy) / 2);
+        rcTarget.DeflateRect((rcTarget.Width() - szSkin.cx) / 2, (rcTarget.Height() - szSkin.cy) / 2);
         pRT->DrawSVG(GetSvg(), &rcTarget, &rcSrc, byAlpha);
     }
 }
 
-//////////////////////////////////////////////////////////////////////////
-//  SSkinImgFrame
+///////////////////////////////////////////////////////////////////////
+/** SSkinImgFrame */
 SSkinImgFrame::SSkinImgFrame()
 {
 }
@@ -674,11 +684,7 @@ void SSkinImgFrame::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState,
             // Cache bitmap was built at scaled per-state size, so margins
             // must be scaled to match the bitmap's pixel coordinate space.
             int nScale = GetScale();
-            CRect rcMargin(
-                MulDiv(m_rcMargin.left, nScale, 100),
-                MulDiv(m_rcMargin.top, nScale, 100),
-                MulDiv(m_rcMargin.right, nScale, 100),
-                MulDiv(m_rcMargin.bottom, nScale, 100));
+            CRect rcMargin(MulDiv(m_rcMargin.left, nScale, 100), MulDiv(m_rcMargin.top, nScale, 100), MulDiv(m_rcMargin.right, nScale, 100), MulDiv(m_rcMargin.bottom, nScale, 100));
             pRT->DrawBitmap9Patch(rcDraw, pImg, &rcSour, &rcMargin, GetExpandMode(), byAlpha);
         }
         else
@@ -711,9 +717,12 @@ void SSkinImgFrame::_Scale(ISkinObj *skinObj, int nScale)
     SSkinImgList::_Scale(skinObj, nScale);
     SSkinImgFrame *pClone = sobj_cast<SSkinImgFrame>(skinObj);
     int nSrcScale = GetScale();
-    if(GetSvg()){
+    if (GetSvg())
+    {
         pClone->m_rcMargin = m_rcMargin;
-    }else{
+    }
+    else
+    {
         pClone->m_rcMargin.left = MulDiv(m_rcMargin.left, nScale, nSrcScale);
         pClone->m_rcMargin.top = MulDiv(m_rcMargin.top, nScale, nSrcScale);
         pClone->m_rcMargin.right = MulDiv(m_rcMargin.right, nScale, nSrcScale);
@@ -721,14 +730,14 @@ void SSkinImgFrame::_Scale(ISkinObj *skinObj, int nScale)
     }
 }
 
-//////////////////////////////////////////////////////////////////////////
-// SSkinButton
+///////////////////////////////////////////////////////////////////////
+/** SSkinButton */
 SSkinButton::SSkinButton()
     : m_nCornerRadius(2)
     , m_fCornerPercent(0.0)
 {
     m_colors.m_crBorder[0] = RGB(0x70, 0x70, 0x70);
-    m_colors.m_crBorder[1] = CR_INVALID; // 不改变 原有的效果
+    m_colors.m_crBorder[1] = CR_INVALID; // Does not change the original effect
     m_colors.m_crBorder[2] = CR_INVALID;
     m_colors.m_crBorder[3] = CR_INVALID;
 
@@ -751,7 +760,7 @@ void SSkinButton::_DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iState, 
         int nH = prcDraw->bottom - prcDraw->top;
         nCorner = (nW < nH) ? (int)(nW * m_fCornerPercent) : (int)(nH * m_fCornerPercent);
     }
-    // 只有 在 需要渐变的情况下 才 需要 这个
+    // This is only needed when a gradient is required
     if (m_colors.m_crUp[iState] != m_colors.m_crDown[iState])
     {
         CRect rcDraw = *prcDraw;
@@ -770,9 +779,9 @@ void SSkinButton::_DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iState, 
             pRT->FillSolidRect(prcDraw, cr.toCOLORREF());
     }
 
-    if (CR_INVALID == m_colors.m_crBorder[iState]) //  不改变 原因的 效果
+    if (CR_INVALID == m_colors.m_crBorder[iState]) // Does not change the original effect
         iState = 0;
-    // 画 边框
+    // Draw border
     SAutoRefPtr<IPenS> pPen, pOldPen;
     pRT->CreatePen(PS_SOLID, m_colors.m_crBorder[iState], 1, &pPen);
     pRT->SelectObject(pPen, (IRenderObj **)&pOldPen);
@@ -806,16 +815,16 @@ void SSkinButton::OnColorize(COLORREF cr)
     else
     {
         if (m_crColorize != 0)
-        { // 从备份里获取数据
+        { // Get data from the backup
             memcpy(&m_colors, &m_colorsBackup, sizeof(BTNCOLORS));
         }
         else
-        { // 将数据备份
+        { // Back up the data
             memcpy(&m_colorsBackup, &m_colors, sizeof(BTNCOLORS));
         }
         m_crColorize = cr;
 
-        // 调整颜色值
+        // Adjust color values
         for (int i = 0; i < 4; i++)
         {
             SDIBHelper::Colorize(m_colors.m_crBorder[i], m_crColorize);
@@ -830,8 +839,8 @@ ISkinObj *SSkinButton::Scale(int nScale)
     return NULL;
 }
 
-//////////////////////////////////////////////////////////////////////////
-// SSkinGradation
+///////////////////////////////////////////////////////////////////////
+/** SSkinGradation */
 SSkinGradation::SSkinGradation()
     : m_bVert(TRUE)
     , m_crFrom(CR_INVALID)
@@ -850,7 +859,7 @@ ISkinObj *SSkinGradation::Scale(int nScale)
     return NULL;
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 SGradientDesc::SGradientDesc()
 {
     // set default to linear gradient
@@ -889,7 +898,7 @@ GradientInfo SGradientDesc::GetGradientInfo(int nScale, int wid, int hei) const
     return ret;
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 SSkinGradation2::SSkinGradation2()
 {
     m_ptCorner = SPoint::Make(0.f, 0.f);
@@ -927,8 +936,8 @@ void SSkinGradation2::OnInitFinished(THIS_ IXmlNode *xmlNode)
     m_gradient->OnInitFinished(xmlNode);
 }
 
-//////////////////////////////////////////////////////////////////////////
-// SSkinScrollbar
+///////////////////////////////////////////////////////////////////////
+/** SSkinScrollbar */
 SSkinScrollbar::SSkinScrollbar()
     : m_nMargin(0)
     , m_bHasGripper(FALSE)
@@ -1019,7 +1028,7 @@ void SSkinScrollbar::_DrawByState(IRenderTarget *pRT, LPCRECT prcDraw, DWORD dwS
     else
     {
         // SVG supports 9-patch now
-        DrawSVG9Patch(pRT, GetSvg(), prcDraw, &rcSour, &rcMargin, byAlpha,GetScale());
+        DrawSVG9Patch(pRT, GetSvg(), prcDraw, &rcSour, &rcMargin, byAlpha, GetScale());
 
         if (nSbCode == SB_THUMBTRACK && m_bHasGripper)
         {
@@ -1030,7 +1039,7 @@ void SSkinScrollbar::_DrawByState(IRenderTarget *pRT, LPCRECT prcDraw, DWORD dwS
                 rcDraw.top += (rcDraw.Height() - rcSour.Height()) / 2, rcDraw.bottom = rcDraw.top + rcSour.Height();
             else
                 rcDraw.left += (rcDraw.Width() - rcSour.Width()) / 2, rcDraw.right = rcDraw.left + rcSour.Width();
-            DrawSVG9Patch(pRT, GetSvg(), &rcDraw, &rcSour, &rcMargin, byAlpha,GetScale());
+            DrawSVG9Patch(pRT, GetSvg(), &rcDraw, &rcSour, &rcMargin, byAlpha, GetScale());
         }
     }
 }
@@ -1057,8 +1066,8 @@ int SSkinScrollbar::GetIdealSize() const
     return 0;
 }
 
-//////////////////////////////////////////////////////////////////////////
-// SSkinColor
+///////////////////////////////////////////////////////////////////////
+/** SSkinColor */
 SSkinColorRect::SSkinColorRect()
     : m_nRadius(0)
     , m_fCornerPercent(0.0)
@@ -1133,7 +1142,7 @@ ISkinObj *SSkinColorRect::Scale(int nScale)
     return NULL;
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 
 SSkinShape::SSkinShape()
     : m_shape(rectangle)
@@ -1583,8 +1592,8 @@ void SSkinShape::SShapePolygon::OnInitFinished(IXmlNode *pNode)
     m_ptCount = i;
 }
 
-//////////////////////////////////////////////////////////////////////////
-// SSKinGroup
+///////////////////////////////////////////////////////////////////////
+/** SSKinGroup */
 int SSKinGroup::GetStates() const
 {
     return 4;
@@ -1622,8 +1631,8 @@ void SSKinGroup::_Scale(ISkinObj *skinObj, int nScale)
     }
 }
 
-//////////////////////////////////////////////////////////////////////////
-// SSKinGroup2
+///////////////////////////////////////////////////////////////////////
+/** SSKinGroup2 */
 
 int SSKinGroup2::GetStates() const
 {
@@ -1686,9 +1695,7 @@ void SSKinGroup2::_Scale(ISkinObj *skinObj, int nScale)
     }
 }
 
-/*
-IBitmap中的内存为RGBA格式，.9中使用alpha通道==0或者255来确定如何拉伸
-*/
+/** The memory in IBitmap is in RGBA format; in .9, the alpha channel == 0 or 255 is used to determine how to stretch */
 HRESULT SSkinImgFrame2::OnAttrSrc(const SStringW &strValue, BOOL bLoading)
 {
     IBitmapS *pImg = LOADIMAGE2(strValue);
@@ -1701,7 +1708,7 @@ HRESULT SSkinImgFrame2::OnAttrSrc(const SStringW &strValue, BOOL bLoading)
     LPBYTE pBuf = (LPBYTE)pImg->LockPixelBits();
 
     int left, right, top, bottom;
-    // 检测第一扫描行中定义的left,right位置
+    // Detect the left,right positions defined in the first scan line
     LPBYTE p = pBuf;
     int i = 1;
     while (i < nWid - 1 && p[3] == 0)
@@ -1712,7 +1719,7 @@ HRESULT SSkinImgFrame2::OnAttrSrc(const SStringW &strValue, BOOL bLoading)
         i++, p += 4;
     right = i - 1;
 
-    // 检测第一列中定义的top,bottom位置
+    // Detect the top,bottom positions defined in the first column
     i = 1;
     p = pBuf + (nWid * 4);
     while (i < nHei - 1 && p[3] == 0)
@@ -1763,8 +1770,8 @@ HRESULT SSkinImgFrame2::OnAttrSrc(const SStringW &strValue, BOOL bLoading)
     return hRet;
 }
 
-//////////////////////////////////////////////////////////////////////////
-// SSkinTreeLines
+///////////////////////////////////////////////////////////////////////
+/** SSkinTreeLines */
 SSkinTreeLines::SSkinTreeLines()
     : m_crLine(RGBA(128, 128, 128, 255))
     , m_crCross(RGBA(0, 0, 0, 255))
@@ -1775,15 +1782,15 @@ SSkinTreeLines::SSkinTreeLines()
 
 SIZE SSkinTreeLines::GetSkinSize() const
 {
-    // 返回一个合适的默认大小
-    #define kDefTreeNodeSize  16
+// Return a suitable default size
+#define kDefTreeNodeSize 16
     int wid = MulDiv(kDefTreeNodeSize, GetScale(), 100);
     return CSize(wid, wid);
 }
 
 int SSkinTreeLines::GetStates() const
 {
-    // 返回10个状态
+    // Return 10 states
     return 10;
 }
 
@@ -1792,7 +1799,7 @@ void SSkinTreeLines::_DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iStat
     SAutoRefPtr<IPenS> pPen, pPenCross, pPenDash;
     HRESULT hr = S_OK;
 
-    // 创建线条颜色的画笔和钢笔
+    // Create the pen and brush for the line color
     hr = pRT->CreatePen(PS_SOLID, m_crCross, m_nLineWidth, &pPenCross);
     if (FAILED(hr))
         return;
@@ -1803,47 +1810,47 @@ void SSkinTreeLines::_DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iStat
     if (FAILED(hr))
         return;
 
-    // 保存当前使用的对象
+    // Save the currently used object
     SAutoRefPtr<IRenderObj> pOldPen;
     pRT->SelectObject(pPen, &pOldPen);
 
     BOOL oldAntiAlias = pRT->SetAntiAlias(FALSE);
-    // 计算中心点
+    // Calculate the center point
     CRect rcDraw(prcDraw);
     int centerX = (prcDraw->left + prcDraw->right) / 2;
     int centerY = (prcDraw->top + prcDraw->bottom) / 2;
-    // 定义方框尺寸
+    // Define the box size
     int boxSize = m_nBoxSize;
     CRect rcBox(centerX - boxSize / 2, centerY - boxSize / 2, centerX + boxSize / 2, centerY + boxSize / 2);
     rcBox.OffsetRect(-m_nLineWidth / 2, -m_nLineWidth / 2);
-    const int kHalfLineLength = MulDiv(2,GetScale(),100);
-    // 定义10个状态的绘制逻辑
+    const int kHalfLineLength = MulDiv(2, GetScale(), 100);
+    // Define the drawing logic for the 10 states
     switch (iState)
     {
     case 0:
     {
-        // 方框中间有+号, 右边带连接虚线
-        // 绘制方框
+        // The box has a + sign in the middle and a connected dashed line on the right
+        // Draw the box
         pRT->DrawRectangle(&rcBox);
-        // 绘制+号
+        // Draw the + sign
         pRT->SelectObject(pPenCross, NULL);
         pRT->DrawLine(CPoint(centerX, centerY - kHalfLineLength), CPoint(centerX, centerY + kHalfLineLength));
         pRT->DrawLine(CPoint(centerX - kHalfLineLength, centerY), CPoint(centerX + kHalfLineLength, centerY));
-        // 绘制右边连接虚线
+        // Draw the connected dashed line on the right
         pRT->SelectObject(pPenDash, NULL);
         pRT->DrawLine(CPoint(centerX + boxSize / 2, centerY), CPoint(rcDraw.right, centerY));
         break;
     }
     case 1:
     {
-        // 方框中间有+号, 上右下带连接虚线
-        // 绘制方框
+        // The box has a + sign in the middle and connected dashed lines on the top, right, and bottom
+        // Draw the box
         pRT->DrawRectangle(&rcBox);
-        // 绘制+号
+        // Draw the + sign
         pRT->SelectObject(pPenCross, NULL);
         pRT->DrawLine(CPoint(centerX, centerY - kHalfLineLength), CPoint(centerX, centerY + kHalfLineLength));
         pRT->DrawLine(CPoint(centerX - kHalfLineLength, centerY), CPoint(centerX + kHalfLineLength, centerY));
-        // 绘制上右连接虚线
+        // Draw the connected dashed lines on the top and right
         pRT->SelectObject(pPenDash, NULL);
         pRT->DrawLine(CPoint(centerX, rcDraw.top), CPoint(centerX, centerY - boxSize / 2));    // top line
         pRT->DrawLine(CPoint(centerX + boxSize / 2, centerY), CPoint(rcDraw.right, centerY));  // right line
@@ -1852,14 +1859,14 @@ void SSkinTreeLines::_DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iStat
     }
     case 2:
     {
-        // 方框中间有+号, 上右带连接虚线
-        // 绘制方框
+        // The box has a + sign in the middle and connected dashed lines on the top and right
+        // Draw the box
         pRT->DrawRectangle(&rcBox);
-        // 绘制+号
+        // Draw the + sign
         pRT->SelectObject(pPenCross, NULL);
         pRT->DrawLine(CPoint(centerX, centerY - kHalfLineLength), CPoint(centerX, centerY + kHalfLineLength));
         pRT->DrawLine(CPoint(centerX - kHalfLineLength, centerY), CPoint(centerX + kHalfLineLength, centerY));
-        // 绘制上右连接虚线
+        // Draw the connected dashed lines on the top and right
         pRT->SelectObject(pPenDash, NULL);
         pRT->DrawLine(CPoint(centerX, rcDraw.top), CPoint(centerX, centerY - boxSize / 2));   // top line
         pRT->DrawLine(CPoint(centerX + boxSize / 2, centerY), CPoint(rcDraw.right, centerY)); // right line
@@ -1867,26 +1874,26 @@ void SSkinTreeLines::_DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iStat
     }
     case 3:
     {
-        // 方框中间有-号, 右边带连接虚线
-        // 绘制方框
+        // The box has a - sign in the middle and a connected dashed line on the right
+        // Draw the box
         pRT->DrawRectangle(&rcBox);
-        // 绘制-号
+        // Draw the - sign
         pRT->SelectObject(pPenCross, NULL);
         pRT->DrawLine(CPoint(centerX - kHalfLineLength, centerY), CPoint(centerX + kHalfLineLength, centerY));
-        // 绘制右边连接虚线
+        // Draw the connected dashed line on the right
         pRT->SelectObject(pPenDash, NULL);
         pRT->DrawLine(CPoint(centerX + boxSize / 2, centerY), CPoint(rcDraw.right, centerY)); // right line
         break;
     }
     case 4:
     {
-        // 方框中间有-号, 上右下带连接虚线
-        // 绘制方框
+        // The box has a - sign in the middle and connected dashed lines on the top, right, and bottom
+        // Draw the box
         pRT->DrawRectangle(&rcBox);
-        // 绘制-号
+        // Draw the - sign
         pRT->SelectObject(pPenCross, NULL);
         pRT->DrawLine(CPoint(centerX - kHalfLineLength, centerY), CPoint(centerX + kHalfLineLength, centerY));
-        // 绘制上右下连接虚线
+        // Draw the connected dashed lines on the top, right, and bottom
         pRT->SelectObject(pPenDash, NULL);
         pRT->DrawLine(CPoint(centerX, rcDraw.top), CPoint(centerX, centerY - boxSize / 2));    // top line
         pRT->DrawLine(CPoint(centerX + boxSize / 2, centerY), CPoint(rcDraw.right, centerY));  // right line
@@ -1895,13 +1902,13 @@ void SSkinTreeLines::_DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iStat
     }
     case 5:
     {
-        // 方框中间有-号, 上右带连接虚线
-        // 绘制方框
+        // The box has a - sign in the middle and connected dashed lines on the top and right
+        // Draw the box
         pRT->DrawRectangle(&rcBox);
-        // 绘制-号
+        // Draw the - sign
         pRT->SelectObject(pPenCross, NULL);
         pRT->DrawLine(CPoint(centerX - kHalfLineLength, centerY), CPoint(centerX + kHalfLineLength, centerY));
-        // 绘制上右连接虚线
+        // Draw the connected dashed lines on the top and right
         pRT->SelectObject(pPenDash, NULL);
         pRT->DrawLine(CPoint(centerX, rcDraw.top), CPoint(centerX, centerY - boxSize / 2));   // top line
         pRT->DrawLine(CPoint(centerX + boxSize / 2, centerY), CPoint(rcDraw.right, centerY)); // right line
@@ -1909,45 +1916,45 @@ void SSkinTreeLines::_DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iStat
     }
     case 6:
     {
-        // 中间垂直虚线
-        // 绘制垂直虚线
+        // Vertical dashed line in the middle
+        // Draw the vertical dashed line
         pRT->SelectObject(pPenDash, NULL);
         pRT->DrawLine(CPoint(centerX, rcDraw.top), CPoint(centerX, rcDraw.bottom));
         break;
     }
     case 7:
     {
-        // 中间垂直虚线+向右虚线
-        // 绘制垂直虚线
+        // Vertical dashed line in the middle + dashed line to the right
+        // Draw the vertical dashed line
         pRT->SelectObject(pPenDash, NULL);
         pRT->DrawLine(CPoint(centerX, rcDraw.top), CPoint(centerX, rcDraw.bottom));
-        // 绘制向右虚线
+        // Draw the dashed line to the right
         pRT->DrawLine(CPoint(centerX, centerY), CPoint(rcDraw.right, centerY));
         break;
     }
     case 8:
     {
-        // 从中心点向上及向右带连接虚线
-        // 绘制向上虚线
+        // Connected dashed lines going up and to the right from the center point
+        // Draw the dashed line going up
         pRT->SelectObject(pPenDash, NULL);
         pRT->DrawLine(CPoint(centerX, rcDraw.top), CPoint(centerX, centerY));
-        // 绘制向右虚线
+        // Draw the dashed line to the right
         pRT->DrawLine(CPoint(centerX, centerY), CPoint(rcDraw.right, centerY));
         break;
     }
     case 9:
     {
-        // 从中心点向下及向右带连接虚线
-        // 绘制向下虚线
+        // Connected dashed lines going down and to the right from the center point
+        // Draw the dashed line going down
         pRT->SelectObject(pPenDash, NULL);
         pRT->DrawLine(CPoint(centerX, centerY), CPoint(centerX, rcDraw.bottom));
-        // 绘制向右虚线
+        // Draw the dashed line to the right
         pRT->DrawLine(CPoint(centerX, centerY), CPoint(rcDraw.right, centerY));
         break;
     }
     }
 
-    // 恢复原来的对象
+    // Restore the original object
     if (pOldPen)
         pRT->SelectObject(pOldPen, NULL);
     pRT->SetAntiAlias(oldAntiAlias);

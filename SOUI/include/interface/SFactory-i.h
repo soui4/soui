@@ -19,98 +19,95 @@ SNSBEGIN
 #define INTERFACE ISouiFactory
 DECLARE_INTERFACE_(ISouiFactory, IObjRef)
 {
-    //!添加引用
-    /*!
-     */
+    /** Add reference */
+    //
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
-    //!释放引用
-    /*!
-     */
+    /** Release reference */
+    //
     STDMETHOD_(long, Release)(THIS) PURE;
 
-    //!释放对象
-    /*!
-     */
+    /** Release object */
+    //
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
-    //////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
 
     /** CreateApp
-     * @brief 创建IApp对象
-     * @return IApplication * -- App对象
+     * @brief Create IApp object
+     * @return IApplication * -- App object
      */
     STDMETHOD_(IApplication *, CreateApp)(THIS_ IRenderFactory * pRenderFac, HMODULE hInst, LPCTSTR pszHostClassName DEF_VAL(_T("SOUIHOST")), BOOL bImeApp DEF_VAL(FALSE)) PURE;
 
     /** CreateNativeWnd
-     * @brief 创建窗口对象
-     * @return INativeWnd * -- 窗口对象
+     * @brief Create window object
+     * @return INativeWnd * -- window object
      */
     STDMETHOD_(INativeWnd *, CreateNativeWnd)(THIS) PURE;
 
     /** CreateHostWnd
-     * @brief 创建SOUI窗口对象
-     * @return IHostWnd * -- SOUI窗口对象
+     * @brief Create SOUI window object
+     * @return IHostWnd * -- SOUI window object
      */
     STDMETHOD_(IHostWnd *, CreateHostWnd)(THIS_ LPCTSTR pszResID DEF_VAL(NULL)) PURE;
 
     /** CreateHostDialog
-     * @brief 创建SOUI对话框对象
-     * @return IHostDialog * -- SOUI对话框对象
+     * @brief Create SOUI dialog object
+     * @return IHostDialog * -- SOUI dialog object
      */
     STDMETHOD_(IHostDialog *, CreateHostDialog)(THIS_ LPCTSTR pszResID DEF_VAL(NULL)) PURE;
 
     /** CreateStringA
-     * @brief 创建IStringA对象
-     * @return IStringA * -- 字符串对象
+     * @brief Create IStringA object
+     * @return IStringA * -- string object
      */
     STDMETHOD_(IStringA *, CreateStringA)(THIS_ LPCSTR pszSrc) PURE;
 
     /** CreateStringW
-     * @brief 创建IStringW对象
-     * @return IStringW * -- 字符串对象
+     * @brief Create IStringW object
+     * @return IStringW * -- string object
      */
     STDMETHOD_(IStringW *, CreateStringW)(THIS_ LPCWSTR pszSrc) PURE;
 
     /** CreateXmlDoc
-     * @brief 创建IXmlDoc对象
-     * @return IXmlDoc * -- Xml对象
+     * @brief Create IXmlDoc object
+     * @return IXmlDoc * -- Xml object
      */
     STDMETHOD_(IXmlDoc *, CreateXmlDoc)(THIS) PURE;
 
     /** CreateResProvider
-     * @brief 创建IResProvider对象
-     * @return IResProvider * -- 资源包对象
+     * @brief Create IResProvider object
+     * @return IResProvider * -- resource object
      */
     STDMETHOD_(IResProvider *, CreateResProvider)(THIS_ BUILTIN_RESTYPE resType) PURE;
 
     /** CreateFuncSlot
-     * @brief 创建IEvtSlot对象
-     * @return IEvtSlot * -- Event Slot对象
+     * @brief Create IEvtSlot object
+     * @return IEvtSlot * -- Event Slot object
      */
     STDMETHOD_(IEvtSlot *, CreateFuncSlot)(THIS_ FunCallback fun, void *ctx) PURE;
 
     /** CreateMenu
-     * @brief 创建Menu对象
-     * @return IMenu * -- Menu对象
+     * @brief Create Menu object
+     * @return IMenu * -- Menu object
      */
     STDMETHOD_(IMenu *, CreateMenu)(THIS_ HMENU hMenu DEF_VAL(0)) PURE;
 
     /** CreateMenuEx
-     * @brief 创建MenuEx对象
-     * @return IMenuEx * -- MenuEx对象
+     * @brief Create MenuEx object
+     * @return IMenuEx * -- MenuEx object
      */
     STDMETHOD_(IMenuEx *, CreateMenuEx)(THIS) PURE;
 
     /** CreateTimer
-     * @brief 创建定时器对象
-     * @return ITimer * -- 定时器对象
+     * @brief Create timer object
+     * @return ITimer * -- timer object
      */
     STDMETHOD_(ITimer *, CreateTimer)(THIS_ IEvtSlot * pEvtSlot) PURE;
 
     /** CreateAnimatorGroup
-     * @brief 创建动画组
-     * @return IAnimatorGroup * -- 动画组
+     * @brief Create animation group
+     * @return IAnimatorGroup * -- animation group
      */
     STDMETHOD_(IAnimatorGroup *, CreateAnimatorGroup)(THIS) PURE;
 };
@@ -125,4 +122,4 @@ typedef ISouiFactory *ISouiFactoryPtr;
 
 EXTERN_C ISouiFactoryPtr SOUI_EXP CreateSouiFactory();
 
-#endif // __SFACTORY_I__H__
+#endif /**< __SFACTORY_I__H__ */

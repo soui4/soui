@@ -12,40 +12,40 @@ typedef struct IWindow IWindow;
 DECLARE_INTERFACE_(IAttrStorage, IObjRef)
 {
     /**
-     * @brief 添加引用
-     * @return long -- 引用计数
+     * @brief Add reference
+     * @return long -- reference count
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief 释放引用
-     * @return long -- 引用计数
+     * @brief Release reference
+     * @return long -- reference count
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief 释放对象
+     * @brief Release object
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
-    //////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief 响应IObject::SetAttribute的时保存attribute值的方法
-     * @param strName const IStringW* -- 属性名
-     * @param strValue const IStringW* -- 属性值
-     * @param bHandled BOOL -- 该属性是否已经被处理
+     * @brief Method to save attribute values when responding to IObject::SetAttribute
+     * @param strName const IStringW* -- attribute name
+     * @param strValue const IStringW* -- attribute value
+     * @param bHandled BOOL -- whether this attribute has already been handled
      * @return void
      */
     STDMETHOD_(void, OnSetAttribute)
     (THIS_ const IStringW *strName, const IStringW *strValue, BOOL bHandled) PURE;
 
     /**
-     * @brief 响应IObject::GetAttribute调用
-     * @param strName const IStringW* -- 属性名
-     * @param[out] strValue IStringW* -- 返回的属性值
-     * @return BOOL -- TRUE: 成功
+     * @brief Respond to IObject::GetAttribute calls
+     * @param strName const IStringW* -- attribute name
+     * @param[out] strValue IStringW* -- returned attribute value
+     * @return BOOL -- TRUE: success
      */
     STDMETHOD_(BOOL, OnGetAttribute)(CTHIS_ const IStringW *strName, IStringW *strValue) SCONST PURE;
 };
@@ -55,34 +55,34 @@ DECLARE_INTERFACE_(IAttrStorage, IObjRef)
 DECLARE_INTERFACE_(IAttrStorageFactory, IObjRef)
 {
     /**
-     * @brief 添加引用
-     * @return long -- 引用计数
+     * @brief Add reference
+     * @return long -- reference count
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief 释放引用
-     * @return long -- 引用计数
+     * @brief Release reference
+     * @return long -- reference count
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief 释放对象
+     * @brief Release object
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
-    //////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief 创建IAttrStorage对象
-     * @param owner IWindow* -- IAttrStorage的宿主
-     * @param[out] ppAttrStorage IAttrStorage** -- 返回值
-     * @return HRESULT -- S_OK: 成功
+     * @brief Create an IAttrStorage object
+     * @param owner IWindow* -- the host of IAttrStorage
+     * @param[out] ppAttrStorage IAttrStorage** -- return value
+     * @return HRESULT -- S_OK: success
      */
     STDMETHOD_(HRESULT, CreateAttrStorage)
     (CTHIS_ IWindow * owner, IAttrStorage * *ppAttrStorage) SCONST PURE;
 };
 
 SNSEND
-#endif // __SATTRSTORAGE_I__H__
+#endif /**< __SATTRSTORAGE_I__H__ */

@@ -26,7 +26,7 @@ SHeaderCtrl::~SHeaderCtrl(void)
 {
 }
 
-int SHeaderCtrl::InsertItem(int iItem, LPCTSTR pszText, int nWidth, UINT fmt, LPARAM lParam, BOOL bDpiAware /*=FALSE*/, float fWeight /*=0.0f*/)
+int SHeaderCtrl::InsertItem(int iItem, LPCTSTR pszText, int nWidth, UINT fmt, LPARAM lParam, BOOL bDpiAware /**< =FALSE */, float fWeight /**< =0.0f */)
 {
     SASSERT(pszText);
     SASSERT(nWidth >= 0);
@@ -46,7 +46,7 @@ int SHeaderCtrl::InsertItem(int iItem, LPCTSTR pszText, int nWidth, UINT fmt, LP
     item.lParam = lParam;
     item.bVisible = TRUE;
     m_arrItems.InsertAt(iItem, item);
-    //需要更新列的序号
+    // Column index to update
     for (size_t i = 0; i < GetItemCount(); i++)
     {
         if (i == (size_t)iItem)
@@ -58,6 +58,7 @@ int SHeaderCtrl::InsertItem(int iItem, LPCTSTR pszText, int nWidth, UINT fmt, LP
     FireEvent(e);
 
     Invalidate();
+    accNotifyEvent(EVENT_OBJECT_REORDER);
     return iItem;
 }
 
@@ -175,7 +176,7 @@ BOOL SHeaderCtrl::DeleteItem(int iItem)
 
     int iOrder = m_arrItems[iItem].iOrder;
     m_arrItems.RemoveAt(iItem);
-    //更新排序
+    // Update sorting
     for (UINT i = 0; i < m_arrItems.GetCount(); i++)
     {
         if (m_arrItems[i].iOrder > iOrder)
@@ -185,6 +186,7 @@ BOOL SHeaderCtrl::DeleteItem(int iItem)
     FireEvent(e);
 
     Invalidate();
+    accNotifyEvent(EVENT_OBJECT_REORDER);
     return TRUE;
 }
 
@@ -194,6 +196,7 @@ void SHeaderCtrl::DeleteAllItems()
     EventHeaderRelayout e(this);
     FireEvent(e);
     Invalidate();
+    accNotifyEvent(EVENT_OBJECT_REORDER);
 }
 
 void SHeaderCtrl::OnDestroy()
@@ -269,7 +272,7 @@ void SHeaderCtrl::OnLButtonUp(UINT nFlags, CPoint pt)
     if (IsItemHover(m_dwHitTest))
     {
         if (m_bDragging)
-        { //拖动表头项
+        { // Drag header item
             if (m_bItemSwapEnable)
             {
                 SDragWnd::EndDrag();
@@ -284,9 +287,9 @@ void SHeaderCtrl::OnLButtonUp(UINT nFlags, CPoint pt)
                     m_arrItems.RemoveAt(LOWORD(m_dwHitTest));
                     int nPos = LOWORD(m_dwDragTo);
                     if (nPos > LOWORD(m_dwHitTest))
-                        nPos--; //要考虑将自己移除的影响
+                        nPos--; // Account for the effect of removing itself
                     m_arrItems.InsertAt(LOWORD(m_dwDragTo), t);
-                    //发消息通知宿主表项位置发生变化
+                    // Send a message notifying that the host item position has changed
                     EventHeaderItemSwap evt(this);
                     evt.iOldIndex = LOWORD(m_dwHitTest);
                     evt.iNewIndex = nPos;
@@ -302,7 +305,7 @@ void SHeaderCtrl::OnLButtonUp(UINT nFlags, CPoint pt)
             }
         }
         else
-        { //点击表头项
+        { // Click header item
             if (m_bSortHeader)
             {
                 m_arrItems[LOWORD(m_dwHitTest)].state = WndState_Hover;
@@ -314,7 +317,7 @@ void SHeaderCtrl::OnLButtonUp(UINT nFlags, CPoint pt)
         }
     }
     else if (m_dwHitTest != -1)
-    { //调整表头宽度，发送一个调整完成消息
+    { // Adjust header width and send an adjustment-complete message
         EventHeaderItemChanged evt(this);
         evt.iItem = LOWORD(m_dwHitTest);
         evt.nWidth = GetItemWidth(evt.iItem);
@@ -367,7 +370,7 @@ void SHeaderCtrl::OnMouseMove(UINT nFlags, CPoint pt)
             }
         }
         else if (m_dwHitTest != -1)
-        { //调节宽度
+        { // Adjust width
             if (!m_bFixWidth)
             {
                 int iItem = LOWORD(m_dwHitTest);
@@ -415,7 +418,7 @@ void SHeaderCtrl::OnMouseMove(UINT nFlags, CPoint pt)
                 }
 
                 Invalidate();
-                //发出调节宽度消息
+                // Send width-adjust message
                 EventHeaderItemChanging evt(this);
                 evt.iItem = iItem;
                 evt.nWidth = cxNew;
@@ -555,7 +558,7 @@ DWORD SHeaderCtrl::HitTest(CPoint pt)
     for (UINT i = 0; i < m_arrItems.GetCount(); i++)
     {
         if (m_arrItems[i].cx == 0 || !m_arrItems[i].bVisible)
-            continue; //越过宽度为0的项
+            continue; // Skip items with zero width
 
         rcItem.left = rcItem.right;
         rcItem.right = rcItem.left + GetItemWidth(i);
@@ -572,7 +575,7 @@ DWORD SHeaderCtrl::HitTest(CPoint pt)
         {
             WORD nRight = (WORD)i + 1;
             if (nRight >= m_arrItems.GetCount())
-                nRight = (WORD)-1; //采用-1代表末尾
+                nRight = (WORD)-1; // Use -1 to represent the end
             return MAKELONG(i, nRight);
         }
     }
@@ -789,7 +792,7 @@ void SHeaderCtrl::SetItemVisible(int iItem, BOOL visible)
     m_arrItems[iItem].bVisible = visible;
 
     Invalidate();
-    //发出调节宽度消息
+    // Send width-adjust message
     EventHeaderItemChanged evt(this);
     evt.iItem = iItem;
     evt.nWidth = GetItemWidth(iItem);

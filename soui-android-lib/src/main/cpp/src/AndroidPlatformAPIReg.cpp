@@ -192,6 +192,10 @@ static BOOL androidAudio_playSound(LPCSTR pszSound, HMODULE hmod, DWORD fdwSound
     return AndroidPlatformAPI::instance().playSound(pszSound, hmod, fdwSound);
 }
 
+static BOOL androidAudio_messageBeep(UINT uType) {
+    return AndroidPlatformAPI::instance().messageBeep(uType);
+}
+
 // Path API wrapper
 static DWORD androidPath_getTempPathA(DWORD nBufferLength, LPSTR lpBuffer) {
     return AndroidPlatformAPI::instance().getTempPathA(nBufferLength, lpBuffer);
@@ -251,6 +255,7 @@ extern "C" void RegisterAndroidPlatformAPI() {
 
     // Audio API
     api.audio.playSound = androidAudio_playSound;
+    api.audio.messageBeep = androidAudio_messageBeep;
 
     // Path API
     api.path.getTempPathA = androidPath_getTempPathA;

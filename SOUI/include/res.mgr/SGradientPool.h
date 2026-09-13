@@ -2,7 +2,7 @@
  * @file SGradientPool.h
  * @brief Gradient Pool Management
  * @version v1.0
- * @author SOUI团队
+ * @author SOUI team
  * @date 2014-05-28
  *
  * @details Manages a pool of gradients identified by names.
@@ -45,4 +45,4 @@ class SOUI_EXP SGradientPool
 
 SNSEND
 
-#endif // __SGRADIENTPOOL__H__
+#endif /**< __SGRADIENTPOOL__H__ */

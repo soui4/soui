@@ -10,7 +10,7 @@ SNSBEGIN
 
 /**
  * @class SvgObj
- * @brief svg 对象
+ * @brief svg object
  */
 class SvgObj : public TObjRefImpl<ISvgObj> {
     void *m_ptr;
@@ -30,7 +30,7 @@ class SvgObj : public TObjRefImpl<ISvgObj> {
     STDMETHOD_(int, GetHeight)(CTHIS) SCONST OVERRIDE;
     STDMETHOD_(SIZE, Size)(CTHIS) SCONST OVERRIDE
     {
-        SIZE sz = {GetWidth(), GetHeight()};
+        SIZE sz = { GetWidth(), GetHeight() };
         return sz;
     }
 };
@@ -138,9 +138,9 @@ EXTERN_C ISvgObjPtr CreateSvgFromFileW(LPCWSTR pszSvgFile)
 
 SNSEND
 
-#else // !SOUI_ENABLE_SVG
+#else /**< !SOUI_ENABLE_SVG */
 
-// When SVG is disabled, provide stub implementations that return NULL
+/** When SVG is disabled, provide stub implementations that return NULL */
 SNSBEGIN
 
 EXTERN_C ISvgObjPtr CreateSvgObj(char *strSvg)
@@ -169,4 +169,4 @@ EXTERN_C ISvgObjPtr CreateSvgFromFileW(LPCWSTR pszSvgFile)
 
 SNSEND
 
-#endif // SOUI_ENABLE_SVG
+#endif /**< SOUI_ENABLE_SVG */

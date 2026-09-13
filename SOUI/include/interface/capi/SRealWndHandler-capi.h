@@ -7,13 +7,13 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for SRealWndHandler Interface
  * These macros provide C-style function call syntax for C++ interface methods
  * IRealWndHandler inherits from IObjRef.
  */
 
-/* IObjRef base interface macros */
+/** IObjRef base interface macros */
 #define IRealWndHandler_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -23,7 +23,7 @@ extern "C" {
 #define IRealWndHandler_OnFinalRelease(This) \
     ((This)->lpVtbl->OnFinalRelease(This))
 
-/* IRealWndHandler specific interface macros */
+/** IRealWndHandler specific interface macros */
 #define IRealWndHandler_OnRealWndCreate(This, pRealWnd) \
     ((This)->lpVtbl->OnRealWndCreate(This, pRealWnd))
 
@@ -40,4 +40,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SREALWNDHANDLER_CAPI_H__ */
+#endif /**< __SREALWNDHANDLER_CAPI_H__ */

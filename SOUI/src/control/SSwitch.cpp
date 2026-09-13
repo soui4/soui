@@ -104,7 +104,9 @@ void SSwitch::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
     {
         m_animator->SetID(IsChecked());
         m_animator->start(GetContainer());
-    }else if(nChar == VK_ESCAPE){
+    }
+    else if (nChar == VK_ESCAPE)
+    {
         SetMsgHandled(FALSE);
     }
 }

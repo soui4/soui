@@ -44,4 +44,4 @@ public:
 
 SNSEND
 
-#endif//_SCTRL_PROXY_H_
+#endif /**< _SCTRL_PROXY_H_ */

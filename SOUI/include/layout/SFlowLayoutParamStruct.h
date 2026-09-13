@@ -7,17 +7,17 @@ SNSBEGIN
 
 /**
  * @struct SFlowLayoutParamStruct
- * @brief 流式布局参数结构体
+ * @brief Flow layout parameter struct
  */
 struct SFlowLayoutParamStruct
 {
-    SLayoutSize width;         // 宽度
-    SLayoutSize height;        // 高度
-    SLayoutSize extend_left;   // 左侧扩展
-    SLayoutSize extend_top;    // 顶部扩展
-    SLayoutSize extend_right;  // 右侧扩展
-    SLayoutSize extend_bottom; // 底部扩展
-    Gravity gravity;           // 对齐方式
+    SLayoutSize width;         /**< Width */
+    SLayoutSize height;        /**< Height */
+    SLayoutSize extend_left;   /**< Left expansion */
+    SLayoutSize extend_top;    /**< Top expansion */
+    SLayoutSize extend_right;  /**< Right expansion */
+    SLayoutSize extend_bottom; /**< Bottom expansion */
+    Gravity gravity;           /**< Alignment */
 
     SFlowLayoutParamStruct()
     {
@@ -33,4 +33,4 @@ struct SFlowLayoutParamStruct
 
 SNSEND
 
-#endif // __SFLOWLAYOUTPARAMSTRUCT__H__
+#endif /**< __SFLOWLAYOUTPARAMSTRUCT__H__ */

@@ -10,12 +10,12 @@ SNSBEGIN
 #define ENABLE_THUNK 1
 #else
 #define ENABLE_THUNK 0
-#endif //_WIN32
-#endif // ENABLE_THUNK
+#endif /**< _WIN32 */
+#endif /**< ENABLE_THUNK */
 
-//////////////////////////////////////////////////////////////////////////
-// thunk 技术实现参考http://www.cppblog.com/proguru/archive/2008/08/24/59831.html
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
+/** thunk implementation reference: http://www.cppblog.com/proguru/archive/2008/08/24/59831.html */
+///////////////////////////////////////////////////////////////////////
 
 #if defined(__i386__) || defined(__X86__) || defined(_M_IX86)
 #pragma pack(push, 1)
@@ -44,11 +44,11 @@ struct tagThunk
 #pragma pack(push, 2)
 struct tagThunk
 {
-    USHORT RdiMov;  // mov rdi, pThis
-    ULONG64 RdiImm; //
-    USHORT RaxMov;  // mov rax, target
-    ULONG64 RaxImm; //
-    USHORT RaxJmp;  // jmp target
+    USHORT RdiMov;  /**< mov rdi, pThis */
+    ULONG64 RdiImm; /**<  */
+    USHORT RaxMov;  /**< mov rax, target */
+    ULONG64 RaxImm; /**<  */
+    USHORT RaxJmp;  /**< jmp target */
     void Init(DWORD_PTR proc, void *pThis)
     {
         RdiMov = 0xbf48;         // mov rdi, pThis
@@ -58,21 +58,21 @@ struct tagThunk
         RaxJmp = 0xe0ff;         // jmp rax
         BOOL b = FlushInstructionCache(INVALID_HANDLE_VALUE, this, sizeof(tagThunk));
     }
-    // some thunks will dynamically allocate the memory for the code
+    /** some thunks will dynamically allocate the memory for the code */
     void *GetCodeAddress()
     {
         return this;
     }
 };
-#else //__linux__
+#else /**< __linux__ */
 #pragma pack(push, 2)
 struct tagThunk
 {
-    USHORT RcxMov;  // mov rcx, pThis
-    ULONG64 RcxImm; //
-    USHORT RaxMov;  // mov rax, target
-    ULONG64 RaxImm; //
-    USHORT RaxJmp;  // jmp target
+    USHORT RcxMov;  /**< mov rcx, pThis */
+    ULONG64 RcxImm; /**<  */
+    USHORT RaxMov;  /**< mov rax, target */
+    ULONG64 RaxImm; /**<  */
+    USHORT RaxJmp;  /**< jmp target */
     void Init(DWORD_PTR proc, void *pThis)
     {
         RcxMov = 0xb948;         // mov rcx, pThis
@@ -82,21 +82,21 @@ struct tagThunk
         RaxJmp = 0xe0ff;         // jmp rax
         FlushInstructionCache(INVALID_HANDLE_VALUE, this, sizeof(tagThunk));
     }
-    // some thunks will dynamically allocate the memory for the code
+    /** some thunks will dynamically allocate the memory for the code */
     void *GetCodeAddress()
     {
         return this;
     }
 };
 #pragma pack(pop)
-#endif //__linux__
+#endif /**< __linux__ */
 
 #elif defined(__arm__) || defined(_M_ARM)
 #pragma pack(push, 4)
-struct tagThunk // this should come out to 16 bytes
+struct tagThunk /**< this should come out to 16 bytes */
 {
-    DWORD m_mov_r0; // mov    r0, pThis
-    DWORD m_mov_pc; // mov    pc, pFunc
+    DWORD m_mov_r0; /**< mov    r0, pThis */
+    DWORD m_mov_pc; /**< mov    pc, pFunc */
     DWORD m_pThis;
     DWORD m_pFunc;
     void Init(DWORD_PTR proc, void *pThis)
@@ -106,7 +106,7 @@ struct tagThunk // this should come out to 16 bytes
         m_pThis = (DWORD)pThis;
         m_pFunc = (DWORD)proc;
         // write block from data cache and
-        //  flush from instruction cache
+        // flush from instruction cache
         FlushInstructionCache(INVALID_HANDLE_VALUE, this, sizeof(tagThunk));
     }
     void *GetCodeAddress()
@@ -117,11 +117,11 @@ struct tagThunk // this should come out to 16 bytes
 #pragma pack(pop)
 #elif defined(__arm64__) || defined(_M_ARM64) || defined(__aarch64__)
 #pragma pack(push, 1)
-struct tagThunk // this should come out to 16 bytes
+struct tagThunk /**< this should come out to 16 bytes */
 {
-    DWORD m_ldr_r16; // ldr  x16, [pc, #24]
-    DWORD m_ldr_r0;  // ldr  x0, [pc, #12]
-    DWORD m_br;      // br   x16
+    DWORD m_ldr_r16; /**< ldr  x16, [pc, #24] */
+    DWORD m_ldr_r0;  /**< ldr  x0, [pc, #12] */
+    DWORD m_br;      /**< br   x16 */
     DWORD m_pad;
     ULONG64 m_pThis;
     ULONG64 m_pFunc;
@@ -134,7 +134,7 @@ struct tagThunk // this should come out to 16 bytes
         m_pThis = (ULONG64)pThis;
         m_pFunc = (ULONG64)proc;
         // write block from data cache and
-        //  flush from instruction cache
+        // flush from instruction cache
         FlushInstructionCache(INVALID_HANDLE_VALUE, this, sizeof(tagThunk));
     }
     void *GetCodeAddress()
@@ -192,7 +192,7 @@ void SNativeWndHelper::UnlockSharePtr()
     m_cs.Leave();
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 SNativeWnd::SNativeWnd()
     : m_bDestoryed(FALSE)
     , m_pCurrentMsg(NULL)
@@ -328,11 +328,11 @@ LRESULT CALLBACK SNativeWnd::StartWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam
     SNativeWndHelper::instance()->UnlockSharePtr();
     pThis->m_hWnd = hWnd;
 #if ENABLE_THUNK
-    // 初始化Thunk，做了两件事:1、mov指令替换hWnd为对象指针，2、jump指令跳转到WindowProc
+    // Initialize Thunk; does two things: 1. the mov instruction replaces hWnd with the object pointer; 2. the jump instruction jumps to WindowProc
     pThis->m_pThunk->Init((DWORD_PTR)WindowProc, pThis);
-    // 得到Thunk指针
+    // Get the Thunk pointer
     WNDPROC pProc = (WNDPROC)pThis->m_pThunk->GetCodeAddress();
-    // 调用下面的语句后，以后消息来了，都由pProc处理
+    // After calling the statement below, all subsequent messages will be handled by pProc
     ::SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG_PTR)pProc);
     return pProc(hWnd, uMsg, wParam, lParam);
 #else
@@ -368,7 +368,7 @@ BOOL SNativeWnd::SubclassWindow(HWND hWnd)
     return TRUE;
 }
 
-HWND SNativeWnd::UnsubclassWindow(BOOL bForce /*= FALSE*/)
+HWND SNativeWnd::UnsubclassWindow(BOOL bForce /**< = FALSE */)
 {
     SASSERT(m_hWnd != 0);
 
@@ -478,7 +478,7 @@ LRESULT SNativeWnd::ReflectNotifications(UINT uMsg, WPARAM wParam, LPARAM lParam
     case WM_CTLCOLORSTATIC:
         hWndChild = (HWND)lParam;
         break;
-#endif //_WIN32
+#endif // _WIN32
     default:
         break;
     }
@@ -516,7 +516,7 @@ BOOL SNativeWnd::DefaultReflectionHandler(HWND hWnd, UINT uMsg, WPARAM wParam, L
     case OCM_CTLCOLORMSGBOX:
     case OCM_CTLCOLORSCROLLBAR:
     case OCM_CTLCOLORSTATIC:
-#endif //_WIN32
+#endif // _WIN32
         lResult = ::DefWindowProc(hWnd, uMsg - OCM__BASE, wParam, lParam);
         return TRUE;
     default:
@@ -539,7 +539,7 @@ LRESULT SNativeWnd::DefWindowProc()
     return lRes;
 }
 
-BOOL SNativeWnd::CenterWindow(HWND hWndCenter /*= NULL*/)
+BOOL SNativeWnd::CenterWindow(HWND hWndCenter /**< = NULL */)
 {
     SASSERT(IsWindow());
 
@@ -635,7 +635,7 @@ BOOL SNativeWnd::CenterWindow(HWND hWndCenter /*= NULL*/)
     return ::SetWindowPos(m_hWnd, 0, xLeft, yTop, -1, -1, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
 }
 
-BOOL SNativeWnd::ModifyStyle(DWORD dwRemove, DWORD dwAdd, UINT nFlags /*= 0*/)
+BOOL SNativeWnd::ModifyStyle(DWORD dwRemove, DWORD dwAdd, UINT nFlags /**< = 0 */)
 {
     SASSERT(IsWindow());
 
@@ -653,7 +653,7 @@ BOOL SNativeWnd::ModifyStyle(DWORD dwRemove, DWORD dwAdd, UINT nFlags /*= 0*/)
     return TRUE;
 }
 
-BOOL SNativeWnd::ModifyStyleEx(DWORD dwRemove, DWORD dwAdd, UINT nFlags /*= 0*/)
+BOOL SNativeWnd::ModifyStyleEx(DWORD dwRemove, DWORD dwAdd, UINT nFlags /**< = 0 */)
 {
     // todo:hjx to support ws_ex_composite change during running.
     SASSERT(IsWindow());
@@ -672,7 +672,7 @@ BOOL SNativeWnd::ModifyStyleEx(DWORD dwRemove, DWORD dwAdd, UINT nFlags /*= 0*/)
     return TRUE;
 }
 
-BOOL SNativeWnd::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult, DWORD dwMsgMapID /*= 0*/)
+BOOL SNativeWnd::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult, DWORD dwMsgMapID /**< = 0 */)
 {
     return FALSE;
 }
@@ -684,7 +684,7 @@ BOOL SNativeWnd::UpdateLayeredWindow(HDC hdcDst, POINT *pptDst, SIZE *psize, HDC
     return ::UpdateLayeredWindow(m_hWnd, hdcDst, pptDst, psize, hdcSrc, pptSrc, crKey, pblend, dwFlags);
 #else
     return FALSE;
-#endif //_WIN32
+#endif // _WIN32
 }
 
 BOOL SNativeWnd::SetLayeredWindowAttributes(COLORREF crKey, BYTE bAlpha, DWORD dwFlags)
@@ -693,7 +693,7 @@ BOOL SNativeWnd::SetLayeredWindowAttributes(COLORREF crKey, BYTE bAlpha, DWORD d
     return ::SetLayeredWindowAttributes(m_hWnd, crKey, bAlpha, dwFlags);
 }
 
-int SNativeWnd::SetWindowRgn(HRGN hRgn, BOOL bRedraw /*=TRUE*/)
+int SNativeWnd::SetWindowRgn(HRGN hRgn, BOOL bRedraw /**< =TRUE */)
 {
     SASSERT(IsWindow());
     return ::SetWindowRgn(m_hWnd, hRgn, bRedraw);
@@ -711,13 +711,13 @@ BOOL SNativeWnd::UpdateWindow()
     return ::UpdateWindow(m_hWnd);
 }
 
-BOOL SNativeWnd::MoveWindow2(LPCRECT lpRect, BOOL bRepaint /*= TRUE*/)
+BOOL SNativeWnd::MoveWindow2(LPCRECT lpRect, BOOL bRepaint /**< = TRUE */)
 {
     SASSERT(IsWindow());
     return ::MoveWindow(m_hWnd, lpRect->left, lpRect->top, lpRect->right - lpRect->left, lpRect->bottom - lpRect->top, bRepaint);
 }
 
-BOOL SNativeWnd::MoveWindow(int x, int y, int nWidth, int nHeight, BOOL bRepaint /*= TRUE*/)
+BOOL SNativeWnd::MoveWindow(int x, int y, int nWidth, int nHeight, BOOL bRepaint /**< = TRUE */)
 {
     SASSERT(IsWindow());
     return ::MoveWindow(m_hWnd, x, y, nWidth, nHeight, bRepaint);
@@ -753,19 +753,19 @@ BOOL SNativeWnd::SetWindowText(LPCTSTR lpszString)
     return ::SetWindowText(m_hWnd, lpszString);
 }
 
-BOOL SNativeWnd::SendNotifyMessage(UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/)
+BOOL SNativeWnd::SendNotifyMessage(UINT message, WPARAM wParam /**< = 0 */, LPARAM lParam /**< = 0 */)
 {
     SASSERT(IsWindow());
     return ::SendNotifyMessage(m_hWnd, message, wParam, lParam);
 }
 
-BOOL SNativeWnd::PostMessage(UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/)
+BOOL SNativeWnd::PostMessage(UINT message, WPARAM wParam /**< = 0 */, LPARAM lParam /**< = 0 */)
 {
     SASSERT(IsWindow());
     return ::PostMessage(m_hWnd, message, wParam, lParam);
 }
 
-LRESULT SNativeWnd::SendMessage(UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/)
+LRESULT SNativeWnd::SendMessage(UINT message, WPARAM wParam /**< = 0 */, LPARAM lParam /**< = 0 */)
 {
     SASSERT(IsWindow());
     return ::SendMessage(m_hWnd, message, wParam, lParam);
@@ -835,7 +835,7 @@ BOOL SNativeWnd::KillTimer(UINT_PTR nIDEvent)
     return ::KillTimer(m_hWnd, nIDEvent);
 }
 
-UINT_PTR SNativeWnd::SetTimer(UINT_PTR nIDEvent, UINT nElapse, void(CALLBACK *lpfnTimer)(HWND, UINT, UINT_PTR, DWORD) /*= NULL*/)
+UINT_PTR SNativeWnd::SetTimer(UINT_PTR nIDEvent, UINT nElapse, void(CALLBACK *lpfnTimer)(HWND, UINT, UINT_PTR, DWORD) /**< = NULL */)
 {
     SASSERT(IsWindow());
     return ::SetTimer(m_hWnd, nIDEvent, nElapse, (TIMERPROC)lpfnTimer);
@@ -893,13 +893,13 @@ BOOL SNativeWnd::GetWindowRect(LPRECT lpRect) const
     return ::GetWindowRect(m_hWnd, lpRect);
 }
 
-BOOL SNativeWnd::InvalidateRect(LPCRECT lpRect, BOOL bErase /*= TRUE*/)
+BOOL SNativeWnd::InvalidateRect(LPCRECT lpRect, BOOL bErase /**< = TRUE */)
 {
     SASSERT(IsWindow());
     return ::InvalidateRect(m_hWnd, lpRect, bErase);
 }
 
-BOOL SNativeWnd::Invalidate(BOOL bErase /*= TRUE*/)
+BOOL SNativeWnd::Invalidate(BOOL bErase /**< = TRUE */)
 {
     SASSERT(IsWindow());
     return ::InvalidateRect(m_hWnd, NULL, bErase);

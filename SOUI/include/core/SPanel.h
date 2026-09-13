@@ -139,9 +139,15 @@ class SOUI_EXP SPanel
     void NotifyScrollBarActivity(BOOL bVertical);
 
     BOOL HandleMouseDrag(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lRet);
-    BOOL IsItemDragScrollEnabled() const { return m_bItemDragScrollEnabled; }
+    BOOL IsItemDragScrollEnabled() const
+    {
+        return m_bItemDragScrollEnabled;
+    }
     void StartDragPending(const CPoint &pt);
-    void SetDragPending(BOOL bPending) { m_bDragPending = bPending; }
+    void SetDragPending(BOOL bPending)
+    {
+        m_bDragPending = bPending;
+    }
 
   public:
     /**
@@ -157,7 +163,7 @@ class SOUI_EXP SPanel
     virtual CRect GetClientRect() const;
 
   protected:
-    // Inherited from IScrollBarHost
+    /** Inherited from IScrollBarHost */
     /**
      * @brief Gets the rectangle of a scrollbar.
      * @param bVert TRUE for vertical scrollbar, FALSE for horizontal scrollbar.
@@ -335,53 +341,54 @@ class SOUI_EXP SPanel
      * @return Result of the attribute handling.
      */
     HRESULT OnAttrScrollbarSkin(SStringW strValue, BOOL bLoading);
-  protected:
-    SCROLLINFO m_siVer, m_siHoz;           // Vertical and horizontal scroll information
-    SAutoRefPtr<SSkinScrollbar> m_pSkinSb; // Scrollbar skin
-
-  private:                      // Modified to private, derived classes can only use GetSbArrowSize(), GetSbWidth() to access
-    SLayoutSize m_nSbArrowSize; // Arrow size for the scrollbar
-    SLayoutSize m_nSbWid;       // Width of the scrollbar
 
   protected:
-    CRect m_rcClient; // Client rectangle
+    SCROLLINFO m_siVer, m_siHoz;           /**< Vertical and horizontal scroll information */
+    SAutoRefPtr<SSkinScrollbar> m_pSkinSb; /**< Scrollbar skin */
 
-    SLayoutSize m_nSbLeft;   // Distance of the scrollbar from the left
-    SLayoutSize m_nSbRight;  // Distance of the scrollbar from the right
-    SLayoutSize m_nSbTop;    // Distance of the scrollbar from the top
-    SLayoutSize m_nSbBottom; // Distance of the scrollbar from the bottom
+  private:                      /**< Modified to private, derived classes can only use GetSbArrowSize(), GetSbWidth() to access */
+    SLayoutSize m_nSbArrowSize; /**< Arrow size for the scrollbar */
+    SLayoutSize m_nSbWid;       /**< Width of the scrollbar */
 
-    ScrollBarID m_dragSb, m_hitSb; // Dragging and hit scrollbar IDs
+  protected:
+    CRect m_rcClient; /**< Client rectangle */
 
-    UINT m_wBarVisible;         // Scrollbar visibility information
-    UINT m_wBarEnable;          // Scrollbar enable information
-    SScrollBarHandler m_sbVert; // Vertical scrollbar handler
-    SScrollBarHandler m_sbHorz; // Horizontal scrollbar handler
+    SLayoutSize m_nSbLeft;   /**< Distance of the scrollbar from the left */
+    SLayoutSize m_nSbRight;  /**< Distance of the scrollbar from the right */
+    SLayoutSize m_nSbTop;    /**< Distance of the scrollbar from the top */
+    SLayoutSize m_nSbBottom; /**< Distance of the scrollbar from the bottom */
 
-    DWORD m_dwUpdateTime;     // Time of the last update
-    DWORD m_dwUpdateInterval; // Update interval
+    ScrollBarID m_dragSb, m_hitSb; /**< Dragging and hit scrollbar IDs */
 
-    short m_zDelta;     // Delta value for mouse wheel
-    int m_nScrollSpeed; // Scroll speed
+    UINT m_wBarVisible;         /**< Scrollbar visibility information */
+    UINT m_wBarEnable;          /**< Scrollbar enable information */
+    SScrollBarHandler m_sbVert; /**< Vertical scrollbar handler */
+    SScrollBarHandler m_sbHorz; /**< Horizontal scrollbar handler */
 
-    mutable SAutoRefPtr<IInterpolator> m_fadeInterpolator; // Interpolator for fading
-    int m_fadeFrames;                                      // Number of fade frames
-    BYTE m_bySbThumbTrackMinAlpha;                         // Minimum alpha value for thumb track
+    DWORD m_dwUpdateTime;     /**< Time of the last update */
+    DWORD m_dwUpdateInterval; /**< Update interval */
 
-    // Drag scroll state
-    BOOL m_bDragPending;       /**< TRUE when mouse down, waiting for drag threshold */
-    BOOL m_bDragScrolling;     /**< TRUE when drag scrolling is active */
-    BOOL m_bDragStarted;      /**< TRUE when m_ptDragStart has been initialized */
-    CPoint m_ptDragStart;      /**< Mouse position when drag started */
-    CPoint m_ptDragLast;       /**< Last mouse position during drag */
+    short m_zDelta;     /**< Delta value for mouse wheel */
+    int m_nScrollSpeed; /**< Scroll speed */
+
+    mutable SAutoRefPtr<IInterpolator> m_fadeInterpolator; /**< Interpolator for fading */
+    int m_fadeFrames;                                      /**< Number of fade frames */
+    BYTE m_bySbThumbTrackMinAlpha;                         /**< Minimum alpha value for thumb track */
+
+    /** Drag scroll state */
+    BOOL m_bDragPending;           /**< TRUE when mouse down, waiting for drag threshold */
+    BOOL m_bDragScrolling;         /**< TRUE when drag scrolling is active */
+    BOOL m_bDragStarted;           /**< TRUE when m_ptDragStart has been initialized */
+    CPoint m_ptDragStart;          /**< Mouse position when drag started */
+    CPoint m_ptDragLast;           /**< Last mouse position during drag */
     BOOL m_bItemDragScrollEnabled; /**< Enable drag-scroll */
 
-    // Velocity tracking
-    float m_fLastVelocityX;    /**< Instantaneous velocity X in pixels/ms */
-    float m_fLastVelocityY;    /**< Instantaneous velocity Y in pixels/ms */
-    uint64_t m_nLastMoveTime;  /**< Timestamp of last MOUSEMOVE (ms) */
+    /** Velocity tracking */
+    float m_fLastVelocityX;   /**< Instantaneous velocity X in pixels/ms */
+    float m_fLastVelocityY;   /**< Instantaneous velocity Y in pixels/ms */
+    uint64_t m_nLastMoveTime; /**< Timestamp of last MOUSEMOVE (ms) */
 
-    // Fling animation
+    /** Fling animation */
     SAutoRefPtr<SFloatAnimator> m_pFlingAnimatorV;
     float m_fFlingVStartPos;
     float m_fFlingVTargetPos;
@@ -514,12 +521,12 @@ class SOUI_EXP SPanel
      */
     void OnHScroll(UINT nSBCode, UINT nPos, HWND hwnd);
 
-    // IAnimatorUpdateListener
+    /** IAnimatorUpdateListener */
     STDMETHOD_(void, onAnimationUpdate)(THIS_ IValueAnimator *pAnimator) OVERRIDE;
-    // SAnimatorListener
+    /** SAnimatorListener */
     STDMETHOD_(void, onAnimationEnd)(THIS_ IValueAnimator *pAnimator) OVERRIDE;
 
-    // Drag scroll mouse handlers (for plain SPanel)
+    /** Drag scroll mouse handlers (for plain SPanel) */
     void OnLButtonDown(UINT nFlags, CPoint pt);
     void OnMouseMove(UINT nFlags, CPoint pt);
     void OnLButtonUp(UINT nFlags, CPoint pt);
@@ -550,7 +557,7 @@ class SOUI_EXP SPanel
 
     /**
      * @brief Checks if drag mode is enabled.
-    */
+     */
     virtual BOOL IsEnableDragMode() const;
 
     SOUI_MSG_MAP_BEGIN()
@@ -702,11 +709,11 @@ class SOUI_EXP SScrollView : public TPanelProxy<IScrollView> {
     SOUI_MSG_MAP_END()
 
   protected:
-    SLayoutSize m_viewSize[2]; // View size in two dimensions
-    CPoint m_ptOrigin;         // Origin of the view
-    SIZE m_szView;             // Current size of the view
+    SLayoutSize m_viewSize[2]; /**< View size in two dimensions */
+    CPoint m_ptOrigin;         /**< Origin of the view */
+    SIZE m_szView;             /**< Current size of the view */
 };
 
 SNSEND
 
-#endif // __SPANEL__H__
+#endif /**< __SPANEL__H__ */

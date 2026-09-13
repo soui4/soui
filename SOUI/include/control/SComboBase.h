@@ -7,11 +7,11 @@
 
 SNSBEGIN
 
-// String constants for ComboBase control
+/** String constants for ComboBase control */
 namespace SComboBase_style
 {
-static LPCWSTR kStyle_Dropdown = L"dropdownStyle"; // 下拉列表风格，只包含root节点
-static LPCWSTR kStyle_Edit = L"editStyle";         // 编辑框风格
+static LPCWSTR kStyle_Dropdown = L"dropdownStyle"; /**< Dropdown list style, only contains the root node */
+static LPCWSTR kStyle_Edit = L"editStyle";         /**< Edit box style */
 } // namespace SComboBase_style
 
 #define IDC_CB_EDIT -100
@@ -528,4 +528,4 @@ class TComboBaseProxy
 };
 
 SNSEND
-#endif // __SCOMBOBASE__H__
+#endif /**< __SCOMBOBASE__H__ */

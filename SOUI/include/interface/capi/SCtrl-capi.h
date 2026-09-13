@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for SCtrl Interfaces
  * These macros provide C-style function call syntax for C++ interface methods
  *
@@ -17,7 +17,7 @@ extern "C" {
  *   IItemPanel (inherits IOsrPanel)
  */
 
-/* ICtrl C API Macros */
+/** ICtrl C API Macros */
 #define ICtrl_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -30,7 +30,7 @@ extern "C" {
 #define ICtrl_ToIWindow(This) \
     ((This)->lpVtbl->ToIWindow(This))
 
-/* IOsrPanel C API Macros */
+/** IOsrPanel C API Macros */
 #define IOsrPanel_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -58,7 +58,7 @@ extern "C" {
 #define IOsrPanel_PtToHost(This, pt) \
     ((This)->lpVtbl->PtToHost(This, pt))
 
-/* IItemPanel C API Macros */
+/** IItemPanel C API Macros */
 #define IItemPanel_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -102,4 +102,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SCTRL_CAPI_H__ */
+#endif /**< __SCTRL_CAPI_H__ */

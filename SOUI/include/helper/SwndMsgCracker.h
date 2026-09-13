@@ -16,7 +16,7 @@
     return FALSE;               \
     }
 
-// BOOL OnEraseBkgnd(SNS::IRenderTarget * pRT)
+/** BOOL OnEraseBkgnd(SNS::IRenderTarget * pRT) */
 #define MSG_WM_ERASEBKGND_EX(func)                             \
     if (uMsg == WM_ERASEBKGND)                                 \
     {                                                          \
@@ -26,7 +26,7 @@
             return TRUE;                                       \
     }
 
-// void OnPaint(SNS::IRenderTarget * pRT)
+/** void OnPaint(SNS::IRenderTarget * pRT) */
 #define MSG_WM_PAINT_EX(func)               \
     if (uMsg == WM_PAINT)                   \
     {                                       \
@@ -37,7 +37,7 @@
             return TRUE;                    \
     }
 
-// void OnNcPaint(SNS::IRenderTarget * pRT)
+/** void OnNcPaint(SNS::IRenderTarget * pRT) */
 #define MSG_WM_NCPAINT_EX(func)             \
     if (uMsg == WM_NCPAINT)                 \
     {                                       \
@@ -48,7 +48,7 @@
             return TRUE;                    \
     }
 
-// void OnSetFont(IFont *pFont, BOOL bRedraw)
+/** void OnSetFont(IFont *pFont, BOOL bRedraw) */
 #define MSG_WM_SETFONT_EX(func)                       \
     if (uMsg == WM_SETFONT)                           \
     {                                                 \
@@ -59,7 +59,7 @@
             return TRUE;                              \
     }
 
-// void OnSetFocus(SWND wndOld)
+/** void OnSetFocus(SWND wndOld) */
 #define MSG_WM_SETFOCUS_EX(func) \
     if (uMsg == WM_SETFOCUS)     \
     {                            \
@@ -70,7 +70,7 @@
             return TRUE;         \
     }
 
-// void OnSetFocus(SWND wndOld,CFocusManager::FocusChangeReason)
+/** void OnSetFocus(SWND wndOld,CFocusManager::FocusChangeReason) */
 #define MSG_WM_SETFOCUS_EX2(func)                                     \
     if (uMsg == WM_SETFOCUS)                                          \
     {                                                                 \
@@ -81,7 +81,7 @@
             return TRUE;                                              \
     }
 
-// void OnKillFocus(SWND wndFocus)
+/** void OnKillFocus(SWND wndFocus) */
 #define MSG_WM_KILLFOCUS_EX(func) \
     if (uMsg == WM_KILLFOCUS)     \
     {                             \
@@ -92,7 +92,7 @@
             return TRUE;          \
     }
 
-// void OnNcMouseHover(int nFlag,CPoint pt)
+/** void OnNcMouseHover(int nFlag,CPoint pt) */
 #define MSG_WM_NCMOUSEHOVER(func)                                         \
     if (uMsg == WM_NCMOUSEHOVER)                                          \
     {                                                                     \
@@ -103,7 +103,7 @@
             return TRUE;                                                  \
     }
 
-// void OnNcMouseLeave()
+/** void OnNcMouseLeave() */
 #define MSG_WM_NCMOUSELEAVE(func) \
     if (uMsg == WM_NCMOUSELEAVE)  \
     {                             \
@@ -114,7 +114,7 @@
             return TRUE;          \
     }
 
-// void OnTimer(char cTimerID)
+/** void OnTimer(char cTimerID) */
 #define MSG_WM_TIMER_EX(func) \
     if (uMsg == WM_TIMER)     \
     {                         \
@@ -125,4 +125,4 @@
             return TRUE;      \
     }
 
-#endif // __SWNDMSGCRACKER__H__
+#endif /**< __SWNDMSGCRACKER__H__ */

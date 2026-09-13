@@ -3,7 +3,7 @@
 
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
-#endif // !WIN32_LEAN_AND_MEAN
+#endif /**< !WIN32_LEAN_AND_MEAN */
 
 #include <windows.h>
 
@@ -11,24 +11,24 @@
 
 #ifndef GetAValue
 #define GetAValue(rgb) (LOBYTE(rgb >> 24))
-#endif // GetAValue
+#endif /**< GetAValue */
 
 #ifndef RGBA
 #define RGBA(r, g, b, a) ((r) | (g) << 8 | (b) << 16 | ((uint32_t)a) << 24)
-#endif // RGBA
+#endif /**< RGBA */
 
 /**
  * @class SColor
- * @brief 以ARGB格式存储颜色值的类
+ * @brief Class storing color values in ARGB format
  */
 class SColor {
   public:
     /**
-     * @brief 构造函数，使用RGB和Alpha值初始化颜色
-     * @param r 红色分量（0-255）
-     * @param g 绿色分量（0-255）
-     * @param b 蓝色分量（0-255）
-     * @param a 透明度分量（0-255，默认为255）
+     * @brief Constructor; initialize the color using RGB and Alpha values
+     * @param r red component (0-255)
+     * @param g green component (0-255)
+     * @param b blue component (0-255)
+     * @param a alpha component (0-255, default 255)
      */
     SColor(BYTE r, BYTE g, BYTE b, BYTE a = 0xFF)
         : b(b)
@@ -39,9 +39,9 @@ class SColor {
     }
 
     /**
-     * @brief 构造函数，使用COLORREF和Alpha值初始化颜色
-     * @param cr COLORREF颜色值
-     * @param alpha 透明度分量（0-255）
+     * @brief Constructor; initialize the color using COLORREF and Alpha values
+     * @param cr COLORREF color value
+     * @param alpha alpha component (0-255)
      */
     SColor(COLORREF cr, BYTE alpha)
     {
@@ -53,8 +53,8 @@ class SColor {
     }
 
     /**
-     * @brief 构造函数，使用COLORREF初始化颜色
-     * @param cr COLORREF颜色值
+     * @brief Constructor; initialize the color using COLORREF
+     * @param cr COLORREF color value
      */
     SColor(COLORREF cr)
     {
@@ -65,8 +65,8 @@ class SColor {
     }
 
     /**
-     * @brief 将颜色转换为COLORREF格式
-     * @return COLORREF颜色值
+     * @brief Convert the color to COLORREF format
+     * @return COLORREF color value
      */
     const COLORREF toCOLORREF() const
     {
@@ -74,8 +74,8 @@ class SColor {
     }
 
     /**
-     * @brief 将颜色转换为DWORD格式（ARGB）
-     * @return DWORD格式的颜色值
+     * @brief Convert the color to DWORD format (ARGB)
+     * @return color value in DWORD format
      */
     const DWORD toARGB() const
     {
@@ -85,8 +85,8 @@ class SColor {
     }
 
     /**
-     * @brief 设置颜色的RGB值
-     * @param cr COLORREF颜色值
+     * @brief Set the RGB value of the color
+     * @param cr COLORREF color value
      */
     void setRGB(COLORREF cr)
     {
@@ -97,9 +97,9 @@ class SColor {
     }
 
     /**
-     * @brief 设置颜色的RGB值和Alpha值
-     * @param cr COLORREF颜色值
-     * @param alpha 透明度分量（0-255）
+     * @brief Set the RGB value and Alpha value of the color
+     * @param cr COLORREF color value
+     * @param alpha alpha component (0-255)
      */
     void setRGB(COLORREF cr, BYTE alpha)
     {
@@ -111,8 +111,8 @@ class SColor {
     }
 
     /**
-     * @brief 更新颜色的Alpha值
-     * @param alpha 透明度分量（0-255）
+     * @brief Update the Alpha value of the color
+     * @param alpha alpha component (0-255)
      */
     void updateAlpha(BYTE alpha)
     {
@@ -125,10 +125,10 @@ class SColor {
         }
     }
 
-    DWORD b : 8; ///< 蓝色分量（0-255）
-    DWORD g : 8; ///< 绿色分量（0-255）
-    DWORD r : 8; ///< 红色分量（0-255）
-    DWORD a : 8; ///< 透明度分量（0-255）
+    DWORD b : 8; /**<  Blue component (0-255) */
+    DWORD g : 8; /**<  Green component (0-255) */
+    DWORD r : 8; /**<  Red component (0-255) */
+    DWORD a : 8; /**<  Alpha component (0-255) */
 };
 
-#endif // __SCOLOR__H__
+#endif /**< __SCOLOR__H__ */

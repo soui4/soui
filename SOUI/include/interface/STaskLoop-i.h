@@ -18,16 +18,16 @@ typedef struct ITaskLoop ITaskLoop;
 DECLARE_INTERFACE(ITaskLoopListener)
 {
     /**
-     * @brief 任务循环启动前回调
-     * @param taskLoop ITaskLoop* -- 任务循环对象
+     * @brief Callback before the task loop starts
+     * @param taskLoop ITaskLoop* -- Task loop object
      */
-    STDMETHOD_(void, onStart)(THIS_ ITaskLoop *taskLoop) PURE;
+    STDMETHOD_(void, onStart)(THIS_ ITaskLoop * taskLoop) PURE;
 
     /**
-     * @brief 任务循环退出前回调
-     * @param taskLoop ITaskLoop* -- 任务循环对象
+     * @brief Callback before the task loop exits
+     * @param taskLoop ITaskLoop* -- Task loop object
      */
-    STDMETHOD_(void, onStop)(THIS_ ITaskLoop *taskLoop) PURE;
+    STDMETHOD_(void, onStop)(THIS_ ITaskLoop * taskLoop) PURE;
 };
 
 #undef INTERFACE
@@ -35,112 +35,112 @@ DECLARE_INTERFACE(ITaskLoopListener)
 DECLARE_INTERFACE_(ITaskLoop, IObjRef)
 {
     /**
-     * @brief 添加引用
-     * @return long -- 引用计数
+     * @brief Add reference
+     * @return long -- reference count
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief 释放引用
-     * @return long -- 引用计数
+     * @brief Release reference
+     * @return long -- reference count
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief 释放对象
+     * @brief Release object
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
     /**
-     * @brief 获取任务队列的名称
-     * @param pszBuf char* -- 缓冲区
-     * @param nBufLen int -- 缓冲区长度
-     * @return BOOL -- TRUE: 成功，FALSE: 失败
+     * @brief Get the name of the task queue
+     * @param pszBuf char* -- Buffer
+     * @param nBufLen int -- Buffer length
+     * @return BOOL -- TRUE: success, FALSE: failure
      */
     STDMETHOD_(BOOL, getName)(THIS_ char *pszBuf, int nBufLen) PURE;
 
     /**
-     * @brief 启动一个线程运行任务队列
-     * @param pszName const char* -- 线程名称
-     * @param priority Priority -- 线程优先级
+     * @brief Start a thread to run the task queue
+     * @param pszName const char* -- Thread name
+     * @param priority Priority -- Thread priority
      * @return void
      */
     STDMETHOD_(void, start)(THIS_ const char *pszName, Priority priority) PURE;
 
     /**
-     * @brief 停止线程同步
+     * @brief Stop thread synchronization
      * @return void
      */
     STDMETHOD_(void, stop)(THIS) PURE;
 
     /**
-     * @brief 向任务管理器发布或发送任务
-     * @param runnable const IRunnable* -- 要运行的任务对象
-     * @param waitUntilDone BOOL -- TRUE: 发送任务，FALSE: 发布任务
-     * @param priority int -- 任务优先级
-     * @return long -- 任务ID，可用于取消任务
+     * @brief Post or send a task to the task manager
+     * @param runnable const IRunnable* -- Task object to run
+     * @param waitUntilDone BOOL -- TRUE: send task, FALSE: post task
+     * @param priority int -- Task priority
+     * @return long -- Task ID, can be used to cancel the task
      */
     STDMETHOD_(long, postTask)
     (THIS_ const IRunnable *runnable, BOOL waitUntilDone, int priority) PURE;
 
     /**
-     * @brief 从任务循环待处理任务列表中移除特定对象的任务
-     * @param object void* -- 要移除任务的特定对象
+     * @brief Remove tasks of a specific object from the task loop's pending task list
+     * @param object void* -- Specific object whose tasks are to be removed
      * @return void
      */
     STDMETHOD_(void, cancelTasksForObject)(THIS_ void *object) PURE;
 
     /**
-     * @brief 取消特定任务ID列表中的任务
-     * @param taskId long -- 要取消的任务ID
-     * @return BOOL -- TRUE: 成功，FALSE: 失败
+     * @brief Cancel the task with the specified task ID
+     * @param taskId long -- Task ID to cancel
+     * @return BOOL -- TRUE: success, FALSE: failure
      */
     STDMETHOD_(BOOL, cancelTask)(THIS_ long taskId) PURE;
 
     /**
-     * @brief 获取任务循环队列中的总任务数
-     * @return int -- 任务循环队列中的总任务数
+     * @brief Get the total number of tasks in the task loop queue
+     * @return int -- Total number of tasks in the task loop queue
      */
     STDMETHOD_(int, getTaskCount)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 获取运行循环的状态
-     * @return BOOL -- TRUE: 运行中，FALSE: 未运行
+     * @brief Get the state of the running loop
+     * @return BOOL -- TRUE: running, FALSE: not running
      */
     STDMETHOD_(BOOL, isRunning)(THIS) PURE;
 
     /**
-     * @brief 获取正在运行的任务信息
-     * @param buf char* -- 接收任务信息的缓冲区
-     * @param bufLen int -- 缓冲区长度
-     * @return BOOL -- TRUE: 成功，FALSE: 无任务运行
+     * @brief Get information of the running task
+     * @param buf char* -- Buffer receiving task information
+     * @param bufLen int -- Buffer length
+     * @return BOOL -- TRUE: success, FALSE: no task running
      */
     STDMETHOD_(BOOL, getRunningTaskInfo)(THIS_ char *buf, int bufLen) PURE;
 
     /**
-     * @brief 设置一个任务重复运行
-     * @param pTask IRunnable* -- 要运行的任务对象
-     * @param intervel int -- 心跳间隔
+     * @brief Set a task to run repeatedly
+     * @param pTask IRunnable* -- Task object to run
+     * @param intervel int -- Heartbeat interval
      * @return void
-     * @remark 任务循环将持有pTask的克隆。将pTask设置为null以停止心跳。
+     * @remark The task loop holds a clone of pTask. Set pTask to null to stop the heartbeat.
      */
     STDMETHOD_(void, setHeartBeatTask)(THIS_ IRunnable * pTask, int intervel) PURE;
 
     /**
-     * @brief 设置任务循环监听器
-     * @param listener ITaskLoopListener* -- 监听器对象
+     * @brief Set the task loop listener
+     * @param listener ITaskLoopListener* -- Listener object
      * @return void
-     * @remark 任务循环不拥有listener，调用者需要自行管理生命周期
+     * @remark The task loop does not own the listener; the caller must manage its lifetime.
      */
-    STDMETHOD_(void, setListener)(THIS_ ITaskLoopListener *listener) PURE;
+    STDMETHOD_(void, setListener)(THIS_ ITaskLoopListener * listener) PURE;
 
     /**
-     * @brief 获取任务循环监听器
-     * @return ITaskLoopListener* -- 监听器对象
+     * @brief Get the task loop listener
+     * @return ITaskLoopListener* -- Listener object
      */
-    STDMETHOD_(ITaskLoopListener*, getListener)(THIS) PURE;
+    STDMETHOD_(ITaskLoopListener *, getListener)(THIS) PURE;
 };
 
 SNSEND
-#endif // __STASKLOOP_I__H__
+#endif /**< __STASKLOOP_I__H__ */

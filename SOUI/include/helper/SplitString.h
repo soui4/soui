@@ -4,13 +4,13 @@
 SNSBEGIN
 
 /**
- * @brief 拆分字符串模板函数
- * @tparam T 字符串类型（例如，SStringA, SStringW）
- * @tparam TC 分隔符类型（例如，char, wchar_t）
- * @param str 要拆分的字符串
- * @param cSep 分隔符
- * @param strLst 存储拆分结果的数组
- * @return 拆分后的字符串数量
+ * @brief Split string template function
+ * @tparam T String type (e.g., SStringA, SStringW)
+ * @tparam TC Separator type (e.g., char, wchar_t)
+ * @param str String to split
+ * @param cSep Separator
+ * @param strLst Array storing the split results
+ * @return Number of split strings
  */
 template <class T, class TC>
 size_t SplitString(const T &str, TC cSep, SArray<T> &strLst)
@@ -40,35 +40,35 @@ size_t SplitString(const T &str, TC cSep, SArray<T> &strLst)
 
 /**
  * @typedef SStringAList
- * @brief SStringA 类型的数组
+ * @brief Array of SStringA type
  */
 typedef SArray<SStringA> SStringAList;
 
 /**
  * @typedef SStringWList
- * @brief SStringW 类型的数组
+ * @brief Array of SStringW type
  */
 typedef SArray<SStringW> SStringWList;
 
-// 显式模板实例化
+/** Explicit template instantiation */
 template size_t SplitString<SStringA, char>(const SStringA &str, char cSep, SStringAList &strLst);
 template size_t SplitString<SStringW, wchar_t>(const SStringW &str, wchar_t cSep, SStringWList &strLst);
 
 #ifdef _UNICODE
 /**
  * @typedef SStringTList
- * @brief 根据编译环境定义的字符串数组类型（Unicode环境为SStringWList，非Unicode环境为SStringAList）
+ * @brief String array type defined according to the compilation environment (SStringWList in Unicode environment, SStringAList in non-Unicode environment)
  */
 #define SStringTList SStringWList
 #else
 #define SStringTList SStringAList
-#endif // _UNICODE
+#endif /**< _UNICODE */
 
 /**
- * @brief 解析资源ID
- * @param str 包含资源ID的字符串
- * @param strLst 存储解析结果的数组
- * @return 解析后的字符串数量
+ * @brief Parse resource ID
+ * @param str String containing the resource ID
+ * @param strLst Array storing the parse results
+ * @return Number of parsed strings
  */
 inline int ParseResID(const SStringT &str, SStringTList &strLst)
 {
@@ -94,4 +94,4 @@ inline SStringTList ParseResID(const SStringT &str)
 }
 
 SNSEND
-#endif // __SPLITSTRING__H__
+#endif /**< __SPLITSTRING__H__ */

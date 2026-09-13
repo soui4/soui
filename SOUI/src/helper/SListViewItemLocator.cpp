@@ -2,13 +2,13 @@
 #include "helper/SListViewItemLocator.h"
 
 #pragma warning(push)
-#pragma warning(disable : 4985) // disable the warning message during the include
-#include <math.h>               // this is where I would normally get the warning message
+#pragma warning(disable : 4985) /**< disable the warning message during the include */
+#include <math.h>               /**< this is where I would normally get the warning message */
 #pragma warning(pop)
 
 SNSBEGIN
-//////////////////////////////////////////////////////////////////////////
-// SListViewItemLocatorFix
+///////////////////////////////////////////////////////////////////////
+/** SListViewItemLocatorFix */
 SListViewItemLocatorFix::SListViewItemLocatorFix(SLayoutSize nItemHei, SLayoutSize nDividerSize)
     : m_nItemHeight(nItemHei)
     , m_nDividerSize(nDividerSize)
@@ -80,15 +80,15 @@ void SListViewItemLocatorFix::SetAdapter(ILvAdapter *pAdapter)
     m_adapter = pAdapter;
 }
 
-//////////////////////////////////////////////////////////////////////////
-//  SListViewItemLocatorFlex
+///////////////////////////////////////////////////////////////////////
+/** SListViewItemLocatorFlex */
 double logbase(double a, double base)
 {
     return log(a) / log(base);
 }
 
-#define SEGMENT_SIZE 50 //数据分组最大长度
-#define INDEX_WIDTH  10 //索引表一级最大节点数
+#define SEGMENT_SIZE 50 /**< Maximum length of a data group */
+#define INDEX_WIDTH  10 /**< Maximum number of nodes at the first level of the index table */
 
 SListViewItemLocatorFlex::SListViewItemLocatorFlex(SLayoutSize nItemHei, SLayoutSize nDividerSize)
     : m_nItemHeight(nItemHei)
@@ -250,7 +250,7 @@ void SListViewItemLocatorFlex::InitIndex(HSTREEITEM hParent, int nItems, int nBr
 
     HSTREEITEM hBranch = m_itemPosIndex.InsertItem(bi, hParent);
     if (nItems > SEGMENT_SIZE)
-    { //插入子节点
+    { // Insert child node
         int nRemain = nItems;
         int nSubBranchSize = nBranchSize / INDEX_WIDTH;
         while (nRemain > 0)

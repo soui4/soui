@@ -1,5 +1,5 @@
 
-/*
+/**
  * Copyright 2006 The Android Open Source Project
  *
  * Use of this source code is governed by a BSD-style license that can be
@@ -89,8 +89,8 @@ bool SRect::setBoundsCheck(const SPoint pts[], int count)
     return isFinite;
 }
 
-// http://www.blackpawn.com/texts/pointinpoly/default.html
-// return true if pt is inside triangle; false if outside or on the line
+/** http://www.blackpawn.com/texts/pointinpoly/default.html */
+/** return true if pt is inside triangle; false if outside or on the line */
 bool STriangle::contains(const SPoint &pt) const
 {
     // Compute vectors

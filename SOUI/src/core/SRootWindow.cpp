@@ -5,10 +5,9 @@
 
 SNSBEGIN
 
-//////////////////////////////////////////////////////////////////////////
-// SRootWindow
-//////////////////////////////////////////////////////////////////////////
-
+///////////////////////////////////////////////////////////////////////
+/** SRootWindow */
+///////////////////////////////////////////////////////////////////////
 
 SRootWindow::SRootWindow()
     : m_pHostWnd(NULL)
@@ -68,8 +67,9 @@ void SRootWindow::AfterPaint(IRenderTarget *pRT, SPainter &painter) const
     m_pHostWnd->OnRootAfterPaint(this, pRT, painter);
 }
 
-void SRootWindow::BuildPainter(SPainter &painter) const{
-    m_pHostWnd->OnRootBuildPainter(this,painter);
+void SRootWindow::BuildPainter(SPainter &painter) const
+{
+    m_pHostWnd->OnRootBuildPainter(this, painter);
 }
 
 void SRootWindow::UpdateLayout()

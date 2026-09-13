@@ -2,8 +2,8 @@
 #include <event/SEventSet.h>
 
 SNSBEGIN
-//////////////////////////////////////////////////////////////////////////
-// SEvent
+///////////////////////////////////////////////////////////////////////
+/** SEvent */
 
 SEvent::SEvent(DWORD dwEventID, LPCWSTR pszEventName)
     : m_dwEventID(dwEventID)
@@ -95,8 +95,8 @@ DWORD SEvent::GetID()
     return m_dwEventID;
 }
 
-//////////////////////////////////////////////////////////////////////////
-// SEventSet
+///////////////////////////////////////////////////////////////////////
+/** SEventSet */
 SEventSet::SEventSet(void)
     : m_nMuted(0)
 {
@@ -188,7 +188,7 @@ BOOL SEventSet::unsubscribeEvent(DWORD dwEventID, const IEvtSlot *subscriber)
     return GetEventObject(dwEventID)->unsubscribe(subscriber);
 }
 
-#if _MSC_VER >= 1700 // VS2012
+#if _MSC_VER >= 1700 /**< VS2012 */
 BOOL SEventSet::subscribeEvent(DWORD dwEventID, const StdFunCallback &eventCallback)
 {
     if (!isEventPresent(dwEventID))

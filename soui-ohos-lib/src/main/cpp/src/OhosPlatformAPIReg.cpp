@@ -178,6 +178,10 @@ static BOOL ohosAudio_playSound(LPCSTR pszSoundFile, HMODULE hMod, DWORD fdwSoun
     return OhosPlatformAPI::instance().playSound(pszSoundFile, hMod, fdwSound);
 }
 
+static BOOL ohosAudio_messageBeep(UINT uType) {
+    return OhosPlatformAPI::instance().messageBeep(uType);
+}
+
 extern "C" void RegisterOhosPlatformAPI() {
     SLOGI() << "RegisterOhosPlatformAPI start";
     PlatformAPI &api = g_platformAPI;
@@ -233,6 +237,7 @@ extern "C" void RegisterOhosPlatformAPI() {
 
     // Audio
     api.audio.playSound                  = ohosAudio_playSound;
+    api.audio.messageBeep                = ohosAudio_messageBeep;
 
     SLOGI() << "RegisterOhosPlatformAPI done, version=" << api.version;
 }
@@ -289,5 +294,6 @@ extern "C" void UnregisterOhosPlatformAPI() {
     NullifyOhosEntry(api.path.getTempPathA);
     NullifyOhosEntry(api.path.getSpecialFolderPathA);
     NullifyOhosEntry(api.audio.playSound);
+    NullifyOhosEntry(api.audio.messageBeep);
     SLOGI() << "UnregisterOhosPlatformAPI done";
 }

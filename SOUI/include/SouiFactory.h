@@ -17,96 +17,96 @@ class SOUI_EXP SouiFactory : public TObjRefImpl<ISouiFactory> {
      static SouiFactory &instance(void);
   public:
     /**
-     * @brief 创建应用程序对象
-     * @param pRenderFac 渲染工厂对象
-     * @param hInst 模块句柄
-     * @param pszHostClassName 窗口类名
-     * @param bImeApp 是否启用输入法支持
-     * @return IApplication* 应用程序对象
+     * @brief Create application object
+     * @param pRenderFac render factory object
+     * @param hInst module handle
+     * @param pszHostClassName window class name
+     * @param bImeApp whether to enable IME support
+     * @return IApplication* application object
      */
     STDMETHOD_(IApplication *, CreateApp)(THIS_ IRenderFactory *pRenderFac, HMODULE hInst, LPCTSTR pszHostClassName DEF_VAL(_T("SOUIHOST")), BOOL bImeApp DEF_VAL(FALSE)) OVERRIDE;
 
     /**
-     * @brief 创建原生窗口对象
-     * @return INativeWnd* 原生窗口对象
+     * @brief Create native window object
+     * @return INativeWnd* native window object
      */
     STDMETHOD_(INativeWnd *, CreateNativeWnd)(THIS) OVERRIDE;
 
     /**
-     * @brief 创建宿主窗口对象
-     * @param pszResID 资源ID
-     * @return IHostWnd* 宿主窗口对象
+     * @brief Create host window object
+     * @param pszResID resource ID
+     * @return IHostWnd* host window object
      */
     STDMETHOD_(IHostWnd *, CreateHostWnd)(THIS_ LPCTSTR pszResID DEF_VAL(NULL)) OVERRIDE;
 
     /**
-     * @brief 创建宿主对话框对象
-     * @param pszResID 资源ID
-     * @return IHostDialog* 宿主对话框对象
+     * @brief Create host dialog object
+     * @param pszResID resource ID
+     * @return IHostDialog* host dialog object
      */
     STDMETHOD_(IHostDialog *, CreateHostDialog)(THIS_ LPCTSTR pszResID DEF_VAL(NULL)) OVERRIDE;
 
     /**
-     * @brief 创建ANSI字符串对象
-     * @param pszSrc 源字符串
-     * @return IStringA* ANSI字符串对象
+     * @brief Create ANSI string object
+     * @param pszSrc source string
+     * @return IStringA* ANSI string object
      */
     STDMETHOD_(IStringA *, CreateStringA)(THIS_ LPCSTR pszSrc) OVERRIDE;
 
     /**
-     * @brief 创建宽字符字符串对象
-     * @param pszSrc 源字符串
-     * @return IStringW* 宽字符字符串对象
+     * @brief Create wide-character string object
+     * @param pszSrc source string
+     * @return IStringW* wide-character string object
      */
     STDMETHOD_(IStringW *, CreateStringW)(THIS_ LPCWSTR pszSrc) OVERRIDE;
 
     /**
-     * @brief 创建XML文档对象
-     * @return IXmlDoc* XML文档对象
+     * @brief Create XML document object
+     * @return IXmlDoc* XML document object
      */
     STDMETHOD_(IXmlDoc *, CreateXmlDoc)(THIS) OVERRIDE;
 
     /**
-     * @brief 创建资源提供者对象
-     * @param resType 内置资源类型
-     * @return IResProvider* 资源提供者对象
+     * @brief Create resource provider object
+     * @param resType built-in resource type
+     * @return IResProvider* resource provider object
      */
     STDMETHOD_(IResProvider *, CreateResProvider)(THIS_ BUILTIN_RESTYPE resType) OVERRIDE;
 
     /**
-     * @brief 创建事件槽对象
-     * @param fun 回调函数
-     * @param ctx 上下文指针
-     * @return IEvtSlot* 事件槽对象
+     * @brief Create event slot object
+     * @param fun callback function
+     * @param ctx context pointer
+     * @return IEvtSlot* event slot object
      */
     STDMETHOD_(IEvtSlot *, CreateFuncSlot)(THIS_ FunCallback fun, void *ctx) OVERRIDE;
 
     /**
-     * @brief 创建菜单对象
-     * @param hMenu 菜单句柄
-     * @return IMenu* 菜单对象
+     * @brief Create menu object
+     * @param hMenu menu handle
+     * @return IMenu* menu object
      */
     STDMETHOD_(IMenu *, CreateMenu)(THIS_ HMENU hMenu DEF_VAL(0)) OVERRIDE;
 
     /**
-     * @brief 创建扩展菜单对象
-     * @return IMenuEx* 扩展菜单对象
+     * @brief Create extended menu object
+     * @return IMenuEx* extended menu object
      */
     STDMETHOD_(IMenuEx *, CreateMenuEx)(THIS) OVERRIDE;
 
     /**
-     * @brief 创建定时器对象
-     * @param pEvtSlot 事件槽对象
-     * @return ITimer* 定时器对象
+     * @brief Create timer object
+     * @param pEvtSlot event slot object
+     * @return ITimer* timer object
      */
     STDMETHOD_(ITimer *, CreateTimer)(THIS_ IEvtSlot *pEvtSlot) OVERRIDE;
 
     /**
-     * @brief 创建动画组对象
-     * @return IAnimatorGroup* 动画组对象
+     * @brief Create animator group object
+     * @return IAnimatorGroup* animator group object
      */
     STDMETHOD_(IAnimatorGroup *, CreateAnimatorGroup)(THIS) OVERRIDE;
 };
 
 SNSEND
-#endif // __SOUIFACTORY__H__
+#endif /**< __SOUIFACTORY__H__ */

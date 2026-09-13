@@ -13,8 +13,8 @@ typedef struct IValueAnimator IValueAnimator;
 DECLARE_INTERFACE(IAnimatorUpdateListener)
 {
     /**
-     * @brief 动画更新时调用
-     * @param pAnimator - 动画指针
+     * @brief Called when the animation updates
+     * @param pAnimator - Animation pointer
      * @return void
      */
     STDMETHOD_(void, onAnimationUpdate)(THIS_ IValueAnimator * pAnimator) PURE;
@@ -25,22 +25,22 @@ DECLARE_INTERFACE(IAnimatorUpdateListener)
 DECLARE_INTERFACE(IAnimatorListener)
 {
     /**
-     * @brief 动画开始时调用
-     * @param pAnimator - 动画指针
+     * @brief Called when the animation starts
+     * @param pAnimator - Animation pointer
      * @return void
      */
     STDMETHOD_(void, onAnimationStart)(THIS_ IValueAnimator * pAnimator) PURE;
 
     /**
-     * @brief 动画结束时调用（不适用于无限重复的动画）
-     * @param pAnimator - 动画指针
+     * @brief Called when the animation ends (not applicable to infinitely repeating animations)
+     * @param pAnimator - Animation pointer
      * @return void
      */
     STDMETHOD_(void, onAnimationEnd)(THIS_ IValueAnimator * pAnimator) PURE;
 
     /**
-     * @brief 动画重复时调用
-     * @param pAnimator - 动画指针
+     * @brief Called when the animation repeats
+     * @param pAnimator - Animation pointer
      * @return void
      */
     STDMETHOD_(void, onAnimationRepeat)(THIS_ IValueAnimator * pAnimator) PURE;
@@ -54,209 +54,209 @@ DECLARE_INTERFACE_(IValueAnimator, IObject)
 #include <interface/SobjectApi.h>
 
     /**
-     * @brief 设置动画时长
-     * @param duration - 动画时长（毫秒）
+     * @brief Set the animation duration
+     * @param duration - animation duration (in milliseconds)
      * @return void
      */
     STDMETHOD_(void, setDuration)(THIS_ long duration) PURE;
 
     /**
-     * @brief 获取动画时长
-     * @return long - 动画时长（毫秒）
+     * @brief Get the animation duration
+     * @return long - animation duration (in milliseconds)
      */
     STDMETHOD_(long, getDuration)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 获取动画总时长
-     * @return long - 动画总时长（毫秒）
+     * @brief Get the total animation duration
+     * @return long - total animation duration (in milliseconds)
      */
     STDMETHOD_(long, getTotalDuration)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 设置动画当前播放时间
-     * @param playTime - 播放时间（毫秒）
+     * @brief Set the current playback time of the animation
+     * @param playTime - playback time (in milliseconds)
      * @return void
      */
     STDMETHOD_(void, setCurrentPlayTime)(THIS_ long playTime) PURE;
 
     /**
-     * @brief 设置动画当前播放进度
-     * @param fraction - 播放进度（0到1之间）
+     * @brief Set the current playback progress of the animation
+     * @param fraction - playback progress (between 0 and 1)
      * @return void
      */
     STDMETHOD_(void, setCurrentFraction)(THIS_ float fraction) PURE;
 
     /**
-     * @brief 获取动画当前播放时间
-     * @return long - 当前播放时间（毫秒）
+     * @brief Get the current playback time of the animation
+     * @return long - current playback time (in milliseconds)
      */
     STDMETHOD_(long, getCurrentPlayTime)(THIS) PURE;
 
     /**
-     * @brief 获取动画开始延迟时间
-     * @return long - 开始延迟时间（毫秒）
+     * @brief Get the animation start delay
+     * @return long - start delay (in milliseconds)
      */
     STDMETHOD_(long, getStartDelay)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 设置动画开始延迟时间
-     * @param startDelay - 开始延迟时间（毫秒）
+     * @brief Set the animation start delay
+     * @param startDelay - start delay (in milliseconds)
      * @return void
      */
     STDMETHOD_(void, setStartDelay)(THIS_ long startDelay) PURE;
 
     /**
-     * @brief 设置动画重复次数
-     * @param value - 重复次数
+     * @brief Set the animation repeat count
+     * @param value - repeat count
      * @return void
      */
     STDMETHOD_(void, setRepeatCount)(THIS_ int value) PURE;
 
     /**
-     * @brief 获取动画重复次数
-     * @return int - 重复次数
+     * @brief Get the animation repeat count
+     * @return int - repeat count
      */
     STDMETHOD_(int, getRepeatCount)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 设置动画重复模式
-     * @param value - 重复模式（RESTART或REVERSE）
+     * @brief Set the animation repeat mode
+     * @param value - repeat mode (RESTART or REVERSE)
      * @return void
      */
     STDMETHOD_(void, setRepeatMode)(THIS_ RepeatMode value) PURE;
 
     /**
-     * @brief 获取动画重复模式
-     * @return RepeatMode - 重复模式（RESTART或REVERSE）
+     * @brief Get the animation repeat mode
+     * @return RepeatMode - repeat mode (RESTART or REVERSE)
      */
     STDMETHOD_(RepeatMode, getRepeatMode)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 添加动画更新监听器
-     * @param listener - 监听器指针
+     * @brief Add an animation update listener
+     * @param listener - listener pointer
      * @return void
      */
     STDMETHOD_(void, addUpdateListener)(THIS_ IAnimatorUpdateListener * listener) PURE;
 
     /**
-     * @brief 移除所有动画更新监听器
+     * @brief Remove all animation update listeners
      * @return void
      */
     STDMETHOD_(void, removeAllUpdateListeners)(THIS) PURE;
 
     /**
-     * @brief 移除动画更新监听器
-     * @param listener - 监听器指针
+     * @brief Remove an animation update listener
+     * @param listener - listener pointer
      * @return void
      */
     STDMETHOD_(void, removeUpdateListener)(THIS_ IAnimatorUpdateListener * listener) PURE;
 
     /**
-     * @brief 设置时间插值器
-     * @param value - 插值器指针
+     * @brief Set the time interpolator
+     * @param value - interpolator pointer
      * @return void
      */
     STDMETHOD_(void, setInterpolator)(THIS_ IInterpolator * value) PURE;
 
     /**
-     * @brief 获取时间插值器
-     * @return IInterpolator* - 插值器指针
+     * @brief Get the time interpolator
+     * @return IInterpolator* - interpolator pointer
      */
     STDMETHOD_(IInterpolator *, getInterpolator)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 添加动画监听器
-     * @param p - 监听器指针
+     * @brief Add an animation listener
+     * @param p - listener pointer
      * @return void
      */
     STDMETHOD_(void, addListener)(THIS_ IAnimatorListener * p) PURE;
 
     /**
-     * @brief 移除动画监听器
-     * @param p - 监听器指针
+     * @brief Remove an animation listener
+     * @param p - listener pointer
      * @return void
      */
     STDMETHOD_(void, removeListener)(THIS_ IAnimatorListener * p) PURE;
 
     /**
-     * @brief 开始动画
-     * @param pContainer - 时间线管理器指针
+     * @brief Start the animation
+     * @param pContainer - timeline manager pointer
      * @return void
      */
     STDMETHOD_(void, start)(THIS_ ITimelineHandlersMgr * pContainer) PURE;
 
     /**
-     * @brief 结束动画
+     * @brief End the animation
      * @return void
      */
     STDMETHOD_(void, end)(THIS) PURE;
 
     /**
-     * @brief 检查动画是否正在运行
-     * @return BOOL - 正在运行返回TRUE，否则返回FALSE
+     * @brief Check whether the animation is running
+     * @return BOOL - returns TRUE if running, otherwise FALSE
      */
     STDMETHOD_(BOOL, isRunning)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 检查动画是否已启动
-     * @return BOOL - 已启动返回TRUE，否则返回FALSE
+     * @brief Check whether the animation has started
+     * @return BOOL - returns TRUE if started, otherwise FALSE
      */
     STDMETHOD_(BOOL, isStarted)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 反向播放动画
+     * @brief Play the animation in reverse
      * @return void
      */
     STDMETHOD_(void, reverse)(THIS) PURE;
 
     /**
-     * @brief 提交动画帧
-     * @param frameTime - 帧时间
+     * @brief Submit an animation frame
+     * @param frameTime - frame time
      * @return TRUE if the animation is finished, FALSE otherwise.
      */
     STDMETHOD_(BOOL, commitAnimationFrame)(THIS_ uint64_t frameTime) PURE;
 
     /**
-     * @brief 获取动画当前进度
-     * @return float - 当前进度
+     * @brief Get the current animation progress
+     * @return float - current progress
      */
     STDMETHOD_(float, getAnimatedFraction)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 克隆动画对象
-     * @return IValueAnimator* - 克隆的动画对象指针
+     * @brief Clone the animation object
+     * @return IValueAnimator* - pointer to the cloned animation object
      */
     STDMETHOD_(IValueAnimator *, clone)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 复制动画对象
-     * @param src - 源动画对象指针
+     * @brief Copy the animation object
+     * @param src - source animation object pointer
      * @return void
      */
     STDMETHOD_(void, copy)(THIS_ const IValueAnimator *src) PURE;
 
     /**
-     * @brief 评估动画值
-     * @param fraction - 动画进度
+     * @brief Evaluate the animation value
+     * @param fraction - animation progress
      * @return void
      */
     STDMETHOD_(void, onEvaluateValue)(THIS_ float fraction) PURE;
 
     /**
-     * @brief 获取时间线处理器
-     * @return ITimelineHandler* - 时间线处理器指针
+     * @brief Get the timeline handler
+     * @return ITimelineHandler* - timeline handler pointer
      */
     STDMETHOD_(ITimelineHandler *, GetTimelineHandler)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 获取用户数据
-     * @return LPVOID - 用户数据指针
+     * @brief Get user data
+     * @return LPVOID - user data pointer
      */
     STDMETHOD_(LPVOID, GetUserData)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 设置用户数据
-     * @param pUserData - 用户数据指针
+     * @brief Set user data
+     * @param pUserData - user data pointer
      * @return void
      */
     STDMETHOD_(void, SetUserData)(THIS_ LPVOID pUserData) PURE;
@@ -269,8 +269,8 @@ typedef struct IAnimatorGroup IAnimatorGroup;
 DECLARE_INTERFACE(IAnimatorGroupListerer)
 {
     /**
-     * @brief 动画组结束时调用
-     * @param pGroup - 动画组指针
+     * @brief Called when the animation group ends
+     * @param pGroup - Animation group pointer
      * @return void
      */
     STDMETHOD_(void, OnAnimatorGroupEnd)(THIS_ IAnimatorGroup * pGroup, int nID) PURE;
@@ -281,40 +281,40 @@ DECLARE_INTERFACE(IAnimatorGroupListerer)
 DECLARE_INTERFACE_(IAnimatorGroup, IObjRef)
 {
     /**
-     * @brief 增加引用计数
-     * @return long - 新引用计数
+     * @brief Increment reference count
+     * @return long - new reference count
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief 减少引用计数
-     * @return long - 新引用计数
+     * @brief Decrement reference count
+     * @return long - new reference count
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief 释放对象
+     * @brief Release object
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
     /**
-     * @brief 添加动画
-     * @param ani - 动画指针
-     * @return BOOL - 成功返回TRUE，失败返回FALSE
+     * @brief Add an animation
+     * @param ani - Animation pointer
+     * @return BOOL - Returns TRUE on success, FALSE on failure
      */
     STDMETHOD_(BOOL, AddAnimator)(THIS_ IValueAnimator * ani) PURE;
 
     /**
-     * @brief 移除动画
-     * @param ani - 动画指针
-     * @return BOOL - 成功返回TRUE，失败返回FALSE
+     * @brief Remove an animation
+     * @param ani - Animation pointer
+     * @return BOOL - Returns TRUE on success, FALSE on failure
      */
     STDMETHOD_(BOOL, RemoveAnimator)(THIS_ IValueAnimator * ani) PURE;
 
     /**
-     * @brief 设置动画组监听器
-     * @param listener - 监听器指针
+     * @brief Set the animation group listener
+     * @param listener - Listener pointer
      * @return void
      */
     STDMETHOD_(void, SetListener)(THIS_ IAnimatorGroupListerer * listener) PURE;
@@ -332,7 +332,7 @@ class SAnimatorListener : public IAnimatorListener {
     {
     }
 };
-#endif //__cplusplus
+#endif /**< __cplusplus */
 
 SNSEND
-#endif // __SVALUEANIMATOR_I__H__
+#endif /**< __SVALUEANIMATOR_I__H__ */

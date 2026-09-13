@@ -3,8 +3,8 @@
 #include <helper/SplitString.h>
 #include <core/SWnd.h>
 #pragma warning(push)
-#pragma warning(disable : 4985) // disable the warning message during the include
-#include <math.h>               // this is where I would normally get the warning message
+#pragma warning(disable : 4985) /**< disable the warning message during the include */
+#include <math.h>               /**< this is where I would normally get the warning message */
 #pragma warning(pop)
 
 SNSBEGIN
@@ -267,7 +267,7 @@ BOOL SAnchorLayoutParam::SetAnimatorValue(IPropertyValuesHolder *pHolder, float 
     return FALSE;
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 CPoint SAnchorLayout::Anchor2Pos(const CRect &rcParent, int type)
 {
     CPoint pt;

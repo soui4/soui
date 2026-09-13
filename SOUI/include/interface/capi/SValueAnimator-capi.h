@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for SValueAnimator Interfaces
  * These macros provide C-style function call syntax for C++ interface methods
  *
@@ -19,11 +19,11 @@ extern "C" {
  *   IAnimatorGroup           (inherits IObjRef)
  */
 
-/* IAnimatorUpdateListener C API Macros */
+/** IAnimatorUpdateListener C API Macros */
 #define IAnimatorUpdateListener_onAnimationUpdate(This, pAnimator) \
     ((This)->lpVtbl->onAnimationUpdate(This, pAnimator))
 
-/* IAnimatorListener C API Macros */
+/** IAnimatorListener C API Macros */
 #define IAnimatorListener_onAnimationStart(This, pAnimator) \
     ((This)->lpVtbl->onAnimationStart(This, pAnimator))
 
@@ -33,7 +33,7 @@ extern "C" {
 #define IAnimatorListener_onAnimationRepeat(This, pAnimator) \
     ((This)->lpVtbl->onAnimationRepeat(This, pAnimator))
 
-/* IValueAnimator C API Macros (IObject base interface) */
+/** IValueAnimator C API Macros (IObject base interface) */
 #define IValueAnimator_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -94,7 +94,7 @@ extern "C" {
 #define IValueAnimator_SetAttrHandler(This, attrHandler) \
     ((This)->lpVtbl->SetAttrHandler(This, attrHandler))
 
-/* IValueAnimator specific interface macros */
+/** IValueAnimator specific interface macros */
 #define IValueAnimator_setDuration(This, duration) \
     ((This)->lpVtbl->setDuration(This, duration))
 
@@ -191,11 +191,11 @@ extern "C" {
 #define IValueAnimator_SetUserData(This, pUserData) \
     ((This)->lpVtbl->SetUserData(This, pUserData))
 
-/* IAnimatorGroupListerer C API Macros */
+/** IAnimatorGroupListerer C API Macros */
 #define IAnimatorGroupListerer_OnAnimatorGroupEnd(This, pGroup, nID) \
     ((This)->lpVtbl->OnAnimatorGroupEnd(This, pGroup, nID))
 
-/* IAnimatorGroup C API Macros (IObjRef base interface) */
+/** IAnimatorGroup C API Macros (IObjRef base interface) */
 #define IAnimatorGroup_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -218,4 +218,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SVALUEANIMATOR_CAPI_H__ */
+#endif /**< __SVALUEANIMATOR_CAPI_H__ */

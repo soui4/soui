@@ -5,7 +5,7 @@
  * @author     soui
  * @date       2014-07-08
  *
- * @copyright  Copyright (C) 2014-2050 SOUI团队
+ * @copyright  Copyright (C) 2014-2050 SOUI Team
  *             All rights reserved.
  */
 
@@ -68,7 +68,7 @@ class SSwitch
      */
     STDMETHOD_(void, onAnimationUpdate)(THIS_ IValueAnimator *pAnimator) override;
 
-  protected: // SWindow's virtual functions
+  protected: /**< SWindow's virtual functions */
     /**
      * @brief Calculates the desired size of the control.
      * @param psz Pointer to the SIZE structure to receive the desired size.
@@ -88,7 +88,7 @@ class SSwitch
 
     void OnScaleChanged(int scale) override;
 
-  protected: // Message handling, similar to WTL and MFC
+  protected: /**< Message handling, similar to WTL and MFC */
     /**
      * @brief Handles the paint event.
      * @param pRT Pointer to the render target.
@@ -110,7 +110,7 @@ class SSwitch
      */
     void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 
-    // SOUI control message map
+    /** SOUI control message map */
     SOUI_MSG_MAP_BEGIN()
         MSG_WM_PAINT_EX(OnPaint)      /**< Window paint message. */
         MSG_WM_LBUTTONUP(OnLButtonUp) /**< Left mouse button up message. */
@@ -150,4 +150,4 @@ class SSwitch
 
 SNSEND
 
-#endif // _SWITCH_H_
+#endif /**< _SWITCH_H_ */

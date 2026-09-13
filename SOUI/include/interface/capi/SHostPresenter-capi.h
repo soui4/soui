@@ -7,12 +7,12 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for IHostPresenter Interface
  * These macros provide C-style function call syntax for C++ interface methods
  */
 
-/* IObjRef base interface macros */
+/** IObjRef base interface macros */
 #define IHostPresenter_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -22,7 +22,7 @@ extern "C" {
 #define IHostPresenter_OnFinalRelease(This) \
     ((This)->lpVtbl->OnFinalRelease(This))
 
-/* IHostPresenter specific interface macros */
+/** IHostPresenter specific interface macros */
 #define IHostPresenter_OnHostCreate(This) \
     ((This)->lpVtbl->OnHostCreate(This))
 
@@ -39,4 +39,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SHOSTPRESENTER_CAPI_H__ */
+#endif /**< __SHOSTPRESENTER_CAPI_H__ */

@@ -236,4 +236,4 @@ class SOUI_EXP SSpinButtonCtrl : public TWindowProxy<ISpinButtonCtrl> {
 
 SNSEND
 
-#endif // __SSPINBUTTONCTRL__H__
+#endif /**< __SSPINBUTTONCTRL__H__ */

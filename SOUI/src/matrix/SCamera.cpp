@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2006 The Android Open Source Project
  *
  * Use of this source code is governed by a BSD-style license that can be
@@ -9,9 +9,7 @@
 
 SNSBEGIN
 
-/**
- *  Use to cast a pointer to a different type, and maintaining strict-aliasing
- */
+/** Use to cast a pointer to a different type, and maintaining strict-aliasing */
 template <typename Dst>
 Dst SkTCast(const void *ptr)
 {
@@ -98,14 +96,14 @@ class SkPatch3D {
     void reset();
     void transform(const SkMatrix3D &, SkPatch3D *dst = NULL) const;
 
-    // dot a unit vector with the patch's normal
+    /** dot a unit vector with the patch's normal */
     float dotWith(float dx, float dy, float dz) const;
     float dotWith(const SkVector3D &v) const
     {
         return this->dotWith(v.fX, v.fY, v.fZ);
     }
 
-  public: // make public for SkDraw3D for now
+  public: /**< make public for SkDraw3D for now */
     SkVector3D fU, fV;
     SkPoint3D fOrigin;
 
@@ -189,7 +187,7 @@ static float SFloatDot(int count, const float a[], int step_a, const float b[], 
     return prod;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
 float SkPoint3D::normalize(SkUnit3D *unit) const
 {
@@ -226,7 +224,7 @@ void SkUnit3D::Cross(const SkUnit3D &a, const SkUnit3D &b, SkUnit3D *cross)
     cross->set(x, y, z);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
 SkPatch3D::SkPatch3D()
 {
@@ -260,7 +258,7 @@ float SkPatch3D::dotWith(float dx, float dy, float dz) const
     return SFloatMul(cx, dx) + SFloatMul(cy, dy) + SFloatMul(cz, dz);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
 void SkMatrix3D::reset()
 {
@@ -377,7 +375,7 @@ void SkMatrix3D::mapVector(const SkVector3D &src, SkVector3D *dst) const
     dst->set(x, y, z);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
 SkCamera3D::SkCamera3D()
 {
@@ -471,7 +469,7 @@ void SkCamera3D::patchToMatrix(const SkPatch3D &quilt, SMatrix *matrix) const
     matrix->set(kMPersp2, SK_Scalar1);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
 S3DView::S3DView()
 {
@@ -567,7 +565,7 @@ void S3DView::getMatrix(SMatrix *matrix) const
     }
 }
 
-////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
 SCamera::SCamera()
     : m_priv(new (S3DView))
 {

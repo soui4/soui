@@ -1,6 +1,6 @@
-﻿//////////////////////////////////////////////////////////////////////////
-//   File Name: SPanel.h
-//////////////////////////////////////////////////////////////////////////
+﻿///////////////////////////////////////////////////////////////////////
+/** File Name: SPanel.h */
+///////////////////////////////////////////////////////////////////////
 #include "souistd.h"
 #include "core/SPanel.h"
 
@@ -344,7 +344,7 @@ void SPanel::OnNcPaint(IRenderTarget *pRT)
 {
     __baseCls::OnNcPaint(pRT);
     CRect rcDest;
-    //绘制滚动条
+    // Draw the scroll bar
     if (HasScrollBar(TRUE))
     {
         m_sbVert.OnDraw(pRT, SB_LINEUP);
@@ -488,7 +488,7 @@ void SPanel::OnNcMouseLeave()
     }
 }
 
-//滚动条显示或者隐藏时发送该消息
+/** This message is sent when the scroll bar is shown or hidden */
 LRESULT SPanel::OnNcCalcSize(BOOL bCalcValidRects, LPARAM lParam)
 {
     SWindow::GetClientRect(&m_rcClient);
@@ -513,7 +513,7 @@ BOOL SPanel::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
     short i = 0;
     for (; i < nLines; i++)
     {
-        // 返回FALSE代表无法再再进行滚动,可以透传给父窗口
+        // Returning FALSE means scrolling can no longer proceed, and it can be passed through to the parent window
         if (!OnScroll(bVertScroll, delta > 0 ? SB_LINEUP : SB_LINEDOWN, 0))
         {
             break;
@@ -521,7 +521,7 @@ BOOL SPanel::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
         ScrollUpdate();
     }
     if (i < nLines)
-    { // 返回FALSE代表无法再再进行滚动,可以透传给父窗口
+    { // Returning FALSE means scrolling can no longer proceed, and it can be passed through to the parent window
         delta = (nLines - i) * WHEEL_DELTA * (delta > 0 ? 1 : -1);
         SWindow::OnMouseWheel(nFlags, delta, pt);
     }
@@ -617,7 +617,8 @@ void SPanel::ScrollUpdate()
     }
 }
 
-void SPanel::ClearDragState(){
+void SPanel::ClearDragState()
+{
     if (m_dragSb != SSB_NULL)
     {
         OnNcLButtonUp(0, CPoint(-1, -1));
@@ -708,7 +709,7 @@ void SPanel::OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *p
     SWindow::OnContainerChanged(pOldContainer, pNewContainer);
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 SScrollView::SScrollView()
 {
     m_ptOrigin = CPoint();
@@ -800,12 +801,12 @@ void SScrollView::UpdateScrollBar()
     SWindow::GetClientRect(&rcClient);
 
     CSize size = rcClient.Size();
-    m_wBarVisible = SSB_NULL;     //关闭滚动条
+    m_wBarVisible = SSB_NULL;     // Close scrollbar
     CPoint ptOrigin = m_ptOrigin; // backup
 
     if (size.cy < m_szView.cy || (size.cy < m_szView.cy + GetSbWidth() && size.cx < m_szView.cx))
     {
-        //需要纵向滚动条
+        // Need vertical scrollbar
         m_wBarVisible |= SSB_VERT;
         m_siVer.nMin = 0;
         m_siVer.nMax = m_szView.cy - 1;
@@ -817,7 +818,7 @@ void SScrollView::UpdateScrollBar()
         }
         if (size.cx < m_szView.cx + GetSbWidth())
         {
-            //需要横向滚动条
+            // Need horizontal scrollbar
             m_wBarVisible |= SSB_HORZ;
             m_siVer.nPage = size.cy - GetSbWidth() > 0 ? size.cy - GetSbWidth() : 0;
 
@@ -832,7 +833,7 @@ void SScrollView::UpdateScrollBar()
         }
         else
         {
-            //不需要横向滚动条
+            // No horizontal scrollbar needed
             m_siHoz.nPage = size.cx;
             m_siHoz.nMin = 0;
             m_siHoz.nMax = m_siHoz.nPage - 1;
@@ -842,7 +843,7 @@ void SScrollView::UpdateScrollBar()
     }
     else
     {
-        //不需要纵向滚动条
+        // No vertical scrollbar needed
         m_siVer.nPage = size.cy;
         m_siVer.nMin = 0;
         m_siVer.nMax = size.cy - 1;
@@ -851,7 +852,7 @@ void SScrollView::UpdateScrollBar()
 
         if (size.cx < m_szView.cx)
         {
-            //需要横向滚动条
+            // Need horizontal scrollbar
             m_wBarVisible |= SSB_HORZ;
             m_siHoz.nMin = 0;
             m_siHoz.nMax = m_szView.cx - 1;
@@ -862,7 +863,7 @@ void SScrollView::UpdateScrollBar()
                 m_ptOrigin.x = m_siHoz.nPos;
             }
         }
-        //不需要横向滚动条
+        // No horizontal scrollbar needed
         else
         {
             m_siHoz.nPage = size.cx;
@@ -1006,7 +1007,7 @@ void SScrollView::UpdateChildrenPosition()
     __baseCls::UpdateChildrenPosition();
 }
 
-// === Drag scroll implementation ===
+/** === Drag scroll implementation === */
 
 void SPanel::StartDragPending(const CPoint &pt)
 {
@@ -1081,15 +1082,14 @@ BOOL SPanel::HandleMouseDrag(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &l
             return TRUE;
         }
 
-        // 拖动滚动中仅消费左键拖动相关消息
+        // During drag-scrolling, only consume messages related to left-button dragging
         if (uMsg == WM_MOUSEMOVE || uMsg == WM_LBUTTONUP)
             return TRUE;
         return FALSE;
     }
 
     // === Fling animation running: consume left button events to stop fling ===
-    BOOL bFlingRunning = (m_pFlingAnimatorV && m_pFlingAnimatorV->isRunning())
-                         || (m_pFlingAnimatorH && m_pFlingAnimatorH->isRunning());
+    BOOL bFlingRunning = (m_pFlingAnimatorV && m_pFlingAnimatorV->isRunning()) || (m_pFlingAnimatorH && m_pFlingAnimatorH->isRunning());
     if (bFlingRunning)
     {
         if (uMsg == WM_LBUTTONDOWN)
@@ -1113,7 +1113,7 @@ BOOL SPanel::HandleMouseDrag(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &l
             }
         }
 
-        // fling运行中仅消费左键相关消息
+        // During fling, only consume messages related to the left button
         if (uMsg == WM_LBUTTONDOWN || uMsg == WM_MOUSEMOVE)
             return TRUE;
         return FALSE;
@@ -1246,22 +1246,27 @@ void SPanel::StartFlingAnimation(float fVelocityX, float fVelocityY)
     if (fabs(fVelocityY) > 0.01f)
     {
         long nDuration = (long)(fabs(fVelocityY) * 200.0f);
-        if (nDuration < kMinDuration) nDuration = kMinDuration;
-        if (nDuration > kMaxDuration) nDuration = kMaxDuration;
+        if (nDuration < kMinDuration)
+            nDuration = kMinDuration;
+        if (nDuration > kMaxDuration)
+            nDuration = kMaxDuration;
 
         float fDistance = fVelocityY * (float)nDuration / kDecelFactor;
         m_fFlingVStartPos = (float)nCurV;
         m_fFlingVTargetPos = m_fFlingVStartPos - fDistance;
 
-        if (m_fFlingVTargetPos < (float)nVMin) m_fFlingVTargetPos = (float)nVMin;
-        if (m_fFlingVTargetPos > (float)nVMax) m_fFlingVTargetPos = (float)nVMax;
+        if (m_fFlingVTargetPos < (float)nVMin)
+            m_fFlingVTargetPos = (float)nVMin;
+        if (m_fFlingVTargetPos > (float)nVMax)
+            m_fFlingVTargetPos = (float)nVMax;
 
         if (fabs(m_fFlingVTargetPos - m_fFlingVStartPos) >= 1.0f)
         {
             SFloatAnimator *pAni = new SFloatAnimator();
             pAni->setRange(m_fFlingVStartPos, m_fFlingVTargetPos);
             pAni->setDuration(nDuration);
-            pAni->setInterpolator(new SDecelerateInterpolator(kDecelFactor));
+            SAutoRefPtr<IInterpolator> pInterpolator(SApplication::getSingletonPtr()->CreateInterpolatorByName(SDecelerateInterpolator::GetClassName()), FALSE);
+            pAni->setInterpolator(pInterpolator);
             pAni->addUpdateListener(this);
             pAni->addListener(this);
             m_pFlingAnimatorV.Attach(pAni);
@@ -1272,22 +1277,27 @@ void SPanel::StartFlingAnimation(float fVelocityX, float fVelocityY)
     if (fabs(fVelocityX) > 0.01f)
     {
         long nDuration = (long)(fabs(fVelocityX) * 200.0f);
-        if (nDuration < kMinDuration) nDuration = kMinDuration;
-        if (nDuration > kMaxDuration) nDuration = kMaxDuration;
+        if (nDuration < kMinDuration)
+            nDuration = kMinDuration;
+        if (nDuration > kMaxDuration)
+            nDuration = kMaxDuration;
 
         float fDistance = fVelocityX * (float)nDuration / kDecelFactor;
         m_fFlingHStartPos = (float)nCurH;
         m_fFlingHTargetPos = m_fFlingHStartPos - fDistance;
 
-        if (m_fFlingHTargetPos < (float)nHMin) m_fFlingHTargetPos = (float)nHMin;
-        if (m_fFlingHTargetPos > (float)nHMax) m_fFlingHTargetPos = (float)nHMax;
+        if (m_fFlingHTargetPos < (float)nHMin)
+            m_fFlingHTargetPos = (float)nHMin;
+        if (m_fFlingHTargetPos > (float)nHMax)
+            m_fFlingHTargetPos = (float)nHMax;
 
         if (fabs(m_fFlingHTargetPos - m_fFlingHStartPos) >= 1.0f)
         {
             SFloatAnimator *pAni = new SFloatAnimator();
             pAni->setRange(m_fFlingHStartPos, m_fFlingHTargetPos);
             pAni->setDuration(nDuration);
-            pAni->setInterpolator(new SDecelerateInterpolator(kDecelFactor));
+            SAutoRefPtr<IInterpolator> pInterpolator(SApplication::getSingletonPtr()->CreateInterpolatorByName(SDecelerateInterpolator::GetClassName()), FALSE);
+            pAni->setInterpolator(pInterpolator);
             pAni->addUpdateListener(this);
             pAni->addListener(this);
             m_pFlingAnimatorH.Attach(pAni);
@@ -1339,8 +1349,9 @@ void SPanel::onAnimationEnd(IValueAnimator *pAnimator)
         m_pFlingAnimatorH = NULL;
 }
 
-BOOL SPanel::IsEnableDragMode() const {
-	return  m_bItemDragScrollEnabled && (HasScrollBar(TRUE) || HasScrollBar(FALSE));
+BOOL SPanel::IsEnableDragMode() const
+{
+    return m_bItemDragScrollEnabled && (HasScrollBar(TRUE) || HasScrollBar(FALSE));
 }
 
 void SPanel::OnLButtonDown(UINT nFlags, CPoint pt)

@@ -219,4 +219,4 @@ class SOUI_EXP SHotKeyCtrl
 
 SNSEND
 
-#endif // __SHOTKEYCTRL__H__
+#endif /**< __SHOTKEYCTRL__H__ */

@@ -37,7 +37,7 @@ BOOL SCaret::Init(HBITMAP hBmp, int nWid, int nHei)
     m_bmpCaret = (IBitmapS *)pRT->GetCurrentObject(OT_BITMAP);
     if (hBmp)
     {
-        //以拉伸方式创建一个插入符位图
+        // Create a caret bitmap in a stretched manner
         HDC hdc = pRT->GetDC(0);
         HDC hdc2 = CreateCompatibleDC(hdc);
         SelectObject(hdc2, hBmp);
@@ -50,7 +50,7 @@ BOOL SCaret::Init(HBITMAP hBmp, int nWid, int nHei)
     }
     else
     {
-        //创建一个黑色插入符的位图
+        // Create a bitmap for a black caret
         CRect rc(0, 0, nWid, nHei);
         pRT->BeginDraw();
         pRT->FillSolidRect(&rc, m_crCaret);

@@ -43,7 +43,7 @@ void SNcPanel::SetActive(BOOL bActive)
     }
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 SNcPainter::SNcPainter(SHostWnd *pHost)
     : m_pHost(pHost)
     , m_bInPaint(FALSE)
@@ -693,11 +693,13 @@ void SNcPainter::OnSize(UINT nType, CSize size)
 
 void SNcPainter::UpdateToolTip()
 {
-    CPoint pt =m_ptNcHittest;
+    CPoint pt = m_ptNcHittest;
     CRect rcWnd = m_pHost->GetWindowRect();
     pt -= rcWnd.TopLeft();
 
     SwndToolTipInfo tipInfo;
+    tipInfo.dwCookie = 0;
+    tipInfo.swnd = 0;
     BOOL bOK = m_root->UpdateToolTip(pt, tipInfo);
     if (bOK)
     {

@@ -63,6 +63,8 @@
 				<window size="-1,-1" layout="hbox" interval="10" gravity="center">
 					<button name="btn_menu" size="100,30" text="menu(&X)"/>
 					<button name="btn_smenu" size="100,30" text="SMenu"/>
+					<button name="btn_fullscreen" size="100,30" text="fullscreen"/>
+					<button name="btn_restore" size="100,30" text="restore"/>
 					<button name="btn_msgbox" size="100,30" text="ShowMessageBox" visible="1" display="0"/>
 					<button name="btn_smenuex" size="100,30" text="SMenuEx" visible="1" display="0"/>
 				</window>

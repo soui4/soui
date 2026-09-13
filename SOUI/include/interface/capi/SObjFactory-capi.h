@@ -7,12 +7,12 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for IObjectFactory Interface
  * These macros provide C-style function call syntax for C++ interface methods
  */
 
-/* IObjRef base interface macros */
+/** IObjRef base interface macros */
 #define IObjectFactory_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -22,7 +22,7 @@ extern "C" {
 #define IObjectFactory_OnFinalRelease(This) \
     ((This)->lpVtbl->OnFinalRelease(This))
 
-/* IObjectFactory specific interface macros */
+/** IObjectFactory specific interface macros */
 #define IObjectFactory_NewObject(This) \
     ((This)->lpVtbl->NewObject(This))
 
@@ -39,4 +39,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SOBJFACTORY_CAPI_H__ */
+#endif /**< __SOBJFACTORY_CAPI_H__ */

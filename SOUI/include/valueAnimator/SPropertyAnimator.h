@@ -1,6 +1,6 @@
 ﻿/**
  * @file SPropertyAnimator.h
- * @brief SOUI布局对象动画器实现 - 参考Android ObjectAnimator设计
+ * @brief SOUI layout object animator implementation - modeled after Android ObjectAnimator design
  * @author SOUI group
  * @date 2024
  */
@@ -33,14 +33,14 @@ typedef struct _PROPVALUE
 
 /**
  * @class SPropertyValuesHolder
- * @brief 属性值持有者实现类 - 类似Android PropertyValuesHolder
+ * @brief Property value holder implementation class - similar to Android PropertyValuesHolder
  */
 class SOUI_EXP SPropertyValuesHolder : public TObjRefImpl<IPropertyValuesHolder> {
   public:
     SPropertyValuesHolder();
     virtual ~SPropertyValuesHolder();
 
-    // IPropertyValuesHolder接口实现
+    /** IPropertyValuesHolder interface implementation */
     STDMETHOD_(void, SetPropertyName)(THIS_ LPCWSTR propertyName) OVERRIDE;
     STDMETHOD_(LPCWSTR, GetPropertyName)(CTHIS) SCONST OVERRIDE;
     STDMETHOD_(void, SetByteValues)(THIS_ const BYTE *values, int count) OVERRIDE;
@@ -71,7 +71,7 @@ class SOUI_EXP SPropertyValuesHolder : public TObjRefImpl<IPropertyValuesHolder>
     STDMETHOD_(BOOL, SetKeyFrameWeights)(THIS_ const float *weights, int count) OVERRIDE;
     STDMETHOD_(BOOL, GetKeyFrameWeights)(CTHIS_ float *weights, int count) SCONST OVERRIDE;
 
-    // 静态工厂方法
+    /** Static factory method */
     static SPropertyValuesHolder *ofByte(LPCWSTR propertyName, const BYTE *values, int count);
     static SPropertyValuesHolder *ofShort(LPCWSTR propertyName, const short *values, int count);
     static SPropertyValuesHolder *ofColorRef(LPCWSTR propertyName, const COLORREF *values, int count);
@@ -86,7 +86,7 @@ class SOUI_EXP SPropertyValuesHolder : public TObjRefImpl<IPropertyValuesHolder>
 
     int m_valueCount;
     float m_totalWeight;
-    int m_valueSize; // 用于位置值的大小
+    int m_valueSize; /**< Size used for position values */
 
     void ClearValues();
 
@@ -100,7 +100,7 @@ class SOUI_EXP SPropertyValuesHolder : public TObjRefImpl<IPropertyValuesHolder>
 
 /**
  * @class SPropertyAnimator
- * @brief 属性动画器实现类
+ * @brief Property animator implementation class
  */
 class SOUI_EXP SPropertyAnimator
     : public TValueAnimatorProxy<IPropertyAnimator>
@@ -111,7 +111,7 @@ class SOUI_EXP SPropertyAnimator
     virtual ~SPropertyAnimator();
 
   public:
-    // IPropertyAnimator接口实现
+    /** IPropertyAnimator interface implementation */
     STDMETHOD_(IWindow *, GetTarget)(CTHIS) SCONST OVERRIDE
     {
         return m_pTarget;
@@ -131,13 +131,13 @@ class SOUI_EXP SPropertyAnimator
     }
 
   public:
-    // SValueAnimator接口实现
+    /** SValueAnimator interface implementation */
     STDMETHOD_(void, copy)(THIS_ const IValueAnimator *pAnimator) OVERRIDE;
     STDMETHOD_(IValueAnimator *, clone)(CTHIS) SCONST OVERRIDE;
     STDMETHOD_(void, onEvaluateValue)(THIS_ float fraction) OVERRIDE;
 
   protected:
-    // IAnimatorListener接口实现
+    /** IAnimatorListener interface implementation */
     STDMETHOD_(void, onAnimationStart)(THIS_ IValueAnimator *pAnimator) OVERRIDE;
     STDMETHOD_(void, onAnimationEnd)(THIS_ IValueAnimator *pAnimator) OVERRIDE;
     STDMETHOD_(void, onAnimationRepeat)(THIS_ IValueAnimator *pAnimator) OVERRIDE
@@ -145,7 +145,7 @@ class SOUI_EXP SPropertyAnimator
     }
 
   public:
-    // 静态工厂方法 - 类似Android ObjectAnimator
+    /** Static factory method - similar to Android ObjectAnimator */
     static IPropertyAnimator *ofFloat(IWindow *pWnd, LPCWSTR propertyName, const float *values, int valueCount);
     static IPropertyAnimator *ofInt(IWindow *pWnd, LPCWSTR propertyName, const int *values, int valueCount);
     static IPropertyAnimator *ofLayoutSize(IWindow *pWnd, LPCWSTR propertyName, const SLayoutSize *values, int valueCount);
@@ -154,9 +154,9 @@ class SOUI_EXP SPropertyAnimator
 
   private:
     SAutoRefPtr<IWindow> m_pTarget;
-    SArray<SAutoRefPtr<IPropertyValuesHolder> > m_propertyHolders;
+    SArray<SAutoRefPtr<IPropertyValuesHolder>> m_propertyHolders;
 };
 
 SNSEND
 
-#endif // __SLAYOUT_OBJECT_ANIMATOR__H__
+#endif /**< __SLAYOUT_OBJECT_ANIMATOR__H__ */

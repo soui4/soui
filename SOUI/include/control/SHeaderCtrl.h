@@ -350,4 +350,4 @@ class SOUI_EXP SHeaderCtrl : public TWindowProxy<IHeaderCtrl> {
 
 SNSEND
 
-#endif // __SHEADERCTRL__H__
+#endif /**< __SHEADERCTRL__H__ */

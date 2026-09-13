@@ -1,11 +1,11 @@
 ﻿/**
  * @file SCmnCtrl.h
- * @brief 通用控件
+ * @brief Common controls
  * @version v1.0
  * @author soui
  * @date 2014-05-28
  *
- * @details 此文件中定义了很多通用控件：静态文本、超链接、按钮、单选按钮等。
+ * @details This file defines many common controls: static text, hyperlink, button, radio button, etc.
  */
 
 #ifndef __SCMNCTRL__H__
@@ -22,8 +22,8 @@ SNSBEGIN
 
 /**
  * @class SStatic
- * @brief 静态文本控件类
- * @details 静态文本控件可支持多行，有多行属性时，`\n`可以强制换行。
+ * @brief Static text control class
+ * @details The static text control supports multiple lines; when the multiline attribute is set, `@n` forces a line break.
  * @usage `<text>inner text example</text>`
  */
 class SOUI_EXP SStatic : public SWindow {
@@ -31,65 +31,65 @@ class SOUI_EXP SStatic : public SWindow {
 
   public:
     /**
-     * @brief 构造函数
+     * @brief Constructor
      */
     SStatic();
 
     /**
-     * @brief 绘制文本
-     * @param pRT 绘制设备句柄
-     * @param pszBuf 文本内容字符串
-     * @param cchText 字符串长度
-     * @param pRect 指向矩形结构RECT的指针
-     * @param uFormat 正文的绘制选项
-     * @details 对DrawText封装
+     * @brief Draw text
+     * @param pRT render device handle
+     * @param pszBuf text content string
+     * @param cchText string length
+     * @param pRect pointer to RECT rectangle structure
+     * @param uFormat text drawing options
+     * @details Wrapper around DrawText
      */
     virtual void DrawText(IRenderTarget *pRT, LPCTSTR pszBuf, int cchText, LPRECT pRect, UINT uFormat);
 
   protected:
     /**
-     * @brief 绘制单行文本
-     * @param pRT 绘制设备句柄
-     * @param pszBuf 文本内容字符串
-     * @param iBegin 文本起始位置
-     * @param cchText 字符串长度
-     * @param pRect 指向矩形结构RECT的指针
-     * @param uFormat 正文的绘制选项
+     * @brief Draw single-line text
+     * @param pRT render device handle
+     * @param pszBuf text content string
+     * @param iBegin text start position
+     * @param cchText string length
+     * @param pRect pointer to RECT rectangle structure
+     * @param uFormat text drawing options
      */
     virtual void OnDrawLine(IRenderTarget *pRT, LPCTSTR pszBuf, int iBegin, int cchText, LPRECT pRect, UINT uFormat);
 
     /**
-     * @brief 测量文本大小
-     * @param pRT 绘制设备句柄
-     * @param pszBuf 文本内容字符串
-     * @param cchText 字符串长度
-     * @return 文本大小
+     * @brief Measure text size
+     * @param pRT render device handle
+     * @param pszBuf text content string
+     * @param cchText string length
+     * @return text size
      */
     virtual SIZE OnMeasureText(IRenderTarget *pRT, LPCTSTR pszBuf, int cchText);
 
     /**
-     * @brief 绘制多行文本
-     * @param pRT 绘制设备句柄
-     * @param pszBuf 文本内容字符串
-     * @param cchText 字符串长度
-     * @param pRect 指向矩形结构RECT的指针
-     * @param uFormat 正文的绘制选项
+     * @brief Draw multi-line text
+     * @param pRT render device handle
+     * @param pszBuf text content string
+     * @param cchText string length
+     * @param pRect pointer to RECT rectangle structure
+     * @param uFormat text drawing options
      */
     void DrawMultiLine(IRenderTarget *pRT, LPCTSTR pszBuf, int cchText, LPRECT pRect, UINT uFormat);
 
   protected:
     /**
-     * @brief 行间距
+     * @brief Line spacing
      */
     int m_nLineInter;
 
     /**
-     * @brief 是否自动换行
+     * @brief Whether to wrap automatically
      */
     bool m_bWordbreak;
 
     /**
-     * @brief 是否不显示前缀
+     * @brief Whether to hide prefix
      */
     bool m_bNoPrefix;
 
@@ -101,8 +101,8 @@ class SOUI_EXP SStatic : public SWindow {
 };
 /**
  * @class SLink
- * @brief 超链接控件类
- * @details 用于显示超链接文本。
+ * @brief Hyperlink control class
+ * @details Used to display hyperlink text.
  * @usage `<link>inner text example</link>`
  */
 class SOUI_EXP SLink : public SWindow {
@@ -110,73 +110,73 @@ class SOUI_EXP SLink : public SWindow {
 
   public:
     /**
-     * @brief 构造函数
+     * @brief Constructor
      */
     SLink();
 
   protected:
     /**
-     * @brief 解析XML设置属性
-     * @param pNode XML节点
-     * @details 根据XML文件设置相关属性
+     * @brief Parse XML to set attributes
+     * @param pNode XML node
+     * @details Set related attributes according to the XML file
      */
     virtual void WINAPI OnInitFinished(IXmlNode *pNode);
 
     /**
-     * @brief 绘制文本
-     * @param pRT 绘制设备句柄
-     * @param pszBuf 文本内容字符串
-     * @param cchText 字符串长度
-     * @param pRect 指向矩形结构RECT的指针
-     * @param uFormat 正文的绘制选项
-     * @details 对DrawText封装
+     * @brief Draw text
+     * @param pRT render device handle
+     * @param pszBuf text content string
+     * @param cchText string length
+     * @param pRect pointer to RECT rectangle structure
+     * @param uFormat text drawing options
+     * @details Wrapper around DrawText
      */
     virtual void DrawText(IRenderTarget *pRT, LPCTSTR pszBuf, int cchText, LPRECT pRect, UINT uFormat);
 
     /**
-     * @brief 设置光标样式和位置
-     * @param pt 设置光标位置
-     * @return 成功--TRUE 失败--FALSE
-     * @details 函数内部会加载光标样式
+     * @brief Set cursor style and position
+     * @param pt cursor position to set
+     * @return success--TRUE, failure--FALSE
+     * @details The function loads the cursor style internally
      */
     virtual BOOL OnSetCursor(const CPoint &pt);
 
     /**
-     * @brief 处理左键按下事件
-     * @param nFlags 标志
-     * @param pt 鼠标坐标
+     * @brief Handle left button down event
+     * @param nFlags flags
+     * @param pt mouse position
      */
     void OnLButtonDown(UINT nFlags, CPoint pt);
 
     /**
-     * @brief 处理左键释放事件
-     * @param nFlags 标志
-     * @param pt 鼠标坐标
+     * @brief Handle left button up event
+     * @param nFlags flags
+     * @param pt mouse position
      */
     void OnLButtonUp(UINT nFlags, CPoint pt);
 
     /**
-     * @brief 处理鼠标移动事件
-     * @param nFlags 标志
-     * @param pt 鼠标坐标
+     * @brief Handle mouse move event
+     * @param nFlags flags
+     * @param pt mouse position
      */
     void OnMouseMove(UINT nFlags, CPoint pt);
 
     /**
-     * @brief 处理鼠标悬停事件
-     * @param wParam 额外参数
-     * @param ptPos 鼠标位置
+     * @brief Handle mouse hover event
+     * @param wParam extra parameter
+     * @param ptPos mouse position
      */
     void OnMouseHover(WPARAM wParam, CPoint ptPos);
 
   protected:
     /**
-     * @brief 文本显示所在位置
+     * @brief Text display location
      */
     CRect m_rcText;
 
     /**
-     * @brief 窗口URL
+     * @brief Window URL
      */
     SStringT m_strLinkUrl;
 
@@ -194,8 +194,8 @@ class SOUI_EXP SLink : public SWindow {
 
 /**
  * @class SButton
- * @brief 按钮控件类
- * @details 通过属性ID绑定click事件。使用id属性来处理点击事件。
+ * @brief Button control class
+ * @details The click event is bound via the attribute ID. The id attribute is used to handle click events.
  * @usage `<button id=xx>inner text example</button>`
  */
 class SOUI_EXP SButton
@@ -206,13 +206,13 @@ class SOUI_EXP SButton
 
   public:
     /**
-     * @brief 构造函数
+     * @brief Constructor
      */
     SButton();
 
     /**
-     * @brief 获取加速键
-     * @return 加速键
+     * @brief Get accelerator
+     * @return accelerator
      */
     DWORD GetAccel() const
     {
@@ -221,9 +221,9 @@ class SOUI_EXP SButton
 
   protected:
     /**
-     * @brief 状态变化需要重画
-     * @return 成功--TRUE 失败--FALSE
-     * @details 当按钮状态发生变化时需要重新绘制，默认返回TRUE
+     * @brief State change requires redraw
+     * @return success--TRUE, failure--FALSE
+     * @details When the button state changes, it needs to be redrawn; returns TRUE by default
      */
     virtual BOOL NeedRedrawWhenStateChange()
     {
@@ -231,8 +231,8 @@ class SOUI_EXP SButton
     }
 
     /**
-     * @brief 获取编码
-     * @return 返回宏定义SC_WANTCHARS代表需要WM_CHAR消息
+     * @brief Get encoding
+     * @return Returns the macro SC_WANTCHARS indicating WM_CHAR message is needed
      */
     virtual UINT WINAPI OnGetDlgCode() const
     {
@@ -240,73 +240,73 @@ class SOUI_EXP SButton
     }
 
     /**
-     * @brief 处理加速键按下事件
-     * @param accelerator 加速键相关结构体
-     * @return 成功--TRUE 失败--FALSE
-     * @details 处理加速键响应消息
+     * @brief Handle accelerator key down event
+     * @param accelerator accelerator-related structure
+     * @return success--TRUE, failure--FALSE
+     * @details Handle accelerator response message
      */
     virtual BOOL WINAPI OnAcceleratorPressed(const IAccelerator *accelerator) OVERRIDE;
 
     /**
-     * @brief 从XML初始化控件
-     * @param pNode XML节点
-     * @return 成功--TRUE 失败--FALSE
+     * @brief Initialize control from XML
+     * @param pNode XML node
+     * @return success--TRUE, failure--FALSE
      */
     virtual BOOL WINAPI InitFromXml(IXmlNode *pNode) OVERRIDE;
 
   protected:
     /**
-     * @brief 状态改变处理函数
-     * @param dwOldState 旧状态
-     * @param dwNewState 新状态
+     * @brief State change handler
+     * @param dwOldState old state
+     * @param dwNewState new state
      */
     virtual void OnStateChanged(DWORD dwOldState, DWORD dwNewState);
 
     /**
-     * @brief 容器改变处理函数
-     * @param pOldContainer 旧容器
-     * @param pNewContainer 新容器
+     * @brief Container change handler
+     * @param pOldContainer old container
+     * @param pNewContainer new container
      */
     virtual void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer);
 
     /**
-     * @brief 绘制控件
-     * @param pRT 绘制设备句柄
+     * @brief Draw control
+     * @param pRT render device handle
      */
     void OnPaint(IRenderTarget *pRT);
 
     /**
-     * @brief 处理按键按下事件
-     * @param nChar 字符
-     * @param nRepCnt 重复次数
-     * @param nFlags 标志
+     * @brief Handle key down event
+     * @param nChar character
+     * @param nRepCnt repeat count
+     * @param nFlags flags
      */
     void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 
     /**
-     * @brief 处理按键释放事件
-     * @param nChar 字符
-     * @param nRepCnt 重复次数
-     * @param nFlags 标志
+     * @brief Handle key up event
+     * @param nChar character
+     * @param nRepCnt repeat count
+     * @param nFlags flags
      */
     void OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
 
     /**
-     * @brief 处理销毁事件
+     * @brief Handle destroy event
      */
     void OnDestroy();
 
     /**
-     * @brief 处理大小改变事件
-     * @param nType 类型
-     * @param size 新大小
+     * @brief Handle size change event
+     * @param nType type
+     * @param size new size
      */
     void OnSize(UINT nType, CSize size);
 
     /**
-     * @brief 处理擦除背景事件
-     * @param pRT 绘制设备句柄
-     * @return 成功--TRUE 失败--FALSE
+     * @brief Handle erase background event
+     * @param pRT render device handle
+     * @return success--TRUE, failure--FALSE
      */
     BOOL OnEraseBkgnd(IRenderTarget *pRT)
     {
@@ -314,52 +314,52 @@ class SOUI_EXP SButton
     }
 
     /**
-     * @brief 处理自定义属性accel
-     * @param strAccel 加速键字符串
-     * @param bLoading 是否加载中
-     * @return 成功--TRUE 失败--FALSE
+     * @brief Handle custom attribute accel
+     * @param strAccel accelerator string
+     * @param bLoading whether loading
+     * @return success--TRUE, failure--FALSE
      */
     HRESULT OnAttrAccel(SStringW strAccel, BOOL bLoading);
 
   protected:
     /**
-     * @brief 停止动画
+     * @brief Stop animation
      */
     void StopCurAnimate();
 
     /**
-     * @brief 加速键
+     * @brief Accelerator
      */
     DWORD m_accel;
 
     /**
-     * @brief 动画标志
+     * @brief Animation flag
      */
     BOOL m_bAnimate;
 
     /**
-     * @brief 当前 hover 动画的 alpha 值
+     * @brief Current alpha value of hover animation
      */
     BYTE m_byAlphaAni;
 
     /**
-     * @brief 禁用不可见时的加速键
+     * @brief Disable accelerator when invisible
      */
     BOOL m_bDisableAccelIfInvisible;
 
     /**
-     * @brief 动画时长(ms)
+     * @brief Animation duration (ms)
      */
     int m_nAnimDuration;
 
     /**
-     * @brief Hover 状态动画器（管理 alpha 从 50-255）
+     * @brief Hover state animator (manages alpha from 50-255)
      */
     SAutoRefPtr<SByteAnimator> m_pHoverAni;
 
   protected:
     /**
-     * @brief 处理动画更新回调
+     * @brief Handle animation update callback
      */
     STDMETHOD_(void, onAnimationUpdate)(THIS_ IValueAnimator *p) OVERRIDE;
 
@@ -373,7 +373,7 @@ class SOUI_EXP SButton
     SOUI_MSG_MAP_BEGIN()
         MSG_WM_PAINT_EX(OnPaint)
         MSG_WM_ERASEBKGND_EX(OnEraseBkgnd)
-        MSG_WM_LBUTTONDBLCLK(OnLButtonDown) // 将双击消息处理为单击
+        MSG_WM_LBUTTONDBLCLK(OnLButtonDown) /**< Treat double-click message as single click */
         MSG_WM_KEYDOWN(OnKeyDown)
         MSG_WM_KEYUP(OnKeyUp)
         MSG_WM_DESTROY(OnDestroy)
@@ -383,32 +383,32 @@ class SOUI_EXP SButton
 
 /**
  * @class SImageButton
- * @brief 图片按钮类
- * @details 继承自SButton，用于显示图片按钮。
+ * @brief Image button class
+ * @details Inherits from SButton, used to display image buttons.
  */
 class SOUI_EXP SImageButton : public SButton {
     DEF_SOBJECT(SButton, L"imgbtn")
 
   public:
     /**
-     * @brief 构造函数
+     * @brief Constructor
      */
     SImageButton();
 
   protected:
     /**
-     * @brief 测量内容大小
-     * @param wid 父容器宽度
-     * @param hei 父容器高度
-     * @return 内容大小
+     * @brief Measure content size
+     * @param wid parent container width
+     * @param hei parent container height
+     * @return content size
      */
     SIZE MeasureContent(int wid, int hei) override;
 };
 
 /**
  * @class SImageWnd
- * @brief 图片控件类
- * @details 用于显示图片。
+ * @brief Image control class
+ * @details Used to display images.
  * @usage `<img skin="skin" sub="0"/>`
  */
 class SOUI_EXP SImageWnd : public TWindowProxy<IImageWnd> {
@@ -416,62 +416,62 @@ class SOUI_EXP SImageWnd : public TWindowProxy<IImageWnd> {
 
   public:
     /**
-     * @brief 构造函数
+     * @brief Constructor
      */
     SImageWnd();
 
     /**
-     * @brief 析构函数
+     * @brief Destructor
      */
     virtual ~SImageWnd();
 
   public:
     /**
-     * @brief 设置skin
-     * @param pSkin skin对象
-     * @param iFrame skin的子图索引
-     * @param bAutoFree 控件管理pSkin标志，为TRUE时调用方可以释放该Skin
-     * @return 成功--TRUE 失败--FALSE
+     * @brief Set skin
+     * @param pSkin skin object
+     * @param iFrame skin sub-image index
+     * @param bAutoFree flag indicating whether the control manages pSkin; when TRUE the caller may release the skin
+     * @return success--TRUE, failure--FALSE
      */
     STDMETHOD_(BOOL, SetSkin)(THIS_ ISkinObj *pSkin, int iFrame DEF_VAL(0), BOOL bAutoFree DEF_VAL(TRUE)) OVERRIDE;
 
     /**
-     * @brief 获取资源
-     * @return ISkinObj指针
+     * @brief Get resource
+     * @return ISkinObj pointer
      */
     STDMETHOD_(ISkinObj *, GetSkin)(CTHIS) SCONST OVERRIDE;
 
     /**
-     * @brief 设置绘制图片
-     * @param pBitmap 图片对象
+     * @brief Set drawing image
+     * @param pBitmap image object
      * @param fl FilterLevel
      */
     STDMETHOD_(void, SetImage)(THIS_ IBitmapS *pBitmap, FilterLevel fl DEF_VAL(kNone_FilterLevel)) OVERRIDE;
 
     /**
-     * @brief 获取当前设置的IBitmapS对象
-     * @return 当前设置的IBitmapS对象
+     * @brief Get the currently set IBitmapS object
+     * @return the currently set IBitmapS object
      */
     STDMETHOD_(IBitmapS *, GetImage)(THIS) OVERRIDE;
 
     /**
-     * @brief 设置图标
-     * @param nSubID 子图在Skin中的索引号
-     * @return 成功--TRUE 失败--FALSE
+     * @brief Set icon
+     * @param nSubID index of sub-image within the skin
+     * @return success--TRUE, failure--FALSE
      */
     STDMETHOD_(BOOL, SetIcon)(THIS_ int nSubID) OVERRIDE;
 
     /**
-     * @brief 获取图标
-     * @return 图标索引
+     * @brief Get icon
+     * @return icon index
      */
     STDMETHOD_(int, GetIcon)(CTHIS) SCONST OVERRIDE;
 
     /**
-     * @brief 获取期望大小
-     * @param pSize 期望大小
-     * @param nParentWid 父容器宽度
-     * @param nParentHei 父容器高度
+     * @brief Get desired size
+     * @param pSize desired size
+     * @param nParentWid parent container width
+     * @param nParentHei parent container height
      */
     STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *pSize, int nParentWid, int nParentHei) OVERRIDE;
 
@@ -481,63 +481,63 @@ class SOUI_EXP SImageWnd : public TWindowProxy<IImageWnd> {
 
   protected:
     /**
-     * @brief 处理颜色化事件
-     * @param cr 颜色
+     * @brief Handle colorize event
+     * @param cr color
      */
     virtual void OnColorize(COLORREF cr);
 
     /**
-     * @brief 处理缩放变化事件
-     * @param scale 缩放比例
+     * @brief Handle scale change event
+     * @param scale scale factor
      */
     virtual void OnScaleChanged(int scale);
 
     /**
-     * @brief 测量内容大小
-     * @param nParentWid 父容器宽度
-     * @param nParentHei 父容器高度
-     * @return 内容大小
+     * @brief Measure content size
+     * @param nParentWid parent container width
+     * @param nParentHei parent container height
+     * @return content size
      */
     virtual SIZE MeasureContent(int nParentWid, int nParentHei);
 
   protected:
     /**
-     * @brief 是否要自动释放当前的m_pSkin对象
+     * @brief Whether to automatically release the current m_pSkin object
      */
     BOOL m_bManaged;
 
     /**
-     * @brief 绘制状态索引
+     * @brief Draw state index
      */
     int m_iIcon;
 
     /**
-     * @brief ISkinObj对象
+     * @brief ISkinObj object
      */
     SAutoRefPtr<ISkinObj> m_pSkin;
 
     /**
-     * @brief 使用代码设定的图片
+     * @brief Image set via code
      */
     SAutoRefPtr<IBitmapS> m_pImg;
 
     /**
-     * @brief 使用代码设定的SVG对象
+     * @brief SVG object set via code
      */
     SAutoRefPtr<ISvgObj> m_pSvg;
 
     /**
-     * @brief 绘制图片的放大精度
+     * @brief Scaling quality when drawing the image
      */
     FilterLevel m_fl;
 
     /**
-     * @brief 保持纵横比
+     * @brief Keep aspect ratio
      */
     BOOL m_bKeepAspect;
 
     /**
-     * @brief 适应图片大小
+     * @brief Fit to image size
      */
     BOOL m_bFitImage;
 
@@ -550,8 +550,8 @@ class SOUI_EXP SImageWnd : public TWindowProxy<IImageWnd> {
 
   protected:
     /**
-     * @brief 绘制控件
-     * @param pRT 绘制设备句柄
+     * @brief Draw control
+     * @param pRT render device handle
      */
     void OnPaint(IRenderTarget *pRT);
 
@@ -562,8 +562,8 @@ class SOUI_EXP SImageWnd : public TWindowProxy<IImageWnd> {
 
 /**
  * @class SAnimateImgWnd
- * @brief 动画图片窗口
- * @details 此窗口支持动画效果。
+ * @brief Animated image window
+ * @details This window supports animation effects.
  */
 class SOUI_EXP SAnimateImgWnd
     : public TWindowProxy<IAnimateImgWnd>
@@ -572,30 +572,30 @@ class SOUI_EXP SAnimateImgWnd
 
   public:
     /**
-     * @brief 构造函数
+     * @brief Constructor
      */
     SAnimateImgWnd();
 
     /**
-     * @brief 析构函数
+     * @brief Destructor
      */
     virtual ~SAnimateImgWnd()
     {
     }
 
     /**
-     * @brief 启动动画
+     * @brief Start animation
      */
     void WINAPI Start();
 
     /**
-     * @brief 停止动画
+     * @brief Stop animation
      */
     void WINAPI Stop();
 
     /**
-     * @brief 判断动画运行状态
-     * @return 运行中--TRUE
+     * @brief Check animation running state
+     * @return running--TRUE
      */
     BOOL WINAPI IsPlaying() SCONST
     {
@@ -604,52 +604,52 @@ class SOUI_EXP SAnimateImgWnd
 
   protected:
     /**
-     * @brief 测量内容大小
-     * @param wid 父容器宽度
-     * @param hei 父容器高度
-     * @return 内容大小
+     * @brief Measure content size
+     * @param wid parent container width
+     * @param hei parent container height
+     * @return content size
      */
     virtual SIZE MeasureContent(int wid, int hei);
 
     /**
-     * @brief 处理下一帧事件
+     * @brief Handle next frame event
      */
     STDMETHOD_(void, OnNextFrame)(THIS_) OVERRIDE;
 
     /**
-     * @brief 处理颜色化事件
-     * @param cr 颜色
+     * @brief Handle colorize event
+     * @param cr color
      */
     virtual void OnColorize(COLORREF cr);
 
     /**
-     * @brief 容器改变处理函数
-     * @param pOldContainer 旧容器
-     * @param pNewContainer 新容器
+     * @brief Container change handler
+     * @param pOldContainer old container
+     * @param pNewContainer new container
      */
     virtual void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer);
 
     /**
-     * @brief 处理缩放变化事件
-     * @param scale 缩放比例
+     * @brief Handle scale change event
+     * @param scale scale factor
      */
     void OnScaleChanged(int scale) override;
 
     /**
-     * @brief 绘制控件
-     * @param pRT 绘制设备句柄
+     * @brief Draw control
+     * @param pRT render device handle
      */
     void OnPaint(IRenderTarget *pRT);
 
     /**
-     * @brief 处理显示窗口事件
-     * @param bShow 显示状态
-     * @param nStatus 状态
+     * @brief Handle show window event
+     * @param bShow show state
+     * @param nStatus state
      */
     void OnShowWindow(BOOL bShow, UINT nStatus);
 
     /**
-     * @brief 处理销毁事件
+     * @brief Handle destroy event
      */
     void OnDestroy();
 
@@ -668,50 +668,50 @@ class SOUI_EXP SAnimateImgWnd
 
   protected:
     /**
-     * @brief 动画图片
+     * @brief Animation image
      */
     SAutoRefPtr<ISkinObj> m_pSkin;
 
     /**
-     * @brief 速度
+     * @brief Speed
      */
     int m_nSpeed;
 
     /**
-     * @brief 当前帧
+     * @brief Current frame
      */
     int m_iCurFrame;
 
     /**
-     * @brief 是否自动启动
+     * @brief Whether to auto start
      */
     BOOL m_bAutoStart;
 
     /**
-     * @brief 是否运行中
+     * @brief Whether running
      */
     BOOL m_bPlaying;
 
     /**
-     * @brief OnNextFrame的执行次数
+     * @brief OnNextFrame execution count
      */
     int m_iTimeFrame;
 
     /**
-     * @brief 播放循环次数,-1代表无限循环
+     * @brief Play loop count, -1 means infinite loop
      */
     int m_nRepeat;
 
     /**
-     * @brief 当前播放循环轮次
+     * @brief Current play loop round
      */
     int m_iRepeat;
 };
 
 /**
  * @class SProgress
- * @brief 进度条类
- * @details 进度条控件。
+ * @brief Progress bar class
+ * @details Progress bar control.
  * @usage `<progress bgskin=xx posskin=xx min=0 max=100 value=10,showpercent=0/>`
  */
 class SOUI_EXP SProgress
@@ -727,38 +727,21 @@ class SOUI_EXP SProgress
     };
 
     /**
-     * @brief 构造函数
+     * @brief Constructor
      */
     SProgress();
 
     /**
-     * @brief    设置为不定进度状态
-     * @param    bIndeterminate  --  是否为不定进度状态
-     * @return   返回值是 TRUE -- 设置成功
-     **/
-    STDMETHOD_(void, SetIndeterminate)(THIS_ BOOL bIndeterminate) OVERRIDE;
-    /**
-     * @brief    获取是否为不定进度状态
-     * @return   返回值是 TRUE -- 不定进度状态
-     *
-     * Describe  获取是否为不定进度状态
-     */
-    STDMETHOD_(BOOL, IsIndeterminate)(CTHIS) SCONST OVERRIDE
-    {
-        return m_bIndeterminate;
-    }
-
-    /**
-     * @brief 设置进度条进度值
-     * @param nValue 进度值
-     * @return 设置成功--TRUE
-     * @note 对于需要动画效果的SetValue，请使用SSliderBar
+     * @brief Set progress bar value
+     * @param nValue progress value
+     * @return set successfully--TRUE
+     * @note For SetValue with animation effect, please use SSliderBar
      */
     STDMETHOD_(BOOL, SetValue)(THIS_ int nValue) OVERRIDE;
 
     /**
-     * @brief 获取进度值
-     * @return 进度值
+     * @brief Get progress value
+     * @return progress value
      */
     STDMETHOD_(int, GetValue)(CTHIS) SCONST OVERRIDE
     {
@@ -766,22 +749,22 @@ class SOUI_EXP SProgress
     }
 
     /**
-     * @brief 设置进度值最小大值
-     * @param nMin 进度最小值
-     * @param nMax 进度最大值
+     * @brief Set progress min/max values
+     * @param nMin progress minimum
+     * @param nMax progress maximum
      */
     STDMETHOD_(void, SetRange)(THIS_ int nMin, int nMax) OVERRIDE;
 
     /**
-     * @brief 获取进度值最小大值
-     * @param pMin 进度最小值
-     * @param pMax 进度最大值
+     * @brief Get progress min/max values
+     * @param pMin progress minimum
+     * @param pMax progress maximum
      */
     STDMETHOD_(void, GetRange)(CTHIS_ int *pMin, int *pMax) SCONST OVERRIDE;
 
     /**
-     * @brief 判断进度条是否为竖直状态
-     * @return 竖直状态--TRUE
+     * @brief Check whether the progress bar is vertical
+     * @return vertical state--TRUE
      */
     STDMETHOD_(BOOL, IsVertical)(CTHIS) SCONST OVERRIDE
     {
@@ -790,21 +773,21 @@ class SOUI_EXP SProgress
 
   protected:
     /**
-     * @brief 处理下一帧事件（ITimelineHandler接口实现）
-     * @note 仅用于处理波动特效
+     * @brief Handle next frame event (ITimelineHandler interface implementation)
+     * @note Only used for the wave effect
      */
     STDMETHOD_(void, OnNextFrame)() OVERRIDE;
 
   protected:
     /**
-     * @brief 处理颜色化事件
-     * @param cr 颜色
+     * @brief Handle colorize event
+     * @param cr color
      */
     virtual void OnColorize(COLORREF cr) override;
 
     /**
-     * @brief 处理缩放变化事件
-     * @param scale 缩放比例
+     * @brief Handle scale change event
+     * @param scale scale factor
      */
     virtual void OnScaleChanged(int scale) override;
     SIZE MeasureContent(int nParentWid, int nParentHei) override;
@@ -819,83 +802,71 @@ class SOUI_EXP SProgress
 
   protected:
     /**
-     * @brief 不定进度当前位置（0..1）
-     */
-    float m_fIndeterminatePos;
-
-    /**
-     * @brief 不定进度移动速度（每帧增量）
-     */
-    float m_fIndeterminateSpeed;
-
-    BOOL m_bIndeterminate; // 是否为不定进度状态
-    
-    /**
-     * @brief 进度最小值
+     * @brief Progress minimum
      */
     int m_nMinValue;
 
     /**
-     * @brief 进度最大值
+     * @brief Progress maximum
      */
     int m_nMaxValue;
 
     /**
-     * @brief 进度值
+     * @brief Progress value
      */
     int m_nValue;
 
     /**
-     * @brief 是否显示进度值
+     * @brief Whether to show progress value
      */
     BOOL m_bShowText;
 
     /**
-     * @brief 是否竖直状态
+     * @brief Whether vertical
      */
     BOOL m_bVertical;
 
     /**
-     * @brief 背景资源
+     * @brief Background resource
      */
     SAutoRefPtr<ISkinObj> m_pSkinBg;
 
     /**
-     * @brief 前景资源
+     * @brief Foreground resource
      */
     SAutoRefPtr<ISkinObj> m_pSkinPos;
 
     /**
-     * @brief 波动特效皮肤
+     * @brief Wave effect skin
      */
     SAutoRefPtr<ISkinObj> m_pSkinWaveEffect;
 
     /**
-     * @brief 波动特效当前位置(0-1之间)
+     * @brief Wave effect current position (between 0-1)
      */
     float m_fWaveEffectPos;
 
     /**
-     * @brief 波动特效移动方向(1=增加, -1=减少)
+     * @brief Wave effect movement direction (1=increase, -1=decrease)
      */
     int m_nWaveEffectDir;
 
   protected:
     /**
-     * @brief 绘制控件
-     * @param pRT 绘制设备句柄
+     * @brief Draw control
+     * @param pRT render device handle
      */
     void OnPaint(IRenderTarget *pRT);
 
     /**
-     * @brief 处理创建事件
-     * @param lp 创建参数
-     * @return 成功--0
+     * @brief Handle create event
+     * @param lp creation parameters
+     * @return success--0
      */
     int OnCreate(void *);
 
     /**
-     * @brief 处理销毁事件
+     * @brief Handle destroy event
      */
     void OnDestroy();
 
@@ -918,15 +889,13 @@ class SOUI_EXP SProgress
         ATTR_INT(L"value", m_nValue, FALSE)
         ATTR_BOOL(L"vertical", m_bVertical, FALSE)
         ATTR_BOOL(L"showText", m_bShowText, FALSE)
-        ATTR_BOOL(L"indeterminate", m_bIndeterminate, FALSE)
-        ATTR_FLOAT(L"indeterminateSpeed", m_fIndeterminateSpeed, FALSE)
     SOUI_ATTRS_END()
 };
 
 /**
  * @class SHrLine
- * @brief 线条控件
- * @details 线条控件。
+ * @brief Line control
+ * @details Line control.
  * @usage `<hr size=1 mode="vert" lineStyle="dash"/>`
  */
 class SOUI_EXP SHrLine : public SWindow {
@@ -934,34 +903,34 @@ class SOUI_EXP SHrLine : public SWindow {
 
   public:
     /**
-     * @brief 构造函数
+     * @brief Constructor
      */
     SHrLine();
 
     /**
-     * @brief 绘制控件
-     * @param pRT 绘制设备句柄
+     * @brief Draw control
+     * @param pRT render device handle
      */
     void OnPaint(IRenderTarget *pRT);
 
   protected:
     /**
-     * @brief 线条样式
+     * @brief Line style
      */
     int m_nLineStyle;
 
     /**
-     * @brief 线条大小
+     * @brief Line size
      */
     int m_nLineSize;
 
     /**
-     * @brief 线条颜色
+     * @brief Line color
      */
     COLORREF m_crLine;
 
     /**
-     * @brief 线条模式枚举
+     * @brief Line mode enum
      */
     enum HRMODE
     {
@@ -980,11 +949,11 @@ class SOUI_EXP SHrLine : public SWindow {
             ATTR_ENUM_VALUE(L"tilt", HR_TILT)
         ATTR_ENUM_END(m_mode)
         ATTR_ENUM_BEGIN(L"lineStyle", int, FALSE)
-            ATTR_ENUM_VALUE(L"solid", PS_SOLID)           // default
-            ATTR_ENUM_VALUE(L"dash", PS_DASH)             /* -------  */
-            ATTR_ENUM_VALUE(L"dot", PS_DOT)               /* .......  */
-            ATTR_ENUM_VALUE(L"dashdot", PS_DASHDOT)       /* _._._._  */
-            ATTR_ENUM_VALUE(L"dashdotdot", PS_DASHDOTDOT) /* _.._.._  */
+            ATTR_ENUM_VALUE(L"solid", PS_SOLID)           /**< default */
+            ATTR_ENUM_VALUE(L"dash", PS_DASH)             /**< ------- */
+            ATTR_ENUM_VALUE(L"dot", PS_DOT)               /**< ....... */
+            ATTR_ENUM_VALUE(L"dashdot", PS_DASHDOT)       /**< _._._._ */
+            ATTR_ENUM_VALUE(L"dashdotdot", PS_DASHDOTDOT) /**< _.._.._ */
         ATTR_ENUM_END(m_nLineStyle)
     SOUI_ATTRS_END()
 
@@ -995,22 +964,22 @@ class SOUI_EXP SHrLine : public SWindow {
 
 /**
  * @class SCheckBox
- * @brief 复选框控件类
- * @details 用于实现复选框功能的控件。
+ * @brief Check box control class
+ * @details Control used to implement check box functionality.
  * @usage `<check checked="1">This is a check-box</check>`
  */
 class SOUI_EXP SCheckBox : public SWindow {
-    DEF_SOBJECT(SWindow, L"check") // 定义对象类型为 "check"
+    DEF_SOBJECT(SWindow, L"check") /**< Define object type as "check" */
 
     enum
     {
-        CheckBoxSpacing = 4, // 复选框与文本之间的默认间距
+        CheckBoxSpacing = 4, /**< Default spacing between check box and text */
     };
 
   public:
     /**
-     * @brief 构造函数
-     * @details 初始化复选框控件。
+     * @brief Constructor
+     * @details Initialize the check box control.
      */
     SCheckBox();
 
@@ -1029,53 +998,53 @@ class SOUI_EXP SCheckBox : public SWindow {
 
   protected:
     /**
-     * @brief 状态图片资源
-     * @details 用于绘制复选框的不同状态（如选中、未选中等）。
+     * @brief State image resource
+     * @details Used to draw different check box states (such as checked, unchecked, etc.).
      */
     SAutoRefPtr<ISkinObj> m_pSkin;
 
     /**
-     * @brief 焦点状态资源
-     * @details 当复选框获得焦点时使用的皮肤资源。
+     * @brief Focus state resource
+     * @details Skin resource used when the check box gains focus.
      */
     SAutoRefPtr<ISkinObj> m_pFocusSkin;
 
-    int m_nCheckBoxSpacing; /** < 复选框与文本之间的间距 */
+    int m_nCheckBoxSpacing; /** < Spacing between check box and text */
 
     /**
-     * @brief 获取复选框矩形区域
-     * @return 返回复选框的显示位置矩形 (CRect)。
+     * @brief Get check box rectangle region
+     * @return Returns the display position rectangle of the check box (CRect).
      */
     CRect GetCheckRect();
 
     /**
-     * @brief 测量内容所需的大小
-     * @param wid 父容器宽度
-     * @param hei 父容器高度
-     * @return 返回控件所需的内容大小 (SIZE)。
+     * @brief Measure the size required for content
+     * @param wid parent container width
+     * @param hei parent container height
+     * @return Returns the content size required by the control (SIZE).
      */
     SIZE MeasureContent(int wid, int hei) override;
     SIZE MeasureChildren(int wid, int hei) override;
 
     /**
-     * @brief 获取文本显示区域的大小
-     * @param pRect 输出参数，表示文本显示区域的矩形。
+     * @brief Get the size of the text display area
+     * @param pRect Output parameter representing the rectangle of the text display area.
      */
     virtual void GetTextRect(LPRECT pRect);
 
     /**
-     * @brief 判断状态改变时是否需要重绘控件
-     * @return TRUE 表示需要重绘，FALSE 表示不需要重绘。
+     * @brief Determine whether the control needs redrawing when the state changes
+     * @return TRUE means redraw is needed, FALSE means no redraw needed.
      */
     virtual BOOL NeedRedrawWhenStateChange()
     {
-        return TRUE; // 默认情况下，状态改变时需要重绘
+        return TRUE; // By default, redraw is needed when the state changes
     }
 
     /**
-     * @brief 获取对话框代码
-     * @return 返回值为 UINT 类型，表示对话框代码。
-     * @details 返回 SC_WANTCHARS 表示控件需要处理字符消息。
+     * @brief Get dialog code
+     * @return Return value is of type UINT, representing the dialog code.
+     * @details Returning SC_WANTCHARS indicates the control needs to process character messages.
      */
     virtual UINT WINAPI OnGetDlgCode() const
     {
@@ -1083,84 +1052,84 @@ class SOUI_EXP SCheckBox : public SWindow {
     }
 
     /**
-     * @brief 绘制焦点样式
-     * @param pRT 绘制设备句柄 (IRenderTarget*)。
-     * @details 当控件获得焦点时调用此方法绘制焦点样式。
+     * @brief Draw focus style
+     * @param pRT render device handle (IRenderTarget*).
+     * @details This method is called to draw the focus style when the control gains focus.
      */
     virtual void DrawFocus(IRenderTarget *pRT);
 
     /**
-     * @brief 处理颜色化事件
-     * @param cr 颜色值 (COLORREF)。
-     * @details 当控件的颜色发生变化时调用此方法。
+     * @brief Handle colorize event
+     * @param cr color value (COLORREF).
+     * @details This method is called when the control's color changes.
      */
     virtual void OnColorize(COLORREF cr);
 
     /**
-     * @brief 处理缩放变化事件
-     * @param scale 缩放比例 (int)。
-     * @details 当控件的缩放比例发生变化时调用此方法。
+     * @brief Handle scale change event
+     * @param scale scale factor (int).
+     * @details This method is called when the control's scale factor changes.
      */
     virtual void OnScaleChanged(int scale);
 
     /**
-     * @brief 处理鼠标左键释放事件
-     * @param nFlags 标志位 (UINT)。
-     * @param pt 鼠标位置 (CPoint)。
-     * @details 当用户释放鼠标左键时调用此方法。
+     * @brief Handle left mouse button up event
+     * @param nFlags flags (UINT).
+     * @param pt mouse position (CPoint).
+     * @details This method is called when the user releases the left mouse button.
      */
     void OnLButtonUp(UINT nFlags, CPoint pt);
 
     /**
-     * @brief 处理按键按下事件
-     * @param nChar 字符 (UINT)。
-     * @param nRepCnt 重复次数 (UINT)。
-     * @param nFlags 标志位 (UINT)。
-     * @details 当用户按下键盘按键时调用此方法。
+     * @brief Handle key down event
+     * @param nChar character (UINT).
+     * @param nRepCnt repeat count (UINT).
+     * @param nFlags flags (UINT).
+     * @details This method is called when the user presses a keyboard key.
      */
     void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 
     /**
-     * @brief 处理绘制事件
-     * @param pRT 绘制设备句柄 (IRenderTarget*)。
-     * @details 负责绘制控件的外观。
+     * @brief Handle draw event
+     * @param pRT render device handle (IRenderTarget*).
+     * @details Responsible for drawing the control's appearance.
      */
     void OnPaint(IRenderTarget *pRT);
 
     /**
-     * @brief 处理自定义属性 "checked"
-     * @param strValue 属性值 (SStringW)。
-     * @param bLoading 是否正在加载 (BOOL)。
-     * @return 成功返回 S_OK，失败返回 HRESULT 错误码。
-     * @details 用于解析和设置 "checked" 属性。
+     * @brief Handle custom attribute "checked"
+     * @param strValue attribute value (SStringW).
+     * @param bLoading whether loading (BOOL).
+     * @return Returns S_OK on success, or an HRESULT error code on failure.
+     * @details Used to parse and set the "checked" attribute.
      */
     HRESULT OnAttrCheck(const SStringW &strValue, BOOL bLoading);
 
     /**
-     * @brief 定义控件的属性集合
+     * @brief Define the control's attribute collection
      */
     SOUI_ATTRS_BEGIN()
-        ATTR_SKIN(L"skin", m_pSkin, FALSE)           // 定义皮肤资源属性
-        ATTR_SKIN(L"focusSkin", m_pFocusSkin, FALSE) // 定义焦点皮肤资源属性
-        ATTR_CUSTOM(L"checked", OnAttrCheck)         // 定义自定义属性 "checked"
-        ATTR_INT(L"sep", m_nCheckBoxSpacing, TRUE)   // 定义间距属性
+        ATTR_SKIN(L"skin", m_pSkin, FALSE)           /**< Define skin resource attribute */
+        ATTR_SKIN(L"focusSkin", m_pFocusSkin, FALSE) /**< Define focus skin resource attribute */
+        ATTR_CUSTOM(L"checked", OnAttrCheck)         /**< Define custom attribute "checked" */
+        ATTR_INT(L"sep", m_nCheckBoxSpacing, TRUE)   /**< Define spacing attribute */
     SOUI_ATTRS_END()
 
     /**
-     * @brief 定义控件的消息映射
+     * @brief Define the control's message map
      */
     SOUI_MSG_MAP_BEGIN()
-        MSG_WM_PAINT_EX(OnPaint)            // 绑定绘制消息
-        MSG_WM_LBUTTONDBLCLK(OnLButtonDown) // 绑定鼠标左键双击消息
-        MSG_WM_LBUTTONUP(OnLButtonUp)       // 绑定鼠标左键释放消息
-        MSG_WM_KEYDOWN(OnKeyDown)           // 绑定按键按下消息
+        MSG_WM_PAINT_EX(OnPaint)            /**< Bind draw message */
+        MSG_WM_LBUTTONDBLCLK(OnLButtonDown) /**< Bind left mouse button double-click message */
+        MSG_WM_LBUTTONUP(OnLButtonUp)       /**< Bind left mouse button up message */
+        MSG_WM_KEYDOWN(OnKeyDown)           /**< Bind key down message */
     SOUI_MSG_MAP_END()
 };
 
 /**
  * @class SIconWnd
- * @brief 图标控件
- * @details 图标控件。
+ * @brief Icon control
+ * @details Icon control.
  * @usage `<icon src="icon:16" />`
  */
 class SOUI_EXP SIconWnd : public TWindowProxy<IIconWnd> {
@@ -1168,33 +1137,33 @@ class SOUI_EXP SIconWnd : public TWindowProxy<IIconWnd> {
 
   public:
     /**
-     * @brief 构造函数
+     * @brief Constructor
      */
     SIconWnd();
 
     /**
-     * @brief 析构函数
+     * @brief Destructor
      */
     virtual ~SIconWnd();
 
     /**
-     * @brief 设置图标
-     * @param hIcon 图标句柄
+     * @brief Set icon
+     * @param hIcon icon handle
      */
     STDMETHOD_(void, SetIcon)(THIS_ HICON hIcon) OVERRIDE;
 
   protected:
     /**
-     * @brief 测量内容大小
-     * @param wid 父容器宽度
-     * @param hei 父容器高度
-     * @return 内容大小
+     * @brief Measure content size
+     * @param wid parent container width
+     * @param hei parent container height
+     * @return content size
      */
     SIZE MeasureContent(int wid, int hei) override;
 
     /**
-     * @brief 绘制控件
-     * @param pRT 绘制设备句柄
+     * @brief Draw control
+     * @param pRT render device handle
      */
     void OnPaint(IRenderTarget *pRT);
 
@@ -1213,17 +1182,17 @@ class SOUI_EXP SIconWnd : public TWindowProxy<IIconWnd> {
 
   protected:
     SStringW m_strIconSrc;
-    HICON m_theIcon; /**< 图标资源句柄 */
+    HICON m_theIcon; /**< Icon resource handle */
 };
 
 /**
  * @class SRadioBox
- * @brief 单选框控件类
- * @details 用于实现单选框功能的控件。
+ * @brief Radio box control class
+ * @details Control used to implement radio box functionality.
  * @usage `<radio checked="1">This is a check-box</radio>`
  */
 class SOUI_EXP SRadioBox : public SWindow {
-    DEF_SOBJECT(SWindow, L"radio") // 定义对象类型为 "radio"
+    DEF_SOBJECT(SWindow, L"radio") /**< Define object type as "radio" */
 
     enum
     {
@@ -1232,8 +1201,8 @@ class SOUI_EXP SRadioBox : public SWindow {
 
   public:
     /**
-     * @brief 构造函数
-     * @details 初始化单选框控件。
+     * @brief Constructor
+     * @details Initialize the radio box control.
      */
     SRadioBox();
 
@@ -1252,30 +1221,30 @@ class SOUI_EXP SRadioBox : public SWindow {
 
   protected:
     /**
-     * @brief 获取单选框显示位置的矩形区域
-     * @return 返回单选框的显示位置矩形 (CRect)。
+     * @brief Get the radio box display position rectangle region
+     * @return Returns the radio box display position rectangle (CRect).
      */
     CRect GetRadioRect();
 
     /**
-     * @brief 获取文本显示区域的大小
-     * @param pRect 输出参数，表示文本显示区域的矩形。
+     * @brief Get the size of the text display area
+     * @param pRect Output parameter representing the rectangle of the text display area.
      */
     virtual void GetTextRect(LPRECT pRect);
 
     /**
-     * @brief 测量内容所需的大小
-     * @param wid 父容器宽度
-     * @param hei 父容器高度
-     * @return 返回控件所需的内容大小 (SIZE)。
+     * @brief Measure the size required for content
+     * @param wid parent container width
+     * @param hei parent container height
+     * @return Returns the content size required by the control (SIZE).
      */
     SIZE MeasureContent(int wid, int hei) OVERRIDE;
     SIZE MeasureChildren(int wid, int hei) OVERRIDE;
 
     /**
-     * @brief 获取对话框代码
-     * @return 返回值为 UINT 类型，表示对话框代码。
-     * @details 返回 0 表示不处理特定消息。
+     * @brief Get dialog code
+     * @return Return value is of type UINT, representing the dialog code.
+     * @details Returning 0 means no specific message is processed.
      */
     STDMETHOD_(UINT, OnGetDlgCode)(THIS) SCONST OVERRIDE
     {
@@ -1283,232 +1252,232 @@ class SOUI_EXP SRadioBox : public SWindow {
     }
 
     /**
-     * @brief 判断是否自动将相同名称的单选按钮添加到同一组中
-     * @return TRUE 表示自动分组，FALSE 表示不自动分组。
+     * @brief Determine whether radio buttons with the same name are automatically added to the same group
+     * @return TRUE means automatic grouping, FALSE means no automatic grouping.
      */
     STDMETHOD_(BOOL, IsSiblingsAutoGroupped)(THIS) SCONST OVERRIDE
     {
-        return TRUE; // 默认情况下，相同名称的单选按钮会自动分组
+        return TRUE; /**< By default, radio buttons with the same name are grouped automatically */
     }
 
     /**
-     * @brief 判断状态改变时是否需要重绘控件
-     * @return TRUE 表示需要重绘，FALSE 表示不需要重绘。
+     * @brief Determine whether the control needs redrawing when the state changes
+     * @return TRUE means redraw is needed, FALSE means no redraw needed.
      */
     virtual BOOL NeedRedrawWhenStateChange();
 
     /**
-     * @brief 绘制焦点样式
-     * @param pRT 绘制设备句柄 (IRenderTarget*)。
-     * @details 当控件获得焦点时调用此方法绘制焦点样式。
+     * @brief Draw focus style
+     * @param pRT render device handle (IRenderTarget*).
+     * @details This method is called to draw the focus style when the control gains focus.
      */
     virtual void DrawFocus(IRenderTarget *pRT);
 
     /**
-     * @brief 获取当前组中被选中的兄弟控件
-     * @return 返回指向被选中兄弟控件的指针 (SWindow*)，如果没有则返回 NULL。
+     * @brief Get the selected sibling control in the current group
+     * @return Returns a pointer to the selected sibling control (SWindow*), or NULL if none.
      */
     virtual SWindow *GetSelectedSiblingInGroup();
 
     /**
-     * @brief 处理状态变化事件
-     * @param dwOldState 原状态 (DWORD)。
-     * @param dwNewState 新状态 (DWORD)。
+     * @brief Handle state change event
+     * @param dwOldState old state (DWORD).
+     * @param dwNewState new state (DWORD).
      */
     virtual void OnStateChanging(DWORD dwOldState, DWORD dwNewState);
 
     /**
-     * @brief 处理颜色化事件
-     * @param cr 颜色值 (COLORREF)。
+     * @brief Handle colorize event
+     * @param cr color value (COLORREF).
      */
     virtual void OnColorize(COLORREF cr);
 
     /**
-     * @brief 处理缩放变化事件
-     * @param nScale 缩放比例 (int)。
+     * @brief Handle scale change event
+     * @param nScale scale factor (int).
      */
     virtual void OnScaleChanged(int nScale);
 
   protected:
     /**
-     * @brief 处理焦点改变事件
-     * @param wndOld 原窗口句柄 (SWND)。
-     * @param reason 焦点改变原因 (SFocusManager::FocusChangeReason)。
+     * @brief Handle focus change event
+     * @param wndOld old window handle (SWND).
+     * @param reason focus change reason (SFocusManager::FocusChangeReason).
      */
     void OnSetFocus(SWND wndOld, SFocusManager::FocusChangeReason reason);
 
     /**
-     * @brief 处理鼠标左键释放事件
-     * @param nFlags 标志位 (UINT)。
-     * @param pt 鼠标位置 (CPoint)。
+     * @brief Handle left mouse button up event
+     * @param nFlags flags (UINT).
+     * @param pt mouse position (CPoint).
      */
     void OnLButtonUp(UINT nFlags, CPoint pt);
 
     /**
-     * @brief 绘制控件
-     * @param pRT 绘制设备句柄 (IRenderTarget*)。
+     * @brief Draw control
+     * @param pRT render device handle (IRenderTarget*).
      */
     void OnPaint(IRenderTarget *pRT);
 
     /**
-     * @brief 处理自定义属性 "checked"
-     * @param strValue 属性值 (SStringW)。
-     * @param bLoading 是否正在加载 (BOOL)。
-     * @return 成功返回 S_OK，失败返回 HRESULT 错误码。
+     * @brief Handle custom attribute "checked"
+     * @param strValue attribute value (SStringW).
+     * @param bLoading whether loading (BOOL).
+     * @return Returns S_OK on success, or an HRESULT error code on failure.
      */
     HRESULT OnAttrCheck(const SStringW &strValue, BOOL bLoading);
 
     /**
-     * @brief 定义控件的属性集合
+     * @brief Define the control's attribute collection
      */
     SOUI_ATTRS_BEGIN()
-        ATTR_SKIN(L"skin", m_pSkin, FALSE)                      // 定义皮肤资源属性
-        ATTR_SKIN(L"focusSkin", m_pFocusSkin, FALSE)            // 定义焦点皮肤资源属性
-        ATTR_CUSTOM(L"checked", OnAttrCheck)                    // 定义自定义属性 "checked"
-        ATTR_ENUM_BEGIN(L"iconAlign", UINT, TRUE)               // 定义图标对齐方式属性
-            ATTR_ENUM_VALUE(L"left", SwndStyle::Align_Left)     // 左对齐
-            ATTR_ENUM_VALUE(L"center", SwndStyle::Align_Center) // 居中对齐
-            ATTR_ENUM_VALUE(L"right", SwndStyle::Align_Right)   // 右对齐
+        ATTR_SKIN(L"skin", m_pSkin, FALSE)                      /**< Define skin resource attribute */
+        ATTR_SKIN(L"focusSkin", m_pFocusSkin, FALSE)            /**< Define focus skin resource attribute */
+        ATTR_CUSTOM(L"checked", OnAttrCheck)                    /**< Define custom attribute "checked" */
+        ATTR_ENUM_BEGIN(L"iconAlign", UINT, TRUE)               /**< Define icon alignment attribute */
+            ATTR_ENUM_VALUE(L"left", SwndStyle::Align_Left)     /**< Left align */
+            ATTR_ENUM_VALUE(L"center", SwndStyle::Align_Center) /**< Center align */
+            ATTR_ENUM_VALUE(L"right", SwndStyle::Align_Right)   /**< Right align */
         ATTR_ENUM_END(m_uIconAlign)
-        ATTR_ENUM_BEGIN(L"iconValign", UINT, TRUE)               // 定义图标垂直对齐方式属性
-            ATTR_ENUM_VALUE(L"top", SwndStyle::VAlign_Top)       // 顶部对齐
-            ATTR_ENUM_VALUE(L"middle", SwndStyle::VAlign_Middle) // 中间对齐
-            ATTR_ENUM_VALUE(L"bottom", SwndStyle::VAlign_Bottom) // 底部对齐
+        ATTR_ENUM_BEGIN(L"iconValign", UINT, TRUE)               /**< Define icon vertical alignment attribute */
+            ATTR_ENUM_VALUE(L"top", SwndStyle::VAlign_Top)       /**< Top align */
+            ATTR_ENUM_VALUE(L"middle", SwndStyle::VAlign_Middle) /**< Middle align */
+            ATTR_ENUM_VALUE(L"bottom", SwndStyle::VAlign_Bottom) /**< Bottom align */
         ATTR_ENUM_END(m_uIconVAlign)
-        ATTR_INT(L"sep", m_nRadioBoxSpacing, TRUE) // 定义间距属性
+        ATTR_INT(L"sep", m_nRadioBoxSpacing, TRUE) /**< Define spacing attribute */
     SOUI_ATTRS_END()
 
     /**
-     * @brief 定义控件的消息映射
+     * @brief Define the control's message map
      */
     SOUI_MSG_MAP_BEGIN()
-        MSG_WM_PAINT_EX(OnPaint)        // 绑定绘制消息
-        MSG_WM_LBUTTONUP(OnLButtonUp)   // 绑定鼠标左键释放消息
-        MSG_WM_SETFOCUS_EX2(OnSetFocus) // 绑定焦点改变消息
+        MSG_WM_PAINT_EX(OnPaint)        /**< Bind draw message */
+        MSG_WM_LBUTTONUP(OnLButtonUp)   /**< Bind left mouse button up message */
+        MSG_WM_SETFOCUS_EX2(OnSetFocus) /**< Bind focus change message */
     SOUI_MSG_MAP_END()
 
   protected:
     /**
-     * @brief 皮肤资源
+     * @brief Skin resource
      */
     SAutoRefPtr<ISkinObj> m_pSkin;
 
     /**
-     * @brief 焦点皮肤资源
+     * @brief Focus skin resource
      */
     SAutoRefPtr<ISkinObj> m_pFocusSkin;
 
     /**
-     * @brief 图标水平对齐方式
+     * @brief Icon horizontal alignment
      */
     UINT m_uIconAlign;
 
     /**
-     * @brief 图标垂直对齐方式
+     * @brief Vertical alignment of the icon
      */
     UINT m_uIconVAlign;
 
     /**
-     * @brief 单选框与文本之间的间距
+     * @brief Spacing between the radio button and the text
      */
     int m_nRadioBoxSpacing;
 };
 
 /**
  * @class SRadioGroup
- * @brief 单选按钮组控件
- * @details 用于管理一组单选按钮，确保同一组中的单选按钮互斥。
+ * @brief Radio button group control
+ * @details Manages a group of radio buttons, ensuring mutual exclusion within the same group.
  */
 class SOUI_EXP SRadioGroup : public SWindow {
     DEF_SOBJECT(SWindow, L"radioGroup")
 
   public:
     /**
-     * @brief 构造函数
+     * @brief Constructor
      */
     SRadioGroup();
 
     /**
-     * @brief 检查指定ID的单选按钮
-     * @param nID 单选按钮ID
-     * @return 成功--TRUE 失败--FALSE
+     * @brief Check the radio button with the specified ID
+     * @param nID Radio button ID
+     * @return Success--TRUE Failure--FALSE
      */
     BOOL Check(int nID);
 
     /**
-     * @brief 检查指定名称的单选按钮
-     * @param pszName 单选按钮名称
-     * @return 成功--TRUE 失败--FALSE
+     * @brief Check the radio button with the specified name
+     * @param pszName Radio button name
+     * @return Success--TRUE Failure--FALSE
      */
     BOOL Check(LPCTSTR pszName);
 
     /**
-     * @brief 清除所有选中的单选按钮
-     * @return 成功--TRUE 失败--FALSE
+     * @brief Clear all selected radio buttons
+     * @return Success--TRUE Failure--FALSE
      */
     BOOL ClearCheck();
 
   protected:
     /**
-     * @brief 触发事件
-     * @param evt 事件参数
-     * @return 成功--TRUE 失败--FALSE
+     * @brief Fire event
+     * @param evt Event parameter
+     * @return Success--TRUE Failure--FALSE
      */
     STDMETHOD_(BOOL, FireEvent)(THIS_ IEvtArgs *evt) OVERRIDE;
 
     /**
-     * @brief 在插入子控件后处理
-     * @param pChild 子控件指针
+     * @brief Handle after inserting a child control
+     * @param pChild Child control pointer
      */
     virtual void OnAfterInsertChild(SWindow *pChild);
 
     /**
-     * @brief 在移除子控件前处理
-     * @param pChild 子控件指针
+     * @brief Handle before removing a child control
+     * @param pChild Child control pointer
      */
     virtual void OnBeforeRemoveChild(SWindow *pChild);
 };
 
 /**
  * @class SToggle
- * @brief Toggle控件
- * @details Toggle控件，继承自SCheckBox，用于实现开关效果。
+ * @brief Toggle control
+ * @details Toggle control, inherited from SCheckBox, used to implement on/off (toggle) effect.
  */
 class SOUI_EXP SToggle : public SCheckBox {
     DEF_SOBJECT(SCheckBox, L"toggle")
 
   public:
     /**
-     * @brief 构造函数
+     * @brief Constructor
      */
     SToggle();
 
     /**
-     * @brief 设置Toggle属性
-     * @param bToggle 是否启用Toggle特效
-     * @param bUpdate 是否更新，默认值TRUE
+     * @brief Set Toggle attribute
+     * @param bToggle Whether to enable the Toggle effect
+     * @param bUpdate Whether to update, default value TRUE
      */
     void SetToggle(BOOL bToggle, BOOL bUpdate = TRUE);
 
     /**
-     * @brief 获取Toggle属性
-     * @return 返回值BOOL
-     * @details 获取Toggle属性，主要用于获取是否启用Toggle特效
+     * @brief Get Toggle attribute
+     * @return Returns BOOL
+     * @details Gets the Toggle attribute, mainly used to retrieve whether the Toggle effect is enabled
      */
     BOOL GetToggle();
 
   protected:
     /**
-     * @brief 测量内容大小
-     * @param nParentWid 父容器宽度
-     * @param nParentHei 父容器高度
-     * @return 内容大小
+     * @brief Measure content size
+     * @param nParentWid parent container width
+     * @param nParentHei parent container height
+     * @return content size
      */
     SIZE MeasureContent(int nParentWid, int nParentHei) override;
 
     /**
-     * @brief 状态改变是否需要重画
-     * @return 需要重画--TRUE
+     * @brief Whether a state change requires repainting
+     * @return Needs repaint--TRUE
      */
     virtual BOOL NeedRedrawWhenStateChange()
     {
@@ -1517,8 +1486,8 @@ class SOUI_EXP SToggle : public SCheckBox {
 
   protected:
     /**
-     * @brief 绘制控件
-     * @param pRT 绘制设备句柄
+     * @brief Draw control
+     * @param pRT render device handle
      */
     void OnPaint(IRenderTarget *pRT);
 
@@ -1529,8 +1498,8 @@ class SOUI_EXP SToggle : public SCheckBox {
 
 /**
  * @class SGroup
- * @brief 组控件
- * @details 组控件，用于将多个控件分组显示。
+ * @brief Group control
+ * @details Group control, used to group and display multiple controls.
  * @usage `<group colorLine1="#b8d5e2" colorLine2="#999999">group text</group>`
  */
 class SOUI_EXP SGroup : public SWindow {
@@ -1538,44 +1507,44 @@ class SOUI_EXP SGroup : public SWindow {
 
   public:
     /**
-     * @brief 构造函数
+     * @brief Constructor
      */
     SGroup();
 
   protected:
     /**
-     * @brief 获取子控件布局矩形
-     * @param prc 输出矩形
+     * @brief Get the layout rectangle of the child control
+     * @param prc Output rectangle
      */
     STDMETHOD_(void, GetChildrenLayoutRect)(THIS_ RECT *prc) SCONST OVERRIDE;
 
     /**
-     * @brief 获取预期大小
-     * @param psz 输出大小
-     * @param wid 父容器宽度
-     * @param hei 父容器高度
+     * @brief Get the desired size
+     * @param psz Output size
+     * @param wid Parent container width
+     * @param hei Parent container height
      */
     STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *psz, int wid, int hei) OVERRIDE;
 
     /**
-     * @brief 绘制控件
-     * @param pRT 绘制设备句柄
+     * @brief Draw control
+     * @param pRT render device handle
      */
     void OnPaint(IRenderTarget *pRT);
 
   protected:
     /**
-     * @brief group 3D显示使用的两种颜色
+     * @brief Two colors used for group 3D display
      */
     COLORREF m_crLine1, m_crLine2;
 
     /**
-     * @brief 圆角半径
+     * @brief Corner radius
      */
     SLayoutSize m_nRound;
 
     /**
-     * @brief 头部高度
+     * @brief Header height
      */
     SLayoutSize m_nHeaderHeight;
 
@@ -1605,4 +1574,4 @@ class SOUI_EXP SKeyboardSpacer : public SWindow {
 
 SNSEND
 
-#endif // __SCMNCTRL__H__
+#endif /**< __SCMNCTRL__H__ */

@@ -3,7 +3,7 @@
  * All rights reserved.
  *
  * @file       SwndContainerImpl.h
- * @brief      SOUI窗口容器的实现
+ * @brief      Implementation of the SOUI window container
  * @version    v1.0
  * @author     SOUI group
  * @date       2014/08/02
@@ -77,7 +77,7 @@ class SOUI_EXP SwndContainerImpl
     virtual LRESULT DoFrameEvent(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
   protected:
-    // ISwndContainer
+    /** ISwndContainer */
     /**
      * @brief Registers a drop target for a window.
      * @param swnd Window handle.
@@ -230,7 +230,7 @@ class SOUI_EXP SwndContainerImpl
      */
     STDMETHOD_(BOOL, IsDesignerMode)(CTHIS) SCONST OVERRIDE;
 
-  public: // ITimelineHandler
+  public: /**< ITimelineHandler */
     /**
      * @brief Called when the next frame is ready.
      */
@@ -318,4 +318,4 @@ class SOUI_EXP SwndContainerImpl
 };
 
 SNSEND
-#endif // __SWNDCONTAINERIMPL__H__
+#endif /**< __SWNDCONTAINERIMPL__H__ */

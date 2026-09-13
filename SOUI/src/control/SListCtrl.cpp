@@ -6,8 +6,8 @@
 
 #define ITEM_MARGIN 4
 SNSBEGIN
-//////////////////////////////////////////////////////////////////////////
-//  SListCtrl
+///////////////////////////////////////////////////////////////////////
+/** SListCtrl */
 SListCtrl::SListCtrl()
     : m_nHeaderHeight(20)
     , m_nItemHeight(20)
@@ -251,8 +251,8 @@ CRect SListCtrl::GetListRect()
     return rcList;
 }
 
-//////////////////////////////////////////////////////////////////////////
-//  更新滚动条
+///////////////////////////////////////////////////////////////////////
+/** Update scroll bar */
 void SListCtrl::UpdateScrollBar()
 {
     CSize szView;
@@ -261,17 +261,17 @@ void SListCtrl::UpdateScrollBar()
     szView.cy = GetItemCount() * m_nItemHeight.toPixelSize(GetScale());
 
     CRect rcClient;
-    SWindow::GetClientRect(&rcClient); //不计算滚动条大小
+    SWindow::GetClientRect(&rcClient); // Do not compute scroll bar size
     rcClient.top += m_nHeaderHeight.toPixelSize(GetScale());
     if (rcClient.bottom < rcClient.top)
         rcClient.bottom = rcClient.top;
     CSize size = rcClient.Size();
-    //  关闭滚动条
+    // Close scroll bar
     m_wBarVisible = SSB_NULL;
 
     if (size.cy < szView.cy || (size.cy < szView.cy + GetSbWidth() && size.cx < szView.cx))
     {
-        //  需要纵向滚动条
+        // Need vertical scroll bar
         m_wBarVisible |= SSB_VERT;
         m_siVer.nMin = 0;
         m_siVer.nMax = szView.cy - 1;
@@ -280,9 +280,9 @@ void SListCtrl::UpdateScrollBar()
         int horzSize = size.cx - GetSbWidth();
         if (horzSize < nMinWid)
         {
-            // 小于表头的最小宽度, 需要横向滚动条
+            // Less than the header's minimum width, horizontal scroll bar needed
             m_wBarVisible |= SSB_HORZ;
-            m_siVer.nPage = size.cy - GetSbWidth() > 0 ? size.cy - GetSbWidth() : 0; //注意同时调整纵向滚动条page信息
+            m_siVer.nPage = size.cy - GetSbWidth() > 0 ? size.cy - GetSbWidth() : 0; // Note to also adjust the vertical scroll bar page info
 
             m_siHoz.nMin = 0;
             m_siHoz.nMax = szView.cx - 1;
@@ -291,13 +291,13 @@ void SListCtrl::UpdateScrollBar()
         else
         {
             if (horzSize < szView.cx || m_pHeader->IsAutoResize())
-            { //大于最小宽度，小于现在宽度，则调整表头的宽度。
+            { // Greater than the minimum width but less than the current width, then adjust the header width.
                 CRect rcHead = m_pHeader->GetWindowRect();
                 rcHead.right = rcHead.left + horzSize;
                 m_pHeader->Move(rcHead);
                 szView.cx = horzSize;
             }
-            //  不需要横向滚动条
+            // No horizontal scroll bar needed
             m_siHoz.nPage = szView.cx;
             m_siHoz.nMin = 0;
             m_siHoz.nMax = m_siHoz.nPage - 1;
@@ -306,7 +306,7 @@ void SListCtrl::UpdateScrollBar()
     }
     else
     {
-        //  不需要纵向滚动条
+        // No vertical scroll bar needed
         m_siVer.nPage = size.cy;
         m_siVer.nMin = 0;
         m_siVer.nMax = size.cy - 1;
@@ -314,7 +314,7 @@ void SListCtrl::UpdateScrollBar()
 
         if (size.cx < nMinWid)
         {
-            //小于表头的最小宽度,  需要横向滚动条
+            // Less than the header's minimum width, horizontal scroll bar needed
             m_wBarVisible |= SSB_HORZ;
             m_siHoz.nMin = 0;
             m_siHoz.nMax = szView.cx - 1;
@@ -323,13 +323,13 @@ void SListCtrl::UpdateScrollBar()
         else
         {
             if (size.cx < szView.cx || m_pHeader->IsAutoResize())
-            { //大于最小宽度，小于现在宽度，则调整表头的宽度。
+            { // Greater than the minimum width but less than the current width, then adjust the header width.
                 CRect rcHead = m_pHeader->GetWindowRect();
                 rcHead.right = rcHead.left + size.cx;
                 m_pHeader->Move(rcHead);
                 szView.cx = size.cx;
             }
-            //  不需要横向滚动条
+            // No horizontal scroll bar needed
             m_siHoz.nPage = szView.cx;
             m_siHoz.nMin = 0;
             m_siHoz.nMax = m_siHoz.nPage - 1;
@@ -337,7 +337,7 @@ void SListCtrl::UpdateScrollBar()
         }
     }
 
-    //  根据需要调整原点位置
+    // Adjust origin position as needed
     if (HasScrollBar(FALSE) && m_siHoz.nPos + m_siHoz.nPage > szView.cx)
     {
         m_siHoz.nPos = szView.cx - m_siHoz.nPage;
@@ -351,13 +351,13 @@ void SListCtrl::UpdateScrollBar()
     SetScrollPos(TRUE, m_siVer.nPos, TRUE);
     SetScrollPos(FALSE, m_siHoz.nPos, TRUE);
 
-    //  重新计算客户区及非客户区
+    // Recompute client and non-client areas
     SSendMessage(WM_NCCALCSIZE);
 
     Invalidate();
 }
 
-//更新表头位置
+/** Update header position */
 void SListCtrl::UpdateHeaderCtrl()
 {
     CRect rcClient;
@@ -469,16 +469,16 @@ CRect SListCtrl::GetItemRect(int nItem, int nSubItem)
     }
 
     CRect rcList = GetListRect();
-    //  变换到窗口坐标
+    // Transform to window coordinates
     rcItem.OffsetRect(rcList.TopLeft());
-    //  根据原点坐标修正
+    // Correct based on origin coordinates
     rcItem.OffsetRect(-m_ptOrigin);
 
     return rcItem;
 }
 
-//////////////////////////////////////////////////////////////////////////
-//  自动修改pt的位置为相对当前项的偏移量
+///////////////////////////////////////////////////////////////////////
+/** Automatically modify pt's position to an offset relative to the current item */
 int SListCtrl::HitTest(const CPoint &pt)
 {
     CRect rcList = GetListRect();
@@ -630,7 +630,7 @@ void SListCtrl::DrawItem(IRenderTarget *pRT, CRect rcItem, int nItem)
     }
 
     if (lvItem.checked)
-    { //和下面那个if的条件分开，才会有sel和hot的区别
+    { // Separated from the condition of the if below, so there is a distinction between sel and hot
         if (m_pItemSkin != NULL)
             nBgImg = 2;
         else if (CR_INVALID != m_crItemSelBg)
@@ -649,13 +649,13 @@ void SListCtrl::DrawItem(IRenderTarget *pRT, CRect rcItem, int nItem)
         if (CR_INVALID != m_crSelText)
             crText = m_crSelText;
     }
-    if (CR_INVALID != crItemBg) //先画背景
+    if (CR_INVALID != crItemBg) // Draw background first
         pRT->FillSolidRect(rcItem, crItemBg);
 
-    if (m_pItemSkin != NULL) //有skin，则覆盖背景
+    if (m_pItemSkin != NULL) // If there is a skin, overlay the background
         m_pItemSkin->DrawByIndex(pRT, rcItem, nBgImg);
 
-    //  左边加上空白
+    // Add padding on the left
     rcItem.left += ITEM_MARGIN;
 
     if (CR_INVALID != crText)
@@ -682,14 +682,14 @@ void SListCtrl::DrawItem(IRenderTarget *pRT, CRect rcItem, int nItem)
         if (rcVisiblePart.IsRectEmpty())
             continue;
 
-        // 高亮选中的列
+        // Highlight the selected column
         if (hdi.iOrder == m_nSelectColumn)
         {
             if (CR_INVALID != m_crItemSelBg)
                 pRT->FillSolidRect(rcVisiblePart, m_crItemSelBg);
         }
 
-        // 绘制 checkbox
+        // Draw checkbox
         if (nCol == 0 && m_bCheckBox && m_pCheckSkin)
         {
             CSize sizeSkin = m_pCheckSkin->GetSkinSize();
@@ -862,7 +862,7 @@ BOOL SListCtrl::OnScroll(BOOL bVertical, UINT uCode, int nPos)
     else
     {
         m_ptOrigin.x = m_siHoz.nPos;
-        //  处理列头滚动
+        // Handle column header scrolling
         UpdateHeaderCtrl();
     }
 
@@ -899,7 +899,7 @@ void SListCtrl::OnLButtonDbClick(UINT nFlags, CPoint pt)
     int nSubItem = -1;
     m_nHoverItem = HitTest(pt, &nSubItem);
 
-    // 选择列
+    // Select column
     SetSelectedColumn(nSubItem);
 
     if (m_nHoverItem != m_nSelectItem)

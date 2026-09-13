@@ -169,8 +169,8 @@ bool CMainDlg::LoadSkin()
 	SDemoSkin *skin = (SDemoSkin *)GETSKIN(L"demoskinbk",100);
 	if (skin)
 	{
-		SkinLoadInf loadInf;
-		SkinType type;
+		SkinLoadInf loadInf = {0};
+		SkinType type = builtin;
 		LoadSkinFormXml(skin, &type, &loadInf);
 		skin->SetHander(this);
 		return skin->LoadSkin(type, loadInf);

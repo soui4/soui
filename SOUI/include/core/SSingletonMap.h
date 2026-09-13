@@ -11,4 +11,4 @@ class SSingletonMap
 };
 
 SNSEND
-#endif // __SSINGLETONMAP__H__
+#endif /**< __SSINGLETONMAP__H__ */

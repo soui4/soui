@@ -6,21 +6,35 @@ option(BUILD_SOUI_SYS_RESOURCE "Build SOUI system resource" ON)
 
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
+# Windows：沿用原环境变量机制（SOUI4_INSTALL_32 / SOUI4_INSTALL_64），保持不变
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
 	if(CMAKE_SIZEOF_VOID_P EQUAL 4)
 	file (TO_CMAKE_PATH "$ENV{SOUI4_INSTALL_32}" SOUI_INSTALL_DIR)
 	else()
 	file (TO_CMAKE_PATH "$ENV{SOUI4_INSTALL_64}" SOUI_INSTALL_DIR)
 	endif()
-else()
-	file (TO_CMAKE_PATH "$ENV{SOUI4_INSTALL}" SOUI_INSTALL_DIR)
-endif()
-if("${SOUI_INSTALL_DIR}" STREQUAL "" OR NOT EXISTS ${SOUI_INSTALL_DIR})
-	message(FATAL_ERROR "FATAL:can't find env variable SOUI4_INSTALL.")
-	set(SOUI_INSTALL_DIR "/home/flyhigh/work/soui4_install")
+	if("${SOUI_INSTALL_DIR}" STREQUAL "" OR NOT EXISTS ${SOUI_INSTALL_DIR})
+		message(FATAL_ERROR "FATAL:can't find env variable SOUI4_INSTALL.")
+	endif()
 endif()
 
 message(STATUS "SOUI_INSTALL_DIR: ${SOUI_INSTALL_DIR}")
+
+if(SOUI_INSTALL_DIR)
+	list(APPEND CMAKE_PREFIX_PATH "${SOUI_INSTALL_DIR}")
+endif()
+find_package(soui4 REQUIRED)
+
+# 非 Windows：去掉对 SOUI4_INSTALL 环境变量的依赖，完全交给 find_package
+# 标准搜索（仍支持用户显式 -DSOUI_INSTALL_DIR 覆盖）。find_package 成功后
+# 会通过 SOUI_PREFIX 给出安装根，这里回填 SOUI_INSTALL_DIR，使后续
+# include(__cmake/windres.cmake) 与 include/config 等资源路径在三大平台一致。
+if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
+	if(NOT DEFINED SOUI_INSTALL_DIR OR "${SOUI_INSTALL_DIR}" STREQUAL "")
+		set(SOUI_INSTALL_DIR "${SOUI_PREFIX}")
+	endif()
+endif()
+
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
 add_compile_options(-Wno-c++11-extensions)
 add_compile_options(-Wno-inconsistent-missing-override)
@@ -37,7 +51,7 @@ if (NOT MSVC AND CMAKE_BUILD_TYPE STREQUAL "Debug")
   add_definitions(-D_DEBUG)
 endif()
 
-include(${SOUI_INSTALL_DIR}/__cmake/soui-config.cmake)
+
 
 
 message(STATUS "SOUI_INCLUDE_DIRS: ${SOUI_INCLUDE_DIRS}")
@@ -47,7 +61,7 @@ set(SOUI_ROOT ${SOUI_PREFIX})
 
 message(STATUS "SOUI_ROOT: ${SOUI_ROOT}")
 if ("${SOUI_ROOT}" STREQUAL "")
-	message(FATAL_ERROR "FATAL:can't find env variable SOUI4_INSTALL_64, clone soui core and install wizard first, please.")
+	message(FATAL_ERROR "FATAL: soui4 prefix is empty; ensure find_package(soui4) found a valid install (set -DSOUI_INSTALL_DIR or install soui4 first).")
 endif()
 
 set(RESBUILD_EXE ${SOUI_ROOT}/bin/${CMAKE_BUILD_TYPE}/uiresbuilder)
@@ -148,13 +162,7 @@ else()
 	endif()
 endif()
 
-target_link_libraries(${project_name} ${SOUI_LIBRARIES})
-
-# Link component dependencies if using static libraries
-if(SOUI_ENABLE_COM_LIB AND DEFINED SOUI_COM_DEPS)
-    message(STATUS "Linking SOUI component dependencies: ${SOUI_COM_DEPS}")
-    target_link_libraries(${project_name} ${SOUI_COM_DEPS})
-endif()
+target_link_libraries(${project_name} soui::all)
 
 target_precompile_headers(${project_name} PRIVATE "stdafx.h")
  

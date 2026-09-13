@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for SMessageBox
  * SMessageBox is a C function exported by SOUI.
  */
@@ -18,4 +18,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SMESSAGEBOX_CAPI_H__ */
+#endif /**< __SMESSAGEBOX_CAPI_H__ */

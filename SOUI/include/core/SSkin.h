@@ -30,11 +30,13 @@ SNSBEGIN
  */
 class SOUI_EXP SSkinImgList : public SSkinObjBase {
     DEF_SOBJECT(SSkinObjBase, L"imglist")
-    enum TileMode{
-		TM_Horz = 0,    // Images are arranged horizontally
-		TM_Vert = 1,    // Images are arranged vertically
-		TM_Both = 2     // Images are arranged in a grid
+    enum TileMode
+    {
+        TM_Horz = 0, /**< Images are arranged horizontally */
+        TM_Vert = 1, /**< Images are arranged vertically */
+        TM_Both = 2  /**< Images are arranged in a grid */
     };
+
   public:
     /**
      * @brief Constructor for SSkinImgList.
@@ -182,25 +184,26 @@ class SOUI_EXP SSkinImgList : public SSkinObjBase {
      * @return IBitmapS* Pointer to the cached bitmap (borrowed; may be NULL on failure).
      */
     IBitmapS *GetSvgCacheBitmap(IRenderTarget *pRT, int cxPerState, int cyPerState) const;
-  protected:
-    int m_nStates;                     // Number of skin states
-    BOOL m_bTile;                      // Flag to indicate if the image is tiled
-    BOOL m_bAutoFit;                   // Flag to indicate if the image should auto-fit
-    BOOL m_bVertical;                  // Flag to indicate if images are arranged vertically
-    SAutoRefPtr<IBitmapS> m_imgBackup; // Backup of the image before colorization
-    FilterLevel m_filterLevel;         // Filter level for image scaling
-	  TileMode m_tileMode;             // Tile mode for the image
-  protected:
-    mutable SAutoRefPtr<ISvgObj> m_pSvg;  // Pointer to the SVG object
-    mutable SAutoRefPtr<IBitmapS> m_pImg; // Pointer to the bitmap source
-    mutable SAutoRefPtr<IBitmapS> m_pCacheBmp; // Rasterized SVG cache bitmap (contains all states)
-    mutable CSize m_szPerStateCache;       // Per-state size used to generate the cache bitmap (cache key)
-    mutable SStringW m_strSrc;            // Source string for the image
-    BOOL m_bLazyLoad;                     // Flag to indicate lazy loading
-    BOOL m_bCacheSvg;                     // Cache SVG as bitmap for drawing (enabled by default)
 
   protected:
-    SIZE GetImageSize(BOOL bRaw=FALSE) const;
+    int m_nStates;                     /**< Number of skin states */
+    BOOL m_bTile;                      /**< Flag to indicate if the image is tiled */
+    BOOL m_bAutoFit;                   /**< Flag to indicate if the image should auto-fit */
+    BOOL m_bVertical;                  /**< Flag to indicate if images are arranged vertically */
+    SAutoRefPtr<IBitmapS> m_imgBackup; /**< Backup of the image before colorization */
+    FilterLevel m_filterLevel;         /**< Filter level for image scaling */
+    TileMode m_tileMode;               /**< Tile mode for the image */
+  protected:
+    mutable SAutoRefPtr<ISvgObj> m_pSvg;       /**< Pointer to the SVG object */
+    mutable SAutoRefPtr<IBitmapS> m_pImg;      /**< Pointer to the bitmap source */
+    mutable SAutoRefPtr<IBitmapS> m_pCacheBmp; /**< Rasterized SVG cache bitmap (contains all states) */
+    mutable CSize m_szPerStateCache;           /**< Per-state size used to generate the cache bitmap (cache key) */
+    mutable SStringW m_strSrc;                 /**< Source string for the image */
+    BOOL m_bLazyLoad;                          /**< Flag to indicate lazy loading */
+    BOOL m_bCacheSvg;                          /**< Cache SVG as bitmap for drawing (enabled by default) */
+
+  protected:
+    SIZE GetImageSize(BOOL bRaw = FALSE) const;
 
     void LoadSrcImage() const;
     /**
@@ -213,17 +216,17 @@ class SOUI_EXP SSkinImgList : public SSkinObjBase {
 
     SOUI_ATTRS_BEGIN()
         ATTR_CUSTOM(L"src", OnAttrSrc)
-        ATTR_BOOL(L"tile", m_bTile, FALSE)         // Draw whether to tile, 0--stretch (default), other--tile
-        ATTR_ENUM_BEGIN(L"tileMode", TileMode, FALSE)         // Tile mode for image scaling
+        ATTR_BOOL(L"tile", m_bTile, FALSE)            /**< Draw whether to tile, 0--stretch (default), other--tile */
+        ATTR_ENUM_BEGIN(L"tileMode", TileMode, FALSE) /**< Tile mode for image scaling */
             ATTR_ENUM_VALUE(L"horz", TM_Horz)
             ATTR_ENUM_VALUE(L"low", TM_Vert)
             ATTR_ENUM_VALUE(L"both", TM_Both)
         ATTR_ENUM_END(m_tileMode)
-        ATTR_BOOL(L"autoFit", m_bAutoFit, FALSE)   // autoFit is 0, do not automatically fit to drawing area
-        ATTR_BOOL(L"vertical", m_bVertical, FALSE) // Sub-images are vertically arranged, 0--horizontal (default), other--vertical
-        ATTR_INT(L"states", m_nStates, FALSE)      // Number of sub-images, default is 1
+        ATTR_BOOL(L"autoFit", m_bAutoFit, FALSE)   /**< autoFit is 0, do not automatically fit to drawing area */
+        ATTR_BOOL(L"vertical", m_bVertical, FALSE) /**< Sub-images are vertically arranged, 0--horizontal (default), other--vertical */
+        ATTR_INT(L"states", m_nStates, FALSE)      /**< Number of sub-images, default is 1 */
         ATTR_BOOL(L"lazyLoad", m_bLazyLoad, FALSE)
-        ATTR_BOOL(L"cacheSvg", m_bCacheSvg, TRUE)        // Whether to cache SVG as bitmap when drawing (default on)
+        ATTR_BOOL(L"cacheSvg", m_bCacheSvg, TRUE) /**< Whether to cache SVG as bitmap when drawing (default on) */
         ATTR_ENUM_BEGIN(L"filterLevel", FilterLevel, FALSE)
             ATTR_ENUM_VALUE(L"none", kNone_FilterLevel)
             ATTR_ENUM_VALUE(L"low", kLow_FilterLevel)
@@ -318,16 +321,16 @@ class SOUI_EXP SSkinImgFrame : public SSkinImgList {
     void _DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const override;
 
   protected:
-    CRect m_rcMargin;                       // Margin rectangle for the image frame
+    CRect m_rcMargin; /**< Margin rectangle for the image frame */
 
     SOUI_ATTRS_BEGIN()
-        ATTR_RECT(L"margin", m_rcMargin, FALSE)                          // Nine-grid margins
-        ATTR_INT(L"left", m_rcMargin.left, FALSE)                        // Left margin of the nine-grid
-        ATTR_INT(L"top", m_rcMargin.top, FALSE)                          // Top margin of the nine-grid
-        ATTR_INT(L"right", m_rcMargin.right, FALSE)                      // Right margin of the nine-grid
-        ATTR_INT(L"bottom", m_rcMargin.bottom, FALSE)                    // Bottom margin of the nine-grid
-        ATTR_INT(L"margin-x", m_rcMargin.left = m_rcMargin.right, FALSE) // Left and right margins of the nine-grid
-        ATTR_INT(L"margin-y", m_rcMargin.top = m_rcMargin.bottom, FALSE) // Top and bottom margins of the nine-grid
+        ATTR_RECT(L"margin", m_rcMargin, FALSE)                          /**< Nine-grid margins */
+        ATTR_INT(L"left", m_rcMargin.left, FALSE)                        /**< Left margin of the nine-grid */
+        ATTR_INT(L"top", m_rcMargin.top, FALSE)                          /**< Top margin of the nine-grid */
+        ATTR_INT(L"right", m_rcMargin.right, FALSE)                      /**< Right margin of the nine-grid */
+        ATTR_INT(L"bottom", m_rcMargin.bottom, FALSE)                    /**< Bottom margin of the nine-grid */
+        ATTR_INT(L"margin-x", m_rcMargin.left = m_rcMargin.right, FALSE) /**< Left and right margins of the nine-grid */
+        ATTR_INT(L"margin-y", m_rcMargin.top = m_rcMargin.bottom, FALSE) /**< Top and bottom margins of the nine-grid */
         ATTR_MARGIN(L"margin2", m_rcMargin, FALSE)
     SOUI_ATTRS_END()
 };
@@ -424,27 +427,27 @@ class SOUI_EXP SSkinButton : public SSkinObjBase {
     void _DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const override;
 
   protected:
-    BTNCOLORS m_colors;       // Colors for different states
-    BTNCOLORS m_colorsBackup; // Backup of colors before colorization
+    BTNCOLORS m_colors;       /**< Colors for different states */
+    BTNCOLORS m_colorsBackup; /**< Backup of colors before colorization */
 
-    int m_nCornerRadius;    // Corner radius
-    float m_fCornerPercent; // Corner percentage (0.5 for semi-circle)
+    int m_nCornerRadius;    /**< Corner radius */
+    float m_fCornerPercent; /**< Corner percentage (0.5 for semi-circle) */
 
     SOUI_ATTRS_BEGIN()
-        ATTR_COLOR(L"colorBorder", m_colors.m_crBorder[0], TRUE)             // Normal border color
-        ATTR_COLOR(L"colorBorderHover", m_colors.m_crBorder[1], TRUE)        // Hover border color
-        ATTR_COLOR(L"colorBorderPush", m_colors.m_crBorder[2], TRUE)         // Pushed border color
-        ATTR_COLOR(L"colorBorderDisable", m_colors.m_crBorder[3], TRUE)      // Disabled border color
-        ATTR_COLOR(L"colorUp", m_colors.m_crUp[ST_NORMAL], TRUE)             // Normal up color
-        ATTR_COLOR(L"colorDown", m_colors.m_crDown[ST_NORMAL], TRUE)         // Normal down color
-        ATTR_COLOR(L"colorUpHover", m_colors.m_crUp[ST_HOVER], TRUE)         // Hover up color
-        ATTR_COLOR(L"colorDownHover", m_colors.m_crDown[ST_HOVER], TRUE)     // Hover down color
-        ATTR_COLOR(L"colorUpPush", m_colors.m_crUp[ST_PUSHDOWN], TRUE)       // Pushed up color
-        ATTR_COLOR(L"colorDownPush", m_colors.m_crDown[ST_PUSHDOWN], TRUE)   // Pushed down color
-        ATTR_COLOR(L"colorUpDisable", m_colors.m_crUp[ST_DISABLE], TRUE)     // Disabled up color
-        ATTR_COLOR(L"colorDownDisable", m_colors.m_crDown[ST_DISABLE], TRUE) // Disabled down color
-        ATTR_INT(L"cornerRadius", m_nCornerRadius, TRUE)                     // Corner radius
-        ATTR_FLOAT(L"cornerPercent", m_fCornerPercent, TRUE)                 // Corner percentage (0.5 for semi-circle)
+        ATTR_COLOR(L"colorBorder", m_colors.m_crBorder[0], TRUE)             /**< Normal border color */
+        ATTR_COLOR(L"colorBorderHover", m_colors.m_crBorder[1], TRUE)        /**< Hover border color */
+        ATTR_COLOR(L"colorBorderPush", m_colors.m_crBorder[2], TRUE)         /**< Pushed border color */
+        ATTR_COLOR(L"colorBorderDisable", m_colors.m_crBorder[3], TRUE)      /**< Disabled border color */
+        ATTR_COLOR(L"colorUp", m_colors.m_crUp[ST_NORMAL], TRUE)             /**< Normal up color */
+        ATTR_COLOR(L"colorDown", m_colors.m_crDown[ST_NORMAL], TRUE)         /**< Normal down color */
+        ATTR_COLOR(L"colorUpHover", m_colors.m_crUp[ST_HOVER], TRUE)         /**< Hover up color */
+        ATTR_COLOR(L"colorDownHover", m_colors.m_crDown[ST_HOVER], TRUE)     /**< Hover down color */
+        ATTR_COLOR(L"colorUpPush", m_colors.m_crUp[ST_PUSHDOWN], TRUE)       /**< Pushed up color */
+        ATTR_COLOR(L"colorDownPush", m_colors.m_crDown[ST_PUSHDOWN], TRUE)   /**< Pushed down color */
+        ATTR_COLOR(L"colorUpDisable", m_colors.m_crUp[ST_DISABLE], TRUE)     /**< Disabled up color */
+        ATTR_COLOR(L"colorDownDisable", m_colors.m_crDown[ST_DISABLE], TRUE) /**< Disabled down color */
+        ATTR_INT(L"cornerRadius", m_nCornerRadius, TRUE)                     /**< Corner radius */
+        ATTR_FLOAT(L"cornerPercent", m_fCornerPercent, TRUE)                 /**< Corner percentage (0.5 for semi-circle) */
     SOUI_ATTRS_END()
 };
 
@@ -509,14 +512,14 @@ class SOUI_EXP SSkinGradation : public SSkinObjBase {
     void _DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iState, BYTE byAlpha) const override;
 
   protected:
-    COLORREF m_crFrom; // Starting color of the gradient
-    COLORREF m_crTo;   // Ending color of the gradient
-    BOOL m_bVert;      // Flag to indicate if the gradient is vertical
+    COLORREF m_crFrom; /**< Starting color of the gradient */
+    COLORREF m_crTo;   /**< Ending color of the gradient */
+    BOOL m_bVert;      /**< Flag to indicate if the gradient is vertical */
 
     SOUI_ATTRS_BEGIN()
-        ATTR_COLOR(L"colorFrom", m_crFrom, TRUE) // Starting color of the gradient
-        ATTR_COLOR(L"colorTo", m_crTo, TRUE)     // Ending color of the gradient
-        ATTR_BOOL(L"vertical", m_bVert, TRUE)    // Gradient direction, 0--horizontal, 1--vertical (default)
+        ATTR_COLOR(L"colorFrom", m_crFrom, TRUE) /**< Starting color of the gradient */
+        ATTR_COLOR(L"colorTo", m_crTo, TRUE)     /**< Ending color of the gradient */
+        ATTR_BOOL(L"vertical", m_bVert, TRUE)    /**< Gradient direction, 0--horizontal, 1--vertical (default) */
     SOUI_ATTRS_END()
 };
 
@@ -534,14 +537,14 @@ class SOUI_EXP SGradientDesc {
     SGradientDesc();
 
   protected:
-    SAutoRefPtr<IGradient> m_gradient; // Pointer to the gradient object
-    SLayoutSize m_radius;              // Radius for radial gradients
-    float m_ratio_radius;              // Ratio radius for radial gradients
-    GradientType m_type;               // Type of gradient (linear, radial, sweep)
-    float m_angle;                     // Angle for linear gradients
-    float m_centerX;                   // Center X for radial and sweep gradients
-    float m_centerY;                   // Center Y for radial and sweep gradients
-    float m_startAngle;                // start angle for sweep gradients.
+    SAutoRefPtr<IGradient> m_gradient; /**< Pointer to the gradient object */
+    SLayoutSize m_radius;              /**< Radius for radial gradients */
+    float m_ratio_radius;              /**< Ratio radius for radial gradients */
+    GradientType m_type;               /**< Type of gradient (linear, radial, sweep) */
+    float m_angle;                     /**< Angle for linear gradients */
+    float m_centerX;                   /**< Center X for radial and sweep gradients */
+    float m_centerY;                   /**< Center Y for radial and sweep gradients */
+    float m_startAngle;                /**< start angle for sweep gradients. */
 
   public:
     /**
@@ -622,8 +625,8 @@ class SOUI_EXP SSkinGradation2
     void _DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iState, BYTE byAlpha) const override;
 
   protected:
-    SPoint m_ptCorner;         // Corner point for gradient
-    SLayoutSize m_szCorner[2]; // Corner sizes
+    SPoint m_ptCorner;         /**< Corner point for gradient */
+    SLayoutSize m_szCorner[2]; /**< Corner sizes */
 
   public:
     SOUI_ATTRS_BEGIN()
@@ -641,11 +644,11 @@ class SOUI_EXP SSkinGradation2
  */
 enum SBSTATE
 {
-    SBST_NORMAL = 0, // Normal state
-    SBST_HOVER,      // Hover state
-    SBST_PUSHDOWN,   // Pushed down state
-    SBST_DISABLE,    // Disabled state
-    SBST_INACTIVE,   // Inactive state, mainly for arrow heads
+    SBST_NORMAL = 0, /**< Normal state */
+    SBST_HOVER,      /**< Hover state */
+    SBST_PUSHDOWN,   /**< Pushed down state */
+    SBST_DISABLE,    /**< Disabled state */
+    SBST_INACTIVE,   /**< Inactive state, mainly for arrow heads */
 };
 
 /**
@@ -667,7 +670,7 @@ enum SBSTATE
  * @def        SB_THUMBGRIPPER
  * @brief      Constant for scrollbar thumb gripper.
  */
-#define SB_THUMBGRIPPER 11 // Scrollbar thumb gripper
+#define SB_THUMBGRIPPER 11 /**< Scrollbar thumb gripper */
 
 /**
  * @def        THUMB_MINSIZE
@@ -744,18 +747,18 @@ class SOUI_EXP SSkinScrollbar : public SSkinImgList {
     void _Scale(ISkinObj *skinObj, int nScale) override;
 
   protected:
-    int m_nMargin;       // Margin size
-    BOOL m_bHasGripper;  // Flag to indicate if the thumb has a gripper
-    BOOL m_bHasInactive; // Flag to indicate if there is an inactive state for arrow heads
+    int m_nMargin;       /**< Margin size */
+    BOOL m_bHasGripper;  /**< Flag to indicate if the thumb has a gripper */
+    BOOL m_bHasInactive; /**< Flag to indicate if there is an inactive state for arrow heads */
 
     SOUI_ATTRS_BEGIN()
-        ATTR_INT(L"margin", m_nMargin, FALSE)           // Edge stretch size
-        ATTR_INT(L"hasGripper", m_bHasGripper, FALSE)   // Thumb has gripper
-        ATTR_INT(L"hasInactive", m_bHasInactive, FALSE) // Has inactive state
+        ATTR_INT(L"margin", m_nMargin, FALSE)           /**< Edge stretch size */
+        ATTR_INT(L"hasGripper", m_bHasGripper, FALSE)   /**< Thumb has gripper */
+        ATTR_INT(L"hasInactive", m_bHasInactive, FALSE) /**< Has inactive state */
     SOUI_ATTRS_END()
 };
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 /**
  * @class      SSkinColorRect
  * @brief      Color Rectangle Skin
@@ -800,28 +803,28 @@ class SOUI_EXP SSkinColorRect : public SSkinObjBase {
     void _DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iState, BYTE byAlpha) const override;
 
   protected:
-    int m_nRadius;          // Corner radius
-    float m_fCornerPercent; // Corner percentage (0.5 for semi-circle)
+    int m_nRadius;          /**< Corner radius */
+    float m_fCornerPercent; /**< Corner percentage (0.5 for semi-circle) */
 
-    COLORREF m_crStates[4];  // Colors for different states
-    COLORREF m_crBorders[4]; // Border colors for different states
-    int m_nBorderWidth;      // Border width
+    COLORREF m_crStates[4];  /**< Colors for different states */
+    COLORREF m_crBorders[4]; /**< Border colors for different states */
+    int m_nBorderWidth;      /**< Border width */
 
     SOUI_ATTRS_BEGIN()
-        ATTR_COLOR(L"normal", m_crStates[0], FALSE)           // Normal state color
-        ATTR_COLOR(L"hover", m_crStates[1], FALSE)            // Hover state color
-        ATTR_COLOR(L"pushdown", m_crStates[2], FALSE)         // Pushed down state color
-        ATTR_COLOR(L"disable", m_crStates[3], FALSE)          // Disabled state color
-        ATTR_COLOR(L"normalBorder", m_crBorders[0], FALSE)    // Normal state border color
-        ATTR_COLOR(L"hoverBorder", m_crBorders[1], FALSE)     // Hover state border color
-        ATTR_COLOR(L"pushdownBorder", m_crBorders[2], FALSE)  // Pushed down state border color
-        ATTR_COLOR(L"disableBorder", m_crBorders[3], FALSE)   // Disabled state border color
-        ATTR_INT(L"borderWidth", m_nBorderWidth, FALSE)       // Border width
-        ATTR_INT(L"cornerRadius", m_nRadius, FALSE)           // Corner radius
-        ATTR_FLOAT(L"cornerPercent", m_fCornerPercent, FALSE) // Corner percentage (0.5 for semi-circle)
+        ATTR_COLOR(L"normal", m_crStates[0], FALSE)           /**< Normal state color */
+        ATTR_COLOR(L"hover", m_crStates[1], FALSE)            /**< Hover state color */
+        ATTR_COLOR(L"pushdown", m_crStates[2], FALSE)         /**< Pushed down state color */
+        ATTR_COLOR(L"disable", m_crStates[3], FALSE)          /**< Disabled state color */
+        ATTR_COLOR(L"normalBorder", m_crBorders[0], FALSE)    /**< Normal state border color */
+        ATTR_COLOR(L"hoverBorder", m_crBorders[1], FALSE)     /**< Hover state border color */
+        ATTR_COLOR(L"pushdownBorder", m_crBorders[2], FALSE)  /**< Pushed down state border color */
+        ATTR_COLOR(L"disableBorder", m_crBorders[3], FALSE)   /**< Disabled state border color */
+        ATTR_INT(L"borderWidth", m_nBorderWidth, FALSE)       /**< Border width */
+        ATTR_INT(L"cornerRadius", m_nRadius, FALSE)           /**< Corner radius */
+        ATTR_FLOAT(L"cornerPercent", m_fCornerPercent, FALSE) /**< Corner percentage (0.5 for semi-circle) */
     SOUI_ATTRS_END()
 };
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 
 class SOUI_EXP SSkinShape : public SSkinObjBase {
     DEF_SOBJECT(SSkinObjBase, L"shape")
@@ -852,7 +855,7 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
         }
 
         SOUI_ATTRS_BEGIN()
-            ATTR_COLOR(L"color", m_crSolid, TRUE) // Solid color
+            ATTR_COLOR(L"color", m_crSolid, TRUE) /**< Solid color */
         SOUI_ATTRS_END()
 
         /**
@@ -864,7 +867,7 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
         IBrushS *CreateBrush(IRenderTarget *pRT, BYTE byAlpha);
 
       protected:
-        COLORREF m_crSolid; // Solid color
+        COLORREF m_crSolid; /**< Solid color */
     };
 
     /**
@@ -887,7 +890,7 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
         }
 
         SOUI_ATTRS_BEGIN()
-            ATTR_IMAGEAUTOREF(L"src", m_pImg, TRUE) // Bitmap source
+            ATTR_IMAGEAUTOREF(L"src", m_pImg, TRUE) /**< Bitmap source */
             ATTR_ENUM_BEGIN(L"tileX", TileMode, TRUE)
                 ATTR_ENUM_VALUE(L"clamp", kClamp_TileMode)
                 ATTR_ENUM_VALUE(L"repeat", kRepeat_TileMode)
@@ -909,8 +912,8 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
         IBrushS *CreateBrush(IRenderTarget *pRT, BYTE byAlpha);
 
       protected:
-        SAutoRefPtr<IBitmapS> m_pImg; // Bitmap source
-        TileMode m_tileX, m_tileY;    // Tiling modes for X and Y
+        SAutoRefPtr<IBitmapS> m_pImg; /**< Bitmap source */
+        TileMode m_tileX, m_tileY;    /**< Tiling modes for X and Y */
     };
 
     /**
@@ -971,8 +974,8 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
         SStroke();
 
         SOUI_ATTRS_BEGIN()
-            ATTR_LAYOUTSIZE(L"width", m_width, TRUE) // Stroke width
-            ATTR_COLOR(L"color", m_color, TRUE)      // Stroke color
+            ATTR_LAYOUTSIZE(L"width", m_width, TRUE) /**< Stroke width */
+            ATTR_COLOR(L"color", m_color, TRUE)      /**< Stroke color */
             ATTR_ENUM_BEGIN(L"style", int, TRUE)
                 ATTR_ENUM_VALUE(L"solid", PS_SOLID)
                 ATTR_ENUM_VALUE(L"dash", PS_DASH)
@@ -992,8 +995,8 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
         SOUI_ATTRS_END()
 
       public:
-        SLayoutSize m_width; // Stroke width
-        COLORREF m_color;    // Stroke color
+        SLayoutSize m_width; /**< Stroke width */
+        COLORREF m_color;    /**< Stroke color */
 
         /**
          * @brief Gets the style of the stroke.
@@ -1002,9 +1005,9 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
         int GetStyle() const;
 
       private:
-        int m_style;     // Line style
-        int m_endStyle;  // End cap style
-        int m_joinStyle; // Join style
+        int m_style;     /**< Line style */
+        int m_endStyle;  /**< End cap style */
+        int m_joinStyle; /**< Join style */
     };
 
     /**
@@ -1027,9 +1030,9 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
         HRESULT OnAttrRadius(const SStringW strValue, BOOL bLoading);
 
         SOUI_ATTRS_BEGIN()
-            ATTR_CUSTOM(L"radius", OnAttrRadius)         // Custom handling for 'radius' attribute.
-            ATTR_LAYOUTSIZE(L"radiusX", m_radiusX, TRUE) // X-axis radius.
-            ATTR_LAYOUTSIZE(L"radiusY", m_radiusY, TRUE) // Y-axis radius.
+            ATTR_CUSTOM(L"radius", OnAttrRadius)         /**< Custom handling for 'radius' attribute. */
+            ATTR_LAYOUTSIZE(L"radiusX", m_radiusX, TRUE) /**< X-axis radius. */
+            ATTR_LAYOUTSIZE(L"radiusY", m_radiusY, TRUE) /**< Y-axis radius. */
         SOUI_ATTRS_END()
 
         /**
@@ -1043,7 +1046,7 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
         }
 
       protected:
-        SLayoutSize m_radiusX, m_radiusY; // Layout sizes for X and Y radii.
+        SLayoutSize m_radiusX, m_radiusY; /**< Layout sizes for X and Y radii. */
     };
 
     /**
@@ -1074,9 +1077,9 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
         HRESULT OnAttrRadius(const SStringW strValue, BOOL bLoading);
 
         SOUI_ATTRS_BEGIN()
-            ATTR_CUSTOM(L"radius", OnAttrRadius)      // Custom handling for 'radius' attribute.
-            ATTR_FLOAT(L"radiusX", m_radius.fX, TRUE) // Ratio for X-axis radius.
-            ATTR_FLOAT(L"radiusY", m_radius.fY, TRUE) // Ratio for Y-axis radius.
+            ATTR_CUSTOM(L"radius", OnAttrRadius)      /**< Custom handling for 'radius' attribute. */
+            ATTR_FLOAT(L"radiusX", m_radius.fX, TRUE) /**< Ratio for X-axis radius. */
+            ATTR_FLOAT(L"radiusY", m_radius.fY, TRUE) /**< Ratio for Y-axis radius. */
         SOUI_ATTRS_END()
 
         /**
@@ -1090,7 +1093,7 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
         }
 
       protected:
-        SPoint m_radius; // Ratios for X and Y radii, ranging from [0,1].
+        SPoint m_radius; /**< Ratios for X and Y radii, ranging from [0,1]. */
     };
     /**
      * @class SShapeSize
@@ -1104,11 +1107,11 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
 
       public:
         SOUI_ATTRS_BEGIN()
-            ATTR_LAYOUTSIZE(L"width", m_width, TRUE)   // Width of the shape.
-            ATTR_LAYOUTSIZE(L"height", m_height, TRUE) // Height of the shape.
+            ATTR_LAYOUTSIZE(L"width", m_width, TRUE)   /**< Width of the shape. */
+            ATTR_LAYOUTSIZE(L"height", m_height, TRUE) /**< Height of the shape. */
         SOUI_ATTRS_END()
       protected:
-        SLayoutSize m_width, m_height; // Layout sizes for width and height.
+        SLayoutSize m_width, m_height; /**< Layout sizes for width and height. */
     };
 
     /**
@@ -1132,13 +1135,13 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
         }
 
         SOUI_ATTRS_BEGIN()
-            ATTR_FLOAT(L"startAngle", m_startAngle, TRUE) // Start angle of the ring.
-            ATTR_FLOAT(L"sweepAngle", m_sweepAngle, TRUE) // Sweep angle of the ring.
+            ATTR_FLOAT(L"startAngle", m_startAngle, TRUE) /**< Start angle of the ring. */
+            ATTR_FLOAT(L"sweepAngle", m_sweepAngle, TRUE) /**< Sweep angle of the ring. */
         SOUI_ATTRS_END()
 
       protected:
-        float m_startAngle; // Start angle for the ring.
-        float m_sweepAngle; // Sweep angle for the ring.
+        float m_startAngle; /**< Start angle for the ring. */
+        float m_sweepAngle; /**< Sweep angle for the ring. */
     };
 
     class SShapePolygon : public TObjRefImpl<SObject> {
@@ -1151,7 +1154,7 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
 
       public:
         SOUI_ATTRS_BEGIN()
-            ATTR_BOOL(L"close", m_bClosed, TRUE) // Close the polygon.
+            ATTR_BOOL(L"close", m_bClosed, TRUE) /**< Close the polygon. */
         SOUI_ATTRS_END()
 
         SShapePolygon()
@@ -1173,7 +1176,7 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
         STDMETHOD_(void, OnInitFinished)(THIS_ IXmlNode *pNode) OVERRIDE;
 
       protected:
-        int m_ptCount; // Number of points in the polygon.
+        int m_ptCount; /**< Number of points in the polygon. */
         SPoint m_points[MAX_POINTS];
         BOOL m_bClosed;
     };
@@ -1203,19 +1206,19 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
         STDMETHOD_(void, OnInitFinished)(THIS_ IXmlNode *pNode) OVERRIDE;
 
         SOUI_ATTRS_BEGIN()
-            ATTR_FLOAT(L"dx", m_dx, TRUE)         // Horizontal shadow offset
-            ATTR_FLOAT(L"dy", m_dy, TRUE)         // Vertical shadow offset
-            ATTR_FLOAT(L"sigmaX", m_sigmaX, TRUE) // Horizontal blur radius
-            ATTR_FLOAT(L"sigmaY", m_sigmaY, TRUE) // Vertical blur radius
-            ATTR_COLOR(L"color", m_color, TRUE)   // Shadow color
+            ATTR_FLOAT(L"dx", m_dx, TRUE)         /**< Horizontal shadow offset */
+            ATTR_FLOAT(L"dy", m_dy, TRUE)         /**< Vertical shadow offset */
+            ATTR_FLOAT(L"sigmaX", m_sigmaX, TRUE) /**< Horizontal blur radius */
+            ATTR_FLOAT(L"sigmaY", m_sigmaY, TRUE) /**< Vertical blur radius */
+            ATTR_COLOR(L"color", m_color, TRUE)   /**< Shadow color */
         SOUI_ATTRS_END()
 
       protected:
-        float m_dx;       // Horizontal shadow offset
-        float m_dy;       // Vertical shadow offset
-        float m_sigmaX;   // Horizontal blur radius
-        float m_sigmaY;   // Vertical blur radius
-        COLORREF m_color; // Shadow color
+        float m_dx;       /**< Horizontal shadow offset */
+        float m_dy;       /**< Vertical shadow offset */
+        float m_sigmaX;   /**< Horizontal blur radius */
+        float m_sigmaY;   /**< Vertical blur radius */
+        COLORREF m_color; /**< Shadow color */
         SAutoRefPtr<IImageFilter> m_filter;
     };
 
@@ -1241,13 +1244,13 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
         }
         STDMETHOD_(void, OnInitFinished)(THIS_ IXmlNode *pNode) OVERRIDE;
         SOUI_ATTRS_BEGIN()
-            ATTR_FLOAT(L"sigmaX", m_sigmaX, TRUE) // Horizontal blur radius
-            ATTR_FLOAT(L"sigmaY", m_sigmaY, TRUE) // Vertical blur radius
+            ATTR_FLOAT(L"sigmaX", m_sigmaX, TRUE) /**< Horizontal blur radius */
+            ATTR_FLOAT(L"sigmaY", m_sigmaY, TRUE) /**< Vertical blur radius */
         SOUI_ATTRS_END()
 
       protected:
-        float m_sigmaX; // Horizontal blur radius
-        float m_sigmaY; // Vertical blur radius
+        float m_sigmaX; /**< Horizontal blur radius */
+        float m_sigmaY; /**< Vertical blur radius */
         SAutoRefPtr<IImageFilter> m_filter;
     };
 
@@ -1317,10 +1320,10 @@ class SOUI_EXP SSKinGroup : public SSkinObjBase {
     STDMETHOD_(int, GetStates)(CTHIS) SCONST OVERRIDE;
 
     SOUI_ATTRS_BEGIN()
-        ATTR_SKIN(L"normal", m_skins[0], FALSE)   // Normal state skin.
-        ATTR_SKIN(L"hover", m_skins[1], FALSE)    // Hover state skin.
-        ATTR_SKIN(L"pushDown", m_skins[2], FALSE) // Pushdown state skin.
-        ATTR_SKIN(L"disable", m_skins[3], FALSE)  // Disabled state skin.
+        ATTR_SKIN(L"normal", m_skins[0], FALSE)   /**< Normal state skin. */
+        ATTR_SKIN(L"hover", m_skins[1], FALSE)    /**< Hover state skin. */
+        ATTR_SKIN(L"pushDown", m_skins[2], FALSE) /**< Pushdown state skin. */
+        ATTR_SKIN(L"disable", m_skins[3], FALSE)  /**< Disabled state skin. */
     SOUI_ATTRS_END()
 
   protected:
@@ -1341,7 +1344,7 @@ class SOUI_EXP SSKinGroup : public SSkinObjBase {
     void _Scale(ISkinObj *skinObj, int nScale) override;
 
   protected:
-    SAutoRefPtr<ISkinObj> m_skins[4]; // Array of skins for different states.
+    SAutoRefPtr<ISkinObj> m_skins[4]; /**< Array of skins for different states. */
 };
 
 /**
@@ -1390,7 +1393,7 @@ class SOUI_EXP SSKinGroup2 : public SSkinObjBase {
     void _Scale(ISkinObj *skinObj, int nScale) override;
 
   protected:
-    SArray<SAutoRefPtr<ISkinObj> > m_skins; // Array of skins for different states.
+    SArray<SAutoRefPtr<ISkinObj>> m_skins; /**< Array of skins for different states. */
 };
 
 /**
@@ -1439,18 +1442,18 @@ class SOUI_EXP SSkinTreeLines : public SSkinObjBase {
     void _Scale(ISkinObj *skinObj, int nScale) override;
 
   protected:
-    COLORREF m_crLine;  // Line color
-    COLORREF m_crCross; // Cross color for expand/collapse indicators
-    int m_nLineWidth;   // Line width
-    int m_nBoxSize;     // Size of the expand/collapse box
+    COLORREF m_crLine;  /**< Line color */
+    COLORREF m_crCross; /**< Cross color for expand/collapse indicators */
+    int m_nLineWidth;   /**< Line width */
+    int m_nBoxSize;     /**< Size of the expand/collapse box */
   public:
     SOUI_ATTRS_BEGIN()
-        ATTR_COLOR(L"colorLine", m_crLine, TRUE) // Line color
+        ATTR_COLOR(L"colorLine", m_crLine, TRUE) /**< Line color */
         ATTR_COLOR(L"colorCross", m_crCross, TRUE)
-        ATTR_INT(L"lineWidth", m_nLineWidth, TRUE) // Line width
-        ATTR_INT(L"boxSize", m_nBoxSize, TRUE)     // Expand/collapse box size)
+        ATTR_INT(L"lineWidth", m_nLineWidth, TRUE) /**< Line width */
+        ATTR_INT(L"boxSize", m_nBoxSize, TRUE)     /**< Expand/collapse box size) */
     SOUI_ATTRS_END()
 };
 
 SNSEND
-#endif // __SSKIN__H__
+#endif /**< __SSKIN__H__ */

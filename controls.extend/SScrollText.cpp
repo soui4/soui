@@ -8,6 +8,7 @@ SScrollText::SScrollText(void)
     , m_nOffset(0)
     , m_nScrollWidth(0)
     , m_nRollType(0)
+    , m_nNextInterval(0)
 {
 }
 

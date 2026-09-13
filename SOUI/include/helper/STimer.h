@@ -8,41 +8,41 @@ SNSBEGIN
 
 /**
  * @class STimer
- * @brief 定时器类
+ * @brief Timer class
  */
 class SOUI_EXP STimer : public TObjRefImpl<ITimer> {
   public:
     /**
-     * @brief 构造函数
-     * @param pSlot 事件槽对象指针
+     * @brief Constructor
+     * @param pSlot Pointer to event slot object
      */
     STimer(IEvtSlot *pSlot);
 
     /**
-     * @brief 析构函数
+     * @brief Destructor
      */
     ~STimer(void);
 
   public:
     /**
-     * @brief 启动定时器
-     * @param nElapse 定时器间隔时间（毫秒）
-     * @param bRepeat 是否重复定时器
-     * @param uData 用户数据（默认为0）
-     * @return 如果成功启动定时器返回TRUE，否则返回FALSE
+     * @brief Start the timer
+     * @param nElapse Timer interval (milliseconds)
+     * @param bRepeat Whether the timer repeats
+     * @param uData User data (default is 0)
+     * @return Returns TRUE if the timer started successfully, otherwise FALSE
      */
     STDMETHOD_(BOOL, StartTimer)(THIS_ int nElapse, BOOL bRepeat, LPARAM uData DEF_VAL(0)) OVERRIDE;
 
     /**
-     * @brief 停止定时器
+     * @brief Stop the timer
      */
     STDMETHOD_(void, KillTimer)(THIS) OVERRIDE;
 
   private:
-    UINT m_uTimerId;                 // 定时器ID
-    SAutoRefPtr<IEvtSlot> m_evtSlot; // 事件槽对象指针
+    UINT m_uTimerId;                 /**< Timer ID */
+    SAutoRefPtr<IEvtSlot> m_evtSlot; /**< Pointer to event slot object */
 };
 
 SNSEND
 
-#endif // __STIMER__H__
+#endif /**< __STIMER__H__ */

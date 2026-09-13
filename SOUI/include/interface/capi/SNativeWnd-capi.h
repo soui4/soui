@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for SNativeWnd Interface
  * These macros provide C-style function call syntax for C++ interface methods
  *
@@ -15,7 +15,7 @@ extern "C" {
  *   INativeWnd (inherits IObjRef)
  */
 
-/* INativeWnd C API Macros (IObjRef base interface) */
+/** INativeWnd C API Macros (IObjRef base interface) */
 #define INativeWnd_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -25,7 +25,7 @@ extern "C" {
 #define INativeWnd_OnFinalRelease(This) \
     ((This)->lpVtbl->OnFinalRelease(This))
 
-/* INativeWnd specific interface macros */
+/** INativeWnd specific interface macros */
 #define INativeWnd_CreateNative(This, lpWindowName, dwStyle, dwExStyle, x, y, nWidth, nHeight, hWndParent, nID, lpParam) \
     ((This)->lpVtbl->CreateNative(This, lpWindowName, dwStyle, dwExStyle, x, y, nWidth, nHeight, hWndParent, nID, lpParam))
 
@@ -204,4 +204,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SNATIVEWND_CAPI_H__ */
+#endif /**< __SNATIVEWND_CAPI_H__ */

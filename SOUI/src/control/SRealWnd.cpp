@@ -111,7 +111,7 @@ BOOL SRealWnd::InitFromXml(IXmlNode *pNode)
     return bRet;
 }
 
-HWND SRealWnd::GetRealHwnd(BOOL bAutoCreate /*=TRUE*/)
+HWND SRealWnd::GetRealHwnd(BOOL bAutoCreate /**< =TRUE */)
 {
     if (!bAutoCreate)
         return m_hRealWnd;

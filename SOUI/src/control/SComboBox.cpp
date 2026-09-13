@@ -3,7 +3,7 @@
 
 SNSBEGIN
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 SComboBox::SComboBox()
     : m_pListBox(NULL)
 {
@@ -21,7 +21,7 @@ SComboBox::~SComboBox()
 
 BOOL SComboBox::CreateListBox(SXmlNode xmlNode)
 {
-    //创建列表控件
+    // Create list control
     SXmlNode listStyle = xmlNode.child(SComboBox_style::kStyle_listStyle);
     SStringW strListClass = listStyle.attribute(SComboBox_style::kStyle_wndclass).as_string(SListBox::GetClassName());
     SListBox *pListBox = sobj_cast<SListBox>(CreateChildByName(strListClass));
@@ -32,7 +32,8 @@ BOOL SComboBox::CreateListBox(SXmlNode xmlNode)
     m_pListBox->SetContainer(GetContainer());
     if (listStyle)
         m_pListBox->InitFromXml(&listStyle);
-    else {
+    else
+    {
         m_pListBox->GetStyle().m_crBg = GETCOLOR(SNamedColor::THEME_COLOR);
         m_pListBox->GetStyle().m_crBorder = GETCOLOR(SNamedColor::THEME_BORDER);
         m_pListBox->SetAttribute(L"margin", L"1,1,1,1");
@@ -44,7 +45,7 @@ BOOL SComboBox::CreateListBox(SXmlNode xmlNode)
     m_pListBox->SetID(IDC_DROPDOWN_LIST);
     m_pListBox->SSendMessage(UM_SETSCALE, GetScale());
     m_pListBox->SSendMessage(WM_CREATE);
-    //初始化列表数据
+    // Initialize list data
     SXmlNode xmlNode_Items = xmlNode.child(SComboBox_style::kStyle_items);
     if (xmlNode_Items)
     {

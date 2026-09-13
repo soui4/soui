@@ -643,7 +643,7 @@ HRESULT SRenderTarget_Skia::GetClipRegion(IRegionS **ppRegion)
 
 HRESULT SRenderTarget_Skia::GetClipBox(LPRECT prc)
 {
-    SkRect skrc;
+    SkRect skrc = { 0,0,0,0 };
     m_SkCanvas->getClipBounds(&skrc);
     // 需要将rect的viewOrg还原
     skrc.offset(-m_ptOrg);

@@ -1,10 +1,10 @@
-﻿// Change these values to use different versions
+﻿/** Change these values to use different versions */
 #ifndef WINVER
 #define WINVER       0x0500
-#endif // WINVER
+#endif /**< WINVER */
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0600
-#endif//_WIN32_WINNT
+#endif /**< _WIN32_WINNT */
 
 #ifndef _WIN32_IE
 #define _WIN32_IE 0x0601
@@ -16,14 +16,14 @@
 
 #ifndef _CRT_NON_CONFORMING_SWPRINTFS
 #define _CRT_NON_CONFORMING_SWPRINTFS
-#endif //_CRT_NON_CONFORMING_SWPRINTFS
+#endif /**< _CRT_NON_CONFORMING_SWPRINTFS */
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4661)
 #pragma warning(disable : 4251)
-#pragma warning(disable : 4100) // unreferenced formal parameter
+#pragma warning(disable : 4100) /**< unreferenced formal parameter */
 #pragma warning(disable : 4355)
-#endif//_MSC_VER
+#endif /**< _MSC_VER */
 
 #include <config.h>
 #include <soui-version.h>
@@ -37,11 +37,11 @@
 
 #ifdef _WIN32
 #include <commctrl.h>
-#include <Oleacc.h>	//IAccessible
+#include <Oleacc.h>	/**< IAccessible */
 #include <olectl.h>
 #include <shellapi.h>
 #pragma comment(lib,"shell32.lib")
-#endif//_WIN32
+#endif /**< _WIN32 */
 
 #include <utilities.h>
 #include <soui_exp.h>

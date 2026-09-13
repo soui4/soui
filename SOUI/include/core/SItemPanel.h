@@ -1,9 +1,9 @@
-﻿//////////////////////////////////////////////////////////////////////////
-//  Class Name: SOsrPanel
-// Description: A Framework wrapping frame to be used in a swindow.
-//     Creator: Huang Jianxiong
-//     Version: 2011.10.20 - 1.0 - Create
-//////////////////////////////////////////////////////////////////////////
+﻿///////////////////////////////////////////////////////////////////////
+/** Class Name: SOsrPanel */
+/** Description: A Framework wrapping frame to be used in a swindow. */
+/** Creator: Huang Jianxiong */
+/** Version: 2011.10.20 - 1.0 - Create */
+///////////////////////////////////////////////////////////////////////
 
 #ifndef __SITEMPANEL__H__
 #define __SITEMPANEL__H__
@@ -18,10 +18,9 @@ class SOsrPanel;
 
 struct IItemContainer
 {
-    virtual void OnItemSetCapture(SOsrPanel *pItem, BOOL bCapture) = 0; //设置or释放鼠标捕获
-    virtual BOOL OnItemGetRect(const SOsrPanel *pItem,
-                               CRect &rcItem) const = 0; //获得表项的显示位置
-    virtual BOOL IsItemRedrawDelay() const = 0;          //指示表项的更新方式
+    virtual void OnItemSetCapture(SOsrPanel *pItem, BOOL bCapture) = 0;          /**< Set or release mouse capture */
+    virtual BOOL OnItemGetRect(const SOsrPanel *pItem, CRect &rcItem) const = 0; /**< Get the display position of the table item */
+    virtual BOOL IsItemRedrawDelay() const = 0;                                  /**< Indicate the update mode of the table item */
     virtual BOOL IsTimelineEnabled() const = 0;
 };
 
@@ -83,6 +82,7 @@ class SHostProxy : public IHostProxy {
     {
         return m_pHost->GetTrCtx();
     }
+
   protected:
     SWindow *m_pHost;
 };
@@ -110,7 +110,7 @@ class SOUI_EXP SOsrPanel
     STDMETHOD_(void, OnFinalRelease)(THIS) OVERRIDE;
     STDMETHOD_(BOOL, InitFromXml)(THIS_ IXmlNode *pNode) OVERRIDE;
 
-  public: // SwndContainerImpl
+  public: /**< SwndContainerImpl */
     STDMETHOD_(BOOL, OnFireEvent)(IEvtArgs *evt) OVERRIDE;
 
     STDMETHOD_(void, GetContainerRect)(RECT *ret) const OVERRIDE;
@@ -150,7 +150,7 @@ class SOUI_EXP SOsrPanel
     STDMETHOD_(BOOL, IsTimelineEnabled)(CTHIS) SCONST OVERRIDE;
     STDMETHOD_(BOOL, IsDesignerMode)(CTHIS) SCONST OVERRIDE;
 
-  public: // SWindow
+  public: /**< SWindow */
     virtual LRESULT DoFrameEvent(UINT uMsg, WPARAM wParam, LPARAM lParam);
     virtual void ModifyItemState(DWORD dwStateAdd, DWORD dwStateRemove);
 
@@ -167,7 +167,7 @@ class SOUI_EXP SOsrPanel
     CRect GetItemRect() const;
     void SetItemCapture(BOOL bCapture);
 
-    virtual BOOL CancelCaptureMode(int reason);  // 取消鼠标点击操作，chain到capture子控件
+    virtual BOOL CancelCaptureMode(int reason); /**< Cancel mouse click operation, chain to the captured child control */
 
   protected:
     void OnShowWindow(BOOL bShow, UINT nStatus);
@@ -280,4 +280,4 @@ class SOUI_EXP SItemPanel : public TOsrPanelProxy<IItemPanel> {
 };
 
 SNSEND
-#endif // __SITEMPANEL__H__
+#endif /**< __SITEMPANEL__H__ */

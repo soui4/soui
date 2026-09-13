@@ -5,7 +5,7 @@
 #include <control/STabCtrl.h>
 
 SNSBEGIN
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 
 SMessageBoxImpl::SMessageBoxImpl()
     : SHostDialog()
@@ -61,25 +61,25 @@ BOOL SMessageBoxImpl::OnSetIcon(UINT uType)
 
 struct MSGBTN_TEXT
 {
-    int nBtns; //按钮数,<=3
+    int nBtns; /**< Number of buttons, <= 3 */
     struct
     {
-        UINT uBtnID;      //按钮ID
-        WCHAR szText[20]; //按钮字符
+        UINT uBtnID;      /**< Button ID */
+        WCHAR szText[20]; /**< Button text */
     } btnInfo[3];
 };
 static const MSGBTN_TEXT g_msgBtnText[] = {
-    // MB_OK
+    /** MB_OK */
     { 1, { { IDOK, L"ok" }, { 0, L"" }, { 0, L"" } } },
-    // MB_OKCANCEL
+    /** MB_OKCANCEL */
     { 2, { { IDOK, L"ok" }, { IDCANCEL, L"cancel" }, { 0, L"" } } },
-    // MB_ABORTRETRYIGNORE
+    /** MB_ABORTRETRYIGNORE */
     { 3, { { IDABORT, L"abort" }, { IDRETRY, L"retry" }, { IDIGNORE, L"ignore" } } },
-    // MB_YESNOCANCEL
+    /** MB_YESNOCANCEL */
     { 3, { { IDYES, L"yes" }, { IDNO, L"no" }, { IDCANCEL, L"cancel" } } },
-    // MB_YESNO
+    /** MB_YESNO */
     { 2, { { IDYES, L"yes" }, { IDNO, L"no" }, { 0, L"" } } },
-    // MB_RETRYCANCEL
+    /** MB_RETRYCANCEL */
     { 2, { { IDRETRY, L"retry" }, { IDCANCEL, L"cancel" }, { 0, L"" } } }
 };
 
@@ -118,7 +118,7 @@ BOOL SMessageBoxImpl::OnInitDialog(HWND wnd, LPARAM lInitParam)
         if (strText.IsEmpty())
         {
             SStringW strBtnText = g_msgBtnText[uType].btnInfo[i].szText;
-            //先从模板中的buttonText节点里查按钮的文字
+            // First look up the button text from the buttonText node in the template
             SXmlNode nodeTxt = nodeBtnTxt.child(strBtnText);
             if (nodeTxt)
             {
@@ -127,7 +127,7 @@ BOOL SMessageBoxImpl::OnInitDialog(HWND wnd, LPARAM lInitParam)
                 strBtnText = GETSTRING(strBtnText);
                 strAccel = nodeTxt.attribute(L"accel").as_string();
             }
-            //从翻译引擎中翻译
+            // Translate via the translation engine
             strText = S_CW2T(GetRoot()->tr(strBtnText));
         }
         if (!strAccel.IsEmpty())
@@ -172,7 +172,7 @@ BOOL SMessageBoxImpl::OnInitDialog(HWND wnd, LPARAM lInitParam)
     return 0;
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 INT_PTR SMessageBox(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType)
 {
     SMessageBoxImpl msgBox;

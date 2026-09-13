@@ -218,7 +218,7 @@ class SOUI_EXP SFocusManager : public IAcceleratorMgr {
     void RestoreFocusedView();
 
   protected:
-    // IAcceleratorMgr
+    /** IAcceleratorMgr */
 
     /**
      * @brief    Registers a keyboard accelerator for a target
@@ -289,4 +289,4 @@ class SOUI_EXP SFocusManager : public IAcceleratorMgr {
 
 SNSEND
 
-#endif // __SFOCUSMANAGER__H__
+#endif /**< __SFOCUSMANAGER__H__ */

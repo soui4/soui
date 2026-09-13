@@ -1,7 +1,7 @@
 ﻿#include "souistd.h"
 #include "helper/SToolTip.h"
 #include "helper/slog.h"
-//增加对多显示器的支持
+/** Add support for multiple monitors */
 #define COMPILE_MULTIMON_STUBS
 #include <multimon.h>
 
@@ -198,7 +198,7 @@ void STipCtrl::ShowTip(BOOL bShow)
         GetWindowRect(&rcWnd);
         if (m_tipAlign == TA_AUTO)
         {
-            //增加对多显示器的支持
+            // Add support for multiple monitors
             HMONITOR hMonitor;
             MONITORINFO mi;
             hMonitor = MonitorFromRect(&rcWnd, MONITOR_DEFAULTTONEAREST);
@@ -206,11 +206,11 @@ void STipCtrl::ShowTip(BOOL bShow)
             GetMonitorInfo(hMonitor, &mi);
             int cx = mi.rcMonitor.right;
             int cy = mi.rcMonitor.bottom;
-            /*增加部分结束*/
+            // Addition section ends
 
             rcWnd.right = rcWnd.left + rcText.right + 2 * MARGIN_TIP;
             rcWnd.bottom = rcWnd.top + rcText.bottom + 2 * MARGIN_TIP;
-            //去掉下面这两行
+            // Remove the following two lines
             if (rcWnd.right > cx)
                 rcWnd.OffsetRect(cx - rcWnd.right, 0);
             if (rcWnd.bottom > cy)

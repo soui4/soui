@@ -1239,7 +1239,7 @@ LONG CTxtPtr::FindWordBreak(
 	LONG				cchChunk;
 	LONG				cchText = GetTextLength();
 	WCHAR				ch = GetChar();
-	WCHAR				pchBreakBuf[breakBufSize];
+	WCHAR				pchBreakBuf[breakBufSize] = {0};
 	LONG				cpSave = _cp;				// For calculating break pt
 	LONG				ichBreak;
 	WCHAR *				pBuf;

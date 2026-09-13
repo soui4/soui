@@ -7,7 +7,7 @@ SNSBEGIN
 
 enum
 {
-    ROOT_ID = -100, // The ID of the root window
+    ROOT_ID = -100, /**< The ID of the root window */
 };
 
 enum
@@ -28,9 +28,9 @@ enum AniState
 
 class SHostWnd;
 class SOUI_EXP SRootWindow : public SWindow {
-    // DEF_SOBJECT macro defines the type name of the class
+    /** DEF_SOBJECT macro defines the type name of the class */
     DEF_SOBJECT(SWindow, L"root")
-    // Declare SHostWnd as a friend class to allow access to private members
+    /** Declare SHostWnd as a friend class to allow access to private members */
     friend class SHostWnd;
 
   public:
@@ -87,6 +87,7 @@ class SOUI_EXP SRootWindow : public SWindow {
     {
         return ROOT_ID;
     }
+
   protected:
     /**
      * @brief Called when an animation stops.
@@ -104,7 +105,7 @@ class SOUI_EXP SRootWindow : public SWindow {
      */
     virtual void OnAnimationInvalidate(bool bErase);
 
-  protected: // SWindow virtual methods
+  protected: /**< SWindow virtual methods */
     /**
      * @brief Called before painting the window.
      *
@@ -159,17 +160,17 @@ class SOUI_EXP SRootWindow : public SWindow {
     virtual void RequestRelayout(SWND hSource, BOOL bSourceResizable);
 
   public:
-    // Define attributes for enter and exit animations
+    /** Define attributes for enter and exit animations */
     SOUI_ATTRS_BEGIN()
         ATTR_ANIMATION(L"enterAnimation", m_aniEnter, FALSE)
         ATTR_ANIMATION(L"exitAnimation", m_aniExit, FALSE)
     SOUI_ATTRS_END()
 
   protected:
-    // Auto-managed pointers for enter and exit animations
+    /** Auto-managed pointers for enter and exit animations */
     SAutoRefPtr<IAnimation> m_aniEnter, m_aniExit;
-    // Pointer to the host window
+    /** Pointer to the host window */
     SHostWnd *m_pHostWnd;
 };
 SNSEND
-#endif//__ROOTROOTWINDOW__H__
+#endif /**< __ROOTROOTWINDOW__H__ */

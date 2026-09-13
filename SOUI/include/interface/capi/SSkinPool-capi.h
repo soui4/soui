@@ -7,12 +7,12 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for SSkinPool Interface
  * These macros provide C-style function call syntax for C++ interface methods
  */
 
-/* ISkinPool C API Macros (IObjRef base interface methods) */
+/** ISkinPool C API Macros (IObjRef base interface methods) */
 #define ISkinPool_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -22,7 +22,7 @@ extern "C" {
 #define ISkinPool_OnFinalRelease(This) \
     ((This)->lpVtbl->OnFinalRelease(This))
 
-/* ISkinPool C API Macros (ISkinPool specific methods) */
+/** ISkinPool C API Macros (ISkinPool specific methods) */
 #define ISkinPool_GetSkin(This, strSkinName, nScale) \
     ((This)->lpVtbl->GetSkin(This, strSkinName, nScale))
 
@@ -42,4 +42,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SSKINPOOL_CAPI_H__ */
+#endif /**< __SSKINPOOL_CAPI_H__ */

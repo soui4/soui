@@ -8,154 +8,151 @@ SNSBEGIN
 #define INTERFACE ITileViewItemLocator
 DECLARE_INTERFACE_(ITileViewItemLocator, IObjRef)
 {
-    //!添加引用
-    /*!
-     */
+    /** Add reference */
+    //
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
-    //!释放引用
-    /*!
-     */
+    /** Release reference */
+    //
     STDMETHOD_(long, Release)(THIS) PURE;
 
-    //!释放对象
-    /*!
-     */
+    /** Release object */
+    //
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
     //--------------------------------------------------
 
     /**
-     * @brief 设置关联的适配器
-     * @param pAdapter ILvAdapter *--适配器指针
+     * @brief Set the associated adapter
+     * @param pAdapter ILvAdapter *--Adapter pointer
      * @return void
      */
     STDMETHOD_(void, SetAdapter)(THIS_ ILvAdapter * pAdapter) PURE;
 
     /**
-     * @brief 数据集发生变化后的响应方法
+     * @brief Response method after the data set changes
      * @return
      */
     STDMETHOD_(void, OnDataSetChanged)(THIS) PURE;
 
     /**
-     * @brief 获取表项高度
-     * @param iItem int -- 表项索引
-     * @return int--表项高度
+     * @brief Get the item height
+     * @param iItem int -- Item index
+     * @return int--Item height
      */
     STDMETHOD_(int, GetItemHeight)(CTHIS_ int iItem) SCONST PURE;
 
     /**
-     * @brief 设定表项的高度
-     * @param iItem int--表项索引
-     * @param nHeight int--表项高度
+     * @brief Set the item height
+     * @param iItem int--Item index
+     * @param nHeight int--Item height
      * @return
      */
     STDMETHOD_(void, SetItemHeight)(THIS_ int iItem, int nHeight) PURE;
 
     /**
-     * @brief 获取表项的显示位置
-     * @param iItem int--表项索引
-     * @return RECT--表项显示矩形
-     * @remark 获取item的CRect(相对于TileView)
+     * @brief Get the item display position
+     * @param iItem int--Item index
+     * @return RECT--Item display rectangle
+     * @remark Get the CRect of the item (relative to TileView)
      */
     STDMETHOD_(RECT, GetItemRect)(THIS_ int iItem) PURE;
 
     /**
-     * @brief 设置TileView宽度
-     * @param width int--宽度
+     * @brief Set the TileView width
+     * @param width int--Width
      * @param bDpiAware BOOL--dpi aware flag
      * @return
-     * @remark 在TileView的OnSize中调用
+     * @remark Called in TileView's OnSize
      */
     STDMETHOD_(void, SetTileViewWidth)(THIS_ int width, BOOL bDpiAware) PURE;
 
     /**
-     * @brief 获取item的行、列位置
-     * @param iItem int--表项索引
-     * @param [out] row int*--行号
-     * @param [out] col int*--列号
+     * @brief Get the item's row and column position
+     * @param iItem int--Item index
+     * @param [out] row int*--Row number
+     * @param [out] col int*--Column number
      * @return
      */
     STDMETHOD_(void, GetItemRowAndColIndex)(THIS_ int iItem, int *row, int *col) PURE;
 
     /**
-     * @brief 是否为一行的最后一个元素
-     * @param iItem int--表项索引
-     * @return TRUE--是
+     * @brief Whether it is the last element of a row
+     * @param iItem int--Item index
+     * @return TRUE--Yes
      */
     STDMETHOD_(BOOL, IsLastInRow)(THIS_ int iItem) PURE;
 
     /**
-     * @brief 获取上一行，同一列的元素index
-     * @param iItem int--表项索引
-     * @return int--上一行，同一列的元素index
+     * @brief Get the index of the element in the previous row, same column
+     * @param iItem int--Item index
+     * @return int--Index of the element in the previous row, same column
      */
     STDMETHOD_(int, GetUpItem)(THIS_ int iItem) PURE;
 
     /**
-     * @brief 获取下一行，同一列的元素index
-     * @param iItem int--表项索引
-     * @return int--下一行，同一列的元素index
+     * @brief Get the index of the element in the next row, same column
+     * @param iItem int--Item index
+     * @return int--Index of the element in the next row, same column
      */
     STDMETHOD_(int, GetDownItem)(THIS_ int iItem) PURE;
 
     /**
-     * @brief 计算列表显示总高度
-     * @return int--列表显示总高度
+     * @brief Compute the total list display height
+     * @return int--Total list display height
      */
     STDMETHOD_(int, GetTotalHeight)(THIS) PURE;
 
     /**
-     * @brief 获取表项在滚动条上的Y位置
-     * @param iItem int--表项索引
-     * @return int--Y轴位置
+     * @brief Get the item's Y position on the scrollbar
+     * @param iItem int--Item index
+     * @return int--Y-axis position
      */
     STDMETHOD_(int, Item2Position)(THIS_ int iItem) PURE;
 
     /**
-     * @brief 将滚动条位置转换成表项索引
-     * @param position int--滚动条位置
-     * @return int--表项索引
+     * @brief Convert the scrollbar position to an item index
+     * @param position int--Scrollbar position
+     * @return int--Item index
      */
     STDMETHOD_(int, Position2Item)(THIS_ int position) PURE;
 
     /**
-     * @brief 获取行滚动高度
-     * @return int--行滚动高度
+     * @brief Get the row scroll height
+     * @return int--Row scroll height
      */
     STDMETHOD_(int, GetScrollLineSize)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 获取列表边距
-     * @return int--列表边距
+     * @brief Get the list margin
+     * @return int--List margin
      */
     STDMETHOD_(int, GetMarginSize)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 设置放大倍数
-     * @param scale int--放大倍数，以100为基数
+     * @brief Set the zoom factor
+     * @param scale int--Zoom factor, base is 100
      * @return
      */
     STDMETHOD_(int, SetScale)(THIS_ int scale) PURE;
 
     /**
-     * @brief 获取列数
-     * @return int--列数
+     * @brief Get the column count
+     * @return int--Column count
      */
     STDMETHOD_(int, GetCountInRow)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 获取行高
-     * @return int--行高
+     * @brief Get the row height
+     * @return int--Row height
      */
     STDMETHOD_(int, GetItemLineHeight)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 获取表项显示宽度
-     * @return int--表项显示宽度
+     * @brief Get the item display width
+     * @return int--Item display width
      */
     STDMETHOD_(int, GetItemWidth)(CTHIS) SCONST PURE;
 };
 
 SNSEND
-#endif // __STILEVIEWITEMLOCATOR_I__H__
+#endif /**< __STILEVIEWITEMLOCATOR_I__H__ */

@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-/* IObjRef base interface macros */
+/** IObjRef base interface macros */
 #define IMenu_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -17,7 +17,7 @@ extern "C" {
 #define IMenu_OnFinalRelease(This) \
     ((This)->lpVtbl->OnFinalRelease(This))
 
-/* IMenu specific interface macros */
+/** IMenu specific interface macros */
 #define IMenu_Attach(This, hMenu) \
     ((This)->lpVtbl->Attach(This, hMenu))
 
@@ -91,4 +91,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SMENU_CAPI_H__ */
+#endif /**< __SMENU_CAPI_H__ */

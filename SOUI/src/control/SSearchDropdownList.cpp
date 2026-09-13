@@ -18,7 +18,7 @@ class SDropdownList : public SDropDownWnd {
             return TRUE;
 
         if (pMsg->message == WM_MOUSEWHEEL || ((pMsg->message == WM_KEYDOWN || pMsg->message == WM_KEYUP) && (pMsg->wParam == VK_UP || pMsg->wParam == VK_DOWN || pMsg->wParam == VK_RETURN || pMsg->wParam == VK_ESCAPE)))
-        { // 截获滚轮及上下键消息
+        { // Intercept wheel and up/down key messages
             SNativeWnd::SendMessage(pMsg->message, pMsg->wParam, pMsg->lParam);
             return TRUE;
         }
@@ -83,7 +83,7 @@ void SSearchDropdownList::AdjustDropdownList()
     CRect rcPadding = m_pDropDownWnd->GetRoot()->GetStyle().GetPadding();
     CRect rcMargin = m_pDropDownWnd->GetRoot()->GetStyle().GetMargin();
     int nItemHeight = rcPadding.top + rcPadding.bottom + rcMargin.top + rcMargin.bottom;
-    // 如果没有设置padding和margin，则使用添加默认高度
+    // If padding and margin are not set, add the default height
     if (nItemHeight == 0)
     {
         nItemHeight = szBorder.toPixelSize(GetScale()) * 2;
@@ -211,7 +211,7 @@ BOOL SSearchDropdownList::FireEvent(IEvtArgs *evt)
 BOOL SSearchDropdownList::CreateListBox(SXmlNode xmlNode)
 {
     SASSERT(xmlNode);
-    //创建列表控件
+    // Create list control
     SXmlNode listStyle = xmlNode.child(SSearchDropdownList_style::kStyle_DropdownList);
     SStringW strListClass = listStyle.attribute(L"wndclass").as_string(SListView::GetClassName());
     SListView *pListBox = sobj_cast<SListView>(CreateChildByName(strListClass));
@@ -222,12 +222,13 @@ BOOL SSearchDropdownList::CreateListBox(SXmlNode xmlNode)
     m_pListBox->SetContainer(GetContainer());
     if (listStyle)
         m_pListBox->InitFromXml(&listStyle);
-    else {
+    else
+    {
         m_pListBox->GetStyle().m_crBg = GETCOLOR(SNamedColor::THEME_COLOR);
         m_pListBox->GetStyle().m_crBorder = GETCOLOR(SNamedColor::THEME_BORDER);
         m_pListBox->SetAttribute(L"margin", L"1,1,1,1");
         m_pListBox->SetAttribute(L"hotTrack", L"1", TRUE);
-    }    
+    }
     m_pListBox->SetAttribute(L"pos", L"0,0,-0,-0", TRUE);
     m_pListBox->SetOwner(this); // chain notify message to combobox
     m_pListBox->SetVisible(FALSE);
@@ -236,6 +237,6 @@ BOOL SSearchDropdownList::CreateListBox(SXmlNode xmlNode)
     return TRUE;
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 
 SNSEND

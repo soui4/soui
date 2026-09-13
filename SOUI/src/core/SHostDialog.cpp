@@ -70,7 +70,7 @@ INT_PTR SHostDialog::DoModal(HWND hParent, DWORD dwStyle, DWORD dwExStyle)
         }
 
         if (m_nRetCode == RC_INIT)
-        { //可能是程序中主动退出app，而不是自己EndDialog关闭窗口，重新把WM_QUIT放回消息队列。
+        { // Possibly the app actively exits in the program rather than closing the window via its own EndDialog; re-post WM_QUIT back into the message queue.
             parentMsgLoop->Quit(nRet);
         }
 

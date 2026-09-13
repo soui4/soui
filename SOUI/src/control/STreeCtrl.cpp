@@ -1,8 +1,8 @@
-﻿//////////////////////////////////////////////////////////////////////////
-//  Class Name: STreeCtrl
-//     Creator: JinHui
-//     Version: 2012.12.16 - 1.1 - Create
-//////////////////////////////////////////////////////////////////////////
+﻿///////////////////////////////////////////////////////////////////////
+/** Class Name: STreeCtrl */
+/** Creator: JinHui */
+/** Version: 2012.12.16 - 1.1 - Create */
+///////////////////////////////////////////////////////////////////////
 
 #include "souistd.h"
 #include "control/STreeCtrl.h"
@@ -51,7 +51,7 @@ STreeCtrl::~STreeCtrl()
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
 
 HSTREEITEM STreeCtrl::InsertItem(LPCTSTR lpszItem, HSTREEITEM hParent, HSTREEITEM hInsertAfter)
 {
@@ -103,7 +103,7 @@ BOOL STreeCtrl::RemoveItem(HSTREEITEM hItem)
 
     DeleteItem(hItem);
 
-    //去掉父节点的展开标志
+    // Remove the parent node's expand flag
     if (hParent && !GetChildItem(hParent))
     {
         LPTVITEM pParent = GetItem(hParent);
@@ -114,7 +114,7 @@ BOOL STreeCtrl::RemoveItem(HSTREEITEM hItem)
 
     if (m_bCheckBox && hParent)
     {
-        //如果父节点同为不选或全选，则不用改变状态，其他情况都需要重新判断
+        // If the parent node is also unselected or fully selected, no state change is needed; other cases require re-evaluation
         if (nCheckBoxValue != GetItem(hParent)->nCheckBoxValue || nCheckBoxValue == STVICheckBox_PartChecked)
             CheckState(hParent);
     }
@@ -123,7 +123,7 @@ BOOL STreeCtrl::RemoveItem(HSTREEITEM hItem)
     {
         m_nVisibleItems--;
 
-        //重新计算x最大尺寸
+        // Recalculate the maximum x size
         if (nItemWidth == m_nContentWidth)
             UpdateContentWidth();
 
@@ -158,7 +158,7 @@ HSTREEITEM STreeCtrl::GetPrevSiblingItem(HSTREEITEM hItem) const
     return CSTree<LPTVITEM>::GetPrevSiblingItem(hItem);
 }
 
-HSTREEITEM STreeCtrl::GetChildItem(HSTREEITEM hItem, BOOL bFirst /* =TRUE*/) const
+HSTREEITEM STreeCtrl::GetChildItem(HSTREEITEM hItem, BOOL bFirst /**< =TRUE */) const
 {
     return CSTree<LPTVITEM>::GetChildItem(hItem, bFirst);
 }
@@ -195,7 +195,7 @@ BOOL STreeCtrl::SetItemText(HSTREEITEM hItem, LPCTSTR lpszItem)
         if (pItem)
         {
             pItem->strText = lpszItem;
-            CalcItemContentWidth(pItem); //如果新的串比原来的长，没有重新计算就会出现...
+            CalcItemContentWidth(pItem); // If the new string is longer than the original, not recalculating will cause...
             return TRUE;
         }
     }
@@ -288,11 +288,11 @@ BOOL STreeCtrl::SetCheckState(HSTREEITEM hItem, BOOL bCheck)
     {
         pItem->nCheckBoxValue = nCheck;
 
-        //置子孙结点
+        // Set descendant nodes
         if (CSTree<LPTVITEM>::GetChildItem(hItem))
             SetChildrenState(hItem, nCheck);
 
-        //检查父结点状态
+        // Check parent node state
         CheckState(GetParentItem(hItem));
 
         Invalidate();
@@ -375,7 +375,7 @@ void STreeCtrl::PageDown()
     OnScroll(TRUE, SB_PAGEDOWN, 0);
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
 
 BOOL STreeCtrl::CreateChildren(SXmlNode xmlNode)
 {
@@ -470,7 +470,7 @@ HSTREEITEM STreeCtrl::InsertItem(LPTVITEM pItemObj, HSTREEITEM hParent, HSTREEIT
     return hRet;
 }
 
-HSTREEITEM STreeCtrl::InsertItem(SXmlNode xmlItem, HSTREEITEM hParent /*=STVI_ROOT*/, HSTREEITEM hInsertAfter /*=STVI_LAST*/)
+HSTREEITEM STreeCtrl::InsertItem(SXmlNode xmlItem, HSTREEITEM hParent /**< =STVI_ROOT */, HSTREEITEM hInsertAfter /**< =STVI_LAST */)
 {
     LPTVITEM pItemObj = new TVITEM();
 
@@ -515,7 +515,7 @@ void STreeCtrl::SetChildrenState(HSTREEITEM hItem, int nCheckValue)
     }
 }
 
-//子孙结点状态一致返回TRUE, 否则返回FALSE
+/** Return TRUE if descendant node states are consistent, otherwise return FALSE */
 BOOL STreeCtrl::CheckChildrenState(HSTREEITEM hItem, BOOL bCheck)
 {
     HSTREEITEM hChildItem = CSTree<LPTVITEM>::GetChildItem(hItem);
@@ -524,14 +524,14 @@ BOOL STreeCtrl::CheckChildrenState(HSTREEITEM hItem, BOOL bCheck)
         LPTVITEM pItem = CSTree<LPTVITEM>::GetItem(hChildItem);
 
         int nCheckValue = bCheck ? STVICheckBox_Checked : STVICheckBox_UnChecked;
-        //当前结点不一致立即返回
+        // Current node inconsistent, return immediately
         if (pItem->nCheckBoxValue != nCheckValue)
             return FALSE;
-        //检查子结点不一致立即返回
+        // Check child node inconsistent, return immediately
         else if (CheckChildrenState(hChildItem, bCheck) == FALSE)
             return FALSE;
 
-        //检查子结点兄弟结点
+        // Check child node sibling nodes
         hChildItem = CSTree<LPTVITEM>::GetNextSiblingItem(hChildItem);
     }
     return TRUE;
@@ -560,13 +560,13 @@ void STreeCtrl::CheckState(HSTREEITEM hItem)
                 bHasPartChecked = true;
 
             if (bHasPartChecked || (bHasUnChecked && bHasChecked))
-                break; //已确定半选，提前结束循环
+                break; // Half-selected already determined, end the loop early
             hChild = GetNextSiblingItem(hChild);
         }
 
-        if (bHasPartChecked || (bHasUnChecked && bHasChecked)) //子节点有半选，则父节点也要半选
+        if (bHasPartChecked || (bHasUnChecked && bHasChecked)) // If a child node is half-selected, the parent node must also be half-selected
             pItem->nCheckBoxValue = STVICheckBox_PartChecked;
-        else if (bHasChecked && !bHasUnChecked) //子节点都是全选，则父节点也是全选
+        else if (bHasChecked && !bHasUnChecked) // If all child nodes are fully selected, the parent node is also fully selected
             pItem->nCheckBoxValue = STVICheckBox_Checked;
 
         if (pItem->nCheckBoxValue != nOldState)
@@ -585,7 +585,7 @@ void STreeCtrl::ItemLayout()
     m_rcIcon.SetRect(0, 0, 0, 0);
 
     int nItemHei = m_nItemHei.toPixelSize(GetScale());
-    //计算位置
+    // Compute position
     if (m_pToggleSkin || m_bHasLines)
     {
         m_uItemMask |= STVIMask_Toggle;
@@ -680,7 +680,7 @@ int STreeCtrl::GetItemShowIndex(HSTREEITEM hItemObj)
             return iVisible;
         }
         if (pItem->bCollapsed)
-        { //跳过被折叠的项
+        { // Skip collapsed items
             HSTREEITEM hChild = GetChildItem(hItem, FALSE);
             while (hChild)
             {
@@ -721,7 +721,7 @@ BOOL STreeCtrl::GetItemRect(LPTVITEM pItemObj, CRect &rcItem)
             return TRUE;
         }
         if (pItem->bCollapsed)
-        { //跳过被折叠的项
+        { // Skip collapsed items
             HSTREEITEM hChild = GetChildItem(hItem, FALSE);
             while (hChild)
             {
@@ -734,7 +734,7 @@ BOOL STreeCtrl::GetItemRect(LPTVITEM pItemObj, CRect &rcItem)
     return FALSE;
 }
 
-//自动修改pt的位置为相对当前项的偏移量
+/** Automatically modify pt's position to an offset relative to the current item */
 HSTREEITEM STreeCtrl::HitTest(CPoint &pt)
 {
     CRect rcClient;
@@ -765,7 +765,7 @@ HSTREEITEM STreeCtrl::HitTest(CPoint &pt)
             break;
         }
         if (pItem->bCollapsed)
-        { //跳过被折叠的项
+        { // Skip collapsed items
             HSTREEITEM hChild = GetChildItem(hItem, FALSE);
             while (hChild)
             {
@@ -814,7 +814,7 @@ void STreeCtrl::DrawItem(IRenderTarget *pRT, const CRect &rc, HSTREEITEM hItem)
     rcItemBg.SetRect(m_nItemOffset + m_nItemMargin.toPixelSize(GetScale()), 0, pItem->nContentWidth, nItemHei);
     if (rcItemBg.right > rc.Width() - pItem->nLevel * nIndent)
         rcItemBg.right = rc.Width() - pItem->nLevel * nIndent;
-    //绘制背景
+    // Draw background
     if (hItem == m_hSelItem)
     {
         if (m_pItemSelSkin != NULL)
@@ -1004,7 +1004,7 @@ void STreeCtrl::ItemLButtonDown(HSTREEITEM hItem, UINT nFlags, CPoint pt)
     int nHitTestBtn = ItemHitTest(hItem, pt);
     LPTVITEM pItem = CSTree<LPTVITEM>::GetItem(hItem);
 
-    //清除原有pushdown按钮
+    // Clear the original pushdown button
     if (m_nItemPushDownBtn != nHitTestBtn)
     {
         if (m_nItemPushDownBtn == STVIBtn_Toggle && WndState_PushDown == (pItem->dwToggleState & WndState_PushDown))
@@ -1020,7 +1020,7 @@ void STreeCtrl::ItemLButtonDown(HSTREEITEM hItem, UINT nFlags, CPoint pt)
         m_nItemPushDownBtn = nHitTestBtn;
     }
 
-    //置新pushdown按钮
+    // Set new pushdown button
     if (m_nItemPushDownBtn != STVIBtn_None)
     {
         if (m_nItemPushDownBtn == STVIBtn_Toggle && WndState_PushDown != (pItem->dwToggleState & WndState_PushDown))
@@ -1071,7 +1071,7 @@ void STreeCtrl::ItemLButtonDbClick(HSTREEITEM hItem, UINT nFlags, CPoint pt)
     int nHitTestBtn = ItemHitTest(hItem, pt);
     if (nHitTestBtn == STVIBtn_CheckBox)
         ItemLButtonDown(hItem, nFlags, pt);
-    //产生双击事件 add by zhaosheng
+    // Generate double-click event add by zhaosheng
     EventTCDbClick dbClick(this);
     dbClick.bCancel = FALSE;
     dbClick.hItem = hItem;
@@ -1137,7 +1137,7 @@ void STreeCtrl::ItemMouseLeave(HSTREEITEM hItem)
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
 
 void STreeCtrl::OnDestroy()
 {
@@ -1176,7 +1176,7 @@ void STreeCtrl::OnPaint(IRenderTarget *pRT)
             DrawItem(pRT, rcItem, hItem);
         }
         if (pItem->bCollapsed)
-        { //跳过被折叠的项
+        { // Skip collapsed items
             HSTREEITEM hChild = GetChildItem(hItem, FALSE);
             while (hChild)
             {
@@ -1289,7 +1289,7 @@ void STreeCtrl::OnMouseLeave()
     }
 }
 
-BOOL STreeCtrl::SelectItem(HSTREEITEM hItem, BOOL bEnsureVisible /*=TRUE*/)
+BOOL STreeCtrl::SelectItem(HSTREEITEM hItem, BOOL bEnsureVisible /**< =TRUE */)
 {
     if (!VerifyItem(hItem))
         return FALSE;
@@ -1384,11 +1384,11 @@ void STreeCtrl::UpdateScrollBar()
     CSize size = rcClient.Size();
     CSize szView(m_nContentWidth, m_nVisibleItems * m_nItemHei.toPixelSize(GetScale()));
 
-    m_wBarVisible = SSB_NULL; //关闭滚动条
+    m_wBarVisible = SSB_NULL; // Close scrollbar
 
     if (size.cy < szView.cy || (size.cy < szView.cy + GetSbWidth() && size.cx < szView.cx))
     {
-        //需要纵向滚动条
+        // Need vertical scrollbar
         m_wBarVisible |= SSB_VERT;
         m_siVer.nMin = 0;
         m_siVer.nMax = szView.cy - 1;
@@ -1399,7 +1399,7 @@ void STreeCtrl::UpdateScrollBar()
         }
         if (size.cx < szView.cx + GetSbWidth())
         {
-            //需要横向滚动条
+            // Need horizontal scrollbar
             m_wBarVisible |= SSB_HORZ;
             m_siVer.nPage = size.cy - GetSbWidth() > 0 ? size.cy - GetSbWidth() : 0;
 
@@ -1413,7 +1413,7 @@ void STreeCtrl::UpdateScrollBar()
         }
         else
         {
-            //不需要横向滚动条
+            // No horizontal scrollbar needed
             m_siHoz.nPage = size.cx;
             m_siHoz.nMin = 0;
             m_siHoz.nMax = m_siHoz.nPage - 1;
@@ -1422,7 +1422,7 @@ void STreeCtrl::UpdateScrollBar()
     }
     else
     {
-        //不需要纵向滚动条
+        // No vertical scrollbar needed
         m_siVer.nPage = size.cy;
         m_siVer.nMin = 0;
         m_siVer.nMax = size.cy - 1;
@@ -1430,7 +1430,7 @@ void STreeCtrl::UpdateScrollBar()
 
         if (size.cx < szView.cx)
         {
-            //需要横向滚动条
+            // Need horizontal scrollbar
             m_wBarVisible |= SSB_HORZ;
             m_siHoz.nMin = 0;
             m_siHoz.nMax = szView.cx - 1;
@@ -1440,7 +1440,7 @@ void STreeCtrl::UpdateScrollBar()
                 m_siHoz.nPos = m_siHoz.nMax - m_siHoz.nPage;
             }
         }
-        //不需要横向滚动条
+        // No horizontal scrollbar needed
         else
         {
             m_siHoz.nPage = size.cx;
@@ -1507,6 +1507,61 @@ void STreeCtrl::OnScaleChanged(int nScale)
     RecalcItemsWidth();
     UpdateContentWidth();
     UpdateScrollBar();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/** Accessibility virtual children: expose the visible (expanded, bVisible) items */
+/** in pre-order as ROLE_SYSTEM_OUTLINEITEM simple elements. */
+////////////////////////////////////////////////////////////////////////////////
+
+int STreeCtrl::GetAccItemCount()
+{
+    return m_nVisibleItems;
+}
+
+HSTREEITEM STreeCtrl::GetAccVisibleItem(int nIndex)
+{
+    if (nIndex < 0)
+        return 0;
+    int iVisible = -1;
+    HSTREEITEM hItem = GetNextItem(STVI_ROOT);
+    while (hItem)
+    {
+        LPTVITEM pItem = GetItem(hItem);
+        if (pItem->bVisible)
+            iVisible++;
+        if (iVisible == nIndex)
+            return hItem;
+        if (pItem->bCollapsed)
+        { // Skip collapsed items
+            HSTREEITEM hChild = GetChildItem(hItem, FALSE);
+            while (hChild)
+            {
+                hItem = hChild;
+                hChild = GetChildItem(hItem, FALSE);
+            }
+        }
+        hItem = GetNextItem(hItem);
+    }
+    return 0;
+}
+
+BOOL STreeCtrl::GetAccItemRect(HSTREEITEM hItem, CRect &rcItem)
+{
+    if (!hItem)
+        return FALSE;
+    LPTVITEM pItem = GetItem(hItem);
+    if (!pItem)
+        return FALSE;
+    return GetItemRect(pItem, rcItem);
+}
+
+BOOL STreeCtrl::GetAccItemExpanded(HSTREEITEM hItem)
+{
+    if (!hItem)
+        return FALSE;
+    LPTVITEM pItem = GetItem(hItem);
+    return pItem && pItem->bHasChildren && !pItem->bCollapsed;
 }
 
 SNSEND

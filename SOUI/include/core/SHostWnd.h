@@ -1,7 +1,7 @@
-//////////////////////////////////////////////////////////////////////////
-//  Class Name: SHostWnd
-//    Description: Real Container of SWindow
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
+/** Class Name: SHostWnd */
+/** Description: Real Container of SWindow */
+///////////////////////////////////////////////////////////////////////
 
 #ifndef __SHOSTWND__H__
 #define __SHOSTWND__H__
@@ -194,12 +194,12 @@ class SMenuEx;
  */
 class SOUI_EXP SHostWnd
     : public TNativeWndProxy<IHostWnd>
-    , public SwndContainerImpl
-{
+    , public SwndContainerImpl {
     friend class SDummyWnd;   /**< Friend class used for handling WM_PAINT messages in translucent windows. */
     friend class SRootWindow; /**< Friend class representing the root window. */
     friend class SNcPainter;  /**< Friend class for non-client area painting. */
     friend class SModalRootFinishCallback;
+
   protected:
     SDummyWnd *m_dummyWnd;   /**< A dummy window used to handle WM_PAINT messages for translucent windows. */
     SHostWndAttr m_hostAttr; /**< Host attributes corresponding to the SOUI node in XML. */
@@ -242,14 +242,14 @@ class SOUI_EXP SHostWnd
     static BOOL s_HideLocalUiDef;      /**< Global flag to hide local UI definitions. */
     static int s_TaskQueueBufSize;     /**< Buffer size for asynchronous task queues (default: 5). */
 
-    //////////////////////////////////////////////////////////////////////////
-    // Modal View Session support
-    // Note: the session stack holds SModalRoot pointers directly; each
-    // SModalRoot carries its session id and exit callback. There is no
-    // separate SModalViewSession wrapper object anymore.
+    ///////////////////////////////////////////////////////////////////////
+    /** Modal View Session support */
+    /** Note: the session stack holds SModalRoot pointers directly; each */
+    /** SModalRoot carries its session id and exit callback. There is no */
+    /** separate SModalViewSession wrapper object anymore. */
 
     typedef SAutoRefPtr<SModalRoot> SModalRootPtr;
-	typedef SList<SModalRootPtr> ModalRootStack;
+    typedef SList<SModalRootPtr> ModalRootStack;
 
     ModalRootStack m_modalRootStack; /**< Stack of active modal root windows. */
 
@@ -259,6 +259,7 @@ class SOUI_EXP SHostWnd
      * @param pModalRoot Pointer to the modal root window to initialize.
      */
     void InitModalRoot(SModalRoot *pModalRoot);
+
   public:
     /**
      * @brief Constructs a SHostWnd object with an optional resource name.
@@ -679,7 +680,7 @@ class SOUI_EXP SHostWnd
     void UpdateAutoSizeCount(bool bInc);
 
   public:
-      /**
+    /**
      * @brief Begins a new modal view session.
      *
      * A modal view session is active until endModalViewSession is called. Message
@@ -698,7 +699,7 @@ class SOUI_EXP SHostWnd
      * @note To receive notification when the modal session ends, subscribe to
      *       EventExitModalView on the SModalRoot window.
      */
-    ModalViewSessionID BeginModalViewSession(SModalRoot* pView,SWindow *pRoot=NULL);
+    ModalViewSessionID BeginModalViewSession(SModalRoot *pView, SWindow *pRoot = NULL);
 
     /**
      * @brief Begins a new modal view session with a layout resource.
@@ -707,7 +708,7 @@ class SOUI_EXP SHostWnd
      * @param pRoot Optional parent window for the modal view.
      * @return Pointer to the created modal view window, or NULL if failed.
      */
-    SModalRoot * BeginModalViewSession(LPCTSTR pszLayout, SWindow *pRoot = NULL);
+    SModalRoot *BeginModalViewSession(LPCTSTR pszLayout, SWindow *pRoot = NULL);
 
     /**
      * @brief Ends a modal view session.
@@ -716,14 +717,14 @@ class SOUI_EXP SHostWnd
      * @param exitCode The result code that will be included in the EventExitModalView event.
      * @return TRUE if successful, FALSE otherwise (e.g., invalid session ID or wrong order).
      */
-    BOOL EndModalViewSession(ModalViewSessionID sessionID=0, int exitCode = 0);
+    BOOL EndModalViewSession(ModalViewSessionID sessionID = 0, int exitCode = 0);
 
     /**
      * @brief Gets the last modal view session identifier.
      *
      * @return The last modal view session identifier.
      */
-	  ModalViewSessionID GetLastModalViewSessionID() const;
+    ModalViewSessionID GetLastModalViewSessionID() const;
 
   protected:
     /**
@@ -764,7 +765,7 @@ class SOUI_EXP SHostWnd
      */
     virtual void OnHostAnimationStoped(IAnimation *pAni);
 
-  protected: // 辅助函数
+  protected: /**< Helper functions */
     /**
      * @brief Redraws a specific region of the window.
      *
@@ -818,8 +819,8 @@ class SOUI_EXP SHostWnd
     void _PaintVideoCanvasForeground(IRenderTarget *pRT);
 
   protected:
-    //////////////////////////////////////////////////////////////////////////
-    // 消息处理
+    ///////////////////////////////////////////////////////////////////////
+    /** Message handling */
 
     /**
      * @brief Handles the WM_PRINT message.
@@ -1083,7 +1084,7 @@ class SOUI_EXP SHostWnd
     HWND m_hSpyWnd;
 #endif
 
-  public: // IContainer
+  public: /**< IContainer */
     /**
      * @brief Fires an event in the container.
      *
@@ -1310,23 +1311,24 @@ class SOUI_EXP SHostWnd
 
     /**
      * @brief Called when the scale of the window changes.
-     * */
+     */
     virtual void OnScaleChanged(int nScale);
 
     /**
      * @brief init root painter
      */
-    virtual void OnRootBeforePaint(const SRootWindow *pRoot,IRenderTarget *pRT, SPainter &painter) const;
+    virtual void OnRootBeforePaint(const SRootWindow *pRoot, IRenderTarget *pRT, SPainter &painter) const;
 
     /**
      * @brief uninit root painter.
      */
-    virtual void OnRootAfterPaint(const SRootWindow *pRoot,IRenderTarget *pRT, SPainter &painter) const;
+    virtual void OnRootAfterPaint(const SRootWindow *pRoot, IRenderTarget *pRT, SPainter &painter) const;
 
     /**
      * @brief init root panter
      */
-    virtual void OnRootBuildPainter(const SRootWindow *pRoot,SPainter & painter) const;
+    virtual void OnRootBuildPainter(const SRootWindow *pRoot, SPainter &painter) const;
+
   public:
     /**
      * @brief Handles the resize event of the root window.
@@ -1336,7 +1338,7 @@ class SOUI_EXP SHostWnd
      */
     virtual BOOL onRootResize(IEvtArgs *e);
 
-  public: // 事件处理接口
+  public: /**< Event handling interface */
     /**
      * @brief Handles an event.
      *
@@ -1448,10 +1450,10 @@ class SOUI_EXP SHostWnd
         MESSAGE_HANDLER_EX(SPYMSG_SWNDENUM, OnSpyMsgSwndEnum)
         MESSAGE_HANDLER_EX(SPYMSG_SWNDINFO, OnSpyMsgSwndSpy)
         MESSAGE_HANDLER_EX(SPYMSG_HITTEST, OnSpyMsgHitTest)
-#endif // DISABLE_SWNDSPY
+#endif /**< DISABLE_SWNDSPY */
         REFLECT_NOTIFY_CODE(NM_CUSTOMDRAW)
     END_MSG_MAP()
 };
 
 SNSEND
-#endif // __SHOSTWND__H__
+#endif /**< __SHOSTWND__H__ */

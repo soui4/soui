@@ -15,9 +15,9 @@
 #endif
 SNSBEGIN
 
-//////////////////////////////////////////////////////////////////////////
-//    SDummyWnd
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
+/** SDummyWnd */
+///////////////////////////////////////////////////////////////////////
 class SDummyWnd : public SNativeWnd {
   public:
     SDummyWnd(SHostWnd *pOwner)
@@ -52,9 +52,9 @@ class SDummyWnd : public SNativeWnd {
     SHostWnd *m_pOwner;
 };
 
-//////////////////////////////////////////////////////////////////////////
-//    SHostWndAttr
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
+/** SHostWndAttr */
+///////////////////////////////////////////////////////////////////////
 SHostWndAttr::SHostWndAttr(void)
     : m_hAppIconSmall(NULL)
     , m_hAppIconBig(NULL)
@@ -139,14 +139,14 @@ void SHostWndAttr::SetSendWheel2Hover(bool value)
     m_bSendWheel2Hover = value;
 }
 
-//////////////////////////////////////////////////////////////////////////
-// SHostWnd
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
+/** SHostWnd */
+///////////////////////////////////////////////////////////////////////
 
 BOOL SHostWnd::s_HideLocalUiDef = TRUE;
 int SHostWnd::s_TaskQueueBufSize = 5;
 
-void SHostWnd::OnRootBuildPainter(const SRootWindow *pRoot,SPainter & painter) const
+void SHostWnd::OnRootBuildPainter(const SRootWindow *pRoot, SPainter &painter) const
 {
     int iState = SState2Index::GetDefIndex(pRoot->GetState(), true);
     const SwndStyle &style = pRoot->GetStyle();
@@ -158,7 +158,7 @@ void SHostWnd::OnRootBuildPainter(const SRootWindow *pRoot,SPainter & painter) c
         painter.oldTextColor = crTxt;
 }
 
-void SHostWnd::OnRootBeforePaint(const SRootWindow *pRoot,IRenderTarget *pRT, SPainter &painter) const
+void SHostWnd::OnRootBeforePaint(const SRootWindow *pRoot, IRenderTarget *pRT, SPainter &painter) const
 {
     int iState = SState2Index::GetDefIndex(pRoot->GetState(), true);
     const SwndStyle &style = pRoot->GetStyle();
@@ -175,11 +175,10 @@ void SHostWnd::OnRootBeforePaint(const SRootWindow *pRoot,IRenderTarget *pRT, SP
         pRT->SetTextColor(RGBA(0, 0, 0, 255));
 }
 
-void SHostWnd::OnRootAfterPaint(const SRootWindow *pRoot,IRenderTarget *pRT, SPainter &painter) const
+void SHostWnd::OnRootAfterPaint(const SRootWindow *pRoot, IRenderTarget *pRT, SPainter &painter) const
 {
     pRT->SelectDefaultObject(OT_FONT, NULL);
 }
-
 
 void SHostWnd::SetHideLocalUiDef(BOOL bHide)
 {
@@ -191,7 +190,7 @@ void SHostWnd::SetTaskQueueBufSize(int nBufSize)
     s_TaskQueueBufSize = nBufSize;
 }
 
-SHostWnd::SHostWnd(LPCWSTR pszResName /*= NULL*/)
+SHostWnd::SHostWnd(LPCWSTR pszResName /**< = NULL */)
 {
     if (pszResName)
         m_strXmlLayout = S_CW2T(pszResName);
@@ -268,7 +267,7 @@ HWND SHostWnd::CreateEx(HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, 
         dwExStyle |= WS_EX_LAYERED;
 #ifndef _WIN32
         dwExStyle |= WS_EX_COMPOSITED;
-#endif //_WIN32
+#endif // _WIN32
     }
     m_xmlInit = xmlInit;
     HWND hWnd = SNativeWnd::CreateNative(_T("HOSTWND"), dwStyle, dwExStyle, x, y, nWidth, nHeight, hWndParent, 0);
@@ -290,9 +289,9 @@ HWND SHostWnd::Create(HWND hWndParent, int x, int y, int nWidth, int nHeight)
     return CreateEx(hWndParent, dwStyle, 0, x, y, nWidth, nHeight);
 }
 
-BOOL SHostWnd::Attach(HWND hWnd, IXmlNode *xmlInit /*= NULL*/)
+BOOL SHostWnd::Attach(HWND hWnd, IXmlNode *xmlInit /**< = NULL */)
 {
-    // 不允许重复绑定：已经有创建/Attach的HWND时直接失败
+    // Do not allow duplicate binding: fail directly when a created/Attached HWND already exists
     if (NULL != m_hWnd)
         return FALSE;
     if (!::IsWindow(hWnd))
@@ -317,32 +316,34 @@ BOOL SHostWnd::Attach(HWND hWnd, IXmlNode *xmlInit /*= NULL*/)
             xmlInit = &xmlRoot;
         }
     }
-    // 读取SOUI窗口属性（与CreateEx保持一致）
+    // Read SOUI window attributes (keep consistent with CreateEx)
     m_hostAttr.Init();
     m_hostAttr.InitFromXml(xmlInit);
     m_xmlInit = xmlInit;
 
-    // 构造CREATESTRUCT模拟WM_CREATE场景，让OnCreate复用初始化流程。
-    // 注意：OnCreate只读取cx/cy两个字段（参见SHostWnd::OnCreate第870-871行），
-    // 其余字段初始化为0/NULL即可，避免引用跨平台不存在的API（如GetMenu）。
+    // Construct a CREATESTRUCT to simulate the WM_CREATE scenario, letting OnCreate reuse the initialization flow.
+    // Note: OnCreate only reads the cx/cy fields (see SHostWnd::OnCreate lines 870-871),
+    // The remaining fields can be initialized to 0/NULL to avoid referencing platform-nonexistent APIs (such as GetMenu).
     CREATESTRUCT cs;
     memset(&cs, 0, sizeof(cs));
     CRect rcClient;
     ::GetClientRect(hWnd, &rcClient);
     cs.cx = rcClient.Width();
     cs.cy = rcClient.Height();
-    if (SendMessage(WM_CREATE,0, (LPARAM)&cs)!=0) {
+    if (SendMessage(WM_CREATE, 0, (LPARAM)&cs) != 0)
+    {
         SNativeWnd::UnsubclassWindow();
-        m_xmlInit=NULL;
+        m_xmlInit = NULL;
         return FALSE;
     }
     m_xmlInit = NULL;
-    OnSize(0,rcClient.Size());
+    OnSize(0, rcClient.Size());
     m_bAttached = TRUE;
     return TRUE;
 }
 
-BOOL SHostWnd::Detach() {
+BOOL SHostWnd::Detach()
+{
     if (!m_bAttached)
         return FALSE;
     SASSERT(::IsWindow(m_hWnd));
@@ -421,11 +422,11 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
         m_pScriptModule = NULL;
     }
 
-    //为了能够重入，先销毁原有的SOUI窗口
+    // To allow reentrancy, first destroy the original SOUI window
     GetRoot()->SSendMessage(WM_DESTROY);
     m_bFirstShow = TRUE;
 
-    //加载脚本数据
+    // Load script data
     SXmlNode xmlNode(pNode);
     SXmlNode xmlScript = xmlNode.child(L"script");
     if (xmlScript)
@@ -466,7 +467,7 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
             }
             else
             {
-                //从script节点的cdata中获取脚本
+                // Get the script from the cdata of the script node
                 SStringW strScript = xmlScript.child_value();
                 if (!strScript.IsEmpty())
                 {
@@ -550,7 +551,7 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
                 m_dummyWnd->ShowWindow(SW_SHOWNOACTIVATE);
             }
         }
-#endif //_WIN32
+#endif // _WIN32
     }
     else if (dwExStyle & WS_EX_LAYERED || GetRoot()->GetAlpha() != 0xFF)
     {
@@ -564,7 +565,7 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
             ModifyStyleEx(0, WS_EX_LAYERED);
 #else
             ModifyStyleEx(0, WS_EX_LAYERED | WS_EX_COMPOSITED);
-#endif //_WIN32
+#endif // _WIN32
         }
         SetLayeredWindowAttributes(0, GetRoot()->GetAlpha(), LWA_ALPHA);
     }
@@ -607,7 +608,7 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
     }
 
     if (nWidth <= 0 || nHeight <= 0)
-    { //计算出root大小
+    { // Compute the root size
         if (nWidth <= 0)
         {
             nWidth = SIZE_WRAP_CONTENT;
@@ -635,7 +636,7 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
     SNativeWnd::GetClientRect(&rcClient);
     GetRoot()->OnRelayout(rcClient);
 
-    //设置重绘标记
+    // Set redraw flag
     m_bNeedAllRepaint = TRUE;
     m_bNeedRepaint = TRUE;
     m_rgnInvalidate->Clear();
@@ -691,7 +692,7 @@ void SHostWnd::_RedrawRegion(IRegionS *pRgnUpdate, CRect &rcInvalid)
         pRgnUpdate->CombineRect(&rcWnd, RGN_COPY);
         m_memRT->PushClipRect(&rcInvalid, RGN_COPY);
     }
-    //清除残留的alpha值
+    // Clear residual alpha value
     m_memRT->ClearRect(rcInvalid, 0);
 
     int clipState = 0;
@@ -711,7 +712,7 @@ void SHostWnd::OnPrint(HDC dc, UINT uFlags)
 {
     if (!(GetRoot()->IsLayoutDirty() || IsWindowVisible()))
         return;
-    //刷新前重新布局，会自动检查布局脏标志
+    // Re-layout before refresh; the layout dirty flag is checked automatically
     GetRoot()->UpdateLayout();
 
     if (m_bNeedAllRepaint)
@@ -726,19 +727,19 @@ void SHostWnd::OnPrint(HDC dc, UINT uFlags)
     {
         m_bNeedRepaint = FALSE;
         BuildWndTreeZorder();
-        // m_rgnInvalidate有可能在RedrawRegion时被修改，必须生成一个临时的区域对象
+        // m_rgnInvalidate may be modified during RedrawRegion, so a temporary region object must be created
         SAutoRefPtr<IRegionS> pRgnUpdate = m_rgnInvalidate;
         m_rgnInvalidate = NULL;
         GETRENDERFACTORY->CreateRegion(&m_rgnInvalidate);
         _RedrawRegion(pRgnUpdate, rcInvalid);
     }
     else
-    { //缓存已经更新好了，只需要重新更新到窗口
+    { // The cache is already updated; just update it to the window again
         m_rgnInvalidate->GetRgnBox(&rcInvalid);
         m_rgnInvalidate->Clear();
     }
     if (dc)
-    { //由系统发的WM_PAINT或者WM_PRINT产生的重绘请求
+    { // Redraw request generated by system-sent WM_PAINT or WM_PRINT
         CRect rcUpdate;
         ::GetClipBox(dc, &rcUpdate);
         rcInvalid = rcInvalid | rcUpdate;
@@ -756,7 +757,7 @@ void SHostWnd::OnPaint(HDC dc)
     OnPrint(m_hostAttr.m_bTranslucent ? NULL : dc);
 #else
     OnPrint(dc);
-#endif //_WIN32
+#endif // _WIN32
     ::EndPaint(m_hWnd, &ps);
 }
 
@@ -767,18 +768,18 @@ BOOL SHostWnd::OnEraseBkgnd(HDC dc)
 
 IToolTip *SHostWnd::CreateTooltip() const
 {
-    #ifdef DISABLE_TOOLTIP
-        return NULL;
-    #else
-        return GETTOOLTIPFACTORY->CreateToolTip(m_hWnd);
-    #endif
+#ifdef DISABLE_TOOLTIP
+    return NULL;
+#else
+    return GETTOOLTIPFACTORY->CreateToolTip(m_hWnd);
+#endif
 }
 
 void SHostWnd::DestroyTooltip(IToolTip *pTooltip) const
 {
-    #ifndef DISABLE_TOOLTIP
-        GETTOOLTIPFACTORY->DestroyToolTip(pTooltip);
-    #endif
+#ifndef DISABLE_TOOLTIP
+    GETTOOLTIPFACTORY->DestroyToolTip(pTooltip);
+#endif
 }
 
 SXmlNode SHostWnd::OnGetInitXmlNode(SXmlDoc &xmlDoc)
@@ -1007,7 +1008,7 @@ void SHostWnd::OnTimer(UINT_PTR idEvent)
         }
         else
         {
-            //窗口已经删除，自动清除该窗口的定时器
+            // Window already deleted, automatically clear this window's timer
             ::KillTimer(m_hWnd, idEvent);
         }
     }
@@ -1031,7 +1032,7 @@ LRESULT SHostWnd::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
         m_msgMouse.wParam = wParam;
         m_msgMouse.lParam = lParam;
         if (SNativeWnd::GetStyle() & WS_CHILD)
-            SNativeWnd::SetFocus(); //子窗口情况下才自动获取焦点
+            SNativeWnd::SetFocus(); // Only automatically take focus when it is a child window
         break;
     case WM_LBUTTONUP:
         if (!(SNativeWnd::GetStyle() & WS_CHILD))
@@ -1075,12 +1076,14 @@ LRESULT SHostWnd::OnKeyEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
             return 0;
         }
     }
-    if(!m_modalRootStack.IsEmpty()){
+    if (!m_modalRootStack.IsEmpty())
+    {
         SModalRoot *pModalRoot = m_modalRootStack.GetTail();
-        if(!pModalRoot->IsFocused()){
+        if (!pModalRoot->IsFocused())
+        {
             BOOL bMsgHandled = FALSE;
-            LRESULT lRet = pModalRoot->SSendMessage(uMsg,wParam,lParam,&bMsgHandled);
-            if(bMsgHandled)
+            LRESULT lRet = pModalRoot->SSendMessage(uMsg, wParam, lParam, &bMsgHandled);
+            if (bMsgHandled)
                 return lRet;
         }
     }
@@ -1091,7 +1094,7 @@ LRESULT SHostWnd::OnKeyEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 LRESULT SHostWnd::OnActivateApp(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    if (!m_presenter) //防止host.OnDestroy中destroy子窗口可能给host发这个消息
+    if (!m_presenter) // Prevent host.OnDestroy destroying child windows from possibly sending this message to the host
         return 0;
     return DoFrameEvent(uMsg, wParam, lParam);
 }
@@ -1104,7 +1107,7 @@ BOOL SHostWnd::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 
 void SHostWnd::OnActivate(UINT nState, BOOL bMinimized, HWND wndOther)
 {
-    //    SSLOGI() << "OnActivate, nState=" << nState << " m_hWnd=" << m_hWnd;
+    // SSLOGI() << "OnActivate, nState=" << nState << " m_hWnd=" << m_hWnd;
     if (nState != WA_INACTIVE)
     {
         ::SetFocus(m_hWnd);
@@ -1319,9 +1322,9 @@ BOOL SHostWnd::AnimateHostWindow(DWORD dwTime, DWORD dwFlags)
     }
     else
     {
-        CRect rcWnd; //窗口矩形
+        CRect rcWnd; // Window rectangle
         SNativeWnd::GetClientRect(&rcWnd);
-        CRect rcShow(rcWnd); //动画过程中可见部分
+        CRect rcShow(rcWnd); // Visible portion during animation
 
         SAutoRefPtr<IRenderTarget> pRT;
         GETRENDERFACTORY->CreateRenderTarget(&pRT, rcShow.Width(), rcShow.Height());
@@ -1633,7 +1636,7 @@ LRESULT SHostWnd::OnSpyMsgSwndSpy(UINT uMsg, WPARAM wParam, LPARAM lParam)
         wcscpy(pSwndInfo->szXmlStr, strTmp);
     else
         wcscpy(pSwndInfo->szXmlStr, L"##buf overflow!");
-#endif //_DEBUG
+#endif // _DEBUG
     ::SendMessage(m_hSpyWnd, WM_COPYDATA, (WPARAM)m_hWnd, (LPARAM)&cds);
     delete pSwndInfo;
     return 1;
@@ -1656,20 +1659,20 @@ LRESULT SHostWnd::OnSpyMsgHitTest(UINT uMsg, WPARAM wParam, LPARAM lParam)
     ScreenToClient(&pt);
     return GetRoot()->SwndFromPoint(pt);
 }
-#endif // DISABLE_SWNDSPY
+#endif /**< DISABLE_SWNDSPY */
 
 void SHostWnd::OnCaptureChanged(HWND wnd)
 {
     if (wnd == m_hWnd)
         return;
     if (wnd != NULL)
-    { //如果当前响应了鼠标按下消息，在lost capture时也应该响应弹起消息
+    { // If a mouse-button-down message was responded to, the button-up message should also be responded to on lost capture
 #ifdef _WIN32
         TCHAR szClassName[30];
         ::GetClassName(wnd, szClassName, 30);
         if (_tcscmp(szClassName, _T("CLIPBRDWNDCLASS")) == 0)
-            return; //在窗口内拖动时也可能产生capturechange消息。
-#endif              //_WIN32
+            return; // A capturechange message may also be generated when dragging inside a window.
+#endif              // _WIN32
     }
     _RestoreClickState();
 }
@@ -1684,7 +1687,7 @@ int SHostWnd::GetScale() const
     return GetRoot()->GetScale();
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 BOOL SHostWnd::DestroyWindow()
 {
     if (m_AniState != Ani_none)
@@ -1735,7 +1738,7 @@ LRESULT SHostWnd::OnMenuExEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 }
 
 void SHostWnd::OnWindowPosChanging(LPWINDOWPOS lpWndPos)
-{ //默认不处理该消息，同时防止系统处理该消息
+{ // By default this message is not handled, and also prevents the system from handling it
     if (lpWndPos->flags & SWP_SHOWWINDOW && m_bFirstShow)
     {
         if (m_pRoot->m_aniEnter)
@@ -1750,7 +1753,7 @@ void SHostWnd::OnWindowPosChanging(LPWINDOWPOS lpWndPos)
 
 void SHostWnd::OnWindowPosChanged(LPWINDOWPOS lpWndPos)
 {
-    //下面这一行不能删除，否则显示不正常。
+    // This line below must not be deleted, otherwise display will be abnormal.
     SetMsgHandled(FALSE);
     if (!m_dummyWnd)
         return;
@@ -1842,7 +1845,7 @@ void SHostWnd::_Invalidate(LPCRECT prc)
         SNativeWnd::InvalidateRect(prc, FALSE);
     else
         SNativeWnd::Invalidate(FALSE);
-#endif //_WIN32
+#endif // _WIN32
 }
 
 bool SHostWnd::StartHostAnimation(IAnimation *pAni)
@@ -2140,7 +2143,7 @@ void SHostWnd::OnDropdownState(IHostWnd *pDropdownWnd, BOOL bCreate)
     EnablePrivateUiDef(bCreate);
 }
 
-BOOL SHostWnd::PostTask(THIS_ IRunnable *runable, BOOL bAsync /*DEF_VAL(TRUE)*/)
+BOOL SHostWnd::PostTask(THIS_ IRunnable *runable, BOOL bAsync /**< DEF_VAL(TRUE) */)
 {
     m_cs.Enter();
     m_runnables.AddTail(runable->clone());
@@ -2356,8 +2359,8 @@ LRESULT SHostWnd::OnMenuSelect(UINT uMsg, WPARAM wp, LPARAM lp)
     return 0;
 }
 
-//////////////////////////////////////////////////////////////////
-//  SHostWnd::SHostAnimationHandler
+///////////////////////////////////////////////////////////////
+/** SHostWnd::SHostAnimationHandler */
 void SHostWnd::SHostAnimationHandler::OnNextFrame()
 {
     if (!m_pHostWnd->m_hostAnimation)
@@ -2400,9 +2403,9 @@ void SHostWnd::SHostAnimationHandler::OnNextFrame()
     }
 }
 
-//////////////////////////////////////////////////////////////////////////
-// Modal View Session Implementation
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
+/** Modal View Session Implementation */
+///////////////////////////////////////////////////////////////////////
 
 /**
  * @brief Callback for modal view session cleanup.
@@ -2410,13 +2413,16 @@ void SHostWnd::SHostAnimationHandler::OnNextFrame()
  * This callback is invoked when the modal view's exit animation has completed,
  * allowing SHostWnd to remove the modal root from the view tree and destroy it.
  */
-class SModalRootFinishCallback : public TObjRefImpl<IModalViewExitCallback>
-{
-    SHostWnd* m_pHostWnd;
-public:
-    SModalRootFinishCallback(SHostWnd *pHostWnd) : m_pHostWnd(pHostWnd) {}
+class SModalRootFinishCallback : public TObjRefImpl<IModalViewExitCallback> {
+    SHostWnd *m_pHostWnd;
 
-    void OnModalViewExit(SModalRoot* pModalRoot) override
+  public:
+    SModalRootFinishCallback(SHostWnd *pHostWnd)
+        : m_pHostWnd(pHostWnd)
+    {
+    }
+
+    void OnModalViewExit(SModalRoot *pModalRoot) override
     {
         m_pHostWnd->OnModalViewFinish(pModalRoot);
     }
@@ -2428,18 +2434,19 @@ public:
  * @param pModalRoot The modal root window to display.
  * @return Session ID on success, 0 on failure.
  */
-ModalViewSessionID SHostWnd::BeginModalViewSession(SModalRoot* pModalRoot, SWindow* pRoot)
+ModalViewSessionID SHostWnd::BeginModalViewSession(SModalRoot *pModalRoot, SWindow *pRoot)
 {
     SASSERT(pModalRoot);
     if (pModalRoot->GetParent())
     {
         // The view must not be attached when used for beginModalViewSession
-        SSLOGE()<<"pModalRoot must be root window";
+        SSLOGE() << "pModalRoot must be root window";
         return 0;
     }
-    SModalView * pView = sobj_cast<SModalView>(pModalRoot->GetWindow(GSW_FIRSTCHILD));
-    if(!pView){
-        SSLOGE()<<"the first child of modalroot is not modalview object";
+    SModalView *pView = sobj_cast<SModalView>(pModalRoot->GetWindow(GSW_FIRSTCHILD));
+    if (!pView)
+    {
+        SSLOGE() << "the first child of modalroot is not modalview object";
         return 0;
     }
 
@@ -2452,7 +2459,7 @@ ModalViewSessionID SHostWnd::BeginModalViewSession(SModalRoot* pModalRoot, SWind
     // lazily creates m_pModalContainer if this is the first modal session.
     SASSERT(pRoot != NULL);
     pRoot->InsertChild(pModalRoot);
-	CRect rcLayout;
+    CRect rcLayout;
     pRoot->GetChildrenLayoutRect(&rcLayout);
     pModalRoot->Move(&rcLayout);
     // Push the modal root onto the stack (AddRef is handled by SAutoRefPtr).
@@ -2465,11 +2472,13 @@ ModalViewSessionID SHostWnd::BeginModalViewSession(SModalRoot* pModalRoot, SWind
     return pModalRoot->GetSessionID();
 }
 
-SModalRoot * SHostWnd::BeginModalViewSession(LPCTSTR pszLayout, SWindow *pRoot){
-    SModalRoot * pModal = (SModalRoot*)SApplication::getSingletonPtr()->CreateWindowByName(SModalRoot::GetClassName());
+SModalRoot *SHostWnd::BeginModalViewSession(LPCTSTR pszLayout, SWindow *pRoot)
+{
+    SModalRoot *pModal = (SModalRoot *)SApplication::getSingletonPtr()->CreateWindowByName(SModalRoot::GetClassName());
     pModal->InitFromResId(pszLayout);
     ModalViewSessionID session_id = BeginModalViewSession(pModal);
-    if(session_id==0){
+    if (session_id == 0)
+    {
         pModal->Release();
         return NULL;
     }
@@ -2478,8 +2487,8 @@ SModalRoot * SHostWnd::BeginModalViewSession(LPCTSTR pszLayout, SWindow *pRoot){
 
 void SHostWnd::OnModalViewFinish(SModalRoot *pModalRoot)
 {
-    SWindow* pParent = pModalRoot->GetParent();
-    if(pParent->RemoveChild(pModalRoot))
+    SWindow *pParent = pModalRoot->GetParent();
+    if (pParent->RemoveChild(pModalRoot))
         pModalRoot->Destroy();
     // If there's another modal session active under us, reinitialize it
     // (restore focus to the now top-most modal view).
@@ -2494,7 +2503,7 @@ BOOL SHostWnd::EndModalViewSession(ModalViewSessionID sessionID, int exitCode)
     if (m_modalRootStack.IsEmpty())
         return FALSE;
 
-    if (sessionID!=0 && m_modalRootStack.GetTail()->GetSessionID() != sessionID)
+    if (sessionID != 0 && m_modalRootStack.GetTail()->GetSessionID() != sessionID)
         return FALSE;
 
     // Grab the top-most modal root and remove it from the stack.
@@ -2502,7 +2511,7 @@ BOOL SHostWnd::EndModalViewSession(ModalViewSessionID sessionID, int exitCode)
     m_modalRootStack.RemoveTail();
 
     SASSERT(m_pRoot);
-    SModalRootFinishCallback* pCallback = new SModalRootFinishCallback(this);
+    SModalRootFinishCallback *pCallback = new SModalRootFinishCallback(this);
     pModalRoot->EndModalViewSession(pCallback, exitCode);
     pCallback->Release();
     return TRUE;
@@ -2510,12 +2519,10 @@ BOOL SHostWnd::EndModalViewSession(ModalViewSessionID sessionID, int exitCode)
 
 ModalViewSessionID SHostWnd::GetLastModalViewSessionID() const
 {
-	if (m_modalRootStack.IsEmpty())
-		return 0;
-	return m_modalRootStack.GetTail()->GetSessionID();
+    if (m_modalRootStack.IsEmpty())
+        return 0;
+    return m_modalRootStack.GetTail()->GetSessionID();
 }
-
-
 
 void SHostWnd::InitModalRoot(SModalRoot *pModalRoot)
 {
@@ -2537,7 +2544,8 @@ void SHostWnd::InitModalRoot(SModalRoot *pModalRoot)
     pModalRoot->Invalidate();
 }
 
-void SHostWnd::OnKeyBoardHeight(int keyboardHeight) {
+void SHostWnd::OnKeyBoardHeight(int keyboardHeight)
+{
     GetRoot()->SDispatchMessage(WM_KEYBOARD_HEIGHT, keyboardHeight);
 }
 

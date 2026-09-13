@@ -1,6 +1,6 @@
 ﻿/**
  * @file SLayoutObjectAnimator.cpp
- * @brief SOUI布局对象动画器实现 - 参考Android ObjectAnimator设计
+ * @brief SOUI layout object animator implementation - based on Android ObjectAnimator design
  * @author SOUI group
  * @date 2024
  */
@@ -14,8 +14,8 @@
 
 SNSBEGIN
 
-//////////////////////////////////////////////////////////////////////////
-// SPropertyValuesHolder实现
+///////////////////////////////////////////////////////////////////////
+/** SPropertyValuesHolder implementation */
 
 SPropertyValuesHolder::SPropertyValuesHolder()
 {
@@ -247,7 +247,7 @@ float SPropertyValuesHolder::Fraction2Index(float fraction, int idx[2]) const
 {
     if (!m_value.pWeights)
     {
-        // 没有权重，使用均匀分布逻辑
+        // No weight, use even distribution logic
         float segmentFraction = fraction * (m_valueCount - 1);
         idx[0] = (int)segmentFraction;
         idx[1] = idx[0] + 1;
@@ -257,7 +257,7 @@ float SPropertyValuesHolder::Fraction2Index(float fraction, int idx[2]) const
     }
     else
     {
-        // 处理特殊情况：fraction为1.0时
+        // Handle special case: when fraction is 1.0
         if (fraction >= 1.0f)
         {
             idx[0] = m_valueCount - 2;
@@ -265,7 +265,7 @@ float SPropertyValuesHolder::Fraction2Index(float fraction, int idx[2]) const
             return 1.0f;
         }
 
-        // 使用权重计算关键帧索引和片段分数
+        // Use weights to compute keyframe index and segment fraction
         float weightedFraction = fraction * m_totalWeight;
         float accumulatedWeight = 0.0f;
         for (int i = 0; i < m_valueCount - 1; i++)
@@ -276,14 +276,14 @@ float SPropertyValuesHolder::Fraction2Index(float fraction, int idx[2]) const
                 idx[0] = i;
                 idx[1] = i + 1;
 
-                // 计算在当前段内的fraction
+                // Compute fraction within the current segment
                 float segmentStart = accumulatedWeight - m_value.pWeights[i];
                 float segmentLength = m_value.pWeights[i];
                 return (weightedFraction - segmentStart) / segmentLength;
             }
         }
 
-        // 如果fraction超出了所有段，返回最后一段
+        // If fraction exceeds all segments, return the last segment
         idx[0] = m_valueCount - 2;
         idx[1] = m_valueCount - 1;
         return 1.0f;
@@ -302,7 +302,7 @@ int SPropertyValuesHolder::Fraction2FrameIndex(float fraction) const
 
 BOOL SPropertyValuesHolder::SetKeyFrameWeights(const float *weights, int count)
 {
-    // 权重数量应该是关键帧数减1，因为权重表示的是帧之间的段
+    // The number of weights should be the number of keyframes minus 1, because weights represent the segments between frames
     if (weights && count == m_valueCount - 1)
     {
         float totalWeight = 0.0f;
@@ -325,7 +325,7 @@ BOOL SPropertyValuesHolder::SetKeyFrameWeights(const float *weights, int count)
 
 BOOL SPropertyValuesHolder::GetKeyFrameWeights(float *weights, int count) const
 {
-    // 权重数量应该是关键帧数减1
+    // The number of weights should be the number of keyframes minus 1
     if (!weights || count != m_valueCount - 1)
         return FALSE;
     if (m_value.pWeights)
@@ -394,8 +394,8 @@ int SPropertyValuesHolder::InterpolateInt(float fraction) const
 
 static SLayoutSize _InterpolateLayoutSize(const LAYOUTSIZE &start, const LAYOUTSIZE &end, float fraction)
 {
-    // 简单线性插值
-    float startValue = start.fSize; // 使用scale=1进行插值计算
+    // Simple linear interpolation
+    float startValue = start.fSize; // Use scale=1 for interpolation calculation
     float endValue = end.fSize;
     float interpValue = startValue + (endValue - startValue) * fraction;
     return SLayoutSize(interpValue, start.unit);
@@ -410,7 +410,7 @@ SLayoutSize SPropertyValuesHolder::InterpolateLayoutSize(float fraction) const
     return _InterpolateLayoutSize(m_value.pLayoutSize[idx[0]], m_value.pLayoutSize[idx[1]], fraction);
 }
 
-// 静态工厂方法
+/** Static factory method */
 SPropertyValuesHolder *SPropertyValuesHolder::ofByte(LPCWSTR propertyName, const BYTE *values, int count)
 {
     SPropertyValuesHolder *pHolder = new SPropertyValuesHolder();
@@ -466,10 +466,10 @@ SPropertyValuesHolder *SPropertyValuesHolder::ofPosition(LPCWSTR propertyName, c
     pHolder->SetPositionValues(values, count, valueSize);
     return pHolder;
 }
-//////////////////////////////////////////////////////////////////////////
-// SPropertyAnimator实现
+///////////////////////////////////////////////////////////////////////
+/** SPropertyAnimator implementation */
 
-SPropertyAnimator::SPropertyAnimator(IWindow *pTarget /*= NULL*/)
+SPropertyAnimator::SPropertyAnimator(IWindow *pTarget /**< = NULL */)
 {
     _this_for_callback = (IPropertyAnimator *)this;
     m_pTarget = pTarget;
@@ -574,7 +574,7 @@ IValueAnimator *SPropertyAnimator::clone() const
     return (IValueAnimator *)(IPropertyAnimator *)pAnimator;
 }
 
-// 静态工厂方法
+/** Static factory method */
 IPropertyAnimator *SPropertyAnimator::ofFloat(IWindow *pWnd, LPCWSTR propertyName, const float *values, int valueCount)
 {
     SPropertyAnimator *pAnimator = new SPropertyAnimator(pWnd);

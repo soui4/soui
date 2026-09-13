@@ -43,4 +43,4 @@ class SOUI_EXP SFrame : public SWindow {
 
 SNSEND
 
-#endif // __SFRAME__H__
+#endif /**< __SFRAME__H__ */

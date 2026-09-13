@@ -1,0 +1,115 @@
+#Name: libsoui
+# SOUI CMake Configuration File
+# This file is used to import SOUI into external projects
+# It is reused both as a directly-included module (legacy) and as a
+# find_package() config file (find_package(soui4)).
+
+# Guard against repeated processing (find_package or repeated include()).
+if(DEFINED SOUI_CONFIG_INCLUDED)
+  return()
+endif()
+set(SOUI_CONFIG_INCLUDED TRUE)
+
+set(prefix @CMAKE_INSTALL_PREFIX@)
+set(exec_prefix ${prefix})
+set(libdir ${exec_prefix}/lib)
+set(includedir ${prefix}/include)
+
+set(SOUI_VER "@SOUI_VER1@.@SOUI_VER2@.@SOUI_VER3@.@SOUI_VER4@")
+set(SOUI_SRC_DIR @CMAKE_CURRENT_LIST_DIR@)
+set(SOUI_PREFIX ${prefix})
+
+# Include directories
+set(SOUI_INCLUDE_DIRS 
+    ${includedir}/config 
+    ${includedir}/components 
+    ${includedir}/utilities/include 
+    ${includedir}/SOUI/include 
+    ${includedir}/controls.extend 
+    ${includedir}/@SWINX_CFLAGS@)
+
+# Library directories
+set(SOUI_LIBRARY_PATH ${libdir})
+set(SOUI_LIBRARY_DIRS ${libdir} ${libdir}/${CMAKE_BUILD_TYPE})
+
+# Static library configuration
+set(SOUI_ENABLE_CORE_LIB @SOUI_ENABLE_CORE_LIB@)
+set(SOUI_ENABLE_COM_LIB @SOUI_ENABLE_COM_LIB@)
+
+# Core libraries (always required)
+set(SOUI_CORE_LIBS @CORE_LIBS@)
+set(SOUI_COM_LIBS @COM_LIBS@)
+set(SOUI_COM_DEP_LIBS @COM_DEP_LIBS@)
+set(SOUI_OPTION_LIBS @OPTION_LIBS@)
+set(SOUI_UTILITIES @SOUI_UTILITIES@)
+set(SOUI_SWINX @SOUI_SWINX@)
+set(SOUI_SWINX_DEP_LIBS @SWINX_DEP_LIBS@)
+
+set(SOUI_LIBRARIES 
+    ${SOUI_COM_LIBS} 
+    ${SOUI_CORE_LIBS} 
+    ${SOUI_COM_DEP_LIBS} 
+    ${SOUI_OPTION_LIBS}
+    ${SOUI_UTILITIES}
+    ${SOUI_SWINX}
+    ${SOUI_SWINX_DEP_LIBS}
+)
+
+# Print configuration summary
+message(STATUS "SOUI Version: ${SOUI_VER}")
+message(STATUS "SOUI Include Dirs: ${SOUI_INCLUDE_DIRS}")
+message(STATUS "SOUI Library Dirs: ${SOUI_LIBRARY_DIRS}")
+message(STATUS "SOUI Libraries: ${SOUI_LIBRARIES}")
+message(STATUS "SOUI Enable Core Lib: ${SOUI_ENABLE_CORE_LIB}")
+message(STATUS "SOUI Enable Com Lib: ${SOUI_ENABLE_COM_LIB}")
+
+# ---------------------------------------------------------------------------
+# find_package(soui4) support
+# Build imported targets for every public installed library. Internal static
+# dependencies (COM_DEP_LIBS / SWINX_DEP_LIBS) are part of @SOUI_PUBLIC_LIBS@
+# only when a static build populated them (SOUI_ENABLE_CORE_LIB=ON); in a shared
+# build they are empty and contribute nothing, because they are already bundled
+# inside the shared archives.
+# ---------------------------------------------------------------------------
+set(_soui_lib_dirs ${SOUI_LIBRARY_DIRS} "${libdir}/Release" "${libdir}/Debug")
+
+set(_soui_targets "")
+foreach(_lib @SOUI_PUBLIC_LIBS@)
+  if(NOT _lib)
+    continue()
+  endif()
+  if(TARGET soui::${_lib})
+    list(APPEND _soui_targets soui::${_lib})
+  elseif(TARGET ${_lib})
+    add_library(soui::${_lib} ALIAS ${_lib})
+    list(APPEND _soui_targets soui::${_lib})
+  else()
+    find_library(_soui_${_lib}_loc NAMES ${_lib}
+                 HINTS ${_soui_lib_dirs} NO_DEFAULT_PATH)
+    if(_soui_${_lib}_loc)
+      add_library(soui::${_lib} UNKNOWN IMPORTED)
+      set_target_properties(soui::${_lib} PROPERTIES
+          IMPORTED_LOCATION "${_soui_${_lib}_loc}"
+          INTERFACE_INCLUDE_DIRECTORIES "${SOUI_INCLUDE_DIRS}")
+      list(APPEND _soui_targets soui::${_lib})
+    endif()
+  endif()
+endforeach()
+
+if(_soui_targets AND NOT TARGET soui::all)
+  add_library(soui::all INTERFACE IMPORTED)
+  # On Unix linkers (GNU ld / Clang) a fully-static soui4 has circular
+  # dependencies between its modules (e.g. soui4 <-> swinx), so the libraries
+  # must be resolved as a single --start-group/--end-group regardless of list
+  # order. In a shared build this wrap is harmless. MSVC's linker resolves
+  # left-to-right and the build-time list already places dependencies after
+  # their dependents, so the plain ordered list is sufficient there.
+  if(NOT WIN32)
+    target_link_libraries(soui::all INTERFACE
+        "LINKER:--start-group" ${_soui_targets} "LINKER:--end-group")
+  else()
+    target_link_libraries(soui::all INTERFACE ${_soui_targets})
+  endif()
+endif()
+unset(_soui_lib_dirs)
+unset(_soui_targets)

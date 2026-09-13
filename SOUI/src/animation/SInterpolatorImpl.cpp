@@ -1,22 +1,22 @@
 ﻿#include "souistd.h"
 #include "animation/SInterpolatorImpl.h"
-#include "core/SLayoutSize.h" //for SLayoutSize::fequal
+#include "core/SLayoutSize.h" /**< for SLayoutSize::fequal */
 #pragma warning(push)
-#pragma warning(disable : 4985) // disable the warning message during the include
-#include <math.h>               // this is where I would normally get the warning message
+#pragma warning(disable : 4985) /**< disable the warning message during the include */
+#include <math.h>               /**< this is where I would normally get the warning message */
 #pragma warning(pop)
 
 SNSBEGIN
 
 static const float PI = 3.1415926f;
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 float SLinearInterpolator::getInterpolation(float input) const
 {
     return input;
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 float SAccelerateInterpolator::getInterpolation(float input) const
 {
     if (SLayoutSize::fequal(mFactor, 1.0f))
@@ -35,7 +35,7 @@ SAccelerateInterpolator::SAccelerateInterpolator(float factor)
 {
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 
 float SDecelerateInterpolator::getInterpolation(float input) const
 {
@@ -56,13 +56,13 @@ SDecelerateInterpolator::SDecelerateInterpolator(float factor)
 {
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 float SAccelerateDecelerateInterpolator::getInterpolation(float input) const
 {
     return (float)(cos((input + 1) * PI) / 2.0f) + 0.5f;
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 float SAnticipateInterpolator::getInterpolation(float t) const
 {
     // a(t) = t * t * ((tension + 1) * t - tension)
@@ -79,7 +79,7 @@ SAnticipateInterpolator::SAnticipateInterpolator()
 {
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 float SAnticipateOvershootInterpolator::getInterpolation(float t) const
 {
     // a(t, s) = t * t * ((s + 1) * t - s)
@@ -108,7 +108,7 @@ SAnticipateOvershootInterpolator::SAnticipateOvershootInterpolator(float tension
 {
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 float SBounceInterpolator::getInterpolation(float t) const
 {
     // _b(t) = t * t * 8
@@ -133,7 +133,7 @@ float SBounceInterpolator::bounce(float t)
     return t * t * 8.0f;
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 float SCycleInterpolator::getInterpolation(float input) const
 {
     return (float)(sin(2 * mCycles * PI * input));
@@ -144,7 +144,7 @@ SCycleInterpolator::SCycleInterpolator(float cycles)
 {
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 
 float SOvershootInterpolator::getInterpolation(float t) const
 {
@@ -159,8 +159,8 @@ SOvershootInterpolator::SOvershootInterpolator(float tension)
 {
 }
 
-//////////////////////////////////////////////////////////////////////////
-// Quad interpolators
+///////////////////////////////////////////////////////////////////////
+/** Quad interpolators */
 float SQuadInInterpolator::getInterpolation(float t) const
 {
     return t * t;
@@ -176,8 +176,8 @@ float SQuadInOutInterpolator::getInterpolation(float t) const
     return -1.0f + (4.0f - 2.0f * t) * t;
 }
 
-//////////////////////////////////////////////////////////////////////////
-// Cubic interpolators
+///////////////////////////////////////////////////////////////////////
+/** Cubic interpolators */
 float SCubicInInterpolator::getInterpolation(float t) const
 {
     return t * t * t;
@@ -195,8 +195,8 @@ float SCubicInOutInterpolator::getInterpolation(float t) const
     return 0.5f * p * p * p + 1.0f;
 }
 
-//////////////////////////////////////////////////////////////////////////
-// Sine interpolators
+///////////////////////////////////////////////////////////////////////
+/** Sine interpolators */
 float SSineInInterpolator::getInterpolation(float t) const
 {
     return (float)(1.0f - cos((t * PI) / 2.0f));
@@ -210,8 +210,8 @@ float SSineInOutInterpolator::getInterpolation(float t) const
     return (float)(-0.5f * (cos(PI * t) - 1.0f));
 }
 
-//////////////////////////////////////////////////////////////////////////
-// Exponential interpolators
+///////////////////////////////////////////////////////////////////////
+/** Exponential interpolators */
 float SExpoInInterpolator::getInterpolation(float t) const
 {
     return (t == 0.0f) ? 0.0f : (float)pow(2.0f, 10.0f * (t - 1.0f));
@@ -231,8 +231,8 @@ float SExpoInOutInterpolator::getInterpolation(float t) const
     return -0.5f * (float)pow(2.0f, (-20.0f * t) + 10.0f) + 1.0f;
 }
 
-//////////////////////////////////////////////////////////////////////////
-// Back interpolators
+///////////////////////////////////////////////////////////////////////
+/** Back interpolators */
 SBackInInterpolator::SBackInInterpolator(float tension)
     : mTension(tension)
 {
@@ -274,8 +274,8 @@ float SBackInOutInterpolator::getInterpolation(float t) const
     }
 }
 
-//////////////////////////////////////////////////////////////////////////
-// Quint interpolators
+///////////////////////////////////////////////////////////////////////
+/** Quint interpolators */
 float SQuintInInterpolator::getInterpolation(float t) const
 {
     return t * t * t * t * t;

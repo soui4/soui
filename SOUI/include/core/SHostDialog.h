@@ -135,4 +135,4 @@ class SOUI_EXP SHostDialog : public THostWndProxy<IHostDialog> {
 
 SNSEND
 
-#endif // __SHOSTDIALOG__H__
+#endif /**< __SHOSTDIALOG__H__ */

@@ -15,72 +15,72 @@ DECLARE_INTERFACE_(IEvtArgs, IObject)
     //-------------------------------------------------------------------------------------------
 
     /**
-     * @brief 获取事件发送对象
-     * @return IObject *--事件发送对象
+     * @brief Get the event sender object
+     * @return IObject *--event sender object
      */
     STDMETHOD_(IObject *, Sender)(THIS) PURE;
 
     /**
-     * @brief 获取事件发送对象ID
-     * @return int--事件发送对象ID
+     * @brief Get the event sender object ID
+     * @return int--event sender object ID
      */
     STDMETHOD_(int, IdFrom)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 设置事件的发送对象ID
-     * @param id int--发送对象ID
+     * @brief Set the event sender object ID
+     * @param id int--sender object ID
      * @return void
      */
     STDMETHOD_(void, SetIdFrom)(THIS_ int id) PURE;
 
     /**
-     * @brief 获取事件发送对象Name
-     * @return LPCWSTR--事件发送对象Name
+     * @brief Get the event sender object Name
+     * @return LPCWSTR--event sender object Name
      */
     STDMETHOD_(LPCWSTR, NameFrom)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 设置事件发送对象Name
-     * @param name LPCWSTR--事件发送对象Name
+     * @brief Set the event sender object Name
+     * @param name LPCWSTR--event sender object Name
      * @return void
      */
     STDMETHOD_(void, SetNameFrom)(THIS_ LPCWSTR name) PURE;
 
     /**
-     * @brief 获取事件是否需要冒泡传递
-     * @return BOOL TRUE--冒泡传递
+     * @brief Get whether the event needs bubble propagation
+     * @return BOOL TRUE--bubble propagation
      */
     STDMETHOD_(BOOL, IsBubbleUp)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 设置事件的冒泡传递
-     * @param bBubbleUp BOOL, FALSE--中止传递
+     * @brief Set the event's bubble propagation
+     * @param bBubbleUp BOOL, FALSE--stop propagation
      * @return void
      */
     STDMETHOD_(void, SetBubbleUp)(THIS_ BOOL bBubbleUp) PURE;
 
     /**
-     * @brief 获取事件处理次数
-     * @return UINT 事件处理次数
+     * @brief Get the event handling count
+     * @return UINT event handling count
      */
     STDMETHOD_(UINT, HandleCount)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 增加事件处理计数
+     * @brief Increment the event handling count
      * @return void
      */
     STDMETHOD_(void, IncreaseHandleCount)(THIS) PURE;
 
     /**
-     * @brief 获取事件对象关联的数据结构体指针
-     * @return LPVOID 事件对象关联的数据结构体指针
-     * @remark 不同事件对象包含不同的数据，获取指针再转换为结构体指针。主要给C接口使用。
+     * @brief Get the pointer to the data structure associated with the event object
+     * @return LPVOID pointer to the data structure associated with the event object
+     * @remark Different event objects contain different data; obtain the pointer and cast it to the structure pointer. Mainly used by the C interface.
      */
     STDMETHOD_(LPVOID, Data)(THIS) PURE;
 };
 
-/*!
-\brief
+/**
+@brief
     Defines abstract interface which will be used when constructing various
     functor objects that bind slots to signals (or in CEGUI terms, handlers to
     events).
@@ -89,59 +89,59 @@ DECLARE_INTERFACE_(IEvtArgs, IObject)
 #define INTERFACE IEvtSlot
 DECLARE_INTERFACE_(IEvtSlot, IObjRef)
 {
-    //! 添加引用
-    /*!
-     * @return long - 当前引用计数
+    /** Add reference */
+    /**
+     * @return long - current reference count
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
-    //! 释放引用
-    /*!
-     * @return long - 当前引用计数
+    /** Release reference */
+    /**
+     * @return long - current reference count
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
-    //! 释放对象
-    /*!
+    /** Release object */
+    /**
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
     /**
-     * @brief 执行事件
-     * @param pArg IEvtArgs* 事件对象
-     * @return BOOL TRUE--响应了事件，事件对象增加使用计数, FALSE--事件没有响应
+     * @brief Execute event
+     * @param pArg IEvtArgs* event object
+     * @return BOOL TRUE--the event was handled and the event object's usage count is incremented, FALSE--event not handled
      */
     STDMETHOD_(BOOL, Run)(THIS_ IEvtArgs * pArg) PURE;
 
     /**
-     * @brief clone一个事件槽
-     * @return IEvtSlot * clone出来的对象
+     * @brief Clone an event slot
+     * @return IEvtSlot * cloned object
      */
     STDMETHOD_(IEvtSlot *, Clone)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 判断两个IEvtSlot是否相等
-     * @param sour IEvtSlot * 比较的IEvtSlot
-     * @return BOOL TRUE--相等, FALSE--不相等
+     * @brief Check whether two IEvtSlot are equal
+     * @param sour IEvtSlot * IEvtSlot to compare
+     * @return BOOL TRUE--equal, FALSE--not equal
      */
     STDMETHOD_(BOOL, Equal)(CTHIS_ const IEvtSlot *sour) SCONST PURE;
 
     /**
-     * @brief 获取IEvtSlot类型
-     * @return UINT IEvtSlot类型
+     * @brief Get the IEvtSlot type
+     * @return UINT IEvtSlot type
      */
     STDMETHOD_(UINT, GetSlotType)(CTHIS) SCONST PURE;
 };
 
 /**
- * @brief 事件处理回调
- * @param pEvt IEvtArgs * 事件对象
- * @param Ctx void * 事件处理上下文
- * @return BOOL TRUE--事件被处理，增加处理计数
+ * @brief Event handling callback
+ * @param pEvt IEvtArgs * event object
+ * @param Ctx void * event handling context
+ * @return BOOL TRUE--event handled, increment handling count
  */
 typedef BOOL (*FunCallback)(IEvtArgs *pEvt, void *Ctx);
 
 #define EventArgs IEvtArgs
 SNSEND
-#endif // __SEVTARGS_I__H__
+#endif /**< __SEVTARGS_I__H__ */

@@ -1,9 +1,9 @@
-﻿/*########################################################################
+﻿/**########################################################################
     Filename:     MenuWndHook.h
     ----------------------------------------------------
     Remarks:    ...
     ----------------------------------------------------
-    Author:        成真
+    Author:        Cheng Zhen
     Email:        anyou@sina.com
                 anyou@msn.com
     Created:    7/4/2003 17:37
@@ -14,20 +14,20 @@
 
 SNSBEGIN
 
-/*########################################################################
+/**########################################################################
               ------------------------------------------------
-                             CMenuWndHook 类
+                             CMenuWndHook class
               ------------------------------------------------
   ########################################################################*/
 class SOUI_EXP SMenuWndHook {
-    // 建构 ---------------------------------------------------------
+    /** Construction --------------------------------------------------------- */
   public:
     SMenuWndHook(HWND hWnd);
     ~SMenuWndHook();
     static void InstallHook(HINSTANCE hInst, LPCWSTR pszSkinName = NULL);
     static void UnInstallHook();
 
-    // 消息 ----------------------------------------------------------
+    /** Message ---------------------------------------------------------- */
   public:
     static LRESULT CALLBACK CoolMenuProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     static LRESULT CALLBACK WindowHook(int code, WPARAM wParam, LPARAM lParam);
@@ -40,12 +40,12 @@ class SOUI_EXP SMenuWndHook {
     void OnWindowPosChanging(WINDOWPOS *pWindowPos);
     void OnWindowPosChanged();
 
-    // 操作 ----------------------------------------------------------
+    /** Operations ---------------------------------------------------------- */
   public:
     static SMenuWndHook *AddWndHook(HWND hwnd);
     static SMenuWndHook *GetWndHook(HWND hwnd);
 
-    // 数据 -----------------------------------------------------------
+    /** Data ----------------------------------------------------------- */
   protected:
     HWND m_hWnd;
 
@@ -55,4 +55,4 @@ class SOUI_EXP SMenuWndHook {
 };
 
 SNSEND
-#endif // __SMENUWNDHOOK__H__
+#endif /**< __SMENUWNDHOOK__H__ */

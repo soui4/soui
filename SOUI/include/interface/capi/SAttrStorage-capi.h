@@ -7,12 +7,12 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for SAttrStorage Interfaces
  * These macros provide C-style function call syntax for C++ interface methods
  */
 
-/* IAttrStorage C API Macros */
+/** IAttrStorage C API Macros */
 #define IAttrStorage_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -28,7 +28,7 @@ extern "C" {
 #define IAttrStorage_OnGetAttribute(This, strName, strValue) \
     ((This)->lpVtbl->OnGetAttribute(This, strName, strValue))
 
-/* IAttrStorageFactory C API Macros */
+/** IAttrStorageFactory C API Macros */
 #define IAttrStorageFactory_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -45,4 +45,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SATTRSTORAGE_CAPI_H__ */
+#endif /**< __SATTRSTORAGE_CAPI_H__ */

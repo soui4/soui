@@ -1,4 +1,4 @@
-#ifndef __STREEVIEW__H__
+﻿#ifndef __STREEVIEW__H__
 #define __STREEVIEW__H__
 
 #include <core/SWnd.h>
@@ -401,13 +401,47 @@ class SOUI_EXP STreeView
      * @return Pointer to the item panel at the specified position.
      */
     SItemPanel *HitTest(CPoint &pt) const;
-    
+
     /**
      * @brief Gets the item panel for a given item handle.
      * @param hItem Handle to the item.
      * @return Pointer to the item panel.
      */
     SItemPanel *GetItemPanel(HSTREEITEM hItem);
+
+    //----------------------------------------------------------------------
+    /** Accessibility children (msaa). Tree items (SItemPanel) are exposed */
+    /** directly as real child windows, following the SListView model. */
+    //----------------------------------------------------------------------
+
+    /**
+     * @brief Number of real Accessible child windows (currently visible list item panel count).
+     */
+    int GetVisibleAccChildCount() const
+    {
+        return (int)m_visible_items.GetCount();
+    }
+
+    /**
+     * @brief Get the iChild-th (1-based) visible list item panel.
+     */
+    SWindow *GetVisibleAccChild(int iChild) const
+    {
+        int n = 0;
+        for (SPOSITION it = m_visible_items.GetHeadPosition(); it;)
+        {
+            const ItemInfo &itInfo = m_visible_items.GetNext(it);
+            if (n == iChild - 1)
+                return itInfo.pItem;
+            n++;
+        }
+        return NULL;
+    }
+
+    /**
+     * @brief Accessible index (1-based) of the currently selected list item panel; 0 means none selected.
+     */
+    int GetVisibleAccSelIndex() const;
 
   protected:
     /**
@@ -726,4 +760,4 @@ class SOUI_EXP STreeView
     ItemSelectionMap m_mapSelItems; /**< Map of selected items. */
 };
 SNSEND
-#endif // __STREEVIEW__H__
+#endif /**< __STREEVIEW__H__ */

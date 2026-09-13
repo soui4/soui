@@ -7,146 +7,146 @@ SNSBEGIN
 
 /**
  * @class SEvent
- * @brief 表示一个事件对象
+ * @brief Represents an event object
  */
 class SOUI_EXP SEvent {
   public:
     /**
-     * @brief 构造函数
-     * @param dwEventID 事件ID
-     * @param pszEventName 事件名称
+     * @brief Constructor
+     * @param dwEventID Event ID
+     * @param pszEventName Event name
      */
     SEvent(DWORD dwEventID, LPCWSTR pszEventName);
 
     /**
-     * @brief 析构函数
+     * @brief Destructor
      */
     virtual ~SEvent();
 
     /**
-     * @brief 获取事件ID
-     * @return 事件ID
+     * @brief Get event ID
+     * @return Event ID
      */
     DWORD GetID();
 
     /**
-     * @brief 获取事件名称
-     * @return 事件名称
+     * @brief Get event name
+     * @return Event name
      */
     SStringW GetName() const;
 
     /**
-     * @brief 获取脚本处理程序
-     * @return 脚本处理程序字符串
+     * @brief Get script handler
+     * @return Script handler string
      */
     SStringA GetScriptHandler() const;
 
     /**
-     * @brief 设置脚本处理程序
-     * @param strScriptHandler 脚本处理程序字符串
+     * @brief Set script handler
+     * @param strScriptHandler Script handler string
      */
     void SetScriptHandler(const SStringA &strScriptHandler);
 
     /**
-     * @brief 订阅事件
-     * @param slot 事件槽对象
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Subscribe event
+     * @param slot Event slot object
+     * @return TRUE on success, FALSE on failure
      */
     BOOL subscribe(const IEvtSlot *slot);
 
     /**
-     * @brief 取消订阅事件
-     * @param slot 事件槽对象
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Unsubscribe event
+     * @param slot Event slot object
+     * @return TRUE on success, FALSE on failure
      */
     BOOL unsubscribe(const IEvtSlot *slot);
 
     /**
-     * @brief 触发事件
-     * @param args 事件参数对象
+     * @brief Fire event
+     * @param args Event argument object
      */
     void fire(IEvtArgs *args);
 
   protected:
     /**
-     * @brief 查找事件槽对象
-     * @param slot 事件槽对象
-     * @return 找到的事件槽索引，未找到返回-1
+     * @brief Find event slot object
+     * @param slot Event slot object
+     * @return Index of the found event slot, or -1 if not found
      */
     int findSlotFunctor(const IEvtSlot *slot);
 
-    DWORD m_dwEventID;           ///< 事件ID
-    SStringW m_strEventName;     ///< 事件名称
-    SStringA m_strScriptHandler; ///< 脚本处理程序字符串
+    DWORD m_dwEventID;           /**<  Event ID */
+    SStringW m_strEventName;     /**<  Event name */
+    SStringA m_strScriptHandler; /**<  Script handler string */
 
-    SArray<IEvtSlot *> m_evtSlots; ///< 事件槽数组
+    SArray<IEvtSlot *> m_evtSlots; /**<  Event slot array */
 };
 
 /**
  * @class SEventSet
- * @brief 表示一组事件对象
+ * @brief Represents a set of event objects
  */
 class SOUI_EXP SEventSet {
     friend class SWindow;
 
   public:
     /**
-     * @brief 构造函数
+     * @brief Constructor
      */
     SEventSet(void);
 
     /**
-     * @brief 析构函数
+     * @brief Destructor
      */
     virtual ~SEventSet(void);
 
     /**
-     * @brief 添加一个新事件到事件集
-     * @param dwEventID 事件ID
-     * @param pszEventHandlerName 事件处理程序名称
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Add a new event to the event set
+     * @param dwEventID Event ID
+     * @param pszEventHandlerName Event handler name
+     * @return TRUE on success, FALSE on failure
      */
     BOOL addEvent(DWORD dwEventID, LPCWSTR pszEventHandlerName);
 
     /**
-     * @brief 移除指定ID的事件
-     * @param dwEventID 事件ID
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Remove the event with the specified ID
+     * @param dwEventID Event ID
+     * @return TRUE on success, FALSE on failure
      */
     BOOL removeEvent(DWORD dwEventID);
 
     /**
-     * @brief 移除所有事件对象
+     * @brief Remove all event objects
      */
     void removeAllEvents(void);
 
     /**
-     * @brief 检查事件集是否包含指定ID的事件
-     * @param dwEventID 事件ID
-     * @return 存在返回TRUE，不存在返回FALSE
+     * @brief Check whether the event set contains the event with the specified ID
+     * @param dwEventID Event ID
+     * @return TRUE if exists, FALSE otherwise
      */
     BOOL isEventPresent(DWORD dwEventID);
 
     /**
-     * @brief 设置事件的脚本处理程序
-     * @param strEventName 事件名称
-     * @param strScriptHandler 脚本处理程序字符串
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Set the script handler for the event
+     * @param strEventName Event name
+     * @param strScriptHandler Script handler string
+     * @return TRUE on success, FALSE on failure
      */
     BOOL setEventScriptHandler(const SStringW &strEventName, const SStringA strScriptHandler);
 
     /**
-     * @brief 获取事件的脚本处理程序
-     * @param strEventName 事件名称
-     * @return 脚本处理程序字符串
+     * @brief Get the script handler of the event
+     * @param strEventName event name
+     * @return script handler string
      */
     SStringA getEventScriptHandler(const SStringW &strEventName) const;
 
     /**
-     * @brief 订阅事件
-     * @param dwEventID 事件ID
-     * @param subscriber 事件槽对象
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Subscribe to event
+     * @param dwEventID event ID
+     * @param subscriber event slot object
+     * @return Returns TRUE on success, FALSE on failure
      */
     BOOL subscribeEvent(DWORD dwEventID, const IEvtSlot &subscriber)
     {
@@ -154,30 +154,30 @@ class SOUI_EXP SEventSet {
     }
 
     /**
-     * @brief 订阅事件
-     * @param dwEventID 事件ID
-     * @param subscriber 事件槽对象指针
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Subscribe to event
+     * @param dwEventID event ID
+     * @param subscriber event slot object pointer
+     * @return Returns TRUE on success, FALSE on failure
      */
     BOOL subscribeEvent(DWORD dwEventID, const IEvtSlot *subscriber);
 
-#if _MSC_VER >= 1700 // VS2012
+#if _MSC_VER >= 1700 /**< VS2012 */
     /**
-     * @brief 订阅事件（使用标准函数回调）
-     * @param dwEventID 事件ID
-     * @param eventCallback 标准函数回调
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Subscribe to event (using standard function callback)
+     * @param dwEventID event ID
+     * @param eventCallback standard function callback
+     * @return Returns TRUE on success, FALSE on failure
      */
     BOOL subscribeEvent(DWORD dwEventID, const StdFunCallback &eventCallback);
 #endif
 
     /**
-     * @brief 订阅事件（模板函数）
-     * @tparam T 对象类型
-     * @tparam A 事件参数类型
-     * @param pFn 成员函数指针
-     * @param pObject 对象指针
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Subscribe to event (template function)
+     * @tparam T object type
+     * @tparam A event argument type
+     * @param pFn member function pointer
+     * @param pObject object pointer
+     * @return Returns TRUE on success, FALSE on failure
      */
     template <typename T, typename A>
     BOOL subscribeEvent(BOOL (T::*pFn)(A *), T *pObject)
@@ -186,10 +186,10 @@ class SOUI_EXP SEventSet {
     }
 
     /**
-     * @brief 订阅事件（模板函数）
-     * @tparam A 事件参数类型
-     * @param pFn 函数指针
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Subscribe to event (template function)
+     * @tparam A event argument type
+     * @param pFn function pointer
+     * @return Returns TRUE on success, FALSE on failure
      */
     template <typename A>
     BOOL subscribeEvent(BOOL (*pFn)(A *))
@@ -198,11 +198,11 @@ class SOUI_EXP SEventSet {
     }
 
     /**
-     * @brief 订阅事件（模板函数）
-     * @tparam T 对象类型
-     * @param pFn 成员函数指针
-     * @param pObject 对象指针
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Subscribe to event (template function)
+     * @tparam T object type
+     * @param pFn member function pointer
+     * @param pObject object pointer
+     * @return Returns TRUE on success, FALSE on failure
      */
     template <typename T>
     BOOL subscribeEvent(DWORD dwEventID, BOOL (T::*pFn)(IEvtArgs *), T *pObject)
@@ -211,18 +211,18 @@ class SOUI_EXP SEventSet {
     }
 
     /**
-     * @brief 取消订阅事件
-     * @param dwEventID 事件ID
-     * @param subscriber 事件槽对象指针
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Unsubscribe from event
+     * @param dwEventID event ID
+     * @param subscriber event slot object pointer
+     * @return Returns TRUE on success, FALSE on failure
      */
     BOOL unsubscribeEvent(DWORD dwEventID, const IEvtSlot *subscriber);
 
     /**
-     * @brief 取消订阅事件
-     * @param dwEventID 事件ID
-     * @param subscriber 事件槽对象
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Unsubscribe from event
+     * @param dwEventID event ID
+     * @param subscriber event slot object
+     * @return Returns TRUE on success, FALSE on failure
      */
     BOOL unsubscribeEvent(DWORD dwEventID, const IEvtSlot &subscriber)
     {
@@ -230,12 +230,12 @@ class SOUI_EXP SEventSet {
     }
 
     /**
-     * @brief 取消订阅事件（模板函数）
-     * @tparam T 对象类型
-     * @tparam A 事件参数类型
-     * @param pFn 成员函数指针
-     * @param pObject 对象指针
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Unsubscribe from event (template function)
+     * @tparam T object type
+     * @tparam A event argument type
+     * @param pFn member function pointer
+     * @param pObject object pointer
+     * @return Returns TRUE on success, FALSE on failure
      */
     template <typename T, typename A>
     BOOL unsubscribeEvent(BOOL (T::*pFn)(A *), T *pObject)
@@ -244,10 +244,10 @@ class SOUI_EXP SEventSet {
     }
 
     /**
-     * @brief 取消订阅事件（模板函数）
-     * @tparam A 事件参数类型
-     * @param pFn 函数指针
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Unsubscribe from event (template function)
+     * @tparam A event argument type
+     * @param pFn function pointer
+     * @return Returns TRUE on success, FALSE on failure
      */
     template <typename A>
     BOOL unsubscribeEvent(BOOL (*pFn)(A *))
@@ -256,11 +256,11 @@ class SOUI_EXP SEventSet {
     }
 
     /**
-     * @brief 取消订阅事件（模板函数）
-     * @tparam T 对象类型
-     * @param pFn 成员函数指针
-     * @param pObject 对象指针
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Unsubscribe from event (template function)
+     * @tparam T object type
+     * @param pFn member function pointer
+     * @param pObject object pointer
+     * @return Returns TRUE on success, FALSE on failure
      */
     template <typename T>
     BOOL unsubscribeEvent(DWORD dwEventID, BOOL (T::*pFn)(IEvtArgs *), T *pObject)
@@ -269,14 +269,14 @@ class SOUI_EXP SEventSet {
     }
 
     /**
-     * @brief 触发事件
-     * @param args 事件参数对象
+     * @brief Fire event
+     * @param args Event argument object
      */
     void FireEvent(IEvtArgs *args);
 
     /**
-     * @brief 检查事件集是否被静音
-     * @return 被静音返回TRUE，否则返回FALSE
+     * @brief Check whether the event set is muted
+     * @return Returns TRUE if muted, FALSE otherwise
      */
     BOOL isMuted(void) const
     {
@@ -284,23 +284,23 @@ class SOUI_EXP SEventSet {
     }
 
     /**
-     * @brief 设置事件集的静音状态
-     * @param setting TRUE表示静音，FALSE表示取消静音
+     * @brief Set the mute state of the event set
+     * @param setting TRUE to mute, FALSE to unmute
      */
     void setMutedState(BOOL setting);
 
   protected:
     /**
-     * @brief 获取事件对象
-     * @param dwEventID 事件ID
-     * @return 事件对象指针，未找到返回NULL
+     * @brief Get the event object
+     * @param dwEventID event ID
+     * @return pointer to the event object, NULL if not found
      */
     SEvent *GetEventObject(const DWORD dwEventID);
 
-    SArray<SEvent *> m_evtArr; ///< 事件数组
-    int m_nMuted;              ///< 静音状态计数
+    SArray<SEvent *> m_evtArr; /**<  Event array */
+    int m_nMuted;              /**<  Mute state count */
 };
 
 SNSEND
 
-#endif // __SEVENTSET__H__
+#endif /**< __SEVENTSET__H__ */

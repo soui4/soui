@@ -70,16 +70,16 @@ IResProvider *SouiFactory::CreateResProvider(THIS_ BUILTIN_RESTYPE resType)
     case RES_FILE:
         pObj = new SResProviderFiles;
         break;
-    #ifdef __ANDROID__
+#ifdef __ANDROID__
     case RES_ANDROID_ASSET:
         pObj = new SResProviderAndroidAsset;
         break;
-    #endif//__ANDROID__
-    #ifdef __OHOS__
+#endif // __ANDROID__
+#ifdef __OHOS__
     case RES_OHOS_RAWFILE:
         pObj = new SResProviderOhosRawFile;
         break;
-    #endif//__OHOS__
+#endif // __OHOS__
     default:
         break;
     }

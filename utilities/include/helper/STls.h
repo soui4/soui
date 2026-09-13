@@ -13,11 +13,13 @@ SNSBEGIN
  *          Usage:
  *            static STlsId s_id = 0;
  */
-typedef volatile long STlsId;
+typedef volatile LONG STlsId;
 
 /**
- * @brief Destructor callback invoked by STls::Cleanup for each non-NULL value.
- * @param value The pointer previously stored via STls::Set.
+ * @brief Destructor callback invoked by STls::Cleanup for every slot that has
+ *        one registered (mirrors SDL3's SDL_TLSCleanup: the callback also runs
+ *        for slots whose stored value is NULL, so it must accept NULL).
+ * @param value The pointer previously stored via STls::Set; may be NULL.
  */
 typedef void (*STlsDestructor)(void *value);
 

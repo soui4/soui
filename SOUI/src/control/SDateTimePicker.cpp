@@ -130,12 +130,12 @@ void SDateTimePicker::GetDropBtnRect(LPRECT pBtnRc, LPRECT pSkinRc)
 {
     SIZE szBtn = m_pSkinBtn->GetSkinSize();
     GetClientRect(pBtnRc);
-    pBtnRc->left = pBtnRc->right - (pBtnRc->bottom - pBtnRc->top); // 取 右边的正方形 为  按钮 区域
+    pBtnRc->left = pBtnRc->right - (pBtnRc->bottom - pBtnRc->top); // Take the square on the right as the button area
 
     if (NULL == pSkinRc)
         return;
 
-    int n = (pBtnRc->bottom - pBtnRc->top - szBtn.cy) / 2; // 按钮皮肤 则 要居中
+    int n = (pBtnRc->bottom - pBtnRc->top - szBtn.cy) / 2; // Button skin should be centered
 
     pSkinRc->right = pBtnRc->right - n;
     pSkinRc->left = pSkinRc->right - szBtn.cx;
@@ -147,7 +147,7 @@ void SDateTimePicker::GetDropBtnRect(LPRECT pBtnRc, LPRECT pSkinRc)
 SStringT SDateTimePicker::ToFormatText(EnDateType eType, WORD wNum)
 {
     SStringT szNum;
-    if (eType == m_eSelDateType) // 选中项
+    if (eType == m_eSelDateType) // Selected item
     {
         if (eDT_Year == eType)
         {
@@ -193,7 +193,7 @@ void SDateTimePicker::Draw(EnDateType eType, IRenderTarget *pRT, WORD wNum, CRec
         return;
     }
 
-    // 选中 的 填充 字体颜色 变 白
+    // Selected: fill and font color turn white
     pRT->FillSolidRect(rcText, m_crSelBg);
 
     COLORREF old = pRT->SetTextColor(m_crSelText);
@@ -423,7 +423,7 @@ void SDateTimePicker::OnLButtonDown(UINT nFlags, CPoint pt)
 
     CRect rcBtn;
     GetDropBtnRect(&rcBtn);
-    if (!rcBtn.PtInRect(pt)) // 没有点击 按钮
+    if (!rcBtn.PtInRect(pt)) // Button not clicked
     {
         EnDateType eSelType = HitTest(pt);
         if (m_eSelDateType != eSelType)
@@ -531,7 +531,7 @@ void SDateTimePicker::TimeWheel(bool bUp)
     Invalidate();
 }
 
-void SDateTimePicker::CircluNum(bool bUp, WORD &wNum, WORD wMin /*=1*/, WORD wMax /*=0*/)
+void SDateTimePicker::CircluNum(bool bUp, WORD &wNum, WORD wMin /**< =1 */, WORD wMax /**< =0 */)
 {
     if (bUp)
     {
@@ -551,7 +551,7 @@ void SDateTimePicker::CircluNum(bool bUp, WORD &wNum, WORD wMin /*=1*/, WORD wMa
 
 void SDateTimePicker::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
 {
-    if (37 == nChar) // <-
+    if (37 == nChar) // -
     {
         if (eDT_Year == m_eSelDateType)
             return;
@@ -573,7 +573,8 @@ void SDateTimePicker::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
         TimeWheel(true);
     else if (40 == nChar)
         TimeWheel(false);
-    else if(nChar == VK_ESCAPE){
+    else if (nChar == VK_ESCAPE)
+    {
         SetMsgHandled(FALSE);
     }
 }

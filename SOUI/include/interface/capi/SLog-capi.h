@@ -7,12 +7,12 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for SLog Interfaces
  * These macros provide C-style function call syntax for C++ interface methods
  */
 
-/* IOutputFileBuilder C API Macros */
+/** IOutputFileBuilder C API Macros */
 #define IOutputFileBuilder_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -25,7 +25,7 @@ extern "C" {
 #define IOutputFileBuilder_buildOutputFile(This, pszFileName, nLen, pszLogName, pid, curFileIndex) \
     ((This)->lpVtbl->buildOutputFile(This, pszFileName, nLen, pszLogName, pid, curFileIndex))
 
-/* ILogMgr C API Macros */
+/** ILogMgr C API Macros */
 #define ILogMgr_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -87,4 +87,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SLOG_CAPI_H__ */
+#endif /**< __SLOG_CAPI_H__ */

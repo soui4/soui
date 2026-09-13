@@ -25,9 +25,9 @@ SNSBEGIN
  */
 typedef struct TIPID
 {
-    DWORD dwHi;  //!< ID1, used to save a SWND.
-    DWORD dwLow; //!< ID2, used to save additional data.
-    BOOL bNcTip; //!< Flag indicating if the tooltip is for the non-client area.
+    DWORD dwHi;  /**<  ID1, used to save a SWND. */
+    DWORD dwLow; /**<  ID2, used to save additional data. */
+    BOOL bNcTip; /**<  Flag indicating if the tooltip is for the non-client area. */
 } TIPID;
 
 /**
@@ -38,15 +38,15 @@ typedef struct TIPID
  */
 typedef enum TipAlign
 {
-    TA_AUTO = 0,        //!< Automatic alignment.
-    TA_X_LEFT = 1,      //!< Align left horizontally.
-    TA_X_CENTER = 2,    //!< Align center horizontally.
-    TA_X_RIGHT = 3,     //!< Align right horizontally.
-    TA_X_MASK = 0x0f,   //!< Mask for horizontal alignment.
-    TA_Y_TOP = 0x10,    //!< Align top vertically.
-    TA_Y_CENTER = 0x20, //!< Align center vertically.
-    TA_Y_BOTTOM = 0x30, //!< Align bottom vertically.
-    TA_Y_MASK = 0xF0,   //!< Mask for vertical alignment.
+    TA_AUTO = 0,        /**<  Automatic alignment. */
+    TA_X_LEFT = 1,      /**<  Align left horizontally. */
+    TA_X_CENTER = 2,    /**<  Align center horizontally. */
+    TA_X_RIGHT = 3,     /**<  Align right horizontally. */
+    TA_X_MASK = 0x0f,   /**<  Mask for horizontal alignment. */
+    TA_Y_TOP = 0x10,    /**<  Align top vertically. */
+    TA_Y_CENTER = 0x20, /**<  Align center vertically. */
+    TA_Y_BOTTOM = 0x30, /**<  Align bottom vertically. */
+    TA_Y_MASK = 0xF0,   /**<  Mask for vertical alignment. */
 } TipAlign;
 
 /**
@@ -111,7 +111,7 @@ DECLARE_INTERFACE_(IToolTip, IObjRef)
      * @brief Updates the current tooltip.
      *
      * @param id Pointer to the tooltip ID.
-     * @param rc Rectangle defining the tooltip's感应 area.
+     * @param rc Rectangle defining the tooltip's sensing area.
      * @param pszTip Tooltip string.
      * @param nScale Current scaling factor.
      */
@@ -188,4 +188,4 @@ DECLARE_INTERFACE_(IToolTipFactory, IObjRef)
 };
 
 SNSEND
-#endif // __STOOLTIP_I__H__
+#endif /**< __STOOLTIP_I__H__ */

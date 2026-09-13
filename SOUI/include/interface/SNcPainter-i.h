@@ -14,11 +14,11 @@ DECLARE_INTERFACE_(INcPainter, IObject)
     //--------------------------------------------------------------------------------
 
     /**
-     * @brief 获取绘制非客户区的根窗口
+     * @brief Get root window that draws non-client area
      * @return IWindow *--root
      */
     STDMETHOD_(IWindow *, GetRoot)(THIS) PURE;
 };
 
 SNSEND
-#endif // __SNCPAINTER_I__H__
+#endif /**< __SNCPAINTER_I__H__ */

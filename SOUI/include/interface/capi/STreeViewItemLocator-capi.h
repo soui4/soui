@@ -7,11 +7,9 @@
 extern "C" {
 #endif
 
-/*
- * C API Helper Macros for ITreeViewItemLocator Interface
- */
+/** C API Helper Macros for ITreeViewItemLocator Interface */
 
-/* IObjRef base interface macros */
+/** IObjRef base interface macros */
 #define ITreeViewItemLocator_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -21,7 +19,7 @@ extern "C" {
 #define ITreeViewItemLocator_OnFinalRelease(This) \
     ((This)->lpVtbl->OnFinalRelease(This))
 
-/* ITreeViewItemLocator specific interface macros */
+/** ITreeViewItemLocator specific interface macros */
 #define ITreeViewItemLocator_SetAdapter(This, pAdapter) \
     ((This)->lpVtbl->SetAdapter(This, pAdapter))
 
@@ -74,4 +72,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __STREEVIEWITEMLOCATOR_CAPI_H__ */
+#endif /**< __STREEVIEWITEMLOCATOR_CAPI_H__ */

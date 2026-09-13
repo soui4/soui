@@ -1,4 +1,4 @@
-#ifndef __SMCLISTVIEW__H__
+﻿#ifndef __SMCLISTVIEW__H__
 #define __SMCLISTVIEW__H__
 
 #include "core/SPanel.h"
@@ -267,7 +267,6 @@ class SOUI_EXP SMCListView
      */
     void UpdateScrollBar();
 
-
     /**
      * @brief Paint the control
      * @param pRT Rendering target handle
@@ -533,4 +532,4 @@ class SOUI_EXP SMCListView
 
 SNSEND
 
-#endif // __SMCLISTVIEW__H__
+#endif /**< __SMCLISTVIEW__H__ */

@@ -9,8 +9,12 @@ SNSBEGIN
 
 #undef INTERFACE
 #define INTERFACE IMsgFilter
-/// @interface IMsgFilter
-/// @brief Interface for message filtering.
+/**
+ * @interface IMsgFilter
+ */
+/**
+ * @brief Interface for message filtering.
+ */
 DECLARE_INTERFACE(IMsgFilter)
 {
     /**
@@ -23,8 +27,12 @@ DECLARE_INTERFACE(IMsgFilter)
 
 #undef INTERFACE
 #define INTERFACE IIdleHandler
-/// @interface IIdleHandler
-/// @brief Interface for handling idle time.
+/**
+ * @interface IIdleHandler
+ */
+/**
+ * @brief Interface for handling idle time.
+ */
 DECLARE_INTERFACE(IIdleHandler)
 {
     /**
@@ -37,8 +45,12 @@ DECLARE_INTERFACE(IIdleHandler)
 
 #undef INTERFACE
 #define INTERFACE IMessageLoop
-/// @interface IMessageLoop
-/// @brief Interface for message loops.
+/**
+ * @interface IMessageLoop
+ */
+/**
+ * @brief Interface for message loops.
+ */
 DECLARE_INTERFACE_(IMessageLoop, IObjRef)
 {
     /**
@@ -58,7 +70,7 @@ DECLARE_INTERFACE_(IMessageLoop, IObjRef)
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
-    // Message filter operations
+    /** Message filter operations */
 
     /**
      * @brief Adds a message filter.
@@ -74,7 +86,7 @@ DECLARE_INTERFACE_(IMessageLoop, IObjRef)
      */
     STDMETHOD_(BOOL, RemoveMessageFilter)(THIS_ IMsgFilter * pMessageFilter) PURE;
 
-    // Idle handler operations
+    /** Idle handler operations */
 
     /**
      * @brief Adds an idle handler.
@@ -90,7 +102,7 @@ DECLARE_INTERFACE_(IMessageLoop, IObjRef)
      */
     STDMETHOD_(BOOL, RemoveIdleHandler)(THIS_ IIdleHandler * pIdleHandler) PURE;
 
-    // Override to change message filtering
+    /** Override to change message filtering */
 
     /**
      * @brief Preprocesses a message.
@@ -99,7 +111,7 @@ DECLARE_INTERFACE_(IMessageLoop, IObjRef)
      */
     STDMETHOD_(BOOL, PreTranslateMessage)(THIS_ MSG * pMsg) PURE;
 
-    // Override to change idle processing
+    /** Override to change idle processing */
 
     /**
      * @brief Handles idle time.
@@ -174,20 +186,24 @@ DECLARE_INTERFACE_(IMessageLoop, IObjRef)
     STDMETHOD_(int, HandleMsg)(THIS) PURE;
 
     /**
-     * @brief 
+     * @brief
      */
     STDMETHOD_(void, OnStart)(THIS) PURE;
-    
+
     /**
-     * @brief 
+     * @brief
      */
     STDMETHOD_(void, OnStop)(THIS) PURE;
 };
 
 #undef INTERFACE
 #define INTERFACE IMsgLoopFactory
-/// @interface IMsgLoopFactory
-/// @brief Interface for creating message loops.
+/**
+ * @interface IMsgLoopFactory
+ */
+/**
+ * @brief Interface for creating message loops.
+ */
 DECLARE_INTERFACE_(IMsgLoopFactory, IObjRef)
 {
     /**
@@ -200,4 +216,4 @@ DECLARE_INTERFACE_(IMsgLoopFactory, IObjRef)
 };
 
 SNSEND
-#endif // __SMSGLOOP_I__H__
+#endif /**< __SMSGLOOP_I__H__ */

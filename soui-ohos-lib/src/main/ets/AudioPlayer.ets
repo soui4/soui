@@ -1,5 +1,6 @@
 import { media } from '@kit.MediaKit';
 import { fileIo as fs } from '@kit.CoreFileKit';
+import { audio } from '@kit.AudioKit';
 
 // Win32 SND_* 标志
 const SND_SYNC = 0x0000;
@@ -7,6 +8,14 @@ const SND_ASYNC = 0x0001;
 const SND_NODEFAULT = 0x0002;
 const SND_LOOP = 0x0008;
 const SND_PURGE = 0x0040;
+
+// 系统提示音（MessageBeep）的合成参数：直接用 AudioRenderer 现场合成 PCM，
+// 因此不需要在 HAP 里打包任何音频资源，也不依赖 TonePlayer（后者仅对系统应用开放）。
+const BEEP_SAMPLE_RATE = 48000;   // 采样率（Hz），取 AudioSamplingRate.SAMPLE_RATE_48000
+const BEEP_DURATION_MS = 120;     // 单次提示音时长（ms）
+const BEEP_FREQ_HZ = 880;         // 提示音频率（Hz），接近 Windows 默认提示音音高
+const BEEP_GAIN = 0.35;           // 峰值幅度（相对满量程），避免削顶与刺耳
+const BEEP_FADE_MS = 5;           // 起止淡入淡出时长（ms），消除爆音
 
 //
 // 多实例音频播放器，支持同时播放多个声音
@@ -120,6 +129,94 @@ export class AudioPlayer {
       }
     }
     console.info('[AudioPlayer] All players stopped');
+  }
+
+  //
+// 播放系统提示音（对齐 Win32 MessageBeep）。
+// 鸿蒙可直接调用的 TonePlayer 属系统接口（仅对系统应用开放），第三方应用不可用，
+// 因此这里用公开的 AudioRenderer 现场合成一段短促正弦音，并用"通知"流播报
+// （StreamUsage 枚举里没有 STREAM_USAGE_SYSTEM，提示音语义对应 STREAM_USAGE_NOTIFICATION；
+//  该流不可用时退化为 STREAM_USAGE_GAME），音量/静音策略由系统统一管理。
+// true 表示提示音请求已提交（异步播放，不等待播完）
+  public playBeep(): boolean {
+    this.startBeep().catch(() => {
+      console.error('[AudioPlayer] Beep failed, unknown error');
+    });
+    return true;
+  }
+
+  //
+// 异步合成并播放一次提示音
+  private async startBeep(): Promise<void> {
+    const streamInfo: audio.AudioStreamInfo = {
+      samplingRate: audio.AudioSamplingRate.SAMPLE_RATE_48000,
+      channels: audio.AudioChannel.CHANNEL_1,
+      sampleFormat: audio.AudioSampleFormat.SAMPLE_FORMAT_S16LE,
+      encodingType: audio.AudioEncodingType.ENCODING_TYPE_RAW
+    };
+    const renderer = await this.createBeepRenderer(streamInfo);
+    if (renderer === null) {
+      console.error('[AudioPlayer] Beep: no audio renderer available');
+      return;
+    }
+    try {
+      await renderer.start();
+      await renderer.write(this.makeBeepBuffer());
+      // write() 返回只表示 PCM 已交给渲染器，真正播完还需要一段时间，
+      // 因此等提示音时长走完再停，避免把尾音截断。
+      await new Promise<void>((resolve) => {
+        setTimeout(() => {
+          resolve();
+        }, BEEP_DURATION_MS + 50);
+      });
+    } finally {
+      try {
+        await renderer.stop();
+      } catch (stopErr) {
+        console.error(`[AudioPlayer] Beep stop error: ${stopErr?.toString()}`);
+      }
+      await renderer.release();
+    }
+  }
+
+  //
+// 创建提示音专用的 AudioRenderer。优先用通知音流 STREAM_USAGE_NOTIFICATION(=7)，
+// 注释原文即 "Notification usage"，正是 MessageBeep 对应的流类型，音量/静音/勿扰由系统统一管理；
+// 该流不可用时退化为 STREAM_USAGE_GAME(=11)（游戏音效流走并发 Mix，不抢占其他应用的音频焦点），
+// 保证提示音仍可闻。
+// 注意：StreamUsage 里没有 STREAM_USAGE_SYSTEM，误用会直接编译失败（10505001）。
+// 全部失败返回 null
+  private async createBeepRenderer(
+    streamInfo: audio.AudioStreamInfo): Promise<audio.AudioRenderer | null> {
+    const usages: audio.StreamUsage[] = [
+      audio.StreamUsage.STREAM_USAGE_NOTIFICATION,
+      audio.StreamUsage.STREAM_USAGE_GAME
+    ];
+    for (let i = 0; i < usages.length; i++) {
+      try {
+        const rendererInfo: audio.AudioRendererInfo = { usage: usages[i], rendererFlags: 0 };
+        return await audio.createAudioRenderer({ streamInfo: streamInfo, rendererInfo: rendererInfo });
+      } catch (err) {
+        console.warn(`[AudioPlayer] createAudioRenderer(usage=${usages[i]}) failed: ${err?.toString()}`);
+      }
+    }
+    return null;
+  }
+
+  //
+// 合成一段 16bit 单声道 PCM 提示音（正弦波 + 起止淡入淡出）
+  private makeBeepBuffer(): ArrayBuffer {
+    const total = Math.floor(BEEP_SAMPLE_RATE * BEEP_DURATION_MS / 1000);
+    const fade = Math.max(1, Math.floor(BEEP_SAMPLE_RATE * BEEP_FADE_MS / 1000));
+    const buf = new ArrayBuffer(total * 2);
+    const view = new DataView(buf);
+    for (let i = 0; i < total; i++) {
+      // 两端各做 fade 个采样点的线性包络
+      const env = Math.min(1, Math.min(i, total - 1 - i) / fade);
+      const wave = Math.sin(2 * Math.PI * BEEP_FREQ_HZ * i / BEEP_SAMPLE_RATE);
+      view.setInt16(i * 2, Math.round(wave * env * BEEP_GAIN * 32767), true);
+    }
+    return buf;
   }
 
   //

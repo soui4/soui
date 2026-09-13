@@ -7,12 +7,12 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for SRender Interfaces
  * These macros provide C-style function call syntax for C++ interface methods
  */
 
-/* ISvgObj C API Macros */
+/** ISvgObj C API Macros */
 #define ISvgObj_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -40,7 +40,7 @@ extern "C" {
 #define ISvgObj_Size(This) \
     ((This)->lpVtbl->Size(This))
 
-/* IRenderObj C API Macros */
+/** IRenderObj C API Macros */
 #define IRenderObj_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -56,7 +56,7 @@ extern "C" {
 #define IRenderObj_ObjectType(This) \
     ((This)->lpVtbl->ObjectType(This))
 
-/* IBrushS C API Macros */
+/** IBrushS C API Macros */
 #define IBrushS_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -75,7 +75,7 @@ extern "C" {
 #define IBrushS_GetBrushType(This) \
     ((This)->lpVtbl->GetBrushType(This))
 
-/* IPenS C API Macros */
+/** IPenS C API Macros */
 #define IPenS_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -109,7 +109,7 @@ extern "C" {
 #define IPenS_SetColor(This, cr) \
     ((This)->lpVtbl->SetColor(This, cr))
 
-/* IBitmapS C API Macros */
+/** IBitmapS C API Macros */
 #define IBitmapS_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -173,7 +173,7 @@ extern "C" {
 #define IBitmapS_ToHBITMAP(This) \
     ((This)->lpVtbl->ToHBITMAP(This))
 
-/* IFontS C API Macros */
+/** IFontS C API Macros */
 #define IFontS_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -216,7 +216,7 @@ extern "C" {
 #define IFontS_SetProp(This, pXmlNode) \
     ((This)->lpVtbl->SetProp(This, pXmlNode))
 
-/* IRegionS C API Macros */
+/** IRegionS C API Macros */
 #define IRegionS_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -265,7 +265,7 @@ extern "C" {
 #define IRegionS_Clear(This) \
     ((This)->lpVtbl->Clear(This))
 
-/* IPathS C API Macros */
+/** IPathS C API Macros */
 #define IPathS_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -395,7 +395,7 @@ extern "C" {
 #define IPathS_op(This, other, op, out) \
     ((This)->lpVtbl->op(This, other, op, out))
 
-/* IRenderTarget C API Macros */
+/** IRenderTarget C API Macros */
 #define IRenderTarget_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -633,7 +633,7 @@ extern "C" {
 #define IRenderTarget_DrawSVG(This, pSvg, pRect, prcSrc, byAlpha) \
     ((This)->lpVtbl->DrawSVG(This, pSvg, pRect, prcSrc, byAlpha))
 
-/* IRenderFactory C API Macros */
+/** IRenderFactory C API Macros */
 #define IRenderFactory_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -683,4 +683,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SRENDER_CAPI_H__ */
+#endif /**< __SRENDER_CAPI_H__ */

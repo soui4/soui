@@ -7,7 +7,7 @@ template <class T>
 class TValueAnimatorProxy
 	: public T
 	, public SValueAnimator {
-public://proxy for IObjRef
+public: /**< proxy for IObjRef */
 	STDMETHOD_(long, AddRef)(THIS) OVERRIDE
 	{
 		return SValueAnimator::AddRef();
@@ -21,7 +21,7 @@ public://proxy for IObjRef
 		return SValueAnimator::OnFinalRelease();
 	}
 
-public://proxy for IObject
+public: /**< proxy for IObject */
     STDMETHOD_(int, GetObjectType)(CTHIS) SCONST OVERRIDE{
         return SValueAnimator::GetObjectType();
     }
@@ -76,7 +76,7 @@ public://proxy for IObject
         SValueAnimator::SetAttrHandler(attrHandler);
     }
 
-public://proxy for IValueAnimator
+public: /**< proxy for IValueAnimator */
     /**
      * @brief Sets the length of the animation.
      * @param duration The length of the animation, in milliseconds. This value cannot be negative.
@@ -196,14 +196,14 @@ public://proxy for IValueAnimator
     STDMETHOD_(void, removeListener)(THIS_ IAnimatorListener *p) OVERRIDE;
 
     /**
-     * @brief 获取用户数据
-     * @return LPVOID - 用户数据指针
+     * @brief Get user data
+     * @return LPVOID - user data pointer
      */
     STDMETHOD_(LPVOID, GetUserData)(CTHIS) SCONST OVERRIDE;
 
     /**
-     * @brief 设置用户数据
-     * @param pUserData - 用户数据指针
+     * @brief Set user data
+     * @param pUserData - user data pointer
      * @return void
      */
     STDMETHOD_(void, SetUserData)(THIS_ LPVOID pUserData) OVERRIDE;
@@ -467,4 +467,4 @@ STDMETHODIMP_(ITimelineHandler *) TValueAnimatorProxy<T>::GetTimelineHandler() c
 }
 
 SNSEND
-#endif//__SVALUEANIMATORPROXY__H__
+#endif /**< __SVALUEANIMATORPROXY__H__ */

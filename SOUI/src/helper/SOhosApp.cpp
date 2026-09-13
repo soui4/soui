@@ -26,7 +26,8 @@
 
 SNSBEGIN
 
-namespace {
+namespace
+{
 
 static const unsigned int LOG_DOMAIN_SOUI_OHOS = 0x5350;
 static const char *LOG_TAG_SOUI_OHOS = "SOUI_OHOS";
@@ -35,7 +36,8 @@ static const char *LOG_TAG_SOUI_OHOS = "SOUI_OHOS";
 #define SOHOS_LOGW(fmt, ...) OH_LOG_Print(LOG_APP, LOG_WARN, LOG_DOMAIN_SOUI_OHOS, LOG_TAG_SOUI_OHOS, fmt, ##__VA_ARGS__)
 #define SOHOS_LOGE(fmt, ...) OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN_SOUI_OHOS, LOG_TAG_SOUI_OHOS, fmt, ##__VA_ARGS__)
 
-struct QueuedInput {
+struct QueuedInput
+{
     UINT msg;
     WPARAM wp;
     LPARAM lp;
@@ -43,7 +45,8 @@ struct QueuedInput {
     std::string text;
 };
 
-struct ImeRequest {
+struct ImeRequest
+{
     bool show;
 };
 
@@ -82,8 +85,7 @@ const size_t kMaxInputQueue = 256;
 
 uint64_t nowMs()
 {
-    return static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::steady_clock::now().time_since_epoch()).count());
+    return static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
 }
 
 SHostWnd *getMainHost()
@@ -173,8 +175,7 @@ bool focusedWindowNeedsIme()
         return false;
 
     SWindow *focus = SWindowMgr::GetWindow(container->GetFocus());
-    bool needsIme = focus && (focus->IsClass(SEdit::GetClassName()) || focus->IsClass(SRichEdit::GetClassName()) ||
-                              focus->IsClass(SComboEdit::GetClassName()));
+    bool needsIme = focus && (focus->IsClass(SEdit::GetClassName()) || focus->IsClass(SRichEdit::GetClassName()) || focus->IsClass(SComboEdit::GetClassName()));
     if (!focus && swinx::ohos::IsImeProxyActive() && g_lastImeFocusNeedsIme.load())
     {
         SOHOS_LOGI("focused window is nil while IME proxy is active; keep previous edit IME state");
@@ -188,8 +189,7 @@ bool focusedWindowNeedsIme()
         else if (!swinx::ohos::IsImeProxyActive())
             g_lastImeFocusSwnd = 0;
     }
-    SOHOS_LOGI("focused window=%{public}p class=%{public}ls needsIme=%{public}d",
-               reinterpret_cast<void *>(focus), focus ? focus->GetObjectClass() : L"", needsIme ? 1 : 0);
+    SOHOS_LOGI("focused window=%{public}p class=%{public}ls needsIme=%{public}d", reinterpret_cast<void *>(focus), focus ? focus->GetObjectClass() : L"", needsIme ? 1 : 0);
     return needsIme;
 }
 
@@ -221,8 +221,7 @@ void applyPendingImeFocusCheck()
 void queueInput(UINT msg, WPARAM wp, int x, int y)
 {
     if (msg != WM_MOUSEMOVE)
-        SOHOS_LOGI("queue input msg=%{public}u wp=%{public}llu x=%{public}d y=%{public}d",
-                   static_cast<unsigned int>(msg), static_cast<unsigned long long>(wp), x, y);
+        SOHOS_LOGI("queue input msg=%{public}u wp=%{public}llu x=%{public}d y=%{public}d", static_cast<unsigned int>(msg), static_cast<unsigned long long>(wp), x, y);
     std::lock_guard<std::mutex> lock(g_inputMutex);
     if (msg == WM_LBUTTONDOWN)
         g_leftButtonQueued = true;
@@ -254,8 +253,7 @@ void queueInput(UINT msg, WPARAM wp, int x, int y)
 
 void queueWindowMessage(UINT msg, WPARAM wp, LPARAM lp)
 {
-    SOHOS_LOGI("queue window msg=%{public}u wp=%{public}llu lp=%{public}lld",
-               static_cast<unsigned int>(msg), static_cast<unsigned long long>(wp), static_cast<long long>(lp));
+    SOHOS_LOGI("queue window msg=%{public}u wp=%{public}llu lp=%{public}lld", static_cast<unsigned int>(msg), static_cast<unsigned long long>(wp), static_cast<long long>(lp));
     std::lock_guard<std::mutex> lock(g_inputMutex);
     uint64_t tick = nowMs();
     if (!g_inputQueue.empty())
@@ -310,8 +308,7 @@ void restoreImeEditFocusIfNeeded()
     SWindow *focus = SWindowMgr::GetWindow(swnd);
     if (!focus || focus->IsDisabled(TRUE) || !focus->IsVisible(TRUE))
     {
-        SOHOS_LOGW("restore IME edit focus skipped swnd=%{public}u focus=%{public}p",
-                   swnd, reinterpret_cast<void *>(focus));
+        SOHOS_LOGW("restore IME edit focus skipped swnd=%{public}u focus=%{public}p", swnd, reinterpret_cast<void *>(focus));
         return;
     }
 
@@ -320,8 +317,7 @@ void restoreImeEditFocusIfNeeded()
     if (curFocus != swnd)
     {
         focus->SetFocus();
-        SOHOS_LOGI("restore IME edit focus swnd=%{public}u class=%{public}ls previous=%{public}u",
-                   swnd, focus->GetObjectClass(), curFocus);
+        SOHOS_LOGI("restore IME edit focus swnd=%{public}u class=%{public}ls previous=%{public}u", swnd, focus->GetObjectClass(), curFocus);
     }
 }
 
@@ -344,8 +340,7 @@ void insertQueuedImeText(const std::string &text)
     SRichEdit *edit = focus && focus->IsClass(SRichEdit::GetClassName()) ? sobj_cast<SRichEdit>(focus) : nullptr;
     if (!edit)
     {
-        SOHOS_LOGW("insert IME text skipped focus=%{public}p swnd=%{public}u len=%{public}u",
-                   reinterpret_cast<void *>(focus), swnd, static_cast<unsigned int>(text.size()));
+        SOHOS_LOGW("insert IME text skipped focus=%{public}p swnd=%{public}u len=%{public}u", reinterpret_cast<void *>(focus), swnd, static_cast<unsigned int>(text.size()));
         return;
     }
 
@@ -353,9 +348,7 @@ void insertQueuedImeText(const std::string &text)
     SStringW str = S_CA2W(utf8, CP_UTF8);
     edit->SSendMessage(EM_REPLACESEL, (WPARAM)TRUE, (LPARAM)str.c_str());
     std::string prefix = formatUtf8Prefix(text);
-    SOHOS_LOGI("insert IME text len=%{public}u wlen=%{public}u bytes=%{public}s swnd=%{public}u class=%{public}ls",
-               static_cast<unsigned int>(text.size()), static_cast<unsigned int>(str.GetLength()), prefix.c_str(),
-               edit->GetSwnd(), edit->GetObjectClass());
+    SOHOS_LOGI("insert IME text len=%{public}u wlen=%{public}u bytes=%{public}s swnd=%{public}u class=%{public}ls", static_cast<unsigned int>(text.size()), static_cast<unsigned int>(str.GetLength()), prefix.c_str(), edit->GetSwnd(), edit->GetObjectClass());
 }
 
 bool isPrintableUnicode(UINT unicode)
@@ -365,8 +358,7 @@ bool isPrintableUnicode(UINT unicode)
 
 bool isTextInputVk(UINT vk)
 {
-    return (vk >= '0' && vk <= '9') || (vk >= 'A' && vk <= 'Z') || vk == VK_SPACE ||
-           (vk >= VK_OEM_1 && vk <= VK_OEM_8);
+    return (vk >= '0' && vk <= '9') || (vk >= 'A' && vk <= 'Z') || vk == VK_SPACE || (vk >= VK_OEM_1 && vk <= VK_OEM_8);
 }
 
 void updateModifierState(UINT vk, bool down)
@@ -478,9 +470,7 @@ void CALLBACK drainInputTimer(HWND, UINT, UINT_PTR, DWORD)
             g_inputQueue.pop_front();
         }
         if (input.msg != WM_MOUSEMOVE)
-            SOHOS_LOGI("drain input msg=%{public}u wp=%{public}llu lp=%{public}lld",
-                       static_cast<unsigned int>(input.msg), static_cast<unsigned long long>(input.wp),
-                       static_cast<long long>(input.lp));
+            SOHOS_LOGI("drain input msg=%{public}u wp=%{public}llu lp=%{public}lld", static_cast<unsigned int>(input.msg), static_cast<unsigned long long>(input.wp), static_cast<long long>(input.lp));
         if (input.msg == kQueuedImeTextInput)
         {
             insertQueuedImeText(input.text);
@@ -532,11 +522,7 @@ void runApp()
     SOHOS_LOGI("SOUI OHOS render mode=%{public}d", renderMode);
 
     SAppCfg cfg;
-    cfg.SetRender(render)
-        .SetImgDecoder(ImgDecoder_Stb)
-        .SetLog(TRUE, 2, callbacks->logName ? callbacks->logName : "ohos_soui")
-        .EnableMultiLang(_T("translator:lang_cn"), TRUE)
-        .EnableScript(TRUE);
+    cfg.SetRender(render).SetImgDecoder(ImgDecoder_Stb).SetLog(TRUE, 2, callbacks->logName ? callbacks->logName : "ohos_soui").EnableMultiLang(_T("translator:lang_cn"), TRUE).EnableScript(TRUE);
 
     cfg.SetSysResPeFile(S_CA2T(callbacks->sysResourceDir ? callbacks->sysResourceDir : "soui-sys-resource"));
     cfg.SetAppResPeFile(S_CA2T(callbacks->appName ? callbacks->appName : "libsouidemo"));
@@ -582,8 +568,7 @@ void runApp()
     requestResizeMainWindow();
     InvalidateRect(hWnd, nullptr, TRUE);
 
-    SOHOS_LOGI("SOUI OHOS window created hwnd=%{public}p size=%{public}dx%{public}d",
-               reinterpret_cast<void *>(hWnd), state.width, state.height);
+    SOHOS_LOGI("SOUI OHOS window created hwnd=%{public}p size=%{public}dx%{public}d", reinterpret_cast<void *>(hWnd), state.width, state.height);
     app.Run(hWnd);
     KillTimer(hWnd, kInputDrainTimer);
 
@@ -655,8 +640,7 @@ void onTouchEvent(OH_NativeXComponent *component, void *window)
         return;
 
     OH_NativeXComponent_EventSourceType sourceType = OH_NATIVEXCOMPONENT_SOURCE_TYPE_UNKNOWN;
-    if (OH_NativeXComponent_GetTouchEventSourceType(component, event.id, &sourceType) == 0 &&
-        (sourceType == OH_NATIVEXCOMPONENT_SOURCE_TYPE_MOUSE || sourceType == OH_NATIVEXCOMPONENT_SOURCE_TYPE_TOUCHPAD))
+    if (OH_NativeXComponent_GetTouchEventSourceType(component, event.id, &sourceType) == 0 && (sourceType == OH_NATIVEXCOMPONENT_SOURCE_TYPE_MOUSE || sourceType == OH_NATIVEXCOMPONENT_SOURCE_TYPE_TOUCHPAD))
     {
         return;
     }
@@ -772,8 +756,7 @@ void onKeyEvent(OH_NativeXComponent *component, void *)
 
     OH_NativeXComponent_KeyAction action = OH_NATIVEXCOMPONENT_KEY_ACTION_UNKNOWN;
     OH_NativeXComponent_KeyCode keyCode = KEY_UNKNOWN;
-    if (OH_NativeXComponent_GetKeyEventAction(event, &action) != 0 ||
-        OH_NativeXComponent_GetKeyEventCode(event, &keyCode) != 0)
+    if (OH_NativeXComponent_GetKeyEventAction(event, &action) != 0 || OH_NativeXComponent_GetKeyEventCode(event, &keyCode) != 0)
     {
         return;
     }
@@ -866,8 +849,7 @@ napi_value setRenderMode(napi_env env, napi_callback_info info)
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
 
     int32_t mode = Render_Gdi;
-    bool ok = argc > 0 && argv[0] && napi_get_value_int32(env, argv[0], &mode) == napi_ok &&
-              (mode == Render_Gdi || mode == Render_Skia) && !g_started.load();
+    bool ok = argc > 0 && argv[0] && napi_get_value_int32(env, argv[0], &mode) == napi_ok && (mode == Render_Gdi || mode == Render_Skia) && !g_started.load();
     if (ok)
     {
         g_renderMode = mode;
@@ -917,9 +899,7 @@ napi_value dispatchKeyEvent(napi_env env, napi_callback_info info)
     bool synthCtrl = down && vk && !isModifierVk(vk) && ((modifierMask & 1) != 0) && !g_ctrlDown.load();
     bool synthAlt = down && vk && !isModifierVk(vk) && ((modifierMask & 2) != 0) && !g_altDown.load();
     bool synthShift = down && vk && !isModifierVk(vk) && ((modifierMask & 4) != 0) && !g_shiftDown.load();
-    SOHOS_LOGI("dispatch key keyCode=%{public}d type=%{public}d unicode=%{public}u vk=%{public}u ctrl=%{public}d alt=%{public}d shift=%{public}d mask=%{public}d textLen=%{public}u",
-               keyCode, keyType, unicode, vk, effectiveCtrl ? 1 : 0, effectiveAlt ? 1 : 0,
-               effectiveShift ? 1 : 0, modifierMask, static_cast<unsigned int>(keyTextLen));
+    SOHOS_LOGI("dispatch key keyCode=%{public}d type=%{public}d unicode=%{public}u vk=%{public}u ctrl=%{public}d alt=%{public}d shift=%{public}d mask=%{public}d textLen=%{public}u", keyCode, keyType, unicode, vk, effectiveCtrl ? 1 : 0, effectiveAlt ? 1 : 0, effectiveShift ? 1 : 0, modifierMask, static_cast<unsigned int>(keyTextLen));
     if (keyType == 0)
     {
         if (isPrintableUnicode(unicode) && !effectiveCtrl && !effectiveAlt)
@@ -986,8 +966,7 @@ napi_value setImeRequestCallback(napi_env env, napi_callback_info info)
 
         napi_value name = nullptr;
         napi_create_string_utf8(env, "soui_ime_request", NAPI_AUTO_LENGTH, &name);
-        napi_status status = napi_create_threadsafe_function(env, argv[0], nullptr, name, 0, 1, nullptr, nullptr,
-                                                             nullptr, callImeRequestCallback, &g_imeRequestCallback);
+        napi_status status = napi_create_threadsafe_function(env, argv[0], nullptr, name, 0, 1, nullptr, nullptr, nullptr, callImeRequestCallback, &g_imeRequestCallback);
         ok = status == napi_ok;
         SOHOS_LOGI("setImeRequestCallback status=%{public}d", static_cast<int>(status));
     }
@@ -1025,8 +1004,7 @@ napi_value dispatchTextInput(napi_env env, napi_callback_info info)
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
 
     size_t textLen = 0;
-    bool handled = argc > 0 && argv[0] && napi_get_value_string_utf8(env, argv[0], nullptr, 0, &textLen) == napi_ok &&
-                   textLen > 0;
+    bool handled = argc > 0 && argv[0] && napi_get_value_string_utf8(env, argv[0], nullptr, 0, &textLen) == napi_ok && textLen > 0;
     if (handled)
     {
         std::vector<char> text(textLen + 1, 0);
@@ -1054,12 +1032,7 @@ napi_value SOhosNapiInit(napi_env env, napi_value exports, const SOhosAppCallbac
         registerNativeXComponent(env, xcomponent);
 
     napi_property_descriptor desc[] = {
-        { "setResourceRoot", nullptr, setResourceRoot, nullptr, nullptr, nullptr, napi_default, nullptr },
-        { "setRenderMode", nullptr, setRenderMode, nullptr, nullptr, nullptr, napi_default, nullptr },
-        { "dispatchKeyEvent", nullptr, dispatchKeyEvent, nullptr, nullptr, nullptr, napi_default, nullptr },
-        { "setImeRequestCallback", nullptr, setImeRequestCallback, nullptr, nullptr, nullptr, napi_default, nullptr },
-        { "setImeProxyActive", nullptr, setImeProxyActive, nullptr, nullptr, nullptr, napi_default, nullptr },
-        { "dispatchTextInput", nullptr, dispatchTextInput, nullptr, nullptr, nullptr, napi_default, nullptr },
+        { "setResourceRoot", nullptr, setResourceRoot, nullptr, nullptr, nullptr, napi_default, nullptr }, { "setRenderMode", nullptr, setRenderMode, nullptr, nullptr, nullptr, napi_default, nullptr }, { "dispatchKeyEvent", nullptr, dispatchKeyEvent, nullptr, nullptr, nullptr, napi_default, nullptr }, { "setImeRequestCallback", nullptr, setImeRequestCallback, nullptr, nullptr, nullptr, napi_default, nullptr }, { "setImeProxyActive", nullptr, setImeProxyActive, nullptr, nullptr, nullptr, napi_default, nullptr }, { "dispatchTextInput", nullptr, dispatchTextInput, nullptr, nullptr, nullptr, napi_default, nullptr },
     };
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
     return exports;
@@ -1067,4 +1040,4 @@ napi_value SOhosNapiInit(napi_env env, napi_value exports, const SOhosAppCallbac
 
 SNSEND
 
-#endif // __OHOS__
+#endif /**< __OHOS__ */

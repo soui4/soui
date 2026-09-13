@@ -7,12 +7,12 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for SMatrix Interface
  * These macros provide C-style function call syntax for C++ interface methods
  */
 
-/* IMatrix C API Macros */
+/** IMatrix C API Macros */
 #define IMatrix_Data(This) \
     ((This)->lpVtbl->Data(This))
 
@@ -50,4 +50,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SMATRIX_CAPI_H__ */
+#endif /**< __SMATRIX_CAPI_H__ */

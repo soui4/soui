@@ -5,7 +5,7 @@
 #include "control/SActiveX.h"
 
 SNSBEGIN
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 class SAxContainerImpl
     : public SAxContainer
     , public IAxHostDelegate {
@@ -61,7 +61,7 @@ class SAxContainerImpl
     SActiveX *m_pOwner;
 };
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 
 SActiveX::SActiveX()
     : m_axContainer(new SAxContainerImpl(this))
@@ -130,7 +130,7 @@ void SActiveX::OnShowWindow(BOOL bShow, UINT nStatus)
 
     if (IsVisible(TRUE) && m_bDelayInit)
     {
-        InitActiveX(); //窗口显示时才初始化
+        InitActiveX(); // Initialize only when the window is shown
         m_bDelayInit = FALSE;
     }
 
@@ -197,7 +197,7 @@ void SActiveX::SetActiveXVisible(BOOL bVisible)
             }
         }
         ShowWindow(window, bVisible ? SW_SHOW : SW_HIDE);
-        if (hWnd == window) //避免主窗口失去焦点
+        if (hWnd == window) // Avoid the main window losing focus
             ::SetFocus(GetContainer()->GetHostHwnd());
     }
 }
@@ -217,4 +217,4 @@ void SActiveX::SetExternalUIHandler(IDocHostUIHandler *pUiHandler)
 
 SNSEND
 
-#endif // defined(_WIN32) && !defined(__MINGW32__)
+#endif /**< defined(_WIN32) && !defined(__MINGW32__) */

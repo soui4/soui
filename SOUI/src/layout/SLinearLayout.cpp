@@ -191,7 +191,7 @@ void *SLinearLayoutParam::GetRawData()
 ILayoutParam *SLinearLayoutParam::Clone() const
 {
     SLinearLayoutParam *pRet = new SLinearLayoutParam();
-    memcpy(pRet->GetRawData(), (void*)(SLinearLayoutParamStruct *)this, sizeof(SLinearLayoutParamStruct));
+    memcpy(pRet->GetRawData(), (void *)(SLinearLayoutParamStruct *)this, sizeof(SLinearLayoutParamStruct));
     return pRet;
 }
 
@@ -236,7 +236,7 @@ BOOL SLinearLayoutParam::SetAnimatorValue(IPropertyValuesHolder *pHolder, float 
     return FALSE;
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 SLinearLayout::SLinearLayout(void)
     : m_gravity(G_Undefined)
 {
@@ -451,7 +451,7 @@ void SLinearLayout::LayoutChildren(IWindow *pParent)
     delete[] pSize;
 }
 
-// nWidth,nHeight == -1:wrap_content
+/** nWidth,nHeight == -1:wrap_content */
 SIZE SLinearLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeight) const
 {
     int nChildCount = pParent->GetChildrenCount();
@@ -545,7 +545,7 @@ measureChilds:
 }
     if (nWaiting > 0)
     {
-        //父窗口的非布局方向为自适应，同时存在子窗口在该方向上为填充父窗口，需要计算出该方向其它子窗口的最大值。
+        // The parent's non-layout direction is wrap_content, while a child in that direction fills the parent, so the maximum size of the other children in that direction must be computed.
         nWaiting = 0;
         if (m_orientation == Vert)
         {
@@ -604,8 +604,8 @@ measureChilds:
                     fWeight -= pLinearLayoutParam->weight;
 
                     if (!pLinearLayoutParam->IsSpecifiedSize(orienOther))
-                    { // As pChild->GetDesiredSize may use layout param to get specified size, we
-                      // must set it to new size.
+                    {   // As pChild->GetDesiredSize may use layout param to get specified size, we
+                        // must set it to new size.
                         ILayoutParam *backup = pLinearLayoutParam->Clone();
                         SLayoutSize layoutSize((float)szChild, dp);
                         pLinearLayoutParam->SetSpecifiedSize(m_orientation, &layoutSize);

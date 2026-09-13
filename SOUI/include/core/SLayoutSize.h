@@ -22,20 +22,20 @@ static const LPCWSTR kUnit_Sp = L"sp";
 
 /**
  * @class SLayoutSize
- * @brief 布局大小类
+ * @brief Layout size class
  */
 class SOUI_EXP SLayoutSize : public LAYOUTSIZE {
   public:
     /**
-     * @brief 默认构造函数
-     * @param fSize 大小值（默认为0.0f）
+     * @brief Default constructor
+     * @param fSize Size value (default 0.0f)
      */
     SLayoutSize(float fSize = 0.0f);
 
     /**
-     * @brief 构造函数
-     * @param fSize 大小值
-     * @param unit 大小单位
+     * @brief Constructor
+     * @param fSize Size value
+     * @param unit Size unit
      */
     SLayoutSize(float fSize, Unit unit);
 
@@ -49,116 +49,116 @@ class SOUI_EXP SLayoutSize : public LAYOUTSIZE {
     }
 
     /**
-     * @brief 设置为包裹内容大小
+     * @brief Set to wrap content size
      */
     void setWrapContent();
 
     /**
-     * @brief 检查是否为包裹内容大小
-     * @return 如果为包裹内容大小返回TRUE，否则返回FALSE
+     * @brief Check whether it is wrap content size
+     * @return Returns TRUE if wrap content size, otherwise returns FALSE
      */
     bool isWrapContent() const;
 
     /**
-     * @brief 设置为匹配父容器大小
+     * @brief Set to match parent container size
      */
     void setMatchParent();
 
     /**
-     * @brief 检查是否为匹配父容器大小
-     * @return 如果为匹配父容器大小返回TRUE，否则返回FALSE
+     * @brief Check whether it matches parent container size
+     * @return Returns TRUE if matching parent container size, otherwise returns FALSE
      */
     bool isMatchParent() const;
 
     /**
-     * @brief 设置指定大小
-     * @param fSize 大小值
-     * @param unit 大小单位
+     * @brief Set the specified size
+     * @param fSize Size value
+     * @param unit Size unit
      */
     void setSize(float fSize, Unit unit);
 
     /**
-     * @brief 检查是否为指定大小
-     * @return 如果为指定大小返回TRUE，否则返回FALSE
+     * @brief Check whether it is the specified size
+     * @return Returns TRUE if the specified size, otherwise returns FALSE
      */
     bool isSpecifiedSize() const;
 
     /**
-     * @brief 设置为无效大小
+     * @brief Set to invalid size
      */
     void setInvalid();
 
     /**
-     * @brief 检查是否为有效大小
-     * @return 如果为有效大小返回TRUE，否则返回FALSE
+     * @brief Check whether it is valid size
+     * @return Returns TRUE if valid size, otherwise returns FALSE
      */
     bool isValid() const;
 
     /**
-     * @brief 将大小转换为像素值
-     * @param scale 缩放比例
-     * @return 像素值
+     * @brief Convert the size to a pixel value
+     * @param scale Scale factor
+     * @return Pixel value
      */
     int toPixelSize(int scale) const;
 
     /**
-     * @brief 将大小转换为字符串表示
-     * @return 字符串表示
+     * @brief Convert the size to string representation
+     * @return String representation
      */
     SStringW toString() const;
 
     /**
-     * @brief 检查大小是否为零
-     * @return 如果大小为零返回TRUE，否则返回FALSE
+     * @brief Check whether the size is zero
+     * @return Returns TRUE if the size is zero, otherwise returns FALSE
      */
     bool isZero() const;
 
     /**
-     * @brief 从字符串解析大小
-     * @param strSize 大小字符串
+     * @brief Parse the size from a string
+     * @param strSize Size string
      */
     void parseString(const SStringW &strSize);
 
     /**
-     * @brief 赋值运算符重载
-     * @param src 源大小对象
-     * @return 当前大小对象的引用
+     * @brief Assignment operator overload
+     * @param src Source size object
+     * @return Reference to the current size object
      */
     SLayoutSize &operator=(const SLayoutSize &src);
     SLayoutSize &operator=(const LAYOUTSIZE &src);
 
     /**
-     * @brief 比较大小值是否相等
-     * @param value 大小值
-     * @return 如果大小值相等返回TRUE，否则返回FALSE
+     * @brief Compare whether size values are equal
+     * @param value Size value
+     * @return Returns TRUE if size values are equal, otherwise returns FALSE
      */
     bool valueEqual(float value);
 
     /**
-     * @brief 从字符串创建大小对象
-     * @param strSize 大小字符串
-     * @return 大小对象
+     * @brief Create a size object from a string
+     * @param strSize Size string
+     * @return Size object
      */
     static SLayoutSize fromString(const SStringW &strSize);
 
     /**
-     * @brief 比较两个浮点数是否相等
-     * @param a 第一个浮点数
-     * @param b 第二个浮点数
-     * @return 如果相等返回TRUE，否则返回FALSE
+     * @brief Compare whether two floating-point numbers are equal
+     * @param a First floating-point number
+     * @param b Second floating-point number
+     * @return Returns TRUE if equal, otherwise returns FALSE
      */
     static bool fequal(float a, float b);
 
     /**
-     * @brief 从字符串解析单位
-     * @param strUnit 单位字符串
-     * @return 单位枚举值
+     * @brief Parse the unit from a string
+     * @param strUnit Unit string
+     * @return Unit enum value
      */
     static Unit unitFromString(const SStringW &strUnit);
 
-    static Unit defUnit; // 默认单位
+    static Unit defUnit; /**< Default unit */
 };
 
 SNSEND
 
-#endif // __SLAYOUTSIZE__H__
+#endif /**< __SLAYOUTSIZE__H__ */

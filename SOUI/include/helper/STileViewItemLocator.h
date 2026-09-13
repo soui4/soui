@@ -7,168 +7,168 @@ SNSBEGIN
 
 /**
  * @class STileViewItemLocator
- * @brief 瓷砖视图项定位器类
+ * @brief Tile view item locator class
  */
 class SOUI_EXP STileViewItemLocator : public TObjRefImpl<ITileViewItemLocator> {
   public:
     /**
-     * @brief 构造函数
-     * @param owner 所属窗口对象指针
-     * @param nItemHei 每个项的高度
-     * @param nItemWid 每个项的宽度
-     * @param nMarginSize 项之间的间距（默认为0）
+     * @brief Constructor
+     * @param owner Pointer to the owning window object
+     * @param nItemHei Height of each item
+     * @param nItemWid Width of each item
+     * @param nMarginSize Spacing between items (default is 0)
      */
     STileViewItemLocator(SWindow *owner, int nItemHei, int nItemWid, int nMarginSize = 0);
 
     /**
-     * @brief 构造函数
-     * @param owner 所属窗口对象指针
-     * @param szItemHei 每个项的高度（字符串形式）
-     * @param szItemWid 每个项的宽度（字符串形式）
-     * @param marginSize 项之间的间距（默认为SLayoutSize()）
+     * @brief Constructor
+     * @param owner Pointer to the owning window object
+     * @param szItemHei Height of each item (as string)
+     * @param szItemWid Width of each item (as string)
+     * @param marginSize Spacing between items (default is SLayoutSize())
      */
     STileViewItemLocator(SWindow *owner, LPCWSTR szItemHei, LPCWSTR szItemWid, SLayoutSize marginSize = SLayoutSize());
 
   public:
     /**
-     * @brief 设置适配器
-     * @param pAdapter 列表适配器对象指针
+     * @brief Set adapter
+     * @param pAdapter Pointer to the list adapter object
      */
     STDMETHOD_(void, SetAdapter)(THIS_ ILvAdapter *pAdapter) OVERRIDE;
 
     /**
-     * @brief 数据集改变时调用
+     * @brief Called when the data set changes
      */
     STDMETHOD_(void, OnDataSetChanged)(THIS) OVERRIDE
     {
     }
 
     /**
-     * @brief 获取指定项的高度
-     * @param iItem 项索引
-     * @return 项的高度
+     * @brief Get the height of the specified item
+     * @param iItem Item index
+     * @return Item height
      */
     STDMETHOD_(int, GetItemHeight)(THIS_ int iItem) SCONST OVERRIDE;
 
     /**
-     * @brief 设置指定项的高度
-     * @param iItem 项索引
-     * @param nHeight 新的高度
+     * @brief Set the height of the specified item
+     * @param iItem Item index
+     * @param nHeight New height
      */
     STDMETHOD_(void, SetItemHeight)(THIS_ int iItem, int nHeight) OVERRIDE;
 
     /**
-     * @brief 获取指定项的矩形区域（相对于TileView）
-     * @param iItem 项索引
-     * @return 项的矩形区域
+     * @brief Get the rectangle of the specified item (relative to TileView)
+     * @param iItem Item index
+     * @return Rectangle of the item
      */
     STDMETHOD_(RECT, GetItemRect)(THIS_ int iItem) OVERRIDE;
 
     /**
-     * @brief 设置TileView的宽度（在TileView的OnSize中调用）
-     * @param width TileView的宽度
-     * @param bDpiAware 是否考虑DPI缩放
+     * @brief Set the width of TileView (called in TileView's OnSize)
+     * @param width Width of TileView
+     * @param bDpiAware Whether to consider DPI scaling
      */
     STDMETHOD_(void, SetTileViewWidth)(THIS_ int width, BOOL bDpiAware) OVERRIDE;
 
     /**
-     * @brief 获取指定项的行和列索引
-     * @param iItem 项索引
-     * @param row 行索引指针
-     * @param col 列索引指针
+     * @brief Get the row and column index of the specified item
+     * @param iItem Item index
+     * @param row Pointer to row index
+     * @param col Pointer to column index
      */
     STDMETHOD_(void, GetItemRowAndColIndex)(THIS_ int iItem, int *row, int *col) OVERRIDE;
 
     /**
-     * @brief 判断指定项是否为每行的最后一个元素
-     * @param iItem 项索引
-     * @return 如果是最后一个元素返回TRUE，否则返回FALSE
+     * @brief Determine whether the specified item is the last element of its row
+     * @param iItem Item index
+     * @return Returns TRUE if it is the last element, otherwise FALSE
      */
     STDMETHOD_(BOOL, IsLastInRow)(THIS_ int iItem) OVERRIDE;
 
     /**
-     * @brief 获取上一行同一列的元素索引
-     * @param iItem 项索引
-     * @return 上一行同一列的元素索引
+     * @brief Get the element index of the same column in the previous row
+     * @param iItem Item index
+     * @return Element index of the same column in the previous row
      */
     STDMETHOD_(int, GetUpItem)(THIS_ int iItem) OVERRIDE;
 
     /**
-     * @brief 获取下一行同一列的元素索引
-     * @param iItem 项索引
-     * @return 下一行同一列的元素索引
+     * @brief Get the element index of the same column in the next row
+     * @param iItem Item index
+     * @return Element index of the same column in the next row
      */
     STDMETHOD_(int, GetDownItem)(THIS_ int iItem) OVERRIDE;
 
     /**
-     * @brief 获取总高度
-     * @return 总高度
+     * @brief Get total height
+     * @return Total height
      */
     STDMETHOD_(int, GetTotalHeight)(THIS) OVERRIDE;
 
     /**
-     * @brief 将项索引转换为位置
-     * @param iItem 项索引
-     * @return 位置
+     * @brief Convert item index to position
+     * @param iItem Item index
+     * @return Position
      */
     STDMETHOD_(int, Item2Position)(THIS_ int iItem) OVERRIDE;
 
     /**
-     * @brief 将位置转换为项索引
-     * @param position 位置
-     * @return 项索引
+     * @brief Convert position to item index
+     * @param position Position
+     * @return Item index
      */
     STDMETHOD_(int, Position2Item)(THIS_ int position) OVERRIDE;
 
     /**
-     * @brief 获取滚动行大小
-     * @return 滚动行大小
+     * @brief Get scroll line size
+     * @return Scroll line size
      */
     STDMETHOD_(int, GetScrollLineSize)(THIS) SCONST OVERRIDE;
 
     /**
-     * @brief 获取间距大小
-     * @return 间距大小
+     * @brief Get the margin size
+     * @return Margin size
      */
     STDMETHOD_(int, GetMarginSize)(THIS) SCONST OVERRIDE;
 
     /**
-     * @brief 设置缩放比例
-     * @param scale 缩放比例
-     * @return 新的缩放比例
+     * @brief Set the scale ratio
+     * @param scale Scale ratio
+     * @return New scale ratio
      */
     STDMETHOD_(int, SetScale)(THIS_ int scale) OVERRIDE;
 
     /**
-     * @brief 获取每行的项数量
-     * @return 每行的项数量
+     * @brief Get the number of items per row
+     * @return Number of items per row
      */
     STDMETHOD_(int, GetCountInRow)(THIS) SCONST OVERRIDE;
 
     /**
-     * @brief 获取项的行高
-     * @return 项的行高
+     * @brief Get the row height of the item
+     * @return Row height of the item
      */
     STDMETHOD_(int, GetItemLineHeight)(THIS) SCONST OVERRIDE;
 
     /**
-     * @brief 获取项的宽度
-     * @return 项的宽度
+     * @brief Get the width of the item
+     * @return Width of the item
      */
     STDMETHOD_(int, GetItemWidth)(THIS) SCONST OVERRIDE;
 
   protected:
-    int m_scale;                  // 缩放比例
-    SLayoutSize m_nItemWidth;     // 项宽
-    SLayoutSize m_nItemHeight;    // 项高
-    SLayoutSize m_nTileViewWidth; // TileView宽度（用于计算m_nCountInRow）
-    SLayoutSize m_nItemMargin;    // 块间距
-    int m_nCountInRow;            // 每行的项个数
+    int m_scale;                  /**< Scale */
+    SLayoutSize m_nItemWidth;     /**< Item width */
+    SLayoutSize m_nItemHeight;    /**< Item height */
+    SLayoutSize m_nTileViewWidth; /**< TileView width (used to compute m_nCountInRow) */
+    SLayoutSize m_nItemMargin;    /**< Block spacing */
+    int m_nCountInRow;            /**< Number of items per row */
 
-    SAutoRefPtr<ILvAdapter> m_adapter; // 列表适配器对象指针
-    SWindow *m_pOwner;                 // 所属窗口对象指针
+    SAutoRefPtr<ILvAdapter> m_adapter; /**< Pointer to list adapter object */
+    SWindow *m_pOwner;                 /**< Pointer to the owning window object */
 };
 
 SNSEND
 
-#endif // __STILEVIEWITEMLOCATOR__H__
+#endif /**< __STILEVIEWITEMLOCATOR__H__ */

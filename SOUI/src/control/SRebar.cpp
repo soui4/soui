@@ -4,7 +4,7 @@
 SNSBEGIN
 
 static const int kRebarGripperWidth = 8;
-static const int kRebarSplitterWidth = 4; // band 右侧分隔条，拖拽调节宽度（VS 风格）
+static const int kRebarSplitterWidth = 4; /**< Right-side separator bar of the band; drag to adjust width (VS style) */
 
 SRebar::SRebar()
     : m_nDragBand(-1)
@@ -191,9 +191,9 @@ void SRebar::GetDesiredSize(SIZE *psz, int nParentWid, int nParentHei)
     }
     else
     {
-        // 高度根据“可用宽度”来计算，这样父窗口只需要 RequestRelayout +
-        // 再次调用 GetDesiredSize，就能得到 SRebar 在当前宽度下的合适高度，
-        // 而不需要直接 Move SRebar 本身。
+        // Height is computed from the “可用宽度” (available width), so the parent window only needs RequestRelayout +
+        // Calling GetDesiredSize again yields the appropriate height of SRebar at the current width,
+        // Without directly moving SRebar itself.
         int cxAvail = psz->cx > 0 ? psz->cx : (nParentWid > 0 ? nParentWid : GetClientRect().Width());
         psz->cy = GetTotalHeightForWidth(cxAvail);
     }
@@ -206,7 +206,7 @@ int SRebar::GetTotalHeightForWidth(int cx) const
 
     if (m_bSingleRow)
     {
-        // 单行：所有 band 一行，高度为单行最大高度
+        // Single row: all bands on one row, height is the max height of a single row
         int rowHeight = 0;
         for (size_t i = 0; i < m_bands.GetCount(); i++)
         {
@@ -216,7 +216,7 @@ int SRebar::GetTotalHeightForWidth(int cx) const
         return rowHeight > 0 ? rowHeight : 24;
     }
 
-    // 多行：由 bNewRow 决定换行，与宽度无关（VS 逻辑）
+    // Multi-row: line breaks determined by bNewRow, independent of width (VS logic)
     int y = 0;
     int rowHeight = 0;
     int left = kRebarGripperWidth;
@@ -241,7 +241,7 @@ int SRebar::GetTotalHeight() const
 {
     if (m_bands.GetCount())
         return 24;
-    // 高度由 singleRow + bNewRow 决定，与宽度无关
+    // Height is determined by singleRow + bNewRow, independent of width
     return GetTotalHeightForWidth(0);
 }
 
@@ -252,8 +252,8 @@ void SRebar::CalculateBandLayout()
         BandInfo &band = m_bands[i];
         if (band.pChild && !band.bCollapsed)
         {
-            // 先根据子窗口的期望高度来决定 band 的高度，再按 band 的约束进行裁剪，
-            // 这样“band 大小变化”与“子控件大小”是联动的。
+            // First determine the band height from the child window's desired height, then clip according to the band's constraints,
+            // So that “band size change” and “child control size” are linked.
             SIZE szChild = { 0, 0 };
             int nAvailWid = m_rcClient.Width() > 0 ? m_rcClient.Width() : -1;
             band.pChild->GetDesiredSize(&szChild, nAvailWid, -1);
@@ -261,7 +261,7 @@ void SRebar::CalculateBandLayout()
             int desiredHei = szChild.cy > 0 ? szChild.cy : band.height;
             band.height = smax(band.minHeight, smin(band.maxHeight, desiredHei));
 
-            // 仅在尚未被用户调整宽度（width==0）时，用子窗口期望宽度初始化 band 宽度
+            // Only initialize band width from the child window's desired width when the user has not yet adjusted the width (width==0)
             if (band.width == 0)
             {
                 int desiredWid = szChild.cx > 0 ? (szChild.cx + kRebarGripperWidth + kRebarSplitterWidth) : 80;
@@ -270,7 +270,7 @@ void SRebar::CalculateBandLayout()
         }
         else
         {
-            // 没有子窗口时，仅按 smin/smax 约束现有高度，避免出现非法高度
+            // When there is no child window, only constrain the existing height by smin/smax to avoid invalid heights
             band.height = smax(band.minHeight, smin(band.maxHeight, band.height));
 
             if (band.width == 0)
@@ -302,11 +302,11 @@ void SRebar::UpdateBandLayout()
 
         if (m_bSingleRow)
         {
-            // 单行：不换行，一行排满
+            // Single row: no wrapping, fill one row
         }
         else
         {
-            // 多行：仅由 bNewRow 换行（VS 逻辑，与宽度无关）
+            // Multi-row: line breaks only by bNewRow (VS logic, independent of width)
             if (i > 0 && band.bNewRow)
             {
                 x = m_rcClient.left + kRebarGripperWidth;
@@ -328,7 +328,7 @@ void SRebar::UpdateBandLayout()
             {
                 int xChildLeft = rcBand.left + kRebarGripperWidth;
                 int xChildRight = rcBand.right - kRebarSplitterWidth;
-                // 子窗口不得超出 Rebar 客户区，超出时减小子窗口宽度
+                // The child window must not exceed the Rebar client area; reduce its width if it does
                 int rightLimit = m_rcClient.right - kRebarSplitterWidth;
                 if (xChildRight > rightLimit)
                     xChildRight = rightLimit;
@@ -384,14 +384,14 @@ void SRebar::DrawBand(IRenderTarget *pRT, int nIndex, const CRect &rcBand)
 {
     BandInfo &band = m_bands[nIndex];
 
-    // 普通背景
+    // Normal background
     pRT->FillSolidRect(rcBand, GetStyle().m_crBg);
 
-    // 正在被拖动重排的 band 高亮（调宽时不画）
+    // Highlight the band being dragged for reordering (not drawn while resizing width)
     if (m_bDragging && !m_bResizing && nIndex == m_nDragBand)
     {
         IPenS *pPen = NULL;
-        COLORREF crHighlight = RGBA(0, 120, 215, 255); // 接近 VS 选中蓝色
+        COLORREF crHighlight = RGBA(0, 120, 215, 255); // Close to VS selection blue
         if (SUCCEEDED(pRT->CreatePen(PS_SOLID, crHighlight, 1, &pPen)))
         {
             IRenderObj *pOldPen = NULL;
@@ -404,10 +404,10 @@ void SRebar::DrawBand(IRenderTarget *pRT, int nIndex, const CRect &rcBand)
 
     if (!band.bCollapsed)
     {
-        // VS 风格：左侧 gripper（拖动重排）
+        // VS style: left gripper (drag to reorder)
         CRect rcGripper(rcBand.left, rcBand.top, rcBand.left + kRebarGripperWidth, rcBand.bottom);
         DrawGripper(pRT, rcGripper);
-        // 右侧 splitter（拖动调宽）
+        // Right splitter (drag to resize width)
         if (rcBand.Width() > kRebarGripperWidth + kRebarSplitterWidth)
         {
             CRect rcSplitter(rcBand.right - kRebarSplitterWidth, rcBand.top, rcBand.right, rcBand.bottom);
@@ -473,13 +473,13 @@ int SRebar::HitTest(CPoint point, int &nHitTest) const
                 CRect rcGripper(rcBand.left, rcBand.top, rcBand.left + kRebarGripperWidth, rcBand.bottom);
                 if (rcGripper.PtInRect(point))
                 {
-                    nHitTest = 2; // gripper：拖动重排
+                    nHitTest = 2; // gripper: drag to reorder
                     return i;
                 }
                 CRect rcSplitter(rcBand.right - kRebarSplitterWidth, rcBand.top, rcBand.right, rcBand.bottom);
                 if (rcSplitter.PtInRect(point))
                 {
-                    nHitTest = 3; // splitter：拖动调宽
+                    nHitTest = 3; // splitter: drag to resize width
                     return i;
                 }
             }
@@ -532,7 +532,7 @@ BOOL SRebar::OnLButtonDown(UINT nFlags, CPoint point)
     {
         if (nHitTest == 2)
         {
-            // gripper：仅用于拖动重排（VS 逻辑）
+            // gripper: only for drag reordering (VS logic)
             m_nDragBand = nBand;
             m_bResizing = false;
             m_bDragging = true;
@@ -540,7 +540,7 @@ BOOL SRebar::OnLButtonDown(UINT nFlags, CPoint point)
         }
         else if (nHitTest == 3)
         {
-            // splitter：仅用于调节该 band 宽度（VS 逻辑）
+            // splitter: only for adjusting this band's width (VS logic)
             m_nDragBand = nBand;
             m_nDragPos = point.x;
             m_nDragStartWidth = 0;
@@ -565,7 +565,7 @@ BOOL SRebar::OnLButtonUp(UINT nFlags, CPoint point)
         m_bDragging = false;
         m_bResizing = false;
         ReleaseCapture();
-        // 单行/多行或行数变化后，通知父窗口重新布局（高度可能已变）
+        // After single/multi-row or row-count change, notify the parent to relayout (height may have changed)
         GetParent()->RequestRelayout();
     }
 
@@ -584,7 +584,7 @@ BOOL SRebar::OnMouseMove(UINT nFlags, CPoint point)
     if (!m_bDragging || m_nDragBand < 0)
         return TRUE;
 
-    // 调整宽度逻辑（不变）
+    // Width adjustment logic (unchanged)
     if (m_bResizing)
     {
         if (m_nDragBand >= (int)m_bands.GetCount())
@@ -601,7 +601,7 @@ BOOL SRebar::OnMouseMove(UINT nFlags, CPoint point)
         return TRUE;
     }
 
-    // 重新排序逻辑
+    // Reordering logic
     int bandCount = (int)m_bands.GetCount();
     if (bandCount < 2)
         return TRUE;
@@ -609,8 +609,8 @@ BOOL SRebar::OnMouseMove(UINT nFlags, CPoint point)
     if ((int)m_bandRects.GetCount() != bandCount)
         UpdateBandLayout();
 
-    // 构建按行的区间，找出鼠标所在的行（或在首行之上/末行之下）
-    int rowIndex = -9999; // sentinel: 未找到
+    // Build row-based ranges, find the row under the mouse (or above the first row / below the last row)
+    int rowIndex = -9999; // sentinel: not found
     int firstRowTop = (bandCount > 0) ? m_bandRects[0].top : m_rcClient.top;
     int start = 0;
     int curRow = 0;
@@ -620,7 +620,7 @@ BOOL SRebar::OnMouseMove(UINT nFlags, CPoint point)
         int rowLast = start;
         int rowTop = m_bandRects[rowFirst].top;
         int rowBottom = m_bandRects[rowFirst].bottom;
-        // 扩展到本行所有 band（直到下一个 bNewRow 或末尾）
+        // Expand to all bands in this row (until the next bNewRow or the end)
         while (rowLast + 1 < bandCount && !m_bands[rowLast + 1].bNewRow)
         {
             ++rowLast;
@@ -629,30 +629,30 @@ BOOL SRebar::OnMouseMove(UINT nFlags, CPoint point)
 
         if (point.y < rowTop)
         {
-            rowIndex = -1; // 在所有 band 之上（第一行之上）
+            rowIndex = -1; // Above all bands (above the first row)
             break;
         }
         if (point.y <= rowBottom)
         {
-            rowIndex = curRow; // 在该行
+            rowIndex = curRow; // In this row
             break;
         }
-        // 否则继续下一行
+        // Otherwise continue to the next row
         start = rowLast + 1;
         ++curRow;
     }
     if (start >= bandCount && rowIndex == -9999)
     {
-        // 如果未匹配任何行并且鼠标 Y 在最后行下面
-        rowIndex = INT_MAX; // 标记为在所有 band 之下
+        // If no row matched and the mouse Y is below the last row
+        rowIndex = INT_MAX; // Marked as below all bands
     }
 
-    // 处理在第一行之上（放到第一行开头）
+    // Handle being above the first row (place at the start of the first row)
     if (rowIndex == -1)
     {
         if (m_nDragBand != 0)
         {
-            // 保留原来换行语义：若拖动项曾是 bNewRow，则把该标记传递给其后继（避免丢失）
+            // Preserve original line-break semantics: if the dragged item was bNewRow, pass the flag to its successor (to avoid loss)
             bool wasNewRow = m_bands[m_nDragBand].bNewRow;
             if (wasNewRow && m_nDragBand + 1 < (int)m_bands.GetCount())
             {
@@ -663,7 +663,7 @@ BOOL SRebar::OnMouseMove(UINT nFlags, CPoint point)
             m_bands.InsertAt(0, curBand);
             m_nDragBand = 0;
         }
-        // 如果存在第二个 band，确保它开始新行（把拖到第一的位置独立出来）
+        // If a second band exists, ensure it starts a new row (isolate the item dragged to the first position)
         if ((int)m_bands.GetCount() > 1)
             m_bands[1].bNewRow = true;
         m_bands[0].bNewRow = true;
@@ -671,10 +671,10 @@ BOOL SRebar::OnMouseMove(UINT nFlags, CPoint point)
         return TRUE;
     }
 
-    // 处理在所有 band 之下（放到末尾）
+    // Handle being below all bands (place at the end)
     if (rowIndex == INT_MAX)
     {
-        // 若拖动项原来是行首，则把行首语义传递给其后继
+        // If the dragged item was originally at the start of a row, pass the row-start semantics to its successor
         bool wasNewRow = m_bands[m_nDragBand].bNewRow;
         if (wasNewRow && m_nDragBand + 1 < (int)m_bands.GetCount())
         {
@@ -682,7 +682,7 @@ BOOL SRebar::OnMouseMove(UINT nFlags, CPoint point)
         }
         if (m_nDragBand != (int)m_bands.GetCount() - 1)
         {
-            const BandInfo & curBand = m_bands[m_nDragBand];
+            const BandInfo &curBand = m_bands[m_nDragBand];
             m_bands.RemoveAt(m_nDragBand);
             m_bands.Add(curBand); // append
             m_nDragBand = (int)m_bands.GetCount() - 1;
@@ -692,7 +692,7 @@ BOOL SRebar::OnMouseMove(UINT nFlags, CPoint point)
         return TRUE;
     }
 
-    // 在某一行内部：找行起始/结束索引
+    // Inside a row: find row start/end indices
     int targetRow = rowIndex;
     int rowStart = 0;
     int rowCounter = 0;
@@ -706,13 +706,13 @@ BOOL SRebar::OnMouseMove(UINT nFlags, CPoint point)
         if (i + 1 < bandCount && m_bands[i + 1].bNewRow)
             ++rowCounter;
     }
-    // 计算 rowEnd
+    // Compute rowEnd
     int rowEnd = rowStart;
     while (rowEnd + 1 < bandCount && !m_bands[rowEnd + 1].bNewRow)
         ++rowEnd;
 
-    // 在行内根据每个 band 的中点决定插入前/后。跳过自己（m_nDragBand）。
-    int insertIndex = rowEnd + 1; // 默认插在行末（rowEnd+1）
+    // Within a row, decide insert before/after based on each band's midpoint. Skip self (m_nDragBand).
+    int insertIndex = rowEnd + 1; // Default insert at row end (rowEnd+1)
     for (int i = rowStart; i <= rowEnd; ++i)
     {
         if (i == m_nDragBand)
@@ -723,28 +723,28 @@ BOOL SRebar::OnMouseMove(UINT nFlags, CPoint point)
             insertIndex = i;
             break;
         }
-        // 否则插入到 i 的后面（继续判断下一个）
+        // Otherwise insert after i (continue checking the next one)
         insertIndex = i + 1;
     }
 
-    // 若插入位置等于当前拖动位置（不变），则不需要重排
+    // If the insertion position equals the current drag position (unchanged), no reordering needed
     if (insertIndex == m_nDragBand || insertIndex == m_nDragBand + 1)
     {
-        // insertIndex == m_nDragBand + 1 表示放回原位（因为 remove 后索引会左移）
+        // insertIndex == m_nDragBand + 1 means put back to original position (because index shifts left after remove)
         return TRUE;
     }
 
-    // 先把拖动项的 bNewRow 语义保留并传递给后继（避免丢失）
+    // First preserve the dragged item's bNewRow semantics and pass to its successor (to avoid loss)
     bool dragWasNewRow = m_bands[m_nDragBand].bNewRow;
     if (dragWasNewRow && m_nDragBand + 1 < (int)m_bands.GetCount())
     {
         m_bands[m_nDragBand + 1].bNewRow = true;
     }
 
-    // 做真正的移除与插入（注意索引变化）
-    const BandInfo & curBand = m_bands[m_nDragBand];
+    // Perform the actual remove and insert (watch index changes)
+    const BandInfo &curBand = m_bands[m_nDragBand];
     m_bands.RemoveAt(m_nDragBand);
-    // 调整 insertIndex：如果 insertIndex 在被移除项之后，移除后索引会左移 1
+    // Adjust insertIndex: if insertIndex is after the removed item, the index shifts left by 1 after removal
     if (insertIndex > m_nDragBand)
         insertIndex--;
     if (insertIndex < 0)
@@ -755,7 +755,7 @@ BOOL SRebar::OnMouseMove(UINT nFlags, CPoint point)
     m_bands.InsertAt(insertIndex, curBand);
     m_nDragBand = insertIndex;
 
-    // 如果插入到行首，确保其为行起点；否则清除其行起点标志
+    // If inserted at row start, ensure it is the row start; otherwise clear its row-start flag
     if (insertIndex == rowStart)
     {
         m_bands[insertIndex].bNewRow = true;
@@ -779,12 +779,12 @@ BOOL SRebar::OnSetCursor(const CPoint &pt)
     {
         if (nHitTest == 2)
         {
-            SetCursor(SApplication::getSingleton().LoadCursor(IDC_SIZEALL)); // gripper：重排
+            SetCursor(SApplication::getSingleton().LoadCursor(IDC_SIZEALL)); // gripper: reorder
             return TRUE;
         }
         if (nHitTest == 3)
         {
-            SetCursor(SApplication::getSingleton().LoadCursor(IDC_SIZEWE)); // splitter：调宽
+            SetCursor(SApplication::getSingleton().LoadCursor(IDC_SIZEWE)); // splitter: adjust width
             return TRUE;
         }
         if (nHitTest == 0)

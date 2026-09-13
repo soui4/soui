@@ -75,8 +75,8 @@ class SDropTargetDispatcher : public SUnkImpl<IDropTarget> {
     IUNKNOWN_BEGIN(IDropTarget)
     IUNKNOWN_END()
 
-    //////////////////////////////////////////////////////////////////////////
-    // IDropTarget
+    ///////////////////////////////////////////////////////////////////////
+    /** IDropTarget */
 
     /**
      * @brief    Handles the DragEnter event
@@ -90,10 +90,10 @@ class SDropTargetDispatcher : public SUnkImpl<IDropTarget> {
      */
     STDMETHOD_(HRESULT, DragEnter)
     (
-        /* [unique][in] */ IDataObject *pDataObj,
-        /* [in] */ DWORD grfKeyState,
-        /* [in] */ POINTL pt,
-        /* [out][in] */ DWORD *pdwEffect);
+        /** [unique][in] */ IDataObject *pDataObj,
+        /** [in] */ DWORD grfKeyState,
+        /** [in] */ POINTL pt,
+        /** [out][in] */ DWORD *pdwEffect);
 
     /**
      * @brief    Handles the DragOver event
@@ -106,9 +106,9 @@ class SDropTargetDispatcher : public SUnkImpl<IDropTarget> {
      */
     STDMETHOD_(HRESULT, DragOver)
     (
-        /* [in] */ DWORD grfKeyState,
-        /* [in] */ POINTL pt,
-        /* [out][in] */ DWORD *pdwEffect);
+        /** [in] */ DWORD grfKeyState,
+        /** [in] */ POINTL pt,
+        /** [out][in] */ DWORD *pdwEffect);
 
     /**
      * @brief    Handles the DragLeave event
@@ -130,10 +130,10 @@ class SDropTargetDispatcher : public SUnkImpl<IDropTarget> {
      */
     STDMETHOD_(HRESULT, Drop)
     (
-        /* [unique][in] */ IDataObject *pDataObj,
-        /* [in] */ DWORD grfKeyState,
-        /* [in] */ POINTL pt,
-        /* [out][in] */ DWORD *pdwEffect);
+        /** [unique][in] */ IDataObject *pDataObj,
+        /** [in] */ DWORD grfKeyState,
+        /** [in] */ POINTL pt,
+        /** [out][in] */ DWORD *pdwEffect);
 
   protected:
     /**
@@ -155,4 +155,4 @@ class SDropTargetDispatcher : public SUnkImpl<IDropTarget> {
 
 SNSEND
 
-#endif // __SDROPTARGETDISPATCHER__H__
+#endif /**< __SDROPTARGETDISPATCHER__H__ */

@@ -34,6 +34,6 @@
 #include <control/SRebar.h>
 #ifdef _WIN32
 #include <control/SActiveX.h>
-#endif //_WIN32
+#endif /**< _WIN32 */
 
-#endif // __SOUICTRLS__H__
+#endif /**< __SOUICTRLS__H__ */

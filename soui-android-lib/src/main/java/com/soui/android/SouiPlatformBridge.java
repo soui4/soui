@@ -16,7 +16,12 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.content.ClipboardManager;
 import android.content.ClipData;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.media.ToneGenerator;
+import android.net.Uri;
 
 import androidx.annotation.Nullable;
 
@@ -39,6 +44,8 @@ public class SouiPlatformBridge {
 
     private Context mContext;
     private MediaPlayer mCurrentMediaPlayer;
+    /** MessageBeep 当前正在播报的提示音（下次发声前先停掉，避免 Ringtone 实例堆积）。 */
+    private Ringtone mBeepRingtone;
     private final HashMap<String, MediaPlayer> mActivePlayers = new HashMap<>();
 
     /** Windows WS_* 风格位常量（值与 Win32 完全一致） */
@@ -1329,6 +1336,90 @@ public class SouiPlatformBridge {
         } catch (Exception e) {
             Log.e(TAG, "playSound failed: " + pszSound, e);
             return false;
+        }
+    }
+
+    /**
+     * 播放系统提示音（对齐 Win32 MessageBeep）。
+     *
+     * 语义：优先播报用户在系统设置中选定的通知提示音（RingtoneManager.TYPE_NOTIFICATION），
+     * 这与 Windows MessageBeep 播放注册表里用户配置的系统声音一致；通知声音不可用时退化
+     * 为 ToneGenerator 的 TONE_PROP_BEEP。swinx 各平台都只有一种系统提示音，因此 uType 的
+     * 具体取值（-1 / MB_ICON*）不参与选择，只用于日志。
+     *
+     * 与 Win32"声音已入队即返回 true"一致：这里只保证请求已提交到主线程，不等待播放结束。
+     * @param uType MessageBeep 的 uType（0xFFFFFFFF 或 MB_ICON*）
+     * @return true 表示提示音请求已交给系统；上下文未就绪返回 false
+     */
+    @SuppressWarnings("unused")
+    public boolean messageBeep(final int uType) {
+        if (mContext == null) {
+            return false;
+        }
+        // Ringtone / ToneGenerator 内部依赖 Looper，而本方法可能被 swinx 的工作线程直接调进来，
+        // 因此统一投递到主线程执行（与 setFocus 的处理方式一致）。
+        final Runnable task = () -> playBeepOnMainThread(uType);
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            task.run();
+        } else {
+            mBridgeHandler.post(task);
+        }
+        return true;
+    }
+
+    /**
+     * 在主线程真正发声：先试用户配置的通知提示音，失败再退化到 DTMF 提示音。必须在主线程调用。
+     */
+    private void playBeepOnMainThread(int uType) {
+        // 停掉上一次的提示音，避免 Ringtone 实例持续堆积
+        if (mBeepRingtone != null) {
+            try {
+                mBeepRingtone.stop();
+            } catch (Exception ignored) {
+                // 忽略：上一次的声音可能已自然播完
+            }
+            mBeepRingtone = null;
+        }
+
+        // 1) 用户配置的通知提示音（尊重系统音量 / 静音 / 勿扰策略）
+        try {
+            Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            if (uri != null) {
+                Ringtone ringtone = RingtoneManager.getRingtone(mContext, uri);
+                if (ringtone != null) {
+                    mBeepRingtone = ringtone;
+                    ringtone.play();
+                    // 提示音通常只有几百毫秒；延时 stop() 释放内部 MediaPlayer
+                    mBridgeHandler.postDelayed(() -> {
+                        try {
+                            ringtone.stop();
+                        } catch (Exception ignored) {
+                            // 忽略
+                        }
+                    }, 2000);
+                    return;
+                }
+            }
+        } catch (Exception e) {
+            Log.w(TAG, "messageBeep: notification ringtone unavailable: " + e);
+        }
+
+        // 2) 退化路径：ToneGenerator 的简短提示音
+        Log.d(TAG, "messageBeep: fallback to ToneGenerator, uType=" + uType);
+        try {
+            final ToneGenerator tone =
+                    new ToneGenerator(AudioManager.STREAM_NOTIFICATION, ToneGenerator.MAX_VOLUME);
+            tone.startTone(ToneGenerator.TONE_PROP_BEEP, 150);
+            // release() 会截断正在播放的音调，所以延时释放
+            mBridgeHandler.postDelayed(() -> {
+                try {
+                    tone.release();
+                } catch (Exception ignored) {
+                    // 忽略
+                }
+            }, 300);
+        } catch (Exception e) {
+            Log.e(TAG, "messageBeep: ToneGenerator failed: " + e);
         }
     }
 

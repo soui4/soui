@@ -7,12 +7,12 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for SSkinobj Interface
  * These macros provide C-style function call syntax for C++ interface methods
  */
 
-/* ISkinObj C API Macros (IObject base interface methods) */
+/** ISkinObj C API Macros (IObject base interface methods) */
 #define ISkinObj_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -73,7 +73,7 @@ extern "C" {
 #define ISkinObj_SetAttrHandler(This, attrHandler) \
     ((This)->lpVtbl->SetAttrHandler(This, attrHandler))
 
-/* ISkinObj C API Macros (ISkinObj specific methods) */
+/** ISkinObj C API Macros (ISkinObj specific methods) */
 #define ISkinObj_DrawByState2(This, pRT, rcDraw, dwState, byAlpha) \
     ((This)->lpVtbl->DrawByState2(This, pRT, rcDraw, dwState, byAlpha))
 
@@ -114,4 +114,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SSKINOBJ_CAPI_H__ */
+#endif /**< __SSKINOBJ_CAPI_H__ */

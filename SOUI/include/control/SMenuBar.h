@@ -124,4 +124,4 @@ class SOUI_EXP SMenuBar : public SWindow {
 
 SNSEND
 
-#endif // __SMENUBAR__H__
+#endif /**< __SMENUBAR__H__ */

@@ -6,8 +6,8 @@
 
 SNSBEGIN
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// handle state map
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/** handle state map */
 SState2Index::SState2Index(const SState2Index &src)
 {
     m_mapOfStates = src.m_mapOfStates;
@@ -40,7 +40,7 @@ BOOL SState2Index::Init(IXmlNode *pNode)
     return TRUE;
 }
 
-int SState2Index::GetDefIndex(DWORD dwState, bool checkAsPushdown /*= false*/)
+int SState2Index::GetDefIndex(DWORD dwState, bool checkAsPushdown /**< = false */)
 {
     int idx = 0;
     if (dwState & WndState_Disable)
@@ -116,7 +116,7 @@ DWORD SState2Index::String2State(const SStringW &strState)
     return dwRet;
 }
 
-////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
 SSkinObjBase::SSkinObjBase()
     : m_byAlpha(0xFF)
     , m_bEnableColorize(true)

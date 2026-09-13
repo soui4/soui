@@ -33,15 +33,15 @@ class SOUI_EXP SAnimatorSet : public TValueAnimatorProxy<IAnimatorSet> {
     struct AnimatorNode
     {
         SAutoRefPtr<IValueAnimator> animator;
-        // List of animators that should run after this one
+        /** List of animators that should run after this one */
         SArray<AnimatorNode *> afterNodes;
-        // List of animators that should run in parallel with this one
+        /** List of animators that should run in parallel with this one */
         SArray<AnimatorNode *> withNodes;
-        // List of animators that should run before this one
+        /** List of animators that should run before this one */
         SArray<AnimatorNode *> beforeNodes;
-        // Start time of this animator relative to set start
+        /** Start time of this animator relative to set start */
         long startTime;
-        // Whether this node has been started
+        /** Whether this node has been started */
         bool started;
 
         AnimatorNode(IValueAnimator *pAnimator)
@@ -334,4 +334,4 @@ class SOUI_EXP SAnimatorSet : public TValueAnimatorProxy<IAnimatorSet> {
 
 SNSEND
 
-#endif // __SANIMATORSET__H__
+#endif /**< __SANIMATORSET__H__ */

@@ -3,7 +3,7 @@
  * All rights reserved.
  *
  * @file       SwndStyle.h
- * @brief      SOUI窗口风格管理
+ * @brief      SOUI window style management
  * @version    v1.0
  * @author     SOUI group
  * @date       2014/08/02
@@ -32,9 +32,9 @@ class SOUI_EXP SwndStyle {
      */
     enum
     {
-        Align_Left = 0x000U,   // valign = top
-        Align_Center = 0x100U, // valign = middle
-        Align_Right = 0x200U,  // valign = bottom
+        Align_Left = 0x000U,   /**< valign = top */
+        Align_Center = 0x100U, /**< valign = middle */
+        Align_Right = 0x200U,  /**< valign = bottom */
         Align_MaskX = 0x300U,
     };
 
@@ -43,9 +43,9 @@ class SOUI_EXP SwndStyle {
      */
     enum
     {
-        VAlign_Top = 0x0000U,    // valign = top
-        VAlign_Middle = 0x1000U, // valign = middle
-        VAlign_Bottom = 0x2000U, // valign = bottom
+        VAlign_Top = 0x0000U,    /**< valign = top */
+        VAlign_Middle = 0x1000U, /**< valign = middle */
+        VAlign_Bottom = 0x2000U, /**< valign = bottom */
         Align_MaskY = 0x3000U,
     };
 
@@ -123,7 +123,7 @@ class SOUI_EXP SwndStyle {
      */
     void SetTextColor(int iState, COLORREF cr)
     {
-        if(iState>=0 && iState<4)
+        if (iState >= 0 && iState < 4)
             m_crText[iState] = cr;
     }
 
@@ -271,4 +271,4 @@ class SOUI_EXP SwndStyle {
 };
 
 SNSEND
-#endif // __SWNDSTYLE__H__
+#endif /**< __SWNDSTYLE__H__ */

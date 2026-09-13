@@ -5,7 +5,7 @@
  * @author     soui
  * @date       2014-07-06
  *
- * @copyright  Copyright (C) 2014-2050 SOUI团队
+ * @copyright  Copyright (C) 2014-2050 SOUI Team
  *             All rights reserved.
  */
 
@@ -162,7 +162,7 @@ class SOUI_EXP STileView
      * @return Pointer to the item panel at the specified point.
      */
     SItemPanel *HitTest(CPoint &pt) const;
-    
+
     /**
      * @brief Gets the item panel by index.
      * @param iItem Index of the item.
@@ -214,7 +214,7 @@ class SOUI_EXP STileView
      * @param iItem Index of the item.
      * @return Drawing rectangle of the item.
      */
-    CRect CalcItemDrawRect(int iItem) const; // 计算item实际绘制的位置
+    CRect CalcItemDrawRect(int iItem) const; /**< Compute the actual drawing position of the item */
 
     /**
      * @brief Updates the scroll bars.
@@ -447,4 +447,4 @@ class SOUI_EXP STileView
 
 SNSEND
 
-#endif // __STILEVIEW__H__
+#endif /**< __STILEVIEW__H__ */

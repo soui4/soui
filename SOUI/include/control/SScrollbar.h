@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2014-2050 SOUI团队
+ * Copyright (C) 2014-2050 SOUI Team
  * All rights reserved.
  *
  * @file       SScrollBar.h
@@ -275,4 +275,4 @@ class SOUI_EXP SScrollBar
 
 SNSEND
 
-#endif // __SSCROLLBAR__H__
+#endif /**< __SSCROLLBAR__H__ */

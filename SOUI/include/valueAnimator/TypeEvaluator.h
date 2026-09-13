@@ -306,4 +306,4 @@ inline SIZE Evaluate(float fraction, const SIZE &mStart, const SIZE &mEnd)
 
 SNSEND
 
-#endif // __TYPEEVALUATOR__H__
+#endif /**< __TYPEEVALUATOR__H__ */

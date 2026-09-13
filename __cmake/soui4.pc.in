@@ -1,0 +1,11 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib/@CMAKE_BUILD_TYPE@
+includedir=${prefix}/include
+
+Name: soui4
+Description: SOUI4 UI framework (cross-platform, Windows/Linux/macOS)
+Version: @SOUI_VER1@.@SOUI_VER2@.@SOUI_VER3@
+Requires:
+Libs: -L${libdir} @SOUI_PC_LIBS@
+Cflags: -I${includedir}/config -I${includedir}/components -I${includedir}/utilities/include -I${includedir}/SOUI/include -I${includedir}/controls.extend -I${includedir}/swinx/include

@@ -9,19 +9,19 @@ SNSBEGIN
 
 /**
  * @class SLvObserverMgr
- * @brief 管理列表数据集观察者的类
+ * @brief Class managing observers of the list data set
  */
 class SLvObserverMgr {
   public:
     /**
-     * @brief 构造函数
+     * @brief Constructor
      */
     SLvObserverMgr()
     {
     }
 
     /**
-     * @brief 析构函数，释放所有观察者
+     * @brief Destructor; releases all observers
      */
     ~SLvObserverMgr()
     {
@@ -35,8 +35,8 @@ class SLvObserverMgr {
     }
 
     /**
-     * @brief 注册一个观察者
-     * @param observer 观察者对象指针
+     * @brief Register an observer
+     * @param observer observer object pointer
      */
     void registerObserver(ILvDataSetObserver *observer)
     {
@@ -48,8 +48,8 @@ class SLvObserverMgr {
     }
 
     /**
-     * @brief 注销一个观察者
-     * @param observer 观察者对象指针
+     * @brief Unregister an observer
+     * @param observer observer object pointer
      */
     void unregisterObserver(ILvDataSetObserver *observer)
     {
@@ -62,7 +62,7 @@ class SLvObserverMgr {
     }
 
     /**
-     * @brief 通知所有观察者数据集已更改
+     * @brief Notify all observers that the data set has changed
      */
     void notifyChanged()
     {
@@ -75,7 +75,7 @@ class SLvObserverMgr {
     }
 
     /**
-     * @brief 通知所有观察者数据集已失效
+     * @brief Notify all observers that the data set has been invalidated
      */
     void notifyInvalidated()
     {
@@ -88,8 +88,8 @@ class SLvObserverMgr {
     }
 
     /**
-     * @brief 通知所有观察者指定项的数据已更改
-     * @param iItem 项索引
+     * @brief Notify all observers that the data of the specified item has changed
+     * @param iItem item index
      */
     void notifyItemChanged(int iItem)
     {
@@ -102,19 +102,19 @@ class SLvObserverMgr {
     }
 
   protected:
-    SList<ILvDataSetObserver *> m_lstObserver; ///< 观察者列表
+    SList<ILvDataSetObserver *> m_lstObserver; /**<  Observer list */
 };
 
 /**
  * @class LvAdatperImpl
- * @brief 列表适配器实现模板类
- * @tparam BaseClass 基类类型
+ * @brief List adapter implementation template class
+ * @tparam BaseClass base class type
  */
 template <class BaseClass>
 class LvAdatperImpl : public BaseClass {
   public:
     /**
-     * @brief 通知所有观察者数据集已更改
+     * @brief Notify all observers that the data set has changed
      */
     void notifyDataSetChanged()
     {
@@ -122,7 +122,7 @@ class LvAdatperImpl : public BaseClass {
     }
 
     /**
-     * @brief 通知所有观察者数据集已失效
+     * @brief Notify all observers that the data set has been invalidated
      */
     void notifyDataSetInvalidated()
     {
@@ -130,8 +130,8 @@ class LvAdatperImpl : public BaseClass {
     }
 
     /**
-     * @brief 通知所有观察者指定项的数据已更改
-     * @param iItem 项索引
+     * @brief Notify all observers that the data of the specified item has changed
+     * @param iItem item index
      */
     void notifyItemDataChanged(int iItem)
     {
@@ -139,8 +139,8 @@ class LvAdatperImpl : public BaseClass {
     }
 
     /**
-     * @brief 注册一个数据集观察者
-     * @param observer 观察者对象指针
+     * @brief Register a data set observer
+     * @param observer observer object pointer
      */
     STDMETHOD_(void, registerDataSetObserver)(ILvDataSetObserver *observer) OVERRIDE
     {
@@ -148,8 +148,8 @@ class LvAdatperImpl : public BaseClass {
     }
 
     /**
-     * @brief 注销一个数据集观察者
-     * @param observer 观察者对象指针
+     * @brief Unregister a data set observer
+     * @param observer observer object pointer
      */
     STDMETHOD_(void, unregisterDataSetObserver)(ILvDataSetObserver *observer) OVERRIDE
     {
@@ -157,10 +157,10 @@ class LvAdatperImpl : public BaseClass {
     }
 
     /**
-     * @brief 获取视图
-     * @param position 位置索引
-     * @param pItem 项窗口对象
-     * @param pXmlTemplate XML模板对象
+     * @brief Get the view
+     * @param position position index
+     * @param pItem item window object
+     * @param pXmlTemplate XML template object
      */
     STDMETHOD_(void, getView)(int position, IWindow *pItem, IXmlNode *pXmlTemplate) OVERRIDE
     {
@@ -170,10 +170,10 @@ class LvAdatperImpl : public BaseClass {
     }
 
     /**
-     * @brief 获取视图（模板函数）
-     * @param position 位置索引
-     * @param pItem 项面板对象
-     * @param xmlTemplate XML模板对象
+     * @brief Get the view (template function)
+     * @param position position index
+     * @param pItem item panel object
+     * @param xmlTemplate XML template object
      */
     STDMETHOD_(void, getView)(int position, SItemPanel *pItem, SXmlNode xmlTemplate)
     {
@@ -181,9 +181,9 @@ class LvAdatperImpl : public BaseClass {
     }
 
     /**
-     * @brief 获取项视图类型
-     * @param position 位置索引
-     * @return 视图类型
+     * @brief Get the item view type
+     * @param position position index
+     * @return view type
      */
     STDMETHOD_(int, getItemViewType)(int position)
     {
@@ -191,10 +191,10 @@ class LvAdatperImpl : public BaseClass {
     }
 
     /**
-     * @brief 获取项视图类型（重载）
-     * @param position 位置索引
-     * @param dwState 状态
-     * @return 视图类型
+     * @brief Get the item view type (overload)
+     * @param position position index
+     * @param dwState state
+     * @return view type
      */
     STDMETHOD_(int, getItemViewType)(THIS_ int position, DWORD dwState) OVERRIDE
     {
@@ -202,8 +202,8 @@ class LvAdatperImpl : public BaseClass {
     }
 
     /**
-     * @brief 获取视图类型数量
-     * @return 视图类型数量
+     * @brief Get the number of view types
+     * @return number of view types
      */
     STDMETHOD_(int, getViewTypeCount)() OVERRIDE
     {
@@ -211,8 +211,8 @@ class LvAdatperImpl : public BaseClass {
     }
 
     /**
-     * @brief 检查数据集是否为空
-     * @return 数据集为空返回TRUE，否则返回FALSE
+     * @brief Check whether the data set is empty
+     * @return Returns TRUE if the data set is empty, FALSE otherwise
      */
     STDMETHOD_(BOOL, isEmpty)(THIS) OVERRIDE
     {
@@ -220,15 +220,15 @@ class LvAdatperImpl : public BaseClass {
     }
 
     /**
-     * @brief 获取数据集项数量
-     * @return 数据集项数量
+     * @brief Get the number of items in the data set
+     * @return number of items in the data set
      */
     STDMETHOD_(int, getCount)(THIS) PURE;
 
     /**
-     * @brief 获取项描述
-     * @param position 位置索引
-     * @return 项描述字符串
+     * @brief Get the item description
+     * @param position position index
+     * @return item description string
      */
     STDMETHOD_(SStringW, getItemDesc)(int position)
     {
@@ -236,9 +236,9 @@ class LvAdatperImpl : public BaseClass {
     }
 
     /**
-     * @brief 获取项描述（重载）
-     * @param position 位置索引
-     * @param pDesc 描述字符串对象
+     * @brief Get the item description (overload)
+     * @param position position index
+     * @param pDesc description string object
      */
     STDMETHOD_(void, getItemDesc)(int position, IStringW *pDesc) OVERRIDE
     {
@@ -247,16 +247,16 @@ class LvAdatperImpl : public BaseClass {
     }
 
     /**
-     * @brief 通过模板初始化适配器
-     * @param xmlTemplate XML模板对象
+     * @brief Initialize the adapter via template
+     * @param xmlTemplate XML template object
      */
     STDMETHOD_(void, InitByTemplate)(SXmlNode xmlTemplate)
     {
     }
 
     /**
-     * @brief 通过模板初始化适配器（重载）
-     * @param pXmlTemplate XML模板对象指针
+     * @brief Initialize the adapter via template (overload)
+     * @param pXmlTemplate XML template object pointer
      */
     STDMETHOD_(void, InitByTemplate)(IXmlNode *pXmlTemplate) OVERRIDE
     {
@@ -265,12 +265,12 @@ class LvAdatperImpl : public BaseClass {
     }
 
     /**
-     * @brief 获取视图所需大小
-     * @param ret 返回的大小对象
-     * @param position 位置索引
-     * @param pItem 项面板对象
-     * @param wid 宽度
-     * @param hei 高度
+     * @brief Get the required size of the view
+     * @param ret returned size object
+     * @param position position index
+     * @param pItem item panel object
+     * @param wid width
+     * @param hei height
      */
     STDMETHOD_(void, getViewDesiredSize)(SIZE *ret, int position, SItemPanel *pItem, int wid, int hei)
     {
@@ -278,12 +278,12 @@ class LvAdatperImpl : public BaseClass {
     }
 
     /**
-     * @brief 获取视图所需大小（重载）
-     * @param ret 返回的大小对象
-     * @param position 位置索引
-     * @param pItem 项窗口对象
-     * @param wid 宽度
-     * @param hei 高度
+     * @brief Get the required size of the view (overload)
+     * @param ret returned size object
+     * @param position position index
+     * @param pItem item window object
+     * @param wid width
+     * @param hei height
      */
     STDMETHOD_(void, getViewDesiredSize)(SIZE *ret, int position, IWindow *pItem, int wid, int hei) OVERRIDE
     {
@@ -292,10 +292,10 @@ class LvAdatperImpl : public BaseClass {
     }
 
     /**
-     * @brief 查询接口
-     * @param id 接口ID
-     * @param ppObj 接口对象指针
-     * @return 查询结果
+     * @brief Query interface
+     * @param id interface ID
+     * @param ppObj interface object pointer
+     * @return query result
      */
     STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFGUID id, IObjRef **ppObj) OVERRIDE
     {
@@ -303,24 +303,24 @@ class LvAdatperImpl : public BaseClass {
     }
 
   protected:
-    SLvObserverMgr m_obzMgr; ///< 观察者管理器
+    SLvObserverMgr m_obzMgr; /**<  Observer manager */
 };
 
 /**
  * @class SAdapterBase
- * @brief 列表适配器基类
+ * @brief Base class for list adapters
  */
-class SAdapterBase : public TObjRefImpl<LvAdatperImpl<ILvAdapter> > {
+class SAdapterBase : public TObjRefImpl<LvAdatperImpl<ILvAdapter>> {
   public:
     /**
-     * @brief 构造函数
+     * @brief Constructor
      */
     SAdapterBase()
     {
     }
 
     /**
-     * @brief 析构函数
+     * @brief Destructor
      */
     ~SAdapterBase()
     {
@@ -329,30 +329,30 @@ class SAdapterBase : public TObjRefImpl<LvAdatperImpl<ILvAdapter> > {
 
 /**
  * @class SMcAdapterBase
- * @brief 多列适配器基类
+ * @brief Base class for multi-column adapters
  */
-class SMcAdapterBase : public TObjRefImpl<LvAdatperImpl<IMcAdapter> > {
+class SMcAdapterBase : public TObjRefImpl<LvAdatperImpl<IMcAdapter>> {
   public:
     /**
-     * @brief 构造函数
+     * @brief Constructor
      */
     SMcAdapterBase()
     {
     }
 
     /**
-     * @brief 析构函数
+     * @brief Destructor
      */
     ~SMcAdapterBase()
     {
     }
 
     /**
-     * @brief 排序项
-     * @param iCol 列索引
-     * @param pFmts 格式数组
-     * @param nCols 列数量
-     * @return 排序结果
+     * @brief Sort items
+     * @param iCol column index
+     * @param pFmts format array
+     * @param nCols number of columns
+     * @return sort result
      */
     STDMETHOD_(BOOL, OnSort)(int iCol, UINT *pFmts, int nCols) OVERRIDE
     {
@@ -360,9 +360,9 @@ class SMcAdapterBase : public TObjRefImpl<LvAdatperImpl<IMcAdapter> > {
     }
 
     /**
-     * @brief 获取列名
-     * @param iCol 列索引
-     * @return 列名字符串
+     * @brief Get the column name
+     * @param iCol column index
+     * @return column name string
      */
     STDMETHOD_(SStringW, GetColumnName)(int iCol) SCONST
     {
@@ -370,9 +370,9 @@ class SMcAdapterBase : public TObjRefImpl<LvAdatperImpl<IMcAdapter> > {
     }
 
     /**
-     * @brief 获取列名（重载）
-     * @param iCol 列索引
-     * @param pName 列名字符串对象
+     * @brief Get the column name (overload)
+     * @param iCol column index
+     * @param pName column name string object
      */
     STDMETHOD_(void, GetColumnName)(THIS_ int iCol, IStringW *pName) SCONST
     {
@@ -381,9 +381,9 @@ class SMcAdapterBase : public TObjRefImpl<LvAdatperImpl<IMcAdapter> > {
     }
 
     /**
-     * @brief 检查列是否可见
-     * @param iCol 列索引
-     * @return 列可见返回TRUE，否则返回FALSE
+     * @brief Check whether the column is visible
+     * @param iCol column index
+     * @return Returns TRUE if the column is visible, FALSE otherwise
      */
     STDMETHOD_(BOOL, IsColumnVisible)(THIS_ int iCol) SCONST OVERRIDE
     {
@@ -391,16 +391,16 @@ class SMcAdapterBase : public TObjRefImpl<LvAdatperImpl<IMcAdapter> > {
     }
 
     /**
-     * @brief 通过模板初始化适配器
-     * @param xmlTemplate XML模板对象
+     * @brief Initialize the adapter via template
+     * @param xmlTemplate XML template object
      */
     STDMETHOD_(void, InitByTemplate)(THIS_ SXmlNode xmlTemplate)
     {
     }
 
     /**
-     * @brief 通过模板初始化适配器（重载）
-     * @param xmlTemplate XML模板对象指针
+     * @brief Initialize the adapter via template (overload)
+     * @param xmlTemplate XML template object pointer
      */
     STDMETHOD_(void, InitByTemplate)(THIS_ IXmlNode *xmlTemplate) OVERRIDE
     {
@@ -409,9 +409,9 @@ class SMcAdapterBase : public TObjRefImpl<LvAdatperImpl<IMcAdapter> > {
     }
 
     /**
-     * @brief 设置列宽
-     * @param pColWid 列宽数组
-     * @param nCols 列数量
+     * @brief Set the column width
+     * @param pColWid column width array
+     * @param nCols number of columns
      */
     STDMETHOD_(void, SetColumnsWidth)(THIS_ int *pColWid, int nCols) OVERRIDE
     {
@@ -420,19 +420,19 @@ class SMcAdapterBase : public TObjRefImpl<LvAdatperImpl<IMcAdapter> > {
 
 /**
  * @class STvObserverMgr
- * @brief 管理树形数据集观察者的类
+ * @brief Class managing observers of the tree data set
  */
 class STvObserverMgr {
   public:
     /**
-     * @brief 构造函数
+     * @brief Constructor
      */
     STvObserverMgr()
     {
     }
 
     /**
-     * @brief 析构函数，释放所有观察者
+     * @brief Destructor; releases all observers
      */
     ~STvObserverMgr()
     {
@@ -446,8 +446,8 @@ class STvObserverMgr {
     }
 
     /**
-     * @brief 注册一个观察者
-     * @param observer 观察者对象指针
+     * @brief Register an observer
+     * @param observer observer object pointer
      */
     void registerObserver(ITvDataSetObserver *observer)
     {
@@ -459,8 +459,8 @@ class STvObserverMgr {
     }
 
     /**
-     * @brief 注销一个观察者
-     * @param observer 观察者对象指针
+     * @brief Unregister an observer
+     * @param observer observer object pointer
      */
     void unregisterObserver(ITvDataSetObserver *observer)
     {
@@ -473,8 +473,8 @@ class STvObserverMgr {
     }
 
     /**
-     * @brief 通知所有观察者分支已更改
-     * @param hBranch 分支句柄
+     * @brief Notify all observers that a branch has changed
+     * @param hBranch branch handle
      */
     void notifyChanged(HSTREEITEM hBranch)
     {
@@ -487,10 +487,10 @@ class STvObserverMgr {
     }
 
     /**
-     * @brief 通知所有观察者分支已失效
-     * @param hBranch 分支句柄
-     * @param bInvalidParents 父节点是否失效
-     * @param bInvalidChildren 子节点是否失效
+     * @brief Notify all observers that a branch has been invalidated
+     * @param hBranch branch handle
+     * @param bInvalidParents whether parent nodes are invalidated
+     * @param bInvalidChildren whether child nodes are invalidated
      */
     void notifyInvalidated(HSTREEITEM hBranch, bool bInvalidParents, bool bInvalidChildren)
     {
@@ -503,10 +503,10 @@ class STvObserverMgr {
     }
 
     /**
-     * @brief 通知所有观察者分支展开状态已更改
-     * @param hBranch 分支句柄
-     * @param bExpandedOld 旧展开状态
-     * @param bExpandedNew 新展开状态
+     * @brief Notify all observers that the branch expanded state has changed
+     * @param hBranch branch handle
+     * @param bExpandedOld previous expanded state
+     * @param bExpandedNew new expanded state
      */
     void notifyExpandChanged(HSTREEITEM hBranch, BOOL bExpandedOld, BOOL bExpandedNew)
     {
@@ -519,8 +519,8 @@ class STvObserverMgr {
     }
 
     /**
-     * @brief 通知所有观察者项将被移除
-     * @param hItem 项句柄
+     * @brief Notify all observers that an item is about to be removed
+     * @param hItem item handle
      */
     void notifyItemBeforeRemove(HSTREEITEM hItem)
     {
@@ -533,20 +533,20 @@ class STvObserverMgr {
     }
 
   protected:
-    SList<ITvDataSetObserver *> m_lstObserver; ///< 观察者列表
+    SList<ITvDataSetObserver *> m_lstObserver; /**<  Observer list */
 };
 
 /**
  * @class TvAdatperImpl
- * @brief 树形适配器实现模板类
- * @tparam BaseClass 基类类型
+ * @brief Tree adapter implementation template class
+ * @tparam BaseClass base class type
  */
 template <class BaseClass>
 class TvAdatperImpl : public BaseClass {
   public:
     /**
-     * @brief 通知所有观察者分支已更改
-     * @param hBranch 分支句柄
+     * @brief Notify all observers that a branch has changed
+     * @param hBranch branch handle
      */
     void notifyBranchChanged(HSTREEITEM hBranch)
     {
@@ -554,10 +554,10 @@ class TvAdatperImpl : public BaseClass {
     }
 
     /**
-     * @brief 通知所有观察者分支已失效
-     * @param hBranch 分支句柄
-     * @param bInvalidParents 父节点是否失效
-     * @param bInvalidChildren 子节点是否失效
+     * @brief Notify all observers that a branch has been invalidated
+     * @param hBranch branch handle
+     * @param bInvalidParents whether parent nodes are invalidated
+     * @param bInvalidChildren whether child nodes are invalidated
      */
     void notifyBranchInvalidated(HSTREEITEM hBranch, bool bInvalidParents = true, bool bInvalidChildren = true)
     {
@@ -565,10 +565,10 @@ class TvAdatperImpl : public BaseClass {
     }
 
     /**
-     * @brief 通知所有观察者分支展开状态已更改
-     * @param hBranch 分支句柄
-     * @param bExpandedOld 旧展开状态
-     * @param bExpandedNew 新展开状态
+     * @brief Notify all observers that the branch expanded state has changed
+     * @param hBranch branch handle
+     * @param bExpandedOld previous expanded state
+     * @param bExpandedNew new expanded state
      */
     void notifyBranchExpandChanged(HSTREEITEM hBranch, BOOL bExpandedOld, BOOL bExpandedNew)
     {
@@ -576,8 +576,8 @@ class TvAdatperImpl : public BaseClass {
     }
 
     /**
-     * @brief 通知所有观察者项将被移除
-     * @param hItem 项句柄
+     * @brief Notify all observers that an item is about to be removed
+     * @param hItem item handle
      */
     void notifyItemBeforeRemove(HSTREEITEM hItem)
     {
@@ -585,8 +585,8 @@ class TvAdatperImpl : public BaseClass {
     }
 
     /**
-     * @brief 注册一个数据集观察者
-     * @param observer 观察者对象指针
+     * @brief Register a data set observer
+     * @param observer observer object pointer
      */
     STDMETHOD_(void, registerDataSetObserver)(ITvDataSetObserver *observer) OVERRIDE
     {
@@ -594,8 +594,8 @@ class TvAdatperImpl : public BaseClass {
     }
 
     /**
-     * @brief 注销一个数据集观察者
-     * @param observer 观察者对象指针
+     * @brief Unregister a data set observer
+     * @param observer observer object pointer
      */
     STDMETHOD_(void, unregisterDataSetObserver)(ITvDataSetObserver *observer) OVERRIDE
     {
@@ -603,51 +603,51 @@ class TvAdatperImpl : public BaseClass {
     }
 
   protected:
-    STvObserverMgr m_obzMgr; ///< 观察者管理器
+    STvObserverMgr m_obzMgr; /**<  Observer manager */
 };
 
 /**
  * @class STreeAdapterBase
- * @brief 树形适配器基类模板
- * @tparam T 数据类型
+ * @brief Tree adapter base class template
+ * @tparam T data type
  */
 template <typename T>
-class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
+class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter>> {
   public:
     /**
-     * @brief 数据释放函数类型
+     * @brief Data release function type
      */
     typedef void (*FunTvItemDataFreer)(T cb);
 
     /**
      * @struct ItemInfo
-     * @brief 树节点数据结构
+     * @brief TreeNode data structure
      */
     struct ItemInfo
     {
-        ULONG_PTR userData[DATA_INDEX_NUMBER]; ///< 用户数据数组
-        T data;                                ///< 数据对象
+        ULONG_PTR userData[DATA_INDEX_NUMBER]; /**<  User data array */
+        T data;                                /**<  Data object */
     };
 
     /**
      * @class TreeDataFreer
-     * @brief 树节点数据释放器类
+     * @brief Tree node data releaser class
      */
     class TreeDataFreer : public CSTree<ItemInfo>::IDataFreer {
       public:
         /**
-         * @brief 构造函数
+         * @brief Constructor
          */
         TreeDataFreer()
             : m_dataFreer(NULL)
         {
         }
 
-        FunTvItemDataFreer m_dataFreer; ///< 数据释放函数
+        FunTvItemDataFreer m_dataFreer; /**<  Data release function */
 
         /**
-         * @brief 释放数据
-         * @param data 数据对象引用
+         * @brief Release data
+         * @param data data object reference
          */
         void OnDataFree(ItemInfo &data) override
         {
@@ -658,7 +658,7 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
 
   public:
     /**
-     * @brief 构造函数
+     * @brief Constructor
      */
     STreeAdapterBase()
     {
@@ -667,7 +667,7 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
     }
 
     /**
-     * @brief 析构函数
+     * @brief Destructor
      */
     ~STreeAdapterBase()
     {
@@ -675,10 +675,10 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
     }
 
     /**
-     * @brief 获取hItem中的指定索引的数据
-     * @param hItem 项句柄
-     * @param idx 索引
-     * @return 用户数据
+     * @brief Get the data at the specified index in hItem
+     * @param hItem item handle
+     * @param idx index
+     * @return user data
      */
     STDMETHOD_(ULONG_PTR, GetItemDataByIndex)(HSTREEITEM hItem, DATA_INDEX idx) const OVERRIDE
     {
@@ -689,10 +689,10 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
     }
 
     /**
-     * @brief 保存hItem指定索引的数据
-     * @param hItem 项句柄
-     * @param idx 索引
-     * @param data 数据
+     * @brief Save the data at the specified index in hItem
+     * @param hItem item handle
+     * @param idx index
+     * @param data data
      */
     STDMETHOD_(void, SetItemDataByIndex)(HSTREEITEM hItem, DATA_INDEX idx, ULONG_PTR data) OVERRIDE
     {
@@ -706,9 +706,9 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
     }
 
     /**
-     * @brief 获取父项
-     * @param hItem 项句柄
-     * @return 父项句柄
+     * @brief Get the parent item
+     * @param hItem item handle
+     * @return parent item handle
      */
     STDMETHOD_(HSTREEITEM, GetParentItem)(HSTREEITEM hItem) const OVERRIDE
     {
@@ -721,9 +721,9 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
     }
 
     /**
-     * @brief 检查是否有子项
-     * @param hItem 项句柄
-     * @return 有子项返回TRUE，否则返回FALSE
+     * @brief Check whether there are child items
+     * @param hItem item handle
+     * @return Returns TRUE if there are child items, FALSE otherwise
      */
     STDMETHOD_(BOOL, HasChildren)(HSTREEITEM hItem) const OVERRIDE
     {
@@ -731,9 +731,9 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
     }
 
     /**
-     * @brief 获取第一个子项
-     * @param hItem 项句柄
-     * @return 第一个子项句柄
+     * @brief Get the first child item
+     * @param hItem item handle
+     * @return first child item handle
      */
     STDMETHOD_(HSTREEITEM, GetFirstChildItem)(HSTREEITEM hItem) const OVERRIDE
     {
@@ -742,9 +742,9 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
     }
 
     /**
-     * @brief 获取最后一个子项
-     * @param hItem 项句柄
-     * @return 最后一个子项句柄
+     * @brief Get the last child item
+     * @param hItem item handle
+     * @return last child item handle
      */
     STDMETHOD_(HSTREEITEM, GetLastChildItem)(HSTREEITEM hItem) const OVERRIDE
     {
@@ -753,9 +753,9 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
     }
 
     /**
-     * @brief 获取前一个兄弟项
-     * @param hItem 项句柄
-     * @return 前一个兄弟项句柄
+     * @brief Get the previous sibling item
+     * @param hItem item handle
+     * @return previous sibling item handle
      */
     STDMETHOD_(HSTREEITEM, GetPrevSiblingItem)(HSTREEITEM hItem) const OVERRIDE
     {
@@ -764,9 +764,9 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
     }
 
     /**
-     * @brief 获取下一个兄弟项
-     * @param hItem 项句柄
-     * @return 下一个兄弟项句柄
+     * @brief Get the next sibling item
+     * @param hItem item handle
+     * @return next sibling item handle
      */
     STDMETHOD_(HSTREEITEM, GetNextSiblingItem)(HSTREEITEM hItem) const OVERRIDE
     {
@@ -775,10 +775,10 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
     }
 
     /**
-     * @brief 检查是否为后代项
-     * @param hItem 父项句柄
-     * @param hChild 子项句柄
-     * @return 是后代项返回TRUE，否则返回FALSE
+     * @brief Check whether it is a descendant item
+     * @param hItem parent item handle
+     * @param hChild child item handle
+     * @return Returns TRUE if it is a descendant item, FALSE otherwise
      */
     STDMETHOD_(BOOL, IsDecendentItem)(CTHIS_ HSTREEITEM hItem, HSTREEITEM hChild) const OVERRIDE
     {
@@ -793,9 +793,9 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
     }
 
     /**
-     * @brief 获取项视图类型
-     * @param hItem 项句柄
-     * @return 视图类型
+     * @brief Get the item view type
+     * @param hItem item handle
+     * @return view type
      */
     STDMETHOD_(int, getViewType)(HSTREEITEM hItem) const OVERRIDE
     {
@@ -803,8 +803,8 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
     }
 
     /**
-     * @brief 获取视图类型数量
-     * @return 视图类型数量
+     * @brief Get the number of view types
+     * @return number of view types
      */
     STDMETHOD_(int, getViewTypeCount)() const OVERRIDE
     {
@@ -812,20 +812,20 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
     }
 
     /**
-     * @brief 获取视图
-     * @param hItem 项句柄
-     * @param pItem 项面板对象
-     * @param xmlTemplate XML模板对象
+     * @brief Get the view
+     * @param hItem item handle
+     * @param pItem item panel object
+     * @param xmlTemplate XML template object
      */
     STDMETHOD_(void, getView)(THIS_ HSTREEITEM hItem, SItemPanel *pItem, SXmlNode xmlTemplate)
     {
     }
 
     /**
-     * @brief 获取视图（重载）
-     * @param hItem 项句柄
-     * @param pItem 项窗口对象
-     * @param pXmlTemplate XML模板对象指针
+     * @brief Get the view (overload)
+     * @param hItem item handle
+     * @param pItem item window object
+     * @param pXmlTemplate XML template object pointer
      */
     STDMETHOD_(void, getView)(THIS_ HSTREEITEM hItem, IWindow *pItem, IXmlNode *pXmlTemplate) OVERRIDE
     {
@@ -835,12 +835,12 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
     }
 
     /**
-     * @brief 获取视图所需大小
-     * @param ret 返回的大小对象
-     * @param hItem 项句柄
-     * @param pItem 项面板对象
-     * @param wid 宽度
-     * @param hei 高度
+     * @brief Get the required size of the view
+     * @param ret returned size object
+     * @param hItem item handle
+     * @param pItem item panel object
+     * @param wid width
+     * @param hei height
      */
     STDMETHOD_(void, getViewDesiredSize)(SIZE *ret, HSTREEITEM hItem, SItemPanel *pItem, int wid, int hei)
     {
@@ -848,12 +848,12 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
     }
 
     /**
-     * @brief 获取视图所需大小（重载）
-     * @param ret 返回的大小对象
-     * @param hItem 项句柄
-     * @param pItem 项窗口对象
-     * @param wid 宽度
-     * @param hei 高度
+     * @brief Get the required size of the view (overload)
+     * @param ret returned size object
+     * @param hItem item handle
+     * @param pItem item window object
+     * @param wid width
+     * @param hei height
      */
     STDMETHOD_(void, getViewDesiredSize)(SIZE *ret, HSTREEITEM hItem, IWindow *pItem, int wid, int hei) OVERRIDE
     {
@@ -862,8 +862,8 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
     }
 
     /**
-     * @brief 通过模板初始化适配器
-     * @param xmlTemplate XML模板对象
+     * @brief Initialize the adapter via template
+     * @param xmlTemplate XML template object
      */
     STDMETHOD_(void, InitByTemplate)(SXmlNode xmlTemplate)
     {
@@ -871,8 +871,8 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
     }
 
     /**
-     * @brief 通过模板初始化适配器（重载）
-     * @param pXmlTemplate XML模板对象指针
+     * @brief Initialize the adapter via template (overload)
+     * @param pXmlTemplate XML template object pointer
      */
     STDMETHOD_(void, InitByTemplate)(IXmlNode *pXmlTemplate) OVERRIDE
     {
@@ -881,8 +881,8 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
     }
 
     /**
-     * @brief 检查视图宽度是否匹配父容器
-     * @return 匹配返回TRUE，否则返回FALSE
+     * @brief Check whether the view width matches the parent container
+     * @return Returns TRUE if it matches, FALSE otherwise
      */
     STDMETHOD_(BOOL, isViewWidthMatchParent)() const OVERRIDE
     {
@@ -890,9 +890,9 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
     }
 
     /**
-     * @brief 展开或折叠项
-     * @param hItem 项句柄
-     * @param uCode 展开/折叠代码
+     * @brief Expand or collapse an item
+     * @param hItem item handle
+     * @param uCode expand/collapse code
      */
     STDMETHOD_(void, ExpandItem)(HSTREEITEM hItem, UINT uCode) OVERRIDE
     {
@@ -918,21 +918,21 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
     }
 
     /**
-     * @brief 检查项是否展开
-     * @param hItem 项句柄
-     * @return 展开返回TRUE，否则返回FALSE
+     * @brief Check whether the item is expanded
+     * @param hItem item handle
+     * @return Returns TRUE if expanded, FALSE otherwise
      */
     STDMETHOD_(BOOL, IsItemExpanded)(HSTREEITEM hItem) const OVERRIDE
     {
         if (hItem == ITEM_ROOT)
-            return TRUE; // 虚拟根节点自动展开
+            return TRUE; /**< Virtual root node is auto-expanded */
         return (BOOL)GetItemDataByIndex(hItem, DATA_INDEX_ITEM_EXPANDED);
     }
 
     /**
-     * @brief 设置项展开状态
-     * @param hItem 项句柄
-     * @param bExpanded 展开状态
+     * @brief Set the item expanded state
+     * @param hItem item handle
+     * @param bExpanded expanded state
      */
     STDMETHOD_(void, SetItemExpanded)(HSTREEITEM hItem, BOOL bExpanded) OVERRIDE
     {
@@ -940,9 +940,9 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
     }
 
     /**
-     * @brief 检查项是否可见
-     * @param hItem 项句柄
-     * @return 可见返回TRUE，否则返回FALSE
+     * @brief Check whether the item is visible
+     * @param hItem item handle
+     * @return Returns TRUE if visible, FALSE otherwise
      */
     STDMETHOD_(BOOL, IsItemVisible)(HSTREEITEM hItem) const OVERRIDE
     {
@@ -957,8 +957,8 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
     }
 
     /**
-     * @brief 获取第一个可见项
-     * @return 第一个可见项句柄
+     * @brief Get the first visible item
+     * @return first visible item handle
      */
     STDMETHOD_(HSTREEITEM, GetFirstVisibleItem)() const OVERRIDE
     {
@@ -966,8 +966,8 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
     }
 
     /**
-     * @brief 获取最后一个可见项
-     * @return 最后一个可见项句柄
+     * @brief Get the last visible item
+     * @return last visible item handle
      */
     STDMETHOD_(HSTREEITEM, GetLastVisibleItem)() const OVERRIDE
     {
@@ -985,9 +985,9 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
     }
 
     /**
-     * @brief 获取前一个可见项
-     * @param hItem 项句柄
-     * @return 前一个可见项句柄
+     * @brief Get the previous visible item
+     * @param hItem item handle
+     * @return previous visible item handle
      */
     STDMETHOD_(HSTREEITEM, GetPrevVisibleItem)(HSTREEITEM hItem) const OVERRIDE
     {
@@ -1003,9 +1003,9 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
     }
 
     /**
-     * @brief 获取下一个可见项
-     * @param hItem 项句柄
-     * @return 下一个可见项句柄
+     * @brief Get the next visible item
+     * @param hItem item handle
+     * @return next visible item handle
      */
     STDMETHOD_(HSTREEITEM, GetNextVisibleItem)(HSTREEITEM hItem) const OVERRIDE
     {
@@ -1029,10 +1029,10 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
     }
 
     /**
-     * @brief 查询接口
-     * @param id 接口ID
-     * @param ppObj 接口对象指针
-     * @return 查询结果
+     * @brief Query interface
+     * @param id interface ID
+     * @param ppObj interface object pointer
+     * @return query result
      */
     STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFGUID id, IObjRef **ppObj) OVERRIDE
     {
@@ -1041,11 +1041,11 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
 
   public:
     /**
-     * @brief 插入项
-     * @param data 数据对象
-     * @param hParent 父项句柄
-     * @param hInsertAfter 插入位置
-     * @return 插入的项句柄
+     * @brief Insert an item
+     * @param data data object
+     * @param hParent parent item handle
+     * @param hInsertAfter insert position
+     * @return inserted item handle
      */
     HSTREEITEM InsertItem(const T &data, HSTREEITEM hParent = STVI_ROOT, HSTREEITEM hInsertAfter = STVI_LAST)
     {
@@ -1055,9 +1055,9 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
     }
 
     /**
-     * @brief 删除项
-     * @param hItem 项句柄
-     * @param bNotifyChange 是否通知更改
+     * @brief Delete an item
+     * @param hItem item handle
+     * @param bNotifyChange whether to notify the change
      */
     void DeleteItem(HSTREEITEM hItem, BOOL bNotifyChange = TRUE)
     {
@@ -1076,9 +1076,9 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
     }
 
     /**
-     * @brief 删除项（扩展）
-     * @param hItem 项句柄
-     * @return 删除结果
+     * @brief Delete an item (extended)
+     * @param hItem item handle
+     * @return deletion result
      */
     BOOL DeleteItemEx(HSTREEITEM hItem)
     {
@@ -1086,9 +1086,9 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
     }
 
     /**
-     * @brief 获取项数据
-     * @param hItem 项句柄
-     * @return 数据对象引用
+     * @brief Get the item data
+     * @param hItem item handle
+     * @return data object reference
      */
     const T &GetItemData(HSTREEITEM hItem) const
     {
@@ -1098,9 +1098,9 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
     }
 
     /**
-     * @brief 获取项数据
-     * @param hItem 项句柄
-     * @return 数据对象引用
+     * @brief Get the item data
+     * @param hItem item handle
+     * @return data object reference
      */
     T &GetItemData(HSTREEITEM hItem)
     {
@@ -1110,9 +1110,9 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
     }
 
     /**
-     * @brief 设置项数据
-     * @param hItem 项句柄
-     * @param data 数据对象
+     * @brief Set the item data
+     * @param hItem item handle
+     * @param data data object
      */
     void SetItemData(HSTREEITEM hItem, const T &data)
     {
@@ -1122,8 +1122,8 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
     }
 
     /**
-     * @brief 设置数据释放函数
-     * @param freer 数据释放函数
+     * @brief Set the data release function
+     * @param freer data release function
      */
     void SetDataFreer(FunTvItemDataFreer freer)
     {
@@ -1131,11 +1131,11 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
     }
 
   protected:
-    CSTree<ItemInfo> m_tree;                     ///< 树对象
-    TreeDataFreer m_treeFreer;                   ///< 树数据释放器
-    ULONG_PTR m_rootUserData[DATA_INDEX_NUMBER]; ///< 根节点用户数据
+    CSTree<ItemInfo> m_tree;                     /**<  Tree object */
+    TreeDataFreer m_treeFreer;                   /**<  Tree data releaser */
+    ULONG_PTR m_rootUserData[DATA_INDEX_NUMBER]; /**<  Root node user data */
 };
 
 SNSEND
 
-#endif // __SADAPTERBASE__H__
+#endif /**< __SADAPTERBASE__H__ */

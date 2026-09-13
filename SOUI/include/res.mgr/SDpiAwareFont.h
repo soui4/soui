@@ -48,10 +48,10 @@ class SOUI_EXP SDpiAwareFont {
      */
     IFontS *OnGetFont(const SStringW &strDesc, int nScale);
 
-    SStringW m_strDesc;           // Font description string
-    SAutoRefPtr<IFontS> m_object; // Pointer to the font object
+    SStringW m_strDesc;           /**< Font description string */
+    SAutoRefPtr<IFontS> m_object; /**< Pointer to the font object */
 };
 
 SNSEND
 
-#endif // __SDPIAWAREFONT__H__
+#endif /**< __SDPIAWAREFONT__H__ */

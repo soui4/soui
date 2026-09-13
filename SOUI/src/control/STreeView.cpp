@@ -35,7 +35,7 @@ class STreeViewDataSetObserver : public TObjRefImpl<ITvDataSetObserver> {
     STreeView *m_pOwner;
 };
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 STreeViewItemLocator::STreeViewItemLocator(int nIndent)
     : m_nLineHeight(30)
     , m_nIndent(nIndent)
@@ -65,23 +65,23 @@ void STreeViewItemLocator::_InitBranch(HSTREEITEM hItem)
         _SetItemWidth(hItem, 0);
     }
     if (m_adapter->HasChildren(hItem))
-    { // 有子节点
+    { // Has child node
         HSTREEITEM hChild = m_adapter->GetFirstChildItem(hItem);
         int nBranchHeight = 0;
         while (hChild != ITEM_NULL)
         {
-            // 设置偏移
+            // Set offset
             _SetItemOffset(hChild, nBranchHeight);
             _InitBranch(hChild);
             nBranchHeight += _GetItemVisibleHeight(hChild);
             hChild = m_adapter->GetNextSiblingItem(hChild);
         }
         _SetBranchHeight(hItem, nBranchHeight);
-        // 设置默认宽度
+        // Set default width
         _SetBranchWidth(hItem, m_szDef.cx + m_nIndent);
     }
     else
-    { // 无子节点
+    { // No child node
         _SetBranchHeight(hItem, 0);
         _SetBranchWidth(hItem, 0);
     }
@@ -108,7 +108,7 @@ HSTREEITEM STreeViewItemLocator::_Position2Item(int position, HSTREEITEM hParent
     int nParentBranchHeight = _GetBranchHeight(hParent);
 
     if (position - nPos < nParentBranchHeight / 2)
-    { // 从first开始查找
+    { // Search starting from first
         HSTREEITEM hItem = m_adapter->GetFirstChildItem(hParent);
         while (hItem)
         {
@@ -122,7 +122,7 @@ HSTREEITEM STreeViewItemLocator::_Position2Item(int position, HSTREEITEM hParent
         }
     }
     else
-    { // 从last开始查找
+    { // Search starting from last
         nPos += nParentBranchHeight;
 
         HSTREEITEM hItem = m_adapter->GetLastChildItem(hParent);
@@ -138,7 +138,7 @@ HSTREEITEM STreeViewItemLocator::_Position2Item(int position, HSTREEITEM hParent
         }
     }
 
-    SASSERT(FALSE); // 不应该走到这里来
+    SASSERT(FALSE); // Should not reach here
     return ITEM_NULL;
 }
 
@@ -187,7 +187,7 @@ void STreeViewItemLocator::_UpdateSiblingsOffset(HSTREEITEM hItem)
         nOffset += _GetItemVisibleHeight(hSib);
         hSib = m_adapter->GetNextSiblingItem(hSib);
     }
-    // 注意更新各级父节点的偏移量
+    // Note to update the offset of each level of parent nodes
     HSTREEITEM hParent = m_adapter->GetParentItem(hItem);
     if (hParent != ITEM_NULL && hParent != ITEM_ROOT && IsItemExpanded(hParent))
     {
@@ -240,16 +240,16 @@ void STreeViewItemLocator::_UpdateBranchWidth(HSTREEITEM hItem, int nOldWidth, i
 
     int nIndent = hParent == ITEM_ROOT ? 0 : m_nIndent;
     if (nCurBranchWidth != nOldWidth + nIndent)
-    { // 父节点的宽度不是由当前结点控制的
+    { // The parent node's width is not controlled by the current node
         if (nCurBranchWidth < nNewWidth + nIndent)
-        { // 新宽度扩展了父节点的显示宽度
+        { // The new width extends the parent node's display width
             _SetBranchWidth(hParent, nNewWidth + nIndent);
             if (IsItemExpanded(hParent))
                 _UpdateBranchWidth(hParent, nCurBranchWidth, nNewWidth + nIndent);
         }
     }
     else
-    { // 父节点的宽度正好是由hItem的显示宽度
+    { // The parent node's width is exactly the display width of hItem
         int nNewBranchWidth;
         if (nNewWidth > nOldWidth)
         {
@@ -348,15 +348,15 @@ int STreeViewItemLocator::Item2Position(HSTREEITEM hItem) const
     }
 
     int nRet = 0;
-    // 获得父节点开始位置
+    // Get the parent node's start position
     HSTREEITEM hParent = m_adapter->GetParentItem(hItem);
     if (hParent != ITEM_NULL && hParent != ITEM_ROOT)
     {
         nRet = Item2Position(hParent);
-        // 越过父节点
+        // Skip past the parent node
         nRet += GetItemHeight(hParent);
     }
-    // 越过前面兄弟结点
+    // Skip past preceding sibling nodes
     nRet += _GetItemOffset(hItem);
 
     return nRet;
@@ -416,7 +416,7 @@ void STreeViewItemLocator::OnBranchExpandedChanged(HSTREEITEM hItem, BOOL bExpan
 
 void STreeViewItemLocator::OnBranchChanged(HSTREEITEM hItem)
 {
-    // 初始化列表项高度等数据
+    // Initialize list item height and other data
     int nVisibleHeightOld = _GetItemVisibleHeight(hItem);
     _InitBranch(hItem);
     int nVisibleHeightNew = _GetItemVisibleHeight(hItem);
@@ -433,7 +433,7 @@ void STreeViewItemLocator::OnBranchChanged(HSTREEITEM hItem)
     _UpdateSiblingsOffset(hItem);
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 STreeView::STreeView()
     : m_itemCapture(NULL)
     , m_pHoverItem(NULL)
@@ -644,14 +644,14 @@ void STreeView::OnDestroy()
 
 void STreeView::EnsureVisible(HSTREEITEM hItem)
 {
-    // 保证hItem被正确展开
+    // Ensure hItem is correctly expanded
     HSTREEITEM hParent = m_adapter->GetParentItem(hItem);
     while (hParent != ITEM_ROOT)
     {
         m_adapter->ExpandItem(hParent, TVC_EXPAND);
         hParent = m_adapter->GetParentItem(hParent);
     }
-    // 滚动视图
+    // Scroll view
     int nPos = m_tvItemLocator->Item2Position(hItem);
     int nHeight = m_tvItemLocator->GetItemHeight(hItem);
     if (nPos + nHeight <= m_siVer.nPos)
@@ -677,7 +677,7 @@ void STreeView::EnsureVisible(HSTREEITEM hItem)
     }
 }
 
-void STreeView::SetSel(HSTREEITEM hItem, BOOL bNotify /*=FALSE*/)
+void STreeView::SetSel(HSTREEITEM hItem, BOOL bNotify /**< =FALSE */)
 {
     if (!m_adapter)
         return;
@@ -849,8 +849,7 @@ void STreeView::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
         if (m_hSelected != ITEM_NULL)
         {
             if (m_adapter->HasChildren(m_hSelected) && m_adapter->IsItemExpanded(m_hSelected))
-                m_adapter->ExpandItem(m_hSelected,
-                                      TVC_COLLAPSE); // collapse the selected item
+                m_adapter->ExpandItem(m_hSelected, TVC_COLLAPSE); // collapse the selected item
             else
                 nNewSelItem = m_adapter->GetPrevVisibleItem(m_hSelected);
         }
@@ -859,8 +858,7 @@ void STreeView::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
         if (m_hSelected != ITEM_NULL)
         {
             if (m_adapter->HasChildren(m_hSelected) && !m_adapter->IsItemExpanded(m_hSelected))
-                m_adapter->ExpandItem(m_hSelected,
-                                      TVC_EXPAND); // collapse the selected item
+                m_adapter->ExpandItem(m_hSelected, TVC_EXPAND); // collapse the selected item
             else
                 nNewSelItem = m_adapter->GetNextVisibleItem(m_hSelected);
         }
@@ -929,14 +927,14 @@ void STreeView::UpdateScrollBar()
     szView.cy = m_tvItemLocator->GetTotalHeight();
 
     CRect rcClient;
-    SWindow::GetClientRect(&rcClient); // 不计算滚动条大小
+    SWindow::GetClientRect(&rcClient); // Do not compute scrollbar size
     CSize size = rcClient.Size();
-    //  关闭滚动条
+    // Close scroll bar
     m_wBarVisible = SSB_NULL;
 
     if (size.cy < szView.cy || (size.cy < szView.cy + GetSbWidth() && size.cx < szView.cx))
     {
-        //  需要纵向滚动条
+        // Need vertical scroll bar
         m_wBarVisible |= SSB_VERT;
         m_siVer.nMin = 0;
         m_siVer.nMax = szView.cy - 1;
@@ -944,16 +942,16 @@ void STreeView::UpdateScrollBar()
 
         if (size.cx - GetSbWidth() < szView.cx)
         {
-            // 如果是适应宽度，则说明需要更新项宽度，否则需要横向滚动条
+            // If fit-to-width, it means item width needs updating; otherwise a horizontal scrollbar is needed
             if (m_adapter->isViewWidthMatchParent())
             {
                 UpdateVisibleItems();
             }
             else
             {
-                //  需要横向滚动条
+                // Need horizontal scrollbar
                 m_wBarVisible |= SSB_HORZ;
-                m_siVer.nPage = size.cy - GetSbWidth() > 0 ? size.cy - GetSbWidth() : 0; // 注意同时调整纵向滚动条page信息
+                m_siVer.nPage = size.cy - GetSbWidth() > 0 ? size.cy - GetSbWidth() : 0; // Note to also adjust the vertical scrollbar page info
 
                 m_siHoz.nMin = 0;
                 m_siHoz.nMax = szView.cx - 1;
@@ -962,7 +960,7 @@ void STreeView::UpdateScrollBar()
         }
         else
         {
-            //  不需要横向滚动条
+            // No horizontal scroll bar needed
             m_siHoz.nPage = size.cx;
             m_siHoz.nMin = 0;
             m_siHoz.nMax = m_siHoz.nPage - 1;
@@ -971,7 +969,7 @@ void STreeView::UpdateScrollBar()
     }
     else
     {
-        //  不需要纵向滚动条
+        // No vertical scroll bar needed
         m_siVer.nPage = size.cy;
         m_siVer.nMin = 0;
         m_siVer.nMax = size.cy - 1;
@@ -979,7 +977,7 @@ void STreeView::UpdateScrollBar()
 
         if (size.cx < szView.cx)
         {
-            //  需要横向滚动条
+            // Need horizontal scrollbar
             m_wBarVisible |= SSB_HORZ;
             m_siHoz.nMin = 0;
             m_siHoz.nMax = szView.cx - 1;
@@ -987,7 +985,7 @@ void STreeView::UpdateScrollBar()
         }
         else
         {
-            //  不需要横向滚动条
+            // No horizontal scroll bar needed
             m_siHoz.nPage = size.cx;
             m_siHoz.nMin = 0;
             m_siHoz.nMax = m_siHoz.nPage - 1;
@@ -995,7 +993,7 @@ void STreeView::UpdateScrollBar()
         }
     }
 
-    //  根据需要调整原点位置
+    // Adjust origin position as needed
     if (HasScrollBar(FALSE) && m_siHoz.nPos + (int)m_siHoz.nPage > szView.cx)
     {
         m_siHoz.nPos = szView.cx - m_siHoz.nPage;
@@ -1009,7 +1007,7 @@ void STreeView::UpdateScrollBar()
     SetScrollPos(TRUE, m_siVer.nPos, TRUE);
     SetScrollPos(FALSE, m_siHoz.nPos, TRUE);
 
-    //  重新计算客户区及非客户区
+    // Recompute client and non-client areas
     SSendMessage(WM_NCCALCSIZE);
 
     InvalidateRect(NULL);
@@ -1017,13 +1015,13 @@ void STreeView::UpdateScrollBar()
 
 void STreeView::UpdateVisibleItems()
 {
-	if (!m_adapter || !GetContainer())
-		return;
+    if (!m_adapter || !GetContainer())
+        return;
     SAutoEnableHostPrivUiDef enableUiDef(this);
     HSTREEITEM hItem = m_tvItemLocator->Position2Item(m_siVer.nPos);
     if (hItem == ITEM_NULL)
     {
-        // 如果没有可显示的，则移除所有item
+        // If none is displayable, remove all items
         SPOSITION pos = m_visible_items.GetHeadPosition();
         while (pos)
         {
@@ -1042,7 +1040,7 @@ void STreeView::UpdateVisibleItems()
                 ii.pItem->SetSelected(FALSE, FALSE);
                 ii.pItem->GetFocusManager()->ClearFocus();
             }
-            ii.pItem->SetVisible(FALSE); // 防止执行SItemPanel::OnTimeFrame()
+            ii.pItem->SetVisible(FALSE); // Prevent SItemPanel::OnTimeFrame() from executing
             ii.pItem->GetEventSet()->setMutedState(false);
 
             m_itemRecycle[ii.nType]->AddTail(ii.pItem);
@@ -1080,7 +1078,7 @@ void STreeView::UpdateVisibleItems()
         {
             SList<SItemPanel *> *lstRecycle = m_itemRecycle.GetAt(ii.nType);
             if (lstRecycle->IsEmpty())
-            { // 创建一个新的列表项
+            { // Create a new list item
                 bNewItem = TRUE;
                 ii.pItem = SItemPanel::Create(this, SXmlNode(), this);
                 ii.pItem->GetEventSet()->subscribeEvent(EventItemPanelClick::EventID, Subscriber(&STreeView::OnItemClick, this));
@@ -1116,7 +1114,7 @@ void STreeView::UpdateVisibleItems()
         CSize szItem;
         CRect rcItem = GetClientRect();
         m_adapter->getViewDesiredSize(&szItem, hItem, ii.pItem, -1, -1);
-        // 不使宽度
+        // Do not apply width
         if (m_adapter->isViewWidthMatchParent())
             szItem.cx = rcItem.Width();
         ii.pItem->Move(CRect(0, 0, szItem.cx, szItem.cy));
@@ -1149,7 +1147,7 @@ void STreeView::UpdateVisibleItems()
             ii.pItem->GetFocusManager()->ClearFocus();
             m_hSelected = 0;
         }
-        ii.pItem->SetVisible(FALSE); // 防止执行SItemPanel::OnTimeFrame()
+        ii.pItem->SetVisible(FALSE); // Prevent SItemPanel::OnTimeFrame() from executing
         ii.pItem->GetEventSet()->setMutedState(false);
 
         m_itemRecycle[ii.nType]->AddTail(ii.pItem);
@@ -1164,7 +1162,7 @@ void STreeView::UpdateVisibleItems()
     if (szOldView != szNewView)
     { // update scroll range
         UpdateScrollBar();
-        UpdateVisibleItems(); // 根据新的滚动条状态重新记算显示列表项
+        UpdateVisibleItems(); // Recompute the displayed list items based on the new scrollbar state
     }
     else
     {
@@ -1341,7 +1339,7 @@ LRESULT STreeView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
     LRESULT lRet = 0;
     CPoint pt(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 
-    // === 1. 先尝试拖动处理 ===
+    // === 1. Try drag handling first ===
     if (HandleMouseDrag(uMsg, wParam, lParam, lRet))
     {
         SetMsgHandled(TRUE);
@@ -1357,7 +1355,7 @@ LRESULT STreeView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
     else
     {
         if (uMsg == WM_LBUTTONDOWN || uMsg == WM_RBUTTONDOWN || uMsg == WM_MBUTTONDOWN)
-        { // 交给panel处理
+        { // Hand over to panel for handling
             CPoint pt2(pt);
             SItemPanel *pPanel = HitTest(pt2);
             if (!pPanel && m_hSelected) // hit in none-item area,so make item to killfocus
@@ -1376,7 +1374,7 @@ LRESULT STreeView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
         {
             SOsrPanel *oldHover = m_pHoverItem;
             m_pHoverItem = pHover;
-            //            SSLOGI() << "m_pHoverItem = " << m_pHoverItem;
+            // SSLOGI() << "m_pHoverItem = " << m_pHoverItem;
 
             if (oldHover)
             {
@@ -1397,7 +1395,7 @@ LRESULT STreeView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
     }
 
     if (uMsg == WM_LBUTTONUP || uMsg == WM_RBUTTONUP || uMsg == WM_MBUTTONUP)
-    { // 交给panel处理
+    { // Hand over to panel for handling
         __baseCls::ProcessSwndMessage(uMsg, wParam, lParam, lRet);
     }
     SetMsgHandled(TRUE);
@@ -1460,7 +1458,7 @@ BOOL STreeView::OnScroll(BOOL bVertical, UINT uCode, int nPos)
     {
         UpdateVisibleItems();
 
-        // 加速滚动时UI的刷新
+        // Accelerate UI refresh during scrolling
         if (uCode == SB_THUMBTRACK)
             ScrollUpdate();
 
@@ -1480,6 +1478,19 @@ SItemPanel *STreeView::GetItemPanel(HSTREEITEM hItem)
     if (!pNode)
         return NULL;
     return pNode->m_value.pItem;
+}
+
+int STreeView::GetVisibleAccSelIndex() const
+{
+    int n = 0;
+    for (SPOSITION it = m_visible_items.GetHeadPosition(); it;)
+    {
+        const ItemInfo &itInfo = m_visible_items.GetNext(it);
+        if (IsItemSelected((HSTREEITEM)itInfo.pItem->GetItemIndex()))
+            return n + 1;
+        n++;
+    }
+    return 0;
 }
 
 IItemPanel *STreeView::HitTest(const POINT *pt) const
@@ -1736,7 +1747,7 @@ void STreeView::OnRebuildFont()
 {
     __baseCls::OnRebuildFont();
     DispatchMessage2Items(UM_UPDATEFONT, 0, 0);
-    UpdateVisibleItems(); // 防止因为字体大小变化后，列表项大小发生变化没有更新。其它view不需要这个过程。
+    UpdateVisibleItems(); // Prevent list item size changes from not being updated after font size changes. Other views do not need this process.
 }
 
 ITvAdapter *STreeView::GetAdapter() const

@@ -189,11 +189,11 @@ class SOUI_EXP SMatrix
      */
     enum TypeMask
     {
-        kIdentity_Mask = 0,      //!< Set if the matrix is identity
-        kTranslate_Mask = 0x01,  //!< Set if the matrix has translation
-        kScale_Mask = 0x02,      //!< Set if the matrix has X or Y scale
-        kAffine_Mask = 0x04,     //!< Set if the matrix skews or rotates
-        kPerspective_Mask = 0x08 //!< Set if the matrix is in perspective
+        kIdentity_Mask = 0,      /**<  Set if the matrix is identity */
+        kTranslate_Mask = 0x01,  /**<  Set if the matrix has translation */
+        kScale_Mask = 0x02,      /**<  Set if the matrix has X or Y scale */
+        kAffine_Mask = 0x04,     /**<  Set if the matrix skews or rotates */
+        kPerspective_Mask = 0x08 /**<  Set if the matrix is in perspective */
     };
 
     /**
@@ -836,7 +836,7 @@ class SOUI_EXP SMatrix
 
     enum
     {
-        // writeTo/readFromMemory will never return a value larger than this
+        /** writeTo/readFromMemory will never return a value larger than this */
         kMaxFlattenSize = 9 * sizeof(float) + sizeof(uint32_t)
     };
 

@@ -29,14 +29,14 @@ struct ToolBarItem
     SStringW strText;
     SStringW strTip;
     int dwState;
-    int dwStyle; // Item style flags (TBSTYLE_*)
+    int dwStyle; /**< Item style flags (TBSTYLE_*) */
     SAutoRefPtr<IBitmapS> icon;
 
-    // Animation support for item hover/leave state
-    BYTE byAlphaAni; // Animation alpha value, 0xFF means not animating
+    /** Animation support for item hover/leave state */
+    BYTE byAlphaAni; /**< Animation alpha value, 0xFF means not animating */
 
-    // Child control support
-    SAutoRefPtr<SWindow> pChild; // Optional child control for this item
+    /** Child control support */
+    SAutoRefPtr<SWindow> pChild; /**< Optional child control for this item */
 
     ToolBarItem()
         : nId(0)
@@ -63,7 +63,7 @@ class SOUI_EXP SToolBar
     void AddButton(int nID, int nImage, LPCWSTR lpszText = NULL, LPCWSTR lpszTip = NULL, int dwStyle = TBSTYLE_BUTTON);
     BOOL DeleteButton(int nIndex);
 
-    // Item query methods
+    /** Item query methods */
     int GetItemCount() const
     {
         return (int)m_arrItems.GetCount();
@@ -71,13 +71,13 @@ class SOUI_EXP SToolBar
     int GetItemID(int nIndex) const;
     int CommandToIndex(int nID) const;
 
-    // Item information
+    /** Item information */
     BOOL GetItemInfo(int nIndex, ToolBarItem *pItem) const;
     BOOL SetItemInfo(int nIndex, const ToolBarItem *pItem);
 
     void SetIconsSkin(SAutoRefPtr<ISkinObj> skinIcons, int iState = 0);
 
-    // Button state methods (MFC-compatible)
+    /** Button state methods (MFC-compatible) */
     BOOL EnableButton(int nID, BOOL bEnable = TRUE);
     BOOL CheckButton(int nID, BOOL bCheck = TRUE);
     BOOL PressButton(int nID, BOOL bPress = TRUE);
@@ -85,21 +85,21 @@ class SOUI_EXP SToolBar
     BOOL IsButtonChecked(int nID) const;
     BOOL IsButtonPressed(int nID) const;
 
-    // Button style methods
+    /** Button style methods */
     int GetButtonStyle(int nIndex) const;
     void SetButtonStyle(int nIndex, int nStyle);
 
-    // Display control methods
+    /** Display control methods */
     BOOL IsItemShowText(int nItemId) const;
     BOOL IsDropDownItem(int nItemId) const;
 
-    // Menu style methods
+    /** Menu style methods */
     BOOL LoadMenuStyle(LPCTSTR pszResName);
     void SetMenuStyle(SXmlNode xmlMenuStyle);
 
     CRect GetItemRect(int iItem) const;
 
-    // Child control management methods
+    /** Child control management methods */
     /**
      * Create a child control for toolbar item
      * @param iItem Item index
@@ -116,7 +116,7 @@ class SOUI_EXP SToolBar
     SWindow *GetItemChild(int iItem) const;
 
   protected:
-    STDMETHOD_(void, OnNextFrame)(THIS) OVERRIDE; // ITimelineHandler interface
+    STDMETHOD_(void, OnNextFrame)(THIS) OVERRIDE; /**< ITimelineHandler interface */
     STDMETHOD_(BOOL, OnIdle)(THIS_ int iRun) OVERRIDE;
 
   public:
@@ -225,18 +225,18 @@ class SOUI_EXP SToolBar
     int m_iClickItem;
     int m_iHoverItem;
     BOOL m_bVert;
-    BOOL m_bTextIconVertical; // Whether to arrange text and icon vertically
-    int m_nTextIconInterval;  // Separation between items (in pixels)
+    BOOL m_bTextIconVertical; /**< Whether to arrange text and icon vertically */
+    int m_nTextIconInterval;  /**< Separation between items (in pixels) */
     int m_nMaxItemWidth;
     int m_nVisibleItems;
     DWORD m_dwDropBtnState;
-    int m_nMoreButtonSize; // Size of more button (calculated dynamically)
+    int m_nMoreButtonSize; /**< Size of more button (calculated dynamically) */
 
-    // Animation support
-    BOOL m_bAnimate; // Enable/disable item animation
-    BYTE m_nAniStep; // Animation step for alpha value increment
+    /** Animation support */
+    BOOL m_bAnimate; /**< Enable/disable item animation */
+    BYTE m_nAniStep; /**< Animation step for alpha value increment */
 };
 
 SNSEND
 
-#endif //__SToolBar_H__
+#endif /**< __SToolBar_H__ */

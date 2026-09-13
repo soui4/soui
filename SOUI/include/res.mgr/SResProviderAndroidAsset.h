@@ -1,32 +1,32 @@
-﻿// ============================================================================
-// SResProviderAndroidAsset - 基于 Android NDK AAssetManager 的 SOUI IResProvider。
+﻿//============================================================================
+/** SResProviderAndroidAsset - SOUI IResProvider based on Android NDK AAssetManager. */
 //
-// 优点：
-//   ★ 直接从 APK assets 中读取 uires 资源包（prefix/{uires.idx,xml,image,values,...}）
-//   ★ 无需先把 assets 拷贝到 filesDir，既省磁盘又省启动时间
+/** Advantages: */
+/** ★ Read uires resource package directly from APK assets (prefix/{uires.idx,xml,image,values,...}) */
+/** ★ No need to copy assets to filesDir first, saving both disk space and startup time */
 //
-// 用法（与 SResProviderFiles 的 Init 接口对齐，但类型不同）：
+/** Usage (aligned with SResProviderFiles' Init interface, but with different types): */
 //
-//   #include <android/asset_manager_jni.h>  // for AAssetManager_fromJava
-//   AAssetManager* mgr = AAssetManager_fromJava(env, javaAssetManager);
+/** #include <android/asset_manager_jni.h>  // for AAssetManager_fromJava */
+/** AAssetManager* mgr = AAssetManager_fromJava(env, javaAssetManager); */
 //
-//   SResProviderAndroidAsset* p = new SResProviderAndroidAsset();
-//   // wParam: AAssetManager*
-//   // lParam: assets 下的前缀路径，如 "uires" 或 "soui_sys_res"
-//   p->Init((WPARAM)mgr, (LPARAM)_T("uires"));
+/** SResProviderAndroidAsset* p = new SResProviderAndroidAsset(); */
+/** // wParam: AAssetManager* */
+/** // lParam: prefix path under assets, e.g. "uires" or "soui_sys_res" */
+/** p->Init((WPARAM)mgr, (LPARAM)_T("uires")); */
 //
-//   GETRESPROVIDER->AddResProvider(p, _T("uidef:xml_init")); // 或 LoadSystemNamedResource
+/** GETRESPROVIDER->AddResProvider(p, _T("uidef:xml_init")); // or LoadSystemNamedResource */
 //
-// 约定：
-//   - prefix/uires.idx 必须存在，格式与标准 SOUI uires.idx 一致
-//   - uires.idx 中的 path="uidef\\init.xml" 会被标准化为 path="uidef/init.xml"，
-//     再拼接 prefix 得到 assets 相对路径 "uires/uidef/init.xml"
-// ============================================================================
+/** Conventions: */
+/** - prefix/uires.idx must exist, format consistent with standard SOUI uires.idx */
+/** - path="uidef\init.xml" in uires.idx will be normalized to path="uidef/init.xml", */
+/** then concatenated with prefix to get the assets relative path "uires/uidef/init.xml" */
+//============================================================================
 #ifdef __ANDROID__
 #ifndef _SRESPROVIDER_ANDROID_ASSET_H_
 #define _SRESPROVIDER_ANDROID_ASSET_H_
 
-#include <res.mgr/SResProvider.h>        // SResProvider.h pulls IResProvider + helper/SResID.h
+#include <res.mgr/SResProvider.h> /**< SResProvider.h pulls IResProvider + helper/SResID.h */
 #include <android/asset_manager.h>
 
 SNSBEGIN
@@ -38,8 +38,8 @@ class SOUI_EXP SResProviderAndroidAsset : public TObjRefImpl<IResProvider> {
 
   public:
     /**
-     * @param wParam (AAssetManager*) Android 原生 AssetManager 指针
-     * @param lParam (LPCTSTR) assets 下的前缀目录名，如 _T("uires") / _T("soui_sys_res")
+     * @param wParam (AAssetManager*) Android native AssetManager pointer
+     * @param lParam (LPCTSTR) prefix directory name under assets, e.g. _T("uires") / _T("soui_sys_res")
      */
     STDMETHOD_(BOOL, Init)
     (THIS_ WPARAM wParam, LPARAM lParam) OVERRIDE;
@@ -76,42 +76,42 @@ class SOUI_EXP SResProviderAndroidAsset : public TObjRefImpl<IResProvider> {
 
   protected:
     /**
-     * 根据 type+name 查询 uires.idx 映射的完整 assets 相对路径，
-     * 例如 type=LAYOUT name=dlg_main → "uires/xml/dlg_main.xml"
+     * Query the full assets relative path mapped by uires.idx according to type+name,
+     * e.g. type=LAYOUT name=dlg_main → "uires/xml/dlg_main.xml"
      *
-     * 当 strType == nullptr 时，把 pszResName 作为相对路径直接和 prefix 拼接（用于直接读文件路径）
+     * When strType == nullptr, concatenate pszResName as relative path directly with prefix (used to read file path directly)
      *
-     * @return 空字符串表示找不到该资源
+     * @return empty string means resource not found
      */
     SStringT GetAssetPath(LPCTSTR strType, LPCTSTR pszResName) const;
 
     /**
-     * 递归枚举指定目录下的所有文件
-     * @param dirPath 目录路径（assets 相对路径）
-     * @param funEnumCB 回调函数
-     * @param lp 用户自定义参数
+     * Recursively enumerate all files under the specified directory
+     * @param dirPath directory path (assets relative path)
+     * @param funEnumCB callback function
+     * @param lp user-defined parameter
      */
     void _EnumFile(const SStringT &dirPath, EnumFileCallback funEnumCB, LPARAM lp);
 
     /**
-     * 打开 AAsset 并返回其指针；调用方负责最终 AAsset_close(asset)。
+     * Open AAsset and return its pointer; the caller is responsible for eventually calling AAsset_close(asset).
      *
-     * @param assetPath 使用 / 分隔的完整 assets 相对路径（如 "uires/xml/dlg_main.xml"）
+     * @param assetPath full assets relative path separated by / (e.g. "uires/xml/dlg_main.xml")
      * @param mode      AASSET_MODE_BUFFER / AASSET_MODE_RANDOM ...
      */
     AAsset *OpenAsset(const SStringT &assetPath, int mode = AASSET_MODE_BUFFER) const;
 
-    /** 把 uires.idx path 字段标准化：'\\' -> '/'，并去掉开头多余的 '/' */
+    /** Normalize the uires.idx path field: '\' -> '/', and remove the leading redundant '/' */
     static SStringT NormalizeAssetPath(const SStringT &src);
 
   private:
-    AAssetManager *m_assetMgr;                     // JVM 持有，本类不拥有，也不释放
-    SStringT m_prefix;                             // 前缀目录（不含结尾斜杠），如 _T("uires")
-    SMap<SResID, SStringT> m_mapFiles;             // SResID(type,name) -> 规范化后的相对 asset path
+    AAssetManager *m_assetMgr;         /**< Held by JVM, not owned or released by this class */
+    SStringT m_prefix;                 /**< Prefix directory (without trailing slash), e.g. _T("uires") */
+    SMap<SResID, SStringT> m_mapFiles; /**< SResID(type,name) -> normalized relative asset path */
 };
 
 SNSEND
 
-#endif // _SRESPROVIDER_ANDROID_ASSET_H_
+#endif /**< _SRESPROVIDER_ANDROID_ASSET_H_ */
 
-#endif//__ANDROID__
+#endif /**< __ANDROID__ */

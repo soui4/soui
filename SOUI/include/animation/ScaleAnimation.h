@@ -13,16 +13,16 @@ class SOUI_EXP SScaleAnimation : public SAnimation {
     DEF_SOBJECT(SAnimation, L"scale")
 
   private:
-    float mFromX; ///< Horizontal scaling factor to apply at the start of the animation.
-    float mToX;   ///< Horizontal scaling factor to apply at the end of the animation.
-    float mFromY; ///< Vertical scaling factor to apply at the start of the animation.
-    float mToY;   ///< Vertical scaling factor to apply at the end of the animation.
+    float mFromX; /**<  Horizontal scaling factor to apply at the start of the animation. */
+    float mToX;   /**<  Horizontal scaling factor to apply at the end of the animation. */
+    float mFromY; /**<  Vertical scaling factor to apply at the start of the animation. */
+    float mToY;   /**<  Vertical scaling factor to apply at the end of the animation. */
 
-    SValueDescription mPivotXDesc; ///< Description of the pivot X value.
-    SValueDescription mPivotYDesc; ///< Description of the pivot Y value.
+    SValueDescription mPivotXDesc; /**<  Description of the pivot X value. */
+    SValueDescription mPivotYDesc; /**<  Description of the pivot Y value. */
 
-    float mPivotX; ///< The X coordinate of the pivot point.
-    float mPivotY; ///< The Y coordinate of the pivot point.
+    float mPivotX; /**<  The X coordinate of the pivot point. */
+    float mPivotY; /**<  The Y coordinate of the pivot point. */
 
   public:
     /**
@@ -88,15 +88,15 @@ class SOUI_EXP SScaleAnimation : public SAnimation {
     SOUI_ATTRS_BEGIN()
         ATTR_FLOAT(L"fromScale", mFromX = mFromY, FALSE)
         ATTR_FLOAT(L"toScale", mToX = mToY, FALSE)
-        ATTR_FLOAT(L"fromXScale", mFromX, FALSE) ///< Horizontal scaling factor to apply at the start of the animation.
-        ATTR_FLOAT(L"toXScale", mToX, FALSE)     ///< Horizontal scaling factor to apply at the end of the animation.
-        ATTR_FLOAT(L"fromYScale", mFromY, FALSE) ///< Vertical scaling factor to apply at the start of the animation.
-        ATTR_FLOAT(L"toYScale", mToY, FALSE)     ///< Vertical scaling factor to apply at the end of the animation.
-        ATTR_VALUE_DESC(L"pivotX", mPivotXDesc)  ///< Description of the pivot X value.
-        ATTR_VALUE_DESC(L"pivotY", mPivotYDesc)  ///< Description of the pivot Y value.
+        ATTR_FLOAT(L"fromXScale", mFromX, FALSE) /**<  Horizontal scaling factor to apply at the start of the animation. */
+        ATTR_FLOAT(L"toXScale", mToX, FALSE)     /**<  Horizontal scaling factor to apply at the end of the animation. */
+        ATTR_FLOAT(L"fromYScale", mFromY, FALSE) /**<  Vertical scaling factor to apply at the start of the animation. */
+        ATTR_FLOAT(L"toYScale", mToY, FALSE)     /**<  Vertical scaling factor to apply at the end of the animation. */
+        ATTR_VALUE_DESC(L"pivotX", mPivotXDesc)  /**<  Description of the pivot X value. */
+        ATTR_VALUE_DESC(L"pivotY", mPivotYDesc)  /**<  Description of the pivot Y value. */
     SOUI_ATTRS_END()
 };
 
 SNSEND
 
-#endif // __SCALEANIMATION__H__
+#endif /**< __SCALEANIMATION__H__ */

@@ -9,13 +9,13 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for IAccHelper Interface
  * These macros provide C-style function call syntax for C++ interface methods
  * IAccHelper inherits from IUnknown.
  */
 
-/* IUnknown base interface macros */
+/** IUnknown base interface macros */
 #define IAccHelper_QueryInterface(This, riid, ppvObject) \
     ((This)->lpVtbl->QueryInterface(This, riid, ppvObject))
 
@@ -25,7 +25,7 @@ extern "C" {
 #define IAccHelper_Release(This) \
     ((This)->lpVtbl->Release(This))
 
-/* IAccHelper specific interface macros */
+/** IAccHelper specific interface macros */
 #define IAccHelper_SetOwner(This, pOwner) \
     ((This)->lpVtbl->SetOwner(This, pOwner))
 
@@ -36,6 +36,6 @@ extern "C" {
 }
 #endif
 
-#endif //_WIN32
+#endif /**< _WIN32 */
 
-#endif /* __SACCHELPER_CAPI_H__ */
+#endif /**< __SACCHELPER_CAPI_H__ */

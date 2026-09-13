@@ -14,30 +14,30 @@ typedef struct IAnimation IAnimation;
 DECLARE_INTERFACE(IAnimationListener)
 {
     /**
-     * @brief 通知动画开始
-     * @param animation IAnimation* -- 开始的动画
+     * @brief Notify animation start
+     * @param animation IAnimation* -- the started animation
      * @return void
      */
     STDMETHOD_(void, OnAnimationStart)(THIS_ IAnimation * animation) PURE;
 
     /**
-     * @brief 通知动画结束。对于重复次数设置为INFINITE的动画，不会调用此回调。
-     * @param animation IAnimation* -- 结束的动画
+     * @brief Notify animation end. This callback is not called for animations with repeat count set to INFINITE.
+     * @param animation IAnimation* -- the finished animation
      * @return void
      */
     STDMETHOD_(void, OnAnimationStop)(THIS_ IAnimation * animation) PURE;
 
     /**
-     * @brief 通知动画重复
-     * @param animation IAnimation* -- 重复的动画
+     * @brief Notify animation repeat
+     * @param animation IAnimation* -- the repeated animation
      * @return void
      */
     STDMETHOD_(void, OnAnimationRepeat)(THIS_ IAnimation * animation) PURE;
 
     /**
-     * @brief 通知动画暂停状态变化
-     * @param animation IAnimation* -- 状态变化的动画
-     * @param bPaused BOOL -- TRUE: 暂停，FALSE: 继续
+     * @brief Notify animation pause state change
+     * @param animation IAnimation* -- the animation whose state changed
+     * @param bPaused BOOL -- TRUE: paused, FALSE: resumed
      * @return void
      */
     STDMETHOD_(void, OnAnimationPauseChange)(THIS_ IAnimation * animation, BOOL bPaused) PURE;
@@ -66,9 +66,7 @@ enum
 
 typedef enum AniValueType
 {
-    /**
-     * The specified dimension is an ABSOLUTE_VALUE number of pixels.
-     */
+    /** The specified dimension is an ABSOLUTE_VALUE number of pixels. */
     ABSOLUTE_VALUE = 0,
     /**
      * The specified dimension holds a float and should be multiplied by the
@@ -109,274 +107,274 @@ DECLARE_INTERFACE_(IAnimation, IObject)
 #include <interface/SobjectApi.h>
 
     /**
-     * @brief 克隆动画对象
-     * @return IAnimation* -- 克隆的动画对象
+     * @brief Clone the animation object
+     * @return IAnimation* -- the cloned animation object
      */
     STDMETHOD_(IAnimation *, clone)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 复制动画对象
-     * @param src const IAnimation* -- 源动画对象
+     * @brief Copy the animation object
+     * @param src const IAnimation* -- source animation object
      * @return void
      */
     STDMETHOD_(void, copy)(THIS_ const IAnimation *src) PURE;
 
     /**
-     * @brief 重置动画的初始化状态
+     * @brief Reset the animation's initialization state
      * @return void
      */
     STDMETHOD_(void, reset)(THIS) PURE;
 
     /**
-     * @brief 取消动画。取消动画会调用动画监听器（如果设置了）来通知动画结束。
+     * @brief Cancel the animation. Canceling the animation calls the animation listener (if set) to notify animation end.
      * @return void
      */
     STDMETHOD_(void, cancel)(THIS) PURE;
 
     /**
-     * @brief 设置动画的加速曲线。默认为线性插值。
-     * @param i IInterpolator* -- 定义加速曲线的插值器
+     * @brief Set the animation's acceleration curve. Linear interpolation by default.
+     * @param i IInterpolator* -- interpolator defining the acceleration curve
      * @return void
      */
     STDMETHOD_(void, setInterpolator)(THIS_ IInterpolator * i) PURE;
 
     /**
-     * @brief 设置动画持续时间。持续时间不能为负数。
-     * @param durationMillis long -- 持续时间（毫秒）
+     * @brief Set the animation duration. Duration cannot be negative.
+     * @param durationMillis long -- duration (milliseconds)
      * @return void
      */
     STDMETHOD_(void, setDuration)(THIS_ long durationMillis) PURE;
 
     /**
-     * @brief 缩放当前持续时间
-     * @param scale float -- 缩放比例
+     * @brief Scale the current duration
+     * @param scale float -- scale ratio
      * @return void
      */
     STDMETHOD_(void, scaleCurrentDuration)(THIS_ float scale) PURE;
 
     /**
-     * @brief 设置动画开始前是否应用动画效果
-     * @param bFill BOOL -- TRUE: 应用，FALSE: 不应用
+     * @brief Set whether to apply the animation effect before the animation starts
+     * @param bFill BOOL -- TRUE: apply, FALSE: do not apply
      * @return void
      */
     STDMETHOD_(void, setFillBefore)(THIS_ BOOL bFill) PURE;
 
     /**
-     * @brief 设置动画结束后是否应用动画效果
-     * @param bFill BOOL -- TRUE: 应用，FALSE: 不应用
+     * @brief Set whether to apply the animation effect after the animation ends
+     * @param bFill BOOL -- TRUE: apply, FALSE: do not apply
      * @return void
      */
     STDMETHOD_(void, setFillAfter)(THIS_ BOOL bFill) PURE;
 
     /**
-     * @brief 获取动画开始前是否应用动画效果
-     * @return BOOL -- TRUE: 应用，FALSE: 不应用
+     * @brief Get whether to apply the animation effect before the animation starts
+     * @return BOOL -- TRUE: apply, FALSE: do not apply
      */
     STDMETHOD_(BOOL, getFillBefore)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 获取动画结束后是否应用动画效果
-     * @return BOOL -- TRUE: 应用，FALSE: 不应用
+     * @brief Get whether to apply the animation effect after the animation ends
+     * @return BOOL -- TRUE: apply, FALSE: do not apply
      */
     STDMETHOD_(BOOL, getFillAfter)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 设置动画开始偏移时间
-     * @param offset long -- 偏移时间（毫秒）
+     * @brief Set the animation start offset time
+     * @param offset long -- offset time (milliseconds)
      * @return void
      */
     STDMETHOD_(void, setStartOffset)(THIS_ long offset) PURE;
 
     /**
-     * @brief 获取动画是否启用填充效果
-     * @return BOOL -- TRUE: 启用，FALSE: 不启用
+     * @brief Get whether the animation has fill enabled
+     * @return BOOL -- TRUE: enabled, FALSE: not enabled
      */
     STDMETHOD_(BOOL, isFillEnabled)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 设置动画是否启用填充效果
-     * @param fillEnabled BOOL -- TRUE: 启用，FALSE: 不启用
+     * @brief Set whether the animation enables the fill effect
+     * @param fillEnabled BOOL -- TRUE: enabled, FALSE: disabled
      * @return void
      */
     STDMETHOD_(void, setFillEnabled)(THIS_ BOOL fillEnabled) PURE;
 
     /**
-     * @brief 设置动画开始时间
-     * @param startTimeMillis int64_t -- 开始时间（毫秒）
+     * @brief Set the animation start time
+     * @param startTimeMillis int64_t -- start time (in milliseconds)
      * @return void
      */
     STDMETHOD_(void, setStartTime)(THIS_ int64_t startTimeMillis) PURE;
 
     /**
-     * @brief 方便方法，设置动画在第一次调用getTransformation时开始
+     * @brief Convenience method; start the animation on the first call to getTransformation
      * @return void
      */
     STDMETHOD_(void, start)(THIS) PURE;
 
     /**
-     * @brief 方便方法，设置动画在当前时间开始
+     * @brief Convenience method; start the animation at the current time
      * @return void
      */
     STDMETHOD_(void, startNow)(THIS) PURE;
 
     /**
-     * @brief 设置动画结束时的行为
-     * @param repeatMode RepeatMode -- RESTART或REVERSE
+     * @brief Set the behavior when the animation ends
+     * @param repeatMode RepeatMode -- RESTART or REVERSE
      * @return void
      */
     STDMETHOD_(void, setRepeatMode)(THIS_ RepeatMode repeatMode) PURE;
 
     /**
-     * @brief 设置动画重复次数
-     * @param repeatCount int -- 重复次数
+     * @brief Set the animation repeat count
+     * @param repeatCount int -- repeat count
      * @return void
      */
     STDMETHOD_(void, setRepeatCount)(THIS_ int repeatCount) PURE;
 
     /**
-     * @brief 设置动画运行时的Z顺序模式
-     * @param zAdjustment ZAdjustment -- ZORDER_NORMAL, ZORDER_TOP, 或 ZORDER_BOTTOM
+     * @brief Set the Z-order mode while the animation is running
+     * @param zAdjustment ZAdjustment -- ZORDER_NORMAL, ZORDER_TOP, or ZORDER_BOTTOM
      * @return void
      */
     STDMETHOD_(void, setZAdjustment)(THIS_ ZAdjustment zAdjustment) PURE;
 
     /**
-     * @brief 获取动画的加速曲线类型
-     * @return IInterpolator* -- 插值器
+     * @brief Get the animation's acceleration curve type
+     * @return IInterpolator* -- the interpolator
      */
     STDMETHOD_(IInterpolator *, getInterpolator)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 获取动画开始时间
-     * @return int64_t -- 开始时间（毫秒）
+     * @brief Get the animation start time
+     * @return int64_t -- start time (in milliseconds)
      */
     STDMETHOD_(int64_t, getStartTime)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 获取动画持续时间
-     * @return long -- 持续时间（毫秒）
+     * @brief Get the animation duration
+     * @return long -- duration (in milliseconds)
      */
     STDMETHOD_(long, getDuration)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 获取动画开始偏移时间
-     * @return long -- 偏移时间（毫秒）
+     * @brief Get the animation start offset time
+     * @return long -- offset time (in milliseconds)
      */
     STDMETHOD_(long, getStartOffset)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 获取动画结束时的行为
-     * @return RepeatMode -- RESTART或REVERSE
+     * @brief Get the behavior when the animation ends
+     * @return RepeatMode -- RESTART or REVERSE
      */
     STDMETHOD_(RepeatMode, getRepeatMode)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 获取动画重复次数
-     * @return int -- 重复次数
+     * @brief Get the animation repeat count
+     * @return int -- repeat count
      */
     STDMETHOD_(int, getRepeatCount)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 获取动画运行时的Z顺序模式
-     * @return ZAdjustment -- ZORDER_NORMAL, ZORDER_TOP, 或 ZORDER_BOTTOM
+     * @brief Get the Z-order mode while the animation is running
+     * @return ZAdjustment -- ZORDER_NORMAL, ZORDER_TOP, or ZORDER_BOTTOM
      */
     STDMETHOD_(ZAdjustment, getZAdjustment)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 绑定动画监听器
-     * @param listener IAnimationListener* -- 动画监听器
+     * @brief Bind the animation listener
+     * @param listener IAnimationListener* -- the animation listener
      * @return void
      */
     STDMETHOD_(void, setAnimationListener)(THIS_ IAnimationListener * listener) PURE;
 
     /**
-     * @brief 计算整个动画可能持续的时间（毫秒）
-     * @return long -- 持续时间（毫秒）
+     * @brief Compute the possible total duration of the animation (in milliseconds)
+     * @return long -- duration (in milliseconds)
      */
     STDMETHOD_(long, computeDurationHint)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 获取指定时间点的变换
-     * @param currentTime uint64_t -- 当前时间（毫秒）
-     * @param outTransformation ITransformation* -- 输出变换对象
-     * @param scale float -- 缩放比例
-     * @return BOOL -- TRUE: 动画仍在运行，FALSE: 动画已结束
+     * @brief Get the transformation at the specified time point
+     * @param currentTime uint64_t -- current time (in milliseconds)
+     * @param outTransformation ITransformation* -- output transformation object
+     * @param scale float -- scale factor
+     * @return BOOL -- TRUE: animation still running, FALSE: animation ended
      */
     STDMETHOD_(BOOL, getTransformation2)
     (THIS_ uint64_t currentTime, ITransformation * outTransformation, float scale) PURE;
 
     /**
-     * @brief 获取指定时间点的变换
-     * @param currentTime uint64_t -- 当前时间（毫秒）
-     * @param outTransformation ITransformation* -- 输出变换对象
-     * @return BOOL -- TRUE: 动画仍在运行，FALSE: 动画已结束
+     * @brief Get the transformation at the specified time point
+     * @param currentTime uint64_t -- current time (in milliseconds)
+     * @param outTransformation ITransformation* -- output transformation object
+     * @return BOOL -- TRUE: animation still running, FALSE: animation ended
      */
     STDMETHOD_(BOOL, getTransformation)
     (THIS_ uint64_t currentTime, ITransformation * outTransformation) PURE;
 
     /**
-     * @brief 判断动画是否已开始
-     * @return BOOL -- TRUE: 已开始，FALSE: 未开始
+     * @brief Check whether the animation has started
+     * @return BOOL -- TRUE: started, FALSE: not started
      */
     STDMETHOD_(BOOL, hasStarted)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 判断动画是否已结束
-     * @return BOOL -- TRUE: 已结束，FALSE: 未结束
+     * @brief Check whether the animation has ended
+     * @return BOOL -- TRUE: ended, FALSE: not ended
      */
     STDMETHOD_(BOOL, hasEnded)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 应用变换
-     * @param interpolatedTime float -- 插值时间
-     * @param t ITransformation* -- 变换对象
+     * @brief Apply the transformation
+     * @param interpolatedTime float -- interpolated time
+     * @param t ITransformation* -- transformation object
      * @return void
      */
     STDMETHOD_(void, applyTransformation)(THIS_ float interpolatedTime, ITransformation *t) PURE;
 
     /**
-     * @brief 判断动画是否改变视图的alpha属性
-     * @return BOOL -- TRUE: 改变，FALSE: 不改变
+     * @brief Check whether the animation changes the view's alpha property
+     * @return BOOL -- TRUE: changes, FALSE: does not change
      */
     STDMETHOD_(BOOL, hasAlpha)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 初始化动画
-     * @param width int -- 宽度
-     * @param height int -- 高度
-     * @param parentWidth int -- 父级宽度
-     * @param parentHeight int -- 父级高度
-     * @param nScale int -- 缩放比例
+     * @brief Initialize the animation
+     * @param width int -- width
+     * @param height int -- height
+     * @param parentWidth int -- parent width
+     * @param parentHeight int -- parent height
+     * @param nScale int -- scale factor
      * @return void
      */
     STDMETHOD_(void, initialize)
     (THIS_ int width, int height, int parentWidth, int parentHeight, int nScale) PURE;
 
     /**
-     * @brief 设置用户数据
-     * @param data ULONG_PTR -- 用户数据
+     * @brief Set user data
+     * @param data ULONG_PTR -- user data
      * @return void
      */
     STDMETHOD_(void, setUserData)(THIS_ ULONG_PTR data) PURE;
 
     /**
-     * @brief 获取用户数据
-     * @return ULONG_PTR -- 用户数据
+     * @brief Get user data
+     * @return ULONG_PTR -- user data
      */
     STDMETHOD_(ULONG_PTR, getUserData)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 暂停动画
+     * @brief Pause the animation
      * @return void
      */
     STDMETHOD_(void, pause)(THIS) PURE;
 
     /**
-     * @brief 恢复动画
+     * @brief Resume the animation
      * @return void
      */
     STDMETHOD_(void, resume)(THIS) PURE;
 };
 
 SNSEND
-#endif // __SANIMATION_I__H__
+#endif /**< __SANIMATION_I__H__ */

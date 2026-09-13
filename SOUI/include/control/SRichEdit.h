@@ -56,7 +56,7 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
      */
     static void UninitTextService();
 
-  public: // RichEdit Interface
+  public: /**< RichEdit Interface */
     /**
      * @brief Save content to an RTF file
      * @param pszFileName File name to save the RTF content
@@ -686,16 +686,16 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
     UINT m_fSingleLineVCenter : 1;              /**< Whether control that is single line will be vertical
                                                    centered */
     UINT m_fScrollPending : 1;                  /**< Whether scroll is activated by richedit or by panelex */
-    UINT m_fEnableDragDrop : 1;                 /**< 允许在该控件中使用拖放 */
-    UINT m_fAutoSel : 1;                        /**< 有焦点时自动全选 */
+    UINT m_fEnableDragDrop : 1;                 /**< Allow drag and drop in this control */
+    UINT m_fAutoSel : 1;                        /**< Auto-select all when focused */
     UINT m_fNotifyChange : 1;                   /**< receive re_notify when data changed */
     UINT m_fDisableCaret : 1;                   /**< disable caret flag */
-    BYTE m_byDbcsLeadByte;                      /**< DBCS输入时的中文头字节*/
-    SStringW m_strRtfSrc;                       /**< 在XML中指定的RTF数据源*/
+    BYTE m_byDbcsLeadByte;                      /**< Leading byte of Chinese character under DBCS input*/
+    SStringW m_strRtfSrc;                       /**< RTF data source specified in XML*/
     STextHost *m_pTxtHost;                      /**< Host of Richedit*/
-    SMap<UINT, SAutoRefPtr<ITimer> > m_mapTimer; /**< map of timer to id*/
+    SMap<UINT, SAutoRefPtr<ITimer>> m_mapTimer; /**< map of timer to id*/
 };
 
 SNSEND
 
-#endif // __SRICHEDIT__H__
+#endif /**< __SRICHEDIT__H__ */

@@ -95,4 +95,4 @@ class SOUI_EXP SEdit : public TCtrlProxy<IEdit, SRichEdit> {
 
 SNSEND
 
-#endif // _SEDIT_H_
+#endif /**< _SEDIT_H_ */

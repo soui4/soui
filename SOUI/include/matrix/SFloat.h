@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2006 The Android Open Source Project
  *
  * Use of this source code is governed by a BSD-style license that can be
@@ -23,39 +23,29 @@
 #define sk_float_round2int(x) (int)sk_float_floor((x) + 0.5f)
 #define sk_float_ceil2int(x)  (int)sk_float_ceil(x)
 
-//#define sk_float_rsqrt(x)		sqrt(x)
-//#define SK_SUPPORT_DEPRECATED_SCALARROUND
+/** #define sk_float_rsqrt(x)		sqrt(x) */
+/** #define SK_SUPPORT_DEPRECATED_SCALARROUND */
 
-/** SK_Scalar1 is defined to be 1.0 represented as an float
- */
+/** SK_Scalar1 is defined to be 1.0 represented as an float */
 #define SK_Scalar1 (1.0f)
-/** SK_Scalar1 is defined to be 1/2 represented as an float
- */
+/** SK_Scalar1 is defined to be 1/2 represented as an float */
 #define SK_ScalarHalf (0.5f)
-/** SK_ScalarInfinity is defined to be infinity as an float
- */
+/** SK_ScalarInfinity is defined to be infinity as an float */
 #define SK_ScalarInfinity SK_FloatInfinity
-/** SK_ScalarNegativeInfinity is defined to be negative infinity as an float
- */
+/** SK_ScalarNegativeInfinity is defined to be negative infinity as an float */
 #define SK_ScalarNegativeInfinity SK_FloatNegativeInfinity
-/** SK_ScalarMax is defined to be the largest value representable as an float
- */
+/** SK_ScalarMax is defined to be the largest value representable as an float */
 #define SK_ScalarMax (3.402823466e+38f)
-/** SK_ScalarMin is defined to be the smallest value representable as an float
- */
+/** SK_ScalarMin is defined to be the smallest value representable as an float */
 #define SK_ScalarMin (-SK_ScalarMax)
-/** SK_ScalarNaN is defined to be 'Not a Number' as an float
- */
+/** SK_ScalarNaN is defined to be 'Not a Number' as an float */
 #define SK_ScalarNaN SK_FloatNaN
 
-/** SkIntToScalar(n) returns its integer argument as an float
- */
+/** SkIntToScalar(n) returns its integer argument as an float */
 #define SkIntToScalar(n) ((float)(n))
-/** SkFixedToScalar(n) returns its SkFixed argument as an float
- */
+/** SkFixedToScalar(n) returns its SkFixed argument as an float */
 #define SkFixedToScalar(x) SkFixedToFloat(x)
-/** SFloatToFixed(n) returns its float argument as an SkFixed
- */
+/** SFloatToFixed(n) returns its float argument as an SkFixed */
 #define SFloatToFixed(x) SkFloatToFixed(x)
 
 #define SFloatToFloat(n) (n)
@@ -66,8 +56,7 @@
 #define SFloatToDouble(n)   (double)(n)
 #define SkDoubleToScalar(n) (float)(n)
 
-/** SFloatFraction(x) returns the signed fractional part of the argument
- */
+/** SFloatFraction(x) returns the signed fractional part of the argument */
 #define SFloatFraction(x) sk_float_mod(x, 1.0f)
 
 #define SFloatFloorToScalar(x) sk_float_floor(x)
@@ -82,42 +71,30 @@
 #define SK_ANNOTATE_UNPROTECTED_READ(x)         (x)
 #define SK_ANNOTATE_UNPROTECTED_WRITE(ptr, val) *(ptr) = (val)
 
-/** Returns the absolute value of the specified float
- */
+/** Returns the absolute value of the specified float */
 #define SFloatAbs(x) sk_float_abs(x)
-/** Return x with the sign of y
- */
+/** Return x with the sign of y */
 #define SFloatCopySign(x, y) sk_float_copysign(x, y)
-/** Returns the product of two SFloats
- */
+/** Returns the product of two SFloats */
 #define SFloatMul(a, b) ((float)(a) * (b))
-/** Returns the product of two SFloats plus a third float
- */
+/** Returns the product of two SFloats plus a third float */
 #define SFloatMulAdd(a, b, c) ((float)(a) * (b) + (c))
-/** Returns the quotient of two SFloats (a/b)
- */
+/** Returns the quotient of two SFloats (a/b) */
 #define SFloatDiv(a, b) ((float)(a) / (b))
-/** Returns the mod of two SFloats (a mod b)
- */
+/** Returns the mod of two SFloats (a mod b) */
 #define SFloatMod(x, y) sk_float_mod(x, y)
-/** Returns the product of the first two arguments, divided by the third argument
- */
+/** Returns the product of the first two arguments, divided by the third argument */
 #define SFloatMulDiv(a, b, c) ((float)(a) * (b) / (c))
-/** Returns the multiplicative inverse of the float (1/x)
- */
+/** Returns the multiplicative inverse of the float (1/x) */
 #define SFloatInvert(x)     (SK_Scalar1 / (x))
 #define SFloatFastInvert(x) (SK_Scalar1 / (x))
-/** Returns the square root of the float
- */
+/** Returns the square root of the float */
 #define SFloatSqrt(x) sk_float_sqrt(x)
-/** Returns b to the e
- */
+/** Returns b to the e */
 #define SFloatPow(b, e) sk_float_pow(b, e)
-/** Returns the average of two SFloats (a+b)/2
- */
+/** Returns the average of two SFloats (a+b)/2 */
 #define SFloatAve(a, b) (((a) + (b)) * 0.5f)
-/** Returns one half of the specified float
- */
+/** Returns one half of the specified float */
 #define SFloatHalf(a) ((a)*0.5f)
 
 #define SK_ScalarSqrt2      1.41421356f
@@ -166,8 +143,7 @@ inline float SkMinScalar(float a, float b)
     return a < b ? a : b;
 }
 
-/** SFloatIsNaN(n) returns true if argument is not a number
- */
+/** SFloatIsNaN(n) returns true if argument is not a number */
 inline bool SFloatIsNaN(float x)
 {
     return x != x;
@@ -186,20 +162,17 @@ inline bool SFloatIsFinite(float x)
     return prod == prod;
 }
 
-/** Returns the value pinned between 0 and max inclusive
- */
+/** Returns the value pinned between 0 and max inclusive */
 inline float SFloatClampMax(float x, float max)
 {
     return x < 0 ? 0 : x > max ? max : x;
 }
-/** Returns the value pinned between min and max inclusive
- */
+/** Returns the value pinned between min and max inclusive */
 inline float SFloatPin(float x, float min, float max)
 {
     return x < min ? min : x > max ? max : x;
 }
-/** Returns the specified float squared (x*x)
- */
+/** Returns the specified float squared (x*x) */
 inline float SFloatSquare(float x)
 {
     return x * x;
@@ -221,7 +194,7 @@ inline int SFloatSignAsInt(float x)
     return x < 0 ? -1 : (x > 0);
 }
 
-// Scalar result version of above
+/** Scalar result version of above */
 inline float SFloatSignAsScalar(float x)
 {
     return x < 0 ? -SK_Scalar1 : ((x > 0) ? SK_Scalar1 : 0);
@@ -253,9 +226,7 @@ inline float SFloatInterp(float A, float B, float t)
     return A + (B - A) * t;
 }
 
-/*
- *  Helper to compare an array of scalars.
- */
+/** Helper to compare an array of scalars. */
 inline bool SFloatsEqual(const float a[], const float b[], int n)
 {
     SASSERT(n >= 0);

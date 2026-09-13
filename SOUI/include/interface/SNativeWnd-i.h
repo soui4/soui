@@ -37,8 +37,8 @@ typedef BOOL (*FunMsgHandler)(const LPMSG pMsg, LRESULT *pRes, void *ctx);
  */
 typedef struct _MsgHandlerInfo
 {
-    FunMsgHandler fun; //!< Function pointer to the message handler.
-    void *ctx;         //!< Context pointer for the message handler.
+    FunMsgHandler fun; /**<  Function pointer to the message handler. */
+    void *ctx;         /**<  Context pointer for the message handler. */
 } MsgHandlerInfo;
 
 /**
@@ -54,4 +54,4 @@ DECLARE_INTERFACE_(INativeWnd, IObjRef){
 };
 
 SNSEND
-#endif // __SNATIVEWND_I__H__
+#endif /**< __SNATIVEWND_I__H__ */

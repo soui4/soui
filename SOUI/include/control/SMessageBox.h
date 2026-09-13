@@ -7,14 +7,14 @@
 
 SNSBEGIN
 
-// IDs that must be specified in the message box template.
-#define NAME_MSGBOX_BTNSWITCH L"btnSwitch" // Tab control containing 3 pages
-#define NAME_MSGBOX_TEXT      L"msgtext"   // Text control, only coordinates need to be specified
-#define NAME_MSGBOX_TITLE     L"msgtitle"  // Title control ID
-#define NAME_MSGBOX_ICON      L"msgicon"   // Icon display control ID
-#define NAME_MSGBOX_BTN1      L"button1st" // First button ID, will be automatically modified to IDs like IDOK, IDCANCEL, etc.
-#define NAME_MSGBOX_BTN2      L"button2nd" // Second button ID
-#define NAME_MSGBOX_BTN3      L"button3rd" // Third button ID
+/** IDs that must be specified in the message box template. */
+#define NAME_MSGBOX_BTNSWITCH L"btnSwitch" /**< Tab control containing 3 pages */
+#define NAME_MSGBOX_TEXT      L"msgtext"   /**< Text control, only coordinates need to be specified */
+#define NAME_MSGBOX_TITLE     L"msgtitle"  /**< Title control ID */
+#define NAME_MSGBOX_ICON      L"msgicon"   /**< Icon display control ID */
+#define NAME_MSGBOX_BTN1      L"button1st" /**< First button ID, will be automatically modified to IDs like IDOK, IDCANCEL, etc. */
+#define NAME_MSGBOX_BTN2      L"button2nd" /**< Second button ID */
+#define NAME_MSGBOX_BTN3      L"button3rd" /**< Third button ID */
 
 /**
  * @class SMessageBoxImpl
@@ -95,4 +95,4 @@ class SOUI_EXP SMessageBoxImpl
 
 SNSEND
 
-#endif // __SMESSAGEBOX__H__
+#endif /**< __SMESSAGEBOX__H__ */

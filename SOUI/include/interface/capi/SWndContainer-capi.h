@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for SWndContainer Interface
  * These macros provide C-style function call syntax for C++ interface methods
  *
@@ -15,7 +15,7 @@ extern "C" {
  *   ISwndContainer (inherits ITimelineHandlersMgr)
  */
 
-/* ISwndContainer C API Macros (ITimelineHandlersMgr base interface) */
+/** ISwndContainer C API Macros (ITimelineHandlersMgr base interface) */
 #define ISwndContainer_RegisterTimelineHandler(This, pHandler) \
     ((This)->lpVtbl->RegisterTimelineHandler(This, pHandler))
 
@@ -28,7 +28,7 @@ extern "C" {
 #define ISwndContainer_UnregisterValueAnimator(This, pAnimator) \
     ((This)->lpVtbl->UnregisterValueAnimator(This, pAnimator))
 
-/* ISwndContainer specific interface macros */
+/** ISwndContainer specific interface macros */
 #define ISwndContainer_RegisterDragDrop(This, swnd, pDropTarget) \
     ((This)->lpVtbl->RegisterDragDrop(This, swnd, pDropTarget))
 
@@ -150,4 +150,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SWNDCONTAINER_CAPI_H__ */
+#endif /**< __SWNDCONTAINER_CAPI_H__ */

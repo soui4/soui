@@ -7,11 +7,9 @@
 extern "C" {
 #endif
 
-/*
- * C API Helper Macros for IListViewItemLocator Interface
- */
+/** C API Helper Macros for IListViewItemLocator Interface */
 
-/* IObjRef base interface macros */
+/** IObjRef base interface macros */
 #define IListViewItemLocator_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -21,7 +19,7 @@ extern "C" {
 #define IListViewItemLocator_OnFinalRelease(This) \
     ((This)->lpVtbl->OnFinalRelease(This))
 
-/* IListViewItemLocator specific interface macros */
+/** IListViewItemLocator specific interface macros */
 #define IListViewItemLocator_SetAdapter(This, pAdapter) \
     ((This)->lpVtbl->SetAdapter(This, pAdapter))
 
@@ -59,4 +57,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SLISTVIEWITEMLOCATOR_CAPI_H__ */
+#endif /**< __SLISTVIEWITEMLOCATOR_CAPI_H__ */

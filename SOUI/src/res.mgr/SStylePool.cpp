@@ -3,10 +3,10 @@
 
 SNSBEGIN
 
-//////////////////////////////////////////////////////////////////////////
-// SStylePool
+///////////////////////////////////////////////////////////////////////
+/** SStylePool */
 
-// Get style object from pool by class name
+/** Get style object from pool by class name */
 SXmlNode SStylePool::GetStyle(const SStringW &strName)
 {
     if (!HasKey(strName))
@@ -14,7 +14,7 @@ SXmlNode SStylePool::GetStyle(const SStringW &strName)
     return GetKeyObject(strName);
 }
 
-// Load style-pool from xml tree
+/** Load style-pool from xml tree */
 BOOL SStylePool::Init(SXmlNode xmlStyleRoot)
 {
     if (!xmlStyleRoot)
@@ -30,7 +30,7 @@ BOOL SStylePool::Init(SXmlNode xmlStyleRoot)
             strClsName = xmlChild.attribute(L"name").value();
             if (strClsName.IsEmpty())
                 continue;
-            xmlChild.remove_attribute(L"name"); //删除name属性，防止该属性被处理
+            xmlChild.remove_attribute(L"name"); // Remove the name attribute to prevent it from being processed
         }
         SASSERT(!xmlChild.attribute(L"name"));
         AddKeyObject(strClsName, xmlChild);
@@ -39,7 +39,7 @@ BOOL SStylePool::Init(SXmlNode xmlStyleRoot)
     return TRUE;
 }
 
-/////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
 BOOL STemplatePool::Init(SXmlNode xmlNode)
 {
     if (!xmlNode)

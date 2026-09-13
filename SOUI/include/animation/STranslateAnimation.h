@@ -15,15 +15,15 @@ class SOUI_EXP STranslateAnimation : public SAnimation {
     DEF_SOBJECT(SAnimation, L"translate")
 
   protected:
-    SValueDescription mFromXValue; ///< Description of the starting X value.
-    SValueDescription mToXValue;   ///< Description of the ending X value.
-    SValueDescription mFromYValue; ///< Description of the starting Y value.
-    SValueDescription mToYValue;   ///< Description of the ending Y value.
+    SValueDescription mFromXValue; /**<  Description of the starting X value. */
+    SValueDescription mToXValue;   /**<  Description of the ending X value. */
+    SValueDescription mFromYValue; /**<  Description of the starting Y value. */
+    SValueDescription mToYValue;   /**<  Description of the ending Y value. */
 
-    float mFromXDelta; ///< The starting X delta value.
-    float mToXDelta;   ///< The ending X delta value.
-    float mFromYDelta; ///< The starting Y delta value.
-    float mToYDelta;   ///< The ending Y delta value.
+    float mFromXDelta; /**<  The starting X delta value. */
+    float mToXDelta;   /**<  The ending X delta value. */
+    float mFromYDelta; /**<  The starting Y delta value. */
+    float mToYDelta;   /**<  The ending Y delta value. */
 
   public:
     /**
@@ -82,13 +82,13 @@ class SOUI_EXP STranslateAnimation : public SAnimation {
      * @brief Attributes for STranslateAnimation
      */
     SOUI_ATTRS_BEGIN()
-        ATTR_VALUE_DESC(L"fromXDelta", mFromXValue) ///< Description of the starting X value.
-        ATTR_VALUE_DESC(L"toXDelta", mToXValue)     ///< Description of the ending X value.
-        ATTR_VALUE_DESC(L"fromYDelta", mFromYValue) ///< Description of the starting Y value.
-        ATTR_VALUE_DESC(L"toYDelta", mToYValue)     ///< Description of the ending Y value.
+        ATTR_VALUE_DESC(L"fromXDelta", mFromXValue) /**<  Description of the starting X value. */
+        ATTR_VALUE_DESC(L"toXDelta", mToXValue)     /**<  Description of the ending X value. */
+        ATTR_VALUE_DESC(L"fromYDelta", mFromYValue) /**<  Description of the starting Y value. */
+        ATTR_VALUE_DESC(L"toYDelta", mToYValue)     /**<  Description of the ending Y value. */
     SOUI_ATTRS_END()
 };
 
 SNSEND
 
-#endif // __STRANSLATEANIMATION__H__
+#endif /**< __STRANSLATEANIMATION__H__ */

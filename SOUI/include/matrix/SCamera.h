@@ -1,11 +1,11 @@
-/*
+/**
  * Copyright 2006 The Android Open Source Project
  *
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
 
-//  Inspired by Rob Johnson's most excellent QuickDraw GX sample code
+/** Inspired by Rob Johnson's most excellent QuickDraw GX sample code */
 
 #ifndef _SCamera_DEFINED_
 #define _SCamera_DEFINED_

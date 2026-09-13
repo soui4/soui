@@ -106,17 +106,17 @@ typedef ISvgObj *ISvgObjPtr;
 
 typedef struct IRenderFactory IRenderFactory;
 
-// Enumerations
+/** Enumerations */
 typedef enum EXPEND_MODE
 {
-    EM_NULL = 0, /*< 不变 */
-    EM_STRETCH,  /*< 拉伸 */
-    EM_TILE,     /*< 平铺 */
+    EM_NULL = 0, /**<  Unchanged */
+    EM_STRETCH,  /**<  Stretch */
+    EM_TILE,     /**<  Tile */
 } EXPEND_MODE;
 
 typedef enum FilterLevel
 {
-    kUndef_FilterLevel = 100, // don't use -1 as filter level will pass to render in word and will get 65535
+    kUndef_FilterLevel = 100, /**< don't use -1 as filter level will pass to render in word and will get 65535 */
     kNone_FilterLevel = 0,
     kLow_FilterLevel,
     kMedium_FilterLevel,
@@ -125,23 +125,23 @@ typedef enum FilterLevel
 
 typedef enum RopMode
 {
-    kClear_Mode,    //!< [0, 0]
-    kSrc_Mode,      //!< [Sa, Sc]
-    kDst_Mode,      //!< [Da, Dc]
-    kSrcOver_Mode,  //!< [Sa + Da - Sa*Da, Rc = Sc + (1 - Sa)*Dc]
-    kDstOver_Mode,  //!< [Sa + Da - Sa*Da, Rc = Dc + (1 - Da)*Sc]
-    kSrcIn_Mode,    //!< [Sa * Da, Sc * Da]
-    kDstIn_Mode,    //!< [Sa * Da, Sa * Dc]
-    kSrcOut_Mode,   //!< [Sa * (1 - Da), Sc * (1 - Da)]
-    kDstOut_Mode,   //!< [Da * (1 - Sa), Dc * (1 - Sa)]
-    kSrcATop_Mode,  //!< [Da, Sc * Da + (1 - Sa) * Dc]
-    kDstATop_Mode,  //!< [Sa, Sa * Dc + Sc * (1 - Da)]
-    kXor_Mode,      //!< [Sa + Da - 2 * Sa * Da, Sc * (1 - Da) + (1 - Sa) * Dc]
-    kPlus_Mode,     //!< [Sa + Da, Sc + Dc]
-    kModulate_Mode, // multiplies all components (= alpha and color)
+    kClear_Mode,    /**<  [0, 0] */
+    kSrc_Mode,      /**<  [Sa, Sc] */
+    kDst_Mode,      /**<  [Da, Dc] */
+    kSrcOver_Mode,  /**<  [Sa + Da - Sa*Da, Rc = Sc + (1 - Sa)*Dc] */
+    kDstOver_Mode,  /**<  [Sa + Da - Sa*Da, Rc = Dc + (1 - Da)*Sc] */
+    kSrcIn_Mode,    /**<  [Sa * Da, Sc * Da] */
+    kDstIn_Mode,    /**<  [Sa * Da, Sa * Dc] */
+    kSrcOut_Mode,   /**<  [Sa * (1 - Da), Sc * (1 - Da)] */
+    kDstOut_Mode,   /**<  [Da * (1 - Sa), Dc * (1 - Sa)] */
+    kSrcATop_Mode,  /**<  [Da, Sc * Da + (1 - Sa) * Dc] */
+    kDstATop_Mode,  /**<  [Sa, Sa * Dc + Sc * (1 - Da)] */
+    kXor_Mode,      /**<  [Sa + Da - 2 * Sa * Da, Sc * (1 - Da) + (1 - Sa) * Dc] */
+    kPlus_Mode,     /**<  [Sa + Da, Sc + Dc] */
+    kModulate_Mode, /**< multiplies all components (= alpha and color) */
 
-    // Following blend modes are defined in the CSS Compositing standard:
-    // https://dvcs.w3.org/hg/FXTF/rawfile/tip/compositing/index.html#blending
+    /** Following blend modes are defined in the CSS Compositing standard: */
+    /** https://dvcs.w3.org/hg/FXTF/rawfile/tip/compositing/index.html#blending */
     kScreen_Mode,
     kLastCoeffMode = kScreen_Mode,
 
@@ -162,7 +162,7 @@ typedef enum RopMode
     kColor_Mode,
     kLuminosity_Mode,
 
-    // extend xfermode
+    /** extend xfermode */
     kSrcCopy = SRCCOPY,
     kDstInvert = DSTINVERT,
     kSrcInvert = SRCINVERT,
@@ -254,9 +254,9 @@ DECLARE_INTERFACE_(IRenderObj, IObjRef)
  */
 typedef enum _BrushType
 {
-    Brush_Color = 0, //!< Color brush.
-    Brush_Bitmap,    //!< Bitmap brush.
-    Brush_Shader     //!< Shader brush.
+    Brush_Color = 0, /**<  Color brush. */
+    Brush_Bitmap,    /**<  Bitmap brush. */
+    Brush_Shader     /**<  Shader brush. */
 } BrushType;
 
 typedef enum _TileMode
@@ -697,9 +697,9 @@ typedef IBitmapS *IBitmapPtr;
  */
 typedef enum _FillStyle
 {
-    kFill_Style = 0,          //!< Fill only.
-    kStroke_Style = 1,        //!< Stroke only.
-    kStrokeAndFill_Style = 2, //!< Stroke and fill.
+    kFill_Style = 0,          /**<  Fill only. */
+    kStroke_Style = 1,        /**<  Stroke only. */
+    kStrokeAndFill_Style = 2, /**<  Stroke and fill. */
 } FillStyle;
 
 /**
@@ -1018,16 +1018,16 @@ DECLARE_INTERFACE_(IRegionS, IRenderObj)
  */
 typedef enum _xFormIndex
 {
-    kMScaleX = 0, //!< Index for the X-axis scaling factor.
-    kMSkewX,      //!< Index for the X-axis skew factor.
-    kMTransX,     //!< Index for the X-axis translation factor.
-    kMSkewY,      //!< Index for the Y-axis skew factor.
-    kMScaleY,     //!< Index for the Y-axis scaling factor.
-    kMTransY,     //!< Index for the Y-axis translation factor.
-    kMPersp0,     //!< Index for the first perspective factor.
-    kMPersp1,     //!< Index for the second perspective factor.
-    kMPersp2,     //!< Index for the third perspective factor.
-    kMCount,      //!< Total number of elements in the transformation matrix.
+    kMScaleX = 0, /**<  Index for the X-axis scaling factor. */
+    kMSkewX,      /**<  Index for the X-axis skew factor. */
+    kMTransX,     /**<  Index for the X-axis translation factor. */
+    kMSkewY,      /**<  Index for the Y-axis skew factor. */
+    kMScaleY,     /**<  Index for the Y-axis scaling factor. */
+    kMTransY,     /**<  Index for the Y-axis translation factor. */
+    kMPersp0,     /**<  Index for the first perspective factor. */
+    kMPersp1,     /**<  Index for the second perspective factor. */
+    kMPersp2,     /**<  Index for the third perspective factor. */
+    kMCount,      /**<  Total number of elements in the transformation matrix. */
 } xFormIndex;
 
 /**
@@ -1038,7 +1038,7 @@ typedef enum _xFormIndex
  */
 typedef struct _IxForm
 {
-    float fMat[kMCount]; //!< Array of floats representing the matrix elements.
+    float fMat[kMCount]; /**<  Array of floats representing the matrix elements. */
 } IxForm;
 
 /**
@@ -1082,11 +1082,11 @@ typedef enum _Direction
 
 typedef enum _PathOP
 {
-    kDifference_PathOp,        //!< subtract the op path from the first path
-    kIntersect_PathOp,         //!< intersect the two paths
-    kUnion_PathOp,             //!< union (inclusive-or) the two paths
-    kXOR_PathOp,               //!< exclusive-or the two paths
-    kReverseDifference_PathOp, //!< subtract the first path from the op path
+    kDifference_PathOp,        /**<  subtract the op path from the first path */
+    kIntersect_PathOp,         /**<  intersect the two paths */
+    kUnion_PathOp,             /**<  union (inclusive-or) the two paths */
+    kXOR_PathOp,               /**<  exclusive-or the two paths */
+    kReverseDifference_PathOp, /**<  subtract the first path from the op path */
 } PathOP;
 
 /**
@@ -1175,7 +1175,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      */
     STDMETHOD_(void, getBounds)(CTHIS_ LPRECT prc) SCONST PURE;
 
-    //  Construction methods
+    /** Construction methods */
 
     /**
      * moveTo
@@ -1490,9 +1490,9 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
 
 typedef enum GradientType
 {
-    linear = 0, /*< 线性渐变 */
-    radial,     /*< 辐射渐变 */
-    sweep       /*< 扫描渐变 */
+    linear = 0, /**<  Linear gradient */
+    radial,     /**<  Radial gradient */
+    sweep       /**<  Sweep gradient */
 } GradientType;
 
 /**
@@ -1503,19 +1503,19 @@ typedef struct _GradientInfo
 {
     GradientType type;
     union {
-        float angle; // for linear
+        float angle; /**< for linear */
         struct
         {
-            float radius;  // Radius for radial gradient.
-            float centerX; // X-coordinate of the center (0.0 -> 1.0, 0.5 is center).
-            float centerY; // Y-coordinate of the center (0.0 -> 1.0, 0.5 is center).
-        } radial;          // Parameters for radial gradient.
+            float radius;  /**< Radius for radial gradient. */
+            float centerX; /**< X-coordinate of the center (0.0 -> 1.0, 0.5 is center). */
+            float centerY; /**< Y-coordinate of the center (0.0 -> 1.0, 0.5 is center). */
+        } radial;          /**< Parameters for radial gradient. */
         struct
         {
-            float startAngle; // True if the sweep gradient is rendered for a full circle.
-            float centerX; // X-coordinate of the center (0.0 -> 1.0, 0.5 is center).
-            float centerY; // Y-coordinate of the center (0.0 -> 1.0, 0.5 is center).
-        } sweep;           // Parameters for sweep gradient.
+            float startAngle; /**< True if the sweep gradient is rendered for a full circle. */
+            float centerX;    /**< X-coordinate of the center (0.0 -> 1.0, 0.5 is center). */
+            float centerY;    /**< Y-coordinate of the center (0.0 -> 1.0, 0.5 is center). */
+        } sweep;              /**< Parameters for sweep gradient. */
     };
 } GradientInfo;
 
@@ -2161,7 +2161,7 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
      * @param color Shadow color.
      * @return HRESULT indicating success or failure.
      */
-    // STDMETHOD_(HRESULT, DrawShadowRect)(THIS_ LPCRECT pRect, float dx, float dy, float sigmaX, float sigmaY, COLORREF color) PURE;
+    /** STDMETHOD_(HRESULT, DrawShadowRect)(THIS_ LPCRECT pRect, float dx, float dy, float sigmaX, float sigmaY, COLORREF color) PURE; */
 
     /**
      * @brief Draw a rounded rectangle with shadow.
@@ -2174,7 +2174,7 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
      * @param color Shadow color.
      * @return HRESULT indicating success or failure.
      */
-    // STDMETHOD_(HRESULT, DrawShadowRoundRect)(THIS_ LPCRECT pRect, POINT pt, float dx, float dy, float sigmaX, float sigmaY, COLORREF color) PURE;
+    /** STDMETHOD_(HRESULT, DrawShadowRoundRect)(THIS_ LPCRECT pRect, POINT pt, float dx, float dy, float sigmaX, float sigmaY, COLORREF color) PURE; */
 
     /**
      * @brief Draw a path with shadow.
@@ -2186,7 +2186,7 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
      * @param color Shadow color.
      * @return HRESULT indicating success or failure.
      */
-    // STDMETHOD_(HRESULT, DrawShadowPath)(THIS_ IPathS * pPath, float dx, float dy, float sigmaX, float sigmaY, COLORREF color) PURE;
+    /** STDMETHOD_(HRESULT, DrawShadowPath)(THIS_ IPathS * pPath, float dx, float dy, float sigmaX, float sigmaY, COLORREF color) PURE; */
 
     /**
      * @brief Set the image effect for rendering operations.
@@ -2343,4 +2343,4 @@ SNSEND
  */
 typedef BOOL (*FontFallback)(LPCSTR u8FontName, const wchar_t *pWord, size_t wordLen, char u8FontNameFallback[100], int *charset);
 
-#endif // __SRENDER_I__H__
+#endif /**< __SRENDER_I__H__ */

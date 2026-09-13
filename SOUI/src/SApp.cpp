@@ -195,7 +195,7 @@ void SObjectDefaultRegister::RegisterWindows(SObjectFactoryMgr *objFactory) cons
 
 #if defined(_WIN32) && !defined(__MINGW32__)
     objFactory->TplRegisterFactory<SActiveX>();
-#endif //_WIN32
+#endif // _WIN32
 }
 
 void SObjectDefaultRegister::RegisterSkins(SObjectFactoryMgr *objFactory) const
@@ -279,8 +279,8 @@ void SObjectDefaultRegister::RegisterValueAnimator(SObjectFactoryMgr *objFactory
     objFactory->TplRegisterFactory<SSizeAnimator>();
     objFactory->TplRegisterFactory<SRectAnimator>();
 }
-//////////////////////////////////////////////////////////////////////////
-// SApplication
+///////////////////////////////////////////////////////////////////////
+/** SApplication */
 SApplication *SApplication::ms_Singleton = NULL;
 SApplication &SApplication::getSingleton(void)
 {
@@ -299,7 +299,7 @@ void SApplication::_InitApp(const ISystemObjectRegister &sysObjRegister)
     ms_Singleton = this;
 #ifdef _WIN32
     SWndSurface::Init();
-#endif //_WIN32
+#endif // _WIN32
     SRichEdit::InitTextService();
     memset(m_pSingletons, 0, sizeof(m_pSingletons));
     _CreateSingletons();
@@ -376,10 +376,9 @@ void SApplication::_DestroySingletons()
     DELETE_SINGLETON(SWindowMgr);
 }
 
-#ifdef _WIN32
+#ifdef SOUI_ENABLE_ACC
 IAccProxy *SApplication::CreateAccProxy(IWindow *pWnd) const
 {
-#ifdef SOUI_ENABLE_ACC
     if (pWnd->IsClass(SProgress::GetClassName()))
     {
         return new SAccProxyProgress(pWnd);
@@ -432,10 +431,12 @@ IAccProxy *SApplication::CreateAccProxy(IWindow *pWnd) const
     {
         return new SAccProxyGroup(pWnd);
     }
+#ifdef _WIN32
     else if (pWnd->IsClass(SActiveX::GetClassName()))
     {
         return new SAccProxyActiveX(pWnd);
     }
+#endif // _WIN32
     else if (pWnd->IsClass(SCalendar::GetClassName()))
     {
         return new SAccProxyCalendar(pWnd);
@@ -536,22 +537,14 @@ IAccProxy *SApplication::CreateAccProxy(IWindow *pWnd) const
     {
         return new SAccProxyTreeView(pWnd);
     }
-
     return new SAccProxyWindow(pWnd);
-#else
-    return NULL;
-#endif // SOUI_ENABLE_ACC
 }
 
 IAccessible *SApplication::CreateAccessible(IWindow *pWnd) const
 {
-#ifdef SOUI_ENABLE_ACC
     return new SAccessible(pWnd);
-#else
-    return NULL;
-#endif // SOUI_ENABLE_ACC
 }
-#endif
+#endif /**< SOUI_ENABLE_ACC */
 
 void *SApplication::GetInnerSingleton(SingletonType nType)
 {
@@ -560,7 +553,7 @@ void *SApplication::GetInnerSingleton(SingletonType nType)
     return m_pSingletons[nType];
 }
 
-BOOL SApplication::_LoadXmlDocment(LPCTSTR pszXmlName, LPCTSTR pszType, SXmlDoc &xmlDoc, IResProvider *pResProvider /* = NULL*/)
+BOOL SApplication::_LoadXmlDocment(LPCTSTR pszXmlName, LPCTSTR pszType, SXmlDoc &xmlDoc, IResProvider *pResProvider /**< = NULL */)
 {
     SAutoBuf xmlBuf;
     if (!LoadRawBuffer(pszType, pszXmlName, pResProvider, xmlBuf))
@@ -592,7 +585,7 @@ IXmlDoc *SApplication::LoadXmlDocment(LPCTSTR strResId)
     }
 }
 
-BOOL SApplication::LoadXmlDocment(SXmlDoc &xmlDoc, const SStringT &strResId, IResProvider *pResProvider /*=NULL*/)
+BOOL SApplication::LoadXmlDocment(SXmlDoc &xmlDoc, const SStringT &strResId, IResProvider *pResProvider /**< =NULL */)
 {
     SStringTList strLst;
     if (2 == ParseResID(strResId, strLst))
@@ -846,7 +839,7 @@ SStringW SApplication::tr(const SStringW &strSrc, const SStringW &strCtx) const
 }
 
 IWindow *SApplication::CreateWindowByName(LPCWSTR pszWndClass) const
-{ //支持使用类似button.ok这样的控件名来创建控件，对于这种格式自动应用button.ok为class属性.
+{ // Supports creating controls using control names like button.ok; for this format, button.ok is automatically applied as the class attribute.
     SStringW strClsName = pszWndClass;
     int nPos = strClsName.ReverseFind(L'.');
     if (nPos != -1)
@@ -941,7 +934,7 @@ BOOL SApplication::RemoveMsgLoop()
     return TRUE;
 }
 
-IMessageLoop *SApplication::GetMsgLoop(tid_t dwThreadID /*= ::GetCurrentThreadId()*/) const
+IMessageLoop *SApplication::GetMsgLoop(tid_t dwThreadID /**< = ::GetCurrentThreadId() */) const
 {
     SAutoLock autoLock(m_cs);
     const MsgLoopMap::CPair *p = m_msgLoopMap.Lookup(dwThreadID);

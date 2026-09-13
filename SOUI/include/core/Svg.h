@@ -6,33 +6,33 @@ SNSBEGIN
 
 /**
  * CreateSvgObj
- * @brief 创建svg对象
- * @param strSvg svg数据
- * @return ISvgObjPtr svg对象
+ * @brief Create svg object
+ * @param strSvg svg data
+ * @return ISvgObjPtr svg object
  */
 EXTERN_C ISvgObjPtr SOUI_EXP CreateSvgObj(char *strSvg);
 
 /**
  * CreateSvgFromResId
- * @brief 创建svg对象
- * @param resId 资源ID
- * @return ISvgObjPtr svg对象
+ * @brief Create svg object
+ * @param resId Resource ID
+ * @return ISvgObjPtr svg object
  */
 EXTERN_C ISvgObjPtr SOUI_EXP CreateSvgFromResId(LPCTSTR resId);
 
 /**
  * CreateSvgFromFile
- * @brief 创建svg对象
- * @param resId 文件路径
- * @return ISvgObjPtr svg对象
+ * @brief Create svg object
+ * @param resId File path
+ * @return ISvgObjPtr svg object
  */
 EXTERN_C ISvgObjPtr SOUI_EXP CreateSvgFromFileA(LPCSTR resId);
 
 /**
  * CreateSvgFromFile
- * @brief 创建svg对象
- * @param resId 文件路径
- * @return ISvgObjPtr svg对象
+ * @brief Create svg object
+ * @param resId File path
+ * @return ISvgObjPtr svg object
  */
 EXTERN_C ISvgObjPtr SOUI_EXP CreateSvgFromFileW(LPCWSTR resId);
 
@@ -40,8 +40,8 @@ EXTERN_C ISvgObjPtr SOUI_EXP CreateSvgFromFileW(LPCWSTR resId);
 #define CreateSvgFromFile CreateSvgFromFileW
 #else
 #define CreateSvgFromFile CreateSvgFromFileA
-#endif // UNICODE
+#endif /**< UNICODE */
 
 SNSEND
 
-#endif // !__SVG__H__
+#endif /**< !__SVG__H__ */

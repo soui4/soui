@@ -1,26 +1,26 @@
-﻿//! Add reference
-/*!
+﻿/** Add reference */
+/**
  * @brief Increments the reference count of the object.
  *
  * @return long The new reference count.
  */
 STDMETHOD_(long, AddRef)(THIS) PURE;
 
-//! Release reference
-/*!
+/** Release reference */
+/**
  * @brief Decrements the reference count of the object.
  *
  * @return long The new reference count.
  */
 STDMETHOD_(long, Release)(THIS) PURE;
 
-//! Final release of the object
-/*!
+/** Final release of the object */
+/**
  * @brief Final release of the object, performing cleanup if necessary.
  */
 STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 
 /**
  * @brief Creates a Native window.
@@ -61,7 +61,7 @@ STDMETHOD_(BOOL, SubclassWindow)(THIS_ HWND hWnd) PURE;
  * @param bForce If TRUE, forces the unsubclassing even if the current window procedure is not SNativeWnd's.
  * @return HWND Handle to the unsubclassed window.
  */
-STDMETHOD_(HWND, UnsubclassWindow)(THIS_ BOOL bForce /*= FALSE*/) PURE;
+STDMETHOD_(HWND, UnsubclassWindow)(THIS_ BOOL bForce /**< = FALSE */) PURE;
 
 /**
  * @brief Retrieves the current window message object.
@@ -138,7 +138,7 @@ STDMETHOD_(BOOL, IsWindowEnabled)(CTHIS) SCONST PURE;
  * @param nFlags Window positioning flags.
  * @return BOOL TRUE if successful, FALSE otherwise.
  */
-STDMETHOD_(BOOL, ModifyStyle)(THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags /*=0*/) PURE;
+STDMETHOD_(BOOL, ModifyStyle)(THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags /**< =0 */) PURE;
 
 /**
  * @brief Modifies the extended window style.
@@ -148,7 +148,7 @@ STDMETHOD_(BOOL, ModifyStyle)(THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags /*=
  * @param nFlags Window positioning flags.
  * @return BOOL TRUE if successful, FALSE otherwise.
  */
-STDMETHOD_(BOOL, ModifyStyleEx)(THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags /*=0*/) PURE;
+STDMETHOD_(BOOL, ModifyStyleEx)(THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags /**< =0 */) PURE;
 
 /**
  * @brief Sets the window position.
@@ -170,7 +170,7 @@ STDMETHOD_(BOOL, SetWindowPos)
  * @param hWndCenter Handle to the window to center relative to.
  * @return BOOL TRUE if successful, FALSE otherwise.
  */
-STDMETHOD_(BOOL, CenterWindow)(THIS_ HWND hWndCenter /*= NULL*/) PURE;
+STDMETHOD_(BOOL, CenterWindow)(THIS_ HWND hWndCenter /**< = NULL */) PURE;
 
 /**
  * @brief Destroys the window.
@@ -192,7 +192,7 @@ STDMETHOD_(BOOL, IsWindow)(CTHIS) SCONST PURE;
  * @param bErase Flag indicating if the background should be erased.
  * @return BOOL TRUE if successful, FALSE otherwise.
  */
-STDMETHOD_(BOOL, Invalidate)(THIS_ BOOL bErase /*= TRUE*/) PURE;
+STDMETHOD_(BOOL, Invalidate)(THIS_ BOOL bErase /**< = TRUE */) PURE;
 
 /**
  * @brief Invalidates a specified rectangle of the window.
@@ -201,7 +201,7 @@ STDMETHOD_(BOOL, Invalidate)(THIS_ BOOL bErase /*= TRUE*/) PURE;
  * @param bErase Flag indicating if the background should be erased.
  * @return BOOL TRUE if successful, FALSE otherwise.
  */
-STDMETHOD_(BOOL, InvalidateRect)(THIS_ LPCRECT lpRect, BOOL bErase /* = TRUE*/) PURE;
+STDMETHOD_(BOOL, InvalidateRect)(THIS_ LPCRECT lpRect, BOOL bErase /**< = TRUE */) PURE;
 
 /**
  * @brief Retrieves the window rectangle.
@@ -279,7 +279,7 @@ STDMETHOD_(int, MapWindowRect)(CTHIS_ HWND hWndTo, LPRECT lpRect) SCONST PURE;
  * @return UINT_PTR Timer ID.
  */
 STDMETHOD_(UINT_PTR, SetTimer)
-(THIS_ UINT_PTR nIDEvent, UINT nElapse, void(CALLBACK *lpfnTimer)(HWND, UINT, UINT_PTR, DWORD) /*= NULL*/) PURE;
+(THIS_ UINT_PTR nIDEvent, UINT nElapse, void(CALLBACK *lpfnTimer)(HWND, UINT, UINT_PTR, DWORD) /**< = NULL */) PURE;
 
 /**
  * @brief Kills a timer for the window.
@@ -372,7 +372,7 @@ STDMETHOD_(HWND, SetFocus)(THIS) PURE;
  * @return LRESULT Result of the message processing.
  */
 STDMETHOD_(LRESULT, SendMessage)
-(THIS_ UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/) PURE;
+(THIS_ UINT message, WPARAM wParam /**< = 0 */, LPARAM lParam /**< = 0 */) PURE;
 
 /**
  * @brief Posts a message to the window.
@@ -383,7 +383,7 @@ STDMETHOD_(LRESULT, SendMessage)
  * @return BOOL TRUE if successful, FALSE otherwise.
  */
 STDMETHOD_(BOOL, PostMessage)
-(THIS_ UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/) PURE;
+(THIS_ UINT message, WPARAM wParam /**< = 0 */, LPARAM lParam /**< = 0 */) PURE;
 
 /**
  * @brief Sends a notify message to the window.
@@ -394,7 +394,7 @@ STDMETHOD_(BOOL, PostMessage)
  * @return BOOL TRUE if successful, FALSE otherwise.
  */
 STDMETHOD_(BOOL, SendNotifyMessage)
-(THIS_ UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/) PURE;
+(THIS_ UINT message, WPARAM wParam /**< = 0 */, LPARAM lParam /**< = 0 */) PURE;
 
 /**
  * @brief Sets the window text.
@@ -445,7 +445,7 @@ STDMETHOD_(BOOL, IsWindowVisible)(CTHIS) SCONST PURE;
  * @return BOOL TRUE if successful, FALSE otherwise.
  */
 STDMETHOD_(BOOL, MoveWindow)
-(THIS_ int x, int y, int nWidth, int nHeight, BOOL bRepaint /*= TRUE*/) PURE;
+(THIS_ int x, int y, int nWidth, int nHeight, BOOL bRepaint /**< = TRUE */) PURE;
 
 /**
  * @brief Moves the window to the specified position and resizes it using a rectangle.
@@ -454,7 +454,7 @@ STDMETHOD_(BOOL, MoveWindow)
  * @param bRepaint Flag indicating if the window should be repainted.
  * @return BOOL TRUE if successful, FALSE otherwise.
  */
-STDMETHOD_(BOOL, MoveWindow2)(THIS_ LPCRECT lpRect, BOOL bRepaint /*= TRUE*/) PURE;
+STDMETHOD_(BOOL, MoveWindow2)(THIS_ LPCRECT lpRect, BOOL bRepaint /**< = TRUE */) PURE;
 
 /**
  * @brief Sets the show state of the window.
@@ -476,7 +476,7 @@ STDMETHOD_(BOOL, UpdateWindow)(THIS) PURE;
  * @param bRedraw Flag indicating if the window should be redrawn.
  * @return int Previous region handle.
  */
-STDMETHOD_(int, SetWindowRgn)(THIS_ HRGN hRgn, BOOL bRedraw /*=TRUE*/) PURE;
+STDMETHOD_(int, SetWindowRgn)(THIS_ HRGN hRgn, BOOL bRedraw /**< =TRUE */) PURE;
 
 /**
  * @brief Sets the layered window attributes.

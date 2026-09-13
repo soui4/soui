@@ -1,11 +1,11 @@
-/**
+﻿/**
  * @file       STreeCtrl.h
  * @brief      Definition of the STreeCtrl class.
  * @version    2012.12.16 - 1.1
  * @author     soui
  * @date       2012-12-16
  *
- * @copyright  Copyright (C) 2012-2050 SOUI团队
+ * @copyright  Copyright (C) 2012-2050 SOUI Team
  *             All rights reserved.
  */
 
@@ -404,6 +404,32 @@ class SOUI_EXP STreeCtrl
     {
         return GetItemText(hItem, &strText);
     }
+
+    //----------------------------------------------------------------------
+    /** Accessibility virtual children. */
+    /** Tree items are self-drawn (not child windows) and are exposed as */
+    /** virtual (simple-element) ACC children (ROLE_SYSTEM_OUTLINEITEM). */
+    //----------------------------------------------------------------------
+
+    /**
+     * @brief Number of Accessible virtual children (currently visible list items).
+     */
+    int GetAccItemCount();
+
+    /**
+     * @brief Get the nIndex-th visible list item (0-based); returns 0 if out of range.
+     */
+    HSTREEITEM GetAccVisibleItem(int nIndex);
+
+    /**
+     * @brief Get the rectangle of the list item in the client area.
+     */
+    BOOL GetAccItemRect(HSTREEITEM hItem, CRect &rcItem);
+
+    /**
+     * @brief Determine whether the list item is expanded.
+     */
+    BOOL GetAccItemExpanded(HSTREEITEM hItem);
 
   protected:
     void CalcItemWidth(IRenderTarget *pRT, HSTREEITEM hItem, DWORD dwFlags);
@@ -897,4 +923,4 @@ class SOUI_EXP STreeCtrl
 
 SNSEND
 
-#endif // __STREECTRL__H__
+#endif /**< __STREECTRL__H__ */

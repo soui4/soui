@@ -7,7 +7,7 @@
 
 SNSBEGIN
 
-// Define system resource types
+/** Define system resource types */
 extern const TCHAR KTypeBitmap[];
 extern const TCHAR KTypeCursor[];
 extern const TCHAR KTypeIcon[];
@@ -157,8 +157,8 @@ class SOUI_EXP SResProviderPE : public TObjRefImpl<IResProvider> {
      */
     HRSRC MyFindResource(LPCTSTR strType, LPCTSTR pszResName);
 
-    HINSTANCE m_hResInst; // Handle to the resource instance
-    BOOL m_bOwner;        // Flag indicating if the instance is owned
+    HINSTANCE m_hResInst; /**< Handle to the resource instance */
+    BOOL m_bOwner;        /**< Flag indicating if the instance is owned */
 };
 
 /**
@@ -336,10 +336,10 @@ class SOUI_EXP SResProviderFiles : public TObjRefImpl<IResProvider> {
      */
     SStringT GetRes(LPCTSTR strType, LPCTSTR pszResName);
 
-    SStringT m_strPath;                // Base path for resource files
-    SMap<SResID, SStringT> m_mapFiles; // Map of resource IDs to file paths
+    SStringT m_strPath;                /**< Base path for resource files */
+    SMap<SResID, SStringT> m_mapFiles; /**< Map of resource IDs to file paths */
 };
 
 SNSEND
 
-#endif // __SRESPROVIDER__H__
+#endif /**< __SRESPROVIDER__H__ */

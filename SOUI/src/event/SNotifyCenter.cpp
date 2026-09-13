@@ -8,7 +8,7 @@ SNSBEGIN
 template <>
 SNotifyCenter *SSingleton<SNotifyCenter>::ms_Singleton = 0;
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 class SNotifyReceiver : public SNativeWnd {
   public:
     enum
@@ -56,7 +56,7 @@ void SNotifyReceiver::OnTimer(UINT_PTR uID)
     }
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 SNotifyCenter::SNotifyCenter(int nInterval)
     : m_pReceiver(NULL)
     , m_bRunning(FALSE)
@@ -88,7 +88,7 @@ void SNotifyCenter::FireEventSync(IEvtArgs *e)
     OnFireEvent(e);
 }
 
-//把事件抛到事件队列，不检查事件是否注册，执行事件时再检查。
+/** Throw the event into the event queue without checking whether the event is registered; check it when the event is executed. */
 void SNotifyCenter::FireEventAsync(IEvtArgs *e)
 {
     SAutoLock lock(m_cs);
@@ -104,7 +104,7 @@ void SNotifyCenter::FireEventAsync(IEvtArgs *e)
 void SNotifyCenter::OnFireEvent(IEvtArgs *e)
 {
     if (!GetEventObject(e->GetID()))
-        return; //确保事件是已经注册过的已经事件。
+        return; // Ensure the event is an already-registered event.
 
     FireEvent(e);
     if (!e->IsBubbleUp())
@@ -123,7 +123,7 @@ void SNotifyCenter::OnFireEvent(IEvtArgs *e)
 void SNotifyCenter::OnFireEvts()
 {
     SList<IEvtArgs *> evts;
-    SList<SAutoRefPtr<IRunnable> > cbs;
+    SList<SAutoRefPtr<IRunnable>> cbs;
     {
         SAutoLock lock(m_cs);
         evts = m_ayncEvent;

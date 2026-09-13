@@ -120,7 +120,7 @@ class SOUI_EXP SDropDownWnd
      * @param pMsg Pointer to the message
      * @return TRUE if the message is handled, FALSE otherwise
      */
-    STDMETHOD_(BOOL,PreTranslateMessage)(MSG *pMsg);
+    STDMETHOD_(BOOL, PreTranslateMessage)(MSG *pMsg);
 
     /**
      * @brief Handle left mouse button down event
@@ -170,7 +170,7 @@ class SOUI_EXP SDropDownWnd
      * @param bMinimized Minimized flag
      * @param wndOther Handle to the previous active window
      */
-    void OnActivate(UINT nState, BOOL bMinimized, HWND wndOther); // Interrupt message processing to prevent setting focus
+    void OnActivate(UINT nState, BOOL bMinimized, HWND wndOther); /**< Interrupt message processing to prevent setting focus */
 
     /**
      * @brief Handle final message
@@ -181,7 +181,8 @@ class SOUI_EXP SDropDownWnd
     /**
      * @brief init root painter
      */
-    void OnRootBeforePaint(const SRootWindow *pRoot,IRenderTarget *pRT, SPainter &painter) const override;
+    void OnRootBeforePaint(const SRootWindow *pRoot, IRenderTarget *pRT, SPainter &painter) const override;
+
   protected:
     ISDropDownOwner *m_pOwner; /**< Pointer to the dropdown owner */
     UINT m_uExitCode;          /**< Exit code */
@@ -200,4 +201,4 @@ class SOUI_EXP SDropDownWnd
 
 SNSEND
 
-#endif // __SDROPDOWN__H__
+#endif /**< __SDROPDOWN__H__ */

@@ -19,9 +19,9 @@ class SOUI_EXP STransformation : public ITransformation {
     STransformation();
 
   protected:
-    SMatrix mMatrix;         ///< The 3x3 matrix representing the transformation.
-    BYTE mAlpha;             ///< The degree of transparency (255 means fully opaque, 0 means fully transparent).
-    int mTransformationType; ///< Indicates the nature of this transformation.
+    SMatrix mMatrix;         /**<  The 3x3 matrix representing the transformation. */
+    BYTE mAlpha;             /**<  The degree of transparency (255 means fully opaque, 0 means fully transparent). */
+    int mTransformationType; /**<  Indicates the nature of this transformation. */
 
   public:
     /**
@@ -129,4 +129,4 @@ class SOUI_EXP STransformation : public ITransformation {
 
 SNSEND
 
-#endif // __STRANSFORMATION__H__
+#endif /**< __STRANSFORMATION__H__ */

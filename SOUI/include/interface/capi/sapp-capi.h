@@ -7,12 +7,12 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for IApplication Interface
  * These macros provide C-style function call syntax for C++ interface methods
  */
 
-/* IObjRef base interface macros */
+/** IObjRef base interface macros */
 #define IApplication_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -22,7 +22,7 @@ extern "C" {
 #define IApplication_OnFinalRelease(This) \
     ((This)->lpVtbl->OnFinalRelease(This))
 
-/* IApplication specific interface macros */
+/** IApplication specific interface macros */
 #define IApplication_GetModule(This) \
     ((This)->lpVtbl->GetModule(This))
 
@@ -210,4 +210,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SAPP_CAPI_H__ */
+#endif /**< __SAPP_CAPI_H__ */

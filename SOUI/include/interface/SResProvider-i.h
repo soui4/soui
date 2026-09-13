@@ -17,7 +17,7 @@
 #include <interface/obj-ref-i.h>
 #include <interface/SRender-i.h>
 
-#define UIRES_INDEX _T("uires.idx") //文件夹资源的文件映射表索引表文件名
+#define UIRES_INDEX _T("uires.idx") /**< File name of the file mapping table index for folder resources */
 
 #ifdef _WIN32
 #define PATH_SLASH '\\'
@@ -37,7 +37,7 @@
 #define TPATH_SLASH  '/'
 #define TPATH_SLASH2 "/"
 #endif
-#endif //_WIN32
+#endif /**< _WIN32 */
 
 SNSBEGIN
 
@@ -54,122 +54,122 @@ typedef BOOL(CALLBACK *EnumFileCallback)(LPCTSTR pszFileName, LPARAM lp);
 
 /**
  * @struct     IResProvider
- * @brief      ResProvider对象
+ * @brief      ResProvider object
  *
- * Describe  实现各种资源的加载
+ * Describe   Implements loading of various resources
  */
 #undef INTERFACE
 #define INTERFACE IResProvider
 DECLARE_INTERFACE_(IResProvider, IObjRef)
 {
     /**
-     * @brief 添加引用
-     * @return long -- 引用计数
+     * @brief Add reference
+     * @return long -- reference count
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief 释放引用
-     * @return long -- 引用计数
+     * @brief Release reference
+     * @return long -- reference count
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief 释放对象
+     * @brief Release object
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
     /**
-     * @brief 资源初始化函数
-     * @param wParam WPARAM -- 参数1
-     * @param lParam LPARAM -- 参数2
-     * @return BOOL -- TRUE: 成功
-     * @remark 每个ResProvider必须实现此接口
+     * @brief Resource initialization function
+     * @param wParam WPARAM -- param 1
+     * @param lParam LPARAM -- param 2
+     * @return BOOL -- TRUE: success
+     * @remark Every ResProvider must implement this interface
      */
     STDMETHOD_(BOOL, Init)(THIS_ WPARAM wParam, LPARAM lParam) PURE;
 
     /**
-     * @brief 查询一个资源是否存在
-     * @param pszType LPCTSTR -- 资源类型
-     * @param pszResName LPCTSTR -- 资源名称
-     * @return BOOL -- TRUE: 存在，FALSE: 不存在
+     * @brief Query whether a resource exists
+     * @param pszType LPCTSTR -- resource type
+     * @param pszResName LPCTSTR -- resource name
+     * @return BOOL -- TRUE: exists, FALSE: not exists
      */
     STDMETHOD_(BOOL, HasResource)(THIS_ LPCTSTR pszType, LPCTSTR pszResName) PURE;
 
     /**
-     * @brief 从资源中加载ICON
-     * @param pszResName LPCTSTR -- ICON名称
-     * @param cx int -- ICON宽度
-     * @param cy int -- ICON高度
-     * @return HICON -- 成功返回ICON的句柄，失败返回0
+     * @brief Load ICON from resource
+     * @param pszResName LPCTSTR -- ICON name
+     * @param cx int -- ICON width
+     * @param cy int -- ICON height
+     * @return HICON -- returns ICON handle on success, 0 on failure
      */
     STDMETHOD_(HICON, LoadIcon)(THIS_ LPCTSTR pszResName, int cx, int cy) PURE;
 
     /**
-     * @brief 从资源中加载HBITMAP
-     * @param pszResName LPCTSTR -- BITMAP名称
-     * @return HBITMAP -- 成功返回BITMAP的句柄，失败返回0
+     * @brief Load HBITMAP from resource
+     * @param pszResName LPCTSTR -- BITMAP name
+     * @return HBITMAP -- returns BITMAP handle on success, 0 on failure
      */
     STDMETHOD_(HBITMAP, LoadBitmap)(THIS_ LPCTSTR pszResName) PURE;
 
     /**
-     * @brief 从资源中加载光标
-     * @param pszResName LPCTSTR -- 光标名
-     * @return HCURSOR -- 成功返回光标的句柄，失败返回0
-     * @remark 支持动画光标
+     * @brief Load cursor from resource
+     * @param pszResName LPCTSTR -- cursor name
+     * @return HCURSOR -- returns cursor handle on success, 0 on failure
+     * @remark Supports animated cursors
      */
     STDMETHOD_(HCURSOR, LoadCursor)(THIS_ LPCTSTR pszResName) PURE;
 
     /**
-     * @brief 从资源加载一个IBitmap对象
-     * @param pszType LPCTSTR -- 图片类型
-     * @param pszResName LPCTSTR -- 图片名
-     * @return IBitmapS* -- 成功返回一个IBitmap对象，失败返回0
-     * @remark 如果没有定义strType，则根据name使用FindImageType自动查找匹配的类型
+     * @brief Load an IBitmap object from resource
+     * @param pszType LPCTSTR -- image type
+     * @param pszResName LPCTSTR -- image name
+     * @return IBitmapS* -- returns an IBitmap object on success, 0 on failure
+     * @remark If strType is not defined, FindImageType is used to automatically find a matching type based on name
      */
     STDMETHOD_(IBitmapS *, LoadImage)(THIS_ LPCTSTR pszType, LPCTSTR pszResName) PURE;
 
     /**
-     * @brief 从资源中创建一个IImgX对象
-     * @param pszType LPCTSTR -- 图片类型
-     * @param pszResName LPCTSTR -- 图片名
-     * @return IImgX* -- 成功返回一个IImgX对象，失败返回0
+     * @brief Create an IImgX object from resource
+     * @param pszType LPCTSTR -- image type
+     * @param pszResName LPCTSTR -- image name
+     * @return IImgX* -- returns an IImgX object on success, 0 on failure
      */
     STDMETHOD_(IImgX *, LoadImgX)(THIS_ LPCTSTR pszType, LPCTSTR pszResName) PURE;
 
     /**
-     * @brief 获得资源数据大小
-     * @param pszType LPCTSTR -- 资源类型
-     * @param pszResName LPCTSTR -- 资源名
-     * @return size_t -- 资源大小（byte)，失败返回0
+     * @brief Get resource data size
+     * @param pszType LPCTSTR -- resource type
+     * @param pszResName LPCTSTR -- resource name
+     * @return size_t -- resource size (byte), 0 on failure
      */
     STDMETHOD_(size_t, GetRawBufferSize)(THIS_ LPCTSTR pszType, LPCTSTR pszResName) PURE;
 
     /**
-     * @brief 获得资源内存块
-     * @param pszType LPCTSTR -- 资源类型
-     * @param pszResName LPCTSTR -- 资源名
-     * @param pBuf LPVOID -- 输出内存块
-     * @param size size_t -- 内存大小
-     * @return BOOL -- TRUE: 成功
-     * @remark 应该先用GetRawBufferSize查询资源大小再分配足够空间
+     * @brief Get resource memory block
+     * @param pszType LPCTSTR -- resource type
+     * @param pszResName LPCTSTR -- resource name
+     * @param pBuf LPVOID -- output memory block
+     * @param size size_t -- memory size
+     * @return BOOL -- TRUE: success
+     * @remark Should first query the resource size with GetRawBufferSize, then allocate enough space
      */
     STDMETHOD_(BOOL, GetRawBuffer)
     (THIS_ LPCTSTR pszType, LPCTSTR pszResName, LPVOID pBuf, size_t size) PURE;
 
     /**
-     * @brief 枚举资源
-     * @param funEnumCB EnumResCallback -- 枚举使用的回调函数
-     * @param lp LPARAM -- 回调参数
+     * @brief Enumerate resources
+     * @param funEnumCB EnumResCallback -- callback function used for enumeration
+     * @param lp LPARAM -- callback parameter
      * @return void
      */
     STDMETHOD_(void, EnumResource)(THIS_ EnumResCallback funEnumCB, LPARAM lp) PURE;
 
     /**
-     * @brief 枚举资源文件,返回文件路径
-     * @param funEnumCB EnumFileCallback -- 枚举使用的回调函数
-     * @param lp LPARAM -- 回调参数
+     * @brief Enumerate resource files, return file paths
+     * @param funEnumCB EnumFileCallback -- callback function used for enumeration
+     * @param lp LPARAM -- callback parameter
      * @return void
      */
     STDMETHOD_(void, EnumFile)(THIS_ EnumFileCallback funEnumCB, LPARAM lp) PURE;
@@ -177,4 +177,4 @@ DECLARE_INTERFACE_(IResProvider, IObjRef)
 
 SNSEND
 
-#endif //_SRESPROVIDER_I_
+#endif /**< _SRESPROVIDER_I_ */

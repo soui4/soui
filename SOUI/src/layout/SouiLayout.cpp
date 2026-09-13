@@ -3,15 +3,15 @@
 #include "helper/SplitString.h"
 #include <core/SWnd.h>
 #pragma warning(push)
-#pragma warning(disable : 4985) // disable the warning message during the include
-#include <math.h>               // this is where I would normally get the warning message
+#pragma warning(disable : 4985) /**< disable the warning message during the include */
+#include <math.h>               /**< this is where I would normally get the warning message */
 #pragma warning(pop)
 
 SNSBEGIN
 enum
 {
-    POS_INIT = 0x11000000, //坐标的初始化值
-    POS_WAIT = 0x12000000, //坐标的计算依赖于其它窗口的布局
+    POS_INIT = 0x11000000, /**< Initial value of the coordinate */
+    POS_WAIT = 0x12000000, /**< Coordinate calculation depends on the layout of other windows */
 };
 
 SouiLayoutParam::SouiLayoutParam()
@@ -95,7 +95,7 @@ BOOL SouiLayoutParam::ParsePosition12(const SStringW &strPos1, const SStringW &s
     POS_INFO pos1, pos2;
     if (!StrPos2ItemPos(strPos1, pos1) || !StrPos2ItemPos(strPos2, pos2))
         return FALSE;
-    if (pos1.pit == PIT_SIZE || pos2.pit == PIT_SIZE) //前面2个属性不能是size类型
+    if (pos1.pit == PIT_SIZE || pos2.pit == PIT_SIZE) // The first 2 attributes cannot be of size type
         return FALSE;
     posLeft = pos1;
     posTop = pos2;
@@ -224,7 +224,7 @@ HRESULT SouiLayoutParam::OnAttrPos(const SStringW &strValue, BOOL bLoading)
         SSLOGW() << "Parse pos attribute failed, strPos=" << strValue;
         return E_INVALIDARG;
     }
-    //增加pos属性中的空格兼容。
+    // Add space compatibility in the pos attribute.
     for (size_t i = 0; i < strLst.GetCount(); i++)
     {
         strLst.GetAt(i).TrimBlank();
@@ -237,7 +237,7 @@ HRESULT SouiLayoutParam::OnAttrPos(const SStringW &strValue, BOOL bLoading)
         bRet = ParsePosition34(strLst[2], strLst[3]);
     }
     if (bRet && nCount == 4)
-    { //检测X,Y方向上是否为充满父窗口
+    { // Check whether the X,Y directions fill the parent window
         if ((posLeft.pit == PIT_NORMAL && posLeft.nPos.isZero() && (!posTop.bMinus)) && (posRight.pit == PIT_NORMAL && posRight.nPos.isZero() && posBottom.bMinus))
         {
             width.setMatchParent();
@@ -379,7 +379,7 @@ void *SouiLayoutParam::GetRawData()
 ILayoutParam *SouiLayoutParam::Clone() const
 {
     SouiLayoutParam *pRet = new SouiLayoutParam();
-    memcpy(pRet->GetRawData(), (void*)(SouiLayoutParamStruct *)this, sizeof(SouiLayoutParamStruct));
+    memcpy(pRet->GetRawData(), (void *)(SouiLayoutParamStruct *)this, sizeof(SouiLayoutParamStruct));
     return pRet;
 }
 
@@ -409,7 +409,7 @@ BOOL SouiLayoutParam::SetAnimatorValue(IPropertyValuesHolder *pHolder, float fra
     return FALSE;
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 
 SouiLayout::SouiLayout(void)
 {
@@ -440,13 +440,13 @@ int SouiLayout::PositionItem2Value(SList<WndPos> *pLstChilds, SPOSITION position
 
     switch (pos.pit)
     {
-    case PIT_CENTER: //参考中心
+    case PIT_CENTER: // Reference center
         if (nMax != SIZE_WRAP_CONTENT)
             nRet = pos.nPos.toPixelSize(nScale) * (pos.bMinus ? -1 : 1) + nMax / 2;
         break;
     case PIT_NORMAL:
         if (pos.bMinus)
-        { //参考右边或者下边
+        { // Reference right or bottom
             if (nMax != SIZE_WRAP_CONTENT)
                 nRet = nMax - pos.nPos.toPixelSize(nScale);
         }
@@ -538,7 +538,7 @@ int SouiLayout::PositionItem2Value(SList<WndPos> *pLstChilds, SPOSITION position
             }
         }
         if (!wndPosRef.pWnd)
-        { //没有找到时,使用父窗口信息
+        { // When not found, use parent window info
             wndPosRef.rc = CRect(0, 0, nMax, nMax);
             wndPosRef.bWaitOffsetX = wndPosRef.bWaitOffsetY = false;
         }
@@ -581,7 +581,7 @@ SIZE SouiLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeight
     while (pChild)
     {
         if (!pChild->IsFloat() && (pChild->IsVisible(FALSE) || pChild->IsDisplay()))
-        { //不显示且不占位的窗口不参与计算
+        { // Windows that are not visible and do not occupy space are excluded from calculation
             WndPos wndPos;
             wndPos.pWnd = (SWindow *)pChild;
             wndPos.rc = CRect(POS_INIT, POS_INIT, POS_INIT, POS_INIT);
@@ -593,10 +593,10 @@ SIZE SouiLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeight
         pChild = pParent->GetNextLayoutIChild(pChild);
     }
 
-    //计算子窗口位置
+    // Calculate child window position
     CalcPositionEx(&lstWndPos, nWidth, nHeight);
 
-    //计算子窗口范围
+    // Calculate child window extent
     int nMaxX = 0, nMaxY = 0;
     SPOSITION pos = lstWndPos.GetHeadPosition();
     while (pos)
@@ -621,22 +621,22 @@ SIZE SouiLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeight
     return CSize(nWidth, nHeight);
 }
 
-/*
-计算子窗口容器大小逻辑：
-1:引用父窗口左上角的窗口称之为I类确定性窗口。
-2:引用I类窗口的窗口称为II类确定性窗口。
-3:左边引用父窗口左上角或者I,II类确定性窗口，右边引用父窗口右下角的窗口为I不确定性窗口，这类窗口自动转换成自适应大小窗口。
-4:左右都引用父窗口右下角的窗口为II类不确定窗口，这类窗口不影响父窗口大小。
-5:引用I,II类不确定大小窗口的窗口同样不影响父窗口大小。
+/**
+Logic for computing child window container size:
+1: A window referencing the parent's top-left corner is called a type-I deterministic window.
+2: A window referencing a type-I window is called a type-II deterministic window.
+3: A window referencing the parent's top-left corner or a type-I/II deterministic window on its left, and the parent's bottom-right corner on its right, is a type-I non-deterministic window; such windows are automatically converted to wrap_content size.
+4: A window referencing the parent's bottom-right corner on both sides is a type-II non-deterministic window; such windows do not affect the parent's size.
+5: Windows referencing type-I/II non-deterministic-size windows also do not affect the parent's size.
 
-只要一个控件左边位置能确定，控件的右边也可以保证可以确定。
-如果左边位置不能确定，则控件大小不影响父窗口大小。
+As long as a control's left position is determined, its right position can also be guaranteed determined.
+If the left position cannot be determined, the control's size does not affect the parent's size.
 */
 void SouiLayout::CalcPositionEx(SList<WndPos> *pListChildren, int nWidth, int nHeight) const
 {
     CalcPostion(pListChildren, nWidth, nHeight);
 
-    //将参考父窗口右边或者底边的子窗口设置为wrap_content并计算出大小
+    // Set children referencing the parent's right or bottom edge to wrap_content and compute their size
 
     int nResolved = 0;
     for (SPOSITION pos = pListChildren->GetHeadPosition(); pos; pListChildren->GetNext(pos))
@@ -687,7 +687,7 @@ int SouiLayout::CalcPostion(SList<WndPos> *pListChildren, int nWidth, int nHeigh
         nResolvedStep1 = 0;
         nResolvedStep2 = 0;
 
-        // step 1:计算出所有不需要计算窗口大小就可以确定的坐标
+        // step 1: compute all coordinates that can be determined without calculating window size
         int nResolved = 0;
         do
         {
@@ -765,7 +765,7 @@ int SouiLayout::CalcPostion(SList<WndPos> *pListChildren, int nWidth, int nHeigh
         if (nResolvedStep1 > 0)
         {
             int nResolved = 0;
-            // step 2:计算出自适应大小窗口的Size,对于可以确定的窗口完成offset操作
+            // step 2: compute the size of wrap_content windows, and complete the offset operation for windows that can be determined
             do
             {
                 nResolved = 0;
@@ -774,7 +774,7 @@ int SouiLayout::CalcPostion(SList<WndPos> *pListChildren, int nWidth, int nHeigh
                     WndPos &wndPos = pListChildren->GetAt(pos);
                     const SouiLayoutParam *pLayoutParam = (const SouiLayoutParam *)wndPos.pWnd->GetLayoutParam();
                     if (IsWaitingPos(wndPos.rc.left) || IsWaitingPos(wndPos.rc.top))
-                        continue; //至少确定了一个点后才开始计算
+                        continue; // Only start calculation after at least one point is determined
 
                     if ((IsWaitingPos(wndPos.rc.right) && pLayoutParam->IsWrapContent(Horz)) || (IsWaitingPos(wndPos.rc.bottom) && pLayoutParam->IsWrapContent(Vert)))
                     { //
@@ -837,10 +837,10 @@ void SouiLayout::LayoutChildren(IWindow *pParent)
 
     CRect rcParent;
     pParent->GetChildrenLayoutRect(&rcParent);
-    //计算子窗口位置
+    // Calculate child window position
     CalcPostion(&lstWndPos, rcParent.Width(), rcParent.Height());
 
-    //偏移窗口坐标
+    // Offset window coordinates
     SPOSITION pos = lstWndPos.GetHeadPosition();
     while (pos)
     {

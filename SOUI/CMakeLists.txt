@@ -14,7 +14,7 @@ message("---disable thunk in soui")
 add_definitions(-DENABLE_THUNK=0)
 endif()
 
-if(CMAKE_SYSTEM_NAME MATCHES "iOS|Android")
+if(CMAKE_SYSTEM_NAME MATCHES "iOS|Android|HarmonyOS")
     add_definitions(-DDISABLE_TOOLTIP)
 endif()
 

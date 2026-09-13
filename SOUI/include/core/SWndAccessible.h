@@ -4,7 +4,7 @@
 #ifdef SOUI_ENABLE_ACC
 #include <oleacc.h>
 #include <helper/SUnkImpl.h>
-#include "Swnd.h"
+#include "SWnd.h"
 #include "interface/sacchelper-i.h"
 
 SNSBEGIN
@@ -20,7 +20,7 @@ class SOUI_EXP SAccessible
     : public IAccHelper
     , public SUnkImpl<IAccessible> {
   protected:
-    SWindow *m_pWnd; // Pointer to the associated SWindow.
+    SWindow *m_pWnd; /**< Pointer to the associated SWindow. */
 
   public:
     /**
@@ -42,8 +42,39 @@ class SOUI_EXP SAccessible
      */
     BOOL accValidateNavStart(VARIANT *pvar) const;
 
+    /**
+     * @brief Resolves a child ID variant to the target SWindow.
+     * @param varChild Child object identifier. CHILDID_SELF (0) means the
+     *                 accessible object itself (m_pWnd); positive values are
+     *                 1-based child indices resolved via the proxy's GetAccChild().
+     * @return Pointer to the target SWindow, NULL if invalid or out-of-range.
+     */
+    SWindow *GetAccTarget(VARIANT varChild) const;
+
+    /**
+     * @brief Number of real (object-based) children exposed via the proxy's
+     *         GetAccChild().
+     */
+    int RealChildCount() const;
+
+    /**
+     * @brief Number of virtual (simple-element) children from the window proxy.
+     */
+    int VirtualChildCount() const;
+
+    /**
+     * @brief Total ACC child count (real + virtual).
+     */
+    long TotalChildCount() const;
+
+    /**
+     * @brief Returns the 1-based virtual-child index if varChild addresses a
+     *         virtual (simple-element) child, otherwise returns 0.
+     */
+    int VirtualChildIndex(VARIANT varChild) const;
+
   public:
-    // Implement IAccHelper
+    /** Implement IAccHelper */
     /**
      * @brief Sets the owner window for accessibility.
      * @param pOwner Pointer to the owner window.
@@ -62,7 +93,7 @@ class SOUI_EXP SAccessible
         return m_pWnd;
     }
 
-    // Implement IAccessible
+    /** Implement IAccessible */
     /**
      * @brief Retrieves the parent of the accessible object.
      * @param ppdispParent Pointer to receive the parent IDispatch.
@@ -232,7 +263,7 @@ class SOUI_EXP SAccessible
      */
     STDMETHODIMP put_accValue(VARIANT varChild, BSTR szValue);
 
-    // Implement IDispatch
+    /** Implement IDispatch */
     /**
      * @brief Retrieves the number of type information interfaces that an object provides.
      * @param pctinfo Pointer to receive the count of type information interfaces.
@@ -283,6 +314,6 @@ class SOUI_EXP SAccessible
 
 SNSEND
 
-#endif // SOUI_ENABLE_ACC
+#endif /**< SOUI_ENABLE_ACC */
 
-#endif // __SWNDACCESSIBLE__H__
+#endif /**< __SWNDACCESSIBLE__H__ */

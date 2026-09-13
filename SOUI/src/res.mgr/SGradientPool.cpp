@@ -4,8 +4,8 @@
 
 SNSBEGIN
 
-//////////////////////////////////////////////////////////////////////////
-// SGradientPool
+///////////////////////////////////////////////////////////////////////
+/** SGradientPool */
 IGradient *SGradientPool::GetGradient(const SStringW &strName)
 {
     if (!HasKey(strName))
@@ -13,7 +13,7 @@ IGradient *SGradientPool::GetGradient(const SStringW &strName)
     return GetKeyObject(strName);
 }
 
-// Load SGradientPool from xml tree
+/** Load SGradientPool from xml tree */
 BOOL SGradientPool::Init(SXmlNode xmlRoot)
 {
     if (!xmlRoot)

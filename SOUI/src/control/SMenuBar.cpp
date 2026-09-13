@@ -119,7 +119,7 @@ UINT SMenuBarItem::PopMenu()
     m_pHostMenu->m_pNowMenu = this;
     m_pHostMenu->m_iNowMenu = m_iIndex;
 
-    // 把弹出事件发送过去
+    // Send the popup event
     EventPopMenu evt_pop(m_pHostMenu);
     evt_pop.nMenuIndex = m_iIndex;
     evt_pop.pMenu = this;
@@ -132,8 +132,7 @@ UINT SMenuBarItem::PopMenu()
     CRect rcMenu = GetClientRect();
 
     if (SMenuBar::m_hMsgHook == NULL)
-        SMenuBar::m_hMsgHook = ::SetWindowsHookEx(WH_MSGFILTER, SMenuBar::MenuSwitch, NULL,
-                                                  GetCurrentThreadId()); // m_bLoop may become TRUE
+        SMenuBar::m_hMsgHook = ::SetWindowsHookEx(WH_MSGFILTER, SMenuBar::MenuSwitch, NULL, GetCurrentThreadId()); // m_bLoop may become TRUE
 
     int iRet = 0;
     if (IsUseMenuEx())
@@ -164,7 +163,7 @@ UINT SMenuBarItem::PopMenu()
     ::UnhookWindowsHookEx(SMenuBar::m_hMsgHook);
     SMenuBar::m_hMsgHook = NULL;
 
-    // 把选择事件发送过去
+    // Send the selection event
     EventSelectMenu evt_sel(m_pHostMenu);
     evt_sel.nMenuId = iRet;
     evt_sel.pMenu = this;

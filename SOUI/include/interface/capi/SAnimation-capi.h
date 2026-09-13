@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for SAnimation Interfaces
  * These macros provide C-style function call syntax for C++ interface methods
  *
@@ -16,7 +16,7 @@ extern "C" {
  *   IAnimation         (inherits IObject)
  */
 
-/* IAnimationListener C API Macros */
+/** IAnimationListener C API Macros */
 #define IAnimationListener_OnAnimationStart(This, animation) \
     ((This)->lpVtbl->OnAnimationStart(This, animation))
 
@@ -29,7 +29,7 @@ extern "C" {
 #define IAnimationListener_OnAnimationPauseChange(This, animation, bPaused) \
     ((This)->lpVtbl->OnAnimationPauseChange(This, animation, bPaused))
 
-/* IAnimation C API Macros (IObject base interface) */
+/** IAnimation C API Macros (IObject base interface) */
 #define IAnimation_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -90,7 +90,7 @@ extern "C" {
 #define IAnimation_SetAttrHandler(This, attrHandler) \
     ((This)->lpVtbl->SetAttrHandler(This, attrHandler))
 
-/* IAnimation specific interface macros */
+/** IAnimation specific interface macros */
 #define IAnimation_clone(This) \
     ((This)->lpVtbl->clone(This))
 
@@ -215,4 +215,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SANIMATION_CAPI_H__ */
+#endif /**< __SANIMATION_CAPI_H__ */

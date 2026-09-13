@@ -76,4 +76,4 @@ class SOUI_EXP SDockBar : public SWindow {
 
 SNSEND
 
-#endif // __SDOCKBAR__H__
+#endif /**< __SDOCKBAR__H__ */

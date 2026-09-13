@@ -1,7 +1,7 @@
-﻿//////////////////////////////////////////////////////////////////////////
-//  Class Name: SFontPool
-// Description: Font Pool
-//////////////////////////////////////////////////////////////////////////
+﻿///////////////////////////////////////////////////////////////////////
+/** Class Name: SFontPool */
+/** Description: Font Pool */
+///////////////////////////////////////////////////////////////////////
 #include "souistd.h"
 #include "res.mgr/SFontPool.h"
 #include "helper/SplitString.h"
@@ -10,10 +10,10 @@
 
 SNSBEGIN
 
-int CALLBACK DefFontsEnumProc(CONST LOGFONT *lplf,    // logical-font data
-                              CONST TEXTMETRIC *lptm, // physical-font data
-                              DWORD dwType,           // font type
-                              LPARAM lpData           // application-defined data
+int CALLBACK DefFontsEnumProc(CONST LOGFONT *lplf,    /**< logical-font data */
+                              CONST TEXTMETRIC *lptm, /**< physical-font data */
+                              DWORD dwType,           /**< font type */
+                              LPARAM lpData           /**< application-defined data */
 )
 {
     BOOL *pbValidFont = (BOOL *)lpData;
@@ -56,8 +56,8 @@ void SFontPool::OnKeyRemoved(const IFontPtr &obj)
     obj->Release();
 }
 
-static const WCHAR KFontPropSeprator = L','; //字体属性之间的分隔符，不再支持其它符号。
-static const WCHAR KPropSeprator = L':';     //一个属性name:value对之间的分隔符
+static const WCHAR KFontPropSeprator = L','; /**< Separator between font attributes; other symbols are no longer supported. */
+static const WCHAR KPropSeprator = L':';     /**< Separator between a name:value attribute pair */
 static const WCHAR kExPropKey[] = L"exprop";
 static const WCHAR KFontFace[] = L"face";
 static const WCHAR KFontBold[] = L"bold";
@@ -95,9 +95,9 @@ IFontPtr SFontPool::_CreateFont(const FontInfo &fontInfo)
 
     lfNew.lfCharSet = fontInfo.style.attr.byCharset;
 
-    //优先使用weigth属性.
+    // Prefer the weigth attribute.
     lfNew.lfWeight = (long)(fontInfo.style.attr.byWeight * 4);
-    if (lfNew.lfWeight == 0) //没有weight属性时检查bold属性.
+    if (lfNew.lfWeight == 0) // When there is no weight attribute, check the bold attribute.
         lfNew.lfWeight = (fontInfo.style.attr.fBold ? FW_BOLD : FW_NORMAL);
     lfNew.lfUnderline = (FALSE != fontInfo.style.attr.fUnderline);
     lfNew.lfItalic = (FALSE != fontInfo.style.attr.fItalic);
@@ -209,7 +209,7 @@ FontInfo SFontPool::FontInfoFromString(const SStringW &strFontDesc, const FontIn
         }
         else if (kv[0] == KFontWeight)
         {
-            fi.style.attr.byWeight = (_wtoi(kv[1]) + 2) / 4; //+2 for 四舍五入. /4是为了把weight scale到0-250.
+            fi.style.attr.byWeight = (_wtoi(kv[1]) + 2) / 4; // +2 for rounding. /4 scales weight to 0-250.
         }
         else if (kv[0] == KFontBold)
         {

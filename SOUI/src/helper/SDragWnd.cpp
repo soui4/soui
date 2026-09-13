@@ -66,7 +66,7 @@ BOOL SDragWnd::BeginDrag(HBITMAP hBmp, POINT ptHot, COLORREF crKey, BYTE byAlpha
         s_pCurDragWnd->m_bmp = hBmp;
         s_pCurDragWnd->Invalidate();
     }
-#else  //_WIN32
+#else  // _WIN32
 
     DWORD dwExStyle = WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW | WS_EX_TOPMOST | WS_EX_LAYERED;
     if (bm.bmBitsPixel == 32)
@@ -80,7 +80,7 @@ BOOL SDragWnd::BeginDrag(HBITMAP hBmp, POINT ptHot, COLORREF crKey, BYTE byAlpha
     s_pCurDragWnd->m_bmp = hBmp;
     s_pCurDragWnd->SetLayeredWindowAttributes(crKey, byAlpha, dwFlags);
     s_pCurDragWnd->Invalidate();
-#endif //_WIN32
+#endif // _WIN32
     s_pCurDragWnd->m_ptHot = ptHot;
     return TRUE;
 }

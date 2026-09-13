@@ -7,12 +7,12 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for SRunnable Interface
  * These macros provide C-style function call syntax for C++ interface methods
  */
 
-/* IRunnable C API Macros */
+/** IRunnable C API Macros */
 #define IRunnable_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -38,4 +38,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SRUNNABLE_CAPI_H__ */
+#endif /**< __SRUNNABLE_CAPI_H__ */

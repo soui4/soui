@@ -3,7 +3,7 @@
  * All rights reserved.
  *
  * @file       SWindowMgr.h
- * @brief      SOUI系统中的DUI窗口管理模块
+ * @brief      DUI window management module in the SOUI system
  * @version    v1.0
  * @author     SOUI group
  * @date       2014/08/02
@@ -81,9 +81,9 @@ class SOUI_EXP SWindowMgr : public SSingletonMap<SWindowMgr, SWindow *, SWND> {
     static BOOL DestroyWindow(SWND swnd);
 
   protected:
-    SCriticalSection m_lockWndMap; // Critical section for thread-safe access to the window map.
-    SWND m_hNextWnd;               // Next available window handle.
+    SCriticalSection m_lockWndMap; /**< Critical section for thread-safe access to the window map. */
+    SWND m_hNextWnd;               /**< Next available window handle. */
 };
 
 SNSEND
-#endif // __SWINDOWMGR__H__
+#endif /**< __SWINDOWMGR__H__ */

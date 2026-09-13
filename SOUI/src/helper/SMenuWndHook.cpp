@@ -1,13 +1,13 @@
-﻿/*########################################################################
+﻿/**########################################################################
     Filename:     MenuWndHook.cpp
     ----------------------------------------------------
     Remarks:    ...
     ----------------------------------------------------
-    Author:        成真
+    Author:        Cheng Zhen
     Email:        anyou@sina.com
                 anyou@msn.com
     Created:    7/4/2003 17:38
-                6/20/2012 黄建雄，修改为使用SSkin皮肤绘制非客户区边框，支持边框大小配置
+                6/20/2012 Huang Jianxiong, modified to draw the non-client-area border using SSkin skin, supporting border size configuration
   ########################################################################*/
 
 #include "souistd.h"
@@ -17,7 +17,7 @@
 
 #ifdef _WIN64
 #define GWL_WNDPROC GWLP_WNDPROC
-#endif //_WIN64
+#endif /**< _WIN64 */
 
 #ifdef _WIN32
 
@@ -25,9 +25,9 @@ SNSBEGIN
 
 const TCHAR CoolMenu_oldProc[] = _T("CoolMenu_oldProc");
 
-#define SM_CXMENUBORDER 3 //默认菜单边框大小
+#define SM_CXMENUBORDER 3 /**< Default menu border size */
 
-/*########################################################################
+/**########################################################################
               ------------------------------------------------
                                 class CMenuWndHook
               ------------------------------------------------
@@ -101,9 +101,9 @@ SMenuWndHook *SMenuWndHook::AddWndHook(HWND hwnd)
     return pWnd;
 }
 
-/*########################################################################
+/**########################################################################
               ------------------------------------------------
-                                  消息过程
+                                Message procedure
               ------------------------------------------------
   ########################################################################*/
 LRESULT CALLBACK SMenuWndHook::WindowHook(int code, WPARAM wParam, LPARAM lParam)
@@ -119,7 +119,7 @@ LRESULT CALLBACK SMenuWndHook::WindowHook(int code, WPARAM wParam, LPARAM lParam
             break;
         }
 
-        // 是否为菜单类 ----------------------------------------
+        // Whether it is a menu class ----------------------------------------
         TCHAR strClassName[10];
         int Count = ::GetClassName(hWnd, strClassName, sizeof(strClassName) / sizeof(strClassName[0]));
         if (Count != 6 || _tcscmp(strClassName, _T("#32768")) != 0)
@@ -127,7 +127,7 @@ LRESULT CALLBACK SMenuWndHook::WindowHook(int code, WPARAM wParam, LPARAM lParam
             break;
         }
 
-        // 是否已经被子类化 ------------------------------------
+        // Whether it has been subclassed ------------------------------------
         if (::GetProp(hWnd, CoolMenu_oldProc) != NULL)
         {
             break;
@@ -135,7 +135,7 @@ LRESULT CALLBACK SMenuWndHook::WindowHook(int code, WPARAM wParam, LPARAM lParam
 
         AddWndHook(pStruct->hwnd);
 
-        // 取得原来的窗口过程 ----------------------------------
+        // Get the original window procedure ----------------------------------
         WNDPROC oldWndProc = (WNDPROC)::GetWindowLongPtr(hWnd, GWLP_WNDPROC);
         if (oldWndProc == NULL)
         {
@@ -143,13 +143,13 @@ LRESULT CALLBACK SMenuWndHook::WindowHook(int code, WPARAM wParam, LPARAM lParam
         }
 
         SASSERT(oldWndProc != CoolMenuProc);
-        // 保存到窗口的属性中 ----------------------------------
+        // Save to the window's attributes ----------------------------------
         if (!SetProp(hWnd, CoolMenu_oldProc, (HANDLE)oldWndProc))
         {
             break;
         }
 
-        // 子类化 ----------------------------------------------
+        // Subclassing ----------------------------------------------
         if (!SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG_PTR)CoolMenuProc))
         {
             ::RemoveProp(hWnd, CoolMenu_oldProc);
@@ -237,9 +237,9 @@ LRESULT CALLBACK SMenuWndHook::CoolMenuProc(HWND hWnd, UINT uMsg, WPARAM wParam,
     return CallWindowProc(oldWndProc, hWnd, uMsg, wParam, lParam);
 }
 
-/*########################################################################
+/**########################################################################
               ------------------------------------------------
-                                消息处理函数
+                              Message handling function
               ------------------------------------------------
   ########################################################################*/
 int SMenuWndHook::OnCreate(LPCREATESTRUCT lpCreateStruct)
@@ -325,19 +325,17 @@ void SMenuWndHook::OnNcDestroy()
     delete this;
 }
 
-//不能设计窗口半透明，设置区域后，非客户区位置发生改变，不明白原因。
+/** Cannot make the window semi-transparent; after setting the region, the non-client area position changes, and the reason is unclear. */
 void SMenuWndHook::OnWindowPosChanged()
 {
-    /*
-        CRect rcWnd;
-        GetWindowRect(m_hWnd,&rcWnd);
-        rcWnd.MoveToXY(0,0);
-        HRGN hRgn = ::CreateEllipticRgnIndirect(&rcWnd);
-        SetWindowRgn(m_hWnd,hRgn,TRUE);
-        DeleteObject(hRgn);
-        */
+    // CRect rcWnd;
+    // GetWindowRect(m_hWnd,&rcWnd);
+    // rcWnd.MoveToXY(0,0);
+    // HRGN hRgn = ::CreateEllipticRgnIndirect(&rcWnd);
+    // SetWindowRgn(m_hWnd,hRgn,TRUE);
+    // DeleteObject(hRgn);
 }
 
 SNSEND
 
-#endif //_WIN32
+#endif /**< _WIN32 */

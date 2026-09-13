@@ -7,12 +7,12 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for ITimer Interface
  * These macros provide C-style function call syntax for C++ interface methods
  */
 
-/* ITimer C API Macros (IObjRef base interface methods) */
+/** ITimer C API Macros (IObjRef base interface methods) */
 #define ITimer_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -22,7 +22,7 @@ extern "C" {
 #define ITimer_OnFinalRelease(This) \
     ((This)->lpVtbl->OnFinalRelease(This))
 
-/* ITimer C API Macros (ITimer specific methods) */
+/** ITimer C API Macros (ITimer specific methods) */
 #define ITimer_StartTimer(This, nElapse, bRepeat, uData) \
     ((This)->lpVtbl->StartTimer(This, nElapse, bRepeat, uData))
 
@@ -33,4 +33,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __STIMER_CAPI_H__ */
+#endif /**< __STIMER_CAPI_H__ */

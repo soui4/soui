@@ -1,4 +1,4 @@
-﻿/*
+﻿/**
 ** Copyright 2008-2009, Ernest Laurentin (http://www.ernzo.com/)
 **
 ** Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -19,9 +19,7 @@
 #ifndef ATLAXUTIL_HPP
 #define ATLAXUTIL_HPP
 
-/**
- * NoRefIUnknownImpl class
- */
+/** NoRefIUnknownImpl class */
 template <class Base> class NoRefIUnknownImpl : public Base
 {
     public:
@@ -29,14 +27,12 @@ template <class Base> class NoRefIUnknownImpl : public Base
       Base::FinalRelease();
     }
 
-    // IUnknown
+    /** IUnknown */
     virtual ULONG STDMETHODCALLTYPE AddRef() { return 1; }
     virtual ULONG STDMETHODCALLTYPE Release() { return 0; }
 };
 
-/**
- * MinimumIDispatchImpl
- */
+/** MinimumIDispatchImpl */
 class MinimumIDispatchImpl : public IDispatch {
     public:
     STDMETHOD(GetTypeInfoCount)(UINT *pctinfo)
@@ -44,22 +40,22 @@ class MinimumIDispatchImpl : public IDispatch {
         *pctinfo = 0;
         return S_OK;
     }
-    STDMETHOD(GetTypeInfo)(UINT /*iTInfo*/, LCID /*lcid*/, ITypeInfo** /*ppTInfo*/)
+    STDMETHOD(GetTypeInfo)(UINT /**< iTInfo */, LCID /**< lcid */, ITypeInfo** /**< ppTInfo */)
     {
         return E_NOTIMPL;
     }
-    STDMETHOD(GetIDsOfNames)(REFIID /*riid*/, LPOLESTR* /*rgszNames*/,
-                             UINT /*cNames*/, LCID /*lcid*/, DISPID* /*rgDispId*/)
+    STDMETHOD(GetIDsOfNames)(REFIID /**< riid */, LPOLESTR* /**< rgszNames */,
+                             UINT /**< cNames */, LCID /**< lcid */, DISPID* /**< rgDispId */)
     {
         return E_NOTIMPL;
     }
-    STDMETHOD(Invoke)(DISPID /*dispIdMember*/, REFIID /*riid*/, LCID /*lcid*/, WORD /*wFlags*/,
-                      DISPPARAMS* /*pDispParams*/, VARIANT* /*pVarResult*/, EXCEPINFO* /*pExcepInfo*/,
-                      UINT* /*puArgErr*/)
+    STDMETHOD(Invoke)(DISPID /**< dispIdMember */, REFIID /**< riid */, LCID /**< lcid */, WORD /**< wFlags */,
+                      DISPPARAMS* /**< pDispParams */, VARIANT* /**< pVarResult */, EXCEPINFO* /**< pExcepInfo */,
+                      UINT* /**< puArgErr */)
     {
         // check 'OleCtl.h' for list of DISPID_*
         return E_NOTIMPL;
     }
 };
 
-#endif //ATLAXUTIL_HPP
+#endif /**< ATLAXUTIL_HPP */

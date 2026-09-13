@@ -7,12 +7,12 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for IWindow Interface
  * These macros provide C-style function call syntax for C++ interface methods
  */
 
-/* IObject base interface macros */
+/** IObject base interface macros */
 #define IWindow_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -73,7 +73,7 @@ extern "C" {
 #define IWindow_SetAttrHandler(This, attrHandler) \
     ((This)->lpVtbl->SetAttrHandler(This, attrHandler))
 
-/* IWindow specific interface macros */
+/** IWindow specific interface macros */
 #define IWindow_QueryInterface(This, id, ppRet) \
     ((This)->lpVtbl->QueryInterface(This, id, ppRet))
 
@@ -447,4 +447,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SWINDOW_CAPI_H__ */
+#endif /**< __SWINDOW_CAPI_H__ */

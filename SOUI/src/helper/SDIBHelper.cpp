@@ -11,10 +11,10 @@ struct DIBINFO
     UINT nHei;
 };
 
-// ------------------------------------------------------------
-// 有太多的算法需要用某种方式(map)变换位图的每个像素的颜色，比如
-// 彩色转换为灰度图，gamma校正，颜色空间转换,hsl调整.所以写一个模板做为参数调用的通用算法
-// ------------------------------------------------------------
+//------------------------------------------------------------
+/** There are too many algorithms that need to transform the color of each pixel of a bitmap in some way (map), such as */
+/** color-to-grayscale conversion, gamma correction, color space conversion, hsl adjustment. So write a template as a general algorithm called with parameters */
+//------------------------------------------------------------
 template <class Mode, class Param>
 bool ColorTransform(DIBINFO *pDib, Mode mode, const Param &param)
 {
@@ -44,20 +44,20 @@ bool ColorTransform(DIBINFO *pDib, Mode mode, const Param &param)
     return true;
 }
 
-// 灰度 = 0.299 * red + 0.587 * green + 0.114 * blue
+/** Gray = 0.299 * red + 0.587 * green + 0.114 * blue */
 static void GrayMode(BYTE *pColor, const int &)
 {
     pColor[0] = pColor[1] = pColor[2] = RGB2GRAY(pColor[0], pColor[1], pColor[2]);
 }
 
-static void DisabledStyleMode(BYTE *pColor, const COLORREF & /*ref*/)
+static void DisabledStyleMode(BYTE *pColor, const COLORREF & /**< ref */)
 {
     BYTE blue = pColor[0], green = pColor[1], red = pColor[2], alpha = pColor[3];
 
     if (alpha == 0)
-        return; // 完全透明，不处理
+        return; // Fully transparent; do not process
 
-    // 若像素为预乘 alpha，先解预乘（整数运算）
+    // If the pixel is premultiplied alpha, un-premultiply it first (integer arithmetic)
     if (alpha != 255)
     {
         red = (red * 255) / alpha;
@@ -67,22 +67,22 @@ static void DisabledStyleMode(BYTE *pColor, const COLORREF & /*ref*/)
 
     int gray = RGB2GRAY(red, green, blue); // 0..255
 
-    // 固定目标禁用颜色（用户要求的值）
+    // Fixed target disabled color (value requested by user)
     const int disabledR = 160;
     const int disabledG = 166;
     const int disabledB = 187;
 
-    // 浅色（高亮部分）
+    // Light color (highlight part)
     const int light = 230;
 
-    // 使用整数线性插值： out = disabled*(255 - gray)/255 + light*gray/255
-    // 为了四舍五入加上 127 (半除数)
+    // Use integer linear interpolation: out = disabled*(255 - gray)/255 + light*gray/255
+    // Add 127 (half of divisor) for rounding
     int inv = 255 - gray;
     int outR = (disabledR * inv + light * gray + 127) / 255;
     int outG = (disabledG * inv + light * gray + 127) / 255;
     int outB = (disabledB * inv + light * gray + 127) / 255;
 
-    // 重新应用预乘 alpha（若原先为预乘）
+    // Re-apply premultiplied alpha (if originally premultiplied)
     if (alpha != 255)
     {
         outR = (outR * alpha) / 255;
@@ -93,15 +93,15 @@ static void DisabledStyleMode(BYTE *pColor, const COLORREF & /*ref*/)
     pColor[0] = (BYTE)outB;
     pColor[1] = (BYTE)outG;
     pColor[2] = (BYTE)outR;
-    // 保留原 alpha：pColor[3] 不变
+    // Keep original alpha: pColor[3] unchanged
 }
 
 struct COLORIZEPARAM
 {
     BYTE hue;
     BYTE sat;
-    int a0; //[0-256]
-    int a1; //[0-256]
+    int a0; /**< [0-256] */
+    int a1; /**< [0-256] */
 };
 
 static void FillColorizeParam(COLORIZEPARAM &param, BYTE hue, BYTE sat, float fBlend)
@@ -113,43 +113,43 @@ static void FillColorizeParam(COLORIZEPARAM &param, BYTE hue, BYTE sat, float fB
     param.a1 = 256 - param.a0;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-#define HSLMAX 255 /* H,L, and S vary over 0-HSLMAX */
-#define RGBMAX 255 /* R,G, and B vary over 0-RGBMAX */
-/* HSLMAX BEST IF DIVISIBLE BY 6 */
-/* RGBMAX, HSLMAX must each fit in a BYTE. */
-/* Hue is undefined if Saturation is 0 (grey-scale) */
-/* This value determines where the Hue scrollbar is */
-/* initially set for achromatic colors */
+/////////////////////////////////////////////////////////////////////////////
+#define HSLMAX 255 /**< H,L, and S vary over 0-HSLMAX */
+#define RGBMAX 255 /**< R,G, and B vary over 0-RGBMAX */
+/** HSLMAX BEST IF DIVISIBLE BY 6 */
+/** RGBMAX, HSLMAX must each fit in a BYTE. */
+/** Hue is undefined if Saturation is 0 (grey-scale) */
+/** This value determines where the Hue scrollbar is */
+/** initially set for achromatic colors */
 #define HSLUNDEFINED (HSLMAX * 2 / 3)
-////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 static RGBQUAD RGBtoHSL(RGBQUAD lRGBColor)
 {
-    BYTE R, G, B;                /* input RGB values */
-    BYTE H, L, S;                /* output HSL values */
-    BYTE cMax, cMin;             /* max and min RGB values */
-    WORD Rdelta, Gdelta, Bdelta; /* intermediate value: % of spread from max*/
+    BYTE R, G, B;                // input RGB values
+    BYTE H, L, S;                // output HSL values
+    BYTE cMax, cMin;             // max and min RGB values
+    WORD Rdelta, Gdelta, Bdelta; // intermediate value: % of spread from max
 
-    R = lRGBColor.rgbRed; /* get R, G, and B out of DWORD */
+    R = lRGBColor.rgbRed; // get R, G, and B out of DWORD
     G = lRGBColor.rgbGreen;
     B = lRGBColor.rgbBlue;
 
-    cMax = smax(smax(R, G), B); /* calculate lightness */
+    cMax = smax(smax(R, G), B); // calculate lightness
     cMin = smin(smin(R, G), B);
     L = (BYTE)((((cMax + cMin) * HSLMAX) + RGBMAX) / (2 * RGBMAX));
 
     if (cMax == cMin)
-    {                     /* r=g=b --> achromatic case */
-        S = 0;            /* saturation */
-        H = HSLUNDEFINED; /* hue */
+    {                     // r=g=b --> achromatic case
+        S = 0;            // saturation
+        H = HSLUNDEFINED; // hue
     }
     else
-    {                          /* chromatic case */
-        if (L <= (HSLMAX / 2)) /* saturation */
+    {                          // chromatic case
+        if (L <= (HSLMAX / 2)) // saturation
             S = (BYTE)((((cMax - cMin) * HSLMAX) + ((cMax + cMin) / 2)) / (cMax + cMin));
         else
             S = (BYTE)((((cMax - cMin) * HSLMAX) + ((2 * RGBMAX - cMax - cMin) / 2)) / (2 * RGBMAX - cMax - cMin));
-        /* hue */
+        // hue
         Rdelta = (WORD)((((cMax - R) * (HSLMAX / 6)) + ((cMax - cMin) / 2)) / (cMax - cMin));
         Gdelta = (WORD)((((cMax - G) * (HSLMAX / 6)) + ((cMax - cMin) / 2)) / (cMax - cMin));
         Bdelta = (WORD)((((cMax - B) * (HSLMAX / 6)) + ((cMax - cMin) / 2)) / (cMax - cMin));
@@ -158,10 +158,10 @@ static RGBQUAD RGBtoHSL(RGBQUAD lRGBColor)
             H = (BYTE)(Bdelta - Gdelta);
         else if (G == cMax)
             H = (BYTE)((HSLMAX / 3) + Rdelta - Bdelta);
-        else /* B == cMax */
+        else // B == cMax
             H = (BYTE)(((2 * HSLMAX) / 3) + Gdelta - Rdelta);
 
-        //		if (H < 0) H += HSLMAX;     //always false
+        // if (H < 0) H += HSLMAX;     //always false
         if (H > HSLMAX)
             H -= HSLMAX;
     }
@@ -169,26 +169,26 @@ static RGBQUAD RGBtoHSL(RGBQUAD lRGBColor)
     return hsl;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 static RGBQUAD RGBtoRGBQUAD(COLORREF cr)
 {
     RGBQUAD c;
-    c.rgbRed = GetRValue(cr); /* get R, G, and B out of DWORD */
+    c.rgbRed = GetRValue(cr); // get R, G, and B out of DWORD
     c.rgbGreen = GetGValue(cr);
     c.rgbBlue = GetBValue(cr);
     c.rgbReserved = GetAValue(cr);
     return c;
 }
-////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 static COLORREF RGBQUADtoRGB(RGBQUAD c)
 {
     return RGBA(c.rgbRed, c.rgbGreen, c.rgbBlue, c.rgbReserved);
 }
 
-////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 static float HueToRGB(float n1, float n2, float hue)
 {
-    //<F. Livraghi> fixed implementation for HSL2RGB routine
+    // <F. Livraghi> fixed implementation for HSL2RGB routine
     float rValue;
 
     if (hue > 360)
@@ -207,11 +207,11 @@ static float HueToRGB(float n1, float n2, float hue)
 
     return rValue;
 }
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 static RGBQUAD HSLtoRGB(RGBQUAD lHSLColor)
 {
-    //<F. Livraghi> fixed implementation for HSL2RGB routine
+    // <F. Livraghi> fixed implementation for HSL2RGB routine
     float h, s, l;
     float m1, m2;
     BYTE r, g, b;
@@ -396,7 +396,7 @@ static int RgbCmp(const void *p1, const void *p2)
     return deltaR + deltaG + deltaB;
 }
 
-COLORREF SDIBHelper::CalcAvarageColor(IBitmapS *pBmp, int nPercent, int nBlockSize /*=5*/)
+COLORREF SDIBHelper::CalcAvarageColor(IBitmapS *pBmp, int nPercent, int nBlockSize /**< =5 */)
 {
     if (!pBmp || pBmp->Width() == 0 || pBmp->Height() == 0 || nBlockSize <= 0)
         return CR_INVALID;
@@ -422,10 +422,10 @@ COLORREF SDIBHelper::CalcAvarageColor(IBitmapS *pBmp, int nPercent, int nBlockSi
         rcBlock.MoveToX(0);
         rcBlock.OffsetRect(0, nBlockSize);
     }
-    // RGB排序
+    // RGB order
     qsort(pAvgColors, nBlocks, sizeof(COLORREF), RgbCmp);
 
-    int nThrows = nBlocks * (100 - nPercent) / 200; // 一端丢弃数量
+    int nThrows = nBlocks * (100 - nPercent) / 200; // Number discarded at one end
     int iBegin = nThrows;
     int iEnd = nBlocks - nThrows;
 

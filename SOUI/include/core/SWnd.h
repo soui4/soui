@@ -3,7 +3,7 @@
  * All rights reserved.
  *
  * @file       Swnd.h
- * @brief      SOUI基础DUI窗口模块
+ * @brief      SOUI base DUI window module
  * @version    v1.0
  * @author     SOUI group
  * @date       2014/08/02
@@ -31,12 +31,12 @@
 #include <animation/SAnimation.h>
 #include <interface/SWindow-i.h>
 
-#define SC_WANTARROWS  0x0001     /* Control wants arrow keys         */
-#define SC_WANTTAB     0x0002     /* Control wants tab keys           */
-#define SC_WANTRETURN  0x0004     /* Control wants return keys        */
-#define SC_WANTCHARS   0x0008     /* Want WM_CHAR messages            */
-#define SC_WANTALLKEYS 0xFFFF     /* Control wants all keys           */
-#define SC_WANTSYSKEY  0x80000000 /* System Key */
+#define SC_WANTARROWS  0x0001     /**< Control wants arrow keys */
+#define SC_WANTTAB     0x0002     /**< Control wants tab keys */
+#define SC_WANTRETURN  0x0004     /**< Control wants return keys */
+#define SC_WANTCHARS   0x0008     /**< Want WM_CHAR messages */
+#define SC_WANTALLKEYS 0xFFFF     /**< Control wants all keys */
+#define SC_WANTSYSKEY  0x80000000 /**< System Key */
 
 #ifdef _DEBUG
 #define ASSERT_UI_THREAD() SNS::SWindow::TestMainThread()
@@ -46,49 +46,49 @@
 
 SNSBEGIN
 
-// String constants for SWindow template support
+/** String constants for SWindow template support */
 namespace SWindow_style
 {
-static LPCWSTR kLabel_Include = L"include";   // 文件包含标签
-static LPCWSTR kTemp_Namespace = L"t:";       // 模板识别命名空间
-static LPCWSTR kTemp_Data = L"data";          // 模板参数
-static LPCWSTR kTemp_ParamFormat = L"{{%s}}"; // 模板数据替换格式
+static LPCWSTR kLabel_Include = L"include";   /**< File include tag */
+static LPCWSTR kTemp_Namespace = L"t:";       /**< Template identification namespace */
+static LPCWSTR kTemp_Data = L"data";          /**< Template parameter */
+static LPCWSTR kTemp_ParamFormat = L"{{%s}}"; /**< Template data replacement format */
 } // namespace SWindow_style
 
 /**
- * @brief 布局属性名称常量 - 参考Android属性动画设计
+ * @brief Layout attribute name constants - referenced Android property animation design
  */
 namespace LayoutProperty
 {
-// 通用属性
+/** Common attributes */
 static const LPCWSTR WIDTH = L"width";
 static const LPCWSTR HEIGHT = L"height";
 
-// 位置属性（souilayout and anchorlayout）
+/** Position attributes (souilayout and anchorlayout) */
 static const LPCWSTR OFFSET_X = L"offsetX";
 static const LPCWSTR OFFSET_Y = L"offsetY";
 
-// 线性布局属性
+/** Linear layout attributes */
 static const LPCWSTR WEIGHT = L"weight";
 static const LPCWSTR EXTEND_LEFT = L"extendLeft";
 static const LPCWSTR EXTEND_RIGHT = L"extendRight";
 static const LPCWSTR EXTEND_TOP = L"extendTop";
 static const LPCWSTR EXTEND_BOTTOM = L"extendBottom";
 
-// 网格布局属性
+/** Grid layout attributes */
 static const LPCWSTR COL_WEIGHT = L"colWeight";
 static const LPCWSTR ROW_WEIGHT = L"rowWeight";
 
-// Soui布局属性
+/** Soui layout attributes */
 static const LPCWSTR LEFT = L"left";
 static const LPCWSTR TOP = L"top";
 static const LPCWSTR RIGHT = L"right";
 static const LPCWSTR BOTTOM = L"bottom";
 
-// AnchorLayout属性
-static const LPCWSTR POSITION = L"pos";    // 窗口位置
-static const LPCWSTR POSITION_X = L"posX"; // X坐标（相对于锚点）
-static const LPCWSTR POSITION_Y = L"posY"; // Y坐标（相对于锚点）
+/** AnchorLayout attributes */
+static const LPCWSTR POSITION = L"pos";    /**< Window position */
+static const LPCWSTR POSITION_X = L"posX"; /**< X coordinate (relative to the anchor) */
+static const LPCWSTR POSITION_Y = L"posY"; /**< Y coordinate (relative to the anchor) */
 } // namespace LayoutProperty
 
 namespace WindowProperty
@@ -348,7 +348,7 @@ class SAnimationHandler;
  * event handling, and rendering.
  */
 class SOUI_EXP SWindow
-    : public TObjRefImpl<SObjectImpl<IWindow> >
+    : public TObjRefImpl<SObjectImpl<IWindow>>
     , protected IAnimationListener {
     DEF_SOBJECT(SObjectImpl<IWindow>, L"window")
 
@@ -358,6 +358,7 @@ class SOUI_EXP SWindow
     friend class SAnimatorHandler;
     friend class SAnimationHandler;
     friend class SRootWindow;
+
   public:
     /**
      * @brief Constructor.
@@ -396,7 +397,6 @@ class SOUI_EXP SWindow
      */
     STDMETHOD_(void, OnFinalRelease)(THIS);
 
-
     /**
      * @brief Retrieves the window handle.
      * @return Window handle.
@@ -415,8 +415,8 @@ class SOUI_EXP SWindow
     /**
      * @brief Sets the layout object for the window.
      * @param pLayout Pointer to the layout object.
-	 */
-	STDMETHOD_(void, SetLayout)(THIS_ ILayout* pLayout) OVERRIDE;
+     */
+    STDMETHOD_(void, SetLayout)(THIS_ ILayout *pLayout) OVERRIDE;
 
     /**
      * @brief Retrieves the layout parameter object associated with the window.
@@ -740,9 +740,9 @@ class SOUI_EXP SWindow
     /**
      * @brief Starts an animation for the window.
      * @param animation Pointer to the animation object.
-	 * @param bStartNow Flag to start the animation immediately.
+     * @param bStartNow Flag to start the animation immediately.
      */
-    STDMETHOD_(void, StartAnimation)(THIS_ IAnimation *animation,BOOL bStartNow DEF_VAL(FALSE)) OVERRIDE;
+    STDMETHOD_(void, StartAnimation)(THIS_ IAnimation *animation, BOOL bStartNow DEF_VAL(FALSE)) OVERRIDE;
 
     /**
      * @brief Clears the animation for the window.
@@ -1107,7 +1107,7 @@ class SOUI_EXP SWindow
         StdFunctionSlot slot(callback);
         return SWindow::SubscribeEvent(evtId, &slot);
     }
-#endif // ENABLE_STDFUNCTOR
+#endif /**< ENABLE_STDFUNCTOR */
 
     /**
      * @brief Unsubscribes from an event.
@@ -1181,7 +1181,7 @@ class SOUI_EXP SWindow
      */
     STDMETHOD_(BOOL, UnregisterDragDrop)(THIS) OVERRIDE;
 
-  public: // caret相关方法
+  public: /**< Caret-related methods */
     /**
      * @brief Creates a caret.
      * @param pBmp Bitmap for the caret.
@@ -1211,30 +1211,30 @@ class SOUI_EXP SWindow
     STDMETHOD_(void, SetLayer)(THIS_ int nLayer) OVERRIDE;
 
     /**
-     * @brief 获取窗口所在图层
-     * @return int--窗口所在图层
+     * @brief Get the layer where the window is located
+     * @return int--the layer where the window is located
      */
     STDMETHOD_(int, GetLayer)(CTHIS) SCONST OVERRIDE;
 
     /**
-     * @brief 更新属性动画器状态
-     * @param pHolder IPropertyValuesHolder*--属性值持有者
-     * @param fraction float--动画进度（0.0-1.0）
-     * @param state ANI_STATE--动画状态（ANI_START/ANI_PROGRESS/ANI_END）
+     * @brief Update the property animator state
+     * @param pHolder IPropertyValuesHolder*--property value holder
+     * @param fraction float--animation progress (0.0-1.0)
+     * @param state ANI_STATE--animation state (ANI_START/ANI_PROGRESS/ANI_END)
      */
     STDMETHOD_(BOOL, SetAnimatorValue)(THIS_ IPropertyValuesHolder *pHolder, float fraction, ANI_STATE state) OVERRIDE;
 
     /**
-     * @brief 设置窗口属性动画矩阵中心
-     * @param x float--中心X坐标, 0.5f表示窗口中心
-     * @param y float--中心Y坐标, 0.5f表示窗口中心
+     * @brief Set the window property animation matrix center
+     * @param x float--center X coordinate, 0.5f means window center
+     * @param y float--center Y coordinate, 0.5f means window center
      */
     STDMETHOD_(void, SetPivot)(THIS_ float x, float y) OVERRIDE;
 
     /**
-     * @brief 获取窗口属性动画矩阵中心
-     * @param x float*--中心X坐标, 0.5f表示窗口中心
-     * @param y float*--中心Y坐标, 0.5f表示窗口中心
+     * @brief Get the window property animation matrix center
+     * @param x float*--center X coordinate, 0.5f means window center
+     * @param y float*--center Y coordinate, 0.5f means window center
      */
     STDMETHOD_(void, GetPivot)(CTHIS_ float *x, float *y) SCONST OVERRIDE
     {
@@ -1243,7 +1243,9 @@ class SOUI_EXP SWindow
     }
 
   public:
-#ifdef _WIN32
+    /** Controlled by SOUI_ENABLE_ACC rather than _WIN32: swinx already provides the MSAA surface, and on Linux
+     * the accessibility object tree is also available after enabling SOUI_ENABLE_ACC. */
+#ifdef SOUI_ENABLE_ACC
     /**
      * @brief Retrieves the accessible object for the window.
      * @return Pointer to the accessible object.
@@ -1428,14 +1430,15 @@ class SOUI_EXP SWindow
     virtual CRect GetClientRect() const;
 
     /**
-     * @brief 取消控件的鼠标Captrue
-     * @param reason 取消原因(CANCEL_REASON_xxx)
-     * @return TRUE表示已取消，FALSE表示不需要取消(如sliderbar正在拖拽)
-     * @details 当父容器开始滚动时，会调用此方法通知子控件释放模态状态。
-     *          子类可重写此方法决定是否取消。
+     * @brief Cancel the control's mouse capture
+     * @param reason Cancel reason (CANCEL_REASON_xxx)
+     * @return TRUE means cancelled, FALSE means no need to cancel (e.g. sliderbar is being dragged)
+     * @details When the parent container starts scrolling, this method is called to notify child controls to release the modal state.
+     *          Subclasses may override this method to decide whether to cancel.
      */
     virtual BOOL CancelCaptureMode(int reason);
-  public: // Window tree structure-related methods
+
+  public: /**< Window tree structure-related methods */
     /**
      * @brief Finds a child window by its ID.
      * @param nID ID of the child window to find.
@@ -1588,7 +1591,7 @@ class SOUI_EXP SWindow
         return NULL;
     }
 
-    // Protected methods for internal use
+    /** Protected methods for internal use */
   protected:
     /**
      * @brief Retrieves the script module interface.
@@ -1623,7 +1626,7 @@ class SOUI_EXP SWindow
      */
     void CreateChilds(SXmlNode xmlNode);
 
-    // Animation related callback functions
+    /** Animation related callback functions */
   protected:
     /**
      * @brief Called when an animation starts.
@@ -1650,7 +1653,7 @@ class SOUI_EXP SWindow
      */
     STDMETHOD_(void, OnAnimationPauseChange)(THIS_ IAnimation *animation, BOOL bPaused);
 
-    // Virtual functions for override
+    /** Virtual functions for override */
   protected:
     /**
      * @brief Called when an animation requires a redraw.
@@ -1702,7 +1705,7 @@ class SOUI_EXP SWindow
      * @return UINT The updated z-order.
      */
     virtual UINT OnBuildTreeZorder(UINT uOrder);
-    // Public virtual functions
+    /** Public virtual functions */
   public:
     /**
      * @brief Handles window position changes during layout updates.
@@ -1711,7 +1714,7 @@ class SOUI_EXP SWindow
      */
     virtual BOOL OnRelayout(const CRect &rcWnd);
 
-	virtual void OnLayoutFloatChild(SWindow* pChild, const CRect& rcWnd);
+    virtual void OnLayoutFloatChild(SWindow *pChild, const CRect &rcWnd);
 
     /**
      * @brief Measures the size of the content within the window.
@@ -1784,7 +1787,7 @@ class SOUI_EXP SWindow
      * @param strSrc Source string
      * @return SStringW Translated string
      */
-    virtual SStringW tr(const SStringW &strSrc) const; // Translation function
+    virtual SStringW tr(const SStringW &strSrc) const; /**< Translation function */
 
     /**
      * SwndFromPoint
@@ -1793,7 +1796,7 @@ class SOUI_EXP SWindow
      * @param bIncludeMsgTransparent Include message transparency
      * @return SWND Window handle
      */
-    virtual SWND SwndFromPoint(CPoint &pt, BOOL bIncludeMsgTransparent = false) const; // Get window from point
+    virtual SWND SwndFromPoint(CPoint &pt, BOOL bIncludeMsgTransparent = false) const; /**< Get window from point */
 
     /**
      * OnNcHitTest
@@ -1801,7 +1804,7 @@ class SOUI_EXP SWindow
      * @param pt Point coordinates
      * @return BOOL TRUE if the point is within the non-client area; otherwise, FALSE
      */
-    virtual UINT OnNcHitTest(const CPoint &pt); // Non-client area hit test
+    virtual UINT OnNcHitTest(const CPoint &pt); /**< Non-client area hit test */
 
     /**
      * OnUpdateFloatPosition
@@ -1851,7 +1854,7 @@ class SOUI_EXP SWindow
      */
     virtual LPCWSTR GetTrCtx() const;
 
-    // Public methods related to rendering
+    /** Public methods related to rendering */
   public:
     /**
      * RedrawRegion
@@ -1937,7 +1940,7 @@ class SOUI_EXP SWindow
      * @return   void
      *
      * Describe  Typically used in conjunction with IDropDownHost.
-     */ 
+     */
     virtual void BuildPainter(SPainter &painter) const;
 
     /**
@@ -1973,7 +1976,7 @@ class SOUI_EXP SWindow
         return FireEvent(&evt);
     }
 
-    // Protected methods related to caching
+    /** Protected methods related to caching */
   protected:
     /**
      * IsCacheDirty
@@ -2048,7 +2051,7 @@ class SOUI_EXP SWindow
      * Describe  Called when child window focus changes.
      */
     virtual void OnDecendantFocusChanged(SWND swnd, BOOL bSet);
-    // Protected helper functions
+    /** Protected helper functions */
   protected:
     /**
      * _FindChildByID
@@ -2112,7 +2115,7 @@ class SOUI_EXP SWindow
      */
     bool _WndRectInRgn(const CRect &rc, const IRegionS *rgn) const;
 
-    // Protected helper functions
+    /** Protected helper functions */
   protected:
     void _RemoveChild(SWindow *pChild);
     void _InsertChild(SWindow *pChild, SWindow *pInsertAfter);
@@ -2174,7 +2177,7 @@ class SOUI_EXP SWindow
      * @param nScale The scale factor.
      */
     void GetScaleSkin(SAutoRefPtr<ISkinObj> &pSkin, int nScale);
-    // Protected methods for handling messages
+    /** Protected methods for handling messages */
   protected:
     /**
      * OnCreate
@@ -2442,7 +2445,7 @@ class SOUI_EXP SWindow
     void OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
     void OnSysKeyUp(UINT nChar, UINT nFlagsCnt, UINT nFlags);
 
-    // Message map for associating messages with handlers
+    /** Message map for associating messages with handlers */
     SOUI_MSG_MAP_BEGIN()
         MSG_WM_PAINT_EX(OnPaint)
         MSG_WM_ERASEBKGND_EX(OnEraseBkgnd)
@@ -2473,9 +2476,9 @@ class SOUI_EXP SWindow
         MESSAGE_HANDLER_EX(UM_SETSCALE, OnSetScale)
         MESSAGE_HANDLER_EX(UM_SETCOLORIZE, OnSetColorize)
         MESSAGE_HANDLER_EX(UM_UPDATEFONT, OnUpdateFont)
-    SOUI_MSG_MAP_END_BASE() // Messages are not passed to the base class.
+    SOUI_MSG_MAP_END_BASE() /**< Messages are not passed to the base class. */
 
-    // Protected attribute handling functions
+    /** Protected attribute handling functions */
   protected:
     /**
      * OnAttrVisible
@@ -2712,7 +2715,7 @@ class SOUI_EXP SWindow
         ATTR_CHAIN_PTR(m_pLayout, HRET_FLAG_LAYOUT)
         ATTR_CHAIN_PTR(m_pLayoutParam, HRET_FLAG_LAYOUT_PARAM)
     SOUI_ATTRS_END()
-    // Protected virtual methods for handling specific events and operations in SWindow class.
+    /** Protected virtual methods for handling specific events and operations in SWindow class. */
   protected:
     /**
      * @brief Called when the language of the window changes.
@@ -2762,7 +2765,7 @@ class SOUI_EXP SWindow
      */
     virtual void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer);
 
-    // Private member variable representing the window's position in its container.
+    /** Private member variable representing the window's position in its container. */
   private:
     CRect m_rcWindow; /**<
                          The position of the window within its container. Adjusted to private to prevent direct access by derived classes.
@@ -2774,9 +2777,9 @@ class SOUI_EXP SWindow
      */
     enum LayoutDirtyType
     {
-        dirty_clean = 0, // Clean state (no layout issues).
-        dirty_self = 1,  // Self-dirty state (this window needs re-layout).
-        dirty_child = 2, // Child-dirty state (a child window needs re-layout).
+        dirty_clean = 0, /**< Clean state (no layout issues). */
+        dirty_self = 1,  /**< Self-dirty state (this window needs re-layout). */
+        dirty_child = 2, /**< Child-dirty state (a child window needs re-layout). */
     };
 
     /**
@@ -2810,7 +2813,7 @@ class SOUI_EXP SWindow
     BOOL m_bEnableLayer;      /**< Indicates if the layer is enabled. */
     int m_nUpdateLockCnt;     /**< Update lock count. Prevents Invalidate messages to the host when locked. */
 
-    DWORD m_dwState;         /**< State of the window during rendering. */
+    DWORD m_dwState;        /**< State of the window during rendering. */
     BOOL m_bVisible;        /**< Visibility state of the window. */
     BOOL m_bDisable;        /**< Disabled state of the window. */
     BOOL m_bDisplay;        /**< Indicates if the window occupies space when hidden. */
@@ -2860,10 +2863,10 @@ class SOUI_EXP SWindow
     SAutoRefPtr<ICaret> m_caret;             /**< Caret object. */
 
     FunSwndProc m_funSwndProc; /**< Custom window procedure. */
-#ifdef _WIN32
+#ifdef SOUI_ENABLE_ACC
     SAutoRefPtr<IAccessible> m_pAcc;    /**< Accessibility object. */
     SAutoRefPtr<IAccProxy> m_pAccProxy; /**< Accessibility proxy object. */
-#endif                                  //_WIN32
+#endif                                  /**< SOUI_ENABLE_ACC */
 #ifdef _DEBUG
     tid_t m_nMainThreadId; /**< ID of the main thread hosting the window. */
 #endif
@@ -2899,4 +2902,4 @@ class SOUI_EXP SAutoEnableHostPrivUiDef {
 };
 
 SNSEND
-#endif // __SWND__H__
+#endif /**< __SWND__H__ */

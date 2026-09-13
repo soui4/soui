@@ -139,4 +139,4 @@ The latest souieditor is integrated in the demos folder. Build the demo to get s
 See [contributors.md](./contributors.md)
 
 ## License
-See [`license.txt`](./license.txt)
+See [`LICENSE-en.md`](./LICENSE-en.md)

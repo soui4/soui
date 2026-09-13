@@ -7,12 +7,12 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for Adapter Interfaces
  * These macros provide C-style function call syntax for C++ interface methods
  */
 
-/* ILvDataSetObserver C API Macros */
+/** ILvDataSetObserver C API Macros */
 #define ILvDataSetObserver_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -31,7 +31,7 @@ extern "C" {
 #define ILvDataSetObserver_OnItemChanged(This, iItem) \
     ((This)->lpVtbl->OnItemChanged(This, iItem))
 
-/* ILvAdapter C API Macros */
+/** ILvAdapter C API Macros */
 #define ILvAdapter_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -74,12 +74,12 @@ extern "C" {
 #define ILvAdapter_QueryInterface(This, id, ppObj) \
     ((This)->lpVtbl->QueryInterface(This, id, ppObj))
 
-/*
+/**
  * IMcAdapter interface macros
  * IMcAdapter inherits from ILvAdapter; use ILvAdapter_ macros for inherited methods.
  */
 
-/* IMcAdapter specific interface macros */
+/** IMcAdapter specific interface macros */
 #define IMcAdapter_GetColumnName(This, iCol, pName) \
     ((This)->lpVtbl->GetColumnName(This, iCol, pName))
 
@@ -92,7 +92,7 @@ extern "C" {
 #define IMcAdapter_SetColumnsWidth(This, pColWid, nCols) \
     ((This)->lpVtbl->SetColumnsWidth(This, pColWid, nCols))
 
-/* ITvDataSetObserver C API Macros */
+/** ITvDataSetObserver C API Macros */
 #define ITvDataSetObserver_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -114,7 +114,7 @@ extern "C" {
 #define ITvDataSetObserver_notifyItemBeforeRemove(This, hItem) \
     ((This)->lpVtbl->notifyItemBeforeRemove(This, hItem))
 
-/* ITvAdapter C API Macros */
+/** ITvAdapter C API Macros */
 #define ITvAdapter_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -206,4 +206,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SADAPTER_CAPI_H__ */
+#endif /**< __SADAPTER_CAPI_H__ */

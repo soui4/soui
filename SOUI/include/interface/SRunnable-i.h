@@ -9,47 +9,47 @@ SNSBEGIN
 DECLARE_INTERFACE_(IRunnable, IObjRef)
 {
     /**
-     * @brief 增加引用计数
-     * @return 新引用计数
+     * @brief Increment the reference count
+     * @return new reference count
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief 减少引用计数
-     * @return 新引用计数
+     * @brief Decrement the reference count
+     * @return new reference count
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief 释放对象
+     * @brief Release object
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
     /**
-     * @brief clone当前对象
-     * @return IRunnable *--clone得到的新对象
+     * @brief Clone current object
+     * @return IRunnable *--newly cloned object
      */
     STDMETHOD_(IRunnable *, clone)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 运行该对象
+     * @brief Run this object
      * @return
      */
     STDMETHOD_(void, run)(THIS) PURE;
 
     /**
-     * @brief 获取该Runnable的宿主
-     * @return void *--宿主指针，对于FreeFunction对象，该值为NULL
+     * @brief Get the host of this Runnable
+     * @return void *--host pointer, NULL for FreeFunction objects
      */
     STDMETHOD_(void *, getObject)(THIS) PURE;
 
     /**
-     * @brief 获取runnable的描述
-     * @return const char *--描述
+     * @brief Get runnable description
+     * @return const char *--description
      */
     STDMETHOD_(const char *, getClassInfo)(CTHIS) SCONST PURE;
 };
 
 SNSEND
-#endif // __SRUNNABLE_I__H__
+#endif /**< __SRUNNABLE_I__H__ */

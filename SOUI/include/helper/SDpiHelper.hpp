@@ -11,15 +11,15 @@ SNSBEGIN
 
 /**
  * @class SDpiHandler
- * @brief 处理DPI变化的模板类
- * @tparam T 派生类类型
+ * @brief Template class handling DPI changes
+ * @tparam T derived class type
  */
 template <class T>
 class SDpiHandler {
   protected:
     /**
-     * @brief 检查是否支持DPI感知
-     * @return 支持DPI感知返回TRUE，否则返回FALSE
+     * @brief Check whether DPI awareness is supported
+     * @return Returns TRUE if DPI awareness is supported, FALSE otherwise
      */
     virtual bool IsDpiAware() const
     {
@@ -27,9 +27,9 @@ class SDpiHandler {
     }
 
     /**
-     * @brief 处理DPI变化事件
-     * @param dpi 新的DPI值
-     * @param desRect 目标矩形区域
+     * @brief Handle the DPI change event
+     * @param dpi new DPI value
+     * @param desRect destination rectangle
      */
     void OnDpiChanged(WORD dpi, const RECT *desRect)
     {
@@ -41,9 +41,9 @@ class SDpiHandler {
     }
 
     /**
-     * @brief 处理缩放变化
-     * @param nScale 新的缩放比例
-     * @param desRect 目标矩形区域
+     * @brief Handle the scale change
+     * @param nScale new scale factor
+     * @param desRect destination rectangle
      */
     virtual void HandleScaleChange(WORD nScale, const RECT *desRect)
     {
@@ -55,8 +55,8 @@ class SDpiHandler {
     }
 
     /**
-     * @brief 根据DPI缩放窗口
-     * @param hWnd 窗口句柄
+     * @brief Scale the window according to DPI
+     * @param hWnd window handle
      */
     void ScaleHost(HWND hWnd)
     {
@@ -71,20 +71,20 @@ class SDpiHandler {
         sz.cx = sz.cx * nScale / 100;
         sz.cy = sz.cy * nScale / 100;
         rc = CRect(center, sz);
-        rc.OffsetRect(-sz.cx/2, -sz.cy/2);
+        rc.OffsetRect(-sz.cx / 2, -sz.cy / 2);
         HandleScaleChange(nScale, &rc);
     }
 
   public:
     /**
-     * @brief 处理窗口消息
-     * @param hWnd 窗口句柄
-     * @param uMsg 消息ID
-     * @param wParam 附加参数1
-     * @param lParam 附加参数2
-     * @param lResult 消息处理结果
-     * @param dwMsgMapID 消息映射ID
-     * @return 消息是否被处理
+     * @brief Handle the window message
+     * @param hWnd window handle
+     * @param uMsg message ID
+     * @param wParam additional parameter 1
+     * @param lParam additional parameter 2
+     * @param lResult message processing result
+     * @param dwMsgMapID message map ID
+     * @return whether the message was handled
      */
     BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult, DWORD dwMsgMapID = 0)
     {
@@ -109,4 +109,4 @@ class SDpiHandler {
 
 SNSEND
 
-#endif //__DPIHELPER_H_
+#endif /**< __DPIHELPER_H_ */

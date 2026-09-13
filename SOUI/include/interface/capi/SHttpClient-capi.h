@@ -7,12 +7,12 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for SHttpClient Interfaces
  * These macros provide C-style function call syntax for C++ interface methods
  */
 
-/* IHttpCallback C API Macros */
+/** IHttpCallback C API Macros */
 #define IHttpCallback_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -25,7 +25,7 @@ extern "C" {
 #define IHttpCallback_OnDownloadCallback(This, state, nTotalSize, nLoadSize) \
     ((This)->lpVtbl->OnDownloadCallback(This, state, nTotalSize, nLoadSize))
 
-/* IHttpClient C API Macros */
+/** IHttpClient C API Macros */
 #define IHttpClient_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -63,4 +63,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SHTTPCLIENT_CAPI_H__ */
+#endif /**< __SHTTPCLIENT_CAPI_H__ */

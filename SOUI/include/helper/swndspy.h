@@ -18,4 +18,4 @@ struct SWNDINFO
     wchar_t szXmlStr[SWND_MAX_XML + 1];
 };
 #pragma pack(pop)
-#endif // __SWNDSPY__H__
+#endif /**< __SWNDSPY__H__ */

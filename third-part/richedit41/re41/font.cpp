@@ -684,6 +684,7 @@ void CFontCache::Init()
 	TRACEBEGIN(TRCSUBSYSFONT, TRCSCOPEINTERN, "CFontCache::CFontCache");
 
 	_dwAgeNext = 0;
+	memset(quickHashSearch, 0, sizeof(quickHashSearch));
 }
 
 /*

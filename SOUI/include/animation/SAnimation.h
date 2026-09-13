@@ -64,7 +64,7 @@ class SOUI_EXP SValueDescription {
  *
  * See the {@link android.view.animation animation package description file}.
  */
-class SOUI_EXP SAnimation : public TObjRefImpl<SObjectImpl<IAnimation> > {
+class SOUI_EXP SAnimation : public TObjRefImpl<SObjectImpl<IAnimation>> {
     DEF_SOBJECT(SObjectImpl<IAnimation>, L"animation")
 
   protected:
@@ -473,26 +473,26 @@ class SOUI_EXP SAnimation : public TObjRefImpl<SObjectImpl<IAnimation> > {
      * @brief Attributes for SAnimation
      */
     SOUI_ATTRS_BEGIN()
-        ATTR_INT(L"duration", mDuration, FALSE)       ///< Duration of the animation in milliseconds.
-        ATTR_INT(L"startOffset", mStartOffset, FALSE) ///< Delay before the animation starts in milliseconds.
-        ATTR_BOOL(L"fillEnable", mFillEnabled, FALSE) ///< Whether fillBefore and fillAfter are taken into account.
-        ATTR_BOOL(L"fillBefore", mFillBefore, FALSE)  ///< Whether the animation transformation should be applied before the animation starts.
-        ATTR_BOOL(L"fillAfter", mFillAfter, FALSE)    ///< Whether the animation transformation should be applied after the animation ends.
-        ATTR_INT(L"repeatCount", mRepeatCount, FALSE) ///< Number of times the animation must repeat.
+        ATTR_INT(L"duration", mDuration, FALSE)       /**<  Duration of the animation in milliseconds. */
+        ATTR_INT(L"startOffset", mStartOffset, FALSE) /**<  Delay before the animation starts in milliseconds. */
+        ATTR_BOOL(L"fillEnable", mFillEnabled, FALSE) /**<  Whether fillBefore and fillAfter are taken into account. */
+        ATTR_BOOL(L"fillBefore", mFillBefore, FALSE)  /**<  Whether the animation transformation should be applied before the animation starts. */
+        ATTR_BOOL(L"fillAfter", mFillAfter, FALSE)    /**<  Whether the animation transformation should be applied after the animation ends. */
+        ATTR_INT(L"repeatCount", mRepeatCount, FALSE) /**<  Number of times the animation must repeat. */
         ATTR_ENUM_BEGIN(L"zAdjustment", ZAdjustment, FALSE)
-            ATTR_ENUM_VALUE(L"normal", ZORDER_NORMAL) ///< Normal Z order adjustment.
-            ATTR_ENUM_VALUE(L"top", ZORDER_TOP)       ///< Top Z order adjustment.
-            ATTR_ENUM_VALUE(L"bottom", ZORDER_BOTTOM) ///< Bottom Z order adjustment.
+            ATTR_ENUM_VALUE(L"normal", ZORDER_NORMAL) /**<  Normal Z order adjustment. */
+            ATTR_ENUM_VALUE(L"top", ZORDER_TOP)       /**<  Top Z order adjustment. */
+            ATTR_ENUM_VALUE(L"bottom", ZORDER_BOTTOM) /**<  Bottom Z order adjustment. */
         ATTR_ENUM_END(mZAdjustment)
         ATTR_ENUM_BEGIN(L"repeatMode", RepeatMode, FALSE)
-            ATTR_ENUM_VALUE(L"restart", RESTART) ///< Restart repeat mode.
-            ATTR_ENUM_VALUE(L"reverse", REVERSE) ///< Reverse repeat mode.
+            ATTR_ENUM_VALUE(L"restart", RESTART) /**<  Restart repeat mode. */
+            ATTR_ENUM_VALUE(L"reverse", REVERSE) /**<  Reverse repeat mode. */
         ATTR_ENUM_END(mRepeatMode)
-        ATTR_INTERPOLATOR(L"interpolator", mInterpolator, FALSE) ///< Interpolator used by the animation.
+        ATTR_INTERPOLATOR(L"interpolator", mInterpolator, FALSE) /**<  Interpolator used by the animation. */
         ATTR_CHAIN_PTR(mInterpolator, 0)
     SOUI_ATTRS_END()
 };
 
 SNSEND
 
-#endif // __SANIMATION__H__
+#endif /**< __SANIMATION__H__ */

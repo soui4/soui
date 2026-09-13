@@ -12,38 +12,38 @@ SNSBEGIN
 DECLARE_INTERFACE_(ILvDataSetObserver, IObjRef)
 {
     /**
-     * @brief 添加引用
-     * @return long -- 引用计数
+     * @brief Add reference
+     * @return long -- reference count
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief 释放引用
-     * @return long -- 引用计数
+     * @brief Release reference
+     * @return long -- reference count
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief 释放对象
+     * @brief Release object
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
     /**
-     * @brief 当整个数据集发生变化时调用
+     * @brief Called when the entire data set changes
      * @return void
      */
     STDMETHOD_(void, onChanged)(THIS) PURE;
 
     /**
-     * @brief 当整个数据集变得无效时调用
+     * @brief Called when the entire data set becomes invalid
      * @return void
      */
     STDMETHOD_(void, onInvalidated)(THIS) PURE;
 
     /**
-     * @brief 通知列表项数据变化
-     * @param iItem int -- 列表索引
+     * @brief Notify that list item data has changed
+     * @param iItem int -- list index
      * @return void
      */
     STDMETHOD_(void, OnItemChanged)(THIS_ int iItem) PURE;
@@ -54,103 +54,103 @@ DECLARE_INTERFACE_(ILvDataSetObserver, IObjRef)
 DECLARE_INTERFACE_(ILvAdapter, IObjRef)
 {
     /**
-     * @brief 添加引用
-     * @return long -- 引用计数
+     * @brief Add reference
+     * @return long -- reference count
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief 释放引用
-     * @return long -- 引用计数
+     * @brief Release reference
+     * @return long -- reference count
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief 释放对象
+     * @brief Release object
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
     /**
-     * @brief 注册一个观察者，当数据发生变化时调用
-     * @param observer ILvDataSetObserver* -- 观察者对象
+     * @brief Register an observer, called when data changes
+     * @param observer ILvDataSetObserver* -- observer object
      * @return void
      */
     STDMETHOD_(void, registerDataSetObserver)(THIS_ ILvDataSetObserver * observer) PURE;
 
     /**
-     * @brief 取消注册一个观察者
-     * @param observer ILvDataSetObserver* -- 观察者对象
+     * @brief Unregister an observer
+     * @param observer ILvDataSetObserver* -- observer object
      * @return void
      */
     STDMETHOD_(void, unregisterDataSetObserver)(THIS_ ILvDataSetObserver * observer) PURE;
 
     /**
-     * @brief 获取数据集中项目的数量
-     * @return int -- 项目数量
+     * @brief Get the number of items in the data set
+     * @return int -- number of items
      */
     STDMETHOD_(int, getCount)(THIS) PURE;
 
     /**
-     * @brief 获取显示指定位置数据的视图
-     * @param position int -- 数据集中的位置
-     * @param pItem IWindow* -- 旧视图，如果可能，重用它
-     * @param xmlTemplate IXmlNode* -- 提供的XML模板
+     * @brief Get the view displaying data at the specified position
+     * @param position int -- position in the data set
+     * @param pItem IWindow* -- old view, reuse it if possible
+     * @param xmlTemplate IXmlNode* -- provided XML template
      * @return void
      */
     STDMETHOD_(void, getView)(THIS_ int position, IWindow *pItem, IXmlNode *xmlTemplate) PURE;
 
     /**
-     * @brief 获取将由getView创建的视图类型
-     * @param position int -- 数据集中的位置
-     * @param dwState DWORD -- 视图状态
-     * @return int -- 视图类型
+     * @brief Get the view type that will be created by getView
+     * @param position int -- position in the data set
+     * @param dwState DWORD -- view state
+     * @return int -- view type
      */
     STDMETHOD_(int, getItemViewType)(THIS_ int position, DWORD dwState) PURE;
 
     /**
-     * @brief 返回将由getView创建的视图类型数量
-     * @return int -- 视图类型数量
+     * @brief Return the number of view types that will be created by getView
+     * @return int -- number of view types
      */
     STDMETHOD_(int, getViewTypeCount)(THIS) PURE;
 
     /**
-     * @brief 计算列表项显示大小
-     * @param ret SIZE* -- 列表项大小
-     * @param position int -- 列表项索引
-     * @param pItem IWindow* -- 列表项窗口
-     * @param wid int -- 父窗口宽度
-     * @param hei int -- 父窗口高度
+     * @brief Compute the display size of a list item
+     * @param ret SIZE* -- list item size
+     * @param position int -- list item index
+     * @param pItem IWindow* -- list item window
+     * @param wid int -- parent window width
+     * @param hei int -- parent window height
      * @return void
      */
     STDMETHOD_(void, getViewDesiredSize)(THIS_ SIZE * ret, int position, IWindow *pItem, int wid, int hei) PURE;
 
     /**
-     * @brief 判断数据是否为空
-     * @return BOOL -- TRUE: 为空，FALSE: 不为空
+     * @brief Determine whether the data is empty
+     * @return BOOL -- TRUE: empty, FALSE: not empty
      */
     STDMETHOD_(BOOL, isEmpty)(THIS) PURE;
 
     /**
-     * @brief 获取列表项描述
-     * @param positoin int -- 列表项索引
-     * @param pDesc IStringW* -- 字符串描述返回值
+     * @brief Get the list item description
+     * @param positoin int -- list item index
+     * @param pDesc IStringW* -- returned string description
      * @return void
      */
     STDMETHOD_(void, getItemDesc)(THIS_ int positoin, IStringW *pDesc) PURE;
 
     /**
-     * @brief 从指定的模板XML数据初始化适配器
-     * @param xmlTemplate IXmlNode* -- XML模板
+     * @brief Initialize the adapter from the specified template XML data
+     * @param xmlTemplate IXmlNode* -- XML template
      * @return void
      */
     STDMETHOD_(void, InitByTemplate)(THIS_ IXmlNode * xmlTemplate) PURE;
 
     /**
-     * @brief 从适配器查询用户定义的接口
-     * @param id REFGUID -- 接口ID
-     * @param ppObj IObjRef** -- 返回的接口
-     * @return HRESULT -- S_OK: 成功
+     * @brief Query a user-defined interface from the adapter
+     * @param id REFGUID -- interface ID
+     * @param ppObj IObjRef** -- returned interface
+     * @return HRESULT -- S_OK: success
      */
     STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFGUID id, IObjRef * *ppObj) PURE;
 };
@@ -160,135 +160,135 @@ DECLARE_INTERFACE_(ILvAdapter, IObjRef)
 DECLARE_INTERFACE_(IMcAdapter, ILvAdapter)
 {
     /**
-     * @brief 添加引用
-     * @return long -- 引用计数
+     * @brief Add reference
+     * @return long -- reference count
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief 释放引用
-     * @return long -- 引用计数
+     * @brief Release reference
+     * @return long -- reference count
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief 释放对象
+     * @brief Release object
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
     /**
-     * @brief 注册一个观察者，当数据发生变化时调用
-     * @param observer ILvDataSetObserver* -- 观察者对象
+     * @brief Register an observer, called when data changes
+     * @param observer ILvDataSetObserver* -- observer object
      * @return void
      */
     STDMETHOD_(void, registerDataSetObserver)(THIS_ ILvDataSetObserver * observer) PURE;
 
     /**
-     * @brief 取消注册一个观察者
-     * @param observer ILvDataSetObserver* -- 观察者对象
+     * @brief Unregister an observer
+     * @param observer ILvDataSetObserver* -- observer object
      * @return void
      */
     STDMETHOD_(void, unregisterDataSetObserver)(THIS_ ILvDataSetObserver * observer) PURE;
 
     /**
-     * @brief 获取数据集中项目的数量
-     * @return int -- 项目数量
+     * @brief Get the number of items in the data set
+     * @return int -- number of items
      */
     STDMETHOD_(int, getCount)(THIS) PURE;
 
     /**
-     * @brief 获取显示指定位置数据的视图
-     * @param position int -- 数据集中的位置
-     * @param pItem IWindow* -- 旧视图，如果可能，重用它
-     * @param xmlTemplate IXmlNode* -- 提供的XML模板
+     * @brief Get the view displaying data at the specified position
+     * @param position int -- position in the data set
+     * @param pItem IWindow* -- old view, reuse it if possible
+     * @param xmlTemplate IXmlNode* -- provided XML template
      * @return void
      */
     STDMETHOD_(void, getView)(THIS_ int position, IWindow *pItem, IXmlNode *xmlTemplate) PURE;
 
     /**
-     * @brief 获取将由getView创建的视图类型
-     * @param position int -- 数据集中的位置
-     * @param dwState DWORD -- 视图状态
-     * @return int -- 视图类型
+     * @brief Get the view type that will be created by getView
+     * @param position int -- position in the data set
+     * @param dwState DWORD -- view state
+     * @return int -- view type
      */
     STDMETHOD_(int, getItemViewType)(THIS_ int position, DWORD dwState) PURE;
 
     /**
-     * @brief 返回将由getView创建的视图类型数量
-     * @return int -- 视图类型数量
+     * @brief Return the number of view types that will be created by getView
+     * @return int -- number of view types
      */
     STDMETHOD_(int, getViewTypeCount)(THIS) PURE;
 
     /**
-     * @brief 计算列表项显示大小
-     * @param ret SIZE* -- 列表项大小
-     * @param position int -- 列表项索引
-     * @param pItem IWindow* -- 列表项窗口
-     * @param wid int -- 父窗口宽度
-     * @param hei int -- 父窗口高度
+     * @brief Compute the display size of a list item
+     * @param ret SIZE* -- list item size
+     * @param position int -- list item index
+     * @param pItem IWindow* -- list item window
+     * @param wid int -- parent window width
+     * @param hei int -- parent window height
      * @return void
      */
     STDMETHOD_(void, getViewDesiredSize)(THIS_ SIZE * ret, int position, IWindow *pItem, int wid, int hei) PURE;
 
     /**
-     * @brief 判断数据是否为空
-     * @return BOOL -- TRUE: 为空，FALSE: 不为空
+     * @brief Determine whether the data is empty
+     * @return BOOL -- TRUE: empty, FALSE: not empty
      */
     STDMETHOD_(BOOL, isEmpty)(THIS) PURE;
 
     /**
-     * @brief 获取列表项描述
-     * @param positoin int -- 列表项索引
-     * @param pDesc IStringW* -- 字符串描述返回值
+     * @brief Get the list item description
+     * @param positoin int -- list item index
+     * @param pDesc IStringW* -- returned string description
      * @return void
      */
     STDMETHOD_(void, getItemDesc)(THIS_ int positoin, IStringW *pDesc) PURE;
 
     /**
-     * @brief 从指定的模板XML数据初始化适配器
-     * @param xmlTemplate IXmlNode* -- XML模板
+     * @brief Initialize the adapter from the specified template XML data
+     * @param xmlTemplate IXmlNode* -- XML template
      * @return void
      */
     STDMETHOD_(void, InitByTemplate)(THIS_ IXmlNode * xmlTemplate) PURE;
 
     /**
-     * @brief 从适配器查询用户定义的接口
-     * @param id REFGUID -- 接口ID
-     * @param ppObj IObjRef** -- 返回的接口
-     * @return HRESULT -- S_OK: 成功
+     * @brief Query a user-defined interface from the adapter
+     * @param id REFGUID -- interface ID
+     * @param ppObj IObjRef** -- returned interface
+     * @return HRESULT -- S_OK: success
      */
     STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFGUID id, IObjRef * *ppObj) PURE;
 
     /**
-     * @brief 获取一个列在模板中对应的窗口名称
-     * @param iCol int -- 列索引
-     * @param pName IStringW* -- 列名
+     * @brief Get the window name corresponding to a column in the template
+     * @param iCol int -- column index
+     * @param pName IStringW* -- column name
      * @return void
      */
     STDMETHOD_(void, GetColumnName)(CTHIS_ int iCol, IStringW *pName) SCONST PURE;
 
     /**
-     * @brief 由Adapter决定一列是否需要显示
-     * @param iCol int -- 列序号
-     * @return BOOL -- TRUE: 显示，FALSE: 隐藏
-     * @remark 默认显示
+     * @brief Let the Adapter decide whether a column should be shown
+     * @param iCol int -- column ordinal
+     * @return BOOL -- TRUE: show, FALSE: hide
+     * @remark Shown by default
      */
     STDMETHOD_(BOOL, IsColumnVisible)(CTHIS_ int iCol) SCONST PURE;
 
     /**
-     * @brief 排序接口
-     * @param iCol int -- 排序列
-     * @param pFmts UINT* -- 当前列排序标志
-     * @param nCols int -- 总列数，pFmts数组长度
-     * @return BOOL -- TRUE: 执行排序，FALSE: 没有执行排序
+     * @brief Sort interface
+     * @param iCol int -- sort column
+     * @param pFmts UINT* -- current column sort flags
+     * @param nCols int -- total number of columns, length of the pFmts array
+     * @return BOOL -- TRUE: sorting performed, FALSE: sorting not performed
      */
     STDMETHOD_(BOOL, OnSort)(THIS_ int iCol, UINT *pFmts, int nCols) PURE;
 
     /**
-     * @brief 设置列宽接口
-     * @param pColWid int* -- 列宽数据
-     * @param nCols int -- 总列数
+     * @brief Set column width interface
+     * @param pColWid int* -- column width data
+     * @param nCols int -- total number of columns
      * @return void
      */
     STDMETHOD_(void, SetColumnsWidth)(THIS_ int *pColWid, int nCols) PURE;
@@ -299,53 +299,53 @@ DECLARE_INTERFACE_(IMcAdapter, ILvAdapter)
 DECLARE_INTERFACE_(ITvDataSetObserver, IObjRef)
 {
     /**
-     * @brief 添加引用
-     * @return long -- 引用计数
+     * @brief Add reference
+     * @return long -- reference count
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief 释放引用
-     * @return long -- 引用计数
+     * @brief Release reference
+     * @return long -- reference count
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief 释放对象
+     * @brief Release object
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
     /**
-     * @brief 当整个数据集发生变化时调用
-     * @param hBranch HSTREEITEM -- 目标分支
+     * @brief Called when the entire data set changes
+     * @param hBranch HSTREEITEM -- target branch
      * @return void
      */
     STDMETHOD_(void, onBranchChanged)(THIS_ HSTREEITEM hBranch) PURE;
 
     /**
-     * @brief 当指定树项数据变得无效时调用
-     * @param hBranch HSTREEITEM -- 目标分支
-     * @param bInvalidParents BOOL -- 目标的父项变得无效
-     * @param bInvalidChildren BOOL -- 目标的子项变得无效
+     * @brief Called when the data of the specified tree item becomes invalid
+     * @param hBranch HSTREEITEM -- target branch
+     * @param bInvalidParents BOOL -- target's parents become invalid
+     * @param bInvalidChildren BOOL -- target's children become invalid
      * @return void
      */
     STDMETHOD_(void, onBranchInvalidated)
     (THIS_ HSTREEITEM hBranch, BOOL bInvalidParents, BOOL bInvalidChildren) PURE;
 
     /**
-     * @brief 当指定树项展开状态改变时调用
-     * @param hBranch HSTREEITEM -- 目标分支
-     * @param bExpandedOld BOOL -- 旧的展开状态
-     * @param bExpandedNew BOOL -- 新的展开状态
+     * @brief Called when the expand state of the specified tree item changes
+     * @param hBranch HSTREEITEM -- target branch
+     * @param bExpandedOld BOOL -- old expand state
+     * @param bExpandedNew BOOL -- new expand state
      * @return void
      */
     STDMETHOD_(void, onBranchExpandedChanged)
     (THIS_ HSTREEITEM hBranch, BOOL bExpandedOld, BOOL bExpandedNew) PURE;
 
     /**
-     * @brief 当指定树项即将被移除时调用
-     * @param hItem HSTREEITEM -- 目标项
+     * @brief Called when the specified tree item is about to be removed
+     * @param hItem HSTREEITEM -- target item
      * @return void
      */
     STDMETHOD_(void, notifyItemBeforeRemove)
@@ -359,13 +359,13 @@ DECLARE_INTERFACE_(ITvDataSetObserver, IObjRef)
 
 typedef enum DATA_INDEX
 {
-    DATA_INDEX_ITEM_HEIGHT = 0, // 行高
-    DATA_INDEX_ITEM_WIDTH,      // 行宽度
-    DATA_INDEX_BRANCH_HEIGHT,   // 分枝高度
-    DATA_INDEX_BRANCH_WIDTH,    // 分枝宽度，不包含缩进
-    DATA_INDEX_ITEM_EXPANDED,   // 子项展开状态
-    DATA_INDEX_ITEM_OFFSET,     // 当前节点在父节点中的Y方向偏移
-    DATA_INDEX_ITEM_USER,       // 自定义数据
+    DATA_INDEX_ITEM_HEIGHT = 0, /**< Row height */
+    DATA_INDEX_ITEM_WIDTH,      /**< Row width */
+    DATA_INDEX_BRANCH_HEIGHT,   /**< Branch height */
+    DATA_INDEX_BRANCH_WIDTH,    /**< Branch width, excluding indentation */
+    DATA_INDEX_ITEM_EXPANDED,   /**< Child expand state */
+    DATA_INDEX_ITEM_OFFSET,     /**< Y direction offset of the current node within its parent node */
+    DATA_INDEX_ITEM_USER,       /**< Custom data */
     DATA_INDEX_NUMBER
 } DATA_INDEX;
 
@@ -381,155 +381,155 @@ enum
 DECLARE_INTERFACE_(ITvAdapter, IObjRef)
 {
     /**
-     * @brief 添加引用
-     * @return long -- 引用计数
+     * @brief Add reference
+     * @return long -- reference count
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief 释放引用
-     * @return long -- 引用计数
+     * @brief Release reference
+     * @return long -- reference count
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief 释放对象
+     * @brief Release object
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
     /**
-     * @brief 注册一个观察者，当数据发生变化时调用
-     * @param observer ITvDataSetObserver* -- 观察者对象
+     * @brief Register an observer, called when data changes
+     * @param observer ITvDataSetObserver* -- observer object
      * @return void
      */
     STDMETHOD_(void, registerDataSetObserver)(THIS_ ITvDataSetObserver * observer) PURE;
 
     /**
-     * @brief 取消注册一个观察者
-     * @param observer ITvDataSetObserver* -- 观察者对象
+     * @brief Unregister an observer
+     * @param observer ITvDataSetObserver* -- observer object
      * @return void
      */
     STDMETHOD_(void, unregisterDataSetObserver)(THIS_ ITvDataSetObserver * observer) PURE;
 
     /**
-     * @brief 获取hItem中的指定索引的数据
-     * @param hItem HSTREEITEM -- 表项索引
-     * @param idx DATA_INDEX -- 数据类型
-     * @return ULONG_PTR -- 数据
+     * @brief Get the data of the specified index in hItem
+     * @param hItem HSTREEITEM -- item index
+     * @param idx DATA_INDEX -- data type
+     * @return ULONG_PTR -- data
      */
     STDMETHOD_(ULONG_PTR, GetItemDataByIndex)(CTHIS_ HSTREEITEM hItem, DATA_INDEX idx) SCONST PURE;
 
     /**
-     * @brief 保存hItem指定索引的数据
-     * @param hItem HSTREEITEM -- 表项索引
-     * @param idx DATA_INDEX -- 数据类型
-     * @param data ULONG_PTR -- 数据
+     * @brief Save the data of the specified index in hItem
+     * @param hItem HSTREEITEM -- item index
+     * @param idx DATA_INDEX -- data type
+     * @param data ULONG_PTR -- data
      * @return void
      */
     STDMETHOD_(void, SetItemDataByIndex)
     (THIS_ HSTREEITEM hItem, DATA_INDEX idx, ULONG_PTR data) PURE;
 
     /**
-     * @brief 获取父级表项
-     * @param hItem HSTREEITEM -- 表项索引
-     * @return HSTREEITEM -- 父级表项
+     * @brief Get the parent item
+     * @param hItem HSTREEITEM -- item index
+     * @return HSTREEITEM -- parent item
      */
     STDMETHOD_(HSTREEITEM, GetParentItem)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
-     * @brief 获取第一个子项
-     * @param hItem HSTREEITEM -- 表项索引
-     * @return HSTREEITEM -- 第一个子项
+     * @brief Get the first child item
+     * @param hItem HSTREEITEM -- item index
+     * @return HSTREEITEM -- first child item
      */
     STDMETHOD_(HSTREEITEM, GetFirstChildItem)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
-     * @brief 获取最后一个子项
-     * @param hItem HSTREEITEM -- 表项索引
-     * @return HSTREEITEM -- 最后一个子项
+     * @brief Get the last child item
+     * @param hItem HSTREEITEM -- item index
+     * @return HSTREEITEM -- last child item
      */
     STDMETHOD_(HSTREEITEM, GetLastChildItem)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
-     * @brief 获取前一个兄弟项
-     * @param hItem HSTREEITEM -- 表项索引
-     * @return HSTREEITEM -- 前一个兄弟项
+     * @brief Get the previous sibling item
+     * @param hItem HSTREEITEM -- item index
+     * @return HSTREEITEM -- previous sibling item
      */
     STDMETHOD_(HSTREEITEM, GetPrevSiblingItem)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
-     * @brief 获取后一个兄弟项
-     * @param hItem HSTREEITEM -- 表项索引
-     * @return HSTREEITEM -- 后一个兄弟项
+     * @brief Get the next sibling item
+     * @param hItem HSTREEITEM -- item index
+     * @return HSTREEITEM -- next sibling item
      */
     STDMETHOD_(HSTREEITEM, GetNextSiblingItem)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
-     * @brief 是否包含子项
-     * @param hItem HSTREEITEM -- 表项索引
-     * @return BOOL -- TRUE: 有子项，FALSE: 无子项
+     * @brief Whether it has child items
+     * @param hItem HSTREEITEM -- item index
+     * @return BOOL -- TRUE: has children, FALSE: no children
      */
     STDMETHOD_(BOOL, HasChildren)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
-     * @brief 表项是否当前可见
-     * @param hItem HSTREEITEM -- 表项索引
-     * @return BOOL -- TRUE: 可见，FALSE: 不可见，被折叠
+     * @brief Whether the item is currently visible
+     * @param hItem HSTREEITEM -- item index
+     * @return BOOL -- TRUE: visible, FALSE: not visible (collapsed)
      */
     STDMETHOD_(BOOL, IsItemVisible)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
-     * @brief 获取第一个可见项
-     * @return HSTREEITEM -- 第一个可见项
+     * @brief Get the first visible item
+     * @return HSTREEITEM -- first visible item
      */
     STDMETHOD_(HSTREEITEM, GetFirstVisibleItem)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 获取最后一个可见项
-     * @return HSTREEITEM--最后一个可见项
+     * @brief Get the last visible item
+     * @return HSTREEITEM--last visible item
      */
     STDMETHOD_(HSTREEITEM, GetLastVisibleItem)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 测试一个节点是否为另一个节点的子孙节点
-     * @param HSTREEITEM--hItem 父节点
-     * @param HSTREEITEM--hChild 被测试的子节点
-     * @return TRUE--是子孙节点
+     * @brief Test whether one node is a descendant of another node
+     * @param HSTREEITEM--hItem parent node
+     * @param HSTREEITEM--hChild child node being tested
+     * @return TRUE--is a descendant node
      */
     STDMETHOD_(BOOL, IsDecendentItem)(CTHIS_ HSTREEITEM hItem, HSTREEITEM hChild) SCONST PURE;
 
     /**
-     * @brief 获取前一个可见项
-     * @return HSTREEITEM--前一个可见项
+     * @brief Get the previous visible item
+     * @return HSTREEITEM--previous visible item
      */
     STDMETHOD_(HSTREEITEM, GetPrevVisibleItem)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
-     * @brief 获取后一个可见项
-     * @return HSTREEITEM--后一个可见项
+     * @brief Get the next visible item
+     * @return HSTREEITEM--next visible item
      */
     STDMETHOD_(HSTREEITEM, GetNextVisibleItem)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
-     * @brief 展开/折叠子项
-     * @param hItem HSTREEITEM--目标项
+     * @brief Expand/collapse child items
+     * @param hItem HSTREEITEM--target item
      * @param code  int TVC_COLLAPSE,TVC_EXPAND,TVC_TOGGLE
      * @return
      */
     STDMETHOD_(void, ExpandItem)(THIS_ HSTREEITEM hItem, UINT code) PURE;
 
     /**
-     * @brief 判断表项是否展开
-     * @param hItem HSTREEITEM--目标项
-     * @return TRUE--展开，FALSE--折叠
+     * @brief Determine whether the item is expanded
+     * @param hItem HSTREEITEM--target item
+     * @return TRUE--expanded, FALSE--collapsed
      */
     STDMETHOD_(BOOL, IsItemExpanded)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
-     * @brief 设置表项展开标志
-     * @param hItem HSTREEITEM--目标项
-     * @param bExpanded TRUE--展开，FALSE--折叠
+     * @brief Set the item expand flag
+     * @param hItem HSTREEITEM--target item
+     * @param bExpanded TRUE--expanded, FALSE--collapsed
      * @return
      */
     STDMETHOD_(void, SetItemExpanded)(THIS_ HSTREEITEM hItem, BOOL bExpanded) PURE;
@@ -555,39 +555,39 @@ DECLARE_INTERFACE_(ITvAdapter, IObjRef)
     (THIS_ HSTREEITEM hItem, IWindow * pItem, IXmlNode * pXmlTemplate) PURE;
 
     /**
-     * @brief 获取表项对应的模板ID
-     * @param hItem HSTREEITEM--目标项
-     * @return int--模板ID
+     * @brief Get the template ID corresponding to the item
+     * @param hItem HSTREEITEM--target item
+     * @return int--template ID
      */
     STDMETHOD_(int, getViewType)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
-     * @brief 获取表项模板数量
-     * @return int--模板数量
+     * @brief Get the number of item templates
+     * @return int--number of templates
      */
     STDMETHOD_(int, getViewTypeCount)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 获取表项大小
-     * @param SIZE *ret -- 窗口大小
-     * @param hItem HSTREEITEM--目标项
-     * @param pItem IWindow *--窗口指针
-     * @param wid int--父窗口宽度
-     * @param hei int--你窗口高度
+     * @brief Get the item size
+     * @param SIZE *ret -- window size
+     * @param hItem HSTREEITEM--target item
+     * @param pItem IWindow *--window pointer
+     * @param wid int--parent window width
+     * @param hei int--parent window height
      * @return void
      */
     STDMETHOD_(void, getViewDesiredSize)
     (THIS_ SIZE * ret, HSTREEITEM hItem, IWindow * pItem, int wid, int hei) PURE;
 
     /**
-     * @brief 定义行宽度和treeview客户区宽度相同
-     * @return TRUE--表项宽度占满父窗口，FALSE--表项宽度和父窗口无关
+     * @brief Define that the row width equals the treeview client area width
+     * @return TRUE--item width fills the parent window, FALSE--item width is independent of the parent window
      */
     STDMETHOD_(BOOL, isViewWidthMatchParent)(CTHIS) SCONST PURE;
 
     /**
      * @brief init adapter from the specified template xml data
-     * @param pXmlTemplate IXmlNode *--XML模板
+     * @param pXmlTemplate IXmlNode *--XML template
      * @return void
      */
     STDMETHOD_(void, InitByTemplate)(THIS_ IXmlNode * pXmlTemplate) PURE;
@@ -602,4 +602,4 @@ DECLARE_INTERFACE_(ITvAdapter, IObjRef)
 };
 
 SNSEND
-#endif // __SADAPTER_I__H__
+#endif /**< __SADAPTER_I__H__ */

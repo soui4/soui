@@ -7,7 +7,7 @@
 
 SNSBEGIN
 
-// Forward declarations
+/** Forward declarations */
 class SMessageLoopPriv;
 
 /**
@@ -136,14 +136,15 @@ class SOUI_EXP SMessageLoop : public TObjRefImpl<IMessageLoop> {
     STDMETHOD_(int, HandleMsg)(THIS) OVERRIDE;
 
     /**
-     * @brief 
+     * @brief
      */
     STDMETHOD_(void, OnStart)(THIS) OVERRIDE;
-    
+
     /**
-     * @brief 
+     * @brief
      */
     STDMETHOD_(void, OnStop)(THIS) OVERRIDE;
+
   public:
     /**
      * @brief Checks if a message is an idle message.
@@ -159,25 +160,25 @@ class SOUI_EXP SMessageLoop : public TObjRefImpl<IMessageLoop> {
     BOOL RunIdle();
 
   protected:
-    // Flag indicating whether the message loop is running
+    /** Flag indicating whether the message loop is running */
     volatile BOOL m_bRunning;
-    // Flag indicating whether the message loop should quit
+    /** Flag indicating whether the message loop should quit */
     BOOL m_bQuit;
-    // Flag indicating whether idle processing should be done
+    /** Flag indicating whether idle processing should be done */
     BOOL m_bDoIdle;
-    // Idle count
+    /** Idle count */
     int m_nIdleCount;
 
-    // Critical section for thread safety
+    /** Critical section for thread safety */
     SCriticalSection m_cs;
-    // Critical section for the running queue
+    /** Critical section for the running queue */
     SCriticalSection m_csRunningQueue;
-    // Thread ID of the message loop
+    /** Thread ID of the message loop */
     tid_t m_tid;
-    // Pointer to the private implementation
+    /** Pointer to the private implementation */
     SMessageLoopPriv *m_priv;
 };
 
 SNSEND
 
-#endif // __SMSGLOOP__H__
+#endif /**< __SMSGLOOP__H__ */

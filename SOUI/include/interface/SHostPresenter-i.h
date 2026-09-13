@@ -8,55 +8,55 @@ SNSBEGIN
 #define INTERFACE IHostPresenter
 DECLARE_INTERFACE_(IHostPresenter, IObjRef)
 {
-    //! 添加引用
-    /*!
-     * @return long - 当前引用计数
+    /** Add reference */
+    /**
+     * @return long - current reference count
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
-    //! 释放引用
-    /*!
-     * @return long - 当前引用计数
+    /** Release reference */
+    /**
+     * @return long - current reference count
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
-    //! 释放对象
-    /*!
+    /** Release object */
+    /**
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
-    //////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief 宿主创建时调用
+     * @brief Called when the host is created
      * @return void
      */
     STDMETHOD_(void, OnHostCreate)(THIS) PURE;
 
     /**
-     * @brief 宿主销毁时调用
+     * @brief Called when the host is destroyed
      * @return void
      */
     STDMETHOD_(void, OnHostDestroy)(THIS) PURE;
 
     /**
-     * @brief 宿主大小调整时调用
-     * @param szHost - 宿主的新大小
+     * @brief Called when the host is resized
+     * @param szHost - new host size
      * @return void
      */
     STDMETHOD_(void, OnHostResize)(THIS_ SIZE szHost) PURE;
 
     /**
-     * @brief 宿主呈现时调用
-     * @param hdc - 设备上下文句柄
-     * @param pMemRT - 内存渲染目标
-     * @param rcDirty - 脏矩形区域
-     * @param byAlpha - 透明度
+     * @brief Called when the host renders
+     * @param hdc - device context handle
+     * @param pMemRT - memory render target
+     * @param rcDirty - dirty rectangle region
+     * @param byAlpha - alpha
      * @return void
      */
     STDMETHOD_(void, OnHostPresent)(THIS_ HDC hdc, IRenderTarget * pMemRT, LPCRECT rcDirty, BYTE byAlpha) PURE;
 };
 
 SNSEND
-#endif // __SHOSTPRESENTER_I__H__
+#endif /**< __SHOSTPRESENTER_I__H__ */

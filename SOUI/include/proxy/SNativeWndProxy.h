@@ -54,7 +54,7 @@ public:
 	{
 		return SNativeWnd::SubclassWindow(hWnd);
 	}
-	STDMETHOD_(HWND, UnsubclassWindow)(THIS_ BOOL bForce /*= FALSE*/) OVERRIDE
+	STDMETHOD_(HWND, UnsubclassWindow)(THIS_ BOOL bForce /**< = FALSE */) OVERRIDE
 	{
 		return SNativeWnd::UnsubclassWindow(bForce);
 	}
@@ -298,4 +298,4 @@ public:
 };
 
 SNSEND
-#endif // __SNATIVEWNDPROXY__H__
+#endif /**< __SNATIVEWNDPROXY__H__ */

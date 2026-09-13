@@ -30,7 +30,7 @@ static const LPCWSTR kDockMode_All = L"all";
 } // namespace FrameLayout_DockMode
 
 class SOUI_EXP SFrameLayoutParam
-    : public TObjRefImpl<SObjectImpl<ILayoutParam> >
+    : public TObjRefImpl<SObjectImpl<ILayoutParam>>
     , public SFrameLayoutParamStruct {
     DEF_SOBJECT(SObjectImpl<ILayoutParam>, L"FrameLayoutParam")
 
@@ -80,7 +80,7 @@ struct FrameLayoutItemInfo : SFrameLayoutParamStruct
     BOOL bVisible;
 };
 
-class SOUI_EXP SFrameLayout : public TObjRefImpl<SObjectImpl<ILayout> > {
+class SOUI_EXP SFrameLayout : public TObjRefImpl<SObjectImpl<ILayout>> {
     DEF_SOBJECT_EX(SObjectImpl<ILayout>, L"frameLayout", L"frame")
 
   public:
@@ -88,30 +88,30 @@ class SOUI_EXP SFrameLayout : public TObjRefImpl<SObjectImpl<ILayout> > {
     ~SFrameLayout(void);
 
     /**
-     * @brief 设置允许停靠的边
-     * @param mode 停靠模式
+     * @brief Set the edges allowed to dock
+     * @param mode dock mode
      */
     void SetEnableDockMode(DockMode mode);
 
     /**
-     * @brief 获取允许停靠的边
-     * @return 停靠模式
+     * @brief Get the edges allowed to dock
+     * @return dock mode
      */
     DockMode GetEnableDockMode() const;
 
     /**
-     * @brief 保存当前布局配置
-     * @param pParent 父窗口指针
-     * @param lstItems 返回布局项信息列表
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Save the current layout configuration
+     * @param pParent parent window pointer
+     * @param lstItems returns the list of layout item info
+     * @return Returns TRUE on success, FALSE on failure
      */
     BOOL SaveLayout(IWindow *pParent, SArray<FrameLayoutItemInfo> &lstItems) const;
 
     /**
-     * @brief 恢复布局配置
-     * @param pParent 父窗口指针
-     * @param lstItems 布局项信息列表
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Restore layout configuration
+     * @param pParent parent window pointer
+     * @param lstItems layout item info list
+     * @return Returns TRUE on success, FALSE on failure
      */
     BOOL RestoreLayout(IWindow *pParent, const SArray<FrameLayoutItemInfo> &lstItems);
 

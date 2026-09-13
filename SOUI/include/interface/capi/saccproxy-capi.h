@@ -9,7 +9,7 @@ extern "C" {
 
 #ifdef _WIN32
 
-/* IObjRef base interface macros */
+/** IObjRef base interface macros */
 #define IAccProxy_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -19,7 +19,7 @@ extern "C" {
 #define IAccProxy_OnFinalRelease(This) \
     ((This)->lpVtbl->OnFinalRelease(This))
 
-/* IAccProxy specific interface macros */
+/** IAccProxy specific interface macros */
 #define IAccProxy_get_accName(This, pszName) \
     ((This)->lpVtbl->get_accName(This, pszName))
 
@@ -59,10 +59,10 @@ extern "C" {
 #define IAccProxy_put_accValue(This, szValue) \
     ((This)->lpVtbl->put_accValue(This, szValue))
 
-#endif //_WIN32
+#endif /**< _WIN32 */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __SACCPROXY_CAPI_H__ */
+#endif /**< __SACCPROXY_CAPI_H__ */

@@ -20,7 +20,7 @@ SFindInfo::SFindInfo(IWindow *pParent, int _nID, int _nDeep)
 {
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 IWindow *SWindowFinder::FindChildByName(IWindow *pParent, LPCWSTR strName, int nDeep)
 {
     SFindInfo fi(pParent, strName, nDeep);

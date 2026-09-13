@@ -7,11 +7,11 @@
 
 SNSBEGIN
 
-// String constants for SearchDropdownList control
+/** String constants for SearchDropdownList control */
 namespace SSearchDropdownList_style
 {
-static LPCWSTR kStyle_Dropdown = L"dropdownStyle"; // 下拉列表风格
-static LPCWSTR kStyle_DropdownList = L"listStyle"; // 列表风格
+static LPCWSTR kStyle_Dropdown = L"dropdownStyle"; /**< Dropdown list style */
+static LPCWSTR kStyle_DropdownList = L"listStyle"; /**< List style */
 } // namespace SSearchDropdownList_style
 
 class SDropdownList;
@@ -26,7 +26,7 @@ class SOUI_EXP SSearchDropdownList
     DEF_SOBJECT(SWindow, L"searchdropdownlist")
 
   protected:
-    SDropdownList *m_pDropDownWnd; /**< DropDown指针 */
+    SDropdownList *m_pDropDownWnd; /**< DropDown pointer */
     DropAlign m_nDropAlign;
     SLayoutSize m_nMaxDropHeight;
     SAutoRefPtr<SListView> m_pListBox;
@@ -82,4 +82,4 @@ class SOUI_EXP SSearchDropdownList
 
 SNSEND
 
-#endif //__SSEARCHDROPDOWNLIST__H__
+#endif /**< __SSEARCHDROPDOWNLIST__H__ */

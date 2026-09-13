@@ -9,135 +9,132 @@ SNSBEGIN
 #define INTERFACE ITreeViewItemLocator
 DECLARE_INTERFACE_(ITreeViewItemLocator, IObjRef)
 {
-    //!添加引用
-    /*!
-     */
+    /** Add reference */
+    //
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
-    //!释放引用
-    /*!
-     */
+    /** Release reference */
+    //
     STDMETHOD_(long, Release)(THIS) PURE;
 
-    //!释放对象
-    /*!
-     */
+    /** Release object */
+    //
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
     //----------------------------------------------
 
     /**
-     * @brief 设置适配器
-     * @param pAdapter ITvAdapter *--适配器
+     * @brief Set the adapter
+     * @param pAdapter ITvAdapter *--Adapter
      * @return
      */
     STDMETHOD_(void, SetAdapter)(THIS_ ITvAdapter * pAdapter) PURE;
 
     /**
-     * @brief 树列表项数据发生变化后的响应
-     * @param hItem HSTREEITEM--树列表项
+     * @brief Response after the tree list item data changes
+     * @param hItem HSTREEITEM--Tree list item
      * @return
      */
     STDMETHOD_(void, OnBranchChanged)(THIS_ HSTREEITEM hItem) PURE;
 
     /**
-     * @brief 树列表项展开状态发生变化
-     * @param hItem HSTREEITEM--树列表项
-     * @param bExpandedOld BOOL--原展开状态标志
-     * @param bExpandedNew BOOL--新展开状态标志
+     * @brief Tree list item expand state changed
+     * @param hItem HSTREEITEM--Tree list item
+     * @param bExpandedOld BOOL--Original expanded state flag
+     * @param bExpandedNew BOOL--New expanded state flag
      * @return
      */
     STDMETHOD_(void, OnBranchExpandedChanged)
     (THIS_ HSTREEITEM hItem, BOOL bExpandedOld, BOOL bExpandedNew) PURE;
 
     /**
-     * @brief 获取总高度
-     * @return int--总高度
+     * @brief Get the total height
+     * @return int--Total height
      */
     STDMETHOD_(int, GetTotalHeight)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 获取总宽度
-     * @return int--总宽度
+     * @brief Get the total width
+     * @return int--Total width
      */
     STDMETHOD_(int, GetTotalWidth)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 从列表项转换为显示位置
-     * @param hItem HSTREEITEM--树列表项
-     * @return int--显示位置
+     * @brief Convert from list item to display position
+     * @param hItem HSTREEITEM--Tree list item
+     * @return int--Display position
      */
     STDMETHOD_(int, Item2Position)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
-     * @brief 显示位置转换成列表项
-     * @param position int--显示位置
+     * @brief Convert display position to list item
+     * @param position int--Display position
      * @return
      */
     STDMETHOD_(HSTREEITEM, Position2Item)(CTHIS_ int position) SCONST PURE;
 
     /**
-     * @brief 设置默认项高度
-     * @param nHeight int--默认项高度
+     * @brief Set the default item height
+     * @param nHeight int--Default item height
      * @return
      */
     STDMETHOD_(void, SetDefItemHeight)(THIS_ int nHeight) PURE;
 
     /**
-     * @brief 获取滚动行大小
-     * @return int--滚动行大小
+     * @brief Get scroll row size
+     * @return int--scroll row size
      */
     STDMETHOD_(int, GetScrollLineSize)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 设置表项宽度
-     * @param hItem HSTREEITEM--表项
-     * @param nWidth int--宽度
+     * @brief Set the item width
+     * @param hItem HSTREEITEM--Item
+     * @param nWidth int--Width
      * @return
      */
     STDMETHOD_(void, SetItemWidth)(THIS_ HSTREEITEM hItem, int nWidth) PURE;
 
     /**
-     * @brief 获取表项宽度
-     * @param hItem HSTREEITEM--表项
-     * @return int--表项宽度
+     * @brief Get the item width
+     * @param hItem HSTREEITEM--Item
+     * @return int--Item width
      */
     STDMETHOD_(int, GetItemWidth)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
-     * @brief 设置表项高度
-     * @param hItem HSTREEITEM--表项
-     * @param nHeight int--表项高度
+     * @brief Set the item height
+     * @param hItem HSTREEITEM--Item
+     * @param nHeight int--Item height
      * @return
      */
     STDMETHOD_(void, SetItemHeight)(THIS_ HSTREEITEM hItem, int nHeight) PURE;
 
     /**
-     * @brief 获取表项高度
-     * @param hItem HSTREEITEM--表项
-     * @return int--表项高度
+     * @brief Get the item height
+     * @param hItem HSTREEITEM--Item
+     * @return int--Item height
      */
     STDMETHOD_(int, GetItemHeight)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
-     * @brief 获取表项缩进
-     * @param hItem HSTREEITEM--表项
-     * @return int--表项缩进
+     * @brief Get the item indentation
+     * @param hItem HSTREEITEM--Item
+     * @return int--Item indentation
      */
     STDMETHOD_(int, GetItemIndent)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
-     * @brief 获取缩进
-     * @return int--缩进
+     * @brief Get the indentation
+     * @return int--Indentation
      */
     STDMETHOD_(int, GetIndent)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 设置缩进
-     * @param nIndent int--缩进
+     * @brief Set the indentation
+     * @param nIndent int--Indentation
      * @return
      */
     STDMETHOD_(void, SetIndent)(THIS_ int nIndent) PURE;
 };
 
 SNSEND
-#endif // __STREEVIEWITEMLOCATOR_I__H__
+#endif /**< __STREEVIEWITEMLOCATOR_I__H__ */

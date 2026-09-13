@@ -10,12 +10,12 @@
 
 SNSBEGIN
 
-#define CX_ICON 16 // 支持的图标的宽度
-#define CY_ICON 16 // 支持的图标的高度
+#define CX_ICON 16 /**< Width of supported icons */
+#define CY_ICON 16 /**< Height of supported icons */
 
 /**
  * @class SMenuAttr
- * @brief 菜单属性类
+ * @brief Menu attribute class
  */
 class SMenuAttr : public TObjRefImpl<SObject> {
     friend class SMenu;
@@ -24,72 +24,72 @@ class SMenuAttr : public TObjRefImpl<SObject> {
 
   public:
     /**
-     * @brief 构造函数
+     * @brief Constructor
      */
     SMenuAttr();
 
     /**
-     * @brief 析构函数
+     * @brief Destructor
      */
     ~SMenuAttr();
 
     /**
-     * @brief 设置缩放比例
-     * @param scale 缩放比例
+     * @brief Set scale
+     * @param scale Scale
      */
     void SetScale(int scale);
 
     SOUI_ATTRS_BEGIN()
-        ATTR_SKIN(L"itemSkin", m_pItemSkin, FALSE)           // 菜单项皮肤，包含2种状态：正常状态+选中状态
-        ATTR_SKIN(L"iconSkin", m_pIconSkin, FALSE)           // 菜单图标
-        ATTR_SKIN(L"sepSkin", m_pSepSkin, FALSE)             // 分割栏皮肤
-        ATTR_SKIN(L"checkSkin", m_pCheckSkin, FALSE)         // 选中状态,包含两种状态:勾选+圈选
-        ATTR_LAYOUTSIZE(L"itemHeight", m_nItemHei, FALSE)    // 菜单项高度
-        ATTR_LAYOUTSIZE(L"iconMargin", m_nIconMargin, FALSE) // 图标边缘空间
-        ATTR_LAYOUTSIZE(L"textMargin", m_nTextMargin, FALSE) // 文本边缘空间
-        ATTR_LAYOUTSIZE(L"maxWidth", m_nMaxWidth, FALSE)     // 菜单项最大宽度
-        ATTR_LAYOUTSIZE2(L"iconSize", m_szIcon, FALSE)       // 图标尺寸
-        ATTR_FONT(L"font", m_dpiFont, FALSE)                 // 字体
-        ATTR_COLOR(L"colorText", m_crTxtNormal, FALSE)       // 正常文本颜色
-        ATTR_COLOR(L"colorTextSel", m_crTxtSel, FALSE)       // 选中文本颜色
-        ATTR_COLOR(L"colorTextGray", m_crTxtGray, FALSE)     // 灰文本颜色
-        ATTR_STRINGW(L"trCtx", m_strTrCtx, FALSE)            // 翻译上下文
+        ATTR_SKIN(L"itemSkin", m_pItemSkin, FALSE)           /**< Menu item skin, containing 2 states: normal state + selected state */
+        ATTR_SKIN(L"iconSkin", m_pIconSkin, FALSE)           /**< Menu icon */
+        ATTR_SKIN(L"sepSkin", m_pSepSkin, FALSE)             /**< Separator bar skin */
+        ATTR_SKIN(L"checkSkin", m_pCheckSkin, FALSE)         /**< Selected state, containing two states: checked + radio-selected */
+        ATTR_LAYOUTSIZE(L"itemHeight", m_nItemHei, FALSE)    /**< Menu item height */
+        ATTR_LAYOUTSIZE(L"iconMargin", m_nIconMargin, FALSE) /**< Icon margin space */
+        ATTR_LAYOUTSIZE(L"textMargin", m_nTextMargin, FALSE) /**< Text margin space */
+        ATTR_LAYOUTSIZE(L"maxWidth", m_nMaxWidth, FALSE)     /**< Menu item max width */
+        ATTR_LAYOUTSIZE2(L"iconSize", m_szIcon, FALSE)       /**< Icon size */
+        ATTR_FONT(L"font", m_dpiFont, FALSE)                 /**< Font */
+        ATTR_COLOR(L"colorText", m_crTxtNormal, FALSE)       /**< Normal text color */
+        ATTR_COLOR(L"colorTextSel", m_crTxtSel, FALSE)       /**< Selected text color */
+        ATTR_COLOR(L"colorTextGray", m_crTxtGray, FALSE)     /**< Grayed text color */
+        ATTR_STRINGW(L"trCtx", m_strTrCtx, FALSE)            /**< Translation context */
     SOUI_ATTRS_END()
 
   protected:
     /**
-     * @brief 获取文本边缘空间
-     * @return 文本边缘空间
+     * @brief Get text margin space
+     * @return Text margin space
      */
     int GetTextMargin();
 
     /**
-     * @brief 获取图标边缘空间
-     * @return 图标边缘空间
+     * @brief Get icon margin space
+     * @return Icon margin space
      */
     int GetIconMargin();
 
     /**
-     * @brief 获取图标尺寸
-     * @return 图标尺寸
+     * @brief Get icon size
+     * @return Icon size
      */
     CSize GetIconSize();
 
     /**
-     * @brief 获取菜单项高度
-     * @return 菜单项高度
+     * @brief Get menu item height
+     * @return Menu item height
      */
     int GetItemHeight();
 
     /**
-     * @brief 获取菜单项最大宽度
-     * @return 菜单项最大宽度
+     * @brief Get menu item max width
+     * @return Menu item max width
      */
     int GetMaxWidth();
 
     /**
-     * @brief 获取缩放比例
-     * @return 缩放比例
+     * @brief Get scale
+     * @return Scale
      */
     int GetScale() const
     {
@@ -97,67 +97,67 @@ class SMenuAttr : public TObjRefImpl<SObject> {
     }
 
     /**
-     * @brief 获取字体指针
-     * @return 字体指针
+     * @brief Get font pointer
+     * @return Font pointer
      */
     SAutoRefPtr<IFontS> GetFontPtr();
 
   protected:
     /**
-     * @brief 初始化完成后的回调函数
-     * @param xmlNode XML节点
+     * @brief Callback function after initialization completes
+     * @param xmlNode XML node
      */
     virtual void WINAPI OnInitFinished(SXmlNode xmlNode);
 
-    SAutoRefPtr<ISkinObj> m_pItemSkin;  // 菜单项皮肤，包含2种状态：正常状态+选中状态
-    SAutoRefPtr<ISkinObj> m_pIconSkin;  // 菜单图标
-    SAutoRefPtr<ISkinObj> m_pSepSkin;   // 分割栏皮肤
-    SAutoRefPtr<ISkinObj> m_pCheckSkin; // 选中状态,包含两种状态:勾选+圈选
-    SLayoutSize m_nItemHei;             // 菜单项高度
-    SLayoutSize m_nIconMargin;          // 图标边缘空间
-    SLayoutSize m_nTextMargin;          // 文本边缘空间
-    COLORREF m_crTxtNormal;             // 正常文本颜色
-    COLORREF m_crTxtSel;                // 选中文本颜色
-    COLORREF m_crTxtGray;               // 灰文本颜色
-    SLayoutSize m_szIcon[2];            // 图标尺寸
-    SDpiAwareFont m_dpiFont;            // 字体
-    SStringW m_strTrCtx;                // 翻译上下文
-    SLayoutSize m_nMaxWidth;            // 菜单项最大宽度
-    int m_scale;                        // 缩放比例
+    SAutoRefPtr<ISkinObj> m_pItemSkin;  /**< Menu item skin, containing 2 states: normal state + selected state */
+    SAutoRefPtr<ISkinObj> m_pIconSkin;  /**< Menu icon */
+    SAutoRefPtr<ISkinObj> m_pSepSkin;   /**< Separator bar skin */
+    SAutoRefPtr<ISkinObj> m_pCheckSkin; /**< Selected state, containing two states: checked + radio-selected */
+    SLayoutSize m_nItemHei;             /**< Menu item height */
+    SLayoutSize m_nIconMargin;          /**< Icon margin space */
+    SLayoutSize m_nTextMargin;          /**< Text margin space */
+    COLORREF m_crTxtNormal;             /**< Normal text color */
+    COLORREF m_crTxtSel;                /**< Selected text color */
+    COLORREF m_crTxtGray;               /**< Grayed text color */
+    SLayoutSize m_szIcon[2];            /**< Icon size */
+    SDpiAwareFont m_dpiFont;            /**< Font */
+    SStringW m_strTrCtx;                /**< Translation context */
+    SLayoutSize m_nMaxWidth;            /**< Menu item max width */
+    int m_scale;                        /**< Scale */
 };
 
 /**
  * @struct SMenuItemData
- * @brief 菜单项数据结构
+ * @brief Menu item data structure
  */
 struct SMenuItemData
 {
     /**
-     * @brief 构造函数
+     * @brief Constructor
      */
     SMenuItemData();
 
     /**
-     * @brief 析构函数
+     * @brief Destructor
      */
     ~SMenuItemData();
 
-    int iIcon;            // 图标索引
-    SStringT strText;     // 文本
-    UINT vHotKey;         // 快捷键
-    ULONG_PTR dwUserData; // 用户数据
-    HICON hIcon;          // 图标句柄
+    int iIcon;            /**< Icon index */
+    SStringT strText;     /**< Text */
+    UINT vHotKey;         /**< Accelerator key */
+    ULONG_PTR dwUserData; /**< User data */
+    HICON hIcon;          /**< Icon handle */
 };
 
 /**
  * @class SOwnerDraw
- * @brief 所有者绘制模板类
- * @tparam T 派生类类型
+ * @brief Owner-draw template class
+ * @tparam T Derived class type
  */
 template <class T>
 class SOwnerDraw {
   public:
-    // Message map and handlers
+    /** Message map and handlers */
     BEGIN_MSG_MAP_EX(SOwnerDraw<T>)
         MESSAGE_HANDLER(WM_DRAWITEM, OnDrawItem)
         MESSAGE_HANDLER(WM_MEASUREITEM, OnMeasureItem)
@@ -172,14 +172,14 @@ class SOwnerDraw {
     END_MSG_MAP()
 
     /**
-     * @brief 处理WM_DRAWITEM消息
-     * @param uMsg 消息ID
-     * @param wParam 附加参数1
-     * @param lParam 附加参数2
-     * @param bHandled 消息是否被处理
-     * @return 处理结果
+     * @brief Handle WM_DRAWITEM message
+     * @param uMsg Message ID
+     * @param wParam Additional parameter 1
+     * @param lParam Additional parameter 2
+     * @param bHandled Whether the message is handled
+     * @return Result
      */
-    LRESULT OnDrawItem(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam, BOOL &bHandled)
+    LRESULT OnDrawItem(UINT /**< uMsg */, WPARAM /**< wParam */, LPARAM lParam, BOOL &bHandled)
     {
         T *pT = static_cast<T *>(this);
         pT->SetMsgHandled(TRUE);
@@ -189,14 +189,14 @@ class SOwnerDraw {
     }
 
     /**
-     * @brief 处理WM_MEASUREITEM消息
-     * @param uMsg 消息ID
-     * @param wParam 附加参数1
-     * @param lParam 附加参数2
-     * @param bHandled 消息是否被处理
-     * @return 处理结果
+     * @brief Handle WM_MEASUREITEM message
+     * @param uMsg Message ID
+     * @param wParam Additional parameter 1
+     * @param lParam Additional parameter 2
+     * @param bHandled Whether the message is handled
+     * @return Result
      */
-    LRESULT OnMeasureItem(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam, BOOL &bHandled)
+    LRESULT OnMeasureItem(UINT /**< uMsg */, WPARAM /**< wParam */, LPARAM lParam, BOOL &bHandled)
     {
         T *pT = static_cast<T *>(this);
         pT->SetMsgHandled(TRUE);
@@ -206,14 +206,14 @@ class SOwnerDraw {
     }
 
     /**
-     * @brief 处理WM_COMPAREITEM消息
-     * @param uMsg 消息ID
-     * @param wParam 附加参数1
-     * @param lParam 附加参数2
-     * @param bHandled 消息是否被处理
-     * @return 处理结果
+     * @brief Handle WM_COMPAREITEM message
+     * @param uMsg Message ID
+     * @param wParam Additional parameter 1
+     * @param lParam Additional parameter 2
+     * @param bHandled Whether the message is handled
+     * @return Result
      */
-    LRESULT OnCompareItem(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam, BOOL &bHandled)
+    LRESULT OnCompareItem(UINT /**< uMsg */, WPARAM /**< wParam */, LPARAM lParam, BOOL &bHandled)
     {
         T *pT = static_cast<T *>(this);
         pT->SetMsgHandled(TRUE);
@@ -222,14 +222,14 @@ class SOwnerDraw {
     }
 
     /**
-     * @brief 处理WM_DELETEITEM消息
-     * @param uMsg 消息ID
-     * @param wParam 附加参数1
-     * @param lParam 附加参数2
-     * @param bHandled 消息是否被处理
-     * @return 处理结果
+     * @brief Handle WM_DELETEITEM message
+     * @param uMsg Message ID
+     * @param wParam Additional parameter 1
+     * @param lParam Additional parameter 2
+     * @param bHandled Whether the message is handled
+     * @return Result
      */
-    LRESULT OnDeleteItem(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam, BOOL &bHandled)
+    LRESULT OnDeleteItem(UINT /**< uMsg */, WPARAM /**< wParam */, LPARAM lParam, BOOL &bHandled)
     {
         T *pT = static_cast<T *>(this);
         pT->SetMsgHandled(TRUE);
@@ -239,14 +239,14 @@ class SOwnerDraw {
     }
 
     /**
-     * @brief 处理WM_MENUCHAR消息
-     * @param uMsg 消息ID
-     * @param wParam 附加参数1
-     * @param lParam 附加参数2
-     * @param bHandled 消息是否被处理
-     * @return 处理结果
+     * @brief Handle WM_MENUCHAR message
+     * @param uMsg Message ID
+     * @param wParam Additional parameter 1
+     * @param lParam Additional parameter 2
+     * @param bHandled Whether the message is handled
+     * @return Result
      */
-    LRESULT OnMenuChar(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL &bHandled)
+    LRESULT OnMenuChar(UINT /**< uMsg */, WPARAM wParam, LPARAM lParam, BOOL &bHandled)
     {
         T *pT = static_cast<T *>(this);
         pT->SetMsgHandled(TRUE);
@@ -260,20 +260,20 @@ class SOwnerDraw {
         return lRes;
     }
 
-    // Overrideables
+    /** Overrideables */
     /**
-     * @brief 绘制菜单项
-     * @param lpDrawItemStruct 绘制项结构
+     * @brief Draw menu item
+     * @param lpDrawItemStruct Draw item structure
      */
-    void DrawItem(LPDRAWITEMSTRUCT /*lpDrawItemStruct*/)
+    void DrawItem(LPDRAWITEMSTRUCT /**< lpDrawItemStruct */)
     {
         // must be implemented
         SASSERT(FALSE);
     }
 
     /**
-     * @brief 测量菜单项
-     * @param lpMeasureItemStruct 测量项结构
+     * @brief Measure menu item
+     * @param lpMeasureItemStruct Measure item structure
      */
     void MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct)
     {
@@ -294,21 +294,21 @@ class SOwnerDraw {
     }
 
     /**
-     * @brief 比较菜单项
-     * @param lpCompareItemStruct 比较项结构
-     * @return 比较结果
+     * @brief Compare menu items
+     * @param lpCompareItemStruct Compare item structure
+     * @return Comparison result
      */
-    int CompareItem(LPCOMPAREITEMSTRUCT /*lpCompareItemStruct*/)
+    int CompareItem(LPCOMPAREITEMSTRUCT /**< lpCompareItemStruct */)
     {
         // all items are equal
         return 0;
     }
 
     /**
-     * @brief 删除菜单项
-     * @param lpDeleteItemStruct 删除项结构
+     * @brief Delete menu item
+     * @param lpDeleteItemStruct Delete item structure
      */
-    void DeleteItem(LPDELETEITEMSTRUCT /*lpDeleteItemStruct*/)
+    void DeleteItem(LPDELETEITEMSTRUCT /**< lpDeleteItemStruct */)
     {
         // default - nothing
     }
@@ -316,7 +316,7 @@ class SOwnerDraw {
 
 /**
  * @class SMenuODWnd
- * @brief 所有者绘制菜单窗口类
+ * @brief Owner-draw menu window class
  */
 class SMenuODWnd
     : public SNativeWnd
@@ -325,58 +325,58 @@ class SMenuODWnd
 
   public:
     /**
-     * @brief 构造函数
-     * @param hMenuOwner 菜单所有者窗口句柄
-     * @param pMenuAttr 菜单属性对象指针
+     * @brief Constructor
+     * @param hMenuOwner Menu owner window handle
+     * @param pMenuAttr Pointer to menu attribute object
      */
     SMenuODWnd(HWND hMenuOwner, SMenuAttr *pMenuAttr);
 
     /**
-     * @brief 析构函数
+     * @brief Destructor
      */
     ~SMenuODWnd();
 
   protected:
     /**
-     * @brief 初始化菜单
-     * @param menu 菜单句柄
+     * @brief Initialize menu
+     * @param menu Menu handle
      */
     void OnInitMenu(HMENU menu);
 
     /**
-     * @brief 初始化弹出菜单
-     * @param menuPopup 弹出菜单句柄
-     * @param nIndex 索引
-     * @param bSysMenu 是否为系统菜单
+     * @brief Initialize popup menu
+     * @param menuPopup Popup menu handle
+     * @param nIndex Index
+     * @param bSysMenu Whether it is a system menu
      */
     void OnInitMenuPopup(HMENU menuPopup, UINT nIndex, BOOL bSysMenu);
 
     /**
-     * @brief 绘制菜单项
-     * @param lpDrawItemStruct 绘制项结构
+     * @brief Draw menu item
+     * @param lpDrawItemStruct Draw item structure
      */
     void DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct);
 
     /**
-     * @brief 测量菜单项
-     * @param lpMeasureItemStruct 测量项结构
+     * @brief Measure menu item
+     * @param lpMeasureItemStruct Measure item structure
      */
     void MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct);
 
     /**
-     * @brief 处理菜单选择消息
-     * @param nItemID 项ID
-     * @param nFlags 标志
-     * @param menu 菜单句柄
+     * @brief Handle menu selection message
+     * @param nItemID Item ID
+     * @param nFlags Flags
+     * @param menu Menu handle
      */
     void OnMenuSelect(UINT nItemID, UINT nFlags, HMENU menu);
 
     /**
-     * @brief 处理菜单字符消息
-     * @param nChar 字符
-     * @param nFlags 标志
-     * @param hMenu 菜单句柄
-     * @return 处理结果
+     * @brief Handle menu character message
+     * @param nChar Character
+     * @param nFlags Flags
+     * @param hMenu Menu handle
+     * @return Result
      */
     LRESULT OnMenuChar(UINT nChar, UINT nFlags, HMENU hMenu);
 
@@ -388,261 +388,261 @@ class SMenuODWnd
         REFLECT_NOTIFICATIONS_EX()
     END_MSG_MAP()
 
-    HWND m_hMenuOwner;             // 菜单所有者窗口句柄
-    SAutoRefPtr<SMenuAttr> m_attr; // 菜单属性对象指针
+    HWND m_hMenuOwner;             /**< Menu owner window handle */
+    SAutoRefPtr<SMenuAttr> m_attr; /**< Pointer to menu attribute object */
 };
 
 /**
  * @class SMenu
- * @brief 菜单类
+ * @brief Menu class
  */
 class SOUI_EXP SMenu : public TObjRefImpl<IMenu> {
   public:
     /**
-     * @brief 复制构造函数
-     * @param src 源菜单对象
+     * @brief Copy constructor
+     * @param src Source menu object
      */
     SMenu(const SMenu &src);
 
     /**
-     * @brief 构造函数
-     * @param hMenu 菜单句柄（默认为0）
+     * @brief Constructor
+     * @param hMenu Menu handle (default is 0)
      */
     SMenu(HMENU hMenu = 0);
 
     /**
-     * @brief 析构函数
+     * @brief Destructor
      */
     ~SMenu(void);
 
   public:
-    HMENU m_hMenu; // 菜单句柄
+    HMENU m_hMenu; /**< Menu handle */
 
-  public: // IMenu
+  public: /**< IMenu */
     /**
-     * @brief 附加菜单句柄
-     * @param hMenu 菜单句柄
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Attach menu handle
+     * @param hMenu Menu handle
+     * @return Returns TRUE on success, FALSE on failure
      */
     STDMETHOD_(BOOL, Attach)(THIS_ HMENU hMenu) OVERRIDE;
 
     /**
-     * @brief 分离菜单句柄
-     * @return 分离的菜单句柄
+     * @brief Detach menu handle
+     * @return Detached menu handle
      */
     STDMETHOD_(HMENU, Detach)(THIS) OVERRIDE;
 
     /**
-     * @brief 获取菜单句柄
-     * @return 菜单句柄
+     * @brief Get menu handle
+     * @return Menu handle
      */
     STDMETHOD_(HMENU, GetHMenu)(THIS) SCONST OVERRIDE;
 
     /**
-     * @brief 加载菜单资源
-     * @param resId 资源ID
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Load menu resource
+     * @param resId Resource ID
+     * @return Returns TRUE on success, FALSE on failure
      */
     STDMETHOD_(BOOL, LoadMenu)(THIS_ LPCTSTR resId) OVERRIDE;
 
     /**
-     * @brief 加载菜单资源（UTF-8）
-     * @param resId 资源ID
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Load menu resource (UTF-8)
+     * @param resId Resource ID
+     * @return Returns TRUE on success, FALSE on failure
      */
     STDMETHOD_(BOOL, LoadMenuU8)(THIS_ LPCSTR resId) OVERRIDE;
 
     /**
-     * @brief 加载菜单资源（XML）
-     * @param xmlMenu XML节点
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Load menu resource (XML)
+     * @param xmlMenu XML node
+     * @return Returns TRUE on success, FALSE on failure
      */
     STDMETHOD_(BOOL, LoadMenu2)(THIS_ IXmlNode *xmlMenu) OVERRIDE;
 
     /**
-     * @brief 设置菜单图标皮肤
-     * @param icons 图标皮肤对象指针
+     * @brief Set menu icon skin
+     * @param icons Pointer to icon skin object
      */
     STDMETHOD_(void, SetIconSkin)(THIS_ ISkinObj *icons) OVERRIDE;
 
     /**
-     * @brief 插入菜单项
-     * @param uPosition 位置
-     * @param uFlags 标志
-     * @param nIDNewItem 新项ID
-     * @param strText 文本
-     * @param iIcon 图标索引（默认为-1）
-     * @param hIcon 图标句柄（默认为0）
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Insert menu item
+     * @param uPosition Position
+     * @param uFlags Flags
+     * @param nIDNewItem New item ID
+     * @param strText Text
+     * @param iIcon Icon index (default is -1)
+     * @param hIcon Icon handle (default is 0)
+     * @return Returns TRUE on success, FALSE on failure
      */
     STDMETHOD_(BOOL, InsertMenu)(THIS_ UINT uPosition, UINT uFlags, UINT_PTR nIDNewItem, LPCTSTR strText, int iIcon DEF_VAL(-1), HICON hIcon DEF_VAL(0)) OVERRIDE;
 
     /**
-     * @brief 追加菜单项
-     * @param uFlags 标志
-     * @param uIDNewItem 新项ID
-     * @param lpNewItem 文本
-     * @param iIcon 图标索引（默认为-1）
-     * @param hIcon 图标句柄（默认为0）
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Append menu item
+     * @param uFlags Flags
+     * @param uIDNewItem New item ID
+     * @param lpNewItem Text
+     * @param iIcon Icon index (default is -1)
+     * @param hIcon Icon handle (default is 0)
+     * @return Returns TRUE on success, FALSE on failure
      */
     STDMETHOD_(BOOL, AppendMenu)(THIS_ UINT uFlags, UINT_PTR uIDNewItem, LPCTSTR lpNewItem, int iIcon DEF_VAL(-1), HICON hIcon DEF_VAL(0)) OVERRIDE;
 
     /**
-     * @brief 启用或禁用菜单项
-     * @param uIDEnableItem 项目ID或索引
+     * @brief Enable or disable menu item
+     * @param uIDEnableItem Item ID or index
      * @param uEnable MF_BYCOMMAND/MF_BYPOSITION | MF_ENABLED/MF_GRAYED/MF_DISABLED
-     * @return 成功返回TRUE，失败返回FALSE
+     * @return Returns TRUE on success, FALSE on failure
      */
     STDMETHOD_(BOOL, EnableMenuItem)(THIS_ UINT uIDEnableItem, UINT uEnable) OVERRIDE;
 
     /**
-     * @brief 检查菜单项
-     * @param uIdCheckItem 要检查的菜单项ID
-     * @param uCheck 检查标志（例如，MF_CHECKED, MF_UNCHECKED）
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Check menu item
+     * @param uIdCheckItem Menu item ID to check
+     * @param uCheck Check flag (e.g., MF_CHECKED, MF_UNCHECKED)
+     * @return Returns TRUE on success, FALSE on failure
      */
     STDMETHOD_(BOOL, CheckMenuItem)(THIS_ UINT uIdCheckItem, UINT uCheck) OVERRIDE;
 
     /**
-     * @brief 检查菜单项（单选按钮）
-     * @param idFirst 第一个菜单项ID
-     * @param idLast 最后一个菜单项ID
-     * @param idCheck 要检查的菜单项ID
-     * @param uFlags 检查标志（例如，MF_BYCOMMAND, MF_BYPOSITION）
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Check menu item (radio button)
+     * @param idFirst First menu item ID
+     * @param idLast Last menu item ID
+     * @param idCheck Menu item ID to check
+     * @param uFlags Check flag (e.g., MF_BYCOMMAND, MF_BYPOSITION)
+     * @return Returns TRUE on success, FALSE on failure
      */
     STDMETHOD_(BOOL, CheckMenuRadioItem)(THIS_ UINT idFirst, UINT idLast, UINT idCheck, UINT uFlags) OVERRIDE;
 
     /**
-     * @brief 删除菜单项
-     * @param uPosition 菜单项位置
-     * @param uFlags 删除标志（例如，MF_BYCOMMAND, MF_BYPOSITION）
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Delete menu item
+     * @param uPosition Menu item position
+     * @param uFlags Delete flag (e.g., MF_BYCOMMAND, MF_BYPOSITION)
+     * @return Returns TRUE on success, FALSE on failure
      */
     STDMETHOD_(BOOL, DeleteMenu)(THIS_ UINT uPosition, UINT uFlags) OVERRIDE;
 
     /**
-     * @brief 跟踪弹出菜单
-     * @param uFlags 跟踪标志（例如，TPM_LEFTALIGN, TPM_RIGHTALIGN）
-     * @param x 菜单左上角的X坐标
-     * @param y 菜单左上角的Y坐标
-     * @param hWnd 父窗口句柄
-     * @param prcRect 可选的矩形区域
-     * @param nScale 缩放比例（默认为100）
-     * @return 菜单项ID
+     * @brief Track popup menu
+     * @param uFlags Track flag (e.g., TPM_LEFTALIGN, TPM_RIGHTALIGN)
+     * @param x X coordinate of the menu's top-left corner
+     * @param y Y coordinate of the menu's top-left corner
+     * @param hWnd Parent window handle
+     * @param prcRect Optional rectangle region
+     * @param nScale Scale (default is 100)
+     * @return Menu item ID
      */
     STDMETHOD_(UINT, TrackPopupMenu)(THIS_ UINT uFlags, int x, int y, HWND hWnd, LPCRECT prcRect DEF_VAL(NULL), int nScale DEF_VAL(100)) OVERRIDE;
 
     /**
-     * @brief 销毁菜单
+     * @brief Destroy menu
      */
     STDMETHOD_(void, DestroyMenu)(THIS) OVERRIDE;
 
     /**
-     * @brief 修改菜单项字符串
-     * @param uPosition 菜单项位置
-     * @param uFlags 标志（例如，MF_BYCOMMAND, MF_BYPOSITION）
-     * @param lpItemString 新的菜单项字符串
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Modify menu item string
+     * @param uPosition Menu item position
+     * @param uFlags Flags (e.g., MF_BYCOMMAND, MF_BYPOSITION)
+     * @param lpItemString New menu item string
+     * @return Returns TRUE on success, FALSE on failure
      */
     STDMETHOD_(BOOL, ModifyMenuString)(THIS_ UINT uPosition, UINT uFlags, LPCTSTR lpItemString) OVERRIDE;
 
     /**
-     * @brief 设置菜单项用户数据
-     * @param uPosition 菜单项位置
-     * @param uFlags 标志（例如，MF_BYCOMMAND, MF_BYPOSITION）
-     * @param ulUserData 用户数据
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Set menu item user data
+     * @param uPosition Menu item position
+     * @param uFlags Flags (e.g., MF_BYCOMMAND, MF_BYPOSITION)
+     * @param ulUserData User data
+     * @return Returns TRUE on success, FALSE on failure
      */
     STDMETHOD_(BOOL, SetMenuUserData)(THIS_ UINT uPosition, UINT uFlags, ULONG_PTR ulUserData) OVERRIDE;
 
     /**
-     * @brief 获取菜单项用户数据
-     * @param uPosition 菜单项位置
-     * @param uFlags 标志（例如，MF_BYCOMMAND, MF_BYPOSITION）
-     * @return 用户数据
+     * @brief Get menu item user data
+     * @param uPosition Menu item position
+     * @param uFlags Flags (e.g., MF_BYCOMMAND, MF_BYPOSITION)
+     * @return User data
      */
     STDMETHOD_(ULONG_PTR, GetMenuUserData)(THIS_ UINT uPosition, UINT uFlags) OVERRIDE;
 
     /**
-     * @brief 获取上下文帮助ID
-     * @return 上下文帮助ID
+     * @brief Get context help ID
+     * @return Context help ID
      */
     STDMETHOD_(DWORD, GetContextHelpId)(THIS) SCONST OVERRIDE;
 
     /**
-     * @brief 设置上下文帮助ID
-     * @param dwId 上下文帮助ID
+     * @brief Set context help ID
+     * @param dwId Context help ID
      */
     STDMETHOD_(void, SetContextHelpId)(THIS_ DWORD dwId) OVERRIDE;
 
     /**
-     * @brief 获取子菜单
-     * @param nPos 子菜单位置
-     * @return 子菜单句柄
+     * @brief Get submenu
+     * @param nPos Submenu position
+     * @return Submenu handle
      */
     STDMETHOD_(HMENU, GetSubMenu)(THIS_ int nPos) OVERRIDE;
 
     /**
-     * @brief 获取菜单项字符串
-     * @param uPosition 菜单项位置
-     * @param uFlags 标志（例如，MF_BYCOMMAND, MF_BYPOSITION）
-     * @param lpItemString 接收菜单项字符串的对象指针
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Get menu item string
+     * @param uPosition Menu item position
+     * @param uFlags Flags (e.g., MF_BYCOMMAND, MF_BYPOSITION)
+     * @param lpItemString Pointer to object receiving the menu item string
+     * @return Returns TRUE on success, FALSE on failure
      */
     STDMETHOD_(BOOL, GetMenuString)(THIS_ UINT uPosition, UINT uFlags, IStringT *lpItemString) OVERRIDE;
 
     /**
-     * @brief 获取菜单项数量
-     * @return 菜单项数量
+     * @brief Get menu item count
+     * @return Menu item count
      */
     STDMETHOD_(int, GetMenuItemCount)(CTHIS) SCONST OVERRIDE;
 
   protected:
     /**
-     * @brief 更新缩放比例
-     * @param nScale 缩放比例
+     * @brief Update scale
+     * @param nScale Scale
      */
     void UpdateScale(int nScale);
 
     /**
-     * @brief 构建菜单
-     * @param menuPopup 弹出菜单句柄
-     * @param xmlNode XML节点
+     * @brief Build menu
+     * @param menuPopup Popup menu handle
+     * @param xmlNode XML node
      */
     void BuildMenu(HMENU menuPopup, SXmlNode xmlNode);
 
     /**
-     * @brief 初始化菜单项数据
-     * @param itemInfo 菜单项数据指针
-     * @param strText 菜单项文本
+     * @brief Initialize menu item data
+     * @param itemInfo Pointer to menu item data
+     * @param strText Menu item text
      */
     void InitMenuItemData(SMenuItemData *itemInfo, const SStringW &strText);
 
     /**
-     * @brief 释放菜单项数据
-     * @param hMemu 菜单句柄
+     * @brief Release menu item data
+     * @param hMemu Menu handle
      */
     void FreeMenuItemData(HMENU hMemu);
 
     /**
-     * @brief 获取菜单属性对象指针
-     * @param hMenu 菜单句柄
-     * @return 菜单属性对象指针
+     * @brief Get pointer to menu attribute object
+     * @param hMenu Menu handle
+     * @return Pointer to menu attribute object
      */
     SMenuAttr *GetMenuAttr(HMENU hMenu) const;
 
     /**
-     * @brief 设置菜单属性对象指针
-     * @param hMenu 菜单句柄
-     * @param pMenuAttr 菜单属性对象指针
+     * @brief Set pointer to menu attribute object
+     * @param hMenu Menu handle
+     * @param pMenuAttr Pointer to menu attribute object
      */
     void SetMenuAttr(HMENU hMenu, SMenuAttr *pMenuAttr) const;
 
-    bool m_bAttached;              // 是否已附加菜单句柄
-    SAutoRefPtr<ISkinObj> m_icons; // 图标皮肤对象指针
+    bool m_bAttached;              /**< Whether the menu handle is attached */
+    SAutoRefPtr<ISkinObj> m_icons; /**< Pointer to icon skin object */
 };
 
 SNSEND
-#endif // __SMENU__H__
+#endif /**< __SMENU__H__ */

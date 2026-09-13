@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for IPC Interfaces
  * These macros provide C-style function call syntax for C++ interface methods
  *
@@ -15,19 +15,19 @@ extern "C" {
  *       IIpcHandle, IIpcConnection, IIpcServer, IIpcFactory inherit IObjRef.
  */
 
-/* IPC constants */
+/** IPC constants */
 #define IPC_FUN_ID_CONNECT      FUN_ID_CONNECT
 #define IPC_FUN_ID_DISCONNECT   FUN_ID_DISCONNECT
 #define IPC_FUN_ID_START        FUN_ID_START
 
 #define IPC_UM_CALL_FUN        UM_CALL_FUN
 
-/* IShareBuffer seek modes */
+/** IShareBuffer seek modes */
 #define IPC_SEEK_SET    0
 #define IPC_SEEK_CUR    1
 #define IPC_SEEK_END    2
 
-/* IShareBuffer C API Macros */
+/** IShareBuffer C API Macros */
 #define IShareBuffer_Write(This, data, nLen) \
     ((This)->Write(data, nLen))
 
@@ -49,7 +49,7 @@ extern "C" {
 #define IShareBuffer_Unlock(This) \
     ((This)->Unlock())
 
-/* IFunParams C API Macros */
+/** IFunParams C API Macros */
 #define IFunParams_GetID(This) \
     ((This)->GetID())
 
@@ -65,7 +65,7 @@ extern "C" {
 #define IFunParams_FromStream4Output(This, ps) \
     ((This)->FromStream4Output(ps))
 
-/* IIpcHandle C API Macros */
+/** IIpcHandle C API Macros */
 #define IIpcHandle_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -123,7 +123,7 @@ extern "C" {
 #define IIpcHandle_FromStream4Output(This, pParams, pBuf) \
     ((This)->lpVtbl->FromStream4Output(This, pParams, pBuf))
 
-/* IIpcConnection C API Macros */
+/** IIpcConnection C API Macros */
 #define IIpcConnection_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -148,7 +148,7 @@ extern "C" {
 #define IIpcConnection_BuildShareBufferName(This, idLocal, idRemote, szBuf) \
     ((This)->lpVtbl->BuildShareBufferName(This, idLocal, idRemote, szBuf))
 
-/* IIpcServer C API Macros */
+/** IIpcServer C API Macros */
 #define IIpcServer_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -176,7 +176,7 @@ extern "C" {
 #define IIpcServer_Disconnect(This, idConn) \
     ((This)->lpVtbl->Disconnect(This, idConn))
 
-/* IIpcFactory C API Macros */
+/** IIpcFactory C API Macros */
 #define IIpcFactory_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -196,4 +196,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SIPCOBJ_CAPI_H__ */
+#endif /**< __SIPCOBJ_CAPI_H__ */

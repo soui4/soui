@@ -15,16 +15,16 @@ DECLARE_INTERFACE_(ICaret, IObject)
     //-----------------------------------------------------------------------------------
 
     /**
-     * @brief 初始化光标
-     * @param hBmp --光标的位图，可以为空
-     * @param nWid --光标宽度
-     * @param nHei --光标高度
-     * @return BOOL TRUE-成功
+     * @brief Initialize the cursor
+     * @param hBmp -- cursor bitmap, may be NULL
+     * @param nWid -- cursor width
+     * @param nHei -- cursor height
+     * @return BOOL TRUE on success
      */
     STDMETHOD_(BOOL, Init)(THIS_ HBITMAP hBmp, int nWid, int nHei) PURE;
 
     /**
-     * @brief 设置光标位置
+     * @brief Set the cursor position
      * @param x -- X
      * @param y -- Y
      * @return
@@ -32,32 +32,32 @@ DECLARE_INTERFACE_(ICaret, IObject)
     STDMETHOD_(void, SetPosition)(THIS_ int x, int y) PURE;
 
     /**
-     * @brief 设置光标显示状态
-     * @param bVisible --显示状态
-     * @param owner --光标的宿主
-     * @return BOOL TRUE-成功
+     * @brief Set the cursor visibility state
+     * @param bVisible -- visibility state
+     * @param owner -- the cursor's host
+     * @return BOOL TRUE on success
      */
     STDMETHOD_(BOOL, SetVisible)(THIS_ BOOL bVisible, SWND owner) PURE;
 
     /**
-     * @brief 获取光标显示状态
-     * @return BOOL TRUE-显示
+     * @brief Get the cursor visibility state
+     * @return BOOL TRUE if visible
      */
     STDMETHOD_(BOOL, IsVisible)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 绘制光标
-     * @param pRT --绘制光标的RenderTarget
+     * @brief Draw the cursor
+     * @param pRT -- the RenderTarget for drawing the cursor
      * @return
      */
     STDMETHOD_(void, Draw)(THIS_ IRenderTarget * pRT) PURE;
 
     /**
-     * @brief 获取光标显示矩形
+     * @brief Get the cursor display rectangle
      * @return RECT
      */
     STDMETHOD_(RECT, GetRect)(CTHIS) SCONST PURE;
 };
 
 SNSEND
-#endif // __SCARET_I__H__
+#endif /**< __SCARET_I__H__ */

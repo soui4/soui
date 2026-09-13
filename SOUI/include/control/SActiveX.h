@@ -178,4 +178,4 @@ class SOUI_EXP SActiveX : public SWindow {
 
 SNSEND
 
-#endif // __SACTIVEX__H__
+#endif /**< __SACTIVEX__H__ */

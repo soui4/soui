@@ -13,7 +13,7 @@ SAxContainer::~SAxContainer()
 {
 }
 
-BOOL SAxContainer::CreateControl(REFGUID clsid, DWORD dwClsCtx /*=CLSCTX_INPROC_SERVER*/)
+BOOL SAxContainer::CreateControl(REFGUID clsid, DWORD dwClsCtx /**< =CLSCTX_INPROC_SERVER */)
 {
     SASSERT(m_pAxHostDelegate);
     HRESULT hr = E_FAIL;
@@ -26,8 +26,8 @@ BOOL SAxContainer::CreateControl(REFGUID clsid, DWORD dwClsCtx /*=CLSCTX_INPROC_
     return SUCCEEDED(hr);
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// IUnknown
+////////////////////////////////////////////////////////////////////////////
+/** IUnknown */
 HRESULT SAxContainer::QueryInterface(REFIID iid, void **object)
 {
     HRESULT hr = S_OK;
@@ -79,9 +79,9 @@ ULONG STDMETHODCALLTYPE SAxContainer::Release()
     return ::InterlockedDecrement(&m_lRefCnt);
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// IBindHost
-HRESULT SAxContainer::CreateMoniker(LPOLESTR szName, IBindCtx * /*pBC*/, IMoniker **ppmk, DWORD /*dwReserved*/)
+////////////////////////////////////////////////////////////////////////////
+/** IBindHost */
+HRESULT SAxContainer::CreateMoniker(LPOLESTR szName, IBindCtx * /**< pBC */, IMoniker **ppmk, DWORD /**< dwReserved */)
 {
     HRESULT hr;
     typedef HRESULT(WINAPI * pfnCreateURLMonikerEx)(IMoniker * pMkCtx, LPCWSTR szURL, IMoniker * *ppmk, DWORD dwFlags);
@@ -119,15 +119,15 @@ HRESULT SAxContainer::MonikerBindToStorage(IMoniker *pMk, IBindCtx *pBC, IBindSt
     return hr;
 }
 
-HRESULT SAxContainer::MonikerBindToObject(IMoniker * /*pMk*/, IBindCtx * /*pBC*/, IBindStatusCallback * /*pBSC*/, REFIID /*riid*/, void ** /*ppvObj*/)
+HRESULT SAxContainer::MonikerBindToObject(IMoniker * /**< pMk */, IBindCtx * /**< pBC */, IBindStatusCallback * /**< pBSC */, REFIID /**< riid */, void ** /**< ppvObj */)
 {
     ATLTRACENOTIMPL(_T("ActiveXContainerImpl::MonikerBindToObject\n"));
 }
 
-// {0002DF05-0000-0000-C000-000000000046}
+/** {0002DF05-0000-0000-C000-000000000046} */
 static const GUID GUID_IWebBrowserApp = { 0x0002DF05, 0x0000, 0x0000, { 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46 } };
 
-// {1B36028E-B491-4BB2-8584-8A9E0A677D6E}
+/** {1B36028E-B491-4BB2-8584-8A9E0A677D6E} */
 static const GUID GUID_IXcpControlHost = { 0x1B36028E, 0xB491, 0x4BB2, { 0x85, 0x84, 0x8A, 0x9E, 0x0A, 0x67, 0x7D, 0x6E } };
 
 HRESULT SAxContainer::QueryService(REFGUID guidService, REFIID riid, void **ppvObject)
@@ -142,4 +142,4 @@ HRESULT SAxContainer::QueryService(REFGUID guidService, REFIID riid, void **ppvO
 
 SNSEND
 
-#endif // defined(_WIN32) && !defined(__MINGW32__)
+#endif /**< defined(_WIN32) && !defined(__MINGW32__) */

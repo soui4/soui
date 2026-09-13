@@ -11,32 +11,32 @@ SNSBEGIN
 DECLARE_INTERFACE(ITimelineHandlersMgr)
 {
     /**
-     * @brief 注册动画帧处理接口
-     * @param pHandler ITimelineHandler *--动画帧处理接口
-     * @return TRUE--成功
+     * @brief Register the animation frame handler interface
+     * @param pHandler ITimelineHandler *--Animation frame handler interface
+     * @return TRUE--success
      */
     STDMETHOD_(BOOL, RegisterTimelineHandler)(THIS_ ITimelineHandler * pHandler) PURE;
 
     /**
-     * @brief 注销动画帧处理接口
-     * @param pHandler ITimelineHandler *--动画帧处理接口
-     * @return TRUE--成功
+     * @brief Unregister the animation frame handler interface
+     * @param pHandler ITimelineHandler *--Animation frame handler interface
+     * @return TRUE--success
      */
     STDMETHOD_(BOOL, UnregisterTimelineHandler)(THIS_ ITimelineHandler * pHandler) PURE;
 
     /**
-     * @brief 注册属性动画器
-     * @param pAnimator IValueAnimator *--属性动画器
-     * @return TRUE--成功
+     * @brief Register the property animator
+     * @param pAnimator IValueAnimator *--Property animator
+     * @return TRUE--success
      */
     STDMETHOD_(BOOL, RegisterValueAnimator)(THIS_ IValueAnimator * pAnimator) PURE;
 
     /**
-     * @brief 注销属性动画器
-     * @param pAnimator IValueAnimator *--属性动画器
-     * @return TRUE--成功
+     * @brief Unregister the property animator
+     * @param pAnimator IValueAnimator *--Property animator
+     * @return TRUE--success
      */
     STDMETHOD_(BOOL, UnregisterValueAnimator)(THIS_ IValueAnimator * pAnimator) PURE;
 };
 SNSEND
-#endif // __STIMELINEHANDLERSMGR_I__H__
+#endif /**< __STIMELINEHANDLERSMGR_I__H__ */

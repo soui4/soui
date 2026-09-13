@@ -44,7 +44,7 @@ BOOL SWndSurface::Init()
         SASSERT(FALSE);
         return FALSE;
     }
-#ifdef _WIN64 // X64中使用UpdateLayeredWindowIndirect在Win7测试显示不出内容，只能使用UpdateLayeredWindow,fuck
+#ifdef _WIN64 // Using UpdateLayeredWindowIndirect in X64 failed to display content in Win7 tests, can only use UpdateLayeredWindow, fuck
     // MS.
     s_funUpdateLayeredWindowIndirect = _SUpdateLayeredWindowIndirect;
 #else
@@ -170,5 +170,5 @@ void SHostPresenter::OnHostPresent(THIS_ HDC hdc, IRenderTarget *pMemRT, LPCRECT
         m_pHostWnd->ReleaseDC(hdc);
 }
 
-#endif //_WIN32
+#endif /**< _WIN32 */
 SNSEND

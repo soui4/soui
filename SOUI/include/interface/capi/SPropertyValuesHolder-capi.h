@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-/* IPropertyValuesHolder C API Macros (IObjRef base interface) */
+/** IPropertyValuesHolder C API Macros (IObjRef base interface) */
 #define IPropertyValuesHolder_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -17,7 +17,7 @@ extern "C" {
 #define IPropertyValuesHolder_OnFinalRelease(This) \
     ((This)->lpVtbl->OnFinalRelease(This))
 
-/* IPropertyValuesHolder specific interface macros */
+/** IPropertyValuesHolder specific interface macros */
 #define IPropertyValuesHolder_SetPropertyName(This, propertyName) \
     ((This)->lpVtbl->SetPropertyName(This, propertyName))
 
@@ -78,7 +78,7 @@ extern "C" {
 #define IPropertyValuesHolder_GetKeyFrameWeights(This, weights, count) \
     ((This)->lpVtbl->GetKeyFrameWeights(This, weights, count))
 
-/* IPropertyAnimator C API Macros (IValueAnimator base interface) */
+/** IPropertyAnimator C API Macros (IValueAnimator base interface) */
 #define IPropertyAnimator_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -88,7 +88,7 @@ extern "C" {
 #define IPropertyAnimator_OnFinalRelease(This) \
     ((This)->lpVtbl->OnFinalRelease(This))
 
-/* IPropertyAnimator specific interface macros */
+/** IPropertyAnimator specific interface macros */
 #define IPropertyAnimator_GetTarget(This) \
     ((This)->lpVtbl->GetTarget(This))
 
@@ -114,4 +114,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SPROPERTY_VALUES_HOLDER_CAPI_H__ */
+#endif /**< __SPROPERTY_VALUES_HOLDER_CAPI_H__ */

@@ -20,7 +20,7 @@ class SListViewDataSetObserver : public TObjRefImpl<ILvDataSetObserver> {
     SListView *m_pOwner;
 };
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 void SListViewDataSetObserver::onChanged()
 {
     m_pOwner->onDataSetChanged();
@@ -36,7 +36,7 @@ void SListViewDataSetObserver::OnItemChanged(int iItem)
     m_pOwner->onItemDataChanged(iItem);
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 SListView::SListView()
     : SViewBase(this)
     , m_pSkinDivider(NULL)
@@ -132,12 +132,12 @@ void SListView::UpdateScrollBar()
         szView.cx = rcClient.Width();
         szView.cy = m_lvItemLocator ? m_lvItemLocator->GetTotalHeight() : 0;
 
-        //  关闭滚动条
+        // Close scroll bar
         m_wBarVisible = SSB_NULL;
 
         if (size.cy < szView.cy)
         {
-            //  需要纵向滚动条
+            // Need vertical scroll bar
             m_wBarVisible |= SSB_VERT;
             m_siVer.nMin = 0;
             m_siVer.nMax = szView.cy - 1;
@@ -146,7 +146,7 @@ void SListView::UpdateScrollBar()
         }
         else
         {
-            //  不需要纵向滚动条
+            // No vertical scroll bar needed
             m_siVer.nPage = size.cy;
             m_siVer.nMin = 0;
             m_siVer.nMax = size.cy - 1;
@@ -160,12 +160,12 @@ void SListView::UpdateScrollBar()
         szView.cy = rcClient.Height();
         szView.cx = m_lvItemLocator ? m_lvItemLocator->GetTotalHeight() : 0;
 
-        //  关闭滚动条
+        // Close scroll bar
         m_wBarVisible = SSB_NULL;
 
         if (size.cx < szView.cx)
         {
-            //  需要纵向滚动条
+            // Need vertical scroll bar
             m_wBarVisible |= SSB_HORZ;
             m_siHoz.nMin = 0;
             m_siHoz.nMax = szView.cx - 1;
@@ -174,7 +174,7 @@ void SListView::UpdateScrollBar()
         }
         else
         {
-            //  不需要纵向滚动条
+            // No vertical scroll bar needed
             m_siHoz.nPage = size.cx;
             m_siHoz.nMin = 0;
             m_siHoz.nMax = size.cx - 1;
@@ -184,7 +184,7 @@ void SListView::UpdateScrollBar()
         SetScrollPos(FALSE, m_siHoz.nPos, FALSE);
     }
 
-    //  重新计算客户区及非客户区
+    // Recompute client and non-client areas
     SSendMessage(WM_NCCALCSIZE);
 
     InvalidateRect(NULL);
@@ -302,7 +302,7 @@ void SListView::OnPaint(IRenderTarget *pRT)
                 rcItem.right += m_lvItemLocator->GetDividerSize();
             }
             if (m_pSkinDivider && !rcItem.IsRectEmpty() && rgnClip->RectInRegion(&rcItem))
-            { //绘制分隔线
+            { // Draw separator line
                 m_pSkinDivider->DrawByIndex(pRT, rcItem, 0);
             }
         }
@@ -322,7 +322,7 @@ BOOL SListView::OnScroll(BOOL bVertical, UINT uCode, int nPos)
     {
         UpdateVisibleItems();
 
-        //加速滚动时UI的刷新
+        // Accelerate UI refresh during scrolling
         if (uCode == SB_THUMBTRACK)
             ScrollUpdate();
 
@@ -333,7 +333,7 @@ BOOL SListView::OnScroll(BOOL bVertical, UINT uCode, int nPos)
 
 void SListView::UpdateVisibleItems()
 {
-    if (!m_adapter || ! GetContainer())
+    if (!m_adapter || !GetContainer())
         return;
     SAutoEnableHostPrivUiDef enableUiDef(this);
     int iOldFirstVisible = m_iFirstVisible;
@@ -372,13 +372,13 @@ void SListView::UpdateVisibleItems()
             ii.nType = m_adapter->getItemViewType(iNewLastVisible, dwState);
             if (iNewLastVisible >= iOldFirstVisible && iNewLastVisible < iOldLastVisible)
             {                                                   // use the old visible item
-                int iItem = iNewLastVisible - iOldFirstVisible; //(iNewLastVisible-iNewFirstVisible) +
-                                                                //(iNewFirstVisible-iOldFirstVisible);
+                int iItem = iNewLastVisible - iOldFirstVisible; // (iNewLastVisible-iNewFirstVisible) +
+                                                                // (iNewFirstVisible-iOldFirstVisible);
                 SASSERT(iItem >= 0 && iItem <= (iOldLastVisible - iOldFirstVisible));
                 if (ii.nType == pItemInfos[iItem].nType)
                 {
                     ii = pItemInfos[iItem];
-                    pItemInfos[iItem].pItem = NULL; //标记该行已经被重用
+                    pItemInfos[iItem].pItem = NULL; // Mark this row as reused
                 }
             }
             BOOL bNewItem = FALSE;
@@ -386,7 +386,7 @@ void SListView::UpdateVisibleItems()
             { // create new visible item
                 SList<SItemPanel *> *lstRecycle = m_itemRecycle.GetAt(ii.nType);
                 if (lstRecycle->IsEmpty())
-                { //创建一个新的列表项
+                { // Create a new list item
                     bNewItem = TRUE;
                     ii.pItem = SItemPanel::Create(this, SXmlNode(), this);
                     ii.pItem->GetEventSet()->subscribeEvent(EventItemPanelClick::EventID, Subscriber(&SViewBase::OnItemClick, (SViewBase *)this));
@@ -410,7 +410,7 @@ void SListView::UpdateVisibleItems()
                 ii.pItem->Move(rcItem);
             }
 
-            //设置状态，同时暂时禁止应用响应statechanged事件。
+            // Set state while temporarily preventing the app from responding to the statechanged event.
             ii.pItem->GetEventSet()->setMutedState(true);
             ii.pItem->ModifyItemState(dwState, 0);
             ii.pItem->GetEventSet()->setMutedState(false);
@@ -484,7 +484,7 @@ void SListView::UpdateVisibleItems()
     if (!m_lvItemLocator->IsFixHeight() && m_lvItemLocator->GetTotalHeight() != nOldTotalHeight)
     { // update scroll range
         UpdateScrollBar();
-        UpdateVisibleItems(); //根据新的滚动条状态重新记录显示列表项
+        UpdateVisibleItems(); // Re-record the displayed list items based on the new scroll bar state
     }
     else
     {
@@ -558,7 +558,7 @@ void SListView::OnDestroy()
     __baseCls::OnDestroy();
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 BOOL SListView::IsItemRedrawDelay() const
 {
     return TRUE;
@@ -622,7 +622,7 @@ LRESULT SListView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
     LRESULT lRet = 0;
     CPoint pt(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 
-    // === 1. 先尝试SPanel的拖动处理 ===
+    // === 1. First try SPanel's drag handling ===
     if (HandleMouseDrag(uMsg, wParam, lParam, lRet))
     {
         SetMsgHandled(TRUE);
@@ -638,7 +638,7 @@ LRESULT SListView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
     else
     {
         if (uMsg == WM_LBUTTONDOWN || uMsg == WM_RBUTTONDOWN || uMsg == WM_MBUTTONDOWN)
-        { //交给panel处理
+        { // Hand off to panel for handling
             __baseCls::ProcessSwndMessage(uMsg, wParam, lParam, lRet);
         }
 
@@ -666,7 +666,7 @@ LRESULT SListView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
     }
 
     if (uMsg == WM_LBUTTONUP || uMsg == WM_RBUTTONUP || uMsg == WM_MBUTTONUP)
-    { //交给panel处理
+    { // Hand off to panel for handling
         __baseCls::ProcessSwndMessage(uMsg, wParam, lParam, lRet);
     }
     SetMsgHandled(TRUE);
@@ -950,13 +950,13 @@ BOOL SListView::CreateChildren(SXmlNode xmlNode)
         LPCWSTR kItemSize = m_bVertical ? SListView_style::kStyle_itemHeight : SListView_style::kStyle_itemWidth;
         SLayoutSize nItemHei = GETLAYOUTSIZE(xmlTemplate.attribute(kItemSize).value());
         if (nItemHei.fSize > 0.0f)
-        { //指定了itemHeight属性时创建一个固定行高的定位器
+        { // When itemHeight is specified, create a locator with fixed row height
             IListViewItemLocator *pItemLocator = new SListViewItemLocatorFix(nItemHei, m_nDividerSize);
             SetItemLocator(pItemLocator);
             pItemLocator->Release();
         }
         else
-        { //创建一个行高可变的行定位器，从defHeight/defWidth属性中获取默认行高
+        { // Create a variable row-height locator; obtain the default row height from the defHeight/defWidth attributes
             LPCWSTR kDefSize = m_bVertical ? SListView_style::kStyle_defHeight : SListView_style::kStyle_defWidth;
             IListViewItemLocator *pItemLocator = new SListViewItemLocatorFlex(GETLAYOUTSIZE(xmlTemplate.attribute(kDefSize).as_string(L"30dp")), m_nDividerSize);
             SetItemLocator(pItemLocator);

@@ -11,7 +11,8 @@
 
 SNSBEGIN
 
-struct SOUI_EXP SOhosAppCallbacks {
+struct SOUI_EXP SOhosAppCallbacks
+{
     const char *appName;
     const char *appResourceDir;
     const char *appResourceZipName;
@@ -30,4 +31,4 @@ SOUI_EXP napi_value SOhosNapiInit(napi_env env, napi_value exports, const SOhosA
 
 SNSEND
 
-#endif // __SOHOSAPP__H__
+#endif /**< __SOHOSAPP__H__ */

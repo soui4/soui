@@ -8,12 +8,12 @@ extern "C" {
 #endif
 
 
-/*
+/**
  * C API Helper Macros for IToolTip Interface
  * These macros provide C-style function call syntax for C++ interface methods
  */
 
-/* IObjRef base interface macros */
+/** IObjRef base interface macros */
 #define IToolTip_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -23,7 +23,7 @@ extern "C" {
 #define IToolTip_OnFinalRelease(This) \
     ((This)->lpVtbl->OnFinalRelease(This))
 
-/* IToolTip specific interface macros */
+/** IToolTip specific interface macros */
 #define IToolTip_Create(This) \
     ((This)->lpVtbl->Create(This))
 
@@ -48,7 +48,7 @@ extern "C" {
 #define IToolTip_RelayEvent(This, pMsg) \
     ((This)->lpVtbl->RelayEvent(This, pMsg))
 
-/* IToolTipFactory interface macros */
+/** IToolTipFactory interface macros */
 #define IToolTipFactory_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -68,4 +68,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __STOOLTIP_CAPI_H__ */
+#endif /**< __STOOLTIP_CAPI_H__ */

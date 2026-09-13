@@ -827,6 +827,17 @@ export class SouiPlatformBridge {
     return true;
   }
 
+  //
+// 播放系统提示音，语义对齐 Win32 MessageBeep / Android SouiPlatformBridge.messageBeep。
+// 鸿蒙的 TonePlayer 属系统接口、第三方应用不可用，故由 AudioPlayer 用 AudioRenderer
+// 现场合成提示音。各平台都只有一种系统提示音，uType（-1 / MB_ICON*）不参与选择，仅用于日志。
+// uType Win32 MessageBeep 的 uType
+// true 表示提示音请求已提交（异步播放，不等待播完）
+  public messageBeep(uType: number): boolean {
+    console.info(`[SouiPlatformBridge] messageBeep: uType=${uType}`);
+    return this.audioPlayer.playBeep();
+  }
+
   // ============================= 路径（对应 Path API）============================= 
 
   // getCacheDir() —— 对应 Android SouiPlatformBridge.getTempPath 

@@ -16,7 +16,7 @@ SNSBEGIN
  *             drawing, and animation.
  */
 class SOUI_EXP SCaret
-    : public TObjRefImpl<SObjectImpl<ICaret> >
+    : public TObjRefImpl<SObjectImpl<ICaret>>
     , public ITimelineHandler {
     DEF_SOBJECT(SObjectImpl<ICaret>, L"caret")
 
@@ -37,7 +37,7 @@ class SOUI_EXP SCaret
     ~SCaret();
 
   public:
-    // Methods inherited from ICaret
+    /** Methods inherited from ICaret */
 
     /**
      * @brief    Initializes the caret
@@ -94,7 +94,7 @@ class SOUI_EXP SCaret
     STDMETHOD_(RECT, GetRect)(THIS) SCONST OVERRIDE;
 
   public:
-    // Method inherited from ITimelineHandler
+    /** Method inherited from ITimelineHandler */
 
     /**
      * @brief    Handles the next frame in the timeline
@@ -140,4 +140,4 @@ class SOUI_EXP SCaret
 
 SNSEND
 
-#endif // __SCARET__H__
+#endif /**< __SCARET__H__ */

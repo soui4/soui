@@ -19,7 +19,7 @@ class STileViewDataSetObserver : public TObjRefImpl<ILvDataSetObserver> {
     STileView *m_pOwner;
 };
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 void STileViewDataSetObserver::onChanged()
 {
     m_pOwner->onDataSetChanged();
@@ -35,7 +35,7 @@ void STileViewDataSetObserver::OnItemChanged(int iItem)
     m_pOwner->onItemDataChanged(iItem);
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 STileView::STileView()
     : SViewBase(this)
     , m_nMarginSize(0.0f, px)
@@ -130,12 +130,12 @@ void STileView::UpdateScrollBar()
     szView.cx = rcClient.Width();
     szView.cy = m_tvItemLocator ? m_tvItemLocator->GetTotalHeight() : 0;
 
-    //  关闭滚动条
+    // Close scroll bar
     m_wBarVisible = SSB_NULL;
 
     if (size.cy < szView.cy)
     {
-        //  需要纵向滚动条
+        // Need vertical scroll bar
         m_wBarVisible |= SSB_VERT;
         m_siVer.nMin = 0;
         m_siVer.nMax = szView.cy - 1;
@@ -144,7 +144,7 @@ void STileView::UpdateScrollBar()
     }
     else
     {
-        //  不需要纵向滚动条
+        // No vertical scroll bar needed
         m_siVer.nPage = size.cy;
         m_siVer.nMin = 0;
         m_siVer.nMax = size.cy - 1;
@@ -153,7 +153,7 @@ void STileView::UpdateScrollBar()
 
     SetScrollPos(TRUE, m_siVer.nPos, FALSE);
 
-    //  重新计算客户区及非客户区
+    // Recompute client and non-client areas
     SSendMessage(WM_NCCALCSIZE);
 
     InvalidateRect(NULL);
@@ -270,7 +270,7 @@ BOOL STileView::OnScroll(BOOL bVertical, UINT uCode, int nPos)
     {
         UpdateVisibleItems();
 
-        //加速滚动时UI的刷新
+        // Accelerate UI refresh during scrolling
         if (uCode == SB_THUMBTRACK)
         {
             ScrollUpdate();
@@ -282,8 +282,8 @@ BOOL STileView::OnScroll(BOOL bVertical, UINT uCode, int nPos)
 
 void STileView::UpdateVisibleItems()
 {
-	if (!m_adapter || !GetContainer())
-		return;
+    if (!m_adapter || !GetContainer())
+        return;
     SAutoEnableHostPrivUiDef enableUiDef(this);
     int iOldFirstVisible = m_iFirstVisible;
     int iOldLastVisible = m_iFirstVisible + (int)m_lstItems.GetCount();
@@ -324,7 +324,7 @@ void STileView::UpdateVisibleItems()
                 if (ii.nType == pItemInfos[iItem].nType)
                 {
                     ii = pItemInfos[iItem];
-                    pItemInfos[iItem].pItem = NULL; //标记该行已经被重用
+                    pItemInfos[iItem].pItem = NULL; // Mark this row as reused
                 }
             }
             BOOL bNewItem = FALSE;
@@ -334,7 +334,7 @@ void STileView::UpdateVisibleItems()
                 SList<SItemPanel *> *lstRecycle = m_itemRecycle.GetAt(ii.nType);
                 if (lstRecycle->IsEmpty())
                 {
-                    //创建一个新的列表项
+                    // Create a new list item
                     bNewItem = TRUE;
                     ii.pItem = SItemPanel::Create(this, SXmlNode(), this);
                     ii.pItem->GetEventSet()->subscribeEvent(EventItemPanelClick::EventID, Subscriber(&SViewBase::OnItemClick, (SViewBase *)this));
@@ -351,7 +351,7 @@ void STileView::UpdateVisibleItems()
             rcItem.MoveToXY(0, 0);
             ii.pItem->Move(rcItem);
 
-            //设置状态，同时暂时禁止应用响应statechanged事件。
+            // Set state while temporarily preventing the app from responding to the statechanged event.
             ii.pItem->GetEventSet()->setMutedState(true);
             ii.pItem->ModifyItemState(dwState, 0);
             ii.pItem->GetEventSet()->setMutedState(false);
@@ -416,8 +416,8 @@ void STileView::OnSize(UINT nType, CSize size)
     __baseCls::OnSize(nType, size);
 
     CRect rcClient = SWindow::GetClientRect();
-    m_tvItemLocator->SetTileViewWidth(rcClient.Width(), FALSE); //重设TileView宽度
-    UpdateScrollBar();                                          //重设滚动条
+    m_tvItemLocator->SetTileViewWidth(rcClient.Width(), FALSE); // Reset TileView width
+    UpdateScrollBar();                                          // Reset scrollbar
 
     UpdateVisibleItems();
 }
@@ -453,7 +453,7 @@ void STileView::OnDestroy()
     __baseCls::OnDestroy();
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 
 BOOL STileView::IsItemRedrawDelay() const
 {
@@ -465,14 +465,14 @@ BOOL STileView::IsTimelineEnabled() const
 }
 CRect STileView::CalcItemDrawRect(int iItem) const
 {
-    //相对整个窗体的实际绘制位置
+    // Actual drawing position relative to the whole window
     int nOffset = m_tvItemLocator->Item2Position(iItem) - m_siVer.nPos;
 
     CRect rcClient = GetClientRect();
-    //获取left/right
+    // Get left/right
     CRect rcItem = m_tvItemLocator->GetItemRect(iItem);
     rcItem.OffsetRect(rcClient.TopLeft());
-    //修正top/bottom
+    // Fix top/bottom
     rcItem.MoveToY(rcClient.top + m_tvItemLocator->GetMarginSize() + nOffset);
     return rcItem;
 }
@@ -527,14 +527,14 @@ LRESULT STileView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
     LRESULT lRet = 0;
     CPoint pt(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 
-    // === 1. 先尝试SPanel的拖动处理 ===
+    // === 1. First try SPanel's drag handling ===
     if (HandleMouseDrag(uMsg, wParam, lParam, lRet))
     {
         SetMsgHandled(TRUE);
         return 0;
     }
 
-    // === 2. 如果有item capture，转发给item ===
+    // === 2. If there is item capture, forward to item ===
     if (m_itemCapture)
     {
         CRect rcItem = m_itemCapture->GetItemRect();
@@ -544,7 +544,7 @@ LRESULT STileView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
     else
     {
         if (uMsg == WM_LBUTTONDOWN || uMsg == WM_RBUTTONDOWN || uMsg == WM_MBUTTONDOWN)
-        { //交给panel处理
+        { // Hand off to panel for handling
             __baseCls::ProcessSwndMessage(uMsg, wParam, lParam, lRet);
         }
 
@@ -572,7 +572,7 @@ LRESULT STileView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
     }
 
     if (uMsg == WM_LBUTTONUP || uMsg == WM_RBUTTONUP || uMsg == WM_MBUTTONUP)
-    { //交给panel处理
+    { // Hand off to panel for handling
         __baseCls::ProcessSwndMessage(uMsg, wParam, lParam, lRet);
     }
     SetMsgHandled(TRUE);
@@ -849,7 +849,7 @@ BOOL STileView::CreateChildren(SXmlNode xmlNode)
         m_xmlTemplate.Reset();
         m_xmlTemplate.root().append_copy(xmlTemplate);
         {
-            //创建一个定位器
+            // Create a locator
             STileViewItemLocator *pItemLocator = new STileViewItemLocator(this, xmlTemplate.attribute(STileView_style::kStyle_itemHeight).as_string(L"10dp"), xmlTemplate.attribute(STileView_style::kStyle_itemWidth).as_string(L"10dp"), m_nMarginSize);
             SetItemLocator(pItemLocator);
             pItemLocator->Release();

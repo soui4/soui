@@ -104,4 +104,4 @@ class SSingleton2 {
 
 SNSEND
 
-#endif // __SSINGLETON2__H__
+#endif /**< __SSINGLETON2__H__ */

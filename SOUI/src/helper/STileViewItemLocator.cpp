@@ -2,9 +2,9 @@
 #include "helper/STileViewItemLocator.h"
 
 SNSBEGIN
-//////////////////////////////////////////////////////////////////////////
-// STileViewItemLocatorFix
-STileViewItemLocator::STileViewItemLocator(SWindow *owner, int nItemHei, int nItemWid, int nMarginSize /*= 0*/)
+///////////////////////////////////////////////////////////////////////
+/** STileViewItemLocatorFix */
+STileViewItemLocator::STileViewItemLocator(SWindow *owner, int nItemHei, int nItemWid, int nMarginSize /**< = 0 */)
     : m_nItemHeight((float)nItemHei, px)
     , m_nItemWidth((float)nItemWid, px)
     , m_nItemMargin((float)nMarginSize, px)
@@ -106,7 +106,7 @@ void STileViewItemLocator::SetAdapter(ILvAdapter *pAdapter)
 
 RECT STileViewItemLocator::GetItemRect(int iItem)
 {
-    //返回相对于TileView内部的Rect
+    // Return the Rect relative to the inside of TileView
     int nRowIdx, nColIdx;
     GetItemRowAndColIndex(iItem, &nRowIdx, &nColIdx);
 
@@ -164,7 +164,7 @@ BOOL STileViewItemLocator::IsLastInRow(int iItem)
 int STileViewItemLocator::GetUpItem(int iItem)
 {
     int up_idx = iItem - m_nCountInRow;
-    //没有上一行了，返回原值
+    // No previous row; return the original value
     return up_idx < 0 ? iItem : up_idx;
 }
 
@@ -177,10 +177,10 @@ int STileViewItemLocator::GetDownItem(int iItem)
     }
     else if ((m_adapter->getCount() - 1) / m_nCountInRow == iItem / m_nCountInRow)
     {
-        //没有下一行了，返回原值
+        // No next row; return the original value
         return iItem;
     }
-    //有下一行，但同一列没有元素，返回下一行最后一个元素
+    // There is a next row, but no element in the same column; return the last element of the next row
     return m_adapter->getCount() - 1;
 }
 

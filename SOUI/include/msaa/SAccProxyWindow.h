@@ -116,17 +116,90 @@ class SOUI_EXP SAccProxyWindow : public TObjRefImpl<IAccProxy> {
 
     /**
      * @brief Sets the value of the accessible object.
-     * @param szValue New value for the accessible object.
+     * @param szValue New value for the object.
      * @return HRESULT indicating success or failure.
      */
     virtual STDMETHODIMP put_accValue(BSTR szValue);
 
+    //----------------------------------------------------------------------
+    /** AccChild (real child window) support. Default: the window's regular */
+    /** child windows. MVC virtual-list controls override these to expose their */
+    /** currently-visible item panels instead. */
+    //----------------------------------------------------------------------
+
+    /**
+     * @brief Returns the number of AccChild (real child window) objects.
+     * @return Number of AccChildren.
+     */
+    virtual int STDMETHODCALLTYPE GetAccChildCount() override;
+
+    /**
+     * @brief Returns the i-th AccChild window (1-based).
+     * @param iChild AccChild index (1-based).
+     * @return Child window or NULL if out of range.
+     */
+    virtual IWindow *STDMETHODCALLTYPE GetAccChild(int iChild) override;
+
+    /**
+     * @brief Returns the currently selected child's 1-based index, 0 if none.
+     */
+    virtual int STDMETHODCALLTYPE GetAccSelIndex() override;
+
+    //----------------------------------------------------------------------
+    /** AccSubItem (self-drawn sub-item) support. Default: none. */
+    /** Composite controls (STabCtrl / SHeaderCtrl) override these to expose */
+    /** their drawn sub-items as AccSubItems. */
+    //----------------------------------------------------------------------
+
+    /**
+     * @brief Returns the number of AccSubItems (drawn sub-items).
+     * @return Number of AccSubItems, 0 = none.
+     */
+    virtual int STDMETHODCALLTYPE GetAccSubItemCount() override;
+
+    /**
+     * @brief Returns the name of the i-th AccSubItem (1-based).
+     * @param iChild AccSubItem index (1-based).
+     * @return BSTR (SysAllocString'd) or NULL.
+     */
+    virtual BSTR STDMETHODCALLTYPE GetAccSubItemName(int iChild) override;
+
+    /**
+     * @brief Returns the role (ROLE_SYSTEM_*) of the i-th AccSubItem.
+     */
+    virtual long STDMETHODCALLTYPE GetAccSubItemRole(int iChild) override;
+
+    /**
+     * @brief Returns the state (STATE_SYSTEM_*) of the i-th AccSubItem.
+     */
+    virtual DWORD STDMETHODCALLTYPE GetAccSubItemState(int iChild) override;
+
+    /**
+     * @brief Returns the host-client rect of the i-th AccSubItem.
+     */
+    virtual void STDMETHODCALLTYPE GetAccSubItemRect(int iChild, RECT *prc) override;
+
+    /**
+     * @brief Returns the currently selected AccSubItem (1-based), -1 if none.
+     */
+    virtual int STDMETHODCALLTYPE GetAccSubItemSel() override;
+
+    /**
+     * @brief Selects the i-th AccSubItem.
+     */
+    virtual STDMETHODIMP SetAccSubItemSel(int iChild) override;
+
+    /**
+     * @brief Hit-tests a host-client point; returns 1-based AccSubItem index or -1.
+     */
+    virtual int STDMETHODCALLTYPE HitTestAccSubItem(long x, long y) override;
+
   protected:
-    IWindow *m_pWnd; // Pointer to the associated window
+    IWindow *m_pWnd; /**< Pointer to the associated window */
 };
 
-#endif // SOUI_ENABLE_ACC
+#endif /**< SOUI_ENABLE_ACC */
 
 SNSEND
 
-#endif // __SACCPROXYWINDOW__H__
+#endif /**< __SACCPROXYWINDOW__H__ */

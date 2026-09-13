@@ -1,9 +1,9 @@
-﻿//////////////////////////////////////////////////////////////////////////
-//  Class Name: SListBox
-// Description: A DuiWindow Based ListBox Control.
-//     Creator: JinHui
-//     Version: 2012.12.18 - 1.0 - Create
-//////////////////////////////////////////////////////////////////////////
+﻿///////////////////////////////////////////////////////////////////////
+/** Class Name: SListBox */
+/** Description: A DuiWindow Based ListBox Control. */
+/** Creator: JinHui */
+/** Version: 2012.12.18 - 1.0 - Create */
+///////////////////////////////////////////////////////////////////////
 #include "souistd.h"
 #include <control/SListbox.h>
 
@@ -76,6 +76,7 @@ BOOL SListBox::SetCurSel(int nIndex, BOOL bNotifyChange)
     {
         NotifySelChange(nOldSelItem, nIndex);
     }
+    accNotifyEvent(EVENT_OBJECT_SELECTION);
     return TRUE;
 }
 
@@ -139,15 +140,16 @@ BOOL SListBox::GetIText(int nIndex, BOOL bRawText, IStringT *str) const
 
 int SListBox::GetItemHeight() const
 {
-    if(m_itemHeight.isWrapContent()){
-		if (m_nItemHeight != -1) 
+    if (m_itemHeight.isWrapContent())
+    {
+        if (m_nItemHeight != -1)
             return m_nItemHeight;
         SAutoRefPtr<IRenderTarget> pRT;
         GETRENDERFACTORY->CreateRenderTarget(&pRT);
         BeforePaintEx(pRT);
         SIZE sz;
-        pRT->MeasureText(_T("A"),1,&sz);
-		m_nItemHeight = sz.cy + 2;
+        pRT->MeasureText(_T("A"), 1, &sz);
+        m_nItemHeight = sz.cy + 2;
         return m_nItemHeight;
     }
     return m_itemHeight.toPixelSize(GetScale());
@@ -233,12 +235,12 @@ void SListBox::EnsureVisible(int nIndex)
             nOffset = (nIndex - iFirstVisible) * nItemHei;
         else
             nOffset = (nIndex - iFirstVisible - nVisibleItems + 1) * nItemHei;
-        nOffset -= nOffset % nItemHei; //让当前行刚好显示
+        nOffset -= nOffset % nItemHei; // Make the current row just visible
         OnScroll(TRUE, SB_THUMBPOSITION, nOffset + GetScrollPos(TRUE));
     }
 }
 
-//自动修改pt的位置为相对当前项的偏移量
+/** Automatically modify pt's position to an offset relative to the current item */
 int SListBox::HitTest(CPoint &pt)
 {
     CRect rcClient;
@@ -370,7 +372,7 @@ void SListBox::DrawItem(IRenderTarget *pRT, CRect &rc, int iItem)
     }
 
     if (iItem == m_iSelItem)
-    { //和下面那个if的条件分开，才会有sel和hot的区别
+    { // Separated from the condition of the if below, so there is a distinction between sel and hot
         if (m_pItemSkin != NULL)
             nBgImg = 2;
         else if (CR_INVALID != m_crItemSelBg)
@@ -390,10 +392,10 @@ void SListBox::DrawItem(IRenderTarget *pRT, CRect &rc, int iItem)
             crText = m_crSelText;
     }
 
-    if (CR_INVALID != crItemBg) //先画背景
+    if (CR_INVALID != crItemBg) // Draw background first
         pRT->FillSolidRect(rc, crItemBg);
 
-    if (m_pItemSkin != NULL) //有skin，则覆盖背景
+    if (m_pItemSkin != NULL) // If there is a skin, overlay the background
         m_pItemSkin->DrawByIndex(pRT, rc, nBgImg);
 
     if (CR_INVALID != crText)
@@ -413,7 +415,7 @@ void SListBox::DrawItem(IRenderTarget *pRT, CRect &rc, int iItem)
             nOffsetX = nItemHei / 6;
 
         if (!m_ptIcon[1].isValid())
-            nOffsetY = (nItemHei - sizeSkin.cy) / 2; // y 默认居中
+            nOffsetY = (nItemHei - sizeSkin.cy) / 2; // y centered by default
 
         rcIcon.OffsetRect(rc.left + nOffsetX, rc.top + nOffsetY);
         m_pIconSkin->DrawByIndex(pRT, rcIcon, pItem->nImage);
@@ -488,8 +490,9 @@ void SListBox::OnSize(UINT nType, CSize size)
     UpdateScrollBar();
 }
 
-BOOL SListBox::IsEnableDragMode() const {
-	return __baseCls::IsEnableDragMode(); 
+BOOL SListBox::IsEnableDragMode() const
+{
+    return __baseCls::IsEnableDragMode();
 }
 
 void SListBox::OnLButtonDownEx(UINT nFlags, CPoint pt)
@@ -500,7 +503,9 @@ void SListBox::OnLButtonDownEx(UINT nFlags, CPoint pt)
         m_iHoverItem = HitTest(pt);
         if (m_iHoverItem != m_iSelItem)
             NotifySelChange(m_iSelItem, m_iHoverItem);
-    }else{
+    }
+    else
+    {
         m_iClickItem = m_iHoverItem;
     }
 }
@@ -559,7 +564,8 @@ void SListBox::OnMouseMoveEx(UINT nFlags, CPoint pt)
 
 void SListBox::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
 {
-    if(nChar == VK_ESCAPE){
+    if (nChar == VK_ESCAPE)
+    {
         SetMsgHandled(FALSE);
         return;
     }
@@ -638,7 +644,7 @@ void SListBox::OnScaleChanged(int nScale)
     __baseCls::OnScaleChanged(nScale);
     GetScaleSkin(m_pItemSkin, nScale);
     GetScaleSkin(m_pIconSkin, nScale);
-	m_nItemHeight = -1;
+    m_nItemHeight = -1;
 }
 
 void SListBox::UpdateScrollBar()
@@ -649,12 +655,12 @@ void SListBox::UpdateScrollBar()
     szView.cx = rcClient.Width();
     szView.cy = GetCount() * GetItemHeight();
 
-    //  关闭滚动条
+    // Close scroll bar
     m_wBarVisible = SSB_NULL;
 
     if (size.cy < szView.cy)
     {
-        //  需要纵向滚动条
+        // Need vertical scroll bar
         m_wBarVisible |= SSB_VERT;
         m_siVer.nMin = 0;
         m_siVer.nMax = szView.cy - 1;
@@ -663,7 +669,7 @@ void SListBox::UpdateScrollBar()
     }
     else
     {
-        //  不需要纵向滚动条
+        // No vertical scroll bar needed
         m_siVer.nPage = size.cy;
         m_siVer.nMin = 0;
         m_siVer.nMax = size.cy - 1;
@@ -672,7 +678,7 @@ void SListBox::UpdateScrollBar()
 
     SetScrollPos(TRUE, m_siVer.nPos, FALSE);
 
-    //  重新计算客户区及非客户区
+    // Recompute client and non-client areas
     SSendMessage(WM_NCCALCSIZE);
 
     InvalidateRect(NULL);

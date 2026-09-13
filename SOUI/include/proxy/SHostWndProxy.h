@@ -402,4 +402,4 @@ public:
 };
 
 SNSEND
-#endif // __SHOSTWNDPROXY__H__
+#endif /**< __SHOSTWNDPROXY__H__ */

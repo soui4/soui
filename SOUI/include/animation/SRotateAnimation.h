@@ -16,14 +16,14 @@ class SOUI_EXP SRotateAnimation : public SAnimation {
     DEF_SOBJECT(SAnimation, L"rotate")
 
   private:
-    float mFromDegrees; ///< Rotation offset to apply at the start of the animation.
-    float mToDegrees;   ///< Rotation offset to apply at the end of the animation.
+    float mFromDegrees; /**<  Rotation offset to apply at the start of the animation. */
+    float mToDegrees;   /**<  Rotation offset to apply at the end of the animation. */
 
-    SValueDescription mPivotXDesc; ///< Description of the pivot X value.
-    SValueDescription mPivotYDesc; ///< Description of the pivot Y value.
+    SValueDescription mPivotXDesc; /**<  Description of the pivot X value. */
+    SValueDescription mPivotYDesc; /**<  Description of the pivot Y value. */
 
-    float mPivotX; ///< The X coordinate of the pivot point.
-    float mPivotY; ///< The Y coordinate of the pivot point.
+    float mPivotX; /**<  The X coordinate of the pivot point. */
+    float mPivotY; /**<  The Y coordinate of the pivot point. */
 
   public:
     /**
@@ -83,13 +83,13 @@ class SOUI_EXP SRotateAnimation : public SAnimation {
      * @brief Attributes for SRotateAnimation
      */
     SOUI_ATTRS_BEGIN()
-        ATTR_FLOAT(L"fromDegrees", mFromDegrees, FALSE) ///< Rotation offset to apply at the start of the animation.
-        ATTR_FLOAT(L"toDegrees", mToDegrees, FALSE)     ///< Rotation offset to apply at the end of the animation.
-        ATTR_VALUE_DESC(L"pivotX", mPivotXDesc)         ///< Description of the pivot X value.
-        ATTR_VALUE_DESC(L"pivotY", mPivotYDesc)         ///< Description of the pivot Y value.
+        ATTR_FLOAT(L"fromDegrees", mFromDegrees, FALSE) /**<  Rotation offset to apply at the start of the animation. */
+        ATTR_FLOAT(L"toDegrees", mToDegrees, FALSE)     /**<  Rotation offset to apply at the end of the animation. */
+        ATTR_VALUE_DESC(L"pivotX", mPivotXDesc)         /**<  Description of the pivot X value. */
+        ATTR_VALUE_DESC(L"pivotY", mPivotYDesc)         /**<  Description of the pivot Y value. */
     SOUI_ATTRS_END()
 };
 
 SNSEND
 
-#endif // __SRotateAnimation__H__
+#endif /**< __SRotateAnimation__H__ */

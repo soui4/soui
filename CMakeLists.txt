@@ -111,22 +111,22 @@ set(SOUI_BUILD_WS OFF)
 endif()
 endif()
 
+if(IS_OHOS)
+set(SOUI_BUILD_RICHEDIT ON CACHE BOOL "using richedit from source code" FORCE)
+set(SOUI_ENABLE_ACC OFF)
+else(IS_OHOS)
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
 option(SOUI_BUILD_RICHEDIT "using richedit from source code" OFF)
-option(SOUI_ENABLE_ACC "Enable Acc" OFF)
 option(SOUI_ENABLE_SPY "Enable Swnd Spy" OFF)
 if (MSVC)
     add_compile_options(/MP)
 endif()
-elseif(IS_OHOS)
-set(SOUI_BUILD_RICHEDIT ON CACHE BOOL "using richedit from source code" FORCE)
-set(SOUI_ENABLE_ACC OFF)
-set(SOUI_ENABLE_SPY OFF)
 else()
 set(SOUI_BUILD_RICHEDIT ON)
-set(SOUI_ENABLE_ACC OFF)
 set(SOUI_ENABLE_SPY OFF)
 endif()
+option(SOUI_ENABLE_ACC "Enable MSAA/IAccessible (provided by swinx)" OFF)
+endif(IS_OHOS)
 
 include(__cmake/global.cmake)
 include(__cmake/windres.cmake)
@@ -230,9 +230,64 @@ if(NOT CMAKE_SYSTEM_NAME MATCHES Windows)
 set(SWINX_LIBS swinx)
 set(SWINX_CFLAGS swinx/include)
 endif()
-configure_file("${PROJECT_SOURCE_DIR}/__cmake/soui-config.cmake.in" "${PROJECT_BINARY_DIR}/soui-config.cmake" @ONLY)
-install(FILES "${PROJECT_BINARY_DIR}/soui-config.cmake"
+
+# ---------------------------------------------------------------------------
+# Aggregate the *public* (installed) libraries exposed to consumers.
+#
+# In the default (shared) build COM_DEP_LIBS / SWINX_DEP_LIBS are empty (those
+# variables are only populated when SOUI_ENABLE_CORE_LIB=ON), so they add
+# nothing here. When soui4 is built as a set of static libraries
+# (SOUI_ENABLE_CORE_LIB=ON), those third-party dependencies are NOT bundled
+# into the static archives and MUST be exposed so the consumer can link them.
+# Appending them unconditionally is therefore correct for both configurations.
+# ---------------------------------------------------------------------------
+set(SOUI_PUBLIC_LIBS ${CORE_LIBS} ${COM_LIBS} ${OPTION_LIBS}
+    ${SOUI_UTILITIES} ${SOUI_SWINX}
+    ${COM_DEP_LIBS} ${SWINX_DEP_LIBS})
+list(REMOVE_DUPLICATES SOUI_PUBLIC_LIBS)
+
+set(SOUI_PC_LIBS "")
+foreach(_l ${SOUI_PUBLIC_LIBS})
+    if(_l)
+        list(APPEND SOUI_PC_LIBS "-l${_l}")
+    endif()
+endforeach()
+list(REMOVE_DUPLICATES SOUI_PC_LIBS)
+string(REPLACE ";" " " SOUI_PC_LIBS "${SOUI_PC_LIBS}")
+
+# Configure the (single) soui4-config.cmake template — reused for both direct
+# include() and find_package(soui4). Installed to __cmake for the legacy
+# include(), and to lib/cmake/soui4/ for find_package(soui4).
+configure_file("${PROJECT_SOURCE_DIR}/__cmake/soui4-config.cmake.in"
+               "${PROJECT_BINARY_DIR}/soui4-config.cmake" @ONLY)
+install(FILES "${PROJECT_BINARY_DIR}/soui4-config.cmake"
         DESTINATION ${CMAKE_INSTALL_PREFIX}/__cmake)
+
+# ---------------------------------------------------------------------------
+# find_package(soui4) support.
+# The generated soui4-config.cmake is installed as the package config for the
+# single canonical package name "soui4". A matching <name>-config-version file
+# is emitted for version-gated find_package() requests.
+# ---------------------------------------------------------------------------
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+    "${PROJECT_BINARY_DIR}/soui4-config-version.cmake"
+    VERSION "${SOUI_VER1}.${SOUI_VER2}.${SOUI_VER3}.${SOUI_VER4}"
+    COMPATIBILITY SameMajorVersion)
+
+install(FILES "${PROJECT_BINARY_DIR}/soui4-config.cmake"
+        RENAME soui4-config.cmake
+        DESTINATION lib/cmake/soui4)
+install(FILES "${PROJECT_BINARY_DIR}/soui4-config-version.cmake"
+        DESTINATION lib/cmake/soui4)
+
+# ---------------------------------------------------------------------------
+# pkg-config file (soui4.pc) so soui4 can be consumed without CMake.
+# ---------------------------------------------------------------------------
+configure_file("${PROJECT_SOURCE_DIR}/__cmake/soui4.pc.in"
+               "${PROJECT_BINARY_DIR}/soui4.pc" @ONLY)
+install(FILES "${PROJECT_BINARY_DIR}/soui4.pc"
+        DESTINATION lib/pkgconfig)
 
 
 # Install cmake files

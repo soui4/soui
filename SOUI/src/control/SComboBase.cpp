@@ -3,8 +3,8 @@
 
 SNSBEGIN
 
-//////////////////////////////////////////////////////////////////////////
-// CComboEdit
+///////////////////////////////////////////////////////////////////////
+/** CComboEdit */
 SComboEdit::SComboEdit()
 {
 }
@@ -40,7 +40,7 @@ void SComboEdit::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 BOOL SComboEdit::FireEvent(IEvtArgs *evt)
 {
     if (evt->GetID() == EVT_RE_NOTIFY)
-    { // 转发richedit的txNotify消息
+    { // Forward richedit's txNotify message
         evt->SetIdFrom(GetOwner()->GetID());
         evt->SetNameFrom(GetOwner()->GetName());
     }
@@ -53,22 +53,22 @@ void SComboEdit::OnKillFocus(SWND wndFocus)
     GetOwner()->SSendMessage(WM_KILLFOCUS, wndFocus);
 }
 
-//////////////////////////////////////////////////////////////////////////
-// SDropDownWnd_ComboBox
+///////////////////////////////////////////////////////////////////////
+/** SDropDownWnd_ComboBox */
 BOOL SDropDownWnd_ComboBox::PreTranslateMessage(MSG *pMsg)
 {
     if (SDropDownWnd::PreTranslateMessage(pMsg))
         return TRUE;
     if (pMsg->message == WM_MOUSEWHEEL || ((pMsg->message == WM_KEYDOWN || pMsg->message == WM_KEYUP) && (pMsg->wParam == VK_UP || pMsg->wParam == VK_DOWN || pMsg->wParam == VK_RETURN || pMsg->wParam == VK_ESCAPE)))
-    { // 截获滚轮及上下键消息
+    { // Intercept wheel and up/down key messages
         SNativeWnd::SendMessage(pMsg->message, pMsg->wParam, pMsg->lParam);
         return TRUE;
     }
     return FALSE;
 }
 
-//////////////////////////////////////////////////////////////////////////
-// SComboBoxBase
+///////////////////////////////////////////////////////////////////////
+/** SComboBoxBase */
 SComboBase::SComboBase(void)
     : m_pSkinBtn(GETBUILTINSKIN(SKIN_SYS_DROPBTN))
     , m_pEdit(NULL)
@@ -103,7 +103,7 @@ SComboBase::~SComboBase(void)
 BOOL SComboBase::CreateChildren(SXmlNode xmlNode)
 {
     m_xmlDropdownStyle.root().append_copy(xmlNode.child(SComboBase_style::kStyle_Dropdown));
-    // 创建edit对象
+    // Create edit object
     SXmlNode xmlEditStyle = xmlNode.child(SComboBase_style::kStyle_Edit);
     SStringW strEditClass = xmlEditStyle.attribute(L"wndclass").as_string(SComboEdit::GetClassName());
     m_pEdit = sobj_cast<SComboEdit>(CreateChildByName(strEditClass));
@@ -237,7 +237,7 @@ void SComboBase::OnMouseLeave()
 
 void SComboBase::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
 {
-    // 方向键改变当前选项
+    // Arrow keys change the current option
     switch (nChar)
     {
     case VK_DOWN:
@@ -308,15 +308,15 @@ void SComboBase::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
 
 BOOL SComboBase::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
-    // 鼠标滚轮改变当前选项
-    if (zDelta > 0) // 上滚
+    // Mouse wheel changes the current option
+    if (zDelta > 0) // Scroll up
     {
         int iSel = GetCurSel();
         iSel -= 1;
         if (iSel < GetCount() && iSel >= 0)
             SetCurSel(iSel);
     }
-    else // 下滚
+    else // Scroll down
     {
         int iSel = GetCurSel();
         iSel += 1;
@@ -544,7 +544,7 @@ BOOL SComboBase::FireEvent(IEvtArgs *evt)
     return SWindow::FireEvent(evt);
 }
 
-int SComboBase::FindString(LPCTSTR pszFind, int iFindAfter /*=-1*/, BOOL bPartMatch /*=TRUE*/)
+int SComboBase::FindString(LPCTSTR pszFind, int iFindAfter /**< =-1 */, BOOL bPartMatch /**< =TRUE */)
 {
     if (iFindAfter < 0)
         iFindAfter = -1;
@@ -571,7 +571,7 @@ void SComboBase::GetDesiredSize(SIZE *psz, int nParentWid, int nParentHei)
 {
     CSize szRet(-1, -1);
     if (GetLayoutParam()->IsSpecifiedSize(Horz))
-    { // 检查设置大小
+    { // Check the set size
         SLayoutSize layoutSize;
         GetLayoutParam()->GetSpecifiedSize(Horz, &layoutSize);
         szRet.cx = layoutSize.toPixelSize(GetScale());
@@ -582,7 +582,7 @@ void SComboBase::GetDesiredSize(SIZE *psz, int nParentWid, int nParentHei)
     }
 
     if (GetLayoutParam()->IsSpecifiedSize(Vert))
-    { // 检查设置大小
+    { // Check the set size
         SLayoutSize layoutSize;
         GetLayoutParam()->GetSpecifiedSize(Vert, &layoutSize);
         szRet.cy = layoutSize.toPixelSize(GetScale());
@@ -600,7 +600,7 @@ void SComboBase::GetDesiredSize(SIZE *psz, int nParentWid, int nParentHei)
     int nTestDrawMode = GetTextAlign() & ~(DT_CENTER | DT_RIGHT | DT_VCENTER | DT_BOTTOM);
 
     CRect rcPadding = GetStyle().GetPadding();
-    // 计算文本大小
+    // Compute text size
     CRect rcTest(0, 0, 100000, 100000);
 
     SAutoRefPtr<IRenderTarget> pRT;
@@ -628,7 +628,7 @@ void SComboBase::GetDesiredSize(SIZE *psz, int nParentWid, int nParentHei)
     *psz = szRet;
 }
 
-SStringT SComboBase::GetWindowText(BOOL bRawText /*=TRUE*/) const
+SStringT SComboBase::GetWindowText(BOOL bRawText /**< =TRUE */) const
 {
     if (!m_bDropdown)
     {
@@ -739,7 +739,7 @@ void SComboBase::SetFocus()
         __baseCls::SetFocus();
 }
 
-SStringT SComboBase::GetLBText(int iItem, BOOL bRawText /*= FALSE*/) const
+SStringT SComboBase::GetLBText(int iItem, BOOL bRawText /**< = FALSE */) const
 {
     SStringT str;
     GetItemText(iItem, bRawText, &str);

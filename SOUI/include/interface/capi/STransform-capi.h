@@ -7,12 +7,12 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for STransform Interface
  * These macros provide C-style function call syntax for C++ interface methods
  */
 
-/* ITransformation C API Macros */
+/** ITransformation C API Macros */
 #define ITransformation_GetMatrix(This) \
     ((This)->lpVtbl->GetMatrix(This))
 
@@ -35,4 +35,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __STRANSFORM_CAPI_H__ */
+#endif /**< __STRANSFORM_CAPI_H__ */

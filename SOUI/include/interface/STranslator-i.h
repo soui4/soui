@@ -198,4 +198,4 @@ DECLARE_INTERFACE_(ITranslatorMgr, IObjRef)
 };
 
 SNSEND
-#endif // __STRANSLATOR_I__H__
+#endif /**< __STRANSLATOR_I__H__ */

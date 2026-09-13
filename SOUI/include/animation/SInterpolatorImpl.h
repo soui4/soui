@@ -7,7 +7,7 @@
 
 SNSBEGIN
 
-typedef TObjRefImpl<SObjectImpl<IInterpolator> > SInterpolatorBase;
+typedef TObjRefImpl<SObjectImpl<IInterpolator>> SInterpolatorBase;
 
 /**
  * @class SLinearInterpolator
@@ -33,8 +33,8 @@ class SOUI_EXP SAccelerateInterpolator : public SInterpolatorBase {
     DEF_SOBJECT(SInterpolatorBase, L"Accelerate")
 
   private:
-    float mFactor;        ///< Degree to which the animation should be eased.
-    double mDoubleFactor; ///< Double value of the factor for calculations.
+    float mFactor;        /**<  Degree to which the animation should be eased. */
+    double mDoubleFactor; /**<  Double value of the factor for calculations. */
 
   public:
     /**
@@ -55,7 +55,7 @@ class SOUI_EXP SAccelerateInterpolator : public SInterpolatorBase {
      * @brief Attributes for SAccelerateInterpolator
      */
     SOUI_ATTRS_BEGIN()
-        ATTR_FLOAT(L"factor", mFactor, FALSE) ///< Degree to which the animation should be eased.
+        ATTR_FLOAT(L"factor", mFactor, FALSE) /**<  Degree to which the animation should be eased. */
     SOUI_ATTRS_END()
 };
 
@@ -67,7 +67,7 @@ class SOUI_EXP SDecelerateInterpolator : public SInterpolatorBase {
     DEF_SOBJECT(SInterpolatorBase, L"Decelerate")
 
   private:
-    float mFactor; ///< Degree to which the animation should be eased.
+    float mFactor; /**<  Degree to which the animation should be eased. */
 
   public:
     /**
@@ -88,7 +88,7 @@ class SOUI_EXP SDecelerateInterpolator : public SInterpolatorBase {
      * @brief Attributes for SDecelerateInterpolator
      */
     SOUI_ATTRS_BEGIN()
-        ATTR_FLOAT(L"factor", mFactor, FALSE) ///< Degree to which the animation should be eased.
+        ATTR_FLOAT(L"factor", mFactor, FALSE) /**<  Degree to which the animation should be eased. */
     SOUI_ATTRS_END()
 };
 
@@ -116,7 +116,7 @@ class SOUI_EXP SAnticipateInterpolator : public SInterpolatorBase {
     DEF_SOBJECT(SInterpolatorBase, L"Anticipate")
 
   private:
-    float mTension; ///< Amount of anticipation.
+    float mTension; /**<  Amount of anticipation. */
 
   public:
     /**
@@ -141,7 +141,7 @@ class SOUI_EXP SAnticipateInterpolator : public SInterpolatorBase {
      * @brief Attributes for SAnticipateInterpolator
      */
     SOUI_ATTRS_BEGIN()
-        ATTR_FLOAT(L"tension", mTension, FALSE) ///< Amount of anticipation.
+        ATTR_FLOAT(L"tension", mTension, FALSE) /**<  Amount of anticipation. */
     SOUI_ATTRS_END()
 };
 
@@ -153,8 +153,8 @@ class SOUI_EXP SAnticipateOvershootInterpolator : public SInterpolatorBase {
     DEF_SOBJECT(SInterpolatorBase, L"AnticipateOvershoot")
 
   private:
-    float mTension;      ///< Amount of anticipation/overshoot.
-    float mExtraTension; ///< Extra amount by which to multiply the tension.
+    float mTension;      /**<  Amount of anticipation/overshoot. */
+    float mExtraTension; /**<  Extra amount by which to multiply the tension. */
 
     /**
      * @brief Helper function for anticipation.
@@ -200,8 +200,8 @@ class SOUI_EXP SAnticipateOvershootInterpolator : public SInterpolatorBase {
      * @brief Attributes for SAnticipateOvershootInterpolator
      */
     SOUI_ATTRS_BEGIN()
-        ATTR_FLOAT(L"tension", mTension, FALSE)           ///< Amount of anticipation/overshoot.
-        ATTR_FLOAT(L"extraTension", mExtraTension, FALSE) ///< Extra amount by which to multiply the tension.
+        ATTR_FLOAT(L"tension", mTension, FALSE)           /**<  Amount of anticipation/overshoot. */
+        ATTR_FLOAT(L"extraTension", mExtraTension, FALSE) /**<  Extra amount by which to multiply the tension. */
     SOUI_ATTRS_END()
 };
 
@@ -237,7 +237,7 @@ class SOUI_EXP SCycleInterpolator : public SInterpolatorBase {
     DEF_SOBJECT(SInterpolatorBase, L"Cycle")
 
   private:
-    float mCycles; ///< Number of cycles to repeat.
+    float mCycles; /**<  Number of cycles to repeat. */
 
   public:
     /**
@@ -257,7 +257,7 @@ class SOUI_EXP SCycleInterpolator : public SInterpolatorBase {
      * @brief Attributes for SCycleInterpolator
      */
     SOUI_ATTRS_BEGIN()
-        ATTR_FLOAT(L"cycles", mCycles, FALSE) ///< Number of cycles to repeat.
+        ATTR_FLOAT(L"cycles", mCycles, FALSE) /**<  Number of cycles to repeat. */
     SOUI_ATTRS_END()
 };
 
@@ -269,7 +269,7 @@ class SOUI_EXP SOvershootInterpolator : public SInterpolatorBase {
     DEF_SOBJECT(SInterpolatorBase, L"Overshoot")
 
   private:
-    float mTension; ///< Amount of overshoot.
+    float mTension; /**<  Amount of overshoot. */
 
   public:
     /**
@@ -289,16 +289,14 @@ class SOUI_EXP SOvershootInterpolator : public SInterpolatorBase {
      * @brief Attributes for SOvershootInterpolator
      */
     SOUI_ATTRS_BEGIN()
-        ATTR_FLOAT(L"tension", mTension, FALSE) ///< Amount of overshoot.
+        ATTR_FLOAT(L"tension", mTension, FALSE) /**<  Amount of overshoot. */
     SOUI_ATTRS_END()
 };
 
-/**
- * Additional common easing interpolators
- */
+/** Additional common easing interpolators */
 
-// Quad (power 2) interpolators
-// Quad (power 2) interpolators
+/** Quad (power 2) interpolators */
+
 class SOUI_EXP SQuadInInterpolator : public SInterpolatorBase {
     DEF_SOBJECT(SInterpolatorBase, L"QuadIn")
   public:
@@ -317,8 +315,8 @@ class SOUI_EXP SQuadInOutInterpolator : public SInterpolatorBase {
     STDMETHOD_(float, getInterpolation)(THIS_ float input) SCONST OVERRIDE;
 };
 
-// Cubic (power 3) interpolators
-// Cubic (power 3) interpolators
+/** Cubic (power 3) interpolators */
+
 class SOUI_EXP SCubicInInterpolator : public SInterpolatorBase {
     DEF_SOBJECT(SInterpolatorBase, L"CubicIn")
   public:
@@ -337,7 +335,7 @@ class SOUI_EXP SCubicInOutInterpolator : public SInterpolatorBase {
     STDMETHOD_(float, getInterpolation)(THIS_ float input) SCONST OVERRIDE;
 };
 
-// Sine interpolators
+/** Sine interpolators */
 class SOUI_EXP SSineInInterpolator : public SInterpolatorBase {
     DEF_SOBJECT(SInterpolatorBase, L"SineIn")
   public:
@@ -356,7 +354,7 @@ class SOUI_EXP SSineInOutInterpolator : public SInterpolatorBase {
     STDMETHOD_(float, getInterpolation)(THIS_ float input) SCONST OVERRIDE;
 };
 
-// Exponential interpolators
+/** Exponential interpolators */
 class SOUI_EXP SExpoInInterpolator : public SInterpolatorBase {
     DEF_SOBJECT(SInterpolatorBase, L"ExpoIn")
   public:
@@ -375,7 +373,7 @@ class SOUI_EXP SExpoInOutInterpolator : public SInterpolatorBase {
     STDMETHOD_(float, getInterpolation)(THIS_ float input) SCONST OVERRIDE;
 };
 
-// Back interpolators (overshoot) - similar to Anticipate/Overshoot but simpler
+/** Back interpolators (overshoot) - similar to Anticipate/Overshoot but simpler */
 class SOUI_EXP SBackInInterpolator : public SInterpolatorBase {
     DEF_SOBJECT(SInterpolatorBase, L"BackIn")
   private:
@@ -389,8 +387,8 @@ class SOUI_EXP SBackInInterpolator : public SInterpolatorBase {
     SOUI_ATTRS_END()
 };
 
-// Quint (power 5) interpolators
-// Quint (power 5) interpolators
+
+/** Quint (power 5) interpolators */
 class SOUI_EXP SQuintInInterpolator : public SInterpolatorBase {
     DEF_SOBJECT(SInterpolatorBase, L"QuintIn")
   public:
@@ -436,4 +434,4 @@ class SOUI_EXP SBackInOutInterpolator : public SInterpolatorBase {
 };
 
 SNSEND
-#endif // __SINTERPOLATORIMPL__H__
+#endif /**< __SINTERPOLATORIMPL__H__ */

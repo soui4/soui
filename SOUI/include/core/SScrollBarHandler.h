@@ -126,8 +126,8 @@ struct IScrollBarHost
  */
 class SOUI_EXP SScrollBarHandler : public ITimelineHandler {
   private:
-    SScrollBarHandler(const SScrollBarHandler &);                  // Private copy constructor
-    const SScrollBarHandler &operator=(const SScrollBarHandler &); // Private assignment operator
+    SScrollBarHandler(const SScrollBarHandler &);                  /**< Private copy constructor */
+    const SScrollBarHandler &operator=(const SScrollBarHandler &); /**< Private assignment operator */
 
   public:
     enum
@@ -295,17 +295,17 @@ class SOUI_EXP SScrollBarHandler : public ITimelineHandler {
         FADEIN = 1,
     };
 
-    IScrollBarHost *m_pSbHost; // Pointer to the scrollbar host
-    bool m_bVert;              // TRUE if vertical, FALSE if horizontal
-    int m_iFrame;              // Current frame index
-    FADEMODE m_fadeMode;       // Fade mode
-    int m_iHitPart;            // Hit part identifier
-    int m_iClickPart;          // Clicked part identifier
-    CPoint m_ptClick;          // Click point
-    CPoint m_ptCursor;         // Cursor point
-    int m_nClickPos;           // Click position
+    IScrollBarHost *m_pSbHost; /**< Pointer to the scrollbar host */
+    bool m_bVert;              /**< TRUE if vertical, FALSE if horizontal */
+    int m_iFrame;              /**< Current frame index */
+    FADEMODE m_fadeMode;       /**< Fade mode */
+    int m_iHitPart;            /**< Hit part identifier */
+    int m_iClickPart;          /**< Clicked part identifier */
+    CPoint m_ptClick;          /**< Click point */
+    CPoint m_ptCursor;         /**< Cursor point */
+    int m_nClickPos;           /**< Click position */
 };
 
 SNSEND
 
-#endif // __SSCROLLBARHANDLER__H__
+#endif /**< __SSCROLLBARHANDLER__H__ */

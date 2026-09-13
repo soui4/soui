@@ -17,10 +17,10 @@ struct SLinearLayoutParamStruct
 {
     SLayoutSize width;
     SLayoutSize height;
-    SLayoutSize extend_left, extend_right; //相当于android的margin属性
-    SLayoutSize extend_top, extend_bottom; //相当于android的margin属性
+    SLayoutSize extend_left, extend_right; /**< Equivalent to Android's margin attribute */
+    SLayoutSize extend_top, extend_bottom; /**< Equivalent to Android's margin attribute */
     float weight;
     Gravity gravity;
 };
 SNSEND
-#endif // __SLINEARLAYOUTPARAMSTRUCT__H__
+#endif /**< __SLINEARLAYOUTPARAMSTRUCT__H__ */

@@ -40,12 +40,12 @@ class SOUI_EXP SAnimationSet : public SAnimation {
     };
 
   private:
-    int mFlags;                                  ///< Flags to manage properties like fillAfter, fillBefore, duration, and shareInterpolator.
-    bool mDirty;                                 ///< Indicates if the animation set needs to be reinitialized.
-    bool mHasAlpha;                              ///< Indicates if any child animation affects the alpha property.
-    SArray<SAutoRefPtr<IAnimation> > mAnimations; ///< Array of child animations.
-    bool mChildStarted;                          ///< Indicates if any child animation has started.
-    long mLastEnd;                               ///< The end time of the last child animation.
+    int mFlags;                                  /**<  Flags to manage properties like fillAfter, fillBefore, duration, and shareInterpolator. */
+    bool mDirty;                                 /**<  Indicates if the animation set needs to be reinitialized. */
+    bool mHasAlpha;                              /**<  Indicates if any child animation affects the alpha property. */
+    SArray<SAutoRefPtr<IAnimation>> mAnimations; /**<  Array of child animations. */
+    bool mChildStarted;                          /**<  Indicates if any child animation has started. */
+    long mLastEnd;                               /**<  The end time of the last child animation. */
 
   public:
     /**
@@ -202,14 +202,14 @@ class SOUI_EXP SAnimationSet : public SAnimation {
      * @brief Attributes for SAnimationSet
      */
     SOUI_ATTRS_BEGIN()
-        ATTR_BIT(L"shareInterpolator", mFlags, PROPERTY_SHARE_INTERPOLATOR_MASK, FALSE) ///< Whether to share the interpolator with child animations.
-        ATTR_CUSTOM(L"duration", OnAttrDuration)                                        ///< Duration of the animation in milliseconds.
-        ATTR_CUSTOM(L"fillBefore", OnAttrFillBefore)                                    ///< Whether the animation transformation should be applied before the animation starts.
-        ATTR_CUSTOM(L"fillAfter", OnAttrFillAfter)                                      ///< Whether the animation transformation should be applied after the animation ends.
-        ATTR_CUSTOM(L"startOffset", OnAttrStartOffset)                                  ///< Delay before the animation starts in milliseconds.
+        ATTR_BIT(L"shareInterpolator", mFlags, PROPERTY_SHARE_INTERPOLATOR_MASK, FALSE) /**<  Whether to share the interpolator with child animations. */
+        ATTR_CUSTOM(L"duration", OnAttrDuration)                                        /**<  Duration of the animation in milliseconds. */
+        ATTR_CUSTOM(L"fillBefore", OnAttrFillBefore)                                    /**<  Whether the animation transformation should be applied before the animation starts. */
+        ATTR_CUSTOM(L"fillAfter", OnAttrFillAfter)                                      /**<  Whether the animation transformation should be applied after the animation ends. */
+        ATTR_CUSTOM(L"startOffset", OnAttrStartOffset)                                  /**<  Delay before the animation starts in milliseconds. */
     SOUI_ATTRS_END()
 };
 
 SNSEND
 
-#endif // __SANIMATIONSET__H__
+#endif /**< __SANIMATIONSET__H__ */

@@ -750,7 +750,7 @@ BOOL SToolBar::UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo)
     return TRUE;
 }
 
-void SToolBar::InsertItem(const ToolBarItem &item, int nPos /*=-1*/)
+void SToolBar::InsertItem(const ToolBarItem &item, int nPos /**< =-1 */)
 {
     if (nPos < 0 || nPos >= m_arrItems.GetCount())
     {

@@ -1,11 +1,11 @@
 ﻿/**
  * @file SCaption.h
- * @brief 标题栏控件
+ * @brief Caption control
  * @version v1.0
  * @author soui
  * @date 2014-05-28
  *
- * @details 此类完成标题栏控件的实现。
+ * @details This class implements the caption control.
  */
 
 #ifndef __SCAPTION__H__
@@ -17,55 +17,55 @@ SNSBEGIN
 
 /**
  * @class SCaption
- * @brief 标题栏控件类
- * @details 此类实现了一个标题栏控件，支持鼠标事件处理。
+ * @brief Caption control class
+ * @details This class implements a caption control, supporting mouse event handling.
  */
 class SOUI_EXP SCaption : public SWindow {
     DEF_SOBJECT(SWindow, L"caption")
 
   public:
     /**
-     * @brief 构造函数
-     * @details 初始化标题栏控件。
+     * @brief Constructor
+     * @details Initialize the caption control.
      */
     SCaption(void);
 
     /**
-     * @brief 析构函数
-     * @details 释放标题栏控件资源。
+     * @brief Destructor
+     * @details Release the caption control resources.
      */
     virtual ~SCaption(void);
 
   protected:
     /**
-     * @brief 处理左键按下事件
-     * @param nFlags 标志
-     * @param point 鼠标坐标
-     * @details 此函数是消息响应函数，处理左键按下事件。
+     * @brief Handle left button down event
+     * @param nFlags flags
+     * @param point mouse position
+     * @details This is a message handler that handles the left button down event.
      */
     void OnLButtonDown(UINT nFlags, CPoint point);
 
     /**
-     * @brief 处理左键双击事件
-     * @param nFlags 标志
-     * @param point 鼠标坐标
-     * @details 此函数是消息响应函数，处理左键双击事件。
+     * @brief Handle left button double-click event
+     * @param nFlags flags
+     * @param point mouse position
+     * @details This is a message handler that handles the left button double-click event.
      */
     void OnLButtonDblClk(UINT nFlags, CPoint point);
 
     /**
-     * @brief 处理鼠标移动事件
-     * @param nFlags 标志
-     * @param point 鼠标坐标
-     * @details 此函数是消息响应函数，处理鼠标移动事件。
+     * @brief Handle mouse move event
+     * @param nFlags flags
+     * @param point mouse position
+     * @details This is a message handler that handles the mouse move event.
      */
     void OnMouseMove(UINT nFlags, CPoint point);
 
     /**
-     * @brief 处理左键释放事件
-     * @param nFlags 标志
-     * @param point 鼠标坐标
-     * @details 此函数是消息响应函数，处理左键释放事件。
+     * @brief Handle left button up event
+     * @param nFlags flags
+     * @param point mouse position
+     * @details This is a message handler that handles the left button up event.
      */
     void OnLButtonUp(UINT nFlags, CPoint point);
 
@@ -78,11 +78,11 @@ class SOUI_EXP SCaption : public SWindow {
 
   private:
     /**
-     * @brief 标记最大化时鼠标左键是否已经按下
+     * @brief Flag indicating whether the left mouse button is pressed when maximized
      */
     BOOL m_bIsMaxDown;
 };
 
 SNSEND
 
-#endif // __SCAPTION__H__
+#endif /**< __SCAPTION__H__ */

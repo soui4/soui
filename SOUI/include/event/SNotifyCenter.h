@@ -6,18 +6,18 @@
 #include <interface/SNotifyCenter-i.h>
 #include <event/SEventSet.h>
 
-#if !defined(_WIN32) || _MSC_VER >= 1700 // VS2012
+#if !defined(_WIN32) || _MSC_VER >= 1700 /**< VS2012 */
 #define ENABLE_RUNONUI
 #endif
 #ifdef ENABLE_RUNONUI
 #include <functional>
-// 将 闭包 传递到了 UI线程
-// 所以 这里 尽量 将 相同类型的 处理 放到一起 执行  而不是分开调用。
+/** Pass the closure to the UI thread */
+/** Therefore, here we try to group handlers of the same type together for execution, rather than calling them separately. */
 
-// SendMessage [&] 中的 & 是指 fn里调用的变量 都是 引用拷贝的
+/** In SendMessage [&], the & means the variables used in fn are captured by reference. */
 #define SRUNONUISYNC(fn) SNotifyCenter::getSingletonPtr()->RunOnUISync([&]() { fn })
 
-// PostMessage [=] 中的 等号 是指 fn里调用的变量 都是 值拷贝的
+/** In PostMessage [=], the = means the variables used in fn are captured by value. */
 #define SRUNONUI(fn) SNotifyCenter::getSingletonPtr()->RunOnUIAsync([=]() { fn })
 
 #endif
@@ -26,8 +26,8 @@ SNSBEGIN
 
 /**
  * @class TAutoEventMapReg
- * @brief 自动注册和注销事件映射的模板类
- * @tparam T 类型
+ * @brief Template class that automatically registers and unregisters the event map
+ * @tparam T type
  */
 template <class T>
 class TAutoEventMapReg {
@@ -35,7 +35,7 @@ class TAutoEventMapReg {
 
   public:
     /**
-     * @brief 构造函数，自动注册事件映射
+     * @brief Constructor; automatically registers the event map
      */
     TAutoEventMapReg()
     {
@@ -43,7 +43,7 @@ class TAutoEventMapReg {
     }
 
     /**
-     * @brief 析构函数，自动注销事件映射
+     * @brief Destructor; automatically unregisters the event map
      */
     ~TAutoEventMapReg()
     {
@@ -51,20 +51,20 @@ class TAutoEventMapReg {
     }
 
     /**
-     * @brief 注册事件映射
+     * @brief Register the event map
      */
     void registerNotifyCenter();
 
     /**
-     * @brief 注销事件映射
+     * @brief Unregister the event map
      */
     void unregisterNotifyCenter();
 
   protected:
     /**
-     * @brief 处理事件
-     * @param e 事件参数对象
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Handle the event
+     * @param e event argument object
+     * @return Returns TRUE on success, FALSE on failure
      */
     BOOL OnEvent(IEvtArgs *e)
     {
@@ -75,18 +75,18 @@ class TAutoEventMapReg {
 
 /**
  * @struct INotifyCallback
- * @brief 通知回调接口
+ * @brief Notification callback interface
  */
 struct INotifyCallback
 {
     /**
-     * @brief 触发事件
-     * @param e 事件参数对象
+     * @brief Fire the event
+     * @param e event argument object
      */
     virtual void OnFireEvent(IEvtArgs *e) = 0;
 
     /**
-     * @brief 触发多个事件
+     * @brief Fire multiple events
      */
     virtual void OnFireEvts() = 0;
 };
@@ -95,7 +95,7 @@ class SNotifyReceiver;
 
 /**
  * @class SNotifyCenter
- * @brief 通知中心类，管理事件的注册、注销和触发
+ * @brief Notification center class; manages event registration, unregistration, and firing
  */
 class SOUI_EXP SNotifyCenter
     : public INotifyCenter
@@ -107,102 +107,102 @@ class SOUI_EXP SNotifyCenter
 
   private:
     /**
-     * @brief 构造函数
-     * @param nIntervel 事件处理间隔时间（毫秒）
+     * @brief Constructor
+     * @param nIntervel event handling interval (in milliseconds)
      */
     SNotifyCenter(int nIntervel = 20);
 
     /**
-     * @brief 析构函数
+     * @brief Destructor
      */
     ~SNotifyCenter(void);
 
   public:
     /**
-     * @brief 触发一个同步通知事件
-     * @param e 事件参数对象
+     * @brief Fire a synchronous notification event
+     * @param e event argument object
      *
-     * @details 只能在UI线程中调用
+     * @details Can only be called in the UI thread
      */
     STDMETHOD_(void, FireEventSync)(THIS_ IEvtArgs *e) OVERRIDE;
 
     /**
-     * @brief 触发一个异步通知事件
-     * @param e 事件参数对象
+     * @brief Fire an asynchronous notification event
+     * @param e event argument object
      *
-     * @details 可以在非UI线程中调用，EventArgs *e必须是从堆上分配的内存，调用后使用Release释放引用计数
+     * @details Can be called from a non-UI thread. EventArgs *e must be memory allocated on the heap; call Release to decrement the reference count after use.
      */
     STDMETHOD_(void, FireEventAsync)(THIS_ IEvtArgs *e) OVERRIDE;
 
     /**
-     * @brief 注册一个处理通知的对象
-     * @param slot 事件处理对象
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Register a notification handler object
+     * @param slot event handler object
+     * @return Returns TRUE on success, FALSE on failure
      */
     STDMETHOD_(BOOL, RegisterEventMap)(THIS_ const IEvtSlot *slot) OVERRIDE;
 
     /**
-     * @brief 注销一个处理通知的对象
-     * @param slot 事件处理对象
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Unregister a notification handler object
+     * @param slot event handler object
+     * @return Returns TRUE on success, FALSE on failure
      */
     STDMETHOD_(BOOL, UnregisterEventMap)(THIS_ const IEvtSlot *slot) OVERRIDE;
 
     /**
-     * @brief 在UI线程中运行一个可运行对象
-     * @param pRunnable 可运行对象
-     * @param bSync 同步执行标志
+     * @brief Run a runnable object in the UI thread
+     * @param pRunnable runnable object
+     * @param bSync synchronous execution flag
      */
     STDMETHOD_(void, RunOnUI)(THIS_ IRunnable *pRunnable, BOOL bSync) OVERRIDE;
 
     /**
-     * @brief 在UI线程中运行一个函数
-     * @param fun 函数指针
-     * @param wp WPARAM参数
-     * @param lp LPARAM参数
-     * @param bSync 同步执行标志
+     * @brief Run a function in the UI thread
+     * @param fun function pointer
+     * @param wp WPARAM parameter
+     * @param lp LPARAM parameter
+     * @param bSync synchronous execution flag
      */
     STDMETHOD_(void, RunOnUI2)(THIS_ FunRunOnUI fun, WPARAM wp, LPARAM lp, BOOL bSync) OVERRIDE;
 
   public:
 #ifdef ENABLE_RUNONUI
     /**
-     * @brief 在UI线程中同步运行一个闭包
-     * @param fn 闭包函数
+     * @brief Run a closure synchronously in the UI thread
+     * @param fn closure function
      */
     void RunOnUISync(std::function<void(void)> fn);
 
     /**
-     * @brief 在UI线程中异步运行一个闭包
-     * @param fn 闭包函数
+     * @brief Run a closure asynchronously in the UI thread
+     * @param fn closure function
      */
     void RunOnUIAsync(std::function<void(void)> fn);
 #endif
 
   protected:
     /**
-     * @brief 触发事件
-     * @param e 事件参数对象
+     * @brief Fire the event
+     * @param e event argument object
      */
     virtual void OnFireEvent(IEvtArgs *e);
 
     /**
-     * @brief 触发多个事件
+     * @brief Fire multiple events
      */
     virtual void OnFireEvts();
 
-    tid_t m_dwMainTrdID; // 主线程ID
+    tid_t m_dwMainTrdID; /**< Main thread ID */
 
-    SList<IEvtSlot *> m_evtHandlerMap; // 事件处理对象列表
+    SList<IEvtSlot *> m_evtHandlerMap; /**< Event handler object list */
 
-    SNotifyReceiver *m_pReceiver; // 通知接收器
+    SNotifyReceiver *m_pReceiver; /**< Notification receiver */
 
-    SCriticalSection m_cs;         // 临界区对象
-    SList<IEvtArgs *> m_ayncEvent; // 异步事件列表
-    BOOL m_bRunning;               // 运行状态标志
-    int m_nInterval;               // 事件处理间隔时间（毫秒）
+    SCriticalSection m_cs;         /**< Critical section object */
+    SList<IEvtArgs *> m_ayncEvent; /**< Asynchronous event list */
+    BOOL m_bRunning;               /**< Running state flag */
+    int m_nInterval;               /**< Event handling interval (in milliseconds) */
 
-    SList<SAutoRefPtr<IRunnable> > m_asyncRunnable; // 异步可运行对象列表
+    SList<SAutoRefPtr<IRunnable>> m_asyncRunnable; /**< Asynchronous runnable object list */
 };
 
 template <class T>
@@ -221,4 +221,4 @@ inline void TAutoEventMapReg<T>::unregisterNotifyCenter()
 
 SNSEND
 
-#endif // __SNOTIFYCENTER__H__
+#endif /**< __SNOTIFYCENTER__H__ */

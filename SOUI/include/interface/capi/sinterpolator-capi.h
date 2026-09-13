@@ -7,18 +7,16 @@
 extern "C" {
 #endif
 
-/*
- * Interpolator constants
- */
+/** Interpolator constants */
 #define INTERPOLATOR_INPUT_MIN      0.0f
 #define INTERPOLATOR_INPUT_MAX      1.0f
 
-/*
+/**
  * C API Helper Macros for sinterpolator Interface
  * These macros provide C-style function call syntax for C++ interface methods
  */
 
-/* IInterpolator C API Macros (IObject base interface) */
+/** IInterpolator C API Macros (IObject base interface) */
 #define IInterpolator_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -79,7 +77,7 @@ extern "C" {
 #define IInterpolator_SetAttrHandler(This, attrHandler) \
     ((This)->lpVtbl->SetAttrHandler(This, attrHandler))
 
-/* IInterpolator specific interface macros */
+/** IInterpolator specific interface macros */
 #define IInterpolator_getInterpolation(This, input) \
     ((This)->lpVtbl->getInterpolation(This, input))
 
@@ -87,4 +85,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __SINTERPOLATOR_CAPI_H__ */
+#endif /**< __SINTERPOLATOR_CAPI_H__ */

@@ -248,10 +248,10 @@ typedef struct _SvrOption
  */
 typedef struct _SvrPingCfg
 {
-    uint32_t pingIntervalSeconds; // Ping sending interval in seconds. The server periodically sends pings to check if clients are online
-    uint32_t nHeartbeatSeconds;   // Heartbeat timeout in seconds. If the client has no activity (sending data or pong) within this time, the connection will be closed
-    uint32_t nPingTimeoutCount;   // Maximum number of ping timeouts. If the number of consecutive pings sent without receiving pongs exceeds this value, the connection will be closed
-                                  // Note: nHeartbeatSeconds should be greater than pingIntervalSeconds * nPingTimeoutCount, otherwise heartbeat timeout will trigger first
+    uint32_t pingIntervalSeconds; /**< Ping sending interval in seconds. The server periodically sends pings to check if clients are online */
+    uint32_t nHeartbeatSeconds;   /**< Heartbeat timeout in seconds. If the client has no activity (sending data or pong) within this time, the connection will be closed */
+    uint32_t nPingTimeoutCount;   /**< Maximum number of ping timeouts. If the number of consecutive pings sent without receiving pongs exceeds this value, the connection will be closed */
+                                  /** Note: nHeartbeatSeconds should be greater than pingIntervalSeconds * nPingTimeoutCount, otherwise heartbeat timeout will trigger first */
 } SvrPingCfg;
 
 #undef INTERFACE
@@ -425,4 +425,4 @@ DECLARE_INTERFACE_(IWebsocket, IObjRef)
 };
 
 SNSEND
-#endif // WS_LISTENER_H
+#endif /**< WS_LISTENER_H */

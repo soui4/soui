@@ -34,9 +34,9 @@ void STranslateAnimation::copy(const IAnimation *src)
         return;
     SAnimation::copy(src);
     mFromXValue = src2->mFromXValue;
-    mToXValue   = src2->mToXValue;
+    mToXValue = src2->mToXValue;
     mFromYValue = src2->mFromYValue;
-    mToYValue   = src2->mToYValue;
+    mToYValue = src2->mToYValue;
 }
 
 IAnimation *STranslateAnimation::clone() const

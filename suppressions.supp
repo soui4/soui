@@ -1,5 +1,9 @@
 {
-    suppressions.supp
-    Memcheck:Leak
-    fun:cairo_show_text2
+    glibc AVX2 wmemcmp reads 32-byte chunks and may overread past the end of
+    a small heap block (std::wstring map-key compare).  Benign: the extra
+    bytes stay within the same malloc chunk's page and are never used for
+    the comparison result.  Known valgrind/glibc false positive (ifunc
+    dispatch bypasses valgrind's memcmp interceptors).
+    Memcheck:Addr32
+    fun:__wmemcmp_avx2_movbe
 }

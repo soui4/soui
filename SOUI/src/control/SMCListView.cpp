@@ -22,7 +22,7 @@ class SMCListViewDataSetObserver : public TObjRefImpl<ILvDataSetObserver> {
     SMCListView *m_pOwner;
 };
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 void SMCListViewDataSetObserver::onChanged()
 {
     m_pOwner->onDataSetChanged();
@@ -38,8 +38,8 @@ void SMCListViewDataSetObserver::OnItemChanged(int iItem)
     m_pOwner->onItemDataChanged(iItem);
 }
 
-//////////////////////////////////////////////////////////////////////////
-//  SMCListView
+///////////////////////////////////////////////////////////////////////
+/** SMCListView */
 
 SMCListView::SMCListView()
     : SViewBase(this)
@@ -131,7 +131,7 @@ BOOL SMCListView::SetAdapter(IMcAdapter *adapter)
     return TRUE;
 }
 
-int SMCListView::InsertColumn(int nIndex, LPCTSTR pszText, int nWidth, UINT fmt, LPARAM lParam, BOOL bDpiAware /*=TRUE*/, float fWeight /*=0.0f*/)
+int SMCListView::InsertColumn(int nIndex, LPCTSTR pszText, int nWidth, UINT fmt, LPARAM lParam, BOOL bDpiAware /**< =TRUE */, float fWeight /**< =0.0f */)
 {
     SASSERT(m_pHeader);
     int nRet = m_pHeader->InsertItem(nIndex, pszText, nWidth, fmt, lParam, bDpiAware, fWeight);
@@ -141,7 +141,7 @@ int SMCListView::InsertColumn(int nIndex, LPCTSTR pszText, int nWidth, UINT fmt,
 
 BOOL SMCListView::CreateChildren(SXmlNode xmlNode)
 {
-    //  listctrl的子控件只能是一个header控件
+    // A listctrl's child control can only be a header control
     SXmlNode xmlTemplate = xmlNode.child(SMCListView_style::kStyle_template);
     xmlTemplate.set_userdata(1);
     SXmlNode xmlHeader = xmlNode.child(SMCListView_style::kStyle_headerStyle);
@@ -160,13 +160,13 @@ BOOL SMCListView::CreateChildren(SXmlNode xmlNode)
         m_xmlTemplate.root().append_copy(xmlTemplate);
         SLayoutSize nItemHei = GETLAYOUTSIZE(xmlTemplate.attribute(SMCListView_style::kStyle_itemHeight).value());
         if (nItemHei.fSize > 0.0f)
-        { //指定了itemHeight属性时创建一个固定行高的定位器
+        { // When itemHeight is specified, create a locator with fixed row height
             IListViewItemLocator *pItemLocator = new SListViewItemLocatorFix(nItemHei, m_nDividerSize);
             SetItemLocator(pItemLocator);
             pItemLocator->Release();
         }
         else
-        { //创建一个行高可变的行定位器，从defHeight属性中获取默认行高
+        { // Create a variable row-height locator; obtain the default row height from the defHeight attribute
             IListViewItemLocator *pItemLocator = new SListViewItemLocatorFlex(GETLAYOUTSIZE(xmlTemplate.attribute(SMCListView_style::kStyle_defHeight).as_string(L"30dp")), m_nDividerSize);
             SetItemLocator(pItemLocator);
             pItemLocator->Release();
@@ -190,7 +190,7 @@ CRect SMCListView::GetListRect()
     return rcList;
 }
 
-//  更新滚动条
+/** Update scroll bar */
 void SMCListView::UpdateScrollBar()
 {
     CSize szView;
@@ -199,17 +199,17 @@ void SMCListView::UpdateScrollBar()
     szView.cy = m_lvItemLocator->GetTotalHeight();
 
     CRect rcClient;
-    SWindow::GetClientRect(&rcClient); //不计算滚动条大小
+    SWindow::GetClientRect(&rcClient); // Do not compute scroll bar size
     rcClient.top += GetHeaderHeight();
     if (rcClient.bottom < rcClient.top)
         rcClient.bottom = rcClient.top;
     CSize size = rcClient.Size();
-    //  关闭滚动条
+    // Close scroll bar
     m_wBarVisible = SSB_NULL;
 
     if (size.cy < szView.cy || (size.cy < szView.cy + GetSbWidth() && size.cx < szView.cx))
     {
-        //  需要纵向滚动条
+        // Need vertical scroll bar
         m_wBarVisible |= SSB_VERT;
         m_siVer.nMin = 0;
         m_siVer.nMax = szView.cy - 1;
@@ -218,9 +218,9 @@ void SMCListView::UpdateScrollBar()
         int horzSize = size.cx - GetSbWidth();
         if (horzSize < nMinWid)
         {
-            // 小于表头的最小宽度, 需要横向滚动条
+            // Less than the header's minimum width, horizontal scroll bar needed
             m_wBarVisible |= SSB_HORZ;
-            m_siVer.nPage = size.cy - GetSbWidth() > 0 ? size.cy - GetSbWidth() : 0; //注意同时调整纵向滚动条page信息
+            m_siVer.nPage = size.cy - GetSbWidth() > 0 ? size.cy - GetSbWidth() : 0; // Note to also adjust the vertical scroll bar page info
 
             m_siHoz.nMin = 0;
             m_siHoz.nMax = szView.cx - 1;
@@ -229,13 +229,13 @@ void SMCListView::UpdateScrollBar()
         else
         {
             if (horzSize < szView.cx || m_pHeader->IsAutoResize())
-            { //大于最小宽度，小于现在宽度，则调整表头的宽度。
+            { // Greater than the minimum width but less than the current width, then adjust the header width.
                 CRect rcHead = m_pHeader->GetWindowRect();
                 rcHead.right = rcHead.left + horzSize;
                 m_pHeader->Move(rcHead);
                 szView.cx = horzSize;
             }
-            //  不需要横向滚动条
+            // No horizontal scroll bar needed
             m_siHoz.nPage = szView.cx;
             m_siHoz.nMin = 0;
             m_siHoz.nMax = m_siHoz.nPage - 1;
@@ -244,7 +244,7 @@ void SMCListView::UpdateScrollBar()
     }
     else
     {
-        //  不需要纵向滚动条
+        // No vertical scroll bar needed
         m_siVer.nPage = size.cy;
         m_siVer.nMin = 0;
         m_siVer.nMax = size.cy - 1;
@@ -252,7 +252,7 @@ void SMCListView::UpdateScrollBar()
 
         if (size.cx < nMinWid)
         {
-            //小于表头的最小宽度,  需要横向滚动条
+            // Less than the header's minimum width, horizontal scroll bar needed
             m_wBarVisible |= SSB_HORZ;
             m_siHoz.nMin = 0;
             m_siHoz.nMax = szView.cx - 1;
@@ -261,13 +261,13 @@ void SMCListView::UpdateScrollBar()
         else
         {
             if (size.cx < szView.cx || m_pHeader->IsAutoResize())
-            { //大于最小宽度，小于现在宽度，则调整表头的宽度。
+            { // Greater than the minimum width but less than the current width, then adjust the header width.
                 CRect rcHead = m_pHeader->GetWindowRect();
                 rcHead.right = rcHead.left + size.cx;
                 m_pHeader->Move(rcHead);
                 szView.cx = size.cx;
             }
-            //  不需要横向滚动条
+            // No horizontal scroll bar needed
             m_siHoz.nPage = szView.cx;
             m_siHoz.nMin = 0;
             m_siHoz.nMax = m_siHoz.nPage - 1;
@@ -275,7 +275,7 @@ void SMCListView::UpdateScrollBar()
         }
     }
 
-    //  根据需要调整原点位置
+    // Adjust origin position as needed
     if (HasScrollBar(FALSE) && m_siHoz.nPos + m_siHoz.nPage > szView.cx)
     {
         m_siHoz.nPos = szView.cx - m_siHoz.nPage;
@@ -289,13 +289,13 @@ void SMCListView::UpdateScrollBar()
     SetScrollPos(TRUE, m_siVer.nPos, TRUE);
     SetScrollPos(FALSE, m_siHoz.nPos, TRUE);
 
-    //  重新计算客户区及非客户区
+    // Recompute client and non-client areas
     SSendMessage(WM_NCCALCSIZE);
 
     Invalidate();
 }
 
-//更新表头位置
+/** Update header position */
 void SMCListView::UpdateHeaderCtrl()
 {
     CRect rcClient;
@@ -352,7 +352,7 @@ BOOL SMCListView::OnHeaderClick(IEvtArgs *pEvt)
     }
     if (m_adapter && m_adapter->OnSort(iCol, pFmts, m_pHeader->GetItemCount()))
     {
-        //更新表头的排序状态
+        // Update header sort state
         for (int i = 0; i < m_pHeader->GetItemCount(); i++)
         {
             m_pHeader->SetItemSort(pOrders[i], pFmts[i]);
@@ -423,7 +423,7 @@ void SMCListView::onDataSetChanged()
         return;
     }
 
-    //更新列显示状态
+    // Update column display state
     m_pHeader->GetEventSet()->setMutedState(true);
     for (size_t i = 0; i < m_pHeader->GetItemCount(); i++)
     {
@@ -527,7 +527,7 @@ void SMCListView::OnPaint(IRenderTarget *pRT)
             rcItem.top = rcItem.bottom;
             rcItem.bottom += m_lvItemLocator->GetDividerSize();
             if (m_pSkinDivider && !rcItem.IsRectEmpty() && rgnClip->RectInRegion(&rcItem))
-            { //绘制分隔线
+            { // Draw separator line
                 m_pSkinDivider->DrawByIndex(pRT, rcItem, 0);
             }
         }
@@ -570,7 +570,7 @@ BOOL SMCListView::OnScroll(BOOL bVertical, UINT uCode, int nPos)
             UpdateVisibleItems();
         else
             UpdateHeaderCtrl();
-        //加速滚动时UI的刷新
+        // Accelerate UI refresh during scrolling
         if (uCode == SB_THUMBTRACK)
             ScrollUpdate();
 
@@ -581,8 +581,8 @@ BOOL SMCListView::OnScroll(BOOL bVertical, UINT uCode, int nPos)
 
 void SMCListView::UpdateVisibleItems()
 {
-	if (!m_adapter || !GetContainer())
-		return;
+    if (!m_adapter || !GetContainer())
+        return;
     SAutoEnableHostPrivUiDef enableUiDef(this);
     int iOldFirstVisible = m_iFirstVisible;
     int iOldLastVisible = m_iFirstVisible + m_lstItems.GetCount();
@@ -619,13 +619,13 @@ void SMCListView::UpdateVisibleItems()
 
             if (iNewLastVisible >= iOldFirstVisible && iNewLastVisible < iOldLastVisible)
             {                                                   // use the old visible item
-                int iItem = iNewLastVisible - iOldFirstVisible; //(iNewLastVisible-iNewFirstVisible) +
-                                                                //(iNewFirstVisible-iOldFirstVisible);
+                int iItem = iNewLastVisible - iOldFirstVisible; // (iNewLastVisible-iNewFirstVisible) +
+                                                                // (iNewFirstVisible-iOldFirstVisible);
                 SASSERT(iItem >= 0 && iItem <= (iOldLastVisible - iOldFirstVisible));
                 if (pItemInfos[iItem].nType == ii.nType)
-                { //类型相同才能重用
+                { // Can only reuse if the type is the same
                     ii = pItemInfos[iItem];
-                    pItemInfos[iItem].pItem = NULL; //标记该行已经被重用
+                    pItemInfos[iItem].pItem = NULL; // Mark this row as reused
                 }
             }
             BOOL bNewItem = FALSE;
@@ -633,7 +633,7 @@ void SMCListView::UpdateVisibleItems()
             { // create new visible item
                 SList<SItemPanel *> *lstRecycle = m_itemRecycle.GetAt(ii.nType);
                 if (lstRecycle->IsEmpty())
-                { //创建一个新的列表项
+                { // Create a new list item
                     bNewItem = TRUE;
                     ii.pItem = SItemPanel::Create(this, SXmlNode(), this);
                     ii.pItem->GetEventSet()->subscribeEvent(EventItemPanelClick::EventID, Subscriber(&SViewBase::OnItemClick, (SViewBase *)this));
@@ -653,14 +653,14 @@ void SMCListView::UpdateVisibleItems()
                 ii.pItem->Move(rcItem);
             }
 
-            //设置状态，同时暂时禁止应用响应statechanged事件。
+            // Set state while temporarily preventing the app from responding to the statechanged event.
             ii.pItem->GetEventSet()->setMutedState(true);
             ii.pItem->ModifyItemState(dwState, 0);
             ii.pItem->GetEventSet()->setMutedState(false);
             if (dwState & WndState_Hover)
                 m_pHoverItem = ii.pItem;
 
-            //应用可以根据ii.pItem的状态来决定如何初始化列表数据
+            // The app can decide how to initialize list data based on the state of ii.pItem
             SXmlNode xmlNode = m_xmlTemplate.root().first_child();
             ii.pItem->LockUpdate();
             m_adapter->getView(iNewLastVisible, ii.pItem, &xmlNode);
@@ -673,7 +673,7 @@ void SMCListView::UpdateVisibleItems()
             }
 
             if (!m_lvItemLocator->IsFixHeight())
-            { //计算出列表行高度
+            { // Compute the list row height
                 SIZE szView;
                 m_adapter->getViewDesiredSize(&szView, iNewLastVisible, ii.pItem, rcItem.Width(), rcItem.Height());
                 m_lvItemLocator->SetItemHeight(iNewLastVisible, szView.cy);
@@ -682,7 +682,7 @@ void SMCListView::UpdateVisibleItems()
             }
             ii.pItem->UpdateLayout();
 
-            //调整网格大小
+            // Adjust grid size
             CRect rcSubItem(rcItem);
             rcSubItem.right = rcSubItem.left;
             for (int i = 0; i < m_pHeader->GetItemCount(); i++)
@@ -744,7 +744,7 @@ void SMCListView::UpdateVisibleItems()
     { // update scroll range
         UpdateScrollBar();
         UpdateHeaderCtrl();
-        UpdateVisibleItems(); //根据新的滚动条状态重新记录显示列表项
+        UpdateVisibleItems(); // Re-record the displayed list items based on the new scroll bar state
     }
     else
     {
@@ -804,7 +804,7 @@ void SMCListView::OnDestroy()
     __baseCls::OnDestroy();
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 
 BOOL SMCListView::IsItemRedrawDelay() const
 {
@@ -878,7 +878,7 @@ LRESULT SMCListView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
     LRESULT lRet = 0;
     CPoint pt(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 
-    // === 1. 先尝试SPanel的拖动处理 ===
+    // === 1. First try SPanel's drag handling ===
     if (HandleMouseDrag(uMsg, wParam, lParam, lRet))
     {
         SetMsgHandled(TRUE);
@@ -894,7 +894,7 @@ LRESULT SMCListView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
     else
     {
         if (uMsg == WM_LBUTTONDOWN || uMsg == WM_RBUTTONDOWN || uMsg == WM_MBUTTONDOWN)
-        { //交给panel处理
+        { // Hand off to panel for handling
             __baseCls::ProcessSwndMessage(uMsg, wParam, lParam, lRet);
         }
 
@@ -921,13 +921,13 @@ LRESULT SMCListView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
         }
         else if (uMsg == WM_LBUTTONDOWN || uMsg == WM_RBUTTONDOWN || uMsg == WM_MBUTTONDOWN)
         {
-            // 点击空白区域取消选中
+            // Click blank area to clear selection
             SetSel(-1, TRUE);
         }
     }
 
     if (uMsg == WM_LBUTTONUP || uMsg == WM_RBUTTONUP || uMsg == WM_MBUTTONUP)
-    { //交给panel处理
+    { // Hand off to panel for handling
         __baseCls::ProcessSwndMessage(uMsg, wParam, lParam, lRet);
     }
     SetMsgHandled(TRUE);

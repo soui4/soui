@@ -5,11 +5,11 @@
 #include <interface/SCtrls-i.h>
 #include <proxy/SWindowProxy.h>
 
-//////////////////////////////////////////////////////////////////////////
-// Real Window Control
-// Binding a real window
+///////////////////////////////////////////////////////////////////////
+/** Real Window Control */
+/** Binding a real window */
 //
-// Usage: <realwnd id=xx wndclass="edit" wndname="name" style="00000001" exstyle="00000000"/>
+/** Usage: <realwnd id=xx wndclass="edit" wndname="name" style="00000001" exstyle="00000000"/> */
 //
 
 SNSBEGIN
@@ -195,4 +195,4 @@ class SOUI_EXP SRealWnd : public TWindowProxy<IRealWnd> {
 
 SNSEND
 
-#endif // __SREALWND__H__
+#endif /**< __SREALWND__H__ */

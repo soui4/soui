@@ -1,14 +1,14 @@
 ﻿/**
- * Copyright (C) 2014-2050 SOUI团队
+ * Copyright (C) 2014-2050 SOUI team
  * All rights reserved.
  *
  * @file       SDropDown.cpp
- * @brief      SDropDownWnd类源文件
+ * @brief      SDropDownWnd class source file
  * @version    v1.0
  * @author     soui
  * @date       2014-05-25
  *
- * Describe  此文件主要用于SDropDownWnd类相关实现
+ * Describe  This file mainly contains the implementation related to the SDropDownWnd class
  */
 #include <souistd.h>
 #include <control/SDropDown.h>
@@ -33,18 +33,22 @@ void SDropDownWnd::OnFinalMessage(HWND hWnd)
     delete this;
 }
 
-void SDropDownWnd::OnRootBeforePaint(const SRootWindow *pRoot,IRenderTarget *pRT, SPainter &painter) const{
-    SHostWnd::OnRootBeforePaint(pRoot,pRT,painter);
-    if(painter.oldFont == NULL && painter.oldTextColor == CR_INVALID){
-        //no font or color setted, use owner font and color
-        if(SWindow *pOwnerWindow = m_pOwner->GetDropDownOwner())
+void SDropDownWnd::OnRootBeforePaint(const SRootWindow *pRoot, IRenderTarget *pRT, SPainter &painter) const
+{
+    SHostWnd::OnRootBeforePaint(pRoot, pRT, painter);
+    if (painter.oldFont == NULL && painter.oldTextColor == CR_INVALID)
+    {
+        // no font or color setted, use owner font and color
+        if (SWindow *pOwnerWindow = m_pOwner->GetDropDownOwner())
         {
             SPainter ownerPainter;
             pOwnerWindow->BuildPainter(ownerPainter);
-            if(ownerPainter.oldFont){
-                pRT->SelectObject(ownerPainter.oldFont,(IRenderObj**)&painter.oldFont);
+            if (ownerPainter.oldFont)
+            {
+                pRT->SelectObject(ownerPainter.oldFont, (IRenderObj **)&painter.oldFont);
             }
-            if(ownerPainter.oldTextColor != CR_INVALID){
+            if (ownerPainter.oldTextColor != CR_INVALID)
+            {
                 painter.oldTextColor = pRT->SetTextColor(ownerPainter.oldTextColor);
             }
         }
@@ -76,7 +80,8 @@ BOOL SDropDownWnd::Create(LPCRECT lpRect, IXmlNode *pInitXml, DWORD dwStyle, DWO
     return TRUE;
 }
 
-void SDropDownWnd::ShowWindow(int x, int y, int nWidth, int nHeight, int nAniMs, BOOL bDropDown) {
+void SDropDownWnd::ShowWindow(int x, int y, int nWidth, int nHeight, int nAniMs, BOOL bDropDown)
+{
     MoveWindow(x, y, nWidth, nHeight, FALSE);
 #ifdef _WIN32
     if (nAniMs > 0)
@@ -143,7 +148,7 @@ BOOL SDropDownWnd::PreTranslateMessage(MSG *pMsg)
         SNativeWnd::SendMessage(pMsg->message, pMsg->wParam, pMsg->lParam);
     }
     else if (pMsg->message == WM_MOUSEMOVE)
-    { //由于窗口显示后就调用了setcapture，导致收不到setcursor消息，这里在WM_MOUSEMOVE消息里模拟一个setcursor消息。
+    { // Since setcapture is called after the window is shown, the setcursor message is not received; here we simulate a setcursor message within WM_MOUSEMOVE.
         SNativeWnd::SendMessage(WM_SETCURSOR, (WPARAM)m_hWnd, MAKELPARAM(HTCLIENT, WM_MOUSEMOVE));
     }
     return FALSE;

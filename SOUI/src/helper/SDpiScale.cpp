@@ -14,7 +14,7 @@ const int *SDpiScale::GetBuiltinScales()
     return KBuiltinScales;
 }
 
-/*标准化放大比例, 选择比自己指定比例小一号的比例*/
+/** Normalized zoom ratio; choose a ratio one step smaller than the specified ratio */
 int SDpiScale::NormalizeScale(int nScale)
 {
     for (int i = 1; i < ARRAYSIZE(KBuiltinScales); i++)

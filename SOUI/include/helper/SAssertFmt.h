@@ -32,5 +32,5 @@
 #else
 #define SASSERT_FMT SASSERT_FMTA
 #define SASSERT_MSG SASSERT_MSGA
-#endif //_UNICODE
-#endif // __SASSERTFMT__H__
+#endif /**< _UNICODE */
+#endif /**< __SASSERTFMT__H__ */

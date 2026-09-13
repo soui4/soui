@@ -1,4 +1,4 @@
-#ifndef __SLISTBOX__H__
+﻿#ifndef __SLISTBOX__H__
 #define __SLISTBOX__H__
 
 #include <core/SPanel.h>
@@ -46,6 +46,10 @@ typedef struct tagLBITEM
  * @details A control that displays a list of items from which the user can select one or more.
  */
 class SOUI_EXP SListBox : public TPanelProxy<IListBox> {
+#ifdef SOUI_ENABLE_ACC
+    /** Access the protected m_siVer / self-drawn item rectangle to build ACC virtual children. */
+    friend class SAccProxyListBox;
+#endif
   public:
     DEF_SOBJECT(SPanel, L"listbox")
 
@@ -369,18 +373,19 @@ class SOUI_EXP SListBox : public TPanelProxy<IListBox> {
      */
     void OnLButtonUpEx(UINT nFlags, CPoint pt) override;
 
-	BOOL IsEnableDragMode() const override;
+    BOOL IsEnableDragMode() const override;
+
   private:
-    SLayoutSize m_itemHeight; /**< Height of the items */
+    SLayoutSize m_itemHeight;  /**< Height of the items */
     mutable int m_nItemHeight; /**< Height of the items in pixels */
 
   protected:
     SArray<LPLBITEM> m_arrItems; /**< Array of items */
-    int m_iSelItem;           /**< Index of the selected item */
-    int m_iClickItem;         /**< Index of the clickec item */
-    int m_iHoverItem;         /**< Index of the item under the mouse */
-    int m_iScrollSpeed;       /**< Scroll speed */
-    BOOL m_bHotTrack;         /**< Hot tracking flag */
+    int m_iSelItem;              /**< Index of the selected item */
+    int m_iClickItem;            /**< Index of the clickec item */
+    int m_iHoverItem;            /**< Index of the item under the mouse */
+    int m_iScrollSpeed;          /**< Scroll speed */
+    BOOL m_bHotTrack;            /**< Hot tracking flag */
 
     SLayoutSize m_ptIcon[2]; /**< Icon coordinates */
     SLayoutSize m_ptText[2]; /**< Text coordinates */
@@ -426,4 +431,4 @@ class SOUI_EXP SListBox : public TPanelProxy<IListBox> {
 
 SNSEND
 
-#endif // __SLISTBOX__H__
+#endif /**< __SLISTBOX__H__ */

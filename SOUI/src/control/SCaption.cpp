@@ -1,14 +1,14 @@
 ﻿/**
- * Copyright (C) 2014-2050 SOUI团队
+ * Copyright (C) 2014-2050 SOUI team
  * All rights reserved.
  *
  * @file       SCaption.cpp
- * @brief      标签控件
+ * @brief      Caption control
  * @version    v1.0
  * @author     soui
  * @date       2014-05-28
  *
- * Describe    此类完成标题栏控件
+ * Describe    This class implements the title bar control
  */
 #include "souistd.h"
 #include "control/SCaption.h"
@@ -24,14 +24,7 @@ bool IsCaptionInteractiveChild(SWindow *pWnd)
     if (!pWnd)
         return false;
 
-    return pWnd->IsClass(SButton::GetClassName()) ||
-        pWnd->IsClass(SLink::GetClassName()) ||
-        pWnd->IsClass(SCheckBox::GetClassName()) ||
-        pWnd->IsClass(SRadioBox::GetClassName()) ||
-        pWnd->IsClass(L"combobase") ||
-        pWnd->IsClass(L"spinButton") ||
-        pWnd->IsClass(L"edit") ||
-        pWnd->IsClass(L"menuItem");
+    return pWnd->IsClass(SButton::GetClassName()) || pWnd->IsClass(SLink::GetClassName()) || pWnd->IsClass(SCheckBox::GetClassName()) || pWnd->IsClass(SRadioBox::GetClassName()) || pWnd->IsClass(L"combobase") || pWnd->IsClass(L"spinButton") || pWnd->IsClass(L"edit") || pWnd->IsClass(L"menuItem");
 }
 
 bool HitCaptionDragArea(const SCaption *pCaption, CPoint point)

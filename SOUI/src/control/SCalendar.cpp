@@ -1,14 +1,14 @@
 ﻿/**
- * Copyright (C) 2014-2050 SOUI团队
+ * Copyright (C) 2014-2050 SOUI team
  * All rights reserved.
  *
  * @file       SCalendar.cpp
- * @brief      SCalendarCore以及SCalendar类源文件
+ * @brief      SCalendarCore and SCalendar class source file
  * @version    v1.0
  * @author     soui
  * @date       2014-05-25
  *
- * Describe  时间控件相关函数实现
+ * Describe  Implementations of time-control related functions
  */
 #include "souistd.h"
 #include "control/SCalendar.h"
@@ -20,8 +20,8 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-/////////////////////////////////////////////////////////////////////////////
-// SCalendarCore
+//////////////////////////////////////////////////////////////////////////
+/** SCalendarCore */
 
 SNSBEGIN
 
@@ -29,14 +29,14 @@ extern WORD gLunarMonthDay[];
 extern BYTE gLunarMonth[];
 extern BYTE gLunarHolDay[];
 
-#define REFTYPE_SUJIU 1 //数九
-#define REFTYPE_MEIYU 2 //梅雨
-#define REFTYPE_SANFU 3 //三伏
+#define REFTYPE_SUJIU 1 /**< Nine-day periods (Shujiu) */
+#define REFTYPE_MEIYU 2 /**< Plum rains (Meiyu season) */
+#define REFTYPE_SANFU 3 /**< Dog days (Sanfu) */
 
 #define TITLE_HEIGHT  20.f
 #define FOOTER_HEIGHT 20.f
 
-//两个子控件的名字
+/** Names of the two child controls */
 #define NAME_BTN_TODAY   "btn_today"
 #define NAME_LABEL_TODAY "label_today"
 
@@ -45,11 +45,11 @@ WORD const DayOrdinalLeap[13] = { 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 3
 
 BOOL SCalendarCore::IsLeapYear(WORD wYear, BOOL &bLeapYear)
 {
-    if (wYear < 1600 || wYear >= 7000) //压缩算法规定了的年份区间（提取器只能导出此区间的数据，Lunar.dll支持-6000到20000（不含20000）之间的年份）
+    if (wYear < 1600 || wYear >= 7000) // Year range defined by the compression algorithm (the extractor can only export data within this range; Lunar.dll supports years between -6000 and 20000 (exclusive of 20000))
     {
         return FALSE;
     }
-    if (wYear % 4 == 0 && wYear % 100 != 0 || wYear % 400 == 0) //判断闰年的条件
+    if (wYear % 4 == 0 && wYear % 100 != 0 || wYear % 400 == 0) // Condition for determining a leap year
     {
         bLeapYear = TRUE;
     }
@@ -62,8 +62,8 @@ BOOL SCalendarCore::IsLeapYear(WORD wYear, BOOL &bLeapYear)
 
 BOOL SCalendarCore::GetDaysNumInYear(WORD wYear, WORD wMonth, WORD wDay, WORD &wDays)
 {
-    //从日期算出距离元旦的天数
-    if (DateCheck(wYear, wMonth, wDay) == 0) //对输入的日期进行检查
+    // Compute days from a date to New Year's Day
+    if (DateCheck(wYear, wMonth, wDay) == 0) // Validate the input date
     {
         return FALSE;
     }
@@ -74,7 +74,7 @@ BOOL SCalendarCore::GetDaysNumInYear(WORD wYear, WORD wMonth, WORD wDay, WORD &w
     }
     if (bLeapYear == TRUE)
     {
-        wDays = DayOrdinalLeap[wMonth - 1] + wDay - 1; //元旦为序数0，因此减1
+        wDays = DayOrdinalLeap[wMonth - 1] + wDay - 1; // New Year's Day is ordinal 0, so subtract 1
     }
     else
     {
@@ -85,7 +85,7 @@ BOOL SCalendarCore::GetDaysNumInYear(WORD wYear, WORD wMonth, WORD wDay, WORD &w
 
 BOOL SCalendarCore::GetDateFromDays(WORD wYear, WORD wDays, WORD &wMonth, WORD &wDay)
 {
-    //从距离元旦的天数算出日期
+    // Compute the date from days since New Year's Day
     if (wDays < 1)
     {
         return FALSE;
@@ -97,7 +97,7 @@ BOOL SCalendarCore::GetDateFromDays(WORD wYear, WORD wDays, WORD &wMonth, WORD &
     }
     if (bLeapYear == TRUE)
     {
-        if (wDays > 366) //超出了该年的总天数
+        if (wDays > 366) // Exceeds the total days of that year
         {
             return FALSE;
         }
@@ -115,10 +115,10 @@ BOOL SCalendarCore::GetDateFromDays(WORD wYear, WORD wDays, WORD &wMonth, WORD &
     {
         if (bLeapYear == TRUE)
         {
-            if (wDays >= DayOrdinalLeap[i] && wDays < DayOrdinalLeap[i + 1]) //找出月份
+            if (wDays >= DayOrdinalLeap[i] && wDays < DayOrdinalLeap[i + 1]) // Find the month
             {
                 wMonth = i + 1;
-                wDay = wDays - DayOrdinalLeap[i]; //计算出“日”
+                wDay = wDays - DayOrdinalLeap[i]; // Compute the day
                 break;
             }
         }
@@ -181,9 +181,9 @@ short SCalendarCore::GetDayOfWeek(WORD wYear, WORD wMonth, WORD wDay)
         return -1;
     }
     unsigned int DayofWeek = 0;
-    uDayOrd++; //一年中的第几天，因为GetDaysNumInYear所得到的是索引，因此要加一
+    uDayOrd++; // Day of the year; since GetDaysNumInYear returns an index, add one
     wYear--;
-    DayofWeek = (wYear + wYear / 4 - wYear / 100 + wYear / 400 + uDayOrd) % 7; //这个只是算星期的通用公式
+    DayofWeek = (wYear + wYear / 4 - wYear / 100 + wYear / 400 + uDayOrd) % 7; // This is just a general formula for computing the weekday
     return DayofWeek;
 }
 
@@ -191,22 +191,22 @@ WORD SCalendarCore::GetDaysOfMonth(WORD wYear, WORD wMonth)
 {
     if (wMonth == 12)
     {
-        return 31; //这里为了简便，判断12月就直接返回
+        return 31; // For simplicity, return directly when December is detected
     }
     WORD days1 = 0, days2 = 0;
     WORD ret = 0;
-    ret = GetDaysNumInYear(wYear, wMonth, 1, days1); //本月1日在年内的序数
+    ret = GetDaysNumInYear(wYear, wMonth, 1, days1); // Ordinal of the 1st of this month within the year
     if (ret == 0)
     {
         return ret;
     }
     wMonth++;
-    ret = GetDaysNumInYear(wYear, wMonth, 1, days2); //下个月1日的年内序数
+    ret = GetDaysNumInYear(wYear, wMonth, 1, days2); // Ordinal of the 1st of next month within the year
     if (ret == 0)
     {
         return ret;
     }
-    ret = days2 - days1; //下个月1日的序数减本月1日的序数
+    ret = days2 - days1; // Ordinal of the 1st of next month minus that of the 1st of this month
     return ret;
 }
 
@@ -329,13 +329,13 @@ void SCalendar::GetDate(WORD &iYear, WORD &iMonth, WORD &iDay)
 
 BOOL SCalendar::SetDate(WORD iYear, WORD iMonth, WORD iDay, int nBtnType, bool bNotify)
 {
-    short iWeek = SCalendarCore::GetDayOfWeek(iYear, iMonth, 1); // 计算出 当月 1号 是星期几
+    short iWeek = SCalendarCore::GetDayOfWeek(iYear, iMonth, 1); // Compute the weekday of the 1st of the current month
     if (iWeek < 0)
         return FALSE;
 
     WORD nDayCount = SCalendarCore::GetDaysOfMonth(iYear, iMonth);
 
-    if (iWeek > 0) // 如果 不是星期天 先计算 上个月 的最后几天
+    if (iWeek > 0) // If not Sunday, first compute the last few days of the previous month
     {
         WORD nFrontDayCount = 0;
         if (1 == iMonth)
@@ -350,7 +350,7 @@ BOOL SCalendar::SetDate(WORD iYear, WORD iMonth, WORD iDay, int nBtnType, bool b
         }
     }
 
-    // 计算 当月 的 天数 位置
+    // Compute the day positions of the current month
     for (int i = 0; i < nDayCount; ++i)
     {
         m_arrDays[iWeek + i].nType = 0;
@@ -396,14 +396,14 @@ void SCalendar::SetYearDecadeCentury()
             m_arrMonthOrYear[i].iMonthOrYear = i + 1;
             m_arrMonthOrYear[i].nType = 0;
         }
-        //计算m_nSelItem
+        // Compute m_nSelItem
         m_nSelItem = m_iMonth - 1;
     }
     if (m_showType == SHOW_YEAR_DECADE)
     {
-        //年代头年份
+        // Year at the head of the decade
         int decadeFirstYear = m_iYear - m_iYear % 10;
-        //计算 显示
+        // Compute display
 
         m_arrMonthOrYear[0].iMonthOrYear = decadeFirstYear - 1;
         m_arrMonthOrYear[0].nType = -1;
@@ -417,14 +417,14 @@ void SCalendar::SetYearDecadeCentury()
         m_arrMonthOrYear[11].iMonthOrYear = decadeFirstYear + 10;
         m_arrMonthOrYear[11].nType = -1;
 
-        //计算m_nSelItem
+        // Compute m_nSelItem
         m_nSelItem = m_iYear % 10 + 1;
     }
     else if (m_showType == SHOW_YEAR_CENTURY)
     {
-        //世纪头 年份 2019 -19 = 2000
+        // Century head year: 2019 - 19 = 2000
         int centiryFirstYear = m_iYear - m_iYear % 100;
-        //计算 显示
+        // Compute display
 
         m_arrMonthOrYear[0].iMonthOrYear = centiryFirstYear - 10;
         m_arrMonthOrYear[0].nType = -1;
@@ -438,7 +438,7 @@ void SCalendar::SetYearDecadeCentury()
         m_arrMonthOrYear[11].iMonthOrYear = centiryFirstYear + 100;
         m_arrMonthOrYear[11].nType = -1;
 
-        //计算m_nSelItem
+        // Compute m_nSelItem
         m_nSelItem = m_iYear % 100 / 10 + 1;
     }
 }
@@ -518,7 +518,7 @@ void SCalendar::DrawYearMonth(IRenderTarget *pRT, const CRect &rect)
         return;
     int nHeight = m_nYearMonthHeight.toPixelSize(GetScale());
 
-    // 绘制 上一个 按钮
+    // Draw previous button
     DWORD dwPrevState = 0;
     if (HIT_LEFT == m_nHoverItem)
     {
@@ -537,7 +537,7 @@ void SCalendar::DrawYearMonth(IRenderTarget *pRT, const CRect &rect)
         m_pSkinPrev->DrawByIndex(pRT, rcItem, dwPrevState);
     }
 
-    // 绘制 年月
+    // Draw year and month
     COLORREF crText = pRT->GetTextColor();
     if (HIT_YEAR == m_nHoverItem)
     {
@@ -557,13 +557,13 @@ void SCalendar::DrawYearMonth(IRenderTarget *pRT, const CRect &rect)
     }
     else if (m_showType == SHOW_YEAR_DECADE)
     {
-        //年代头年份
+        // Year at the head of the decade
         int decadeFirstYear = m_iYear - m_iYear % 10;
         szYearMonth.Format(_T("%04d-%04d"), decadeFirstYear, decadeFirstYear + 9);
     }
     else if (m_showType == SHOW_YEAR_CENTURY)
     {
-        //世纪头年份
+        // Century head year
         int centuryFirstYear = m_iYear - m_iYear % 100;
         szYearMonth.Format(_T("%04d-%04d"), centuryFirstYear, centuryFirstYear + 99);
     }
@@ -572,7 +572,7 @@ void SCalendar::DrawYearMonth(IRenderTarget *pRT, const CRect &rect)
 
     pRT->SetTextColor(crText);
 
-    // 绘制 下一个 按钮
+    // Draw next button
     DWORD dwNextState = 0;
     if (HIT_RIGHT == m_nHoverItem)
     {
@@ -634,7 +634,7 @@ void SCalendar::DrawDay(IRenderTarget *pRT, CRect &rcDay, int nItem)
     }
     else if (m_Today.wDay == dayInfo.iDay && m_Today.wYear == m_iYear && m_Today.wMonth == m_iMonth)
     {
-        // today 框 就用 textcolor
+        // The today box uses textcolor
         pRT->DrawRoundRect(rcDay, ptRound);
     }
     DWORD dwState = 0;
@@ -679,9 +679,9 @@ void SCalendar::DrawToday(IRenderTarget *pRT, CRect &rcDay)
     szToday.Format(_T("今天:%04d/%d/%d"), m_Today.wYear, m_Today.wMonth, m_Today.wDay);
     // CRect rc = rect;
     m_rcToday = rcDay;
-    // 计算 文本
+    // Compute text
     pRT->DrawText(szToday, -1, m_rcToday, DT_SINGLELINE | DT_VCENTER | DT_CENTER | DT_CALCRECT);
-    m_rcToday.bottom = m_rcToday.top + rcDay.Height(); //高度 不变
+    m_rcToday.bottom = m_rcToday.top + rcDay.Height(); // Height unchanged
     m_rcToday.OffsetRect((rcDay.Width() - m_rcToday.Width()) / 2, 0);
     pRT->DrawText(szToday, -1, m_rcToday, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
     pRT->SetTextColor(crText);
@@ -703,12 +703,12 @@ void SCalendar::DrawYearDecadeCentury(IRenderTarget *pRT, const CRect &rect, int
     {
         pRT->SetTextColor(m_crOtherDayText);
     }
-    // 		else if (m_Today.wDay == dayInfo.iDay && m_Today.wYear == m_iYear && m_Today.wMonth ==
+    // else if (m_Today.wDay == dayInfo.iDay && m_Today.wYear == m_iYear && m_Today.wMonth ==
     // m_iMonth)
-    // 		{
-    // 			// today 框 就用 textcolor
-    // 			pRT->DrawRoundRect(rcDay, ptRound);
-    // 		}
+    // {
+    // // The today box uses textcolor
+    // pRT->DrawRoundRect(rcDay, ptRound);
+    // }
     DWORD dwState = 0;
     if (m_nSelItem == nItem)
     {
@@ -755,7 +755,7 @@ void SCalendar::DrawYearDecadeCentury(IRenderTarget *pRT, const CRect &rect, int
 
 void SCalendar::OnPaint(IRenderTarget *pRT)
 {
-    // 字体 都用 默认 的
+    // Fonts all use the default
     if (m_showType == SHOW_MONTH)
     {
         OnPaintMonth(pRT);
@@ -773,16 +773,16 @@ void SCalendar::OnPaintMonth(IRenderTarget *pRT)
     CRect rcClient;
     GetClientRect(&rcClient);
 
-    CRect rcYear(rcClient); // 年月 区域
+    CRect rcYear(rcClient); // Year-month area
     rcYear.bottom = rcYear.top + m_nYearMonthHeight.toPixelSize(GetScale());
     DrawYearMonth(pRT, rcYear);
 
-    CRect rcWeek(rcClient); // 星期 区域
+    CRect rcWeek(rcClient); // Weekday area
     rcWeek.top = rcYear.bottom;
     rcWeek.bottom = rcWeek.top + m_nWeekHeight.toPixelSize(GetScale());
     DrawWeek(pRT, rcWeek);
 
-    // 计算 天
+    // Compute days
     m_rcDays = rcClient;
     m_rcDays.top = rcWeek.bottom;
     m_rcDays.bottom = rcClient.bottom - m_nFooterHeight.toPixelSize(GetScale());
@@ -808,11 +808,11 @@ void SCalendar::OnPaintYearDecadeCentury(IRenderTarget *pRT)
     CRect rcClient;
     GetClientRect(&rcClient);
 
-    CRect rcYear(rcClient); // 年月 区域
+    CRect rcYear(rcClient); // Year-month area
     rcYear.bottom = rcYear.top + m_nYearMonthHeight.toPixelSize(GetScale());
     DrawYearMonth(pRT, rcYear);
 
-    CRect rcMonth(rcClient); // 中间月份 区域
+    CRect rcMonth(rcClient); // Middle month area
     rcMonth.top = rcYear.bottom;
     rcMonth.bottom = rcClient.bottom - m_nFooterHeight.toPixelSize(GetScale());
 
@@ -828,7 +828,7 @@ void SCalendar::OnPaintYearDecadeCentury(IRenderTarget *pRT)
         DrawYearDecadeCentury(pRT, rcItem, i);
     }
 
-    // 计算 今天
+    // Compute today
     CRect rcToday(rcClient);
     rcToday.top = rcMonth.bottom;
     DrawToday(pRT, rcToday);
@@ -903,9 +903,9 @@ void SCalendar::OnLButtonDown(UINT nFlags, CPoint point)
 
             m_nSelItem = nItem;
             EventCalendarExChanged evt(this);
-            evt.nBtnType = nItem; // 天数 就是 0-41
+            evt.nBtnType = nItem; // Days are 0-41
             evt.iNewDay = dayInfo.iDay;
-            if (dayInfo.nType < 0) // 点击 上一个月 的天
+            if (dayInfo.nType < 0) // Click a day of the previous month
             {
                 if (1 == m_iMonth)
                 {
@@ -915,7 +915,7 @@ void SCalendar::OnLButtonDown(UINT nFlags, CPoint point)
                 else
                     --m_iMonth;
             }
-            else if (dayInfo.nType > 0) //点击 下一个月 的 天
+            else if (dayInfo.nType > 0) // Click a day of the next month
             {
                 if (12 == m_iMonth)
                 {
@@ -972,8 +972,8 @@ void SCalendar::OnLButtonDown(UINT nFlags, CPoint point)
 void SCalendar::OnLButtonUp(UINT nFlags, CPoint point)
 {
     int nItem = HitTest(point);
-    // 只有在显示天数， 点击天  才 发送 cmd 事件  使dropwnd关闭
-    //其他情况，让event mute静止
+    // Only when days are displayed, clicking a day sends a cmd event to close the drop window
+    // In other cases, keep the event muted
     if (!(m_showType == SHOW_MONTH && m_showTypeLbdown == SHOW_MONTH && nItem >= 0 && nItem < 42))
     {
         GetEventSet()->setMutedState(true);
@@ -1002,7 +1002,7 @@ void SCalendar::OnMouseLeave()
 
 BOOL SCalendar::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
-    if (zDelta > 0) // 上滚  上一个
+    if (zDelta > 0) // Scroll up: previous
     {
         if (m_showType == SHOW_MONTH)
         {
@@ -1021,7 +1021,7 @@ BOOL SCalendar::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
             SetLastYearCentury();
         }
     }
-    else // 下滚   下一个
+    else // Scroll down: next
     {
         if (m_showType == SHOW_MONTH)
         {
@@ -1048,7 +1048,7 @@ int SCalendar::HitTest(const CPoint &pt)
 {
     if (m_showType == SHOW_MONTH)
     {
-        if (pt.y < m_rcDays.top) //  小于  表示  在 天  的上面
+        if (pt.y < m_rcDays.top) // Less than means above the day
         {
             if (pt.y > (m_rcDays.top - m_nWeekHeight.toPixelSize(GetScale())))
                 return HIT_NULL;
@@ -1075,18 +1075,18 @@ int SCalendar::HitTest(const CPoint &pt)
         int nHei = m_rcDays.Height() / 6;
 
         int nRow = nDay_X / nWid;
-        if (nRow > 6) // 处理 边缘
+        if (nRow > 6) // Handle edges
             nRow = 6;
 
         return nRow + (nDay_Y / nHei) * 7;
     }
     else if (m_showType == SHOW_YEAR || m_showType == SHOW_YEAR_DECADE || m_showType == SHOW_YEAR_CENTURY)
     {
-        //多出星期的高度
+        // Extra height for the week
         CRect rcDays = m_rcDays;
         rcDays.top = rcDays.top - m_nWeekHeight.toPixelSize(GetScale());
 
-        if (pt.y < rcDays.top) //  小于  表示  在 天  的上面
+        if (pt.y < rcDays.top) // Less than means above the day
         {
             int nYearHei = m_nYearMonthHeight.toPixelSize(GetScale());
             if ((pt.x - rcDays.left) < nYearHei)
@@ -1110,7 +1110,7 @@ int SCalendar::HitTest(const CPoint &pt)
         int nHei = m_rcDays.Height() / 3;
 
         int nRow = nDay_X / nWid;
-        if (nRow > 3) // 处理 边缘
+        if (nRow > 3) // Handle edges
             nRow = 3;
 
         return nRow + (nDay_Y / nHei) * 4;

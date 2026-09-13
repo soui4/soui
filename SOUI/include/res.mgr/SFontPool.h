@@ -204,4 +204,4 @@ class SOUI_EXP SFontPool : public SCmnMap<IFontPtr, FontInfo> {
 
 SNSEND
 
-#endif // __SFONTPOOL__H__
+#endif /**< __SFONTPOOL__H__ */

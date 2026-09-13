@@ -1,8 +1,8 @@
-﻿//////////////////////////////////////////////////////////////////////////
-//  Class Name: SOsrPanel
-//     Creator: Huang Jianxiong
-//     Version: 2011.10.20 - 1.0 - Create
-//////////////////////////////////////////////////////////////////////////
+﻿///////////////////////////////////////////////////////////////////////
+/** Class Name: SOsrPanel */
+/** Creator: Huang Jianxiong */
+/** Version: 2011.10.20 - 1.0 - Create */
+///////////////////////////////////////////////////////////////////////
 #include "souistd.h"
 #include "core/SItemPanel.h"
 
@@ -32,7 +32,7 @@ SOsrPanel::SOsrPanel(IHostProxy *pFrameHost, IItemContainer *pItemContainer)
 
 void SOsrPanel::OnFinalRelease()
 {
-    AddRef(); //防止重复进入该函数
+    AddRef(); // Prevent re-entering this function
     SSendMessage(WM_DESTROY);
     m_pHostProxy->GetHostContainer()->UnregisterTimelineHandler(this);
     __baseCls::OnFinalRelease();
@@ -266,7 +266,7 @@ void SOsrPanel::Draw(IRenderTarget *pRT, const CRect &rc)
     SPainter painter;
     BeforePaint(pRT, painter);
     pRT->OffsetViewportOrg(rc.left, rc.top, NULL);
-    //没有矩阵变换的时候才启用clip region.
+    // Only enable the clip region when there is no matrix transformation.
     SAutoRefPtr<IRegionS> rgn;
     SMatrix mtx;
     pRT->GetTransform(mtx.fMat);
@@ -306,18 +306,20 @@ BOOL SOsrPanel::CancelCaptureMode(int reason)
     BOOL bCancelled = TRUE;
     if (hCapture)
     {
-        if (hCapture != m_swnd) {
-            SWindow* pCapture = SWindowMgr::GetWindow(hCapture);
+        if (hCapture != m_swnd)
+        {
+            SWindow *pCapture = SWindowMgr::GetWindow(hCapture);
             if (pCapture)
             {
                 bCancelled = pCapture->CancelCaptureMode(reason);
             }
         }
-        else {
-			__baseCls::CancelCaptureMode(reason);
+        else
+        {
+            __baseCls::CancelCaptureMode(reason);
         }
     }
-    // 2. 如果子控件同意取消，释放自身的Pressed/Hover状态
+    // 2. If the child control agrees to cancel, release its own Pressed/Hover state
     if (bCancelled)
     {
         ModifyState(0, WndState_PushDown | WndState_Hover, TRUE);
@@ -339,7 +341,7 @@ BOOL SOsrPanel::UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo)
 
     SWindow *pHover = SWindowMgr::GetWindow(m_hHover);
     if (!pHover)
-    { // disabled窗口也可以有tooltip
+    { // A disabled window can also have a tooltip
         tipInfo.swnd = 0;
         return TRUE;
     }
@@ -369,7 +371,7 @@ void SOsrPanel::FrameToHost(RECT *rc) const
     ::OffsetRect(rc, rcItem.left, rcItem.top);
 }
 
-//不继承宿主的字体，从指定的字体或者系统字体开始，避免在GetRenderTarget时还需要从宿主窗口到获取当前的文字属性。
+/** Do not inherit the host's font; start from the specified font or system font, to avoid needing to get the current text attributes from the host window when calling GetRenderTarget. */
 void SOsrPanel::BeforePaint(IRenderTarget *pRT, SPainter &painter) const
 {
     int iState = SState2Index::GetDefIndex(GetState(), true);
@@ -486,7 +488,7 @@ BOOL SOsrPanel::IsDesignerMode() const
 {
     return m_pHostProxy->GetHostContainer()->IsDesignerMode();
 }
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 SItemPanel *SItemPanel::Create(IHostProxy *pFrameHost, SXmlNode xmlNode, IItemContainer *pItemContainer)
 {
     SItemPanel *pItem = new SItemPanel(pFrameHost, pItemContainer);

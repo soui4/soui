@@ -45,10 +45,10 @@ BOOL SDropTargetDispatcher::UnregisterDragDrop(SWND swnd)
     return TRUE;
 }
 
-HRESULT SDropTargetDispatcher::DragEnter(/* [unique][in] */ IDataObject *pDataObj,
-                                         /* [in] */ DWORD grfKeyState,
-                                         /* [in] */ POINTL pt,
-                                         /* [out][in] */ DWORD *pdwEffect)
+HRESULT SDropTargetDispatcher::DragEnter(/**< [unique][in] */ IDataObject *pDataObj,
+                                         /** [in] */ DWORD grfKeyState,
+                                         /** [in] */ POINTL pt,
+                                         /** [out][in] */ DWORD *pdwEffect)
 {
     m_pDataObj = pDataObj;
     m_dwEnterEffect = *pdwEffect;
@@ -57,9 +57,9 @@ HRESULT SDropTargetDispatcher::DragEnter(/* [unique][in] */ IDataObject *pDataOb
     return DragOver(grfKeyState, pt, pdwEffect);
 }
 
-HRESULT SDropTargetDispatcher::DragOver(/* [in] */ DWORD grfKeyState,
-                                        /* [in] */ POINTL pt,
-                                        /* [out][in] */ DWORD *pdwEffect)
+HRESULT SDropTargetDispatcher::DragOver(/**< [in] */ DWORD grfKeyState,
+                                        /** [in] */ POINTL pt,
+                                        /** [out][in] */ DWORD *pdwEffect)
 {
     *pdwEffect = DROPEFFECT_NONE;
     CPoint pt2 = PointL2FrameClient(pt);
@@ -115,10 +115,10 @@ HRESULT SDropTargetDispatcher::DragLeave(void)
     return S_OK;
 }
 
-HRESULT SDropTargetDispatcher::Drop(/* [unique][in] */ IDataObject *pDataObj,
-                                    /* [in] */ DWORD grfKeyState,
-                                    /* [in] */ POINTL pt,
-                                    /* [out][in] */ DWORD *pdwEffect)
+HRESULT SDropTargetDispatcher::Drop(/**< [unique][in] */ IDataObject *pDataObj,
+                                    /** [in] */ DWORD grfKeyState,
+                                    /** [in] */ POINTL pt,
+                                    /** [out][in] */ DWORD *pdwEffect)
 {
     // SSLOGI() << "Drop, *pdwEffect="<<*pdwEffect;
     DTMAP::CPair *pPair = m_mapDropTarget.Lookup(m_hHover);

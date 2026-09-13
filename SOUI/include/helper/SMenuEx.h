@@ -11,7 +11,7 @@ class SMenuEx;
 
 /**
  * @class SMenuExItem
- * @brief 扩展菜单项类
+ * @brief Extended menu item class
  */
 class SOUI_EXP SMenuExItem : public SWindow {
     DEF_SOBJECT(SWindow, L"menuItem")
@@ -19,43 +19,43 @@ class SOUI_EXP SMenuExItem : public SWindow {
 
   public:
     /**
-     * @brief 构造函数
-     * @param pOwnerMenu 所属菜单对象指针
-     * @param pItemSkin 菜单项皮肤对象指针
+     * @brief Constructor
+     * @param pOwnerMenu Pointer to owner menu object
+     * @param pItemSkin Pointer to menu item skin object
      */
     SMenuExItem(SMenuEx *pOwnerMenu, ISkinObj *pItemSkin);
 
     /**
-     * @brief 析构函数
+     * @brief Destructor
      */
     ~SMenuExItem();
 
     /**
-     * @brief 获取子菜单
-     * @return 子菜单对象指针
+     * @brief Get submenu
+     * @return Pointer to submenu object
      */
     SMenuEx *GetSubMenu();
 
     /**
-     * @brief 获取所属菜单
-     * @return 所属菜单对象指针
+     * @brief Get owner menu
+     * @return Pointer to owner menu object
      */
     SMenuEx *GetOwnerMenu();
 
     /**
-     * @brief 隐藏子菜单
+     * @brief Hide submenu
      */
     void HideSubMenu();
 
     /**
-     * @brief 显示子菜单
-     * @param bCheckFirstItem 是否选中第一个子菜单项
+     * @brief Show submenu
+     * @param bCheckFirstItem Whether to select the first submenu item
      */
     void ShowSubMenu(BOOL bCheckFirstItem);
 
     /**
-     * @brief 获取热键字符
-     * @return 热键字符
+     * @brief Get hotkey character
+     * @return Hotkey character
      */
     WCHAR GetHotKey() const;
 
@@ -63,50 +63,50 @@ class SOUI_EXP SMenuExItem : public SWindow {
     void BeforePaint(IRenderTarget *pRT, SPainter &painter) const override;
 
     /**
-     * @brief 处理子菜单隐藏事件
-     * @param bUncheckItem 是否取消选中子菜单项
+     * @brief Handle submenu hidden event
+     * @param bUncheckItem Whether to uncheck the submenu item
      */
     void OnSubMenuHided(BOOL bUncheckItem);
 
     /**
-     * @brief 创建子窗口
-     * @param xmlNode XML节点
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Create child window
+     * @param xmlNode XML node
+     * @return Returns TRUE on success, FALSE on failure
      */
     BOOL CreateChildren(SXmlNode xmlNode) OVERRIDE;
 
     /**
-     * @brief 根据名称创建子窗口
-     * @param pszName 子窗口名称
-     * @return 子窗口对象指针
+     * @brief Create child window by name
+     * @param pszName Child window name
+     * @return Pointer to child window object
      */
     SWindow *CreateChildByName(LPCWSTR pszName) OVERRIDE;
 
     /**
-     * @brief 获取期望的大小
-     * @param psz 大小结构指针
-     * @param wid 宽度
-     * @param hei 高度
+     * @brief Get desired size
+     * @param psz Pointer to size structure
+     * @param wid Width
+     * @param hei Height
      */
     STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *psz, int wid, int hei) OVERRIDE;
 
     /**
-     * @brief 获取文本矩形
-     * @param pRect 矩形结构指针
+     * @brief Get text rectangle
+     * @param pRect Pointer to rectangle structure
      */
     void GetTextRect(LPRECT pRect) OVERRIDE;
 
   protected:
     /**
-     * @brief 处理擦除背景消息
-     * @param pRT 渲染目标对象指针
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Handle erase background message
+     * @param pRT Pointer to render target object
+     * @return Returns TRUE on success, FALSE on failure
      */
     BOOL OnEraseBkgnd(IRenderTarget *pRT);
 
     /**
-     * @brief 处理绘制消息
-     * @param pRT 渲染目标对象指针
+     * @brief Handle paint message
+     * @param pRT Pointer to render target object
      */
     void OnPaint(IRenderTarget *pRT);
 
@@ -117,23 +117,23 @@ class SOUI_EXP SMenuExItem : public SWindow {
 
   protected:
     SOUI_ATTRS_BEGIN()
-        ATTR_INT(L"icon", m_iIcon, TRUE)       // 图标索引
-        ATTR_INT(L"check", m_bCheck, TRUE)     // 是否选中
-        ATTR_INT(L"radio", m_bRadio, TRUE)     // 是否为单选按钮
-        ATTR_CHAR(L"hotKey", m_cHotKey, FALSE) // 热键字符
+        ATTR_INT(L"icon", m_iIcon, TRUE)       /**< Icon index */
+        ATTR_INT(L"check", m_bCheck, TRUE)     /**< Whether selected */
+        ATTR_INT(L"radio", m_bRadio, TRUE)     /**< Whether it is a radio button */
+        ATTR_CHAR(L"hotKey", m_cHotKey, FALSE) /**< Hotkey character */
     SOUI_ATTRS_END()
 
-    SMenuEx *m_pSubMenu;   // 子菜单对象指针
-    SMenuEx *m_pOwnerMenu; // 所属菜单对象指针
-    int m_iIcon;           // 图标索引
-    BOOL m_bCheck;         // 是否选中
-    BOOL m_bRadio;         // 是否为单选按钮
-    WCHAR m_cHotKey;       // 热键字符
+    SMenuEx *m_pSubMenu;   /**< Pointer to submenu object */
+    SMenuEx *m_pOwnerMenu; /**< Pointer to owner menu object */
+    int m_iIcon;           /**< Icon index */
+    BOOL m_bCheck;         /**< Whether selected */
+    BOOL m_bRadio;         /**< Whether it is a radio button */
+    WCHAR m_cHotKey;       /**< Hotkey character */
 };
 
 /**
  * @class SMenuEx
- * @brief 扩展菜单类
+ * @brief Extended menu class
  */
 class SOUI_EXP SMenuEx
     : public SHostWnd
@@ -145,29 +145,29 @@ class SOUI_EXP SMenuEx
 
   public:
     /**
-     * @brief 构造函数
+     * @brief Constructor
      */
     SMenuEx(void);
 
     /**
-     * @brief 析构函数
+     * @brief Destructor
      */
     virtual ~SMenuEx(void);
 
   public:
-    //! 添加引用
+    /** Add reference */
     STDMETHOD_(long, AddRef)(THIS) OVERRIDE
     {
         return SHostWnd::AddRef();
     }
 
-    //! 释放引用
+    /** Release reference */
     STDMETHOD_(long, Release)(THIS) OVERRIDE
     {
         return SHostWnd::Release();
     }
 
-    //! 释放对象
+    /** Release object */
     STDMETHOD_(void, OnFinalRelease)(THIS) OVERRIDE
     {
         delete this;
@@ -175,154 +175,154 @@ class SOUI_EXP SMenuEx
 
     //=================================================================
     /**
-     * @brief 加载菜单资源
-     * @param resId 资源ID
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Load menu resource
+     * @param resId Resource ID
+     * @return Returns TRUE on success, FALSE on failure
      */
     STDMETHOD_(BOOL, LoadMenu)(THIS_ LPCTSTR resId) OVERRIDE;
 
     /**
-     * @brief 加载菜单资源（UTF-8）
-     * @param resId 资源ID
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Load menu resource (UTF-8)
+     * @param resId Resource ID
+     * @return Returns TRUE on success, FALSE on failure
      */
     STDMETHOD_(BOOL, LoadMenuU8)(THIS_ LPCSTR resId) OVERRIDE;
 
     /**
-     * @brief 加载菜单资源（XML）
-     * @param xmlMenu XML节点
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Load menu resource (XML)
+     * @param xmlMenu XML node
+     * @return Returns TRUE on success, FALSE on failure
      */
     STDMETHOD_(BOOL, LoadMenu2)(THIS_ IXmlNode *xmlMenu) OVERRIDE;
 
     /**
-     * @brief 插入菜单项
-     * @param uPosition 位置
-     * @param uFlags 标志
-     * @param nIDNewItem 新项ID
-     * @param strText 文本
-     * @param iIcon 图标索引（默认为-1）
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Insert menu item
+     * @param uPosition Position
+     * @param uFlags Flags
+     * @param nIDNewItem New item ID
+     * @param strText Text
+     * @param iIcon Icon index (default is -1)
+     * @return Returns TRUE on success, FALSE on failure
      */
     STDMETHOD_(BOOL, InsertMenu)(THIS_ UINT uPosition, UINT uFlags, int nIDNewItem, LPCTSTR strText, int iIcon DEF_VAL(-1)) OVERRIDE;
 
     /**
-     * @brief 追加菜单项
-     * @param uFlags 标志
-     * @param uIDNewItem 新项ID
-     * @param lpNewItem 文本
-     * @param iIcon 图标索引（默认为-1）
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Append menu item
+     * @param uFlags Flags
+     * @param uIDNewItem New item ID
+     * @param lpNewItem Text
+     * @param iIcon Icon index (default is -1)
+     * @return Returns TRUE on success, FALSE on failure
      */
     STDMETHOD_(BOOL, AppendMenu)(THIS_ UINT uFlags, int uIDNewItem, LPCTSTR lpNewItem, int iIcon DEF_VAL(-1)) OVERRIDE;
 
     /**
-     * @brief 检查菜单项（单选按钮）
-     * @param idFirst 第一个菜单项ID
-     * @param idLast 最后一个菜单项ID
-     * @param idCheck 要检查的菜单项ID
-     * @param uFlags 标志（例如，MF_BYCOMMAND, MF_BYPOSITION）
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Check menu item (radio button)
+     * @param idFirst First menu item ID
+     * @param idLast Last menu item ID
+     * @param idCheck Menu item ID to check
+     * @param uFlags Check flag (e.g., MF_BYCOMMAND, MF_BYPOSITION)
+     * @return Returns TRUE on success, FALSE on failure
      */
     STDMETHOD_(BOOL, CheckMenuRadioItem)(THIS_ UINT idFirst, UINT idLast, UINT idCheck, UINT uFlags) OVERRIDE;
 
     /**
-     * @brief 检查菜单项
-     * @param uIdCheckItem 要检查的菜单项ID
-     * @param uCheck 检查标志（例如，MF_CHECKED, MF_UNCHECKED）
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Check menu item
+     * @param uIdCheckItem Menu item ID to check
+     * @param uCheck Check flag (e.g., MF_CHECKED, MF_UNCHECKED)
+     * @return Returns TRUE on success, FALSE on failure
      */
     STDMETHOD_(BOOL, CheckMenuItem)(THIS_ UINT uIdCheckItem, UINT uCheck) OVERRIDE;
 
     /**
-     * @brief 启用或禁用菜单项
-     * @param uIDEnableItem 项目ID或索引
+     * @brief Enable or disable menu item
+     * @param uIDEnableItem Item ID or index
      * @param uEnable MF_BYCOMMAND/MF_BYPOSITION | MF_ENABLED/MF_GRAYED/MF_DISABLED
-     * @return 成功返回TRUE，失败返回FALSE
+     * @return Returns TRUE on success, FALSE on failure
      */
     STDMETHOD_(BOOL, EnableMenuItem)(THIS_ UINT uIDEnableItem, UINT uEnable) OVERRIDE;
 
     /**
-     * @brief 删除菜单项
-     * @param uPosition 菜单项位置
-     * @param uFlags 删除标志（例如，MF_BYCOMMAND, MF_BYPOSITION）
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Delete menu item
+     * @param uPosition Menu item position
+     * @param uFlags Delete flag (e.g., MF_BYCOMMAND, MF_BYPOSITION)
+     * @return Returns TRUE on success, FALSE on failure
      */
     STDMETHOD_(BOOL, DeleteMenu)(THIS_ UINT uPosition, UINT uFlags) OVERRIDE;
 
     /**
-     * @brief 跟踪弹出菜单
-     * @param uFlags 跟踪标志（例如，TPM_LEFTALIGN, TPM_RIGHTALIGN）
-     * @param x 菜单左上角的X坐标
-     * @param y 菜单左上角的Y坐标
-     * @param hWnd 父窗口句柄
-     * @param nScale 缩放比例（默认为100）
-     * @return 菜单项ID
+     * @brief Track popup menu
+     * @param uFlags Track flag (e.g., TPM_LEFTALIGN, TPM_RIGHTALIGN)
+     * @param x X coordinate of the menu's top-left corner
+     * @param y Y coordinate of the menu's top-left corner
+     * @param hWnd Parent window handle
+     * @param nScale Scale (default is 100)
+     * @return Menu item ID
      */
     STDMETHOD_(UINT, TrackPopupMenu)(THIS_ UINT uFlags, int x, int y, HWND hWnd, int nScale DEF_VAL(100)) OVERRIDE;
 
     /**
-     * @brief 销毁菜单
+     * @brief Destroy menu
      */
     STDMETHOD_(void, DestroyMenu)(THIS) OVERRIDE;
 
     /**
-     * @brief 修改菜单项字符串
-     * @param uPosition 菜单项位置
-     * @param uFlags 标志（例如，MF_BYCOMMAND, MF_BYPOSITION）
-     * @param lpItemString 新的菜单项字符串
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Modify menu item string
+     * @param uPosition Menu item position
+     * @param uFlags Flags (e.g., MF_BYCOMMAND, MF_BYPOSITION)
+     * @param lpItemString New menu item string
+     * @return Returns TRUE on success, FALSE on failure
      */
     STDMETHOD_(BOOL, ModifyMenuString)(THIS_ UINT uPosition, UINT uFlags, LPCTSTR lpItemString) OVERRIDE;
 
     /**
-     * @brief 设置菜单项用户数据
-     * @param uPosition 菜单项位置
-     * @param uFlags 标志（例如，MF_BYCOMMAND, MF_BYPOSITION）
-     * @param ulUserData 用户数据
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Set menu item user data
+     * @param uPosition Menu item position
+     * @param uFlags Flags (e.g., MF_BYCOMMAND, MF_BYPOSITION)
+     * @param ulUserData User data
+     * @return Returns TRUE on success, FALSE on failure
      */
     STDMETHOD_(BOOL, SetMenuUserData)(THIS_ UINT uPosition, UINT uFlags, ULONG_PTR ulUserData) OVERRIDE;
 
     /**
-     * @brief 获取菜单项用户数据
-     * @param uPosition 菜单项位置
-     * @param uFlags 标志（例如，MF_BYCOMMAND, MF_BYPOSITION）
-     * @return 用户数据
+     * @brief Get menu item user data
+     * @param uPosition Menu item position
+     * @param uFlags Flags (e.g., MF_BYCOMMAND, MF_BYPOSITION)
+     * @return User data
      */
     STDMETHOD_(ULONG_PTR, GetMenuUserData)(THIS_ UINT uPosition, UINT uFlags) OVERRIDE;
 
     /**
-     * @brief 获取上下文帮助ID
-     * @return 上下文帮助ID
+     * @brief Get context help ID
+     * @return Context help ID
      */
     STDMETHOD_(DWORD, GetContextHelpId)(THIS) SCONST OVERRIDE;
 
     /**
-     * @brief 设置上下文帮助ID
-     * @param dwId 上下文帮助ID
+     * @brief Set context help ID
+     * @param dwId Context help ID
      */
     STDMETHOD_(void, SetContextHelpId)(THIS_ DWORD dwId) OVERRIDE;
 
     /**
-     * @brief 获取子菜单
-     * @param nPos 子菜单位置
-     * @return 子菜单对象指针
+     * @brief Get submenu
+     * @param nPos Submenu position
+     * @return Pointer to submenu object
      */
     STDMETHOD_(IMenuEx *, GetSubMenu)(THIS_ int nPos) OVERRIDE;
 
     /**
-     * @brief 获取菜单项字符串
-     * @param uPosition 菜单项位置
-     * @param uFlags 标志（例如，MF_BYCOMMAND, MF_BYPOSITION）
-     * @param lpItemString 接收菜单项字符串的对象指针
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Get menu item string
+     * @param uPosition Menu item position
+     * @param uFlags Flags (e.g., MF_BYCOMMAND, MF_BYPOSITION)
+     * @param lpItemString Pointer to object receiving the menu item string
+     * @return Returns TRUE on success, FALSE on failure
      */
     STDMETHOD_(BOOL, GetMenuString)(THIS_ UINT uPosition, UINT uFlags, IStringT *lpItemString) OVERRIDE;
 
     /**
-     * @brief 获取宿主窗口
-     * @return 宿主窗口对象指针
+     * @brief Get host window
+     * @return Pointer to host window object
      */
     STDMETHOD_(IHostWnd *, GetHostWnd)(THIS) OVERRIDE
     {
@@ -333,20 +333,20 @@ class SOUI_EXP SMenuEx
 
   public:
     /**
-     * @brief 结束菜单
-     * @param nCmdId 命令ID（默认为0）
+     * @brief End menu
+     * @param nCmdId Command ID (default is 0)
      */
     static void EndMenu(int nCmdId = 0);
 
     /**
-     * @brief 获取事件所有者
-     * @return 事件所有者对象指针
+     * @brief Get event owner
+     * @return Pointer to event owner object
      */
     static SMenuEx *GetEvtOwner();
 
     /**
-     * @brief 获取父菜单项
-     * @return 父菜单项对象指针
+     * @brief Get parent menu item
+     * @return Pointer to parent menu item object
      */
     SMenuExItem *GetParentItem()
     {
@@ -354,18 +354,18 @@ class SOUI_EXP SMenuEx
     }
 
     /**
-     * @brief 获取子菜单
-     * @param nID 菜单项ID
-     * @param byCmdId 是否按命令ID查找
-     * @return 子菜单对象指针
+     * @brief Get submenu
+     * @param nID Menu item ID
+     * @param byCmdId Whether to look up by command ID
+     * @return Pointer to submenu object
      */
     SMenuEx *GetSubMenu(int nID, BOOL byCmdId);
 
     /**
-     * @brief 获取菜单项
-     * @param nID 菜单项ID
-     * @param byCmdId 是否按命令ID查找
-     * @return 菜单项对象指针
+     * @brief Get menu item
+     * @param nID Menu item ID
+     * @param byCmdId Whether to look up by command ID
+     * @return Pointer to menu item object
      */
     SMenuExItem *GetMenuItem(int nID, BOOL byCmdId);
 
@@ -373,44 +373,44 @@ class SOUI_EXP SMenuEx
     void OnMenuEnd();
 
     /**
-     * @brief 菜单项选中状态改变
-     * @param pItem 菜单项对象指针
-     * @param bByMouse 是否由鼠标触发
+     * @brief Menu item selected state changed
+     * @param pItem Pointer to menu item object
+     * @param bByMouse Whether triggered by mouse
      */
     void OnSelItemChanged(SMenuExItem *pItem, BOOL bByMouse);
 
     /**
-     * @brief 初始化一个空菜单（不应在外部调用）
-     * @param ParentRoot 父菜单根对象指针
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Initialize an empty menu (should not be called externally)
+     * @param ParentRoot Pointer to parent menu root object
+     * @return Returns TRUE on success, FALSE on failure
      */
     BOOL IniNullMenu(SMenuExRoot *ParentRoot);
 
     /**
-     * @brief 处理鼠标激活消息
-     * @param wndTopLevel 顶级窗口句柄
-     * @param nHitTest 击中测试结果
-     * @param message 消息ID
-     * @return 激活状态
+     * @brief Handle mouse activate message
+     * @param wndTopLevel Top-level window handle
+     * @param nHitTest Hit test result
+     * @param message Message ID
+     * @return Activation state
      */
     int OnMouseActivate(HWND wndTopLevel, UINT nHitTest, UINT message);
 
     /**
-     * @brief 处理定时器消息
-     * @param timeID 定时器ID
+     * @brief Handle timer message
+     * @param timeID Timer ID
      */
     void OnTimer(UINT_PTR timeID);
 
     /**
-     * @brief 处理按键消息
-     * @param nChar 字符
-     * @param nRepCnt 重复次数
-     * @param nFlags 标志
+     * @brief Handle key message
+     * @param nChar Character
+     * @param nRepCnt Repeat count
+     * @param nFlags Flags
      */
     void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 
     /**
-     * @brief 处理鼠标离开消息
+     * @brief Handle mouse leave message
      */
     void OnMouseLeave();
 
@@ -424,109 +424,109 @@ class SOUI_EXP SMenuEx
 
   protected:
     /**
-     * @brief 处理事件
-     * @param pEvt 事件参数对象指针
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Handle event
+     * @param pEvt Pointer to event parameter object
+     * @return Returns TRUE on success, FALSE on failure
      */
     virtual BOOL _HandleEvent(IEvtArgs *pEvt);
 
     /**
-     * @brief 从资源ID加载布局
-     * @param xmlDoc XML文档对象引用
-     * @return 成功返回TRUE，失败返回FALSE
+     * @brief Load layout from resource ID
+     * @param xmlDoc Reference to XML document object
+     * @return Returns TRUE on success, FALSE on failure
      */
     BOOL OnLoadLayoutFromResourceID(SXmlDoc &xmlDoc) override;
 
     /**
-     * @brief 创建根窗口
-     * @return 根窗口对象指针
+     * @brief Create root window
+     * @return Pointer to root window object
      */
     SRootWindow *CreateRoot() override;
 
     /**
-     * @brief 获取翻译上下文
-     * @return 翻译上下文字符串
+     * @brief Get translation context
+     * @return Translation context string
      */
     STDMETHOD_(LPCWSTR, GetTranslatorContext)(THIS) SCONST OVERRIDE;
 
     /**
-     * @brief 获取缩放比例
-     * @return 缩放比例
+     * @brief Get scale
+     * @return Scale
      */
     STDMETHOD_(int, GetScale)() SCONST OVERRIDE;
 
     /**
-     * @brief 查找菜单项
-     * @param uPos 位置
-     * @param uFlag 标志
-     * @return 菜单项对象指针
+     * @brief Find menu item
+     * @param uPos Position
+     * @param uFlag Flag
+     * @return Pointer to menu item object
      */
     SWindow *FindItem(UINT uPos, UINT uFlag);
 
     /**
-     * @brief 显示菜单
-     * @param uFlag 标志
-     * @param x X坐标
-     * @param y Y坐标
+     * @brief Show menu
+     * @param uFlag Flag
+     * @param x X coordinate
+     * @param y Y coordinate
      */
     void ShowMenu(UINT uFlag, int x, int y);
 
     /**
-     * @brief 隐藏菜单
-     * @param bUncheckParentItem 是否取消选中父菜单项
+     * @brief Hide menu
+     * @param bUncheckParentItem Whether to uncheck the parent menu item
      */
     void HideMenu(BOOL bUncheckParentItem);
 
     /**
-     * @brief 隐藏子菜单
+     * @brief Hide submenu
      */
     void HideSubMenu();
 
     /**
-     * @brief 运行菜单
-     * @param hOwner 所有者窗口句柄
+     * @brief Run menu
+     * @param hOwner Owner window handle
      */
     void RunMenu(HWND hOwner);
 
     /**
-     * @brief 弹出子菜单
-     * @param pItem 菜单项对象指针
-     * @param bCheckFirstItem 是否选中第一个子菜单项
+     * @brief Pop up submenu
+     * @param pItem Pointer to menu item object
+     * @param bCheckFirstItem Whether to select the first submenu item
      */
     void PopupSubMenu(SMenuExItem *pItem, BOOL bCheckFirstItem);
 
     /**
-     * @brief 处理子菜单隐藏事件
-     * @param bUncheckItem 是否取消选中子菜单项
+     * @brief Handle submenu hidden event
+     * @param bUncheckItem Whether to uncheck the submenu item
      */
     void OnSubMenuHided(BOOL bUncheckItem);
 
     /**
-     * @brief 构造函数（带父菜单项）
-     * @param pParent 父菜单项对象指针
+     * @brief Constructor (with parent menu item)
+     * @param pParent Pointer to parent menu item object
      */
     SMenuEx(SMenuExItem *pParent);
 
     /**
-     * @brief 发送初始化弹出菜单事件给所有者
-     * @param idx 索引
+     * @brief Send initialization popup menu event to owner
+     * @param idx Index
      */
     void SendInitPopupMenu2Owner(int idx);
 
     /**
-     * @brief 菜单项转换为索引
-     * @param pItem 菜单项对象指针
-     * @return 索引
+     * @brief Convert menu item to index
+     * @param pItem Pointer to menu item object
+     * @return Index
      */
     int MenuItem2Index(SMenuExItem *pItem) const;
 
-    SMenuExItem *m_pParent;    // 父菜单项对象指针
-    SMenuExItem *m_pHoverItem; // 悬停菜单项对象指针
-    SMenuExItem *m_pCheckItem; // 选中菜单项对象指针
+    SMenuExItem *m_pParent;    /**< Pointer to parent menu item object */
+    SMenuExItem *m_pHoverItem; /**< Pointer to hovered menu item object */
+    SMenuExItem *m_pCheckItem; /**< Pointer to selected menu item object */
 
-    BOOL m_bMenuInitialized; // 菜单是否已初始化
+    BOOL m_bMenuInitialized; /**< Whether the menu is initialized */
 };
 
 SNSEND
 
-#endif // __SMENUEX__H__
+#endif /**< __SMENUEX__H__ */

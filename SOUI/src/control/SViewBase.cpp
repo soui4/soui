@@ -78,6 +78,10 @@ void SViewBase::onDataSetChanged()
     m_bPendingUpdate = true;
     m_iPendingUpdateItem = -1;
     m_pHost->Invalidate();
+#ifdef SOUI_ENABLE_ACC
+    if (m_pView)
+        m_pView->accNotifyEvent(EVENT_OBJECT_REORDER); // Visible set/data changed, notify screen reader to rebuild the child tree
+#endif
 }
 
 void SViewBase::onDataSetInvalidated()
@@ -86,6 +90,10 @@ void SViewBase::onDataSetInvalidated()
     m_iPendingUpdateItem = -1;
     m_bDatasetInvalidated = TRUE;
     m_pHost->Invalidate();
+#ifdef SOUI_ENABLE_ACC
+    if (m_pView)
+        m_pView->accNotifyEvent(EVENT_OBJECT_REORDER);
+#endif
 }
 
 void SViewBase::onItemDataChanged(int iItem)
@@ -102,6 +110,34 @@ void SViewBase::DispatchMessage2Items(UINT uMsg, WPARAM wParam, LPARAM lParam)
         ItemInfo &itInfo = m_lstItems.GetNext(it);
         itInfo.pItem->SDispatchMessage(uMsg, wParam, lParam);
     }
+}
+
+SWindow *SViewBase::GetVisibleAccChild(int iChild) const
+{
+    if (iChild < 1)
+        return NULL;
+    int n = 0;
+    for (SPOSITION it = m_lstItems.GetHeadPosition(); it;)
+    {
+        const ItemInfo &itInfo = m_lstItems.GetNext(it);
+        n++;
+        if (n == iChild)
+            return itInfo.pItem;
+    }
+    return NULL;
+}
+
+int SViewBase::GetVisibleAccSelIndex() const
+{
+    int n = 0;
+    for (SPOSITION it = m_lstItems.GetHeadPosition(); it;)
+    {
+        const ItemInfo &itInfo = m_lstItems.GetNext(it);
+        n++;
+        if (itInfo.pItem && itInfo.pItem->GetItemIndex() == (LPARAM)m_iSelItem)
+            return n;
+    }
+    return 0;
 }
 
 void SViewBase::SetMultiSel(BOOL bMultiSel)
@@ -265,7 +301,7 @@ BOOL SViewBase::IsItemSelected(int iItem) const
     }
     else
     {
-        // 单选模式下，m_iSelItem保存了选中的项
+        // In single-selection mode, m_iSelItem holds the selected item
         return m_iSelItem == iItem;
     }
 }
@@ -278,7 +314,7 @@ int SViewBase::GetSelItemCount() const
     }
     else
     {
-        // 单选模式下，如果有选中项，返回1，否则返回0
+        // In single-selection mode, return 1 if there is a selected item, otherwise return 0
         return m_iSelItem != -1 ? 1 : 0;
     }
 }
@@ -287,7 +323,7 @@ int SViewBase::GetSelItems(int *pItems, int nMaxCount) const
 {
     if (m_bMultiSel)
     {
-        // 多选模式下，返回m_mapSelItems中的所有项
+        // In multi-selection mode, return all items in m_mapSelItems
         int i = 0;
         for (SPOSITION pos = m_mapSelItems.GetStartPosition(); pos && nMaxCount > 0;)
         {
@@ -301,7 +337,7 @@ int SViewBase::GetSelItems(int *pItems, int nMaxCount) const
     }
     else
     {
-        // 单选模式下，如果有选中项，返回该项
+        // In single-selection mode, return the selected item if there is one
         if (m_iSelItem != -1 && nMaxCount > 0)
         {
             pItems[0] = m_iSelItem;
@@ -350,6 +386,10 @@ void SViewBase::HandleSelectionChange(int nOldSel, int nNewSel)
     {
         AddSelItem(nNewSel);
     }
+#ifdef SOUI_ENABLE_ACC
+    if (m_pView)
+        m_pView->accNotifyEvent(EVENT_OBJECT_SELECTION); // Selection changed, notify screen reader
+#endif
 }
 
 BOOL SViewBase::OnItemClick(IEvtArgs *pEvt)

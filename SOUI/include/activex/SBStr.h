@@ -9,8 +9,8 @@ typedef unsigned int uint32;
 
 SNSBEGIN
 
-// Manages a BSTR string pointer.
-// The class interface is based on scoped_ptr.
+/** Manages a BSTR string pointer. */
+/** The class interface is based on scoped_ptr. */
 class SOUI_EXP sbstr {
   public:
     /**
@@ -118,7 +118,7 @@ class SOUI_EXP sbstr {
     BSTR bstr_;
 
   private:
-    // Forbid comparison of sbstr types. You should never have the same BSTR owned by two different sbstr instances.
+    /** Forbid comparison of sbstr types. You should never have the same BSTR owned by two different sbstr instances. */
     bool operator==(const sbstr &bstr2) const;
     bool operator!=(const sbstr &bstr2) const;
     DISALLOW_COPY_AND_ASSIGN(sbstr);
@@ -126,4 +126,4 @@ class SOUI_EXP sbstr {
 
 SNSEND
 
-#endif //__SBSTR_H__
+#endif /**< __SBSTR_H__ */

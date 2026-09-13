@@ -8,27 +8,27 @@
  * @author     SOUI group
  * @date       2014/08/15
  *
- * Describe    定义SOUI的XML属性解析宏
+ * Describe    Defines the XML attribute parsing macros for SOUI
  */
 
 #ifndef _SATTRCRACK_H
 #define _SATTRCRACK_H
 
-// Attribute Declaration
+/** Attribute Declaration */
 #define SOUI_ATTRS_BEGIN()                                                                                                 \
   public:                                                                                                                  \
     virtual HRESULT SetAttribute(const SNS::SStringW &strAttribName, const SNS::SStringW &strValue, BOOL bLoading = FALSE) \
     {                                                                                                                      \
         HRESULT hRet = E_FAIL;
 
-//从SObject派生的类是属性结尾
+/** Classes derived from SObject mark the end of properties */
 #define SOUI_ATTRS_END()                                                            \
     if (FAILED(hRet))                                                               \
         return __baseCls::SetAttribute(strAttribName, strValue, bLoading);          \
     return AfterAttribute(strAttribName.c_str(), strValue.c_str(), bLoading, hRet); \
     }
 
-//不交给SObject处理的属性表结尾
+/** End of the property table not handled by SObject */
 #define SOUI_ATTRS_BREAK() \
     hRet = E_NOTIMPL;      \
     return hRet;           \
@@ -76,7 +76,7 @@
     }                                                 \
     else
 
-// Int = %d StringA
+/** Int = %d StringA */
 #define ATTR_INT(attribname, varname, allredraw)      \
     if (0 == strAttribName.CompareNoCase(attribname)) \
     {                                                 \
@@ -134,7 +134,7 @@
     }                                                               \
     else
 
-// Rect = %d,%d,%d,%d StringA
+/** Rect = %d,%d,%d,%d StringA */
 #define ATTR_RECT(attribname, varname, allredraw)                                                          \
     if (0 == strAttribName.CompareNoCase(attribname))                                                      \
     {                                                                                                      \
@@ -143,7 +143,7 @@
     }                                                                                                      \
     else
 
-// Size = %d,%d StringA
+/** Size = %d,%d StringA */
 #define ATTR_SIZE(attribname, varname, allredraw)                \
     if (0 == strAttribName.CompareNoCase(attribname))            \
     {                                                            \
@@ -152,7 +152,7 @@
     }                                                            \
     else
 
-// Point = %d,%d StringA
+/** Point = %d,%d StringA */
 #define ATTR_POINT(attribname, varname, allredraw)             \
     if (0 == strAttribName.CompareNoCase(attribname))          \
     {                                                          \
@@ -161,7 +161,7 @@
     }                                                          \
     else
 
-// Point = %d,%d StringA
+/** Point = %d,%d StringA */
 #define ATTR_SPOINT(attribname, varname, allredraw)              \
     if (0 == strAttribName.CompareNoCase(attribname))            \
     {                                                            \
@@ -170,7 +170,7 @@
     }                                                            \
     else
 
-// Float = %f StringA
+/** Float = %f StringA */
 #define ATTR_FLOAT(attribname, varname, allredraw)    \
     if (0 == strAttribName.CompareNoCase(attribname)) \
     {                                                 \
@@ -181,7 +181,7 @@
     }                                                 \
     else
 
-// UInt = %u StringA
+/** UInt = %u StringA */
 #define ATTR_UINT(attribname, varname, allredraw)     \
     if (0 == strAttribName.CompareNoCase(attribname)) \
     {                                                 \
@@ -191,7 +191,7 @@
     }                                                 \
     else
 
-// DWORD = %u StringA
+/** DWORD = %u StringA */
 #define ATTR_DWORD(attribname, varname, allredraw)    \
     if (0 == strAttribName.CompareNoCase(attribname)) \
     {                                                 \
@@ -201,7 +201,7 @@
     }                                                 \
     else
 
-// WORD = %u StringA
+/** WORD = %u StringA */
 #define ATTR_WORD(attribname, varname, allredraw)     \
     if (0 == strAttribName.CompareNoCase(attribname)) \
     {                                                 \
@@ -211,7 +211,7 @@
     }                                                 \
     else
 
-// bool = 0 or 1 StringA
+/** bool = 0 or 1 StringA */
 #define ATTR_BIT(attribname, varname, maskbit, allredraw) \
     if (0 == strAttribName.CompareNoCase(attribname))     \
     {                                                     \
@@ -224,7 +224,7 @@
     }                                                     \
     else
 
-// StringA = StringA
+/** StringA = StringA */
 #define ATTR_STRINGA(attribname, varname, allredraw)  \
     if (0 == strAttribName.CompareNoCase(attribname)) \
     {                                                 \
@@ -234,7 +234,7 @@
     }                                                 \
     else
 
-// StringW = StringA
+/** StringW = StringA */
 #define ATTR_STRINGW(attribname, varname, allredraw)  \
     if (0 == strAttribName.CompareNoCase(attribname)) \
     {                                                 \
@@ -243,7 +243,7 @@
     }                                                 \
     else
 
-// StringT = StringA
+/** StringT = StringA */
 #define ATTR_STRINGT(attribname, varname, allredraw)  \
     if (0 == strAttribName.CompareNoCase(attribname)) \
     {                                                 \
@@ -252,7 +252,7 @@
     }                                                 \
     else
 
-// StringA = StringA
+/** StringA = StringA */
 #define ATTR_I18NSTRA(attribname, varname, allredraw)   \
     if (0 == strAttribName.CompareNoCase(attribname))   \
     {                                                   \
@@ -262,7 +262,7 @@
     }                                                   \
     else
 
-// STrText = StringA
+/** STrText = StringA */
 #define ATTR_I18NSTRT(attribname, varname, allredraw) \
     if (0 == strAttribName.CompareNoCase(attribname)) \
     {                                                 \
@@ -272,7 +272,7 @@
     }                                                 \
     else
 
-// DWORD = 0x08x StringA
+/** DWORD = 0x08x StringA */
 #define ATTR_HEX(attribname, varname, allredraw)      \
     if (0 == strAttribName.CompareNoCase(attribname)) \
     {                                                 \
@@ -282,7 +282,7 @@
     }                                                 \
     else
 
-// COLORREF = #06X or #08x or rgba(r,g,b,a) or rgb(r,g,b)
+/** COLORREF = #06X or #08x or rgba(r,g,b,a) or rgb(r,g,b) */
 #define ATTR_COLOR(attribname, varname, allredraw)    \
     if (0 == strAttribName.CompareNoCase(attribname)) \
     {                                                 \
@@ -298,7 +298,7 @@
     }                                                 \
     else
 
-// DpiAwareFont="face:宋体;bold:1;italic:1;underline:1;adding:10"
+/** DpiAwareFont="face:宋体;bold:1;italic:1;underline:1;adding:10" */
 #define ATTR_FONT(attribname, varname, allredraw)     \
     if (0 == strAttribName.CompareNoCase(attribname)) \
     {                                                 \
@@ -307,7 +307,7 @@
     }                                                 \
     else
 
-// Value In {String1 : Value1, String2 : Value2 ...}
+/** Value In {String1 : Value1, String2 : Value2 ...} */
 #define ATTR_ENUM_BEGIN(attribname, vartype, allredraw) \
     if (0 == strAttribName.CompareNoCase(attribname))   \
     {                                                   \
@@ -327,7 +327,7 @@
     }                          \
     else
 
-// SwndStyle From StringA Key
+/** SwndStyle From StringA Key */
 #define ATTR_STYLE(attribname, varname, allredraw)    \
     if (0 == strAttribName.CompareNoCase(attribname)) \
     {                                                 \
@@ -336,7 +336,7 @@
     }                                                 \
     else
 
-// SSkinPool From StringA Key
+/** SSkinPool From StringA Key */
 #define ATTR_SKIN(attribname, varname, allredraw)     \
     if (0 == strAttribName.CompareNoCase(attribname)) \
     {                                                 \
@@ -345,7 +345,7 @@
     }                                                 \
     else
 
-// SSkinPool From StringA Key
+/** SSkinPool From StringA Key */
 #define ATTR_INTERPOLATOR(attribname, varname, allredraw) \
     if (0 == strAttribName.CompareNoCase(attribname))     \
     {                                                     \
@@ -354,8 +354,8 @@
     }                                                     \
     else
 
-// ATTR_IMAGE:直接使用IResProvider::LoadImage创建SNS::IBitmapS对象，创建成功后引用计数为1
-//不需要调用AddRef，但是用完后需要调用Release
+/** ATTR_IMAGE: Directly use IResProvider::LoadImage to create an SNS::IBitmapS object; the reference count is 1 after successful creation */
+/** No need to call AddRef, but Release must be called after use */
 #define ATTR_IMAGE(attribname, varname, allredraw)    \
     if (0 == strAttribName.CompareNoCase(attribname)) \
     {                                                 \
@@ -372,7 +372,7 @@
     }                                                 \
     else
 
-// ATTR_IMAGEAUTOREF:varname应该是一个SAutoRefPtr<SNS::IBitmapS>对象
+/** ATTR_IMAGEAUTOREF: varname should be an SAutoRefPtr<SNS::IBitmapS> object */
 #define ATTR_IMAGEAUTOREF(attribname, varname, allredraw) \
     if (0 == strAttribName.CompareNoCase(attribname))     \
     {                                                     \
@@ -428,4 +428,4 @@
     }                                                                \
     else
 
-#endif //_SATTRCRACK_H
+#endif /**< _SATTRCRACK_H */

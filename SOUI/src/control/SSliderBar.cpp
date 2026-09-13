@@ -6,8 +6,8 @@ SNSBEGIN
 #define TIMERID_NOTIFY1 1
 #define TIMERID_DELAY1  2
 
-//////////////////////////////////////////////////////////////////////////
-//  SSliderBar
+///////////////////////////////////////////////////////////////////////
+/** SSliderBar */
 SSliderBar::SSliderBar()
     : m_bDrag(FALSE)
     , m_uHtPrev(-1)
@@ -64,7 +64,7 @@ SSliderBar::RANGE SSliderBar::_GetPartRange(int nLength, int nThumbSize, BOOL bT
     RANGE rRet = { 0 };
     switch (uSBCode)
     {
-    case SC_RAILBACK: //轨道背景
+    case SC_RAILBACK: // Track background
         rRet.value1 = 0;
         rRet.value2 = nLength;
         if (!bThumbInRail)
@@ -73,7 +73,7 @@ SSliderBar::RANGE SSliderBar::_GetPartRange(int nLength, int nThumbSize, BOOL bT
             rRet.value2 -= nHalfThumb;
         }
         break;
-    case SC_RAIL: //轨道区
+    case SC_RAIL: // Track area
         rRet.value1 = 0;
         rRet.value2 = nLength;
         rRet.value1 += nHalfThumb;
@@ -158,8 +158,8 @@ void SSliderBar::DrawOthers(IRenderTarget *pRT, const CRect &rcClient)
         {
             SEGMENT &segment = m_segments.GetAt(i);
             int r1 = segment.value;
-            int r2 = i<m_segments.GetCount()-1?m_segments.GetAt(i+1).value:m_nMaxValue;
-            CRect rcSeg = _GetSegmentRect(rcRail,r1,r2);
+            int r2 = i < m_segments.GetCount() - 1 ? m_segments.GetAt(i + 1).value : m_nMaxValue;
+            CRect rcSeg = _GetSegmentRect(rcRail, r1, r2);
             if (IsVertical())
             {
                 pRT->DrawLine(rcSeg.TopLeft(), CPoint(rcSeg.right, rcSeg.top));
@@ -179,19 +179,19 @@ void SSliderBar::DrawOthers(IRenderTarget *pRT, const CRect &rcClient)
         return;
     CRect rcThumb = GetPartRect(rcClient, SC_THUMB);
     DWORD dwState = GetState();
-    if(m_bDrag)
+    if (m_bDrag)
         dwState |= WndState_PushDown;
-    else if((dwState & WndState_PushDown) && m_uHtPrev != SC_THUMB)
+    else if ((dwState & WndState_PushDown) && m_uHtPrev != SC_THUMB)
         dwState &= ~WndState_PushDown;
 
     if (m_byThumbAlphaAni == 0xFF)
-    { // 不在动画过程中
+    { // Not in animation
         m_pSkinThumb->DrawByState(pRT, rcThumb, dwState);
     }
     else
-    { // 在动画过程中
+    { // In animation
         BYTE byAlpha = m_byThumbAlphaAni;
-        if(GetState()&WndState_Hover)
+        if (GetState() & WndState_Hover)
         {
             // enter hover
             m_pSkinThumb->DrawByIndex2(pRT, rcThumb, 0, 255 - byAlpha);
@@ -256,7 +256,7 @@ void SSliderBar::OnLButtonDown(UINT nFlags, CPoint point)
             nValue = ((int64_t)(point.x - rcRail.left)) * (m_nMaxValue - m_nMinValue + 1) / rcRail.Width() + m_nMinValue;
         }
 
-        // 处理分段逻辑
+        // Handle segment logic
         if (m_segments.GetCount() > 0)
         {
             int iCurSegment = FindSegmentByValue(m_nValue);
@@ -272,7 +272,7 @@ void SSliderBar::OnLButtonDown(UINT nFlags, CPoint point)
             if (m_valueAni->isRunning())
                 m_valueAni->end();
             m_valueAni->setRange(m_nValue, nValue);
-            // 注册到时间轴处理器并启动动画
+            // Register to the timeline handler and start the animation
             m_valueAni->start(GetContainer());
         }
         else
@@ -316,10 +316,13 @@ void SSliderBar::OnMouseHover(UINT uHitTest, CPoint point)
     if (m_bDrag)
         return;
     m_uHtPrev = HitTest(point);
-    // 悬停状态改变，启动动画
-    if(m_byThumbAlphaAni == 255){
+    // Hover state changed, start animation
+    if (m_byThumbAlphaAni == 255)
+    {
         m_thumbAni->setRange(50, 255);
-    }else{
+    }
+    else
+    {
         m_thumbAni->setRange(m_byThumbAlphaAni, 255);
     }
     m_thumbAni->start(GetContainer());
@@ -330,11 +333,14 @@ void SSliderBar::OnMouseLeave()
     __baseCls::OnMouseLeave();
     if (m_bDrag)
         return;
-    // 悬停状态改变，启动动画
+    // Hover state changed, start animation
     m_uHtPrev = SC_NULL;
-    if(m_byThumbAlphaAni == 255){
+    if (m_byThumbAlphaAni == 255)
+    {
         m_thumbAni->setRange(50, 255);
-    }else{
+    }
+    else
+    {
         m_thumbAni->setRange(m_byThumbAlphaAni, 255);
     }
     m_thumbAni->start(GetContainer());
@@ -392,21 +398,25 @@ void SSliderBar::OnScaleChanged(int scale)
     GetScaleSkin(m_pSkinThumb, scale);
 }
 
-CRect SSliderBar::_GetSegmentRect(const CRect &rcRail,int r1,int r2) const{
+CRect SSliderBar::_GetSegmentRect(const CRect &rcRail, int r1, int r2) const
+{
     CRect rc = rcRail;
-    if(IsVertical()){
-        rc.top = rcRail.top + MulDiv(r1 , rcRail.Height(), m_nMaxValue - m_nMinValue + 1);
-        rc.bottom = rcRail.top + MulDiv(r2 , rcRail.Height(), m_nMaxValue - m_nMinValue + 1);
-    }else{
-        rc.left = rcRail.left + MulDiv(r1 , rcRail.Width(), m_nMaxValue - m_nMinValue + 1);
-        rc.right = rcRail.left + MulDiv(r2 , rcRail.Width(), m_nMaxValue - m_nMinValue + 1);
+    if (IsVertical())
+    {
+        rc.top = rcRail.top + MulDiv(r1, rcRail.Height(), m_nMaxValue - m_nMinValue + 1);
+        rc.bottom = rcRail.top + MulDiv(r2, rcRail.Height(), m_nMaxValue - m_nMinValue + 1);
+    }
+    else
+    {
+        rc.left = rcRail.left + MulDiv(r1, rcRail.Width(), m_nMaxValue - m_nMinValue + 1);
+        rc.right = rcRail.left + MulDiv(r2, rcRail.Width(), m_nMaxValue - m_nMinValue + 1);
     }
     return rc;
 }
 
 BOOL SSliderBar::GetSegmentRect(int iSeg, RECT &rc) const
 {
-    if(iSeg >= m_segments.GetCount())
+    if (iSeg >= m_segments.GetCount())
         return FALSE;
     CRect rcClient = GetClientRect();
     CRect rcRail = GetPartRect(rcClient, SC_RAIL);
@@ -414,14 +424,14 @@ BOOL SSliderBar::GetSegmentRect(int iSeg, RECT &rc) const
     const SEGMENT &seg = m_segments[iSeg];
     int r1 = seg.value;
     int r2 = iSeg < m_segments.GetCount() - 1 ? m_segments[iSeg + 1].value : m_nMaxValue;
-    rc = _GetSegmentRect(rcRail,r1,r2);
+    rc = _GetSegmentRect(rcRail, r1, r2);
     return TRUE;
 }
 
 BOOL SSliderBar::UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo)
 {
     if (m_segments.IsEmpty())
-        return __baseCls::UpdateToolTip(pt,tipInfo);
+        return __baseCls::UpdateToolTip(pt, tipInfo);
     CRect rcRail = GetPartRect2(PC_RAIL);
     int nValue = 0;
     if (IsVertical())
@@ -437,12 +447,11 @@ BOOL SSliderBar::UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo)
         return FALSE;
 
     tipInfo.swnd = m_swnd;
-    tipInfo.dwCookie = iSegment+1;
+    tipInfo.dwCookie = iSegment + 1;
     GetSegmentRect(iSegment, tipInfo.rcTarget);
     tipInfo.strTip = m_segments[iSegment].szDesc;
     return tipInfo.rcTarget.PtInRect(pt);
 }
-
 
 void SSliderBar::OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer)
 {
@@ -546,8 +555,8 @@ int SSliderBar::FindSegmentByValue(int value) const
     if (m_segments.GetCount() == 0)
         return -1;
 
-    // 找到值所在的分段
-    // 分段范围：[当前分段value, 下一分段value)
+    // Find the segment where the value lies
+    // Segment range: [current segment value, next segment value)
     for (int i = 0; i < m_segments.GetCount(); i++)
     {
         int nSegStart = m_segments[i].value;
@@ -559,7 +568,7 @@ int SSliderBar::FindSegmentByValue(int value) const
         }
     }
 
-    // 如果值大于等于最后一个分段的起点，归属于最后一个分段
+    // If the value is greater than or equal to the start of the last segment, it belongs to the last segment
     if (m_segments.GetCount() > 0 && value >= m_segments[m_segments.GetCount() - 1].value)
     {
         return m_segments.GetCount() - 1;

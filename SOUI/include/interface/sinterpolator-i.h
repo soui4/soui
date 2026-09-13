@@ -14,12 +14,12 @@ DECLARE_INTERFACE_(IInterpolator, IObject)
 
     /**
      * getInterpolation
-     * @brief    计算出插值
-     * @param    float input --  输入值[0,1]
-     * @return   float -- 输出插值结果
+     * @brief    Compute the interpolation
+     * @param    float input --  input value [0,1]
+     * @return   float -- output interpolation result
      * Describe
      */
     STDMETHOD_(float, getInterpolation)(CTHIS_ float input) SCONST PURE;
 };
 SNSEND
-#endif // __SINTERPOLATOR_I__H__
+#endif /**< __SINTERPOLATOR_I__H__ */

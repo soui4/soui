@@ -8,7 +8,7 @@
  * @author     SOUI group
  * @date       2014/08/02
  *
- * Describe    DUI窗口容器接口
+ * Describe    DUI window container interface
  */
 
 #ifndef __SWNDCONTAINER_I__H__
@@ -344,4 +344,4 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
 
 SNSEND
 
-#endif // __SWNDCONTAINER_I__H__
+#endif /**< __SWNDCONTAINER_I__H__ */

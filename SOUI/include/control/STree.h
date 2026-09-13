@@ -21,7 +21,7 @@
 #define SASSERT(x)
 #endif
 
-// typedef ULONG_PTR HSTREEITEM;
+/** typedef ULONG_PTR HSTREEITEM; */
 #ifdef _WIN64
 #define STVN_ROOT  ((HSTREENODE)(ULONG_PTR)0xFFFF000000000000) /**< STVN_ROOT */
 #define STVN_FIRST ((HSTREENODE)(ULONG_PTR)0xFFFF000000000001) /**< STVN_FIRST */
@@ -44,7 +44,7 @@
 #define STVI_FIRST ((HSTREEITEM)0xFFFF0001) /**< STVI_FIRST */
 #define STVI_LAST  ((HSTREEITEM)0xFFFF0002) /**< STVI_LAST */
 #endif
-#endif // STVI_ROOT
+#endif /**< STVI_ROOT */
 
 /**
  * @class CSTree
@@ -717,4 +717,4 @@ class CSTree {
     HSTREENODE m_hRootLast;  /**< Pointer to the last root node of the tree. */
 };
 
-#endif // __STREE__H__
+#endif /**< __STREE__H__ */

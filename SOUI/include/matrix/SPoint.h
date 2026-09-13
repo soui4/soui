@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2006 The Android Open Source Project
  *
  * Use of this source code is governed by a BSD-style license that can be
@@ -45,9 +45,7 @@ struct SOUI_EXP SPoint : public fPoint
         return fY;
     }
 
-    /**
-     *  Returns true iff fX and fY are both zero.
-     */
+    /** Returns true iff fX and fY are both zero. */
     bool isZero() const
     {
         return (0 == fX) & (0 == fY);
@@ -70,14 +68,12 @@ struct SOUI_EXP SPoint : public fPoint
     */
     void iset(const POINT &p);
 
-    /** Return the euclidian distance from (0,0) to the point
-     */
+    /** Return the euclidian distance from (0,0) to the point */
     float length() const
     {
         return SPoint::Length(fX, fY);
     }
-    /** Returns a new point whose coordinates are the negative of the point's
-     */
+    /** Returns a new point whose coordinates are the negative of the point's */
     SPoint operator-() const
     {
         SPoint neg;
@@ -86,16 +82,14 @@ struct SOUI_EXP SPoint : public fPoint
         return neg;
     }
 
-    /** Add v's coordinates to the point's
-     */
+    /** Add v's coordinates to the point's */
     void operator+=(const SPoint &v)
     {
         fX += v.fX;
         fY += v.fY;
     }
 
-    /** Subtract v's coordinates from the point's
-     */
+    /** Subtract v's coordinates from the point's */
     void operator-=(const SPoint &v)
     {
         fX -= v.fX;
@@ -122,20 +116,17 @@ struct SOUI_EXP SPoint : public fPoint
         return v;
     }
 
-    /** Returns a new point whose coordinates are the sum of a's and b's (a + b)
-     */
+    /** Returns a new point whose coordinates are the sum of a's and b's (a + b) */
     friend SPoint operator+(const SPoint &a, const SPoint &b)
     {
         SPoint v;
         v.set(a.fX + b.fX, a.fY + b.fY);
         return v;
     }
-    /** Returns the euclidian distance from (0,0) to (x,y)
-     */
+    /** Returns the euclidian distance from (0,0) to (x,y) */
     static float Length(float x, float y);
 
-    /** Returns the dot product of a and b, treating them as 2D vectors
-     */
+    /** Returns the dot product of a and b, treating them as 2D vectors */
     static float DotProduct(const SPoint &a, const SPoint &b);
 
     float dot(const SPoint &vec) const;

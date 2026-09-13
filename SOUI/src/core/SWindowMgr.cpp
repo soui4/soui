@@ -3,7 +3,7 @@
 
 SNSBEGIN
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 SWindowMgr::SWindowMgr()
     : m_hNextWnd(SWND_INVALID)
 {
@@ -13,7 +13,7 @@ SWindowMgr::~SWindowMgr()
 {
 }
 
-// Get SWindow pointer from handle
+/** Get SWindow pointer from handle */
 SWindow *SWindowMgr::GetWindow(SWND swnd)
 {
     if (!swnd)
@@ -29,7 +29,7 @@ bool SWindowMgr::IsWindow(SWND swnd)
     return GetWindow(swnd) != NULL;
 }
 
-// Specify a handle to a SWindow
+/** Specify a handle to a SWindow */
 SWND SWindowMgr::NewWindow(SWindow *pSwnd)
 {
     SASSERT(pSwnd);
@@ -39,7 +39,7 @@ SWND SWindowMgr::NewWindow(SWindow *pSwnd)
     return swndNext;
 }
 
-// Destroy SWindow
+/** Destroy SWindow */
 BOOL SWindowMgr::DestroyWindow(SWND swnd)
 {
     SAutoLock lock(getSingleton().m_lockWndMap);

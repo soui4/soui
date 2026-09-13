@@ -5,7 +5,7 @@
  * @author     soui
  * @date       2014-07-08
  *
- * @copyright  Copyright (C) 2014-2050 SOUI团队
+ * @copyright  Copyright (C) 2014-2050 SOUI Team
  *             All rights reserved.
  */
 
@@ -421,4 +421,4 @@ class SOUI_EXP SStackView
 
 SNSEND
 
-#endif // __SSTACKVIEW__H__
+#endif /**< __SSTACKVIEW__H__ */

@@ -75,7 +75,7 @@ class StdRunnable : public SRunnable {
   protected:
     std::function<void(void)> _func;
 };
-#endif // ENABLE_STD_FUNCTIONAL
+#endif /**< ENABLE_STD_FUNCTIONAL */
 
 template <typename TClass, typename Func>
 class SFunctor0 : public SRunnable {
@@ -576,44 +576,48 @@ class StaticSFunctor5 : public SRunnable {
 class STaskHelper {
   public:
 #if ENABLE_STD_FUNCTIONAL
-    //////////////////////////////////////////////////////////////////////////
-    // Lambda support for IMessageLoop
+    ///////////////////////////////////////////////////////////////////////
+    /** Lambda support for IMessageLoop */
     template <typename Func, typename... Args>
-    static void post(IMessageLoop *pMsgLoop, Func&& func, Args&&... args) {
+    static void post(IMessageLoop *pMsgLoop, Func &&func, Args &&... args)
+    {
         auto boundFunc = std::bind(std::forward<Func>(func), std::forward<Args>(args)...);
         StdRunnable runnable(boundFunc);
         pMsgLoop->PostTask(&runnable);
     }
 
-    // Lambda support for IMessageLoop with object
+    /** Lambda support for IMessageLoop with object */
     template <typename TObj, typename Func, typename... Args>
-    static void post(IMessageLoop *pMsgLoop, TObj* pObj, Func&& func, Args&&... args) {
+    static void post(IMessageLoop *pMsgLoop, TObj *pObj, Func &&func, Args &&... args)
+    {
         auto boundFunc = std::bind(std::forward<Func>(func), std::forward<Args>(args)...);
         StdRunnable runnable(pObj, boundFunc);
         pMsgLoop->PostTask(&runnable);
     }
 
-    // Lambda support for ITaskLoop
+    /** Lambda support for ITaskLoop */
     template <typename Func, typename... Args>
-    static long post(ITaskLoop *pTaskLoop, Func&& func, Args&&... args, bool waitUntilDone = false, int nPriority = 0) {
+    static long post(ITaskLoop *pTaskLoop, Func &&func, Args &&... args, bool waitUntilDone = false, int nPriority = 0)
+    {
         auto boundFunc = std::bind(std::forward<Func>(func), std::forward<Args>(args)...);
         StdRunnable runnable(boundFunc);
         return pTaskLoop->postTask(&runnable, waitUntilDone, nPriority);
         return 0;
     }
 
-    // Lambda support for ITaskLoop with object
+    /** Lambda support for ITaskLoop with object */
     template <typename TObj, typename Func, typename... Args>
-    static long post(ITaskLoop *pTaskLoop, TObj* pObj, Func&& func, Args&&... args, bool waitUntilDone = false, int nPriority = 0) {
+    static long post(ITaskLoop *pTaskLoop, TObj *pObj, Func &&func, Args &&... args, bool waitUntilDone = false, int nPriority = 0)
+    {
         auto boundFunc = std::bind(std::forward<Func>(func), std::forward<Args>(args)...);
         StdRunnable runnable(pObj, boundFunc);
         return pTaskLoop->postTask(&runnable, waitUntilDone, nPriority);
         return 0;
     }
-#endif//ENABLE_STD_FUNCTIONAL
+#endif /**< ENABLE_STD_FUNCTIONAL */
 
-    //////////////////////////////////////////////////////////////////////////
-    // Original member function support
+    ///////////////////////////////////////////////////////////////////////
+    /** Original member function support */
     template <typename TClass, typename Fun>
     static long post(ITaskLoop *pTaskLoop, TClass *pObj, Fun fun, bool waitUntilDone, int nPriority = 0)
     {
@@ -684,7 +688,7 @@ class STaskHelper {
         return pTaskLoop->postTask(&runnable, waitUntilDone, nPriority);
     }
 
-    //////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
     template <typename TClass, typename Fun>
     static void post(IMessageLoop *pMsgLoop, TClass *pObj, Fun fun)
     {
@@ -755,7 +759,7 @@ class STaskHelper {
         pMsgLoop->PostTask(&runnable);
     }
 
-    //////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
     template <typename TClass, typename Fun>
     static void postTask(ISwndContainer *pContainer, TClass *pObj, Fun fun)
     {
@@ -826,7 +830,7 @@ class STaskHelper {
         pContainer->PostTask(&runnable);
     }
 
-    //////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
     template <typename TClass, typename Fun>
     static void sendTask(ISwndContainer *pContainer, TClass *pObj, Fun fun)
     {
@@ -900,4 +904,4 @@ class STaskHelper {
 
 SNSEND
 
-#endif //_SFUNCTOR_H_
+#endif /**< _SFUNCTOR_H_ */

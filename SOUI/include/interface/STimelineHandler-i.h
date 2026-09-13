@@ -5,7 +5,7 @@
 SNSBEGIN
 /**
  * @struct     ITimelineHandler
- * @brief      时间轴处理接口
+ * @brief      Timeline handler interface
  *
  * Describe
  */
@@ -16,15 +16,15 @@ DECLARE_INTERFACE(ITimelineHandler)
 #ifdef __cplusplus
     enum
     {
-        kPulseInterval = 10 // 10ms
+        kPulseInterval = 10 /**< 10ms */
     };
 #endif
     /**
-     * @brief 下一个动画帧处理接口
+     * @brief Next animation frame handler interface
      * @return
      */
     STDMETHOD_(void, OnNextFrame)(THIS) PURE;
 };
 
 SNSEND
-#endif // __STIMELINEHANDLER_I__H__
+#endif /**< __STIMELINEHANDLER_I__H__ */

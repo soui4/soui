@@ -1,6 +1,6 @@
 ﻿/**
  * @file SPropertyAnimator-i.h
- * @brief SOUI属性动画接口定义 - 参考Android属性动画系统设计
+ * @brief SOUI property animation interface definition - modeled after Android's property animation system design
  * @author SOUI group
  * @date 2025
  */
@@ -29,7 +29,7 @@ typedef enum _PROP_TYPE
 
 /**
  * @interface IPropertyValuesHolder
- * @brief 属性值持有者接口 - 类似Android PropertyValuesHolder
+ * @brief Property value holder interface - similar to Android's PropertyValuesHolder
  */
 #undef INTERFACE
 #define INTERFACE IPropertyValuesHolder
@@ -55,143 +55,143 @@ DECLARE_INTERFACE_(IPropertyValuesHolder, IObjRef)
 
     //--------------------------------------------------------------------------
     /**
-     * @brief 设置属性名称
-     * @param propertyName 属性名称
+     * @brief Set property name
+     * @param propertyName property name
      */
     STDMETHOD_(void, SetPropertyName)(THIS_ LPCWSTR propertyName) PURE;
 
     /**
-     * @brief 获取属性名称
-     * @return 属性名称
+     * @brief Get property name
+     * @return property name
      */
     STDMETHOD_(LPCWSTR, GetPropertyName)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 设置字节值
-     * @param values 值数组
-     * @param count 值数量
+     * @brief Set byte value
+     * @param values value array
+     * @param count value count
      */
     STDMETHOD_(void, SetByteValues)(THIS_ const BYTE *values, int count) PURE;
 
     /**
-     * @brief 设置短整型值
-     * @param values 值数组
-     * @param count 值数量
+     * @brief Set short value
+     * @param values value array
+     * @param count value count
      */
     STDMETHOD_(void, SetShortValues)(THIS_ const short *values, int count) PURE;
 
     /**
-     * @brief 颜色值
-     * @param values 值数组
-     * @param count 值数量
+     * @brief Color value
+     * @param values value array
+     * @param count value count
      */
     STDMETHOD_(void, SetColorRefValues)(THIS_ const COLORREF *values, int count) PURE;
 
     /**
-     * @brief 设置浮点数值
-     * @param values 值数组
-     * @param count 值数量
+     * @brief Set float value
+     * @param values value array
+     * @param count value count
      */
     STDMETHOD_(void, SetFloatValues)(THIS_ const float *values, int count) PURE;
 
     /**
-     * @brief 设置整数值
-     * @param values 值数组
-     * @param count 值数量
+     * @brief Set integer value
+     * @param values value array
+     * @param count value count
      */
     STDMETHOD_(void, SetIntValues)(THIS_ const int *values, int count) PURE;
 
     /**
-     * @brief 设置LAYOUTSIZE值
-     * @param values 值数组
-     * @param count 值数量
+     * @brief Set LAYOUTSIZE value
+     * @param values value array
+     * @param count value count
      */
     STDMETHOD_(void, SetLayoutSizeValues)(THIS_ const LAYOUTSIZE *values, int count) PURE;
 
     /**
-     * @brief 设置位置值（用于位置相关属性）
-     * @param values 值数组（具体类型依赖于布局类型）
-     * @param count 值数量
-     * @param valueSize 每个值的大小（字节）
+     * @brief Set position value (for position-related properties)
+     * @param values value array (specific type depends on layout type)
+     * @param count value count
+     * @param valueSize size of each value (in bytes)
      */
     STDMETHOD_(void, SetPositionValues)(THIS_ const void *values, int count, int valueSize) PURE;
 
     /**
-     * @brief 获取当前动画值
-     * @param fraction 动画进度(0.0-1.0)
-     * @param pValue 输出值指针
-     * @return 成功返回TRUE
+     * @brief Get current animation value
+     * @param fraction animation progress (0.0-1.0)
+     * @param pValue output value pointer
+     * @return returns TRUE on success
      */
     STDMETHOD_(BOOL, GetAnimatedValue)(CTHIS_ float fraction, void *pValue) SCONST PURE;
 
     /**
-     * @brief 获取值类型
-     * @return 值类型
+     * @brief Get value type
+     * @return value type
      */
     STDMETHOD_(PROP_TYPE, GetValueType)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 获取值占用内存大小
-     * @return 值数量
+     * @brief Get memory size occupied by value
+     * @return value count
      */
     STDMETHOD_(int, GetValueSize)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 获取起始值
-     * @param pValue 输出值指针
+     * @brief Get start value
+     * @param pValue output value pointer
      */
     STDMETHOD_(void, GetStartValue)(CTHIS_ void *pValue) SCONST PURE;
 
     /**
-     * @brief 获取结束值
-     * @param pValue 输出值指针
+     * @brief Get end value
+     * @param pValue output value pointer
      */
     STDMETHOD_(void, GetEndValue)(CTHIS_ void *pValue) SCONST PURE;
 
     /**
-     * @brief 将动画进度转换为索引
-     * @param fraction 动画进度(0.0-1.0)
-     * @param idx 索引值数组（输出）
-     * @return 分段内动画进度（0.0-1.0）
+     * @brief Convert animation progress to index
+     * @param fraction animation progress (0.0-1.0)
+     * @param idx index value array (output)
+     * @return animation progress within the segment (0.0-1.0)
      */
     STDMETHOD_(float, Fraction2Index)(CTHIS_ float fraction, int idx[2]) SCONST PURE;
 
     /**
-     * @brief 将动画进度转换为帧索引
-     * @param fraction 动画进度(0.0-1.0)
-     * @return 帧索引
+     * @brief Convert animation progress to frame index
+     * @param fraction animation progress (0.0-1.0)
+     * @return frame index
      */
     STDMETHOD_(int, Fraction2FrameIndex)(CTHIS_ float fraction) SCONST PURE;
 
     /**
-     * @brief 通过索引获取值
-     * @param index 索引值
-     * @param pValue 输出值指针
-     * @param valueSize 值大小
-     * @return 成功返回TRUE
+     * @brief Get value by index
+     * @param index index value
+     * @param pValue output value pointer
+     * @param valueSize value size
+     * @return returns TRUE on success
      */
     STDMETHOD_(BOOL, GetValueByIndex)(CTHIS_ int index, void *pValue, int valueSize) SCONST PURE;
 
     /**
-     * @brief 获取关键帧数量
-     * @return 关键帧数量
+     * @brief Get keyframe count
+     * @return keyframe count
      */
     STDMETHOD_(int, GetKeyframeCount)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 设置关键帧权重
-     * @param weights 权重数组
-     * @param count 权重数量
-     * @return 成功返回TRUE,失败返回FALSE(权重数量与关键帧数量不一致)
-     * @note 权重数量必须与关键帧数量一致,不设置权重则默认为1.0
+     * @brief Set keyframe weights
+     * @param weights weight array
+     * @param count weight count
+     * @return returns TRUE on success, FALSE on failure (weight count does not match keyframe count)
+     * @note Weight count must match keyframe count; if not set, default is 1.0
      */
     STDMETHOD_(BOOL, SetKeyFrameWeights)(THIS_ const float *weights, int count) PURE;
 
     /**
-     * @brief 获取关键帧权重
-     * @param weights 权重数组
-     * @param count 权重数量
-     * @return 成功返回TRUE,失败返回FALSE(权重数量与关键帧数量不一致)
+     * @brief Get keyframe weights
+     * @param weights weight array
+     * @param count weight count
+     * @return returns TRUE on success, FALSE on failure (weight count does not match keyframe count)
      */
     STDMETHOD_(BOOL, GetKeyFrameWeights)(CTHIS_ float *weights, int count) SCONST PURE;
 };
@@ -201,258 +201,258 @@ DECLARE_INTERFACE_(IPropertyAnimator, IValueAnimator)
 #include <interface/SobjectApi.h>
 
     /**
-     * @brief 设置动画时长
-     * @param duration - 动画时长（毫秒）
+     * @brief Set the animation duration
+     * @param duration - animation duration (in milliseconds)
      * @return void
      */
     STDMETHOD_(void, setDuration)(THIS_ long duration) PURE;
 
     /**
-     * @brief 获取动画时长
-     * @return long - 动画时长（毫秒）
+     * @brief Get the animation duration
+     * @return long - animation duration (in milliseconds)
      */
     STDMETHOD_(long, getDuration)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 获取动画总时长
-     * @return long - 动画总时长（毫秒）
+     * @brief Get the total animation duration
+     * @return long - total animation duration (in milliseconds)
      */
     STDMETHOD_(long, getTotalDuration)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 设置动画当前播放时间
-     * @param playTime - 播放时间（毫秒）
+     * @brief Set the current playback time of the animation
+     * @param playTime - playback time (in milliseconds)
      * @return void
      */
     STDMETHOD_(void, setCurrentPlayTime)(THIS_ long playTime) PURE;
 
     /**
-     * @brief 设置动画当前播放进度
-     * @param fraction - 播放进度（0到1之间）
+     * @brief Set the current playback progress of the animation
+     * @param fraction - playback progress (between 0 and 1)
      * @return void
      */
     STDMETHOD_(void, setCurrentFraction)(THIS_ float fraction) PURE;
 
     /**
-     * @brief 获取动画当前播放时间
-     * @return long - 当前播放时间（毫秒）
+     * @brief Get the current playback time of the animation
+     * @return long - current playback time (in milliseconds)
      */
     STDMETHOD_(long, getCurrentPlayTime)(THIS) PURE;
 
     /**
-     * @brief 获取动画开始延迟时间
-     * @return long - 开始延迟时间（毫秒）
+     * @brief Get the animation start delay
+     * @return long - start delay (in milliseconds)
      */
     STDMETHOD_(long, getStartDelay)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 设置动画开始延迟时间
-     * @param startDelay - 开始延迟时间（毫秒）
+     * @brief Set the animation start delay
+     * @param startDelay - start delay (in milliseconds)
      * @return void
      */
     STDMETHOD_(void, setStartDelay)(THIS_ long startDelay) PURE;
 
     /**
-     * @brief 设置动画重复次数
-     * @param value - 重复次数
+     * @brief Set the animation repeat count
+     * @param value - repeat count
      * @return void
      */
     STDMETHOD_(void, setRepeatCount)(THIS_ int value) PURE;
 
     /**
-     * @brief 获取动画重复次数
-     * @return int - 重复次数
+     * @brief Get the animation repeat count
+     * @return int - repeat count
      */
     STDMETHOD_(int, getRepeatCount)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 设置动画重复模式
-     * @param value - 重复模式（RESTART或REVERSE）
+     * @brief Set the animation repeat mode
+     * @param value - repeat mode (RESTART or REVERSE)
      * @return void
      */
     STDMETHOD_(void, setRepeatMode)(THIS_ RepeatMode value) PURE;
 
     /**
-     * @brief 获取动画重复模式
-     * @return RepeatMode - 重复模式（RESTART或REVERSE）
+     * @brief Get the animation repeat mode
+     * @return RepeatMode - repeat mode (RESTART or REVERSE)
      */
     STDMETHOD_(RepeatMode, getRepeatMode)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 添加动画更新监听器
-     * @param listener - 监听器指针
+     * @brief Add an animation update listener
+     * @param listener - listener pointer
      * @return void
      */
     STDMETHOD_(void, addUpdateListener)(THIS_ IAnimatorUpdateListener * listener) PURE;
 
     /**
-     * @brief 移除所有动画更新监听器
+     * @brief Remove all animation update listeners
      * @return void
      */
     STDMETHOD_(void, removeAllUpdateListeners)(THIS) PURE;
 
     /**
-     * @brief 移除动画更新监听器
-     * @param listener - 监听器指针
+     * @brief Remove an animation update listener
+     * @param listener - listener pointer
      * @return void
      */
     STDMETHOD_(void, removeUpdateListener)(THIS_ IAnimatorUpdateListener * listener) PURE;
 
     /**
-     * @brief 设置时间插值器
-     * @param value - 插值器指针
+     * @brief Set the time interpolator
+     * @param value - interpolator pointer
      * @return void
      */
     STDMETHOD_(void, setInterpolator)(THIS_ IInterpolator * value) PURE;
 
     /**
-     * @brief 获取时间插值器
-     * @return IInterpolator* - 插值器指针
+     * @brief Get the time interpolator
+     * @return IInterpolator* - interpolator pointer
      */
     STDMETHOD_(IInterpolator *, getInterpolator)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 添加动画监听器
-     * @param p - 监听器指针
+     * @brief Add an animation listener
+     * @param p - listener pointer
      * @return void
      */
     STDMETHOD_(void, addListener)(THIS_ IAnimatorListener * p) PURE;
 
     /**
-     * @brief 移除动画监听器
-     * @param p - 监听器指针
+     * @brief Remove an animation listener
+     * @param p - listener pointer
      * @return void
      */
     STDMETHOD_(void, removeListener)(THIS_ IAnimatorListener * p) PURE;
 
     /**
-     * @brief 开始动画
-     * @param pContainer - 时间线管理器指针
+     * @brief Start the animation
+     * @param pContainer - timeline manager pointer
      * @return void
      */
     STDMETHOD_(void, start)(THIS_ ITimelineHandlersMgr * pContainer) PURE;
 
     /**
-     * @brief 结束动画
+     * @brief End the animation
      * @return void
      */
     STDMETHOD_(void, end)(THIS) PURE;
 
     /**
-     * @brief 检查动画是否正在运行
-     * @return BOOL - 正在运行返回TRUE，否则返回FALSE
+     * @brief Check whether the animation is running
+     * @return BOOL - returns TRUE if running, otherwise FALSE
      */
     STDMETHOD_(BOOL, isRunning)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 检查动画是否已启动
-     * @return BOOL - 已启动返回TRUE，否则返回FALSE
+     * @brief Check whether the animation has started
+     * @return BOOL - returns TRUE if started, otherwise FALSE
      */
     STDMETHOD_(BOOL, isStarted)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 反向播放动画
+     * @brief Play the animation in reverse
      * @return void
      */
     STDMETHOD_(void, reverse)(THIS) PURE;
 
     /**
-     * @brief 提交动画帧
-     * @param frameTime - 帧时间
+     * @brief Submit an animation frame
+     * @param frameTime - frame time
      * @return TRUE if the animation is finished, FALSE otherwise.
      */
     STDMETHOD_(BOOL, commitAnimationFrame)(THIS_ uint64_t frameTime) PURE;
 
     /**
-     * @brief 获取动画当前进度
-     * @return float - 当前进度
+     * @brief Get the current animation progress
+     * @return float - current progress
      */
     STDMETHOD_(float, getAnimatedFraction)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 克隆动画对象
-     * @return IValueAnimator* - 克隆的动画对象指针
+     * @brief Clone the animation object
+     * @return IValueAnimator* - pointer to the cloned animation object
      */
     STDMETHOD_(IValueAnimator *, clone)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 复制动画对象
-     * @param src - 源动画对象指针
+     * @brief Copy the animation object
+     * @param src - source animation object pointer
      * @return void
      */
     STDMETHOD_(void, copy)(THIS_ const IValueAnimator *src) PURE;
 
     /**
-     * @brief 评估动画值
-     * @param fraction - 动画进度
+     * @brief Evaluate the animation value
+     * @param fraction - animation progress
      * @return void
      */
     STDMETHOD_(void, onEvaluateValue)(THIS_ float fraction) PURE;
 
     /**
-     * @brief 获取时间线处理器
-     * @return ITimelineHandler* - 时间线处理器指针
+     * @brief Get the timeline handler
+     * @return ITimelineHandler* - timeline handler pointer
      */
     STDMETHOD_(ITimelineHandler *, GetTimelineHandler)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 获取用户数据
-     * @return LPVOID - 用户数据指针
+     * @brief Get user data
+     * @return LPVOID - user data pointer
      */
     STDMETHOD_(LPVOID, GetUserData)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 设置用户数据
-     * @param pUserData - 用户数据指针
+     * @brief Set user data
+     * @param pUserData - user data pointer
      * @return void
      */
     STDMETHOD_(void, SetUserData)(THIS_ LPVOID pUserData) PURE;
     //------------------------------------------------------------------------------
 
     /**
-     * @brief 获取动画目标
-     * @return 动画目标
+     * @brief Get animation target
+     * @return animation target
      */
     STDMETHOD_(IWindow *, GetTarget)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 设置动画目标
-     * @param target 动画目标
+     * @brief Set animation target
+     * @param target animation target
      */
     STDMETHOD_(void, SetTarget)(THIS_ IWindow * target) PURE;
 
     /**
-     * @brief 设置属性值持有者
-     * @param pHolder 属性值持有者
+     * @brief Set property value holder
+     * @param pHolder property value holder
      */
     STDMETHOD_(void, SetPropertyValuesHolder)(THIS_ IPropertyValuesHolder * pHolder) PURE;
     /**
-     * @brief 设置属性值持有者数组
-     * @param pHolders 属性值持有者数组
-     * @param count 属性值持有者数量
+     * @brief Set property value holder array
+     * @param pHolders property value holder array
+     * @param count property value holder count
      */
     STDMETHOD_(void, SetPropertyValuesHolders)(THIS_ IPropertyValuesHolder * *pHolders, int count) PURE;
     /**
-     * @brief 获取属性值持有者
-     * @param propertyName 属性名称
-     * @return 属性值持有者
+     * @brief Get property value holder
+     * @param propertyName property name
+     * @return property value holder
      */
     STDMETHOD_(IPropertyValuesHolder *, GetPropertyValuesHolderByName)(CTHIS_ LPCWSTR propertyName) SCONST PURE;
 
     /**
-     * @brief 获取属性值持有者
-     * @param index 索引
-     * @return 属性值持有者
+     * @brief Get property value holder
+     * @param index index
+     * @return property value holder
      */
     STDMETHOD_(IPropertyValuesHolder *, GetPropertyValuesHolderByIndex)(CTHIS_ int index) SCONST PURE;
 
     /**
-     * @brief 获取属性值持有者数量
-     * @return 属性值持有者数量
+     * @brief Get property value holder count
+     * @return property value holder count
      */
     STDMETHOD_(int, GetPropertyValuesHolderCount)(CTHIS) SCONST PURE;
 };
 
 SNSEND
 
-#endif // __SPROPERTY_AMINATOR_I__H__
+#endif /**< __SPROPERTY_AMINATOR_I__H__ */

@@ -19,8 +19,8 @@ SNSBEGIN
 template <class T>
 struct TNAMEDVALUE
 {
-    wchar_t strName[MAX_NAME + 1]; // Name of the value
-    T value;                       // Value associated with the name
+    wchar_t strName[MAX_NAME + 1]; /**< Name of the value */
+    T value;                       /**< Value associated with the name */
 };
 
 /**
@@ -34,7 +34,7 @@ struct TNAMEDVALUE
 template <class T, class ValueParser>
 class SNamedValue {
   public:
-    typedef TNAMEDVALUE<T> NAMEDVALUE; // Type alias for TNAMEDVALUE
+    typedef TNAMEDVALUE<T> NAMEDVALUE; /**< Type alias for TNAMEDVALUE */
 
     /**
      * @brief Initializes the named values from an XML node.
@@ -161,7 +161,7 @@ class SNamedValue {
         return wcscmp(pData1->strName, pData2->strName);
     }
 
-    SArray<NAMEDVALUE> m_lstNamedValue; // Array to store named values
+    SArray<NAMEDVALUE> m_lstNamedValue; /**< Array to store named values */
 };
 
 /**
@@ -239,28 +239,28 @@ class SOUI_EXP SNamedColor : public SNamedValue<COLORREF, SColorParser> {
     /**
      * @brief Theme color name.
      */
-    static const wchar_t *THEME_COLOR; // = L"@color/thm_color";
+    static const wchar_t *THEME_COLOR; /**< = L"@color/thm_color"; */
 
     /**
      * @brief Theme border color name.
      */
-    static const wchar_t* THEME_BORDER;// = L"@color/thm_border";
+    static const wchar_t *THEME_BORDER; /**< = L"@color/thm_border"; */
     /**
      * @brief Theme text normal color name.
      */
-    static const wchar_t *THEME_COLOR_TXT_NORMAL; // = L"@color/txt_normal";
+    static const wchar_t *THEME_COLOR_TXT_NORMAL; /**< = L"@color/txt_normal"; */
     /**
      * @brief Theme text hover color name.
      */
-    static const wchar_t *THEME_COLOR_TXT_HOVER; // = L"@color/txt_hover";
+    static const wchar_t *THEME_COLOR_TXT_HOVER; /**< = L"@color/txt_hover"; */
     /**
      * @brief Theme text push color name.
      */
-    static const wchar_t *THEME_COLOR_TXT_PUSH; // = L"@color/txt_push";
+    static const wchar_t *THEME_COLOR_TXT_PUSH; /**< = L"@color/txt_push"; */
     /**
      * @brief Theme text disable color name.
      */
-    static const wchar_t *THEME_COLOR_TXT_DISABLE; // = L"@color/txt_disable";
+    static const wchar_t *THEME_COLOR_TXT_DISABLE; /**< = L"@color/txt_disable"; */
 
     /**
      * @brief Retrieves a color value by name, automatically converting named colors.
@@ -400,4 +400,4 @@ class SOUI_EXP SNamedDimension : public SNamedValue<SLayoutSize, SDimensionParse
 
 SNSEND
 
-#endif // __SNAMEDVALUE__H__
+#endif /**< __SNAMEDVALUE__H__ */

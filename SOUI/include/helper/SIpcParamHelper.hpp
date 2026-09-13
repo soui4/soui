@@ -42,7 +42,7 @@
         }                                                                            \
     }
 
-/////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
 template <typename P1>
 void toParamStream(SNS::SParamStream &ps, P1 &p1)
 {
@@ -64,7 +64,7 @@ void fromParamStream(SNS::SParamStream &ps, P1 &p1)
         fromParamStream(ps, p1);                  \
     }
 
-/////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////
 template <typename P1, typename P2>
 void toParamStream(SNS::SParamStream &ps, P1 &p1, P2 &p2)
 {
@@ -86,7 +86,7 @@ void fromParamStream(SNS::SParamStream &ps, P1 &p1, P2 &p2)
         fromParamStream(ps, p1, p2);              \
     }
 
-////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
 template <typename P1, typename P2, typename P3>
 void toParamStream(SNS::SParamStream &ps, P1 &p1, P2 &p2, P3 &p3)
 {
@@ -108,7 +108,7 @@ void fromParamStream(SNS::SParamStream &ps, P1 &p1, P2 &p2, P3 &p3)
         fromParamStream(ps, p1, p2, p3);          \
     }
 
-///////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
 template <typename P1, typename P2, typename P3, typename P4>
 void toParamStream(SNS::SParamStream &ps, P1 &p1, P2 &p2, P3 &p3, P4 &p4)
 {
@@ -130,7 +130,7 @@ void fromParamStream(SNS::SParamStream &ps, P1 &p1, P2 &p2, P3 &p3, P4 &p4)
         fromParamStream(ps, p1, p2, p3, p4);      \
     }
 
-/////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 template <typename P1, typename P2, typename P3, typename P4, typename P5>
 void toParamStream(SNS::SParamStream &ps, P1 &p1, P2 &p2, P3 &p3, P4 &p4, P5 &p5)
 {

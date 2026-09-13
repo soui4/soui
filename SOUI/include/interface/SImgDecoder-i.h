@@ -195,4 +195,4 @@ DECLARE_INTERFACE_(IImgDecoderFactory, IObjRef)
 };
 
 SNSEND
-#endif // __SIMGDECODER_I__H__
+#endif /**< __SIMGDECODER_I__H__ */

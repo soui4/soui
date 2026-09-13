@@ -26,12 +26,12 @@ SObjectFactoryMgr::SObjectFactoryMgr(void)
 }
 
 //************************************
-// Method:    RegisterFactory,注册APP自定义的窗口类
-// Access:    public
-// Returns:   bool
-// Qualifier:
-// Parameter: SObjectFactory * pWndFactory:窗口工厂指针
-// Parameter: bool bReplace:强制替换原有工厂标志
+/** Method:    RegisterFactory, registers the window class customized by the APP */
+/** Access:    public */
+/** Returns:   bool */
+/** Qualifier: */
+/** Parameter: SObjectFactory * pWndFactory: pointer to the window factory */
+/** Parameter: bool bReplace: flag to force replacement of the existing factory */
 //************************************
 BOOL SObjectFactoryMgr::RegisterFactory(const IObjectFactory *objFactory, BOOL bReplace)
 {
@@ -64,11 +64,11 @@ void SObjectFactoryMgr::OnFactoryRemoved(const SObjectFactoryPtr &obj)
 }
 
 //************************************
-// Method:    UnregisterFactor,反注册APP自定义的窗口类
-// Access:    public
-// Returns:   bool
-// Qualifier:
-// Parameter: SWindowFactory * pWndFactory
+/** Method:    UnregisterFactor, unregisters the window class customized by the APP */
+/** Access:    public */
+/** Returns:   bool */
+/** Qualifier: */
+/** Parameter: SWindowFactory * pWndFactory */
 //************************************
 
 BOOL SObjectFactoryMgr::UnregisterFactory(const SObjectInfo &objInfo)
@@ -107,7 +107,7 @@ void SObjectFactoryMgr::SetSwndDefAttr(IObject *pObject) const
 {
     if (pObject->GetObjectType() != Window)
         return;
-    //检索并设置类的默认属性
+    // Retrieve and set the class's default attributes
     SObjDefAttr *pDefObjAttr = GETUIDEF->GetUiDef()->GetObjDefAttr();
     if (!pDefObjAttr)
         return;
@@ -118,7 +118,7 @@ void SObjectFactoryMgr::SetSwndDefAttr(IObject *pObject) const
         SXmlNode defAttr = pDefObjAttr->GetDefAttribute(szClassNameList[i]);
         if (!defAttr)
             continue;
-        // 优先处理"class"属性
+        // Prioritize handling the "class" attribute
         SXmlAttr attrClass = defAttr.attribute(L"class");
         if (attrClass)
         {

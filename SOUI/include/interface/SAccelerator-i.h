@@ -99,4 +99,4 @@ DECLARE_INTERFACE(IAcceleratorMgr)
 };
 
 SNSEND
-#endif // __SACCELERATOR_I__H__
+#endif /**< __SACCELERATOR_I__H__ */

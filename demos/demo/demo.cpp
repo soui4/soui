@@ -51,6 +51,9 @@
 #define INIT_R_DATA
 #include "res/resource.h"
 
+void demo_SWinxLogCallback(const char *pLogStr, int level){
+    SLOG("swinx",level)<<pLogStr;
+}
 static SStringT getSourceDir()
 {
 #ifdef __APPLE__
@@ -88,7 +91,9 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
     {
         return 0;
     }
-    
+    #ifndef _WIN32
+    SetSwinxLogCallback(demo_SWinxLogCallback,0);
+    #endif//_WIN32
     SApplication app(hInstance);
     SAppCfg cfg;
     cfg.SetRender(nType == IDYES ? Render_Skia : Render_Gdi)

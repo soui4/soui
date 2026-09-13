@@ -22,7 +22,7 @@ void SSplitPane::Move(CRect rc)
     FireEvent(evt);
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 SSplitWnd::SSplitWnd(void)
     : m_orintation(Vertical)
     , m_bAdjustable(TRUE)
@@ -162,7 +162,7 @@ void SSplitWnd::OnMouseMove(UINT nFlags, CPoint pt)
     if (-1 == m_iDragSep)
         return;
 
-    //将列表分裂成两组。
+    // Split the list into two groups.
     SplitPaneList lstPane1, lstPane2;
     SplitPaneList lstPriority1, lstPriority2;
 
@@ -209,7 +209,7 @@ void SSplitWnd::OnMouseMove(UINT nFlags, CPoint pt)
         if (diff == 0)
             return;
 
-        //伸长part1
+        // Elongate part1
         int idxPrev = lstPriority1.Find(lstPane1.GetAt(lstPane1.GetCount() - 1));
         SASSERT(idxPrev != -1);
         PANESIZE &paneSize1 = lstPaneSize1[idxPrev];
@@ -229,7 +229,7 @@ void SSplitWnd::OnMouseMove(UINT nFlags, CPoint pt)
             lstPaneSize1.InsertAt(idxPrev, szBackup);
         }
 
-        //压缩part2
+        // Compress part2
         int idxNext = lstPriority2.Find(lstPane2[0]);
         SASSERT(idxNext != -1);
         PANESIZE &paneSize2 = lstPaneSize2[idxNext];
@@ -266,7 +266,7 @@ void SSplitWnd::OnMouseMove(UINT nFlags, CPoint pt)
         if (diff == 0)
             return;
 
-        //压缩part1
+        // Compress part1
         int idxPrev = lstPriority1.Find(lstPane1.GetAt(lstPane1.GetCount() - 1));
         SASSERT(idxPrev != -1);
         PANESIZE &paneSize1 = lstPaneSize1[idxPrev];
@@ -286,7 +286,7 @@ void SSplitWnd::OnMouseMove(UINT nFlags, CPoint pt)
             lstPaneSize1.InsertAt(idxPrev, szBackup);
         }
 
-        //伸长part2
+        // Elongate part2
         int idxNext = lstPriority2.Find(lstPane2[0]);
         SASSERT(idxNext != -1);
         PANESIZE &paneSize2 = lstPaneSize2[idxNext];
@@ -307,7 +307,7 @@ void SSplitWnd::OnMouseMove(UINT nFlags, CPoint pt)
         }
         diff *= -1;
     }
-    //根据新分配的窗口大小重置窗口位置
+    // Reset window positions based on the newly allocated window size
     CRect rcClient;
     GetChildrenLayoutRect(&rcClient);
     int nOffset = m_orintation == Vertical ? rcClient.left : rcClient.top;
@@ -362,9 +362,9 @@ void SSplitWnd::GetChildrenLayoutRect(RECT *prc) const
     *prc = rc;
 }
 
-int SSplitWnd::InsertItem(SSplitPane *pane, int index /*= -1 */)
+int SSplitWnd::InsertItem(SSplitPane *pane, int index /**< = -1 */)
 {
-    //禁止重复插入
+    // Disallow duplicate insertion
     if (m_lstPane.Find(pane) != -1)
     {
         SASSERT(FALSE);
@@ -396,7 +396,7 @@ int SSplitWnd::InsertItem(SSplitPane *pane, int index /*= -1 */)
     return index;
 }
 
-void SSplitWnd::Relayout(const CRect &rc, PANESIZELIST lstPaneSize /*=PANESIZELIST()*/)
+void SSplitWnd::Relayout(const CRect &rc, PANESIZELIST lstPaneSize /**< =PANESIZELIST() */)
 {
     if (lstPaneSize.IsEmpty())
     {
@@ -421,12 +421,12 @@ void SSplitWnd::Relayout(const CRect &rc, PANESIZELIST lstPaneSize /*=PANESIZELI
 
 int SSplitWnd::AdjustPanesSize(PANESIZELIST &lstPriority, int remain)
 {
-    // step 1: 将残余量按优先级从高到低顺序根据期望size在窗口间分配
+    // step 1: Distribute the residual amount among windows according to desired size in order of priority from high to low
     for (int i = 0; i < (int)lstPriority.GetCount(); i++)
     {
         PANESIZE &pane = lstPriority[i];
         if (remain > 0)
-        { //扩大窗口
+        { // Enlarge window
             if (pane.preferred < pane.actural)
                 continue;
 
@@ -444,7 +444,7 @@ int SSplitWnd::AdjustPanesSize(PANESIZELIST &lstPriority, int remain)
             }
         }
         else
-        { //缩小窗口
+        { // Shrink window
             if (pane.preferred > pane.actural)
                 continue;
 
@@ -462,14 +462,14 @@ int SSplitWnd::AdjustPanesSize(PANESIZELIST &lstPriority, int remain)
             }
         }
     }
-    // step 2: 将残余量按优先级从低到高顺序在窗口的极值间分配
+    // step 2: Distribute the residual amount among window extremes in order of priority from low to high
     if (remain)
     {
         for (int i = (int)lstPriority.GetCount() - 1; i >= 0; i--)
         {
             PANESIZE &pane = lstPriority[i];
             if (remain > 0)
-            { //扩大窗口
+            { // Enlarge window
                 int max_digest = pane.maximum - pane.actural;
                 if (max_digest >= remain)
                 {
@@ -484,7 +484,7 @@ int SSplitWnd::AdjustPanesSize(PANESIZELIST &lstPriority, int remain)
                 }
             }
             else
-            { //缩小窗口
+            { // Shrink window
                 int max_digest = pane.actural - pane.minimum;
                 if (max_digest > -remain)
                 {
@@ -521,7 +521,7 @@ int SSplitWnd::ResetPanesPostion(SplitPaneList &lstPane, SplitPaneList &lstPaneP
             rc.top = (offset);
             rc.bottom = (offset + lstPaneSize[idx].actural);
         }
-        if (lstPane[i]->IsVisible()) //窗口不可见时不修改窗口size
+        if (lstPane[i]->IsVisible()) // Do not modify window size when the window is invisible
         {
             lstPane[i]->Move(rc);
             offset += lstPaneSize[idx].actural + m_spliterSize;
@@ -536,7 +536,7 @@ int SSplitWnd::ResetPanesPostion(SplitPaneList &lstPane, SplitPaneList &lstPaneP
 
 void SSplitWnd::FatchPaneSizeInfo(const SplitPaneList &lstPane, PANESIZELIST &lstPaneSize)
 {
-    lstPaneSize.SetCount(lstPane.GetCount()); //分配空间
+    lstPaneSize.SetCount(lstPane.GetCount()); // Allocate space
 
     for (int i = 0; i < (int)lstPane.GetCount(); i++)
     {

@@ -79,7 +79,7 @@ class SOUI_EXP SResProviderMgr : public IResProviderMgr {
      */
     STDMETHOD_(BOOL, GetFilePrefix)(THIS_ LPTSTR pszFilePrefix, int cchMax) SCONST OVERRIDE;
 
-    //////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
     /**
      * @brief Checks if a resource exists.
      * @param pszType Type of the resource.
@@ -149,7 +149,7 @@ class SOUI_EXP SResProviderMgr : public IResProviderMgr {
     STDMETHOD_(BOOL, GetRawBuffer)(THIS_ LPCTSTR pszType, LPCTSTR pszResName, LPVOID pBuf, size_t size) OVERRIDE;
 
   public:
-    // Helper methods
+    /** Helper methods */
 
     /**
      * @brief Finds the resource provider that contains the specified resource type and name.
@@ -209,20 +209,20 @@ class SOUI_EXP SResProviderMgr : public IResProviderMgr {
      */
     BOOL IsFileType(LPCTSTR pszType);
 
-    SStringT m_strFilePrefix;              // File prefix for resource paths
-    SList<IResProvider *> m_lstResPackage; // List of resource providers
+    SStringT m_strFilePrefix;              /**< File prefix for resource paths */
+    SList<IResProvider *> m_lstResPackage; /**< List of resource providers */
 
     typedef SMap<SStringT, HCURSOR> CURSORMAP;
-    CURSORMAP m_mapCachedCursor; // Map of cached cursors
+    CURSORMAP m_mapCachedCursor; /**< Map of cached cursors */
 
-    mutable SCriticalSection m_cs; // Critical section for thread safety
+    mutable SCriticalSection m_cs; /**< Critical section for thread safety */
 
 #ifdef _DEBUG
-    // Resource usage count map (debug only)
+    /** Resource usage count map (debug only) */
     SMap<SStringT, int> m_mapResUsageCount;
 #endif
 };
 
 SNSEND
 
-#endif // __SRESPROVIDERMGR__H__
+#endif /**< __SRESPROVIDERMGR__H__ */

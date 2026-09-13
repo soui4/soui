@@ -1,6 +1,6 @@
-﻿//////////////////////////////////////////////////////////////////////////
-//   File Name: SNamedValue.cpp
-//////////////////////////////////////////////////////////////////////////
+﻿///////////////////////////////////////////////////////////////////////
+/** File Name: SNamedValue.cpp */
+///////////////////////////////////////////////////////////////////////
 
 #include "souistd.h"
 #include "res.mgr/SNamedValue.h"
@@ -8,7 +8,7 @@
 #include <shlwapi.h>
 SNSBEGIN
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 
 const wchar_t KPrefixString[] = L"@string/";
 const wchar_t KPrefixColor[] = L"@color/";
@@ -26,7 +26,7 @@ bool SIntParser::ParseValue(const SStringW &strValue, int &value)
     return true;
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 SStringW SStringParser::GetNullValue()
 {
     return SStringW();
@@ -67,9 +67,9 @@ BOOL SNamedFont::Get(const SStringW &strValue, SStringW &ret) const
         return TRUE;
     }
 }
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 const wchar_t *SNamedColor::THEME_COLOR = L"@color/thm_color";
-const wchar_t* SNamedColor::THEME_BORDER = L"@color/thm_border";
+const wchar_t *SNamedColor::THEME_BORDER = L"@color/thm_border";
 const wchar_t *SNamedColor::THEME_COLOR_TXT_NORMAL = L"@color/thm_txt_normal";
 const wchar_t *SNamedColor::THEME_COLOR_TXT_HOVER = L"@color/thm_txt_hover";
 const wchar_t *SNamedColor::THEME_COLOR_TXT_PUSH = L"@color/thm_txt_push";
@@ -108,23 +108,28 @@ bool SColorParser::ParseValue(const SStringW &strValue, COLORREF &value)
         }
     }
     else if (strValueL.Left(4).CompareNoCase(L"rgba") == 0)
-    {//rgba(r,g,b,a%), rgba(r,g,b,a) with a range from 0 to 1.0 and rgba(r,g,b, a) with a range from 0 to 255
+    { // rgba(r,g,b,a%), rgba(r,g,b,a) with a range from 0 to 1.0 and rgba(r,g,b, a) with a range from 0 to 255
         SStringWList strValues;
-		strValueL = strValueL.Mid(5, strValueL.GetLength() - 6);
+        strValueL = strValueL.Mid(5, strValueL.GetLength() - 6);
         SplitString(strValueL, L',', strValues);
         if (strValues.GetCount() == 4)
         {
             nSeg = 4;
-            StrToIntExW(strValues[0],STIF_SUPPORT_HEX,&r);
-            StrToIntExW(strValues[1],STIF_SUPPORT_HEX,&g);
-            StrToIntExW(strValues[2],STIF_SUPPORT_HEX,&b);
-            if(strValues[3].EndsWith(L"%")){
+            StrToIntExW(strValues[0], STIF_SUPPORT_HEX, &r);
+            StrToIntExW(strValues[1], STIF_SUPPORT_HEX, &g);
+            StrToIntExW(strValues[2], STIF_SUPPORT_HEX, &b);
+            if (strValues[3].EndsWith(L"%"))
+            {
                 a = (int)(_wtof(strValues[3]) * 255 / 100);
-            }else if(strValues[3].StartsWith(L"0x")){
-                StrToIntExW(strValues[3],STIF_SUPPORT_HEX,&a);
-            }else{
+            }
+            else if (strValues[3].StartsWith(L"0x"))
+            {
+                StrToIntExW(strValues[3], STIF_SUPPORT_HEX, &a);
+            }
+            else
+            {
                 float ratio = _wtof(strValues[3]);
-                if(ratio <= 1.0f)
+                if (ratio <= 1.0f)
                     a = (int)(ratio * 255);
                 else
                     a = (int)floor(ratio);
@@ -167,7 +172,7 @@ BOOL SNamedColor::Get(const SStringW &strValue, COLORREF &cr) const
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
 bool SDimensionParser::ParseValue(const SStringW &strValue, SLayoutSize &value)
 {
     value.parseString(strValue);
@@ -193,7 +198,7 @@ BOOL SNamedDimension::Get(const SStringW &strValue, SLayoutSize &ret) const
     }
 }
 
-/////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 void SNamedID::Init2(const NAMEDVALUE *pValue, int nCount, BOOL bSorted)
 {
     m_lstNamedValue.RemoveAll();
@@ -203,7 +208,7 @@ void SNamedID::Init2(const NAMEDVALUE *pValue, int nCount, BOOL bSorted)
         m_lstNamedValue.SetAt(i, pValue[i]);
     }
     if (!bSorted)
-    { //自动排序
+    { // Auto sort
         qsort(m_lstNamedValue.GetData(), m_lstNamedValue.GetCount(), sizeof(NAMEDVALUE), Compare);
     }
 }
@@ -220,7 +225,7 @@ void SNamedID::Init3(const LPCWSTR *pNames, const int *nIDs, int nCount, BOOL bS
         m_lstNamedValue.SetAt(i, value);
     }
     if (!bSorted)
-    { //自动排序
+    { // Auto sort
         qsort(m_lstNamedValue.GetData(), m_lstNamedValue.GetCount(), sizeof(NAMEDVALUE), Compare);
     }
 }

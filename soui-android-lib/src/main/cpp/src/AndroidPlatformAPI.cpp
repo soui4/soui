@@ -84,6 +84,7 @@ void AndroidPlatformAPI::init(JNIEnv *env, jobject bridge, jobject ctx) {
         m_getInputDevicesMethod = env->GetMethodID(clsBridge, "getInputDevices", "()[[Ljava/lang/String;");
         m_showSoftKeyboard = env->GetMethodID(clsBridge, "showSoftKeyboard", "(Landroid/view/View;Z)Z");
         m_playSoundMethod = env->GetMethodID(clsBridge, "playSound", "(Ljava/lang/String;I)Z");
+        m_messageBeepMethod = env->GetMethodID(clsBridge, "messageBeep", "(I)Z");
         m_getTempPathMethod = env->GetMethodID(clsBridge, "getTempPath", "()Ljava/lang/String;");
         m_getSpecialFolderPathMethod = env->GetMethodID(clsBridge, "getSpecialFolderPath", "(I)Ljava/lang/String;");
         // Clipboard methods
@@ -1258,6 +1259,19 @@ BOOL AndroidPlatformAPI::playSound(LPCSTR pszSound, HMODULE hmod, DWORD fdwSound
     }
     jboolean ret = env->CallBooleanMethod(m_javaBridge, m_playSoundMethod, jSound, (jint)fdwSound);
     env->DeleteLocalRef(jSound);
+    return ret;
+}
+
+BOOL AndroidPlatformAPI::messageBeep(UINT uType) {
+    JNIEnv *env = getJNIEnv();
+    if (!env || !m_javaBridge || !m_messageBeepMethod) {
+        return FALSE;
+    }
+    jboolean ret = env->CallBooleanMethod(m_javaBridge, m_messageBeepMethod, (jint)uType);
+    if (env->ExceptionCheck()) {
+        env->ExceptionClear();
+        return FALSE;
+    }
     return ret;
 }
 

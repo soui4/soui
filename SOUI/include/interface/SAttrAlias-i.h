@@ -28,14 +28,14 @@ DECLARE_INTERFACE_(IAttrAlias, IObjRef)
     //-----------------------------------------------------------------------------------
 
     /**
-     * @brief 获取属性别名
-     * @param pszAttr -- 属性名
-     * @param pszClsName -- 类名
-     * @param objType -- 对象类型
-     * @return LPCWSTR 属性别名
+     * @brief Get the attribute alias
+     * @param pszAttr -- attribute name
+     * @param pszClsName -- class name
+     * @param objType -- object type
+     * @return LPCWSTR attribute alias
      */
     STDMETHOD_(LPCWSTR, GetAttrAlias)(CTHIS_ LPCWSTR pszAttr, LPCWSTR pszClsName, int objType) SCONST PURE;
 };
 
 SNSEND
-#endif // __SATTRALIAS_I__H__
+#endif /**< __SATTRALIAS_I__H__ */

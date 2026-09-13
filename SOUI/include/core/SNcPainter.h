@@ -7,7 +7,7 @@
 
 SNSBEGIN
 
-// Forward declarations
+/** Forward declarations */
 class SNcPanel;
 class SHostWnd;
 
@@ -16,7 +16,7 @@ class SHostWnd;
  * This class handles the painting and event processing for the non-client area of a window.
  */
 class SOUI_EXP SNcPainter
-    : public TObjRefImpl<SObjectImpl<INcPainter> >
+    : public TObjRefImpl<SObjectImpl<INcPainter>>
     , public IItemContainer
     , public IHostProxy {
     DEF_SOBJECT(SObjectImpl<INcPainter>, L"ncpainter")
@@ -170,6 +170,7 @@ class SOUI_EXP SNcPainter
     {
         return NULL;
     }
+
   protected:
     /**
      * @brief Gets the scale factor.
@@ -329,37 +330,37 @@ class SOUI_EXP SNcPainter
     void UpdateToolTip();
 
   private:
-    // Pointer to the host window
+    /** Pointer to the host window */
     SHostWnd *m_pHost;
 
-    // Height of the title bar
+    /** Height of the title bar */
     SLayoutSize m_titleHeight;
-    // Width of the border
+    /** Width of the border */
     SLayoutSize m_borderWidth;
-    // Skin for the border
+    /** Skin for the border */
     SAutoRefPtr<ISkinObj> m_skinBorder;
-    // Flag indicating if the system non-client painter is used
+    /** Flag indicating if the system non-client painter is used */
     BOOL m_bSysNcPainter;
 
-    // Memory render target for the main area
+    /** Memory render target for the main area */
     SAutoRefPtr<IRenderTarget> m_memRT;
-    // Memory render target for the left side
+    /** Memory render target for the left side */
     SAutoRefPtr<IRenderTarget> m_memLeft;
-    // Memory render target for the right side
+    /** Memory render target for the right side */
     SAutoRefPtr<IRenderTarget> m_memRight;
-    // Memory render target for the top side
+    /** Memory render target for the top side */
     SAutoRefPtr<IRenderTarget> m_memTop;
-    // Memory render target for the bottom side
+    /** Memory render target for the bottom side */
     SAutoRefPtr<IRenderTarget> m_memBottom;
-    // Flag indicating if painting is in progress
+    /** Flag indicating if painting is in progress */
     BOOL m_bInPaint;
-    // Flag indicating if the left mouse button is down
+    /** Flag indicating if the left mouse button is down */
     BOOL m_bLButtonDown;
-    // Flag indicating if the mouse is hovering
+    /** Flag indicating if the mouse is hovering */
     BOOL m_bMouseHover;
-    // Root non-client panel
+    /** Root non-client panel */
     SNcPanel *m_root;
-    // Invalid rectangle
+    /** Invalid rectangle */
     CRect m_rcInvalid;
     CPoint m_ptNcHittest;
 };
@@ -415,19 +416,19 @@ class SNcPanel : public SOsrPanel {
     SOUI_ATTRS_END()
 
   protected:
-    // Skin for the active state
+    /** Skin for the active state */
     SAutoRefPtr<ISkinObj> m_skinActive;
-    // Skin for the inactive state
+    /** Skin for the inactive state */
     SAutoRefPtr<ISkinObj> m_skinInactive;
-    // Color for the active title
+    /** Color for the active title */
     COLORREF m_crActiveTitle;
-    // Color for the inactive title
+    /** Color for the inactive title */
     COLORREF m_crInactiveTitle;
 
-    // Flag indicating if the panel is active
+    /** Flag indicating if the panel is active */
     BOOL m_bActive;
 };
 
 SNSEND
 
-#endif // __SNCPAINTER__H__
+#endif /**< __SNCPAINTER__H__ */

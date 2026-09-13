@@ -4,10 +4,10 @@
 #include "core/SNativeWnd.h"
 
 #ifndef WM_SYSTIMER
-#define WM_SYSTIMER 0x0118 //(caret blink)
-#endif                     // WM_SYSTIMER
+#define WM_SYSTIMER 0x0118 /**< (caret blink) */
+#endif                     /**< WM_SYSTIMER */
 
-#define TM_POSTTASK 200   // Timer ID for posting tasks to the message loop
+#define TM_POSTTASK 200 /**< Timer ID for posting tasks to the message loop */
 
 SNSBEGIN
 
@@ -21,15 +21,19 @@ BOOL RemoveElementFromArray(SArray<T> &arr, T ele)
     return TRUE;
 }
 
-class SMsgLoopWnd : public SNativeWnd
-{
+class SMsgLoopWnd : public SNativeWnd {
     BOOL m_hasTimer;
     IMessageLoop *m_pMsgLoop;
+
   public:
-    SMsgLoopWnd(IMessageLoop *pMsgLoop): m_pMsgLoop(pMsgLoop),m_hasTimer(FALSE)
+    SMsgLoopWnd(IMessageLoop *pMsgLoop)
+        : m_pMsgLoop(pMsgLoop)
+        , m_hasTimer(FALSE)
     {
     }
-    ~SMsgLoopWnd() {}
+    ~SMsgLoopWnd()
+    {
+    }
     void OnTimer(UINT_PTR nIDEvent)
     {
         if (nIDEvent == TM_POSTTASK)
@@ -39,16 +43,18 @@ class SMsgLoopWnd : public SNativeWnd
         }
     }
 
-    void StartTimer(){
-        if(!m_hasTimer)
+    void StartTimer()
+    {
+        if (!m_hasTimer)
         {
             m_hasTimer = TRUE;
             SetTimer(TM_POSTTASK, 0);
         }
     }
 
-    void StopTimer(){
-        if(m_hasTimer)
+    void StopTimer()
+    {
+        if (m_hasTimer)
         {
             m_hasTimer = FALSE;
             KillTimer(TM_POSTTASK);
@@ -72,7 +78,7 @@ class SMessageLoopPriv {
     SList<IRunnable *> m_runnables;
     SList<IRunnable *> m_runningQueue;
     SAutoRefPtr<IMessageLoop> m_parentLoop;
-    // Window handle for the message loop, used for handling WM_TIMER messages
+    /** Window handle for the message loop, used for handling WM_TIMER messages */
     SMsgLoopWnd m_msgWnd;
 };
 
@@ -83,7 +89,7 @@ SMessageLoop::SMessageLoop(IMessageLoop *pParentLoop)
     , m_bDoIdle(FALSE)
     , m_nIdleCount(0)
 {
-    m_priv = new SMessageLoopPriv(this,pParentLoop);
+    m_priv = new SMessageLoopPriv(this, pParentLoop);
 }
 
 SMessageLoop::~SMessageLoop()
@@ -108,7 +114,8 @@ void SMessageLoop::Quit(int exitCode)
     PostThreadMessage(m_tid, WM_QUIT, (WPARAM)exitCode, 0);
 }
 
-void SMessageLoop::OnStart(){
+void SMessageLoop::OnStart()
+{
     m_bDoIdle = TRUE;
     m_nIdleCount = 0;
     m_tid = GetCurrentThreadId();
@@ -118,7 +125,8 @@ void SMessageLoop::OnStart(){
     m_bQuit = FALSE;
 }
 
-void SMessageLoop::OnStop(){
+void SMessageLoop::OnStop()
+{
     SAutoLock lock(m_cs);
     SPOSITION pos = m_priv->m_runnables.GetHeadPosition();
     while (pos)
@@ -324,8 +332,7 @@ BOOL SMessageLoop::RunIdle()
         if (MsgWaitForMultipleObjects(0, NULL, FALSE, 20, QS_ALLINPUT) != WAIT_TIMEOUT)
         {
             MSG msg;
-            PeekMessage(&msg, 0, 0, 0, PM_NOREMOVE);
-            if (IsIdleMessage(&msg))
+            if (PeekMessage(&msg, 0, 0, 0, PM_NOREMOVE) && IsIdleMessage(&msg))
             {
                 m_bDoIdle = OnIdle(m_nIdleCount++);
             }

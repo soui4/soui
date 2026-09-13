@@ -15,7 +15,7 @@ SNSBEGIN
 #endif
 #endif
 
-// Get attribute alias
+/** Get attribute alias */
 extern LPCWSTR SOUI_EXP GetAttrAlias(LPCWSTR pszAttr, IObject *pObject);
 
 /**
@@ -93,13 +93,13 @@ public:
         }
 #endif
 
-        // Set current object's attributes
+        /** Set current object's attributes */
         for (SXmlAttr attr = xmlNode.first_attribute(); attr; attr = attr.next_attribute()) {
             if (IsAttributeHandled(attr)) continue;   // Ignore already processed attributes
             SetAttribute(attr.name(), attr.value(), TRUE);
         }
 
-        // Call initialization finished interface
+        /** Call initialization finished interface */
         OnInitFinished(pXmlNode);
         return TRUE;
     }
@@ -302,7 +302,7 @@ public:
 #if ENABLE_SOBJ_XML
 public:
     SStringW m_strXml;  /**< XML string for debugging purposes */
-#endif // ENABLE_SOBJ_XML
+#endif /**< ENABLE_SOBJ_XML */
 
 protected:
     SStringW m_strName;       /**< Object's name */
@@ -319,4 +319,4 @@ typedef SObjectImpl<IObject> SObject;
 
 SNSEND
 
-#endif // __SOBJECT_I_H_
+#endif /**< __SOBJECT_I_H_ */

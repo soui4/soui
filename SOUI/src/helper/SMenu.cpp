@@ -21,7 +21,7 @@ SMenuItemData::~SMenuItemData()
         DestroyIcon(hIcon);
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 
 SMenuAttr::SMenuAttr()
     : m_pItemSkin(GETBUILTINSKIN(SKIN_SYS_MENU_SKIN))
@@ -108,7 +108,7 @@ void SMenuAttr::SetScale(int scale)
         m_pCheckSkin = GETSKIN(m_pCheckSkin->GetName(), m_scale);
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 
 SMenuODWnd::SMenuODWnd(HWND hMenuOwner, SMenuAttr *pMenuAttr)
     : m_hMenuOwner(hMenuOwner)
@@ -281,7 +281,7 @@ LRESULT SMenuODWnd::OnMenuChar(UINT nChar, UINT nFlags, HMENU hMenu)
     return MAKELONG(0, MNC_IGNORE);
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 
 SMenu::SMenu(const SMenu &src)
     : m_hMenu(0)
@@ -362,7 +362,7 @@ void SMenu::InitMenuItemData(SMenuItemData *itemInfo, const SStringW &strTextW)
 {
     SMenuAttr *pMenuAttr = GetMenuAttr(m_hMenu);
     itemInfo->strText = S_CW2T(TR(strTextW, pMenuAttr->m_strTrCtx));
-    //查找快捷键
+    // Find shortcut key
     int iHotKey = strTextW.Find(L"&");
     if (iHotKey != -1 && iHotKey < strTextW.GetLength() - 1)
     {

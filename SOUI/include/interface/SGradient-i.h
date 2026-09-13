@@ -16,35 +16,35 @@ typedef struct _GradientItem
 DECLARE_INTERFACE_(IGradient, IObject)
 {
     /**
-     * @brief 添加引用
-     * @return long -- 引用计数
+     * @brief Add reference
+     * @return long -- reference count
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief 释放引用
-     * @return long -- 引用计数
+     * @brief Release reference
+     * @return long -- reference count
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief 释放对象
+     * @brief Release object
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
     /**
-     * @brief 获取渐变数据
-     * @return const GradientItem* -- 渐变数据
+     * @brief Get gradient data
+     * @return const GradientItem* -- gradient data
      */
     STDMETHOD_(const GradientItem *, GetGradientData)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 获取渐变长度
-     * @return int -- 渐变长度
+     * @brief Get gradient length
+     * @return int -- gradient length
      */
     STDMETHOD_(int, GetGradientLength)(CTHIS) SCONST PURE;
 };
 
 SNSEND
-#endif //_GRADIENT_I_H_
+#endif /**< _GRADIENT_I_H_ */

@@ -326,4 +326,4 @@ class SOUI_EXP SDateTimePicker
 
 SNSEND
 
-#endif // __SDATETIMEPICKER__H__
+#endif /**< __SDATETIMEPICKER__H__ */

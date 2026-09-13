@@ -7,12 +7,12 @@
 extern "C" {
 #endif
 
-/*
+/**
  * C API Helper Macros for STranslator Interfaces
  * These macros provide C-style function call syntax for C++ interface methods
  */
 
-/* ITranslator C API Macros */
+/** ITranslator C API Macros */
 #define ITranslator_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -46,7 +46,7 @@ extern "C" {
 #define ITranslator_getFontInfo(This, strFont) \
     ((This)->lpVtbl->getFontInfo(This, strFont))
 
-/* ITranslatorMgr C API Macros */
+/** ITranslatorMgr C API Macros */
 #define ITranslatorMgr_AddRef(This) \
     ((This)->lpVtbl->AddRef(This))
 
@@ -87,4 +87,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __STRANSLATOR_CAPI_H__ */
+#endif /**< __STRANSLATOR_CAPI_H__ */

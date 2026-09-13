@@ -12,7 +12,7 @@ SNSBEGIN
 #define WIDTH_MENU_MIN  100.f
 
 static const float INVALID_POS = -1000.f;
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 class SMenuExRoot : public SRootWindow {
     DEF_SOBJECT(SWindow, L"menuRoot")
     friend class SMenuEx;
@@ -54,7 +54,7 @@ class SMenuExRoot : public SRootWindow {
         pNewMenuExRoot->m_nSubMenuOffset = m_nSubMenuOffset;
         for (int i = 0; i < 4; i++)
             pNewMenuExRoot->m_rcItemPadding[i] = m_rcItemPadding[i];
-        pNewMenuExRoot->m_style = m_style; // 设置了 些 margin 之类的 属性 也要 copy
+        pNewMenuExRoot->m_style = m_style; // Attributes such as margin that were set must also be copied
     }
 
     HRESULT OnAttrIconPos(const SStringW &strValue, BOOL bLoading);
@@ -120,14 +120,14 @@ class SMenuExRoot : public SRootWindow {
     STDMETHOD_(BOOL, InitFromXml)(THIS_ IXmlNode *pNode) OVERRIDE
     {
         SXmlNode xmlNode(pNode);
-        // 找到根节点，获取在根节点上配置的全局菜单对象属性
+        /** Find the root node and get the global menu object attribute configured on the root node */
         SXmlNode xmlRoot = xmlNode.root().first_child();
         if (xmlNode != xmlRoot)
         {
             __baseCls::__baseCls::InitFromXml(&xmlRoot); // IObject::InitFromXml
         }
         BOOL bRet = __baseCls::InitFromXml(&xmlNode);
-        SetWindowText(_T("")); // 防止子菜单显示父级菜单项的文本。
+        SetWindowText(_T("")); /**< Prevent the child menu from displaying the parent menu item's text. */
         return TRUE;
     }
 
@@ -172,7 +172,7 @@ HRESULT SMenuExRoot::OnAttrIconPos(const SStringW &strValue, BOOL bLoading)
     SplitString(strValue, L',', values);
     if (1 == values.GetCount())
     {
-        //只设置X时，让Y方向自动居中
+        // When only X is set, center it automatically along the Y direction
         m_iconX = GETLAYOUTSIZE(values[0]);
         m_iconY.setSize(INVALID_POS, px);
         return S_OK;
@@ -206,8 +206,8 @@ SMenuExItem *SMenuExRoot::GetNextMenuItem(SMenuExItem *pItem, BOOL bForword, int
         return GetNextMenuItem(pRet, bForword, nCount + 1);
 }
 
-//////////////////////////////////////////////////////////////////////////
-// SMenuExItem
+///////////////////////////////////////////////////////////////////////
+/** SMenuExItem */
 
 SMenuExItem::~SMenuExItem()
 {
@@ -289,7 +289,8 @@ void SMenuExItem::OnPaint(IRenderTarget *pRT)
                 nState = m_bCheck ? 1 : 2;
             }
             CSize szIcon = pMenuRoot->m_pCheckSkin->GetSkinSize();
-            if(szIcon.cy>rc.Height()-4){
+            if (szIcon.cy > rc.Height() - 4)
+            {
                 int hei = rc.Height() - 4;
                 int wid = szIcon.cx / szIcon.cy * hei;
                 szIcon.cx = wid;
@@ -318,7 +319,7 @@ void SMenuExItem::OnPaint(IRenderTarget *pRT)
     else if (pMenuRoot->m_pIconSkin)
     {
         CSize szIcon = pMenuRoot->m_pIconSkin->GetSkinSize();
-        if(szIcon.cy > rc.Height()-4)
+        if (szIcon.cy > rc.Height() - 4)
         {
             int hei = rc.Height() - 4;
             int wid = szIcon.cx / szIcon.cy * hei;
@@ -400,7 +401,7 @@ void SMenuExItem::GetDesiredSize(SIZE *psz, int wid, int hei)
         {
             szRet.cx += pMenuRoot->m_nIconBarWidth.toPixelSize(GetScale()) + pMenuRoot->m_nTextOffset.toPixelSize(GetScale());
             if (m_pSubMenu)
-                szRet.cx += pMenuRoot->m_pArrowSkin->GetSkinSize().cx; //加上子菜单箭头宽度
+                szRet.cx += pMenuRoot->m_pArrowSkin->GetSkinSize().cx; // Add the child menu arrow width
         }
     }
     if (!GetLayoutParam()->IsSpecifiedSize(Vert))
@@ -415,7 +416,7 @@ BOOL SMenuExItem::CreateChildren(SXmlNode xmlNode)
     __baseCls::CreateChildren(xmlNode);
     SXmlNode xmlChild = xmlNode.child(SMenuExItem::GetClassName());
     if (xmlChild)
-    { //有子菜单
+    { // Has a child menu
         m_pSubMenu = new SMenuEx(this);
         m_pSubMenu->LoadMenu2(&xmlNode);
     }
@@ -465,7 +466,7 @@ SMenuEx *SMenuExItem::GetSubMenu()
     return m_pSubMenu;
 }
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 
 class SMenuExSep : public SMenuExItem {
     DEF_SOBJECT(SMenuExItem, L"sep")
@@ -488,7 +489,7 @@ class SMenuExSep : public SMenuExItem {
             if (m_pBgSkin)
             {
                 szRet.cy = m_pBgSkin->GetSkinSize().cy;
-                if (szRet.cy == 0) //纯色皮肤没有size
+                if (szRet.cy == 0) // A solid-color skin has no size
                     szRet.cy = 1;
             }
             else
@@ -522,7 +523,7 @@ class SMenuExSep : public SMenuExItem {
     SOUI_MSG_MAP_END()
 };
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 SWindow *SMenuExRoot::CreateMenuItem(const SStringW &strItemName)
 {
     SWindow *pMenuItem = NULL;
@@ -534,13 +535,13 @@ SWindow *SMenuExRoot::CreateMenuItem(const SStringW &strItemName)
     {
         pMenuItem = new SMenuExSep(m_pMenuEx, m_pSepSkin);
     }
-    //从style里初始化MenuItem
+    // Initialize MenuItem from style
     if (pMenuItem)
         SApplication::getSingleton().SetSwndDefAttr(pMenuItem);
 
     return pMenuItem;
 }
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 class SMenuExRunData : public TObjRefImpl<IObjRef> {
     friend class SMenuEx;
 
@@ -640,7 +641,7 @@ class SMenuExRunData : public TObjRefImpl<IObjRef> {
 
 static SMenuExRunData *s_MenuData = NULL;
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 SMenuEx::SMenuEx(void)
     : m_pParent(NULL)
     , m_pHoverItem(NULL)
@@ -763,7 +764,7 @@ UINT SMenuEx::TrackPopupMenu(UINT flag, int x, int y, HWND hOwner, int nScale)
 {
 #ifdef __ANDROID__
     return 0;
-#endif//__ANDROID__
+#endif // __ANDROID__
     if (!IsWindow() || GetMenuItemCount() == 0)
         return 0;
     if (!s_MenuData)
@@ -949,7 +950,7 @@ void SMenuEx::RunMenu(HWND hRoot)
 
     SAutoRefPtr<IMessageLoop> msgLoop;
     SApplication::getSingletonPtr()->GetMsgLoopFactory()->CreateMsgLoop(&msgLoop, GetMsgLoop());
-    if(s_MenuData->GetOwner())
+    if (s_MenuData->GetOwner())
         ::SendMessage(s_MenuData->GetOwner(), WM_ENTERMENULOOP, 0, 0);
     for (;;)
     {
@@ -966,7 +967,7 @@ void SMenuEx::RunMenu(HWND hRoot)
         MSG msg = { 0 };
 
         for (;;)
-        { //获取菜单相关消息，抄自wine代码
+        { // Obtain menu-related messages, copied from Wine code
             if (msgLoop->PeekMsg(&msg, 0, 0, FALSE))
             {
                 if (!CallMsgFilter(&msg, MSGF_MENU))
@@ -984,7 +985,7 @@ void SMenuEx::RunMenu(HWND hRoot)
             break;
         }
         if (msg.message == WM_KEYDOWN || msg.message == WM_KEYUP || msg.message == WM_SYSKEYDOWN || msg.message == WM_SYSKEYUP)
-        { //拦截alt键
+        { // Intercept the Alt key
             if (msg.wParam == VK_MENU)
             { // handle alt key down, exit menu loop
                 s_MenuData->ExitMenu(0);
@@ -1010,10 +1011,10 @@ void SMenuEx::RunMenu(HWND hRoot)
             bMsgQuit = TRUE;
         }
 
-        //移除消息队列中当前的消息。
+        // Remove the current message from the message queue.
         msgLoop->PeekMsg(&msg, msg.message, msg.message, TRUE);
 
-        //拦截非菜单窗口的MouseMove消息
+        // Intercept the MouseMove message of non-menu windows
         if (msg.message == WM_MOUSEMOVE)
         {
             if (msg.hwnd != hCurMenu)
@@ -1035,7 +1036,7 @@ void SMenuEx::RunMenu(HWND hRoot)
         msgLoop->OnMsg(&msg);
 
         if (msg.message == WM_KEYDOWN || msg.message == WM_KEYUP || msg.message == WM_CHAR)
-        { //将键盘事件强制发送到最后一级菜单窗口，让菜单处理快速键
+        { // Force-send the keyboard event to the last-level menu window, letting the menu handle the shortcut key
             HWND menuWnd = s_MenuData->GetMenuEx()->m_hWnd;
             ::SendMessage(menuWnd, msg.message, msg.wParam, msg.lParam);
         }
@@ -1046,7 +1047,7 @@ void SMenuEx::RunMenu(HWND hRoot)
             break;
         }
     }
-    if(s_MenuData->GetOwner())
+    if (s_MenuData->GetOwner())
         ::SendMessage(s_MenuData->GetOwner(), WM_EXITMENULOOP, 0, 0);
 }
 
@@ -1309,7 +1310,7 @@ int SMenuEx::GetScale() const
     return s_MenuData->GetScale();
 }
 
-void SMenuEx::EndMenu(int nCmdId /*=0*/)
+void SMenuEx::EndMenu(int nCmdId /**< =0 */)
 {
     if (!s_MenuData)
         return;
@@ -1414,7 +1415,7 @@ BOOL SMenuEx::IniNullMenu(SMenuExRoot *ParentRoot)
     SMenuExRoot *pMenuRoot = new SMenuExRoot(this);
     if (ParentRoot)
     {
-        //拷贝属性
+        // Copy attributes
         ParentRoot->Copy(pMenuRoot);
     }
     GetRoot()->InsertChild(pMenuRoot);

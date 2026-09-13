@@ -15,7 +15,7 @@ SNSBEGIN
  * @details    This class manages gradient data, including loading and retrieving gradient items.
  *             It implements the `IGradient` interface and provides methods to handle gradient attributes.
  */
-class SOUI_EXP SGradient : public TObjRefImpl<SObjectImpl<IGradient> > {
+class SOUI_EXP SGradient : public TObjRefImpl<SObjectImpl<IGradient>> {
     DEF_SOBJECT(SObjectImpl<IGradient>, L"gradient")
 
   public:
@@ -84,4 +84,4 @@ class SOUI_EXP SGradient : public TObjRefImpl<SObjectImpl<IGradient> > {
 
 SNSEND
 
-#endif // _SGRADIENT_H_
+#endif /**< _SGRADIENT_H_ */

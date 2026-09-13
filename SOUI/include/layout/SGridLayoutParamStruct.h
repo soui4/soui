@@ -7,31 +7,31 @@ SNSBEGIN
 
 enum GridGravity
 {
-    gUndef = -1, /**< 未定义 */
-    gLeft = 0,   /**< 左对齐 */
-    gTop = 0,    /**< 上对齐 */
-    gCenter = 1, /**< 居中对齐 */
-    gRight = 2,  /**< 右对齐 */
-    gBottom = 2, /**< 底对齐 */
-    gFill = 3,   /**< 扩展对齐 */
+    gUndef = -1, /**<Undefined*/
+    gLeft = 0,   /**<Left align*/
+    gTop = 0,    /**<Top align*/
+    gCenter = 1, /**<Center align*/
+    gRight = 2,  /**<Right align*/
+    gBottom = 2, /**<Bottom align*/
+    gFill = 3,   /**<Expand align*/
 };
 
-/*
- * 网格布局单元格参数
+/**
+ * Grid layout cell parameters
  * remark:
- * 如果同一行中多个单无格指定了rowWeight,只有最大的那一个有效，相应的同一列中也只有最大的colWeight有效
+ * If multiple cells in the same row specify rowWeight, only the largest one takes effect; correspondingly, in the same column only the largest colWeight takes effect
  */
 struct SGridLayoutParamStruct
 {
-    int nColSpan;               /**< 网格占列数 */
-    int nRowSpan;               /**< 网格占行数 */
-    GridGravity layoutGravityX; /**< 网格水平对齐方式 */
-    GridGravity layoutGravityY; /**< 网格垂直对齐方式 */
-    SLayoutSize width;          /**< 网格宽度 */
-    SLayoutSize height;         /**< 网格高度 */
-    float fColWeight;           /**< 网格宽度的加权 */
-    float fRowWeight;           /**< 网格高度的加权 */
+    int nColSpan;               /**<Grid column span*/
+    int nRowSpan;               /**<Grid row span*/
+    GridGravity layoutGravityX; /**<Grid horizontal alignment*/
+    GridGravity layoutGravityY; /**<Grid vertical alignment*/
+    SLayoutSize width;          /**<Grid width*/
+    SLayoutSize height;         /**<Grid height*/
+    float fColWeight;           /**<Weight of grid width*/
+    float fRowWeight;           /**<Weight of grid height*/
 };
 
 SNSEND
-#endif // __SGRIDLAYOUTPARAMSTRUCT__H__
+#endif /**< __SGRIDLAYOUTPARAMSTRUCT__H__ */

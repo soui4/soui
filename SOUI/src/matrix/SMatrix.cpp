@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2006 The Android Open Source Project
  *
  * Use of this source code is governed by a BSD-style license that can be
@@ -10,18 +10,18 @@
 
 #include <stddef.h>
 
-// In a few places, we performed the following
-//      a * b + c * d + e
-// as
-//      a * b + (c * d + e)
+/** In a few places, we performed the following */
+/** a * b + c * d + e */
+/** as */
+/** a * b + (c * d + e) */
 //
-// sdot and scross are indended to capture these compound operations into a
-// function, with an eye toward considering upscaling the intermediates to
-// doubles for more precision (as we do in concat and invert).
+/** sdot and scross are indended to capture these compound operations into a */
+/** function, with an eye toward considering upscaling the intermediates to */
+/** doubles for more precision (as we do in concat and invert). */
 //
-// However, these few lines that performed the last add before the "dot", cause
-// tiny image differences, so we guard that change until we see the impact on
-// chrome's layouttests.
+/** However, these few lines that performed the last add before the "dot", cause */
+/** tiny image differences, so we guard that change until we see the impact on */
+/** chrome's layouttests. */
 //
 #define SK_LEGACY_MATRIX_MATH_ORDER
 #define SiToU8(x) ((uint8_t)(x))
@@ -38,7 +38,7 @@ SMatrix::SMatrix(const float data[9], int type)
     setTypeMask(type);
 }
 
-/*      [scale-x    skew-x      trans-x]   [X]   [X']
+/**      [scale-x    skew-x      trans-x]   [X]   [X']
         [skew-y     scale-y     trans-y] * [Y] = [Y']
         [persp-0    persp-1     persp-2]   [1]   [1 ]
 */
@@ -51,7 +51,7 @@ void SMatrix::reset()
     this->setTypeMask(kIdentity_Mask | kRectStaysRect_Mask);
 }
 
-// this guy aligns with the masks, so we can compute a mask from a varaible 0/1
+/** this guy aligns with the masks, so we can compute a mask from a varaible 0/1 */
 enum
 {
     kTranslate_Shift,
@@ -148,16 +148,16 @@ uint8_t SMatrix::computeTypeMask() const
     return SiToU8(mask);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
-// helper function to determine if upper-left 2x2 of matrix is degenerate
+/** helper function to determine if upper-left 2x2 of matrix is degenerate */
 static inline bool is_degenerate_2x2(float scaleX, float skewX, float skewY, float scaleY)
 {
     float perp_dot = scaleX * scaleY - skewX * skewY;
     return SFloatNearlyZero(perp_dot, SK_ScalarNearlyZero * SK_ScalarNearlyZero);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
 bool SMatrix::isSimilarity(float tol) const
 {
@@ -226,7 +226,7 @@ bool SMatrix::preservesRightAngles(float tol) const
     return SFloatNearlyZero(vec[0].dot(vec[1]), SFloatSquare(tol));
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
 static inline float sdot(float a, float b, float c, float d)
 {
@@ -308,7 +308,7 @@ void SMatrix::postTranslate(float dx, float dy)
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
 void SMatrix::setScale2(float sx, float sy, float px, float py)
 {
@@ -420,8 +420,8 @@ void SMatrix::postScale(float sx, float sy)
     this->postConcat(m);
 }
 
-// this guy perhaps can go away, if we have a fract/high-precision way to
-// scale matrices
+/** this guy perhaps can go away, if we have a fract/high-precision way to */
+/** scale matrices */
 bool SMatrix::postIDiv(int divx, int divy)
 {
     if (divx == 0 || divy == 0)
@@ -444,7 +444,7 @@ bool SMatrix::postIDiv(int divx, int divy)
     return true;
 }
 
-////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
 
 void SMatrix::setSinCos(float sinV, float cosV, float px, float py)
 {
@@ -542,7 +542,7 @@ void SMatrix::postRotate(float degrees)
     this->postConcat(m);
 }
 
-////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
 
 void SMatrix::setSkew2(float sx, float sy, float px, float py)
 {
@@ -604,7 +604,7 @@ void SMatrix::postSkew(float sx, float sy)
     this->postConcat(m);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
 bool SMatrix::setRectToRect(const SRect &src, const SRect &dst, ScaleToFit align)
 {
@@ -690,7 +690,7 @@ bool SMatrix::setRectToRect(const SRect &src, const SRect &dst, ScaleToFit align
     return true;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
 static inline float muladdmul(float a, float b, float c, float d)
 {
@@ -762,7 +762,7 @@ void SMatrix::setConcat(const SMatrix &a, const SMatrix &b)
             tmp.fMat[kMTransY] += a.fMat[kMTransY];
             tmp.fMat[kMPersp0] = tmp.fMat[kMPersp1] = 0;
             tmp.fMat[kMPersp2] = 1;
-            // SkDebugf("Concat mat non-persp type: %d\n", tmp.getType());
+            // SkDebugf("Concat mat non-persp type: %d@n", tmp.getType());
             // SASSERT(!(tmp.getType() & kPerspective_Mask));
             tmp.setTypeMask(kUnknown_Mask | kOnlyPerspectiveValid_Mask);
         }
@@ -790,9 +790,9 @@ void SMatrix::postConcat(const SMatrix &mat)
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
-/*  Matrix inversion is very expensive, but also the place where keeping
+/**  Matrix inversion is very expensive, but also the place where keeping
     precision may be most important (here and matrix concat). Hence to avoid
     bitmap blitting artifacts when walking the inverse, we use doubles for
     the intermediate math, even though we know that is more expensive.
@@ -970,7 +970,7 @@ bool SMatrix::invertNonIdentity(SMatrix *inv) const
     return true;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
 void SMatrix::Identity_pts(const SMatrix &m, SPoint dst[], const SPoint src[], int count)
 {
@@ -1119,7 +1119,7 @@ void SMatrix::Persp_pts(const SMatrix &m, SPoint dst[], const SPoint src[], int 
 }
 
 const SMatrix::MapPtsProc SMatrix::gMapPtsProcs[] = { SMatrix::Identity_pts, SMatrix::Trans_pts, SMatrix::Scale_pts, SMatrix::ScaleTrans_pts, SMatrix::Rot_pts, SMatrix::RotTrans_pts, SMatrix::Rot_pts, SMatrix::RotTrans_pts,
-                                                      // repeat the persp proc 8 times
+                                                      /** repeat the persp proc 8 times */
                                                       SMatrix::Persp_pts, SMatrix::Persp_pts, SMatrix::Persp_pts, SMatrix::Persp_pts, SMatrix::Persp_pts, SMatrix::Persp_pts, SMatrix::Persp_pts, SMatrix::Persp_pts };
 
 void SMatrix::mapPoints(SPoint dst[], const SPoint src[], int count) const
@@ -1131,7 +1131,7 @@ void SMatrix::mapPoints(SPoint dst[], const SPoint src[], int count) const
     this->getMapPtsProc()(*this, dst, src, count);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
 static int32_t SkAbs32(int32_t value)
 {
@@ -1174,7 +1174,7 @@ void SMatrix::mapHomogeneousPoints(float dst[], const float src[], int count) co
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
 void SMatrix::mapVectors(SPoint dst[], const SPoint src[], int count) const
 {
@@ -1239,7 +1239,7 @@ float SMatrix::mapRadius(float radius) const
     return SFloatSqrt(d0 * d1);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
 void SMatrix::Persp_xy(const SMatrix &m, float sx, float sy, SPoint *pt)
 {
@@ -1319,15 +1319,15 @@ void SMatrix::Identity_xy(const SMatrix &m, float sx, float sy, SPoint *pt)
 }
 
 const SMatrix::MapXYProc SMatrix::gMapXYProcs[] = { SMatrix::Identity_xy, SMatrix::Trans_xy, SMatrix::Scale_xy, SMatrix::ScaleTrans_xy, SMatrix::Rot_xy, SMatrix::RotTrans_xy, SMatrix::Rot_xy, SMatrix::RotTrans_xy,
-                                                    // repeat the persp proc 8 times
+                                                    /** repeat the persp proc 8 times */
                                                     SMatrix::Persp_xy, SMatrix::Persp_xy, SMatrix::Persp_xy, SMatrix::Persp_xy, SMatrix::Persp_xy, SMatrix::Persp_xy, SMatrix::Persp_xy, SMatrix::Persp_xy };
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
-// if its nearly zero (just made up 26, perhaps it should be bigger or smaller)
+/** if its nearly zero (just made up 26, perhaps it should be bigger or smaller) */
 #define PerspNearlyZero(x) SFloatNearlyZero(x, (1.0f / (1 << 26)))
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
 static inline bool checkForZero(float x)
 {
@@ -1416,7 +1416,7 @@ bool SMatrix::Poly4Proc(const SPoint srcPt[], SMatrix *dst, const SPoint &scale)
     x2 = srcPt[2].fX - srcPt[3].fX;
     y2 = srcPt[2].fY - srcPt[3].fY;
 
-    /* check if abs(x2) > abs(y2) */
+    // check if abs(x2) > abs(y2)
     if (x2 > 0 ? y2 > 0 ? x2 > y2 : x2 > -y2 : y2 > 0 ? -x2 > y2 : x2 < y2)
     {
         float denom = SFloatMulDiv(x1, y2, x2) - y1;
@@ -1436,7 +1436,7 @@ bool SMatrix::Poly4Proc(const SPoint srcPt[], SMatrix *dst, const SPoint &scale)
         a1 = (x0 - x1 - SFloatMulDiv(y0 - y1, x2, y2)) / denom;
     }
 
-    /* check if abs(x1) > abs(y1) */
+    // check if abs(x1) > abs(y1)
     if (x1 > 0 ? y1 > 0 ? x1 > y1 : x1 > -y1 : y1 > 0 ? -x1 > y1 : x1 < y1)
     {
         float denom = y2 - SFloatMulDiv(x2, y1, x1);
@@ -1475,13 +1475,12 @@ bool SMatrix::Poly4Proc(const SPoint srcPt[], SMatrix *dst, const SPoint &scale)
 
 typedef bool (*PolyMapProc)(const SPoint[], SMatrix *, const SPoint &);
 
-/*  Taken from Rob Johnson's original sample code in QuickDraw GX
- */
+/** Taken from Rob Johnson's original sample code in QuickDraw GX */
 bool SMatrix::setPolyToPoly(const SPoint src[], const SPoint dst[], int count)
 {
     if ((unsigned)count > 4)
     {
-        //        SkDebugf("--- SkMatrix::setPolyToPoly count out of range %d\n", count);
+        // SkDebugf("--- SkMatrix::setPolyToPoly count out of range %d@n", count);
         return false;
     }
 
@@ -1524,7 +1523,7 @@ bool SMatrix::setPolyToPoly(const SPoint src[], const SPoint dst[], int count)
     return true;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
 enum MinMaxOrBoth
 {
@@ -1534,7 +1533,7 @@ enum MinMaxOrBoth
 };
 
 template <MinMaxOrBoth MIN_MAX_OR_BOTH>
-bool get_scale_factor(SMatrix::TypeMask typeMask, const float m[9], float results[/*1 or 2*/])
+bool get_scale_factor(SMatrix::TypeMask typeMask, const float m[9], float results[/**< 1 or 2 */])
 {
     if (typeMask & SMatrix::kPerspective_Mask)
     {
@@ -1676,13 +1675,13 @@ const SMatrix &SMatrix::InvalidMatrix()
     return invalidMatrix;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
-/*!
-\fn SMatrix &SMatrix::operator *=(const SMatrix &matrix)
-\overload
+/**
+@fn SMatrix &SMatrix::operator *=(const SMatrix &matrix)
+@overload
 
-Returns the result of multiplying this matrix by the given \a
+Returns the result of multiplying this matrix by the given @a
 matrix.
 */
 
@@ -1692,10 +1691,10 @@ SMatrix &SMatrix::operator*=(const SMatrix &src)
     return *this;
 }
 
-/*!
-\fn SMatrix SMatrix::operator *(const SMatrix &matrix) const
+/**
+@fn SMatrix SMatrix::operator *(const SMatrix &matrix) const
 
-Returns the result of multiplying this matrix by the given \a
+Returns the result of multiplying this matrix by the given @a
 matrix.
 
 Note that matrix multiplication is not commutative, i.e. a*b !=
@@ -1709,9 +1708,9 @@ SMatrix SMatrix::operator*(const SMatrix &m) const
     return ret;
 }
 
-/*!
-Assigns the given \a matrix's values to this matrix.
-*/
+/**
+ * Assigns the given @a matrix's values to this matrix.
+ */
 SMatrix &SMatrix::operator=(const SMatrix &src)
 {
     memcpy(fMat, src.fMat, sizeof(fMat));

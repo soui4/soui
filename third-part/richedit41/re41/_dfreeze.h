@@ -79,8 +79,9 @@ private:
  *	@mfunc
  *		Initialize object for accumulating display changes
  */
-inline CAccumDisplayChanges::CAccumDisplayChanges() 
-	: _cRefs(1), _cpMin(CP_INFINITE), _fUpdateCaret(FALSE)
+inline CAccumDisplayChanges::CAccumDisplayChanges()
+	: _cRefs(1), _cpMin(CP_INFINITE), _fUpdateCaret(FALSE),
+	  _fScrollIntoView(FALSE), _fNeedRedisplay(FALSE)
 {
 	// Header does all the work
 }

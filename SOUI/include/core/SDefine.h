@@ -1,8 +1,8 @@
 ﻿#ifndef __SDEFINE__H__
 #define __SDEFINE__H__
 
-// DISALLOW_COPY_AND_ASSIGN禁用拷贝和赋值构造函数.
-// 需要在类的private:访问控制域中使用.
+/** DISALLOW_COPY_AND_ASSIGN disables the copy and assignment constructors. */
+/** Must be used within the class's private: access control section. */
 #define DISALLOW_COPY_AND_ASSIGN(TypeName) \
     TypeName(const TypeName &);            \
     void operator=(const TypeName &)
@@ -32,8 +32,8 @@
 #define S_NO_VTABLE __declspec(novtable)
 #endif
 
-// SWindow Handle
+/** SWindow Handle */
 typedef DWORD SWND;
 typedef ULONG_PTR HSTREEITEM;
 
-#endif // __SDEFINE__H__
+#endif /**< __SDEFINE__H__ */
