@@ -276,6 +276,7 @@ EndgameHandler::EndgameHandler(CMainDlg *pMainDlg, SGameTheme *pTheme)
     , m_cellWidth(0)
     , m_cellHeight(0)
     , m_nCurEndgameIndex(-1)
+    , m_bAutoStartSent(false)
 {
     m_ptBoardOrigin = CPoint(0, 0);
 }
@@ -390,8 +391,33 @@ BOOL EndgameHandler::OnTableInfo(const void *lpData, int nSize)
 {
     if (!m_pAdapter || nSize < (int)sizeof(GAME_TABLE_INFO))
         return FALSE;
-    m_pAdapter->SetTableInfo((GAME_TABLE_INFO *)lpData, nSize);
+    GAME_TABLE_INFO *pInfo = (GAME_TABLE_INFO *)lpData;
+    m_pAdapter->SetTableInfo(pInfo, nSize);
+    TryAutoStart(pInfo);
     return TRUE;
+}
+
+void EndgameHandler::TryAutoStart(GAME_TABLE_INFO *pInfo)
+{
+    if (!pInfo || m_bAutoStartSent)
+        return;
+    if (pInfo->nTableId < ENDGAME_TABLE_BASE)
+        return;
+    MyProfile *pMy = MyProfile::getSingletonPtr();
+    // 仅处理玩家本人所在桌, 且玩家已入座
+    if (pMy->GetTableId() != pInfo->nTableId)
+        return;
+    if (pMy->GetSeatIndex() < 0 || pMy->GetSeatIndex() >= PLAYER_COUNT)
+        return;
+    // 真人+机器人坐满后才自动开局
+    if (pInfo->nPlayers < PLAYER_COUNT)
+        return;
+    m_bAutoStartSent = true;
+    if (m_ws)
+        m_ws->SendMsg(GMT_READY, NULL, 0);
+    SLOGI() << "EndgameHandler: 残局桌坐满, 自动就绪并跳转到对局页";
+    if (m_pMainDlg)
+        m_pMainDlg->SwitchToGame();
 }
 
 BOOL EndgameHandler::OnSeatDownAck(const void *lpData, int nSize)
@@ -404,6 +430,8 @@ BOOL EndgameHandler::OnSeatDownAck(const void *lpData, int nSize)
     MyProfile *pMy = MyProfile::getSingletonPtr();
     pMy->SetTableId(pAck->nTableId);
     pMy->SetSeatIndex(pAck->nSeat);
+    // 重新入座后允许再次自动开局
+    m_bAutoStartSent = false;
     SLOGI() << "EndgameHandler: seatdown ok table=" << pAck->nTableId << " seat=" << pAck->nSeat;
     return TRUE;
 }
@@ -517,7 +545,7 @@ void EndgameHandler::RenderLayout(const int layout[10][9])
             SAnchorLayoutParamStruct *pParamStruct = (SAnchorLayoutParamStruct *)pParam->GetRawData();
             pParamStruct->pos.type = 10;
             pParamStruct->pos.x.fSize = (float)x;
-            pParamStruct->pos.y.fSize = (float)(9-y);//using 9-y to swap top bottom color.
+            pParamStruct->pos.y.fSize = (float)y;//using 9-y to swap top bottom color.
             pPiece->SetPos(CPoint(x, y));
             m_pPreviewBoard->InsertIChild(pPiece);
             m_pieces.push_back(pPiece);

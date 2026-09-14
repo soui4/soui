@@ -334,6 +334,17 @@ void CMainDlg::SwitchToTab(int nIndex)
         pTab->SetCurSel(nIndex);
 }
 
+void CMainDlg::SwitchToGame()
+{
+    STabCtrl *pTab = FindChildByName2<STabCtrl>(L"main_tabctrl");
+    if (!pTab)
+        return;
+    // 桌面/移动端页签顺序不同, 按游戏页窗口名查找所在页签
+    int nIndex = pTab->GetPageIndex(L"game_container", FALSE);
+    if (nIndex >= 0)
+        pTab->SetCurSel(nIndex);
+}
+
 void CMainDlg::OnThemeReady(const SStringT& strThemeDir, bool bUpdated)
 {
     SLOGI() << "OnThemeReady: dir=" << strThemeDir.c_str() << " updated=" << bUpdated;

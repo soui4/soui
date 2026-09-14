@@ -37,6 +37,8 @@ public:
     SWindow *getModalRoot() const{return m_modalRoot;}
     // 切换主内容区页签(index: 0大厅/1对局/2关于/3残局)
     void SwitchToTab(int nIndex);
+    // 切换到对局页(按窗口名查找, 兼容各平台页签顺序)
+    void SwitchToGame();
 #if defined(__MOBILE__)
     // 登录成功回调（模态视图方式，移动平台不支持独立消息循环）
     void OnLoginSuccess(SStringT strSvr, SStringT strName, char cSex);

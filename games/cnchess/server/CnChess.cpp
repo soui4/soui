@@ -13,7 +13,7 @@ SNSBEGIN
 
 CCnChess::CCnChess(ITableListener* pListener, int nTableId):CGameTable(pListener, nTableId, PLAYER_COUNT)
 {
-    m_nRedIndex = rand()%PLAYER_COUNT;
+    m_nRedIndex = 0;    // 开局固定红方为0号位, 与大厅对战一致
     memcpy(m_dwProps, PropBag::getSingletonPtr()->m_dwProps, sizeof(DWORD) * PROP_SIZE);
     for (int i = 0; i < PLAYER_COUNT; i++)
     {

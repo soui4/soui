@@ -9,7 +9,7 @@
 #include "SGameTheme.h"
 #include "ChessBoard.h"
 #include "ChessPiece.h"
-
+#include "protocol.h"
 class CEndgameAdapter;
 class CMainDlg;
 
@@ -71,6 +71,8 @@ protected:
     void OnPreviewSizeChanged(IEvtArgs *e);
     void ClearPieces();
     void RenderLayout(const int layout[10][9]);
+    // 残局桌坐满后自动就绪并跳转到对局页
+    void TryAutoStart(GAME_TABLE_INFO *pInfo);
 private:
     CMainDlg *m_pMainDlg;
     SGameTheme *m_pTheme;
@@ -84,6 +86,7 @@ private:
     float m_cellHeight;
     CPoint m_ptBoardOrigin;               ///< 棋盘左下角坐标
     int m_nCurEndgameIndex;               ///< 当前选中的残局序号
+    bool m_bAutoStartSent;                ///< 是否已为本局自动发送过就绪
 };
 
 #endif//ENDGAMEHANDLER_H
