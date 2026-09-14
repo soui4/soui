@@ -381,6 +381,53 @@ BOOL CWebSocketGame::ClientLogin(PWSCLIENT pClient, LPVOID pData, DWORD dwSize)
     return TRUE;
 }
 
+//=====================================================================
+// 残局桌辅助函数
+//=====================================================================
+
+// 确保残局配置已加载(惰性加载, 路径相对于可执行文件目录下的 config/)
+static void EnsureEndgameLoaded()
+{
+    EndgameConfig *pCfg = EndgameConfig::GetInstance();
+    if (pCfg->GetCount() > 0)
+        return;
+    char szExePath[MAX_PATH];
+    GetModuleFileNameA(NULL, szExePath, MAX_PATH);
+    char* pSlash = strrchr(szExePath, '\\');
+    if (!pSlash) pSlash = strrchr(szExePath, '/');
+    std::string strPath;
+    if (pSlash)
+    {
+        strPath.assign(szExePath, pSlash - szExePath + 1);
+        strPath += "config/endgames.json";
+    }
+    else
+    {
+        strPath = "config/endgames.json";
+    }
+    pCfg->Load(strPath.c_str());
+}
+
+// 判断是否为残局桌号(残局桌号区间: [BASE, BASE + 残局数*2))
+static bool IsEndgameTable(int nTable)
+{
+    if (nTable < ENDGAME_TABLE_BASE)
+        return false;
+    EnsureEndgameLoaded();
+    int nEndgameSlotMax = EndgameConfig::GetInstance()->GetCount() * 2;
+    return nTable < ENDGAME_TABLE_BASE + nEndgameSlotMax;
+}
+
+// 为残局桌配置布局: 桌号 -> 残局序号 index = (nTable - BASE) / 2
+static void ConfigureEndgameTable(IGameTable *pTable, int nTable)
+{
+    EnsureEndgameLoaded();
+    int nIndex = (nTable - ENDGAME_TABLE_BASE) / 2;
+    const EndgameItem *pItem = EndgameConfig::GetInstance()->GetByIndex(nIndex);
+    if (pItem)
+        pTable->ConfigureEndgame(pItem->nId, pItem->layout, pItem->nPlayer);
+}
+
 BOOL CWebSocketGame::ClientSeatDown(PWSCLIENT pClient, LPVOID pData, DWORD dwSize)
 {
     if (dwSize < sizeof(SeatID))
@@ -399,7 +446,8 @@ BOOL CWebSocketGame::ClientSeatDown(PWSCLIENT pClient, LPVOID pData, DWORD dwSiz
 			return FALSE;
 		}
 	}
-    if (pSeatID->nTableId >= m_nMaxTable)
+    // 普通桌限制在 [0, m_nMaxTable), 残局桌在独立区间 [ENDGAME_TABLE_BASE, ...)
+    if (!IsEndgameTable(pSeatID->nTableId) && pSeatID->nTableId >= m_nMaxTable)
         return FALSE;
     if (pSeatID->nTableId < 0 || pSeatID->nSeat < 0)
     {
@@ -442,6 +490,9 @@ BOOL CWebSocketGame::ClientSeatDown(PWSCLIENT pClient, LPVOID pData, DWORD dwSiz
     if (it == m_tableClients.end())
     {
 		SAutoRefPtr<IGameTable> pTable(new CCnChess(this, pSeatID->nTableId),false);
+        // 残局桌: 按桌号推导并配置残局布局(坐哪桌即对应一个残局)
+        if (IsEndgameTable(pSeatID->nTableId))
+            ConfigureEndgameTable(pTable, pSeatID->nTableId);
         it = m_tableClients.insert(std::make_pair(pSeatID->nTableId, pTable)).first;
     }else{
 		if(it->second->HasPlayer( pSeatID->nSeat))
@@ -506,7 +557,8 @@ BOOL CWebSocketGame::ClientRobotInvite(PWSCLIENT pClient, LPVOID pData, DWORD dw
     int nSeat = pReq->nSeat;
     GAME_ROBOT_INVITE_ACK ack = { nTable, nSeat, 0 };
 
-    if (nSeat < 0 || nSeat >= PLAYER_COUNT || nTable < 0 || nTable >= m_nMaxTable)
+    if (nSeat < 0 || nSeat >= PLAYER_COUNT
+        || (!IsEndgameTable(nTable) && (nTable < 0 || nTable >= m_nMaxTable)))
     {
         SendMsg(pClient, GMT_ROBOT_INVITE_ACK, &ack, sizeof(ack));
         return FALSE;
@@ -548,29 +600,6 @@ BOOL CWebSocketGame::ClientRobotInvite(PWSCLIENT pClient, LPVOID pData, DWORD dw
 //=====================================================================
 // 残局打谱
 //=====================================================================
-
-// 确保残局配置已加载(惰性加载, 路径相对于可执行文件目录下的 config/)
-static void EnsureEndgameLoaded()
-{
-    EndgameConfig *pCfg = EndgameConfig::GetInstance();
-    if (pCfg->GetCount() > 0)
-        return;
-    char szExePath[MAX_PATH];
-    GetModuleFileNameA(NULL, szExePath, MAX_PATH);
-    char* pSlash = strrchr(szExePath, '\\');
-    if (!pSlash) pSlash = strrchr(szExePath, '/');
-    std::string strPath;
-    if (pSlash)
-    {
-        strPath.assign(szExePath, pSlash - szExePath + 1);
-        strPath += "config/endgames.json";
-    }
-    else
-    {
-        strPath = "config/endgames.json";
-    }
-    pCfg->Load(strPath.c_str());
-}
 
 // 残局列表下发 (Server -> Client)
 BOOL CWebSocketGame::ClientEndgameList(PWSCLIENT pClient, LPVOID pData, DWORD dwSize)
@@ -888,15 +917,11 @@ void CWebSocketGame::notifyRoomInfoChanged()
 {
     std::stringstream ss;
     ss.write((char *)&m_nMaxTable, sizeof(int));
-    // 残局桌(>=10000)不进入大厅房间列表
-    int nTableCount = 0;
-    for (auto &table : m_tableClients)
-        if (table.first < 10000) nTableCount++;
+    // 统计全部桌数(含残局桌); 首个字段 m_nMaxTable 仍控制普通大厅的桌卡数量, 保证大厅列表不变
+    int nTableCount = (int)m_tableClients.size();
     ss.write((char *)&nTableCount, sizeof(int));
     for (auto &table : m_tableClients)
     {
-        if (table.first >= 10000)
-            continue;
         ss.write((char *)&table.first, sizeof(int));
         int nPlayers = table.second->GetPlayerCount();
         ss.write((char *)&nPlayers, sizeof(int));
@@ -939,15 +964,11 @@ void CWebSocketGame::sendRoomInfo(PWSCLIENT pClient)
 {
 	std::stringstream ss;
 	ss.write((char*)&m_nMaxTable, sizeof(int));
-	// 残局桌(>=10000)不进入大厅房间列表
-	int nTableCount = 0;
-	for (auto &table : m_tableClients)
-		if (table.first < 10000) nTableCount++;
+	// 统计全部桌数(含残局桌); 首个字段 m_nMaxTable 仍控制普通大厅, 保证大厅列表不变
+	int nTableCount = (int)m_tableClients.size();
 	ss.write((char*)&nTableCount, sizeof(int));
 	for (auto &table : m_tableClients)
 	{
-		if (table.first >= 10000)
-			continue;
 		ss.write((char*)&table.first, sizeof(int));
 		int nPlayers = table.second->GetPlayerCount(); 
 		ss.write((char*)&nPlayers, sizeof(int));

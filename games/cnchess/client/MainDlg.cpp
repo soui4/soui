@@ -321,6 +321,9 @@ BOOL CMainDlg::_OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE> > data
         break;
     }
     bRet = m_pLobbyHandler->OnMessage(dwType, data);
+    // 残局大厅与普通大厅共用房间/桌卡信息, 二者都要接收
+    if (dwType == GMT_ROOM_INFO || dwType == GMT_TABLE_INFO)
+        m_pEndgameHandler->OnMessage(dwType, data);
     if(bRet) return TRUE;
     bRet = m_pEndgameHandler->OnMessage(dwType, data);
     if(bRet) return TRUE;
