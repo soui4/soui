@@ -8,6 +8,13 @@
     <imgframe name="btn_primary" src="svg:btn_primary" states="4" margin="5,5,5,5"/>
     <!-- 中国象棋Logo SVG -->
     <imglist name="skin_cnchess_logo" src="svg:cnchess_logo"/>
+    <!-- 主窗口背景 (9-patch 深木纹+金色边框) -->
+    <imgframe name="skin_main_bg" src="svg:main_window_bg" margin="24,24,24,24"/>
+    <!-- 窗口控制按钮 (最小化/最大化/还原/关闭, 4态) -->
+    <imglist name="skin_win_min" src="svg:win_btn_min" states="4"/>
+    <imglist name="skin_win_max" src="svg:win_btn_max" states="4"/>
+    <imglist name="skin_win_restore" src="svg:win_btn_restore" states="4"/>
+    <imglist name="skin_win_close" src="svg:win_btn_close" states="4"/>
     <!-- 登录界面背景装饰 -->
     <imgframe name="skin_login_bg" src="svg:login_bg" margin="10,10,10,10"/>
     <!-- 登录面板背景(9-patch圆角木纹+边框) -->

@@ -18,4 +18,7 @@
   <login_panel_dark value="#1A0D06"/>
   <login_panel value="#2A1810"/>
   <login_avatar_border value="#5D4E37"/>
+  <!-- 主窗口标题栏 -->
+  <main_title value="#F5E6C8"/>
+  <main_title_hi value="#FFD700"/>
 </color>

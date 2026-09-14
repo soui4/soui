@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="112" height="20" viewBox="0 0 112 20">
+  <!-- 关闭按钮 4态 (28x20) 金色主题, hover红色 -->
+  <defs>
+    <rect id="under" x="0.5" y="0.5" width="27" height="19" rx="4" ry="4"/>
+    <g id="glyph">
+      <path d="M9 6 L19 14 M19 6 L9 14" stroke="#DAA520" stroke-width="2" stroke-linecap="round"/>
+    </g>
+    <g id="glyphRed">
+      <path d="M9 6 L19 14 M19 6 L9 14" stroke="#FF1744" stroke-width="2" stroke-linecap="round"/>
+    </g>
+  </defs>
+
+  <!-- 态1 Normal (悬停红, 平时金) -->
+  <use href="#under" fill="rgba(0,0,0,0)" stroke="#5D4E37" stroke-width="1"/>
+  <use href="#glyph" opacity="0.7"/>
+
+  <!-- 态2 Hover: 红色底 + 白叉 -->
+  <use href="#under" x="28" fill="#E60026" stroke="#C4001E" stroke-width="1"/>
+  <g transform="translate(28,0)"><g transform="translate(0,0)"><path d="M9 6 L19 14 M19 6 L9 14" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/></g></g>
+
+  <!-- 态3 Pressed: 深红 -->
+  <use href="#under" x="56" fill="#B00018" stroke="#8F0013" stroke-width="1"/>
+  <g transform="translate(56,0)"><g transform="translate(0,0)"><path d="M9 6 L19 14 M19 6 L9 14" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/></g></g>
+
+  <!-- 态4 Disabled -->
+  <use href="#under" x="84" fill="rgba(0,0,0,0)" stroke="#5D4E37" stroke-width="1" opacity="0.5"/>
+  <g transform="translate(84,0)"><g transform="translate(0,0)"><path d="M9 6 L19 14 M19 6 L9 14" stroke="#5D4E37" stroke-width="2" stroke-linecap="round"/></g></g>
+</svg>

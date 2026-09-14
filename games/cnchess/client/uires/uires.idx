@@ -74,5 +74,11 @@
     <file name="btn_robot_medium" path="svg\btn_robot_medium.svg"/>
     <file name="btn_robot_advanced" path="svg\btn_robot_advanced.svg"/>
     <file name="btn_robot_invite" path="svg\btn_robot_invite.svg"/>
+
+    <file name="main_window_bg" path="svg\main_window_bg.svg"/>
+    <file name="win_btn_close" path="svg\win_btn_close.svg"/>
+    <file name="win_btn_max" path="svg\win_btn_max.svg"/>
+    <file name="win_btn_min" path="svg\win_btn_min.svg"/>
+    <file name="win_btn_restore" path="svg\win_btn_restore.svg"/>
   </svg>
 </resource>

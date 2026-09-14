@@ -1,4 +1,4 @@
-﻿//stamp:1481b81205f0fb73
+﻿//stamp:1481c26cc66baa69
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -77,6 +77,11 @@
 			const TCHAR * btn_robot_medium;
 			const TCHAR * btn_robot_advanced;
 			const TCHAR * btn_robot_invite;
+			const TCHAR * main_window_bg;
+			const TCHAR * win_btn_close;
+			const TCHAR * win_btn_max;
+			const TCHAR * win_btn_min;
+			const TCHAR * win_btn_restore;
 			}svg;
 	};
 #endif//_UIRES_H_
@@ -154,6 +159,11 @@ struct _UIRES UIRES={
 			_T("svg:btn_robot_medium"),
 			_T("svg:btn_robot_advanced"),
 			_T("svg:btn_robot_invite"),
+			_T("svg:main_window_bg"),
+			_T("svg:win_btn_close"),
+			_T("svg:win_btn_max"),
+			_T("svg:win_btn_min"),
+			_T("svg:win_btn_restore"),
 		},
 	};
 #else
@@ -184,6 +194,7 @@ struct _R{
 		 const wchar_t * btn_unmute;
 		 const wchar_t * cbx_sex;
 		 const wchar_t * chessboard;
+		 const wchar_t * content;
 		 const wchar_t * edit_desc;
 		 const wchar_t * edt_name;
 		 const wchar_t * edt_svr;
@@ -195,6 +206,7 @@ struct _R{
 		 const wchar_t * seat_0;
 		 const wchar_t * seat_1;
 		 const wchar_t * tileview_lobby;
+		 const wchar_t * tip_container;
 		 const wchar_t * txt_anchor_detail;
 		 const wchar_t * txt_anchor_layout;
 		 const wchar_t * txt_contact;
@@ -240,6 +252,7 @@ struct _R{
 		int btn_unmute;
 		int cbx_sex;
 		int chessboard;
+		int content;
 		int edit_desc;
 		int edt_name;
 		int edt_svr;
@@ -251,6 +264,7 @@ struct _R{
 		int seat_0;
 		int seat_1;
 		int tileview_lobby;
+		int tip_container;
 		int txt_anchor_detail;
 		int txt_anchor_layout;
 		int txt_contact;
@@ -290,6 +304,8 @@ struct _R{
 		int login_panel_dark;
 		int login_text;
 		int login_text_sub;
+		int main_title;
+		int main_title_hi;
 		int mask_select;
 		int red;
 		int white;
@@ -332,6 +348,7 @@ struct _R R={
 		L"btn_unmute",
 		L"cbx_sex",
 		L"chessboard",
+		L"content",
 		L"edit_desc",
 		L"edt_name",
 		L"edt_svr",
@@ -343,6 +360,7 @@ struct _R R={
 		L"seat_0",
 		L"seat_1",
 		L"tileview_lobby",
+		L"tip_container",
 		L"txt_anchor_detail",
 		L"txt_anchor_layout",
 		L"txt_contact",
@@ -369,60 +387,62 @@ struct _R R={
 	}
 	,
 	{
-		65547,
-		65548,
 		65549,
 		65550,
+		65551,
 		65552,
+		65554,
 		65542,
-		65562,
-		65553,
-		65566,
 		65564,
-		65565,
+		65555,
+		65568,
+		65566,
+		65567,
 		65540,
 		65539,
 		65537,
 		65541,
-		65544,
-		65571,
-		65538,
 		65546,
-		65570,
-		65586,
-		65545,
+		65573,
+		65538,
+		65548,
+		65572,
 		65543,
-		65569,
-		65551,
-		65558,
-		65587,
-		65554,
+		65588,
+		65547,
+		65545,
+		65571,
+		65553,
+		65560,
+		65589,
+		65556,
 		10,
 		11,
-		65556,
-		65575,
-		65574,
-		65580,
-		65585,
-		65572,
-		65583,
-		65573,
-		65555,
-		65578,
-		65579,
+		65558,
+		65544,
 		65577,
 		65576,
-		65581,
-		65559,
-		65560,
-		65567,
-		65557,
-		65568,
-		65584,
-		65536,
 		65582,
+		65587,
+		65574,
+		65585,
+		65575,
+		65557,
+		65580,
+		65581,
+		65579,
+		65578,
+		65583,
 		65561,
-		65563
+		65562,
+		65569,
+		65559,
+		65570,
+		65586,
+		65536,
+		65584,
+		65563,
+		65565
 	}
 	,
 	{
@@ -442,7 +462,9 @@ struct _R R={
 		13,
 		14,
 		15,
-		16
+		16,
+		17,
+		18
 	}
 	,
 	{
