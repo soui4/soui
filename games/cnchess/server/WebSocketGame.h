@@ -62,8 +62,6 @@ protected:
 	BOOL ClientRobotInvite(PWSCLIENT pClient, LPVOID pData, DWORD dwSize);
     // 残局打谱相关
     BOOL ClientEndgameList(PWSCLIENT pClient, LPVOID pData, DWORD dwSize);
-    BOOL ClientEndgameEnter(PWSCLIENT pClient, LPVOID pData, DWORD dwSize);
-    BOOL ClientEndgameLeave(PWSCLIENT pClient, LPVOID pData, DWORD dwSize);
 
     BOOL OnQuerySeat(SeatID *pSeatID);
 	BOOL OnMsg(PWSCLIENT pClient, DWORD dwType, LPVOID pData, DWORD dwSize);
