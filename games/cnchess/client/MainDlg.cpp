@@ -37,6 +37,7 @@ CMainDlg::CMainDlg(SGameTheme* pTheme)
 {
     m_pGame = new CChessGame(this,pTheme);
     m_pLobbyHandler = new LobbyHandler(this);
+    m_pEndgameHandler = new EndgameHandler(this, pTheme);
     m_webSocketClient.SetMessageHandler(this);
     m_themeDownloader.SetListener(this);
 }
@@ -45,6 +46,7 @@ CMainDlg::~CMainDlg()
 {
     delete m_pGame;
     delete m_pLobbyHandler;
+    delete m_pEndgameHandler;
 }
 
 BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
@@ -160,6 +162,7 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 
     // 初始化大厅（不依赖主题）
     m_pLobbyHandler->Init(FindChildByName(L"room_container"), &m_webSocketClient);
+    m_pEndgameHandler->Init(FindChildByName(L"endgame_container"), &m_webSocketClient);
     m_bLobbyInited = true;
 
     // 游戏初始化延迟到主题加载完成后（OnThemeReady）
@@ -183,6 +186,7 @@ void CMainDlg::OnLoginSuccess(SStringT strSvr, SStringT strName, char cSex)
 
     // 初始化大厅（不依赖主题）
     m_pLobbyHandler->Init(FindChildByName(L"room_container"), &m_webSocketClient);
+    m_pEndgameHandler->Init(FindChildByName(L"endgame_container"), &m_webSocketClient);
     m_bLobbyInited = true;
 
     // 游戏初始化延迟到主题加载完成后（OnThemeReady）
@@ -256,6 +260,7 @@ void CMainDlg::OnConnected()
 
     // 大厅不依赖主题，可以立即处理连接
     m_pLobbyHandler->OnConnected();
+    m_pEndgameHandler->OnConnected();
 
     // 游戏依赖主题，仅在已初始化时通知连接
     if (m_bGameInited)
@@ -317,8 +322,17 @@ BOOL CMainDlg::_OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE> > data
     }
     bRet = m_pLobbyHandler->OnMessage(dwType, data);
     if(bRet) return TRUE;
+    bRet = m_pEndgameHandler->OnMessage(dwType, data);
+    if(bRet) return TRUE;
     bRet = m_pGame->OnMessage(dwType, data);
     return bRet;
+}
+
+void CMainDlg::SwitchToTab(int nIndex)
+{
+    STabCtrl *pTab = FindChildByName2<STabCtrl>(L"main_tabctrl");
+    if (pTab)
+        pTab->SetCurSel(nIndex);
 }
 
 void CMainDlg::OnThemeReady(const SStringT& strThemeDir, bool bUpdated)

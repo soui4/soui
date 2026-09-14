@@ -6,6 +6,7 @@
   <lobby value="游戏大厅" />
   <cnchess value="开心象棋" />
   <about value="关于" />
+  <endgame value="残局" />
   <peace_req value="求和" />
   <peace_ack value="同意" />
   <surrender value="认输" />

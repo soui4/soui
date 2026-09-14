@@ -6,13 +6,14 @@ translucent="1"
   <root skin="_skin.sys.wnd.bkgnd" cache="1"  width="1000" height="800" layout="vbox">
     <window size="-2,40" colorBkgnd="@color/gold" display="0" visible="0" name="pane_ios_header"/>
     <window size="-2,0" weight="1" name="modal_root">
-      <tabctrl pos="0,0,-0,-0" tabHeight="36" duration="200" tabAlign="middle"
+      <tabctrl name="main_tabctrl" pos="0,0,-0,-0" tabHeight="36" duration="200" tabAlign="middle"
           tabSkin="skin_tab_bg"
           colorText="@color/text_light" colorTextHover="@color/gold" colorTextPush="@color/text_dark"
           font="size:14,bold">
         <include src="layout:page_lobby"/>
         <include src="layout:page_game"/>
         <include src="layout:page_about"/>
+        <include src="layout:page_endgame"/>
       </tabctrl>
       <!-- 顶层操作提示容器: 与 tabctrl 同处内容容器, 悬浮于所有页面之上, 由 CMainDlg::PlayTip 使用 -->
       <window pos="0,0,-0,-0" name="tip_container" layout="anchor" msgTransparent="1"/>

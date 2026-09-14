@@ -20,6 +20,10 @@ CCnChess::CCnChess(ITableListener* pListener, int nTableId):CGameTable(pListener
         m_bRobot[i] = false;
         m_nRobotLevel[i] = 0;
     }
+    m_bEndgame = false;
+    m_nEndgameId = -1;
+    m_nEndgamePlayer = 0;
+    memset(m_nEndgameLayout, 0, sizeof(m_nEndgameLayout));
 }
 
 CCnChess::~CCnChess()
@@ -88,18 +92,62 @@ BOOL CCnChess::OnMsg(PWSCLIENT pClient, DWORD dwType, LPVOID pData, DWORD dwSize
     return TRUE;
 }
 
+void CCnChess::ConfigureEndgame(int nEndgameId, const int layout[10][9], int nPlayer)
+{
+    m_bEndgame = true;
+    m_nEndgameId = nEndgameId;
+    m_nEndgamePlayer = nPlayer;
+    for (int y = 0; y < 10; y++)
+        for (int x = 0; x < 9; x++)
+            m_nEndgameLayout[y][x] = layout[y][x];
+}
+
 void CCnChess::OnGameStart()
 {
     CGameTable::OnGameStart();
     SLOGI() << "game start";
     //游戏开始前的初始化逻辑
-    m_layout.InitLayout(NULL,CS_RED);
+    if (m_bEndgame)
+    {
+        // 残局桌: 使用残局布局, 每局重新应用, 平移到以红方为下方
+        CChessLayout tmp;
+        tmp.InitLayout(m_nEndgameLayout, CS_RED);
+        memcpy(m_layout.m_chesses, tmp.m_chesses, sizeof(m_layout.m_chesses));
+        m_layout.m_selfSide = CS_RED;
+        m_layout.SetActiveSide(m_nEndgamePlayer ? CS_BLACK : CS_RED);
+        // 重新计算棋子的ID
+        int nID = 0;
+        for (int y = 0; y < 10; y++)
+            for (int x = 0; x < 9; x++)
+                m_layout.m_nChsID[y][x] = (m_layout.m_chesses[y][x] != CHSMAN_NULL) ? (++nID) : 0;
+        m_layout.m_nDeadRed = m_layout.m_nDeadBlack = 0;
+    }
+    else
+    {
+        m_layout.InitLayout(NULL, CS_RED);
+    }
     m_dwStartTime = time(NULL);
     MSG_INIT msg;
-    memcpy(msg.layout,m_layout.m_chesses,sizeof(msg.layout));
+    memcpy(msg.layout, m_layout.m_chesses, sizeof(msg.layout));
     msg.iRedIndex = m_nRedIndex;
 
-    m_nChsPassable = m_nLeftPassable = 22;
+    // 过河子数量按实际布局统计(残局布局棋子数量与常规开局不同)
+    m_nChsPassable = m_nLeftPassable = 0;
+    for (int y = 0; y < 10; y++)
+    {
+        for (int x = 0; x < 9; x++)
+        {
+            int nChs = m_layout.m_chesses[y][x];
+            if (nChs == CHSMAN_NULL)
+                continue;
+            int nSide = nChs / 7;
+            int nKind = nChs % 7;
+            // 车马炮兵卒视为可过河子(红/黑兵卒均计入)
+            if ((nKind >= CHSMAN_RED_JU && nKind <= CHSMAN_RED_PAO) || nKind == CHSMAN_RED_BING)
+                m_nLeftPassable++;
+        }
+    }
+    m_nChsPassable = m_nLeftPassable;
     m_regretRec[0].nLeft=m_regretRec[1].nLeft=m_dwProps[PROPID_REGRET];
     m_regretRec[0].iMoveStep=m_regretRec[1].iMoveStep=-1;
     m_nRegretSteps[0]=m_nRegretSteps[1]=0;
@@ -128,6 +176,9 @@ void CCnChess::OnGameEnd()
         }
     }
     m_nRedIndex = (m_nRedIndex+1)%2;
+    // 残局桌: 每局结束后双方交换局面(首步行棋方交替), 下一局由另一方先行
+    if (m_bEndgame)
+        m_nEndgamePlayer = (m_nEndgamePlayer + 1) % 2;
 }
 
 BOOL CCnChess::OnPlayerLeave(int seatId, PWSCLIENT pClient)

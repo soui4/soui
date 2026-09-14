@@ -1,4 +1,4 @@
-﻿//stamp:1481c2709f618c64
+//stamp:1481c2709f618c64
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -14,6 +14,7 @@
 			const TCHAR * page_lobby;
 			const TCHAR * page_game;
 			const TCHAR * page_about;
+			const TCHAR * page_endgame;
 			const TCHAR * dlg_peace_req;
 			const TCHAR * dlg_peace_ack;
 			const TCHAR * dlg_theme_progress;
@@ -97,6 +98,7 @@ struct _UIRES UIRES={
 			_T("LAYOUT:page_lobby"),
 			_T("LAYOUT:page_game"),
 			_T("LAYOUT:page_about"),
+			_T("LAYOUT:page_endgame"),
 			_T("LAYOUT:dlg_peace_req"),
 			_T("LAYOUT:dlg_peace_ack"),
 			_T("LAYOUT:dlg_theme_progress"),

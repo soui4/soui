@@ -13,6 +13,7 @@
 #include "CnChess.h"
 #include "PropBag.h"
 #include "ThemeResourceProvider.h"
+#include "EndgameConfig.h"
 #include <helper/slog.h>
 #define kLogTag "WebSocketGame"
 
@@ -544,6 +545,202 @@ BOOL CWebSocketGame::ClientRobotInvite(PWSCLIENT pClient, LPVOID pData, DWORD dw
     return TRUE;
 }
 
+//=====================================================================
+// 残局打谱
+//=====================================================================
+
+// 确保残局配置已加载(惰性加载, 路径相对于可执行文件目录下的 config/)
+static void EnsureEndgameLoaded()
+{
+    EndgameConfig *pCfg = EndgameConfig::GetInstance();
+    if (pCfg->GetCount() > 0)
+        return;
+    char szExePath[MAX_PATH];
+    GetModuleFileNameA(NULL, szExePath, MAX_PATH);
+    char* pSlash = strrchr(szExePath, '\\');
+    if (!pSlash) pSlash = strrchr(szExePath, '/');
+    std::string strPath;
+    if (pSlash)
+    {
+        strPath.assign(szExePath, pSlash - szExePath + 1);
+        strPath += "config/endgames.json";
+    }
+    else
+    {
+        strPath = "config/endgames.json";
+    }
+    pCfg->Load(strPath.c_str());
+}
+
+// 残局列表下发 (Server -> Client)
+BOOL CWebSocketGame::ClientEndgameList(PWSCLIENT pClient, LPVOID pData, DWORD dwSize)
+{
+    EnsureEndgameLoaded();
+    EndgameConfig *pCfg = EndgameConfig::GetInstance();
+    int nCount = pCfg->GetCount();
+    int nLen = sizeof(GAME_ENDGAME_LIST) - 1 + nCount * sizeof(ENDGAME_INFO);
+    std::vector<BYTE> buf(nLen);
+    PGAME_ENDGAME_LIST pList = (PGAME_ENDGAME_LIST)buf.data();
+    memset(pList, 0, nLen);
+    pList->nCount = nCount;
+    for (int i = 0; i < nCount; i++)
+    {
+        const EndgameItem *pItem = pCfg->GetByIndex(i);
+        if (!pItem) continue;
+        ENDGAME_INFO &info = pList->vInfo[i];
+        info.nId = pItem->nId;
+        info.nLevel = pItem->nLevel;
+        info.nPlayer = pItem->nPlayer;
+        strncpy(info.szTitle, pItem->szTitle, sizeof(info.szTitle) - 1);
+        memcpy(info.layout, pItem->layout, sizeof(info.layout));
+    }
+    SendMsg(pClient, GMT_ENDGAME_LIST_ACK, buf.data(), nLen);
+    SLOGI() << "send endgame list, count=" << nCount;
+    return TRUE;
+}
+
+// 进入残局桌 (Client -> Server)
+BOOL CWebSocketGame::ClientEndgameEnter(PWSCLIENT pClient, LPVOID pData, DWORD dwSize)
+{
+    if (dwSize < sizeof(GAME_ENDGAME_ENTER_REQ))
+        return FALSE;
+    GAME_ENDGAME_ENTER_REQ *pReq = (GAME_ENDGAME_ENTER_REQ *)pData;
+
+    GAME_ENDGAME_ENTER_ACK ack;
+    memset(&ack, 0, sizeof(ack));
+    ack.bSuccess = 0;
+    ack.nTableId = -1;
+    ack.nSeat = -1;
+
+    EnsureEndgameLoaded();
+    const EndgameItem *pItem = EndgameConfig::GetInstance()->FindById(pReq->nEndgameId);
+    if (!pItem || pReq->nEndgameId < 0)
+    {
+        SendMsg(pClient, GMT_ENDGAME_ENTER_ACK, &ack, sizeof(ack));
+        SLOGW() << "endgame not found, id=" << pReq->nEndgameId;
+        return FALSE;
+    }
+    int nTable = 10000 + pReq->nEndgameId;   // 残局桌号区间(>=10000)
+
+    // 先将玩家从现有桌位或临时列表移除
+    int id = pClient->m_pConn->getId();
+    if (id != -1)
+    {
+        int iTable = id / PLAYER_COUNT;
+        auto it = m_tableClients.find(iTable);
+        if (it != m_tableClients.end())
+        {
+            it->second->OnPlayerLeave(id % PLAYER_COUNT, pClient);
+            if (it->second->GetPlayerCount() == 0)
+                m_tableClients.erase(it);
+        }
+        pClient->m_pConn->setId(-1);
+        pClient->m_nTable = -1;
+        pClient->m_nIndex = -1;
+        pClient->m_bReady = FALSE;
+    }
+    for (auto it = m_tmpClients.begin(); it != m_tmpClients.end(); ++it)
+    {
+        if (*it == pClient)
+        {
+            m_tmpClients.erase(it);
+            break;
+        }
+    }
+
+    // 找到/创建残局桌
+    auto it = m_tableClients.find(nTable);
+    if (it == m_tableClients.end())
+    {
+        SAutoRefPtr<IGameTable> pTable(new CCnChess(this, nTable), false);
+        it = m_tableClients.insert(std::make_pair(nTable, pTable)).first;
+    }
+    if (it->second->GetState() != TABLE_STATE_WAIT)
+    {
+        SendMsg(pClient, GMT_ENDGAME_ENTER_ACK, &ack, sizeof(ack));
+        m_tmpClients.push_back(pClient);
+        pClient->m_pConn->setId(-1);
+        SLOGW() << "endgame table busy, table=" << nTable;
+        return FALSE;
+    }
+    int nSeat = it->second->GetEmptySeat();
+    if (nSeat < 0)
+    {
+        SendMsg(pClient, GMT_ENDGAME_ENTER_ACK, &ack, sizeof(ack));
+        m_tmpClients.push_back(pClient);
+        pClient->m_pConn->setId(-1);
+        SLOGW() << "endgame table full, table=" << nTable;
+        return FALSE;
+    }
+
+    it->second->ConfigureEndgame(pItem->nId, pItem->layout, pItem->nPlayer);
+
+    // 入座
+    pClient->m_nTable = nTable;
+    pClient->m_nIndex = nSeat;
+    pClient->m_pConn->setId(nTable * PLAYER_COUNT + nSeat);
+    it->second->OnAddPlayer(nSeat, pClient);
+
+    // 人机对战: 在另一座位安排机器人
+    int nRobotSeat = (nSeat + 1) % PLAYER_COUNT;
+    bool bRobotAdded = false;
+    if (pReq->bRobot && !it->second->HasPlayer(nRobotSeat))
+    {
+        PWSCLIENT pRobot = new GameClient;
+        pRobot->m_pConn = NULL;
+        pRobot->m_nTable = nTable;
+        pRobot->m_nIndex = nRobotSeat;
+        pRobot->m_dwState = 0;
+        pRobot->m_bReady = TRUE;    // 机器人入座即自动准备
+        SStringA strName = "残局机器人";
+        strncpy(pRobot->m_userInfo.szName, strName.c_str(), sizeof(pRobot->m_userInfo.szName) - 1);
+        pRobot->m_userInfo.uid = m_nextUid++;
+        pRobot->m_userInfo.nSex = SEX_SECRET;
+        pRobot->m_userInfo.nAvatarId = 1;
+        int nLevel = (pReq->nLevel >= ROBOT_LEVEL_BEGINNER && pReq->nLevel <= ROBOT_LEVEL_ADVANCED)
+                     ? pReq->nLevel : ROBOT_LEVEL_MEDIUM;
+        it->second->OnAddPlayer(nRobotSeat, pRobot);
+        it->second->SetupRobot(nRobotSeat, nLevel);
+        bRobotAdded = true;
+    }
+
+    ack.nTableId = nTable;
+    ack.nSeat = nSeat;
+    ack.nEndgameId = pItem->nId;
+    ack.bSuccess = 1;
+    memcpy(ack.layout, pItem->layout, sizeof(ack.layout));
+    SendMsg(pClient, GMT_ENDGAME_ENTER_ACK, &ack, sizeof(ack));
+
+    OnTableChange(nTable);
+    SLOGI() << "endgame enter: table=" << nTable << " endgame=" << pItem->nId
+            << " seat=" << nSeat << " robot=" << bRobotAdded;
+    return TRUE;
+}
+
+// 离开残局桌 (Client -> Server)
+BOOL CWebSocketGame::ClientEndgameLeave(PWSCLIENT pClient, LPVOID pData, DWORD dwSize)
+{
+    int id = pClient->m_pConn->getId();
+    if (id < 0)
+        return FALSE;
+    int nTableId = id / PLAYER_COUNT;
+    if (nTableId < 10000)   // 仅处理残局桌
+        return FALSE;
+    int nSeat = id % PLAYER_COUNT;
+    auto it = m_tableClients.find(nTableId);
+    if (it == m_tableClients.end())
+        return FALSE;
+    if (!it->second->OnPlayerLeave(nSeat, pClient))
+        return FALSE;
+    pClient->m_pConn->setId(-1);
+    pClient->m_nTable = -1;
+    pClient->m_nIndex = -1;
+    m_tmpClients.push_back(pClient);
+    OnTableChange(nTableId);
+    SLOGI() << "endgame leave: table=" << nTableId << " seat=" << nSeat;
+    return TRUE;
+}
+
 BOOL CWebSocketGame::OnQuerySeat(SeatID * pSeatID)
 {
 	int iTable = pSeatID->nTableId;
@@ -614,6 +811,12 @@ BOOL CWebSocketGame::OnMsg(PWSCLIENT pClient, DWORD dwType, LPVOID pData, DWORD 
 		return ClientReady(pClient, pData, dwSize);
 	case GMT_THEME_REQ:
 		return ClientThemeReq(pClient, pData, dwSize);
+	case GMT_ENDGAME_LIST_REQ:
+		return ClientEndgameList(pClient, pData, dwSize);
+	case GMT_ENDGAME_ENTER_REQ:
+		return ClientEndgameEnter(pClient, pData, dwSize);
+	case GMT_ENDGAME_LEAVE:
+		return ClientEndgameLeave(pClient, pData, dwSize);
 	default:
 		{
 			//转发到游戏桌处理
@@ -685,10 +888,15 @@ void CWebSocketGame::notifyRoomInfoChanged()
 {
     std::stringstream ss;
     ss.write((char *)&m_nMaxTable, sizeof(int));
-    int nTableCount = m_tableClients.size();
+    // 残局桌(>=10000)不进入大厅房间列表
+    int nTableCount = 0;
+    for (auto &table : m_tableClients)
+        if (table.first < 10000) nTableCount++;
     ss.write((char *)&nTableCount, sizeof(int));
     for (auto &table : m_tableClients)
     {
+        if (table.first >= 10000)
+            continue;
         ss.write((char *)&table.first, sizeof(int));
         int nPlayers = table.second->GetPlayerCount();
         ss.write((char *)&nPlayers, sizeof(int));
@@ -731,10 +939,15 @@ void CWebSocketGame::sendRoomInfo(PWSCLIENT pClient)
 {
 	std::stringstream ss;
 	ss.write((char*)&m_nMaxTable, sizeof(int));
-	int nTableCount = m_tableClients.size();
+	// 残局桌(>=10000)不进入大厅房间列表
+	int nTableCount = 0;
+	for (auto &table : m_tableClients)
+		if (table.first < 10000) nTableCount++;
 	ss.write((char*)&nTableCount, sizeof(int));
 	for (auto &table : m_tableClients)
 	{
+		if (table.first >= 10000)
+			continue;
 		ss.write((char*)&table.first, sizeof(int));
 		int nPlayers = table.second->GetPlayerCount(); 
 		ss.write((char*)&nPlayers, sizeof(int));

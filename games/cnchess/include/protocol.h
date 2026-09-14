@@ -199,6 +199,55 @@ typedef struct tagTHEME_DATA {
 	BYTE byData[1];		// 数据
 } THEME_DATA;
 
+//=====================================================================
+// 残局打谱 (Endgame)
+//=====================================================================
+//请求残局列表 (Client -> Server, 无数据)
+#define GMT_ENDGAME_LIST_REQ		122
+//残局列表 (Server -> Client)
+#define GMT_ENDGAME_LIST_ACK		123
+//请求进入残局桌 (Client -> Server)
+#define GMT_ENDGAME_ENTER_REQ		124
+//进入残局桌应答 (Server -> Client)
+#define GMT_ENDGAME_ENTER_ACK		125
+//离开残局桌 (Client -> Server)
+#define GMT_ENDGAME_LEAVE			126
+
+//残局条目信息
+typedef struct tagENDGAME_INFO
+{
+	int nId;			//残局ID
+	int nLevel;			//难度 1初级/2中级/3高级
+	int nPlayer;		//首步行棋方: 0=红先 1=黑先
+	char szTitle[64];	//标题 utf8
+	int layout[10][9];	//残局布局, 编码同CHESSMAN: 255空/正红(0-6)/负黑(7-13)
+}ENDGAME_INFO,*PENDGAME_INFO;
+
+//残局列表 (变长结构)
+typedef struct tagGAME_ENDGAME_LIST
+{
+	int nCount;					//残局数量
+	ENDGAME_INFO vInfo[1];		//残局条目数组
+}GAME_ENDGAME_LIST,*PGAME_ENDGAME_LIST;
+
+//进入残局桌请求
+typedef struct tagGAME_ENDGAME_ENTER_REQ
+{
+	int nEndgameId;	//残局ID
+	int bRobot;		//1=人机对战 0=人人对战
+	int nLevel;		//机器人难度(bRobot=1时有效)
+}GAME_ENDGAME_ENTER_REQ,*PGAME_ENDGAME_ENTER_REQ;
+
+//进入残局桌应答
+typedef struct tagGAME_ENDGAME_ENTER_ACK
+{
+	int nTableId;	//残局桌号(>=10000)
+	int nSeat;		//本机座位号
+	int nEndgameId;	//残局ID
+	uint32_t bSuccess;	//是否成功
+	int layout[10][9];	//残局布局(供预览用), 编码同ChessLayout:0空/正红/负黑
+}GAME_ENDGAME_ENTER_ACK,*PGAME_ENDGAME_ENTER_ACK;
+
 //其它游戏的消息ID从GMT_GAMEBASE+1开始
 #define	GMT_GAMEBASE		1000
 

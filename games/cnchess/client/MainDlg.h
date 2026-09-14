@@ -7,6 +7,7 @@
 #include "SGameTheme.h"
 #include "WebSocketClient.h"
 #include "LobbyHandler.h"
+#include "EndgameHandler.h"
 #include "ChessGame.h"
 #include "ThemeDownloadManager.h"
 #include "myprofile.h"
@@ -34,6 +35,8 @@ public:
     // 主题是否已加载
     bool IsThemeLoaded() const { return m_bThemeLoaded; }
     SWindow *getModalRoot() const{return m_modalRoot;}
+    // 切换主内容区页签(index: 0大厅/1对局/2关于/3残局)
+    void SwitchToTab(int nIndex);
 #if defined(__MOBILE__)
     // 登录成功回调（模态视图方式，移动平台不支持独立消息循环）
     void OnLoginSuccess(SStringT strSvr, SStringT strName, char cSex);
@@ -77,6 +80,7 @@ public:
         EVENT_NAME_COMMAND(L"btn_unmute", OnBtnUnmute)
         CHAIN_EVENT_MAP_MEMBER(*m_pGame)
         CHAIN_EVENT_MAP_MEMBER(*m_pLobbyHandler)
+        CHAIN_EVENT_MAP_MEMBER(*m_pEndgameHandler)
     EVENT_MAP_END2(SHostWnd)
 
     //HostWnd真实窗口消息处理
@@ -93,6 +97,7 @@ public:
 private:
     CChessGame* m_pGame;  // 游戏核心逻辑
     LobbyHandler* m_pLobbyHandler;
+    EndgameHandler* m_pEndgameHandler;
         // 网络通信
     WebSocketClient m_webSocketClient;
     SAutoRefPtr<SGameTheme> m_pTheme;
