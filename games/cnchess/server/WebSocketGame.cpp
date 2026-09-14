@@ -132,6 +132,7 @@ CWebSocketGame::CWebSocketGame()
     m_pListener = NULL;
     m_pWsServer = NULL;
     m_nMaxTable = 100; // 默认最大桌子数;
+	new CRobotAIPool();
 }
 
 CWebSocketGame::~CWebSocketGame()
@@ -149,6 +150,7 @@ CWebSocketGame::~CWebSocketGame()
 		m_pWsServer->quit();
 		m_pWsServer = NULL;
 	}
+	delete CRobotAIPool::getSingletonPtr();
 }
 
 BOOL CWebSocketGame::GameStart(unsigned short uPort)
