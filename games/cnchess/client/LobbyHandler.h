@@ -29,12 +29,14 @@ public:
      */
     virtual ~LobbyHandler();
 
+    void SetWebSocket(WebSocketClient* pWs);
+
     /**
      * @brief 初始化大厅处理器
      * @param pRoot 根窗口指针
      * @param pWs WebSocket客户端指针
      */
-    void Init(SWindow *pRoot, WebSocketClient *pWs);
+    void Init(SWindow *pRoot);
 
 public:
     /**

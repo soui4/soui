@@ -2230,6 +2230,7 @@ UINT SWindow::OnBuildTreeZorder(UINT iOrder)
             lstChild[i++] = pChild;
             pChild = pChild->GetWindow(GSW_NEXTSIBLING);
         }
+        SASSERT(i == lstChild.GetCount());
         // sort children by layer
         SArray<SWindow *> lstChildSorted;
         lstChildSorted.SetCount(lstChild.GetCount());

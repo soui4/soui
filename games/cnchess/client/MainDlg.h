@@ -109,7 +109,6 @@ private:
     bool m_bThemeLoaded;    // 主题是否已加载
     bool m_bGameInited;     // 游戏是否已初始化
     bool m_bConnected;      // WebSocket是否已连接
-    bool m_bLobbyInited;    // 大厅是否已初始化
 
     // 主题下载进度弹窗
     SModalRoot* m_pThemeProgressModal;

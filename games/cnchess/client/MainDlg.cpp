@@ -29,17 +29,18 @@ CMainDlg::CMainDlg(SGameTheme* pTheme)
 , m_bThemeLoaded(false)
 , m_bGameInited(false)
 , m_bConnected(false)
-, m_bLobbyInited(false)
 , m_pThemeProgressModal(NULL)
 , m_themeProgressSession(0)
 , m_modalRoot(NULL)
 , m_pTipContainer(NULL)
 {
+    m_webSocketClient.SetMessageHandler(this);
+    m_themeDownloader.SetListener(this);
     m_pGame = new CChessGame(this,pTheme);
     m_pLobbyHandler = new LobbyHandler(this);
     m_pEndgameHandler = new EndgameHandler(this, pTheme);
-    m_webSocketClient.SetMessageHandler(this);
-    m_themeDownloader.SetListener(this);
+    m_pLobbyHandler->SetWebSocket(&m_webSocketClient);
+    m_pEndgameHandler->SetWebSocket(&m_webSocketClient);
 }
 
 CMainDlg::~CMainDlg()
@@ -159,11 +160,6 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
     SStringT strTitle = SStringT().Format(_T("用户:%s"), myProfile->GetName().c_str());
     FindChildByName(L"txt_title")->SetWindowText(strTitle);
     SetWindowText(strTitle);
-
-    // 初始化大厅（不依赖主题）
-    m_pLobbyHandler->Init(FindChildByName(L"room_container"), &m_webSocketClient);
-    m_pEndgameHandler->Init(FindChildByName(L"endgame_container"), &m_webSocketClient);
-    m_bLobbyInited = true;
 
     // 游戏初始化延迟到主题加载完成后（OnThemeReady）
 
@@ -407,6 +403,9 @@ void CMainDlg::InitGameAndLobby()
     if (!m_bThemeLoaded) return;
 
     SLOGI() << "InitGameAndLobby: initializing game";
+    // 初始化大厅（不依赖主题）
+    m_pLobbyHandler->Init(FindChildByName(L"room_container"));
+    m_pEndgameHandler->Init(FindChildByName(L"endgame_container"));
     m_pGame->Init(FindChildByName(L"game_container"), &m_webSocketClient);
     m_bGameInited = true;
 

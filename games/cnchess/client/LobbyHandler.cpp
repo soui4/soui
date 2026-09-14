@@ -212,12 +212,14 @@ LobbyHandler::~LobbyHandler()
     }
 }
 
-void LobbyHandler::Init(SWindow *pRoot, WebSocketClient *pWs)
+void LobbyHandler::SetWebSocket(WebSocketClient* pWs) {
+    m_ws = pWs;
+}
+
+void LobbyHandler::Init(SWindow *pRoot)
 {
     m_pRoot = pRoot;
     m_pRoot->AddEvent(EVENTID(EventTableInfo));
-
-    m_ws = pWs;
     STileView *pTileView = m_pRoot->FindChildByName2<STileView>(L"tileview_lobby");
     m_pAdapter = new CTableAdapter(this);
     pTileView->SetAdapter(m_pAdapter);

@@ -34,7 +34,8 @@ public:
      * @param pRoot 残局页根窗口
      * @param pWs WebSocket客户端
      */
-    void Init(SWindow *pRoot, WebSocketClient *pWs);
+    void Init(SWindow *pRoot);
+    void SetWebSocket(WebSocketClient* pWs);
 
 public:
     EVENT_MAP_BEGIN()

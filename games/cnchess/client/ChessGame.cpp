@@ -502,6 +502,20 @@ BOOL CChessGame::OnChessPieceClick(IEvtArgs *e)
     }
     return TRUE;
 }
+
+static void TestChessBoardChilds(SWindow * m_pGameBoard) {
+    SArray<SWindow*> lstChild;
+    lstChild.SetCount(m_pGameBoard->GetChildrenCount());
+    int i = 0;
+    SWindow* pChild = m_pGameBoard->GetWindow(GSW_FIRSTCHILD);
+    while (pChild)
+    {
+        lstChild[i++] = pChild;
+        pChild = pChild->GetWindow(GSW_NEXTSIBLING);
+    }
+    SASSERT(i == m_pGameBoard->GetChildrenCount());
+}
+
 void CChessGame::Init(SWindow *pGameHost, WebSocketClient *pWs)
 {
     CChessBoard* pGameBoard = pGameHost->FindChildByName2<CChessBoard>(L"chessboard");
@@ -612,6 +626,7 @@ void CChessGame::Init(SWindow *pGameHost, WebSocketClient *pWs)
     m_pGameBoard->InsertIChild(pFlagTo);
     pFlagTo->AddRef();
 
+    TestChessBoardChilds(m_pGameBoard);
     OnStageChanged(STAGE_CONNECTING);
 }
 
@@ -807,7 +822,8 @@ void CChessGame::OnStageChanged(STAGE stage)
             OnSetActivePlayerIndex(GetActivePlayerIndex()==m_iSelfIndex?0:1);
         }
         break;
-    }    
+    }
+    TestChessBoardChilds(m_pGameBoard);
 }
 
 int CChessGame::GetScale() const {

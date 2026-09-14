@@ -289,10 +289,13 @@ EndgameHandler::~EndgameHandler()
     }
 }
 
-void EndgameHandler::Init(SWindow *pRoot, WebSocketClient *pWs)
+void EndgameHandler::SetWebSocket(WebSocketClient* pWs) {
+    m_ws = pWs;
+}
+
+void EndgameHandler::Init(SWindow *pRoot)
 {
     m_pRoot = pRoot;
-    m_ws = pWs;
 
     STileView *pTileView = m_pRoot->FindChildByName2<STileView>(L"tileview_endgame");
     if (pTileView)
@@ -499,10 +502,14 @@ void EndgameHandler::RenderLayout(const int layout[10][9])
 {
     if (!m_pPreviewBoard || !m_pTheme)
         return;
+    return;
     ClearPieces();
 
     SXmlNode xmlPiece = m_pTheme->GetTemplate(Template::kChessPiece);
     SStringW clsPieceName = xmlPiece.attribute(L"wndclass").as_string(L"chesspiece");
+    // 与对局棋盘一致, 为每颗棋子铺设阴影层(type==11)
+    SXmlNode xmlShadow = m_pTheme->GetTemplate(Template::kShadow);
+    SStringW clsShadowName = xmlShadow.attribute(L"wndclass").as_string(L"img");
 
     for (int y = 0; y < 10; y++)
     {
@@ -522,6 +529,18 @@ void EndgameHandler::RenderLayout(const int layout[10][9])
             pPiece->SetPos(CPoint(x, y));
             m_pPreviewBoard->InsertIChild(pPiece);
             m_pieces.push_back(pPiece);
+
+            // 阴影: 与 CChessGame::OnGameStart 相同的锚点(type==11)+枢轴
+            IWindow *pShadow = SApplication::getSingletonPtr()->CreateWindowByName(clsShadowName);
+            pShadow->InitFromXml(&xmlShadow);
+            SAnchorLayoutParam *pShadowParam = (SAnchorLayoutParam *)pShadow->GetLayoutParam();
+            SAnchorLayoutParamStruct *pShadowStruct = (SAnchorLayoutParamStruct *)pShadowParam->GetRawData();
+            pShadowStruct->pos.type = 11;
+            pShadowStruct->pos.x.fSize = (float)x;
+            pShadowStruct->pos.y.fSize = (float)y;
+            pShadow->SetPivot(0.5f, 0.0f);
+            m_pPreviewBoard->InsertIChild(pShadow);
+            m_pieces.push_back(pShadow);
         }
     }
     if (m_pPreviewBoard)
