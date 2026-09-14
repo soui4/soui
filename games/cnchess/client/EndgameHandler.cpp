@@ -113,9 +113,7 @@ public:
 
         auto slot = Subscriber(&CEndgameAdapter::OnButtonClick, this);
         auto selSlot = Subscriber(&CEndgameAdapter::OnTitleClick, this);
-        SWindow *pTitle = pItem->FindChildByName(L"txt_eg_table_title");
-        if (pTitle)
-            pTitle->SubscribeEvent(EventCmd::EventID, &selSlot);
+        pItem->SubscribeEvent(EventItemPanelClick::EventID, &selSlot);
 
         // 订阅邀请机器人及其难度按钮、座位按钮事件
         const wchar_t *kRobotBtns[] = { L"btn_invite_robot", L"btn_lvl_beginner", L"btn_lvl_medium", L"btn_lvl_advanced" };
@@ -126,6 +124,7 @@ public:
                 pBtn->SubscribeEvent(EventCmd::EventID, &slot);
         }
 
+        SWindow* pTitle = pItem->FindChildByName(L"txt_eg_table_title");
         // 标题 + 桌序号
         if (pTitle)
         {
@@ -471,7 +470,7 @@ void EndgameHandler::SelectEndgame(int nEndgameIndex)
     {
         SStringT strTitle;
         if (pInfo->nId > 0)
-            strTitle.Format(_T("#%d %s"), pInfo->nId, S_CA2T(pInfo->szTitle, CP_UTF8));
+            strTitle.Format(_T("#%d %s"), pInfo->nId, S_CA2T(pInfo->szTitle, CP_UTF8).c_str());
         else
             strTitle = S_CA2T(pInfo->szTitle, CP_UTF8);
         pTxtTitle->SetWindowText(strTitle);
