@@ -1,4 +1,4 @@
-#ifndef __GAMEPROTOCOL_H__
+﻿#ifndef __GAMEPROTOCOL_H__
 #define __GAMEPROTOCOL_H__
 
 #include "protocol.h"

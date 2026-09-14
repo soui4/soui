@@ -1,4 +1,4 @@
-#include <gtest/gtest.h>
+﻿#include <gtest/gtest.h>
 #include <windows.h>
 #include <tchar.h>
 #include <Chessman.h>
@@ -9,7 +9,7 @@
 TEST(ChessAlgorithmTest, BoardInitialization)
 {
     CChessLayout layout;
-    CHESSMAN initLayout[10][9];
+    int initLayout[10][9];
     
     // 初始化一个空棋盘
     for (int y = 0; y < 10; y++) {
@@ -33,7 +33,7 @@ TEST(ChessAlgorithmTest, BoardInitialization)
 TEST(ChessAlgorithmTest, JiangMovement)
 {
     CChessLayout layout;
-    CHESSMAN initLayout[10][9];
+    int initLayout[10][9];
     
     // 初始化一个空棋盘
     for (int y = 0; y < 10; y++) {
@@ -72,7 +72,7 @@ TEST(ChessAlgorithmTest, JiangMovement)
 TEST(ChessAlgorithmTest, JuMovement)
 {
     CChessLayout layout;
-    CHESSMAN initLayout[10][9];
+    int initLayout[10][9];
     
     // 初始化一个空棋盘
     for (int y = 0; y < 10; y++) {
@@ -106,7 +106,7 @@ TEST(ChessAlgorithmTest, JuMovement)
 TEST(ChessAlgorithmTest, MaMovement)
 {
     CChessLayout layout;
-    CHESSMAN initLayout[10][9];
+    int initLayout[10][9];
     
     // 初始化一个空棋盘
     for (int y = 0; y < 10; y++) {
@@ -147,7 +147,7 @@ TEST(ChessAlgorithmTest, MaMovement)
 TEST(ChessAlgorithmTest, PaoMovement)
 {
     CChessLayout layout;
-    CHESSMAN initLayout[10][9];
+    int initLayout[10][9];
     
     // 初始化一个空棋盘
     for (int y = 0; y < 10; y++) {
@@ -181,7 +181,7 @@ TEST(ChessAlgorithmTest, PaoMovement)
 TEST(ChessAlgorithmTest, ShiMovement)
 {
     CChessLayout layout;
-    CHESSMAN initLayout[10][9];
+    int initLayout[10][9];
     
     // 初始化一个空棋盘
     for (int y = 0; y < 10; y++) {
@@ -224,7 +224,7 @@ TEST(ChessAlgorithmTest, ShiMovement)
 TEST(ChessAlgorithmTest, XiangMovement)
 {
     CChessLayout layout;
-    CHESSMAN initLayout[10][9];
+    int initLayout[10][9];
     
     // 初始化一个空棋盘
     for (int y = 0; y < 10; y++) {
@@ -264,7 +264,7 @@ TEST(ChessAlgorithmTest, XiangMovement)
 TEST(ChessAlgorithmTest, BingMovement)
 {
     CChessLayout layout;
-    CHESSMAN initLayout[10][9];
+    int initLayout[10][9];
     
     // 初始化一个空棋盘
     for (int y = 0; y < 10; y++) {
@@ -323,7 +323,7 @@ TEST(ChessAlgorithmTest, BingMovement)
 TEST(ChessAlgorithmTest, MoveFunction)
 {
     CChessLayout layout;
-    CHESSMAN initLayout[10][9];
+    int initLayout[10][9];
     
     // 初始化一个空棋盘
     for (int y = 0; y < 10; y++) {
@@ -356,7 +356,7 @@ TEST(ChessAlgorithmTest, MoveFunction)
 TEST(ChessAlgorithmTest, UndoMove)
 {
     CChessLayout layout;
-    CHESSMAN initLayout[10][9];
+    int initLayout[10][9];
     
     // 初始化一个空棋盘
     for (int y = 0; y < 10; y++) {
@@ -392,7 +392,7 @@ TEST(ChessAlgorithmTest, UndoMove)
 TEST(ChessAlgorithmTest, MoveDescription)
 {
     CChessLayout layout;
-    CHESSMAN initLayout[10][9];
+    int initLayout[10][9];
     
     // 初始化一个空棋盘
     for (int y = 0; y < 10; y++) {
