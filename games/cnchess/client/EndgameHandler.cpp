@@ -310,14 +310,7 @@ void EndgameHandler::Init(SWindow *pRoot)
         SAnchorLayout *pAnchorLayout = sobj_cast<SAnchorLayout>(m_pPreviewBoard->GetLayout());
         if (pAnchorLayout)
             pAnchorLayout->SetPosition2PointCallback(ChessAnchor2Pos, this);
-
-        IWindow *pBackground = m_pTheme->GetWidget(Sprites::img_background);
-        if (pBackground)
-        {
-            m_pPreviewBoard->InsertIChild(pBackground);
-            pBackground->AddRef();
-        }
-        m_pChessBoard = sobj_cast<SImageWnd>(m_pTheme->GetWidget(Sprites::board_main));
+        m_pChessBoard = sobj_cast<SImageWnd>(m_pTheme->GetWidget(Sprites::board_preview));
         if (m_pChessBoard)
         {
             m_pPreviewBoard->InsertChild(m_pChessBoard);
@@ -502,7 +495,6 @@ void EndgameHandler::RenderLayout(const int layout[10][9])
 {
     if (!m_pPreviewBoard || !m_pTheme)
         return;
-    return;
     ClearPieces();
 
     SXmlNode xmlPiece = m_pTheme->GetTemplate(Template::kChessPiece);

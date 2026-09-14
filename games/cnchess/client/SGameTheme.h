@@ -57,6 +57,7 @@ namespace Sprites{
     static const wchar_t* img_clock = L"img_clock";         ///< 时钟图片
 
     static const wchar_t* board_main = L"board_main";       ///< 棋盘主界面
+    static const wchar_t* board_preview = L"board_preview";    ///< 棋盘预览
 }
 
 /**

@@ -52,6 +52,7 @@
         <gifplayer name="sprite_vectory" skin="ani_vectory_0" ownerLayout="anchor" pos="0,-50,4" offset="-0.5,-0.5" layer="1000" loopCount="1" msgTransparent="1" />
         <img name="img_background" skin="skin_background" ownerLayout="anchor" pos="0,0,0" size="-2,-2" layer="-2"/>
         <img name="board_main" skin="skin_chessboard" layout="anchor" ownerLayout="anchor" pos="0,0,4" offset="-0.5,-0.5" fitImage="1"/>
+        <img name="board_preview" skin="skin_chessboard" layout="anchor" ownerLayout="anchor" pos="0,0,4" offset="-0.5,-0.5" fitImage="1"/>
         
         <gifplayer name="sprite_flag_pos_to" skin="ani_flag_pos_to" ownerLayout="anchor" pos="0,1,10" size="90,90" offset="-0.5,-0.5" layer="50" msgTransparent="1" visible="0" />
         <img name="img_flag_pos_from" skin="skin_flag_pos_from" ownerLayout="anchor" pos="0,0,10" size="55,55" offset="-0.5,-0.5" layer="4" msgTransparent="1" visible="0"/>
