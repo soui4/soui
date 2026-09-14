@@ -1067,6 +1067,7 @@ void SWindow::InsertChild(SWindow *pNewChild, SWindow *pInsertAfter /**< =ICWND_
     ASSERT_UI_THREAD();
     if (pNewChild->GetParent() == this)
         return;
+    SASSERT(pNewChild->GetParent() == NULL);
     OnBeforeInsertChild(pNewChild);
     pNewChild->SetContainer(GetContainer());
 

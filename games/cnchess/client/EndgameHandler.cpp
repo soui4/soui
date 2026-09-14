@@ -517,7 +517,7 @@ void EndgameHandler::RenderLayout(const int layout[10][9])
             SAnchorLayoutParamStruct *pParamStruct = (SAnchorLayoutParamStruct *)pParam->GetRawData();
             pParamStruct->pos.type = 10;
             pParamStruct->pos.x.fSize = (float)x;
-            pParamStruct->pos.y.fSize = (float)y;
+            pParamStruct->pos.y.fSize = (float)(9-y);//using 9-y to swap top bottom color.
             pPiece->SetPos(CPoint(x, y));
             m_pPreviewBoard->InsertIChild(pPiece);
             m_pieces.push_back(pPiece);
@@ -576,6 +576,7 @@ void EndgameHandler::OnPreviewSizeChanged(IEvtArgs *e)
     m_ptBoardOrigin.y = rcBoard.bottom;
     m_cellWidth = rcBoard.Width() * 1.f / 8;
     m_cellHeight = rcBoard.Height() * 1.f / 9;
+    m_pPreviewBoard->SDispatchMessage(UM_SETSCALE, scale * 100, 1);
 }
 
 POINT CALLBACK EndgameHandler::ChessAnchor2Pos(const AnchorPos &pos, const CRect &rcParent,
