@@ -141,9 +141,17 @@ void CChsLytState::UpdateState()
 BOOL CChsLytState::IsJiangJun(CHSSIDE side)
 {
 	if(side==CS_RED)
+	{
+		//帅已被吃/不存在时(吃将或结束态)按"不在被将军"处理，避免越界崩溃
+		if(m_ptJiangRed.x<0 || m_ptJiangRed.y<0) return FALSE;
 		return m_ChessInfo[m_ptJiangRed.y][m_ptJiangRed.x]->m_lstAttacker.size()>0;
+	}
 	else
+	{
+		//将已被吃/不存在时(吃将或结束态)按"不在被将军"处理，避免越界崩溃
+		if(m_ptJiangBlack.x<0 || m_ptJiangBlack.y<0) return FALSE;
 		return m_ChessInfo[m_ptJiangBlack.y][m_ptJiangBlack.x]->m_lstAttacker.size()>0;
+	}
 }
 
 int CChsLytState::GetProtecter(POINT pt)

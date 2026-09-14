@@ -65,11 +65,11 @@ namespace
 // 智力等级 -> 搜索深度 映射
 TEST(ChessAITest, LevelToDepthMapping)
 {
-    EXPECT_EQ(4, CChessAI::LevelToDepth(ROBOT_LEVEL_BEGINNER)); // 初级
-    EXPECT_EQ(5, CChessAI::LevelToDepth(ROBOT_LEVEL_MEDIUM));   // 中级
+    EXPECT_EQ(3, CChessAI::LevelToDepth(ROBOT_LEVEL_BEGINNER)); // 初级
+    EXPECT_EQ(4, CChessAI::LevelToDepth(ROBOT_LEVEL_MEDIUM));   // 中级
     EXPECT_EQ(6, CChessAI::LevelToDepth(ROBOT_LEVEL_ADVANCED)); // 高级
-    EXPECT_EQ(4, CChessAI::LevelToDepth(0));                    // 非法等级回退初级
-    EXPECT_EQ(4, CChessAI::LevelToDepth(99));
+    EXPECT_EQ(3, CChessAI::LevelToDepth(0));                    // 非法等级回退初级
+    EXPECT_EQ(3, CChessAI::LevelToDepth(99));
 }
 
 // 默认开局下，三个难度均能给出一个有效、且不送王的走法
@@ -145,6 +145,109 @@ TEST(ChessAITest, AvoidsStayingInCheck)
     l2.Copy(&layout);
     l2.Move(best.pt1, best.pt2);
     EXPECT_FALSE(IsChecked(l2, CS_RED));
+}
+
+// 被炮将军时，AI 必须应将（炮隔子打将）
+TEST(ChessAITest, AvoidsCannonCheck)
+{
+    int board[10][9];
+    ClearBoard(board);
+    board[1][4] = CHSMAN_RED_JIANG; // 红将 (x=4,y=1)
+    board[0][0] = CHSMAN_RED_JU;    // 红方另有车可挡
+    board[5][4] = CHSMAN_BLK_BING;  // 炮架 (x=4,y=5)
+    board[9][4] = CHSMAN_BLK_PAO;   // 黑炮隔子瞄红将 (x=4,y=9)
+    board[9][3] = CHSMAN_BLK_JIANG; // 黑将
+
+    CChessLayout layout;
+    layout.InitLayout(board, CS_RED);
+
+    // 确认当前局面确实将军
+    EXPECT_TRUE(IsChecked(layout, CS_RED));
+
+    MOVESTEP best = CChessAI::SearchBestMove(layout, 3);
+    EXPECT_FALSE(IsInvalidMove(best));
+    if (IsInvalidMove(best))
+        return;
+
+    // 该走法必须解除将军
+    CChessLayout l2;
+    l2.Copy(&layout);
+    l2.Move(best.pt1, best.pt2);
+    EXPECT_FALSE(IsChecked(l2, CS_RED));
+}
+
+// 将帅照面(对脸)时，AI 必须移动将/帅或挡子解将
+TEST(ChessAITest, AvoidsFacingGeneralCheck)
+{
+    int board[10][9];
+    ClearBoard(board);
+    board[1][3] = CHSMAN_RED_JIANG; // 红将 (x=3,y=1)
+    board[9][3] = CHSMAN_BLK_JIANG; // 黑将 (x=3,y=9) 同列无遮挡
+
+    CChessLayout layout;
+    layout.InitLayout(board, CS_RED);
+
+    EXPECT_TRUE(IsChecked(layout, CS_RED));
+
+    MOVESTEP best = CChessAI::SearchBestMove(layout, 3);
+    EXPECT_FALSE(IsInvalidMove(best));
+    if (IsInvalidMove(best))
+        return;
+
+    CChessLayout l2;
+    l2.Copy(&layout);
+    l2.Move(best.pt1, best.pt2);
+    EXPECT_FALSE(IsChecked(l2, CS_RED));
+}
+
+// 被将军但有棋可走(有子可将应)时，AI 必须选择一个解杀的走法(挡/逃/吃将军子)
+TEST(ChessAITest, CheckedHasMoveForcesResponse)
+{
+    int board[10][9];
+    ClearBoard(board);
+    board[7][4] = CHSMAN_RED_JIANG; // 红将 (4,7)
+    board[9][4] = CHSMAN_BLK_JU;    // 黑车沿第4列将军(y8为空)
+    board[8][0] = CHSMAN_RED_JU;    // 红方另有第8行的一车,可横向挡在(4,8)
+    board[0][4] = CHSMAN_BLK_JIANG; // 黑将
+
+    CChessLayout layout;
+    layout.InitLayout(board, CS_RED);
+
+    // 构造的局面确实处于将军状态
+    EXPECT_TRUE(IsChecked(layout, CS_RED));
+
+    MOVESTEP best = CChessAI::SearchBestMove(layout, 3);
+    // 有棋可走，不存在必须判负
+    EXPECT_FALSE(IsInvalidMove(best));
+    if (IsInvalidMove(best))
+        return;
+
+    // 该走法必须解除将军(挡住了能挡子的应将)
+    CChessLayout l2;
+    l2.Copy(&layout);
+    l2.Move(best.pt1, best.pt2);
+    EXPECT_FALSE(IsChecked(l2, CS_RED));
+}
+
+// 被将军且无棋可走(将死)时，引擎判定无合法着法(对应判负信号)
+TEST(ChessAITest, CheckedNoMovesReturnsLoss)
+{
+    int board[10][9];
+    ClearBoard(board);
+    board[7][4] = CHSMAN_RED_JIANG; // 红将 (4,7)
+    board[9][4] = CHSMAN_BLK_JU;    // 黑车沿第4列封住纵向
+    board[7][0] = CHSMAN_BLK_JU;    // 黑车沿第7行封住横向
+    board[0][4] = CHSMAN_BLK_JIANG; // 黑将
+
+    CChessLayout layout;
+    layout.InitLayout(board, CS_RED);
+
+    // 双车锁死确为将军
+    EXPECT_TRUE(IsChecked(layout, CS_RED));
+
+    // 唯一子为红将,且 (3,7)/(5,7)/(4,6) 每一步走完仍被将军，故无任何合法着法
+    MOVESTEP best = CChessAI::SearchBestMove(layout, 3);
+    EXPECT_TRUE(IsInvalidMove(best)) << "将死局面应返回无合法着法(判负)";
 }
 
 // 搜索不会破坏原始棋盘状态(可用于多次调用/复局面)

@@ -71,6 +71,7 @@ int  CChsMoveGenerator::GetPossiableMoves(const CHESSMAN chsmLayout[10][9],BOOL 
 	for(int i=0;i<nRet;i++)
 	{
 		CHESSMAN cs=tmpLayout[ptMoves[i].y][ptMoves[i].x];
+		if(cs==CHSMAN_BLK_JIANG||cs==CHSMAN_RED_JIANG) continue;//将死即止:禁止吃将/飞将吃掉对方将
 		if(cs==CHSMAN_NULL || CHSMANSIDE(cs)!=CS_RED)
 		{
 			ptMoves[nValid++]=ptMoves[i];
