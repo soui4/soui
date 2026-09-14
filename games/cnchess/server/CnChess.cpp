@@ -22,7 +22,6 @@ CCnChess::CCnChess(ITableListener* pListener, int nTableId):CGameTable(pListener
     }
     m_bEndgame = false;
     m_nEndgameId = -1;
-    m_nEndgamePlayer = 0;
     memset(m_nEndgameLayout, 0, sizeof(m_nEndgameLayout));
 }
 
@@ -92,11 +91,10 @@ BOOL CCnChess::OnMsg(PWSCLIENT pClient, DWORD dwType, LPVOID pData, DWORD dwSize
     return TRUE;
 }
 
-void CCnChess::ConfigureEndgame(int nEndgameId, const int layout[10][9], int nPlayer)
+void CCnChess::ConfigureEndgame(int nEndgameId, const int layout[10][9])
 {
     m_bEndgame = true;
     m_nEndgameId = nEndgameId;
-    m_nEndgamePlayer = nPlayer;
     for (int y = 0; y < 10; y++)
         for (int x = 0; x < 9; x++)
             m_nEndgameLayout[y][x] = layout[y][x];
@@ -106,26 +104,12 @@ void CCnChess::OnGameStart()
 {
     CGameTable::OnGameStart();
     SLOGI() << "game start";
-    //游戏开始前的初始化逻辑
-    if (m_bEndgame)
-    {
-        // 残局桌: 使用残局布局, 每局重新应用, 平移到以红方为下方
-        CChessLayout tmp;
-        tmp.InitLayout(m_nEndgameLayout, CS_RED);
-        memcpy(m_layout.m_chesses, tmp.m_chesses, sizeof(m_layout.m_chesses));
-        m_layout.m_selfSide = CS_RED;
-        m_layout.SetActiveSide(m_nEndgamePlayer ? CS_BLACK : CS_RED);
-        // 重新计算棋子的ID
-        int nID = 0;
-        for (int y = 0; y < 10; y++)
-            for (int x = 0; x < 9; x++)
-                m_layout.m_nChsID[y][x] = (m_layout.m_chesses[y][x] != CHSMAN_NULL) ? (++nID) : 0;
-        m_layout.m_nDeadRed = m_layout.m_nDeadBlack = 0;
-    }
-    else
-    {
-        m_layout.InitLayout(NULL, CS_RED);
-    }
+    // 残局与常规模式的唯一区别: 开局使用残局布局, 其余逻辑(红先/红黑互换)与常规模式完全一致
+    m_layout.InitLayout(m_bEndgame ? m_nEndgameLayout : NULL, CS_RED);
+    SLOGI() << "[对局开局] table=" << GetID() << " endgame=" << m_bEndgame
+            << " redIndex=" << m_nRedIndex
+            << " actSide=" << (m_layout.m_actSide == CS_RED ? "RED" : "BLACK")
+            << " seat0Robot=" << m_bRobot[0] << " seat1Robot=" << m_bRobot[1];
     m_dwStartTime = time(NULL);
     MSG_INIT msg;
     memcpy(msg.layout, m_layout.m_chesses, sizeof(msg.layout));
@@ -176,9 +160,8 @@ void CCnChess::OnGameEnd()
         }
     }
     m_nRedIndex = (m_nRedIndex+1)%2;
-    // 残局桌: 每局结束后双方交换局面(首步行棋方交替), 下一局由另一方先行
-    if (m_bEndgame)
-        m_nEndgamePlayer = (m_nEndgamePlayer + 1) % 2;
+    SLOGI() << "[对局结束] table=" << GetID() << " endgame=" << m_bEndgame
+            << " redIndex->" << m_nRedIndex;
 }
 
 BOOL CCnChess::OnPlayerLeave(int seatId, PWSCLIENT pClient)
@@ -251,7 +234,9 @@ BOOL CCnChess::OnChessMove(PWSCLIENT pClient, DWORD dwType, LPVOID pData, DWORD 
         return FALSE;
     if(iIndexOrder != GetActiveSeat())
     {
-        SLOGW() << "Invalide move Seat="<<iIndexOrder;
+        SLOGW() << "[走棋拒绝] seat="<<iIndexOrder<<" != actSeat="<<GetActiveSeat()
+                <<" actSide="<<(m_layout.m_actSide==CS_RED?"RED":"BLACK")
+                <<" redIndex="<<m_nRedIndex;
         return FALSE;
     }
 
@@ -305,11 +290,16 @@ BOOL CCnChess::OnChessMove(PWSCLIENT pClient, DWORD dwType, LPVOID pData, DWORD 
 		BrdcstAckOver(GOT_PEACE,-1,szMsg);
 	}
     // 机器人对局：服务端检测胜负并驱动机器人走棋
-    if (HasRobot())
-    {
-        CheckServerOver();
-        TriggerIfRobotTurn();
-    }
+	    if (HasRobot())
+	    {
+	        CheckServerOver();
+	        TriggerIfRobotTurn();
+	    }
+	    else
+	    {
+	        SLOGI() << "[走棋后] actSide=" << (m_layout.m_actSide == CS_RED ? "RED" : "BLACK")
+	                << " actSeat=" << GetActiveSeat();
+	    }
 	return TRUE;
 }
 
@@ -554,6 +544,8 @@ void CCnChess::TriggerIfRobotTurn()
 {
 	if (m_state != TABLE_STATE_PLAYING) return;
 	int seat = GetActiveSeat();
+	SLOGI() << "[机器人回合检查] actSide=" << (m_layout.m_actSide == CS_RED ? "RED" : "BLACK")
+	        << " seat=" << seat << " robot=" << (seat>=0 && m_bRobot[seat]);
 	if (seat >= 0 && seat < PLAYER_COUNT && m_bRobot[seat])
 		RobotMakeMove(seat);
 }
@@ -563,11 +555,12 @@ void CCnChess::RobotMakeMove(int seatId)
 	if (m_state != TABLE_STATE_PLAYING) return;
 	if (GetActiveSeat() != seatId) return;  // 还不到该机器人走
 	if (!m_bRobot[seatId]) return;
-
+	SLOGI() << "[机器人走棋] seat=" << seatId << " actSeat=" << GetActiveSeat() << " actSide=" << (m_layout.m_actSide == CS_RED ? "RED" : "BLACK");
 	int nDepth = CChessAI::LevelToDepth(m_nRobotLevel[seatId]);
 	MOVESTEP best = CChessAI::SearchBestMove(m_layout, nDepth);
 	if (best.pt1.x < 0)
 	{//机器人无子可走，判负
+        SLOGE() << "[机器人走棋] 无子可走 seat=" << seatId;
 		BrdcstAckOver(GOT_NORMAL, seatId, L"您赢了！对方无子可走。");
 		return;
 	}

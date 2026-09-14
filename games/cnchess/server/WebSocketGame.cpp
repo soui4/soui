@@ -425,7 +425,7 @@ static void ConfigureEndgameTable(IGameTable *pTable, int nTable)
     int nIndex = (nTable - ENDGAME_TABLE_BASE) / 2;
     const EndgameItem *pItem = EndgameConfig::GetInstance()->GetByIndex(nIndex);
     if (pItem)
-        pTable->ConfigureEndgame(pItem->nId, pItem->layout, pItem->nPlayer);
+        pTable->ConfigureEndgame(pItem->nId, pItem->layout);
 }
 
 BOOL CWebSocketGame::ClientSeatDown(PWSCLIENT pClient, LPVOID pData, DWORD dwSize)

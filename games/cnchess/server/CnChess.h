@@ -36,8 +36,7 @@ public:
     // 将指定座位标记为机器人并记录智力等级(1=初级,2=中级,3=高级)
     void SetupRobot(int seatId, int nLevel) override;
     // 配置残局桌: 进入残局时设置自定义布局(布局始终以红方为下方向, 与正式棋盘一致)
-    // nPlayer: 首步行棋方 0=红先 1=黑先
-    void ConfigureEndgame(int nEndgameId, const int layout[10][9], int nPlayer);
+    void ConfigureEndgame(int nEndgameId, const int layout[10][9]);
 protected:
     // 象棋游戏相关方法
     void BrdcstAckOver(GAMEOVERTYPE nType, int nLossSeat, LPCWSTR pszDesc);
@@ -91,7 +90,6 @@ protected:
 	bool	m_bEndgame;					// 本桌是否为残局桌
 	int		m_nEndgameId;				// 残局ID
 	int		m_nEndgameLayout[10][9];	// 残局布局(正红方向)
-	int		m_nEndgamePlayer;			// 残局首步行棋方
 
 };
 

@@ -1,7 +1,7 @@
 ﻿// 残局打谱 - 游戏桌端到端(服务器逻辑层)测试
 //
 // 覆盖: endgames.json 配置加载、每个残局固定2张游戏桌的表位映射、
-// 残局布局合法性与首步行棋方、开局应用布局、一局结束后双方交换局面(交换先行方)。
+// 残局布局合法性、开局应用布局、一局结束后红方座位轮换(与常规模式一致)。
 #include <gtest/gtest.h>
 #include <windows.h>
 #include <tchar.h>
@@ -36,7 +36,6 @@ namespace
     public:
         TEndgameTable(ITableListener *l, int t) : SOUI::CCnChess(l, t) {}
         CChessLayout & TLayout() { return m_layout; }
-        int TFirstPlayer() const { return m_nEndgamePlayer; }
         bool TIsEndgame() const { return m_bEndgame; }
         int TPassable() const { return m_nChsPassable; }
     };
@@ -113,8 +112,9 @@ TEST(EndgameTableTest, TwoTablesPerEndgame)
     EXPECT_LT(ENDGAME_TABLE_BASE - 1, ENDGAME_TABLE_BASE);
 }
 
-// 残局桌渲染布局: 打开一局后按配置布局落子, 首步行棋方正确, 一局后交换先行方
-TEST(EndgameTableTest, EndgameGameFlowAppliesLayoutAndSwapsSides)
+// 残局桌渲染布局: 开局按配置布局落子, 与常规模式一致红先,
+// 一局结束后通过红方座位轮换实现交换双方(与常规模式一致)
+TEST(EndgameTableTest, EndgameGameFlowAppliesLayoutAndRotateRedSeat)
 {
     const EndgameItem *pEg = GetEndgameByIndex(0);
     ASSERT_NE(pEg, nullptr);
@@ -127,16 +127,15 @@ TEST(EndgameTableTest, EndgameGameFlowAppliesLayoutAndSwapsSides)
     table.OnAddPlayer(0, new GameClient);
     table.OnAddPlayer(1, new GameClient);
     EXPECT_EQ(table.GetPlayerCount(), 2);
+    int nRedSeat0 = table.GetRedSeat();         // 初始红方座位
 
-    // 配置残局: 布局 + 首步行棋方 = 黑先(1)
-    int nFirst = (pEg->nPlayer == 0) ? 1 : 0;   // 本测试显式验证黑先开局的情形
-    table.ConfigureEndgame(pEg->nId, pEg->layout, nFirst);
+    // 配置残局: 仅设置自定义布局, 其余逻辑与常规模式一致(无残局特有首行状态)
+    table.ConfigureEndgame(pEg->nId, pEg->layout);
 
     // 开局
     table.OnGameStart();
 
     EXPECT_TRUE(table.TIsEndgame()) << "残局桌标志应生效";
-    EXPECT_EQ(table.TFirstPlayer(), nFirst);
 
     // 布局被完整应用
     for (int y = 0; y < 10; y++)
@@ -144,20 +143,20 @@ TEST(EndgameTableTest, EndgameGameFlowAppliesLayoutAndSwapsSides)
             EXPECT_EQ((int)table.TLayout().m_chesses[y][x], pEg->layout[y][x])
                 << "残局布局未正确应用 cell=(" << x << "," << y << ")";
 
-    // 首步行棋方 = 黑(因 nFirst=1)
-    EXPECT_EQ((int)table.TLayout().m_actSide, CS_BLACK) << "首步行棋方应为黑先";
+    // 首步行棋方 = 红先, 与常规模式一致
+    EXPECT_EQ((int)table.TLayout().m_actSide, CS_RED) << "开局首行应红先";
     EXPECT_GT(table.TPassable(), 0) << "应统计到可过河子数量";
 
-    // 一局结束 → 双方交换局面(交换先行方)
+    // 一局结束 → 红方座位轮换(与常规模式一致)
     table.OnGameEnd();
-    EXPECT_EQ(table.TFirstPlayer(), (nFirst + 1) % 2) << "一局结束后应交换先行方";
+    EXPECT_EQ(table.GetRedSeat(), (nRedSeat0 + 1) % 2) << "一局结束后应轮换红方座位";
 
-    // 双方准备后再次开局, 首步行棋方应为红先
+    // 双方准备后再次开局, 首行仍红先, 红方座位保持轮换后的座位
     for (int i = 0; i < 2; i++)
         table.GetPlayer(i)->m_bReady = TRUE;
     table.OnGameStart();
-    EXPECT_EQ(table.TFirstPlayer(), (nFirst + 1) % 2);
-    EXPECT_EQ((int)table.TLayout().m_actSide, CS_RED) << "交换后第二局应由另一方先行";
+    EXPECT_EQ(table.GetRedSeat(), (nRedSeat0 + 1) % 2);
+    EXPECT_EQ((int)table.TLayout().m_actSide, CS_RED) << "交换后第二局首行仍红先";
 }
 
 // 普通桌与残局桌隔离: 普通桌不会进残局区间
