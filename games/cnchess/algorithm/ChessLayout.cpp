@@ -502,7 +502,10 @@ BOOL CChessLayout::IsValidMove(POINT pt1 , POINT pt2,CChsLytState *pLytState)
 	while(p!=pLstDest->end())
 	{
 		if(p->x==pt2.x && p->y==pt2.y 
-			&& CHSMANSIDE(m_chesses[pt1.y][pt1.x])!=CHSMANSIDE(m_chesses[pt2.y][pt2.x]))
+			&& CHSMANSIDE(m_chesses[pt1.y][pt1.x])!=CHSMANSIDE(m_chesses[pt2.y][pt2.x])
+			// 将死即止:不允许"吃掉对方将",落点为将/帅一步判非法
+			&& m_chesses[pt2.y][pt2.x]!=CHSMAN_RED_JIANG
+			&& m_chesses[pt2.y][pt2.x]!=CHSMAN_BLK_JIANG)
 		{
 			bRet=TRUE;
 			break;

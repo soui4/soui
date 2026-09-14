@@ -363,6 +363,13 @@ BOOL CChessGame::CheckMove(POINT ptFrom, POINT ptTo, BOOL bSilent){
         return FALSE;
     }
 
+    // 将死即止:不允许"吃掉对方将",落点为将/帅一步判非法
+    if (m_layout.m_chesses[ptTo.y][ptTo.x] == CHSMAN_RED_JIANG
+        || m_layout.m_chesses[ptTo.y][ptTo.x] == CHSMAN_BLK_JIANG)
+    {
+        return FALSE;
+    }
+
     CHSSIDE actSide=m_layout.m_actSide;
     BOOL bJiangJun = m_LytState.IsJiangJun(actSide); // 检查自己是否在被将军状态
     // 检查走棋后的效果，包括自杀及长捉
