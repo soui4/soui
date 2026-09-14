@@ -59,5 +59,9 @@
     <file name="progress_pos" path="svg\progress_pos.svg"/>
 
     <file name="list_item" path="svg\list_item.svg"/>
+    <file name="btn_robot_beginner" path="svg\btn_robot_beginner.svg"/>
+    <file name="btn_robot_medium" path="svg\btn_robot_medium.svg"/>
+    <file name="btn_robot_advanced" path="svg\btn_robot_advanced.svg"/>
+    <file name="btn_robot_invite" path="svg\btn_robot_invite.svg"/>
   </svg>
 </resource>
