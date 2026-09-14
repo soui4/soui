@@ -144,8 +144,12 @@ void CChessAI::GenerateLegalMoves(CChessLayout &layout, std::vector<MOVESTEP> &o
             for (int i = 0; i < n; i++)
             {
                 POINT pt2 = ptMoves[i];
+                // 将死即止:AI 不允许吃掉对方将(吃将/飞将),将死由"无合法着法"判定
+                CHESSMAN dst = layout.m_chesses[pt2.y][pt2.x];
+                if (dst == CHSMAN_RED_JIANG || dst == CHSMAN_BLK_JIANG)
+                    continue;
                 POINT ptBegin = { x, y };
-                CHESSMAN enemy = layout.m_chesses[pt2.y][pt2.x];
+                CHESSMAN enemy = dst;
                 int nEnemyID = layout.m_nChsID[pt2.y][pt2.x];
                 MOVESTEP ms = layout.Move(ptBegin, pt2);
                 if (!IsJiangInCheck(layout, mover))

@@ -71,7 +71,6 @@ int  CChsMoveGenerator::GetPossiableMoves(const CHESSMAN chsmLayout[10][9],BOOL 
 	for(int i=0;i<nRet;i++)
 	{
 		CHESSMAN cs=tmpLayout[ptMoves[i].y][ptMoves[i].x];
-		if(cs==CHSMAN_BLK_JIANG||cs==CHSMAN_RED_JIANG) continue;//将死即止:禁止吃将/飞将吃掉对方将
 		if(cs==CHSMAN_NULL || CHSMANSIDE(cs)!=CS_RED)
 		{
 			ptMoves[nValid++]=ptMoves[i];
@@ -113,20 +112,23 @@ int CChsMoveGenerator::GetMoves_Jiang(const CHESSMAN chsLayout[10][9],POINT ptFo
 		ptMoves[nRet].y=ptFocus.y+1;
 		nRet++;
 	}
-	//将帅对面检测
+	//将帅对面检测:红在下布局,敌将(黑)在上方,需扫全九宫列(而非固定y7-10)才能识别对脸"飞将"
     POINT ptEnemyKing = { -1, -1 };
-	for(int y=7;y<10;y++) for(int x=3;x<6;x++)
+	for(int yy=0;yy<10 && ptEnemyKing.x<0;yy++) for(int x=3;x<6;x++)
 	{
-		if(chsLayout[y][x]==CHSMAN_BLK_JIANG)
+		if(chsLayout[yy][x]==CHSMAN_BLK_JIANG)
 		{
-			ptEnemyKing.y=y,ptEnemyKing.x=x;
+			ptEnemyKing.y=yy,ptEnemyKing.x=x;
 			break;
 		}
 	}
 	if(ptEnemyKing.x==ptFocus.x)
 	{
+		//两将同列且之间通视时可飞吃对方将(不局限于己将一定在下)
 		BOOL bBlocked=FALSE;
-		for(int y=ptFocus.y+1;y<ptEnemyKing.y;y++)
+		int yLo=(ptFocus.y<ptEnemyKing.y)?ptFocus.y:ptEnemyKing.y;
+		int yHi=(ptFocus.y>ptEnemyKing.y)?ptFocus.y:ptEnemyKing.y;
+		for(int y=yLo+1;y<yHi;y++)
 		{
 			if(chsLayout[y][ptFocus.x]!=CHSMAN_NULL)
 			{
