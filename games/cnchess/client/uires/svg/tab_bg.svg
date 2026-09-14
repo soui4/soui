@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="248" height="30" viewBox="0 0 248 30">
+  <!-- tabctrl 标签头皮肤: 4态横向排布 (每态62x30) -->
+  <defs>
+    <linearGradient id="gNormal" x1="0" y1="0" x2="0" y2="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3A2818"/>
+      <stop offset="1" stop-color="#251408"/>
+    </linearGradient>
+    <linearGradient id="gHover" x1="0" y1="0" x2="0" y2="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4A3220"/>
+      <stop offset="1" stop-color="#2E1A0C"/>
+    </linearGradient>
+    <linearGradient id="gSel" x1="0" y1="0" x2="0" y2="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5D4E37"/>
+      <stop offset="0.55" stop-color="#3D2F1F"/>
+      <stop offset="1" stop-color="#2A1810"/>
+    </linearGradient>
+    <linearGradient id="gDis" x1="0" y1="0" x2="0" y2="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3A3A3A"/>
+      <stop offset="1" stop-color="#252525"/>
+    </linearGradient>
+  </defs>
+
+  <!-- ============ State 0: Normal (0-62) ============ -->
+  <path d="M1 30 L1 8 Q1 3 6 3 L24 3 L38 3 L56 3 Q61 3 61 8 L61 30 Z" fill="url(#gNormal)"/>
+  <path d="M1 30 L1 8 Q1 3 6 3 L24 3 L38 3 L56 3 Q61 3 61 8 L61 30 Z" fill="none" stroke="#5D4E37" stroke-width="1.4" opacity="0.9"/>
+
+  <!-- ============ State 1: Hover (62-124) ============ -->
+  <path d="M63 30 L63 8 Q63 3 68 3 L86 3 L100 3 L118 3 Q123 3 123 8 L123 30 Z" fill="url(#gHover)"/>
+  <path d="M63 30 L63 8 Q63 3 68 3 L86 3 L100 3 L118 3 Q123 3 123 8 L123 30 Z" fill="none" stroke="#DAA520" stroke-width="1.4"/>
+
+  <!-- ============ State 2: Selected / PushDown (124-186) ============ -->
+  <path d="M125 30 L125 8 Q125 3 130 3 L148 3 L162 3 L180 3 Q185 3 185 8 L185 30 Z" fill="url(#gSel)"/>
+  <path d="M125 30 L125 8 Q125 3 130 3 L148 3 L162 3 L180 3 Q185 3 185 8 L185 30 Z" fill="none" stroke="#FFD700" stroke-width="1.6"/>
+  <path d="M129 5 L167 5 L181 5" stroke="#FFD700" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- ============ State 3: Disabled (186-248) ============ -->
+  <path d="M187 30 L187 8 Q187 3 192 3 L210 3 L224 3 L242 3 Q247 3 247 8 L247 30 Z" fill="url(#gDis)"/>
+  <path d="M187 30 L187 8 Q187 3 192 3 L210 3 L224 3 L242 3 Q247 3 247 8 L247 30 Z" fill="none" stroke="#4A4A4A" stroke-width="1.4"/>
+</svg>

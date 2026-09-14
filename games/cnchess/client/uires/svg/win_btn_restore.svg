@@ -1,27 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="112" height="20" viewBox="0 0 112 20">
-  <!-- 还原按钮 4态 (28x20) 金色主题 -->
-  <defs>
-    <rect id="under" x="0.5" y="0.5" width="27" height="19" rx="4" ry="4"/>
-    <g id="glyph">
-      <rect x="6.5" y="9" width="10" height="7" rx="1" ry="1" fill="none" stroke="#DAA520" stroke-width="1.6"/>
-      <rect x="10.5" y="4" width="10" height="7" rx="1" ry="1" fill="none" stroke="#DAA520" stroke-width="1.6"/>
-    </g>
-  </defs>
+  <!-- 还原按钮 4态 (每态28x20) 金色主题 -->
 
   <!-- 态1 Normal -->
-  <use href="#under" fill="rgba(0,0,0,0)" stroke="#5D4E37" stroke-width="1"/>
-  <use href="#glyph" opacity="0.6"/>
+  <rect x="0.5" y="0.5" width="27" height="19" rx="4" ry="4" fill="rgba(0,0,0,0)" stroke="#5D4E37" stroke-width="1"/>
+  <rect x="7.5" y="9.5" width="10" height="6.5" rx="1" ry="1" fill="none" stroke="#DAA520" stroke-width="1.6" opacity="0.6"/>
+  <rect x="10.5" y="4.5" width="10" height="6.5" rx="1" ry="1" fill="none" stroke="#DAA520" stroke-width="1.6" opacity="0.6"/>
 
   <!-- 态2 Hover -->
-  <use href="#under" x="28" fill="#FFD700" stroke="#DAA520" stroke-width="1"/>
-  <g transform="translate(28,0)"><g transform="translate(0,0)"><rect x="6.5" y="9" width="10" height="7" rx="1" ry="1" fill="none" stroke="#2A1810" stroke-width="1.6"/><rect x="10.5" y="4" width="10" height="7" rx="1" ry="1" fill="none" stroke="#2A1810" stroke-width="1.6"/></g></g>
+  <rect x="28.5" y="0.5" width="27" height="19" rx="4" ry="4" fill="#FFD700" stroke="#DAA520" stroke-width="1"/>
+  <rect x="35.5" y="9.5" width="10" height="6.5" rx="1" ry="1" fill="none" stroke="#2A1810" stroke-width="1.6"/>
+  <rect x="38.5" y="4.5" width="10" height="6.5" rx="1" ry="1" fill="none" stroke="#2A1810" stroke-width="1.6"/>
 
   <!-- 态3 Pressed -->
-  <use href="#under" x="56" fill="#B8860B" stroke="#8B6B1F" stroke-width="1"/>
-  <g transform="translate(56,0)"><g transform="translate(0,0)"><rect x="6.5" y="9" width="10" height="7" rx="1" ry="1" fill="none" stroke="#1E0F07" stroke-width="1.6"/><rect x="10.5" y="4" width="10" height="7" rx="1" ry="1" fill="none" stroke="#1E0F07" stroke-width="1.6"/></g></g>
+  <rect x="56.5" y="0.5" width="27" height="19" rx="4" ry="4" fill="#B8860B" stroke="#8B6B1F" stroke-width="1"/>
+  <rect x="63.5" y="9.5" width="10" height="6.5" rx="1" ry="1" fill="none" stroke="#1E0F07" stroke-width="1.6"/>
+  <rect x="66.5" y="4.5" width="10" height="6.5" rx="1" ry="1" fill="none" stroke="#1E0F07" stroke-width="1.6"/>
 
   <!-- 态4 Disabled -->
-  <use href="#under" x="84" fill="rgba(0,0,0,0)" stroke="#5D4E37" stroke-width="1" opacity="0.5"/>
-  <g transform="translate(84,0)"><g transform="translate(0,0)"><rect x="6.5" y="9" width="10" height="7" rx="1" ry="1" fill="none" stroke="#5D4E37" stroke-width="1.6" opacity="0.5"/><rect x="10.5" y="4" width="10" height="7" rx="1" ry="1" fill="none" stroke="#5D4E37" stroke-width="1.6" opacity="0.5"/></g></g>
+  <rect x="84.5" y="0.5" width="27" height="19" rx="4" ry="4" fill="rgba(0,0,0,0)" stroke="#5D4E37" stroke-width="1" opacity="0.5"/>
+  <rect x="91.5" y="9.5" width="10" height="6.5" rx="1" ry="1" fill="none" stroke="#5D4E37" stroke-width="1.6" opacity="0.5"/>
+  <rect x="94.5" y="4.5" width="10" height="6.5" rx="1" ry="1" fill="none" stroke="#5D4E37" stroke-width="1.6" opacity="0.5"/>
 </svg>
