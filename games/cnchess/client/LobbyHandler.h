@@ -1,4 +1,4 @@
-﻿#ifndef LOBBYHANDLER_H
+#ifndef LOBBYHANDLER_H
 #define LOBBYHANDLER_H
 
 #include <sobject/Sobject.hpp>
@@ -87,6 +87,14 @@ private:
      * @return 是否处理成功
      */
     BOOL OnSeatDownAck(const void *lpData, int nSize);
+
+    /**
+     * @brief 处理邀请机器人入座确认
+     * @param lpData 消息数据指针
+     * @param nSize 消息数据大小
+     * @return 是否处理成功
+     */
+    BOOL OnRobotInviteAck(const void *lpData, int nSize);
     
     /**
      * @brief 处理登录确认消息
@@ -102,6 +110,20 @@ private:
      * @param iSeat 座位号
      */
     void ReqSeatDown(int iTable, int iSeat);
+
+    /**
+     * @brief 请求邀请机器人入座
+     * @param iTable 桌号
+     * @param iSeat 目标座位号
+     * @param nLevel 机器人智力等级(ROBOT_LEVEL_*)
+     */
+    void ReqRobotInvite(int iTable, int iSeat, int nLevel);
+
+    /**
+     * @brief 弹出提示消息框
+     * @param pszMsg 提示内容
+     */
+    void NotifyToast(LPCWSTR pszMsg);
     
   private:
     SWindow *m_pRoot;              ///< 根窗口指针

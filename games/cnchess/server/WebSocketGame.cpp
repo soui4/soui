@@ -1,4 +1,4 @@
-﻿// WebSocketGame.cpp: WebSocket版本的游戏服务器基类实现
+// WebSocketGame.cpp: WebSocket版本的游戏服务器基类实现
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -496,6 +496,54 @@ BOOL CWebSocketGame::ClientGetUp(PWSCLIENT pClient, LPVOID pData, DWORD dwSize)
     return TRUE;
 }
 
+BOOL CWebSocketGame::ClientRobotInvite(PWSCLIENT pClient, LPVOID pData, DWORD dwSize)
+{
+    if (dwSize < sizeof(GAME_ROBOT_INVITE_REQ))
+        return FALSE;
+    GAME_ROBOT_INVITE_REQ *pReq = (GAME_ROBOT_INVITE_REQ *)pData;
+    int nTable = pReq->nTableId;
+    int nSeat = pReq->nSeat;
+    GAME_ROBOT_INVITE_ACK ack = { nTable, nSeat, 0 };
+
+    if (nSeat < 0 || nSeat >= PLAYER_COUNT || nTable < 0 || nTable >= m_nMaxTable)
+    {
+        SendMsg(pClient, GMT_ROBOT_INVITE_ACK, &ack, sizeof(ack));
+        return FALSE;
+    }
+    auto it = m_tableClients.find(nTable);
+    if (it == m_tableClients.end())
+    {
+        // 需先有人坐下创建游戏桌
+        SendMsg(pClient, GMT_ROBOT_INVITE_ACK, &ack, sizeof(ack));
+        return FALSE;
+    }
+    if (it->second->GetState() != TABLE_STATE_WAIT || it->second->HasPlayer(nSeat))
+    {
+        SendMsg(pClient, GMT_ROBOT_INVITE_ACK, &ack, sizeof(ack));
+        return FALSE;
+    }
+
+    // 创建机器人客户端(无真实连接)
+    PWSCLIENT pRobot = new GameClient;
+    pRobot->m_pConn = NULL;                 // 机器人没有实际连接
+    pRobot->m_nTable = nTable;
+    pRobot->m_nIndex = nSeat;
+    pRobot->m_dwState = 0;
+    pRobot->m_bReady = TRUE;                // 机器人入座即自动准备
+    memcpy(&pRobot->m_userInfo, &pReq->stUserInfo, sizeof(GS_USERINFO));
+    pRobot->m_userInfo.uid = m_nextUid++;   // 分配唯一 UID
+
+    it->second->OnAddPlayer(nSeat, pRobot);
+    it->second->SetupRobot(nSeat, pReq->nLevel);
+
+    ack.bSuccess = 1;
+    SendMsg(pClient, GMT_ROBOT_INVITE_ACK, &ack, sizeof(ack));
+
+    OnTableChange(nTable);
+    SLOGI() << "Robot invite: table=" << nTable << " seat=" << nSeat << " level=" << pReq->nLevel;
+    return TRUE;
+}
+
 BOOL CWebSocketGame::OnQuerySeat(SeatID * pSeatID)
 {
 	int iTable = pSeatID->nTableId;
@@ -558,6 +606,8 @@ BOOL CWebSocketGame::OnMsg(PWSCLIENT pClient, DWORD dwType, LPVOID pData, DWORD 
 		return ClientSeatDown(pClient, pData, dwSize);
 	case GMT_GETUP_REQ:
 		return ClientGetUp(pClient, pData, dwSize);
+	case GMT_ROBOT_INVITE_REQ:
+		return ClientRobotInvite(pClient, pData, dwSize);
 	case GMT_AVATAR_REQ:
 		return ClientAvatar(pClient, pData, dwSize);
 	case GMT_READY:

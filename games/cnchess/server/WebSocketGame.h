@@ -1,4 +1,4 @@
-﻿// WebSocketGame.h: WebSocket版本的游戏服务器基类
+// WebSocketGame.h: WebSocket版本的游戏服务器基类
 // 替换原有的CGame类中的socket部分，使用SOUI5的ws模块实现
 //
 //////////////////////////////////////////////////////////////////////
@@ -59,6 +59,7 @@ protected:
     BOOL ClientSeatDown(PWSCLIENT pClient, LPVOID pData, DWORD dwSize);
 	BOOL ClientGetUp(PWSCLIENT pClient, LPVOID pData, DWORD dwSize);
 	BOOL ClientThemeReq(PWSCLIENT pClient, LPVOID pData, DWORD dwSize);
+	BOOL ClientRobotInvite(PWSCLIENT pClient, LPVOID pData, DWORD dwSize);
 
     BOOL OnQuerySeat(SeatID *pSeatID);
 	BOOL OnMsg(PWSCLIENT pClient, DWORD dwType, LPVOID pData, DWORD dwSize);

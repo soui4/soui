@@ -1,4 +1,4 @@
-﻿#ifndef __GAMETABLE_I_H__
+#ifndef __GAMETABLE_I_H__
 #define __GAMETABLE_I_H__
 
 #include <windows.h>
@@ -33,6 +33,8 @@ struct IGameTable : IObjRef
     virtual void OnRoundEnd() = 0; // called when round end.
     virtual void NotifyClient(PWSCLIENT pClient, LPCWSTR pszMsg) = 0;
     virtual void EndGame(int type, LPCWSTR pszDesc) = 0;
+    // 将指定座位标记为机器人并记录智力等级(默认无机器人)
+    virtual void SetupRobot(int seatId, int nLevel) {}
 };
 
 #endif // !__GAMETABLE_I_H__

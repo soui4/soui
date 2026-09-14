@@ -1,9 +1,14 @@
-﻿#ifndef __GAMEPROTOCOL_H__
+#ifndef __GAMEPROTOCOL_H__
 #define __GAMEPROTOCOL_H__
 
 #include "protocol.h"
 
 #define PLAYER_COUNT 2
+
+// 机器人智力等级
+#define ROBOT_LEVEL_BEGINNER 1 // 初级
+#define ROBOT_LEVEL_MEDIUM   2 // 中级
+#define ROBOT_LEVEL_ADVANCED 3 // 高级
 
 #pragma pack(push,1)
 // 象棋游戏消息类型定义

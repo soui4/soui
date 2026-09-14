@@ -1,4 +1,4 @@
-﻿#ifndef _PROTOCOL_H_
+#ifndef _PROTOCOL_H_
 #define _PROTOCOL_H_
 
 #include <stdint.h>
@@ -135,6 +135,24 @@ typedef struct tagGAME_AVATAR_ACK
 
 //玩家就绪
 #define GMT_READY				110
+
+//邀请机器人入座 (Client -> Server)
+#define GMT_ROBOT_INVITE_REQ		120
+typedef struct tagGAME_ROBOT_INVITE_REQ
+{
+	int nTableId;	//游戏桌ID
+	int nSeat;		//目标座位
+	int nLevel;		//机器人难度: ROBOT_LEVEL_BEGINNER/MEDIUM/ADVANCED
+	GS_USERINFO stUserInfo;	//机器人展示的用户信息
+}GAME_ROBOT_INVITE_REQ;
+//邀请机器人入座应答 (Server -> Client)
+#define GMT_ROBOT_INVITE_ACK		121
+typedef struct tagGAME_ROBOT_INVITE_ACK
+{
+	int nTableId;	//游戏桌ID
+	int nSeat;		//目标座位
+	uint32_t bSuccess;	//是否成功
+}GAME_ROBOT_INVITE_ACK;
 
 
 //退出游戏

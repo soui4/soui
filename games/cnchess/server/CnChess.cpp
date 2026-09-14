@@ -1,7 +1,8 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "CnChess.h"
 #include "GameClient.h"
 #include "PropBag.h"
+#include <ChessAI.h>
 #include <algorithm>
 #include <string/strcpcvt.h>
 #include <helper/slog.h>
@@ -14,6 +15,11 @@ CCnChess::CCnChess(ITableListener* pListener, int nTableId):CGameTable(pListener
 {
     m_nRedIndex = rand()%PLAYER_COUNT;
     memcpy(m_dwProps, PropBag::getSingletonPtr()->m_dwProps, sizeof(DWORD) * PROP_SIZE);
+    for (int i = 0; i < PLAYER_COUNT; i++)
+    {
+        m_bRobot[i] = false;
+        m_nRobotLevel[i] = 0;
+    }
 }
 
 CCnChess::~CCnChess()
@@ -104,22 +110,45 @@ void CCnChess::OnGameStart()
     m_lstMoves.clear();
 
     SendMsg(NULL, GMT_START, &msg, sizeof(msg));
+
+    // 若首个行棋方为机器人，立即触发走棋
+    TriggerIfRobotTurn();
 }
 
 void CCnChess::OnGameEnd()
 {
     CGameTable::OnGameEnd();
+    // 机器人自动重新准备，方便真人直接准备好进入下一局
+    for (int i = 0; i < PLAYER_COUNT; i++)
+    {
+        if (m_bRobot[i])
+        {
+            PWSCLIENT pc = GetPlayer(i);
+            if (pc) pc->m_bReady = TRUE;
+        }
+    }
     m_nRedIndex = (m_nRedIndex+1)%2;
 }
 
 BOOL CCnChess::OnPlayerLeave(int seatId, PWSCLIENT pClient)
 {
     int state = m_state;
-	CGameTable::OnPlayerLeave(seatId, pClient);
+    CGameTable::OnPlayerLeave(seatId, pClient);
     if (state == TABLE_STATE_PLAYING)
 	{
 		BrdcstAckOver(GOT_NETBREAK, seatId, L"对家断线");
 	}
+    // 真人离开时，清理桌上遗留的机器人(释放座位与内存，避免空桌残留)
+    for (int i = 0; i < PLAYER_COUNT; i++)
+    {
+        if (m_bRobot[i])
+        {
+            delete m_clients[i];
+            m_clients[i] = nullptr;
+            m_bRobot[i] = false;
+            m_nRobotLevel[i] = 0;
+        }
+    }
     return TRUE;
 }
 
@@ -224,6 +253,12 @@ BOOL CCnChess::OnChessMove(PWSCLIENT pClient, DWORD dwType, LPVOID pData, DWORD 
 		WCHAR szMsg[100]=L"双方无可过河子，自动判和！";
 		BrdcstAckOver(GOT_PEACE,-1,szMsg);
 	}
+    // 机器人对局：服务端检测胜负并驱动机器人走棋
+    if (HasRobot())
+    {
+        CheckServerOver();
+        TriggerIfRobotTurn();
+    }
 	return TRUE;
 }
 
@@ -434,6 +469,98 @@ UINT CCnChess::GetFarthestRepeat(CHESSMAN & chsEnemy)
 		layout.UndoMove(*p);
 	}
 	return nRet;
+}
+
+void CCnChess::SetupRobot(int seatId, int nLevel)
+{
+	if (seatId < 0 || seatId >= PLAYER_COUNT) return;
+	m_bRobot[seatId] = true;
+	m_nRobotLevel[seatId] = nLevel;
+}
+
+bool CCnChess::HasRobot() const
+{
+	for (int i = 0; i < PLAYER_COUNT; i++)
+		if (m_bRobot[i]) return true;
+	return false;
+}
+
+void CCnChess::CheckServerOver()
+{
+	if (m_state != TABLE_STATE_PLAYING) return;
+	CChsLytState state(&m_layout);
+	state.UpdateState();
+	CHSSIDE csWinner = state.GetWinner();
+	if (csWinner == CS_RED || csWinner == CS_BLACK)
+	{
+		int winSeat = (csWinner == CS_RED) ? GetRedSeat() : (GetRedSeat() + 1) % 2;
+		int lossSeat = (winSeat + 1) % 2;
+		BrdcstAckOver(GOT_NORMAL, lossSeat, L"将死/困毙，对方获胜！");
+	}
+}
+
+void CCnChess::TriggerIfRobotTurn()
+{
+	if (m_state != TABLE_STATE_PLAYING) return;
+	int seat = GetActiveSeat();
+	if (seat >= 0 && seat < PLAYER_COUNT && m_bRobot[seat])
+		RobotMakeMove(seat);
+}
+
+void CCnChess::RobotMakeMove(int seatId)
+{
+	if (m_state != TABLE_STATE_PLAYING) return;
+	if (GetActiveSeat() != seatId) return;  // 还不到该机器人走
+	if (!m_bRobot[seatId]) return;
+
+	int nDepth = CChessAI::LevelToDepth(m_nRobotLevel[seatId]);
+	MOVESTEP best = CChessAI::SearchBestMove(m_layout, nDepth);
+	if (best.pt1.x < 0)
+	{//机器人无子可走，判负
+		BrdcstAckOver(GOT_NORMAL, seatId, L"您赢了！对方无子可走。");
+		return;
+	}
+
+	// 时间累计
+	time_t now = time(NULL);
+	m_alTime[seatId] += now - m_dwStartTime;
+	m_dwStartTime = now;
+
+	MOVESTEP mstep = m_layout.Move(best.pt1, best.pt2);
+	m_lstMoves.push_back(mstep);
+
+	MSG_MOVE msg;
+	msg.ptBegin = best.pt1;
+	msg.ptEnd = best.pt2;
+	msg.bLocal = 0;
+	msg.iIndex = seatId;
+	msg.dwRoundTime = (DWORD)m_alTime[seatId];
+	SendMsg(NULL, MSG_REQ_MOVE, &msg, sizeof(msg)); // 广播给所有用户(机器人无连接不会收到)
+	m_nChessMsg++;
+
+	// 累计未吃子步数
+	if (mstep.enemy == CHSMAN_NULL)
+		m_nPeaceSteps++;
+	else
+	{
+		m_nPeaceSteps = 0;
+		int nChs = mstep.enemy % 7;
+		if ((nChs >= CHSMAN_RED_JU && nChs <= CHSMAN_RED_PAO) || nChs == CHSMAN_RED_BING)
+			m_nLeftPassable--;
+	}
+	if (m_nPeaceSteps == m_dwProps[PROPID_MAX_STP_PEACE])
+	{
+		BrdcstAckOver(GOT_PEACE, -1, L"未吃子，自动判和！");
+		return;
+	}
+	if (m_nLeftPassable == 0)
+	{
+		BrdcstAckOver(GOT_PEACE, -1, L"双方无可过河子，自动判和！");
+		return;
+	}
+
+	// 检测机器人走子后是否已经分出胜负，否则若轮到真人对局则结束本次驱动
+	CheckServerOver();
 }
 
 SNSEND

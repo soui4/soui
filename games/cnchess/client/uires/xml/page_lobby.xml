@@ -9,7 +9,7 @@
     
     <!-- 游戏桌列表 -->
     <tileview name="tileview_lobby" size="-2,0" weight="1" wantTab="1" marginSize="8" sbFadeFrames="30" enableItemDragScroll="1" align="center">
-        <template itemWidth="220" itemHeight="180" layout="vbox" gravity="center" skin="skin_item_bk">
+        <template itemWidth="220" itemHeight="214" layout="vbox" gravity="center" skin="skin_item_bk">
             <!-- 顶部: 桌子ID和状态 -->
             <window size="-2,30" layout="hbox" interval="5" gravity="center_vertical" padding="20,10,20,0">
                 <text name="txt_table_id" text="桌号: 0" colorText="#FFD700" font="size:12,bold"/>
@@ -33,6 +33,14 @@
                     <img name="seat_1" msgTransparent="0" size="50,60" id="11" cursor="hand" skin="skin_seat" iconIndex="3"/>
                     <text name="txt_seat_1" text="空位" colorText="#CCCCCC" font="size:10" gravity="center"/>
                 </window>
+            </window>
+
+            <!-- 邀请机器人: 点击展开难度(初/中/高) -->
+            <window size="-2,26" layout="hbox" interval="6" gravity="center" padding="20,2,20,2">
+                <button name="btn_invite_robot" text="邀请机器人" size="-2,22" cursor="hand" font="size:10"/>
+                <button name="btn_lvl_beginner" text="初" visible="0" size="-4,22" cursor="hand" font="size:10"/>
+                <button name="btn_lvl_medium" text="中" visible="0" size="-4,22" cursor="hand" font="size:10"/>
+                <button name="btn_lvl_advanced" text="高" visible="0" size="-4,22" cursor="hand" font="size:10"/>
             </window>
             
             <!-- 底部: 分隔线和状态提示 -->

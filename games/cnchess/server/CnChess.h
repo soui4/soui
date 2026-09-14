@@ -1,4 +1,4 @@
-﻿#ifndef __CNCHESSTABLE_H__
+#ifndef __CNCHESSTABLE_H__
 #define __CNCHESSTABLE_H__
 
 #include "GameTable-i.h"
@@ -33,6 +33,8 @@ public:
     void OnGameEnd() override;
     void OnRoundEnd() override{}
     BOOL OnPlayerLeave(int seatId, PWSCLIENT pClient) override;
+    // 将指定座位标记为机器人并记录智力等级(1=初级,2=中级,3=高级)
+    void SetupRobot(int seatId, int nLevel) override;
 protected:
     // 象棋游戏相关方法
     void BrdcstAckOver(GAMEOVERTYPE nType, int nLossSeat, LPCWSTR pszDesc);
@@ -52,6 +54,12 @@ protected:
     }
 	UINT GetFarthestRepeat(CHESSMAN & chsEnemy);
     int GetActiveSeat() const;
+
+	// 机器人相关辅助
+	bool HasRobot() const;              // 桌上是否有机器人
+	void RobotMakeMove(int seatId);     // 让机器人思考并走一步
+	void CheckServerOver();             // 服务端将死/困毙检测(仅机器人对局)
+	void TriggerIfRobotTurn();          // 当前行棋方为机器人时触发走棋
 protected:
 	DWORD	m_dwProps[PROP_SIZE];//游戏室属性
 
@@ -72,6 +80,9 @@ protected:
 
 	time_t m_alTime[ PLAYER_COUNT ];
 	time_t m_dwStartTime; 
+
+	bool	m_bRobot[PLAYER_COUNT];		// 座位是否为机器人
+	int		m_nRobotLevel[PLAYER_COUNT];	// 机器人智力等级(ROBOT_LEVEL_*)
 
 };
 
