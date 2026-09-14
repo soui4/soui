@@ -98,19 +98,22 @@ void WsServer::run()
 void WsServer::DrainServiceQueue()
 {
     // 服务队列在 LWS 事件线程(LWS线程)上排空, 确保回调与其他游戏消息串行执行
-    std::deque<std::function<void()> > tasks;
+    std::deque<SAutoRefPtr<IRunnable> > tasks;
     {
         std::lock_guard<std::mutex> lock(m_serviceMutex);
         tasks.swap(m_serviceQueue);
     }
-    for (auto &task : tasks)
-        task();
+    for (size_t i = 0; i < tasks.size(); ++i)
+        tasks[i]->run();
 }
 
-void WsServer::postServiceTask(std::function<void()> task)
+void WsServer::postServiceTask(IRunnable * task)
 {
+    // clone 使调用方栈上的 IRunnable 可在返回后安全销毁(与 ITaskLoop::postTask 一致)
+    SAutoRefPtr<IRunnable> pClone;
+    pClone.Attach(task->clone());
     std::lock_guard<std::mutex> lock(m_serviceMutex);
-    m_serviceQueue.push_back(std::move(task));
+    m_serviceQueue.push_back(pClone);
 }
 
 static void lws_send_ping(struct lws *wsi) {

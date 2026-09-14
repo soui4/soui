@@ -16,7 +16,6 @@
 #include <thread>
 #include <mutex>
 #include <deque>
-#include <functional>
 
 SNSBEGIN
 
@@ -42,7 +41,7 @@ class WsServer : public TObjRefImpl<IWsServer> {
     STDMETHODIMP_(int) start(THIS_ uint16_t port, const char *protocolName, SvrOption option, SvrPingCfg pingCfg) OVERRIDE;
     STDMETHODIMP_(BOOL) wait(THIS_ int timeoutMs) OVERRIDE;
     STDMETHODIMP_(void) quit(THIS) OVERRIDE;
-    STDMETHODIMP_(void) postServiceTask(THIS_ std::function<void()> task) OVERRIDE;
+    STDMETHODIMP_(void) postServiceTask(THIS_ IRunnable * task) OVERRIDE;
   private:
     void run();
     void DrainServiceQueue();
@@ -62,7 +61,7 @@ class WsServer : public TObjRefImpl<IWsServer> {
     lws_context *m_context;
 
     std::mutex m_serviceMutex;
-    std::deque<std::function<void()> > m_serviceQueue;
+    std::deque<SAutoRefPtr<IRunnable> > m_serviceQueue;
 
     static int cb_lws(lws *websocket, lws_callback_reasons reasons, void *userData, void *data, std::size_t len);
 

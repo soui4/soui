@@ -16,6 +16,7 @@
 #include "EndgameConfig.h"
 #include "RobotAIPool.h"
 #include <helper/slog.h>
+#include <helper/SFunctor.hpp>
 #include <functional>
 #define kLogTag "WebSocketGame"
 
@@ -185,7 +186,11 @@ BOOL CWebSocketGame::GameStart(unsigned short uPort)
 	    CRobotAIPool *pool = CRobotAIPool::getSingletonPtr();
 	    pool->Init(PropBag::getSingletonPtr()->GetRobotAIPool());
 	    pool->SetSink(
-	        [this](std::function<void()> fn) { m_pWsServer->postServiceTask(std::move(fn)); },
+	        [this](std::function<void()> fn) {
+	            // 包一层 SOUI IRunnable 再投递, postServiceTask 内部会 clone, 栈对象可安全返回
+	            StdRunnable runnable(std::move(fn));
+	            m_pWsServer->postServiceTask(&runnable);
+	        },
 	        [this](int tableId, int seatId, int generation, const MOVESTEP &best) {
 	            auto it = m_tableClients.find(tableId);
 	            if (it == m_tableClients.end())
