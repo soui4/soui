@@ -1,4 +1,4 @@
-//stamp:01dd44026db82e97
+//stamp:01dd4428b077daa9
 /*<------------------------------------------------------------------------------------------------->*/
 #define DEFINE_UIRES(name, type, file_path)\
     name type file_path
@@ -7,6 +7,7 @@ DEFINE_UIRES(XML_INIT,	UIDEF,	"uires/uidef/init.xml")
 DEFINE_UIRES(XML_MAINWND,	LAYOUT,	"uires/xml/dlg_main.xml")
 DEFINE_UIRES(XML_LOGIN,	LAYOUT,	"uires/xml/dlg_login.xml")
 DEFINE_UIRES(page_lobby,	LAYOUT,	"uires/xml/page_lobby.xml")
+DEFINE_UIRES(page_endgame,	LAYOUT,	"uires/xml/page_endgame.xml")
 DEFINE_UIRES(page_game,	LAYOUT,	"uires/xml/page_game.xml")
 DEFINE_UIRES(page_about,	LAYOUT,	"uires/xml/page_about.xml")
 DEFINE_UIRES(dlg_peace_req,	LAYOUT,	"uires/xml/dlg_peace_req.xml")

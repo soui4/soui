@@ -1,4 +1,4 @@
-//stamp:1481c2709f618c64
+﻿//stamp:165f112e47be7aef
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -12,9 +12,9 @@
 			const TCHAR * XML_MAINWND;
 			const TCHAR * XML_LOGIN;
 			const TCHAR * page_lobby;
+			const TCHAR * page_endgame;
 			const TCHAR * page_game;
 			const TCHAR * page_about;
-			const TCHAR * page_endgame;
 			const TCHAR * dlg_peace_req;
 			const TCHAR * dlg_peace_ack;
 			const TCHAR * dlg_theme_progress;
@@ -96,9 +96,9 @@ struct _UIRES UIRES={
 			_T("LAYOUT:XML_MAINWND"),
 			_T("LAYOUT:XML_LOGIN"),
 			_T("LAYOUT:page_lobby"),
+			_T("LAYOUT:page_endgame"),
 			_T("LAYOUT:page_game"),
 			_T("LAYOUT:page_about"),
-			_T("LAYOUT:page_endgame"),
 			_T("LAYOUT:dlg_peace_req"),
 			_T("LAYOUT:dlg_peace_ack"),
 			_T("LAYOUT:dlg_theme_progress"),
@@ -198,31 +198,35 @@ struct _R{
 		 const wchar_t * btn_unmute;
 		 const wchar_t * cbx_sex;
 		 const wchar_t * chessboard;
+		 const wchar_t * chessboard_preview;
 		 const wchar_t * content;
 		 const wchar_t * edit_desc;
 		 const wchar_t * edt_name;
 		 const wchar_t * edt_svr;
+		 const wchar_t * endgame_container;
 		 const wchar_t * game_container;
 		 const wchar_t * gp_preview;
 		 const wchar_t * img_playing;
+		 const wchar_t * main_tabctrl;
 		 const wchar_t * progress_bar;
 		 const wchar_t * room_container;
 		 const wchar_t * seat_0;
 		 const wchar_t * seat_1;
+		 const wchar_t * tileview_endgame;
 		 const wchar_t * tileview_lobby;
 		 const wchar_t * tip_container;
-		 const wchar_t * txt_anchor_detail;
-		 const wchar_t * txt_anchor_layout;
 		 const wchar_t * txt_contact;
 		 const wchar_t * txt_copyright;
 		 const wchar_t * txt_desc;
-		 const wchar_t * txt_info;
+		 const wchar_t * txt_eg_detail_intro;
+		 const wchar_t * txt_eg_detail_title;
+		 const wchar_t * txt_eg_table_title;
+		 const wchar_t * txt_feature_ai;
+		 const wchar_t * txt_feature_online;
+		 const wchar_t * txt_feature_rule;
+		 const wchar_t * txt_feature_ui;
 		 const wchar_t * txt_new_features;
 		 const wchar_t * txt_online;
-		 const wchar_t * txt_path_animation;
-		 const wchar_t * txt_path_detail;
-		 const wchar_t * txt_prop_detail;
-		 const wchar_t * txt_property_animation;
 		 const wchar_t * txt_qq_group;
 		 const wchar_t * txt_seat_0;
 		 const wchar_t * txt_seat_1;
@@ -232,6 +236,8 @@ struct _R{
 		 const wchar_t * txt_thanks;
 		 const wchar_t * txt_title;
 		 const wchar_t * txt_website;
+		 const wchar_t * wnd_eg_detail;
+		 const wchar_t * wnd_eg_list;
 		 const wchar_t * wnd_robot_area;
 		 const wchar_t * wnd_robot_levels;
 	}name;
@@ -256,31 +262,35 @@ struct _R{
 		int btn_unmute;
 		int cbx_sex;
 		int chessboard;
+		int chessboard_preview;
 		int content;
 		int edit_desc;
 		int edt_name;
 		int edt_svr;
+		int endgame_container;
 		int game_container;
 		int gp_preview;
 		int img_playing;
+		int main_tabctrl;
 		int progress_bar;
 		int room_container;
 		int seat_0;
 		int seat_1;
+		int tileview_endgame;
 		int tileview_lobby;
 		int tip_container;
-		int txt_anchor_detail;
-		int txt_anchor_layout;
 		int txt_contact;
 		int txt_copyright;
 		int txt_desc;
-		int txt_info;
+		int txt_eg_detail_intro;
+		int txt_eg_detail_title;
+		int txt_eg_table_title;
+		int txt_feature_ai;
+		int txt_feature_online;
+		int txt_feature_rule;
+		int txt_feature_ui;
 		int txt_new_features;
 		int txt_online;
-		int txt_path_animation;
-		int txt_path_detail;
-		int txt_prop_detail;
-		int txt_property_animation;
 		int txt_qq_group;
 		int txt_seat_0;
 		int txt_seat_1;
@@ -290,6 +300,8 @@ struct _R{
 		int txt_thanks;
 		int txt_title;
 		int txt_website;
+		int wnd_eg_detail;
+		int wnd_eg_list;
 		int wnd_robot_area;
 		int wnd_robot_levels;
 	}id;
@@ -317,6 +329,7 @@ struct _R{
 	struct _string{
 		int about;
 		int cnchess;
+		int endgame;
 		int lobby;
 		int login;
 		int peace_ack;
@@ -352,31 +365,35 @@ struct _R R={
 		L"btn_unmute",
 		L"cbx_sex",
 		L"chessboard",
+		L"chessboard_preview",
 		L"content",
 		L"edit_desc",
 		L"edt_name",
 		L"edt_svr",
+		L"endgame_container",
 		L"game_container",
 		L"gp_preview",
 		L"img_playing",
+		L"main_tabctrl",
 		L"progress_bar",
 		L"room_container",
 		L"seat_0",
 		L"seat_1",
+		L"tileview_endgame",
 		L"tileview_lobby",
 		L"tip_container",
-		L"txt_anchor_detail",
-		L"txt_anchor_layout",
 		L"txt_contact",
 		L"txt_copyright",
 		L"txt_desc",
-		L"txt_info",
+		L"txt_eg_detail_intro",
+		L"txt_eg_detail_title",
+		L"txt_eg_table_title",
+		L"txt_feature_ai",
+		L"txt_feature_online",
+		L"txt_feature_rule",
+		L"txt_feature_ui",
 		L"txt_new_features",
 		L"txt_online",
-		L"txt_path_animation",
-		L"txt_path_detail",
-		L"txt_prop_detail",
-		L"txt_property_animation",
 		L"txt_qq_group",
 		L"txt_seat_0",
 		L"txt_seat_1",
@@ -386,67 +403,75 @@ struct _R R={
 		L"txt_thanks",
 		L"txt_title",
 		L"txt_website",
+		L"wnd_eg_detail",
+		L"wnd_eg_list",
 		L"wnd_robot_area",
 		L"wnd_robot_levels"
 	}
 	,
 	{
-		65549,
 		65550,
 		65551,
 		65552,
-		65554,
-		65542,
-		65564,
+		65553,
 		65555,
-		65568,
-		65566,
+		65542,
+		65565,
+		65556,
+		65569,
 		65567,
+		65568,
 		65540,
 		65539,
 		65537,
 		65541,
-		65546,
-		65573,
-		65538,
-		65548,
-		65572,
-		65543,
-		65588,
 		65547,
-		65545,
-		65571,
-		65553,
-		65560,
-		65589,
-		65556,
-		10,
-		11,
-		65558,
-		65544,
-		65577,
-		65576,
 		65582,
-		65587,
-		65574,
-		65585,
-		65575,
-		65557,
-		65580,
+		65538,
+		65549,
 		65581,
 		65579,
-		65578,
-		65583,
+		65543,
+		65594,
+		65548,
+		65546,
+		65572,
+		65580,
+		65554,
 		65561,
-		65562,
-		65569,
+		65544,
+		65595,
+		65557,
+		10,
+		11,
+		65574,
 		65559,
-		65570,
+		65545,
+		65589,
+		65593,
+		65583,
+		65578,
+		65577,
+		65575,
 		65586,
-		65536,
+		65585,
+		65587,
+		65588,
 		65584,
+		65558,
+		65590,
+		65562,
 		65563,
-		65565
+		65570,
+		65560,
+		65571,
+		65592,
+		65536,
+		65591,
+		65576,
+		65573,
+		65564,
+		65566
 	}
 	,
 	{
@@ -481,7 +506,8 @@ struct _R R={
 		6,
 		7,
 		8,
-		9
+		9,
+		10
 	}
 	
 };

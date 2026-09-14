@@ -24,9 +24,9 @@ translucent="1"
     <window size="-2,0" weight="1" name="content">
       <tabctrl name="main_tabctrl" pos="0,0,-0,-0" tabHeight="30" tabWidth="150" tabSkin="skin_tab_header" colorText="#8B7355" colorTextHover="#FFD700" colorTextPush="#FFE45E">
         <include src="layout:page_lobby"/>
+        <include src="layout:page_endgame"/>
         <include src="layout:page_game"/>
         <include src="layout:page_about"/>
-        <include src="layout:page_endgame"/>
       </tabctrl>
       <window pos="0,0,-0,-0" name="tip_container" layout="anchor" float="1" msgTransparent="1"/>
     </window>
