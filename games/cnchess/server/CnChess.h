@@ -1,4 +1,4 @@
-#ifndef __CNCHESSTABLE_H__
+﻿#ifndef __CNCHESSTABLE_H__
 #define __CNCHESSTABLE_H__
 
 #include "GameTable-i.h"

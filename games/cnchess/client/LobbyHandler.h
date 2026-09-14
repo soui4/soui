@@ -1,4 +1,4 @@
-#ifndef LOBBYHANDLER_H
+﻿#ifndef LOBBYHANDLER_H
 #define LOBBYHANDLER_H
 
 #include <sobject/Sobject.hpp>

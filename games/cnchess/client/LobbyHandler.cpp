@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "LobbyHandler.h"
 #include "myprofile.h"
 #include <cnchessProtocol.h>
@@ -304,7 +304,7 @@ void LobbyHandler::ReqRobotInvite(int iTable, int iSeat, int nLevel)
     req.nLevel = nLevel;
     const wchar_t *kNames[] = { L"机器人·初", L"机器人·中", L"机器人·高" };
     int idx = (nLevel >= ROBOT_LEVEL_BEGINNER && nLevel <= ROBOT_LEVEL_ADVANCED) ? nLevel - ROBOT_LEVEL_BEGINNER : 0;
-    std::string strName = S_CW2A(kNames[idx], CP_UTF8);
+    SStringA strName = S_CW2A(kNames[idx], CP_UTF8);
     strcpy(req.stUserInfo.szName, strName.c_str());
     req.stUserInfo.nSex = SEX_SECRET;
     req.stUserInfo.nAvatarId = 1; // 男性内置头像
