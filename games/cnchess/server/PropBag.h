@@ -1,4 +1,4 @@
-﻿#ifndef __PROPBAG_H__
+#ifndef __PROPBAG_H__
 #define __PROPBAG_H__
 
 #include <core/SSingleton.h>
@@ -8,6 +8,7 @@ SNSBEGIN
 class PropBag : public SSingleton<PropBag>
 {
     WORD m_wPort;
+    int m_nRobotPool;
 public:
     enum{
         DEF_PORT = 3311,
@@ -19,6 +20,9 @@ public:
     void Init(LPCTSTR pszPropXml);
 
     WORD GetPort() const;
+
+    // 机器人AI线程池线程数
+    int GetRobotAIPool() const { return m_nRobotPool; }
 public:
     PropBag();
     ~PropBag();

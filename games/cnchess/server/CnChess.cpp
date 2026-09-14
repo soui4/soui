@@ -2,12 +2,16 @@
 #include "CnChess.h"
 #include "GameClient.h"
 #include "PropBag.h"
+#include "RobotDispatch.h"
 #include <ChessAI.h>
 #include <algorithm>
 #include <string/strcpcvt.h>
 #include <helper/slog.h>
 #include <time.h>
 #define kLogTag "CCnChess"
+
+// 机器人思考派发钩子(全局): 由服务器接线到 CRobotAIPool, 未接线时走同步回退
+PfnRobotDispatch g_pfnRobotDispatch = NULL;
 
 SNSBEGIN
 
@@ -557,7 +561,33 @@ void CCnChess::RobotMakeMove(int seatId)
 	if (!m_bRobot[seatId]) return;
 	SLOGI() << "[机器人走棋] seat=" << seatId << " actSeat=" << GetActiveSeat() << " actSide=" << (m_layout.m_actSide == CS_RED ? "RED" : "BLACK");
 	int nDepth = CChessAI::LevelToDepth(m_nRobotLevel[seatId]);
+
+	// 1) 优先派发到线程池异步思考, 避免思考卡住游戏交互
+	if (g_pfnRobotDispatch)
+	{
+		SRobotTask task;
+		task.tableId = GetID();
+		task.seatId = seatId;
+		task.depth = nDepth;
+		task.generation = m_nChessMsg;
+		task.layout.Copy(&m_layout); // 深拷贝棋盘快照, 线程池仅操作副本
+		if (g_pfnRobotDispatch(task))
+			return; // 已入池, 结果稍后经 ApplyRobotMove 在主线程异步应用
+	}
+
+	// 2) 回退: 线程池未接线或派发失败时同步搜索并立即应用
 	MOVESTEP best = CChessAI::SearchBestMove(m_layout, nDepth);
+	ApplyRobotMove(best, seatId, m_nChessMsg);
+}
+
+void CCnChess::ApplyRobotMove(const MOVESTEP &best, int seatId, int generation)
+{
+	// 以下全部在游戏主线程(LWS线程)串行执行
+	if (m_state != TABLE_STATE_PLAYING) return;
+	if (GetActiveSeat() != seatId) return;  // 已非该机器人行棋
+	if (!m_bRobot[seatId]) return;
+	if (generation != m_nChessMsg) return;  // 状态已推进(悔棋/新局等), 丢弃过期结果
+
 	if (best.pt1.x < 0)
 	{//机器人无子可走，判负
         SLOGE() << "[机器人走棋] 无子可走 seat=" << seatId;
@@ -603,8 +633,10 @@ void CCnChess::RobotMakeMove(int seatId)
 		return;
 	}
 
-	// 检测机器人走子后是否已经分出胜负，否则若轮到真人对局则结束本次驱动
+	// 检测机器人走子后是否已经分出胜负
 	CheckServerOver();
+	// 若下一位行棋方仍为机器人(如双机器人对局), 继续驱动下一回合
+	TriggerIfRobotTurn();
 }
 
 SNSEND

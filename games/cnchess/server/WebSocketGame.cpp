@@ -14,7 +14,9 @@
 #include "PropBag.h"
 #include "ThemeResourceProvider.h"
 #include "EndgameConfig.h"
+#include "RobotAIPool.h"
 #include <helper/slog.h>
+#include <functional>
 #define kLogTag "WebSocketGame"
 
 class CUrlArgs {
@@ -177,6 +179,27 @@ BOOL CWebSocketGame::GameStart(unsigned short uPort)
 	int nRet = m_pWsServer->start(uPort, "cnchess", option, pingCfg);
 	if (nRet != 0)
 		return FALSE;
+
+	// 接线机器人AI线程池: 搜索在线程池执行, 结果经服务队列回到 LWS 主线程应用走子
+	{
+	    CRobotAIPool *pool = CRobotAIPool::getSingletonPtr();
+	    pool->Init(PropBag::getSingletonPtr()->GetRobotAIPool());
+	    pool->SetSink(
+	        [this](std::function<void()> fn) { m_pWsServer->postServiceTask(std::move(fn)); },
+	        [this](int tableId, int seatId, int generation, const MOVESTEP &best) {
+	            auto it = m_tableClients.find(tableId);
+	            if (it == m_tableClients.end())
+	                return; // table already destroyed
+	            IGameTable *pTable = it->second; // SAutoRefPtr -> T*
+	            CCnChess *pChess = static_cast<CCnChess *>(pTable);
+	            if (pChess)
+	                pChess->ApplyRobotMove(best, seatId, generation);
+	        });
+	    g_pfnRobotDispatch = [](const SRobotTask &task) -> bool {
+	        return CRobotAIPool::getSingletonPtr()->Dispatch(task);
+	    };
+	}
+
     bool bFinish = m_pWsServer->wait(-1);
     m_pWsServer->Release();
 	return TRUE;

@@ -91,7 +91,26 @@ void WsServer::run()
     while (!m_finished)
     {
         lws_service(m_context, 50);
+        DrainServiceQueue();
     }
+}
+
+void WsServer::DrainServiceQueue()
+{
+    // 服务队列在 LWS 事件线程(LWS线程)上排空, 确保回调与其他游戏消息串行执行
+    std::deque<std::function<void()> > tasks;
+    {
+        std::lock_guard<std::mutex> lock(m_serviceMutex);
+        tasks.swap(m_serviceQueue);
+    }
+    for (auto &task : tasks)
+        task();
+}
+
+void WsServer::postServiceTask(std::function<void()> task)
+{
+    std::lock_guard<std::mutex> lock(m_serviceMutex);
+    m_serviceQueue.push_back(std::move(task));
 }
 
 static void lws_send_ping(struct lws *wsi) {

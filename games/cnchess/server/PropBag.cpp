@@ -10,6 +10,7 @@ PropBag * SSingleton<PropBag>::ms_Singleton = NULL;
 PropBag::PropBag()
 {
     m_wPort=DEF_PORT;	//默认端口号
+    m_nRobotPool = 4;	//默认机器人AI线程池线程数
     
 	memset(m_dwProps,0,sizeof(m_dwProps));
     m_dwProps[PROPID_REGRET] = 2;
@@ -50,6 +51,7 @@ void PropBag::Init(LPCTSTR pszPropXml)
     m_dwProps[PROPID_MIN_STEPS] = xmlNode.attribute(L"min_steps").as_int(10);	//默认最小步数为10步
 
     m_wPort = xmlNode.attribute(L"port").as_int(DEF_PORT);     //默认端口号
+    m_nRobotPool = xmlNode.attribute(L"robot_ai_pool").as_int(4); //默认机器人AI线程池线程数
 }
 WORD PropBag::GetPort() const
 {

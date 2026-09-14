@@ -16,6 +16,7 @@
 
 #include "PropBag.h"
 #include "ThemeResourceProvider.h"
+#include "RobotAIPool.h"
 #define kLogTag "CnChessServer"
 
 #ifdef _WIN32
@@ -132,6 +133,8 @@ int run(LPCTSTR pszCfg){
         signal(SIGTERM, signalHandler);
 #endif
         BOOL bRet = game.GameStart(nPort);
+        // 服务器退出后回收机器人AI线程池线程
+        CRobotAIPool::getSingletonPtr()->Shutdown();
         delete propBag;
         SLOGI() << " chess server quit, ret=" << bRet;
         return bRet ? 0 : 1;

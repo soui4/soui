@@ -32,10 +32,10 @@ target_link_libraries(${current_project}
     utilities4
     cnchess_algorithm
     ws
+    taskloop
     log4z
     jsoncpp
 )
-
 
 if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
     target_link_libraries(${current_project} swinx)
@@ -87,6 +87,16 @@ add_custom_command(TARGET ${current_project} POST_BUILD
         ${CMAKE_CURRENT_SOURCE_DIR}/config/endgames.json
         ${ENDGAME_CONFIG_OUT}/endgames.json
     COMMENT "Copying endgames.json"
+)
+
+# 复制 config.ini 到可执行文件目录(与服务器 server.cpp 中 ./config.ini 的加载路径对齐)
+set(SERVER_CONFIG_OUT ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIGURATION>)
+add_custom_command(TARGET ${current_project} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${SERVER_CONFIG_OUT}
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${CMAKE_CURRENT_SOURCE_DIR}/config/config.ini
+        ${SERVER_CONFIG_OUT}/config.ini
+    COMMENT "Copying config.ini"
 )
 
 set_target_properties (${current_project} PROPERTIES

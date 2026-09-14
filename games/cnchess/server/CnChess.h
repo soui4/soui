@@ -37,6 +37,8 @@ public:
     void SetupRobot(int seatId, int nLevel) override;
     // 配置残局桌: 进入残局时设置自定义布局(布局始终以红方为下方向, 与正式棋盘一致)
     void ConfigureEndgame(int nEndgameId, const int layout[10][9]);
+    // 应用机器人走子(桌子A.I.搜索结果经线程池异步回到主线程后调用; generation 用于丢弃过期结果)
+    void ApplyRobotMove(const MOVESTEP &best, int seatId, int generation);
 protected:
     // 象棋游戏相关方法
     void BrdcstAckOver(GAMEOVERTYPE nType, int nLossSeat, LPCWSTR pszDesc);

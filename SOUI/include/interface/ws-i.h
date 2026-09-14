@@ -4,6 +4,7 @@
 #define _WINSOCKAPI_
 #include <interface/obj-ref-i.h>
 #include <stdint.h>
+#include <functional>
 
 SNSBEGIN
 
@@ -290,6 +291,12 @@ DECLARE_INTERFACE_(IWsServer, IObjRef)
      * @brief Quit server
      */
     STDMETHOD_(void, quit)(THIS) PURE;
+
+    /**
+     * @brief 投递一个任务到服务器事件线程(LWS线程)执行
+     * @remark 供其他线程(如机器人AI线程池)把结果回调安全地切回游戏主线程串行执行
+     */
+    STDMETHOD_(void, postServiceTask)(THIS_ std::function<void()> task) PURE;
 };
 
 /**
