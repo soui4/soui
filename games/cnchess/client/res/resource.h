@@ -1,4 +1,4 @@
-﻿//stamp:147e080ffdfcf259
+﻿//stamp:1481b81205f0fb73
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -73,6 +73,10 @@
 			const TCHAR * combobox_dropbtn;
 			const TCHAR * edit_bg;
 			const TCHAR * list_item;
+			const TCHAR * btn_robot_beginner;
+			const TCHAR * btn_robot_medium;
+			const TCHAR * btn_robot_advanced;
+			const TCHAR * btn_robot_invite;
 			}svg;
 	};
 #endif//_UIRES_H_
@@ -146,6 +150,10 @@ struct _UIRES UIRES={
 			_T("svg:combobox_dropbtn"),
 			_T("svg:edit_bg"),
 			_T("svg:list_item"),
+			_T("svg:btn_robot_beginner"),
+			_T("svg:btn_robot_medium"),
+			_T("svg:btn_robot_advanced"),
+			_T("svg:btn_robot_invite"),
 		},
 	};
 #else
@@ -162,7 +170,11 @@ struct _R{
 		 const wchar_t * btn_avatar_4;
 		 const wchar_t * btn_avatar_ext;
 		 const wchar_t * btn_close;
+		 const wchar_t * btn_invite_robot;
 		 const wchar_t * btn_login;
+		 const wchar_t * btn_lvl_advanced;
+		 const wchar_t * btn_lvl_beginner;
+		 const wchar_t * btn_lvl_medium;
 		 const wchar_t * btn_max;
 		 const wchar_t * btn_min;
 		 const wchar_t * btn_mute;
@@ -204,6 +216,8 @@ struct _R{
 		 const wchar_t * txt_thanks;
 		 const wchar_t * txt_title;
 		 const wchar_t * txt_website;
+		 const wchar_t * wnd_robot_area;
+		 const wchar_t * wnd_robot_levels;
 	}name;
 	struct _id{
 		int btn_avatar_1;
@@ -212,7 +226,11 @@ struct _R{
 		int btn_avatar_4;
 		int btn_avatar_ext;
 		int btn_close;
+		int btn_invite_robot;
 		int btn_login;
+		int btn_lvl_advanced;
+		int btn_lvl_beginner;
+		int btn_lvl_medium;
 		int btn_max;
 		int btn_min;
 		int btn_mute;
@@ -254,6 +272,8 @@ struct _R{
 		int txt_thanks;
 		int txt_title;
 		int txt_website;
+		int wnd_robot_area;
+		int wnd_robot_levels;
 	}id;
 	struct _color{
 		int black;
@@ -298,7 +318,11 @@ struct _R R={
 		L"btn_avatar_4",
 		L"btn_avatar_ext",
 		L"btn_close",
+		L"btn_invite_robot",
 		L"btn_login",
+		L"btn_lvl_advanced",
+		L"btn_lvl_beginner",
+		L"btn_lvl_medium",
 		L"btn_max",
 		L"btn_min",
 		L"btn_mute",
@@ -339,7 +363,9 @@ struct _R R={
 		L"txt_table_info",
 		L"txt_thanks",
 		L"txt_title",
-		L"txt_website"
+		L"txt_website",
+		L"wnd_robot_area",
+		L"wnd_robot_levels"
 	}
 	,
 	{
@@ -349,48 +375,54 @@ struct _R R={
 		65550,
 		65552,
 		65542,
+		65562,
 		65553,
+		65566,
+		65564,
+		65565,
 		65540,
 		65539,
 		65537,
 		65541,
 		65544,
-		65565,
+		65571,
 		65538,
 		65546,
-		65564,
-		65580,
+		65570,
+		65586,
 		65545,
 		65543,
-		65563,
+		65569,
 		65551,
 		65558,
-		65581,
+		65587,
 		65554,
 		10,
 		11,
 		65556,
-		65569,
-		65568,
-		65574,
-		65579,
-		65566,
-		65577,
-		65567,
-		65555,
-		65572,
-		65573,
-		65571,
-		65570,
 		65575,
+		65574,
+		65580,
+		65585,
+		65572,
+		65583,
+		65573,
+		65555,
+		65578,
+		65579,
+		65577,
+		65576,
+		65581,
 		65559,
 		65560,
-		65561,
+		65567,
 		65557,
-		65562,
-		65578,
+		65568,
+		65584,
 		65536,
-		65576
+		65582,
+		65561,
+		65563
 	}
 	,
 	{

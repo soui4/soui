@@ -1,4 +1,4 @@
-//stamp:01dd31e42ff22efd
+//stamp:01dd43e803177e57
 /*<------------------------------------------------------------------------------------------------->*/
 #define DEFINE_UIRES(name, type, file_path)\
     name type file_path
@@ -58,3 +58,7 @@ DEFINE_UIRES(btn_small,	svg,	"uires/svg/btn_small.svg")
 DEFINE_UIRES(combobox_dropbtn,	svg,	"uires/svg/combobox_dropbtn.svg")
 DEFINE_UIRES(edit_bg,	svg,	"uires/svg/edit_bg.svg")
 DEFINE_UIRES(list_item,	svg,	"uires/svg/list_item.svg")
+DEFINE_UIRES(btn_robot_beginner,	svg,	"uires/svg/btn_robot_beginner.svg")
+DEFINE_UIRES(btn_robot_medium,	svg,	"uires/svg/btn_robot_medium.svg")
+DEFINE_UIRES(btn_robot_advanced,	svg,	"uires/svg/btn_robot_advanced.svg")
+DEFINE_UIRES(btn_robot_invite,	svg,	"uires/svg/btn_robot_invite.svg")
