@@ -1,4 +1,4 @@
-//stamp:01dd440045fbcef5
+//stamp:01dd44026db82e97
 /*<------------------------------------------------------------------------------------------------->*/
 #define DEFINE_UIRES(name, type, file_path)\
     name type file_path
@@ -67,3 +67,4 @@ DEFINE_UIRES(win_btn_close,	svg,	"uires/svg/win_btn_close.svg")
 DEFINE_UIRES(win_btn_max,	svg,	"uires/svg/win_btn_max.svg")
 DEFINE_UIRES(win_btn_min,	svg,	"uires/svg/win_btn_min.svg")
 DEFINE_UIRES(win_btn_restore,	svg,	"uires/svg/win_btn_restore.svg")
+DEFINE_UIRES(tab_bg,	svg,	"uires/svg/tab_bg.svg")

@@ -80,5 +80,6 @@
     <file name="win_btn_max" path="svg\win_btn_max.svg"/>
     <file name="win_btn_min" path="svg\win_btn_min.svg"/>
     <file name="win_btn_restore" path="svg\win_btn_restore.svg"/>
+    <file name="tab_bg" path="svg\tab_bg.svg"/>
   </svg>
 </resource>

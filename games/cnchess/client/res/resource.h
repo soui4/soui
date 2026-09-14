@@ -1,4 +1,4 @@
-﻿//stamp:1481c26cc66baa69
+﻿//stamp:1481c2709f618c64
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -82,6 +82,7 @@
 			const TCHAR * win_btn_max;
 			const TCHAR * win_btn_min;
 			const TCHAR * win_btn_restore;
+			const TCHAR * tab_bg;
 			}svg;
 	};
 #endif//_UIRES_H_
@@ -164,6 +165,7 @@ struct _UIRES UIRES={
 			_T("svg:win_btn_max"),
 			_T("svg:win_btn_min"),
 			_T("svg:win_btn_restore"),
+			_T("svg:tab_bg"),
 		},
 	};
 #else
