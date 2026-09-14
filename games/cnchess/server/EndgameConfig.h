@@ -24,6 +24,8 @@ public:
     bool Load(const char * pszJsonPath);
     // 获得残局数量
     int GetCount() const { return (int)m_items.size(); }
+    // 每个残局开设的游戏桌数(配置项), 配置缺省时为 2
+    int GetTablesPerEndgame() const { return m_nTablesPerEndgame; }
     // 按下标获取残局条目
     const EndgameItem * GetByIndex(int nIndex) const;
     // 按ID查找残局条目, 不存在返回NULL
@@ -33,6 +35,7 @@ private:
     ~EndgameConfig() {}
     void Clear();
     std::vector<EndgameItem> m_items;
+    int m_nTablesPerEndgame = 2;   // 每个残局的游戏桌数
 };
 
 #endif //__ENDGAMECONFIG_H__

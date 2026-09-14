@@ -408,21 +408,22 @@ static void EnsureEndgameLoaded()
     pCfg->Load(strPath.c_str());
 }
 
-// 判断是否为残局桌号(残局桌号区间: [BASE, BASE + 残局数*2))
+// 判断是否为残局桌号(残局桌号区间: [BASE, BASE + 残局数*tablesPerEndgame))
 static bool IsEndgameTable(int nTable)
 {
     if (nTable < ENDGAME_TABLE_BASE)
         return false;
     EnsureEndgameLoaded();
-    int nEndgameSlotMax = EndgameConfig::GetInstance()->GetCount() * 2;
+    int nEndgameSlotMax = EndgameConfig::GetInstance()->GetCount() * EndgameConfig::GetInstance()->GetTablesPerEndgame();
     return nTable < ENDGAME_TABLE_BASE + nEndgameSlotMax;
 }
 
-// 为残局桌配置布局: 桌号 -> 残局序号 index = (nTable - BASE) / 2
+// 为残局桌配置布局: 桌号 -> 残局序号 index = (nTable - BASE) / tablesPerEndgame
 static void ConfigureEndgameTable(IGameTable *pTable, int nTable)
 {
     EnsureEndgameLoaded();
-    int nIndex = (nTable - ENDGAME_TABLE_BASE) / 2;
+    int nTables = EndgameConfig::GetInstance()->GetTablesPerEndgame();
+    int nIndex = (nTable - ENDGAME_TABLE_BASE) / nTables;
     const EndgameItem *pItem = EndgameConfig::GetInstance()->GetByIndex(nIndex);
     if (pItem)
         pTable->ConfigureEndgame(pItem->nId, pItem->layout);
@@ -612,6 +613,7 @@ BOOL CWebSocketGame::ClientEndgameList(PWSCLIENT pClient, LPVOID pData, DWORD dw
     PGAME_ENDGAME_LIST pList = (PGAME_ENDGAME_LIST)buf.data();
     memset(pList, 0, nLen);
     pList->nCount = nCount;
+    pList->nTablesPerEndgame = pCfg->GetTablesPerEndgame();
     for (int i = 0; i < nCount; i++)
     {
         const EndgameItem *pItem = pCfg->GetByIndex(i);

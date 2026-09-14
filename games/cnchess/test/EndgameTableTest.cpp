@@ -1,6 +1,6 @@
 ﻿// 残局打谱 - 游戏桌端到端(服务器逻辑层)测试
 //
-// 覆盖: endgames.json 配置加载、每个残局固定2张游戏桌的表位映射、
+// 覆盖: endgames.json 配置加载、每残局桌数(tablesPerEndgame)表位映射、
 // 残局布局合法性、开局应用布局、一局结束后红方座位轮换(与常规模式一致)。
 #include <gtest/gtest.h>
 #include <windows.h>
@@ -38,6 +38,7 @@ namespace
         CChessLayout & TLayout() { return m_layout; }
         bool TIsEndgame() const { return m_bEndgame; }
         int TPassable() const { return m_nChsPassable; }
+        int TRedSeat() const { return GetRedSeat(); }
     };
 
     // 由残局配置在 endgames.json 中按序号取布局/解析器
@@ -58,7 +59,7 @@ namespace
                 int nChs = layout[y][x];
                 if (nChs == CHSMAN_NULL)
                     continue;
-                if (nChs < 0 || nChs > 6 * 2)   // 合法编码 0-13(正红/负黑), 否则 127 以上且非255视为非法
+                if (nChs < CHSMAN_RED_JIANG || nChs > CHSMAN_BLK_BING)  // 合法编码 0-13(0-6红, 7-13黑), 255为空
                     return -1;
                 nPieces++;
                 if (nChs == CHSMAN_RED_JIANG) nRedJiang++;
@@ -75,7 +76,7 @@ TEST(EndgameTableTest, ConfigLoadsRealEndgames)
     bool bLoaded = EndgameConfig::GetInstance()->Load(ENDGAME_TEST_JSON);
     ASSERT_TRUE(bLoaded) << "无法加载 endgames.json: " ENDGAME_TEST_JSON;
     int nCount = EndgameConfig::GetInstance()->GetCount();
-    EXPECT_GT(nCount, 0) << "残局数量应为正数";
+    EXPECT_GE(nCount, 100) << "残局数量应达到 100 个经典残局";
     ASSERT_GT(nCount, 0);
 
     for (int i = 0; i < nCount; i++)
@@ -90,25 +91,39 @@ TEST(EndgameTableTest, ConfigLoadsRealEndgames)
     }
 }
 
-// 每个残局固定 2 张游戏桌: 坐哪桌就对应哪一个残局
+// 每残局桌数配置项: 从 endgames.json 读取, 驱动残局桌区间与映射
+TEST(EndgameTableTest, ConfigTablesPerEndgameParsed)
+{
+    EndgameConfig *pCfg = EndgameConfig::GetInstance();
+    ASSERT_GT(pCfg->GetCount(), 0);
+    int nTables = pCfg->GetTablesPerEndgame();
+    EXPECT_GE(nTables, 1) << "tablesPerEndgame 配置应 >= 1";
+    // 残局区间接配置桌数展开: [BASE, BASE + 数量*桌数)
+    int nSlotMax = pCfg->GetCount() * nTables;
+    EXPECT_GT(nSlotMax, pCfg->GetCount()) << "每残局至少一桌, 总桌数应大于残局数";
+}
+
+// 每个残局按配置开 N 张游戏桌: 坐哪桌就对应哪一个残局
 TEST(EndgameTableTest, TwoTablesPerEndgame)
 {
     int nCount = EndgameConfig::GetInstance()->GetCount();
+    int nTables = EndgameConfig::GetInstance()->GetTablesPerEndgame();
     ASSERT_GT(nCount, 0);
+    ASSERT_GT(nTables, 0);
 
     for (int idx = 0; idx < nCount; idx++)
     {
-        int t0 = ENDGAME_TABLE_BASE + idx * 2;
-        int t1 = ENDGAME_TABLE_BASE + idx * 2 + 1;
-        EXPECT_EQ((t0 - ENDGAME_TABLE_BASE) / 2, idx) << "残局序号映射错误(t0)";
-        EXPECT_EQ((t1 - ENDGAME_TABLE_BASE) / 2, idx) << "残局序号映射错误(t1)";
-        EXPECT_NE(t0, t1) << "同一残局的2张桌不应重复";
+        int t0 = ENDGAME_TABLE_BASE + idx * nTables;
+        int t1 = ENDGAME_TABLE_BASE + idx * nTables + nTables - 1;
+        EXPECT_EQ((t0 - ENDGAME_TABLE_BASE) / nTables, idx) << "残局序号映射错误(t0)";
+        EXPECT_EQ((t1 - ENDGAME_TABLE_BASE) / nTables, idx) << "残局序号映射错误(t1)";
+        EXPECT_NE(t0, t1) << "同一残局的桌数不应为0";
     }
     // 全部残局桌连续且互不重叠, 不越界
     int nFirst = ENDGAME_TABLE_BASE;
-    int nLast  = ENDGAME_TABLE_BASE + nCount * 2 - 1;
-    EXPECT_EQ(nLast - nFirst + 1, nCount * 2);
-    // 边界: BASE-1 不属于残局区间(大厅桌), BASE + count*2 超出残局区间
+    int nLast  = ENDGAME_TABLE_BASE + nCount * nTables - 1;
+    EXPECT_EQ(nLast - nFirst + 1, nCount * nTables);
+    // 边界: BASE-1 不属于残局区间(大厅桌), BASE + count*nTables 超出残局区间
     EXPECT_LT(ENDGAME_TABLE_BASE - 1, ENDGAME_TABLE_BASE);
 }
 
@@ -120,14 +135,15 @@ TEST(EndgameTableTest, EndgameGameFlowAppliesLayoutAndRotateRedSeat)
     ASSERT_NE(pEg, nullptr);
 
     TEndgameListener listener;
-    int nTable = ENDGAME_TABLE_BASE + 0 * 2;   // 残局0 的第1张桌
+    int nTables = EndgameConfig::GetInstance()->GetTablesPerEndgame();
+    int nTable = ENDGAME_TABLE_BASE + 0 * nTables;   // 残局0 的第1张桌
     TEndgameTable table(&listener, nTable);
 
     // 2名玩家入座
     table.OnAddPlayer(0, new GameClient);
     table.OnAddPlayer(1, new GameClient);
     EXPECT_EQ(table.GetPlayerCount(), 2);
-    int nRedSeat0 = table.GetRedSeat();         // 初始红方座位
+    int nRedSeat0 = table.TRedSeat();           // 初始红方座位
 
     // 配置残局: 仅设置自定义布局, 其余逻辑与常规模式一致(无残局特有首行状态)
     table.ConfigureEndgame(pEg->nId, pEg->layout);
@@ -149,13 +165,13 @@ TEST(EndgameTableTest, EndgameGameFlowAppliesLayoutAndRotateRedSeat)
 
     // 一局结束 → 红方座位轮换(与常规模式一致)
     table.OnGameEnd();
-    EXPECT_EQ(table.GetRedSeat(), (nRedSeat0 + 1) % 2) << "一局结束后应轮换红方座位";
+    EXPECT_EQ(table.TRedSeat(), (nRedSeat0 + 1) % 2) << "一局结束后应轮换红方座位";
 
     // 双方准备后再次开局, 首行仍红先, 红方座位保持轮换后的座位
     for (int i = 0; i < 2; i++)
         table.GetPlayer(i)->m_bReady = TRUE;
     table.OnGameStart();
-    EXPECT_EQ(table.GetRedSeat(), (nRedSeat0 + 1) % 2);
+    EXPECT_EQ(table.TRedSeat(), (nRedSeat0 + 1) % 2);
     EXPECT_EQ((int)table.TLayout().m_actSide, CS_RED) << "交换后第二局首行仍红先";
 }
 
@@ -163,12 +179,13 @@ TEST(EndgameTableTest, EndgameGameFlowAppliesLayoutAndRotateRedSeat)
 TEST(EndgameTableTest, NormalTableOutsideEndgameRange)
 {
     EXPECT_LT(0, ENDGAME_TABLE_BASE);
-    // 所有残局桌号都落在 [ENDGAME_TABLE_BASE, ENDGAME_TABLE_BASE+count*2)
+    // 所有残局桌号都落在 [ENDGAME_TABLE_BASE, ENDGAME_TABLE_BASE+count*tablesPerEndgame)
     int nCount = EndgameConfig::GetInstance()->GetCount();
-    for (int s = 0; s < nCount * 2; s++)
+    int nTables = EndgameConfig::GetInstance()->GetTablesPerEndgame();
+    for (int s = 0; s < nCount * nTables; s++)
     {
         int t = ENDGAME_TABLE_BASE + s;
-        int idx = (t - ENDGAME_TABLE_BASE) / 2;
+        int idx = (t - ENDGAME_TABLE_BASE) / nTables;
         EXPECT_GE(idx, 0);
         EXPECT_LT(idx, nCount);
     }

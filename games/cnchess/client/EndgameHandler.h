@@ -16,8 +16,8 @@ class CMainDlg;
 /**
  * @brief 残局打谱处理器
  *
- * 采用与普通大厅一致的"游戏桌"模型: 每个残局固定占用 2 张游戏桌
- * (桌号 = ENDGAME_TABLE_BASE + 残局序号*2 + 0/1), 坐哪桌就对应哪一个残局。
+ * 采用与普通大厅一致的"游戏桌"模型: 每个残局按配置占用 N 张游戏桌
+ * (桌号 = ENDGAME_TABLE_BASE + 残局序号*N + 槽位, N 由服务端 tablesPerEndgame 下发), 坐哪桌就对应哪一个残局。
  * 本处理器负责展示残局桌列表、坐桌、邀请机器人, 并在右侧/底部棋盘上预览
  * 当前选中残局的布局。
  */
@@ -86,6 +86,7 @@ private:
     float m_cellHeight;
     CPoint m_ptBoardOrigin;               ///< 棋盘左下角坐标
     int m_nCurEndgameIndex;               ///< 当前选中的残局序号
+    int m_nTablesPerEndgame;              ///< 每残局桌数(由服务端配置下发, 默认2)
     bool m_bAutoStartSent;                ///< 是否已为本局自动发送过就绪
 };
 

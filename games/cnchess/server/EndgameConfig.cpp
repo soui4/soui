@@ -15,6 +15,7 @@ EndgameConfig * EndgameConfig::GetInstance()
 void EndgameConfig::Clear()
 {
     m_items.clear();
+    m_nTablesPerEndgame = 2;
 }
 
 const EndgameItem * EndgameConfig::GetByIndex(int nIndex) const
@@ -62,6 +63,10 @@ bool EndgameConfig::Load(const char * pszJsonPath)
         SLOGW() << "endgame json has no endgames array";
         return false;
     }
+    // 每残局桌数配置项(缺省 2), 供残局桌区间/映射使用
+    m_nTablesPerEndgame = root.get("tablesPerEndgame", 2).asInt();
+    if (m_nTablesPerEndgame < 1)
+        m_nTablesPerEndgame = 2;
     for (Json::Value::ArrayIndex i = 0; i < arr.size(); i++)
     {
         Json::Value & item = arr[i];

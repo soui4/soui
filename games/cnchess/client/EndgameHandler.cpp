@@ -14,11 +14,12 @@
 
 #define kLogTag "EndgameHandler"
 
-// 残局桌适配器(大厅式游戏桌): 每个残局 2 张桌, 项数 = 残局数*2
+// 残局桌适配器(大厅式游戏桌): 每个残局按配置 N 张桌, 项数 = 残局数*N
 class CEndgameAdapter : public SAdapterBase
 {
     std::vector<std::shared_ptr<ENDGAME_INFO> > m_endgames;
     std::map<int, std::shared_ptr<GAME_TABLE_INFO> > m_tables;   // key = 残局桌号(>=ENDGAME_TABLE_BASE)
+    int m_nTablesPerEndgame = 2;                // 每残局桌数(由服务端配置下发)
     EndgameHandler *m_pHandler;
 public:
     CEndgameAdapter(EndgameHandler *pHandler)
@@ -27,23 +28,25 @@ public:
     }
     ~CEndgameAdapter() {}
 
-    // 残局桌号: 残局序号 + 槽位(0/1)
-    static int GetTableId(int nEndgameIndex, int nSlot)
+    // 残局桌号: 残局序号*tablesPerEndgame + 槽位
+    int GetTableId(int nEndgameIndex, int nSlot) const
     {
-        return ENDGAME_TABLE_BASE + nEndgameIndex * 2 + nSlot;
+        return ENDGAME_TABLE_BASE + nEndgameIndex * m_nTablesPerEndgame + nSlot;
     }
-    // 桌号 -> 项位置(残局序号*2 + 槽位)
-    static int GetPositionForTable(int nTableId)
+    // 桌号 -> 项位置(残局序号*tablesPerEndgame + 槽位)
+    int GetPositionForTable(int nTableId) const
     {
         int nOff = nTableId - ENDGAME_TABLE_BASE;
         if (nOff < 0)
             return -1;
-        return (nOff / 2) * 2 + (nOff % 2);
+        return (nOff / m_nTablesPerEndgame) * m_nTablesPerEndgame + (nOff % m_nTablesPerEndgame);
     }
 
-    void SetEndgames(LPBYTE pInfo, int nCount, int nInfoSize)
+    void SetEndgames(LPBYTE pInfo, int nCount, int nInfoSize, int nTablesPerEndgame)
     {
         m_endgames.clear();
+        if (nTablesPerEndgame > 0)
+            m_nTablesPerEndgame = nTablesPerEndgame;
         for (int i = 0; i < nCount; i++)
         {
             std::shared_ptr<ENDGAME_INFO> sp(new ENDGAME_INFO);
@@ -93,7 +96,7 @@ public:
 
     STDMETHOD_(int, getCount)() override
     {
-        return (int)m_endgames.size() * 2;
+        return (int)m_endgames.size() * m_nTablesPerEndgame;
     }
 
     STDMETHOD_(void, getView)(int position, SItemPanel *pItem, SXmlNode xmlTemplate) override
@@ -101,8 +104,8 @@ public:
         if (pItem->GetChildrenCount() == 0)
             pItem->InitFromXml(&xmlTemplate);
 
-        int nEndgameIndex = position / 2;
-        int nSlot = position % 2;
+        int nEndgameIndex = position / m_nTablesPerEndgame;
+        int nSlot = position % m_nTablesPerEndgame;
         int nTableId = GetTableId(nEndgameIndex, nSlot);
         const ENDGAME_INFO *pEndgame = GetEndgame(nEndgameIndex);
 
@@ -205,7 +208,7 @@ public:
         SItemPanel *pItem = sobj_cast<SItemPanel>(pBtn->GetRoot());
         int nPos = pItem->GetItemIndex();
         if (m_pHandler)
-            m_pHandler->SelectEndgame(nPos / 2);
+            m_pHandler->SelectEndgame(nPos / m_nTablesPerEndgame);
         return TRUE;
     }
 
@@ -214,8 +217,8 @@ public:
         SWindow *pBtn = sobj_cast<SWindow>(e->Sender());
         SItemPanel *pItem = sobj_cast<SItemPanel>(pBtn->GetRoot());
         int nPos = pItem->GetItemIndex();
-        int nEndgameIndex = nPos / 2;
-        int nTableId = GetTableId(nEndgameIndex, nPos % 2);
+        int nEndgameIndex = nPos / m_nTablesPerEndgame;
+        int nTableId = GetTableId(nEndgameIndex, nPos % m_nTablesPerEndgame);
         SStringW strName = pBtn->GetName();
 
         // 邀请机器人: 展开/收起难度选择
@@ -276,6 +279,7 @@ EndgameHandler::EndgameHandler(CMainDlg *pMainDlg, SGameTheme *pTheme)
     , m_cellWidth(0)
     , m_cellHeight(0)
     , m_nCurEndgameIndex(-1)
+    , m_nTablesPerEndgame(2)
     , m_bAutoStartSent(false)
 {
     m_ptBoardOrigin = CPoint(0, 0);
@@ -367,11 +371,14 @@ BOOL EndgameHandler::OnEndgameListAck(const void *lpData, int nSize)
     if (nSize < (int)(sizeof(GAME_ENDGAME_LIST) - 1) || !m_pAdapter)
         return FALSE;
     PGAME_ENDGAME_LIST pList = (PGAME_ENDGAME_LIST)lpData;
-    SLOGI() << "EndgameHandler: endgame list count=" << pList->nCount;
+    SLOGI() << "EndgameHandler: endgame list count=" << pList->nCount
+            << " tablesPerEndgame=" << pList->nTablesPerEndgame;
+    if (pList->nTablesPerEndgame > 0)
+        m_nTablesPerEndgame = pList->nTablesPerEndgame;
     if (pList->nCount > 0)
-        m_pAdapter->SetEndgames((LPBYTE)&pList->vInfo[0], pList->nCount, sizeof(ENDGAME_INFO));
+        m_pAdapter->SetEndgames((LPBYTE)&pList->vInfo[0], pList->nCount, sizeof(ENDGAME_INFO), m_nTablesPerEndgame);
     else
-        m_pAdapter->SetEndgames(NULL, 0, 0);
+        m_pAdapter->SetEndgames(NULL, 0, 0, m_nTablesPerEndgame);
 
     // 默认预览第一个残局
     if (m_nCurEndgameIndex < 0 && pList->nCount > 0)

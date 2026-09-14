@@ -202,7 +202,7 @@ typedef struct tagTHEME_DATA {
 //=====================================================================
 // 残局打谱 (Endgame)
 //=====================================================================
-// 残局桌号基础偏移: 每个残局固定占用 2 张游戏桌(桌号 = BASE + 残局序号*2 + 0/1)
+// 残局桌号基础偏移: 每个残局按配置占用 N 张游戏桌(桌号 = BASE + 残局序号*N + 槽位), N 由 endgames.json 的 tablesPerEndgame 决定
 #define ENDGAME_TABLE_BASE    10000
 //请求残局列表 (Client -> Server, 无数据)
 #define GMT_ENDGAME_LIST_REQ		122
@@ -223,6 +223,7 @@ typedef struct tagENDGAME_INFO
 typedef struct tagGAME_ENDGAME_LIST
 {
 	int nCount;					//残局数量
+	int nTablesPerEndgame;		//每个残局的游戏桌数(与 endgames.json 的 tablesPerEndgame 一致)
 	ENDGAME_INFO vInfo[1];		//残局条目数组
 }GAME_ENDGAME_LIST,*PGAME_ENDGAME_LIST;
 
