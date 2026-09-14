@@ -51,6 +51,8 @@
     <imglist name="skin_btn_robot_beginner" src="svg:btn_robot_beginner" states="3"/>
     <imglist name="skin_btn_robot_medium" src="svg:btn_robot_medium" states="3" />
     <imglist name="skin_btn_robot_advanced" src="svg:btn_robot_advanced" states="3" />
+    <!-- 邀请机器人按钮 (蓝色, 机器人头部+加号徽章; 点击展开难度选择) -->
+    <imglist name="skin_btn_robot_invite" src="svg:btn_robot_invite" states="3" />
     <!-- 进度条皮肤 -->
     <imglist name="skin_progress_bg" src="svg:progress_bar"/>
     <imglist name="skin_progress_pos" src="svg:progress_pos"/>
