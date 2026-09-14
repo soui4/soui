@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <skin>
     <imgframe name="skin_item_bk" src="svg:lobby_table_bk" states="3" margin="5,5,5,5"/>
     <imglist name="skin_table" src="svg:chess_table"/>
@@ -47,6 +47,10 @@
     <imglist name="skin_seat" src="svg:seat_states" states="6"/>
     <!-- 下拉列表项背景 (4态: normal/hover/selected/disabled) -->
     <imgframe name="skin_list_item" src="svg:list_item" states="4" margin="5,2,2,2"/>
+    <!-- 邀请机器人难度按钮 (3态: normal/hover/pressed, 无文字由图标表达难度) -->
+    <imglist name="skin_btn_robot_beginner" src="svg:btn_robot_beginner" states="3"/>
+    <imglist name="skin_btn_robot_medium" src="svg:btn_robot_medium" states="3" />
+    <imglist name="skin_btn_robot_advanced" src="svg:btn_robot_advanced" states="3" />
     <!-- 进度条皮肤 -->
     <imglist name="skin_progress_bg" src="svg:progress_bar"/>
     <imglist name="skin_progress_pos" src="svg:progress_pos"/>

@@ -69,9 +69,9 @@ public:
         pItem->FindChildByName(L"txt_table_id")->SetWindowText(strTableId);
 
         // 重置难度选择为收起状态
-        pItem->FindChildByName(L"btn_lvl_beginner")->SetVisible(FALSE, TRUE);
-        pItem->FindChildByName(L"btn_lvl_medium")->SetVisible(FALSE, TRUE);
-        pItem->FindChildByName(L"btn_lvl_advanced")->SetVisible(FALSE, TRUE);
+        SWindow *pLevels = pItem->FindChildByName(L"wnd_robot_levels");
+        if (pLevels)
+            pLevels->SetVisible(FALSE, TRUE);
 
         auto slot = Subscriber(&CTableAdapter::OnButtonClick, this);
 
@@ -162,13 +162,12 @@ public:
         int nTableId = pItem->GetItemIndex();
         SStringW strName = pBtn->GetName();
 
-        // 邀请机器人: 展开/收起难度选择
+        // 邀请机器人: 展开/收起难度选择(初/中/高 图片按钮)
         if (strName == L"btn_invite_robot")
         {
-            BOOL bShow = !pItem->FindChildByName(L"btn_lvl_beginner")->IsVisible();
-            pItem->FindChildByName(L"btn_lvl_beginner")->SetVisible(bShow, TRUE);
-            pItem->FindChildByName(L"btn_lvl_medium")->SetVisible(bShow, TRUE);
-            pItem->FindChildByName(L"btn_lvl_advanced")->SetVisible(bShow, TRUE);
+            SWindow *pLevels = pItem->FindChildByName(L"wnd_robot_levels");
+            if (pLevels)
+                pLevels->SetVisible(!pLevels->IsVisible(), TRUE);
             return TRUE;
         }
 
@@ -187,9 +186,9 @@ public:
             int nTargetSeat = (nMySeat + 1) % PLAYER_COUNT;
             m_pLobby->ReqRobotInvite(nTableId, nTargetSeat, nLevel);
             // 收起难度选择
-            pItem->FindChildByName(L"btn_lvl_beginner")->SetVisible(FALSE, TRUE);
-            pItem->FindChildByName(L"btn_lvl_medium")->SetVisible(FALSE, TRUE);
-            pItem->FindChildByName(L"btn_lvl_advanced")->SetVisible(FALSE, TRUE);
+            SWindow *pLevels = pItem->FindChildByName(L"wnd_robot_levels");
+            if (pLevels)
+                pLevels->SetVisible(FALSE, TRUE);
             return TRUE;
         }
 

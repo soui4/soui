@@ -69,5 +69,9 @@
     <file name="combobox_dropbtn" path="svg\combobox_dropbtn.svg"/>
     <file name="edit_bg" path="svg\edit_bg.svg"/>
     <file name="list_item" path="svg\list_item.svg"/>
+    <!-- 邀请机器人难度按钮 -->
+    <file name="btn_robot_beginner" path="svg\btn_robot_beginner.svg"/>
+    <file name="btn_robot_medium" path="svg\btn_robot_medium.svg"/>
+    <file name="btn_robot_advanced" path="svg\btn_robot_advanced.svg"/>
   </svg>
 </resource>
