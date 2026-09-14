@@ -65,11 +65,11 @@ namespace
 // 智力等级 -> 搜索深度 映射
 TEST(ChessAITest, LevelToDepthMapping)
 {
-    EXPECT_EQ(2, CChessAI::LevelToDepth(ROBOT_LEVEL_BEGINNER)); // 初级
-    EXPECT_EQ(3, CChessAI::LevelToDepth(ROBOT_LEVEL_MEDIUM));   // 中级
-    EXPECT_EQ(4, CChessAI::LevelToDepth(ROBOT_LEVEL_ADVANCED)); // 高级
-    EXPECT_EQ(2, CChessAI::LevelToDepth(0));                    // 非法等级回退初级
-    EXPECT_EQ(2, CChessAI::LevelToDepth(99));
+    EXPECT_EQ(4, CChessAI::LevelToDepth(ROBOT_LEVEL_BEGINNER)); // 初级
+    EXPECT_EQ(5, CChessAI::LevelToDepth(ROBOT_LEVEL_MEDIUM));   // 中级
+    EXPECT_EQ(6, CChessAI::LevelToDepth(ROBOT_LEVEL_ADVANCED)); // 高级
+    EXPECT_EQ(4, CChessAI::LevelToDepth(0));                    // 非法等级回退初级
+    EXPECT_EQ(4, CChessAI::LevelToDepth(99));
 }
 
 // 默认开局下，三个难度均能给出一个有效、且不送王的走法

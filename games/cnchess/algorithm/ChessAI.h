@@ -3,9 +3,9 @@
 #include <vector>
 
 // 机器人搜索深度(对应智力等级)
-#define ROBOT_AI_DEPTH_BEGINNER 2   // 初级
-#define ROBOT_AI_DEPTH_MEDIUM   3   // 中级
-#define ROBOT_AI_DEPTH_ADVANCED 4   // 高级
+#define ROBOT_AI_DEPTH_BEGINNER 3   // 初级
+#define ROBOT_AI_DEPTH_MEDIUM   4   // 中级
+#define ROBOT_AI_DEPTH_ADVANCED 6   // 高级
 
 /**
  * @brief 中国象棋 AI 引擎
