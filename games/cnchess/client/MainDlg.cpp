@@ -13,7 +13,11 @@
 #include <helper/slog.h>
 #include <mmsystem.h>
 #include <shlobj.h>
+#include "utils.h"
+#include <valueAnimator/SPropertyAnimator.h>
 #define kLogTag "MainDlg"
+
+const int CMainDlg::ANI_TIP = 0x50;
 
 #ifdef _WIN32
 #include "win32_audio.h"
@@ -29,9 +33,10 @@ CMainDlg::CMainDlg(SGameTheme* pTheme)
 , m_pThemeProgressModal(NULL)
 , m_themeProgressSession(0)
 , m_modalRoot(NULL)
+, m_pTipContainer(NULL)
 {
     m_pGame = new CChessGame(this,pTheme);
-    m_pLobbyHandler = new LobbyHandler();
+    m_pLobbyHandler = new LobbyHandler(this);
     m_webSocketClient.SetMessageHandler(this);
     m_themeDownloader.SetListener(this);
 }
@@ -45,6 +50,7 @@ CMainDlg::~CMainDlg()
 BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 {
     m_modalRoot = FindChildByName("modal_root");
+    m_pTipContainer = FindChildByName("tip_container");
     #if defined (__IOS__)
     FindChildByName("pane_ios_header")->SetVisible(TRUE,TRUE);
     #endif
@@ -437,6 +443,46 @@ void CMainDlg::OnBtnUnmute()
     FindChildByName(L"btn_mute")->SetVisible(TRUE);
     FindChildByName(L"btn_unmute")->SetVisible(FALSE);
     m_bMute = TRUE;
+}
+
+void CMainDlg::onAnimationEnd(IValueAnimator *pAnimator)
+{
+    IPropertyAnimator *pPropAnimator = sobj_cast<IPropertyAnimator>(pAnimator);
+    if (pPropAnimator && pPropAnimator->GetID() == ANI_TIP)
+    {
+        IWindow *pTip = pPropAnimator->GetTarget();
+        if (pTip)
+            pTip->Destroy();
+    }
+}
+
+void CMainDlg::PlayTip(const SStringT &strTip)
+{
+    if (!m_pTipContainer || !m_pTheme) return;
+    SXmlNode xmlTip = m_pTheme->GetTemplate(L"tip");
+    SASSERT(xmlTip);
+    SStringW strWndClass = xmlTip.attribute(L"wndclass").as_string(L"text");
+    IWindow *pTip = SApplication::getSingletonPtr()->CreateWindowByName(strWndClass);
+    pTip->InitFromXml(&xmlTip);
+    // 让提示容器覆盖顶层内容区域（悬浮容器不参与 vbox 布局，这里显式设置尺寸）
+    SWindow *pParent = m_pTipContainer->GetParent();
+    if (pParent)
+    {
+        CRect rcContent;
+        pParent->GetChildrenLayoutRect(&rcContent);
+        m_pTipContainer->Move(rcContent);
+    }
+    m_pTipContainer->InsertIChild(pTip);
+    pTip->SetWindowText(strTip);
+    AnchorPos toPos;
+    toPos.type = APT_Center_Top;
+    toPos.x = SLayoutSize(-10, dp);
+    toPos.y = SLayoutSize(-10, dp);
+    toPos.fOffsetX = -0.5f;
+    toPos.fOffsetY = -0.5f;
+    SAutoRefPtr<IValueAnimator> pAnim = Util::MoveAndHideSprite(pTip, toPos, 5000);
+    pAnim->SetID(ANI_TIP);
+    pAnim->addListener(this);//destroy the tip when animation end.
 }
 
 void CMainDlg::PlayWave(LPCTSTR pszSound)

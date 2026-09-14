@@ -15,6 +15,7 @@ class CMainDlg : public SHostWnd
                , public SDpiHandler<CMainDlg>
                , public WebSocketClient::IListener
                , public ThemeDownloadManager::IListener
+               , public IAnimatorListener
 {
 public:
     CMainDlg(SGameTheme* pTheme);
@@ -28,6 +29,8 @@ public:
     BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam);
 
     void PlayWave(LPCTSTR pszSound);
+    // 顶层操作提示（悬浮于所有页面之上，大厅/游戏通用）
+    void PlayTip(const SStringT &strTip);
     // 主题是否已加载
     bool IsThemeLoaded() const { return m_bThemeLoaded; }
     SWindow *getModalRoot() const{return m_modalRoot;}
@@ -38,6 +41,10 @@ public:
 
   protected:
     void OnScaleChanged(int nScale) override;
+    // IAnimatorListener: 提示动画结束后销毁提示窗口
+    STDMETHOD_(void, onAnimationStart)(THIS_ IValueAnimator * pAnimator) override{}
+    STDMETHOD_(void, onAnimationEnd)(THIS_ IValueAnimator * pAnimator) override;
+    STDMETHOD_(void, onAnimationRepeat)(THIS_ IValueAnimator * pAnimator) override{}
   protected:
     virtual BOOL OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE> > data) override;
 
@@ -103,4 +110,6 @@ private:
     SModalRoot* m_pThemeProgressModal;
     ModalViewSessionID m_themeProgressSession;
     SWindow * m_modalRoot;
+    SWindow* m_pTipContainer;   // 顶层操作提示容器
+    static const int ANI_TIP;   // 提示动画ID
 };

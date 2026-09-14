@@ -6,7 +6,7 @@
 #include "WebSocketClient.h"
 #include "ConnListener-i.h"
 class CTableAdapter;
-
+class CMainDlg;
 /**
  * @brief 大厅处理器类
  * 
@@ -22,7 +22,7 @@ public:
     /**
      * @brief 构造函数
      */
-    LobbyHandler();
+    LobbyHandler(CMainDlg *pMainDlg);
     
     /**
      * @brief 析构函数
@@ -123,12 +123,13 @@ private:
      * @brief 弹出提示消息框
      * @param pszMsg 提示内容
      */
-    void NotifyToast(LPCWSTR pszMsg);
+    void NotifyToast(LPCTSTR pszMsg);
     
   private:
     SWindow *m_pRoot;              ///< 根窗口指针
     WebSocketClient *m_ws;         ///< WebSocket客户端指针
     CTableAdapter *m_pAdapter;     ///< 桌子适配器指针
+    CMainDlg *m_pMainDlg;
 };
 
 #endif//LOBBYHANDLER_H

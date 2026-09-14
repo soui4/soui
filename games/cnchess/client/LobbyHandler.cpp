@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "LobbyHandler.h"
 #include "myprofile.h"
+#include "MainDlg.h"
 #include <cnchessProtocol.h>
 #include <helper/slog.h>
 #include <helper/SAdapterBase.h>
@@ -199,7 +200,7 @@ public:
 };
 
 //---------------------------------------------------------------------------
-LobbyHandler::LobbyHandler():m_pRoot(NULL),m_pAdapter(NULL)
+LobbyHandler::LobbyHandler(CMainDlg *pMainDlg):m_pRoot(NULL),m_pAdapter(NULL),m_pMainDlg(pMainDlg)
 {
 
 }
@@ -319,19 +320,18 @@ BOOL LobbyHandler::OnRobotInviteAck(const void *lpData, int nSize)
     SLOGI() << "OnRobotInviteAck: nTableId=" << pAck->nTableId << " nSeat=" << pAck->nSeat << " bSuccess=" << pAck->bSuccess;
     if (pAck->bSuccess)
     {
-        NotifyToast(L"机器人已入座！");
+        NotifyToast(_T("机器人已入座！"));
     }
     else
     {
-        NotifyToast(L"邀请机器人失败，座位可能已被占用。");
+        NotifyToast(_T("邀请机器人失败，座位可能已被占用。"));
     }
     return TRUE;
 }
 
-void LobbyHandler::NotifyToast(LPCWSTR pszMsg)
+void LobbyHandler::NotifyToast(LPCTSTR pszMsg)
 {
-    if (!m_pRoot) return;
-    SMessageBox(m_pRoot->GetContainer()->GetHostHwnd(), SStringW(pszMsg), SStringW(L"提示"), MB_OK | MB_ICONINFORMATION);
+    m_pMainDlg->PlayTip(pszMsg);
 }
 
 void LobbyHandler::OnConnected()

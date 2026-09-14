@@ -102,7 +102,6 @@ enum{
     ANI_DOWN,
     ANI_MOVEDOWN,
     ANI_SHADOW_RESTORE,
-    ANI_TIP,
 };
 
 void CChessGame::ShowPosFlags(POINT ptPiece, BOOL bShow)
@@ -248,11 +247,6 @@ void CChessGame::onAnimationEnd(IValueAnimator *pAnimator)
         POINT ptTarget = pPiece->GetTarget();
         MovePiece(pPiece->GetID()-ID_CHESS_BASE, ptTarget);
     }
-    else if(pPropAnimator->GetID() == ANI_TIP)
-    {
-        IWindow *pTip = pPropAnimator->GetTarget();
-        pTip->Destroy();
-    }
 }
 
 void CChessGame::SelectPiece(int nId)
@@ -396,7 +390,7 @@ BOOL CChessGame::CheckMove(POINT ptFrom, POINT ptTo, BOOL bSilent){
         bValidMove = FALSE;
         if (!bSilent)
         {
-            PlayTip(strTip);
+            m_pMainDlg->PlayTip(strTip);
             PlayEffectSound(Sounds::Effects::kDanger);
         }
     }
@@ -422,7 +416,7 @@ BOOL CChessGame::CheckMove(POINT ptFrom, POINT ptTo, BOOL bSilent){
         }
         if (!bSilent && !strTip.IsEmpty())
         {
-            PlayTip(strTip);
+            m_pMainDlg->PlayTip(strTip);
         }
     }
     // 恢复状态
@@ -436,12 +430,12 @@ BOOL CChessGame::OnChessPieceClick(IEvtArgs *e)
 {
     if(GetActivePlayerIndex() != GetSelfIndex()) 
     {
-        PlayTip(_T("It's not your turn"));
+        m_pMainDlg->PlayTip(_T("It's not your turn"));
         return TRUE;
     }
     if(m_nUndoLeft > 0)
     {
-        PlayTip(_T("正在悔棋中，请稍候"));
+        m_pMainDlg->PlayTip(_T("正在悔棋中，请稍候"));
         return TRUE;
     }
     if(m_nSelectedChessID != -1)
@@ -618,12 +612,12 @@ void CChessGame::OnBtnStart()
 {
     MyProfile *pMyProfile = MyProfile::getSingletonPtr();
     if(pMyProfile->GetUID() == 0){
-        PlayTip(_T("请先登录"));
+        m_pMainDlg->PlayTip(_T("请先登录"));
         return;
     }
     if(pMyProfile->GetTableId()==-1 || pMyProfile->GetSeatIndex()==-1)
     {
-        PlayTip(_T("请先在大厅找个桌子坐下:)"));
+        m_pMainDlg->PlayTip(_T("请先在大厅找个桌子坐下:)"));
         return;
     }
 
@@ -647,7 +641,7 @@ void CChessGame::OnBtnReqPeace()
         SStringA strDesc = S_CT2A(pEdtDesc->GetWindowText(), CP_UTF8);
         strcpy_s(msg.szMsg, 100, strDesc);
         wsSendMsg(MSG_REQ_PEACE, &msg, sizeof(msg));
-        PlayTip(_T("已发送求和请求"));
+        m_pMainDlg->PlayTip(_T("已发送求和请求"));
         m_pMainDlg->EndModalViewSession(session_id, IDOK);
         return TRUE;
     });
@@ -664,7 +658,7 @@ void CChessGame::OnBtnReqPeace()
         SStringA strDesc = S_CT2A(dlg.m_strDesc,CP_UTF8);
         strcpy_s(msg.szMsg,100,strDesc);
         wsSendMsg(MSG_REQ_PEACE, &msg, sizeof(msg));
-        PlayTip(_T("已发送求和请求"));
+        m_pMainDlg->PlayTip(_T("已发送求和请求"));
     }
 #endif
 }
@@ -683,7 +677,7 @@ void CChessGame::OnBtnReqSurrender()
         MSG_SURRENDER msg;
         msg.iIndex = m_iSelfIndex;
         wsSendMsg(MSG_REQ_SURRENDER, &msg, sizeof(msg));
-        PlayTip(_T("已发送投降请求"));
+        m_pMainDlg->PlayTip(_T("已发送投降请求"));
         m_pMainDlg->EndModalViewSession(session_id, IDOK);
         return TRUE;
     });
@@ -701,7 +695,7 @@ void CChessGame::OnBtnReqSurrender()
         MSG_SURRENDER msg;
         msg.iIndex = m_iSelfIndex;
         wsSendMsg(MSG_REQ_SURRENDER, &msg, sizeof(msg));
-        PlayTip(_T("已发送投降请求"));
+        m_pMainDlg->PlayTip(_T("已发送投降请求"));
     }
 #endif
 }
@@ -710,23 +704,23 @@ void CChessGame::OnBtnReqRegret()
 {
     if(m_nUsedRegretCount >= m_dwProps[PROPID_REGRET])
     {
-        PlayTip(_T("已用完悔棋次数"));
+        m_pMainDlg->PlayTip(_T("已用完悔棋次数"));
         return;
     }
     if(m_history.empty())
     {
-        PlayTip(_T("没有可悔棋的棋子"));
+        m_pMainDlg->PlayTip(_T("没有可悔棋的棋子"));
         return;
     }
     if(GetActivePlayerIndex() != m_iSelfIndex){
-        PlayTip(_T("请等待对方落子后再悔棋"));
+        m_pMainDlg->PlayTip(_T("请等待对方落子后再悔棋"));
         return;
     }
 
     MSG_REGRET msg;
     msg.iIndex = m_iSelfIndex; 
     wsSendMsg(MSG_REQ_REGRET, &msg, sizeof(msg));
-    PlayTip(_T("已发送悔棋请求"));
+    m_pMainDlg->PlayTip(_T("已发送悔棋请求"));
 }
 
 void CChessGame::OnSetActivePlayerIndex(int nActiveSeat){
@@ -900,7 +894,7 @@ void CChessGame::PlayWattingAnimation(LPCTSTR pszTip)
         m_pGameBoard->InsertIChild(pWaiting);
         pWaiting->AddRef();
     }
-    PlayTip(SStringT(pszTip));
+    m_pMainDlg->PlayTip(SStringT(pszTip));
 }
 
 void CChessGame::StopWatingAnimation()
@@ -1268,7 +1262,7 @@ void CChessGame::OnAckPeace(const void *pData, int nSize)
         return;
     SLOGI() << "Peace request, desc: " << pPeace->szMsg;
     SASSERT(pPeace->nResult == 0);
-    PlayTip(SStringT().Format(_T("对家不同意和棋,%s"),S_CA2T(pPeace->szMsg,CP_UTF8).c_str()));
+    m_pMainDlg->PlayTip(SStringT().Format(_T("对家不同意和棋,%s"),S_CA2T(pPeace->szMsg,CP_UTF8).c_str()));
 }
 
 void CChessGame::OnAckRegret(const void *pData, int nSize)
@@ -1446,7 +1440,7 @@ void CChessGame::OnGameOver(const void *pData, int nSize)
 {
     MSG_GAMEOVER *pOver = (MSG_GAMEOVER *)pData;
     SLOGI() << "Game over, desc: " << pOver->szDesc;
-    PlayTip(S_CA2T(pOver->szDesc, CP_UTF8));
+    m_pMainDlg->PlayTip(S_CA2T(pOver->szDesc, CP_UTF8));
     m_pMainDlg->KillTimer(TIMERID_CLOCK_ME);
     m_pMainDlg->KillTimer(TIMERID_CLOCK_ENEMY);
     for(int i = 0; i < PLAYER_COUNT; i++){
@@ -1481,7 +1475,7 @@ void CChessGame::OnLoginAck(const void *pData, int nSize)
 void CChessGame::OnGameMsg(const void *pData, int nSize)
 {
     SStringA msgUtf8((LPCSTR)pData, nSize);
-    PlayTip(S_CA2T(msgUtf8, CP_UTF8));
+    m_pMainDlg->PlayTip(S_CA2T(msgUtf8, CP_UTF8));
 }
 
 void CChessGame::OnAvatarAck(const void *pData, int nSize)
@@ -1557,26 +1551,6 @@ void CChessGame::UpdateClock(int nSecond, int iSeat)
     {
         PlayEffectSound(Sounds::Effects::kcount_down);
     }    
-}
-
-void CChessGame::PlayTip(const SStringT &strTip)
-{
-    SXmlNode xmlTip = m_pTheme->GetTemplate(L"tip");
-    SASSERT(xmlTip);
-    SStringW strWndClass = xmlTip.attribute(L"wndclass").as_string(L"text");
-    IWindow *pTip = SApplication::getSingletonPtr()->CreateWindowByName(strWndClass);
-    pTip->InitFromXml(&xmlTip);
-    m_pGameBoard->InsertIChild(pTip);
-    pTip->SetWindowText(strTip);
-    AnchorPos toPos;
-    toPos.type = APT_Center_Top;
-    toPos.x=SLayoutSize(-10,dp);
-    toPos.y=SLayoutSize(-10,dp);
-    toPos.fOffsetX = -0.5f;
-    toPos.fOffsetY = -0.5f;
-    SAutoRefPtr<IValueAnimator> pAnim = Util::MoveAndHideSprite(pTip, toPos, 5000);
-    pAnim->SetID(ANI_TIP);
-    pAnim->addListener(this);//destroy the tip when animation end.
 }
 
 void CChessGame::wsSendMsg(DWORD dwType, LPVOID lpData, DWORD dwSize)

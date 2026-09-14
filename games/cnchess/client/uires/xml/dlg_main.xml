@@ -20,10 +20,13 @@ translucent="1"
       </window>
       <imgbtn name="btn_close" skin="_skin.sys.btn.close"     tip="close" animate="1"/>
     </caption>
-    <tabctrl size="-2,0" weight="1" tabHeight="30">
-      <include src="layout:page_lobby"/>
-      <include src="layout:page_game"/>
-      <include src="layout:page_about"/>
-    </tabctrl>
+    <window size="-2,0" weight="1" name="content">
+      <tabctrl pos="0,0,-0,-0" tabHeight="30">
+        <include src="layout:page_lobby"/>
+        <include src="layout:page_game"/>
+        <include src="layout:page_about"/>
+      </tabctrl>
+      <window pos="0,0,-0,-0" name="tip_container" layout="anchor" float="1" msgTransparent="1"/>
+    </window>
   </root>
 </SOUI>

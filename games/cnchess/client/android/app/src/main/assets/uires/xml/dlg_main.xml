@@ -15,5 +15,7 @@ translucent="1"
         <include src="layout:page_about"/>
       </tabctrl>
     </window>
+    <!-- 顶层操作提示容器: 悬浮于所有页面之上, 由 CMainDlg::PlayTip 使用 -->
+    <window name="tip_container" layout="anchor" float="1" msgTransparent="1" size="-2,-2"/>
   </root>
 </SOUI>

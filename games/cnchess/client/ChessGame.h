@@ -284,12 +284,6 @@ protected:
     void UpdateClock(int nSecond, int iSeat);
     
     /**
-     * @brief 显示提示信息
-     * @param strTip 提示信息
-     */
-    void PlayTip(const SStringT &strTip);
-    
-    /**
      * @brief 通过WebSocket发送消息
      * @param dwType 消息类型
      * @param lpData 消息数据指针
