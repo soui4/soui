@@ -280,17 +280,20 @@ TEST(ChessAITest, CapturesHangingBigPiece)
 
 // 高级机器人不应"白白送子": 黑炮处于红车攻击线(悬空, 无兑子补偿), 黑方行棋时必须
 // 把该炮移开或妥善处理, 不能移到一个仍会被红车立刻吃掉的落点。
+// 注: CChessLayout 为 m_chesses[行y][列x] 二维数组, 注释坐标均为 (x,y);
+//     且 InitLayout 恒置红先行, 黑方行棋须显式 SetActiveSide(CS_BLACK)。
 TEST(ChessAITest, AvoidsHangingOwnPiece)
 {
     int board[10][9];
     ClearBoard(board);
     board[0][4] = CHSMAN_BLK_JIANG; // 黑将 (4,0)
-    board[7][3] = CHSMAN_BLK_PAO;   // 黑炮 (3,7), 沿第7列被下路红车攻击
+    board[3][7] = CHSMAN_BLK_PAO;   // 黑炮 (7,3), 沿第7列被下路红车攻击
     board[7][7] = CHSMAN_RED_JU;    // 红车 (7,7), (7,6)..(7,4) 为空 → 攻击 (7,3)
-    board[3][7] = CHSMAN_RED_JIANG; // 红将 (3,7)
+    board[7][3] = CHSMAN_RED_JIANG; // 红将 (3,7)
 
     CChessLayout layout;
     layout.InitLayout(board, CS_BLACK);
+    layout.SetActiveSide(CS_BLACK); // 轮到黑方走棋
 
     MOVESTEP best = CChessAI::SearchBestMove(layout, CChessAI::LevelToDepth(ROBOT_LEVEL_ADVANCED));
     ASSERT_FALSE(IsInvalidMove(best));
