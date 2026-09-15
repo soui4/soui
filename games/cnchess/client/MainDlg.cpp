@@ -33,6 +33,7 @@ CMainDlg::CMainDlg(SGameTheme* pTheme)
 , m_themeProgressSession(0)
 , m_modalRoot(NULL)
 , m_pTipContainer(NULL)
+, m_nSelAvatarId(1)
 {
     m_webSocketClient.SetMessageHandler(this);
     m_themeDownloader.SetListener(this);
@@ -93,8 +94,34 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
                 pEdtSvr->SetWindowText(S_CW2T(node.attribute(L"svr").as_string()));
                 pEdtName->SetWindowText(S_CW2T(node.attribute(L"name").as_string()));
                 pComboSex->SetCurSel(node.attribute(L"sex").as_int(0));
+                int nAvatarId = node.attribute(L"avatar_id").as_int(1);
+                if (nAvatarId < 1 || nAvatarId >= BuiltinAvatar::COUNT) nAvatarId = 1;
+                m_nSelAvatarId = nAvatarId;
             }
         }
+    }
+
+    // 头像选择：仅提供内置头像(CHAIR 为空座位占位, 不提供), 选中项高亮
+    auto UpdateAvatarSel = [pModal](int nId){
+        for (int i = 1; i < BuiltinAvatar::COUNT; ++i)
+        {
+            SStringT strName;
+            strName.Format(_T("btn_avatar_%d"), i);
+            SWindow *pBtn = pModal->FindChildByName(strName);
+            if (pBtn) pBtn->SetAlpha(i == nId ? 255 : 160);
+        }
+    };
+    UpdateAvatarSel(m_nSelAvatarId);
+    for (int i = 1; i < BuiltinAvatar::COUNT; ++i)
+    {
+        SStringT strName;
+        strName.Format(_T("btn_avatar_%d"), i);
+        SWindow *pBtn = pModal->FindChildByName(strName);
+        if (pBtn) pBtn->SubscribeEvent(EventCmd::EventID, [this, i, UpdateAvatarSel](IEvtArgs *e){
+            m_nSelAvatarId = i;
+            UpdateAvatarSel(i);
+            return TRUE;
+        });
     }
 
     ModalViewSessionID session_id = BeginModalViewSession(pModal,m_modalRoot);
@@ -114,6 +141,7 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
             node.attribute2(L"svr").set_value(S_CT2W(strSvr));
             node.attribute2(L"name").set_value(S_CT2W(strName));
             node.attribute2(L"sex").set_value(cSex);
+            node.attribute2(L"avatar_id").set_value(m_nSelAvatarId);
         }
         SStringT strCfg = SApplication::getSingleton().GetAppDir() + _T("/cnchess_cfg.xml");
         doc.save_file(strCfg);
@@ -130,7 +158,7 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
             SStringT strName = pEdtName->GetWindowText();
             int iSel = pComboSex->GetCurSel();
             char cSex = pComboSex->GetItemData(iSel);
-            OnLoginSuccess(strSvr, strName, cSex);
+            OnLoginSuccess(strSvr, strName, cSex, m_nSelAvatarId);
         } else {
             OnClose();
         }
@@ -171,14 +199,15 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 }
 
 #if defined(__MOBILE__)
-void CMainDlg::OnLoginSuccess(SStringT strSvr, SStringT strName, char cSex)
+void CMainDlg::OnLoginSuccess(SStringT strSvr, SStringT strName, char cSex, int nAvatarId)
 {
     MyProfile* myProfile = MyProfile::getSingletonPtr();
     myProfile->SetSex(cSex);
     myProfile->SetName(strName);
-    // 移动端默认根据性别匹配默认内置头像
-    int nId = (cSex == SEX_FEMALE) ? BuiltinAvatar::FEMALE : BuiltinAvatar::MALE;
-    myProfile->SetAvatarId(nId);
+    // 使用登录弹窗选择的内置头像; 非法值回退为按性别匹配默认头像
+    if (nAvatarId < 1 || nAvatarId >= BuiltinAvatar::COUNT)
+        nAvatarId = (cSex == SEX_FEMALE) ? BuiltinAvatar::FEMALE : BuiltinAvatar::MALE;
+    myProfile->SetAvatarId(nAvatarId);
 
     // 初始化大厅（不依赖主题）
     m_pLobbyHandler->Init(FindChildByName(L"room_container"), &m_webSocketClient);

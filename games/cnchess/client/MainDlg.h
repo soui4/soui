@@ -41,7 +41,7 @@ public:
     void SwitchToGame();
 #if defined(__MOBILE__)
     // 登录成功回调（模态视图方式，移动平台不支持独立消息循环）
-    void OnLoginSuccess(SStringT strSvr, SStringT strName, char cSex);
+    void OnLoginSuccess(SStringT strSvr, SStringT strName, char cSex, int nAvatarId);
 #endif
 
   protected:
@@ -117,5 +117,6 @@ private:
     ModalViewSessionID m_themeProgressSession;
     SWindow * m_modalRoot;
     SWindow* m_pTipContainer;   // 顶层操作提示容器
+    int m_nSelAvatarId;         // 移动端登录弹窗当前选中的内置头像ID (1..BuiltinAvatar::COUNT-1)
     static const int ANI_TIP;   // 提示动画ID
 };
