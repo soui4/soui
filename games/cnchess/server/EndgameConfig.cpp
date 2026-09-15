@@ -7,53 +7,43 @@
 #include <string/strcpcvt.h>
 #define kLogTag "EndgameConfig"
 
-// 汉字棋谱布局: 把一行9个汉字(UTF-8)翻译为CHESSMAN数字编码.
-// 红方简体: 帅车马炮仕相兵; 黑方繁体: 将車馬砲士象卒; 空位 '.'
-static int EndgameCharToMan(const std::string & ch)
+
+static size_t UTF8CharLength(unsigned char ch)
 {
-    if (ch == "\xe5\xb8\x85") return CHSMAN_RED_JIANG;  // 帅
-    if (ch == "\xe8\xbd\xa6") return CHSMAN_RED_JU;     // 车
-    if (ch == "\xe9\xa9\xac") return CHSMAN_RED_MA;     // 马
-    if (ch == "\xe7\x82\xae") return CHSMAN_RED_PAO;    // 炮
-    if (ch == "\xe4\xbb\x95") return CHSMAN_RED_SHI;    // 仕
-    if (ch == "\xe7\x9b\xb8") return CHSMAN_RED_XIANG;  // 相
-    if (ch == "\xe5\x85\xb5") return CHSMAN_RED_BING;   // 兵
-    if (ch == "\xe5\xb0\x86") return CHSMAN_BLK_JIANG;  // 将
-    if (ch == "\xe8\xbb\x8a") return CHSMAN_BLK_JU;     // 車
-    if (ch == "\xe9\xa6\xac") return CHSMAN_BLK_MA;     // 馬
-    if (ch == "\xe7\xa0\xb2") return CHSMAN_BLK_PAO;    // 砲
-    if (ch == "\xe5\xa3\xab") return CHSMAN_BLK_SHI;    // 士
-    if (ch == "\xe8\xb1\xa1") return CHSMAN_BLK_XIANG;  // 象
-    if (ch == "\xe5\x8d\x92") return CHSMAN_BLK_BING;   // 卒
-    return CHSMAN_NULL; // '.' 或不认识视为空
+    if (ch < 0x80)
+    {
+        return 1;
+    }
+    else if (ch < 0x80 + 0x40 + 0x20)
+    {
+        return 2;
+    }
+    else if (ch < 0x80 + 0x40 + 0x20 + 0x10)
+    {
+        return 3;
+    }
+    else
+    {
+        return 4;
+    }
 }
 
-static bool EndgameTranslateRow(const std::string & s, int out[9])
+typedef std::map<std::string, int> CHESS_NAME_MAP;
+
+static bool EndgameTranslateRow(const std::string & s, int out[9], const CHESS_NAME_MAP & chessMap)
 {
-    size_t len = s.size();
-    size_t i = 0;
     int idx = 0;
-    while (i < len && idx < 9)
+    const uint8_t* p = (const uint8_t*)s.c_str();
+    while (*p && idx < 9)
     {
-        unsigned char c = (unsigned char)s[i];
-        if (c == '.')
-        {
+        int n = UTF8CharLength(*p);
+        std::string name((const char*)p, n);
+        p += n;
+        CHESS_NAME_MAP::const_iterator it = chessMap.find(name);
+        if (it == chessMap.cend())
             out[idx++] = CHSMAN_NULL;
-            i += 1;
-        }
-        else if (c >= 0x80)
-        {
-            if (i + 3 > len)
-                break;
-            std::string sub = s.substr(i, 3);
-            int man = EndgameCharToMan(sub);
-            out[idx++] = man;
-            i += 3;
-        }
         else
-        {
-            return false; // 意外ASCII字符
-        }
+            out[idx++] = it->second;
     }
     while (idx < 9)
         out[idx++] = CHSMAN_NULL;
@@ -135,8 +125,25 @@ bool EndgameConfig::Load(LPCTSTR pszJsonPath)
     }
     // 每残局桌数配置项(缺省 2), 供残局桌区间/映射使用
     m_nTablesPerEndgame = root.get("tablesPerEndgame", 2).asInt();
-    if (m_nTablesPerEndgame < 1)
+    if (m_nTablesPerEndgame < 2)
         m_nTablesPerEndgame = 2;
+    std::string strRed = root.get("red", "").asString();
+    std::string strBlack = root.get("black", "").asString();
+    CHESS_NAME_MAP chessmap;
+    const uint8_t* pRed = (const uint8_t*)strRed.c_str();
+    const uint8_t* pBlack = (const uint8_t*)strBlack.c_str();
+    for (int i = 0; i < 7; i++) {
+        int n1 = UTF8CharLength(*pRed);
+        chessmap.insert(std::make_pair(std::string((const char*)pRed, n1), CHSMAN_RED_JIANG+i));
+        pRed += n1;
+        int n2 = UTF8CharLength(*pBlack);
+        chessmap.insert(std::make_pair(std::string((const char*)pBlack, n1), CHSMAN_BLK_JIANG + i));
+        pBlack += n2;
+        if (pRed[0] == 0 || pBlack[0] == 0)
+            break;
+    }
+    if (chessmap.size() != 14)
+        return false;
     for (Json::Value::ArrayIndex i = 0; i < arr.size(); i++)
     {
         Json::Value & item = arr[i];
@@ -165,7 +172,7 @@ bool EndgameConfig::Load(LPCTSTR pszJsonPath)
             {
                 // 汉字布局: 每行一个9字字符串, 翻译为数字编码
                 std::string s = layout[y].asString();
-                if (!EndgameTranslateRow(s, row))
+                if (!EndgameTranslateRow(s, row, chessmap))
                     bValid = false;
             }
             else if (layout[y].isArray() && layout[y].size() == 9)

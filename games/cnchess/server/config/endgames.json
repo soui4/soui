@@ -1,5 +1,7 @@
 ﻿{
   "tablesPerEndgame": 2,
+  "red":"帅车马炮仕相兵",
+  "black":"将車馬砲士象卒",
   "endgames": [
     {
       "id": 1,
