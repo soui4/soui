@@ -1,7 +1,7 @@
-#pragma once
+#ifndef _SRATING_BAR_H_
+#define _SRATING_BAR_H_
 
-namespace SOUI
-{
+SNSBEGIN
 class SRatingBar : public SWindow {
     DEF_SOBJECT(SWindow, L"ratingbar")
   public:
@@ -33,4 +33,5 @@ class SRatingBar : public SWindow {
     float m_fValue;
 };
 
-} // namespace SOUI
+SNSEND
+#endif//_SRATING_BAR_H_

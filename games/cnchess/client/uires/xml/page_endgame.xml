@@ -10,6 +10,7 @@
                 <!-- 顶部: 残局名 + 桌序号 + 对局中 -->
                 <window size="-2,30" layout="hbox" interval="5" gravity="center_vertical" padding="20,10,20,0">
                     <text name="txt_eg_table_title" text="" colorText="#FFD700" font="size:12,bold" cursor="hand"/>
+                    <text name="txt_eg_table_difficulty" text="" colorText="#FFE45E" font="size:11"/>
                     <window size="0,0" weight="1"/>
                     <img name="img_playing" skin="skin_playing" visible="0" size="30,20"/>
                 </window>

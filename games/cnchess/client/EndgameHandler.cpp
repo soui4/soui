@@ -144,6 +144,21 @@ public:
             pTitle->SetWindowText(strTitle);
         }
 
+        // 难度系数(与 ENDGAME_INFO::nLevel 对应: 1初级/2中级/3高级)
+        SWindow *pDiff = pItem->FindChildByName(L"txt_eg_table_difficulty");
+        if (pDiff)
+        {
+            SStringT strDiff;
+            if (pEndgame)
+            {
+                int nLevel = pEndgame->nLevel;
+                strDiff = SStringT().Format(_T("难度:%s"),
+                    (nLevel == 1) ? _T("初级") : (nLevel == 2) ? _T("中级")
+                    : (nLevel >= 3) ? _T("高级") : _T("-"));
+            }
+            pDiff->SetWindowText(strDiff);
+        }
+
         // 初始化座位
         for (int i = 0; i < PLAYER_COUNT; i++)
         {

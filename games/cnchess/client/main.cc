@@ -1,10 +1,11 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include <SAppCfg.h>
 #include "MainDlg.h"
 #include "SGameTheme.h"
 #include "CnchessSkin.h"
 #include "ChessBoard.h"
 #include "ChessPiece.h"
+#include "SRatingBar.h"
 #include <helper/slog.h>
 
 #if defined(__IOS__)
@@ -49,6 +50,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
     app.RegisterWindowClass<SGifPlayer>();
     app.RegisterWindowClass<CChessBoard>();
     app.RegisterWindowClass<CChessPiece>();
+    app.RegisterWindowClass<SOUI::SRatingBar>();
     SStringT appDir = app.GetAppDir();
 
     SAppCfg cfg;

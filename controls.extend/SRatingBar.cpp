@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "SRatingBar.h"
 
-namespace SOUI
-{
+SNSBEGIN
+
 SRatingBar::SRatingBar(void)
     : m_pStar(NULL)
     , m_nStars(5)
@@ -63,4 +63,4 @@ void SRatingBar::SetValue(float fValue)
     Invalidate();
 }
 
-} // namespace SOUI
+SNSEND
