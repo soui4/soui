@@ -48,8 +48,9 @@ static BOOL WINAPI ConsoleHandler(DWORD dwType)
     case CTRL_LOGOFF_EVENT:
     case CTRL_SHUTDOWN_EVENT:
         if (g_game) {
+            // 只置停止标志, 由主线程检测后安全退出, 避免在控制台处理线程内阻塞/join
             SLOGI() << "Received exit signal, stopping game...";
-            g_game->GameStop();
+            g_game->RequestStop();
         }
         return TRUE;
     default:
@@ -60,9 +61,9 @@ static BOOL WINAPI ConsoleHandler(DWORD dwType)
 static void signalHandler(int signum)
 {
     if (g_game) {
-        g_game->GameStop();
+        // 只置停止标志, 由主线程检测后安全退出, 不在信号上下文内做阻塞操作
+        g_game->RequestStop();
     }
-    exit(signum);
 }
 #endif
 
@@ -133,8 +134,6 @@ int run(LPCTSTR pszCfg){
         signal(SIGTERM, signalHandler);
 #endif
         BOOL bRet = game.GameStart(nPort);
-        // 服务器退出后回收机器人AI线程池线程
-        CRobotAIPool::getSingletonPtr()->Shutdown();
         delete propBag;
         SLOGI() << " chess server quit, ret=" << bRet;
         return bRet ? 0 : 1;

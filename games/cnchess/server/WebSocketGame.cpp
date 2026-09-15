@@ -129,6 +129,7 @@ CWebSocketGame::CWebSocketGame()
 {
 	m_nextUid = 1;
 	m_uPort = 0;
+	m_stopRequested = false;
     m_pListener = NULL;
     m_pWsServer = NULL;
     m_nMaxTable = 100; // 默认最大桌子数;
@@ -207,8 +208,13 @@ BOOL CWebSocketGame::GameStart(unsigned short uPort)
 	    };
 	}
 
-    bool bFinish = m_pWsServer->wait(-1);
+    // 主线程循环: 交替等待服务器事件与检测停止请求, 保证 Ctrl+C 后能安全退出
+    while (!m_stopRequested.load())
+    {
+        m_pWsServer->wait(100);
+    }
     m_pWsServer->Release();
+    m_pWsServer = NULL;
 	return TRUE;
 }
 
@@ -218,6 +224,11 @@ void CWebSocketGame::GameStop()
 	{
 		m_pWsServer->quit();
 	}
+}
+
+void CWebSocketGame::RequestStop()
+{
+    m_stopRequested = true;
 }
 
 PWSCLIENT CWebSocketGame::CreateClient(ISvrConnection *pConn, LPCSTR uriPath, LPCSTR pszArgs)
