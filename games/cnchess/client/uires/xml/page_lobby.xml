@@ -9,9 +9,9 @@
     
     <!-- 游戏桌列表 -->
     <tileview name="tileview_lobby" size="-2,0" weight="1" wantTab="1" marginSize="8" sbFadeFrames="30" enableItemDragScroll="1" align="center">
-        <template itemWidth="220" itemHeight="232" layout="vbox" gravity="center" skin="skin_item_bk">
+        <template itemWidth="220" itemHeight="232" layout="vbox" gravity="center" skin="skin_item_bk" padding="10,10,10,10">
             <!-- 顶部: 桌子ID和状态 -->
-            <window size="-2,30" layout="hbox" interval="5" gravity="center_vertical" padding="20,10,20,0">
+            <window size="-2,30" layout="hbox" interval="5" gravity="center_vertical" padding="10,8,10,0">
                 <text name="txt_table_id" text="桌号: 0" colorText="#FFD700" font="size:12,bold"/>
                 <window size="0,0" weight="1"/>
                 <img name="img_playing" skin="skin_playing" visible="0" size="30,20"/>
@@ -47,7 +47,7 @@
             
             <!-- 底部: 分隔线和状态提示 -->
             <window size="-2,1" colorBkgnd="#8B7355" padding="20,0,20,0"/>
-            <window size="-2,30" layout="hbox" interval="5" gravity="center_vertical" padding="20,5,20,5">
+            <window size="-2,30" layout="hbox" interval="5" gravity="center_vertical" padding="10,10,10,5">
                 <text name="txt_status" text="等待入座" colorText="#8B7355" font="size:10" gravity="center" size="-2,-1"/>
             </window>
         </template>

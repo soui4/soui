@@ -6,17 +6,18 @@
         <text text="残局游戏桌" colorText="#FFD700" font="size:14,bold" size="-2,30" gravity="center_vertical"/>
         <tileview name="tileview_endgame" size="-2,0" weight="1" wantTab="1" marginSize="6"
                   sbFadeFrames="30" enableItemDragScroll="1" align="center">
-            <template itemWidth="220" itemHeight="254" layout="vbox" gravity="center" skin="skin_item_bk">
+            <template itemWidth="220" itemHeight="254" layout="vbox" gravity="center" skin="skin_item_bk" padding="10,10,10,10">
                 <!-- 顶部: 残局名 + 桌序号 + 对局中 -->
-                <window size="-2,30" layout="hbox" interval="5" gravity="center_vertical" padding="20,10,20,0">
+                <window size="-2,30" layout="hbox" interval="5" gravity="center_vertical" padding="10,10,10,0">
+                    <window size="0,0" weight="1"/>
                     <text name="txt_eg_table_title" text="" colorText="#FFD700" font="size:12,bold" cursor="hand"/>
                     <text name="txt_eg_table_difficulty" text="" colorText="#FFE45E" font="size:11"/>
+                    <img name="img_playing" skin="skin_playing" visible="0" size="30,20" display="0"/>
                     <window size="0,0" weight="1"/>
-                    <img name="img_playing" skin="skin_playing" visible="0" size="30,20"/>
                 </window>
 
                 <!-- 星级难度 -->
-                <ratingbar name="rtg_eg_table_difficulty" starSkin="skin_star" starNum="3" value="1" size="-2,16" gravity="center"/>
+                <ratingbar name="rtg_eg_table_difficulty" starSkin="skin_star" starNum="3" value="1" size="48,16" gravity="center"/>
 
                 <!-- 中间: 座位区域 -->
                 <window size="-2,0" weight="1" layout="hbox" interval="5" gravity="center">
@@ -42,8 +43,8 @@
                 </window>
 
                 <!-- 底部: 分隔线和状态提示 -->
-                <window size="-2,1" colorBkgnd="#8B7355" padding="20,0,20,0"/>
-                <window size="-2,26" layout="hbox" interval="5" gravity="center_vertical" padding="20,4,20,4">
+                <window size="-2,1" colorBkgnd="#8B7355" padding="10,0,10,0"/>
+                <window size="-2,26" layout="hbox" interval="5" gravity="center_vertical" padding="10,8,10,4">
                     <text name="txt_status" text="等待入座" colorText="#8B7355" font="size:10"/>
                 </window>
             </template>
@@ -56,7 +57,7 @@
         <text name="txt_eg_detail_title" text="残局预览" colorText="#FFD700" font="size:15,bold" gravity="center"/>
         <text name="txt_eg_detail_intro" text="" colorText="#E8D9B8" font="size:11" gravity="center"/>
         <text name="txt_eg_detail_intro_desc" text="" wordBreak="1" colorText="#D8C8A8" font="size:11"
-              gravity="center_vertical" size="-2,66" margin="0,4,0,8"/>
+              gravity="center_vertical" size="-2,-1" margin="0,4,0,8" multiLines="1"/>
 
         <!-- 预览棋盘 -->
         <chessboard name="chessboard_preview" size="-2,0" weight="1" enableLayer="1" layout="anchor"/>
