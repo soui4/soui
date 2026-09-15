@@ -16,8 +16,9 @@ namespace
 {
     enum { TT_BOUND_EXACT = 0, TT_BOUND_LOWER = 1, TT_BOUND_UPPER = 2 };
 
-    const int              TT_SIZE = 1 << 16;             // 65536 项
-    const unsigned long long TT_MASK = TT_SIZE - 1;
+    const int TT_BUCKETS = 1 << 10;                        // 分桶锁数量(1024 把)
+    const int TT_SIZE = 1 << 16;                           // 索引数(每索引 2 槽)
+    const unsigned long long TT_MASK = (TT_SIZE - 1);
 
     struct TTEntry
     {
@@ -27,8 +28,10 @@ namespace
         int                score; // 相对当前行棋方的分值
         int                bx1, by1, bx2, by2; // 最佳着法(用于着法排序)
     };
-    TTEntry    g_tt[TT_SIZE];
-    std::mutex g_ttLock;
+    // 每个索引 2 槽, 配合深度感知的替换策略: 保留更深的结果, 降低深条目被浅条目挤掉的机会
+    TTEntry    g_tt[TT_SIZE][2];
+    // 分桶锁: 共享表按桶拆分, 显著降低多桌/多线程并发时的锁竞争
+    std::mutex g_ttLock[TT_BUCKETS];
 
     // Zobrist 随机表(按下标 = 棋子值低 4 位), 行棋方异或项; 首次使用前一次性初始化
     unsigned long long g_zob[10][9][16];
@@ -74,6 +77,11 @@ namespace
     const int KILLER_MAX_PLY = 64;
     thread_local MOVESTEP g_killers[KILLER_MAX_PLY][2];
 
+    // 历史启发表: [from][to] 统计"安静着法在某深度导致剪枝"的累计次数(深度平方加权)。
+    // 用于在置换表/吃子/杀手之后继续给安静着法排序, 提升同层着法选择质量。
+    // 与杀手走法一样 thread_local, 且每次走子清零, 避免跨对局泄漏。
+    thread_local int g_history[90][90];
+
     void StoreKiller(int ply, const MOVESTEP &m)
     {
         if (m.pt1.x < 0 || ply >= KILLER_MAX_PLY)
@@ -116,6 +124,15 @@ namespace
         if ((++g_time.nodeCount & 255) == 0 && NowMs() >= g_time.deadlineMs)
             g_time.stop = true;
         return g_time.stop;
+    }
+
+    // 线程局部伪随机: rand() 共享全局状态、非线程安全, 而走子搜索运行在机器人池线程上,
+    // 必须按线程独立产生随机数, 避免跨线程数据竞争。
+    thread_local unsigned long long g_seed = 0x9e3779b97f4a7c15ULL;
+    int ThreadRand(int n)
+    {
+        g_seed = g_seed * 2862933555777941757ULL + 3037000493ULL;
+        return (int)(g_seed >> 33) % n; // 取高位更随机
     }
 }
 
@@ -388,8 +405,12 @@ void CChessAI::GenerateLegalMoves(CChessLayout &layout, std::vector<MOVESTEP> &o
     }
 
     // 吃子优先排序，提升 alpha-beta 剪枝效率
+    // 注意: 安静着法(不吃子)的 enemy 为 CHSMAN_NULL, 不可误把 PieceValue(NULL) 当作其分值,
+    // 故仅在 enemy != NULL 时才计入其被吃子力, 否则视为 0, 置于吃子之后。
     std::sort(out.begin(), out.end(), [](const MOVESTEP &a, const MOVESTEP &b) {
-        return PieceValue(a.enemy) > PieceValue(b.enemy);
+        int va = (a.enemy != CHSMAN_NULL) ? PieceValue(a.enemy) : 0;
+        int vb = (b.enemy != CHSMAN_NULL) ? PieceValue(b.enemy) : 0;
+        return va > vb;
     });
 }
 
@@ -439,11 +460,14 @@ int CChessAI::Negamax(CChessLayout &layout, int depth, int alpha, int beta, int 
 
     unsigned long long key = ComputeKey(layout);
     int tx1 = -1, ty1 = 0, tx2 = 0, ty2 = 0; // 命中时给出的最佳着法候选
+    const int idx = (int)(key & TT_MASK);
     {
-        std::lock_guard<std::mutex> lk(g_ttLock);
-        const TTEntry &e = g_tt[key & TT_MASK];
-        if (e.key == key)
+        std::lock_guard<std::mutex> lk(g_ttLock[idx & (TT_BUCKETS - 1)]);
+        for (int s = 0; s < 2; s++)
         {
+            const TTEntry &e = g_tt[idx][s];
+            if (e.key != key)
+                continue;
             if (e.depth >= depth)
             {
                 if (e.bound == TT_BOUND_EXACT)          return e.score;
@@ -478,6 +502,11 @@ int CChessAI::Negamax(CChessLayout &layout, int depth, int alpha, int beta, int 
                 b.pt2.x == kills[s].pt2.x && b.pt2.y == kills[s].pt2.y)
                 sb += 10000 - s * 1000;
         }
+        // 历史启发: 仅安静着法累计, 右移 10 缩放使量级远低于杀手/吃子, 用于进一步区分
+        if (a.enemy == CHSMAN_NULL)
+            sa += g_history[a.pt1.y * 9 + a.pt1.x][a.pt2.y * 9 + a.pt2.x] >> 10;
+        if (b.enemy == CHSMAN_NULL)
+            sb += g_history[b.pt1.y * 9 + b.pt1.x][b.pt2.y * 9 + b.pt2.x] >> 10;
         return sa > sb;
     });
 
@@ -493,9 +522,14 @@ int CChessAI::Negamax(CChessLayout &layout, int depth, int alpha, int beta, int 
         if (best > alpha) alpha = best;
         if (alpha >= beta)
         {
-            // 该安静着法导致剪枝, 记为本层杀手着法供同层其它局面优先尝试
+            // 该安静着法导致剪枝, 记为本层杀手着法并累计历史启发(深度平方加权),
+            // 供同层其它局面/后续搜索优先尝试
             if (moves[i].enemy == CHSMAN_NULL)
+            {
                 StoreKiller(ply, moves[i]);
+                g_history[moves[i].pt1.y * 9 + moves[i].pt1.x]
+                         [moves[i].pt2.y * 9 + moves[i].pt2.x] += depth * depth;
+            }
             break;
         }
     }
@@ -509,8 +543,17 @@ int CChessAI::Negamax(CChessLayout &layout, int depth, int alpha, int beta, int 
     // 将死/困毙分值随 ply 变化, 不参与缓存, 避免跨深度复用导致距离失真
     if (best > -(CHECKMATE - 200) && best < (CHECKMATE - 200))
     {
-        std::lock_guard<std::mutex> lk(g_ttLock);
-        TTEntry &e = g_tt[key & TT_MASK];
+        std::lock_guard<std::mutex> lk(g_ttLock[idx & (TT_BUCKETS - 1)]);
+        TTEntry (&s)[2] = g_tt[idx];
+        // 选槽: 命中同键则就地更新; 否则空槽优先, 再否则覆盖较浅者以保留更深的结果
+        int w;
+        if (s[0].key == key)      w = 0;
+        else if (s[1].key == key) w = 1;
+        else if (s[0].key == 0)   w = 0;
+        else if (s[1].key == 0)   w = 1;
+        else if (s[1].depth < s[0].depth) w = 1;
+        else                      w = 0;
+        TTEntry &e = s[w];
         e.key = key; e.depth = depth; e.bound = bound; e.score = best;
         e.bx1 = bestMove.pt1.x; e.by1 = bestMove.pt1.y;
         e.bx2 = bestMove.pt2.x; e.by2 = bestMove.pt2.y;
@@ -567,6 +610,11 @@ MOVESTEP CChessAI::SearchBestMove(CChessLayout &layout, int nDepth)
 
 MOVESTEP CChessAI::SearchBestMove(CChessLayout &layout, int nDepth, int nTimeMs)
 {
+    // 清零杀手着法与历史启发表: 均 thread_local, 同一池线程会复用处理不同对局, 需每次全新开始,
+    // 避免上一任务残留的着法排序提示泄漏到本局。
+    memset(g_killers, 0, sizeof(g_killers));
+    memset(g_history, 0, sizeof(g_history));
+
     // 开局阶段先查经验数据库, 命中则直接采用(补充开局经验, 避免搜索浪费)
     POINT book1, book2;
     if (CChessOpeningBook::Probe(layout, book1, book2))
@@ -645,7 +693,7 @@ MOVESTEP CChessAI::SearchBestMove(CChessLayout &layout, int nDepth, int nTimeMs)
         g_time.enabled = prevEnabled;
     }
     // 多个等优走法随机取一，增加棋风变化
-    return completed[rand() % (int)completed.size()];
+    return completed[ThreadRand((int)completed.size())];
 }
 
 int CChessAI::SearchRoot(CChessLayout &layout, std::vector<MOVESTEP> &moves,

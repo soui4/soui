@@ -172,6 +172,15 @@ namespace
         BBoot() { BuildBook(); }
     };
     const BBoot g_boot;
+
+    // 线程局部伪随机: rand() 共享全局状态、非线程安全, 而开局库探测运行在机器人池线程上,
+    // 必须按线程独立产生随机数, 避免跨线程数据竞争。
+    thread_local unsigned long long g_seed = 0x9e3779b97f4a7c15ULL;
+    int ThreadRand(int n)
+    {
+        g_seed = g_seed * 2862933555777941757ULL + 3037000493ULL;
+        return (int)(g_seed >> 33) % n; // 取高位更随机
+    }
 }
 
 unsigned long long CChessOpeningBook::Hash(const CChessLayout &layout)
@@ -232,7 +241,7 @@ bool CChessOpeningBook::Probe(const CChessLayout &layout, POINT &pt1, POINT &pt2
         return false;
 
     bool flip = (redKingY >= 5);
-    std::pair<POINT, POINT> rec = it->second[rand() % (int)it->second.size()];
+    std::pair<POINT, POINT> rec = it->second[ThreadRand((int)it->second.size())];
     pt1 = rec.first;
     pt2 = rec.second;
     if (flip) // 把规范化坐标还原为实际棋盘坐标

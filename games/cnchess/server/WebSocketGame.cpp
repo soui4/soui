@@ -138,8 +138,12 @@ CWebSocketGame::CWebSocketGame()
 
 CWebSocketGame::~CWebSocketGame()
 {
+	// 必须先停用并 join 机器人线程池: 否则正在运行的搜索会经 service 回调访问
+	// m_pWsServer/m_tableClients 等之后才被释放的资源, 造成空指针/野指针。
+	delete CRobotAIPool::getSingletonPtr();
+
     m_tableClients.clear();
-	
+		
 	// clear temp clients
     for (auto it = m_tmpClients.begin(); it != m_tmpClients.end(); ++it) {
 		PWSCLIENT pClient = *it;
@@ -151,7 +155,6 @@ CWebSocketGame::~CWebSocketGame()
 		m_pWsServer->quit();
 		m_pWsServer = NULL;
 	}
-	delete CRobotAIPool::getSingletonPtr();
 }
 
 BOOL CWebSocketGame::GameStart(unsigned short uPort)
