@@ -203,9 +203,6 @@ BOOL CWebSocketGame::GameStart(unsigned short uPort)
 	            if (pChess)
 	                pChess->ApplyRobotMove(best, seatId, generation);
 	        });
-	    g_pfnRobotDispatch = [](const SRobotTask &task) -> bool {
-	        return CRobotAIPool::getSingletonPtr()->Dispatch(task);
-	    };
 	}
 
     // 主线程循环: 交替等待服务器事件与检测停止请求, 保证 Ctrl+C 后能安全退出

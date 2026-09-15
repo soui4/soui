@@ -10,7 +10,7 @@
 #include <helper/slog.h>
 #include <com-loader.hpp>
 #include <interface/slog-i.h>
-#define  SCOM_MASK scom_mask_log4z
+#define  SCOM_MASK scom_mask_log4z|scom_mask_taskloop
 #include <commgr2.h>
 #include "WebSocketGame.h"
 

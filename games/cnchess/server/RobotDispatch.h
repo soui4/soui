@@ -16,11 +16,4 @@ struct SRobotTask
     CChessLayout layout; // board snapshot (deep copied via Layout::Copy)
 };
 
-typedef bool (*PfnRobotDispatch)(const SRobotTask &task);
-
-// Dispatch hook: wired at runtime by the server to the robot AI thread pool
-// (CRobotAIPool). When NULL the game table falls back to synchronous search,
-// which keeps unit tests decoupled from the thread pool.
-extern PfnRobotDispatch g_pfnRobotDispatch;
-
 #endif // !__ROBOTDISPATCH_H__

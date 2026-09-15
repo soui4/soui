@@ -4,12 +4,13 @@
 #include <TaskLoop/TaskLoop.h>
 #include <helper/SFunctor.hpp>
 #include <helper/slog.h>
-#include <stdio.h>
+#define  SCOM_MASK scom_mask_log4z|scom_mask_taskloop
+#include <commgr2.h>
 #define kLogTag "RobotAIPool"
 SNSBEGIN
 
 template<> CRobotAIPool * SSingleton<CRobotAIPool>::ms_Singleton = NULL;
-
+static SComMgr2 s_comMgr2; 
 CRobotAIPool::CRobotAIPool()
 {
 }
@@ -29,7 +30,7 @@ bool CRobotAIPool::Init(int nThreads)
     for (int i = 0; i < nThreads; ++i)
     {
         SAutoRefPtr<ITaskLoop> taskLoop;
-        if (!TASKLOOP::SCreateInstance((IObjRef **)&taskLoop))
+        if (!s_comMgr2.CreateTaskLoop((IObjRef **)&taskLoop))
         {
             SLOGE() << "create ITaskLoop failed, index=" << i;
             return false;

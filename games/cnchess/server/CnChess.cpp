@@ -8,10 +8,8 @@
 #include <string/strcpcvt.h>
 #include <helper/slog.h>
 #include <time.h>
+#include "RobotAIPool.h"
 #define kLogTag "CCnChess"
-
-// 机器人思考派发钩子(全局): 由服务器接线到 CRobotAIPool, 未接线时走同步回退
-PfnRobotDispatch g_pfnRobotDispatch = NULL;
 
 SNSBEGIN
 
@@ -562,22 +560,13 @@ void CCnChess::RobotMakeMove(int seatId)
 	SLOGI() << "[机器人走棋] seat=" << seatId << " actSeat=" << GetActiveSeat() << " actSide=" << (m_layout.m_actSide == CS_RED ? "RED" : "BLACK");
 	int nDepth = CChessAI::LevelToDepth(m_nRobotLevel[seatId]);
 
-	// 1) 优先派发到线程池异步思考, 避免思考卡住游戏交互
-	if (g_pfnRobotDispatch)
-	{
-		SRobotTask task;
-		task.tableId = GetID();
-		task.seatId = seatId;
-		task.depth = nDepth;
-		task.generation = m_nChessMsg;
-		task.layout.Copy(&m_layout); // 深拷贝棋盘快照, 线程池仅操作副本
-		if (g_pfnRobotDispatch(task))
-			return; // 已入池, 结果稍后经 ApplyRobotMove 在主线程异步应用
-	}
-
-	// 2) 回退: 线程池未接线或派发失败时同步搜索并立即应用
-	MOVESTEP best = CChessAI::SearchBestMove(m_layout, nDepth);
-	ApplyRobotMove(best, seatId, m_nChessMsg);
+	SRobotTask task;
+	task.tableId = GetID();
+	task.seatId = seatId;
+	task.depth = nDepth;
+	task.generation = m_nChessMsg;
+	task.layout.Copy(&m_layout); // 深拷贝棋盘快照, 线程池仅操作副本
+	CRobotAIPool::getSingletonPtr()->Dispatch(task);
 }
 
 void CCnChess::ApplyRobotMove(const MOVESTEP &best, int seatId, int generation)
