@@ -45,11 +45,20 @@ static bool EndgameTranslateRow(const std::string & s, int out[9])
         {
             if (i + 3 > len)
                 break;
-            int man = EndgameCharToMan(s.substr(i, 3));
-            if (man == CHSMAN_NULL && c != '.')
-                return false; // 无法识别的汉字
-            out[idx++] = man;
-            i += 3;
+            std::string sub = s.substr(i, 3);
+            if (sub == "\xe7\xa9\xba") // "空" 空位
+            {
+                out[idx++] = CHSMAN_NULL;
+                i += 3;
+            }
+            else
+            {
+                int man = EndgameCharToMan(sub);
+                if (man == CHSMAN_NULL && c != '.')
+                    return false; // 无法识别的汉字
+                out[idx++] = man;
+                i += 3;
+            }
         }
         else
         {
