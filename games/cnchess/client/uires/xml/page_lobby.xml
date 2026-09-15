@@ -36,9 +36,9 @@
             </window>
 
             <!-- 邀请机器人: 点击展开难度(初/中/高 图片按钮) -->
-            <window name="wnd_robot_area" size="-2,64" layout="vbox" interval="2" gravity="center" padding="14,2,14,2">
+            <window name="wnd_robot_area" size="-2,64" layout="vbox" interval="2" gravity="center" padding="5,2,5,2">
                 <imgbtn name="btn_invite_robot" skin="skin_btn_robot_invite" size="56,28" cursor="hand" animate="1"/>
-                <window name="wnd_robot_levels" size="-2,30" layout="hbox" interval="4" gravity="center" visible="0">
+                <window name="wnd_robot_levels" size="-2,30" layout="hbox" interval="-2" gravity="center" visible="0">
                     <imgbtn name="btn_lvl_beginner" skin="skin_btn_robot_beginner" size="56,28" cursor="hand" animate="1"/>
                     <imgbtn name="btn_lvl_medium" skin="skin_btn_robot_medium" size="56,28" cursor="hand" animate="1"/>
                     <imgbtn name="btn_lvl_advanced" skin="skin_btn_robot_advanced" size="56,28" cursor="hand" animate="1"/>
