@@ -112,8 +112,25 @@ void WsServer::postServiceTask(IRunnable * task)
     // clone 使调用方栈上的 IRunnable 可在返回后安全销毁(与 ITaskLoop::postTask 一致)
     SAutoRefPtr<IRunnable> pClone;
     pClone.Attach(task->clone());
-    std::lock_guard<std::mutex> lock(m_serviceMutex);
-    m_serviceQueue.push_back(pClone);
+    bool bWake = false;
+    {
+        std::lock_guard<std::mutex> lock(m_serviceMutex);
+        // 仅当队列"从空变非空"时才唤醒, 避免打断已在进行的中断唤醒
+        bWake = m_serviceQueue.empty();
+        m_serviceQueue.push_back(pClone);
+    }
+    if (bWake)
+    {
+        // 关键修复: LWS 事件线程当前正阻塞在 lws_service/poll 等待网络事件,
+        // 单纯入队不会打断该阻塞。若这里不唤醒, 服务任务(如机器人AI结果)会一直被
+        // 拖延到下一次网络事件才在 run() 中被 DrainServiceQueue 执行,
+        // 导致"搜索已完成(0ms)但结果迟迟不落子"的严重延迟(实测可达20s+)。
+        // lws_cancel_service 是该场景的标准跨线程唤醒机制(quit() 亦用它退出阻塞),
+        // 会令 poll 立即返回, run() 随即循环回来执行 DrainServiceQueue。
+        lws_context *ctx = m_context;
+        if (ctx)
+            lws_cancel_service(ctx);
+    }
 }
 
 static void lws_send_ping(struct lws *wsi) {
