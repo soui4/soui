@@ -30,10 +30,18 @@ public:
      * @return 最佳走法；当无合法走法时返回{pt1={-1,-1},pt2={-1,-1},...}
      */
     static MOVESTEP SearchBestMove(CChessLayout &layout, int nDepth);
+    // 带时间预算的版本: nTimeMs>0 时在迭代加深中受思考时间约束, 到点即返回已完成的最深层
+    // 较优着法; ≤0 等价于纯迭代加深。
+    static MOVESTEP SearchBestMove(CChessLayout &layout, int nDepth, int nTimeMs);
 
 protected:
     // negamax 搜索
     static int Negamax(CChessLayout &layout, int depth, int alpha, int beta, int ply);
+    // 静态搜索: 深度归零后仅延展吃子着法, 缓解水平线效应
+    static int Quiesce(CChessLayout &layout, int alpha, int beta, int ply);
+    // 根节点单层搜索: 对每个着法搜索至指定深度, 返回最佳分并收集等优候选
+    static int SearchRoot(CChessLayout &layout, std::vector<MOVESTEP> &moves,
+                          int depth, int alpha, int beta, std::vector<MOVESTEP> &candidates);
     // 局面评估(正值表示当前走棋方占优)
     static int Evaluate(const CChessLayout &layout);
     // 生成当前走棋方的全部合法走法

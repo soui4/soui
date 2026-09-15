@@ -11,6 +11,9 @@ PropBag::PropBag()
 {
     m_wPort=DEF_PORT;	//默认端口号
     m_nRobotPool = 4;	//默认机器人AI线程池线程数
+    m_nRobotTimeMs[0] = 400;	//初级默认预算
+    m_nRobotTimeMs[1] = 800;	//中级默认预算
+    m_nRobotTimeMs[2] = 1500;	//高级默认预算
     
 	memset(m_dwProps,0,sizeof(m_dwProps));
     m_dwProps[PROPID_REGRET] = 2;
@@ -52,6 +55,9 @@ void PropBag::Init(LPCTSTR pszPropXml)
 
     m_wPort = xmlNode.attribute(L"port").as_int(DEF_PORT);     //默认端口号
     m_nRobotPool = xmlNode.attribute(L"robot_ai_pool").as_int(4); //默认机器人AI线程池线程数
+    m_nRobotTimeMs[0] = xmlNode.attribute(L"robot_ai_begin_time_ms").as_int(400);   //初级默认预算
+    m_nRobotTimeMs[1] = xmlNode.attribute(L"robot_ai_medium_time_ms").as_int(800);  //中级默认预算
+    m_nRobotTimeMs[2] = xmlNode.attribute(L"robot_ai_advanced_time_ms").as_int(1500); //高级默认预算
 }
 WORD PropBag::GetPort() const
 {

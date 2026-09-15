@@ -5,10 +5,11 @@ include_directories(${PROJECT_SOURCE_DIR}/third-part/gtest/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../algorithm)
 
-# 收集源文件
+# 收集源文件(排除 EndgameTableTest.cpp: 它依赖服务器端源码, 归属 cnchess_endgame_test 目标)
 file(GLOB CNCHESS_TEST_SRC 
     "*.cpp"
 )
+list(FILTER CNCHESS_TEST_SRC EXCLUDE REGEX "EndgameTableTest\\.cpp$")
 
 # 创建可执行文件
 add_executable(cnchess_test ${CNCHESS_TEST_SRC})

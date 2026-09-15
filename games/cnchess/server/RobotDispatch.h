@@ -1,4 +1,4 @@
-#ifndef __ROBOTDISPATCH_H__
+﻿#ifndef __ROBOTDISPATCH_H__
 #define __ROBOTDISPATCH_H__
 
 #include <ChessLayout.h>
@@ -13,6 +13,7 @@ struct SRobotTask
     int seatId;        // robot seat
     int depth;         // search depth converted from intelligence level
     int generation;    // move-message counter at dispatch time, to drop stale results
+    int timeMs;        // thinking time budget in ms (0 = fixed depth only)
     CChessLayout layout; // board snapshot (deep copied via Layout::Copy)
 };
 

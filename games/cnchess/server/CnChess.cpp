@@ -564,6 +564,7 @@ void CCnChess::RobotMakeMove(int seatId)
 	task.tableId = GetID();
 	task.seatId = seatId;
 	task.depth = nDepth;
+	task.timeMs = PropBag::getSingletonPtr()->GetRobotAITimeMs(m_nRobotLevel[seatId]);
 	task.generation = m_nChessMsg;
 	task.layout.Copy(&m_layout); // 深拷贝棋盘快照, 线程池仅操作副本
 	CRobotAIPool::getSingletonPtr()->Dispatch(task);
