@@ -21,7 +21,7 @@ namespace
     bool IsInPieceMoves(CChessLayout &layout, POINT pt1, POINT pt2)
     {
         POINT moves[MAX_MOVES];
-        int n = layout.GetPossiableMoves(pt1.x, pt1.y, moves);
+        int n = layout.GetPossibleMoves(pt1.x, pt1.y, moves);
         for (int i = 0; i < n; i++)
         {
             if (moves[i].x == pt2.x && moves[i].y == pt2.y)

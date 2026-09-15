@@ -51,7 +51,7 @@ TEST(ChessAlgorithmTest, JiangMovement)
     POINT moves[MAX_MOVES];
     
     // 测试红帅的移动
-    int moveCount = layout.GetPossiableMoves(4, 1, moves);
+    int moveCount = layout.GetPossibleMoves(4, 1, moves);
     
     // 红帅应该能在九宫格内移动
     EXPECT_GT(moveCount, 0);
@@ -89,7 +89,7 @@ TEST(ChessAlgorithmTest, JuMovement)
     POINT moves[MAX_MOVES];
     
     // 测试红车的移动
-    int moveCount = layout.GetPossiableMoves(4, 4, moves);
+    int moveCount = layout.GetPossibleMoves(4, 4, moves);
     
     // 车应该能在没有阻挡的情况下沿直线移动
     EXPECT_GT(moveCount, 0);
@@ -123,7 +123,7 @@ TEST(ChessAlgorithmTest, MaMovement)
     POINT moves[MAX_MOVES];
     
     // 测试红马的移动
-    int moveCount = layout.GetPossiableMoves(4, 4, moves);
+    int moveCount = layout.GetPossibleMoves(4, 4, moves);
     
     // 马应该能走"日"字形状
     EXPECT_GT(moveCount, 0);
@@ -164,7 +164,7 @@ TEST(ChessAlgorithmTest, PaoMovement)
     POINT moves[MAX_MOVES];
     
     // 测试红炮的移动
-    int moveCount = layout.GetPossiableMoves(4, 4, moves);
+    int moveCount = layout.GetPossibleMoves(4, 4, moves);
     
     // 炮应该能沿直线移动（不吃子时）
     EXPECT_GT(moveCount, 0);
@@ -198,7 +198,7 @@ TEST(ChessAlgorithmTest, ShiMovement)
     POINT moves[MAX_MOVES];
     
     // 测试红士的移动
-    int moveCount = layout.GetPossiableMoves(4, 1, moves);
+    int moveCount = layout.GetPossibleMoves(4, 1, moves);
     
     // 士应该只能斜着走一格，且不能走出九宫格
     EXPECT_GT(moveCount, 0);
@@ -241,7 +241,7 @@ TEST(ChessAlgorithmTest, XiangMovement)
     POINT moves[MAX_MOVES];
     
     // 测试红相的移动
-    int moveCount = layout.GetPossiableMoves(4, 4, moves);
+    int moveCount = layout.GetPossibleMoves(4, 4, moves);
     
     // 相应该走"田"字，且不能过河
     EXPECT_GT(moveCount, 0);
@@ -281,7 +281,7 @@ TEST(ChessAlgorithmTest, BingMovement)
     POINT moves[MAX_MOVES];
     
     // 测试红兵的移动（未过河）
-    int moveCount = layout.GetPossiableMoves(4, 3, moves);
+    int moveCount = layout.GetPossibleMoves(4, 3, moves);
     
     // 兵未过河只能向前走
     EXPECT_EQ(moveCount, 1);
@@ -297,7 +297,7 @@ TEST(ChessAlgorithmTest, BingMovement)
     initLayout[5][4] = CHSMAN_RED_BING;  // 放在河对面
     layout.InitLayout(initLayout, CS_RED);
     
-    moveCount = layout.GetPossiableMoves(4, 5, moves);
+    moveCount = layout.GetPossibleMoves(4, 5, moves);
     
     // 过河后兵可以向前或横向移动
     EXPECT_GE(moveCount, 1);

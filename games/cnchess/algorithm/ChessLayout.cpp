@@ -66,7 +66,7 @@ void CChsLytState::UpdateState()
 			m_ptJiangBlack.y=y,m_ptJiangBlack.x=x;
 		//获得每一个棋子的可到达位置
 		m_ChessInfo[y][x]=new CChessInfo;
-		nDest=m_pLayout->GetPossiableMoves(x,y,ptDest);
+		nDest=m_pLayout->GetPossibleMoves(x,y,ptDest);
 		for(int i=0;i<nDest;i++) m_ChessInfo[y][x]->m_lstDest.push_back(ptDest[i]);
 	}
 	//计算出棋子的保护及攻击位置
@@ -267,7 +267,7 @@ void CChessLayout::InitLayout(const int chsLayout[10][9],CHSSIDE selfSide)
 	memset(m_csDeadBlack,0,sizeof(m_csDeadBlack));
 }
 
-void CChessLayout::Copy(CChessLayout *pLayout)
+void CChessLayout::Copy(const CChessLayout *pLayout)
 {
 	m_selfSide=pLayout->m_selfSide;
 	m_actSide=pLayout->m_actSide;
@@ -314,12 +314,12 @@ BOOL CChessLayout::UndoMove(const MOVESTEP & moveStep)
 	return TRUE;
 }
 
-int  CChessLayout::GetPossiableMoves(POINT ptFocus,POINT ptMoves[MAX_MOVES])
+int  CChessLayout::GetPossibleMoves(POINT ptFocus,POINT ptMoves[MAX_MOVES])
 {
 	return CChsMoveGenerator::GetPossiableMoves(m_chesses,m_selfSide==CS_RED,ptFocus,ptMoves);
 }
 
-int  CChessLayout::GetPossiableMoves(int x,int y,POINT ptMoves[MAX_MOVES])
+int  CChessLayout::GetPossibleMoves(int x,int y,POINT ptMoves[MAX_MOVES])
 {
 	POINT pt={x,y};
 	return CChsMoveGenerator::GetPossiableMoves(m_chesses,m_selfSide==CS_RED,pt,ptMoves);

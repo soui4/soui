@@ -47,9 +47,9 @@ protected:
     // 生成当前走棋方的全部合法走法
     static void GenerateLegalMoves(CChessLayout &layout, std::vector<MOVESTEP> &out);
     // 指定方是否被将军 == 检测己方将是否被对手攻击
+    // 复用 client 的 CChsLytState::IsJiangJun(内部经 CChsMoveGenerator::GetPossiableMoves
+    // 生成攻击者表)判定, 与客户端走棋合法性判定完全一致。
     static bool IsJiangInCheck(const CChessLayout &layout, CHSSIDE side);
-    // 检测 (tx,ty) 是否被 bySide 一方攻击
-    static bool IsSquareAttacked(const CChessLayout &layout, int tx, int ty, CHSSIDE bySide);
     // 吃子价值
     static int PieceValue(CHESSMAN chs);
 

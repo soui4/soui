@@ -108,7 +108,7 @@ void CChessGame::ShowPosFlags(POINT ptPiece, BOOL bShow)
 {
     // show or hide possible move positions
     POINT ptMoves[MAX_MOVES];
-    int nMoves = m_layout.GetPossiableMoves(ptPiece.x, ptPiece.y, ptMoves);
+    int nMoves = m_layout.GetPossibleMoves(ptPiece.x, ptPiece.y, ptMoves);
     for (int i = 0; i < nMoves; i++)
     {
         if (m_layout.m_chesses[ptMoves[i].y][ptMoves[i].x] != CHSMAN_NULL)
@@ -349,7 +349,7 @@ BOOL CChessGame::CheckMove(POINT ptFrom, POINT ptTo, BOOL bSilent){
     BOOL bValidMove = FALSE;
 
     POINT ptMoves[MAX_MOVES];
-    int nMoves = m_layout.GetPossiableMoves(ptFrom, ptMoves);
+    int nMoves = m_layout.GetPossibleMoves(ptFrom, ptMoves);
     for (int i = 0; i < nMoves; i++)
     {
         if (ptMoves[i].x == ptTo.x && ptMoves[i].y == ptTo.y)
@@ -998,7 +998,7 @@ void CChessGame::OnBtnTest()
         int nTotalMoves = 0;
         for (int i = 0; i < nCount; i++)
         {
-            int moves = m_layout.GetPossiableMoves(ptChs[i], ptMoves[i]);
+            int moves = m_layout.GetPossibleMoves(ptChs[i], ptMoves[i]);
             int nValidMoves = 0;
             for(int j = 0; j < moves; j++){
                 if(CheckMove(ptChs[i], ptMoves[i][j],TRUE)){

@@ -137,7 +137,7 @@ namespace
         if (cs == CHSMAN_NULL || CHSMANSIDE(cs) != layout.m_actSide)
             return false;
         POINT moves[MAX_MOVES];
-        int n = layout.GetPossiableMoves(x1, y1, moves);
+        int n = layout.GetPossibleMoves(x1, y1, moves);
         for (int i = 0; i < n; i++)
             if (moves[i].x == x2 && moves[i].y == y2)
                 return true;
