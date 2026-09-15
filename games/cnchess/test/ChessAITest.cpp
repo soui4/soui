@@ -278,6 +278,29 @@ TEST(ChessAITest, CapturesHangingBigPiece)
     EXPECT_NE(CHSMAN_NULL, best.enemy);
 }
 
+// 高级机器人不应"白白送子": 黑炮处于红车攻击线(悬空, 无兑子补偿), 黑方行棋时必须
+// 把该炮移开或妥善处理, 不能移到一个仍会被红车立刻吃掉的落点。
+TEST(ChessAITest, AvoidsHangingOwnPiece)
+{
+    int board[10][9];
+    ClearBoard(board);
+    board[0][4] = CHSMAN_BLK_JIANG; // 黑将 (4,0)
+    board[7][3] = CHSMAN_BLK_PAO;   // 黑炮 (3,7), 沿第7列被下路红车攻击
+    board[7][7] = CHSMAN_RED_JU;    // 红车 (7,7), (7,6)..(7,4) 为空 → 攻击 (7,3)
+    board[3][7] = CHSMAN_RED_JIANG; // 红将 (3,7)
+
+    CChessLayout layout;
+    layout.InitLayout(board, CS_BLACK);
+
+    MOVESTEP best = CChessAI::SearchBestMove(layout, CChessAI::LevelToDepth(ROBOT_LEVEL_ADVANCED));
+    ASSERT_FALSE(IsInvalidMove(best));
+
+    // 判定黑方是否"保住"了悬空的炮: 模拟红车吃回后, 黑方不出现白白丢子
+    EXPECT_EQ(7, best.pt1.x) << "应移动被攻击的黑炮";
+    EXPECT_EQ(3, best.pt1.y);
+    EXPECT_NE(7, best.pt2.x) << "黑炮不能移到仍被红车沿第7列攻击的落点";
+}
+
 // 搜索不会破坏原始棋盘状态(可用于多次调用/复局面)
 TEST(ChessAITest, SearchDoesNotMutateLayout)
 {
