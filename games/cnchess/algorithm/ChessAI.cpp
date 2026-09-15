@@ -23,15 +23,6 @@ namespace
         return s_engine;
     }
 
-    // 线程局部伪随机: rand() 共享全局状态、非线程安全, 而走子搜索运行在机器人池线程上,
-    // 必须按线程独立产生随机数, 避免跨线程数据竞争。
-    thread_local unsigned long long g_seed = 0x9e3779b97f4a7c15ULL;
-    int ThreadRand(int n)
-    {
-        g_seed = g_seed * 2862933555777941757ULL + 3037000493ULL;
-        return (int)(g_seed >> 33) % n; // 取高位更随机
-    }
-
     // -------------------------------------------------------------------------
     // 朝向判定与坐标映射
     // 搜索引擎规范坐标系: 红方宫在低行(row 0..2), 红兵向高行进攻。
@@ -199,20 +190,9 @@ MOVESTEP CChessAI::SearchBestMove(CChessLayout &layout, int nDepth, int nTimeMs)
             return MakeInvalidStep(); // 理论上不可达, 双保险
     }
 
-    // 多个等分候选时的取舍: 优先吃子(确定性取第一个), 其余随机 —— 与旧版棋风一致。
-    // 根节点 PVS 会把排在正解之后的安静着法"剪到"当前最优值(返回界值), 使它们
-    // 与真正的最佳着法同分; 优先吃子可避免"对方送大子却不取"的病态棋风,
-    // 等分且均非吃子时随机, 保留棋风变化。
-    if (result.RootTieCount > 1)
-    {
-        for (int i = 0; i < result.RootTieCount; i++)
-        {
-            MOVESTEP ms = SearchMoveToStep(layout, bRedTop, result.RootTies[i]);
-            if (ms.enemy != CHSMAN_NULL)
-                return ms;
-        }
-        return SearchMoveToStep(layout, bRedTop,
-                                result.RootTies[ThreadRand(result.RootTieCount)]);
-    }
+    // 严格采用搜索引擎的最佳着法(与 C# 原版一致)。
+    // 注意: 不要在根节点做"等分随机挑选"——根节点子搜窗口随 alpha 收窄后,
+    // fail-high 返回的边界值会与最佳分"伪同分"(实测自对弈中 64% 的等分候选
+    // 为伪等分, 真实分值可差数百), 随机/优先吃子挑选会系统性劣化棋力。
     return SearchMoveToStep(layout, bRedTop, result.BestMove);
 }

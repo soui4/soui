@@ -199,11 +199,8 @@ namespace ChsAI
         int      Depth;           /**< 完整算完的最大深度 */
         long long Nodes;          /**< 搜索节点数 */
         long long ElapsedMs;      /**< 耗时(毫秒) */
-        /** 根节点与最佳着法等分的候选(压缩编码, 含最佳着法本身), 供上层做棋风取舍 */
-        unsigned short RootTies[MoveGenerator::MaxBuffer];
-        int      RootTieCount;
 
-        SearchResult() : BestMove(0), Score(0), Depth(0), Nodes(0), ElapsedMs(0), RootTieCount(0) {}
+        SearchResult() : BestMove(0), Score(0), Depth(0), Nodes(0), ElapsedMs(0) {}
     };
 
     /** 迭代加深 alpha-beta + PVS 搜索引擎(移植自 SearchEngine.cs) */
@@ -251,9 +248,6 @@ namespace ChsAI
 
         uint16_t m_killers[MaxPly][2];
         int      m_history[14][SearchBoard::Size];
-
-        uint16_t m_rootTies[MoveGenerator::MaxBuffer]; /**< 最近一个完整层的根等分候选 */
-        int      m_rootTieCount;
     };
 }
 

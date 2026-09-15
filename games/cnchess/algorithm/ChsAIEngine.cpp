@@ -736,11 +736,9 @@ namespace ChsAI
 
     SearchEngine::SearchEngine(int ttSizeBits)
         : m_board(), m_tt(ttSizeBits), m_nodes(0), m_startMs(0), m_timeLimitMs(0), m_stop(false)
-        , m_rootTieCount(0)
     {
         memset(m_killers, 0, sizeof(m_killers));
         memset(m_history, 0, sizeof(m_history));
-        memset(m_rootTies, 0, sizeof(m_rootTies));
     }
 
     SearchEngine::~SearchEngine()
@@ -784,14 +782,6 @@ namespace ChsAI
         result.Depth = completedDepth;
         result.Nodes = m_nodes;
         result.ElapsedMs = NowMs() - m_startMs;
-
-        // 根等分候选来自最近一个"完整算完"的层(中途超时的层不会写入);
-        // 若从未完整算完任何层, RootTieCount 保持 0
-        if (m_rootTieCount > 0)
-        {
-            memcpy(result.RootTies, m_rootTies, sizeof(uint16_t) * m_rootTieCount);
-            result.RootTieCount = m_rootTieCount;
-        }
         return result;
     }
 
@@ -824,11 +814,6 @@ namespace ChsAI
         int bestScore = -Inf;
         uint16_t iterBest = bestMove;
 
-        // 根节点等分候选: 仅在本层完整算完时由 Search() 外部读取,
-        // 故用局部数组暂存, 循环结束后不回填(避免中途超时残留脏数据)
-        uint16_t ties[MoveGenerator::MaxBuffer];
-        int tieCount = 0;
-
         for (int i = 0; i < nMoves; i++)
         {
             SearchMove m = moves[i];
@@ -850,18 +835,11 @@ namespace ChsAI
             {
                 bestScore = score;
                 iterBest = m.Encode();
-                tieCount = 0;
-                ties[tieCount++] = iterBest;
                 if (score > alpha)
                 {
                     alpha = score;
                     if (alpha >= beta) break;
                 }
-            }
-            else if (score == bestScore)
-            {
-                if (tieCount < MoveGenerator::MaxBuffer)
-                    ties[tieCount++] = m.Encode();
             }
         }
 
@@ -871,10 +849,6 @@ namespace ChsAI
             return -Evaluation::MateValue + ply;
         }
         bestMove = iterBest;
-
-        // 等分候选写入成员缓冲, 供 Search() 返回给上层做棋风取舍
-        memcpy(m_rootTies, ties, sizeof(uint16_t) * tieCount);
-        m_rootTieCount = tieCount;
 
         m_tt.Store(m_board.ZobristKey, depth, bestScore, iterBest, TT_EXACT, ply);
         return bestScore;
