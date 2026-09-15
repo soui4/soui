@@ -2,7 +2,7 @@
 #include "EndgameConfig.h"
 #include "Chessman.h"
 #include <json/json.h>
-#include <fstream>
+#include <sstream>
 #include <helper/slog.h>
 #include <string/strcpcvt.h>
 #define kLogTag "EndgameConfig"
@@ -89,7 +89,20 @@ const EndgameItem * EndgameConfig::FindById(int nId) const
     return NULL;
 }
 
-bool EndgameConfig::Load(const char * pszJsonPath)
+void read_all(FILE* fp,std::stringstream & ss) {
+    char buf[8192];
+    size_t n;
+    uint8_t bom[3];
+    fread(bom, 1, 3, fp);
+    if (!(bom[0] == 0xef && bom[1] == 0xbb && bom[2] == 0xbf))
+        ss << std::string((char*)bom, 3);
+    while ((n = fread(buf, 1, sizeof buf, fp)) > 0) {
+        std::string str(buf, n);
+        ss << str;
+    }
+}
+
+bool EndgameConfig::Load(LPCTSTR pszJsonPath)
 {
     Clear();
     if (!pszJsonPath)
@@ -99,14 +112,17 @@ bool EndgameConfig::Load(const char * pszJsonPath)
     }
     Json::Value root;
     Json::CharReaderBuilder builder;
-    std::ifstream ifs(pszJsonPath, std::ios::binary);
-    if (!ifs.is_open())
-    {
+    FILE* f = _tfopen(pszJsonPath, _T("rb"));
+    if (!f) {
         SLOGW() << "can not open endgame json: " << pszJsonPath;
+        fclose(f);
         return false;
     }
+    std::stringstream ss;
+    read_all(f, ss);
+    fclose(f);
     std::string errs;
-    if (!Json::parseFromStream(builder, ifs, &root, &errs))
+    if (!Json::parseFromStream(builder, ss, &root, &errs))
     {
         SLOGW() << "parse endgame json error: " << errs.c_str();
         return false;

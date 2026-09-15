@@ -121,6 +121,26 @@ void WebSocketSvrListener::onDataRecv(ISvrConnection* pConn, const void* data, i
 	}
 }
 
+
+//=====================================================================
+// 残局桌辅助函数
+//=====================================================================
+
+// 确保残局配置已加载(惰性加载, 路径相对于可执行文件目录下的 config/)
+static void EnsureEndgameLoaded()
+{
+	EndgameConfig* pCfg = EndgameConfig::GetInstance();
+	if (pCfg->GetCount() > 0)
+		return;
+	TCHAR szExePath[MAX_PATH];
+	GetModuleFileName(NULL, szExePath, MAX_PATH);
+	SStringT strPath(szExePath);
+	strPath.ReplaceChar('\\', '/');
+	int pos = strPath.ReverseFind('/');
+	strPath = strPath.Left(pos) + _T("/config/endgames.json");
+	pCfg->Load(strPath.c_str());
+}
+
 //////////////////////////////////////////////////////////////////////
 // CWebSocketGame Implementation
 //////////////////////////////////////////////////////////////////////
@@ -134,6 +154,7 @@ CWebSocketGame::CWebSocketGame()
     m_pWsServer = NULL;
     m_nMaxTable = 100; // 默认最大桌子数;
 	new CRobotAIPool();
+	EnsureEndgameLoaded();
 }
 
 CWebSocketGame::~CWebSocketGame()
@@ -420,33 +441,6 @@ BOOL CWebSocketGame::ClientLogin(PWSCLIENT pClient, LPVOID pData, DWORD dwSize)
 	SendMsg(pClient, GMT_LOGIN_ACK, &ack, sizeof(ack));
     sendRoomInfo(pClient);
     return TRUE;
-}
-
-//=====================================================================
-// 残局桌辅助函数
-//=====================================================================
-
-// 确保残局配置已加载(惰性加载, 路径相对于可执行文件目录下的 config/)
-static void EnsureEndgameLoaded()
-{
-    EndgameConfig *pCfg = EndgameConfig::GetInstance();
-    if (pCfg->GetCount() > 0)
-        return;
-    char szExePath[MAX_PATH];
-    GetModuleFileNameA(NULL, szExePath, MAX_PATH);
-    char* pSlash = strrchr(szExePath, '\\');
-    if (!pSlash) pSlash = strrchr(szExePath, '/');
-    std::string strPath;
-    if (pSlash)
-    {
-        strPath.assign(szExePath, pSlash - szExePath + 1);
-        strPath += "config/endgames.json";
-    }
-    else
-    {
-        strPath = "config/endgames.json";
-    }
-    pCfg->Load(strPath.c_str());
 }
 
 // 判断是否为残局桌号(残局桌号区间: [BASE, BASE + 残局数*tablesPerEndgame))

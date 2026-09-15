@@ -21,7 +21,7 @@ class EndgameConfig
 public:
     static EndgameConfig * GetInstance();
     // 从 json 文件加载残局数据
-    bool Load(const char * pszJsonPath);
+    bool Load(LPCTSTR pszJsonPath);
     // 获得残局数量
     int GetCount() const { return (int)m_items.size(); }
     // 每个残局开设的游戏桌数(配置项), 配置缺省时为 2
