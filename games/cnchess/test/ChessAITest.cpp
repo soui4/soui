@@ -252,6 +252,32 @@ TEST(ChessAITest, CheckedNoMovesReturnsLoss)
     EXPECT_TRUE(IsInvalidMove(best)) << "将死局面应返回无合法着法(判负)";
 }
 
+// 对方"送大子"(一子可安全吃掉、无兑子损失)时, AI 应主动吃下。
+// 回归：此前根节点 alpha-beta 把安静着法剪到与"吃子最佳着法"同分, 随机挑选使 AI
+// 有相当概率不吃送上门的大子; 现已改为同分时确定性优先吃子, 该用例应无条件通过。
+TEST(ChessAITest, CapturesHangingBigPiece)
+{
+    int board[10][9];
+    ClearBoard(board);
+    board[7][3] = CHSMAN_RED_JIANG; // 红将 (3,7)
+    board[0][4] = CHSMAN_BLK_JIANG; // 黑将 (4,0)
+    board[3][0] = CHSMAN_RED_JU;    // 红车 (0,3), 沿第0列可下吃
+    board[8][0] = CHSMAN_BLK_JU;    // 黑送的车 (0,8), 中间 y4..7 为空
+
+    CChessLayout layout;
+    layout.InitLayout(board, CS_RED);
+
+    MOVESTEP best = CChessAI::SearchBestMove(layout, 2);
+
+    if (IsInvalidMove(best)) { FAIL() << "AI 应能给出合法着法"; return; }
+    // 期望: 红车(0,3) 下移吃掉黑车(0,8)
+    EXPECT_EQ(0, best.pt1.x);
+    EXPECT_EQ(3, best.pt1.y);
+    EXPECT_EQ(0, best.pt2.x);
+    EXPECT_EQ(8, best.pt2.y);
+    EXPECT_NE(CHSMAN_NULL, best.enemy);
+}
+
 // 搜索不会破坏原始棋盘状态(可用于多次调用/复局面)
 TEST(ChessAITest, SearchDoesNotMutateLayout)
 {

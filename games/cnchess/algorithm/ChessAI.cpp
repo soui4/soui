@@ -603,7 +603,20 @@ MOVESTEP CChessAI::SearchBestMove(CChessLayout &layout, int nDepth, int nTimeMs)
             completed.push_back(moves[0]);
         g_time.enabled = prevEnabled;
     }
-    // 多个等优走法随机取一，增加棋风变化
+    // 多个同分候选时的取舍: 优先吃子。
+    // 根节点 alpha-beta 会把排在正解之后的安静着法"剪到"当前最优值(返回界值),
+    // 使它们与真正的最佳着法同分; 若对全部候选随机挑选, 就经常出现"对方送大子却
+    // 不取"、"随手乱走"的病态棋风。吃子着法要么真正最优, 要么至少与被剪的安静着法
+    // 等价, 不会比它们差, 故确定性优先吃子; 仅当候选均为非吃子(真·同分)时才随机,
+    // 以保留棋风变化。
+    if (completed.size() > 1)
+    {
+        for (size_t i = 0; i < completed.size(); i++)
+        {
+            if (completed[i].enemy != CHSMAN_NULL)
+                return completed[i];
+        }
+    }
     return completed[ThreadRand((int)completed.size())];
 }
 
