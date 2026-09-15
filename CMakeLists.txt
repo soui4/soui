@@ -300,11 +300,12 @@ install(FILES ${PROJECT_SOURCE_DIR}/__cmake/plist.in ${PROJECT_SOURCE_DIR}/__cma
 )
 
 install(FILES 
-        #${PROJECT_SOURCE_DIR}/simsun.ttc
         ${PROJECT_SOURCE_DIR}/soui-sys-resource.zip
         DESTINATION ${CMAKE_INSTALL_PREFIX}/resources
 )
 
-install(FILES ${PROJECT_SOURCE_DIR}/LICENSE
+install(FILES 
+        ${PROJECT_SOURCE_DIR}/LICENSE-en.md
+        ${PROJECT_SOURCE_DIR}/LICENSE-zh.md
         DESTINATION ${CMAKE_INSTALL_PREFIX}
 )
