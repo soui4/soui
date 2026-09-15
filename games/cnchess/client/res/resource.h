@@ -1,4 +1,4 @@
-﻿//stamp:165f112e47be7aef
+﻿//stamp:165f11d5aa645ac6
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -84,6 +84,7 @@
 			const TCHAR * win_btn_min;
 			const TCHAR * win_btn_restore;
 			const TCHAR * tab_bg;
+			const TCHAR * star_rating;
 			}svg;
 	};
 #endif//_UIRES_H_
@@ -168,6 +169,7 @@ struct _UIRES UIRES={
 			_T("svg:win_btn_min"),
 			_T("svg:win_btn_restore"),
 			_T("svg:tab_bg"),
+			_T("svg:star_rating"),
 		},
 	};
 #else
@@ -210,6 +212,7 @@ struct _R{
 		 const wchar_t * main_tabctrl;
 		 const wchar_t * progress_bar;
 		 const wchar_t * room_container;
+		 const wchar_t * rtg_eg_table_difficulty;
 		 const wchar_t * seat_0;
 		 const wchar_t * seat_1;
 		 const wchar_t * tileview_endgame;
@@ -219,7 +222,9 @@ struct _R{
 		 const wchar_t * txt_copyright;
 		 const wchar_t * txt_desc;
 		 const wchar_t * txt_eg_detail_intro;
+		 const wchar_t * txt_eg_detail_intro_desc;
 		 const wchar_t * txt_eg_detail_title;
+		 const wchar_t * txt_eg_table_difficulty;
 		 const wchar_t * txt_eg_table_title;
 		 const wchar_t * txt_feature_ai;
 		 const wchar_t * txt_feature_online;
@@ -274,6 +279,7 @@ struct _R{
 		int main_tabctrl;
 		int progress_bar;
 		int room_container;
+		int rtg_eg_table_difficulty;
 		int seat_0;
 		int seat_1;
 		int tileview_endgame;
@@ -283,7 +289,9 @@ struct _R{
 		int txt_copyright;
 		int txt_desc;
 		int txt_eg_detail_intro;
+		int txt_eg_detail_intro_desc;
 		int txt_eg_detail_title;
+		int txt_eg_table_difficulty;
 		int txt_eg_table_title;
 		int txt_feature_ai;
 		int txt_feature_online;
@@ -377,6 +385,7 @@ struct _R R={
 		L"main_tabctrl",
 		L"progress_bar",
 		L"room_container",
+		L"rtg_eg_table_difficulty",
 		L"seat_0",
 		L"seat_1",
 		L"tileview_endgame",
@@ -386,7 +395,9 @@ struct _R R={
 		L"txt_copyright",
 		L"txt_desc",
 		L"txt_eg_detail_intro",
+		L"txt_eg_detail_intro_desc",
 		L"txt_eg_detail_title",
+		L"txt_eg_table_difficulty",
 		L"txt_eg_table_title",
 		L"txt_feature_ai",
 		L"txt_feature_online",
@@ -426,49 +437,52 @@ struct _R R={
 		65537,
 		65541,
 		65547,
-		65582,
+		65585,
 		65538,
 		65549,
-		65581,
-		65579,
+		65584,
+		65582,
 		65543,
-		65594,
+		65597,
 		65548,
 		65546,
 		65572,
-		65580,
+		65583,
 		65554,
 		65561,
 		65544,
-		65595,
+		65598,
 		65557,
+		65577,
 		10,
 		11,
 		65574,
 		65559,
 		65545,
-		65589,
-		65593,
-		65583,
-		65578,
-		65577,
-		65575,
+		65592,
+		65596,
 		65586,
-		65585,
-		65587,
+		65580,
+		65581,
+		65579,
+		65576,
+		65575,
+		65589,
 		65588,
-		65584,
-		65558,
 		65590,
+		65591,
+		65587,
+		65558,
+		65593,
 		65562,
 		65563,
 		65570,
 		65560,
 		65571,
-		65592,
+		65595,
 		65536,
-		65591,
-		65576,
+		65594,
+		65578,
 		65573,
 		65564,
 		65566

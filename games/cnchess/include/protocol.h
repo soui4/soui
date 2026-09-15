@@ -211,11 +211,11 @@ typedef struct tagTHEME_DATA {
 
 //残局条目信息
 typedef struct tagENDGAME_INFO
-{
-	int nId;			//残局ID
+{	int nId;			//残局ID
 	int nLevel;			//难度 1初级/2中级/3高级
 	int nPlayer;		//首步行棋方: 0=红先 1=黑先
 	char szTitle[64];	//标题 utf8
+	char szIntro[256];	//介绍/说明 utf8
 	int layout[10][9];	//残局布局, 编码同CHESSMAN: 255空/正红(0-6)/负黑(7-13)
 }ENDGAME_INFO,*PENDGAME_INFO;
 

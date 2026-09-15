@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include <SAppCfg.h>
 #include "MainDlg.h"
 #include "SGameTheme.h"

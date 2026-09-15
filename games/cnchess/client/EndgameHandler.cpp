@@ -10,6 +10,7 @@
 #include <layout/SAnchorLayout.h>
 #include <map>
 #include <memory>
+#include "SRatingBar.h"
 #include "events.h"
 
 #define kLogTag "EndgameHandler"
@@ -158,6 +159,11 @@ public:
             }
             pDiff->SetWindowText(strDiff);
         }
+
+        // 星级难度(RatingBar): value = 难度系数 1/2/3
+        SRatingBar *pRating = sobj_cast<SRatingBar>(pItem->FindChildByName(L"rtg_eg_table_difficulty"));
+        if (pRating)
+            pRating->SetValue(pEndgame ? (float)pEndgame->nLevel : 0.0f);
 
         // 初始化座位
         for (int i = 0; i < PLAYER_COUNT; i++)
@@ -525,9 +531,14 @@ void EndgameHandler::SelectEndgame(int nEndgameIndex)
     {
         SStringT strIntro = SStringT().Format(_T("难度: %s | 行棋: %s"),
             (pInfo->nLevel >= 1 && pInfo->nLevel <= 3) ? (pInfo->nLevel == 1 ? _T("初级") : (pInfo->nLevel == 2 ? _T("中级") : _T("高级"))) : _T("初级"),
-            pInfo->nPlayer == 0 ? _T("红先") : _T("黑先"));
+           pInfo->nPlayer == 0 ? _T("红先") : _T("黑先"));
         pIntro->SetWindowText(strIntro);
     }
+
+    // 残局介绍(简述)
+    SWindow *pDesc = m_pRoot ? m_pRoot->FindChildByName(L"txt_eg_detail_intro_desc") : NULL;
+    if (pDesc)
+        pDesc->SetWindowText(pInfo->szIntro[0] ? S_CA2T(pInfo->szIntro, CP_UTF8) : _T(""));
 }
 
 void EndgameHandler::ClearPieces()

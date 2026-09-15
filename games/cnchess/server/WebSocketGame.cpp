@@ -658,6 +658,7 @@ BOOL CWebSocketGame::ClientEndgameList(PWSCLIENT pClient, LPVOID pData, DWORD dw
         info.nLevel = pItem->nLevel;
         info.nPlayer = pItem->nPlayer;
         strncpy(info.szTitle, pItem->szTitle, sizeof(info.szTitle) - 1);
+        strncpy(info.szIntro, pItem->szIntro, sizeof(info.szIntro) - 1);
         memcpy(info.layout, pItem->layout, sizeof(info.layout));
     }
     SendMsg(pClient, GMT_ENDGAME_LIST_ACK, buf.data(), nLen);

@@ -82,5 +82,6 @@
     <file name="win_btn_min" path="svg\win_btn_min.svg"/>
     <file name="win_btn_restore" path="svg\win_btn_restore.svg"/>
     <file name="tab_bg" path="svg\tab_bg.svg"/>
+    <file name="star_rating" path="svg\star_rating.svg"/>
   </svg>
 </resource>
