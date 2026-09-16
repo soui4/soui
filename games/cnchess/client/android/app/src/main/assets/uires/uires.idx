@@ -64,5 +64,6 @@
     <file name="btn_robot_medium" path="svg\btn_robot_medium.svg"/>
     <file name="btn_robot_advanced" path="svg\btn_robot_advanced.svg"/>
     <file name="btn_robot_invite" path="svg\btn_robot_invite.svg"/>
+    <file name="star_rating" path="svg\star_rating.svg"/>
   </svg>
 </resource>
