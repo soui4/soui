@@ -43,7 +43,6 @@ enum{
 };
 
 static const wchar_t* kFxWidgetNames[FX_COUNT] = {Widgets::kfx_eat, Widgets::kfx_check, Widgets::kfx_mate};
-static const wchar_t* kSoundEffectNames[FX_COUNT] = {Sounds::Effects::kEat, Sounds::Effects::kJiangjun, NULL};
 
 //chariot/horse/cannon are treated as major pieces
 static bool IsBigPiece(int chs)
@@ -527,24 +526,15 @@ BOOL CChessGame::OnChessPieceClick(IEvtArgs *e)
     return TRUE;
 }
 
-static void TestChessBoardChilds(SWindow * m_pGameBoard) {
-    SArray<SWindow*> lstChild;
-    lstChild.SetCount(m_pGameBoard->GetChildrenCount());
-    int i = 0;
-    SWindow* pChild = m_pGameBoard->GetWindow(GSW_FIRSTCHILD);
-    while (pChild)
-    {
-        lstChild[i++] = pChild;
-        pChild = pChild->GetWindow(GSW_NEXTSIBLING);
-    }
-    SASSERT(i == m_pGameBoard->GetChildrenCount());
-}
 
 void CChessGame::Init(SWindow *pGameHost, WebSocketClient *pWs)
 {
     CChessBoard* pGameBoard = pGameHost->FindChildByName2<CChessBoard>(L"chessboard");
     SAnchorLayout *pAnchorLayout = sobj_cast<SAnchorLayout>(pGameBoard->GetLayout());
     SASSERT(pAnchorLayout);
+#ifdef ENABLE_MOCK
+    pGameBoard->FindChildByName("btn_test")->SetVisible(TRUE,TRUE);
+#endif//ENABLE_MOCK
     //btn_test stays visible: OnBtnTest cycles the game fx for local visual verification
     pAnchorLayout->SetPosition2PointCallback(ChessAnchor2Pos,this);
 
@@ -660,8 +650,6 @@ void CChessGame::Init(SWindow *pGameHost, WebSocketClient *pWs)
                 return TRUE;
             });
     }
-
-    TestChessBoardChilds(m_pGameBoard);
     OnStageChanged(STAGE_CONNECTING);
 }
 
@@ -859,7 +847,6 @@ void CChessGame::OnStageChanged(STAGE stage)
         }
         break;
     }
-    TestChessBoardChilds(m_pGameBoard);
 }
 
 int CChessGame::GetScale() const {
@@ -1007,10 +994,6 @@ void CChessGame::OnGameBoardSizeChanged(IEvtArgs* e)
 
 void CChessGame::OnBtnTest()
 {
-    //cycle play the game fx: eat -> check -> mate
-    static int nFx = FX_EAT;
-    ShowGameFx(nFx);
-    nFx = (nFx + 1) % FX_COUNT;
 #ifdef ENABLE_MOCK
     if(m_stage == STAGE_CONNECTING){
         OnStageChanged(STAGE_CONTINUE);
