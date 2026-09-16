@@ -114,7 +114,7 @@ class STabSlider
         if (m_pTabCtrl->m_nTabAlign == STabCtrl::AlignMiddle)
         {
             int nHeight = rcWnd.Height();
-            int nTabHeight = m_pTabCtrl->m_szTab[1].toPixelSize(m_pTabCtrl->GetScale());
+            int nTabHeight = m_pTabCtrl->GetTitleRect().Height();
             int nPageHeight = rcWnd.Height() - nTabHeight * m_pTabCtrl->GetItemCount();
             int nPageFromHeight = nPageHeight * (1.0f - fraction);
             int nPageToHeight = nPageHeight - nPageFromHeight;
@@ -289,7 +289,7 @@ void STabCtrl::OnPaint(IRenderTarget *pRT)
             else if (i == m_nHoverTabItem)
                 dwState = WndState_Hover;
 
-            GetItemRect(i, rcItem);
+            GetItemRect2(i, rcItem,pRT);
             if (rcItem.IsRectEmpty())
                 continue;
 
@@ -338,8 +338,9 @@ void STabCtrl::GetChildrenLayoutRect(RECT *prc) const
     CRect rcRet;
     GetClientRect(rcRet);
     rcRet.DeflateRect(GetStyle().GetPadding());
-    int nTabWidth = m_szTab[0].toPixelSize(GetScale());
-    int nTabHeight = m_szTab[1].toPixelSize(GetScale());
+    CRect rcTitle = GetTitleRect();
+    int nTabWidth = rcTitle.Width();
+    int nTabHeight = rcTitle.Height();
     switch (m_nTabAlign)
     {
     case AlignLeft:
@@ -690,14 +691,16 @@ CRect STabCtrl::GetTitleRect() const
 		tabWid = m_szTab[0].toPixelSize(GetScale());
     else if (m_szTab[0].isWrapContent()) {
         SASSERT(m_pSkinTab);
-		tabWid = m_pSkinTab->GetSkinSize().cx;
+		if(m_pSkinTab)
+			tabWid = m_pSkinTab->GetSkinSize().cx;
     }
 	int tabHei = rcTitle.Height();
 	if (m_szTab[1].isSpecifiedSize())
 		tabHei = m_szTab[1].toPixelSize(GetScale());
     else if (m_szTab[1].isWrapContent()) {
 		SASSERT(m_pSkinTab);
-        tabHei = m_pSkinTab->GetSkinSize().cy;
+		if(m_pSkinTab)
+			tabWid = m_pSkinTab->GetSkinSize().cy;
 	}   
     switch (m_nTabAlign)
     {
@@ -810,6 +813,10 @@ BOOL STabCtrl::GetItemRect2(int nIndex, CRect& rcItem, IRenderTarget* pRT) const
             nCross = 0;
             for (int i = 0; i < GetItemCount(); i++)
                 nCross = smax(nCross, (nCrossAxis == 0) ? MeasureTabWidth(pRT, i) : MeasureTabHeight(pRT, i));
+        }
+        else if (m_szTab[nCrossAxis].isMatchParent())
+        { // matchParent: tabs span the whole title strip, clipped by IntersectRect below
+            nCross = (nCrossAxis == 0) ? rcTitle.Width() : rcTitle.Height();
         }
         else
             nCross = m_szTab[nCrossAxis].toPixelSize(nScale);
