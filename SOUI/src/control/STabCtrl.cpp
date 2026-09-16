@@ -254,6 +254,7 @@ STabCtrl::STabCtrl()
 {
     m_ptText[0] = m_ptText[1] = SLayoutSize(-1.f, px);
     m_szTab[0] = m_szTab[1] = SLayoutSize(-1.f, px);
+    m_ptTextPad[0] = m_ptTextPad[1] = SLayoutSize(4.f, px);
 
     m_bFocusable = TRUE;
     m_aniSlider.Attach(new SFloatAnimator);
@@ -680,7 +681,7 @@ int STabCtrl::InsertItem(SXmlNode xmlNode, int iInsert /**< =-1 */, BOOL bLoadin
     return iInsert;
 }
 
-CRect STabCtrl::GetTitleRect()
+CRect STabCtrl::GetTitleRect() const
 {
     CRect rcTitle;
     GetClientRect(rcTitle);
@@ -702,10 +703,32 @@ CRect STabCtrl::GetTitleRect()
     return rcTitle;
 }
 
-BOOL STabCtrl::GetItemRect(int nIndex, CRect &rcItem)
+int STabCtrl::MeasureTabWidth(IRenderTarget *pRT, int iPage) const
+{
+    return 0;
+}
+
+int STabCtrl::MeasureTabHeight(IRenderTarget* pRT, int iPage) const
+{
+    return 0;
+}
+
+BOOL STabCtrl::GetItemRect(int nIndex, CRect& rcItem) const
+{
+    SAutoRefPtr<IRenderTarget> pRT;
+	GETRENDERFACTORY->CreateRenderTarget(&pRT);
+	BeforePaintEx(pRT);
+	return GetItemRect2(nIndex, rcItem, pRT);
+}
+
+BOOL STabCtrl::GetItemRect2(int nIndex, CRect& rcItem, IRenderTarget* pRT) const
 {
     if (nIndex < 0 || nIndex >= (int)GetItemCount())
         return FALSE;
+    CRect rcClient = GetClientRect();
+    int nScale = GetScale();
+    int nInter = m_nTabInterSize.toPixelSize(nScale);
+    int nTabPos = m_nTabPos.toPixelSize(nScale);
     if (m_nTabAlign == AlignMiddle)
     {
         // middle, each tab is same height
@@ -725,21 +748,45 @@ BOOL STabCtrl::GetItemRect(int nIndex, CRect &rcItem)
     }
     else
     {
-        CRect rcTitle = GetTitleRect();
-
-        rcItem = CRect(rcTitle.TopLeft(), CSize(m_szTab[0].toPixelSize(GetScale()), m_szTab[1].toPixelSize(GetScale())));
-
-        switch (m_nTabAlign)
-        {
-        case AlignTop:
-        case AlignBottom:
-            rcItem.OffsetRect(m_nTabPos.toPixelSize(GetScale()) + nIndex * (rcItem.Width() + m_nTabInterSize.toPixelSize(GetScale())), 0);
-            break;
-        case AlignLeft:
-        case AlignRight:
-            rcItem.OffsetRect(0, m_nTabPos.toPixelSize(GetScale()) + nIndex * (rcItem.Height() + m_nTabInterSize.toPixelSize(GetScale())));
-            break;
+        bool bVert = (m_nTabAlign == AlignLeft || m_nTabAlign == AlignRight);
+        int nStripAxis = bVert ? 1 : 0;
+        int nCross = GetTabSpanPx(1 - nStripAxis);
+        int nStrip, nOffset;
+        if (m_szTab[nStripAxis].isWrapContent())
+        { // wrapContent: each tab fits its own title text
+            SAutoRefPtr<IRenderTarget> pRT = GetTextMeasureRT();
+            nOffset = nTabPos;
+            nStrip = 0;
+            for (int i = 0; i <= nIndex; i++)
+            {
+                SIZE sz = GetTabWrapSize(i, pRT);
+                int nSize = (nStripAxis == 0) ? sz.cx : sz.cy;
+                if (i == nIndex)
+                    nStrip = nSize;
+                else
+                    nOffset += nSize + nInter;
+            }
         }
+        else
+        { // fixed size, or matchParent: tabs evenly divide the whole strip
+            nStrip = m_szTab[nStripAxis].toPixelSize(nScale);
+            nOffset = nTabPos + nIndex * (nStrip + nInter);
+            if (m_szTab[nStripAxis].isMatchParent())
+            {
+                int nStripLen = (nStripAxis == 0) ? rcClient.Width() : rcClient.Height();
+                nStrip = smax(0, (nStripLen - nTabPos - (GetItemCount() - 1) * nInter) / GetItemCount());
+                nOffset = nTabPos + nIndex * (nStrip + nInter);
+            }
+        }
+        CRect rcTitle = GetTitleRect();
+        if (bVert)
+            rcItem = CRect(rcTitle.TopLeft(), CSize(nCross, nStrip));
+        else
+            rcItem = CRect(rcTitle.TopLeft(), CSize(nStrip, nCross));
+        if (bVert)
+            rcItem.OffsetRect(0, nOffset);
+        else
+            rcItem.OffsetRect(nOffset, 0);
         rcItem.IntersectRect(rcItem, rcTitle);
         return TRUE;
     }
@@ -865,18 +912,6 @@ int STabCtrl::HitTest(CPoint pt)
     return -1;
 }
 
-void STabCtrl::OnInitFinished(THIS_ IXmlNode *xmlNode)
-{
-    if (m_pSkinTab)
-    {
-        SIZE sz = m_pSkinTab->GetSkinSize();
-        if (SLayoutSize::fequal(m_szTab[0].fSize, -1.f))
-            m_szTab[0] = SLayoutSize((float)sz.cx, SLayoutSize::defUnit);
-        if (SLayoutSize::fequal(m_szTab[1].fSize, -1.f))
-            m_szTab[1] = SLayoutSize((float)sz.cy, SLayoutSize::defUnit);
-    }
-}
-
 void STabCtrl::UpdateChildrenPosition()
 {
     CRect rcPage;
@@ -914,7 +949,7 @@ void STabCtrl::TextOutV(IRenderTarget *pRT, int x, int y, const SStringT &strTex
     strTmp.ReleaseBuffer();
 }
 
-SIZE STabCtrl::MeasureTextV(IRenderTarget *pRT, const SStringT &strText)
+SIZE STabCtrl::MeasureTextV(IRenderTarget *pRT, const SStringT &strText) const
 {
     SIZE szRet = { 0, 0 };
     SStringT strTmp = strText;

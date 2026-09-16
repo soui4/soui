@@ -137,6 +137,8 @@ class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
     SLayoutSize m_ptText[2];               /**< Position of the text. */
     int m_nTabAlign;                       /**< Alignment of the tabs. */
 
+    SLayoutSize m_ptTextPad[2];            /**< Padding (x,y) around the title text, applied when tabWidth/tabHeight is wrapContent. */
+
     SArray<STabPage *> m_lstPages; /**< List of tab pages. */
     STabSlider *m_tabSlider;
     enum
@@ -306,7 +308,7 @@ class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
      * @brief Gets the rectangle of the tab header.
      * @return Rectangle of the tab header.
      */
-    virtual CRect GetTitleRect();
+    virtual CRect GetTitleRect() const;
 
     /**
      * @brief Gets the rectangle of a specified tab item.
@@ -314,7 +316,7 @@ class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
      * @param rcItem Rectangle to receive the item position.
      * @return TRUE if successful, otherwise FALSE.
      */
-    virtual BOOL GetItemRect(int nIndex, CRect &rcItem);
+    virtual BOOL GetItemRect(int nIndex, CRect &rcItem) const;
 
     /**
      * @brief Draws a tab item.
@@ -342,8 +344,6 @@ class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
      * @brief Updates the positions of child windows.
      */
     STDMETHOD_(void, UpdateChildrenPosition)(THIS) OVERRIDE;
-
-    STDMETHOD_(void, OnInitFinished)(THIS_ IXmlNode *xmlNode) OVERRIDE;
 
     virtual void OnColorize(COLORREF cr) override;
     virtual void OnScaleChanged(int nScale) override;
@@ -386,8 +386,11 @@ class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
      * @param strText Text to measure.
      * @return Size of the text.
      */
-    SIZE MeasureTextV(IRenderTarget *pRT, const SStringT &strText);
+    SIZE MeasureTextV(IRenderTarget *pRT, const SStringT &strText) const;
 
+	int MeasureTabWidth(IRenderTarget* pRT, int iPage) const;
+	int MeasureTabHeight(IRenderTarget* pRT, int iPage) const;
+    BOOL GetItemRect2(int nIndex, CRect& rcItem, IRenderTarget* pRT) const;
   protected:
     /**
      * @brief Handles the paint event.
@@ -443,8 +446,8 @@ class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
     SOUI_ATTRS_BEGIN()
         ATTR_INT(L"curSel", m_nCurrentPage, FALSE)               /**< Index of the currently selected page. */
         ATTR_LAYOUTSIZE2(L"tabSize", m_szTab, TRUE)              /**< Size of the tab pages. */
-        ATTR_LAYOUTSIZE(L"tabWidth", m_szTab[0], FALSE)          /**< Width of the tab pages. */
-        ATTR_LAYOUTSIZE(L"tabHeight", m_szTab[1], FALSE)         /**< Height of the tab pages. */
+        ATTR_LAYOUTSIZE(L"tabWidth", m_szTab[0], FALSE)          /**< Width of the tab pages: -1/wrapContent fits title text, -2/matchParent evenly divides the strip. */
+        ATTR_LAYOUTSIZE(L"tabHeight", m_szTab[1], FALSE)         /**< Height of the tab pages: -1/wrapContent fits title text, -2/matchParent evenly divides the strip. */
         ATTR_LAYOUTSIZE(L"tabPos", m_nTabPos, FALSE)             /**< Position of the tabs. */
         ATTR_LAYOUTSIZE(L"tabInterSize", m_nTabInterSize, FALSE) /**< Spacing between tab pages. */
         ATTR_SKIN(L"tabInterSkin", m_pSkinTabInter, FALSE)       /**< Skin object for the tab spacing. */
@@ -455,6 +458,7 @@ class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
         ATTR_LAYOUTSIZE(L"icon-y", m_ptIcon[1], FALSE)           /**< Y-coordinate of the icons. */
         ATTR_LAYOUTSIZE(L"text-x", m_ptText[0], FALSE)           /**< X-coordinate of the text. */
         ATTR_LAYOUTSIZE(L"text-y", m_ptText[1], FALSE)           /**< Y-coordinate of the text. */
+        ATTR_LAYOUTSIZE2(L"textPadding", m_ptTextPad, FALSE)     /**< Padding (x,y) around the title text, applied when tabWidth/tabHeight is wrapContent. */
         ATTR_CUSTOM(L"tabAlign", OnAttrTabAlign)                 /**< Alignment of the tabs. */
         ATTR_ENUM_BEGIN(L"textDir", TEXTDIR, TRUE)
             ATTR_ENUM_VALUE(L"hori", Text_Horz)       /**< Horizontal text direction. */
