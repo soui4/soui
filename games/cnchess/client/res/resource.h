@@ -1,4 +1,4 @@
-﻿//stamp:165f15202bf57c2c
+﻿//stamp:183c5c4364fff6c2
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -18,6 +18,7 @@
 			const TCHAR * dlg_peace_req;
 			const TCHAR * dlg_peace_ack;
 			const TCHAR * dlg_theme_progress;
+			const TCHAR * XML_MSGBOX;
 			}LAYOUT;
 		struct _values{
 			const TCHAR * string;
@@ -103,6 +104,7 @@ struct _UIRES UIRES={
 			_T("LAYOUT:dlg_peace_req"),
 			_T("LAYOUT:dlg_peace_ack"),
 			_T("LAYOUT:dlg_theme_progress"),
+			_T("LAYOUT:XML_MSGBOX"),
 		},
 		{
 			_T("values:string"),
@@ -180,6 +182,7 @@ extern struct _UIRES UIRES;
 #define _R_H_
 struct _R{
 	struct _name{
+		 const wchar_t * btnSwitch;
 		 const wchar_t * btn_avatar_1;
 		 const wchar_t * btn_avatar_2;
 		 const wchar_t * btn_avatar_3;
@@ -198,6 +201,9 @@ struct _R{
 		 const wchar_t * btn_svr_local;
 		 const wchar_t * btn_test;
 		 const wchar_t * btn_unmute;
+		 const wchar_t * button1st;
+		 const wchar_t * button2nd;
+		 const wchar_t * button3rd;
 		 const wchar_t * cbx_sex;
 		 const wchar_t * chessboard;
 		 const wchar_t * chessboard_preview;
@@ -210,6 +216,9 @@ struct _R{
 		 const wchar_t * gp_preview;
 		 const wchar_t * img_playing;
 		 const wchar_t * main_tabctrl;
+		 const wchar_t * msgicon;
+		 const wchar_t * msgtext;
+		 const wchar_t * msgtitle;
 		 const wchar_t * progress_bar;
 		 const wchar_t * room_container;
 		 const wchar_t * rtg_eg_table_difficulty;
@@ -247,6 +256,7 @@ struct _R{
 		 const wchar_t * wnd_robot_levels;
 	}name;
 	struct _id{
+		int btnSwitch;
 		int btn_avatar_1;
 		int btn_avatar_2;
 		int btn_avatar_3;
@@ -265,6 +275,9 @@ struct _R{
 		int btn_svr_local;
 		int btn_test;
 		int btn_unmute;
+		int button1st;
+		int button2nd;
+		int button3rd;
 		int cbx_sex;
 		int chessboard;
 		int chessboard_preview;
@@ -277,6 +290,9 @@ struct _R{
 		int gp_preview;
 		int img_playing;
 		int main_tabctrl;
+		int msgicon;
+		int msgtext;
+		int msgtitle;
 		int progress_bar;
 		int room_container;
 		int rtg_eg_table_difficulty;
@@ -314,8 +330,15 @@ struct _R{
 		int wnd_robot_levels;
 	}id;
 	struct _color{
+		int bg_edit;
+		int bg_modal;
 		int black;
 		int blue;
+		int border_dark;
+		int divider;
+		int gold;
+		int gold_dark;
+		int gold_light;
 		int gray;
 		int green;
 		int login_avatar_border;
@@ -332,6 +355,8 @@ struct _R{
 		int main_title_hi;
 		int mask_select;
 		int red;
+		int text_light;
+		int text_muted;
 		int white;
 	}color;
 	struct _string{
@@ -353,6 +378,7 @@ struct _R{
 #ifdef INIT_R_DATA
 struct _R R={
 	{
+		L"btnSwitch",
 		L"btn_avatar_1",
 		L"btn_avatar_2",
 		L"btn_avatar_3",
@@ -371,6 +397,9 @@ struct _R R={
 		L"btn_svr_local",
 		L"btn_test",
 		L"btn_unmute",
+		L"button1st",
+		L"button2nd",
+		L"button3rd",
 		L"cbx_sex",
 		L"chessboard",
 		L"chessboard_preview",
@@ -383,6 +412,9 @@ struct _R R={
 		L"gp_preview",
 		L"img_playing",
 		L"main_tabctrl",
+		L"msgicon",
+		L"msgtext",
+		L"msgtitle",
 		L"progress_bar",
 		L"room_container",
 		L"rtg_eg_table_difficulty",
@@ -421,6 +453,7 @@ struct _R R={
 	}
 	,
 	{
+		65602,
 		65550,
 		65551,
 		65552,
@@ -439,6 +472,9 @@ struct _R R={
 		65547,
 		65585,
 		65538,
+		65603,
+		65604,
+		65605,
 		65549,
 		65584,
 		65582,
@@ -451,6 +487,9 @@ struct _R R={
 		65554,
 		65561,
 		65544,
+		65600,
+		65601,
+		65599,
 		65598,
 		65557,
 		65577,
@@ -507,7 +546,16 @@ struct _R R={
 		15,
 		16,
 		17,
-		18
+		18,
+		19,
+		20,
+		21,
+		22,
+		23,
+		24,
+		25,
+		26,
+		27
 	}
 	,
 	{

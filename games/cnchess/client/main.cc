@@ -82,6 +82,8 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
     {
         return -1;
     }
+    // 覆盖系统 MessageBox 模板: 使用与游戏主题一致的弹窗样式(深木色+金色)
+    app.SetMessageBoxTemplateResId(_T("LAYOUT:XML_MSGBOX"));
 #ifndef _WIN32
     // 加载宋体字体
     #ifdef __APPLE__

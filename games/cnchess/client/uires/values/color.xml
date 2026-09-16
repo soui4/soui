@@ -21,4 +21,14 @@
   <!-- 主窗口标题栏 -->
   <main_title value="#F5E6C8"/>
   <main_title_hi value="#FFD700"/>
+  <!-- 通用弹窗主题色(与移动端 color.xml 对齐, 供 msgbox 等模板使用) -->
+  <bg_modal value="#2A1A0E"/>
+  <bg_edit value="#3D2F1F"/>
+  <border_dark value="#5D4E37"/>
+  <divider value="#8B7355"/>
+  <gold value="#FFD700"/>
+  <gold_light value="#FFE066"/>
+  <gold_dark value="#B8860B"/>
+  <text_light value="#CCCCCC"/>
+  <text_muted value="#8B7355"/>
 </color>

@@ -1,4 +1,4 @@
-//stamp:01dd44cb515fe434
+//stamp:01dd4590894f8f03
 /*<------------------------------------------------------------------------------------------------->*/
 #define DEFINE_UIRES(name, type, file_path)\
     name type file_path
@@ -13,6 +13,7 @@ DEFINE_UIRES(page_about,	LAYOUT,	"uires/xml/page_about.xml")
 DEFINE_UIRES(dlg_peace_req,	LAYOUT,	"uires/xml/dlg_peace_req.xml")
 DEFINE_UIRES(dlg_peace_ack,	LAYOUT,	"uires/xml/dlg_peace_ack.xml")
 DEFINE_UIRES(dlg_theme_progress,	LAYOUT,	"uires/xml/dlg_theme_progress.xml")
+DEFINE_UIRES(XML_MSGBOX,	LAYOUT,	"uires/xml/msgbox.xml")
 DEFINE_UIRES(string,	values,	"uires/values/string.xml")
 DEFINE_UIRES(color,	values,	"uires/values/color.xml")
 DEFINE_UIRES(skin,	values,	"uires/values/skin.xml")

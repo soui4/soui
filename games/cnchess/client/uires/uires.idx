@@ -13,6 +13,7 @@
     <file name="dlg_peace_req" path="xml\dlg_peace_req.xml"/>
     <file name="dlg_peace_ack" path="xml\dlg_peace_ack.xml"/>
     <file name="dlg_theme_progress" path="xml\dlg_theme_progress.xml"/>
+    <file name="XML_MSGBOX" path="xml\msgbox.xml"/>
   </LAYOUT>
   <values>
     <file name="string" path="values\string.xml"/>
