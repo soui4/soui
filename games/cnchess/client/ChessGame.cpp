@@ -31,8 +31,6 @@ namespace {
  
 #define TIMERID_CLOCK_ME 503
 #define TIMERID_CLOCK_ENEMY 504
-#define TIMERID_FX_HIDE 505
-#define FX_HIDE_DELAY 1700	//fx_pop animation lasts about 1650ms, hide a bit later
 
 static const float kPieceScale = 1.1f;
 
@@ -549,9 +547,7 @@ void CChessGame::Init(SWindow *pGameHost, WebSocketClient *pWs)
     CChessBoard* pGameBoard = pGameHost->FindChildByName2<CChessBoard>(L"chessboard");
     SAnchorLayout *pAnchorLayout = sobj_cast<SAnchorLayout>(pGameBoard->GetLayout());
     SASSERT(pAnchorLayout);
-    #ifndef ENABLE_MOCK
-    pGameBoard->FindChildByName(L"btn_test")->SetVisible(FALSE);
-    #endif//ENABLE_MOCK
+    //btn_test stays visible: OnBtnTest cycles the game fx for local visual verification
     pAnchorLayout->SetPosition2PointCallback(ChessAnchor2Pos,this);
 
     m_pGameBoard = pGameBoard;
@@ -654,11 +650,17 @@ void CChessGame::Init(SWindow *pGameHost, WebSocketClient *pWs)
     m_pGameBoard->InsertIChild(pFlagTo);
     pFlagTo->AddRef();
 
-    //insert game fx widgets (capture major piece / check / checkmate)
+    //insert game fx widgets (capture major piece / check / checkmate);
+    //each widget hides itself when its animation stop event fires
     for(int i=0;i<FX_COUNT;i++){
-        IWindow *pFx = m_pTheme->GetWidget(kFxWidgetNames[i]);
+        SWindow *pFx = sobj_cast<SWindow>(m_pTheme->GetWidget(kFxWidgetNames[i]));
         m_pGameBoard->InsertIChild(pFx);
         pFx->AddRef();
+        pFx->SubscribeEvent(EventSwndAnimationStop::EventID,
+            [this, pFx](IEvtArgs *e){
+                HideGameFx(pFx);
+                return TRUE;
+            });
     }
 
     TestChessBoardChilds(m_pGameBoard);
@@ -854,6 +856,7 @@ void CChessGame::OnStageChanged(STAGE stage)
     case STAGE_PLAYING:
         {
             StopWatingAnimation();
+            HideGameFx(NULL);
             OnSetActivePlayerIndex(GetActivePlayerIndex()==m_iSelfIndex?0:1);
         }
         break;
@@ -1006,6 +1009,11 @@ void CChessGame::OnGameBoardSizeChanged(IEvtArgs* e)
 
 void CChessGame::OnBtnTest()
 {
+    //cycle play the game fx: eat -> check -> mate
+    static int nFx = FX_EAT;
+    ShowGameFx(nFx);
+    nFx = (nFx + 1) % FX_COUNT;
+#ifdef ENABLE_MOCK
     if(m_stage == STAGE_CONNECTING){
         OnStageChanged(STAGE_CONTINUE);
         GAME_LOGIN_ACK ack = { 1, ERR_SUCCESS, {0} };
@@ -1069,6 +1077,7 @@ void CChessGame::OnBtnTest()
             wsSendMsg(MSG_REQ_MOVE, &msg, sizeof(msg));
         }
     }
+#endif//ENABLE_MOCK
 }
 
 void CChessGame::OnTimer(UINT_PTR uIDEvent)
@@ -1081,9 +1090,6 @@ void CChessGame::OnTimer(UINT_PTR uIDEvent)
         int nSecond = m_pGameBoard->FindChildByID(ID_ALARM_CLOCK_ENEMY)->GetUserData();
         m_pMainDlg->KillTimer(uIDEvent);
         UpdateClock(nSecond-1, 1);
-    }else if(uIDEvent == TIMERID_FX_HIDE){
-        m_pMainDlg->KillTimer(uIDEvent);
-        HideGameFx();
     }else{
         SetMsgHandled(FALSE);
     }
@@ -1100,11 +1106,7 @@ void CChessGame::ShowGameFx(int nFx)
     IAnimation *pAni = m_pTheme->GetAnimation(Animations::kfx_pop);
     if(!pAni)
         return;
-    //show the requested fx widget and hide the others
-    for(int i=0;i<FX_COUNT;i++){
-        IWindow *pFx = m_pTheme->GetWidget(kFxWidgetNames[i]);
-        pFx->SetVisible(i==nFx, TRUE);
-    }
+    HideGameFx(NULL);
     //clone the cached animation so a replay starts from scratch;
     //SetAnimation will auto-start it on the next frame
     IAnimation *pAniClone = pAni->clone();
@@ -1112,19 +1114,24 @@ void CChessGame::ShowGameFx(int nFx)
         IWindow *pFx = m_pTheme->GetWidget(kFxWidgetNames[nFx]);
         pFx->SetAnimation(pAniClone);
         pAniClone->Release();
+        //show the target AFTER SetAnimation: replacing a running animation
+        //may fire the old animation's stop event, which hides all fx widgets
+        pFx->SetVisible(TRUE, TRUE);
     }
-    //schedule hiding after the animation finishes
-    m_pMainDlg->SetTimer(TIMERID_FX_HIDE, FX_HIDE_DELAY);
 }
 
 /**
  * @brief 隐藏所有游戏特效widget
  */
-void CChessGame::HideGameFx()
+void CChessGame::HideGameFx(IWindow *pFx)
 {
-    for(int i=0;i<FX_COUNT;i++){
-        IWindow *pFx = m_pTheme->GetWidget(kFxWidgetNames[i]);
+    if(pFx){
         pFx->SetVisible(FALSE, TRUE);
+    }else{
+        for(int i=0;i<FX_COUNT;i++){
+            IWindow *pFx = m_pTheme->GetWidget(kFxWidgetNames[i]);
+            pFx->SetVisible(FALSE, TRUE);
+        }
     }
 }
 

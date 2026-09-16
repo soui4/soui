@@ -304,7 +304,7 @@ protected:
      * @param nFx 特效类型: FX_EAT=吃大子, FX_CHECK=将军, FX_MATE=绝杀
      */
     void ShowGameFx(int nFx);
-    void HideGameFx();  ///< 隐藏所有游戏特效widget
+    void HideGameFx(IWindow *pFx);
     UINT GetFarthestRepeat(CHESSMAN & chsEnemy); //计算当前步最远的一次重复走棋，在计算长捉时使用
     BOOL CheckMove(POINT ptFrom,POINT ptTo, BOOL bSilent=FALSE);
 private:
