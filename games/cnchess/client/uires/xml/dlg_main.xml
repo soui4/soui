@@ -22,7 +22,7 @@ translucent="1"
       <imgbtn name="btn_close" skin="skin_win_close" tip="close" animate="1"/>
     </caption>
     <window size="-2,0" weight="1" name="content">
-      <tabctrl name="main_tabctrl" pos="0,0,-0,-0" tabHeight="30" tabWidth="150" tabSkin="skin_tab_header" colorText="#8B7355" colorTextHover="#FFD700" colorTextPush="#FFE45E">
+      <tabctrl name="main_tabctrl" pos="0,0,-0,-0" tabHeight="30" tabWidth="-2" tabSkin="skin_tab_header" colorText="#8B7355" colorTextHover="#FFD700" colorTextPush="#FFE45E" duration="200">
         <include src="layout:page_lobby"/>
         <include src="layout:page_endgame"/>
         <include src="layout:page_game"/>
