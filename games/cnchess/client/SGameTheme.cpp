@@ -124,7 +124,7 @@ IAnimation *SGameTheme::GetAnimation(LPCWSTR pszName)
 SStringW SGameTheme::GetEffectSoundFile(LPCWSTR pszName)
 {
     SXmlNode xmlEffect = m_docSounds.root().first_child().child(L"effects").first_child();
-    while (xmlEffect)
+    while (pszName && xmlEffect)
     {
         SStringW name = xmlEffect.attribute(L"name").as_string();
         if (name == pszName)

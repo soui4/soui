@@ -43,6 +43,7 @@ enum{
 };
 
 static const wchar_t* kFxWidgetNames[FX_COUNT] = {Widgets::kfx_eat, Widgets::kfx_check, Widgets::kfx_mate};
+static const wchar_t* kSoundEffectNames[FX_COUNT] = {Sounds::Effects::kEat, Sounds::Effects::kJiangjun, NULL};
 
 //chariot/horse/cannon are treated as major pieces
 static bool IsBigPiece(CHESSMAN chs)
@@ -231,15 +232,10 @@ void CChessGame::onAnimationEnd(IValueAnimator *pAnimator)
                 ShowGameFx(FX_MATE);
             else if(bCheck)
                 ShowGameFx(FX_CHECK);
-            else if(IsBigPiece(moveStep.enemy))
+            else if(moveStep.nEnemyID != 0)
                 ShowGameFx(FX_EAT);
-            if(bCheck)
-                PlayEffectSound(Sounds::Effects::kJiangjun);
-            else if(moveStep.nEnemyID==0)
-                PlayEffectSound(Sounds::Effects::kGo);
             else
-                PlayEffectSound(Sounds::Effects::kEat);
-
+                PlayEffectSound(Sounds::Effects::kGo);
             if(moveStep.nEnemyID != 0){
                 CChessPiece *pEnemyPiece = (CChessPiece *)m_pGameBoard->FindChildByID(ID_CHESS_BASE+moveStep.nEnemyID);
                 pEnemyPiece->Destroy();
@@ -1118,6 +1114,7 @@ void CChessGame::ShowGameFx(int nFx)
         //may fire the old animation's stop event, which hides all fx widgets
         pFx->SetVisible(TRUE, TRUE);
     }
+    PlayEffectSound(kSoundEffectNames[nFx]);
 }
 
 /**
