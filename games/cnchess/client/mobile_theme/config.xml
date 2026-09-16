@@ -121,20 +121,12 @@
         </effects>
         <processes>
             <male>
-                <process name="绝杀">
-                    <file id="0" weight="1" src="Sound/processes/male/jueshagamewin.wav"/>
-                </process>
-                <process name="被绝杀">
-                    <file id="0" weight="1" src="Sound/processes/male/jueshagameover.wav"/>
-                </process>
+                <file name="绝杀" src="Sound/processes/male/jueshagamewin.wav"/>
+                <file name="被绝杀" src="Sound/processes/male/jueshagameover.wav"/>
             </male>
             <female>
-                <process name="绝杀">
-                    <file id="0" weight="1" src="Sound/processes/female/jueshagamewin.wav"/>
-                </process>
-                <process name="被绝杀">
-                    <file id="0" weight="1" src="Sound/processes/female/jueshagameover.wav"/>
-                </process>
+                <file name="绝杀" src="Sound/processes/female/jueshagamewin.wav"/>
+                <file name="被绝杀" src="Sound/processes/female/jueshagameover.wav"/>
             </female>
         </processes>
     </sounds>

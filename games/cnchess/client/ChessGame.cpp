@@ -1565,12 +1565,12 @@ void CChessGame::OnGameOver(const void *pData, int nSize)
         {
             if (GetActivePlayerIndex() != m_iSelfIndex)
             {
-                PlayEffectSound(Sounds::Effects::kGameWin);
+                PlayEffectSound(Sounds::Effects::kJueSha );
                 ShowGameFx(FX_MATE);
             }
             else
             {
-                PlayEffectSound(Sounds::Effects::kJueSha);
+                PlayEffectSound(Sounds::Effects::kGameWin);
             }
         }
         SGifPlayer *pVectory = (SGifPlayer *)m_pTheme->GetWidget(Sprites::sprite_vectory);
@@ -1584,7 +1584,7 @@ void CChessGame::OnGameOver(const void *pData, int nSize)
         m_roundResult = RESULT_LOSE;
         if (pOver->overType == GOT_NORMAL)
         {
-            if (GetActivePlayerIndex() != m_iSelfIndex)
+            if (GetActivePlayerIndex() == m_iSelfIndex)
             {
                 ShowGameFx(FX_MATE);
                 PlayEffectSound(Sounds::Effects::kBeiJueSha);
