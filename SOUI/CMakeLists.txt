@@ -25,6 +25,12 @@ file(GLOB_RECURSE CURRENT_UIRES  *.xml *.idx *.ico)
 file(GLOB_RECURSE CURRENT_RC *.rc *.rc2)
 file(GLOB_RECURSE NANOSVG_HEADERS  ${SOUI_ROOT_DIR}/third-part/nanosvg/nanosvg.h)
 
+# Tests belong to SOUI but must be compiled by the test target, not soui4.
+list(FILTER CURRENT_HEADERS EXCLUDE REGEX "/tests/")
+list(FILTER CURRENT_SRCS EXCLUDE REGEX "/tests/")
+list(FILTER CURRENT_UIRES EXCLUDE REGEX "/tests/")
+list(FILTER CURRENT_RC EXCLUDE REGEX "/tests/")
+
 source_group("Header Files" FILES ${CURRENT_HEADERS})
 source_group("Source Files" FILES ${CURRENT_SRCS})
 source_group("SoUI Resource" FILES ${CURRENT_UIRES})

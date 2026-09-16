@@ -1,0 +1,36 @@
+name: GUI smoke
+
+on:
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gui-linux-x64:
+    name: gui-linux-x64
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: "^3.25.0"
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential xvfb libxcb1-dev libxcb-render0-dev uuid-dev libasound2-dev libgl1-mesa-dev freeglut3-dev libglfw3-dev libglew-dev pkg-config
+      - name: Configure
+        run: >-
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+          -DSOUI_BUILD_GAMES=OFF
+          -DSOUI_FUN_TEST_POST_BUILD=OFF
+          -DSOUI_ENABLE_GUI_SMOKE=ON
+      - name: Build fun_test
+        run: cmake --build build --target fun_test --parallel 4
+      - name: Run native-window smoke test
+        run: xvfb-run -a ctest --test-dir build -L '^soui-gui$' --no-tests=error --output-on-failure

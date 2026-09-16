@@ -1,0 +1,79 @@
+name: PR core validation
+
+on:
+  pull_request:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+  core-linux-x64:
+    name: core-linux-x64
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: "^3.25.0"
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential gdb xvfb libxcb1-dev libxcb-render0-dev uuid-dev libasound2-dev libgl1-mesa-dev freeglut3-dev libglfw3-dev libglew-dev pkg-config
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DSOUI_BUILD_GAMES=OFF -DSOUI_FUN_TEST_POST_BUILD=OFF
+      - name: Build fun_test
+        run: cmake --build build --target fun_test --parallel 4
+      - name: Run basic validation
+        run: xvfb-run -a ctest --test-dir build -L '^soui-' --output-on-failure
+      - name: Diagnose failing SOUI cases
+        if: failure()
+        run: |
+          cd build/demos/fun_test
+          xvfb-run -a gdb -q -batch -ex 'set args --gtest_filter=soui_component.resprovider_zip_load_and_read' -ex run -ex 'thread apply all bt 20' -- ../../bin/fun_test
+          xvfb-run -a gdb -q -batch -ex 'set args --gtest_filter=soui_window.named_child_lookup_respects_depth' -ex run -ex 'thread apply all bt 20' -- ../../bin/fun_test
+
+  core-windows-x64:
+    name: core-windows-x64
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: "^3.25.0"
+      - name: Configure
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DSOUI_BUILD_GAMES=OFF -DSOUI_FUN_TEST_POST_BUILD=OFF
+      - name: Build fun_test
+        run: cmake --build build --target fun_test --parallel 4
+      - name: Run basic validation
+        run: ctest --test-dir build -L '^soui-' --output-on-failure
+
+  core-macos-arm64:
+    name: core-macos-arm64
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: "^3.25.0"
+      - name: Install dependencies
+        run: brew install ninja pkgconf glfw glew
+      - name: Configure
+        run: >-
+          cmake -S . -B build -G Ninja
+          -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_OSX_ARCHITECTURES=arm64
+          -DPNG_HARDWARE_OPTIMIZATIONS=OFF
+          -DSOUI_BUILD_GAMES=OFF
+          -DSOUI_FUN_TEST_POST_BUILD=OFF
+      - name: Build fun_test
+        run: cmake --build build --target fun_test --parallel 4
+      - name: Run basic validation
+        run: ctest --test-dir build -L '^soui-' --output-on-failure

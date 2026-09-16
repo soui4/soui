@@ -1,0 +1,5 @@
+<resource>
+    <LAYOUT>
+        <file name="XML_CORE_E2E" path="xml\core_e2e.xml"/>
+    </LAYOUT>
+</resource>
