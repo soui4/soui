@@ -7,7 +7,7 @@
 - 引擎：`games/cnchess/algorithm/ChessAI.{h,cpp}`、`games/cnchess/algorithm/ChessBook.{h,cpp}`
 - 线程池：`games/cnchess/server/RobotAIPool.{h,cpp}`、`games/cnchess/server/RobotDispatch.h`
 - 游戏流程：`games/cnchess/server/CnChess.{h,cpp}`、`games/cnchess/server/WebSocketGame.cpp`
-- 配置：`games/cnchess/server/PropBag.{h,cpp}`、`games/cnchess/server/config/config.ini`
+- 配置：`games/cnchess/server/PropBag.{h,cpp}`、`games/cnchess/server/config/config.xml`
 
 ---
 
@@ -115,7 +115,7 @@ struct SRobotTask
 
 ### 2.6 配置项
 
-`config.ini` 的 `<prop ...>`：
+`config.xml` 的 `<prop ...>`：
 
 | 键 | 默认 | 含义 |
 |----|------|------|

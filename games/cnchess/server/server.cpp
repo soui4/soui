@@ -142,7 +142,7 @@ int run(LPCTSTR pszCfg){
 
 int _tmain(int argc, TCHAR **argv)
 {
-    LPCTSTR pszCfg = _T("./config.ini");
+    LPCTSTR pszCfg = _T("./config.xml");
     if(argc > 1)
         pszCfg = argv[1];
     return run(pszCfg);

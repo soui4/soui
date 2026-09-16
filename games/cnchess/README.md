@@ -43,7 +43,7 @@ cnchess/
 │   ├── server.cpp      # 服务器入口
 │   ├── stdafx.h        # 预编译头文件
 │   ├── stdafx.cpp      # 预编译头源文件
-│   ├── config.ini      # 服务器配置文件
+│   ├── config.xml      # 服务器配置文件
 │   └── CMakeLists.txt
 ├── test/               # 算法测试模块
 │   ├── ChessAlgorithmTest.cpp # 算法测试实现
@@ -88,7 +88,7 @@ make
 ## 服务器使用说明
 
 1. 编译服务器程序
-2. 修改config.ini配置文件
+2. 修改config.xml配置文件
 3. 运行服务器程序: ./chess_server [config_file]
 
 ## 测试模块使用说明
