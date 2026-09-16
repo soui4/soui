@@ -293,8 +293,9 @@ DECLARE_INTERFACE_(IWsServer, IObjRef)
     STDMETHOD_(void, quit)(THIS) PURE;
 
     /**
-     * @brief 投递一个任务到服务器事件线程(LWS线程)执行
-     * @remark 供其他线程(如机器人AI线程池)把结果回调安全地切回游戏主线程串行执行
+     * @brief Post a task to the server event thread (LWS thread) for execution
+     * @param task Runnable task object to be executed on the server event thread
+     * @remark Intended for other threads (such as AI worker threads) to safely hand results back and serialize callbacks onto the main game thread
      */
     STDMETHOD_(void, postServiceTask)(THIS_ IRunnable * task) PURE;
 };
