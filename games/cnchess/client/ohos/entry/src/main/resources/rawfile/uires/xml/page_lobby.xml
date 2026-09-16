@@ -9,7 +9,7 @@
     
     <!-- 游戏桌列表 -->
     <tileview name="tileview_lobby" size="-2,0" weight="1" wantTab="1" marginSize="8" sbFadeFrames="30" align="center">
-        <template itemWidth="220" itemHeight="180" layout="vbox" gravity="center" skin="skin_item_bk">
+        <template itemWidth="220" itemHeight="244" layout="vbox" gravity="center" skin="skin_item_bk">
             <!-- 顶部: 桌子ID和状态 -->
             <window size="-2,30" layout="hbox" interval="5" gravity="center_vertical" padding="10,5,10,0">
                 <text name="txt_table_id" text="桌号: 0" colorText="@color/gold" font="size:12,bold"/>
@@ -34,7 +34,17 @@
                     <text name="txt_seat_1" text="空位" colorText="@color/text_light" font="size:10" gravity="center"/>
                 </window>
             </window>
-            
+
+            <!-- 邀请机器人: 点击展开难度(初/中/高 图片按钮) -->
+            <window name="wnd_robot_area" size="-2,64" layout="vbox" interval="2" gravity="center" padding="14,2,14,2">
+                <imgbtn name="btn_invite_robot" skin="skin_btn_robot_invite" size="56,28" cursor="hand" animate="1"/>
+                <window name="wnd_robot_levels" size="-2,30" layout="hbox" interval="4" gravity="center" visible="0">
+                    <imgbtn name="btn_lvl_beginner" skin="skin_btn_robot_beginner" size="56,28" cursor="hand" animate="1"/>
+                    <imgbtn name="btn_lvl_medium" skin="skin_btn_robot_medium" size="56,28" cursor="hand" animate="1"/>
+                    <imgbtn name="btn_lvl_advanced" skin="skin_btn_robot_advanced" size="56,28" cursor="hand" animate="1"/>
+                </window>
+            </window>
+
             <!-- 底部: 分隔线和状态提示 -->
             <window size="-2,1" colorBkgnd="@color/divider" opacity="0.3" margin="10,0,10,0"/>
             <window size="-2,25" layout="hbox" interval="5" gravity="center_vertical" padding="10,0,10,5">
@@ -42,17 +52,7 @@
             </window>
         </template>
     </tileview>
-    
-    <!-- 邀请机器人: 点击展开难度(初/中/高 图片按钮) -->
-    <window name="wnd_robot_area" size="-2,64" layout="vbox" interval="2" gravity="center" padding="14,2,14,2">
-        <imgbtn name="btn_invite_robot" skin="skin_btn_robot_invite" size="56,28" cursor="hand" animate="1"/>
-        <window name="wnd_robot_levels" size="-2,30" layout="hbox" interval="4" gravity="center" visible="0">
-            <imgbtn name="btn_lvl_beginner" skin="skin_btn_robot_beginner" size="56,28" cursor="hand" animate="1"/>
-            <imgbtn name="btn_lvl_medium" skin="skin_btn_robot_medium" size="56,28" cursor="hand" animate="1"/>
-            <imgbtn name="btn_lvl_advanced" skin="skin_btn_robot_advanced" size="56,28" cursor="hand" animate="1"/>
-        </window>
-    </window>
-    
+
     <!-- 底部信息栏 -->
     <window size="-2,60" layout="vbox" interval="3" padding="15,5,15,10" colorBkgnd="@color/bg_panel">
         <text text="游戏规则" colorText="@color/gold" font="size:12,bold"/>
