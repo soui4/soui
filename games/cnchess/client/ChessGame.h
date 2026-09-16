@@ -308,6 +308,12 @@ protected:
     UINT GetFarthestRepeat(CHESSMAN & chsEnemy); //计算当前步最远的一次重复走棋，在计算长捉时使用
     BOOL CheckMove(POINT ptFrom,POINT ptTo, BOOL bSilent=FALSE);
 private:
+    BOOL _OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE> > data);
+    void PumpMessage();
+
+    std::list < std::pair<DWORD, std::shared_ptr<std::vector<BYTE> > > > m_lstPendingMsg;
+    BOOL m_canHandleMsg;
+private:
     CMainDlg* m_pMainDlg;               ///< 主窗口指针
     CChessBoard * m_pGameBoard;         ///< 游戏面板
     STAGE m_stage;                      ///< 当前游戏阶段

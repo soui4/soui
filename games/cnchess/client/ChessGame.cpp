@@ -263,7 +263,9 @@ void CChessGame::onAnimationEnd(IValueAnimator *pAnimator)
                 wsSendMsg(MSG_REQ_MOVE, &msgMove, sizeof(msgMove));
             }
         }
-
+        SLOGI() << "move animation done, restore msg receive";
+        m_canHandleMsg = TRUE;
+        PumpMessage();
     }else if(pPropAnimator->GetID() == ANI_UP_MOVE){
         CChessPiece *pPiece = (CChessPiece *)pPropAnimator->GetTarget();
         POINT ptTarget = pPiece->GetTarget();
@@ -1129,7 +1131,22 @@ void CChessGame::OnDisconnected()
 #endif
 }
 
+void CChessGame::PumpMessage() {
+    while (m_canHandleMsg && !m_lstPendingMsg.empty()) {
+        auto msg = m_lstPendingMsg.front();
+        m_lstPendingMsg.pop_front();
+        _OnMessage(msg.first, msg.second);
+    }
+}
+
 BOOL CChessGame::OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE> > data)
+{
+    m_lstPendingMsg.push_back(std::make_pair(dwType, data));
+    PumpMessage();
+    return TRUE;
+}
+
+BOOL CChessGame::_OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE> > data)
 {
     const LPBYTE pMsg = data ? data->data() : NULL;
     DWORD dwLen = data ? data->size() : 0;
@@ -1286,7 +1303,6 @@ POINT CChessGame::PtLocal2Net(POINT ptLocal) const
 
 void CChessGame::OnMoveChess(const void *pData, int nSize)
 {
-    SLOGI() << "Move chess";
     MSG_MOVE *pMove = (MSG_MOVE *)pData;
     if(pMove->iIndex == m_iSelfIndex && !pMove->bLocal)
         return;
@@ -1304,6 +1320,8 @@ void CChessGame::OnMoveChess(const void *pData, int nSize)
     }else{
         SelectAndMovePiece(nChessID, pMove->ptEnd);
     }
+    SLOGI() << "block msg receive, Move chess from=" << pMove->ptBegin << " to=" << pMove->ptEnd;
+    m_canHandleMsg = FALSE; //enable handle msg;
 }
 
 void CChessGame::OnReqPeace(const void *pData, int nSize){
@@ -1532,8 +1550,9 @@ void CChessGame::OnGifVectoryOver(IEvtArgs *e)
 void CChessGame::OnGameOver(const void *pData, int nSize)
 {
     MSG_GAMEOVER *pOver = (MSG_GAMEOVER *)pData;
-    SLOGI() << "Game over, desc: " << pOver->szDesc;
-    m_pMainDlg->PlayTip(S_CA2T(pOver->szDesc, CP_UTF8));
+    SStringT strDesc = S_CA2T(pOver->szDesc, CP_UTF8);
+    SLOGI() << "Game over, desc: " << strDesc.c_str();
+    m_pMainDlg->PlayTip(strDesc);
     m_pMainDlg->KillTimer(TIMERID_CLOCK_ME);
     m_pMainDlg->KillTimer(TIMERID_CLOCK_ENEMY);
     for(int i = 0; i < PLAYER_COUNT; i++){

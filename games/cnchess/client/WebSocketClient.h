@@ -54,6 +54,7 @@ public:
 	// 消息处理回调设置
 	void SetMessageHandler(IListener *pMsgListener);
 
+	void BlockReceive(BOOL bBlock);
 private:
 	// WebSocket相关成员
 	SComMgr2 m_comLoader;
