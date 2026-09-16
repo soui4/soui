@@ -3,24 +3,19 @@
     <scrollview size="-2,-2" wantTab="1" sbFadeFrames="30" viewSize="-2,-1" layout="vbox" interval="10" padding="20">
         <!-- 标题 -->
         <text name="txt_title" text="象棋游戏" font="size:24,bold" colorText="@color/gold" align="center"/>
-        <text name="txt_desc" text="这是一个使用SOUI框架开发的象棋游戏。" font="size:14" colorText="@color/text_light" align="center"/>
+        <text name="txt_desc" text="使用 SOUI 框架打造的跨平台中国象棋对战游戏，支持在线对战、AI 人机对弈与经典残局打谱。" font="size:14" colorText="@color/text_light" align="center"/>
 
         <!-- 分隔线 -->
         <window size="-2,1" colorBkgnd="@color/divider" opacity="0.4" margin="10,5,10,5"/>
 
-        <!-- 新特性标题 -->
-        <text name="txt_new_features" text="SOUI 5.3 新特性：" font="size:16,bold" colorText="@color/gold_light" margin="5,5,5,5"/>
-        <text text="实现与Android平台无缝集成" font="size:14,bold" colorText="@color/gold" margin="15,5,5,5"/>
-        <text text="• 原生能干的我能干，原生干不了的我也能干!" font="size:14" colorText="@color/text_light" margin="25,5"/>
-
-        <text text="锚点布局（Anchor Layout）" font="size:14,bold" colorText="@color/gold" margin="15,5,5,5"/>
-        <text text="• 基于9个参考点的新型布局模型;\n• 适用于复杂界面元素精确定位;\n• 游戏类应用的精灵容器推荐使用anchor布局作为宿主容器" multiLines="1" font="size:14" colorText="@color/text_light" margin="25,5"/>
-
-        <text text="属性动画（Property Animation）" font="size:14,bold" colorText="@color/gold" margin="15,5,5,5"/>
-        <text text="• 支持对布局参数和窗口属性的动画控制;\n• 借鉴Android属性动画设计模式;\n• 动画系统参考Android属性动画设计模式" multiLines="1" font="size:14" colorText="@color/text_light" margin="25,5"/>
-
-        <text text="路径动画（Path Animation）" font="size:14,bold" colorText="@color/gold" margin="15,5,5,5"/>
-        <text text="• 使用锚点布局支持数值动画实现;\n• 可实现复杂的曲线运动轨迹;\n• 适用于游戏元素的移动动画效果" font="size:14" multiLines="1" colorText="@color/text_light" margin="25,5"/>
+        <!-- 玩法特色 -->
+        <text name="txt_new_features" text="玩法特色" font="size:16,bold" colorText="@color/gold_light" margin="5,5,5,5"/>
+        <text text="• 在线对战：大厅选座，与局域网或远程玩家实时对弈" font="size:14" colorText="@color/text_light" margin="25,5"/>
+        <text text="• 人机对弈：大厅选桌邀请机器人，初/中/高三档 AI，机器人入座后自动开局" multiLines="1" font="size:14" colorText="@color/text_light" margin="25,5"/>
+        <text text="• 残局打谱：内置 100 局经典江湖残局，选局邀请机器人陪练，自动进入对局" multiLines="1" font="size:14" colorText="@color/text_light" margin="25,5"/>
+        <text text="• 对局体验：吃子/将军/绝杀动画特效与语音播报，支持悔棋、求和、认负" multiLines="1" font="size:14" colorText="@color/text_light" margin="25,5"/>
+        <text text="• 规则完备：包含将军、应将、困毙、长捉判负等标准象棋规则" font="size:14" colorText="@color/text_light" margin="25,5"/>
+        <text text="• 主题界面：古风木纹与金色配色，沉浸式对局体验" font="size:14" colorText="@color/text_light" margin="25,5"/>
 
         <!-- 分隔线 -->
         <window size="-2,1" colorBkgnd="@color/divider" opacity="0.4" margin="10,10,10,5"/>

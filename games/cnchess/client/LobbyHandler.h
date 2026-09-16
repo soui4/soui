@@ -5,6 +5,7 @@
 #include <helper/obj-ref-impl.hpp>
 #include "WebSocketClient.h"
 #include "ConnListener-i.h"
+#include "protocol.h"
 class CTableAdapter;
 class CMainDlg;
 /**
@@ -105,7 +106,13 @@ private:
      * @return 是否处理成功
      */
     BOOL OnLoginAck(const void *lpData, int nSize);
-    
+
+    /**
+     * @brief 机器人对战桌坐满后自动就绪并跳转到对局页(与残局页一致)
+     * @param pInfo 桌子信息
+     */
+    void TryAutoStart(GAME_TABLE_INFO *pInfo);
+
     /**
      * @brief 请求坐下
      * @param iTable 桌号
@@ -132,6 +139,7 @@ private:
     WebSocketClient *m_ws;         ///< WebSocket客户端指针
     CTableAdapter *m_pAdapter;     ///< 桌子适配器指针
     CMainDlg *m_pMainDlg;
+    bool m_bRobotAutoStart;        ///< 邀请机器人成功后武装, 桌子坐满即自动开局
 };
 
 #endif//LOBBYHANDLER_H

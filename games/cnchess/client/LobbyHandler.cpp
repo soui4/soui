@@ -201,6 +201,7 @@ public:
 
 //---------------------------------------------------------------------------
 LobbyHandler::LobbyHandler(CMainDlg *pMainDlg):m_pRoot(NULL),m_pAdapter(NULL),m_pMainDlg(pMainDlg)
+    ,m_bRobotAutoStart(false)
 {
 
 }
@@ -274,7 +275,30 @@ BOOL LobbyHandler::OnTableInfo(const void *lpData, int nSize)
         evt.nSize = nSize;
         m_pRoot->FireEvent(evt);
     }
+    //机器人对战桌坐满时自动就绪并跳转到对局页
+    TryAutoStart(pTableInfo);
     return TRUE;
+}
+
+void LobbyHandler::TryAutoStart(GAME_TABLE_INFO *pInfo)
+{
+    if (!pInfo || !m_bRobotAutoStart)
+        return;
+    MyProfile *pMy = MyProfile::getSingletonPtr();
+    // 仅处理玩家本人所在桌, 且玩家已入座
+    if (pMy->GetTableId() != pInfo->nTableId)
+        return;
+    if (pMy->GetSeatIndex() < 0 || pMy->GetSeatIndex() >= PLAYER_COUNT)
+        return;
+    // 真人+机器人坐满后才自动开局
+    if (pInfo->nPlayers < PLAYER_COUNT)
+        return;
+    m_bRobotAutoStart = false;
+    if (m_ws)
+        m_ws->SendMsg(GMT_READY, NULL, 0);
+    SLOGI() << "LobbyHandler: 机器人对战桌坐满, 自动就绪并跳转到对局页";
+    if (m_pMainDlg)
+        m_pMainDlg->SwitchToGame();
 }
 
 BOOL LobbyHandler::OnSeatDownAck(const void *lpData, int nSize)
@@ -286,6 +310,8 @@ BOOL LobbyHandler::OnSeatDownAck(const void *lpData, int nSize)
     MyProfile *pMyProfile = MyProfile::getSingletonPtr();
     pMyProfile->SetTableId(pAck->nTableId);
     pMyProfile->SetSeatIndex(pAck->nSeat);
+    // 重新入座后取消未触发的自动开局
+    m_bRobotAutoStart = false;
 
     return TRUE;
 }
@@ -322,6 +348,9 @@ BOOL LobbyHandler::OnRobotInviteAck(const void *lpData, int nSize)
     SLOGI() << "OnRobotInviteAck: nTableId=" << pAck->nTableId << " nSeat=" << pAck->nSeat << " bSuccess=" << pAck->bSuccess;
     if (pAck->bSuccess)
     {
+        // 邀请成功后武装自动开局, 桌子坐满(机器人已自动准备)即触发
+        if (pAck->nTableId < ENDGAME_TABLE_BASE)
+            m_bRobotAutoStart = true;
         NotifyToast(_T("机器人已入座！"));
     }
     else

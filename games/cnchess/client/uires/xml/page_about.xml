@@ -2,14 +2,16 @@
 <page name="room_container" title="@string/about" layout="vbox" padding="24dp,16dp">
     <!-- 顶部：标题 + 简介 -->
     <text name="txt_title" text="开心象棋" colorText="#FFD700" font="size:26;bold:1" align="center" margin="0,0,0,6dp"/>
-    <text name="txt_desc" text="使用 SOUI 框架打造的跨平台中国象棋对战游戏，支持在线对战与 AI 人机对弈。" colorText="#F5E6C8" font="size:13" align="center" margin="0,0,0,4dp"/>
+    <text name="txt_desc" text="使用 SOUI 框架打造的跨平台中国象棋对战游戏，支持在线对战、AI 人机对弈与经典残局打谱。" colorText="#F5E6C8" font="size:13" align="center" margin="0,0,0,4dp"/>
     <img size="-2,1" skin="skin_login_divider_line" margin="20dp,10dp,20dp,0"/>
 
     <!-- 特色功能介绍 -->
     <text name="txt_new_features" text="玩法特色" colorText="#FFE45E" font="size:16;bold:1" margin="10dp,16dp,5dp,4dp"/>
     <text name="txt_feature_online" text="• 在线对战：大厅选座，与局域网或远程玩家实时对弈" colorText="#E8D9B8" font="size:13" margin="24dp,3dp"/>
-    <text name="txt_feature_ai" text="• 人机对弈：内置初级/中级/高级三档 AI，逐步挑战" colorText="#E8D9B8" font="size:13" margin="24dp,3dp"/>
-    <text name="txt_feature_rule" text="• 规则完备：包含将军、应将、困毙等标准象棋规则" colorText="#E8D9B8" font="size:13" margin="24dp,3dp"/>
+    <text name="txt_feature_ai" text="• 人机对弈：大厅选桌邀请机器人，初/中/高三档 AI，机器人入座后自动开局" colorText="#E8D9B8" font="size:13" margin="24dp,3dp"/>
+    <text name="txt_feature_endgame" text="• 残局打谱：内置 100 局经典江湖残局，选局邀请机器人陪练，自动进入对局" colorText="#E8D9B8" font="size:13" margin="24dp,3dp"/>
+    <text name="txt_feature_fx" text="• 对局体验：吃子/将军/绝杀动画特效与语音播报，支持悔棋、求和、认负" colorText="#E8D9B8" font="size:13" margin="24dp,3dp"/>
+    <text name="txt_feature_rule" text="• 规则完备：包含将军、应将、困毙、长捉判负等标准象棋规则" colorText="#E8D9B8" font="size:13" margin="24dp,3dp"/>
     <text name="txt_feature_ui" text="• 主题界面：古风木纹与金色配色，沉浸式对局体验" colorText="#E8D9B8" font="size:13" margin="24dp,3dp"/>
     <img size="-2,1" skin="skin_login_divider_line" margin="20dp,12dp,20dp,0"/>
 

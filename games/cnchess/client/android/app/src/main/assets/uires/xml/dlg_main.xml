@@ -11,9 +11,9 @@ translucent="1"
           colorText="@color/text_light" colorTextHover="@color/gold" colorTextPush="@color/text_dark"
           font="size:14,bold">
         <include src="layout:page_lobby"/>
+        <include src="layout:page_endgame"/>
         <include src="layout:page_game"/>
         <include src="layout:page_about"/>
-        <include src="layout:page_endgame"/>
       </tabctrl>
       <!-- 顶层操作提示容器: 与 tabctrl 同处内容容器, 悬浮于所有页面之上, 由 CMainDlg::PlayTip 使用 -->
       <window pos="0,0,-0,-0" name="tip_container" layout="anchor" msgTransparent="1"/>

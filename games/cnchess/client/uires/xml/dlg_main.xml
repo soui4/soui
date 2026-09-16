@@ -5,7 +5,7 @@ translucent="1"
 >
   <root skin="skin_main_bg" cache="1"  width="1000" height="800" layout="vbox" padding="10,6,10,10">
     <img size="-2,3" skin="skin_login_gold_line" margin="26,0,26,0"/>
-    <caption size="-2,32" layout="hbox" interval="6" gravity="center">
+    <caption size="-2,32" layout="hbox" interval="6" gravity="center" padding="5,0,5,0">
       <icon src="ICON_LOGO:16"/>
       <text text="@string/cnchess" colorText="@color/main_title_hi" font="size:15,bold" letterSpace="2"/>
       <text name="txt_title" colorText="@color/main_title" font="size:12"/>
