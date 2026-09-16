@@ -52,7 +52,7 @@ target_link_libraries(cnchess_endgame_test
 
 # 端到端测试直接读取真实残局配置文件
 target_compile_definitions(cnchess_endgame_test PRIVATE
-    "ENDGAME_TEST_JSON=\"${CMAKE_CURRENT_SOURCE_DIR}/../server/config/endgames.json\""
+    "ENDGAME_TEST_JSON=_T(\"${CMAKE_CURRENT_SOURCE_DIR}/../server/config/endgames.json\")"
 )
 
 set_target_properties(cnchess_endgame_test PROPERTIES
