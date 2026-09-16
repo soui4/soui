@@ -181,7 +181,7 @@ public:
             int nMySeat = MyProfile::getSingletonPtr()->GetSeatIndex();
             if (nMySeat < 0 || nMySeat >= PLAYER_COUNT)
             {
-                m_pLobby->NotifyToast(L"请先入座后再邀请机器人！");
+                m_pLobby->NotifyToast(_T("请先入座后再邀请机器人！"));
                 return TRUE;
             }
             int nTargetSeat = (nMySeat + 1) % PLAYER_COUNT;

@@ -369,7 +369,7 @@ void CMainDlg::SwitchToGame()
     if (!pTab)
         return;
     // 桌面/移动端页签顺序不同, 按游戏页窗口名查找所在页签
-    int nIndex = pTab->GetPageIndex(L"game_container", FALSE);
+    int nIndex = pTab->GetPageIndex(_T("game_container"), FALSE);
     if (nIndex >= 0)
         pTab->SetCurSel(nIndex);
 }
