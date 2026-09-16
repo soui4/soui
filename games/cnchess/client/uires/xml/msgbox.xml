@@ -19,7 +19,7 @@
     <window size="-2,3" colorBkgnd="@color/gold"/>
     <!-- 标题栏 -->
     <caption size="-2,34">
-      <text name="msgtitle" pos="12,0,-40,0" valign="center" text="提示" colorText="@color/gold" font="size:16,bold"/>
+      <text name="msgtitle" pos="12,0,-40,-0" valign="center" text="提示" colorText="@color/gold" font="size:16,bold"/>
       <imgbtn id="2" skin="_skin.sys.btn.close" pos="-38,2" tip="close"/>
     </caption>
     <!-- 分隔线 -->
