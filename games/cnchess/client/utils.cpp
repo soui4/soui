@@ -97,23 +97,27 @@ SAutoRefPtr<IValueAnimator> Util::MoveSpriteTo(IWindow *pSprite, AnchorPos toPos
     return MoveSprite(pSprite, fromPos, toPos, nSpeed);
 }
 
-SAutoRefPtr<IValueAnimator> Util::MoveAndHideSprite(IWindow *pSprite, AnchorPos toPos, int nSpeed)
+SAutoRefPtr<IValueAnimator> Util::MoveAndHideSprite(IWindow* pSprite, AnchorPos fromPos, AnchorPos toPos, int nSpeed)
 {
-    ILayoutParam *pParam = (ILayoutParam*)pSprite->GetLayoutParam();
-    SAnchorLayoutParamStruct * pParamStruct = (SAnchorLayoutParamStruct*)pParam->GetRawData();
-    AnchorPos fromPos = pParamStruct->pos;
     AnchorPos pos[] = {
-		fromPos,
-		toPos
-	};
-    SAutoRefPtr<IPropertyValuesHolder> pPosHolder(SPropertyValuesHolder::ofPosition(LayoutProperty::POSITION, pos, ARRAYSIZE(pos), sizeof(AnchorPos)),FALSE);
+        fromPos,
+        toPos
+    };
+    SAutoRefPtr<IPropertyValuesHolder> pPosHolder(SPropertyValuesHolder::ofPosition(LayoutProperty::POSITION, pos, ARRAYSIZE(pos), sizeof(AnchorPos)), FALSE);
     BYTE alpha[] = { 255, 0 };
-    SAutoRefPtr<IPropertyValuesHolder> pAlphaHolder(SPropertyValuesHolder::ofByte(WindowProperty::ALPHA, alpha, 2),FALSE);
-    IPropertyValuesHolder *holders[] = { pPosHolder, pAlphaHolder };
+    SAutoRefPtr<IPropertyValuesHolder> pAlphaHolder(SPropertyValuesHolder::ofByte(WindowProperty::ALPHA, alpha, 2), FALSE);
+    IPropertyValuesHolder* holders[] = { pPosHolder, pAlphaHolder };
     SAutoRefPtr<IValueAnimator> pAnimator(SPropertyAnimator::ofPropertyValuesHolder(pSprite, holders, ARRAYSIZE(holders)), FALSE);
     pAnimator->setDuration(nSpeed);
     s_movingCardMgr.StartAnimator(pAnimator, pSprite);
     return pAnimator;
+}
+
+SAutoRefPtr<IValueAnimator> Util::MoveAndHideSprite(IWindow *pSprite, AnchorPos toPos, int nSpeed)
+{
+    ILayoutParam *pParam = (ILayoutParam*)pSprite->GetLayoutParam();
+    SAnchorLayoutParamStruct * pParamStruct = (SAnchorLayoutParamStruct*)pParam->GetRawData();
+    return MoveAndHideSprite(pSprite, pParamStruct->pos, toPos, nSpeed);
 }
 
 SAutoRefPtr<IValueAnimator> Util::ScaleSprite(IWindow *pSprite, float from, float to, int nSpeed){

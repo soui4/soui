@@ -104,7 +104,7 @@ private:
     WebSocketClient m_webSocketClient;
     SAutoRefPtr<SGameTheme> m_pTheme;
     BOOL m_bMute;
-
+    DWORD m_tsLastTip;
     // 主题下载
     ThemeDownloadManager m_themeDownloader;
     SStringT m_strThemeCacheDir;

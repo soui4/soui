@@ -34,6 +34,7 @@ CMainDlg::CMainDlg(SGameTheme* pTheme)
 , m_modalRoot(NULL)
 , m_pTipContainer(NULL)
 , m_nSelAvatarId(1)
+, m_tsLastTip(0)
 {
     m_webSocketClient.SetMessageHandler(this);
     m_themeDownloader.SetListener(this);
@@ -536,7 +537,16 @@ void CMainDlg::PlayTip(const SStringT &strTip)
     toPos.y = SLayoutSize(-10, dp);
     toPos.fOffsetX = -0.5f;
     toPos.fOffsetY = -0.5f;
-    SAutoRefPtr<IValueAnimator> pAnim = Util::MoveAndHideSprite(pTip, toPos, 5000);
+
+    ILayoutParam* pParam = (ILayoutParam*)pTip->GetLayoutParam();
+    SAnchorLayoutParamStruct* pParamStruct = (SAnchorLayoutParamStruct*)pParam->GetRawData();
+    AnchorPos fromPos = pParamStruct->pos;
+    DWORD now = GetTickCount();
+    if ((now - m_tsLastTip) < 1000) {
+        fromPos.y.fSize += 50;
+    }
+    m_tsLastTip = now;
+    SAutoRefPtr<IValueAnimator> pAnim = Util::MoveAndHideSprite(pTip, fromPos, toPos, 5000);
     pAnim->SetID(ANI_TIP);
     pAnim->addListener(this);//destroy the tip when animation end.
 }
