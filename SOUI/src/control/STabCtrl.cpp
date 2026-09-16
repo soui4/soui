@@ -713,6 +713,9 @@ CRect STabCtrl::GetTitleRect() const
     case AlignRight:
         rcTitle.left = rcTitle.right - tabWid;
         break;
+	case AlignMiddle:
+		rcTitle.bottom = rcTitle.top + tabHei;
+        break;
     }
     return rcTitle;
 }
