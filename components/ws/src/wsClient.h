@@ -83,15 +83,17 @@ class WsClient : public TObjRefImpl<IWsClient> {
 
     struct MsgData
     {
-        MsgData(const std::string &buf_, bool bBinary_, int msgId_)
+        MsgData(const std::string &buf_, bool bBinary_, int msgId_, bool bContinuation_ = false)
             : buf(buf_)
             , bBinary(bBinary_)
             , msgId(msgId_)
+            , bContinuation(bContinuation_)
         {
         }
         std::string buf;
         bool bBinary;
         int msgId;
+        bool bContinuation; /**< TRUE if this is the unsent remainder of a partially written frame (LWS_WRITE_CONTINUATION). */
     };
     std::list<MsgData> m_sendingBuf;
     int m_msgId;

@@ -35,6 +35,7 @@ typedef struct _heartbeat_data_t {
     time_t last_activity;
     time_t last_ping;
     int ping_timeout_count;
+    bool bPingPending; /**< TRUE if a ping was requested by the TIMER and is waiting to be sent in the WRITEABLE callback. */
 } heartbeat_data_t;
 
 class SvrConnection : public TObjRefImpl<ISvrConnection> , heartbeat_data_t{
@@ -79,11 +80,13 @@ class SvrConnection : public TObjRefImpl<ISvrConnection> , heartbeat_data_t{
         std::string buf;
         bool bBinary;
         int msgId;
+        bool bContinuation; /**< TRUE if this is the unsent remainder of a partially written frame (LWS_WRITE_CONTINUATION). */
     };
 
     std::list<MsgData> sendingBuf;
     int m_msgId;
     std::stringstream receiveStream;
+    bool bWantClose; /**< Set on lws_write failure; the WRITEABLE callback kills the connection afterwards. */
     SAutoRefPtr< ISvrListener> m_svrListener;
 
 };

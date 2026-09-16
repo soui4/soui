@@ -143,7 +143,10 @@ int WsServer::handler(lws *websocket, lws_callback_reasons reasons,
     void *userData, void *data, size_t len)
 {
     std::unique_lock<std::mutex> lock(m_mutex);
-    if (m_finished)
+    // After quit() the lws_context_destroy below still fires LWS_CALLBACK_CLOSED
+    // for every live connection: it must NOT be short-circuited, otherwise each
+    // SvrConnection leaks and the listener never sees onDisconnect.
+    if (m_finished && reasons != LWS_CALLBACK_CLOSED)
         return -1;
     int ret = 0;
     switch (reasons)
@@ -183,11 +186,10 @@ int WsServer::handler(lws *websocket, lws_callback_reasons reasons,
                         return -1;  // 关闭连接
                     }
 
-                    // 发送ping
-                    lws_send_ping(websocket);
-                    conn->last_ping = now;
-                    conn->ping_timeout_count++;  // 假设会超时，收到pong时会清零
-                    SLOGI() << "send ping, count=" << conn->ping_timeout_count << ", conn=" << conn;
+                    // request a ping: the actual write must happen in the
+                    // WRITEABLE callback (lws only allows writes there)
+                    conn->bPingPending = true;
+                    lws_callback_on_writable(websocket);
                 }
             }
 
@@ -252,11 +254,17 @@ int WsServer::handler(lws *websocket, lws_callback_reasons reasons,
         SvrConnection*conn = *(SvrConnection**)userData;
         if (!conn)
             break;
+        {
+            // invalidate the socket BEFORE the wsi is recycled, so isValid()
+            // returns 0 and send() fails fast instead of touching a dangling lws*
+            std::lock_guard<std::mutex> connLock(conn->m_mutex);
+            conn->m_socket = nullptr;
+        }
         if (m_pListener)
         {
             SLOGI() << "connection closed, conn=" << conn;
             lock_guard_rev rev(m_mutex);
-            m_pListener->onDisconnect(conn); 
+            m_pListener->onDisconnect(conn);
         }
         conn->Release();
         break;
@@ -282,6 +290,21 @@ int WsServer::handler(lws *websocket, lws_callback_reasons reasons,
         {
             lock_guard_rev rev(m_mutex);
             conn->sendBuf();
+            std::lock_guard<std::mutex> connLock(conn->m_mutex);
+            if (conn->bWantClose)
+            {
+                lws_close_reason(websocket, LWS_CLOSE_STATUS_UNEXPECTED_CONDITION, NULL, 0);
+                ret = -1; // kill the connection after a write error
+            }
+            else if (conn->bPingPending && conn->sendingBuf.empty())
+            {
+                // send the ping requested by the TIMER here, where lws allows writes
+                conn->bPingPending = false;
+                conn->last_ping = time(NULL);
+                conn->ping_timeout_count++; // assume timeout, reset on pong
+                lws_send_ping(websocket);
+                SLOGI() << "send ping, count=" << conn->ping_timeout_count << ", conn=" << conn;
+            }
         }
     }
     break;
