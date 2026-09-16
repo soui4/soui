@@ -100,6 +100,7 @@ typedef struct tagMSG_LONGCATCH
 typedef struct tagMSG_GAMEOVER
 {
 	int iWinner;	//赢棋方，-1代表和棋
+	GAMEOVERTYPE overType;	//结束方式,客户端按此播放不同音效
 	char szDesc[100];//说明,utf8编码
 }MSG_GAMEOVER,*PMSG_GAMEOVER;
 //服务器通知客户端游戏结束

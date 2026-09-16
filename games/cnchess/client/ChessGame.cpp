@@ -46,7 +46,7 @@ static const wchar_t* kFxWidgetNames[FX_COUNT] = {Widgets::kfx_eat, Widgets::kfx
 static const wchar_t* kSoundEffectNames[FX_COUNT] = {Sounds::Effects::kEat, Sounds::Effects::kJiangjun, NULL};
 
 //chariot/horse/cannon are treated as major pieces
-static bool IsBigPiece(CHESSMAN chs)
+static bool IsBigPiece(int chs)
 {
     return chs==CHSMAN_RED_JU || chs==CHSMAN_RED_MA || chs==CHSMAN_RED_PAO
         || chs==CHSMAN_BLK_JU || chs==CHSMAN_BLK_MA || chs==CHSMAN_BLK_PAO;
@@ -225,15 +225,17 @@ void CChessGame::onAnimationEnd(IValueAnimator *pAnimator)
         }else{
             MOVESTEP moveStep = m_layout.Move(ptPiece,ptTarget);
             OnChessMove(moveStep,TRUE);
-            BOOL bMate = m_LytState.GetWinner()!=CS_NEUTRAL;
             BOOL bCheck = m_LytState.IsJiangJun(m_layout.m_actSide);
             //game fx: checkmate > check > capture major piece
-            if(bMate)
-                ShowGameFx(FX_MATE);
-            else if(bCheck)
+            if(bCheck)
                 ShowGameFx(FX_CHECK);
-            else if(moveStep.nEnemyID != 0)
+            else if(IsBigPiece(moveStep.nEnemyID))
                 ShowGameFx(FX_EAT);
+            
+            if(bCheck)
+                PlayEffectSound(Sounds::Effects::kJiangjun);
+			else if(moveStep.nEnemyID != 0)
+                PlayEffectSound(Sounds::Effects::kEat);
             else
                 PlayEffectSound(Sounds::Effects::kGo);
             if(moveStep.nEnemyID != 0){
@@ -1114,7 +1116,6 @@ void CChessGame::ShowGameFx(int nFx)
         //may fire the old animation's stop event, which hides all fx widgets
         pFx->SetVisible(TRUE, TRUE);
     }
-    PlayEffectSound(kSoundEffectNames[nFx]);
 }
 
 /**
@@ -1417,6 +1418,7 @@ void CChessGame::OnChessMove(const MOVESTEP & mstep,BOOL bCheckResult)
         #ifdef ENABLE_MOCK
             MSG_GAMEOVER msg;
             msg.iWinner = bWin ? m_iSelfIndex : -1;
+            msg.overType = GOT_NORMAL;
             msg.szDesc[0] = 0;
 			OnGameOver(&msg, sizeof(msg));
         #else
@@ -1553,6 +1555,16 @@ void CChessGame::OnGameOver(const void *pData, int nSize)
     }
     if(pOver->iWinner == m_iSelfIndex){
         m_roundResult = RESULT_WIN;
+        if (pOver->overType == GOT_NORMAL)
+        {
+            if(GetActivePlayerIndex() == m_iSelfIndex)
+                PlayEffectSound(Sounds::Effects::kGameWin);
+            else
+            {
+                PlayEffectSound(Sounds::Effects::kJueSha);
+				ShowGameFx(FX_MATE);
+            }
+        }
         SGifPlayer *pVectory = (SGifPlayer *)m_pTheme->GetWidget(Sprites::sprite_vectory);
         m_pGameBoard->InsertIChild(pVectory);
         pVectory->AddRef();
@@ -1562,6 +1574,16 @@ void CChessGame::OnGameOver(const void *pData, int nSize)
         OnGifVectoryOver(&e);
     }else if(pOver->iWinner == (m_iSelfIndex + 1) % PLAYER_COUNT){
         m_roundResult = RESULT_LOSE;
+        if (pOver->overType == GOT_NORMAL)
+        {
+            if (GetActivePlayerIndex() == m_iSelfIndex)
+                PlayEffectSound(Sounds::Effects::kGameOver);
+            else
+            {
+                PlayEffectSound(Sounds::Effects::kBeiJueSha);
+                ShowGameFx(FX_MATE);
+            }
+        }
     }else{
         m_roundResult = RESULT_DRAW;
     }

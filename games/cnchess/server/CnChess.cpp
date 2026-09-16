@@ -220,6 +220,7 @@ void CCnChess::BrdcstAckOver(GAMEOVERTYPE nType,int nLossSeat, LPCWSTR pszDesc)
 {
 	MSG_GAMEOVER msg;
 	msg.iWinner=(nLossSeat==-1)?-1:((nLossSeat+1)%2);
+	msg.overType=nType;	//结束方式,客户端按此播放不同音效
     SStringA strDesc = S_CW2A(pszDesc, CP_UTF8);
 	strcpy(msg.szDesc,strDesc.c_str());
 
@@ -538,7 +539,7 @@ void CCnChess::CheckServerOver()
 	{
 		int winSeat = (csWinner == CS_RED) ? GetRedSeat() : (GetRedSeat() + 1) % 2;
 		int lossSeat = (winSeat + 1) % 2;
-		BrdcstAckOver(GOT_NORMAL, lossSeat, L"将死/困毙，对方获胜！");
+		BrdcstAckOver(GOT_NORMAL, lossSeat, L"将死/困毙！");
 	}
 }
 
