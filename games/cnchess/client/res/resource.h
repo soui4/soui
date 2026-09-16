@@ -1,4 +1,4 @@
-﻿//stamp:165f11d5aa645ac6
+﻿//stamp:165f15202bf57c2c
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -224,7 +224,7 @@ struct _R{
 		 const wchar_t * txt_eg_detail_intro;
 		 const wchar_t * txt_eg_detail_intro_desc;
 		 const wchar_t * txt_eg_detail_title;
-		 const wchar_t * txt_eg_table_difficulty;
+		 const wchar_t * txt_eg_table_index;
 		 const wchar_t * txt_eg_table_title;
 		 const wchar_t * txt_feature_ai;
 		 const wchar_t * txt_feature_online;
@@ -291,7 +291,7 @@ struct _R{
 		int txt_eg_detail_intro;
 		int txt_eg_detail_intro_desc;
 		int txt_eg_detail_title;
-		int txt_eg_table_difficulty;
+		int txt_eg_table_index;
 		int txt_eg_table_title;
 		int txt_feature_ai;
 		int txt_feature_online;
@@ -397,7 +397,7 @@ struct _R R={
 		L"txt_eg_detail_intro",
 		L"txt_eg_detail_intro_desc",
 		L"txt_eg_detail_title",
-		L"txt_eg_table_difficulty",
+		L"txt_eg_table_index",
 		L"txt_eg_table_title",
 		L"txt_feature_ai",
 		L"txt_feature_online",

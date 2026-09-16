@@ -132,32 +132,17 @@ public:
         // 标题 + 桌序号
         if (pTitle)
         {
-            SStringT strTitle;
-            if (pEndgame)
-            {
-                SStringT strName = S_CA2T(pEndgame->szTitle, CP_UTF8);
-                strTitle.Format(_T("%s 第%d桌"), strName.c_str(), nSlot + 1);
-            }
-            else
-            {
-                strTitle.Format(_T("第%d桌"), nSlot + 1);
-            }
+            SStringT strTitle = S_CA2T(pEndgame->szTitle, CP_UTF8);
             pTitle->SetWindowText(strTitle);
         }
 
         // 难度系数(与 ENDGAME_INFO::nLevel 对应: 1初级/2中级/3高级)
-        SWindow *pDiff = pItem->FindChildByName(L"txt_eg_table_difficulty");
-        if (pDiff)
+        SWindow *pIndex = pItem->FindChildByName(L"txt_eg_table_index");
+        if (pIndex)
         {
-            SStringT strDiff;
-            if (pEndgame)
-            {
-                int nLevel = pEndgame->nLevel;
-                strDiff = SStringT().Format(_T("难度:%s"),
-                    (nLevel == 1) ? _T("初级") : (nLevel == 2) ? _T("中级")
-                    : (nLevel >= 3) ? _T("高级") : _T("-"));
-            }
-            pDiff->SetWindowText(strDiff);
+            SStringT strIndex;
+            strIndex.Format(_T("第%d桌"), nSlot + 1);
+            pIndex->SetWindowText(strIndex);
         }
 
         // 星级难度(RatingBar): value = 难度系数 1/2/3
