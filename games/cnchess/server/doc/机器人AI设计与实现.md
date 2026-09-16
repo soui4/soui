@@ -2,9 +2,11 @@
 
 本文档详细说明 cnchess 项目的机器人（AI 对手）逻辑，覆盖从**接入方式**（服务器如何调度、如何与游戏主线程协作）到**算法实现细节**（搜索引擎、评估函数、置换表、开局库等）的完整链路。
 
+> **2026-09 更新**：搜索引擎已整体替换为开源项目 [jie65535/ChineseChess](https://github.com/jie65535/ChineseChess)（MIT License, Copyright (c) 2021）C# 引擎的 C++ 移植版（`ChsAIEngine.{h,cpp}`），算法升级为 **PVS + 空着裁剪 + 将军延伸 + 置换表 + 杀手/历史启发 + 静态搜索**。对外接口 `CChessAI::SearchBestMove` 与服务器调度链路保持不变。
+
 相关代码位置：
 
-- 引擎：`games/cnchess/algorithm/ChessAI.{h,cpp}`、`games/cnchess/algorithm/ChessBook.{h,cpp}`
+- 引擎：`games/cnchess/algorithm/ChsAIEngine.{h,cpp}`（搜索算法本体）、`games/cnchess/algorithm/ChessAI.{h,cpp}`（适配层）、`games/cnchess/algorithm/ChessBook.{h,cpp}`（开局库）
 - 线程池：`games/cnchess/server/RobotAIPool.{h,cpp}`、`games/cnchess/server/RobotDispatch.h`
 - 游戏流程：`games/cnchess/server/CnChess.{h,cpp}`、`games/cnchess/server/WebSocketGame.cpp`
 - 配置：`games/cnchess/server/PropBag.{h,cpp}`、`games/cnchess/server/config/config.xml`
@@ -39,6 +41,8 @@
 
 **关键点**：线程池线程**只对棋盘快照做纯计算**，绝不触碰实时游戏状态；计算结果通过 SOUI 的 `postServiceTask` 服务队列**串行**回到游戏主线程去落子，从而保证逻辑一致性，同时让耗时的搜索不阻塞其他玩家的对局。
 
+`CChessAI::SearchBestMove` 内部分两层：**适配层**（`ChessAI.cpp`，负责坐标映射与结果转换）+ **搜索引擎**（`ChsAIEngine.cpp`，纯算法，只依赖标准 C++ 头，MSVC / MinGW / NDK / OHOS clang 均可编译）。
+
 ---
 
 ## 2. 接入（服务器侧）
@@ -51,13 +55,13 @@ bool CCnChess::HasRobot() const;                   // 是否对局中存在机�
 ```
 
 - 等级来自客户端坐席时选择的按钮（`btn_lvl_beginner/medium/advanced`，见客户端 `LobbyHandler/EndgameHandler`）。
-- 等级 → 搜索深度映射在 [ChessAI.h](`ROBOT_AI_DEPTH_*`)：
+- 等级 → 搜索深度映射在 `ChessAI.h`（`ROBOT_AI_DEPTH_*`）：
 
 | 等级 | 值 | 搜索深度 |
 |------|----|---------|
-| 初级 ROBOT_LEVEL_BEGINNER | 1 | 4 |
+| 初级 ROBOT_LEVEL_BEGINNER | 1 | 3 |
 | 中级 ROBOT_LEVEL_MEDIUM   | 2 | 5 |
-| 高级 ROBOT_LEVEL_ADVANCED | 3 | 6 |
+| 高级 ROBOT_LEVEL_ADVANCED | 3 | 7 |
 
 ### 2.2 触发：轮到机器人走棋
 
@@ -130,88 +134,115 @@ struct SRobotTask
 
 ## 3. 搜索引擎
 
-核心入口为 `CChessAI::SearchBestMove(layout, depth, timeMs)`，由三个层面构成：
+核心入口 `CChessAI::SearchBestMove(layout, depth, timeMs)` 分为**适配层**与**搜索引擎**两层。
 
-### 3.1 迭代加深（Iterative Deepening）
+### 3.1 适配层（`ChessAI.cpp`）
+
+适配层对搜索引擎屏蔽 `CChessLayout` 的坐标系细节，公开接口与旧版完全一致：
+
+1. **开局库探测**：先调 `CChessOpeningBook::Probe(layout, book1, book2)`，命中直接返回开局着法（见第 7 节）。
+2. **朝向判定 `DetectRedTop`**：搜索引擎内部恒用"红方宫在低行（row 0..2）、红兵向高行进攻"的规范坐标系；`CChessLayout` 经 `InitLayout/ConvertLayout` 后红方可能在高 y 侧，故按**红帅实际位置**自动判定——红帅在低 y 侧直接映射 `row=y`，否则垂直翻转 `row=9-y`；无红帅（残局构造场景）按黑将位置反推。**列方向不翻转**（棋规左右对称，恒取 `col=x`）。
+3. **棋盘转换** `LayoutToSearchBoard`：`m_chesses[y][x]` 的 `CHESSMAN` 枚举 → 90 格一维 `int8_t`（正红负黑，类型 1..7 = 将士象马车炮卒），同时记录红帅/黑将所在格、行棋方，并从头计算 Zobrist 键。搜索全程在快照上运行，不修改调用方的 layout。
+4. **根节点合法着法普查**：`MoveGenerator::Generate` 全量生成后逐个 `Make → IsSideInCheck → Unmake` 数合法着法；**0 个合法**（将死/困毙/无子）直接返回无效走法 `pt1=pt2={-1,-1}`，上层 `ApplyRobotMove` 据此判负。
+5. **结果回转** `SearchMoveToStep`：压缩着法编码（起点高 8 位 + 终点低 8 位）还原为 `MOVESTEP`；`enemy/nEnemyID` 取自走子前的盘面快照。
+6. **兜底保证**：若时间预算过小导致引擎连第 1 层都没算完（`BestMove==0`），不计时间补算 1 层（`Search(sb, 1, 0)`），**保证永远返回合法着法**。
+
+> ⚠️ **严格采用引擎最佳着法（不要做根节点"等分随机挑选"）**：根节点子搜窗口随 alpha 收窄后，fail-high 返回的边界值会与最佳分"伪同分"——实测自对弈中 64% 的等分候选为伪等分，真实分值可差数百，随机/优先吃子挑选会系统性劣化棋力。此行为与 C# 原版一致。
+
+### 3.2 迭代加深（Iterative Deepening）
 
 ```
-for (d = 1; d <= depth; d++):
-    用上一层的最佳着法把根着法列表提到最前（候选打头 → 剪枝更快）
-    SearchRoot(根)  // 对每个合法着法做一次 alpha-beta
-    若时间预算耗尽(g_time.stop) → break，放弃本层，采用上一完整层结果
-随机取最终层的一组等优着法之一（增加棋风变化）
+for (d = 1; d <= maxDepth; d++):
+    iterBest = 上一层的 bestMove（经根节点着法排序置顶 → 剪枝更快）
+    score = AlphaBetaRoot(d, iterBest)
+    若本层被时间硬停(m_stop) → 本层结果作废，break，采用上一个完整层结果
+    记录 bestMove/bestScore/completedDepth
+    若已见绝杀（|score| >= MateInMaxPly）→ 提前结束
+    若耗时超过预算的 60%（软停）→ break，避免下一层吞超
 ```
 
-收益：
+收益：浅层结果**预热置换表**与**杀手/历史表**，让深层搜索获得更好的着法排序与剪枝；同时为时间预算提供"随时可取上一层完整解"的回退能力。每次 `Search` 开启置换表**新代次**并清零杀手/历史表。
 
-- 浅层结果**预热置换表**与**杀手着法表**，让深层搜索获得更好的着法排序与剪枝；
-- 为**时间预算**提供"随时可取上一层的较优解"的回退能力。
+### 3.3 PVS（Principal Variation Search + Alpha-Beta）
 
-### 3.2 负极大 + Alpha-Beta 剪枝（Negamax）
+`AlphaBeta(depth, alpha, beta, ply, allowNull)` 返回相对当前行棋方的估值：
 
-`Negamax(layout, depth, alpha, beta, ply)` 返回**相对当前行棋方**的估值（负极大形式）。
+- **将军延伸**：当前行棋方被将军时 `depth++`（将军链不计入深度预算）；
+- **ply 上限保护**：`ply >= MaxPly-2`（64 层）强制转入静态搜索，防止延伸链导致深度不再递减而栈溢出/杀手表越界；
+- **置换表截断**：命中且 `ttDepth >= depth` 时，按 `EXACT / LOWER(≥beta) / UPPER(≤alpha)` 三种边界直接返回（见第 5 节）；
+- **空着裁剪（Null-Move Pruning）**：`allowNull && 不被将军 && depth>=3 && 己方仍有车马炮卒大子 && beta 不是绝杀边界` 时，走一步空着并以 `R = depth>=6 ? 3 : 2` 的减层做 null-window 验证，`nullScore >= beta` 即剪枝（null 搜索返回的绝杀分钳制到 beta 防止假杀分传播）；
+- **PVS 搜索窗**：第一个合法着法全窗 `(-beta,-alpha)`；后续先以 null-window `(-alpha-1,-alpha)` 试探，`alpha < score < beta` 时才重搜全窗——对排序良好的着法序列可省去大量全窗搜索；
+- **剪枝反馈**：`alpha >= beta` 且导致剪枝的是**安静着法**（非吃子）时，记入杀手表并按 `depth*depth` 加权累计历史启发（见第 6 节）；
+- 结点边界：基于本结点是否提升过 alpha 判定 `TT_EXACT / TT_LOWER / TT_UPPER` 写入置换表；
+- **无合法着法** → 返回 `-(MateValue - ply)`（将死/困毙，中国象棋无和棋判定），分值随 ply 递减使引擎倾向**较快**的将死解。
 
-- `depth <= 0` 时转入**静态搜索** `Quiesce`。
-- 无合法着法 → 返回 `-(CHECKMATE - ply)`（将死/困毙，距离随搜索深度递减，让 AI 倾向较快的将死解）。
-- **着法排序**（剪枝效率的核心）：`置换表最佳着法 > 吃子(按被吃子力) > 杀手着法 > 其它`。
-- 剪枝触发（`alpha >= beta`）时若该着为**安静着法**（非吃子），记为同层杀手着法。
-- 结点边界：基于 `origAlpha` 与 `beta` 判定 `EXACT / LOWER / UPPER` 并写入置换表。
+### 3.4 静态搜索（Quiescence）
 
-### 3.3 静态搜索（Quiescence）
+在搜索深度用尽（或 ply 达上限）后，为避免"水平线效应"，只延展**吃子着法**（fail-hard 风格）：
 
-在搜索深度用尽后，为避免"水平线效应"（对手紧接着的吃子/反吃子连锁被误判），只延展**吃子着法**：
+1. 先做静态评估（stand-pat），`>= beta` 直接返回 `beta`，否则把 `alpha` 提升到 stand-pat；
+2. 仅生成吃子着法，按 **MVV-LVA**（被吃子价值×16 − 攻方价值）降序；
+3. 每个吃子 `Make` 后同样用 `IsSideInCheck` 排除自将着法，递归 `-Quiescence(-beta,-alpha)`；
+4. `score >= beta` 返回 `beta`，否则提升 `alpha`。
 
-1. 先对当前局面做静态评估（stand-pat），若已 `≥ beta` 直接返回；
-2. 仅取吃子着法，按被吃子力降序；
-3. 对每个吃子递归 `-Quiesce(layout, -beta, -alpha, ply+1)`；
-4. 更新 `alpha`，`≥ beta` 即剪枝。
+### 3.5 着法排序（剪枝效率的核心）
+
+`OrderMoves` 为每个着法打分后插入排序（着法数通常 30~80，插入排序足够）：
+
+| 优先级 | 类别 | 分值 |
+|--------|------|------|
+| 1 | 置换表最佳着法 | `10,000,000` |
+| 2 | 吃子（MVV-LVA） | `1,000,000 + victim*16 − attacker` |
+| 3 | 杀手着法[ply][0] | `900,000` |
+| 4 | 杀手着法[ply][1] | `800,000` |
+| 5 | 其它 | 历史启发累计值 |
 
 ---
 
-## 4. 评估函数 `Evaluate`
+## 4. 评估函数 `Evaluation::Evaluate`
 
-总评 = 我方各子力价值 + 位置分 − 对方相应之和（正值为当前行棋方占优）。
+全盘单遍扫描：`score = Σ ±(PieceValue[type] + kPSTByType[type][sq])`，黑方格子按行镜像 `MirrorSq`（`row → 9-row`）取红方视角的位置分，最后按行棋方取正负——**返回值相对当前行棋方**，越大越有利。
 
-### 4.1 子力价值 `KR_VAL[7]`
+### 4.1 子力价值 `PieceValue[8]`
 
-| 棋子 | 将 | 车 | 马 | 炮 | 士 | 相 | 兵 |
-|------|----|----|----|----|----|----|----|
-| 价值 | 10000 | 900 | 400 | 450 | 200 | 200 | 100 |
+| 棋子 | 将/帅 | 士 | 象 | 马 | 车 | 炮 | 卒/兵 |
+|------|-------|-----|-----|-----|-----|-----|-------|
+| 价值 | 10000¹ | 120 | 120 | 270 | 600 | 285 | 30 |
 
-### 4.2 位置评分表（PSQT）
+¹ 将的分值仅参与绝杀量级计算（`MateValue=30000` 与之保持量级隔离），常规评估中双方将帅恒在。
 
-为弥补纯子力对"站位与子力配合"感知的不足，为每类棋子配置 `10×9` 位置评分表，以"**本方王宫在第 0 行、向对方推进方向 r=9**"的规范坐标系设计（黑方做垂直镜像 `tr = 9 - y`）。
+### 4.2 分兵种位置表（PST）
 
-- 车 `kJuPos`：鼓励占据/沿第 4 行通路，底线两头略低；
-- 马 `kMaPos`：偏向中心，避免边角；
-- 炮 `kPaoPos`：开局偏后（如中炮/自家人马未动时不急于推进），中盘前压；
-- 将 `kJiangPos`：鼓励镇中与补士安全，避免暴露；
-- 士 `kShiPos`：鼓励归位守宫；
-- 相 `kXiangPos`：鼓励回到各相位；
-- 兵 `kBingPos`：过河（r≥5）后价值陡增，越深入越高。
+每类棋子一张 90 项表（红方视角 `[row][col]`，黑方按行镜像），弥补纯子力对站位与配合的感知不足：
 
-### 4.3 兵过河加分
+- **兵 `kPawnPST`**：起始线基本为 0，**过河（row 5）起大幅升值**（14~28），越深入越高，近九宫（row 8）达到峰值 32~58，敌方底线略回落（18~32）；
+- **马 `kKnightPST`**：中心强（最高 34），被困边角弱（-4）；
+- **车 `kRookPST`**：到处都强，向前推进与中路、肋道略优（最高 28），己方底线角落 -2；
+- **炮 `kCannonPST`**：中路与宫顶炮位为正（如空头炮位 +16），边路与后退为负（-12~-14）；
+- **将 `kKingPST`**：鼓励窝在底线中位（+18/+10），上宫顶线为负（-6/-8）；
+- **士 `kMandarinPST`**：仅宫心格 +4，其余 0；
+- **象 `kElephantPST`**：典型三七象位 +4/+6，其余 0。
 
-在位置表之外，兵过河额外加分增强其战斗价值（红：`y>=5 +40`，`y>=3 +(y-2)*10`；黑镜像）。
+> 与旧版差异：旧版"兵过河独立加分"逻辑已并入兵的 PST，不再有独立代码路径。
 
 ---
 
 ## 5. 置换表（Transposition Table）+ Zobrist 哈希
 
-- 大小 `1<<16 = 65536` 项，Zobrist 键（固定种子 LCG 生成，`call_once` 初始化）。
-- 键 = 全棋盘棋子异或 + 黑方行棋时再异或 `g_zobSide`（区分行棋方）。
-- 命中条件：`e.key == key` 且 `e.depth >= 需要的深度`；按 `EXACT / LOWER / UPPER` 三种边界决定是否截断。
-- 命中时给出**最佳着法**，用于着法排序置顶。
-- **将死/困毙分值随 ply 变化**，不写入 TT，避免跨深度复用导致距离失真（以 `best ∈ (-(CHECKMATE-200), (CHECKMATE-200))` 过滤）。
-- **线程安全**：机器人并发走子，共享表用 `std::mutex` 保护读写。
+- **每线程独立一份**：`thread_local SearchEngine`（`ChessAI.cpp` 的 `GetEngine()`），构造参数 `ttSizeBits=18`，即 **2^18 = 262,144 条**；每条 `Entry` 16 字节（Key 8 + Score int16 2 + BestMove 2 + Depth/Flag/Generation/Pad 各 1），**约 4MB/线程**，16 线程上限约 64MB。同池线程连续走子时复用表内容，每次 `Search` 开启新代次。
+- Zobrist 键在棋盘上**增量维护**（`Make/Unmake/MakeNullMove` 同步异或），转换快照时由 `ComputeZobristFromScratch` 从头计算一次。
+- **替换策略（深度优先 + 代次老化）**：同 key 且已存深度更深且同代 → 保留；否则替换。`Generation` 字段让跨搜索的旧条目自然老化。
+- **mate 分 ply 校正**：`|score| >= MateInMaxPly`（30000−1024=28976，达到该量级视为已见绝杀）的分数在 **Store 时 `±ply`、Probe 时 `∓ply`**，保证存储的是"距根的绝对距离"，取出时还原为"距当前结点的相对距离"——跨结点复用不会导致将死距离失真。
+- 命中条件与截断：`ttDepth >= depth` 时按 `EXACT / LOWER(≥beta) / UPPER(≤alpha)` 返回；未达截断条件时仍给出 **最佳着法** 用于着法排序置顶。
+- **线程安全**：表随引擎实例 thread_local，**无锁**——各池线程互不干扰。
 
 ---
 
-## 6. 杀手着法（Killer Moves）
+## 6. 杀手着法（Killer Moves）与历史启发（History Heuristic）
 
-- 表 `g_killers[64][2]`，每层记录两个**导致 beta 剪枝的安静着法**（出车、进马等在非吃子情况下却关键着法的启发）。
-- 在着法排序中位于"吃子之后、其它之前"，进一步提高剪枝率。
-- **thread_local 隔离**：每次搜索在各自线程内进行，既避免跨线程竞争，也保证不同对局的杀手学习互不干扰。
+- **杀手表** `m_killers[MaxPly][2]`：每 ply 记录两个**导致 beta 剪枝的安静着法**（出车、进马等在非吃子情况下却关键着法的启发），新着法挤入 [0]、原 [0] 顺移到 [1]（同着法不重复记）。排序分值仅次于吃子。
+- **历史表** `m_history[14][90]`：按"被移棋子类型 × 落点格"累计 `depth*depth` 加权的剪枝次数——深层剪枝的着法获得远高于浅层的权重。排序时作为普通着法的分值。
+- **生命周期**：两者均为引擎成员，每次 `Search` 开始时清零——启发知识只在单次搜索内有效，跨对局不携带（避免上一局的启发污染本局）。
 
 ---
 
@@ -237,9 +268,10 @@ for (d = 1; d <= depth; d++):
 
 ## 8. 着法合法性与搜索健壮性
 
-- `GenerateLegalMoves`：仅收集**己方棋子**的合法落点；模拟走子后再用 `IsJiangInCheck` 校验**不把自己送进将军**；**禁止吃掉对方将**（吃将/飞将不构成着法，将死由"无合法着法"判定），避免出现无效将位置（-1）引发的崩溃。
-- `IsSquareAttacked` 覆盖车/将对面/炮的直线扫描、马的骑士步（含蹩马腿）、兵的向前+过河后左右。
-- 无合法着法的行棋方即判负（将死/困毙），同时由 `CChsLytState` 在服务器判胜/判和路径中兜底。
+- **伪合法生成 + Make 后过滤**：`MoveGenerator::Generate` 生成伪合法走法（**不预过滤自将**），搜索在 `Make` 之后用 `IsSideInCheck` 排除把己方将送入将军的着法——比生成期过滤更简单，且静态搜索/根普查共用同一套逻辑。`capturesOnly=true` 时仅生成吃子（静态搜索用）。
+- **将帅不可被吃**：引擎不做"吃将"着法（将死由"无合法着法"判定）；`IsSquareAttacked` 覆盖车/将**对面飞将照面**/炮的直线扫描、马的骑士步（含蹩马腿）、兵的向前+过河后左右，将帅不在盘上视为被将。
+- **无合法着法的行棋方即判负**（将死/困毙），返回 `-(MateValue - ply)`；适配层在根节点额外做一次合法普查，0 合法时返回无效走法，由服务器 `ApplyRobotMove` 发出判负广播。
+- **栈/表边界**：`ply >= MaxPly-2` 强制转静态搜索；单节点着法缓冲 `MaxBuffer=128`（车最多 17 步，全盘 44 子实测远小于该值）。
 
 ---
 
@@ -247,17 +279,30 @@ for (d = 1; d <= depth; d++):
 
 | 方面 | 机制 |
 |------|------|
-| 思考时间 | `thread_local STimeCtrl`（`deadlineMs`、`stop`、`nodeCount`）；`CheckTime()` 每 256 个节点看一次 `steady_clock` 降低开销；到点置 `stop`，Negamax/Quiesce 即时 `return 0` 快速放弃，`SearchRoot` 丢弃未完成迭代 |
-| 线程隔离 | 时间控制、杀手着法均 `thread_local`；置换表全局但互斥量保护 |
-| 快照隔离 | 线程池只操作 `task.layout` 深拷贝，绝不触碰实时 `m_layout` |
+| 计时基准 | `clock()` 进程 CPU 时间（不引 `<chrono>`，最小依赖；单线程阻塞搜索场景与墙钟等价） |
+| 硬停（搜内） | `CheckTime()` 每 4096 个节点（`m_nodes & 4095 == 0`）查一次，到 100% 预算置 `m_stop`，AlphaBeta/Quiesce 即时 `return 0` 快速放弃，本层结果作废 |
+| 软停（层间） | 每层完整算完后查一次，超过预算 **60%** 即停——下一层大概率吞超，不如保住已完成的层 |
+| 兜底 | 预算过小连第 1 层都没算完时，不计时间补算 1 层，保证总返回合法着法 |
+| 线程隔离 | 搜索引擎实例（含置换表、杀手/历史表）`thread_local`，**无锁**；各线程互不干扰 |
+| 快照隔离 | 线程池只操作 `task.layout` 深拷贝，搜索又在转换出的 `SearchBoard` 快照上运行，绝不触碰实时 `m_layout` |
 | 串行落子 | 结果经 `postServiceTask` 回到主线程，`ApplyRobotMove` 串行应用并校验剧本代 |
 | 过期结果 | `generation`（`m_nChessMsg`）不匹配即丢弃 |
 
 ---
 
-## 10. 如何调整与扩展
+## 10. 移植说明与如何调整/扩展
 
-- **提棋力**：增大各级 `robot_ai_medium/advanced_time_ms` 或提升 `ROBOT_AI_DEPTH_*`；给高级"只按时间、不设深度硬上限"时，可在 `RobotMakeMove` 为高级传入足够大的 `nDepth`，让迭代加深由时间自然主导。
+### 10.1 移植来源与边界
+
+- 引擎移植自 [jie65535/ChineseChess](https://github.com/jie65535/ChineseChess) 的 `ChineseChess.Core/AI` 模块（C#），**MIT License**，按许可要求在 `ChsAIEngine.h` 文件头保留版权与许可声明。
+- 移植保持算法语义不变（PVS/空着裁剪/置换表替换策略/mate 分校正等均与原版一致）；两处 C++ 化差异：① 原版时间到时抛 `OperationCanceledException` 中断本层，C++ 版以 `m_stop` 标记等价实现；② 引擎按线程独立实例（原版单线程 UI 场景无此需求）。
+- `ChsAIEngine.h/.cpp` 只依赖标准 C++ 头（`stdint.h`、`string.h`、`time.h`），**不依赖 stdafx/windows.h**，可在服务端与各移动端（NDK/OHOS clang）直接复用。
+
+### 10.2 调整与扩展
+
+- **提棋力**：增大各级 `robot_ai_medium/advanced_time_ms`（时间预算对 PVS 引擎的增益显著）或提升 `ROBOT_AI_DEPTH_*`；给高级"只按时间、不设深度硬上限"时，可在 `RobotMakeMove` 为高级传入足够大的 `nDepth`，让迭代加深由时间自然主导。
+- **置换表容量**：`GetEngine()` 的 `SearchEngine(18)` 可调大（如 20 = 16MB/线程），内存换命中率；线程池越大越要留意总内存。
 - **补充开局库**：在 `ChessBook.cpp` 的 `kLineA..H` 追加新变例，保证坐标与合法性正确（以"红在上"坐标系书写），构建期会自动校验并注册。
 - **细化预算**：`PropBag` 的预算字段是 `[3]` 数组，若想加"很弱"等更多档位，同步扩展数组与 `ROBOT_*` 宏即可。
-- **进一步优化**：可考虑“历史启发（History）”“约束搜索/迭代加深结合时间动态调层”等，但这些**不属于当前必需**，需在确保正确性与并发安全的前提下引入。
+- **进一步优化方向**：TT 结点直接返回最佳着法以改善 PVS 截断质量、空着裁剪的自适应 R、残局专用评估/残局库（配合 `server/config/endgames.json` 残局玩法）、静态权重（PST/子力价值）调优。改动需在确保正确性与并发安全的前提下引入。
+- ⚠️ **再次强调**：不要在根节点做"等分候选随机挑选"（历史教训，见 3.1 节末尾的警告）。
