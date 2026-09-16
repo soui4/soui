@@ -116,6 +116,26 @@
             <file name="吃子" src="Sound/effect/eat.wav"/>
             <file name="danger" src="Sound/effect/danger.wav"/>
             <file name="焰火" src="Sound/effect/ty_焰火-02.wav"/>
+            <file name="gamewin" src="Sound/effect/gamewin.wav"/>
+            <file name="gameover" src="Sound/effect/gameover.wav"/>
         </effects>
+        <processes>
+            <male>
+                <process name="绝杀">
+                    <file id="0" weight="1" src="Sound/processes/male/jueshagamewin.wav"/>
+                </process>
+                <process name="被绝杀">
+                    <file id="0" weight="1" src="Sound/processes/male/jueshagameover.wav"/>
+                </process>
+            </male>
+            <female>
+                <process name="绝杀">
+                    <file id="0" weight="1" src="Sound/processes/female/jueshagamewin.wav"/>
+                </process>
+                <process name="被绝杀">
+                    <file id="0" weight="1" src="Sound/processes/female/jueshagameover.wav"/>
+                </process>
+            </female>
+        </processes>
     </sounds>
 </theme>
