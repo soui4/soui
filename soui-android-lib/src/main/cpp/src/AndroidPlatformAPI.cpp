@@ -659,12 +659,6 @@ HWND AndroidPlatformAPI::getFocus() const {
     return reinterpret_cast<HWND>(static_cast<UINT_PTR>(hwnd));
 }
 
-// SWinx TCHAR → UTF-8 char* 编码：与 demo MainDlg S_CW2A(text, CP_UTF8) Toast 写法一致。
-static inline const char* toUtf8OrEmpty(const char* maybeNull) {
-    return maybeNull ? maybeNull : "";
-}
-
-
 int AndroidPlatformAPI::stringSlotAlloc(const char * pszStr) {
     std::string initValue = pszStr ? pszStr : "";
     // ① 快速路径（原子自增）：绝大多数命中 [1, 65535]

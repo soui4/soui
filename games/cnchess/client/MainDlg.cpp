@@ -211,9 +211,8 @@ void CMainDlg::OnLoginSuccess(SStringT strSvr, SStringT strName, char cSex, int 
     myProfile->SetAvatarId(nAvatarId);
 
     // 初始化大厅（不依赖主题）
-    m_pLobbyHandler->Init(FindChildByName(L"room_container"), &m_webSocketClient);
-    m_pEndgameHandler->Init(FindChildByName(L"endgame_container"), &m_webSocketClient);
-    m_bLobbyInited = true;
+    m_pLobbyHandler->Init(FindChildByName(L"room_container"));
+    m_pEndgameHandler->Init(FindChildByName(L"endgame_container"));
 
     // 游戏初始化延迟到主题加载完成后（OnThemeReady）
 

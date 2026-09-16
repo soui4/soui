@@ -3,14 +3,17 @@
 #
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${PROJECT_SOURCE_DIR}/components)
-include_directories(${PROJECT_SOURCE_DIR}/utilities/include)
-include_directories(${PROJECT_SOURCE_DIR}/SOUI/include)
-include_directories(${PROJECT_SOURCE_DIR}/soui-sys-resource)
-include_directories(${PROJECT_SOURCE_DIR}/controls.extend)
-include_directories(${PROJECT_SOURCE_DIR}/third-part/Scintilla/include)
-include_directories(${PROJECT_SOURCE_DIR}/third-part/wke/include)
-file(GLOB_RECURSE CTRLS_SRC ${PROJECT_SOURCE_DIR}/controls.extend/*.*)
+
+set(SOUI_ROOT_DIR ${CMAKE_CURRENT_LIST_DIR}/..)
+
+include_directories(${SOUI_ROOT_DIR}/components)
+include_directories(${SOUI_ROOT_DIR}/utilities/include)
+include_directories(${SOUI_ROOT_DIR}/SOUI/include)
+include_directories(${SOUI_ROOT_DIR}/soui-sys-resource)
+include_directories(${SOUI_ROOT_DIR}/controls.extend)
+include_directories(${SOUI_ROOT_DIR}/third-part/Scintilla/include)
+include_directories(${SOUI_ROOT_DIR}/third-part/wke/include)
+file(GLOB_RECURSE CTRLS_SRC ${SOUI_ROOT_DIR}/controls.extend/*.*)
 
 
 add_library(ExtendCtrls STATIC ${CTRLS_SRC})
