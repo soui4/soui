@@ -225,7 +225,6 @@ void CChessGame::onAnimationEnd(IValueAnimator *pAnimator)
             MOVESTEP moveStep = m_layout.Move(ptPiece,ptTarget);
             OnChessMove(moveStep,TRUE);
             BOOL bCheck = m_LytState.IsJiangJun(m_layout.m_actSide);
-            //game fx: checkmate > check > capture major piece
             if(bCheck)
                 ShowGameFx(FX_CHECK);
             else if(IsBigPiece(moveStep.nEnemyID))
@@ -233,7 +232,7 @@ void CChessGame::onAnimationEnd(IValueAnimator *pAnimator)
             
             if(bCheck)
                 PlayEffectSound(Sounds::Effects::kJiangjun);
-			else if(moveStep.nEnemyID != 0)
+			else if(IsBigPiece(moveStep.nEnemyID))
                 PlayEffectSound(Sounds::Effects::kEat);
             else
                 PlayEffectSound(Sounds::Effects::kGo);
@@ -1204,6 +1203,11 @@ void CChessGame::OnGameStart(const void *pData, int nSize)
             pWnd->Destroy();
         } 
     }
+	//clear previous move flags
+    IWindow* pFlagFrom = m_pTheme->GetWidget(Widgets::kflag_pos_from);
+	pFlagFrom->SetVisible(FALSE, TRUE);
+    IWindow* pFlagTo = m_pTheme->GetWidget(Widgets::kflag_pos_to);
+	pFlagTo->SetVisible(FALSE, TRUE);
 
     SLOGI() << "Game start";
     MSG_INIT    *pInit = (MSG_INIT *)pData;
@@ -1540,12 +1544,14 @@ void CChessGame::OnGameOver(const void *pData, int nSize)
         m_roundResult = RESULT_WIN;
         if (pOver->overType == GOT_NORMAL)
         {
-            if(GetActivePlayerIndex() == m_iSelfIndex)
+            if (GetActivePlayerIndex() != m_iSelfIndex)
+            {
                 PlayEffectSound(Sounds::Effects::kGameWin);
+                ShowGameFx(FX_MATE);
+            }
             else
             {
                 PlayEffectSound(Sounds::Effects::kJueSha);
-				ShowGameFx(FX_MATE);
             }
         }
         SGifPlayer *pVectory = (SGifPlayer *)m_pTheme->GetWidget(Sprites::sprite_vectory);
@@ -1559,12 +1565,14 @@ void CChessGame::OnGameOver(const void *pData, int nSize)
         m_roundResult = RESULT_LOSE;
         if (pOver->overType == GOT_NORMAL)
         {
-            if (GetActivePlayerIndex() == m_iSelfIndex)
-                PlayEffectSound(Sounds::Effects::kGameOver);
+            if (GetActivePlayerIndex() != m_iSelfIndex)
+            {
+                ShowGameFx(FX_MATE);
+                PlayEffectSound(Sounds::Effects::kBeiJueSha);
+            }
             else
             {
-                PlayEffectSound(Sounds::Effects::kBeiJueSha);
-                ShowGameFx(FX_MATE);
+                PlayEffectSound(Sounds::Effects::kGameOver);
             }
         }
     }else{
