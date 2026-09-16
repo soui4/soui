@@ -114,6 +114,10 @@ namespace Sounds{
         static const wchar_t *kEat = L"吃子";                  ///< 吃子音效
         static const wchar_t *kDanger = L"danger";              ///< 危险音效
         static const wchar_t *kfireworks = L"焰火";             ///< 烟花音效
+        static const wchar_t *kJueSha = L"绝杀";
+        static const wchar_t *kBeiJueSha =L"被绝杀";
+        static const wchar_t *kGameWin = L"gamewin";
+        static const wchar_t *kGameOver = L"gameover";
     }
 }
 
