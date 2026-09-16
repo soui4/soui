@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 140" width="260" height="140">
+  <defs>
+    <radialGradient id="piece" cx="130" cy="68" r="50" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5A3A1A"/>
+      <stop offset="0.65" stop-color="#3B2412"/>
+      <stop offset="1" stop-color="#221408"/>
+    </radialGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFD700"/>
+      <stop offset="1" stop-color="#B8860B"/>
+    </linearGradient>
+    <radialGradient id="redGlow" cx="130" cy="68" r="66" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#C0392B" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#C0392B" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <circle cx="130" cy="68" r="66" fill="url(#redGlow)"/>
+
+  <!-- shatter rays -->
+  <g stroke="#E8B04B" stroke-width="3" stroke-linecap="round" stroke-opacity="0.85">
+    <path d="M74,30 L60,16"/>
+    <path d="M186,30 L200,16"/>
+    <path d="M58,68 L40,68"/>
+    <path d="M202,68 L220,68"/>
+    <path d="M74,106 L60,120"/>
+    <path d="M186,106 L200,120"/>
+  </g>
+
+  <!-- shattered piece, two halves with jagged crack -->
+  <path d="M130,20 A48,48 0 0 0 82,68 A48,48 0 0 0 130,116 L126,96 L138,80 L124,64 L136,48 L128,32 Z" fill="url(#piece)" stroke="url(#rim)" stroke-width="4"/>
+  <path d="M130,20 A48,48 0 0 1 178,68 A48,48 0 0 1 130,116 L134,94 L120,78 L134,62 L122,46 L132,30 Z" fill="url(#piece)" stroke="url(#rim)" stroke-width="4"/>
+
+  <!-- red X seal -->
+  <g stroke="#C0392B" stroke-width="7" stroke-linecap="round">
+    <path d="M158,24 L186,46"/>
+    <path d="M186,24 L158,46"/>
+  </g>
+</svg>

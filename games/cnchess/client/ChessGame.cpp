@@ -31,9 +31,28 @@ namespace {
  
 #define TIMERID_CLOCK_ME 503
 #define TIMERID_CLOCK_ENEMY 504
-
+#define TIMERID_FX_HIDE 505
+#define FX_HIDE_DELAY 1700	//fx_pop animation lasts about 1650ms, hide a bit later
 
 static const float kPieceScale = 1.1f;
+
+//game fx types
+enum{
+    FX_EAT = 0,	//capture a major piece (chariot/horse/cannon)
+    FX_CHECK,	//check
+    FX_MATE,	//checkmate
+    FX_COUNT,
+};
+
+static const wchar_t* kFxWidgetNames[FX_COUNT] = {Widgets::kfx_eat, Widgets::kfx_check, Widgets::kfx_mate};
+
+//chariot/horse/cannon are treated as major pieces
+static bool IsBigPiece(CHESSMAN chs)
+{
+    return chs==CHSMAN_RED_JU || chs==CHSMAN_RED_MA || chs==CHSMAN_RED_PAO
+        || chs==CHSMAN_BLK_JU || chs==CHSMAN_BLK_MA || chs==CHSMAN_BLK_PAO;
+}
+
 enum{
     kShadowHeight_Normal = 86,
     kShadowHeight_Up = 110,
@@ -207,7 +226,16 @@ void CChessGame::onAnimationEnd(IValueAnimator *pAnimator)
         }else{
             MOVESTEP moveStep = m_layout.Move(ptPiece,ptTarget);
             OnChessMove(moveStep,TRUE);
-            if(m_LytState.IsJiangJun(m_layout.m_actSide))
+            BOOL bMate = m_LytState.GetWinner()!=CS_NEUTRAL;
+            BOOL bCheck = m_LytState.IsJiangJun(m_layout.m_actSide);
+            //game fx: checkmate > check > capture major piece
+            if(bMate)
+                ShowGameFx(FX_MATE);
+            else if(bCheck)
+                ShowGameFx(FX_CHECK);
+            else if(IsBigPiece(moveStep.enemy))
+                ShowGameFx(FX_EAT);
+            if(bCheck)
                 PlayEffectSound(Sounds::Effects::kJiangjun);
             else if(moveStep.nEnemyID==0)
                 PlayEffectSound(Sounds::Effects::kGo);
@@ -625,6 +653,13 @@ void CChessGame::Init(SWindow *pGameHost, WebSocketClient *pWs)
     IWindow *pFlagTo = m_pTheme->GetWidget(Widgets::kflag_pos_to);
     m_pGameBoard->InsertIChild(pFlagTo);
     pFlagTo->AddRef();
+
+    //insert game fx widgets (capture major piece / check / checkmate)
+    for(int i=0;i<FX_COUNT;i++){
+        IWindow *pFx = m_pTheme->GetWidget(kFxWidgetNames[i]);
+        m_pGameBoard->InsertIChild(pFx);
+        pFx->AddRef();
+    }
 
     TestChessBoardChilds(m_pGameBoard);
     OnStageChanged(STAGE_CONNECTING);
@@ -1046,8 +1081,50 @@ void CChessGame::OnTimer(UINT_PTR uIDEvent)
         int nSecond = m_pGameBoard->FindChildByID(ID_ALARM_CLOCK_ENEMY)->GetUserData();
         m_pMainDlg->KillTimer(uIDEvent);
         UpdateClock(nSecond-1, 1);
+    }else if(uIDEvent == TIMERID_FX_HIDE){
+        m_pMainDlg->KillTimer(uIDEvent);
+        HideGameFx();
     }else{
         SetMsgHandled(FALSE);
+    }
+}
+
+/**
+ * @brief 显示游戏特效动画
+ * @param nFx 特效类型: FX_EAT=吃大子, FX_CHECK=将军, FX_MATE=绝杀
+ */
+void CChessGame::ShowGameFx(int nFx)
+{
+    if(nFx < 0 || nFx >= FX_COUNT)
+        return;
+    IAnimation *pAni = m_pTheme->GetAnimation(Animations::kfx_pop);
+    if(!pAni)
+        return;
+    //show the requested fx widget and hide the others
+    for(int i=0;i<FX_COUNT;i++){
+        IWindow *pFx = m_pTheme->GetWidget(kFxWidgetNames[i]);
+        pFx->SetVisible(i==nFx, TRUE);
+    }
+    //clone the cached animation so a replay starts from scratch;
+    //SetAnimation will auto-start it on the next frame
+    IAnimation *pAniClone = pAni->clone();
+    if(pAniClone){
+        IWindow *pFx = m_pTheme->GetWidget(kFxWidgetNames[nFx]);
+        pFx->SetAnimation(pAniClone);
+        pAniClone->Release();
+    }
+    //schedule hiding after the animation finishes
+    m_pMainDlg->SetTimer(TIMERID_FX_HIDE, FX_HIDE_DELAY);
+}
+
+/**
+ * @brief 隐藏所有游戏特效widget
+ */
+void CChessGame::HideGameFx()
+{
+    for(int i=0;i<FX_COUNT;i++){
+        IWindow *pFx = m_pTheme->GetWidget(kFxWidgetNames[i]);
+        pFx->SetVisible(FALSE, TRUE);
     }
 }
 

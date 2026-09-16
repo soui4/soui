@@ -50,6 +50,7 @@ typedef struct tagGS_USERINFO
 //用户登录请求，上传用户信息及头像数据
 #define GMT_LOGIN_REQ			100
 typedef struct tagGAME_LOGIN_REQ : GS_USERINFO{
+	DWORD dwVersion;	//客户端协议版本(GAME_VERSION); 老客户端无此字段, 该偏移处为其dwLen, 服务器以GAME_VERSION_MAGIC区分
 	DWORD dwLen;	//头像二进制数据长度；为0时使用nAvatarId指定的内置头像
 	BYTE byData[1];
 }GAME_LOGIN_REQ;
@@ -65,6 +66,12 @@ typedef struct tagGAME_LOGIN_ACK
 
 #define ERR_SUCCESS			0
 #define ERR_USER_EXIST		1
+#define ERR_VERSION_LOW		2	//客户端协议版本低于服务器要求的最低版本
+
+//协议版本: 客户端登录时上报, 服务器与config.xml的min_version比较, 版本过低拒绝登录
+#define GAME_VERSION_MAGIC	0x53560000	//'SV'魔数, 用于识别带版本字段的新客户端(老客户端该偏移处是头像长度, 远小于该魔数)
+#define GAME_VERSION_NUM(v)	((v) & 0x0000FFFF)	//从版本字段提取版本号
+#define GAME_VERSION		(GAME_VERSION_MAGIC | 1)	//当前客户端协议版本
 
 typedef struct SeatID
 {

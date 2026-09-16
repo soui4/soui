@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set fillAfter="true" shareInterpolator="false">
+    <!-- pop in: 0.2 -> 1.15 -->
+    <scale duration="260" startOffset="0" fromXScale="0.2" toXScale="1.15" fromYScale="0.2" toYScale="1.15" pivotX="50%" pivotY="50%" interpolator="Decelerate"/>
+    <!-- settle: 1.15 -> 1.0 -->
+    <scale duration="140" startOffset="260" fromXScale="1.15" toXScale="1.0" fromYScale="1.15" toYScale="1.0" pivotX="50%" pivotY="50%" interpolator="Decelerate" fillAfter="true"/>
+    <!-- hold until 1350ms, then shrink away -->
+    <scale duration="300" startOffset="1350" fromXScale="1.0" toXScale="0.05" fromYScale="1.0" toYScale="0.05" pivotX="50%" pivotY="50%" interpolator="Accelerate" fillAfter="true"/>
+</set>

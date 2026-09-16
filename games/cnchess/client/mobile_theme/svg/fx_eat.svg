@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 140" width="260" height="140">
+  <defs>
+    <radialGradient id="burst" cx="130" cy="70" r="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFD700" stop-opacity="0.95"/>
+      <stop offset="0.55" stop-color="#E8B04B" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#C0392B" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="blade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#F5F0E1"/>
+      <stop offset="0.5" stop-color="#D8D8D8"/>
+      <stop offset="1" stop-color="#9A9A9A"/>
+    </linearGradient>
+    <linearGradient id="hilt" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8B0000"/>
+      <stop offset="1" stop-color="#C0392B"/>
+    </linearGradient>
+  </defs>
+
+  <!-- burst shockwave -->
+  <circle cx="130" cy="70" r="56" fill="url(#burst)"/>
+  <circle cx="130" cy="70" r="56" fill="none" stroke="#E8B04B" stroke-width="2" stroke-opacity="0.8"/>
+  <circle cx="130" cy="70" r="44" fill="none" stroke="#FFD700" stroke-width="1.5" stroke-opacity="0.5"/>
+
+  <!-- crossed swords -->
+  <g transform="rotate(45 130 70)">
+    <circle cx="130" cy="14" r="7" fill="url(#hilt)"/>
+    <rect x="125" y="18" width="10" height="16" rx="3" fill="#5A3A1A"/>
+    <rect x="106" y="32" width="48" height="9" rx="3" fill="url(#hilt)" stroke="#3B2412" stroke-width="1"/>
+    <path d="M123,41 L137,41 L132.5,112 L130,120 L127.5,112 Z" fill="url(#blade)" stroke="#6B6B6B" stroke-width="1"/>
+  </g>
+  <g transform="rotate(-45 130 70)">
+    <circle cx="130" cy="14" r="7" fill="url(#hilt)"/>
+    <rect x="125" y="18" width="10" height="16" rx="3" fill="#5A3A1A"/>
+    <rect x="106" y="32" width="48" height="9" rx="3" fill="url(#hilt)" stroke="#3B2412" stroke-width="1"/>
+    <path d="M123,41 L137,41 L132.5,112 L130,120 L127.5,112 Z" fill="url(#blade)" stroke="#6B6B6B" stroke-width="1"/>
+  </g>
+
+  <!-- sparkles -->
+  <path d="M58,34 L61,42 L69,45 L61,48 L58,56 L55,48 L47,45 L55,42 Z" fill="#FFD700"/>
+  <path d="M202,34 L205,42 L213,45 L205,48 L202,56 L199,48 L191,45 L199,42 Z" fill="#FFD700"/>
+  <path d="M64,102 L66.5,108 L73,110.5 L66.5,113 L64,119 L61.5,113 L55,110.5 L61.5,108 Z" fill="#E8B04B"/>
+  <path d="M196,102 L198.5,108 L205,110.5 L198.5,113 L196,119 L193.5,113 L187,110.5 L193.5,108 Z" fill="#E8B04B"/>
+</svg>

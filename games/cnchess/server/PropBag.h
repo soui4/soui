@@ -10,6 +10,7 @@ class PropBag : public SSingleton<PropBag>
     WORD m_wPort;
     int m_nRobotPool;
     int m_nRobotTimeMs[3]; // 按智力等级(初级/中级/高级)的思考时间预算(毫秒, 0=固定深度)
+    DWORD m_dwMinVersion; // 服务器支持的最低客户端协议版本(config.xml min_version, 0=不限制)
 public:
     enum{
         DEF_PORT = 3311,
@@ -17,10 +18,13 @@ public:
     DWORD m_dwProps[MAX_PROP];
 
     DWORD GetProp(DWORD dwProp) const;
-    
+
     void Init(LPCTSTR pszPropXml);
 
     WORD GetPort() const;
+
+    // 服务器支持的最低客户端协议版本(0=不限制), 低于该版本的客户端登录时被拒绝
+    DWORD GetMinVersion() const { return m_dwMinVersion; }
 
     // 机器人AI线程池线程数
     int GetRobotAIPool() const { return m_nRobotPool; }

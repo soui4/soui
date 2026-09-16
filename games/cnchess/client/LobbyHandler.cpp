@@ -345,6 +345,7 @@ void LobbyHandler::OnConnected()
    std::shared_ptr<GS_USERINFO> pUserInfo = pMyProfile->GetUserInfo();
    GAME_LOGIN_REQ *pLogin = (GAME_LOGIN_REQ *)malloc(len);
    memcpy(pLogin, pUserInfo.get(), sizeof(GS_USERINFO));
+   pLogin->dwVersion = GAME_VERSION;
    pLogin->dwLen = avatarSize;
    if(avatarSize){
        memcpy(pLogin->byData, pMyProfile->GetAvatarData()->data(), pMyProfile->GetAvatarData()->size());
@@ -360,7 +361,11 @@ BOOL LobbyHandler::OnLoginAck(const void *lpData, int nSize)
     GAME_LOGIN_ACK *pAck = (GAME_LOGIN_ACK *)lpData;
     SLOGI() << "OnLoginAck: uid=" << pAck->uid << " errCode=" << pAck->errCode;
     if(pAck->errCode != ERR_SUCCESS)
+    {
+        if(pAck->errCode == ERR_VERSION_LOW)
+            NotifyToast(_T("客户端版本过低，请升级客户端后再登录！"));
         return FALSE;
+    }
     MyProfile *pMyProfile = MyProfile::getSingletonPtr();
     pMyProfile->SetUID(pAck->uid);
 

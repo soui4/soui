@@ -76,6 +76,7 @@ namespace Skins{
  */
 namespace Animations{
     static const wchar_t *kclock_alarm = L"clock_alarm";    ///< 时钟报警动画
+    static const wchar_t *kfx_pop = L"fx_pop";              ///< 游戏特效弹出动画
 }
 
 namespace Widgets{
@@ -87,6 +88,9 @@ namespace Widgets{
     static const wchar_t *kbtn_req_peace = L"btn_req_peace";
     static const wchar_t *kbtn_req_surrender = L"btn_req_surrender";
     static const wchar_t *kbtn_req_regret = L"btn_req_regret";
+    static const wchar_t *kfx_eat = L"sprite_fx_eat";       ///< 吃大子特效
+    static const wchar_t *kfx_check = L"sprite_fx_check";   ///< 将军特效
+    static const wchar_t *kfx_mate = L"sprite_fx_mate";     ///< 绝杀特效
 }
 
 /**

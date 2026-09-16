@@ -299,6 +299,12 @@ protected:
     
     void UndoLastMove();
     void OnChessMove(const MOVESTEP & mstep,BOOL bCheckResult);
+    /**
+     * @brief 显示游戏特效动画(配合主题 fx_pop 动画显示及关闭)
+     * @param nFx 特效类型: FX_EAT=吃大子, FX_CHECK=将军, FX_MATE=绝杀
+     */
+    void ShowGameFx(int nFx);
+    void HideGameFx();  ///< 隐藏所有游戏特效widget
     UINT GetFarthestRepeat(CHESSMAN & chsEnemy); //计算当前步最远的一次重复走棋，在计算长捉时使用
     BOOL CheckMove(POINT ptFrom,POINT ptTo, BOOL bSilent=FALSE);
 private:
