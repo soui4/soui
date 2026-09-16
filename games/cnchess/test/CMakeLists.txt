@@ -40,6 +40,7 @@ add_executable(cnchess_endgame_test
     ${CMAKE_CURRENT_SOURCE_DIR}/../server/PropBag.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../server/Game.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../server/CnChess.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../server/RobotAIPool.cpp
 )
 
 target_link_libraries(cnchess_endgame_test
