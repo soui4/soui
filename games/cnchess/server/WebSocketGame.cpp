@@ -426,13 +426,9 @@ BOOL CWebSocketGame::ClientLogin(PWSCLIENT pClient, LPVOID pData, DWORD dwSize)
 		SendMsg(pClient, GMT_LOGIN_ACK, &ack, sizeof(ack));
 		return FALSE;
 	}
-	//检查协议版本: 新客户端在GS_USERINFO之后带dwVersion字段(带'SV'魔数);
-	//老客户端该偏移处是其dwLen(头像长度, 远小于GAME_VERSION_MAGIC), 视为版本0
-	DWORD dwVerField = pLogin->dwVersion;
-	BOOL bNewClient = (dwVerField & GAME_VERSION_MAGIC) == GAME_VERSION_MAGIC;
-	DWORD dwVersion = bNewClient ? GAME_VERSION_NUM(dwVerField) : 0;
+	//检查协议版本: 客户端必须在GS_USERINFO之后上报dwVersion, 低于服务器min_version则拒绝登录
 	DWORD dwMinVersion = PropBag::getSingletonPtr()->GetMinVersion();
-	if (dwVersion < dwMinVersion)
+	if (pLogin->dwVersion < dwMinVersion)
 	{
 		//版本过低, 拒绝登录, 客户端据此提示升级
 		GAME_LOGIN_ACK ack;
@@ -440,30 +436,15 @@ BOOL CWebSocketGame::ClientLogin(PWSCLIENT pClient, LPVOID pData, DWORD dwSize)
 		ack.errCode = ERR_VERSION_LOW;
 		memset(&ack.dwProps, 0, sizeof(ack.dwProps));
 		SendMsg(pClient, GMT_LOGIN_ACK, &ack, sizeof(ack));
-		SLOGI() << "client version too low, ver=" << dwVersion << " min_version=" << dwMinVersion;
+		SLOGI() << "client version too low, ver=" << pLogin->dwVersion << " min_version=" << dwMinVersion;
 		return FALSE;
 	}
 	memcpy(&pClient->m_userInfo, pLogin, sizeof(GS_USERINFO));
 	pClient->m_userInfo.uid = m_nextUid++;
-	//头像数据位于消息尾部, 新老客户端布局不同, 分别解析其长度
-	DWORD dwAvatarLen = 0;
-	if (bNewClient)
-	{
-		if (dwSize >= sizeof(GS_USERINFO) + sizeof(DWORD) * 2 + pLogin->dwLen)
-			dwAvatarLen = pLogin->dwLen;
-	}
-	else
-	{
-		if (dwSize >= sizeof(GS_USERINFO) + sizeof(DWORD) + dwVerField)
-			dwAvatarLen = dwVerField;
-	}
-	if (dwAvatarLen)
-	{
-		const BYTE *pbyAvatar = (const BYTE *)pLogin + dwSize - dwAvatarLen;
-		pClient->m_avatar = std::make_shared<std::vector<BYTE> >(pbyAvatar, pbyAvatar + dwAvatarLen);
-	}
-	else
-	{
+	if(dwSize>=sizeof(GS_USERINFO)+sizeof(DWORD)*2+pLogin->dwLen){
+		//login with avatar
+		pClient->m_avatar = std::make_shared<std::vector<BYTE> >(pLogin->byData, (BYTE*)pLogin+dwSize);
+	}else{
 		pClient->m_avatar = nullptr;
 	}
 	GAME_LOGIN_ACK ack;
