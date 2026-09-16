@@ -2,6 +2,23 @@
 
 SOUI 的 gtest 单元测试工程（链接 `gtest`（含 gtest_main）+ `soui4` + `Scintilla`；非 Windows 平台额外链接 `swinx`）。
 
+## 基本自动验证
+
+从仓库根目录配置并构建 `fun_test` 后，执行：
+
+```sh
+cmake --build build --target fun_test --config Debug
+ctest --test-dir build -L '^soui-' --output-on-failure
+```
+
+CTest 从测试源码注册独立用例，并用 `soui-unit`、`soui-integration`、`soui-e2e` 标签区分层级。当前基础入口有 34 个单元、1 个 ZIP 资源集成和 1 个资源到控件状态的无窗口核心 E2E 用例。SOUI 核心单元源码放在 `SOUI/tests/test_*.cpp`；新增集成和 E2E 用例分别放在本目录的 `test_integration_*.cpp`、`test_e2e_*.cpp`。新增常规 `TEST`/`TEST_F` 用例会随重新构建进入相应标签，使用 `ctest --test-dir build -N -L '^soui-'` 核对注册结果；参数化用例须另行核验。可用 `ctest --test-dir build -R '^soui_matrix\.' --output-on-failure` 单独复跑矩阵用例。E2E 不打开交互窗口，暂不验证屏幕显示、鼠标输入或窗口容器中的事件派发。测试失败会输出用例日志并返回非零状态。
+
+Linux/macOS 默认在构建 `fun_test` 后运行全套非交互测试；PR 快速构建可配置 `-DSOUI_FUN_TEST_POST_BUILD=OFF`，然后显式运行上面的 CTest 命令。全套也可手动运行 `fun_test '--gtest_filter=-window.*'`。
+
+## GUI 烟测
+
+在有桌面显示的环境配置 `-DSOUI_ENABLE_GUI_SMOKE=ON`，构建后运行 `ctest --test-dir build -L '^soui-gui$' --output-on-failure`。Linux 可用 `xvfb-run -a` 包裹 CTest。`window.gui_smoke_dispatches_button_click` 创建并显示真实 SOUI 宿主窗口，通过窗口过程发送鼠标消息并检查按钮事件；它不会长期等待人工操作。GUI 组默认不注册，现有基础 PR 门禁仍为 36 个用例；全套非交互 `fun_test` 的 `-window.*` 过滤器也排除 GUI 组。此烟测尚不比较渲染像素或验证真实设备鼠标。
+
 ## 目录结构
 
 ```
