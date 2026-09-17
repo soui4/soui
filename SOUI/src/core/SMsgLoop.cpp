@@ -2,7 +2,7 @@
 #include "core/SMsgLoop.h"
 #include "helper/slog.h"
 #include "core/SNativeWnd.h"
-
+#include "helper/SCriticalSection.h"
 #ifndef WM_SYSTIMER
 #define WM_SYSTIMER 0x0118 /**< (caret blink) */
 #endif                     /**< WM_SYSTIMER */
@@ -22,6 +22,7 @@ BOOL RemoveElementFromArray(SArray<T> &arr, T ele)
 }
 
 class SMsgLoopWnd : public SNativeWnd {
+    SCriticalSection m_cs;
     BOOL m_hasTimer;
     IMessageLoop *m_pMsgLoop;
 
@@ -45,6 +46,7 @@ class SMsgLoopWnd : public SNativeWnd {
 
     void StartTimer()
     {
+		SAutoLock lock(m_cs);
         if (!m_hasTimer)
         {
             m_hasTimer = TRUE;
@@ -54,6 +56,7 @@ class SMsgLoopWnd : public SNativeWnd {
 
     void StopTimer()
     {
+        SAutoLock lock(m_cs);
         if (m_hasTimer)
         {
             m_hasTimer = FALSE;
