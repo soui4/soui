@@ -289,7 +289,7 @@ void STabCtrl::OnPaint(IRenderTarget *pRT)
             else if (i == m_nHoverTabItem)
                 dwState = WndState_Hover;
 
-            GetItemRect2(i, rcItem,pRT);
+            GetItemRect2(i, rcItem, pRT);
             if (rcItem.IsRectEmpty())
                 continue;
 
@@ -687,21 +687,23 @@ CRect STabCtrl::GetTitleRect() const
     CRect rcTitle;
     GetClientRect(rcTitle);
     int tabWid = rcTitle.Width();
-    if(m_szTab[0].isSpecifiedSize())
-		tabWid = m_szTab[0].toPixelSize(GetScale());
-    else if (m_szTab[0].isWrapContent()) {
+    if (m_szTab[0].isSpecifiedSize())
+        tabWid = m_szTab[0].toPixelSize(GetScale());
+    else if (m_szTab[0].isWrapContent())
+    {
         SASSERT(m_pSkinTab);
-		if(m_pSkinTab)
-			tabWid = m_pSkinTab->GetSkinSize().cx;
+        if (m_pSkinTab)
+            tabWid = m_pSkinTab->GetSkinSize().cx;
     }
-	int tabHei = rcTitle.Height();
-	if (m_szTab[1].isSpecifiedSize())
-		tabHei = m_szTab[1].toPixelSize(GetScale());
-    else if (m_szTab[1].isWrapContent()) {
-		SASSERT(m_pSkinTab);
-		if(m_pSkinTab)
-			tabWid = m_pSkinTab->GetSkinSize().cy;
-	}   
+    int tabHei = rcTitle.Height();
+    if (m_szTab[1].isSpecifiedSize())
+        tabHei = m_szTab[1].toPixelSize(GetScale());
+    else if (m_szTab[1].isWrapContent())
+    {
+        SASSERT(m_pSkinTab);
+        if (m_pSkinTab)
+            tabWid = m_pSkinTab->GetSkinSize().cy;
+    }
     switch (m_nTabAlign)
     {
     case AlignTop:
@@ -716,8 +718,8 @@ CRect STabCtrl::GetTitleRect() const
     case AlignRight:
         rcTitle.left = rcTitle.right - tabWid;
         break;
-	case AlignMiddle:
-		rcTitle.bottom = rcTitle.top + tabHei;
+    case AlignMiddle:
+        rcTitle.bottom = rcTitle.top + tabHei;
         break;
     }
     return rcTitle;
@@ -769,15 +771,15 @@ int STabCtrl::MeasureTabHeight(IRenderTarget *pRT, int iPage) const
     return nH + nPad * 2;
 }
 
-BOOL STabCtrl::GetItemRect(int nIndex, CRect& rcItem) const
+BOOL STabCtrl::GetItemRect(int nIndex, CRect &rcItem) const
 {
     SAutoRefPtr<IRenderTarget> pRT;
-	GETRENDERFACTORY->CreateRenderTarget(&pRT);
-	BeforePaintEx(pRT);
-	return GetItemRect2(nIndex, rcItem, pRT);
+    GETRENDERFACTORY->CreateRenderTarget(&pRT);
+    BeforePaintEx(pRT);
+    return GetItemRect2(nIndex, rcItem, pRT);
 }
 
-BOOL STabCtrl::GetItemRect2(int nIndex, CRect& rcItem, IRenderTarget* pRT) const
+BOOL STabCtrl::GetItemRect2(int nIndex, CRect &rcItem, IRenderTarget *pRT) const
 {
     if (nIndex < 0 || nIndex >= (int)GetItemCount())
         return FALSE;
@@ -788,8 +790,8 @@ BOOL STabCtrl::GetItemRect2(int nIndex, CRect& rcItem, IRenderTarget* pRT) const
     if (m_nTabAlign == AlignMiddle)
     {
         // middle, each tab is same height
-		CRect rcClient = GetClientRect();
-		int nTabHeight = rcTitle.Height();
+        CRect rcClient = GetClientRect();
+        int nTabHeight = rcTitle.Height();
         rcItem = CRect(0, 0, rcTitle.Width(), nTabHeight);
         if (nIndex <= m_nCurrentPage)
         {

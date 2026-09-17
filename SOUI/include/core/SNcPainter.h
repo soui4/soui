@@ -166,8 +166,8 @@ class SOUI_EXP SNcPainter
      */
     virtual void OnLayoutDirty() OVERRIDE;
 
-    virtual LPCWSTR GetTrCtx() const
-     OVERRIDE{
+    virtual LPCWSTR GetTrCtx() const OVERRIDE
+    {
         return NULL;
     }
 

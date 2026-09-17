@@ -329,32 +329,32 @@ class SOUI_EXP SEvtArgs : public TObjRefImpl<SObjectImpl<IEvtArgs>> {
 };
 
 /** Define a group of macros for event definitions to simplify event definition. */
-#define DEF_EVT_CLASS(evt, id, evt_name, evtData, api) \
-    class api evt                                      \
-        : public SEvtArgs                              \
-        , public evtData {                             \
-        DEF_SOBJECT(SEvtArgs, WIDESTR(evt_name))       \
-      public:                                          \
-        STDMETHOD_(int, GetID)(THIS) const  OVERRIDE           \
-        {                                              \
-            return evt::EventID;                       \
-        }                                              \
-        STDMETHOD_(LPCWSTR, GetName)(THIS) const  OVERRIDE     \
-        {                                              \
-            return evt::GetClassName();                \
-        }                                              \
-        STDMETHOD_(LPVOID, Data)(THIS)  OVERRIDE               \
-        {                                              \
-            return (evtData *)this;                    \
-        }                                              \
-        enum                                           \
-        {                                              \
-            EventID = id                               \
-        };                                             \
-        evt(SNS::IObject *pSender = NULL)              \
-            : SEvtArgs(pSender)                        \
-        {                                              \
-        }                                              \
+#define DEF_EVT_CLASS(evt, id, evt_name, evtData, api)    \
+    class api evt                                         \
+        : public SEvtArgs                                 \
+        , public evtData {                                \
+        DEF_SOBJECT(SEvtArgs, WIDESTR(evt_name))          \
+      public:                                             \
+        STDMETHOD_(int, GetID)(THIS) const OVERRIDE       \
+        {                                                 \
+            return evt::EventID;                          \
+        }                                                 \
+        STDMETHOD_(LPCWSTR, GetName)(THIS) const OVERRIDE \
+        {                                                 \
+            return evt::GetClassName();                   \
+        }                                                 \
+        STDMETHOD_(LPVOID, Data)(THIS) OVERRIDE           \
+        {                                                 \
+            return (evtData *)this;                       \
+        }                                                 \
+        enum                                              \
+        {                                                 \
+            EventID = id                                  \
+        };                                                \
+        evt(SNS::IObject *pSender = NULL)                 \
+            : SEvtArgs(pSender)                           \
+        {                                                 \
+        }                                                 \
     };
 
 #define EVENTID(x) x::EventID, x::GetClassName()

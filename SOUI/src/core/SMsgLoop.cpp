@@ -46,7 +46,7 @@ class SMsgLoopWnd : public SNativeWnd {
 
     void StartTimer()
     {
-		SAutoLock lock(m_cs);
+        SAutoLock lock(m_cs);
         if (!m_hasTimer)
         {
             m_hasTimer = TRUE;

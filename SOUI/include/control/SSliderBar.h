@@ -57,28 +57,28 @@ class TProgressProxy
             return SProgress::QueryInterface(id, ppRet);
         }
     }
-    STDMETHOD_(BOOL, SetValue)(THIS_ int nValue)
-     OVERRIDE{
+    STDMETHOD_(BOOL, SetValue)(THIS_ int nValue) OVERRIDE
+    {
         return SProgress::SetValue(nValue);
     }
 
-    STDMETHOD_(int, GetValue)(CTHIS) SCONST
-     OVERRIDE{
+    STDMETHOD_(int, GetValue)(CTHIS) SCONST OVERRIDE
+    {
         return SProgress::GetValue();
     }
 
-    STDMETHOD_(void, SetRange)(THIS_ int nMin, int nMax)
-     OVERRIDE{
+    STDMETHOD_(void, SetRange)(THIS_ int nMin, int nMax) OVERRIDE
+    {
         SProgress::SetRange(nMin, nMax);
     }
 
-    STDMETHOD_(void, GetRange)(CTHIS_ int *pMin, int *pMax) SCONST
-     OVERRIDE{
+    STDMETHOD_(void, GetRange)(CTHIS_ int *pMin, int *pMax) SCONST OVERRIDE
+    {
         SProgress::GetRange(pMin, pMax);
     }
 
-    STDMETHOD_(BOOL, IsVertical)(CTHIS) SCONST
-     OVERRIDE{
+    STDMETHOD_(BOOL, IsVertical)(CTHIS) SCONST OVERRIDE
+    {
         return SProgress::IsVertical();
     }
 };

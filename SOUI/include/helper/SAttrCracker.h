@@ -21,7 +21,6 @@
     {                                                                                                                      \
         HRESULT hRet = E_FAIL;
 
-
 /** Classes derived from SObject mark the end of properties */
 #define SOUI_ATTRS_END()                                                            \
     if (FAILED(hRet))                                                               \

@@ -92,8 +92,8 @@ class SOUI_EXP STabPage : public TWindowProxy<ITabPage> {
      * @param tipInfo Tooltip information.
      * @return Always returns FALSE to disable tooltips on the page.
      */
-    virtual BOOL UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo)
-     OVERRIDE{
+    virtual BOOL UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo) OVERRIDE
+    {
         return FALSE;
     }
 
@@ -137,7 +137,7 @@ class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
     SLayoutSize m_ptText[2];               /**< Position of the text. */
     int m_nTabAlign;                       /**< Alignment of the tabs. */
 
-    SLayoutSize m_ptTextPad[2];            /**< Padding (x,y) around the title text, applied when tabWidth/tabHeight is wrapContent. */
+    SLayoutSize m_ptTextPad[2]; /**< Padding (x,y) around the title text, applied when tabWidth/tabHeight is wrapContent. */
 
     SArray<STabPage *> m_lstPages; /**< List of tab pages. */
     STabSlider *m_tabSlider;
@@ -333,8 +333,8 @@ class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
      * @brief Gets the dialog code for the window.
      * @return Dialog code.
      */
-    virtual UINT WINAPI OnGetDlgCode() const
-     OVERRIDE{
+    virtual UINT WINAPI OnGetDlgCode() const OVERRIDE
+    {
         return SC_WANTARROWS;
     }
 
@@ -388,9 +388,10 @@ class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
      */
     SIZE MeasureTextV(IRenderTarget *pRT, const SStringT &strText) const;
 
-	int MeasureTabWidth(IRenderTarget* pRT, int iPage) const;
-	int MeasureTabHeight(IRenderTarget* pRT, int iPage) const;
-    BOOL GetItemRect2(int nIndex, CRect& rcItem, IRenderTarget* pRT) const;
+    int MeasureTabWidth(IRenderTarget *pRT, int iPage) const;
+    int MeasureTabHeight(IRenderTarget *pRT, int iPage) const;
+    BOOL GetItemRect2(int nIndex, CRect &rcItem, IRenderTarget *pRT) const;
+
   protected:
     /**
      * @brief Handles the paint event.

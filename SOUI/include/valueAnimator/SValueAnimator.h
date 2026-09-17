@@ -860,8 +860,8 @@ class SOUI_EXP SAnimatorGroup
      * @brief Called when an animation repeats.
      * @param pAnimator Pointer to the animator that repeated.
      */
-    STDMETHOD_(void, onAnimationRepeat)(THIS_ IValueAnimator *pAnimator)
-     OVERRIDE{
+    STDMETHOD_(void, onAnimationRepeat)(THIS_ IValueAnimator *pAnimator) OVERRIDE
+    {
     }
 
     /**

@@ -1,10 +1,9 @@
 ﻿#ifndef __SWNDMSGCRACKER__H__
 #define __SWNDMSGCRACKER__H__
 
-#define SOUI_MSG_MAP_BEGIN()                                                                   \
-  protected:                                                                                   \
-    virtual BOOL ProcessSwndMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult) \
-        OVERRIDE                                                                               \
+#define SOUI_MSG_MAP_BEGIN()                                                                            \
+  protected:                                                                                            \
+    virtual BOOL ProcessSwndMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult) OVERRIDE \
     {
 
 /** For SWindow (root of the ProcessSwndMessage chain, not an override) */

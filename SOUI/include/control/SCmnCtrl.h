@@ -225,7 +225,8 @@ class SOUI_EXP SButton
      * @return success--TRUE, failure--FALSE
      * @details When the button state changes, it needs to be redrawn; returns TRUE by default
      */
-    virtual BOOL NeedRedrawWhenStateChange() OVERRIDE{
+    virtual BOOL NeedRedrawWhenStateChange() OVERRIDE
+    {
         return TRUE;
     }
 

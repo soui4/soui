@@ -387,7 +387,6 @@ class SOUI_EXP SBackInInterpolator : public SInterpolatorBase {
     SOUI_ATTRS_END()
 };
 
-
 /** Quint (power 5) interpolators */
 class SOUI_EXP SQuintInInterpolator : public SInterpolatorBase {
     DEF_SOBJECT(SInterpolatorBase, L"QuintIn")

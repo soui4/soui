@@ -90,8 +90,8 @@ class SOUI_EXP SRealWnd : public TWindowProxy<IRealWnd> {
      * @brief Set the additional data for the real window
      * @param lpData Pointer to the additional data
      */
-    STDMETHOD_(void, SetData)(THIS_ LPVOID lpData)
-     OVERRIDE{
+    STDMETHOD_(void, SetData)(THIS_ LPVOID lpData) OVERRIDE
+    {
         m_lpData = lpData;
     }
 
@@ -99,8 +99,8 @@ class SOUI_EXP SRealWnd : public TWindowProxy<IRealWnd> {
      * @brief Get the additional data for the real window
      * @return Pointer to the additional data
      */
-    STDMETHOD_(LPVOID, GetData)(THIS)
-     OVERRIDE{
+    STDMETHOD_(LPVOID, GetData)(THIS) OVERRIDE
+    {
         return m_lpData;
     }
 

@@ -132,8 +132,8 @@ class SOUI_EXP SRootWindow : public SWindow {
      *
      * @return TRUE if the window is a layered window, FALSE otherwise.
      */
-    virtual BOOL IsLayeredWindow() const
-     OVERRIDE{
+    virtual BOOL IsLayeredWindow() const OVERRIDE
+    {
         return FALSE;
     }
 
