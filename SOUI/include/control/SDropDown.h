@@ -107,20 +107,20 @@ class SOUI_EXP SDropDownWnd
      * @brief Get the message loop
      * @return Pointer to the message loop
      */
-    STDMETHOD_(IMessageLoop *, GetMsgLoop)();
+    STDMETHOD_(IMessageLoop *, GetMsgLoop)() OVERRIDE;
 
     /**
      * @brief Prevent the window from releasing capture
      * @return TRUE if successful, FALSE otherwise
      */
-    STDMETHOD_(BOOL, OnReleaseSwndCapture)();
+    STDMETHOD_(BOOL, OnReleaseSwndCapture)() OVERRIDE;
 
     /**
      * @brief Pre-translate messages
      * @param pMsg Pointer to the message
      * @return TRUE if the message is handled, FALSE otherwise
      */
-    STDMETHOD_(BOOL, PreTranslateMessage)(MSG *pMsg);
+    STDMETHOD_(BOOL, PreTranslateMessage)(MSG *pMsg) OVERRIDE;
 
     /**
      * @brief Handle left mouse button down event

@@ -24,13 +24,13 @@ class SOUI_EXP SEdit : public TCtrlProxy<IEdit, SRichEdit> {
      * @brief Get the cue text
      * @param pStr Output string for the cue text
      */
-    STDMETHOD_(void, GetCueText)(CTHIS_ IStringT *pStr) SCONST;
+    STDMETHOD_(void, GetCueText)(CTHIS_ IStringT *pStr) SCONST OVERRIDE;
 
     /**
      * @brief Get the cue text color
      * @return Cue text color
      */
-    STDMETHOD_(COLORREF, GetCueColor)(CTHIS) SCONST
+    STDMETHOD_(COLORREF, GetCueColor)(CTHIS) SCONST OVERRIDE
     {
         return m_crCue;
     }

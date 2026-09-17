@@ -19,7 +19,9 @@
 #include <interface/sxml-i.h>
 #include <stdint.h>
 
+#if defined(_MSC_VER)
 #pragma warning(disable : 4275)
+#endif
 ///////////////////////////////////////////////////////////////////////
 SNSBEGIN
 
@@ -67,18 +69,18 @@ SNSBEGIN
         return __baseCls::GetClassName();                                                                      \
     }                                                                                                          \
                                                                                                                \
-    virtual LPCWSTR WINAPI GetObjectClass() const                                                              \
+    virtual LPCWSTR WINAPI GetObjectClass() const OVERRIDE \
     {                                                                                                          \
         return clsName;                                                                                        \
     }                                                                                                          \
                                                                                                                \
-    virtual BOOL WINAPI IsClass(LPCWSTR lpszName) const                                                        \
+    virtual BOOL WINAPI IsClass(LPCWSTR lpszName) const OVERRIDE \
     {                                                                                                          \
         if (wcscmp(GetClassName(), lpszName) == 0)                                                             \
             return TRUE;                                                                                       \
         return __baseCls::IsClass(lpszName);                                                                   \
     }                                                                                                          \
-    virtual int WINAPI GetClassNameList(wchar_t ppClassNameList[][50], int nMaxCount) const                    \
+    virtual int WINAPI GetClassNameList(wchar_t ppClassNameList[][50], int nMaxCount) const OVERRIDE \
     {                                                                                                          \
         if (nMaxCount > 0 && ppClassNameList)                                                                  \
             wcscpy_s(ppClassNameList[0], 50, GetClassName());                                                  \

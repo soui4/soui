@@ -103,7 +103,7 @@ class SOUI_EXP SRootWindow : public SWindow {
      *
      * @param bErase Flag indicating whether to erase the animation.
      */
-    virtual void OnAnimationInvalidate(bool bErase);
+    virtual void OnAnimationInvalidate(bool bErase) OVERRIDE;
 
   protected: /**< SWindow virtual methods */
     /**
@@ -133,7 +133,7 @@ class SOUI_EXP SRootWindow : public SWindow {
      * @return TRUE if the window is a layered window, FALSE otherwise.
      */
     virtual BOOL IsLayeredWindow() const
-    {
+     OVERRIDE{
         return FALSE;
     }
 
@@ -142,14 +142,14 @@ class SOUI_EXP SRootWindow : public SWindow {
      *
      * @return HRESULT indicating the success or failure of the operation.
      */
-    virtual HRESULT OnLanguageChanged();
+    virtual HRESULT OnLanguageChanged() OVERRIDE;
 
     /**
      * @brief Called when the scale changes.
      *
      * @param scale New scale factor.
      */
-    virtual void OnScaleChanged(int scale);
+    virtual void OnScaleChanged(int scale) OVERRIDE;
 
     /**
      * @brief Requests a relayout of the window.
@@ -157,7 +157,7 @@ class SOUI_EXP SRootWindow : public SWindow {
      * @param hSource Source window handle.
      * @param bSourceResizable Flag indicating if the source window is resizable.
      */
-    virtual void RequestRelayout(SWND hSource, BOOL bSourceResizable);
+    virtual void RequestRelayout(SWND hSource, BOOL bSourceResizable) OVERRIDE;
 
   public:
     /** Define attributes for enter and exit animations */

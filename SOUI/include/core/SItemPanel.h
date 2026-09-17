@@ -151,7 +151,7 @@ class SOUI_EXP SOsrPanel
     STDMETHOD_(BOOL, IsDesignerMode)(CTHIS) SCONST OVERRIDE;
 
   public: /**< SWindow */
-    virtual LRESULT DoFrameEvent(UINT uMsg, WPARAM wParam, LPARAM lParam);
+    virtual LRESULT DoFrameEvent(UINT uMsg, WPARAM wParam, LPARAM lParam) OVERRIDE;
     virtual void ModifyItemState(DWORD dwStateAdd, DWORD dwStateRemove);
 
     virtual SWND SwndFromPoint(CPoint &pt, bool bIncludeMsgTransparent = false);
@@ -160,14 +160,14 @@ class SOUI_EXP SOsrPanel
 
     virtual void BeforePaint(IRenderTarget *pRT, SPainter &painter) const override;
 
-    virtual BOOL NeedRedrawWhenStateChange();
-    virtual BOOL UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo);
-    virtual void RequestRelayout(SWND hSource, BOOL bSourceResizable);
+    virtual BOOL NeedRedrawWhenStateChange() OVERRIDE;
+    virtual BOOL UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo) OVERRIDE;
+    virtual void RequestRelayout(SWND hSource, BOOL bSourceResizable) OVERRIDE;
 
     CRect GetItemRect() const;
     void SetItemCapture(BOOL bCapture);
 
-    virtual BOOL CancelCaptureMode(int reason); /**< Cancel mouse click operation, chain to the captured child control */
+    virtual BOOL CancelCaptureMode(int reason) OVERRIDE; /**< Cancel mouse click operation, chain to the captured child control */
 
   protected:
     void OnShowWindow(BOOL bShow, UINT nStatus);
@@ -273,7 +273,7 @@ class SOUI_EXP SItemPanel : public TOsrPanelProxy<IItemPanel> {
 
   protected:
     STDMETHOD_(COLORREF, GetBkgndColor)(THIS) SCONST OVERRIDE;
-    STDMETHOD_(BOOL, OnFireEvent)(IEvtArgs *evt);
+    STDMETHOD_(BOOL, OnFireEvent)(IEvtArgs *evt) OVERRIDE;
 
   protected:
     COLORREF m_crBk, m_crSelBk, m_crHover;

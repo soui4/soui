@@ -74,7 +74,7 @@ class SOUI_EXP SHotKeyCtrl
      * @details This function is a message handler.
      */
     virtual UINT WINAPI OnGetDlgCode() const
-    {
+     OVERRIDE{
         return (SC_WANTALLKEYS | SC_WANTSYSKEY) & (~SC_WANTTAB);
     }
 

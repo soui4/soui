@@ -110,19 +110,19 @@ class SOUI_EXP SDateTimePicker
      * @brief Get the owner window for the dropdown
      * @return Owner window pointer
      */
-    virtual SWindow *GetDropDownOwner();
+    virtual SWindow *GetDropDownOwner() OVERRIDE;
 
     /**
      * @brief Handle creation of the dropdown window
      * @param pDropDown Dropdown window pointer
      */
-    virtual void OnCreateDropDown(SDropDownWnd *pDropDown);
+    virtual void OnCreateDropDown(SDropDownWnd *pDropDown) OVERRIDE;
 
     /**
      * @brief Handle destruction of the dropdown window
      * @param pDropDown Dropdown window pointer
      */
-    virtual void OnDestroyDropDown(SDropDownWnd *pDropDown);
+    virtual void OnDestroyDropDown(SDropDownWnd *pDropDown) OVERRIDE;
 
   protected:
     /**
@@ -137,13 +137,13 @@ class SOUI_EXP SDateTimePicker
      * @param xmlNode XML node for the child controls
      * @return TRUE if successful, FALSE otherwise
      */
-    virtual BOOL CreateChildren(SXmlNode xmlNode);
+    virtual BOOL CreateChildren(SXmlNode xmlNode) OVERRIDE;
 
     /**
      * @brief Called when the scale of the window changes.
      * @param scale The new scale value.
      */
-    virtual void OnScaleChanged(int scale);
+    virtual void OnScaleChanged(int scale) OVERRIDE;
 
     /**
      * @brief Handle date change event

@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.16)
 project(SOUI4)
 
+# Register the project's repeatable unit, integration and core E2E checks.
+# Test targets are added by their own CMakeLists.txt files below.
+enable_testing()
+
 file(STRINGS  SOUI/include/soui-version.h ver_h_contents REGEX "^#define SOUI_VER[0-9]+ [0-9]+$")
 
 foreach(line IN LISTS ver_h_contents) 

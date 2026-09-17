@@ -225,8 +225,7 @@ class SOUI_EXP SButton
      * @return success--TRUE, failure--FALSE
      * @details When the button state changes, it needs to be redrawn; returns TRUE by default
      */
-    virtual BOOL NeedRedrawWhenStateChange()
-    {
+    virtual BOOL NeedRedrawWhenStateChange() OVERRIDE{
         return TRUE;
     }
 
@@ -234,7 +233,7 @@ class SOUI_EXP SButton
      * @brief Get encoding
      * @return Returns the macro SC_WANTCHARS indicating WM_CHAR message is needed
      */
-    virtual UINT WINAPI OnGetDlgCode() const
+    virtual UINT WINAPI OnGetDlgCode() const OVERRIDE
     {
         return SC_WANTCHARS;
     }
@@ -260,14 +259,14 @@ class SOUI_EXP SButton
      * @param dwOldState old state
      * @param dwNewState new state
      */
-    virtual void OnStateChanged(DWORD dwOldState, DWORD dwNewState);
+    virtual void OnStateChanged(DWORD dwOldState, DWORD dwNewState) OVERRIDE;
 
     /**
      * @brief Container change handler
      * @param pOldContainer old container
      * @param pNewContainer new container
      */
-    virtual void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer);
+    virtual void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer) OVERRIDE;
 
     /**
      * @brief Draw control
@@ -484,13 +483,13 @@ class SOUI_EXP SImageWnd : public TWindowProxy<IImageWnd> {
      * @brief Handle colorize event
      * @param cr color
      */
-    virtual void OnColorize(COLORREF cr);
+    virtual void OnColorize(COLORREF cr) OVERRIDE;
 
     /**
      * @brief Handle scale change event
      * @param scale scale factor
      */
-    virtual void OnScaleChanged(int scale);
+    virtual void OnScaleChanged(int scale) OVERRIDE;
 
     /**
      * @brief Measure content size
@@ -498,7 +497,7 @@ class SOUI_EXP SImageWnd : public TWindowProxy<IImageWnd> {
      * @param nParentHei parent container height
      * @return content size
      */
-    virtual SIZE MeasureContent(int nParentWid, int nParentHei);
+    virtual SIZE MeasureContent(int nParentWid, int nParentHei) OVERRIDE;
 
   protected:
     /**
@@ -586,18 +585,18 @@ class SOUI_EXP SAnimateImgWnd
     /**
      * @brief Start animation
      */
-    void WINAPI Start();
+    void WINAPI Start() OVERRIDE;
 
     /**
      * @brief Stop animation
      */
-    void WINAPI Stop();
+    void WINAPI Stop() OVERRIDE;
 
     /**
      * @brief Check animation running state
      * @return running--TRUE
      */
-    BOOL WINAPI IsPlaying() SCONST
+    BOOL WINAPI IsPlaying() SCONST OVERRIDE
     {
         return m_bPlaying;
     }
@@ -609,7 +608,7 @@ class SOUI_EXP SAnimateImgWnd
      * @param hei parent container height
      * @return content size
      */
-    virtual SIZE MeasureContent(int wid, int hei);
+    virtual SIZE MeasureContent(int wid, int hei) OVERRIDE;
 
     /**
      * @brief Handle next frame event
@@ -620,14 +619,14 @@ class SOUI_EXP SAnimateImgWnd
      * @brief Handle colorize event
      * @param cr color
      */
-    virtual void OnColorize(COLORREF cr);
+    virtual void OnColorize(COLORREF cr) OVERRIDE;
 
     /**
      * @brief Container change handler
      * @param pOldContainer old container
      * @param pNewContainer new container
      */
-    virtual void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer);
+    virtual void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer) OVERRIDE;
 
     /**
      * @brief Handle scale change event
@@ -1030,13 +1029,13 @@ class SOUI_EXP SCheckBox : public SWindow {
      * @brief Get the size of the text display area
      * @param pRect Output parameter representing the rectangle of the text display area.
      */
-    virtual void GetTextRect(LPRECT pRect);
+    virtual void GetTextRect(LPRECT pRect) OVERRIDE;
 
     /**
      * @brief Determine whether the control needs redrawing when the state changes
      * @return TRUE means redraw is needed, FALSE means no redraw needed.
      */
-    virtual BOOL NeedRedrawWhenStateChange()
+    virtual BOOL NeedRedrawWhenStateChange() OVERRIDE
     {
         return TRUE; // By default, redraw is needed when the state changes
     }
@@ -1046,7 +1045,7 @@ class SOUI_EXP SCheckBox : public SWindow {
      * @return Return value is of type UINT, representing the dialog code.
      * @details Returning SC_WANTCHARS indicates the control needs to process character messages.
      */
-    virtual UINT WINAPI OnGetDlgCode() const
+    virtual UINT WINAPI OnGetDlgCode() const OVERRIDE
     {
         return SC_WANTCHARS;
     }
@@ -1056,21 +1055,21 @@ class SOUI_EXP SCheckBox : public SWindow {
      * @param pRT render device handle (IRenderTarget*).
      * @details This method is called to draw the focus style when the control gains focus.
      */
-    virtual void DrawFocus(IRenderTarget *pRT);
+    virtual void DrawFocus(IRenderTarget *pRT) OVERRIDE;
 
     /**
      * @brief Handle colorize event
      * @param cr color value (COLORREF).
      * @details This method is called when the control's color changes.
      */
-    virtual void OnColorize(COLORREF cr);
+    virtual void OnColorize(COLORREF cr) OVERRIDE;
 
     /**
      * @brief Handle scale change event
      * @param scale scale factor (int).
      * @details This method is called when the control's scale factor changes.
      */
-    virtual void OnScaleChanged(int scale);
+    virtual void OnScaleChanged(int scale) OVERRIDE;
 
     /**
      * @brief Handle left mouse button up event
@@ -1230,7 +1229,7 @@ class SOUI_EXP SRadioBox : public SWindow {
      * @brief Get the size of the text display area
      * @param pRect Output parameter representing the rectangle of the text display area.
      */
-    virtual void GetTextRect(LPRECT pRect);
+    virtual void GetTextRect(LPRECT pRect) OVERRIDE;
 
     /**
      * @brief Measure the size required for content
@@ -1264,39 +1263,39 @@ class SOUI_EXP SRadioBox : public SWindow {
      * @brief Determine whether the control needs redrawing when the state changes
      * @return TRUE means redraw is needed, FALSE means no redraw needed.
      */
-    virtual BOOL NeedRedrawWhenStateChange();
+    virtual BOOL NeedRedrawWhenStateChange() OVERRIDE;
 
     /**
      * @brief Draw focus style
      * @param pRT render device handle (IRenderTarget*).
      * @details This method is called to draw the focus style when the control gains focus.
      */
-    virtual void DrawFocus(IRenderTarget *pRT);
+    virtual void DrawFocus(IRenderTarget *pRT) OVERRIDE;
 
     /**
      * @brief Get the selected sibling control in the current group
      * @return Returns a pointer to the selected sibling control (SWindow*), or NULL if none.
      */
-    virtual SWindow *GetSelectedSiblingInGroup();
+    virtual SWindow *GetSelectedSiblingInGroup() OVERRIDE;
 
     /**
      * @brief Handle state change event
      * @param dwOldState old state (DWORD).
      * @param dwNewState new state (DWORD).
      */
-    virtual void OnStateChanging(DWORD dwOldState, DWORD dwNewState);
+    virtual void OnStateChanging(DWORD dwOldState, DWORD dwNewState) OVERRIDE;
 
     /**
      * @brief Handle colorize event
      * @param cr color value (COLORREF).
      */
-    virtual void OnColorize(COLORREF cr);
+    virtual void OnColorize(COLORREF cr) OVERRIDE;
 
     /**
      * @brief Handle scale change event
      * @param nScale scale factor (int).
      */
-    virtual void OnScaleChanged(int nScale);
+    virtual void OnScaleChanged(int nScale) OVERRIDE;
 
   protected:
     /**
@@ -1429,13 +1428,13 @@ class SOUI_EXP SRadioGroup : public SWindow {
      * @brief Handle after inserting a child control
      * @param pChild Child control pointer
      */
-    virtual void OnAfterInsertChild(SWindow *pChild);
+    virtual void OnAfterInsertChild(SWindow *pChild) OVERRIDE;
 
     /**
      * @brief Handle before removing a child control
      * @param pChild Child control pointer
      */
-    virtual void OnBeforeRemoveChild(SWindow *pChild);
+    virtual void OnBeforeRemoveChild(SWindow *pChild) OVERRIDE;
 };
 
 /**
@@ -1479,7 +1478,7 @@ class SOUI_EXP SToggle : public SCheckBox {
      * @brief Whether a state change requires repainting
      * @return Needs repaint--TRUE
      */
-    virtual BOOL NeedRedrawWhenStateChange()
+    virtual BOOL NeedRedrawWhenStateChange() OVERRIDE
     {
         return TRUE;
     }

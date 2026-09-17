@@ -223,20 +223,20 @@ class SOUI_EXP SComboBase
      * @brief Get the owner window
      * @return Owner window pointer
      */
-    virtual SWindow *GetDropDownOwner();
+    virtual SWindow *GetDropDownOwner() OVERRIDE;
 
     /**
      * @brief Handle creation of the dropdown window
      * @param pDropDown Dropdown window pointer
      */
-    virtual void OnCreateDropDown(SDropDownWnd *pDropDown);
+    virtual void OnCreateDropDown(SDropDownWnd *pDropDown) OVERRIDE;
 
     /**
      * @brief Handle destruction of the dropdown window
      * @param pDropDown Dropdown window pointer
      * @param uCode Message code
      */
-    virtual void OnDestroyDropDown(SDropDownWnd *pDropDown);
+    virtual void OnDestroyDropDown(SDropDownWnd *pDropDown) OVERRIDE;
 
     /**
      * @brief Handle selection change in the dropdown window
@@ -282,31 +282,31 @@ class SOUI_EXP SComboBase
      * @param xmlNode XML node for the child controls
      * @return TRUE if successful, FALSE otherwise
      */
-    virtual BOOL CreateChildren(SXmlNode xmlNode);
+    virtual BOOL CreateChildren(SXmlNode xmlNode) OVERRIDE;
 
     /**
      * @brief Get the rectangle of the text
      * @param pRect Output rectangle for the text
      */
-    virtual void GetTextRect(LPRECT pRect);
+    virtual void GetTextRect(LPRECT pRect) OVERRIDE;
 
     /**
      * @brief Handle colorization event
      * @param cr Color
      */
-    virtual void OnColorize(COLORREF cr);
+    virtual void OnColorize(COLORREF cr) OVERRIDE;
 
     /**
      * @brief Handle language change event
      * @return HRESULT
      */
-    virtual HRESULT OnLanguageChanged();
+    virtual HRESULT OnLanguageChanged() OVERRIDE;
 
     /**
      * @brief Handle scale change event
      * @param nScale Scale factor
      */
-    virtual void OnScaleChanged(int nScale);
+    virtual void OnScaleChanged(int nScale) OVERRIDE;
 
     /**
      * @brief Paint the control

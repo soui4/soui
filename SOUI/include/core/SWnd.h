@@ -395,7 +395,7 @@ class SOUI_EXP SWindow
     /**
      * @brief Called when the last reference to the object is released.
      */
-    STDMETHOD_(void, OnFinalRelease)(THIS);
+    STDMETHOD_(void, OnFinalRelease)(THIS) OVERRIDE;
 
     /**
      * @brief Retrieves the window handle.
@@ -1632,26 +1632,26 @@ class SOUI_EXP SWindow
      * @brief Called when an animation starts.
      * @param animation Pointer to the animation object.
      */
-    STDMETHOD_(void, OnAnimationStart)(THIS_ IAnimation *animation);
+    STDMETHOD_(void, OnAnimationStart)(THIS_ IAnimation *animation) OVERRIDE;
 
     /**
      * @brief Called when an animation stops.
      * @param animation Pointer to the animation object.
      */
-    STDMETHOD_(void, OnAnimationStop)(THIS_ IAnimation *animation);
+    STDMETHOD_(void, OnAnimationStop)(THIS_ IAnimation *animation) OVERRIDE;
 
     /**
      * @brief Called when an animation repeats.
      * @param animation Pointer to the animation object.
      */
-    STDMETHOD_(void, OnAnimationRepeat)(THIS_ IAnimation *animation);
+    STDMETHOD_(void, OnAnimationRepeat)(THIS_ IAnimation *animation) OVERRIDE;
 
     /**
      * @brief Called when the pause state of an animation changes.
      * @param animation Pointer to the animation object.
      * @param bPaused TRUE if the animation is paused; otherwise, FALSE.
      */
-    STDMETHOD_(void, OnAnimationPauseChange)(THIS_ IAnimation *animation, BOOL bPaused);
+    STDMETHOD_(void, OnAnimationPauseChange)(THIS_ IAnimation *animation, BOOL bPaused) OVERRIDE;
 
     /** Virtual functions for override */
   protected:
@@ -2446,7 +2446,7 @@ class SOUI_EXP SWindow
     void OnSysKeyUp(UINT nChar, UINT nFlagsCnt, UINT nFlags);
 
     /** Message map for associating messages with handlers */
-    SOUI_MSG_MAP_BEGIN()
+    SOUI_MSG_MAP_BEGIN_ROOT()
         MSG_WM_PAINT_EX(OnPaint)
         MSG_WM_ERASEBKGND_EX(OnEraseBkgnd)
         MSG_WM_NCPAINT_EX(OnNcPaint)
@@ -2665,7 +2665,7 @@ class SOUI_EXP SWindow
      *
      * Describe  This method processes attributes not explicitly handled.
      */
-    HRESULT DefAttributeProc(const SStringW &strAttribName, const SStringW &strValue, BOOL bLoading);
+    HRESULT DefAttributeProc(const SStringW &strAttribName, const SStringW &strValue, BOOL bLoading) OVERRIDE;
 
     /**
      * AfterAttribute

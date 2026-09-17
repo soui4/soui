@@ -117,7 +117,7 @@ class SOUI_EXP SScrollBar
      *
      * Describe  Performs additional initialization after the control is created.
      */
-    virtual void WINAPI OnInitFinished(IXmlNode *pNode);
+    virtual void WINAPI OnInitFinished(IXmlNode *pNode) OVERRIDE;
 
     /**
      * SScrollBar::NotifySbCode

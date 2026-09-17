@@ -197,14 +197,14 @@ class SOUI_EXP SHeaderCtrl : public TWindowProxy<IHeaderCtrl> {
      * @param xmlNode XML node for the child items
      * @return TRUE if successful, FALSE otherwise
      */
-    virtual BOOL CreateChildren(SXmlNode xmlNode);
+    virtual BOOL CreateChildren(SXmlNode xmlNode) OVERRIDE;
 
     /**
      * @brief Set the cursor based on the mouse position
      * @param pt Mouse coordinates
      * @return TRUE if successful, FALSE otherwise
      */
-    virtual BOOL OnSetCursor(const CPoint &pt);
+    virtual BOOL OnSetCursor(const CPoint &pt) OVERRIDE;
 
     /**
      * @brief Paint the control
@@ -224,26 +224,26 @@ class SOUI_EXP SHeaderCtrl : public TWindowProxy<IHeaderCtrl> {
      * @brief Handle colorization event
      * @param cr Color reference
      */
-    virtual void OnColorize(COLORREF cr);
+    virtual void OnColorize(COLORREF cr) OVERRIDE;
 
     /**
      * @brief Handle language change event
      * @return HRESULT
      */
-    virtual HRESULT OnLanguageChanged();
+    virtual HRESULT OnLanguageChanged() OVERRIDE;
 
     /**
      * @brief Handle scale change event
      * @param nScale Scale factor
      */
-    virtual void OnScaleChanged(int nScale);
+    virtual void OnScaleChanged(int nScale) OVERRIDE;
 
     /**
      * @brief Handle relayout event
      * @param rcWnd Window rectangle
      * @return TRUE if successful, FALSE otherwise
      */
-    virtual BOOL OnRelayout(const CRect &rcWnd);
+    virtual BOOL OnRelayout(const CRect &rcWnd) OVERRIDE;
 
     /**
      * @brief Hit test to determine the item under the mouse

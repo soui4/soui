@@ -276,7 +276,7 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
      * @brief Get dialog code
      * @return Dialog code
      */
-    virtual UINT WINAPI OnGetDlgCode() const;
+    virtual UINT WINAPI OnGetDlgCode() const OVERRIDE;
 
     /**
      * @brief Handle scroll message
@@ -285,25 +285,25 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
      * @param nPos Scroll position
      * @return TRUE if successful, FALSE otherwise
      */
-    virtual BOOL OnScroll(BOOL bVertical, UINT uCode, int nPos);
+    virtual BOOL OnScroll(BOOL bVertical, UINT uCode, int nPos) OVERRIDE;
 
     /**
      * @brief Handle set cursor message
      * @param pt Mouse coordinates
      * @return TRUE if successful, FALSE otherwise
      */
-    virtual BOOL OnSetCursor(const CPoint &pt);
+    virtual BOOL OnSetCursor(const CPoint &pt) OVERRIDE;
 
     /**
      * @brief Handle scale change message
      * @param nScale New scale factor
      */
-    virtual void OnScaleChanged(int nScale);
+    virtual void OnScaleChanged(int nScale) OVERRIDE;
 
     /**
      * @brief Handle rebuild font message
      */
-    virtual void OnRebuildFont();
+    virtual void OnRebuildFont() OVERRIDE;
 
     /**
      * @brief Check if rich text scaling is enabled

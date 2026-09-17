@@ -116,7 +116,7 @@ class SOUI_EXP SHostDialog : public THostWndProxy<IHostDialog> {
      */
     void OnCancel();
 
-    EVENT_MAP_BEGIN()
+    EVENT_MAP_BEGIN_OV()
         EVENT_ID_COMMAND(IDOK, OnOK)         /**< Maps the IDOK command to the OnOK method. */
         EVENT_ID_COMMAND(IDCANCEL, OnCancel) /**< Maps the IDCANCEL command to the OnCancel method. */
     EVENT_MAP_END2(SHostWnd)

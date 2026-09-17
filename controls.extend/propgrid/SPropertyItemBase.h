@@ -35,44 +35,44 @@ SNSBEGIN
 		}
 
 	public:
-        virtual BOOL HasButton() const {return FALSE;}
-        virtual int  GetLevel() const ;
-        virtual BOOL IsExpand() const ;
-        virtual void Expand(BOOL bExpend) ;
+        virtual BOOL HasButton() const  OVERRIDE{return FALSE;}
+        virtual int  GetLevel() const  OVERRIDE;
+        virtual BOOL IsExpand() const  OVERRIDE;
+        virtual void Expand(BOOL bExpend)  OVERRIDE;
 
-        virtual IPropertyItem * GetParent() const ;
-        virtual void SetParent(IPropertyItem * pParent);
-        virtual IPropertyItem * GetItem(PROPITEMTYPE type) const ;
-		virtual IPropertyItem * GetChildById(int nID) const;
+        virtual IPropertyItem * GetParent() const  OVERRIDE;
+        virtual void SetParent(IPropertyItem * pParent) OVERRIDE;
+        virtual IPropertyItem * GetItem(PROPITEMTYPE type) const  OVERRIDE;
+		virtual IPropertyItem * GetChildById(int nID) const OVERRIDE;
 
-        virtual SPropertyGrid * GetOwner() const ;
-        virtual BOOL InsertChild(IPropertyItem * pChild,IPropertyItem * pInsertAfter=IC_LAST);
-        virtual BOOL RemoveChild(IPropertyItem * pChild);
-        virtual int ChildrenCount() const;
+        virtual SPropertyGrid * GetOwner() const  OVERRIDE;
+        virtual BOOL InsertChild(IPropertyItem * pChild,IPropertyItem * pInsertAfter=IC_LAST) OVERRIDE;
+        virtual BOOL RemoveChild(IPropertyItem * pChild) OVERRIDE;
+        virtual int ChildrenCount() const OVERRIDE;
 
-		virtual SStringT GetTitle() const{return m_strTitle.IsEmpty()?S_CW2T(m_strName):m_strTitle;}
-        virtual void SetTitle(const SStringT & strName){m_strTitle=strName;}
-		virtual SStringW GetName2() const {return m_strName;}
-        virtual SStringT GetDescription() const {return m_strDescription;}
-        virtual void SetDescription(const SStringT & strDescription){m_strDescription =strDescription;}
-        virtual SStringT GetValue() const {return _T("");}
-        virtual void SetValue(const SStringT & strValue) {}
+		virtual SStringT GetTitle() const OVERRIDE{return m_strTitle.IsEmpty()?S_CW2T(m_strName):m_strTitle;}
+        virtual void SetTitle(const SStringT & strName) OVERRIDE{m_strTitle=strName;}
+		virtual SStringW GetName2() const  OVERRIDE{return m_strName;}
+        virtual SStringT GetDescription() const  OVERRIDE{return m_strDescription;}
+        virtual void SetDescription(const SStringT & strDescription) OVERRIDE{m_strDescription =strDescription;}
+        virtual SStringT GetValue() const  OVERRIDE{return _T("");}
+        virtual void SetValue(const SStringT & strValue)  OVERRIDE{}
 
-        virtual void AdjustInplaceActiveWndRect(CRect & rc){}
-        virtual void DrawItem(IRenderTarget *pRT,CRect rc){}
-        virtual BOOL IsInplaceActive() const {return m_bInplaceActive;}
-        virtual void OnInplaceActive(BOOL bActive){ m_bInplaceActive = bActive;}
-        virtual BOOL OnButtonClick(){ return FALSE;}
-        virtual void OnValueChanged();
-        virtual void OnChildValueChanged( IPropertyItem *pChild ){};
+        virtual void AdjustInplaceActiveWndRect(CRect & rc) OVERRIDE{}
+        virtual void DrawItem(IRenderTarget *pRT,CRect rc) OVERRIDE{}
+        virtual BOOL IsInplaceActive() const  OVERRIDE{return m_bInplaceActive;}
+        virtual void OnInplaceActive(BOOL bActive) OVERRIDE{ m_bInplaceActive = bActive;}
+        virtual BOOL OnButtonClick() OVERRIDE{ return FALSE;}
+        virtual void OnValueChanged() OVERRIDE;
+        virtual void OnChildValueChanged( IPropertyItem *pChild ) OVERRIDE{};
 		virtual SList<IPropertyItem*>* GetItemList(){return &m_childs;};
 		
-		virtual BOOL IsReadOnly() const{return m_bReadOnly;}
-		virtual void SetReadOnly(BOOL bReadOnly);
-		virtual SStringW GetExtendType() const;
+		virtual BOOL IsReadOnly() const OVERRIDE{return m_bReadOnly;}
+		virtual void SetReadOnly(BOOL bReadOnly) OVERRIDE;
+		virtual SStringW GetExtendType() const OVERRIDE;
 
-		IPropertyItem * FindChildByName(LPCWSTR pszName) const;
-		IPropertyItem * FindChildById(int nID);
+		IPropertyItem * FindChildByName(LPCWSTR pszName) const OVERRIDE;
+		IPropertyItem * FindChildById(int nID) OVERRIDE;
 		
         SOUI_ATTRS_BEGIN()
             ATTR_STRINGT(L"title",m_strTitle,TRUE)
@@ -84,7 +84,7 @@ SNSBEGIN
 			ATTR_STRINGW(L"extendType",m_strExType,FALSE)
         SOUI_ATTRS_END()
 
-        STDMETHOD_(BOOL,InitFromXml)(THIS_ IXmlNode * xmlNode);
+        STDMETHOD_(BOOL,InitFromXml)(THIS_ IXmlNode * xmlNode) OVERRIDE;
     protected:
         HRESULT OnAttrExpanded(const SStringW &  strValue,BOOL bLoading);
 

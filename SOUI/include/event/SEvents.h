@@ -335,15 +335,15 @@ class SOUI_EXP SEvtArgs : public TObjRefImpl<SObjectImpl<IEvtArgs>> {
         , public evtData {                             \
         DEF_SOBJECT(SEvtArgs, WIDESTR(evt_name))       \
       public:                                          \
-        STDMETHOD_(int, GetID)(THIS) const             \
+        STDMETHOD_(int, GetID)(THIS) const  OVERRIDE           \
         {                                              \
             return evt::EventID;                       \
         }                                              \
-        STDMETHOD_(LPCWSTR, GetName)(THIS) const       \
+        STDMETHOD_(LPCWSTR, GetName)(THIS) const  OVERRIDE     \
         {                                              \
             return evt::GetClassName();                \
         }                                              \
-        STDMETHOD_(LPVOID, Data)(THIS)                 \
+        STDMETHOD_(LPVOID, Data)(THIS)  OVERRIDE               \
         {                                              \
             return (evtData *)this;                    \
         }                                              \

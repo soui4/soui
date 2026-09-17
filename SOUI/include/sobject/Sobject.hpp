@@ -240,7 +240,7 @@ public:
 	 * @param nMaxCount Maximum number of strings to copy to the buffer.
 	 * @return int The number of strings copied to the buffer.
 	 */
-	STDMETHOD_(int, GetClassNameList)(CTHIS_ wchar_t ppClassNameList[][50], int nMaxCount) SCONST{
+	STDMETHOD_(int, GetClassNameList)(CTHIS_ wchar_t ppClassNameList[][50], int nMaxCount) SCONST OVERRIDE{
 		return 0;
 	}
 

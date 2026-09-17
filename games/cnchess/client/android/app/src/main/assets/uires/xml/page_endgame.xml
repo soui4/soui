@@ -51,12 +51,10 @@
     </window>
 
     <!-- 下部: 布局预览 + 详情 -->
-    <window name="wnd_eg_detail" size="-2,240" layout="vbox" gravity="center"
-            interval="6" padding="10,6,10,6">
-        <text name="txt_eg_detail_title" text="残局预览" colorText="@color/gold" font="size:14,bold" gravity="center"/>
+    <window name="wnd_eg_detail" size="-2,260" layout="vbox" gravity="center"
+            interval="6" padding="10,2,10,2">
         <text name="txt_eg_detail_intro" text="" colorText="@color/text_light" font="size:10" gravity="center"/>
-        <text name="txt_eg_detail_intro_desc" text="" wordBreak="1" colorText="@color/text_light" font="size:10"
-              gravity="center_vertical" size="-2,40" margin="0,2,0,4"/>
-        <chessboard name="chessboard_preview" size="-2,-2" weight="1" enableLayer="1" layout="anchor"/>
+        <text name="txt_eg_detail_intro_desc" text="" wordBreak="1" colorText="@color/text_light" font="size:10" size="-2,-1" multilines="1"/>
+        <chessboard name="chessboard_preview" size="-2,0" weight="1" enableLayer="1" layout="anchor"/>
     </window>
 </page>

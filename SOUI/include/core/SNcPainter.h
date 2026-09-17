@@ -80,7 +80,7 @@ class SOUI_EXP SNcPainter
      * @param pItem Pointer to the item.
      * @param bCapture TRUE if the item sets capture, FALSE otherwise.
      */
-    virtual void OnItemSetCapture(SOsrPanel *pItem, BOOL bCapture);
+    virtual void OnItemSetCapture(SOsrPanel *pItem, BOOL bCapture) OVERRIDE;
 
     /**
      * @brief Called to get the rectangle of an item.
@@ -88,15 +88,15 @@ class SOUI_EXP SNcPainter
      * @param rcItem Rectangle to receive the item's bounds.
      * @return TRUE if the rectangle is successfully retrieved, FALSE otherwise.
      */
-    virtual BOOL OnItemGetRect(const SOsrPanel *pItem, CRect &rcItem) const;
+    virtual BOOL OnItemGetRect(const SOsrPanel *pItem, CRect &rcItem) const OVERRIDE;
 
     /**
      * @brief Checks if item redraw is delayed.
      * @return TRUE if redraw is delayed, FALSE otherwise.
      */
-    virtual BOOL IsItemRedrawDelay() const;
+    virtual BOOL IsItemRedrawDelay() const OVERRIDE;
 
-    virtual BOOL IsTimelineEnabled() const
+    virtual BOOL IsTimelineEnabled() const OVERRIDE
     {
         return TRUE;
     }
@@ -104,7 +104,7 @@ class SOUI_EXP SNcPainter
      * @brief Gets the host object.
      * @return Pointer to the host object.
      */
-    virtual IObject *GetHost();
+    virtual IObject *GetHost() OVERRIDE;
 
   protected:
     /**
@@ -112,38 +112,38 @@ class SOUI_EXP SNcPainter
      * @param e Pointer to the event arguments.
      * @return TRUE if the event is handled, FALSE otherwise.
      */
-    virtual BOOL OnHostFireEvent(IEvtArgs *e);
+    virtual BOOL OnHostFireEvent(IEvtArgs *e) OVERRIDE;
 
     /**
      * @brief Checks if host updates are locked.
      * @return TRUE if updates are locked, FALSE otherwise.
      */
-    virtual BOOL IsHostUpdateLocked() const;
+    virtual BOOL IsHostUpdateLocked() const OVERRIDE;
 
     /**
      * @brief Checks if the host is visible.
      * @return TRUE if the host is visible, FALSE otherwise.
      */
-    virtual BOOL IsHostVisible() const;
+    virtual BOOL IsHostVisible() const OVERRIDE;
 
     /**
      * @brief Gets the rectangle of the host.
      * @return Rectangle of the host.
      */
-    virtual CRect GetHostRect() const;
+    virtual CRect GetHostRect() const OVERRIDE;
 
     /**
      * @brief Invalidates a rectangle in the host.
      * @param pRc Pointer to the rectangle to invalidate.
      * @param bClip TRUE to clip the rectangle, FALSE otherwise.
      */
-    virtual void InvalidateHostRect(LPCRECT pRc, BOOL bClip);
+    virtual void InvalidateHostRect(LPCRECT pRc, BOOL bClip) OVERRIDE;
 
     /**
      * @brief Gets the host container.
      * @return Pointer to the host container.
      */
-    virtual ISwndContainer *GetHostContainer();
+    virtual ISwndContainer *GetHostContainer() OVERRIDE;
 
     /**
      * @brief Called to get the host render target.
@@ -164,10 +164,10 @@ class SOUI_EXP SNcPainter
     /**
      * @brief Called when layout is dirty.
      */
-    virtual void OnLayoutDirty();
+    virtual void OnLayoutDirty() OVERRIDE;
 
     virtual LPCWSTR GetTrCtx() const
-    {
+     OVERRIDE{
         return NULL;
     }
 

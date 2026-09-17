@@ -20,9 +20,16 @@ static const char *  kZip_Psw = "souizip";
 
 
 inline SOUI::SStringT getSourceDir() {
+#ifdef SOUI_FUN_TEST_SOURCE_DIR
+	return SOUI::S_CA2T(SOUI_FUN_TEST_SOURCE_DIR);
+#else
 	SOUI::SStringA file(__FILE__);
-	file = file.Left(file.ReverseFind(PATH_SLASH));
+	int slash = file.ReverseFind('/');
+	int backslash = file.ReverseFind('\\');
+	if (backslash > slash) slash = backslash;
+	file = file.Left(slash);
 	return SOUI::S_CA2T(file);
+#endif
 }
 
 

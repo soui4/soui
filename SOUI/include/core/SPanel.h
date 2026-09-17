@@ -154,13 +154,13 @@ class SOUI_EXP SPanel
      * @brief Gets the client rectangle.
      * @param pRect Pointer to receive the client rectangle.
      */
-    virtual void WINAPI GetClientRect(LPRECT pRect) const;
+    virtual void WINAPI GetClientRect(LPRECT pRect) const OVERRIDE;
 
     /**
      * @brief Gets the client rectangle.
      * @return Client rectangle.
      */
-    virtual CRect GetClientRect() const;
+    virtual CRect GetClientRect() const OVERRIDE;
 
   protected:
     /** Inherited from IScrollBarHost */
@@ -282,20 +282,20 @@ class SOUI_EXP SPanel
      * @brief Handles colorization events.
      * @param cr Color reference.
      */
-    virtual void OnColorize(COLORREF cr);
+    virtual void OnColorize(COLORREF cr) OVERRIDE;
 
     /**
      * @brief Handles scale change events.
      * @param nScale New scale value.
      */
-    virtual void OnScaleChanged(int nScale);
+    virtual void OnScaleChanged(int nScale) OVERRIDE;
 
     /**
      * @brief Handles container change events.
      * @param pOldContainer Pointer to the old container.
      * @param pNewContainer Pointer to the new container.
      */
-    virtual void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer);
+    virtual void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer) OVERRIDE;
 
   protected:
     /**
@@ -669,7 +669,7 @@ class SOUI_EXP SScrollView : public TPanelProxy<IScrollView> {
      * @param nPos Position for the scroll.
      * @return TRUE if handled, FALSE otherwise.
      */
-    virtual BOOL OnScroll(BOOL bVertical, UINT uCode, int nPos);
+    virtual BOOL OnScroll(BOOL bVertical, UINT uCode, int nPos) OVERRIDE;
 
     /**
      * @brief Updates the scrollbar.

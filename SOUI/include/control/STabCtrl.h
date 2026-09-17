@@ -93,7 +93,7 @@ class SOUI_EXP STabPage : public TWindowProxy<ITabPage> {
      * @return Always returns FALSE to disable tooltips on the page.
      */
     virtual BOOL UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo)
-    {
+     OVERRIDE{
         return FALSE;
     }
 
@@ -264,7 +264,7 @@ class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
      * @param xmlNode XML node containing the tab page definitions.
      * @return TRUE if successful, otherwise FALSE.
      */
-    BOOL CreateChildren(SXmlNode xmlNode);
+    BOOL CreateChildren(SXmlNode xmlNode) OVERRIDE;
 
     /**
      * @brief Inserts a new tab page from an XML node.
@@ -334,11 +334,11 @@ class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
      * @return Dialog code.
      */
     virtual UINT WINAPI OnGetDlgCode() const
-    {
+     OVERRIDE{
         return SC_WANTARROWS;
     }
 
-    virtual BOOL UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo);
+    virtual BOOL UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo) OVERRIDE;
 
     /**
      * @brief Updates the positions of child windows.

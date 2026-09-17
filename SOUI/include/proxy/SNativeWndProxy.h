@@ -9,23 +9,23 @@ class TNativeWndProxy
 	, public SNativeWnd {
 public:
 	STDMETHOD_(long, AddRef)(THIS)
-	{
+	 OVERRIDE{
 		return SNativeWnd::AddRef();
 	}
 	STDMETHOD_(long, Release)(THIS)
-	{
+	 OVERRIDE{
 		return SNativeWnd::Release();
 	}
 	STDMETHOD_(void, OnFinalRelease)(THIS)
-	{
+	 OVERRIDE{
 		SNativeWnd::OnFinalRelease();
 	}
 	STDMETHOD_(int, GetID)(THIS) SCONST
-	{
+	 OVERRIDE{
 		return SNativeWnd::GetID();
 	}
 	STDMETHOD_(void, SetID)(THIS_ int nID)
-	{
+	 OVERRIDE{
 		return SNativeWnd::SetID(nID);
 	}
 
@@ -281,7 +281,7 @@ public:
 		COLORREF crKey,
 		BLENDFUNCTION *pblend,
 		DWORD dwFlags)
-	{
+	 OVERRIDE{
 		return SNativeWnd::UpdateLayeredWindow(hdcDst, pptDst, psize, hdcSrc, pptSrc, crKey, pblend,
 			dwFlags);
 	}

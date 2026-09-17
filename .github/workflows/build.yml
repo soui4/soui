@@ -110,6 +110,9 @@ jobs:
       if: matrix.os == 'macOS'
       run: ninja -C build
 
+    - name: Run unit, integration and core E2E checks
+      run: ctest --test-dir build -L '^soui-' --output-on-failure
+
     - name: Create file structure (Windows)
       if: matrix.os == 'Windows'
       run: tree /F /A | Out-File file_structure.txt
@@ -171,5 +174,3 @@ jobs:
       with:
         name: file_structure-${{ matrix.os }}-${{ matrix.arch }}
         path: file_structure.txt
-
-

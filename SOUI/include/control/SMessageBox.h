@@ -81,7 +81,7 @@ class SOUI_EXP SMessageBoxImpl
         EndDialog(uID);
     }
 
-    EVENT_MAP_BEGIN()
+    EVENT_MAP_BEGIN_OV()
         EVENT_ID_COMMAND_RANGE(IDOK, IDNO, OnBtnClick)
     EVENT_MAP_END2(SHostDialog)
 

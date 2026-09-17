@@ -162,20 +162,20 @@ class SOUI_EXP SComboBox : public TComboBaseProxy<IComboBox> {
      * @brief Handle scale change event
      * @param nScale Scale factor
      */
-    virtual void OnScaleChanged(int nScale);
+    virtual void OnScaleChanged(int nScale) OVERRIDE;
 
     /**
      * @brief Handle language change event
      * @return HRESULT
      */
-    virtual HRESULT OnLanguageChanged();
+    virtual HRESULT OnLanguageChanged() OVERRIDE;
 
     /**
      * @brief Create the list box
      * @param xmlNode XML node for the list box
      * @return TRUE if successful, FALSE otherwise
      */
-    virtual BOOL CreateListBox(SXmlNode xmlNode);
+    virtual BOOL CreateListBox(SXmlNode xmlNode) OVERRIDE;
 
     /**
      * @brief Get the height of the list box
@@ -187,18 +187,18 @@ class SOUI_EXP SComboBox : public TComboBaseProxy<IComboBox> {
      * @brief Handle creation of the dropdown window
      * @param pDropDown Dropdown window pointer
      */
-    virtual void OnCreateDropDown(SDropDownWnd *pDropDown);
+    virtual void OnCreateDropDown(SDropDownWnd *pDropDown) OVERRIDE;
 
     /**
      * @brief Handle destruction of the dropdown window
      * @param pDropDown Dropdown window pointer
      */
-    virtual void OnDestroyDropDown(SDropDownWnd *pDropDown);
+    virtual void OnDestroyDropDown(SDropDownWnd *pDropDown) OVERRIDE;
 
     /**
      * @brief Handle selection change in the dropdown window
      */
-    virtual void OnSelChanged();
+    virtual void OnSelChanged() OVERRIDE;
 
   protected:
     SListBox *m_pListBox; /**< Pointer to the list box */

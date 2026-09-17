@@ -667,7 +667,7 @@ class SOUI_EXP STreeCtrl
      * @brief Frees the memory associated with an item.
      * @param pItemData Pointer to the item data.
      */
-    virtual void OnNodeFree(LPTVITEM &pItemData);
+    virtual void OnNodeFree(LPTVITEM &pItemData) OVERRIDE;
 
     /**
      * @brief Handles the insertion of an item.

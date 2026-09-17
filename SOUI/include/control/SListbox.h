@@ -239,7 +239,7 @@ class SOUI_EXP SListBox : public TPanelProxy<IListBox> {
      * @brief Handle language change event
      * @return HRESULT
      */
-    virtual HRESULT OnLanguageChanged();
+    virtual HRESULT OnLanguageChanged() OVERRIDE;
 
     /**
      * @brief Handle scale change event
@@ -252,7 +252,7 @@ class SOUI_EXP SListBox : public TPanelProxy<IListBox> {
      * @param xmlNode XML node for the child items
      * @return TRUE if successful, FALSE otherwise
      */
-    virtual BOOL CreateChildren(SXmlNode xmlNode);
+    virtual BOOL CreateChildren(SXmlNode xmlNode) OVERRIDE;
 
     /**
      * @brief Load attributes for an item from XML
@@ -288,7 +288,7 @@ class SOUI_EXP SListBox : public TPanelProxy<IListBox> {
      * @brief Get the dialog code
      * @return Dialog code
      */
-    virtual UINT WINAPI OnGetDlgCode() const;
+    virtual UINT WINAPI OnGetDlgCode() const OVERRIDE;
 
   protected:
     /**

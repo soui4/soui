@@ -130,128 +130,128 @@ public:
 public:
     /// @brief Retrieves the length of the string.
     /// @return The length of the string.
-    STDMETHOD_(int, GetLength)(THIS) SCONST;
+    STDMETHOD_(int, GetLength)(THIS) SCONST OVERRIDE;
 
     /// @brief Checks if the string is empty.
     /// @return TRUE if the string is empty, FALSE otherwise.
-    STDMETHOD_(BOOL, IsEmpty)(THIS) SCONST;
+    STDMETHOD_(BOOL, IsEmpty)(THIS) SCONST OVERRIDE;
 
     /// @brief Empties the string.
-    STDMETHOD_(void, Empty)(THIS);
+    STDMETHOD_(void, Empty)(THIS) OVERRIDE;
 
     /// @brief Retrieves the character at a specified index.
     /// @param nIndex The index of the character.
     /// @return The character at the specified index.
-    STDMETHOD_(wchar_t, GetAt)(THIS_ int nIndex) SCONST;
+    STDMETHOD_(wchar_t, GetAt)(THIS_ int nIndex) SCONST OVERRIDE;
 
     /// @brief Sets the character at a specified index.
     /// @param nIndex The index of the character.
     /// @param ch The new character value.
-    STDMETHOD_(void, SetAt)(THIS_ int nIndex, wchar_t ch);
+    STDMETHOD_(void, SetAt)(THIS_ int nIndex, wchar_t ch) OVERRIDE;
 
     /// @brief Retrieves a C-style string representation of the string.
     /// @return A pointer to the C-style string.
-    STDMETHOD_(const wchar_t *, c_str)(THIS) SCONST;
+    STDMETHOD_(const wchar_t *, c_str)(THIS) SCONST OVERRIDE;
 
     /// @brief Compares the string with another string.
     /// @param psz The string to compare with.
     /// @return An integer less than, equal to, or greater than zero if the string is found, respectively, to be less than, to match, or be greater than psz.
-    STDMETHOD_(int, Compare)(THIS_ const wchar_t* psz) SCONST;
+    STDMETHOD_(int, Compare)(THIS_ const wchar_t* psz) SCONST OVERRIDE;
 
     /// @brief Compares the string with another string, ignoring case.
     /// @param psz The string to compare with.
     /// @return An integer less than, equal to, or greater than zero if the string is found, respectively, to be less than, to match, or be greater than psz.
-    STDMETHOD_(int, CompareNoCase)(THIS_ const wchar_t* psz) SCONST;
+    STDMETHOD_(int, CompareNoCase)(THIS_ const wchar_t* psz) SCONST OVERRIDE;
 
     /// @brief Trims leading and trailing whitespace characters from the string.
-    STDMETHOD_(void, TrimBlank)(THIS);
+    STDMETHOD_(void, TrimBlank)(THIS) OVERRIDE;
 
     /// @brief Inserts a character at a specified index.
     /// @param nIndex The index at which to insert the character.
     /// @param ch The character to insert.
     /// @return The new length of the string.
-    STDMETHOD_(int, InsertChar)(THIS_ int nIndex, wchar_t ch);
+    STDMETHOD_(int, InsertChar)(THIS_ int nIndex, wchar_t ch) OVERRIDE;
 
     /// @brief Inserts a substring at a specified index.
     /// @param nIndex The index at which to insert the substring.
     /// @param psz The substring to insert.
     /// @return The new length of the string.
-    STDMETHOD_(int, Insert)(THIS_ int nIndex, const wchar_t* psz);
+    STDMETHOD_(int, Insert)(THIS_ int nIndex, const wchar_t* psz) OVERRIDE;
 
     /// @brief Deletes a substring from the string.
     /// @param nIndex The index at which to start deletion.
     /// @param nCount The number of characters to delete.
     /// @return The new length of the string.
-    STDMETHOD_(int, Delete)(THIS_ int nIndex, int nCount = 1);
+    STDMETHOD_(int, Delete)(THIS_ int nIndex, int nCount = 1) OVERRIDE;
 
     /// @brief Replaces all occurrences of a character with another character.
     /// @param chOld The character to replace.
     /// @param chNew The character to replace with.
     /// @return The number of characters replaced.
-    STDMETHOD_(int, ReplaceChar)(THIS_ wchar_t chOld, wchar_t chNew);
+    STDMETHOD_(int, ReplaceChar)(THIS_ wchar_t chOld, wchar_t chNew) OVERRIDE;
 
     /// @brief Replaces all occurrences of a substring with another substring.
     /// @param pszOld The substring to replace.
     /// @param pszNew The substring to replace with.
     /// @return The number of substrings replaced.
-    STDMETHOD_(int, Replace)(THIS_ const wchar_t* pszOld, const wchar_t* pszNew);
+    STDMETHOD_(int, Replace)(THIS_ const wchar_t* pszOld, const wchar_t* pszNew) OVERRIDE;
 
     /// @brief Removes all occurrences of a character from the string.
     /// @param chRemove The character to remove.
     /// @return The number of characters removed.
-    STDMETHOD_(int, Remove)(THIS_ wchar_t chRemove);
+    STDMETHOD_(int, Remove)(THIS_ wchar_t chRemove) OVERRIDE;
 
     /// @brief Finds the first occurrence of a character in the string.
     /// @param ch The character to find.
     /// @param nStart The index at which to start the search.
     /// @return The index of the first occurrence of the character, or -1 if not found.
-    STDMETHOD_(int, FindChar)(THIS_ wchar_t ch, int nStart DEF_VAL(0)) SCONST;
+    STDMETHOD_(int, FindChar)(THIS_ wchar_t ch, int nStart DEF_VAL(0)) SCONST OVERRIDE;
 
     /// @brief Finds the last occurrence of a character in the string.
     /// @param ch The character to find.
     /// @return The index of the last occurrence of the character, or -1 if not found.
-    STDMETHOD_(int, ReverseFind)(THIS_ wchar_t ch) SCONST;
+    STDMETHOD_(int, ReverseFind)(THIS_ wchar_t ch) SCONST OVERRIDE;
 
     /// @brief Finds the first occurrence of a substring in the string.
     /// @param pszSub The substring to find.
     /// @param nStart The index at which to start the search.
     /// @return The index of the first occurrence of the substring, or -1 if not found.
-    STDMETHOD_(int, Find)(THIS_ const wchar_t* pszSub, int nStart DEF_VAL(0)) SCONST;
+    STDMETHOD_(int, Find)(THIS_ const wchar_t* pszSub, int nStart DEF_VAL(0)) SCONST OVERRIDE;
 
     /// @brief Retrieves a modifiable buffer for the string.
     /// @param nMinBufLength The minimum buffer length.
     /// @return A pointer to the buffer.
-    STDMETHOD_(wchar_t*, GetBuffer)(THIS_ int nMinBufLength DEF_VAL(-1));
+    STDMETHOD_(wchar_t*, GetBuffer)(THIS_ int nMinBufLength DEF_VAL(-1)) OVERRIDE;
 
     /// @brief Releases the buffer and sets the new length of the string.
     /// @param nNewLength The new length of the string.
-    STDMETHOD_(void, ReleaseBuffer)(THIS_ int nNewLength DEF_VAL(-1));
+    STDMETHOD_(void, ReleaseBuffer)(THIS_ int nNewLength DEF_VAL(-1)) OVERRIDE;
 
     /// @brief Retrieves a modifiable buffer for the string and sets the new length.
     /// @param nNewLength The new length of the string.
     /// @return A pointer to the buffer.
-    STDMETHOD_(wchar_t*, GetBufferSetLength)(THIS_ int nNewLength);
+    STDMETHOD_(wchar_t*, GetBufferSetLength)(THIS_ int nNewLength) OVERRIDE;
 
     /// @brief Sets the length of the string.
     /// @param nLength The new length of the string.
-    STDMETHOD_(void, SetLength)(THIS_ int nLength);
+    STDMETHOD_(void, SetLength)(THIS_ int nLength) OVERRIDE;
 
     /// @brief Copies the contents of another string into this string.
     /// @param src The string to copy from.
-    STDMETHOD_(void, Copy)(THIS_ const IStringW* src);
+    STDMETHOD_(void, Copy)(THIS_ const IStringW* src) OVERRIDE;
 
     /// @brief Assigns a character array to the string.
     /// @param src The character array to assign.
-    STDMETHOD_(void, Assign)(THIS_ LPCWSTR src);
+    STDMETHOD_(void, Assign)(THIS_ LPCWSTR src) OVERRIDE;
 
     /// @brief Assigns a substring of a character array to the string.
     /// @param src The character array to assign.
     /// @param nLen The length of the substring.
-    STDMETHOD_(void, Assign2)(THIS_ LPCWSTR src, int nLen);
+    STDMETHOD_(void, Assign2)(THIS_ LPCWSTR src, int nLen) OVERRIDE;
 
     /// @brief Retrieves private data associated with the string.
     /// @return A pointer to the private data.
-    STDMETHOD_(LPVOID, GetPrivData)(THIS) SCONST;
+    STDMETHOD_(LPVOID, GetPrivData)(THIS) SCONST OVERRIDE;
 
     /// @brief Converts the string to uppercase.
     STDMETHOD_(void, ToUpper)(THIS) OVERRIDE;
