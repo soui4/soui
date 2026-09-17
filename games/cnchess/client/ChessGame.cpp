@@ -264,8 +264,7 @@ void CChessGame::onAnimationEnd(IValueAnimator *pAnimator)
             }
         }
         SLOGI() << "move animation done, restore msg receive";
-        m_canHandleMsg = TRUE;
-        PumpMessage();
+        BLockReceive(FALSE);
     }else if(pPropAnimator->GetID() == ANI_UP_MOVE){
         CChessPiece *pPiece = (CChessPiece *)pPropAnimator->GetTarget();
         POINT ptTarget = pPiece->GetTarget();
@@ -1131,21 +1130,6 @@ void CChessGame::OnDisconnected()
 #endif
 }
 
-void CChessGame::PumpMessage() {
-    while (m_canHandleMsg && !m_lstPendingMsg.empty()) {
-        auto msg = m_lstPendingMsg.front();
-        m_lstPendingMsg.pop_front();
-        _OnMessage(msg.first, msg.second);
-    }
-}
-
-BOOL CChessGame::OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE> > data)
-{
-    m_lstPendingMsg.push_back(std::make_pair(dwType, data));
-    PumpMessage();
-    return TRUE;
-}
-
 BOOL CChessGame::_OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE> > data)
 {
     const LPBYTE pMsg = data ? data->data() : NULL;
@@ -1321,7 +1305,7 @@ void CChessGame::OnMoveChess(const void *pData, int nSize)
         SelectAndMovePiece(nChessID, pMove->ptEnd);
     }
     SLOGI() << "block msg receive, Move chess from=" << pMove->ptBegin << " to=" << pMove->ptEnd;
-    m_canHandleMsg = FALSE; //enable handle msg;
+	BLockReceive(TRUE);
 }
 
 void CChessGame::OnReqPeace(const void *pData, int nSize){

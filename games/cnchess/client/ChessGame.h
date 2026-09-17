@@ -5,7 +5,7 @@
 #include <protocol.h>
 #include "events.h"
 #include "SGameTheme.h"
-#include "WebSocketClient.h"
+#include "WsClientListener.h"
 #include "ConnListener-i.h"
 #include <sobject/Sobject.hpp>
 #include <helper/obj-ref-impl.hpp>
@@ -25,7 +25,7 @@ class CMainDlg;
  * 3. 游戏数据管理
  * 4. 与UI的交互
  */
-class CChessGame : public TObjRefImpl<SObject>, public WebSocketClient::IListener, public IConnListener2, public IAnimatorListener
+class CChessGame : public TObjRefImpl<SObject>, public WsClientListener, public IConnListener2, public IAnimatorListener
 {
     DEF_SOBJECT(SObject, L"chessgame")     // 定义SObject的类名和类别名
     
@@ -136,15 +136,6 @@ public:
      * @brief WebSocket连接断开回调
      */
     void OnDisconnected() override;
-    
-    /**
-     * @brief 处理收到的网络消息
-     * @param dwType 消息类型
-     * @param data 消息数据
-     * @return 是否处理成功
-     */
-    BOOL OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE> > data) override;    
-    
 public:
     static POINT CALLBACK ChessAnchor2Pos(const AnchorPos &pos, const CRect &rcParent, const CSize & szChild, int nScale, void * userData);   
     void OnGameBoardSizeChanged(IEvtArgs *e);
@@ -309,10 +300,6 @@ protected:
     BOOL CheckMove(POINT ptFrom,POINT ptTo, BOOL bSilent=FALSE);
 private:
     BOOL _OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE> > data);
-    void PumpMessage();
-
-    std::list < std::pair<DWORD, std::shared_ptr<std::vector<BYTE> > > > m_lstPendingMsg;
-    BOOL m_canHandleMsg;
 private:
     CMainDlg* m_pMainDlg;               ///< 主窗口指针
     CChessBoard * m_pGameBoard;         ///< 游戏面板

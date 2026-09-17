@@ -35,9 +35,10 @@ class WebSocketClient
 {
 	friend class WebSocketConnListener;
 public:
+	typedef std::shared_ptr<std::vector<BYTE> > MSGDATA;
 	struct IListener
 	{
-		virtual BOOL OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE> > data) = 0;
+		virtual BOOL OnMessage(DWORD dwType, MSGDATA data) = 0;
 	};
 public:
 
