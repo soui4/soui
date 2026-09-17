@@ -34,22 +34,27 @@ BOOL SWkeLoader::Init(LPCTSTR pszDll)
 {
     if (m_hModWke)
         return TRUE;
-    HMODULE m_hModWke = LoadLibrary(pszDll);
-    if (!m_hModWke)
+    HMODULE hModWke = LoadLibrary(pszDll);
+    if (!hModWke)
         return FALSE;
-    m_funWkeInit = (FunWkeInit)GetProcAddress(m_hModWke, "wkeInit");
-    m_funWkeShutdown = (FunWkeShutdown)GetProcAddress(m_hModWke, "wkeShutdown");
-    m_funWkeCreateWebView = (FunWkeCreateWebView)GetProcAddress(m_hModWke, "wkeCreateWebView");
-    m_funWkeDestroyWebView = (FunWkeDestroyWebView)GetProcAddress(m_hModWke, "wkeDestroyWebView");
+    m_funWkeInit = (FunWkeInit)GetProcAddress(hModWke, "wkeInit");
+    m_funWkeShutdown = (FunWkeShutdown)GetProcAddress(hModWke, "wkeShutdown");
+    m_funWkeCreateWebView = (FunWkeCreateWebView)GetProcAddress(hModWke, "wkeCreateWebView");
+    m_funWkeDestroyWebView = (FunWkeDestroyWebView)GetProcAddress(hModWke, "wkeDestroyWebView");
     if (!m_funWkeInit || !m_funWkeShutdown || !m_funWkeCreateWebView || !m_funWkeDestroyWebView)
     {
-        FreeLibrary(m_hModWke);
+        FreeLibrary(hModWke);
         return FALSE;
     }
     m_funWkeInit();
+    m_hModWke = hModWke;
     return TRUE;
 }
 
+BOOL SWkeLoader::IsLoaded() const
+{
+    return m_hModWke != NULL;
+}
 //////////////////////////////////////////////////////////////////////////
 // SWkeWebkit
 
