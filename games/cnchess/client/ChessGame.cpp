@@ -1536,7 +1536,6 @@ void CChessGame::OnGameOver(const void *pData, int nSize)
     MSG_GAMEOVER *pOver = (MSG_GAMEOVER *)pData;
     SStringT strDesc = S_CA2T(pOver->szDesc, CP_UTF8);
     SLOGI() << "Game over, desc: " << strDesc.c_str();
-    m_pMainDlg->PlayTip(strDesc);
     m_pMainDlg->KillTimer(TIMERID_CLOCK_ME);
     m_pMainDlg->KillTimer(TIMERID_CLOCK_ENEMY);
     for(int i = 0; i < PLAYER_COUNT; i++){
@@ -1556,6 +1555,8 @@ void CChessGame::OnGameOver(const void *pData, int nSize)
             {
                 PlayEffectSound(Sounds::Effects::kGameWin);
             }
+        }else{
+                m_pMainDlg->PlayTip(strDesc);
         }
         SGifPlayer *pVectory = (SGifPlayer *)m_pTheme->GetWidget(Sprites::sprite_vectory);
         m_pGameBoard->InsertIChild(pVectory);
@@ -1577,6 +1578,8 @@ void CChessGame::OnGameOver(const void *pData, int nSize)
             {
                 PlayEffectSound(Sounds::Effects::kGameOver);
             }
+        }else{
+                m_pMainDlg->PlayTip(strDesc);
         }
     }else{
         m_roundResult = RESULT_DRAW;
