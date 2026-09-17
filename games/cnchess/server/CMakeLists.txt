@@ -87,7 +87,7 @@ add_custom_command(TARGET ${current_project} POST_BUILD
 )
 
 # 复制 config.xml 到可执行文件目录(与服务器 server.cpp 中 ./config.xml 的加载路径对齐)
-set(SERVER_CONFIG_OUT ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIGURATION>)
+set(SERVER_CONFIG_OUT ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIGURATION>/config)
 add_custom_command(TARGET ${current_project} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E make_directory ${SERVER_CONFIG_OUT}
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
