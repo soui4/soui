@@ -1,0 +1,4 @@
+<window name="core_root" layout="vbox" width="240" height="80">
+    <text name="status" text="Ready" size="-2,30"/>
+    <button name="action" text="Continue" size="100,30"/>
+</window>
