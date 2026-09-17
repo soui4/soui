@@ -1,5 +1,4 @@
 add_subdirectory(algorithm)
-set(SOUI_ENABLE_GAME_TEST ON)
 if(SOUI_ENABLE_GAME_TEST)
 add_subdirectory(test)
 endif()
