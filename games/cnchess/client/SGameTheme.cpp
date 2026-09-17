@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "SGameTheme.h"
-
+#include "myprofile.h"
 SNSBEGIN
 
 
@@ -120,11 +120,8 @@ IAnimation *SGameTheme::GetAnimation(LPCWSTR pszName)
     return nullptr;
 }
 
-
-SStringW SGameTheme::GetEffectSoundFile(LPCWSTR pszName)
-{
-    SXmlNode xmlEffect = m_docSounds.root().first_child().child(L"effects").first_child();
-    while (xmlEffect)
+static SStringW findEffect(SXmlNode xmlEffect, LPCWSTR pszName) {
+    while (pszName && xmlEffect)
     {
         SStringW name = xmlEffect.attribute(L"name").as_string();
         if (name == pszName)
@@ -140,6 +137,18 @@ SStringW SGameTheme::GetEffectSoundFile(LPCWSTR pszName)
         xmlEffect = xmlEffect.next_sibling();
     }
     return L"";
+}
+
+SStringW SGameTheme::GetEffectSoundFile(LPCWSTR pszName)
+{
+    SXmlNode xmlEffect = m_docSounds.root().first_child().child(L"effects").first_child();
+    SStringW ret = findEffect(xmlEffect, pszName);
+    if (!ret.IsEmpty())
+        return ret;
+    MyProfile* myprofile = MyProfile::getSingletonPtr();
+    int sex = myprofile->GetSex();
+    xmlEffect = m_docSounds.root().first_child().child(L"processes").child(sex==0?L"male":L"female").first_child();
+    return findEffect(xmlEffect, pszName);
 }
 
 SNSEND

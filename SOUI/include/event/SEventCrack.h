@@ -18,6 +18,13 @@
         UINT uCode = pEvt->GetID();                \
         UINT nCount = 0;
 
+#define EVENT_MAP_BEGIN_OV()                                \
+  public:                                                   \
+    virtual BOOL _HandleEvent(SNS::IEvtArgs *pEvt) OVERRIDE \
+    {                                                       \
+        UINT uCode = pEvt->GetID();                         \
+        UINT nCount = 0;
+
 #define EVENT_MAP_DECLEAR() \
   protected:                \
     virtual BOOL _HandleEvent(SNS::IEvtArgs *pEvt);

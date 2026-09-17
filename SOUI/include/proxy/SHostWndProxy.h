@@ -20,23 +20,23 @@ public:
 
 public:
 	STDMETHOD_(long, AddRef)(THIS)
-	{
+	 OVERRIDE{
 		return SHostWnd::AddRef();
 	}
 	STDMETHOD_(long, Release)(THIS)
-	{
+	 OVERRIDE{
 		return SHostWnd::Release();
 	}
 	STDMETHOD_(void, OnFinalRelease)(THIS)
-	{
+	 OVERRIDE{
 		SHostWnd::OnFinalRelease();
 	}
 	STDMETHOD_(int, GetID)(THIS) SCONST
-	{
+	 OVERRIDE{
 		return SHostWnd::GetID();
 	}
 	STDMETHOD_(void, SetID)(THIS_ int nID)
-	{
+	 OVERRIDE{
 		return SHostWnd::SetID(nID);
 	}
 
@@ -296,7 +296,7 @@ public:
 		COLORREF crKey,
 		BLENDFUNCTION *pblend,
 		DWORD dwFlags)
-	{
+	 OVERRIDE{
 		return SHostWnd::UpdateLayeredWindow(hdcDst, pptDst, psize, hdcSrc, pptSrc, crKey, pblend,
 			dwFlags);
 	}
@@ -311,12 +311,12 @@ public:
 
 	STDMETHOD_(HWND, CreateEx)
     (THIS_ HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight, IXmlNode *xmlInit DEF_VAL(NULL))
-	{
+	 OVERRIDE{
         return SHostWnd::CreateEx(hWndParent, dwStyle, dwExStyle, x, y, nWidth, nHeight, xmlInit);
 	}
 	STDMETHOD_(HWND, Create)
 		(THIS_ HWND hWndParent, int x = 0, int y = 0, int nWidth = 0, int nHeight = 0)
-	{
+	 OVERRIDE{
 		return SHostWnd::Create(hWndParent, x, y, nWidth, nHeight);
 	}
 
@@ -395,7 +395,7 @@ public:
 	STDMETHOD_(void, EnablePrivateUiDef)(THIS_ BOOL bEnable) OVERRIDE{
 		return SHostWnd::EnablePrivateUiDef(bEnable);
 	}
-	STDMETHOD_(void, SetScale)(THIS_ int nScale,LPCRECT pDestRect){
+	STDMETHOD_(void, SetScale)(THIS_ int nScale,LPCRECT pDestRect) OVERRIDE{
 		return SHostWnd::SetScale(nScale,pDestRect);
 	}
 

@@ -9,7 +9,7 @@
       <imgbtn name="btn_webkit_back" skin="skin_webbtn_back" alpha="128"/>
       <imgbtn name="btn_webkit_fore" skin="skin_webbtn_forward"/>
       <imgbtn name="btn_webkit_refresh" skin="skin_webbtn_refresh"/>
-      <edit size="0,-2" weight="1" class="cls_edit" name="edit_url">http://www.cnblogs.com/setoutsoft/</edit>
+      <edit size="0,-2" weight="1" class="cls_edit" name="edit_url">https://www.cnblogs.com/setoutsoft/</edit>
       <button size="50,-2" name="btn_webkit_go">go</button>
     </window>
   </window>

@@ -5,6 +5,7 @@
 #include "CnchessSkin.h"
 #include "ChessBoard.h"
 #include "ChessPiece.h"
+#include "SRatingBar.h"
 #include <helper/slog.h>
 
 #if defined(__IOS__)
@@ -49,6 +50,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
     app.RegisterWindowClass<SGifPlayer>();
     app.RegisterWindowClass<CChessBoard>();
     app.RegisterWindowClass<CChessPiece>();
+    app.RegisterWindowClass<SOUI::SRatingBar>();
     SStringT appDir = app.GetAppDir();
 
     SAppCfg cfg;
@@ -80,6 +82,8 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
     {
         return -1;
     }
+    // 覆盖系统 MessageBox 模板: 使用与游戏主题一致的弹窗样式(深木色+金色)
+    app.SetMessageBoxTemplateResId(_T("LAYOUT:XML_MSGBOX"));
 #ifndef _WIN32
     // 加载宋体字体
     #ifdef __APPLE__

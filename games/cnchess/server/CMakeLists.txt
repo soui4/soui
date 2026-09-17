@@ -2,6 +2,7 @@
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${PROJECT_SOURCE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/config)
+include_directories(${PROJECT_SOURCE_DIR}/third-part/jsoncpp/include)
 include_directories(${PROJECT_SOURCE_DIR}/utilities/include)
 include_directories(${PROJECT_SOURCE_DIR}/SOUI/include)
 include_directories(${PROJECT_SOURCE_DIR}/components)
@@ -30,10 +31,8 @@ add_executable(${current_project}
 target_link_libraries(${current_project}
     utilities4
     cnchess_algorithm
-    ws
-    log4z
+    jsoncpp
 )
-
 
 if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
     target_link_libraries(${current_project} swinx)
@@ -75,6 +74,27 @@ else()
         COMMENT "Packaging ${MOBILE_ZIP_NAME}"
     )
 endif()
+
+# 复制残局配置 endgames.json 到可执行文件目录下的 config/ 子目录
+# (与服务器 WebSocketGame.cpp 中 {exe_dir}/config/endgames.json 的加载路径对齐)
+set(ENDGAME_CONFIG_OUT ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIGURATION>/config)
+add_custom_command(TARGET ${current_project} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${ENDGAME_CONFIG_OUT}
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${CMAKE_CURRENT_SOURCE_DIR}/config/endgames.json
+        ${ENDGAME_CONFIG_OUT}/endgames.json
+    COMMENT "Copying endgames.json"
+)
+
+# 复制 config.xml 到可执行文件目录(与服务器 server.cpp 中 ./config.xml 的加载路径对齐)
+set(SERVER_CONFIG_OUT ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIGURATION>/config)
+add_custom_command(TARGET ${current_project} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${SERVER_CONFIG_OUT}
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${CMAKE_CURRENT_SOURCE_DIR}/config/config.xml
+        ${SERVER_CONFIG_OUT}/config.xml
+    COMMENT "Copying config.xml"
+)
 
 set_target_properties (${current_project} PROPERTIES
     FOLDER "games/cnchess"

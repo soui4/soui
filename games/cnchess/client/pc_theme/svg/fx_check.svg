@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 140" width="260" height="140">
+  <defs>
+    <linearGradient id="bolt" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFF3B0"/>
+      <stop offset="0.45" stop-color="#FFD700"/>
+      <stop offset="1" stop-color="#E8890C"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="130" cy="70" r="62" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFD700" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#C0392B" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <circle cx="130" cy="70" r="62" fill="url(#glow)"/>
+
+  <!-- alarm arcs -->
+  <path d="M84,30 A60,60 0 0 1 176,30" fill="none" stroke="#C0392B" stroke-width="5" stroke-linecap="round" stroke-opacity="0.9"/>
+  <path d="M84,110 A60,60 0 0 0 176,110" fill="none" stroke="#C0392B" stroke-width="5" stroke-linecap="round" stroke-opacity="0.9"/>
+
+  <!-- lightning bolt -->
+  <path d="M147,14 L104,72 L127,72 L110,126 L160,62 L136,62 Z" fill="url(#bolt)" stroke="#8B4513" stroke-width="2" stroke-linejoin="round"/>
+
+  <!-- sparkles -->
+  <path d="M52,70 L55,78 L63,81 L55,84 L52,92 L49,84 L41,81 L49,78 Z" fill="#FFD700"/>
+  <path d="M208,70 L211,78 L219,81 L211,84 L208,92 L205,84 L197,81 L205,78 Z" fill="#FFD700"/>
+</svg>

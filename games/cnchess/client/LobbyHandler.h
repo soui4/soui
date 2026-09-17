@@ -5,8 +5,9 @@
 #include <helper/obj-ref-impl.hpp>
 #include "WebSocketClient.h"
 #include "ConnListener-i.h"
+#include "protocol.h"
 class CTableAdapter;
-
+class CMainDlg;
 /**
  * @brief 大厅处理器类
  * 
@@ -22,19 +23,21 @@ public:
     /**
      * @brief 构造函数
      */
-    LobbyHandler();
+    LobbyHandler(CMainDlg *pMainDlg);
     
     /**
      * @brief 析构函数
      */
     virtual ~LobbyHandler();
 
+    void SetWebSocket(WebSocketClient* pWs);
+
     /**
      * @brief 初始化大厅处理器
      * @param pRoot 根窗口指针
      * @param pWs WebSocket客户端指针
      */
-    void Init(SWindow *pRoot, WebSocketClient *pWs);
+    void Init(SWindow *pRoot);
 
 public:
     /**
@@ -87,6 +90,14 @@ private:
      * @return 是否处理成功
      */
     BOOL OnSeatDownAck(const void *lpData, int nSize);
+
+    /**
+     * @brief 处理邀请机器人入座确认
+     * @param lpData 消息数据指针
+     * @param nSize 消息数据大小
+     * @return 是否处理成功
+     */
+    BOOL OnRobotInviteAck(const void *lpData, int nSize);
     
     /**
      * @brief 处理登录确认消息
@@ -95,18 +106,40 @@ private:
      * @return 是否处理成功
      */
     BOOL OnLoginAck(const void *lpData, int nSize);
-    
+
+    /**
+     * @brief 机器人对战桌坐满后自动就绪并跳转到对局页(与残局页一致)
+     * @param pInfo 桌子信息
+     */
+    void TryAutoStart(GAME_TABLE_INFO *pInfo);
+
     /**
      * @brief 请求坐下
      * @param iTable 桌号
      * @param iSeat 座位号
      */
     void ReqSeatDown(int iTable, int iSeat);
+
+    /**
+     * @brief 请求邀请机器人入座
+     * @param iTable 桌号
+     * @param iSeat 目标座位号
+     * @param nLevel 机器人智力等级(ROBOT_LEVEL_*)
+     */
+    void ReqRobotInvite(int iTable, int iSeat, int nLevel);
+
+    /**
+     * @brief 弹出提示消息框
+     * @param pszMsg 提示内容
+     */
+    void NotifyToast(LPCTSTR pszMsg);
     
   private:
     SWindow *m_pRoot;              ///< 根窗口指针
     WebSocketClient *m_ws;         ///< WebSocket客户端指针
     CTableAdapter *m_pAdapter;     ///< 桌子适配器指针
+    CMainDlg *m_pMainDlg;
+    bool m_bRobotAutoStart;        ///< 邀请机器人成功后武装, 桌子坐满即自动开局
 };
 
 #endif//LOBBYHANDLER_H

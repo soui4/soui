@@ -37,7 +37,7 @@ class SPropertyItemText : public SPropertyItemBase {
     SOUI_ATTRS_END()
 
   protected:
-    virtual void OnInplaceActive(BOOL bActive);
+    virtual void OnInplaceActive(BOOL bActive) OVERRIDE;
 
   protected:
     SStringT m_strValue;

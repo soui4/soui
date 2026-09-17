@@ -48,6 +48,8 @@ public:
      */
     static SAutoRefPtr<IValueAnimator> MoveSpriteTo(IWindow *pSprite, AnchorPos toPos, int nSpeed);
 
+    static SAutoRefPtr<IValueAnimator> MoveAndHideSprite(IWindow* pSprite, AnchorPos fromPos, AnchorPos toPos, int nSpeed);
+
     /**
      * @brief 移动并隐藏精灵窗口
      * @param pSprite 精灵对象

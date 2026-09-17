@@ -71,7 +71,7 @@ set(SWINX_DIR ${SOUI_ROOT_DIR}/swinx)
 set(UTILITIES_DIR ${SOUI_ROOT_DIR}/utilities)
 set(COMPONENTS_DIR ${SOUI_ROOT_DIR}/components)
 set(THIRD_PART_DIR ${SOUI_ROOT_DIR}/third-part)
-
+set(EXTENDCTRL_DIR ${SOUI_ROOT_DIR}/controls.extend)
 #=============================================================================
 # Compile Definitions for Android
 #=============================================================================
@@ -127,7 +127,7 @@ add_subdirectory(${SOUI_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/SOUI)
 add_subdirectory(${THIRD_PART_DIR} ${CMAKE_CURRENT_BINARY_DIR}/third_part)
 # 5. components (组件，依赖 soui4 和 third-part)
 add_subdirectory(${COMPONENTS_DIR} ${CMAKE_CURRENT_BINARY_DIR}/components)
-
+add_subdirectory(${EXTENDCTRL_DIR} ${CMAKE_CURRENT_BINARY_DIR}/controls.extend)
 #=============================================================================
 # soui4android Library（Android JNI 桥，库名保持 soui4android）
 #=============================================================================

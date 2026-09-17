@@ -312,7 +312,7 @@ class SOUI_EXP SListCtrl : public SPanel {
      * @param xmlNode XML node for the child items
      * @return TRUE if successful, FALSE otherwise
      */
-    virtual BOOL CreateChildren(SXmlNode xmlNode);
+    virtual BOOL CreateChildren(SXmlNode xmlNode) OVERRIDE;
 
     /**
      * @brief Hit test to determine the item under the mouse
@@ -404,7 +404,7 @@ class SOUI_EXP SListCtrl : public SPanel {
      * @param nPos Scroll position
      * @return TRUE if handled, FALSE otherwise
      */
-    virtual BOOL OnScroll(BOOL bVertical, UINT uCode, int nPos);
+    virtual BOOL OnScroll(BOOL bVertical, UINT uCode, int nPos) OVERRIDE;
 
     /**
      * @brief Handle left mouse button double-click event

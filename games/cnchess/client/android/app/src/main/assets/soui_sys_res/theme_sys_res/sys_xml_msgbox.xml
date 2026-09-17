@@ -1,41 +1,47 @@
-<SOUI title="mesagebox" width="-1" height="-1" appwin="0"  minSize="300,132" resize="0" translucent="1" trCtx="messagebox">
-  <style>
-    <text.caption colorText="#e3e7eb"/>
-    <text.msg colorText="#c1c3c5"/>
-    <class name="normalbtn" skin="_skin.sys.btn.normal" font="" colorText="#e3e7eb" colorTextDisable="#91a7c0" textMode="0x25" cursor="hand" margin-x="0"/>
-  </style>
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 象棋游戏主题 MessageBox 模板: 深木色面板+金色装饰, 与游戏内弹窗(dlg_confirm_modal 等)风格一致.
+     button1st 恒为肯定项(OK/Yes/Retry, 红色主按钮), button2nd/3rd 为深木色次按钮.
+     PC 端由 main.cc 调 SetMessageBoxTemplateResId(LAYOUT:XML_MSGBOX) 启用;
+     移动端直接替换各自打包的 soui_sys_res/theme_sys_res/sys_xml_msgbox.xml. -->
+<SOUI title="msgbox" width="-1" height="-1" appwin="0" minSize="320,150" resize="0" translucent="1" trCtx="messagebox">
   <buttonText>
-    <ok accel="Ctrl+O">确定(&O)</ok>
-    <cancel accel="Ctrl+C">取消(&C)</cancel>
-    <abort accel="Ctrl+A">中止(&A)</abort>
-    <retry accel="Ctrl+R">重试(&R)</retry>
-    <yes accel="Ctrl+Y">是(&Y)</yes>
-    <no accel="Ctrl+N">否(&N)</no>
-    <ignore accel="Ctrl+I">忽略(&I)</ignore>
+    <ok>确定</ok>
+    <cancel>取消</cancel>
+    <abort>中止</abort>
+    <retry>重试</retry>
+    <yes>是</yes>
+    <no>否</no>
+    <ignore>忽略</ignore>
   </buttonText>
 
-  <root skin="_skin.sys.wnd.bkgnd" layout="vbox">
-    <caption size="-2,29">
-      <text.caption pos="9,9,@100,@20" name="msgtitle" text="prompt"/>
-      <imgbtn id="2" skin="_skin.sys.btn.close"    pos="-45,0" tip="close"/>
+  <root layout="vbox" colorBkgnd="@color/bg_modal">
+    <!-- 顶部金色装饰条(与游戏内 modal 一致) -->
+    <window size="-2,3" colorBkgnd="@color/gold"/>
+    <!-- 标题栏 -->
+    <caption size="-2,34">
+      <text name="msgtitle" pos="12,0,-40,0" valign="center" text="提示" colorText="@color/gold" font="size:16,bold"/>
+      <imgbtn id="2" skin="_skin.sys.btn.close" pos="-38,2" tip="close"/>
     </caption>
-
-    <window size="-2,-1" layout="hbox" interval="5" padding="10,10,10,10">
-      <img name="msgicon" size="50,50" display="0" skin="_skin.sys.msgicon"/>
-      <text.msg name="msgtext" size="-1,-2" weight="1" multilines="1" valign="top" maxWidth="300"/>
+    <!-- 分隔线 -->
+    <window size="-2,1" colorBkgnd="@color/divider" opacity="0.4"/>
+    <!-- 内容区: 图标 + 正文 -->
+    <window size="-2,-1" layout="hbox" interval="14" padding="20,14,20,6">
+      <img name="msgicon" size="44,44" display="0" skin="_skin.sys.msgicon"/>
+      <text name="msgtext" size="-1,-2" weight="1" colorText="@color/text_light" font="size:14" multilines="1" valign="center" maxWidth="360"/>
     </window>
-    <tabctrl size="-2,50" name="btnSwitch"  tabHeight="0">
-      <page>
-        <button pos="|-50,10,|50,-10" name="button1st" class="normalbtn">button1</button>
+    <!-- 按钮区 -->
+    <tabctrl name="btnSwitch" size="-2,62" tabHeight="0">
+      <page layout="hbox" interval="14" padding="20,12,20,12">
+        <button name="button1st" size="0,38" weight="1" skin="btn_primary" colorText="#FFFFFF" font="size:14,bold" cursor="hand">确定</button>
       </page>
-      <page>
-        <button pos="|-100,10,|-10,-10" name="button1st" class="normalbtn">button1</button>
-        <button pos="|10,10,|100,-10" name="button2nd" class="normalbtn">button2</button>
+      <page layout="hbox" interval="14" padding="20,12,20,12">
+        <button name="button1st" size="0,38" weight="1" skin="btn_primary" colorText="#FFFFFF" font="size:14,bold" cursor="hand">是</button>
+        <button name="button2nd" size="0,38" weight="1" colorText="@color/text_light" colorBkgnd="@color/bg_edit" font="size:14" cursor="hand">否</button>
       </page>
-      <page>
-        <button pos="|-140,10,|-50,-10" name="button1st" class="normalbtn">button1</button>
-        <button pos="|-45,10,|45,-10" name="button2nd" class="normalbtn">button2</button>
-        <button pos="|50,10,|140,-10" name="button3rd" class="normalbtn">button3</button>
+      <page layout="hbox" interval="10" padding="14,12,14,12">
+        <button name="button1st" size="0,38" weight="1" skin="btn_primary" colorText="#FFFFFF" font="size:14,bold" cursor="hand">重试</button>
+        <button name="button2nd" size="0,38" weight="1" colorText="@color/text_light" colorBkgnd="@color/bg_edit" font="size:14" cursor="hand">忽略</button>
+        <button name="button3rd" size="0,38" weight="1" colorText="@color/text_light" colorBkgnd="@color/bg_edit" font="size:14" cursor="hand">取消</button>
       </page>
     </tabctrl>
   </root>

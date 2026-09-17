@@ -1333,7 +1333,7 @@ BOOL SHostWnd::AnimateHostWindow(DWORD dwTime, DWORD dwFlags)
         GetRoot()->RedrawRegion(m_memRT, m_rgnInvalidate);
 
         int nSteps = dwTime / 10;
-        if (nSteps<1)
+        if (nSteps < 1)
             nSteps = 1;
         const BYTE byAlpha = GetRoot()->GetAlpha();
         if (dwFlags & AW_HIDE)

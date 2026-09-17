@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100" viewBox="0 0 200 100">
+    <defs>
+        <!-- 实心星金色渐变(点亮) -->
+        <linearGradient id="starGold" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#FFE45E"/>
+            <stop offset="55%" stop-color="#FFD700"/>
+            <stop offset="100%" stop-color="#DAA520"/>
+        </linearGradient>
+    </defs>
+
+    <!-- ========== 帧0: 实心金星(已点亮) ========== -->
+    <path d="M50,6 L60.6,37.4 L93.8,37.8 L67.1,57.6 L77.0,89.2 L50,70 L23.0,89.2 L32.9,57.6 L6.3,37.8 L39.4,37.4 Z"
+          fill="url(#starGold)" stroke="#B8860B" stroke-width="1.5"/>
+
+    <!-- ========== 帧1: 空心灰星(未点亮) ========== -->
+    <path d="M150,6 L160.6,37.4 L193.8,37.8 L167.1,57.6 L177.0,89.2 L150,70 L123.0,89.2 L132.9,57.6 L106.3,37.8 L139.4,37.4 Z"
+          fill="#3D2F1F" stroke="#8B7355" stroke-width="1.5"/>
+</svg>

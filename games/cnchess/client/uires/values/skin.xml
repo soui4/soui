@@ -1,13 +1,24 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <skin>
     <imgframe name="skin_item_bk" src="svg:lobby_table_bk" states="3" margin="5,5,5,5"/>
     <imglist name="skin_table" src="svg:chess_table"/>
     <imglist name="skin_playing" src="svg:playing_icon"/>
+    <!-- 难度星级: 2帧(实心金星/空心灰星), 配合 ratingbar 控件 -->
+    <imglist name="skin_star" src="svg:star_rating" states="2"/>
     <imglist name="skin_btn_mute" src="image:PNG_MUTE" states="4"/>
     <imglist name="skin_btn_unmute" src="image:PNG_UNMUTE" states="4"/>
     <imgframe name="btn_primary" src="svg:btn_primary" states="4" margin="5,5,5,5"/>
     <!-- 中国象棋Logo SVG -->
     <imglist name="skin_cnchess_logo" src="svg:cnchess_logo"/>
+    <!-- 主窗口背景 (9-patch 深木纹+金色边框) -->
+    <imgframe name="skin_main_bg" src="svg:main_window_bg" margin="24,24,24,24"/>
+    <!-- 窗口控制按钮 (最小化/最大化/还原/关闭, 4态) -->
+    <imglist name="skin_win_min" src="svg:win_btn_min" states="4"/>
+    <imglist name="skin_win_max" src="svg:win_btn_max" states="4"/>
+    <imglist name="skin_win_restore" src="svg:win_btn_restore" states="4"/>
+    <imglist name="skin_win_close" src="svg:win_btn_close" states="4"/>
+    <!-- tabctrl 标签头皮肤 (4态: normal/hover/selected/disable) -->
+    <imgframe name="skin_tab_header" src="svg:tab_bg" states="4" margin="8,4,8,4"/>
     <!-- 登录界面背景装饰 -->
     <imgframe name="skin_login_bg" src="svg:login_bg" margin="10,10,10,10"/>
     <!-- 登录面板背景(9-patch圆角木纹+边框) -->
@@ -47,6 +58,12 @@
     <imglist name="skin_seat" src="svg:seat_states" states="6"/>
     <!-- 下拉列表项背景 (4态: normal/hover/selected/disabled) -->
     <imgframe name="skin_list_item" src="svg:list_item" states="4" margin="5,2,2,2"/>
+    <!-- 邀请机器人难度按钮 (3态: normal/hover/pressed, 无文字由图标表达难度) -->
+    <imglist name="skin_btn_robot_beginner" src="svg:btn_robot_beginner" states="3"/>
+    <imglist name="skin_btn_robot_medium" src="svg:btn_robot_medium" states="3" />
+    <imglist name="skin_btn_robot_advanced" src="svg:btn_robot_advanced" states="3" />
+    <!-- 邀请机器人按钮 (蓝色, 机器人头部+加号徽章; 点击展开难度选择) -->
+    <imglist name="skin_btn_robot_invite" src="svg:btn_robot_invite" states="3" />
     <!-- 进度条皮肤 -->
     <imglist name="skin_progress_bg" src="svg:progress_bar"/>
     <imglist name="skin_progress_pos" src="svg:progress_pos"/>

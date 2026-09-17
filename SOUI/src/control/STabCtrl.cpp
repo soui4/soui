@@ -114,7 +114,7 @@ class STabSlider
         if (m_pTabCtrl->m_nTabAlign == STabCtrl::AlignMiddle)
         {
             int nHeight = rcWnd.Height();
-            int nTabHeight = m_pTabCtrl->m_szTab[1].toPixelSize(m_pTabCtrl->GetScale());
+            int nTabHeight = m_pTabCtrl->GetTitleRect().Height();
             int nPageHeight = rcWnd.Height() - nTabHeight * m_pTabCtrl->GetItemCount();
             int nPageFromHeight = nPageHeight * (1.0f - fraction);
             int nPageToHeight = nPageHeight - nPageFromHeight;
@@ -254,6 +254,7 @@ STabCtrl::STabCtrl()
 {
     m_ptText[0] = m_ptText[1] = SLayoutSize(-1.f, px);
     m_szTab[0] = m_szTab[1] = SLayoutSize(-1.f, px);
+    m_ptTextPad[0] = m_ptTextPad[1] = SLayoutSize(4.f, px);
 
     m_bFocusable = TRUE;
     m_aniSlider.Attach(new SFloatAnimator);
@@ -288,7 +289,7 @@ void STabCtrl::OnPaint(IRenderTarget *pRT)
             else if (i == m_nHoverTabItem)
                 dwState = WndState_Hover;
 
-            GetItemRect(i, rcItem);
+            GetItemRect2(i, rcItem, pRT);
             if (rcItem.IsRectEmpty())
                 continue;
 
@@ -337,8 +338,9 @@ void STabCtrl::GetChildrenLayoutRect(RECT *prc) const
     CRect rcRet;
     GetClientRect(rcRet);
     rcRet.DeflateRect(GetStyle().GetPadding());
-    int nTabWidth = m_szTab[0].toPixelSize(GetScale());
-    int nTabHeight = m_szTab[1].toPixelSize(GetScale());
+    CRect rcTitle = GetTitleRect();
+    int nTabWidth = rcTitle.Width();
+    int nTabHeight = rcTitle.Height();
     switch (m_nTabAlign)
     {
     case AlignLeft:
@@ -680,38 +682,117 @@ int STabCtrl::InsertItem(SXmlNode xmlNode, int iInsert /**< =-1 */, BOOL bLoadin
     return iInsert;
 }
 
-CRect STabCtrl::GetTitleRect()
+CRect STabCtrl::GetTitleRect() const
 {
     CRect rcTitle;
     GetClientRect(rcTitle);
+    int tabWid = rcTitle.Width();
+    if (m_szTab[0].isSpecifiedSize())
+        tabWid = m_szTab[0].toPixelSize(GetScale());
+    else if (m_szTab[0].isWrapContent())
+    {
+        SASSERT(m_pSkinTab);
+        if (m_pSkinTab)
+            tabWid = m_pSkinTab->GetSkinSize().cx;
+    }
+    int tabHei = rcTitle.Height();
+    if (m_szTab[1].isSpecifiedSize())
+        tabHei = m_szTab[1].toPixelSize(GetScale());
+    else if (m_szTab[1].isWrapContent())
+    {
+        SASSERT(m_pSkinTab);
+        if (m_pSkinTab)
+            tabWid = m_pSkinTab->GetSkinSize().cy;
+    }
     switch (m_nTabAlign)
     {
     case AlignTop:
-        rcTitle.bottom = rcTitle.top + m_szTab[1].toPixelSize(GetScale());
+        rcTitle.bottom = rcTitle.top + tabHei;
         break;
     case AlignBottom:
-        rcTitle.top = rcTitle.bottom - m_szTab[1].toPixelSize(GetScale());
+        rcTitle.top = rcTitle.bottom - tabHei;
         break;
     case AlignLeft:
-        rcTitle.right = rcTitle.left + m_szTab[0].toPixelSize(GetScale());
+        rcTitle.right = rcTitle.left + tabWid;
         break;
     case AlignRight:
-        rcTitle.left = rcTitle.right - m_szTab[0].toPixelSize(GetScale());
+        rcTitle.left = rcTitle.right - tabWid;
+        break;
+    case AlignMiddle:
+        rcTitle.bottom = rcTitle.top + tabHei;
         break;
     }
     return rcTitle;
 }
 
-BOOL STabCtrl::GetItemRect(int nIndex, CRect &rcItem)
+int STabCtrl::MeasureTabWidth(IRenderTarget *pRT, int iPage) const
+{ // wrapContent width: title text or icon extent plus textPadding-x on both sides
+    if (iPage < 0 || iPage >= GetItemCount())
+        return 0;
+    int nScale = GetScale();
+    int nPad = m_ptTextPad[0].toPixelSize(nScale);
+    int nW = 0;
+    LPCTSTR pszTitle = m_lstPages[iPage]->GetTitle();
+    if (pszTitle && *pszTitle)
+    {
+        SStringT strTitle = pszTitle;
+        SIZE szTxt = { 0, 0 };
+        if (m_txtDir == Text_Vert)
+            szTxt = MeasureTextV(pRT, strTitle);
+        else
+            pRT->MeasureText(strTitle, strTitle.GetLength(), &szTxt);
+        nW = smax(nW, m_ptText[0].toPixelSize(nScale) + szTxt.cx);
+    }
+    if (m_pSkinIcon)
+        nW = smax(nW, m_ptIcon[0].toPixelSize(nScale) + m_pSkinIcon->GetSkinSize().cx);
+    return nW + nPad * 2;
+}
+
+int STabCtrl::MeasureTabHeight(IRenderTarget *pRT, int iPage) const
+{ // wrapContent height: title text or icon extent plus textPadding-y on both sides
+    if (iPage < 0 || iPage >= GetItemCount())
+        return 0;
+    int nScale = GetScale();
+    int nPad = m_ptTextPad[1].toPixelSize(nScale);
+    int nH = 0;
+    LPCTSTR pszTitle = m_lstPages[iPage]->GetTitle();
+    if (pszTitle && *pszTitle)
+    {
+        SStringT strTitle = pszTitle;
+        SIZE szTxt = { 0, 0 };
+        if (m_txtDir == Text_Vert)
+            szTxt = MeasureTextV(pRT, strTitle);
+        else
+            pRT->MeasureText(strTitle, strTitle.GetLength(), &szTxt);
+        nH = smax(nH, m_ptText[1].toPixelSize(nScale) + szTxt.cy);
+    }
+    if (m_pSkinIcon)
+        nH = smax(nH, m_ptIcon[1].toPixelSize(nScale) + m_pSkinIcon->GetSkinSize().cy);
+    return nH + nPad * 2;
+}
+
+BOOL STabCtrl::GetItemRect(int nIndex, CRect &rcItem) const
+{
+    SAutoRefPtr<IRenderTarget> pRT;
+    GETRENDERFACTORY->CreateRenderTarget(&pRT);
+    BeforePaintEx(pRT);
+    return GetItemRect2(nIndex, rcItem, pRT);
+}
+
+BOOL STabCtrl::GetItemRect2(int nIndex, CRect &rcItem, IRenderTarget *pRT) const
 {
     if (nIndex < 0 || nIndex >= (int)GetItemCount())
         return FALSE;
+    CRect rcTitle = GetTitleRect();
+    int nScale = GetScale();
+    int nInter = m_nTabInterSize.toPixelSize(nScale);
+    int nTabPos = m_nTabPos.toPixelSize(nScale);
     if (m_nTabAlign == AlignMiddle)
     {
         // middle, each tab is same height
         CRect rcClient = GetClientRect();
-        int nTabHeight = m_szTab[1].toPixelSize(GetScale());
-        rcItem = CRect(0, 0, rcClient.Width(), nTabHeight);
+        int nTabHeight = rcTitle.Height();
+        rcItem = CRect(0, 0, rcTitle.Width(), nTabHeight);
         if (nIndex <= m_nCurrentPage)
         {
             rcItem.OffsetRect(0, nTabHeight * nIndex);
@@ -725,21 +806,55 @@ BOOL STabCtrl::GetItemRect(int nIndex, CRect &rcItem)
     }
     else
     {
-        CRect rcTitle = GetTitleRect();
-
-        rcItem = CRect(rcTitle.TopLeft(), CSize(m_szTab[0].toPixelSize(GetScale()), m_szTab[1].toPixelSize(GetScale())));
-
-        switch (m_nTabAlign)
-        {
-        case AlignTop:
-        case AlignBottom:
-            rcItem.OffsetRect(m_nTabPos.toPixelSize(GetScale()) + nIndex * (rcItem.Width() + m_nTabInterSize.toPixelSize(GetScale())), 0);
-            break;
-        case AlignLeft:
-        case AlignRight:
-            rcItem.OffsetRect(0, m_nTabPos.toPixelSize(GetScale()) + nIndex * (rcItem.Height() + m_nTabInterSize.toPixelSize(GetScale())));
-            break;
+        bool bVert = (m_nTabAlign == AlignLeft || m_nTabAlign == AlignRight);
+        int nStripAxis = bVert ? 1 : 0;
+        int nCrossAxis = 1 - nStripAxis;
+        int nCross;
+        if (m_szTab[nCrossAxis].isWrapContent())
+        { // wrapContent: all tabs share the max measured size
+            nCross = 0;
+            for (int i = 0; i < GetItemCount(); i++)
+                nCross = smax(nCross, (nCrossAxis == 0) ? MeasureTabWidth(pRT, i) : MeasureTabHeight(pRT, i));
         }
+        else if (m_szTab[nCrossAxis].isMatchParent())
+        { // matchParent: tabs span the whole title strip, clipped by IntersectRect below
+            nCross = (nCrossAxis == 0) ? rcTitle.Width() : rcTitle.Height();
+        }
+        else
+            nCross = m_szTab[nCrossAxis].toPixelSize(nScale);
+        int nStrip, nOffset;
+        if (m_szTab[nStripAxis].isWrapContent())
+        { // wrapContent: each tab fits its own title text
+            nOffset = nTabPos;
+            nStrip = 0;
+            for (int i = 0; i <= nIndex; i++)
+            {
+                int nSize = (nStripAxis == 0) ? MeasureTabWidth(pRT, i) : MeasureTabHeight(pRT, i);
+                if (i == nIndex)
+                    nStrip = nSize;
+                else
+                    nOffset += nSize + nInter;
+            }
+        }
+        else
+        { // fixed size, or matchParent: tabs evenly divide the whole strip
+            nStrip = m_szTab[nStripAxis].toPixelSize(nScale);
+            nOffset = nTabPos + nIndex * (nStrip + nInter);
+            if (m_szTab[nStripAxis].isMatchParent())
+            {
+                int nStripLen = (nStripAxis == 0) ? rcTitle.Width() : rcTitle.Height();
+                nStrip = smax(0, (nStripLen - nTabPos - (GetItemCount() - 1) * nInter) / GetItemCount());
+                nOffset = nTabPos + nIndex * (nStrip + nInter);
+            }
+        }
+        if (bVert)
+            rcItem = CRect(rcTitle.TopLeft(), CSize(nCross, nStrip));
+        else
+            rcItem = CRect(rcTitle.TopLeft(), CSize(nStrip, nCross));
+        if (bVert)
+            rcItem.OffsetRect(0, nOffset);
+        else
+            rcItem.OffsetRect(nOffset, 0);
         rcItem.IntersectRect(rcItem, rcTitle);
         return TRUE;
     }
@@ -865,18 +980,6 @@ int STabCtrl::HitTest(CPoint pt)
     return -1;
 }
 
-void STabCtrl::OnInitFinished(THIS_ IXmlNode *xmlNode)
-{
-    if (m_pSkinTab)
-    {
-        SIZE sz = m_pSkinTab->GetSkinSize();
-        if (SLayoutSize::fequal(m_szTab[0].fSize, -1.f))
-            m_szTab[0] = SLayoutSize((float)sz.cx, SLayoutSize::defUnit);
-        if (SLayoutSize::fequal(m_szTab[1].fSize, -1.f))
-            m_szTab[1] = SLayoutSize((float)sz.cy, SLayoutSize::defUnit);
-    }
-}
-
 void STabCtrl::UpdateChildrenPosition()
 {
     CRect rcPage;
@@ -914,7 +1017,7 @@ void STabCtrl::TextOutV(IRenderTarget *pRT, int x, int y, const SStringT &strTex
     strTmp.ReleaseBuffer();
 }
 
-SIZE STabCtrl::MeasureTextV(IRenderTarget *pRT, const SStringT &strText)
+SIZE STabCtrl::MeasureTextV(IRenderTarget *pRT, const SStringT &strText) const
 {
     SIZE szRet = { 0, 0 };
     SStringT strTmp = strText;

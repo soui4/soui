@@ -68,7 +68,7 @@ void WebSocketConnListener::onDataRecv(const void *data, int len, BOOL bBinary)
 }
 
 static void CnchessLogCallback(int level, const char* line) {
-	SLOG("WebSocket Log [Level %d]: %s", level)<<line;
+	//SLOG("WebSocket Log [Level %d]: %s", level)<<line;
 }
 //////////////////////////////////////////////////////////////////////
 // WebSocketClient Implementation
@@ -203,4 +203,9 @@ void WebSocketClient::NotifyMessage(DWORD dwType, std::shared_ptr<std::vector<BY
 void WebSocketClient::SetMessageHandler(IListener *pMsgListener)
 {
 	m_pMsgListener = pMsgListener;
+}
+
+void WebSocketClient::BlockReceive(BOOL bBlock)
+{
+	m_pWsClient->blockReceive(bBlock);
 }

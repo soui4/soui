@@ -1,4 +1,4 @@
-﻿//stamp:147e080ffdfcf259
+﻿//stamp:183c5c4364fff6c2
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -12,11 +12,13 @@
 			const TCHAR * XML_MAINWND;
 			const TCHAR * XML_LOGIN;
 			const TCHAR * page_lobby;
+			const TCHAR * page_endgame;
 			const TCHAR * page_game;
 			const TCHAR * page_about;
 			const TCHAR * dlg_peace_req;
 			const TCHAR * dlg_peace_ack;
 			const TCHAR * dlg_theme_progress;
+			const TCHAR * XML_MSGBOX;
 			}LAYOUT;
 		struct _values{
 			const TCHAR * string;
@@ -73,6 +75,17 @@
 			const TCHAR * combobox_dropbtn;
 			const TCHAR * edit_bg;
 			const TCHAR * list_item;
+			const TCHAR * btn_robot_beginner;
+			const TCHAR * btn_robot_medium;
+			const TCHAR * btn_robot_advanced;
+			const TCHAR * btn_robot_invite;
+			const TCHAR * main_window_bg;
+			const TCHAR * win_btn_close;
+			const TCHAR * win_btn_max;
+			const TCHAR * win_btn_min;
+			const TCHAR * win_btn_restore;
+			const TCHAR * tab_bg;
+			const TCHAR * star_rating;
 			}svg;
 	};
 #endif//_UIRES_H_
@@ -85,11 +98,13 @@ struct _UIRES UIRES={
 			_T("LAYOUT:XML_MAINWND"),
 			_T("LAYOUT:XML_LOGIN"),
 			_T("LAYOUT:page_lobby"),
+			_T("LAYOUT:page_endgame"),
 			_T("LAYOUT:page_game"),
 			_T("LAYOUT:page_about"),
 			_T("LAYOUT:dlg_peace_req"),
 			_T("LAYOUT:dlg_peace_ack"),
 			_T("LAYOUT:dlg_theme_progress"),
+			_T("LAYOUT:XML_MSGBOX"),
 		},
 		{
 			_T("values:string"),
@@ -146,6 +161,17 @@ struct _UIRES UIRES={
 			_T("svg:combobox_dropbtn"),
 			_T("svg:edit_bg"),
 			_T("svg:list_item"),
+			_T("svg:btn_robot_beginner"),
+			_T("svg:btn_robot_medium"),
+			_T("svg:btn_robot_advanced"),
+			_T("svg:btn_robot_invite"),
+			_T("svg:main_window_bg"),
+			_T("svg:win_btn_close"),
+			_T("svg:win_btn_max"),
+			_T("svg:win_btn_min"),
+			_T("svg:win_btn_restore"),
+			_T("svg:tab_bg"),
+			_T("svg:star_rating"),
 		},
 	};
 #else
@@ -156,13 +182,18 @@ extern struct _UIRES UIRES;
 #define _R_H_
 struct _R{
 	struct _name{
+		 const wchar_t * btnSwitch;
 		 const wchar_t * btn_avatar_1;
 		 const wchar_t * btn_avatar_2;
 		 const wchar_t * btn_avatar_3;
 		 const wchar_t * btn_avatar_4;
 		 const wchar_t * btn_avatar_ext;
 		 const wchar_t * btn_close;
+		 const wchar_t * btn_invite_robot;
 		 const wchar_t * btn_login;
+		 const wchar_t * btn_lvl_advanced;
+		 const wchar_t * btn_lvl_beginner;
+		 const wchar_t * btn_lvl_medium;
 		 const wchar_t * btn_max;
 		 const wchar_t * btn_min;
 		 const wchar_t * btn_mute;
@@ -170,31 +201,46 @@ struct _R{
 		 const wchar_t * btn_svr_local;
 		 const wchar_t * btn_test;
 		 const wchar_t * btn_unmute;
+		 const wchar_t * button1st;
+		 const wchar_t * button2nd;
+		 const wchar_t * button3rd;
 		 const wchar_t * cbx_sex;
 		 const wchar_t * chessboard;
+		 const wchar_t * chessboard_preview;
+		 const wchar_t * content;
 		 const wchar_t * edit_desc;
 		 const wchar_t * edt_name;
 		 const wchar_t * edt_svr;
+		 const wchar_t * endgame_container;
 		 const wchar_t * game_container;
 		 const wchar_t * gp_preview;
 		 const wchar_t * img_playing;
+		 const wchar_t * main_tabctrl;
+		 const wchar_t * msgicon;
+		 const wchar_t * msgtext;
+		 const wchar_t * msgtitle;
 		 const wchar_t * progress_bar;
 		 const wchar_t * room_container;
+		 const wchar_t * rtg_eg_table_difficulty;
 		 const wchar_t * seat_0;
 		 const wchar_t * seat_1;
+		 const wchar_t * tileview_endgame;
 		 const wchar_t * tileview_lobby;
-		 const wchar_t * txt_anchor_detail;
-		 const wchar_t * txt_anchor_layout;
+		 const wchar_t * tip_container;
 		 const wchar_t * txt_contact;
 		 const wchar_t * txt_copyright;
 		 const wchar_t * txt_desc;
-		 const wchar_t * txt_info;
+		 const wchar_t * txt_eg_detail_intro;
+		 const wchar_t * txt_eg_detail_intro_desc;
+		 const wchar_t * txt_eg_detail_title;
+		 const wchar_t * txt_eg_table_index;
+		 const wchar_t * txt_eg_table_title;
+		 const wchar_t * txt_feature_ai;
+		 const wchar_t * txt_feature_online;
+		 const wchar_t * txt_feature_rule;
+		 const wchar_t * txt_feature_ui;
 		 const wchar_t * txt_new_features;
 		 const wchar_t * txt_online;
-		 const wchar_t * txt_path_animation;
-		 const wchar_t * txt_path_detail;
-		 const wchar_t * txt_prop_detail;
-		 const wchar_t * txt_property_animation;
 		 const wchar_t * txt_qq_group;
 		 const wchar_t * txt_seat_0;
 		 const wchar_t * txt_seat_1;
@@ -204,15 +250,24 @@ struct _R{
 		 const wchar_t * txt_thanks;
 		 const wchar_t * txt_title;
 		 const wchar_t * txt_website;
+		 const wchar_t * wnd_eg_detail;
+		 const wchar_t * wnd_eg_list;
+		 const wchar_t * wnd_robot_area;
+		 const wchar_t * wnd_robot_levels;
 	}name;
 	struct _id{
+		int btnSwitch;
 		int btn_avatar_1;
 		int btn_avatar_2;
 		int btn_avatar_3;
 		int btn_avatar_4;
 		int btn_avatar_ext;
 		int btn_close;
+		int btn_invite_robot;
 		int btn_login;
+		int btn_lvl_advanced;
+		int btn_lvl_beginner;
+		int btn_lvl_medium;
 		int btn_max;
 		int btn_min;
 		int btn_mute;
@@ -220,31 +275,46 @@ struct _R{
 		int btn_svr_local;
 		int btn_test;
 		int btn_unmute;
+		int button1st;
+		int button2nd;
+		int button3rd;
 		int cbx_sex;
 		int chessboard;
+		int chessboard_preview;
+		int content;
 		int edit_desc;
 		int edt_name;
 		int edt_svr;
+		int endgame_container;
 		int game_container;
 		int gp_preview;
 		int img_playing;
+		int main_tabctrl;
+		int msgicon;
+		int msgtext;
+		int msgtitle;
 		int progress_bar;
 		int room_container;
+		int rtg_eg_table_difficulty;
 		int seat_0;
 		int seat_1;
+		int tileview_endgame;
 		int tileview_lobby;
-		int txt_anchor_detail;
-		int txt_anchor_layout;
+		int tip_container;
 		int txt_contact;
 		int txt_copyright;
 		int txt_desc;
-		int txt_info;
+		int txt_eg_detail_intro;
+		int txt_eg_detail_intro_desc;
+		int txt_eg_detail_title;
+		int txt_eg_table_index;
+		int txt_eg_table_title;
+		int txt_feature_ai;
+		int txt_feature_online;
+		int txt_feature_rule;
+		int txt_feature_ui;
 		int txt_new_features;
 		int txt_online;
-		int txt_path_animation;
-		int txt_path_detail;
-		int txt_prop_detail;
-		int txt_property_animation;
 		int txt_qq_group;
 		int txt_seat_0;
 		int txt_seat_1;
@@ -254,10 +324,21 @@ struct _R{
 		int txt_thanks;
 		int txt_title;
 		int txt_website;
+		int wnd_eg_detail;
+		int wnd_eg_list;
+		int wnd_robot_area;
+		int wnd_robot_levels;
 	}id;
 	struct _color{
+		int bg_edit;
+		int bg_modal;
 		int black;
 		int blue;
+		int border_dark;
+		int divider;
+		int gold;
+		int gold_dark;
+		int gold_light;
 		int gray;
 		int green;
 		int login_avatar_border;
@@ -270,13 +351,18 @@ struct _R{
 		int login_panel_dark;
 		int login_text;
 		int login_text_sub;
+		int main_title;
+		int main_title_hi;
 		int mask_select;
 		int red;
+		int text_light;
+		int text_muted;
 		int white;
 	}color;
 	struct _string{
 		int about;
 		int cnchess;
+		int endgame;
 		int lobby;
 		int login;
 		int peace_ack;
@@ -292,13 +378,18 @@ struct _R{
 #ifdef INIT_R_DATA
 struct _R R={
 	{
+		L"btnSwitch",
 		L"btn_avatar_1",
 		L"btn_avatar_2",
 		L"btn_avatar_3",
 		L"btn_avatar_4",
 		L"btn_avatar_ext",
 		L"btn_close",
+		L"btn_invite_robot",
 		L"btn_login",
+		L"btn_lvl_advanced",
+		L"btn_lvl_beginner",
+		L"btn_lvl_medium",
 		L"btn_max",
 		L"btn_min",
 		L"btn_mute",
@@ -306,31 +397,46 @@ struct _R R={
 		L"btn_svr_local",
 		L"btn_test",
 		L"btn_unmute",
+		L"button1st",
+		L"button2nd",
+		L"button3rd",
 		L"cbx_sex",
 		L"chessboard",
+		L"chessboard_preview",
+		L"content",
 		L"edit_desc",
 		L"edt_name",
 		L"edt_svr",
+		L"endgame_container",
 		L"game_container",
 		L"gp_preview",
 		L"img_playing",
+		L"main_tabctrl",
+		L"msgicon",
+		L"msgtext",
+		L"msgtitle",
 		L"progress_bar",
 		L"room_container",
+		L"rtg_eg_table_difficulty",
 		L"seat_0",
 		L"seat_1",
+		L"tileview_endgame",
 		L"tileview_lobby",
-		L"txt_anchor_detail",
-		L"txt_anchor_layout",
+		L"tip_container",
 		L"txt_contact",
 		L"txt_copyright",
 		L"txt_desc",
-		L"txt_info",
+		L"txt_eg_detail_intro",
+		L"txt_eg_detail_intro_desc",
+		L"txt_eg_detail_title",
+		L"txt_eg_table_index",
+		L"txt_eg_table_title",
+		L"txt_feature_ai",
+		L"txt_feature_online",
+		L"txt_feature_rule",
+		L"txt_feature_ui",
 		L"txt_new_features",
 		L"txt_online",
-		L"txt_path_animation",
-		L"txt_path_detail",
-		L"txt_prop_detail",
-		L"txt_property_animation",
 		L"txt_qq_group",
 		L"txt_seat_0",
 		L"txt_seat_1",
@@ -339,58 +445,86 @@ struct _R R={
 		L"txt_table_info",
 		L"txt_thanks",
 		L"txt_title",
-		L"txt_website"
+		L"txt_website",
+		L"wnd_eg_detail",
+		L"wnd_eg_list",
+		L"wnd_robot_area",
+		L"wnd_robot_levels"
 	}
 	,
 	{
-		65547,
-		65548,
-		65549,
+		65602,
 		65550,
+		65551,
 		65552,
-		65542,
 		65553,
+		65555,
+		65542,
+		65565,
+		65556,
+		65569,
+		65567,
+		65568,
 		65540,
 		65539,
 		65537,
 		65541,
-		65544,
-		65565,
+		65547,
+		65585,
 		65538,
-		65546,
-		65564,
-		65580,
-		65545,
+		65603,
+		65604,
+		65605,
+		65549,
+		65584,
+		65582,
 		65543,
-		65563,
-		65551,
-		65558,
-		65581,
+		65597,
+		65548,
+		65546,
+		65572,
+		65583,
 		65554,
+		65561,
+		65544,
+		65600,
+		65601,
+		65599,
+		65598,
+		65557,
+		65577,
 		10,
 		11,
-		65556,
-		65569,
-		65568,
 		65574,
-		65579,
-		65566,
-		65577,
-		65567,
-		65555,
-		65572,
-		65573,
-		65571,
-		65570,
-		65575,
 		65559,
-		65560,
-		65561,
-		65557,
+		65545,
+		65592,
+		65596,
+		65586,
+		65580,
+		65581,
+		65579,
+		65576,
+		65575,
+		65589,
+		65588,
+		65590,
+		65591,
+		65587,
+		65558,
+		65593,
 		65562,
-		65578,
+		65563,
+		65570,
+		65560,
+		65571,
+		65595,
 		65536,
-		65576
+		65594,
+		65578,
+		65573,
+		65564,
+		65566
 	}
 	,
 	{
@@ -410,7 +544,18 @@ struct _R R={
 		13,
 		14,
 		15,
-		16
+		16,
+		17,
+		18,
+		19,
+		20,
+		21,
+		22,
+		23,
+		24,
+		25,
+		26,
+		27
 	}
 	,
 	{
@@ -423,7 +568,8 @@ struct _R R={
 		6,
 		7,
 		8,
-		9
+		9,
+		10
 	}
 	
 };

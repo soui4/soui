@@ -395,7 +395,7 @@ class SOUI_EXP SWindow
     /**
      * @brief Called when the last reference to the object is released.
      */
-    STDMETHOD_(void, OnFinalRelease)(THIS);
+    STDMETHOD_(void, OnFinalRelease)(THIS) OVERRIDE;
 
     /**
      * @brief Retrieves the window handle.
@@ -1632,26 +1632,26 @@ class SOUI_EXP SWindow
      * @brief Called when an animation starts.
      * @param animation Pointer to the animation object.
      */
-    STDMETHOD_(void, OnAnimationStart)(THIS_ IAnimation *animation);
+    STDMETHOD_(void, OnAnimationStart)(THIS_ IAnimation *animation) OVERRIDE;
 
     /**
      * @brief Called when an animation stops.
      * @param animation Pointer to the animation object.
      */
-    STDMETHOD_(void, OnAnimationStop)(THIS_ IAnimation *animation);
+    STDMETHOD_(void, OnAnimationStop)(THIS_ IAnimation *animation) OVERRIDE;
 
     /**
      * @brief Called when an animation repeats.
      * @param animation Pointer to the animation object.
      */
-    STDMETHOD_(void, OnAnimationRepeat)(THIS_ IAnimation *animation);
+    STDMETHOD_(void, OnAnimationRepeat)(THIS_ IAnimation *animation) OVERRIDE;
 
     /**
      * @brief Called when the pause state of an animation changes.
      * @param animation Pointer to the animation object.
      * @param bPaused TRUE if the animation is paused; otherwise, FALSE.
      */
-    STDMETHOD_(void, OnAnimationPauseChange)(THIS_ IAnimation *animation, BOOL bPaused);
+    STDMETHOD_(void, OnAnimationPauseChange)(THIS_ IAnimation *animation, BOOL bPaused) OVERRIDE;
 
     /** Virtual functions for override */
   protected:
@@ -2446,40 +2446,42 @@ class SOUI_EXP SWindow
     void OnSysKeyUp(UINT nChar, UINT nFlagsCnt, UINT nFlags);
 
     /** Message map for associating messages with handlers */
-    SOUI_MSG_MAP_BEGIN()
-        MSG_WM_PAINT_EX(OnPaint)
-        MSG_WM_ERASEBKGND_EX(OnEraseBkgnd)
-        MSG_WM_NCPAINT_EX(OnNcPaint)
-        MSG_WM_CREATE(OnCreate)
-        MSG_WM_SIZE(OnSize)
-        MSG_WM_DESTROY(OnDestroy)
-        MSG_WM_SHOWWINDOW(OnShowWindow)
-        MSG_WM_ENABLE_EX(OnEnable)
-        MESSAGE_RANGE_HANDLER_EX(WM_LBUTTONDOWN, WM_MBUTTONDBLCLK, OnMouseClick)
-        MSG_WM_LBUTTONDOWN(OnLButtonDown)
-        MSG_WM_LBUTTONUP(OnLButtonUp)
-        MSG_WM_LBUTTONDBLCLK(OnLButtonDbClick)
-        MSG_WM_RBUTTONDOWN(OnRButtonDown)
-        MSG_WM_RBUTTONUP(OnRButtonUp)
-        MSG_WM_MOUSEMOVE(OnMouseMove)
-        MSG_WM_MOUSEHOVER(OnMouseHover)
-        MSG_WM_MOUSELEAVE(OnMouseLeave)
-        MSG_WM_MOUSEWHEEL(OnMouseWheel)
-        MSG_WM_SETFOCUS_EX(OnSetFocus)
-        MSG_WM_KILLFOCUS_EX(OnKillFocus)
-        MSG_WM_KEYDOWN(OnKeyDown)
-        MSG_WM_KEYUP(OnKeyUp)
-        MSG_WM_CHAR(OnChar)
-        MSG_WM_SYSKEYDOWN(OnSysKeyDown)
-        MSG_WM_SYSKEYUP(OnSysKeyUp)
-        MESSAGE_HANDLER_EX(UM_SETLANGUAGE, OnSetLanguage)
-        MESSAGE_HANDLER_EX(UM_SETSCALE, OnSetScale)
-        MESSAGE_HANDLER_EX(UM_SETCOLORIZE, OnSetColorize)
-        MESSAGE_HANDLER_EX(UM_UPDATEFONT, OnUpdateFont)
-    SOUI_MSG_MAP_END_BASE() /**< Messages are not passed to the base class. */
+    SOUI_MSG_MAP_BEGIN_ROOT()
+    MSG_WM_PAINT_EX(OnPaint)
+    MSG_WM_ERASEBKGND_EX(OnEraseBkgnd)
+    MSG_WM_NCPAINT_EX(OnNcPaint)
+    MSG_WM_CREATE(OnCreate)
+    MSG_WM_SIZE(OnSize)
+    MSG_WM_DESTROY(OnDestroy)
+    MSG_WM_SHOWWINDOW(OnShowWindow)
+    MSG_WM_ENABLE_EX(OnEnable)
+    MESSAGE_RANGE_HANDLER_EX(WM_LBUTTONDOWN, WM_MBUTTONDBLCLK, OnMouseClick)
+    MSG_WM_LBUTTONDOWN(OnLButtonDown)
+    MSG_WM_LBUTTONUP(OnLButtonUp)
+    MSG_WM_LBUTTONDBLCLK(OnLButtonDbClick)
+    MSG_WM_RBUTTONDOWN(OnRButtonDown)
+    MSG_WM_RBUTTONUP(OnRButtonUp)
+    MSG_WM_MOUSEMOVE(OnMouseMove)
+    MSG_WM_MOUSEHOVER(OnMouseHover)
+    MSG_WM_MOUSELEAVE(OnMouseLeave)
+    MSG_WM_MOUSEWHEEL(OnMouseWheel)
+    MSG_WM_SETFOCUS_EX(OnSetFocus)
+    MSG_WM_KILLFOCUS_EX(OnKillFocus)
+    MSG_WM_KEYDOWN(OnKeyDown)
+    MSG_WM_KEYUP(OnKeyUp)
+    MSG_WM_CHAR(OnChar)
+    MSG_WM_SYSKEYDOWN(OnSysKeyDown)
+    MSG_WM_SYSKEYUP(OnSysKeyUp)
+    MESSAGE_HANDLER_EX(UM_SETLANGUAGE, OnSetLanguage)
+    MESSAGE_HANDLER_EX(UM_SETSCALE, OnSetScale)
+    MESSAGE_HANDLER_EX(UM_SETCOLORIZE, OnSetColorize)
+    MESSAGE_HANDLER_EX(UM_UPDATEFONT, OnUpdateFont)
+SOUI_MSG_MAP_END_BASE
+() /**< Messages are not passed to the base class. */
 
     /** Protected attribute handling functions */
-  protected:
+    protected
+    :
     /**
      * OnAttrVisible
      * @brief    Handles the 'visible' attribute.
@@ -2491,386 +2493,387 @@ class SOUI_EXP SWindow
      */
     HRESULT OnAttrVisible(const SStringW &strValue, BOOL bLoading);
 
-    /**
-     * OnAttrEnable
-     * @brief    Handles the 'enable' attribute.
-     * @param    const SStringW &strValue -- Attribute value.
-     * @param    BOOL bLoading -- TRUE during loading, FALSE otherwise.
-     * @return   HRESULT -- Result of attribute processing.
-     *
-     * Describe  This method processes the 'enable' attribute.
-     */
-    HRESULT OnAttrEnable(const SStringW &strValue, BOOL bLoading);
+/**
+ * OnAttrEnable
+ * @brief    Handles the 'enable' attribute.
+ * @param    const SStringW &strValue -- Attribute value.
+ * @param    BOOL bLoading -- TRUE during loading, FALSE otherwise.
+ * @return   HRESULT -- Result of attribute processing.
+ *
+ * Describe  This method processes the 'enable' attribute.
+ */
+HRESULT OnAttrEnable(const SStringW &strValue, BOOL bLoading);
 
-    /**
-     * OnAttrDisplay
-     * @brief    Handles the 'display' attribute.
-     * @param    const SStringW &strValue -- Attribute value.
-     * @param    BOOL bLoading -- TRUE during loading, FALSE otherwise.
-     * @return   HRESULT -- Result of attribute processing.
-     *
-     * Describe  This method processes the 'display' attribute.
-     */
-    HRESULT OnAttrDisplay(const SStringW &strValue, BOOL bLoading);
+/**
+ * OnAttrDisplay
+ * @brief    Handles the 'display' attribute.
+ * @param    const SStringW &strValue -- Attribute value.
+ * @param    BOOL bLoading -- TRUE during loading, FALSE otherwise.
+ * @return   HRESULT -- Result of attribute processing.
+ *
+ * Describe  This method processes the 'display' attribute.
+ */
+HRESULT OnAttrDisplay(const SStringW &strValue, BOOL bLoading);
 
-    /**
-     * OnAttrCache
-     * @brief    Handles the 'cache' attribute.
-     * @param    const SStringW &strValue -- Attribute value.
-     * @param    BOOL bLoading -- TRUE during loading, FALSE otherwise.
-     * @return   HRESULT -- Result of attribute processing.
-     *
-     * Describe  This method processes the 'cache' attribute.
-     */
-    HRESULT OnAttrCache(const SStringW &strValue, BOOL bLoading);
+/**
+ * OnAttrCache
+ * @brief    Handles the 'cache' attribute.
+ * @param    const SStringW &strValue -- Attribute value.
+ * @param    BOOL bLoading -- TRUE during loading, FALSE otherwise.
+ * @return   HRESULT -- Result of attribute processing.
+ *
+ * Describe  This method processes the 'cache' attribute.
+ */
+HRESULT OnAttrCache(const SStringW &strValue, BOOL bLoading);
 
-    /**
-     * OnAttrAlpha
-     * @brief    Handles the 'alpha' attribute.
-     * @param    const SStringW &strValue -- Attribute value.
-     * @param    BOOL bLoading -- TRUE during loading, FALSE otherwise.
-     * @return   HRESULT -- Result of attribute processing.
-     *
-     * Describe  This method processes the 'alpha' attribute.
-     */
-    HRESULT OnAttrAlpha(const SStringW &strValue, BOOL bLoading);
+/**
+ * OnAttrAlpha
+ * @brief    Handles the 'alpha' attribute.
+ * @param    const SStringW &strValue -- Attribute value.
+ * @param    BOOL bLoading -- TRUE during loading, FALSE otherwise.
+ * @return   HRESULT -- Result of attribute processing.
+ *
+ * Describe  This method processes the 'alpha' attribute.
+ */
+HRESULT OnAttrAlpha(const SStringW &strValue, BOOL bLoading);
 
-    /**
-     * OnAttrSkin
-     * @brief    Handles the 'skin' attribute.
-     * @param    const SStringW &strValue -- Attribute value.
-     * @param    BOOL bLoading -- TRUE during loading, FALSE otherwise.
-     * @return   HRESULT -- Result of attribute processing.
-     *
-     * Describe  This method processes the 'skin' attribute.
-     */
-    HRESULT OnAttrSkin(const SStringW &strValue, BOOL bLoading);
+/**
+ * OnAttrSkin
+ * @brief    Handles the 'skin' attribute.
+ * @param    const SStringW &strValue -- Attribute value.
+ * @param    BOOL bLoading -- TRUE during loading, FALSE otherwise.
+ * @return   HRESULT -- Result of attribute processing.
+ *
+ * Describe  This method processes the 'skin' attribute.
+ */
+HRESULT OnAttrSkin(const SStringW &strValue, BOOL bLoading);
 
-    /**
-     * OnAttrLayout
-     * @brief    Handles the 'layout' attribute.
-     * @param    const SStringW &strValue -- Attribute value.
-     * @param    BOOL bLoading -- TRUE during loading, FALSE otherwise.
-     * @return   HRESULT -- Result of attribute processing.
-     *
-     * Describe  This method processes the 'layout' attribute.
-     */
-    HRESULT OnAttrLayout(const SStringW &strValue, BOOL bLoading);
+/**
+ * OnAttrLayout
+ * @brief    Handles the 'layout' attribute.
+ * @param    const SStringW &strValue -- Attribute value.
+ * @param    BOOL bLoading -- TRUE during loading, FALSE otherwise.
+ * @return   HRESULT -- Result of attribute processing.
+ *
+ * Describe  This method processes the 'layout' attribute.
+ */
+HRESULT OnAttrLayout(const SStringW &strValue, BOOL bLoading);
 
-    /**
-     * OnAttrOwnerLayout
-     * @brief    Handles the 'ownerLayout' attribute.
-     * @param    const SStringW &strValue -- Attribute value.
-     * @param    BOOL bLoading -- TRUE during loading, FALSE otherwise.
-     * @return   HRESULT -- Result of attribute processing.
-     * Describe Set default owner layout parameter to contain the following parameters before insert the widget to parent.
-     */
-    HRESULT OnAttrOwnerLayout(const SStringW &strValue, BOOL bLoading);
+/**
+ * OnAttrOwnerLayout
+ * @brief    Handles the 'ownerLayout' attribute.
+ * @param    const SStringW &strValue -- Attribute value.
+ * @param    BOOL bLoading -- TRUE during loading, FALSE otherwise.
+ * @return   HRESULT -- Result of attribute processing.
+ * Describe Set default owner layout parameter to contain the following parameters before insert the widget to parent.
+ */
+HRESULT OnAttrOwnerLayout(const SStringW &strValue, BOOL bLoading);
 
-    /**
-     * OnAttrClass
-     * @brief    Handles the 'class' attribute.
-     * @param    const SStringW &strValue -- Attribute value.
-     * @param    BOOL bLoading -- TRUE during loading, FALSE otherwise.
-     * @return   HRESULT -- Result of attribute processing.
-     *
-     * Describe  This method processes the 'class' attribute.
-     */
-    HRESULT OnAttrClass(const SStringW &strValue, BOOL bLoading);
+/**
+ * OnAttrClass
+ * @brief    Handles the 'class' attribute.
+ * @param    const SStringW &strValue -- Attribute value.
+ * @param    BOOL bLoading -- TRUE during loading, FALSE otherwise.
+ * @return   HRESULT -- Result of attribute processing.
+ *
+ * Describe  This method processes the 'class' attribute.
+ */
+HRESULT OnAttrClass(const SStringW &strValue, BOOL bLoading);
 
-    /**
-     * OnAttrTrackMouseEvent
-     * @brief    Handles the 'trackMouseEvent' attribute.
-     * @param    const SStringW &strValue -- Attribute value.
-     * @param    BOOL bLoading -- TRUE during loading, FALSE otherwise.
-     * @return   HRESULT -- Result of attribute processing.
-     *
-     * Describe  This method processes the 'trackMouseEvent' attribute.
-     */
-    HRESULT OnAttrTrackMouseEvent(const SStringW &strValue, BOOL bLoading);
+/**
+ * OnAttrTrackMouseEvent
+ * @brief    Handles the 'trackMouseEvent' attribute.
+ * @param    const SStringW &strValue -- Attribute value.
+ * @param    BOOL bLoading -- TRUE during loading, FALSE otherwise.
+ * @return   HRESULT -- Result of attribute processing.
+ *
+ * Describe  This method processes the 'trackMouseEvent' attribute.
+ */
+HRESULT OnAttrTrackMouseEvent(const SStringW &strValue, BOOL bLoading);
 
-    /**
-     * OnAttrVideoCanvas
-     * @brief    Handles the 'videoCanvas' attribute.
-     * @param    const SStringW &strValue -- Attribute value.
-     * @param    BOOL bLoading -- TRUE during loading, FALSE otherwise.
-     * @return   HRESULT -- Result of attribute processing.
-     *
-     * Describe  This method processes the 'videoCanvas' attribute.
-     */
-    HRESULT OnAttrVideoCanvas(const SStringW &strValue, BOOL bLoading);
+/**
+ * OnAttrVideoCanvas
+ * @brief    Handles the 'videoCanvas' attribute.
+ * @param    const SStringW &strValue -- Attribute value.
+ * @param    BOOL bLoading -- TRUE during loading, FALSE otherwise.
+ * @return   HRESULT -- Result of attribute processing.
+ *
+ * Describe  This method processes the 'videoCanvas' attribute.
+ */
+HRESULT OnAttrVideoCanvas(const SStringW &strValue, BOOL bLoading);
 
-    /**
-     * OnAttrID
-     * @brief    Handles the 'id' attribute.
-     * @param    const SStringW &strValue -- Attribute value.
-     * @param    BOOL bLoading -- TRUE during loading, FALSE otherwise.
-     * @return   HRESULT -- Result of attribute processing.
-     *
-     * Describe  This method processes the 'id' attribute.
-     */
-    HRESULT OnAttrID(const SStringW &strValue, BOOL bLoading);
+/**
+ * OnAttrID
+ * @brief    Handles the 'id' attribute.
+ * @param    const SStringW &strValue -- Attribute value.
+ * @param    BOOL bLoading -- TRUE during loading, FALSE otherwise.
+ * @return   HRESULT -- Result of attribute processing.
+ *
+ * Describe  This method processes the 'id' attribute.
+ */
+HRESULT OnAttrID(const SStringW &strValue, BOOL bLoading);
 
-    /**
-     * OnAttrName
-     * @brief    Handles the 'name' attribute.
-     * @param    const SStringW &strValue -- Attribute value.
-     * @param    BOOL bLoading -- TRUE during loading, FALSE otherwise.
-     * @return   HRESULT -- Result of attribute processing.
-     *
-     * Describe  This method processes the 'name' attribute.
-     */
-    HRESULT OnAttrName(const SStringW &strValue, BOOL bLoading);
+/**
+ * OnAttrName
+ * @brief    Handles the 'name' attribute.
+ * @param    const SStringW &strValue -- Attribute value.
+ * @param    BOOL bLoading -- TRUE during loading, FALSE otherwise.
+ * @return   HRESULT -- Result of attribute processing.
+ *
+ * Describe  This method processes the 'name' attribute.
+ */
+HRESULT OnAttrName(const SStringW &strValue, BOOL bLoading);
 
-    /**
-     * OnAttrTip
-     * @brief    Handles the 'tip' attribute.
-     * @param    const SStringW &strValue -- Attribute value.
-     * @param    BOOL bLoading -- TRUE during loading, FALSE otherwise.
-     * @return   HRESULT -- Result of attribute processing.
-     *
-     * Describe  This method processes the 'tip' attribute.
-     */
-    HRESULT OnAttrTip(const SStringW &strValue, BOOL bLoading);
+/**
+ * OnAttrTip
+ * @brief    Handles the 'tip' attribute.
+ * @param    const SStringW &strValue -- Attribute value.
+ * @param    BOOL bLoading -- TRUE during loading, FALSE otherwise.
+ * @return   HRESULT -- Result of attribute processing.
+ *
+ * Describe  This method processes the 'tip' attribute.
+ */
+HRESULT OnAttrTip(const SStringW &strValue, BOOL bLoading);
 
-    /**
-     * OnAttrText
-     * @brief    Handles the 'text' attribute.
-     * @param    const SStringW &strValue -- Attribute value.
-     * @param    BOOL bLoading -- TRUE during loading, FALSE otherwise.
-     * @return   HRESULT -- Result of attribute processing.
-     *
-     * Describe  This method processes the 'text' attribute.
-     */
-    HRESULT OnAttrText(const SStringW &strValue, BOOL bLoading);
+/**
+ * OnAttrText
+ * @brief    Handles the 'text' attribute.
+ * @param    const SStringW &strValue -- Attribute value.
+ * @param    BOOL bLoading -- TRUE during loading, FALSE otherwise.
+ * @return   HRESULT -- Result of attribute processing.
+ *
+ * Describe  This method processes the 'text' attribute.
+ */
+HRESULT OnAttrText(const SStringW &strValue, BOOL bLoading);
 
-    /**
-     * OnAttrLayer
-     * @brief    Handles the 'layer' attribute.
-     * @param    const SStringW &strValue -- Attribute value.
-     * @param    BOOL bLoading -- TRUE during loading, FALSE otherwise.
-     * @return   HRESULT -- Result of attribute processing.
-     *
-     * Describe  This method processes the 'layer' attribute.
-     */
-    HRESULT OnAttrLayer(const SStringW &strValue, BOOL bLoading);
+/**
+ * OnAttrLayer
+ * @brief    Handles the 'layer' attribute.
+ * @param    const SStringW &strValue -- Attribute value.
+ * @param    BOOL bLoading -- TRUE during loading, FALSE otherwise.
+ * @return   HRESULT -- Result of attribute processing.
+ *
+ * Describe  This method processes the 'layer' attribute.
+ */
+HRESULT OnAttrLayer(const SStringW &strValue, BOOL bLoading);
 
-    /**
-     * DefAttributeProc
-     * @brief    Default attribute processing function.
-     * @param    const SStringW &strAttribName -- Attribute name.
-     * @param    const SStringW &strValue -- Attribute value.
-     * @param    BOOL bLoading -- TRUE during loading, FALSE otherwise.
-     * @return   HRESULT -- Result of attribute processing.
-     *
-     * Describe  This method processes attributes not explicitly handled.
-     */
-    HRESULT DefAttributeProc(const SStringW &strAttribName, const SStringW &strValue, BOOL bLoading);
+/**
+ * DefAttributeProc
+ * @brief    Default attribute processing function.
+ * @param    const SStringW &strAttribName -- Attribute name.
+ * @param    const SStringW &strValue -- Attribute value.
+ * @param    BOOL bLoading -- TRUE during loading, FALSE otherwise.
+ * @return   HRESULT -- Result of attribute processing.
+ *
+ * Describe  This method processes attributes not explicitly handled.
+ */
+HRESULT DefAttributeProc(const SStringW &strAttribName, const SStringW &strValue, BOOL bLoading) OVERRIDE;
 
-    /**
-     * AfterAttribute
-     * @brief    Called after an attribute is processed.
-     * @param    const SStringW &strAttribName -- Attribute name.
-     * @param    const SStringW &strValue -- Attribute value.
-     * @param    BOOL bLoading -- TRUE during loading, FALSE otherwise.
-     * @param    HRESULT hr -- Result of attribute processing.
-     * @return   HRESULT -- Result of post-processing.
-     *
-     * Describe  This method performs additional processing after an attribute is set.
-     */
-    virtual HRESULT AfterAttribute(const SStringW &strAttribName, const SStringW &strValue, BOOL bLoading, HRESULT hr);
-    SOUI_ATTRS_BEGIN()
-        ATTR_CUSTOM(L"layout", OnAttrLayout)
-        ATTR_CUSTOM(L"ownerLayout", OnAttrOwnerLayout)
-        ATTR_CUSTOM(L"class", OnAttrClass)
-        ATTR_CUSTOM(L"id", OnAttrID)
-        ATTR_CUSTOM(L"name", OnAttrName)
-        ATTR_CUSTOM(L"skin", OnAttrSkin)
-        ATTR_SKIN(L"ncskin", m_pNcSkin, TRUE)
-        ATTR_INT(L"data", m_uData, 0)
-        ATTR_CUSTOM(L"text", OnAttrText)
-        ATTR_STRINGW(L"trCtx", m_strTrCtx, FALSE)
-        ATTR_CUSTOM(L"enable", OnAttrEnable)
-        ATTR_CUSTOM(L"visible", OnAttrVisible)
-        ATTR_CUSTOM(L"show", OnAttrVisible)
-        ATTR_CUSTOM(L"display", OnAttrDisplay)
-        ATTR_CUSTOM(L"cache", OnAttrCache)
-        ATTR_CUSTOM(L"alpha", OnAttrAlpha)
-        ATTR_BOOL(L"layeredWindow", m_bLayeredWindow, TRUE)
-        ATTR_CUSTOM(L"layer", OnAttrLayer)
-        ATTR_BOOL(L"enableLayer", m_bEnableLayer, FALSE)
-        ATTR_CUSTOM(L"trackMouseEvent", OnAttrTrackMouseEvent)
-        ATTR_CUSTOM(L"videoCanvas", OnAttrVideoCanvas)
-        ATTR_CUSTOM(L"tip", OnAttrTip)
-        ATTR_BOOL(L"msgTransparent", m_bMsgTransparent, FALSE)
-        ATTR_LAYOUTSIZE(L"maxWidth", m_nMaxWidth, FALSE)
-        ATTR_BOOL(L"clipClient", m_bClipClient, FALSE)
-        ATTR_BOOL(L"focusable", m_bFocusable, FALSE)
-        ATTR_BOOL(L"drawFocusRect", m_bDrawFocusRect, TRUE)
-        ATTR_BOOL(L"hoverAware", m_bHoverAware, FALSE)
-        ATTR_BOOL(L"float", m_bFloat, FALSE)
-        ATTR_FLOAT(L"pivotX", m_pivotX, FALSE)
-        ATTR_FLOAT(L"pivotY", m_pivotY, FALSE)
-        ATTR_CHAIN(m_style, HRET_FLAG_STYLE)
-        ATTR_CHAIN_PTR(m_pLayout, HRET_FLAG_LAYOUT)
-        ATTR_CHAIN_PTR(m_pLayoutParam, HRET_FLAG_LAYOUT_PARAM)
-    SOUI_ATTRS_END()
-    /** Protected virtual methods for handling specific events and operations in SWindow class. */
-  protected:
-    /**
-     * @brief Called when the language of the window changes.
-     * @return HRESULT Result of the operation.
-     */
-    virtual HRESULT OnLanguageChanged();
+/**
+ * AfterAttribute
+ * @brief    Called after an attribute is processed.
+ * @param    const SStringW &strAttribName -- Attribute name.
+ * @param    const SStringW &strValue -- Attribute value.
+ * @param    BOOL bLoading -- TRUE during loading, FALSE otherwise.
+ * @param    HRESULT hr -- Result of attribute processing.
+ * @return   HRESULT -- Result of post-processing.
+ *
+ * Describe  This method performs additional processing after an attribute is set.
+ */
+virtual HRESULT AfterAttribute(const SStringW &strAttribName, const SStringW &strValue, BOOL bLoading, HRESULT hr);
+SOUI_ATTRS_BEGIN()
+    ATTR_CUSTOM(L"layout", OnAttrLayout)
+    ATTR_CUSTOM(L"ownerLayout", OnAttrOwnerLayout)
+    ATTR_CUSTOM(L"class", OnAttrClass)
+    ATTR_CUSTOM(L"id", OnAttrID)
+    ATTR_CUSTOM(L"name", OnAttrName)
+    ATTR_CUSTOM(L"skin", OnAttrSkin)
+    ATTR_SKIN(L"ncskin", m_pNcSkin, TRUE)
+    ATTR_INT(L"data", m_uData, 0)
+    ATTR_CUSTOM(L"text", OnAttrText)
+    ATTR_STRINGW(L"trCtx", m_strTrCtx, FALSE)
+    ATTR_CUSTOM(L"enable", OnAttrEnable)
+    ATTR_CUSTOM(L"visible", OnAttrVisible)
+    ATTR_CUSTOM(L"show", OnAttrVisible)
+    ATTR_CUSTOM(L"display", OnAttrDisplay)
+    ATTR_CUSTOM(L"cache", OnAttrCache)
+    ATTR_CUSTOM(L"alpha", OnAttrAlpha)
+    ATTR_BOOL(L"layeredWindow", m_bLayeredWindow, TRUE)
+    ATTR_CUSTOM(L"layer", OnAttrLayer)
+    ATTR_BOOL(L"enableLayer", m_bEnableLayer, FALSE)
+    ATTR_CUSTOM(L"trackMouseEvent", OnAttrTrackMouseEvent)
+    ATTR_CUSTOM(L"videoCanvas", OnAttrVideoCanvas)
+    ATTR_CUSTOM(L"tip", OnAttrTip)
+    ATTR_BOOL(L"msgTransparent", m_bMsgTransparent, FALSE)
+    ATTR_LAYOUTSIZE(L"maxWidth", m_nMaxWidth, FALSE)
+    ATTR_BOOL(L"clipClient", m_bClipClient, FALSE)
+    ATTR_BOOL(L"focusable", m_bFocusable, FALSE)
+    ATTR_BOOL(L"drawFocusRect", m_bDrawFocusRect, TRUE)
+    ATTR_BOOL(L"hoverAware", m_bHoverAware, FALSE)
+    ATTR_BOOL(L"float", m_bFloat, FALSE)
+    ATTR_FLOAT(L"pivotX", m_pivotX, FALSE)
+    ATTR_FLOAT(L"pivotY", m_pivotY, FALSE)
+    ATTR_CHAIN(m_style, HRET_FLAG_STYLE)
+    ATTR_CHAIN_PTR(m_pLayout, HRET_FLAG_LAYOUT)
+    ATTR_CHAIN_PTR(m_pLayoutParam, HRET_FLAG_LAYOUT_PARAM)
+SOUI_ATTRS_END()
+/** Protected virtual methods for handling specific events and operations in SWindow class. */
+protected:
+/**
+ * @brief Called when the language of the window changes.
+ * @return HRESULT Result of the operation.
+ */
+virtual HRESULT OnLanguageChanged();
 
-    /**
-     * @brief Called when the scale of the window changes.
-     * @param scale The new scale value.
-     */
-    virtual void OnScaleChanged(int scale);
+/**
+ * @brief Called when the scale of the window changes.
+ * @param scale The new scale value.
+ */
+virtual void OnScaleChanged(int scale);
 
-    /**
-     * @brief Called when the font of the window needs to be rebuilt.
-     */
-    virtual void OnRebuildFont();
+/**
+ * @brief Called when the font of the window needs to be rebuilt.
+ */
+virtual void OnRebuildFont();
 
-    /**
-     * @brief Called before a child window is inserted into this window.
-     * @param pChild Pointer to the child window being inserted.
-     */
-    virtual void OnBeforeInsertChild(SWindow *pChild);
+/**
+ * @brief Called before a child window is inserted into this window.
+ * @param pChild Pointer to the child window being inserted.
+ */
+virtual void OnBeforeInsertChild(SWindow *pChild);
 
-    /**
-     * @brief Called after a child window has been inserted into this window.
-     * @param pChild Pointer to the child window that was inserted.
-     */
-    virtual void OnAfterInsertChild(SWindow *pChild);
+/**
+ * @brief Called after a child window has been inserted into this window.
+ * @param pChild Pointer to the child window that was inserted.
+ */
+virtual void OnAfterInsertChild(SWindow *pChild);
 
-    /**
-     * @brief Called before a child window is removed from this window.
-     * @param pChild Pointer to the child window being removed.
-     */
-    virtual void OnBeforeRemoveChild(SWindow *pChild);
+/**
+ * @brief Called before a child window is removed from this window.
+ * @param pChild Pointer to the child window being removed.
+ */
+virtual void OnBeforeRemoveChild(SWindow *pChild);
 
-    /**
-     * @brief Called after a child window has been removed from this window.
-     * @param pChild Pointer to the child window that was removed.
-     */
-    virtual void OnAfterRemoveChild(SWindow *pChild);
+/**
+ * @brief Called after a child window has been removed from this window.
+ * @param pChild Pointer to the child window that was removed.
+ */
+virtual void OnAfterRemoveChild(SWindow *pChild);
 
-    /**
-     * @brief Called when the container of the window changes.
-     * @param pOldContainer Pointer to the old container.
-     * @param pNewContainer Pointer to the new container.
-     */
-    virtual void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer);
+/**
+ * @brief Called when the container of the window changes.
+ * @param pOldContainer Pointer to the old container.
+ * @param pNewContainer Pointer to the new container.
+ */
+virtual void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer);
 
-    /** Private member variable representing the window's position in its container. */
-  private:
-    CRect m_rcWindow; /**<
-                         The position of the window within its container. Adjusted to private to prevent direct access by derived classes.
-                       */
+/** Private member variable representing the window's position in its container. */
+private:
+CRect m_rcWindow; /**<
+                     The position of the window within its container. Adjusted to private to prevent direct access by derived classes.
+                   */
 
-  protected:
-    /**
-     * @brief Enumerates the types of layout dirty states.
-     */
-    enum LayoutDirtyType
-    {
-        dirty_clean = 0, /**< Clean state (no layout issues). */
-        dirty_self = 1,  /**< Self-dirty state (this window needs re-layout). */
-        dirty_child = 2, /**< Child-dirty state (a child window needs re-layout). */
-    };
-
-    /**
-     * @brief Member variables representing various properties of the window.
-     */
-    SWND m_swnd;   /**< Window handle. */
-    BOOL m_bFloat; /**< Indicates if the window position is fixed. */
-
-    ISwndContainer *m_pContainer; /**< Pointer to the container object. */
-    SEventSet m_evtSet;           /**< Event set for the window. */
-
-    SAutoRefPtr<ILayout> m_pLayout;           /**< Pointer to the layout object.  */
-    SAutoRefPtr<ILayoutParam> m_pLayoutParam; /**< Pointer to the layout parameter object. */
-
-    SWindow *m_pOwner;       /**< Pointer to the owner window. */
-    SWindow *m_pParent;      /**< Pointer to the parent window. */
-    SWindow *m_pFirstChild;  /**< Pointer to the first child window. */
-    SWindow *m_pLastChild;   /**< Pointer to the last child window. */
-    SWindow *m_pNextSibling; /**< Pointer to the next sibling window. */
-    SWindow *m_pPrevSibling; /**< Pointer to the previous sibling window. */
-    UINT m_nChildrenCount;   /**< Number of child windows. */
-
-    SWNDMSG *m_pCurMsg; /**< Pointer to the current message being processed. */
-
-    SwndStyle m_style;        /**< Window style, a collection of window attributes. */
-    STrText m_strText;        /**< Window text. */
-    STrText m_strToolTipText; /**< Tooltip text for the window. */
-    SStringW m_strTrCtx;      /**< Translation context. If empty, uses the container's translation context. */
-    UINT m_uZorder;           /**< Z-order of the window. */
-    int m_nLayer;             /**< Layer of the window. */
-    BOOL m_bEnableLayer;      /**< Indicates if the layer is enabled. */
-    int m_nUpdateLockCnt;     /**< Update lock count. Prevents Invalidate messages to the host when locked. */
-
-    DWORD m_dwState;        /**< State of the window during rendering. */
-    BOOL m_bVisible;        /**< Visibility state of the window. */
-    BOOL m_bDisable;        /**< Disabled state of the window. */
-    BOOL m_bDisplay;        /**< Indicates if the window occupies space when hidden. */
-    BOOL m_bClipClient;     /**< Flag indicating if client area clipping is enabled. */
-    BOOL m_bMsgTransparent; /**< Message transparency flag. TRUE means no message processing. */
-    BOOL m_bFocusable;      /**< Indicates if the window can receive focus. */
-    BOOL m_bDrawFocusRect;  /**< Indicates if the default focus rectangle should be drawn. */
-    BOOL m_bCacheDraw;      /**< Indicates if the window content is cached. */
-    BOOL m_bCacheDirty;     /**< Indicates if the cache is dirty. */
-    BOOL m_bLayeredWindow;  /**< Indicates if the window is layered. */
-    BOOL m_isLoading;       /**< Loading state flag. */
-    BOOL m_bHoverAware;     /**< Hover-aware state flag. */
-    BOOL m_bMsgHandled;     /**< Message handled flag. */
-
-    LayoutDirtyType m_layoutDirty;         /**< Layout dirty state. */
-    SAutoRefPtr<IRenderTarget> m_cachedRT; /**< Cached render target for the window. */
-    SAutoRefPtr<IRegionS> m_clipRgn;       /**< Clipping region for the window. */
-    SAutoRefPtr<IPathS> m_clipPath;        /**< Clipping path for the window. */
-    SAutoRefPtr<ISkinObj> m_pBgSkin;       /**< Background skin object. */
-    SAutoRefPtr<ISkinObj> m_pNcSkin;       /**< Non-client area skin object. */
-    ULONG_PTR m_uData;                     /**< User data for the window. */
-
-    SLayoutSize m_nMaxWidth; /**< Maximum width of the window when calculating size automatically. */
-
-    COLORREF m_crColorize; /**< Colorization value for the window. */
-
-    SAutoRefPtr<IAnimation> m_animation;    /**< Animation object. */
-    SAnimationHandler *m_pAnimationHandler; /**< Animation handler for the window.  */
-    float m_pivotX;                         /**< Pivot X coordinate for transformations. default is 0.5f */
-    float m_pivotY;                         /**< Pivot Y coordinate for transformations. default is 0.5f */
-    SAnimatorHandler *m_pAnimatorHandler;   /**< Property animator handler for the window. */
-    STransformation m_transform;            /**< Transformation object. */
-    BOOL m_isAnimating;                     /**< Flag indicating if the window is currently animating. */
-    BOOL m_isDestroying;                    /**< Flag indicating if the window is being destroyed. */
-
-    typedef struct GETRTDATA
-    {
-        CRect rcRT;                    /**< Valid range for GETRT calls. */
-        GrtFlag gdcFlags;              /**< Drawing flags for GETRT. */
-        SAutoRefPtr<IRegionS> rgn;     /**< IRegion object corresponding to rcRT. */
-        SAutoRefPtr<IRenderTarget> rt; /**< Render target created during GetRenderTarget, used for caching during redraws. */
-    } * PGETRTDATA;
-
-    PGETRTDATA m_pGetRTData; /**< Pointer to GETRT data.  */
-
-    SAutoRefPtr<IAttrStorage> m_attrStorage; /**< Attribute storage object. */
-    SAutoRefPtr<ICaret> m_caret;             /**< Caret object. */
-
-    FunSwndProc m_funSwndProc; /**< Custom window procedure. */
-#ifdef SOUI_ENABLE_ACC
-    SAutoRefPtr<IAccessible> m_pAcc;    /**< Accessibility object. */
-    SAutoRefPtr<IAccProxy> m_pAccProxy; /**< Accessibility proxy object. */
-#endif                                  /**< SOUI_ENABLE_ACC */
-#ifdef _DEBUG
-    tid_t m_nMainThreadId; /**< ID of the main thread hosting the window. */
-#endif
+protected:
+/**
+ * @brief Enumerates the types of layout dirty states.
+ */
+enum LayoutDirtyType
+{
+    dirty_clean = 0, /**< Clean state (no layout issues). */
+    dirty_self = 1,  /**< Self-dirty state (this window needs re-layout). */
+    dirty_child = 2, /**< Child-dirty state (a child window needs re-layout). */
 };
+
+/**
+ * @brief Member variables representing various properties of the window.
+ */
+SWND m_swnd;   /**< Window handle. */
+BOOL m_bFloat; /**< Indicates if the window position is fixed. */
+
+ISwndContainer *m_pContainer; /**< Pointer to the container object. */
+SEventSet m_evtSet;           /**< Event set for the window. */
+
+SAutoRefPtr<ILayout> m_pLayout;           /**< Pointer to the layout object.  */
+SAutoRefPtr<ILayoutParam> m_pLayoutParam; /**< Pointer to the layout parameter object. */
+
+SWindow *m_pOwner;       /**< Pointer to the owner window. */
+SWindow *m_pParent;      /**< Pointer to the parent window. */
+SWindow *m_pFirstChild;  /**< Pointer to the first child window. */
+SWindow *m_pLastChild;   /**< Pointer to the last child window. */
+SWindow *m_pNextSibling; /**< Pointer to the next sibling window. */
+SWindow *m_pPrevSibling; /**< Pointer to the previous sibling window. */
+UINT m_nChildrenCount;   /**< Number of child windows. */
+
+SWNDMSG *m_pCurMsg; /**< Pointer to the current message being processed. */
+
+SwndStyle m_style;        /**< Window style, a collection of window attributes. */
+STrText m_strText;        /**< Window text. */
+STrText m_strToolTipText; /**< Tooltip text for the window. */
+SStringW m_strTrCtx;      /**< Translation context. If empty, uses the container's translation context. */
+UINT m_uZorder;           /**< Z-order of the window. */
+int m_nLayer;             /**< Layer of the window. */
+BOOL m_bEnableLayer;      /**< Indicates if the layer is enabled. */
+int m_nUpdateLockCnt;     /**< Update lock count. Prevents Invalidate messages to the host when locked. */
+
+DWORD m_dwState;        /**< State of the window during rendering. */
+BOOL m_bVisible;        /**< Visibility state of the window. */
+BOOL m_bDisable;        /**< Disabled state of the window. */
+BOOL m_bDisplay;        /**< Indicates if the window occupies space when hidden. */
+BOOL m_bClipClient;     /**< Flag indicating if client area clipping is enabled. */
+BOOL m_bMsgTransparent; /**< Message transparency flag. TRUE means no message processing. */
+BOOL m_bFocusable;      /**< Indicates if the window can receive focus. */
+BOOL m_bDrawFocusRect;  /**< Indicates if the default focus rectangle should be drawn. */
+BOOL m_bCacheDraw;      /**< Indicates if the window content is cached. */
+BOOL m_bCacheDirty;     /**< Indicates if the cache is dirty. */
+BOOL m_bLayeredWindow;  /**< Indicates if the window is layered. */
+BOOL m_isLoading;       /**< Loading state flag. */
+BOOL m_bHoverAware;     /**< Hover-aware state flag. */
+BOOL m_bMsgHandled;     /**< Message handled flag. */
+
+LayoutDirtyType m_layoutDirty;         /**< Layout dirty state. */
+SAutoRefPtr<IRenderTarget> m_cachedRT; /**< Cached render target for the window. */
+SAutoRefPtr<IRegionS> m_clipRgn;       /**< Clipping region for the window. */
+SAutoRefPtr<IPathS> m_clipPath;        /**< Clipping path for the window. */
+SAutoRefPtr<ISkinObj> m_pBgSkin;       /**< Background skin object. */
+SAutoRefPtr<ISkinObj> m_pNcSkin;       /**< Non-client area skin object. */
+ULONG_PTR m_uData;                     /**< User data for the window. */
+
+SLayoutSize m_nMaxWidth; /**< Maximum width of the window when calculating size automatically. */
+
+COLORREF m_crColorize; /**< Colorization value for the window. */
+
+SAutoRefPtr<IAnimation> m_animation;    /**< Animation object. */
+SAnimationHandler *m_pAnimationHandler; /**< Animation handler for the window.  */
+float m_pivotX;                         /**< Pivot X coordinate for transformations. default is 0.5f */
+float m_pivotY;                         /**< Pivot Y coordinate for transformations. default is 0.5f */
+SAnimatorHandler *m_pAnimatorHandler;   /**< Property animator handler for the window. */
+STransformation m_transform;            /**< Transformation object. */
+BOOL m_isAnimating;                     /**< Flag indicating if the window is currently animating. */
+BOOL m_isDestroying;                    /**< Flag indicating if the window is being destroyed. */
+
+typedef struct GETRTDATA
+{
+    CRect rcRT;                    /**< Valid range for GETRT calls. */
+    GrtFlag gdcFlags;              /**< Drawing flags for GETRT. */
+    SAutoRefPtr<IRegionS> rgn;     /**< IRegion object corresponding to rcRT. */
+    SAutoRefPtr<IRenderTarget> rt; /**< Render target created during GetRenderTarget, used for caching during redraws. */
+} * PGETRTDATA;
+
+PGETRTDATA m_pGetRTData; /**< Pointer to GETRT data.  */
+
+SAutoRefPtr<IAttrStorage> m_attrStorage; /**< Attribute storage object. */
+SAutoRefPtr<ICaret> m_caret;             /**< Caret object. */
+
+FunSwndProc m_funSwndProc; /**< Custom window procedure. */
+#ifdef SOUI_ENABLE_ACC
+SAutoRefPtr<IAccessible> m_pAcc;    /**< Accessibility object. */
+SAutoRefPtr<IAccProxy> m_pAccProxy; /**< Accessibility proxy object. */
+#endif                              /**< SOUI_ENABLE_ACC */
+#ifdef _DEBUG
+tid_t m_nMainThreadId; /**< ID of the main thread hosting the window. */
+#endif
+}
+;
 
 /**
  * @brief A helper class to enable or disable private UI definitions for the host container.

@@ -67,10 +67,10 @@ class CChessLayout
 	//CHESSMAN chsLayout[10][9]:布局
 	//CHSSIDE selfSide:自己的颜色
 	void InitLayout(const int chsLayout[10][9],CHSSIDE selfSide);
-	void Copy(CChessLayout *pLayout);
+	void Copy(const CChessLayout *pLayout);
 	//获得指定棋子的移动范围
-	int  GetPossiableMoves(POINT ptFocus,POINT ptMoves[MAX_MOVES]);
-	int  GetPossiableMoves(int x,int y,POINT ptMoves[MAX_MOVES]);
+	int  GetPossibleMoves(POINT ptFocus,POINT ptMoves[MAX_MOVES]);
+	int  GetPossibleMoves(int x,int y,POINT ptMoves[MAX_MOVES]);
 	// 移动一步
 	MOVESTEP Move(POINT pt1, POINT pt2);
 	//回退一步走棋

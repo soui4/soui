@@ -101,7 +101,7 @@ class SOUI_EXP SSpinButtonCtrl : public TWindowProxy<ISpinButtonCtrl> {
      * @brief Handles colorization of the control.
      * @param cr Color reference for colorization.
      */
-    virtual void OnColorize(COLORREF cr);
+    virtual void OnColorize(COLORREF cr) OVERRIDE;
 
   protected:
     /**
@@ -114,7 +114,7 @@ class SOUI_EXP SSpinButtonCtrl : public TWindowProxy<ISpinButtonCtrl> {
      * @brief Handles scale change events.
      * @param scale The new scale value.
      */
-    void OnScaleChanged(int scale);
+    void OnScaleChanged(int scale) OVERRIDE;
 
     /**
      * @brief Handles left mouse button down events.

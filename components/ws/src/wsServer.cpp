@@ -91,6 +91,45 @@ void WsServer::run()
     while (!m_finished)
     {
         lws_service(m_context, 50);
+        DrainServiceQueue();
+    }
+}
+
+void WsServer::DrainServiceQueue()
+{
+    // 服务队列在 LWS 事件线程(LWS线程)上排空, 确保回调与其他游戏消息串行执行
+    std::deque<SAutoRefPtr<IRunnable> > tasks;
+    {
+        std::lock_guard<std::mutex> lock(m_serviceMutex);
+        tasks.swap(m_serviceQueue);
+    }
+    for (size_t i = 0; i < tasks.size(); ++i)
+        tasks[i]->run();
+}
+
+void WsServer::postServiceTask(IRunnable * task)
+{
+    // clone 使调用方栈上的 IRunnable 可在返回后安全销毁(与 ITaskLoop::postTask 一致)
+    SAutoRefPtr<IRunnable> pClone;
+    pClone.Attach(task->clone());
+    bool bWake = false;
+    {
+        std::lock_guard<std::mutex> lock(m_serviceMutex);
+        // 仅当队列"从空变非空"时才唤醒, 避免打断已在进行的中断唤醒
+        bWake = m_serviceQueue.empty();
+        m_serviceQueue.push_back(pClone);
+    }
+    if (bWake)
+    {
+        // 关键修复: LWS 事件线程当前正阻塞在 lws_service/poll 等待网络事件,
+        // 单纯入队不会打断该阻塞。若这里不唤醒, 服务任务(如机器人AI结果)会一直被
+        // 拖延到下一次网络事件才在 run() 中被 DrainServiceQueue 执行,
+        // 导致"搜索已完成(0ms)但结果迟迟不落子"的严重延迟(实测可达20s+)。
+        // lws_cancel_service 是该场景的标准跨线程唤醒机制(quit() 亦用它退出阻塞),
+        // 会令 poll 立即返回, run() 随即循环回来执行 DrainServiceQueue。
+        lws_context *ctx = m_context;
+        if (ctx)
+            lws_cancel_service(ctx);
     }
 }
 
@@ -104,7 +143,10 @@ int WsServer::handler(lws *websocket, lws_callback_reasons reasons,
     void *userData, void *data, size_t len)
 {
     std::unique_lock<std::mutex> lock(m_mutex);
-    if (m_finished)
+    // After quit() the lws_context_destroy below still fires LWS_CALLBACK_CLOSED
+    // for every live connection: it must NOT be short-circuited, otherwise each
+    // SvrConnection leaks and the listener never sees onDisconnect.
+    if (m_finished && reasons != LWS_CALLBACK_CLOSED)
         return -1;
     int ret = 0;
     switch (reasons)
@@ -144,11 +186,10 @@ int WsServer::handler(lws *websocket, lws_callback_reasons reasons,
                         return -1;  // 关闭连接
                     }
 
-                    // 发送ping
-                    lws_send_ping(websocket);
-                    conn->last_ping = now;
-                    conn->ping_timeout_count++;  // 假设会超时，收到pong时会清零
-                    SLOGI() << "send ping, count=" << conn->ping_timeout_count << ", conn=" << conn;
+                    // request a ping: the actual write must happen in the
+                    // WRITEABLE callback (lws only allows writes there)
+                    conn->bPingPending = true;
+                    lws_callback_on_writable(websocket);
                 }
             }
 
@@ -213,11 +254,17 @@ int WsServer::handler(lws *websocket, lws_callback_reasons reasons,
         SvrConnection*conn = *(SvrConnection**)userData;
         if (!conn)
             break;
+        {
+            // invalidate the socket BEFORE the wsi is recycled, so isValid()
+            // returns 0 and send() fails fast instead of touching a dangling lws*
+            std::lock_guard<std::mutex> connLock(conn->m_mutex);
+            conn->m_socket = nullptr;
+        }
         if (m_pListener)
         {
             SLOGI() << "connection closed, conn=" << conn;
             lock_guard_rev rev(m_mutex);
-            m_pListener->onDisconnect(conn); 
+            m_pListener->onDisconnect(conn);
         }
         conn->Release();
         break;
@@ -243,6 +290,21 @@ int WsServer::handler(lws *websocket, lws_callback_reasons reasons,
         {
             lock_guard_rev rev(m_mutex);
             conn->sendBuf();
+            std::lock_guard<std::mutex> connLock(conn->m_mutex);
+            if (conn->bWantClose)
+            {
+                lws_close_reason(websocket, LWS_CLOSE_STATUS_UNEXPECTED_CONDITION, NULL, 0);
+                ret = -1; // kill the connection after a write error
+            }
+            else if (conn->bPingPending && conn->sendingBuf.empty())
+            {
+                // send the ping requested by the TIMER here, where lws allows writes
+                conn->bPingPending = false;
+                conn->last_ping = time(NULL);
+                conn->ping_timeout_count++; // assume timeout, reset on pong
+                lws_send_ping(websocket);
+                SLOGI() << "send ping, count=" << conn->ping_timeout_count << ", conn=" << conn;
+            }
         }
     }
     break;

@@ -107,6 +107,7 @@ target_link_libraries(
         cnchess-android
         PUBLIC
         soui4android
+        ExtendCtrls
         soui4
         utilities4
         swinx

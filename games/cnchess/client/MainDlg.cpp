@@ -13,7 +13,11 @@
 #include <helper/slog.h>
 #include <mmsystem.h>
 #include <shlobj.h>
+#include "utils.h"
+#include <valueAnimator/SPropertyAnimator.h>
 #define kLogTag "MainDlg"
+
+const int CMainDlg::ANI_TIP = 0x50;
 
 #ifdef _WIN32
 #include "win32_audio.h"
@@ -25,26 +29,33 @@ CMainDlg::CMainDlg(SGameTheme* pTheme)
 , m_bThemeLoaded(false)
 , m_bGameInited(false)
 , m_bConnected(false)
-, m_bLobbyInited(false)
 , m_pThemeProgressModal(NULL)
 , m_themeProgressSession(0)
 , m_modalRoot(NULL)
+, m_pTipContainer(NULL)
+, m_nSelAvatarId(1)
+, m_tsLastTip(0)
 {
-    m_pGame = new CChessGame(this,pTheme);
-    m_pLobbyHandler = new LobbyHandler();
     m_webSocketClient.SetMessageHandler(this);
     m_themeDownloader.SetListener(this);
+    m_pGame = new CChessGame(this,pTheme);
+    m_pLobbyHandler = new LobbyHandler(this);
+    m_pEndgameHandler = new EndgameHandler(this, pTheme);
+    m_pLobbyHandler->SetWebSocket(&m_webSocketClient);
+    m_pEndgameHandler->SetWebSocket(&m_webSocketClient);
 }
 
 CMainDlg::~CMainDlg()
 {
     delete m_pGame;
     delete m_pLobbyHandler;
+    delete m_pEndgameHandler;
 }
 
 BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 {
     m_modalRoot = FindChildByName("modal_root");
+    m_pTipContainer = FindChildByName("tip_container");
     #if defined (__IOS__)
     FindChildByName("pane_ios_header")->SetVisible(TRUE,TRUE);
     #endif
@@ -84,8 +95,34 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
                 pEdtSvr->SetWindowText(S_CW2T(node.attribute(L"svr").as_string()));
                 pEdtName->SetWindowText(S_CW2T(node.attribute(L"name").as_string()));
                 pComboSex->SetCurSel(node.attribute(L"sex").as_int(0));
+                int nAvatarId = node.attribute(L"avatar_id").as_int(1);
+                if (nAvatarId < 1 || nAvatarId >= BuiltinAvatar::COUNT) nAvatarId = 1;
+                m_nSelAvatarId = nAvatarId;
             }
         }
+    }
+
+    // 头像选择：仅提供内置头像(CHAIR 为空座位占位, 不提供), 选中项高亮
+    auto UpdateAvatarSel = [pModal](int nId){
+        for (int i = 1; i < BuiltinAvatar::COUNT; ++i)
+        {
+            SStringT strName;
+            strName.Format(_T("btn_avatar_%d"), i);
+            SWindow *pBtn = pModal->FindChildByName(strName);
+            if (pBtn) pBtn->SetAlpha(i == nId ? 255 : 160);
+        }
+    };
+    UpdateAvatarSel(m_nSelAvatarId);
+    for (int i = 1; i < BuiltinAvatar::COUNT; ++i)
+    {
+        SStringT strName;
+        strName.Format(_T("btn_avatar_%d"), i);
+        SWindow *pBtn = pModal->FindChildByName(strName);
+        if (pBtn) pBtn->SubscribeEvent(EventCmd::EventID, [this, i, UpdateAvatarSel](IEvtArgs *e){
+            m_nSelAvatarId = i;
+            UpdateAvatarSel(i);
+            return TRUE;
+        });
     }
 
     ModalViewSessionID session_id = BeginModalViewSession(pModal,m_modalRoot);
@@ -105,6 +142,7 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
             node.attribute2(L"svr").set_value(S_CT2W(strSvr));
             node.attribute2(L"name").set_value(S_CT2W(strName));
             node.attribute2(L"sex").set_value(cSex);
+            node.attribute2(L"avatar_id").set_value(m_nSelAvatarId);
         }
         SStringT strCfg = SApplication::getSingleton().GetAppDir() + _T("/cnchess_cfg.xml");
         doc.save_file(strCfg);
@@ -121,7 +159,7 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
             SStringT strName = pEdtName->GetWindowText();
             int iSel = pComboSex->GetCurSel();
             char cSex = pComboSex->GetItemData(iSel);
-            OnLoginSuccess(strSvr, strName, cSex);
+            OnLoginSuccess(strSvr, strName, cSex, m_nSelAvatarId);
         } else {
             OnClose();
         }
@@ -152,10 +190,6 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
     FindChildByName(L"txt_title")->SetWindowText(strTitle);
     SetWindowText(strTitle);
 
-    // 初始化大厅（不依赖主题）
-    m_pLobbyHandler->Init(FindChildByName(L"room_container"), &m_webSocketClient);
-    m_bLobbyInited = true;
-
     // 游戏初始化延迟到主题加载完成后（OnThemeReady）
 
     SStringA svr = S_CT2A(dlgLogin.m_strSvr);
@@ -166,18 +200,19 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 }
 
 #if defined(__MOBILE__)
-void CMainDlg::OnLoginSuccess(SStringT strSvr, SStringT strName, char cSex)
+void CMainDlg::OnLoginSuccess(SStringT strSvr, SStringT strName, char cSex, int nAvatarId)
 {
     MyProfile* myProfile = MyProfile::getSingletonPtr();
     myProfile->SetSex(cSex);
     myProfile->SetName(strName);
-    // 移动端默认根据性别匹配默认内置头像
-    int nId = (cSex == SEX_FEMALE) ? BuiltinAvatar::FEMALE : BuiltinAvatar::MALE;
-    myProfile->SetAvatarId(nId);
+    // 使用登录弹窗选择的内置头像; 非法值回退为按性别匹配默认头像
+    if (nAvatarId < 1 || nAvatarId >= BuiltinAvatar::COUNT)
+        nAvatarId = (cSex == SEX_FEMALE) ? BuiltinAvatar::FEMALE : BuiltinAvatar::MALE;
+    myProfile->SetAvatarId(nAvatarId);
 
     // 初始化大厅（不依赖主题）
-    m_pLobbyHandler->Init(FindChildByName(L"room_container"), &m_webSocketClient);
-    m_bLobbyInited = true;
+    m_pLobbyHandler->Init(FindChildByName(L"room_container"));
+    m_pEndgameHandler->Init(FindChildByName(L"endgame_container"));
 
     // 游戏初始化延迟到主题加载完成后（OnThemeReady）
 
@@ -250,6 +285,7 @@ void CMainDlg::OnConnected()
 
     // 大厅不依赖主题，可以立即处理连接
     m_pLobbyHandler->OnConnected();
+    m_pEndgameHandler->OnConnected();
 
     // 游戏依赖主题，仅在已初始化时通知连接
     if (m_bGameInited)
@@ -310,9 +346,32 @@ BOOL CMainDlg::_OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE> > data
         break;
     }
     bRet = m_pLobbyHandler->OnMessage(dwType, data);
+    // 残局大厅与普通大厅共用房间/桌卡信息, 二者都要接收
+    if (dwType == GMT_ROOM_INFO || dwType == GMT_TABLE_INFO)
+        m_pEndgameHandler->OnMessage(dwType, data);
+    if(bRet) return TRUE;
+    bRet = m_pEndgameHandler->OnMessage(dwType, data);
     if(bRet) return TRUE;
     bRet = m_pGame->OnMessage(dwType, data);
     return bRet;
+}
+
+void CMainDlg::SwitchToTab(int nIndex)
+{
+    STabCtrl *pTab = FindChildByName2<STabCtrl>(L"main_tabctrl");
+    if (pTab)
+        pTab->SetCurSel(nIndex);
+}
+
+void CMainDlg::SwitchToGame()
+{
+    STabCtrl *pTab = FindChildByName2<STabCtrl>(L"main_tabctrl");
+    if (!pTab)
+        return;
+    // 桌面/移动端页签顺序不同, 按游戏页窗口名查找所在页签
+    int nIndex = pTab->GetPageIndex(_T("game_container"), FALSE);
+    if (nIndex >= 0)
+        pTab->SetCurSel(nIndex);
 }
 
 void CMainDlg::OnThemeReady(const SStringT& strThemeDir, bool bUpdated)
@@ -384,6 +443,9 @@ void CMainDlg::InitGameAndLobby()
     if (!m_bThemeLoaded) return;
 
     SLOGI() << "InitGameAndLobby: initializing game";
+    // 初始化大厅（不依赖主题）
+    m_pLobbyHandler->Init(FindChildByName(L"room_container"));
+    m_pEndgameHandler->Init(FindChildByName(L"endgame_container"));
     m_pGame->Init(FindChildByName(L"game_container"), &m_webSocketClient);
     m_bGameInited = true;
 
@@ -437,6 +499,55 @@ void CMainDlg::OnBtnUnmute()
     FindChildByName(L"btn_mute")->SetVisible(TRUE);
     FindChildByName(L"btn_unmute")->SetVisible(FALSE);
     m_bMute = TRUE;
+}
+
+void CMainDlg::onAnimationEnd(IValueAnimator *pAnimator)
+{
+    IPropertyAnimator *pPropAnimator = sobj_cast<IPropertyAnimator>(pAnimator);
+    if (pPropAnimator && pPropAnimator->GetID() == ANI_TIP)
+    {
+        IWindow *pTip = pPropAnimator->GetTarget();
+        if (pTip)
+            pTip->Destroy();
+    }
+}
+
+void CMainDlg::PlayTip(const SStringT &strTip)
+{
+    if (!m_pTipContainer || !m_pTheme) return;
+    SXmlNode xmlTip = m_pTheme->GetTemplate(L"tip");
+    SASSERT(xmlTip);
+    SStringW strWndClass = xmlTip.attribute(L"wndclass").as_string(L"text");
+    IWindow *pTip = SApplication::getSingletonPtr()->CreateWindowByName(strWndClass);
+    pTip->InitFromXml(&xmlTip);
+    // 让提示容器覆盖顶层内容区域（悬浮容器不参与 vbox 布局，这里显式设置尺寸）
+    SWindow *pParent = m_pTipContainer->GetParent();
+    if (pParent)
+    {
+        CRect rcContent;
+        pParent->GetChildrenLayoutRect(&rcContent);
+        m_pTipContainer->Move(rcContent);
+    }
+    m_pTipContainer->InsertIChild(pTip);
+    pTip->SetWindowText(strTip);
+    AnchorPos toPos;
+    toPos.type = APT_Center_Top;
+    toPos.x = SLayoutSize(-10, dp);
+    toPos.y = SLayoutSize(-10, dp);
+    toPos.fOffsetX = -0.5f;
+    toPos.fOffsetY = -0.5f;
+
+    ILayoutParam* pParam = (ILayoutParam*)pTip->GetLayoutParam();
+    SAnchorLayoutParamStruct* pParamStruct = (SAnchorLayoutParamStruct*)pParam->GetRawData();
+    AnchorPos fromPos = pParamStruct->pos;
+    DWORD now = GetTickCount();
+    if ((now - m_tsLastTip) < 1000) {
+        fromPos.y.fSize += 50;
+    }
+    m_tsLastTip = now;
+    SAutoRefPtr<IValueAnimator> pAnim = Util::MoveAndHideSprite(pTip, fromPos, toPos, 5000);
+    pAnim->SetID(ANI_TIP);
+    pAnim->addListener(this);//destroy the tip when animation end.
 }
 
 void CMainDlg::PlayWave(LPCTSTR pszSound)

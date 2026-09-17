@@ -175,14 +175,14 @@ class SOUI_EXP SSplitWnd : public SWindow {
      * @param xmlNode The XML node containing the child window definitions.
      * @return TRUE if successful, otherwise FALSE.
      */
-    virtual BOOL CreateChildren(SXmlNode xmlNode);
+    virtual BOOL CreateChildren(SXmlNode xmlNode) OVERRIDE;
 
     /**
      * @brief Sets the cursor.
      * @param pt The mouse position.
      * @return TRUE if the cursor was set, otherwise FALSE.
      */
-    virtual BOOL OnSetCursor(const CPoint &pt);
+    virtual BOOL OnSetCursor(const CPoint &pt) OVERRIDE;
 
     /**
      * @brief Paints the window.

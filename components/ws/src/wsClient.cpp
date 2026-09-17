@@ -42,6 +42,15 @@ static bool load_file(const char *pszPath_u8, std::string &buf)
 
 int WsClient::connectTo(const char *server_, const char *path_, uint16_t port_, const char *protocolName_, ClientOption option)
 {
+    {
+        std::lock_guard<std::mutex> lockGuard(m_mutex);
+        if (!m_finished || m_worker.joinable())
+        {
+            lwsl_err("%s: already connecting/connected\n", __func__);
+            return -2;
+        }
+        m_finished = false;
+    }
     m_server = server_;
     m_path = path_;
     m_port = port_;
@@ -75,7 +84,6 @@ int WsClient::connectTo(const char *server_, const char *path_, uint16_t port_, 
     {
         contextCreationInfo.options = LWS_SERVER_OPTION_DO_SSL_GLOBAL_INIT;
     }
-    m_finished = false;
     this->m_context = lws_create_context(&contextCreationInfo);
 
     if (!this->m_context)
@@ -109,6 +117,9 @@ int WsClient::connectTo(const char *server_, const char *path_, uint16_t port_, 
     if (!lws_client_connect_via_info(&clientConnectInfo))
     {
         lwsl_err("%s: Could not connect!\n", __func__);
+        // destroy the context too, otherwise it leaks on every retry
+        lws_context_destroy(m_context);
+        m_context = nullptr;
         m_finished = true;
         return -1;
     }
@@ -118,19 +129,33 @@ int WsClient::connectTo(const char *server_, const char *path_, uint16_t port_, 
 
 void WsClient::quit()
 {
+    // fast path without the lock: quit() may be called from a listener callback
+    // running on the worker thread itself (which already holds m_mutex)
+    if (m_finished.load())
     {
-        std::lock_guard<std::mutex> lockGuard(m_mutex);
-        if (m_finished) {
-            if (this->m_worker.joinable())
-                this->m_worker.detach();
+        if (!m_worker.joinable())
+            return;
+        if (std::this_thread::get_id() == m_worker.get_id())
+        {
+            // joining ourselves would deadlock; let run() finish on its own
+            m_worker.detach();
             return;
         }
-        else {
-            this->m_finished = true;
-            lws_cancel_service(m_context);
-        }
+        // join so the object can be destroyed right after disconnect,
+        // while run() may still be inside lws_service/lws_context_destroy
+        m_worker.join();
+        return;
     }
-    this->m_worker.join();
+    {
+        std::lock_guard<std::mutex> lockGuard(m_mutex);
+        if (m_finished.load())
+            return;
+        m_finished = true;
+        lws_context *ctx = m_context;
+        if (ctx)
+            lws_cancel_service(ctx);
+    }
+    m_worker.join();
 }
 
 BOOL WsClient::wait(int timeout)
@@ -158,7 +183,7 @@ int WsClient::sendBinary2(DWORD dwType, const void *data, int nLen)
 int WsClient::send(const std::string &text, bool bBinary)
 {
     std::lock_guard<std::mutex> lockGuard(m_mutex);
-    if (this->m_finished)
+    if (this->m_finished || !this->m_wsi)
     {
         return -1;
     }
@@ -247,7 +272,21 @@ int WsClient::handler(lws_callback_reasons reasons, void *user, const void *data
             std::vector<unsigned char> buf;
             buf.resize(msgData.buf.length() + LWS_PRE);
             memcpy(buf.data() + LWS_PRE, msgData.buf.data(), msgData.buf.length());
-            lws_write(m_wsi, buf.data() + LWS_PRE, msgData.buf.length(), msgData.bBinary ? LWS_WRITE_BINARY : LWS_WRITE_TEXT);
+            lws_write_protocol writeMode = msgData.bContinuation ? LWS_WRITE_CONTINUATION
+                            : (msgData.bBinary ? LWS_WRITE_BINARY : LWS_WRITE_TEXT);
+            int n = lws_write(m_wsi, buf.data() + LWS_PRE, msgData.buf.length(), writeMode);
+            if (n < 0)
+            {
+                lwsl_err("%s: WRITEABLE: %d\n", __func__, n);
+                break; // the connection will be closed by lws afterwards
+            }
+            if (n < (int)msgData.buf.length())
+            {
+                // partial write: keep the unsent remainder at the queue head and retry
+                m_sendingBuf.push_front(MsgData(msgData.buf.substr(n), msgData.bBinary, msgData.msgId, true));
+                lws_callback_on_writable(m_wsi);
+                break;
+            }
             if (m_pListener)
             {
                 lock_guard_rev rev(m_mutex);
@@ -265,6 +304,7 @@ int WsClient::handler(lws_callback_reasons reasons, void *user, const void *data
     {
         const char *err = (char *)data;
         this->m_connected = false;
+        this->m_wsi = nullptr;
         if (m_pListener)
         {
             lock_guard_rev rev(m_mutex);
@@ -277,6 +317,7 @@ int WsClient::handler(lws_callback_reasons reasons, void *user, const void *data
     case LWS_CALLBACK_CLIENT_CLOSED:
     {
         this->m_connected = false;
+        this->m_wsi = nullptr;
         if (m_pListener)
         {
             lock_guard_rev rev(m_mutex);
@@ -314,7 +355,7 @@ void WsClient::blockReceive(BOOL bBlock)
         bEmpty = m_receivingBuf.empty();
     }
     // 解除阻塞时，如果缓冲中有消息，触发handler来处理
-    if (!bBlock && !bEmpty)
+    if (!bBlock && !bEmpty && m_wsi && m_context)
     {
         lws_callback_on_writable(m_wsi);
         lws_cancel_service(m_context);

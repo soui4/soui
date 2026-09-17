@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "LobbyHandler.h"
 #include "myprofile.h"
+#include "MainDlg.h"
 #include <cnchessProtocol.h>
 #include <helper/slog.h>
 #include <helper/SAdapterBase.h>
@@ -68,7 +69,21 @@ public:
         SStringT strTableId = SStringT().Format(_T("桌号: %d"), position);
         pItem->FindChildByName(L"txt_table_id")->SetWindowText(strTableId);
 
+        // 重置难度选择为收起状态
+        SWindow *pLevels = pItem->FindChildByName(L"wnd_robot_levels");
+        if (pLevels)
+            pLevels->SetVisible(FALSE, TRUE);
+
         auto slot = Subscriber(&CTableAdapter::OnButtonClick, this);
+
+        // 订阅邀请机器人及其难度按钮事件
+        const wchar_t *kRobotBtns[] = { L"btn_invite_robot", L"btn_lvl_beginner", L"btn_lvl_medium", L"btn_lvl_advanced" };
+        for (int i = 0; i < 4; i++)
+        {
+            SWindow *pBtn = pItem->FindChildByName(kRobotBtns[i]);
+            if (pBtn)
+                pBtn->SubscribeEvent(EventCmd::EventID, &slot);
+        }
 
         // 初始化座位显示
         for (int i = 0; i < PLAYER_COUNT; i++)
@@ -146,6 +161,38 @@ public:
         SWindow *pBtn = sobj_cast<SWindow>(e->Sender());
         SItemPanel *pItem = sobj_cast<SItemPanel>(pBtn->GetRoot());
         int nTableId = pItem->GetItemIndex();
+        SStringW strName = pBtn->GetName();
+
+        // 邀请机器人: 展开/收起难度选择(初/中/高 图片按钮)
+        if (strName == L"btn_invite_robot")
+        {
+            SWindow *pLevels = pItem->FindChildByName(L"wnd_robot_levels");
+            if (pLevels)
+                pLevels->SetVisible(!pLevels->IsVisible(), TRUE);
+            return TRUE;
+        }
+
+        // 选择难度: 邀请机器人坐到本桌的空位上(2人对局取当前用户对座)
+        if (strName == L"btn_lvl_beginner" || strName == L"btn_lvl_medium" || strName == L"btn_lvl_advanced")
+        {
+            int nLevel = (strName == L"btn_lvl_beginner") ? ROBOT_LEVEL_BEGINNER
+                       : (strName == L"btn_lvl_medium") ? ROBOT_LEVEL_MEDIUM
+                       : ROBOT_LEVEL_ADVANCED;
+            int nMySeat = MyProfile::getSingletonPtr()->GetSeatIndex();
+            if (nMySeat < 0 || nMySeat >= PLAYER_COUNT)
+            {
+                m_pLobby->NotifyToast(_T("请先入座后再邀请机器人！"));
+                return TRUE;
+            }
+            int nTargetSeat = (nMySeat + 1) % PLAYER_COUNT;
+            m_pLobby->ReqRobotInvite(nTableId, nTargetSeat, nLevel);
+            // 收起难度选择
+            SWindow *pLevels = pItem->FindChildByName(L"wnd_robot_levels");
+            if (pLevels)
+                pLevels->SetVisible(FALSE, TRUE);
+            return TRUE;
+        }
+
         int id = pBtn->GetID()-10;
         m_pLobby->ReqSeatDown(nTableId, id);
         return TRUE;
@@ -153,7 +200,8 @@ public:
 };
 
 //---------------------------------------------------------------------------
-LobbyHandler::LobbyHandler():m_pRoot(NULL),m_pAdapter(NULL)
+LobbyHandler::LobbyHandler(CMainDlg *pMainDlg):m_pRoot(NULL),m_pAdapter(NULL),m_pMainDlg(pMainDlg)
+    ,m_bRobotAutoStart(false)
 {
 
 }
@@ -165,12 +213,14 @@ LobbyHandler::~LobbyHandler()
     }
 }
 
-void LobbyHandler::Init(SWindow *pRoot, WebSocketClient *pWs)
+void LobbyHandler::SetWebSocket(WebSocketClient* pWs) {
+    m_ws = pWs;
+}
+
+void LobbyHandler::Init(SWindow *pRoot)
 {
     m_pRoot = pRoot;
     m_pRoot->AddEvent(EVENTID(EventTableInfo));
-
-    m_ws = pWs;
     STileView *pTileView = m_pRoot->FindChildByName2<STileView>(L"tileview_lobby");
     m_pAdapter = new CTableAdapter(this);
     pTileView->SetAdapter(m_pAdapter);
@@ -191,6 +241,9 @@ BOOL LobbyHandler::OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE> > d
             break;
         case GMT_SEATDOWN_ACK:
             ret = OnSeatDownAck(pData, nSize);
+            break;
+        case GMT_ROBOT_INVITE_ACK:
+            ret = OnRobotInviteAck(pData, nSize);
             break;
         case GMT_LOGIN_ACK:
             OnLoginAck(pData, nSize);
@@ -222,7 +275,30 @@ BOOL LobbyHandler::OnTableInfo(const void *lpData, int nSize)
         evt.nSize = nSize;
         m_pRoot->FireEvent(evt);
     }
+    //机器人对战桌坐满时自动就绪并跳转到对局页
+    TryAutoStart(pTableInfo);
     return TRUE;
+}
+
+void LobbyHandler::TryAutoStart(GAME_TABLE_INFO *pInfo)
+{
+    if (!pInfo || !m_bRobotAutoStart)
+        return;
+    MyProfile *pMy = MyProfile::getSingletonPtr();
+    // 仅处理玩家本人所在桌, 且玩家已入座
+    if (pMy->GetTableId() != pInfo->nTableId)
+        return;
+    if (pMy->GetSeatIndex() < 0 || pMy->GetSeatIndex() >= PLAYER_COUNT)
+        return;
+    // 真人+机器人坐满后才自动开局
+    if (pInfo->nPlayers < PLAYER_COUNT)
+        return;
+    m_bRobotAutoStart = false;
+    if (m_ws)
+        m_ws->SendMsg(GMT_READY, NULL, 0);
+    SLOGI() << "LobbyHandler: 机器人对战桌坐满, 自动就绪并跳转到对局页";
+    if (m_pMainDlg)
+        m_pMainDlg->SwitchToGame();
 }
 
 BOOL LobbyHandler::OnSeatDownAck(const void *lpData, int nSize)
@@ -234,6 +310,8 @@ BOOL LobbyHandler::OnSeatDownAck(const void *lpData, int nSize)
     MyProfile *pMyProfile = MyProfile::getSingletonPtr();
     pMyProfile->SetTableId(pAck->nTableId);
     pMyProfile->SetSeatIndex(pAck->nSeat);
+    // 重新入座后取消未触发的自动开局
+    m_bRobotAutoStart = false;
 
     return TRUE;
 }
@@ -245,6 +323,48 @@ void LobbyHandler::ReqSeatDown(int iTable, int iSeat)
     m_ws->SendMsg(GMT_SEATDOWN_REQ, &seatId, sizeof(seatId));
 }
 
+void LobbyHandler::ReqRobotInvite(int iTable, int iSeat, int nLevel)
+{
+    SLOGI() << "ReqRobotInvite: iTable=" << iTable << " iSeat=" << iSeat << " nLevel=" << nLevel;
+    GAME_ROBOT_INVITE_REQ req;
+    memset(&req, 0, sizeof(req));
+    req.nTableId = iTable;
+    req.nSeat = iSeat;
+    req.nLevel = nLevel;
+    const wchar_t *kNames[] = { L"机器人·初", L"机器人·中", L"机器人·高" };
+    int idx = (nLevel >= ROBOT_LEVEL_BEGINNER && nLevel <= ROBOT_LEVEL_ADVANCED) ? nLevel - ROBOT_LEVEL_BEGINNER : 0;
+    SStringA strName = S_CW2A(kNames[idx], CP_UTF8);
+    strcpy(req.stUserInfo.szName, strName.c_str());
+    req.stUserInfo.nSex = SEX_SECRET;
+    req.stUserInfo.nAvatarId = 1; // 男性内置头像
+    m_ws->SendMsg(GMT_ROBOT_INVITE_REQ, &req, sizeof(req));
+}
+
+BOOL LobbyHandler::OnRobotInviteAck(const void *lpData, int nSize)
+{
+    if (nSize < sizeof(GAME_ROBOT_INVITE_ACK))
+        return FALSE;
+    GAME_ROBOT_INVITE_ACK *pAck = (GAME_ROBOT_INVITE_ACK *)lpData;
+    SLOGI() << "OnRobotInviteAck: nTableId=" << pAck->nTableId << " nSeat=" << pAck->nSeat << " bSuccess=" << pAck->bSuccess;
+    if (pAck->bSuccess)
+    {
+        // 邀请成功后武装自动开局, 桌子坐满(机器人已自动准备)即触发
+        if (pAck->nTableId < ENDGAME_TABLE_BASE)
+            m_bRobotAutoStart = true;
+        NotifyToast(_T("机器人已入座！"));
+    }
+    else
+    {
+        NotifyToast(_T("邀请机器人失败，座位可能已被占用。"));
+    }
+    return TRUE;
+}
+
+void LobbyHandler::NotifyToast(LPCTSTR pszMsg)
+{
+    m_pMainDlg->PlayTip(pszMsg);
+}
+
 void LobbyHandler::OnConnected()
 {
    //req login.
@@ -254,6 +374,7 @@ void LobbyHandler::OnConnected()
    std::shared_ptr<GS_USERINFO> pUserInfo = pMyProfile->GetUserInfo();
    GAME_LOGIN_REQ *pLogin = (GAME_LOGIN_REQ *)malloc(len);
    memcpy(pLogin, pUserInfo.get(), sizeof(GS_USERINFO));
+   pLogin->dwVersion = GAME_VERSION;
    pLogin->dwLen = avatarSize;
    if(avatarSize){
        memcpy(pLogin->byData, pMyProfile->GetAvatarData()->data(), pMyProfile->GetAvatarData()->size());
@@ -269,7 +390,11 @@ BOOL LobbyHandler::OnLoginAck(const void *lpData, int nSize)
     GAME_LOGIN_ACK *pAck = (GAME_LOGIN_ACK *)lpData;
     SLOGI() << "OnLoginAck: uid=" << pAck->uid << " errCode=" << pAck->errCode;
     if(pAck->errCode != ERR_SUCCESS)
+    {
+        if(pAck->errCode == ERR_VERSION_LOW)
+            NotifyToast(_T("客户端版本过低，请升级客户端后再登录！"));
         return FALSE;
+    }
     MyProfile *pMyProfile = MyProfile::getSingletonPtr();
     pMyProfile->SetUID(pAck->uid);
 

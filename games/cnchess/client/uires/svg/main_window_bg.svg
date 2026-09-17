@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 150 150">
+  <defs>
+    <!-- 深木纹渐变背景 -->
+    <linearGradient id="bg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2A1810"/>
+      <stop offset="50%" stop-color="#1E0F07"/>
+      <stop offset="100%" stop-color="#140A04"/>
+    </linearGradient>
+    <!-- 金色边框渐变 -->
+    <linearGradient id="gold" x1="45%" y1="0%" x2="55%" y2="100%">
+      <stop offset="0%" stop-color="#FFE45E"/>
+      <stop offset="50%" stop-color="#B8860B"/>
+      <stop offset="100%" stop-color="#DAA520"/>
+    </linearGradient>
+    <!-- 内部微光 -->
+    <linearGradient id="innerGlow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFD700" stop-opacity="0.10"/>
+      <stop offset="35%" stop-color="#FFD700" stop-opacity="0.0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 主体圆角背景 (9-patch margin=24) -->
+  <rect x="4" y="4" width="142" height="142" rx="10" ry="10" fill="url(#bg)"/>
+
+  <!-- 金色外框 (双线) -->
+  <rect x="4.5" y="4.5" width="141" height="141" rx="10" ry="10" fill="none" stroke="url(#gold)" stroke-width="2"/>
+  <rect x="8.5" y="8.5" width="133" height="133" rx="7" ry="7" fill="none" stroke="#5D4E37" stroke-width="1" opacity="0.6"/>
+
+  <!-- 顶部标题栏内侧微光 -->
+  <rect x="6" y="6" width="138" height="36" rx="8" ry="8" fill="url(#innerGlow)"/>
+
+  <!-- 四角金色角花 -->
+  <g stroke="#FFD700" stroke-width="1.5" fill="none" opacity="0.5" stroke-linecap="round">
+    <path d="M10 34 L10 14 Q10 10 14 10 L34 10"/>
+    <path d="M140 34 L140 14 Q140 10 136 10 L116 10"/>
+    <path d="M10 116 L10 136 Q10 140 14 140 L34 140"/>
+    <path d="M140 116 L140 136 Q140 140 136 140 L116 140"/>
+  </g>
+</svg>

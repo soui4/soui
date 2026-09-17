@@ -854,13 +854,13 @@ class SOUI_EXP SAnimatorGroup
      * @brief Called when an animation starts.
      * @param pAnimator Pointer to the animator that started.
      */
-    STDMETHOD_(void, onAnimationStart)(THIS_ IValueAnimator *pAnimator);
+    STDMETHOD_(void, onAnimationStart)(THIS_ IValueAnimator *pAnimator) OVERRIDE;
 
     /**
      * @brief Called when an animation repeats.
      * @param pAnimator Pointer to the animator that repeated.
      */
-    STDMETHOD_(void, onAnimationRepeat)(THIS_ IValueAnimator *pAnimator)
+    STDMETHOD_(void, onAnimationRepeat)(THIS_ IValueAnimator *pAnimator) OVERRIDE
     {
     }
 
@@ -868,7 +868,7 @@ class SOUI_EXP SAnimatorGroup
      * @brief Called when an animation ends.
      * @param pAnimator Pointer to the animator that ended.
      */
-    STDMETHOD_(void, onAnimationEnd)(THIS_ IValueAnimator *pAnimator);
+    STDMETHOD_(void, onAnimationEnd)(THIS_ IValueAnimator *pAnimator) OVERRIDE;
 
   protected:
     /**

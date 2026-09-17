@@ -3,6 +3,7 @@
 
 #define _WINSOCKAPI_
 #include <interface/obj-ref-i.h>
+#include <interface/SRunnable-i.h>
 #include <stdint.h>
 
 SNSBEGIN
@@ -290,6 +291,13 @@ DECLARE_INTERFACE_(IWsServer, IObjRef)
      * @brief Quit server
      */
     STDMETHOD_(void, quit)(THIS) PURE;
+
+    /**
+     * @brief Post a task to the server event thread (LWS thread) for execution
+     * @param task Runnable task object to be executed on the server event thread
+     * @remark Intended for other threads (such as AI worker threads) to safely hand results back and serialize callbacks onto the main game thread
+     */
+    STDMETHOD_(void, postServiceTask)(THIS_ IRunnable * task) PURE;
 };
 
 /**

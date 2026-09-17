@@ -37,6 +37,20 @@
             </window>
         </window>
         
+        <!-- 头像选择（仅内置头像） -->
+        <window size="-2,-1" layout="vbox" interval="6" gravity="center">
+            <window size="-2,-1" layout="hbox" interval="6" gravity="center">
+                <img size="20,20" skin="skin_form_icons" iconIndex="1" opacity="0.8"/>
+                <text text="选择头像" colorText="@color/gold" font="size:12,bold"/>
+            </window>
+            <window size="-2,54" layout="hbox" interval="10" gravity="center">
+                <imgbtn name="btn_avatar_1" size="54,54" skin="gif_avatar_builtin_1" animate="1" tip="头像1"/>
+                <imgbtn name="btn_avatar_2" size="54,54" skin="gif_avatar_builtin_2" animate="1" tip="头像2"/>
+                <imgbtn name="btn_avatar_3" size="54,54" skin="gif_avatar_builtin_3" animate="1" tip="头像3"/>
+                <imgbtn name="btn_avatar_4" size="54,54" skin="gif_avatar_builtin_4" animate="1" tip="头像4"/>
+            </window>
+        </window>
+        
         <!-- 登录按钮 -->
         <window size="-2,-1" layout="vbox" interval="8" gravity="center">
             <button name="btn_login" size="-2,44" text="登 录" font="size:18,bold" colorText="#2C1810" bgSkin="btn_login" cursor="hand"/>

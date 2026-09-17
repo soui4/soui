@@ -1067,6 +1067,7 @@ void SWindow::InsertChild(SWindow *pNewChild, SWindow *pInsertAfter /**< =ICWND_
     ASSERT_UI_THREAD();
     if (pNewChild->GetParent() == this)
         return;
+    SASSERT(pNewChild->GetParent() == NULL);
     OnBeforeInsertChild(pNewChild);
     pNewChild->SetContainer(GetContainer());
 
@@ -2230,6 +2231,7 @@ UINT SWindow::OnBuildTreeZorder(UINT iOrder)
             lstChild[i++] = pChild;
             pChild = pChild->GetWindow(GSW_NEXTSIBLING);
         }
+        SASSERT(i == lstChild.GetCount());
         // sort children by layer
         SArray<SWindow *> lstChildSorted;
         lstChildSorted.SetCount(lstChild.GetCount());

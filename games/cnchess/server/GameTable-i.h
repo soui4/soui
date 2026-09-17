@@ -33,6 +33,10 @@ struct IGameTable : IObjRef
     virtual void OnRoundEnd() = 0; // called when round end.
     virtual void NotifyClient(PWSCLIENT pClient, LPCWSTR pszMsg) = 0;
     virtual void EndGame(int type, LPCWSTR pszDesc) = 0;
+    // 将指定座位标记为机器人并记录智力等级(默认无机器人)
+    virtual void SetupRobot(int seatId, int nLevel) {}
+    // 配置残局桌: 设置残局布局(默认普通对局, 残局桌实现)
+    virtual void ConfigureEndgame(int nEndgameId, const int layout[10][9]) {}
 };
 
 #endif // !__GAMETABLE_I_H__

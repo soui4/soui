@@ -7,6 +7,7 @@
 #include "SGameTheme.h"
 #include "WebSocketClient.h"
 #include "LobbyHandler.h"
+#include "EndgameHandler.h"
 #include "ChessGame.h"
 #include "ThemeDownloadManager.h"
 #include "myprofile.h"
@@ -15,6 +16,7 @@ class CMainDlg : public SHostWnd
                , public SDpiHandler<CMainDlg>
                , public WebSocketClient::IListener
                , public ThemeDownloadManager::IListener
+               , public IAnimatorListener
 {
 public:
     CMainDlg(SGameTheme* pTheme);
@@ -28,16 +30,26 @@ public:
     BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam);
 
     void PlayWave(LPCTSTR pszSound);
+    // 顶层操作提示（悬浮于所有页面之上，大厅/游戏通用）
+    void PlayTip(const SStringT &strTip);
     // 主题是否已加载
     bool IsThemeLoaded() const { return m_bThemeLoaded; }
     SWindow *getModalRoot() const{return m_modalRoot;}
+    // 切换主内容区页签(index: 0大厅/1对局/2关于/3残局)
+    void SwitchToTab(int nIndex);
+    // 切换到对局页(按窗口名查找, 兼容各平台页签顺序)
+    void SwitchToGame();
 #if defined(__MOBILE__)
     // 登录成功回调（模态视图方式，移动平台不支持独立消息循环）
-    void OnLoginSuccess(SStringT strSvr, SStringT strName, char cSex);
+    void OnLoginSuccess(SStringT strSvr, SStringT strName, char cSex, int nAvatarId);
 #endif
 
   protected:
     void OnScaleChanged(int nScale) override;
+    // IAnimatorListener: 提示动画结束后销毁提示窗口
+    STDMETHOD_(void, onAnimationStart)(THIS_ IValueAnimator * pAnimator) override{}
+    STDMETHOD_(void, onAnimationEnd)(THIS_ IValueAnimator * pAnimator) override;
+    STDMETHOD_(void, onAnimationRepeat)(THIS_ IValueAnimator * pAnimator) override{}
   protected:
     virtual BOOL OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE> > data) override;
 
@@ -70,6 +82,7 @@ public:
         EVENT_NAME_COMMAND(L"btn_unmute", OnBtnUnmute)
         CHAIN_EVENT_MAP_MEMBER(*m_pGame)
         CHAIN_EVENT_MAP_MEMBER(*m_pLobbyHandler)
+        CHAIN_EVENT_MAP_MEMBER(*m_pEndgameHandler)
     EVENT_MAP_END2(SHostWnd)
 
     //HostWnd真实窗口消息处理
@@ -86,21 +99,24 @@ public:
 private:
     CChessGame* m_pGame;  // 游戏核心逻辑
     LobbyHandler* m_pLobbyHandler;
+    EndgameHandler* m_pEndgameHandler;
         // 网络通信
     WebSocketClient m_webSocketClient;
     SAutoRefPtr<SGameTheme> m_pTheme;
     BOOL m_bMute;
-
+    DWORD m_tsLastTip;
     // 主题下载
     ThemeDownloadManager m_themeDownloader;
     SStringT m_strThemeCacheDir;
     bool m_bThemeLoaded;    // 主题是否已加载
     bool m_bGameInited;     // 游戏是否已初始化
     bool m_bConnected;      // WebSocket是否已连接
-    bool m_bLobbyInited;    // 大厅是否已初始化
 
     // 主题下载进度弹窗
     SModalRoot* m_pThemeProgressModal;
     ModalViewSessionID m_themeProgressSession;
     SWindow * m_modalRoot;
+    SWindow* m_pTipContainer;   // 顶层操作提示容器
+    int m_nSelAvatarId;         // 移动端登录弹窗当前选中的内置头像ID (1..BuiltinAvatar::COUNT-1)
+    static const int ANI_TIP;   // 提示动画ID
 };

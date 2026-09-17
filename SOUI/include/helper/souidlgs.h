@@ -3332,7 +3332,7 @@ class CMemDlgTemplateT {
             AddString(Menu.m_lpstr);
         }
 #else  // _WIN32_WCE
-        // Windows CE doesn't support the addition of menus to a dialog box
+       // Windows CE doesn't support the addition of menus to a dialog box
         ATLASSERT(Menu.m_lpstr == NULL);
         Menu.m_lpstr; // avoid level 4 warning
         WORD menuData = 0;
@@ -5127,7 +5127,7 @@ class ATL_NO_VTABLE CAxPropertyPageImpl : public CPropertyPageImpl<T, TBase> {
                                     if (bDialogEx && ((ATL::_DialogSplitHelper::DLGITEMTEMPLATEEX *)pItem)->helpID != 0)
                                         wnd.SetWindowContextHelpId(((ATL::_DialogSplitHelper::DLGITEMTEMPLATEEX *)pItem)->helpID);
 #endif // !_WIN32_WCE
-                                    // Try to create the ActiveX control.
+       // Try to create the ActiveX control.
                                     hr = wnd.CreateControlLic(pszClassName, spStream, NULL, bstrLicKey);
                                     if (FAILED(hr))
                                         break;

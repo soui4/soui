@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="112" height="20" viewBox="0 0 112 20">
+  <!-- 关闭按钮 4态 (每态28x20) 金色主题, hover红色 -->
+
+  <!-- 态1 Normal -->
+  <rect x="0.5" y="0.5" width="27" height="19" rx="4" ry="4" fill="rgba(0,0,0,0)" stroke="#5D4E37" stroke-width="1"/>
+  <path d="M9.5 6.5 L19.5 14.5 M19.5 6.5 L9.5 14.5" stroke="#DAA520" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+
+  <!-- 态2 Hover: 红底白叉 -->
+  <rect x="28.5" y="0.5" width="27" height="19" rx="4" ry="4" fill="#E60026" stroke="#C4001E" stroke-width="1"/>
+  <path d="M37.5 6.5 L47.5 14.5 M47.5 6.5 L37.5 14.5" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- 态3 Pressed: 深红 -->
+  <rect x="56.5" y="0.5" width="27" height="19" rx="4" ry="4" fill="#B00018" stroke="#8F0013" stroke-width="1"/>
+  <path d="M65.5 6.5 L75.5 14.5 M75.5 6.5 L65.5 14.5" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- 态4 Disabled -->
+  <rect x="84.5" y="0.5" width="27" height="19" rx="4" ry="4" fill="rgba(0,0,0,0)" stroke="#5D4E37" stroke-width="1" opacity="0.5"/>
+  <path d="M93.5 6.5 L103.5 14.5 M103.5 6.5 L93.5 14.5" stroke="#5D4E37" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+</svg>

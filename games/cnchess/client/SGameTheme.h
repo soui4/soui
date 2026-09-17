@@ -57,6 +57,7 @@ namespace Sprites{
     static const wchar_t* img_clock = L"img_clock";         ///< 时钟图片
 
     static const wchar_t* board_main = L"board_main";       ///< 棋盘主界面
+    static const wchar_t* board_preview = L"board_preview";    ///< 棋盘预览
 }
 
 /**
@@ -75,6 +76,7 @@ namespace Skins{
  */
 namespace Animations{
     static const wchar_t *kclock_alarm = L"clock_alarm";    ///< 时钟报警动画
+    static const wchar_t *kfx_pop = L"fx_pop";              ///< 游戏特效弹出动画
 }
 
 namespace Widgets{
@@ -86,6 +88,9 @@ namespace Widgets{
     static const wchar_t *kbtn_req_peace = L"btn_req_peace";
     static const wchar_t *kbtn_req_surrender = L"btn_req_surrender";
     static const wchar_t *kbtn_req_regret = L"btn_req_regret";
+    static const wchar_t *kfx_eat = L"sprite_fx_eat";       ///< 吃大子特效
+    static const wchar_t *kfx_check = L"sprite_fx_check";   ///< 将军特效
+    static const wchar_t *kfx_mate = L"sprite_fx_mate";     ///< 绝杀特效
 }
 
 /**
@@ -109,6 +114,10 @@ namespace Sounds{
         static const wchar_t *kEat = L"吃子";                  ///< 吃子音效
         static const wchar_t *kDanger = L"danger";              ///< 危险音效
         static const wchar_t *kfireworks = L"焰火";             ///< 烟花音效
+        static const wchar_t *kJueSha = L"绝杀";
+        static const wchar_t *kBeiJueSha =L"被绝杀";
+        static const wchar_t *kGameWin = L"gamewin";
+        static const wchar_t *kGameOver = L"gameover";
     }
 }
 

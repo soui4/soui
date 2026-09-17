@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="168" height="28" viewBox="0 0 168 28">
+  <defs>
+    <linearGradient id="bgN" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4f8bf7"/><stop offset="100%" stop-color="#2f6be0"/>
+    </linearGradient>
+    <linearGradient id="bgH" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#669cf9"/><stop offset="100%" stop-color="#427bec"/>
+    </linearGradient>
+    <linearGradient id="bgP" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2451b8"/><stop offset="100%" stop-color="#1d4296"/>
+    </linearGradient>
+    <radialGradient id="badge" cx="40%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#dce9ff"/>
+    </radialGradient>
+  </defs>
+
+  <!-- State 1: Normal (邀请机器人: 蓝 + 加号徽章) -->
+  <g>
+    <rect x="0.75" y="0.75" width="54.5" height="26.5" rx="13" fill="url(#bgN)" stroke="#2451b8" stroke-width="1.5"/>
+    <!-- 机器人头 -->
+    <rect x="8" y="8" width="16" height="13" rx="3.5" fill="#f6f8ff" opacity="0.92" stroke="#1d4296" stroke-width="1.2"/>
+    <line x1="11" y1="9" x2="10" y2="4.8" stroke="#1d4296" stroke-width="1.3" stroke-linecap="round"/>
+    <line x1="21" y1="9" x2="22" y2="4.8" stroke="#1d4296" stroke-width="1.3" stroke-linecap="round"/>
+    <circle cx="10" cy="4.6" r="1.4" fill="#ffd54f"/>
+    <circle cx="22" cy="4.6" r="1.4" fill="#ffd54f"/>
+    <circle cx="13" cy="14" r="1.9" fill="#1d4296"/>
+    <circle cx="19" cy="14" r="1.9" fill="#1d4296"/>
+    <path d="M15,17.5 q2,1.8 4.8,0" stroke="#1d4296" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+    <!-- 邀请加号徽章 -->
+    <circle cx="45" cy="14" r="6" fill="url(#badge)" stroke="#1d4296" stroke-width="1.2"/>
+    <rect x="42.8" y="13.1" width="4.4" height="1.8" rx="0.9" fill="#1d4296"/>
+    <rect x="44.1" y="11.8" width="1.8" height="4.4" rx="0.9" fill="#1d4296"/>
+  </g>
+
+  <!-- State 2: Hover -->
+  <g transform="translate(56,0)">
+    <rect x="0.75" y="0.75" width="54.5" height="26.5" rx="13" fill="url(#bgH)" stroke="#2451b8" stroke-width="1.5"/>
+    <rect x="0.75" y="0.75" width="54.5" height="26.5" rx="13" fill="none" stroke="#ffd700" stroke-opacity="0.75" stroke-width="1.5"/>
+    <rect x="8" y="8" width="16" height="13" rx="3.5" fill="#f6f8ff" opacity="0.95" stroke="#1d4296" stroke-width="1.2"/>
+    <line x1="11" y1="9" x2="10" y2="4.8" stroke="#1d4296" stroke-width="1.3" stroke-linecap="round"/>
+    <line x1="21" y1="9" x2="22" y2="4.8" stroke="#1d4296" stroke-width="1.3" stroke-linecap="round"/>
+    <circle cx="10" cy="4.6" r="1.4" fill="#ffd54f"/>
+    <circle cx="22" cy="4.6" r="1.4" fill="#ffd54f"/>
+    <circle cx="13" cy="14" r="1.9" fill="#1d4296"/>
+    <circle cx="19" cy="14" r="1.9" fill="#1d4296"/>
+    <path d="M15,17.5 q2,1.8 4.8,0" stroke="#1d4296" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+    <circle cx="45" cy="14" r="6" fill="url(#badge)" stroke="#1d4296" stroke-width="1.2"/>
+    <rect x="42.8" y="13.1" width="4.4" height="1.8" rx="0.9" fill="#1d4296"/>
+    <rect x="44.1" y="11.8" width="1.8" height="4.4" rx="0.9" fill="#1d4296"/>
+  </g>
+
+  <!-- State 3: Pressed (下沉1px) -->
+  <g transform="translate(112,1)">
+    <rect x="0.75" y="0.75" width="54.5" height="26.5" rx="13" fill="url(#bgP)" stroke="#172f78" stroke-width="1.5"/>
+    <rect x="8" y="8" width="16" height="13" rx="3.5" fill="#eef1f7" opacity="0.95" stroke="#172f78" stroke-width="1.2"/>
+    <line x1="11" y1="9" x2="10" y2="4.8" stroke="#172f78" stroke-width="1.3" stroke-linecap="round"/>
+    <line x1="21" y1="9" x2="22" y2="4.8" stroke="#172f78" stroke-width="1.3" stroke-linecap="round"/>
+    <circle cx="10" cy="4.6" r="1.4" fill="#e6b400"/>
+    <circle cx="22" cy="4.6" r="1.4" fill="#e6b400"/>
+    <circle cx="13" cy="14" r="1.9" fill="#172f78"/>
+    <circle cx="19" cy="14" r="1.9" fill="#172f78"/>
+    <path d="M15,17.5 q2,1.8 4.8,0" stroke="#172f78" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+    <circle cx="45" cy="14" r="6" fill="#cfe0ff" stroke="#172f78" stroke-width="1.2"/>
+    <rect x="42.8" y="13.1" width="4.4" height="1.8" rx="0.9" fill="#172f78"/>
+    <rect x="44.1" y="11.8" width="1.8" height="4.4" rx="0.9" fill="#172f78"/>
+  </g>
+</svg>

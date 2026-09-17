@@ -605,14 +605,14 @@ class SOUI_EXP STreeView
      * @brief Gets the dialog code for the tree view.
      * @return Dialog code.
      */
-    virtual UINT WINAPI OnGetDlgCode() const;
+    virtual UINT WINAPI OnGetDlgCode() const OVERRIDE;
 
     /**
      * @brief Sets the cursor for the tree view.
      * @param pt Mouse position.
      * @return TRUE if the cursor is set, otherwise FALSE.
      */
-    virtual BOOL OnSetCursor(const CPoint &pt);
+    virtual BOOL OnSetCursor(const CPoint &pt) OVERRIDE;
 
     /**
      * @brief Updates the tooltip information.
@@ -620,30 +620,30 @@ class SOUI_EXP STreeView
      * @param tipInfo Tooltip information.
      * @return TRUE if the tooltip is updated, otherwise FALSE.
      */
-    virtual BOOL UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo);
+    virtual BOOL UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo) OVERRIDE;
 
     /**
      * @brief Applies colorization to the tree view.
      * @param cr Color reference.
      */
-    virtual void OnColorize(COLORREF cr);
+    virtual void OnColorize(COLORREF cr) OVERRIDE;
 
     /**
      * @brief Handles scale changes.
      * @param nScale New scale.
      */
-    virtual void OnScaleChanged(int nScale);
+    virtual void OnScaleChanged(int nScale) OVERRIDE;
 
     /**
      * @brief Handles language change events.
      * @return Result of the language change handling.
      */
-    virtual HRESULT OnLanguageChanged();
+    virtual HRESULT OnLanguageChanged() OVERRIDE;
 
     /**
      * @brief Rebuilds the font settings.
      */
-    virtual void OnRebuildFont();
+    virtual void OnRebuildFont() OVERRIDE;
 
     /**
      * @brief Handles scroll events.
@@ -652,28 +652,28 @@ class SOUI_EXP STreeView
      * @param nPos New position.
      * @return TRUE if the scroll event is handled, otherwise FALSE.
      */
-    virtual BOOL OnScroll(BOOL bVertical, UINT uCode, int nPos);
+    virtual BOOL OnScroll(BOOL bVertical, UINT uCode, int nPos) OVERRIDE;
 
     /**
      * @brief Gets the scroll line size.
      * @param bVertical TRUE if the scroll is vertical, FALSE if horizontal.
      * @return Scroll line size.
      */
-    virtual int GetScrollLineSize(BOOL bVertical);
+    virtual int GetScrollLineSize(BOOL bVertical) OVERRIDE;
 
     /**
      * @brief Creates child elements from XML node.
      * @param xmlNode XML node containing child elements.
      * @return TRUE if successful, otherwise FALSE.
      */
-    virtual BOOL CreateChildren(SXmlNode xmlNode);
+    virtual BOOL CreateChildren(SXmlNode xmlNode) OVERRIDE;
 
     /**
      * @brief Sets or releases mouse capture for an item.
      * @param pItem Pointer to the item panel.
      * @param bCapture TRUE to set capture, FALSE to release capture.
      */
-    virtual void OnItemSetCapture(SOsrPanel *pItem, BOOL bCapture);
+    virtual void OnItemSetCapture(SOsrPanel *pItem, BOOL bCapture) OVERRIDE;
 
     /**
      * @brief Gets the rectangle of an item.
@@ -681,15 +681,15 @@ class SOUI_EXP STreeView
      * @param rcItem Rectangle to receive the item position.
      * @return TRUE if successful, otherwise FALSE.
      */
-    virtual BOOL OnItemGetRect(const SOsrPanel *pItem, CRect &rcItem) const;
+    virtual BOOL OnItemGetRect(const SOsrPanel *pItem, CRect &rcItem) const OVERRIDE;
 
     /**
      * @brief Indicates if item redraw is delayed.
      * @return TRUE if redraw is delayed, otherwise FALSE.
      */
-    virtual BOOL IsItemRedrawDelay() const;
+    virtual BOOL IsItemRedrawDelay() const OVERRIDE;
 
-    virtual BOOL IsTimelineEnabled() const;
+    virtual BOOL IsTimelineEnabled() const OVERRIDE;
 
     virtual BOOL OnDragCancelCapture(int reason) override;
     virtual void OnDragClearItemCapture() override;

@@ -1,25 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<page name="room_container" title="@string/about" layout="vbox" gravity="center" padding="20dp">
-    <text name="txt_title" text="象棋游戏" font="size:24" align="center" margin="10dp"/>
-    
-    <text name="txt_desc" text="这是一个使用SOUI框架开发的象棋游戏。" font="size:14" align="center" margin="5dp"/>
-    
-    <text name="txt_new_features" text="SOUI 5.1 新特性：" font="size:16;bold:1" margin="10dp,20dp,5dp,5dp"/>
-    
-    <text name="txt_anchor_layout" text="锚点布局（Anchor Layout）" font="size:14;bold:1" margin="20dp,10dp,5dp,5dp"/>
-    <text name="txt_anchor_detail" text="• 基于9个参考点的新型布局模型&#xA;• 适用于复杂界面元素精确定位&#xA;• 游戏类应用的精灵容器推荐使用anchor布局作为宿主容器" font="size:14" margin="30dp,5dp"/>
-    
-    <text name="txt_property_animation" text="属性动画（Property Animation）" font="size:14;bold:1" margin="20dp,10dp,5dp,5dp"/>
-    <text name="txt_prop_detail" text="• 支持对布局参数和窗口属性的动画控制&#xA;• 借鉴Android属性动画设计模式&#xA;• 动画系统参考Android属性动画设计模式" font="size:14" margin="30dp,5dp"/>
-    
-    <text name="txt_path_animation" text="路径动画（Path Animation）" font="size:14;bold:1" margin="20dp,10dp,5dp,5dp"/>
-    <text name="txt_path_detail" text="• 使用锚点布局支持数值动画实现&#xA;• 可实现复杂的曲线运动轨迹&#xA;• 适用于游戏元素的移动动画效果" font="size:14" margin="30dp,5dp"/>
-    
-    <text name="txt_contact" text="联系我们：" font="size:16;bold:1" margin="10dp,20dp,5dp,5dp"/>
-    <text name="txt_qq_group" text="SOUI官方QQ群：229313785" font="size:14" margin="20dp,5dp"/>
-    <text name="txt_website" text="官方网站：https://gitee.com/setoutsoft/soui4" font="size:14" margin="20dp,5dp"/>
-    
-    <text name="txt_info" text="SOUI是一套轻量级的Windows客户端UI开发框架，具有高效、稳定、易用的特点。如果您对此项目感兴趣，欢迎加入我们的QQ群交流学习！" font="size:12" align="center" margin="10dp,30dp,10dp,10dp"/>
-    <text name="txt_thanks" text="所有游戏图片资源来自网络，版权归原作者所有。" font="size:12" align="center" margin="10dp,10dp,10dp,10dp"/>
-    <text name="txt_copyright" text="Copyright © 2015-2020 Setoutsoft" font="size:12" align="center"/>
+<page name="room_container" title="@string/about" layout="vbox" padding="24dp,16dp">
+    <!-- 顶部：标题 + 简介 -->
+    <text name="txt_title" text="开心象棋" colorText="#FFD700" font="size:26;bold:1" align="center" margin="0,0,0,6dp"/>
+    <text name="txt_desc" text="使用 SOUI 框架打造的跨平台中国象棋对战游戏，支持在线对战、AI 人机对弈与经典残局打谱。" colorText="#F5E6C8" font="size:13" align="center" margin="0,0,0,4dp"/>
+    <img size="-2,1" skin="skin_login_divider_line" margin="20dp,10dp,20dp,0"/>
+
+    <!-- 特色功能介绍 -->
+    <text name="txt_new_features" text="玩法特色" colorText="#FFE45E" font="size:16;bold:1" margin="10dp,16dp,5dp,4dp"/>
+    <text name="txt_feature_online" text="• 在线对战：大厅选座，与局域网或远程玩家实时对弈" colorText="#E8D9B8" font="size:13" margin="24dp,3dp"/>
+    <text name="txt_feature_ai" text="• 人机对弈：大厅选桌邀请机器人，初/中/高三档 AI，机器人入座后自动开局" colorText="#E8D9B8" font="size:13" margin="24dp,3dp"/>
+    <text name="txt_feature_endgame" text="• 残局打谱：内置 100 局经典江湖残局，选局邀请机器人陪练，自动进入对局" colorText="#E8D9B8" font="size:13" margin="24dp,3dp"/>
+    <text name="txt_feature_fx" text="• 对局体验：吃子/将军/绝杀动画特效与语音播报，支持悔棋、求和、认负" colorText="#E8D9B8" font="size:13" margin="24dp,3dp"/>
+    <text name="txt_feature_rule" text="• 规则完备：包含将军、应将、困毙、长捉判负等标准象棋规则" colorText="#E8D9B8" font="size:13" margin="24dp,3dp"/>
+    <text name="txt_feature_ui" text="• 主题界面：古风木纹与金色配色，沉浸式对局体验" colorText="#E8D9B8" font="size:13" margin="24dp,3dp"/>
+    <img size="-2,1" skin="skin_login_divider_line" margin="20dp,12dp,20dp,0"/>
+
+    <!-- 相关链接 -->
+    <text name="txt_contact" text="了解更多" colorText="#FFE45E" font="size:16;bold:1" margin="10dp,16dp,5dp,4dp"/>
+    <text name="txt_qq_group" text="• SOUI 官方 QQ 群：229313785" colorText="#E8D9B8" font="size:13" margin="24dp,3dp"/>
+    <text name="txt_website" text="• 官方网站：https://gitee.com/setoutsoft/soui4" colorText="#E8D9B8" font="size:13" margin="24dp,3dp"/>
+
+    <window size="-2,0" weight="1"/>
+
+    <!-- 底部说明 -->
+    <text name="txt_thanks" text="游戏图片资源来自网络，版权归原作者所有。" colorText="#A89070" font="size:11" align="center" margin="0,8dp,0,4dp"/>
+    <text name="txt_copyright" text="Copyright © 2015-2020 Setoutsoft" colorText="#8B7355" font="size:11" align="center"/>
 </page>

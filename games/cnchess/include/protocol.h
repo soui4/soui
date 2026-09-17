@@ -50,6 +50,7 @@ typedef struct tagGS_USERINFO
 //用户登录请求，上传用户信息及头像数据
 #define GMT_LOGIN_REQ			100
 typedef struct tagGAME_LOGIN_REQ : GS_USERINFO{
+	DWORD dwVersion;	//客户端协议版本(GAME_VERSION), 服务器按config.xml的min_version校验
 	DWORD dwLen;	//头像二进制数据长度；为0时使用nAvatarId指定的内置头像
 	BYTE byData[1];
 }GAME_LOGIN_REQ;
@@ -65,6 +66,10 @@ typedef struct tagGAME_LOGIN_ACK
 
 #define ERR_SUCCESS			0
 #define ERR_USER_EXIST		1
+#define ERR_VERSION_LOW		2	//客户端协议版本低于服务器要求的最低版本
+
+//协议版本: 客户端登录时上报, 服务器与config.xml的min_version比较, 版本过低拒绝登录
+#define GAME_VERSION		1	//当前客户端协议版本
 
 typedef struct SeatID
 {
@@ -136,6 +141,24 @@ typedef struct tagGAME_AVATAR_ACK
 //玩家就绪
 #define GMT_READY				110
 
+//邀请机器人入座 (Client -> Server)
+#define GMT_ROBOT_INVITE_REQ		120
+typedef struct tagGAME_ROBOT_INVITE_REQ
+{
+	int nTableId;	//游戏桌ID
+	int nSeat;		//目标座位
+	int nLevel;		//机器人难度: ROBOT_LEVEL_BEGINNER/MEDIUM/ADVANCED
+	GS_USERINFO stUserInfo;	//机器人展示的用户信息
+}GAME_ROBOT_INVITE_REQ;
+//邀请机器人入座应答 (Server -> Client)
+#define GMT_ROBOT_INVITE_ACK		121
+typedef struct tagGAME_ROBOT_INVITE_ACK
+{
+	int nTableId;	//游戏桌ID
+	int nSeat;		//目标座位
+	uint32_t bSuccess;	//是否成功
+}GAME_ROBOT_INVITE_ACK;
+
 
 //退出游戏
 #define GMT_LOGOFF			111
@@ -180,6 +203,34 @@ typedef struct tagTHEME_DATA {
 	DWORD dwDataLen;	// 数据长度
 	BYTE byData[1];		// 数据
 } THEME_DATA;
+
+//=====================================================================
+// 残局打谱 (Endgame)
+//=====================================================================
+// 残局桌号基础偏移: 每个残局按配置占用 N 张游戏桌(桌号 = BASE + 残局序号*N + 槽位), N 由 endgames.json 的 tablesPerEndgame 决定
+#define ENDGAME_TABLE_BASE    10000
+//请求残局列表 (Client -> Server, 无数据)
+#define GMT_ENDGAME_LIST_REQ		122
+//残局列表 (Server -> Client)
+#define GMT_ENDGAME_LIST_ACK		123
+
+//残局条目信息
+typedef struct tagENDGAME_INFO
+{	int nId;			//残局ID
+	int nLevel;			//难度 1初级/2中级/3高级
+	int nPlayer;		//首步行棋方: 0=红先 1=黑先
+	char szTitle[64];	//标题 utf8
+	char szIntro[256];	//介绍/说明 utf8
+	int layout[10][9];	//残局布局, 编码同CHESSMAN: 255空/正红(0-6)/负黑(7-13)
+}ENDGAME_INFO,*PENDGAME_INFO;
+
+//残局列表 (变长结构)
+typedef struct tagGAME_ENDGAME_LIST
+{
+	int nCount;					//残局数量
+	int nTablesPerEndgame;		//每个残局的游戏桌数(与 endgames.json 的 tablesPerEndgame 一致)
+	ENDGAME_INFO vInfo[1];		//残局条目数组
+}GAME_ENDGAME_LIST,*PGAME_ENDGAME_LIST;
 
 //其它游戏的消息ID从GMT_GAMEBASE+1开始
 #define	GMT_GAMEBASE		1000

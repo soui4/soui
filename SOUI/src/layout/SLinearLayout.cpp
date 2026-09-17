@@ -604,7 +604,7 @@ measureChilds:
                     fWeight -= pLinearLayoutParam->weight;
 
                     if (!pLinearLayoutParam->IsSpecifiedSize(orienOther))
-                    {   // As pChild->GetDesiredSize may use layout param to get specified size, we
+                    { // As pChild->GetDesiredSize may use layout param to get specified size, we
                         // must set it to new size.
                         ILayoutParam *backup = pLinearLayoutParam->Clone();
                         SLayoutSize layoutSize((float)szChild, dp);

@@ -1,4 +1,4 @@
-#include <gtest/gtest.h>
+﻿#include <gtest/gtest.h>
 #include <windows.h>
 #include <tchar.h>
 #include <Chessman.h>
@@ -9,7 +9,7 @@
 TEST(ChessAlgorithmTest, BoardInitialization)
 {
     CChessLayout layout;
-    CHESSMAN initLayout[10][9];
+    int initLayout[10][9];
     
     // 初始化一个空棋盘
     for (int y = 0; y < 10; y++) {
@@ -33,7 +33,7 @@ TEST(ChessAlgorithmTest, BoardInitialization)
 TEST(ChessAlgorithmTest, JiangMovement)
 {
     CChessLayout layout;
-    CHESSMAN initLayout[10][9];
+    int initLayout[10][9];
     
     // 初始化一个空棋盘
     for (int y = 0; y < 10; y++) {
@@ -51,7 +51,7 @@ TEST(ChessAlgorithmTest, JiangMovement)
     POINT moves[MAX_MOVES];
     
     // 测试红帅的移动
-    int moveCount = layout.GetPossiableMoves(4, 1, moves);
+    int moveCount = layout.GetPossibleMoves(4, 1, moves);
     
     // 红帅应该能在九宫格内移动
     EXPECT_GT(moveCount, 0);
@@ -72,7 +72,7 @@ TEST(ChessAlgorithmTest, JiangMovement)
 TEST(ChessAlgorithmTest, JuMovement)
 {
     CChessLayout layout;
-    CHESSMAN initLayout[10][9];
+    int initLayout[10][9];
     
     // 初始化一个空棋盘
     for (int y = 0; y < 10; y++) {
@@ -89,7 +89,7 @@ TEST(ChessAlgorithmTest, JuMovement)
     POINT moves[MAX_MOVES];
     
     // 测试红车的移动
-    int moveCount = layout.GetPossiableMoves(4, 4, moves);
+    int moveCount = layout.GetPossibleMoves(4, 4, moves);
     
     // 车应该能在没有阻挡的情况下沿直线移动
     EXPECT_GT(moveCount, 0);
@@ -106,7 +106,7 @@ TEST(ChessAlgorithmTest, JuMovement)
 TEST(ChessAlgorithmTest, MaMovement)
 {
     CChessLayout layout;
-    CHESSMAN initLayout[10][9];
+    int initLayout[10][9];
     
     // 初始化一个空棋盘
     for (int y = 0; y < 10; y++) {
@@ -123,7 +123,7 @@ TEST(ChessAlgorithmTest, MaMovement)
     POINT moves[MAX_MOVES];
     
     // 测试红马的移动
-    int moveCount = layout.GetPossiableMoves(4, 4, moves);
+    int moveCount = layout.GetPossibleMoves(4, 4, moves);
     
     // 马应该能走"日"字形状
     EXPECT_GT(moveCount, 0);
@@ -147,7 +147,7 @@ TEST(ChessAlgorithmTest, MaMovement)
 TEST(ChessAlgorithmTest, PaoMovement)
 {
     CChessLayout layout;
-    CHESSMAN initLayout[10][9];
+    int initLayout[10][9];
     
     // 初始化一个空棋盘
     for (int y = 0; y < 10; y++) {
@@ -164,7 +164,7 @@ TEST(ChessAlgorithmTest, PaoMovement)
     POINT moves[MAX_MOVES];
     
     // 测试红炮的移动
-    int moveCount = layout.GetPossiableMoves(4, 4, moves);
+    int moveCount = layout.GetPossibleMoves(4, 4, moves);
     
     // 炮应该能沿直线移动（不吃子时）
     EXPECT_GT(moveCount, 0);
@@ -181,7 +181,7 @@ TEST(ChessAlgorithmTest, PaoMovement)
 TEST(ChessAlgorithmTest, ShiMovement)
 {
     CChessLayout layout;
-    CHESSMAN initLayout[10][9];
+    int initLayout[10][9];
     
     // 初始化一个空棋盘
     for (int y = 0; y < 10; y++) {
@@ -198,7 +198,7 @@ TEST(ChessAlgorithmTest, ShiMovement)
     POINT moves[MAX_MOVES];
     
     // 测试红士的移动
-    int moveCount = layout.GetPossiableMoves(4, 1, moves);
+    int moveCount = layout.GetPossibleMoves(4, 1, moves);
     
     // 士应该只能斜着走一格，且不能走出九宫格
     EXPECT_GT(moveCount, 0);
@@ -224,7 +224,7 @@ TEST(ChessAlgorithmTest, ShiMovement)
 TEST(ChessAlgorithmTest, XiangMovement)
 {
     CChessLayout layout;
-    CHESSMAN initLayout[10][9];
+    int initLayout[10][9];
     
     // 初始化一个空棋盘
     for (int y = 0; y < 10; y++) {
@@ -241,7 +241,7 @@ TEST(ChessAlgorithmTest, XiangMovement)
     POINT moves[MAX_MOVES];
     
     // 测试红相的移动
-    int moveCount = layout.GetPossiableMoves(4, 4, moves);
+    int moveCount = layout.GetPossibleMoves(4, 4, moves);
     
     // 相应该走"田"字，且不能过河
     EXPECT_GT(moveCount, 0);
@@ -264,7 +264,7 @@ TEST(ChessAlgorithmTest, XiangMovement)
 TEST(ChessAlgorithmTest, BingMovement)
 {
     CChessLayout layout;
-    CHESSMAN initLayout[10][9];
+    int initLayout[10][9];
     
     // 初始化一个空棋盘
     for (int y = 0; y < 10; y++) {
@@ -281,7 +281,7 @@ TEST(ChessAlgorithmTest, BingMovement)
     POINT moves[MAX_MOVES];
     
     // 测试红兵的移动（未过河）
-    int moveCount = layout.GetPossiableMoves(4, 3, moves);
+    int moveCount = layout.GetPossibleMoves(4, 3, moves);
     
     // 兵未过河只能向前走
     EXPECT_EQ(moveCount, 1);
@@ -297,7 +297,7 @@ TEST(ChessAlgorithmTest, BingMovement)
     initLayout[5][4] = CHSMAN_RED_BING;  // 放在河对面
     layout.InitLayout(initLayout, CS_RED);
     
-    moveCount = layout.GetPossiableMoves(4, 5, moves);
+    moveCount = layout.GetPossibleMoves(4, 5, moves);
     
     // 过河后兵可以向前或横向移动
     EXPECT_GE(moveCount, 1);
@@ -323,7 +323,7 @@ TEST(ChessAlgorithmTest, BingMovement)
 TEST(ChessAlgorithmTest, MoveFunction)
 {
     CChessLayout layout;
-    CHESSMAN initLayout[10][9];
+    int initLayout[10][9];
     
     // 初始化一个空棋盘
     for (int y = 0; y < 10; y++) {
@@ -356,7 +356,7 @@ TEST(ChessAlgorithmTest, MoveFunction)
 TEST(ChessAlgorithmTest, UndoMove)
 {
     CChessLayout layout;
-    CHESSMAN initLayout[10][9];
+    int initLayout[10][9];
     
     // 初始化一个空棋盘
     for (int y = 0; y < 10; y++) {
@@ -392,7 +392,7 @@ TEST(ChessAlgorithmTest, UndoMove)
 TEST(ChessAlgorithmTest, MoveDescription)
 {
     CChessLayout layout;
-    CHESSMAN initLayout[10][9];
+    int initLayout[10][9];
     
     // 初始化一个空棋盘
     for (int y = 0; y < 10; y++) {

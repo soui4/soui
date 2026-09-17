@@ -168,7 +168,7 @@ class SOUI_EXP STileView
      * @param iItem Index of the item.
      * @return Pointer to the item panel.
      */
-    SItemPanel *GetItemPanel(int iItem);
+    SItemPanel *GetItemPanel(int iItem) OVERRIDE;
 
   protected:
     /**
@@ -178,21 +178,21 @@ class SOUI_EXP STileView
      * @param nPos Scroll position.
      * @return TRUE if the event was handled, otherwise FALSE.
      */
-    virtual BOOL OnScroll(BOOL bVertical, UINT uCode, int nPos);
+    virtual BOOL OnScroll(BOOL bVertical, UINT uCode, int nPos) OVERRIDE;
 
     /**
      * @brief Gets the scroll line size.
      * @param bVertical Flag indicating if the scroll is vertical.
      * @return Scroll line size.
      */
-    virtual int GetScrollLineSize(BOOL bVertical);
+    virtual int GetScrollLineSize(BOOL bVertical) OVERRIDE;
 
     /**
      * @brief Creates child windows from an XML node.
      * @param xmlNode XML node containing the child window definitions.
      * @return TRUE if successful, otherwise FALSE.
      */
-    virtual BOOL CreateChildren(SXmlNode xmlNode);
+    virtual BOOL CreateChildren(SXmlNode xmlNode) OVERRIDE;
 
     /**
      * @brief Updates the tooltip.
@@ -200,14 +200,14 @@ class SOUI_EXP STileView
      * @param tipInfo Tooltip information.
      * @return TRUE if the tooltip was updated, otherwise FALSE.
      */
-    virtual BOOL UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo);
+    virtual BOOL UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo) OVERRIDE;
 
     /**
      * @brief Sets the cursor.
      * @param pt Mouse position.
      * @return TRUE if the cursor was set, otherwise FALSE.
      */
-    virtual BOOL OnSetCursor(const CPoint &pt);
+    virtual BOOL OnSetCursor(const CPoint &pt) OVERRIDE;
 
     /**
      * @brief Calculates the drawing rectangle for an item.
@@ -224,13 +224,13 @@ class SOUI_EXP STileView
     /**
      * @brief Updates the visible items.
      */
-    void UpdateVisibleItems();
+    void UpdateVisibleItems() OVERRIDE;
 
     /**
      * @brief Updates a specific visible item.
      * @param iItem Index of the item.
      */
-    void UpdateVisibleItem(int iItem);
+    void UpdateVisibleItem(int iItem) OVERRIDE;
 
     /**
      * @brief Handles the paint event.
@@ -345,30 +345,30 @@ class SOUI_EXP STileView
     /**
      * @brief Handle data set changed event
      */
-    virtual void onDataSetChanged();
+    virtual void onDataSetChanged() OVERRIDE;
 
     /**
      * @brief Handle data set invalidated event
      */
-    virtual void onDataSetInvalidated();
+    virtual void onDataSetInvalidated() OVERRIDE;
 
     /**
      * @brief Handle item data changed event
      * @param iItem Index of the item
      */
-    virtual void onItemDataChanged(int iItem);
+    virtual void onItemDataChanged(int iItem) OVERRIDE;
 
     /**
      * @brief Indicates if item redraw is delayed
      * @return TRUE if redraw is delayed, FALSE otherwise
      */
-    virtual BOOL IsItemRedrawDelay() const;
+    virtual BOOL IsItemRedrawDelay() const OVERRIDE;
 
     /**
      * @brief Indicates if timeline is enabled
      * @return TRUE if timeline is enabled, FALSE otherwise
      */
-    virtual BOOL IsTimelineEnabled() const;
+    virtual BOOL IsTimelineEnabled() const OVERRIDE;
 
     /**
      * @brief Gets the rectangle of an item
@@ -376,13 +376,13 @@ class SOUI_EXP STileView
      * @param rcItem Reference to the rectangle to fill
      * @return TRUE if successful, FALSE otherwise
      */
-    virtual BOOL OnItemGetRect(const SOsrPanel *pItem, CRect &rcItem) const;
+    virtual BOOL OnItemGetRect(const SOsrPanel *pItem, CRect &rcItem) const OVERRIDE;
 
     /**
      * @brief Redraws an item
      * @param pItem Pointer to the item panel
      */
-    virtual void RedrawItem(SOsrPanel *pItem);
+    virtual void RedrawItem(SOsrPanel *pItem) OVERRIDE;
     virtual ILvAdapter *getAdapter() override
     {
         return m_adapter;
@@ -391,30 +391,30 @@ class SOUI_EXP STileView
      * @brief Gets the dialog code
      * @return Dialog code
      */
-    virtual UINT WINAPI OnGetDlgCode() const;
+    virtual UINT WINAPI OnGetDlgCode() const OVERRIDE;
 
     /**
      * @brief Handles colorization event
      * @param cr Color reference
      */
-    virtual void OnColorize(COLORREF cr);
+    virtual void OnColorize(COLORREF cr) OVERRIDE;
 
     /**
      * @brief Handles scale change event
      * @param nScale Scale factor
      */
-    virtual void OnScaleChanged(int nScale);
+    virtual void OnScaleChanged(int nScale) OVERRIDE;
 
     /**
      * @brief Handles language change event
      * @return HRESULT
      */
-    virtual HRESULT OnLanguageChanged();
+    virtual HRESULT OnLanguageChanged() OVERRIDE;
 
     /**
      * @brief Handles font rebuild event
      */
-    virtual void OnRebuildFont();
+    virtual void OnRebuildFont() OVERRIDE;
 
     /**
      * @brief Dispatches messages to items

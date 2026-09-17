@@ -142,7 +142,7 @@ class SOUI_EXP SwndContainerImpl
      * @brief Retrieves the accelerator manager.
      * @return Pointer to the accelerator manager.
      */
-    STDMETHOD_(IAcceleratorMgr *, GetAcceleratorMgr)(THIS)
+    STDMETHOD_(IAcceleratorMgr *, GetAcceleratorMgr)(THIS) OVERRIDE
     {
         return &m_focusMgr;
     }

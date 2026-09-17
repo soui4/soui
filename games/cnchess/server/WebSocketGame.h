@@ -12,6 +12,7 @@
 #include <vector>
 #include <memory>
 #include <string>
+#include <atomic>
 #include "GameClient.h"
 #include "GameTable-i.h"
 #include <commgr2.h>
@@ -48,6 +49,8 @@ public:
 
 	BOOL GameStart( unsigned short uPort);
 	void GameStop();  // 添加GameStop方法声明
+	void RequestStop(); // 请求停止(由信号/控制台处理线程置位, 主线程检测后安全退出)
+	bool IsStopRequested() const { return m_stopRequested.load(); }
 	unsigned short GetPort() { return m_uPort; }
 protected:
 	void OnTableChange(int nTableId) override;
@@ -59,6 +62,9 @@ protected:
     BOOL ClientSeatDown(PWSCLIENT pClient, LPVOID pData, DWORD dwSize);
 	BOOL ClientGetUp(PWSCLIENT pClient, LPVOID pData, DWORD dwSize);
 	BOOL ClientThemeReq(PWSCLIENT pClient, LPVOID pData, DWORD dwSize);
+	BOOL ClientRobotInvite(PWSCLIENT pClient, LPVOID pData, DWORD dwSize);
+    // 残局打谱相关
+    BOOL ClientEndgameList(PWSCLIENT pClient, LPVOID pData, DWORD dwSize);
 
     BOOL OnQuerySeat(SeatID *pSeatID);
 	BOOL OnMsg(PWSCLIENT pClient, DWORD dwType, LPVOID pData, DWORD dwSize);
@@ -76,6 +82,7 @@ protected:
 	uint32_t m_nextUid;
   private:
 	unsigned short m_uPort;
+	std::atomic<bool> m_stopRequested; // 收到 Ctrl+C / 终止信号时置位
 	// 内部方法
 	void ProcessReceivedData(ISvrConnection* pConn, const void* data, int len);
 	PWSCLIENT CreateClient(ISvrConnection* pConn,LPCSTR pszUriPath, LPCSTR pszArgs);

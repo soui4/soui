@@ -10,12 +10,13 @@
 #include <helper/slog.h>
 #include <com-loader.hpp>
 #include <interface/slog-i.h>
-#define  SCOM_MASK scom_mask_log4z
+#define  SCOM_MASK scom_mask_log4z|scom_mask_taskloop
 #include <commgr2.h>
 #include "WebSocketGame.h"
 
 #include "PropBag.h"
 #include "ThemeResourceProvider.h"
+#include "RobotAIPool.h"
 #define kLogTag "CnChessServer"
 
 #ifdef _WIN32
@@ -47,8 +48,9 @@ static BOOL WINAPI ConsoleHandler(DWORD dwType)
     case CTRL_LOGOFF_EVENT:
     case CTRL_SHUTDOWN_EVENT:
         if (g_game) {
+            // 只置停止标志, 由主线程检测后安全退出, 避免在控制台处理线程内阻塞/join
             SLOGI() << "Received exit signal, stopping game...";
-            g_game->GameStop();
+            g_game->RequestStop();
         }
         return TRUE;
     default:
@@ -59,9 +61,9 @@ static BOOL WINAPI ConsoleHandler(DWORD dwType)
 static void signalHandler(int signum)
 {
     if (g_game) {
-        g_game->GameStop();
+        // 只置停止标志, 由主线程检测后安全退出, 不在信号上下文内做阻塞操作
+        g_game->RequestStop();
     }
-    exit(signum);
 }
 #endif
 
@@ -140,7 +142,7 @@ int run(LPCTSTR pszCfg){
 
 int _tmain(int argc, TCHAR **argv)
 {
-    LPCTSTR pszCfg = _T("./config.ini");
+    LPCTSTR pszCfg = _T("./config/config.xml");
     if(argc > 1)
         pszCfg = argv[1];
     return run(pszCfg);

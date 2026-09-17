@@ -428,7 +428,7 @@ class SOUI_EXP SMenuEx
      * @param pEvt Pointer to event parameter object
      * @return Returns TRUE on success, FALSE on failure
      */
-    virtual BOOL _HandleEvent(IEvtArgs *pEvt);
+    virtual BOOL _HandleEvent(IEvtArgs *pEvt) OVERRIDE;
 
     /**
      * @brief Load layout from resource ID

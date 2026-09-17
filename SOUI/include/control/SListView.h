@@ -169,21 +169,21 @@ class SOUI_EXP SListView
      * @param nPos Scroll position
      * @return TRUE if handled, FALSE otherwise
      */
-    virtual BOOL OnScroll(BOOL bVertical, UINT uCode, int nPos);
+    virtual BOOL OnScroll(BOOL bVertical, UINT uCode, int nPos) OVERRIDE;
 
     /**
      * @brief Get the scroll line size
      * @param bVertical Whether the scroll is vertical
      * @return Scroll line size
      */
-    virtual int GetScrollLineSize(BOOL bVertical);
+    virtual int GetScrollLineSize(BOOL bVertical) OVERRIDE;
 
     /**
      * @brief Create child items from XML configuration
      * @param xmlNode XML node for the child items
      * @return TRUE if successful, FALSE otherwise
      */
-    virtual BOOL CreateChildren(SXmlNode xmlNode);
+    virtual BOOL CreateChildren(SXmlNode xmlNode) OVERRIDE;
 
     /**
      * @brief Update tooltip information
@@ -191,14 +191,14 @@ class SOUI_EXP SListView
      * @param tipInfo Tooltip information
      * @return TRUE if handled, FALSE otherwise
      */
-    virtual BOOL UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo);
+    virtual BOOL UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo) OVERRIDE;
 
     /**
      * @brief Handle set cursor event
      * @param pt Mouse coordinates
      * @return TRUE if handled, FALSE otherwise
      */
-    virtual BOOL OnSetCursor(const CPoint &pt);
+    virtual BOOL OnSetCursor(const CPoint &pt) OVERRIDE;
 
     /**
      * @brief Dispatch messages to items
@@ -329,30 +329,30 @@ class SOUI_EXP SListView
     /**
      * @brief Handle data set changed event
      */
-    virtual void onDataSetChanged();
+    virtual void onDataSetChanged() OVERRIDE;
 
     /**
      * @brief Handle data set invalidated event
      */
-    virtual void onDataSetInvalidated();
+    virtual void onDataSetInvalidated() OVERRIDE;
 
     /**
      * @brief Handle item data changed event
      * @param iItem Index of the item
      */
-    virtual void onItemDataChanged(int iItem);
+    virtual void onItemDataChanged(int iItem) OVERRIDE;
 
     /**
      * @brief Indicates if item redraw is delayed
      * @return TRUE if redraw is delayed, FALSE otherwise
      */
-    virtual BOOL IsItemRedrawDelay() const;
+    virtual BOOL IsItemRedrawDelay() const OVERRIDE;
 
     /**
      * @brief Indicates if timeline is enabled
      * @return TRUE if timeline is enabled, FALSE otherwise
      */
-    virtual BOOL IsTimelineEnabled() const;
+    virtual BOOL IsTimelineEnabled() const OVERRIDE;
 
     /**
      * @brief Gets the rectangle of an item
@@ -360,13 +360,13 @@ class SOUI_EXP SListView
      * @param rcItem Reference to the rectangle to fill
      * @return TRUE if successful, FALSE otherwise
      */
-    virtual BOOL OnItemGetRect(const SOsrPanel *pItem, CRect &rcItem) const;
+    virtual BOOL OnItemGetRect(const SOsrPanel *pItem, CRect &rcItem) const OVERRIDE;
 
     /**
      * @brief Redraws an item
      * @param pItem Pointer to the item panel
      */
-    virtual void RedrawItem(SOsrPanel *pItem);
+    virtual void RedrawItem(SOsrPanel *pItem) OVERRIDE;
     virtual ILvAdapter *getAdapter() override
     {
         return m_adapter;
@@ -375,30 +375,30 @@ class SOUI_EXP SListView
      * @brief Gets the dialog code
      * @return Dialog code
      */
-    virtual UINT WINAPI OnGetDlgCode() const;
+    virtual UINT WINAPI OnGetDlgCode() const OVERRIDE;
 
     /**
      * @brief Handles colorization event
      * @param cr Color reference
      */
-    virtual void OnColorize(COLORREF cr);
+    virtual void OnColorize(COLORREF cr) OVERRIDE;
 
     /**
      * @brief Handles scale change event
      * @param nScale Scale factor
      */
-    virtual void OnScaleChanged(int nScale);
+    virtual void OnScaleChanged(int nScale) OVERRIDE;
 
     /**
      * @brief Handles language change event
      * @return HRESULT
      */
-    virtual HRESULT OnLanguageChanged();
+    virtual HRESULT OnLanguageChanged() OVERRIDE;
 
     /**
      * @brief Handles font rebuild event
      */
-    virtual void OnRebuildFont();
+    virtual void OnRebuildFont() OVERRIDE;
 
     /**
      * @brief Cancel capture when drag scrolling takes over

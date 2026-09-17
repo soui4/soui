@@ -3,6 +3,8 @@
     <imgframe name="skin_item_bk" src="svg:lobby_table_bk" states="3" margin="5,5,5,5"/>
     <imglist name="skin_table" src="svg:chess_table"/>
     <imglist name="skin_playing" src="svg:playing_icon"/>
+    <!-- 难度星级: 2帧(实心金星/空心灰星), 配合 ratingbar 控件 -->
+    <imglist name="skin_star" src="svg:star_rating" states="2"/>
     <imglist name="skin_btn_mute" src="image:PNG_MUTE" states="4"/>
     <imglist name="skin_btn_unmute" src="image:PNG_UNMUTE" states="4"/>
     <imgframe name="btn_primary" src="svg:btn_primary" states="4" margin="5,5,5,5"/>
@@ -18,6 +20,12 @@
     <imglist name="skin_form_icons" src="svg:form_icons" states="3"/>
     <!-- 大厅座位 (6态: 红空/红占/红准备/黑空/黑占/黑准备) -->
     <imglist name="skin_seat" src="svg:seat_states" states="6"/>
+    <!-- 邀请机器人难度按钮 (3态: normal/hover/pressed) -->
+    <imglist name="skin_btn_robot_beginner" src="svg:btn_robot_beginner" states="3"/>
+    <imglist name="skin_btn_robot_medium" src="svg:btn_robot_medium" states="3"/>
+    <imglist name="skin_btn_robot_advanced" src="svg:btn_robot_advanced" states="3"/>
+    <!-- 邀请机器人按钮 (点击展开难度选择) -->
+    <imglist name="skin_btn_robot_invite" src="svg:btn_robot_invite" states="3"/>
     <!-- 进度条皮肤 -->
     <imglist name="skin_progress_bg" src="svg:progress_bar"/>
     <imglist name="skin_progress_pos" src="svg:progress_pos"/>

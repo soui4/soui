@@ -66,7 +66,7 @@ void CChsLytState::UpdateState()
 			m_ptJiangBlack.y=y,m_ptJiangBlack.x=x;
 		//获得每一个棋子的可到达位置
 		m_ChessInfo[y][x]=new CChessInfo;
-		nDest=m_pLayout->GetPossiableMoves(x,y,ptDest);
+		nDest=m_pLayout->GetPossibleMoves(x,y,ptDest);
 		for(int i=0;i<nDest;i++) m_ChessInfo[y][x]->m_lstDest.push_back(ptDest[i]);
 	}
 	//计算出棋子的保护及攻击位置
@@ -141,9 +141,17 @@ void CChsLytState::UpdateState()
 BOOL CChsLytState::IsJiangJun(CHSSIDE side)
 {
 	if(side==CS_RED)
+	{
+		//帅已被吃/不存在时(吃将或结束态)按"不在被将军"处理，避免越界崩溃
+		if(m_ptJiangRed.x<0 || m_ptJiangRed.y<0) return FALSE;
 		return m_ChessInfo[m_ptJiangRed.y][m_ptJiangRed.x]->m_lstAttacker.size()>0;
+	}
 	else
+	{
+		//将已被吃/不存在时(吃将或结束态)按"不在被将军"处理，避免越界崩溃
+		if(m_ptJiangBlack.x<0 || m_ptJiangBlack.y<0) return FALSE;
 		return m_ChessInfo[m_ptJiangBlack.y][m_ptJiangBlack.x]->m_lstAttacker.size()>0;
+	}
 }
 
 int CChsLytState::GetProtecter(POINT pt)
@@ -259,7 +267,7 @@ void CChessLayout::InitLayout(const int chsLayout[10][9],CHSSIDE selfSide)
 	memset(m_csDeadBlack,0,sizeof(m_csDeadBlack));
 }
 
-void CChessLayout::Copy(CChessLayout *pLayout)
+void CChessLayout::Copy(const CChessLayout *pLayout)
 {
 	m_selfSide=pLayout->m_selfSide;
 	m_actSide=pLayout->m_actSide;
@@ -306,12 +314,12 @@ BOOL CChessLayout::UndoMove(const MOVESTEP & moveStep)
 	return TRUE;
 }
 
-int  CChessLayout::GetPossiableMoves(POINT ptFocus,POINT ptMoves[MAX_MOVES])
+int  CChessLayout::GetPossibleMoves(POINT ptFocus,POINT ptMoves[MAX_MOVES])
 {
 	return CChsMoveGenerator::GetPossiableMoves(m_chesses,m_selfSide==CS_RED,ptFocus,ptMoves);
 }
 
-int  CChessLayout::GetPossiableMoves(int x,int y,POINT ptMoves[MAX_MOVES])
+int  CChessLayout::GetPossibleMoves(int x,int y,POINT ptMoves[MAX_MOVES])
 {
 	POINT pt={x,y};
 	return CChsMoveGenerator::GetPossiableMoves(m_chesses,m_selfSide==CS_RED,pt,ptMoves);
@@ -494,7 +502,10 @@ BOOL CChessLayout::IsValidMove(POINT pt1 , POINT pt2,CChsLytState *pLytState)
 	while(p!=pLstDest->end())
 	{
 		if(p->x==pt2.x && p->y==pt2.y 
-			&& CHSMANSIDE(m_chesses[pt1.y][pt1.x])!=CHSMANSIDE(m_chesses[pt2.y][pt2.x]))
+			&& CHSMANSIDE(m_chesses[pt1.y][pt1.x])!=CHSMANSIDE(m_chesses[pt2.y][pt2.x])
+			// 将死即止:不允许"吃掉对方将",落点为将/帅一步判非法
+			&& m_chesses[pt2.y][pt2.x]!=CHSMAN_RED_JIANG
+			&& m_chesses[pt2.y][pt2.x]!=CHSMAN_BLK_JIANG)
 		{
 			bRet=TRUE;
 			break;

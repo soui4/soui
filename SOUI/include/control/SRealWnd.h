@@ -90,7 +90,7 @@ class SOUI_EXP SRealWnd : public TWindowProxy<IRealWnd> {
      * @brief Set the additional data for the real window
      * @param lpData Pointer to the additional data
      */
-    STDMETHOD_(void, SetData)(THIS_ LPVOID lpData)
+    STDMETHOD_(void, SetData)(THIS_ LPVOID lpData) OVERRIDE
     {
         m_lpData = lpData;
     }
@@ -99,7 +99,7 @@ class SOUI_EXP SRealWnd : public TWindowProxy<IRealWnd> {
      * @brief Get the additional data for the real window
      * @return Pointer to the additional data
      */
-    STDMETHOD_(LPVOID, GetData)(THIS)
+    STDMETHOD_(LPVOID, GetData)(THIS) OVERRIDE
     {
         return m_lpData;
     }
@@ -117,21 +117,21 @@ class SOUI_EXP SRealWnd : public TWindowProxy<IRealWnd> {
      * @brief Determine if the control needs to be redrawn when its state changes
      * @return TRUE if redraw is needed, FALSE otherwise
      */
-    virtual BOOL NeedRedrawWhenStateChange();
+    virtual BOOL NeedRedrawWhenStateChange() OVERRIDE;
 
     /**
      * @brief Initialize the control from an XML node
      * @param pNode XML node containing initialization parameters
      * @return TRUE if initialization is successful, FALSE otherwise
      */
-    virtual BOOL WINAPI InitFromXml(IXmlNode *pNode);
+    virtual BOOL WINAPI InitFromXml(IXmlNode *pNode) OVERRIDE;
 
     /**
      * @brief Handle layout changes
      * @param rcWnd New window rectangle
      * @return TRUE if layout is successful, FALSE otherwise
      */
-    virtual BOOL OnRelayout(const CRect &rcWnd);
+    virtual BOOL OnRelayout(const CRect &rcWnd) OVERRIDE;
 
     /**
      * @brief Handle show window event

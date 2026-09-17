@@ -2,7 +2,7 @@
 #include "core/SMsgLoop.h"
 #include "helper/slog.h"
 #include "core/SNativeWnd.h"
-
+#include "helper/SCriticalSection.h"
 #ifndef WM_SYSTIMER
 #define WM_SYSTIMER 0x0118 /**< (caret blink) */
 #endif                     /**< WM_SYSTIMER */
@@ -22,6 +22,7 @@ BOOL RemoveElementFromArray(SArray<T> &arr, T ele)
 }
 
 class SMsgLoopWnd : public SNativeWnd {
+    SCriticalSection m_cs;
     BOOL m_hasTimer;
     IMessageLoop *m_pMsgLoop;
 
@@ -45,6 +46,7 @@ class SMsgLoopWnd : public SNativeWnd {
 
     void StartTimer()
     {
+        SAutoLock lock(m_cs);
         if (!m_hasTimer)
         {
             m_hasTimer = TRUE;
@@ -54,6 +56,7 @@ class SMsgLoopWnd : public SNativeWnd {
 
     void StopTimer()
     {
+        SAutoLock lock(m_cs);
         if (m_hasTimer)
         {
             m_hasTimer = FALSE;
@@ -136,6 +139,7 @@ void SMessageLoop::OnStop()
     }
     m_priv->m_runnables.RemoveAll();
     m_bRunning = FALSE;
+    m_priv->m_msgWnd.StopTimer();
     m_priv->m_msgWnd.DestroyWindow();
 }
 
@@ -314,10 +318,12 @@ void SMessageLoop::ExecutePendingTask()
     {
         m_priv->m_parentLoop->ExecutePendingTask();
     }
-    if (m_bRunning)
-    {
-        m_priv->m_msgWnd.StopTimer();
-    }
+    // Do NOT stop the timer here. The timer is consumed by SMsgLoopWnd::OnTimer,
+    // which stops it BEFORE draining. If a worker thread posts a task while tasks
+    // are being executed, its StartTimer() has already re-armed the timer; stopping
+    // it here would kill that fresh timer and orphan the task in m_runnables with
+    // no wakeup until the next UI message arrives (on Android this surfaced as
+    // multi-second delays of the pending queue, resumed only by touch input).
 }
 
 BOOL SMessageLoop::PeekMsg(THIS_ LPMSG pMsg, UINT wMsgFilterMin, UINT wMsgFilterMax, BOOL bRemove)
