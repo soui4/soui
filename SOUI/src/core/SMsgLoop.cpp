@@ -139,6 +139,7 @@ void SMessageLoop::OnStop()
     }
     m_priv->m_runnables.RemoveAll();
     m_bRunning = FALSE;
+    m_priv->m_msgWnd.StopTimer();
     m_priv->m_msgWnd.DestroyWindow();
 }
 
@@ -317,10 +318,12 @@ void SMessageLoop::ExecutePendingTask()
     {
         m_priv->m_parentLoop->ExecutePendingTask();
     }
-    if (m_bRunning)
-    {
-        m_priv->m_msgWnd.StopTimer();
-    }
+    // Do NOT stop the timer here. The timer is consumed by SMsgLoopWnd::OnTimer,
+    // which stops it BEFORE draining. If a worker thread posts a task while tasks
+    // are being executed, its StartTimer() has already re-armed the timer; stopping
+    // it here would kill that fresh timer and orphan the task in m_runnables with
+    // no wakeup until the next UI message arrives (on Android this surfaced as
+    // multi-second delays of the pending queue, resumed only by touch input).
 }
 
 BOOL SMessageLoop::PeekMsg(THIS_ LPMSG pMsg, UINT wMsgFilterMin, UINT wMsgFilterMax, BOOL bRemove)
