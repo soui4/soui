@@ -42,9 +42,7 @@ BEGIN
 "LANGUAGE 4, 2\r\n"
 "#pragma code_page(936)\r\n"
     "#include ""res/soui_res.rc2"" //SOUI Resource\r\n"
-#if (defined(LIB_CORE) && defined(LIB_SOUI_COM))
-    "#include ""../soui-sys-resource/theme_sys_res.rc2"" //SOUI SYS Resource\r\n"
-#endif
+    "#include ""../../soui-sys-resource/theme_sys_res.rc2"" //SOUI SYS Resource\r\n"
 "#endif\r\n"
 END
 
@@ -103,10 +101,7 @@ END
 LANGUAGE 4, 2
 #pragma code_page(936)
 #include "res/soui_res.rc2" //SOUI Resource
-#if (defined(LIB_CORE) && defined(LIB_SOUI_COM))
-#include "../soui-sys-resource/theme_sys_res.rc2" //SOUI SYS Resource
-#endif
-
+#include "../../soui-sys-resource/theme_sys_res.rc2" //SOUI SYS Resource
 #endif
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
