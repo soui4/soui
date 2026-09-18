@@ -36,9 +36,6 @@ set(RESBUILD_EXE $<TARGET_FILE:uiresbuilder>)
 # 将生成的resource.h文件添加到项目中
 set(UIRES_RES_HEADER ${CMAKE_CURRENT_SOURCE_DIR}/res/resource.h)
 
-# 确保在构建时会处理uires.idx文件
-set_source_files_properties(${UIRES_RES_HEADER} PROPERTIES GENERATED TRUE)
-
 # Apple bundle properties
 set(MACOSX_BUNDLE_HIGH_RESOLUTION_CAPABLE "true")
 set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.soui.cnchess")
@@ -48,7 +45,8 @@ set(current_project "cnchess_client")
 add_soui_exe(${current_project} ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${UIRES_RES_HEADER} ${CURRENT_RC})
 
 # Compile resource files with windres on non-Windows
-target_compile_resources(${current_project} ${CURRENT_RC} INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/soui-sys-resource)
+target_compile_definitions(${current_project} PRIVATE BUILD_SYS_RES)
+target_compile_resources(${current_project} ${CURRENT_RC} INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/soui-sys-resource DEPENDS ${CURRENT_UIRES})
 
 add_dependencies(${current_project} soui4 ExtendCtrls resprovider-zip)
 target_link_libraries(${current_project} soui4 utilities4 ExtendCtrls cnchess_algorithm resprovider-zip)

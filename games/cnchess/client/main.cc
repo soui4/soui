@@ -12,6 +12,7 @@
 #include <ios_entry.h>
 #endif
 
+#define SYS_NAMED_RESOURCE _T("soui-sys-resource")
 #ifdef __APPLE__
 static const TCHAR * kPath_SysRes = _T("/soui-sys-resource");
 #else
@@ -60,42 +61,31 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
     cfg.SetRender(Render_Skia)
         .SetImgDecoder(ImgDecoder_Stb)
         .SetLog(TRUE);
-#ifdef _WIN32
-    cfg.SetSysResPeFile(appDir + _T("/soui-sys-resource.dll"));
-    cfg.SetAppResPeHandle(hInstance);
-    // SStringT strAppRes = resDir + kPath_UiRes;
-    // cfg.SetAppResFile(strAppRes);
-#else
-    SStringT strAppRes = appDir+_T("/chess_uires.zip");
-    if(GetFileAttributes(strAppRes) != INVALID_FILE_ATTRIBUTES)
-        cfg.SetAppResZip(strAppRes, "");
-    else
-        cfg.SetAppResFile(resDir + kPath_UiRes);
 
-    SStringT strSysRes = appDir + _T("/soui-sys-resource.zip");
-    if(GetFileAttributes(strSysRes) != INVALID_FILE_ATTRIBUTES)
-        cfg.SetSysResZip(strSysRes, "");
-    else
-        cfg.SetSysResFile(resDir + kPath_SysRes);
+
+    // Load system resources
+#ifdef ENABLE_BUILD_RESOURCE
+#if defined(BUILD_SYS_RES)
+    cfg.SetSysResPeHandle(hInstance);
+#else
+    cfg.SetSysResPeFile(SYS_NAMED_RESOURCE);
 #endif
+#else
+    cfg.SetSysResFile(resDir + kPath_SysRes);
+#endif//ENABLE_BUILD_RESOURCE
+
+#if !defined(_DEBUG) && defined(ENABLE_BUILD_RESOURCE)
+    cfg.SetAppResPeHandle(hInstance);
+#else
+    cfg.SetAppResFile(resDir + kPath_UiRes);
+#endif
+
     if (!cfg.DoConfig(&app))
     {
         return -1;
     }
     // 覆盖系统 MessageBox 模板: 使用与游戏主题一致的弹窗样式(深木色+金色)
     app.SetMessageBoxTemplateResId(_T("LAYOUT:XML_MSGBOX"));
-#ifndef _WIN32
-    // 加载宋体字体
-    #ifdef __APPLE__
-    // Apple 平台：字体应位于 bundle 根目录
-    SStringT strFont = resDir + _T("/simsun.ttc");
-    #else
-    // Linux 平台：字体位于源码树上三级目录
-    SStringT strFont = resDir + _T("/../../../simsun.ttc");
-    #endif
-    if(GetFileAttributes(strFont) != INVALID_FILE_ATTRIBUTES)
-        AddFontResource(strFont.c_str());
-#endif
     // Show main dialog
     {
         SLog::setLogLevel(LOG_LEVEL_DEBUG);
