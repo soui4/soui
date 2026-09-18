@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <!-- 仿古宣纸背景渐变 -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F5E6C8" />
+      <stop offset="100%" stop-color="#D4B896" />
+    </linearGradient>
+    
+    <!-- 木质棋子径向渐变 -->
+    <radialGradient id="woodGrad" cx="40%" cy="40%" r="65%">
+      <stop offset="0%" stop-color="#D2A679" />
+      <stop offset="50%" stop-color="#A67B5B" />
+      <stop offset="100%" stop-color="#6B4226" />
+    </radialGradient>
+    
+    <!-- 棋子边缘深色渐变 -->
+    <radialGradient id="edgeGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#8B5A2B" />
+      <stop offset="100%" stop-color="#3E2723" />
+    </radialGradient>
+
+    <!-- 整体圆角裁剪路径 (圆角半径 20) -->
+    <clipPath id="roundedClip">
+      <rect x="0" y="0" width="200" height="200" rx="20" ry="20" />
+    </clipPath>
+  </defs>
+
+  <!-- 所有内容置于圆角矩形内裁剪 -->
+  <g clip-path="url(#roundedClip)">
+    
+    <!-- 1. 仿古宣纸底纹 -->
+    <rect width="200" height="200" fill="url(#bgGrad)" />
+    
+    <!-- 2. 棋盘线装饰（九宫格 + 斜线） -->
+    <g stroke="#8B6B4D" stroke-width="1.5" opacity="0.35">
+      <line x1="25" y1="25" x2="175" y2="25" />
+      <line x1="25" y1="25" x2="25" y2="175" />
+      <line x1="175" y1="25" x2="175" y2="175" />
+      <line x1="25" y1="175" x2="175" y2="175" />
+      <line x1="25" y1="100" x2="175" y2="100" />
+      <line x1="100" y1="25" x2="100" y2="175" />
+      <!-- 斜线（楚河汉界意向） -->
+      <line x1="25" y1="25" x2="175" y2="175" stroke-dasharray="4,4" />
+      <line x1="175" y1="25" x2="25" y2="175" stroke-dasharray="4,4" />
+    </g>
+    
+    <!-- 3. 棋子阴影 -->
+    <ellipse cx="102" cy="103" rx="78" ry="78" fill="#000000" opacity="0.12" />
+    
+    <!-- 4. 棋子主体（圆形木质） -->
+    <circle cx="100" cy="100" r="78" fill="url(#woodGrad)" stroke="url(#edgeGrad)" stroke-width="4" />
+    
+    <!-- 5. 内圈装饰线 -->
+    <circle cx="100" cy="100" r="68" fill="none" stroke="#5D3A1A" stroke-width="2" opacity="0.5" />
+    <circle cx="100" cy="100" r="62" fill="none" stroke="#8B5A2B" stroke-width="1" opacity="0.3" />
+    
+    <!-- 6. 品牌 “SOUI”（大号，居中，朱红，略微旋转） -->
+    <text x="100" y="118" 
+          font-family="'Times New Roman', 'Georgia', serif" 
+          font-size="54" 
+          font-weight="bold" 
+          fill="#7A1F1A" 
+          text-anchor="middle" 
+          letter-spacing="3" 
+          transform="rotate(-4, 100, 100)">
+      SOUI
+    </text>
+    
+    <!-- 7. 印章：左下角朱文小印（含“印”字） -->
+    <circle cx="68" cy="135" r="9" fill="#C41E24" opacity="0.75" />
+    <text x="68" y="139" 
+          font-family="'KaiTi', 'STKaiti', serif" 
+          font-size="12" 
+          fill="#F5E6C8" 
+          text-anchor="middle" 
+          opacity="0.9">
+      印
+    </text>
+    
+    <!-- 8. 底部小字 “象棋” -->
+    <text x="100" y="172" 
+          font-family="'KaiTi', 'STKaiti', 'SimSun', serif" 
+          font-size="16" 
+          fill="#5D3A1A" 
+          text-anchor="middle" 
+          letter-spacing="4" 
+          opacity="0.6">
+      象棋
+    </text>
+    
+  </g>
+</svg>

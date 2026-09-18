@@ -79,7 +79,7 @@ PACKAGE_DIR="$PROJECT_DIR/debian_package"
 OUTPUT_DEB="$PROJECT_DIR/cnchess.deb"
 
 # Icon source (rendered to png via rsvg-convert/convert/inkscape when available)
-ICON_SOURCE_SVG="$PROJECT_DIR/uires/svg/cnchess_logo.svg"
+ICON_SOURCE_SVG="$PROJECT_DIR/uires/svg/icon.svg"
 
 # Icon sizes to generate (following freedesktop.org standards)
 ICON_SIZES=(16 32 48 64 128 256)
@@ -110,6 +110,7 @@ DEFAULT_SERVER="124.222.50.176:3311"
 REQUIRED_MODULES=(
     libsoui4.so
     libswinx.so
+    libcairo.so
     libutilities4.so
     libresprovider-zip.so
     librender-skia.so
@@ -117,14 +118,7 @@ REQUIRED_MODULES=(
     liblog4z.so
     libtaskloop.so
     libws.so
-)
-# Optional modules: collected only when present in the build output
-# (depends on the actual build configuration).
-OPTIONAL_MODULES=(
     libmsftedit.so
-    libtranslator.so
-    libresprovider-7zip.so
-    soui-sys-resource.so
 )
 
 # Display target distribution
@@ -207,12 +201,6 @@ if [ -f "$BIN_DIR/libsoui4.so" ]; then
         fi
         MODULES+=("$mod")
         echo "  + $mod"
-    done
-    for mod in "${OPTIONAL_MODULES[@]}"; do
-        if [ -f "$BIN_DIR/$mod" ]; then
-            MODULES+=("$mod")
-            echo "  + $mod (optional)"
-        fi
     done
 else
     echo ""
