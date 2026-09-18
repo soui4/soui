@@ -2502,6 +2502,8 @@ public:
     }
 
     virtual SkTypeface* matchStyle(const SkFontStyle& pattern) SK_OVERRIDE {
+		if(fArray.count() == 0)
+			return NULL;
         // Find the best matching font by calculating scores
         int bestIndex = 0;
         int bestScore = INT_MAX;
