@@ -343,12 +343,14 @@ SNSBEGIN
 	}
 
 
-	SOUI_COM_C BOOL SOUI_COM_API TASKLOOP::SCreateInstance(IObjRef **ppTaskLoop)
-	{
-		*ppTaskLoop = new STaskLoop();
-		return TRUE;
+	namespace TASKLOOP
+	{ 
+		SOUI_COM_C BOOL SOUI_COM_API SCreateInstance(IObjRef **ppTaskLoop)
+		{
+			*ppTaskLoop = new STaskLoop();
+			return TRUE;
+		}
 	}
-
 SNSEND
 
 EXTERN_C BOOL TaskLoop_SCreateInstance(IObjRef **ppTaskLoop)

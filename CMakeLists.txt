@@ -224,8 +224,14 @@ add_subdirectory(controls.extend)
 if(SOUI_BUILD_TOOLS)
         add_subdirectory(tools)
 endif()
+
+configure_file("${PROJECT_SOURCE_DIR}/__cmake/soui4-config.cmake.in"
+               "${PROJECT_BINARY_DIR}/soui4-config.cmake" @ONLY)
+
+#include(${PROJECT_BINARY_DIR}/soui4-config.cmake)
+
 if(SOUI_BUILD_DEMOS)
-        add_subdirectory(demos)
+        #add_subdirectory(demos)
 endif(SOUI_BUILD_DEMOS)
 if(SOUI_BUILD_GAMES AND TARGET websockets)
         add_subdirectory(games) 
@@ -259,11 +265,7 @@ endforeach()
 list(REMOVE_DUPLICATES SOUI_PC_LIBS)
 string(REPLACE ";" " " SOUI_PC_LIBS "${SOUI_PC_LIBS}")
 
-# Configure the (single) soui4-config.cmake template — reused for both direct
-# include() and find_package(soui4). Installed to __cmake for the legacy
-# include(), and to lib/cmake/soui4/ for find_package(soui4).
-configure_file("${PROJECT_SOURCE_DIR}/__cmake/soui4-config.cmake.in"
-               "${PROJECT_BINARY_DIR}/soui4-config.cmake" @ONLY)
+
 install(FILES "${PROJECT_BINARY_DIR}/soui4-config.cmake"
         DESTINATION ${CMAKE_INSTALL_PREFIX}/__cmake)
 

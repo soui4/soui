@@ -32,6 +32,8 @@ target_link_libraries(cnchess_test
     jsoncpp
     log4z
     utilities4
+    taskloop
+    ws
 )
 
 # 端到端测试直接读取真实残局配置文件

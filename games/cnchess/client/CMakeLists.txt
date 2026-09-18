@@ -46,7 +46,7 @@ add_soui_exe(${current_project} ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOU
 
 # Compile resource files with windres on non-Windows
 target_compile_definitions(${current_project} PRIVATE BUILD_SYS_RES)
-target_compile_resources(${current_project} ${CURRENT_RC} INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/soui-sys-resource DEPENDS ${CURRENT_UIRES})
+target_compile_resources(${current_project} ${CURRENT_RC} INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/config ${PROJECT_SOURCE_DIR}/soui-sys-resource DEPENDS ${CURRENT_UIRES})
 
 add_dependencies(${current_project} soui4 ExtendCtrls resprovider-zip)
 target_link_libraries(${current_project} soui4 utilities4 ExtendCtrls cnchess_algorithm resprovider-zip)

@@ -32,6 +32,9 @@ target_link_libraries(${current_project}
     utilities4
     cnchess_algorithm
     jsoncpp
+    taskloop
+    ws
+    log4z
 )
 
 if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
@@ -58,21 +61,24 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
         COMMENT "Packaging ${MOBILE_ZIP_NAME}"
     )
 else()
-    # Unix: 使用 zip 命令
-    add_custom_command(TARGET ${current_project} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory
-            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIGURATION>
-        COMMAND zip -r ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIGURATION>/${PC_ZIP_NAME} .
-        WORKING_DIRECTORY ${PC_THEME_SOURCE_DIR}
-        COMMENT "Packaging ${PC_ZIP_NAME}"
-    )
-    add_custom_command(TARGET ${current_project} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory
-            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIGURATION>
-        COMMAND zip -r ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIGURATION>/${MOBILE_ZIP_NAME} .
-        WORKING_DIRECTORY ${MOBILE_THEME_SOURCE_DIR}
-        COMMENT "Packaging ${MOBILE_ZIP_NAME}"
-    )
+    find_program(ZIP_EXECUTABLE zip)
+    if(ZIP_EXECUTABLE)
+        # Unix: 使用 zip 命令
+        add_custom_command(TARGET ${current_project} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E make_directory
+                ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIGURATION>
+            COMMAND zip -r ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIGURATION>/${PC_ZIP_NAME} .
+            WORKING_DIRECTORY ${PC_THEME_SOURCE_DIR}
+            COMMENT "Packaging ${PC_ZIP_NAME}"
+        )
+        add_custom_command(TARGET ${current_project} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E make_directory
+                ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIGURATION>
+            COMMAND zip -r ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIGURATION>/${MOBILE_ZIP_NAME} .
+            WORKING_DIRECTORY ${MOBILE_THEME_SOURCE_DIR}
+            COMMENT "Packaging ${MOBILE_ZIP_NAME}"
+        )
+    endif()
 endif()
 
 # 复制残局配置 endgames.json 到可执行文件目录下的 config/ 子目录

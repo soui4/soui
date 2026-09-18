@@ -75,3 +75,4 @@ ios/
 /demos/ohos-demo/.clangd
 /.workbuddy
 /.trae
+*.deb

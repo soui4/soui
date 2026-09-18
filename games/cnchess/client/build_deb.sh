@@ -15,15 +15,15 @@
 #
 # This script handles both build flavors automatically:
 #   - DLL mode   (bin/libsoui4.so exists): exe + all module .so files
-#                are installed into /usr/local/lib/cnchess, and a launcher
-#                script /usr/local/bin/cnchess sets LD_LIBRARY_PATH.
+#                are installed into /usr/local/lib/happychess, and a launcher
+#                script /usr/local/bin/happychess sets LD_LIBRARY_PATH.
 #   - Static mode (no libsoui4.so): behaves like xmusic, only the exe
 #                is packaged (launcher still works, LD_LIBRARY_PATH is a no-op).
 #
 set -e
 
 echo "==================================="
-echo "cnchess Debian Package Builder"
+echo "happychess Debian Package Builder"
 echo "==================================="
 echo ""
 
@@ -76,18 +76,17 @@ PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 # script lives at <soui4-root>/games/cnchess/client -> three levels up is the repo root
 SOUI_ROOT="$(cd "$PROJECT_DIR/../../.." && pwd)"
 PACKAGE_DIR="$PROJECT_DIR/debian_package"
-OUTPUT_DEB="$PROJECT_DIR/cnchess.deb"
+OUTPUT_DEB="$PROJECT_DIR/happychess.deb"
 
-# Icon source (rendered to png via rsvg-convert/convert/inkscape when available)
+# Icon source (rendered to png by the svgcvt tool from the build output)
 ICON_SOURCE_SVG="$PROJECT_DIR/uires/svg/icon.svg"
-
 # Icon sizes to generate (following freedesktop.org standards)
 ICON_SIZES=(16 32 48 64 128 256)
 
 # Package metadata
-PKG_NAME="cnchess"
+PKG_NAME="happychess"
 PKG_VERSION="1.0.0"
-APP_HOME="/usr/local/lib/cnchess"   # exe + modules + default config live here
+APP_HOME="/usr/local/lib/happychess"   # exe + modules + default config live here
 EXE_NAME="cnchess_client"
 
 # Default game server written into the shipped cnchess_cfg.xml.
@@ -184,6 +183,11 @@ fi
 echo "Build directory : $BUILD_DIR"
 echo "Binary directory: $BIN_DIR"
 
+# svgcvt lives next to cnchess_client in the build output (built when
+# SOUI_ENABLE_SVG=ON, which is the default). Assigned here on purpose:
+# BIN_DIR must be resolved first.
+SVG2PNG_TOOL="$BIN_DIR/svgcvt"
+
 # ---------------------------------------------------------------
 # Detect build flavor (DLL vs static) and collect the module list
 # ---------------------------------------------------------------
@@ -268,62 +272,49 @@ EOF
 chmod 666 "$PACKAGE_DIR$APP_HOME/cnchess_cfg.xml"
 
 # ---------------------------------------------------------------
-# Launcher script /usr/local/bin/cnchess
+# Launcher script /usr/local/bin/happychess
 # ---------------------------------------------------------------
 echo "Creating launcher script..."
-cat > "$PACKAGE_DIR/usr/local/bin/cnchess" << EOF
+cat > "$PACKAGE_DIR/usr/local/bin/happychess" << EOF
 #!/bin/bash
 # Launcher for $EXE_NAME (SOUI4 Chinese chess client)
 APP_HOME="$APP_HOME"
 export LD_LIBRARY_PATH="\$APP_HOME\${LD_LIBRARY_PATH:+:\$LD_LIBRARY_PATH}"
 exec "\$APP_HOME/$EXE_NAME" "\$@"
 EOF
-chmod 755 "$PACKAGE_DIR/usr/local/bin/cnchess"
+chmod 755 "$PACKAGE_DIR/usr/local/bin/happychess"
 
-# ---------------------------------------------------------------
-# Application icons (SVG -> PNG, like xmusic)
-# ---------------------------------------------------------------
+# Generate application icons from SVG using the svgcvt tool
 echo "Generating application icons from SVG..."
 if [ -f "$ICON_SOURCE_SVG" ]; then
-    SVG_TOOL=""
-    if command -v rsvg-convert >/dev/null 2>&1; then
-        SVG_TOOL="rsvg-convert"
-    elif command -v convert >/dev/null 2>&1; then
-        SVG_TOOL="convert"
-    elif command -v inkscape >/dev/null 2>&1; then
-        SVG_TOOL="inkscape"
-    fi
-
-    if [ -n "$SVG_TOOL" ]; then
-        echo "Using $SVG_TOOL to generate icons..."
+    if [ -x "$SVG2PNG_TOOL" ]; then
+        echo "Using svgcvt tool to generate icons..."
+        
+        # Generate icons for all required sizes
         for size in "${ICON_SIZES[@]}"; do
             icon_dir="$PACKAGE_DIR/usr/local/share/icons/hicolor/${size}x${size}/apps"
             icon_file="$icon_dir/$PKG_NAME.png"
-            case "$SVG_TOOL" in
-                rsvg-convert)
-                    rsvg-convert -w "$size" -h "$size" "$ICON_SOURCE_SVG" -o "$icon_file"
-                    ;;
-                convert)
-                    convert -background none -density 300 "$ICON_SOURCE_SVG" -resize "${size}x${size}" "$icon_file"
-                    ;;
-                inkscape)
-                    inkscape "$ICON_SOURCE_SVG" -w "$size" -h "$size" -o "$icon_file"
-                    ;;
-            esac
+            
+            echo "  Generating ${size}x${size} icon..."
+            "$SVG2PNG_TOOL" -i "$ICON_SOURCE_SVG" -o "$icon_file" -s "$size"
+            
             if [ -f "$icon_file" ]; then
-                echo "  OK ${size}x${size}"
+                echo "    ✓ ${size}x${size} icon generated successfully"
             else
-                echo "  FAILED ${size}x${size}"
+                echo "    ✗ Failed to generate ${size}x${size} icon"
             fi
         done
+        
+        echo "✓ All icons generated successfully using svgcvt"
     else
-        echo "Warning: no SVG converter found (rsvg-convert / convert / inkscape)."
-        echo "  The package will be built without icons."
-        echo "  Install librsvg2-bin to enable icon generation: sudo apt install librsvg2-bin"
+        echo "⚠ Warning: svgcvt tool not found at $SVG2PNG_TOOL"
+        echo "  Please build the project first to generate the svgcvt tool"
+        echo "  (requires SOUI_ENABLE_SVG=ON, which is the default)."
+        exit 1
     fi
 else
-    echo "Warning: SVG icon file not found at $ICON_SOURCE_SVG"
-    echo "  The package will be built without icons."
+    echo "⚠ Warning: SVG icon file not found at $ICON_SOURCE_SVG"
+    echo "  The package will be built without an icon."
 fi
 
 # ---------------------------------------------------------------
@@ -369,10 +360,10 @@ Priority: optional
 Architecture: $ARCH
 Depends: $DEPENDS
 Recommends: fonts-noto-cjk | fonts-wqy-microhei | fonts-wqy-zenhei
-Maintainer: cnchess Team <setoutsoft@qq.com>
+Maintainer: happychess Team <setoutsoft@qq.com>
 Homepage: https://gitee.com/setoutsoft/soui
 Description: Online Chinese chess (xiangqi) client based on SOUI4 framework
- cnchess is an online Chinese chess game client built with the SOUI4
+ happychess is an online Chinese chess game client built with the SOUI4
  Direct UI framework, connecting to a dedicated game server for
  multiplayer matches.
  .
@@ -401,7 +392,7 @@ set -e
 # The app writes cnchess_cfg.xml, log/ and theme_cache/ next to its
 # executable (SApplication::GetAppDir()). Pre-create those with
 # permissive modes so regular (non-root) users can run the game.
-APP_HOME="/usr/local/lib/cnchess"
+APP_HOME="/usr/local/lib/happychess"
 if [ -d "$APP_HOME" ]; then
     if [ -f "$APP_HOME/cnchess_cfg.xml" ]; then
         chmod 666 "$APP_HOME/cnchess_cfg.xml" || true
@@ -420,8 +411,8 @@ if command -v gtk-update-icon-cache >/dev/null 2>&1; then
     gtk-update-icon-cache -f /usr/local/share/icons/hicolor || true
 fi
 
-echo "cnchess has been successfully installed!"
-echo "You can launch it from the applications menu or by running 'cnchess' in terminal."
+echo "happychess has been successfully installed!"
+echo "You can launch it from the applications menu or by running 'happychess' in terminal."
 
 exit 0
 EOF
@@ -463,13 +454,13 @@ GenericName=Chinese Chess Game
 GenericName[zh_CN]=中国象棋
 Comment=Online Chinese chess (xiangqi) client with multiplayer and robot games
 Comment[zh_CN]=开心象棋客户端：联机对弈、人机对弈、残局闯关
-Exec=cnchess
+Exec=happychess
 Icon=$PKG_NAME
 Terminal=false
 Categories=Game;BoardGame;
-Keywords=chess;xiangqi;cnchess;象棋;棋类;
+Keywords=chess;xiangqi;happychess;象棋;棋类;
 StartupNotify=true
-StartupWMClass=cnchess
+StartupWMClass=happychess
 EOF
 chmod 644 "$PACKAGE_DIR/usr/local/share/applications/$PKG_NAME.desktop"
 
@@ -486,7 +477,7 @@ REQUIRED_FILES=(
     "$PACKAGE_DIR/DEBIAN/postinst"
     "$PACKAGE_DIR/DEBIAN/prerm"
     "$PACKAGE_DIR$APP_HOME/$EXE_NAME"
-    "$PACKAGE_DIR/usr/local/bin/cnchess"
+    "$PACKAGE_DIR/usr/local/bin/happychess"
     "$PACKAGE_DIR/usr/local/share/applications/$PKG_NAME.desktop"
 )
 
