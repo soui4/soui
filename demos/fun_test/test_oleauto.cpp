@@ -1,5 +1,6 @@
 ﻿/**
- * swinx OLE automation data APIs: BSTR management, VARIANT init/clear/copy
+ * swinx OLE automation data APIs: BSTR management (alloc/realloc/free),
+ * VARIANT init/clear/copy
  * and COM task memory. Assertions follow standard Win32/OLE semantics and
  * compile against real Windows (oleaut32/ole32) as well as swinx.
  *
@@ -83,6 +84,143 @@ TEST(swinx_bstr, free_null_is_noop)
     SysFreeString(NULL);
     SUCCEED();
 }
+
+// ------------------------------------------------------------------------
+// BSTR: SysReAllocString / SysReAllocStringLen
+// ------------------------------------------------------------------------
+
+TEST(swinx_bstr, realloc_string_replaces_content)
+{
+    BSTR s = SysAllocString(L"old");
+    ASSERT_TRUE(s != NULL);
+
+    EXPECT_TRUE(SysReAllocString(&s, L"a longer replacement") != 0);
+    ASSERT_TRUE(s != NULL);
+    EXPECT_EQ(SysStringLen(s), 20u);
+    EXPECT_EQ(SysStringByteLen(s), 40u);
+    EXPECT_EQ(wcscmp(s, L"a longer replacement"), 0);
+    EXPECT_EQ(s[20], L'\0');
+    SysFreeString(s);
+}
+
+TEST(swinx_bstr, realloc_string_empty_source_is_valid)
+{
+    // an empty (non-NULL) source yields a valid empty BSTR, not NULL
+    BSTR s = SysAllocString(L"old");
+    ASSERT_TRUE(s != NULL);
+    EXPECT_TRUE(SysReAllocString(&s, L"") != 0);
+    ASSERT_TRUE(s != NULL);
+    EXPECT_EQ(SysStringLen(s), 0u);
+    EXPECT_EQ(s[0], L'\0');
+    SysFreeString(s);
+}
+
+TEST(swinx_bstr, realloc_string_from_null_pointer_allocates)
+{
+    // a NULL *pbstr behaves like SysAllocString
+    BSTR s = NULL;
+    EXPECT_TRUE(SysReAllocString(&s, L"fresh") != 0);
+    ASSERT_TRUE(s != NULL);
+    EXPECT_EQ(SysStringLen(s), 5u);
+    EXPECT_EQ(wcscmp(s, L"fresh"), 0);
+    SysFreeString(s);
+}
+
+TEST(swinx_bstr, realloc_string_len_truncates_and_keeps_embedded_nul)
+{
+    BSTR s = SysAllocString(L"abcdef");
+    ASSERT_TRUE(s != NULL);
+
+    EXPECT_TRUE(SysReAllocStringLen(&s, L"XY", 2) != 0);
+    ASSERT_TRUE(s != NULL);
+    EXPECT_EQ(SysStringLen(s), 2u);
+    EXPECT_EQ(SysStringByteLen(s), 4u);
+    EXPECT_EQ(wcscmp(s, L"XY"), 0);
+    EXPECT_EQ(s[2], L'\0');
+
+    // documented: the source may contain embedded NULs and does not need to be
+    // NUL-terminated - len characters are copied and a NUL is appended after
+    const OLECHAR src[4] = {L'a', L'\0', L'b', L'c'};
+    EXPECT_TRUE(SysReAllocStringLen(&s, src, 4) != 0);
+    ASSERT_TRUE(s != NULL);
+    EXPECT_EQ(SysStringLen(s), 4u);
+    EXPECT_EQ(SysStringByteLen(s), 8u);
+    EXPECT_EQ(s[0], L'a');
+    EXPECT_EQ(s[1], L'\0');
+    EXPECT_EQ(s[2], L'b');
+    EXPECT_EQ(s[3], L'c');
+    EXPECT_EQ(s[4], L'\0');
+    SysFreeString(s);
+}
+
+TEST(swinx_bstr, realloc_string_len_null_source_is_sized)
+{
+    // documented: a NULL source allocates a string of len characters whose
+    // contents are uninitialized - only length and termination are asserted
+    BSTR s = SysAllocString(L"old");
+    ASSERT_TRUE(s != NULL);
+
+    EXPECT_TRUE(SysReAllocStringLen(&s, NULL, 7) != 0);
+    ASSERT_TRUE(s != NULL);
+    EXPECT_EQ(SysStringLen(s), 7u);
+    EXPECT_EQ(SysStringByteLen(s), 14u);
+    EXPECT_EQ(s[7], L'\0');
+    SysFreeString(s);
+}
+
+TEST(swinx_bstr, realloc_string_len_from_null_pointer_allocates)
+{
+    BSTR s = NULL;
+    EXPECT_TRUE(SysReAllocStringLen(&s, L"abcdef", 3) != 0);
+    ASSERT_TRUE(s != NULL);
+    EXPECT_EQ(SysStringLen(s), 3u);
+    EXPECT_EQ(wcsncmp(s, L"abc", 3), 0);
+    SysFreeString(s);
+}
+
+TEST(swinx_bstr, realloc_string_len_zero_is_valid_empty)
+{
+    BSTR s = SysAllocString(L"old");
+    ASSERT_TRUE(s != NULL);
+    EXPECT_TRUE(SysReAllocStringLen(&s, L"xyz", 0) != 0);
+    ASSERT_TRUE(s != NULL);
+    EXPECT_EQ(SysStringLen(s), 0u);
+    EXPECT_EQ(s[0], L'\0');
+    SysFreeString(s);
+}
+
+#ifndef _WIN32
+// The three cases below are swinx-specific. Win32 documents a NULL pbstr as an
+// access violation, a source aliasing *pbstr as undefined ("unexpected results
+// may occur"), and says nothing about a NULL source for SysReAllocString (its
+// psz is marked [in, optional] though). swinx follows Wine's conformance-tested
+// behaviour instead: defensive NULL checks, a NULL source releasing the BSTR,
+// and an allocate-before-release order that also makes aliasing safe.
+TEST(swinx_bstr, realloc_string_null_source_releases)
+{
+    BSTR s = SysAllocString(L"old");
+    ASSERT_TRUE(s != NULL);
+    EXPECT_TRUE(SysReAllocString(&s, NULL) != 0);
+    EXPECT_TRUE(s == NULL);
+}
+
+TEST(swinx_bstr, realloc_string_null_pointer_is_rejected)
+{
+    EXPECT_TRUE(SysReAllocString(NULL, L"x") == 0);
+    EXPECT_TRUE(SysReAllocStringLen(NULL, L"x", 1) == 0);
+}
+
+TEST(swinx_bstr, realloc_string_self_alias_is_safe)
+{
+    BSTR s = SysAllocString(L"self alias");
+    ASSERT_TRUE(s != NULL);
+    EXPECT_TRUE(SysReAllocString(&s, s) != 0);
+    ASSERT_TRUE(s != NULL);
+    EXPECT_EQ(SysStringLen(s), 10u);
+    EXPECT_EQ(wcscmp(s, L"self alias"), 0);
+    SysFreeString(s);
+}
+#endif // !_WIN32
 
 // ------------------------------------------------------------------------
 // VARIANT

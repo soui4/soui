@@ -111,7 +111,7 @@ jobs:
       run: ninja -C build
 
     - name: Run unit, integration and core E2E checks
-      run: ctest --test-dir build -L '^soui-' --output-on-failure
+      run: ctest --test-dir build -L '^soui-headless$' --output-on-failure
 
     - name: Create file structure (Windows)
       if: matrix.os == 'Windows'

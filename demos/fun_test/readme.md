@@ -8,24 +8,57 @@ SOUI 的 gtest 单元测试工程（链接 `gtest`（含 gtest_main）+ `soui4` 
 
 ```sh
 cmake --build build --target fun_test --config Debug
-ctest --test-dir build -L '^soui-' --output-on-failure
+ctest --test-dir build -L '^soui-headless$' --output-on-failure
 ```
 
-CTest 从测试源码注册独立用例，并用 `soui-unit`、`soui-integration`、`soui-e2e` 标签区分层级。当前基础入口有 34 个单元、1 个 ZIP 资源集成和 1 个资源到控件状态的无窗口核心 E2E 用例。SOUI 核心单元源码放在 `SOUI/tests/test_*.cpp`；新增集成和 E2E 用例分别放在本目录的 `test_integration_*.cpp`、`test_e2e_*.cpp`。新增常规 `TEST`/`TEST_F` 用例会随重新构建进入相应标签，使用 `ctest --test-dir build -N -L '^soui-'` 核对注册结果；参数化用例须另行核验。可用 `ctest --test-dir build -R '^soui_matrix\.' --output-on-failure` 单独复跑矩阵用例。E2E 不打开交互窗口，暂不验证屏幕显示、鼠标输入或窗口容器中的事件派发。测试失败会输出用例日志并返回非零状态。
+CTest 在**配置期**扫描测试源码，把每个 `TEST` / `TEST_F` 注册成独立用例，并按**文件名约定**分层打标签（分组的实现与理由见 `CMakeLists.txt` 文件头注释）：
 
-Linux/macOS 默认在构建 `fun_test` 后运行全套非交互测试；PR 快速构建可配置 `-DSOUI_FUN_TEST_POST_BUILD=OFF`，然后显式运行上面的 CTest 命令。全套也可手动运行 `fun_test '--gtest_filter=-window.*'`。
+| 源文件 | 层级标签 | 注册用例数 |
+|---|---|---|
+| 其余 `test_*.cpp` | `soui-unit` | 323 |
+| `test_integration_*.cpp` | `soui-integration` | 1 |
+| `test_e2e_*.cpp` | `soui-e2e` | 1 |
+| **门禁合计** | **`soui-headless`**（= 上面三行） | **325** |
+| `test_gui_*.cpp` | `soui-gui`，需 `-DSOUI_ENABLE_GUI_SMOKE=ON` | 1 |
+| `test_gdi.cpp`、`test_soui.cpp` | `soui-interactive`，需 `-DSOUI_ENABLE_INTERACTIVE_TESTS=ON` | 2 |
+
+`soui-headless` 是门禁标签，`pr-core.yml` 与 `build.yml` 都是 `ctest -L '^soui-headless$'`；`soui-unit` / `soui-integration` / `soui-e2e` 用来单跑某一层。最后两层**不带** `soui-headless`，所以打开它们的开关也不会把"需要桌面"或"需要人工操作"的用例拖进门禁。
+
+新增常规 `TEST`/`TEST_F` 用例只要文件按约定命名，重新构建就会进入相应标签，**不必改 CMakeLists**。三条限制：① 扫描发生在配置期，新增文件后需让 CMake 重跑一次（`CONFIGURE_DEPENDS` 一般能自动触发）；② 参数化用例（`TEST_P`）只能扫出模板、拆不出全部实例，须单独核验；③ 分组以文件为界，同一套件若跨文件可能分属不同层（`soui_component` 的用例就分别在 `test_module.cpp` 与 `test_integration_resprovider.cpp` 里），标签只是登记层级，不代表语义纯度。注册结果用 `ctest --test-dir build -N -L '^soui-headless$'` 核对，单组用例可用 `ctest --test-dir build -R '^soui_matrix\.' --output-on-failure` 复跑。
+
+E2E 不打开交互窗口，暂不验证屏幕显示、鼠标输入或窗口容器中的事件派发。测试失败会输出用例日志并返回非零状态。
+
+Linux/macOS 默认在构建 `fun_test` 后运行全套非交互测试；PR 快速构建可配置 `-DSOUI_FUN_TEST_POST_BUILD=OFF` 关掉该构建后动作，再显式运行上面的 CTest 门禁。两条路径覆盖面一致（都是"除 `window.*` 外的全部用例"），差别只在粒度：门禁逐用例各起一个进程、可 `-j` 并行、失败定位到用例；构建后动作是单进程一次跑完，快得多。全套也可手动运行 `fun_test '--gtest_filter=-window.*'`。
 
 ## GUI 烟测
 
-在有桌面显示的环境配置 `-DSOUI_ENABLE_GUI_SMOKE=ON`，构建后运行 `ctest --test-dir build -L '^soui-gui$' --output-on-failure`。Linux 可用 `xvfb-run -a` 包裹 CTest。`window.gui_smoke_dispatches_button_click` 创建并显示真实 SOUI 宿主窗口，通过窗口过程发送鼠标消息并检查按钮事件；它不会长期等待人工操作。GUI 组默认不注册，现有基础 PR 门禁仍为 36 个用例；全套非交互 `fun_test` 的 `-window.*` 过滤器也排除 GUI 组。此烟测尚不比较渲染像素或验证真实设备鼠标。
+在有桌面显示的环境配置 `-DSOUI_ENABLE_GUI_SMOKE=ON`，构建后运行 `ctest --test-dir build -L '^soui-gui$' --output-on-failure`。Linux 可用 `xvfb-run -a` 包裹 CTest。`window.gui_smoke_dispatches_button_click` 创建并显示真实 SOUI 宿主窗口，通过窗口过程发送鼠标消息并检查按钮事件；它不会长期等待人工操作。GUI 组默认不注册，门禁仍是 325 个无头用例；全套非交互 `fun_test` 的 `-window.*` 过滤器也排除 GUI 组。此烟测尚不比较渲染像素或验证真实设备鼠标。
+
+## 交互式窗口用例
+
+`test_gdi.cpp`（`window.gdi`）与 `test_soui.cpp`（`window.soui`）会开窗并**等待人工操作**、没有时间上界，因此默认不注册（`TIMEOUT 0` = 不设超时）。需要人工验证时显式打开：
+
+```sh
+cmake -S . -B build -DSOUI_ENABLE_INTERACTIVE_TESTS=ON
+cmake --build build --target fun_test
+ctest --test-dir build -L '^soui-interactive$' --output-on-failure
+```
+
+不要把它加进门禁：它既需要桌面，也需要人。
 
 ## 目录结构
 
 ```
 fun_test/
-├── test_native.cpp   # GDI 渲染可视化测试（run_window）
-├── test_hostwnd.cpp  # 完整 SOUI 应用测试（run_app，交互式）
-├── ScintillaWnd.cpp  # Scintilla 控件封装
+├── CMakeLists.txt   # 编译 + CTest 分组注册（分层约定与理由见文件头注释）
+├── common.h         # 用例共用：源码目录定位（getSourceDir）、LoadPng
+├── ScintillaWnd.cpp # Scintilla 控件封装
+├── test_gui_smoke.cpp / test_gdi.cpp / test_soui.cpp
+│                    # 窗口用例：前者需桌面（soui-gui），后两者需人工操作
+│                    # （soui-interactive），三者默认都不注册
+├── test_soui_core_unit.cpp
+│                    # SOUI 内核无窗口单测：SLayoutSize 语义、SMatrix 逆变换、
+│                    # 命名子窗口按层级查找
 ├── test_sync.cpp     # swinx（Win32 兼容层）模块专项测试（下列 test_*.cpp 均属此类，
 │                      # 仅在非 Windows 平台链接 swinx；Windows 宿主按真实 Win32 API
 │                      # 编译运行并应同样通过）：
@@ -65,6 +98,7 @@ fun_test/
 │                     # GetLocalTime/GetSystemTime 合法性、FILETIME 转换族
 │                     # （CompareFileTime 排序、LocalFileTime 双向往返、DOS 日期时间往返）
 ├── test_oleauto.cpp  # OLE 自动化数据 API：BSTR（SysAllocString/AllocLen/AllocByteLen、
+│                     # SysReAllocString/ReAllocLen 换长与 NULL 源语义、
 │                     # 嵌入 NUL 的 ByteLen 语义、NULL 安全）、VARIANT（Init/Clear/Copy、
 │                     # VT_BSTR 深拷贝独立存储、Clear 对 VT_DISPATCH/VT_UNKNOWN 走
 │                     # Release 与 VT_ARRAY 走 SafeArrayDestroy 的引用计数闭环、
@@ -131,6 +165,14 @@ fun_test/
 │                     # NULL/NEAREST/PRIMARY 标志）、MonitorFromRect（中心命中、
 │                     # 远处 NULL、跨屏大矩形命中）、MonitorFromWindow（NULL 窗口
 │                     # 标志语义）、EnumDisplayDevices（设备枚举与越界索引）
+├── test_wnd_rect.cpp # 窗口几何（AdjustWindowRectEx）。仅非 Windows 断言 swinx 的非客户区
+│                     # 模型，Windows 宿主跑真机、只保留那条跨平台用例：swinx 把**自绘的
+│                     # WS_BORDER 一圈**算进窗口矩形（厚度 SM_CXEDGE/SM_CYEDGE），标题栏与
+│                     # 调整边框由原生窗口管理器画在窗口矩形**之外**、菜单栏由 SOUI 自绘，
+│                     # 故这三项对矩形的贡献为 0；WS_CAPTION 的定义含 WS_BORDER 位，
+│                     # 必须先判标题栏再把这圈边框归一化清掉（与 WIN_CreateWindowEx 一致）；
+│                     # NULL 矩形返回失败、menu 与扩展样式标志不改动矩形；
+│                     # 跨平台用例断言"与 GetClientRect 互逆"
 ├── test_region.cpp   # 区域：CreateRectRgn/Indirect、GetRgnBox、RectInRegion、EqualRgn、
 │                     # CombineRgn（OR/AND/DIFF/XOR 返回类型与边界，含包含关系 OR 盒不变、
 │                     # 整列 DIFF 剩余矩形——自 test.cpp 迁入）、OffsetRgn、
@@ -185,6 +227,22 @@ fun_test/
 
 - `test_*.cpp` 中的 swinx 用例断言全部按标准 Win32 行为编写：非 Windows 平台跑 swinx 兼容实现，
   Windows 宿主（真实 Win32 API）参与编译且应同样通过（已用 MSVC + 真机验证）。
+- **CTest 注册的两个坑**（都源于"配置期扫源码文本"这一机制）：
+  - **平台条件分支下的用例名必须互不相同。** `gtest_add_tests` 扫的是源码文本而非预处理结果，
+    `#ifdef` 的每个分支都会被扫到；而 CTest 会把 `DISABLED_` 前缀从用例名里剥掉。于是
+    `#ifdef _WIN32` 写 `DISABLED_foo`、`#else` 写 `foo` 会让两条记录重名，CMake 在**配置期**
+    直接报 `add_test given test NAME ... which already exists in this directory`。
+    `test_misc.cpp` 的 `is_dbcs_lead_byte` 正是这个坑，Windows 分支现名
+    `DISABLED_is_dbcs_lead_byte_codepage_dependent`。
+  - 被平台条件编译掉的用例，其 CTest 记录在其他平台上**仍然存在并"空跑通过"**（gtest 过滤不到
+    任何用例时返回 0）。所以某个平台上"325 个全过"里可能含若干空条目，不能当覆盖证据。
+  - **连注释掉的 `TEST` 也会被注册**：注册是纯文本正则匹配（`GoogleTest.cmake` 的
+    `(TYPED_TEST|TEST)_?[FP]?` 用的是**未锚定行首**的 `REGEX MATCH`），所以
+    `//TEST(suite, name)` 同样产出一条空跑条目——`test_misc.cpp:51` 的
+    `//TEST(swinx_misc, is_bad_read_ptr)` 正是如此（325 条里有 1 条来自它，源码实际只有
+    19 个 TEST 却注册出 20 条）。要让某用例彻底退出门禁，必须整行删除，不能只注释掉。
+- 某一层分组为空会让 CMake **配置期直接失败**（`soui_assert_group_not_empty`），
+  避免该层悄悄退化成 0 个用例、而门禁依旧全绿。
 - 运行方式：构建后在 `uires` 同级目录执行 `fun_test`，可用 `--gtest_filter=swinx_*` 只跑 swinx 用例。
 - 部分用例是近期修复的回归测试，标注 `Regression`：
   - `test_file.cpp` `readonly_file_generic_read`：CreateFileA 权限位 `|`/`&` 恒真 bug。
@@ -217,6 +275,16 @@ fun_test/
   `fun_test --gtest_filter=swinx_beep.*`（会连续响 6 次 + 3 次）。移动端（Android/OHOS）
   该 API 依赖宿主应用注册的 `g_platformAPI.audio.messageBeep` 回调：应用未注册时恒为 `FALSE`，
   因此这两个平台上的期望值同样是"合法 BOOL"而非 `TRUE`。
+- `swinx_wnd_rect.*`（`AdjustWindowRectEx`）断言的是 **swinx 的非客户区模型**，不是 Win32 的
+  `NONCLIENTMETRICS` 算法：swinx 只把**自绘的 `WS_BORDER` 一圈**算进窗口矩形（四周各
+  `SM_CXEDGE`/`SM_CYEDGE`），标题栏与调整边框由原生窗口管理器画在窗口矩形**之外**（Linux
+  `_MOTIF_WM_HINTS` 的 `MWM_DECOR_*`、macOS `NSWindowStyleMask`，cocoa 的 `GetWindowRect`
+  还显式做 `contentRectForFrameRect`），菜单栏由 SOUI 自己的菜单控件自绘，因此这三项对矩形的
+  贡献为 0（`GetSystemMetrics` 对相应度量返回 0，不再刷 "unknown index" 日志）。`WS_CAPTION`
+  的定义本身含 `WS_BORDER` 位，所以函数内先按**原始 style** 判定标题栏、再把这圈边框归一化
+  清掉——与 `WIN_CreateWindowEx` 创建标题栏窗口时的处理一致。这些断言在 Windows 宿主上不参与
+  （`#ifndef _WIN32`）：真机的标题栏与调整边框确实占窗口矩形，两边语义本就不同；跨平台那条
+  用真实窗口验证"`AdjustWindowRectEx` 与 `GetClientRect` 互逆"。
 - `utilities_tls.*` 与 `test_kernel.cpp` 的 `swinx_tls` 是两件事：前者测 utilities 自己实现的
   `helper/STls.h`（对标 SDL3 的 `SDL_TLS*`），后者测 Win32 API `TlsAlloc/TlsSetValue/
   TlsGetValue/TlsFree` 的 swinx 兼容实现。
@@ -224,5 +292,17 @@ fun_test/
   信号也会打断它（swinx 进程装着 SIGCHLD 处理器），只留几十~几百 ms 余量的断言必然随机失败。
   统一做法：把"等待对方进入某状态"交给事件（`SetEvent`/`WaitForSingleObject`），
   让 worker 阻塞在事件上而不是"睡够时间"。参考 `test_cs.cpp` 的 `try_enter_cross_thread`。
+- **X11 事件一律经 `xcb_send_event32()` 发送**（见 `swinx/src/platform/linux/xcb_event.h`）：
+  libxcb 的 `xcb_send_event()` 无条件 `memcpy` 32 字节，而 `xcb_expose_event_t`(20B)、
+  `xcb_unmap_notify_event_t`(16B)、`xcb_selection_notify_event_t`(24B) 都不足 32 字节，
+  直接传结构体地址会让 libxcb 读过对象尾部、把未初始化栈字节发给 X server
+  （valgrind: `Syscall param writev(vector[...]) points to uninitialised byte(s)`；报错点
+  指向最近的 `xcb_flush`，容易被误判到无关的 cairo 绘制路径）。事件结构体自身还须 `= {}`，
+  因为 padding 与未填的 `data.data32[]` 同样会被 memcpy 出去。
+- **用 valgrind 跑本工程请加 `--child-silent-after-fork=yes`**：`test_flock.cpp` 用 `fork()`
+  制造并发锁场景，子进程不 exec 且以 `_exit()` 结束，会继承父进程整片堆后直接退出；于是
+  fontconfig/cairo（`FcPatternDuplicate`/`FcFontMatch`）与 swinx 单例的线程对象在每个子进程里
+  都被报成 `definitely lost`（每子进程约 95 KB，3 个子进程数字雷同）。这是 fork 假阳性而非真泄漏
+  ——同一份代码在主进程里是 `definitely lost: 0`。
 - swinx 已知语义偏差（测试已按实际行为断言）：互斥锁为管道字节实现，**不支持 Win32 的属主线程递归等待**。
 - 运行方式：构建后在 `uires` 同级目录执行 `fun_test`，可用 `--gtest_filter=swinx_*` 只跑 swinx 用例。

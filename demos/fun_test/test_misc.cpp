@@ -184,7 +184,11 @@ TEST(swinx_misc, is_bad_string_ptr)
 #ifdef _WIN32
 // On real Windows IsDBCSLeadByte depends on the active ANSI code page,
 // so the UTF-8-based swinx behavior can only be asserted on non-Windows.
-TEST(swinx_misc, DISABLED_is_dbcs_lead_byte)
+// The Windows placeholder must NOT be called DISABLED_is_dbcs_lead_byte:
+// CTest registers a disabled case under its name with the DISABLED_ prefix
+// stripped, so it would collide with the live case below and abort CMake
+// configure with "add_test given test NAME ... which already exists".
+TEST(swinx_misc, DISABLED_is_dbcs_lead_byte_codepage_dependent)
 #else
 TEST(swinx_misc, is_dbcs_lead_byte)
 #endif

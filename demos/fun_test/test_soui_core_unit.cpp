@@ -80,4 +80,5 @@ TEST(soui_window, named_child_lookup_respects_depth)
     SWindow *nested = root.FindChildByName("nested", 2);
     ASSERT_TRUE(nested);
     EXPECT_EQ(nested->GetWindowText(), _T("Inner"));
+    root.DestroyAllChildren();
 }

@@ -35,4 +35,5 @@ TEST(soui_core_e2e, resource_to_window_state)
 
     status->SetWindowText(_T("Completed"));
     EXPECT_EQ(status->GetWindowText(), _T("Completed"));
+    root.DestroyAllChildren();
 }

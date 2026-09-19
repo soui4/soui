@@ -21,22 +21,22 @@
 ## 按行为选择验证层级
 
 - 每个功能变更先列出关键行为、边界条件、失败路径和受影响平台，再为每项选择能观察结果的验证方式。新增用例要能在修改引入回归时失败，避免只重复实现细节或断言控件存在。
-- 纯函数、尺寸和矩阵计算、状态转换、控件自身规则等可隔离的逻辑，优先写快速的单元测试。SOUI 核心函数用例放在 `SOUI/tests/`；其他模块沿用其现有测试目录。
+- 纯函数、尺寸和矩阵计算、状态转换、控件自身规则等可隔离的逻辑，优先写快速的单元测试。SOUI 核心函数用例放在 `demos/fun_test/`（如 `test_soui_core_unit.cpp`，与 `swinx`/`utilities` 用例同目录）；其他模块沿用其现有测试目录。
 - 资源提供器与资源管理器、XML 与控件创建、组件间接口等交界处，只在交互本身是风险点时写集成测试，尽量使用真实资源和组件。
 - 核心 E2E 用少量稳定用例覆盖重要的跨模块路径。新功能落入已有路径时扩展或复用该路径；只有新增关键路径、改变路径契约或现有较低层测试无法发现的风险，才新增 E2E。当前无窗口 E2E 只验证资源到控件树和状态，不能当作画面或输入验收。
 - 渲染结果、鼠标输入、窗口事件派发等 GUI 行为需使用可运行的 GUI 自动化；暂时无法自动化时，记录操作环境、步骤和预期结果，并明确未自动覆盖的风险。跨平台行为至少验证可执行的平台，未运行的平台如实标注。
 - 缺陷修复优先在能重现缺陷的最低层级加入回归测试。纯文档或不改变行为的整理可以不新增用例，但仍须运行受影响的已有检查；构建配置变更要验证相应构建和测试入口。
 - 完成条件是验收行为有相应证据、适用的已有和新增测试实际运行且通过，任务或 PR 记录命令、用例数、结果和未覆盖范围。不要把三层用例数量或总覆盖率当作单个功能的完成标准。
-- 基础 CTest 按源码文件分组自动注册常规 Google Test 用例：`SOUI/tests/test_*.cpp` 属于核心单元，`demos/fun_test/test_integration_*.cpp` 属于集成，`test_e2e_*.cpp` 属于无窗口核心 E2E。新增用例须沿用这些文件名规则并核对 `ctest -N -L '^soui-'` 的注册结果；参数化用例不能只依赖源码扫描，应单独核验。
+- 基础 CTest 按**文件名约定**分组自动注册常规 Google Test 用例：`demos/fun_test/test_integration_*.cpp` 属于集成（`soui-integration`），`test_e2e_*.cpp` 属于无窗口核心 E2E（`soui-e2e`），其余 `test_*.cpp` 属于单元（`soui-unit`）；三层都带门禁标签 `soui-headless`。需要桌面或人工操作的用例分属 `soui-gui`（`test_gui_*.cpp`）与 `soui-interactive`（`test_gdi.cpp`、`test_soui.cpp`），默认不注册且不带 `soui-headless`。新增用例须沿用这些文件名规则并核对 `ctest -N -L '^soui-headless$'` 的注册结果；参数化用例不能只依赖源码扫描，应单独核验。另外 `gtest_add_tests` 扫的是源码文本而非预处理结果，`#ifdef` 各分支的用例名不得重复，尤其要避免 `DISABLED_foo` 与 `foo` 并存（CTest 会剥掉 `DISABLED_` 前缀，导致配置期报重名）；该匹配**不锚定行首**，所以注释掉的 `//TEST(...)` 同样会被注册成一条空跑条目，要彻底移除用例必须整行删除。
 
 ## 本地构建与验证
 
 - 初始化需要的子模块：`git submodule update --init --recursive`。依赖安装与各平台构建细节见 `README.zh-CN.md`；不要在没有目标 SDK 的主机上声称完成移动端验证。
 - 桌面平台通常用 `cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug` 配置，再用 `cmake --build build --config Debug --parallel` 构建。macOS 可按 README 使用 Ninja。构建大仓库时可先构建受影响目标，再运行适用的完整验证。
-- `demos/fun_test` 使用 Google Test，并编译 `SOUI/tests/` 中的核心单元用例；启用 demo 构建后可构建 `fun_test` 目标。Linux/macOS 的桌面构建默认在该目标完成后运行 `--gtest_filter=-window.*` 的全套非交互测试；PR 快速构建用 `-DSOUI_FUN_TEST_POST_BUILD=OFF` 关闭该构建后动作，再显式执行基础 CTest。Windows 或需要复跑全套时，应从构建输出目录手动运行 `fun_test` 并使用同一过滤条件。不要把“构建成功”泛化为全部测试通过。
-- 基本验证入口：构建 `fun_test` 后运行 `ctest --test-dir build -L '^soui-' --output-on-failure`。CTest 逐个注册并执行 `swinx/utilities` 单元测试、SOUI 核心函数单元测试、ZIP 资源提供器集成测试，以及资源索引与 XML 到控件树和状态变化的无窗口核心 E2E 测试；需要时可用 `ctest -R '^soui_matrix\.'` 等条件单独复跑。它还没有覆盖屏幕显示、鼠标输入、窗口事件派发、全部业务路径或平台。
+- `demos/fun_test` 使用 Google Test，全部 `test_*.cpp` 编进单一 `fun_test` 目标；启用 demo 构建后可构建它。Linux/macOS 的桌面构建默认在该目标完成后运行 `--gtest_filter=-window.*` 的全套非交互测试；PR 快速构建用 `-DSOUI_FUN_TEST_POST_BUILD=OFF` 关闭该构建后动作，再显式执行基础 CTest。Windows 或需要复跑全套时，应从构建输出目录手动运行 `fun_test` 并使用同一过滤条件。不要把"构建成功"泛化为全部测试通过。
+- 基本验证入口：构建 `fun_test` 后运行 `ctest --test-dir build -L '^soui-headless$' --output-on-failure`（当前 325 个用例：323 单元 + 1 集成 + 1 无窗口 E2E）。CTest 逐个注册并执行 `swinx`/`utilities` 单元测试、SOUI 核心函数单元测试、ZIP 资源提供器集成测试，以及资源索引与 XML 到控件树和状态变化的无窗口核心 E2E 测试；需要时可用 `ctest -R '^soui_matrix\.'` 等条件单独复跑。它还没有覆盖屏幕显示、鼠标输入、窗口事件派发、全部业务路径或平台。
 - `components/network/test` 的 `network_test` 由 `SOUI_BUILD_NETWORK_TEST` 选项控制，默认关闭；游戏模块也有各自的测试目标。选择与改动有关的补充测试并记录实际命令和结果。
-- GUI 试点需在有桌面显示的环境配置 `-DSOUI_ENABLE_GUI_SMOKE=ON`，构建 `fun_test` 后执行 `ctest --test-dir build -L '^soui-gui$' --output-on-failure`；Linux CI 使用 Xvfb。该烟测创建真实宿主窗口并验证鼠标消息到按钮事件的派发，暂不证明视觉像素正确或全部窗口交互。默认选项关闭，基础 36 个用例不受影响。
+- GUI 试点需在有桌面显示的环境配置 `-DSOUI_ENABLE_GUI_SMOKE=ON`，构建 `fun_test` 后执行 `ctest --test-dir build -L '^soui-gui$' --output-on-failure`；Linux CI 使用 Xvfb。该烟测创建真实宿主窗口并验证鼠标消息到按钮事件的派发，暂不证明视觉像素正确或全部窗口交互。默认选项关闭，门禁的 325 个无头用例不受影响。需要人工操作的演示窗口（`window.soui`、`window.gdi`）另由 `-DSOUI_ENABLE_INTERACTIVE_TESTS=ON` 控制，同样默认关闭，不得加入门禁。
 - C/C++ 格式以仓库根目录 `.clang-format` 为准；格式化仅限所改文件，避免形成无关的大规模 diff。
 
 ## PR、CI 与发布

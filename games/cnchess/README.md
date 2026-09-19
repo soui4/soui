@@ -1,123 +1,94 @@
-# 中国象棋游戏 (SOUI框架移植版)
+# 中国象棋游戏（cnchess，SOUI4 跨平台示例）
 
-这是一个将传统的tkchess象棋游戏移植到SOUI4框架的项目。
+将传统中国象棋游戏移植到 **SOUI4** 框架的项目，是 SOUI4 **一套 C++ 代码覆盖六端** 的官方示例：
+Windows / Linux / macOS / iOS / Android / OpenHarmony（OHOS）共用同一份 C++ 业务与 UI 逻辑，
+各端均已测试通过。
 
 ## 项目结构
 
 ```
 cnchess/
-├── algorithm/          # 象棋算法实现
-│   ├── Chessman.h/cpp  # 棋子定义和移动规则
-│   ├── ChessLayout.h/cpp # 棋局布局和状态管理
-│   └── CMakeLists.txt
-├── client/             # 客户端主程序
-│   ├── uires/          # UI资源文件
-│   │   ├── icon/       # 图标资源
-│   │   ├── image/      # 图片资源
-│   │   ├── uidef/      # UI定义文件
-│   │   ├── values/     # 配置值
-│   │   └── xml/        # XML布局文件
-│   ├── def_theme/      # 默认主题资源
-│   ├── avatar/         # 用户头像资源
-│   ├── MainDlg.h       # 主对话框声明
-│   ├── MainDlg.cpp     # 主对话框实现
-│   ├── ChessGame.h     # 游戏逻辑声明（基于升级游戏框架同步）
-│   ├── ChessGame.cpp   # 游戏逻辑实现
-│   ├── LoginDlg.h      # 登录对话框声明
-│   ├── LoginDlg.cpp    # 登录对话框实现
-│   ├── LobbyHandler.h  # 大厅处理器声明
-│   ├── LobbyHandler.cpp# 大厅处理器实现
-│   ├── WebSocketClient.h # WebSocket客户端声明
-│   ├── WebSocketClient.cpp # WebSocket客户端实现
-│   ├── SGameTheme.h    # 游戏主题声明
-│   ├── SGameTheme.cpp  # 游戏主题实现
-│   ├── main.cpp        # 程序入口
-│   ├── stdafx.h        # 预编译头文件
-│   ├── stdafx.cpp      # 预编译头源文件
-│   └── CMakeLists.txt
-├── server/             # 服务器程序
-│   ├── CnChess.h       # 象棋游戏逻辑声明 (替代原来的Upgrade类)
-│   ├── CnChess.cpp     # 象棋游戏逻辑实现
-│   ├── ChessServer.h   # 服务器主类声明
-│   ├── ChessServer.cpp # 服务器主类实现
-│   ├── server.cpp      # 服务器入口
-│   ├── stdafx.h        # 预编译头文件
-│   ├── stdafx.cpp      # 预编译头源文件
-│   ├── config.xml      # 服务器配置文件
-│   └── CMakeLists.txt
-├── test/               # 算法测试模块
-│   ├── ChessAlgorithmTest.cpp # 算法测试实现
-│   └── CMakeLists.txt  # 测试模块构建配置
-└── CMakeLists.txt      # 顶层CMake配置
+├── algorithm/              # 象棋算法与 AI 引擎（纯标准 C++，不依赖 windows.h）
+│   ├── ChsAIEngine.h/.cpp  # 迭代加深 + PVS + 置换表 + 杀手/历史启发（C++ 移植，MIT）
+│   ├── Chessman.h/.cpp     # 棋子定义与走子规则
+│   ├── ChessLayout.h/.cpp  # 棋局布局与状态管理
+│   └── ChessBook.h/.cpp    # 开局/残局棋谱
+├── client/                 # 客户端共享 C++ 业务代码 + 桌面/iOS 入口
+│   ├── main.cc             # 统一入口：桌面（Win/Linux/macOS）与 iOS 经 swinx 归一为 WinMain
+│   ├── android_entry.cc    # Android 专属入口（实现 Soui4AndroidEntry 四虚函数 + JNI 注册）
+│   ├── ohos_entry.cc       # 鸿蒙专属入口（实现 Soui4OhosEntry 四虚函数 + N-API 注册）
+│   ├── MainDlg.cpp/.h      # 主窗口（SHostWnd 子类）
+│   ├── ChessGame.cpp/.h    # 棋局逻辑
+│   ├── ChessBoard.cpp/.h   # 棋盘自定义窗口
+│   ├── ChessPiece.cpp/.h   # 棋子自定义窗口
+│   ├── LoginDlg / PeaceReqDlg / PeaceAckDlg / myprofile / CnchessSkin …  # 对话框与皮肤
+│   ├── LobbyHandler / EndgameHandler / SGameTheme / WebSocketClient / WsClientListener …  # 网络与大厅
+│   ├── ThemeDownloadManager.h/.cpp  # 主题热换（WebSocket 分块下载 + MD5 校验）
+│   ├── uires/              # 桌面版 UI 资源（布局/皮肤/字符串/动画，XML 描述）
+│   ├── pc_theme/           # 桌面端本地皮肤资产（时钟/数字等局部皮肤）
+│   ├── mobile_theme/       # 移动端本地皮肤资产（时钟/数字等局部皮肤）
+│   └── CMakeLists.txt      # 生成 cnchess_client 目标
+├── client/android/         # Android 工程（JNI 桥接，见 android/readme.md）
+├── client/ohos/            # 鸿蒙工程（N-API 桥接，见 ohos/readme.md）
+├── server/                 # 服务器程序（C++，详见下）
+└── CMakeLists.txt          # 顶层 CMake 配置
 ```
+
+> 各平台详细结构、构建与运行步骤见：
+> - `client/readme.md`（桌面 / iOS）
+> - `client/android/readme.md`
+> - `client/ohos/readme.md`
+
+## 跨平台机制（一套 C++，六端运行）
+
+同一份 `MainDlg` / `ChessGame` / `ChessBoard` / `algorithm` 经**三个薄入口**接入不同宿主：
+
+- **桌面 / iOS**：`client/main.cc` 由 `swinx` 提供事件泵与窗口系统，归一为 `WinMain`；
+  iOS 经 `swinx_ios_entry` 托管进 `UIApplicationMain`。
+- **Android**：`client/android/` 经 `soui-android-lib`（JNI）把 `SApplication` 托管进 `GameActivity`。
+- **OHOS**：`client/ohos/` 经 `soui-ohos-lib`（N-API）托管进 `EntryAbility`。
+
+平台差异被 `swinx` + 宿主 lib 吸收；核心绘制/逻辑文件（`ChessBoard.cpp`、`ChessPiece.cpp`、
+`myprofile.cpp`、`CnchessSkin.cpp`、`algorithm/*`）**完全无平台宏**，`__ANDROID__` 在业务层出现 0 次，
+仅以 `__MOBILE__` 一处开关区分移动触屏与桌面弹窗交互。
+
+## 主题（皮肤）机制
+
+- 本地 `pc_theme/` 与 `mobile_theme/` 仅承载**时钟/数字等局部皮肤资产**，随包发布。
+- **完整主题包在运行时经 `ThemeDownloadManager`（WebSocket）分块下载、MD5 校验后解压到
+  `theme_cache/`**，由服务端 `server/ThemeResourceProvider.cpp` 按平台（`dwOSId`）分发达下发。
+  换肤不改动任何 C++ 代码。
 
 ## 编译说明
 
-在项目根目录执行以下命令：
+| 目标 | 构建方式 | 入口 |
+|------|----------|------|
+| Windows / Linux / macOS / iOS | SOUI 根工程 CMake 生成 `cnchess_client` | `client/main.cc` |
+| Android | Android Studio 打开 `client/android`（Gradle + NDK） | `android_entry.cc` |
+| OpenHarmony | DevEco Studio 打开 `client/ohos`（hvigor + NDK） | `ohos_entry.cc` |
 
-```bash
-mkdir build
-cd build
-cmake ..
-make
-```
+桌面端构建产物支持资源内嵌（`ENABLE_BUILD_RESOURCE` 把系统/应用资源打进 PE，单文件部署）；
+Linux 提供 `client/build_deb.sh` 打包为 `.deb`。
 
-或者使用Visual Studio打开sln文件进行编译。
+## 服务器
 
-## 当前进度
+`server/` 同为 C++，提供联机对弈、人机对战（机器人复用 `algorithm/` 引擎）与残局练习：
 
-- [x] 项目基本框架搭建
-- [x] CMakeLists.txt配置文件创建
-- [x] 主程序入口(main.cpp)
-- [x] 主对话框(MainDlg.h/cpp)
-- [x] 游戏逻辑框架(ChessGame.h/cpp)，基于升级游戏框架同步实现
-- [x] 登录对话框(LoginDlg.h/cpp)
-- [x] 大厅处理器(LobbyHandler.h/cpp)
-- [x] WebSocket客户端(WebSocketClient.h/cpp)
-- [x] 游戏主题系统(SGameTheme.h/cpp)
-- [x] 象棋算法基础类(Chessman.h/cpp, ChessLayout.h/cpp)
-- [x] UI资源文件结构
-- [x] 服务器框架(ChessServer.h/cpp)
-- [x] 服务器游戏逻辑(CnChess.h/cpp，替代了原来的CUpgrade类)
-- [x] 算法测试模块(test/)，基于新的算法模块重写
-- [ ] 棋子资源图片
-- [ ] 完整的游戏逻辑实现
-- [ ] 网络对战功能
-- [ ] AI对手功能
+- `Game.cpp`：牌桌/对局管理
+- `CnChess.cpp` / `WebSocketGame.cpp`：棋局规则与 WebSocket 协议
+- `RobotAIPool.cpp`：机器人 AI（复用 `algorithm/` 引擎）
+- `ThemeResourceProvider.cpp`：按平台分发主题资源
+- `config.xml` / `endgames.json`：配置与残局库
 
-## 服务器使用说明
+运行：`./chess_server [config_file]`。
 
-1. 编译服务器程序
-2. 修改config.xml配置文件
-3. 运行服务器程序: ./chess_server [config_file]
+## 使用的 SOUI 特性
 
-## 测试模块使用说明
-
-1. 编译测试程序
-2. 运行测试程序: ./cnchess_test
-
-测试模块现已更新，包含以下测试用例：
-- 棋盘初始化测试
-- 各种棋子移动规则测试（帅/将、车、马、炮、士、相/象、兵/卒）
-- 走棋和悔棋功能测试
-- 走棋描述功能测试
-
-## 后续工作
-
-1. 实现完整的象棋规则判定
-2. 添加棋子图片资源
-3. 实现用户交互逻辑
-4. 添加音效和动画效果
-5. 实现保存/加载棋局功能
-6. 添加网络对战功能
-7. 添加AI对手功能
-
-## 使用的SOUI特性
-
-- XML布局系统
-- 事件映射机制
-- 网格布局(Grid Layout)
-- 窗口管理
-- 资源管理系统
-- WebSocket网络通信
-- Google Test单元测试框架
+- XML 布局系统（UI 与逻辑分离）
+- 事件映射机制（Win32/WTL 式消息路由）
+- 网格 / 锚点 / 流式 / 框架布局
+- 自定义窗口与皮肤（`SWindow` 子类、`SSkinAni`/`SSkinPiece`/`SSkinBoard`）
+- 资源管理系统（ZIP / PE / Android assets / OHOS rawfile 抽象）
+- WebSocket 网络通信
+- 类 COM 引用计数（`SAutoRefPtr`）管理对象生命周期
+- Google Test 单元测试框架（算法层）

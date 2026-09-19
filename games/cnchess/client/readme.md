@@ -3,6 +3,7 @@
 本目录（`games/cnchess/client`）是 **cnchess 中国象棋** 的桌面与 iOS 版本共享的 C++ 业务代码。它通过 SOUI 根工程的 CMake 统一编译，是“其它版本”（相对 Android / 鸿蒙 移动端）的实现。
 
 > Android 与鸿蒙 各自的工程与 readme 在子目录 `android/`、`ohos/`；本文件描述的是直接由 `main.cc` 入口、在桌面（Windows/Linux/macOS）与 iOS 上运行的版本。
+> 六端如何共用同一份 C++ 代码（跨平台机制、主题热换、服务器）见仓库根 [`README.md`](../README.md)。
 
 ## 入口与平台分流
 
@@ -37,6 +38,8 @@ uiresbuilder.exe -i uires\uires.idx -p uires -r res\soui_res.rc2 -h res\resource
 
 所有平台统一使用 `Render_Skia` + `ImgDecoder_Stb`。
 
+> **主题热换**：完整主题包不在本地，而是在运行时经 `ThemeDownloadManager`（WebSocket，分块下载 + MD5 校验）从服务器拉取并解压到 `theme_cache/`；本地 `pc_theme/` / `mobile_theme/` 仅提供时钟/数字等**局部皮肤资产**，随包发布。换肤不改动任何 C++ 代码。
+
 ## 平台差异要点
 
 - **Windows**：PE 内嵌资源；链接 `win32_audio`；DPI 感知 manifest。
@@ -54,7 +57,7 @@ uiresbuilder.exe -i uires\uires.idx -p uires -r res\soui_res.rc2 -h res\resource
 | `MainDlg.cpp/.h` | 主窗口（`SHostWnd` 子类） |
 | `ChessGame.cpp/.h` | 棋局逻辑 |
 | `uires/` | 桌面版 UI 资源（布局、皮肤、字符串） |
-| `pc_theme/` / `mobile_theme/` | 桌面 / 移动两套主题资源 |
+| `pc_theme/` / `mobile_theme/` | 桌面 / 移动本地皮肤资产（时钟/数字等局部皮肤，随包发布；完整主题运行时下载，见上文） |
 
 ## 与其它版本的关系
 
