@@ -1137,7 +1137,7 @@ BOOL SMenuEx::_HandleEvent(IEvtArgs *pEvt)
         }
         else if (pEvt->GetID() == EventSwndMouseLeave::EventID)
         {
-            if (pMenuItem->GetSubMenu() != NULL)
+            if (pMenuItem->GetSubMenu() != NULL && m_pHoverItem == pMenuItem)
             {
                 SNativeWnd::KillTimer(TIMERID_POPSUBMENU);
                 m_pHoverItem = NULL;
