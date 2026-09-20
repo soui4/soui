@@ -304,6 +304,20 @@ void EndgameHandler::SetWebSocket(WebSocketClient* pWs) {
     m_ws = pWs;
 }
 
+void EndgameHandler::OnThemdReady() {
+    if (m_pPreviewBoard)
+    {
+        SAnchorLayout* pAnchorLayout = sobj_cast<SAnchorLayout>(m_pPreviewBoard->GetLayout());
+        if (pAnchorLayout)
+            pAnchorLayout->SetPosition2PointCallback(ChessAnchor2Pos, this);
+        m_pChessBoard = sobj_cast<SImageWnd>(m_pTheme->GetWidget(Sprites::board_preview));
+        if (m_pChessBoard)
+        {
+            m_pPreviewBoard->InsertChild(m_pChessBoard);
+            m_pChessBoard->AddRef();
+        }
+    }
+}
 void EndgameHandler::Init(SWindow *pRoot)
 {
     m_pRoot = pRoot;
@@ -316,18 +330,6 @@ void EndgameHandler::Init(SWindow *pRoot)
     }
 
     m_pPreviewBoard = m_pRoot->FindChildByName2<CChessBoard>(L"chessboard_preview");
-    if (m_pPreviewBoard)
-    {
-        SAnchorLayout *pAnchorLayout = sobj_cast<SAnchorLayout>(m_pPreviewBoard->GetLayout());
-        if (pAnchorLayout)
-            pAnchorLayout->SetPosition2PointCallback(ChessAnchor2Pos, this);
-        m_pChessBoard = sobj_cast<SImageWnd>(m_pTheme->GetWidget(Sprites::board_preview));
-        if (m_pChessBoard)
-        {
-            m_pPreviewBoard->InsertChild(m_pChessBoard);
-            m_pChessBoard->AddRef();
-        }
-    }
 }
 
 BOOL EndgameHandler::OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE> > data)

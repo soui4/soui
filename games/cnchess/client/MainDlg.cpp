@@ -396,6 +396,7 @@ void CMainDlg::OnThemeReady(const SStringT& strThemeDir, bool bUpdated)
             SLOGE() << "Failed to load theme from " << strThemeDir.c_str();
         }
     }
+    m_pEndgameHandler->OnThemdReady();
     InitGame();
     m_bThemeBusy = false;
     HideThemeProgress();

@@ -36,7 +36,7 @@ public:
      */
     void Init(SWindow *pRoot);
     void SetWebSocket(WebSocketClient* pWs);
-
+    void OnThemdReady();
 public:
     EVENT_MAP_BEGIN()
         EVENT_CHECK_SENDER_ROOT(m_pRoot)
