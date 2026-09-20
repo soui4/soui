@@ -23,7 +23,7 @@
         <!-- 联系方式 -->
         <text name="txt_contact" text="联系我们：" font="size:16,bold" colorText="@color/gold_light" margin="5,5,5,5"/>
         <text name="txt_qq_group" text="SOUI官方QQ群：229313785" font="size:14" colorText="@color/text_light" margin="15,5"/>
-        <text name="txt_website" text="官方网站：https://gitee.com/setoutsoft/soui4" font="size:14" colorText="@color/text_light" margin="15,5"/>
+        <text name="txt_website" text="官方网站：https://soui.com.cn/cnchess" font="size:14" colorText="@color/text_light" margin="15,5"/>
 
         <!-- 底部信息 -->
         <window size="-2,1" colorBkgnd="@color/divider" opacity="0.4" margin="10,15,10,5"/>

@@ -22,6 +22,7 @@ using namespace SOUI;
 class CWebSocketGame;
 
 // WebSocket服务器监听器
+// ISvrListener: 连接/收发事件; 
 class WebSocketSvrListener : public TObjRefImpl<ISvrListener>
 {
 public:
@@ -39,7 +40,7 @@ private:
 	CWebSocketGame* m_pGame;
 };
 
-class CWebSocketGame : ITableListener
+class CWebSocketGame : ITableListener, ITimerListener
 {
 	friend class WebSocketSvrListener;
 
@@ -49,11 +50,18 @@ public:
 
 	BOOL GameStart( unsigned short uPort);
 	void GameStop();  // 添加GameStop方法声明
-	void RequestStop(); // 请求停止(由信号/控制台处理线程置位, 主线程检测后安全退出)
-	bool IsStopRequested() const { return m_stopRequested.load(); }
 	unsigned short GetPort() { return m_uPort; }
+
+	// 定时器ID: 在 ws 的定时器发生器上按此ID登记, ITimerListener::onTimer 也按此ID分派
+	enum
+	{
+		TIMER_ONLINE_BROADCAST = 1, // 周期广播在线人数
+	};
 protected:
 	void OnTableChange(int nTableId) override;
+protected:
+	// ITimerListener接口实现: 按ID分派定时器响应
+	STDMETHODIMP_(void) onTimer(UINT_PTR uTimerID) override;
 protected:
 	// 消息发送接口
 	BOOL SendMsg(PWSCLIENT pClient, DWORD dwType, LPVOID pData, DWORD dwSize);
@@ -69,10 +77,18 @@ protected:
     BOOL OnQuerySeat(SeatID *pSeatID);
 	BOOL OnMsg(PWSCLIENT pClient, DWORD dwType, LPVOID pData, DWORD dwSize);
 
+	// 在线人数: 统计所有已登录且连接存活的客户端(不含机器人)
+	int GetOnlineCount();
+	// 向单个客户端下发在线人数(登录时调用)
+	void sendOnlineCount(PWSCLIENT pClient);
+	// 向所有在线客户端广播在线人数(由服务级定时器周期性触发)
+	void broadcastOnlineCount();
+
 	// WebSocket相关成员
 	SComMgr2 m_comLoader;
 	SAutoRefPtr<IWebsocket> m_pWebsocket;
 	SAutoRefPtr<IWsServer> m_pWsServer;
+	SAutoRefPtr<ITimerGenerator> m_pTimerGenerator;
 	SAutoRefPtr<WebSocketSvrListener> m_pListener;
 
     std::list<PWSCLIENT> m_tmpClients;
@@ -82,7 +98,6 @@ protected:
 	uint32_t m_nextUid;
   private:
 	unsigned short m_uPort;
-	std::atomic<bool> m_stopRequested; // 收到 Ctrl+C / 终止信号时置位
 	// 内部方法
 	void ProcessReceivedData(ISvrConnection* pConn, const void* data, int len);
 	PWSCLIENT CreateClient(ISvrConnection* pConn,LPCSTR pszUriPath, LPCSTR pszArgs);

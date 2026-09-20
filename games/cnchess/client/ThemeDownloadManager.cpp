@@ -7,12 +7,15 @@
 #include "WebSocketClient.h"
 #include "md5.h"
 #include <resprovider-zip/zipresprovider-param.h>
+#include <helper/SFunctor.hpp>
 #include <helper/slog.h>
 #include <string>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <shellapi.h>
 #define kLogTag "ThemeDownloadMgr"
+
+static SComMgr2 s_comMgr;
 
 // 递归创建目录
 static bool MakeDirs(const SStringT& strPath)
@@ -51,25 +54,45 @@ static SStringT NormalizeZipPath(const TCHAR* pszZipPath)
     return strPath;
 }
 
-// EnumFile 回调参数结构
+// EnumFile 回调参数结构（在工作线程中使用）
 struct ExtractContext
 {
-    IResProvider* pResProvider;
-    const SStringT* pstrDestDir;
-    bool bSuccess;
-    int nFileCount;
+    IResProvider* pResProvider;       ///< 资源提供器（zip）
+    const SStringT* pstrDestDir;      ///< 解压目标目录
+    bool bCountOnly;                  ///< TRUE: 第一遍仅统计；FALSE: 第二遍实际解压
+    bool bSuccess;                    ///< 解压是否成功
+    int nFileCount;                   ///< 已处理文件数
+    int nTotalFiles;                  ///< 待解压文件总数（第一遍统计得到）
+    size_t dwTotalBytes;              ///< 待解压总字节数（第一遍统计得到）
+    size_t dwDoneBytes;               ///< 已写出字节数
+    ThemeDownloadManager* pMgr;       ///< 用于上报进度（弱引用）
+    const std::atomic<bool>* pbAbort; ///< 中止标志（跨线程只读）
 };
 
-// EnumFile 回调函数：提取单个文件
-static BOOL CALLBACK ExtractOneFile(LPCTSTR pszFileName, LPARAM lp)
+// EnumFile 回调函数：第一遍统计待解压内容，第二遍提取单个文件
+BOOL CALLBACK ThemeDownloadManager::EnumZipFileCallback(LPCTSTR pszFileName, LPARAM lp)
 {
     ExtractContext* pCtx = (ExtractContext*)lp;
     if (!pCtx || !pCtx->pResProvider) return FALSE;
+
+    // 已请求中止（例如窗口已关闭），中断枚举
+    if (pCtx->pbAbort && pCtx->pbAbort->load())
+        return FALSE;
 
     // 跳过以目录分隔符结尾的项（纯目录项）
     size_t len = _tcslen(pszFileName);
     if (len > 0 && (pszFileName[len - 1] == _T('/') || pszFileName[len - 1] == _T('\\')))
         return TRUE;
+
+    // 获取文件大小（zip内部目录查询，开销很小）
+    size_t szFile = pCtx->pResProvider->GetRawBufferSize(NULL, pszFileName);
+
+    if (pCtx->bCountOnly)
+    {// 第一遍：仅统计文件数与总字节数，用于计算解压进度
+        pCtx->nTotalFiles++;
+        pCtx->dwTotalBytes += szFile;
+        return TRUE;
+    }
 
     // 规范化路径
     SStringT strRelPath = NormalizeZipPath(pszFileName);
@@ -82,59 +105,70 @@ static BOOL CALLBACK ExtractOneFile(LPCTSTR pszFileName, LPARAM lp)
         pCtx->bSuccess = false;
         return TRUE;
     }
+    SLOGI() << "ExtractZip: file=" << pszFileName;
 
-    // 获取文件大小
-    size_t szFile = pCtx->pResProvider->GetRawBufferSize(NULL, pszFileName);
     if (szFile == 0)
-    {
-        // 空文件，直接创建
+    {// 空文件，直接创建
         FILE* fOut = _tfopen(strFullPath, _T("wb"));
         if (fOut)
         {
             fclose(fOut);
-            pCtx->nFileCount++;
         }
         else
         {
             SLOGW() << "ExtractZip: failed to create empty file: " << S_CT2A(strFullPath);
             pCtx->bSuccess = false;
+            return TRUE;
         }
-        return TRUE;
     }
+    else
+    {// 分配缓冲区读取
+        BYTE* pBuf = new BYTE[szFile];
+        if (!pBuf)
+        {
+            SLOGW() << "ExtractZip: out of memory for file: " << S_CT2A(strRelPath);
+            pCtx->bSuccess = false;
+            return TRUE;
+        }
 
-    // 分配缓冲区读取
-    size_t szAlloc = szFile;
-    BYTE* pBuf = new BYTE[szAlloc];
-    if (!pBuf)
-    {
-        SLOGW() << "ExtractZip: out of memory for file: " << S_CT2A(strRelPath);
-        pCtx->bSuccess = false;
-        return TRUE;
-    }
+        BOOL bRead = pCtx->pResProvider->GetRawBuffer(NULL, pszFileName, pBuf, szFile);
+        if (!bRead)
+        {
+            SLOGW() << "ExtractZip: failed to read file: " << S_CT2A(strRelPath);
+            delete[] pBuf;
+            pCtx->bSuccess = false;
+            return TRUE;
+        }
 
-    BOOL bRead = pCtx->pResProvider->GetRawBuffer(NULL, pszFileName, pBuf, szAlloc);
-    if (!bRead)
-    {
-        SLOGW() << "ExtractZip: failed to read file: " << S_CT2A(strRelPath);
+        // 写入文件
+        FILE* fOut = _tfopen(strFullPath, _T("wb"));
+        if (!fOut)
+        {
+            SLOGW() << "ExtractZip: failed to open output: " << S_CT2A(strFullPath);
+            delete[] pBuf;
+            pCtx->bSuccess = false;
+            return TRUE;
+        }
+
+        fwrite(pBuf, 1, szFile, fOut);
+        fclose(fOut);
         delete[] pBuf;
-        pCtx->bSuccess = false;
-        return TRUE;
     }
 
-    // 写入文件
-    FILE* fOut = _tfopen(strFullPath, _T("wb"));
-    if (!fOut)
-    {
-        SLOGW() << "ExtractZip: failed to open output: " << S_CT2A(strFullPath);
-        delete[] pBuf;
-        pCtx->bSuccess = false;
-        return TRUE;
-    }
-
-    fwrite(pBuf, 1, szFile, fOut);
-    fclose(fOut);
-    delete[] pBuf;
     pCtx->nFileCount++;
+    pCtx->dwDoneBytes += szFile;
+
+    // 上报解压进度（内部会切回UI线程回调监听器）
+    if (pCtx->pMgr)
+    {
+        int nPercent = 0;
+        if (pCtx->dwTotalBytes > 0)
+            nPercent = (int)((pCtx->dwDoneBytes * 100) / pCtx->dwTotalBytes);
+        else if (pCtx->nTotalFiles > 0)
+            nPercent = (int)(((size_t)pCtx->nFileCount * 100) / (size_t)pCtx->nTotalFiles);
+        if (nPercent > 100) nPercent = 100;
+        pCtx->pMgr->NotifyExtractProgress(nPercent);
+    }
     return TRUE;
 }
 
@@ -144,12 +178,26 @@ ThemeDownloadManager::ThemeDownloadManager()
     , m_dwTotalSize(0)
     , m_dwReceivedBytes(0)
     , m_pWsClient(NULL)
+    , m_pMsgLoop(NULL)
+    , m_bExtractAbort(false)
+    , m_nExtractPercent(-1)
 {
     memset(m_serverMD5, 0, sizeof(m_serverMD5));
 }
 
 ThemeDownloadManager::~ThemeDownloadManager()
 {
+    // 先请求中止解压（解压回调会尽快中断枚举），再回收工作线程，
+    // 避免工作线程在本对象析构后仍回调 this
+    m_bExtractAbort = true;
+    if (m_pExtractLoop)
+    {
+        m_pExtractLoop->stop();
+        m_pExtractLoop = NULL;
+    }
+    // 清理已投递到UI线程但尚未执行的回调（工作线程停止后不会再有新的投递）
+    if (m_pMsgLoop)
+        m_pMsgLoop->RemoveTasksForObject(this);
 }
 
 bool ThemeDownloadManager::Init(const SStringT& strCacheDir)
@@ -244,6 +292,8 @@ void ThemeDownloadManager::Reset()
     m_dwReceivedBytes = 0;
     m_zipChunks.clear();
     m_pWsClient = NULL;
+    // 中止可能正在进行的解压（工作线程会在处理下一个文件时中断）
+    m_bExtractAbort = true;
 }
 
 bool ThemeDownloadManager::HandleMessage(DWORD dwType, const BYTE* pData, DWORD dwSize)
@@ -291,15 +341,8 @@ void ThemeDownloadManager::OnThemeAck(const BYTE* pData, DWORD dwSize)
             if (GetFileAttributes(m_strZipPath) != INVALID_FILE_ATTRIBUTES)
             {
                 m_state = STATE_EXTRACTING;
-                if (ExtractZip(m_strZipPath, m_strThemeDir))
-                {
-                    m_state = STATE_DONE;
-                    NotifyReady(false);
-                }
-                else
-                {
+                if (!ExtractZipAsync(false))
                     NotifyError("Failed to extract cached theme zip");
-                }
             }
             else
             {
@@ -367,19 +410,11 @@ void ThemeDownloadManager::OnThemeData(const BYTE* pData, DWORD dwSize)
     // 检查是否下载完成
     if (m_dwReceivedBytes >= m_dwTotalSize)
     {
+        if (!SaveDownloadedZip())
+            return;
         m_state = STATE_EXTRACTING;
-        if (SaveDownloadedZip())
-        {
-            if (ExtractZip(m_strZipPath, m_strThemeDir))
-            {
-                m_state = STATE_DONE;
-                NotifyReady(true);
-            }
-            else
-            {
-                NotifyError("Failed to extract downloaded theme zip");
-            }
-        }
+        if (!ExtractZipAsync(true))
+            NotifyError("Failed to extract downloaded theme zip");
     }
 }
 
@@ -464,14 +499,75 @@ bool ThemeDownloadManager::WriteMD5File(const unsigned char md5[16])
     return true;
 }
 
-bool ThemeDownloadManager::ExtractZip(const SStringT& strZipPath, const SStringT& strDestDir)
+bool ThemeDownloadManager::EnsureExtractLoop()
 {
-    SLOGI() << "ExtractZip: zip=" << S_CT2A(strZipPath) << " dest=" << S_CT2A(strDestDir);
-    SComMgr2 comMgr;
-    // 创建 SResProviderZip 实例
+    if (m_pExtractLoop)
+        return m_pExtractLoop->isRunning() != FALSE;
+
+    if (!s_comMgr.CreateTaskLoop((IObjRef**)&m_pExtractLoop))
+    {
+        SLOGE() << "EnsureExtractLoop: failed to create taskloop component";
+        return false;
+    }
+    m_pExtractLoop->start("theme_extract", Normal);
+    SLOGI() << "EnsureExtractLoop: extract task loop started, running=" << m_pExtractLoop->isRunning();
+    return m_pExtractLoop->isRunning() != FALSE;
+}
+
+bool ThemeDownloadManager::ExtractZipAsync(bool bUpdated)
+{
+    if (!EnsureExtractLoop())
+    {
+        SLOGE() << "ExtractZipAsync: extract task loop unavailable";
+        return false;
+    }
+
+    // 记录UI线程的消息循环：解压进度与解压结果都需要切回UI线程回调监听器。
+    // 本函数由UI线程调用，因此这里取到的就是UI线程的消息循环。
+    if (!m_pMsgLoop)
+    {
+        m_pMsgLoop = SApplication::getSingleton().GetMsgLoop();
+        if (!m_pMsgLoop)
+            SLOGW() << "ExtractZipAsync: no msg loop, progress/result will not be delivered";
+    }
+
+    m_bExtractAbort = false;
+    m_nExtractPercent = -1;
+
+    // 先上报一帧 0%：解压前段要删除旧主题目录并统计文件数，这段时间还没有文件级进度，
+    // 提前上报可让进度视图在解压刚提交时就显示出来。必须在 postTask 之前完成，
+    // 否则工作线程可能先上报更高的百分比，导致进度出现回退。
+    NotifyExtractProgress(0);
+
+    // 只传递this与bUpdated：解压路径均取自本对象成员，
+    // 避免在跨线程传递SStringT时触碰其非原子的引用计数。
+    StdRunnable runnable(this, [this, bUpdated]() {
+        DoExtractZip(bUpdated);
+    });
+    long nTaskId = m_pExtractLoop->postTask(&runnable, FALSE, (int)Normal);
+    if (nTaskId < 0)
+    {
+        SLOGE() << "ExtractZipAsync: postTask failed";
+        return false;
+    }
+    SLOGI() << "ExtractZipAsync: task posted, id=" << nTaskId << " zip=" << S_CT2A(m_strZipPath);
+    return true;
+}
+
+bool ThemeDownloadManager::DoExtractZip(bool bUpdated)
+{
+    // 在工作线程执行，路径取自本对象成员（Init后不再变化）
+    const SStringT& strZipPath = m_strZipPath;
+    const SStringT& strDestDir = m_strThemeDir;
+
+    SLOGI() << "DoExtractZip: zip=" << S_CT2A(strZipPath) << " dest=" << S_CT2A(strDestDir)
+            << " tid=" << GetCurrentThreadId();
+
     SAutoRefPtr<IResProvider> pResProvider;
-    if (!comMgr.CreateResProvider_ZIP((IObjRef**)&pResProvider)) {
-        SLOGE() << "ExtractZip: failed to create SResProviderZip instance";
+    if (!s_comMgr.CreateResProvider_7ZIP((IObjRef**)&pResProvider))
+    {
+        SLOGE() << "DoExtractZip: failed to create SResProviderZip instance";
+        PostExtractFinished(false, bUpdated);
         return false;
     }
 
@@ -480,10 +576,21 @@ bool ThemeDownloadManager::ExtractZip(const SStringT& strZipPath, const SStringT
     ZipFile(&zipParam, NULL, strZipPath, NULL, NULL);
     if (!pResProvider->Init((WPARAM)&zipParam, 0))
     {
-        SLOGE() << "ExtractZip: failed to init ResProvider with zip";
+        SLOGE() << "DoExtractZip: failed to init ResProvider with zip";
+        pResProvider = NULL;
+        PostExtractFinished(false, bUpdated);
         return false;
     }
-    if(GetFileAttributes(strDestDir)!=INVALID_FILE_ATTRIBUTES)
+
+    // 已请求中止（对象析构）时不再改动磁盘
+    if (m_bExtractAbort)
+    {
+        SLOGI() << "DoExtractZip: aborted before removing old files";
+        pResProvider = NULL;
+        return false;
+    }
+
+    if (GetFileAttributes(strDestDir) != INVALID_FILE_ATTRIBUTES)
     {//remove old files.
         SHFILEOPSTRUCT op={0};
         TCHAR szBuf[MAX_PATH] = { 0 };
@@ -498,21 +605,107 @@ bool ThemeDownloadManager::ExtractZip(const SStringT& strZipPath, const SStringT
     // 创建目标目录
     if (!MakeDirs(strDestDir))
     {
-        SLOGE() << "ExtractZip: failed to create dest dir";
+        SLOGE() << "DoExtractZip: failed to create dest dir";
+        pResProvider = NULL;
+        PostExtractFinished(false, bUpdated);
         return false;
     }
 
-    // 枚举并提取文件
+    // 第一遍：统计文件数与总字节数，用于计算解压进度
+    ExtractContext countCtx;
+    countCtx.pResProvider = pResProvider;
+    countCtx.pstrDestDir = &strDestDir;
+    countCtx.bCountOnly = true;
+    countCtx.bSuccess = true;
+    countCtx.nFileCount = 0;
+    countCtx.nTotalFiles = 0;
+    countCtx.dwTotalBytes = 0;
+    countCtx.dwDoneBytes = 0;
+    countCtx.pMgr = NULL;
+    countCtx.pbAbort = &m_bExtractAbort;
+    pResProvider->EnumFile(ThemeDownloadManager::EnumZipFileCallback, (LPARAM)&countCtx);
+
+    // 第二遍：提取文件，并逐文件上报进度
     ExtractContext ctx;
     ctx.pResProvider = pResProvider;
     ctx.pstrDestDir = &strDestDir;
+    ctx.bCountOnly = false;
     ctx.bSuccess = true;
     ctx.nFileCount = 0;
+    ctx.nTotalFiles = countCtx.nTotalFiles;
+    ctx.dwTotalBytes = countCtx.dwTotalBytes;
+    ctx.dwDoneBytes = 0;
+    ctx.pMgr = this;
+    ctx.pbAbort = &m_bExtractAbort;
+    pResProvider->EnumFile(ThemeDownloadManager::EnumZipFileCallback, (LPARAM)&ctx);
 
-    pResProvider->EnumFile(ExtractOneFile, (LPARAM)&ctx);
     pResProvider = NULL;//release the resprovider before commgr deconstructor.
-    SLOGI() << "ExtractZip: extracted " << ctx.nFileCount << " files";
+
+    if (m_bExtractAbort)
+    {// 已请求中止，不再通知监听器
+        SLOGI() << "DoExtractZip: aborted";
+        return false;
+    }
+
+    SLOGI() << "DoExtractZip: extracted " << ctx.nFileCount << "/" << ctx.nTotalFiles
+            << " files, bytes=" << ctx.dwDoneBytes << "/" << ctx.dwTotalBytes;
+    PostExtractFinished(ctx.bSuccess, bUpdated);
     return ctx.bSuccess;
+}
+
+void ThemeDownloadManager::NotifyExtractProgress(int nPercent)
+{
+    // 工作线程调用：仅在百分比发生变化时投递，避免刷爆UI消息队列
+    if (nPercent == m_nExtractPercent)
+        return;
+    m_nExtractPercent = nPercent;
+
+    if (!m_pMsgLoop)
+        return;
+    StdRunnable runnable(this, [this, nPercent]() {
+        OnExtractProgress(nPercent);
+    });
+    m_pMsgLoop->PostTask(&runnable);
+}
+
+void ThemeDownloadManager::PostExtractFinished(bool bSuccess, bool bUpdated)
+{
+    if (!m_pMsgLoop)
+    {// 没有UI消息循环时无法切回UI线程，直接放弃回调，避免在错误的线程触碰界面
+        SLOGW() << "PostExtractFinished: no msg loop, skip notify, success=" << bSuccess;
+        return;
+    }
+    StdRunnable runnable(this, [this, bSuccess, bUpdated]() {
+        OnExtractFinished(bSuccess, bUpdated);
+    });
+    m_pMsgLoop->PostTask(&runnable);
+}
+
+void ThemeDownloadManager::OnExtractProgress(int nPercent)
+{
+    // UI线程
+    if (m_pListener)
+        m_pListener->OnThemeExtractProgress(nPercent);
+}
+
+void ThemeDownloadManager::OnExtractFinished(bool bSuccess, bool bUpdated)
+{
+    //clear unzip taskloop.
+    m_pExtractLoop->stop();
+    m_pExtractLoop = NULL;
+    // UI线程
+    if (m_bExtractAbort)
+    {// 解压已被中止（例如窗口关闭或Reset），不再回调监听器
+        SLOGI() << "OnExtractFinished: aborted, ignore result";
+        return;
+    }
+    if (!bSuccess)
+    {
+        NotifyError(bUpdated ? "Failed to extract downloaded theme zip" : "Failed to extract cached theme zip");
+        return;
+    }
+    m_state = STATE_DONE;
+    NotifyReady(bUpdated);
 }
 
 void ThemeDownloadManager::NotifyError(const SStringA& strErr)

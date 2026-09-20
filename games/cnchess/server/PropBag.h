@@ -11,6 +11,7 @@ class PropBag : public SSingleton<PropBag>
     int m_nRobotPool;
     int m_nRobotTimeMs[3]; // 按智力等级(初级/中级/高级)的思考时间预算(毫秒, 0=固定深度)
     DWORD m_dwMinVersion; // 服务器支持的最低客户端协议版本(config.xml min_version, 0=不限制)
+    int m_nOnlineBroadcastMs; // 在线人数广播周期(毫秒, 0=不广播)
 public:
     enum{
         DEF_PORT = 3311,
@@ -28,6 +29,8 @@ public:
 
     // 机器人AI线程池线程数
     int GetRobotAIPool() const { return m_nRobotPool; }
+    // 在线人数广播周期(毫秒, 0=不广播)
+    int GetOnlineBroadcastMs() const { return m_nOnlineBroadcastMs; }
     // 机器人思考时间预算(毫秒, 0=由固定深度决定)。按智力等级取对应档位, 非法等级回退初级
     int GetRobotAITimeMs(int nLevel = ROBOT_LEVEL_BEGINNER) const
     {

@@ -15,6 +15,7 @@ PropBag::PropBag()
     m_nRobotTimeMs[1] = 800;	//中级默认预算
     m_nRobotTimeMs[2] = 1500;	//高级默认预算
     m_dwMinVersion = 0;	//默认不限制客户端版本
+    m_nOnlineBroadcastMs = 5000;	//默认每5秒广播一次在线人数
 
 	memset(m_dwProps,0,sizeof(m_dwProps));
     m_dwProps[PROPID_REGRET] = 2;
@@ -60,6 +61,7 @@ void PropBag::Init(LPCTSTR pszPropXml)
     m_nRobotTimeMs[1] = xmlNode.attribute(L"robot_ai_medium_time_ms").as_int(800);  //中级默认预算
     m_nRobotTimeMs[2] = xmlNode.attribute(L"robot_ai_advanced_time_ms").as_int(1500); //高级默认预算
     m_dwMinVersion = xmlNode.attribute(L"min_version").as_int(0);	//服务器支持的最低客户端协议版本, 0=不限制
+    m_nOnlineBroadcastMs = xmlNode.attribute(L"online_broadcast_ms").as_int(5000);	//在线人数广播周期(毫秒), 0=不广播
 }
 WORD PropBag::GetPort() const
 {

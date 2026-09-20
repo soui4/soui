@@ -60,15 +60,16 @@ public:
     // ThemeDownloadManager::IListener
     virtual void OnThemeReady(const SStringT& strThemeDir, bool bUpdated) override;
     virtual void OnThemeProgress(int nPercent) override;
+    virtual void OnThemeExtractProgress(int nPercent) override;
     virtual void OnThemeError(const SStringA& strErr) override;
 
     // 初始化游戏（需要主题已加载）
-    void InitGameAndLobby();
+    void InitGame();
 
-    // 主题下载进度弹窗
+    // 主题资源进度弹窗（版本检查/下载/解压/应用共用同一个模态视图）
     void ShowThemeProgress();
     void HideThemeProgress();
-    void UpdateThemeProgress(int nPercent, const SStringT& strStatus);
+    void UpdateThemeProgress(int nPercent, const SStringT& strStatus, LPCTSTR pszTitle = NULL);
   protected:
     void OnBtnMute();
     void OnBtnUnmute();
@@ -115,6 +116,10 @@ private:
     // 主题下载进度弹窗
     SModalRoot* m_pThemeProgressModal;
     ModalViewSessionID m_themeProgressSession;
+    // 主题资源(检查/下载/解压/应用)准备阶段标志: 期间进度弹窗保持显示,
+    // 只有主题可用(OnThemeReady)或失败(OnThemeError)之后才关闭。
+    // 下载/解压进度都是异步投递的,用它挡住阶段结束后迟到的进度回调。
+    bool m_bThemeBusy;
     SWindow * m_modalRoot;
     SWindow* m_pTipContainer;   // 顶层操作提示容器
     int m_nSelAvatarId;         // 移动端登录弹窗当前选中的内置头像ID (1..BuiltinAvatar::COUNT-1)

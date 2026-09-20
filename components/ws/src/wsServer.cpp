@@ -1,12 +1,13 @@
 ﻿#include "wsServer.h"
 #include <helper/slog.h>
+#include <helper/SFunctor.hpp>
 #define kLogTag "WsServer"
 
 SNSBEGIN
 WsServer::WsServer(ISvrListener *pListener)
     : m_pListener(pListener)
-    , m_context(nullptr)
     , m_finished(true)
+    , m_context(nullptr)
 {
 }
 
@@ -155,8 +156,8 @@ int WsServer::handler(lws *websocket, lws_callback_reasons reasons,
         {
             SvrConnection* conn = *(SvrConnection**)userData;
             if (!conn) {
-                lwsl_err("invalid connection in TIMER callback");
-                break;  // 使用break而不是return -1，避免影响其他连接
+                // 非连接 wsi(如 vhost 的 wsi): 无心跳可维护
+                break;
             }
             time_t now = time(NULL);
 
@@ -345,6 +346,11 @@ void WsServer::quit()
     this->m_worker.join();
     lws_context_destroy(m_context);
     m_context = nullptr;
+    {
+        // LWS 事件线程已退出, 队列不会再被排空: 丢弃可能残留的定时器任务
+        std::lock_guard<std::mutex> lock(m_serviceMutex);
+        m_serviceQueue.clear();
+    }
     m_cvQuit.notify_all();
 }
 

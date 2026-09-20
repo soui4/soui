@@ -121,7 +121,6 @@ void WebSocketSvrListener::onDataRecv(ISvrConnection* pConn, const void* data, i
 	}
 }
 
-
 //=====================================================================
 // 残局桌辅助函数
 //=====================================================================
@@ -149,7 +148,6 @@ CWebSocketGame::CWebSocketGame()
 {
 	m_nextUid = 1;
 	m_uPort = 0;
-	m_stopRequested = false;
     m_pListener = NULL;
     m_pWsServer = NULL;
     m_nMaxTable = 100; // 默认最大桌子数;
@@ -193,12 +191,13 @@ BOOL CWebSocketGame::GameStart(unsigned short uPort)
         return FALSE;
 
     // 创建WebSocket服务器
-    m_pWsServer = m_pWebsocket->CreateWsServer(m_pListener);
+    m_pWsServer.Attach(m_pWebsocket->CreateWsServer(m_pListener));
     if (!m_pWsServer)
     {
         return FALSE;
     }
 	m_uPort = uPort;
+	m_pTimerGenerator.Attach(m_pWebsocket->CreateTimerGenerator());
 
 	// 启动服务器
 	SvrOption option = { FALSE, NULL, NULL }; // 非安全连接
@@ -228,13 +227,14 @@ BOOL CWebSocketGame::GameStart(unsigned short uPort)
 	                pChess->ApplyRobotMove(best, seatId, generation);
 	        });
 	}
-
-    // 主线程循环: 交替等待服务器事件与检测停止请求, 保证 Ctrl+C 后能安全退出
-    while (!m_stopRequested.load())
-    {
-        m_pWsServer->wait(100);
-    }
-    m_pWsServer->Release();
+	m_pTimerGenerator->start(this);
+	int nBroadcastMs = PropBag::getSingletonPtr()->GetOnlineBroadcastMs();
+	if (nBroadcastMs < 5)
+		nBroadcastMs = 5;
+	UINT_PTR uTimerID = m_pTimerGenerator->setTimer(TIMER_ONLINE_BROADCAST, (uint32_t)nBroadcastMs, TRUE);
+	SLOGI() << "online count broadcast interval=" << nBroadcastMs << "ms, timerID=" << (int)uTimerID;
+	m_pWsServer->wait(-1);
+	m_pTimerGenerator->stop();
     m_pWsServer = NULL;
 	return TRUE;
 }
@@ -245,11 +245,6 @@ void CWebSocketGame::GameStop()
 	{
 		m_pWsServer->quit();
 	}
-}
-
-void CWebSocketGame::RequestStop()
-{
-    m_stopRequested = true;
 }
 
 PWSCLIENT CWebSocketGame::CreateClient(ISvrConnection *pConn, LPCSTR uriPath, LPCSTR pszArgs)
@@ -453,6 +448,8 @@ BOOL CWebSocketGame::ClientLogin(PWSCLIENT pClient, LPVOID pData, DWORD dwSize)
 	memcpy(&ack.dwProps, PropBag::getSingletonPtr()->m_dwProps, sizeof(ack.dwProps));
 	SendMsg(pClient, GMT_LOGIN_ACK, &ack, sizeof(ack));
     sendRoomInfo(pClient);
+    // 登录时除返回游戏桌(房间)信息外, 再返回一次当前在线人数
+    sendOnlineCount(pClient);
     return TRUE;
 }
 
@@ -897,6 +894,59 @@ void CWebSocketGame::sendRoomInfo(PWSCLIENT pClient)
 	SLOGI() << "sendRoomInfo to client " << pClient << " data size="<<ss.str().size();
 }
 
+int CWebSocketGame::GetOnlineCount()
+{
+	// 在线人数 = 已登录但未入座的客户端 + 各桌的真实玩家。
+	// 机器人虽然有 uid, 但没有真实连接(m_pConn == NULL), 不计入在线人数。
+	int nCount = 0;
+	for (auto it = m_tmpClients.begin(); it != m_tmpClients.end(); ++it)
+	{
+		if (*it && (*it)->m_pConn && (*it)->m_userInfo.uid != 0)
+			nCount++;
+	}
+	for (auto it = m_tableClients.begin(); it != m_tableClients.end(); ++it)
+	{
+		int nPlayerCount = 0;
+		PWSCLIENT *pClients = it->second->GetClients(&nPlayerCount);
+		for (int i = 0; i < nPlayerCount; i++)
+		{
+			if (pClients[i] && pClients[i]->m_pConn && pClients[i]->m_userInfo.uid != 0)
+				nCount++;
+		}
+	}
+	return nCount;
+}
+
+void CWebSocketGame::sendOnlineCount(PWSCLIENT pClient)
+{
+	GAME_ONLINE_COUNT msg;
+	msg.nOnlineCount = GetOnlineCount();
+	SendMsg(pClient, GMT_ONLINE_COUNT, &msg, sizeof(msg));
+}
+
+void CWebSocketGame::broadcastOnlineCount()
+{
+	GAME_ONLINE_COUNT msg;
+	msg.nOnlineCount = GetOnlineCount();
+
+	for (auto it = m_tmpClients.begin(); it != m_tmpClients.end(); ++it)
+	{
+		if (*it && (*it)->m_pConn)
+			SendMsg(*it, GMT_ONLINE_COUNT, &msg, sizeof(msg));
+	}
+	for (auto it = m_tableClients.begin(); it != m_tableClients.end(); ++it)
+	{
+		int nPlayerCount = 0;
+		PWSCLIENT *pClients = it->second->GetClients(&nPlayerCount);
+		for (int i = 0; i < nPlayerCount; i++)
+		{
+			if (pClients[i] && pClients[i]->m_pConn)
+				SendMsg(pClients[i], GMT_ONLINE_COUNT, &msg, sizeof(msg));
+		}
+	}
+	//SLOGI() << "broadcast online count=" << msg.nOnlineCount;
+}
+
 BOOL CWebSocketGame::ClientAvatar(PWSCLIENT pClient, LPVOID pData, DWORD dwSize){
 	if(dwSize < sizeof(GAME_AVATAR_REQ)){
 		return FALSE;
@@ -1039,4 +1089,19 @@ BOOL CWebSocketGame::ClientThemeReq(PWSCLIENT pClient, LPVOID pData, DWORD dwSiz
 	SLOGI() << "Theme data send complete. uid=" << pClient->m_userInfo.uid
 			<< " OSId=" << dwOSId << " bytes sent=" << dwOffset;
 	return TRUE;
+}
+
+void CWebSocketGame::onTimer(UINT_PTR uTimerID)
+{
+	m_pWsServer->postServiceTask(&StdRunnable([uTimerID,this]{
+		switch (uTimerID)
+		{
+		case TIMER_ONLINE_BROADCAST:
+			broadcastOnlineCount();
+			break;
+		default:
+			break;
+		}
+		}));
+
 }

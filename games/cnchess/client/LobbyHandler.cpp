@@ -236,6 +236,9 @@ BOOL LobbyHandler::OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE> > d
         case GMT_ROOM_INFO:
             ret = OnRoomInfo(pData, nSize);
             break;
+        case GMT_ONLINE_COUNT:
+            ret = OnOnlineCount(pData, nSize);
+            break;
         case GMT_TABLE_INFO:
             ret = OnTableInfo(pData, nSize);
             break;
@@ -257,6 +260,26 @@ BOOL LobbyHandler::OnRoomInfo(const void *lpData, int nSize)
     GAME_ROOM_INFO *pRoomInfo = (GAME_ROOM_INFO *)lpData;
     SLOGI() << "OnRoomInfo: nTableCount=" << pRoomInfo->nTableCount;
     m_pAdapter->SetRoomInfo((LPBYTE)pRoomInfo, nSize);
+    return TRUE;
+}
+
+BOOL LobbyHandler::OnOnlineCount(const void *lpData, int nSize)
+{
+    if (!lpData || nSize < (int)sizeof(GAME_ONLINE_COUNT))
+        return FALSE;
+    GAME_ONLINE_COUNT *pOnline = (GAME_ONLINE_COUNT *)lpData;
+    if (!m_pRoot)
+        return FALSE;
+    SWindow *pText = m_pRoot->FindChildByName(L"txt_online");
+    if (!pText)
+    {
+        SLOGW() << "OnOnlineCount: txt_online not found";
+        return FALSE;
+    }
+    SStringT strText;
+    strText.Format(_T("在线: %d"), pOnline->nOnlineCount);
+    pText->SetWindowText(strText);
+    SLOGI() << "OnOnlineCount: nOnlineCount=" << pOnline->nOnlineCount << " text=" << strText;
     return TRUE;
 }
 

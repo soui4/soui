@@ -48,6 +48,11 @@ class Websocket : public TObjRefImpl<IWebsocket> {
     {
         return new WsServer(pListener);
     }
+
+    STDMETHOD_(ITimerGenerator*, CreateTimerGenerator)(CTHIS) OVERRIDE {
+        return new CTimerGenerator;
+    }
+
     STDMETHODIMP_(void) SetLogCallback(THIS_ WsLogCallback cb) OVERRIDE
     {
         g_logCallback = cb;

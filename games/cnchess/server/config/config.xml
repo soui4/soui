@@ -1,2 +1,2 @@
 <?xml version="1.0" encoding="utf-8"?>
-<prop port="3311" min_version="1" regret="2" step="60" round="0" max_jiang="10" max_catch="10" max_peace="100" min_steps="10" robot_ai_pool="4" robot_ai_begin_time_ms="400" robot_ai_medium_time_ms="800" robot_ai_advanced_time_ms="1500"/>
+<prop port="3311" min_version="1" regret="2" step="60" round="0" max_jiang="10" max_catch="10" max_peace="100" min_steps="10" robot_ai_pool="4" robot_ai_begin_time_ms="400" robot_ai_medium_time_ms="800" robot_ai_advanced_time_ms="1500" online_broadcast_ms="5000"/>

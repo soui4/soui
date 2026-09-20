@@ -256,6 +256,87 @@ typedef struct _SvrPingCfg
 } SvrPingCfg;
 
 #undef INTERFACE
+#define INTERFACE ITimerListener
+/**
+ * @brief Timer expiration listener interface
+ *
+ * Implemented by the business layer: it is the response to a timer produced by ITimerGenerator.
+ * The generator knows nothing about what a timer means, it only reports the fired ID, so the same
+ * mechanism serves every periodic or one-shot job on the server side.
+ *
+ * This interface carries no reference counting: the caller keeps ownership of its implementation
+ * and must keep it alive while it is installed on a generator (i.e. between start() and stop()).
+ */
+DECLARE_INTERFACE(ITimerListener)
+{
+    /**
+     * @brief A timer expired
+     * @param uTimerID Timer ID, as registered by ITimerGenerator::setTimer
+     * @remark Invoked on the generator's dedicated timer thread.
+     */
+    STDMETHOD_(void, onTimer)(THIS_ UINT_PTR uTimerID) PURE;
+};
+
+#undef INTERFACE
+#define INTERFACE ITimerGenerator
+/**
+ * @brief Timer generator
+ *
+ * Owns one dedicated timer thread that keeps every timer in an ID-keyed schedule. When a timer
+ * becomes due the thread invokes ITimerListener::onTimer directly on that timer thread; it does
+ * NOT marshal to the server event thread, so the business layer decides (per timer) whether to
+ * switch threads (e.g. via IWsServer::postServiceTask). What a timer actually does is decided by
+ * the business layer through its ITimerListener.
+ *
+ * This is a ref-counted object (it derives IObjRef): obtain it from
+ * IWebsocket::CreateTimerGenerator and manage it through an SAutoRefPtr (or AddRef/Release). The
+ * generator is independent of any server instance; stop() (or destruction) joins its thread, so
+ * let the listener object outlive the generator.
+ */
+DECLARE_INTERFACE_(ITimerGenerator,IObjRef)
+{
+    /**
+     * @brief Install the listener and start the timer thread
+     * @param pListener Business layer implementation; must outlive the generator until stop()
+     * @return TRUE if the thread was started, FALSE if it is already running
+     * @remark Call start() before or after setTimer(); the first tick of every timer is measured
+     *         from the moment the thread starts, so timers armed earlier are re-based to
+     *         "now + period" at start. Calling start() again after stop() is allowed: it resets
+     *         the stop flag and spawns a fresh thread.
+     */
+    STDMETHOD_(BOOL, start)(THIS_ ITimerListener * pListener) PURE;
+
+    /**
+     * @brief Stop the timer thread and detach the listener
+     * @remark Sets the stop flag, clears the listener, and joins the timer thread. Pending ticks
+     *         already collected but not yet dispatched are dropped. Safe to call from any thread
+     *         except the timer thread itself.
+     */
+    STDMETHOD_(void, stop)(THIS) PURE;
+
+    /**
+     * @brief Create, update or remove a timer
+     * @param uTimerID Timer ID used to identify the timer; 0 asks the generator to allocate a free one
+     * @param uIntervalMs Timer period in milliseconds; 0 removes the timer identified by uTimerID
+     * @param bRepeat TRUE (default) for a repeating timer that fires every uIntervalMs until it is
+     *                killed or the generator is stopped; FALSE for a one-shot timer that fires
+     *                exactly once and is then removed automatically.
+     * @return The assigned/kept timer ID (non-zero) on create or update; 0 on removal (even if
+     *         successful), when the generator is stopped, or when an auto-ID cannot be allocated.
+     * @remark Reusing an existing ID replaces both its period and its repeat flag, and re-bases its
+     *         next tick to "now + period". May be called before or after start().
+     */
+    STDMETHOD_(UINT_PTR, setTimer)(THIS_ UINT_PTR uTimerID, uint32_t uIntervalMs, BOOL bRepeat DEF_VAL(TRUE)) PURE;
+
+    /**
+     * @brief Remove a timer
+     * @param uTimerID Timer ID returned by setTimer
+     * @return TRUE if a timer was removed, FALSE if there is no such timer
+     */
+    STDMETHOD_(BOOL, killTimer)(THIS_ UINT_PTR uTimerID) PURE;
+};
+
+#undef INTERFACE
 #define INTERFACE IWsServer
 /**
  * @brief WebSocket server interface
@@ -424,6 +505,11 @@ DECLARE_INTERFACE_(IWebsocket, IObjRef)
      * @return WebSocket server instance pointer
      */
     STDMETHOD_(IWsServer *, CreateWsServer)(THIS_ ISvrListener * pListener) PURE;
+
+    /**
+     * @brief Create Timer generator
+     */
+    STDMETHOD_(ITimerGenerator *,CreateTimerGenerator)(CTHIS) PURE;
 
     /**
      * @brief Set log callback function

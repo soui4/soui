@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+//协议版本: 客户端登录时上报, 服务器与config.xml的min_version比较, 版本过低拒绝登录
+#define GAME_VERSION		2	//当前客户端协议版本
 #define MAX_PROP			20	//服务器配置文件的属性最大值
 
 enum tagSEXTYPE{SEX_MALE=0,SEX_FEMALE,SEX_SECRET};
@@ -67,9 +69,6 @@ typedef struct tagGAME_LOGIN_ACK
 #define ERR_SUCCESS			0
 #define ERR_USER_EXIST		1
 #define ERR_VERSION_LOW		2	//客户端协议版本低于服务器要求的最低版本
-
-//协议版本: 客户端登录时上报, 服务器与config.xml的min_version比较, 版本过低拒绝登录
-#define GAME_VERSION		1	//当前客户端协议版本
 
 typedef struct SeatID
 {
@@ -231,6 +230,17 @@ typedef struct tagGAME_ENDGAME_LIST
 	int nTablesPerEndgame;		//每个残局的游戏桌数(与 endgames.json 的 tablesPerEndgame 一致)
 	ENDGAME_INFO vInfo[1];		//残局条目数组
 }GAME_ENDGAME_LIST,*PGAME_ENDGAME_LIST;
+
+//=====================================================================
+// 在线人数 (Online)
+//=====================================================================
+//在线人数 (Server -> Client)
+//登录成功时随房间信息(GMT_ROOM_INFO)下发一次, 之后由服务器定时器周期广播
+#define GMT_ONLINE_COUNT		124
+typedef struct tagGAME_ONLINE_COUNT
+{
+	int nOnlineCount;	//当前在线人数(不含机器人)
+}GAME_ONLINE_COUNT;
 
 //其它游戏的消息ID从GMT_GAMEBASE+1开始
 #define	GMT_GAMEBASE		1000

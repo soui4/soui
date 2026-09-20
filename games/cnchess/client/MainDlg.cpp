@@ -31,6 +31,7 @@ CMainDlg::CMainDlg(SGameTheme* pTheme)
 , m_bConnected(false)
 , m_pThemeProgressModal(NULL)
 , m_themeProgressSession(0)
+, m_bThemeBusy(false)
 , m_modalRoot(NULL)
 , m_pTipContainer(NULL)
 , m_nSelAvatarId(1)
@@ -69,6 +70,10 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
     #endif
     m_strThemeCacheDir += _T("/theme_cache");
     m_themeDownloader.Init(m_strThemeCacheDir);
+    // 解压在工作线程中进行，把UI线程的消息循环交给它，以便进度/结果回调切回UI线程
+    m_themeDownloader.SetMsgLoop(GetMsgLoop());
+    m_pLobbyHandler->Init(FindChildByName(L"room_container"));
+    m_pEndgameHandler->Init(FindChildByName(L"endgame_container"));
 
     // 主题不在此加载，等待连接服务器成功后由 ThemeDownloadManager 下载加载
 
@@ -210,12 +215,6 @@ void CMainDlg::OnLoginSuccess(SStringT strSvr, SStringT strName, char cSex, int 
         nAvatarId = (cSex == SEX_FEMALE) ? BuiltinAvatar::FEMALE : BuiltinAvatar::MALE;
     myProfile->SetAvatarId(nAvatarId);
 
-    // 初始化大厅（不依赖主题）
-    m_pLobbyHandler->Init(FindChildByName(L"room_container"));
-    m_pEndgameHandler->Init(FindChildByName(L"endgame_container"));
-
-    // 游戏初始化延迟到主题加载完成后（OnThemeReady）
-
     SStringA svr = S_CT2A(strSvr);
     BOOL bRet = m_webSocketClient.ConnectToServer(svr, "");
     SLOGI()<<"connect to server ret:"<<bRet;
@@ -276,9 +275,10 @@ void CMainDlg::OnConnected()
     SLOGI()<<"Connected to server";
     m_bConnected = true;
 
-    // 显示主题下载进度弹窗
+    // 显示主题资源进度弹窗：从版本检查开始，直到主题解压完成并应用成功才关闭
+    m_bThemeBusy = true;
     ShowThemeProgress();
-    UpdateThemeProgress(0, _T("正在检查主题版本..."));
+    UpdateThemeProgress(0, _T("正在检查主题版本..."), _T("正在更新主题资源..."));
 
     // 请求主题（发送本地MD5，服务器决定是否需要下载）
     m_themeDownloader.RequestTheme(&m_webSocketClient);
@@ -378,47 +378,63 @@ void CMainDlg::OnThemeReady(const SStringT& strThemeDir, bool bUpdated)
 {
     SLOGI() << "OnThemeReady: dir=" << strThemeDir.c_str() << " updated=" << bUpdated;
 
-    // 更新进度弹窗
-    UpdateThemeProgress(100, _T("主题加载完成"));
+    // 资源已解压完成，进度视图继续显示到主题真正可用：先把进度置满并切到"应用主题"阶段
+    UpdateThemeProgress(100, _T("解压完成，正在加载主题..."), _T("正在应用主题资源..."));
 
     // 重新加载主题
+    bool bThemeOK = false;
     if (m_pTheme)
     {
         if (m_pTheme->Load(strThemeDir))
         {
             m_bThemeLoaded = true;
+            bThemeOK = true;
             SLOGI() << "Theme loaded successfully from " << strThemeDir.c_str();
         }
         else
         {
             SLOGE() << "Failed to load theme from " << strThemeDir.c_str();
-            HideThemeProgress();
-            return;
         }
     }
-
-    // 如果游戏尚未初始化，现在初始化
-    if (!m_bGameInited)
-    {
-        InitGameAndLobby();
-    }
-
-    // 隐藏进度弹窗
+    InitGame();
+    m_bThemeBusy = false;
     HideThemeProgress();
+
+    if (!bThemeOK)
+    {
+        SLOGE() << "Theme resource is extracted but failed to load: " << strThemeDir.c_str();
+    }
 }
 
 void CMainDlg::OnThemeProgress(int nPercent)
 {
     SLOGI() << "Theme download progress: " << nPercent << "%";
+    if (!m_bThemeBusy)
+        return; // 资源准备阶段已结束(成功或失败)，丢弃迟到的进度回调
+    // 弹窗必须覆盖整个"主题资源准备"过程，任何一次进度都保证它处于显示状态
+    ShowThemeProgress();
     SStringT strStatus;
     strStatus.Format(_T("正在下载... %d%%"), nPercent);
-    UpdateThemeProgress(nPercent, strStatus);
+    UpdateThemeProgress(nPercent, strStatus, _T("正在更新主题资源..."));
+}
+
+void CMainDlg::OnThemeExtractProgress(int nPercent)
+{
+    SLOGI() << "Theme extract progress: " << nPercent << "%";
+    if (!m_bThemeBusy)
+        return; // 资源准备阶段已结束(成功或失败)，丢弃迟到的进度回调
+    // 与下载进度共用同一个模态视图：解压在工作线程中进行，这里确保弹窗已显示，
+    // 并且一直保持到解压完成、主题可用(OnThemeReady)之后才关闭
+    ShowThemeProgress();
+    SStringT strStatus;
+    strStatus.Format(_T("正在解压... %d%%"), nPercent);
+    UpdateThemeProgress(nPercent, strStatus, _T("正在解压主题资源..."));
 }
 
 void CMainDlg::OnThemeError(const SStringA& strErr)
 {
     SLOGE() << "Theme download error: " << strErr;
-    UpdateThemeProgress(0, _T("下载失败，尝试使用缓存..."));
+    UpdateThemeProgress(0, _T("下载失败，尝试使用缓存..."), _T("主题资源更新失败"));
     // 如果游戏尚未初始化且主题未加载，使用本地备用主题（如果有）
     if (!m_bGameInited && !m_bThemeLoaded)
     {
@@ -427,25 +443,22 @@ void CMainDlg::OnThemeError(const SStringA& strErr)
         if (m_pTheme && m_pTheme->Load(strCacheThemeDir))
         {
             m_bThemeLoaded = true;
-            InitGameAndLobby();
         }
         else
         {
             SLOGE() << "No fallback theme available";
         }
     }
+    // 资源准备已终止（失败）：先清busy挡掉迟到的进度回调，再关闭弹窗
+    m_bThemeBusy = false;
     HideThemeProgress();
 }
 
-void CMainDlg::InitGameAndLobby()
+void CMainDlg::InitGame()
 {
     if (m_bGameInited) return;
-    if (!m_bThemeLoaded) return;
-
-    SLOGI() << "InitGameAndLobby: initializing game";
+    SLOGI() << "InitGame: initializing game";
     // 初始化大厅（不依赖主题）
-    m_pLobbyHandler->Init(FindChildByName(L"room_container"));
-    m_pEndgameHandler->Init(FindChildByName(L"endgame_container"));
     m_pGame->Init(FindChildByName(L"game_container"), &m_webSocketClient);
     m_bGameInited = true;
 
@@ -460,11 +473,22 @@ void CMainDlg::ShowThemeProgress()
 {
     if (m_pThemeProgressModal) return; // 已显示
 
-    m_pThemeProgressModal = (SModalRoot*)SApplication::getSingleton().CreateWindowByName(SModalRoot::GetClassName());
-    if (!m_pThemeProgressModal) return;
+    SModalRoot* pModal = (SModalRoot*)SApplication::getSingleton().CreateWindowByName(SModalRoot::GetClassName());
+    if (!pModal) return;
 
-    m_pThemeProgressModal->InitFromResId(_T("layout:dlg_theme_progress"));
-    m_themeProgressSession = BeginModalViewSession(m_pThemeProgressModal,m_modalRoot);
+    pModal->InitFromResId(_T("layout:dlg_theme_progress"));
+
+    // 该弹窗只能由本类主动关闭：XML 中已设 quitOnClick="0" 与 quitOnEsc="0"，
+    // 所以点击背景与按下ESC都不会结束模态会话，进度视图不会被用户中途关掉。
+    ModalViewSessionID session = BeginModalViewSession(pModal, m_modalRoot);
+    if (session == 0)
+    {
+        SLOGE() << "ShowThemeProgress: failed to begin modal view session";
+        pModal->Release();
+        return;
+    }
+    m_pThemeProgressModal = pModal;
+    m_themeProgressSession = session;
 }
 
 void CMainDlg::HideThemeProgress()
@@ -476,7 +500,7 @@ void CMainDlg::HideThemeProgress()
     m_themeProgressSession = 0;
 }
 
-void CMainDlg::UpdateThemeProgress(int nPercent, const SStringT& strStatus)
+void CMainDlg::UpdateThemeProgress(int nPercent, const SStringT& strStatus, LPCTSTR pszTitle)
 {
     if (!m_pThemeProgressModal) return;
 
@@ -485,6 +509,12 @@ void CMainDlg::UpdateThemeProgress(int nPercent, const SStringT& strStatus)
 
     SWindow* pStatus = m_pThemeProgressModal->FindChildByName(L"txt_status");
     if (pStatus) pStatus->SetWindowText(strStatus);
+
+    if (pszTitle)
+    {
+        SWindow* pTitle = m_pThemeProgressModal->FindChildByName(L"txt_title");
+        if (pTitle) pTitle->SetWindowText(pszTitle);
+    }
 }
 
 void CMainDlg::OnBtnMute()

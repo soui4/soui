@@ -74,6 +74,14 @@ private:
      * @return 是否处理成功
      */
     BOOL OnRoomInfo(const void *lpData, int nSize);
+
+    /**
+     * @brief 处理在线人数消息(登录时下发一次, 之后由服务器周期广播)
+     * @param lpData 消息数据指针
+     * @param nSize 消息数据大小
+     * @return 是否处理成功
+     */
+    BOOL OnOnlineCount(const void *lpData, int nSize);
     
     /**
      * @brief 处理桌子信息消息

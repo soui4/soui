@@ -50,7 +50,7 @@ static BOOL WINAPI ConsoleHandler(DWORD dwType)
         if (g_game) {
             // 只置停止标志, 由主线程检测后安全退出, 避免在控制台处理线程内阻塞/join
             SLOGI() << "Received exit signal, stopping game...";
-            g_game->RequestStop();
+            g_game->GameStop();
         }
         return TRUE;
     default:
