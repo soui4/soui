@@ -30,6 +30,7 @@ ModalViewSessionID SModalRoot::s_sessionIDCounter = 0;
 SModalRoot::SModalRoot()
     : m_sessionID(0)
     , m_bQuitOnClick(TRUE)
+    , m_bQuitOnEsc(TRUE)
     , m_exitCode(-1)
 {
     GetEventSet()->addEvent(EVENTID(EventExitModalView));
@@ -89,7 +90,7 @@ void SModalRoot::FireExitCallback(int exitCode)
 
 void SModalRoot::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-    if (nChar == VK_ESCAPE)
+    if (nChar == VK_ESCAPE && m_bQuitOnEsc)
     {
         // If the modal view is clicked, quit the modal session.
         SRootWindow *pRoot = sobj_cast<SRootWindow>(GetRoot());

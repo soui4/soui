@@ -702,7 +702,7 @@ CRect STabCtrl::GetTitleRect() const
     {
         SASSERT(m_pSkinTab);
         if (m_pSkinTab)
-            tabWid = m_pSkinTab->GetSkinSize().cy;
+            tabHei = m_pSkinTab->GetSkinSize().cy;
     }
     switch (m_nTabAlign)
     {

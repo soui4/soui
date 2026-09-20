@@ -42,6 +42,10 @@ detectArmTarget(BUILD_FOR_ARM)
 message(STATUS "BUILD_FOR_ARM: ${BUILD_FOR_ARM}")
 
 add_definitions(-DWCHAR_SIZE=4)
+add_compile_options(-Wno-inconsistent-missing-override)
+add_compile_options(-Wno-unused-value)
+add_compile_options(-Wno-unknown-pragmas)
+add_compile_options(-Wno-missing-field-initializers)
 
 # 动态库模式：所有模块编译为 .so
 set(SOUI_ENABLE_CORE_LIB OFF)

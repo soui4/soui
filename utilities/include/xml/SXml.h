@@ -54,6 +54,20 @@ public:
      */
     SXmlAttr(const SXmlAttr& src);
 
+#if __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1900)
+    /**
+     * @brief Copy assignment operator for SXmlAttr.
+     * 
+     * Explicitly defaulted so that the class satisfies the Rule of Three: providing a copy constructor
+     * while relying on the implicitly generated copy assignment operator is deprecated since C++11 and
+     * triggers -Wdeprecated-copy-with-user-provided-copy on newer compilers.
+     * 
+     * @param src The SXmlAttr to copy.
+     * @return Reference to this object.
+     */
+    SXmlAttr& operator=(const SXmlAttr& src) = default;
+#endif // __cplusplus >= 201103L || _MSC_VER >= 1900
+
     /**
      * @brief Constructor for SXmlAttr with an optional private data pointer.
      * 
@@ -385,6 +399,20 @@ public:
      * @param src The SXmlNode to copy.
      */
     SXmlNode(const SXmlNode& src);
+
+#if __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1900)
+    /**
+     * @brief Copy assignment operator for SXmlNode.
+     * 
+     * Explicitly defaulted so that the class satisfies the Rule of Three: providing a copy constructor
+     * while relying on the implicitly generated copy assignment operator is deprecated since C++11 and
+     * triggers -Wdeprecated-copy-with-user-provided-copy on newer compilers.
+     * 
+     * @param src The SXmlNode to copy.
+     * @return Reference to this object.
+     */
+    SXmlNode& operator=(const SXmlNode& src) = default;
+#endif // __cplusplus >= 201103L || _MSC_VER >= 1900
 
     /**
      * @brief Constructor for SXmlNode with an optional private data pointer.

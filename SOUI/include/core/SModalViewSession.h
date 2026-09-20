@@ -109,6 +109,7 @@ class SOUI_EXP SModalRoot : public SWindow {
   public:
     SOUI_ATTRS_BEGIN()
         ATTR_BOOL(L"quitOnClick", m_bQuitOnClick, FALSE)
+        ATTR_BOOL(L"quitOnEsc", m_bQuitOnEsc, FALSE)
     SOUI_ATTRS_END()
 
     void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
@@ -146,6 +147,7 @@ class SOUI_EXP SModalRoot : public SWindow {
   protected:
     ModalViewSessionID m_sessionID;                     /**<  Session ID bound to this root; 0 if unattached. */
     BOOL m_bQuitOnClick;                                /**<  If TRUE, clicking background dismisses modal view. */
+    BOOL m_bQuitOnEsc;                                  /**<  If TRUE, press escape dismisses modal view. */
     SAutoRefPtr<IModalViewExitCallback> m_exitCallback; /**<  Callback invoked when exit animation completes. */
     int m_exitCode;                                     /**<  Exit code to pass to EventExitModalView subscribers. */
     static ModalViewSessionID s_sessionIDCounter;       /**<  Global counter for generating unique session IDs. */
