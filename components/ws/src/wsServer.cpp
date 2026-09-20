@@ -108,7 +108,7 @@ void WsServer::DrainServiceQueue()
         tasks[i]->run();
 }
 
-void WsServer::postServiceTask(IRunnable * task)
+void WsServer::postServiceTask(const IRunnable * task)
 {
     // clone 使调用方栈上的 IRunnable 可在返回后安全销毁(与 ITaskLoop::postTask 一致)
     SAutoRefPtr<IRunnable> pClone;

@@ -1093,7 +1093,7 @@ BOOL CWebSocketGame::ClientThemeReq(PWSCLIENT pClient, LPVOID pData, DWORD dwSiz
 
 void CWebSocketGame::onTimer(UINT_PTR uTimerID)
 {
-	m_pWsServer->postServiceTask(&StdRunnable([uTimerID,this]{
+	StdRunnable task([uTimerID,this]{
 		switch (uTimerID)
 		{
 		case TIMER_ONLINE_BROADCAST:
@@ -1102,6 +1102,7 @@ void CWebSocketGame::onTimer(UINT_PTR uTimerID)
 		default:
 			break;
 		}
-		}));
+		});
+	m_pWsServer->postServiceTask(&task);
 
 }

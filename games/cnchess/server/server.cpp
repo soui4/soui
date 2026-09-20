@@ -62,7 +62,7 @@ static void signalHandler(int signum)
 {
     if (g_game) {
         // 只置停止标志, 由主线程检测后安全退出, 不在信号上下文内做阻塞操作
-        g_game->RequestStop();
+        g_game->GameStop();
     }
 }
 #endif

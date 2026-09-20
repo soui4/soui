@@ -378,7 +378,7 @@ DECLARE_INTERFACE_(IWsServer, IObjRef)
      * @param task Runnable task object to be executed on the server event thread
      * @remark Intended for other threads (such as AI worker threads) to safely hand results back and serialize callbacks onto the main game thread
      */
-    STDMETHOD_(void, postServiceTask)(THIS_ IRunnable * task) PURE;
+    STDMETHOD_(void, postServiceTask)(THIS_ const IRunnable * task) PURE;
 };
 
 /**

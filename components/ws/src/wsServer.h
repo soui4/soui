@@ -42,7 +42,7 @@ class WsServer : public TObjRefImpl<IWsServer>{
     STDMETHODIMP_(int) start(THIS_ uint16_t port, const char *protocolName, SvrOption option, SvrPingCfg pingCfg) OVERRIDE;
     STDMETHODIMP_(BOOL) wait(THIS_ int timeoutMs) OVERRIDE;
     STDMETHODIMP_(void) quit(THIS) OVERRIDE;
-    STDMETHODIMP_(void) postServiceTask(THIS_ IRunnable * task) OVERRIDE;
+    STDMETHODIMP_(void) postServiceTask(THIS_ const IRunnable * task) OVERRIDE;
   private:
     void run();
     void DrainServiceQueue();
