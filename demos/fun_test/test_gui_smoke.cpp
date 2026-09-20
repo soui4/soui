@@ -8,7 +8,8 @@ using namespace SOUI;
 
 namespace {
 struct ClickCounter {
-    int clicks = 0;
+	ClickCounter():clicks(0){}
+    int clicks;
 
     BOOL onClick(IEvtArgs *)
     {
@@ -62,7 +63,8 @@ TEST(window, gui_smoke_dispatches_button_click)
     ASSERT_TRUE(xmlRoot);
 
     SHostWnd host;
-    HostClose close{&host};
+    HostClose close;
+	close.host=&host;
     HWND hwnd = host.CreateEx(NULL, WS_POPUP, 0, 100, 100, 240, 80, &xmlRoot);
     ASSERT_TRUE(hwnd);
     host.ShowWindow(SW_SHOW);
@@ -74,9 +76,9 @@ TEST(window, gui_smoke_dispatches_button_click)
     EXPECT_EQ(status->GetWindowText(), _T("Ready"));
 
     ClickCounter counter;
-    auto slot = Subscriber(&ClickCounter::onClick, &counter);
+	MemberFunctionSlot<ClickCounter,IEvtArgs> slot = Subscriber(&ClickCounter::onClick, &counter);
     ASSERT_TRUE(action->SubscribeEvent(EventCmd::EventID, &slot));
-    EventUnsubscribe unsubscribe{action, EventCmd::EventID, &slot};
+    EventUnsubscribe unsubscribe ={action, EventCmd::EventID, &slot};
     CRect rect = action->GetWindowRect();
     ASSERT_GT(rect.Width(), 0);
     ASSERT_GT(rect.Height(), 0);

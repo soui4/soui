@@ -34,9 +34,11 @@
 
 class KeyboardLayoutTest : public testing::Test
 {
+public:
+	KeyboardLayoutTest():m_saved(NULL){}
 protected:
-    HKL m_saved = NULL;
-
+    HKL m_saved;
+	
     void SetUp() override
     {
         // 记录当前线程布局，供 TearDown 还原（Windows 真实切换的副作用收敛）。
@@ -56,18 +58,18 @@ protected:
 // ---------------------------------------------------------------------------
 TEST_F(KeyboardLayoutTest, ListReturnsAtLeastOne)
 {
-    UINT n = GetKeyboardLayoutList(0, nullptr);
+    UINT n = GetKeyboardLayoutList(0, NULL);
     EXPECT_GE(n, 1u);
 }
 
 TEST_F(KeyboardLayoutTest, ListCountIsStable)
 {
-    UINT n = GetKeyboardLayoutList(0, nullptr);
+    UINT n = GetKeyboardLayoutList(0, NULL);
     ASSERT_GE(n, 1u);
 
     // nBuff=0 时 lpList 可为 NULL，返回的是总布局数，不应写入。
     std::vector<HKL> buf(n);
-    UINT got = GetKeyboardLayoutList((int)n, buf.data());
+    UINT got = GetKeyboardLayoutList((int)n, &buf[0]);
     EXPECT_EQ(got, n);
 }
 
@@ -78,11 +80,11 @@ TEST_F(KeyboardLayoutTest, ListCountIsStable)
 // ---------------------------------------------------------------------------
 TEST_F(KeyboardLayoutTest, ActivateThenGetRoundTrip)
 {
-    UINT n = GetKeyboardLayoutList(0, nullptr);
+    UINT n = GetKeyboardLayoutList(0, NULL);
     ASSERT_GE(n, 1u);
 
     std::vector<HKL> layouts(n);
-    ASSERT_EQ(GetKeyboardLayoutList((int)n, layouts.data()), n);
+    ASSERT_EQ(GetKeyboardLayoutList((int)n, &layouts[0]), n);
 
     for (UINT i = 0; i < n; ++i)
     {
@@ -98,11 +100,11 @@ TEST_F(KeyboardLayoutTest, ActivateThenGetRoundTrip)
 // ---------------------------------------------------------------------------
 TEST_F(KeyboardLayoutTest, ReactivateIsIdempotent)
 {
-    UINT n = GetKeyboardLayoutList(0, nullptr);
+    UINT n = GetKeyboardLayoutList(0, NULL);
     ASSERT_GE(n, 1u);
 
     std::vector<HKL> layouts(n);
-    ASSERT_EQ(GetKeyboardLayoutList((int)n, layouts.data()), n);
+    ASSERT_EQ(GetKeyboardLayoutList((int)n, &layouts[0]), n);
 
     HKL L = layouts[0];
     ActivateKeyboardLayout(L, 0);
@@ -132,7 +134,7 @@ TEST_F(KeyboardLayoutTest, NextPrevAreCallable)
 // 仅在布局数 <2 时不强制（由运行时分支判断，不是平台分支）。
 TEST_F(KeyboardLayoutTest, NextPrevCycleRestores)
 {
-    UINT n = GetKeyboardLayoutList(0, nullptr);
+    UINT n = GetKeyboardLayoutList(0, NULL);
     HKL before = GetKeyboardLayout(0);
 
     ActivateKeyboardLayout((HKL)(size_t)HKL_NEXT, 0);
