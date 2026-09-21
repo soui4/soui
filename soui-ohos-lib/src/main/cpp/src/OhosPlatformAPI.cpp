@@ -169,6 +169,7 @@ void OhosPlatformAPI::init(napi_env env, napi_value bridge, napi_value ctx) {
     m_mShowSoftKeyboard           = cacheMethod(env, bridge, "showSoftKeyboard");
     m_mPlaySound                  = cacheMethod(env, bridge, "playSound");
     m_mMessageBeep                = cacheMethod(env, bridge, "messageBeep");
+    m_mShellExecute               = cacheMethod(env, bridge, "shellExecute");
     m_mScheduleMessageProcessing  = cacheMethod(env, bridge, "scheduleMessageProcessing");
     m_mGetTempPath                = cacheMethod(env, bridge, "getTempPath");
     m_mGetSpecialFolderPath       = cacheMethod(env, bridge, "getSpecialFolderPath");
@@ -218,6 +219,7 @@ void OhosPlatformAPI::deinit() {
     freeRef(m_mGetFocus);
     freeRef(m_mShowSoftKeyboard);
     freeRef(m_mPlaySound);
+    freeRef(m_mShellExecute);
     freeRef(m_mScheduleMessageProcessing);
     freeRef(m_mGetTempPath);
     freeRef(m_mGetSpecialFolderPath);
@@ -841,6 +843,19 @@ BOOL OhosPlatformAPI::messageBeep(UINT uType) {
     BridgeArg arg = BridgeArg::fromInt64((int64_t)uType);
     bool queued = invokeBridge(m_mMessageBeep, std::vector<BridgeArg>{ arg },
                                BridgeRetType::Bool, nullptr, 0);
+    return queued ? TRUE : FALSE;
+}
+
+BOOL OhosPlatformAPI::shellExecute(LPCSTR lpOperation, LPCSTR lpFile, LPCSTR lpParameters) {
+    if (!m_env || !m_mShellExecute || !lpFile || !*lpFile) return FALSE;
+    // 与 messageBeep 同理用跨线程安全的 invokeBridge：ShellExecute 可能被 swinx 的
+    // 工作线程调用，callBridge 对非 JS 线程的调用只会记日志并静默丢弃。
+    // waitMs=0：请求投递到 JS 线程即返回 TRUE，与 Win32"ShellExecute 提交即返回"一致。
+    std::vector<BridgeArg> args;
+    args.push_back(BridgeArg::fromStr(lpOperation && *lpOperation ? lpOperation : "open"));
+    args.push_back(BridgeArg::fromStr(lpFile));
+    args.push_back(BridgeArg::fromStr(lpParameters ? lpParameters : ""));
+    bool queued = invokeBridge(m_mShellExecute, args, BridgeRetType::Bool, nullptr, 0);
     return queued ? TRUE : FALSE;
 }
 

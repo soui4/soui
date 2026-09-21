@@ -40,6 +40,9 @@ int WsServer::start(uint16_t port, const char *protocolName_, SvrOption option, 
     if(m_cfg.pingIntervalSeconds>m_cfg.nHeartbeatSeconds/2){
         m_cfg.pingIntervalSeconds = m_cfg.nHeartbeatSeconds/2;
     }
+    if(m_cfg.pingIntervalSeconds<1){
+        m_cfg.pingIntervalSeconds = 1;
+    }
     lws_protocols protocols[] = { { m_protocolName.c_str(), &WsServer::cb_lws, sizeof(void*), kSocketBufSize, 0, nullptr, kSocketBufSize },
                                   {
                                       nullptr, nullptr, 0, 0, 0, nullptr, 0 // Quasi null terminator
@@ -89,11 +92,30 @@ int WsServer::start(uint16_t port, const char *protocolName_, SvrOption option, 
 
 void WsServer::run()
 {
+    {
+        std::lock_guard<std::mutex> lock(m_teardownMutex);
+        m_teardownDone = false;
+    }
     while (!m_finished)
     {
         lws_service(m_context, 50);
         DrainServiceQueue();
     }
+    // teardown 移到工作线程内完成: 这样即便 quit() 从工作线程调用(detach 路径),
+    // context 也由 run() 自行销毁, 不会泄漏, 也不会在回调仍持有 lws* 时于 quit() 中
+    // 跨线程销毁导致 UAF。lws_context_destroy 在 service 线程上调用是推荐做法。
+    lws_context_destroy(m_context);
+    m_context = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(m_serviceMutex);
+        m_serviceQueue.clear();
+    }
+    m_cvQuit.notify_all();
+    {
+        std::lock_guard<std::mutex> lock(m_teardownMutex);
+        m_teardownDone = true;
+    }
+    m_teardownCv.notify_all();
 }
 
 void WsServer::DrainServiceQueue()
@@ -110,9 +132,15 @@ void WsServer::DrainServiceQueue()
 
 void WsServer::postServiceTask(const IRunnable * task)
 {
-    // clone 使调用方栈上的 IRunnable 可在返回后安全销毁(与 ITaskLoop::postTask 一致)
+    if (!task)
+        return;
     SAutoRefPtr<IRunnable> pClone;
-    pClone.Attach(task->clone());
+    IRunnable *p = task->clone();
+    if (!p)
+    {
+		return;
+    }
+    pClone.Attach(p);
     bool bWake = false;
     {
         std::lock_guard<std::mutex> lock(m_serviceMutex);
@@ -319,6 +347,8 @@ int WsServer::handler(lws *websocket, lws_callback_reasons reasons,
 WsServer::~WsServer()
 {
     quit();
+    std::unique_lock<std::mutex> lock(m_teardownMutex);
+    m_teardownCv.wait(lock, [&] { return m_teardownDone; });
 }
 
 BOOL WsServer::wait(int timeout)
@@ -339,19 +369,28 @@ void WsServer::quit()
     {
         std::unique_lock<std::mutex> lock(m_mutex);
         if (this->m_finished)
+        {
+            joinOrDetachWorker();
             return;
+        }
         this->m_finished = true;
     }
     lws_cancel_service(m_context);
-    this->m_worker.join();
-    lws_context_destroy(m_context);
-    m_context = nullptr;
+    joinOrDetachWorker();
+}
+
+void WsServer::joinOrDetachWorker()
+{
+    if (!m_worker.joinable())
+        return;
+    if (std::this_thread::get_id() == m_worker.get_id())
     {
-        // LWS 事件线程已退出, 队列不会再被排空: 丢弃可能残留的定时器任务
-        std::lock_guard<std::mutex> lock(m_serviceMutex);
-        m_serviceQueue.clear();
+        m_worker.detach();
     }
-    m_cvQuit.notify_all();
+    else
+    {
+        m_worker.join();
+    }
 }
 
 int WsServer::cb_lws(lws *websocket, lws_callback_reasons reasons, void *userData, void *data, size_t len)

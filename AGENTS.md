@@ -34,9 +34,9 @@
 - 初始化需要的子模块：`git submodule update --init --recursive`。依赖安装与各平台构建细节见 `README.zh-CN.md`；不要在没有目标 SDK 的主机上声称完成移动端验证。
 - 桌面平台通常用 `cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug` 配置，再用 `cmake --build build --config Debug --parallel` 构建。macOS 可按 README 使用 Ninja。构建大仓库时可先构建受影响目标，再运行适用的完整验证。
 - `demos/fun_test` 使用 Google Test，全部 `test_*.cpp` 编进单一 `fun_test` 目标；启用 demo 构建后可构建它。Linux/macOS 的桌面构建默认在该目标完成后运行 `--gtest_filter=-window.*` 的全套非交互测试；PR 快速构建用 `-DSOUI_FUN_TEST_POST_BUILD=OFF` 关闭该构建后动作，再显式执行基础 CTest。Windows 或需要复跑全套时，应从构建输出目录手动运行 `fun_test` 并使用同一过滤条件。不要把"构建成功"泛化为全部测试通过。
-- 基本验证入口：构建 `fun_test` 后运行 `ctest --test-dir build -L '^soui-headless$' --output-on-failure`（当前 325 个用例：323 单元 + 1 集成 + 1 无窗口 E2E）。CTest 逐个注册并执行 `swinx`/`utilities` 单元测试、SOUI 核心函数单元测试、ZIP 资源提供器集成测试，以及资源索引与 XML 到控件树和状态变化的无窗口核心 E2E 测试；需要时可用 `ctest -R '^soui_matrix\.'` 等条件单独复跑。它还没有覆盖屏幕显示、鼠标输入、窗口事件派发、全部业务路径或平台。
+- 基本验证入口：构建 `fun_test` 后运行 `ctest --test-dir build -L '^soui-headless$' --output-on-failure`（当前 329 个用例：327 单元 + 1 集成 + 1 无窗口 E2E）。CTest 逐个注册并执行 `swinx`/`utilities` 单元测试、SOUI 核心函数单元测试、ZIP 资源提供器集成测试，以及资源索引与 XML 到控件树和状态变化的无窗口核心 E2E 测试；需要时可用 `ctest -R '^soui_matrix\.'` 等条件单独复跑。它还没有覆盖屏幕显示、鼠标输入、窗口事件派发、全部业务路径或平台。
 - `components/network/test` 的 `network_test` 由 `SOUI_BUILD_NETWORK_TEST` 选项控制，默认关闭；游戏模块也有各自的测试目标。选择与改动有关的补充测试并记录实际命令和结果。
-- GUI 试点需在有桌面显示的环境配置 `-DSOUI_ENABLE_GUI_SMOKE=ON`，构建 `fun_test` 后执行 `ctest --test-dir build -L '^soui-gui$' --output-on-failure`；Linux CI 使用 Xvfb。该烟测创建真实宿主窗口并验证鼠标消息到按钮事件的派发，暂不证明视觉像素正确或全部窗口交互。默认选项关闭，门禁的 325 个无头用例不受影响。需要人工操作的演示窗口（`window.soui`、`window.gdi`）另由 `-DSOUI_ENABLE_INTERACTIVE_TESTS=ON` 控制，同样默认关闭，不得加入门禁。
+- GUI 试点需在有桌面显示的环境配置 `-DSOUI_ENABLE_GUI_SMOKE=ON`，构建 `fun_test` 后执行 `ctest --test-dir build -L '^soui-gui$' --output-on-failure`；Linux CI 使用 Xvfb。该烟测创建真实宿主窗口并验证鼠标消息到按钮事件的派发，暂不证明视觉像素正确或全部窗口交互。默认选项关闭，门禁的 329 个无头用例不受影响。需要人工操作的演示窗口（`window.soui`、`window.gdi`）另由 `-DSOUI_ENABLE_INTERACTIVE_TESTS=ON` 控制，同样默认关闭，不得加入门禁。
 - C/C++ 格式以仓库根目录 `.clang-format` 为准；格式化仅限所改文件，避免形成无关的大规模 diff。
 
 ## PR、CI 与发布

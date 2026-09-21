@@ -1,4 +1,4 @@
-#ifndef WsClient_H
+﻿#ifndef WsClient_H
 #define WsClient_H
 
 #include "Connection.h"
@@ -50,6 +50,7 @@ class WsClient : public TObjRefImpl<IWsClient> {
     STDMETHOD_(void, blockReceive)(THIS_ BOOL bBlock) OVERRIDE;
   private:
     void quit();
+    void joinOrDetachWorker();
 
     int send(const std::string &text, bool bBinary);
 
@@ -78,6 +79,12 @@ class WsClient : public TObjRefImpl<IWsClient> {
     std::mutex m_mutex;
     std::condition_variable m_cvQuit;
     std::atomic_bool m_finished;
+
+    // run() 收尾同步: 当 quit() 因"从工作线程调用"而 detach 时, 工作线程仍在跑
+    // run() 的收尾(含 lws_context_destroy), 析构/二次 quit 必须等其真正结束。
+    std::mutex m_teardownMutex;
+    std::condition_variable m_teardownCv;
+    bool m_teardownDone = true;
 
     std::stringstream m_receiveStream;
 

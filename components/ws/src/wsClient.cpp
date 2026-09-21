@@ -19,6 +19,10 @@ WsClient::WsClient(IConnListener *pGroup)
 WsClient::~WsClient()
 {
     quit();
+    // 若 quit() 因"从工作线程调用"而 detach, 工作线程仍在跑 run() 的收尾
+    // (含 lws_context_destroy); 必须等其真正结束再销毁成员, 否则产生 UAF。
+    std::unique_lock<std::mutex> lock(m_teardownMutex);
+    m_teardownCv.wait(lock, [&] { return m_teardownDone; });
 }
 
 #ifdef _WIN32
@@ -133,29 +137,36 @@ void WsClient::quit()
     // running on the worker thread itself (which already holds m_mutex)
     if (m_finished.load())
     {
-        if (!m_worker.joinable())
-            return;
-        if (std::this_thread::get_id() == m_worker.get_id())
-        {
-            // joining ourselves would deadlock; let run() finish on its own
-            m_worker.detach();
-            return;
-        }
-        // join so the object can be destroyed right after disconnect,
-        // while run() may still be inside lws_service/lws_context_destroy
-        m_worker.join();
+        joinOrDetachWorker();
         return;
     }
     {
         std::lock_guard<std::mutex> lockGuard(m_mutex);
         if (m_finished.load())
+        {
+            joinOrDetachWorker();
             return;
+        }
         m_finished = true;
         lws_context *ctx = m_context;
         if (ctx)
             lws_cancel_service(ctx);
     }
-    m_worker.join();
+    joinOrDetachWorker();
+}
+
+void WsClient::joinOrDetachWorker()
+{
+    if (!m_worker.joinable())
+        return;
+    if (std::this_thread::get_id() == m_worker.get_id())
+    {
+        m_worker.detach();
+    }
+    else
+    {
+        m_worker.join();
+    }
 }
 
 BOOL WsClient::wait(int timeout)
@@ -198,6 +209,10 @@ int WsClient::send(const std::string &text, bool bBinary)
 
 void WsClient::run()
 {
+    {
+        std::lock_guard<std::mutex> lock(m_teardownMutex);
+        m_teardownDone = false;
+    }
     while (!m_finished)
     {
         lws_service(this->m_context, 100);
@@ -205,6 +220,11 @@ void WsClient::run()
     lws_context_destroy(m_context);
     m_context = nullptr;
     m_cvQuit.notify_all();
+    {
+        std::lock_guard<std::mutex> lock(m_teardownMutex);
+        m_teardownDone = true;
+    }
+    m_teardownCv.notify_all();
 }
 
 

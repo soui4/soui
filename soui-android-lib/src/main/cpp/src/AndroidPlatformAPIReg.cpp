@@ -196,6 +196,11 @@ static BOOL androidAudio_messageBeep(UINT uType) {
     return AndroidPlatformAPI::instance().messageBeep(uType);
 }
 
+// Shell API wrapper
+static BOOL androidShell_shellExecute(LPCSTR lpOperation, LPCSTR lpFile, LPCSTR lpParameters) {
+    return AndroidPlatformAPI::instance().shellExecute(lpOperation, lpFile, lpParameters);
+}
+
 // Path API wrapper
 static DWORD androidPath_getTempPathA(DWORD nBufferLength, LPSTR lpBuffer) {
     return AndroidPlatformAPI::instance().getTempPathA(nBufferLength, lpBuffer);
@@ -256,6 +261,9 @@ extern "C" void RegisterAndroidPlatformAPI() {
     // Audio API
     api.audio.playSound = androidAudio_playSound;
     api.audio.messageBeep = androidAudio_messageBeep;
+
+    // Shell API
+    api.shell.shellExecute = androidShell_shellExecute;
 
     // Path API
     api.path.getTempPathA = androidPath_getTempPathA;

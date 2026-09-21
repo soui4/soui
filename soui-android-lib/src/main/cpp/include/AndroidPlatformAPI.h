@@ -188,6 +188,12 @@ public:
      *  优先播用户配置的通知提示音，退化到 ToneGenerator。成功返回 TRUE 表示请求已提交。 */
     BOOL messageBeep(UINT uType);
 
+    /** ShellExecute（对齐 Win32 ShellExecuteA "open" verb）。委托 Java 层
+     *  SouiPlatformBridge.shellExecute(String, String, String) 用 ACTION_VIEW Intent
+     *  打开 URL（http/https 等带 scheme 的链接）或本地文件。
+     *  成功返回 TRUE 表示 Intent 已成功提交给系统。 */
+    BOOL shellExecute(LPCSTR lpOperation, LPCSTR lpFile, LPCSTR lpParameters);
+
     /** 获取临时目录路径（UTF-8）。委托 Java 层 getCacheDir() 实现。
      *  返回值约定与 Win32 GetTempPathA 一致：成功为写入 lpBuffer 的字节数（含结尾 '\0"），失败/缓冲区不足返回 0 */
     DWORD getTempPathA(DWORD nBufferLength, LPSTR lpBuffer);
@@ -269,6 +275,7 @@ private:
     jmethodID m_showSoftKeyboard{nullptr};
     jmethodID m_playSoundMethod{nullptr};
     jmethodID m_messageBeepMethod{nullptr};
+    jmethodID m_shellExecuteMethod{nullptr};
     jmethodID m_getTempPathMethod{nullptr};
     jmethodID m_getSpecialFolderPathMethod{nullptr};
     jmethodID m_getSystemServiceMethod{nullptr};

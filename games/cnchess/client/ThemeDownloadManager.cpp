@@ -564,7 +564,7 @@ bool ThemeDownloadManager::DoExtractZip(bool bUpdated)
             << " tid=" << GetCurrentThreadId();
 
     SAutoRefPtr<IResProvider> pResProvider;
-    if (!s_comMgr.CreateResProvider_7ZIP((IObjRef**)&pResProvider))
+    if (!s_comMgr.CreateResProvider_ZIP((IObjRef**)&pResProvider))
     {
         SLOGE() << "DoExtractZip: failed to create SResProviderZip instance";
         PostExtractFinished(false, bUpdated);

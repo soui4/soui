@@ -25,7 +25,7 @@
 import { INativeWindow } from './INativeWindow';
 import { SouiSurface } from './SouiSurface';
 import { NativeEditView } from './NativeEditView';
-import { common } from '@kit.AbilityKit';
+import { common, Want } from '@kit.AbilityKit';
 import { window } from '@kit.ArkUI';
 import { inputMethod } from '@kit.IMEKit';
 import pasteboard from '@ohos.pasteboard';
@@ -836,6 +836,34 @@ export class SouiPlatformBridge {
   public messageBeep(uType: number): boolean {
     console.info(`[SouiPlatformBridge] messageBeep: uType=${uType}`);
     return this.audioPlayer.playBeep();
+  }
+
+  // ============================= Shell（对应 ShellExecute）=============================
+
+  // ShellExecute（对齐 Win32 ShellExecuteA "open" verb / Android SouiPlatformBridge.shellExecute）。
+  // 用 Want（action=ohos.want.action.viewData）打开 URL（http/https 等带 scheme 的链接）或
+  // 本地文件。与 Win32"ShellExecute 提交请求即返回"一致：只保证 Want 已提交给系统，不等待结果。
+  // operation Win32 verb（"open" 等，当前仅 open 有意义）
+  // file URL（完整 scheme）或本地文件路径
+  // parameters 未使用（移动端无意义），可为空串
+  // true 表示请求已成功提交给系统
+  public shellExecute(operation: string, file: string, parameters: string): boolean {
+    if (!this.mContext || !file) {
+      return false;
+    }
+    const want: Want = {
+      action: 'ohos.want.action.viewData',
+      uri: file
+    };
+    try {
+      this.mContext.startAbility(want).catch((err: Error) => {
+        console.error(`[SouiPlatformBridge] shellExecute failed: ${file}`, err);
+      });
+      return true;
+    } catch (e) {
+      console.error(`[SouiPlatformBridge] shellExecute failed: ${file}`, e);
+      return false;
+    }
   }
 
   // ============================= 路径（对应 Path API）============================= 

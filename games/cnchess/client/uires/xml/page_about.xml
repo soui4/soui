@@ -18,7 +18,7 @@
     <!-- 相关链接 -->
     <text name="txt_contact" text="了解更多" colorText="#FFE45E" font="size:16;bold:1" margin="10dp,16dp,5dp,4dp"/>
     <text name="txt_qq_group" text="• SOUI 官方 QQ 群：229313785" colorText="#E8D9B8" font="size:13" margin="24dp,3dp"/>
-    <text name="txt_website" text="• 官方网站：https://gitee.com/setoutsoft/soui4" colorText="#E8D9B8" font="size:13" margin="24dp,3dp"/>
+    <text name="txt_website" text="• 官方网站：https://soui.com.cn/cnchess" colorText="#E8D9B8" font="size:13" margin="24dp,3dp"/>
 
     <window size="-2,0" weight="1"/>
 

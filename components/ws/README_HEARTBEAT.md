@@ -159,8 +159,7 @@ pingCfg.nPingTimeoutCount = 100;       // 很大的值
 
 ## 相关文件
 
-- `components/ws/HEARTBEAT_FIX.md` - 详细的修复说明
-- `components/ws/BUGFIX_SUMMARY.md` - BUG修复总结
+- `components/ws/README.md` - ws 组件设计与使用文档（含 Review 问题清单与修复状态）
 - `components/ws/test/HeartbeatTest.cpp` - 测试程序
 - `SOUI/include/interface/ws-i.h` - 接口定义
 

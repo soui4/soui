@@ -85,6 +85,8 @@ void AndroidPlatformAPI::init(JNIEnv *env, jobject bridge, jobject ctx) {
         m_showSoftKeyboard = env->GetMethodID(clsBridge, "showSoftKeyboard", "(Landroid/view/View;Z)Z");
         m_playSoundMethod = env->GetMethodID(clsBridge, "playSound", "(Ljava/lang/String;I)Z");
         m_messageBeepMethod = env->GetMethodID(clsBridge, "messageBeep", "(I)Z");
+        m_shellExecuteMethod = env->GetMethodID(clsBridge, "shellExecute",
+                                                "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z");
         m_getTempPathMethod = env->GetMethodID(clsBridge, "getTempPath", "()Ljava/lang/String;");
         m_getSpecialFolderPathMethod = env->GetMethodID(clsBridge, "getSpecialFolderPath", "(I)Ljava/lang/String;");
         // Clipboard methods
@@ -1266,6 +1268,31 @@ BOOL AndroidPlatformAPI::messageBeep(UINT uType) {
         env->ExceptionClear();
         return FALSE;
     }
+    return ret;
+}
+
+BOOL AndroidPlatformAPI::shellExecute(LPCSTR lpOperation, LPCSTR lpFile, LPCSTR lpParameters) {
+    JNIEnv *env = getJNIEnv();
+    if (!env || !m_javaBridge || !m_shellExecuteMethod || !lpFile || !*lpFile) {
+        return FALSE;
+    }
+    jstring jOperation = env->NewStringUTF(lpOperation && *lpOperation ? lpOperation : "open");
+    jstring jFile = env->NewStringUTF(lpFile);
+    jstring jParameters = (lpParameters && *lpParameters) ? env->NewStringUTF(lpParameters) : nullptr;
+    if (!jOperation || !jFile) {
+        if (jOperation) env->DeleteLocalRef(jOperation);
+        if (jFile) env->DeleteLocalRef(jFile);
+        return FALSE;
+    }
+    jboolean ret = env->CallBooleanMethod(m_javaBridge, m_shellExecuteMethod,
+                                          jOperation, jFile, jParameters);
+    if (env->ExceptionCheck()) {
+        env->ExceptionClear();
+        ret = JNI_FALSE;
+    }
+    env->DeleteLocalRef(jOperation);
+    env->DeleteLocalRef(jFile);
+    if (jParameters) env->DeleteLocalRef(jParameters);
     return ret;
 }
 

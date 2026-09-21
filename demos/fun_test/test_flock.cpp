@@ -87,8 +87,8 @@ void reap_child(pid_t pid)
     }
 }
 
-// Derive the lock-file path exactly like TNamedSemRwLock::init does
-// (keep in sync with sharedmem.h: <lockDir>/soui_flock_<sanitized>.lock).
+// Derive the lock-file path exactly like TSemRwLock<kSharedNumber>::init does
+// (keep in sync with sharedmem.h: /tmp/soui_flock_<sanitized>.lock).
 // Used only to assert exclusion/release at the raw fcntl level.
 std::string flock_path(const char *name)
 {
@@ -121,7 +121,7 @@ const char *global_table_shm_name()
 }
 
 // fork a child that takes the swinx exclusive lock for `name` through
-// swinx::TNamedSemRwLock and holds it until the parent SIGKILLs it (the
+// swinx::TSemRwLock and holds it until the parent SIGKILLs it (the
 // normal, crash-like path) or the quit pipe closes (assertion-failure path:
 // the holder releases instead of wedging the rest of the suite).
 // The child writes one 'L' byte into ready[1] once the lock is held; an
@@ -136,7 +136,7 @@ pid_t fork_lock_holder(const char *name, const int ready[2], const int quitp[2])
     // child
     close(ready[0]);
     close(quitp[1]);
-    swinx::TNamedSemRwLock<5> lock;
+    swinx::TSemRwLock<5> lock;
     if (!lock.init(name))
         _exit(2);
     lock.lockExclusive();
@@ -155,7 +155,7 @@ pid_t fork_lock_holder(const char *name, const int ready[2], const int quitp[2])
 // 1) Kernel-level contract of the fix, on the real swinx lock class:
 //    a live holder excludes other processes, and a crashed (SIGKILLed)
 //    holder's lock is released by the kernel so the next acquirer - via
-//    swinx::TNamedSemRwLock itself - gets through without blocking.
+//    swinx::TSemRwLock itself - gets through without blocking.
 // ------------------------------------------------------------------------
 TEST(swinx_flock, crash_holder_releases_flock)
 {
@@ -180,7 +180,7 @@ TEST(swinx_flock, crash_holder_releases_flock)
     //     write-lock on the same lock file must be refused.
     std::string path = flock_path(kName);
     int fd = open(path.c_str(), O_RDWR, 0666);
-    ASSERT_GE(fd, 0) << "lock file not created by TNamedSemRwLock: " << path;
+    ASSERT_GE(fd, 0) << "lock file not created by TSemRwLock: " << path;
     struct flock fl;
     memset(&fl, 0, sizeof(fl));
     fl.l_type = F_WRLCK;
@@ -221,7 +221,7 @@ TEST(swinx_flock, crash_holder_releases_flock)
         signal(SIGALRM, alarm_exit_handler);
         alarm(10);
         int code = 0;
-        swinx::TNamedSemRwLock<5> lock;
+        swinx::TSemRwLock<5> lock;
         if (!lock.init(kName))
             code = 5;
         else

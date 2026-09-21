@@ -16,6 +16,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.content.ClipboardManager;
 import android.content.ClipData;
+import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.Ringtone;
@@ -1359,6 +1360,44 @@ public class SouiPlatformBridge {
         // Ringtone / ToneGenerator 内部依赖 Looper，而本方法可能被 swinx 的工作线程直接调进来，
         // 因此统一投递到主线程执行（与 setFocus 的处理方式一致）。
         final Runnable task = () -> playBeepOnMainThread(uType);
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            task.run();
+        } else {
+            mBridgeHandler.post(task);
+        }
+        return true;
+    }
+
+    /**
+     * ShellExecute（对齐 Win32 ShellExecuteA "open" verb）。
+     *
+     * 用 ACTION_VIEW Intent 打开 URL（http/https 等带 scheme 的链接）或本地文件。
+     * 与 Win32"ShellExecute 提交请求即返回"一致：这里只保证 Intent 已成功创建并提交给
+     * 系统，不等待目标应用打开完成。mContext 是 Application 上下文，因此必须携带
+     * FLAG_ACTIVITY_NEW_TASK；Intent 启动统一投递到主线程执行。
+     *
+     * @param lpOperation Win32 verb（"open" 等，当前仅 open 有意义）
+     * @param lpFile      URL（http/https/mailto 等完整 scheme）或本地文件绝对路径
+     * @param lpParameters 未使用（Win32 ShellExecute 的参数，移动端无意义），可为 null
+     * @return true 表示 Intent 已成功提交给系统；上下文未就绪 / 无可用应用返回 false
+     */
+    @SuppressWarnings("unused")
+    public boolean shellExecute(final String lpOperation, final String lpFile, final String lpParameters) {
+        if (mContext == null || lpFile == null || lpFile.isEmpty()) {
+            return false;
+        }
+        final Uri uri = lpFile.contains("://")
+                ? Uri.parse(lpFile)
+                : Uri.fromFile(new java.io.File(lpFile));
+        final Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        final Runnable task = () -> {
+            try {
+                mContext.startActivity(intent);
+            } catch (Exception e) {
+                Log.e(TAG, "shellExecute failed: " + lpFile, e);
+            }
+        };
         if (Looper.myLooper() == Looper.getMainLooper()) {
             task.run();
         } else {

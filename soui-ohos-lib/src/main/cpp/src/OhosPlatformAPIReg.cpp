@@ -182,6 +182,12 @@ static BOOL ohosAudio_messageBeep(UINT uType) {
     return OhosPlatformAPI::instance().messageBeep(uType);
 }
 
+// ========= Shell API =========
+
+static BOOL ohosShell_shellExecute(LPCSTR lpOperation, LPCSTR lpFile, LPCSTR lpParameters) {
+    return OhosPlatformAPI::instance().shellExecute(lpOperation, lpFile, lpParameters);
+}
+
 extern "C" void RegisterOhosPlatformAPI() {
     SLOGI() << "RegisterOhosPlatformAPI start";
     PlatformAPI &api = g_platformAPI;
@@ -239,6 +245,9 @@ extern "C" void RegisterOhosPlatformAPI() {
     api.audio.playSound                  = ohosAudio_playSound;
     api.audio.messageBeep                = ohosAudio_messageBeep;
 
+    // Shell
+    api.shell.shellExecute               = ohosShell_shellExecute;
+
     SLOGI() << "RegisterOhosPlatformAPI done, version=" << api.version;
 }
 
@@ -295,5 +304,6 @@ extern "C" void UnregisterOhosPlatformAPI() {
     NullifyOhosEntry(api.path.getSpecialFolderPathA);
     NullifyOhosEntry(api.audio.playSound);
     NullifyOhosEntry(api.audio.messageBeep);
+    NullifyOhosEntry(api.shell.shellExecute);
     SLOGI() << "UnregisterOhosPlatformAPI done";
 }

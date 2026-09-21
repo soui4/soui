@@ -155,6 +155,14 @@ public:
     // 现场合成提示音（鸿蒙 TonePlayer 属系统接口，第三方应用不可用）。
     BOOL messageBeep(UINT uType);
 
+    // ---- Shell：ShellExecute ----
+
+    // ShellExecute（对齐 Win32 ShellExecuteA "open" verb）。委托 ArkTS
+    // SouiPlatformBridge.shellExecute(operation, file, params)：用 Want + startAbility
+    // 打开 URL（http/https 等带 scheme 的链接）或本地文件。
+    // 成功返回 TRUE 表示请求已提交给系统。
+    BOOL shellExecute(LPCSTR lpOperation, LPCSTR lpFile, LPCSTR lpParameters);
+
     // ---- 路径：getCacheDir / getFilesDir / getTempPath ----
 
     // 返回应用私有缓存目录（UTF-8），对应 platform_api getTempPathA
@@ -272,6 +280,7 @@ private:
     napi_ref m_mShowSoftKeyboard{nullptr};
     napi_ref m_mPlaySound{nullptr};               // playSound(path, fdwSound): boolean
     napi_ref m_mMessageBeep{nullptr};             // messageBeep(uType): boolean
+    napi_ref m_mShellExecute{nullptr};            // shellExecute(op, file, params): boolean
     napi_ref m_mScheduleMessageProcessing{nullptr};
     napi_ref m_mGetTempPath{nullptr};
     napi_ref m_mGetSpecialFolderPath{nullptr};
