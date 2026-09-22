@@ -1,6 +1,6 @@
 {
   "app": {
-    "bundleName": "com.soui.ohos.happychess",
+    "bundleName": "com.soui.happychess",
     "vendor": "soui",
     "versionCode": 1000000,
     "versionName": "1.0.0",
