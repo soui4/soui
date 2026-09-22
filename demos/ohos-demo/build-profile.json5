@@ -38,6 +38,18 @@
           ]
         }
       ]
+    },
+    {
+      "name": "soui_ohos_lib",
+      "srcPath": "../../soui-ohos-lib",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
     }
   ]
 }

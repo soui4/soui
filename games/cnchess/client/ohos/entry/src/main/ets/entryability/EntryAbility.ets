@@ -15,7 +15,7 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 
 import cnchess from 'libcnchess.so';
-import { SouiPlatformBridge } from '../soui/SouiPlatformBridge';
+import { SouiPlatformBridge } from '@soui/ohos';
 
 const DOMAIN = 0x5350;
 const TAG = 'SOUI_Demo';

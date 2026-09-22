@@ -1201,9 +1201,9 @@ BOOL CW32System::IsComplexScriptLcid(
 BOOL CW32System::IsBiDiDiacritic(
 	WCHAR ch)
 {
-	return IN_RANGE(0x64B, ch, 0x670) && (ch <= 0x652 || ch == 0x670) ||	// Arabic
-		   IN_RANGE(0x591, ch, 0x5C4) && (ch != 0x5A2 && ch != 0x5BA &&		// Hebrew
-				ch != 0x5BE && ch != 0x5C0 && ch != 0x5C3);					
+	return (IN_RANGE(0x64B, ch, 0x670) && (ch <= 0x652 || ch == 0x670)) ||	// Arabic
+		   (IN_RANGE(0x591, ch, 0x5C4) && (ch != 0x5A2 && ch != 0x5BA &&		// Hebrew
+				ch != 0x5BE && ch != 0x5C0 && ch != 0x5C3));					
 }
 
 
@@ -1222,7 +1222,7 @@ BOOL CW32System::IsVietCdmSequenceValid(
 	WCHAR ch2)
 {
 	if (!IN_RANGE(0x300, ch2, 0x323) ||		// Fast out
-		!IN_RANGE(0x300, ch2, 0x301) && ch2 != 0x303 && ch2 != 0x309 && ch2 != 0x323)
+		(!IN_RANGE(0x300, ch2, 0x301) && ch2 != 0x303 && ch2 != 0x309 && ch2 != 0x323))
 	{
 		return TRUE;						// Not Vietnamese tone mark
 	}

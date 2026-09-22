@@ -261,12 +261,12 @@ LRESULT CALLBACK RichEditWndProc(
 		// following code doesn't send a notification for AltGr characters
 		// (LeftCtrl+RightAlt+vkey), since some hosts misinterpret these
 		// characters as hot keys.
-		if (phost->_fKeyMaskSet && IN_RANGE(WM_KEYFIRST, msg, WM_KEYLAST) &&
+		if ((phost->_fKeyMaskSet && IN_RANGE(WM_KEYFIRST, msg, WM_KEYLAST) &&
 				(msg != WM_KEYDOWN ||
-				 (GetKeyboardFlags() & (ALT | CTRL)) != (LCTRL | RALT)) || // AltGr
-			phost->_fMouseMaskSet && (msg == WM_MOUSEACTIVATE ||
-							IN_RANGE(WM_MOUSEFIRST, msg, WM_MOUSELAST)) ||
-			phost->_fScrollMaskSet && IN_RANGE(WM_HSCROLL, msg, WM_VSCROLL))
+				 (GetKeyboardFlags() & (ALT | CTRL)) != (LCTRL | RALT))) || // AltGr
+			(phost->_fMouseMaskSet && (msg == WM_MOUSEACTIVATE ||
+							IN_RANGE(WM_MOUSEFIRST, msg, WM_MOUSELAST))) ||
+			(phost->_fScrollMaskSet && IN_RANGE(WM_HSCROLL, msg, WM_VSCROLL)))
 		{
 			MSGFILTER msgfltr;
 
@@ -944,8 +944,8 @@ BOOL CTxtWinHost::Init(
 		if (_dwExStyle & WS_EX_LAYOUTRTL)
 		{
 			// Swap whatever RTL params we have
-			_dwStyle = (_dwStyle & ~ES_RIGHT) | (_dwStyle & ES_RIGHT ^ ES_RIGHT);
-			_dwExStyle = (_dwExStyle & ~WS_EX_RTLREADING) | (_dwExStyle & WS_EX_RTLREADING ^ WS_EX_RTLREADING);
+			_dwStyle = (_dwStyle & ~ES_RIGHT) | ((_dwStyle & ES_RIGHT) ^ ES_RIGHT);
+			_dwExStyle = (_dwExStyle & ~WS_EX_RTLREADING) | ((_dwExStyle & WS_EX_RTLREADING) ^ WS_EX_RTLREADING);
 			_dwExStyle = (_dwExStyle & ~WS_EX_LEFTSCROLLBAR) |
 						 (_dwStyle & ES_RIGHT ? WS_EX_LEFTSCROLLBAR : 0);
 	
@@ -2529,7 +2529,7 @@ COLORREF CTxtWinHost::TxGetSysColor(
 	TRACEBEGIN(TRCSUBSYSHOST, TRCSCOPEEXTERN, "CTxtWinHost::TxGetSysColor");
 
 	if (!_fDisabled ||
-		nIndex != COLOR_WINDOW && nIndex != COLOR_WINDOWTEXT)
+		(nIndex != COLOR_WINDOW && nIndex != COLOR_WINDOWTEXT))
 	{
 		// This window is not disabled or the color is not interesting
 		// in the disabled case.

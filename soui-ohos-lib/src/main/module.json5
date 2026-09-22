@@ -1,0 +1,11 @@
+{
+  "module": {
+    "name": "soui_ohos_lib",
+    "type": "har",
+    "deviceTypes": [
+      "default",
+      "tablet",
+      "2in1"
+    ]
+  }
+}

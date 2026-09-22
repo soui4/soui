@@ -6,7 +6,7 @@
   "author": "",
   "license": "",
   "dependencies": {
-    "libsouidemo.so": "file:./src/main/cpp/types/libsouidemo",
-    "libsoui4ohos.so": "file:./src/main/cpp/types/libsoui4ohos"
+    "@soui/ohos": "file:../../../soui-ohos-lib",
+    "libsouidemo.so": "file:./src/main/cpp/types/libsouidemo"
   }
 }

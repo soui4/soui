@@ -1018,7 +1018,7 @@ void WINAPI CW32System::REExtTextOut(
 		SelectObject(hdc, hfont);
 	}
 
-	if (fConvert || (!(dwETOFlags & fETOFEFontOnNonFEWin9x)) && cm != CVT_NONE)		
+	if (fConvert || ((!(dwETOFlags & fETOFEFontOnNonFEWin9x)) && cm != CVT_NONE))		
 	{
 		if (cm == CVT_WCTMB)
 		{

@@ -13,16 +13,10 @@ games/cnchess/client/ohos/
 │   ├── src/main/
 │   │   ├── cpp/
 │   │   │   ├── CMakeLists.txt            # 构建脚本（计算 SOUI 根目录，引入 soui-ohos-lib + client 源码）
-│   │   │   └── types/                     # N-API 类型声明（libcnchess / libsoui4ohos）
+│   │   │   └── types/                     # N-API 类型声明（libcnchess）
 │   │   ├── ets/
 │   │   │   ├── entryability/EntryAbility.ets   # UIAbility 入口，初始化 SOUI 并启动
-│   │   │   ├── pages/Index.ets                 # 主页面，放置 SouiScreen
-│   │   │   └── soui/                           # soui-ohos-lib 的 ArkTS 适配层
-│   │   │       ├── SouiPlatformBridge.ets      # 全局桥接单例（生命周期/窗口/定时器/IME/剪切板…）
-│   │   │       ├── SouiScreen.ets              # SOUI 渲染宿主组件
-│   │   │       ├── SouiSurface.ets / SouiSurfaceView.ets
-│   │   │       ├── NativeEditView.ets          # 输入法编辑框
-│   │   │       └── AudioPlayer.ets             # 音频播放
+│   │   │   └── pages/Index.ets                 # 主页面，放置 SouiScreen
 │   │   └── resources/rawfile/
 │   │       ├── uires/                     # SOUI 应用资源（布局、皮肤、字符串、动画）
 │   │       └── soui_sys_res/              # SOUI 系统资源（控件皮肤）
@@ -72,7 +66,11 @@ games/cnchess/client/
 
 1. DevEco Studio（HarmonyOS NEXT 版本）
 2. HarmonyOS NEXT SDK（API 版本以 `entry/build-profile.json5` 中 `compatibleSdkVersion` 为准）
-3. 工程依赖 `soui-ohos-lib`，位于 SOUI 源码根目录 `soui-ohos-lib/`（与 `games/` 同级）
+3. 通过 **HAR 源码依赖**使用 `soui-ohos-lib`（位于 SOUI 源码根目录 `soui-ohos-lib/`，与 `games/` 同级）：
+   `entry/oh-package.json5` 中 `"@soui/ohos": "file:../../../../soui-ohos-lib"`，且工程级 `build-profile.json5`
+   的 `modules` 列表中**必须注册**该模块（`"name": "soui_ohos_lib", "srcPath": "../../../../soui-ohos-lib"`，
+   缺失会报 00309001/10311002）；ArkTS 代码直接 `import { SouiPlatformBridge, SouiScreen } from '@soui/ohos'`，
+   **不再复制 .ets 源码**。Native 侧仍由本工程 CMakeLists 经 `include(soui4_ohos.cmake)` 从 `soui-ohos-lib/src/main/cpp` 源码编译 `libsoui4ohos.so`。
 
 ### 构建步骤
 
@@ -89,12 +87,11 @@ games/cnchess/client/
 
 | 文件 | 作用 |
 |------|------|
-| `entry/src/main/cpp/CMakeLists.txt` | 计算 SOUI 根目录，引入 `soui-ohos-lib` + `games/cnchess/client` 共享源码，定义宏（`SOUI_OHOS`/`__OHOS__`/`__MOBILE__`/`ENABLE_VIRTUAL_HWND` 等） |
+| `entry/src/main/cpp/CMakeLists.txt` | 计算 SOUI 根目录，`include(soui4_ohos.cmake)` 引入 `soui-ohos-lib` 构建片段 + `games/cnchess/client` 共享源码，定义宏（`SOUI_OHOS`/`__OHOS__`/`__MOBILE__`/`ENABLE_VIRTUAL_HWND` 等） |
 | `ohos_entry.cc`（client 根目录） | 实现 `Soui4OhosEntry` 四虚函数 + `cnchess` N-API 模块注册 |
 | `entry/src/main/ets/entryability/EntryAbility.ets` | 应用入口，初始化并启动 SOUI |
 | `entry/src/main/ets/pages/Index.ets` | 主页面，放置 `SouiScreen` |
-| `entry/src/main/ets/soui/SouiPlatformBridge.ets` | ArkTS 桥接单例（对应 `soui-ohos-lib` 的 N-API 层） |
-| `entry/src/main/ets/soui/SouiScreen.ets` | SOUI 渲染宿主组件 |
+| `oh-package.json5` 依赖 `@soui/ohos` | soui-ohos-lib 的 ArkTS 适配层（HAR 源码依赖，见 `soui-ohos-lib/README.md`） |
 | `entry/src/main/resources/rawfile/uires/` | SOUI 应用资源 |
 | `entry/src/main/resources/rawfile/soui_sys_res/` | SOUI 系统资源 |
 

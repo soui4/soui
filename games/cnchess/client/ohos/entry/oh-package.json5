@@ -6,7 +6,7 @@
   "author": "",
   "license": "",
   "dependencies": {
-    "libcnchess.so": "file:./src/main/cpp/types/libcnchess",
-    "libsoui4ohos.so": "file:./src/main/cpp/types/libsoui4ohos"
+    "@soui/ohos": "file:../../../../../soui-ohos-lib",
+    "libcnchess.so": "file:./src/main/cpp/types/libcnchess"
   }
 }

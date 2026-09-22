@@ -174,7 +174,7 @@
  */
 __inline BOOL IsEOP(unsigned ch)
 {
-	return IN_RANGE(CELL, ch, CR) && ch != TAB || (ch | 1) == PS;
+	return (IN_RANGE(CELL, ch, CR) && ch != TAB) || (ch | 1) == PS;
 }
 
 BOOL IsRTF(char *pstr, LONG cb);

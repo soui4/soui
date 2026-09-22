@@ -24,13 +24,13 @@ set( TOOLCHAIN_SUPPORTS_ATTRIBUTE_DESTRUCTOR_EXITCODE__TRYRUN_OUTPUT
 # ============================================================================
 set(SOUI_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../..)
 get_filename_component(SOUI_ROOT_DIR "${SOUI_ROOT_DIR}" ABSOLUTE)
-set(SOUI_OHOS_LIB_DIR ${SOUI_ROOT_DIR}/soui-ohos-lib/src/main/cpp)
+set(SOUI_OHOS_LIB_CPP_DIR ${SOUI_ROOT_DIR}/soui-ohos-lib/src/main/cpp)
 
 message(STATUS "===========================================")
 message(STATUS "SOUI OHOS Demo Configuration")
 message(STATUS "===========================================")
 message(STATUS "SOUI_ROOT_DIR: ${SOUI_ROOT_DIR}")
-message(STATUS "SOUI_OHOS_LIB_DIR: ${SOUI_OHOS_LIB_DIR}")
+message(STATUS "SOUI_OHOS_LIB_CPP_DIR: ${SOUI_OHOS_LIB_CPP_DIR}")
 message(STATUS "===========================================")
 
 # ============================================================================
@@ -62,10 +62,10 @@ add_compile_options(-Wno-unused-parameter)
 add_compile_options(-Wno-macro-redefined)
 
 # ============================================================================
-# 添加 soui-ohos-lib 子目录（编译出 libsoui4ohos.so 及 SOUI 核心库）
+# 引入 soui-ohos-lib 构建片段（编译出 libsoui4ohos.so 及 SOUI 核心库）
+# 片段不创建 project，要求先设好 SOUI_ROOT_DIR / SOUI_OHOS_LIB_CPP_DIR
 # ============================================================================
-# soui-ohos-lib 的 CMakeLists 依赖 SOUI_ROOT_DIR 变量
-add_subdirectory(${SOUI_OHOS_LIB_DIR} ${CMAKE_CURRENT_BINARY_DIR}/soui-ohos-lib)
+include(${SOUI_OHOS_LIB_CPP_DIR}/soui4_ohos.cmake)
 
 # ============================================================================
 # Demo 业务层 native 代码
@@ -75,13 +75,13 @@ file(GLOB_RECURSE DEMO_NATIVE_SRC
         )
 
 add_library(
-        cnchess
+        souidemo
         SHARED
         ${DEMO_NATIVE_SRC}
 )
 
 target_include_directories(
-        cnchess
+        souidemo
         PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${SOUI_ROOT_DIR}
@@ -89,13 +89,13 @@ target_include_directories(
         ${SOUI_ROOT_DIR}/utilities/include
         ${SOUI_ROOT_DIR}/swinx/include
         ${SOUI_ROOT_DIR}/components
-        ${SOUI_OHOS_LIB_DIR}/include
-        ${CMAKE_CURRENT_BINARY_DIR}/soui-ohos-lib/config
+        ${SOUI_OHOS_LIB_CPP_DIR}/include
+        ${PROJECT_BINARY_DIR}/config
 )
 
 # 链接 soui-ohos-lib 导出的 soui4ohos 目标（其内部已链接 soui4/utilities4/swinx）
 target_link_libraries(
-        cnchess
+        souidemo
         PUBLIC
         soui4ohos
 )

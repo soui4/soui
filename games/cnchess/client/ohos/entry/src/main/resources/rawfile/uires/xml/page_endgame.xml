@@ -8,15 +8,16 @@
                   sbFadeFrames="30" enableItemDragScroll="1" align="center">
             <template itemWidth="220" itemHeight="196" layout="vbox" gravity="center" skin="skin_item_bk">
                 <!-- 顶部: 残局名 + 桌序号 + 对局中 -->
-                <window size="-2,30" layout="hbox" interval="5" gravity="center_vertical" padding="10,5,10,0">
+                <window size="-2,30" layout="hbox" interval="5" gravity="center_vertical" padding="15,10,15,0">
+                    <window size="0,0" weight="1"/>
                     <text name="txt_eg_table_title" text="" colorText="@color/gold" font="size:12,bold" cursor="hand"/>
                     <text name="txt_eg_table_index" text="" colorText="@color/gold" font="size:11"/>
                     <window size="0,0" weight="1"/>
-                    <img name="img_playing" skin="skin_playing" visible="0" size="30,20"/>
+                    <img name="img_playing" skin="skin_playing" visible="0" size="30,20" display="0"/>
                 </window>
 
                 <!-- 星级难度 -->
-                <ratingbar name="rtg_eg_table_difficulty" starSkin="skin_star" starNum="3" value="1" size="-2,16" gravity="center"/>
+                <ratingbar name="rtg_eg_table_difficulty" starSkin="skin_star" starNum="3" value="1" size="48,16" gravity="center"/>
 
                 <!-- 中间: 座位区域 -->
                 <window size="-2,0" weight="1" layout="hbox" interval="5" gravity="center">

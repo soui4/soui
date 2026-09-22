@@ -14,11 +14,10 @@ soui-ohos-demo/
 │   │   │   ├── demo_native.cpp   # Soui4OhosEntry 实现 + N-API 注册
 │   │   │   ├── MainDlg.h/cpp     # 主对话框（SHostWnd 子类）
 │   │   │   ├── SouiRealWndHandler.h/cpp  # RealWnd 处理器
-│   │   │   └── types/             # N-API 类型声明
+│   │   │   └── types/             # N-API 类型声明（libsouidemo）
 │   │   ├── ets/
 │   │   │   ├── entryability/     # EntryAbility（初始化 SOUI）
-│   │   │   ├── pages/Index.ets   # 主页面（放置 SouiScreen）
-│   │   │   └── soui/             # soui-ohos-lib 的 ArkTS 适配层
+│   │   │   └── pages/Index.ets   # 主页面（放置 SouiScreen）
 │   │   └── resources/
 │   │       ├── rawfile/          # SOUI 资源（uires + soui_sys_res）
 │   │       └── base/             # ArkUI 资源
@@ -61,12 +60,16 @@ soui-ohos-demo/
 
 1. DevEco Studio（HarmonyOS NEXT 版本）
 2. HarmonyOS SDK（API 26+）
-3. 工程依赖 `soui-ohos-lib`（位于 `d:\work\soui4\soui-ohos-lib`）
+3. 通过 **HAR 源码依赖**使用 `soui-ohos-lib`（位于 `d:\work\soui4\soui-ohos-lib`）：
+   `entry/oh-package.json5` 中 `"@soui/ohos": "file:../../../soui-ohos-lib"`，且工程级 `build-profile.json5`
+   的 `modules` 列表中**必须注册**该模块（`"name": "soui_ohos_lib", "srcPath": "../../soui-ohos-lib"`，
+   缺失会报 00309001/10311002）；ArkTS 代码直接 `import { SouiPlatformBridge, SouiScreen } from '@soui/ohos'`，
+   **不再复制 .ets 源码**。Native 侧仍由本工程 CMakeLists 经 `include(soui4_ohos.cmake)` 从 `soui-ohos-lib/src/main/cpp` 源码编译 `libsoui4ohos.so`。
 
 ### 构建步骤
 
-1. 用 DevEco Studio 打开 `d:\work\soui4\demos\soui-ohos-demo`
-2. 等待 hvigor 同步完成（首次会编译 SOUI 核心 + soui-ohos-lib，耗时较长）
+1. 用 DevEco Studio 打开 `d:\work\soui4\demos\ohos-demo`
+2. 等待 hvigor / ohpm 同步完成（首次会安装 `@soui/ohos` 源码依赖并编译 SOUI 核心，耗时较长）
 3. 连接鸿蒙设备或启动模拟器
 4. 点击 Run 或 `hvigorw assembleHap` 构建并安装
 
@@ -82,7 +85,7 @@ soui-ohos-demo/
 | `entry/src/main/cpp/MainDlg.h/cpp` | 主对话框，演示按钮事件、定时器 |
 | `entry/src/main/ets/entryability/EntryAbility.ets` | 应用入口，初始化 SOUI |
 | `entry/src/main/ets/pages/Index.ets` | 主页面，放置 SouiScreen |
-| `entry/src/main/ets/soui/` | soui-ohos-lib 的 ArkTS 适配层（从 soui-ohos-lib 复制） |
+| `oh-package.json5` 依赖 `@soui/ohos` | soui-ohos-lib 的 ArkTS 适配层（HAR 源码依赖，见 `soui-ohos-lib/README.md`） |
 | `entry/src/main/resources/rawfile/uires/` | SOUI 应用资源（布局、皮肤、字符串） |
 | `entry/src/main/resources/rawfile/soui_sys_res/` | SOUI 系统资源（控件皮肤） |
 

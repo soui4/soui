@@ -23,7 +23,7 @@ set( TOOLCHAIN_SUPPORTS_ATTRIBUTE_DESTRUCTOR_EXITCODE__TRYRUN_OUTPUT
 # ============================================================================
 set(SOUI_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../../../)
 get_filename_component(SOUI_ROOT_DIR "${SOUI_ROOT_DIR}" ABSOLUTE)
-set(SOUI_OHOS_LIB_DIR ${SOUI_ROOT_DIR}/soui-ohos-lib/src/main/cpp)
+set(SOUI_OHOS_LIB_CPP_DIR ${SOUI_ROOT_DIR}/soui-ohos-lib/src/main/cpp)
 set(CNCHESS_CLIENT_DIR ${SOUI_ROOT_DIR}/games/cnchess/client)
 set(CNCHESS_ROOT_DIR ${SOUI_ROOT_DIR}/games/cnchess)
 set(CNCHESS_ALGORITHM_DIR ${CNCHESS_ROOT_DIR}/algorithm)
@@ -33,14 +33,14 @@ message(STATUS "===========================================")
 message(STATUS "SOUI OHOS cnchess Configuration")
 message(STATUS "===========================================")
 message(STATUS "SOUI_ROOT_DIR: ${SOUI_ROOT_DIR}")
-message(STATUS "SOUI_OHOS_LIB_DIR: ${SOUI_OHOS_LIB_DIR}")
+message(STATUS "SOUI_OHOS_LIB_CPP_DIR: ${SOUI_OHOS_LIB_CPP_DIR}")
 message(STATUS "CNCHESS_CLIENT_DIR: ${CNCHESS_CLIENT_DIR}")
 message(STATUS "CNCHESS_ALGORITHM_DIR: ${CNCHESS_ALGORITHM_DIR}")
 message(STATUS "CONTROLS_EXTEND_GIF_DIR: ${CONTROLS_EXTEND_GIF_DIR}")
 message(STATUS "===========================================")
 
-if(NOT EXISTS ${SOUI_OHOS_LIB_DIR})
-    message(FATAL_ERROR "SOUI_OHOS_LIB_DIR: ${SOUI_OHOS_LIB_DIR} is not existed")
+if(NOT EXISTS ${SOUI_OHOS_LIB_CPP_DIR})
+    message(FATAL_ERROR "SOUI_OHOS_LIB_CPP_DIR: ${SOUI_OHOS_LIB_CPP_DIR} is not existed")
 endif()
 if(NOT EXISTS ${CNCHESS_CLIENT_DIR})
     message(FATAL_ERROR "CNCHESS_CLIENT_DIR: ${CNCHESS_CLIENT_DIR} is not existed")
@@ -76,9 +76,10 @@ add_compile_options(-Wno-unused-parameter)
 add_compile_options(-Wno-macro-redefined)
 
 # ============================================================================
-# 添加 soui-ohos-lib 子目录（编译出 libsoui4ohos.so 及 SOUI 核心库）
+# 引入 soui-ohos-lib 构建片段（编译出 libsoui4ohos.so 及 SOUI 核心库）
+# 片段不创建 project，要求先设好 SOUI_ROOT_DIR / SOUI_OHOS_LIB_CPP_DIR
 # ============================================================================
-add_subdirectory(${SOUI_OHOS_LIB_DIR} ${CMAKE_CURRENT_BINARY_DIR}/soui-ohos-lib)
+include(${SOUI_OHOS_LIB_CPP_DIR}/soui4_ohos.cmake)
 
 # ============================================================================
 # cnchess 业务层 native 代码（复用 android 共享源码，排除 android_entry.cc）
@@ -122,8 +123,8 @@ target_include_directories(
         ${SOUI_ROOT_DIR}/utilities/include
         ${SOUI_ROOT_DIR}/components
         ${CONTROLS_EXTEND_GIF_DIR}
-        ${SOUI_OHOS_LIB_DIR}/include
-        ${CMAKE_CURRENT_BINARY_DIR}/soui-ohos-lib/config
+        ${SOUI_OHOS_LIB_CPP_DIR}/include
+        ${PROJECT_BINARY_DIR}/config
 )
 
 # 链接 soui-ohos-lib 导出的 soui4ohos 目标（其内部已链接 soui4/utilities4/swinx/components/ws）

@@ -552,7 +552,7 @@ public:
 	{
         wchar_t * cp = dst;
 		while(*cp) cp++;		 // find null character in first string
-        while( *cp++ = *src++ ); // Copy src over dst 
+        while(*src) *cp++ = *src++; // Copy src over dst
         return( dst );
 	}
 

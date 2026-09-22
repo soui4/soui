@@ -1,14 +1,26 @@
 # uiresbuilder —— SOUI UI 资源编译工具
 
-`uiresbuilder` 是 SOUI4 框架配套的**离线资源构建器**（CLI 工具）。它读取一份 XML 格式的资源索引文件 `uires.idx`（描述皮肤包内所有资源的清单：布局 XML、皮肤 XML、图标、位图、字符串、颜色、菜单等），生成**三份**构建产物，供不同平台和语言调用：
+`uiresbuilder` 是 SOUI4 框架配套的**离线资源构建器**（CLI 工具）。它以一份 XML 格式的资源索引文件 `uires.idx`（描述皮肤包内所有资源的清单：布局 XML、皮肤 XML、图标、位图、字符串、颜色、菜单等）为**输入**，生成**三份**构建产物，供不同平台和语言调用：
+
+> ⚠️ **`uires.idx` 不是本工具生成的**。它是需要**手工维护**的源文件（新增 / 改名 / 删除资源文件后必须自己补改，移动端不会扫描目录）；成批新增图片条目可以借助同目录的 `uiresImporter` 辅助回写（见 §与 uiresImporter 的分工）。本工具只负责"读 `uires.idx` → 产出下面三份产物"。
 
 | 产物                       | 参数   | 典型文件名                         | 用途                                                                                                                                                                                                                         |
 | ------------------------ | ---- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 资源打包清单（Win32 RC include） | `-r` | `winres.rc2` / `soui_res.rc2` | 被 MSVC `.rc` 脚本 `#include` 后，将整个 UI 资源以 `RCDATA` 自定义资源类型编译进 Windows PE `.exe` / `.dll`，运行期 SWinx 直接从模块资源里解包加载皮肤。                                                                                                           |
+| 资源打包清单（Win32 RC include） | `-r` | `winres.rc2` / `soui_res.rc2` | 被 `.rc` 脚本 `#include` 后，将整个 UI 资源以 `RCDATA` 自定义资源类型编译进最终二进制：Windows 为 PE `.exe` / `.dll`（MSVC `rc.exe` 原生编译），Linux 为 ELF、macOS 为 Mach-O（MinGW `windres` 编译成 COFF 后再由 `__cmake/windres.cmake` 转换嵌入）。运行期由 swinx 直接从模块资源里解包加载皮肤。 |
 | C/C++ 资源访问头文件            | `-h` | `resource.h`                  | 定义 `struct _UIRES`（按资源类型分层访问原始文件路径/名，如 `UIRES.LAYOUT.maindlg`）与 `struct _R`（运行期读取布局中控件的 `R.name.xxx` / `R.id.xxx` / `R.color.xxx` / `R.string.xxx`）。C++ 额外提供 `R.ID.xxx` 匿名 `enum`，可用于 `switch/case`、数组维度、模板参数等**常量表达式**场景。 |
 | JS/TS 资源访问模块（可选）         | `-j` | `R.js`                        | 导出 `R { id, name, arrName, arrId }` 四个集合，供 OpenHarmony / Web / Node.js 等非 C++ 环境在脚本层以字符串或 ID 访问布局控件。                                                                                                                       |
 
-它是 SOUI4 资源系统\*\*从"人肉写 resource.h + 手工 #include rc2"升级为"一键生成、跨平台复用"\*\*的核心工具。Windows / Android / HarmonyOS / iOS 四端共用同一套 `uires.idx`，各自调用本工具生成对应产物。
+它是 SOUI4 资源系统\*\*从"人肉写 resource.h + 手工 #include rc2"升级为"一键生成、跨平台复用"\*\*的核心工具。Windows / Linux / macOS / Android / HarmonyOS / iOS 六端共用同一套手写的 `uires.idx`；其中**三个桌面端在构建时都会用本工具的产物**（`.rc2` + `resource.h`）把资源打进最终可执行文件，只是资源编译器与目标格式不同：
+
+| 桌面端 | 资源编译器 | 打进的目标格式 |
+| --- | --- | --- |
+| Windows | MSVC `rc.exe`（原生，无需转换） | PE `.exe` / `.dll` |
+| Linux | MinGW `x86_64-w64-mingw32-windres` → COFF，再经 `ld -r -b binary` + `objcopy --redefine-syms` 转为 ELF | ELF |
+| macOS | MinGW `x86_64-w64-mingw32-windres` → COFF，再经汇编 `.incbin` + `as` 转为 Mach-O | Mach-O |
+
+非 Windows 桌面端的这套转换由 `__cmake/windres.cmake` 的 `target_compile_resources()` 自动完成（`demos/demo`、`soui-sys-resource`、`games/cnchess/client` 等都在 CMake 里无条件调用它，不区分平台），运行期再由 swinx 的 Win32 资源 API（`swinx/src/winres.cpp` + COFF 解析器）读取。因此 `.rc` / `.rc2` 与资源 API 调用代码在三个桌面端**完全同源**，"一份资源定义、三端单文件发布"正是它支撑起来的。
+
+Android / HarmonyOS （以及 iOS）侧**不调用、也不需要**这三份产物：运行期由 `SResProviderAndroidAsset` / `SResProviderOhosRawFile` 直接解析打包进 APK assets / HAP rawfile 的 `uires.idx`，布局按 `"layout:dlg_main"` 这样的字符串逻辑名加载。
 
 ***
 
@@ -52,7 +64,7 @@ uiresbuilder -i uires.idx [-p uires_prefix] [-r output.rc2] [-h resource.h] [-j 
 | ----------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `-i <path>` | ✅ 必须       | `uires.idx` 索引文件的路径。工具用 `tinyxml` 解析该 XML，根节点必须为 `<resource>`。解析失败返回退出码 `2`。                                                                                                                                                                                                                    |
 | `-p <path>` | 建议指定       | 资源根目录前缀，用于拼接 `.rc2` 里每条资源的相对路径（传给 Win32 `RCDATA` 的文件路径）。典型取值 `uires`、`res/uires` 或项目里实际的皮肤包目录。不指定时 `.rc2` 里会使用 `uires.idx` 内记录的原始 `path`。                                                                                                                                                       |
-| `-r <path>` | Windows 必选 | 生成 `.rc2` 资源打包清单。典型输出 `uires/winres.rc2` 或 `res/soui_res.rc2`。配合 `-p` 生成的路径需与 RC 编译时的工作目录相对关系一致。                                                                                                                                                                                                |
+| `-r <path>` | 桌面端必选 | 生成 `.rc2` 资源打包清单。典型输出 `uires/winres.rc2` 或 `res/soui_res.rc2`。Windows 下被 MSVC `rc.exe` 直接 `#include`，Linux / macOS 下被 MinGW `windres` 编译后转成 ELF / Mach-O。配合 `-p` 生成的路径需与 RC 编译时的工作目录相对关系一致。 |
 | `-h <path>` | 桌面端必选      | 生成 `resource.h`（C/C++ 头）。含 `_UIRES` / `_R` 两个结构体及 `INIT_R_DATA` 分支。`WriteFile` 实现了时间戳增量写入：仅当索引 / 布局文件 / uidef 文件时间戳发生变更时才重写，不会触发无意义的增量编译。**生成的头文件顶部已标注"请勿手动修改"字样**。                                                                                                                             |
 | `-j <path>` | 鸿蒙/Web 可选  | 生成 `R.js`（ESM `export const R = { id:{...}, name:{...}, arrName:[...], arrId:[...] }`）。JS 版本中 ID 与 Name 一一对应。                                                                                                                                                                                   |
 | `idtable`   | 可选开关       | 位置参数（无前缀），置于命令行末尾。启用后 `resource.h` 的 `_R::ID` 匿名枚举生成逻辑会打开**增量稳定性**：仅当 `uires.idx` 以及所有 `<LAYOUT>` / `<SMENU>` / `<SMENUEX>` / 标记了 `buildId="1"` 的资源文件实际修改后（较 `resource.h` 的 `tmResource` 时间戳更新）才重新分配 ID。**强烈建议所有生产构建都加上** **`idtable`**，避免新增一行 XML 导致全部控件 ID 重排，而使得已发布的 `.rc` / `R.js` 发生不兼容变化。 |
@@ -60,7 +72,7 @@ uiresbuilder -i uires.idx [-p uires_prefix] [-r output.rc2] [-h resource.h] [-j 
 ### 最小示例
 
 ```bash
-# Windows 桌面端完整用法（与 SOUI demos/demo 项目一致）
+# 桌面端完整用法（与 SOUI demos/demo 项目一致）
 uiresbuilder.exe ^
     -p uires ^
     -i .\uires\uires.idx ^
@@ -68,14 +80,22 @@ uiresbuilder.exe ^
     -h .\resource.h ^
     idtable
 
-# OpenHarmony ohos-demo：生成 JS 侧 R.js + C++ 侧 resource.h
+# 可选：仅当需要在 JS/TS 侧按 id/name 访问控件时，才额外用 -j 生成 R.js
 uiresbuilder \
     -p uires \
-    -i entry/src/main/resources/rawfile/uires/uires.idx \
-    -h entry/src/main/cpp/include/resource.h \
-    -j entry/src/main/ets/soui/R.js \
+    -i <uires 目录>/uires.idx \
+    -h <头文件输出目录>/resource.h \
+    -j <脚本输出目录>/R.js \
     idtable
 ```
+
+> 说明：仓库内现有的移动端工程（`demos/android-demo`、`demos/ohos-demo`、`games/cnchess/client/{android,ohos}`）
+> **都没有调用本工具**，也不生成 `resource.h` / `.rc2` —— 它们的 CMake 里不出现 `uiresbuilder`。
+> 而**三个桌面端都使用本工具的产物**：`demos/demo`、`demos/uieditor`、`soui-sys-resource`、`games/cnchess/client` 等的 CMake 都是
+> `file(GLOB_RECURSE CURRENT_RC *.rc *.rc2)` + `target_compile_resources()`，**不带任何平台判断**，所以 Windows / Linux / macOS 都会编译并链接同一份 `.rc2`。
+> 仓库里这些 `.rc2` / `resource.h` 是提交进版本库的产物，需要重新生成时，Windows 侧用 `build_rc2.bat`（`games/cnchess/client` 等），
+> 新工程模板 `wizard/CmakeApp` 则用 `add_custom_command(COMMAND ${RESBUILD_EXE} ...)`（同样无平台判断，三端构建时都会执行）。
+> 故上面的 `-j` 示例仅作能力说明，不是现有工程的构建步骤。
 
 无参数 / 缺 `-i` 会打印用法并退出（退出码 `1`）：
 
@@ -277,7 +297,7 @@ export const R = {
 
 ## 与 SOUI demos 集成方式
 
-参考 `demos/demo`（SOUI4 经典桌面示例）、`demos/ohos-demo`（鸿蒙示例）、`games/cnchess`（跨平台示例）这三个工程的 CMakeLists / PreBuild 步骤，通常以**构建前事件**运行：
+参考 `demos/demo`、`soui-sys-resource`、`games/cnchess`（三个桌面端通用）、`wizard/CmakeApp`（新工程模板）等工程的 CMakeLists / PreBuild 步骤，通常以**构建前事件**运行。这些 CMake 都不做平台判断，因此 Windows / Linux / macOS 构建时都会生成并消费 `.rc2` / `resource.h`：
 
 ```cmake
 # CMakeLists.txt 片段：编译 demo 前生成 resource.h + soui_res.rc2
@@ -300,6 +320,23 @@ Visual Studio `.vcxproj` 可以用同样方式写 `<CustomBuildStep>`：
 <Outputs>res\soui_res.rc2;resource.h</Outputs>
 <Inputs>uiresbuilder.exe;uires\uieres.idx</Inputs>
 ```
+
+***
+
+## 与 uiresImporter 的分工
+
+两者都围绕 `uires.idx` 工作，但方向相反，不要混用：
+
+| 工具 | 对 `uires.idx` 的态度 | 做什么 | 何时用 |
+| --- | --- | --- | --- |
+| `uiresImporter`（`tools/src/uiresImporter`） | **写**（回写） | 读入**已存在**的 `uires.idx`，按 `-s <子目录>\|...` 重新扫描并重建这些类型节点、按 `-i <图片目录>` 追加图片条目，保存回 `uires.idx`（可选备份为 `uires.bak.idx`），同时把图片补进 `values/skin.xml` | 成批新增图片、需要批量刷新某个资源类型节点时 |
+| `uiresbuilder`（本工具） | **只读**（输入） | 以 `uires.idx` 为输入，生成 `.rc2` / `resource.h` / `R.js` | 三个桌面端（Windows / Linux / macOS）构建前处理资源（PRE_BUILD / CustomBuildStep）；移动端构建不使用 |
+
+要点：
+
+- 两个工具**都不会从零创建** `uires.idx`：`<resource>` 根节点、`<LAYOUT>` / `<values>` / `<UIDEF>` 等类型分组都需手写。
+- `uiresImporter` 只处理你显式列出的类型（`-s` 的子目录名 = 资源类型名）与图片目录，**不碰** `<LAYOUT>` 里的逐条布局登记。
+- 只跑了 `uiresImporter` 而没有在桌面端跑 `uiresbuilder`，`.rc2` / `resource.h` 就不会更新 —— 反之亦然，二者互不替代。
 
 ***
 

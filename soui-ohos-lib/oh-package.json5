@@ -1,0 +1,11 @@
+{
+  "name": "@soui/ohos",
+  "version": "1.0.0",
+  "description": "SOUI for OpenHarmony/HarmonyOS NEXT platform adapter (ArkTS layer, HAR).",
+  "main": "Index.ets",
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "libsoui4ohos.so": "file:./src/main/cpp/types/libsoui4ohos"
+  }
+}

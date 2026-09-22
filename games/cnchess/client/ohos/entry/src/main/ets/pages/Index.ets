@@ -8,7 +8,7 @@
  * → C++ 层 ScreenStartup → 创建 SHostWnd（CMainDlg）并显示。
  */
 
-import { SouiScreen } from '../soui/SouiScreen';
+import { SouiScreen } from '@soui/ohos';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 
 const DOMAIN = 0x5350;

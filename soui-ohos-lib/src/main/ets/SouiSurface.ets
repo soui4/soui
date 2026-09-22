@@ -39,7 +39,7 @@ const TOUCH_MOVE = 2;
 const TOUCH_CANCEL = 3;
 
 const DOMAIN = 0x5350;
-const TAG = 'SouiSurface';
+const TAG = './SouiSurface';
 
 //
 // SOUI 渲染 Surface 模型。@Observed 装饰使视觉属性变化可被 ArkUI 观察。

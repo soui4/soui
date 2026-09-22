@@ -19,6 +19,20 @@ add_definitions(-D_CRT_SECURE_NO_WARNINGS
 
 if (NOT CMAKE_SYSTEM_NAME MATCHES Windows)
 	add_compile_options(-Wno-invalid-offsetof)
+	# msftedit(richedit41) 是第三方 vendored 代码，存在大量 &&/||、&/^ 混用的
+	# 风格性警告（-Wlogical-op-parentheses 等）。这些表达式按 C++ 优先级本就计算
+	# 正确，只是缺少显式括号。在源码里逐处加括号既脱离实际又容易改错，这里统一在
+	# 构建层关闭的本文件作用域（仅影响本 target 及其子目录，不波及 SOUI 代码）。
+	add_compile_options(
+		-Wno-logical-op-parentheses  # && 于 || 未加括号
+		-Wno-shorten-64-to-32        # 64->32 隐式窄化
+		-Wno-unused-value            # 表达式结果未使用（如 for 子句命名变量）
+		-Wno-parentheses             # 赋值作条件等
+		-Wno-unsequenced             # 同表达式内无序列副作用
+		-Wno-undefined-var-template  # 模板静态成员未实例化
+		-Wno-constant-conversion     # 常量到较小类型的有损转换（如 TOM 高位枚举）
+		-Wno-tautological-constant-out-of-range-compare  # 常量比较恒定越界
+	)
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -w")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -w")
 endif()
