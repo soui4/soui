@@ -340,7 +340,7 @@ int _tmain(int argc, TCHAR* argv[])
 }
 
 #if !defined(_WIN32) || defined(__MINGW32__)
-int main(int argc, char** argv)
+int main(int argc, TCHAR** argv)
 {
     return _tmain(argc, argv);
 }
