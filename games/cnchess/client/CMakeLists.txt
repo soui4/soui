@@ -2,6 +2,8 @@ if(CMAKE_SYSTEM_NAME MATCHES "iOS")
 add_definitions(-D__MOBILE__)
 endif()
 
+set(CMAKE_CXX_STANDARD 11)
+
 # Include directories
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${PROJECT_SOURCE_DIR})

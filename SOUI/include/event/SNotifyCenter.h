@@ -6,7 +6,7 @@
 #include <interface/SNotifyCenter-i.h>
 #include <event/SEventSet.h>
 
-#if !defined(_WIN32) || _MSC_VER >= 1700 /**< VS2012 */
+#if __cplusplus >= 201103L
 #define ENABLE_RUNONUI
 #endif
 #ifdef ENABLE_RUNONUI

@@ -188,7 +188,7 @@ BOOL SEventSet::unsubscribeEvent(DWORD dwEventID, const IEvtSlot *subscriber)
     return GetEventObject(dwEventID)->unsubscribe(subscriber);
 }
 
-#if _MSC_VER >= 1700 /**< VS2012 */
+#if __cplusplus >= 201103L
 BOOL SEventSet::subscribeEvent(DWORD dwEventID, const StdFunCallback &eventCallback)
 {
     if (!isEventPresent(dwEventID))

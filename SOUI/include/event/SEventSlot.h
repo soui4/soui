@@ -4,7 +4,7 @@
 #include <interface/SEvtArgs-i.h>
 #include <helper/obj-ref-impl.hpp>
 
-#if !defined(_WIN32) || _MSC_VER >= 1700
+#if __cplusplus >= 201103L
 #define ENABLE_STDFUNCTOR 1
 #else
 #define ENABLE_STDFUNCTOR 0

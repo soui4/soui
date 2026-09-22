@@ -5,7 +5,7 @@
 #include <interface/SMsgLoop-i.h>
 #include <interface/SWndContainer-i.h>
 #include <helper/obj-ref-impl.hpp>
-#if !defined(_WIN32) || _MSC_VER >= 1700
+#if __cplusplus >= 201103L
 #define ENABLE_STD_FUNCTIONAL 1
 #else
 #define ENABLE_STD_FUNCTIONAL 0
