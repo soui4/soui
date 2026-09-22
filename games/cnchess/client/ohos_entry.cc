@@ -34,7 +34,7 @@ using namespace SNS;
 #include "myprofile.h"
 #include <gif/SSkinAni.h>
 #include <gif/SGifPlayer.h>
-
+#include <SRatingBar.h>
 #define kLogTag "cnchess-ohos"
 
 class CnchessOhosApp : public Soui4OhosEntry {
@@ -70,7 +70,7 @@ BOOL CnchessOhosApp::InitApp(SouiOhosAssetManager assetMgr, LPCSTR pszAssetDir) 
     m_souiApp->RegisterWindowClass<SGifPlayer>();
     m_souiApp->RegisterWindowClass<CChessBoard>();
     m_souiApp->RegisterWindowClass<CChessPiece>();
-
+    m_souiApp->RegisterWindowClass<SRatingBar>();
     SAppCfg cfg;
     cfg.SetRender(Render_Skia)
             .SetImgDecoder(ImgDecoder_Stb)

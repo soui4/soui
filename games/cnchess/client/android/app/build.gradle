@@ -21,6 +21,7 @@ android {
                 // native 由本 app 通过 soui4_android.cmake 统一编译（见 app/src/main/cpp/CMakeLists.txt），
                 cppFlags "-std=c++17 -fexceptions -frtti"
                 arguments "-DANDROID_STL=c++_shared",
+                        "-DCMAKE_BUILD_TYPE=RelWithDebInfo",
                         "-DSOUI_ROOT_DIR=${rootDir.absolutePath.replace('\\', '/')}/../../../../",
                         "-DSOUI_ANDROID_LIB_CPP_DIR=${project(':soui-android-lib').projectDir.absolutePath.replace('\\', '/')}/src/main/cpp",
                         "-DSOUI_CONTROLS_EXTEND_DIR=${rootDir.absolutePath.replace('\\', '/')}/../../../../controls.extend",

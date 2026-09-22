@@ -18,6 +18,7 @@ using namespace SOUI;
 #include <helper/slog.h>
 #include <gif/SSkinAni.h>
 #include <gif/SGifPlayer.h>
+#include <SRatingBar.h>
 
 #define kLogTag "cnchess-jni"
 
@@ -52,7 +53,7 @@ BOOL CnchessAndroidApp::InitApp(AAssetManager* assetMgr, LPCSTR pszAssetDir) {
     m_souiApp->RegisterWindowClass<SGifPlayer>();
     m_souiApp->RegisterWindowClass<CChessBoard>();
     m_souiApp->RegisterWindowClass<CChessPiece>();
-
+    m_souiApp->RegisterWindowClass<SRatingBar>();
     SAppCfg cfg;
     cfg.SetRender(Render_Skia)
             .SetImgDecoder(ImgDecoder_Stb)
