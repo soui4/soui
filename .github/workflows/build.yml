@@ -60,7 +60,7 @@ jobs:
 
     - name: Install dependencies (Ubuntu)
       if: startsWith(matrix.dist, 'ubuntu')
-      run: sudo apt-get update && sudo apt install -y cmake  build-essential libxcb1-dev libxcb-render0-dev uuid-dev libasound2-dev libgl1-mesa-dev freeglut3-dev pkg-config mingw-w64 --fix-missing
+      run: sudo apt-get update && sudo apt install -y cmake  build-essential xvfb libxcb1-dev libxcb-render0-dev uuid-dev libasound2-dev libgl1-mesa-dev freeglut3-dev pkg-config mingw-w64 --fix-missing
 
     - name: Install dependencies (macOS)
       if: matrix.os == 'macOS'
@@ -70,12 +70,12 @@ jobs:
 
     - name: Configure CMake (Linux x64)
       if: matrix.os == 'Linux' && matrix.arch == 'x64'
-      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DSOUI_FUN_TEST_POST_BUILD=OFF
 
     - name: Configure CMake (Linux arm64)
       if: matrix.os == 'Linux' && matrix.arch == 'arm64'
       run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
-            -DPNG_HARDWARE_OPTIMIZATIONS=OFF
+            -DPNG_HARDWARE_OPTIMIZATIONS=OFF  -DSOUI_FUN_TEST_POST_BUILD=OFF
 
     - name: Configure CMake (Windows)
       if: matrix.os == 'Windows' && matrix.platform == ''
@@ -110,7 +110,12 @@ jobs:
       if: matrix.os == 'macOS'
       run: ninja -C build
 
+    - name: Run unit, integration and core E2E checks (Linux, under Xvfb)
+      if: matrix.os == 'Linux'
+      run: xvfb-run -a ctest --test-dir build -L '^soui-headless$' --output-on-failure
+
     - name: Run unit, integration and core E2E checks
+      if: matrix.os != 'Linux'
       run: ctest --test-dir build -L '^soui-headless$' --output-on-failure
 
     - name: Create file structure (Windows)
