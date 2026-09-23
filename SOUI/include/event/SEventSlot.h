@@ -4,7 +4,7 @@
 #include <interface/SEvtArgs-i.h>
 #include <helper/obj-ref-impl.hpp>
 
-#if __cplusplus >= 201103L
+#if __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1700)
 #define ENABLE_STDFUNCTOR 1
 #else
 #define ENABLE_STDFUNCTOR 0
@@ -12,7 +12,7 @@
 
 #if ENABLE_STDFUNCTOR
 #include <functional>
-#endif
+#endif//ENABLE_STDFUNCTOR
 
 SNSBEGIN
 

@@ -161,7 +161,7 @@ class SOUI_EXP SEventSet {
      */
     BOOL subscribeEvent(DWORD dwEventID, const IEvtSlot *subscriber);
 
-#if __cplusplus >= 201103L
+#if ENABLE_STDFUNCTOR
     /**
      * @brief Subscribe to event (using standard function callback)
      * @param dwEventID event ID

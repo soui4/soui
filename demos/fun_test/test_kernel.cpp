@@ -11,9 +11,9 @@
 #include <tchar.h>
 
 #if __cplusplus >= 201103L
-#define SWINX_TEST_HAS_CPP11 0
-#else
 #define SWINX_TEST_HAS_CPP11 1
+#else
+#define SWINX_TEST_HAS_CPP11 0
 #endif
 
 #if SWINX_TEST_HAS_CPP11

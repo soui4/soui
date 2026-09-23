@@ -6,7 +6,7 @@
 #include <interface/SNotifyCenter-i.h>
 #include <event/SEventSet.h>
 
-#if __cplusplus >= 201103L
+#if ENABLE_STDFUNCTOR
 #define ENABLE_RUNONUI
 #endif
 #ifdef ENABLE_RUNONUI

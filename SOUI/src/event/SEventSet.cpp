@@ -188,7 +188,7 @@ BOOL SEventSet::unsubscribeEvent(DWORD dwEventID, const IEvtSlot *subscriber)
     return GetEventObject(dwEventID)->unsubscribe(subscriber);
 }
 
-#if __cplusplus >= 201103L
+#if ENABLE_STDFUNCTOR
 BOOL SEventSet::subscribeEvent(DWORD dwEventID, const StdFunCallback &eventCallback)
 {
     if (!isEventPresent(dwEventID))

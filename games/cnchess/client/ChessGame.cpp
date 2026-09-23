@@ -644,13 +644,16 @@ void CChessGame::Init(SWindow *pGameHost, WebSocketClient *pWs)
         SWindow *pFx = sobj_cast<SWindow>(m_pTheme->GetWidget(kFxWidgetNames[i]));
         m_pGameBoard->InsertIChild(pFx);
         pFx->AddRef();
-        pFx->SubscribeEvent(EventSwndAnimationStop::EventID,
-            [this, pFx](IEvtArgs *e){
-                HideGameFx(pFx);
-                return TRUE;
-            });
+		pFx->SubscribeEvent(EventSwndAnimationStop::EventID, &Subscriber(&CChessGame::OnFxAnimationStop, this));
     }
     OnStageChanged(STAGE_CONNECTING);
+}
+
+BOOL CChessGame::OnFxAnimationStop(IEvtArgs *e)
+{
+    SWindow *pFx = sobj_cast<SWindow>(e->Sender());
+    HideGameFx(pFx);
+    return TRUE;
 }
 
 void CChessGame::OnBtnStart()
