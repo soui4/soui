@@ -644,7 +644,8 @@ void CChessGame::Init(SWindow *pGameHost, WebSocketClient *pWs)
         SWindow *pFx = sobj_cast<SWindow>(m_pTheme->GetWidget(kFxWidgetNames[i]));
         m_pGameBoard->InsertIChild(pFx);
         pFx->AddRef();
-		pFx->SubscribeEvent(EventSwndAnimationStop::EventID, &Subscriber(&CChessGame::OnFxAnimationStop, this));
+        auto slot = Subscriber(&CChessGame::OnFxAnimationStop, this);
+		pFx->SubscribeEvent(EventSwndAnimationStop::EventID, &slot);
     }
     OnStageChanged(STAGE_CONNECTING);
 }
