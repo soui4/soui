@@ -1,7 +1,11 @@
 #
 # 1394020320@qq.com
 #
-if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+# NOTE: clang-cl is a drop-in MSVC-compatible driver on Windows.  CMake reports
+# CMAKE_CXX_COMPILER_ID == "Clang" for it while MSVC == TRUE, so the test must be on
+# the MSVC variable and not on the compiler id -- otherwise clang-cl falls into the
+# GNU/POSIX branch below and wrongly gets -msse4.1 / -DSK_USE_POSIX_THREADS on Windows.
+if(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4355 /wd4225 /wd4244 /wd4996")
   if(MSVC_VERSION LESS 1600)
       include_directories(${PROJECT_SOURCE_DIR}/third-part/stdint)
@@ -1014,7 +1018,12 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "Android")
 endif()
 #message("...........plat....${CMAKE_GENERATOR_PLATFORM}")
 if(BUILD_FOR_ARM)
-    if(MSVC)
+    if(MSVC AND NOT CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        # Genuine MSVC on Windows-on-ARM64.  Its NEON vector types are union / __n64
+        # wrappers with NO C++ operator support (| & + - += ...), while the skia NEON
+        # sources (especially the shared SkColor_opts_neon.h) are written in GCC/clang
+        # operator style.  Therefore only the scalar fallbacks can be built here; this
+        # is deliberate, not an oversight.  Use clang-cl (see the branch below) for SIMD.
         set(srcs
             ${srcs}
             "src/opts/SkXfermode_opts_none.cpp"
@@ -1026,11 +1035,12 @@ if(BUILD_FOR_ARM)
             "src/opts/SkBlitMask_opts_none.cpp"
         )
     else()
+        # GCC / Clang, including clang-cl on Windows-on-ARM64.  Here the NEON types are
+        # native vectors with full operator support, so the real NEON implementation is
+        # compiled.  Note: CMake reports MSVC==TRUE for clang-cl as well, hence the
+        # compiler-id check above to keep the two worlds apart.
         set(srcs
             ${srcs}
-            "src/opts/memset.arm.S"
-        #    "src/opts/memset16_neon.S"
-        #    "src/opts/memset32_neon.S"
             "src/opts/SkBitmapProcState_arm_neon.cpp"
             "src/opts/SkBitmapProcState_matrixProcs_neon.cpp"
             "src/opts/SkBitmapProcState_opts_arm.cpp"
@@ -1044,11 +1054,26 @@ if(BUILD_FOR_ARM)
             "src/opts/SkMorphology_opts_neon.cpp"
             "src/opts/SkTextureCompression_opts_arm.cpp"
             "src/opts/SkTextureCompression_opts_neon.cpp"
-            "src/opts/SkUtils_opts_arm.cpp"
             "src/opts/SkXfermode_opts_arm_neon.cpp"
             "src/opts/SkXfermode_opts_arm.cpp"
         )
-    endif(MSVC)
+        if(NOT MSVC)
+            # GNU as syntax, only assembleable by GNU-style toolchains.
+            set(srcs
+                ${srcs}
+                "src/opts/memset.arm.S"
+                "src/opts/SkUtils_opts_arm.cpp"
+            )
+        else()
+            # clang-cl cannot assemble the GNU as .S sources, and SkUtils_opts_arm.cpp
+            # references memset16_neon/arm_memset16 defined there, so keep the scalar
+            # fallback instead (it returns NULL from every query, which is fine).
+            set(srcs
+                ${srcs}
+                "src/opts/SkUtils_opts_none.cpp"
+            )
+        endif()
+    endif()
 else()
     set(srcs
         ${srcs}

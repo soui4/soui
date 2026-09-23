@@ -403,10 +403,14 @@
 #  endif
 #endif
 
+// ARM64 is weakly ordered and therefore needs real memory barriers rather than the
+// compiler-only barrier provided by SkBarriers_x86.h.  MSVC does not define SK_CPU_ARM64
+// (it uses _M_ARM64), so accept that spelling explicitly here.
 #ifndef SK_BARRIERS_PLATFORM_H
 #  if SK_HAS_COMPILER_FEATURE(thread_sanitizer)
 #    define SK_BARRIERS_PLATFORM_H "../../src/ports/SkBarriers_tsan.h"
-#  elif defined(SK_CPU_ARM32) || defined(SK_CPU_ARM64)
+#  elif defined(SK_CPU_ARM32) || defined(SK_CPU_ARM64) \
+        || (defined(_MSC_VER) && defined(_M_ARM64))
 #    define SK_BARRIERS_PLATFORM_H "../../src/ports/SkBarriers_arm.h"
 #  else
 #    define SK_BARRIERS_PLATFORM_H "../../src/ports/SkBarriers_x86.h"
