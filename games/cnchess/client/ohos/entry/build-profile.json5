@@ -1,5 +1,6 @@
 {
   "apiType": "stageMode",
+  "signingConfig": "release",
   "buildOption": {
     "resOptions": {
       "copyCodeResource": {
