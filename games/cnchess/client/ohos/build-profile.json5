@@ -1,10 +1,24 @@
 {
   "app": {
     "signingConfigs": [
+      {
+        "name": "release",
+        "type": "HarmonyOS",
+        "material": {
+          "storeFile": "D:/soui4.p12",
+          "storePassword": "00000019F65D1F15651BB9552760A63007F87D1C0A2F5A04B5C05AE6107244F90014E5EAD2954A92F5",
+          "keyAlias": "soui4",
+          "keyPassword": "000000193BFECC978E253B177371F5E3460898E0AA5BF757204BC42C0D80A0B9FCA52DFFD671060788",
+          "signAlg": "SHA256withECDSA",
+          "profile": "D:/1.0Release.p7b",
+          "certpath": "D:/soui4.cer"
+        }
+      }
     ],
     "products": [
       {
         "name": "default",
+        "signingConfig": "release",
         "targetSdkVersion": "6.1.1(24)",
         "compatibleSdkVersion": "6.1.1(24)",
         "runtimeOS": "HarmonyOS",

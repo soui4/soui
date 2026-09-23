@@ -83,6 +83,7 @@ public:
      */
     void Init(SWindow *pGameBoard, WebSocketClient *pWs);
 
+
     /**
      * @brief 将玩家索引转换为座位索引
      * @param nIndex 玩家索引
@@ -296,6 +297,7 @@ protected:
      */
     void ShowGameFx(int nFx);
     void HideGameFx(IWindow *pFx);
+    BOOL OnFxAnimationStop(IEvtArgs* e);
     UINT GetFarthestRepeat(CHESSMAN & chsEnemy); //计算当前步最远的一次重复走棋，在计算长捉时使用
     BOOL CheckMove(POINT ptFrom,POINT ptTo, BOOL bSilent=FALSE);
 private:

@@ -10,20 +10,10 @@
 #include <string>
 #include <tchar.h>
 
-// ---------------------------------------------------------------------------
-// C++11 feature detection.
-//
-// <atomic>, <chrono>, <thread>, std::thread, lambdas and 'auto' are C++11;
-// the stock VS2008 toolchain (_MSC_VER 1500) provides none of them. When the
-// compiler lacks C++11 support the affected test cases below are excluded so
-// the file still compiles.
-//   - MSVC      : VS2012+ (_MSC_VER >= 1700) ships the C++11 standard library.
-//   - GCC/Clang : assume C++11 support.
-// ---------------------------------------------------------------------------
-#if defined(_MSC_VER) && _MSC_VER < 1700
-#define SWINX_TEST_HAS_CPP11 0
-#else
+#if __cplusplus >= 201103L
 #define SWINX_TEST_HAS_CPP11 1
+#else
+#define SWINX_TEST_HAS_CPP11 0
 #endif
 
 #if SWINX_TEST_HAS_CPP11

@@ -191,7 +191,7 @@ FontInfo SFontPool::FontInfoFromString(const SStringW &strFontDesc, const FontIn
         {
             SLayoutSize layoutSize;
             layoutSize.parseString(kv[1]);
-            fi.style.attr.nSize = (short)abs(layoutSize.fSize);
+            fi.style.attr.nSize = (short)fabs(layoutSize.fSize);
             fi.style.attr.szUnit = (int)layoutSize.unit;
             fi.style.attr.szIsAdding = 0;
         }

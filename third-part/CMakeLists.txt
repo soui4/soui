@@ -97,6 +97,13 @@ if(SOUI_BUILD_WS)
         set(LWS_WITH_STATIC ON)
         set(LWS_WITH_SHARED OFF)
         set(LWS_STATIC_PIC ON)
+        if(MSVC AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+            # Unlike cl.exe (which merely ignores -Werror), clang-cl enforces it, and this
+            # vendored libwebsockets snapshot trips -Wsign-compare in
+            # lib/roles/http/header.c.  Keep third-party warnings from becoming build
+            # failures; this only affects the clang-cl toolset.
+            set(DISABLE_WERROR ON CACHE BOOL "Avoid treating compiler warnings as fatal errors" FORCE)
+        endif()
         message("---Building with libwebsockets")
         add_subdirectory(libwebsockets)
 endif()

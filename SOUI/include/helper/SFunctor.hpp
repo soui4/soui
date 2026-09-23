@@ -5,15 +5,7 @@
 #include <interface/SMsgLoop-i.h>
 #include <interface/SWndContainer-i.h>
 #include <helper/obj-ref-impl.hpp>
-#if !defined(_WIN32) || _MSC_VER >= 1700
-#define ENABLE_STD_FUNCTIONAL 1
-#else
-#define ENABLE_STD_FUNCTIONAL 0
-#endif
-
-#if ENABLE_STD_FUNCTIONAL
-#include <functional>
-#endif
+#include <event/SEventSlot.h>
 
 #ifndef __PRETTY_FUNCTION__
 #define __PRETTY_FUNCTION__ __FUNCTION__
@@ -46,7 +38,7 @@ class SRunnable : public TObjRefImpl<IRunnable> {
         return __PRETTY_FUNCTION__;                     \
     }
 
-#if ENABLE_STD_FUNCTIONAL
+#if ENABLE_STDFUNCTOR
 
 class StdRunnable : public SRunnable {
     IMPL_GETCLASSINFO
@@ -75,7 +67,7 @@ class StdRunnable : public SRunnable {
   protected:
     std::function<void(void)> _func;
 };
-#endif /**< ENABLE_STD_FUNCTIONAL */
+#endif /**< ENABLE_STDFUNCTOR */
 
 template <typename TClass, typename Func>
 class SFunctor0 : public SRunnable {
@@ -575,7 +567,7 @@ class StaticSFunctor5 : public SRunnable {
 
 class STaskHelper {
   public:
-#if ENABLE_STD_FUNCTIONAL
+#if ENABLE_STDFUNCTOR
     ///////////////////////////////////////////////////////////////////////
     /** Lambda support for IMessageLoop */
     template <typename Func, typename... Args>
@@ -614,7 +606,7 @@ class STaskHelper {
         return pTaskLoop->postTask(&runnable, waitUntilDone, nPriority);
         return 0;
     }
-#endif /**< ENABLE_STD_FUNCTIONAL */
+#endif /**< ENABLE_STDFUNCTOR */
 
     ///////////////////////////////////////////////////////////////////////
     /** Original member function support */

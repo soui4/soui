@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-
+set(CMAKE_CXX_STANDARD 11)
 include_directories(${SOUI_ROOT_DIR}/utilities/include)
 include_directories(${SOUI_ROOT_DIR}/SOUI/include)
 
