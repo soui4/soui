@@ -647,6 +647,10 @@ void Editor::SetSelection(SelectionPosition currentPos_, SelectionPosition ancho
 		RedrawSelMargin();
 	}
 	QueueIdleWork(WorkNeeded::workUpdateUI);
+	// Caret position changed: push it to the platform (headless hosts rely on
+	// this to keep the DUI caret in sync, e.g. after Undo/Redo when no
+	// InvalidateCaret/Redraw is issued).
+	UpdateSystemCaret();
 }
 
 void Editor::SetSelection(int currentPos_, int anchor_) {
@@ -675,6 +679,7 @@ void Editor::SetSelection(SelectionPosition currentPos_) {
 		RedrawSelMargin();
 	}
 	QueueIdleWork(WorkNeeded::workUpdateUI);
+	UpdateSystemCaret();
 }
 
 void Editor::SetSelection(int currentPos_) {
@@ -697,6 +702,7 @@ void Editor::SetEmptySelection(SelectionPosition currentPos_) {
 		RedrawSelMargin();
 	}
 	QueueIdleWork(WorkNeeded::workUpdateUI);
+	UpdateSystemCaret();
 }
 
 void Editor::SetEmptySelection(int currentPos_) {
@@ -936,6 +942,10 @@ void Editor::ScrollTo(int line, bool moveThumb) {
 		if (moveThumb) {
 			SetVerticalScrollPos();
 		}
+		// Push the new caret viewport position to the host after a vertical
+		// scroll. The headless caret is owned by the upper layer, so do not rely
+		// on the Redraw path alone (scroll blits may skip it). Base no-op.
+		UpdateSystemCaret();
 	}
 }
 
@@ -953,6 +963,9 @@ void Editor::HorizontalScrollTo(int xPos) {
 		ContainerNeedsUpdate(SC_UPDATE_H_SCROLL);
 		SetHorizontalScrollPos();
 		RedrawRect(GetClientRectangle());
+		// Push the new caret viewport position to the host after a horizontal
+		// scroll; RedrawRect does not push. Base no-op.
+		UpdateSystemCaret();
 	}
 }
 
@@ -1761,8 +1774,6 @@ void Editor::Paint(Surface *surfaceWindow, PRectangle rcArea) {
 			}
 		}
 	}
-
-	NotifyPainted();
 }
 
 // This is mostly copied from the Paint method but with some things omitted

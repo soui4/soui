@@ -1,54 +1,91 @@
-<?xml version="1.0" encoding="utf-8"?>
-  <tabctrl size="-2,-2" animateSteps="10" animateType="1" tabAlign="left" tabInterSize="2" tabWidth="150" iconSkin="skin_small_icons" icon-x="5" icon-y="8" colorText="#000000bb">
-    <page title="controls">
-      <gifplayer pos="10,10" skin="gif_horse" name="giftest" show="1"/>
-      <button width="250" height="30" name="btnSelectGif">load gif file</button>
-      <gifplayer pos="10,150" skin="gif_penguin" show="1" id="1000" name="gif_test"/>
-      <icon pos="[10,{0" src="ICON_LOGO:64"/>
-      <gifplayer pos="[10,{0" skin="apng_haha" />
-      <animateimg pos="[10,{0" skin="skin_page_icons" autoStart="1"/>
-      <scrolltext show="1" pos="{0,[10,@200,@30" rollType="1" colorText="#ff0000" speed="10">Pay attention! apng would be played only if imgdecoder-stb is used here!</scrolltext>
-    </page>
-    <page title="interpolator">
-      <combobox pos="10,10,@300,@30" name="cbx_interpolator" dropdown="1" class="cls_edit">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  page_animator.xml - 动画演示分区
+
+  controls 页按行组织动图演示:第一行为 GIF(horse)与"加载本地 GIF"按钮,
+  第二行为企鹅 GIF / LOGO 图标 / APNG / 多帧动画,第三行为滚动字幕;
+  素材固有尺寸:horse 93x70、penguin 120x95、apng 188x103、page_icons 帧 48x48。
+  interpolator 页演示插值算法对动画曲线的影响。
+  giftest/gif_test/btnSelectGif/cbx_interpolator/view_interpolator 的
+  name 被 MainDlg_Misc.cpp / MainDlg_Animation.cpp 引用,不可改动。
+-->
+<tabctrl size="-2,-2" colorBkgnd="@color/clr_page_bg" colorText="@color/clr_title" animateSteps="10" animateType="1" tabAlign="left" tabInterSize="2" tabWidth="150" iconSkin="svg_tab_animator" icon-x="6" icon-y="5">
+  <page title="controls" iconIndex="0" layout="vbox" padding="15,12,15,15" interval="12">
+    <text text="动图播放" font="size:16,bold:1" colorText="@color/clr_title"/>
+    <text text="GIF / APNG 播放与滚动字幕，点击按钮可加载本地 GIF 文件" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
+    <window size="-2,-1" padding="14,12,14,12" layout="vbox" interval="14">
+      <window size="-2,-1" layout="hbox" interval="20" gravity="center">
+        <gifplayer size="93,70" skin="gif_horse" name="giftest" show="1" layout_gravity="center"/>
+        <button size="250,30" name="btnSelectGif" layout_gravity="center">load gif file</button>
+      </window>
+      <window size="-2,-1" layout="hbox" interval="20" gravity="center">
+        <gifplayer size="120,95" skin="gif_penguin" show="1" id="1000" name="gif_test"/>
+        <icon src="ICON_LOGO:64" size="64,64" layout_gravity="center"/>
+        <gifplayer size="188,103" skin="apng_haha"/>
+        <animateimg size="48,48" skin="skin_page_icons" autoStart="1" layout_gravity="center"/>
+      </window>
+    </window>
+    <window size="-2,0" weight="1" padding="14,12,14,12" layout="vbox" interval="8" gravity="fill">
+      <text text="scrolltext 滚动字幕测试" font="size:13,bold:1" colorText="@color/clr_title"/>
+      <window size="-2,0" weight="1" padding="14,12,14,12" layout="hbox" interval="8" gravity="fill">
+        <window size="0,-2" weight="1" layout="vbox" interval="8">
+          <text text="单行超宽 rollType=0：首尾衔接的循环水平滚动" font="size:12" colorText="@color/clr_text_sub"/>
+          <scrolltext size="-2,-1" rollType="0" colorText="@color/clr_primary" speed="10">这是单行超宽时的水平滚动演示，内容很长很长，以首尾衔接的方式循环滚动展示。</scrolltext>
+          <text text="单行超宽 rollType=1：滚到末尾后回到起点" font="size:12" colorText="@color/clr_text_sub"/>
+          <scrolltext size="-2,-1" rollType="1" colorText="@color/clr_primary" speed="10">单行非衔接水平滚动：滚动到文本末尾后回到起点，用于观察非衔接效果。</scrolltext>
+          <text text="多行 rollType=0 staytime=1500：逐行垂直滚动并回环" font="size:12" colorText="@color/clr_text_sub"/>
+          <scrolltext size="-2,-1" colorText="@color/clr_primary" speed="10" staytime="1500" rollType="0">第一行内容\n第二行内容\n第三行内容\n第四行内容</scrolltext>
+        </window>
+        <window size="0,-2" weight="1" layout="vbox" interval="8">
+          <text layout_gravity="left" text="多行含超宽行 rollType=0 staytime=2500：停留期水平展示完整内容" font="size:12" colorText="@color/clr_text_sub"/>
+          <scrolltext size="-2,-1" colorText="@color/clr_primary" speed="10" staytime="2500" rollType="0">短行内容\n这是一条非常非常长的内容，超出了显示宽度，自动水平滚动以展示完整内容\n末尾行回环到首行</scrolltext>
+          <text layout_gravity="left" text="多行 rollType=1 staytime=1500：末行停驻不再滚动" font="size:12" colorText="@color/clr_text_sub"/>
+          <scrolltext  size="-2,-1" colorText="@color/clr_primary" speed="10" staytime="1500" rollType="1">首行\n中间行\n末行显示完成后停驻不再滚动</scrolltext>
+        </window>
+      </window>
+    </window>
+  </page>
+  <page title="interpolator" iconIndex="1" layout="vbox" padding="15,12,15,15" interval="12">
+    <text text="插值器" font="size:16,bold:1" colorText="@color/clr_title"/>
+    <text text="选择插值算法，观察下方滑块的动画曲线差异" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
+    <combobox size="300,30" name="cbx_interpolator" dropdown="1" class="cls_edit">
 		  <dropdownStyle>
 			  <root colorBkgnd="#ffffff"/>
 		  </dropdownStyle>
-        <liststyle class="cls_edit" iconSkin="skin_menuicon" itemHeight="30"/>
-        <items>
-          <item text="SLinearInterpolator" icon="1" data="100"/>
-          <item text="SAccelerateInterpolator" icon="2" data="100"/>
-          <item text="SDecelerateInterpolator" icon="3" data="103"/>
-          <item text="SAccelerateDecelerateInterpolator" icon="4" data="100"/>
-          <item text="SAnticipateInterpolator" icon="5" data="105"/>
-          <item text="SAnticipateOvershootInterpolator" icon="0" data="100"/>
-          <item text="SBounceInterpolator" icon="0" data="100"/>
-          <item text="SCycleInterpolator" icon="0" data="100"/>
-          <item text="SOvershootInterpolator" icon="0" data="100"/>
-          <item text="SQuadInInterpolator" icon="0" data="100"/>
-          <item text="SQuadOutInterpolator" icon="0" data="100"/>
-          <item text="SQuadInOutInterpolator" icon="0" data="100"/>
-          <item text="SQuintInInterpolator" icon="0" data="100"/>
-          <item text="SQuintOutInterpolator" icon="0" data="100"/>
-          <item text="SQuintInOutInterpolator" icon="0" data="100"/>
-          <item text="SCubicInInterpolator" icon="0" data="100"/>
-          <item text="SCubicOutInterpolator" icon="0" data="100"/>
-          <item text="SCubicInOutInterpolator" icon="0" data="100"/>
-          <item text="SSineInInterpolator" icon="0" data="100"/>
-          <item text="SSineOutInterpolator" icon="0" data="100"/>
-          <item text="SSineInOutInterpolator" icon="0" data="100"/>
-          <item text="SExpoInInterpolator" icon="0" data="100"/>
-          <item text="SExpoOutInterpolator" icon="0" data="100"/>
-          <item text="SExpoInOutInterpolator" icon="0" data="100"/>
-          <item text="SBackInInterpolator" icon="0" data="100"/>
-          <item text="SBackOutInterpolator" icon="0" data="100"/>
-          <item text="SBackInOutInterpolator" icon="0" data="100"/>
-        </items>
-      </combobox>
-      <interpolatorView pos="10,[10,-10,@50" colorBkgnd="#cccccc" name="view_interpolator" speed="2"/>
-    </page>
-    <page title="Android动画">
-      <include src="layout:page_ani3"/>
-    </page>
-  </tabctrl>
-
+      <liststyle class="cls_edit" iconSkin="skin_menuicon" itemHeight="30"/>
+      <items>
+        <item text="SLinearInterpolator" icon="1" data="100"/>
+        <item text="SAccelerateInterpolator" icon="2" data="100"/>
+        <item text="SDecelerateInterpolator" icon="3" data="103"/>
+        <item text="SAccelerateDecelerateInterpolator" icon="4" data="100"/>
+        <item text="SAnticipateInterpolator" icon="5" data="105"/>
+        <item text="SAnticipateOvershootInterpolator" icon="0" data="100"/>
+        <item text="SBounceInterpolator" icon="0" data="100"/>
+        <item text="SCycleInterpolator" icon="0" data="100"/>
+        <item text="SOvershootInterpolator" icon="0" data="100"/>
+        <item text="SQuadInInterpolator" icon="0" data="100"/>
+        <item text="SQuadOutInterpolator" icon="0" data="100"/>
+        <item text="SQuadInOutInterpolator" icon="0" data="100"/>
+        <item text="SQuintInInterpolator" icon="0" data="100"/>
+        <item text="SQuintOutInterpolator" icon="0" data="100"/>
+        <item text="SQuintInOutInterpolator" icon="0" data="100"/>
+        <item text="SCubicInInterpolator" icon="0" data="100"/>
+        <item text="SCubicOutInterpolator" icon="0" data="100"/>
+        <item text="SCubicInOutInterpolator" icon="0" data="100"/>
+        <item text="SSineInInterpolator" icon="0" data="100"/>
+        <item text="SSineOutInterpolator" icon="0" data="100"/>
+        <item text="SSineInOutInterpolator" icon="0" data="100"/>
+        <item text="SExpoInInterpolator" icon="0" data="100"/>
+        <item text="SExpoOutInterpolator" icon="0" data="100"/>
+        <item text="SExpoInOutInterpolator" icon="0" data="100"/>
+        <item text="SBackInInterpolator" icon="0" data="100"/>
+        <item text="SBackOutInterpolator" icon="0" data="100"/>
+        <item text="SBackInOutInterpolator" icon="0" data="100"/>
+      </items>
+    </combobox>
+    <interpolatorView size="-2,50" colorBkgnd="@color/clr_divider" name="view_interpolator" speed="2"/>
+  </page>
+  <page title="Android动画" iconIndex="2">
+    <include src="layout:page_ani3"/>
+  </page>
+</tabctrl>

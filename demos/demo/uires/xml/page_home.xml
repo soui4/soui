@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  page_home.xml - 宫格首页(SOUI 功能演示启动器)
+
+  以卡片宫格形式展示 demo 的 7 个演示分区,点击卡片由 CMainDlg::OnNavToPage
+  切换到 tab_main 中对应页面;卡片背景使用 svg_card_bg 三态皮肤实现
+  normal/hover/push 视觉反馈。卡片 name 与页序号的对应关系见 MainDlg_Nav.cpp。
+
+  卡片结构用 XML 内联模板描述:<template name="home_card"> 定义模板体,
+  <t:home_card .../> 引用并实例化,引用节点的属性替换模板体中的 {{attr}} 占位。
+  内联模板须先定义后引用;模板解析见 SWindow::CreateChildren(Swnd.cpp)。
+-->
+<window layout="vbox" size="-2,-2" padding="30,24,30,24" clipClient="1" colorBkgnd="@color/clr_page_bg">
+  <!-- 头部标题区 -->
+  <text layout_gravity="center" text="SOUI 功能演示" font="face:微软雅黑,size:30,bold:1" colorText="@color/clr_title"/>
+  <text layout_gravity="center" extend_top="6" text="选择一个分类,开始体验 SOUI 5 的核心能力" font="size:15" colorText="@color/clr_text_sub"/>
+
+  <!-- 宫格卡片区分4列排布,卡片点击事件统一由 CMainDlg 处理 -->
+  <window size="-2,-1" layout="gridlayout" columnCount="4" interval="16" gravity="center" extend_top="24">
+    <!-- 内联模板:宫格卡片(不创建窗口,仅注册) -->
+    <template name="home_card">
+      <imgbtn name="{{name}}" size="190,150" skin="svg_card_bg" layout="vbox" gravity="center" interval="10" animate="1">
+        <window size="0,0" weight="1"/>
+        <img size="48,48" skin="svg_home_icons" iconIndex="{{icon}}" msgTransparent="1"/>
+        <text text="{{title}}" font="size:17,bold:1" colorText="@color/clr_title" msgTransparent="1"/>
+        <text text="{{desc}}" font="size:12" colorText="@color/clr_text_sub" msgTransparent="1"/>
+        <window size="0,0" weight="1"/>
+      </imgbtn>
+    </template>
+    <t:home_card name="card_ctrls" icon="0" title="基础控件" desc="列表 / 树 / 编辑器等 18 种控件"/>
+    <t:home_card name="card_webkit" icon="1" title="教程" desc="基于 WKE 的内嵌网页浏览器"/>
+    <t:home_card name="card_animator" icon="2" title="动画" desc="GIF / APNG 动图播放演示"/>
+    <t:home_card name="card_layout" icon="3" title="布局" desc="线性 / 网格 / 模板布局能力"/>
+    <t:home_card name="card_misc" icon="4" title="杂项" desc="脚本 / 拖放 / 矩阵变换 / SVG 等"/>
+    <t:home_card name="card_skia" icon="5" title="Skia" desc="Skia 渲染高级特性演示"/>
+    <t:home_card name="card_about" icon="6" title="关于" desc="版本信息与社区链接"/>
+  </window>
+</window>

@@ -77,6 +77,7 @@ BOOL SDropDownWnd::Create(LPCRECT lpRect, IXmlNode *pInitXml, DWORD dwStyle, DWO
         return FALSE;
     GetMsgLoop()->AddMessageFilter(this);
     m_pOwner->OnCreateDropDown(this);
+    // SSLOGI()<<"SDropDownWnd::Create, m_hWnd="<<m_hWnd<<" hwnd="<<hWnd;
     return TRUE;
 }
 
@@ -131,6 +132,7 @@ void SDropDownWnd::EndDropDown(UINT uCode)
     if (m_uExitCode != IDINIT)
         return;
     m_uExitCode = uCode;
+    // SSLOGI()<<"SDropDownWnd::EndDropDown,m_hWnd="<<m_hWnd<<" code="<<uCode;
     SNativeWnd::DestroyWindow();
 }
 

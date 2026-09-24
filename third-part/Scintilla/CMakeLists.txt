@@ -23,6 +23,7 @@ add_definitions(-DSCI_LEXER -DSTATIC_BUILD -D_CRT_SECURE_NO_WARNINGS)
 add_library(Scintilla STATIC ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_RC})
 
 if (NOT CMAKE_SYSTEM_NAME MATCHES Windows)
+    target_compile_options(Scintilla PRIVATE -fPIC)
    add_dependencies(Scintilla swinx)
 endif()
 set(OPTION_LIBS ${OPTION_LIBS} Scintilla CACHE INTERNAL "option_lib")

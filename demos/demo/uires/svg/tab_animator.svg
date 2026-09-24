@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="60" height="20" viewBox="0 0 60 20">
+  <!-- frame 0: animation controls (play) -->
+  <circle cx="10" cy="10" r="7.5" fill="none" stroke="#2563EB" stroke-width="2"/>
+  <path d="M8 6.5l6 3.5-6 3.5z" fill="#2563EB"/>
+  <!-- frame 1: interpolator (easing curve) -->
+  <path d="M23 15c4 0 5-10 13-10" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="23" cy="15" r="1.8" fill="#93C5FD"/>
+  <circle cx="36" cy="5" r="1.8" fill="#93C5FD"/>
+  <!-- frame 2: android animation (android head) -->
+  <path d="M43 13a7 6 0 0 1 14 0z" fill="#2563EB"/>
+  <path d="M45.5 5l1.5 3M54.5 5l-1.5 3" stroke="#2563EB" stroke-width="1.5" stroke-linecap="round"/>
+  <circle cx="47.5" cy="10" r="0.9" fill="#fff"/>
+  <circle cx="52.5" cy="10" r="0.9" fill="#fff"/>
+</svg>

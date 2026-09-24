@@ -211,8 +211,13 @@ void AutoComplete::Cancel() {
 	if (lb->Created()) {
 		lb->Clear();
 		lb->Destroy();
-		active = false;
+	} else if (lb->IsHostAutoComplete()) {
+		// A host callback listbox keeps no real window (wid stays 0) yet still
+		// needs to be cleared so the owning headless window can hide its popup
+		// and drop the active selection.
+		lb->Clear();
 	}
+	active = false;
 }
 
 

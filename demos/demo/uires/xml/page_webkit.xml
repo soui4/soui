@@ -1,10 +1,15 @@
-﻿  <window size="-2,-2">
-    <text pos="0,0,-0,-0" align="center">没有找到wke.dll,请将third-part\wke\wke.7z解压到bin目录。</text>
-    <fadeframe pos="0,0,-16,28" targetName="webkit_toolbar" showAlpha="200">
+﻿﻿﻿  <!--
+    page_webkit.xml - 内嵌浏览器(教程)演示分区
+    fadeframe 实现工具栏渐显渐隐动画,targetName 指向 webkit_toolbar;
+    wke_test/edit_url/btn_webkit_back/fore/refresh/go 被 MainDlg_Webkit.cpp 引用,不可改动。
+  -->
+  <window size="-2,-2" colorBkgnd="@color/clr_page_bg">
+    <text pos="8,8,-8,-8" align="center" valign="center" colorText="@color/clr_text_sub">没有找到wke.dll,请将third-part\wke\wke.7z解压到bin目录。</text>
+    <fadeframe pos="8,8,-16,36" targetName="webkit_toolbar" showAlpha="200">
       <!--一个实现渐显渐隐动画的工具栏控件-->
     </fadeframe>
-    <wkeWebkit pos="0,0,-0,-0" url="http://www.cnblogs.com/setoutsoft/" name="wke_test"/>
-    <window pos="0,0,-16,28" name="webkit_toolbar" colorBkgnd="rgb(86,156,214)" layeredWindow="1" layout="hbox" gravity="center" interval="5">
+    <wkeWebkit pos="8,8,-8,-8" url="http://www.cnblogs.com/setoutsoft/" name="wke_test"/>
+    <window pos="8,8,-16,36" name="webkit_toolbar" colorBkgnd="@color/clr_primary" layeredWindow="1" layout="hbox" gravity="center" interval="5">
       <!--这个窗口是前面的fadeframe的作用对象-->
       <imgbtn name="btn_webkit_back" skin="skin_webbtn_back" alpha="128"/>
       <imgbtn name="btn_webkit_fore" skin="skin_webbtn_forward"/>

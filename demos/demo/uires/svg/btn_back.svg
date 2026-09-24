@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  btn_back.svg - 导航栏"返回"按钮图标(nanosvg 兼容)
+  3 帧横排,每帧 20x20,总尺寸 60x20。
+  帧序与 SOUI imgbtn 三态约定一致:0=normal  1=hover  2=push
+  图形:左向返回箭头。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="60" height="20" viewBox="0 0 60 20">
+  <!-- 帧0:normal #64748B -->
+  <g transform="translate(0,0)" stroke="#64748B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <line x1="16" y1="10" x2="4.5" y2="10"/>
+    <path d="M10,4.5 L4.5,10 L10,15.5"/>
+  </g>
+  <!-- 帧1:hover #2563EB -->
+  <g transform="translate(20,0)" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <line x1="16" y1="10" x2="4.5" y2="10"/>
+    <path d="M10,4.5 L4.5,10 L10,15.5"/>
+  </g>
+  <!-- 帧2:push #1D4ED8 -->
+  <g transform="translate(40,0)" stroke="#1D4ED8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <line x1="16" y1="10" x2="4.5" y2="10"/>
+    <path d="M10,4.5 L4.5,10 L10,15.5"/>
+  </g>
+</svg>

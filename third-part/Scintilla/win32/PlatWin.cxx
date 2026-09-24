@@ -68,6 +68,12 @@ typedef BOOL (WINAPI *GetMonitorInfoSig)(HMONITOR, LPMONITORINFO);
 
 static CRITICAL_SECTION crPlatformLock;
 static HINSTANCE hinstPlatformRes = 0;
+// crPlatformLock is a plain (zero-initialised) CRITICAL_SECTION that must be
+// set up once via Platform_Initialise before any EnterCriticalSection. Both the
+// native (Scintilla_RegisterClasses) and the headless (CreateHeadless) entry
+// points can run, and either may come first, so guard it to be initialised only
+// once. Combined with the Reset in Platform_Finalise this keeps both paths safe.
+static bool s_platformInitialised = false;
 
 static HMODULE hDLLImage = 0;
 static AlphaBlendSig AlphaBlendFn = 0;
@@ -3163,8 +3169,11 @@ int Platform::Clamp(int val, int minVal, int maxVal) {
 }
 
 void Platform_Initialise(void *hInstance) {
+	if (s_platformInitialised)
+		return;
 	::InitializeCriticalSection(&crPlatformLock);
 	hinstPlatformRes = static_cast<HINSTANCE>(hInstance);
+	s_platformInitialised = true;
 	// This may be called from DllMain, in which case the call to LoadLibrary
 	// is bad because it can upset the DLL load order.
 #ifdef _WIN32
@@ -3192,6 +3201,7 @@ void Platform_Initialise(void *hInstance) {
 }
 
 void Platform_Finalise(bool fromDllMain) {
+	s_platformInitialised = false;
 #if defined(USE_D2D)
 	if (!fromDllMain) {
 		if (defaultRenderingParams) {

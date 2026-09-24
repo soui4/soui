@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  tab_page.svg - radio 切换演示页签的配图(nanosvg 兼容)
+  6 帧横排,每帧 48x48,总尺寸 288x48。
+  帧序与 page_ctrls.xml 中 tab_radio2 六个 page 一一对应:
+    0=首页总览  1=个人中心  2=消息通知  3=数据统计  4=邮件订阅  5=收藏关注
+  风格:描边线条式,主色 #2563EB,点缀 #93C5FD;底部 pill 强调条呼应主题蓝。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="288" height="48" viewBox="0 0 288 48">
+  <!-- 帧0:首页总览(房子) -->
+  <g transform="translate(0,0)">
+    <g fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M10,23 L24,11 L38,23"/>
+      <path d="M14,21 L14,36 L34,36 L34,21"/>
+    </g>
+    <rect x="21" y="27" width="6" height="9" fill="#93C5FD"/>
+    <rect x="14" y="42" width="20" height="4" rx="2" fill="#2563EB" opacity="0.3"/>
+  </g>
+  <!-- 帧1:个人中心(用户) -->
+  <g transform="translate(48,0)">
+    <g fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="24" cy="17" r="6.5"/>
+      <path d="M12,36 C12,28.5 17,25.5 24,25.5 C31,25.5 36,28.5 36,36"/>
+    </g>
+    <circle cx="24" cy="17" r="2.2" fill="#93C5FD"/>
+    <rect x="14" y="42" width="20" height="4" rx="2" fill="#2563EB" opacity="0.3"/>
+  </g>
+  <!-- 帧2:消息通知(气泡) -->
+  <g transform="translate(96,0)">
+    <rect x="9" y="11" width="30" height="20" rx="5" fill="#FFFFFF" stroke="#2563EB" stroke-width="2"/>
+    <path d="M18,30.5 L18,38 L25.5,30.5" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="18" cy="21" r="1.9" fill="#2563EB"/>
+    <circle cx="24" cy="21" r="1.9" fill="#93C5FD"/>
+    <circle cx="30" cy="21" r="1.9" fill="#93C5FD"/>
+    <rect x="14" y="42" width="20" height="4" rx="2" fill="#2563EB" opacity="0.3"/>
+  </g>
+  <!-- 帧3:数据统计(柱状图) -->
+  <g transform="translate(144,0)">
+    <line x1="10" y1="38" x2="38" y2="38" stroke="#2563EB" stroke-width="2" stroke-linecap="round"/>
+    <rect x="14" y="25" width="6" height="11" rx="1.5" fill="#93C5FD"/>
+    <rect x="23" y="16" width="6" height="20" rx="1.5" fill="#2563EB"/>
+    <rect x="32" y="21" width="6" height="15" rx="1.5" fill="#93C5FD"/>
+    <rect x="14" y="42" width="20" height="4" rx="2" fill="#2563EB" opacity="0.3"/>
+  </g>
+  <!-- 帧4:邮件订阅(信封) -->
+  <g transform="translate(192,0)">
+    <rect x="9" y="14" width="30" height="22" rx="3" fill="#FFFFFF" stroke="#2563EB" stroke-width="2"/>
+    <path d="M10.5,16 L24,26.5 L37.5,16" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="14" y="42" width="20" height="4" rx="2" fill="#2563EB" opacity="0.3"/>
+  </g>
+  <!-- 帧5:收藏关注(星星) -->
+  <g transform="translate(240,0)">
+    <path d="M24,9 L28.2,18.5 L38.5,19.6 L30.9,26.5 L33,36.6 L24,31.4 L15,36.6 L17.1,26.5 L9.5,19.6 L19.8,18.5 Z" fill="#93C5FD" stroke="#2563EB" stroke-width="2" stroke-linejoin="round"/>
+    <rect x="14" y="42" width="20" height="4" rx="2" fill="#2563EB" opacity="0.3"/>
+  </g>
+</svg>

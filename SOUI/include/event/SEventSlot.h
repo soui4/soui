@@ -12,7 +12,7 @@
 
 #if ENABLE_STDFUNCTOR
 #include <functional>
-#endif//ENABLE_STDFUNCTOR
+#endif // ENABLE_STDFUNCTOR
 
 SNSBEGIN
 

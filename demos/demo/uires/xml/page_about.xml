@@ -1,30 +1,45 @@
-﻿<window layout="vbox" interval="10" gravity="left" size="-2,-2" padding="10,50,10,10">
-  <text layout_gravity="center" font="style:StrokeAndFill,blurStyle:solid,blurRadius:3,size:30">欢迎使用SOUI！</text>
-  <text>协议类型：自定义开源协议，商业化产品收费，个人免费产品免费使用，具体参考license.txt</text>
-  <text>版权所有：启程软件</text>
-  <window size="-1,-1" layout="hbox" interval="10" layout_gravity="center">
-    <link href="http://www.cnblogs.com/setoutsoft/" class="cls_btn_weblink">SOUI教程</link>
-    <link href="http://www.soui.vip" class="cls_btn_weblink">SOUI论坛</link>
+﻿﻿﻿﻿﻿﻿﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  page_about.xml - 关于页
+  垂直节奏:标题区 -> 协议/版权说明 -> 社区链接 -> 信息卡片;
+  两张信息卡片(QQ 群 / 代码仓库)宽度 fill_parent 对齐页宽,二维码固定 100 并垂直居中,
+  卡片底色用 white_50 半透明白,在 clr_page_bg 页面底上形成层次,不影响换肤层透出。
+-->
+<window layout="vbox" interval="12" size="-2,-2" padding="20,50,20,20" colorBkgnd="@color/clr_page_bg">
+  <!-- 标题区 -->
+  <window size="-2,-1" layout="hbox" gravity="center" interval="14">
+    <img src="ICON_LOGO:48" size="48,48" layout_gravity="center"/>
+    <text text="欢迎使用SOUI！" layout_gravity="center" font="face:微软雅黑,size:30,bold:1" colorText="@color/clr_title"/>
+  </window>
+  <text layout_gravity="center" colorText="@color/clr_text">协议类型：自定义开源协议，商业化产品收费，个人免费产品免费使用，具体参考license.txt</text>
+  <text layout_gravity="center" colorText="@color/clr_text_sub">版权所有：启程软件</text>
+  <!-- 社区链接 -->
+  <window size="-2,-1" layout="hbox" gravity="center" interval="10">
+    <link href="https://www.cnblogs.com/setoutsoft/" class="cls_btn_weblink">SOUI教程</link>
+    <link href="https://soui.com.cn/bbs" class="cls_btn_weblink">SOUI论坛</link>
   </window>
 
-  <window size="-1,-1" layout="gridlayout" interval="10" columnCount="3" gravity="fill">
-      <text >QQ群#1(2000人)：</text>
-      <edit readOnly="1" padding="1" margin="1">229313785</edit>
-      <link href="http://jq.qq.com/?_wv=1027&k=PxXh59"  class="cls_btn_weblink">申请群#1</link>
+  <!-- QQ 群信息卡片 -->
+  <window size="-2,-1" layout="gridlayout" interval="10" columnCount="3" gravity="fill" padding="15,15,15,15" colorBkgnd="@color/white_50">
+    <text colorText="@color/clr_text">QQ群#1(2000人)：</text>
+    <edit readOnly="1" padding="1" margin="1">229313785</edit>
+    <link href="http://jq.qq.com/?_wv=1027&k=PxXh59" class="cls_btn_weblink">申请群#1</link>
 
-    <text>QQ群#2(500人)：</text>
-      <edit readOnly="1" padding="1" margin="1">385438344</edit>
-      <link href="http://jq.qq.com/?_wv=1027&k=VRATCo"  class="cls_btn_weblink">申请群#2</link>
+    <text colorText="@color/clr_text">QQ群#2(500人)：</text>
+    <edit readOnly="1" padding="1" margin="1">385438344</edit>
+    <link href="http://jq.qq.com/?_wv=1027&k=VRATCo" class="cls_btn_weblink">申请群#2</link>
   </window>
-	<window size="-1,-1" layout="hbox" gravity="center" interval="20">
-		<window size="-1,-1" layout="gridlayout" interval="10" columnCount="2" gravity="fill">
-			<text >github：</text>
-			<edit readOnly="1" padding="1" margin="1">https://github.com/soui4/soui</edit>
-			<text>gitee：</text>
-			<edit readOnly="1" padding="1" margin="1">https://gitee.com/setousoft/soui4</edit>
-			<text>gitcode：</text>
-			<edit readOnly="1" padding="1" margin="1">https://gitcode.com/setousoft/soui4</edit>
-		</window>
-		<qrctrl size="100,100" text="Using Soui, UI just so so!"/>
-	</window>
+
+  <!-- 代码仓库卡片 + 二维码 -->
+  <window size="-2,-1" layout="hbox" gravity="center" interval="20">
+    <window size="0,-1" weight="1" layout="gridlayout" interval="10" columnCount="2" gravity="fill" padding="15,15,15,15" colorBkgnd="@color/white_50">
+      <text colorText="@color/clr_text">github：</text>
+      <edit readOnly="1" padding="1" margin="1">https://github.com/soui4/soui</edit>
+      <text colorText="@color/clr_text">gitee：</text>
+      <edit readOnly="1" padding="1" margin="1">https://gitee.com/setousoft/soui4</edit>
+      <text colorText="@color/clr_text">gitcode：</text>
+      <edit readOnly="1" padding="1" margin="1">https://gitcode.com/setousoft/soui4</edit>
+    </window>
+    <qrctrl size="100,100" text="Using Soui, UI just so so!" msgTransparent="0" layout_gravity="center" tip="Using Soui, UI just so so!"/>
+  </window>
 </window>

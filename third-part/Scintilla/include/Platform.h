@@ -418,6 +418,12 @@ public:
 	virtual void ClearRegisteredImages()=0;
 	virtual void SetDoubleClickAction(CallBackAction, void *)=0;
 	virtual void SetList(const char* list, char separator, char typesep)=0;
+
+	/// True for a host callback listbox that forwards candidates/selection to the
+	/// owning window (a headless auto-complete popup). Such a listbox keeps no
+	/// real backing window (wid stays 0), yet must still be cleared/cancelled so
+	/// the owner can hide its popup. Defaults to false (native listboxes).
+	virtual bool IsHostAutoComplete() const { return false; }
 };
 
 /**

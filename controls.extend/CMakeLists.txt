@@ -20,9 +20,11 @@ add_library(ExtendCtrls STATIC ${CTRLS_SRC})
 set(OPTION_LIBS ${OPTION_LIBS} ExtendCtrls CACHE INTERNAL "option_lib")
 
 target_link_libraries(ExtendCtrls soui4 utilities4)
+add_dependencies(ExtendCtrls Scintilla)
 
 if(CMAKE_SYSTEM_NAME MATCHES Windows)
 target_link_libraries(ExtendCtrls gdiplus Msimg32)
+target_link_libraries(ExtendCtrls Scintilla)
 if(NOT MINGW)
     target_link_libraries(ExtendCtrls smiley)
 endif()
@@ -30,6 +32,7 @@ endif()
 else()
 target_compile_options(ExtendCtrls PRIVATE -fPIC)
 target_link_libraries(ExtendCtrls swinx)
+target_link_libraries(ExtendCtrls Scintilla)
 endif()
 
 # 仅安装当前源码目录下的 .h/.hpp/.hxx/.hh 头文件到 include/ 目录

@@ -1349,6 +1349,25 @@ SWindow *SWindow::FindChildByName(LPCSTR strName, int nDeep /**< = -1 */)
     return FindChildByName(S_CA2W(strName, CP_UTF8), nDeep);
 }
 
+BOOL SWindow::CreateFromTemplate(const SStringW &strTemplate, SXmlNode xmlParam)
+{
+    SStringW strXml = strTemplate;
+    for (SXmlAttr param = xmlParam.first_attribute(); param; param = param.next_attribute())
+    {
+        SStringW strParam = SStringW().Format(SWindow_style::kTemp_ParamFormat, param.name());
+        SStringW strValue = param.value();
+        strValue.Replace(L"\"", L"&#34;");  // Prevent data containing "double quotes" from breaking the XML structure
+        strXml.Replace(strParam, strValue); // replace params to value.
+    }
+    SXmlDoc xmlDoc;
+    BOOL bRet = xmlDoc.load_buffer_inplace(strXml.GetBuffer(strXml.GetLength()), strXml.GetLength() * sizeof(WCHAR), 116, sizeof(wchar_t) == 2 ? enc_utf16 : enc_utf32) ? TRUE : FALSE;
+    if (bRet)
+    {
+        CreateChilds(xmlDoc.root());
+    }
+    return bRet;
+};
+
 BOOL SWindow::CreateChildren(SXmlNode xmlNode)
 {
     ASSERT_UI_THREAD();
@@ -1396,31 +1415,59 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
         else if (!xmlChild.get_userdata()) // Use userdata to mark whether a node can be ignored
         {
             SStringW strName = xmlChild.name();
-            if (strName.StartsWith(SWindow_style::kTemp_Namespace))
+            if (_wcsicmp(strName, SWindow_style::kLabel_Template) == 0)
+            { // Inline template definition: only mark the node with userdata so it never
+              // participates in child window creation. The template body is looked up in
+              // real time from the XML node when referenced by a "t:" child, so no
+              // template state is stored on SWindow.
+                xmlChild.set_userdata(1);
+            }
+            else if (strName.StartsWith(SWindow_style::kTemp_Namespace))
             {
                 strName = strName.Right(strName.GetLength() - 2);
-                SStringW strXmlTemp = GETUIDEF->GetTemplateString(strName);
+                // Look up a <template name="xxx"> child node of the current window's XML
+                // node in real time; fall back to the global template pool (template.xml
+                // and the host private uidef) when not found.
+                SXmlNode xmlTpl;
+                for (SXmlNode xmlIter = xmlNode.first_child(); xmlIter; xmlIter = xmlIter.next_sibling())
+                {
+                    if (xmlIter.type() == node_element && _wcsicmp(xmlIter.name(), SWindow_style::kLabel_Template) == 0 && _wcsicmp(xmlIter.attribute(L"name").value(), strName) == 0)
+                    {
+                        xmlTpl = xmlIter;
+                        break;
+                    }
+                }
+                SStringW strXmlTemp;
+                if (xmlTpl)
+                {
+                    for (SXmlNode xmlTplChild = xmlTpl.first_child(); xmlTplChild; xmlTplChild = xmlTplChild.next_sibling())
+                    {
+                        if (xmlTplChild.type() != node_element)
+                            continue;
+                        SStringW strXml;
+                        xmlTplChild.ToString(&strXml);
+                        strXmlTemp += strXml;
+                    }
+                }
+                if (strXmlTemp.IsEmpty())
+                    strXmlTemp = GETUIDEF->GetTemplateString(strName);
                 SASSERT(!strXmlTemp.IsEmpty());
                 if (!strXmlTemp.IsEmpty())
-                { // create children by template.
+                { // create children by template: replace {{attr}} placeholders with the
+                  // attributes of xmlParam, then parse and create the resulting XML.
+
                     SXmlNode xmlData = xmlChild.child(SWindow_style::kTemp_Data);
-                    while (xmlData)
+                    if (xmlData)
                     {
-                        SStringW strXml = strXmlTemp;
-                        for (SXmlAttr param = xmlData.first_attribute(); param; param = param.next_attribute())
+                        while (xmlData)
                         {
-                            SStringW strParam = SStringW().Format(SWindow_style::kTemp_ParamFormat, param.name());
-                            SStringW strValue = param.value();
-                            strValue.Replace(L"\"", L"&#34;");  // Prevent data containing "double quotes" from breaking the XML structure
-                            strXml.Replace(strParam, strValue); // replace params to value.
+                            CreateFromTemplate(strXmlTemp, xmlData);
+                            xmlData = xmlData.next_sibling(SWindow_style::kTemp_Data);
                         }
-                        SXmlDoc xmlDoc;
-                        if (xmlDoc.load_buffer_inplace(strXml.GetBuffer(strXml.GetLength()), strXml.GetLength() * sizeof(WCHAR), 116, sizeof(wchar_t) == 2 ? enc_utf16 : enc_utf32))
-                        {
-                            CreateChilds(xmlDoc.root());
-                        }
-                        strXml.ReleaseBuffer();
-                        xmlData = xmlData.next_sibling(SWindow_style::kTemp_Data);
+                    }
+                    else
+                    { // No <data> child: instantiate once with the attributes of the reference node itself.
+                        CreateFromTemplate(strXmlTemp, xmlChild);
                     }
                 }
             }

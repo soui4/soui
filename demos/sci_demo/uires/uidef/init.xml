@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UIDEF>
+  <font face="宋体" size="15"/>
+  <unit defUnit="dp"/>
+  <caret color="rgb(255,0,0)" animate="true" fadeTime="20" showTime="10" interpolator="Accelerate"/>
+
+  <string src="values:string" />
+  <skin src="values:skin"/>
+  <color src="values:color"/>
+</UIDEF>

@@ -104,13 +104,14 @@ public:
 	}
 };
 
-const wchar_t* KAttrName_Height[] = {
+//static:该头文件会被多个编译单元包含,内部链接避免链接期重定义
+static const wchar_t* KAttrName_Height[] = {
 	L"oddHeight",
 	L"evenHeight",
 	L"evenSelHeight"
 };
 
-const wchar_t* KNodeName_Item[] = {
+static const wchar_t* KNodeName_Item[] = {
 	L"itemOdd",
 	L"itemEven",
 	L"itemEvenHover"
@@ -424,7 +425,7 @@ public:
 
 
 
-SStringW skins[5] = {
+static SStringW skins[5] = {
 	L"skin_icon1",
 	L"skin_icon2",
 	L"skin_icon3",

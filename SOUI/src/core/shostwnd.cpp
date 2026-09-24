@@ -864,6 +864,11 @@ int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 void SHostWnd::OnDestroy()
 {
+    if (!IsWindow())
+    {
+        SSLOGW() << "m_hwnd:" << m_hWnd << " is not an valid window handle!!!";
+        return;
+    }
     // Clear all modal view sessions before destroying the window
     while (!m_modalRootStack.IsEmpty())
     {

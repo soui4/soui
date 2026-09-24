@@ -1,0 +1,11 @@
+<window name="tpl_root" layout="vbox" width="240" height="80">
+    <!-- Inline template defined as a child node of the panel window; the two
+         t: references instantiate the body with their own attributes. -->
+    <window name="panel" layout="vbox" width="240" height="80">
+        <template name="tpl_item">
+            <text name="{{name}}" text="{{text}}" size="-2,30"/>
+        </template>
+        <t:tpl_item name="first" text="One"/>
+        <t:tpl_item name="second" text="Two"/>
+    </window>
+</window>

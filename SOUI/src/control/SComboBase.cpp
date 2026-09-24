@@ -656,13 +656,10 @@ void SComboBase::OnKillFocus(SWND wndFocus)
 HRESULT SComboBase::OnAttrDropDown(const SStringW &strValue, BOOL bLoading)
 {
     m_bDropdown = STRINGASBOOL(strValue);
-    if (!m_pEdit)
-    {
-        m_bDropdown = TRUE;
-        return S_OK;
-    }
     if (bLoading)
         return S_OK;
+    if (!m_pEdit)
+        m_bDropdown = TRUE;
     if (m_pEdit)
         m_pEdit->SetVisible(!m_bDropdown, TRUE);
     return S_OK;

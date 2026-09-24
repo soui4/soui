@@ -1,4 +1,4 @@
-﻿//stamp:341b16e64db71cb5
+﻿//stamp:3610ce01062bdc7e
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -40,6 +40,7 @@
 			const TCHAR * menu_tray;
 			}SMENUEX;
 		struct _LAYOUT{
+			const TCHAR * page_home;
 			const TCHAR * page_ctrls;
 			const TCHAR * maindlg;
 			const TCHAR * page_layout;
@@ -207,6 +208,18 @@
 			const TCHAR * elements;
 			const TCHAR * advanced;
 			const TCHAR * comprehensive;
+			const TCHAR * home_icons;
+			const TCHAR * ctrl_icons;
+			const TCHAR * card_bg;
+			const TCHAR * btn_skin;
+			const TCHAR * btn_menu;
+			const TCHAR * btn_back;
+			const TCHAR * nav_bg;
+			const TCHAR * radio_num;
+			const TCHAR * tab_page;
+			const TCHAR * tab_layout;
+			const TCHAR * tab_animator;
+			const TCHAR * tab_misc;
 			}svg;
 		struct _xml{
 			const TCHAR * roomlist;
@@ -250,6 +263,7 @@ struct _UIRES UIRES={
 			_T("SMENUEX:menu_tray"),
 		},
 		{
+			_T("LAYOUT:page_home"),
 			_T("LAYOUT:page_ctrls"),
 			_T("LAYOUT:maindlg"),
 			_T("LAYOUT:page_layout"),
@@ -417,6 +431,18 @@ struct _UIRES UIRES={
 			_T("svg:elements"),
 			_T("svg:advanced"),
 			_T("svg:comprehensive"),
+			_T("svg:home_icons"),
+			_T("svg:ctrl_icons"),
+			_T("svg:card_bg"),
+			_T("svg:btn_skin"),
+			_T("svg:btn_menu"),
+			_T("svg:btn_back"),
+			_T("svg:nav_bg"),
+			_T("svg:radio_num"),
+			_T("svg:tab_page"),
+			_T("svg:tab_layout"),
+			_T("svg:tab_animator"),
+			_T("svg:tab_misc"),
 		},
 		{
 			_T("xml:roomlist"),
@@ -445,6 +471,7 @@ struct _R{
 		 const wchar_t * btn_ani_hostwnd;
 		 const wchar_t * btn_animator;
 		 const wchar_t * btn_append_msg;
+		 const wchar_t * btn_back;
 		 const wchar_t * btn_builtinskin;
 		 const wchar_t * btn_close;
 		 const wchar_t * btn_create_by_temp;
@@ -465,6 +492,8 @@ struct _R{
 		 const wchar_t * btn_run;
 		 const wchar_t * btn_set_prop_value;
 		 const wchar_t * btn_skin;
+		 const wchar_t * btn_speed_dec;
+		 const wchar_t * btn_speed_inc;
 		 const wchar_t * btn_test;
 		 const wchar_t * btn_text;
 		 const wchar_t * btn_tip;
@@ -473,6 +502,14 @@ struct _R{
 		 const wchar_t * btn_webkit_fore;
 		 const wchar_t * btn_webkit_go;
 		 const wchar_t * btn_webkit_refresh;
+		 const wchar_t * card_about;
+		 const wchar_t * card_animator;
+		 const wchar_t * card_ctrls;
+		 const wchar_t * card_layout;
+		 const wchar_t * card_misc;
+		 const wchar_t * card_skia;
+		 const wchar_t * card_webkit;
+		 const wchar_t * cbx_dropdown;
 		 const wchar_t * cbx_in_lv;
 		 const wchar_t * cbx_interpolator;
 		 const wchar_t * cbx_test;
@@ -500,6 +537,17 @@ struct _R{
 		 const wchar_t * edit_translate;
 		 const wchar_t * edit_url;
 		 const wchar_t * edit_xml;
+		 const wchar_t * fl_b1;
+		 const wchar_t * fl_b2;
+		 const wchar_t * fl_b3;
+		 const wchar_t * fl_bottom;
+		 const wchar_t * fl_fill;
+		 const wchar_t * fl_left;
+		 const wchar_t * fl_main;
+		 const wchar_t * fl_main2;
+		 const wchar_t * fl_right;
+		 const wchar_t * fl_title;
+		 const wchar_t * fl_top;
 		 const wchar_t * flag_win;
 		 const wchar_t * fmw_test;
 		 const wchar_t * game_canvas;
@@ -510,6 +558,7 @@ struct _R{
 		 const wchar_t * gl_catalog;
 		 const wchar_t * group1;
 		 const wchar_t * group2;
+		 const wchar_t * home_card;
 		 const wchar_t * img_file_icon;
 		 const wchar_t * img_girl;
 		 const wchar_t * img_icon;
@@ -568,6 +617,7 @@ struct _R{
 		 const wchar_t * menu_slider_vol;
 		 const wchar_t * musiclist;
 		 const wchar_t * mytree;
+		 const wchar_t * nav_bar;
 		 const wchar_t * option2_1;
 		 const wchar_t * page_button;
 		 const wchar_t * page_calendar;
@@ -627,9 +677,11 @@ struct _R{
 		 const wchar_t * slider_test;
 		 const wchar_t * slider_test2;
 		 const wchar_t * songname;
+		 const wchar_t * speed_ctrl;
 		 const wchar_t * split_col;
 		 const wchar_t * split_row;
 		 const wchar_t * svg_test;
+		 const wchar_t * tab_contents;
 		 const wchar_t * tab_ctrls;
 		 const wchar_t * tab_main;
 		 const wchar_t * tab_radio2;
@@ -658,6 +710,7 @@ struct _R{
 		 const wchar_t * txt_installtime;
 		 const wchar_t * txt_label;
 		 const wchar_t * txt_name;
+		 const wchar_t * txt_nav_title;
 		 const wchar_t * txt_path_length;
 		 const wchar_t * txt_rate;
 		 const wchar_t * txt_score;
@@ -676,6 +729,7 @@ struct _R{
 		 const wchar_t * wnd_container;
 		 const wchar_t * wnd_rgn;
 		 const wchar_t * wnd_temp_host;
+		 const wchar_t * __name__;
 	}name;
 	struct _id{
 		int name_3d_test;
@@ -693,6 +747,7 @@ struct _R{
 		int btn_ani_hostwnd;
 		int btn_animator;
 		int btn_append_msg;
+		int btn_back;
 		int btn_builtinskin;
 		int btn_close;
 		int btn_create_by_temp;
@@ -713,6 +768,8 @@ struct _R{
 		int btn_run;
 		int btn_set_prop_value;
 		int btn_skin;
+		int btn_speed_dec;
+		int btn_speed_inc;
 		int btn_test;
 		int btn_text;
 		int btn_tip;
@@ -721,6 +778,14 @@ struct _R{
 		int btn_webkit_fore;
 		int btn_webkit_go;
 		int btn_webkit_refresh;
+		int card_about;
+		int card_animator;
+		int card_ctrls;
+		int card_layout;
+		int card_misc;
+		int card_skia;
+		int card_webkit;
+		int cbx_dropdown;
 		int cbx_in_lv;
 		int cbx_interpolator;
 		int cbx_test;
@@ -748,6 +813,17 @@ struct _R{
 		int edit_translate;
 		int edit_url;
 		int edit_xml;
+		int fl_b1;
+		int fl_b2;
+		int fl_b3;
+		int fl_bottom;
+		int fl_fill;
+		int fl_left;
+		int fl_main;
+		int fl_main2;
+		int fl_right;
+		int fl_title;
+		int fl_top;
 		int flag_win;
 		int fmw_test;
 		int game_canvas;
@@ -758,6 +834,7 @@ struct _R{
 		int gl_catalog;
 		int group1;
 		int group2;
+		int home_card;
 		int img_file_icon;
 		int img_girl;
 		int img_icon;
@@ -816,6 +893,7 @@ struct _R{
 		int menu_slider_vol;
 		int musiclist;
 		int mytree;
+		int nav_bar;
 		int option2_1;
 		int page_button;
 		int page_calendar;
@@ -875,9 +953,11 @@ struct _R{
 		int slider_test;
 		int slider_test2;
 		int songname;
+		int speed_ctrl;
 		int split_col;
 		int split_row;
 		int svg_test;
+		int tab_contents;
 		int tab_ctrls;
 		int tab_main;
 		int tab_radio2;
@@ -906,6 +986,7 @@ struct _R{
 		int txt_installtime;
 		int txt_label;
 		int txt_name;
+		int txt_nav_title;
 		int txt_path_length;
 		int txt_rate;
 		int txt_score;
@@ -924,9 +1005,21 @@ struct _R{
 		int wnd_container;
 		int wnd_rgn;
 		int wnd_temp_host;
+		int __name__;
 	}id;
 	struct _color{
 		int blue;
+		int clr_card_bg;
+		int clr_card_hover;
+		int clr_divider;
+		int clr_nav_bg;
+		int clr_page_bg;
+		int clr_primary;
+		int clr_primary_dark;
+		int clr_text;
+		int clr_text_sub;
+		int clr_title;
+		int clr_window_bg;
 		int gray;
 		int green;
 		int red;
@@ -944,6 +1037,286 @@ struct _R{
 		int setskintitle;
 		int title;
 	}string;
+#ifdef __cplusplus
+	struct {
+		enum {
+			name_3d_test = 65713,
+			album = 65594,
+			ani_hot = 65747,
+			ani_test = 65577,
+			artist = 65593,
+			btn4_1 = 65623,
+			btn4_2 = 65624,
+			btn4_3 = 65625,
+			btn4_4 = 65626,
+			btn4_5 = 65627,
+			btn4_6 = 65628,
+			btnSelectGif = 65725,
+			btn_ani_hostwnd = 65758,
+			btn_animator = 65753,
+			btn_append_msg = 65601,
+			btn_back = 65672,
+			btn_builtinskin = 51,
+			btn_close = 65749,
+			btn_create_by_temp = 65679,
+			btn_createchildren = 65701,
+			btn_display = 65676,
+			btn_filewnd = 65700,
+			btn_go_offcial_url = 65748,
+			btn_hidetst = 65677,
+			btn_icon = 65582,
+			btn_init_listbox = 65643,
+			btn_insert_gif = 0,
+			btn_lrc = 65606,
+			btn_menu = 65669,
+			btn_msgbox = 65605,
+			btn_open_wrap_content = 65678,
+			btn_richedit_open = 65602,
+			btn_richedit_save = 65603,
+			btn_run = 65741,
+			btn_set_prop_value = 65647,
+			btn_skin = 65668,
+			btn_speed_dec = 65695,
+			btn_speed_inc = 65696,
+			btn_test = 65585,
+			btn_text = 65583,
+			btn_tip = 65610,
+			btn_uninstall = 65579,
+			btn_webkit_back = 65719,
+			btn_webkit_fore = 65720,
+			btn_webkit_go = 65723,
+			btn_webkit_refresh = 65721,
+			card_about = 65552,
+			card_animator = 65548,
+			card_ctrls = 65546,
+			card_layout = 65549,
+			card_misc = 65550,
+			card_skia = 65551,
+			card_webkit = 65547,
+			cbx_dropdown = 65641,
+			cbx_in_lv = 65586,
+			cbx_interpolator = 65726,
+			cbx_test = 65640,
+			chk_mclv_sel = 65562,
+			chromeTab = 65728,
+			clock_main = 65714,
+			col1 = 65563,
+			col2 = 65568,
+			col3 = 65571,
+			col4 = 65573,
+			col5 = 65575,
+			col6 = 65578,
+			color2_1 = 65659,
+			container = 65557,
+			ctrl_hexedit = 65600,
+			ctrl_hk1 = 65597,
+			ctrl_hk2 = 65598,
+			edit_drop_top1 = 65698,
+			edit_drop_top2 = 65699,
+			edit_repeat = 65744,
+			edit_rotate = 65706,
+			edit_scale = 65707,
+			edit_skew = 65708,
+			edit_spin = 65596,
+			edit_translate = 65709,
+			edit_url = 65722,
+			edit_xml = 65702,
+			fl_b1 = 65689,
+			fl_b2 = 65690,
+			fl_b3 = 65691,
+			fl_bottom = 65683,
+			fl_fill = 65688,
+			fl_left = 65684,
+			fl_main = 65686,
+			fl_main2 = 65692,
+			fl_right = 65685,
+			fl_title = 65687,
+			fl_top = 65682,
+			flag_win = 400,
+			fmw_test = 65715,
+			game_canvas = 65734,
+			game_toolbar = 65740,
+			game_wnd = 300,
+			gif_test = 1000,
+			giftest = 65724,
+			gl_catalog = 65553,
+			group1 = 65649,
+			group2 = 65655,
+			home_card = 65544,
+			img_file_icon = 65589,
+			img_girl = 65755,
+			img_icon = 65564,
+			img_indicator = 65558,
+			img_round = 65607,
+			img_round2 = 65608,
+			img_round3 = 65609,
+			img_skin_0 = 10,
+			img_skin_1 = 11,
+			img_skin_10 = 19,
+			img_skin_11 = 20,
+			img_skin_12 = 21,
+			img_skin_13 = 22,
+			img_skin_14 = 23,
+			img_skin_15 = 24,
+			img_skin_16 = 25,
+			img_skin_17 = 26,
+			img_skin_18 = 27,
+			img_skin_2 = 12,
+			img_skin_4 = 13,
+			img_skin_5 = 14,
+			img_skin_6 = 15,
+			img_skin_7 = 16,
+			img_skin_8 = 17,
+			img_skin_9 = 18,
+			img_soui = 65752,
+			img_state = 65746,
+			ip_test = 65599,
+			lasttime = 65595,
+			lb_test = 65642,
+			lc_test = 65580,
+			lv_test_fix = 65584,
+			lv_test_fix_horz = 65581,
+			lv_test_flex = 65587,
+			lv_test_tile = 65588,
+			matrix_test = 65705,
+			mclv_test = 65560,
+			mclv_test_header = 65561,
+			menu_230 = 230,
+			menu_231 = 231,
+			menu_about = 102,
+			menu_add_group = 21,
+			menu_btn_cir = 65541,
+			menu_btn_ilike = 65540,
+			menu_btn_next = 65539,
+			menu_btn_play = 65538,
+			menu_btn_pre = 65537,
+			menu_btn_vol = 65542,
+			menu_clear_group = 24,
+			menu_del_group = 65536,
+			menu_exit = 12,
+			menu_help = 101,
+			menu_modify_group = 22,
+			menu_open_lib = 13,
+			menu_save_lib = 14,
+			menu_slider_vol = 65543,
+			musiclist = 65590,
+			mytree = 65733,
+			nav_bar = 65671,
+			option2_1 = 65656,
+			page_button = 110,
+			page_calendar = 113,
+			page_edit = 108,
+			page_fix_height_listview = 102,
+			page_flex_height_listview = 103,
+			page_listbox = 115,
+			page_listctrl = 101,
+			page_mclistview = 100,
+			page_mclistview_ex = 105,
+			page_morectrl = 117,
+			page_progress = 112,
+			page_property = 116,
+			page_radio_button = 111,
+			page_richedit = 109,
+			page_splitwnd = 114,
+			page_tileview = 104,
+			page_treectrl = 106,
+			page_treeview = 107,
+			pane_left = 65754,
+			playbtn = 65592,
+			player_1 = 65735,
+			player_2 = 65736,
+			player_3 = 65737,
+			player_4 = 65738,
+			prog_ring = 65636,
+			prog_test = 65630,
+			prog_test2 = 65633,
+			prop_prop = 65645,
+			prop_target = 65644,
+			prop_test = 65648,
+			prop_value = 65646,
+			pv_test = 65694,
+			radio3_1 = 65617,
+			radio3_2 = 65618,
+			radio3_3 = 65619,
+			radio3_4 = 65620,
+			radio3_5 = 65621,
+			radio3_6 = 65622,
+			radio_1 = 65611,
+			radio_2 = 65612,
+			radio_3 = 65613,
+			radio_4 = 65614,
+			radio_5 = 65615,
+			radio_6 = 65616,
+			rating_score = 65569,
+			re_gifhost = 65604,
+			re_temp_input = 65680,
+			re_xmlinput = 65743,
+			room_tv = 65745,
+			rotate_x = 65710,
+			rotate_y = 65711,
+			rotate_z = 65712,
+			sb_test1 = 65632,
+			sb_test2 = 65635,
+			size2_1 = 65657,
+			slider_test = 65631,
+			slider_test2 = 65634,
+			songname = 65591,
+			speed_ctrl = 65697,
+			split_col = 65639,
+			split_row = 65638,
+			svg_test = 65716,
+			tab_contents = 65674,
+			tab_ctrls = 65559,
+			tab_main = 65670,
+			tab_radio2 = 65629,
+			text1_1 = 65650,
+			text1_1_1 = 65652,
+			text1_1_2 = 65653,
+			text1_1_3 = 65651,
+			text1_2 = 65654,
+			text2_1 = 65660,
+			text2_2 = 65658,
+			text2_3 = 65661,
+			text2_4 = 65662,
+			text2_5 = 65663,
+			text2_6 = 65664,
+			text2_7 = 65665,
+			text2_8 = 65666,
+			tgl_left = 65757,
+			tgl_switch = 65556,
+			timepicker = 65637,
+			title = 65554,
+			tray_008 = 65675,
+			tree_test = 65756,
+			txt_coins = 65742,
+			txt_desc = 65566,
+			txt_index = 65567,
+			txt_installtime = 65574,
+			txt_label = 65555,
+			txt_name = 65565,
+			txt_nav_title = 65673,
+			txt_path_length = 65693,
+			txt_rate = 65739,
+			txt_score = 65570,
+			txt_size = 65572,
+			txt_tip = 65750,
+			txt_title = 65667,
+			txt_usetime = 65576,
+			verificationCodeEdit = 65732,
+			view_interpolator = 65727,
+			waveProgress0 = 65729,
+			waveProgress1 = 65730,
+			waveProgress2 = 65731,
+			webkit_toolbar = 65718,
+			wke_test = 65717,
+			wnd_ani_host = 65751,
+			wnd_container = 65703,
+			wnd_rgn = 65704,
+			wnd_temp_host = 65681,
+			__name__ = 65545
+		};
+	}ID;
+#endif//__cplusplus
 
 };
 #endif//_R_H_
@@ -965,6 +1338,7 @@ struct _R R={
 		L"btn_ani_hostwnd",
 		L"btn_animator",
 		L"btn_append_msg",
+		L"btn_back",
 		L"btn_builtinskin",
 		L"btn_close",
 		L"btn_create_by_temp",
@@ -985,6 +1359,8 @@ struct _R R={
 		L"btn_run",
 		L"btn_set_prop_value",
 		L"btn_skin",
+		L"btn_speed_dec",
+		L"btn_speed_inc",
 		L"btn_test",
 		L"btn_text",
 		L"btn_tip",
@@ -993,6 +1369,14 @@ struct _R R={
 		L"btn_webkit_fore",
 		L"btn_webkit_go",
 		L"btn_webkit_refresh",
+		L"card_about",
+		L"card_animator",
+		L"card_ctrls",
+		L"card_layout",
+		L"card_misc",
+		L"card_skia",
+		L"card_webkit",
+		L"cbx_dropdown",
 		L"cbx_in_lv",
 		L"cbx_interpolator",
 		L"cbx_test",
@@ -1020,6 +1404,17 @@ struct _R R={
 		L"edit_translate",
 		L"edit_url",
 		L"edit_xml",
+		L"fl_b1",
+		L"fl_b2",
+		L"fl_b3",
+		L"fl_bottom",
+		L"fl_fill",
+		L"fl_left",
+		L"fl_main",
+		L"fl_main2",
+		L"fl_right",
+		L"fl_title",
+		L"fl_top",
 		L"flag_win",
 		L"fmw_test",
 		L"game_canvas",
@@ -1030,6 +1425,7 @@ struct _R R={
 		L"gl_catalog",
 		L"group1",
 		L"group2",
+		L"home_card",
 		L"img_file_icon",
 		L"img_girl",
 		L"img_icon",
@@ -1088,6 +1484,7 @@ struct _R R={
 		L"menu_slider_vol",
 		L"musiclist",
 		L"mytree",
+		L"nav_bar",
 		L"option2.1",
 		L"page_button",
 		L"page_calendar",
@@ -1147,9 +1544,11 @@ struct _R R={
 		L"slider_test",
 		L"slider_test2",
 		L"songname",
+		L"speed_ctrl",
 		L"split_col",
 		L"split_row",
 		L"svg_test",
+		L"tab_contents",
 		L"tab_ctrls",
 		L"tab_main",
 		L"tab_radio2",
@@ -1178,6 +1577,7 @@ struct _R R={
 		L"txt_installtime",
 		L"txt_label",
 		L"txt_name",
+		L"txt_nav_title",
 		L"txt_path_length",
 		L"txt_rate",
 		L"txt_score",
@@ -1195,97 +1595,121 @@ struct _R R={
 		L"wnd_ani_host",
 		L"wnd_container",
 		L"wnd_rgn",
-		L"wnd_temp_host"
+		L"wnd_temp_host",
+		L"{{name}}"
 	}
 	,
 	{
-		65685,
-		65585,
-		65719,
-		65568,
-		65584,
-		65614,
-		65615,
-		65616,
-		65617,
-		65618,
-		65619,
-		65697,
-		65730,
-		65725,
-		65592,
-		51,
-		65721,
-		65665,
-		65673,
-		65662,
-		65672,
-		65720,
-		65663,
-		65573,
-		65633,
-		0,
-		65597,
-		65659,
-		65596,
-		65664,
-		65593,
-		65594,
 		65713,
-		65637,
-		65658,
-		65576,
-		65574,
-		65601,
-		65570,
-		65691,
-		65692,
-		65695,
-		65693,
+		65594,
+		65747,
 		65577,
-		65698,
-		65631,
-		65553,
-		65700,
-		65686,
-		65554,
-		65559,
-		65562,
-		65564,
-		65566,
-		65569,
-		65649,
-		65548,
-		65591,
-		65588,
-		65589,
-		65670,
-		65671,
-		65716,
-		65678,
+		65593,
+		65623,
+		65624,
+		65625,
+		65626,
+		65627,
+		65628,
+		65725,
+		65758,
+		65753,
+		65601,
+		65672,
+		51,
+		65749,
 		65679,
-		65680,
-		65587,
-		65681,
-		65694,
-		65674,
-		400,
-		65687,
+		65701,
+		65676,
+		65700,
+		65748,
+		65677,
+		65582,
+		65643,
+		0,
+		65606,
+		65669,
+		65605,
+		65678,
+		65602,
+		65603,
+		65741,
+		65647,
+		65668,
+		65695,
+		65696,
+		65585,
+		65583,
+		65610,
+		65579,
+		65719,
+		65720,
+		65723,
+		65721,
+		65552,
+		65548,
+		65546,
+		65549,
+		65550,
+		65551,
+		65547,
+		65641,
+		65586,
+		65726,
+		65640,
+		65562,
+		65728,
+		65714,
+		65563,
+		65568,
+		65571,
+		65573,
+		65575,
+		65578,
+		65659,
+		65557,
+		65600,
+		65597,
+		65598,
+		65698,
+		65699,
+		65744,
 		65706,
-		65712,
+		65707,
+		65708,
+		65596,
+		65709,
+		65722,
+		65702,
+		65689,
+		65690,
+		65691,
+		65683,
+		65688,
+		65684,
+		65686,
+		65692,
+		65685,
+		65687,
+		65682,
+		400,
+		65715,
+		65734,
+		65740,
 		300,
 		1000,
-		65696,
+		65724,
+		65553,
+		65649,
+		65655,
 		65544,
-		65639,
-		65645,
-		65580,
-		65727,
-		65555,
-		65549,
-		65598,
-		65599,
-		65600,
+		65589,
+		65755,
+		65564,
+		65558,
+		65607,
+		65608,
+		65609,
 		10,
 		11,
 		19,
@@ -1304,19 +1728,19 @@ struct _R R={
 		16,
 		17,
 		18,
-		65724,
-		65718,
-		65590,
-		65586,
-		65632,
-		65571,
-		65575,
-		65572,
-		65578,
-		65579,
-		65677,
-		65551,
-		65552,
+		65752,
+		65746,
+		65599,
+		65595,
+		65642,
+		65580,
+		65584,
+		65581,
+		65587,
+		65588,
+		65705,
+		65560,
+		65561,
 		230,
 		231,
 		102,
@@ -1335,9 +1759,10 @@ struct _R R={
 		13,
 		14,
 		65543,
-		65581,
-		65705,
-		65646,
+		65590,
+		65733,
+		65671,
+		65656,
 		110,
 		113,
 		108,
@@ -1356,95 +1781,99 @@ struct _R R={
 		104,
 		106,
 		107,
-		65726,
-		65583,
-		65707,
-		65708,
-		65709,
-		65710,
-		65627,
-		65621,
-		65624,
-		65635,
-		65634,
-		65638,
+		65754,
+		65592,
+		65735,
+		65736,
+		65737,
+		65738,
 		65636,
-		65669,
-		65608,
-		65609,
-		65610,
+		65630,
+		65633,
+		65645,
+		65644,
+		65648,
+		65646,
+		65694,
+		65617,
+		65618,
+		65619,
+		65620,
+		65621,
+		65622,
 		65611,
 		65612,
 		65613,
-		65602,
-		65603,
+		65614,
+		65615,
+		65616,
+		65569,
 		65604,
-		65605,
-		65606,
-		65607,
-		65560,
-		65595,
-		65666,
-		65715,
-		65717,
-		65682,
-		65683,
-		65684,
-		65623,
-		65626,
-		65647,
-		65622,
-		65625,
-		65582,
-		65630,
+		65680,
+		65743,
+		65745,
+		65710,
+		65711,
+		65712,
+		65632,
+		65635,
+		65657,
+		65631,
+		65634,
+		65591,
+		65697,
+		65639,
+		65638,
+		65716,
+		65674,
+		65559,
+		65670,
 		65629,
-		65688,
-		65550,
-		65660,
-		65620,
-		65640,
-		65642,
-		65643,
-		65641,
-		65644,
 		65650,
-		65648,
-		65651,
 		65652,
 		65653,
+		65651,
 		65654,
-		65655,
-		65656,
-		65729,
-		65547,
-		65628,
-		65545,
+		65660,
+		65658,
 		65661,
-		65728,
-		65714,
-		65557,
-		65558,
-		65565,
-		65546,
+		65662,
+		65663,
+		65664,
+		65665,
+		65666,
+		65757,
 		65556,
-		65668,
-		65711,
-		65561,
-		65563,
-		65722,
-		65657,
-		65567,
-		65704,
-		65699,
-		65701,
-		65702,
-		65703,
-		65690,
-		65689,
-		65723,
+		65637,
+		65554,
 		65675,
-		65676,
-		65667
+		65756,
+		65742,
+		65566,
+		65567,
+		65574,
+		65555,
+		65565,
+		65673,
+		65693,
+		65739,
+		65570,
+		65572,
+		65750,
+		65667,
+		65576,
+		65732,
+		65727,
+		65729,
+		65730,
+		65731,
+		65718,
+		65717,
+		65751,
+		65703,
+		65704,
+		65681,
+		65545
 	}
 	,
 	{
@@ -1454,7 +1883,18 @@ struct _R R={
 		3,
 		4,
 		5,
-		6
+		6,
+		7,
+		8,
+		9,
+		10,
+		11,
+		12,
+		13,
+		14,
+		15,
+		16,
+		17
 	}
 	,
 	{

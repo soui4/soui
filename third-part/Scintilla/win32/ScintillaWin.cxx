@@ -87,6 +87,7 @@
 
 #include "PlatWin.h"
 #include "HanjaDic.h"
+#include "ScintillaHost.h"
 
 #ifndef SPI_GETWHEELSCROLLLINES
 #define SPI_GETWHEELSCROLLLINES   104
@@ -232,6 +233,131 @@ public:
 
 }
 
+namespace {
+
+// In-memory ListBox used by the headless host when it HandlesAutoComplete().
+// It never creates a native popup window: it parses/keeps the candidate list and
+// selection in memory and forwards every state change to the host (via
+// ScintillaHost::AutoCompleteNotify) so the owning DUI window can render a real
+// popup itself. Keyboard navigation (Up/Down/PageUp/PageDown/Tab/Enter) still
+// flows through the shared engine state machine (ScintillaBase::KeyCommand ->
+// AutoComplete::Move / AutoCompleteCompleted), exactly like the native HWND
+// popup, so the two paths stay behaviourally aligned.
+class ScintillaAutoCompleteListBox : public ListBox {
+	ScintillaHeadlessHost *host_;
+	std::vector<std::string> items_;
+	int selection_;
+	int heightPerRow_;
+	int desiredVisibleRows_;
+	bool shown_;
+
+	// Deliver the current snapshot to the owner. visible is the owner-facing
+	// "should I show a popup" flag; it is derived from the engine lifecycle
+	// (Clear hides, a populated Select shows).
+	void Emit(bool visible) {
+		if (!host_)
+			return;
+		ScintillaAutoCompleteInfo info;
+		info.visible = visible && !items_.empty();
+		info.shown = shown_;
+		info.count = static_cast<int>(items_.size());
+		info.selection = (info.visible && selection_ >= 0 && selection_ < info.count)
+			? selection_ : -1;
+		info.items = items_;
+		host_->AutoCompleteNotify(info);
+	}
+
+public:
+	explicit ScintillaAutoCompleteListBox(ScintillaHeadlessHost *host)
+		: host_(host), selection_(-1), heightPerRow_(10), desiredVisibleRows_(5), shown_(false) {}
+
+	bool IsHostAutoComplete() const override { return true; }
+
+	void SetFont(Font &) override {}
+	void Create(Window &, int, Point, int lineHeight, bool, int) override {
+		heightPerRow_ = lineHeight;
+	}
+	void SetAverageCharWidth(int) override {}
+	void SetVisibleRows(int rows) override { desiredVisibleRows_ = rows; }
+	int GetVisibleRows() const override { return desiredVisibleRows_; }
+	PRectangle GetDesiredRect() override {
+		int rows = static_cast<int>(items_.size());
+		if ((rows == 0) || (rows > desiredVisibleRows_))
+			rows = desiredVisibleRows_;
+		return PRectangle::FromInts(0, 0, 200,
+			heightPerRow_ > 0 ? heightPerRow_ * rows : 10 * rows);
+	}
+	int CaretFromEdge() override { return 0; }
+	void Clear() override {
+		items_.clear();
+		selection_ = -1;
+		shown_ = false;
+		Emit(false);
+	}
+	void Append(char *, int) override {}
+	int Length() override { return static_cast<int>(items_.size()); }
+	void Select(int n) override {
+		if (n < -1)
+			n = -1;
+		if (n >= static_cast<int>(items_.size()))
+			n = static_cast<int>(items_.size()) - 1;
+		selection_ = n;
+		if (n >= 0)
+			shown_ = true;
+		Emit(shown_);
+	}
+	int GetSelection() override { return selection_; }
+	int Find(const char *) override { return -1; }
+	void GetValue(int n, char *value, int len) override {
+		if (n < 0 || n >= static_cast<int>(items_.size())) {
+			if (len > 0)
+				value[0] = '\0';
+			return;
+		}
+		const std::string &s = items_[n];
+		int cpl = static_cast<int>(s.size());
+		if (cpl > len - 1)
+			cpl = len - 1;
+		memcpy(value, s.c_str(), cpl);
+		value[cpl] = '\0';
+	}
+	void RegisterImage(int, const char *) override {}
+	void RegisterRGBAImage(int, int, int, const unsigned char *) override {}
+	void ClearRegisteredImages() override {}
+	void SetDoubleClickAction(CallBackAction, void *) override {}
+	void SetList(const char *list, char separator, char typesep) override {
+		// Parse like ListBoxX::SetList: words are separated by 'separator'; an
+		// optional type after 'typesep' is stripped from the displayed word.
+		items_.clear();
+		if (list) {
+			const char *b = list;
+			for (;;) {
+				while (*b == separator)
+					++b;
+				if (!*b)
+					break;
+				const char *e = b;
+				while (*e && *e != separator)
+					++e;
+				size_t len = static_cast<size_t>(e - b);
+				for (size_t i = 0; i < len; ++i) {
+					if (b[i] == typesep) {
+						len = i;
+						break;
+					}
+				}
+				if (len > 0)
+					items_.push_back(std::string(b, len));
+				b = e;
+			}
+		}
+		selection_ = -1;
+		Emit(shown_);
+	}
+};
+
+}  // namespace
+
 /**
  */
 class ScintillaWin :
@@ -272,12 +398,17 @@ class ScintillaWin :
 #endif
 
 	explicit ScintillaWin(HWND hwnd);
+	ScintillaWin(ScintillaHeadlessHost *host);
 	ScintillaWin(const ScintillaWin &);
 	virtual ~ScintillaWin();
 	ScintillaWin &operator=(const ScintillaWin &);
 
+	ScintillaHost *host_;
+	bool ownsHost_;
+
 	virtual void Initialise();
 	virtual void Finalise();
+	virtual PRectangle GetClientRectangle() const;
 #if defined(USE_D2D)
 	void EnsureRenderTarget(HDC hdc);
 	void DropRenderTarget();
@@ -325,6 +456,8 @@ class ScintillaWin :
 	virtual void SetTrackMouseLeaveEvent(bool on);
 	virtual bool PaintContains(PRectangle rc);
 	virtual void ScrollText(int linesToMove);
+	virtual void RedrawRect(PRectangle rc);
+	virtual void Redraw();
 	virtual void UpdateSystemCaret();
 	virtual void SetVerticalScrollPos();
 	virtual void SetHorizontalScrollPos();
@@ -369,6 +502,40 @@ public:
 	// Public for benefit of Scintilla_DirectFunction
 	virtual sptr_t WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam);
 
+	/// Headless (no native window) construction. The returned instance paints to
+	/// caller supplied HDCs (via OnPaint) and receives events through the On*
+	/// helpers; notifications are delivered through the Host callbacks.
+	static ScintillaWin *CreateHeadless(ScintillaHeadlessHost *host);
+	/// Destroy an instance created by CreateHeadless.
+	static void DestroyHeadless(ScintillaWin *sci);
+
+	/// Render the whole control to an external HDC within rc.
+	sptr_t OnPaint(HDC hdc, const RECT &rc);
+	sptr_t OnSize(int cx, int cy);
+	sptr_t OnKeyDown(long key, long scancode = 0, long mods = 0);
+	sptr_t OnKeyUp(long key, long scancode = 0, long mods = 0);
+	sptr_t OnChar(wchar_t ch, long mods = 0);
+	sptr_t OnMouseDown(int x, int y, long mods, UINT button);
+	sptr_t OnMouseMove(int x, int y, long mods = 0);
+	sptr_t OnMouseUp(int x, int y, long mods, UINT button);
+	sptr_t OnMouseWheel(int delta, long mods, const POINT &ptScreen);
+	sptr_t OnFocus(bool focus);
+	sptr_t OnScroll(int bar, int code, int pos = 0);
+	/// Drive an engine fine ticker (e.g. caret blink) after the headless owner's
+	/// own timer fired. The host must invalidate separately to repaint.
+	sptr_t OnTick(int reason);
+
+	/// Return the Window::Cursor the engine would show over a control-local
+	/// point (mirrors the WM_SETCURSOR logic), without setting the platform
+	/// cursor. The DUI owner maps this to its own cursor and applies it.
+	int CursorForPointHeadless(int x, int y);
+
+	/// Push the current caret geometry to the headless owner via
+	/// UpdateSystemCaret. Exposed so the DUI host can force a caret sync right
+	/// after a scroll or any other operation where the engine may not have issued
+	/// the notification itself.
+	void UpdateCaretHeadless();
+
 	/// Implement IUnknown
 	STDMETHODIMP QueryInterface(REFIID riid, PVOID *ppv);
 	STDMETHODIMP_(ULONG)AddRef();
@@ -409,7 +576,7 @@ HINSTANCE ScintillaWin::hInstance = 0;
 ATOM ScintillaWin::scintillaClassAtom = 0;
 ATOM ScintillaWin::callClassAtom = 0;
 
-ScintillaWin::ScintillaWin(HWND hwnd) {
+ScintillaWin::ScintillaWin(HWND hwnd) : host_(new ScintillaNativeHost(hwnd)), ownsHost_(true) {
 
 	lastKeyDownConsumed = false;
 	lastHighSurrogateChar = 0;
@@ -462,13 +629,105 @@ ScintillaWin::ScintillaWin(HWND hwnd) {
 	Initialise();
 }
 
-ScintillaWin::~ScintillaWin() {}
+ScintillaWin::ScintillaWin(ScintillaHeadlessHost *host) : host_(host), ownsHost_(false) {
+
+	lastKeyDownConsumed = false;
+	lastHighSurrogateChar = 0;
+
+	capturedMouse = false;
+	trackedMouseLeave = false;
+	TrackMouseEventFn = 0;
+	SetCoalescableTimerFn = 0;
+
+	linesPerScroll = 0;
+	wheelDelta = 0;   // Wheel delta from roll
+
+	hRgnUpdate = 0;
+
+	hasOKText = false;
+
+	cfColumnSelect = static_cast<CLIPFORMAT>(
+		::RegisterClipboardFormat(TEXT("MSDEVColumnSelect")));
+	cfBorlandIDEBlockType = static_cast<CLIPFORMAT>(
+		::RegisterClipboardFormat(TEXT("Borland IDE Block Type")));
+
+	cfLineSelect = static_cast<CLIPFORMAT>(
+		::RegisterClipboardFormat(TEXT("MSDEVLineSelect")));
+	cfVSLineTag = static_cast<CLIPFORMAT>(
+		::RegisterClipboardFormat(TEXT("VisualStudioEditorOperationsLineCutCopyClipboardTag")));
+	hrOle = E_FAIL;
+
+	wMain = (WindowID)host->MainHWND();
+
+	dob.sci = this;
+	ds.sci = this;
+	dt.sci = this;
+
+	sysCaretBitmap = 0;
+	sysCaretWidth = 0;
+	sysCaretHeight = 0;
+
+#if defined(USE_D2D)
+	pRenderTarget = 0;
+	renderTargetValid = true;
+#endif
+
+	caret.period = ::GetCaretBlinkTime();
+	if (caret.period < 0)
+		caret.period = 0;
+
+	Initialise();
+
+	if (host->HandlesAutoComplete()) {
+		// The owner wants to render its own autocomplete popup: replace the
+		// engine's default native listbox with a callback listbox that forwards
+		// candidates, selection and visibility to the host. The engine still
+		// drives Up/Down/Enter/Tab through the shared AutoComplete state machine
+		// (ScintillaBase::KeyCommand), so behaviour matches the native popup.
+		delete ac.lb;
+		ac.lb = new ScintillaAutoCompleteListBox(host);
+	}
+}
+
+ScintillaWin::~ScintillaWin() {
+	if (ownsHost_)
+		delete host_;
+}
+
+PRectangle ScintillaWin::GetClientRectangle() const {
+	return host_->GetClientRectangle();
+}
+
+ScintillaWin *ScintillaWin::CreateHeadless(ScintillaHeadlessHost *host) {
+	// FontCached (ViewStyle::Refresh builds fonts during text insertion) uses
+	// crPlatformLock, a Win32 CRITICAL_SECTION that is only initialised by
+	// Platform_Initialise. The native entry point goes through
+	// Scintilla_RegisterClasses, but a headless editor has no window class, so
+	// the platform must be set up here. Platform_Initialise is idempotent.
+	Platform_Initialise(GetModuleHandle(NULL));
+	ScintillaWin *sci = new ScintillaWin(host);
+	// A native editor fetches the wheel lines-per-notch (and pins tag/legacy
+	// defaults) in its WM_CREATE handler. A headless editor has no window, so
+	// never sees WM_CREATE; `linesPerScroll` would stay 0 and disable wheel
+	// scrolling (the WM_MOUSEWHEEL path requires linesPerScroll > 0).
+	sci->GetIntelliMouseParameters();
+	return sci;
+}
+
+void ScintillaWin::DestroyHeadless(ScintillaWin *sci) {
+	if (sci) {
+		sci->Finalise();
+		delete sci;
+	}
+}
 
 void ScintillaWin::Initialise() {
 	// Initialize COM.  If the app has already done this it will have
 	// no effect.  If the app hasn't, we really shouldn't ask them to call
 	// it just so this internal feature works.
-	hrOle = ::OleInitialize(NULL);
+	if (host_->IsNative()) {
+		hrOle = ::OleInitialize(NULL);
+	}
 
 	// Find TrackMouseEvent which is available on Windows > 95
 #ifdef _WIN32
@@ -507,9 +766,11 @@ void ScintillaWin::Finalise() {
 #if defined(USE_D2D)
 	DropRenderTarget();
 #endif
-	::RevokeDragDrop(MainHWND());
-	if (SUCCEEDED(hrOle)) {
-		::OleUninitialize();
+	if (host_->IsNative()) {
+		::RevokeDragDrop(MainHWND());
+		if (SUCCEEDED(hrOle)) {
+			::OleUninitialize();
+		}
 	}
 }
 
@@ -861,10 +1122,12 @@ sptr_t ScintillaWin::HandleCompositionWindowed(uptr_t wParam, sptr_t lParam) {
 
 			// Set new position after converted
 			Point pos = PointMainCaret();
+			int imeOffX = 0, imeOffY = 0;
+			host_->GetIMEWindowOffset(&imeOffX, &imeOffY);
 			COMPOSITIONFORM CompForm;
 			CompForm.dwStyle = CFS_POINT;
-			CompForm.ptCurrentPos.x = static_cast<int>(pos.x);
-			CompForm.ptCurrentPos.y = static_cast<int>(pos.y);
+			CompForm.ptCurrentPos.x = static_cast<int>(pos.x) + imeOffX;
+			CompForm.ptCurrentPos.y = static_cast<int>(pos.y) + imeOffY;
 			::ImmSetCompositionWindow(imc.hIMC, &CompForm);
 		}
 		return 0;
@@ -902,14 +1165,16 @@ void ScintillaWin::DrawImeIndicator(int indicator, int len) {
 }
 
 void ScintillaWin::SetCandidateWindowPos() {
-	IMContext imc(MainHWND());
+	IMContext imc(host_->MainHWND());
 	if (imc.hIMC) {
 		Point pos = PointMainCaret();
+		int imeOffX = 0, imeOffY = 0;
+		host_->GetIMEWindowOffset(&imeOffX, &imeOffY);
 		CANDIDATEFORM CandForm;
 		CandForm.dwIndex = 0;
 		CandForm.dwStyle = CFS_CANDIDATEPOS;
-		CandForm.ptCurrentPos.x = static_cast<int>(pos.x);
-		CandForm.ptCurrentPos.y = static_cast<int>(pos.y + vs.lineHeight);
+		CandForm.ptCurrentPos.x = static_cast<int>(pos.x) + imeOffX;
+		CandForm.ptCurrentPos.y = static_cast<int>(pos.y + vs.lineHeight) + imeOffY;
 		::ImmSetCandidateWindow(imc.hIMC, &CandForm);
 	}
 }
@@ -1224,6 +1489,92 @@ sptr_t ScintillaWin::GetText(uptr_t wParam, sptr_t lParam) {
 	}
 }
 
+// Forwarded event entry points for a headless (no native window) control.
+// Each helper synthesizes the corresponding WM_ message and drives the normal
+// WndProc path so the platform-independent editing logic is reused unchanged.
+
+sptr_t ScintillaWin::OnPaint(HDC hdc, const RECT &rc) {
+	PAINTSTRUCT ps;
+	memset(&ps, 0, sizeof(ps));
+	ps.hdc = hdc;
+	ps.rcPaint = rc;
+	return WndProc(WM_PAINT, reinterpret_cast<uptr_t>(&ps), 0);
+}
+
+sptr_t ScintillaWin::OnSize(int cx, int cy) {
+	return WndProc(WM_SIZE, 0, MAKELPARAM(cx, cy));
+}
+
+sptr_t ScintillaWin::OnKeyDown(long key, long scancode, long /*mods*/) {
+	return WndProc(WM_KEYDOWN, static_cast<uptr_t>(key),
+		static_cast<sptr_t>((scancode & 0xff) << 16));
+}
+
+sptr_t ScintillaWin::OnKeyUp(long key, long scancode, long /*mods*/) {
+	return WndProc(WM_KEYUP, static_cast<uptr_t>(key),
+		static_cast<sptr_t>((scancode & 0xff) << 16));
+}
+
+sptr_t ScintillaWin::OnChar(wchar_t ch, long /*mods*/) {
+	return WndProc(WM_CHAR, static_cast<uptr_t>(ch), 0);
+}
+
+sptr_t ScintillaWin::OnMouseDown(int x, int y, long mods, UINT button) {
+	UINT msg = (button & MK_RBUTTON) ? WM_RBUTTONDOWN :
+		((button & MK_MBUTTON) ? WM_MBUTTONDOWN : WM_LBUTTONDOWN);
+	return WndProc(msg, static_cast<uptr_t>(mods), MAKELPARAM(x, y));
+}
+
+sptr_t ScintillaWin::OnMouseUp(int x, int y, long mods, UINT button) {
+	UINT msg = (button & MK_RBUTTON) ? WM_RBUTTONUP :
+		((button & MK_MBUTTON) ? WM_MBUTTONUP : WM_LBUTTONUP);
+	return WndProc(msg, static_cast<uptr_t>(mods), MAKELPARAM(x, y));
+}
+
+sptr_t ScintillaWin::OnMouseMove(int x, int y, long mods) {
+	return WndProc(WM_MOUSEMOVE, static_cast<uptr_t>(mods), MAKELPARAM(x, y));
+}
+
+sptr_t ScintillaWin::OnMouseWheel(int delta, long mods, const POINT &ptScreen) {
+	const uptr_t wParam = static_cast<uptr_t>(mods) |
+		((static_cast<uptr_t>(delta) & 0xffff) << 16);
+	return WndProc(WM_MOUSEWHEEL, wParam, MAKELPARAM(ptScreen.x, ptScreen.y));
+}
+
+sptr_t ScintillaWin::OnFocus(bool focus) {
+	SetFocusState(focus);
+	return 0;
+}
+
+sptr_t ScintillaWin::OnScroll(int bar, int code, int pos) {
+	UINT msg = (bar == SB_HORZ) ? WM_HSCROLL : WM_VSCROLL;
+	const uptr_t wParam = MAKELONG(code & 0xffff, pos & 0xffff);
+	return WndProc(msg, wParam, 0);
+}
+
+sptr_t ScintillaWin::OnTick(int reason) {
+	TickFor(static_cast<TickReason>(reason));
+	return 0;
+}
+
+int ScintillaWin::CursorForPointHeadless(int x, int y) {
+	// Mirror Editor::DisplayCursor: SC_CURSORNORMAL means the contextual cursor
+	// is used (margin/selection/hotspot/text); otherwise a fixed cursor is forced.
+	if (cursorMode != SC_CURSORNORMAL) {
+		return cursorMode;
+	}
+	Point pt(x, y);
+	if (inDragDrop == ddDragging)
+		return Window::cursorUp;
+	if (PointInSelMargin(pt))
+		return GetMarginCursor(pt);
+	if (PointInSelection(pt) && !SelectionEmpty())
+		return Window::cursorArrow;
+	if (PointIsHotspot(pt))
+		return Window::cursorHand;
+	return Window::cursorText;
+}
+
 sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 	try {
 		//Platform::DebugPrintf("S M:%x WP:%x L:%x\n", iMessage, wParam, lParam);
@@ -1471,15 +1822,24 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 		case WM_KEYDOWN: {
 			//Platform::DebugPrintf("S keydown %d %x %x %x %x\n",iMessage, wParam, lParam, ::IsKeyDown(VK_SHIFT), ::IsKeyDown(VK_CONTROL));
 				lastKeyDownConsumed = false;
-				int ret = KeyDown(KeyTranslate(static_cast<int>(wParam)),
-					Platform::IsKeyDown(VK_SHIFT),
-					Platform::IsKeyDown(VK_CONTROL),
-					Platform::IsKeyDown(VK_MENU),
-					&lastKeyDownConsumed);
-				if (!ret && !lastKeyDownConsumed) {
-					return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
-				}
-				break;
+					// macOS: the Command key is the platform's primary modifier but
+					// swinx reports it as VK_LWIN/VK_RWIN, and the engine keys its
+					// editing commands off VK_CONTROL. In headless mode (the macOS
+					// path) treat Command as Control so Cmd+c/v/a/z... map to the
+					// standard Scintilla shortcuts.
+					const bool ctrl = Platform::IsKeyDown(VK_CONTROL) ||
+						((!host_->IsNative()) &&
+						 (Platform::IsKeyDown(VK_LWIN) ||
+						  Platform::IsKeyDown(VK_RWIN)));
+					int ret = KeyDown(KeyTranslate(static_cast<int>(wParam)),
+						Platform::IsKeyDown(VK_SHIFT),
+						ctrl,
+						Platform::IsKeyDown(VK_MENU),
+						&lastKeyDownConsumed);
+					if (!ret && !lastKeyDownConsumed) {
+						return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
+					}
+					break;
 			}
 
 		case WM_IME_KEYDOWN: {
@@ -1520,7 +1880,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 					DestroySystemCaret();
 				}
 				// Explicitly complete any IME composition
-				IMContext imc(MainHWND());
+				IMContext imc(host_->MainHWND());
 				if (imc.hIMC) {
 					::ImmNotifyIME(imc.hIMC, NI_COMPOSITIONSTR, CPS_COMPLETE, 0);
 				}
@@ -1754,7 +2114,7 @@ bool ScintillaWin::ValidCodePage(int codePage) const {
 }
 
 sptr_t ScintillaWin::DefWndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
-	return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
+	return host_->DefWndProc(iMessage, wParam, lParam);
 }
 
 /**
@@ -1769,6 +2129,9 @@ bool ScintillaWin::FineTickerRunning(TickReason reason) {
 }
 
 void ScintillaWin::FineTickerStart(TickReason reason, int millis, int tolerance) {
+	if (!host_->IsNative()) {	// headless: rendering timer is driven by the host/SOUI
+		return;
+	}
 	FineTickerCancel(reason);
 	if (SetCoalescableTimerFn && tolerance) {
 		timers[reason] = SetCoalescableTimerFn(MainHWND(), fineTimerStart + reason, millis, NULL, tolerance);
@@ -1778,6 +2141,11 @@ void ScintillaWin::FineTickerStart(TickReason reason, int millis, int tolerance)
 }
 
 void ScintillaWin::FineTickerCancel(TickReason reason) {
+	timers[reason] = 0;
+	if (!host_->IsNative()) {	// headless: no native timer to cancel
+		host_->RequestTimer(reason, 0);
+		return;
+	}
 	if (timers[reason]) {
 		::KillTimer(MainHWND(), timers[reason]);
 		timers[reason] = 0;
@@ -1789,7 +2157,7 @@ bool ScintillaWin::SetIdle(bool on) {
 	// On Win32 the Idler is implemented as a Timer on the Scintilla window.  This
 	// takes advantage of the fact that WM_TIMER messages are very low priority,
 	// and are only posted when the message queue is empty, i.e. during idle time.
-	if (idler.state != on) {
+	if (host_->IsNative() && idler.state != on) {
 		if (on) {
 			idler.idlerID = ::SetTimer(MainHWND(), idleTimerID, 10, NULL)
 				? reinterpret_cast<IdlerID>(idleTimerID) : 0;
@@ -1803,7 +2171,7 @@ bool ScintillaWin::SetIdle(bool on) {
 }
 
 void ScintillaWin::SetMouseCapture(bool on) {
-	if (mouseDownCaptures) {
+	if (host_->IsNative() && mouseDownCaptures) {
 		if (on) {
 			::SetCapture(MainHWND());
 		} else {
@@ -1820,7 +2188,7 @@ bool ScintillaWin::HaveMouseCapture() {
 }
 
 void ScintillaWin::SetTrackMouseLeaveEvent(bool on) {
-	if (on && TrackMouseEventFn && !trackedMouseLeave) {
+	if (host_->IsNative() && on && TrackMouseEventFn && !trackedMouseLeave) {
 		TRACKMOUSEEVENT tme;
 		tme.cbSize = sizeof(tme);
 		tme.dwFlags = TME_LEAVE;
@@ -1847,7 +2215,30 @@ void ScintillaWin::ScrollText(int /* linesToMove */) {
 	UpdateSystemCaret();
 }
 
+// Editor::Redraw covers the full redraw path (e.g. a scroll that moves more than
+// a few lines), which -- unlike ScrollText -- does not update the caret. For a
+// native window that is fine because the OS caret is a separate window that the
+// system scrolls along. Headless relies entirely on geometry pushed through
+// NotifyCaret, so re-issue the caret update here to keep the DUI caret following
+// the scrollbar even on large jumps.
+void ScintillaWin::Redraw() {
+	Editor::Redraw();
+	if (!host_->IsNative()) {
+		// Full-document invalidate; forward the whole client rect to the host so
+		// the owner requests a (partial-style) repaint through the same channel as
+		// RedrawRect. Prevents unconditional full-window repaints.
+		UpdateSystemCaret();
+		host_->InvalidateRectangle(GetClientRectangle());
+	}
+}
+
 void ScintillaWin::UpdateSystemCaret() {
+	if (!host_->IsNative()) {	// headless: drive the SOUI caret owned by the DUI window
+		Point pos = PointMainCaret();
+		host_->NotifyCaret(
+			static_cast<int>(pos.x), static_cast<int>(pos.y), vs.lineHeight, hasFocus);
+		return;
+	}
 	if (hasFocus) {
 		if (HasCaretSizeChanged()) {
 			DestroySystemCaret();
@@ -1858,12 +2249,26 @@ void ScintillaWin::UpdateSystemCaret() {
 	}
 }
 
+void ScintillaWin::UpdateCaretHeadless() {
+	if (!host_->IsNative()) {
+		UpdateSystemCaret();
+	}
+}
+
+void ScintillaWin::RedrawRect(PRectangle rc) {
+	if (host_->IsNative()) {
+		Editor::RedrawRect(rc);
+	} else {
+		host_->InvalidateRectangle(rc);
+	}
+}
+
 int ScintillaWin::SetScrollInfo(int nBar, LPCSCROLLINFO lpsi, BOOL bRedraw) {
-	return ::SetScrollInfo(MainHWND(), nBar, lpsi, bRedraw);
+	return host_->SetScrollInfo(nBar, lpsi, bRedraw ? true : false);
 }
 
 bool ScintillaWin::GetScrollInfo(int nBar, LPSCROLLINFO lpsi) {
-	return ::GetScrollInfo(MainHWND(), nBar, lpsi) ? true : false;
+	return host_->GetScrollInfo(nBar, lpsi);
 }
 
 // Change the scroll position but avoid repaint if changing to same value
@@ -1941,41 +2346,31 @@ bool ScintillaWin::ModifyScrollBars(int nMax, int nPage) {
 }
 
 void ScintillaWin::NotifyChange() {
-	::SendMessage(::GetParent(MainHWND()), WM_COMMAND,
-	        MAKELONG(GetCtrlID(), SCEN_CHANGE),
-		(LPARAM)(MainHWND()));
+	host_->NotifyChange(GetCtrlID());
 }
 
 void ScintillaWin::NotifyFocus(bool focus) {
-	::SendMessage(::GetParent(MainHWND()), WM_COMMAND,
-	        MAKELONG(GetCtrlID(), focus ? SCEN_SETFOCUS : SCEN_KILLFOCUS),
-		(LPARAM)(MainHWND()));
+	host_->NotifyFocus(focus, GetCtrlID());
 	Editor::NotifyFocus(focus);
 }
 
 void ScintillaWin::SetCtrlID(int identifier) {
-	::SetWindowID(reinterpret_cast<HWND>(wMain.GetID()), identifier);
+	host_->SetCtrlID(identifier);
 }
 
 int ScintillaWin::GetCtrlID() {
-	return ::GetDlgCtrlID(reinterpret_cast<HWND>(wMain.GetID()));
+	return host_->GetCtrlID();
 }
 
 void ScintillaWin::NotifyParent(SCNotification scn) {
-	scn.nmhdr.hwndFrom = (void*)MainHWND();
-	scn.nmhdr.idFrom = GetCtrlID();
-	::SendMessage(::GetParent(MainHWND()), WM_NOTIFY,
-	              GetCtrlID(), reinterpret_cast<LPARAM>(&scn));
+	host_->NotifyParent(scn);
 }
 
 void ScintillaWin::NotifyDoubleClick(Point pt, int modifiers) {
 	//Platform::DebugPrintf("ScintillaWin Double click 0\n");
 	ScintillaBase::NotifyDoubleClick(pt, modifiers);
 	// Send myself a WM_LBUTTONDBLCLK, so the container can handle it too.
-	::SendMessage(MainHWND(),
-			  WM_LBUTTONDBLCLK,
-			  (modifiers & SCI_SHIFT) ? MK_SHIFT : 0,
-			  MAKELPARAM(pt.x, pt.y));
+	host_->NotifyDoubleClick(modifiers, static_cast<int>(pt.x), static_cast<int>(pt.y));
 }
 
 class CaseFolderDBCS : public CaseFolderTable {
@@ -2209,7 +2604,7 @@ static bool OpenClipboardRetry(HWND hwnd) {
 }
 
 void ScintillaWin::Paste() {
-	if (!::OpenClipboardRetry(MainHWND())) {
+	if (!::OpenClipboardRetry(host_->ClipboardOwnerHwnd())) {
 		return;
 	}
 	UndoGroup ug(pdoc);
@@ -2629,10 +3024,15 @@ void ScintillaWin::ImeStartComposition() {
 		// Move IME Window to current caret position
 		IMContext imc(MainHWND());
 		Point pos = PointMainCaret();
+		// In headless mode the engine client rect is control-local, while the
+		// IME context belongs to the host window; add the control origin so the
+		// floating IME window lands at the caret.
+		int imeOffX = 0, imeOffY = 0;
+		host_->GetIMEWindowOffset(&imeOffX, &imeOffY);
 		COMPOSITIONFORM CompForm;
 		CompForm.dwStyle = CFS_POINT;
-		CompForm.ptCurrentPos.x = static_cast<int>(pos.x);
-		CompForm.ptCurrentPos.y = static_cast<int>(pos.y);
+		CompForm.ptCurrentPos.x = static_cast<int>(pos.x) + imeOffX;
+		CompForm.ptCurrentPos.y = static_cast<int>(pos.y) + imeOffY;
 
 		::ImmSetCompositionWindow(imc.hIMC, &CompForm);
 
@@ -2758,10 +3158,17 @@ LRESULT ScintillaWin::ImeOnReconvert(LPARAM lParam) {
 void ScintillaWin::GetIntelliMouseParameters() {
 	// This retrieves the number of lines per scroll as configured inthe Mouse Properties sheet in Control Panel
 	::SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &linesPerScroll, 0);
+	// On platforms without the Win32 wheel-lines setting (headless / non-Windows
+	// builds) SPI leaves linesPerScroll at 0, which disables wheel scrolling
+	// entirely (see the `linesPerScroll > 0` guard in WM_MOUSEWHEEL). Fall back
+	// to a sane 3 lines per wheel notch.
+	if (linesPerScroll == 0) {
+		linesPerScroll = 3;
+	}
 }
 
 void ScintillaWin::CopyToClipboard(const SelectionText &selectedText) {
-	if (!::OpenClipboardRetry(MainHWND())) {
+	if (!::OpenClipboardRetry(host_->ClipboardOwnerHwnd())) {
 		return;
 	}
 	::EmptyClipboard();
@@ -3374,17 +3781,72 @@ LRESULT PASCAL ScintillaWin::CTWndProc(
 
 sptr_t ScintillaWin::DirectFunction(
     sptr_t ptr, UINT iMessage, uptr_t wParam, sptr_t lParam) {
-	PLATFORM_ASSERT(::GetCurrentThreadId() == ::GetWindowThreadProcessId(reinterpret_cast<ScintillaWin *>(ptr)->MainHWND(), NULL));
-	return reinterpret_cast<ScintillaWin *>(ptr)->WndProc(iMessage, wParam, lParam);
+	ScintillaWin *sci = reinterpret_cast<ScintillaWin *>(ptr);
+	if (sci->host_->IsNative()) {
+		PLATFORM_ASSERT(::GetCurrentThreadId() == ::GetWindowThreadProcessId(sci->MainHWND(), NULL));
+	}
+	return sci->WndProc(iMessage, wParam, lParam);
 }
 
 extern "C"
 #ifndef STATIC_BUILD
 __declspec(dllexport)
 #endif
-sptr_t __stdcall Scintilla_DirectFunction(
+sptr_t  Scintilla_DirectFunction(
     ScintillaWin *sci, UINT iMessage, uptr_t wParam, sptr_t lParam) {
 	return sci->WndProc(iMessage, wParam, lParam);
+}
+
+/// Headless entry points: create/destroy a Scintilla control that needs no
+/// native window. Events and paint are delivered through the ScintillaWin On*
+/// methods (see ScintillaHost.h). The Host (with its notification callback) is
+/// owned by the caller and must outlive the returned control.
+extern "C"
+#ifndef STATIC_BUILD
+__declspec(dllexport)
+#endif
+void *  Scintilla_CreateHeadless(ScintillaHeadlessHost *sciHost) {
+	return ScintillaWin::CreateHeadless(sciHost);
+}
+
+extern "C"
+#ifndef STATIC_BUILD
+__declspec(dllexport)
+#endif
+void  Scintilla_DestroyHeadless(void *sci) {
+	ScintillaWin::DestroyHeadless(static_cast<ScintillaWin *>(sci));
+}
+
+extern "C"
+#ifndef STATIC_BUILD
+__declspec(dllexport)
+#endif
+sptr_t  Scintilla_PaintHeadless(void *sci, HDC hdc, const RECT *rc) {
+	return static_cast<ScintillaWin *>(sci)->OnPaint(hdc, *rc);
+}
+
+extern "C"
+#ifndef STATIC_BUILD
+__declspec(dllexport)
+#endif
+sptr_t  Scintilla_TickHeadless(void *sci, int reason) {
+	return static_cast<ScintillaWin *>(sci)->OnTick(reason);
+}
+
+extern "C"
+#ifndef STATIC_BUILD
+__declspec(dllexport)
+#endif
+void  Scintilla_UpdateCaretHeadless(void *sci) {
+	static_cast<ScintillaWin *>(sci)->UpdateCaretHeadless();
+}
+
+extern "C"
+#ifndef STATIC_BUILD
+__declspec(dllexport)
+#endif
+int  Scintilla_CursorForPointHeadless(void *sci, int x, int y) {
+	return static_cast<ScintillaWin *>(sci)->CursorForPointHeadless(x, y);
 }
 
 LRESULT PASCAL ScintillaWin::SWndProc(

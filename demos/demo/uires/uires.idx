@@ -36,6 +36,7 @@
 		<file name="menu_tray" path="xml\menuex_test.xml" />
 	</SMENUEX>
 	<LAYOUT>
+		<file name="page_home" path="xml\page_home.xml" />
 		<file name="page_ctrls" path="xml\page_ctrls.xml" />
 		<file name="maindlg" path="xml\dlg_main.xml" />
 		<file name="page_layout" path="xml\page_layout.xml" />
@@ -203,6 +204,18 @@
     <file name="elements" path="svg\test_elements.svg"/>
     <file name="advanced" path="svg\test_advanced.svg"/>
     <file name="comprehensive" path="svg\test_comprehensive.svg"/>
+    <file name="home_icons" path="svg\home_icons.svg"/>
+    <file name="ctrl_icons" path="svg\ctrl_icons.svg"/>
+    <file name="card_bg" path="svg\card_bg.svg"/>
+    <file name="btn_skin" path="svg\btn_skin.svg"/>
+    <file name="btn_menu" path="svg\btn_menu.svg"/>
+    <file name="btn_back" path="svg\btn_back.svg"/>
+    <file name="nav_bg" path="svg\nav_bg.svg"/>
+	<file name="radio_num" path="svg\radio_num.svg"/>
+	<file name="tab_page" path="svg\tab_page.svg"/>
+	<file name="tab_layout" path="svg\tab_layout.svg"/>
+	<file name="tab_animator" path="svg\tab_animator.svg"/>
+	<file name="tab_misc" path="svg\tab_misc.svg"/>
   </svg>
 	<xml>
 		<file name="roomlist" path="xml\roomlist.xml"/>

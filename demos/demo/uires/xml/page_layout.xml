@@ -1,47 +1,62 @@
-<?xml version="1.0"?>
-	<tabctrl pos="0,0,-0,-0" animateSteps="20" tabAlign="left" tabInterSize="2" tabWidth="150" iconSkin="skin_small_icons" icon-x="5" icon-y="8" colorText="#000000bb" curSel="0">
-		<page title="soui layout">
-			<group pos="0,0,-0,-0" id="10000">
-				I'm a group
-				<text pos="100,10" offset="-0.5,-0.5">center align1</text>
-				<text pos="100,30" offset="-0.5,-0.5">center align align</text>
-				<text pos="250,50" offset="-1,0">align right top</text>
-				<text pos="250,70" offset="-1,0">align right top 2</text>
-				<check pos="250,90" offset="-1,0">check right top</check>
-				<check pos="250,110" offset="-1,0" font="adding:-5">check right top1235</check>
-				<text pos="250,130" class="cls_txt_red">text left top</text>
-				<button pos="10,150,@150,@30">button 1 using @</button>
-				<button id="4321" pos="10,200" width="150" height="30">button 1 using width</button>
-				<text pos="%50,20,%90,@50" colorBkgnd="#ff0000">pos="%50,100,%90,@50"</text>
-				<button name="btn_display" pos="300,150,@100,@30" display="0">Image Ref</button>
-				<window skin="skin_page_icons" pos="[5,150,-10,-10" id="1236">
-					<text pos="|0,|0" offset="-0.5,-0.5" font="adding:20" colorText="#ff000066">alpha test</text>
-					<text pos="5,5" id="100" visible="0">ref text</text>
-					<button pos="sib.left@100:10,sib.bottom@100:10,@100,@25" name="btn_hidetst" tip="click me to hide me and see how the next image will move">ref id:100</button>
-				</window>
-			</group>
-		</page>
-		<page title="linear layout">
-			<!--这里演示在SOUI中使用线性布局,在window中指定layout="vbox,hbox,linearLayout"时窗口的子窗口布局变成自动布局模式-->
-			<window layout="vbox" size="-1,-1" colorBkgnd="#cccccc" gravity="center">
-				<!--线性布局的自适应子窗口大小-->
-				<text>vbox + gravity + wrapContent</text>
-				<window size="100,30" colorBkgnd="#ff0000" />
-				<window size="200,30" extend="10,5,10,5" colorBkgnd="#ff0000" />
-				<window size="120,30" layout_gravity="right" colorBkgnd="#ff0000" />
+﻿<?xml version="1.0"?>
+<!--
+  page_layout.xml - 布局演示分区
+
+  soui layout 页保留绝对布局(含 offset/sib 相对定位/@尺寸等语法演示)并包入卡片;
+  linear layout 页按 wrapContent / weight / hbox 三块卡片重排;
+  grid layout 页左右分栏:左侧为计算器演示,右侧为嵌套网格(外层 gridLayout
+  内嵌"行列对齐"与"三分窗"两个 gridLayout);template 页演示 g.block 模板。
+  frame layout 页演示 dock 四边停靠、dock=main 主视图及 dockRelativeTo 同行
+  并排 + weight 分配;flow layout 页演示 hflow 自动换行、vflow 自动换列及
+  layout_gravity 行内对齐。
+  btn_display/btn_hidetst/btn_open_wrap_content/btn_create_by_temp、
+  re_temp_input/wnd_temp_host 及 id=100/10000/4321/1236 被源码引用,不可改动。
+-->
+<tabctrl pos="0,0,-0,-0" colorBkgnd="@color/clr_page_bg" colorText="@color/clr_title" animateSteps="20" tabAlign="left" tabInterSize="2" tabWidth="150" iconSkin="svg_tab_layout" icon-x="6" icon-y="5" curSel="0">
+		<page title="soui layout" iconIndex="0" layout="vbox" padding="15,12,15,15" interval="10">
+			<text text="soui 绝对布局" font="size:16,bold:1" colorText="@color/clr_title"/>
+			<text text="演示 pos / offset / 相对兄弟节点(sib) / 百分比与 @ 固定尺寸等定位语法" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
+			<window size="-2,0" weight="1" clipClient="1">
+				<group pos="0,0,-0,-0" id="10000">
+					I'm a group
+					<text pos="100,10" offset="-0.5,-0.5">center align1</text>
+					<text pos="100,30" offset="-0.5,-0.5">center align align</text>
+					<text pos="250,50" offset="-1,0">align right top</text>
+					<text pos="250,70" offset="-1,0">align right top 2</text>
+					<check pos="250,90" offset="-1,0">check right top</check>
+					<check pos="250,110" offset="-1,0" font="adding:-5">check right top1235</check>
+					<text pos="250,130" class="cls_txt_red">text left top</text>
+					<button pos="10,150,@150,@30">button 1 using @</button>
+					<button id="4321" pos="10,200" width="150" height="30">button 1 using width</button>
+					<text pos="%50,20,%90,@50" colorBkgnd="#ff0000">pos="%50,100,%90,@50"</text>
+					<button name="btn_display" pos="300,150,@100,@30" display="0">Image Ref</button>
+					<window skin="skin_page_icons" pos="[5,150,-10,-10" id="1236">
+						<text pos="|0,|0" offset="-0.5,-0.5" font="adding:20" colorText="#ff000066">alpha test</text>
+						<text pos="5,5" id="100" visible="0">ref text</text>
+						<button pos="sib.left@100:10,sib.bottom@100:10,@100,@25" name="btn_hidetst" tip="click me to hide me and see how the next image will move">ref id:100</button>
+					</window>
+				</group>
 			</window>
-			<window pos="0,[5,@-1,@200" layout="vbox" colorBkgnd="#cccccc">
-				<!--线性布局的weight属性-->
-				<text extend_bottom="10">vbox + gravity + weight</text>
-				<window size="100,30" colorBkgnd="#ff0000" />
-				<window size="200,30" extend="10,5,10,5" colorBkgnd="#ff0000" weight="1" />
-				<window size="120,30" layout_gravity="right" colorBkgnd="#ff0000" weight="1" />
+		</page>
+		<page title="linear layout" iconIndex="1" layout="vbox" padding="15,12,15,15" interval="12">
+			<text text="线性布局" font="size:16,bold:1" colorText="@color/clr_title"/>
+			<text text="layout 指定为 vbox / hbox 后子窗口进入自动布局，支持 weight 与 layout_gravity" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
+			<window size="-2,-1" padding="14,12,14,12" layout="vbox" interval="10">
+				<text text="vbox + gravity + wrapContent" colorText="@color/clr_title" font="bold:1"/>
+				<window size="100,30" colorBkgnd="@color/clr_primary" />
+				<window size="200,30" extend="10,5,10,5" colorBkgnd="@color/clr_primary" />
+				<window size="120,30" layout_gravity="right" colorBkgnd="@color/clr_primary" />
+			</window>
+			<window size="-2,170" padding="14,12,14,12" layout="vbox" interval="10">
+				<text text="vbox + gravity + weight（weight=1 的子项均分剩余空间）" colorText="@color/clr_title" font="bold:1"/>
+				<window size="100,30" colorBkgnd="@color/clr_primary" />
+				<window size="200,30" extend="10,5,10,5" colorBkgnd="@color/clr_primary" weight="1" />
+				<window size="120,30" layout_gravity="right" colorBkgnd="@color/clr_primary" weight="1" />
 				<button size="100,30" extend_top="10">button test</button>
 			</window>
-			<window pos="0,[5" layout="vbox" colorBkgnd="#cccccc" id="10000">
-				<text extend_bottom="10" layout_gravity="center">hbox demo</text>
-				<window size="-1,-1" layout="hbox" colorBkgnd="#888888">
-					<!--线性布局之hbox-->
+			<window size="-2,-1" padding="14,12,14,12" layout="vbox" interval="10" id="10000">
+				<text text="hbox 演示" layout_gravity="center" colorText="@color/clr_title" font="bold:1"/>
+				<window size="-1,-1" layout="hbox" gravity="center">
 					<button size="100,30">button1</button>
 					<button size="100,30" extend_left="10">button2</button>
 					<button size="100,30" extend_left="10">button3</button>
@@ -50,13 +65,16 @@
 				<button size="-1,-1" padding="10,5,10,5" name="btn_open_wrap_content" extend_top="10">打开自适应大小窗口</button>
 			</window>
 		</page>
-		<page title="grid layout">
-			<tabctrl pos="0,0,-0,-0" tabAlign="bottom" tabInterSize="2" tabWidth="200" curSel="0">
-				<page title="calc">
-					<text pos="|0,10" offset="-0.5,0" text="soui grid layout calc" />
-					<window pos="10,[5,@350,-10" layout="gridLayout" columnCount="4" rowCount="6" xInterval="5" yInterval="5" xGravity="fill" yGravity="fill">
-						<edit size="0,0" cueText="数值" columnSpan="4" rowWeight="2" colorBkgnd="#ffffe0ff" />
-						<button size="0,0" text="清除" columnWeight="1" rowWeight="1" colorText="#0000ff" animate="1" skin="skin_btn_skin1_png" />
+		<page title="grid layout" iconIndex="2" layout="vbox" padding="15,12,15,15" interval="10">
+			<text text="网格布局" font="size:16,bold:1" colorText="@color/clr_title"/>
+			<text text="左侧为计算器;右侧为嵌套网格——外层 gridLayout 内嵌行列对齐与三分窗两个 gridLayout" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
+			<window size="-2,0" weight="1" layout="hbox" interval="10">
+				<!--左:计算器(4列x6行,行列按权重均分)-->
+				<window size="378,-2" padding="14,12,14,12" layout="vbox" interval="10">
+					<text text="计算器" colorText="@color/clr_title" font="bold:1"/>
+					<window size="-2,0" weight="1" layout="gridLayout" columnCount="4" rowCount="6" xInterval="5" yInterval="5" xGravity="fill" yGravity="fill">
+						<edit size="0,0" cueText="数值" columnSpan="4" rowWeight="2" colorBkgnd="@color/clr_window_bg" />
+						<button size="0,0" text="清除" columnWeight="1" rowWeight="1" colorText="@color/clr_primary" animate="1" skin="skin_btn_skin1_png" />
 						<button size="0,0" text="后退" columnWeight="1" rowWeight="1" animate="1" skin="skin_btn_skin1_png" />
 						<button size="0,0" text="/" columnWeight="1" rowWeight="1" animate="1" skin="skin_btn_skin1_png" />
 						<!--//列 行权重为1-->
@@ -90,31 +108,31 @@
 						<button size="0,0" text="." columnWeight="1" rowWeight="1" animate="1" skin="skin_btn_skin1_png" />
 						<!--列 行 权重1-->
 					</window>
-				</page>
-				<page title="行列对齐">
-					<text pos="|0,10" offset="-0.5,0" text="行列对齐" />
-					<window pos="|0,[5" offset="-0.5,0" layout="gridLayout" columnCount="2" xInterval="5" yInterval="5" xGravity="right" colorBkgnd="#888888">
-						<text size="-1,-1">所在地:</text>
-						<edit size="200,50" layout_xGravity="fill">广东 广州</edit>
-						<text size="-1,-1">邮箱:</text>
-						<edit size="200,-1" layout_xGravity="fill">xx@qq.com</edit>
-						<text size="-1,-1">兴趣:</text>
-						<edit size="200,-1" layout_xGravity="fill">看小电影</edit>
+				</window>
+				<!--右:嵌套网格(外层 1列x2行,分别内嵌"行列对齐"与"三分窗"两个 gridLayout)-->
+				<window size="0,-2" weight="1" padding="14,12,14,12" layout="vbox" interval="10">
+					<text text="嵌套网格" colorText="@color/clr_title" font="bold:1"/>
+					<window size="-2,0" weight="1" layout="grid" columnCount="2" rowCount="2" yInterval="10" xGravity="fill" yGravity="fill">
+						<window size="0,0" columnSpan="2" rowWeight="1" layout="grid" columnCount="2" xInterval="5" yInterval="5" xGravity="right">
+							<text size="-1,-1">所在地:</text>
+							<edit size="200,50" layout_xGravity="fill">广东 广州</edit>
+							<text size="-1,-1">邮箱:</text>
+							<edit size="200,-1" layout_xGravity="fill">xx@qq.com</edit>
+							<text size="-1,-1">兴趣:</text>
+							<edit size="200,-1" layout_xGravity="fill">看小电影</edit>
+						</window>
+						<window size="0,0" columnWeight="1" rowWeight="1" colorBkgnd="#60A5FA" />
+						<window size="0,0" columnWeight="1" rowWeight="1" colorBkgnd="#DBEAFE" />
 					</window>
-				</page>
-				<page title="三分窗">
-					<window size="-2,-2" layout="gridLayout" columnCount="2" xGravity="fill" yGravity="fill">
-						<window size="0,0" rowSpan="2" columnWeight="1" colorBkgnd="#ff0000" />
-						<window size="0,0" columnWeight="1" rowWeight="1" colorBkgnd="#00ff00" />
-						<window size="0,0" columnWeight="1" rowWeight="1" colorBkgnd="#0000ff" />
-					</window>
-				</page>
-			</tabctrl>
+				</window>
+			</window>
 		</page>
-		<page title="template" layout="vbox">
-			<window size="-2,-1" layout="hbox">
-				<button size="-1,-1" name="btn_create_by_temp" text="创建模板窗口" padding="10,5,10,5"/>
-				<text text="g.block模板支持3个变量，name,text,color,参考values\template.xml"/>
+		<page title="template" iconIndex="3" layout="vbox" padding="15,12,15,15" interval="10">
+			<text text="模板布局" font="size:16,bold:1" colorText="@color/clr_title"/>
+			<text text="以 XML 模板 + 变量批量创建窗口，g.block 模板支持 name / text / color 三个变量" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
+			<window size="-2,-1" layout="hbox" interval="10">
+				<button size="180,-1" name="btn_create_by_temp" text="创建模板窗口" padding="10,5,10,5"/>
+				<text text="模板定义见 values\template.xml" size="-1,-1" layout_gravity="center" colorText="@color/clr_text_sub"/>
 			</window>
 			<richedit name="re_temp_input" size="-2,100" class="cls_edit" multiLines="1" vscrollBar="1" sbSkin="skin_vscrollbar" wordWrap="1"  autoVscroll="1" hscrollBar="0">
 				<![CDATA[
@@ -126,6 +144,76 @@
 				</t:g.block>
 				]]>
 			</richedit>
-			<scrollview name="wnd_temp_host" size="-2,0" weight="1" viewSize="-1,-1" colorBkgnd="@color/white" layout="vbox"/>
+			<scrollview name="wnd_temp_host" size="-2,0" weight="1" viewSize="-1,-1" layout="vbox"/>
+		</page>
+		<page title="frame layout" iconIndex="4" layout="vbox" padding="15,12,15,15" interval="10">
+			<text text="帧布局(停靠)" font="size:16,bold:1" colorText="@color/clr_title"/>
+			<text text="子窗口以 dock 停靠四边并依次收缩可用区域,dock=main 的主视图填充剩余空间;dockRelativeTo 使多个子项并排到同一行/列,weight 按权重分配行宽/列高" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
+			<window size="-2,0" weight="1" padding="14,12,14,12" layout="vbox" interval="10">
+				<text text="dock 四边停靠 + main 主视图" colorText="@color/clr_title" font="bold:1"/>
+				<window size="-2,0" weight="1" layout="frame" colorBkgnd="@color/clr_window_bg">
+					<window name="fl_top" width="-2" height="30" dock="top" text="dock=top" colorBkgnd="#60A5FA" colorText="#FFFFFF"/>
+					<window name="fl_bottom" width="-2" height="30" dock="bottom" text="dock=bottom" colorBkgnd="#60A5FA" colorText="#FFFFFF"/>
+					<window name="fl_left" width="70" height="0" weight="1" dock="left" text="dock=left" colorBkgnd="#93C5FD" colorText="#1E3A8A"/>
+					<window name="fl_right" width="70" height="0" weight="1" dock="right" text="dock=right" colorBkgnd="#93C5FD" colorText="#1E3A8A"/>
+					<window name="fl_main" dock="main" text="dock=main(主视图,填充剩余区域)" colorBkgnd="@color/clr_window_bg" colorText="@color/clr_text_sub"/>
+				</window>
+			</window>
+			<window size="-2,175" padding="14,12,14,12" layout="vbox" interval="10"  colorBkgnd="@color/clr_window_bg">
+				<text text="dockRelativeTo 同行并排 + weight 分配剩余宽度" colorText="@color/clr_title" font="bold:1"/>
+				<window size="-2,0" weight="1" layout="frame">
+					<window name="fl_title" width="140" height="28" dock="top" text="固定宽 140" colorBkgnd="#60A5FA" colorText="#FFFFFF"/>
+					<window name="fl_fill" width="0" height="28" weight="1" dock="top" dockRelativeTo="fl_title" text="weight=1 占满同行剩余宽度" colorBkgnd="#DBEAFE" colorText="#1E3A8A"/>
+					<window name="fl_b1" width="0" height="28" weight="1" dock="bottom" text="weight=1" colorBkgnd="#93C5FD" colorText="#1E3A8A"/>
+					<window name="fl_b2" width="0" height="28" weight="1" dock="bottom" dockRelativeTo="fl_b1" text="weight=1" colorBkgnd="#93C5FD" colorText="#1E3A8A"/>
+					<window name="fl_b3" width="0" height="28" weight="1" dock="bottom" dockRelativeTo="fl_b2" text="weight=1" colorBkgnd="#93C5FD" colorText="#1E3A8A"/>
+					<window name="fl_main2" dock="main" text="dock=main" colorBkgnd="@color/clr_window_bg" colorText="@color/clr_text_sub"/>
+				</window>
+			</window>
+		</page>
+		<page title="flow layout" iconIndex="5" layout="vbox" padding="15,12,15,15" interval="10">
+			<text text="流式布局" font="size:16,bold:1" colorText="@color/clr_title"/>
+			<text text="layout 指定为 hflow 时子窗口自左向右排列、超出自动换行,vflow 自上而下排列、超出自动换列;interval 为项间距,layout_gravity 控制行/列内对齐" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
+			<window size="-2,0" weight="1" padding="14,12,14,12" layout="vbox" interval="10">
+				<text text="hflow:超出容器宽度自动换行" colorText="@color/clr_title" font="bold:1"/>
+				<window size="-2,0" weight="1" layout="hflow" interval="10">
+					<button size="100,30">按钮 1</button>
+					<button size="100,30">按钮 2</button>
+					<button size="100,30">按钮 3</button>
+					<button size="100,30">按钮 4</button>
+					<button size="100,30">按钮 5</button>
+					<button size="100,30">按钮 6</button>
+					<button size="100,30">按钮 7</button>
+					<button size="100,30">按钮 8</button>
+					<button size="100,30">按钮 9</button>
+					<button size="100,30">按钮 10</button>
+					<button size="100,30">按钮 11</button>
+					<button size="100,30">按钮 12</button>
+				</window>
+			</window>
+			<window size="-2,168" padding="14,12,14,12" layout="vbox" interval="10">
+				<text text="vflow:超出容器高度自动换列" colorText="@color/clr_title" font="bold:1"/>
+				<window size="-2,0" weight="1" layout="vflow" interval="8">
+					<button size="100,26">按钮 1</button>
+					<button size="100,26">按钮 2</button>
+					<button size="100,26">按钮 3</button>
+					<button size="100,26">按钮 4</button>
+					<button size="100,26">按钮 5</button>
+					<button size="100,26">按钮 6</button>
+					<button size="100,26">按钮 7</button>
+					<button size="100,26">按钮 8</button>
+					<button size="100,26">按钮 9</button>
+					<button size="100,26">按钮 10</button>
+				</window>
+			</window>
+			<window size="-2,130" padding="14,12,14,12" layout="vbox" interval="10">
+				<text text="layout_gravity 行内对齐(以行高最高的子项为基准)" colorText="@color/clr_title" font="bold:1"/>
+				<window size="-2,0" weight="1" layout="hflow" interval="10">
+					<button size="100,30">默认(顶部对齐)</button>
+					<button size="100,56">行高基准项</button>
+					<button size="100,36" layout_gravity="center">垂直居中</button>
+					<button size="100,36" layout_gravity="bottom">底部对齐</button>
+				</window>
+			</window>
 		</page>
 	</tabctrl>

@@ -1,0 +1,7 @@
+<window name="frame_page" layout="vbox" width="400" height="300">
+    <window name="frame_host" size="-2,-2" layout="frame">
+        <window name="p_top" width="-2" height="30" dock="top"/>
+        <window name="p_left" width="70" height="0" weight="1" dock="left"/>
+        <window name="p_main" dock="main"/>
+    </window>
+</window>

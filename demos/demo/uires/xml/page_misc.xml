@@ -1,42 +1,54 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<tabctrl pos="0,0,-0,-0" tabAlign="left" tabInterSize="2" tabWidth="200" iconSkin="skin_small_icons" icon-x="5" icon-y="8">
-    <page title="script" colorBorder="#ff0000" margin-x="1" margin-y="1">
+<!--
+  page_misc.xml - 杂项功能演示分区
+
+  汇集脚本(script)、拖放、UIAnimation、IE 控件、动态创建窗口、桌面 Dock、
+  窗口区域(SetWindowRgn)、矩阵/3D 变换、自由窗口与 SVG 等演示。
+  自成一体的小型演示(script/page_ani3、apple dock、svg 等)保持原布局,
+  常规子页统一页头版式;edit_xml/wnd_container/wnd_rgn/matrix_test/3d_test/
+  rotate_x/y/z/fmw_test/svg_test 等被源码引用,不可改动。
+-->
+<tabctrl pos="0,0,-0,-0" colorBkgnd="@color/clr_page_bg" colorText="@color/clr_title" tabAlign="left" tabInterSize="2" tabWidth="200" iconSkin="svg_tab_misc" icon-x="6" icon-y="5">
+    <page title="script" iconIndex="0" colorBorder="#ff0000" margin-x="1" margin-y="1">
       <include src="layout:page_script"/>
     </page>
-    <page title="drag drop" layout="vbox" interval="5">
-      <text size="-2,-1" offset="0,-0.5" colorText="RGB(255,0,0)"  colorBkgnd="RGB(0,255,0)">show how to implement dragdrop in soui</text>
+    <page title="drag drop" iconIndex="1" layout="vbox" interval="10" padding="15,12,15,15">
+      <text text="拖放" font="size:16,bold:1" colorText="@color/clr_title"/>
+      <text text="将文件拖入下方编辑框，观察 enableDragdrop 的接收效果" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
       <edit name="edit_drop_top1" size="-2,0" weight="1" multilines="1" cueText="draging a file to me to see what will happen"  vscrollbar="1"  margin="2,2"/>
       <edit name="edit_drop_top2" size="-2,0" weight="1" multilines="1" cueText="draging a file to me to see what will happen"  vscrollbar="1"  margin="2,2"/>
     </page>
-    <page title="animation" font="adding:10" clipClient="1">
-      <text pos="|0,|0" offset="-0.5,-0.5" colorText="#ff0000">动画效果只在Vista及以上版本的操作系统能够演示</text>
+    <page title="animation" iconIndex="2" font="adding:10" clipClient="1">
+      <text pos="|0,|0" offset="-0.5,-0.5" colorText="@color/clr_text_sub">动画效果只在Vista及以上版本的操作系统能够演示</text>
       <!--注意在uianimationwnd元素中指定bkgndBlend为0还是1对性能影响-->
-      <uianimationwnd pos="0,0,-0,-0" icon="skin_small_icons" aniMode="imgx:png_animode"  colorBkgnd="#cccccc" bkgndBlend="0"/>
-      <text pos="|0,20" offset="-0.5,0" colorText="#ff0000">SOUI动画演示</text>
+      <uianimationwnd pos="0,0,-0,-0" icon="skin_small_icons" aniMode="imgx:png_animode"  colorBkgnd="@color/clr_divider" bkgndBlend="0"/>
+      <text pos="|0,20" offset="-0.5,0" colorText="@color/clr_title">SOUI动画演示</text>
     </page>
 
-    <page title="iectrl">
-      <text pos="|0,|0" offset="-0.5,-0.5" colorText="#ff0000">IE CTRL需要窗口句柄，在半透明宿主上不能正常显示</text>
+    <page title="iectrl" iconIndex="3">
+      <text pos="|0,|0" offset="-0.5,-0.5" colorText="@color/clr_text_sub">IE CTRL需要窗口句柄，在半透明宿主上不能正常显示</text>
       <iectrl pos="0,0,-0,-0" url="http://www.baidu.com"/>
     </page>
-    <page title="create window">
-      <button name="btn_filewnd" pos="0,0,@150,@30">从文件创建窗口</button>
-      <button name="btn_createchildren" pos="|0,0,@150,@30">CreateChildren</button>
-      <window pos="0,[5,-0,-0">
-        <richedit name="edit_xml" pos="0,0,|0,-0" multilines="1" autovscroll="1" wordwrap="1"  margin-x="2" margin-y="2" cueText="输入待插入的XML字符串">
-          &lt;button pos="|0,|0,@150,@30" offset="-0.5,-0.5"&gt;new button&lt;/button&gt;
-        </richedit>
-        <window name="wnd_container" pos="|0,0,-0,-0" colorBkgnd="@color/gray"/>
+    <page title="create window" iconIndex="4" layout="vbox" padding="15,12,15,15" interval="10">
+      <text text="动态创建窗口" font="size:16,bold:1" colorText="@color/clr_title"/>
+      <text text="从 XML 字符串 / 文件创建窗口树，左侧输入 XML，右侧预览结果" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
+      <window size="-2,-1" layout="hbox" interval="10">
+        <button name="btn_filewnd" size="150,30">从文件创建窗口</button>
+        <button name="btn_createchildren" size="150,30">CreateChildren</button>
+      </window>
+      <window size="-2,0" weight="1" layout="hbox" interval="10">
+        <scintilla name="edit_xml" size="0,-2" weight="1" showLineNumber="1" lexer="xml" text="&lt;button pos=&quot;|0,|0,@150,@30&quot; offset=&quot;-0.5,-0.5&quot;&gt;new button&lt;/button&gt;"/>
+        <window name="wnd_container" size="0,-2" weight="1" colorBkgnd="@color/clr_card_bg"/>
       </window>
     </page>
-    <page title="apple dock">
+    <page title="apple dock" iconIndex="5">
       <deskdock pos="0,0,-0,-0" skin="skin_dock_bg"  skin1="skin_png_icon_1" skin2="skin_png_icon_2" skin3="skin_png_icon_3" skin4="skin_png_icon_4"
  skin5="skin_png_icon_5" skin6="skin_png_icon_6" skin7="skin_png_icon_7" skin8="skin_png_icon_8" skin9="skin_png_icon_9" skin10="skin_png_icon_10" >
 
         <text pos="|0,|0" offset="-0.5,-0.5" font="face:黑体,bold:2,adding:20" colorText="#ff000066">多点桌面 dock演示 </text>
       </deskdock>
     </page>
-    <page title="SetWindowRgn">
+    <page title="SetWindowRgn" iconIndex="6">
       <scrollview pos="0,0,-0,-0" viewSize="-1,-1">
         <!--viewSize 根据子窗口内容自动计算-->
         <window name="wnd_rgn" pos="100,100,@100,@50" offset="-0.5,-0.5" colorBkgnd="#ff000088" cursor="hand" class="cls_border">Region</window>
@@ -45,8 +57,10 @@
         <img pos="0,[0" skin="skin_bkgnd"/>
       </scrollview>
     </page>
-    <page title="transform">
-      <tabctrl tabHeight="30" size="-2,-2">
+    <page title="transform" iconIndex="7" layout="vbox" padding="15,12,15,15" interval="10">
+      <text text="矩阵变换" font="size:16,bold:1" colorText="@color/clr_title"/>
+      <text text="2D 矩阵（rotate/scale/skew/translate）、3D 旋转与表盘时钟" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
+      <tabctrl tabHeight="30" size="-2,0" weight="1">
         <page title="2d">
           <matrixWindow pos="5,5,-5,-5" skin="skin_avatar_low" name="matrix_test" clipClient="1">
             <text pos="5,5">rotate:</text>
@@ -64,7 +78,7 @@
             <radio name="rotate_x" text="rotate x"/>
             <radio name="rotate_y" text="rotate y" checked="1"/>
             <radio name="rotate_z" text="rotate z"/>
-            <text colorText="@color/red" text="只有使用skia渲染才有3D变换效果!"/>
+            <text colorText="@color/clr_text_sub" text="只有使用skia渲染才有3D变换效果!"/>
           </window>
           <s3dview name="3d_test" size="-2,0" weight="1" skin_fore="skin_avatar_low" skin_back="skin_bkgnd" clipClient="1"/>
         </page>
@@ -76,14 +90,16 @@
 	        />
         </page>
       </tabctrl>
-      
+
     </page>
-    <page title="free move" colorBkgnd="@color/gray" clipClient="1">
+    <page title="free move" iconIndex="8" clipClient="1">
+      <text pos="15,12" text="自由窗口 free move" font="size:16,bold:1" colorText="@color/clr_title"/>
+      <text pos="15,36" text="拖动标题栏移动窗口，拉伸边缘缩放，靠近边缘自动磁吸" font="size:12" colorText="@color/clr_text_sub"/>
       <freeMoveWindow name="fmw_test" margin="5,25,5,5" clipClient="1" captionHeight="20" captionSkin="skin_caption" colorBorder="#cccccc" width="160" height="100" valign="0x20" halign="0x02" distx="20" disty="20" colorBkgnd="@color/blue">
         <text pos="|0,|0" offset="-0.5,-0.5" multilines="1" colorText="@color/red">drag and resize\n the host to see\n what will happen.</text>
       </freeMoveWindow>
     </page>
-  <page title="svg">
+  <page title="svg" iconIndex="9">
     <tabctrl tabHeight="30" size="-2,-2" tabAlign="middle" animateSteps="20">
       <page title="tiger">
         <img name="svg_test" pos="|0,|0" offset="-0.5,-0.5" skin="svg_tiger"/>

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="20" viewBox="0 0 120 20">
+  <!-- frame 0: soui layout (absolute positioning anchor) -->
+  <circle cx="10" cy="10" r="4" fill="none" stroke="#2563EB" stroke-width="2"/>
+  <circle cx="10" cy="10" r="1.2" fill="#2563EB"/>
+  <path d="M10 2v3M10 15v3M2 10h3M15 10h3" stroke="#93C5FD" stroke-width="2" stroke-linecap="round"/>
+  <!-- frame 1: linear layout -->
+  <rect x="20" y="4" width="20" height="3" rx="1.5" fill="#2563EB"/>
+  <rect x="20" y="9" width="14" height="3" rx="1.5" fill="#93C5FD"/>
+  <rect x="20" y="14" width="20" height="3" rx="1.5" fill="#2563EB"/>
+  <!-- frame 2: grid layout -->
+  <rect x="42" y="3" width="7" height="7" rx="1" fill="#2563EB"/>
+  <rect x="51" y="3" width="7" height="7" rx="1" fill="#93C5FD"/>
+  <rect x="42" y="12" width="7" height="7" rx="1" fill="#93C5FD"/>
+  <rect x="51" y="12" width="7" height="7" rx="1" fill="#2563EB"/>
+  <!-- frame 3: template -->
+  <rect x="61" y="3" width="18" height="14" rx="2" fill="none" stroke="#93C5FD" stroke-width="1.5" stroke-dasharray="3 2"/>
+  <rect x="66" y="6" width="8" height="8" rx="1" fill="#2563EB"/>
+  <!-- frame 4: frame layout (docked bars around a main view) -->
+  <rect x="81" y="3" width="18" height="14" rx="2" fill="none" stroke="#2563EB" stroke-width="1.5"/>
+  <rect x="83" y="5" width="14" height="3" rx="1" fill="#2563EB"/>
+  <rect x="83" y="10" width="4" height="5" rx="1" fill="#93C5FD"/>
+  <rect x="89" y="10" width="8" height="5" rx="1" fill="#93C5FD"/>
+  <!-- frame 5: flow layout (wrapping rows of tiles) -->
+  <rect x="101" y="5" width="4" height="4" rx="1" fill="#2563EB"/>
+  <rect x="107" y="5" width="4" height="4" rx="1" fill="#93C5FD"/>
+  <rect x="113" y="5" width="4" height="4" rx="1" fill="#2563EB"/>
+  <rect x="101" y="11" width="4" height="4" rx="1" fill="#93C5FD"/>
+  <rect x="107" y="11" width="4" height="4" rx="1" fill="#2563EB"/>
+</svg>

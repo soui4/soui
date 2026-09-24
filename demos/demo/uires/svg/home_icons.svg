@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  home_icons.svg - 宫格首页分类图标雪碧图(nanosvg 兼容)
+  7 帧横排,每帧 48x48,总尺寸 336x48。
+  帧序与原 page_icons.png 一致:
+    0=基础控件  1=教程  2=动画  3=布局  4=杂项  5=skia  6=关于
+  配色:现代蓝色系 #2563EB -> #1D4ED8 渐变
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="336" height="48" viewBox="0 0 336 48">
+  <defs>
+    <linearGradient id="gBlue" gradientUnits="userSpaceOnUse" x1="0" y1="6" x2="0" y2="42">
+      <stop offset="0" stop-color="#3B82F6"/>
+      <stop offset="1" stop-color="#1D4ED8"/>
+    </linearGradient>
+    <linearGradient id="gCyan" gradientUnits="userSpaceOnUse" x1="0" y1="6" x2="0" y2="42">
+      <stop offset="0" stop-color="#38BDF8"/>
+      <stop offset="1" stop-color="#2563EB"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 帧0:基础控件(九宫格) -->
+  <g transform="translate(0,0)" fill="url(#gBlue)">
+    <rect x="5"  y="5"  width="12" height="12" rx="3"/>
+    <rect x="20" y="5"  width="12" height="12" rx="3" opacity="0.75"/>
+    <rect x="35" y="5"  width="12" height="12" rx="3"/>
+    <rect x="5"  y="20" width="12" height="12" rx="3" opacity="0.75"/>
+    <rect x="20" y="20" width="12" height="12" rx="3"/>
+    <rect x="35" y="20" width="12" height="12" rx="3" opacity="0.75"/>
+    <rect x="5"  y="35" width="12" height="12" rx="3"/>
+    <rect x="20" y="35" width="12" height="12" rx="3"/>
+    <rect x="35" y="35" width="12" height="12" rx="3" opacity="0.75"/>
+  </g>
+
+  <!-- 帧1:教程(打开的书本) -->
+  <g transform="translate(48,0)">
+    <path d="M24,13 C19,9 13,8 7,9 L7,36 C13,35 19,36 24,40 Z" fill="#93C5FD"/>
+    <path d="M24,13 C29,9 35,8 41,9 L41,36 C35,35 29,36 24,40 Z" fill="url(#gBlue)"/>
+    <path d="M24,13 L24,40" stroke="#1E40AF" stroke-width="2" fill="none"/>
+  </g>
+
+  <!-- 帧2:动画(播放按钮) -->
+  <g transform="translate(96,0)">
+    <circle cx="24" cy="24" r="17" fill="url(#gBlue)"/>
+    <path d="M20,16 L33,24 L20,32 Z" fill="#FFFFFF"/>
+  </g>
+
+  <!-- 帧3:布局(分区线框) -->
+  <g transform="translate(144,0)">
+    <rect x="7" y="7" width="34" height="34" rx="3" fill="none" stroke="url(#gBlue)" stroke-width="2.5"/>
+    <rect x="7" y="7" width="34" height="9" rx="3" fill="url(#gBlue)"/>
+    <rect x="10.5" y="19" width="11" height="19" rx="2" fill="#93C5FD"/>
+    <rect x="25" y="19" width="13" height="19" rx="2" fill="none" stroke="#2563EB" stroke-width="2"/>
+  </g>
+
+  <!-- 帧4:杂项(四色方块组合) -->
+  <g transform="translate(192,0)">
+    <rect x="4"  y="4"  width="19" height="19" rx="4" fill="url(#gBlue)"/>
+    <rect x="26" y="4"  width="19" height="19" rx="4" fill="#93C5FD"/>
+    <rect x="4"  y="26" width="19" height="19" rx="4" fill="#60A5FA"/>
+    <rect x="26" y="26" width="19" height="19" rx="4" fill="url(#gCyan)"/>
+  </g>
+
+  <!-- 帧5:skia(画笔) -->
+  <g transform="translate(240,0)">
+    <path d="M32,5 L43,16 L21,38 L10,42 L7,39 L11,27 Z" fill="url(#gBlue)"/>
+    <path d="M10,42 L7,39 L11,27 L21,38 Z" fill="#93C5FD"/>
+    <path d="M7,39 L4,44 L10,42 Z" fill="#1E40AF"/>
+    <path d="M28,9 L39,20" stroke="#FFFFFF" stroke-width="1.5" opacity="0.6" fill="none"/>
+  </g>
+
+  <!-- 帧6:关于(信息) -->
+  <g transform="translate(288,0)">
+    <circle cx="24" cy="24" r="17" fill="url(#gBlue)"/>
+    <circle cx="24" cy="15.5" r="2.6" fill="#FFFFFF"/>
+    <rect x="21.4" y="20.5" width="5.2" height="13.5" rx="2.6" fill="#FFFFFF"/>
+  </g>
+</svg>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SOUI name="sci_demo" title="Scintilla Headless DUI Test" width="760" height="480"
+      resizable="1" minsize="320,200" resizable="1" margin="5,5,5,5"
+      trCtx="sci_demo"
+>
+  <root colorBkgnd="#f0f0f0" margin="1,1,1,1" colorBorder="#a0a0a0" layout="vbox" padding="5,5,5,5">
+    <caption size="-2,37" layout="hbox" gravity="center">
+      <text font="size:14">Scintilla Headless DUI Test</text>
+      <window size="0,0" weight="1"/>
+      <imgbtn id="IDCANCEL" skin="_skin.sys.btn.close" animate="1"/>
+    </caption>
+    <scintilla size="-2,0" weight="1" name="sci_editor" font="size:20" showLineNumber="1" autocompleteList="printf println puts putchar main return void int char bool true false for while if else static struct class virtual" text="// headless Scintilla hosted in a SOUI SWindow.&#10;// No native HWND is used to render or dispatch events.&#10;int main()&#10;{&#10;    printf(&quot;hello world\n&quot;);&#10;    for (int i = 0; i &lt; 40; ++i)&#10;    {&#10;        printf(&quot;line %d: enough text to grow the vertical scrollbar.\n&quot;, i);&#10;        if (i % 4 == 0)&#10;        {&#10;            printf(&quot;    - indented multi-line block %d\n&quot;, i);&#10;            printf(&quot;    - another line in the block\n&quot;);&#10;        }&#10;    }&#10;    return 0;&#10;}&#10;"/>
+  </root>
+</SOUI>

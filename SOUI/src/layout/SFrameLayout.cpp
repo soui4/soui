@@ -1,4 +1,4 @@
-﻿#include "souistd.h"
+#include "souistd.h"
 #include "layout/SFrameLayout.h"
 #include <core/SWnd.h>
 SNSBEGIN
@@ -262,7 +262,7 @@ void SFrameLayout::CollectChildren(const IWindow *pParent, SList<ChildInfo> &lst
     const IWindow *pChild = pParent->GetNextLayoutIChild(NULL);
     while (pChild)
     {
-        if (pChild->IsVisible(TRUE))
+        if (pChild->IsVisible(FALSE))
         {
             ChildInfo info;
             info.pWnd = (IWindow *)pChild;
@@ -335,7 +335,7 @@ SIZE SFrameLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeig
     while (pos)
     {
         ChildInfo &info = lstChildren.GetNext(pos);
-        if (!info.pWnd->IsVisible(TRUE))
+        if (!info.pWnd->IsVisible(FALSE))
             continue;
 
         CSize sz = MeasureChild(info, SIZE_WRAP_CONTENT, SIZE_WRAP_CONTENT);

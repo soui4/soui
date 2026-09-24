@@ -1,4 +1,4 @@
-//stamp:01dcbf58f44b7b99
+//stamp:01dd4d709247cbe0
 /*<------------------------------------------------------------------------------------------------->*/
 #define DEFINE_UIRES(name, type, file_path)\
     name type file_path
@@ -25,6 +25,7 @@ DEFINE_UIRES(menu_file,	SMENU,	"uires/smenu/menu_file.xml")
 DEFINE_UIRES(menu_edit,	SMENU,	"uires/smenu/menu_edit.xml")
 DEFINE_UIRES(menu_help,	SMENU,	"uires/smenu/menu_help.xml")
 DEFINE_UIRES(menu_tray,	SMENUEX,	"uires/xml/menuex_test.xml")
+DEFINE_UIRES(page_home,	LAYOUT,	"uires/xml/page_home.xml")
 DEFINE_UIRES(page_ctrls,	LAYOUT,	"uires/xml/page_ctrls.xml")
 DEFINE_UIRES(maindlg,	LAYOUT,	"uires/xml/dlg_main.xml")
 DEFINE_UIRES(page_layout,	LAYOUT,	"uires/xml/page_layout.xml")
@@ -162,4 +163,16 @@ DEFINE_UIRES(tiger,	svg,	"uires/svg/tiger.svg")
 DEFINE_UIRES(elements,	svg,	"uires/svg/test_elements.svg")
 DEFINE_UIRES(advanced,	svg,	"uires/svg/test_advanced.svg")
 DEFINE_UIRES(comprehensive,	svg,	"uires/svg/test_comprehensive.svg")
+DEFINE_UIRES(home_icons,	svg,	"uires/svg/home_icons.svg")
+DEFINE_UIRES(ctrl_icons,	svg,	"uires/svg/ctrl_icons.svg")
+DEFINE_UIRES(card_bg,	svg,	"uires/svg/card_bg.svg")
+DEFINE_UIRES(btn_skin,	svg,	"uires/svg/btn_skin.svg")
+DEFINE_UIRES(btn_menu,	svg,	"uires/svg/btn_menu.svg")
+DEFINE_UIRES(btn_back,	svg,	"uires/svg/btn_back.svg")
+DEFINE_UIRES(nav_bg,	svg,	"uires/svg/nav_bg.svg")
+DEFINE_UIRES(radio_num,	svg,	"uires/svg/radio_num.svg")
+DEFINE_UIRES(tab_page,	svg,	"uires/svg/tab_page.svg")
+DEFINE_UIRES(tab_layout,	svg,	"uires/svg/tab_layout.svg")
+DEFINE_UIRES(tab_animator,	svg,	"uires/svg/tab_animator.svg")
+DEFINE_UIRES(tab_misc,	svg,	"uires/svg/tab_misc.svg")
 DEFINE_UIRES(roomlist,	xml,	"uires/xml/roomlist.xml")

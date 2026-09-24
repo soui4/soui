@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <skin>
 	<!--全局skin对象-->
 	<imglist name="skin_switch" src="imgx:png_switch" states="8" checkAsPushdown="0"/>
@@ -115,4 +115,19 @@
   <imglist name="svg_elements" src="svg:elements"/>
   <imglist name="svg_advanced" src="svg:advanced"/>
   <imglist name="svg_comprehensive" src="svg:comprehensive"/>
+
+  <!-- 宫格首页及导航使用的 SVG 图标(nanosvg 兼容雪碧图,states 为横向分帧数) -->
+  <imglist name="svg_home_icons" src="svg:home_icons" states="7"/>
+  <imglist name="svg_ctrl_icons" src="svg:ctrl_icons" states="18"/>
+  <imglist name="svg_card_bg" src="svg:card_bg" states="3"/>
+  <imglist name="svg_btn_skin" src="svg:btn_skin" states="3"/>
+  <imglist name="svg_btn_menu" src="svg:btn_menu" states="3"/>
+  <imglist name="svg_btn_back" src="svg:btn_back" states="3"/>
+  <imglist name="svg_nav_bg" src="svg:nav_bg"/>
+  <colorrect name="skin_nav_back_bk" normal="#00FFFFFF" hover="#BFDBFE" pushdown="#93C5FD" cornerRadius="6"/>
+  <imglist name="skin_svg_radio_num" src="svg:radio_num" states="3"/>
+  <imglist name="svg_tab_page" src="svg:tab_page" states="6"/>
+  <imglist name="svg_tab_layout" src="svg:tab_layout" states="6"/>
+  <imglist name="svg_tab_animator" src="svg:tab_animator" states="3"/>
+  <imglist name="svg_tab_misc" src="svg:tab_misc" states="10"/>
 </skin>

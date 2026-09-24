@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  nav_bg.svg - 主界面导航栏(nav_bar)标题渐变背景(nanosvg 兼容)
+  单帧,8x44(与导航栏同高;宽度拉伸不影响纵向渐变)。
+  纵向线性渐变:顶部淡蓝 #DBEAFE -> 底部融入页面背景色 #F1F5F9。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="8" height="44" viewBox="0 0 8 44">
+  <defs>
+    <linearGradient id="navGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#DBEAFE"/>
+      <stop offset="1" stop-color="#F1F5F9"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="8" height="44" fill="url(#navGrad)"/>
+</svg>

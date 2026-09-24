@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  radio_num.svg - numeric radio button background (nanosvg compatible)
+  3 frames side by side, each 28x28, total 84x28.
+  Frame order follows SOUI imglist convention (checkAsPushdown=true default):
+    0 = normal   : white disc + soft gray ring
+    1 = hover    : light blue disc + blue ring
+    2 = checked  : blue gradient disc + strong primary ring + halo
+  The number text is drawn by a child <text> on top (colorText=clr_primary).
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="84" height="28" viewBox="0 0 84 28">
+  <defs>
+    <linearGradient id="chkGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#BFDBFE"/>
+      <stop offset="1" stop-color="#93C5FD"/>
+    </linearGradient>
+  </defs>
+
+  <!-- frame 0: normal -->
+  <circle cx="14" cy="14" r="11" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2"/>
+
+  <!-- frame 1: hover -->
+  <circle cx="42" cy="14" r="11" fill="#DBEAFE" stroke="#60A5FA" stroke-width="2"/>
+
+  <!-- frame 2: checked / pushdown -->
+  <circle cx="70" cy="14" r="12.5" fill="none" stroke="#93C5FD" stroke-width="1.5" opacity="0.45"/>
+  <circle cx="70" cy="14" r="10.5" fill="url(#chkGrad)" stroke="#2563EB" stroke-width="2.5"/>
+</svg>

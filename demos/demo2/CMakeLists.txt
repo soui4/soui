@@ -31,7 +31,7 @@ if(CMAKE_DEBUG_POSTFIX)
     set_target_properties(demo2 PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
 endif()
 
-add_dependencies(demo soui4 ${COM_LIBS})
+add_dependencies(demo2 soui4 ${COM_LIBS})
 target_link_libraries(demo2 soui4)
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
     if(MSVC)

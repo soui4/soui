@@ -50,6 +50,7 @@ SNSBEGIN
 namespace SWindow_style
 {
 static LPCWSTR kLabel_Include = L"include";   /**< File include tag */
+static LPCWSTR kLabel_Template = L"template"; /**< Inline template definition tag */
 static LPCWSTR kTemp_Namespace = L"t:";       /**< Template identification namespace */
 static LPCWSTR kTemp_Data = L"data";          /**< Template parameter */
 static LPCWSTR kTemp_ParamFormat = L"{{%s}}"; /**< Template data replacement format */
@@ -2177,6 +2178,15 @@ class SOUI_EXP SWindow
      * @param nScale The scale factor.
      */
     void GetScaleSkin(SAutoRefPtr<ISkinObj> &pSkin, int nScale);
+
+    /**
+     * @brief Creates child windows from a window template.
+     * @param strTemplate Name or identifier of the window template.
+     * @param xmlParam XML node containing parameters used to expand the template.
+     * @return TRUE if the template is created successfully; otherwise, FALSE.
+     */
+    BOOL CreateFromTemplate(const SStringW &strTemplate, SXmlNode xmlParam);
+
     /** Protected methods for handling messages */
   protected:
     /**
@@ -2766,7 +2776,6 @@ virtual void OnAfterRemoveChild(SWindow *pChild);
  * @param pNewContainer Pointer to the new container.
  */
 virtual void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer);
-
 /** Private member variable representing the window's position in its container. */
 private:
 CRect m_rcWindow; /**<

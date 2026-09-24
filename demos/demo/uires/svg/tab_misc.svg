@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="20" viewBox="0 0 200 20">
+  <!-- frame 0: script -->
+  <path d="M7 6L3 10l4 4M13 6l4 4-4 4M11.5 4l-3 12" stroke="#2563EB" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- frame 1: drag drop -->
+  <path d="M22 13v4h16v-4" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M30 3v9M27 9l3 3 3-3" fill="none" stroke="#93C5FD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- frame 2: animation (film strip) -->
+  <rect x="42" y="5" width="16" height="10" rx="2" fill="none" stroke="#2563EB" stroke-width="2"/>
+  <path d="M47 7.5l5 2.5-5 2.5z" fill="#2563EB"/>
+  <path d="M42 17h16" stroke="#93C5FD" stroke-width="1.5" stroke-dasharray="2.5 2"/>
+  <!-- frame 3: iectrl (globe) -->
+  <circle cx="70" cy="10" r="7" fill="none" stroke="#2563EB" stroke-width="2"/>
+  <ellipse cx="70" cy="10" rx="3.2" ry="7" fill="none" stroke="#93C5FD" stroke-width="1.5"/>
+  <path d="M63 10h14M64.5 6h11M64.5 14h11" stroke="#93C5FD" stroke-width="1.5"/>
+  <!-- frame 4: create window -->
+  <rect x="82" y="4" width="14" height="11" rx="1.5" fill="none" stroke="#2563EB" stroke-width="2"/>
+  <path d="M82 8h14" stroke="#2563EB" stroke-width="2"/>
+  <path d="M98 12v7M94.5 15.5h7" stroke="#93C5FD" stroke-width="2" stroke-linecap="round"/>
+  <!-- frame 5: apple dock -->
+  <rect x="102" y="14" width="16" height="4" rx="2" fill="none" stroke="#93C5FD" stroke-width="1.5"/>
+  <circle cx="106" cy="16" r="1" fill="#2563EB"/>
+  <circle cx="110" cy="16" r="1" fill="#2563EB"/>
+  <circle cx="114" cy="16" r="1" fill="#2563EB"/>
+  <circle cx="110" cy="7" r="2.5" fill="#2563EB"/>
+  <!-- frame 6: SetWindowRgn (clipped star) -->
+  <circle cx="130" cy="10" r="7.5" fill="none" stroke="#93C5FD" stroke-width="1.5" stroke-dasharray="3 2"/>
+  <path d="M130 4.5l1.6 3.2 3.5.5-2.5 2.5.6 3.5-3.2-1.7-3.2 1.7.6-3.5-2.5-2.5 3.5-.5z" fill="#2563EB"/>
+  <!-- frame 7: transform (rotate arrow) -->
+  <path d="M156 5a6.5 6.5 0 1 0 3.5 9" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round"/>
+  <path d="M157.5 3l3 3.5-4.5 1z" fill="#2563EB"/>
+  <!-- frame 8: free move (4-way arrow) -->
+  <path d="M170 5v10M165 10h10" stroke="#2563EB" stroke-width="2" stroke-linecap="round"/>
+  <path d="M170 2l-2 3h4zM170 18l-2-3h4zM162 10l3-2v4zM178 10l-3-2v4z" fill="#2563EB"/>
+  <!-- frame 9: svg (bezier anchor) -->
+  <path d="M184 14c2.5-7 9.5-7 12 0" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="184" cy="14" r="1.6" fill="#93C5FD"/>
+  <circle cx="196" cy="14" r="1.6" fill="#93C5FD"/>
+  <path d="M186 5h8" stroke="#93C5FD" stroke-width="1.5" stroke-dasharray="2 1.5"/>
+</svg>

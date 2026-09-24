@@ -293,7 +293,7 @@ DECLARE_INTERFACE(ITimerListener)
  * generator is independent of any server instance; stop() (or destruction) joins its thread, so
  * let the listener object outlive the generator.
  */
-DECLARE_INTERFACE_(ITimerGenerator,IObjRef)
+DECLARE_INTERFACE_(ITimerGenerator, IObjRef)
 {
     /**
      * @brief Install the listener and start the timer thread
@@ -378,7 +378,7 @@ DECLARE_INTERFACE_(IWsServer, IObjRef)
      * @param task Runnable task object to be executed on the server event thread
      * @remark Intended for other threads (such as AI worker threads) to safely hand results back and serialize callbacks onto the main game thread
      */
-    STDMETHOD_(void, postServiceTask)(THIS_ const IRunnable * task) PURE;
+    STDMETHOD_(void, postServiceTask)(THIS_ const IRunnable *task) PURE;
 };
 
 /**
@@ -509,7 +509,7 @@ DECLARE_INTERFACE_(IWebsocket, IObjRef)
     /**
      * @brief Create Timer generator
      */
-    STDMETHOD_(ITimerGenerator *,CreateTimerGenerator)(CTHIS) PURE;
+    STDMETHOD_(ITimerGenerator *, CreateTimerGenerator)(CTHIS) PURE;
 
     /**
      * @brief Set log callback function

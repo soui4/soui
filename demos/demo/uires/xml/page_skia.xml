@@ -1,8 +1,14 @@
-﻿<include>
-  <tabctrl pos="0,[10,-0,-0" tabAlign="top" tabInterSize="2" tabHeight="30">
+﻿﻿﻿﻿﻿<include>
+  <!--
+    page_skia.xml - Skia 渲染高级特性演示分区
+    filter level 演示不同抗锯齿/过滤等级的头像缩放效果;
+    path 页演示 pathView 路径编辑(txt_path_length/pv_test 为代码引用名);
+    SpeedMeter 页演示仪表盘控件(speed_ctrl/btn_speed_dec/btn_speed_inc 为代码引用名)。
+  -->
+  <tabctrl pos="0,0,-0,-0" colorBkgnd="@color/clr_page_bg" colorText="@color/clr_title" tabAlign="top" tabInterSize="2" tabHeight="30">
 
     <page title="filter level">
-      <tabctrl pos="0,[10,-0,-0" tabAlign="top" tabInterSize="2" tabHeight="30">
+      <tabctrl pos="0,0,-0,-0" colorText="@color/clr_title" tabAlign="top" tabInterSize="2" tabHeight="30">
         <page title="none">
           <img pos="0,0,-0,-0" skin="skin_avatar_none"/>
         </page>
@@ -17,24 +23,28 @@
         </page>
       </tabctrl>
     </page>
-    <page title="path" layout="vbox">
-
-      <window size="-2,-1" layout="hbox">
-        <text size="-1,-1">path, left button: add point, right button: remove point.</text>
-        <text size="-1,-1" extend_left="10dp">path length:</text>
-        <text size="-1,-1" name="txt_path_length" colorText="#ff0000">0</text>
+    <page title="path" layout="vbox" padding="15,12,15,15" interval="10">
+      <text text="pathView 路径" font="size:16,bold:1" colorText="@color/clr_title"/>
+      <window size="-2,-1" layout="hbox" interval="6">
+        <text size="-1,-1" text="左键添加点，右键删除点，路径长度:" colorText="@color/clr_text_sub"/>
+        <text size="-1,-1" name="txt_path_length" colorText="@color/clr_primary">0</text>
       </window>
-      
-      <pathView size="-2,0" weight="1" cornerRadius="8" lineStyle="3" lineWidth="2" lineColor="#00ff00" name="pv_test">
-        演示path
-      </pathView>
+      <window size="-2,0" weight="1" padding="8,8,8,8">
+        <pathView size="-2,-2" cornerRadius="8" lineStyle="3" lineWidth="2" lineColor="@color/clr_primary" name="pv_test">
+          演示path
+        </pathView>
+      </window>
     </page>
-    <page title="SpeedMeter" layout="vbox">
-        <window size="-1,-1" layout="hbox"> 
-          <button name="btn_speed_dec" text="-" size="50,30"/>
-          <button name="btn_speed_inc" text="+" size="50,30"/>
+    <page title="SpeedMeter" layout="vbox" padding="15,12,15,15" interval="10">
+        <text text="SpeedMeter 仪表盘" font="size:16,bold:1" colorText="@color/clr_title"/>
+        <text text="点击 +/- 调整表盘读数，观察指针动画" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
+        <window size="-2,-1" padding="14,12,14,12" layout="vbox" gravity="center" interval="10">
+          <window size="-1,-1" layout="hbox" gravity="center" interval="10">
+            <button name="btn_speed_dec" text="-" size="50,30"/>
+            <button name="btn_speed_inc" text="+" size="50,30"/>
+          </window>
+          <SpeedMeter size="200,200" name="speed_ctrl" layout_gravity="center" extend_top="10" value="200" minValue="0" maxValue="300" RingWidth="16" />
         </window>
-        <SpeedMeter size="200,200" name="speed_ctrl" value="200" minValue="0" maxValue="300" RingWidth="16" />
     </page>
   </tabctrl>
 </include>

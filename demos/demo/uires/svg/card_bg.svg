@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  card_bg.svg - 宫格首页卡片背景(nanosvg 兼容)
+  3 帧横排,每帧 190x150(与卡片控件同比例,光栅化时无变形),总尺寸 570x150。
+  帧序与 SOUI imgbtn 三态约定一致:0=normal  1=hover  2=push
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="570" height="150" viewBox="0 0 570 150">
+  <!-- 帧0:normal 白卡片+浅灰描边 -->
+  <g transform="translate(0,0)">
+    <rect x="0.75" y="0.75" width="188.5" height="148.5" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+  </g>
+  <!-- 帧1:hover 淡蓝卡片+主色描边 -->
+  <g transform="translate(190,0)">
+    <rect x="0.75" y="0.75" width="188.5" height="148.5" rx="12" fill="#EFF6FF" stroke="#2563EB" stroke-width="1.5"/>
+  </g>
+  <!-- 帧2:push 更深淡蓝卡片+深色描边 -->
+  <g transform="translate(380,0)">
+    <rect x="0.75" y="0.75" width="188.5" height="148.5" rx="12" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.5"/>
+  </g>
+</svg>

@@ -8,5 +8,19 @@
   <white_30 value="rgba(255,255,255,30%)"/>
   <white_50 value="rgba(255,255,255,0.5)"/>
   <gray value="#808080"/>
-</color> 
+
+  <!-- 宫格首页及导航使用的现代蓝色系配色 -->
+  <clr_window_bg value="#F1F5F9"/>
+  <clr_card_bg value="#FFFFFF"/>
+  <clr_card_hover value="#EFF6FF"/>
+  <clr_primary value="#2563EB"/>
+  <clr_primary_dark value="#1D4ED8"/>
+  <clr_title value="#0F172A"/>
+  <clr_text value="#334155"/>
+  <clr_text_sub value="#64748B"/>
+  <clr_nav_bg value="#FFFFFF"/>
+  <clr_divider value="#E2E8F0"/>
+  <!--内容页统一半透明底色:叠在换肤层(demoskinbk)之上,透出主题色/皮肤图-->
+  <clr_page_bg value="rgba(255,255,255,0.7)"/>
+</color>
  

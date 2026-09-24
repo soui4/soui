@@ -2,8 +2,8 @@
       title="SOUI-DEMO"
       bigIcon="ICON_LOGO:32"
       smallIcon="ICON_LOGO:16"
-      width="666"
-      height="400"
+      width="1000"
+      height="700"
       wndType="appMain"
       margin="10,10,10,10"
       resizable="1"
@@ -45,19 +45,27 @@
     end
     ]]>
   </script>
+  <!--
+    主窗口布局说明:
+      1. id=9527 的 window 是换肤演示的背景载体(demoskinbk),换肤/主题色渲染均作用于它;
+      2. nav_bar 为全局导航栏(背景透明,不遮挡换肤层),
+         返回按钮与标题文字组合在同一个 button(btn_back)内,点击任意位置均返回宫格首页;
+         仅在宫格以外的页面显示;
+      3. tab_main 隐藏页签头(tabHeight=0),九宫格首页与 7 个演示分区页均由 tabctrl 承载,
+         animateSteps=30(300ms)+Decelerate 插值器提供页面滑动切换动画,
+         页面切换统一由宫格卡片和返回按钮驱动(SetCurSel)。
+  -->
   <root skin="_skin.sys.wnd.bkgnd" cache="1" on_init="on_init" on_exit="on_exit"
         enterAnimation="anim:alpha_in" exitAnimation="anim:alpha_out">
     <window pos="1,1,-1,-1" id="9527" skin="demoskinbk" cache="1" colorBkgnd="#169ada"/>
     <caption pos="0,0,-0,30" font="adding:2" layout="hbox" gravity="center" padding_left="10">
-      <frame size="-2,-2" layout="hbox" gravity="center">       
+      <frame size="-2,-2" layout="hbox" gravity="center">
         <!--show where a frame widget can be used-->
         <icon src="ICON_LOGO:16"/>
         <text name="txt_title" extend_left="5"/>
-        <text text="QQ群:" extend_left="5"/>
-        <text text="229313785" colorText="@color/red"/>
         <window size="0,0" weight="1" visible="0"/>
-        <imgbtn name="btn_skin" skin="skin_btn_skin"  animate="1"/>
-        <imgbtn name="btn_menu" skin="skin_btn_menu" animate="1" />
+        <imgbtn name="btn_skin" skin="svg_btn_skin" size="20,20" animate="1"/>
+        <imgbtn name="btn_menu" skin="svg_btn_menu" size="20,20" animate="1" extend_left="8"/>
         <imgbtn id="5" skin="_skin.sys.btn.minimize"  animate="1" />
         <window size="-1,-1">
           <imgbtn id="2" skin="_skin.sys.btn.maximize"  pos="0,0" animate="1" />
@@ -66,27 +74,42 @@
         <imgbtn id="1" skin="_skin.sys.btn.close"  tip="close" animate="1"/>
       </frame>
     </caption>
-    <tabctrl name="tab_main" pos="5,30,-5,-5" interpolator="Decelerate" curSel="0" focusable="0" animateSteps="30" animateType="1" tabHeight="75" text-y="50" tabSkin="_skin.sys.tab.header" iconSkin="skin_page_icons" icon-x="10" colorTextHover="#ff0000" fontHover="italic:1">
-      <page title="soui ctrl">
-        <include src="layout:page_ctrls"/>
+
+    <tabctrl name="tab_main" pos="5,30,-5,-5" interpolator="Decelerate" curSel="0" focusable="0" animateSteps="30" tabHeight="0" text-y="50" tabSkin="_skin.sys.tab.header" iconSkin="skin_page_icons" icon-x="10" colorTextHover="#ff0000" fontHover="italic:1">
+      <page title="home">
+        <include src="layout:page_home"/>
       </page>
-      <page title="教程" tip="show webkit based on WKE">
-        <include src="layout:page_webkit"/>
-      </page>
-      <page title="animate" tip="play gif and apng">
-        <include src="layout:page_animator"/>
-      </page>
-      <page title="layout" tip="show layout capability in soui">
-        <include src="layout:page_layout"/>
-      </page>
-      <page title ="misc." tip="many features, just find it.">
-        <include src="layout:page_misc"/>
-      </page>
-      <page title="skia" tip="demo skia advance features">
-        <include src="layout:page_skia"/>
-      </page>
-      <page title="about" tip="copy right(c) setoutsoft 2011-2019.">
-        <include src="layout:page_about"/>
+      <page title="contents" layout="vbox">
+        <!--全局导航栏:进入演示分区时显示;背景保持透明以露出换肤层(demoskinbk); back 按钮与标题文字组合为同一个按钮,点击任意位置均可返回宫格首页-->
+        <window name="nav_bar" size="-2,44" layout="hbox" gravity="center" padding_left="10">
+          <button name="btn_back" layout="hbox" gravity="center" interval="6" padding="8,4,12,4" skin="skin_nav_back_bk" cursor="hand" tip="返回宫格首页">
+            <img skin="svg_btn_back" size="20,20"/>
+            <text name="txt_nav_title" font="size:18,bold:1" colorText="@color/clr_title" msgTransparent="1"/>
+          </button>
+        </window>
+        <tabctrl name="tab_contents" size="-2,0" weight="1" interpolator="Decelerate" curSel="0" focusable="0" animateSteps="30" tabHeight="0" text-y="50" tabSkin="_skin.sys.tab.header" iconSkin="skin_page_icons" icon-x="10" colorTextHover="#ff0000" fontHover="italic:1">
+          <page title="soui ctrl">
+            <include src="layout:page_ctrls"/>
+          </page>
+          <page title="教程" tip="show webkit based on WKE">
+            <include src="layout:page_webkit"/>
+          </page>
+          <page title="animate" tip="play gif and apng">
+            <include src="layout:page_animator"/>
+          </page>
+          <page title="layout" tip="show layout capability in soui">
+            <include src="layout:page_layout"/>
+          </page>
+          <page title ="misc." tip="many features, just find it.">
+            <include src="layout:page_misc"/>
+          </page>
+          <page title="skia" tip="demo skia advance features">
+            <include src="layout:page_skia"/>
+          </page>
+          <page title="about" tip="copy right(c) setoutsoft 2011-2019.">
+            <include src="layout:page_about"/>
+          </page>
+        </tabctrl>
       </page>
     </tabctrl>
     <shellnotifyicon name="tray_008" icons="ICON_MM_ONLINE;ICON_MM_OFFLINE;ICON_Loading1;ICON_Loading2;ICON_Loading3;ICON_Loading4;ICON_Loading5;ICON_Loading6" startframe="2" duration="200" tip="SOUI小飞侠"/>

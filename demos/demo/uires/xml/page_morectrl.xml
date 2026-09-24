@@ -1,6 +1,16 @@
-<window size="-2,-2" layout="vbox" interval="10">
-	<window size="-2,-1" layout="hbox" gravity="center" interval="5">
-		<text text="menubar:"/>
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  page_morectrl.xml - 更多扩展控件演示(page_ctrls 的 morectrl 子页)
+
+  菜单栏(menubar)、Chrome 风格页签(chromeTabCtrl,支持拖拽与新建/关闭)、
+  旋钮(imgknob)、水波进度(waveProgress)与验证码输入(verificationCodeEdit)。
+  chromeTab 的 EventCmd 事件由 CMainDlg 按名绑定,不可改名。
+-->
+<window size="-2,-2" layout="vbox" interval="12" colorBkgnd="@color/clr_page_bg">
+	<text text="更多控件" font="size:16,bold:1" colorText="@color/clr_title"/>
+	<text text="菜单栏、Chrome 页签、旋钮、水波进度与验证码输入" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
+	<window size="-2,-1" padding="10,8,10,8" layout="hbox" gravity="center" interval="5">
+		<text text="menubar:" colorText="@color/clr_text"/>
 		<menubar size="-1,30">
 			<btnstyle skin="_skin.sys.list.item" padding="2"/>
 			<menus>
@@ -20,14 +30,16 @@
 			<chromeTab tip="the tab #3">tab3</chromeTab>
 		</tabs>
 	</chromeTabCtrl>
-	<window size="-1,-1" layout="hbox" interval="10">
+	<window size="-2,-1" padding="12,10,12,10" layout="hbox" gravity="center" interval="20">
 		<imgknob size="80,80"  skin="skin_knob" min="0" max="1" value="0.5"/>
 		<imgknob size="80,80"  skin="skin_knob" min="0" max="1" value="0"/>
 	</window>
-	<window size="-1,-1" layout="hbox" interval="10">
+	<window size="-2,-1" padding="12,10,12,10" layout="hbox" gravity="center" interval="20">
 		<waveProgress size="100,100" name="waveProgress0" value="50" min="0" max="100"/>
 		<waveProgress size="100,100" name="waveProgress1" value="60" min="0" max="100"/>
 		<waveProgress size="100,100" name="waveProgress2" value="80" min="0" max="100"/>
 	</window>
-	<verificationCodeEdit size="300,40" name="verificationCodeEdit" maxBuffer="6"/>
+	<window size="-2,-1" padding="12,10,12,10" layout="hbox" gravity="center">
+		<verificationCodeEdit size="300,40" name="verificationCodeEdit" maxBuffer="6"/>
+	</window>
 </window>
