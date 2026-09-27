@@ -143,6 +143,7 @@ jobs:
           build/bin/${{ env.BUILD_TYPE }}/cnchess/**
           build/bin/${{ env.BUILD_TYPE }}/upgrade/**
           build/bin/${{ env.BUILD_TYPE }}/Config/**
+          build/bin/${{ env.BUILD_TYPE }}/demo_res/**
 
     - name: Upload demo (Linux)
       if: matrix.os == 'Linux'
@@ -156,6 +157,7 @@ jobs:
           build/bin/junqi/**
           build/bin/cnchess/**
           build/bin/upgrade/**
+          build/bin/demo_res/**
           !build/bin/*.a
           !build/bin/*.o
 
@@ -171,6 +173,7 @@ jobs:
           build/bin/cnchess/**
           build/bin/upgrade/**
           build/bin/Config/**
+          build/bin/demo_res/**
           !build/bin/*.a
           !build/bin/*.o
 
