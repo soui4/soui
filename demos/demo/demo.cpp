@@ -87,9 +87,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 #elif defined(__APPLE__)
     AddFontResource((appDir + _T("/fonts/simsun.ttc")).c_str());
 #endif
-    //渲染类型选择(暂时屏蔽,自动化验证时自动选择 Skia)
-    int nType = IDYES;
-    //int nType = MessageBox(GetActiveWindow(), _T("选择渲染类型：\n[yes]: Skia\n[no]:GDI\n[cancel]:Quit"), _T("select a render"), MB_ICONQUESTION | MB_YESNOCANCEL);
+    int nType = MessageBox(GetActiveWindow(), _T("选择渲染类型：\n[yes]: Skia\n[no]:GDI\n[cancel]:Quit"), _T("select a render"), MB_ICONQUESTION | MB_YESNOCANCEL);
     if (nType == IDCANCEL)
     {
         return 0;

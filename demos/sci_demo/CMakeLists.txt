@@ -37,6 +37,14 @@ endif()
 if(SOUI_ENABLE_COM_LIB)
     target_link_libraries(${current_project} ${COM_LIBS} ${COM_DEP_LIBS})
 endif()
+if (CMAKE_SYSTEM_NAME MATCHES Windows)
+    if(MSVC AND MSVC_VERSION GREATER_EQUAL 1900)
+        set(DPI_AWARE_MANIFEST "${PROJECT_SOURCE_DIR}/__cmake/dpi_aware.manifest")
+        set_target_properties(${current_project} PROPERTIES
+            LINK_FLAGS "/MANIFEST:EMBED /MANIFESTINPUT:${DPI_AWARE_MANIFEST}"
+        )
+    endif()
+endif()
 set_target_properties (${current_project} PROPERTIES
     FOLDER demos
 )

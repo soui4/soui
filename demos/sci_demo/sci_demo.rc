@@ -1,0 +1,4 @@
+// sci_demo.rc : exe 文件图标(资源 ID 1 = 应用默认图标)
+// 图标源文件 res/sci_demo.svg 经 tools/svgcvt.exe 转换:
+//   svgcvt -i res/sci_demo.svg -o uires/image/sci_demo.ico -f ico
+1 ICON "uires/image/sci_demo.ico"

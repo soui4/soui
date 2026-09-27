@@ -3,6 +3,9 @@
 	<UIDEF>
 		<file name="XML_INIT" path="uidef\init.xml" />
 	</UIDEF>
+	<ICON>
+		<file name="ICON_LOGO" path="image\sci_demo.ico" />
+	</ICON>
 	<values>
 		<file name="string" path="values\string.xml" />
 		<file name="color" path="values\color.xml" />
@@ -11,4 +14,7 @@
 	<layout>
 		<file name="sci.demo" path="layout\sci.demo.xml" />
 	</layout>
+	<svg>
+		<file name="logo" path="svg\logo.svg" />
+	</svg>
 </resource>

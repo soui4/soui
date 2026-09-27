@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <SOUI name="sci_demo" title="Scintilla Headless DUI Test" width="760" height="480"
       resizable="1" minsize="320,200" resizable="1" margin="5,5,5,5"
+      bigIcon="ICON_LOGO:48" smallIcon="ICON_LOGO:16"
       trCtx="sci_demo"
 >
   <root colorBkgnd="#f0f0f0" margin="1,1,1,1" colorBorder="#a0a0a0" layout="vbox" padding="5,5,5,5">
     <caption size="-2,37" layout="hbox" gravity="center">
+      <img skin="logo" size="24,24"/>
       <text font="size:14">Scintilla Headless DUI Test</text>
       <window size="0,0" weight="1"/>
       <imgbtn id="IDCANCEL" skin="_skin.sys.btn.close" animate="1"/>
