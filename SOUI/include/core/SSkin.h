@@ -84,9 +84,14 @@ class SOUI_EXP SSkinImgList : public SSkinObjBase {
 
     /**
      * @brief Gets the image used by the skin.
-     * @return Pointer to the bitmap source.
+     * @details Returns an owning SAutoRefPtr taken under the skin lock: the
+     *          bitmap stays alive even if a concurrent thread lazy-loads or
+     *          re-sets the image. Assigning it to a raw pointer still works
+     *          via the implicit conversion (borrowed) when the caller does
+     *          not need to keep it alive.
+     * @return The bitmap source, or NULL when the skin uses SVG instead.
      */
-    virtual IBitmapS *GetImage() const;
+    virtual SAutoRefPtr<IBitmapS> GetImage() const;
 
     /**
      * @brief Sets the SVG object for the skin.
@@ -97,9 +102,10 @@ class SOUI_EXP SSkinImgList : public SSkinObjBase {
 
     /**
      * @brief Gets the SVG object used by the skin.
-     * @return Pointer to the SVG object.
+     * @return Owning SAutoRefPtr to the SVG object, or NULL when the skin
+     *         uses a bitmap instead (see GetImage).
      */
-    virtual ISvgObj *GetSvg() const;
+    virtual SAutoRefPtr<ISvgObj> GetSvg() const;
 
     /**
      * @brief Sets whether the image should be tiled.
@@ -181,9 +187,22 @@ class SOUI_EXP SSkinImgList : public SSkinObjBase {
      * @param pRT Render target used to obtain the render factory.
      * @param cxPerState Width of one state's tile in the output bitmap (pixels).
      * @param cyPerState Height of one state's tile in the output bitmap (pixels).
-     * @return IBitmapS* Pointer to the cached bitmap (borrowed; may be NULL on failure).
+     * @return Owning SAutoRefPtr to the cached bitmap (may be NULL on failure).
+     *         The reference keeps the bitmap alive even if a concurrent colorize
+     *         resets the cache while this draw is in flight.
      */
-    IBitmapS *GetSvgCacheBitmap(IRenderTarget *pRT, int cxPerState, int cyPerState) const;
+    SAutoRefPtr<IBitmapS> GetSvgCacheBitmap(IRenderTarget *pRT, int cxPerState, int cyPerState) const;
+
+    /**
+     * @brief One-lock accessor for the drawing path: fetches BOTH the bitmap
+     *        and the SVG object (either one is NULL) and performs the lazy
+     *        load when neither has been loaded yet.
+     * @details This is the primitive behind GetImage()/GetSvg(); a draw only
+     *          needs this single call, the returned references stay valid for
+     *          the whole draw, and no further locking is required while
+     *          drawing.
+     */
+    void GetDrawable(SAutoRefPtr<IBitmapS> &pImg, SAutoRefPtr<ISvgObj> &pSvg) const;
 
   protected:
     int m_nStates;                     /**< Number of skin states */

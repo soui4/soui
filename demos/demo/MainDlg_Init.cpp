@@ -22,11 +22,9 @@
 #include "stdafx.h"
 #include "MainDlg.h"
 #include <controls.extend/SHexEdit.h>
-#include <controls.extend/SMcListViewEx/SMCListViewEx.h> //adapter.h 依赖 SMcAdapterBaseEx
 #include <controls.extend/reole/RichEditOle.h>           //CSmileySource/SetSRicheditOleCallback
 #include "SMatrixWindow.h"
 #include "skin/SSkinLoader.h"
-#include "adapter.h"
 #include "trayicon/SShellTray.h"
 #include "CAdapter.h"
 #include "CDropTarget.h"
@@ -119,11 +117,10 @@ LRESULT CMainDlg::OnInitDialog( HWND hWnd, LPARAM lParam )
 }
 
 /**
-* @brief      列表控件(SListCtrl)与扩展多列列表演示数据初始化
+* @brief      列表控件(SListCtrl)演示数据初始化
 *
-* Describe    - SListCtrl:传统报告风格列表,ItemData 中挂 student 结构,
-*               表头点击排序事件通过 subscribeEvent 动态订阅(见 OnListHeaderClick);
-*             - SMCListViewEx:音乐列表示例,由 SMusicListAdapter 提供数据。
+* Describe    SListCtrl:传统报告风格列表,ItemData 中挂 student 结构,
+*             表头点击排序事件通过 subscribeEvent 动态订阅(见 OnListHeaderClick)。
 */
 void CMainDlg::InitListCtrl()
 {
@@ -137,12 +134,12 @@ void CMainDlg::InitListCtrl()
         pHeader->GetEventSet()->subscribeEvent(EVT_HEADER_CLICK,Subscriber(&CMainDlg::OnListHeaderClick,this));
 
         //插入 100 行演示数据
-        TCHAR szSex[][8]={_T("男"),_T("女"),_T("人妖")};
+        TCHAR szSex[][8]={_T("男"),_T("女")};
         for(int i=0;i<100;i++)
         {
             student *pst=new student;
             _stprintf(pst->szName,_T("学生_%d"),i+1);
-            _tcscpy(pst->szSex,szSex[rand()%3]);
+            _tcscpy(pst->szSex,szSex[rand()%2]);
             pst->age=rand()%30;
             pst->score=rand()%60+40;
 
@@ -156,16 +153,6 @@ void CMainDlg::InitListCtrl()
             pList->SetSubItemText(iItem,3,szBuf);
         }
     }
-
-	//扩展多列列表(SMCListViewEx),使用适配器提供音乐数据
-	SMCListViewEx *musiclist = FindChildByName2<SMCListViewEx>(_T("musiclist"));
-	if (musiclist)
-	{
-		SMusicListAdapter* musicadapter = new SMusicListAdapter(1, m_hWnd);
-		musiclist->SetAdapter(musicadapter);
-		//SetAdapter 内部已 AddRef,这里释放一次初始引用,由列表托管生命周期
-		musicadapter->Release();
-	}
 }
 
 /**

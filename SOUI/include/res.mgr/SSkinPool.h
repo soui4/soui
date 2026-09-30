@@ -68,6 +68,8 @@ enum SYS_SKIN
     SKIN_SYS_BTN_MINI_CLOSE,
     SKIN_SYS_LIST_ITEM,
 
+    SKIN_SYS_SELBAND, /**< L"_skin.sys.selband": rubber band (marquee) selection rectangle */
+
     SKIN_SYS_COUNT,
 };
 
@@ -213,6 +215,16 @@ class SOUI_EXP SSkinPool
 #endif
 
     BOOL m_bAutoScale; /**< Flag indicating if automatic scaling is enabled */
+
+    // Thread safety: SSkinPool has NO lock of its own. Every public API
+    // (GetSkin/AddSkin/RemoveSkin/RemoveAll/LoadSkins) serializes on
+    // SUiDef::GetSkinLock() (recursive) -- the SAME lock used by SUiDef's
+    // skin/style/font paths. One lock, one lock order (SUiDef -> skin),
+    // so no SUiDef-vs-pool ABBA deadlock is possible and direct pool calls
+    // from user code (e.g. SImagePlayer pushing a lazy gif skin) are safe.
+    // Remaining constraint: a per-skin SSkinObjBase::m_cs must NEVER be held
+    // while calling GETSKIN/SUiDef::GetSkin -- two skins could otherwise
+    // deadlock against each other through the SUiDef lock.
 };
 
 SNSEND

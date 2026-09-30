@@ -90,8 +90,6 @@ namespace SOUI
     }
     void SFolderTreeCtrl::DrawTreeItem(IRenderTarget *pRT, CRect & rc, HSTREEITEM hItem)
     {    
-        BOOL     bTextColorChanged = FALSE;;
-        COLORREF crOldText=RGBA(0xFF,0xFF,0xFF,0xFF);
         CRect rcItemBg;
         LPTVITEM pItem=CSTree<LPTVITEM>::GetItem(hItem);
 
@@ -105,24 +103,10 @@ namespace SOUI
         //绘制背景
         if (hItem == m_hSelItem)
         {
-            if (m_pItemSelSkin != NULL)
-                m_pItemSelSkin->DrawByIndex(pRT, rcItemBg, 0);
+            if (m_pItemSkin != NULL)
+                m_pItemSkin->DrawByIndex(pRT, rcItemBg, 0);
             else if (CR_INVALID != m_crItemSelBg)
                 pRT->FillSolidRect(rcItemBg, m_crItemSelBg);
-
-            if (CR_INVALID != m_crItemSelText)
-            {
-                bTextColorChanged = TRUE;
-                crOldText = pRT->SetTextColor(m_crItemSelText);
-            }
-        }
-        else
-        {
-            if (CR_INVALID != m_crItemText)
-            {
-                bTextColorChanged = TRUE;
-                crOldText = pRT->SetTextColor(m_crItemText);
-            }
         }
 
         if (pItem->bHasChildren &&
@@ -159,10 +143,10 @@ namespace SOUI
 
         UINT align=DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS;
         rcItemBg.OffsetRect(nItemMargin, 0);
+		COLORREF crText = GetStyle().GetTextColor(hItem == m_hSelItem ? 2 : 0);
+		COLORREF crOldText = pRT->SetTextColor(crText);
         pRT->DrawText(pItem->strText,-1,rcItemBg,align);    
-
-        if (bTextColorChanged)
-            pRT->SetTextColor(crOldText);
+        pRT->SetTextColor(crOldText);
 
         pRT->OffsetViewportOrg(-(rc.left  + pItem->nLevel * nIndent),-rc.top);
     }

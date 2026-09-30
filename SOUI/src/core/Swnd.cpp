@@ -4228,7 +4228,7 @@ void SWindow::accNotifyEvent(DWORD dwEvt)
 #ifdef SOUI_ENABLE_ACC
     if (GetContainer())
         NotifyWinEvent(dwEvt, GetContainer()->GetHostHwnd(), GetSwnd(), CHILDID_SELF);
-#endif
+#endif // SOUI_ENABLE_ACC
 }
 
 BOOL SWindow::SetLayoutParam(ILayoutParam *pLayoutParam)

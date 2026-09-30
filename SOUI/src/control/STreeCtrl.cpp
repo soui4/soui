@@ -14,18 +14,19 @@ STreeCtrl::STreeCtrl()
     , m_nIndent(18)
     , m_nItemMargin(4)
     , m_hSelItem(0)
+    , m_hSelAnchor(0)
+    , m_bMultiSel(FALSE)
+    , m_bFullRowSel(TRUE)
+    , m_hBandOldSel(0)
     , m_hHoverItem(0)
     , m_hCaptureItem(0)
-    , m_pItemBgSkin(NULL)
-    , m_pItemSelSkin(NULL)
+    , m_pItemSkin(GETBUILTINSKIN(SKIN_SYS_LIST_ITEM))
     , m_pIconSkin(NULL)
     , m_pLineSkin(GETBUILTINSKIN(SKIN_SYS_TREE_LINES))
     , m_pToggleSkin(GETBUILTINSKIN(SKIN_SYS_TREE_TOGGLE))
     , m_pCheckSkin(GETBUILTINSKIN(SKIN_SYS_TREE_CHECKBOX))
     , m_crItemBg(RGBA(255, 255, 255, 255))
     , m_crItemSelBg(RGBA(0, 0, 136, 255))
-    , m_crItemText(RGBA(0, 0, 0, 255))
-    , m_crItemSelText(RGBA(255, 255, 255, 255))
     , m_nVisibleItems(0)
     , m_nContentWidth(0)
     , m_bCheckBox(FALSE)
@@ -41,6 +42,7 @@ STreeCtrl::STreeCtrl()
     m_bFocusable = TRUE;
     m_evtSet.addEvent(EVENTID(EventTCSelChanging));
     m_evtSet.addEvent(EVENTID(EventTCSelChanged));
+    m_evtSet.addEvent(EVENTID(EventTreeItemSelChanged));
     m_evtSet.addEvent(EVENTID(EventTCCheckState));
     m_evtSet.addEvent(EVENTID(EventTCExpand));
     m_evtSet.addEvent(EVENTID(EventTCDbClick));
@@ -97,9 +99,41 @@ BOOL STreeCtrl::RemoveItem(HSTREEITEM hItem)
     if (IsAncestor(hItem, m_hHoverItem))
         m_hHoverItem = 0;
     if (IsAncestor(hItem, m_hSelItem))
+    {
         m_hSelItem = 0;
+        m_hSelAnchor = 0;
+    }
+    else if (IsAncestor(hItem, m_hSelAnchor))
+    {
+        // The shift-range anchor can be a fixed base independent of the
+        // cursor (e.g. it lives in a sibling branch); clear it too so it
+        // never dangles past the deletion. Keeping it in an else branch
+        // preserves the invariant: cursor cleared => anchor cleared.
+        m_hSelAnchor = 0;
+    }
     if (IsAncestor(hItem, m_hCaptureItem))
         m_hCaptureItem = 0;
+
+    // Drop the item (and its descendants) from the multi-selection map -
+    // silently, the rows are going away (same convention as STreeView).
+    // Filter on ancestry: a pre-order walk starting from the last child
+    // would run past the subtree into the following siblings and wrongly
+    // deselect them.
+    {
+        SArray<HSTREEITEM> arrStale;
+        for (SPOSITION pos = m_mapSelItems.GetStartPosition(); pos;)
+        {
+            HSTREEITEM hSel;
+            BOOL bVal;
+            m_mapSelItems.GetNextAssoc(pos, hSel, bVal);
+            if (hSel == hItem || IsAncestor(hItem, hSel))
+                arrStale.Add(hSel);
+        }
+        for (int i = 0; i < (int)arrStale.GetCount(); i++)
+        {
+            m_mapSelItems.RemoveKey(arrStale[i]);
+        }
+    }
 
     DeleteItem(hItem);
 
@@ -137,8 +171,10 @@ void STreeCtrl::RemoveAllItems()
     DeleteAllItems();
     m_nVisibleItems = 0;
     m_hSelItem = 0;
+    m_hSelAnchor = 0;
     m_hHoverItem = 0;
     m_hCaptureItem = 0;
+    m_mapSelItems.RemoveAll();
     m_nContentWidth = 0;
     UpdateScrollBar();
 }
@@ -760,8 +796,17 @@ HSTREEITEM STreeCtrl::HitTest(CPoint &pt)
         {
             CRect rcItem(nIndent * pItem->nLevel, 0, rcClient.Width(), nItemHei);
             rcItem.OffsetRect(rcClient.left - m_siHoz.nPos, rcClient.top - m_siVer.nPos + iVisible * nItemHei);
-            pt -= rcItem.TopLeft();
-            hRet = hItem;
+            if (!m_bFullRowSel && pt.x - rcItem.left > pItem->nContentWidth)
+            {
+                // Text-highlight mode: the area beyond the item text does not
+                // belong to the item, so clicking there must not select it.
+                hRet = 0;
+            }
+            else
+            {
+                pt -= rcItem.TopLeft();
+                hRet = hItem;
+            }
             break;
         }
         if (pItem->bCollapsed)
@@ -801,9 +846,6 @@ void STreeCtrl::RedrawItem(HSTREEITEM hItem)
 
 void STreeCtrl::DrawItem(IRenderTarget *pRT, const CRect &rc, HSTREEITEM hItem)
 {
-    BOOL bTextColorChanged = FALSE;
-    ;
-    COLORREF crOldText = RGBA(0xFF, 0xFF, 0xFF, 0xFF);
     CRect rcItemBg;
     LPTVITEM pItem = CSTree<LPTVITEM>::GetItem(hItem);
 
@@ -814,27 +856,29 @@ void STreeCtrl::DrawItem(IRenderTarget *pRT, const CRect &rc, HSTREEITEM hItem)
     rcItemBg.SetRect(m_nItemOffset + m_nItemMargin.toPixelSize(GetScale()), 0, pItem->nContentWidth, nItemHei);
     if (rcItemBg.right > rc.Width() - pItem->nLevel * nIndent)
         rcItemBg.right = rc.Width() - pItem->nLevel * nIndent;
-    // Draw background
-    if (hItem == m_hSelItem)
+    if (m_bFullRowSel)
     {
-        if (m_pItemSelSkin != NULL)
-            m_pItemSelSkin->DrawByIndex(pRT, rcItemBg, 0);
+        // Full-row selection: the highlight covers the entire visible item row,
+        // including the indent (tree lines) space before the item content.
+        CRect rcClient;
+        GetClientRect(&rcClient);
+        rcItemBg.left = -pItem->nLevel * nIndent;
+        rcItemBg.right = rcClient.Width() + m_siHoz.nPos - pItem->nLevel * nIndent;
+    }
+    // Draw background
+    if (IsItemSelected(hItem))
+    {
+        if (m_pItemSkin != NULL)
+        {
+            // Draw with the selected state index (falls back to index 0 for
+            // single-state skins dedicated to the selected look).
+            int idx = SState2Index::GetDefIndex(WndState_Check, true);
+            if (idx >= m_pItemSkin->GetStates())
+                idx = 0;
+            m_pItemSkin->DrawByIndex(pRT, rcItemBg, idx);
+        }
         else if (CR_INVALID != m_crItemSelBg)
             pRT->FillSolidRect(rcItemBg, m_crItemSelBg);
-
-        if (CR_INVALID != m_crItemSelText)
-        {
-            bTextColorChanged = TRUE;
-            crOldText = pRT->SetTextColor(m_crItemSelText);
-        }
-    }
-    else
-    {
-        if (CR_INVALID != m_crItemText)
-        {
-            bTextColorChanged = TRUE;
-            crOldText = pRT->SetTextColor(m_crItemText);
-        }
     }
 
     if (pItem->bHasChildren && STVIMask_Toggle == (m_uItemMask & STVIMask_Toggle) && !m_bHasLines)
@@ -857,7 +901,7 @@ void STreeCtrl::DrawItem(IRenderTarget *pRT, const CRect &rc, HSTREEITEM hItem)
 
     if (STVIMask_Icon == (m_uItemMask & STVIMask_Icon) && (pItem->nSelectedImage != -1 || pItem->nImage != -1))
     {
-        if (pItem->nSelectedImage != -1 && hItem == m_hSelItem)
+        if (pItem->nSelectedImage != -1 && IsItemSelected(hItem))
             m_pIconSkin->DrawByIndex(pRT, m_rcIcon, pItem->nSelectedImage);
         else
             m_pIconSkin->DrawByIndex(pRT, m_rcIcon, pItem->nImage);
@@ -865,11 +909,12 @@ void STreeCtrl::DrawItem(IRenderTarget *pRT, const CRect &rc, HSTREEITEM hItem)
 
     UINT align = DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS;
 
-    rcItemBg.OffsetRect(m_nItemMargin.toPixelSize(GetScale()), 0);
-    pRT->DrawText(pItem->strText, -1, rcItemBg, align);
-
-    if (bTextColorChanged)
-        pRT->SetTextColor(crOldText);
+    CRect rcText(m_nItemOffset + m_nItemMargin.toPixelSize(GetScale()), 0, pItem->nContentWidth, nItemHei);
+    rcText.OffsetRect(m_nItemMargin.toPixelSize(GetScale()), 0);
+    COLORREF crText = GetStyle().GetTextColor(IsItemSelected(hItem) ? 2 : 0);
+    COLORREF crOldText = pRT->SetTextColor(crText);
+    pRT->DrawText(pItem->strText, -1, rcText, align);
+    pRT->SetTextColor(crOldText);
 
     pRT->OffsetViewportOrg(-rc.left - pItem->nLevel * m_nIndent.toPixelSize(GetScale()), -rc.top, NULL);
 }
@@ -1172,8 +1217,8 @@ void STreeCtrl::OnPaint(IRenderTarget *pRT)
         {
             CRect rcItem(0, 0, CalcItemWidth(pItem), nItemHei);
             rcItem.OffsetRect(rcClient.left - m_siHoz.nPos, rcClient.top - m_siVer.nPos + iVisible * nItemHei);
-            DrawLines(pRT, rcItem, hItem);
             DrawItem(pRT, rcItem, hItem);
+            DrawLines(pRT, rcItem, hItem);
         }
         if (pItem->bCollapsed)
         { // Skip collapsed items
@@ -1186,6 +1231,7 @@ void STreeCtrl::OnPaint(IRenderTarget *pRT)
         }
         hItem = CSTree<LPTVITEM>::GetNextItem(hItem);
     }
+    DrawRubberBandSel(pRT);
     AfterPaint(pRT, painter);
 }
 
@@ -1194,8 +1240,69 @@ void STreeCtrl::OnLButtonDownEx(UINT nFlags, CPoint pt)
     __baseCls::OnLButtonDownEx(nFlags, pt);
     m_hHoverItem = HitTest(pt);
 
-    if (m_hHoverItem != m_hSelItem && m_hHoverItem)
-        SelectItem(m_hHoverItem, FALSE);
+    if (m_bMultiSel && m_hHoverItem && (nFlags & MK_CONTROL))
+    {
+        // Ctrl + click toggles the clicked item without touching the rest of
+        // the selection set. In multi-selection mode the set lives entirely
+        // in the map; the anchor follows the clicked item as the keyboard
+        // cursor (it is not a selection record).
+        if (IsItemSelected(m_hHoverItem))
+            RemoveSelItem(m_hHoverItem);
+        else
+            AddSelItem(m_hHoverItem);
+        m_hSelItem = m_hHoverItem;
+        m_hSelAnchor = m_hHoverItem;
+    }
+    else if (m_bMultiSel && (nFlags & (MK_CONTROL | MK_SHIFT)))
+    {
+        // Ctrl/Shift in multi-selection mode never replaces the selection
+        // here; a following rubber band with bAdd decides how the set grows.
+    }
+    else if (m_bMultiSel && m_hHoverItem)
+    {
+        // Plain click in multi-selection mode replaces the whole set; the
+        // anchor only follows as the cursor. Clicking the sole selected
+        // item keeps the set (the record does not change) - it just moves
+        // the cursor.
+        if (GetSelItemCount() != 1 || !IsItemSelected(m_hHoverItem))
+            SelectItem(m_hHoverItem);
+        else
+        {
+            m_hSelItem = m_hHoverItem;
+            m_hSelAnchor = m_hHoverItem;
+        }
+    }
+    else if (!m_bMultiSel && m_hHoverItem && !IsItemSelected(m_hHoverItem))
+        SelectItem(m_hHoverItem);
+    else if (!m_hHoverItem && (nFlags & (MK_CONTROL | MK_SHIFT)) == 0 && (m_hSelItem || GetSelItemCount() > 0))
+    {
+        // Plain click on blank area clears the selection. The anchor-style
+        // TCSelChanging/TCSelChanged pair is a single-selection protocol;
+        // multi-selection feedback is per-item only (via ClearSelItems).
+        if (m_bMultiSel)
+        {
+            ClearSelItems();
+        }
+        else
+        {
+            EventTCSelChanging evt1(this);
+            evt1.bCancel = FALSE;
+            evt1.hOldSel = m_hSelItem;
+            evt1.hNewSel = 0;
+            FireEvent(&evt1);
+            if (!evt1.bCancel)
+            {
+                EventTCSelChanged evt(this);
+                evt.hOldSel = m_hSelItem;
+                evt.hNewSel = 0;
+                m_hSelItem = 0;
+                ClearSelItems();
+                FireEvent(&evt);
+                if (evt.hOldSel)
+                    RedrawItem(evt.hOldSel);
+            }
+        }
+    }
 
     if (m_hHoverItem)
     {
@@ -1214,8 +1321,22 @@ void STreeCtrl::OnRButtonDown(UINT nFlags, CPoint pt)
 
     m_hHoverItem = HitTest(pt);
 
-    if (m_hHoverItem != m_hSelItem && m_hHoverItem)
-        SelectItem(m_hHoverItem, FALSE);
+    if (!m_hHoverItem)
+        return;
+    if (m_bMultiSel)
+    {
+        if (GetSelItemCount() != 1 || !IsItemSelected(m_hHoverItem))
+            SelectItem(m_hHoverItem);
+        else
+        {
+            m_hSelItem = m_hHoverItem;
+            m_hSelAnchor = m_hHoverItem;
+        }
+    }
+    else if (!IsItemSelected(m_hHoverItem))
+    {
+        SelectItem(m_hHoverItem);
+    }
 }
 
 void STreeCtrl::OnRButtonUp(UINT nFlags, CPoint pt)
@@ -1289,47 +1410,334 @@ void STreeCtrl::OnMouseLeave()
     }
 }
 
-BOOL STreeCtrl::SelectItem(HSTREEITEM hItem, BOOL bEnsureVisible /**< =TRUE */)
+BOOL STreeCtrl::SelectItem(HSTREEITEM hItem, BOOL bNotify /**< =TRUE */)
 {
     if (!VerifyItem(hItem))
         return FALSE;
 
-    EventTCSelChanging evt1(this);
-    evt1.bCancel = FALSE;
-    evt1.hOldSel = m_hSelItem;
-    evt1.hNewSel = hItem;
+    if (m_bMultiSel)
+    {
+        m_hSelItem = hItem;
+        m_hSelAnchor = hItem;
+        ClearSelItems();
+        AddSelItem(hItem);
+        return TRUE;
+    }
 
-    FireEvent(&evt1);
-    if (evt1.bCancel)
-        return FALSE;
+    // Single selection mode: the anchor m_hSelItem is the selection record
+    // (IsItemSelected reads it); the map is the multi-selection record only.
+    if (IsItemSelected(hItem))
+        return TRUE;
 
-    if (bEnsureVisible)
-        EnsureVisible(hItem);
+    HSTREEITEM hOldSel = m_hSelItem;
 
-    EventTCSelChanged evt(this);
-    evt.hOldSel = m_hSelItem;
-    evt.hNewSel = hItem;
+    if (bNotify)
+    {
+        EventTCSelChanging evt1(this);
+        evt1.bCancel = FALSE;
+        evt1.hOldSel = hOldSel;
+        evt1.hNewSel = hItem;
+
+        FireEvent(&evt1);
+        if (evt1.bCancel)
+            return FALSE;
+    }
 
     m_hSelItem = hItem;
+    m_hSelAnchor = hItem;
 
-    FireEvent(&evt);
-
-    if (evt.hOldSel)
-    {
-        RedrawItem(evt.hOldSel);
-    }
-
+    if (hOldSel)
+        RedrawItem(hOldSel);
     if (m_hSelItem)
-    {
         RedrawItem(m_hSelItem);
+    if (bNotify)
+    {
+        EventTCSelChanged evt(this);
+        evt.hOldSel = hOldSel;
+        evt.hNewSel = hItem;
+        FireEvent(&evt);
     }
-
     return TRUE;
 }
 
 int STreeCtrl::CalcItemWidth(const LPTVITEM pItemObj)
 {
     return pItemObj->nContentWidth + pItemObj->nLevel * m_nIndent.toPixelSize(GetScale());
+}
+
+HSTREEITEM STreeCtrl::GetNextVisibleItem(HSTREEITEM hItem) const
+{
+    HSTREEITEM hRet = CSTree<LPTVITEM>::GetNextItem(hItem);
+    while (hRet && !CSTree<LPTVITEM>::GetItem(hRet)->bVisible)
+        hRet = CSTree<LPTVITEM>::GetNextItem(hRet);
+    return hRet;
+}
+
+HSTREEITEM STreeCtrl::GetPrevVisibleItem(HSTREEITEM hItem) const
+{
+    HSTREEITEM hPrev = CSTree<LPTVITEM>::GetPrevSiblingItem(hItem);
+    if (!hPrev)
+    {
+        // No previous sibling: the previous visible item is the parent
+        // (0 for root-level items, which have no parent).
+        return CSTree<LPTVITEM>::GetParentItem(hItem);
+    }
+    // Descend into the previous sibling's last visible descendant.
+    HSTREEITEM hLast = hPrev;
+    for (;;)
+    {
+        if (CSTree<LPTVITEM>::GetItem(hLast)->bCollapsed)
+            break;
+        HSTREEITEM hChild = CSTree<LPTVITEM>::GetChildItem(hLast, FALSE);
+        while (hChild && !CSTree<LPTVITEM>::GetItem(hChild)->bVisible)
+            hChild = CSTree<LPTVITEM>::GetPrevSiblingItem(hChild);
+        if (!hChild)
+            break;
+        hLast = hChild;
+    }
+    return hLast;
+}
+
+HSTREEITEM STreeCtrl::GetVisibleItemByRow(int iRow) const
+{
+    if (iRow < 0)
+        return 0;
+    int iVisible = -1;
+    HSTREEITEM hItem = CSTree<LPTVITEM>::GetNextItem(STVI_ROOT);
+    while (hItem)
+    {
+        LPTVITEM pItem = CSTree<LPTVITEM>::GetItem(hItem);
+        if (pItem->bVisible)
+        {
+            iVisible++;
+            if (iVisible == iRow)
+                return hItem;
+        }
+        hItem = CSTree<LPTVITEM>::GetNextItem(hItem);
+    }
+    return 0;
+}
+
+HSTREEITEM STreeCtrl::GetLastVisibleItem() const
+{
+    HSTREEITEM hLast = 0;
+    HSTREEITEM hItem = CSTree<LPTVITEM>::GetNextItem(STVI_ROOT);
+    while (hItem)
+    {
+        if (CSTree<LPTVITEM>::GetItem(hItem)->bVisible)
+            hLast = hItem;
+        hItem = CSTree<LPTVITEM>::GetNextItem(hItem);
+    }
+    return hLast;
+}
+
+void STreeCtrl::SetSelRange(HSTREEITEM hAnchor, HSTREEITEM hCursor)
+{
+    if (!m_bMultiSel || !hCursor)
+        return;
+    if (!hAnchor)
+        hAnchor = hCursor;
+
+    // Determine the visible-order span [hLo..hHi]: walk forward from the
+    // anchor looking for the cursor; if the cursor is not below it, walk
+    // forward from the cursor instead (the anchor is below).
+    BOOL bAnchorFirst = FALSE;
+    HSTREEITEM h = hAnchor;
+    while (h)
+    {
+        if (h == hCursor)
+        {
+            bAnchorFirst = TRUE;
+            break;
+        }
+        h = GetNextVisibleItem(h);
+    }
+    HSTREEITEM hLo = bAnchorFirst ? hAnchor : hCursor;
+    HSTREEITEM hHi = bAnchorFirst ? hCursor : hAnchor;
+
+    // Collect the span once and mark it, so membership tests below are cheap.
+    SMap<HSTREEITEM, BOOL> inSpan;
+    SArray<HSTREEITEM> arrSpan;
+    h = hLo;
+    while (h)
+    {
+        inSpan[h] = TRUE;
+        arrSpan.Add(h);
+        if (h == hHi)
+            break;
+        h = GetNextVisibleItem(h);
+    }
+
+    // Deselect everything outside the span (snapshot first: RemoveSelItem
+    // mutates the map while firing events).
+    SArray<HSTREEITEM> arrStale;
+    for (SPOSITION pos = m_mapSelItems.GetStartPosition(); pos;)
+    {
+        HSTREEITEM hSel;
+        BOOL bVal;
+        m_mapSelItems.GetNextAssoc(pos, hSel, bVal);
+        if (!inSpan.Lookup(hSel))
+            arrStale.Add(hSel);
+    }
+    for (int i = 0; i < (int)arrStale.GetCount(); i++)
+    {
+        RemoveSelItem(arrStale[i]);
+    }
+    // Select everything inside the span that is not selected yet.
+    for (int i = 0; i < (int)arrSpan.GetCount(); i++)
+    {
+        if (!IsItemSelected(arrSpan[i]))
+            AddSelItem(arrSpan[i]);
+    }
+}
+
+void STreeCtrl::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
+{
+    if (nChar == VK_ESCAPE)
+    {
+        // Let the base class handle rubber band cancellation (SPanel).
+        SetMsgHandled(FALSE);
+        return;
+    }
+
+    SWindow *pOwner = GetOwner();
+    if (pOwner && nChar == VK_RETURN)
+    {
+        pOwner->SSendMessage(WM_KEYDOWN, nChar, MAKELONG(nFlags, nRepCnt));
+        return;
+    }
+
+    BOOL bCtrlPressed = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
+    BOOL bShiftPressed = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
+
+    // SPACE toggles the item at the cursor in multi-selection mode.
+    if (nChar == VK_SPACE && m_hSelItem)
+    {
+        if (m_bMultiSel)
+        {
+            if (IsItemSelected(m_hSelItem))
+                RemoveSelItem(m_hSelItem);
+            else
+                AddSelItem(m_hSelItem);
+            return;
+        }
+        SetMsgHandled(FALSE);
+        return;
+    }
+
+    // Ctrl+A selects all items in multi-selection mode.
+    if (bCtrlPressed && nChar == 'A')
+    {
+        if (m_bMultiSel)
+        {
+            ClearSelItems();
+            HSTREEITEM hItem = GetVisibleItemByRow(0);
+            while (hItem)
+            {
+                AddSelItem(hItem);
+                hItem = GetNextVisibleItem(hItem);
+            }
+            return;
+        }
+        SetMsgHandled(FALSE);
+        return;
+    }
+
+    HSTREEITEM hNewSel = 0;
+    switch (nChar)
+    {
+    case VK_DOWN:
+        hNewSel = m_hSelItem ? GetNextVisibleItem(m_hSelItem) : GetVisibleItemByRow(0);
+        break;
+    case VK_UP:
+        if (m_hSelItem)
+            hNewSel = GetPrevVisibleItem(m_hSelItem);
+        break;
+    case VK_PRIOR:
+    {
+        OnScroll(TRUE, SB_PAGEUP, 0);
+        int nItemHei = m_nItemHei.toPixelSize(GetScale());
+        hNewSel = GetVisibleItemByRow(m_siVer.nPos / nItemHei);
+        break;
+    }
+    case VK_NEXT:
+    {
+        OnScroll(TRUE, SB_PAGEDOWN, 0);
+        CRect rcClient;
+        GetClientRect(rcClient);
+        int nItemHei = m_nItemHei.toPixelSize(GetScale());
+        int iRow = (m_siVer.nPos + rcClient.Height() - 1) / nItemHei;
+        hNewSel = GetVisibleItemByRow(iRow);
+        if (!hNewSel)
+            hNewSel = GetLastVisibleItem();
+        break;
+    }
+    case VK_HOME:
+        OnScroll(TRUE, SB_TOP, 0);
+        hNewSel = GetVisibleItemByRow(0);
+        break;
+    case VK_END:
+        OnScroll(TRUE, SB_BOTTOM, 0);
+        hNewSel = GetLastVisibleItem();
+        break;
+    case VK_LEFT:
+        if (m_hSelItem)
+        {
+            if (CSTree<LPTVITEM>::GetChildItem(m_hSelItem) && !CSTree<LPTVITEM>::GetItem(m_hSelItem)->bCollapsed)
+                Expand(m_hSelItem, TVE_COLLAPSE);
+            else
+                hNewSel = GetPrevVisibleItem(m_hSelItem);
+        }
+        break;
+    case VK_RIGHT:
+        if (m_hSelItem)
+        {
+            if (CSTree<LPTVITEM>::GetChildItem(m_hSelItem) && CSTree<LPTVITEM>::GetItem(m_hSelItem)->bCollapsed)
+                Expand(m_hSelItem, TVE_EXPAND);
+            else
+                hNewSel = GetNextVisibleItem(m_hSelItem);
+        }
+        break;
+    }
+
+    if (hNewSel)
+    {
+        EnsureVisible(hNewSel);
+
+        if (!m_bMultiSel)
+        {
+            // Single selection mode: move the selection (anchor events fire).
+            SelectItem(hNewSel);
+        }
+        else if (bCtrlPressed)
+        {
+            // Ctrl + arrow: move the cursor without changing selection.
+            m_hSelItem = hNewSel;
+            m_hSelAnchor = hNewSel;
+        }
+        else if (bShiftPressed)
+        {
+            // Shift + arrow: move the anchored span to the new cursor (the
+            // anchor stays fixed, so the span can shrink as well as grow -
+            // Explorer semantics).
+            SetSelRange(m_hSelAnchor, hNewSel);
+            m_hSelItem = hNewSel;
+        }
+        else
+        {
+            // Plain arrow: replace the whole set with the new item.
+            SelectItem(hNewSel);
+        }
+    }
+    else
+    {
+        SetMsgHandled(FALSE);
+    }
+}
+
+UINT STreeCtrl::OnGetDlgCode() const
+{
+    return SC_WANTARROWS | SC_WANTSYSKEY;
 }
 
 void STreeCtrl::SortChildren(HSTREEITEM hItem, FunTreeSortCallback sortFunc, void *pCtx)
@@ -1498,8 +1906,7 @@ void STreeCtrl::OnScaleChanged(int nScale)
 {
     __baseCls::OnScaleChanged(nScale);
     GetScaleSkin(m_pLineSkin, nScale);
-    GetScaleSkin(m_pItemBgSkin, nScale);
-    GetScaleSkin(m_pItemSelSkin, nScale);
+    GetScaleSkin(m_pItemSkin, nScale);
     GetScaleSkin(m_pToggleSkin, nScale);
     GetScaleSkin(m_pIconSkin, nScale);
     GetScaleSkin(m_pCheckSkin, nScale);
@@ -1564,4 +1971,254 @@ BOOL STreeCtrl::GetAccItemExpanded(HSTREEITEM hItem)
     return pItem && pItem->bHasChildren && !pItem->bCollapsed;
 }
 
+void STreeCtrl::AddSelItem(HSTREEITEM hItem)
+{
+    if (!hItem)
+        return;
+
+    // Already in the multi-selection map: the state does not change and no
+    // per-item event fires.
+    const ItemSelectionMap::CPair *pPair = m_mapSelItems.Lookup(hItem);
+    if (pPair && pPair->m_value)
+        return;
+
+    m_mapSelItems[hItem] = TRUE;
+    RedrawItem(hItem);
+
+    EventTreeItemSelChanged evt(this);
+    evt.hItem = hItem;
+    evt.bSelected = TRUE;
+    FireEvent(&evt);
+}
+
+void STreeCtrl::RemoveSelItem(HSTREEITEM hItem)
+{
+    if (!hItem)
+        return;
+
+    // Not in the multi-selection map: nothing to remove, no event.
+    if (!m_mapSelItems.RemoveKey(hItem))
+        return;
+    RedrawItem(hItem);
+
+    EventTreeItemSelChanged evt(this);
+    evt.hItem = hItem;
+    evt.bSelected = FALSE;
+    FireEvent(&evt);
+}
+
+void STreeCtrl::ClearSelItems()
+{
+    // Route through RemoveSelItem so every deselected item fires its
+    // per-item selection-state event. Keys are collected first because
+    // RemoveSelItem mutates the map while firing events.
+    SArray<HSTREEITEM> arrSel;
+    for (SPOSITION pos = m_mapSelItems.GetStartPosition(); pos;)
+    {
+        HSTREEITEM hItem;
+        BOOL bVal;
+        m_mapSelItems.GetNextAssoc(pos, hItem, bVal);
+        arrSel.Add(hItem);
+    }
+    for (int i = 0; i < (int)arrSel.GetCount(); i++)
+    {
+        RemoveSelItem(arrSel[i]);
+    }
+}
+
+BOOL STreeCtrl::IsRubberBandSelEnabled() const
+{
+    return m_bMultiSel && IsBandSelEnabled();
+}
+
+void STreeCtrl::OnRubberBandStart()
+{
+    m_hBandOldSel = m_hSelItem;
+    m_arrBandSnapshot.RemoveAll();
+    for (SPOSITION pos = m_mapSelItems.GetStartPosition(); pos;)
+    {
+        HSTREEITEM hItem;
+        BOOL bVal;
+        m_mapSelItems.GetNextAssoc(pos, hItem, bVal);
+        m_arrBandSnapshot.Add(hItem);
+    }
+}
+
+void STreeCtrl::OnRubberBandSelect(const CRect &rcBand, BOOL bAdd)
+{
+    if (m_nVisibleItems == 0)
+        return;
+    int nItemHei = m_nItemHei.toPixelSize(GetScale());
+    if (nItemHei <= 0)
+        return;
+
+    if (!bAdd)
+        ClearSelItems();
+
+    CRect rcClient;
+    GetClientRect(rcClient);
+
+    int iVisible = -1;
+    HSTREEITEM hLast = 0;
+    HSTREEITEM hItem = CSTree<LPTVITEM>::GetNextItem(STVI_ROOT);
+    while (hItem)
+    {
+        LPTVITEM pItem = CSTree<LPTVITEM>::GetItem(hItem);
+        if (pItem->bVisible)
+            iVisible++;
+        if (iVisible < 0)
+        {
+            hItem = CSTree<LPTVITEM>::GetNextItem(hItem);
+            continue;
+        }
+        int nTop = rcClient.top - m_siVer.nPos + iVisible * nItemHei;
+        if (nTop > rcBand.bottom)
+            break; // rows below the band, positions keep increasing
+        CRect rcItem(0, nTop, 0, nTop + nItemHei);
+        rcItem.left = rcClient.left - m_siHoz.nPos;
+        rcItem.right = rcItem.left + CalcItemWidth(pItem);
+        CRect rcInter;
+        if (rcInter.IntersectRect(rcItem, rcBand))
+        {
+            AddSelItem(hItem);
+            hLast = hItem;
+        }
+        else if (!bAdd && IsItemSelected(hItem))
+        {
+            RemoveSelItem(hItem);
+        }
+        if (pItem->bCollapsed)
+        { // Skip collapsed items
+            HSTREEITEM hChild = GetChildItem(hItem, FALSE);
+            while (hChild)
+            {
+                hItem = hChild;
+                hChild = GetChildItem(hItem, FALSE);
+            }
+        }
+        hItem = CSTree<LPTVITEM>::GetNextItem(hItem);
+    }
+
+    // The cursor follows the last item hit by the band (same convention as
+    // the other multi-selection controls), so keyboard navigation continues
+    // from the band's end.
+    if (hLast)
+        m_hSelItem = hLast;
+}
+
+void STreeCtrl::OnRubberBandEnd(const CRect &rcBand, BOOL bCancelled)
+{
+    if (bCancelled)
+    {
+        // ESC / external cancel: restore the selection taken at band start.
+        // Every restored item fires its per-item event
+        // (EventTreeItemSelChanged) via AddSelItem / RemoveSelItem; the
+        // anchor-style SelChanged is a single-selection event and is not
+        // fired for multi-selection bands.
+        ClearSelItems();
+        for (int i = 0; i < (int)m_arrBandSnapshot.GetCount(); i++)
+        {
+            AddSelItem(m_arrBandSnapshot[i]);
+        }
+        m_arrBandSnapshot.RemoveAll();
+        m_hSelItem = m_hBandOldSel;
+        m_hSelAnchor = m_hSelItem;
+        Invalidate();
+    }
+    else
+    {
+        // Normal end: the cursor stayed on the last banded item; the range
+        // anchor follows it so the next Shift+arrow works from there.
+        m_hSelAnchor = m_hSelItem;
+    }
+}
+
+/**
+ * @brief Gets all rubber band selected items.
+ * @param items Output array of item handles.
+ * @param nMaxCount Maximum number of handles to retrieve.
+ * @return Number of handles retrieved.
+ */
+int STreeCtrl::GetSelItems(HSTREEITEM *items, int nMaxCount) const
+{
+    if (!m_bMultiSel)
+    {
+        // Single-selection mode: report the anchor.
+        if (m_hSelItem && nMaxCount > 0)
+        {
+            items[0] = m_hSelItem;
+            return 1;
+        }
+        return 0;
+    }
+    int i = 0;
+    for (SPOSITION pos = m_mapSelItems.GetStartPosition(); pos && nMaxCount > 0;)
+    {
+        HSTREEITEM hItem;
+        BOOL bVal;
+        m_mapSelItems.GetNextAssoc(pos, hItem, bVal);
+        items[i++] = hItem;
+        nMaxCount--;
+    }
+    return i;
+}
+
+/**
+ * @brief Enables or disables multiple selection (rubber band marquee).
+ * @param enable TRUE to enable multiple selection, FALSE otherwise.
+ */
+void STreeCtrl::EnableMultiSelection(BOOL enable)
+{
+    if (enable && !m_bMultiSel)
+    {
+        // The map becomes the only selection record (all queries read it
+        // exclusively in multi mode). Make sure it holds the anchor's item -
+        // a pure record move, no event, no repaint (the item is already
+        // drawn selected). The anchor keeps its cursor role (keyboard
+        // navigation / shift-range base) but is never a selection record
+        // in multi mode.
+        if (m_hSelItem)
+            m_mapSelItems[m_hSelItem] = TRUE;
+        m_hSelAnchor = m_hSelItem;
+    }
+    else if (!enable && m_bMultiSel)
+    {
+        int nCount = m_mapSelItems.GetCount();
+        if (nCount == 1)
+        {
+            // The sole selected item keeps its state: just move the record
+            // from the map to the single-selection anchor. No event, no
+            // repaint.
+            m_hSelItem = m_mapSelItems.GetAt(m_mapSelItems.GetStartPosition())->m_key;
+            m_mapSelItems.RemoveAll();
+            m_hSelAnchor = m_hSelItem;
+        }
+        else if (nCount > 1)
+        {
+            // Several items selected: the whole selection is cleared,
+            // including the cursor anchor.
+            ClearSelItems();
+            m_hSelItem = 0;
+            m_hSelAnchor = 0;
+        }
+        // nCount == 0: the anchor is kept unchanged.
+    }
+    m_bMultiSel = enable;
+}
+
+BOOL STreeCtrl::IsItemSelected(HSTREEITEM hItem) const
+{
+    if (!m_bMultiSel)
+        return hItem != 0 && hItem == m_hSelItem;
+    // Multi-selection mode: the map is the only selection record; the
+    // anchor (m_hSelItem) is just the keyboard cursor there.
+    return m_mapSelItems.Lookup(hItem) != NULL;
+}
+
+int STreeCtrl::GetSelItemCount() const
+{
+    if (m_bMultiSel)
+        return (int)m_mapSelItems.GetCount();
+    return m_hSelItem ? 1 : 0;
+}
 SNSEND

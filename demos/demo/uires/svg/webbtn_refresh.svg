@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  webbtn_refresh.svg - 浏览器"刷新"按钮图标(SVG 1.1,nanosvg 兼容)
+  3 帧横排,每帧 20x20,总尺寸 60x20。
+  帧序:0=normal #64748B  1=hover #2563EB  2=push #1D4ED8
+  图形:环形箭头(刷新/重新加载)。圆心(10,10),半径 6。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="60" height="20" viewBox="0 0 60 20">
+  <!-- 帧0:normal #64748B -->
+  <g transform="translate(0,0)" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M10 4 A6 6 0 1 0 10 16"/>
+    <path d="M6.5 4 L10 4 L10 7.5"/>
+  </g>
+  <!-- 帧1:hover #2563EB -->
+  <g transform="translate(20,0)" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M10 4 A6 6 0 1 0 10 16"/>
+    <path d="M6.5 4 L10 4 L10 7.5"/>
+  </g>
+  <!-- 帧2:push #1D4ED8 -->
+  <g transform="translate(40,0)" fill="none" stroke="#1D4ED8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M10 4 A6 6 0 1 0 10 16"/>
+    <path d="M6.5 4 L10 4 L10 7.5"/>
+  </g>
+</svg>

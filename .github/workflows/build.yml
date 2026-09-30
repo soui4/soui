@@ -48,10 +48,24 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         fetch-depth: 2
-        submodules: true  # 拉取子模块
+
+    - name: Checkout submodules from GitHub mirror
+      shell: bash
+      run: |
+        # 子模块在 GitHub 上的镜像与 gitee 组织不一致，逐仓库改写（本地 .gitmodules 不动）：
+        #   swinx         -> github.com/soui4/swinx
+        #   libwebsockets -> github.com/setoutsoft/libwebsockets
+        #   openssl-cmake -> github.com/setoutsoft/openssl-cmake
+        #   curl          -> github.com/setoutsoft/curl
+        # 分支信息（branch = master / soui_ws 等）仍来自 .gitmodules。
+        git config --global url."https://github.com/soui4/swinx".insteadOf "https://gitee.com/setoutsoft/swinx"
+        git config --global url."https://github.com/setoutsoft/libwebsockets".insteadOf "https://gitee.com/setoutsoft/libwebsockets"
+        git config --global url."https://github.com/setoutsoft/openssl-cmake".insteadOf "https://gitee.com/setoutsoft/openssl-cmake"
+        git config --global url."https://github.com/setoutsoft/curl".insteadOf "https://gitee.com/setoutsoft/curl"
+        git submodule update --init --recursive
 
     - name: Set up CMake
       uses: lukka/get-cmake@latest

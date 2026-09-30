@@ -14,8 +14,8 @@
 
 #include "appledock/SDesktopDock.h"
 #include "SMatrixWindow.h"
-#include "SScintillaView.h"
-
+#include <SScintillaView.h>
+#include <SEdit2.h>
 #include "clock/sclock.h"
 #include "FpsWnd.h"
 //#include <vld.h>
@@ -151,6 +151,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 
     app.RegisterWindowClass<SShellTray>();
     app.RegisterWindowClass<FpsWnd>();
+    app.RegisterWindowClass<SEdit2>();
 #if defined(_WIN32) && !defined(__MINGW32__)
     if (SUCCEEDED(CUiAnimation::Init()))
     {

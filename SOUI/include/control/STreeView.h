@@ -374,7 +374,23 @@ class SOUI_EXP STreeView
     STDMETHOD_(void, ClearSelItems)(THIS) OVERRIDE;
 
     /**
+     * @brief Selects the visible-order span between two items
+     *        (Explorer-style anchored shift-selection): the set becomes
+     *        exactly the span [anchor..cursor], items outside are
+     *        deselected and items inside are selected, each flip firing
+     *        its per-item event. Multi-selection mode only.
+     * @param hAnchor Selection anchor (fixed base of the span).
+     * @param hCursor Keyboard cursor (moving end).
+     */
+    void SetSelRange(HSTREEITEM hAnchor, HSTREEITEM hCursor);
+
+    /**
      * @brief Checks if an item is selected.
+     *
+     * The single query for the selection state: single-selection mode reads
+     * the anchor m_hSelected, multi-selection mode reads the selection map
+     * (the anchor is only the keyboard cursor there).
+     *
      * @param hItem Handle to the item.
      * @return TRUE if the item is selected, FALSE otherwise.
      */
@@ -695,6 +711,28 @@ class SOUI_EXP STreeView
     virtual void OnDragClearItemCapture() override;
 
     /**
+     * @brief Checks whether rubber band selection is enabled (multi-select mode on).
+     */
+    virtual BOOL IsRubberBandSelEnabled() const override;
+
+    /**
+     * @brief Records the selection anchor when the band starts.
+     */
+    virtual void OnRubberBandStart() override;
+
+    /**
+     * @brief Updates the selection so it matches the visible items covered by the band.
+     * @param rcBand Band rectangle in client coordinates.
+     * @param bAdd TRUE to add to the existing selection (Ctrl held).
+     */
+    virtual void OnRubberBandSelect(const CRect &rcBand, BOOL bAdd) override;
+
+    /**
+     * @brief Fires the selection changed event when the band finishes.
+     */
+    virtual void OnRubberBandEnd(const CRect &rcBand, BOOL bCancelled) override;
+
+    /**
      * @brief Draws lines for an item.
      * @param pRT Pointer to the rendering target.
      * @param rc Rectangle to draw the lines.
@@ -748,7 +786,8 @@ class SOUI_EXP STreeView
     SOsrPanel *m_itemCapture; /**< Item that has capture. */
     SOsrPanel *m_pHoverItem;  /**< Item under hover state. */
 
-    HSTREEITEM m_hSelected; /**< Current selected item. */
+    HSTREEITEM m_hSelected;  /**< Current selected item (single) / keyboard cursor (multi). */
+    HSTREEITEM m_hSelAnchor; /**< Multi-selection range anchor: fixed base for Shift ranges; follows the cursor on every non-Shift change. */
 
     BOOL m_bWantTab;                   /**< Flag indicating if tab is wanted. */
     BOOL m_bHasLines;                  /**< Flag indicating if lines are drawn between items. */
@@ -757,7 +796,9 @@ class SOUI_EXP STreeView
     SLayoutSize m_indent;              /**< Indentation between levels. */
 
     typedef SMap<HSTREEITEM, BOOL> ItemSelectionMap;
-    ItemSelectionMap m_mapSelItems; /**< Map of selected items. */
+    ItemSelectionMap m_mapSelItems;       /**< Map of selected items. */
+    HSTREEITEM m_hBandOldSel;             /**< Selection anchor before a rubber band started */
+    SArray<HSTREEITEM> m_arrBandSnapshot; /**< Selection snapshot taken when the rubber band starts */
 };
 SNSEND
 #endif /**< __STREEVIEW__H__ */

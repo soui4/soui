@@ -412,6 +412,28 @@ class SOUI_EXP SListView
      */
     virtual void OnDragClearItemCapture() override;
 
+    /**
+     * @brief Checks whether rubber band selection is enabled (multi-select mode on).
+     */
+    virtual BOOL IsRubberBandSelEnabled() const override;
+
+    /**
+     * @brief Records the selection anchor when the band starts.
+     */
+    virtual void OnRubberBandStart() override;
+
+    /**
+     * @brief Updates the selection so it matches the items covered by the band.
+     * @param rcBand Band rectangle in client coordinates.
+     * @param bAdd TRUE to add to the existing selection (Ctrl held).
+     */
+    virtual void OnRubberBandSelect(const CRect &rcBand, BOOL bAdd) override;
+
+    /**
+     * @brief Fires the selection changed event when the band finishes.
+     */
+    virtual void OnRubberBandEnd(const CRect &rcBand, BOOL bCancelled) override;
+
   protected:
     SAutoRefPtr<ILvAdapter> m_adapter;                 /**< Pointer to the list view adapter */
     SAutoRefPtr<ILvDataSetObserver> m_observer;        /**< Pointer to the data set observer */
@@ -420,6 +442,7 @@ class SOUI_EXP SListView
     SAutoRefPtr<ISkinObj> m_pSkinDivider; /**< Skin for dividers */
     SLayoutSize m_nDividerSize;           /**< Size of dividers */
     BOOL m_bVertical;                     /**< Flag indicating vertical orientation */
+    int m_iBandOldSel;                    /**< Selection anchor before a rubber band started */
 };
 
 SNSEND

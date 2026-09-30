@@ -51,4 +51,5 @@
   <imglist name="_skin.sys.switch_bg" src="PNG:SYS_SWITCH_BG" states="1"/>
   <imgframe name="_skin.sys.list.item" src="PNG:SYS_LIST_ITEM" states="3" margin="3,3,3,3"/>
   <imglist name="_skin.sys.btn.mini.close" src="PNG:SYS_BTN_MINI_CLOSE" states="3"/>
+  <colorrect name="_skin.sys.selband" normal="rgba(24,144,255,25%)" normalBorder="#1890FF" borderWidth="1" cornerRadius="2"/>
 </skin>

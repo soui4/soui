@@ -4,6 +4,7 @@
 SNSBEGIN
 SEdit2::SEdit2(void)
 {
+	m_dwStyle |= ES_WANTRETURN;
     m_evtSet.addEvent(EVENTID(EventKeyEnter));
 }
 

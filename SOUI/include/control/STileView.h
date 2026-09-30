@@ -436,6 +436,28 @@ class SOUI_EXP STileView
      */
     virtual void OnDragClearItemCapture() override;
 
+    /**
+     * @brief Checks whether rubber band selection is enabled (multi-select mode on).
+     */
+    virtual BOOL IsRubberBandSelEnabled() const override;
+
+    /**
+     * @brief Records the selection anchor when the band starts.
+     */
+    virtual void OnRubberBandStart() override;
+
+    /**
+     * @brief Updates the selection so it matches the tiles covered by the band.
+     * @param rcBand Band rectangle in client coordinates.
+     * @param bAdd TRUE to add to the existing selection (Ctrl held).
+     */
+    virtual void OnRubberBandSelect(const CRect &rcBand, BOOL bAdd) override;
+
+    /**
+     * @brief Fires the selection changed event when the band finishes.
+     */
+    virtual void OnRubberBandEnd(const CRect &rcBand, BOOL bCancelled) override;
+
   protected:
     SAutoRefPtr<ILvAdapter> m_adapter;                 /**< Adapter for the tile view. */
     SAutoRefPtr<ILvDataSetObserver> m_observer;        /**< Data set observer. */
@@ -443,6 +465,7 @@ class SOUI_EXP STileView
 
     SLayoutSize m_nMarginSize;  /**< Margin size for items. */
     BOOL m_bDatasetInvalidated; /**< Flag indicating if the data set is invalidated. */
+    int m_iBandOldSel;          /**< Selection anchor before a rubber band started */
 };
 
 SNSEND

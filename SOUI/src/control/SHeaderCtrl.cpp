@@ -479,7 +479,7 @@ BOOL SHeaderCtrl::CreateChildren(SXmlNode xmlNode)
     __baseCls::CreateChildren(xmlNode);
 
     if (!xmlItems)
-        return FALSE;
+        return TRUE;
     SXmlNode xmlItem = xmlItems.child(SHeaderCtrl_style::kStyle_item);
     int iOrder = 0;
     while (xmlItem)

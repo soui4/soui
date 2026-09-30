@@ -118,6 +118,9 @@ typedef enum _SOUI_EVENTS
     EVT_LV_SELCHANGED,          /**<  List view selection changed event */
     EVT_LV_ITEMCLICK,           /**<  List view item click event */
 
+    EVT_ITEM_SELCHANGED = 15200, /**<  A single item's selection state changed (index based multi-selection views) */
+    EVT_TREE_ITEMSELCHANGED,     /**<  A single tree item's selection state changed (multi-selection tree views) */
+
     EVT_RE_NOTIFY = 16000, /**<  Rich edit control notify event */
     EVT_RE_MENU,           /**<  Rich edit control menu event */
 
@@ -726,6 +729,18 @@ DEF_EVT(EventTCSelChanged, EVT_TC_SELCHANGED, on_treectrl_sel_changed, {
 DEF_EVT(EventTCCheckState, EVT_TC_CHECKSTATE, on_treectrl_item_check, {
     HSTREEITEM hItem; /**<  Item handle */
     UINT uCheckState; /**<  Check state */
+})
+
+/** Multi-selection: a single item's selection state changed (index based: listview / mclistview / tileview / listctrl) */
+DEF_EVT(EventItemSelChanged, EVT_ITEM_SELCHANGED, on_item_sel_changed, {
+    int iItem;      /**<  Index of the item whose selection state changed */
+    BOOL bSelected; /**<  New selection state: TRUE=selected, FALSE=deselected */
+})
+
+/** Multi-selection: a single tree item's selection state changed (treeview / treectrl) */
+DEF_EVT(EventTreeItemSelChanged, EVT_TREE_ITEMSELCHANGED, on_tree_item_sel_changed, {
+    HSTREEITEM hItem; /**<  Handle of the tree item whose selection state changed */
+    BOOL bSelected;   /**<  New selection state: TRUE=selected, FALSE=deselected */
 })
 
 DEF_EVT(EventTCExpand, EVT_TC_EXPAND, on_treectrl_item_expand, {

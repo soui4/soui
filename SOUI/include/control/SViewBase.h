@@ -12,7 +12,7 @@ SNSBEGIN
  * @class SViewBase
  * @brief Base class for view controls that use adapters
  * @details This class provides common functionality for view controls that use adapters,
- *          such as SListView, STileView, SMcListView, and SMcListViewEx.
+ *          such as SListView, STileView, and SMcListView.
  *          Drag scroll and fling animation are handled by SPanel.
  */
 class SOUI_EXP SViewBase
@@ -129,8 +129,23 @@ class SOUI_EXP SViewBase
     /**
      * @brief Sets the selected item.
      * @param iItem Index of the item.
+     * @note Virtual: derived controls (SListView/SMCListView/STileView)
+     *       override this with their COM-interface SetSel. Item clicks and
+     *       keyboard navigation therefore share ONE implementation path -
+     *       do not reintroduce a second, non-virtual variant.
      */
-    void SetSel(int iItem, BOOL bNotify);
+    void SelectItem(int iItem, BOOL bNotify);
+
+    /**
+     * @brief Selects the contiguous range between two items (Explorer-style
+     *        anchored shift-selection): the set becomes exactly
+     *        [min..max](anchor, cursor), items outside are deselected and
+     *        items inside are selected, each flip firing its per-item event.
+     *        Multi-selection mode only.
+     * @param iAnchor Selection anchor (fixed base of the range).
+     * @param iCursor Keyboard cursor / clicked item (moving end).
+     */
+    void SetSelRange(int iAnchor, int iCursor);
 
     /**
      * @brief Adds an item to the selection.
@@ -148,6 +163,18 @@ class SOUI_EXP SViewBase
      * @brief Clears all selected items.
      */
     void ClearSelItems();
+
+    /**
+     * @brief Prunes the selection after the dataset changes size.
+     * @param nNewCount New number of items in the dataset.
+     * @details Drops the cursor, the multi-selection anchor and any selected
+     *          entry that falls beyond the new item count. The anchor can be
+     *          independent of the cursor (a stable base for Shift ranges), so
+     *          it is normalized here instead of relying on the cursor check.
+     *          Removed rows no longer exist, so they are deselected silently
+     *          (no per-item event), matching the tree views' pruning rule.
+     */
+    void PruneSelItems(int nNewCount);
 
     /**
      * @brief Checks if an item is selected.
@@ -169,6 +196,16 @@ class SOUI_EXP SViewBase
      * @return Number of selected items.
      */
     int GetSelItems(int *pItems, int nMaxCount) const;
+
+    /**
+     * @brief Takes a snapshot of the current selection (for rubber band cancel).
+     */
+    void SnapshotSelItems();
+
+    /**
+     * @brief Restores the selection from the snapshot taken by SnapshotSelItems.
+     */
+    void RestoreSelItems();
 
     /**
      * @brief Handles the core selection logic.
@@ -231,7 +268,8 @@ class SOUI_EXP SViewBase
     SList<ItemInfo> m_lstItems; /**< List of currently visible items */
     SOsrPanel *m_itemCapture;   /**< Item panel that has been set capture */
 
-    int m_iSelItem;             /**< Index of the selected item */
+    int m_iSelItem;             /**< Index of the selected item (single) / keyboard cursor (multi) */
+    int m_iSelAnchor;           /**< Multi-selection range anchor: fixed base for Shift ranges; follows the cursor on every non-Shift change */
     SOsrPanel *m_pHoverItem;    /**< Item panel under the mouse */
     BOOL m_bDatasetInvalidated; /**< Flag indicating data set is invalidated */
 
@@ -243,6 +281,7 @@ class SOUI_EXP SViewBase
 
     typedef SMap<int, BOOL> ItemSelectionMap;
     ItemSelectionMap m_mapSelItems; /**< Map of selected items (index -> is_selected) */
+    SArray<int> m_arrBandSnapshot;  /**< Selection snapshot taken when the rubber band starts */
 
     SPanel *m_pView; /**< Pointer to the view panel */
 };

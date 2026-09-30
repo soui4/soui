@@ -170,6 +170,13 @@ SPanel::SPanel()
     , m_fFlingVTargetPos(0.0f)
     , m_fFlingHStartPos(0.0f)
     , m_fFlingHTargetPos(0.0f)
+    , m_bRubberBandActive(FALSE)
+    , m_bBandEnable(TRUE)
+    , m_pSkinBand(GETBUILTINSKIN(SKIN_SYS_SELBAND))
+    , m_bBandAdd(FALSE)
+    , m_nBandScrollV(0)
+    , m_nBandScrollH(0)
+    , m_bBandTimerOn(FALSE)
 {
     m_nSbWid.setInvalid();
     m_nSbArrowSize.setInvalid();
@@ -503,6 +510,11 @@ LRESULT SPanel::OnNcCalcSize(BOOL bCalcValidRects, LPARAM lParam)
 
 BOOL SPanel::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
+    // Scrolling while a rubber band is active would desynchronize the band
+    // rectangle from the content it covers; swallow the wheel until mouse up.
+    if (m_bRubberBandActive)
+        return TRUE;
+
     BOOL bVertScroll = HasScrollBar(TRUE);
 
     m_zDelta += zDelta;
@@ -605,6 +617,10 @@ void SPanel::OnTimer(char cTimerID)
         m_sbVert.OnTimer(cTimerID);
         m_sbHorz.OnTimer(cTimerID);
     }
+    else if (cTimerID == Timer_BandAutoScroll)
+    {
+        OnBandAutoScroll();
+    }
 }
 
 void SPanel::ScrollUpdate()
@@ -624,6 +640,7 @@ void SPanel::ClearDragState()
         OnNcLButtonUp(0, CPoint(-1, -1));
     }
     StopFlingAnimation();
+    EndRubberBandSel(TRUE);
     if (m_bDragPending || m_bDragScrolling)
     {
         m_bDragPending = FALSE;
@@ -1021,6 +1038,26 @@ BOOL SPanel::HandleMouseDrag(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &l
 {
     CPoint pt(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 
+    // === Rubber band selection active: consume left button events ===
+    if (m_bRubberBandActive)
+    {
+        if (uMsg == WM_MOUSEMOVE)
+        {
+            BOOL bAdd = (wParam & MK_CONTROL) != 0;
+            UpdateRubberBandSel(pt, bAdd);
+        }
+        else if (uMsg == WM_LBUTTONUP)
+        {
+            EndRubberBandSel(FALSE);
+            m_nLastMoveTime = 0;
+        }
+
+        // While banding, only consume messages related to the left button band
+        if (uMsg == WM_MOUSEMOVE || uMsg == WM_LBUTTONUP)
+            return TRUE;
+        return FALSE;
+    }
+
     // === Drag scrolling active: consume left button events ===
     if (m_bDragScrolling)
     {
@@ -1101,6 +1138,11 @@ BOOL SPanel::HandleMouseDrag(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &l
             if (wParam & MK_LBUTTON)
             {
                 StopFlingAnimation();
+                // Rubber band selection has priority over drag scroll / fling
+                if (IsRubberBandSelEnabled() && StartRubberBandSel(pt, (wParam & MK_CONTROL) != 0))
+                {
+                    return TRUE;
+                }
                 m_bDragPending = FALSE;
                 m_bDragScrolling = TRUE;
                 m_ptDragLast = pt;
@@ -1120,20 +1162,31 @@ BOOL SPanel::HandleMouseDrag(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &l
     }
 
     // === Waiting for drag threshold ===
+    // m_ptDragStart was already set to the press point by StartDragPending;
+    // the 8px threshold and the rubber band origin both refer to that point.
     if (m_bDragPending)
     {
-        if (!m_bDragStarted)
-        {
-            m_ptDragStart = pt;
-            m_bDragStarted = TRUE;
-        }
-
         if (uMsg == WM_MOUSEMOVE)
         {
             int dx = abs(pt.x - m_ptDragStart.x);
             int dy = abs(pt.y - m_ptDragStart.y);
             if (dx > 8 || dy > 8)
             {
+                // Rubber band selection has priority over drag scroll / fling
+                if (IsRubberBandSelEnabled())
+                {
+                    BOOL bAdd = (wParam & MK_CONTROL) != 0;
+                    if (StartRubberBandSel(m_ptDragStart, bAdd))
+                    {
+                        // the move that crossed the threshold also updates the band
+                        UpdateRubberBandSel(pt, bAdd);
+                        return TRUE;
+                    }
+                    // refused by the item: fall through like a refused drag scroll
+                    m_bDragPending = FALSE;
+                    m_bDragStarted = FALSE;
+                    return FALSE;
+                }
                 if (OnDragCancelCapture(CANCEL_REASON_SCROLL))
                 {
                     m_bDragPending = FALSE;
@@ -1207,9 +1260,220 @@ void SPanel::OnDragScrollEnd()
 
 BOOL SPanel::CancelCaptureMode(int reason)
 {
-    if (reason == CANCEL_REASON_SCROLL && (HasScrollBar(TRUE) || HasScrollBar(FALSE)))
-        return FALSE;
+    if (reason == CANCEL_REASON_SCROLL)
+    {
+        // Rubber band selection (multi-select) has priority over scrolling:
+        // refuse to cancel while banding, even if an outer container starts scrolling.
+        if (m_bRubberBandActive)
+            return FALSE;
+        if (HasScrollBar(TRUE) || HasScrollBar(FALSE))
+            return FALSE;
+    }
+    // really cancelled: give up an in-progress rubber band
+    EndRubberBandSel(TRUE);
     return __baseCls::CancelCaptureMode(reason);
+}
+
+BOOL SPanel::IsRubberBandSelEnabled() const
+{
+    return FALSE;
+}
+
+void SPanel::OnRubberBandStart()
+{
+}
+
+void SPanel::OnRubberBandSelect(const CRect &rcBand, BOOL bAdd)
+{
+}
+
+void SPanel::OnRubberBandEnd(const CRect &rcBand, BOOL bCancelled)
+{
+}
+
+BOOL SPanel::StartRubberBandSel(const CPoint &pt, BOOL bAdd)
+{
+    // Ask the view to release the captured item first; a refused item keeps
+    // its own drag operation and the band will not start.
+    if (!OnDragCancelCapture(CANCEL_REASON_SCROLL))
+    {
+        m_bDragPending = FALSE;
+        m_bDragStarted = FALSE;
+        return FALSE;
+    }
+    OnDragClearItemCapture();
+    // The band replaces the drag-pending state entirely; a leftover pending
+    // flag would let button-less mouse moves re-trigger a band after mouse up.
+    m_bDragPending = FALSE;
+    m_bDragStarted = FALSE;
+    // Own the capture for the whole band session. Idempotent when the press
+    // already captured us (drag-pending path); required for the fling path
+    // where the press was consumed without capturing.
+    SetCapture();
+    // Take focus so ESC (cancel band) reaches this window even when the host
+    // routes keyboard messages through the focus chain.
+    if (!IsFocused())
+        SetFocus();
+    m_ptBandLast = pt;
+    m_bBandAdd = bAdd;
+    m_nBandScrollV = 0;
+    m_nBandScrollH = 0;
+    m_bBandTimerOn = FALSE;
+    m_bRubberBandActive = TRUE;
+    m_ptBandStart = pt;
+    // Anchor the band in content coordinates (client + scroll position). When
+    // edge auto-scrolling later moves the content under a stationary mouse,
+    // the band keeps covering everything between this anchor and the current
+    // point, so views re-derive exactly the accumulated selection instead of
+    // dropping the items that scrolled out of the viewport.
+    m_ptBandAnchorContent = m_ptBandStart + CPoint(m_siHoz.nPos, m_siVer.nPos);
+    // Keep the initial band at least 1x1 pixel so it can already intersect
+    // the item under the press point.
+    m_rcBand.SetRect(pt.x, pt.y, pt.x + 1, pt.y + 1);
+    OnRubberBandStart();
+    OnRubberBandSelect(m_rcBand, bAdd);
+    Invalidate();
+    return TRUE;
+}
+
+void SPanel::UpdateRubberBandSel(const CPoint &pt, BOOL bAdd)
+{
+    // remember the raw (unclamped) point and the modifier state: both are
+    // needed by the edge auto-scroll timer while the mouse rests at an edge.
+    m_ptBandLast = pt;
+    m_bBandAdd = bAdd;
+    // Build the band from the content-space anchor: content = client + scroll
+    // position. While auto-scrolling the mouse stands still but nPos grows, so
+    // the band extends toward the scrolled direction and, crucially, keeps
+    // covering every item selected since the band started. The rect handed to
+    // OnRubberBandSelect is expressed back in client coordinates and may
+    // extend beyond the client rect on purpose - views map it onto their items
+    // (off-screen ones included), which re-derives the accumulated selection.
+    CPoint ptContent(pt.x + m_siHoz.nPos, pt.y + m_siVer.nPos);
+    CRect rcNew(smin(m_ptBandAnchorContent.x, ptContent.x), smin(m_ptBandAnchorContent.y, ptContent.y), smax(m_ptBandAnchorContent.x, ptContent.x), smax(m_ptBandAnchorContent.y, ptContent.y));
+    rcNew.OffsetRect(-m_siHoz.nPos, -m_siVer.nPos);
+    // A zero-width/height band (e.g. dragging straight down a vertical list)
+    // would never intersect any item; keep it at least 1x1 pixel.
+    rcNew.right = smax(rcNew.right, rcNew.left + 1);
+    rcNew.bottom = smax(rcNew.bottom, rcNew.top + 1);
+    BOOL bBandMoved = (rcNew != m_rcBand);
+    if (bBandMoved)
+    {
+        m_rcBand = rcNew;
+        OnRubberBandSelect(m_rcBand, bAdd);
+        Invalidate();
+    }
+    // The auto-scroll zone only depends on the mouse position, so evaluate it
+    // on every move even when the band rectangle itself did not change.
+    UpdateBandAutoScrollTimer();
+}
+
+void SPanel::UpdateBandAutoScrollTimer()
+{
+    if (!m_bRubberBandActive)
+        return;
+    CRect rcClient;
+    GetClientRect(&rcClient);
+    const int EDGE = 24; // width of the auto-scroll zone in pixels
+    m_nBandScrollV = 0;
+    m_nBandScrollH = 0;
+    if (HasScrollBar(TRUE))
+    {
+        if (m_ptBandLast.y < rcClient.top + EDGE)
+            m_nBandScrollV = -(1 + smin((rcClient.top + EDGE - m_ptBandLast.y) / EDGE, 3));
+        else if (m_ptBandLast.y > rcClient.bottom - EDGE)
+            m_nBandScrollV = 1 + smin((m_ptBandLast.y - (rcClient.bottom - EDGE)) / EDGE, 3);
+    }
+    if (HasScrollBar(FALSE))
+    {
+        if (m_ptBandLast.x < rcClient.left + EDGE)
+            m_nBandScrollH = -(1 + smin((rcClient.left + EDGE - m_ptBandLast.x) / EDGE, 3));
+        else if (m_ptBandLast.x > rcClient.right - EDGE)
+            m_nBandScrollH = 1 + smin((m_ptBandLast.x - (rcClient.right - EDGE)) / EDGE, 3);
+    }
+    // Win32 SetTimer resets an existing timer, so it must only be called on
+    // the off->on transition - otherwise constant mouse moves would starve it.
+    if ((m_nBandScrollV || m_nBandScrollH) && !m_bBandTimerOn)
+    {
+        m_bBandTimerOn = TRUE;
+        SetTimer(Timer_BandAutoScroll, 40);
+    }
+    else if (!(m_nBandScrollV || m_nBandScrollH) && m_bBandTimerOn)
+    {
+        m_bBandTimerOn = FALSE;
+        KillTimer(Timer_BandAutoScroll);
+    }
+}
+
+void SPanel::OnBandAutoScroll()
+{
+    if (!m_bRubberBandActive)
+    {
+        m_bBandTimerOn = FALSE;
+        KillTimer(Timer_BandAutoScroll);
+        return;
+    }
+    BOOL bScrolled = FALSE;
+    for (int i = 0; i < abs(m_nBandScrollV); i++)
+    {
+        if (!OnScroll(TRUE, m_nBandScrollV > 0 ? SB_LINEDOWN : SB_LINEUP, 0))
+            break; // reached the scroll edge
+        bScrolled = TRUE;
+    }
+    for (int i = 0; i < abs(m_nBandScrollH); i++)
+    {
+        if (!OnScroll(FALSE, m_nBandScrollH > 0 ? SB_LINEDOWN : SB_LINEUP, 0))
+            break;
+        bScrolled = TRUE;
+    }
+    if (!bScrolled)
+        return; // at the edge already; the timer keeps polling until the mouse leaves the zone
+    // The content moved under the fixed band rectangle: re-run the mapping so
+    // the selection extends toward the scrolled direction.
+    UpdateRubberBandSel(m_ptBandLast, m_bBandAdd);
+}
+
+void SPanel::EndRubberBandSel(BOOL bCancelled)
+{
+    if (!m_bRubberBandActive)
+        return;
+    m_bRubberBandActive = FALSE;
+    m_bDragPending = FALSE;
+    m_bDragStarted = FALSE;
+    m_bBandTimerOn = FALSE;
+    KillTimer(Timer_BandAutoScroll);
+    m_nBandScrollV = 0;
+    m_nBandScrollH = 0;
+    OnRubberBandEnd(m_rcBand, bCancelled);
+    m_rcBand = CRect();
+    Invalidate();
+    ReleaseCapture();
+}
+
+void SPanel::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+    if (nChar == VK_ESCAPE && m_bRubberBandActive)
+    {
+        // Cancel the band and restore the selection snapshot taken at
+        // OnRubberBandStart (the view does the restore in OnRubberBandEnd).
+        EndRubberBandSel(TRUE);
+        return;
+    }
+    SWindow::OnKeyDown(nChar, nRepCnt, nFlags);
+}
+
+void SPanel::DrawRubberBandSel(IRenderTarget *pRT)
+{
+    if (!m_bRubberBandActive || m_rcBand.IsRectEmpty())
+        return;
+    CRect rcBand = m_rcBand;
+    CRect rcClient;
+    GetClientRect(&rcClient);
+    rcBand.IntersectRect(rcBand, rcClient);
+    if (rcBand.IsRectEmpty())
+        return;
+    if (m_pSkinBand)
+        m_pSkinBand->DrawByIndex(pRT, rcBand, 0);
 }
 
 void SPanel::OnFlingScroll()
@@ -1362,7 +1626,7 @@ void SPanel::OnLButtonDown(UINT nFlags, CPoint pt)
         return;
     }
     OnLButtonDownEx(nFlags, pt);
-    if (IsEnableDragMode())
+    if (IsRubberBandSelEnabled() || IsEnableDragMode())
     {
         StartDragPending(pt);
     }

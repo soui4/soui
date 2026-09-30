@@ -76,3 +76,5 @@ ios/
 /.workbuddy
 /.trae
 *.deb
+/soui-ohos-lib/BuildProfile.ets
+demos/RIPDemo/

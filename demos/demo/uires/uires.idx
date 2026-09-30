@@ -216,6 +216,10 @@
 	<file name="tab_layout" path="svg\tab_layout.svg"/>
 	<file name="tab_animator" path="svg\tab_animator.svg"/>
 	<file name="tab_misc" path="svg\tab_misc.svg"/>
+	<file name="webbtn_back" path="svg\webbtn_back.svg"/>
+	<file name="webbtn_forward" path="svg\webbtn_forward.svg"/>
+	<file name="webbtn_go" path="svg\webbtn_go.svg"/>
+	<file name="webbtn_refresh" path="svg\webbtn_refresh.svg"/>
   </svg>
 	<xml>
 		<file name="roomlist" path="xml\roomlist.xml"/>

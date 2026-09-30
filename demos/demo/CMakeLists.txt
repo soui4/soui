@@ -117,6 +117,18 @@ if (CMAKE_SYSTEM_NAME MATCHES Windows)
 else()
 	target_link_libraries(demo dl)
 endif()
+
+# 32 位 Windows 构建:编译完成后自动将 wke.7z 解压到 demo 运行目录(与 demo.exe 同目录),
+if(CMAKE_SYSTEM_NAME MATCHES "Windows" AND CMAKE_SIZEOF_VOID_P EQUAL 4)
+    set(_WKE_7Z "${PROJECT_SOURCE_DIR}/third-part/wke/wke.7z")
+    set(_WKE_7Z_EXE "${PROJECT_SOURCE_DIR}/tools/7z.exe")
+    if(EXISTS "${_WKE_7Z}" AND EXISTS "${_WKE_7Z_EXE}")
+        add_custom_command(TARGET demo POST_BUILD
+            COMMENT "解压 wke.7z 到运行目录 (32 位 Windows)"
+            COMMAND "${_WKE_7Z_EXE}" x -y "-o$<TARGET_FILE_DIR:demo>" "${_WKE_7Z}"
+            VERBATIM)
+    endif()
+endif()
 if(SOUI_ENABLE_COM_LIB)
     target_link_libraries(demo ${COM_LIBS} ${COM_DEP_LIBS})
 endif()

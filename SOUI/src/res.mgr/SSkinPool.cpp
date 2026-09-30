@@ -2,9 +2,45 @@
 #include "res.mgr/SSkinPool.h"
 #include "core/SSkin.h"
 #include "SApp.h"
+#include "res.mgr/SUiDef.h"
 #include "helper/SDpiScale.h"
 
 SNSBEGIN
+
+/**
+ * @brief RAII guard locking SUiDef's singleton skin lock.
+ * @details All SSkinPool public APIs share SUiDef's lock (recursive) with
+ *          SUiDef's own skin/style/font paths, so there is a single lock
+ *          and no pool-vs-SUiDef lock-ordering to reason about. Same-thread
+ *          reentry (LoadSkins -> PushSkinPool, GetSkin from within
+ *          SUiDef::GetSkin, GETSKIN from within Scale) is legal.
+ *          When SUiDef has already been torn down (late shutdown) the
+ *          guard degrades to a no-op: teardown is single-threaded, so
+ *          there is nothing left to race with.
+ */
+class CSkinLock {
+    SCriticalSection *m_pCs;
+
+  public:
+    CSkinLock()
+    {
+        SUiDef *pUiDef = GETUIDEF;
+        if (pUiDef)
+        {
+            m_pCs = &pUiDef->GetSkinLock();
+            m_pCs->Enter();
+        }
+        else
+        {
+            m_pCs = NULL;
+        }
+    }
+    ~CSkinLock()
+    {
+        if (m_pCs)
+            m_pCs->Leave();
+    }
+};
 
 ///////////////////////////////////////////////////////////////////////
 /** SSkinPool */
@@ -52,13 +88,16 @@ ISkinObj *SSkinPool::_LoadSkin(SXmlNode xmlSkin, int nScale)
             pSkin->SetScale(nScale);
         }
         SkinKey key = { strSkinName, pSkin->GetScale() };
-        if (HasKey(key))
         {
-            SSLOGW() << "load skin duplicated found,type=" << strTypeName << " name=" << strSkinName;
-            pSkin->Release();
-            return NULL;
+            CSkinLock lock;
+            if (HasKey(key))
+            {
+                SSLOGW() << "load skin duplicated found,type=" << strTypeName << " name=" << strSkinName;
+                pSkin->Release();
+                return NULL;
+            }
+            AddKeyObject(key, pSkin);
         }
-        AddKeyObject(key, pSkin);
     }
     else
     {
@@ -106,6 +145,7 @@ int SSkinPool::LoadSkins(IXmlNode *xmlNode)
 BOOL SSkinPool::AddSkin(ISkinObj *pSkin)
 {
     SkinKey key = { pSkin->GetName(), pSkin->GetScale() };
+    CSkinLock lock;
     if (HasKey(key))
         return FALSE;
     AddKeyObject(key, pSkin);
@@ -116,13 +156,14 @@ BOOL SSkinPool::AddSkin(ISkinObj *pSkin)
 BOOL SSkinPool::RemoveSkin(THIS_ ISkinObj *pSkin)
 {
     SkinKey key = { pSkin->GetName(), pSkin->GetScale() };
+    CSkinLock lock;
     return !!RemoveKeyObject(key);
 }
 
 ISkinObj *SSkinPool::GetSkin(LPCWSTR strSkinName, int nScale)
 {
     SkinKey key = { strSkinName, nScale };
-
+    CSkinLock lock;
     if (!HasKey(key))
     {
         if (!m_bAutoScale)
@@ -189,6 +230,7 @@ void SSkinPool::OnKeyRemoved(const SSkinPtr &obj)
 
 void SSkinPool::RemoveAll(THIS)
 {
+    CSkinLock lock;
     SCmnMap<SSkinPtr, SkinKey>::RemoveAll();
 }
 

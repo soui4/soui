@@ -28,7 +28,7 @@
       </imgbtn>
     </template>
     <t:home_card name="card_ctrls" icon="0" title="基础控件" desc="列表 / 树 / 编辑器等 18 种控件"/>
-    <t:home_card name="card_webkit" icon="1" title="教程" desc="基于 WKE 的内嵌网页浏览器"/>
+    <t:home_card name="card_webkit" icon="1" title="SOUI官网" desc="基于 WKE 的内嵌网页浏览器"/>
     <t:home_card name="card_animator" icon="2" title="动画" desc="GIF / APNG 动图播放演示"/>
     <t:home_card name="card_layout" icon="3" title="布局" desc="线性 / 网格 / 模板布局能力"/>
     <t:home_card name="card_misc" icon="4" title="杂项" desc="脚本 / 拖放 / 矩阵变换 / SVG 等"/>

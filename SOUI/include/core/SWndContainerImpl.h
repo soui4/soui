@@ -238,6 +238,28 @@ class SOUI_EXP SwndContainerImpl
 
   protected:
     /**
+     * @brief Called when the timeline request state of the container changes.
+     *
+     * SwndContainerImpl watches its timeline handler manager on every
+     * Register/Unregister call (both for ITimelineHandler and IValueAnimator) and
+     * invokes this hook only when the manager transits between empty and non-empty,
+     * i.e. a timer start/stop request is added or fully released.
+     *
+     * Subclasses use it to react on the request change, e.g. SHostWnd starts/stops
+     * its kPulseTimer, while SOsrPanel registers/unregisters itself as a timeline
+     * handler of the host container.
+     *
+     * @param bHasTimelineRequest TRUE if there is at least one pending timeline
+     *                            request, FALSE if the last request was released.
+     */
+    virtual void OnTimelineRequestChanged(BOOL bHasTimelineRequest) PURE;
+
+    /**
+    * @brief Determine whether time line manager empty or not.
+    */
+    bool IsTimeLineMgrEmpty() const;
+  protected:
+    /**
      * @brief Handles mouse move events within the frame.
      * @param uFlag Flags indicating the state of the mouse buttons.
      * @param pt Current mouse position.

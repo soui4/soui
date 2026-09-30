@@ -32,9 +32,10 @@
 
 #include "magnet/MagnetFrame.h"
 #include "skin/SDemoSkin.h"
-#include <controls.extend/SMcListViewEx/STabCtrlHeaderBinder.h>
+#include <controls.extend/STabCtrlHeaderBinder.h>
 #include <helper/SDpiHelper.hpp>
 #include "trayicon/SShellTray.h"
+#include <SEdit2.h>
 
 extern UINT g_dwSkinChangeMessage;
 
@@ -160,6 +161,11 @@ protected:
 	void OnMclvCtxMenu(IEvtArgs *pEvt);         //多列列表右键菜单
 	void OnMclvEventOfPanel(IEvtArgs *pEvt);    //列表项面板事件转发(双击)
 	void OnMcLvHeaderRelayout(IEvtArgs *e);     //表头内"全选"复选框的跟随布局
+	void OnMclvItemSelChanged(IEvtArgs *e);     //mclistview 页单项选中状态事件:实时刷新已选条目数
+	void OnLcItemSelChanged(IEvtArgs *e);       //listctrl 页单项选中状态事件:实时刷新已选条目数
+	void OnMultiSelToggle(IEvtArgs *e);         //列表页"启用多选"复选框:运行时切换多选(框选)支持
+	void OnBandToggle(IEvtArgs *e);             //列表页"启用框选"复选框:运行时切换框选手势(关闭后多选拖动为 fling)
+	void OnFullRowSelToggle(IEvtArgs *e);       //treectrl页"整行选中"复选框:运行时切换整行高亮
 	void OnInitListBox();                       //动态向 listbox 追加条目
 	void OnInitGroup(IEvtArgs *e);              //grouplist 分组项初始化
 	void OnInitItem(IEvtArgs *e);               //grouplist 列表项初始化
@@ -179,6 +185,7 @@ protected:
 
     //教程页 - 内嵌浏览器(MainDlg_Webkit.cpp)
     void OnBtnWebkitGo();
+	void OnBtnWebkitGo2(IEvtArgs *e){OnBtnWebkitGo();}
     void OnBtnWebkitBackward();
     void OnBtnWebkitForeward();
     void OnBtnWebkitRefresh();
@@ -242,6 +249,7 @@ protected:
         EVENT_NAME_COMMAND(L"btn_webkit_back",OnBtnWebkitBackward)
         EVENT_NAME_COMMAND(L"btn_webkit_fore",OnBtnWebkitForeward)
         EVENT_NAME_COMMAND(L"btn_webkit_refresh",OnBtnWebkitRefresh)
+		EVENT_NAME_HANDLER(L"edit_url",EventKeyEnter::EventID,OnBtnWebkitGo2)
         EVENT_NAME_COMMAND(L"btn_hidetst",OnBtnHideTest)
         EVENT_NAME_COMMAND(L"btn_insert_gif",OnBtnInsertGif2RE)
         EVENT_NAME_COMMAND(L"btn_append_msg",OnBtnAppendMsg)
@@ -264,6 +272,23 @@ protected:
 		EVENT_ID_HANDLER(R.id.gl_catalog,EventGroupStateChanged::EventID,OnGroupStateChanged)
 		EVENT_ID_HANDLER(R.id.gl_catalog,EventGroupListItemCheck::EventID,OnCtrlPageClick)
 		EVENT_NAME_HANDLER(L"mclv_test_header",EventHeaderRelayout::EventID,OnMcLvHeaderRelayout)
+		EVENT_NAME_HANDLER(L"mclv_test",EventItemSelChanged::EventID,OnMclvItemSelChanged)
+		EVENT_NAME_HANDLER(L"lc_test",EventItemSelChanged::EventID,OnLcItemSelChanged)
+		EVENT_NAME_HANDLER(L"chk_multi_mclv",EventCmd::EventID,OnMultiSelToggle)
+		EVENT_NAME_HANDLER(L"chk_multi_lc",EventCmd::EventID,OnMultiSelToggle)
+		EVENT_NAME_HANDLER(L"chk_multi_lvfix",EventCmd::EventID,OnMultiSelToggle)
+		EVENT_NAME_HANDLER(L"chk_multi_lvflex",EventCmd::EventID,OnMultiSelToggle)
+		EVENT_NAME_HANDLER(L"chk_multi_tile",EventCmd::EventID,OnMultiSelToggle)
+		EVENT_NAME_HANDLER(L"chk_multi_tv",EventCmd::EventID,OnMultiSelToggle)
+		EVENT_NAME_HANDLER(L"chk_multi_tree",EventCmd::EventID,OnMultiSelToggle)
+		EVENT_NAME_HANDLER(L"chk_band_mclv",EventCmd::EventID,OnBandToggle)
+		EVENT_NAME_HANDLER(L"chk_band_lc",EventCmd::EventID,OnBandToggle)
+		EVENT_NAME_HANDLER(L"chk_band_lvfix",EventCmd::EventID,OnBandToggle)
+		EVENT_NAME_HANDLER(L"chk_band_lvflex",EventCmd::EventID,OnBandToggle)
+		EVENT_NAME_HANDLER(L"chk_band_tile",EventCmd::EventID,OnBandToggle)
+		EVENT_NAME_HANDLER(L"chk_band_tv",EventCmd::EventID,OnBandToggle)
+		EVENT_NAME_HANDLER(L"chk_band_tree",EventCmd::EventID,OnBandToggle)
+		EVENT_NAME_HANDLER(L"chk_fullrow_tree",EventCmd::EventID,OnFullRowSelToggle)
 
 		EVENT_NAME_HANDLER(L"rotate_x",EventSwndStateChanged::EventID,On3dViewRotate)
 		EVENT_NAME_HANDLER(L"rotate_y",EventSwndStateChanged::EventID,On3dViewRotate)

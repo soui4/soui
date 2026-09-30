@@ -150,6 +150,8 @@ class SOUI_EXP SOsrPanel
     STDMETHOD_(BOOL, IsTimelineEnabled)(CTHIS) SCONST OVERRIDE;
     STDMETHOD_(BOOL, IsDesignerMode)(CTHIS) SCONST OVERRIDE;
 
+    virtual void OnTimelineRequestChanged(BOOL bHasTimelineRequest) OVERRIDE;
+
   public: /**< SWindow */
     virtual LRESULT DoFrameEvent(UINT uMsg, WPARAM wParam, LPARAM lParam) OVERRIDE;
     virtual void ModifyItemState(DWORD dwStateAdd, DWORD dwStateRemove);
@@ -170,6 +172,15 @@ class SOUI_EXP SOsrPanel
     virtual BOOL CancelCaptureMode(int reason) OVERRIDE; /**< Cancel mouse click operation, chain to the captured child control */
 
   protected:
+    /**
+     * @brief Synchronize the panel's timeline registration with the host container.
+     *
+     * The panel registers itself as a timeline handler of the host only when it is
+     * visible and at least one child object has requested the timeline; otherwise it
+     * unregisters to free the host from running an unnecessary timeline timer.
+     */
+    void UpdateTimelineRegistration();
+
     void OnShowWindow(BOOL bShow, UINT nStatus);
     void OnDestroy();
     SOUI_MSG_MAP_BEGIN()

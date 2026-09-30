@@ -3,7 +3,7 @@
   page_ctrls.xml - 基础控件演示分区
 
   左侧 grouplist(gl_catalog) 为控件分类目录,右侧 tab_ctrls(tabWidth=0 隐藏页签)
-  承载 17 个控件演示子页,页切换由 MainDlg_List.cpp 响应目录点击驱动。
+  承载 16 个控件演示子页,页切换由 MainDlg_List.cpp 响应目录点击驱动。
   每个子页采用统一版式:页头(标题+说明) -> 演示区(卡片容器无底色,由页面根的
   半透明 clr_page_bg 统一衬底,透出换肤层 demoskinbk);列表类演示页同为页头 + 全区域列表(weight 撑满)。
   注意:控件 name/id 被 demos\demo 源码按名引用,不可改动。
@@ -28,27 +28,26 @@
 				<item text="固定高度列表" icon="2" name="page_fix_height_listview" id="102" />
 				<item text="可变高度列表" icon="3" name="page_flex_height_listview" id="103" />
 				<item text="TileView" icon="4" name="page_tileview" id="104" />
-				<item text="扩展多列列表" icon="5" name="page_mclistview_ex" id="105" />
 			</group>
 			<group text="树型控件" id="2000">
-				<item text="TreeCtrl" icon="6" name="page_treectrl" id="106" />
-				<item text="TreeView" icon="7" name="page_treeview" id="107" />
+				<item text="TreeCtrl" icon="6" name="page_treectrl" id="105" />
+				<item text="TreeView" icon="7" name="page_treeview" id="106" />
 			</group>
 			<group text="编辑器及热键" id="3000">
-				<item text="编辑器" icon="8" name="page_edit" id="108" />
-				<item text="富文本" icon="9" name="page_richedit" id="109" />
+				<item text="编辑器" icon="8" name="page_edit" id="107" />
+				<item text="富文本" icon="9" name="page_richedit" id="108" />
 			</group>
 			<group text="按钮" id="4000">
-				<item text="按钮" icon="10" name="page_button" id="110" />
-				<item text="radio button" icon="11" name="page_radio_button" id="111" />
+				<item text="按钮" icon="10" name="page_button" id="109" />
+				<item text="radio button" icon="11" name="page_radio_button" id="110" />
 			</group>
 			<group text="其它控件" id="5000">
-				<item text="进度条控件" icon="12" name="page_progress" id="112" />
-				<item text="分割窗口" icon="13" name="page_splitwnd" id="114" />
-				<item text="列表框及组合框" icon="14" name="page_listbox" id="115" />
-				<item text="日历" icon="15" name="page_calendar" id="113" />
-				<item text="属性表控件" icon="16" name="page_property" id="116" />
-				<item text="更多控件" icon="17" name="page_morectrl" id="117" />
+				<item text="进度条控件" icon="12" name="page_progress" id="111" />
+				<item text="分割窗口" icon="13" name="page_splitwnd" id="113" />
+				<item text="列表框及组合框" icon="14" name="page_listbox" id="114" />
+				<item text="日历" icon="15" name="page_calendar" id="112" />
+				<item text="属性表控件" icon="16" name="page_property" id="115" />
+				<item text="更多控件" icon="17" name="page_morectrl" id="116" />
 			</group>
 		</data>
 	</grouplist>
@@ -57,6 +56,11 @@
 		<page title="mclistview" layout="vbox" interval="12">
 				<text text="多列列表" font="size:16,bold:1" colorText="@color/clr_title"/>
 				<text text="报表式多列虚拟列表,表头支持排序拖换与全选,条目模板内可嵌入任意控件" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
+				<window layout="hbox" interval="16">
+				<check name="chk_multi_mclv" text="启用多选(关闭后点击为单选)" checked="1" font="size:12"/>
+				<check name="chk_band_mclv" text="启用框选(关闭后多选拖动为 fling 滚动)" checked="1" font="size:12"/>
+				<text name="txt_mclv_selcount" text="已选 0 项" font="size:12" colorText="@color/clr_primary" marginSize="8,0,0,0"/>
+				</window>
 				<mclistview name="mclv_test" multiSel="1" colorBkgnd="@color/clr_card_bg" size="-2,0" weight="1" headerHeight="30" dividerSize="1">
 				<headerStyle wndclass="header" align="center" name="mclv_test_header" sortSkin="skin_lcex_header_arrow" itemSwapEnable="1" fixWidth="0" font="underline:0,adding:-3" sortHeader="1" colorBkgnd="#ffffff">
 					<items>
@@ -99,14 +103,19 @@
 		</page>
 		<page title="listctrl" layout="vbox" interval="12">
 				<text text="基础列表" font="size:16,bold:1" colorText="@color/clr_title"/>
-				<text text="listctrl 报表式列表,演示表头排序、拖换与热跟踪光标" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
-				<listctrl name="lc_test" hotTrack="1" size="-2,0" weight="1" itemHeight="20" headerHeight="30" cursor="CUR_TST" font="underline:1" sbSkin="skin_new_scrollbar">
-				<headerStyle align="left" itemSwapEnable="1" fixWidth="0" sortHeader="1">
+				<text text="报表式列表,演示表头排序、拖换与热跟踪光标;框选矩形使用可配置的 bandSkin(系统内置 _skin.sys.selband,colorrect 皮肤)" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
+				<window layout="hbox" interval="16">
+				<check name="chk_multi_lc" text="启用多选(关闭后点击为单选)" checked="1" font="size:12"/>
+				<check name="chk_band_lc" text="启用框选(关闭后多选拖动为 fling 滚动)" checked="1" font="size:12"/>
+				<text name="txt_lc_selcount" text="已选 0 项" font="size:12" colorText="@color/clr_primary" marginSize="8,0,0,0"/>
+				</window>
+				<listctrl name="lc_test" multiSelection="1" hotTrack="1" size="-2,0" weight="1" itemHeight="28" headerHeight="30" colorBkgnd="@color/clr_card_bg" colorItemHotBkgnd="@color/clr_card_hover" colorItemSelBkgnd="#DBEAFE" colorText="@color/clr_text" colorSelText="@color/clr_title" bandSkin="_skin.sys.selband" sbSkin="skin_new_scrollbar" font="size:12">
+				<headerStyle align="left" itemSwapEnable="1" fixWidth="0" sortHeader="1" sortSkin="skin_lcex_header_arrow" colorBkgnd="@color/clr_card_bg" colorText="@color/clr_title" font="size:12,bold:1">
 					<items>
-						<item width="150" weight="1">name</item>
-						<item width="150">gender</item>
-						<item width="150">age</item>
-						<item width="150">score</item>
+						<item width="150" weight="1">姓名</item>
+						<item width="100">性别</item>
+						<item width="80">年龄</item>
+						<item width="100">成绩</item>
 					</items>
 				</headerStyle>
 			</listctrl>
@@ -114,7 +123,11 @@
 		<page title="listview(fix)" layout="vbox" interval="10" >
 			<text text="固定高度列表 listview" font="size:16,bold:1" colorText="@color/clr_title"/>
 			<text text="横向与纵向的定高虚拟列表,item 内可嵌入任意子控件" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
-			<listview size="-2,100" name="lv_test_fix_horz" dividerSize="5" wantTab="1" sbFadeFrames="30" vertical="0">
+			<window layout="hbox" interval="16">
+			<check name="chk_multi_lvfix" text="启用多选(关闭后点击为单选)" checked="1" font="size:12"/>
+			<check name="chk_band_lvfix" text="启用框选(关闭后多选拖动为 fling 滚动)" checked="1" font="size:12"/>
+			</window>
+			<listview size="-2,100" name="lv_test_fix_horz" multiSel="1" dividerSize="5" wantTab="1" sbFadeFrames="30" vertical="0">
 				<template itemWidth="100" trackMouseEvent="1">
 					<imgbtn size="-2,-2" layout="vbox" gravity="center" interval="10">
 						<img size="-1,-1" name="btn_icon" skin="skin_page_icons" iconIndex="0"/>
@@ -122,7 +135,7 @@
 					</imgbtn>
 				</template>
 			</listview>
-			<listview size="-2,0" weight="1" name="lv_test_fix" dividerSize="5" wantTab="1" sbFadeFrames="30">
+			<listview size="-2,0" weight="1" name="lv_test_fix" multiSel="1" dividerSize="5" wantTab="1" sbFadeFrames="30">
 				<template itemHeight="50" trackMouseEvent="1">
 					<button pos="10,5,@150,@25" name="btn_test" tip="click the button to see how to writing the response function">btn</button>
 					<animateimg pos="[10,{0" skin="skin_busy" name="ani_test" tip="animateimg is used here" msgTransparent="0" />
@@ -148,7 +161,11 @@
 		<page title="listview(flex)" layout="vbox" interval="12">
 				<text text="可变高度列表" font="size:16,bold:1" colorText="@color/clr_title"/>
 				<text text="奇偶行使用不同模板与高度的虚拟列表,悬停态可单独定制" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
-				<listview size="-2,0" weight="1" name="lv_test_flex" dividerSize="5" sbFadeFrames="30">
+				<window layout="hbox" interval="16">
+				<check name="chk_multi_lvflex" text="启用多选(关闭后点击为单选)" checked="1" font="size:12"/>
+				<check name="chk_band_lvflex" text="启用框选(关闭后多选拖动为 fling 滚动)" checked="1" font="size:12"/>
+				</window>
+				<listview size="-2,0" weight="1" name="lv_test_flex" multiSel="1" dividerSize="5" sbFadeFrames="30">
 				<template defHeight="50" oddHeight="50" evenHeight="60" evenSelHeight="90">
 					<itemOdd>
 						<button pos="10,5,@150,@25" name="btn_test" tip="click the button to see how to writing the response function">btn</button>
@@ -168,50 +185,26 @@
 		<page title="tileview" layout="vbox" interval="12">
 				<text text="TileView" font="size:16,bold:1" colorText="@color/clr_title"/>
 				<text text="平铺网格虚拟列表,适合图标卡片式内容展示" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
-				<tileview size="-2,0" weight="1" name="lv_test_tile" wantTab="1" marginSize="5" sbFadeFrames="30">
+				<window layout="hbox" interval="16">
+				<check name="chk_multi_tile" text="启用多选(关闭后点击为单选)" checked="1" font="size:12"/>
+				<check name="chk_band_tile" text="启用框选(关闭后多选拖动为 fling 滚动)" checked="1" font="size:12"/>
+				</window>
+				<tileview size="-2,0" weight="1" name="lv_test_tile" multiSel="1" wantTab="1" marginSize="5" sbFadeFrames="30">
 				<template itemHeight="130" itemWidth="135" trackMouseEvent="1">
 					<img pos="|0,0,@100,@100" offset="-0.5,0" name="img_file_icon" />
 					<button pos="|0,[5,@115,@22" offset="-0.5,0" name="btn_test" tip="click the button to see how to writing the response function">btn</button>
 				</template>
 			</tileview>
 		</page>
-		<page title="mclistviewex" layout="vbox" interval="12">
-				<text text="扩展多列列表" font="size:16,bold:1" colorText="@color/clr_title"/>
-				<text text="以音乐列表为场景,表头自适应拉伸,支持列拖放与拖放高亮" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
-				<mclistviewex name="musiclist" headerHeight="48" colorSwapLine="@color/clr_primary" colorDropBk="@color/clr_primary" size="-2,0" weight="1" sbTop="48" sbFadeFrames="30">
-				<headerStyle wndclass="header2" align="center" matchParent="1" sortSkin="skin_lcex_header_arrow"  cursor="hand" itemSwapEnable="1" sortHeader="0" colorText="@color/clr_title">
-					<items>
-						<item width="150">歌曲</item>
-						<item width="120">歌手</item>
-						<item width="120">专辑</item>
-						<item width="120">时长</item>
-					</items>
-				</headerStyle>
-				<template itemHeight="48" colorHover="@color/clr_card_hover" colorSelected="#DBEAFE" fond="adding:-4">
-					<window name="col1" clipClient="1">
-						<hr pos="0,0,-0,1" colorLine="@color/clr_divider" />
-						<text name="songname" dotted="1" pos="5,|,]-30,-0" offset="0,-0.5" font="bold:1,adding:-1" colorText="@color/clr_title">天天想听</text>
-						<window pos="-0,|" name="playbtn" offset="-1.2,-0.5" display="0" show="0" />
-					</window>
-					<window name="col2" clipClient="1" layout="vbox" gravity="center">
-						<hr size="-2,1" colorLine="@color/clr_divider" />
-						<text name="artist" size="-1,0" weight="1">卖炭翁</text>
-					</window>
-					<window name="col3" clipClient="1"  layout="vbox" gravity="center">
-						<hr size="-2,1" colorLine="@color/clr_divider" />
-						<text name="album" size="-1,0" weight="1">SOUI就是棒</text>
-					</window>
-					<window name="col4" clipClient="1">
-						<hr pos="0,0,-0,1" colorLine="@color/clr_divider" />
-						<text name="lasttime" pos="0,|" offset="0,-0.5" colorText="@color/clr_text_sub">00:00</text>
-					</window>
-				</template>
-			</mclistviewex>
-		</page>
 		<!-- ============ 树型控件 ============ -->
 		<page title="treectrl" layout="vbox" interval="12">
 				<text text="TreeCtrl" font="size:16,bold:1" colorText="@color/clr_title"/>
 				<text text="经典树控件,支持复选框、节点图标与多级组织结构" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
+				<window layout="hbox" interval="16">
+					<check name="chk_multi_tree" text="启用多选(关闭后清除多选)" checked="1" font="size:12"/>
+					<check name="chk_band_tree" text="启用框选(关闭后多选拖动为 fling 滚动)" checked="1" font="size:12"/>
+					<check name="chk_fullrow_tree" text="整行选中(关闭后只高亮文本)" checked="1" font="size:12"/>
+				</window>
 				<window size="-2,0" weight="1" clipClient="1">
 					<include src="layout:treectrl" />
 				</window>

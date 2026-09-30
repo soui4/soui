@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  webbtn_back.svg - 浏览器"后退"按钮图标(SVG 1.1,nanosvg 兼容)
+  3 帧横排,每帧 20x20,总尺寸 60x20。
+  帧序与 SOUI imgbtn 三态约定一致:0=normal  1=hover  2=push
+  图形:左向箭头。配色沿用 demo 主题:normal 石板灰 / hover 主蓝 / push 深蓝。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="60" height="20" viewBox="0 0 60 20">
+  <!-- 帧0:normal #64748B -->
+  <g transform="translate(0,0)" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="15" y1="10" x2="5" y2="10"/>
+    <path d="M10 5 L5 10 L10 15"/>
+  </g>
+  <!-- 帧1:hover #2563EB -->
+  <g transform="translate(20,0)" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="15" y1="10" x2="5" y2="10"/>
+    <path d="M10 5 L5 10 L10 15"/>
+  </g>
+  <!-- 帧2:push #1D4ED8 -->
+  <g transform="translate(40,0)" fill="none" stroke="#1D4ED8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="15" y1="10" x2="5" y2="10"/>
+    <path d="M10 5 L5 10 L10 15"/>
+  </g>
+</svg>

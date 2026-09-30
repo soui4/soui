@@ -53,4 +53,5 @@
   <imglist name="_skin.sys.btn.skin" src="SVG:SYS_BTN_SKIN" states="4"/>
   <imglist name="_skin.sys.btn.mini.close" src="SVG:SYS_BTN_MINI_CLOSE" states="4"/>
   <imgframe name="_skin.sys.list.item" src="SVG:SYS_LIST_ITEM" states="4" margin="5,5,5,5"/>
+  <colorrect name="_skin.sys.selband" normal="rgba(37,99,235,15%)" normalBorder="#2563EB" borderWidth="1" cornerRadius="2"/>
 </skin>

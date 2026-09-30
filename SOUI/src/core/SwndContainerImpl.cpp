@@ -471,29 +471,54 @@ void SwndContainerImpl::BuildWndTreeZorder()
 {
     if (m_bZorderDirty)
     {
-        m_pRoot->OnBuildTreeZorder(0);
+        if (m_pRoot)
+            m_pRoot->OnBuildTreeZorder(0);
         m_bZorderDirty = FALSE;
     }
 }
 
 BOOL SwndContainerImpl::RegisterTimelineHandler(ITimelineHandler *pHandler)
 {
-    return m_timelineHandlerMgr.RegisterTimelineHandler(pHandler);
+    bool bEmpty1 = m_timelineHandlerMgr.IsEmpty();
+    BOOL bRet = m_timelineHandlerMgr.RegisterTimelineHandler(pHandler);
+    bool bEmpty2 = m_timelineHandlerMgr.IsEmpty();
+    if (bEmpty1 && !bEmpty2)
+        OnTimelineRequestChanged(TRUE);
+    return bRet;
 }
 
 BOOL SwndContainerImpl::UnregisterTimelineHandler(ITimelineHandler *pHandler)
 {
-    return m_timelineHandlerMgr.UnregisterTimelineHandler(pHandler);
+    bool bEmpty1 = m_timelineHandlerMgr.IsEmpty();
+    BOOL bRet = m_timelineHandlerMgr.UnregisterTimelineHandler(pHandler);
+    bool bEmpty2 = m_timelineHandlerMgr.IsEmpty();
+    if (!bEmpty1 && bEmpty2)
+        OnTimelineRequestChanged(FALSE);
+    return bRet;
 }
 
 BOOL SwndContainerImpl::RegisterValueAnimator(IValueAnimator *pAnimator)
 {
-    return m_timelineHandlerMgr.RegisterValueAnimator(pAnimator);
+    bool bEmpty1 = m_timelineHandlerMgr.IsEmpty();
+    BOOL bRet = m_timelineHandlerMgr.RegisterValueAnimator(pAnimator);
+    bool bEmpty2 = m_timelineHandlerMgr.IsEmpty();
+    if (bEmpty1 && !bEmpty2)
+        OnTimelineRequestChanged(TRUE);
+    return bRet;
 }
 
 BOOL SwndContainerImpl::UnregisterValueAnimator(IValueAnimator *pAnimator)
 {
-    return m_timelineHandlerMgr.UnregisterValueAnimator(pAnimator);
+    bool bEmpty1 = m_timelineHandlerMgr.IsEmpty();
+    BOOL bRet = m_timelineHandlerMgr.UnregisterValueAnimator(pAnimator);
+    bool bEmpty2 = m_timelineHandlerMgr.IsEmpty();
+    if (!bEmpty1 && bEmpty2)
+        OnTimelineRequestChanged(FALSE);
+    return bRet;
+}
+
+bool SwndContainerImpl::IsTimeLineMgrEmpty() const{
+    return m_timelineHandlerMgr.IsEmpty();
 }
 
 void SwndContainerImpl::OnNextFrame()

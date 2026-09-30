@@ -385,13 +385,31 @@ void SOsrPanel::BeforePaint(IRenderTarget *pRT, SPainter &painter) const
     painter.oldTextColor = pRT->SetTextColor(crText);
 }
 
-void SOsrPanel::OnShowWindow(BOOL bShow, UINT nStatus)
+void SOsrPanel::UpdateTimelineRegistration()
 {
-    __baseCls::OnShowWindow(bShow, nStatus);
-    if (IsVisible(TRUE))
+    // Register into the host only when the panel is visible and there is at least one
+    // pending timeline request (child timeline handlers or value animators); otherwise
+    // unregister so the host does not run a timeline timer for an idle panel.
+    BOOL bNeedTimeline = IsVisible(TRUE) && !IsTimeLineMgrEmpty();
+    if (bNeedTimeline)
         m_pHostProxy->GetHostContainer()->RegisterTimelineHandler(this);
     else
         m_pHostProxy->GetHostContainer()->UnregisterTimelineHandler(this);
+}
+
+void SOsrPanel::OnTimelineRequestChanged(BOOL bHasTimelineRequest)
+{
+    // The container base calls this when the first timeline request arrives or the
+    // last one is released; re-evaluate the registration into the host container.
+    UpdateTimelineRegistration();
+}
+
+void SOsrPanel::OnShowWindow(BOOL bShow, UINT nStatus)
+{
+    __baseCls::OnShowWindow(bShow, nStatus);
+    // (Re)evaluate the host timeline registration: register on show only if some child
+    // object already requested the timeline, unregister on hide unconditionally.
+    UpdateTimelineRegistration();
 }
 
 void SOsrPanel::OnDestroy()

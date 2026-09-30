@@ -126,12 +126,12 @@ void SIECtrl::OnAxActivate(IUnknown *pUnknwn)
 
 int SIECtrl::OnCreate(LPVOID)
 {
-    int nRet = __baseCls::OnCreate(NULL);
     if (GetContainer()->IsTranslucent())
     {
         SSLOGW()<<"warning!!! create iectrl failed bacause of host is translucent!";
         return -1;
     }
+    int nRet = __baseCls::OnCreate(NULL);
     GetContainer()->GetMsgLoop()->AddMessageFilter(this);
     return nRet;
 }
@@ -180,7 +180,7 @@ BOOL SIECtrl::PreTranslateMessage(MSG *pMsg)
 BOOL SIECtrl::Navigate(const SStringW &strUrl)
 {
     m_strUrl = strUrl;
-    m_pIE->put_Silent(VARIANT_TRUE); //
+    m_pIE->put_Silent(VARIANT_TRUE); 
     return S_OK == m_pIE->Navigate(BSTR(strUrl.c_str()), NULL, NULL, NULL, NULL);
 }
 

@@ -15,8 +15,6 @@
 #include "SIPAddressCtrl.h"
 #include "STurn3DView.h"
 #include "SRadioBox2.h"
-#include "SMcListViewEx/SHeaderCtrlEx.h"
-#include "SMcListViewEx/SMCListViewEx.h"
 #include "SGroupList.h"
 #include "SChromeTabCtrl.h"
 #include "SScrollText.h"
@@ -55,8 +53,6 @@ void SCtrlsRegister::RegisterCtrls(SApplication *theApp)
 {
 	theApp->RegisterWindowClass<STabPage2>();//STabPage2
 	theApp->RegisterWindowClass<STabCtrl2>();//STabCtrl2
-	theApp->RegisterWindowClass<SHeaderCtrlEx>();//STabCtrl2
-	theApp->RegisterWindowClass<SMCListViewEx>();
 	theApp->RegisterWindowClass<SChromeTabCtrl>();//ChromeTabCtrl
 	theApp->RegisterWindowClass<SImageMaskWnd>();//SImageMaskWnd
 	theApp->RegisterWindowClass<SButtonEx>();

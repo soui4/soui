@@ -9,7 +9,11 @@
 <window size="-2,-2" layout="vbox" interval="10">
 	<text text="treeview" font="size:16,bold:1" colorText="@color/clr_title"/>
 	<text text="支持节点模板的树形列表，以房间列表为演示场景" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
-	<treeview name="room_tv" size="-2,0" weight="1" margin="1,1" colorBorder="@color/clr_divider" hasLines="true" indent="20" colorBkgnd="@color/clr_card_bg">
+	<window layout="hbox" interval="16">
+		<check name="chk_multi_tv" text="启用多选(关闭后清除多选)" checked="1" font="size:12"/>
+		<check name="chk_band_tv" text="启用框选(关闭后多选拖动为 fling 滚动)" checked="1" font="size:12"/>
+	</window>
+	<treeview name="room_tv" multiSel="1" size="-2,0" weight="1" margin="1,1" colorBorder="@color/clr_divider" hasLines="true" indent="20" colorBkgnd="@color/clr_card_bg">
 		<template data="xml:roomlist" height="30" layout="hbox" trackMouseEvent="1" gravity="center" interval="5"  font="size:16">
 			<img name="img_state" skin="skin_tree_icon" iconIndex="0"/>
 			<text name="txt_label" colorText="@color/clr_text"/>

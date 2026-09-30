@@ -218,7 +218,12 @@ class SOUI_EXP STreeCtrl
 
     /**
      * @brief Gets the selected item.
-     * @return Handle to the selected item.
+     *
+     * Single-selection mode: returns the selected item. Multi-selection
+     * mode: returns the keyboard cursor (focus item) - the selection lives
+     * entirely in the map; use GetSelItems / GetSelItemCount instead.
+     *
+     * @return Handle to the selected item (or the cursor in multi mode).
      */
     STDMETHOD_(HSTREEITEM, GetSelectedItem)(THIS) SCONST OVERRIDE;
 
@@ -244,7 +249,7 @@ class SOUI_EXP STreeCtrl
      * @param bEnsureVisible TRUE to ensure the item is visible.
      * @return TRUE if successful, otherwise FALSE.
      */
-    STDMETHOD_(BOOL, SelectItem)(THIS_ HSTREEITEM hItem, BOOL bEnsureVisible = TRUE) OVERRIDE;
+    STDMETHOD_(BOOL, SelectItem)(THIS_ HSTREEITEM hItem, BOOL bNotify DEF_VAL(TRUE)) OVERRIDE;
 
     /**
      * @brief Gets the text of an item.
@@ -662,7 +667,95 @@ class SOUI_EXP STreeCtrl
      */
     void ItemMouseLeave(HSTREEITEM hItem);
 
+  public:
+    /**
+     * @brief Enables or disables multiple selection (rubber band marquee).
+     * @param enable TRUE to enable multiple selection, FALSE otherwise.
+     */
+    void EnableMultiSelection(BOOL enable);
+
+    /**
+     * @brief Checks whether multiple selection is enabled.
+     * @return TRUE if multiple selection is enabled, FALSE otherwise.
+     */
+    BOOL GetMultiSel() const
+    {
+        return m_bMultiSel;
+    }
+
+    /**
+     * @brief Enables or disables full-row selection highlight.
+     *
+     * When disabled only the item text is highlighted and clicks beyond the
+     * text no longer select the item.
+     * @param bEnable TRUE to highlight the entire item row, FALSE otherwise.
+     */
+    VOID EnableFullRowSel(BOOL bEnable)
+    {
+        if (m_bFullRowSel != bEnable)
+        {
+            m_bFullRowSel = bEnable;
+            InvalidateRect(NULL);
+        }
+    }
+
+    /**
+     * @brief Checks whether full-row selection highlight is enabled.
+     * @return TRUE if the entire item row is highlighted when selected.
+     */
+    BOOL IsFullRowSelEnabled() const
+    {
+        return m_bFullRowSel;
+    }
+
+    /**
+     * @brief Checks whether an item is in the rubber band selection set.
+     * @param hItem Handle to the item.
+     * @return TRUE if the item is selected, FALSE otherwise.
+     */
+    BOOL IsItemSelected(HSTREEITEM hItem) const;
+
+    /**
+     * @brief Gets the count of selected items.
+     *
+     * Mode-aware: multi-selection mode reports the size of the selection
+     * map (the only selection record); single-selection mode reports 1
+     * while the anchor is set.
+     *
+     * @return Number of selected items.
+     */
+    int GetSelItemCount() const;
+
+    /**
+     * @brief Gets all selected items.
+     *
+     * Mode-aware: multi-selection mode enumerates the selection map;
+     * single-selection mode reports the anchor.
+     *
+     * @param items Output array of item handles.
+     * @param nMaxCount Maximum number of handles to retrieve.
+     * @return Number of handles retrieved.
+     */
+    int GetSelItems(HSTREEITEM *items, int nMaxCount) const;
+
   protected:
+    /**
+     * @brief Adds an item to the rubber band selection set.
+     * @param hItem Handle to the item.
+     */
+    void AddSelItem(HSTREEITEM hItem);
+
+    /**
+     * @brief Removes an item from the rubber band selection set.
+     * @param hItem Handle to the item.
+     */
+    void RemoveSelItem(HSTREEITEM hItem);
+
+    /**
+     * @brief Clears the rubber band selection set.
+     */
+    void ClearSelItems();
+
     /**
      * @brief Frees the memory associated with an item.
      * @param pItemData Pointer to the item data.
@@ -678,8 +771,50 @@ class SOUI_EXP STreeCtrl
   protected:
     /**
      * @brief Handle to the selected item.
+     *
+     * Single-selection mode: the selection anchor (the only selection
+     * record). Multi-selection mode: the keyboard cursor - never a
+     * selection record (the map is the only record there).
      */
     HSTREEITEM m_hSelItem;
+
+    /**
+     * @brief Multi-selection range anchor (Explorer-style Shift ranges).
+     *
+     * Fixed base for Shift+arrow / Shift+page ranges: the cursor moves, the
+     * anchor stays, and the set becomes the visible-order span between
+     * them (so Shift+Up shrinks what Shift+Down grew). Follows the cursor
+     * on every non-Shift change.
+     */
+    HSTREEITEM m_hSelAnchor;
+
+    /**
+     * @brief TRUE when multiple selection (rubber band) is enabled.
+     */
+    BOOL m_bMultiSel;
+
+    /**
+     * @brief TRUE (default) to highlight the entire item row when selected;
+     * FALSE to highlight only the item text and make clicks beyond the text
+     * not select the item.
+     */
+    BOOL m_bFullRowSel;
+
+    /**
+     * @brief Map of rubber band selected items (handle -> TRUE).
+     */
+    typedef SMap<HSTREEITEM, BOOL> ItemSelectionMap;
+    ItemSelectionMap m_mapSelItems;
+
+    SArray<HSTREEITEM> m_arrBandSnapshot; /**< Selection snapshot taken when the rubber band starts */
+
+    /**
+     * @brief Keyboard cursor position before a rubber band started.
+     *
+     * The cursor (m_hSelItem) follows the last item hit by the band; this
+     * snapshot restores it when the band is cancelled.
+     */
+    HSTREEITEM m_hBandOldSel;
 
     /**
      * @brief Handle to the item under the hover state.
@@ -767,14 +902,9 @@ class SOUI_EXP STreeCtrl
     IListener *m_pListener;
 
     /**
-     * @brief Skin for the background of items.
-     */
-    SAutoRefPtr<ISkinObj> m_pItemBgSkin;
-
-    /**
      * @brief Skin for the selected background of items.
      */
-    SAutoRefPtr<ISkinObj> m_pItemSelSkin;
+    SAutoRefPtr<ISkinObj> m_pItemSkin;
 
     /**
      * @brief Skin for the icons.
@@ -807,16 +937,6 @@ class SOUI_EXP STreeCtrl
     COLORREF m_crItemSelBg;
 
     /**
-     * @brief Text color of items.
-     */
-    COLORREF m_crItemText;
-
-    /**
-     * @brief Text color of selected items.
-     */
-    COLORREF m_crItemSelText;
-
-    /**
      * @brief Flag indicating if lines are drawn between items.
      */
     BOOL m_bHasLines; /**< has lines*/
@@ -826,17 +946,16 @@ class SOUI_EXP STreeCtrl
         ATTR_LAYOUTSIZE(L"itemHeight", m_nItemHei, TRUE)
         ATTR_LAYOUTSIZE(L"itemMargin", m_nItemMargin, TRUE)
         ATTR_BOOL(L"checkBox", m_bCheckBox, TRUE)
+        ATTR_BOOL(L"multiSel", m_bMultiSel, FALSE)
+        ATTR_BOOL(L"fullRowSel", m_bFullRowSel, TRUE)
         ATTR_BOOL(L"rightClickSel", m_bRightClickSel, TRUE)
-        ATTR_SKIN(L"itemBkgndSkin", m_pItemBgSkin, TRUE)
-        ATTR_SKIN(L"itemSelSkin", m_pItemSelSkin, TRUE)
+        ATTR_SKIN(L"itemSkin", m_pItemSkin, TRUE)
         ATTR_SKIN(L"lineSkin", m_pLineSkin, TRUE)
         ATTR_SKIN(L"toggleSkin", m_pToggleSkin, TRUE)
         ATTR_SKIN(L"iconSkin", m_pIconSkin, TRUE)
         ATTR_SKIN(L"checkSkin", m_pCheckSkin, TRUE)
         ATTR_COLOR(L"colorItemBkgnd", m_crItemBg, FALSE)
         ATTR_COLOR(L"colorItemSelBkgnd", m_crItemSelBg, FALSE)
-        ATTR_COLOR(L"colorItemText", m_crItemText, FALSE)
-        ATTR_COLOR(L"colorItemSelText", m_crItemSelText, FALSE)
         ATTR_BOOL(L"hasLines", m_bHasLines, TRUE)
     SOUI_ATTRS_END()
 
@@ -888,7 +1007,81 @@ class SOUI_EXP STreeCtrl
     virtual BOOL OnDragCancelCapture(int reason) override;
     virtual void OnDragClearItemCapture() override;
 
+    /**
+     * @brief Checks whether rubber band selection is enabled (multi-select mode on).
+     */
+    virtual BOOL IsRubberBandSelEnabled() const override;
+
+    /**
+     * @brief Records the selection anchor when the band starts.
+     */
+    virtual void OnRubberBandStart() override;
+
+    /**
+     * @brief Updates the selection so it matches the rows covered by the band.
+     * @param rcBand Band rectangle in client coordinates.
+     * @param bAdd TRUE to add to the existing selection (Ctrl held).
+     */
+    virtual void OnRubberBandSelect(const CRect &rcBand, BOOL bAdd) override;
+
+    /**
+     * @brief Fires the selection changed event when the band finishes.
+     */
+    virtual void OnRubberBandEnd(const CRect &rcBand, BOOL bCancelled) override;
+
+    /**
+     * @brief Gets the next visible item in depth-first order.
+     * @param hItem Handle to the item.
+     * @return Handle to the next visible item, or 0 at the end.
+     */
+    HSTREEITEM GetNextVisibleItem(HSTREEITEM hItem) const;
+
+    /**
+     * @brief Gets the previous visible item in depth-first order.
+     * @param hItem Handle to the item.
+     * @return Handle to the previous visible item, or 0 at the start.
+     */
+    HSTREEITEM GetPrevVisibleItem(HSTREEITEM hItem) const;
+
+    /**
+     * @brief Gets the visible item at a zero-based visible row index.
+     * @param iRow Visible row index (matches the paint layout).
+     * @return Handle to the item, or 0 if the row is out of range.
+     */
+    HSTREEITEM GetVisibleItemByRow(int iRow) const;
+
+    /**
+     * @brief Gets the last visible item in depth-first order.
+     * @return Handle to the last visible item, or 0 if the tree is empty.
+     */
+    HSTREEITEM GetLastVisibleItem() const;
+
+    /**
+     * @brief Selects the visible-order span between two items
+     *        (Explorer-style anchored shift-selection): the set becomes
+     *        exactly the span [anchor..cursor], items outside are
+     *        deselected and items inside are selected, each flip firing
+     *        its per-item event. Multi-selection mode only.
+     * @param hAnchor Selection anchor (fixed base of the span).
+     * @param hCursor Keyboard cursor (moving end).
+     */
+    void SetSelRange(HSTREEITEM hAnchor, HSTREEITEM hCursor);
+
   protected:
+    /**
+     * @brief Handles key down for keyboard navigation.
+     * @param nChar Virtual key code.
+     * @param nRepCnt Repeat count.
+     * @param nFlags Key flags.
+     */
+    void OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags);
+
+    /**
+     * @brief Tells the dialog manager which keys the control wants.
+     * @return Dialog code (arrow keys + system keys).
+     */
+    virtual UINT WINAPI OnGetDlgCode() const OVERRIDE;
+
     /**
      * @brief Handles left mouse button down when not drag scrolling.
      * @param nFlags Flags associated with the mouse event.
@@ -918,6 +1111,7 @@ class SOUI_EXP STreeCtrl
         MSG_WM_RBUTTONUP(OnRButtonUp);
         MSG_WM_MOUSELEAVE(OnMouseLeave)
         MSG_WM_SIZE(OnSize)
+        MSG_WM_KEYDOWN(OnKeyDown)
     SOUI_MSG_MAP_END()
 };
 

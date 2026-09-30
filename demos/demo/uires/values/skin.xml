@@ -15,9 +15,10 @@
 	<imglist name="skin_small_icons" src="imgx:png_small_icons" states="12" />
 	<imglist name="skin_tree_icon" src="imgx:png_treeicon" states="3" />
 	<imglist name="skin_menuicon" src="imgx:png_small_icons" states="12" />
-	<imglist name="skin_webbtn_back" src="imgx:webbtn_back" states="4" />
-	<imglist name="skin_webbtn_forward" src="imgx:webbtn_forward" states="4" />
-	<imglist name="skin_webbtn_refresh" src="imgx:webbtn_refresh" states="4" />
+	<imglist name="skin_webbtn_back" src="svg:webbtn_back" states="3" />
+	<imglist name="skin_webbtn_forward" src="svg:webbtn_forward" states="3" />
+	<imglist name="skin_webbtn_refresh" src="svg:webbtn_refresh" states="3" />
+	<imglist name="skin_webbtn_go" src="svg:webbtn_go" states="3" />
 	<imglist name="skin_message" src="imgx:message" states="3"  />
 	<imglist name="skin_contacts" src="imgx:contacts" states="3"  />
 	<imglist name="skin_group" src="imgx:group" states="3"  />
@@ -125,6 +126,8 @@
   <imglist name="svg_btn_back" src="svg:btn_back" states="3"/>
   <imglist name="svg_nav_bg" src="svg:nav_bg"/>
   <colorrect name="skin_nav_back_bk" normal="#00FFFFFF" hover="#BFDBFE" pushdown="#93C5FD" cornerRadius="6"/>
+  <!-- 浏览器工具栏背景:沿用 demo 浅色圆角卡片风格(frosted white + 浅灰描边) -->
+  <colorrect name="skin_webkit_nav_bk" normal="#E6FFFFFF" hover="#E6FFFFFF" pushdown="#E6FFFFFF" normalBorder="#E2E8F0" hoverBorder="#E2E8F0" borderWidth="1" cornerRadius="10"/>
   <imglist name="skin_svg_radio_num" src="svg:radio_num" states="3"/>
   <imglist name="svg_tab_page" src="svg:tab_page" states="6"/>
   <imglist name="svg_tab_layout" src="svg:tab_layout" states="6"/>

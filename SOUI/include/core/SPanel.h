@@ -149,6 +149,22 @@ class SOUI_EXP SPanel
         m_bDragPending = bPending;
     }
 
+    /**
+     * @brief Draws the rubber band selection rectangle (if active) on top of the client content.
+     * @param pRT Render target of the view's OnPaint.
+     * @details Derived view controls should call this at the end of their OnPaint implementation.
+     */
+    void DrawRubberBandSel(IRenderTarget *pRT);
+
+    /**
+     * @brief Checks if a rubber band (marquee) selection is currently in progress.
+     * @return TRUE when the band is being dragged.
+     */
+    BOOL IsRubberBandSelActive() const
+    {
+        return m_bRubberBandActive;
+    }
+
   public:
     /**
      * @brief Gets the client rectangle.
@@ -278,6 +294,67 @@ class SOUI_EXP SPanel
     virtual void OnDragClearItemCapture();
     virtual BOOL CancelCaptureMode(int reason) override;
 
+    /** === Rubber band (marquee) multi-selection support ===
+     * When a derived control supports multi-selection, dragging in the client area
+     * starts a rubber band selection. The rubber band takes priority over drag
+     * scroll / fling (see HandleMouseDrag and CancelCaptureMode).
+     */
+    /**
+     * @brief Checks whether rubber band selection is enabled for this control.
+     * @return Derived multi-select capable controls return TRUE when multi-select is on.
+     */
+    virtual BOOL IsRubberBandSelEnabled() const;
+
+    /**
+     * @brief Called once when the rubber band actually starts (drag threshold passed).
+     */
+    virtual void OnRubberBandStart();
+
+    /**
+     * @brief Called on every mouse move while the rubber band is active.
+     * @param rcBand Current band rectangle in client coordinates.
+     * @param bAdd TRUE when Ctrl is held: items should be added to the current selection.
+     */
+    virtual void OnRubberBandSelect(const CRect &rcBand, BOOL bAdd);
+
+    /**
+     * @brief Called when the rubber band finishes (mouse up) or is cancelled.
+     * @param rcBand Final band rectangle in client coordinates.
+     * @param bCancelled TRUE when the band was cancelled instead of finished by mouse up.
+     */
+    virtual void OnRubberBandEnd(const CRect &rcBand, BOOL bCancelled);
+
+  public:
+    /**
+     * @brief Enables or disables the rubber band gesture at runtime.
+     *
+     * The rubber band gesture is gated by both this flag (XML attr
+     * bandEnable, default TRUE) and the control's multi-select state:
+     * only when both are on does dragging start a band. With the band
+     * disabled a multi-select control falls back to drag scroll / fling.
+     */
+    void EnableBandSel(BOOL bEnable)
+    {
+        m_bBandEnable = bEnable;
+    }
+
+    /**
+     * @brief Checks whether the rubber band gesture is allowed (bandEnable attr).
+     * @return TRUE unless bandEnable="0" was set or EnableBandSel(FALSE) was called.
+     */
+    BOOL IsBandSelEnabled() const
+    {
+        return m_bBandEnable;
+    }
+
+  private:
+    BOOL StartRubberBandSel(const CPoint &pt, BOOL bAdd);
+    void UpdateRubberBandSel(const CPoint &pt, BOOL bAdd);
+    void UpdateBandAutoScrollTimer();
+    void OnBandAutoScroll();
+    void EndRubberBandSel(BOOL bCancelled);
+
+  protected:
     /**
      * @brief Handles colorization events.
      * @param cr Color reference.
@@ -396,6 +473,24 @@ class SOUI_EXP SPanel
     float m_fFlingHStartPos;
     float m_fFlingHTargetPos;
 
+    /** Rubber band (marquee) multi-selection state */
+    BOOL m_bRubberBandActive;          /**< TRUE while the rubber band is being dragged */
+    BOOL m_bBandEnable;                /**< XML attr bandEnable: whether the rubber band gesture is allowed at all */
+    CPoint m_ptBandStart;              /**< Anchor point (client coords) where the band started */
+    CPoint m_ptBandAnchorContent;      /**< Anchor point in content coords (client + scroll pos), fixed at band start */
+    CRect m_rcBand;                    /**< Current band rectangle in client coordinates */
+    SAutoRefPtr<ISkinObj> m_pSkinBand; /**< Band skin (defaults to the builtin _skin.sys.selband); the only band rendering path */
+    CPoint m_ptBandLast;               /**< Last raw mouse position during banding (unclamped, for auto scroll) */
+    BOOL m_bBandAdd;                   /**< Ctrl (additive) state of the current band session */
+    int m_nBandScrollV;                /**< Auto-scroll speed on the vertical axis in lines per tick (0 = off) */
+    int m_nBandScrollH;                /**< Auto-scroll speed on the horizontal axis in lines per tick (0 = off) */
+    BOOL m_bBandTimerOn;               /**< TRUE while the band auto-scroll timer is running */
+
+    enum
+    {
+        Timer_BandAutoScroll = 103 /**< 100~102 are reserved by the scrollbar handlers */
+    };
+
     SOUI_ATTRS_BEGIN()
         ATTR_CUSTOM(L"sbSkin", OnAttrScrollbarSkin)
         ATTR_LAYOUTSIZE(L"sbArrowSize", m_nSbArrowSize, FALSE)
@@ -414,6 +509,8 @@ class SOUI_EXP SPanel
         ATTR_INTERPOLATOR(L"sbFadeInterpolator", m_fadeInterpolator, FALSE)
         ATTR_CHAIN_PTR(m_fadeInterpolator, 0)
         ATTR_BOOL(L"enableDragScroll", m_bItemDragScrollEnabled, FALSE)
+        ATTR_SKIN(L"bandSkin", m_pSkinBand, FALSE)
+        ATTR_BOOL(L"bandEnable", m_bBandEnable, FALSE)
     SOUI_ATTRS_END()
 
   protected:
@@ -530,6 +627,7 @@ class SOUI_EXP SPanel
     void OnLButtonDown(UINT nFlags, CPoint pt);
     void OnMouseMove(UINT nFlags, CPoint pt);
     void OnLButtonUp(UINT nFlags, CPoint pt);
+    void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 
     /**
      * @brief Called when left mouse button is pressed and drag scroll is not active.
@@ -579,6 +677,7 @@ class SOUI_EXP SPanel
         MSG_WM_LBUTTONDOWN(OnLButtonDown)
         MSG_WM_MOUSEMOVE(OnMouseMove)
         MSG_WM_LBUTTONUP(OnLButtonUp)
+        MSG_WM_KEYDOWN(OnKeyDown)
     SOUI_MSG_MAP_END()
 };
 

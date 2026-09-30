@@ -39,12 +39,14 @@ void STileViewDataSetObserver::OnItemChanged(int iItem)
 STileView::STileView()
     : SViewBase(this)
     , m_nMarginSize(0.0f, px)
+    , m_iBandOldSel(-1)
 {
     m_bFocusable = TRUE;
     m_observer.Attach(new STileViewDataSetObserver(this));
     m_dwUpdateInterval = 40;
     m_evtSet.addEvent(EVENTID(EventLVSelChanging));
     m_evtSet.addEvent(EVENTID(EventLVSelChanged));
+    m_evtSet.addEvent(EVENTID(EventItemSelChanged));
 }
 
 STileView::~STileView()
@@ -99,6 +101,7 @@ BOOL STileView::SetAdapter(ILvAdapter *adapter)
         m_pHoverItem = NULL;
         m_itemCapture = NULL;
         m_iSelItem = -1;
+        m_iSelAnchor = -1;
         m_iFirstVisible = -1;
     }
 
@@ -169,8 +172,7 @@ void STileView::onDataSetChanged()
     {
         m_tvItemLocator->OnDataSetChanged();
     }
-    if (m_iSelItem != -1 && m_iSelItem >= m_adapter->getCount())
-        m_iSelItem = -1;
+    PruneSelItems(m_adapter->getCount());
 
     UpdateScrollBar();
     UpdateVisibleItems();
@@ -258,6 +260,7 @@ void STileView::OnPaint(IRenderTarget *pRT)
 
         pRT->PopClip();
     }
+    DrawRubberBandSel(pRT);
     AfterPaint(pRT, duiDC);
 }
 
@@ -569,6 +572,11 @@ LRESULT STileView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
         {
             m_pHoverItem->DoFrameEvent(uMsg, wParam, MAKELPARAM(pt.x, pt.y));
         }
+        else if (uMsg == WM_LBUTTONDOWN && (wParam & (MK_CONTROL | MK_SHIFT)) == 0)
+        {
+            // Plain click on blank area clears the selection.
+            SetSel(-1, TRUE);
+        }
     }
 
     if (uMsg == WM_LBUTTONUP || uMsg == WM_RBUTTONUP || uMsg == WM_MBUTTONUP)
@@ -746,18 +754,16 @@ void STileView::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
             {
                 // Ctrl + arrow: move focus without changing selection
                 m_iSelItem = nNewSelItem;
+                m_iSelAnchor = nNewSelItem;
                 // Update visible items to reflect the new focus
                 UpdateVisibleItems();
             }
             else if (bShiftPressed)
             {
-                // Shift + arrow: extend selection from current to new item
-                int iStart = smin(m_iSelItem, nNewSelItem);
-                int iEnd = smax(m_iSelItem, nNewSelItem);
-                for (int i = iStart; i <= iEnd; i++)
-                {
-                    AddSelItem(i);
-                }
+                // Shift + arrow: move the anchored range to the new cursor
+                // (the anchor stays fixed, so the range can shrink as well
+                // as grow - Explorer semantics).
+                SetSelRange(m_iSelAnchor, nNewSelItem);
                 m_iSelItem = nNewSelItem;
             }
             else
@@ -898,7 +904,29 @@ void STileView::SetSel(int iItem, BOOL bNotify)
     int nOldSel = m_iSelItem;
     int nNewSel = iItem;
 
-    m_iSelItem = nNewSel;
+    if (m_bMultiSel)
+    {
+        // Multi-selection mode: replace the set through the base handler
+        // (map-only record; per-item events report the flips - the anchor-
+        // style LV SelChanging/SelChanged are a single-selection protocol
+        // and are not fired here). accNotifyEvent afterwards keeps the
+        // click and keyboard paths identical.
+        SViewBase::SelectItem(nNewSel, FALSE);
+        if (m_pView)
+            m_pView->accNotifyEvent(EVENT_OBJECT_SELECTION);
+        return;
+    }
+
+    // Single selection mode: the anchor m_iSelItem is the selection record;
+    // HandleSelectionChange below updates the record and the visuals.
+    if (IsItemSelected(nNewSel))
+        return;
+
+    // Clearing an already-empty selection changes nothing: no visuals and
+    // no SelChanging/SelChanged pair.
+    if (nNewSel == -1 && nOldSel == -1)
+        return;
+
     if (bNotify)
     {
         EventLVSelChanging evt(this);
@@ -908,13 +936,13 @@ void STileView::SetSel(int iItem, BOOL bNotify)
         FireEvent(evt);
         if (evt.bCancel)
         {
-            // Cancel SetSel and restore selection state
-            m_iSelItem = nOldSel;
             return;
         }
     }
 
-    // Use the base class method to handle the selection change
+    // Use the base class method to handle the selection change. No per-item
+    // event here - the anchor-style LVSelChanging/LVSelChanged pair is the
+    // single-selection feedback.
     HandleSelectionChange(nOldSel, nNewSel);
 
     if (bNotify)
@@ -1140,4 +1168,73 @@ void STileView::OnDragClearItemCapture()
 {
     m_itemCapture = NULL;
 }
+
+BOOL STileView::IsRubberBandSelEnabled() const
+{
+    return GetMultiSel() && IsBandSelEnabled() && m_adapter != NULL && m_tvItemLocator != NULL;
+}
+
+void STileView::OnRubberBandStart()
+{
+    m_iBandOldSel = m_iSelItem;
+    SnapshotSelItems();
+}
+
+void STileView::OnRubberBandSelect(const CRect &rcBand, BOOL bAdd)
+{
+    if (!m_adapter || !m_tvItemLocator)
+        return;
+    int nCount = m_adapter->getCount();
+    if (nCount == 0)
+        return;
+
+    // Per-item realtime feedback flows from SViewBase::AddSelItem /
+    // RemoveSelItem (EventItemSelChanged). The anchor-style SelChanged is a
+    // single-selection event and is not fired anywhere in the band path.
+    // Tiles are laid out in a grid: select every tile intersecting the band.
+    // CalcItemDrawRect returns client coordinates already.
+    if (!bAdd)
+        ClearSelItems();
+    int iLast = -1;
+    for (int i = 0; i < nCount; i++)
+    {
+        CRect rcItem = CalcItemDrawRect(i);
+        if (rcItem.top > rcBand.bottom)
+            break; // items below the band, positions keep increasing
+        CRect rcInter;
+        if (rcInter.IntersectRect(rcItem, rcBand))
+        {
+            AddSelItem(i);
+            iLast = i;
+        }
+        else if (!bAdd && IsItemSelected(i))
+        {
+            RemoveSelItem(i);
+        }
+    }
+    if (iLast != -1)
+        m_iSelItem = iLast;
+}
+
+void STileView::OnRubberBandEnd(const CRect &rcBand, BOOL bCancelled)
+{
+    if (bCancelled)
+    {
+        // ESC / external cancel: restore the selection taken at band start.
+        // Each restored item fires its per-item event (EventItemSelChanged)
+        // via AddSelItem / RemoveSelItem; the anchor-style SelChanged is a
+        // single-selection event and is not fired for multi-selection bands.
+        RestoreSelItems();
+        m_iSelItem = m_iBandOldSel;
+        m_iSelAnchor = m_iSelItem;
+        Invalidate();
+    }
+    else
+    {
+        // Normal end: the cursor stayed on the last banded item; the range
+        // anchor follows it so the next Shift+arrow works from there.
+        m_iSelAnchor = m_iSelItem;
+    }
+}
+
 SNSEND

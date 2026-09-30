@@ -2856,10 +2856,10 @@ DECLARE_INTERFACE_(ITreeCtrl, IPanel)
     /**
      * @brief Select the specified item
      * @param hItem --specified item
-     * @param bEnsureVisible --flag to automatically scroll into view
+     * @param bNotify --flag to notify selection change
      * @return
      */
-    STDMETHOD_(BOOL, SelectItem)(THIS_ HSTREEITEM hItem, BOOL bEnsureVisible DEF_VAL(TRUE)) PURE;
+    STDMETHOD_(BOOL, SelectItem)(THIS_ HSTREEITEM hItem, BOOL bNotify DEF_VAL(TRUE)) PURE;
 
     /**
      * @brief Get the text data of the specified item

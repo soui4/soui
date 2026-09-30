@@ -239,6 +239,19 @@ class SOUI_EXP SUiDef
     ISkinPool *GetBuiltinSkinPool();
 
     /**
+     * @brief Exposes the UI-definition lock so skin pool APIs can share it.
+     * @details The lock is a recursive critical section: SUiDef's skin/style/
+     *          font paths and every SSkinPool public API serialize on this ONE
+     *          lock, which removes any SUiDef-vs-pool lock-ordering concern.
+     *          Same-thread reentry (e.g. LoadSkins -> PushSkinPool, pool ->
+     *          GetSkin from within SUiDef::GetSkin) is legal and cheap.
+     */
+    SCriticalSection &GetSkinLock() const
+    {
+        return m_cs;
+    }
+
+    /**
      * @brief Retrieves a style XML node by name.
      * @param strName Name of the style.
      * @return XML node containing the style, or an invalid node if not found.

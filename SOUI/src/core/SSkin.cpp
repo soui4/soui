@@ -228,18 +228,23 @@ SSkinImgList::~SSkinImgList()
 SIZE SSkinImgList::GetImageSize(BOOL bRaw) const
 {
     SIZE ret = { 0, 0 };
-    if (GetSvg())
+    SAutoRefPtr<ISvgObj> pSvg = GetSvg();
+    if (pSvg)
     {
-        ret = GetSvg()->Size();
+        ret = pSvg->Size();
         if (!bRaw)
         {
             ret.cx = MulDiv(ret.cx, GetScale(), 100);
             ret.cy = MulDiv(ret.cy, GetScale(), 100);
         }
     }
-    else if (GetImage())
+    else
     {
-        ret = GetImage()->Size();
+        SAutoRefPtr<IBitmapS> pImg = GetImage();
+        if (pImg)
+        {
+            ret = pImg->Size();
+        }
     }
     return ret;
 }
@@ -266,6 +271,7 @@ int SSkinImgList::GetStates() const
 
 void SSkinImgList::LoadSrcImage() const
 {
+    // Must be called with m_cs held (all call sites do; recursive lock).
     if (m_strSrc.IsEmpty())
         return;
     SStringTList list;
@@ -298,16 +304,36 @@ void SSkinImgList::OnInitFinished(IXmlNode *xmlNode)
     }
 }
 
-IBitmapS *SSkinImgList::GetSvgCacheBitmap(IRenderTarget *pRT, int cxPerState, int cyPerState) const
+void SSkinImgList::GetDrawable(SAutoRefPtr<IBitmapS> &pImg, SAutoRefPtr<ISvgObj> &pSvg) const
 {
-    ISvgObj *pSvg = GetSvg();
+    // The ONE lock acquisition of the drawing path: lazy load if needed, then
+    // hand out both pointers as owning references. The references keep the
+    // objects alive for the whole draw even if another thread re-loads the
+    // source or resets the SVG cache concurrently.
+    SAutoLock lock(m_cs);
+    if (!m_pImg && !m_pSvg && m_bLazyLoad && !m_strSrc.IsEmpty())
+    {
+        LoadSrcImage();
+    }
+    pImg = m_pImg;
+    pSvg = m_pSvg;
+}
+
+SAutoRefPtr<IBitmapS> SSkinImgList::GetSvgCacheBitmap(IRenderTarget *pRT, int cxPerState, int cyPerState) const
+{
+    // The cache may be built by one thread while other threads draw the same
+    // skin; serialize cache access with the skin's own lock.
+    SAutoLock lock(m_cs);
+    SAutoRefPtr<ISvgObj> pSvg = GetSvg();
     SASSERT(pSvg);
     if (cxPerState <= 0 || cyPerState <= 0)
         return NULL;
 
     // Cache hit: same per-state dimensions (skin's states/layout are immutable)
     if (m_pCacheBmp && m_szPerStateCache.cx == cxPerState && m_szPerStateCache.cy == cyPerState)
+    {
         return m_pCacheBmp;
+    }
 
     IRenderFactory *pRenderFactory = GETRENDERFACTORY;
     if (!pRenderFactory)
@@ -349,10 +375,14 @@ IBitmapS *SSkinImgList::GetSvgCacheBitmap(IRenderTarget *pRT, int cxPerState, in
 
 void SSkinImgList::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const
 {
-    if (!GetImage() && !GetSvg())
+    // One lock acquisition, owning references: safe against concurrent
+    // lazy-load / source reload / cache reset for the whole draw.
+    SAutoRefPtr<IBitmapS> pImg;
+    SAutoRefPtr<ISvgObj> pSvg;
+    GetDrawable(pImg, pSvg);
+    if (!pImg && !pSvg)
         return;
 
-    IBitmapS *pImg = GetImage();
     SIZE szSrc; // size of one state in the source image's coordinate space
     bool bFromCache = false;
 
@@ -361,7 +391,7 @@ void SSkinImgList::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, 
         // Regular bitmap: all states in one image
         szSrc = _GetSkinSize(FALSE);
     }
-    else if (GetSvg())
+    else if (pSvg)
     {
         if (m_bCacheSvg)
         {
@@ -428,7 +458,7 @@ void SSkinImgList::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, 
             pRT->DrawBitmapEx(rcDraw, pImg, &rcSrc, GetExpandMode(), byAlpha);
         }
     }
-    else if (GetSvg())
+    else if (pSvg)
     {
         // Direct SVG drawing (cache disabled or failed)
         SIZE sz = _GetSkinSize(TRUE); // raw SVG coordinates
@@ -446,13 +476,13 @@ void SSkinImgList::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, 
                 for (int x = rcDraw->left; x < rcDraw->right; x += wid)
                 {
                     RECT rcTile = { x, y, x + wid, y + hei };
-                    pRT->DrawSVG(GetSvg(), &rcTile, &rcSrc, byAlpha);
+                    pRT->DrawSVG(pSvg, &rcTile, &rcSrc, byAlpha);
                 }
             }
         }
         else
         {
-            pRT->DrawSVG(GetSvg(), rcDraw, &rcSrc, byAlpha);
+            pRT->DrawSVG(pSvg, rcDraw, &rcSrc, byAlpha);
         }
     }
 }
@@ -467,6 +497,7 @@ UINT SSkinImgList::GetExpandMode() const
 
 HRESULT SSkinImgList::OnAttrSrc(const SStringW &value, BOOL bLoading)
 {
+    SAutoLock lock(m_cs);
     m_strSrc = value;
     if (!bLoading)
     {
@@ -477,6 +508,7 @@ HRESULT SSkinImgList::OnAttrSrc(const SStringW &value, BOOL bLoading)
 
 bool SSkinImgList::SetImage(IBitmapS *pImg)
 {
+    SAutoLock lock(m_cs);
     m_pImg = pImg;
     m_bLazyLoad = FALSE;
     m_pSvg = NULL;
@@ -487,6 +519,7 @@ bool SSkinImgList::SetImage(IBitmapS *pImg)
 
 bool SSkinImgList::SetSvg(ISvgObj *pSvg)
 {
+    SAutoLock lock(m_cs);
     m_pSvg = pSvg;
     m_pImg = NULL;
     m_bLazyLoad = FALSE;
@@ -495,40 +528,35 @@ bool SSkinImgList::SetSvg(ISvgObj *pSvg)
     return true;
 }
 
-ISvgObj *SSkinImgList::GetSvg() const
+SAutoRefPtr<ISvgObj> SSkinImgList::GetSvg() const
 {
-    if (m_pSvg)
-        return m_pSvg;
-    if (m_pImg)
-        return NULL;
-    if (m_bLazyLoad && !m_strSrc.IsEmpty())
-    {
-        LoadSrcImage();
-    }
-    return m_pSvg;
+    SAutoRefPtr<IBitmapS> pImg;
+    SAutoRefPtr<ISvgObj> pSvg;
+    GetDrawable(pImg, pSvg);
+    return pSvg;
 }
-IBitmapS *SSkinImgList::GetImage() const
+
+SAutoRefPtr<IBitmapS> SSkinImgList::GetImage() const
 {
-    if (m_pImg)
-        return m_pImg;
-    if (m_pSvg)
-        return NULL;
-    if (m_bLazyLoad && !m_strSrc.IsEmpty())
-    {
-        LoadSrcImage();
-    }
-    return m_pImg;
+    SAutoRefPtr<IBitmapS> pImg;
+    SAutoRefPtr<ISvgObj> pSvg;
+    GetDrawable(pImg, pSvg);
+    return pImg;
 }
 
 void SSkinImgList::OnColorize(COLORREF cr)
 {
+    // In-place colorize under the lock: the bitmap/SVG object identity never
+    // changes, so concurrent draws keep valid pointers. They may observe
+    // half-colorized pixels, which is accepted (no-crash over no-tearing).
+    SAutoLock lock(m_cs);
     if (!m_bEnableColorize)
         return;
     if (cr == m_crColorize)
         return;
     m_crColorize = cr;
 
-    IBitmapS *pImg = GetImage();
+    IBitmapS *pImg = m_pImg; // read directly: already under the lock
     if (pImg)
     {
         if (m_imgBackup)
@@ -561,11 +589,36 @@ void SSkinImgList::OnColorize(COLORREF cr)
         else
             m_imgBackup = NULL; // free backup
     }
-    else if (GetSvg())
+    else if (m_pSvg)
     {
         m_pCacheBmp = NULL; // reset cache.
         m_szPerStateCache.cx = m_szPerStateCache.cy = 0;
-        NSVGimage *pImg = (NSVGimage *)GetSvg()->GetPtr();
+        if (!m_strSrc.IsEmpty())
+        {
+            // Copy-then-swap from the retained source: a fresh parse is an
+            // independent mutable object, so colorizing it never races with
+            // another thread drawing the previous m_pSvg reference. Mutating
+            // the shared m_pSvg in place is a data race against readers that
+            // hold the owning reference handed out by GetDrawable() (the ref
+            // keeps the object alive but does not stop pixel mutation). For
+            // cr==0 the fresh parse also correctly restores original colors.
+            SAutoRefPtr<ISvgObj> pNewSvg;
+            pNewSvg.Attach(CreateSvgFromResId(S_CW2T(m_strSrc)));
+            if (pNewSvg)
+            {
+                if (cr != 0)
+                {
+                    NSVGimage *pImg = (NSVGimage *)pNewSvg->GetPtr();
+                    ColorizeSVG(pImg, SDIBHelper::Colorize, cr);
+                }
+                m_pSvg = pNewSvg;
+                return;
+            }
+        }
+        // Programmatic SVG without a retained source (or the re-parse failed):
+        // fall back to in-place colorize under the lock (status quo). Rare and
+        // covered by m_cs.
+        NSVGimage *pImg = (NSVGimage *)m_pSvg->GetPtr();
         ColorizeSVG(pImg, SDIBHelper::Colorize, cr);
     }
 }
@@ -618,20 +671,23 @@ void SSkinImgList::_Scale(ISkinObj *skinObj, int nScale)
 /** SSkinImgCenter */
 void SSkinImgCenter::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const
 {
-    if (!GetImage() && !GetSvg())
+    SAutoRefPtr<IBitmapS> pImg;
+    SAutoRefPtr<ISvgObj> pSvg;
+    GetDrawable(pImg, pSvg);
+    if (!pImg && !pSvg)
         return;
-    SIZE szSkin = _GetSkinSize(GetSvg() != NULL);
+    SIZE szSkin = _GetSkinSize(pSvg != NULL);
     RECT rcSrc = { 0, 0, szSkin.cx, szSkin.cy };
     if (m_bVertical)
         OffsetRect(&rcSrc, 0, iState * szSkin.cy);
     else
         OffsetRect(&rcSrc, iState * szSkin.cx, 0);
 
-    if (GetImage())
+    if (pImg)
     {
         CRect rcTarget = *rcDraw;
         rcTarget.DeflateRect((rcTarget.Width() - szSkin.cx) / 2, (rcTarget.Height() - szSkin.cy) / 2);
-        pRT->DrawBitmapEx(rcTarget, GetImage(), &rcSrc, GetExpandMode(), byAlpha);
+        pRT->DrawBitmapEx(rcTarget, pImg, &rcSrc, GetExpandMode(), byAlpha);
     }
     else
     {
@@ -639,7 +695,7 @@ void SSkinImgCenter::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState
         szSkin.cx = MulDiv(szSkin.cx, GetScale(), 100);
         szSkin.cy = MulDiv(szSkin.cy, GetScale(), 100);
         rcTarget.DeflateRect((rcTarget.Width() - szSkin.cx) / 2, (rcTarget.Height() - szSkin.cy) / 2);
-        pRT->DrawSVG(GetSvg(), &rcTarget, &rcSrc, byAlpha);
+        pRT->DrawSVG(pSvg, &rcTarget, &rcSrc, byAlpha);
     }
 }
 
@@ -650,7 +706,9 @@ SSkinImgFrame::SSkinImgFrame()
 }
 void SSkinImgFrame::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const
 {
-    IBitmapS *pImg = GetImage();
+    SAutoRefPtr<IBitmapS> pImg;
+    SAutoRefPtr<ISvgObj> pSvg;
+    GetDrawable(pImg, pSvg);
     bool bFromCache = false;
     SIZE szPerState;
 
@@ -658,7 +716,7 @@ void SSkinImgFrame::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState,
     {
         szPerState = _GetSkinSize(FALSE);
     }
-    else if (GetSvg() && m_bCacheSvg)
+    else if (pSvg && m_bCacheSvg)
     {
         // Cache at scaled per-state size (natural corner size for 9-patch).
         // The cache bitmap contains ALL states arranged in the same layout as the SVG.
@@ -693,7 +751,7 @@ void SSkinImgFrame::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState,
             pRT->DrawBitmap9Patch(rcDraw, pImg, &rcSour, &m_rcMargin, GetExpandMode(), byAlpha);
         }
     }
-    else if (GetSvg())
+    else if (pSvg)
     {
         // Direct SVG 9-patch (cache disabled or failed)
         SIZE sz = _GetSkinSize(TRUE);
@@ -703,7 +761,7 @@ void SSkinImgFrame::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState,
         else
             pt.x = sz.cx * iState;
         CRect rcSour(pt, sz);
-        DrawSVG9Patch(pRT, GetSvg(), rcDraw, &rcSour, &m_rcMargin, byAlpha, GetScale());
+        DrawSVG9Patch(pRT, pSvg, rcDraw, &rcSour, &m_rcMargin, byAlpha, GetScale());
     }
 }
 
@@ -803,6 +861,7 @@ void SSkinButton::SetColors(COLORREF crUp[4], COLORREF crDown[4], COLORREF crBor
 
 void SSkinButton::OnColorize(COLORREF cr)
 {
+    SAutoLock lock(m_cs);
     if (!m_bEnableColorize)
         return;
     if (m_crColorize == cr)
@@ -996,7 +1055,10 @@ CRect SSkinScrollbar::GetPartRect(int nSbCode, int nState, BOOL bVertical) const
 
 void SSkinScrollbar::_DrawByState(IRenderTarget *pRT, LPCRECT prcDraw, DWORD dwState, BYTE byAlpha) const
 {
-    if (!GetImage() && !GetSvg())
+    SAutoRefPtr<IBitmapS> pImg;
+    SAutoRefPtr<ISvgObj> pSvg;
+    GetDrawable(pImg, pSvg);
+    if (!pImg && !pSvg)
         return;
     int nSbCode = LOWORD(dwState);
     int nState = LOBYTE(HIWORD(dwState));
@@ -1009,9 +1071,9 @@ void SSkinScrollbar::_DrawByState(IRenderTarget *pRT, LPCRECT prcDraw, DWORD dwS
 
     CRect rcSour = GetPartRect(nSbCode, nState, bVertical);
 
-    if (GetImage())
+    if (pImg)
     {
-        pRT->DrawBitmap9Patch(prcDraw, GetImage(), &rcSour, &rcMargin, m_bTile ? EM_TILE : EM_STRETCH, byAlpha);
+        pRT->DrawBitmap9Patch(prcDraw, pImg, &rcSour, &rcMargin, m_bTile ? EM_TILE : EM_STRETCH, byAlpha);
 
         if (nSbCode == SB_THUMBTRACK && m_bHasGripper)
         {
@@ -1022,13 +1084,13 @@ void SSkinScrollbar::_DrawByState(IRenderTarget *pRT, LPCRECT prcDraw, DWORD dwS
                 rcDraw.top += (rcDraw.Height() - rcSour.Height()) / 2, rcDraw.bottom = rcDraw.top + rcSour.Height();
             else
                 rcDraw.left += (rcDraw.Width() - rcSour.Width()) / 2, rcDraw.right = rcDraw.left + rcSour.Width();
-            pRT->DrawBitmap9Patch(&rcDraw, GetImage(), &rcSour, &rcMargin, m_bTile ? EM_TILE : EM_STRETCH, byAlpha);
+            pRT->DrawBitmap9Patch(&rcDraw, pImg, &rcSour, &rcMargin, m_bTile ? EM_TILE : EM_STRETCH, byAlpha);
         }
     }
     else
     {
         // SVG supports 9-patch now
-        DrawSVG9Patch(pRT, GetSvg(), prcDraw, &rcSour, &rcMargin, byAlpha, GetScale());
+        DrawSVG9Patch(pRT, pSvg, prcDraw, &rcSour, &rcMargin, byAlpha, GetScale());
 
         if (nSbCode == SB_THUMBTRACK && m_bHasGripper)
         {
@@ -1039,7 +1101,7 @@ void SSkinScrollbar::_DrawByState(IRenderTarget *pRT, LPCRECT prcDraw, DWORD dwS
                 rcDraw.top += (rcDraw.Height() - rcSour.Height()) / 2, rcDraw.bottom = rcDraw.top + rcSour.Height();
             else
                 rcDraw.left += (rcDraw.Width() - rcSour.Width()) / 2, rcDraw.right = rcDraw.left + rcSour.Width();
-            DrawSVG9Patch(pRT, GetSvg(), &rcDraw, &rcSour, &rcMargin, byAlpha, GetScale());
+            DrawSVG9Patch(pRT, pSvg, &rcDraw, &rcSour, &rcMargin, byAlpha, GetScale());
         }
     }
 }
@@ -1056,11 +1118,13 @@ void SSkinScrollbar::_Scale(ISkinObj *skinObj, int nScale)
 
 int SSkinScrollbar::GetIdealSize() const
 {
-    if (GetImage())
-        return GetImage()->Width() / 9;
-    else if (GetSvg())
+    SAutoRefPtr<IBitmapS> pImg = GetImage();
+    if (pImg)
+        return pImg->Width() / 9;
+    SAutoRefPtr<ISvgObj> pSvg = GetSvg();
+    if (pSvg)
     {
-        int ret = GetSvg()->GetWidth() / 9;
+        int ret = pSvg->GetWidth() / 9;
         return ret * GetScale() / 100;
     }
     return 0;

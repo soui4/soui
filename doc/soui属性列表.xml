@@ -496,21 +496,6 @@
     <Attribute name="wantTab" default="0" type="INT" comment="wantTab代表系统会将tab按钮交给控件处理。如果wanttab=0, 那这个控件就不处理tab，这样按tab就可以切换焦点。	0--不支持（默认）  1--支持 "/>
   </mclistview>
 
-  <!-- 范例   扩展多列列表   比mclistview新增了可以进行子项目的拖动
-      <mclistviewex name="musiclist" headerHeight="48" colorSwapLine="rgb(0,0,255)" colorDropBk="rgb(0,0,255)" pos="20,20,-20,-20" sbTop="48">
--->
-  <mclistviewex  parent="SPanel" comment=" 扩展多列列表"  classname="SMCListViewEx">
-    <Attribute name="headerHeight" default="0" type="INT" comment="表头高度 "/>
-    <Attribute name="hotTrack" default="0" type="INT" comment="鼠标移动时高亮显示下面的行 0--不支持（默认）  1--支持 "/>
-    <Attribute name="dividerSkin" default="0" type="STRING" comment="分割线的皮肤 属性值为BUILDIN_SKIN_NAME "/>
-    <Attribute name="dividerSize" default="0" type="INT" comment="分割线的宽度 "/>
-    <Attribute name="wantTab" default="0" type="INT" comment="wantTab代表系统会将tab按钮交给控件处理。如果wanttab=0, 那这个控件就不处理tab，这样按tab就可以切换焦点。	0--不支持（默认）  1--支持 "/>
-    <Attribute name="canSwapItem" default="0" type="INT" comment="子项目位置能否移动 0--不支持（默认）  1--支持 "/>
-    <Attribute name="colorSwapLine" default="#0000ff" type="COLOR" comment="子项目拖动位置的线条颜色 "/>
-    <Attribute name="colorDropBk" default="#0000ff" type="COLOR" comment="子项目被按下的时候的颜色 "/>
-    <Attribute name="dropBkAlpha" default="0" type="INT" comment="拖拽时候的透明度 "/>
-  </mclistviewex>
-
   <!-- 范例   瓦片控件   
       <tileview pos="5,0,-5,-5" name="lv_test_tile" wantTab="1" marginSize="5" colorBkgnd="#FFFFFF">
 -->

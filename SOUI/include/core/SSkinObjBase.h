@@ -4,6 +4,7 @@
 #include <interface/SSkinobj-i.h>
 #include <interface/sxml-i.h>
 #include <helper/obj-ref-impl.hpp>
+#include <helper/SCriticalSection.h>
 #include <sobject/Sobject.hpp>
 #include <souicoll.h>
 
@@ -233,6 +234,27 @@ class SOUI_EXP SSkinObjBase : public TObjRefImpl<SObjectImpl<ISkinObj>> {
     bool m_bEnableScale;        /**< Flag to enable scaling. */
     bool m_checkAsPushdown;     /**< Flag to check if the state should be treated as pushdown. */
     SState2Index m_state2Index; /**< State-to-index mapping. */
+
+    /**
+     * @brief Guards the mutable parts of a skin shared by multiple UI threads.
+     * @details THREAD-SAFETY MODEL of skin objects (goal: never crash when
+     *          shared, NOT per-thread data independence):
+     *          1. A skin is initialized once (XML parse / SetImage/SetSvg /
+     *             first-draw lazy load) and is read-mostly afterwards.
+     *          2. Lazy load and cache fills run under this lock; the returned
+     *             ISvgObj/IBitmapS pointers are handed out as SAutoRefPtr so
+     *             an in-flight draw keeps its objects alive.
+     *          3. OnColorize mutates pixels IN PLACE under this lock (the
+     *              object identity never changes), so concurrent draws may
+     *              observe half-colorized pixels (accepted tearing) but never
+     *              a dangling pointer.
+     *          4. Scale() takes this lock once around the whole "read source
+     *             + write clone" process; _Scale() implementations need no
+     *             locking of their own.
+     *          It is a recursive critical section, so nested locked calls on
+     *          the same thread are safe and cheap.
+     */
+    mutable SCriticalSection m_cs;
 };
 
 SNSEND

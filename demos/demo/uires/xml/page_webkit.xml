@@ -1,20 +1,22 @@
-﻿﻿﻿﻿﻿  <!--
+﻿﻿<!--
     page_webkit.xml - 内嵌浏览器(教程)演示分区
-    fadeframe 实现工具栏渐显渐隐动画,targetName 指向 webkit_toolbar;
-    wke_test/edit_url/btn_webkit_back/fore/refresh/go 被 MainDlg_Webkit.cpp 引用,不可改动。
+    fadeframe 实现工具栏"自动隐藏":鼠标移到顶部区域时 webkit_toolbar 渐显,移开后延时渐隐;
+    targetName 指向 webkit_toolbar。
+    wke_test/edit_url/btn_webkit_back/fore/refresh/go 被 MainDlg_Webkit.cpp 引用,不可改名。
+    工具栏背景 skin_webkit_nav_bk 与图标按钮(webbtn_*.svg)均沿用 demo 浅色圆角卡片 + 蓝灰主题。
   -->
   <window size="-2,-2" colorBkgnd="@color/clr_page_bg">
-    <text pos="8,8,-8,-8" align="center" valign="center" colorText="@color/clr_text_sub">没有找到wke.dll,请将third-part\wke\wke.7z解压到bin目录。</text>
-    <fadeframe pos="8,8,-16,36" targetName="webkit_toolbar" showAlpha="200">
-      <!--一个实现渐显渐隐动画的工具栏控件-->
+    <text pos="8,8,-8,-8" align="center" valign="center" colorText="@color/clr_text_sub" multiLines="1">没有找到 wke.dll,请将 third-part\wke\wke.7z 解压到 bin 目录。\nwke.dll目前只有32位</text>
+    <fadeframe pos="8,8,-16,48" targetName="webkit_toolbar" showAlpha="235">
+      <!--自动隐藏:鼠标进入顶部区域时工具栏渐显,移开后延时渐隐-->
     </fadeframe>
-    <wkeWebkit pos="8,8,-8,-8" url="http://www.cnblogs.com/setoutsoft/" name="wke_test"/>
-    <window pos="8,8,-16,36" name="webkit_toolbar" colorBkgnd="@color/clr_primary" layeredWindow="1" layout="hbox" gravity="center" interval="5">
-      <!--这个窗口是前面的fadeframe的作用对象-->
-      <imgbtn name="btn_webkit_back" skin="skin_webbtn_back" alpha="128"/>
-      <imgbtn name="btn_webkit_fore" skin="skin_webbtn_forward"/>
-      <imgbtn name="btn_webkit_refresh" skin="skin_webbtn_refresh"/>
-      <edit size="0,-2" weight="1" class="cls_edit" name="edit_url">https://www.cnblogs.com/setoutsoft/</edit>
-      <button size="50,-2" name="btn_webkit_go">go</button>
+    <wkeWebkit pos="8,8,-8,-8" url="https://soui.com.cn" name="wke_test"/>
+    <window pos="8,8,-16,48" name="webkit_toolbar" skin="skin_webkit_nav_bk" layeredWindow="1" layout="hbox" gravity="center" padding="6,0,6,0" interval="6">
+      <!--这个窗口是前面的 fadeframe 的作用对象;图标按钮用 SVG 三态图标(石楠灰→主蓝)-->
+      <imgbtn name="btn_webkit_back" skin="skin_webbtn_back" size="22,22" animate="1" tip="后退"/>
+      <imgbtn name="btn_webkit_fore" skin="skin_webbtn_forward" size="22,22" animate="1" tip="前进"/>
+      <imgbtn name="btn_webkit_refresh" skin="skin_webbtn_refresh" size="22,22" animate="1" tip="刷新"/>
+      <edit2 size="0,-2" weight="1" height="30" class="cls_edit" name="edit_url">https://soui.com.cn</edit2>
+      <imgbtn name="btn_webkit_go" skin="skin_webbtn_go" size="30,30" animate="1" tip="转到"/>
     </window>
   </window>

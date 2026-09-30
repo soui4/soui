@@ -262,6 +262,29 @@ class SOUI_EXP SListCtrl : public SPanel {
     int GetCheckedItemCount();
 
     /**
+     * @brief Get the number of selected items
+     *
+     * Mode-aware: multi-selection mode counts the checked items (the only
+     * selection record); single-selection mode reports 1 while the anchor
+     * is set.
+     *
+     * @return Number of selected items
+     */
+    int GetSelItemCount() const;
+
+    /**
+     * @brief Get all selected items
+     *
+     * Mode-aware: multi-selection mode enumerates the checked items;
+     * single-selection mode reports the anchor.
+     *
+     * @param items Output array of item indexes.
+     * @param nMaxCount Maximum number of indexes to retrieve.
+     * @return Number of indexes retrieved.
+     */
+    int GetSelItems(int *items, int nMaxCount) const;
+
+    /**
      * @brief Get the header control
      * @return Pointer to the header control
      */
@@ -281,10 +304,64 @@ class SOUI_EXP SListCtrl : public SPanel {
 
     /**
      * @brief Enable or disable multiple selection
+     *
+     * Dual-track model: in single-selection mode the anchor m_nSelectItem is
+     * the selection record (the checked flag of that item is kept in sync);
+     * in multi-selection mode the checked flags are the only record and the
+     * anchor acts as the cursor (keyboard / shift base) only. Enabling is a
+     * no-op for the record (the checked flag already mirrors the anchor);
+     * disabling transfers the sole checked item to the anchor or clears all.
+     *
      * @param enable Enable flag
      */
     VOID EnableMultiSelection(BOOL enable)
     {
+        if (!enable && m_bMultiSelection)
+        {
+            // Turning multi-selection off. The checked flag marks the
+            // selection in both modes; the anchor m_nSelectItem must follow
+            // it (single-selection paths read m_nSelectItem).
+            int iChecked = -1;
+            int nSelected = 0;
+            for (int i = 0; i < GetItemCount(); i++)
+            {
+                if (m_arrItems[i].checked)
+                {
+                    nSelected++;
+                    if (iChecked == -1)
+                        iChecked = i;
+                }
+            }
+            if (nSelected > 1)
+            {
+                // Several items checked: the whole selection is cleared.
+                for (int i = 0; i < GetItemCount(); i++)
+                {
+                    if (m_arrItems[i].checked)
+                    {
+                        m_arrItems[i].checked = FALSE;
+                        RedrawItem(i);
+                        NotifyItemSelState(i, FALSE);
+                    }
+                }
+                m_nSelectItem = -1;
+                m_nSelAnchor = -1;
+            }
+            else if (nSelected == 1)
+            {
+                // Exactly one item checked: it becomes the single selection
+                // (the flag is already set, only the anchor moves).
+                m_nSelectItem = iChecked;
+                m_nSelAnchor = iChecked;
+            }
+            // nSelected == 0: the anchor is kept unchanged.
+        }
+        else if (enable && !m_bMultiSelection)
+        {
+            // Turning multi-selection on: the range anchor starts at the
+            // cursor so the first Shift+Click/arrow works from there.
+            m_nSelAnchor = m_nSelectItem;
+        }
         m_bMultiSelection = enable;
     }
 
@@ -362,8 +439,46 @@ class SOUI_EXP SListCtrl : public SPanel {
      * @param nOldSel Old selected index
      * @param nNewSel New selected index
      * @param checkBox Whether the change is due to a checkbox
+     * @param nFlags Modifier keys from the mouse message wParam (MK_CONTROL / MK_SHIFT);
+     *              pass 0 for programmatic changes. Replaces the former
+     *              GetKeyState() lookups so keyboard state is testable headless.
      */
-    void NotifySelChange(int nOldSel, int nNewSel, BOOL checkBox = FALSE);
+    void NotifySelChange(int nOldSel, int nNewSel, BOOL checkBox = FALSE, UINT nFlags = 0);
+
+    /**
+     * @brief Fire the per-item selection state event (multi-selection)
+     * @param iItem Index of the item whose checked / selected state flipped
+     * @param bSelected New state: TRUE=selected(checked), FALSE=deselected
+     */
+    void NotifyItemSelState(int iItem, BOOL bSelected)
+    {
+        EventItemSelChanged evt(this);
+        evt.iItem = iItem;
+        evt.bSelected = bSelected;
+        FireEvent(evt);
+    }
+
+    /**
+     * @brief Scrolls the list so an item becomes visible (keyboard navigation)
+     * @param nItem Index of the item to reveal
+     */
+    void EnsureVisible(int nItem);
+
+    /**
+     * @brief Handle key down event (arrows / PgUp / PgDn / Home / End /
+     *        SPACE toggle / Ctrl+A, with Ctrl- and Shift- modifiers)
+     * @param nChar Key code
+     * @param nRepCnt Repeat count
+     * @param nFlags Flags
+     */
+    void OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags);
+
+    /**
+     * @brief Reports the arrow keys as wanted dialog codes so the control
+     *        receives keyboard navigation
+     * @return Dialog codes
+     */
+    virtual UINT WINAPI OnGetDlgCode() const OVERRIDE;
 
     /**
      * @brief Paint the control
@@ -426,6 +541,13 @@ class SOUI_EXP SListCtrl : public SPanel {
     void OnMouseLeave();
 
     /**
+     * @brief Handle focus loss: the keyboard cursor frame is drawn only
+     *        while the control is focused, so repaint
+     * @param wndFocus Handle of the window receiving focus
+     */
+    void OnKillFocus(SWND wndFocus);
+
+    /**
      * @brief Handle size change event
      * @param nType Size change type
      * @param size New size
@@ -453,6 +575,28 @@ class SOUI_EXP SListCtrl : public SPanel {
      * @param pt Mouse coordinates
      */
     void OnLButtonUpEx(UINT nFlags, CPoint pt) override;
+
+    /**
+     * @brief Checks whether rubber band selection is enabled (multi-selection on).
+     */
+    virtual BOOL IsRubberBandSelEnabled() const override;
+
+    /**
+     * @brief Records the selection anchor when the band starts.
+     */
+    virtual void OnRubberBandStart() override;
+
+    /**
+     * @brief Updates the checked state so it matches the rows covered by the band.
+     * @param rcBand Band rectangle in client coordinates.
+     * @param bAdd TRUE to add to the existing selection (Ctrl held).
+     */
+    virtual void OnRubberBandSelect(const CRect &rcBand, BOOL bAdd) override;
+
+    /**
+     * @brief Fires the selection changed event when the band finishes.
+     */
+    virtual void OnRubberBandEnd(const CRect &rcBand, BOOL bCancelled) override;
 
     /**
      * @brief Update the position of child items
@@ -486,10 +630,13 @@ class SOUI_EXP SListCtrl : public SPanel {
     SLayoutSize m_nHeaderHeight; /**< Height of the header */
     SLayoutSize m_nItemHeight;   /**< Height of the items */
 
-    int m_nSelectItem;   /**< Index of the selected item */
-    int m_nSelectColumn; /**< Index of the selected column */
-    int m_nHoverItem;    /**< Index of the item under the mouse */
-    BOOL m_bHotTrack;    /**< Hot tracking flag */
+    int m_nSelectItem;              /**< Index of the selected item (single) / keyboard cursor (multi) */
+    int m_nSelAnchor;               /**< Multi-selection range anchor: fixed base for Shift ranges; follows the cursor on every non-Shift change */
+    int m_nSelectColumn;            /**< Index of the selected column */
+    int m_nHoverItem;               /**< Index of the item under the mouse */
+    BOOL m_bHotTrack;               /**< Hot tracking flag */
+    int m_iBandOldSel;              /**< Selection anchor before a rubber band started */
+    SArray<BOOL> m_arrBandSnapshot; /**< Checked-state snapshot taken when the rubber band starts */
 
     CPoint m_ptIcon; /**< Icon position */
     CPoint m_ptText; /**< Text position */
@@ -543,6 +690,8 @@ class SOUI_EXP SListCtrl : public SPanel {
         MSG_WM_LBUTTONDBLCLK(OnLButtonDbClick)
         MSG_WM_RBUTTONUP(OnRButtonUp)
         MSG_WM_MOUSELEAVE(OnMouseLeave)
+        MSG_WM_KILLFOCUS_EX(OnKillFocus)
+        MSG_WM_KEYDOWN(OnKeyDown)
     SOUI_MSG_MAP_END()
 };
 

@@ -1174,36 +1174,16 @@ class SOUI_EXP SHostWnd
     STDMETHOD_(void, SetToolTip)(THIS_ LPCRECT rc, UINT tipAlign, LPCTSTR pszTip) OVERRIDE;
 
     /**
-     * @brief Registers a timeline handler.
+     * @brief Called when the timeline request state of the container changes.
      *
-     * @param pHandler Pointer to the timeline handler.
-     * @return TRUE if the handler was registered, FALSE otherwise.
-     */
-    STDMETHOD_(BOOL, RegisterTimelineHandler)(THIS_ ITimelineHandler *pHandler) OVERRIDE;
-
-    /**
-     * @brief Unregisters a timeline handler.
+     * Overrides SwndContainerImpl::OnTimelineRequestChanged to start the kPulseTimer
+     * when the first timeline request arrives and to stop it when the last request
+     * is released.
      *
-     * @param pHandler Pointer to the timeline handler.
-     * @return TRUE if the handler was unregistered, FALSE otherwise.
+     * @param bHasTimelineRequest TRUE if there is at least one pending timeline
+     *                            request, FALSE if the last request was released.
      */
-    STDMETHOD_(BOOL, UnregisterTimelineHandler)(THIS_ ITimelineHandler *pHandler) OVERRIDE;
-
-    /**
-     * @brief Registers a value animator.
-     *
-     * @param pAnimator Pointer to the value animator.
-     * @return TRUE if the animator was registered, FALSE otherwise.
-     */
-    STDMETHOD_(BOOL, RegisterValueAnimator)(THIS_ IValueAnimator *pAnimator) OVERRIDE;
-
-    /**
-     * @brief Unregisters a value animator.
-     *
-     * @param pAnimator Pointer to the value animator.
-     * @return TRUE if the animator was unregistered, FALSE otherwise.
-     */
-    STDMETHOD_(BOOL, UnregisterValueAnimator)(THIS_ IValueAnimator *pAnimator) OVERRIDE;
+    virtual void OnTimelineRequestChanged(BOOL bHasTimelineRequest) OVERRIDE;
 
     /**
      * @brief Enables or disables host private UI definitions.

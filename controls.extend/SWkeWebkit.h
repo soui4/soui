@@ -11,6 +11,8 @@ class SWkeLoader {
     typedef void (*FunWkeShutdown)();
     typedef wkeWebView (*FunWkeCreateWebView)();
     typedef void (*FunWkeDestroyWebView)(wkeWebView);
+    typedef const wchar_t *(*FunWkeToStringW)(const wkeString str);
+    typedef const utf8 *(*FunWkeToString)(const wkeString str);
 
   public:
     SWkeLoader();
@@ -25,6 +27,8 @@ class SWkeLoader {
   public:
     FunWkeCreateWebView m_funWkeCreateWebView;
     FunWkeDestroyWebView m_funWkeDestroyWebView;
+    FunWkeToStringW m_funWkeToStringW;
+    FunWkeToString m_funWkeToString;
 
   protected:
     HMODULE m_hModWke;
@@ -95,8 +99,15 @@ class SWkeWebkit
     SOUI_MSG_MAP_END()
 
   protected:
+    void OnWkeTickLog();
+
     wkeWebView m_pWebView;
     SStringW m_strUrl;
+    wkeClientHandler m_clientHandler;
+    BOOL m_bLoggedLoadFailed;
+    BOOL m_bLoggedLoadComplete;
+    int m_nLoggedContentsW;
+    int m_nLoggedContentsH;
 };
 
 SNSEND

@@ -160,6 +160,11 @@ void SSkinObjBase::_Scale(ISkinObj *pObj, int nScale)
 
 ISkinObj *SSkinObjBase::Scale(int nScale)
 {
+    // Single lock site for scaling: covers the whole "read source + write
+    // clone" process, so no _Scale() implementation needs locking of its own.
+    // m_cs is recursive, so _Scale() may freely call locked getters.
+    // Classes overriding Scale() to return NULL never touch shared state here.
+    SAutoLock lock(m_cs);
     if (!m_bEnableScale)
     {
         AddRef();

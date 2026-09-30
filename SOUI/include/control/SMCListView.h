@@ -457,6 +457,28 @@ class SOUI_EXP SMCListView
      */
     virtual void OnDragClearItemCapture() override;
 
+    /**
+     * @brief Checks whether rubber band selection is enabled (multi-select mode on).
+     */
+    virtual BOOL IsRubberBandSelEnabled() const override;
+
+    /**
+     * @brief Records the selection anchor when the band starts.
+     */
+    virtual void OnRubberBandStart() override;
+
+    /**
+     * @brief Updates the selection so it matches the rows covered by the band.
+     * @param rcBand Band rectangle in client coordinates.
+     * @param bAdd TRUE to add to the existing selection (Ctrl held).
+     */
+    virtual void OnRubberBandSelect(const CRect &rcBand, BOOL bAdd) override;
+
+    /**
+     * @brief Fires the selection changed event when the band finishes.
+     */
+    virtual void OnRubberBandEnd(const CRect &rcBand, BOOL bCancelled) override;
+
   protected:
     SAutoRefPtr<IMcAdapter> m_adapter;                 /**< Pointer to the multi-column adapter */
     SAutoRefPtr<ILvDataSetObserver> m_observer;        /**< Pointer to the data set observer */
@@ -466,6 +488,7 @@ class SOUI_EXP SMCListView
     SLayoutSize m_nDividerSize;           /**< Size of dividers */
     BOOL m_bDatasetInvalidated;           /**< Flag indicating data set is invalidated */
     COLORREF m_crGrid;                    /**< Grid color */
+    int m_iBandOldSel;                    /**< Selection anchor before a rubber band started */
 
   protected:
     /**

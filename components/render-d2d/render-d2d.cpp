@@ -159,7 +159,10 @@ SRenderFactory_D2D::~SRenderFactory_D2D()
 
 BOOL SRenderFactory_D2D::Init()
 {
-    HRESULT hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pD2DFactory);
+    // MULTI_THREADED: the factory is shared by all UI threads; resources
+    // created from a SINGLE_THREADED factory are not safe for concurrent use
+    // from multiple threads.
+    HRESULT hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_MULTI_THREADED, &m_pD2DFactory);
     if (!SUCCEEDED(hr))
         return FALSE;
 

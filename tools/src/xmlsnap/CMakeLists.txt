@@ -1,0 +1,32 @@
+
+include_directories(${PROJECT_SOURCE_DIR}/components)
+include_directories(${PROJECT_SOURCE_DIR}/third-part/stb)
+include_directories(${PROJECT_SOURCE_DIR}/utilities/include)
+include_directories(${PROJECT_SOURCE_DIR}/SOUI/include)
+include_directories(${PROJECT_SOURCE_DIR}/soui-sys-resource)
+include_directories(${PROJECT_SOURCE_DIR}/controls.extend)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
+file(GLOB CURRENT_HEADERS  *.h *.hpp)
+file(GLOB CURRENT_SRCS  *.cpp)
+
+source_group("Header Files" FILES ${CURRENT_HEADERS})
+source_group("Source Files" FILES ${CURRENT_SRCS})
+
+set(current_project "xmlsnap")
+
+add_executable(${current_project} ${CURRENT_HEADERS} ${CURRENT_SRCS})
+add_dependencies(${current_project} soui4 ExtendCtrls)
+target_link_libraries(${current_project} soui4 ExtendCtrls)
+
+if(CMAKE_SYSTEM_NAME MATCHES Windows)
+    target_link_libraries(${current_project} imm32 gdiplus Msimg32)
+endif()
+
+if(SOUI_ENABLE_COM_LIB)
+    target_link_libraries(${current_project} ${COM_LIBS} ${COM_DEP_LIBS})
+endif()
+
+set_target_properties (${current_project} PROPERTIES
+    FOLDER tools
+)

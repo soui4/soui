@@ -1,12 +1,40 @@
 ﻿#include "stdafx.h"
 #include "SWkeWebkit.h"
 #include <imm.h>
+#include <helper/slog.h>
+#define kLogTag "wke"
 #ifdef _WIN32
 #pragma comment(lib, "imm32.lib")
 #pragma comment(lib, "msimg32.lib")
 #endif
 
 SNSBEGIN
+
+//////////////////////////////////////////////////////////////////////////
+
+
+//wkeString -> wchar_t*，通过 SWkeLoader 里动态解析的函数指针完成
+static const wchar_t *WkeStringToW(const wkeString str)
+{
+    SWkeLoader *pLoader = SWkeLoader::GetInstance();
+    if (!pLoader || !pLoader->m_funWkeToStringW || !str)
+        return NULL;
+    return pLoader->m_funWkeToStringW(str);
+}
+
+//标题变化回调
+static void WkeOnTitleChanged(const wkeClientHandler *pHandler, const wkeString title)
+{
+    const wchar_t *psz = WkeStringToW(title);
+    SLOGI()<<"wke "<<pHandler<< "title changed : "<< psz;
+}
+
+//地址变化回调
+static void WkeOnURLChanged(const wkeClientHandler *pHandler, const wkeString url)
+{
+    const wchar_t *psz = WkeStringToW(url);
+	SLOGI()<<"wke "<<pHandler<< "url changed : "<< psz;
+}
 
 //////////////////////////////////////////////////////////////////////////
 // SWkeLoader
@@ -20,6 +48,8 @@ SWkeLoader *SWkeLoader::GetInstance()
 SWkeLoader::SWkeLoader()
     : m_hModWke(0)
 {
+    m_funWkeToStringW = NULL;
+    m_funWkeToString = NULL;
     SASSERT(!s_pInst);
     s_pInst = this;
 }
@@ -41,6 +71,9 @@ BOOL SWkeLoader::Init(LPCTSTR pszDll)
     m_funWkeShutdown = (FunWkeShutdown)GetProcAddress(hModWke, "wkeShutdown");
     m_funWkeCreateWebView = (FunWkeCreateWebView)GetProcAddress(hModWke, "wkeCreateWebView");
     m_funWkeDestroyWebView = (FunWkeDestroyWebView)GetProcAddress(hModWke, "wkeDestroyWebView");
+    //可选接口：老版本 wke.dll 不一定导出，取不到只影响日志里字符串的显示
+    m_funWkeToStringW = (FunWkeToStringW)GetProcAddress(hModWke, "wkeToStringW");
+    m_funWkeToString = (FunWkeToString)GetProcAddress(hModWke, "wkeToString");
     if (!m_funWkeInit || !m_funWkeShutdown || !m_funWkeCreateWebView || !m_funWkeDestroyWebView)
     {
         FreeLibrary(hModWke);
@@ -60,7 +93,13 @@ BOOL SWkeLoader::IsLoaded() const
 
 SWkeWebkit::SWkeWebkit(void)
     : m_pWebView(NULL)
+    , m_bLoggedLoadFailed(FALSE)
+    , m_bLoggedLoadComplete(FALSE)
+    , m_nLoggedContentsW(0)
+    , m_nLoggedContentsH(0)
 {
+    m_clientHandler.onTitleChanged = &WkeOnTitleChanged;
+    m_clientHandler.onURLChanged = &WkeOnURLChanged;
     m_bFocusable = true;
 }
 
@@ -108,7 +147,10 @@ int SWkeWebkit::OnCreate(void *)
     m_pWebView = pWkeLoader->m_funWkeCreateWebView();
     if (!m_pWebView)
         return 1;
+    //注册客户端回调：标题/地址变化会打到调试日志，用于定位 wke 加载问题
+    m_pWebView->setClientHandler(&m_clientHandler);
     m_pWebView->setBufHandler(this);
+    SLOGI()<<"wke "<<(const void *)&m_clientHandler<<  "created, loadURL : "<< m_strUrl.c_str();
     m_pWebView->loadURL(m_strUrl);
     SetTimer(
         TM_TICKER,
@@ -119,7 +161,10 @@ int SWkeWebkit::OnCreate(void *)
 void SWkeWebkit::OnDestroy()
 {
     if (m_pWebView)
+    {
+        m_pWebView->setClientHandler(NULL); //先注销回调，避免销毁过程中再次回调
         SWkeLoader::GetInstance()->m_funWkeDestroyWebView(m_pWebView);
+    }
     __baseCls::OnDestroy();
 }
 
@@ -280,6 +325,33 @@ void SWkeWebkit::OnTimer(char cTimerID)
     if (cTimerID == TM_TICKER)
     {
         m_pWebView->tick();
+        OnWkeTickLog();
+    }
+}
+
+//加载状态只在变化时打一条日志，用于判断 wke 到底卡在哪一步（请求/加载/布局）
+void SWkeWebkit::OnWkeTickLog()
+{
+    if (!m_pWebView)
+        return;
+    if (!m_bLoggedLoadFailed && m_pWebView->isLoadFailed())
+    {
+        m_bLoggedLoadFailed = TRUE;
+        SLOGW()<<"wke "<<(const void *)&m_clientHandler<< " load FAILED";
+    }
+    if (!m_bLoggedLoadComplete && m_pWebView->isLoadComplete())
+    {
+        m_bLoggedLoadComplete = TRUE;
+		SLOGW()<<"wke "<<(const void *)&m_clientHandler<< " load COMPLETE";
+    }
+    int nW = m_pWebView->contentsWidth();
+    int nH = m_pWebView->contentsHeight();
+    if (nW != m_nLoggedContentsW || nH != m_nLoggedContentsH)
+    {
+        m_nLoggedContentsW = nW;
+        m_nLoggedContentsH = nH;
+		SLOGW()<<"wke "<<(const void *)&m_clientHandler<< " contents="<<nW<<"x"<<nH<<" complete="<<m_pWebView->isLoadComplete()
+			<<" failed="<<m_pWebView->isLoadFailed()<<" loaded="<<m_pWebView->isLoaded()<<" ready="<<m_pWebView->isDocumentReady();
     }
 }
 

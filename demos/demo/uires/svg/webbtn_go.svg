@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  webbtn_go.svg - 浏览器"转到/确认"按钮图标(SVG 1.1,nanosvg 兼容)
+  3 帧横排,每帧 20x20,总尺寸 60x20。
+  帧序:0=normal #64748B  1=hover #2563EB  2=push #1D4ED8
+  图形:回车/确认箭头(↵),与"前进"的右向直箭头区分。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="60" height="20" viewBox="0 0 60 20">
+  <!-- 帧0:normal #64748B -->
+  <g transform="translate(0,0)" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M5 4 L5 13 L14 13"/>
+    <path d="M11 10 L14 13 L11 16"/>
+  </g>
+  <!-- 帧1:hover #2563EB -->
+  <g transform="translate(20,0)" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M5 4 L5 13 L14 13"/>
+    <path d="M11 10 L14 13 L11 16"/>
+  </g>
+  <!-- 帧2:push #1D4ED8 -->
+  <g transform="translate(40,0)" fill="none" stroke="#1D4ED8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M5 4 L5 13 L14 13"/>
+    <path d="M11 10 L14 13 L11 16"/>
+  </g>
+</svg>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  webbtn_forward.svg - 浏览器"前进"按钮图标(SVG 1.1,nanosvg 兼容)
+  3 帧横排,每帧 20x20,总尺寸 60x20。
+  帧序:0=normal #64748B  1=hover #2563EB  2=push #1D4ED8
+  图形:右向箭头(后退箭头镜像)。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="60" height="20" viewBox="0 0 60 20">
+  <!-- 帧0:normal #64748B -->
+  <g transform="translate(0,0)" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="5" y1="10" x2="15" y2="10"/>
+    <path d="M10 5 L15 10 L10 15"/>
+  </g>
+  <!-- 帧1:hover #2563EB -->
+  <g transform="translate(20,0)" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="5" y1="10" x2="15" y2="10"/>
+    <path d="M10 5 L15 10 L10 15"/>
+  </g>
+  <!-- 帧2:push #1D4ED8 -->
+  <g transform="translate(40,0)" fill="none" stroke="#1D4ED8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="5" y1="10" x2="15" y2="10"/>
+    <path d="M10 5 L15 10 L10 15"/>
+  </g>
+</svg>

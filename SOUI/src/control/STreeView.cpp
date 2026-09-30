@@ -438,9 +438,11 @@ STreeView::STreeView()
     : m_itemCapture(NULL)
     , m_pHoverItem(NULL)
     , m_hSelected(ITEM_NULL)
+    , m_hSelAnchor(ITEM_NULL)
     , m_pVisibleMap(new VISIBLEITEMSMAP)
     , m_bWantTab(FALSE)
     , m_bMultiSel(FALSE)
+    , m_hBandOldSel(ITEM_NULL)
     , m_pLineSkin(GETBUILTINSKIN(SKIN_SYS_TREE_LINES))
     , m_bHasLines(FALSE)
     , SHostProxy(this)
@@ -449,6 +451,7 @@ STreeView::STreeView()
 
     m_evtSet.addEvent(EVENTID(EventTVSelChanging));
     m_evtSet.addEvent(EVENTID(EventTVSelChanged));
+    m_evtSet.addEvent(EVENTID(EventTreeItemSelChanged));
     m_observer.Attach(new STreeViewDataSetObserver(this));
     m_tvItemLocator.Attach(new STreeViewItemLocator);
 }
@@ -506,6 +509,13 @@ BOOL STreeView::SetAdapter(ITvAdapter *adapter)
         m_pHoverItem = NULL;
         m_itemCapture = NULL;
         m_hSelected = 0;
+        m_hSelAnchor = 0;
+        // The selection map holds handles owned by the old adapter; keep or
+        // reuse them across an adapter swap and lookups would hit dangling
+        // handles (or false-match a recycled address). Same for a stale band
+        // snapshot - a band cannot span an adapter swap.
+        m_mapSelItems.RemoveAll();
+        m_arrBandSnapshot.RemoveAll();
     }
 
     if (m_tvItemLocator)
@@ -597,6 +607,7 @@ void STreeView::OnPaint(IRenderTarget *pRT)
 
     pRT->PopClip();
 
+    DrawRubberBandSel(pRT);
     AfterPaint(pRT, painter);
 }
 
@@ -682,24 +693,32 @@ void STreeView::SetSel(HSTREEITEM hItem, BOOL bNotify /**< =FALSE */)
     if (!m_adapter)
         return;
 
-    if (bNotify)
-    {
-        EventTVSelChanging evt(this);
-        evt.bCancel = FALSE;
-        evt.hOldSel = m_hSelected;
-        evt.hNewSel = hItem;
-        FireEvent(&evt);
-        if (evt.bCancel)
-        { // Cancel SetSel and restore selection state
-            return;
-        }
-    }
-
     if (!m_bMultiSel)
     {
-        // Single selection mode
-        if (m_hSelected == hItem)
+        // Single selection mode: the anchor m_hSelected is the selection
+        // record (IsItemSelected reads it); the map is the multi-selection
+        // record only.
+        if (IsItemSelected(hItem))
             return;
+        // Clearing an already-empty selection changes nothing: no visuals
+        // and no SelChanging/SelChanged pair.
+        if (hItem == ITEM_NULL && m_hSelected == ITEM_NULL)
+            return;
+        HSTREEITEM hOldSel = m_hSelected;
+        // The anchor-style TV SelChanging/SelChanged are a single-selection
+        // protocol; multi-selection feedback is per-item only.
+        if (bNotify)
+        {
+            EventTVSelChanging evt(this);
+            evt.bCancel = FALSE;
+            evt.hOldSel = hOldSel;
+            evt.hNewSel = hItem;
+            FireEvent(&evt);
+            if (evt.bCancel)
+            { // Cancel SetSel and restore selection state
+                return;
+            }
+        }
 
         // Clear old selection
         SItemPanel *pItem = GetItemPanel(m_hSelected);
@@ -710,14 +729,25 @@ void STreeView::SetSel(HSTREEITEM hItem, BOOL bNotify /**< =FALSE */)
             RedrawItem(pItem);
         }
 
-        // Update selection map
-        ClearSelItems();
-
-        // Set new selection
+        // Set new selection. No per-item event here - the anchor-style
+        // TVSelChanging/TVSelChanged pair is the single-selection feedback.
         m_hSelected = hItem;
+        m_hSelAnchor = hItem;
         if (hItem != ITEM_NULL)
         {
-            AddSelItem(hItem);
+            SItemPanel *pNewItem = GetItemPanel(hItem);
+            if (pNewItem)
+            {
+                pNewItem->SetSelected(TRUE);
+                RedrawItem(pNewItem);
+            }
+        }
+        if (bNotify)
+        {
+            EventTVSelChanged evt(this);
+            evt.hOldSel = hOldSel;
+            evt.hNewSel = hItem;
+            FireEvent(&evt);
         }
     }
     else
@@ -728,6 +758,14 @@ void STreeView::SetSel(HSTREEITEM hItem, BOOL bNotify /**< =FALSE */)
             // Clear all selections
             ClearSelItems();
             m_hSelected = ITEM_NULL;
+            m_hSelAnchor = ITEM_NULL;
+        }
+        else if (IsItemSelected(hItem) && m_mapSelItems.GetCount() == 1)
+        {
+            // The set is already exactly {hItem}: only the cursor follows,
+            // no per-item events, no repaint (mirrors SViewBase::SetSel).
+            m_hSelected = hItem;
+            m_hSelAnchor = hItem;
         }
         else
         {
@@ -736,16 +774,9 @@ void STreeView::SetSel(HSTREEITEM hItem, BOOL bNotify /**< =FALSE */)
 
             // Select new item
             m_hSelected = hItem;
+            m_hSelAnchor = hItem;
             AddSelItem(hItem);
         }
-    }
-
-    if (bNotify)
-    {
-        EventTVSelChanged evt(this);
-        evt.hOldSel = m_hSelected;
-        evt.hNewSel = hItem;
-        FireEvent(evt);
     }
 }
 
@@ -834,17 +865,46 @@ void STreeView::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
         nNewSelItem = (m_hSelected == ITEM_NULL) ? m_adapter->GetFirstVisibleItem() : m_adapter->GetPrevVisibleItem(m_hSelected);
         break;
     case VK_PRIOR:
+    {
+        // Page keys move the selection/cursor too (mirrors STreeCtrl):
+        // scroll first, then land on the item at the new top visible row.
         OnScroll(TRUE, SB_PAGEUP, 0);
+        nNewSelItem = m_tvItemLocator->Position2Item(m_siVer.nPos);
         break;
+    }
     case VK_NEXT:
+    {
         OnScroll(TRUE, SB_PAGEDOWN, 0);
+        CRect rcClient;
+        GetClientRect(&rcClient);
+        nNewSelItem = m_tvItemLocator->Position2Item(m_siVer.nPos + rcClient.Height() - 1);
+        if (nNewSelItem == ITEM_NULL)
+        {
+            // position past the content end: fall back to the last visible item
+            HSTREEITEM hItem = m_adapter->GetFirstVisibleItem();
+            while (hItem != ITEM_NULL)
+            {
+                nNewSelItem = hItem;
+                hItem = m_adapter->GetNextVisibleItem(hItem);
+            }
+        }
         break;
+    }
     case VK_HOME:
         OnScroll(TRUE, SB_TOP, 0);
+        nNewSelItem = m_adapter->GetFirstVisibleItem();
         break;
     case VK_END:
+    {
         OnScroll(TRUE, SB_BOTTOM, 0);
+        HSTREEITEM hItem = m_adapter->GetFirstVisibleItem();
+        while (hItem != ITEM_NULL)
+        {
+            nNewSelItem = hItem;
+            hItem = m_adapter->GetNextVisibleItem(hItem);
+        }
         break;
+    }
     case VK_LEFT:
         if (m_hSelected != ITEM_NULL)
         {
@@ -875,13 +935,16 @@ void STreeView::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
             {
                 // Ctrl + arrow: move focus without changing selection
                 m_hSelected = nNewSelItem;
+                m_hSelAnchor = nNewSelItem;
                 // Update visible items to reflect the new focus
                 UpdateVisibleItems();
             }
             else if (bShiftPressed)
             {
-                // Shift + arrow: select the new item (tree view doesn't support range selection easily)
-                AddSelItem(nNewSelItem);
+                // Shift + arrow: move the anchored span to the new cursor
+                // (the anchor stays fixed, so the span can shrink as well
+                // as grow - Explorer semantics).
+                SetSelRange(m_hSelAnchor, nNewSelItem);
                 m_hSelected = nNewSelItem;
             }
             else
@@ -1143,9 +1206,11 @@ void STreeView::UpdateVisibleItems()
         ii.pItem->GetEventSet()->setMutedState(true);
         if ((HSTREEITEM)ii.pItem->GetItemIndex() == m_hSelected)
         {
+            // Recycle the panel's focus / check visuals only. The selection
+            // record (the anchor in single mode, the map in multi mode) is
+            // kept: the rebuilt panel re-applies it via IsItemSelected.
             ii.pItem->ModifyItemState(0, WndState_Check);
             ii.pItem->GetFocusManager()->ClearFocus();
-            m_hSelected = 0;
         }
         ii.pItem->SetVisible(FALSE); // Prevent SItemPanel::OnTimeFrame() from executing
         ii.pItem->GetEventSet()->setMutedState(false);
@@ -1306,6 +1371,25 @@ void STreeView::onItemBeforeRemove(HSTREEITEM hItem)
     if (m_hSelected && (m_hSelected == hItem || m_adapter->IsDecendentItem(hItem, m_hSelected)))
     {
         m_hSelected = 0;
+        m_hSelAnchor = 0;
+    }
+
+    // Drop the item (and its descendants) from the multi-selection map -
+    // silently, the rows are going away (same convention as STreeCtrl).
+    {
+        SArray<HSTREEITEM> arrStale;
+        for (SPOSITION pos = m_mapSelItems.GetStartPosition(); pos;)
+        {
+            HSTREEITEM hSel;
+            BOOL bVal;
+            m_mapSelItems.GetNextAssoc(pos, hSel, bVal);
+            if (hSel == hItem || m_adapter->IsDecendentItem(hItem, hSel))
+                arrStale.Add(hSel);
+        }
+        for (int i = 0; i < (int)arrStale.GetCount(); i++)
+        {
+            m_mapSelItems.RemoveKey(arrStale[i]);
+        }
     }
 
     if (m_pHoverItem)
@@ -1363,7 +1447,29 @@ LRESULT STreeView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
                 SItemPanel *pSelItem = GetItemPanel(m_hSelected);
                 if (pSelItem)
                     pSelItem->DoFrameEvent(WM_KILLFOCUS, 0, 0);
-                m_hSelected = NULL;
+            }
+            if (!pPanel && uMsg == WM_LBUTTONDOWN && (wParam & (MK_CONTROL | MK_SHIFT)) == 0)
+            {
+                // Plain click on blank area clears the selection. Ctrl/
+                // Shift+click and right/middle clicks leave it untouched.
+                if (m_bMultiSel)
+                {
+                    ClearSelItems();
+                    m_hSelected = ITEM_NULL; // the cursor goes with the set
+                    m_hSelAnchor = ITEM_NULL;
+                }
+                else if (m_hSelected)
+                {
+                    // Single-selection mode: the anchor is the record.
+                    SItemPanel *pSelItem = GetItemPanel(m_hSelected);
+                    if (pSelItem)
+                    {
+                        pSelItem->ModifyItemState(0, WndState_Check);
+                        RedrawItem(pSelItem);
+                    }
+                    m_hSelected = NULL;
+                    m_hSelAnchor = NULL;
+                }
             }
 
             __baseCls::ProcessSwndMessage(uMsg, wParam, lParam, lRet);
@@ -1552,7 +1658,7 @@ BOOL STreeView::OnItemClick(IEvtArgs *pEvt)
     if (!m_bMultiSel)
     {
         // Single selection mode
-        if (hItem != m_hSelected)
+        if (!IsItemSelected(hItem))
         {
             SetSel(hItem, TRUE);
         }
@@ -1575,62 +1681,14 @@ BOOL STreeView::OnItemClick(IEvtArgs *pEvt)
                 AddSelItem(hItem);
             }
             m_hSelected = hItem;
+            m_hSelAnchor = hItem;
         }
         else if (uKeyFlags & MK_SHIFT)
         {
-            // Shift + click: select range
-            if (m_hSelected != ITEM_NULL)
-            {
-                // Get the current selected item and the clicked item
-                HSTREEITEM hStart = m_hSelected;
-                HSTREEITEM hEnd = hItem;
-
-                // Select all visible items between hStart and hEnd
-                // First, collect all visible items
-                SArray<HSTREEITEM> visibleItems;
-                HSTREEITEM hCurrent = m_adapter->GetFirstVisibleItem();
-                while (hCurrent != ITEM_NULL)
-                {
-                    visibleItems.Add(hCurrent);
-                    hCurrent = m_adapter->GetNextVisibleItem(hCurrent);
-                }
-
-                // Find the indices of hStart and hEnd in the visible items list
-                int nStartIndex = -1, nEndIndex = -1;
-                for (int i = 0; i < visibleItems.GetCount(); i++)
-                {
-                    if (visibleItems[i] == hStart)
-                    {
-                        nStartIndex = i;
-                    }
-                    if (visibleItems[i] == hEnd)
-                    {
-                        nEndIndex = i;
-                    }
-                }
-
-                // If both items are found, select the range
-                if (nStartIndex != -1 && nEndIndex != -1)
-                {
-                    int nMin = smin(nStartIndex, nEndIndex);
-                    int nMax = smax(nStartIndex, nEndIndex);
-
-                    for (int i = nMin; i <= nMax; i++)
-                    {
-                        AddSelItem(visibleItems[i]);
-                    }
-                }
-                else
-                {
-                    // If either item is not found, just select the clicked item
-                    AddSelItem(hItem);
-                }
-            }
-            else
-            {
-                // If no item is selected, just select the clicked item
-                AddSelItem(hItem);
-            }
+            // Shift + click: select the anchored span [anchor..clicked]
+            // (Explorer semantics: the anchor stays fixed, the set is
+            // replaced, so the span can shrink as well as grow).
+            SetSelRange(m_hSelAnchor, hItem);
             m_hSelected = hItem;
         }
         else
@@ -1772,16 +1830,45 @@ HSTREEITEM STreeView::GetSel() const
 
 void STreeView::SetMultiSel(BOOL bMultiSel)
 {
-    m_bMultiSel = bMultiSel;
-    if (!bMultiSel)
+    if (bMultiSel && !m_bMultiSel)
     {
-        // Clear all selections except the current one
-        ClearSelItems();
+        // Turning multi-selection on: the anchor's item migrates into the
+        // map - silently, its selection state does not change - and the
+        // anchor stays on as the keyboard cursor.
         if (m_hSelected != ITEM_NULL)
-        {
-            AddSelItem(m_hSelected);
-        }
+            m_mapSelItems[m_hSelected] = TRUE;
+        m_hSelAnchor = m_hSelected;
     }
+    else if (!bMultiSel && m_bMultiSel)
+    {
+        // Turning multi-selection off. The map is the multi-selection
+        // record only; the anchor is the single-selection record.
+        int nCount = m_mapSelItems.GetCount();
+        if (nCount == 1)
+        {
+            // The sole selected item keeps its state: move the record from
+            // the map to the single-selection anchor. No event, no repaint.
+            HSTREEITEM hItem = ITEM_NULL;
+            BOOL bVal;
+            for (SPOSITION pos = m_mapSelItems.GetStartPosition(); pos;)
+            {
+                m_mapSelItems.GetNextAssoc(pos, hItem, bVal);
+            }
+            m_mapSelItems.RemoveAll();
+            m_hSelected = hItem;
+            m_hSelAnchor = hItem;
+        }
+        else if (nCount > 1)
+        {
+            // Several items selected: clear everything (ClearSelItems fires
+            // the per-item events and repaints) and reset the cursor.
+            ClearSelItems();
+            m_hSelected = ITEM_NULL;
+            m_hSelAnchor = ITEM_NULL;
+        }
+        // nCount == 0: the anchor (cursor) is kept unchanged.
+    }
+    m_bMultiSel = bMultiSel;
 }
 
 BOOL STreeView::GetMultiSel() const
@@ -1789,9 +1876,75 @@ BOOL STreeView::GetMultiSel() const
     return m_bMultiSel;
 }
 
+void STreeView::SetSelRange(HSTREEITEM hAnchor, HSTREEITEM hCursor)
+{
+    if (!m_bMultiSel || !m_adapter || hCursor == ITEM_NULL)
+        return;
+    if (hAnchor == ITEM_NULL)
+        hAnchor = hCursor;
+
+    // Determine the visible-order span [hLo..hHi]: walk forward from the
+    // anchor looking for the cursor; if the cursor is not below it, walk
+    // forward from the cursor instead (the anchor is below).
+    BOOL bAnchorFirst = FALSE;
+    HSTREEITEM h = hAnchor;
+    while (h != ITEM_NULL)
+    {
+        if (h == hCursor)
+        {
+            bAnchorFirst = TRUE;
+            break;
+        }
+        h = m_adapter->GetNextVisibleItem(h);
+    }
+    HSTREEITEM hLo = bAnchorFirst ? hAnchor : hCursor;
+    HSTREEITEM hHi = bAnchorFirst ? hCursor : hAnchor;
+
+    // Collect the span once and mark it, so membership tests below are cheap.
+    SMap<HSTREEITEM, BOOL> inSpan;
+    SArray<HSTREEITEM> arrSpan;
+    h = hLo;
+    while (h != ITEM_NULL)
+    {
+        inSpan[h] = TRUE;
+        arrSpan.Add(h);
+        if (h == hHi)
+            break;
+        h = m_adapter->GetNextVisibleItem(h);
+    }
+
+    // Deselect everything outside the span (snapshot first: RemoveSelItem
+    // mutates the map while firing events).
+    SArray<HSTREEITEM> arrStale;
+    for (SPOSITION pos = m_mapSelItems.GetStartPosition(); pos;)
+    {
+        HSTREEITEM hSel;
+        BOOL bVal;
+        m_mapSelItems.GetNextAssoc(pos, hSel, bVal);
+        if (!inSpan.Lookup(hSel))
+            arrStale.Add(hSel);
+    }
+    for (int i = 0; i < (int)arrStale.GetCount(); i++)
+    {
+        RemoveSelItem(arrStale[i]);
+    }
+    // Select everything inside the span that is not selected yet.
+    for (int i = 0; i < (int)arrSpan.GetCount(); i++)
+    {
+        if (!IsItemSelected(arrSpan[i]))
+            AddSelItem(arrSpan[i]);
+    }
+}
+
 void STreeView::AddSelItem(HSTREEITEM hItem)
 {
     if (hItem == ITEM_NULL)
+        return;
+
+    // Already in the multi-selection map: the state does not change and no
+    // per-item event fires.
+    const ItemSelectionMap::CPair *pPair = m_mapSelItems.Lookup(hItem);
+    if (pPair && pPair->m_value)
         return;
 
     m_mapSelItems[hItem] = TRUE;
@@ -1803,6 +1956,11 @@ void STreeView::AddSelItem(HSTREEITEM hItem)
         pItem->SetSelected(TRUE);
         RedrawItem(pItem);
     }
+
+    EventTreeItemSelChanged evt(this);
+    evt.hItem = hItem;
+    evt.bSelected = TRUE;
+    FireEvent(evt);
 }
 
 void STreeView::RemoveSelItem(HSTREEITEM hItem)
@@ -1810,7 +1968,9 @@ void STreeView::RemoveSelItem(HSTREEITEM hItem)
     if (hItem == ITEM_NULL)
         return;
 
-    m_mapSelItems.RemoveKey(hItem);
+    // Not in the multi-selection map: nothing to remove, no event.
+    if (!m_mapSelItems.RemoveKey(hItem))
+        return;
 
     // Update the visible item's state
     SItemPanel *pItem = GetItemPanel(hItem);
@@ -1819,27 +1979,30 @@ void STreeView::RemoveSelItem(HSTREEITEM hItem)
         pItem->ModifyItemState(0, WndState_Check);
         RedrawItem(pItem);
     }
+
+    EventTreeItemSelChanged evt(this);
+    evt.hItem = hItem;
+    evt.bSelected = FALSE;
+    FireEvent(evt);
 }
 
 void STreeView::ClearSelItems()
 {
-    // Update all visible items' states
+    // Route through RemoveSelItem so every deselected item fires its
+    // per-item selection-state event. Keys are collected first because
+    // RemoveSelItem mutates the map while firing events.
+    SArray<HSTREEITEM> arrSel;
     for (SPOSITION pos = m_mapSelItems.GetStartPosition(); pos;)
     {
         HSTREEITEM hItem;
         BOOL bVal;
         m_mapSelItems.GetNextAssoc(pos, hItem, bVal);
-
-        SItemPanel *pItem = GetItemPanel(hItem);
-        if (pItem)
-        {
-            SSLOGI() << "Clearing selection for item: " << hItem << " state=" << pItem->GetState();
-            pItem->ModifyItemState(0, WndState_Check);
-            RedrawItem(pItem);
-        }
+        arrSel.Add(hItem);
     }
-
-    m_mapSelItems.RemoveAll();
+    for (int i = 0; i < (int)arrSel.GetCount(); i++)
+    {
+        RemoveSelItem(arrSel[i]);
+    }
 }
 
 BOOL STreeView::IsItemSelected(HSTREEITEM hItem) const
@@ -1847,27 +2010,48 @@ BOOL STreeView::IsItemSelected(HSTREEITEM hItem) const
     if (hItem == ITEM_NULL)
         return FALSE;
 
+    if (!m_bMultiSel)
+    {
+        // Single-selection mode: the anchor m_hSelected is the selection
+        // record.
+        return hItem == m_hSelected;
+    }
+    // Multi-selection mode: the map is the only selection record; the
+    // anchor is just the keyboard cursor there.
     const ItemSelectionMap::CPair *pVal = m_mapSelItems.Lookup(hItem);
     return pVal && pVal->m_value;
 }
 
 int STreeView::GetSelItemCount() const
 {
-    return m_mapSelItems.GetCount();
+    if (m_bMultiSel)
+        return m_mapSelItems.GetCount();
+    // Single-selection mode: 1 while the anchor is set.
+    return m_hSelected != ITEM_NULL ? 1 : 0;
 }
 
 int STreeView::GetSelItems(HSTREEITEM *items, int nMaxCount) const
 {
-    int i = 0;
-    for (SPOSITION pos = m_mapSelItems.GetStartPosition(); pos && nMaxCount > 0;)
+    if (m_bMultiSel)
     {
-        HSTREEITEM hItem;
-        BOOL bVal;
-        m_mapSelItems.GetNextAssoc(pos, hItem, bVal);
-        items[i++] = hItem;
-        nMaxCount--;
+        int i = 0;
+        for (SPOSITION pos = m_mapSelItems.GetStartPosition(); pos && nMaxCount > 0;)
+        {
+            HSTREEITEM hItem;
+            BOOL bVal;
+            m_mapSelItems.GetNextAssoc(pos, hItem, bVal);
+            items[i++] = hItem;
+            nMaxCount--;
+        }
+        return i;
     }
-    return i;
+    // Single-selection mode: report the anchor.
+    if (m_hSelected != ITEM_NULL && nMaxCount > 0)
+    {
+        items[0] = m_hSelected;
+        return 1;
+    }
+    return 0;
 }
 
 void STreeView::DrawLines(IRenderTarget *pRT, const CRect &rc, HSTREEITEM hItem)
@@ -1991,6 +2175,89 @@ BOOL STreeView::OnDragCancelCapture(int reason)
 void STreeView::OnDragClearItemCapture()
 {
     m_itemCapture = NULL;
+}
+
+BOOL STreeView::IsRubberBandSelEnabled() const
+{
+    return m_bMultiSel && IsBandSelEnabled() && m_adapter != NULL && m_tvItemLocator != NULL;
+}
+
+void STreeView::OnRubberBandStart()
+{
+    m_hBandOldSel = m_hSelected;
+    m_arrBandSnapshot.RemoveAll();
+    for (SPOSITION pos = m_mapSelItems.GetStartPosition(); pos;)
+    {
+        HSTREEITEM hItem;
+        BOOL bVal;
+        m_mapSelItems.GetNextAssoc(pos, hItem, bVal);
+        m_arrBandSnapshot.Add(hItem);
+    }
+}
+
+void STreeView::OnRubberBandSelect(const CRect &rcBand, BOOL bAdd)
+{
+    if (!m_adapter || !m_tvItemLocator)
+        return;
+
+    if (!bAdd)
+        ClearSelItems();
+
+    // Only visible (materialized) items can be hit by the band.
+    CRect rcClient = GetClientRect();
+    HSTREEITEM hLast = ITEM_NULL;
+    HSTREEITEM hItem = m_adapter->GetFirstVisibleItem();
+    while (hItem != ITEM_NULL)
+    {
+        int nTop = m_tvItemLocator->Item2Position(hItem) - m_siVer.nPos + rcClient.top;
+        int nHei = m_tvItemLocator->GetItemHeight(hItem);
+        CRect rcItem(rcClient.left, nTop, rcClient.right, nTop + nHei);
+        if (nTop > rcBand.bottom)
+            break; // items below the band, positions keep increasing
+        CRect rcInter;
+        if (rcInter.IntersectRect(rcItem, rcBand))
+        {
+            AddSelItem(hItem);
+            hLast = hItem;
+        }
+        else if (!bAdd && IsItemSelected(hItem))
+        {
+            RemoveSelItem(hItem);
+        }
+        hItem = m_adapter->GetNextVisibleItem(hItem);
+    }
+    if (hLast != ITEM_NULL)
+        m_hSelected = hLast;
+}
+
+void STreeView::OnRubberBandEnd(const CRect &rcBand, BOOL bCancelled)
+{
+    if (bCancelled)
+    {
+        // ESC / external cancel: restore the selection taken at band start.
+        // Every restored item fires its per-item event
+        // (EventTreeItemSelChanged) via AddSelItem / RemoveSelItem; the
+        // anchor-style SelChanged is a single-selection event and is not
+        // fired for multi-selection bands.
+        ClearSelItems();
+        for (int i = 0; i < (int)m_arrBandSnapshot.GetCount(); i++)
+        {
+            AddSelItem(m_arrBandSnapshot[i]);
+        }
+        m_arrBandSnapshot.RemoveAll();
+        // Restore the cursor unconditionally, matching the other five
+        // controls: when the band started with no selection the cursor goes
+        // back to "none" instead of staying at the last banded item.
+        m_hSelected = m_hBandOldSel;
+        m_hSelAnchor = m_hSelected;
+        Invalidate();
+    }
+    else
+    {
+        // Normal end: the cursor stayed on the last banded item; the range
+        // anchor follows it so the next Shift+arrow works from there.
+        m_hSelAnchor = m_hSelected;
+    }
 }
 
 SNSEND

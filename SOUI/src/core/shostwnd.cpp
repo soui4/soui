@@ -252,7 +252,8 @@ HWND SHostWnd::CreateEx(HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, 
         xmlRoot = OnGetInitXmlNode(xmlDoc);
         if (!xmlRoot)
         {
-            SSLOGW() << "OnGetInitXmlNode return empty xml";
+            if (!m_strXmlLayout.IsEmpty())
+                SSLOGW() << "OnGetInitXmlNode return empty xml, layoutId=" << m_strXmlLayout.c_str();
         }
         else
         {
@@ -1519,52 +1520,16 @@ BOOL SHostWnd::AnimateHostWindow(DWORD dwTime, DWORD dwFlags)
     }
 }
 
-BOOL SHostWnd::RegisterTimelineHandler(ITimelineHandler *pHandler)
+void SHostWnd::OnTimelineRequestChanged(BOOL bHasTimelineRequest)
 {
-    bool bEmpty1 = m_timelineHandlerMgr.IsEmpty();
-    BOOL bRet = SwndContainerImpl::RegisterTimelineHandler(pHandler);
-    bool bEmpty2 = m_timelineHandlerMgr.IsEmpty();
-    if (bEmpty1 && !bEmpty2)
+    if (bHasTimelineRequest)
     {
         SNativeWnd::SetTimer(kPulseTimer, ITimelineHandler::kPulseInterval, NULL);
     }
-    return bRet;
-}
-
-BOOL SHostWnd::UnregisterTimelineHandler(ITimelineHandler *pHandler)
-{
-    bool bEmpty1 = m_timelineHandlerMgr.IsEmpty();
-    BOOL bRet = SwndContainerImpl::UnregisterTimelineHandler(pHandler);
-    bool bEmpty2 = m_timelineHandlerMgr.IsEmpty();
-    if (!bEmpty1 && bEmpty2)
+    else
     {
         SNativeWnd::KillTimer(kPulseTimer);
     }
-    return bRet;
-}
-
-BOOL SHostWnd::RegisterValueAnimator(IValueAnimator *pAnimator)
-{
-    bool bEmpty1 = m_timelineHandlerMgr.IsEmpty();
-    BOOL bRet = SwndContainerImpl::RegisterValueAnimator(pAnimator);
-    bool bEmpty2 = m_timelineHandlerMgr.IsEmpty();
-    if (bEmpty1 && !bEmpty2)
-    {
-        SNativeWnd::SetTimer(kPulseTimer, ITimelineHandler::kPulseInterval, NULL);
-    }
-    return bRet;
-}
-
-BOOL SHostWnd::UnregisterValueAnimator(IValueAnimator *pAnimator)
-{
-    bool bEmpty1 = m_timelineHandlerMgr.IsEmpty();
-    BOOL bRet = SwndContainerImpl::UnregisterValueAnimator(pAnimator);
-    bool bEmpty2 = m_timelineHandlerMgr.IsEmpty();
-    if (!bEmpty1 && bEmpty2)
-    {
-        SNativeWnd::KillTimer(kPulseTimer);
-    }
-    return bRet;
 }
 
 LPCWSTR SHostWnd::GetTranslatorContext() const
