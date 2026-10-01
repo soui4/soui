@@ -140,4 +140,6 @@
   <!-- 消消乐 SVG 重制版:7 态糖果风棋子 + 10 态七段 LED 数字 -->
   <imglist name="svg_xxl_icons" src="svg:xxl_icons" states="7"/>
   <imglist name="svg_xxl_digits" src="svg:xxl_digits" states="10"/>
+  <!-- 消消乐消除爆发特效(金色星芒冲击波,配合 anim:xxl_fx_pop) -->
+  <imglist name="skin_xxl_fx" src="svg:xxl_fx"/>
 </skin>

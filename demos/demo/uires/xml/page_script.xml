@@ -48,7 +48,9 @@
         </window>
         <stack size="0,-2" weight="1" curSel="-2">
           <window size="-2,-2" name="wnd_xxl_board" layout="gridlayout" columnCount="7" gravity="fill"/>
-          <window size="-2,-2" name="wnd_xxl_aniframe" visible="0" msgTransparent="1"/>
+          <window size="-2,-2" name="wnd_xxl_aniframe" msgTransparent="1">
+            <img name="wnd_xxl_fx" skin="skin_xxl_fx" size="96,96"/>
+          </window>
         </stack>
       </window>
   </page>

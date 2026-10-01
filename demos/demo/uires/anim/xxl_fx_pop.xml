@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 消除爆发特效(参考 cnchess pc_theme anim/fx_pop.xml 三段缩放):
+     pop in 0.2 -> 1.15, settle 1.15 -> 1.0, hold 后收缩消失 -->
+<set fillAfter="true" shareInterpolator="false">
+    <scale duration="260" startOffset="0" fromXScale="0.2" toXScale="1.15" fromYScale="0.2" toYScale="1.15" pivotX="50%" pivotY="50%" interpolator="Decelerate"/>
+    <scale duration="140" startOffset="260" fromXScale="1.15" toXScale="1.0" fromYScale="1.15" toYScale="1.0" pivotX="50%" pivotY="50%" interpolator="Decelerate" fillAfter="true"/>
+    <scale duration="300" startOffset="1350" fromXScale="1.0" toXScale="0.05" fromYScale="1.0" toYScale="0.05" pivotX="50%" pivotY="50%" interpolator="Accelerate" fillAfter="true"/>
+</set>

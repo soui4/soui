@@ -274,6 +274,7 @@ xxl = {
 	copy_seq = 0;    -- 浮层副本 id 序号(全局唯一)
 	ani_move = nil;  -- 模板动画(animator:xxl_move)
 	ani_sel = nil;   -- 选中标记动画(anim:xxl_scale_select)
+	ani_fx = nil;    -- 消除爆发特效动画(anim:xxl_fx_pop,cnchess kfx_pop 同款)
 	root = nil; wndBoard = nil; aniframe = nil;
 };
 
@@ -691,6 +692,8 @@ end
 -- js onAnimatorGroupEnd2: 消除动画结束,启动上方元素下落(每列被清格子上方的格子各落一格)
 function xxl_on_clear_end(g)
 	local samex = g.samex;
+	-- 消除瞬间爆发特效:>=3 连全显示,len>=4 特效放大(参考 cnchess ShowGameFx)
+	xxl_show_fx(samex.x + math.floor((samex.len-1)/2), samex.y, samex.len >= 4);
 	if samex.y > 0 then
 		local ctxId = xxl_new_ctx("drop", { samex=samex });
 		local group = NewAnimatorGroup();
@@ -739,6 +742,44 @@ end
 function xxl_get_ele_rect(pos)
 	local ele = xxl.wndBoard:FindChildByID(xxl_pos2id(pos),-1);
 	return ele:GetWindowRect2();
+end
+
+-- cnchess CChessGame::HideGameFx 同款:隐藏特效窗口(不传 fx 则自己查)
+function xxl_hide_fx(fx)
+	if fx == nil and xxl.aniframe then
+		fx = xxl.aniframe:FindChildByNameA("wnd_xxl_fx",-1);
+	end
+	if fx then fx:SetVisible(false,true); end
+end
+
+-- cnchess CChessGame::ShowGameFx 同款:先隐藏旧特效(终止可能运行中的旧动画),
+-- 再 clone 缓存动画重播;SetAnimation 之后才 SetVisible——顺序关键:替换运行中
+-- 动画可能触发旧动画的 stop 事件,若先显示会被旧 stop 一并藏掉。
+-- (cx,cy)=消除段中心格;boost=大消除(len>=4)特效放大
+function xxl_show_fx(cx,cy,boost)
+	if xxl.aniframe == nil or xxl.ani_fx == nil then
+		xxl_slog("show_fx SKIP: aniframe=" .. tostring(xxl.aniframe) .. " ani_fx=" .. tostring(xxl.ani_fx));
+		return
+	end
+	local fx = xxl.aniframe:FindChildByNameA("wnd_xxl_fx",-1);
+	if fx == nil then
+		xxl_slog("show_fx SKIP: fx widget NOT FOUND");
+		return
+	end
+	xxl_hide_fx(fx);
+	local rc = xxl_get_ele_rect({x=cx,y=cy});
+	local scale = 1.5 + (boost and 0.5 or 0);
+	local w = math.floor(rc:Width()*scale); local h = math.floor(rc:Height()*scale);
+	local px = rc.left + math.floor(rc:Width()/2);
+	local py = rc.top + math.floor(rc:Height()/2);
+	fx:Move(CRect(px - math.floor(w/2), py - math.floor(h/2), px - math.floor(w/2) + w, py - math.floor(h/2) + h));
+	local ani = xxl.ani_fx:clone();
+	fx:SetAnimation(ani);
+	ani:Release();
+	fx:SetVisible(true,true);
+	local rcFx = fx:GetWindowRect2();
+	xxl_slog("show_fx: rcFx=" .. rcFx.left .. "," .. rcFx.top .. "," .. rcFx.right .. "," .. rcFx.bottom
+		.. " vis=" .. fx:IsVisible(FALSE) .. " aniframe_vis=" .. xxl.aniframe:IsVisible(FALSE));
 end
 
 -- js onGetSameX: 横向 3 连聚拢到中心
@@ -816,6 +857,8 @@ end
 -- js onAnimatorGroupEndY2: 纵向消除结束,上方格子整体下移 len 格
 function xxl_on_clear_end_y(g)
 	local samey = g.samey;
+	-- 消除瞬间爆发特效(横向/纵向同款,len>=4 放大)
+	xxl_show_fx(samey.x, samey.y + math.floor((samey.len-1)/2), samey.len >= 4);
 	if samey.y > 0 then
 		local ctxId = xxl_new_ctx("drop_y", { samey=samey });
 		local group = NewAnimatorGroup();
@@ -939,6 +982,13 @@ function xxl_restart_internal()
 	xxl_show_score();
 	xxl_show_combo();
 	xxl_init_board();
+	-- TEMP-FX-PROBE: 强造第 3 行 3 连,保证下次任意交换必触发消除(验证特效后删除)
+	local st = xxl.board[3][3];
+	xxl.board[3][0] = st; xxl.board[3][1] = st; xxl.board[3][2] = st;
+	xxl_on_grid_changed({x=0,y=3}, false);
+	xxl_on_grid_changed({x=1,y=3}, false);
+	xxl_on_grid_changed({x=2,y=3}, false);
+	xxl_slog("fx-probe: forced match at row 3, state=" .. st);
 end
 
 -- 重新开始按钮
@@ -1002,6 +1052,7 @@ function xxl_init(root)
 		xxl_slog("init: load animator:xxl_move failed");
 	end
 	xxl.ani_sel = GetApp():LoadAnimation("anim:xxl_scale_select");
+	xxl.ani_fx = GetApp():LoadAnimation("anim:xxl_fx_pop");
 	-- 统一走 restart 复位:coin/score/combo/gameover 清零 + 受约束发牌建盘
 	-- (否则上一局 gameover=true 残留,重进页面金币 0 且不再弹结束框)
 	xxl_restart_internal();
