@@ -254,11 +254,11 @@ end
   - settle 稳定后检测无步可走 => 自动洗牌(xxl_redeal,带翻页动画);
   - 提示按钮(xxl_on_hint):找一个可行交换,两枚棋子复用选中脉冲动画;
   - 金币耗尽 => 游戏结束弹窗(SMessageBox),确定后重开。
-棋盘 id 约定: xxl_base_id + y*7 + x (x,y 从 0 开始)。
+棋盘 id 约定: xxl_base_id + y*8 + x (x,y 从 0 开始)。
 ]]
 
 xxl_base_id = 30000;
-xxl_row = 7; xxl_col = 7;
+xxl_row = 8; xxl_col = 8;
 xxl_max_state = 7; xxl_min_same = 3;
 
 xxl = {
@@ -1031,7 +1031,7 @@ function xxl_init_board()
 	xxl.ani_list = {};
 	xxl.ani_count = 0;
 	xxl.wndBoard:DestroyAllChildren();
-	xxl.wndBoard:SetAttribute(T"columnCount", T"7", false);
+	xxl.wndBoard:SetAttribute(T"columnCount", T"8", false);
 	local xml = "";
 	local eles = xxl_row * xxl_col;
 	for i = 0, eles-1 do

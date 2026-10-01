@@ -7,7 +7,7 @@
   - 跑马机: game_wnd/game_canvas/players/flag_win,on_init 时初始化,
     on_run 启动计时器推进赛马,on_bet 下注,on_canvas_size 跟随布局;
   - 消消乐: 参考 soxxl(基于 soui4js 的消消乐)移植并完善为市场常见玩法,
-    7x7 棋盘由 lua 的 xxl_init 在宿主初始化时动态创建,
+    8x8 棋盘由 lua 的 xxl_init 在宿主初始化时动态创建,
     每个格子是 t.g.xxl_ele 模板实例(values/template.xml,SVG 糖果风棋子),
     stack 的 on_command 属性直接把点击事件路由到 lua 全局函数 xxl_on_cmd;
     交换/消除/下沉动画使用 SValueAnimator(animator:xxl_move) + 动画组,
@@ -66,10 +66,10 @@
         <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
         <text text="交换相邻棋子凑 3 连消除&#10;连击有加分&#10;无路可走自动洗牌" font="size:11" colorText="@color/clr_text_sub" multilines="1"/>
       </window>
-      <!-- 棋盘卡片:7x7 gridlayout 棋盘 + 顶层动画浮层(名字/层级为 lua 依赖,不可改动) -->
+      <!-- 棋盘卡片:8x8 gridlayout 棋盘 + 顶层动画浮层(名字/层级为 lua 依赖,不可改动) -->
       <window size="0,-2" weight="1" layout="vbox" padding="12,12,12,12" colorBkgnd="@color/clr_card_bg">
         <stack size="-2,0" weight="1" curSel="-2" colorBkgnd="@color/clr_window_bg">
-          <window size="-2,-2" name="wnd_xxl_board" layout="gridlayout" columnCount="7" gravity="fill"/>
+          <window size="-2,-2" name="wnd_xxl_board" layout="gridlayout" columnCount="8" gravity="fill"/>
           <window size="-2,-2" name="wnd_xxl_aniframe" msgTransparent="1"/>
         </stack>
       </window>
