@@ -345,6 +345,7 @@ function xxl_on_grid_changed(pos, enableAni)
 	if stackApi == nil then return end
 	stackApi:SelectPage(xxl.board[pos.y][pos.x], enableAni);
 	stackApi:Release();
+	ele:Invalidate(); -- SelectPage 内部翻页在不可见态可能不失效,强制补一次重绘
 end
 
 -- js setGridState
@@ -616,7 +617,7 @@ function xxl_begin_move(aniframe, state, ele, rcFrom, rcTo)
 	ele:SetVisible(false,false);
 	local ani_widget = xxl_build_ani_widget(aniframe, state);
 	if ani_widget == nil then
-		ele:SetVisible(true,false);
+		ele:SetVisible(true,true); -- 失败回滚:恢复可见必须补失效(无副本覆盖此区域)
 		xxl_slog("begin_move: build ani widget failed");
 		return nil;
 	end
@@ -648,7 +649,9 @@ function xxl_ani_end(luaAni, ctxId)
 		return
 	end
 	if c.ani_widget then c.ani_widget:Destroy(); end
-	c.ele:SetVisible(true,false);
+	-- bUpdate=true:格子隐藏期间可能被 SelectPage 直切过页(invalidate 发生在
+	-- 不可见态被吞),恢复可见时必须补一次失效,否则偶发空白格
+	c.ele:SetVisible(true,true);
 	xxl.ani_ctx[ctxId] = nil;
 end
 
@@ -968,8 +971,9 @@ function xxl_on_click(idFrom, eleSender)
 			end
 			if nAdded == 0 then
 				xxl.ani_ctx[ctxId] = nil;
-				ele1:SetVisible(true,false);
-				ele2:SetVisible(true,false);
+				-- 回滚:两格恢复可见,补失效(此分支无动画副本覆盖)
+				ele1:SetVisible(true,true);
+				ele2:SetVisible(true,true);
 				return 0;
 			end
 			xxl.ani_count = xxl.ani_count + 1;
