@@ -434,12 +434,22 @@ end
 
 -- js buildAniWidget: 在浮层上创建与格子同状态的副本。
 -- 副本 id 全局唯一(与棋盘 id 空间隔离),见文件头"刻意偏离 1"。
+-- 🚨 创建后必须 SelectPage(state):模板 curSel="0" 默认停在 0 号棋子,
+--    漏掉会让下沉/交换期间所有副本显示同一枚棋子(js 同款步骤)。
 function xxl_build_ani_widget(aniframe, state)
 	xxl.copy_seq = xxl.copy_seq + 1;
 	local cid = xxl_base_id + 100000 + xxl.copy_seq;
 	local xml = "<t:g.xxl_ele><data id=\"" .. cid .. "\"/></t:g.xxl_ele>";
 	aniframe:CreateChildrenFromXml(xml);
-	return aniframe:FindChildByID(cid,-1);
+	local ele = aniframe:FindChildByID(cid,-1);
+	if ele and state then
+		local stackApi = QiIStackView(ele);
+		if stackApi then
+			stackApi:SelectPage(state,false);
+			stackApi:Release();
+		end
+	end
+	return ele;
 end
 
 -- js 内联的 new SValueAnimator + CopyFrom + SetRange + 回调 + Start:
