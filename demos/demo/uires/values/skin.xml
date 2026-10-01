@@ -142,4 +142,6 @@
   <imglist name="svg_xxl_digits" src="svg:xxl_digits" states="10"/>
   <!-- 消消乐消除爆发特效(金色星芒冲击波,配合 anim:xxl_fx_pop) -->
   <imglist name="skin_xxl_fx" src="svg:xxl_fx"/>
+  <!-- 消消乐提示特效(青色冰环,配合 anim:xxl_fx_ring) -->
+  <imglist name="skin_xxl_fx2" src="svg:xxl_fx2"/>
 </skin>

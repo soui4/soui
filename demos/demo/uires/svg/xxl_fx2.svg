@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96">
+  <defs>
+    <radialGradient id="core" cx="48.0" cy="48.0" r="26" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.95"/>
+      <stop offset="0.55" stop-color="#9BE7FF" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#4FC3F7" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- 双层扩散环 -->
+  <circle cx="48.0" cy="48.0" r="42" fill="none" stroke="#4FC3F7" stroke-width="2.6" stroke-opacity="0.85"/>
+  <circle cx="48.0" cy="48.0" r="33" fill="none" stroke="#E1F8FF" stroke-width="1.6" stroke-opacity="0.7"/>
+  <circle cx="48.0" cy="48.0" r="24" fill="none" stroke="#4FC3F7" stroke-width="1.2" stroke-opacity="0.45"/>
+
+  <!-- 中心辉光 -->
+  <circle cx="48.0" cy="48.0" r="26" fill="url(#core)"/>
+  <circle cx="48.0" cy="48.0" r="7" fill="#FFFFFF" fill-opacity="0.95"/>
+
+  <!-- 6 颗冰晶菱形 -->
+  <polygon points="48.0,2.5 53.5,8.0 48.0,13.5 42.5,8.0" fill="#BFF3FF" stroke="#4FC3F7" stroke-width="1.4" fill-opacity="0.95"/>
+  <polygon points="87.4,25.3 85.4,32.8 77.9,30.8 79.9,23.2" fill="#BFF3FF" stroke="#4FC3F7" stroke-width="1.4" fill-opacity="0.95"/>
+  <polygon points="87.4,70.8 79.9,72.8 77.9,65.2 85.4,63.2" fill="#BFF3FF" stroke="#4FC3F7" stroke-width="1.4" fill-opacity="0.95"/>
+  <polygon points="48.0,93.5 42.5,88.0 48.0,82.5 53.5,88.0" fill="#BFF3FF" stroke="#4FC3F7" stroke-width="1.4" fill-opacity="0.95"/>
+  <polygon points="8.6,70.8 10.6,63.2 18.1,65.2 16.1,72.8" fill="#BFF3FF" stroke="#4FC3F7" stroke-width="1.4" fill-opacity="0.95"/>
+  <polygon points="8.6,25.2 16.1,23.2 18.1,30.7 10.6,32.8" fill="#BFF3FF" stroke="#4FC3F7" stroke-width="1.4" fill-opacity="0.95"/>
+</svg>

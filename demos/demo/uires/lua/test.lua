@@ -274,7 +274,8 @@ xxl = {
 	copy_seq = 0;    -- 浮层副本 id 序号(全局唯一)
 	ani_move = nil;  -- 模板动画(animator:xxl_move)
 	ani_sel = nil;   -- 选中标记动画(anim:xxl_scale_select)
-	ani_fx = nil;    -- 消除爆发特效动画(anim:xxl_fx_pop,cnchess kfx_pop 同款)
+	fx_ani = {};     -- 特效动画缓存(key="anim:xxx",pop_fx 懒加载)
+	fx_seq = 0;      -- 特效窗口 id 序号(每次动态创建,+xxl_fx_base_id)
 	root = nil; wndBoard = nil; aniframe = nil;
 };
 
@@ -558,6 +559,11 @@ end
 
 -- 提示:找一个可行交换,两枚棋子做选中脉冲动画(复用选中动画,点击即被替换)
 function xxl_on_hint(args)
+	-- 提示按钮上播放青色冰环特效(与重开按钮的金色星芒区分)
+	local btn = xxl.root:FindChildByNameA("btn_xxl_hint",-1);
+	if btn then
+		xxl_pop_fx(btn:GetWindowRect2(), false, "skin_xxl_fx2", "anim:xxl_fx_ring");
+	end
 	if xxl.wndBoard == nil or xxl.coin <= 0 then return 0 end
 	if xxl.ani_count ~= 0 then return 0 end -- 动画进行中不给提示
 	local m = xxl_find_move();
@@ -646,11 +652,9 @@ function xxl_ani_end(luaAni, ctxId)
 	xxl.ani_ctx[ctxId] = nil;
 end
 
--- js checkAnimatorList: 无存活动画组时隐藏浮层
+-- 浮层常驻可见(msgTransparent=1 只显示不挡交互,见 page_script.xml),
+-- 不再随动画启停切换可见性;特效窗口也因此不受浮层显隐影响
 function xxl_check_aniframe()
-	if xxl.aniframe and xxl.ani_count == 0 then
-		xxl.aniframe:SetVisible(false,true);
-	end
 end
 
 -- 动画组结束分发(js onAnimatorGroupEnd / 2 / 3 / Y2 / Y3)
@@ -692,8 +696,8 @@ end
 -- js onAnimatorGroupEnd2: 消除动画结束,启动上方元素下落(每列被清格子上方的格子各落一格)
 function xxl_on_clear_end(g)
 	local samex = g.samex;
-	-- 消除瞬间爆发特效:>=3 连全显示,len>=4 特效放大(参考 cnchess ShowGameFx)
-	xxl_show_fx(samex.x + math.floor((samex.len-1)/2), samex.y, samex.len >= 4);
+	-- 消除瞬间爆发特效:>=3 连全显示,len>=4 特效放大
+	xxl_pop_fx(xxl_get_ele_rect({x=samex.x + math.floor((samex.len-1)/2), y=samex.y}), samex.len >= 4);
 	if samex.y > 0 then
 		local ctxId = xxl_new_ctx("drop", { samex=samex });
 		local group = NewAnimatorGroup();
@@ -744,42 +748,62 @@ function xxl_get_ele_rect(pos)
 	return ele:GetWindowRect2();
 end
 
--- cnchess CChessGame::HideGameFx 同款:隐藏特效窗口(不传 fx 则自己查)
-function xxl_hide_fx(fx)
-	if fx == nil and xxl.aniframe then
-		fx = xxl.aniframe:FindChildByNameA("wnd_xxl_fx",-1);
-	end
-	if fx then fx:SetVisible(false,true); end
+-- 消除爆发特效(参考 cnchess CChessGame::ShowGameFx + sprite_fx_*/kfx_pop 模式):
+-- 每次在浮层上动态创建一个独立特效窗口播放 clone 出来的 anim:xxl_fx_pop,
+-- 动画结束由 on_animation_stop 事件(xxw_fx_stop)自动销毁 => 支持多处特效并发。
+xxl_fx_base_id = 250000; -- 特效窗口 id 空间(棋盘 30000+,浮层副本 130000+,互不重叠)
+
+-- 特效动画播完(SOUI EventSwndAnimationStop) => 销毁特效窗口
+function xxw_fx_stop(args)
+	local fx = toSWindow(args:Sender());
+	if fx then fx:Destroy(); end
 end
 
--- cnchess CChessGame::ShowGameFx 同款:先隐藏旧特效(终止可能运行中的旧动画),
--- 再 clone 缓存动画重播;SetAnimation 之后才 SetVisible——顺序关键:替换运行中
--- 动画可能触发旧动画的 stop 事件,若先显示会被旧 stop 一并藏掉。
--- (cx,cy)=消除段中心格;boost=大消除(len>=4)特效放大
-function xxl_show_fx(cx,cy,boost)
-	if xxl.aniframe == nil or xxl.ani_fx == nil then
-		xxl_slog("show_fx SKIP: aniframe=" .. tostring(xxl.aniframe) .. " ani_fx=" .. tostring(xxl.ani_fx));
+-- 在 rc 中心播放一次特效;boost=true 时放大(大消除)。
+-- szSkin/szAnim 可指定不同外观与动画:重开按钮=金星芒(skin_xxl_fx/anim:xxl_fx_pop),
+-- 提示按钮=青色冰环(skin_xxl_fx2/anim:xxl_fx_ring);缺省即游戏内消除用的金星芒。
+-- 坐标模型:SOUI4 全树共享宿主窗口坐标系(Swnd.cpp DispatchPaint 无逐级平移,
+-- GetWindowRect2 一律相对宿主)——格子/按钮的 rect 直接可用,无需任何换算。
+-- 定位用显式 Move(浮动模式,立即生效):pos 属性要等下一次 relayout 才生效,
+-- 上一版靠 pos 定位导致特效时有时无/错位。
+function xxl_pop_fx(rc, boost, szSkin, szAnim)
+	if xxl.aniframe == nil then
+		xxl_slog("pop_fx SKIP: aniframe nil");
 		return
 	end
-	local fx = xxl.aniframe:FindChildByNameA("wnd_xxl_fx",-1);
-	if fx == nil then
-		xxl_slog("show_fx SKIP: fx widget NOT FOUND");
+	local skin = szSkin or "skin_xxl_fx";
+	local key = szAnim or "anim:xxl_fx_pop";
+	local aniCache = xxl.fx_ani[key];
+	if aniCache == nil then
+		aniCache = GetApp():LoadAnimation(key);
+		xxl.fx_ani[key] = aniCache;
+	end
+	if aniCache == nil then
+		xxl_slog("pop_fx SKIP: LoadAnimation failed: " .. key);
 		return
 	end
-	xxl_hide_fx(fx);
-	local rc = xxl_get_ele_rect({x=cx,y=cy});
+	xxl.fx_seq = xxl.fx_seq + 1;
+	local fid = xxl_fx_base_id + xxl.fx_seq;
 	local scale = 1.5 + (boost and 0.5 or 0);
 	local w = math.floor(rc:Width()*scale); local h = math.floor(rc:Height()*scale);
 	local px = rc.left + math.floor(rc:Width()/2);
 	local py = rc.top + math.floor(rc:Height()/2);
+	local xml = '<img id="' .. fid .. '" skin="' .. skin .. '"'
+		.. ' msgTransparent="1" visible="0" on_animation_stop="xxw_fx_stop"/>';
+	xxl.aniframe:CreateChildrenFromXml(xml);
+	local fx = xxl.aniframe:FindChildByID(fid,-1);
+	if fx == nil then
+		xxl_slog("pop_fx FAIL: fx window not created, id=" .. fid);
+		return
+	end
 	fx:Move(CRect(px - math.floor(w/2), py - math.floor(h/2), px - math.floor(w/2) + w, py - math.floor(h/2) + h));
-	local ani = xxl.ani_fx:clone();
+	-- cnchess 同款:clone 缓存动画再挂上,SetAnimation 后下一帧自动启动
+	local ani = aniCache:clone();
 	fx:SetAnimation(ani);
 	ani:Release();
+	-- 显示必须在 SetAnimation 之后:替换运行中动画可能触发旧动画 stop 事件
 	fx:SetVisible(true,true);
-	local rcFx = fx:GetWindowRect2();
-	xxl_slog("show_fx: rcFx=" .. rcFx.left .. "," .. rcFx.top .. "," .. rcFx.right .. "," .. rcFx.bottom
-		.. " vis=" .. fx:IsVisible(FALSE) .. " aniframe_vis=" .. xxl.aniframe:IsVisible(FALSE));
+	xxl_slog("pop_fx: #" .. xxl.fx_seq .. " " .. skin .. " @" .. (px - math.floor(w/2)) .. "," .. (py - math.floor(h/2)) .. " " .. w .. "x" .. h);
 end
 
 -- js onGetSameX: 横向 3 连聚拢到中心
@@ -858,7 +882,7 @@ end
 function xxl_on_clear_end_y(g)
 	local samey = g.samey;
 	-- 消除瞬间爆发特效(横向/纵向同款,len>=4 放大)
-	xxl_show_fx(samey.x, samey.y + math.floor((samey.len-1)/2), samey.len >= 4);
+	xxl_pop_fx(xxl_get_ele_rect({x=samey.x, y=samey.y + math.floor((samey.len-1)/2)}), samey.len >= 4);
 	if samey.y > 0 then
 		local ctxId = xxl_new_ctx("drop_y", { samey=samey });
 		local group = NewAnimatorGroup();
@@ -982,19 +1006,17 @@ function xxl_restart_internal()
 	xxl_show_score();
 	xxl_show_combo();
 	xxl_init_board();
-	-- TEMP-FX-PROBE: 强造第 3 行 3 连,保证下次任意交换必触发消除(验证特效后删除)
-	local st = xxl.board[3][3];
-	xxl.board[3][0] = st; xxl.board[3][1] = st; xxl.board[3][2] = st;
-	xxl_on_grid_changed({x=0,y=3}, false);
-	xxl_on_grid_changed({x=1,y=3}, false);
-	xxl_on_grid_changed({x=2,y=3}, false);
-	xxl_slog("fx-probe: forced match at row 3, state=" .. st);
 end
 
--- 重新开始按钮
+-- 重新开始按钮:先复位棋盘,再在按钮上播放金色星芒爆发特效
+-- (按钮 rect 与棋盘格子同处宿主坐标系,直接传给 pop_fx,无需换算)
 function xxl_on_restart(args)
 	if xxl.wndBoard == nil then return 0 end
 	xxl_restart_internal();
+	local btn = xxl.root:FindChildByNameA("btn_xxl_restart",-1);
+	if btn then
+		xxl_pop_fx(btn:GetWindowRect2(), true);
+	end
 	return 1;
 end
 
@@ -1052,7 +1074,7 @@ function xxl_init(root)
 		xxl_slog("init: load animator:xxl_move failed");
 	end
 	xxl.ani_sel = GetApp():LoadAnimation("anim:xxl_scale_select");
-	xxl.ani_fx = GetApp():LoadAnimation("anim:xxl_fx_pop");
+	-- 特效动画由 xxl_pop_fx 按 key 懒加载(xxl.fx_ani 缓存)
 	-- 统一走 restart 复位:coin/score/combo/gameover 清零 + 受约束发牌建盘
 	-- (否则上一局 gameover=true 残留,重进页面金币 0 且不再弹结束框)
 	xxl_restart_internal();

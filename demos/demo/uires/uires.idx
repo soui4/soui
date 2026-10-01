@@ -197,6 +197,7 @@
     <file name="alpha_out" path="anim\alpha_out.xml"/>
     <file name="xxl_scale_select" path="anim\xxl_scale_select.xml"/>
     <file name="xxl_fx_pop" path="anim\xxl_fx_pop.xml"/>
+    <file name="xxl_fx_ring" path="anim\xxl_fx_ring.xml"/>
   </anim>
   <valueAni>
     <file name="alphaAni" path="valueAni\alpha.xml"/>
@@ -230,6 +231,7 @@
 	<file name="xxl_icons" path="svg\xxl_icons.svg"/>
 	<file name="xxl_digits" path="svg\xxl_digits.svg"/>
 	<file name="xxl_fx" path="svg\xxl_fx.svg"/>
+	<file name="xxl_fx2" path="svg\xxl_fx2.svg"/>
   </svg>
   <xml>
 	<file name="roomlist" path="xml\roomlist.xml"/>

@@ -1,4 +1,4 @@
-//stamp:01dd519d02d50755
+//stamp:01dd51a34d82d5f2
 /*<------------------------------------------------------------------------------------------------->*/
 #define DEFINE_UIRES(name, type, file_path)\
     name type file_path
@@ -160,6 +160,7 @@ DEFINE_UIRES(alpha_in,	anim,	"uires/anim/alpha_in.xml")
 DEFINE_UIRES(alpha_out,	anim,	"uires/anim/alpha_out.xml")
 DEFINE_UIRES(xxl_scale_select,	anim,	"uires/anim/xxl_scale_select.xml")
 DEFINE_UIRES(xxl_fx_pop,	anim,	"uires/anim/xxl_fx_pop.xml")
+DEFINE_UIRES(xxl_fx_ring,	anim,	"uires/anim/xxl_fx_ring.xml")
 DEFINE_UIRES(alphaAni,	valueAni,	"uires/valueAni/alpha.xml")
 DEFINE_UIRES(colorAni,	valueAni,	"uires/valueAni/color.xml")
 DEFINE_UIRES(xxl_move,	animator,	"uires/animator/xxl_move.xml")
@@ -187,4 +188,5 @@ DEFINE_UIRES(container_bg,	svg,	"uires/svg/container_bg.svg")
 DEFINE_UIRES(xxl_icons,	svg,	"uires/svg/xxl_icons.svg")
 DEFINE_UIRES(xxl_digits,	svg,	"uires/svg/xxl_digits.svg")
 DEFINE_UIRES(xxl_fx,	svg,	"uires/svg/xxl_fx.svg")
+DEFINE_UIRES(xxl_fx2,	svg,	"uires/svg/xxl_fx2.svg")
 DEFINE_UIRES(roomlist,	xml,	"uires/xml/roomlist.xml")
