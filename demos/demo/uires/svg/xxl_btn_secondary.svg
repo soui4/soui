@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  xxl_btn_secondary.svg - 消消乐次级按钮底(药丸形,白底描边)
+  3 帧横排,每帧 100x40,总尺寸 300x40。
+  帧序:0=normal  1=hover  2=push
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="40" viewBox="0 0 300 40">
+  <!-- 帧0:normal 白底灰描边 -->
+  <rect x="0.5" y="0.5" width="99" height="39" rx="19" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+  <!-- 帧1:hover 浅蓝底蓝描边 -->
+  <rect x="100.5" y="0.5" width="99" height="39" rx="19" fill="#EFF6FF" stroke="#2563EB" stroke-width="1.5"/>
+  <!-- 帧2:push 深蓝描边 -->
+  <rect x="200.5" y="0.5" width="99" height="39" rx="19" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.8"/>
+</svg>

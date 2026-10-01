@@ -14,43 +14,66 @@
     回调经 exp_LuaValueAnimator.h 的包装进入 lua;
     wnd_xxl_aniframe 是动画浮层,动画期间把移动中的元素画在棋盘之上;
     金币/得分用 t:g.xxl_digit 七段 LED 翻页计数器(soxxl digit 同款),
-    完善点: 连击计分、无步可走自动洗牌、提示、游戏结束弹窗。
+    完善点: 连击计分、无步可走自动洗牌、提示、游戏结束弹窗;
+    功能按钮("重新开始"/"提示")为 SVG 药丸形底(3 态)+SVG 图标(3 态)
+    组合按钮(skin: xxl_btn_primary/xxl_btn_secondary)。
   棋盘/状态栏的名字与 id 约定见 test.lua 的 xxl_* 函数。
 -->
 <tabctrl pos="0,0,-0,-0" tabWidth="100" tabAlign="left" curSel="0" animateSteps="20"
          colorBkgnd="@color/clr_page_bg" colorText="@color/clr_title">
   <page title="消消乐">
-    <window size="full,full" layout="hbox" padding="15,12,15,15" interval="10">
-        <window size="170,-2" layout="vbox" interval="8">
-          <text text="消消乐" font="size:16,bold:1" colorText="@color/clr_title"/>
-          <text text="lua + SVG 完整版" font="size:12" colorText="@color/clr_text_sub"/>
-          <window size="-2,-1" layout="hbox" interval="6" extend_top="4">
-            <button name="btn_xxl_restart" size="76,30" on_command="xxl_on_restart">重新开始</button>
-            <button name="btn_xxl_hint" size="76,30" on_command="xxl_on_hint">提示</button>
+    <window size="full,full" layout="hbox" padding="15,12,15,15" interval="12">
+      <!-- 左侧信息卡片:标题 / SVG 功能按钮 / LED 计分区 / 玩法说明 -->
+      <window size="192,-2" layout="vbox" interval="10" padding="14,12,14,12" colorBkgnd="@color/clr_card_bg">
+        <!-- 标题行:糖果图标 + 标题/副标题 -->
+        <window size="-2,-1" layout="hbox" interval="8">
+          <img size="30,30" skin="svg_xxl_icons" iconIndex="0" layout_gravity="center" msgTransparent="1"/>
+          <window size="-1,-2" layout="vbox" interval="1">
+            <text text="消消乐" font="size:16,bold:1" colorText="@color/clr_title"/>
+            <text text="LUA + SVG 完整版" font="size:10" colorText="@color/clr_text_sub"/>
           </window>
-          <window size="-2,-1" layout="vbox" interval="3" extend_top="8">
-            <text text="金币" font="size:13" colorText="@color/clr_text_sub"/>
-            <window size="-2,-1" layout="hbox" interval="2">
-              <t:g.xxl_digit><data name="digit_coin_2"/></t:g.xxl_digit>
-              <t:g.xxl_digit><data name="digit_coin_1"/></t:g.xxl_digit>
-              <t:g.xxl_digit><data name="digit_coin_0"/></t:g.xxl_digit>
-            </window>
-            <text text="得分" extend_top="4" font="size:13" colorText="@color/clr_text_sub"/>
-            <window size="-2,-1" layout="hbox" interval="2">
-              <t:g.xxl_digit><data name="digit_score_2"/></t:g.xxl_digit>
-              <t:g.xxl_digit><data name="digit_score_1"/></t:g.xxl_digit>
-              <t:g.xxl_digit><data name="digit_score_0"/></t:g.xxl_digit>
-            </window>
-          </window>
-          <text name="txt_xxl_combo" text="" size="-2,-1" extend_top="6" font="size:13,bold:1" colorText="@color/orange"/>
-          <window size="0,0" weight="1"/>
-          <text text="交换相邻棋子凑 3 连消除;连击有加分;无路可走自动洗牌" font="size:11" colorText="@color/clr_text_sub" multilines="1"/>
         </window>
-        <stack size="0,-2" weight="1" curSel="-2">
+        <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
+        <!-- 功能按钮:SVG 药丸形底(3 态) + SVG 图标(3 态),重新开始=主色实底,提示=白底描边 -->
+        <button name="btn_xxl_restart" size="-2,36" skin="xxl_btn_primary" layout="hbox" cursor="hand" on_command="xxl_on_restart" tip="重新开始一局">
+          <window size="0,0" weight="1" msgTransparent="1"/>
+          <img size="16,16" skin="svg_xxl_btn_restart" msgTransparent="1"/>
+          <text text="重新开始" extend_left="6" font="size:13,bold:1" colorText="#FFFFFF" msgTransparent="1"/>
+          <window size="0,0" weight="1" msgTransparent="1"/>
+        </button>
+        <button name="btn_xxl_hint" size="-2,36" skin="xxl_btn_secondary" layout="hbox" cursor="hand" on_command="xxl_on_hint" tip="提示一步可行走法">
+          <window size="0,0" weight="1" msgTransparent="1"/>
+          <img size="16,16" skin="svg_xxl_btn_hint" msgTransparent="1"/>
+          <text text="提 示" extend_left="6" font="size:13,bold:1" colorText="@color/clr_primary" msgTransparent="1"/>
+          <window size="0,0" weight="1" msgTransparent="1"/>
+        </button>
+        <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
+        <!-- 计分区:七段 LED 翻页计数器 -->
+        <text text="金币" font="size:12" colorText="@color/clr_text_sub"/>
+        <window size="-2,-1" layout="hbox" interval="3">
+          <t:g.xxl_digit><data name="digit_coin_2"/></t:g.xxl_digit>
+          <t:g.xxl_digit><data name="digit_coin_1"/></t:g.xxl_digit>
+          <t:g.xxl_digit><data name="digit_coin_0"/></t:g.xxl_digit>
+        </window>
+        <text text="得分" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
+        <window size="-2,-1" layout="hbox" interval="3">
+          <t:g.xxl_digit><data name="digit_score_2"/></t:g.xxl_digit>
+          <t:g.xxl_digit><data name="digit_score_1"/></t:g.xxl_digit>
+          <t:g.xxl_digit><data name="digit_score_0"/></t:g.xxl_digit>
+        </window>
+        <text name="txt_xxl_combo" text="" size="-2,-1" extend_top="4" font="size:13,bold:1" colorText="@color/orange"/>
+        <window size="0,0" weight="1"/>
+        <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
+        <text text="交换相邻棋子凑 3 连消除&#10;连击有加分&#10;无路可走自动洗牌" font="size:11" colorText="@color/clr_text_sub" multilines="1"/>
+      </window>
+      <!-- 棋盘卡片:7x7 gridlayout 棋盘 + 顶层动画浮层(名字/层级为 lua 依赖,不可改动) -->
+      <window size="0,-2" weight="1" layout="vbox" padding="12,12,12,12" colorBkgnd="@color/clr_card_bg">
+        <stack size="-2,0" weight="1" curSel="-2" colorBkgnd="@color/clr_window_bg">
           <window size="-2,-2" name="wnd_xxl_board" layout="gridlayout" columnCount="7" gravity="fill"/>
           <window size="-2,-2" name="wnd_xxl_aniframe" msgTransparent="1"/>
         </stack>
       </window>
+    </window>
   </page>
   <page title="跑马机">
     <window size="full,full" name="game_wnd" id="300">

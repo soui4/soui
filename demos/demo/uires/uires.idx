@@ -232,6 +232,10 @@
 	<file name="xxl_digits" path="svg\xxl_digits.svg"/>
 	<file name="xxl_fx" path="svg\xxl_fx.svg"/>
 	<file name="xxl_fx2" path="svg\xxl_fx2.svg"/>
+	<file name="xxl_btn_primary" path="svg\xxl_btn_primary.svg"/>
+	<file name="xxl_btn_secondary" path="svg\xxl_btn_secondary.svg"/>
+	<file name="xxl_btn_restart" path="svg\xxl_btn_restart.svg"/>
+	<file name="xxl_btn_hint" path="svg\xxl_btn_hint.svg"/>
   </svg>
   <xml>
 	<file name="roomlist" path="xml\roomlist.xml"/>

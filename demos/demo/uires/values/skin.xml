@@ -144,4 +144,9 @@
   <imglist name="skin_xxl_fx" src="svg:xxl_fx"/>
   <!-- 消消乐提示特效(青色冰环,配合 anim:xxl_fx_ring) -->
   <imglist name="skin_xxl_fx2" src="svg:xxl_fx2"/>
+  <!-- 消消乐功能按钮(SVG 药丸底 + SVG 图标,均 3 态:normal/hover/push) -->
+  <imglist name="xxl_btn_primary" src="svg:xxl_btn_primary" states="3"/>
+  <imglist name="xxl_btn_secondary" src="svg:xxl_btn_secondary" states="3"/>
+  <imglist name="svg_xxl_btn_restart" src="svg:xxl_btn_restart" states="3"/>
+  <imglist name="svg_xxl_btn_hint" src="svg:xxl_btn_hint" states="3"/>
 </skin>
