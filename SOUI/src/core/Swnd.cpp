@@ -4223,10 +4223,16 @@ IAccProxy *SWindow::GetAccProxy()
 #endif
 }
 
+static BOOL s_bAccEnable = TRUE;
+void SWindow::EnableAcc(BOOL bEnable)
+{
+	s_bAccEnable = bEnable;
+}
+
 void SWindow::accNotifyEvent(DWORD dwEvt)
 {
 #ifdef SOUI_ENABLE_ACC
-    if (GetContainer())
+    if (s_bAccEnable && GetContainer())
         NotifyWinEvent(dwEvt, GetContainer()->GetHostHwnd(), GetSwnd(), CHILDID_SELF);
 #endif // SOUI_ENABLE_ACC
 }

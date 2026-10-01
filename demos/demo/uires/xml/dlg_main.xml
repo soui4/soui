@@ -75,7 +75,7 @@
       </frame>
     </caption>
 
-    <tabctrl name="tab_main" pos="5,30,-5,-5" interpolator="Decelerate" curSel="0" focusable="0" animateSteps="30" tabHeight="0" text-y="50" tabSkin="_skin.sys.tab.header" iconSkin="skin_page_icons" icon-x="10" colorTextHover="#ff0000" fontHover="italic:1">
+    <tabctrl name="tab_main" pos="5,30,-5,-5" interpolator="Decelerate" curSel="0" focusable="0" animateSteps="30" tabHeight="0">
       <page title="home">
         <include src="layout:page_home"/>
       </page>

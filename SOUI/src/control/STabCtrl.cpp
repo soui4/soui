@@ -16,6 +16,7 @@ class STabSlider
         , m_iFrom(iFrom)
         , m_iTo(iTo)
     {
+        SWindow::EnableAcc(FALSE);
         SASSERT(pTabCtrl);
         m_bClipClient = TRUE;
         pTabCtrl->m_aniSlider->addListener(this);
@@ -75,6 +76,7 @@ class STabSlider
         pageTo->SetVisible(FALSE);
         pTabCtrl->m_aniSlider->start(GetContainer());
         SetVisible(TRUE, TRUE);
+        SWindow::EnableAcc(TRUE);
     }
 
     virtual ~STabSlider()
