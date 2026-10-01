@@ -106,7 +106,7 @@ void CMainDlg::OnCommand( UINT uNotifyCode, int nID, HWND wndCtl )
             PostMessage(WM_CLOSE);
         }else if(nID==5)
         {//about SOUI:经 NavigateToPage 走两级 tab 动画切换到关于分区
-            NavigateToPage(7);
+            NavigateToPage(8);
 		}
 		else if(nID==100)
         {//delete item in mclistview

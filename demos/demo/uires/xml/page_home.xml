@@ -33,7 +33,7 @@
     <t:home_card name="card_layout" icon="3" page="4" title="布局" desc="线性 / 网格 / 模板布局能力"/>
     <t:home_card name="card_misc" icon="4" page="5" title="杂项" desc="脚本 / 拖放 / 矩阵变换 / SVG 等"/>
     <t:home_card name="card_skia" icon="5" page="6" title="Skia" desc="Skia 渲染高级特性演示"/>
-    <t:home_card name="card_about" icon="6" page="7" title="关于" desc="版本信息与社区链接"/>
-    <t:home_card name="card_xxl" icon="7" page="8" title="脚本" desc="lua 跑马机 / 消消乐(match-3)"/>
+    <t:home_card name="card_xxl" icon="7" page="7" title="脚本" desc="lua 跑马机 / 消消乐(match-3)"/>
+    <t:home_card name="card_about" icon="6" page="8" title="关于" desc="版本信息与社区链接"/>
   </window>
 </window>

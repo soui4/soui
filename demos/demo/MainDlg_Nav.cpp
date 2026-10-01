@@ -38,13 +38,7 @@ void CMainDlg::InitPageNav()
 /**
 * @brief      宫格卡片点击的统一入口
 *
-* Describe    7 张卡片的事件在 EVENT_MAP 中统一绑定到本函数,
-*             通过 sender 的 name 查映射表得到目标页序与标题。
-*             卡片 name 与 dlg_main.xml 中分区页序的对应关系
-*             (NavigateToPage 内部将其映射为 tab_contents 的页序):
-*               card_ctrls=1 基础控件  card_webkit=2 教程  card_animator=3 动画
-*               card_layout=4 布局     card_misc=5 杂项    card_skia=6 Skia
-*               card_about=7 关于      card_xxl=8 脚本(跑马机/消消乐)
+* Describe    8 张卡片的事件在 EVENT_MAP 中统一绑定到本函数,
 */
 void CMainDlg::OnNavCard(IEvtArgs *e)
 {
