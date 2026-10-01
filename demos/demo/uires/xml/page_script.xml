@@ -17,8 +17,41 @@
     完善点: 连击计分、无步可走自动洗牌、提示、游戏结束弹窗。
   棋盘/状态栏的名字与 id 约定见 test.lua 的 xxl_* 函数。
 -->
-<tabctrl pos="0,0,-0,-0" tabHeight="30" tabAlign="middle" curSel="0" animateSteps="20"
+<tabctrl pos="0,0,-0,-0" tabWidth="100" tabAlign="left" curSel="0" animateSteps="20"
          colorBkgnd="@color/clr_page_bg" colorText="@color/clr_title">
+  <page title="消消乐">
+    <window size="full,full" layout="hbox" padding="15,12,15,15" interval="10">
+        <window size="170,-2" layout="vbox" interval="8">
+          <text text="消消乐" font="size:16,bold:1" colorText="@color/clr_title"/>
+          <text text="lua + SVG 完整版" font="size:12" colorText="@color/clr_text_sub"/>
+          <window size="-2,-1" layout="hbox" interval="6" extend_top="4">
+            <button name="btn_xxl_restart" size="76,30" on_command="xxl_on_restart">重新开始</button>
+            <button name="btn_xxl_hint" size="76,30" on_command="xxl_on_hint">提示</button>
+          </window>
+          <window size="-2,-1" layout="vbox" interval="3" extend_top="8">
+            <text text="金币" font="size:13" colorText="@color/clr_text_sub"/>
+            <window size="-2,-1" layout="hbox" interval="2">
+              <t:g.xxl_digit><data name="digit_coin_2"/></t:g.xxl_digit>
+              <t:g.xxl_digit><data name="digit_coin_1"/></t:g.xxl_digit>
+              <t:g.xxl_digit><data name="digit_coin_0"/></t:g.xxl_digit>
+            </window>
+            <text text="得分" extend_top="4" font="size:13" colorText="@color/clr_text_sub"/>
+            <window size="-2,-1" layout="hbox" interval="2">
+              <t:g.xxl_digit><data name="digit_score_2"/></t:g.xxl_digit>
+              <t:g.xxl_digit><data name="digit_score_1"/></t:g.xxl_digit>
+              <t:g.xxl_digit><data name="digit_score_0"/></t:g.xxl_digit>
+            </window>
+          </window>
+          <text name="txt_xxl_combo" text="" size="-2,-1" extend_top="6" font="size:13,bold:1" colorText="@color/orange"/>
+          <window size="0,0" weight="1"/>
+          <text text="交换相邻棋子凑 3 连消除;连击有加分;无路可走自动洗牌" font="size:11" colorText="@color/clr_text_sub" multilines="1"/>
+        </window>
+        <stack size="0,-2" weight="1" curSel="-2">
+          <window size="-2,-2" name="wnd_xxl_board" layout="gridlayout" columnCount="7" gravity="fill"/>
+          <window size="-2,-2" name="wnd_xxl_aniframe" visible="0" msgTransparent="1"/>
+        </stack>
+      </window>
+  </page>
   <page title="跑马机">
     <window size="full,full" name="game_wnd" id="300">
       <text pos="0,0,-0,@30" colorBkgnd="#cccccc" colorText="#ff0000" align="center">SOUI + LUA 跑马机</text>
@@ -53,41 +86,6 @@
         <button name="btn_run" pos="0,|0,@100,@30" offset="0,-0.5" tip="run the game" on_command="on_run">run</button>
         <text pos="]-5,0,@-1,-0" offset="-1,0">现有金币:</text>
         <text pos="-64,0,@64,-0" name="txt_coins" align="center">100</text>
-      </window>
-    </window>
-  </page>
-  <page title="消消乐">
-    <window size="full,full" layout="vbox" padding="15,12,15,15" interval="10">
-      <window size="-2,-1" layout="hbox" interval="10">
-        <window size="170,-2" layout="vbox" interval="8">
-          <text text="消消乐" font="size:16,bold:1" colorText="@color/clr_title"/>
-          <text text="lua + SVG 完整版" font="size:12" colorText="@color/clr_text_sub"/>
-          <window size="-2,-2" layout="hbox" interval="6" extend_top="4">
-            <button name="btn_xxl_restart" size="76,30" on_command="xxl_on_restart">重新开始</button>
-            <button name="btn_xxl_hint" size="76,30" on_command="xxl_on_hint">提示</button>
-          </window>
-          <window size="-2,-2" layout="vbox" interval="3" extend_top="8">
-            <text text="金币" font="size:13" colorText="@color/clr_text_sub"/>
-            <window size="-2,-2" layout="hbox" interval="2">
-              <t:g.xxl_digit><data name="digit_coin_2"/></t:g.xxl_digit>
-              <t:g.xxl_digit><data name="digit_coin_1"/></t:g.xxl_digit>
-              <t:g.xxl_digit><data name="digit_coin_0"/></t:g.xxl_digit>
-            </window>
-            <text text="得分" extend_top="4" font="size:13" colorText="@color/clr_text_sub"/>
-            <window size="-2,-2" layout="hbox" interval="2">
-              <t:g.xxl_digit><data name="digit_score_2"/></t:g.xxl_digit>
-              <t:g.xxl_digit><data name="digit_score_1"/></t:g.xxl_digit>
-              <t:g.xxl_digit><data name="digit_score_0"/></t:g.xxl_digit>
-            </window>
-          </window>
-          <text name="txt_xxl_combo" text="" size="-2,-2" extend_top="6" font="size:13,bold:1" colorText="@color/orange"/>
-          <window size="0,0" weight="1"/>
-          <text text="交换相邻棋子凑 3 连消除;连击有加分;无路可走自动洗牌" font="size:11" colorText="@color/clr_text_sub" multilines="1"/>
-        </window>
-        <stack size="-1,-1" weight="1" curSel="-2">
-          <window name="wnd_xxl_board" layout="gridlayout" columnCount="7" gravity="fill"/>
-          <window size="-2,-2" name="wnd_xxl_aniframe" visible="0"/>
-        </stack>
       </window>
     </window>
   </page>

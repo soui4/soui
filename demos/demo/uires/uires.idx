@@ -229,7 +229,7 @@
 	<file name="xxl_icons" path="svg\xxl_icons.svg"/>
 	<file name="xxl_digits" path="svg\xxl_digits.svg"/>
   </svg>
-	<xml>
-		<file name="roomlist" path="xml\roomlist.xml"/>
-	</xml>
+  <xml>
+	<file name="roomlist" path="xml\roomlist.xml"/>
+  </xml>
 </resource>
