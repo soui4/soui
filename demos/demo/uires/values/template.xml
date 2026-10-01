@@ -1,16 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <template>
+  <!-- 消消乐棋子:stack 翻页显示 7 种 SVG 棋子(svg_xxl_icons),lua SelectPage 驱动 -->
   <g.xxl_ele>
     <stack id="{{id}}" size="-1,-1" curSel="0" aniType="fade" cursor="hand" on_command="xxl_on_cmd">
-      <img size="-1,-1" skin="skin_xxl_icons" iconIndex="0"/>
-      <img size="-2,-2" skin="skin_xxl_icons" iconIndex="1"/>
-      <img size="-2,-2" skin="skin_xxl_icons" iconIndex="2"/>
-      <img size="-2,-2" skin="skin_xxl_icons" iconIndex="3"/>
-      <img size="-2,-2" skin="skin_xxl_icons" iconIndex="4"/>
-      <img size="-2,-2" skin="skin_xxl_icons" iconIndex="5"/>
-      <img size="-2,-2" skin="skin_xxl_icons" iconIndex="6"/>
+      <img size="-1,-1" skin="svg_xxl_icons" iconIndex="0"/>
+      <img size="-2,-2" skin="svg_xxl_icons" iconIndex="1"/>
+      <img size="-2,-2" skin="svg_xxl_icons" iconIndex="2"/>
+      <img size="-2,-2" skin="svg_xxl_icons" iconIndex="3"/>
+      <img size="-2,-2" skin="svg_xxl_icons" iconIndex="4"/>
+      <img size="-2,-2" skin="svg_xxl_icons" iconIndex="5"/>
+      <img size="-2,-2" skin="svg_xxl_icons" iconIndex="6"/>
     </stack>
   </g.xxl_ele>
+  <!-- 消消乐 LED 数字位:10 页 stack(soxxl digit.xml 同款 push 翻页),lua setDigit 驱动 -->
+  <g.xxl_digit>
+    <stack name="{{name}}" size="22,32" curSel="0" aniType="push" vertical="1" duration="200">
+      <img size="-2,-2" skin="svg_xxl_digits" iconIndex="0"/>
+      <img size="-2,-2" skin="svg_xxl_digits" iconIndex="1"/>
+      <img size="-2,-2" skin="svg_xxl_digits" iconIndex="2"/>
+      <img size="-2,-2" skin="svg_xxl_digits" iconIndex="3"/>
+      <img size="-2,-2" skin="svg_xxl_digits" iconIndex="4"/>
+      <img size="-2,-2" skin="svg_xxl_digits" iconIndex="5"/>
+      <img size="-2,-2" skin="svg_xxl_digits" iconIndex="6"/>
+      <img size="-2,-2" skin="svg_xxl_digits" iconIndex="7"/>
+      <img size="-2,-2" skin="svg_xxl_digits" iconIndex="8"/>
+      <img size="-2,-2" skin="svg_xxl_digits" iconIndex="9"/>
+    </stack>
+  </g.xxl_digit>
   <g.block>
     <window name="{{name}}" layout="hbox" gravity="center">
       <window size="-1,-1" layout="hbox">

@@ -226,6 +226,8 @@
 	<file name="webbtn_go" path="svg\webbtn_go.svg"/>
 	<file name="webbtn_refresh" path="svg\webbtn_refresh.svg"/>
 	<file name="container_bg" path="svg\container_bg.svg"/>
+	<file name="xxl_icons" path="svg\xxl_icons.svg"/>
+	<file name="xxl_digits" path="svg\xxl_digits.svg"/>
   </svg>
 	<xml>
 		<file name="roomlist" path="xml\roomlist.xml"/>

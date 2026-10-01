@@ -1,4 +1,4 @@
-﻿//stamp:36110dc01eca9f89
+﻿//stamp:36110dd76a3140b5
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -230,6 +230,8 @@
 			const TCHAR * webbtn_go;
 			const TCHAR * webbtn_refresh;
 			const TCHAR * container_bg;
+			const TCHAR * xxl_icons;
+			const TCHAR * xxl_digits;
 			}svg;
 		struct _xml{
 			const TCHAR * roomlist;
@@ -463,6 +465,8 @@ struct _UIRES UIRES={
 			_T("svg:webbtn_go"),
 			_T("svg:webbtn_refresh"),
 			_T("svg:container_bg"),
+			_T("svg:xxl_icons"),
+			_T("svg:xxl_digits"),
 		},
 		{
 			_T("xml:roomlist"),
@@ -520,6 +524,7 @@ struct _R{
 		 const wchar_t * btn_webkit_fore;
 		 const wchar_t * btn_webkit_go;
 		 const wchar_t * btn_webkit_refresh;
+		 const wchar_t * btn_xxl_hint;
 		 const wchar_t * btn_xxl_restart;
 		 const wchar_t * card_about;
 		 const wchar_t * card_animator;
@@ -562,6 +567,12 @@ struct _R{
 		 const wchar_t * ctrl_hexedit;
 		 const wchar_t * ctrl_hk1;
 		 const wchar_t * ctrl_hk2;
+		 const wchar_t * digit_coin_0;
+		 const wchar_t * digit_coin_1;
+		 const wchar_t * digit_coin_2;
+		 const wchar_t * digit_score_0;
+		 const wchar_t * digit_score_1;
+		 const wchar_t * digit_score_2;
 		 const wchar_t * edit_drop_top1;
 		 const wchar_t * edit_drop_top2;
 		 const wchar_t * edit_repeat;
@@ -750,8 +761,7 @@ struct _R{
 		 const wchar_t * txt_tip;
 		 const wchar_t * txt_title;
 		 const wchar_t * txt_usetime;
-		 const wchar_t * txt_xxl_coin;
-		 const wchar_t * txt_xxl_score;
+		 const wchar_t * txt_xxl_combo;
 		 const wchar_t * verificationCodeEdit;
 		 const wchar_t * view_interpolator;
 		 const wchar_t * waveProgress0;
@@ -812,6 +822,7 @@ struct _R{
 		int btn_webkit_fore;
 		int btn_webkit_go;
 		int btn_webkit_refresh;
+		int btn_xxl_hint;
 		int btn_xxl_restart;
 		int card_about;
 		int card_animator;
@@ -854,6 +865,12 @@ struct _R{
 		int ctrl_hexedit;
 		int ctrl_hk1;
 		int ctrl_hk2;
+		int digit_coin_0;
+		int digit_coin_1;
+		int digit_coin_2;
+		int digit_score_0;
+		int digit_score_1;
+		int digit_score_2;
 		int edit_drop_top1;
 		int edit_drop_top2;
 		int edit_repeat;
@@ -1042,8 +1059,7 @@ struct _R{
 		int txt_tip;
 		int txt_title;
 		int txt_usetime;
-		int txt_xxl_coin;
-		int txt_xxl_score;
+		int txt_xxl_combo;
 		int verificationCodeEdit;
 		int view_interpolator;
 		int waveProgress0;
@@ -1093,7 +1109,7 @@ struct _R{
 	struct {
 		enum {
 			name_3d_test = 65723,
-			ani_hot = 65764,
+			ani_hot = 65770,
 			ani_test = 65581,
 			btn4_1 = 65633,
 			btn4_2 = 65634,
@@ -1102,17 +1118,17 @@ struct _R{
 			btn4_5 = 65637,
 			btn4_6 = 65638,
 			btnSelectGif = 65735,
-			btn_ani_hostwnd = 65775,
-			btn_animator = 65770,
+			btn_ani_hostwnd = 65781,
+			btn_animator = 65776,
 			btn_append_msg = 65611,
 			btn_back = 65682,
 			btn_builtinskin = 51,
-			btn_close = 65766,
+			btn_close = 65772,
 			btn_create_by_temp = 65689,
 			btn_createchildren = 65711,
 			btn_display = 65686,
 			btn_filewnd = 65710,
-			btn_go_offcial_url = 65765,
+			btn_go_offcial_url = 65771,
 			btn_hidetst = 65687,
 			btn_icon = 65591,
 			btn_init_listbox = 65653,
@@ -1136,6 +1152,7 @@ struct _R{
 			btn_webkit_fore = 65730,
 			btn_webkit_go = 65733,
 			btn_webkit_refresh = 65731,
+			btn_xxl_hint = 65754,
 			btn_xxl_restart = 65753,
 			card_about = 65552,
 			card_animator = 65548,
@@ -1155,7 +1172,7 @@ struct _R{
 			chk_band_mclv = 65562,
 			chk_band_tile = 65600,
 			chk_band_tree = 65604,
-			chk_band_tv = 65761,
+			chk_band_tv = 65767,
 			chk_fullrow_tree = 65605,
 			chk_mclv_sel = 65566,
 			chk_multi_lc = 65584,
@@ -1164,7 +1181,7 @@ struct _R{
 			chk_multi_mclv = 65561,
 			chk_multi_tile = 65599,
 			chk_multi_tree = 65603,
-			chk_multi_tv = 65760,
+			chk_multi_tv = 65766,
 			chromeTab = 65738,
 			clock_main = 65724,
 			col1 = 65567,
@@ -1178,9 +1195,15 @@ struct _R{
 			ctrl_hexedit = 65610,
 			ctrl_hk1 = 65607,
 			ctrl_hk2 = 65608,
+			digit_coin_0 = 65757,
+			digit_coin_1 = 65756,
+			digit_coin_2 = 65755,
+			digit_score_0 = 65760,
+			digit_score_1 = 65759,
+			digit_score_2 = 65758,
 			edit_drop_top1 = 65708,
 			edit_drop_top2 = 65709,
-			edit_repeat = 65759,
+			edit_repeat = 65765,
 			edit_rotate = 65716,
 			edit_scale = 65717,
 			edit_skew = 65718,
@@ -1211,7 +1234,7 @@ struct _R{
 			group2 = 65665,
 			home_card = 65544,
 			img_file_icon = 65602,
-			img_girl = 65772,
+			img_girl = 65778,
 			img_icon = 65568,
 			img_indicator = 65559,
 			img_round = 65617,
@@ -1235,8 +1258,8 @@ struct _R{
 			img_skin_7 = 16,
 			img_skin_8 = 17,
 			img_skin_9 = 18,
-			img_soui = 65769,
-			img_state = 65763,
+			img_soui = 65775,
+			img_state = 65769,
 			ip_test = 65609,
 			lb_test = 65652,
 			lc_test = 65587,
@@ -1285,7 +1308,7 @@ struct _R{
 			page_tileview = 104,
 			page_treectrl = 105,
 			page_treeview = 106,
-			pane_left = 65771,
+			pane_left = 65777,
 			player_1 = 65745,
 			player_2 = 65746,
 			player_3 = 65747,
@@ -1313,8 +1336,8 @@ struct _R{
 			rating_score = 65573,
 			re_gifhost = 65614,
 			re_temp_input = 65690,
-			re_xmlinput = 65758,
-			room_tv = 65762,
+			re_xmlinput = 65764,
+			room_tv = 65768,
 			rotate_x = 65720,
 			rotate_y = 65721,
 			rotate_z = 65722,
@@ -1344,12 +1367,12 @@ struct _R{
 			text2_6 = 65674,
 			text2_7 = 65675,
 			text2_8 = 65676,
-			tgl_left = 65774,
+			tgl_left = 65780,
 			tgl_switch = 65557,
 			timepicker = 65647,
 			title = 65555,
 			tray_008 = 65685,
-			tree_test = 65773,
+			tree_test = 65779,
 			txt_coins = 65752,
 			txt_desc = 65570,
 			txt_index = 65571,
@@ -1363,11 +1386,10 @@ struct _R{
 			txt_rate = 65749,
 			txt_score = 65574,
 			txt_size = 65576,
-			txt_tip = 65767,
+			txt_tip = 65773,
 			txt_title = 65677,
 			txt_usetime = 65580,
-			txt_xxl_coin = 65754,
-			txt_xxl_score = 65755,
+			txt_xxl_combo = 65761,
 			verificationCodeEdit = 65742,
 			view_interpolator = 65737,
 			waveProgress0 = 65739,
@@ -1375,12 +1397,12 @@ struct _R{
 			waveProgress2 = 65741,
 			webkit_toolbar = 65728,
 			wke_test = 65727,
-			wnd_ani_host = 65768,
+			wnd_ani_host = 65774,
 			wnd_container = 65713,
 			wnd_rgn = 65714,
 			wnd_temp_host = 65691,
-			wnd_xxl_aniframe = 65757,
-			wnd_xxl_board = 65756,
+			wnd_xxl_aniframe = 65763,
+			wnd_xxl_board = 65762,
 			__name__ = 65545
 		};
 	}ID;
@@ -1435,6 +1457,7 @@ struct _R R={
 		L"btn_webkit_fore",
 		L"btn_webkit_go",
 		L"btn_webkit_refresh",
+		L"btn_xxl_hint",
 		L"btn_xxl_restart",
 		L"card_about",
 		L"card_animator",
@@ -1477,6 +1500,12 @@ struct _R R={
 		L"ctrl_hexedit",
 		L"ctrl_hk1",
 		L"ctrl_hk2",
+		L"digit_coin_0",
+		L"digit_coin_1",
+		L"digit_coin_2",
+		L"digit_score_0",
+		L"digit_score_1",
+		L"digit_score_2",
 		L"edit_drop_top1",
 		L"edit_drop_top2",
 		L"edit_repeat",
@@ -1665,8 +1694,7 @@ struct _R R={
 		L"txt_tip",
 		L"txt_title",
 		L"txt_usetime",
-		L"txt_xxl_coin",
-		L"txt_xxl_score",
+		L"txt_xxl_combo",
 		L"verificationCodeEdit",
 		L"view_interpolator",
 		L"waveProgress0",
@@ -1685,7 +1713,7 @@ struct _R R={
 	,
 	{
 		65723,
-		65764,
+		65770,
 		65581,
 		65633,
 		65634,
@@ -1694,17 +1722,17 @@ struct _R R={
 		65637,
 		65638,
 		65735,
-		65775,
-		65770,
+		65781,
+		65776,
 		65611,
 		65682,
 		51,
-		65766,
+		65772,
 		65689,
 		65711,
 		65686,
 		65710,
-		65765,
+		65771,
 		65687,
 		65591,
 		65653,
@@ -1728,6 +1756,7 @@ struct _R R={
 		65730,
 		65733,
 		65731,
+		65754,
 		65753,
 		65552,
 		65548,
@@ -1747,7 +1776,7 @@ struct _R R={
 		65562,
 		65600,
 		65604,
-		65761,
+		65767,
 		65605,
 		65566,
 		65584,
@@ -1756,7 +1785,7 @@ struct _R R={
 		65561,
 		65599,
 		65603,
-		65760,
+		65766,
 		65738,
 		65724,
 		65567,
@@ -1770,9 +1799,15 @@ struct _R R={
 		65610,
 		65607,
 		65608,
+		65757,
+		65756,
+		65755,
+		65760,
+		65759,
+		65758,
 		65708,
 		65709,
-		65759,
+		65765,
 		65716,
 		65717,
 		65718,
@@ -1803,7 +1838,7 @@ struct _R R={
 		65665,
 		65544,
 		65602,
-		65772,
+		65778,
 		65568,
 		65559,
 		65617,
@@ -1827,8 +1862,8 @@ struct _R R={
 		16,
 		17,
 		18,
+		65775,
 		65769,
-		65763,
 		65609,
 		65652,
 		65587,
@@ -1877,7 +1912,7 @@ struct _R R={
 		104,
 		105,
 		106,
-		65771,
+		65777,
 		65745,
 		65746,
 		65747,
@@ -1905,8 +1940,8 @@ struct _R R={
 		65573,
 		65614,
 		65690,
-		65758,
-		65762,
+		65764,
+		65768,
 		65720,
 		65721,
 		65722,
@@ -1936,12 +1971,12 @@ struct _R R={
 		65674,
 		65675,
 		65676,
-		65774,
+		65780,
 		65557,
 		65647,
 		65555,
 		65685,
-		65773,
+		65779,
 		65752,
 		65570,
 		65571,
@@ -1955,11 +1990,10 @@ struct _R R={
 		65749,
 		65574,
 		65576,
-		65767,
+		65773,
 		65677,
 		65580,
-		65754,
-		65755,
+		65761,
 		65742,
 		65737,
 		65739,
@@ -1967,12 +2001,12 @@ struct _R R={
 		65741,
 		65728,
 		65727,
-		65768,
+		65774,
 		65713,
 		65714,
 		65691,
-		65757,
-		65756,
+		65763,
+		65762,
 		65545
 	}
 	,

@@ -246,6 +246,14 @@ end
   2. freeSameY 源行越界保护:js 的 this.board[x][y-1-i] 是转置索引笔误,
      贴顶消除时越界(js 靠 setGridState 的 try/catch 掩盖);
   3. 副本创建失败时回滚格子可见性,绝不让格子凭空消失。
+市场常见玩法完善(在 js 版基础上新增):
+  - 金币/得分用七段 LED 翻页计数器(t:g.xxl_digit,SelectPage 驱动,push 动画);
+  - 初始棋盘受约束随机(xxl_gen_board),绝无初始 3 连且保证有解
+    (旧版裸随机开局即自动消除,白送分且棋盘缺格);
+  - 连击计分:第 n 波消除得分 = len * n,新交换清零,settle 时清零显示;
+  - settle 稳定后检测无步可走 => 自动洗牌(xxl_redeal,带翻页动画);
+  - 提示按钮(xxl_on_hint):找一个可行交换,两枚棋子复用选中脉冲动画;
+  - 金币耗尽 => 游戏结束弹窗(SMessageBox),确定后重开。
 棋盘 id 约定: xxl_base_id + y*7 + x (x,y 从 0 开始)。
 ]]
 
@@ -257,6 +265,8 @@ xxl = {
 	board = {};      -- board[y][x] = icon state(0..6)
 	click_id = -1;
 	coin = 20; score = 0;
+	combo = 0;       -- 连击数(第 n 波消除得分 x n,settle 清零)
+	gameover = false;-- 金币耗尽弹窗只出一次
 	ani_list = {};   -- ctxId -> 动画组(js ani_list;按 ctxId 索引,勿用对象身份比较)
 	ani_count = 0;   -- 存活动画组数
 	ani_ctx = {};    -- ctxId -> {kind=..., ele=..., ani_widget=...}
@@ -287,17 +297,42 @@ function xxl_new_ctx(kind, data)
 	return xxl.ani_seq;
 end
 
--- js showScore/showCoin 用三位数字 stack;demo 页面用单文本框
-function xxl_show_score()
+-- js showScore/showCoin 用三位数字 stack;LED 翻页计数器版(soxxl setDigit 同款):
+-- 每位是 t:g.xxl_digit 十页 stack,SelectPage(digit,true) 走 push 翻页动画。
+function xxl_set_digits(prefix, num)
 	if xxl.root == nil then return end
-	local txt = xxl.root:FindChildByNameA("txt_xxl_score",-1);
-	if txt then txt:SetWindowText(T(tostring(xxl.score))); end
+	for i = 0, 2 do
+		local stack = xxl.root:FindChildByNameA(prefix .. "_" .. i,-1);
+		if stack then
+			local d = math.floor(num / 10^i) % 10;
+			local stackApi = QiIStackView(stack);
+			if stackApi then
+				stackApi:SelectPage(d, true);
+				stackApi:Release();
+			end
+		end
+	end
+end
+
+function xxl_show_score()
+	xxl_set_digits("digit_score", xxl.score % 1000);
 end
 
 function xxl_show_coin()
+	xxl_set_digits("digit_coin", xxl.coin % 1000);
+end
+
+-- 连击提示文本(第 n 波消除 n>=2 才显示)
+function xxl_show_combo()
 	if xxl.root == nil then return end
-	local txt = xxl.root:FindChildByNameA("txt_xxl_coin",-1);
-	if txt then txt:SetWindowText(T(tostring(xxl.coin))); end
+	local txt = xxl.root:FindChildByNameA("txt_xxl_combo",-1);
+	if txt then
+		if xxl.combo >= 2 then
+			txt:SetWindowText(T("连击 x" .. xxl.combo .. "!"));
+		else
+			txt:SetWindowText(T(""));
+		end
+	end
 end
 
 -- js onGridChanged
@@ -430,6 +465,123 @@ function xxl_free_same_y(x,y,len)
 		xxl_set_grid_state(x,j,math.random(0, xxl_max_state-1),true);
 	end
 	xxl_check_board();
+end
+
+-- ============ 市场常见玩法:死局检测 / 提示 / 洗牌 ============
+-- pos 处交换后是否构成 3 连(纯数据,横竖两个方向)
+function xxl_match_at(pos)
+	local s = xxl.board[pos.y][pos.x];
+	local n = 1;
+	for i = pos.x-1, 0, -1 do
+		if xxl.board[pos.y][i] ~= s then break end
+		n = n + 1;
+	end
+	for i = pos.x+1, xxl_col-1 do
+		if xxl.board[pos.y][i] ~= s then break end
+		n = n + 1;
+	end
+	if n >= xxl_min_same then return true end
+	n = 1;
+	for j = pos.y-1, 0, -1 do
+		if xxl.board[j][pos.x] ~= s then break end
+		n = n + 1;
+	end
+	for j = pos.y+1, xxl_row-1 do
+		if xxl.board[j][pos.x] ~= s then break end
+		n = n + 1;
+	end
+	return n >= xxl_min_same;
+end
+
+-- 试交换 p1,p2(数据层试完立即还原),返回是否成 3 连
+function xxl_try_swap_creates_match(p1,p2)
+	local s1 = xxl.board[p1.y][p1.x];
+	local s2 = xxl.board[p2.y][p2.x];
+	xxl.board[p1.y][p1.x] = s2;
+	xxl.board[p2.y][p2.x] = s1;
+	local hit = xxl_match_at(p1) or xxl_match_at(p2);
+	xxl.board[p1.y][p1.x] = s1;
+	xxl.board[p2.y][p2.x] = s2;
+	return hit;
+end
+
+-- 找一个可行交换(右邻、下邻两个方向),返回 {p1=..,p2=..} 或 nil
+function xxl_find_move()
+	for y = 0, xxl_row-1 do
+		for x = 0, xxl_col-1 do
+			if x+1 < xxl_col and xxl_try_swap_creates_match({x=x,y=y},{x=x+1,y=y}) then
+				return {p1={x=x,y=y}, p2={x=x+1,y=y}};
+			end
+			if y+1 < xxl_row and xxl_try_swap_creates_match({x=x,y=y},{x=x,y=y+1}) then
+				return {p1={x=x,y=y}, p2={x=x,y=y+1}};
+			end
+		end
+	end
+	return nil;
+end
+
+function xxl_has_valid_move()
+	return xxl_find_move() ~= nil;
+end
+
+-- 受约束随机生成棋盘:无初始 3 连,且保证有解(市场消消乐发牌规则)
+function xxl_gen_board()
+	for attempt = 1, 50 do
+		for y = 0, xxl_row-1 do
+			xxl.board[y] = {};
+			for x = 0, xxl_col-1 do
+				local s;
+				repeat
+					s = math.random(0, xxl_max_state-1);
+				until not ((x >= 2 and xxl.board[y][x-1] == s and xxl.board[y][x-2] == s)
+					or (y >= 2 and xxl.board[y-1][x] == s and xxl.board[y-2][x] == s));
+				xxl.board[y][x] = s;
+			end
+		end
+		if xxl_has_valid_move() then return end
+	end
+	-- 50 次仍无解(概率极低)接受最后一版,避免死循环
+end
+
+-- 死局洗牌:受约束重排 + 带翻页动画重放全盘
+function xxl_redeal()
+	xxl.click_id = -1;
+	xxl_gen_board();
+	for y = 0, xxl_row-1 do
+		for x = 0, xxl_col-1 do
+			xxl_on_grid_changed({x=x,y=y}, true);
+		end
+	end
+	xxl_check_board();
+end
+
+-- 提示:找一个可行交换,两枚棋子做选中脉冲动画(复用选中动画,点击即被替换)
+function xxl_on_hint(args)
+	if xxl.wndBoard == nil or xxl.coin <= 0 then return 0 end
+	xxl_probe_digits(); -- TEMP-PROBE(确认后删除)
+	if xxl.ani_count ~= 0 then return 0 end -- 动画进行中不给提示
+	local m = xxl_find_move();
+	if m == nil then return 0 end
+	xxl.hint_ids = { xxl_pos2id(m.p1), xxl_pos2id(m.p2) };
+	for _,p in ipairs({m.p1, m.p2}) do
+		local ele = xxl.wndBoard:FindChildByID(xxl_pos2id(p),-1);
+		if ele and xxl.ani_sel then
+			local ani = xxl.ani_sel:clone();
+			ele:SetAnimation(ani);
+			ani:Release();
+		end
+	end
+	return 1;
+end
+
+-- 清掉上次提示的脉冲动画(下次任意棋盘点击时调用)
+function xxl_clear_hint()
+	if xxl.hint_ids == nil then return end
+	for _,hid in ipairs(xxl.hint_ids) do
+		local he = xxl.wndBoard:FindChildByID(hid,-1);
+		if he then he:ClearAnimation(); end
+	end
+	xxl.hint_ids = {};
 end
 
 -- js buildAniWidget: 在浮层上创建与格子同状态的副本。
@@ -575,12 +727,12 @@ function xxl_on_clear_end(g)
 	end
 end
 
--- js onAnimatorGroupEnd3: 下沉结束,计分并补位
+-- js onAnimatorGroupEnd3: 下沉结束,计分(连击倍乘)并补位
 function xxl_on_drop_end(g)
 	local samex = g.samex;
 	xxl.coin = xxl.coin + 1;
 	xxl_show_coin();
-	xxl.score = xxl.score + samex.len;
+	xxl.score = xxl.score + samex.len * xxl.combo;
 	xxl_show_score();
 	xxl_free_same_x(samex.y, samex.x, samex.len);
 end
@@ -593,6 +745,8 @@ end
 -- js onGetSameX: 横向 3 连聚拢到中心
 function xxl_on_get_same_x(y,x,len)
 	xxl.aniframe:SetVisible(true,true);
+	xxl.combo = xxl.combo + 1;
+	xxl_show_combo();
 	local ctxId = xxl_new_ctx("clear", { samex={y=y,x=x,len=len}, posLst={} });
 	local group = NewAnimatorGroup();
 	group:SetOnGroupEnd("xxl_group_end");
@@ -627,6 +781,8 @@ end
 -- js onGetSameY: 纵向 3 连聚拢到中心
 function xxl_on_get_same_y(x,y,len)
 	xxl.aniframe:SetVisible(true,true);
+	xxl.combo = xxl.combo + 1;
+	xxl_show_combo();
 	local ctxId = xxl_new_ctx("samey", { samey={x=x,y=y,len=len}, posLst={} });
 	local group = NewAnimatorGroup();
 	group:SetOnGroupEnd("xxl_group_end");
@@ -693,12 +849,12 @@ function xxl_on_clear_end_y(g)
 	end
 end
 
--- js onAnimatorGroupEndY3: 下沉结束,计分并补位
+-- js onAnimatorGroupEndY3: 下沉结束,计分(连击倍乘)并补位
 function xxl_on_drop_end_y(g)
 	local samey = g.samey;
 	xxl.coin = xxl.coin + 1;
 	xxl_show_coin();
-	xxl.score = xxl.score + samey.len;
+	xxl.score = xxl.score + samey.len * xxl.combo;
 	xxl_show_score();
 	xxl_free_same_y(samey.x, samey.y, samey.len);
 end
@@ -709,6 +865,7 @@ function xxl_on_click(idFrom, eleSender)
 	if idFrom < xxl_base_id or idFrom >= xxl_base_id + xxl_row*xxl_col then
 		return 0;
 	end
+	xxl_clear_hint(); -- 任意棋盘点击都收掉提示脉冲
 	if xxl.click_id ~= -1 then
 		-- 先清掉旧选中格子的缩放动画(js: ele.ClearAnimation())
 		local eleOld = xxl.wndBoard:FindChildByID(xxl.click_id,-1);
@@ -717,6 +874,8 @@ function xxl_on_click(idFrom, eleSender)
 		local pos2 = xxl_id2pos(idFrom);
 		if xxl_can_swap(pos1,pos2) then
 			-- 交换动画(js onCmd canSwap 分支:两副本交叉飞行)
+			xxl.combo = 0; -- 新一次交换,连击重新计
+			xxl_show_combo();
 			xxl.aniframe:SetVisible(true,true);
 			local id1 = xxl.click_id;
 			local id2 = idFrom;
@@ -773,14 +932,20 @@ function xxl_on_cmd(args)
 	return xxl_on_click(args:IdFrom(), toSWindow(args:Sender()));
 end
 
+-- 重新开始(按钮与游戏结束弹窗共用)
+function xxl_restart_internal()
+	xxl.coin = 20; xxl.score = 0;
+	xxl.combo = 0; xxl.gameover = false;
+	xxl_show_coin();
+	xxl_show_score();
+	xxl_show_combo();
+	xxl_init_board();
+end
+
 -- 重新开始按钮
 function xxl_on_restart(args)
 	if xxl.wndBoard == nil then return 0 end
-	xxl.coin = 20; xxl.score = 0;
-	xxl.click_id = -1;
-	xxl_show_coin();
-	xxl_show_score();
-	xxl_init_board();
+	xxl_restart_internal();
 	return 1;
 end
 
@@ -798,14 +963,22 @@ function xxl_init_board()
 		xml = xml .. "<t:g.xxl_ele><data id=\"" .. (xxl_base_id+i) .. "\"/></t:g.xxl_ele>";
 	end
 	xxl.wndBoard:CreateChildrenFromXml(xml);
-	xxl.wndBoard:RequestRelayout();
-	for y = 0, xxl_row-1 do
-		xxl.board[y] = {};
-		for x = 0, xxl_col-1 do
-			xxl.board[y][x] = math.random(0, xxl_max_state-1);
+	-- 棋盘格底色(市场消消乐的格子感):按 (x+y) 奇偶交替
+	for i = 0, eles-1 do
+		local ele = xxl.wndBoard:FindChildByID(xxl_base_id+i,-1);
+		if ele then
+			local par = ((i % xxl_col) + math.floor(i / xxl_col)) % 2;
+			if par == 0 then
+				ele:SetAttribute(T"colorBkgnd", T"rgba(255,255,255,55)", false);
+			else
+				ele:SetAttribute(T"colorBkgnd", T"rgba(0,0,0,16)", false);
+			end
 		end
 	end
-	-- 随机布局后必须逐格 SelectPage 显示当前状态(soxxl init() 同款循环)
+	xxl.wndBoard:RequestRelayout();
+	-- 受约束随机:无初始 3 连且保证有解(旧版裸随机,开局即自动消,送分且棋盘缺格)
+	xxl_gen_board();
+	-- 逐格 SelectPage 显示当前状态(soxxl init() 同款循环)
 	for y = 0, xxl_row-1 do
 		for x = 0, xxl_col-1 do
 			xxl_on_grid_changed({x=x,y=y}, false);
@@ -830,16 +1003,34 @@ function xxl_init(root)
 		xxl_slog("init: load animator:xxl_move failed");
 	end
 	xxl.ani_sel = GetApp():LoadAnimation("anim:xxl_scale_select");
-	xxl_init_board();
-	xxl_show_coin();
-	xxl_show_score();
+	-- 统一走 restart 复位:coin/score/combo/gameover 清零 + 受约束发牌建盘
+	-- (否则上一局 gameover=true 残留,重进页面金币 0 且不再弹结束框)
+	xxl_restart_internal();
 	xxl_slog("init done");
 	return 1;
+end
+
+-- TEMP-PROBE: 布局完成后由 xxl_on_hint 触发的 LED 几何取证(确认后删除)
+function xxl_probe_digits()
+	for _,nm in ipairs({"digit_coin_2","digit_coin_0","digit_score_0"}) do
+		local ds = xxl.root:FindChildByNameA(nm,-1);
+		if ds == nil then
+			xxl_slog("probe " .. nm .. " NOT FOUND");
+		else
+			local rc = ds:GetWindowRect2();
+			local pr = ds:GetParent();
+			local prc = pr and pr:GetWindowRect2() or nil;
+			xxl_slog("probe " .. nm .. " rc=" .. rc.left .. "," .. rc.top .. "," .. rc.right .. "," .. rc.bottom
+				.. " vis=" .. ds:IsVisible(FALSE)
+				.. " parent_rc=" .. (prc and (prc.left .. "," .. prc.top .. "," .. prc.right .. "," .. prc.bottom) or "nil"));
+		end
+	end
 end
 
 -- ============ 稳定态自检(常驻,成功时零输出) ============
 -- 无 3 连且无动画在跑 => 棋盘稳定:校验所有格子存在、可见、数据完整。
 -- 直接盯住"棋子缺失/消失不恢复"类问题,异常时打日志定位。
+-- 稳定后再做市场玩法收尾:连击清零 / 游戏结束判定 / 死局自动洗牌。
 function xxl_on_settle()
 	if xxl.wndBoard == nil then return end
 	if xxl.ani_count ~= 0 then return end -- 还有动画在跑,不算稳定
@@ -864,6 +1055,25 @@ function xxl_on_settle()
 				return
 			end
 		end
+	end
+	-- 稳定收尾 1:连击链结束,清零
+	if xxl.combo ~= 0 then
+		xxl.combo = 0;
+		xxl_show_combo();
+	end
+	-- 稳定收尾 2:金币耗尽 => 游戏结束(只弹一次)
+	if xxl.coin <= 0 and not xxl.gameover then
+		xxl.gameover = true;
+		xxl_slog("settle: game over, score=" .. xxl.score);
+		local hwnd = xxl.wndBoard:GetHostHwnd();
+		SMessageBox(hwnd, L("本局结束!最终得分 " .. xxl.score .. "\n点击确定重新开始"), L("消消乐"), 0);
+		xxl_restart_internal();
+		return
+	end
+	-- 稳定收尾 3:无步可走 => 自动洗牌
+	if not xxl_has_valid_move() then
+		xxl_slog("settle: dead board, auto redeal");
+		xxl_redeal();
 	end
 end
 

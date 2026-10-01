@@ -137,4 +137,7 @@
   <imglist name="svg_container_bg" src="svg:container_bg"/>
   <!-- 消消乐(lua 版)元素图标:7 态雪碧图(源自 soxxl icons.png) -->
   <imglist name="skin_xxl_icons" src="imgx:xxl_icons" states="7"/>
+  <!-- 消消乐 SVG 重制版:7 态糖果风棋子 + 10 态七段 LED 数字 -->
+  <imglist name="svg_xxl_icons" src="svg:xxl_icons" states="7"/>
+  <imglist name="svg_xxl_digits" src="svg:xxl_digits" states="10"/>
 </skin>

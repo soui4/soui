@@ -6,13 +6,15 @@
   内层 tabctrl 两个子页切换;两个小游戏的逻辑都在 uires/lua/test.lua:
   - 跑马机: game_wnd/game_canvas/players/flag_win,on_init 时初始化,
     on_run 启动计时器推进赛马,on_bet 下注,on_canvas_size 跟随布局;
-  - 消消乐: 参考 soxxl(基于 soui4js 的消消乐)移植,
+  - 消消乐: 参考 soxxl(基于 soui4js 的消消乐)移植并完善为市场常见玩法,
     7x7 棋盘由 lua 的 xxl_init 在宿主初始化时动态创建,
-    每个格子是 t.g.xxl_ele 模板实例(values/template.xml),
+    每个格子是 t.g.xxl_ele 模板实例(values/template.xml,SVG 糖果风棋子),
     stack 的 on_command 属性直接把点击事件路由到 lua 全局函数 xxl_on_cmd;
     交换/消除/下沉动画使用 SValueAnimator(animator:xxl_move) + 动画组,
     回调经 exp_LuaValueAnimator.h 的包装进入 lua;
-    wnd_xxl_aniframe 是动画浮层,动画期间把移动中的元素画在棋盘之上。
+    wnd_xxl_aniframe 是动画浮层,动画期间把移动中的元素画在棋盘之上;
+    金币/得分用 t:g.xxl_digit 七段 LED 翻页计数器(soxxl digit 同款),
+    完善点: 连击计分、无步可走自动洗牌、提示、游戏结束弹窗。
   棋盘/状态栏的名字与 id 约定见 test.lua 的 xxl_* 函数。
 -->
 <tabctrl pos="0,0,-0,-0" tabHeight="30" tabAlign="middle" curSel="0" animateSteps="20"
@@ -57,18 +59,30 @@
   <page title="消消乐">
     <window size="full,full" layout="vbox" padding="15,12,15,15" interval="10">
       <window size="-2,-1" layout="hbox" interval="10">
-        <window size="150,-2" layout="vbox" interval="10">
+        <window size="170,-2" layout="vbox" interval="8">
           <text text="消消乐" font="size:16,bold:1" colorText="@color/clr_title"/>
-          <text text="lua 版,参考 soxxl" font="size:12" colorText="@color/clr_text_sub"/>
-          <button name="btn_xxl_restart" size="150,30" extend_top="10" on_command="xxl_on_restart">重新开始</button>
-          <window size="-2,-1" layout="vbox" interval="5" extend_top="10">
-            <text text="金币:" font="size:13"/>
-            <text name="txt_xxl_coin" text="20" font="size:20,bold:1" colorText="@color/orange"/>
-            <text text="得分:" extend_top="6" font="size:13"/>
-            <text name="txt_xxl_score" text="0" font="size:20,bold:1" colorText="@color/green"/>
+          <text text="lua + SVG 完整版" font="size:12" colorText="@color/clr_text_sub"/>
+          <window size="-2,-2" layout="hbox" interval="6" extend_top="4">
+            <button name="btn_xxl_restart" size="76,30" on_command="xxl_on_restart">重新开始</button>
+            <button name="btn_xxl_hint" size="76,30" on_command="xxl_on_hint">提示</button>
           </window>
+          <window size="-2,-2" layout="vbox" interval="3" extend_top="8">
+            <text text="金币" font="size:13" colorText="@color/clr_text_sub"/>
+            <window size="-2,-2" layout="hbox" interval="2">
+              <t:g.xxl_digit><data name="digit_coin_2"/></t:g.xxl_digit>
+              <t:g.xxl_digit><data name="digit_coin_1"/></t:g.xxl_digit>
+              <t:g.xxl_digit><data name="digit_coin_0"/></t:g.xxl_digit>
+            </window>
+            <text text="得分" extend_top="4" font="size:13" colorText="@color/clr_text_sub"/>
+            <window size="-2,-2" layout="hbox" interval="2">
+              <t:g.xxl_digit><data name="digit_score_2"/></t:g.xxl_digit>
+              <t:g.xxl_digit><data name="digit_score_1"/></t:g.xxl_digit>
+              <t:g.xxl_digit><data name="digit_score_0"/></t:g.xxl_digit>
+            </window>
+          </window>
+          <text name="txt_xxl_combo" text="" size="-2,-2" extend_top="6" font="size:13,bold:1" colorText="@color/orange"/>
           <window size="0,0" weight="1"/>
-          <text text="逻辑见 uires/lua/test.lua" font="size:11" colorText="@color/clr_text_sub" multilines="1"/>
+          <text text="交换相邻棋子凑 3 连消除;连击有加分;无路可走自动洗牌" font="size:11" colorText="@color/clr_text_sub" multilines="1"/>
         </window>
         <stack size="-1,-1" weight="1" curSel="-2">
           <window name="wnd_xxl_board" layout="gridlayout" columnCount="7" gravity="fill"/>
