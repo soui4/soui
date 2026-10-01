@@ -143,7 +143,7 @@ protected:
     void InitPageNav();                 //缓存导航相关子控件指针
     void OnNavCard(IEvtArgs *e);        //宫格卡片点击:切换到对应演示分区
     void OnNavBack();                   //返回按钮点击:回到宫格首页
-    void NavigateToPage(int iPage, const wchar_t *pszTitle); //0=回宫格首页;1..7=先无动画切 tab_contents 到目标分区,再动画切 tab_main
+    void NavigateToPage(int iPage); //0=回宫格首页;1..7=先无动画切 tab_contents 到目标分区,再动画切 tab_main
 
     //radio button 页:演示多种 tab 页切换绑定方式
     void OnTabPageRadioSwitch(IEvtArgs *pEvt);

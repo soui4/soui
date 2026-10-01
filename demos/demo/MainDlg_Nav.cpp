@@ -50,28 +50,9 @@ void CMainDlg::OnNavCard(IEvtArgs *e)
 {
 	SWindow *pSender = sobj_cast<SWindow>(e->Sender());
 	SASSERT(pSender);
-	const SStringW strName = pSender->GetName();
-
-	struct NavItem { const wchar_t *pszCard; int iPage; const wchar_t *pszTitle; };
-	static const NavItem kNavMap[] = {
-		{ L"card_ctrls",    1, L"基础控件" },
-		{ L"card_webkit",   2, L"教程" },
-		{ L"card_animator", 3, L"动画" },
-		{ L"card_layout",   4, L"布局" },
-		{ L"card_misc",     5, L"杂项" },
-		{ L"card_skia",     6, L"Skia" },
-		{ L"card_about",    7, L"关于" },
-		{ L"card_xxl",      8, L"脚本" },
-	};
-	for(int i=0;i<ARRAYSIZE(kNavMap);i++)
-	{
-		if(strName.CompareNoCase(kNavMap[i].pszCard)==0)
-		{
-			NavigateToPage(kNavMap[i].iPage,kNavMap[i].pszTitle);
-			return;
-		}
-	}
-	SLOGW()<<"unknown card clicked: "<<strName.c_str();
+	int iPage = pSender->GetUserData();
+	SASSERT(iPage > 0);
+	NavigateToPage(iPage);
 }
 
 /**
@@ -79,13 +60,12 @@ void CMainDlg::OnNavCard(IEvtArgs *e)
 */
 void CMainDlg::OnNavBack()
 {
-	NavigateToPage(0,L"");
+	NavigateToPage(0);
 }
 
 /**
 * @brief      执行页面切换(两级 tab 协同)
 * @param      iPage     0=宫格首页;1..7=第 iPage 个演示分区
-* @param      pszTitle  导航栏显示的标题(home 页不使用)
 *
 * Describe    进入分区:先将 tab_contents 切到目标分区页,再让 tab_main
 *             动画切入 contents 页,滑入时即显示目标分区。tab_contents
@@ -96,17 +76,20 @@ void CMainDlg::OnNavBack()
 *             演示 SetCurSel 的整型页序用法;对比 OnCommand 中按页 title
 *             跳转的字符串用法(两种方式 SOUI 均支持)。
 */
-void CMainDlg::NavigateToPage(int iPage, const wchar_t *pszTitle)
+void CMainDlg::NavigateToPage(int iPage)
 {
 	if(m_pMainTab == NULL)
 		return;
 	if(iPage > 0)
 	{
-		if(m_pContentsTab && m_pContentsTab->GetCurSel() != iPage-1)
-			m_pContentsTab->SetCurSel(iPage-1);
-		if(m_pNavTitle && pszTitle && pszTitle[0])
+		if (m_pContentsTab && m_pContentsTab->GetCurSel() != iPage - 1)
 		{
-			m_pNavTitle->SetWindowText(S_CW2T(SStringW(pszTitle)));
+			m_pContentsTab->SetCurSel(iPage - 1);
+		}
+		SStringT strTitle = m_pContentsTab->GetItem(iPage - 1)->GetTitle();
+		if (m_pNavTitle)
+		{
+			m_pNavTitle->SetWindowText(strTitle);
 		}
 		if(m_pMainTab->GetCurSel() != 1)
 			m_pMainTab->SetCurSel(1);
