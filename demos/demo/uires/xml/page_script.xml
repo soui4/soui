@@ -35,17 +35,17 @@
         </window>
         <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
         <!-- 功能按钮:SVG 药丸形底(3 态) + SVG 图标(3 态),重新开始=主色实底,提示=白底描边 -->
-        <button name="btn_xxl_restart" size="-2,36" skin="xxl_btn_primary" layout="hbox" cursor="hand" on_command="xxl_on_restart" tip="重新开始一局">
-          <window size="0,0" weight="1" msgTransparent="1"/>
-          <img size="16,16" skin="svg_xxl_btn_restart" msgTransparent="1"/>
-          <text text="重新开始" extend_left="6" font="size:13,bold:1" colorText="#FFFFFF" msgTransparent="1"/>
-          <window size="0,0" weight="1" msgTransparent="1"/>
+        <button name="btn_xxl_restart" size="-2,36" skin="xxl_btn_primary" gravity="center" layout="hbox" cursor="hand" on_command="xxl_on_restart" tip="重新开始一局">
+          <window size="0,0" weight="1"/>
+          <img size="16,16" skin="svg_xxl_btn_restart"/>
+          <text text="重新开始" extend_left="6" font="size:13,bold:1" colorText="#FFFFFF"/>
+          <window size="0,0" weight="1"/>
         </button>
-        <button name="btn_xxl_hint" size="-2,36" skin="xxl_btn_secondary" layout="hbox" cursor="hand" on_command="xxl_on_hint" tip="提示一步可行走法">
-          <window size="0,0" weight="1" msgTransparent="1"/>
-          <img size="16,16" skin="svg_xxl_btn_hint" msgTransparent="1"/>
-          <text text="提 示" extend_left="6" font="size:13,bold:1" colorText="@color/clr_primary" msgTransparent="1"/>
-          <window size="0,0" weight="1" msgTransparent="1"/>
+        <button name="btn_xxl_hint" size="-2,36" skin="xxl_btn_secondary" gravity="center" layout="hbox" cursor="hand" on_command="xxl_on_hint" tip="提示一步可行走法">
+          <window size="0,0" weight="1" />
+          <img size="16,16" skin="svg_xxl_btn_hint" />
+          <text text="提 示" extend_left="6" font="size:13,bold:1" colorText="@color/clr_primary"/>
+          <window size="0,0" weight="1"/>
         </button>
         <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
         <!-- 计分区:七段 LED 翻页计数器 -->
