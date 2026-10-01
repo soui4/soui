@@ -557,7 +557,6 @@ end
 
 -- 提示:找一个可行交换,两枚棋子做选中脉冲动画(复用选中动画,点击即被替换)
 function xxl_on_hint(args)
-	xxl_probe_digits(); -- TEMP-PROBE(确认后删除)
 	if xxl.wndBoard == nil or xxl.coin <= 0 then return 0 end
 	if xxl.ani_count ~= 0 then return 0 end -- 动画进行中不给提示
 	local m = xxl_find_move();
@@ -944,7 +943,6 @@ end
 
 -- 重新开始按钮
 function xxl_on_restart(args)
-	xxl_probe_digits(); -- TEMP-PROBE(确认后删除)
 	if xxl.wndBoard == nil then return 0 end
 	xxl_restart_internal();
 	return 1;
@@ -1009,23 +1007,6 @@ function xxl_init(root)
 	xxl_restart_internal();
 	xxl_slog("init done");
 	return 1;
-end
-
--- TEMP-PROBE: 布局完成后由 xxl_on_hint 触发的 LED 几何取证(确认后删除)
-function xxl_probe_digits()
-	local ok, err = pcall(function()
-		for _,nm in ipairs({"digit_coin_2","digit_coin_0","digit_score_0"}) do
-			local ds = xxl.root:FindChildByNameA(nm,-1);
-			if ds == nil then
-				xxl_slog("probe " .. nm .. " NOT FOUND");
-			else
-				local rc = ds:GetWindowRect2();
-				xxl_slog("probe " .. nm .. " rc=" .. rc.left .. "," .. rc.top .. "," .. rc.right .. "," .. rc.bottom
-					.. " vis=" .. ds:IsVisible(FALSE));
-			end
-		end
-	end)
-	if not ok then xxl_slog("probe ERROR: " .. tostring(err)); end
 end
 
 -- ============ 稳定态自检(常驻,成功时零输出) ============
