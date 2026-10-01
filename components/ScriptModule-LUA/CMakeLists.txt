@@ -38,6 +38,15 @@ set(ScriptModule-lua_header
            src/exports/luaAnimationListener.h
            src/exports/exp_SysApi.h
            src/exports/luaFunSlot.h
+           src/exports/exp_IPropertyAnimator.h
+           src/exports/exp_IAnimatorSet.h
+           src/exports/exp_SXml.h
+           src/exports/exp_ISkinObj.h
+           src/exports/exp_ITranslator.h
+           src/exports/exp_ILogMgr.h
+           src/exports/exp_SMatrix.h
+           src/exports/exp_IBitmapS.h
+           src/exports/exp_LuaValueAnimator.h
            src/exports/toobj.h
 	lua_tinker/lua_tinker.h
 )

@@ -1,4 +1,5 @@
 ﻿#include <string/strcpcvt.h>
+#include <commgr2.h>
 #include <interface/SWindow-i.h>
 #include <interface/smenu-i.h>
 #include <interface/smenuex-i.h>
@@ -186,6 +187,40 @@ void SScreenToClient(INativeWnd *pWnd,CRect & rc){
 	pWnd->ScreenToClient2(&rc);
 }
 
+// ---------------------------------------------------------------------------
+// new global factories (parity with soui4js)
+// ---------------------------------------------------------------------------
+ITranslatorMgr * CreateTranslatorMgr(){
+	ITranslatorMgr *pRet = NULL;
+	SComMgr2 comMgr;
+	comMgr.CreateTranslator((IObjRef**)&pRet);
+	return pRet;
+}
+
+ILogMgr * GetLogMgr(){
+	return SApplication::getSingleton().GetLogManager();
+}
+
+BOOL IsX64() {
+#if defined(_M_AMD64) || defined(__amd64__) || defined(__x86_64__) || defined(_WIN64)
+	return TRUE;
+#else
+	return FALSE;
+#endif
+}
+
+int OsType() {
+#ifdef _WIN32
+	return 1;
+#elif defined(__linux__)
+	return 2;
+#elif defined(__APPLE__)
+	return 4;
+#else
+	return 0;
+#endif
+}
+
 BOOL ExpLua_Global(lua_State *L)
 {
 	try{
@@ -229,6 +264,19 @@ BOOL ExpLua_Global(lua_State *L)
 
 		lua_tinker::def(L,"SScreenToClient",SScreenToClient);
 		lua_tinker::def(L,"SClientToScreen",SClientToScreen);
+
+		// new in soui5 parity
+		lua_tinker::def(L,"CreateTranslatorMgr",CreateTranslatorMgr);
+		lua_tinker::def(L,"GetLogMgr",GetLogMgr);
+		lua_tinker::def(L,"IsX64",IsX64);
+		lua_tinker::def(L,"OsType",OsType);
+
+		// animation system
+		lua_tinker::def(L,"CreatePropertyAnimator",CreatePropertyAnimator);
+		lua_tinker::def(L,"CreatePropertyValuesHolder",CreatePropertyValuesHolder);
+		lua_tinker::def(L,"CreateAnimatorSet",CreateAnimatorSet);
+		lua_tinker::def(L,"CreateAnimatorGroup",CreateAnimatorGroup);
+		lua_tinker::def(L,"LoadValueAnimator",Lua_LoadValueAnimator);
 
 		return TRUE;
 	}catch(...)

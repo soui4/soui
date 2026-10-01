@@ -339,6 +339,8 @@ namespace lua_tinker
 
    template<>  char*               read ( lua_State *L, int index );
    template<>  const char*         read ( lua_State *L, int index );
+   // wide char strings are converted between lua utf8 and c++ utf16 automatically
+   template<>  const wchar_t*      read ( lua_State *L, int index );
    template<>  char                read ( lua_State *L, int index );
    template<>  unsigned char       read ( lua_State *L, int index );
    template<>  short               read ( lua_State *L, int index );
@@ -382,6 +384,8 @@ namespace lua_tinker
    template<>  void push ( lua_State *L, double ret );
    template<>  void push ( lua_State *L, char* ret );
    template<>  void push ( lua_State *L, const char* ret );
+   template<>  void push ( lua_State *L, wchar_t* ret );
+   template<>  void push ( lua_State *L, const wchar_t* ret );
    template<>  void push ( lua_State *L, bool ret );
    template<>  void push ( lua_State *L, lua_value* ret );
    template<>  void push ( lua_State *L, long long ret );
@@ -614,6 +618,18 @@ namespace lua_tinker
    {
       V T::*_var;
       mem_var ( V T::*val ) : _var ( val ) {}
+      void get ( lua_State *L )  { push<typename if_<is_obj<V>::value, V&, V>::type> ( L, read<T*> ( L, 1 )->*( _var ) ); }
+      void set ( lua_State *L )  { read<T*> ( L, 1 )->*( _var ) = read<V> ( L, 3 ); }
+   };
+
+   // member variable accessor for a derived registered class T whose member
+   // pointer is declared in base class BASE: read<T*> then apply the member
+   // pointer, so the implicit base conversion keeps the correct offset.
+   template<typename T, typename BASE, typename V>
+   struct mem_var_derived : var_base
+   {
+      V BASE::*_var;
+      mem_var_derived ( V BASE::*val ) : _var ( val ) {}
       void get ( lua_State *L )  { push<typename if_<is_obj<V>::value, V&, V>::type> ( L, read<T*> ( L, 1 )->*( _var ) ); }
       void set ( lua_State *L )  { read<T*> ( L, 1 )->*( _var ) = read<V> ( L, 3 ); }
    };
@@ -1701,17 +1717,14 @@ namespace lua_tinker
 	   if(lua_isfunction(L,-1))
 	   {
 		   push(L, arg);
-		   if(lua_pcall(L, 1, 1, errfunc) != 0)
-		   {
-			   lua_pop(L, 1);
-		   }
+		   lua_pcall(L, 1, 1, errfunc);
 	   }
 	   else
 	   {
 		   print_error(L, "lua_tinker::call() attempt to call global `%s' (not a function)", name);
 	   }
 
-	   lua_remove(L, -2);
+	   lua_remove(L, errfunc);
 	   return pop<RVal>(L);
    }
 
@@ -1725,17 +1738,14 @@ namespace lua_tinker
 	   {
 		   push(L, arg1);
 		   push(L, arg2);
-		   if(lua_pcall(L, 2, 1, errfunc) != 0)
-		   {
-			   lua_pop(L, 1);
-		   }
+		   lua_pcall(L, 2, 1, errfunc);
 	   }
 	   else
 	   {
 		   print_error(L, "lua_tinker::call() attempt to call global `%s' (not a function)", name);
 	   }
 
-	   lua_remove(L, -2);
+	   lua_remove(L, errfunc);
 	   return pop<RVal>(L);
    }
 
@@ -1750,17 +1760,14 @@ namespace lua_tinker
 		   push(L, arg1);
 		   push(L, arg2);
 		   push(L, arg3);
-		   if(lua_pcall(L, 3, 1, errfunc) != 0)
-		   {
-			   lua_pop(L, 1);
-		   }
+		   lua_pcall(L, 3, 1, errfunc);
 	   }
 	   else
 	   {
 		   print_error(L, "lua_tinker::call() attempt to call global `%s' (not a function)", name);
 	   }
 
-	   lua_remove(L, -2);
+	   lua_remove(L, errfunc);
 	   return pop<RVal>(L);
    }
 
@@ -1776,17 +1783,14 @@ namespace lua_tinker
 		   push(L, arg2);
 		   push(L, arg3);
 		   push(L, arg4);
-		   if(lua_pcall(L, 4, 1, errfunc) != 0)
-		   {
-			   lua_pop(L, 1);
-		   }
+		   lua_pcall(L, 4, 1, errfunc);
 	   }
 	   else
 	   {
 		   print_error(L, "lua_tinker::call() attempt to call global `%s' (not a function)", name);
 	   }
 
-	   lua_remove(L, -2);
+	   lua_remove(L, errfunc);
 	   return pop<RVal>(L);
    }
 
@@ -1803,17 +1807,14 @@ namespace lua_tinker
 		   push(L, arg3);
 		   push(L, arg4);
 		   push(L, arg5);
-		   if(lua_pcall(L, 5, 1, errfunc) != 0)
-		   {
-			   lua_pop(L, 1);
-		   }
+		   lua_pcall(L, 5, 1, errfunc);
 	   }
 	   else
 	   {
 		   print_error(L, "lua_tinker::call() attempt to call global `%s' (not a function)", name);
 	   }
 
-	   lua_remove(L, -2);
+	   lua_remove(L, errfunc);
 	   return pop<RVal>(L);
    }
 
@@ -1908,9 +1909,9 @@ namespace lua_tinker
       if ( lua_istable ( L, -1 ) )
       {
          // 压入类参数
-         lua_pushstring ( L, name );
-         new( lua_newuserdata ( L, sizeof ( mem_var<BASE, VAR> ) ) ) mem_var<BASE, VAR> ( val );
-         lua_rawset ( L, -3 );
+      lua_pushstring ( L, name );
+      new( lua_newuserdata ( L, sizeof ( mem_var_derived<T, BASE, VAR> ) ) ) mem_var_derived<T, BASE, VAR> ( val );
+      lua_rawset ( L, -3 );
       }
       lua_pop ( L, 1 );
    }

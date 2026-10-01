@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <template>
+  <g.xxl_ele>
+    <stack id="{{id}}" size="-1,-1" curSel="0" aniType="fade" cursor="hand" on_command="xxl_on_cmd">
+      <img size="-1,-1" skin="skin_xxl_icons" iconIndex="0"/>
+      <img size="-2,-2" skin="skin_xxl_icons" iconIndex="1"/>
+      <img size="-2,-2" skin="skin_xxl_icons" iconIndex="2"/>
+      <img size="-2,-2" skin="skin_xxl_icons" iconIndex="3"/>
+      <img size="-2,-2" skin="skin_xxl_icons" iconIndex="4"/>
+      <img size="-2,-2" skin="skin_xxl_icons" iconIndex="5"/>
+      <img size="-2,-2" skin="skin_xxl_icons" iconIndex="6"/>
+    </stack>
+  </g.xxl_ele>
   <g.block>
     <window name="{{name}}" layout="hbox" gravity="center">
       <window size="-1,-1" layout="hbox">

@@ -309,6 +309,7 @@ protected:
 		EVENT_NAME_HANDLER(L"card_misc",EventCmd::EventID,OnNavCard)
 		EVENT_NAME_HANDLER(L"card_skia",EventCmd::EventID,OnNavCard)
 		EVENT_NAME_HANDLER(L"card_about",EventCmd::EventID,OnNavCard)
+		EVENT_NAME_HANDLER(L"card_xxl",EventCmd::EventID,OnNavCard)
 		EVENT_NAME_COMMAND(L"btn_back",OnNavBack)
 	EVENT_MAP_END2(SHostWnd)
 

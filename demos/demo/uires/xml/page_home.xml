@@ -2,7 +2,7 @@
 <!--
   page_home.xml - 宫格首页(SOUI 功能演示启动器)
 
-  以卡片宫格形式展示 demo 的 7 个演示分区,点击卡片由 CMainDlg::OnNavToPage
+  以卡片宫格形式展示 demo 的 8 个演示分区,点击卡片由 CMainDlg::OnNavToPage
   切换到 tab_main 中对应页面;卡片背景使用 svg_card_bg 三态皮肤实现
   normal/hover/push 视觉反馈。卡片 name 与页序号的对应关系见 MainDlg_Nav.cpp。
 
@@ -34,5 +34,6 @@
     <t:home_card name="card_misc" icon="4" title="杂项" desc="脚本 / 拖放 / 矩阵变换 / SVG 等"/>
     <t:home_card name="card_skia" icon="5" title="Skia" desc="Skia 渲染高级特性演示"/>
     <t:home_card name="card_about" icon="6" title="关于" desc="版本信息与社区链接"/>
+    <t:home_card name="card_xxl" icon="7" title="脚本" desc="lua 跑马机 / 消消乐(match-3)"/>
   </window>
 </window>

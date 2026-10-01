@@ -109,6 +109,12 @@
           <page title="about" tip="copy right(c) setoutsoft 2011-2019.">
             <include src="layout:page_about"/>
           </page>
+          <!-- xxl 页置于最后:宫格导航 kNavMap 中 card_about=7 的页序映射保持不变
+               (MainDlg_Nav.cpp);iconIndex 显式指定,避免默认按页序取第 7 帧
+               越过 png_page_icons(7 态)边界 -->
+          <page title="脚本" tip="lua 跑马机 / 消消乐(match-3)" iconIndex="2">
+            <include src="layout:page_script"/>
+          </page>
         </tabctrl>
       </page>
     </tabctrl>

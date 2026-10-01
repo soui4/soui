@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   home_icons.svg - 宫格首页分类图标雪碧图(nanosvg 兼容)
-  7 帧横排,每帧 48x48,总尺寸 336x48。
+  8 帧横排,每帧 48x48,总尺寸 384x48。
   帧序与原 page_icons.png 一致:
-    0=基础控件  1=教程  2=动画  3=布局  4=杂项  5=skia  6=关于
+    0=基础控件  1=教程  2=动画  3=布局  4=杂项  5=skia  6=关于  7=消消乐
   配色:现代蓝色系 #2563EB -> #1D4ED8 渐变
 -->
-<svg xmlns="http://www.w3.org/2000/svg" width="336" height="48" viewBox="0 0 336 48">
+<svg xmlns="http://www.w3.org/2000/svg" width="384" height="48" viewBox="0 0 384 48">
   <defs>
     <linearGradient id="gBlue" gradientUnits="userSpaceOnUse" x1="0" y1="6" x2="0" y2="42">
       <stop offset="0" stop-color="#3B82F6"/>
@@ -73,5 +73,18 @@
     <circle cx="24" cy="24" r="17" fill="url(#gBlue)"/>
     <circle cx="24" cy="15.5" r="2.6" fill="#FFFFFF"/>
     <rect x="21.4" y="20.5" width="5.2" height="13.5" rx="2.6" fill="#FFFFFF"/>
+  </g>
+
+  <!-- 帧7:消消乐(3x3 方块棋盘,右下高亮) -->
+  <g transform="translate(336,0)">
+    <rect x="5"  y="5"  width="11" height="11" rx="3" fill="url(#gBlue)"/>
+    <rect x="18.5" y="5" width="11" height="11" rx="3" fill="#93C5FD"/>
+    <rect x="32" y="5"  width="11" height="11" rx="3" fill="url(#gCyan)"/>
+    <rect x="5"  y="18.5" width="11" height="11" rx="3" fill="#60A5FA"/>
+    <rect x="18.5" y="18.5" width="11" height="11" rx="3" fill="url(#gCyan)"/>
+    <rect x="32" y="18.5" width="11" height="11" rx="3" fill="#93C5FD"/>
+    <rect x="5"  y="32" width="11" height="11" rx="3" fill="url(#gCyan)"/>
+    <rect x="18.5" y="32" width="11" height="11" rx="3" fill="url(#gBlue)"/>
+    <circle cx="37.5" cy="37.5" r="5.5" fill="#F59E0B"/>
   </g>
 </svg>

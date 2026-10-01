@@ -1,5 +1,49 @@
 ﻿#include <interface/sxml-i.h>
+#include "toobj.h"
 using namespace pugi;
+
+// interface As* methods have DEF_VAL default args; lua_tinker cannot fill
+// them, so wrap with lua_CFunctions that apply the defaults.
+static int IXmlAttr_AsInt(lua_State *L)
+{
+    IXmlAttr *_this = lua_tinker_toobj<IXmlAttr>(L, 1);
+    if (!_this) return 0;
+    int def = lua_isnoneornil(L, 2) ? 0 : (int)lua_tointeger(L, 2);
+    lua_pushinteger(L, _this->AsInt(def));
+    return 1;
+}
+static int IXmlAttr_AsUint(lua_State *L)
+{
+    IXmlAttr *_this = lua_tinker_toobj<IXmlAttr>(L, 1);
+    if (!_this) return 0;
+    int def = lua_isnoneornil(L, 2) ? 0 : (int)lua_tointeger(L, 2);
+    lua_pushinteger(L, (lua_Integer)_this->AsUint(def));
+    return 1;
+}
+static int IXmlAttr_AsFloat(lua_State *L)
+{
+    IXmlAttr *_this = lua_tinker_toobj<IXmlAttr>(L, 1);
+    if (!_this) return 0;
+    float def = lua_isnoneornil(L, 2) ? 0.0f : (float)lua_tonumber(L, 2);
+    lua_pushnumber(L, _this->AsFloat(def));
+    return 1;
+}
+static int IXmlAttr_AsDouble(lua_State *L)
+{
+    IXmlAttr *_this = lua_tinker_toobj<IXmlAttr>(L, 1);
+    if (!_this) return 0;
+    double def = lua_isnoneornil(L, 2) ? 0.0 : lua_tonumber(L, 2);
+    lua_pushnumber(L, _this->AsDouble(def));
+    return 1;
+}
+static int IXmlAttr_AsBool(lua_State *L)
+{
+    IXmlAttr *_this = lua_tinker_toobj<IXmlAttr>(L, 1);
+    if (!_this) return 0;
+    BOOL def = lua_isnoneornil(L, 2) ? FALSE : (lua_toboolean(L, 2) ? TRUE : FALSE);
+    lua_pushboolean(L, _this->AsBool(def) ? 1 : 0);
+    return 1;
+}
 
 BOOL ExpLua_IXml(lua_State *L)
 {
@@ -14,8 +58,13 @@ BOOL ExpLua_IXml(lua_State *L)
 		lua_tinker::class_def<IXmlAttr>(L,"get_userdata",&IXmlAttr::get_userdata);
 		lua_tinker::class_def<IXmlAttr>(L,"Next",&IXmlAttr::Next);
 		lua_tinker::class_def<IXmlAttr>(L,"Prev",&IXmlAttr::Prev);
+		class_set_cfun<IXmlAttr>(L,"AsInt", IXmlAttr_AsInt);
+		class_set_cfun<IXmlAttr>(L,"AsUint", IXmlAttr_AsUint);
+		class_set_cfun<IXmlAttr>(L,"AsFloat", IXmlAttr_AsFloat);
+		class_set_cfun<IXmlAttr>(L,"AsDouble", IXmlAttr_AsDouble);
+		class_set_cfun<IXmlAttr>(L,"AsBool", IXmlAttr_AsBool);
 
-        
+
 		lua_tinker::class_add<IXmlNode>(L,"IXmlNode");
 		lua_tinker::class_inh<IXmlNode,IObjRef>(L);
 		lua_tinker::class_def<IXmlNode>(L,"ToString",&IXmlNode::ToString);
@@ -23,6 +72,8 @@ BOOL ExpLua_IXml(lua_State *L)
 		lua_tinker::class_def<IXmlNode>(L,"Empty",&IXmlNode::Empty);
 		lua_tinker::class_def<IXmlNode>(L,"Name",&IXmlNode::Name);
 		lua_tinker::class_def<IXmlNode>(L,"Value",&IXmlNode::Value);
+		lua_tinker::class_def<IXmlNode>(L,"Text",&IXmlNode::Text);
+		lua_tinker::class_def<IXmlNode>(L,"SetText",&IXmlNode::SetText);
 		lua_tinker::class_def<IXmlNode>(L,"set_userdata",&IXmlNode::set_userdata);
 		lua_tinker::class_def<IXmlNode>(L,"get_userdata",&IXmlNode::get_userdata);
 
@@ -39,6 +90,19 @@ BOOL ExpLua_IXml(lua_State *L)
 
 		lua_tinker::class_def<IXmlNode>(L,"NextSibling2",&IXmlNode::NextSibling2);
 		lua_tinker::class_def<IXmlNode>(L,"PrevSibling2",&IXmlNode::PrevSibling2);
+
+		// mutation methods (DOM building from script)
+		lua_tinker::class_def<IXmlNode>(L,"AppendChild",&IXmlNode::AppendChild);
+		lua_tinker::class_def<IXmlNode>(L,"PrependChild",&IXmlNode::PrependChild);
+		lua_tinker::class_def<IXmlNode>(L,"AppendCopyNode",&IXmlNode::AppendCopyNode);
+		lua_tinker::class_def<IXmlNode>(L,"PrependCopyNode",&IXmlNode::PrependCopyNode);
+		lua_tinker::class_def<IXmlNode>(L,"AppendAttribute",&IXmlNode::AppendAttribute);
+		lua_tinker::class_def<IXmlNode>(L,"PrependAttribute",&IXmlNode::PrependAttribute);
+		lua_tinker::class_def<IXmlNode>(L,"AppendCopyAttribute",&IXmlNode::AppendCopyAttribute);
+		lua_tinker::class_def<IXmlNode>(L,"PrependCopyAttribute",&IXmlNode::PrependCopyAttribute);
+		lua_tinker::class_def<IXmlNode>(L,"RemoveAttribute",&IXmlNode::RemoveAttribute);
+		lua_tinker::class_def<IXmlNode>(L,"RemoveChild",&IXmlNode::RemoveChild);
+		lua_tinker::class_def<IXmlNode>(L,"RemoveAllChilden",&IXmlNode::RemoveAllChilden);
 
 
 		lua_tinker::class_add<IXmlDoc>(L,"IXmlDoc");

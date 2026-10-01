@@ -10,7 +10,7 @@
 *
 * Describe    宫格首页(page_home.xml)的页面切换逻辑(两级 tab 结构):
 *               - tab_main 仅两页:0=home(宫格首页),1=contents(导航栏+分区容器);
-*               - 卡片点击 -> OnNavCard -> NavigateToPage(1..7):先将 tab_contents
+*               - 卡片点击 -> OnNavCard -> NavigateToPage(1..8):先将 tab_contents
 *                 无动画切到目标分区,再由 tab_main 以滑动动画进入 contents 页;
 *               - 返回按钮 -> OnNavBack   -> NavigateToPage(0):tab_main 滑动动画回 home;
 *               - 导航栏(nav_bar)位于 contents 页内部,显隐随 tab_main 页切换
@@ -44,7 +44,7 @@ void CMainDlg::InitPageNav()
 *             (NavigateToPage 内部将其映射为 tab_contents 的页序):
 *               card_ctrls=1 基础控件  card_webkit=2 教程  card_animator=3 动画
 *               card_layout=4 布局     card_misc=5 杂项    card_skia=6 Skia
-*               card_about=7 关于
+*               card_about=7 关于      card_xxl=8 脚本(跑马机/消消乐)
 */
 void CMainDlg::OnNavCard(IEvtArgs *e)
 {
@@ -61,6 +61,7 @@ void CMainDlg::OnNavCard(IEvtArgs *e)
 		{ L"card_misc",     5, L"杂项" },
 		{ L"card_skia",     6, L"Skia" },
 		{ L"card_about",    7, L"关于" },
+		{ L"card_xxl",      8, L"脚本" },
 	};
 	for(int i=0;i<ARRAYSIZE(kNavMap);i++)
 	{
