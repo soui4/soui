@@ -139,6 +139,9 @@ config_compiler_and_linker()
 
 
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
+	if(MSVC AND CMAKE_SIZEOF_VOID_P EQUAL 4)
+	    add_link_options(/SAFESEH:NO)
+	endif()
   if(MSVC_VERSION LESS 1600)
       include_directories(${PROJECT_SOURCE_DIR}/third-part/stdint)
   endif()
