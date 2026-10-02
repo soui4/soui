@@ -1,4 +1,4 @@
-//stamp:01dd51a34d82d5f2
+//stamp:01dd520d03f6f374
 /*<------------------------------------------------------------------------------------------------->*/
 #define DEFINE_UIRES(name, type, file_path)\
     name type file_path
@@ -189,4 +189,9 @@ DEFINE_UIRES(xxl_icons,	svg,	"uires/svg/xxl_icons.svg")
 DEFINE_UIRES(xxl_digits,	svg,	"uires/svg/xxl_digits.svg")
 DEFINE_UIRES(xxl_fx,	svg,	"uires/svg/xxl_fx.svg")
 DEFINE_UIRES(xxl_fx2,	svg,	"uires/svg/xxl_fx2.svg")
+DEFINE_UIRES(xxl_btn_primary,	svg,	"uires/svg/xxl_btn_primary.svg")
+DEFINE_UIRES(xxl_btn_secondary,	svg,	"uires/svg/xxl_btn_secondary.svg")
+DEFINE_UIRES(xxl_btn_restart,	svg,	"uires/svg/xxl_btn_restart.svg")
+DEFINE_UIRES(xxl_btn_hint,	svg,	"uires/svg/xxl_btn_hint.svg")
+DEFINE_UIRES(coin,	svg,	"uires/svg/coin.svg")
 DEFINE_UIRES(roomlist,	xml,	"uires/xml/roomlist.xml")

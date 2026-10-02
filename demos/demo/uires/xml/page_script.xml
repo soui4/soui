@@ -19,7 +19,7 @@
     组合按钮(skin: xxl_btn_primary/xxl_btn_secondary)。
   棋盘/状态栏的名字与 id 约定见 test.lua 的 xxl_* 函数。
 -->
-<tabctrl pos="0,0,-0,-0" tabWidth="100" tabAlign="left" curSel="1" animateSteps="20"
+<tabctrl pos="0,0,-0,-0" tabWidth="100" tabAlign="left" curSel="0" animateSteps="20"
          colorBkgnd="@color/clr_page_bg" colorText="@color/clr_title">
   <page title="消消乐">
     <window size="full,full" layout="hbox" padding="15,12,15,15" interval="12">
@@ -89,58 +89,60 @@
         </window>
       </window>
 
-      <!-- 赛道 + 下注区 (vbox 子项: -2,0 = 宽度撑满 + weight 分剩余高度) -->
-      <window size="-2,0" weight="1" layout="hbox" interval="12">
-        <!-- 赛道(白色跑道,赛马由 lua 定位;白底 GIF 素材可直接融入) -->
-        <window size="0,-2" weight="1" layout="vbox" padding="12,12,12,12" colorBkgnd="@color/clr_card_bg">
-          <window size="-2,0" weight="1" name="game_canvas" on_size="on_canvas_size" clipClient="1" colorBkgnd="#FFFFFF">
-            <!-- 跑道外框(1px 淡绿,在白底上勾出跑道边界) -->
-            <window pos="0,0,-0,@1" colorBkgnd="#BFDBCB"/>
-            <window pos="0,-1,-0,@1" colorBkgnd="#BFDBCB"/>
-            <window pos="0,0,@1,-0" colorBkgnd="#BFDBCB"/>
-            <window pos="-1,0,-0,-0" colorBkgnd="#BFDBCB"/>
-            <!-- 车道分隔线(1px 色块,pos y1=%N + y2=@1) -->
-            <window pos="0,%25,-0,@1" colorBkgnd="#C8E3D2"/>
-            <window pos="0,%50,-0,@1" colorBkgnd="#C8E3D2"/>
-            <window pos="0,%75,-0,@1" colorBkgnd="#C8E3D2"/>
-            <!-- 终点线 -->
-            <window pos="-10,0,-8,-0" colorBkgnd="#15602F"/>
-            <text pos="-36,3,@36,@16" text="终点" font="size:11,bold:1" colorText="#15602F" align="center"/>
-            <!-- 赛马(lua 定位,编号随马移动) -->
-            <gifplayer name="player_1" float="1" skin="gif_horse">
-              <window size="20,20" pos="0,0" colorBkgnd="@color/clr_primary" layout="hbox" gravity="center" msgTransparent="1"><text text="1" font="size:12,bold:1" colorText="#FFFFFF"/></window>
-            </gifplayer>
-            <gifplayer name="player_2" float="1" skin="gif_horse">
-              <window size="20,20" pos="0,0" colorBkgnd="@color/clr_primary" layout="hbox" gravity="center" msgTransparent="1"><text text="2" font="size:12,bold:1" colorText="#FFFFFF"/></window>
-            </gifplayer>
-            <gifplayer name="player_3" float="1" skin="gif_horse">
-              <window size="20,20" pos="0,0" colorBkgnd="@color/clr_primary" layout="hbox" gravity="center" msgTransparent="1"><text text="3" font="size:12,bold:1" colorText="#FFFFFF"/></window>
-            </gifplayer>
-            <gifplayer name="player_4" float="1" skin="gif_horse">
-              <window size="20,20" pos="0,0" colorBkgnd="@color/clr_primary" layout="hbox" gravity="center" msgTransparent="1"><text text="4" font="size:12,bold:1" colorText="#FFFFFF"/></window>
-            </gifplayer>
-            <gifplayer name="flag_win" float="1" skin="gif_win" show="0" id="400"/>
-          </window>
+      <!-- 赛道 + 下注区:同一张白色卡片内,下注区 4 行与 4 条跑道终点一一对应 -->
+      <window size="-2,0" weight="1" layout="hbox" interval="0" padding="12,12,12,12" colorBkgnd="@color/clr_card_bg">
+        <!-- 跑道(白底,white-bg GIF 素材可直接融入;赛马由 lua 定位) -->
+        <window size="0,-2" weight="1" name="game_canvas" on_size="on_canvas_size" clipClient="1" colorBkgnd="#FFFFFF">
+          <!-- 跑道外框(1px 淡绿,在白底上勾出跑道边界) -->
+          <window pos="0,0,-0,@1" colorBkgnd="#BFDBCB"/>
+          <window pos="0,-1,-0,@1" colorBkgnd="#BFDBCB"/>
+          <window pos="0,0,@1,-0" colorBkgnd="#BFDBCB"/>
+          <window pos="-1,0,-0,-0" colorBkgnd="#BFDBCB"/>
+          <!-- 车道分隔线(1px 色块) -->
+          <window pos="0,%25,-0,@1" colorBkgnd="#C8E3D2"/>
+          <window pos="0,%50,-0,@1" colorBkgnd="#C8E3D2"/>
+          <window pos="0,%75,-0,@1" colorBkgnd="#C8E3D2"/>
+          <!-- 赛马(lua 定位,编号随马移动) -->
+          <gifplayer name="player_1" float="1" skin="gif_horse">
+            <window size="20,20" pos="0,0" colorBkgnd="@color/clr_primary" layout="hbox" gravity="center" msgTransparent="1"><text text="1" font="size:12,bold:1" colorText="#FFFFFF"/></window>
+          </gifplayer>
+          <gifplayer name="player_2" float="1" skin="gif_horse">
+            <window size="20,20" pos="0,0" colorBkgnd="@color/clr_primary" layout="hbox" gravity="center" msgTransparent="1"><text text="2" font="size:12,bold:1" colorText="#FFFFFF"/></window>
+          </gifplayer>
+          <gifplayer name="player_3" float="1" skin="gif_horse">
+            <window size="20,20" pos="0,0" colorBkgnd="@color/clr_primary" layout="hbox" gravity="center" msgTransparent="1"><text text="3" font="size:12,bold:1" colorText="#FFFFFF"/></window>
+          </gifplayer>
+          <gifplayer name="player_4" float="1" skin="gif_horse">
+            <window size="20,20" pos="0,0" colorBkgnd="@color/clr_primary" layout="hbox" gravity="center" msgTransparent="1"><text text="4" font="size:12,bold:1" colorText="#FFFFFF"/></window>
+          </gifplayer>
+          <gifplayer name="flag_win" float="1" skin="gif_win" show="0" id="400"/>
+          <!-- 终点线:贴 game_canvas 右边缘,并排在赛马之后绘制,避免白底 GIF 盖住 -->
+          <window pos="-3,0,-0,@3" colorBkgnd="#16A34A"/>
+          <text pos="-32,4,-3,@16" text="终点" font="size:11,bold:1" colorText="#15803D" align="center"/>
         </window>
-        <!-- 下注区 -->
-        <window size="100,-2" layout="vbox" interval="8" padding="10,10,10,10" gravity="center" colorBkgnd="@color/clr_card_bg">
-          <text text="下注区" font="size:13,bold:1" colorText="@color/clr_title" align="center"/>
-          <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
-          <window size="-1,-1" layout="hbox" interval="6" gravity="center">
-            <window size="22,22" colorBkgnd="@color/clr_primary" layout="hbox" gravity="center"><text text="1" font="size:13,bold:1" colorText="#FFFFFF"/></window>
-            <window size="48,48" skin="img_coin" id="101" tip="下注1号马" on_command="on_bet" align="center" valign="center" font="size:16,bold:1" colorText="@color/clr_title">0</window>
+        <!-- 跑道与下注区之间的分隔线 -->
+        <window size="1,-2" colorBkgnd="@color/clr_divider"/>
+        <!-- 下注区:4 行等高,与 4 条跑道终点对齐(每行一个跑道的下注位) -->
+        <window size="92,-2" layout="vbox" interval="0">
+          <window size="-2,0" weight="1" layout="hbox" interval="0" margin="0,2,0,2" colorBkgnd="#F8FAFC">
+            <window size="3,-2" colorBkgnd="@color/clr_primary"/>
+            <window size="18,18" layout="hbox" gravity="center" colorBkgnd="@color/clr_primary" msgTransparent="1" layout_gravity="center"><text text="1" font="size:12,bold:1" colorText="#FFFFFF"/></window>
+            <window size="44,44" layout_gravity="center" skin="svg_coin" id="101" tip="下注1号马" on_command="on_bet" align="center" valign="center" font="size:15,bold:1" colorText="#7A4A00">0</window>
           </window>
-          <window size="-1,-1" layout="hbox" interval="6" gravity="center">
-            <window size="22,22" colorBkgnd="@color/clr_primary" layout="hbox" gravity="center"><text text="2" font="size:13,bold:1" colorText="#FFFFFF"/></window>
-            <window size="48,48" skin="img_coin" id="102" tip="下注2号马" on_command="on_bet" align="center" valign="center" font="size:16,bold:1" colorText="@color/clr_title">0</window>
+          <window size="-2,0" weight="1" layout="hbox" interval="0" margin="0,2,0,2" colorBkgnd="#F8FAFC">
+            <window size="3,-2" colorBkgnd="@color/clr_primary"/>
+            <window size="18,18" layout="hbox" gravity="center" colorBkgnd="@color/clr_primary" msgTransparent="1" layout_gravity="center"><text text="2" font="size:12,bold:1" colorText="#FFFFFF"/></window>
+            <window size="44,44" layout_gravity="center" skin="svg_coin" id="102" tip="下注2号马" on_command="on_bet" align="center" valign="center" font="size:15,bold:1" colorText="#7A4A00">0</window>
           </window>
-          <window size="-1,-1" layout="hbox" interval="6" gravity="center">
-            <window size="22,22" colorBkgnd="@color/clr_primary" layout="hbox" gravity="center"><text text="3" font="size:13,bold:1" colorText="#FFFFFF"/></window>
-            <window size="48,48" skin="img_coin" id="103" tip="下注3号马" on_command="on_bet" align="center" valign="center" font="size:16,bold:1" colorText="@color/clr_title">0</window>
+          <window size="-2,0" weight="1" layout="hbox" interval="0" margin="0,2,0,2" colorBkgnd="#F8FAFC">
+            <window size="3,-2" colorBkgnd="@color/clr_primary"/>
+            <window size="18,18" layout="hbox" gravity="center" colorBkgnd="@color/clr_primary" msgTransparent="1" layout_gravity="center"><text text="3" font="size:12,bold:1" colorText="#FFFFFF"/></window>
+            <window size="44,44" layout_gravity="center" skin="svg_coin" id="103" tip="下注3号马" on_command="on_bet" align="center" valign="center" font="size:15,bold:1" colorText="#7A4A00">0</window>
           </window>
-          <window size="-1,-1" layout="hbox" interval="6" gravity="center">
-            <window size="22,22" colorBkgnd="@color/clr_primary" layout="hbox" gravity="center"><text text="4" font="size:13,bold:1" colorText="#FFFFFF"/></window>
-            <window size="48,48" skin="img_coin" id="104" tip="下注4号马" on_command="on_bet" align="center" valign="center" font="size:16,bold:1" colorText="@color/clr_title">0</window>
+          <window size="-2,0" weight="1" layout="hbox" interval="0" margin="0,2,0,2" colorBkgnd="#F8FAFC">
+            <window size="3,-2" colorBkgnd="@color/clr_primary"/>
+            <window size="18,18" layout="hbox" gravity="center" colorBkgnd="@color/clr_primary" msgTransparent="1" layout_gravity="center"><text text="4" font="size:12,bold:1" colorText="#FFFFFF"/></window>
+            <window size="44,44" layout_gravity="center" skin="svg_coin" id="104" tip="下注4号马" on_command="on_bet" align="center" valign="center" font="size:15,bold:1" colorText="#7A4A00">0</window>
           </window>
         </window>
       </window>

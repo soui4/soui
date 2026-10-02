@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  coin.svg - 跑马机下注金币(nanosvg 兼容)
+  3 帧横排,单帧 48x48(与下注按钮尺寸一致,光栅化时无变形),总尺寸 144x48。
+  帧序与 SOUI imglist 三态约定一致:0=normal  1=hover  2=push
+  视觉语言:金色外圈 + 12 齿纹 + 浅色内盘,内盘留给 SOUI 绘制的下注金额文字。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="144" height="48" viewBox="0 0 144 48">
+    <g transform="translate(0,0)">
+      <!-- 外圈:金币主体 -->
+      <circle cx="24" cy="24" r="23" fill="#F59E0B"/>
+      <circle cx="24" cy="24" r="23" fill="none" stroke="#B45309" stroke-width="1.6"/>
+      <circle cx="24" cy="24" r="21" fill="#FBBF24"/>
+      <!-- 12 个齿纹 -->
+      <g stroke="#D97706" stroke-width="1.6" stroke-linecap="round">
+        <line x1="43.8" y1="29.3" x2="45.8" y2="29.8"/>
+        <line x1="38.5" y1="38.5" x2="40.0" y2="40.0"/>
+        <line x1="29.3" y1="43.8" x2="29.8" y2="45.8"/>
+        <line x1="18.7" y1="43.8" x2="18.2" y2="45.8"/>
+        <line x1="9.5" y1="38.5" x2="8.0" y2="40.0"/>
+        <line x1="4.2" y1="29.3" x2="2.2" y2="29.8"/>
+        <line x1="4.2" y1="18.7" x2="2.2" y2="18.2"/>
+        <line x1="9.5" y1="9.5" x2="8.0" y2="8.0"/>
+        <line x1="18.7" y1="4.2" x2="18.2" y2="2.2"/>
+        <line x1="29.3" y1="4.2" x2="29.8" y2="2.2"/>
+        <line x1="38.5" y1="9.5" x2="40.0" y2="8.0"/>
+        <line x1="43.8" y1="18.7" x2="45.8" y2="18.2"/>
+      </g>
+      <!-- 内盘:浅色底,下注金额文字压在上面保证对比度 -->
+      <circle cx="24" cy="24" r="16" fill="#FFFBEB"/>
+      <circle cx="24" cy="24" r="16" fill="none" stroke="#FCD34D" stroke-width="1"/>
+      <!-- 左上高光 -->
+      <path d="M6.8 15.2 A19 19 0 0 1 32.8 6.1" fill="none" stroke="#FFFFFF" stroke-opacity="0.45" stroke-width="2.4" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(48,0)">
+      <!-- 外圈:金币主体 -->
+      <circle cx="24" cy="24" r="23" fill="#FBBF24"/>
+      <circle cx="24" cy="24" r="23" fill="none" stroke="#B45309" stroke-width="1.6"/>
+      <circle cx="24" cy="24" r="21" fill="#FCD34D"/>
+      <!-- 12 个齿纹 -->
+      <g stroke="#B45309" stroke-width="1.6" stroke-linecap="round">
+        <line x1="43.8" y1="29.3" x2="45.8" y2="29.8"/>
+        <line x1="38.5" y1="38.5" x2="40.0" y2="40.0"/>
+        <line x1="29.3" y1="43.8" x2="29.8" y2="45.8"/>
+        <line x1="18.7" y1="43.8" x2="18.2" y2="45.8"/>
+        <line x1="9.5" y1="38.5" x2="8.0" y2="40.0"/>
+        <line x1="4.2" y1="29.3" x2="2.2" y2="29.8"/>
+        <line x1="4.2" y1="18.7" x2="2.2" y2="18.2"/>
+        <line x1="9.5" y1="9.5" x2="8.0" y2="8.0"/>
+        <line x1="18.7" y1="4.2" x2="18.2" y2="2.2"/>
+        <line x1="29.3" y1="4.2" x2="29.8" y2="2.2"/>
+        <line x1="38.5" y1="9.5" x2="40.0" y2="8.0"/>
+        <line x1="43.8" y1="18.7" x2="45.8" y2="18.2"/>
+      </g>
+      <!-- 内盘:浅色底,下注金额文字压在上面保证对比度 -->
+      <circle cx="24" cy="24" r="16" fill="#FFFBEB"/>
+      <circle cx="24" cy="24" r="16" fill="none" stroke="#FDE68A" stroke-width="1"/>
+      <!-- 左上高光 -->
+      <path d="M6.8 15.2 A19 19 0 0 1 32.8 6.1" fill="none" stroke="#FFFFFF" stroke-opacity="0.60" stroke-width="2.4" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(96,0)">
+      <!-- 外圈:金币主体 -->
+      <circle cx="24" cy="24" r="23" fill="#D97706"/>
+      <circle cx="24" cy="24" r="23" fill="none" stroke="#92400E" stroke-width="1.6"/>
+      <circle cx="24" cy="24" r="21" fill="#F59E0B"/>
+      <!-- 12 个齿纹 -->
+      <g stroke="#92400E" stroke-width="1.6" stroke-linecap="round">
+        <line x1="43.8" y1="29.3" x2="45.8" y2="29.8"/>
+        <line x1="38.5" y1="38.5" x2="40.0" y2="40.0"/>
+        <line x1="29.3" y1="43.8" x2="29.8" y2="45.8"/>
+        <line x1="18.7" y1="43.8" x2="18.2" y2="45.8"/>
+        <line x1="9.5" y1="38.5" x2="8.0" y2="40.0"/>
+        <line x1="4.2" y1="29.3" x2="2.2" y2="29.8"/>
+        <line x1="4.2" y1="18.7" x2="2.2" y2="18.2"/>
+        <line x1="9.5" y1="9.5" x2="8.0" y2="8.0"/>
+        <line x1="18.7" y1="4.2" x2="18.2" y2="2.2"/>
+        <line x1="29.3" y1="4.2" x2="29.8" y2="2.2"/>
+        <line x1="38.5" y1="9.5" x2="40.0" y2="8.0"/>
+        <line x1="43.8" y1="18.7" x2="45.8" y2="18.2"/>
+      </g>
+      <!-- 内盘:浅色底,下注金额文字压在上面保证对比度 -->
+      <circle cx="24" cy="24" r="16" fill="#FEF3C7"/>
+      <circle cx="24" cy="24" r="16" fill="none" stroke="#FBBF24" stroke-width="1"/>
+      <!-- 左上高光 -->
+      <path d="M6.8 15.2 A19 19 0 0 1 32.8 6.1" fill="none" stroke="#FFFFFF" stroke-opacity="0.25" stroke-width="2.4" stroke-linecap="round"/>
+    </g>
+</svg>

@@ -134,7 +134,9 @@
   <imglist name="svg_tab_animator" src="svg:tab_animator" states="3"/>
   <imglist name="svg_tab_misc" src="svg:tab_misc" states="10"/>
   <!-- 动态创建窗口演示页:wnd_container 的容器标识背景(蓝色虚线框+角标) -->
-  <imglist name="svg_container_bg" src="svg:container_bg"/>
+  <imglist name="svg_container_bg" src="svg:container_bg"/>
+  <!-- 跑马机下注金币(SVG 重制版,3 态:normal/hover/push) -->
+  <imglist name="svg_coin" src="svg:coin" states="3"/>
   <!-- 消消乐(lua 版)元素图标:7 态雪碧图(源自 soxxl icons.png) -->
   <imglist name="skin_xxl_icons" src="imgx:xxl_icons" states="7"/>
   <!-- 消消乐 SVG 重制版:7 态糖果风棋子 + 10 态七段 LED 数字 -->
