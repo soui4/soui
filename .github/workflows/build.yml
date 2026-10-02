@@ -91,14 +91,14 @@ jobs:
       run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
             -DPNG_HARDWARE_OPTIMIZATIONS=OFF  -DSOUI_FUN_TEST_POST_BUILD=OFF
 
-    # Windows 用 VS 生成器（多配置）+ 指定平台：
-    #   - matrix.platform 未定义（x64）时表达式取 'x64'（GitHub 表达式中 null == '' 为真）
-    #   - x86 -> Win32, arm64 -> ARM64
-    # 此前用 -G Ninja 时 runner 无 MSVC 环境，CMake 会静默选中 MinGW GCC，
-    # 且单配置生成器没有 Release 子目录，导致 build/bin/Release/*.exe 打包为空。
+    # Windows 保持 MinGW + Ninja（runner 无 MSVC 环境时 CMake 自动选中 MinGW GCC，
+    # 2026-09-30 的构建即为此组合，2214 个目标全部编过）。
+    # 注意：Ninja 是单配置生成器，exe/dll 直接输出到 build/bin/（没有 Release 子目录），
+    # 而 games 资源按 $<CONFIGURATION> 固定落在 build/bin/Release/；
+    # 打包前用 staging 步骤把可执行产物与 demo_res 汇入 build/bin/Release/，统一布局后上传。
     - name: Configure CMake (Windows)
       if: matrix.os == 'Windows'
-      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -G "Visual Studio 17 2022" -A ${{ matrix.platform == '' && 'x64' || matrix.platform }}
+      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -G Ninja
 
     - name: Configure CMake (macOS x64)
       if: matrix.os == 'macOS' && matrix.arch == 'x64'
@@ -129,13 +129,27 @@ jobs:
       if: matrix.os == 'Linux'
       run: xvfb-run -a ctest --test-dir build -L '^soui-headless$' --output-on-failure
 
-    - name: Run unit, integration and core E2E checks (Windows, MSVC multi-config needs -C)
-      if: matrix.os == 'Windows'
-      run: ctest --test-dir build -C ${{ env.BUILD_TYPE }} -L '^soui-headless$' --output-on-failure
-
-    - name: Run unit, integration and core E2E checks (macOS)
-      if: matrix.os == 'macOS'
+    - name: Run unit, integration and core E2E checks
+      if: matrix.os != 'Linux'
       run: ctest --test-dir build -L '^soui-headless$' --output-on-failure
+
+    # MinGW/Ninja 单配置布局：exe/dll/exctrl/demo_res 直接在 build/bin/，
+    # junqi/cnchess/upgrade/config 资源因 CMakeLists 用 $<CONFIGURATION> 固定落在
+    # build/bin/Release/（zip 内会保留 Release/ 这一层级）。
+    - name: Upload demo (Windows)
+      if: matrix.os == 'Windows'
+      uses: actions/upload-artifact@v4
+      with:
+        name: demo-${{ matrix.os }}-${{ matrix.arch }}
+        path: |
+          build/bin/*.exe
+          build/bin/*.dll
+          build/bin/*.exctrl
+          build/bin/demo_res/**
+          build/bin/${{ env.BUILD_TYPE }}/junqi/**
+          build/bin/${{ env.BUILD_TYPE }}/cnchess/**
+          build/bin/${{ env.BUILD_TYPE }}/upgrade/**
+          build/bin/${{ env.BUILD_TYPE }}/Config/**
 
     - name: Create file structure (Windows)
       if: matrix.os == 'Windows'
@@ -148,21 +162,6 @@ jobs:
     - name: Create file structure (macOS)
       if: matrix.os == 'macOS'
       run: find . -type f -name "*.dylib" -o -name "*.app" -o -name "demo*" | head -50 > file_structure.txt
-
-    - name: Upload demo (Windows)
-      if: matrix.os == 'Windows'
-      uses: actions/upload-artifact@v4
-      with:
-        name: demo-${{ matrix.os }}-${{ matrix.arch }}
-        path: |
-          build/bin/${{ env.BUILD_TYPE }}/*.exe
-          build/bin/${{ env.BUILD_TYPE }}/*.dll
-          build/bin/${{ env.BUILD_TYPE }}/*.exctrl
-          build/bin/${{ env.BUILD_TYPE }}/junqi/**
-          build/bin/${{ env.BUILD_TYPE }}/cnchess/**
-          build/bin/${{ env.BUILD_TYPE }}/upgrade/**
-          build/bin/${{ env.BUILD_TYPE }}/Config/**
-          build/bin/${{ env.BUILD_TYPE }}/demo_res/**
 
     - name: Upload demo (Linux)
       if: matrix.os == 'Linux'
