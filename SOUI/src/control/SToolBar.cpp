@@ -456,15 +456,15 @@ void SToolBar::DrawItem(IRenderTarget *pRT, const CRect &rcItem, const ToolBarIt
             else
             {
                 // Horizontal arrangement: icon left of text
-                int nInter = (rcContent.Height() - smax(szIcon.cy, szTxt.cy)) / 2;
-                CRect rcIcon(rcContent.left + nInter, rcContent.top + nInter, rcContent.left + nInter + szIcon.cx, rcContent.top + nInter + szIcon.cy);
+                int nInter = (rcContent.Height() - szIcon.cy) / 2;
+                CRect rcIcon(CPoint(rcContent.left + nInter, rcContent.top + nInter), szIcon);
                 if (pItem->icon)
                     pRT->DrawBitmapEx(rcIcon, pItem->icon, CRect(CPoint(), szIcon), EM_STRETCH, 0xff);
                 else if (_skinIcons && pItem->iIcon >= 0)
                     _skinIcons->DrawByIndex(pRT, rcIcon, pItem->iIcon);
-
-                CRect rcTxt(rcIcon.right + m_nTextIconInterval, rcContent.top + nInter, rcContent.right - nInter, rcContent.bottom - nInter);
-                pRT->TextOut(rcTxt.left, rcTxt.top, strText.c_str(), strText.GetLength());
+                nInter = (rcContent.Height() - szTxt.cy) / 2;
+                CPoint ptTxt(rcIcon.right + m_nTextIconInterval, rcContent.top + nInter);
+                pRT->TextOut(ptTxt.x, ptTxt.y, strText.c_str(), strText.GetLength());
             }
             pRT->SetTextColor(crOld);
         }

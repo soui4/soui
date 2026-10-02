@@ -1043,6 +1043,9 @@ HRESULT SRenderTarget_Skia::TextOut(int x, int y, LPCTSTR lpszString, int nCount
 
     SkPaint::FontMetrics metrics;
     txtPaint.getFontMetrics(&metrics);
+    float lineSpan = GetTextHeightFromMetrics(metrics);
+    bool  bUseAllHeight = (lineSpan == -metrics.fTop + metrics.fBottom);
+
     SkScalar fx = m_ptOrg.fX + x;
     SkScalar fy = m_ptOrg.fY + y;
 
@@ -1059,7 +1062,8 @@ HRESULT SRenderTarget_Skia::TextOut(int x, int y, LPCTSTR lpszString, int nCount
         mtx.postConcat(oldMtx);
         m_SkCanvas->setMatrix(mtx);
     }
-    fy += -metrics.fTop;
+    fy += -(bUseAllHeight?metrics.fTop:metrics.fAscent);
+    //fy += -metrics.fTop;
     m_SkCanvas->drawText((LPCWSTR)strW, strW.GetLength() * sizeof(WCHAR), fx, fy, txtPaint);
     if (m_curFont->LogFont()->lfEscapement != 0)
     {
