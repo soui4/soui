@@ -111,6 +111,8 @@ class SOUI_EXP SDockBar : public SWindow {
     BOOL m_bFloating;
     BOOL m_bDragFloating;
     CPoint m_ptDragStart;
+    CPoint m_ptFloatDragScreen; /**< 拖动中继锚点：浮动窗口左上角屏幕坐标 */
+    CPoint m_ptMouseDragScreen; /**< 拖动中继锚点：按下时鼠标屏幕坐标 */
     SWindow *m_pDockParent;
     SWindow *m_pDockPrevSibling;
     SFrameLayoutParamStruct m_paramDocked;

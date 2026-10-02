@@ -293,6 +293,14 @@ void SDockBar::OnLButtonDown(UINT nFlags, CPoint point)
         // Dragging the caption: float the dock bar (docked) or move the float window (floating).
         m_bDragFloating = TRUE;
         m_ptDragStart = point;
+        m_ptMouseDragScreen = GetWindowScreenTopLeft();
+        m_ptMouseDragScreen.Offset(point);
+        if (m_bFloating && m_pFloatWnd)
+        {
+            CRect rcFloat;
+            ::GetWindowRect(m_pFloatWnd->GetHwnd(), &rcFloat);
+            m_ptFloatDragScreen = rcFloat.TopLeft();
+        }
         SetCapture();
         return;
     }
@@ -358,22 +366,37 @@ void SDockBar::OnMouseMove(UINT nFlags, CPoint point)
     {
         if (m_bFloating)
         {
-            // Move the float window by the drag delta.
+            // Move the float window keeping the grab point under the cursor.
             if (m_pFloatWnd)
             {
-                CRect rcFloat;
-                ::GetWindowRect(m_pFloatWnd->GetHwnd(), &rcFloat);
-                CPoint ptTopLeft = rcFloat.TopLeft();
-                ptTopLeft.Offset(point.x - m_ptDragStart.x, point.y - m_ptDragStart.y);
+                CPoint ptMouseNow = GetWindowScreenTopLeft();
+                ptMouseNow.Offset(point);
+                CPoint ptTopLeft = m_ptFloatDragScreen;
+                ptTopLeft.Offset(ptMouseNow - m_ptMouseDragScreen);
                 m_pFloatWnd->MoveTo(ptTopLeft);
             }
         }
         else if (abs(point.x - m_ptDragStart.x) > 8 || abs(point.y - m_ptDragStart.y) > 8)
         {
-            // Release capture in the docked container, then float the bar at its current position.
+            // Float the dock bar at its current position, then relay the drag to
+            // the new float window so the user can keep dragging without
+            // releasing the mouse button.
+            CPoint ptFloatPos = GetWindowScreenTopLeft();
+            m_ptMouseDragScreen = ptFloatPos;
+            m_ptMouseDragScreen.Offset(point);
+            m_ptFloatDragScreen = ptFloatPos;
+
+            // Release the capture held by the docked container first so it does
+            // not keep a dangling reference to this window.
             m_bDragFloating = FALSE;
             ReleaseCapture();
-            Float(GetWindowScreenTopLeft());
+
+            if (Float(ptFloatPos))
+            {
+                // Resume dragging inside the float host.
+                m_bDragFloating = TRUE;
+                SetCapture();
+            }
         }
     }
 }
