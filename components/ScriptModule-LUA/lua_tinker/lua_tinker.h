@@ -1,4 +1,4 @@
-﻿// lua_tinker.h
+// lua_tinker.h
 //
 // LuaTinker - Simple and light C++ wrapper for Lua.
 //
@@ -342,6 +342,7 @@ namespace lua_tinker
    // wide char strings are converted between lua utf8 and c++ utf16 automatically
    template<>  const wchar_t*      read ( lua_State *L, int index );
    template<>  char                read ( lua_State *L, int index );
+   template<>  signed char         read ( lua_State *L, int index );
    template<>  unsigned char       read ( lua_State *L, int index );
    template<>  short               read ( lua_State *L, int index );
    template<>  unsigned short      read ( lua_State *L, int index );

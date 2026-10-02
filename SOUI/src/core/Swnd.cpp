@@ -1,4 +1,4 @@
-﻿#include "souistd.h"
+#include "souistd.h"
 #include "core/SWnd.h"
 #include "core/SNcPainter.h"
 #include "helper/SColor.h"
