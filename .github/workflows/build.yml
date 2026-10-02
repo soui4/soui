@@ -91,13 +91,14 @@ jobs:
       run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
             -DPNG_HARDWARE_OPTIMIZATIONS=OFF  -DSOUI_FUN_TEST_POST_BUILD=OFF
 
+    # Windows 用 VS 生成器（多配置）+ 指定平台：
+    #   - matrix.platform 未定义（x64）时表达式取 'x64'（GitHub 表达式中 null == '' 为真）
+    #   - x86 -> Win32, arm64 -> ARM64
+    # 此前用 -G Ninja 时 runner 无 MSVC 环境，CMake 会静默选中 MinGW GCC，
+    # 且单配置生成器没有 Release 子目录，导致 build/bin/Release/*.exe 打包为空。
     - name: Configure CMake (Windows)
-      if: matrix.os == 'Windows' && matrix.platform == ''
-      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -G Ninja
-
-    - name: Configure CMake (Win32, WOA)
-      if: matrix.os == 'Windows' && matrix.platform != ''
-      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -G Ninja
+      if: matrix.os == 'Windows'
+      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -G "Visual Studio 17 2022" -A ${{ matrix.platform == '' && 'x64' || matrix.platform }}
 
     - name: Configure CMake (macOS x64)
       if: matrix.os == 'macOS' && matrix.arch == 'x64'
@@ -118,7 +119,7 @@ jobs:
 
     - name: Build (Windows/Linux)
       if: matrix.os != 'macOS'
-      run: cmake --build build --config ${{ env.BUILD_TYPE }}
+      run: cmake --build build --config ${{ env.BUILD_TYPE }} --parallel
 
     - name: Build (macOS)
       if: matrix.os == 'macOS'
@@ -128,8 +129,12 @@ jobs:
       if: matrix.os == 'Linux'
       run: xvfb-run -a ctest --test-dir build -L '^soui-headless$' --output-on-failure
 
-    - name: Run unit, integration and core E2E checks
-      if: matrix.os != 'Linux'
+    - name: Run unit, integration and core E2E checks (Windows, MSVC multi-config needs -C)
+      if: matrix.os == 'Windows'
+      run: ctest --test-dir build -C ${{ env.BUILD_TYPE }} -L '^soui-headless$' --output-on-failure
+
+    - name: Run unit, integration and core E2E checks (macOS)
+      if: matrix.os == 'macOS'
       run: ctest --test-dir build -L '^soui-headless$' --output-on-failure
 
     - name: Create file structure (Windows)
