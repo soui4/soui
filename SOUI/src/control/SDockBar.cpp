@@ -369,8 +369,8 @@ void SDockBar::OnMouseMove(UINT nFlags, CPoint point)
             // Move the float window keeping the grab point under the cursor.
             if (m_pFloatWnd)
             {
-                CPoint ptMouseNow = GetWindowScreenTopLeft();
-                ptMouseNow.Offset(point);
+                CPoint ptMouseNow;
+                ::GetCursorPos(&ptMouseNow);
                 CPoint ptTopLeft = m_ptFloatDragScreen;
                 ptTopLeft.Offset(ptMouseNow - m_ptMouseDragScreen);
                 m_pFloatWnd->MoveTo(ptTopLeft);
@@ -382,9 +382,6 @@ void SDockBar::OnMouseMove(UINT nFlags, CPoint point)
             // the new float window so the user can keep dragging without
             // releasing the mouse button.
             CPoint ptFloatPos = GetWindowScreenTopLeft();
-            m_ptMouseDragScreen = ptFloatPos;
-            m_ptMouseDragScreen.Offset(point);
-            m_ptFloatDragScreen = ptFloatPos;
 
             // Release the capture held by the docked container first so it does
             // not keep a dangling reference to this window.
@@ -393,6 +390,20 @@ void SDockBar::OnMouseMove(UINT nFlags, CPoint point)
 
             if (Float(ptFloatPos))
             {
+                // Re-anchor the drag to the *actual* float window screen position:
+                // the position laid out by the float host may differ from
+                // ptFloatPos (container coordinate conversions). The current
+                // message was dispatched by the docked container, so its local
+                // `point` is not comparable across the switch; use the cursor's
+                // screen position instead. This keeps the grab point under the
+                // cursor and synchronizes coordinates.
+                CPoint ptMouseNow;
+                ::GetCursorPos(&ptMouseNow);
+                CRect rcFloat;
+                ::GetWindowRect(m_pFloatWnd->GetHwnd(), &rcFloat);
+                m_ptFloatDragScreen = rcFloat.TopLeft();
+                m_ptMouseDragScreen = ptMouseNow;
+
                 // Resume dragging inside the float host.
                 m_bDragFloating = TRUE;
                 SetCapture();
