@@ -7,7 +7,7 @@
 7 dockbar support float.
 8 IAccessible for linux and macos. done
 9 fullscreen op for macos. done
-10 finish lua script.
+10 finish lua script. done
 11 api table for swinx. done
 12 TLS using swinx defined TSL API. done
 13 rename acc func. done

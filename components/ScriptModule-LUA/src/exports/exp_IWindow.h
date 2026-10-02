@@ -1,5 +1,46 @@
 #include <interface/SWindow-i.h>
+#include <matrix/SMatrix.h>
 #include "toobj.h"
+
+// IWindow:SetMatrix(mtx, bInvalidate=TRUE)
+// mtx: SMatrix userdata or a table of 9 floats
+static int IWindow_SetMatrix(lua_State *L)
+{
+    IWindow *_this = lua_tinker_toobj<IWindow>(L, 1);
+    if (!_this) return 0;
+    BOOL bInvalidate = lua_isnoneornil(L, 3) ? TRUE : (lua_toboolean(L, 3) ? TRUE : FALSE);
+    SMatrix mtx;
+    const IMatrix *pMtx = &mtx;
+    if (lua_isuserdata(L, 2))
+    {
+        SMatrix *pUser = lua_tinker_toobj<SMatrix>(L, 2);
+        if (!pUser) return 0;
+        pMtx = pUser;
+    }
+    else if (lua_istable(L, 2))
+    {
+        std::vector<float> vals = lua_table_to_floats(L, 2);
+        if (vals.size() < 9) return 0;
+        for (int i = 0; i < 9; i++) mtx.set(i, vals[i]);
+    }
+    else
+    {
+        return 0;
+    }
+    _this->SetMatrix(pMtx, bInvalidate);
+    return 0;
+}
+
+// IWindow:GetMatrix() -> SMatrix value
+static int IWindow_GetMatrix(lua_State *L)
+{
+    IWindow *_this = lua_tinker_toobj<IWindow>(L, 1);
+    if (!_this) return 0;
+    SMatrix mtx;
+    _this->GetMatrix(&mtx);
+    lua_tinker::push<SMatrix>(L, mtx);
+    return 1;
+}
 
 BOOL ExpLua_IWindow(lua_State *L)
 {
@@ -68,8 +109,12 @@ BOOL ExpLua_IWindow(lua_State *L)
 
 		lua_tinker::class_def<IWindow>(L,"SetAlpha",&IWindow::SetAlpha);
 		lua_tinker::class_def<IWindow>(L,"GetAlpha",&IWindow::GetAlpha);
-		lua_tinker::class_def<IWindow>(L,"SetMatrix",&IWindow::SetMatrix);
+		lua_tinker::class_def<IWindow>(L,"SetMatrix",(void (UAPI IWindow::*)(const IMatrix *,BOOL))&IWindow::SetMatrix);
 		lua_tinker::class_def<IWindow>(L,"GetMatrix",&IWindow::GetMatrix);
+		// lua-friendly wrappers: SetMatrix accepts SMatrix userdata or a 9-float
+		// table; GetMatrix returns a SMatrix value
+		class_set_cfun<IWindow>(L,"SetMatrix", IWindow_SetMatrix);
+		class_set_cfun<IWindow>(L,"GetMatrix", IWindow_GetMatrix);
 		lua_tinker::class_def<IWindow>(L,"GetScale",&IWindow::GetScale);
 		lua_tinker::class_def<IWindow>(L,"RequestRelayout",&IWindow::RequestRelayout);
 		lua_tinker::class_def<IWindow>(L,"UpdateLayout",&IWindow::UpdateLayout);
@@ -88,6 +133,10 @@ BOOL ExpLua_IWindow(lua_State *L)
 		lua_tinker::class_def<IWindow>(L,"GetIOwner",&IWindow::GetIOwner);
 		lua_tinker::class_def<IWindow>(L,"BringWindowToTop",&IWindow::BringWindowToTop);
 		lua_tinker::class_def<IWindow>(L,"AdjustIZOrder",&IWindow::AdjustIZOrder);
+		lua_tinker::class_def<IWindow>(L,"CreateChildrenFromResId",&IWindow::CreateChildrenFromResId);
+		lua_tinker::class_def<IWindow>(L,"SetLayer",&IWindow::SetLayer);
+		// RegisterDragDrop/UnregisterDragDrop take IDropTarget* which is not
+		// exported, skipped.
 		lua_tinker::class_def<IWindow>(L,"InsertIChild",&IWindow::InsertIChild);
 		lua_tinker::class_def<IWindow>(L,"RemoveIChild",&IWindow::RemoveIChild);
 		lua_tinker::class_def<IWindow>(L,"CreateChildrenFromXml",&IWindow::CreateChildrenFromXml);

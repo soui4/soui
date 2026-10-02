@@ -48,6 +48,9 @@
 		<file name="png_tb_main" path="image\tb_main.png" />
 		<file name="png_tb_sep" path="image\tb_sep.png" />
 	</IMG>
+	<svg>
+		<file name="dock_btn" path="svg\dock_btn.svg" />
+	</svg>
 	<ICON>
 		<file name="ICON_logo" path="image\logo.ico" />
 	</ICON>

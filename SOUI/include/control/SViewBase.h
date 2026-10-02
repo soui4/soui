@@ -1,4 +1,4 @@
-﻿#ifndef __SVIEWBASE__H__
+#ifndef __SVIEWBASE__H__
 #define __SVIEWBASE__H__
 
 #include <core/SPanel.h>
@@ -213,6 +213,15 @@ class SOUI_EXP SViewBase
      * @param nNewSel Index of the newly selected item.
      */
     void HandleSelectionChange(int nOldSel, int nNewSel);
+
+    /**
+     * @brief Releases every item panel owned by this control (the recycle bin and
+     *        the visible item list), clears the containers, and resets per-item
+     *        hover, capture and selection state. Shared by SetAdapter() (called
+     *        before adopting a new adapter) and OnDestroy() (teardown) so both
+     *        paths free the exact same panels and cannot drift.
+     */
+    void ClearItemPanels();
 
   public:
     /**

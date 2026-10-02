@@ -392,6 +392,11 @@ class SOUI_EXP SWindow
      */
     static SStringW GetXmlText(const SXmlNode &xmlNode);
 
+    /**
+     * @brief Enables or disables accessibility support.
+     * @param bEnable TRUE to enable, FALSE to disable.
+	 */
+	static void EnableAcc(BOOL bEnable);
   public:
     /**
      * @brief Called when the last reference to the object is released.

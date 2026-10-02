@@ -75,7 +75,7 @@
       </frame>
     </caption>
 
-    <tabctrl name="tab_main" pos="5,30,-5,-5" interpolator="Decelerate" curSel="0" focusable="0" animateSteps="30" tabHeight="0" text-y="50" tabSkin="_skin.sys.tab.header" iconSkin="skin_page_icons" icon-x="10" colorTextHover="#ff0000" fontHover="italic:1">
+    <tabctrl name="tab_main" pos="5,30,-5,-5" interpolator="Decelerate" curSel="0" focusable="0" animateSteps="30" tabHeight="0">
       <page title="home">
         <include src="layout:page_home"/>
       </page>
@@ -88,25 +88,28 @@
           </button>
         </window>
         <tabctrl name="tab_contents" size="-2,0" weight="1" interpolator="Decelerate" curSel="0" focusable="0" animateSteps="30" tabHeight="0" text-y="50" tabSkin="_skin.sys.tab.header" iconSkin="skin_page_icons" icon-x="10" colorTextHover="#ff0000" fontHover="italic:1">
-          <page title="soui ctrl">
+          <page title="基础控件">
             <include src="layout:page_ctrls"/>
           </page>
           <page title="教程" tip="show webkit based on WKE">
             <include src="layout:page_webkit"/>
           </page>
-          <page title="animate" tip="play gif and apng">
+          <page title="动画" tip="play gif and apng">
             <include src="layout:page_animator"/>
           </page>
-          <page title="layout" tip="show layout capability in soui">
+          <page title="布局" tip="show layout capability in soui">
             <include src="layout:page_layout"/>
           </page>
-          <page title ="misc." tip="many features, just find it.">
+          <page title ="杂项" tip="many features, just find it.">
             <include src="layout:page_misc"/>
           </page>
-          <page title="skia" tip="demo skia advance features">
+          <page title="Skia" tip="demo skia advance features">
             <include src="layout:page_skia"/>
           </page>
-          <page title="about" tip="copy right(c) setoutsoft 2011-2019.">
+          <page title="脚本" tip="lua 跑马机 / 消消乐(match-3)" iconIndex="2">
+            <include src="layout:page_script"/>
+          </page>
+          <page title="关于" tip="copy right(c) setoutsoft 2011-2019.">
             <include src="layout:page_about"/>
           </page>
         </tabctrl>

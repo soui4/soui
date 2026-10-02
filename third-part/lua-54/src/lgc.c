@@ -171,7 +171,11 @@ static void linkgclist_ (GCObject *o, GCObject **pnext, GCObject **list) {
 static void clearkey (Node *n) {
   lua_assert(isempty(gval(n)));
   if (keyiscollectable(n))
-    setdeadkey(n);  /* unused key; remove it */
+    /* keep the store conditional: VS2010 x64 /Og (16.00.40219.01) turns the
+     * conditional store above into an unconditional "write back same value",
+     * which faults when GC traverses the read-only dummy node of an empty
+     * table. Do NOT replace this with the plain setdeadkey() macro. */
+    *(volatile lu_byte*)&(n)->u.key_tt = LUA_TDEADKEY;
 }
 
 

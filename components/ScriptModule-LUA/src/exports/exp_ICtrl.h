@@ -1,4 +1,31 @@
 #include <interface/SCtrl-i.h>
+#include "toobj.h"
+// IOsrPanel:PtToHost takes POINT*; wrap so Lua can pass two numbers or {x,y}
+// and get {x,y} back.
+static int IOsrPanel_PtToHost(lua_State *L)
+{
+    IOsrPanel *_this = lua_tinker_toobj<IOsrPanel>(L, 1);
+    if (!_this) return 0;
+    POINT pt = { 0, 0 };
+    if (lua_istable(L, 2))
+    {
+        std::vector<int> v = lua_table_to_ints(L, 2);
+        pt.x = v.size() > 0 ? v[0] : 0;
+        pt.y = v.size() > 1 ? v[1] : 0;
+    }
+    else
+    {
+        pt.x = (int)lua_tointeger(L, 2);
+        pt.y = (int)lua_tointeger(L, 3);
+    }
+    _this->PtToHost(&pt);
+    lua_newtable(L);
+    lua_pushinteger(L, pt.x);
+    lua_rawseti(L, -2, 1);
+    lua_pushinteger(L, pt.y);
+    lua_rawseti(L, -2, 2);
+    return 1;
+}
 
 template<typename T1,typename T2>
 T1 * QueryICtrl(IWindow *pWnd){
@@ -28,6 +55,7 @@ BOOL ExpLua_ICtrl(lua_State *L)
 		lua_tinker::class_def<IOsrPanel>(L,"GetItemIndex",&IOsrPanel::GetItemIndex);
 		lua_tinker::class_def<IOsrPanel>(L,"SetItemData",&IOsrPanel::SetItemData);
 		lua_tinker::class_def<IOsrPanel>(L,"GetItemData",&IOsrPanel::GetItemData);
+		class_set_cfun<IOsrPanel>(L,"PtToHost", IOsrPanel_PtToHost);
 		DEF_QICTRL(L,IOsrPanel,SOsrPanel);
 
 		lua_tinker::class_add<IItemPanel>(L,"IItemPanel");
@@ -173,6 +201,8 @@ BOOL ExpLua_ICtrl(lua_State *L)
 		lua_tinker::class_def<IListBox>(L,"InsertString",&IListBox::InsertString);
 		lua_tinker::class_def<IListBox>(L,"EnsureVisible",&IListBox::EnsureVisible);
 		lua_tinker::class_def<IListBox>(L,"FindString",&IListBox::FindString);
+		lua_tinker::class_def<IListBox>(L,"GetItemImage",&IListBox::GetItemImage);
+		lua_tinker::class_def<IListBox>(L,"SetItemImage",&IListBox::SetItemImage);
 		DEF_QICTRL(L,IListBox,SListBox);
 
 		lua_tinker::class_add<IComboBase>(L,"IComboBase");
@@ -181,6 +211,13 @@ BOOL ExpLua_ICtrl(lua_State *L)
 		lua_tinker::class_def<IComboBase>(L,"CloseUp",&IComboBase::CloseUp);
 		lua_tinker::class_def<IComboBase>(L,"IsDropdown",&IComboBase::IsDropdown);
 		lua_tinker::class_def<IComboBase>(L,"SetDropdown",&IComboBase::SetDropdown);
+		lua_tinker::class_def<IComboBase>(L,"GetCount",&IComboBase::GetCount);
+		lua_tinker::class_def<IComboBase>(L,"GetCurSel",&IComboBase::GetCurSel);
+		lua_tinker::class_def<IComboBase>(L,"SetCurSel",&IComboBase::SetCurSel);
+		lua_tinker::class_def<IComboBase>(L,"FindString",&IComboBase::FindString);
+		// takes (iItem, bRawText, IStringW*) -- pass a string object from
+		// ISouiFactory:CreateStringW()
+		lua_tinker::class_def<IComboBase>(L,"GetItemText",&IComboBase::GetItemText);
 		DEF_QICTRL(L,IComboBase,SComboBase);
 
 		lua_tinker::class_add<IComboBox>(L,"IComboBox");
@@ -196,6 +233,7 @@ BOOL ExpLua_ICtrl(lua_State *L)
 		lua_tinker::class_add<IComboView>(L,"IComboView");
 		lua_tinker::class_inh<IComboView,IComboBase>(L);
 		lua_tinker::class_def<IComboView>(L,"GetIListView",&IComboView::GetIListView);
+		lua_tinker::class_def<IComboView>(L,"GetListView",&IComboView::GetIListView); // alias, js parity
 		DEF_QICTRL(L,IComboView,SComboView);
 
 		lua_tinker::class_add<IDateTimePicker>(L,"IDateTimePicker");
@@ -295,6 +333,20 @@ BOOL ExpLua_ICtrl(lua_State *L)
 		lua_tinker::class_inh<IIconWnd,ICtrl>(L);
 		lua_tinker::class_def<IIconWnd>(L,"SetIcon",&IIconWnd::SetIcon);
 		DEF_QICTRL(L,IIconWnd,SIconWnd);
+
+		lua_tinker::class_add<IStackView>(L,"IStackView");
+		lua_tinker::class_inh<IStackView,ICtrl>(L);
+		// UAPI(__stdcall) MUST be kept in the member pointer type: STDMETHOD
+		// interface methods are __stdcall, and lua_tinker selects the correct
+		// invocation thunk (invoke/invokeU) from the calling convention of F.
+		// A plain cast strips __stdcall and crashes on x86 (this passed in ECX
+		// while the stdcall vcall thunk reads it from [esp+4]); harmless on x64.
+		lua_tinker::class_def<IStackView>(L,"SelectPage",(BOOL (UAPI IStackView::*)(int,BOOL))&IStackView::SelectPage);
+		lua_tinker::class_def<IStackView>(L,"SetAniStyle",&IStackView::SetAniStyle);
+		lua_tinker::class_def<IStackView>(L,"SetAniDir",&IStackView::SetAniDir);
+		lua_tinker::class_def<IStackView>(L,"GetSelPage",&IStackView::GetSelPage);
+		lua_tinker::class_def<IStackView>(L,"GetPage",(IWindow * (UAPI IStackView::*)(int) const)&IStackView::GetPage);
+		DEF_QICTRL(L,IStackView,SStackView);
 
 		return TRUE;
 	}catch(...)

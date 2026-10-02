@@ -44,7 +44,7 @@ SkRect DrawText_Skia(SkCanvas* canvas,const wchar_t *text,int len,SkRect box, Sk
     return layout.draw(canvas);
 }
 
-static SkScalar GetTextHeightFromMetrics(SkPaint::FontMetrics &metrics)
+SkScalar GetTextHeightFromMetrics(SkPaint::FontMetrics &metrics)
 {
     SkScalar heiGraph = -metrics.fAscent + metrics.fDescent;
     SkScalar heiAll = -metrics.fTop + metrics.fBottom;

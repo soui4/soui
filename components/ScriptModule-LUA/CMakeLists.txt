@@ -2,6 +2,7 @@ add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_CRT_NON_CONFORMING_SWPRINTFS)
 include_directories(${SOUI_ROOT_DIR}/utilities/include)
 include_directories(${SOUI_ROOT_DIR}/SOUI/include)
 include_directories(${SOUI_ROOT_DIR}/third-part/lua-54/src)
+include_directories(${SOUI_ROOT_DIR}/components)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lua_tinker)
@@ -38,6 +39,15 @@ set(ScriptModule-lua_header
            src/exports/luaAnimationListener.h
            src/exports/exp_SysApi.h
            src/exports/luaFunSlot.h
+           src/exports/exp_IPropertyAnimator.h
+           src/exports/exp_IAnimatorSet.h
+           src/exports/exp_SXml.h
+           src/exports/exp_ISkinObj.h
+           src/exports/exp_ITranslator.h
+           src/exports/exp_ILogMgr.h
+           src/exports/exp_SMatrix.h
+           src/exports/exp_IBitmapS.h
+           src/exports/exp_LuaValueAnimator.h
            src/exports/toobj.h
 	lua_tinker/lua_tinker.h
 )

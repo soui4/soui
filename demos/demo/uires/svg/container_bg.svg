@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  container_bg.svg - 动态创建窗口演示页 wnd_container 容器背景(nanosvg 兼容)
+  单帧 260x160,绘制时整体拉伸到容器客户区。
+  视觉语言:蓝色虚线圆角框 + 四角实线角标 + 左上角标签条,
+  明确标识"此处是一个容器"(虚线=占位区,角标=边界可辨识)。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="260" height="160" viewBox="0 0 260 160">
+  <!-- 半透明底色:与页面浅色背景叠加后呈淡蓝,不遮盖动态创建的子窗口 -->
+  <rect x="2" y="2" width="256" height="156" rx="10" fill="#3B82F614"/>
+  <!-- 虚线主边框:容器语义的核心标识 -->
+  <rect x="2" y="2" width="256" height="156" rx="10" fill="none" stroke="#3B82F6" stroke-width="2" stroke-dasharray="10,7"/>
+  <!-- 四角实线 L 形角标,增强边界辨识 -->
+  <path d="M2,30 L2,12 Q2,2 12,2 L30,2" fill="none" stroke="#2563EB" stroke-width="4"/>
+  <path d="M230,2 L248,2 Q258,2 258,12 L258,30" fill="none" stroke="#2563EB" stroke-width="4"/>
+  <path d="M258,130 L258,148 Q258,158 248,158 L230,158" fill="none" stroke="#2563EB" stroke-width="4"/>
+  <path d="M30,158 L12,158 Q2,158 2,148 L2,130" fill="none" stroke="#2563EB" stroke-width="4"/>
+  <!-- 左上角标签条:呼应 UI 设计中"容器/分组"的常见标签样式 -->
+  <rect x="18" y="18" width="64" height="14" rx="7" fill="#3B82F680"/>
+  <rect x="26" y="23" width="34" height="4" rx="2" fill="#FFFFFFB0"/>
+  <circle cx="72" cy="25" r="3" fill="#FFFFFFB0"/>
+</svg>

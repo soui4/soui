@@ -8,6 +8,8 @@
 
 
 #include <iostream>
+#include <string>
+#include <cwchar>
 #include "lua_tinker.h"
 
 #if defined(_MSC_VER)
@@ -210,27 +212,182 @@ const char* lua_tinker::read ( lua_State *L, int index )
    return ( const char* ) lua_tostring ( L, index );
 }
 
+/*---------------------------------------------------------------------------*/
+/* utf8 <-> utf16 conversion helpers (self-contained, no platform deps)      */
+/*---------------------------------------------------------------------------*/
+namespace
+{
+   size_t utf8_to_utf16(const char *src, size_t srcLen, wchar_t *dst, size_t dstCap)
+   {
+      size_t out = 0;
+      size_t i = 0;
+      while (i < srcLen)
+      {
+         unsigned int cp = (unsigned char)src[i];
+         size_t adv = 1;
+         if (cp < 0x80)
+         {
+            i += 1;
+         }
+         else if ((cp & 0xE0) == 0xC0 && i + 1 < srcLen)
+         {
+            cp = ((cp & 0x1F) << 6) | (src[i + 1] & 0x3F);
+            adv = 2;
+            i += 2;
+         }
+         else if ((cp & 0xF0) == 0xE0 && i + 2 < srcLen)
+         {
+            cp = ((cp & 0x0F) << 12) | ((src[i + 1] & 0x3F) << 6) | (src[i + 2] & 0x3F);
+            adv = 3;
+            i += 3;
+         }
+         else if ((cp & 0xF8) == 0xF0 && i + 3 < srcLen)
+         {
+            cp = ((cp & 0x07) << 18) | ((src[i + 1] & 0x3F) << 12) | ((src[i + 2] & 0x3F) << 6) | (src[i + 3] & 0x3F);
+            adv = 4;
+            i += 4;
+         }
+         else
+         {
+            // invalid lead byte: skip one byte
+            cp = '?';
+            adv = 1;
+            i += 1;
+         }
+         (void)adv;
+         if (dst)
+         {
+            if (cp >= 0x10000)
+            {
+               if (out + 2 > dstCap) break;
+               cp -= 0x10000;
+               dst[out++] = (wchar_t)(0xD800 | (cp >> 10));
+               dst[out++] = (wchar_t)(0xDC00 | (cp & 0x3FF));
+            }
+            else
+            {
+               if (out + 1 > dstCap) break;
+               dst[out++] = (wchar_t)cp;
+            }
+         }
+         else
+         {
+            out += (cp >= 0x10000) ? 2 : 1;
+         }
+      }
+      return out;
+   }
+
+   size_t utf16_to_utf8(const wchar_t *src, size_t srcLen, char *dst, size_t dstCap)
+   {
+      size_t out = 0;
+      size_t i = 0;
+      while (i < srcLen)
+      {
+         unsigned int cp = (unsigned short)src[i];
+         i++;
+         if (cp >= 0xD800 && cp <= 0xDBFF && i < srcLen)
+         {
+            unsigned int lo = (unsigned short)src[i];
+            if (lo >= 0xDC00 && lo <= 0xDFFF)
+            {
+               cp = 0x10000 + ((cp - 0xD800) << 10) + (lo - 0xDC00);
+               i++;
+            }
+         }
+         size_t need;
+         if (cp < 0x80) need = 1;
+         else if (cp < 0x800) need = 2;
+         else if (cp < 0x10000) need = 3;
+         else need = 4;
+         if (dst)
+         {
+            if (out + need > dstCap) break;
+            switch (need)
+            {
+            case 1:
+               dst[out++] = (char)cp;
+               break;
+            case 2:
+               dst[out++] = (char)(0xC0 | (cp >> 6));
+               dst[out++] = (char)(0x80 | (cp & 0x3F));
+               break;
+            case 3:
+               dst[out++] = (char)(0xE0 | (cp >> 12));
+               dst[out++] = (char)(0x80 | ((cp >> 6) & 0x3F));
+               dst[out++] = (char)(0x80 | (cp & 0x3F));
+               break;
+            default:
+               dst[out++] = (char)(0xF0 | (cp >> 18));
+               dst[out++] = (char)(0x80 | ((cp >> 12) & 0x3F));
+               dst[out++] = (char)(0x80 | ((cp >> 6) & 0x3F));
+               dst[out++] = (char)(0x80 | (cp & 0x3F));
+               break;
+            }
+         }
+         else
+         {
+            out += need;
+         }
+      }
+      return out;
+   }
+} // namespace
+
+/*---------------------------------------------------------------------------*/
+template<>
+const wchar_t* lua_tinker::read ( lua_State *L, int index )
+{
+   // convert a lua utf8 string to a utf16 buffer anchored on the lua stack
+   // (lua_newuserdata value stays alive while the C++ call is running)
+   const char *str = lua_tostring ( L, index );
+   if (!str)
+      return L"";
+   size_t n = strlen ( str );
+   size_t wlen = utf8_to_utf16 ( str, n, NULL, 0 );
+   wchar_t *buf = (wchar_t *)lua_newuserdata ( L, (wlen + 1) * sizeof ( wchar_t ) );
+   utf8_to_utf16 ( str, n, buf, wlen + 1 );
+   buf[wlen] = 0;
+   return buf;
+}
+
 template<>
 char lua_tinker::read ( lua_State *L, int index )
 {
+   if ( lua_isboolean ( L, index ) )
+      return lua_toboolean ( L, index ) != 0 ? 1 : 0;
    return ( char ) lua_tonumber ( L, index );
+}
+
+template<>
+signed char lua_tinker::read ( lua_State *L, int index )
+{
+   if ( lua_isboolean ( L, index ) )
+      return lua_toboolean ( L, index ) != 0 ? 1 : 0;
+   return ( signed char ) lua_tonumber ( L, index );
 }
 
 template<>
 unsigned char lua_tinker::read ( lua_State *L, int index )
 {
+   if ( lua_isboolean ( L, index ) )
+      return lua_toboolean ( L, index ) != 0 ? 1 : 0;
    return ( unsigned char ) lua_tonumber ( L, index );
 }
 
 template<>
 short lua_tinker::read ( lua_State *L, int index )
 {
+   if ( lua_isboolean ( L, index ) )
+      return lua_toboolean ( L, index ) != 0 ? 1 : 0;
    return ( short ) lua_tonumber ( L, index );
 }
 
 template<>
 unsigned short lua_tinker::read ( lua_State *L, int index )
 {
+   if ( lua_isboolean ( L, index ) )
+      return lua_toboolean ( L, index ) != 0 ? 1 : 0;
    return ( unsigned short ) lua_tonumber ( L, index );
 }
 
@@ -239,6 +396,8 @@ unsigned short lua_tinker::read ( lua_State *L, int index )
 template<>
 long lua_tinker::read(lua_State *L, int index)
 {
+   if(lua_isboolean(L,index))
+      return lua_toboolean(L,index) != 0 ? 1L : 0L;
    if(lua_isnumber(L,index))
       return (long)lua_tonumber(L, index);
    else
@@ -248,6 +407,8 @@ long lua_tinker::read(lua_State *L, int index)
 template<>
 unsigned long lua_tinker::read(lua_State *L, int index)
 {
+   if(lua_isboolean(L,index))
+      return lua_toboolean(L,index) != 0 ? 1UL : 0UL;
    if(lua_isnumber(L,index))
       return (unsigned long)lua_tonumber(L, index);
    else
@@ -321,12 +482,16 @@ HINSTANCE lua_tinker::read(lua_State *L, int index)
 template<>
 long lua_tinker::read ( lua_State *L, int index )
 {
+   if ( lua_isboolean ( L, index ) )
+      return lua_toboolean ( L, index ) != 0 ? 1L : 0L;
    return ( long ) lua_tonumber ( L, index );
 }
 
 template<>
 unsigned long lua_tinker::read ( lua_State *L, int index )
 {
+   if ( lua_isboolean ( L, index ) )
+      return lua_toboolean ( L, index ) != 0 ? 1UL : 0UL;
    return ( unsigned long ) lua_tonumber ( L, index );
 }
 
@@ -390,24 +555,35 @@ HINSTANCE lua_tinker::read(lua_State *L, int index)
 template<>
 int lua_tinker::read ( lua_State *L, int index )
 {
+   // FIX: lua_tonumber on a boolean returns 0.0, which turned every lua `true`
+   // argument into 0 (FALSE) at the binding boundary (e.g. SetVisible(true)
+   // became SetVisible(false)). Map booleans explicitly.
+   if ( lua_isboolean ( L, index ) )
+      return lua_toboolean ( L, index ) != 0 ? 1 : 0;
    return ( int ) lua_tonumber ( L, index );
 }
 
 template<>
 unsigned int lua_tinker::read ( lua_State *L, int index )
 {
+   if ( lua_isboolean ( L, index ) )
+      return lua_toboolean ( L, index ) != 0 ? 1u : 0u;
    return ( unsigned int ) lua_tonumber ( L, index );
 }
 
 template<>
 float lua_tinker::read ( lua_State *L, int index )
 {
+   if ( lua_isboolean ( L, index ) )
+      return lua_toboolean ( L, index ) != 0 ? 1.0f : 0.0f;
    return ( float ) lua_tonumber ( L, index );
 }
 
 template<>
 double lua_tinker::read ( lua_State *L, int index )
 {
+   if ( lua_isboolean ( L, index ) )
+      return lua_toboolean ( L, index ) != 0 ? 1.0 : 0.0;
    return ( double ) lua_tonumber ( L, index );
 }
 
@@ -431,6 +607,8 @@ void lua_tinker::read ( lua_State *L, int index )
 template<>
 long long lua_tinker::read ( lua_State *L, int index )
 {
+   if ( lua_isboolean ( L, index ) )
+      return lua_toboolean ( L, index ) != 0 ? 1 : 0;
    if ( lua_isinteger ( L, index ) )
    {
       return ( long long ) lua_tointeger ( L, index );
@@ -443,6 +621,8 @@ long long lua_tinker::read ( lua_State *L, int index )
 template<>
 unsigned long long lua_tinker::read ( lua_State *L, int index )
 {
+   if ( lua_isboolean ( L, index ) )
+      return lua_toboolean ( L, index ) != 0 ? 1 : 0;
    if ( lua_isinteger ( L, index ) )
    {
       return (unsigned long long ) lua_tointeger ( L, index );
@@ -658,6 +838,29 @@ template<>
 void lua_tinker::push ( lua_State *L, const char* ret )
 {
    lua_pushstring ( L, ret );
+}
+
+template<>
+void lua_tinker::push ( lua_State *L, wchar_t* ret )
+{
+   lua_tinker::push ( L, (const wchar_t *)ret );
+}
+
+template<>
+void lua_tinker::push ( lua_State *L, const wchar_t* ret )
+{
+   // convert a c++ utf16 string to a lua utf8 string
+   if (!ret)
+   {
+      lua_pushnil ( L );
+      return;
+   }
+   size_t wlen = wcslen ( ret );
+   size_t u8len = utf16_to_utf8 ( ret, wlen, NULL, 0 );
+   std::string u8 ( u8len, '\0' );
+   if (u8len > 0)
+      utf16_to_utf8 ( ret, wlen, &u8[0], u8len );
+   lua_pushlstring ( L, u8.c_str (), u8len );
 }
 
 template<>

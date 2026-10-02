@@ -1,4 +1,4 @@
-﻿#ifndef __SFRAMELAYOUT__H__
+#ifndef __SFRAMELAYOUT__H__
 #define __SFRAMELAYOUT__H__
 
 #include <interface/slayout-i.h>
@@ -7,6 +7,8 @@
 #include <sobject/Sobject.hpp>
 
 SNSBEGIN
+
+class SWindow;
 
 namespace FrameLayout_Dock
 {
@@ -114,6 +116,27 @@ class SOUI_EXP SFrameLayout : public TObjRefImpl<SObjectImpl<ILayout>> {
      * @return Returns TRUE on success, FALSE on failure
      */
     BOOL RestoreLayout(IWindow *pParent, const SArray<FrameLayoutItemInfo> &lstItems);
+
+    /**
+     * @brief Float a child dock bar into a separate host window
+     * @param pDockBar child dock bar pointer
+     * @param ptScreen desired screen top-left of the float window
+     * @return Returns TRUE on success, FALSE on failure
+     */
+    BOOL FloatChild(SWindow *pDockBar, const CPoint &ptScreen);
+
+    /**
+     * @brief Dock a floating child dock bar back into this layout
+     * @param pDockBar child dock bar pointer
+     */
+    void DockChild(SWindow *pDockBar);
+
+    /**
+     * @brief Check whether a child dock bar is currently floating
+     * @param pDockBar child dock bar pointer
+     * @return TRUE if the dock bar is floating
+     */
+    BOOL IsChildFloating(SWindow *pDockBar) const;
 
   protected:
     static DockMode parseDockMode(const SStringW &strValue);

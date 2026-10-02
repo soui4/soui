@@ -18,6 +18,12 @@ BOOL ExpLua_IHostWnd(lua_State *L)
 		lua_tinker::class_def<IHostWnd>(L,"GetEventHandler",&IHostWnd::GetEventHandler);
 		lua_tinker::class_def<IHostWnd>(L,"AnimateHostWindow",&IHostWnd::AnimateHostWindow);
         lua_tinker::class_def<IHostWnd>(L,"GetRoot",&IHostWnd::GetIRoot);
+		// GetPresenter/SetPresenter take IHostPresenter* which is not exported, skipped.
+		lua_tinker::class_def<IHostWnd>(L,"InitFromXml",&IHostWnd::InitFromXml);
+		lua_tinker::class_def<IHostWnd>(L,"EnableDragDrop",&IHostWnd::EnableDragDrop);
+		lua_tinker::class_def<IHostWnd>(L,"EnablePrivateUiDef",&IHostWnd::EnablePrivateUiDef);
+		lua_tinker::class_def<IHostWnd>(L,"ShowHostWnd",&IHostWnd::ShowHostWnd);
+		lua_tinker::class_def<IHostWnd>(L,"GetMsgLoop",&IHostWnd::GetMsgLoop);
 
 		return TRUE;
 	}catch(...)

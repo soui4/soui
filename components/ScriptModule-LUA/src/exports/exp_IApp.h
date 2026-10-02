@@ -35,6 +35,13 @@ BOOL ExpLua_IAppication(lua_State *L)
 		lua_tinker::class_def<IApplication>(L,"LoadAnimation",&IApplication::LoadAnimation);
 		lua_tinker::class_def<IApplication>(L,"LoadValueAnimator",&IApplication::LoadValueAnimator);
 		lua_tinker::class_def<IApplication>(L,"EnableNotifyCenter",&IApplication::EnableNotifyCenter);
+		// LoadImage/LoadTranslator return IBitmapS*/ITranslator*, both registered.
+		// SetRenderFactory takes IRenderFactory* which is not exported, skipped.
+		lua_tinker::class_def<IApplication>(L,"InstallTranslator",&IApplication::InstallTranslator);
+		lua_tinker::class_def<IApplication>(L,"LoadTranslator",&IApplication::LoadTranslator);
+		lua_tinker::class_def<IApplication>(L,"LoadTranslatorU8",&IApplication::LoadTranslatorU8);
+		lua_tinker::class_def<IApplication>(L,"LoadImage",&IApplication::LoadImage);
+		lua_tinker::class_def<IApplication>(L,"LoadImageU8",&IApplication::LoadImageU8);
 
 		lua_tinker::class_def<IApplication>(L,"GetInnerSingleton",&IApplication::GetInnerSingleton);
 		lua_tinker::class_def<IApplication>(L,"CreateObject",&IApplication::CreateObject);

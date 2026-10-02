@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  xxl_btn_restart.svg - "重新开始"按钮图标(环形刷新箭头)
+  3 帧横排,每帧 18x18,总尺寸 54x18。白色线条,叠在主色按钮底上。
+  帧序:0=normal  1=hover  2=push
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="54" height="18" viewBox="0 0 54 18">
+  <!-- 帧0:normal -->
+  <g transform="translate(0,0)" stroke="#FFFFFF" stroke-opacity="0.95" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <polyline points="17.25,3 17.25,7.5 12.75,7.5"/>
+    <path d="M15.37,11.25 a6.75,6.75 0 1 1 -1.59,-7.02 L17.25,7.5"/>
+  </g>
+  <!-- 帧1:hover -->
+  <g transform="translate(18,0)" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <polyline points="17.25,3 17.25,7.5 12.75,7.5"/>
+    <path d="M15.37,11.25 a6.75,6.75 0 1 1 -1.59,-7.02 L17.25,7.5"/>
+  </g>
+  <!-- 帧2:push -->
+  <g transform="translate(36,0)" stroke="#FFFFFF" stroke-opacity="0.75" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <polyline points="17.25,3 17.25,7.5 12.75,7.5"/>
+    <path d="M15.37,11.25 a6.75,6.75 0 1 1 -1.59,-7.02 L17.25,7.5"/>
+  </g>
+</svg>

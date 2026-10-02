@@ -1,6 +1,41 @@
 {
     "version": 4,
-    "configurations": [        
+    "configurations": [
+        {
+            "name": "Win32 MinGW64",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/utilities/include"
+            ],
+            "defines": [
+                "WIN32",
+                "_WIN32",
+                "_WIN64",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "compilerPath": "C:/msys64/mingw64/bin/gcc.exe",
+            "cStandard": "c17",
+            "cppStandard": "c++14",
+            "intelliSenseMode": "windows-gcc-x64"
+        },
+        {
+            "name": "Win32 MinGW32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/utilities/include"
+            ],
+            "defines": [
+                "WIN32",
+                "_WIN32",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "compilerPath": "C:/msys64/mingw32/bin/gcc.exe",
+            "cStandard": "c17",
+            "cppStandard": "c++14",
+            "intelliSenseMode": "windows-gcc-x86"
+        },
         {
             "name": "linux",
             "includePath": [

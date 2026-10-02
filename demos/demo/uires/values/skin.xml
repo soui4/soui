@@ -118,7 +118,7 @@
   <imglist name="svg_comprehensive" src="svg:comprehensive"/>
 
   <!-- 宫格首页及导航使用的 SVG 图标(nanosvg 兼容雪碧图,states 为横向分帧数) -->
-  <imglist name="svg_home_icons" src="svg:home_icons" states="7"/>
+  <imglist name="svg_home_icons" src="svg:home_icons" states="8"/>
   <imglist name="svg_ctrl_icons" src="svg:ctrl_icons" states="18"/>
   <imglist name="svg_card_bg" src="svg:card_bg" states="3"/>
   <imglist name="svg_btn_skin" src="svg:btn_skin" states="3"/>
@@ -133,4 +133,22 @@
   <imglist name="svg_tab_layout" src="svg:tab_layout" states="6"/>
   <imglist name="svg_tab_animator" src="svg:tab_animator" states="3"/>
   <imglist name="svg_tab_misc" src="svg:tab_misc" states="10"/>
+  <!-- 动态创建窗口演示页:wnd_container 的容器标识背景(蓝色虚线框+角标) -->
+  <imglist name="svg_container_bg" src="svg:container_bg"/>
+  <!-- 跑马机下注金币(SVG 重制版,3 态:normal/hover/push) -->
+  <imglist name="svg_coin" src="svg:coin" states="3"/>
+  <!-- 消消乐(lua 版)元素图标:7 态雪碧图(源自 soxxl icons.png) -->
+  <imglist name="skin_xxl_icons" src="imgx:xxl_icons" states="7"/>
+  <!-- 消消乐 SVG 重制版:7 态糖果风棋子 + 10 态七段 LED 数字 -->
+  <imglist name="svg_xxl_icons" src="svg:xxl_icons" states="7"/>
+  <imglist name="svg_xxl_digits" src="svg:xxl_digits" states="10"/>
+  <!-- 消消乐消除爆发特效(金色星芒冲击波,配合 anim:xxl_fx_pop) -->
+  <imglist name="skin_xxl_fx" src="svg:xxl_fx"/>
+  <!-- 消消乐提示特效(青色冰环,配合 anim:xxl_fx_ring) -->
+  <imglist name="skin_xxl_fx2" src="svg:xxl_fx2"/>
+  <!-- 消消乐功能按钮(SVG 药丸底 + SVG 图标,均 3 态:normal/hover/push) -->
+  <imgframe name="xxl_btn_primary" src="svg:xxl_btn_primary" states="3" margin="20,10,20,10"/>
+  <imgframe name="xxl_btn_secondary" src="svg:xxl_btn_secondary" states="3" margin="20,10,20,10"/>
+  <imglist name="svg_xxl_btn_restart" src="svg:xxl_btn_restart" states="3"/>
+  <imglist name="svg_xxl_btn_hint" src="svg:xxl_btn_hint" states="3"/>
 </skin>

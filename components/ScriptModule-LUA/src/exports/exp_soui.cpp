@@ -12,6 +12,8 @@ extern "C"
 using namespace SNS;
 
 #include "exp_Basic.h"
+#include "exp_SMatrix.h"
+#include "exp_IBitmapS.h"
 #include "exp_string.h"
 #include "exp_IXml.h"
 #include "exp_ctrls.h"
@@ -38,6 +40,14 @@ using namespace SNS;
 #include "exp_IAnimation.h"
 #include "exp_IValueAnimator.h"
 #include "exp_IInterpolator.h"
+
+#include "exp_IPropertyAnimator.h"
+#include "exp_IAnimatorSet.h"
+#include "exp_LuaValueAnimator.h"
+#include "exp_SXml.h"
+#include "exp_ISkinObj.h"
+#include "exp_ITranslator.h"
+#include "exp_ILogMgr.h"
 #include "exp_global.h"
 #include "exp_SysApi.h"
 
@@ -45,6 +55,8 @@ BOOL SOUI_Export_Lua(lua_State *L)
 {
 	BOOL bRet=TRUE;
 	if(bRet) bRet=ExpLua_Basic(L);
+	if(bRet) bRet=ExpLua_SMatrix(L);
+	if(bRet) bRet=ExpLua_IBitmapS(L);
 	if(bRet) bRet=ExpLua_String(L);
 	if(bRet) bRet=ExpLua_IObjRef(L);
 	if(bRet) bRet=ExpLua_ISouiFactory(L);
@@ -83,6 +95,21 @@ BOOL SOUI_Export_Lua(lua_State *L)
 	
 	if(bRet) bRet=ExpLua_Global(L);
 	if(bRet) bRet=ExpLua_SysApi(L);
+
+	// new exports (parity with soui4js), self-contained registrations
+	if(bRet)
+	{
+		ExpLua_IPropertyValuesHolder_Inner(L);
+		ExpLua_IPropertyAnimator_Inner(L);
+		ExpLua_IAnimatorSet_Inner(L);
+		ExpLua_IAnimatorGroup_Inner(L);
+		ExpLua_ISkinObj_Inner(L);
+		ExpLua_ITranslator_Inner(L);
+		ExpLua_ITranslatorMgr_Inner(L);
+		ExpLua_ILogMgr_Inner(L);
+		ExpLua_LuaValueAnimator(L);
+		bRet = ExpLua_SXml(L);
+	}
 
 	return bRet;
 }

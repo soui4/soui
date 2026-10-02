@@ -1,4 +1,4 @@
-﻿#include "souistd.h"
+#include "souistd.h"
 #include "control/SMCListView.h"
 #include "helper/SListViewItemLocator.h"
 
@@ -86,35 +86,7 @@ BOOL SMCListView::SetAdapter(IMcAdapter *adapter)
     {
         m_adapter->unregisterDataSetObserver(m_observer);
     }
-    {
-        // free all itemPanels in recycle
-        for (size_t i = 0; i < m_itemRecycle.GetCount(); i++)
-        {
-            SList<SItemPanel *> *lstItemPanels = m_itemRecycle.GetAt(i);
-            SPOSITION pos = lstItemPanels->GetHeadPosition();
-            while (pos)
-            {
-                SItemPanel *pItemPanel = lstItemPanels->GetNext(pos);
-                pItemPanel->Release();
-            }
-            delete lstItemPanels;
-        }
-        m_itemRecycle.RemoveAll();
-
-        // free all visible itemPanels
-        SPOSITION pos = m_lstItems.GetHeadPosition();
-        while (pos)
-        {
-            ItemInfo ii = m_lstItems.GetNext(pos);
-            ii.pItem->Destroy();
-        }
-        m_lstItems.RemoveAll();
-        m_pHoverItem = NULL;
-        m_itemCapture = NULL;
-        m_iSelItem = -1;
-        m_iSelAnchor = -1;
-        m_iFirstVisible = -1;
-    }
+    ClearItemPanels();
 
     m_adapter = adapter;
     if (m_lvItemLocator)
@@ -781,29 +753,7 @@ void SMCListView::OnDestroy()
     {
         m_adapter->unregisterDataSetObserver(m_observer);
     }
-
-    // destroy all itempanel
-    SPOSITION pos = m_lstItems.GetHeadPosition();
-    while (pos)
-    {
-        ItemInfo ii = m_lstItems.GetNext(pos);
-        ii.pItem->Release();
-    }
-    m_lstItems.RemoveAll();
-
-    for (int i = 0; i < (int)m_itemRecycle.GetCount(); i++)
-    {
-        SList<SItemPanel *> *pLstTypeItems = m_itemRecycle[i];
-        SPOSITION pos = pLstTypeItems->GetHeadPosition();
-        while (pos)
-        {
-            SItemPanel *pItem = pLstTypeItems->GetNext(pos);
-            pItem->Release();
-        }
-        delete pLstTypeItems;
-    }
-    m_itemRecycle.RemoveAll();
-
+    ClearItemPanels();
     __baseCls::OnDestroy();
 }
 

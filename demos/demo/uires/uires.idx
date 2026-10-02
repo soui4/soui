@@ -62,6 +62,7 @@
 		<file name="png_switch" path="image\switch.png"/>
 		<file name="png_switch_bg" path="image\switch_bg.png"/>
 		<file name="png_ctrl_icons" path="image\ctrl_icons.png"/>
+		<file name="xxl_icons" path="image\xxl_icons.png"/>
 		<file name="qrbg" path="image\thDKT76T9X.png" />
 		<file name="img_busy" path="image\img_busy.png" />
 		<file name="btn_expand" path="image\btn_expand.png" />
@@ -194,11 +195,17 @@
     <file name="scale_out" path="anim\scale_out.xml"/>
     <file name="alpha_in" path="anim\alpha_in.xml"/>
     <file name="alpha_out" path="anim\alpha_out.xml"/>
+    <file name="xxl_scale_select" path="anim\xxl_scale_select.xml"/>
+    <file name="xxl_fx_pop" path="anim\xxl_fx_pop.xml"/>
+    <file name="xxl_fx_ring" path="anim\xxl_fx_ring.xml"/>
   </anim>
   <valueAni>
     <file name="alphaAni" path="valueAni\alpha.xml"/>
     <file name="colorAni" path="valueAni\color.xml"/>
   </valueAni>
+  <animator>
+    <file name="xxl_move" path="animator\xxl_move.xml"/>
+  </animator>
   <svg>
     <file name="tiger" path="svg\tiger.svg"/>
     <file name="elements" path="svg\test_elements.svg"/>
@@ -220,8 +227,18 @@
 	<file name="webbtn_forward" path="svg\webbtn_forward.svg"/>
 	<file name="webbtn_go" path="svg\webbtn_go.svg"/>
 	<file name="webbtn_refresh" path="svg\webbtn_refresh.svg"/>
+	<file name="container_bg" path="svg\container_bg.svg"/>
+	<file name="xxl_icons" path="svg\xxl_icons.svg"/>
+	<file name="xxl_digits" path="svg\xxl_digits.svg"/>
+	<file name="xxl_fx" path="svg\xxl_fx.svg"/>
+	<file name="xxl_fx2" path="svg\xxl_fx2.svg"/>
+	<file name="xxl_btn_primary" path="svg\xxl_btn_primary.svg"/>
+	<file name="xxl_btn_secondary" path="svg\xxl_btn_secondary.svg"/>
+	<file name="xxl_btn_restart" path="svg\xxl_btn_restart.svg"/>
+	<file name="xxl_btn_hint" path="svg\xxl_btn_hint.svg"/>
+	<file name="coin" path="svg\coin.svg"/>
   </svg>
-	<xml>
-		<file name="roomlist" path="xml\roomlist.xml"/>
-	</xml>
+  <xml>
+	<file name="roomlist" path="xml\roomlist.xml"/>
+  </xml>
 </resource>

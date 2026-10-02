@@ -1,4 +1,4 @@
-﻿#include "control/SViewBase.h"
+#include "control/SViewBase.h"
 
 SNSBEGIN
 
@@ -458,6 +458,42 @@ void SViewBase::RestoreSelItems()
         AddSelItem(m_arrBandSnapshot[i]);
     }
     m_arrBandSnapshot.RemoveAll();
+}
+
+void SViewBase::ClearItemPanels()
+{
+    if (m_itemCapture) {
+        m_itemCapture->ReleaseCapture();
+        m_itemCapture = NULL;
+    }
+    m_pHoverItem = NULL;
+    // free all item panels in the recycle bin
+    for (size_t i = 0; i < m_itemRecycle.GetCount(); i++)
+    {
+        SList<SItemPanel *> *lstItemPanels = m_itemRecycle.GetAt(i);
+        SPOSITION pos = lstItemPanels->GetHeadPosition();
+        while (pos)
+        {
+            SItemPanel *pItemPanel = lstItemPanels->GetNext(pos);
+            pItemPanel->Release();
+        }
+        delete lstItemPanels;
+    }
+    m_itemRecycle.RemoveAll();
+
+    // free all visible item panels
+    SPOSITION pos = m_lstItems.GetHeadPosition();
+    while (pos)
+    {
+        ItemInfo ii = m_lstItems.GetNext(pos);
+        ii.pItem->Release();
+    }
+    m_lstItems.RemoveAll();
+
+    // reset per-item hover, capture and selection state
+    m_iSelItem = -1;
+    m_iSelAnchor = -1;
+    m_iFirstVisible = -1;
 }
 
 BOOL SViewBase::IsItemSelected(int iItem) const

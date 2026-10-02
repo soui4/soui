@@ -1,4 +1,4 @@
-﻿#ifndef __STREEVIEW__H__
+#ifndef __STREEVIEW__H__
 #define __STREEVIEW__H__
 
 #include <core/SWnd.h>
@@ -764,6 +764,15 @@ class SOUI_EXP STreeView
      * @param lParam Additional message information.
      */
     void DispatchMessage2Items(UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+    /**
+     * @brief Releases every item panel owned by this tree view (the recycle bin and
+     *        the visible item list), clears the containers, and resets per-item
+     *        hover, capture and selection state. Shared by SetAdapter() (called
+     *        before adopting a new adapter) and OnDestroy() (teardown) so both
+     *        paths free the exact same panels and cannot drift.
+     */
+    void ClearItemPanels();
 
   protected:
     SAutoRefPtr<ITvAdapter> m_adapter;                 /**< Adapter for the tree view items. */

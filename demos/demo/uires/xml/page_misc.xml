@@ -2,16 +2,14 @@
 <!--
   page_misc.xml - 杂项功能演示分区
 
-  汇集脚本(script)、拖放、UIAnimation、IE 控件、动态创建窗口、桌面 Dock、
+  汇集拖放、UIAnimation、IE 控件、动态创建窗口、桌面 Dock、
   窗口区域(SetWindowRgn)、矩阵/3D 变换、自由窗口与 SVG 等演示。
-  自成一体的小型演示(script/page_ani3、apple dock、svg 等)保持原布局,
+  (跑马机等 lua 脚本演示已移至"脚本"分区 page_script.xml)
+  自成一体的小型演示(page_ani3、apple dock、svg 等)保持原布局,
   常规子页统一页头版式;edit_xml/wnd_container/wnd_rgn/matrix_test/3d_test/
   rotate_x/y/z/fmw_test/svg_test 等被源码引用,不可改动。
 -->
 <tabctrl pos="0,0,-0,-0" colorBkgnd="@color/clr_page_bg" colorText="@color/clr_title" tabAlign="left" tabInterSize="2" tabWidth="200" iconSkin="svg_tab_misc" icon-x="6" icon-y="5">
-    <page title="script" iconIndex="0" colorBorder="#ff0000" margin-x="1" margin-y="1">
-      <include src="layout:page_script"/>
-    </page>
     <page title="drag drop" iconIndex="1" layout="vbox" interval="10" padding="15,12,15,15">
       <text text="拖放" font="size:16,bold:1" colorText="@color/clr_title"/>
       <text text="将文件拖入下方编辑框，观察 enableDragdrop 的接收效果" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
@@ -31,14 +29,20 @@
     </page>
     <page title="create window" iconIndex="4" layout="vbox" padding="15,12,15,15" interval="10">
       <text text="动态创建窗口" font="size:16,bold:1" colorText="@color/clr_title"/>
-      <text text="从 XML 字符串 / 文件创建窗口树，左侧输入 XML，右侧预览结果" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
+      <text text="从 XML 字符串 / 文件创建窗口树，上面输入 XML，下面预览结果" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
       <window size="-2,-1" layout="hbox" interval="10">
         <button name="btn_filewnd" size="150,30">从文件创建窗口</button>
         <button name="btn_createchildren" size="150,30">CreateChildren</button>
       </window>
-      <window size="-2,0" weight="1" layout="hbox" interval="10">
-        <scintilla name="edit_xml" size="0,-2" weight="1" showLineNumber="1" lexer="xml" text="&lt;button pos=&quot;|0,|0,@150,@30&quot; offset=&quot;-0.5,-0.5&quot;&gt;new button&lt;/button&gt;"/>
-        <window name="wnd_container" size="0,-2" weight="1" colorBkgnd="@color/clr_card_bg"/>
+      <window size="-2,0" weight="1" layout="vbox" interval="10">
+        <scintilla name="edit_xml" size="-2,0" weight="1" showLineNumber="1" lexer="xml" text="&lt;button pos=&quot;|0,|0,@200,@40&quot; offset=&quot;-0.5,-0.5&quot; on_command=&quot;onDynBtnCmd&quot;&gt;lua button: click me&lt;/button&gt;"/>
+        <!--
+          wnd_container 配 svg_container_bg(SVG 虚线框+角标)作为背景,
+          标识"这里是一个容器";SWindow 指定 skin 后 colorBkgnd 不再生效,故移除。
+          点击 CreateChildren 后,默认 XML 中的按钮带 on_command=onDynBtnCmd
+          (函数定义在 uires/lua/test.lua),动态创建的按钮点击时由脚本模块弹 msgbox。
+        -->
+        <window name="wnd_container" size="-2,0" weight="1" skin="svg_container_bg"/>
       </window>
     </page>
     <page title="apple dock" iconIndex="5">

@@ -2,7 +2,7 @@
 <!--
   page_home.xml - 宫格首页(SOUI 功能演示启动器)
 
-  以卡片宫格形式展示 demo 的 7 个演示分区,点击卡片由 CMainDlg::OnNavToPage
+  以卡片宫格形式展示 demo 的 8 个演示分区,点击卡片由 CMainDlg::OnNavToPage
   切换到 tab_main 中对应页面;卡片背景使用 svg_card_bg 三态皮肤实现
   normal/hover/push 视觉反馈。卡片 name 与页序号的对应关系见 MainDlg_Nav.cpp。
 
@@ -19,7 +19,7 @@
   <window size="-2,-1" layout="gridlayout" columnCount="4" interval="16" gravity="center" extend_top="24">
     <!-- 内联模板:宫格卡片(不创建窗口,仅注册) -->
     <template name="home_card">
-      <imgbtn name="{{name}}" size="190,150" skin="svg_card_bg" layout="vbox" gravity="center" interval="10" animate="1">
+      <imgbtn name="{{name}}" size="190,150" data="{{page}}" skin="svg_card_bg" layout="vbox" gravity="center" interval="10" animate="1">
         <window size="0,0" weight="1"/>
         <img size="48,48" skin="svg_home_icons" iconIndex="{{icon}}" msgTransparent="1"/>
         <text text="{{title}}" font="size:17,bold:1" colorText="@color/clr_title" msgTransparent="1"/>
@@ -27,12 +27,13 @@
         <window size="0,0" weight="1"/>
       </imgbtn>
     </template>
-    <t:home_card name="card_ctrls" icon="0" title="基础控件" desc="列表 / 树 / 编辑器等 18 种控件"/>
-    <t:home_card name="card_webkit" icon="1" title="SOUI官网" desc="基于 WKE 的内嵌网页浏览器"/>
-    <t:home_card name="card_animator" icon="2" title="动画" desc="GIF / APNG 动图播放演示"/>
-    <t:home_card name="card_layout" icon="3" title="布局" desc="线性 / 网格 / 模板布局能力"/>
-    <t:home_card name="card_misc" icon="4" title="杂项" desc="脚本 / 拖放 / 矩阵变换 / SVG 等"/>
-    <t:home_card name="card_skia" icon="5" title="Skia" desc="Skia 渲染高级特性演示"/>
-    <t:home_card name="card_about" icon="6" title="关于" desc="版本信息与社区链接"/>
+    <t:home_card name="card_ctrls" icon="0" page="1" title="基础控件" desc="列表 / 树 / 编辑器等 18 种控件"/>
+    <t:home_card name="card_webkit" icon="1" page="2" title="SOUI官网" desc="基于 WKE 的内嵌网页浏览器"/>
+    <t:home_card name="card_animator" icon="2" page="3" title="动画" desc="GIF / APNG 动图播放演示"/>
+    <t:home_card name="card_layout" icon="3" page="4" title="布局" desc="线性 / 网格 / 模板布局能力"/>
+    <t:home_card name="card_misc" icon="4" page="5" title="杂项" desc="脚本 / 拖放 / 矩阵变换 / SVG 等"/>
+    <t:home_card name="card_skia" icon="5" page="6" title="Skia" desc="Skia 渲染高级特性演示"/>
+    <t:home_card name="card_xxl" icon="7" page="7" title="脚本" desc="lua 跑马机 / 消消乐(match-3)"/>
+    <t:home_card name="card_about" icon="6" page="8" title="关于" desc="版本信息与社区链接"/>
   </window>
 </window>

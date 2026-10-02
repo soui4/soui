@@ -1,4 +1,4 @@
-﻿#include "souistd.h"
+#include "souistd.h"
 #include "control/STreeView.h"
 
 SNSBEGIN
@@ -477,45 +477,11 @@ BOOL STreeView::SetAdapter(ITvAdapter *adapter)
         }
         return TRUE;
     }
+    ClearItemPanels();
     m_adapter = adapter;
     if (m_adapter)
     {
         m_adapter->registerDataSetObserver(m_observer);
-    }
-    {
-        // free all itemPanels in recycle
-        for (size_t i = 0; i < m_itemRecycle.GetCount(); i++)
-        {
-            SList<SItemPanel *> *lstItemPanels = m_itemRecycle.GetAt(i);
-            SPOSITION pos = lstItemPanels->GetHeadPosition();
-            while (pos)
-            {
-                SItemPanel *pItemPanel = lstItemPanels->GetNext(pos);
-                pItemPanel->Release();
-            }
-            delete lstItemPanels;
-        }
-        m_itemRecycle.RemoveAll();
-
-        // free all visible itemPanels
-        SPOSITION pos = m_visible_items.GetHeadPosition();
-        while (pos)
-        {
-            ItemInfo ii = m_visible_items.GetNext(pos);
-            ii.pItem->Destroy();
-        }
-        m_visible_items.RemoveAll();
-        m_pVisibleMap->RemoveAll();
-        m_pHoverItem = NULL;
-        m_itemCapture = NULL;
-        m_hSelected = 0;
-        m_hSelAnchor = 0;
-        // The selection map holds handles owned by the old adapter; keep or
-        // reuse them across an adapter swap and lookups would hit dangling
-        // handles (or false-match a recycled address). Same for a stale band
-        // snapshot - a band cannot span an adapter swap.
-        m_mapSelItems.RemoveAll();
-        m_arrBandSnapshot.RemoveAll();
     }
 
     if (m_tvItemLocator)
@@ -626,8 +592,32 @@ void STreeView::OnDestroy()
     {
         m_adapter->unregisterDataSetObserver(m_observer);
     }
+    ClearItemPanels();
+    __baseCls::OnDestroy();
+}
 
-    // destroy all itempanel
+void STreeView::ClearItemPanels()
+{
+    if (m_itemCapture) {
+        m_itemCapture->ReleaseCapture();
+        m_itemCapture = NULL;
+    }
+    m_pHoverItem = NULL;
+    // free all item panels in the recycle bin
+    for (size_t i = 0; i < m_itemRecycle.GetCount(); i++)
+    {
+        SList<SItemPanel *> *lstItemPanels = m_itemRecycle.GetAt(i);
+        SPOSITION pos = lstItemPanels->GetHeadPosition();
+        while (pos)
+        {
+            SItemPanel *pItemPanel = lstItemPanels->GetNext(pos);
+            pItemPanel->Release();
+        }
+        delete lstItemPanels;
+    }
+    m_itemRecycle.RemoveAll();
+
+    // free all visible item panels
     SPOSITION pos = m_visible_items.GetHeadPosition();
     while (pos)
     {
@@ -637,20 +627,14 @@ void STreeView::OnDestroy()
     m_visible_items.RemoveAll();
     m_pVisibleMap->RemoveAll();
 
-    for (int i = 0; i < (int)m_itemRecycle.GetCount(); i++)
-    {
-        SList<SItemPanel *> *pLstTypeItems = m_itemRecycle[i];
-        SPOSITION pos = pLstTypeItems->GetHeadPosition();
-        while (pos)
-        {
-            SItemPanel *pItem = pLstTypeItems->GetNext(pos);
-            pItem->Release();
-        }
-        delete pLstTypeItems;
-    }
-    m_itemRecycle.RemoveAll();
-
-    __baseCls::OnDestroy();
+    // reset per-item hover, capture and selection state
+    m_hSelected = 0;
+    m_hSelAnchor = 0;
+    // The selection map holds handles owned by the old adapter; reuse them
+    // across an adapter swap and lookups would hit dangling handles (or
+    // false-match a recycled address), and a band cannot span an adapter swap.
+    m_mapSelItems.RemoveAll();
+    m_arrBandSnapshot.RemoveAll();
 }
 
 void STreeView::EnsureVisible(HSTREEITEM hItem)

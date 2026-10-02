@@ -35,6 +35,22 @@ BOOL ExpLua_Basic(lua_State *L)
 		lua_tinker::class_def<CRect>(L,"SetRectEmpty",&CRect::SetRectEmpty);
         lua_tinker::class_def<CRect>(L,"OffsetRect",(void (CRect::*)(int,int))&CRect::OffsetRect);
 
+		lua_tinker::class_def<CRect>(L,"SetRect",(void (CRect::*)(int,int,int,int))&CRect::SetRect);
+		lua_tinker::class_def<CRect>(L,"CenterPoint",&CRect::CenterPoint);
+		lua_tinker::class_def<CRect>(L,"CopyRect",(void (CRect::*)(LPCRECT))&CRect::CopyRect);
+		lua_tinker::class_def<CRect>(L,"EqualRect",(BOOL (CRect::*)(LPCRECT) const)&CRect::EqualRect);
+		lua_tinker::class_def<CRect>(L,"InflateRect",(void (CRect::*)(int,int))&CRect::InflateRect);
+		lua_tinker::class_def<CRect>(L,"InflateRect2",(void (CRect::*)(int,int,int,int))&CRect::InflateRect);
+		lua_tinker::class_def<CRect>(L,"DeflateRect",(void (CRect::*)(int,int))&CRect::DeflateRect);
+		lua_tinker::class_def<CRect>(L,"DeflateRect2",(void (CRect::*)(int,int,int,int))&CRect::DeflateRect);
+		lua_tinker::class_def<CRect>(L,"NormalizeRect",&CRect::NormalizeRect);
+		lua_tinker::class_def<CRect>(L,"IntersectRect",(BOOL (CRect::*)(LPCRECT,LPCRECT))&CRect::IntersectRect);
+		lua_tinker::class_def<CRect>(L,"UnionRect",(BOOL (CRect::*)(LPCRECT,LPCRECT))&CRect::UnionRect);
+		lua_tinker::class_def<CRect>(L,"SubtractRect",(BOOL (CRect::*)(const RECT *,const RECT *))&CRect::SubtractRect);
+		lua_tinker::class_def<CRect>(L,"MoveToX",&CRect::MoveToX);
+		lua_tinker::class_def<CRect>(L,"MoveToY",&CRect::MoveToY);
+		lua_tinker::class_def<CRect>(L,"MoveToXY",(void (CRect::*)(int,int))&CRect::MoveToXY);
+
 
 		//CSize
 		lua_tinker::class_add<CSize>(L,"CSize");
