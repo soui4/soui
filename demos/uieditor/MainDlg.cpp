@@ -270,8 +270,11 @@ void CMainDlg::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
 		}else if(nID == R.id.menu_file_exit){
 			OnClose();
 		}else if(nID == R.id.menu_view_property){
+			// The dock bar may be floating in its own host window, in which case
+			// FindChildByID cannot see it; only toggle it while it is docked.
 			SWindow *pProp = FindChildByID(R.id.property_panel_dock);
-			pProp->SetVisible(!pProp->IsVisible(), TRUE);
+			if (pProp)
+				pProp->SetVisible(!pProp->IsVisible(), TRUE);
 		}else if(nID == R.id.menu_view_toolbar){
 			SWindow *pToolbar = FindChildByID(R.id.tb_main);
 			pToolbar->SetVisible(!pToolbar->IsVisible(), TRUE);
@@ -422,7 +425,9 @@ BOOL CMainDlg::NewLayout(const SStringT &strPath, const SStringT &strName)
 		SStringT strType;
 		m_UIResFileMgr.IsLayoutXml(strPath, strType);
 		m_pXmlEdtior->LoadXml(strPath, strType);
-        FindChildByID(R.id.property_panel_dock)->SetVisible(TRUE, TRUE);
+		SWindow *pPropDock = FindChildByID(R.id.property_panel_dock);
+		if (pPropDock)
+			pPropDock->SetVisible(TRUE, TRUE);
 	}
 	return bRet;
 }
@@ -686,7 +691,9 @@ void CMainDlg::OnTvEventOfPanel(IEvtArgs *e)
 			pTab->SetCurSel(0);
 			m_editXmlType = type;
 			m_pXmlEdtior->LoadXml(strPath, layoutId);
-            FindChildByID(R.id.property_panel_dock)->SetVisible(TRUE, TRUE);
+			SWindow *pPropDock = FindChildByID(R.id.property_panel_dock);
+			if (pPropDock)
+				pPropDock->SetVisible(TRUE, TRUE);
 			UpdateEditorToolbar();
 		}else{
 			// 打开图片查看器
