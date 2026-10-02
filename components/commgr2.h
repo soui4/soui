@@ -170,7 +170,7 @@ public:
 
     BOOL CreateScrpit_Lua(IObjRef **ppObj)
     {
-        #if(SCOM_MASK&scom_mask_script_lua) && defined(DLL_SOUI_COM)
+        #if(SCOM_MASK&scom_mask_script_lua)
         return SCRIPT_LUA::SCreateInstance(ppObj);
         #else
         return FALSE;

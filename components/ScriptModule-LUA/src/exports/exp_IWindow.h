@@ -109,7 +109,7 @@ BOOL ExpLua_IWindow(lua_State *L)
 
 		lua_tinker::class_def<IWindow>(L,"SetAlpha",&IWindow::SetAlpha);
 		lua_tinker::class_def<IWindow>(L,"GetAlpha",&IWindow::GetAlpha);
-		lua_tinker::class_def<IWindow>(L,"SetMatrix",(void (IWindow::*)(const IMatrix *,BOOL))&IWindow::SetMatrix);
+		lua_tinker::class_def<IWindow>(L,"SetMatrix",(void (UAPI IWindow::*)(const IMatrix *,BOOL))&IWindow::SetMatrix);
 		lua_tinker::class_def<IWindow>(L,"GetMatrix",&IWindow::GetMatrix);
 		// lua-friendly wrappers: SetMatrix accepts SMatrix userdata or a 9-float
 		// table; GetMatrix returns a SMatrix value

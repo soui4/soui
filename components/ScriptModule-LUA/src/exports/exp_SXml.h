@@ -21,11 +21,14 @@ static void ExpLua_SXmlAttr(lua_State *L)
     lua_tinker::class_def<SXmlAttr>(L, "Prev", &SXmlAttr::previous_attribute);
 
     // convenience value readers (inherited from IXmlAttr, need explicit arg)
-    lua_tinker::class_def<SXmlAttr>(L, "AsInt", (int (IXmlAttr::*)(int)) & IXmlAttr::AsInt);
-    lua_tinker::class_def<SXmlAttr>(L, "AsUint", (unsigned int (IXmlAttr::*)(int)) & IXmlAttr::AsUint);
-    lua_tinker::class_def<SXmlAttr>(L, "AsFloat", (float (IXmlAttr::*)(float)) & IXmlAttr::AsFloat);
-    lua_tinker::class_def<SXmlAttr>(L, "AsDouble", (double (IXmlAttr::*)(double)) & IXmlAttr::AsDouble);
-    lua_tinker::class_def<SXmlAttr>(L, "AsBool", (BOOL (IXmlAttr::*)(BOOL)) & IXmlAttr::AsBool);
+    // keep UAPI(__stdcall) in the member pointer type: IXmlAttr methods are
+    // STDMETHOD; a plain cast strips it and misbinds lua_tinker's invocation
+    // thunk on x86 (this in ECX vs stdcall's this at [esp+4]).
+    lua_tinker::class_def<SXmlAttr>(L, "AsInt", (int (UAPI IXmlAttr::*)(int)) & IXmlAttr::AsInt);
+    lua_tinker::class_def<SXmlAttr>(L, "AsUint", (unsigned int (UAPI IXmlAttr::*)(int)) & IXmlAttr::AsUint);
+    lua_tinker::class_def<SXmlAttr>(L, "AsFloat", (float (UAPI IXmlAttr::*)(float)) & IXmlAttr::AsFloat);
+    lua_tinker::class_def<SXmlAttr>(L, "AsDouble", (double (UAPI IXmlAttr::*)(double)) & IXmlAttr::AsDouble);
+    lua_tinker::class_def<SXmlAttr>(L, "AsBool", (BOOL (UAPI IXmlAttr::*)(BOOL)) & IXmlAttr::AsBool);
 
     DEF_CAST_PVOID(L, SXmlAttr);
 }

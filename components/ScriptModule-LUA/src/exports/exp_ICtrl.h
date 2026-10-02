@@ -1,6 +1,5 @@
 #include <interface/SCtrl-i.h>
 #include "toobj.h"
-
 // IOsrPanel:PtToHost takes POINT*; wrap so Lua can pass two numbers or {x,y}
 // and get {x,y} back.
 static int IOsrPanel_PtToHost(lua_State *L)
@@ -337,11 +336,16 @@ BOOL ExpLua_ICtrl(lua_State *L)
 
 		lua_tinker::class_add<IStackView>(L,"IStackView");
 		lua_tinker::class_inh<IStackView,ICtrl>(L);
-		lua_tinker::class_def<IStackView>(L,"SelectPage",(BOOL (IStackView::*)(int,BOOL))&IStackView::SelectPage);
+		// UAPI(__stdcall) MUST be kept in the member pointer type: STDMETHOD
+		// interface methods are __stdcall, and lua_tinker selects the correct
+		// invocation thunk (invoke/invokeU) from the calling convention of F.
+		// A plain cast strips __stdcall and crashes on x86 (this passed in ECX
+		// while the stdcall vcall thunk reads it from [esp+4]); harmless on x64.
+		lua_tinker::class_def<IStackView>(L,"SelectPage",(BOOL (UAPI IStackView::*)(int,BOOL))&IStackView::SelectPage);
 		lua_tinker::class_def<IStackView>(L,"SetAniStyle",&IStackView::SetAniStyle);
 		lua_tinker::class_def<IStackView>(L,"SetAniDir",&IStackView::SetAniDir);
 		lua_tinker::class_def<IStackView>(L,"GetSelPage",&IStackView::GetSelPage);
-		lua_tinker::class_def<IStackView>(L,"GetPage",(IWindow * (IStackView::*)(int) const)&IStackView::GetPage);
+		lua_tinker::class_def<IStackView>(L,"GetPage",(IWindow * (UAPI IStackView::*)(int) const)&IStackView::GetPage);
 		DEF_QICTRL(L,IStackView,SStackView);
 
 		return TRUE;
