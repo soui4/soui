@@ -19,7 +19,7 @@
     组合按钮(skin: xxl_btn_primary/xxl_btn_secondary)。
   棋盘/状态栏的名字与 id 约定见 test.lua 的 xxl_* 函数。
 -->
-<tabctrl pos="0,0,-0,-0" tabWidth="100" tabAlign="left" curSel="0" animateSteps="20"
+<tabctrl pos="0,0,-0,-0" tabWidth="100" tabAlign="left" curSel="1" animateSteps="20"
          colorBkgnd="@color/clr_page_bg" colorText="@color/clr_title">
   <page title="消消乐">
     <window size="full,full" layout="hbox" padding="15,12,15,15" interval="12">
@@ -91,16 +91,21 @@
 
       <!-- 赛道 + 下注区 (vbox 子项: -2,0 = 宽度撑满 + weight 分剩余高度) -->
       <window size="-2,0" weight="1" layout="hbox" interval="12">
-        <!-- 赛道(绿茵场地,赛马由 lua 定位) -->
+        <!-- 赛道(白色跑道,赛马由 lua 定位;白底 GIF 素材可直接融入) -->
         <window size="0,-2" weight="1" layout="vbox" padding="12,12,12,12" colorBkgnd="@color/clr_card_bg">
-          <window size="-2,0" weight="1" name="game_canvas" on_size="on_canvas_size" clipClient="1" colorBkgnd="#15602F">
+          <window size="-2,0" weight="1" name="game_canvas" on_size="on_canvas_size" clipClient="1" colorBkgnd="#FFFFFF">
+            <!-- 跑道外框(1px 淡绿,在白底上勾出跑道边界) -->
+            <window pos="0,0,-0,@1" colorBkgnd="#BFDBCB"/>
+            <window pos="0,-1,-0,@1" colorBkgnd="#BFDBCB"/>
+            <window pos="0,0,@1,-0" colorBkgnd="#BFDBCB"/>
+            <window pos="-1,0,-0,-0" colorBkgnd="#BFDBCB"/>
             <!-- 车道分隔线(1px 色块,pos y1=%N + y2=@1) -->
-            <window pos="0,%25,-0,@1" colorBkgnd="#3DA35D"/>
-            <window pos="0,%50,-0,@1" colorBkgnd="#3DA35D"/>
-            <window pos="0,%75,-0,@1" colorBkgnd="#3DA35D"/>
+            <window pos="0,%25,-0,@1" colorBkgnd="#C8E3D2"/>
+            <window pos="0,%50,-0,@1" colorBkgnd="#C8E3D2"/>
+            <window pos="0,%75,-0,@1" colorBkgnd="#C8E3D2"/>
             <!-- 终点线 -->
-            <window pos="-9,0,-8,-0" colorBkgnd="#FFFFFF"/>
-            <text pos="-36,3,@36,@16" text="终点" font="size:11,bold:1" colorText="#FFFFFF" align="center"/>
+            <window pos="-10,0,-8,-0" colorBkgnd="#15602F"/>
+            <text pos="-36,3,@36,@16" text="终点" font="size:11,bold:1" colorText="#15602F" align="center"/>
             <!-- 赛马(lua 定位,编号随马移动) -->
             <gifplayer name="player_1" float="1" skin="gif_horse">
               <window size="20,20" pos="0,0" colorBkgnd="@color/clr_primary" layout="hbox" gravity="center" msgTransparent="1"><text text="1" font="size:12,bold:1" colorText="#FFFFFF"/></window>
