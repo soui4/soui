@@ -67,6 +67,8 @@ CRect SDockBar::GetDockBtnRect() const
 {
     CRect rcCaption = GetCaptionRect();
     CRect rcCloseBtn = GetCloseBtnRect();
+    // Keep the dock button the same size as the close button; the dock button
+    // skin is stretched into this rect when drawn.
     int nBtnSize = rcCloseBtn.Width();
     CRect rcDockBtn;
     rcDockBtn.right = rcCloseBtn.left - 4;
@@ -431,14 +433,19 @@ void SDockBar::OnMouseLeave()
 void SDockBar::OnShowWindow(BOOL bShow, UINT nStatus)
 {
     __baseCls::OnShowWindow(bShow, nStatus);
+    // Keep the float host in sync with this dock bar's visibility: hiding a
+    // floating dock bar also hides its host window instead of leaving an empty
+    // window on screen; a later Show()/SetVisible(TRUE) restores the bar and
+    // keeps it floating.
+    if (m_bFloating && m_pFloatWnd)
+        ::ShowWindow(m_pFloatWnd->GetHwnd(), bShow ? SW_SHOW : SW_HIDE);
     RequestRelayout();
 }
 void SDockBar::OnCloseBtnClick()
 {
-    if (m_bFloating)
-        Dock();
-    else
-        SetVisible(FALSE, TRUE);
+    // Hiding the dock bar in both docked and floating states; re-showing it
+    // later via Show()/SetVisible(TRUE) restores it in its current state.
+    SetVisible(FALSE, TRUE);
 }
 
 void SDockBar::OnNcLButtonDown(UINT nHitTest, CPoint point)

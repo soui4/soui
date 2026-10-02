@@ -149,5 +149,6 @@ public:
 	CPoint  	m_tvClickPt;
 
 	SAutoRefPtr<SSkinPool> m_skinPool;
+	SWindow *m_pPropPanel; /**< 属性面板 dockbar 缓存：浮动后脱离主窗口树，无法用 FindChildByID 找到 */
 };
 #endif//_MAINDLG_H_

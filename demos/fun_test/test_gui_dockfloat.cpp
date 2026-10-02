@@ -87,6 +87,23 @@ TEST(window, gui_dockfloat_float_and_dock_roundtrip)
     EXPECT_FALSE(pDockLeft->IsFloating());
     EXPECT_EQ(pDockLeft->GetParent(), pDockParent);
 
+    // Round 3: while floating, the close button hides the dock bar (keeping
+    // the float state); re-showing it stays floating.
+    ASSERT_TRUE(pDockLeft->Float(CPoint(300, 200)));
+    EXPECT_TRUE(pDockLeft->IsFloating());
+
+    pDockLeft->SetVisible(FALSE, TRUE);
+    EXPECT_FALSE(pDockLeft->IsVisible(FALSE));
+    EXPECT_TRUE(pDockLeft->IsFloating());
+
+    pDockLeft->SetVisible(TRUE, TRUE);
+    EXPECT_TRUE(pDockLeft->IsVisible(FALSE));
+    EXPECT_TRUE(pDockLeft->IsFloating());
+
+    // Clean up: dock it back so the float host is destroyed via WM_CLOSE.
+    pDockLeft->Dock();
+    EXPECT_FALSE(pDockLeft->IsFloating());
+
     // Let the posted WM_CLOSE destroy the float host window objects.
     PumpMessages();
 

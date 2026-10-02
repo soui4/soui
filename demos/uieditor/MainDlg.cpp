@@ -40,6 +40,7 @@ CMainDlg::CMainDlg()
 ,m_pFileOperationManager(NULL)
 ,m_pUIResManager(NULL)
 ,m_pToolbarManager(NULL)
+,m_pPropPanel(NULL)
 {
 	m_skinPool.Attach(new SSkinPool());
 	SUiDef::getSingleton().PushSkinPool(m_skinPool);
@@ -81,6 +82,10 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 
 	// 初始化文件树视图
 	m_treeView = FindChildByID2<STreeView>(R.id.workspace_treeview);
+	// Cache the property panel dock bar: it can be floated into its own host
+	// window, after which it leaves the main window tree and FindChildByID
+	// cannot see it anymore.
+	m_pPropPanel = FindChildByID(R.id.property_panel_dock);
 	if (m_treeView)
 	{
 		m_pFileTreeAdapter.Attach(new CFileTreeAdapter(&m_UIResFileMgr));
@@ -270,11 +275,7 @@ void CMainDlg::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
 		}else if(nID == R.id.menu_file_exit){
 			OnClose();
 		}else if(nID == R.id.menu_view_property){
-			// The dock bar may be floating in its own host window, in which case
-			// FindChildByID cannot see it; only toggle it while it is docked.
-			SWindow *pProp = FindChildByID(R.id.property_panel_dock);
-			if (pProp)
-				pProp->SetVisible(!pProp->IsVisible(), TRUE);
+			m_pPropPanel->SetVisible(!m_pPropPanel->IsVisible(), TRUE);
 		}else if(nID == R.id.menu_view_toolbar){
 			SWindow *pToolbar = FindChildByID(R.id.tb_main);
 			pToolbar->SetVisible(!pToolbar->IsVisible(), TRUE);
@@ -880,7 +881,8 @@ void CMainDlg::OnUpdateCmdUI(IEvtArgs *e){
 		e2->bEnable = m_bIsOpen && (m_editXmlType == FT_LAYOUT_XML);
 	}else if(e2->nCmdId == R.id.menu_view_property){
 		e2->bEnable = m_bIsOpen && m_editXmlType == FT_LAYOUT_XML;
-		e2->bChecked = FindChildByID(R.id.property_panel_dock)->IsVisible();
+		if (m_pPropPanel)
+			e2->bChecked = m_pPropPanel->IsVisible();
 	}else if(e2->nCmdId == R.id.menu_view_toolbar){
 		e2->bChecked = FindChildByID(R.id.tb_main)->IsVisible();
 	}else if(e2->nCmdId == R.id.menu_view_statusbar){
