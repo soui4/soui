@@ -8,8 +8,6 @@
 
 SNSBEGIN
 
-#define WM_INITMENUPOPUP_EX (WM_USER + 0x4004) /**<  Message sent to the window that owns the menu before the menu pops up */
-#define WM_MENUSELECT_EX    (WM_USER + 0x4005) /**<  Message sent to the window that owns the menu when a menu item is selected */
 #undef INTERFACE
 #define INTERFACE IMenuEx
 DECLARE_INTERFACE_(IMenuEx, IObjRef)

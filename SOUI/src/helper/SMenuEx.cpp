@@ -505,6 +505,9 @@ class SMenuExSep : public SMenuExItem {
         *psz = szRet;
     }
 
+    BOOL IsSeperator() const override{
+        return TRUE;
+    }
   protected:
     BOOL OnEraseBkgnd(IRenderTarget *pRT)
     {
@@ -823,6 +826,33 @@ void SMenuEx::ShowMenu(UINT uFlag, int x, int y)
 
     SendInitPopupMenu2Owner(0);
     pMenuRoot->SDispatchMessage(UM_SETSCALE, GetScale(), 0);
+	//SWindow * pItem = pMenuRoot->GetWindow(GSW_FIRSTCHILD);
+ //   int iItem = 0;
+ //   while(pItem)
+ //   {
+	//	SMenuExItem* pMenuItem = sobj_cast<SMenuExItem>(pItem);
+ //       if (pMenuItem) {
+ //           if (!pMenuItem->IsSeperator()){
+ //               EventUpdateCmdUI evt(pItem);
+ //               evt.nCmdId = pMenuItem->GetID();
+ //               evt.iIndex = iItem;
+ //               evt.bEnable = (pMenuItem->GetState() & WndState_Disable) ? FALSE : TRUE;
+ //               evt.bChecked = (pMenuItem->GetState() & WndState_Check) ? TRUE : FALSE;
+ //               if (pItem->FireEvent(evt)) {
+ //                   if (evt.bEnable)
+ //                       pItem->ModifyState(0, WndState_Disable);
+ //                   else
+ //                       pItem->ModifyState(WndState_Disable, 0);
+ //                   if (evt.bChecked)
+ //                       pItem->ModifyState(WndState_Check, 0);
+ //                   else
+ //                       pItem->ModifyState(0, WndState_Check);
+ //               }
+ //           }
+ //           iItem++;
+ //       }
+ //       pItem = pItem->GetWindow(GSW_NEXTSIBLING);
+	//}
 
     CSize szMenu = pMenuRoot->CalcMenuSize();
 
@@ -1106,11 +1136,11 @@ void SMenuEx::OnSelItemChanged(SMenuExItem *pMenuItem, BOOL bByMouse)
             nFlag |= pMenuItem->IsDisabled() ? MF_GRAYED : 0;
         }
         if (s_MenuData)
-            ::SendMessage(s_MenuData->GetOwner(), WM_MENUSELECT_EX, MAKEWPARAM(idx, nFlag), (LPARAM)this);
+            ::SendMessage(s_MenuData->GetOwner(), WM_MENUSELECT, MAKEWPARAM(idx, nFlag), (LPARAM)this);
     }
     else if (s_MenuData)
     {
-        ::SendMessage(s_MenuData->GetOwner(), WM_MENUSELECT_EX, MAKEWPARAM(0, 0xffff), 0);
+        ::SendMessage(s_MenuData->GetOwner(), WM_MENUSELECT, MAKEWPARAM(0, 0xffff), 0);
     }
 }
 
@@ -1543,7 +1573,7 @@ void SMenuEx::SendInitPopupMenu2Owner(int idx)
 
     if (::IsWindow(s_MenuData->GetOwner()))
     {
-        ::SendMessage(s_MenuData->GetOwner(), WM_INITMENUPOPUP_EX, (WPARAM)this, (LPARAM)idx);
+        ::SendMessage(s_MenuData->GetOwner(), WM_INITMENUPOPUP, (WPARAM)this, (LPARAM)idx);
     }
     m_bMenuInitialized = TRUE;
 }

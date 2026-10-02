@@ -880,9 +880,7 @@ void CMainDlg::OnUpdateCmdUI(IEvtArgs *e){
     {
 		e2->bEnable = m_bIsOpen && (m_editXmlType == FT_LAYOUT_XML);
 	}else if(e2->nCmdId == R.id.menu_view_property){
-		e2->bEnable = m_bIsOpen && m_editXmlType == FT_LAYOUT_XML;
-		if (m_pPropPanel)
-			e2->bChecked = m_pPropPanel->IsVisible();
+		e2->bChecked = m_pPropPanel->IsVisible();
 	}else if(e2->nCmdId == R.id.menu_view_toolbar){
 		e2->bChecked = FindChildByID(R.id.tb_main)->IsVisible();
 	}else if(e2->nCmdId == R.id.menu_view_statusbar){
