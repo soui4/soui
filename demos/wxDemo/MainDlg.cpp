@@ -936,8 +936,13 @@ LRESULT CMainDlg::OnMenuEvent(UINT msg, WPARAM wp, LPARAM lp) {
 	return 0;
 }
 
-void CMainDlg::OnInitEmojiMenu(IMenuEx* menuPopup, UINT nIndex) {
-	SHostWnd* pMenuHost = static_cast<SHostWnd*>(menuPopup->GetHostWnd());
+void CMainDlg::OnInitEmojiMenu(HMENU menuPopup, UINT nIndex, BOOL bSysMenu) {
+	if (IsMenu(menuPopup))
+	{
+		SetMsgHandled(FALSE);
+		return;
+	}
+	SMenuEx* pMenuHost = reinterpret_cast<SMenuEx*>(menuPopup);
 	STileView* pTileView = pMenuHost->FindChildByName2<STileView>(L"emoji_titleview");
 	SASSERT(pTileView);
 	CEmotionTileViewAdapter* pAdapter = new CEmotionTileViewAdapter(this);

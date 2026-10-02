@@ -120,7 +120,7 @@ protected:
 	EVENT_MAP_END2(SHostWnd)
 		
 	LRESULT OnMenuEvent(UINT msg, WPARAM wp, LPARAM lp);
-	void OnInitEmojiMenu(IMenuEx* menuPopup, UINT nIndex);
+	void OnInitEmojiMenu(HMENU menuPopup, UINT nIndex, BOOL bSysMenu);
 
 	//HostWnd真实窗口消息处理
 	BEGIN_MSG_MAP_EX(CMainDlg)
@@ -131,7 +131,7 @@ protected:
 		//MESSAGE_HANDLER(WM_ICONNOTIFY, OnIconNotify)
 		MSG_WM_COMMAND(OnCommand)
 		MESSAGE_HANDLER_EX(UM_MENUEVENT, OnMenuEvent)
-		MSG_WM_INITMENUPOPUP_EX(OnInitEmojiMenu)
+		MSG_WM_INITMENUPOPUP(OnInitEmojiMenu)
 		CHAIN_MSG_MAP(SHostWnd)
 		REFLECT_NOTIFICATIONS_EX()
 	END_MSG_MAP()

@@ -781,7 +781,11 @@ void SMCListView::OnDestroy()
     {
         m_adapter->unregisterDataSetObserver(m_observer);
     }
-
+    if (m_itemCapture) {
+        m_itemCapture->ReleaseCapture();
+        m_itemCapture = NULL;
+    }
+    m_pHoverItem = NULL;
     // destroy all itempanel
     SPOSITION pos = m_lstItems.GetHeadPosition();
     while (pos)
