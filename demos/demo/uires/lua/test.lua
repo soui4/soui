@@ -649,8 +649,7 @@ function xxl_ani_end(luaAni, ctxId)
 		return
 	end
 	if c.ani_widget then c.ani_widget:Destroy(); end
-	-- bUpdate=true:格子隐藏期间可能被 SelectPage 直切过页(invalidate 发生在
-	-- 不可见态被吞),恢复可见时必须补一次失效,否则偶发空白格
+	-- 恢复原格子可见(带失效)
 	c.ele:SetVisible(true,true);
 	xxl.ani_ctx[ctxId] = nil;
 end

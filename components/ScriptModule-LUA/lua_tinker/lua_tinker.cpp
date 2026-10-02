@@ -1,4 +1,4 @@
-﻿// lua_tinker.cpp
+// lua_tinker.cpp
 //
 // LuaTinker - Simple and light C++ wrapper for Lua.
 //
@@ -357,6 +357,14 @@ char lua_tinker::read ( lua_State *L, int index )
    if ( lua_isboolean ( L, index ) )
       return lua_toboolean ( L, index ) != 0 ? 1 : 0;
    return ( char ) lua_tonumber ( L, index );
+}
+
+template<>
+signed char lua_tinker::read ( lua_State *L, int index )
+{
+   if ( lua_isboolean ( L, index ) )
+      return lua_toboolean ( L, index ) != 0 ? 1 : 0;
+   return ( signed char ) lua_tonumber ( L, index );
 }
 
 template<>
