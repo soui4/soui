@@ -83,23 +83,23 @@
         <img size="30,30" skin="svg_home_icons" iconIndex="7" layout_gravity="center" msgTransparent="1"/>
         <text text="SOUI + LUA 跑马机" font="face:微软雅黑,size:20,bold:1" colorText="@color/clr_title" layout_gravity="center"/>
         <window size="0,0" weight="1"/>
-        <window size="-2,-1" layout="hbox" gravity="center" interval="6" colorBkgnd="#EFF6FF" padding="12,4,12,4">
+        <window size="-1,-1" layout="hbox" gravity="center" interval="6" colorBkgnd="#EFF6FF" padding="12,4,12,4">
           <text text="赔率" font="size:13" colorText="@color/clr_text_sub"/>
           <text text="x4" font="size:16,bold:1" colorText="@color/clr_primary"/>
         </window>
       </window>
 
-      <!-- 赛道 + 下注区 -->
-      <window size="0,-2" weight="1" layout="hbox" interval="12">
+      <!-- 赛道 + 下注区 (vbox 子项: -2,0 = 宽度撑满 + weight 分剩余高度) -->
+      <window size="-2,0" weight="1" layout="hbox" interval="12">
         <!-- 赛道(绿茵场地,赛马由 lua 定位) -->
         <window size="0,-2" weight="1" layout="vbox" padding="12,12,12,12" colorBkgnd="@color/clr_card_bg">
-          <window size="0,-2" weight="1" name="game_canvas" on_size="on_canvas_size" clipClient="1" colorBkgnd="#15602F">
-            <!-- 车道分隔线 -->
-            <hr pos="0,%25,-0,%25" mode="horizontal" colorLine="#3DA35D"/>
-            <hr pos="0,%50,-0,%50" mode="horizontal" colorLine="#3DA35D"/>
-            <hr pos="0,%75,-0,%75" mode="horizontal" colorLine="#3DA35D"/>
+          <window size="-2,0" weight="1" name="game_canvas" on_size="on_canvas_size" clipClient="1" colorBkgnd="#15602F">
+            <!-- 车道分隔线(1px 色块,pos y1=%N + y2=@1) -->
+            <window pos="0,%25,-0,@1" colorBkgnd="#3DA35D"/>
+            <window pos="0,%50,-0,@1" colorBkgnd="#3DA35D"/>
+            <window pos="0,%75,-0,@1" colorBkgnd="#3DA35D"/>
             <!-- 终点线 -->
-            <hr pos="-8,0,-8,-0" mode="vertical" colorLine="#FFFFFF"/>
+            <window pos="-9,0,-8,-0" colorBkgnd="#FFFFFF"/>
             <text pos="-36,3,@36,@16" text="终点" font="size:11,bold:1" colorText="#FFFFFF" align="center"/>
             <!-- 赛马(lua 定位,编号随马移动) -->
             <gifplayer name="player_1" float="1" skin="gif_horse">
@@ -145,7 +145,7 @@
         <button name="btn_run" size="110,36" skin="xxl_btn_primary" colorText="#FFFFFF" cursor="hand" on_command="on_run" gravity="center" align="center">run</button>
         <window size="0,0" weight="1"/>
         <text text="现有金币" font="size:13" colorText="@color/clr_text_sub" layout_gravity="center"/>
-        <window size="-2,-1" layout="hbox" gravity="center" colorBkgnd="#FEF3C7" padding="12,4,12,4">
+        <window size="-1,-1" layout="hbox" gravity="center" colorBkgnd="#FEF3C7" padding="12,4,12,4">
           <text name="txt_coins" text="100" font="size:18,bold:1" colorText="#B45309"/>
           <text text="枚" font="size:12" colorText="#B45309" extend_left="2"/>
         </window>
