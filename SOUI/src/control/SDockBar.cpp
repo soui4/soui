@@ -260,17 +260,33 @@ void SDockBar::OnPaint(IRenderTarget *pRT)
         }
         else
         {
-            COLORREF clrBtn = RGBA(120, 160, 200, 255);
+            // No skin configured: draw a simple button with the render target API.
+            // The background follows the button state (normal/hover/pressed).
+            COLORREF clrBg = RGBA(200, 208, 220, 255);
             if (m_bDockBtnPressed)
-                clrBtn = RGBA(80, 120, 160, 255);
+                clrBg = RGBA(110, 140, 180, 255);
             else if (m_bDockBtnHover)
-                clrBtn = RGBA(150, 190, 230, 255);
+                clrBg = RGBA(226, 232, 240, 255);
 
-            pRT->FillSolidRect(&rcDockBtn, clrBtn);
+            pRT->FillSolidRect(&rcDockBtn, clrBg);
 
-            COLORREF oldColor = pRT->SetTextColor(RGBA(255, 255, 255, 255));
-            pRT->DrawText(_T("="), 1, &rcDockBtn, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-            pRT->SetTextColor(oldColor);
+            // A simple "dock" glyph: a downward triangle arrow, drawn centered
+            // with the render target API.
+            int nGlyph = smin(rcDockBtn.Width(), rcDockBtn.Height()) / 3;
+            if (nGlyph > 2)
+            {
+                CPoint cpt = rcDockBtn.CenterPoint();
+                POINT pts[3] = {
+                    {cpt.x - nGlyph / 2, cpt.y - nGlyph / 2},
+                    {cpt.x + nGlyph / 2, cpt.y - nGlyph / 2},
+                    {cpt.x, cpt.y + nGlyph / 2},
+                };
+                SAutoRefPtr<IBrushS> pBrush, pOldBrush;
+                pRT->CreateSolidColorBrush(RGBA(255, 255, 255, 255), &pBrush);
+                pRT->SelectObject(pBrush, (IRenderObj **)&pOldBrush);
+                pRT->FillPolygon(pts, 3);
+                pRT->SelectObject(pOldBrush, NULL);
+            }
         }
     }
     AfterPaint(pRT, painter);
