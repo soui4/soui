@@ -61,6 +61,32 @@ static void ExpLua_SXmlNode(lua_State *L)
 // ---------------------------------------------------------------------------
 // SXmlDoc  (concrete, ref counted)
 // ---------------------------------------------------------------------------
+static int SXmlDoc_LoadFileA(lua_State *L)
+{
+    SXmlDoc *_this = lua_tinker_toobj<SXmlDoc>(L, 1);
+    if (!_this)
+        return luaL_error(L, "expect SXmlDoc at arg 1");
+    const char *path = luaL_checkstring(L, 2);
+    unsigned int options = (unsigned int)(lua_isnoneornil(L, 3) ? pugi::parse_default : lua_tointeger(L, 3));
+    int encoding = (int)(lua_isnoneornil(L, 4) ? pugi::encoding_auto : lua_tointeger(L, 4));
+    BOOL bRet = _this->LoadFileA(path, options, (XmlEncoding)encoding);
+    lua_pushboolean(L, bRet);
+    return 1;
+}
+
+static int SXmlDoc_LoadStringU8(lua_State *L)
+{
+    SXmlDoc *_this = lua_tinker_toobj<SXmlDoc>(L, 1);
+    if (!_this)
+        return luaL_error(L, "expect SXmlDoc at arg 1");
+    const char *contents = luaL_checkstring(L, 2);
+    unsigned int options = (unsigned int)(lua_isnoneornil(L, 3) ? pugi::parse_default : lua_tointeger(L, 3));
+    SStringW wstr = S_CA2W(contents, CP_UTF8);
+    BOOL bRet = _this->LoadString(wstr.c_str(), options);
+    lua_pushboolean(L, bRet);
+    return 1;
+}
+
 static void ExpLua_SXmlDoc(lua_State *L)
 {
     lua_tinker::class_add<SXmlDoc>(L, "SXmlDoc");
@@ -70,30 +96,10 @@ static void ExpLua_SXmlDoc(lua_State *L)
     lua_tinker::class_def<SXmlDoc>(L, "Root", &SXmlDoc::root);
 
     // LoadFileA(path[, options[, encoding]]) - wrapper with optional args
-    class_set_cfun<SXmlDoc>(L, "LoadFileA", [](lua_State *L) -> int {
-        SXmlDoc *_this = lua_tinker_toobj<SXmlDoc>(L, 1);
-        if (!_this)
-            return luaL_error(L, "expect SXmlDoc at arg 1");
-        const char *path = luaL_checkstring(L, 2);
-        unsigned int options = (unsigned int)(lua_isnoneornil(L, 3) ? pugi::parse_default : lua_tointeger(L, 3));
-        int encoding = (int)(lua_isnoneornil(L, 4) ? pugi::encoding_auto : lua_tointeger(L, 4));
-        BOOL bRet = _this->LoadFileA(path, options, (XmlEncoding)encoding);
-        lua_pushboolean(L, bRet);
-        return 1;
-    });
+    class_set_cfun<SXmlDoc>(L, "LoadFileA", SXmlDoc_LoadFileA);
 
     // LoadStringU8(utf8 contents[, options])
-    class_set_cfun<SXmlDoc>(L, "LoadStringU8", [](lua_State *L) -> int {
-        SXmlDoc *_this = lua_tinker_toobj<SXmlDoc>(L, 1);
-        if (!_this)
-            return luaL_error(L, "expect SXmlDoc at arg 1");
-        const char *contents = luaL_checkstring(L, 2);
-        unsigned int options = (unsigned int)(lua_isnoneornil(L, 3) ? pugi::parse_default : lua_tointeger(L, 3));
-        SStringW wstr = S_CA2W(contents, CP_UTF8);
-        BOOL bRet = _this->LoadString(wstr.c_str(), options);
-        lua_pushboolean(L, bRet);
-        return 1;
-    });
+    class_set_cfun<SXmlDoc>(L, "LoadStringU8", SXmlDoc_LoadStringU8);
 
     DEF_CAST_OBJREF(L, SXmlDoc);
 }
