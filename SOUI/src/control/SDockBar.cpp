@@ -256,7 +256,24 @@ void SDockBar::OnPaint(IRenderTarget *pRT)
 
         if (m_skinDockBtn)
         {
-            m_skinDockBtn->DrawByState(pRT, rcDockBtn, dwDockState);
+            // Clamp the state index: single-frame skins (e.g. a 1-frame SVG icon) have
+            // no dedicated hover/pressed frames, so never select a frame beyond the
+            // available states or the button would draw nothing.
+            int nMaxState = m_skinDockBtn->GetStates();
+            int iState = SState2Index::GetDefIndex(dwDockState, true);
+            if (iState >= nMaxState)
+                iState = nMaxState - 1;
+            m_skinDockBtn->DrawByState(pRT, rcDockBtn, 1 << iState);
+
+            // For single-frame skins only, overlay an explicit feedback tint since
+            // the clamped index loses the hover/pressed distinction.
+            if (nMaxState < 3)
+            {
+                if (m_bDockBtnPressed)
+                    pRT->FillSolidRect(&rcDockBtn, RGBA(0, 0, 0, 60));
+                else if (m_bDockBtnHover)
+                    pRT->FillSolidRect(&rcDockBtn, RGBA(255, 255, 255, 50));
+            }
         }
         else
         {

@@ -1,0 +1,45 @@
+<svg width="72" height="24" viewBox="0 0 72 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- state 0: normal -->
+    <linearGradient id="bg_normal" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#7aa8e0"/>
+      <stop offset="100%" stop-color="#5b86c5"/>
+    </linearGradient>
+    <!-- state 1: hover -->
+    <linearGradient id="bg_hover" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#93bcef"/>
+      <stop offset="100%" stop-color="#6f9adf"/>
+    </linearGradient>
+    <!-- state 2: pressed -->
+    <linearGradient id="bg_pressed" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#476fb2"/>
+      <stop offset="100%" stop-color="#385d94"/>
+    </linearGradient>
+  </defs>
+
+  <!-- ============ state 0: normal ============ -->
+  <g>
+    <rect x="0.5" y="0.5" width="23" height="23" rx="4" fill="url(#bg_normal)"/>
+    <rect x="0.5" y="0.5" width="23" height="23" rx="4" stroke="#2f4f7d" stroke-opacity="0.45"/>
+    <!-- downward arrow (dock back into the frame) -->
+    <path d="M12 6.5 L12 15 M12 15 L8.5 11.5 M12 15 L15.5 11.5" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="6" y="16.5" width="12" height="3" rx="1.5" fill="#ffffff"/>
+  </g>
+
+  <!-- ============ state 1: hover (lighter, subtle top sheen) ============ -->
+  <g transform="translate(24,0)">
+    <rect x="0.5" y="0.5" width="23" height="23" rx="4" fill="url(#bg_hover)"/>
+    <rect x="0.5" y="0.5" width="23" height="23" rx="4" stroke="#2f4f7d" stroke-opacity="0.5"/>
+    <rect x="4" y="4" width="16" height="2" rx="1" fill="#ffffff" fill-opacity="0.3"/>
+    <path d="M12 6.5 L12 15 M12 15 L8.5 11.5 M12 15 L15.5 11.5" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="6" y="16.5" width="12" height="3" rx="1.5" fill="#ffffff"/>
+  </g>
+
+  <!-- ============ state 2: pressed (darker, glyph pushed down 1px) ============ -->
+  <g transform="translate(48,0)">
+    <rect x="0.5" y="0.5" width="23" height="23" rx="4" fill="url(#bg_pressed)"/>
+    <rect x="0.5" y="0.5" width="23" height="23" rx="4" stroke="#1f3657" stroke-opacity="0.6"/>
+    <path d="M12 7.5 L12 16 M12 16 L8.5 12.5 M12 16 L15.5 12.5" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="6" y="17.5" width="12" height="3" rx="1.5" fill="#ffffff"/>
+  </g>
+</svg>

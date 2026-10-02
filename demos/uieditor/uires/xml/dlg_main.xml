@@ -56,7 +56,7 @@
 						<include src="layout:xml_uidesigner_main" />
 					</pane>
 				</splitcol>
-				<dockbar width="300" dock="right" name="property_panel_dock" text="@string/property" resizable="1" floatable="1" dockBtnSkin="skin_blue_button" margin="2">
+				<dockbar width="300" dock="right" name="property_panel_dock" text="@string/property" resizable="1" floatable="1" dockBtnSkin="skin_dock_btn" margin="2">
 					<include src="layout:property_panel" />
 				</dockbar>
 				<window name="wnd_status" size="-2,25" dock="bottom" margin="2" colorBorder="@color/border" layout="hbox" gravity="center" display="0">

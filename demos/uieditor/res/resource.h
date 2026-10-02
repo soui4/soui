@@ -1,4 +1,4 @@
-﻿//stamp:2e8ca06253b8a73e
+﻿//stamp:2e9b35afe877c593
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -53,6 +53,9 @@
 			const TCHAR * png_tb_main;
 			const TCHAR * png_tb_sep;
 			}IMG;
+		struct _svg{
+			const TCHAR * dock_btn;
+			}svg;
 		struct _ICON{
 			const TCHAR * ICON_logo;
 			}ICON;
@@ -117,6 +120,9 @@ struct _UIRES UIRES={
 			_T("IMG:png_dropdown"),
 			_T("IMG:png_tb_main"),
 			_T("IMG:png_tb_sep"),
+		},
+		{
+			_T("svg:dock_btn"),
 		},
 		{
 			_T("ICON:ICON_logo"),
@@ -403,6 +409,108 @@ struct _R{
 		int xml_editor;
 		int xml_struct;
 	}string;
+#ifdef __cplusplus
+	struct {
+		enum {
+			NAME_UIDESIGNER_NEW_SKIN_LB = 65585,
+			NAME_UIDESIGNER_btn_OK = 65582,
+			NAME_UIDESIGNER_btn_close = 65578,
+			NAME_UIDESIGNER_btn_dlg = 65581,
+			NAME_UIDESIGNER_main_icon = 65577,
+			NAME_UIDESIGNER_split_col = 65558,
+			UI_main_caption = 65546,
+			apptitle = 65547,
+			btnCancel = 65584,
+			btnOK = 65586,
+			btnSwitch = 65542,
+			btn_close = 65552,
+			btn_help = 65548,
+			btn_max = 65550,
+			btn_min = 65549,
+			btn_next = 65599,
+			btn_prev = 65597,
+			btn_replace = 65604,
+			btn_restore = 65551,
+			button1st = 65543,
+			button2nd = 65544,
+			button3rd = 65545,
+			chk_auto_size = 65596,
+			chk_autosave = 65555,
+			chk_match_case = 65602,
+			chk_match_whole_word = 65603,
+			color_preview = 65570,
+			edit_replace = 65601,
+			edit_search = 65600,
+			edtInput = 65587,
+			edt_custom_name = 65605,
+			edt_custom_parent = 65606,
+			img_icon_exclamation = 65540,
+			img_icon_information = 65538,
+			img_icon_question = 65539,
+			img_preview = 65592,
+			img_preview_auto = 65595,
+			img_preview_full = 65594,
+			img_state = 65563,
+			img_viewer = 65575,
+			lbl_index = 65598,
+			lv_skin = 65593,
+			main_menu = 65553,
+			menu_about = 400,
+			menu_file_closeproject = 2,
+			menu_file_exit = 100,
+			menu_file_newinclude = 5,
+			menu_file_newlayout = 4,
+			menu_file_openproject = 1,
+			menu_file_save_xml = 3,
+			menu_tool_format_xml = 31,
+			menu_tool_new_custom_skin = 35,
+			menu_tool_new_custom_widget = 34,
+			menu_tool_preview = 33,
+			menu_tool_view_skin = 32,
+			menu_view_property = 23,
+			menu_view_statusbar = 22,
+			menu_view_toolbar = 21,
+			msgicon = 65537,
+			msgtext = 65541,
+			msgtitle = 65536,
+			new_layout_path = 65580,
+			new_layout_resname = 65579,
+			page_image = 65574,
+			page_xml = 65572,
+			property_panel_dock = 65559,
+			propgrid_element = 65566,
+			skin_preview = 65569,
+			slider_zoom = 65576,
+			tab_editor = 65571,
+			tb_main = 65554,
+			tb_main_about = 8,
+			tb_main_closeproject = 2,
+			tb_main_formatxml = 6,
+			tb_main_newinclude = 5,
+			tb_main_newlayout = 4,
+			tb_main_openproject = 1,
+			tb_main_savexml = 3,
+			tb_main_viewskin = 7,
+			tb_prop = 65588,
+			tb_skin = 65557,
+			tb_widget = 65556,
+			txt_desc = 65567,
+			txt_label = 65564,
+			txt_path = 65589,
+			txt_prop_desc = 65591,
+			txt_prop_title = 65590,
+			txt_status = 65561,
+			txt_title = 65583,
+			txt_value = 65568,
+			uidesigner_scintilla = 100000,
+			uidesigner_wnd_layout = 100000,
+			uidesigner_wnd_xmltree = 65565,
+			wnd_status = 65560,
+			workspace_treeview = 65562,
+			xml_editor = 65573
+		};
+	}ID;
+#endif//__cplusplus
 
 };
 #endif//_R_H_
