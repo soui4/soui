@@ -3,7 +3,7 @@
   home_icons.svg - 宫格首页分类图标雪碧图(nanosvg 兼容)
   8 帧横排,每帧 48x48,总尺寸 384x48。
   帧序与原 page_icons.png 一致:
-    0=基础控件  1=教程  2=动画  3=布局  4=杂项  5=skia  6=关于  7=消消乐
+    0=基础控件  1=教程  2=动画  3=布局  4=杂项  5=skia  6=关于  7=脚本
   配色:现代蓝色系 #2563EB -> #1D4ED8 渐变
 -->
 <svg xmlns="http://www.w3.org/2000/svg" width="384" height="48" viewBox="0 0 384 48">
@@ -75,16 +75,15 @@
     <rect x="21.4" y="20.5" width="5.2" height="13.5" rx="2.6" fill="#FFFFFF"/>
   </g>
 
-  <!-- 帧7:消消乐(3x3 方块棋盘,右下高亮) -->
+  <!-- 帧7:脚本(代码编辑器窗口 + </> 符号) -->
   <g transform="translate(336,0)">
-    <rect x="5"  y="5"  width="11" height="11" rx="3" fill="url(#gBlue)"/>
-    <rect x="18.5" y="5" width="11" height="11" rx="3" fill="#93C5FD"/>
-    <rect x="32" y="5"  width="11" height="11" rx="3" fill="url(#gCyan)"/>
-    <rect x="5"  y="18.5" width="11" height="11" rx="3" fill="#60A5FA"/>
-    <rect x="18.5" y="18.5" width="11" height="11" rx="3" fill="url(#gCyan)"/>
-    <rect x="32" y="18.5" width="11" height="11" rx="3" fill="#93C5FD"/>
-    <rect x="5"  y="32" width="11" height="11" rx="3" fill="url(#gCyan)"/>
-    <rect x="18.5" y="32" width="11" height="11" rx="3" fill="url(#gBlue)"/>
-    <circle cx="37.5" cy="37.5" r="5.5" fill="#F59E0B"/>
+    <rect x="4" y="9" width="40" height="31" rx="5" fill="url(#gBlue)"/>
+    <circle cx="10" cy="13.5" r="1.8" fill="#FCA5A5"/>
+    <circle cx="15" cy="13.5" r="1.8" fill="#FCD34D"/>
+    <circle cx="20" cy="13.5" r="1.8" fill="#86EFAC"/>
+    <line x1="6" y1="18.5" x2="42" y2="18.5" stroke="#1E3A8A" stroke-width="1"/>
+    <path d="M16,23 L10,29 L16,35" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M22,23 L31,35" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M27,23 L33,29 L27,35" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
   </g>
 </svg>

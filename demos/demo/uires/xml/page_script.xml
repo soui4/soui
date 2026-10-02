@@ -76,39 +76,79 @@
     </window>
   </page>
   <page title="跑马机">
-    <window size="full,full" name="game_wnd" id="300">
-      <text pos="0,0,-0,@30" colorBkgnd="#cccccc" colorText="#ff0000" align="center">SOUI + LUA 跑马机</text>
-      <window pos="0,[0,-0,-50">
-        <window pos="0,0,-64,-0" name="game_canvas" on_size="on_canvas_size" clipClient="1" colorBkgnd="#ffffff">
-          <!--比赛场地-->
-          <gifplayer name="player_1" float="1" skin="gif_horse">
-            <text pos="0,%1" colorText="rgb(255,0,0)" font="size:20">1</text>
-          </gifplayer>
-          <gifplayer name="player_2" float="1" skin="gif_horse">
-            <text pos="0,0" colorText="rgb(255,0,0)" font="size:20">2</text>
-          </gifplayer>
-          <gifplayer name="player_3" float="1" skin="gif_horse">
-            <text pos="0,0" colorText="rgb(255,0,0)" font="size:20">3</text>
-          </gifplayer>
-          <gifplayer name="player_4" float="1" skin="gif_horse">
-            <text pos="0,0" colorText="rgb(255,0,0)" font="size:20">4</text>
-          </gifplayer>
-          <gifplayer name="flag_win" float="1" skin="gif_win" show="0" id="400"/>
-          <text pos="|0,0">赔率:</text>
-          <text pos="[0,0,@20,[0" colorText="#ff0000" name="txt_rate">4</text>
-          <hr pos="-1,0,-0,-0" mode="vertical" colorLine="#ff0000"/>
-        </window>
-        <window pos="[0,0,-0,-0">
-          <window pos="0,%12.5,@64,@64" offset="0,-0.5" skin="img_coin" id="101" tip="下注1号马" on_command="on_bet">0</window>
-          <window pos="0,%37.5,@64,@64" offset="0,-0.5" skin="img_coin" id="102" tip="下注2号马" on_command="on_bet">0</window>
-          <window pos="0,%62.5,@64,@64" offset="0,-0.5" skin="img_coin" id="103" tip="下注3号马" on_command="on_bet">0</window>
-          <window pos="0,%87.5,@64,@64" offset="0,-0.5" skin="img_coin" id="104" tip="下注4号马" on_command="on_bet">0</window>
+    <!-- 根容器:纵向三段(标题 / 赛道+下注 / 工具栏) -->
+    <window size="full,full" name="game_wnd" id="300" layout="vbox" padding="14,14,14,14" interval="12" colorBkgnd="@color/clr_page_bg">
+      <!-- 标题栏 -->
+      <window size="-2,-1" layout="hbox" interval="10" gravity="center" padding="14,10,14,10" colorBkgnd="@color/clr_card_bg">
+        <img size="30,30" skin="svg_home_icons" iconIndex="7" layout_gravity="center" msgTransparent="1"/>
+        <text text="SOUI + LUA 跑马机" font="face:微软雅黑,size:20,bold:1" colorText="@color/clr_title" layout_gravity="center"/>
+        <window size="0,0" weight="1"/>
+        <window size="-2,-1" layout="hbox" gravity="center" interval="6" colorBkgnd="#EFF6FF" padding="12,4,12,4">
+          <text text="赔率" font="size:13" colorText="@color/clr_text_sub"/>
+          <text text="x4" font="size:16,bold:1" colorText="@color/clr_primary"/>
         </window>
       </window>
-      <window pos="10,[5,-0,-0" name="game_toolbar">
-        <button name="btn_run" pos="0,|0,@100,@30" offset="0,-0.5" tip="run the game" on_command="on_run">run</button>
-        <text pos="]-5,0,@-1,-0" offset="-1,0">现有金币:</text>
-        <text pos="-64,0,@64,-0" name="txt_coins" align="center">100</text>
+
+      <!-- 赛道 + 下注区 -->
+      <window size="0,-2" weight="1" layout="hbox" interval="12">
+        <!-- 赛道(绿茵场地,赛马由 lua 定位) -->
+        <window size="0,-2" weight="1" layout="vbox" padding="12,12,12,12" colorBkgnd="@color/clr_card_bg">
+          <window size="0,-2" weight="1" name="game_canvas" on_size="on_canvas_size" clipClient="1" colorBkgnd="#15602F">
+            <!-- 车道分隔线 -->
+            <hr pos="0,%25,-0,%25" mode="horizontal" colorLine="#3DA35D"/>
+            <hr pos="0,%50,-0,%50" mode="horizontal" colorLine="#3DA35D"/>
+            <hr pos="0,%75,-0,%75" mode="horizontal" colorLine="#3DA35D"/>
+            <!-- 终点线 -->
+            <hr pos="-8,0,-8,-0" mode="vertical" colorLine="#FFFFFF"/>
+            <text pos="-36,3,@36,@16" text="终点" font="size:11,bold:1" colorText="#FFFFFF" align="center"/>
+            <!-- 赛马(lua 定位,编号随马移动) -->
+            <gifplayer name="player_1" float="1" skin="gif_horse">
+              <window size="20,20" pos="0,0" colorBkgnd="@color/clr_primary" layout="hbox" gravity="center" msgTransparent="1"><text text="1" font="size:12,bold:1" colorText="#FFFFFF"/></window>
+            </gifplayer>
+            <gifplayer name="player_2" float="1" skin="gif_horse">
+              <window size="20,20" pos="0,0" colorBkgnd="@color/clr_primary" layout="hbox" gravity="center" msgTransparent="1"><text text="2" font="size:12,bold:1" colorText="#FFFFFF"/></window>
+            </gifplayer>
+            <gifplayer name="player_3" float="1" skin="gif_horse">
+              <window size="20,20" pos="0,0" colorBkgnd="@color/clr_primary" layout="hbox" gravity="center" msgTransparent="1"><text text="3" font="size:12,bold:1" colorText="#FFFFFF"/></window>
+            </gifplayer>
+            <gifplayer name="player_4" float="1" skin="gif_horse">
+              <window size="20,20" pos="0,0" colorBkgnd="@color/clr_primary" layout="hbox" gravity="center" msgTransparent="1"><text text="4" font="size:12,bold:1" colorText="#FFFFFF"/></window>
+            </gifplayer>
+            <gifplayer name="flag_win" float="1" skin="gif_win" show="0" id="400"/>
+          </window>
+        </window>
+        <!-- 下注区 -->
+        <window size="100,-2" layout="vbox" interval="8" padding="10,10,10,10" gravity="center" colorBkgnd="@color/clr_card_bg">
+          <text text="下注区" font="size:13,bold:1" colorText="@color/clr_title" align="center"/>
+          <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
+          <window size="-1,-1" layout="hbox" interval="6" gravity="center">
+            <window size="22,22" colorBkgnd="@color/clr_primary" layout="hbox" gravity="center"><text text="1" font="size:13,bold:1" colorText="#FFFFFF"/></window>
+            <window size="48,48" skin="img_coin" id="101" tip="下注1号马" on_command="on_bet" align="center" valign="center" font="size:16,bold:1" colorText="@color/clr_title">0</window>
+          </window>
+          <window size="-1,-1" layout="hbox" interval="6" gravity="center">
+            <window size="22,22" colorBkgnd="@color/clr_primary" layout="hbox" gravity="center"><text text="2" font="size:13,bold:1" colorText="#FFFFFF"/></window>
+            <window size="48,48" skin="img_coin" id="102" tip="下注2号马" on_command="on_bet" align="center" valign="center" font="size:16,bold:1" colorText="@color/clr_title">0</window>
+          </window>
+          <window size="-1,-1" layout="hbox" interval="6" gravity="center">
+            <window size="22,22" colorBkgnd="@color/clr_primary" layout="hbox" gravity="center"><text text="3" font="size:13,bold:1" colorText="#FFFFFF"/></window>
+            <window size="48,48" skin="img_coin" id="103" tip="下注3号马" on_command="on_bet" align="center" valign="center" font="size:16,bold:1" colorText="@color/clr_title">0</window>
+          </window>
+          <window size="-1,-1" layout="hbox" interval="6" gravity="center">
+            <window size="22,22" colorBkgnd="@color/clr_primary" layout="hbox" gravity="center"><text text="4" font="size:13,bold:1" colorText="#FFFFFF"/></window>
+            <window size="48,48" skin="img_coin" id="104" tip="下注4号马" on_command="on_bet" align="center" valign="center" font="size:16,bold:1" colorText="@color/clr_title">0</window>
+          </window>
+        </window>
+      </window>
+
+      <!-- 工具栏 -->
+      <window size="-2,-1" layout="hbox" interval="10" gravity="center" padding="12,10,12,10" colorBkgnd="@color/clr_card_bg" name="game_toolbar">
+        <button name="btn_run" size="110,36" skin="xxl_btn_primary" colorText="#FFFFFF" cursor="hand" on_command="on_run" gravity="center" align="center">run</button>
+        <window size="0,0" weight="1"/>
+        <text text="现有金币" font="size:13" colorText="@color/clr_text_sub" layout_gravity="center"/>
+        <window size="-2,-1" layout="hbox" gravity="center" colorBkgnd="#FEF3C7" padding="12,4,12,4">
+          <text name="txt_coins" text="100" font="size:18,bold:1" colorText="#B45309"/>
+          <text text="枚" font="size:12" colorText="#B45309" extend_left="2"/>
+        </window>
       </window>
     </window>
   </page>
