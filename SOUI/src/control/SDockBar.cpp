@@ -1,5 +1,6 @@
 #include "souistd.h"
 #include "control/SDockBar.h"
+#include "control/SDockFloatWnd.h"
 #include "layout/SFrameLayout.h"
 
 SNSBEGIN
@@ -7,11 +8,19 @@ SNSBEGIN
 SDockBar::SDockBar(void)
     : m_bCloseBtnHover(FALSE)
     , m_bCloseBtnPressed(FALSE)
+    , m_bDockBtnHover(FALSE)
+    , m_bDockBtnPressed(FALSE)
     , m_nCaptionHeight(24, dp)
     , m_bActive(FALSE)
     , m_bResizable(FALSE)
+    , m_bFloatable(TRUE)
     , m_nResizeHitTest(0)
     , m_bIsResizing(FALSE)
+    , m_bFloating(FALSE)
+    , m_bDragFloating(FALSE)
+    , m_pDockParent(NULL)
+    , m_pDockPrevSibling(NULL)
+    , m_pFloatWnd(NULL)
     , m_skinCloseBtn(GETBUILTINSKIN(SKIN_SYS_BTN_MINI_CLOSE))
 {
     m_bFocusable = TRUE;
@@ -52,6 +61,45 @@ BOOL SDockBar::IsPointOnCloseBtn(CPoint point) const
 {
     CRect rcCloseBtn = GetCloseBtnRect();
     return rcCloseBtn.PtInRect(point);
+}
+
+CRect SDockBar::GetDockBtnRect() const
+{
+    CRect rcCaption = GetCaptionRect();
+    CRect rcCloseBtn = GetCloseBtnRect();
+    int nBtnSize = rcCloseBtn.Width();
+    CRect rcDockBtn;
+    rcDockBtn.right = rcCloseBtn.left - 4;
+    rcDockBtn.left = rcDockBtn.right - nBtnSize;
+    rcDockBtn.top = rcCaption.top + (rcCaption.Height() - nBtnSize) / 2;
+    rcDockBtn.bottom = rcDockBtn.top + nBtnSize;
+    return rcDockBtn;
+}
+
+BOOL SDockBar::IsPointOnDockBtn(CPoint point) const
+{
+    if (!m_bFloating)
+        return FALSE;
+    CRect rcDockBtn = GetDockBtnRect();
+    return rcDockBtn.PtInRect(point);
+}
+
+BOOL SDockBar::IsPointOnCaption(CPoint point) const
+{
+    return GetCaptionRect().PtInRect(point);
+}
+
+CPoint SDockBar::GetWindowScreenTopLeft() const
+{
+    CPoint pt;
+    const ISwndContainer *pContainer = GetContainer();
+    if (!pContainer)
+        return pt;
+    CRect rcWnd = GetWindowRect();
+    pContainer->FrameToHost(&rcWnd);
+    pt = rcWnd.TopLeft();
+    ::ClientToScreen(pContainer->GetHostHwnd(), &pt);
+    return pt;
 }
 
 UINT SDockBar::OnNcHitTest(const CPoint &point)
@@ -193,6 +241,36 @@ void SDockBar::OnPaint(IRenderTarget *pRT)
         pRT->DrawText(_T("x"), 1, &rcCloseBtn, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
         pRT->SetTextColor(oldColor);
     }
+
+    // Draw the dock button while floating (clicking it docks the bar back).
+    if (m_bFloating)
+    {
+        CRect rcDockBtn = GetDockBtnRect();
+        DWORD dwDockState = 0;
+        if (m_bDockBtnPressed)
+            dwDockState |= WndState_PushDown;
+        else if (m_bDockBtnHover)
+            dwDockState |= WndState_Hover;
+
+        if (m_skinDockBtn)
+        {
+            m_skinDockBtn->DrawByState(pRT, rcDockBtn, dwDockState);
+        }
+        else
+        {
+            COLORREF clrBtn = RGBA(120, 160, 200, 255);
+            if (m_bDockBtnPressed)
+                clrBtn = RGBA(80, 120, 160, 255);
+            else if (m_bDockBtnHover)
+                clrBtn = RGBA(150, 190, 230, 255);
+
+            pRT->FillSolidRect(&rcDockBtn, clrBtn);
+
+            COLORREF oldColor = pRT->SetTextColor(RGBA(255, 255, 255, 255));
+            pRT->DrawText(_T("="), 1, &rcDockBtn, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+            pRT->SetTextColor(oldColor);
+        }
+    }
     AfterPaint(pRT, painter);
 }
 
@@ -202,6 +280,20 @@ void SDockBar::OnLButtonDown(UINT nFlags, CPoint point)
     {
         m_bCloseBtnPressed = TRUE;
         Invalidate();
+        return;
+    }
+    if (IsPointOnDockBtn(point))
+    {
+        m_bDockBtnPressed = TRUE;
+        Invalidate();
+        return;
+    }
+    if (IsPointOnCaption(point) && (m_bFloating || m_bFloatable))
+    {
+        // Dragging the caption: float the dock bar (docked) or move the float window (floating).
+        m_bDragFloating = TRUE;
+        m_ptDragStart = point;
+        SetCapture();
         return;
     }
     if (IsFocusable())
@@ -214,9 +306,36 @@ void SDockBar::OnLButtonUp(UINT nFlags, CPoint point)
     {
         OnCloseBtnClick();
     }
-
     m_bCloseBtnPressed = FALSE;
     Invalidate();
+
+    if (m_bDockBtnPressed && IsPointOnDockBtn(point))
+    {
+        Dock();
+    }
+    m_bDockBtnPressed = FALSE;
+    Invalidate();
+
+    if (m_bDragFloating)
+    {
+        m_bDragFloating = FALSE;
+        ReleaseCapture();
+    }
+}
+
+void SDockBar::OnLButtonDblClk(UINT nFlags, CPoint point)
+{
+    if (IsPointOnCaption(point) && !IsPointOnCloseBtn(point) && !IsPointOnDockBtn(point))
+    {
+        if (m_bFloating)
+        {
+            Dock();
+        }
+        else if (m_bFloatable)
+        {
+            Float(GetWindowScreenTopLeft());
+        }
+    }
 }
 
 void SDockBar::OnMouseMove(UINT nFlags, CPoint point)
@@ -226,6 +345,36 @@ void SDockBar::OnMouseMove(UINT nFlags, CPoint point)
     {
         m_bCloseBtnHover = bNewHover;
         Invalidate();
+    }
+
+    BOOL bNewDockHover = IsPointOnDockBtn(point);
+    if (bNewDockHover != m_bDockBtnHover)
+    {
+        m_bDockBtnHover = bNewDockHover;
+        Invalidate();
+    }
+
+    if (m_bDragFloating)
+    {
+        if (m_bFloating)
+        {
+            // Move the float window by the drag delta.
+            if (m_pFloatWnd)
+            {
+                CRect rcFloat;
+                ::GetWindowRect(m_pFloatWnd->GetHwnd(), &rcFloat);
+                CPoint ptTopLeft = rcFloat.TopLeft();
+                ptTopLeft.Offset(point.x - m_ptDragStart.x, point.y - m_ptDragStart.y);
+                m_pFloatWnd->MoveTo(ptTopLeft);
+            }
+        }
+        else if (abs(point.x - m_ptDragStart.x) > 8 || abs(point.y - m_ptDragStart.y) > 8)
+        {
+            // Release capture in the docked container, then float the bar at its current position.
+            m_bDragFloating = FALSE;
+            ReleaseCapture();
+            Float(GetWindowScreenTopLeft());
+        }
     }
 }
 
@@ -238,6 +387,11 @@ void SDockBar::OnMouseLeave()
         m_bCloseBtnHover = FALSE;
         Invalidate();
     }
+    if (m_bDockBtnHover)
+    {
+        m_bDockBtnHover = FALSE;
+        Invalidate();
+    }
 }
 
 void SDockBar::OnShowWindow(BOOL bShow, UINT nStatus)
@@ -247,7 +401,10 @@ void SDockBar::OnShowWindow(BOOL bShow, UINT nStatus)
 }
 void SDockBar::OnCloseBtnClick()
 {
-    SetVisible(FALSE, TRUE);
+    if (m_bFloating)
+        Dock();
+    else
+        SetVisible(FALSE, TRUE);
 }
 
 void SDockBar::OnNcLButtonDown(UINT nHitTest, CPoint point)
@@ -338,6 +495,86 @@ void SDockBar::OnNcMouseMove(UINT nHitTest, CPoint point)
     {
         SetMsgHandled(FALSE);
     }
+}
+
+BOOL SDockBar::Float(const CPoint &ptScreen)
+{
+    if (!m_bFloatable || m_bFloating)
+        return FALSE;
+    SWindow *pParent = GetParent();
+    ISwndContainer *pContainer = GetContainer();
+    if (!pParent || !pContainer)
+        return FALSE;
+    SFrameLayoutParam *pParam = sobj_cast<SFrameLayoutParam>(GetLayoutParam());
+    if (!pParam)
+        return FALSE;
+    HWND hHost = pContainer->GetHostHwnd();
+
+    // Snapshot the docked state (dock parent, sibling order and layout param).
+    m_paramDocked = *(SFrameLayoutParamStruct *)pParam;
+    m_pDockParent = pParent;
+    m_pDockPrevSibling = GetWindow(GSW_PREVSIBLING);
+
+    CRect rcWnd = GetWindowRect();
+    CSize szFloat = rcWnd.Size();
+
+    // Detach from the dock parent.
+    pParent->RemoveChild(this);
+
+    // While floating, the dock bar fills the float host.
+    pParam->dockPos = DockMainView;
+    pParam->width.setMatchParent();
+    pParam->height.setMatchParent();
+
+    SDockFloatWnd *pFloatWnd = new SDockFloatWnd();
+    if (!pFloatWnd->Create(this, hHost, ptScreen, szFloat))
+    {
+        // Create() already released pFloatWnd on failure; roll back the docked state.
+        *(SFrameLayoutParamStruct *)pParam = m_paramDocked;
+        pParent->InsertChild(this, m_pDockPrevSibling);
+        return FALSE;
+    }
+
+    m_pFloatWnd = pFloatWnd;
+    m_bFloating = TRUE;
+    pParent->RequestRelayout();
+    return TRUE;
+}
+
+void SDockBar::Dock()
+{
+    if (!m_bFloating)
+        return;
+    SWindow *pFloatParent = GetParent();
+    if (!pFloatParent)
+        return;
+    SDockFloatWnd *pFloatWnd = m_pFloatWnd;
+    SWindow *pDockParent = m_pDockParent;
+
+    m_bFloating = FALSE;
+    m_pFloatWnd = NULL;
+
+    // Detach from the float host.
+    pFloatParent->RemoveChild(this);
+
+    // Restore the docked layout param.
+    SFrameLayoutParam *pParam = sobj_cast<SFrameLayoutParam>(GetLayoutParam());
+    if (pParam)
+        *(SFrameLayoutParamStruct *)pParam = m_paramDocked;
+
+    // Re-insert into the dock parent (after the previous sibling if it is still valid).
+    if (pDockParent)
+    {
+        SWindow *pInsertAfter = ICWND_LAST;
+        if (m_pDockPrevSibling && m_pDockPrevSibling->GetParent() == pDockParent)
+            pInsertAfter = m_pDockPrevSibling;
+        pDockParent->InsertChild(this, pInsertAfter);
+        pDockParent->RequestRelayout();
+    }
+
+    // Close the float window asynchronously.
+    if (pFloatWnd)
+        pFloatWnd->RequestClose();
 }
 
 BOOL SDockBar::IsDisplay() const

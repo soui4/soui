@@ -1,5 +1,6 @@
 #include "souistd.h"
 #include "layout/SFrameLayout.h"
+#include "control/SDockBar.h"
 #include <core/SWnd.h>
 SNSBEGIN
 
@@ -928,6 +929,27 @@ BOOL SFrameLayout::RestoreLayout(IWindow *pParent, const SArray<FrameLayoutItemI
     // Re-layout
     LayoutChildren(pParent);
     return TRUE;
+}
+
+BOOL SFrameLayout::FloatChild(SWindow *pDockBar, const CPoint &ptScreen)
+{
+    SDockBar *pDockBarCtrl = sobj_cast<SDockBar>(pDockBar);
+    if (!pDockBarCtrl)
+        return FALSE;
+    return pDockBarCtrl->Float(ptScreen);
+}
+
+void SFrameLayout::DockChild(SWindow *pDockBar)
+{
+    SDockBar *pDockBarCtrl = sobj_cast<SDockBar>(pDockBar);
+    if (pDockBarCtrl)
+        pDockBarCtrl->Dock();
+}
+
+BOOL SFrameLayout::IsChildFloating(SWindow *pDockBar) const
+{
+    SDockBar *pDockBarCtrl = sobj_cast<SDockBar>(pDockBar);
+    return pDockBarCtrl ? pDockBarCtrl->IsFloating() : FALSE;
 }
 
 SNSEND
