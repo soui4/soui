@@ -3,7 +3,7 @@
     // 系统 CMake 已是 4.2.x，会硬性拒绝仓库内老式 cmake_minimum_required
     // （third-part/openssl-cmake 声明 2.8.12、libcurl 声明 3.1.0），
     // 必须带上官方迁移开关 CMAKE_POLICY_VERSION_MINIMUM=3.5。
-    "cmake.cmakePath": "C:/Program Files/CMake/bin/cmake.exe",
+    //"cmake.cmakePath": "C:/Program Files/CMake/bin/cmake.exe",
     "cmake.configureSettings": {
         "CMAKE_POLICY_VERSION_MINIMUM": "3.5"
     },
