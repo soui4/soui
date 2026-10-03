@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Copyright (C) 2014-2050
  * All rights reserved.
  *
@@ -21,6 +21,7 @@
 #include <interface/scaret-i.h>
 #include <helper/SwndMsgCracker.h>
 #include <helper/SplitString.h>
+#include <souicoll.h>
 #include <core/SLayoutSize.h>
 #include <event/SEventSlot.h>
 #include <event/SEvents.h>
@@ -1501,6 +1502,17 @@ class SOUI_EXP SWindow
     SWindow *FindChildByName(LPCSTR strName, int nDeep = -1);
 
     /**
+     * @brief Register a window that logically belongs under this window but is
+     *        physically hosted in another container (e.g. a floating dock bar).
+     * @details FindChildByID / FindChildByName keep locating such windows as if
+     *          they were still children of this window. The registered window is
+     *          not inserted into the normal child list and takes no layout space.
+     */
+    void AddDetachedChild(SWindow *pWnd);
+    void RemoveDetachedChild(SWindow *pWnd);
+    BOOL HasDetachedChild(SWindow *pWnd) const;
+
+    /**
      * @brief Finds a child window by its name and casts it to a specific type.
      * @tparam T Type of the child window.
      * @param pszName Name of the child window to find.
@@ -2080,6 +2092,19 @@ class SOUI_EXP SWindow
      * Describe  Searches for a child window by its name attribute.
      */
     virtual SWindow *_FindChildByName(const SStringW &strName, int nDeep);
+
+    /**
+     * @brief Recursive finder over detached children only (see AddDetachedChild).
+     */
+    virtual SWindow *_FindDetachedChildByID(int nID, int nDeep);
+    virtual SWindow *_FindDetachedChildByName(const SStringW &strName, int nDeep);
+
+    /**
+     * @brief Checks whether pWnd is a detached child of this window or lies
+     *        inside the subtree of one (e.g. content hosted by a floating dock
+     *        bar), so lookup guards can accept cached finder results for them.
+     */
+    BOOL _IsInDetachedSubtree(SWindow *pWnd) const;
 
     /**
      * _GetCurrentRenderContainer
@@ -2817,6 +2842,14 @@ SWindow *m_pLastChild;   /**< Pointer to the last child window. */
 SWindow *m_pNextSibling; /**< Pointer to the next sibling window. */
 SWindow *m_pPrevSibling; /**< Pointer to the previous sibling window. */
 UINT m_nChildrenCount;   /**< Number of child windows. */
+
+/**
+ * @brief Detached children: windows that logically belong to this window but are
+ *        physically hosted in another container (e.g. floating dock bars). They
+ *        are not part of the normal child list and are only reachable through
+ *        AddDetachedChild / the FindChildByID/ByName lookup paths.
+ */
+SList<SWindow *> m_lstDetachedChildren;
 
 SWNDMSG *m_pCurMsg; /**< Pointer to the current message being processed. */
 

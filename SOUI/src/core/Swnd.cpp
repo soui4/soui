@@ -1260,6 +1260,11 @@ SWindow *SWindow::_FindChildByID(int id, int nDeep)
     if (nDeep == 0)
         return NULL;
 
+    // Detached children (e.g. floating dock bars) are also searchable.
+    SWindow *pDetached = _FindDetachedChildByID(id, nDeep);
+    if (pDetached)
+        return pDetached;
+
     pChild = (SWindow *)GetWindow(GSW_FIRSTCHILD);
     while (pChild)
     {
@@ -1287,6 +1292,11 @@ SWindow *SWindow::_FindChildByName(const SStringW &strName, int nDeep)
     if (nDeep == 0)
         return NULL;
 
+    // Detached children (e.g. floating dock bars) are also searchable.
+    SWindow *pDetached = _FindDetachedChildByName(strName, nDeep);
+    if (pDetached)
+        return pDetached;
+
     pChild = (SWindow *)GetWindow(GSW_FIRSTCHILD);
     while (pChild)
     {
@@ -1307,7 +1317,7 @@ SWindow *SWindow::FindChildByID(int id, int nDeep /**< =-1 */)
     SWindow *pRet = (SWindow *)pFinder->FindChildByID(this, id, nDeep);
     if (pRet)
     {
-        if (pRet->IsDescendant(this) && pRet->GetID() == id)
+        if ((pRet->IsDescendant(this) || _IsInDetachedSubtree(pRet)) && pRet->GetID() == id)
             return pRet;
         pFinder->EraseCacheForID(this, id, nDeep);
     }
@@ -1332,7 +1342,7 @@ SWindow *SWindow::FindChildByName(LPCWSTR pszName, int nDeep)
     SWindow *pRet = (SWindow *)pFinder->FindChildByName(this, strName, nDeep);
     if (pRet)
     {
-        if (pRet->IsDescendant(this) && wcsicmp(pRet->GetName(), pszName) == 0)
+        if ((pRet->IsDescendant(this) || _IsInDetachedSubtree(pRet)) && wcsicmp(pRet->GetName(), pszName) == 0)
             return pRet;
         // update find cache.
         pFinder->EraseCacheForName(this, strName, nDeep);
@@ -1347,6 +1357,106 @@ SWindow *SWindow::FindChildByName(LPCWSTR pszName, int nDeep)
 SWindow *SWindow::FindChildByName(LPCSTR strName, int nDeep /**< = -1 */)
 {
     return FindChildByName(S_CA2W(strName, CP_UTF8), nDeep);
+}
+
+void SWindow::AddDetachedChild(SWindow *pWnd)
+{
+    if (!pWnd || HasDetachedChild(pWnd))
+        return;
+    m_lstDetachedChildren.AddTail(pWnd);
+}
+
+void SWindow::RemoveDetachedChild(SWindow *pWnd)
+{
+    SPOSITION pos = m_lstDetachedChildren.GetHeadPosition();
+    while (pos)
+    {
+        SPOSITION posHead = pos;
+        if (m_lstDetachedChildren.GetNext(pos) == pWnd)
+        {
+            m_lstDetachedChildren.RemoveAt(posHead);
+            return;
+        }
+    }
+}
+
+BOOL SWindow::HasDetachedChild(SWindow *pWnd) const
+{
+    SPOSITION pos = m_lstDetachedChildren.GetHeadPosition();
+    while (pos)
+    {
+        if (m_lstDetachedChildren.GetNext(pos) == pWnd)
+            return TRUE;
+    }
+    return FALSE;
+}
+
+SWindow *SWindow::_FindDetachedChildByID(int nID, int nDeep)
+{
+    SPOSITION pos = m_lstDetachedChildren.GetHeadPosition();
+    while (pos)
+    {
+        SWindow *pChild = m_lstDetachedChildren.GetNext(pos);
+        if (pChild->GetID() == nID)
+            return pChild;
+    }
+
+    if (nDeep > 0)
+        nDeep--;
+    if (nDeep == 0)
+        return NULL;
+
+    // Recurse through the regular finder so windows inside a detached child
+    // (e.g. content hosted by a floating dock bar) are found as well.
+    pos = m_lstDetachedChildren.GetHeadPosition();
+    while (pos)
+    {
+        SWindow *pChild = m_lstDetachedChildren.GetNext(pos);
+        SWindow *pChildFind = pChild->_FindChildByID(nID, nDeep);
+        if (pChildFind)
+            return pChildFind;
+    }
+    return NULL;
+}
+
+SWindow *SWindow::_FindDetachedChildByName(const SStringW &strName, int nDeep)
+{
+    SPOSITION pos = m_lstDetachedChildren.GetHeadPosition();
+    while (pos)
+    {
+        SWindow *pChild = m_lstDetachedChildren.GetNext(pos);
+        if (pChild->m_strName == strName)
+            return pChild;
+    }
+
+    if (nDeep > 0)
+        nDeep--;
+    if (nDeep == 0)
+        return NULL;
+
+    pos = m_lstDetachedChildren.GetHeadPosition();
+    while (pos)
+    {
+        SWindow *pChild = m_lstDetachedChildren.GetNext(pos);
+        SWindow *pChildFind = pChild->_FindChildByName(strName, nDeep);
+        if (pChildFind)
+            return pChildFind;
+    }
+    return NULL;
+}
+
+BOOL SWindow::_IsInDetachedSubtree(SWindow *pWnd) const
+{
+    if (HasDetachedChild(pWnd))
+        return TRUE;
+    SPOSITION pos = m_lstDetachedChildren.GetHeadPosition();
+    while (pos)
+    {
+        SWindow *pChild = m_lstDetachedChildren.GetNext(pos);
+        if (pWnd->IsDescendant(pChild))
+            return TRUE;
+    }
+    return FALSE;
 }
 
 BOOL SWindow::CreateFromTemplate(const SStringW &strTemplate, SXmlNode xmlParam)

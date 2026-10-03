@@ -1,4 +1,4 @@
-#include "souistd.h"
+﻿#include "souistd.h"
 #include "control/SDockBar.h"
 #include "control/SDockFloatWnd.h"
 #include "layout/SFrameLayout.h"
@@ -20,6 +20,8 @@ SDockBar::SDockBar(void)
     , m_bDragFloating(FALSE)
     , m_pDockParent(NULL)
     , m_pDockPrevSibling(NULL)
+    , m_bInitFloating(FALSE)
+    , m_bInitFloatPending(FALSE)
     , m_pFloatWnd(NULL)
     , m_skinCloseBtn(GETBUILTINSKIN(SKIN_SYS_BTN_MINI_CLOSE))
 {
@@ -28,6 +30,15 @@ SDockBar::SDockBar(void)
 
 SDockBar::~SDockBar(void)
 {
+    // If the dock bar is destroyed while floating (e.g. the float host is torn
+    // down), unregister from the dock parent so FindChildByID/ByName no longer
+    // reports a dangling window. The dock parent may already be destroyed when
+    // the whole application shuts down, so validate it through the window map.
+    if (m_bFloating && m_pDockParent &&
+        SWindowMgr::GetWindow(m_pDockParent->GetSwnd()) == m_pDockParent)
+    {
+        m_pDockParent->RemoveDetachedChild(this);
+    }
 }
 
 void SDockBar::OnDecendantFocusChanged(SWND swnd, BOOL bSet)
@@ -466,6 +477,14 @@ void SDockBar::OnMouseLeave()
 void SDockBar::OnShowWindow(BOOL bShow, UINT nStatus)
 {
     __baseCls::OnShowWindow(bShow, nStatus);
+    // Init-time float: the "floating" attribute asks to start the dock bar in
+    // float mode. Defer through a one-shot timer so the first layout has run
+    // and the float window can be placed at the dock bar's real size/position.
+    if (bShow && m_bInitFloating && !m_bFloating && !m_bInitFloatPending)
+    {
+        m_bInitFloatPending = TRUE;
+        SetTimer(kTimerIdInitFloat, 0);
+    }
     // Keep the float host in sync with this dock bar's visibility: hiding a
     // floating dock bar also hides its host window instead of leaving an empty
     // window on screen; a later Show()/SetVisible(TRUE) restores the bar and
@@ -473,6 +492,20 @@ void SDockBar::OnShowWindow(BOOL bShow, UINT nStatus)
     if (m_bFloating && m_pFloatWnd)
         ::ShowWindow(m_pFloatWnd->GetHwnd(), bShow ? SW_SHOW : SW_HIDE);
     RequestRelayout();
+}
+
+void SDockBar::OnTimer(char cTimerID)
+{
+    if (cTimerID == kTimerIdInitFloat)
+    {
+        KillTimer(kTimerIdInitFloat);
+        m_bInitFloatPending = FALSE;
+        if (m_bInitFloating && !m_bFloating)
+        {
+            m_bInitFloating = FALSE; // consume the request
+            Float(GetWindowScreenTopLeft());
+        }
+    }
 }
 void SDockBar::OnCloseBtnClick()
 {
@@ -571,7 +604,7 @@ void SDockBar::OnNcMouseMove(UINT nHitTest, CPoint point)
     }
 }
 
-BOOL SDockBar::Float(const CPoint &ptScreen)
+BOOL SDockBar::Float(const CPoint &ptScreen, const CSize &szFloat /* = CSize(0,0) */)
 {
     if (!m_bFloatable || m_bFloating)
         return FALSE;
@@ -590,7 +623,11 @@ BOOL SDockBar::Float(const CPoint &ptScreen)
     m_pDockPrevSibling = GetWindow(GSW_PREVSIBLING);
 
     CRect rcWnd = GetWindowRect();
-    CSize szFloat = rcWnd.Size();
+    CSize szFloatOut = szFloat;
+    if (szFloatOut.cx <= 0 || szFloatOut.cy <= 0)
+        szFloatOut = rcWnd.Size();
+    if (szFloatOut.cx <= 0 || szFloatOut.cy <= 0)
+        szFloatOut = CSize(300, 300); // not laid out yet: use a default size
 
     // Detach from the dock parent.
     pParent->RemoveChild(this);
@@ -601,7 +638,7 @@ BOOL SDockBar::Float(const CPoint &ptScreen)
     pParam->height.setMatchParent();
 
     SDockFloatWnd *pFloatWnd = new SDockFloatWnd();
-    if (!pFloatWnd->Create(this, hHost, ptScreen, szFloat))
+    if (!pFloatWnd->Create(this, hHost, ptScreen, szFloatOut))
     {
         // Create() already released pFloatWnd on failure; roll back the docked state.
         *(SFrameLayoutParamStruct *)pParam = m_paramDocked;
@@ -611,6 +648,9 @@ BOOL SDockBar::Float(const CPoint &ptScreen)
 
     m_pFloatWnd = pFloatWnd;
     m_bFloating = TRUE;
+    // Keep the dock bar discoverable from the dock parent (FindChildByID/ByName)
+    // even though it is physically hosted in the float window now.
+    pParent->AddDetachedChild(this);
     pParent->RequestRelayout();
     return TRUE;
 }
@@ -636,6 +676,16 @@ void SDockBar::Dock()
     if (pParam)
         *(SFrameLayoutParamStruct *)pParam = m_paramDocked;
 
+    // The dock parent may already be destroyed when the application shuts down
+    // (the owned float window is torn down after its owner); in that case there
+    // is nowhere to re-dock, the float host is just closed.
+    if (pDockParent && SWindowMgr::GetWindow(pDockParent->GetSwnd()) != pDockParent)
+        pDockParent = NULL;
+
+    // Unregister from the dock parent's detached list before re-inserting.
+    if (pDockParent)
+        pDockParent->RemoveDetachedChild(this);
+
     // Re-insert into the dock parent (after the previous sibling if it is still valid).
     if (pDockParent)
     {
@@ -644,6 +694,12 @@ void SDockBar::Dock()
             pInsertAfter = m_pDockPrevSibling;
         pDockParent->InsertChild(this, pInsertAfter);
         pDockParent->RequestRelayout();
+    }
+    else
+    {
+        // Dock parent is gone: nothing to restore, mark the bar as detached for
+        // good so the float host teardown destroys it with its own tree.
+        m_pDockParent = NULL;
     }
 
     // Close the float window asynchronously.

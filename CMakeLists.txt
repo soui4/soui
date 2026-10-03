@@ -169,15 +169,6 @@ else()
                 message(FATAL_ERROR "swinx submodule not available, please checkout submodules manually")
         endif()
 
-  # 添加调试标志
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
-  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0")
-  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2")
-  set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O2")
-  if(CMAKE_SYSTEM_NAME MATCHES Linux)
-  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s")
-  set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -s")
-  endif()
   if(CMAKE_SYSTEM_NAME MATCHES Darwin)
   set(CMAKE_OSX_DEPLOYMENT_TARGET "12.0")
   add_compile_options(-Wno-deprecated-declarations)
@@ -198,6 +189,16 @@ else()
 
   add_definitions(-DWCHAR_SIZE=4)
   include_directories(${PROJECT_SOURCE_DIR}/swinx/include)
+endif()
+if(NOT MSVC)
+  # MinGW Release 默认 -O3、无 strip、无死代码消除，DLL 体积约为 MSVC 的 4 倍；
+  # 对齐 MSVC /O2 + /OPT:REF,ICF 的行为：-O2 + 函数级分段 + gc-sections + 链接期 strip。
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
+  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 -ffunction-sections -fdata-sections")
+  set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O2 -ffunction-sections -fdata-sections")
+  set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} -Wl,--gc-sections -s")
+  set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -Wl,--gc-sections -s")
 endif()
 
 configure_file("config/config.h.in" "${PROJECT_BINARY_DIR}/config/config.h" @ONLY)

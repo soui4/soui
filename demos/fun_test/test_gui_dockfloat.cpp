@@ -39,7 +39,7 @@ TEST(window, gui_dockfloat_float_and_dock_roundtrip)
     static const char xml[] =
         "<SOUI title='DockFloat' translucent='0'>"
         "<root width='640' height='480' layout='frame' colorBkgnd='#ffffff'>"
-        "<dockbar name='dock_left' dock='left' width='120' text='DockLeft'/>"
+        "<dockbar name='dock_left' id='2001' dock='left' width='120' text='DockLeft'/>"
         "<window name='main' dock='mainview'/>"
         "</root></SOUI>";
     SXmlDoc doc;
@@ -63,34 +63,47 @@ TEST(window, gui_dockfloat_float_and_dock_roundtrip)
     SFrameLayout *pFrameLayout = sobj_cast<SFrameLayout>(pRoot->GetLayout());
     ASSERT_TRUE(pFrameLayout);
 
+    // The dock bar stays discoverable from the host window whether it is docked
+    // or floating (detached children are still searched by the finders).
+    auto expectFindable = [&]() {
+        EXPECT_EQ(host.FindChildByName(L"dock_left"), (SWindow *)pDockLeft);
+        EXPECT_EQ(host.FindChildByID(2001), (SWindow *)pDockLeft);
+    };
+
     // Initial state: docked inside the frame layout.
     EXPECT_FALSE(pDockLeft->IsFloating());
     EXPECT_FALSE(pFrameLayout->IsChildFloating(pDockLeft));
+    expectFindable();
 
     // Round 1: float/dock through the frame layout convenience methods.
     ASSERT_TRUE(pFrameLayout->FloatChild(pDockLeft, CPoint(300, 200)));
     EXPECT_TRUE(pDockLeft->IsFloating());
     EXPECT_TRUE(pFrameLayout->IsChildFloating(pDockLeft));
     EXPECT_NE(pDockLeft->GetParent(), pDockParent);
+    expectFindable();
 
     pFrameLayout->DockChild(pDockLeft);
     EXPECT_FALSE(pDockLeft->IsFloating());
     EXPECT_FALSE(pFrameLayout->IsChildFloating(pDockLeft));
     EXPECT_EQ(pDockLeft->GetParent(), pDockParent);
+    expectFindable();
 
     // Round 2: float/dock through the dock bar API directly.
     ASSERT_TRUE(pDockLeft->Float(CPoint(300, 200)));
     EXPECT_TRUE(pDockLeft->IsFloating());
     EXPECT_NE(pDockLeft->GetParent(), pDockParent);
+    expectFindable();
 
     pDockLeft->Dock();
     EXPECT_FALSE(pDockLeft->IsFloating());
     EXPECT_EQ(pDockLeft->GetParent(), pDockParent);
+    expectFindable();
 
     // Round 3: while floating, the close button hides the dock bar (keeping
     // the float state); re-showing it stays floating.
     ASSERT_TRUE(pDockLeft->Float(CPoint(300, 200)));
     EXPECT_TRUE(pDockLeft->IsFloating());
+    expectFindable();
 
     pDockLeft->SetVisible(FALSE, TRUE);
     EXPECT_FALSE(pDockLeft->IsVisible(FALSE));
@@ -103,6 +116,69 @@ TEST(window, gui_dockfloat_float_and_dock_roundtrip)
     // Clean up: dock it back so the float host is destroyed via WM_CLOSE.
     pDockLeft->Dock();
     EXPECT_FALSE(pDockLeft->IsFloating());
+    expectFindable();
+
+    // Let the posted WM_CLOSE destroy the float host window objects.
+    PumpMessages();
+
+    host.DestroyWindow();
+}
+
+// GUI test: a dock bar with the "floating" attribute starts in float mode as
+// soon as the first layout runs, and stays discoverable through the host via
+// FindChildByName/FindChildByID (including windows hosted inside the bar).
+TEST(window, gui_dockfloat_init_floating_findable)
+{
+    SComMgr2 comMgr;
+    SAutoRefPtr<IRenderFactory> renderFactory;
+    ASSERT_TRUE(comMgr.CreateRender_GDI((IObjRef **)&renderFactory));
+    ASSERT_TRUE(renderFactory);
+    SApplication app(renderFactory, NULL);
+
+    static const char xml[] =
+        "<SOUI title='DockFloatInit' translucent='0'>"
+        "<root width='640' height='480' layout='frame' colorBkgnd='#ffffff'>"
+        "<dockbar name='dock_right' id='3001' dock='right' width='140' floating='1' text='DockRight'>"
+        "<text name='inner_text' text='inner'/>"
+        "</dockbar>"
+        "<window name='main' dock='mainview'/>"
+        "</root></SOUI>";
+    SXmlDoc doc;
+    ASSERT_TRUE(doc.LoadBuffer(xml, sizeof(xml) - 1, 0, enc_utf8));
+    SXmlNode xmlRoot = doc.root().first_child();
+    ASSERT_TRUE(xmlRoot);
+
+    SHostWnd host;
+    HWND hwnd = host.CreateEx(NULL, WS_POPUP, 0, 100, 100, 640, 480, &xmlRoot);
+    ASSERT_TRUE(hwnd);
+    host.ShowWindow(SW_SHOW);
+
+    SWindow *pRoot = host.GetRoot();
+    ASSERT_TRUE(pRoot);
+
+    SDockBar *pDockRight = sobj_cast<SDockBar>(host.FindChildByName(L"dock_right"));
+    ASSERT_TRUE(pDockRight);
+    SWindow *pDockParent = pDockRight->GetParent();
+    ASSERT_TRUE(pDockParent);
+
+    // The init-time float is deferred through a one-shot timer; pump messages
+    // so the timer fires after the first layout has run.
+    EXPECT_FALSE(pDockRight->IsFloating());
+    PumpMessages();
+
+    EXPECT_TRUE(pDockRight->IsFloating());
+    EXPECT_NE(pDockRight->GetParent(), pDockParent);
+    EXPECT_EQ(host.FindChildByName(L"dock_right"), (SWindow *)pDockRight);
+    EXPECT_EQ(host.FindChildByID(3001), (SWindow *)pDockRight);
+    // Windows hosted inside the floating dock bar remain searchable too.
+    EXPECT_EQ(host.FindChildByName(L"inner_text"), pDockRight->FindChildByName(L"inner_text"));
+
+    // Docking it back restores the ordinary child relationship.
+    pDockRight->Dock();
+    EXPECT_FALSE(pDockRight->IsFloating());
+    EXPECT_EQ(pDockRight->GetParent(), pDockParent);
+    EXPECT_EQ(host.FindChildByName(L"dock_right"), (SWindow *)pDockRight);
+    EXPECT_EQ(host.FindChildByID(3001), (SWindow *)pDockRight);
 
     // Let the posted WM_CLOSE destroy the float host window objects.
     PumpMessages();
