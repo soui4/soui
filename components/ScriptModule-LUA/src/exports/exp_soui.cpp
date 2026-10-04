@@ -50,6 +50,13 @@ using namespace SNS;
 #include "exp_ILogMgr.h"
 #include "exp_global.h"
 #include "exp_SysApi.h"
+#include <commgr2.h>
+
+static SComMgr2 s_comMgr;
+
+SComMgr2* GetLuaScriptComMgr2() {
+	return &s_comMgr;
+}
 
 BOOL SOUI_Export_Lua(lua_State *L)
 {

@@ -187,13 +187,13 @@ void SScreenToClient(INativeWnd *pWnd,CRect & rc){
 	pWnd->ScreenToClient2(&rc);
 }
 
+SComMgr2* GetLuaScriptComMgr2();
 // ---------------------------------------------------------------------------
 // new global factories (parity with soui4js)
 // ---------------------------------------------------------------------------
 ITranslatorMgr * CreateTranslatorMgr(){
 	ITranslatorMgr *pRet = NULL;
-	SComMgr2 comMgr;
-	comMgr.CreateTranslator((IObjRef**)&pRet);
+	GetLuaScriptComMgr2()->CreateTranslator((IObjRef**)&pRet);
 	return pRet;
 }
 

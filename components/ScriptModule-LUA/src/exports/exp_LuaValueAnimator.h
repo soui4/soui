@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 // LuaValueAnimator / LuaAnimatorGroup: thin wrappers aligned with soui4js
 // JsValueAnimator / JsAnimatorGroup, so a Lua port of a js mini-game can keep
 // the same flow: LoadAnimator/CopyFrom -> SetRange -> Start -> callbacks.
@@ -8,7 +8,15 @@
 //   onGroupEnd(group, ctxId, nID)
 // The ctxId is an arbitrary routing id set from Lua (SetCtx), so several live
 // animators can share one callback and dispatch through a Lua table.
+//
+// 生命周期：两个包装对象都是"属性在 lua 栈上的对象"，生命周期完全归属
+// lua —— 工厂里 new，GC 回收 userdata 时 __gc 直接 delete（push_gcnew /
+// val2user 路径），引用计数不参与管理：
+//   - LuaValueAnimator：纯 C++ 包装类，不继承 IObjRef；
+//   - LuaAnimatorGroup：继承 SAnimatorGroup（自身带 TObjRefImpl 引用计数），
+//     但那只是基类实现细节，导出层从 Release 到 delete 都不经引用计数。
 #include <valueAnimator/SValueAnimator.h>
+//#include <helper/obj-ref-impl.hpp>
 #include "toobj.h"
 
 SNSBEGIN
@@ -36,10 +44,11 @@ public:
 
 	~LuaValueAnimator()
 	{
-		Release();
+		Detach();
 	}
 
-	void Release()
+	// 摘除监听并释放所持 IValueAnimator（析构时由 __gc 自动调用）
+	void Detach()
 	{
 		if (m_ani)
 		{
@@ -52,7 +61,7 @@ public:
 
 	void Init(IValueAnimator *ani)
 	{
-		Release();
+		Detach();
 		if (!ani)
 			return;
 		m_ani = ani;
@@ -250,21 +259,20 @@ protected:
 	SStringA m_cbEnd;
 };
 
-static LuaValueAnimator *Lua_NewValueAnimator()
-{
-	return new LuaValueAnimator(lua_tinker::get_state());
-}
-
-static LuaAnimatorGroup *Lua_NewAnimatorGroup(int nID = 0)
-{
-	return new LuaAnimatorGroup(lua_tinker::get_state(), nID);
-}
+// 构造器走 class_con + constructor_lstate（lua_tinker 自动注入 lua_State*），
+// lua 侧用 LuaValueAnimator() / LuaAnimatorGroup(nID) 直接构造，与 CRect 等
+// 其它可构造类写法一致。对象同为 val2user（GC 时 __gc destroyer 直接 delete），
+// 与 push_gcnew 同语义：生命周期完全归属 lua，引用计数不参与管理。析构里
+// Detach 摘除监听并释放所持 IValueAnimator；回调里推送的 this 仍是普通
+// 非托管指针（ptr2user，__gc 不 delete），不受影响。
 
 static int ExpLua_LuaValueAnimator(lua_State *L)
 {
 	try
 	{
 		lua_tinker::class_add<LuaValueAnimator>(L, "LuaValueAnimator");
+		// 构造器：C++ ctor 首参 lua_State* 由 lua_tinker 自动注入
+		lua_tinker::class_con<LuaValueAnimator>(L, lua_tinker::constructor_lstate<LuaValueAnimator>);
 		lua_tinker::class_def<LuaValueAnimator>(L, "LoadAnimator", &LuaValueAnimator::LoadAnimator);
 		lua_tinker::class_def<LuaValueAnimator>(L, "CopyFrom", &LuaValueAnimator::CopyFrom);
 		lua_tinker::class_def<LuaValueAnimator>(L, "GetIValueAnimator", &LuaValueAnimator::GetIValueAnimator);
@@ -279,16 +287,16 @@ static int ExpLua_LuaValueAnimator(lua_State *L)
 		lua_tinker::class_def<LuaValueAnimator>(L, "GetCtx", &LuaValueAnimator::GetCtx);
 		lua_tinker::class_def<LuaValueAnimator>(L, "SetOnUpdate", &LuaValueAnimator::SetOnUpdate);
 		lua_tinker::class_def<LuaValueAnimator>(L, "SetOnEnd", &LuaValueAnimator::SetOnEnd);
-		lua_tinker::def(L, "NewValueAnimator", &Lua_NewValueAnimator);
 
 		lua_tinker::class_add<LuaAnimatorGroup>(L, "LuaAnimatorGroup");
 		lua_tinker::class_inh<LuaAnimatorGroup, IAnimatorGroup>(L);
+		// 构造器：缺省 nID=0（read<int> 对 nil 返回 0）
+		lua_tinker::class_con<LuaAnimatorGroup>(L, lua_tinker::constructor_lstate<LuaAnimatorGroup, int>);
 		// IAnimatorSet methods inherited by IAnimatorGroup are already bound on
 		// IAnimatorGroup in exp_IAnimatorSet.h; expose group-specific ones here.
 		lua_tinker::class_def<LuaAnimatorGroup>(L, "SetCtx", &LuaAnimatorGroup::SetCtx);
 		lua_tinker::class_def<LuaAnimatorGroup>(L, "GetCtx", &LuaAnimatorGroup::GetCtx);
 		lua_tinker::class_def<LuaAnimatorGroup>(L, "SetOnGroupEnd", &LuaAnimatorGroup::SetOnGroupEnd);
-		lua_tinker::def(L, "NewAnimatorGroup", &Lua_NewAnimatorGroup);
 	}
 	catch (...)
 	{

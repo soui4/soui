@@ -279,9 +279,30 @@ namespace lua_tinker
    template<typename T>
    struct ptr2lua { static void invoke ( lua_State *L, T* input ){ if ( input ) new( lua_newuserdata ( L, sizeof ( ptr2user<T> ) ) ) ptr2user<T> ( input ); else lua_pushnil ( L ); } };
    template<typename T>
-   // 指针传入lua 
+   // 指针传入lua
    // 方法：ref2user<T> 分配在lua上，而T引用input存在C++中，通过ref2user<T>中的指针指向
    struct ref2lua { static void invoke ( lua_State *L, T& input ){ new( lua_newuserdata ( L, sizeof ( ref2user<T> ) ) ) ref2user<T> ( input ); } };
+
+   // 把 C++ 侧 new 出来的普通堆对象（非 IObjRef，生命周期完全归属 lua 栈上
+   // 的 userdata）移交给 lua 持有：userdata 内嵌 val2user<T>（T 在构造时 new），
+   // 挂接 class_add 注册的类元表，__gc destroyer 时直接 delete 该对象。
+   //   - push_gcnew ：普通 C++ 对象，GC → delete，引用计数不参与生命周期
+   // 仅用于工厂函数的返回值；同一指针绝不能再以普通 push 方式二次入栈。
+   template<typename T, typename A1>
+   void push_gcnew ( lua_State *L, A1 a1 )
+   {
+      new ( lua_newuserdata ( L, sizeof ( val2user<T> ) ) ) val2user<T> ( a1 );
+      push_meta ( L, class_name<T>::name ( ) );
+      lua_setmetatable ( L, -2 );
+   }
+
+   template<typename T, typename A1, typename A2>
+   void push_gcnew ( lua_State *L, A1 a1, A2 a2 )
+   {
+      new ( lua_newuserdata ( L, sizeof ( val2user<T> ) ) ) val2user<T> ( a1, a2 );
+      push_meta ( L, class_name<T>::name ( ) );
+      lua_setmetatable ( L, -2 );
+   }
 
    // 枚举传入lua
    template<typename T>
@@ -1636,6 +1657,73 @@ namespace lua_tinker
    int constructor ( lua_State *L )
    {
       new( lua_newuserdata ( L, sizeof ( val2user<T> ) ) ) val2user<T> ( );
+      push_meta ( L, class_name<typename class_type<T>::type>::name ( ) );
+      lua_setmetatable ( L, -2 );
+
+      return 1;
+   }
+
+   // constructor_lstate：构造函数首参为 lua_State* 的类的构造器重载。
+   // lua_tinker 自动注入当前 L，其余参数仍按 __call 约定从栈索引 2 起读取
+   // （索引 1 是 __call 传入的类表本身）。用于 LuaValueAnimator 这类"属性
+   // 在 lua 栈上"的包装对象，导出写法与 constructor/class_con 完全一致：
+   //   class_con<T>(L, lua_tinker::constructor_lstate<T>);
+   //   class_con<T>(L, lua_tinker::constructor_lstate<T, A1>);
+   // 对象同为 val2user（GC 时 __gc destroyer 直接 delete），与 push_gcnew 同语义。
+   template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5>
+   int constructor_lstate ( lua_State *L )
+   {
+      new( lua_newuserdata ( L, sizeof ( val2user<T> ) ) ) val2user<T> ( L, read<T1> ( L, 2 ), read<T2> ( L, 3 ), read<T3> ( L, 4 ), read<T4> ( L, 5 ), read<T5> ( L, 6 ) );
+      push_meta ( L, class_name<typename class_type<T>::type>::name ( ) );
+      lua_setmetatable ( L, -2 );
+
+      return 1;
+   }
+
+   template<typename T, typename T1, typename T2, typename T3, typename T4>
+   int constructor_lstate ( lua_State *L )
+   {
+      new( lua_newuserdata ( L, sizeof ( val2user<T> ) ) ) val2user<T> ( L, read<T1> ( L, 2 ), read<T2> ( L, 3 ), read<T3> ( L, 4 ), read<T4> ( L, 5 ) );
+      push_meta ( L, class_name<typename class_type<T>::type>::name ( ) );
+      lua_setmetatable ( L, -2 );
+
+      return 1;
+   }
+
+   template<typename T, typename T1, typename T2, typename T3>
+   int constructor_lstate ( lua_State *L )
+   {
+      new( lua_newuserdata ( L, sizeof ( val2user<T> ) ) ) val2user<T> ( L, read<T1> ( L, 2 ), read<T2> ( L, 3 ), read<T3> ( L, 4 ) );
+      push_meta ( L, class_name<typename class_type<T>::type>::name ( ) );
+      lua_setmetatable ( L, -2 );
+
+      return 1;
+   }
+
+   template<typename T, typename T1, typename T2>
+   int constructor_lstate ( lua_State *L )
+   {
+      new( lua_newuserdata ( L, sizeof ( val2user<T> ) ) ) val2user<T> ( L, read<T1> ( L, 2 ), read<T2> ( L, 3 ) );
+      push_meta ( L, class_name<typename class_type<T>::type>::name ( ) );
+      lua_setmetatable ( L, -2 );
+
+      return 1;
+   }
+
+   template<typename T, typename T1>
+   int constructor_lstate ( lua_State *L )
+   {
+      new( lua_newuserdata ( L, sizeof ( val2user<T> ) ) ) val2user<T> ( L, read<T1> ( L, 2 ) );
+      push_meta ( L, class_name<typename class_type<T>::type>::name ( ) );
+      lua_setmetatable ( L, -2 );
+
+      return 1;
+   }
+
+   template<typename T>
+   int constructor_lstate ( lua_State *L )
+   {
+      new( lua_newuserdata ( L, sizeof ( val2user<T> ) ) ) val2user<T> ( L );
       push_meta ( L, class_name<typename class_type<T>::type>::name ( ) );
       lua_setmetatable ( L, -2 );
 

@@ -14,7 +14,7 @@
     回调经 exp_LuaValueAnimator.h 的包装进入 lua;
     wnd_xxl_aniframe 是动画浮层,动画期间把移动中的元素画在棋盘之上;
     金币/得分用 t:g.xxl_digit 七段 LED 翻页计数器(soxxl digit 同款),
-    完善点: 连击计分、无步可走自动洗牌、提示、游戏结束弹窗;
+    完善点: 连击计分、花金币主动洗牌(全盘重排,金币不足不能洗)、提示、游戏结束弹窗;
     功能按钮("重新开始"/"提示")为 SVG 药丸形底(3 态)+SVG 图标(3 态)
     组合按钮(skin: xxl_btn_primary/xxl_btn_secondary)。
   棋盘/状态栏的名字与 id 约定见 test.lua 的 xxl_* 函数。
@@ -47,6 +47,13 @@
           <text text="提 示" extend_left="6" font="size:13,bold:1" colorText="@color/clr_primary"/>
           <window size="0,0" weight="1"/>
         </button>
+        <!-- 洗牌:花 5 金币把全盘棋子受约束重排(随时可用);金币不足不能洗 -->
+        <button name="btn_xxl_shuffle" size="-2,36" skin="xxl_btn_secondary" gravity="center" layout="hbox" cursor="hand" on_command="xxl_on_shuffle" tip="花 5 金币重排全部棋子">
+          <window size="0,0" weight="1" />
+          <img size="16,16" skin="svg_xxl_btn_hint" />
+          <text text="洗牌(5金币)" extend_left="6" font="size:13,bold:1" colorText="@color/clr_primary"/>
+          <window size="0,0" weight="1"/>
+        </button>
         <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
         <!-- 计分区:七段 LED 翻页计数器 -->
         <text text="金币" font="size:12" colorText="@color/clr_text_sub"/>
@@ -61,10 +68,10 @@
           <t:g.xxl_digit><data name="digit_score_1"/></t:g.xxl_digit>
           <t:g.xxl_digit><data name="digit_score_0"/></t:g.xxl_digit>
         </window>
-        <text name="txt_xxl_combo" text="" size="-2,-1" extend_top="4" font="size:13,bold:1" colorText="@color/orange"/>
+        <text name="txt_xxl_combo" text="" size="-2,-1" extend_top="4" font="size:20,bold:1" colorText="@color/orange"/>
         <window size="0,0" weight="1"/>
         <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
-        <text text="交换相邻棋子凑 3 连消除&#10;连击有加分&#10;无路可走自动洗牌" font="size:11" colorText="@color/clr_text_sub" multilines="1"/>
+        <text text="交换相邻棋子凑 3 连消除&#10;连击有加分&#10;花 5 金币随时洗牌" font="size:11" colorText="@color/clr_text_sub" multilines="1"/>
       </window>
       <!-- 棋盘卡片:8x8 gridlayout 棋盘 + 顶层动画浮层(名字/层级为 lua 依赖,不可改动) -->
       <window size="0,-2" weight="1" layout="vbox" padding="12,12,12,12" colorBkgnd="@color/clr_card_bg">

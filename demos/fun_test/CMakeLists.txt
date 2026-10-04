@@ -85,6 +85,7 @@ target_include_directories(fun_test PRIVATE
     ${PROJECT_SOURCE_DIR}/third-part/gtest/include
     ${PROJECT_SOURCE_DIR}/third-part/Scintilla/include
     ${PROJECT_SOURCE_DIR}/components
+    ${PROJECT_SOURCE_DIR}/SOUI/include
 )
 
 # 把源码目录以字符串字面量编进代码，common.h 的 getSourceDir() 靠它定位 uires /
@@ -92,6 +93,19 @@ target_include_directories(fun_test PRIVATE
 # build/demos/fun_test）。两边的 \" 转义是必需的，否则路径会被当成标识符撕开。
 target_compile_definitions(fun_test PRIVATE
     SOUI_FUN_TEST_SOURCE_DIR=\"${SOUI_FUN_TEST_DIR}\")
+
+# ---------------------------------------------------------------------------
+# 3.5 lua 脚本模块测试（test_lua.cpp）
+# ---------------------------------------------------------------------------
+# test_lua.cpp 用 SComMgr2 加载 scriptmodule-lua：静态 COM 构建（LIB_SOUI_COM）
+# 直链 SCRIPT_LUA::SCreateInstance，DLL COM 构建运行时 LoadLibrary —— 两种模式
+# 测试代码零差异，因此这里不设任何编译条件。测试 TU 不链接 lua 库、不 include
+# lua 头：对象全部由脚本经 IScriptModule::executeScriptBuffer 创建。
+#
+# 唯一需要的注入是 demo uires 目录（LoadAnimation/LoadValueAnimator 用例要经
+# FILE resprovider 加载 anim:/valueAni: 资源）。
+target_compile_definitions(fun_test PRIVATE
+    SOUI_FUN_TEST_DEMO_UIRES=\"${SOUI_FUN_TEST_DIR}/../demo/uires\")
 
 # ---------------------------------------------------------------------------
 # 4. CTest 注册：一个用例一条记录

@@ -73,6 +73,7 @@ function on_exit(args)
 	win = getHostFromInitEvent(args);
 	HostWnd_SetMsgHandler(win,"",nil);--remove msg handler
 	runTimer:Release();
+	xxl_exit();
 end
 
 function on_timer(args)
@@ -251,15 +252,18 @@ end
   - 初始棋盘受约束随机(xxl_gen_board),绝无初始 3 连且保证有解
     (旧版裸随机开局即自动消除,白送分且棋盘缺格);
   - 连击计分:第 n 波消除得分 = len * n,新交换清零,settle 时清零显示;
-  - settle 稳定后检测无步可走 => 自动洗牌(xxl_redeal,带翻页动画);
+  - 洗牌为主动技能:点"洗牌"按钮花 xxl_shuffle_cost 金币全盘受约束重排
+    (xxl_on_shuffle => xxl_redeal,随时可洗);金币不足不能洗(提示不结算);
+    死局且金币不足(settle 判定解不开) => 游戏结束;
   - 提示按钮(xxl_on_hint):找一个可行交换,两枚棋子复用选中脉冲动画;
-  - 金币耗尽 => 游戏结束弹窗(SMessageBox),确定后重开。
+  - 金币耗尽/死局无力洗牌 => 游戏结束弹窗(SMessageBox),确定后重开。
 棋盘 id 约定: xxl_base_id + y*8 + x (x,y 从 0 开始)。
 ]]
 
 xxl_base_id = 30000;
 xxl_row = 8; xxl_col = 8;
 xxl_max_state = 7; xxl_min_same = 3;
+xxl_shuffle_cost = 5; -- 死局洗牌费用(金币)
 
 xxl = {
 	board = {};      -- board[y][x] = icon state(0..6)
@@ -268,6 +272,7 @@ xxl = {
 	combo = 0;       -- 连击数(第 n 波消除得分 x n,settle 清零)
 	gameover = false;-- 金币耗尽弹窗只出一次
 	ani_list = {};   -- ctxId -> 动画组(js ani_list;按 ctxId 索引,勿用对象身份比较)
+	ani_orphan = {}; -- 上一次 init_board 时的存活动画组(保活防 GC 悬挂,重建时清)
 	ani_count = 0;   -- 存活动画组数
 	ani_ctx = {};    -- ctxId -> {kind=..., ele=..., ani_widget=...}
 	ani_seq = 0;
@@ -613,6 +618,11 @@ end
 
 -- js 内联的 new SValueAnimator + CopyFrom + SetRange + 回调 + Start:
 -- 隐藏原格子,浮层副本从 rcFrom 移到 rcTo。失败时回滚格子可见性(见文件头"刻意偏离 3")。
+-- 🚨 包装对象 ani 必须存进 ctx 保活:它把自己注册为 IValueAnimator 的
+--    update/end 监听器,而 C++ 动画器只 AddRef 了 IValueAnimator 本体,不持有
+--    包装;若包装被 GC(~LuaValueAnimator→Detach 摘监听),onUpdate/onEnd 不再
+--    回调 => 副本冻结在浮层上冒充棋子(该消除的还在显示)、原格子永久隐藏
+--    (不能点击)。存入 ctx 直到 ani_end 清掉后才允许回收。
 function xxl_begin_move(aniframe, state, ele, rcFrom, rcTo)
 	ele:SetVisible(false,false);
 	local ani_widget = xxl_build_ani_widget(aniframe, state);
@@ -621,12 +631,12 @@ function xxl_begin_move(aniframe, state, ele, rcFrom, rcTo)
 		xxl_slog("begin_move: build ani widget failed");
 		return nil;
 	end
-	local ctxId = xxl_new_ctx("move", { ele=ele, ani_widget=ani_widget });
-	local ani = NewValueAnimator();
+	local ani = LuaValueAnimator();
 	ani:CopyFrom(xxl.ani_move:GetIValueAnimator());
 	ani:SetRangeRect(rcFrom, rcTo);
 	ani:SetOnUpdate("xxl_ani_update");
 	ani:SetOnEnd("xxl_ani_end");
+	local ctxId = xxl_new_ctx("move", { ele=ele, ani_widget=ani_widget, ani=ani });
 	ani:SetCtx(ctxId);
 	-- SAnimatorGroup 只聚合回调,不启动子动画 => 必须逐个 Start(js 同款)
 	ani:Start(aniframe);
@@ -670,10 +680,12 @@ function xxl_group_end(group, ctxId, nID)
 	end
 	local g = xxl.ani_ctx[ctxId];
 	if g == nil then
+		xxl_slog("group_end: ctx " .. tostring(ctxId) .. " gone (anomaly), ani_count=" .. xxl.ani_count);
 		xxl_check_aniframe();
 		return
 	end
 	xxl.ani_ctx[ctxId] = nil;
+	xxl_slog("group_end kind=" .. g.kind .. " ctx=" .. ctxId .. " left=" .. xxl.ani_count);
 	if g.kind == "swap" then
 		xxl_on_swap_end(g);
 	elseif g.kind == "clear" then
@@ -702,7 +714,7 @@ function xxl_on_clear_end(g)
 	xxl_pop_fx(xxl_get_ele_rect({x=samex.x + math.floor((samex.len-1)/2), y=samex.y}), samex.len >= 4);
 	if samex.y > 0 then
 		local ctxId = xxl_new_ctx("drop", { samex=samex });
-		local group = NewAnimatorGroup();
+		local group = LuaAnimatorGroup();
 		group:SetOnGroupEnd("xxl_group_end");
 		group:SetCtx(ctxId);
 		local nAdded = 0;
@@ -768,7 +780,7 @@ end
 -- GetWindowRect2 一律相对宿主)——格子/按钮的 rect 直接可用,无需任何换算。
 -- 定位用显式 Move(浮动模式,立即生效):pos 属性要等下一次 relayout 才生效,
 -- 上一版靠 pos 定位导致特效时有时无/错位。
-function xxl_pop_fx(rc, boost, szSkin, szAnim)
+function xxl_pop_fx(rc, boost, szSkin, szAnim, fScale)
 	if xxl.aniframe == nil then
 		xxl_slog("pop_fx SKIP: aniframe nil");
 		return
@@ -778,15 +790,16 @@ function xxl_pop_fx(rc, boost, szSkin, szAnim)
 	local aniCache = xxl.fx_ani[key];
 	if aniCache == nil then
 		aniCache = GetApp():LoadAnimation(key);
+		if aniCache == nil then
+			xxl_slog("pop_fx SKIP: LoadAnimation failed: " .. key);
+			return
+		end
 		xxl.fx_ani[key] = aniCache;
-	end
-	if aniCache == nil then
-		xxl_slog("pop_fx SKIP: LoadAnimation failed: " .. key);
-		return
 	end
 	xxl.fx_seq = xxl.fx_seq + 1;
 	local fid = xxl_fx_base_id + xxl.fx_seq;
-	local scale = 1.5 + (boost and 0.5 or 0);
+	-- fScale:显式缩放(如洗牌特效铺满棋盘传 1.05);缺省 1.5,boost 再 +0.5
+	local scale = fScale or (1.5 + (boost and 0.5 or 0));
 	local w = math.floor(rc:Width()*scale); local h = math.floor(rc:Height()*scale);
 	local px = rc.left + math.floor(rc:Width()/2);
 	local py = rc.top + math.floor(rc:Height()/2);
@@ -800,6 +813,7 @@ function xxl_pop_fx(rc, boost, szSkin, szAnim)
 	end
 	fx:Move(CRect(px - math.floor(w/2), py - math.floor(h/2), px - math.floor(w/2) + w, py - math.floor(h/2) + h));
 	-- cnchess 同款:clone 缓存动画再挂上,SetAnimation 后下一帧自动启动
+	-- 缓存的 master 绝不能直接交给窗口:窗口 stop 时会 Release 它,缓存里会成悬空指针
 	local ani = aniCache:clone();
 	fx:SetAnimation(ani);
 	ani:Release();
@@ -814,7 +828,7 @@ function xxl_on_get_same_x(y,x,len)
 	xxl.combo = xxl.combo + 1;
 	xxl_show_combo();
 	local ctxId = xxl_new_ctx("clear", { samex={y=y,x=x,len=len}, posLst={} });
-	local group = NewAnimatorGroup();
+	local group = LuaAnimatorGroup();
 	group:SetOnGroupEnd("xxl_group_end");
 	group:SetCtx(ctxId);
 	local state = xxl.board[y][x];
@@ -850,7 +864,7 @@ function xxl_on_get_same_y(x,y,len)
 	xxl.combo = xxl.combo + 1;
 	xxl_show_combo();
 	local ctxId = xxl_new_ctx("samey", { samey={x=x,y=y,len=len}, posLst={} });
-	local group = NewAnimatorGroup();
+	local group = LuaAnimatorGroup();
 	group:SetOnGroupEnd("xxl_group_end");
 	group:SetCtx(ctxId);
 	local state = xxl.board[y][x];
@@ -887,7 +901,7 @@ function xxl_on_clear_end_y(g)
 	xxl_pop_fx(xxl_get_ele_rect({x=samey.x, y=samey.y + math.floor((samey.len-1)/2)}), samey.len >= 4);
 	if samey.y > 0 then
 		local ctxId = xxl_new_ctx("drop_y", { samey=samey });
-		local group = NewAnimatorGroup();
+		local group = LuaAnimatorGroup();
 		group:SetOnGroupEnd("xxl_group_end");
 		group:SetCtx(ctxId);
 		local nAdded = 0;
@@ -933,6 +947,13 @@ function xxl_on_click(idFrom, eleSender)
 	if idFrom < xxl_base_id or idFrom >= xxl_base_id + xxl_row*xxl_col then
 		return 0;
 	end
+	if xxl.ani_count ~= 0 then
+		-- 🚨 动画链进行中禁止新点击:交换/消除/下沉各链都在组结束回调里才
+		-- 提交数据(xxl_swap)与补位(free_same_x/y),并发链捕获的 pos/board 是
+		-- 中间态,前后链互相踩踏后数据与显示分叉且无法自愈。留日志取证。
+		xxl_slog("on_click BUSY drop id=" .. idFrom .. " ani_count=" .. xxl.ani_count);
+		return 0;
+	end
 	xxl_clear_hint(); -- 任意棋盘点击都收掉提示脉冲
 	if xxl.click_id ~= -1 then
 		-- 先清掉旧选中格子的缩放动画(js: ele.ClearAnimation())
@@ -954,7 +975,7 @@ function xxl_on_click(idFrom, eleSender)
 			local rc1 = ele1:GetWindowRect2();
 			local rc2 = ele2:GetWindowRect2();
 			local ctxId = xxl_new_ctx("swap", { pos1=pos1, pos2=pos2 });
-			local group = NewAnimatorGroup();
+			local group = LuaAnimatorGroup();
 			group:SetOnGroupEnd("xxl_group_end");
 			group:SetCtx(ctxId);
 			local nAdded = 0;
@@ -1025,11 +1046,19 @@ end
 
 -- js initBoard + init 的全盘 SelectPage 循环
 function xxl_init_board()
-	-- 先丢弃所有动画上下文:格子即将销毁,存活动画回调(ctx=nil)自动变 no-op
+	-- 先丢弃所有动画上下文:格子即将销毁,存活动画回调(ctx=nil)自动变 no-op。
+	-- 🚨 存活的动画组包装挪入 orphan 表保活到下次重建:LuaAnimatorGroup 是子
+	-- 动画器的监听者(SAnimatorGroup::AddAnimator 存裸指针),若让它被 GC 而子
+	-- 动画器还在跑,子动画器结束回调会踩悬挂指针;orphan 表保证组活得比子长。
+	xxl.ani_orphan = xxl.ani_list;
 	xxl.ani_ctx = {};
 	xxl.ani_list = {};
 	xxl.ani_count = 0;
 	xxl.wndBoard:DestroyAllChildren();
+	-- 浮层只承载动态创建的副本/特效窗口(见 page_script.xml),一并清空:
+	-- restart 时可能有副本正在飞行,其 ani_end 因 ctx 被抹掉而 no-op,不清掉
+	-- 就会永远停在浮层上冒充棋子("该消除的还在显示")且 msgTransparent 不挡点击。
+	xxl.aniframe:DestroyAllChildren();
 	xxl.wndBoard:SetAttribute(T"columnCount", T"8", false);
 	local xml = "";
 	local eles = xxl_row * xxl_col;
@@ -1062,7 +1091,15 @@ function xxl_init_board()
 	xxl_check_board();
 end
 
--- js 构造器 + init
+function xxl_exit()
+	-- 释放 pop_fx 懒加载的特效动画缓存(每项引用计数 1,脚本持有)
+	for _, aniCache in pairs(xxl.fx_ani) do
+		aniCache:Release();
+	end
+	xxl.fx_ani = {};
+	xxl.ani_sel:Release();
+end
+-- lua 构造器 + init
 function xxl_init(root)
 	local wndBoard = root:FindChildByNameA("wnd_xxl_board",-1);
 	local aniframe = root:FindChildByNameA("wnd_xxl_aniframe",-1);
@@ -1072,7 +1109,7 @@ function xxl_init(root)
 	xxl.root = root;
 	xxl.wndBoard = wndBoard;
 	xxl.aniframe = aniframe;
-	xxl.ani_move = NewValueAnimator();
+	xxl.ani_move = LuaValueAnimator();
 	if not xxl.ani_move:LoadAnimator("animator:xxl_move") then
 		xxl_slog("init: load animator:xxl_move failed");
 	end
@@ -1088,7 +1125,7 @@ end
 -- ============ 稳定态自检(常驻,成功时零输出) ============
 -- 无 3 连且无动画在跑 => 棋盘稳定:校验所有格子存在、可见、数据完整。
 -- 直接盯住"棋子缺失/消失不恢复"类问题,异常时打日志定位。
--- 稳定后再做市场玩法收尾:连击清零 / 游戏结束判定 / 死局自动洗牌。
+-- 稳定后再做市场玩法收尾:连击清零 / 游戏结束判定 / 死局等玩家花金币洗牌。
 function xxl_on_settle()
 	if xxl.wndBoard == nil then return end
 	if xxl.ani_count ~= 0 then return end -- 还有动画在跑,不算稳定
@@ -1120,18 +1157,62 @@ function xxl_on_settle()
 		xxl_show_combo();
 	end
 	-- 稳定收尾 2:金币耗尽 => 游戏结束(只弹一次)
-	if xxl.coin <= 0 and not xxl.gameover then
-		xxl.gameover = true;
-		xxl_slog("settle: game over, score=" .. xxl.score);
-		local hwnd = xxl.wndBoard:GetHostHwnd();
-		SMessageBox(hwnd, L("本局结束!最终得分 " .. xxl.score .. "\n点击确定重新开始"), L("消消乐"), 0);
-		xxl_restart_internal();
+	if xxl.coin <= 0 then
+		xxl_game_over();
 		return
 	end
-	-- 稳定收尾 3:无步可走 => 自动洗牌
+	-- 稳定收尾 3:死局不自动洗牌,等玩家花金币手动洗(见 xxl_on_shuffle);
+	-- 金币不足洗牌费 => 死局永远解不开,直接游戏结束
 	if not xxl_has_valid_move() then
-		xxl_slog("settle: dead board, auto redeal");
-		xxl_redeal();
+		if xxl.coin < xxl_shuffle_cost then
+			xxl_game_over();
+			return
+		end
+		xxl_slog("settle: dead board, wait player shuffle (cost=" .. xxl_shuffle_cost .. ")");
+		xxl_show_deadboard_tip();
 	end
+end
+
+-- 游戏结束(只弹一次):弹窗展示得分,确定后重开
+function xxl_game_over()
+	if xxl.wndBoard == nil or xxl.gameover then return end
+	xxl.gameover = true;
+	xxl_slog("settle: game over, score=" .. xxl.score);
+	local hwnd = xxl.wndBoard:GetHostHwnd();
+	SMessageBox(hwnd, L("本局结束!最终得分 " .. xxl.score .. "\n点击确定重新开始"), L("消消乐"), 0);
+	xxl_restart_internal();
+end
+
+-- 死局提示:复用连击文本位显示提示(settle 时连击已清零,不冲突;
+-- 洗牌成功/重开后由 xxl_show_combo 覆盖清掉)
+function xxl_show_deadboard_tip()
+	local txt = xxl.root:FindChildByNameA("txt_xxl_combo",-1);
+	if txt then txt:SetWindowText(T("无路可走,请洗牌!")); end
+end
+
+-- 洗牌按钮:花金币把全盘棋子受约束重排(无死局门,随时可洗);
+-- 金币不足 => 不能洗(文本位提示,不扣币不结算)
+function xxl_on_shuffle(args)
+	if xxl.wndBoard == nil or xxl.gameover then return 0 end
+	if xxl.ani_count ~= 0 then return 0 end -- 动画进行中不响应
+	if xxl.coin < xxl_shuffle_cost then
+		xxl_slog("shuffle: coin " .. xxl.coin .. " < cost " .. xxl_shuffle_cost .. ", denied");
+		local txt = xxl.root:FindChildByNameA("txt_xxl_combo",-1);
+		if txt then txt:SetWindowText(T("金币不足,不能洗牌!")); end
+		return 1;
+	end
+	-- 按钮上的青色冰环(与提示按钮一致)
+	local btn = xxl.root:FindChildByNameA("btn_xxl_shuffle",-1);
+	if btn then
+		xxl_pop_fx(btn:GetWindowRect2(), false, "skin_xxl_fx2", "anim:xxl_fx_ring");
+	end
+	-- 洗牌特效:金色星芒铺满整个棋盘(1.05 倍防露边)
+	xxl_pop_fx(xxl.wndBoard:GetWindowRect2(), false, nil, nil, 1.05);
+	xxl.coin = xxl.coin - xxl_shuffle_cost;
+	xxl_show_coin();
+	xxl_slog("shuffle: pay " .. xxl_shuffle_cost .. " coin, left=" .. xxl.coin);
+	xxl_redeal();
+	xxl_show_combo(); -- combo==0,清掉死局提示文本
+	return 1;
 end
 

@@ -57,7 +57,7 @@ BOOL ExpLua_Basic(lua_State *L)
 		lua_tinker::class_inh<CSize,SIZE>(L);
 		lua_tinker::class_con<CSize>(L,lua_tinker::constructor<CSize,LONG,LONG>);
 
-		//SIZE
+		//MSG
 		lua_tinker::class_add<MSG>(L,"MSG");
 		lua_tinker::class_mem<MSG>(L, "hwnd", &MSG::hwnd);
 		lua_tinker::class_mem<MSG>(L, "message", &MSG::message);

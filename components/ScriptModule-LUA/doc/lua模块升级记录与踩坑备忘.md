@@ -1,8 +1,8 @@
 # ScriptModule-LUA 升级记录与踩坑备忘
 
-> 记录时间：2026-10
-> 范围：Lua 5.4 + lua_tinker（SOUI 定制版）脚本模块升级，对齐 soui4js（QuickJS）导出面。
-> 目的：沉淀本次升级完成的功能与踩过的坑，**防止下次升级/移植再犯**。
+> 记录时间：2026-10>   
+> 范围：Lua 5.4 + lua_tinker（SOUI 定制版）脚本模块升级，对齐 soui4js（QuickJS）导出面。>   
+> 目的：沉淀本次升级完成的功能与踩过的坑，**防止下次升级/移植再犯**。>   
 > 相关记忆：`.workbuddy/memory/2026-10-01.md`、`2026-10-02.md`；对外文档：soui-docs `08-advanced-topics/script/index.md`。
 
 ---
@@ -22,15 +22,16 @@
 
 ### 2.1 lua_tinker 层增强（`lua_tinker/`）
 
-| # | 修复/增强 | 说明 |
-|---|-----------|------|
-| 1 | 事件字段注册修正 | `DEF_EVT` 生成 `EventXxx : SEvtArgs, StEventXxx` 多继承，SEvtArgs 有 5 成员 ⇒ StEventXxx 子对象偏移非零；裸指针 cast 读字段全部错位。改为注册**完整 EventXxx 类**走 `sobj_cast`（63 事件、118 处 class_mem），并提供 `toEventXxx`/`toStEventXxx` 双别名 |
-| 2 | `mem_var_derived<T,BASE,V>` | lua_tinker `class_mem` 用 `read<T*>` 裸重解释，派生类注册基类成员指针错位；新增派生类成员变量绑定（`V BASE::*` 让编译器做偏移调整），向后兼容 |
-| 3 | `wchar_t`/`wchar_t*` 绑定 | 原本宽字符串返回是垃圾 userdata；补自包含 UTF-8↔UTF-16 编解码（read 侧用 `lua_newuserdata` 栈锚定缓冲）。`CreateChildrenFromXml(LPCWSTR)` 因此可直接传 lua string |
-| 4 | **布尔参数 read 修复（最隐蔽）** | `read<int/BOOL/long/float/double/...>` 全部基于 `lua_tonumber`，而 Lua C API 对布尔值 `lua_tonumber` 恒返 0.0 ⇒ **lua 传 `true` 到 C++ 的 BOOL/int 参数一律变 0**（`SetVisible(true)` 实际是隐藏！）。全部数值 read 特化补 `lua_isboolean` 分支；`long/long long` 原本布尔会走 userdata 解引用（UB）一并堵上 |
-| 5 | `call<带参>` 错误路径修复 | pcall 失败后 `lua_pop(1)` 弹 errmsg 再 `lua_remove(L,-2)`，偷掉调用方外层栈一个槽，随后 `pop<RVal>` 把错误对象当返回值读 ⇒ 任何 lua 处理器报错都会破坏宿主栈（tbc abort 只是下游症状）。5 个重载统一改为无条件 `lua_pcall` + `lua_remove(L, errfunc)` |
-| 6 | `class_set_cfun`（toobj.h） | 带 `DEF_VAL` 默认参数的接口方法无法直绑，用 cfunction 包装统一支持 |
-| 7 | `lua_tinker` 无 `__stdcall` 死角的正确用法 | x86 下 UAPI（`__stdcall`）成员走 `invokeU` 重载链（lua_tinker.h ~1387 起 x86-only 块），注册时必须显式写 `(UAPI RET (T::*)(args))`，见 §3.1 |
+| # | 修复/增强                               | 说明                                                                                                                                                                                                                                                     |
+| - | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1 | 事件字段注册修正                            | `DEF_EVT` 生成 `EventXxx : SEvtArgs, StEventXxx` 多继承，SEvtArgs 有 5 成员 ⇒ StEventXxx 子对象偏移非零；裸指针 cast 读字段全部错位。改为注册**完整 EventXxx 类**走 `sobj_cast`（63 事件、118 处 class_mem），并提供 `toEventXxx`/`toStEventXxx` 双别名                                                 |
+| 2 | `mem_var_derived<T,BASE,V>`         | lua_tinker `class_mem` 用 `read<T*>` 裸重解释，派生类注册基类成员指针错位；新增派生类成员变量绑定（`V BASE::*` 让编译器做偏移调整），向后兼容                                                                                                                                                         |
+| 3 | `wchar_t`/`wchar_t*` 绑定             | 原本宽字符串返回是垃圾 userdata；补自包含 UTF-8↔UTF-16 编解码（read 侧用 `lua_newuserdata` 栈锚定缓冲）。`CreateChildrenFromXml(LPCWSTR)` 因此可直接传 lua string                                                                                                                         |
+| 4 | **布尔参数 read 修复（最隐蔽）**               | `read<int/BOOL/long/float/double/...>` 全部基于 `lua_tonumber`，而 Lua C API 对布尔值 `lua_tonumber` 恒返 0.0 ⇒ **lua 传 `true` 到 C++ 的 BOOL/int 参数一律变 0**（`SetVisible(true)` 实际是隐藏！）。全部数值 read 特化补 `lua_isboolean` 分支；`long/long long` 原本布尔会走 userdata 解引用（UB）一并堵上 |
+| 5 | `call<带参>` 错误路径修复                   | pcall 失败后 `lua_pop(1)` 弹 errmsg 再 `lua_remove(L,-2)`，偷掉调用方外层栈一个槽，随后 `pop<RVal>` 把错误对象当返回值读 ⇒ 任何 lua 处理器报错都会破坏宿主栈（tbc abort 只是下游症状）。5 个重载统一改为无条件 `lua_pcall` + `lua_remove(L, errfunc)`                                                                 |
+| 6 | `class_set_cfun`（toobj.h）           | 带 `DEF_VAL` 默认参数的接口方法无法直绑，用 cfunction 包装统一支持                                                                                                                                                                                                           |
+| 7 | `push_gcnew` / `constructor_lstate` | 生命周期完全归属 lua 的对象入栈助手：`push_gcnew<T>(L, args...)`（val2user 语义，`__gc` 直接 delete）；`constructor_lstate<T[, A1..A5]>` 支持 ctor 首参 `lua_State*` 的类走 `class_con` 直接构造（见 §3.9/§3.10）                                                                            |
+| 8 | `lua_tinker` 无 `__stdcall` 死角的正确用法  | x86 下 UAPI（`__stdcall`）成员走 `invokeU` 重载链（lua_tinker.h ~1387 起 x86-only 块），注册 STDMETHOD 接口方法时必须显式写 `(UAPI RET (T::*)(args))`，见 §3.1                                                                                                                     |
 
 ### 2.2 导出补齐（`src/exports/`，核心优先范围）
 
@@ -45,7 +46,7 @@
 - **IHostWnd**：InitFromXml / EnableDragDrop / EnablePrivateUiDef / ShowHostWnd / GetMsgLoop。
 - **IWindow**：CreateChildrenFromResId / SetLayer；**IComboBase / IComboView / IListBox / IOsrPanel** 补方法；CRect::MoveToX/Y/XY；ISouiFactory::CreateAnimatorGroup。
 - **IStackView**（`exp_ICtrl.h`）：SelectPage / GetSelPage / GetPage / SetAniStyle / SetAniDir + `DEF_QICTRL` 注册全局 `QiIStackView`（消消乐格子 7 态切换依赖）。
-- 确认不移植：JsHostWnd/JsHostDialog 专属机制、RequireEvent*、setOutputFileBuilder、DrawBy*、IHttpClient、INcPainter、SDropTarget 等冷门项。
+- 确认不移植：JsHostWnd/JsHostDialog 专属机制、RequireEven&#x74;*、setOutputFileBuilder、DrawBy*、IHttpClient、INcPainter、SDropTarget 等冷门项。
 
 ### 2.3 demo 实证（`demos/demo`）
 
@@ -86,17 +87,17 @@ lua_tinker::class_def<IStackView>(L, "SelectPage",
 
 ### 3.4 lua_tinker 绑定层使用坑（lua 侧写脚本时的天坑清单）
 
-| 坑 | 后果 | 正确做法 |
-|----|------|----------|
-| lua 布尔传 BOOL/int 参数 | 升级前恒变 0（已修 read 层）；但**自己写包装 cfunction 时仍需注意** | 包装层记得 `lua_isboolean` 分支 |
-| lua 里比较 C++ 回调推回的对象身份 | `v == group` 恒 false：C++ 侧 `lua_tinker::call(..., this, ...)` 把指针重新 push 成新 userdata，`==` 是 userdata 裸身份比较 | 回调对象用创建时的 **ctxId 键控**管理，勿用身份比较 |
-| `IWindow::GetWindowRect(LPRECT)` | 要传 RECT 参数；无参调用报 "no class at first argument" | 无参返回 CRect 的版本注册名是 **`GetWindowRect2`**（SWindow 上） |
-| `lua_tinker` 指针推入不拥有对象 | ptr2user 无 `__gc`，`NewValueAnimator` 等包装类永不析构（泄漏但无 UAF），知悉即可 | 长生命周期包装对象由业务层 ctxId 表管理 |
-| lua 处理器报错后不能信其返回值 | call 错误路径已修为无条件 pcall，但业务上仍应假设失败即无返回值 | 关键流程在 C++ 侧校验 |
-| 未注册的 IWindow 方法直接调 | 如 `GetParent` 未绑定 ⇒ "can't find 'GetParent' class variable" | **用之前必须 grep `exports/exp_*.h` 确认绑定面**，绑定面窄于 C++ 接口 |
-| `Root()` 语义（pugi） | `Root()` 是文档节点 | 文档元素要 `Root():Child('root', false)` |
-| BOOL 返回值 | 是数字 | `==0` 判空，勿用 `not` |
-| 类表即全局名 | lua_tinker 类表 = Lua 全局名 | 可 `type(IXmlAttr.AsInt)=='function'` 断言绑定存在 |
+| 坑                                | 后果                                                                                                         | 正确做法                                                |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| lua 布尔传 BOOL/int 参数              | 升级前恒变 0（已修 read 层）；但**自己写包装 cfunction 时仍需注意**                                                              | 包装层记得 `lua_isboolean` 分支                            |
+| lua 里比较 C++ 回调推回的对象身份            | `v == group` 恒 false：C++ 侧 `lua_tinker::call(..., this, ...)` 把指针重新 push 成新 userdata，`==` 是 userdata 裸身份比较 | 回调对象用创建时的 **ctxId 键控**管理，勿用身份比较                     |
+| `IWindow::GetWindowRect(LPRECT)` | 要传 RECT 参数；无参调用报 "no class at first argument"                                                              | 无参返回 CRect 的版本注册名是 **`GetWindowRect2`**（SWindow 上）  |
+| `lua_tinker` 指针推入不拥有对象           | ptr2user 无 `__gc`，普通 push 的对象永不析构（泄漏但无 UAF），知悉即可                                                           | 长生命周期包装对象由业务层 ctxId 表管理                             |
+| lua 处理器报错后不能信其返回值                | call 错误路径已修为无条件 pcall，但业务上仍应假设失败即无返回值                                                                      | 关键流程在 C++ 侧校验                                       |
+| 未注册的 IWindow 方法直接调               | 如 `GetParent` 未绑定 ⇒ "can't find 'GetParent' class variable"                                                | **用之前必须 grep `exports/exp_*.h` 确认绑定面**，绑定面窄于 C++ 接口 |
+| `Root()` 语义（pugi）                | `Root()` 是文档节点                                                                                             | 文档元素要 `Root():Child('root', false)`                 |
+| BOOL 返回值                         | 是数字                                                                                                        | `==0` 判空，勿用 `not`                                   |
+| 类表即全局名                           | lua_tinker 类表 = Lua 全局名                                                                                    | 可 `type(IXmlAttr.AsInt)=='function'` 断言绑定存在         |
 
 ### 3.5 SOUI 框架机制坑（lua 游戏实证踩出，写脚本前先看）
 
@@ -123,6 +124,115 @@ lua_tinker::class_def<IStackView>(L, "SelectPage",
 - 编辑 CRLF 源文件（如 exp_SXml.h）后必须字节级复核 BOM/CRLF，编辑工具可能把 CRLF 写坏成 LF。
 - 诊断定位优先级：无头环境 printf 结果在 segfault 时全丢 ⇒ `setvbuf(stdout, NULL, _IONBF, 0)` + 结果文件残留判断；GUI 子系统进程 stderr 不可见 ⇒ 日志文件才是可靠观察点。
 
+### 3.7 🚨 工厂返回值泄漏：脚本必须显式 Release（VLD/valgrind 实测驱动）
+
+**规则**：lua_tinker `push<T*>` 一律是**非托管指针**（ptr2user，无 `__gc`，GC 永不  
+回收）。`class_def` 直绑的工厂方法（`LoadAnimation`、`CreateTimer`、  
+`CreateSouiFactory` 等）把初始引用=1 的 IObjRef 对象交给脚本——**脚本必须显式  
+`:Release()`，漏调即泄漏**，且泄漏的是整条成员链（对象本体 + 字符串成员 +  
+容器缓冲 + 插值器）。
+
+**典型事故**：消消乐把 `LoadAnimation` 结果缓存在 `xxl.fx_ani`/`xxl.ani_sel` 但从不  
+Release → VLD 报十几个对象的整链泄漏。正确模式 = **master 缓存 + clone 挂载**：
+
+- master 懒加载入缓存（脚本持 1 引），进程退出钩子（`xxl_exit`）逐项 Release；
+- 挂载走 `clone → SetAnimation(ani) → ani:Release()`（clone 新对象 1 引 → 窗口    
+  AddRef→2 → 脚本 Release→1 → 窗口 stop 时释放→0）；
+- 🚨 **缓存 master 绝不能直接 SetAnimation 给窗口**：`SWindow::m_animation` 是    
+  `SAutoRefPtr`，窗口 stop 时会 Release 它，缓存里就成了悬空指针。
+
+
+**监听器**：IAnimatorListener 等是**非持有的裸指针**，框架不 AddRef、不备份迭代；  
+回调中删除监听器对象必崩，属脚本契约，框架层不兜底（备份迭代方案试过，救不了）。
+
+**回调窗口契约**：动画运行期 lua 侧经 `ani_ctx[ctxId]` 持有 userdata；脚本若在  
+动画回调里主动丢弃全部引用并触发 GC，属契约违规（提前回收/监听器悬挂，框架不兜底）。
+
+**教训**：
+
+- 🚨 判据看继承链（TObjRefImpl/SObjectImpl = IObjRef 系），不是"有没有叫    
+  Release 的方法"——普通对象自带无关 `Release()` 时绑定能编译但语义错。
+- 🚨 脚本侧对每个 [Rel] 对象建立"谁创建谁 Release"的收支账：创建/缓存/退出    
+  三处对齐，用完即 Release、持有期绝不提前 Release。
+- 🚨 无头/宿主环境验泄漏：MinGW release 靠残留字节"侥幸不崩"会掩盖 UAF，    
+  **MSVC Debug（0xDD 填充）+ VLD/valgrind 才是有效探测器**。
+
+### 3.8 🚨 导出对象生命周期调试测试（fun_test/test_lua.cpp）抓出的坑（2026-10-03 晚）
+
+`demos/fun_test/test_lua.cpp`（27 用例，SComMgr2 加载模块、零 lua 链接、纯  
+IScriptModule 接口驱动）落地过程中实锤的三个缺陷与两个工程坑：
+
+1. 🚨 **`CreateTranslatorMgr`（exp_global.h）栈上 SComMgr2 → FreeLibrary 崩溃**：     
+   原实现 `SComMgr2 comMgr; comMgr.CreateTranslator(...); return pRet;` —— 函数返回时     
+   `~SComLoader` 会 `FreeLibrary(libtranslator.dll)`，返回的 ITranslatorMgr 对象属于     
+   该模块，调用方任何虚调用（`o:Release()`）都跳进已卸载代码段 → AV。与"持     
+   ITaskLoop 的 SComMgr2 必须 leak-on-purpose"同一规则：改为**函数局部静态指针**     
+   `static SComMgr2 *s_comMgr = new SComMgr2();`，随进程存活绝不析构。     
+   ⚠️ 静态 COM 构建（LIB_SOUI_COM）下走 `TRANSLATOR::SCreateInstance` 直链无此问题，     
+   所以这个 bug 只在 DLL COM 下暴露——新导出工厂凡经 SComMgr2 加载 DLL 的都要按此模式审。
+2. 🚨 **SOUI `SUiDefInfo::Init`（res.mgr/SUiDef.cpp）空/非法 pszUidef 越界**：     
+   `ParseResID` 失败只打 warning 不 return，继续用空 `SStringTList` 取     
+   `strUiDef[0]/[1]` → `SArray::operator[]` 的 SASSERT abort（release 下未定义行为）。     
+   已修：解析失败直接 `return bRet;`。
+3. 🚨 **lua 侧调带 `DEF_VAL` 默认参的接口方法必须传满参数**：`class_def` 直接绑接口     
+   方法（非 class_set_cfun 包装）不做默认参填充——`AddResProvider(rp)` 只传 1 参，     
+   第二参被 `read<wchar_t const*>` 读成**空串 L""（不是 NULL）**，恰好绕过     
+   `if (pszUidef)` 判空走进第 2 条的越界。经验：脚本里调用二参以上接口方法一律显式     
+   传参；宿主基建（如资源挂载）优先 C++ 侧做，可传真 NULL。
+4. **成败探针**：`executeScriptBuffer` 返回 void、`executeScriptFile` 恒 TRUE、     
+   `executeScriptedEventHandler` 会在 handler 返回真值时解引用 pEvt（传 NULL evt     
+   的 handler 不能返回真值）——纯 IScriptModule 接口下唯一可靠的成败观测 =     
+   **脚本末尾写 flag 文件**，C++ 侧检查文件是否出现（脚本中途 error 则 dobuffer     
+   弹栈、flag 不会出现）。
+5. **lua 错误输出进 SOUI 日志而非 stdout**：SScriptModule_Lua 把 lua_tinker 的     
+   print_error 重定向到 SLog —— app 未 SetLogManager 时脚本错误**静默丢弃**，只能     
+   靠 flag 判成败。调试期给 app 装上 LogMgr（SComMgr2::CreateLog4z）才能看到错误文本。
+
+### 3.9 对象生命周期模型（现行）：三条路径与判据
+
+LuaValueAnimator / LuaAnimatorGroup 这类"属性在 lua 栈上的对象"，生命周期完全  
+归属 lua 一个 userdata：`LuaValueAnimator` 是**纯 C++ 包装类**（无 IObjRef 基类，  
+IAnimatorListener/IAnimatorUpdateListener 均非 IObjRef 系、addListener 只存裸  
+指针）；`LuaAnimatorGroup` 保留 `SAnimatorGroup` 基类，但其初始引用永不  
+Release，GC 直接 delete、不经 OnFinalRelease。
+
+**导出写法**：常规走 `class_con<T>(L, lua_tinker::constructor_lstate<T>)`（§3.10）；  
+需要运行时逻辑的工厂用 `push_gcnew<T>(L, args...)`（val2user 语义，`__gc` 直接  
+delete，不经引用计数）。
+
+**判据（三条路径）**：
+
+| 对象                                               | 入栈方式                                | 释放                                  |
+| ------------------------------------------------ | ----------------------------------- | ----------------------------------- |
+| 单例/宿主/窗口树对象（GetApp()、事件参数等）                      | 普通 push（ptr2user）                   | C++ 侧管理，**脚本绝不可 Release**           |
+| 工厂 new 的 IObjRef 产品（LoadAnimation、CreateTimer 等） | `class_def` 直绑                      | **脚本必须显式 `:Release()`**             |
+| 生命周期只归属 lua 的纯包装对象（LuaValueAnimator 等）           | `constructor_lstate` / `push_gcnew` | GC 直接 delete，**脚本绝不可 Release**（双释放） |
+
+**红线**：同一指针绝不能既托管入栈、又以普通 `push` 方式二次入栈（两条路径的  
+`__gc` 语义不同，混用必然双释放或泄漏）；动画运行期 lua 必须经 `ani_ctx[ctxId]`  
+持有 userdata 的脚本契约不变（提前回收/监听器悬挂，框架不兜底）。
+
+### 3.10 构造器重载 constructor_lstate：ctor 首参 lua_State* 的类走 class_con
+
+LuaValueAnimator/LuaAnimatorGroup 的导出与 CRect 等可构造类风格一致：  
+`lua_tinker.h` 提供 `constructor_lstate<T[, A1..A5]>` 重载族（与 `constructor`  
+并列，同 6 档参数）：
+
+- **语义**：C++ ctor 首参 `lua_State*` 由 lua_tinker 自动注入当前 L，其余参数仍    
+  按 `__call` 约定从栈索引 2 起读取（索引 1 是 `__call` 传入的类表本身）。对象    
+  同为 `val2user`（GC 直接 delete），与 `push_gcnew` 同语义。
+- **导出写法归一**：`class_con<T>(L, lua_tinker::constructor_lstate<T>)`；带参    
+  构造 `constructor_lstate<T, int>`。缺参安全：`read<int>` 对 nil 返回 0    
+  （`LuaAnimatorGroup()` 不传参 → nID=0）。
+- **无别名**：脚本一律 `LuaValueAnimator()` / `LuaAnimatorGroup(nID)`，没有    
+  全局工厂名。
+- **手工工厂退役**：`push_gcnew` 保留作底层工具（需要运行时逻辑的工厂仍可    
+  用），常规导出一律走 `class_con + constructor_lstate`。
+
+**注意**：`class_con` 挂 `__call` 时，`constructor_lstate` 内部取元表用  
+`class_type<T>::type`（只剥 ptr/ref/const，不沿继承链走），与 `class_add<T>`  
+注册名天然一致，无需担心挂错元表。
+
 ---
 
 ## 四、提交/回归检查清单
@@ -138,6 +248,8 @@ lua_tinker::class_def<IStackView>(L, "SelectPage",
 - [ ] 探针/日志代码是否全部还原（git diff 只剩正式修复）？
 - [ ] 改过的 CRLF/带 BOM 文件是否字节级复核？
 - [ ] lua 脚本用到的每个 C++ 方法是否都 grep 过 `exports/exp_*.h` 确认已绑定？
+- [ ] 新增"工厂 new 出来交给脚本"的对象：**IObjRef 系产品**→ `class_def` 直绑，脚本显式 `:Release()`（判据看继承链，恰有同名 `Release()` 的普通对象绑定能编译但语义错）；**生命周期只归属 lua 的普通对象**→ `class_con + constructor_lstate` 或 `push_gcnew`（见 §3.9 判据表）。
+- [ ] ctor 首参为 `lua_State*` 的类：构造器是否走 `class_con + constructor_lstate`（勿再手写 lua_CFunction 工厂，见 §3.10）？
 
 ---
 

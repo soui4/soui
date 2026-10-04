@@ -81,6 +81,7 @@ UINT SUiDefInfo::Init(IResProvider *pResProvider, LPCTSTR pszUidef)
     if (2 != ParseResID(pszUidef, strUiDef))
     {
         SSLOGW() << "warning!!!! Add ResProvider Error.";
+        return bRet;
     }
 
     size_t dwSize = pResProvider->GetRawBufferSize(strUiDef[0], strUiDef[1]);
