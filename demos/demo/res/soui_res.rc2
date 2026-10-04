@@ -1,4 +1,4 @@
-//stamp:01dd520d03f6f374
+//stamp:01dd5278f0c90d79
 /*<------------------------------------------------------------------------------------------------->*/
 #define DEFINE_UIRES(name, type, file_path)\
     name type file_path
