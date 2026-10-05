@@ -2141,7 +2141,6 @@ void ScintillaWin::FineTickerStart(TickReason reason, int millis, int tolerance)
 }
 
 void ScintillaWin::FineTickerCancel(TickReason reason) {
-	timers[reason] = 0;
 	if (!host_->IsNative()) {	// headless: no native timer to cancel
 		host_->RequestTimer(reason, 0);
 		return;
