@@ -133,6 +133,17 @@ class SOUI_EXP SFlowLayoutParam
  *
  * Horizontal direction: elements are arranged from left to right, wrapping to the next line when the container width is reached
  * Vertical direction: elements are arranged from top to bottom, moving to the next column when the container height is reached
+ *
+ * Alignment attributes (the combined "gravity" is split into two axes):
+ * - gravity: like other layouts, when specified it assigns both the horizontal and the
+ *   vertical alignment at once (equivalent to setting xgravity and ygravity together).
+ * - xgravity: for hflow, alignment of a whole line inside the parent window (left/center/right);
+ *   for vflow, default horizontal alignment of the items inside a column (left/center/right).
+ * - ygravity: for hflow, default vertical alignment of the items inside a line (top/center/bottom);
+ *   for vflow, alignment of a whole column inside the parent window (top/center/bottom).
+ *
+ * Each child window may override its within-line alignment through its own layout_gravity
+ * layout param attribute, which takes precedence over the layout defaults.
  */
 class SOUI_EXP SFlowLayout : public TObjRefImpl<SObjectImpl<ILayout>> {
     DEF_SOBJECT_EX(SObjectImpl<ILayout>, L"flowLayout", L"flow")
@@ -183,15 +194,18 @@ class SOUI_EXP SFlowLayout : public TObjRefImpl<SObjectImpl<ILayout>> {
             ATTR_ENUM_VALUE(L"horizontal", Horz)            /**< Horizontal direction: arrange from left to right, wrap to next line when exceeding width */
             ATTR_ENUM_VALUE(L"vertical", Vert)              /**< Vertical direction: arrange from top to bottom, move to next column when exceeding height */
         ATTR_ENUM_END(m_orientation)
-        ATTR_GRAVITY(L"gravity", m_gravity, FALSE)                    /**< Alignment */
-        ATTR_LAYOUTSIZE(L"xInterval", m_xInterval, FALSE)             /**< Horizontal spacing */
-        ATTR_LAYOUTSIZE(L"yInterval", m_yInterval, FALSE)             /**< Vertical spacing */
+        ATTR_GRAVITY(L"gravity", m_xgravity = m_ygravity, TRUE)      /**< Alignment: assigns both xgravity and ygravity at once */
+        ATTR_GRAVITY(L"xgravity", m_xgravity, TRUE)                  /**< Horizontal alignment: hflow - line alignment in parent; vflow - default item alignment in column */
+        ATTR_GRAVITY(L"ygravity", m_ygravity, TRUE)                  /**< Vertical alignment: hflow - default item alignment in line; vflow - column alignment in parent */
+        ATTR_LAYOUTSIZE(L"xInterval", m_xInterval, TRUE)             /**< Horizontal spacing */
+        ATTR_LAYOUTSIZE(L"yInterval", m_yInterval, TRUE)             /**< Vertical spacing */
         ATTR_LAYOUTSIZE(L"interval", m_xInterval = m_yInterval, TRUE) /**< Spacing (same for horizontal and vertical) */
     SOUI_ATTRS_BREAK()
 
   protected:
     ORIENTATION m_orientation; /**< Direction: horizontal or vertical */
-    Gravity m_gravity;         /**< Alignment */
+    Gravity m_xgravity;        /**< Horizontal alignment */
+    Gravity m_ygravity;        /**< Vertical alignment */
     SLayoutSize m_xInterval;   /**< Horizontal spacing */
     SLayoutSize m_yInterval;   /**< Vertical spacing */
 };

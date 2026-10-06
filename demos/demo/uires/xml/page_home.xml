@@ -16,7 +16,7 @@
   <text layout_gravity="center" extend_top="6" text="选择一个分类,开始体验 SOUI 5 的核心能力" font="size:15" colorText="@color/clr_text_sub"/>
 
   <!-- 宫格卡片区分4列排布,卡片点击事件统一由 CMainDlg 处理 -->
-  <window size="-2,-1" layout="gridlayout" columnCount="4" interval="16" gravity="center" extend_top="24">
+  <window size="-2,0" weight="1" layout="hflow" interval="16" gravity="center" extend_top="24">
     <!-- 内联模板:宫格卡片(不创建窗口,仅注册) -->
     <template name="home_card">
       <imgbtn name="{{name}}" size="190,150" data="{{page}}" skin="svg_card_bg" layout="vbox" gravity="center" interval="10" animate="1">

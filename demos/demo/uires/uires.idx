@@ -236,6 +236,7 @@
 	<file name="xxl_btn_secondary" path="svg\xxl_btn_secondary.svg"/>
 	<file name="xxl_btn_restart" path="svg\xxl_btn_restart.svg"/>
 	<file name="xxl_btn_hint" path="svg\xxl_btn_hint.svg"/>
+	<file name="xxl_btn_shuffle" path="svg\xxl_btn_shuffle.svg"/>
 	<file name="coin" path="svg\coin.svg"/>
   </svg>
   <xml>

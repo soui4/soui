@@ -180,7 +180,8 @@ BOOL SFlowLayoutParam::SetAnimatorValue(IPropertyValuesHolder *pHolder, float fr
 
 SFlowLayout::SFlowLayout(void)
     : m_orientation(Horz)
-    , m_gravity(G_Undefined)
+    , m_xgravity(G_Undefined)
+    , m_ygravity(G_Undefined)
 {
     m_xInterval.setSize(0, dp);
     m_yInterval.setSize(0, dp);
@@ -271,11 +272,14 @@ void SFlowLayout::LayoutChildren(IWindow *pParent)
     if (m_orientation == Horz)
     {
         // Horizontal flow layout
+        // xgravity: alignment of a whole line inside the parent window (left/center/right)
+        Gravity lineAlign = m_xgravity == G_Undefined ? G_Left : m_xgravity;
+
         int nYInterval = m_yInterval.toPixelSize(pParent->GetScale());
         int nXInterval = m_xInterval.toPixelSize(pParent->GetScale());
 
-        int xOffset = rcParent.left;
         int yOffset = rcParent.top;
+        int nLineWidth = 0; // accumulated width of current line, including the trailing interval
         int nLineHeight = 0;
 
         // Collect items for current line
@@ -283,44 +287,49 @@ void SFlowLayout::LayoutChildren(IWindow *pParent)
 
         for (int i = 0; i < nChilds; i++)
         {
-            SWindow *pChild = (SWindow *)pChilds[i];
-            SFlowLayoutParam *pFlowLayoutParam = (SFlowLayoutParam *)pChild->GetLayoutParam();
-            int nScale = pChild->GetScale();
-            Gravity gravity = pFlowLayoutParam->gravity == G_Undefined ? m_gravity : pFlowLayoutParam->gravity;
-            if (gravity == G_Undefined)
-                gravity = G_Left;
-
             CSize szChild = pSize[i];
 
             // Check if we need to wrap to next line
-            if (xOffset != rcParent.left && xOffset + szChild.cx > rcParent.right)
+            if (nLineWidth != 0 && rcParent.left + nLineWidth + szChild.cx > rcParent.right)
             {
                 // Layout current line
+                int nLineW = nLineWidth - nXInterval;
+                int xLineStart = rcParent.left;
+                if (nLineW > 0 && nLineW < rcParent.Width())
+                {
+                    if (lineAlign == G_Center)
+                        xLineStart += (rcParent.Width() - nLineW) / 2;
+                    else if (lineAlign == G_Right)
+                        xLineStart += rcParent.Width() - nLineW;
+                }
+
                 nLineHeight = 0;
-                xOffset = rcParent.left;
                 for (int j = nLineStart; j < i; j++)
                 {
                     nLineHeight = smax(nLineHeight, pSize[j].cy);
                 }
 
                 // Apply alignment for all items in current line
-                int xPos = rcParent.left;
+                int xPos = xLineStart;
                 for (int j = nLineStart; j < i; j++)
                 {
                     SWindow *pLineChild = (SWindow *)pChilds[j];
                     SFlowLayoutParam *pLineLayoutParam = (SFlowLayoutParam *)pLineChild->GetLayoutParam();
                     int nLineScale = pLineChild->GetScale();
-                    Gravity lineGravity = pLineLayoutParam->gravity == G_Undefined ? m_gravity : pLineLayoutParam->gravity;
-                    if (lineGravity == G_Undefined)
-                        lineGravity = G_Left;
+                    // Within-line vertical alignment: layout_gravity (child) > ygravity (layout) > top
+                    Gravity itemGravity = pLineLayoutParam->gravity;
+                    if (itemGravity == G_Undefined)
+                        itemGravity = m_ygravity;
+                    if (itemGravity == G_Undefined)
+                        itemGravity = G_Top;
 
                     CSize szLineChild = pSize[j];
                     CRect rcLineChild(CPoint(xPos, yOffset), szLineChild);
 
-                    // Apply gravity
-                    if (lineGravity == G_Center)
+                    // Apply within-line vertical alignment
+                    if (itemGravity == G_Center)
                         rcLineChild.OffsetRect(0, (nLineHeight - szLineChild.cy) / 2);
-                    else if (lineGravity == G_Bottom)
+                    else if (itemGravity == G_Bottom)
                         rcLineChild.OffsetRect(0, nLineHeight - szLineChild.cy);
 
                     CRect rcLineChild2 = rcLineChild;
@@ -331,41 +340,54 @@ void SFlowLayout::LayoutChildren(IWindow *pParent)
                 }
 
                 yOffset += nLineHeight + nYInterval;
-                xOffset = rcParent.left;
+                nLineWidth = 0;
                 nLineHeight = 0;
                 nLineStart = i;
             }
 
             nLineHeight = smax(nLineHeight, szChild.cy);
-            xOffset += szChild.cx + nXInterval;
+            nLineWidth += szChild.cx + nXInterval;
         }
 
         // Layout last line
         if (nLineStart < nChilds)
         {
+            int nLineW = nLineWidth - nXInterval;
+            int xLineStart = rcParent.left;
+            if (nLineW > 0 && nLineW < rcParent.Width())
+            {
+                if (lineAlign == G_Center)
+                    xLineStart += (rcParent.Width() - nLineW) / 2;
+                else if (lineAlign == G_Right)
+                    xLineStart += rcParent.Width() - nLineW;
+            }
+
             nLineHeight = 0;
             for (int j = nLineStart; j < nChilds; j++)
             {
                 nLineHeight = smax(nLineHeight, pSize[j].cy);
             }
 
-            int xPos = rcParent.left;
+            int xPos = xLineStart;
             for (int j = nLineStart; j < nChilds; j++)
             {
                 SWindow *pLineChild = (SWindow *)pChilds[j];
                 SFlowLayoutParam *pLineLayoutParam = (SFlowLayoutParam *)pLineChild->GetLayoutParam();
                 int nLineScale = pLineChild->GetScale();
-                Gravity lineGravity = pLineLayoutParam->gravity == G_Undefined ? m_gravity : pLineLayoutParam->gravity;
-                if (lineGravity == G_Undefined)
-                    lineGravity = G_Left;
+                // Within-line vertical alignment: layout_gravity (child) > ygravity (layout) > top
+                Gravity itemGravity = pLineLayoutParam->gravity;
+                if (itemGravity == G_Undefined)
+                    itemGravity = m_ygravity;
+                if (itemGravity == G_Undefined)
+                    itemGravity = G_Top;
 
                 CSize szLineChild = pSize[j];
                 CRect rcLineChild(CPoint(xPos, yOffset), szLineChild);
 
-                // Apply gravity
-                if (lineGravity == G_Center)
+                // Apply within-line vertical alignment
+                if (itemGravity == G_Center)
                     rcLineChild.OffsetRect(0, (nLineHeight - szLineChild.cy) / 2);
-                else if (lineGravity == G_Bottom)
+                else if (itemGravity == G_Bottom)
                     rcLineChild.OffsetRect(0, nLineHeight - szLineChild.cy);
 
                 CRect rcLineChild2 = rcLineChild;
@@ -379,57 +401,59 @@ void SFlowLayout::LayoutChildren(IWindow *pParent)
     else
     {
         // Vertical flow layout
+        // ygravity: alignment of a whole column inside the parent window (top/center/bottom)
+        Gravity colAlign = m_ygravity == G_Undefined ? G_Top : m_ygravity;
+
         int nYInterval = m_yInterval.toPixelSize(pParent->GetScale());
         int nXInterval = m_xInterval.toPixelSize(pParent->GetScale());
 
         int xOffset = rcParent.left;
-        int yOffset = rcParent.top;
-        int nLineWidth = 0;
+        int nColHeight = 0; // accumulated height of current column, including the trailing interval
+        int nColWidth = 0;  // max child width in current column
 
         // Collect items for current column
         int nLineStart = 0;
 
         for (int i = 0; i < nChilds; i++)
         {
-            SWindow *pChild = (SWindow *)pChilds[i];
-            SFlowLayoutParam *pFlowLayoutParam = (SFlowLayoutParam *)pChild->GetLayoutParam();
-            int nScale = pChild->GetScale();
-            Gravity gravity = pFlowLayoutParam->gravity == G_Undefined ? m_gravity : pFlowLayoutParam->gravity;
-            if (gravity == G_Undefined)
-                gravity = G_Top;
-
             CSize szChild = pSize[i];
 
             // Check if we need to wrap to next column
-            if (yOffset != rcParent.top && yOffset + szChild.cy > rcParent.bottom)
+            if (nColHeight != 0 && rcParent.top + nColHeight + szChild.cy > rcParent.bottom)
             {
                 // Layout current column
-                nLineWidth = 0;
-                yOffset = rcParent.top;
-                for (int j = nLineStart; j < i; j++)
+                int nColH = nColHeight - nYInterval;
+                int yColStart = rcParent.top;
+                if (nColH > 0 && nColH < rcParent.Height())
                 {
-                    nLineWidth = smax(nLineWidth, pSize[j].cx);
+                    if (colAlign == G_Center)
+                        yColStart += (rcParent.Height() - nColH) / 2;
+                    else if (colAlign == G_Bottom)
+                        yColStart += rcParent.Height() - nColH;
                 }
 
                 // Apply alignment for all items in current column
-                int yPos = rcParent.top;
+                int yPos = yColStart;
                 for (int j = nLineStart; j < i; j++)
                 {
                     SWindow *pLineChild = (SWindow *)pChilds[j];
                     SFlowLayoutParam *pLineLayoutParam = (SFlowLayoutParam *)pLineChild->GetLayoutParam();
                     int nLineScale = pLineChild->GetScale();
-                    Gravity lineGravity = pLineLayoutParam->gravity == G_Undefined ? m_gravity : pLineLayoutParam->gravity;
-                    if (lineGravity == G_Undefined)
-                        lineGravity = G_Top;
+                    // Within-column horizontal alignment: layout_gravity (child) > xgravity (layout) > left
+                    Gravity itemGravity = pLineLayoutParam->gravity;
+                    if (itemGravity == G_Undefined)
+                        itemGravity = m_xgravity;
+                    if (itemGravity == G_Undefined)
+                        itemGravity = G_Left;
 
                     CSize szLineChild = pSize[j];
                     CRect rcLineChild(CPoint(xOffset, yPos), szLineChild);
 
-                    // Apply gravity
-                    if (lineGravity == G_Center)
-                        rcLineChild.OffsetRect((nLineWidth - szLineChild.cx) / 2, 0);
-                    else if (lineGravity == G_Right)
-                        rcLineChild.OffsetRect(nLineWidth - szLineChild.cx, 0);
+                    // Apply within-column horizontal alignment
+                    if (itemGravity == G_Center)
+                        rcLineChild.OffsetRect((nColWidth - szLineChild.cx) / 2, 0);
+                    else if (itemGravity == G_Right)
+                        rcLineChild.OffsetRect(nColWidth - szLineChild.cx, 0);
 
                     CRect rcLineChild2 = rcLineChild;
                     rcLineChild2.DeflateRect(pLineLayoutParam->extend_left.toPixelSize(nLineScale), pLineLayoutParam->extend_top.toPixelSize(nLineScale), pLineLayoutParam->extend_right.toPixelSize(nLineScale), pLineLayoutParam->extend_bottom.toPixelSize(nLineScale));
@@ -438,43 +462,50 @@ void SFlowLayout::LayoutChildren(IWindow *pParent)
                     yPos += szLineChild.cy + nYInterval;
                 }
 
-                xOffset += nLineWidth + nXInterval;
-                yOffset = rcParent.top;
-                nLineWidth = 0;
+                xOffset += nColWidth + nXInterval;
+                nColHeight = 0;
+                nColWidth = 0;
                 nLineStart = i;
             }
 
-            nLineWidth = smax(nLineWidth, szChild.cx);
-            yOffset += szChild.cy + nYInterval;
+            nColWidth = smax(nColWidth, szChild.cx);
+            nColHeight += szChild.cy + nYInterval;
         }
 
         // Layout last column
         if (nLineStart < nChilds)
         {
-            nLineWidth = 0;
-            for (int j = nLineStart; j < nChilds; j++)
+            int nColH = nColHeight - nYInterval;
+            int yColStart = rcParent.top;
+            if (nColH > 0 && nColH < rcParent.Height())
             {
-                nLineWidth = smax(nLineWidth, pSize[j].cx);
+                if (colAlign == G_Center)
+                    yColStart += (rcParent.Height() - nColH) / 2;
+                else if (colAlign == G_Bottom)
+                    yColStart += rcParent.Height() - nColH;
             }
 
-            int yPos = rcParent.top;
+            int yPos = yColStart;
             for (int j = nLineStart; j < nChilds; j++)
             {
                 SWindow *pLineChild = (SWindow *)pChilds[j];
                 SFlowLayoutParam *pLineLayoutParam = (SFlowLayoutParam *)pLineChild->GetLayoutParam();
                 int nLineScale = pLineChild->GetScale();
-                Gravity lineGravity = pLineLayoutParam->gravity == G_Undefined ? m_gravity : pLineLayoutParam->gravity;
-                if (lineGravity == G_Undefined)
-                    lineGravity = G_Top;
+                // Within-column horizontal alignment: layout_gravity (child) > xgravity (layout) > left
+                Gravity itemGravity = pLineLayoutParam->gravity;
+                if (itemGravity == G_Undefined)
+                    itemGravity = m_xgravity;
+                if (itemGravity == G_Undefined)
+                    itemGravity = G_Left;
 
                 CSize szLineChild = pSize[j];
                 CRect rcLineChild(CPoint(xOffset, yPos), szLineChild);
 
-                // Apply gravity
-                if (lineGravity == G_Center)
-                    rcLineChild.OffsetRect((nLineWidth - szLineChild.cx) / 2, 0);
-                else if (lineGravity == G_Right)
-                    rcLineChild.OffsetRect(nLineWidth - szLineChild.cx, 0);
+                // Apply within-column horizontal alignment
+                if (itemGravity == G_Center)
+                    rcLineChild.OffsetRect((nColWidth - szLineChild.cx) / 2, 0);
+                else if (itemGravity == G_Right)
+                    rcLineChild.OffsetRect(nColWidth - szLineChild.cx, 0);
 
                 CRect rcLineChild2 = rcLineChild;
                 rcLineChild2.DeflateRect(pLineLayoutParam->extend_left.toPixelSize(nLineScale), pLineLayoutParam->extend_top.toPixelSize(nLineScale), pLineLayoutParam->extend_right.toPixelSize(nLineScale), pLineLayoutParam->extend_bottom.toPixelSize(nLineScale));

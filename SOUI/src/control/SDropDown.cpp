@@ -108,7 +108,7 @@ void SDropDownWnd::OnLButtonDown(UINT nFlags, CPoint point)
         {
             CPoint ptTarget = point;
             ::ScreenToClient(hwndTarget, &ptTarget);
-            ::SendMessage(hwndTarget, WM_LBUTTONDOWN, nFlags, MAKELPARAM(ptTarget.x, ptTarget.y));
+            ::PostMessage(hwndTarget, WM_LBUTTONDOWN, nFlags, MAKELPARAM(ptTarget.x, ptTarget.y));
         }
     }
     else

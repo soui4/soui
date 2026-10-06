@@ -27,7 +27,7 @@
       <window size="192,-2" layout="vbox" interval="10" padding="14,12,14,12" colorBkgnd="@color/clr_card_bg">
         <!-- 标题行:糖果图标 + 标题/副标题 -->
         <window size="-2,-1" layout="hbox" interval="8">
-          <img size="30,30" skin="svg_xxl_icons" iconIndex="0" layout_gravity="center" msgTransparent="1"/>
+          <img size="30,30" skin="svg_xxl_icons" iconIndex="0" layout_gravity="center"/>
           <window size="-1,-2" layout="vbox" interval="1">
             <text text="消消乐" font="size:16,bold:1" colorText="@color/clr_title"/>
             <text text="LUA + SVG 完整版" font="size:10" colorText="@color/clr_text_sub"/>
@@ -37,20 +37,20 @@
         <!-- 功能按钮:SVG 药丸形底(3 态) + SVG 图标(3 态),重新开始=主色实底,提示=白底描边 -->
         <button name="btn_xxl_restart" size="-2,36" skin="xxl_btn_primary" gravity="center" layout="hbox" cursor="hand" on_command="xxl_on_restart" tip="重新开始一局">
           <window size="0,0" weight="1"/>
-          <img size="16,16" skin="svg_xxl_btn_restart"/>
+          <imgbtn size="16,16" skin="svg_xxl_btn_restart" msgTransparent="1"/>
           <text text="重新开始" extend_left="6" font="size:13,bold:1" colorText="#FFFFFF"/>
           <window size="0,0" weight="1"/>
         </button>
         <button name="btn_xxl_hint" size="-2,36" skin="xxl_btn_secondary" gravity="center" layout="hbox" cursor="hand" on_command="xxl_on_hint" tip="提示一步可行走法">
           <window size="0,0" weight="1" />
-          <img size="16,16" skin="svg_xxl_btn_hint" />
+          <imgbtn size="16,16" skin="svg_xxl_btn_hint"  msgTransparent="1"/>
           <text text="提 示" extend_left="6" font="size:13,bold:1" colorText="@color/clr_primary"/>
           <window size="0,0" weight="1"/>
         </button>
         <!-- 洗牌:花 5 金币把全盘棋子受约束重排(随时可用);金币不足不能洗 -->
         <button name="btn_xxl_shuffle" size="-2,36" skin="xxl_btn_secondary" gravity="center" layout="hbox" cursor="hand" on_command="xxl_on_shuffle" tip="花 5 金币重排全部棋子">
           <window size="0,0" weight="1" />
-          <img size="16,16" skin="svg_xxl_btn_hint" />
+          <imgbtn size="16,16" skin="svg_xxl_btn_shuffle"  msgTransparent="1"/>
           <text text="洗牌(5金币)" extend_left="6" font="size:13,bold:1" colorText="@color/clr_primary"/>
           <window size="0,0" weight="1"/>
         </button>

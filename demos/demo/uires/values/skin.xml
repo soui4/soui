@@ -134,8 +134,8 @@
   <imglist name="svg_tab_animator" src="svg:tab_animator" states="3"/>
   <imglist name="svg_tab_misc" src="svg:tab_misc" states="10"/>
   <!-- 动态创建窗口演示页:wnd_container 的容器标识背景(蓝色虚线框+角标) -->
-  <imglist name="svg_container_bg" src="svg:container_bg"/>
-  <!-- 跑马机下注金币(SVG 重制版,3 态:normal/hover/push) -->
+  <imglist name="svg_container_bg" src="svg:container_bg"/>
+  <!-- 跑马机下注金币(SVG 重制版,3 态:normal/hover/push) -->
   <imglist name="svg_coin" src="svg:coin" states="3"/>
   <!-- 消消乐(lua 版)元素图标:7 态雪碧图(源自 soxxl icons.png) -->
   <imglist name="skin_xxl_icons" src="imgx:xxl_icons" states="7"/>
@@ -151,4 +151,5 @@
   <imgframe name="xxl_btn_secondary" src="svg:xxl_btn_secondary" states="3" margin="20,10,20,10"/>
   <imglist name="svg_xxl_btn_restart" src="svg:xxl_btn_restart" states="3"/>
   <imglist name="svg_xxl_btn_hint" src="svg:xxl_btn_hint" states="3"/>
+  <imglist name="svg_xxl_btn_shuffle" src="svg:xxl_btn_shuffle" states="3"/>
 </skin>

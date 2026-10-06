@@ -252,9 +252,15 @@ end
   - 初始棋盘受约束随机(xxl_gen_board),绝无初始 3 连且保证有解
     (旧版裸随机开局即自动消除,白送分且棋盘缺格);
   - 连击计分:第 n 波消除得分 = len * n,新交换清零,settle 时清零显示;
-  - 洗牌为主动技能:点"洗牌"按钮花 xxl_shuffle_cost 金币全盘受约束重排
-    (xxl_on_shuffle => xxl_redeal,随时可洗);金币不足不能洗(提示不结算);
-    死局且金币不足(settle 判定解不开) => 游戏结束;
+  - 洗牌为主动技能:点"洗牌"按钮花 xxl_shuffle_cost 金币,对现有棋子做位置
+    置换(Fisher-Yates,约束重试:无初始 3 连且有解,不重新发牌);
+    每枚棋子做两段数值动画(SValueAnimator 驱动,xxl_on_shuffle => xxl_redeal,
+    随时可洗):第一段以棋子当前位置为起点、棋盘中心为圆心绕行
+    1.0~3.0 圈(随机方向),第二段从轨道终点直线飞往目标棋格;
+    棋子一落到目标格立即在目标位显示(新盘数据随置换即时提交,
+    xxl_shuffle_arrive);全部棋子归位后(xxl_shuffle_finalize)才检查消除行列;
+    洗牌全程禁用棋盘窗口防误操作(结束/中途重开时恢复);
+    金币不足不能洗(提示不结算);死局且金币不足(settle 判定解不开) => 游戏结束;
   - 提示按钮(xxl_on_hint):找一个可行交换,两枚棋子复用选中脉冲动画;
   - 金币耗尽/死局无力洗牌 => 游戏结束弹窗(SMessageBox),确定后重开。
 棋盘 id 约定: xxl_base_id + y*8 + x (x,y 从 0 开始)。
@@ -551,16 +557,229 @@ function xxl_gen_board()
 	-- 50 次仍无解(概率极低)接受最后一版,避免死循环
 end
 
--- 死局洗牌:受约束重排 + 带翻页动画重放全盘
-function xxl_redeal()
-	xxl.click_id = -1;
-	xxl_gen_board();
+-- 当前盘是否存在任意 3 连(纯数据,供洗牌候选盘约束判定)
+function xxl_board_has_match()
 	for y = 0, xxl_row-1 do
 		for x = 0, xxl_col-1 do
-			xxl_on_grid_changed({x=x,y=y}, true);
+			if xxl_match_at({x=x,y=y}) then return true end
+		end
+	end
+	return false;
+end
+
+-- 现有棋子位置置换(Fisher-Yates,不重新发牌):约束重试 50 次——
+-- 无初始 3 连且保证有解;50 次仍不满足(概率极低)接受最后一版。
+-- 返回 nb(新盘数据)与 perm(位置置换表:perm[i+1] = 第 i 个棋子
+-- (x=i%col, y=i/col) 的目标格 0 基索引)。判定期间临时换 xxl.board。
+function xxl_gen_permutation()
+	local old = xxl.board;
+	local nb = {};
+	for attempt = 1, 50 do
+		local perm = {};
+		for i = 0, xxl_row*xxl_col-1 do perm[i+1] = i; end
+		for i = #perm, 2, -1 do
+			local j = math.random(1, i);
+			perm[i], perm[j] = perm[j], perm[i];
+		end
+		for y = 0, xxl_row-1 do nb[y] = {}; end
+		for y = 0, xxl_row-1 do
+			for x = 0, xxl_col-1 do
+				local t = perm[y*xxl_col + x + 1];
+				nb[math.floor(t / xxl_col)][t % xxl_col] = old[y][x];
+			end
+		end
+		xxl.board = nb; -- 让 has_match/has_valid_move 在候选盘上判定
+		if not xxl_board_has_match() and xxl_has_valid_move() then
+			return nb, perm;
+		end
+	end
+	return nb, perm;
+end
+
+-- 洗牌动画第一段(数值动画):浮层副本以棋子当前位置为起点、棋盘中心为圆心
+-- 绕行 1.0~3.0 圈(随机方向)。不取动画器的 rect 值,只取 GetFraction 驱动圆周:
+-- rect range 恒等(from==to),角度 = ang0 + angDelta * fraction。
+-- 🚨 包装 ani 必须存进 ctx 保活(同 xxl_begin_move,GC 摘监听则回调全失)。
+-- 失败(建副本/启动失败)返回 nil,由调用方计入直接完成数。
+-- tPos/tState 随 ctx 传递:第二段飞完后由 xxl_shuffle_arrive 立即落位显示。
+function xxl_begin_shuffle_rot(aniframe, state, ele, rcFrom, rcTo, cx, cy, tPos)
+	local ani_widget = xxl_build_ani_widget(aniframe, state);
+	if ani_widget == nil then
+		xxl_slog("shuffle_rot: build ani widget failed");
+		return nil;
+	end
+	local w = rcFrom:Width(); local h = rcFrom:Height();
+	local dx = rcFrom.left + w/2 - cx;
+	local dy = rcFrom.top + h/2 - cy;
+	local turns = 1.0 + math.random()*2.0;             -- 1.0~3.0 圈(可 2.5)
+	local dir = math.random() < 0.5 and -1 or 1;       -- 随机旋转方向
+	local c = {
+		ani_widget = ani_widget,
+		cx = cx, cy = cy,
+		radius = math.sqrt(dx*dx + dy*dy),
+		ang0 = math.atan(dy, dx),
+		angDelta = dir * turns * 2 * math.pi,
+		w = w, h = h,
+		rcTo = rcTo,
+		tPos = tPos,
+		tState = state,
+		rcEnd = nil,
+	};
+	c.ani_widget:Move(CRect(rcFrom.left, rcFrom.top, rcFrom.right, rcFrom.bottom));
+	local ani = LuaValueAnimator();
+	ani:CopyFrom(xxl.ani_move:GetIValueAnimator());
+	-- 旋转时长与圈数成正比(约 400ms/圈):同速旋转,圈数多的转得更久
+	ani:GetIValueAnimator():setDuration(math.floor(turns * 400));
+	ani:SetRangeRect(rcFrom, rcFrom); -- rect 值恒定不用,仅借 fraction 驱动圆周
+	ani:SetOnUpdate("xxl_shuffle_rot_update");
+	ani:SetOnEnd("xxl_shuffle_rot_end");
+	local ctxId = xxl_new_ctx("shuf_rot", c);
+	c.ani = ani;
+	ani:SetCtx(ctxId);
+	-- 🚨 lua_tinker 的 BOOL 返回是数字,用 ==0 判(勿用 not)
+	local okStart = ani:Start(aniframe);
+	if okStart == 0 or okStart == false then
+		xxl.ani_ctx[ctxId] = nil;
+		ani_widget:Destroy();
+		return nil;
+	end
+	return ani;
+end
+
+-- 旋转跟随:按插值后的 fraction 算圆周位置,把副本挪过去;末帧位置存 rcEnd
+function xxl_shuffle_rot_update(luaAni, ctxId)
+	local c = xxl.ani_ctx[ctxId];
+	if c == nil or c.ani_widget == nil then return end
+	local a = c.ang0 + c.angDelta * luaAni:GetFraction();
+	local px = c.cx + math.cos(a) * c.radius - c.w/2;
+	local py = c.cy + math.sin(a) * c.radius - c.h/2;
+	local rc = CRect(math.floor(px), math.floor(py), math.floor(px)+c.w, math.floor(py)+c.h);
+	c.rcEnd = rc;
+	c.ani_widget:Move(rc);
+end
+
+-- 旋转结束 => 第二段:从轨道终点(副本当前所在位置)直线飞往目标棋格
+-- (SAnimatorGroup 不适合此"每枚棋子旋转完立即接力"的逐个衔接,直接链式启动)
+function xxl_shuffle_rot_end(luaAni, ctxId)
+	local c = xxl.ani_ctx[ctxId];
+	if c == nil then return end
+	xxl.ani_ctx[ctxId] = nil;
+	local rcFrom = c.rcEnd;
+	if rcFrom == nil then
+		-- 一次 update 都没来(异常)也按轨道终点=fraction 1 的位置接力
+		local a = c.ang0 + c.angDelta;
+		local px = c.cx + math.cos(a)*c.radius - c.w/2;
+		local py = c.cy + math.sin(a)*c.radius - c.h/2;
+		rcFrom = CRect(math.floor(px), math.floor(py), math.floor(px)+c.w, math.floor(py)+c.h);
+	end
+	local ani2 = LuaValueAnimator();
+	ani2:CopyFrom(xxl.ani_move:GetIValueAnimator());
+	ani2:GetIValueAnimator():setDuration(250);
+	ani2:SetRangeRect(rcFrom, c.rcTo);
+	ani2:SetOnUpdate("xxl_ani_update");
+	ani2:SetOnEnd("xxl_shuffle_move_end");
+	local ctxId2 = xxl_new_ctx("shuf_move", { ani_widget=c.ani_widget, ani=ani2, tPos=c.tPos, tState=c.tState });
+	ani2:SetCtx(ctxId2);
+	-- 🚨 lua_tinker 的 BOOL 返回是数字,用 ==0 判(勿用 not)
+	local okStart = ani2:Start(xxl.aniframe);
+	if okStart == 0 or okStart == false then
+		xxl.ani_ctx[ctxId2] = nil;
+		c.ani_widget:Destroy();
+		xxl_shuffle_arrive(c.tPos, c.tState); -- 启动失败也按到达落位,不让目标格空着
+		xxl_shuffle_piece_done();
+		return
+	end
+end
+
+-- 飞行结束:销毁副本,立即在目标格落位显示该棋子(不等全盘归位);
+-- 新盘数据已在置换确定时提交,xxl_on_grid_changed 读到的即该棋子状态
+function xxl_shuffle_move_end(luaAni, ctxId)
+	local c = xxl.ani_ctx[ctxId];
+	if c == nil then return end
+	if c.ani_widget then c.ani_widget:Destroy(); end
+	xxl.ani_ctx[ctxId] = nil;
+	xxl_shuffle_arrive(c.tPos, c.tState);
+	xxl_shuffle_piece_done();
+end
+
+-- 棋子落位:恢复目标格可见并翻页显示(置换单射 => 每格恰好被落位一次)
+function xxl_shuffle_arrive(tPos, tState)
+	if tPos == nil then return end
+	local ele = xxl.wndBoard:FindChildByID(xxl_pos2id(tPos),-1);
+	if ele == nil then return end
+	ele:SetVisible(true,true); -- 恢复可见必须补失效(动画期间无副本覆盖此格)
+	xxl_on_grid_changed(tPos, false);
+end
+
+function xxl_shuffle_piece_done()
+	if xxl.shuffle_pending == nil then return end
+	xxl.shuffle_pending = xxl.shuffle_pending - 1;
+	if xxl.shuffle_pending <= 0 then
+		xxl.shuffle_pending = nil;
+		xxl_shuffle_finalize();
+	end
+end
+
+-- 全部棋子归位:逐格兜底恢复可见/显示(正常路径已被逐个到达落位接管,
+-- 只补动画失败棋子的目标格),ani_count 归零后再检查可消除行列
+function xxl_shuffle_finalize()
+	local nb = xxl.shuffle_newboard;
+	xxl.shuffle_newboard = nil;
+	if nb == nil then return end
+	xxl.ani_count = xxl.ani_count - 1;
+	if xxl.ani_count < 0 then xxl.ani_count = 0 end
+	xxl.wndBoard:EnableWindow(1, 1); -- 洗牌结束恢复棋盘交互
+	for y = 0, xxl_row-1 do
+		for x = 0, xxl_col-1 do
+			local ele = xxl.wndBoard:FindChildByID(xxl_pos2id({x=x,y=y}),-1);
+			if ele then
+				ele:SetVisible(true,true); -- 恢复可见必须补失效(动画期间无副本覆盖)
+				xxl_on_grid_changed({x=x,y=y}, false);
+			end
 		end
 	end
 	xxl_check_board();
+end
+
+-- 死局洗牌:现有棋子位置置换 + 全盘两段式洗牌动画,全部归位后才检查消除
+function xxl_redeal()
+	xxl.click_id = -1;
+	local oldBoard = xxl.board;
+	local nb, perm = xxl_gen_permutation();
+	-- 新盘数据随置换即时提交(数据先行):飞行期间被 ani_count 门禁无读取方,
+	-- 棋子到达时 xxl_on_grid_changed(tPos) 读到的即该棋子状态,可立即落位显示
+	xxl.shuffle_newboard = nb;
+	-- 棋盘中心(宿主坐标系:GetWindowRect2 全树共享宿主坐标,直接可用)
+	local rcBoard = xxl.wndBoard:GetWindowRect2();
+	local cx = rcBoard.left + rcBoard:Width()/2;
+	local cy = rcBoard.top + rcBoard:Height()/2;
+	xxl.ani_count = xxl.ani_count + 1; -- 整个洗牌链算一条动画链,期间禁止点击
+	-- 洗牌期间禁用棋盘防误操作:点击经 hover 链路派发,IsDisabled(TRUE) 查父链,
+	-- 禁用棋盘窗口即可挡掉全部格子交互(浮层副本是兄弟窗口,不受影响);
+	-- 恢复入口:xxl_shuffle_finalize(正常)与 xxl_init_board(中途重开兜底)
+	xxl.wndBoard:EnableWindow(0, 1);
+	local total = 0; local nFail = 0;
+	for y = 0, xxl_row-1 do
+		for x = 0, xxl_col-1 do
+			local ele = xxl.wndBoard:FindChildByID(xxl_pos2id({x=x,y=y}),-1);
+			if ele == nil then
+				nFail = nFail + 1; -- 缺格:无动画可播,finalize 时一并恢复
+			else
+				total = total + 1;
+				ele:SetVisible(false,false);
+				local tIdx = perm[y*xxl_col + x + 1]; -- 该棋子的目标格
+				local tPos = { x = tIdx % xxl_col, y = math.floor(tIdx / xxl_col) };
+				local rcTo = xxl_get_ele_rect(tPos);
+				local ani = xxl_begin_shuffle_rot(xxl.aniframe, oldBoard[y][x], ele, ele:GetWindowRect2(), rcTo, cx, cy, tPos);
+				if ani == nil then nFail = nFail + 1 end
+			end
+		end
+	end
+	xxl.shuffle_pending = total - nFail;
+	if xxl.shuffle_pending <= 0 then
+		xxl.shuffle_pending = nil;
+		xxl_shuffle_finalize();
+	end
 end
 
 -- 提示:找一个可行交换,两枚棋子做选中脉冲动画(复用选中动画,点击即被替换)
@@ -798,7 +1017,7 @@ function xxl_pop_fx(rc, boost, szSkin, szAnim, fScale)
 	end
 	xxl.fx_seq = xxl.fx_seq + 1;
 	local fid = xxl_fx_base_id + xxl.fx_seq;
-	-- fScale:显式缩放(如洗牌特效铺满棋盘传 1.05);缺省 1.5,boost 再 +0.5
+	-- fScale:显式缩放(可选);缺省 1.5,boost 再 +0.5
 	local scale = fScale or (1.5 + (boost and 0.5 or 0));
 	local w = math.floor(rc:Width()*scale); local h = math.floor(rc:Height()*scale);
 	local px = rc.left + math.floor(rc:Width()/2);
@@ -1054,6 +1273,8 @@ function xxl_init_board()
 	xxl.ani_ctx = {};
 	xxl.ani_list = {};
 	xxl.ani_count = 0;
+	-- 洗牌中途重开的兜底:洗牌禁用了棋盘而 finalize 不会再来,这里必须恢复交互
+	xxl.wndBoard:EnableWindow(1, 1);
 	xxl.wndBoard:DestroyAllChildren();
 	-- 浮层只承载动态创建的副本/特效窗口(见 page_script.xml),一并清空:
 	-- restart 时可能有副本正在飞行,其 ani_end 因 ctx 被抹掉而 no-op,不清掉
@@ -1201,13 +1422,6 @@ function xxl_on_shuffle(args)
 		if txt then txt:SetWindowText(T("金币不足,不能洗牌!")); end
 		return 1;
 	end
-	-- 按钮上的青色冰环(与提示按钮一致)
-	local btn = xxl.root:FindChildByNameA("btn_xxl_shuffle",-1);
-	if btn then
-		xxl_pop_fx(btn:GetWindowRect2(), false, "skin_xxl_fx2", "anim:xxl_fx_ring");
-	end
-	-- 洗牌特效:金色星芒铺满整个棋盘(1.05 倍防露边)
-	xxl_pop_fx(xxl.wndBoard:GetWindowRect2(), false, nil, nil, 1.05);
 	xxl.coin = xxl.coin - xxl_shuffle_cost;
 	xxl_show_coin();
 	xxl_slog("shuffle: pay " .. xxl_shuffle_cost .. " coin, left=" .. xxl.coin);

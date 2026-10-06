@@ -1,4 +1,4 @@
-﻿//stamp:3611133e71ebf95f
+﻿//stamp:3611475a6f122b16
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -240,6 +240,7 @@
 			const TCHAR * xxl_btn_secondary;
 			const TCHAR * xxl_btn_restart;
 			const TCHAR * xxl_btn_hint;
+			const TCHAR * xxl_btn_shuffle;
 			const TCHAR * coin;
 			}svg;
 		struct _xml{
@@ -484,6 +485,7 @@ struct _UIRES UIRES={
 			_T("svg:xxl_btn_secondary"),
 			_T("svg:xxl_btn_restart"),
 			_T("svg:xxl_btn_hint"),
+			_T("svg:xxl_btn_shuffle"),
 			_T("svg:coin"),
 		},
 		{
