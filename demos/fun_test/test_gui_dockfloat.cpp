@@ -24,6 +24,11 @@ void PumpMessages()
 }
 } // namespace
 
+void expectFindable(SHostWnd &host, SWindow * pDockLeft) {
+	EXPECT_EQ(host.FindChildByName(L"dock_left"), pDockLeft);
+	EXPECT_EQ(host.FindChildByID(2001), pDockLeft);
+};
+
 // GUI test: create a real host window with a frame layout holding a dock
 // bar, then float the dock bar into its own host window and dock it back.
 // Keep the suite named window so the default non-interactive fun_test
@@ -63,47 +68,40 @@ TEST(window, gui_dockfloat_float_and_dock_roundtrip)
     SFrameLayout *pFrameLayout = sobj_cast<SFrameLayout>(pRoot->GetLayout());
     ASSERT_TRUE(pFrameLayout);
 
-    // The dock bar stays discoverable from the host window whether it is docked
-    // or floating (detached children are still searched by the finders).
-    auto expectFindable = [&]() {
-        EXPECT_EQ(host.FindChildByName(L"dock_left"), (SWindow *)pDockLeft);
-        EXPECT_EQ(host.FindChildByID(2001), (SWindow *)pDockLeft);
-    };
-
     // Initial state: docked inside the frame layout.
     EXPECT_FALSE(pDockLeft->IsFloating());
     EXPECT_FALSE(pFrameLayout->IsChildFloating(pDockLeft));
-    expectFindable();
+    expectFindable(host,pDockLeft);
 
     // Round 1: float/dock through the frame layout convenience methods.
     ASSERT_TRUE(pFrameLayout->FloatChild(pDockLeft, CPoint(300, 200)));
     EXPECT_TRUE(pDockLeft->IsFloating());
     EXPECT_TRUE(pFrameLayout->IsChildFloating(pDockLeft));
     EXPECT_NE(pDockLeft->GetParent(), pDockParent);
-    expectFindable();
+    expectFindable(host,pDockLeft);
 
     pFrameLayout->DockChild(pDockLeft);
     EXPECT_FALSE(pDockLeft->IsFloating());
     EXPECT_FALSE(pFrameLayout->IsChildFloating(pDockLeft));
     EXPECT_EQ(pDockLeft->GetParent(), pDockParent);
-    expectFindable();
+    expectFindable(host,pDockLeft);
 
     // Round 2: float/dock through the dock bar API directly.
     ASSERT_TRUE(pDockLeft->Float(CPoint(300, 200)));
     EXPECT_TRUE(pDockLeft->IsFloating());
     EXPECT_NE(pDockLeft->GetParent(), pDockParent);
-    expectFindable();
+    expectFindable(host,pDockLeft);
 
     pDockLeft->Dock();
     EXPECT_FALSE(pDockLeft->IsFloating());
     EXPECT_EQ(pDockLeft->GetParent(), pDockParent);
-    expectFindable();
+    expectFindable(host,pDockLeft);
 
     // Round 3: while floating, the close button hides the dock bar (keeping
     // the float state); re-showing it stays floating.
     ASSERT_TRUE(pDockLeft->Float(CPoint(300, 200)));
     EXPECT_TRUE(pDockLeft->IsFloating());
-    expectFindable();
+    expectFindable(host,pDockLeft);
 
     pDockLeft->SetVisible(FALSE, TRUE);
     EXPECT_FALSE(pDockLeft->IsVisible(FALSE));
@@ -116,7 +114,7 @@ TEST(window, gui_dockfloat_float_and_dock_roundtrip)
     // Clean up: dock it back so the float host is destroyed via WM_CLOSE.
     pDockLeft->Dock();
     EXPECT_FALSE(pDockLeft->IsFloating());
-    expectFindable();
+    expectFindable(host,pDockLeft);
 
     // Let the posted WM_CLOSE destroy the float host window objects.
     PumpMessages();
