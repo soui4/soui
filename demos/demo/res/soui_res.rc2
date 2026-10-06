@@ -1,4 +1,4 @@
-//stamp:01dd55715d7bc423
+//stamp:01dd5593348e86de
 /*<------------------------------------------------------------------------------------------------->*/
 #define DEFINE_UIRES(name, type, file_path)\
     name type file_path
@@ -160,6 +160,7 @@ DEFINE_UIRES(alpha_in,	anim,	"uires/anim/alpha_in.xml")
 DEFINE_UIRES(alpha_out,	anim,	"uires/anim/alpha_out.xml")
 DEFINE_UIRES(xxl_scale_select,	anim,	"uires/anim/xxl_scale_select.xml")
 DEFINE_UIRES(xxl_fx_pop,	anim,	"uires/anim/xxl_fx_pop.xml")
+DEFINE_UIRES(xxl_fx_pop_fly,	anim,	"uires/anim/xxl_fx_pop_fly.xml")
 DEFINE_UIRES(xxl_fx_ring,	anim,	"uires/anim/xxl_fx_ring.xml")
 DEFINE_UIRES(alphaAni,	valueAni,	"uires/valueAni/alpha.xml")
 DEFINE_UIRES(colorAni,	valueAni,	"uires/valueAni/color.xml")

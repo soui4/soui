@@ -197,6 +197,7 @@
     <file name="alpha_out" path="anim\alpha_out.xml"/>
     <file name="xxl_scale_select" path="anim\xxl_scale_select.xml"/>
     <file name="xxl_fx_pop" path="anim\xxl_fx_pop.xml"/>
+    <file name="xxl_fx_pop_fly" path="anim\xxl_fx_pop_fly.xml"/>
     <file name="xxl_fx_ring" path="anim\xxl_fx_ring.xml"/>
   </anim>
   <valueAni>

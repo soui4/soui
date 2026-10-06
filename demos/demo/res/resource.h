@@ -1,4 +1,4 @@
-﻿//stamp:3611475a6f122b16
+﻿//stamp:3611493eebb4f355
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -201,6 +201,7 @@
 			const TCHAR * alpha_out;
 			const TCHAR * xxl_scale_select;
 			const TCHAR * xxl_fx_pop;
+			const TCHAR * xxl_fx_pop_fly;
 			const TCHAR * xxl_fx_ring;
 			}anim;
 		struct _valueAni{
@@ -446,6 +447,7 @@ struct _UIRES UIRES={
 			_T("anim:alpha_out"),
 			_T("anim:xxl_scale_select"),
 			_T("anim:xxl_fx_pop"),
+			_T("anim:xxl_fx_pop_fly"),
 			_T("anim:xxl_fx_ring"),
 		},
 		{

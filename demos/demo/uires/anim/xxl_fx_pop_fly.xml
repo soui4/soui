@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 消除爆发特效(金币入账链专用,起手与 xxl_fx_pop 同款):
+     pop in 0.2 -> 1.15 (260ms), settle 1.15 -> 1.0 (140ms),
+     短停留 200ms(alpha no-op 占位撑时长)后即触发 on_animation_stop
+     转入抛物线飞行;无收缩段(飞行段自身把窗口缩到 22x22 落进金币区) -->
+<set fillAfter="true" shareInterpolator="false">
+    <scale duration="260" startOffset="0" fromXScale="0.2" toXScale="1.15" fromYScale="0.2" toYScale="1.15" pivotX="50%" pivotY="50%" interpolator="Decelerate"/>
+    <scale duration="140" startOffset="260" fromXScale="1.15" toXScale="1.0" fromYScale="1.15" toYScale="1.0" pivotX="50%" pivotY="50%" interpolator="Decelerate" fillAfter="true"/>
+    <alpha duration="200" startOffset="400" fromAlpha="1.0" toAlpha="1.0"/>
+</set>

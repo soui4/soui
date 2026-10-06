@@ -252,6 +252,15 @@ end
   - 初始棋盘受约束随机(xxl_gen_board),绝无初始 3 连且保证有解
     (旧版裸随机开局即自动消除,白送分且棋盘缺格);
   - 连击计分:第 n 波消除得分 = len * n,新交换清零,settle 时清零显示;
+    连击 x2 起在连击文本位播同款金星芒(字号已放大到 26);
+  - 金币入账链(三段顺序,xxl_coin_fx 入口):① 消除星芒(特效窗口播 anim,
+    on_animation_stop 驱动转段) => ② 数值动画把【这个特效窗口本身】直线移到
+    金币数字区(SetRangeRect 插值,终点缩 22x22,xxl_coin_fly_begin) =>
+    ③ LED 滚动计数到新值(xxl_coin_count_begin);金币数据在 ① 起点(clear_end)
+    即 +1,仅显示层延迟;每段独立计数单位,段尾先开下一段再释放本段,
+    ani_count 归零(全局动画收尾)统一补跑 xxl_on_settle;
+  - 动画浮层 wnd_xxl_aniframe 扩为整页 float 覆盖层(page_script.xml,
+    盖住棋盘 + 左侧功能按钮/计分区;原 stack 会裁剪子窗口,不能放里面);
   - 洗牌为主动技能:点"洗牌"按钮花 xxl_shuffle_cost 金币,对现有棋子做位置
     置换(Fisher-Yates,约束重试:无初始 3 连且有解,不重新发牌);
     每枚棋子做两段数值动画(SValueAnimator 驱动,xxl_on_shuffle => xxl_redeal,
@@ -275,6 +284,7 @@ xxl = {
 	board = {};      -- board[y][x] = icon state(0..6)
 	click_id = -1;
 	coin = 20; score = 0;
+	coin_shown = 20; -- 金币 LED 当前显示值(滚动计数期间落后于 coin,落地/支付即同步)
 	combo = 0;       -- 连击数(第 n 波消除得分 x n,settle 清零)
 	gameover = false;-- 金币耗尽弹窗只出一次
 	ani_list = {};   -- ctxId -> 动画组(js ani_list;按 ctxId 索引,勿用对象身份比较)
@@ -332,10 +342,12 @@ function xxl_show_score()
 end
 
 function xxl_show_coin()
+	xxl.coin_shown = xxl.coin; -- 即时路径(支付/重开)直接对齐显示值
 	xxl_set_digits("digit_coin", xxl.coin % 1000);
 end
 
--- 连击提示文本(第 n 波消除 n>=2 才显示)
+-- 连击提示文本(第 n 波消除 n>=2 才显示;字号已放大,不播特效——
+-- 每波消除中心已有星芒,连击位再播会重复且遮挡金币区)
 function xxl_show_combo()
 	if xxl.root == nil then return end
 	local txt = xxl.root:FindChildByNameA("txt_xxl_combo",-1);
@@ -346,6 +358,178 @@ function xxl_show_combo()
 			txt:SetWindowText(T(""));
 		end
 	end
+end
+
+-- ============ 金币入账链:① 消除星芒 → ② 数值动画移动特效窗口 → ③ LED 滚动计分 ============
+-- 三段顺序执行,每段一个计数单位;段尾先启动下一段(其 +1)再释放本段(-1),
+-- ani_count 不中途归零 => settle 链不会被打断;真正归零(全局动画收尾)时补跑 settle。
+-- 金币数据在 ① 起点(clear_end)即 +1,③ 才滚动显示(显示层延迟,数据层即时)。
+
+-- 金币数字区中心(宿主坐标系;取中间那颗 LED 的矩形)
+function xxl_get_coin_rect()
+	local ele = xxl.root:FindChildByNameA("digit_coin_1",-1);
+	if ele == nil then return nil end
+	return ele:GetWindowRect2();
+end
+
+-- 计数单位 -1;归零 => 全部动画结束,补跑稳定态收尾(settle 自带门禁,可安全多发)
+function xxl_ani_count_dec()
+	xxl.ani_count = xxl.ani_count - 1;
+	if xxl.ani_count < 0 then xxl.ani_count = 0 end
+	xxl_slog("coin: dec -> ani_count=" .. xxl.ani_count);
+	if xxl.ani_count == 0 then
+		xxl_slog("coin: chain all done, run settle");
+		xxl_on_settle();
+	end
+end
+
+-- ① 特效段:消除中心播星芒(短停留版 anim:xxl_fx_pop_fly,600ms,
+-- 播完经 on_animation_stop 转入飞行段;装饰特效仍用长停留版 xxl_fx_pop)
+function xxl_coin_fx(rc, boost)
+	local fx = xxl_pop_fx(rc, boost, nil, "anim:xxl_fx_pop_fly", nil, "xxl_fx_fly_start");
+	if fx == nil then
+		xxl_slog("coin: [1]fx create FAILED, fallback count");
+		xxl_coin_count_begin(); -- 特效起不来:跳过动画直接计分(计数段自带单位)
+		return
+	end
+	xxl.ani_count = xxl.ani_count + 1;
+	xxl_slog("coin: [1]fx #" .. xxl.fx_seq .. " boost=" .. tostring(boost) .. " ani_count=" .. xxl.ani_count);
+end
+
+-- ①→② 特效动画播完(EventSwndAnimationStop,Sender=特效窗口):
+-- 不销毁,用数值动画把这个特效窗口本身直线移到金币数字区。
+function xxl_fx_fly_start(args)
+	local fx = toSWindow(args:Sender());
+	if fx == nil then
+		xxl_slog("coin: [1->2]stop event sender nil, fallback count");
+		xxl_coin_count_begin();
+		xxl_ani_count_dec();
+		return
+	end
+	xxl_slog("coin: [1->2]fx anim stop -> fly");
+	local started = xxl_coin_fly_begin(fx);
+	if not started then
+		fx:Destroy();
+		xxl_slog("coin: [2]fly begin FAILED, fallback count");
+		xxl_coin_count_begin(); -- 飞行没接上:兜底计分(计数段自带单位)
+	end
+	xxl_ani_count_dec(); -- 释放特效段(下一段已 +1,不会中断 settle 链)
+end
+
+-- ② 飞行段:特效窗口从当前位置沿抛物线飞到金币数字区中心(终点缩为 22x22):
+-- x 线性插值,y 在线性插值上叠加向上弓起的抛物线偏移 arc*4t(1-t)(中点最高),
+-- 宽高同步插值 => 起飞是全尺寸星芒,落地缩成小金币大小。
+-- xxl_move 模板无插值器 => GetFraction 即线性进度 t,轨迹形状精确可控。
+function xxl_coin_fly_begin(fx)
+	local rcTo = xxl_get_coin_rect();
+	if rcTo == nil then
+		xxl_slog("coin: [2]coin rect nil (digit_coin_1 not found)");
+		return false
+	end
+	local rc1 = fx:GetWindowRect2();
+	local cx = rcTo.left + rcTo:Width()/2;
+	local cy = rcTo.top + rcTo:Height()/2;
+	local rc2 = CRect(math.floor(cx-11), math.floor(cy-11), math.floor(cx-11)+22, math.floor(cy-11)+22);
+	-- 弓高:与飞行距离成比例(35%),限制在 60~150px,方向向上
+	local cx1 = rc1.left + rc1:Width()/2;
+	local cy1 = rc1.top + rc1:Height()/2;
+	local dist = math.sqrt((cx-cx1)^2 + (cy-cy1)^2);
+	local arc = math.max(60, math.min(150, dist * 0.35));
+	local ani = LuaValueAnimator();
+	ani:CopyFrom(xxl.ani_move:GetIValueAnimator());
+	ani:GetIValueAnimator():setDuration(400);
+	ani:SetRangeRect(rc1, rc2); -- 线性基准(实际位置在 update 里叠加抛物线偏移)
+	ani:SetOnUpdate("xxl_fly_update");
+	ani:SetOnEnd("xxl_fly_end");
+	local ctxId = xxl_new_ctx("coin_fly", { ani_widget=fx, ani=ani, r1=rc1, r2=rc2, arc=arc });
+	ani:SetCtx(ctxId);
+	xxl.ani_count = xxl.ani_count + 1;
+	-- 🚨 lua_tinker 的 BOOL 返回是数字,用 ==0 判(勿用 not)
+	local ok = ani:Start(xxl.aniframe);
+	xxl_slog("coin: [2]fly start=" .. tostring(ok) .. " ani_count=" .. xxl.ani_count);
+	if ok == 0 or ok == false then
+		xxl.ani_ctx[ctxId] = nil;
+		xxl.ani_count = xxl.ani_count - 1;
+		if xxl.ani_count < 0 then xxl.ani_count = 0 end
+		return false
+	end
+	return true
+end
+
+-- 飞行跟随:抛物线轨迹——x/宽/高线性插值,y 在线性插值上叠加向上弓起
+-- 的偏移 arc*4t(1-t)(t=0/1 时为 0,中点最高,起终点精确落在两格中心)
+function xxl_fly_update(luaAni, ctxId)
+	local c = xxl.ani_ctx[ctxId];
+	if c == nil or c.ani_widget == nil then return end
+	local t = luaAni:GetFraction();
+	local w = c.r1:Width() + (c.r2:Width() - c.r1:Width()) * t;
+	local h = c.r1:Height() + (c.r2:Height() - c.r1:Height()) * t;
+	local x = c.r1.left + (c.r2.left - c.r1.left) * t;
+	local y = c.r1.top + (c.r2.top - c.r1.top) * t - c.arc * 4 * t * (1 - t);
+	local l = math.floor(x);
+	local tp = math.floor(y);
+	c.ani_widget:Move(CRect(l, tp, l + math.floor(w), tp + math.floor(h)));
+end
+
+-- ②→③ 飞行落地:销毁特效窗口,先开计数段(+1)再释放飞行段(-1)
+function xxl_fly_end(luaAni, ctxId)
+	local c = xxl.ani_ctx[ctxId];
+	if c == nil then
+		xxl_slog("coin: [2]fly end but ctx gone (anomaly)");
+		return
+	end
+	if c.ani_widget then c.ani_widget:Destroy(); end
+	xxl.ani_ctx[ctxId] = nil;
+	xxl_slog("coin: [2]fly landed");
+	xxl_coin_count_begin();
+	xxl_ani_count_dec();
+end
+
+-- ③ 计数段:LED 从显示值滚到数据值;无需滚动时不占计数单位(调用方释放自己那段)
+function xxl_coin_count_begin()
+	if xxl.coin_shown == nil then xxl.coin_shown = xxl.coin end
+	if xxl.coin_shown == xxl.coin then
+		xxl_slog("coin: [3]count skipped (shown=" .. xxl.coin_shown .. " == coin)");
+		return
+	end
+	local ani = LuaValueAnimator();
+	ani:CopyFrom(xxl.ani_move:GetIValueAnimator());
+	ani:GetIValueAnimator():setDuration(400);
+	ani:SetRangeRect(CRect(0,0,1,1), CRect(0,0,1,1)); -- rect 恒等,仅取 fraction 驱动
+	ani:SetOnUpdate("xxl_coin_count_update");
+	ani:SetOnEnd("xxl_coin_count_end");
+	local ctxId = xxl_new_ctx("coin_count", { ani=ani, from=xxl.coin_shown, to=xxl.coin });
+	ani:SetCtx(ctxId);
+	xxl.ani_count = xxl.ani_count + 1;
+	-- 🚨 lua_tinker 的 BOOL 返回是数字,用 ==0 判(勿用 not)
+	local ok = ani:Start(xxl.aniframe);
+	xxl_slog("coin: [3]count begin " .. xxl.coin_shown .. "->" .. xxl.coin .. " start=" .. tostring(ok) .. " ani_count=" .. xxl.ani_count);
+	if ok == 0 or ok == false then
+		xxl.ani_ctx[ctxId] = nil;
+		xxl.ani_count = xxl.ani_count - 1;
+		if xxl.ani_count < 0 then xxl.ani_count = 0 end
+	end
+end
+
+-- 计数跟随:按插值 fraction 在 [from,to] 间取整滚动 LED
+function xxl_coin_count_update(luaAni, ctxId)
+	local c = xxl.ani_ctx[ctxId];
+	if c == nil then return end
+	local v = math.floor(c.from + (c.to - c.from) * luaAni:GetFraction() + 0.5);
+	if v ~= xxl.coin_shown then
+		xxl.coin_shown = v;
+		xxl_set_digits("digit_coin", xxl.coin_shown % 1000);
+	end
+end
+
+-- 计数结束:显示值对齐真实数据,释放计数段;归零 => 整局动画收尾补跑 settle
+function xxl_coin_count_end(luaAni, ctxId)
+	local c = xxl.ani_ctx[ctxId];
+	if c == nil then return end
+	xxl.ani_ctx[ctxId] = nil;
+	xxl.coin_shown = xxl.coin; -- 终值对齐(多波叠加/中途重开都以数据为准)
+	xxl_set_digits("digit_coin", xxl.coin_shown % 1000);
+	xxl_ani_count_dec();
 end
 
 -- js onGridChanged
@@ -929,8 +1113,10 @@ end
 -- js onAnimatorGroupEnd2: 消除动画结束,启动上方元素下落(每列被清格子上方的格子各落一格)
 function xxl_on_clear_end(g)
 	local samex = g.samex;
-	-- 消除瞬间爆发特效:>=3 连全显示,len>=4 特效放大
-	xxl_pop_fx(xxl_get_ele_rect({x=samex.x + math.floor((samex.len-1)/2), y=samex.y}), samex.len >= 4);
+	-- 金币入账链 ① 特效段:消除瞬间在消除中心播星芒,播完飞金币区再滚动计数
+	-- (数据层在此即时 +1;显示层等 ③ 计数段才滚)
+	xxl.coin = xxl.coin + 1;
+	xxl_coin_fx(xxl_get_ele_rect({x=samex.x + math.floor((samex.len-1)/2), y=samex.y}), samex.len >= 4);
 	if samex.y > 0 then
 		local ctxId = xxl_new_ctx("drop", { samex=samex });
 		local group = LuaAnimatorGroup();
@@ -967,10 +1153,9 @@ function xxl_on_clear_end(g)
 end
 
 -- js onAnimatorGroupEnd3: 下沉结束,计分(连击倍乘)并补位
+-- (金币已在 clear_end 的入账链 ① 里 +1,这里只管得分与补位)
 function xxl_on_drop_end(g)
 	local samex = g.samex;
-	xxl.coin = xxl.coin + 1;
-	xxl_show_coin();
 	xxl.score = xxl.score + samex.len * xxl.combo;
 	xxl_show_score();
 	xxl_free_same_x(samex.y, samex.x, samex.len);
@@ -995,17 +1180,21 @@ end
 -- 在 rc 中心播放一次特效;boost=true 时放大(大消除)。
 -- szSkin/szAnim 可指定不同外观与动画:重开按钮=金星芒(skin_xxl_fx/anim:xxl_fx_pop),
 -- 提示按钮=青色冰环(skin_xxl_fx2/anim:xxl_fx_ring);缺省即游戏内消除用的金星芒。
+-- szStopFun:动画播完(on_animation_stop)回调,缺省 xxw_fx_stop=自毁;
+-- 金币入账链传 xxl_fx_fly_start(特效播完转飞行段,见 xxl_coin_fx)。
+-- 返回特效窗口(失败返回 nil),供调用方接管。
 -- 坐标模型:SOUI4 全树共享宿主窗口坐标系(Swnd.cpp DispatchPaint 无逐级平移,
 -- GetWindowRect2 一律相对宿主)——格子/按钮的 rect 直接可用,无需任何换算。
 -- 定位用显式 Move(浮动模式,立即生效):pos 属性要等下一次 relayout 才生效,
 -- 上一版靠 pos 定位导致特效时有时无/错位。
-function xxl_pop_fx(rc, boost, szSkin, szAnim, fScale)
+function xxl_pop_fx(rc, boost, szSkin, szAnim, fScale, szStopFun)
 	if xxl.aniframe == nil then
 		xxl_slog("pop_fx SKIP: aniframe nil");
-		return
+		return nil
 	end
 	local skin = szSkin or "skin_xxl_fx";
 	local key = szAnim or "anim:xxl_fx_pop";
+	local stopFun = szStopFun or "xxw_fx_stop";
 	local aniCache = xxl.fx_ani[key];
 	if aniCache == nil then
 		aniCache = GetApp():LoadAnimation(key);
@@ -1023,7 +1212,7 @@ function xxl_pop_fx(rc, boost, szSkin, szAnim, fScale)
 	local px = rc.left + math.floor(rc:Width()/2);
 	local py = rc.top + math.floor(rc:Height()/2);
 	local xml = '<img id="' .. fid .. '" skin="' .. skin .. '"'
-		.. ' msgTransparent="1" visible="0" on_animation_stop="xxw_fx_stop"/>';
+		.. ' msgTransparent="1" visible="0" on_animation_stop="' .. stopFun .. '"/>';
 	xxl.aniframe:CreateChildrenFromXml(xml);
 	local fx = xxl.aniframe:FindChildByID(fid,-1);
 	if fx == nil then
@@ -1038,7 +1227,7 @@ function xxl_pop_fx(rc, boost, szSkin, szAnim, fScale)
 	ani:Release();
 	-- 显示必须在 SetAnimation 之后:替换运行中动画可能触发旧动画 stop 事件
 	fx:SetVisible(true,true);
-	xxl_slog("pop_fx: #" .. xxl.fx_seq .. " " .. skin .. " @" .. (px - math.floor(w/2)) .. "," .. (py - math.floor(h/2)) .. " " .. w .. "x" .. h);
+	return fx;
 end
 
 -- js onGetSameX: 横向 3 连聚拢到中心
@@ -1116,8 +1305,9 @@ end
 -- js onAnimatorGroupEndY2: 纵向消除结束,上方格子整体下移 len 格
 function xxl_on_clear_end_y(g)
 	local samey = g.samey;
-	-- 消除瞬间爆发特效(横向/纵向同款,len>=4 放大)
-	xxl_pop_fx(xxl_get_ele_rect({x=samey.x, y=samey.y + math.floor((samey.len-1)/2)}), samey.len >= 4);
+	-- 金币入账链 ① 特效段(横向/纵向同款,len>=4 放大)
+	xxl.coin = xxl.coin + 1;
+	xxl_coin_fx(xxl_get_ele_rect({x=samey.x, y=samey.y + math.floor((samey.len-1)/2)}), samey.len >= 4);
 	if samey.y > 0 then
 		local ctxId = xxl_new_ctx("drop_y", { samey=samey });
 		local group = LuaAnimatorGroup();
@@ -1151,10 +1341,9 @@ function xxl_on_clear_end_y(g)
 end
 
 -- js onAnimatorGroupEndY3: 下沉结束,计分(连击倍乘)并补位
+-- (金币已在 clear_end_y 的入账链 ① 里 +1,这里只管得分与补位)
 function xxl_on_drop_end_y(g)
 	local samey = g.samey;
-	xxl.coin = xxl.coin + 1;
-	xxl_show_coin();
 	xxl.score = xxl.score + samey.len * xxl.combo;
 	xxl_show_score();
 	xxl_free_same_y(samey.x, samey.y, samey.len);
