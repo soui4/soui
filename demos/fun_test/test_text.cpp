@@ -118,7 +118,7 @@ static std::vector<int> ExtentExPointA(HDC hdc, const char *text, int len,
     std::vector<int> dx(len > 0 ? len : 1, -12345);
     SIZE sz = {0, 0};
     int nFit = -1;
-    EXPECT_TRUE(GetTextExtentExPointA(hdc, text, len, nMaxExtent, &nFit, dx.data(), &sz));
+    EXPECT_TRUE(GetTextExtentExPointA(hdc, text, len, nMaxExtent, &nFit, &dx[0], &sz));
     if (fit)
         *fit = nFit;
     return dx;
@@ -131,7 +131,7 @@ static std::vector<int> ExtentExPointW(HDC hdc, const wchar_t *text, int len,
     std::vector<int> dx(len > 0 ? len : 1, -12345);
     SIZE sz = {0, 0};
     int nFit = -1;
-    EXPECT_TRUE(GetTextExtentExPointW(hdc, text, len, nMaxExtent, &nFit, dx.data(), &sz));
+    EXPECT_TRUE(GetTextExtentExPointW(hdc, text, len, nMaxExtent, &nFit, &dx[0], &sz));
     if (fit)
         *fit = nFit;
     return dx;
@@ -181,8 +181,9 @@ TEST_F(TextTest, extent_ex_point_w_ascii_all_non_negative)
 // catches an under-filled lpnDx).
 TEST_F(TextTest, extent_ex_point_a_multibyte_all_non_negative)
 {
-    const char *text = u8"中文测试abc";
-    int len = (int)strlen(text);
+    const wchar_t *wtext = L"中文测试abc";
+	char text[100];
+	int len = WideCharToMultiByte(CP_UTF8,0,wtext,-1,text,100,NULL,NULL);
     std::vector<int> dx = ExtentExPointA(hdc, text, len, INT_MAX);
     ExpectNonNegativeMonotonic(dx, len);
     // the helper seeds the buffer with a sentinel: a populated array can no
@@ -231,8 +232,9 @@ TEST_F(TextTest, extent_ex_point_accumulation_no_drift)
 // a longer run and against the whole-line measurement.
 TEST_F(TextTest, extent_ex_point_cjk_no_drift)
 {
-    const char *text = u8"这是一段用来测试逐字宽度累加精度的中文文本";
-    int len = (int)strlen(text);
+	const wchar_t *wtext = L"这是一段用来测试逐字宽度累加精度的中文文本";
+	char text[100];
+	int len = WideCharToMultiByte(CP_ACP,0,wtext,-1,text,100,NULL,NULL);
     std::vector<int> dx = ExtentExPointA(hdc, text, len, INT_MAX);
     ExpectNonNegativeMonotonic(dx, len);
 
@@ -301,7 +303,7 @@ TEST_F(TextTest, extent_ex_point_a_zero_fit)
     int fit = -1;
     std::vector<int> dx(len, -777);
     SIZE sz = {0, 0};
-    ASSERT_TRUE(GetTextExtentExPointA(hdc, text, len, 0, &fit, dx.data(), &sz));
+    ASSERT_TRUE(GetTextExtentExPointA(hdc, text, len, 0, &fit, &dx[0], &sz));
     EXPECT_EQ(fit, 0);
     for (int i = 0; i < len; i++)
         EXPECT_EQ(dx[i], -777) << "lpnDx must stay untouched when nothing fits";
@@ -327,7 +329,7 @@ TEST_F(TextTest, extent_ex_point_a_optional_out_params)
 
     // dx only, no fit
     std::vector<int> dx(len);
-    ASSERT_TRUE(GetTextExtentExPointA(hdc, text, len, INT_MAX, NULL, dx.data(), &sz));
+    ASSERT_TRUE(GetTextExtentExPointA(hdc, text, len, INT_MAX, NULL, &dx[0], &sz));
     ExpectNonNegativeMonotonic(dx, len);
 }
 
@@ -335,15 +337,16 @@ TEST_F(TextTest, extent_ex_point_a_optional_out_params)
 // whole string and must not depend on whether the per-char array was requested.
 TEST_F(TextTest, extent_ex_point_size_independent_of_dx_buffer)
 {
-    const char *texts[] = {"sample", u8"Ag1中", "WAVE-WAVE-WAVE"};
-    for (const char *text : texts)
+    const char *texts[] = {"sample", "Ag1中", "WAVE-WAVE-WAVE"};
+    for (int i=0;i<sizeof(texts)/sizeof(char*);i++)
     {
+		const char *text = texts[i];
         int len = (int)strlen(text);
         SIZE withDx = {0, 0}, withoutDx = {0, 0};
         int fit1 = -1, fit2 = -1;
         std::vector<int> dx(len);
 
-        ASSERT_TRUE(GetTextExtentExPointA(hdc, text, len, INT_MAX, &fit1, dx.data(), &withDx));
+        ASSERT_TRUE(GetTextExtentExPointA(hdc, text, len, INT_MAX, &fit1, &dx[0], &withDx));
         ASSERT_TRUE(GetTextExtentExPointA(hdc, text, len, INT_MAX, &fit2, NULL, &withoutDx));
         EXPECT_EQ(withDx.cx, withoutDx.cx) << "size must not depend on lpnDx";
         EXPECT_EQ(fit1, fit2);
@@ -373,11 +376,12 @@ TEST_F(TextTest, extent_ex_point_zero_length)
 TEST_F(TextTest, extent_ex_point_across_font_sizes)
 {
     const int heights[] = {9, 12, 16, 24, 36};
-    const char *text = u8"Ag1中";
+    const char *text = "Ag1中";
     int len = (int)strlen(text);
 
-    for (int h : heights)
+    for (int i=0;i< ARRAYSIZE(heights);i++)
     {
+		int h=heights[i];
         HFONT f = CreateFontA(-h, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
                               DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
                               CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
@@ -415,12 +419,13 @@ TEST_F(TextTest, extent_ex_point_matches_point32_extent)
 
     // cx is independent of nMaxExtent
     const int limits[] = {0, 1, 17, (int)(whole.cx / 2), (int)(whole.cx - 1), (int)whole.cx};
-    for (int limit : limits)
+    for (int i=0;i<ARRAYSIZE(limits);i++)
     {
+		int limit = limits[i];
         SIZE sz = {0, 0};
         int fit = -1;
         std::vector<int> buf(len, -777);
-        ASSERT_TRUE(GetTextExtentExPointA(hdc, text, len, limit, &fit, buf.data(), &sz));
+        ASSERT_TRUE(GetTextExtentExPointA(hdc, text, len, limit, &fit, &buf[0], &sz));
         EXPECT_EQ(sz.cx, whole.cx) << "cx must equal the whole-string width at limit=" << limit;
         EXPECT_GE(fit, 0);
         EXPECT_LE(fit, len);
