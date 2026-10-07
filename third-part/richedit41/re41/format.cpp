@@ -599,6 +599,7 @@ HRESULT CreateFormatCaches()					// Called by DllMain()
 	if(!pPFCache)
 	{
 		pCFCache->Destroy();
+		pCFCache=NULL;
 		return E_OUTOFMEMORY;
 	}
 
@@ -606,7 +607,9 @@ HRESULT CreateFormatCaches()					// Called by DllMain()
 	if(!pTabsCache)
 	{
 		pCFCache->Destroy();
+		pCFCache=NULL;
 		pPFCache->Destroy();
+		pPFCache=NULL;
 		return E_OUTOFMEMORY;
 	}
 	return S_OK;
@@ -617,11 +620,18 @@ HRESULT DestroyFormatCaches()					// Called by DllMain()
 	TRACEBEGIN(TRCSUBSYSBACK, TRCSCOPEINTERN, "DeleteFormatCaches");
 
 	if (pCFCache)
+	{
 		pCFCache->Destroy();
-	if (pPFCache)
+		pCFCache=NULL;
+	}
+	if (pPFCache){
 		pPFCache->Destroy();
-	if (pTabsCache)
+		pPFCache=NULL;
+	}
+	if (pTabsCache){
 		delete pTabsCache;
+		pTabsCache=NULL;
+	}
 	return NOERROR;
 }
 

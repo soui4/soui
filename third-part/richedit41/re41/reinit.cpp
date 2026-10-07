@@ -299,7 +299,10 @@ BOOL WINAPI DllMain(HINSTANCE hmod, DWORD dwReason, LPVOID lpvReserved)
 		if (!lpvReserved)
 			OurUnloadDelayLoadedDlls();
 #endif
-		HeapDestroy(g_hHeap);
+		if(g_hHeap){
+			HeapDestroy(g_hHeap);
+			g_hHeap=NULL;
+		}
 		DeleteCriticalSection(&g_CriticalSection);
 	}
 	else if(dwReason == DLL_PROCESS_ATTACH) // We have just loaded

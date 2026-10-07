@@ -125,55 +125,43 @@ protected:
 class soui_lua_app : public soui_lua {
 protected:
     SApplication *m_app;
-    SAutoRefPtr<IResProvider> m_resProvider;   // 挂到 app 的 FILE 资源提供者
 
     soui_lua_app() : m_app(NULL) {}
 
     void SetUp() override
     {
-        soui_lua::SetUp();
         // SApplication ctor：注册窗口类 + _InitApp（创建 SUiDef/SWindowMgr/
         // STimerGenerator/SHostMgr 等单例 + SObjectDefaultRegister 注册全部
         // 对象工厂）。无渲染工厂、不建窗口，headless 安全。
         m_app = new SApplication(GetModuleHandle(NULL));
         ASSERT_TRUE(m_app != NULL);
-
         // 装默认日志（log4z 组件）：GetLogMgr 用例的前提；同时脚本出错时
         // lua_tinker 的 print_error 输出经 SLog 进入日志可见，便于人工分析
         // （不装的话 lua 错误被静默丢弃，只能靠 flag 文件判断成败）。
-        IObjRef *pLog = NULL;
-        if (m_comMgr.CreateLog4z(&pLog) && pLog)
+        ILogMgr *pLog = NULL;
+        if (m_comMgr.CreateLog4z((IObjRef**)&pLog) && pLog)
         {
-            m_app->SetLogManager(static_cast<ILogMgr *>(pLog)); // 内部 AddRef
+            m_app->SetLogManager(pLog); // 内部 AddRef
             pLog->Release();
         }
-
-        // 挂 FILE resprovider 指向 demo uires（写法与 test_e2e_core.cpp 一致），
-        // 供 LoadAnimation/LoadValueAnimator 用例加载 anim:/valueAni: 资源。
-        // ⚠️ 不能经脚本 AddResProvider(rp) 完成：接口方法带 DEF_VAL(pszUidef)
-        // 默认参，lua 侧只传 1 参时 read<wchar_t const*> 得到空串 L""（而非
-        // NULL），InitDefUiDef 对空串会走进 SUiDefInfo::Init 的数组越界。
-        // 宿主基建（资源挂载）本就归 C++ 夹具，这里直接 C++ 调用传真 NULL。
         SouiFactory factory;
-        m_resProvider = factory.CreateResProvider(RES_FILE);
+        IResProvider * m_resProvider =factory.CreateResProvider(RES_FILE);
         ASSERT_TRUE(m_resProvider != NULL);
         SStringT dir = S_CA2T(SOUI_FUN_TEST_DEMO_UIRES, CP_UTF8);
         ASSERT_TRUE(m_resProvider->Init((LPARAM)dir.c_str(), 0));
         m_app->AddResProvider(m_resProvider, NULL);
+		m_resProvider->Release();
+		soui_lua::SetUp();
     }
 
     void TearDown() override
     {
+		soui_lua::TearDown();
         if (m_app)
         {
-            // 断点：SApplication::Release → OnFinalRelease → delete this
-            //       → ~SApplication（_DestroySingletons / RemoveAll）
-            //       → SResProviderMgr::RemoveAll（Release 挂载的资源包）
-            m_app->Release();
+            delete m_app;
             m_app = NULL;
         }
-        m_resProvider = NULL;
-        soui_lua::TearDown();
     }
 };
 

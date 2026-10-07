@@ -560,6 +560,7 @@ void FreeFontNames()
 		FreePv((LPVOID)g_pFontInfo[i].szFontName);
 	FreePv(g_pFontInfo);
 	g_pFontInfo = NULL;
+	g_cFontInfo = 0;
 }
 
 SHORT	g_iFontJapanese;

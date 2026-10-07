@@ -655,9 +655,15 @@ BOOL InitKinsokuClassify()
 void UninitKinsokuClassify()
 {
 	TRACEBEGIN(TRCSUBSYSFE, TRCSCOPEINTERN, "UninitKinsokuClassify");
-
-	FreePv(classifyData);
-	FreePv(classifyIndex);
+	if(classifyData)
+	{
+		FreePv(classifyData);
+		classifyData=NULL;
+	}
+	if(classifyIndex){
+		FreePv(classifyIndex);
+		classifyIndex=NULL;
+	}
 }
 
 /*
