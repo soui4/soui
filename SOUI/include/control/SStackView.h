@@ -323,9 +323,9 @@ class SOUI_EXP SStackView
             ATTR_ENUM_VALUE(L"move", kMoveInOut) /**< Move in/out animation. */
             ATTR_ENUM_VALUE(L"push", kPushInOut) /**< Push in/out animation. */
         ATTR_ENUM_END(m_aniStyle)
-        ATTR_BOOL(L"samePageSize", m_isSamePageSize, FALSE) /**< Flag indicating if all pages have the same size. */
-        ATTR_CHAIN_CLASS(__baseCls)                         /**< Chain attributes to base class. */
-        ATTR_CHAIN(m_animator, 0)                           /**< Chain attributes to animator. */
+        ATTR_BOOL(L"samePageSize", m_isSamePageSize, FALSE)          /**< Flag indicating if all pages have the same size. */
+        ATTR_CHAIN_CLASS(__baseCls)                                  /**< Chain attributes to base class. */
+        ATTR_CHAIN_PREFIX(m_animator, 0, SAttrChainPrefix::ANIMATOR) /**< Chain attributes to animator. */
     SOUI_ATTRS_BREAK()
 
   protected:

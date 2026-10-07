@@ -507,7 +507,7 @@ class SOUI_EXP SPanel
         ATTR_INT(L"sbFadeFrames", m_fadeFrames, FALSE)
         ATTR_INT(L"sbTrumbTrackMinAlpha", m_bySbThumbTrackMinAlpha, FALSE)
         ATTR_INTERPOLATOR(L"sbFadeInterpolator", m_fadeInterpolator, FALSE)
-        ATTR_CHAIN_PTR(m_fadeInterpolator, 0)
+        ATTR_CHAIN_PTR_PREFIX(m_fadeInterpolator, 0, SAttrChainPrefix::FADE)
         ATTR_BOOL(L"enableDragScroll", m_bItemDragScrollEnabled, FALSE)
         ATTR_SKIN(L"bandSkin", m_pSkinBand, FALSE)
         ATTR_BOOL(L"bandEnable", m_bBandEnable, FALSE)

@@ -489,7 +489,7 @@ class SOUI_EXP SAnimation : public TObjRefImpl<SObjectImpl<IAnimation>> {
             ATTR_ENUM_VALUE(L"reverse", REVERSE) /**<  Reverse repeat mode. */
         ATTR_ENUM_END(mRepeatMode)
         ATTR_INTERPOLATOR(L"interpolator", mInterpolator, FALSE) /**<  Interpolator used by the animation. */
-        ATTR_CHAIN_PTR(mInterpolator, 0)
+        ATTR_CHAIN_PTR_PREFIX(mInterpolator, 0, SAttrChainPrefix::INTERPOLATOR)
     SOUI_ATTRS_END()
 };
 

@@ -137,11 +137,11 @@ class SSwitch
     HRESULT OnAttrCheck(const SStringW &strValue, BOOL bLoading);
 
     SOUI_ATTRS_BEGIN()
-        ATTR_SKIN(L"skin", m_pSkin, TRUE)           /**< Skin object for the switch. */
-        ATTR_SKIN(L"skinforce", m_pSkinForce, TRUE) /**< Skin object for the forced state. */
-        ATTR_CUSTOM(L"animator", OnAttrAnimator)    /**< Custom animator attribute. */
-        ATTR_CUSTOM(L"checked", OnAttrCheck)        /**< Custom checked attribute. */
-        ATTR_CHAIN_PTR(m_animator, 0)               /**< Chain attributes to animator. */
+        ATTR_SKIN(L"skin", m_pSkin, TRUE)                                /**< Skin object for the switch. */
+        ATTR_SKIN(L"skinforce", m_pSkinForce, TRUE)                      /**< Skin object for the forced state. */
+        ATTR_CUSTOM(L"animator", OnAttrAnimator)                         /**< Custom animator attribute. */
+        ATTR_CUSTOM(L"checked", OnAttrCheck)                             /**< Custom checked attribute. */
+        ATTR_CHAIN_PTR_PREFIX(m_animator, 0, SAttrChainPrefix::ANIMATOR) /**< Chain attributes to animator. */
     SOUI_ATTRS_END()
 
   private:

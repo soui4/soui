@@ -2753,9 +2753,9 @@ SOUI_ATTRS_BEGIN()
     ATTR_BOOL(L"float", m_bFloat, FALSE)
     ATTR_FLOAT(L"pivotX", m_pivotX, FALSE)
     ATTR_FLOAT(L"pivotY", m_pivotY, FALSE)
-    ATTR_CHAIN(m_style, HRET_FLAG_STYLE)
-    ATTR_CHAIN_PTR(m_pLayout, HRET_FLAG_LAYOUT)
-    ATTR_CHAIN_PTR(m_pLayoutParam, HRET_FLAG_LAYOUT_PARAM)
+    ATTR_CHAIN_PREFIX(m_style, HRET_FLAG_STYLE, SAttrChainPrefix::STYLE)
+    ATTR_CHAIN_PTR_PREFIX(m_pLayout, HRET_FLAG_LAYOUT, SAttrChainPrefix::LAYOUT)
+    ATTR_CHAIN_PTR_PREFIX(m_pLayoutParam, HRET_FLAG_LAYOUT_PARAM, SAttrChainPrefix::LAYOUT)
 SOUI_ATTRS_END()
 /** Protected virtual methods for handling specific events and operations in SWindow class. */
 protected:

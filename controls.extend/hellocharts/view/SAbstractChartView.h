@@ -132,7 +132,7 @@ public:
         ATTR_BOOL(L"zoomEnabled", m_bZoomEnabled, TRUE)
         ATTR_BOOL(L"scrollEnabled", m_bScrollEnabled, TRUE)
         ATTR_BOOL(L"containerScrollEnabled", m_bContainerScrollEnabled, FALSE)
-        ATTR_CHAIN(m_animator, 0)
+        ATTR_CHAIN_PREFIX(m_animator, 0, SAttrChainPrefix::ANIMATOR)
     SOUI_ATTRS_END()
 };
 

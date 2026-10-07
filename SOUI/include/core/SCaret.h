@@ -110,7 +110,7 @@ class SOUI_EXP SCaret
         ATTR_INT(L"fadeTime", m_nAniFrames, FALSE)
         ATTR_INT(L"showTime", m_nShowFrames, FALSE)
         ATTR_INTERPOLATOR(L"interpolator", m_AniInterpolator, FALSE)
-        ATTR_CHAIN_PTR(m_AniInterpolator, 0)
+        ATTR_CHAIN_PTR_PREFIX(m_AniInterpolator, 0, SAttrChainPrefix::INTERPOLATOR)
     SOUI_ATTRS_END()
 
   protected:

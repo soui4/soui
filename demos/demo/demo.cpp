@@ -14,7 +14,7 @@
 
 #include "appledock/SDesktopDock.h"
 #include "SMatrixWindow.h"
-#include <SScintillaView.h>
+//#include <SScintillaView.h>
 #include <SEdit2.h>
 #include "clock/sclock.h"
 #include "FpsWnd.h"
@@ -140,7 +140,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
     app.RegisterWindowClass<SFreeMoveWindow>(); //
     app.RegisterWindowClass<SClock>();          //
     app.RegisterWindowClass<SDesktopDock>(); // 注册SDesktopDock
-    app.RegisterWindowClass<SScintillaView>(); // 注册无窗口 Scintilla 编辑控件
+    //app.RegisterWindowClass<SScintillaView>(); // 注册无窗口 Scintilla 编辑控件
 
     app.RegisterWindowClass<SInterpolatorView>();
     app.RegisterWindowClass<SPathView>();

@@ -598,7 +598,7 @@ class SOUI_EXP SGradientDesc {
         ATTR_FLOAT(L"centerY", m_centerY, TRUE)
         ATTR_FLOAT(L"stargAngle", m_startAngle, TRUE)
         ATTR_GRADIENT(L"gradient", m_gradient, TRUE)
-        ATTR_CHAIN_PTR(m_gradient, 0)
+        ATTR_CHAIN_PTR_PREFIX(m_gradient, 0, SAttrChainPrefix::GRADIENT)
     SOUI_ATTRS_BREAK()
 };
 

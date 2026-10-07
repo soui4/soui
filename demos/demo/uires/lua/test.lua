@@ -265,7 +265,7 @@ end
     置换(Fisher-Yates,约束重试:无初始 3 连且有解,不重新发牌);
     每枚棋子做两段数值动画(SValueAnimator 驱动,xxl_on_shuffle => xxl_redeal,
     随时可洗):第一段以棋子当前位置为起点、棋盘中心为圆心绕行
-    1.0~3.0 圈(随机方向),第二段从轨道终点直线飞往目标棋格;
+    1.0~3.0 圈(统一顺时针),第二段从轨道终点直线飞往目标棋格;
     棋子一落到目标格立即在目标位显示(新盘数据随置换即时提交,
     xxl_shuffle_arrive);全部棋子归位后(xxl_shuffle_finalize)才检查消除行列;
     洗牌全程禁用棋盘窗口防误操作(结束/中途重开时恢复);
@@ -781,7 +781,7 @@ function xxl_gen_permutation()
 end
 
 -- 洗牌动画第一段(数值动画):浮层副本以棋子当前位置为起点、棋盘中心为圆心
--- 绕行 1.0~3.0 圈(随机方向)。不取动画器的 rect 值,只取 GetFraction 驱动圆周:
+-- 绕行 1.0~3.0 圈(统一顺时针)。不取动画器的 rect 值,只取 GetFraction 驱动圆周:
 -- rect range 恒等(from==to),角度 = ang0 + angDelta * fraction。
 -- 🚨 包装 ani 必须存进 ctx 保活(同 xxl_begin_move,GC 摘监听则回调全失)。
 -- 失败(建副本/启动失败)返回 nil,由调用方计入直接完成数。
@@ -796,7 +796,7 @@ function xxl_begin_shuffle_rot(aniframe, state, ele, rcFrom, rcTo, cx, cy, tPos)
 	local dx = rcFrom.left + w/2 - cx;
 	local dy = rcFrom.top + h/2 - cy;
 	local turns = 1.0 + math.random()*2.0;             -- 1.0~3.0 圈(可 2.5)
-	local dir = math.random() < 0.5 and -1 or 1;       -- 随机旋转方向
+	local dir = 1;                                     -- 统一顺时针(屏幕坐标 Y 向下,角度递增即顺时针)
 	local c = {
 		ani_widget = ani_widget,
 		cx = cx, cy = cy,

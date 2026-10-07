@@ -366,7 +366,7 @@ class SOUI_EXP SButton
     SOUI_ATTRS_BEGIN()
         ATTR_CUSTOM(L"accel", OnAttrAccel)
         ATTR_BOOL(L"animate", m_bAnimate, FALSE)
-        ATTR_CHAIN_PTR(m_pHoverAni, 0)
+        ATTR_CHAIN_PTR_PREFIX(m_pHoverAni, 0, SAttrChainPrefix::HOVER)
         ATTR_BOOL(L"disableAccelIfInvisible", m_bDisableAccelIfInvisible, FALSE)
     SOUI_ATTRS_END()
 

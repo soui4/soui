@@ -15,10 +15,10 @@ CTest 在**配置期**扫描测试源码，把每个 `TEST` / `TEST_F` 注册成
 
 | 源文件                            | 层级标签                                                      | 注册用例数   |
 | ------------------------------ | --------------------------------------------------------- | ------- |
-| 其余 `test_*.cpp`                | `soui-unit`                                               | 391     |
+| 其余 `test_*.cpp`                | `soui-unit`                                               | 396     |
 | `test_integration_*.cpp`       | `soui-integration`                                        | 1       |
 | `test_e2e_*.cpp`               | `soui-e2e`                                                | 3       |
-| **门禁合计**                       | **`soui-headless`**（= 上面三行）                               | **395** |
+| **门禁合计**                       | **`soui-headless`**（= 上面三行）                               | **400** |
 | `test_gui_*.cpp`               | `soui-gui`，需 `-DSOUI_ENABLE_GUI_SMOKE=ON`                 | 1       |
 | `test_gdi.cpp`、`test_soui.cpp` | `soui-interactive`，需 `-DSOUI_ENABLE_INTERACTIVE_TESTS=ON` | 2       |
 
@@ -32,7 +32,7 @@ Linux/macOS 默认在构建 `fun_test` 后运行全套非交互测试；PR 快�
 
 ## GUI 烟测
 
-在有桌面显示的环境配置 `-DSOUI_ENABLE_GUI_SMOKE=ON`，构建后运行 `ctest --test-dir build -L '^soui-gui$' --output-on-failure`。Linux 可用 `xvfb-run -a` 包裹 CTest。`window.gui_smoke_dispatches_button_click` 创建并显示真实 SOUI 宿主窗口，通过窗口过程发送鼠标消息并检查按钮事件；它不会长期等待人工操作。GUI 组默认不注册，门禁仍是 395 个无头用例；全套非交互 `fun_test` 的 `-window.*` 过滤器也排除 GUI 组。此烟测尚不比较渲染像素或验证真实设备鼠标。
+在有桌面显示的环境配置 `-DSOUI_ENABLE_GUI_SMOKE=ON`，构建后运行 `ctest --test-dir build -L '^soui-gui$' --output-on-failure`。Linux 可用 `xvfb-run -a` 包裹 CTest。`window.gui_smoke_dispatches_button_click` 创建并显示真实 SOUI 宿主窗口，通过窗口过程发送鼠标消息并检查按钮事件；它不会长期等待人工操作。GUI 组默认不注册，门禁仍是 400 个无头用例；全套非交互 `fun_test` 的 `-window.*` 过滤器也排除 GUI 组。此烟测尚不比较渲染像素或验证真实设备鼠标。
 
 ## 交互式窗口用例
 
@@ -59,7 +59,11 @@ fun_test/
 │                    # （soui-interactive），三者默认都不注册
 ├── test_soui_core_unit.cpp
 │                    # SOUI 内核无窗口单测：SLayoutSize 语义、SMatrix 逆变换、
-│                    # 命名子窗口按层级查找
+│                    # 命名子窗口按层级查找、链式成员属性的命名空间前缀（常量集中在
+│                    # SAttrCracker.h；前缀只路由给声明它的成员、不匹配的成员根本不被
+│                    # 问到、未声明前缀不得当裸名、同名属性靠前缀区分、大小写不敏感；
+│                    # 名字在 SOUI_ATTRS_BEGIN 里只切一次，成员读剥后名，而对象自己的
+│                    # 属性表始终比较完整名字，所以带前缀的名字不会落到自己表里）
 ├── test_lua.cpp      # script_lua 模块导出 SOUI 对象的创建/释放调试测试（见"说明"）：
 │                     # SComMgr2 加载模块、零 lua 链接、脚本经
 │                     # IScriptModule::executeScriptBuffer 创建对象；每个导出对象
@@ -241,11 +245,11 @@ fun_test/
     `test_misc.cpp` 的 `is_dbcs_lead_byte` 正是这个坑，Windows 分支现名      
     `DISABLED_is_dbcs_lead_byte_codepage_dependent`。
   - 被平台条件编译掉的用例，其 CTest 记录在其他平台上**仍然存在并"空跑通过"**（gtest 过滤不到      
-    任何用例时返回 0）。所以某个平台上"395 个全过"里可能含若干空条目，不能当覆盖证据。
+    任何用例时返回 0）。所以某个平台上"400 个全过"里可能含若干空条目，不能当覆盖证据。
   - **连注释掉的 `TEST` 也会被注册**：注册是纯文本正则匹配（`GoogleTest.cmake` 的      
     `(TYPED_TEST|TEST)_?[FP]?` 用的是**未锚定行首**的 `REGEX MATCH`），所以      
     `//TEST(suite, name)` 同样产出一条空跑条目——`test_misc.cpp:51` 的      
-    `//TEST(swinx_misc, is_bad_read_ptr)` 正是如此（395 条里有 1 条来自它，源码实际只有      
+    `//TEST(swinx_misc, is_bad_read_ptr)` 正是如此（400 条里有 1 条来自它，源码实际只有      
     19 个 TEST 却注册出 20 条）。要让某用例彻底退出门禁，必须整行删除，不能只注释掉。
 - 某一层分组为空会让 CMake **配置期直接失败**（`soui_assert_group_not_empty`），    
   避免该层悄悄退化成 0 个用例、而门禁依旧全绿。

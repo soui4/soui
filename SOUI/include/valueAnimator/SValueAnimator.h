@@ -597,7 +597,7 @@ class TValueAnimator : public SValueAnimator {
             ATTR_ENUM_VALUE(L"restart", RESTART)
         ATTR_ENUM_END(mRepeatMode)
         ATTR_INTERPOLATOR(L"interpolator", mInterpolator, FALSE)
-        ATTR_CHAIN_PTR(mInterpolator, 0)
+        ATTR_CHAIN_PTR_PREFIX(mInterpolator, 0, SAttrChainPrefix::INTERPOLATOR)
     SOUI_ATTRS_END()
 };
 

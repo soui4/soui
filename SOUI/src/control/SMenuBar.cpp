@@ -241,7 +241,9 @@ SMenuBar::~SMenuBar()
         ::UnhookWindowsHookEx(SMenuBar::m_hMsgHook);
         SMenuBar::m_hMsgHook = NULL;
     }
+    SMenuBar::m_pMenuBar = NULL;
 }
+
 BOOL SMenuBar::Insert(LPCTSTR pszTitle, LPCTSTR pszResName, int iPos)
 {
     if (!pszResName)

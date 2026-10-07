@@ -467,7 +467,7 @@ class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
             ATTR_ENUM_VALUE(L"vert", Text_Vert)       /**< Vertical text direction. */
             ATTR_ENUM_VALUE(L"vertical", Text_Vert)   /**< Vertical text direction. */
         ATTR_ENUM_END(m_txtDir)
-        ATTR_CHAIN_PTR(m_aniSlider, 0) /**< Chain attributes to slider animator. */
+        ATTR_CHAIN_PTR_PREFIX(m_aniSlider, 0, SAttrChainPrefix::SLIDER) /**< Chain attributes to slider animator. */
     SOUI_ATTRS_END()
 };
 

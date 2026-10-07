@@ -26,7 +26,7 @@ protected:
 		ATTR_FLOAT(L"minValue", m_fMinValue, FALSE)
 		ATTR_FLOAT(L"maxValue", m_fMaxValue, FALSE)
 		ATTR_FLOAT(L"RingWidth", m_nRingWidth, FALSE)
-		ATTR_CHAIN(*m_ani,0)
+		ATTR_CHAIN_PREFIX(*m_ani,0, SAttrChainPrefix::ANIMATOR)
 	SOUI_ATTRS_END()
 
 private:

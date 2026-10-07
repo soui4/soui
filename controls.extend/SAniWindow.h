@@ -32,7 +32,7 @@ class SAniWindow
   public:
     SOUI_ATTRS_BEGIN()
     ATTR_INTERPOLATOR(L"Interpolator", m_aniInterpolator, FALSE)
-    ATTR_CHAIN_PTR(m_aniInterpolator, 0) // chain attributes to interpolator
+    ATTR_CHAIN_PTR_PREFIX(m_aniInterpolator, 0, SAttrChainPrefix::INTERPOLATOR) // chain attributes to interpolator
     ATTR_INT(L"steps", m_nSteps, FALSE)
     SOUI_ATTRS_END()
   protected:

@@ -133,17 +133,17 @@ class SOUI_EXP SScrollBar
     HRESULT OnAttrVertical(const SStringW &value, BOOL bLoading);
 
     SOUI_ATTRS_BEGIN()
-        ATTR_SKIN(L"skin", m_pSkin, TRUE)                                 /**< Skin object */
-        ATTR_UINT(L"arrowSize", m_uAllowSize, TRUE)                       /**< Arrow size */
-        ATTR_INT(L"min", m_si.nMin, TRUE)                                 /**< Minimum position */
-        ATTR_INT(L"max", m_si.nMax, TRUE)                                 /**< Maximum position */
-        ATTR_INT(L"value", m_si.nPos, TRUE)                               /**< Current position */
-        ATTR_INT(L"page", m_si.nPage, TRUE)                               /**< Page size */
-        ATTR_CUSTOM(L"vertical", OnAttrVertical)                          /**< Vertical orientation */
-        ATTR_INT(L"fadeFrames", m_fadeFrames, FALSE)                      /**< Fade frames */
-        ATTR_INT(L"thumbTrackMinAlpha", m_byThumbTrackMinAlpha, FALSE)    /**< Minimum alpha for thumb tracking */
-        ATTR_INTERPOLATOR(L"fadeInterpolator", m_fadeInterpolator, FALSE) /**< Fade interpolator */
-        ATTR_CHAIN_PTR(m_fadeInterpolator, 0)                             /**< Chain pointer for fade interpolator */
+        ATTR_SKIN(L"skin", m_pSkin, TRUE)                                    /**< Skin object */
+        ATTR_UINT(L"arrowSize", m_uAllowSize, TRUE)                          /**< Arrow size */
+        ATTR_INT(L"min", m_si.nMin, TRUE)                                    /**< Minimum position */
+        ATTR_INT(L"max", m_si.nMax, TRUE)                                    /**< Maximum position */
+        ATTR_INT(L"value", m_si.nPos, TRUE)                                  /**< Current position */
+        ATTR_INT(L"page", m_si.nPage, TRUE)                                  /**< Page size */
+        ATTR_CUSTOM(L"vertical", OnAttrVertical)                             /**< Vertical orientation */
+        ATTR_INT(L"fadeFrames", m_fadeFrames, FALSE)                         /**< Fade frames */
+        ATTR_INT(L"thumbTrackMinAlpha", m_byThumbTrackMinAlpha, FALSE)       /**< Minimum alpha for thumb tracking */
+        ATTR_INTERPOLATOR(L"fadeInterpolator", m_fadeInterpolator, FALSE)    /**< Fade interpolator */
+        ATTR_CHAIN_PTR_PREFIX(m_fadeInterpolator, 0, SAttrChainPrefix::FADE) /**< Chain pointer for fade interpolator */
     SOUI_ATTRS_END()
 
   protected:

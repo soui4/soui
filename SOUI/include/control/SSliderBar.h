@@ -273,8 +273,8 @@ class SOUI_EXP SSliderBar
         ATTR_BOOL(L"dragTip", m_bDragTip, TRUE)
         ATTR_BOOL(L"animate", m_bEnableAnimate, FALSE)
         ATTR_COLOR(L"sepColor", m_crSep, TRUE)
-        ATTR_CHAIN_PREFIX(*m_thumbAni, 0, L"thumb:")
-        ATTR_CHAIN_PREFIX(*m_valueAni, 0, L"value:")
+        ATTR_CHAIN_PREFIX(*m_thumbAni, 0, SAttrChainPrefix::THUMB)
+        ATTR_CHAIN_PREFIX(*m_valueAni, 0, SAttrChainPrefix::VALUE)
     SOUI_ATTRS_END()
 };
 
