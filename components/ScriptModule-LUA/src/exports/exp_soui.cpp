@@ -49,6 +49,7 @@ using namespace SNS;
 #include "exp_ITranslator.h"
 #include "exp_ILogMgr.h"
 #include "exp_global.h"
+#include "exp_NativeCall.h"
 #include "exp_SysApi.h"
 #include <commgr2.h>
 
@@ -57,6 +58,124 @@ static SComMgr2 s_comMgr;
 SComMgr2* GetLuaScriptComMgr2() {
 	return &s_comMgr;
 }
+
+// ============================================================================
+// NativeCall implementation (lua: NativeCall("name", ...) -> int)
+// ============================================================================
+SNSBEGIN
+
+// Handler registry: registered via IScriptFactory::RegisterNativeCallHandler
+static PFN_ScriptNativeCall s_fnNativeCallHandler = NULL;
+static void *s_pNativeCallCtx = NULL;
+
+void NativeCall_SetHandler(PFN_ScriptNativeCall fn, void *ctx)
+{
+	s_fnNativeCallHandler = fn;
+	s_pNativeCallCtx = ctx;
+}
+
+PFN_ScriptNativeCall NativeCall_GetHandler(void **ppCtx)
+{
+	if (ppCtx) *ppCtx = s_pNativeCallCtx;
+	return s_fnNativeCallHandler;
+}
+
+// Max number of variadic arguments accepted by the lua-side NativeCall
+#define NC_MAX_ARGS 16
+
+// Native lua_CFunction entry: variadic arguments require a raw lua_CFunction
+// (lua_tinker::def only supports fixed signatures). Boxes lua stack values
+// into a VARIANT array (nil->VT_EMPTY, boolean->VT_BOOL, integer->VT_I8,
+// number->VT_R8, string->VT_LPSTR). String data is kept alive in SStringA
+// buffers valid for the duration of the call; no VariantClear is performed
+// (it would CoTaskMemFree the VT_LPSTR data owned by those buffers).
+static int LuaNativeCall(lua_State *L)
+{
+	int nargs = lua_gettop(L);
+	if (nargs < 1 || !lua_isstring(L, 1))
+	{
+		return luaL_error(L, "NativeCall: first argument must be a function name (string)");
+	}
+	const char *name = lua_tostring(L, 1);
+
+	int n = nargs - 1;
+	if (n > NC_MAX_ARGS)
+	{
+		return luaL_error(L, "NativeCall '%s': too many arguments (max %d)", name, NC_MAX_ARGS);
+	}
+
+	// Box lua values -> VARIANT; the boxes are plain stack values, nothing
+	// inside them needs freeing.
+	VARIANT boxes[NC_MAX_ARGS];
+	SStringA strs[NC_MAX_ARGS];
+	for (int i = 2; i <= nargs; i++)
+	{
+		VARIANT &arg = boxes[i - 2];
+		memset(&arg, 0, sizeof(arg));
+		int t = lua_type(L, i);
+		switch (t)
+		{
+		case LUA_TNIL:
+			break;
+		case LUA_TBOOLEAN:
+			arg.vt = VT_BOOL;
+			arg.boolVal = lua_toboolean(L, i) ? VARIANT_TRUE : VARIANT_FALSE;
+			break;
+		case LUA_TNUMBER:
+			if (lua_isinteger(L, i))
+			{
+				arg.vt = VT_I8;
+				arg.llVal = (LONGLONG)lua_tointeger(L, i);
+			}
+			else
+			{
+				arg.vt = VT_R8;
+				arg.dblVal = lua_tonumber(L, i);
+			}
+			break;
+		case LUA_TSTRING:
+			{
+				size_t len = 0;
+				const char *p = lua_tolstring(L, i, &len);
+				strs[i - 2] = SStringA(p, (int)len);
+				arg.vt = VT_LPSTR;
+				arg.pcVal = (char*)strs[i - 2].c_str();
+			}
+			break;
+		default:
+			return luaL_error(L, "NativeCall '%s': unsupported argument #%d type '%s'",
+							  name, i - 1, lua_typename(L, t));
+		}
+	}
+
+	// Dispatch: invoke the registered handler; with no handler registered,
+	// log a warning and return -1.
+	int ret = -1;
+	void *ctx = NULL;
+	PFN_ScriptNativeCall fn = NativeCall_GetHandler(&ctx);
+	if (fn)
+		ret = fn(ctx, name, boxes, n);
+	else
+	{
+		SLOGW2("luascript") << "NativeCall: no handler registered, name='" << name << "' (" << n << " args)";
+	}
+	lua_pushinteger(L, ret);
+	return 1;
+}
+
+BOOL ExpLua_NativeCall(lua_State *L)
+{
+	try
+	{
+		lua_register(L, "NativeCall", LuaNativeCall);
+		return TRUE;
+	}
+	catch (...)
+	{
+		return FALSE;
+	}
+}
+SNSEND
 
 BOOL SOUI_Export_Lua(lua_State *L)
 {
@@ -101,6 +220,7 @@ BOOL SOUI_Export_Lua(lua_State *L)
 
 	
 	if(bRet) bRet=ExpLua_Global(L);
+	if(bRet) bRet=ExpLua_NativeCall(L);
 	if(bRet) bRet=ExpLua_SysApi(L);
 
 	// new exports (parity with soui4js), self-contained registrations

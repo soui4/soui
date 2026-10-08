@@ -19,22 +19,22 @@
 #include "clock/sclock.h"
 #include "FpsWnd.h"
 //#include <vld.h>
-//<--定一个tag="demo"的slog输出
+//<-- defines a slog output with tag="demo"
 #define kLogTag "demo"
 //-->
 
 
 #include "MainDlg.h"
 
-#define	RESTYPE_FILE  0 //从文件中加载资源，加载失败再从PE加载
-#define	RESTYPE_PE 1 //从PE资源中加载UI资源
-#define	RESTYPE_ZIP 2 //从zip包中加载资源
-#define RESTYPE_7Z 3//从7zip包中加载资源
+#define	RESTYPE_FILE  0 // load resources from file, fall back to PE resources on failure
+#define	RESTYPE_PE 1 // load UI resources from PE resources
+#define	RESTYPE_ZIP 2 // load resources from a zip package
+#define RESTYPE_7Z 3// load resources from a 7zip package
 
 #ifdef _DEBUG
-#define RES_TYPE RESTYPE_FILE      //从文件中加载资源，加载失败再从PE加载
+#define RES_TYPE RESTYPE_FILE      // load from file, fall back to PE resources on failure
 #else
-#define RES_TYPE RESTYPE_PE		//从PE资源中加载UI资源
+#define RES_TYPE RESTYPE_PE		// load UI resources from PE resources
 #endif
 
 #define SYS_NAMED_RESOURCE _T("soui-sys-resource")
@@ -52,13 +52,44 @@
 #define INIT_R_DATA
 #include "res/resource.h"
 
+// ============================================================================
+// NativeCall handler example: registered via
+// IScriptFactory::RegisterNativeCallHandler.
+// Lua-side NativeCall("cppSum", 1, 2, ...) arrives here; the variadic
+// arguments come as a VARIANT array plus a count, unboxed by index
+// (nil->VT_EMPTY, boolean->VT_BOOL, integer->VT_I8, number->VT_R8,
+// string->VT_LPSTR). The boxes live on the bridge stack; all argument
+// data is valid only during the call - do not free or retain it.
+// ============================================================================
+static int DemoNativeCallHandler(void *ctx, const char *name, const VARIANT *args, int argc)
+{
+    (void)ctx;
+    SLOGW2("demo") << "NativeCall handler: name=" << name << " argc=" << argc;
+    if (strcmp(name, "cppSum") == 0)
+    {
+        int64_t sum = 0;
+        for (int i = 0; i < argc; i++)
+        {
+            switch (args[i].vt)
+            {
+            case VT_I8:  sum += args[i].llVal; break;
+            case VT_I4:  sum += args[i].lVal;  break;
+            case VT_R8:  sum += (int64_t)args[i].dblVal; break;
+            default: break;
+            }
+        }
+        return (int)sum;
+    }
+    return -1;
+}
+
 void demo_SWinxLogCallback(const char *pLogStr, int level){
     SLOG("swinx",level)<<pLogStr;
 }
 static SStringT getSourceDir()
 {
 #ifdef __APPLE__
-    // macOS 和 iOS 统一：资源安装在 .app/<res_name>/ 下（由 CMake add_macos_res_folder 处理）
+    // macOS and iOS unified: resources are installed under .app/<res_name>/ (handled by CMake add_macos_res_folder)
     char szBundlePath[1024] = {0};
     GetAppleBundlePath(szBundlePath, sizeof(szBundlePath));
     return S_CA2T(szBundlePath);
@@ -74,12 +105,12 @@ static SStringT getSourceDir()
 
 int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*lpstrCmdLine*/, int /*nCmdShow*/)
 {
-    // 必须要调用OleInitialize来初始化运行环境
+    // OleInitialize must be called to initialize the runtime environment
     HRESULT hRes = OleInitialize(NULL);
     SASSERT(SUCCEEDED(hRes));
     int nRet = 0;
 
-    // 将程序的运行路径修改到demo所在的目录
+    // Change the working directory to the directory containing demo
     SStringT appDir = getSourceDir();
     SetCurrentDirectory(appDir);
 #ifdef __linux__
@@ -87,8 +118,8 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 #elif defined(__APPLE__)
     AddFontResource((appDir + _T("/fonts/simsun.ttc")).c_str());
 #endif
-    //int nType = IDYES;
-    int nType = MessageBox(GetActiveWindow(), _T("选择渲染类型：\n[yes]: Skia\n[no]:GDI\n[cancel]:Quit"), _T("select a render"), MB_ICONQUESTION | MB_YESNOCANCEL);
+    int nType = IDYES;
+    //int nType = MessageBox(GetActiveWindow(), _T("Select render type://n[yes]: Skia\n[no]:GDI\n[cancel]:Quit"), _T("select a render"), MB_ICONQUESTION | MB_YESNOCANCEL);
     if (nType == IDCANCEL)
     {
         return 0;
@@ -107,7 +138,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
     cfg.EnableScript(TRUE);
 #endif // DLL_CORE
 
-// 加载系统资源
+// Load system resources
 #ifdef ENABLE_BUILD_RESOURCE
 #if (defined(LIB_CORE) && defined(LIB_SOUI_COM))
     cfg.SetSysResPeHandle(hInstance);
@@ -120,15 +151,15 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 
 #if (RES_TYPE == RESTYPE_PE) && defined(ENABLE_BUILD_RESOURCE)
     cfg.SetAppResPeHandle(hInstance);
-#elif (RES_TYPE == RESTYPE_ZIP) // 从ZIP包加载
+#elif (RES_TYPE == RESTYPE_ZIP) // load from a ZIP package
     cfg.SetAppResZipFile(appDir + _T("/uires.zip"), "souizip");
-#elif (RES_TYPE == RESTYPE_7Z)  // 从7z包加载
+#elif (RES_TYPE == RESTYPE_7Z)  // load from a 7z package
     cfg.SetAppRes7ZipFile(appDir + _T("/uires.zip"), "souizip");
-#else // #if (RES_TYPE == RESTYPE_FILE)//从文件加载
+#else // #if (RES_TYPE == RESTYPE_FILE)// load from file
     cfg.SetAppResFile(appDir + _T("/uires"));
 #endif
 
-    // 向SApplication系统中注册由外部扩展的控件及SkinObj类
+    // Register externally extended controls and SkinObj classes into SApplication
     SWkeLoader wkeLoader;
     wkeLoader.Init(_T("wke.dll"));
 
@@ -139,8 +170,8 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
     app.RegisterWindowClass<S3dWindow>();       //
     app.RegisterWindowClass<SFreeMoveWindow>(); //
     app.RegisterWindowClass<SClock>();          //
-    app.RegisterWindowClass<SDesktopDock>(); // 注册SDesktopDock
-    //app.RegisterWindowClass<SScintillaView>(); // 注册无窗口 Scintilla 编辑控件
+    app.RegisterWindowClass<SDesktopDock>(); // register SDesktopDock
+    //app.RegisterWindowClass<SScintillaView>(); // register the windowless Scintilla edit control
 
     app.RegisterWindowClass<SInterpolatorView>();
     app.RegisterWindowClass<SPathView>();
@@ -156,7 +187,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 #if defined(_WIN32) && !defined(__MINGW32__)
     if (SUCCEEDED(CUiAnimation::Init()))
     {
-        app.RegisterWindowClass<SUiAnimationWnd>(); // 注册动画控件
+        app.RegisterWindowClass<SUiAnimationWnd>(); // register the animation control
     }
 #endif
 
@@ -164,17 +195,17 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
     {
         return -1;
     }
-    // 如果需要在代码中使用R::id::namedid这种方式来使用控件必须要这一行代码：2016年2月2日，R::id,R.name是由uiresbuilder 增加-h .\res\resource.h 这2个参数后生成的。
+    // This line is required to use controls via R::id::namedid in code. Since Feb 2, 2016, R::id/R::name are generated by uiresbuilder with the added -h .\res\resource.h arguments.
     app.InitXmlNamedID((const LPCWSTR *)&R.name, (const int *)&R.id, sizeof(R.id) / sizeof(int));
     SSkinLoader *SkinLoader = new SSkinLoader(&app);
     SkinLoader->LoadDefSkin();
 
 #ifdef _WIN32
-    // 采用hook绘制菜单的边框
+    // Draw the menu border via a hook
         SMenuWndHook::InstallHook(hInstance, L"_skin.sys.menu.border");
 #endif
 
-    // 演示R.color.xxx,R.string.xxx在代码中的使用。
+    // Demonstrates using R.color.xxx / R.string.xxx in code.
     COLORREF crRed = GETCOLOR(R.color.red);
     SStringW strTitle = GETSTRING(R.string.title);
     COLORREF crTxtTheme = GETCOLOR(SNamedColor::THEME_COLOR_TXT_NORMAL);
@@ -183,8 +214,17 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 #if defined(_WIN32) && !defined(__MINGW32__)
         SmileyCreateHook smileyHook;
 #endif
-        // 设置提示窗口布局
+        // Set the tooltip window layout
         STipWnd::SetLayout(_T("layout:dlg_tip"));
+        // Register the script NativeCall handler: the handler registry is
+        // component-level shared; once registered on any SIScriptFactory
+        // instance, script modules created afterwards can call NativeCall.
+        IScriptFactory *pScriptFactory = app.GetScriptFactory();
+        if (pScriptFactory)
+        {
+            pScriptFactory->RegisterNativeCallHandler(DemoNativeCallHandler, NULL);
+            SLOGW2("demo") << "NativeCall handler registered";
+        }
         CMainDlg dlgMain;
         dlgMain.Create(GetActiveWindow(), 0, 0, 888, 650);
         dlgMain.GetNative()->SendMessage(WM_INITDIALOG);
@@ -194,11 +234,11 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
         nRet = app.Run(dlgMain.m_hWnd);
     }
 
-    // 应用程序退出
+    // Application exit
     delete SkinLoader;
 
 #ifdef _WIN32
-        // 卸载菜单边框绘制hook
+        // Uninstall the menu border drawing hook
         SMenuWndHook::UnInstallHook();
 #endif
 #if defined(_WIN32) && !defined(__MINGW32__)

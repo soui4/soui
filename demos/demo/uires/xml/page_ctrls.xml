@@ -61,7 +61,7 @@
 				<check name="chk_band_mclv" text="启用框选(关闭后多选拖动为 fling 滚动)" checked="1" font="size:12"/>
 				<text name="txt_mclv_selcount" text="已选 0 项" font="size:12" colorText="@color/clr_primary" marginSize="8,0,0,0"/>
 				</window>
-				<mclistview name="mclv_test" multiSel="1" colorBkgnd="@color/clr_card_bg" size="-2,0" weight="1" headerHeight="30" dividerSize="1">
+				<mclistview name="mclv_test" multiSel="1" bandEnable="1" colorBkgnd="@color/clr_card_bg" size="-2,0" weight="1" headerHeight="30" dividerSize="1">
 				<headerStyle wndclass="header" align="center" name="mclv_test_header" sortSkin="skin_lcex_header_arrow" itemSwapEnable="1" fixWidth="0" font="underline:0,adding:-3" sortHeader="1" colorBkgnd="#ffffff">
 					<items>
 						<item weight="480" align="left">@string/mccol_1</item>
@@ -109,7 +109,7 @@
 				<check name="chk_band_lc" text="启用框选(关闭后多选拖动为 fling 滚动)" checked="1" font="size:12"/>
 				<text name="txt_lc_selcount" text="已选 0 项" font="size:12" colorText="@color/clr_primary" marginSize="8,0,0,0"/>
 				</window>
-				<listctrl name="lc_test" multiSelection="1" hotTrack="1" size="-2,0" weight="1" itemHeight="28" headerHeight="30" colorBkgnd="@color/clr_card_bg" colorItemHotBkgnd="@color/clr_card_hover" colorItemSelBkgnd="#DBEAFE" colorText="@color/clr_text" colorSelText="@color/clr_title" bandSkin="_skin.sys.selband" sbSkin="skin_new_scrollbar" font="size:12">
+				<listctrl name="lc_test" multiSel="1" bandEnable="1" hotTrack="1" size="-2,0" weight="1" itemHeight="28" headerHeight="30" colorBkgnd="@color/clr_card_bg" colorItemHotBkgnd="@color/clr_card_hover" colorItemSelBkgnd="#DBEAFE" colorText="@color/clr_text" colorSelText="@color/clr_title" bandSkin="_skin.sys.selband" sbSkin="skin_new_scrollbar" font="size:12">
 				<headerStyle align="left" itemSwapEnable="1" fixWidth="0" sortHeader="1" sortSkin="skin_lcex_header_arrow" colorBkgnd="@color/clr_card_bg" colorText="@color/clr_title" font="size:12,bold:1">
 					<items>
 						<item width="150" weight="1">姓名</item>
@@ -127,7 +127,7 @@
 			<check name="chk_multi_lvfix" text="启用多选(关闭后点击为单选)" checked="1" font="size:12"/>
 			<check name="chk_band_lvfix" text="启用框选(关闭后多选拖动为 fling 滚动)" checked="1" font="size:12"/>
 			</window>
-			<listview size="-2,100" name="lv_test_fix_horz" multiSel="1" dividerSize="5" wantTab="1" sbFadeFrames="30" vertical="0">
+			<listview size="-2,100" name="lv_test_fix_horz" multiSel="1" bandEnable="1" dividerSize="5" wantTab="1" sbFadeFrames="30" vertical="0">
 				<template itemWidth="100" trackMouseEvent="1">
 					<imgbtn size="-2,-2" layout="vbox" gravity="center" interval="10">
 						<img size="-1,-1" name="btn_icon" skin="skin_page_icons" iconIndex="0"/>
@@ -135,7 +135,7 @@
 					</imgbtn>
 				</template>
 			</listview>
-			<listview size="-2,0" weight="1" name="lv_test_fix" multiSel="1" dividerSize="5" wantTab="1" sbFadeFrames="30">
+			<listview size="-2,0" weight="1" name="lv_test_fix" multiSel="1" bandEnable="1" dividerSize="5" wantTab="1" sbFadeFrames="30">
 				<template itemHeight="50" trackMouseEvent="1">
 					<button pos="10,5,@150,@25" name="btn_test" tip="click the button to see how to writing the response function">btn</button>
 					<animateimg pos="[10,{0" skin="skin_busy" name="ani_test" tip="animateimg is used here" msgTransparent="0" />
@@ -165,7 +165,7 @@
 				<check name="chk_multi_lvflex" text="启用多选(关闭后点击为单选)" checked="1" font="size:12"/>
 				<check name="chk_band_lvflex" text="启用框选(关闭后多选拖动为 fling 滚动)" checked="1" font="size:12"/>
 				</window>
-				<listview size="-2,0" weight="1" name="lv_test_flex" multiSel="1" dividerSize="5" sbFadeFrames="30">
+				<listview size="-2,0" weight="1" name="lv_test_flex" multiSel="1" bandEnable="1" dividerSize="5" sbFadeFrames="30">
 				<template defHeight="50" oddHeight="50" evenHeight="60" evenSelHeight="90">
 					<itemOdd>
 						<button pos="10,5,@150,@25" name="btn_test" tip="click the button to see how to writing the response function">btn</button>
@@ -189,7 +189,7 @@
 				<check name="chk_multi_tile" text="启用多选(关闭后点击为单选)" checked="1" font="size:12"/>
 				<check name="chk_band_tile" text="启用框选(关闭后多选拖动为 fling 滚动)" checked="1" font="size:12"/>
 				</window>
-				<tileview size="-2,0" weight="1" name="lv_test_tile" multiSel="1" wantTab="1" marginSize="5" sbFadeFrames="30">
+				<tileview size="-2,0" weight="1" name="lv_test_tile" multiSel="1" bandEnable="1" wantTab="1" marginSize="5" sbFadeFrames="30">
 				<template itemHeight="130" itemWidth="135" trackMouseEvent="1">
 					<img pos="|0,0,@100,@100" offset="-0.5,0" name="img_file_icon" />
 					<button pos="|0,[5,@115,@22" offset="-0.5,0" name="btn_test" tip="click the button to see how to writing the response function">btn</button>

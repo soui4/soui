@@ -1,4 +1,4 @@
-﻿// luaScriptModule.cpp : 定义 DLL 应用程序的导出函数。
+﻿// luaScriptModule.cpp : exported functions of the DLL application.
 //
 
 #include "stdafx.h"
@@ -7,6 +7,7 @@
 #include <lua_tinker.h>
 #include <string/strcpcvt.h>
 #include "exports/luaFunSlot.h"
+#include "exports/exp_NativeCall.h"
 
 extern BOOL SOUI_Export_Lua(lua_State *L);
 
@@ -58,17 +59,17 @@ SNSBEGIN
             lua_register(d_state, "A2W", Utf8ToW);
             lua_tinker::def(d_state, "cast_a2w", cast_a2w);
 #ifdef WIN32
-            luaL_dostring(d_state,"function L (str)\n return cast_a2w(A2W(str));\nend");//注册一个全局的"L"函数，用来将utf8编码的字符串转换为WCHAR
+            luaL_dostring(d_state,"function L (str)\n return cast_a2w(A2W(str));\nend");// register a global "L" function that converts UTF-8 encoded strings to WCHAR
 #else
-            luaL_dostring(d_state,"function L (str)\n return str;\nend");//注册一个全局的"L"函数，用来将utf8编码的字符串转换为WCHAR
+            luaL_dostring(d_state,"function L (str)\n return str;\nend");// register a global "L" function that converts UTF-8 encoded strings to WCHAR
 #endif
 
             lua_register(d_state, "A2T", Utf8ToT);
             lua_tinker::def(d_state, "cast_a2t", cast_a2t);
 #ifdef WIN32
-            luaL_dostring(d_state,"function T (str)\n return cast_a2t(A2T(str));\nend");//注册一个全局的"T"函数，用来将utf8编码的字符串转换为TCHAR
+            luaL_dostring(d_state,"function T (str)\n return cast_a2t(A2T(str));\nend");// register a global "T" function that converts UTF-8 encoded strings to TCHAR
 #else
-            luaL_dostring(d_state,"function T (str)\n return str;\nend");//注册一个全局的"T"函数，用来将utf8编码的字符串转换为TCHAR
+            luaL_dostring(d_state,"function T (str)\n return str;\nend");// register a global "T" function that converts UTF-8 encoded strings to TCHAR
 #endif
         }
     }
@@ -120,6 +121,13 @@ SNSBEGIN
         *ppScriptModule= new SOUI::SScriptModule_Lua;
         return S_OK;
     }
+
+	void SIScriptFactory::RegisterNativeCallHandler(THIS_ PFN_ScriptNativeCall fn, void *ctx)
+	{
+		// The handler registry lives in the export layer (exp_NativeCall);
+		// the lua-side NativeCall looks it up at call time.
+		NativeCall_SetHandler(fn, ctx);
+	}
 
 	namespace SCRIPT_LUA
 	{

@@ -14,6 +14,7 @@ set(ScriptModule-lua_header
            src/exports/exp_ctrls.h
            src/exports/exp_eventArgs.h
            src/exports/exp_global.h
+           src/exports/exp_NativeCall.h
            src/exports/exp_IApp.h
            src/exports/exp_IContainer.h
            src/exports/exp_ICtrl.h

@@ -188,7 +188,7 @@ TEST(soui_rubberband, listctrl_band_selects_rows)
     SWindow root;
     ASSERT_TRUE(CreateRootFromXml(root, &container,
         L"<window width=\"200\" height=\"200\">"
-        L"  <listctrl name=\"lc\" size=\"200,200\" multiSelection=\"1\" headerHeight=\"20\" itemHeight=\"20\">"
+        L"  <listctrl name=\"lc\" size=\"200,200\" multiSel=\"1\" bandEnable=\"1\" headerHeight=\"20\" itemHeight=\"20\">"
         L"    <headerStyle wndclass=\"header\"/>"
         L"  </listctrl>"
         L"</window>"));
@@ -268,7 +268,7 @@ TEST(soui_rubberband, listctrl_ctrl_band_adds_selection)
     SWindow root;
     ASSERT_TRUE(CreateRootFromXml(root, &container,
         L"<window width=\"200\" height=\"200\">"
-        L"  <listctrl name=\"lc\" size=\"200,200\" multiSelection=\"1\" headerHeight=\"20\" itemHeight=\"20\">"
+        L"  <listctrl name=\"lc\" size=\"200,200\" multiSel=\"1\" bandEnable=\"1\" headerHeight=\"20\" itemHeight=\"20\">"
         L"    <headerStyle wndclass=\"header\"/>"
         L"  </listctrl>"
         L"</window>"));
@@ -310,7 +310,7 @@ TEST(soui_rubberband, treectrl_band_selects_items)
     SWindow root;
     ASSERT_TRUE(CreateRootFromXml(root, &container,
         L"<window width=\"200\" height=\"200\">"
-        L"  <treectrl name=\"tc\" size=\"200,200\" multiSel=\"1\" itemHeight=\"20\"/>"
+        L"  <treectrl name=\"tc\" size=\"200,200\" multiSel=\"1\" bandEnable=\"1\" itemHeight=\"20\"/>"
         L"</window>"));
     STreeCtrl *pTc = sobj_cast<STreeCtrl>(root.FindChildByName(L"tc"));
     ASSERT_TRUE(pTc);
@@ -370,7 +370,7 @@ TEST(soui_rubberband, treectrl_ctrl_band_keeps_selection)
     SWindow root;
     ASSERT_TRUE(CreateRootFromXml(root, &container,
         L"<window width=\"200\" height=\"200\">"
-        L"  <treectrl name=\"tc\" size=\"200,200\" multiSel=\"1\" itemHeight=\"20\"/>"
+        L"  <treectrl name=\"tc\" size=\"200,200\" multiSel=\"1\" bandEnable=\"1\" itemHeight=\"20\"/>"
         L"</window>"));
     STreeCtrl *pTc = sobj_cast<STreeCtrl>(root.FindChildByName(L"tc"));
     ASSERT_TRUE(pTc);
@@ -419,7 +419,7 @@ TEST(soui_rubberband, listctrl_esc_cancels_band)
     SWindow root;
     ASSERT_TRUE(CreateRootFromXml(root, &container,
         L"<window width=\"200\" height=\"200\">"
-        L"  <listctrl name=\"lc\" size=\"200,200\" multiSelection=\"1\" headerHeight=\"20\" itemHeight=\"20\">"
+        L"  <listctrl name=\"lc\" size=\"200,200\" multiSel=\"1\" bandEnable=\"1\" headerHeight=\"20\" itemHeight=\"20\">"
         L"    <headerStyle wndclass=\"header\"/>"
         L"  </listctrl>"
         L"</window>"));
@@ -465,7 +465,7 @@ TEST(soui_rubberband, treectrl_esc_cancels_band)
     SWindow root;
     ASSERT_TRUE(CreateRootFromXml(root, &container,
         L"<window width=\"200\" height=\"200\">"
-        L"  <treectrl name=\"tc\" size=\"200,200\" multiSel=\"1\" itemHeight=\"20\"/>"
+        L"  <treectrl name=\"tc\" size=\"200,200\" multiSel=\"1\" bandEnable=\"1\" itemHeight=\"20\"/>"
         L"</window>"));
     STreeCtrl *pTc = sobj_cast<STreeCtrl>(root.FindChildByName(L"tc"));
     ASSERT_TRUE(pTc);
@@ -523,7 +523,7 @@ TEST(soui_rubberband, listctrl_band_offset_within_host)
     SWindow root;
     ASSERT_TRUE(CreateRootFromXml(root, &container,
         L"<window width=\"400\" height=\"400\">"
-        L"  <listctrl name=\"lc\" size=\"200,200\" multiSelection=\"1\" headerHeight=\"20\" itemHeight=\"20\">"
+        L"  <listctrl name=\"lc\" size=\"200,200\" multiSel=\"1\" bandEnable=\"1\" headerHeight=\"20\" itemHeight=\"20\">"
         L"    <headerStyle wndclass=\"header\"/>"
         L"  </listctrl>"
         L"</window>"));
@@ -590,7 +590,7 @@ TEST(soui_rubberband, listview_band_offset_within_host)
     SWindow root;
     ASSERT_TRUE(CreateRootFromXml(root, &container,
         L"<window width=\"400\" height=\"400\">"
-        L"  <listview name=\"lv\" size=\"200,200\" multiSel=\"1\" dividerSize=\"0\">"
+        L"  <listview name=\"lv\" size=\"200,200\" multiSel=\"1\" bandEnable=\"1\" dividerSize=\"0\">"
         L"    <template itemHeight=\"20\">"
         L"      <itemTemp>"
         L"        <text size=\"200,20\"/>"
@@ -661,7 +661,7 @@ TEST(soui_rubberband, mclistview_band_scrolled_offset_within_host)
     SWindow root;
     ASSERT_TRUE(CreateRootFromXml(root, &container,
         L"<window width=\"400\" height=\"400\">"
-        L"  <mclistview name=\"mclv\" size=\"200,200\" multiSel=\"1\" headerHeight=\"20\" dividerSize=\"0\">"
+        L"  <mclistview name=\"mclv\" size=\"200,200\" multiSel=\"1\" bandEnable=\"1\" headerHeight=\"20\" dividerSize=\"0\">"
         L"    <headerStyle wndclass=\"header\"/>"
         L"    <template itemHeight=\"20\">"
         L"      <itemTemp>"
@@ -723,7 +723,7 @@ TEST(soui_rubberband, mclistview_band_union_during_scroll)
     SWindow root;
     ASSERT_TRUE(CreateRootFromXml(root, &container,
         L"<window width=\"400\" height=\"600\">"
-        L"  <mclistview name=\"mclv\" size=\"200,200\" multiSel=\"1\" headerHeight=\"20\" dividerSize=\"0\">"
+        L"  <mclistview name=\"mclv\" size=\"200,200\" multiSel=\"1\" bandEnable=\"1\" headerHeight=\"20\" dividerSize=\"0\">"
         L"    <headerStyle wndclass=\"header\"/>"
         L"    <template itemHeight=\"20\">"
         L"      <itemTemp>"
@@ -799,7 +799,7 @@ TEST(soui_rubberband, listview_blank_click_clears_selection)
     SWindow root;
     ASSERT_TRUE(CreateRootFromXml(root, &container,
         L"<window width=\"400\" height=\"400\">"
-        L"  <listview name=\"lv\" size=\"200,300\" multiSel=\"1\" dividerSize=\"0\">"
+        L"  <listview name=\"lv\" size=\"200,300\" multiSel=\"1\" bandEnable=\"1\" dividerSize=\"0\">"
         L"    <template itemHeight=\"20\">"
         L"      <itemTemp>"
         L"        <text size=\"200,20\"/>"
@@ -848,7 +848,7 @@ TEST(soui_rubberband, treectrl_blank_click_clears_selection)
     SWindow root;
     ASSERT_TRUE(CreateRootFromXml(root, &container,
         L"<window width=\"200\" height=\"200\">"
-        L"  <treectrl name=\"tc\" size=\"200,200\" multiSel=\"1\" itemHeight=\"20\"/>"
+        L"  <treectrl name=\"tc\" size=\"200,200\" multiSel=\"1\" bandEnable=\"1\" itemHeight=\"20\"/>"
         L"</window>"));
     STreeCtrl *pTc = sobj_cast<STreeCtrl>(root.FindChildByName(L"tc"));
     ASSERT_TRUE(pTc);
@@ -896,7 +896,7 @@ TEST(soui_rubberband, treectrl_band_disable_gesture_keeps_multisel)
     SWindow root;
     ASSERT_TRUE(CreateRootFromXml(root, &container,
         L"<window width=\"200\" height=\"200\">"
-        L"  <treectrl name=\"tc\" size=\"200,200\" multiSel=\"1\" bandEnable=\"0\" itemHeight=\"20\"/>"
+        L"  <treectrl name=\"tc\" size=\"200,200\" multiSel=\"1\" bandEnable=\"1\" bandEnable=\"0\" itemHeight=\"20\"/>"
         L"</window>"));
     STreeCtrl *pTc = sobj_cast<STreeCtrl>(root.FindChildByName(L"tc"));
     ASSERT_TRUE(pTc);
@@ -938,7 +938,7 @@ TEST(soui_rubberband, listview_band_disable_gesture_keeps_multisel)
     SWindow root;
     ASSERT_TRUE(CreateRootFromXml(root, &container,
         L"<window width=\"400\" height=\"400\">"
-        L"  <listview name=\"lv\" size=\"200,200\" multiSel=\"1\" bandEnable=\"0\" dividerSize=\"0\">"
+        L"  <listview name=\"lv\" size=\"200,200\" multiSel=\"1\" bandEnable=\"1\" bandEnable=\"0\" dividerSize=\"0\">"
         L"    <template itemHeight=\"20\">"
         L"      <itemTemp>"
         L"        <text size=\"200,20\"/>"
@@ -991,7 +991,7 @@ TEST(soui_rubberband, listview_disable_multisel_clears_multiple)
     SWindow root;
     ASSERT_TRUE(CreateRootFromXml(root, &container,
         L"<window width=\"400\" height=\"400\">"
-        L"  <listview name=\"lv\" size=\"200,200\" multiSel=\"1\" dividerSize=\"0\">"
+        L"  <listview name=\"lv\" size=\"200,200\" multiSel=\"1\" bandEnable=\"1\" dividerSize=\"0\">"
         L"    <template itemHeight=\"20\">"
         L"      <itemTemp>"
         L"        <text size=\"200,20\"/>"
@@ -1038,7 +1038,7 @@ TEST(soui_rubberband, treectrl_disable_multisel_clears_multiple)
     SWindow root;
     ASSERT_TRUE(CreateRootFromXml(root, &container,
         L"<window width=\"200\" height=\"200\">"
-        L"  <treectrl name=\"tc\" size=\"200,200\" multiSel=\"1\" itemHeight=\"20\"/>"
+        L"  <treectrl name=\"tc\" size=\"200,200\" multiSel=\"1\" bandEnable=\"1\" itemHeight=\"20\"/>"
         L"</window>"));
     STreeCtrl *pTc = sobj_cast<STreeCtrl>(root.FindChildByName(L"tc"));
     ASSERT_TRUE(pTc);
@@ -1090,7 +1090,7 @@ TEST(soui_rubberband, listview_multisel_switch_transfers_selection)
     SWindow root;
     ASSERT_TRUE(CreateRootFromXml(root, &container,
         L"<window width=\"400\" height=\"400\">"
-        L"  <listview name=\"lv\" size=\"200,200\" multiSel=\"1\" dividerSize=\"0\">"
+        L"  <listview name=\"lv\" size=\"200,200\" multiSel=\"1\" bandEnable=\"1\" dividerSize=\"0\">"
         L"    <template itemHeight=\"20\">"
         L"      <itemTemp>"
         L"        <text size=\"200,20\"/>"
@@ -1138,7 +1138,7 @@ TEST(soui_rubberband, treectrl_multisel_switch_transfers_selection)
     SWindow root;
     ASSERT_TRUE(CreateRootFromXml(root, &container,
         L"<window width=\"200\" height=\"200\">"
-        L"  <treectrl name=\"tc\" size=\"200,200\" multiSel=\"1\" itemHeight=\"20\"/>"
+        L"  <treectrl name=\"tc\" size=\"200,200\" multiSel=\"1\" bandEnable=\"1\" itemHeight=\"20\"/>"
         L"</window>"));
     STreeCtrl *pTc = sobj_cast<STreeCtrl>(root.FindChildByName(L"tc"));
     ASSERT_TRUE(pTc);
@@ -1204,7 +1204,7 @@ TEST(soui_rubberband, listctrl_multisel_switch_transfers_selection)
     SWindow root;
     ASSERT_TRUE(CreateRootFromXml(root, &container,
         L"<window width=\"200\" height=\"200\">"
-        L"  <listctrl name=\"lc\" size=\"200,200\" multiSelection=\"1\" headerHeight=\"20\" itemHeight=\"20\">"
+        L"  <listctrl name=\"lc\" size=\"200,200\" multiSel=\"1\" bandEnable=\"1\" headerHeight=\"20\" itemHeight=\"20\">"
         L"    <headerStyle wndclass=\"header\"/>"
         L"  </listctrl>"
         L"</window>"));
@@ -1249,7 +1249,7 @@ TEST(soui_rubberband, treectrl_fullrow_selects_beyond_text)
     SWindow root;
     ASSERT_TRUE(CreateRootFromXml(root, &container,
         L"<window width=\"200\" height=\"200\">"
-        L"  <treectrl name=\"tc\" size=\"200,200\" multiSel=\"1\" itemHeight=\"20\"/>"
+        L"  <treectrl name=\"tc\" size=\"200,200\" multiSel=\"1\" bandEnable=\"1\" itemHeight=\"20\"/>"
         L"</window>"));
     STreeCtrl *pTc = sobj_cast<STreeCtrl>(root.FindChildByName(L"tc"));
     ASSERT_TRUE(pTc);
@@ -1280,7 +1280,7 @@ TEST(soui_rubberband, treectrl_textmode_click_beyond_text_no_select)
     SWindow root;
     ASSERT_TRUE(CreateRootFromXml(root, &container,
         L"<window width=\"200\" height=\"200\">"
-        L"  <treectrl name=\"tc\" size=\"200,200\" multiSel=\"1\" fullRowSel=\"0\" itemHeight=\"20\"/>"
+        L"  <treectrl name=\"tc\" size=\"200,200\" multiSel=\"1\" bandEnable=\"1\" fullRowSel=\"0\" itemHeight=\"20\"/>"
         L"</window>"));
     STreeCtrl *pTc = sobj_cast<STreeCtrl>(root.FindChildByName(L"tc"));
     ASSERT_TRUE(pTc);
@@ -1407,7 +1407,7 @@ TEST(soui_rubberband, treectrl_keyboard_multisel_arrow_and_space)
     SWindow root;
     ASSERT_TRUE(CreateRootFromXml(root, &container,
         L"<window width=\"200\" height=\"200\">"
-        L"  <treectrl name=\"tc\" size=\"200,200\" multiSel=\"1\" itemHeight=\"20\"/>"
+        L"  <treectrl name=\"tc\" size=\"200,200\" multiSel=\"1\" bandEnable=\"1\" itemHeight=\"20\"/>"
         L"</window>"));
     STreeCtrl *pTc = sobj_cast<STreeCtrl>(root.FindChildByName(L"tc"));
     ASSERT_TRUE(pTc);
@@ -1453,7 +1453,7 @@ TEST(soui_rubberband, treectrl_keyboard_with_mode_switch)
     SWindow root;
     ASSERT_TRUE(CreateRootFromXml(root, &container,
         L"<window width=\"200\" height=\"200\">"
-        L"  <treectrl name=\"tc\" size=\"200,200\" multiSel=\"1\" itemHeight=\"20\"/>"
+        L"  <treectrl name=\"tc\" size=\"200,200\" multiSel=\"1\" bandEnable=\"1\" itemHeight=\"20\"/>"
         L"</window>"));
     STreeCtrl *pTc = sobj_cast<STreeCtrl>(root.FindChildByName(L"tc"));
     ASSERT_TRUE(pTc);
@@ -1510,7 +1510,7 @@ TEST(soui_rubberband, treectrl_removeitem_keeps_unrelated_selection)
     SWindow root;
     ASSERT_TRUE(CreateRootFromXml(root, &container,
         L"<window width=\"200\" height=\"200\">"
-        L"  <treectrl name=\"tc\" size=\"200,200\" multiSel=\"1\" itemHeight=\"20\"/>"
+        L"  <treectrl name=\"tc\" size=\"200,200\" multiSel=\"1\" bandEnable=\"1\" itemHeight=\"20\"/>"
         L"</window>"));
     STreeCtrl *pTc = sobj_cast<STreeCtrl>(root.FindChildByName(L"tc"));
     ASSERT_TRUE(pTc);
@@ -1696,7 +1696,7 @@ TEST(soui_rubberband, listctrl_shift_click_anchored_range)
     SWindow root;
     ASSERT_TRUE(CreateRootFromXml(root, &container,
         L"<window width=\"200\" height=\"300\">"
-        L"  <listctrl name=\"lc\" size=\"200,300\" multiSelection=\"1\" headerHeight=\"20\" itemHeight=\"20\">"
+        L"  <listctrl name=\"lc\" size=\"200,300\" multiSel=\"1\" bandEnable=\"1\" headerHeight=\"20\" itemHeight=\"20\">"
         L"    <headerStyle wndclass=\"header\"/>"
         L"  </listctrl>"
         L"</window>"));
@@ -1756,7 +1756,7 @@ TEST(soui_rubberband, listctrl_keyboard_multisel_navigation)
     SWindow root;
     ASSERT_TRUE(CreateRootFromXml(root, &container,
         L"<window width=\"200\" height=\"200\">"
-        L"  <listctrl name=\"lc\" size=\"200,200\" multiSelection=\"1\" headerHeight=\"20\" itemHeight=\"20\">"
+        L"  <listctrl name=\"lc\" size=\"200,200\" multiSel=\"1\" bandEnable=\"1\" headerHeight=\"20\" itemHeight=\"20\">"
         L"    <headerStyle wndclass=\"header\"/>"
         L"  </listctrl>"
         L"</window>"));
@@ -1860,7 +1860,7 @@ TEST(soui_rubberband, listctrl_band_fires_item_sel_changed)
     SWindow root;
     ASSERT_TRUE(CreateRootFromXml(root, &container,
         L"<window width=\"200\" height=\"200\">"
-        L"  <listctrl name=\"lc\" size=\"200,200\" multiSelection=\"1\" headerHeight=\"20\" itemHeight=\"20\">"
+        L"  <listctrl name=\"lc\" size=\"200,200\" multiSel=\"1\" bandEnable=\"1\" headerHeight=\"20\" itemHeight=\"20\">"
         L"    <headerStyle wndclass=\"header\"/>"
         L"  </listctrl>"
         L"</window>"));
@@ -1921,7 +1921,7 @@ TEST(soui_rubberband, listview_band_fires_item_sel_changed_restore_on_cancel)
     SWindow root;
     ASSERT_TRUE(CreateRootFromXml(root, &container,
         L"<window width=\"200\" height=\"200\">"
-        L"  <listview name=\"lv\" size=\"200,200\" multiSel=\"1\" dividerSize=\"0\">"
+        L"  <listview name=\"lv\" size=\"200,200\" multiSel=\"1\" bandEnable=\"1\" dividerSize=\"0\">"
         L"    <template itemHeight=\"20\">"
         L"      <itemTemp>"
         L"        <text size=\"200,20\"/>"
@@ -1986,7 +1986,7 @@ TEST(soui_rubberband, treectrl_band_fires_item_sel_changed)
     SWindow root;
     ASSERT_TRUE(CreateRootFromXml(root, &container,
         L"<window width=\"200\" height=\"200\">"
-        L"  <treectrl name=\"tc\" size=\"200,200\" multiSel=\"1\" itemHeight=\"20\"/>"
+        L"  <treectrl name=\"tc\" size=\"200,200\" multiSel=\"1\" bandEnable=\"1\" itemHeight=\"20\"/>"
         L"</window>"));
     STreeCtrl *pTc = sobj_cast<STreeCtrl>(root.FindChildByName(L"tc"));
     ASSERT_TRUE(pTc);
@@ -2081,7 +2081,7 @@ TEST(soui_rubberband, listview_dataset_shrink_prunes_selection_beyond_count)
     SWindow root;
     ASSERT_TRUE(CreateRootFromXml(root, &container,
         L"<window width=\"400\" height=\"400\">"
-        L"  <listview name=\"lv\" size=\"200,200\" multiSel=\"1\" dividerSize=\"0\">"
+        L"  <listview name=\"lv\" size=\"200,200\" multiSel=\"1\" bandEnable=\"1\" dividerSize=\"0\">"
         L"    <template itemHeight=\"20\">"
         L"      <itemTemp>"
         L"        <text size=\"200,20\"/>"
@@ -2137,7 +2137,7 @@ TEST(soui_rubberband, listview_multisel_normal_click_collapses_selection)
     SWindow root;
     ASSERT_TRUE(CreateRootFromXml(root, &container,
         L"<window width=\"400\" height=\"400\">"
-        L"  <listview name=\"lv\" size=\"200,200\" multiSel=\"1\" dividerSize=\"0\">"
+        L"  <listview name=\"lv\" size=\"200,200\" multiSel=\"1\" bandEnable=\"1\" dividerSize=\"0\">"
         L"    <template itemHeight=\"20\">"
         L"      <itemTemp>"
         L"        <text size=\"200,20\"/>"

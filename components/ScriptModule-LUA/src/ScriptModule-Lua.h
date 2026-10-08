@@ -23,8 +23,8 @@ class SScriptModule_Lua : public TObjRefImpl<IScriptModule>
 
 	/**
      * GetScriptEngine
-     * @brief    获得脚本引擎的指针
-     * @return   void * -- 脚本引擎的指针
+     * @brief    Get the pointer to the script engine
+     * @return   void * -- pointer to the script engine
      * Describe  
      */    
     STDMETHOD_(void *,GetScriptEngine)(THIS) OVERRIDE {return d_state;}
@@ -93,6 +93,8 @@ class SScriptModule_Lua : public TObjRefImpl<IScriptModule>
     {
     public:
 		STDMETHOD_(HRESULT,CreateScriptModule)(THIS_ IScriptModule ** ppScriptModule) OVERRIDE;
+
+		STDMETHOD_(void, RegisterNativeCallHandler)(THIS_ PFN_ScriptNativeCall fn, void *ctx) OVERRIDE;
     };
 
 	namespace SCRIPT_LUA

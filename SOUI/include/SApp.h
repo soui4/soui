@@ -387,6 +387,7 @@ class SOUI_EXP SObjectDefaultRegister : public ISystemObjectRegister {
       */
      STDMETHOD_(void, SetScriptFactory)(THIS_ IScriptFactory *pScriptModule) OVERRIDE;
  
+	 STDMETHOD_(IScriptFactory *,GetScriptFactory)(CTHIS) SCONST OVERRIDE;
      /**
       * @brief Initialize XML named IDs from arrays
       * @param pNames Array of names

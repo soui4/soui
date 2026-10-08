@@ -17,9 +17,35 @@
 #include <interface/obj-ref-i.h>
 #include <interface/SEvtArgs-i.h>
 #include <interface/SMsgLoop-i.h>
+#include <oleauto.h>
 #include <stdint.h>
 
 SNSBEGIN
+
+/**
+ * @brief NativeCall handler function pointer type
+ *
+ * When the script side calls NativeCall(name, ...), the bridge layer boxes
+ * every argument after name into a VARIANT and passes them to the handler
+ * as an array plus a count. The boxing rules are:
+ *   - lua nil      -> VT_EMPTY
+ *   - lua boolean  -> VT_BOOL  (boolVal, VARIANT_TRUE / VARIANT_FALSE)
+ *   - lua integer  -> VT_I8    (llVal)
+ *   - lua number   -> VT_R8    (dblVal)
+ *   - lua string   -> VT_LPSTR (pcVal, raw bytes; a NULL-terminated copy)
+ * Memory contract: the boxes live on the bridge stack and are NOT released
+ * with VariantClear (that would CoTaskMemFree the VT_LPSTR data, which is
+ * owned by bridge-side string buffers). Everything reachable through args
+ * is valid only during the callback call; the handler must neither free it
+ * nor retain pointers beyond the call.
+ *
+ * @param ctx   user context supplied to RegisterNativeCallHandler at registration
+ * @param name  first argument of the script-side NativeCall (function name string)
+ * @param args  array of boxed arguments (unbox by vt; valid only during the call)
+ * @param argc  number of elements in args (may be 0)
+ * @return int  returned directly to the script side as the NativeCall result
+ */
+typedef int (*PFN_ScriptNativeCall)(void *ctx, LPCSTR name, const VARIANT *args, int argc);
 
 /**
 @brief
@@ -127,6 +153,15 @@ DECLARE_INTERFACE_(IScriptFactory, IObjRef)
      * @return HRESULT
      */
     STDMETHOD_(HRESULT, CreateScriptModule)(THIS_ IScriptModule * *ppScriptModule) PURE;
+
+    /**
+     * @brief Register a handler for the script NativeCall(...) function
+     * @param fn - handler function pointer, NULL to unregister
+     * @param ctx - user context passed back to the handler on every call
+     * @return void
+     * @see PFN_ScriptNativeCall
+     */
+    STDMETHOD_(void, RegisterNativeCallHandler)(THIS_ PFN_ScriptNativeCall fn, void *ctx) PURE;
 };
 
 SNSEND

@@ -12,6 +12,12 @@ bet_rate = 4;		--赔率
 prog_max	 = 200;	--最大步数
 prog_all = {0,0,0,0} --马匹进度
 
+-- E2E: verify the C++ handler registered via IScriptFactory::RegisterNativeCallHandler
+-- at script load time (DemoNativeCallHandler in demo.cpp; variadic args passed
+-- as a VARIANT array; 1+2+3+int(4.5) = 10)
+local ok, ret = pcall(NativeCall, "cppSum", 1, 2, 3, 4.5);
+slog("NativeCall cppSum ok=" .. tostring(ok) .. " ret=" .. tostring(ret));
+
 function on_host_msg(hostWnd,msg, wp,lp,pRes)
 	--slog("test on host msg:" .. msg);
 	if msg == 0x82 then -- 0x82 == WM_NCDESTROY

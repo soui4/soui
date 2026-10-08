@@ -56,6 +56,9 @@ extern "C" {
 #define IScriptFactory_CreateScriptModule(This, ppScriptModule) \
     ((This)->lpVtbl->CreateScriptModule(This, ppScriptModule))
 
+#define IScriptFactory_RegisterNativeCallHandler(This, fn, ctx) \
+    ((This)->lpVtbl->RegisterNativeCallHandler(This, fn, ctx))
+
 #ifdef __cplusplus
 }
 #endif

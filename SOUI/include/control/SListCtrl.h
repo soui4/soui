@@ -666,7 +666,7 @@ class SOUI_EXP SListCtrl : public SPanel {
         ATTR_LAYOUTSIZE(L"headerHeight", m_nHeaderHeight, FALSE)
         ATTR_LAYOUTSIZE(L"itemHeight", m_nItemHeight, FALSE)
         ATTR_BOOL(L"checkBox", m_bCheckBox, TRUE)
-        ATTR_BOOL(L"multiSelection", m_bMultiSelection, TRUE)
+        ATTR_BOOL(L"multiSel", m_bMultiSelection, TRUE)
         ATTR_SKIN(L"itemSkin", m_pItemSkin, TRUE)
         ATTR_SKIN(L"iconSkin", m_pIconSkin, TRUE)
         ATTR_SKIN(L"checkSkin", m_pCheckSkin, TRUE)

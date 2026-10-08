@@ -101,6 +101,10 @@ extern "C" {
 #define IApplication_SetScriptFactory(This, pScriptModule) \
     ((This)->lpVtbl->SetScriptFactory(This, pScriptModule))
 
+#define IApplication_GetScriptFactory(This) \
+    ((This)->lpVtbl->GetScriptFactory(This))
+    
+STDMETHOD_(IScriptFactory *,GetScriptFactory)(CTHIS) SCONST PURE;
 #define IApplication_InitXmlNamedID(This, pNames, nIds, nCount) \
     ((This)->lpVtbl->InitXmlNamedID(This, pNames, nIds, nCount))
 

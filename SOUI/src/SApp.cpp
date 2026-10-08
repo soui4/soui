@@ -750,6 +750,11 @@ void SApplication::SetScriptFactory(IScriptFactory *pScriptFactory)
     m_pScriptFactory = pScriptFactory;
 }
 
+IScriptFactory * SApplication::GetScriptFactory(CTHIS) const
+{
+	return m_pScriptFactory;
+}
+
 HRESULT SApplication::CreateScriptModule(IScriptModule **ppScriptModule)
 {
     if (!m_pScriptFactory)
@@ -1086,6 +1091,7 @@ BOOL SApplication::GetBaseClassName(THIS_ LPCWSTR pszClassName, int objType, wch
     wcscpy_s(pszBaseClassName, MAX_OBJNAME, baseClassInfo.szName);
     return TRUE;
 }
+
 LPCWSTR SOUI_EXP GetAttrAlias(LPCWSTR pszAttr, IObject *pObject)
 {
     if (const IAttrAlias *pAttrAlias = SApplication::getSingletonPtr()->GetAttrAlias())
