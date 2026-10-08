@@ -59,9 +59,11 @@ class SOUI_EXP SMenuExItem : public SWindow {
      */
     WCHAR GetHotKey() const;
 
-    virtual BOOL IsSeperator() const {
+    virtual BOOL IsSeperator() const
+    {
         return FALSE;
     }
+
   protected:
     void BeforePaint(IRenderTarget *pRT, SPainter &painter) const override;
 

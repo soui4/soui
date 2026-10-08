@@ -505,9 +505,11 @@ class SMenuExSep : public SMenuExItem {
         *psz = szRet;
     }
 
-    BOOL IsSeperator() const override{
+    BOOL IsSeperator() const override
+    {
         return TRUE;
     }
+
   protected:
     BOOL OnEraseBkgnd(IRenderTarget *pRT)
     {
@@ -826,33 +828,33 @@ void SMenuEx::ShowMenu(UINT uFlag, int x, int y)
 
     SendInitPopupMenu2Owner(0);
     pMenuRoot->SDispatchMessage(UM_SETSCALE, GetScale(), 0);
-	//SWindow * pItem = pMenuRoot->GetWindow(GSW_FIRSTCHILD);
- //   int iItem = 0;
- //   while(pItem)
- //   {
-	//	SMenuExItem* pMenuItem = sobj_cast<SMenuExItem>(pItem);
- //       if (pMenuItem) {
- //           if (!pMenuItem->IsSeperator()){
- //               EventUpdateCmdUI evt(pItem);
- //               evt.nCmdId = pMenuItem->GetID();
- //               evt.iIndex = iItem;
- //               evt.bEnable = (pMenuItem->GetState() & WndState_Disable) ? FALSE : TRUE;
- //               evt.bChecked = (pMenuItem->GetState() & WndState_Check) ? TRUE : FALSE;
- //               if (pItem->FireEvent(evt)) {
- //                   if (evt.bEnable)
- //                       pItem->ModifyState(0, WndState_Disable);
- //                   else
- //                       pItem->ModifyState(WndState_Disable, 0);
- //                   if (evt.bChecked)
- //                       pItem->ModifyState(WndState_Check, 0);
- //                   else
- //                       pItem->ModifyState(0, WndState_Check);
- //               }
- //           }
- //           iItem++;
- //       }
- //       pItem = pItem->GetWindow(GSW_NEXTSIBLING);
-	//}
+    // SWindow * pItem = pMenuRoot->GetWindow(GSW_FIRSTCHILD);
+    //   int iItem = 0;
+    //   while(pItem)
+    //   {
+    //	SMenuExItem* pMenuItem = sobj_cast<SMenuExItem>(pItem);
+    //       if (pMenuItem) {
+    //           if (!pMenuItem->IsSeperator()){
+    //               EventUpdateCmdUI evt(pItem);
+    //               evt.nCmdId = pMenuItem->GetID();
+    //               evt.iIndex = iItem;
+    //               evt.bEnable = (pMenuItem->GetState() & WndState_Disable) ? FALSE : TRUE;
+    //               evt.bChecked = (pMenuItem->GetState() & WndState_Check) ? TRUE : FALSE;
+    //               if (pItem->FireEvent(evt)) {
+    //                   if (evt.bEnable)
+    //                       pItem->ModifyState(0, WndState_Disable);
+    //                   else
+    //                       pItem->ModifyState(WndState_Disable, 0);
+    //                   if (evt.bChecked)
+    //                       pItem->ModifyState(WndState_Check, 0);
+    //                   else
+    //                       pItem->ModifyState(0, WndState_Check);
+    //               }
+    //           }
+    //           iItem++;
+    //       }
+    //       pItem = pItem->GetWindow(GSW_NEXTSIBLING);
+    //}
 
     CSize szMenu = pMenuRoot->CalcMenuSize();
 

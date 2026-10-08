@@ -4,6 +4,7 @@
 #include <core/SWnd.h>
 #include <helper/SMenu.h>
 #include <helper/SMenuEx.h>
+#include <helper/STls.h>
 
 SNSBEGIN
 
@@ -67,7 +68,7 @@ class SOUI_EXP SMenuBar : public SWindow {
 
     /**
      * @brief Hit test to determine the menu item under the mouse
-     * @param pt Mouse coordinates
+     * @param pt Mouse coordinates in the host window's client coordinate system
      * @return Index of the menu item if found, -1 otherwise
      */
     int HitTest(CPoint pt);
@@ -118,8 +119,32 @@ class SOUI_EXP SMenuBar : public SWindow {
     CPoint m_ptMouse;                     /**< Mouse coordinates */
     BOOL m_bUseMenuEx;                    /**< Flag indicating whether to use SMenuEx */
 
-    static HHOOK m_hMsgHook;     /**< Handle to the message hook */
-    static SMenuBar *m_pMenuBar; /**< Pointer to the current menu bar instance */
+    /**
+     * @brief Get the message hook handle stored for the current thread
+     * @details VS2008 无 thread_local 支持，经 STls 线程局部存储保存。
+     */
+    static HHOOK GetMsgHook();
+
+    /**
+     * @brief Set the message hook handle for the current thread
+     * @param hMsgHook Hook handle, NULL to clear
+     */
+    static void SetMsgHook(HHOOK hMsgHook);
+
+    /**
+     * @brief Get the menu bar instance bound to the current thread
+     */
+    static SMenuBar *GetMenuBar();
+
+    /**
+     * @brief Bind the current thread's menu bar instance
+     * @param pMenuBar Menu bar instance, NULL to clear
+     */
+    static void SetMenuBar(SMenuBar *pMenuBar);
+
+  private:
+    static STlsId s_tlsMsgHook; /**< TLS slot id for the message hook handle */
+    static STlsId s_tlsMenuBar; /**< TLS slot id for the current menu bar instance */
 };
 
 SNSEND

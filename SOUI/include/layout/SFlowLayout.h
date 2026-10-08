@@ -194,11 +194,11 @@ class SOUI_EXP SFlowLayout : public TObjRefImpl<SObjectImpl<ILayout>> {
             ATTR_ENUM_VALUE(L"horizontal", Horz)            /**< Horizontal direction: arrange from left to right, wrap to next line when exceeding width */
             ATTR_ENUM_VALUE(L"vertical", Vert)              /**< Vertical direction: arrange from top to bottom, move to next column when exceeding height */
         ATTR_ENUM_END(m_orientation)
-        ATTR_GRAVITY(L"gravity", m_xgravity = m_ygravity, TRUE)      /**< Alignment: assigns both xgravity and ygravity at once */
-        ATTR_GRAVITY(L"xgravity", m_xgravity, TRUE)                  /**< Horizontal alignment: hflow - line alignment in parent; vflow - default item alignment in column */
-        ATTR_GRAVITY(L"ygravity", m_ygravity, TRUE)                  /**< Vertical alignment: hflow - default item alignment in line; vflow - column alignment in parent */
-        ATTR_LAYOUTSIZE(L"xInterval", m_xInterval, TRUE)             /**< Horizontal spacing */
-        ATTR_LAYOUTSIZE(L"yInterval", m_yInterval, TRUE)             /**< Vertical spacing */
+        ATTR_GRAVITY(L"gravity", m_xgravity = m_ygravity, TRUE)       /**< Alignment: assigns both xgravity and ygravity at once */
+        ATTR_GRAVITY(L"xgravity", m_xgravity, TRUE)                   /**< Horizontal alignment: hflow - line alignment in parent; vflow - default item alignment in column */
+        ATTR_GRAVITY(L"ygravity", m_ygravity, TRUE)                   /**< Vertical alignment: hflow - default item alignment in line; vflow - column alignment in parent */
+        ATTR_LAYOUTSIZE(L"xInterval", m_xInterval, TRUE)              /**< Horizontal spacing */
+        ATTR_LAYOUTSIZE(L"yInterval", m_yInterval, TRUE)              /**< Vertical spacing */
         ATTR_LAYOUTSIZE(L"interval", m_xInterval = m_yInterval, TRUE) /**< Spacing (same for horizontal and vertical) */
     SOUI_ATTRS_BREAK()
 

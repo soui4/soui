@@ -255,9 +255,10 @@ class SOUI_EXP SwndContainerImpl
     virtual void OnTimelineRequestChanged(BOOL bHasTimelineRequest) PURE;
 
     /**
-    * @brief Determine whether time line manager empty or not.
-    */
+     * @brief Determine whether time line manager empty or not.
+     */
     bool IsTimeLineMgrEmpty() const;
+
   protected:
     /**
      * @brief Handles mouse move events within the frame.

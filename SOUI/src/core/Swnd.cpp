@@ -916,8 +916,8 @@ BOOL SWindow::OnSetCursor(const CPoint &pt)
 /** Get SWindow state */
 DWORD SWindow::GetState(void) const
 {
-    if(IsMsgTransparent() && GetParent())
-		return GetParent()->GetState();
+    if (IsMsgTransparent() && GetParent())
+        return GetParent()->GetState();
     return m_dwState;
 }
 
@@ -3447,7 +3447,7 @@ SWND SWindow::SetCapture()
 {
     if (!GetContainer())
         return 0;
-	//SSLOGI() << "SetCapture swnd=" << m_swnd<<" hwnd="<<GetHostHwnd();
+    // SSLOGI() << "SetCapture swnd=" << m_swnd<<" hwnd="<<GetHostHwnd();
     return GetContainer()->OnSetSwndCapture(m_swnd);
 }
 
@@ -3455,7 +3455,7 @@ BOOL SWindow::ReleaseCapture()
 {
     if (!GetContainer())
         return FALSE;
-    //SSLOGI() << "ReleaseCapture swnd=" << m_swnd << " hwnd=" << GetHostHwnd();
+    // SSLOGI() << "ReleaseCapture swnd=" << m_swnd << " hwnd=" << GetHostHwnd();
     return GetContainer()->OnReleaseSwndCapture();
 }
 
@@ -4340,7 +4340,7 @@ IAccProxy *SWindow::GetAccProxy()
 static BOOL s_bAccEnable = TRUE;
 void SWindow::EnableAcc(BOOL bEnable)
 {
-	s_bAccEnable = bEnable;
+    s_bAccEnable = bEnable;
 }
 
 void SWindow::accNotifyEvent(DWORD dwEvt)

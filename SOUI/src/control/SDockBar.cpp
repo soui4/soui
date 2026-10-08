@@ -34,8 +34,7 @@ SDockBar::~SDockBar(void)
     // down), unregister from the dock parent so FindChildByID/ByName no longer
     // reports a dangling window. The dock parent may already be destroyed when
     // the whole application shuts down, so validate it through the window map.
-    if (m_bFloating && m_pDockParent &&
-        SWindowMgr::GetWindow(m_pDockParent->GetSwnd()) == m_pDockParent)
+    if (m_bFloating && m_pDockParent && SWindowMgr::GetWindow(m_pDockParent->GetSwnd()) == m_pDockParent)
     {
         m_pDockParent->RemoveDetachedChild(this);
     }
@@ -305,9 +304,9 @@ void SDockBar::OnPaint(IRenderTarget *pRT)
             {
                 CPoint cpt = rcDockBtn.CenterPoint();
                 POINT pts[3] = {
-                    {cpt.x - nGlyph / 2, cpt.y - nGlyph / 2},
-                    {cpt.x + nGlyph / 2, cpt.y - nGlyph / 2},
-                    {cpt.x, cpt.y + nGlyph / 2},
+                    { cpt.x - nGlyph / 2, cpt.y - nGlyph / 2 },
+                    { cpt.x + nGlyph / 2, cpt.y - nGlyph / 2 },
+                    { cpt.x, cpt.y + nGlyph / 2 },
                 };
                 SAutoRefPtr<IBrushS> pBrush, pOldBrush;
                 pRT->CreateSolidColorBrush(RGBA(255, 255, 255, 255), &pBrush);

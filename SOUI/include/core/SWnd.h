@@ -396,8 +396,9 @@ class SOUI_EXP SWindow
     /**
      * @brief Enables or disables accessibility support.
      * @param bEnable TRUE to enable, FALSE to disable.
-	 */
-	static void EnableAcc(BOOL bEnable);
+     */
+    static void EnableAcc(BOOL bEnable);
+
   public:
     /**
      * @brief Called when the last reference to the object is released.

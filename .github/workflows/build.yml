@@ -80,7 +80,7 @@ jobs:
       if: matrix.os == 'macOS'
       run: |
         brew update
-        brew install ninja pkgconf glfw3 glew mingw-w64
+        brew install ninja pkgconf glfw glew mingw-w64
 
     - name: Configure CMake (Linux x64)
       if: matrix.os == 'Linux' && matrix.arch == 'x64'

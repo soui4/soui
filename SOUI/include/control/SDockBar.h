@@ -119,7 +119,7 @@ class SOUI_EXP SDockBar : public SWindow {
 
     BOOL m_bFloating;
     BOOL m_bDragFloating;
-    BOOL m_bInitFloating;    /**< XML 属性 floating：创建后进入 float 模式 */
+    BOOL m_bInitFloating;     /**< XML 属性 floating：创建后进入 float 模式 */
     BOOL m_bInitFloatPending; /**< 初始化 float 已被延迟（等待布局完成） */
     CPoint m_ptDragStart;
     CPoint m_ptFloatDragScreen; /**< 拖动中继锚点：浮动窗口左上角屏幕坐标 */

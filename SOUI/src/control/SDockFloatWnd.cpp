@@ -38,8 +38,7 @@ BOOL SDockFloatWnd::Create(SDockBar *pDockBar, HWND hOwner, const CPoint &ptScre
     xmlFloatHost.append_attribute(L"layout").set_value(L"frame");
     xmlFloatHost.append_attribute(L"dock").set_value(L"mainview");
 
-    HWND hWnd = CreateEx(hOwner, WS_POPUP | WS_CLIPCHILDREN, WS_EX_TOOLWINDOW,
-                         ptScreen.x, ptScreen.y, szFloat.cx, szFloat.cy, &xmlSOUI);
+    HWND hWnd = CreateEx(hOwner, WS_POPUP | WS_CLIPCHILDREN, WS_EX_TOOLWINDOW, ptScreen.x, ptScreen.y, szFloat.cx, szFloat.cy, &xmlSOUI);
     if (!hWnd)
     {
         delete this;
@@ -64,8 +63,7 @@ void SDockFloatWnd::MoveTo(const CPoint &ptTopLeft)
 {
     if (m_hWnd && ::IsWindow(m_hWnd))
     {
-        ::SetWindowPos(m_hWnd, NULL, ptTopLeft.x, ptTopLeft.y, 0, 0,
-                       SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+        ::SetWindowPos(m_hWnd, NULL, ptTopLeft.x, ptTopLeft.y, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
     }
 }
 

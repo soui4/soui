@@ -7,8 +7,28 @@
 
 SNSBEGIN
 
-HHOOK SMenuBar::m_hMsgHook = NULL;
-SMenuBar *SMenuBar::m_pMenuBar = NULL;
+STlsId SMenuBar::s_tlsMsgHook = 0;
+STlsId SMenuBar::s_tlsMenuBar = 0;
+
+HHOOK SMenuBar::GetMsgHook()
+{
+    return (HHOOK)STls::Get(&s_tlsMsgHook);
+}
+
+void SMenuBar::SetMsgHook(HHOOK hMsgHook)
+{
+    STls::Set(&s_tlsMsgHook, (void *)hMsgHook, NULL);
+}
+
+SMenuBar *SMenuBar::GetMenuBar()
+{
+    return (SMenuBar *)STls::Get(&s_tlsMenuBar);
+}
+
+void SMenuBar::SetMenuBar(SMenuBar *pMenuBar)
+{
+    STls::Set(&s_tlsMenuBar, (void *)pMenuBar, NULL);
+}
 
 const wchar_t XmlBtnStyle[] = L"btnStyle";
 const wchar_t XmlMenus[] = L"menus";
@@ -118,6 +138,10 @@ UINT SMenuBarItem::PopMenu()
     m_pHostMenu->m_bIsShow = TRUE;
     m_pHostMenu->m_pNowMenu = this;
     m_pHostMenu->m_iNowMenu = m_iIndex;
+    // 菜单会话开始：将当前实例绑定为 hook 回调的操作对象，并确保 hook 已安装
+    SMenuBar::SetMenuBar(m_pHostMenu);
+    if (SMenuBar::GetMsgHook() == NULL)
+        SMenuBar::SetMsgHook(::SetWindowsHookEx(WH_MSGFILTER, SMenuBar::MenuSwitch, NULL, GetCurrentThreadId())); // m_bLoop may become TRUE
 
     // Send the popup event
     EventPopMenu evt_pop(m_pHostMenu);
@@ -128,11 +152,11 @@ UINT SMenuBarItem::PopMenu()
     SetCheck(TRUE);
 
     CRect rcHost;
-    ::GetWindowRect(m_pHostMenu->m_hWnd, rcHost);
+    if (::IsWindow(m_pHostMenu->m_hWnd))
+        ::GetWindowRect(m_pHostMenu->m_hWnd, rcHost);
+    else
+        rcHost.SetRectEmpty();
     CRect rcMenu = GetClientRect();
-
-    if (SMenuBar::m_hMsgHook == NULL)
-        SMenuBar::m_hMsgHook = ::SetWindowsHookEx(WH_MSGFILTER, SMenuBar::MenuSwitch, NULL, GetCurrentThreadId()); // m_bLoop may become TRUE
 
     int iRet = 0;
     if (IsUseMenuEx())
@@ -159,9 +183,15 @@ UINT SMenuBarItem::PopMenu()
     m_pHostMenu->m_iNowMenu = -1;
     m_pHostMenu->m_pNowMenu = NULL;
 
-    // uninstall hook
-    ::UnhookWindowsHookEx(SMenuBar::m_hMsgHook);
-    SMenuBar::m_hMsgHook = NULL;
+    // uninstall hook and unbind this instance
+    HHOOK hMsgHook = SMenuBar::GetMsgHook();
+    if (hMsgHook)
+    {
+        ::UnhookWindowsHookEx(hMsgHook);
+        SMenuBar::SetMsgHook(NULL);
+    }
+    if (SMenuBar::GetMenuBar() == m_pHostMenu)
+        SMenuBar::SetMenuBar(NULL);
 
     // Send the selection event
     EventSelectMenu evt_sel(m_pHostMenu);
@@ -229,19 +259,24 @@ SMenuBar::SMenuBar()
     , m_bUseMenuEx(FALSE)
 {
     m_evtSet.addEvent(EVENTID(EventSelectMenu));
-    SMenuBar::m_pMenuBar = this;
+    // 不在构造时占用 m_pMenuBar：仅在实际弹菜单（PopMenu）时绑定，避免多个实例相互覆盖
     m_pLayout.Attach(new SHBox());
     m_pLayout->SetAttribute(L"gravity", L"center", TRUE);
 }
 
 SMenuBar::~SMenuBar()
 {
-    if (SMenuBar::m_hMsgHook)
+    // 只清理属于本实例的 hook/menubar 绑定，避免误卸载其他实例正在使用的 hook
+    if (SMenuBar::GetMenuBar() == this)
     {
-        ::UnhookWindowsHookEx(SMenuBar::m_hMsgHook);
-        SMenuBar::m_hMsgHook = NULL;
+        HHOOK hMsgHook = SMenuBar::GetMsgHook();
+        if (hMsgHook)
+        {
+            ::UnhookWindowsHookEx(hMsgHook);
+            SMenuBar::SetMsgHook(NULL);
+        }
+        SMenuBar::SetMenuBar(NULL);
     }
-    SMenuBar::m_pMenuBar = NULL;
 }
 
 BOOL SMenuBar::Insert(LPCTSTR pszTitle, LPCTSTR pszResName, int iPos)
@@ -274,7 +309,7 @@ BOOL SMenuBar::Insert(LPCTSTR pszTitle, LPCTSTR pszResName, int iPos)
     if (nPos > -1)
         pNewMenu->SetAttribute(L"accel", SStringW().Format(L"alt+%c", strText[nPos + 1]));
 
-    if (iPos < 0)
+    if (iPos < 0 || iPos > (int)m_lstMenuItem.GetCount())
         iPos = (int)m_lstMenuItem.GetCount();
     m_lstMenuItem.InsertAt(iPos, pNewMenu);
 
@@ -309,7 +344,7 @@ BOOL SMenuBar::Insert(IXmlNode *pNode, int iPos)
     if (nPos > -1)
         pNewMenu->SetAttribute(L"accel", SStringW().Format(L"alt+%c", strText[nPos + 1]));
 
-    if (iPos < 0)
+    if (iPos < 0 || iPos > (int)m_lstMenuItem.GetCount())
         iPos = (int)m_lstMenuItem.GetCount();
     m_lstMenuItem.InsertAt(iPos, pNewMenu);
 
@@ -378,6 +413,10 @@ LRESULT SMenuBar::MenuSwitch(int code, WPARAM wParam, LPARAM lParam)
 {
     if (code == MSGF_MENU)
     {
+        SMenuBar *pMenuBar = SMenuBar::GetMenuBar();
+        // 防御：hook 存活期可能超过 menubar 实例（跨实例/销毁场景），无有效实例时直接放行
+        if (!pMenuBar || !::IsWindow(pMenuBar->m_hWnd))
+            return CallNextHookEx(SMenuBar::GetMsgHook(), code, wParam, lParam);
         MSG msg = *(MSG *)lParam;
         int nMsg = msg.message;
         switch (nMsg)
@@ -385,23 +424,23 @@ LRESULT SMenuBar::MenuSwitch(int code, WPARAM wParam, LPARAM lParam)
         case WM_MOUSEMOVE:
         {
             CPoint pt(GET_X_LPARAM(msg.lParam), GET_Y_LPARAM(msg.lParam));
-            if (SMenuBar::m_pMenuBar->m_ptMouse != pt && SMenuBar::m_pMenuBar->m_iNowMenu != -1)
+            if (pMenuBar->m_ptMouse != pt && pMenuBar->m_iNowMenu != -1)
             {
-                SMenuBar::m_pMenuBar->m_ptMouse = pt;
-                ::MapWindowPoints(msg.hwnd, SMenuBar::m_pMenuBar->m_hWnd, &pt, 1);
-                int nIndex = SMenuBar::m_pMenuBar->HitTest(pt);
+                pMenuBar->m_ptMouse = pt;
+                ::MapWindowPoints(msg.hwnd, pMenuBar->m_hWnd, &pt, 1);
+                int nIndex = pMenuBar->HitTest(pt);
                 if (nIndex != -1)
                 {
-                    SMenuBarItem *menuItem = SMenuBar::m_pMenuBar->GetMenuItem(nIndex);
-                    if (menuItem && SMenuBar::m_pMenuBar->m_iNowMenu != nIndex)
+                    SMenuBarItem *menuItem = pMenuBar->GetMenuItem(nIndex);
+                    if (menuItem && pMenuBar->m_iNowMenu != nIndex)
                     {
-                        SMenuBar::m_pMenuBar->m_pNowMenu = menuItem;
-                        SMenuBar::m_pMenuBar->m_iNowMenu = nIndex;
+                        pMenuBar->m_pNowMenu = menuItem;
+                        pMenuBar->m_iNowMenu = nIndex;
                         ::PostMessage(msg.hwnd, WM_CANCELMODE, 0, 0); // quit current popup menu.
                         // kill all timer now.
-                        for (size_t i = 0; i < SMenuBar::m_pMenuBar->m_lstMenuItem.GetCount(); i++)
+                        for (size_t i = 0; i < pMenuBar->m_lstMenuItem.GetCount(); i++)
                         {
-                            SMenuBar::m_pMenuBar->m_lstMenuItem[i]->KillTimer(TIMER_POP);
+                            pMenuBar->m_lstMenuItem[i]->KillTimer(TIMER_POP);
                         }
                         menuItem->SetTimer(TIMER_POP, 10); // delay popup new menu.
                         return TRUE;
@@ -413,12 +452,13 @@ LRESULT SMenuBar::MenuSwitch(int code, WPARAM wParam, LPARAM lParam)
         case WM_KEYDOWN:
         {
             TCHAR vKey = (TCHAR)msg.wParam;
-            if (SMenuBar::m_pMenuBar->m_iNowMenu == -1)
+            if (pMenuBar->m_iNowMenu == -1)
                 break;
             if (vKey != VK_LEFT && vKey != VK_RIGHT)
                 break;
-            SMenuBarItem *pNowMenu = SMenuBar::m_pMenuBar->m_pNowMenu;
-            SASSERT(pNowMenu);
+            SMenuBarItem *pNowMenu = pMenuBar->m_pNowMenu;
+            if (!pNowMenu)
+                break;
             int selItem = -1;
             HWND hSubMenuWnd = 0;
             if (!pNowMenu->IsUseMenuEx())
@@ -451,11 +491,14 @@ LRESULT SMenuBar::MenuSwitch(int code, WPARAM wParam, LPARAM lParam)
                     for (int i = 0; i < pMenuEx->GetMenuItemCount(); i++)
                     {
                         SMenuExItem *pItem = pMenuEx->GetMenuItem(i, FALSE);
-                        if (pItem->GetState() & WndState_Hover)
+                        if (pItem && (pItem->GetState() & WndState_Hover))
                         {
                             selItem = i;
                             if (pItem->GetSubMenu())
-                                hSubMenuWnd = pItem->GetSubMenu()->GetHostWnd()->GetHwnd();
+                            {
+                                IHostWnd *pSubMenuHost = pItem->GetSubMenu()->GetHostWnd();
+                                hSubMenuWnd = pSubMenuHost ? pSubMenuHost->GetHwnd() : NULL;
+                            }
                             else
                                 hSubMenuWnd = NULL;
                             break;
@@ -477,15 +520,15 @@ LRESULT SMenuBar::MenuSwitch(int code, WPARAM wParam, LPARAM lParam)
             }
             if (vKey == VK_LEFT)
             {
-                int nRevIndex = SMenuBar::m_pMenuBar->m_iNowMenu - 1;
+                int nRevIndex = pMenuBar->m_iNowMenu - 1;
                 if (nRevIndex < 0)
-                    nRevIndex = (int)SMenuBar::m_pMenuBar->m_lstMenuItem.GetCount() - 1;
-                SMenuBarItem *menuItem = SMenuBar::m_pMenuBar->m_lstMenuItem[nRevIndex];
+                    nRevIndex = (int)pMenuBar->m_lstMenuItem.GetCount() - 1;
+                SMenuBarItem *menuItem = pMenuBar->m_lstMenuItem[nRevIndex];
                 if (menuItem)
                 {
-                    SMenuBar::m_pMenuBar->m_pNowMenu = menuItem;
-                    SMenuBar::m_pMenuBar->m_iNowMenu = nRevIndex;
-                    ::PostMessage(SMenuBar::m_pMenuBar->m_hWnd, WM_KEYDOWN, VK_ESCAPE, 0);
+                    pMenuBar->m_pNowMenu = menuItem;
+                    pMenuBar->m_iNowMenu = nRevIndex;
+                    ::PostMessage(pMenuBar->m_hWnd, WM_KEYDOWN, VK_ESCAPE, 0);
                     ::PostMessage(msg.hwnd, WM_CANCELMODE, 0, 0);
                     menuItem->SetTimer(TIMER_POP, 10);
                     return TRUE;
@@ -493,15 +536,15 @@ LRESULT SMenuBar::MenuSwitch(int code, WPARAM wParam, LPARAM lParam)
             }
             else if (vKey == VK_RIGHT)
             {
-                int nNextIndex = SMenuBar::m_pMenuBar->m_iNowMenu + 1;
-                if (nNextIndex >= (int)SMenuBar::m_pMenuBar->m_lstMenuItem.GetCount())
+                int nNextIndex = pMenuBar->m_iNowMenu + 1;
+                if (nNextIndex >= (int)pMenuBar->m_lstMenuItem.GetCount())
                     nNextIndex = 0;
-                SMenuBarItem *menuItem = SMenuBar::m_pMenuBar->GetMenuItem(nNextIndex);
+                SMenuBarItem *menuItem = pMenuBar->GetMenuItem(nNextIndex);
                 if (menuItem)
                 {
-                    SMenuBar::m_pMenuBar->m_pNowMenu = menuItem;
-                    SMenuBar::m_pMenuBar->m_iNowMenu = nNextIndex;
-                    ::PostMessage(SMenuBar::m_pMenuBar->m_hWnd, WM_KEYDOWN, VK_ESCAPE, 0);
+                    pMenuBar->m_pNowMenu = menuItem;
+                    pMenuBar->m_iNowMenu = nNextIndex;
+                    ::PostMessage(pMenuBar->m_hWnd, WM_KEYDOWN, VK_ESCAPE, 0);
                     ::PostMessage(msg.hwnd, WM_CANCELMODE, 0, 0);
                     menuItem->SetTimer(TIMER_POP, 10);
                     return TRUE;
@@ -510,7 +553,7 @@ LRESULT SMenuBar::MenuSwitch(int code, WPARAM wParam, LPARAM lParam)
         }
         }
     }
-    return CallNextHookEx(m_hMsgHook, code, wParam, lParam);
+    return CallNextHookEx(SMenuBar::GetMsgHook(), code, wParam, lParam);
 }
 
 SNSEND

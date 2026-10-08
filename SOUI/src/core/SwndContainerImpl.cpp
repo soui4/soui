@@ -517,7 +517,8 @@ BOOL SwndContainerImpl::UnregisterValueAnimator(IValueAnimator *pAnimator)
     return bRet;
 }
 
-bool SwndContainerImpl::IsTimeLineMgrEmpty() const{
+bool SwndContainerImpl::IsTimeLineMgrEmpty() const
+{
     return m_timelineHandlerMgr.IsEmpty();
 }
 

@@ -598,7 +598,8 @@ void STreeView::OnDestroy()
 
 void STreeView::ClearItemPanels()
 {
-    if (m_itemCapture) {
+    if (m_itemCapture)
+    {
         m_itemCapture->ReleaseCapture();
         m_itemCapture = NULL;
     }

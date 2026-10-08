@@ -52,21 +52,22 @@ bool STimerlineHandlerMgr::UnregisterValueAnimator(IValueAnimator *pAnimator)
 
 void STimerlineHandlerMgr::OnNextFrame()
 {
-    if (m_mapHandlers.GetCount() > 0) {
-        ITimelineHandler** pHandlers = new ITimelineHandler * [m_mapHandlers.GetCount()];
+    if (m_mapHandlers.GetCount() > 0)
+    {
+        ITimelineHandler **pHandlers = new ITimelineHandler *[m_mapHandlers.GetCount()];
         // collect all handlers.
         SPOSITION pos = m_mapHandlers.GetStartPosition();
         int idx = 0;
         while (pos)
         {
-            ITimelineHandler* p = m_mapHandlers.GetNextKey(pos);
+            ITimelineHandler *p = m_mapHandlers.GetNextKey(pos);
             pHandlers[idx++] = p;
         }
 
         // run handles.
         for (int i = 0; i < idx; i++)
         {
-            TLMAP::CPair* p = m_mapHandlers.Lookup(pHandlers[i]);
+            TLMAP::CPair *p = m_mapHandlers.Lookup(pHandlers[i]);
             if (!p)
                 continue;
             // make sure the handler is valid before run.
