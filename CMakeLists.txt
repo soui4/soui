@@ -104,6 +104,10 @@ option(SOUI_BUILD_HTTPCLIENT "Build HTTP client component" ON)
 option(SOUI_ENABLE_SVG "Enable SVG support" ON)
 
 message(STATUS "MSVC_VERSION: ${MSVC_VERSION}")
+if(MSVC AND MSVC_VERSION EQUAL 1700)
+    # VS2012(v110)std::tuple: 模板参数太多问题
+    add_definitions(-D_VARIADIC_MAX=10)
+endif()
 if(MSVC AND MSVC_VERSION LESS 1800)
 set(SOUI_BUILD_WS OFF)
 message(STATUS "Build Websocket module disabled for VS2013 or lower")
