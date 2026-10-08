@@ -1,0 +1,28 @@
+name: swinx API surface gate
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  swinx-api-surface:
+    name: swinx API surface gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      # 纯文本扫描（约 2 分钟，无需编译）：swinx 头文件声明的 Win32 API 面是否仍与
+      # 已提交的 swinx/doc/tools/api_scan.json 一致。动了实现却没刷新清单 ⇒ 失败；
+      # 本地跑 `python swinx/doc/tools/api_scan.py` 重新生成清单并提交即可。
+      - name: Check api_scan.json is in sync with swinx sources
+        run: python swinx/doc/tools/api_scan.py --check
