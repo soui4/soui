@@ -341,12 +341,34 @@ class CFileDialogImpl : public SNativeWnd {
 
         m_ofn.lpstrFilter = lpszFilter;
         m_ofn.hInstance = SApplication::getSingleton().GetModule();
-        m_ofn.lpfnHook = (LPOFNHOOKPROC)T::StartWindowProc;
+        m_ofn.lpfnHook = (LPOFNHOOKPROC)T::HookProc;
         m_ofn.hwndOwner = hWndParent;
 
         // setup initial file name
         if (lpszFileName != NULL)
             _tcsncpy_s(m_szFileName, _countof(m_szFileName), lpszFileName, _TRUNCATE);
+    }
+
+    /** File dialog hook: recovers the object from OPENFILENAME::lCustData and subclasses the dialog. */
+    static UINT_PTR APIENTRY HookProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+    {
+        if (uMsg != WM_INITDIALOG)
+            return 0;
+        LPOPENFILENAME lpOFN = (LPOPENFILENAME)lParam;
+        T *pT = (T *)lpOFN->lCustData;
+        ATLASSERT(pT != NULL);
+        ATLASSERT(pT->m_hWnd == NULL);
+        ATLASSERT(::IsWindow(hWnd));
+        // subclass dialog's window
+        if (!pT->SubclassWindow(hWnd))
+        {
+            return 0;
+        }
+        // check message map for WM_INITDIALOG handler
+        LRESULT lRes = 0;
+        if (pT->ProcessWindowMessage(pT->m_hWnd, uMsg, wParam, lParam, lRes, 0) == FALSE)
+            return 0;
+        return lRes;
     }
 
     INT_PTR DoModal(HWND hWndParent = ::GetActiveWindow())
@@ -361,14 +383,12 @@ class CFileDialogImpl : public SNativeWnd {
 
         ATLASSERT(m_hWnd == NULL);
 
-        // ModuleHelper::AddCreateWndData(&m_thunk.cd, (ATL::CDialogImplBase*)this);
-        SNativeWndHelper::instance()->LockSharePtr(this);
+        m_ofn.lCustData = (LPARAM)this;
         BOOL bRet;
         if (m_bOpenFileDialog)
             bRet = ::GetOpenFileName(&m_ofn);
         else
             bRet = ::GetSaveFileName(&m_ofn);
-        SNativeWndHelper::instance()->UnlockSharePtr();
         m_hWnd = NULL;
         return bRet ? IDOK : IDCANCEL;
     }
@@ -1723,18 +1743,27 @@ class CFolderDialog : public CFolderDialogImpl<CFolderDialog> {
 
 class ATL_NO_VTABLE CCommonDialogImplBase : public SNativeWnd {
   public:
-    static UINT_PTR APIENTRY HookProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+    static UINT_PTR APIENTRY HookProc(HWND /*hWnd*/, UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/)
+    {
+        // Not used directly: each concrete dialog class provides its own HookProc that
+        // recovers the object pointer from the dialog structure's lCustData field and
+        // calls _InitDialogHook to subclass the dialog window.
+        return 0;
+    }
+
+  protected:
+    /** Helper shared by the per-dialog HookProc implementations: subclasses the dialog
+     *  window and dispatches WM_INITDIALOG to the message map. */
+    static UINT_PTR _InitDialogHook(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, CCommonDialogImplBase *pT)
     {
         if (uMsg != WM_INITDIALOG)
             return 0;
-        CCommonDialogImplBase *pT = (CCommonDialogImplBase *)SNativeWndHelper::instance()->GetSharePtr();
         ATLASSERT(pT != NULL);
         ATLASSERT(pT->m_hWnd == NULL);
         ATLASSERT(::IsWindow(hWnd));
         // subclass dialog's window
         if (!pT->SubclassWindow(hWnd))
         {
-            // SASSERT_FMT(atlTraceUI, 0, _T("Subclassing a common dialog failed@n"));
             return 0;
         }
         // check message map for WM_INITDIALOG handler
@@ -1744,6 +1773,7 @@ class ATL_NO_VTABLE CCommonDialogImplBase : public SNativeWnd {
         return lRes;
     }
 
+  public:
     /** Special override for common dialogs */
     BOOL EndDialog(INT_PTR /**< nRetCode */ = 0)
     {
@@ -1800,6 +1830,15 @@ class ATL_NO_VTABLE CFontDialogImpl : public CCommonDialogImplBase {
         }
     }
 
+    /** Font dialog hook: recovers the object from CHOOSEFONT::lCustData. */
+    static UINT_PTR APIENTRY HookProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+    {
+        if (uMsg != WM_INITDIALOG)
+            return 0;
+        LPCHOOSEFONT lpCF = (LPCHOOSEFONT)lParam;
+        return _InitDialogHook(hWnd, uMsg, wParam, lParam, (CCommonDialogImplBase *)lpCF->lCustData);
+    }
+
     /** Operations */
     INT_PTR DoModal(HWND hWndParent = ::GetActiveWindow())
     {
@@ -1811,10 +1850,8 @@ class ATL_NO_VTABLE CFontDialogImpl : public CCommonDialogImplBase {
 
         ATLASSERT(m_hWnd == NULL);
 
-        // ModuleHelper::AddCreateWndData(&m_thunk.cd, (CCommonDialogImplBase*)this);
-        SNativeWndHelper::instance()->LockSharePtr(this);
+        m_cf.lCustData = (LPARAM)this;
         BOOL bRet = ::ChooseFont(&m_cf);
-        SNativeWndHelper::instance()->UnlockSharePtr();
         m_hWnd = NULL;
 
         if (bRet) // copy logical font from user's initialization buffer (if needed)
@@ -2102,10 +2139,9 @@ class ATL_NO_VTABLE CColorDialogImpl : public CCommonDialogImplBase {
 
         ATLASSERT(m_hWnd == NULL);
 
-        SNativeWndHelper::instance()->LockSharePtr(this);
+        m_cc.lCustData = (LPARAM)this;
 
         BOOL bRet = ::ChooseColor(&m_cc);
-        SNativeWndHelper::instance()->UnlockSharePtr();
         m_hWnd = NULL;
 
         return bRet ? IDOK : IDCANCEL;
@@ -2135,9 +2171,8 @@ class ATL_NO_VTABLE CColorDialogImpl : public CCommonDialogImplBase {
 
         if (uMsg == WM_INITDIALOG)
         {
-            pT = (CCommonDialogImplBase *)SNativeWndHelper::instance()->GetSharePtr();
-            lpCC->lCustData = (LPARAM)pT;
-            ATLASSERT(pT != NULL);
+            pT = (CCommonDialogImplBase *)lpCC->lCustData;
+ATLASSERT(pT != NULL);
             ATLASSERT(pT->m_hWnd == NULL);
             ATLASSERT(::IsWindow(hWnd));
             // subclass dialog's window
@@ -2294,6 +2329,15 @@ class ATL_NO_VTABLE CPrintDialogImpl : public CCommonDialogImplBase {
         m_pd.Flags &= ~PD_RETURNIC; // do not support information context
     }
 
+    /** Print dialog hook: recovers the object from PRINTDLG::lCustData. */
+    static UINT_PTR APIENTRY HookProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+    {
+        if (uMsg != WM_INITDIALOG)
+            return 0;
+        LPPRINTDLG lpPD = (LPPRINTDLG)lParam;
+        return _InitDialogHook(hWnd, uMsg, wParam, lParam, (CCommonDialogImplBase *)lpPD->lCustData);
+    }
+
     /** Operations */
     INT_PTR DoModal(HWND hWndParent = ::GetActiveWindow())
     {
@@ -2308,9 +2352,8 @@ class ATL_NO_VTABLE CPrintDialogImpl : public CCommonDialogImplBase {
 
         ATLASSERT(m_hWnd == NULL);
 
-        SNativeWndHelper::instance()->LockSharePtr(this);
+        m_pd.lCustData = (LPARAM)this;
         BOOL bRet = ::PrintDlg(&m_pd);
-        SNativeWndHelper::instance()->UnlockSharePtr();
         m_hWnd = NULL;
         return bRet ? IDOK : IDCANCEL;
     }
@@ -2930,6 +2973,15 @@ class ATL_NO_VTABLE CFindReplaceDialogImpl : public CCommonDialogImplBase {
         m_fr.wReplaceWithLen = _cchFindReplaceBuffer;
     }
 
+    /** Find/Replace dialog hook: recovers the object from FINDREPLACE::lCustData. */
+    static UINT_PTR APIENTRY HookProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+    {
+        if (uMsg != WM_INITDIALOG)
+            return 0;
+        LPFINDREPLACE lpFR = (LPFINDREPLACE)lParam;
+        return _InitDialogHook(hWnd, uMsg, wParam, lParam, (CCommonDialogImplBase *)lpFR->lCustData);
+    }
+
     /** Note: You must allocate the object on the heap. */
     /** If you do not, you must override OnFinalMessage() */
     virtual void OnFinalMessage(HWND /**< hWnd */)
@@ -2973,6 +3025,7 @@ class ATL_NO_VTABLE CFindReplaceDialogImpl : public CCommonDialogImplBase {
 #endif // (_ATL_VER >= 0x0800)
 
         ModuleHelper::AddCreateWndData(&m_thunk.cd, (CCommonDialogImplBase *)this);
+        m_fr.lCustData = (LPARAM)this;
 
         HWND hWnd = NULL;
         if (bFindDialogOnly)

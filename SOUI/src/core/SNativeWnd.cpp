@@ -149,7 +149,6 @@ struct tagThunk /**< this should come out to 16 bytes */
 
 SNativeWndHelper::SNativeWndHelper()
     : m_hInst(0)
-    , m_sharePtr(NULL)
     , m_atom(0)
 {
 }
@@ -179,17 +178,6 @@ BOOL SNativeWndHelper::Uninit()
 SNativeWndHelper::~SNativeWndHelper()
 {
     SASSERT(m_hHeap == NULL);
-}
-
-void SNativeWndHelper::LockSharePtr(void *p)
-{
-    m_cs.Enter();
-    m_sharePtr = p;
-}
-
-void SNativeWndHelper::UnlockSharePtr()
-{
-    m_cs.Leave();
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -232,14 +220,24 @@ void SNativeWnd::InitWndClass(HINSTANCE hInst, LPCTSTR pszSimpleWndName, BOOL bI
     SNativeWndHelper::instance()->Init(hInst, pszSimpleWndName, bImeWnd);
 }
 
+STlsId SNativeWnd::s_tlsWndCreate = 0;
+
 HWND SNativeWnd::CreateNative(LPCTSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight, HWND hWndParent, int nID, LPVOID lpParam)
 {
-    SNativeWndHelper::instance()->LockSharePtr(this);
 #if ENABLE_THUNK
     m_pThunk = (tagThunk *)HeapAlloc(SNativeWndHelper::instance()->GetHeap(), HEAP_ZERO_MEMORY | HEAP_CREATE_ENABLE_EXECUTE, sizeof(tagThunk));
 #endif
+    // CreateWindowEx dispatches creation messages (e.g. WM_GETMINMAXINFO, WM_NCCREATE, WM_CREATE)
+    // synchronously on the calling thread. Stash this in thread-local storage so that
+    // StartWindowProc can retrieve the object for ANY first message without global shared state,
+    // then clear the slot as soon as creation returns. This removes the dependency on the global
+    // shared pointer m_sharePtr and avoids injecting a wrong object into the thunk when windows
+    // are created concurrently.
+    STls::Set(&s_tlsWndCreate, this, NULL);
     HWND hWnd = ::CreateWindowEx(dwExStyle, (LPCTSTR)(UINT_PTR)SNativeWndHelper::instance()->GetSimpleWndAtom(), lpWindowName, dwStyle, x, y, nWidth, nHeight, hWndParent, (HMENU)(UINT_PTR)nID, SNativeWndHelper::instance()->GetAppInstance(), lpParam);
-    SNativeWndHelper::instance()->UnlockSharePtr();
+    // The thunk is installed by StartWindowProc while processing the first dispatched message above;
+    // all later messages bypass StartWindowProc, so the slot is no longer needed on this thread.
+    STls::Set(&s_tlsWndCreate, NULL, NULL);
 #if ENABLE_THUNK
     if (!hWnd)
     {
@@ -324,8 +322,11 @@ LRESULT CALLBACK SNativeWnd::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
 
 LRESULT CALLBACK SNativeWnd::StartWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    SNativeWnd *pThis = (SNativeWnd *)SNativeWndHelper::instance()->GetSharePtr();
-    SNativeWndHelper::instance()->UnlockSharePtr();
+    // Window creation: retrieve the object pointer from thread-local storage (set by CreateNative).
+    // TLS is available for ANY message dispatched during creation, so the first message does not
+    // have to be WM_NCCREATE (e.g. WM_GETMINMAXINFO can arrive first for top-level windows).
+    SNativeWnd *pThis = (SNativeWnd *)STls::Get(&s_tlsWndCreate);
+    SASSERT(pThis != NULL);
     pThis->m_hWnd = hWnd;
 #if ENABLE_THUNK
     // Initialize Thunk; does two things: 1. the mov instruction replaces hWnd with the object pointer; 2. the jump instruction jumps to WindowProc

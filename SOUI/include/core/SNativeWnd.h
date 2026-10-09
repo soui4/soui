@@ -14,6 +14,7 @@
 
 #include <interface/SNativeWnd-i.h>
 #include <helper/SCriticalSection.h>
+#include <helper/STls.h>
 #include <helper/obj-ref-impl.hpp>
 #include <windows.h>
 #include <soui_exp.h>
@@ -37,28 +38,6 @@ class SOUI_EXP SNativeWndHelper {
     HANDLE GetHeap()
     {
         return m_hHeap;
-    }
-
-    /**
-     * @brief Locks a shared pointer.
-     *
-     * @param p Pointer to the shared object.
-     */
-    void LockSharePtr(void *p);
-
-    /**
-     * @brief Unlocks a shared pointer.
-     */
-    void UnlockSharePtr();
-
-    /**
-     * @brief Retrieves the shared pointer.
-     *
-     * @return void* Pointer to the shared object.
-     */
-    void *GetSharePtr()
-    {
-        return m_sharePtr;
     }
 
     /**
@@ -114,7 +93,6 @@ class SOUI_EXP SNativeWndHelper {
 
     HANDLE m_hHeap;        /**<  Handle to the heap. */
     SCriticalSection m_cs; /**<  Critical section for thread-safe operations. */
-    void *m_sharePtr;      /**<  Shared pointer. */
     ATOM m_atom;           /**<  Atom for the simple window class. */
     HINSTANCE m_hInst;     /**<  Handle to the application instance. */
 };
@@ -775,6 +753,7 @@ class SOUI_EXP SNativeWnd : public TObjRefImpl<INativeWnd> {
      * @return LRESULT Result of the message processing.
      */
     static LRESULT CALLBACK StartWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    static STlsId s_tlsWndCreate; /**< TLS slot id carrying the object pointer during CreateWindowEx */
     tagThunk *m_pThunk;           /**<  Thunk structure. */
     WNDPROC m_pfnSuperWindowProc; /**<  Pointer to the superclass window procedure. */
 };
