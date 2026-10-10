@@ -181,6 +181,7 @@ void SStatic::DrawMultiLine(IRenderTarget *pRT, LPCTSTR pszBuf, int cchText, LPR
         if (*p1 == '&' && (uFormat & DT_NOPREFIX) == 0)
         { // skip the & if DT_NOPREFIX is not set
             p1 = p2;
+			i++;
             continue;
         }
         szWord = OnMeasureText(pRT, p1, (int)(p2 - p1));
