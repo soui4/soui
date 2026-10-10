@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="200" height="20" viewBox="0 0 200 20">
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="20" viewBox="0 0 220 20">
   <!-- frame 0: script -->
   <path d="M7 6L3 10l4 4M13 6l4 4-4 4M11.5 4l-3 12" stroke="#2563EB" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
   <!-- frame 1: drag drop -->
@@ -36,4 +36,7 @@
   <circle cx="184" cy="14" r="1.6" fill="#93C5FD"/>
   <circle cx="196" cy="14" r="1.6" fill="#93C5FD"/>
   <path d="M186 5h8" stroke="#93C5FD" stroke-width="1.5" stroke-dasharray="2 1.5"/>
+  <!-- frame 10: webp (文件带 W 标) -->
+  <path d="M202 4h3.5l2 2H216a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-14a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z" fill="none" stroke="#2563EB" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M203 12.5l2.2-4 1.4 2 1.4-2 2.2 4" fill="none" stroke="#93C5FD" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>

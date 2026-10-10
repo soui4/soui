@@ -1,4 +1,4 @@
-//stamp:01dd5593348e86de
+//stamp:01dd588352cf82a4
 /*<------------------------------------------------------------------------------------------------->*/
 #define DEFINE_UIRES(name, type, file_path)\
     name type file_path
@@ -93,6 +93,9 @@ DEFINE_UIRES(png_girl,	IMGX,	"uires/image/girl.png")
 DEFINE_UIRES(png_love,	IMGX,	"uires/image/love.png")
 DEFINE_UIRES(png_soui,	IMGX,	"uires/image/soui.png")
 DEFINE_UIRES(png_hot,	IMGX,	"uires/image/hot.png")
+DEFINE_UIRES(webp_lossy,	IMGX,	"uires/image/webp_lossy.webp")
+DEFINE_UIRES(webp_lossless,	IMGX,	"uires/image/webp_lossless.webp")
+DEFINE_UIRES(webp_alpha,	IMGX,	"uires/image/webp_alpha.webp")
 DEFINE_UIRES(png_skin_btn_semiarc,	img.calendar2,	"uires/img.calendar2/skin_btn_semiarc.png")
 DEFINE_UIRES(png_skin_btn_curve,	img.calendar2,	"uires/img.calendar2/skin_btn_curve.png")
 DEFINE_UIRES(png_line_1px,	img.calendar2,	"uires/img.calendar2/gradient_1px.png")

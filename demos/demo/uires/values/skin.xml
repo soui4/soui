@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <skin>
 	<!--全局skin对象-->
 	<imglist name="skin_switch" src="imgx:png_switch" states="8" checkAsPushdown="0"/>
@@ -10,6 +10,9 @@
 		</states>
 	</imglist>
 	<imglist name="skin_hot" src="imgx:png_hot"  states="6"/>
+	<imglist name="skin_webp_lossy" src="imgx:webp_lossy" states="1"/>
+	<imglist name="skin_webp_lossless" src="imgx:webp_lossless" states="1"/>
+	<imglist name="skin_webp_alpha" src="imgx:webp_alpha" states="1"/>
 	<imglist name="skin_page_icons"	src="imgx:png_page_icons" states="7"/>
 	<imglist name="skin_ctrl_icons" src="imgx:png_ctrl_icons" states="18"/>
 	<imglist name="skin_small_icons" src="imgx:png_small_icons" states="12" />
@@ -132,7 +135,7 @@
   <imglist name="svg_tab_page" src="svg:tab_page" states="6"/>
   <imglist name="svg_tab_layout" src="svg:tab_layout" states="6"/>
   <imglist name="svg_tab_animator" src="svg:tab_animator" states="3"/>
-  <imglist name="svg_tab_misc" src="svg:tab_misc" states="10"/>
+  <imglist name="svg_tab_misc" src="svg:tab_misc" states="11"/>
   <!-- 动态创建窗口演示页:wnd_container 的容器标识背景(蓝色虚线框+角标) -->
   <imglist name="svg_container_bg" src="svg:container_bg"/>
   <!-- 跑马机下注金币(SVG 重制版,3 态:normal/hover/push) -->

@@ -340,6 +340,7 @@ RECENT REVISION HISTORY:
 //        STBI_NO_HDR
 //        STBI_NO_PIC
 //        STBI_NO_PNM   (.ppm and .pgm)
+//        STBI_NO_WEBP  (.webp)
 //
 //  - You can request *only* certain decoders and suppress all other ones
 //    (this will be more forward-compatible, as addition of new decoders
@@ -354,6 +355,7 @@ RECENT REVISION HISTORY:
 //        STBI_ONLY_HDR
 //        STBI_ONLY_PIC
 //        STBI_ONLY_PNM   (.ppm and .pgm)
+//        STBI_ONLY_WEBP  (.webp)
 //
 //   - If you use STBI_NO_PNG (or _ONLY_ without PNG), and you still
 //     want the zlib decoder to be available, #define STBI_SUPPORT_ZLIB
@@ -549,7 +551,7 @@ STBIDEF int   stbi_zlib_decode_noheader_buffer(char *obuffer, int olen, const ch
 #if defined(STBI_ONLY_JPEG) || defined(STBI_ONLY_PNG) || defined(STBI_ONLY_BMP) \
   || defined(STBI_ONLY_TGA) || defined(STBI_ONLY_GIF) || defined(STBI_ONLY_PSD) \
   || defined(STBI_ONLY_HDR) || defined(STBI_ONLY_PIC) || defined(STBI_ONLY_PNM) \
-  || defined(STBI_ONLY_ZLIB)
+  || defined(STBI_ONLY_WEBP) || defined(STBI_ONLY_ZLIB)
    #ifndef STBI_ONLY_JPEG
    #define STBI_NO_JPEG
    #endif
@@ -576,6 +578,9 @@ STBIDEF int   stbi_zlib_decode_noheader_buffer(char *obuffer, int olen, const ch
    #endif
    #ifndef STBI_ONLY_PNM
    #define STBI_NO_PNM
+   #endif
+   #ifndef STBI_ONLY_WEBP
+   #define STBI_NO_WEBP
    #endif
 #endif
 
@@ -963,6 +968,12 @@ static int      stbi__pnm_info(stbi__context *s, int *x, int *y, int *comp);
 static int      stbi__pnm_is16(stbi__context *s);
 #endif
 
+#ifndef STBI_NO_WEBP
+static int      stbi__webp_test(stbi__context *s);
+static void    *stbi__webp_load(stbi__context *s, int *x, int *y, int *comp, int req_comp, stbi__result_info *ri);
+static int      stbi__webp_info(stbi__context *s, int *x, int *y, int *comp);
+#endif
+
 static
 #ifdef STBI_THREAD_LOCAL
 STBI_THREAD_LOCAL
@@ -1151,6 +1162,9 @@ static void *stbi__load_main(stbi__context *s, int *x, int *y, int *comp, int re
    #endif
    #ifndef STBI_NO_GIF
    if (stbi__gif_test(s))  return stbi__gif_load(s,x,y,comp,req_comp, ri);
+   #endif
+   #ifndef STBI_NO_WEBP
+   if (stbi__webp_test(s)) return stbi__webp_load(s,x,y,comp,req_comp, ri);
    #endif
    #ifndef STBI_NO_PSD
    if (stbi__psd_test(s))  return stbi__psd_load(s,x,y,comp,req_comp, ri, bpc);
@@ -7643,6 +7657,10 @@ static int stbi__info_main(stbi__context *s, int *x, int *y, int *comp)
    if (stbi__gif_info(s, x, y, comp))  return 1;
    #endif
 
+   #ifndef STBI_NO_WEBP
+   if (stbi__webp_info(s, x, y, comp)) return 1;
+   #endif
+
    #ifndef STBI_NO_BMP
    if (stbi__bmp_info(s, x, y, comp))  return 1;
    #endif
@@ -7943,6 +7961,89 @@ STBIDEF int stbi_is_16_bit_from_callbacks(stbi_io_callbacks const *c, void *user
       0.50  (2006-11-19)
               first released version
 */
+
+#ifndef STBI_NO_WEBP
+
+/* WebP decoding is provided by webpdec.h -- an amalgamated libwebp 1.6.0
+   single-file decoder (BSD + PATENTS, Copyright Google LLC), kept as a
+   sibling header in third-part/stb/.  It compiles exactly once, in the same
+   translation unit that defines STB_IMAGE_IMPLEMENTATION. */
+
+#if defined(STB_IMAGE_IMPLEMENTATION)
+#define WEBPDEC_IMPLEMENTATION
+#endif
+#include "webpdec.h"
+
+static int stbi__webp_test(stbi__context *s)
+{
+   int ok = 0;
+   stbi__rewind(s);
+   if (stbi__get8(s)=='R' && stbi__get8(s)=='I' && stbi__get8(s)=='F' && stbi__get8(s)=='F') {
+      stbi__get32le(s);                /* RIFF size */
+      if (stbi__get8(s)=='W' && stbi__get8(s)=='E' && stbi__get8(s)=='B' && stbi__get8(s)=='P')
+         ok = 1;
+   }
+   stbi__rewind(s);
+   return ok;
+}
+
+static int stbi__webp_info(stbi__context *s, int *x, int *y, int *comp)
+{
+   int w = 0, h = 0;
+   stbi__uint32 riffsz;
+   int len;
+   stbi_uc *buf;
+   stbi__rewind(s);
+   if (!stbi__webp_test(s)) return 0;
+   stbi__rewind(s);
+   stbi__get32le(s);                    /* "RIFF" */
+   riffsz = stbi__get32le(s);           /* container size == filesize - 8 */
+   if (riffsz == 0 || riffsz > 0x7fffffffu) return 0;
+   len = (int) riffsz + 8;
+   buf = (stbi_uc *) stbi__malloc((size_t) len);
+   if (!buf) return 0;
+   stbi__rewind(s);
+   if (!stbi__getn(s, buf, len)) { STBI_FREE(buf); return 0; }
+   if (WebPGetInfo(buf, (size_t) len, &w, &h)) {
+      *x = w; *y = h;
+      *comp = 4;
+      STBI_FREE(buf);
+      return 1;
+   }
+   STBI_FREE(buf);
+   return 0;
+}
+
+static void *stbi__webp_load(stbi__context *s, int *x, int *y, int *comp, int req_comp, stbi__result_info *ri)
+{
+   stbi__uint32 riffsz;
+   int len;
+   stbi_uc *buf;
+   unsigned char *rgba;
+   int w = 0, h = 0;
+   stbi__rewind(s);
+   if (!stbi__webp_test(s)) return stbi__errpuc("notwebp", "Not a WebP");
+   stbi__rewind(s);
+   stbi__get32le(s);                    /* "RIFF" */
+   riffsz = stbi__get32le(s);
+   if (riffsz == 0 || riffsz > 0x7fffffffu)
+      return stbi__errpuc("webpbad", "Bad WebP data");
+   len = (int) riffsz + 8;
+   buf = (stbi_uc *) stbi__malloc((size_t) len);
+   if (!buf) return stbi__errpuc("outofmem", "Out of memory");
+   stbi__rewind(s);
+   if (!stbi__getn(s, buf, len)) { STBI_FREE(buf); return stbi__errpuc("readfail", "Read failure"); }
+   rgba = WebPDecodeRGBA(buf, (size_t) len, &w, &h);
+   STBI_FREE(buf);
+   if (!rgba) return stbi__errpuc("webpbad", "Bad WebP data");
+   *x = w; *y = h;
+   if(comp)
+     *comp = 4;
+   if (ri) ri->bits_per_channel = 8;
+   return stbi__convert_format(rgba, 4, req_comp, w, h);
+}
+
+#endif /* !STBI_NO_WEBP */
 
 
 /*

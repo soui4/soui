@@ -1,4 +1,4 @@
-﻿//stamp:3611493eebb4f355
+﻿//stamp:361161dc9f4acf4d
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -110,6 +110,9 @@
 			const TCHAR * png_love;
 			const TCHAR * png_soui;
 			const TCHAR * png_hot;
+			const TCHAR * webp_lossy;
+			const TCHAR * webp_lossless;
+			const TCHAR * webp_alpha;
 			}IMGX;
 		struct _img_calendar2{
 			const TCHAR * png_skin_btn_semiarc;
@@ -356,6 +359,9 @@ struct _UIRES UIRES={
 			_T("IMGX:png_love"),
 			_T("IMGX:png_soui"),
 			_T("IMGX:png_hot"),
+			_T("IMGX:webp_lossy"),
+			_T("IMGX:webp_lossless"),
+			_T("IMGX:webp_alpha"),
 		},
 		{
 			_T("img_calendar2:png_skin_btn_semiarc"),

@@ -531,5 +531,5 @@
 		<page title="morectrl">
 			<include src="layout:page_morectrl"/>
 		</page>
-	</tabctrl>
+		</tabctrl>
 </window>

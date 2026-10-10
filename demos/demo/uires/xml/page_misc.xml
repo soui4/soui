@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   page_misc.xml - 杂项功能演示分区
 
@@ -118,5 +118,23 @@
         <img name="svg_test" pos="|0,|0" offset="-0.5,-0.5" skin="svg_comprehensive"/>
       </page>
     </tabctrl>
+  </page>
+  <page title="webp" iconIndex="10" layout="vbox" interval="12" padding="15,12,15,15">
+    <text text="WebP 解码(基于 stb / libwebp)" font="size:16,bold:1" colorText="@color/clr_title"/>
+    <text text="有损 VP8 / 无损 VP8L / 透明 ALPH 三种 webp 素材经 imgdecoder-stb 解码显示" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
+    <window size="-2,0" weight="1" layout="hflow" interval="16" gravity="center">
+      <window size="-2,-1" layout="vbox" interval="6" gravity="center" padding="14,12,14,12" colorBkgnd="@color/clr_card_bg">
+        <window skin="skin_webp_lossy" size="200,150"/>
+        <text text="有损 VP8(200x150)" font="size:12" colorText="@color/clr_text"/>
+      </window>
+      <window size="-1,-1" layout="vbox" interval="6" gravity="center" padding="14,12,14,12" colorBkgnd="@color/clr_card_bg">
+        <img skin="skin_webp_lossless" size="200,150" />
+        <text text="无损 VP8L(200x150)" font="size:12" colorText="@color/clr_text"/>
+      </window>
+      <window size="-1,-1" layout="vbox" interval="6" gravity="center" padding="14,12,14,12" colorBkgnd="@color/clr_card_bg">
+        <img skin="skin_webp_alpha" size="200,150" />
+        <text text="透明 ALPH(200x150)" font="size:12" colorText="@color/clr_text"/>
+      </window>
+    </window>
   </page>
   </tabctrl>

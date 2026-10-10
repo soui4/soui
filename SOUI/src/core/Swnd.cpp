@@ -916,7 +916,7 @@ BOOL SWindow::OnSetCursor(const CPoint &pt)
 /** Get SWindow state */
 DWORD SWindow::GetState(void) const
 {
-    if (IsMsgTransparent() && GetParent())
+    if (m_dwState == WndState_Normal && IsMsgTransparent() && GetParent())
         return GetParent()->GetState();
     return m_dwState;
 }

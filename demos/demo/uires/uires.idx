@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resource>
 	<UIDEF>
 		<file name="xml_init" path="uidef\init.xml" />
@@ -106,6 +106,9 @@
     <file name="png_love" path="image\love.png"/>
     <file name="png_soui" path="image\soui.png"/>
 		<file name="png_hot" path="image\hot.png"/>
+		<file name="webp_lossy" path="image\webp_lossy.webp"/>
+		<file name="webp_lossless" path="image\webp_lossless.webp"/>
+		<file name="webp_alpha" path="image\webp_alpha.webp"/>
 	</IMGX>
 	<img.calendar2>
 		<file name="png_skin_btn_semiarc" path="img.calendar2\skin_btn_semiarc.png" />
