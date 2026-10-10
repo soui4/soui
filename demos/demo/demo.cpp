@@ -119,7 +119,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
     AddFontResource((appDir + _T("/fonts/simsun.ttc")).c_str());
 #endif
     //int nType = IDYES;
-    int nType = MessageBox(GetActiveWindow(), _T("Select render type://n[yes]: Skia\n[no]:GDI\n[cancel]:Quit"), _T("select a render"), MB_ICONQUESTION | MB_YESNOCANCEL);
+    int nType = MessageBox(GetActiveWindow(), _T("Select render type:\n[yes]: Skia\n[no]:GDI\n[cancel]:Quit"), _T("select a render"), MB_ICONQUESTION | MB_YESNOCANCEL);
     if (nType == IDCANCEL)
     {
         return 0;
