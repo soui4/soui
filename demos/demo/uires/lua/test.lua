@@ -72,6 +72,8 @@ function on_init(args)
 	souiFac:Release();
 	--init the lua match-3 game (page_script 的"消消乐"子页)
 	xxl_init(root);
+	--init the lua tetris game (page_script 的"俄罗斯方块"子页)
+	tetris_init(root);
 end
 
 function on_exit(args)
@@ -80,6 +82,7 @@ function on_exit(args)
 	HostWnd_SetMsgHandler(win,"",nil);--remove msg handler
 	runTimer:Release();
 	xxl_exit();
+	tetris_exit();
 end
 
 function on_timer(args)
@@ -1623,5 +1626,584 @@ function xxl_on_shuffle(args)
 	xxl_redeal();
 	xxl_show_combo(); -- combo==0,清掉死局提示文本
 	return 1;
+end
+
+
+--[[
+==================== 俄罗斯方块(lua 版) ====================
+参考上面消消乐的实现方式移植的经典俄罗斯方块:
+  - 纯数据层(方块矩阵/旋转/碰撞/消行/下落/计分)与渲染层分离,数据层函数
+    不触碰 SOUI 导出,可在裸 lua 解释器中做回归测试:
+      lua -e 'slog=function() end; dofile("test.lua"); ...逻辑断言...'
+  - 棋盘 10x20 与"下一块"预览 4x4 都由 tetris_init 在宿主初始化时动态创建,
+    每个格子是一个 img,统一引用 svg/tetris_blocks.svg 雪碧图
+    (skin.xml: svg_tetris_blocks,17 帧):
+      帧 0=空格 1-7=七种方块(I青/O黄/T紫/S绿/Z红/J蓝/L橙)
+      帧 8-14=对应 1-7 的幽灵块(落点预览) 15=消行闪白 16=标题图标
+    渲染只改 iconIndex,渲染缓存避免每拍全量 SetAttribute;
+  - 计时用 CreateSouiFactory().CreateTimer 独立 50ms 节拍(与跑马机互不影响),
+    状态机:idle -> playing <-> paused,playing/clearing -> over;
+    消行走"锁定 -> 闪白 300ms -> 消除下沉 -> 继续下落"流程;
+  - 计分:消 1/2/3/4 行 = 100/300/500/800 × 等级,软降 +1/格,硬降 +2/格;
+    每 10 行升 1 级并加快下落(800ms 起,每级 -70ms,下限 100ms);
+  - 7-bag 随机(每袋洗牌 7 种)保证出块均匀;旋转带简单踢墙(水平 0/-1/1/-2/2);
+  - 棋盘 focusable,SubscribeEvent(EVT_KEYDOWN=8200) 接键盘(与 btn_lrc 的
+    SubscribeEvent 同一套路):← → 移动 / ↑ 旋转 / ↓ 软降 / 空格 硬降 / P 暂停;
+  - 子页隐藏(on_visible_changed)自动暂停;结束弹窗确认后自动开新一局。
+棋盘格 id 约定: tetris_base_id + y*10 + x(x,y 从 0 开始);预览格 id: tetris_next_base_id + r*4 + c。
+]]
+
+tetris_base_id = 60000;
+tetris_next_base_id = 61000;
+tetris_row = 20;
+tetris_col = 10;
+tetris_cell = 24;		-- 棋盘格尺寸(lua 生成棋盘 img 时使用)
+tetris_next_cell = 18;	-- 预览格尺寸
+tetris_tick_ms = 50;	-- 计时器节拍
+tetris_flash_ms = 300;	-- 消行闪白总时长
+tetris_frame_flash = 15;-- 闪白帧号
+
+-- 七种方块的标准矩阵(I 为 4x4,O 为 2x2,其余 3x3)
+tetris_shapes = {
+	{ {0,0,0,0},{1,1,1,1},{0,0,0,0},{0,0,0,0} },	-- I
+	{ {1,1},{1,1} },								-- O
+	{ {0,1,0},{1,1,1},{0,0,0} },					-- T
+	{ {0,1,1},{1,1,0},{0,0,0} },					-- S
+	{ {1,1,0},{0,1,1},{0,0,0} },					-- Z
+	{ {1,0,0},{1,1,1},{0,0,0} },					-- J
+	{ {0,0,1},{1,1,1},{0,0,0} },					-- L
+};
+-- 每行消行得分(×等级):1/2/3/4 行 = 100/300/500/800(一次锁定最多同时消 4 行)
+tetris_line_scores = {100, 300, 500, 800};
+-- 4 个旋转态的格子偏移:tetris_cells[kind][rot] = {cells={{x,y}...}, w=, h=}
+tetris_cells = {};
+
+tetris = {
+	root=nil, wndBoard=nil, wndNext=nil, timer=nil,
+	grid = {};			-- grid[y][x] = 0(空)或 1..7(方块种类,即雪碧图帧号)
+	cur = nil;			-- 当前方块 {kind,rot,x,y}
+	nextKind = 0;		-- 下一个方块种类
+	bag = {};			-- 7-bag 随机袋
+	score=0, lines=0, level=1,
+	state = "idle";		-- idle/playing/clearing/paused/over
+	pausedFrom = nil;	-- 暂停前的状态(clearing 暂停后恢复回 clearing)
+	ms = 0;				-- 重力计时累计
+	flash_ms = 0;		-- 闪白计时累计
+	flash_rows = nil;	-- 待消除行
+	flash_on = false;	-- 闪白开关(渲染)
+	cache = {};			-- 棋盘渲染缓存(id -> iconIndex)
+	nextCache = {};		-- 预览渲染缓存
+};
+
+function tetris_slog(msg)
+	slog("tetris: " .. msg);
+end
+
+-- 矩阵顺时针旋转 90°
+function tetris_rot_cw(m)
+	local n = #m; local r = {};
+	for y = 1, n do r[y] = {}; end
+	for y = 1, n do
+		for x = 1, n do
+			r[x][n+1-y] = m[y][x];
+		end
+	end
+	return r;
+end
+
+-- 提取矩阵中格子的偏移(平移到包围盒左上角)与包围盒尺寸
+function tetris_cells_of(m)
+	local cells = {}; local minx, miny, maxx, maxy;
+	for y = 1, #m do
+		for x = 1, #m do
+			if m[y][x] == 1 then
+				if minx == nil or x < minx then minx = x end
+				if maxx == nil or x > maxx then maxx = x end
+				if miny == nil or y < miny then miny = y end
+				if maxy == nil or y > maxy then maxy = y end
+				cells[#cells+1] = {x = x, y = y};
+			end
+		end
+	end
+	for _,c in ipairs(cells) do c.x = c.x - minx; c.y = c.y - miny; end
+	return {cells = cells, w = maxx-minx+1, h = maxy-miny+1};
+end
+
+-- 预计算每个方块 4 个旋转态
+function tetris_build_cells()
+	for kind = 1, 7 do
+		tetris_cells[kind] = {};
+		local m = tetris_shapes[kind];
+		for rot = 1, 4 do
+			tetris_cells[kind][rot] = tetris_cells_of(m);
+			m = tetris_rot_cw(m);
+		end
+	end
+end
+
+-- 判定 kind/rot 形状放在 (px,py) 是否合法(越界/重叠都算不行;py<0 视为顶部缓冲区,允许)
+function tetris_can_place(kind, rot, px, py)
+	for _,c in ipairs(tetris_cells[kind][rot].cells) do
+		local gx = px + c.x; local gy = py + c.y;
+		if gx < 0 or gx >= tetris_col or gy >= tetris_row then
+			return false;
+		end
+		if gy >= 0 and tetris.grid[gy][gx] ~= 0 then
+			return false;
+		end
+	end
+	return true;
+end
+
+function tetris_try_move(dx, dy)
+	local cur = tetris.cur;
+	if cur == nil then return false end
+	if tetris_can_place(cur.kind, cur.rot, cur.x+dx, cur.y+dy) then
+		cur.x = cur.x + dx; cur.y = cur.y + dy;
+		return true;
+	end
+	return false;
+end
+
+-- 旋转(带简单踢墙:水平偏移 0/-1/1/-2/2 依次尝试)
+function tetris_try_rotate()
+	local cur = tetris.cur;
+	if cur == nil then return false end
+	local nr = cur.rot % 4 + 1;
+	local kicks = {0, -1, 1, -2, 2};
+	for _,dx in ipairs(kicks) do
+		if tetris_can_place(cur.kind, nr, cur.x+dx, cur.y) then
+			cur.rot = nr; cur.x = cur.x + dx;
+			return true;
+		end
+	end
+	return false;
+end
+
+-- 7-bag 随机:每袋洗牌 7 种方块,保证出块分布均匀
+function tetris_next_kind()
+	if #tetris.bag == 0 then
+		tetris.bag = {1,2,3,4,5,6,7};
+		for i = 7, 2, -1 do
+			local j = math.random(1, i);
+			tetris.bag[i], tetris.bag[j] = tetris.bag[j], tetris.bag[i];
+		end
+	end
+	return table.remove(tetris.bag);
+end
+
+-- 生成当前方块并取出下一个;出生点即重叠则顶满,游戏结束
+function tetris_spawn()
+	local kind = tetris.nextKind;
+	if kind == 0 then kind = tetris_next_kind() end
+	tetris.nextKind = tetris_next_kind();
+	local x = math.floor((tetris_col - tetris_cells[kind][1].w)/2);
+	tetris.cur = {kind = kind, rot = 1, x = x, y = 0};
+	if not tetris_can_place(kind, 1, x, 0) then
+		tetris.cur = nil;
+		tetris_game_over();
+		return;
+	end
+	tetris_render_next();
+end
+
+-- 重力节拍(毫秒):随等级加速,下限 100ms
+function tetris_gravity_ms()
+	local ms = 800 - (tetris.level-1)*70;
+	if ms < 100 then ms = 100 end
+	return ms;
+end
+
+-- 锁定当前方块到棋盘并检测满行:有则进入闪白消除态,否则直接生成下一块
+function tetris_lock()
+	local cur = tetris.cur;
+	if cur == nil then return end
+	for _,c in ipairs(tetris_cells[cur.kind][cur.rot].cells) do
+		local gx = cur.x + c.x; local gy = cur.y + c.y;
+		if gy >= 0 then tetris.grid[gy][gx] = cur.kind; end
+	end
+	tetris.cur = nil;
+	local full = {};
+	for y = 0, tetris_row-1 do
+		local fullRow = true;
+		for x = 0, tetris_col-1 do
+			if tetris.grid[y][x] == 0 then fullRow = false; break end
+		end
+		if fullRow then full[#full+1] = y end
+	end
+	if #full > 0 then
+		tetris.state = "clearing";
+		tetris.flash_rows = full;
+		tetris.flash_ms = 0;
+		tetris.flash_on = true;
+	else
+		tetris_spawn();
+	end
+	tetris_render();
+end
+
+-- 消行闪白结束后:去掉满行、上方行整体下落、计分升级、生成下一块
+function tetris_collapse()
+	local n = #tetris.flash_rows;
+	local keep = {};
+	for y = 0, tetris_row-1 do
+		local isFull = false;
+		for _,fy in ipairs(tetris.flash_rows) do
+			if fy == y then isFull = true; break end
+		end
+		if not isFull then keep[#keep+1] = tetris.grid[y]; end
+	end
+	local newGrid = {};
+	for y = 0, tetris_row-1 do
+		local src = y - n;	-- 新第 y 行来自原第 y-n 行,顶部不足补空行(keep 是 1 基数组)
+		if src >= 0 then
+			newGrid[y] = keep[src + 1];
+		else
+			newGrid[y] = {};
+			for x = 0, tetris_col-1 do newGrid[y][x] = 0 end
+		end
+	end
+	tetris.grid = newGrid;
+	tetris.score = tetris.score + tetris_line_scores[n] * tetris.level;
+	tetris.lines = tetris.lines + n;
+	tetris.level = math.floor(tetris.lines / 10) + 1;
+	tetris.flash_rows = nil;
+	tetris.state = "playing";
+	tetris_show_score(); tetris_show_lines(); tetris_show_level();
+	tetris_spawn();
+	tetris_render();
+end
+
+-- 硬降:直落到底并锁定
+function tetris_hard_drop()
+	if tetris.cur == nil then return end
+	local n = 0;
+	while tetris_try_move(0,1) do n = n + 1 end
+	tetris.score = tetris.score + n*2;
+	tetris_show_score();
+	tetris_lock();
+end
+
+-- 50ms 节拍:推进重力 / 消行闪白
+function tetris_on_timer(args)
+	if tetris.state == "playing" then
+		tetris.ms = tetris.ms + tetris_tick_ms;
+		if tetris.ms >= tetris_gravity_ms() then
+			tetris.ms = 0;
+			if tetris_try_move(0,1) then
+				tetris_render();
+			else
+				tetris_lock();
+			end
+		end
+	elseif tetris.state == "clearing" then
+		tetris.flash_ms = tetris.flash_ms + tetris_tick_ms;
+		local on = math.floor(tetris.flash_ms / 100) % 2 == 0;
+		if on ~= tetris.flash_on then
+			tetris.flash_on = on;
+			tetris_render();
+		end
+		if tetris.flash_ms >= tetris_flash_ms then
+			tetris_collapse();
+		end
+	end
+	return 0;
+end
+
+-- 键盘处理(棋盘通过 SubscribeEvent(EVT_KEYDOWN) 订阅)
+function tetris_on_key(args)
+	if tetris.wndBoard == nil then return 0 end
+	local evt = toStEventKeyDown(args);
+	if evt == nil then return 0 end
+	local key = evt.nChar;
+	if tetris.state == "playing" then
+		if key == 37 then			-- VK_LEFT
+			if tetris_try_move(-1,0) then tetris_render() end
+			return 1;
+		elseif key == 39 then		-- VK_RIGHT
+			if tetris_try_move(1,0) then tetris_render() end
+			return 1;
+		elseif key == 40 then		-- VK_DOWN 软降
+			if tetris_try_move(0,1) then
+				tetris.score = tetris.score + 1;
+				tetris.ms = 0;
+				tetris_show_score();
+				tetris_render();
+			end
+			return 1;
+		elseif key == 38 then		-- VK_UP 旋转
+			if tetris_try_rotate() then tetris_render() end
+			return 1;
+		elseif key == 32 then		-- VK_SPACE 硬降
+			tetris_hard_drop();
+			return 1;
+		elseif key == 80 then		-- 'P' 暂停
+			tetris_pause();
+			return 1;
+		end
+	elseif tetris.state == "paused" and key == 80 then
+		tetris_resume();
+		return 1;
+	end
+	return 0;
+end
+
+function tetris_set_start_btn(text)
+	if tetris.root == nil then return end
+	local btn = tetris.root:FindChildByNameA("btn_tetris_start",-1);
+	if btn then btn:SetWindowText(text) end
+end
+
+-- 七段 LED 翻页计数(与 xxl_set_digits 同款,按位数泛化;不滚动,直接翻页)
+function tetris_set_digits(prefix, num, ndigits)
+	if tetris.root == nil then return end
+	for i = 0, ndigits-1 do
+		local stack = tetris.root:FindChildByNameA(prefix .. "_" .. i, -1);
+		if stack then
+			local d = math.floor(num / 10^i) % 10;
+			local stackApi = QiIStackView(stack);
+			if stackApi then
+				stackApi:SelectPage(d, false);
+				stackApi:Release();
+			end
+		end
+	end
+end
+
+function tetris_show_score() tetris_set_digits("digit_tscore", tetris.score % 10000, 4) end
+function tetris_show_lines() tetris_set_digits("digit_tlines", tetris.lines % 1000, 3) end
+function tetris_show_level() tetris_set_digits("digit_tlevel", tetris.level % 100, 2) end
+
+function tetris_show_state()
+	if tetris.root == nil then return end
+	local txt = tetris.root:FindChildByNameA("txt_tetris_state",-1);
+	if txt == nil then return end
+	local s = {idle = "待开始", playing = "进行中", clearing = "消除中", paused = "已暂停", over = "游戏结束"};
+	txt:SetWindowText(T("状态:" .. (s[tetris.state] or "")));
+end
+
+-- 渲染缓存辅助:值变化才写属性,减少无效重绘
+function tetris_set_frame(wnd, cache, id, frame)
+	if cache[id] == frame then return end
+	cache[id] = frame;
+	local ele = wnd:FindChildByID(id, -1);
+	if ele then
+		ele:SetAttribute(T"iconIndex", T(tostring(frame)), false);
+		ele:Invalidate();
+	end
+end
+
+-- 渲染棋盘:已锁定格子 + 当前方块 + 幽灵落点 + 消行闪白
+function tetris_render()
+	if tetris.wndBoard == nil then return end
+	local overlay = {};
+	if tetris.cur ~= nil then
+		local cur = tetris.cur;
+		local info = tetris_cells[cur.kind][cur.rot];
+		local gy = cur.y;	-- 幽灵:当前形状一路落到不能再落的位置
+		while tetris_can_place(cur.kind, cur.rot, cur.x, gy+1) do gy = gy + 1 end
+		if gy > cur.y then
+			for _,c in ipairs(info.cells) do
+				overlay[(gy+c.y)*tetris_col + cur.x+c.x] = cur.kind + 7;
+			end
+		end
+		for _,c in ipairs(info.cells) do
+			if cur.y + c.y >= 0 then
+				overlay[(cur.y+c.y)*tetris_col + cur.x+c.x] = cur.kind;
+			end
+		end
+	end
+	for y = 0, tetris_row-1 do
+		local flashing = false;
+		if tetris.state == "clearing" and tetris.flash_on then
+			for _,fy in ipairs(tetris.flash_rows) do
+				if fy == y then flashing = true; break end
+			end
+		end
+		for x = 0, tetris_col-1 do
+			local frame;
+			local ov = overlay[y*tetris_col + x];
+			if ov then
+				frame = ov;
+			elseif flashing then
+				frame = tetris_frame_flash;
+			else
+				frame = tetris.grid[y][x];	-- 0=空格,1-7=方块,恰好是雪碧图帧号
+			end
+			tetris_set_frame(tetris.wndBoard, tetris.cache, tetris_base_id + y*tetris_col + x, frame);
+		end
+	end
+end
+
+-- 渲染下一块预览(4x4 内居中)
+function tetris_render_next()
+	if tetris.wndNext == nil then return end
+	local overlay = {};
+	local kind = tetris.nextKind;
+	if kind ~= 0 then
+		local info = tetris_cells[kind][1];
+		local ox = math.floor((4-info.w)/2); local oy = math.floor((4-info.h)/2);
+		for _,c in ipairs(info.cells) do
+			overlay[(oy+c.y)*4 + ox+c.x] = kind;
+		end
+	end
+	for i = 0, 15 do
+		tetris_set_frame(tetris.wndNext, tetris.nextCache, tetris_next_base_id + i, overlay[i] or 0);
+	end
+end
+
+-- 复位数据(不动 UI 状态)
+function tetris_reset_data()
+	tetris.grid = {};
+	for y = 0, tetris_row-1 do
+		tetris.grid[y] = {};
+		for x = 0, tetris_col-1 do tetris.grid[y][x] = 0 end
+	end
+	tetris.bag = {};
+	tetris.nextKind = tetris_next_kind();
+	tetris.cur = nil;
+	tetris.score = 0; tetris.lines = 0; tetris.level = 1;
+	tetris.ms = 0; tetris.flash_ms = 0; tetris.flash_rows = nil; tetris.flash_on = false;
+end
+
+-- 开始新的一局(开始按钮在 idle/over 时、重新开始按钮)
+function tetris_start()
+	tetris_reset_data();
+	tetris_render_next();
+	tetris_show_score(); tetris_show_lines(); tetris_show_level();
+	tetris.state = "playing";
+	tetris_show_state();
+	tetris_set_start_btn(T"暂 停");
+	if tetris.timer then
+		tetris.timer:KillTimer();
+		tetris.timer:StartTimer(tetris_tick_ms, 1, 0);
+	end
+	tetris_spawn();
+	tetris_render();
+end
+
+function tetris_pause()
+	if tetris.state ~= "playing" and tetris.state ~= "clearing" then return end
+	tetris.pausedFrom = tetris.state;
+	tetris.state = "paused";
+	if tetris.timer then tetris.timer:KillTimer() end
+	tetris_set_start_btn(T"继 续");
+	tetris_show_state();
+end
+
+function tetris_resume()
+	if tetris.state ~= "paused" then return end
+	tetris.state = tetris.pausedFrom or "playing";
+	tetris.pausedFrom = nil;
+	if tetris.timer then tetris.timer:StartTimer(tetris_tick_ms, 1, 0) end
+	tetris_set_start_btn(T"暂 停");
+	tetris_show_state();
+end
+
+function tetris_game_over()
+	tetris.state = "over";
+	if tetris.timer then tetris.timer:KillTimer() end
+	tetris_set_start_btn(T"开始游戏");
+	tetris_show_state();
+	tetris_render();
+	if tetris.wndBoard == nil then return end	-- 纯数据测试环境无 UI,到此为止
+	local hwnd = tetris.wndBoard:GetHostHwnd();
+	SMessageBox(hwnd, L("游戏结束!得分 " .. tetris.score .. "\n点击确定重新开始"), L("俄罗斯方块"), 0);
+	tetris_start();	-- 与消消乐一致:弹窗确认后自动开新一局
+end
+
+-- 开始/暂停/继续 三态按钮
+function tetris_on_start(args)
+	if tetris.wndBoard == nil then return 0 end
+	if tetris.state == "playing" or tetris.state == "clearing" then
+		tetris_pause();
+	elseif tetris.state == "paused" then
+		tetris_resume();
+	else
+		tetris_start();
+	end
+	tetris.wndBoard:SetFocus();
+	return 1;
+end
+
+-- 重新开始:任何状态都重开一局
+function tetris_on_restart(args)
+	if tetris.wndBoard == nil then return 0 end
+	tetris_start();
+	tetris.wndBoard:SetFocus();
+	return 1;
+end
+
+-- 子页被隐藏时自动暂停,避免后台空转
+function tetris_on_page_vis(args)
+	if tetris.wndBoard == nil then return 0 end
+	local evt = toStEventSwndVisibleChanged(args);
+	if evt == nil then return 0 end
+	if evt.bVisible == 0 and (tetris.state == "playing" or tetris.state == "clearing") then
+		tetris_pause();
+	end
+	return 0;
+end
+
+-- 动态创建棋盘/预览格子(img + svg_tetris_blocks 雪碧图帧)
+function tetris_init_board()
+	tetris.wndBoard:DestroyAllChildren();
+	tetris.wndNext:DestroyAllChildren();
+	tetris.cache = {}; tetris.nextCache = {};
+	local xml = "";
+	for y = 0, tetris_row-1 do
+		for x = 0, tetris_col-1 do
+			xml = xml .. '<img id="' .. (tetris_base_id + y*tetris_col + x)
+				.. '" size="' .. tetris_cell .. ',' .. tetris_cell
+				.. '" skin="svg_tetris_blocks" iconIndex="0"/>';
+		end
+	end
+	tetris.wndBoard:CreateChildrenFromXml(xml);
+	tetris.wndBoard:RequestRelayout();
+	xml = "";
+	for i = 0, 15 do
+		xml = xml .. '<img id="' .. (tetris_next_base_id + i)
+			.. '" size="' .. tetris_next_cell .. ',' .. tetris_next_cell
+			.. '" skin="svg_tetris_blocks" iconIndex="0"/>';
+	end
+	tetris.wndNext:CreateChildrenFromXml(xml);
+	tetris.wndNext:RequestRelayout();
+end
+
+function tetris_init(root)
+	local wndBoard = root:FindChildByNameA("wnd_tetris_board",-1);
+	local wndNext = root:FindChildByNameA("wnd_tetris_next",-1);
+	if wndBoard == nil or wndNext == nil then
+		return 0; -- demo 不含俄罗斯方块子页,跳过
+	end
+	tetris.root = root;
+	tetris.wndBoard = wndBoard;
+	tetris.wndNext = wndNext;
+	tetris_build_cells();
+	-- 独立计时器(与跑马机的 on_timer 互不影响)
+	local souiFac = CreateSouiFactory();
+	local timerSlot = CreateEventSlot("tetris_on_timer");
+	tetris.timer = souiFac:CreateTimer(timerSlot);
+	timerSlot:Release();
+	souiFac:Release();
+	-- 键盘:棋盘可聚焦,订阅 EVT_KEYDOWN(与 btn_lrc 订阅 EVT_CMD 同一套路)
+	tetris_init_board();
+	tetris_reset_data();
+	local keySlot = CreateEventSlot("tetris_on_key");
+	wndBoard:SubscribeEvent(8200, keySlot);	-- 8200 == EVT_KEYDOWN
+	keySlot:Release();
+	tetris_render_next();
+	tetris_show_score(); tetris_show_lines(); tetris_show_level();
+	tetris_show_state();
+	tetris_slog("init done");
+	return 1;
+end
+
+function tetris_exit()
+	if tetris.timer then
+		tetris.timer:KillTimer();
+		tetris.timer:Release();
+		tetris.timer = nil;
+	end
 end
 
