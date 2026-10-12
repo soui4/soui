@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  tetris_blocks.svg - 俄罗斯方块方块雪碧图(nanosvg 兼容)
+  17 帧横排,每帧 64x64,总尺寸 1088x64。
+  帧序: 0=空格 1=I(青) 2=O(黄) 3=T(紫) 4=S(绿) 5=Z(红) 6=J(蓝) 7=L(橙)
+        8-14=对应 1-7 的幽灵块(落点预览,半透明) 15=消行闪白 16=标题图标(T 块)
+  风格: 与 xxl_icons.svg 糖果风一致(径向渐变 + 左上高光 + 内描边 + 落地阴影)。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="1088" height="64" viewBox="0 0 1088 64">
+  <defs>
+  <radialGradient id="gCyan" cx="0.38" cy="0.30" r="0.85">
+    <stop offset="0" stop-color="#C9F6FD"/>
+    <stop offset="0.5" stop-color="#22C3E8"/>
+    <stop offset="1" stop-color="#0B7E9C"/>
+  </radialGradient>
+  <radialGradient id="gYellow" cx="0.38" cy="0.30" r="0.85">
+    <stop offset="0" stop-color="#FDF3A0"/>
+    <stop offset="0.5" stop-color="#F5C400"/>
+    <stop offset="1" stop-color="#A87D00"/>
+  </radialGradient>
+  <radialGradient id="gPurple" cx="0.38" cy="0.30" r="0.85">
+    <stop offset="0" stop-color="#E2D2FD"/>
+    <stop offset="0.5" stop-color="#9C6BF0"/>
+    <stop offset="1" stop-color="#5B2FA8"/>
+  </radialGradient>
+  <radialGradient id="gGreen" cx="0.38" cy="0.30" r="0.85">
+    <stop offset="0" stop-color="#C8F7D6"/>
+    <stop offset="0.5" stop-color="#3FC974"/>
+    <stop offset="1" stop-color="#1B7A43"/>
+  </radialGradient>
+  <radialGradient id="gRed" cx="0.38" cy="0.30" r="0.85">
+    <stop offset="0" stop-color="#FDC5C5"/>
+    <stop offset="0.5" stop-color="#F06A6A"/>
+    <stop offset="1" stop-color="#A82B2B"/>
+  </radialGradient>
+  <radialGradient id="gBlue" cx="0.38" cy="0.30" r="0.85">
+    <stop offset="0" stop-color="#CCE3FD"/>
+    <stop offset="0.5" stop-color="#4E97F5"/>
+    <stop offset="1" stop-color="#1F5BB0"/>
+  </radialGradient>
+  <radialGradient id="gOrange" cx="0.38" cy="0.30" r="0.85">
+    <stop offset="0" stop-color="#FEDCB0"/>
+    <stop offset="0.5" stop-color="#F58E3C"/>
+    <stop offset="1" stop-color="#A85410"/>
+  </radialGradient>
+  </defs>
+
+  <!-- 帧0:空格(暗色浅纹 + 细描边) -->
+  <g transform="translate(0,0)">
+    <rect x="4" y="4" width="56" height="56" rx="9" fill="#0F172A" opacity="0.05"/>
+    <rect x="4.75" y="4.75" width="54.5" height="54.5" rx="8.5" fill="none" stroke="#0F172A" stroke-width="1.2" opacity="0.10"/>
+  </g>
+
+  <!-- 帧1:I 青色 -->
+  <g transform="translate(64,0)">
+    <ellipse cx="32" cy="58" rx="16" ry="2.4" fill="#000000" opacity="0.10"/>
+    <rect x="5" y="5" width="54" height="54" rx="9" fill="url(#gCyan)"/>
+    <rect x="5.75" y="5.75" width="52.5" height="52.5" rx="8.5" fill="none" stroke="#FFFFFF" stroke-width="1.5" opacity="0.35"/>
+    <ellipse cx="23" cy="19" rx="15" ry="7.5" fill="#FFFFFF" opacity="0.50"/>
+    <rect x="12" y="45" width="40" height="9" rx="4.5" fill="#000000" opacity="0.08"/>
+  </g>
+  <!-- 帧2:O 黄色 -->
+  <g transform="translate(128,0)">
+    <ellipse cx="32" cy="58" rx="16" ry="2.4" fill="#000000" opacity="0.10"/>
+    <rect x="5" y="5" width="54" height="54" rx="9" fill="url(#gYellow)"/>
+    <rect x="5.75" y="5.75" width="52.5" height="52.5" rx="8.5" fill="none" stroke="#FFFFFF" stroke-width="1.5" opacity="0.35"/>
+    <ellipse cx="23" cy="19" rx="15" ry="7.5" fill="#FFFFFF" opacity="0.50"/>
+    <rect x="12" y="45" width="40" height="9" rx="4.5" fill="#000000" opacity="0.08"/>
+  </g>
+  <!-- 帧3:T 紫色 -->
+  <g transform="translate(192,0)">
+    <ellipse cx="32" cy="58" rx="16" ry="2.4" fill="#000000" opacity="0.10"/>
+    <rect x="5" y="5" width="54" height="54" rx="9" fill="url(#gPurple)"/>
+    <rect x="5.75" y="5.75" width="52.5" height="52.5" rx="8.5" fill="none" stroke="#FFFFFF" stroke-width="1.5" opacity="0.35"/>
+    <ellipse cx="23" cy="19" rx="15" ry="7.5" fill="#FFFFFF" opacity="0.50"/>
+    <rect x="12" y="45" width="40" height="9" rx="4.5" fill="#000000" opacity="0.08"/>
+  </g>
+  <!-- 帧4:S 绿色 -->
+  <g transform="translate(256,0)">
+    <ellipse cx="32" cy="58" rx="16" ry="2.4" fill="#000000" opacity="0.10"/>
+    <rect x="5" y="5" width="54" height="54" rx="9" fill="url(#gGreen)"/>
+    <rect x="5.75" y="5.75" width="52.5" height="52.5" rx="8.5" fill="none" stroke="#FFFFFF" stroke-width="1.5" opacity="0.35"/>
+    <ellipse cx="23" cy="19" rx="15" ry="7.5" fill="#FFFFFF" opacity="0.50"/>
+    <rect x="12" y="45" width="40" height="9" rx="4.5" fill="#000000" opacity="0.08"/>
+  </g>
+  <!-- 帧5:Z 红色 -->
+  <g transform="translate(320,0)">
+    <ellipse cx="32" cy="58" rx="16" ry="2.4" fill="#000000" opacity="0.10"/>
+    <rect x="5" y="5" width="54" height="54" rx="9" fill="url(#gRed)"/>
+    <rect x="5.75" y="5.75" width="52.5" height="52.5" rx="8.5" fill="none" stroke="#FFFFFF" stroke-width="1.5" opacity="0.35"/>
+    <ellipse cx="23" cy="19" rx="15" ry="7.5" fill="#FFFFFF" opacity="0.50"/>
+    <rect x="12" y="45" width="40" height="9" rx="4.5" fill="#000000" opacity="0.08"/>
+  </g>
+  <!-- 帧6:J 蓝色 -->
+  <g transform="translate(384,0)">
+    <ellipse cx="32" cy="58" rx="16" ry="2.4" fill="#000000" opacity="0.10"/>
+    <rect x="5" y="5" width="54" height="54" rx="9" fill="url(#gBlue)"/>
+    <rect x="5.75" y="5.75" width="52.5" height="52.5" rx="8.5" fill="none" stroke="#FFFFFF" stroke-width="1.5" opacity="0.35"/>
+    <ellipse cx="23" cy="19" rx="15" ry="7.5" fill="#FFFFFF" opacity="0.50"/>
+    <rect x="12" y="45" width="40" height="9" rx="4.5" fill="#000000" opacity="0.08"/>
+  </g>
+  <!-- 帧7:L 橙色 -->
+  <g transform="translate(448,0)">
+    <ellipse cx="32" cy="58" rx="16" ry="2.4" fill="#000000" opacity="0.10"/>
+    <rect x="5" y="5" width="54" height="54" rx="9" fill="url(#gOrange)"/>
+    <rect x="5.75" y="5.75" width="52.5" height="52.5" rx="8.5" fill="none" stroke="#FFFFFF" stroke-width="1.5" opacity="0.35"/>
+    <ellipse cx="23" cy="19" rx="15" ry="7.5" fill="#FFFFFF" opacity="0.50"/>
+    <rect x="12" y="45" width="40" height="9" rx="4.5" fill="#000000" opacity="0.08"/>
+  </g>
+
+  <!-- 帧8-14:幽灵块(落点预览,半透明填充 + 半透明描边) -->
+  <g transform="translate(512,0)">
+    <rect x="7" y="7" width="50" height="50" rx="8" fill="url(#gCyan)" opacity="0.20"/>
+    <rect x="8.5" y="8.5" width="47" height="47" rx="7" fill="none" stroke="#22C3E8" stroke-width="3" opacity="0.5"/>
+  </g>
+  <g transform="translate(576,0)">
+    <rect x="7" y="7" width="50" height="50" rx="8" fill="url(#gYellow)" opacity="0.20"/>
+    <rect x="8.5" y="8.5" width="47" height="47" rx="7" fill="none" stroke="#F5C400" stroke-width="3" opacity="0.5"/>
+  </g>
+  <g transform="translate(640,0)">
+    <rect x="7" y="7" width="50" height="50" rx="8" fill="url(#gPurple)" opacity="0.20"/>
+    <rect x="8.5" y="8.5" width="47" height="47" rx="7" fill="none" stroke="#9C6BF0" stroke-width="3" opacity="0.5"/>
+  </g>
+  <g transform="translate(704,0)">
+    <rect x="7" y="7" width="50" height="50" rx="8" fill="url(#gGreen)" opacity="0.20"/>
+    <rect x="8.5" y="8.5" width="47" height="47" rx="7" fill="none" stroke="#3FC974" stroke-width="3" opacity="0.5"/>
+  </g>
+  <g transform="translate(768,0)">
+    <rect x="7" y="7" width="50" height="50" rx="8" fill="url(#gRed)" opacity="0.20"/>
+    <rect x="8.5" y="8.5" width="47" height="47" rx="7" fill="none" stroke="#F06A6A" stroke-width="3" opacity="0.5"/>
+  </g>
+  <g transform="translate(832,0)">
+    <rect x="7" y="7" width="50" height="50" rx="8" fill="url(#gBlue)" opacity="0.20"/>
+    <rect x="8.5" y="8.5" width="47" height="47" rx="7" fill="none" stroke="#4E97F5" stroke-width="3" opacity="0.5"/>
+  </g>
+  <g transform="translate(896,0)">
+    <rect x="7" y="7" width="50" height="50" rx="8" fill="url(#gOrange)" opacity="0.20"/>
+    <rect x="8.5" y="8.5" width="47" height="47" rx="7" fill="none" stroke="#F58E3C" stroke-width="3" opacity="0.5"/>
+  </g>
+
+  <!-- 帧15:消行闪白 -->
+  <g transform="translate(960,0)">
+    <rect x="5" y="5" width="54" height="54" rx="9" fill="#FFFFFF"/>
+    <rect x="5.75" y="5.75" width="52.5" height="52.5" rx="8.5" fill="none" stroke="#64748B" stroke-width="1.5" opacity="0.55"/>
+    <ellipse cx="23" cy="19" rx="15" ry="7.5" fill="#94A3B8" opacity="0.25"/>
+  </g>
+
+  <!-- 帧16:标题图标(T 形四连块) -->
+  <g transform="translate(1024,0)">
+    <ellipse cx="32" cy="52" rx="19" ry="2.4" fill="#000000" opacity="0.10"/>
+    <rect x="10" y="16" width="14" height="14" rx="3.5" fill="url(#gPurple)"/>
+    <rect x="25" y="16" width="14" height="14" rx="3.5" fill="url(#gPurple)"/>
+    <rect x="40" y="16" width="14" height="14" rx="3.5" fill="url(#gPurple)"/>
+    <rect x="25" y="31" width="14" height="14" rx="3.5" fill="url(#gPurple)"/>
+  </g>
+</svg>

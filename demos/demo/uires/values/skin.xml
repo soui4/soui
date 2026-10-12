@@ -155,4 +155,6 @@
   <imglist name="svg_xxl_btn_restart" src="svg:xxl_btn_restart" states="3"/>
   <imglist name="svg_xxl_btn_hint" src="svg:xxl_btn_hint" states="3"/>
   <imglist name="svg_xxl_btn_shuffle" src="svg:xxl_btn_shuffle" states="3"/>
+  <!-- 俄罗斯方块(lua 版)方块雪碧图:17 态 = 0 空格 / 1-7 七种方块 / 8-14 幽灵块 / 15 消行闪白 / 16 标题图标 -->
+  <imglist name="svg_tetris_blocks" src="svg:tetris_blocks" states="17"/>
 </skin>
