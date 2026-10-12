@@ -26,6 +26,12 @@
     每格是一个 img,统一引用 svg/tetris_blocks.svg 17 帧雪碧图
     (skin.xml: svg_tetris_blocks,帧 0=空格 1-7=七种方块 8-14=幽灵块
     15=消行闪白 16=标题图标),渲染只切换 iconIndex;
+    布局左右卡片对称: 左侧计分卡(得分/行数/等级 LED + 状态 + 按钮),
+    右侧预览卡(下一个方块 + 键位说明);
+    动画参考消消乐: 消行时整行星芒爆发(skin_xxl_fx + anim:xxl_fx_pop,
+    画在 wnd_tetris_aniframe 浮层),"+分数"文本沿抛物线飞向得分 LED
+    (LuaValueAnimator + animator:xxl_move 模板),得分 LED 随之滚动,
+    升级时 "LV N" 飞向等级 LED;硬降/自然锁定的格子闪白高亮 120ms;
     数据层(旋转/碰撞/消行/计分)与渲染层分离,可在裸 lua 中回归测试;
     键盘: 棋盘 focusable + lua SubscribeEvent(EVT_KEYDOWN),← → 移动、
     ↑ 旋转、↓ 软降、空格 硬降、P 暂停;7-bag 随机、旋转踢墙、消行闪白、
@@ -187,10 +193,6 @@
           </window>
         </window>
         <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
-        <!-- 下一块预览:4x4 格,内容由 lua 动态创建(svg_tetris_blocks 帧) -->
-        <text text="下一个" font="size:12" colorText="@color/clr_text_sub"/>
-        <window name="wnd_tetris_next" size="-2,-2" layout="gridlayout" rowCount="4" columnCount="4" interval="2" gravity="fill" layout_gravity="center"/>
-        <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
         <!-- 计分区:七段 LED 翻页计数器 -->
         <text text="得分" font="size:12" colorText="@color/clr_text_sub"/>
         <window size="-2,-1" layout="hbox" interval="3">
@@ -216,12 +218,30 @@
         <!-- 功能按钮:SVG 药丸形底(3 态),开始=主色实底,重新开始=白底描边 -->
         <button name="btn_tetris_start" size="-2,36" skin="xxl_btn_primary" colorText="#FFFFFF" cursor="hand" on_command="tetris_on_start" tip="开始 / 暂停 / 继续">开始游戏</button>
         <button name="btn_tetris_restart" size="-2,36" skin="xxl_btn_secondary" colorText="@color/clr_primary" cursor="hand" on_command="tetris_on_restart" tip="重新开始一局">重新开始</button>
-        <text text="← → 移动&#10;↑ 旋转 ↓ 软降&#10;空格 硬降 P 暂停" extend_top="2" font="size:11" colorText="@color/clr_text_sub" multilines="1"/>
       </window>
       <!-- 中间留白 + 棋盘(10x20 格,内容由 lua 动态创建,svg_tetris_blocks 雪碧图)+ 留白 -->
       <window size="0,-2" weight="1"/>
       <window name="wnd_tetris_board" size="-2,-2" layout_gravity="center" layout="gridlayout" rowCount="20" columnCount="10" interval="2" padding="8" gravity="fill" colorBkgnd="@color/clr_card_bg" focusable="1" tip="点击此处获取键盘焦点"/>
       <window size="0,-2" weight="1"/>
+      <!-- 右侧预览卡:与左侧计分卡对称(下一个方块 + 键位说明) -->
+      <window size="192,-2" layout="vbox" interval="10" padding="14,12,14,12" colorBkgnd="@color/clr_card_bg">
+        <!-- 标题行:幽灵块图标 + 标题/副标题 -->
+        <window size="-2,-1" layout="hbox" interval="8">
+          <img size="30,30" skin="svg_tetris_blocks" iconIndex="8" layout_gravity="center"/>
+          <window size="-1,-2" layout="vbox" interval="1">
+            <text text="下一个" font="size:16,bold:1" colorText="@color/clr_title"/>
+            <text text="NEXT BLOCK" font="size:10" colorText="@color/clr_text_sub"/>
+          </window>
+        </window>
+        <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
+        <!-- 下一块预览:4x4 格,内容由 lua 动态创建(svg_tetris_blocks 帧) -->
+        <window name="wnd_tetris_next" size="-2,-2" layout="gridlayout" rowCount="4" columnCount="4" interval="2" gravity="fill" layout_gravity="center"/>
+        <window size="0,0" weight="1"/>
+        <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
+        <text text="← → 移动&#10;↑ 旋转 ↓ 软降&#10;空格 硬降 P 暂停" font="size:11" colorText="@color/clr_text_sub" multilines="1"/>
+      </window>
     </window>
+    <!-- 动画浮层:消行星芒 / 飞分文本画在这最顶层(参考消消乐 wnd_xxl_aniframe) -->
+    <window name="wnd_tetris_aniframe" pos="0,0,-0,-0" msgTransparent="1"/>
   </page>
 </tabctrl>

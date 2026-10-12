@@ -1693,6 +1693,14 @@ tetris = {
 	flash_on = false;	-- 闪白开关(渲染)
 	cache = {};			-- 棋盘渲染缓存(id -> iconIndex)
 	nextCache = {};		-- 预览渲染缓存
+	score_shown = 0;	-- 得分 LED 显示值(飞分落地前滞后于 score)
+	lock_cells = nil;	-- 刚锁定格子(闪白高亮 overlay)
+	lock_ms = 0;		-- 锁定高亮剩余时间
+	aniframe = nil;		-- 动画浮层(参考消消乐 wnd_xxl_aniframe)
+	ani_move = nil;		-- animator:xxl_move 模板(无插值器 => 线性进度)
+	fx_ani_cache = nil;	-- anim:xxl_fx_pop 缓存(LoadAnimation 一次,clone 使用)
+	fx_seq = 0;			-- 浮层特效窗口 id 序列
+	ani_ctx = {};		-- 飞行/滚动动画上下文(id -> ctx)
 };
 
 function tetris_slog(msg)
@@ -1818,9 +1826,13 @@ end
 function tetris_lock()
 	local cur = tetris.cur;
 	if cur == nil then return end
+	local locked = {};
 	for _,c in ipairs(tetris_cells[cur.kind][cur.rot].cells) do
 		local gx = cur.x + c.x; local gy = cur.y + c.y;
-		if gy >= 0 then tetris.grid[gy][gx] = cur.kind; end
+		if gy >= 0 then
+			tetris.grid[gy][gx] = cur.kind;
+			locked[#locked+1] = {x = gx, y = gy};
+		end
 	end
 	tetris.cur = nil;
 	local full = {};
@@ -1838,6 +1850,7 @@ function tetris_lock()
 		tetris.flash_on = true;
 	else
 		tetris_spawn();
+		tetris.lock_cells = locked; tetris.lock_ms = 120;	-- 锁定闪白高亮
 	end
 	tetris_render();
 end
@@ -1864,14 +1877,20 @@ function tetris_collapse()
 		end
 	end
 	tetris.grid = newGrid;
-	tetris.score = tetris.score + tetris_line_scores[n] * tetris.level;
+	local pts = tetris_line_scores[n] * tetris.level;	-- 消行得分(按消除前等级)
+	local levelOld = tetris.level;
+	tetris.score = tetris.score + pts;
 	tetris.lines = tetris.lines + n;
 	tetris.level = math.floor(tetris.lines / 10) + 1;
+	local rowsCleared = tetris.flash_rows;
 	tetris.flash_rows = nil;
 	tetris.state = "playing";
-	tetris_show_score(); tetris_show_lines(); tetris_show_level();
+	tetris_show_lines(); tetris_show_level();
 	tetris_spawn();
 	tetris_render();
+	-- 动画:星芒已在 on_timer 闪白结束时弹出;这里飞分 + LED 滚动
+	-- (headless 无浮层时 tetris_score_fly 内部直接对齐显示)
+	tetris_score_fly(pts, tetris.level ~= levelOld, tetris.level, rowsCleared);
 end
 
 -- 硬降:直落到底并锁定
@@ -1880,8 +1899,225 @@ function tetris_hard_drop()
 	local n = 0;
 	while tetris_try_move(0,1) do n = n + 1 end
 	tetris.score = tetris.score + n*2;
+	tetris.score_shown = tetris.score;	-- 小分瞬时对齐(不做飞行动画)
 	tetris_show_score();
 	tetris_lock();
+end
+
+-- ==================== 动画(参考消消乐 xxl_pop_fx/xxl_coin_fly/xxl_coin_count) ====================
+-- 浮层特效窗口 id 基址(与棋盘 60000/预览 61000 不冲突)
+tetris_fx_base_id = 62000;
+
+-- 新建动画上下文(消消乐 xxl_new_ctx 同款:表持有 widget/参数,回调按 id 取回)
+function tetris_new_ani_ctx(ctx)
+	tetris.fx_seq = tetris.fx_seq + 1;
+	tetris.ani_ctx[tetris.fx_seq] = ctx;
+	return tetris.fx_seq;
+end
+
+-- 格子的宿主矩形(浮层与页面根同构,GetWindowRect2 结果可直接作为浮层子窗口位置)
+function tetris_get_cell_rect(x, y)
+	if tetris.wndBoard == nil then return nil end
+	local ele = tetris.wndBoard:FindChildByID(tetris_base_id + y*tetris_col + x, -1);
+	if ele == nil then return nil end
+	return ele:GetWindowRect2();
+end
+
+-- 一行格子的合并矩形(星芒爆发/飞分起点)
+function tetris_get_row_rect(row)
+	local rcL = tetris_get_cell_rect(0, row);
+	local rcR = tetris_get_cell_rect(tetris_col-1, row);
+	if rcL == nil or rcR == nil then return nil end
+	return CRect(rcL.left, rcL.top, rcR.right, rcR.bottom);
+end
+
+-- LED 数字串的合并矩形(prefix_0..prefix_n-1,消消乐 xxl_get_coin_rect 同款思路)
+function tetris_get_led_rect(prefix, ndigits)
+	local l, t, r, b;
+	for i = 0, ndigits-1 do
+		local d = tetris.root and tetris.root:FindChildByNameA(prefix .. "_" .. i, -1);
+		if d then
+			local rc = d:GetWindowRect2();
+			l = (l == nil) and rc.left or math.min(l, rc.left);
+			t = (t == nil) and rc.top or math.min(t, rc.top);
+			r = (r == nil) and rc.right or math.max(r, rc.right);
+			b = (b == nil) and rc.bottom or math.max(b, rc.bottom);
+		end
+	end
+	if l == nil then return nil end
+	return CRect(l, t, r, b);
+end
+
+-- 整行星芒爆发(消消乐 xxl_pop_fx 同款:skin_xxl_fx + anim:xxl_fx_pop,stop 时自毁)
+function tetris_pop_row_fx(row)
+	if tetris.aniframe == nil then return end
+	local rc = tetris_get_row_rect(row);
+	if rc == nil then return end
+	tetris.fx_seq = tetris.fx_seq + 1;
+	local fid = tetris_fx_base_id + tetris.fx_seq;
+	local w = math.floor(rc:Width() * 1.2); local h = math.floor(rc:Height() * 2.0);
+	local px = rc.left + math.floor(rc:Width()/2);
+	local py = rc.top + math.floor(rc:Height()/2);
+	local xml = '<img id="' .. fid .. '" skin="skin_xxl_fx" msgTransparent="1" visible="0" on_animation_stop="tetris_fx_stop"/>';
+	tetris.aniframe:CreateChildrenFromXml(xml);
+	local fx = tetris.aniframe:FindChildByID(fid, -1);
+	if fx == nil then return end
+	fx:Move(CRect(px - math.floor(w/2), py - math.floor(h/2), px - math.floor(w/2) + w, py - math.floor(h/2) + h));
+	-- cnchess 同款:clone 缓存动画再挂上(master 会在窗口 stop 时被 Release,不能直接交缓存)
+	if tetris.fx_ani_cache == nil then
+		tetris.fx_ani_cache = GetApp():LoadAnimation("anim:xxl_fx_pop");
+	end
+	if tetris.fx_ani_cache == nil then fx:Destroy(); return end
+	local ani = tetris.fx_ani_cache:clone();
+	fx:SetAnimation(ani);
+	ani:Release();
+	-- 显示必须在 SetAnimation 之后:替换运行中动画可能触发旧动画 stop 事件
+	fx:SetVisible(true, true);
+end
+
+-- 星芒动画播完(EventSwndAnimationStop):销毁特效窗口
+function tetris_fx_stop(args)
+	local fx = toSWindow(args:Sender());
+	if fx then fx:Destroy() end
+end
+
+-- 飞行文本通用段:"+分数"/"LV N" 沿抛物线从 rcFrom 飞到 rcTo(消消乐 xxl_coin_fly 同款)
+-- kind: "score" 落地触发得分 LED 滚动,"level" 落地刷新等级 LED;返回 false=没起飞,调用方走瞬时兜底
+function tetris_fly_text(rcFrom, rcTo, text, colorText, kind)
+	if tetris.aniframe == nil or tetris.ani_move == nil then return false end
+	tetris.fx_seq = tetris.fx_seq + 1;
+	local fid = tetris_fx_base_id + tetris.fx_seq;
+	local w = 72; local h = 26;
+	local px = rcFrom.left + math.floor(rcFrom:Width()/2) - math.floor(w/2);
+	local py = rcFrom.top + math.floor(rcFrom:Height()/2) - math.floor(h/2);
+	local xml = '<text id="' .. fid .. '" text="' .. text .. '" font="size:20,bold:1"'
+		.. ' colorText="' .. colorText .. '" align="center" valign="center" msgTransparent="1"/>';
+	tetris.aniframe:CreateChildrenFromXml(xml);
+	local fy = tetris.aniframe:FindChildByID(fid, -1);
+	if fy == nil then return false end
+	fy:Move(CRect(px, py, px + w, py + h));
+	local tx = rcTo.left + math.floor(rcTo:Width()/2) - math.floor(w/2);
+	local ty = rcTo.top + math.floor(rcTo:Height()/2) - math.floor(h/2);
+	local rc1 = CRect(px, py, px + w, py + h);
+	local rc2 = CRect(tx, ty, tx + w, ty + h);
+	-- 弓高:与飞行距离成比例(30%),限制在 50~120px,方向向上
+	local arc = math.max(50, math.min(120, math.abs(tx - px) * 0.3));
+	local ani = LuaValueAnimator();
+	ani:CopyFrom(tetris.ani_move:GetIValueAnimator());	-- 模板无插值器 => GetFraction 即线性 t
+	ani:GetIValueAnimator():setDuration(500);
+	ani:SetRangeRect(rc1, rc2);	-- 线性基准(实际位置在 update 里叠加抛物线偏移)
+	ani:SetOnUpdate("tetris_fly_update");
+	ani:SetOnEnd("tetris_fly_end");
+	local ctxId = tetris_new_ani_ctx({ kind = kind, widget = fy, r1 = rc1, r2 = rc2, arc = arc });
+	ani:SetCtx(ctxId);
+	-- lua_tinker 的 BOOL 返回是数字,用 ==0 判(勿用 not)
+	local ok = ani:Start(tetris.aniframe);
+	if ok == 0 or ok == false then
+		tetris.ani_ctx[ctxId] = nil;
+		fy:Destroy();
+		return false
+	end
+	return true
+end
+
+-- 飞行跟随:x/宽/高线性插值,y 叠加向上弓起 arc*4t(1-t)(消消乐 xxl_fly_update 同款)
+function tetris_fly_update(luaAni, ctxId)
+	local c = tetris.ani_ctx[ctxId];
+	if c == nil or c.widget == nil then return end
+	local t = luaAni:GetFraction();
+	local x = c.r1.left + (c.r2.left - c.r1.left) * t;
+	local y = c.r1.top + (c.r2.top - c.r1.top) * t - c.arc * 4 * t * (1 - t);
+	local l = math.floor(x); local tp = math.floor(y);
+	c.widget:Move(CRect(l, tp, l + c.r1:Width(), tp + c.r1:Height()));
+end
+
+-- 飞行落地:销毁文本窗口,按类型接力
+function tetris_fly_end(luaAni, ctxId)
+	local c = tetris.ani_ctx[ctxId];
+	if c == nil then return end
+	if c.widget then c.widget:Destroy() end
+	tetris.ani_ctx[ctxId] = nil;
+	if c.kind == "score" then
+		tetris_score_count_begin();
+	elseif c.kind == "level" then
+		tetris_show_level();
+	end
+end
+
+-- 消行计分动画入口:被消行中部弹 "+分数" 飞向得分 LED,同时 LED 滚动;
+-- 升级时再飞一条 "LV N" 到等级 LED;浮层不可用或起飞失败 => 瞬时对齐显示
+function tetris_score_fly(pts, levelUp, newLevel, rowsCleared)
+	local rcFrom = nil;
+	if tetris.aniframe and rowsCleared and #rowsCleared > 0 then
+		rcFrom = tetris_get_row_rect(rowsCleared[math.ceil(#rowsCleared / 2)]);
+	end
+	if rcFrom ~= nil then
+		local rcTo = tetris_get_led_rect("digit_tscore", 4);
+		if rcTo ~= nil and tetris_fly_text(rcFrom, rcTo, "+" .. pts, "#FFD700", "score") then
+			tetris_score_count_begin();
+			if levelUp then tetris_level_fly(newLevel) end
+			return
+		end
+	end
+	tetris.score_shown = tetris.score;
+	tetris_show_score();
+end
+
+-- 升级提示:"LV N" 从棋盘竖直中部飞向等级 LED
+function tetris_level_fly(newLevel)
+	local rcFrom = tetris_get_row_rect(9);
+	local rcTo = tetris_get_led_rect("digit_tlevel", 2);
+	if rcFrom == nil or rcTo == nil then
+		tetris_show_level();
+		return
+	end
+	if not tetris_fly_text(rcFrom, rcTo, "LV " .. newLevel, "#22D3EE", "level") then
+		tetris_show_level();
+	end
+end
+
+-- 得分 LED 滚动段(shown -> score,消消乐 xxl_coin_count 同款)
+function tetris_score_count_begin()
+	if tetris.root == nil or tetris.aniframe == nil or tetris.ani_move == nil then
+		tetris.score_shown = tetris.score;
+		tetris_show_score();
+		return
+	end
+	if tetris.score_shown == tetris.score then return end
+	local ani = LuaValueAnimator();
+	ani:CopyFrom(tetris.ani_move:GetIValueAnimator());
+	ani:GetIValueAnimator():setDuration(400);
+	ani:SetRangeRect(CRect(0,0,1,1), CRect(0,0,1,1));	-- rect 恒等,仅取 fraction 驱动
+	ani:SetOnUpdate("tetris_score_count_update");
+	ani:SetOnEnd("tetris_score_count_end");
+	local ctxId = tetris_new_ani_ctx({ kind = "count", ani = ani, from = tetris.score_shown, to = tetris.score });
+	ani:SetCtx(ctxId);
+	local ok = ani:Start(tetris.aniframe);
+	if ok == 0 or ok == false then
+		tetris.ani_ctx[ctxId] = nil;
+		tetris.score_shown = tetris.score;
+		tetris_show_score();
+	end
+end
+
+-- 滚动跟随:按 fraction 在 [from,to] 间取整翻 LED
+function tetris_score_count_update(luaAni, ctxId)
+	local c = tetris.ani_ctx[ctxId];
+	if c == nil then return end
+	local v = math.floor(c.from + (c.to - c.from) * luaAni:GetFraction() + 0.5);
+	if v ~= tetris.score_shown then
+		tetris.score_shown = v;
+		tetris_show_score();
+	end
+end
+
+-- 滚动结束:显示值对齐真实分数
+function tetris_score_count_end(luaAni, ctxId)
+	local c = tetris.ani_ctx[ctxId];
+	if c == nil then return end
+	tetris.ani_ctx[ctxId] = nil;
+	tetris.score_shown = tetris.score;
+	tetris_show_score();
 end
 
 -- 50ms 节拍:推进重力 / 消行闪白
@@ -1904,7 +2140,18 @@ function tetris_on_timer(args)
 			tetris_render();
 		end
 		if tetris.flash_ms >= tetris_flash_ms then
+			-- 星芒爆发:每个被消行一道冲击波(collapse 抹掉格子前,按当前布局取位)
+			for _,row in ipairs(tetris.flash_rows) do tetris_pop_row_fx(row) end
 			tetris_collapse();
+		end
+	end
+	-- 锁定高亮计时(锁定后进入 playing,在此统一递减)
+	if tetris.lock_ms > 0 then
+		tetris.lock_ms = tetris.lock_ms - tetris_tick_ms;
+		if tetris.lock_ms <= 0 then
+			tetris.lock_ms = 0;
+			tetris.lock_cells = nil;
+			tetris_render();
 		end
 	end
 	return 0;
@@ -1926,6 +2173,7 @@ function tetris_on_key(args)
 		elseif key == 40 then		-- VK_DOWN 软降
 			if tetris_try_move(0,1) then
 				tetris.score = tetris.score + 1;
+				tetris.score_shown = tetris.score;	-- 小分瞬时对齐
 				tetris.ms = 0;
 				tetris_show_score();
 				tetris_render();
@@ -1970,7 +2218,7 @@ function tetris_set_digits(prefix, num, ndigits)
 	end
 end
 
-function tetris_show_score() tetris_set_digits("digit_tscore", tetris.score % 10000, 4) end
+function tetris_show_score() tetris_set_digits("digit_tscore", (tetris.score_shown or 0) % 10000, 4) end
 function tetris_show_lines() tetris_set_digits("digit_tlines", tetris.lines % 1000, 3) end
 function tetris_show_level() tetris_set_digits("digit_tlevel", tetris.level % 100, 2) end
 
@@ -1993,10 +2241,14 @@ function tetris_set_frame(wnd, cache, id, frame)
 	end
 end
 
--- 渲染棋盘:已锁定格子 + 当前方块 + 幽灵落点 + 消行闪白
+-- 渲染棋盘:已锁定格子 + 当前方块 + 幽灵落点 + 消行闪白 + 刚锁定高亮
 function tetris_render()
 	if tetris.wndBoard == nil then return end
 	local overlay = {};
+	local lockMap = {};
+	if tetris.lock_cells then
+		for _,p in ipairs(tetris.lock_cells) do lockMap[p.y*tetris_col + p.x] = true end
+	end
 	if tetris.cur ~= nil then
 		local cur = tetris.cur;
 		local info = tetris_cells[cur.kind][cur.rot];
@@ -2022,15 +2274,17 @@ function tetris_render()
 		end
 		for x = 0, tetris_col-1 do
 			local frame;
-			local ov = overlay[y*tetris_col + x];
-			if ov then
-				frame = ov;
+			local cellId = y*tetris_col + x;
+			if lockMap[cellId] then
+				frame = tetris_frame_flash;		-- 刚锁定格子闪白高亮(优先级最高)
+			elseif overlay[cellId] then
+				frame = overlay[cellId];
 			elseif flashing then
 				frame = tetris_frame_flash;
 			else
 				frame = tetris.grid[y][x];	-- 0=空格,1-7=方块,恰好是雪碧图帧号
 			end
-			tetris_set_frame(tetris.wndBoard, tetris.cache, tetris_base_id + y*tetris_col + x, frame);
+			tetris_set_frame(tetris.wndBoard, tetris.cache, tetris_base_id + cellId, frame);
 		end
 	end
 end
@@ -2064,6 +2318,7 @@ function tetris_reset_data()
 	tetris.cur = nil;
 	tetris.score = 0; tetris.lines = 0; tetris.level = 1;
 	tetris.ms = 0; tetris.flash_ms = 0; tetris.flash_rows = nil; tetris.flash_on = false;
+	tetris.score_shown = 0; tetris.lock_cells = nil; tetris.lock_ms = 0;
 end
 
 -- 开始新的一局(开始按钮在 idle/over 时、重新开始按钮)
@@ -2180,6 +2435,16 @@ function tetris_init(root)
 	tetris.wndBoard = wndBoard;
 	tetris.wndNext = wndNext;
 	tetris_build_cells();
+	-- 动画:浮层 + animator:xxl_move 模板(与消消乐共用 animator 资源)
+	-- 模板/浮层缺失只影响动画,游戏本体照常(各动画入口有兜底)
+	tetris.aniframe = root:FindChildByNameA("wnd_tetris_aniframe", -1);
+	if tetris.aniframe then
+		tetris.ani_move = LuaValueAnimator();
+		if not tetris.ani_move:LoadAnimator("animator:xxl_move") then
+			tetris_slog("init: load animator:xxl_move failed");
+			tetris.ani_move = nil;
+		end
+	end
 	-- 独立计时器(与跑马机的 on_timer 互不影响)
 	local souiFac = CreateSouiFactory();
 	local timerSlot = CreateEventSlot("tetris_on_timer");
@@ -2205,5 +2470,10 @@ function tetris_exit()
 		tetris.timer:Release();
 		tetris.timer = nil;
 	end
+	if tetris.fx_ani_cache then
+		tetris.fx_ani_cache:Release();	-- LoadAnimation 返回接管引用,须显式释放
+		tetris.fx_ani_cache = nil;
+	end
+	tetris.ani_ctx = {};
 end
 
