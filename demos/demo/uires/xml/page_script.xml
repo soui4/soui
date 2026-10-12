@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
   page_script.xml - 脚本演示页(跑马机 + 消消乐 + 俄罗斯方块,lua 版)
 
@@ -38,7 +38,7 @@
     等级加速、结束弹窗重开;子页隐藏自动暂停。
   棋盘/预览格的名字与 id 约定见 test.lua 的 tetris_* 函数。
 -->
-<tabctrl pos="0,0,-0,-0" tabWidth="100" tabAlign="left" curSel="0" animateSteps="20"
+<tabctrl pos="0,0,-0,-0" tabWidth="100" tabAlign="left" curSel="2" animateSteps="20"
          colorBkgnd="@color/clr_page_bg" colorText="@color/clr_title">
   <page title="消消乐">
     <window pos="0,0,-0,-0" layout="hbox" padding="15,12,15,15" interval="12">
@@ -220,10 +220,10 @@
         <button name="btn_tetris_restart" size="-2,36" skin="xxl_btn_secondary" colorText="@color/clr_primary" cursor="hand" on_command="tetris_on_restart" tip="重新开始一局">重新开始</button>
       </window>
       <!-- 中间留白 + 棋盘(10x20 格,内容由 lua 动态创建,svg_tetris_blocks 雪碧图)+ 留白 -->
-      <window size="0,-2" weight="1"/>
-      <window name="wnd_tetris_board" size="-2,-2" layout_gravity="center" layout="gridlayout" rowCount="20" columnCount="10" interval="2" padding="8" gravity="fill" colorBkgnd="@color/clr_card_bg" focusable="1" tip="点击此处获取键盘焦点"/>
-      <window size="0,-2" weight="1"/>
+      <window size="0,0" weight="1"/>
+      <window name="wnd_tetris_board" size="-1,-2"  layout_gravity="center" layout="gridlayout" rowCount="20" columnCount="10" interval="2" padding="8" gravity="fill" colorBkgnd="@color/clr_card_bg" focusable="1" tip="点击此处获取键盘焦点"/>
       <!-- 右侧预览卡:与左侧计分卡对称(下一个方块 + 键位说明) -->
+      <window size="0,0" weight="1"/>
       <window size="192,-2" layout="vbox" interval="10" padding="14,12,14,12" colorBkgnd="@color/clr_card_bg">
         <!-- 标题行:幽灵块图标 + 标题/副标题 -->
         <window size="-2,-1" layout="hbox" interval="8">
@@ -235,8 +235,7 @@
         </window>
         <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
         <!-- 下一块预览:4x4 格,内容由 lua 动态创建(svg_tetris_blocks 帧) -->
-        <window name="wnd_tetris_next" size="-2,-2" layout="gridlayout" rowCount="4" columnCount="4" interval="2" gravity="fill" layout_gravity="center"/>
-        <window size="0,0" weight="1"/>
+        <window name="wnd_tetris_next" size="-2,0" weight="1" layout="gridlayout" rowCount="4" columnCount="4" interval="2" gravity="fill" layout_gravity="center"/>
         <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
         <text text="← → 移动&#10;↑ 旋转 ↓ 软降&#10;空格 硬降 P 暂停" font="size:11" colorText="@color/clr_text_sub" multilines="1"/>
       </window>
