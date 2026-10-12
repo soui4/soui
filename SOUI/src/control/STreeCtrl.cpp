@@ -37,6 +37,9 @@ STreeCtrl::STreeCtrl()
     , m_nItemPushDownBtn(STVIBtn_None)
     , m_bHasLines(FALSE)
     , m_pListener(NULL)
+    , m_bEditLabel(FALSE)
+    , m_pInplaceEdit(NULL)
+    , m_hEditItem(0)
 {
     m_bClipClient = TRUE;
     m_bFocusable = TRUE;
@@ -47,6 +50,8 @@ STreeCtrl::STreeCtrl()
     m_evtSet.addEvent(EVENTID(EventTCExpand));
     m_evtSet.addEvent(EVENTID(EventTCDbClick));
     m_evtSet.addEvent(EVENTID(EventTCRClick));
+    m_evtSet.addEvent(EVENTID(EventTCBeginEditLabel));
+    m_evtSet.addEvent(EVENTID(EventTCEndEditLabel));
 }
 
 STreeCtrl::~STreeCtrl()
@@ -1078,7 +1083,25 @@ void STreeCtrl::ItemLButtonDown(HSTREEITEM hItem, UINT nFlags, CPoint pt)
         {
             BOOL bCheck = pItem->nCheckBoxValue == STVICheckBox_Checked ? FALSE : TRUE;
             ModifyChekcBoxState(hItem, WndState_PushDown, 0);
-            SetCheckState(pItem->hItem, bCheck);
+            if (m_bMultiSel && IsItemSelected(hItem))
+            {
+                // Explorer-style sync: toggling the checkbox of a selected
+                // item in multi-selection mode applies its new state to
+                // every selected item (children cascade and parents
+                // recompute through SetCheckState). SetCheckState does not
+                // touch the selection map, so iterating it directly is safe.
+                HSTREEITEM hSel = 0;
+                BOOL bVal = FALSE;
+                for (SPOSITION pos = m_mapSelItems.GetStartPosition(); pos;)
+                {
+                    m_mapSelItems.GetNextAssoc(pos, hSel, bVal);
+                    SetCheckState(hSel, bCheck);
+                }
+            }
+            else
+            {
+                SetCheckState(pItem->hItem, bCheck);
+            }
         }
     }
 }
@@ -1116,6 +1139,12 @@ void STreeCtrl::ItemLButtonDbClick(HSTREEITEM hItem, UINT nFlags, CPoint pt)
     int nHitTestBtn = ItemHitTest(hItem, pt);
     if (nHitTestBtn == STVIBtn_CheckBox)
         ItemLButtonDown(hItem, nFlags, pt);
+
+    // In edit-label mode a double click on the item text (not on the toggle
+    // or checkbox) starts label editing: no toggle and no double-click event.
+    if (m_bEditLabel && nHitTestBtn == STVIBtn_None && BeginInplaceEdit(hItem))
+        return;
+
     // Generate double-click event add by zhaosheng
     EventTCDbClick dbClick(this);
     dbClick.bCancel = FALSE;
@@ -1186,6 +1215,8 @@ void STreeCtrl::ItemMouseLeave(HSTREEITEM hItem)
 
 void STreeCtrl::OnDestroy()
 {
+    if (IsInplaceEditing())
+        EndInplaceEdit(FALSE);
     DeleteAllItems();
     __baseCls::OnDestroy();
 }
@@ -1263,8 +1294,16 @@ void STreeCtrl::OnLButtonDownEx(UINT nFlags, CPoint pt)
         // Plain click in multi-selection mode replaces the whole set; the
         // anchor only follows as the cursor. Clicking the sole selected
         // item keeps the set (the record does not change) - it just moves
-        // the cursor.
-        if (GetSelItemCount() != 1 || !IsItemSelected(m_hHoverItem))
+        // the cursor. A checkbox hit on an already selected item keeps the
+        // set too: ItemLButtonDown below then syncs the check state of
+        // every selected item.
+        BOOL bHitCheckBox = ItemHitTest(m_hHoverItem, pt) == STVIBtn_CheckBox;
+        if (bHitCheckBox && IsItemSelected(m_hHoverItem))
+        {
+            m_hSelItem = m_hHoverItem;
+            m_hSelAnchor = m_hHoverItem;
+        }
+        else if (GetSelItemCount() != 1 || !IsItemSelected(m_hHoverItem))
             SelectItem(m_hHoverItem);
         else
         {
@@ -1625,6 +1664,14 @@ void STreeCtrl::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
         return;
     }
 
+    // F2 starts in-place editing of the cursor item.
+    if (nChar == VK_F2)
+    {
+        if (m_hSelItem)
+            BeginInplaceEdit(m_hSelItem);
+        return;
+    }
+
     // Ctrl+A selects all items in multi-selection mode.
     if (bCtrlPressed && nChar == 'A')
     {
@@ -1867,8 +1914,20 @@ void STreeCtrl::UpdateScrollBar()
 
 void STreeCtrl::OnSize(UINT nType, CSize size)
 {
+    if (IsInplaceEditing())
+        EndInplaceEdit(TRUE);
     __baseCls::OnSize(nType, size);
     UpdateScrollBar();
+}
+
+BOOL STreeCtrl::OnScroll(BOOL bVertical, UINT uCode, int nPos)
+{
+    BOOL bRet = __baseCls::OnScroll(bVertical, uCode, nPos);
+    // The editor is a plain child window: it would stay put while the items
+    // scroll away underneath it, so commit and close it on any scroll.
+    if (IsInplaceEditing())
+        EndInplaceEdit(TRUE);
+    return bRet;
 }
 
 HSTREEITEM STreeCtrl::GetNextItem(HSTREEITEM hItem) const
@@ -2221,4 +2280,118 @@ int STreeCtrl::GetSelItemCount() const
         return (int)m_mapSelItems.GetCount();
     return m_hSelItem ? 1 : 0;
 }
+
+//////////////////////////////////////////////////////////////////////////
+// In-place label editing
+
+BOOL STreeCtrl::GetInplaceEditRect(HSTREEITEM hItem, CRect &rcEdit)
+{
+    LPTVITEM pItem = CSTree<LPTVITEM>::GetItem(hItem);
+    if (!pItem || !GetItemRect(pItem, rcEdit))
+        return FALSE;
+
+    // Replicate the text rect of DrawItem: the row rect returned by
+    // GetItemRect already starts at the level indent, the label starts
+    // after the toggle/checkbox/icon offset plus two item margins, and it
+    // ends at the item's content width.
+    int nMargin = m_nItemMargin.toPixelSize(GetScale());
+    rcEdit.left += m_nItemOffset + 2 * nMargin;
+    rcEdit.right = rcEdit.left - (m_nItemOffset + 2 * nMargin) + pItem->nContentWidth;
+
+    CRect rcClient;
+    GetClientRect(rcClient);
+    if (rcEdit.right > rcClient.right)
+        rcEdit.right = rcClient.right;
+    return rcEdit.right > rcEdit.left;
+}
+
+BOOL STreeCtrl::BeginInplaceEdit(HSTREEITEM hItem)
+{
+    if (!m_bEditLabel || IsInplaceEditing() || !VerifyItem(hItem))
+        return FALSE;
+
+    LPTVITEM pItem = CSTree<LPTVITEM>::GetItem(hItem);
+    if (!pItem || !pItem->bVisible)
+        return FALSE;
+
+    CRect rcEdit;
+    if (!GetInplaceEditRect(hItem, rcEdit))
+        return FALSE;
+
+    // Let the application cancel the session or style the editor.
+    SStringW strStyle;
+    EventTCBeginEditLabel evtBegin(this);
+    evtBegin.hItem = hItem;
+    evtBegin.strStyle = &strStyle;
+    evtBegin.bCancel = FALSE;
+    FireEvent(&evtBegin);
+    if (evtBegin.bCancel)
+        return FALSE;
+
+    SInplaceEdit *pEdit = new SInplaceEdit(this);
+    InsertIChild(pEdit);
+    pEdit->GetStyle().SetScale(GetScale());
+
+    if (strStyle.IsEmpty())
+    {
+        pEdit->ApplyDefaultStyle();
+        pEdit->InitFromXml(NULL);
+    }
+    else
+    {
+        SXmlDoc xmlDoc;
+        xmlDoc.LoadBufferInplace((void *)strStyle.c_str(), strStyle.GetLength() * sizeof(wchar_t),
+            xml_parse_default, sizeof(wchar_t) == 2 ? enc_utf16 : enc_utf32);
+        pEdit->InitFromXml(xmlDoc.Root()->FirstChild());
+    }
+
+    pEdit->SetWindowText(pItem->strText);
+    pEdit->Move(rcEdit);
+    pEdit->SetVisible(TRUE, TRUE);
+    pEdit->SetFocus();
+    pEdit->SetSel(0, -1, TRUE);
+
+    m_pInplaceEdit = pEdit;
+    m_hEditItem = hItem;
+    return TRUE;
+}
+
+void STreeCtrl::EndInplaceEdit(BOOL bSave)
+{
+    if (!m_pInplaceEdit)
+        return;
+
+    HSTREEITEM hEditItem = m_hEditItem;
+    SStringT strText = m_pInplaceEdit->GetWindowText();
+
+    // Detach first: handing the focus back (or destroying the editor)
+    // re-enters OnInplaceEditEnd through WM_KILLFOCUS.
+    SInplaceEdit *pEdit = m_pInplaceEdit;
+    m_pInplaceEdit = NULL;
+    m_hEditItem = 0;
+
+    if (bSave)
+        SetItemText(hEditItem, strText);
+
+    EventTCEndEditLabel evt(this);
+    evt.hItem = hEditItem;
+    evt.strText = &strText;
+    evt.bCancel = !bSave;
+    FireEvent(&evt);
+
+    // Hand the focus back to the control before destroying the editor so
+    // the pending WM_KILLFOCUS finds a detached session (no-op).
+    SetFocus();
+
+    pEdit->SetVisible(FALSE, TRUE);
+    pEdit->Destroy();
+
+    RedrawItem(hEditItem);
+}
+
+void STreeCtrl::OnInplaceEditEnd(BOOL bSave)
+{
+    EndInplaceEdit(bSave);
+}
+
 SNSEND

@@ -192,7 +192,7 @@ void CMainDlg::OnLcItemSelChanged(IEvtArgs *e)
     SWindow *pText = FindChildByName(L"txt_lc_selcount");
     if (pText)
     {
-        pText->SetWindowText(SStringT().Format(_T("已选 %d 项"), pList->GetSelItemCount()));
+        pText->SetWindowText(SStringT().Format(_T("已选 %d 项"), pList->GetSelectedCount()));
     }
 }
 

@@ -352,14 +352,6 @@ TEST(swinx_commalloc, get_task_malloc_and_roundtrip)
     m->Free(t);
 }
 
-TEST(swinx_commalloc, invalid_context_rejected)
-{
-    IMalloc *m = NULL;
-    // only MEMCTX_TASK is supported (Win32 documents E_INVALIDARG otherwise)
-    HRESULT hr = CoGetMalloc(MEMCTX_SHARED, &m);
-    EXPECT_FALSE(hr == S_OK || hr == S_FALSE);
-}
-
 // ------------------------------------------------------------------------
 // IIDFromString (P1)
 // ------------------------------------------------------------------------

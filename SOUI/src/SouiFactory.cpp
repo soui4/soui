@@ -7,7 +7,9 @@
 #include <valueAnimator/SValueAnimator.h>
 #include <res.mgr/SResProviderAndroidAsset.h>
 #include <res.mgr/SResProviderOhosRawFile.h>
-
+#if defined(_MSC_VER) // VLD is MSVC-only; MinGW has no vld.h
+//#include <vld.h>
+#endif
 SNSBEGIN
 
 SouiFactory::SouiFactory(void)

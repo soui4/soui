@@ -3839,23 +3839,6 @@ STDAPI CreateTextServices(
 {
 	TRACEBEGIN(TRCSUBSYSTS, TRCSCOPEEXTERN, "CreateTextServices");
 
-	static bool fOnce = FALSE;
-
-	if (!fOnce) {
-		CLock lock;
-		fOnce = TRUE;
-		W32->InitSysParams();
-		W32->InitPreferredFontInfo();
-		RegisterFETCs();					// Register new clipboard formats
-		CreateFormatCaches();				// Create global format caches
-		if ( !InitKinsokuClassify() )
-		{
-			// Init tables for classifying Unicode chars.
-			return E_FAIL;
-		}
-		InitFontCache();
-	}
-
 	if(!ppUnk)
 		return E_INVALIDARG;
 

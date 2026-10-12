@@ -9,171 +9,9 @@
 #include <helper/SAdapterBase.h>
 #include <gtest/gtest.h>
 #include "common.h"
+#include "test_container.h"
 
 using namespace SOUI;
-#ifdef _WIN32
-#define WCHAR_ENC enc_utf16
-#else
-#define WCHAR_ENC enc_utf32
-#endif
-// ---------------------------------------------------------------------------
-// Headless harness: application + in-memory builtin scrollbar skin + a test
-// container so that SPanel-derived controls can be created and receive
-// simulated mouse messages without a host window.
-//
-// SwndContainerImpl is deliberately abstract: drawing / host integration pure
-// virtuals (OnRedraw, UpdateWindow, GetMsgLoop, ...) are implemented by real
-// hosts such as SHostWnd. TestContainer stubs them out: redraws are no-ops and
-// posted tasks run inline so the tests stay deterministic.
-// ---------------------------------------------------------------------------
-namespace
-{
-    class TestContainer : public SwndContainerImpl
-    {
-      public:
-        STDMETHOD_(BOOL, OnFireEvent)(IEvtArgs *evt) OVERRIDE
-        {
-            return FALSE;
-        }
-
-        STDMETHOD_(IMessageLoop *, GetMsgLoop)(THIS) OVERRIDE
-        {
-            return NULL;
-        }
-
-        STDMETHOD_(IScriptModule *, GetScriptModule)() OVERRIDE
-        {
-            return NULL;
-        }
-
-        STDMETHOD_(HWND, GetHostHwnd)(CTHIS) SCONST OVERRIDE
-        {
-            return NULL;
-        }
-
-        STDMETHOD_(BOOL, IsTranslucent)(CTHIS) SCONST OVERRIDE
-        {
-            return FALSE;
-        }
-
-        STDMETHOD_(BOOL, IsSendWheel2Hover)(CTHIS) SCONST OVERRIDE
-        {
-            return FALSE;
-        }
-
-        STDMETHOD_(int, GetScale)(CTHIS) SCONST OVERRIDE
-        {
-            return 100;
-        }
-
-        STDMETHOD_(LPCWSTR, GetTranslatorContext)(CTHIS) SCONST OVERRIDE
-        {
-            return NULL;
-        }
-
-        STDMETHOD_(void, GetContainerRect)(CTHIS_ RECT *ret) SCONST OVERRIDE
-        {
-            ret->left = 0;
-            ret->top = 0;
-            ret->right = 4096;
-            ret->bottom = 4096;
-        }
-
-        STDMETHOD_(void, UpdateRegion)(THIS_ IRegionS *rgn) OVERRIDE
-        {
-        }
-
-        STDMETHOD_(void, OnRedraw)(THIS_ LPCRECT rc, BOOL bClip) OVERRIDE
-        {
-        }
-
-        STDMETHOD_(BOOL, UpdateWindow)(THIS_ BOOL bForce DEF_VAL(TRUE)) OVERRIDE
-        {
-            return TRUE;
-        }
-
-        STDMETHOD_(void, UpdateTooltip)(THIS) OVERRIDE
-        {
-        }
-
-        STDMETHOD_(void, SetToolTip)(THIS_ LPCRECT rc, UINT tipAlign, LPCTSTR pszTip) OVERRIDE
-        {
-        }
-
-        STDMETHOD_(void, EnableIME)(THIS_ BOOL bEnable) OVERRIDE
-        {
-        }
-
-        STDMETHOD_(void, OnUpdateCursor)(THIS) OVERRIDE
-        {
-        }
-
-        STDMETHOD_(void, EnableHostPrivateUiDef)(THIS_ BOOL bEnable) OVERRIDE
-        {
-        }
-
-        STDMETHOD_(BOOL, PostTask)(THIS_ IRunnable *runable, BOOL bAsync DEF_VAL(TRUE)) OVERRIDE
-        {
-            // Headless: no message loop to post to - run inline for determinism.
-            if (runable)
-                runable->run();
-            return TRUE;
-        }
-
-        STDMETHOD_(int, RemoveTasksForObject)(THIS_ void *pObj) OVERRIDE
-        {
-            return 0;
-        }
-
-        STDMETHOD_(void, OnDropdownState)(THIS_ IHostWnd *pDropdown, BOOL bCreate) OVERRIDE
-        {
-        }
-
-        void OnTimelineRequestChanged(BOOL bHasTimelineRequest) override {}
-    };
-
-    struct HeadlessApp
-    {
-        SComMgr2 comMgr;
-        SAutoRefPtr<IRenderFactory> renderFactory;
-        SApplication *app;
-
-        HeadlessApp()
-            : app(NULL)
-        {
-            EXPECT_TRUE(comMgr.CreateRender_GDI((IObjRef **)&renderFactory));
-            app = new SApplication(renderFactory, NULL);
-
-            // SPanel::OnCreate requires a builtin scrollbar skin. Inject a bare
-            // SSkinScrollbar (no image is needed for headless message-level tests).
-            static const wchar_t kSkinXml[] = L"<skin><scrollbar name=\"_skin.sys.scrollbar\"/></skin>";
-            SXmlDoc skinDoc;
-            // ASSERT_* cannot be used inside a constructor (it returns); EXPECT is fine.
-            EXPECT_TRUE(skinDoc.load_buffer(kSkinXml, sizeof(kSkinXml) - sizeof(wchar_t), xml_parse_default, WCHAR_ENC));
-            SXmlNode skinNode = skinDoc.root().child(L"skin");
-            EXPECT_TRUE(skinNode);
-            if (skinNode)
-                GETUIDEF->GetBuiltinSkinPool()->LoadSkins(&skinNode);
-        }
-
-        ~HeadlessApp()
-        {
-            delete app;
-        }
-    };
-
-    static BOOL CreateRootFromXml(SWindow &root, ISwndContainer *pContainer, const wchar_t *pszXml)
-    {
-        SXmlDoc doc;
-        if (!doc.load_buffer(pszXml, (size_t)wcslen(pszXml) * sizeof(wchar_t), xml_parse_default, WCHAR_ENC))
-            return FALSE;
-        SXmlNode nodeRoot = doc.root().first_child();
-        if (!nodeRoot)
-            return FALSE;
-        root.SetContainer(pContainer);
-        return root.InitFromXml(&nodeRoot);
-    }
-}
 
 // ---------------------------------------------------------------------------
 // SListCtrl: dragging with multiSelection enabled draws a rubber band and the
@@ -207,16 +45,16 @@ TEST(soui_rubberband, listctrl_band_selects_rows)
     pLc->SSendMessage(WM_MOUSEMOVE, MK_LBUTTON, MAKELPARAM(50, 95));
 
     // rows 0..3 are covered by the band
-    EXPECT_TRUE(pLc->GetCheckState(0));
-    EXPECT_TRUE(pLc->GetCheckState(3));
-    EXPECT_FALSE(pLc->GetCheckState(4));
+    EXPECT_TRUE(pLc->GetSelected(0));
+    EXPECT_TRUE(pLc->GetSelected(3));
+    EXPECT_FALSE(pLc->GetSelected(4));
 
     pLc->SSendMessage(WM_LBUTTONUP, 0, MAKELPARAM(50, 95));
     EXPECT_FALSE(pLc->IsRubberBandSelActive()) << L"band must end on mouse up";
 
-    EXPECT_TRUE(pLc->GetCheckState(0));
-    EXPECT_TRUE(pLc->GetCheckState(3));
-    EXPECT_FALSE(pLc->GetCheckState(4));
+    EXPECT_TRUE(pLc->GetSelected(0));
+    EXPECT_TRUE(pLc->GetSelected(3));
+    EXPECT_FALSE(pLc->GetSelected(4));
     EXPECT_EQ(3, pLc->GetSelectedItem());
 
     root.DestroyAllChildren();
@@ -251,8 +89,8 @@ TEST(soui_rubberband, listctrl_band_disabled_without_multiselection)
     pLc->SSendMessage(WM_MOUSEMOVE, MK_LBUTTON, MAKELPARAM(50, 95));
     EXPECT_FALSE(pLc->IsRubberBandSelActive());
     pLc->SSendMessage(WM_LBUTTONUP, 0, MAKELPARAM(50, 95));
-    EXPECT_FALSE(pLc->GetCheckState(3));
-    EXPECT_TRUE(pLc->GetCheckState(0));
+    EXPECT_FALSE(pLc->GetSelected(3));
+    EXPECT_TRUE(pLc->GetSelected(0));
 
     root.DestroyAllChildren();
 }
@@ -282,7 +120,7 @@ TEST(soui_rubberband, listctrl_ctrl_band_adds_selection)
 
     // Pre-select row 5 through the click path.
     pLc->SetSelectedItem(5);
-    EXPECT_TRUE(pLc->GetCheckState(5));
+    EXPECT_TRUE(pLc->GetSelected(5));
 
     // Ctrl+drag rows 0..2 with the mouse (band from y=25 to y=80).
     // The click path reads modifier keys from the message wParam, so the
@@ -291,10 +129,10 @@ TEST(soui_rubberband, listctrl_ctrl_band_adds_selection)
     pLc->SSendMessage(WM_MOUSEMOVE, MK_LBUTTON | MK_CONTROL, MAKELPARAM(50, 80));
     pLc->SSendMessage(WM_LBUTTONUP, MK_CONTROL, MAKELPARAM(50, 80));
 
-    EXPECT_TRUE(pLc->GetCheckState(0));
-    EXPECT_TRUE(pLc->GetCheckState(2));
-    EXPECT_TRUE(pLc->GetCheckState(5)) << L"Ctrl+band must keep the previous selection";
-    EXPECT_FALSE(pLc->GetCheckState(3));
+    EXPECT_TRUE(pLc->GetSelected(0));
+    EXPECT_TRUE(pLc->GetSelected(2));
+    EXPECT_TRUE(pLc->GetSelected(5)) << L"Ctrl+band must keep the previous selection";
+    EXPECT_FALSE(pLc->GetSelected(3));
 
     root.DestroyAllChildren();
 }
@@ -437,14 +275,14 @@ TEST(soui_rubberband, listctrl_esc_cancels_band)
     pLc->SSendMessage(WM_MOUSEMOVE, MK_LBUTTON, MAKELPARAM(50, 40));
     EXPECT_TRUE(pLc->IsRubberBandSelActive());
     pLc->SSendMessage(WM_MOUSEMOVE, MK_LBUTTON, MAKELPARAM(50, 95));
-    EXPECT_TRUE(pLc->GetCheckState(0));
-    EXPECT_TRUE(pLc->GetCheckState(3));
+    EXPECT_TRUE(pLc->GetSelected(0));
+    EXPECT_TRUE(pLc->GetSelected(3));
 
     // ESC undoes everything the band added, back to the band-start snapshot.
     pLc->SSendMessage(WM_KEYDOWN, VK_ESCAPE, 0);
     EXPECT_FALSE(pLc->IsRubberBandSelActive()) << L"ESC must cancel an active band";
-    EXPECT_TRUE(pLc->GetCheckState(0)) << L"the click-selected row is part of the snapshot";
-    EXPECT_FALSE(pLc->GetCheckState(3)) << L"ESC must undo the band selection";
+    EXPECT_TRUE(pLc->GetSelected(0)) << L"the click-selected row is part of the snapshot";
+    EXPECT_FALSE(pLc->GetSelected(3)) << L"ESC must undo the band selection";
     EXPECT_EQ(0, pLc->GetSelectedItem());
 
     // ESC again (band inactive) is a no-op and must not crash.
@@ -545,9 +383,9 @@ TEST(soui_rubberband, listctrl_band_offset_within_host)
     EXPECT_TRUE(pLc->IsRubberBandSelActive());
     pLc->SSendMessage(WM_MOUSEMOVE, MK_LBUTTON, MAKELPARAM(150, 140));
 
-    EXPECT_TRUE(pLc->GetCheckState(0));
-    EXPECT_TRUE(pLc->GetCheckState(3));
-    EXPECT_FALSE(pLc->GetCheckState(4)) << L"band must not leak past the covered rows";
+    EXPECT_TRUE(pLc->GetSelected(0));
+    EXPECT_TRUE(pLc->GetSelected(3));
+    EXPECT_FALSE(pLc->GetSelected(4)) << L"band must not leak past the covered rows";
     EXPECT_EQ(3, pLc->GetSelectedItem());
 
     pLc->SSendMessage(WM_LBUTTONUP, 0, MAKELPARAM(150, 140));
@@ -1711,33 +1549,33 @@ TEST(soui_rubberband, listctrl_shift_click_anchored_range)
     // Rows live at client y = 20 (header) + i*20. Plain click on row 2:
     // it becomes the range anchor.
     pLc->SSendMessage(WM_LBUTTONDOWN, MK_LBUTTON, MAKELPARAM(50, 20 + 2 * 20 + 10));
-    EXPECT_TRUE(pLc->GetCheckState(2));
-    EXPECT_EQ(1, pLc->GetCheckedItemCount());
+    EXPECT_TRUE(pLc->GetSelected(2));
+    EXPECT_EQ(1, pLc->GetSelectedCount());
 
     // Shift+Click row 5: anchored range 2..5.
     pLc->SSendMessage(WM_LBUTTONDOWN, MK_LBUTTON | MK_SHIFT, MAKELPARAM(50, 20 + 5 * 20 + 10));
-    EXPECT_EQ(4, pLc->GetCheckedItemCount());
-    EXPECT_TRUE(pLc->GetCheckState(2));
-    EXPECT_TRUE(pLc->GetCheckState(5));
-    EXPECT_FALSE(pLc->GetCheckState(1)) << L"anchored range must replace the set";
-    EXPECT_FALSE(pLc->GetCheckState(6));
+    EXPECT_EQ(4, pLc->GetSelectedCount());
+    EXPECT_TRUE(pLc->GetSelected(2));
+    EXPECT_TRUE(pLc->GetSelected(5));
+    EXPECT_FALSE(pLc->GetSelected(1)) << L"anchored range must replace the set";
+    EXPECT_FALSE(pLc->GetSelected(6));
 
     // Shift+Click row 3: the anchor stays at row 2 - the range SHRINKS
     // to 2..3 (regression: Shift navigation used to only ever grow).
     pLc->SSendMessage(WM_LBUTTONDOWN, MK_LBUTTON | MK_SHIFT, MAKELPARAM(50, 20 + 3 * 20 + 10));
-    EXPECT_EQ(2, pLc->GetCheckedItemCount());
-    EXPECT_TRUE(pLc->GetCheckState(2));
-    EXPECT_TRUE(pLc->GetCheckState(3));
-    EXPECT_FALSE(pLc->GetCheckState(4)) << L"shrinking must deselect items beyond the new cursor";
-    EXPECT_FALSE(pLc->GetCheckState(5));
+    EXPECT_EQ(2, pLc->GetSelectedCount());
+    EXPECT_TRUE(pLc->GetSelected(2));
+    EXPECT_TRUE(pLc->GetSelected(3));
+    EXPECT_FALSE(pLc->GetSelected(4)) << L"shrinking must deselect items beyond the new cursor";
+    EXPECT_FALSE(pLc->GetSelected(5));
 
     // Plain click resets the anchor to the clicked row.
     pLc->SSendMessage(WM_LBUTTONDOWN, MK_LBUTTON, MAKELPARAM(50, 20 + 7 * 20 + 10));
-    EXPECT_EQ(1, pLc->GetCheckedItemCount());
-    EXPECT_TRUE(pLc->GetCheckState(7));
+    EXPECT_EQ(1, pLc->GetSelectedCount());
+    EXPECT_TRUE(pLc->GetSelected(7));
     // Shift+Click row 9: new anchored range 7..9.
     pLc->SSendMessage(WM_LBUTTONDOWN, MK_LBUTTON | MK_SHIFT, MAKELPARAM(50, 20 + 9 * 20 + 10));
-    EXPECT_EQ(3, pLc->GetCheckedItemCount());
+    EXPECT_EQ(3, pLc->GetSelectedCount());
 
     root.DestroyAllChildren();
 }
@@ -1771,31 +1609,31 @@ TEST(soui_rubberband, listctrl_keyboard_multisel_navigation)
     // With no cursor yet, DOWN selects item 0.
     pLc->SSendMessage(WM_KEYDOWN, VK_DOWN, 0);
     EXPECT_EQ(0, pLc->GetSelectedItem());
-    EXPECT_EQ(1, pLc->GetSelItemCount());
-    EXPECT_TRUE(pLc->GetCheckState(0));
+    EXPECT_EQ(1, pLc->GetSelectedCount());
+    EXPECT_TRUE(pLc->GetSelected(0));
 
     // Plain DOWN replaces the set with the new cursor item.
     pLc->SSendMessage(WM_KEYDOWN, VK_DOWN, 0);
     EXPECT_EQ(1, pLc->GetSelectedItem());
-    EXPECT_FALSE(pLc->GetCheckState(0));
-    EXPECT_TRUE(pLc->GetCheckState(1));
+    EXPECT_FALSE(pLc->GetSelected(0));
+    EXPECT_TRUE(pLc->GetSelected(1));
 
     // SPACE toggles the cursor item off / on without moving the cursor.
     pLc->SSendMessage(WM_KEYDOWN, VK_SPACE, 0);
-    EXPECT_EQ(0, pLc->GetSelItemCount()) << L"SPACE must toggle the cursor item off";
+    EXPECT_EQ(0, pLc->GetSelectedCount()) << L"SPACE must toggle the cursor item off";
     EXPECT_EQ(1, pLc->GetSelectedItem()) << L"toggling off must not move the cursor";
     pLc->SSendMessage(WM_KEYDOWN, VK_SPACE, 0);
-    EXPECT_EQ(1, pLc->GetSelItemCount());
-    EXPECT_TRUE(pLc->GetCheckState(1));
+    EXPECT_EQ(1, pLc->GetSelectedCount());
+    EXPECT_TRUE(pLc->GetSelected(1));
 
     // END jumps to the last item (replacing the set), HOME back to the first.
     pLc->SSendMessage(WM_KEYDOWN, VK_END, 0);
     EXPECT_EQ(9, pLc->GetSelectedItem());
-    EXPECT_TRUE(pLc->GetCheckState(9));
-    EXPECT_EQ(1, pLc->GetSelItemCount());
+    EXPECT_TRUE(pLc->GetSelected(9));
+    EXPECT_EQ(1, pLc->GetSelectedCount());
     pLc->SSendMessage(WM_KEYDOWN, VK_HOME, 0);
     EXPECT_EQ(0, pLc->GetSelectedItem());
-    EXPECT_TRUE(pLc->GetCheckState(0));
+    EXPECT_TRUE(pLc->GetSelected(0));
 
     // UP at item 0 stays put.
     pLc->SSendMessage(WM_KEYDOWN, VK_UP, 0);
@@ -2204,11 +2042,15 @@ TEST(soui_rubberband, listctrl_checkbox_only_no_band_select)
     pLc->SSendMessage(WM_MOUSEMOVE, MK_LBUTTON, MAKELPARAM(50, 95));
     EXPECT_FALSE(pLc->IsRubberBandSelActive());
 
-    // Only the pressed row got checked by the plain click (existing
-    // check-box click behavior); the drag must NOT batch-check rows 1..9.
-    EXPECT_TRUE(pLc->GetCheckState(0));
+    // Only the pressed row got selected by the plain click; the drag must
+    // NOT batch-select rows 1..9. The check flags stay untouched: selection
+    // and checkbox state are independent (headless has no checkbox skin, so
+    // no checkbox hit was even possible).
+    EXPECT_TRUE(pLc->GetSelected(0));
     for (int i = 1; i < 10; i++)
-        EXPECT_FALSE(pLc->GetCheckState(i)) << L"row " << i;
+        EXPECT_FALSE(pLc->GetSelected(i)) << L"row " << i;
+    for (int i = 0; i < 10; i++)
+        EXPECT_FALSE(pLc->GetCheck(i)) << L"check row " << i;
 
     pLc->SSendMessage(WM_LBUTTONUP, 0, MAKELPARAM(50, 95));
     EXPECT_FALSE(pLc->IsRubberBandSelActive());

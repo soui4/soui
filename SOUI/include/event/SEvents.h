@@ -102,6 +102,9 @@ typedef enum _SOUI_EVENTS
     EVT_LC_DBCLICK,             /**<  List control double-click event */
     EVT_LC_RCLICK,              /**<  List control right-click event */
 
+    EVT_LC_BEGIN_EDITLABEL = 13100, /**<  List control item label editing about to start */
+    EVT_LC_END_EDITLABEL,           /**<  List control item label editing finished */
+
     EVT_TV_SELCHANGING = 14000, /**<  Tree control selection changing event */
     EVT_TV_SELCHANGED,          /**<  Tree control selection changed event */
 
@@ -112,6 +115,9 @@ typedef enum _SOUI_EVENTS
     EVT_TC_DBCLICK,             /**<  Tree control double-click event */
     EVT_TC_RCLICK,              /**<  Tree control right-click event */
 
+    EVT_TC_BEGIN_EDITLABEL = 15300, /**<  Tree control item label editing about to start */
+    EVT_TC_END_EDITLABEL,           /**<  Tree control item label editing finished */
+
     EVT_CB_BEFORE_CLOSEUP = 15050, /**<  Combo box before-close event */
 
     EVT_LV_SELCHANGING = 15100, /**<  List view selection changing event */
@@ -120,6 +126,7 @@ typedef enum _SOUI_EVENTS
 
     EVT_ITEM_SELCHANGED = 15200, /**<  A single item's selection state changed (index based multi-selection views) */
     EVT_TREE_ITEMSELCHANGED,     /**<  A single tree item's selection state changed (multi-selection tree views) */
+    EVT_ITEM_CHECKSTATE,         /**<  A single item's check state changed (SListCtrl checkbox) */
 
     EVT_RE_NOTIFY = 16000, /**<  Rich edit control notify event */
     EVT_RE_MENU,           /**<  Rich edit control menu event */
@@ -699,6 +706,22 @@ DEF_EVT(EventLCItemDeleted, EVT_LC_ITEMDELETED, on_listctrl_del_item, {
     LPARAM dwData; /**<  Item data */
 })
 
+/** List control: an item label edit session is about to start */
+DEF_EVT(EventLCBeginEditLabel, EVT_LC_BEGIN_EDITLABEL, on_listctrl_begin_editlabel, {
+    int nItem;          /**<  Item index */
+    int nSubItem;       /**<  Subitem index to edit */
+    IStringW *strStyle; /**<  Optional edit window XML (e.g. "<edit ... />"); empty means the default look */
+    BOOL bCancel;       /**<  Set TRUE to prevent entering edit mode */
+})
+
+/** List control: an item label edit session finished */
+DEF_EVT(EventLCEndEditLabel, EVT_LC_END_EDITLABEL, on_listctrl_end_editlabel, {
+    int nItem;         /**<  Item index */
+    int nSubItem;      /**<  Subitem index */
+    IStringT *strText; /**<  Edited text (already written back to the item unless canceled) */
+    BOOL bCancel;      /**<  TRUE when the edit was discarded (ESC) */
+})
+
 DEF_EVT(EventCalendarSelDay, EVT_CALENDAR_SELDAY, on_calendar_sel_day, {
     WORD wOldDay; /**<  Old selected day */
     WORD wNewDay; /**<  New selected day */
@@ -737,6 +760,12 @@ DEF_EVT(EventItemSelChanged, EVT_ITEM_SELCHANGED, on_item_sel_changed, {
     BOOL bSelected; /**<  New selection state: TRUE=selected, FALSE=deselected */
 })
 
+/** SListCtrl: a single item's checkbox state changed (independent of selection) */
+DEF_EVT(EventItemCheckState, EVT_ITEM_CHECKSTATE, on_item_check_state, {
+    int iItem;   /**<  Index of the item whose check state changed */
+    BOOL bCheck; /**<  New check state: TRUE=checked, FALSE=unchecked */
+})
+
 /** Multi-selection: a single tree item's selection state changed (treeview / treectrl) */
 DEF_EVT(EventTreeItemSelChanged, EVT_TREE_ITEMSELCHANGED, on_tree_item_sel_changed, {
     HSTREEITEM hItem; /**<  Handle of the tree item whose selection state changed */
@@ -757,6 +786,20 @@ DEF_EVT(EventTCDbClick, EVT_TC_DBCLICK, on_treectrl_item_dbclick, {
 DEF_EVT(EventTCRClick, EVT_TC_RCLICK, on_treectrl_item_rclick, {
     POINT pt;         /**<  Right-click position */
     HSTREEITEM hItem; /**<  Right-clicked selected node */
+})
+
+/** Tree control: an item label edit session is about to start */
+DEF_EVT(EventTCBeginEditLabel, EVT_TC_BEGIN_EDITLABEL, on_treectrl_begin_editlabel, {
+    HSTREEITEM hItem;   /**<  Item handle */
+    IStringW *strStyle; /**<  Optional edit window XML (e.g. "<edit ... />"); empty means the default look */
+    BOOL bCancel;       /**<  Set TRUE to prevent entering edit mode */
+})
+
+/** Tree control: an item label edit session finished */
+DEF_EVT(EventTCEndEditLabel, EVT_TC_END_EDITLABEL, on_treectrl_end_editlabel, {
+    HSTREEITEM hItem;  /**<  Item handle */
+    IStringT *strText; /**<  Edited text (already written back to the item unless canceled) */
+    BOOL bCancel;      /**<  TRUE when the edit was discarded (ESC) */
 })
 
 DEF_EVT(EventSplitPaneMoved, EVT_SPLIT_PANE_MOVED, on_split_pane_moved, { RECT rcPane; })

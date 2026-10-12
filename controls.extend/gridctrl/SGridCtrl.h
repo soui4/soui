@@ -5,6 +5,7 @@
 #include "SGridCtrl-i.h"
 #include <core/SPanel.h>
 #include <proxy/SPanelProxy.h>
+#include <control/SInplaceEdit.h>
 
 
 SNSBEGIN
@@ -115,6 +116,89 @@ protected:
     int m_nRow;
     int m_nCol;
     BOOL m_bUpdateData;
+};
+
+/**
+ * @class SGridInplaceEdit
+ * @brief Text inplace editing window for grid cells, built on the core
+ *        SInplaceEdit (RETURN / TAB commit, ESC discards, focus loss commits).
+ */
+class SGridInplaceEdit : public SInplaceEdit, public IGridInplaceWnd, protected IInplaceEditHost
+{
+  public:
+    SGridInplaceEdit(IGridCtrl *pGrid, int nRow, int nCol)
+        : SInplaceEdit(this)
+        , m_pGrid(pGrid)
+        , m_nRow(nRow)
+        , m_nCol(nCol)
+    {
+        SASSERT(pGrid);
+        IWindow *pGridWnd = pGrid->ToIWindow();
+        pGridWnd->InsertIChild(this);
+        GetStyle().SetScale(pGridWnd->GetScale());
+    }
+
+    // IObjRef implementation, backed by the SWindow ref counter
+    STDMETHOD_(long, AddRef)(THIS) override
+    {
+        return SWindow::AddRef();
+    }
+
+    STDMETHOD_(long, Release)(THIS) override
+    {
+        return SWindow::Release();
+    }
+
+    STDMETHOD_(void, OnFinalRelease)(THIS) override
+    {
+        SWindow::OnFinalRelease();
+    }
+
+    // IGridInplaceWnd implementation
+    STDMETHOD_(IGridCtrl *, GetGrid)(CTHIS) SCONST override
+    {
+        return m_pGrid;
+    }
+
+    STDMETHOD_(IWindow *, GetIWindow)(CTHIS) SCONST override
+    {
+        return (IWindow *)this;
+    }
+
+    STDMETHOD_(int, GetRow)(CTHIS) SCONST override
+    {
+        return m_nRow;
+    }
+
+    STDMETHOD_(int, GetCol)(CTHIS) SCONST override
+    {
+        return m_nCol;
+    }
+
+    STDMETHOD_(void, UpdateData)(THIS) override
+    {
+        // Read through SRichEdit::GetWindowText (the RichEdit engine text
+        // the user typed); the SWindow:: variant would only return the
+        // m_strText window property and the edit would never commit.
+        SStringT strText = GetWindowText();
+        m_pGrid->SetItemText(m_nRow, m_nCol, strText);
+    }
+
+    STDMETHOD_(void, InitData)(THIS_ LPCTSTR szText) override
+    {
+        SetWindowText(szText ? szText : _T(""));
+    }
+
+  protected:
+    // IInplaceEditHost: end the session by ending the grid edit
+    virtual void OnInplaceEditEnd(BOOL bSave) override
+    {
+        m_pGrid->EndEdit(bSave);
+    }
+
+    IGridCtrl *m_pGrid;
+    int m_nRow;
+    int m_nCol;
 };
 
 /**

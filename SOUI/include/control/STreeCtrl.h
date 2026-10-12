@@ -14,6 +14,7 @@
 
 #include "core/SPanel.h"
 #include "STree.h"
+#include "SInplaceEdit.h"
 
 SNSBEGIN
 
@@ -101,7 +102,8 @@ typedef struct tagTVITEM
  */
 class SOUI_EXP STreeCtrl
     : public TPanelProxy<ITreeCtrl>
-    , protected CSTree<LPTVITEM> {
+    , protected CSTree<LPTVITEM>
+    , protected IInplaceEditHost {
     DEF_SOBJECT(SPanel, L"treectrl")
 
   public:
@@ -667,6 +669,21 @@ class SOUI_EXP STreeCtrl
      */
     void ItemMouseLeave(HSTREEITEM hItem);
 
+    /**
+     * @brief Computes the label rect of an item (client coordinates),
+     *        replicating the text layout of DrawItem.
+     * @param hItem Handle to the item.
+     * @param rcEdit Receives the editor rect.
+     * @return TRUE if the rect is valid, otherwise FALSE.
+     */
+    BOOL GetInplaceEditRect(HSTREEITEM hItem, CRect &rcEdit);
+
+    /**
+     * @brief IInplaceEditHost: ends the session (the text is read from the
+     *        edit window before it is destroyed).
+     */
+    virtual void OnInplaceEditEnd(BOOL bSave) OVERRIDE;
+
   public:
     /**
      * @brief Enables or disables multiple selection (rubber band marquee).
@@ -706,6 +723,34 @@ class SOUI_EXP STreeCtrl
     BOOL IsFullRowSelEnabled() const
     {
         return m_bFullRowSel;
+    }
+
+    /**
+     * @brief Starts in-place editing of an item label.
+     *
+     * Fires EventTCBeginEditLabel (cancelable) and overlays the item text
+     * with an SInplaceEdit child window initialized with the item text.
+     * Requires the editLabel attribute to be enabled.
+     * @param hItem Item whose label is edited (must be visible).
+     * @return TRUE if the editor was created, FALSE otherwise.
+     */
+    BOOL BeginInplaceEdit(HSTREEITEM hItem);
+
+    /**
+     * @brief Finishes the in-place editing session.
+     * @param bSave TRUE to write the edited text back to the item and fire
+     *        EventTCEndEditLabel with bCancel=FALSE; FALSE to discard it
+     *        and fire the event with bCancel=TRUE.
+     */
+    void EndInplaceEdit(BOOL bSave);
+
+    /**
+     * @brief Checks whether an in-place editing session is active.
+     * @return TRUE while the label editor exists.
+     */
+    BOOL IsInplaceEditing() const
+    {
+        return m_pInplaceEdit != NULL;
     }
 
     /**
@@ -941,6 +986,22 @@ class SOUI_EXP STreeCtrl
      */
     BOOL m_bHasLines; /**< has lines*/
 
+    /**
+     * @brief TRUE to allow in-place label editing (double click / F2 /
+     *        BeginInplaceEdit).
+     */
+    BOOL m_bEditLabel;
+
+    /**
+     * @brief Current label editor (NULL while no session is active).
+     */
+    SInplaceEdit *m_pInplaceEdit;
+
+    /**
+     * @brief Item being edited while a session is active.
+     */
+    HSTREEITEM m_hEditItem;
+
     SOUI_ATTRS_BEGIN()
         ATTR_LAYOUTSIZE(L"indent", m_nIndent, TRUE)
         ATTR_LAYOUTSIZE(L"itemHeight", m_nItemHei, TRUE)
@@ -949,6 +1010,7 @@ class SOUI_EXP STreeCtrl
         ATTR_BOOL(L"multiSel", m_bMultiSel, FALSE)
         ATTR_BOOL(L"fullRowSel", m_bFullRowSel, TRUE)
         ATTR_BOOL(L"rightClickSel", m_bRightClickSel, TRUE)
+        ATTR_BOOL(L"editLabel", m_bEditLabel, TRUE)
         ATTR_SKIN(L"itemSkin", m_pItemSkin, TRUE)
         ATTR_SKIN(L"lineSkin", m_pLineSkin, TRUE)
         ATTR_SKIN(L"toggleSkin", m_pToggleSkin, TRUE)
@@ -964,6 +1026,12 @@ class SOUI_EXP STreeCtrl
      * @brief Handles the destruction of the tree control.
      */
     void OnDestroy();
+
+    /**
+     * @brief Handles scrolling: scrolling while editing would misplace the
+     *        editor, so the session is committed first.
+     */
+    virtual BOOL OnScroll(BOOL bVertical, UINT uCode, int nPos) OVERRIDE;
 
     /**
      * @brief Handles the paint event.

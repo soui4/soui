@@ -1,3 +1,4 @@
+#pragma once
 #include <souistd.h>
 #include <SouiFactory.h>
 #include <commgr2.h>

@@ -2,6 +2,7 @@
 #define _SPROPTYITEM_TEXT_H_
 
 #include "../SPropertyItemBase.h"
+#include <control/SInplaceEdit.h>
 
 SNSBEGIN
 
@@ -44,7 +45,7 @@ class SPropertyItemText : public SPropertyItemBase {
     BOOL m_hasButton;
     BOOL m_isNumber;
     BOOL m_bAutoComplete;
-    SEdit *m_pEdit;
+    SInplaceEdit *m_pEdit;
 
   protected:
     SPropertyItemText(SPropertyGrid *pOwner);

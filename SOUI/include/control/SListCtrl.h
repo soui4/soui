@@ -3,6 +3,7 @@
 
 #include "core/SPanel.h"
 #include "SHeaderCtrl.h"
+#include "SInplaceEdit.h"
 
 SNSBEGIN
 
@@ -54,9 +55,22 @@ typedef struct DXLVSUBITEM
 typedef SArray<DXLVSUBITEM> ArrSubItem; /**< Array of subitems */
 
 /**
+ * @enum SListCtrlItemState
+ * @brief Per-item state bits used by GetItemState / SetItemState
+ *        (values match the Win32 LVIS_* constants they mirror).
+ */
+enum SListCtrlItemState
+{
+    S_LVIS_FOCUSED = 0x0001,  /**< Keyboard cursor item */
+    S_LVIS_SELECTED = 0x0002, /**< Selected item */
+};
+
+/**
  * @struct DXLVITEM
  * @brief Item structure
- * @details Structure representing an item in the list control.
+ * @details Structure representing an item in the list control. It carries
+ *          only per-item data: the selection and hover states live at the
+ *          control level, and bCheck is the sole checkbox field.
  */
 typedef struct DXLVITEM
 {
@@ -67,12 +81,12 @@ typedef struct DXLVITEM
     {
         dwData = 0;
         arSubItems = NULL;
-        checked = FALSE;
+        bCheck = FALSE;
     }
 
     ArrSubItem *arSubItems; /**< Array of subitems */
     LPARAM dwData;          /**< Additional data */
-    BOOL checked;           /**< Check state */
+    BOOL bCheck;            /**< Checkbox state: TRUE=checked, FALSE=unchecked (independent of the selection) */
 } DXLVITEM;
 
 /**
@@ -80,7 +94,7 @@ typedef struct DXLVITEM
  * @brief List Control
  * @details A control that displays a list of items with multiple columns and subitems.
  */
-class SOUI_EXP SListCtrl : public SPanel {
+class SOUI_EXP SListCtrl : public SPanel, protected IInplaceEditHost {
     DEF_SOBJECT(SPanel, L"listctrl")
 
   public:
@@ -234,6 +248,9 @@ class SOUI_EXP SListCtrl : public SPanel {
 
     /**
      * @brief Sort items using a comparison function
+     * @details Unlike the Win32 sort, the selection and the cursor are
+     *          cleared afterwards: the comparison protocol carries no item
+     *          identity, so the selection flags cannot follow their items.
      * @param pfnCompare Comparison function
      * @param pContext Context for the comparison function
      * @return TRUE if successful, FALSE otherwise
@@ -241,19 +258,47 @@ class SOUI_EXP SListCtrl : public SPanel {
     BOOL SortItems(PFNLVCOMPAREEX pfnCompare, void *pContext);
 
     /**
-     * @brief Get the check state of an item
+     * @brief Get the per-item selection state
      * @param nItem Index of the item
-     * @return Check state of the item
+     * @return TRUE if the item is selected, FALSE otherwise
      */
-    BOOL GetCheckState(int nItem);
+    BOOL GetSelected(int nItem) const;
 
     /**
-     * @brief Set the check state of an item
+     * @brief Get the item state (MFC CListCtrl::GetItemState)
+     * @param nItem Index of the item
+     * @param nMask Combination of S_LVIS_FOCUSED / S_LVIS_SELECTED
+     * @return The requested state bits
+     */
+    UINT GetItemState(int nItem, UINT nMask) const;
+
+    /**
+     * @brief Set the item state (MFC CListCtrl::SetItemState)
+     * @details S_LVIS_SELECTED adds / removes the item from the selection
+     *          (firing the per-item selection event); S_LVIS_FOCUSED moves
+     *          the keyboard cursor without changing the selection.
+     * @param nItem Index of the item
+     * @param nState New state bits
+     * @param nMask Combination of S_LVIS_FOCUSED / S_LVIS_SELECTED
+     */
+    void SetItemState(int nItem, UINT nState, UINT nMask);
+
+    /**
+     * @brief Get the checkbox state of an item (MFC CListCtrl::GetCheck;
+     *        independent of the selection)
+     * @param nItem Index of the item
+     * @return TRUE if checked, FALSE otherwise
+     */
+    BOOL GetCheck(int nItem) const;
+
+    /**
+     * @brief Set the checkbox state of an item (MFC CListCtrl::SetCheck;
+     *        independent of the selection)
      * @param nItem Index of the item
      * @param bCheck Check state to set
      * @return TRUE if successful, FALSE otherwise
      */
-    BOOL SetCheckState(int nItem, BOOL bCheck);
+    BOOL SetCheck(int nItem, BOOL bCheck);
 
     /**
      * @brief Get the number of checked items
@@ -262,27 +307,34 @@ class SOUI_EXP SListCtrl : public SPanel {
     int GetCheckedItemCount();
 
     /**
-     * @brief Get the number of selected items
-     *
-     * Mode-aware: multi-selection mode counts the checked items (the only
-     * selection record); single-selection mode reports 1 while the anchor
-     * is set.
-     *
+     * @brief Get the number of selected items (MFC CListCtrl::GetSelectedCount)
      * @return Number of selected items
      */
-    int GetSelItemCount() const;
+    UINT GetSelectedCount() const;
 
     /**
-     * @brief Get all selected items
-     *
-     * Mode-aware: multi-selection mode enumerates the checked items;
-     * single-selection mode reports the anchor.
-     *
-     * @param items Output array of item indexes.
-     * @param nMaxCount Maximum number of indexes to retrieve.
-     * @return Number of indexes retrieved.
+     * @brief Get all selected items (MFC CListCtrl::GetSelItems)
+     * @param nMaxItems Maximum number of indexes to retrieve
+     * @param rgIndex Output array of item indexes
+     * @return Number of indexes retrieved
      */
-    int GetSelItems(int *items, int nMaxCount) const;
+    int GetSelItems(int nMaxItems, int *rgIndex) const;
+
+    /**
+     * @brief Start iterating over the selected items
+     *        (MFC CListCtrl::GetFirstSelectedItemPosition)
+     * @return SPOSITION iteration cursor, or NULL when nothing is selected
+     */
+    SPOSITION GetFirstSelectedItemPosition() const;
+
+    /**
+     * @brief Get the next selected item during iteration
+     *        (MFC CListCtrl::GetNextSelectedItem)
+     * @param pos Cursor obtained from GetFirstSelectedItemPosition; set to
+     *        NULL when the iteration ends
+     * @return Index of the next selected item, or -1 when done
+     */
+    int GetNextSelectedItem(SPOSITION &pos) const;
 
     /**
      * @brief Get the header control
@@ -305,12 +357,9 @@ class SOUI_EXP SListCtrl : public SPanel {
     /**
      * @brief Enable or disable multiple selection
      *
-     * Dual-track model: in single-selection mode the anchor m_nSelectItem is
-     * the selection record (the checked flag of that item is kept in sync);
-     * in multi-selection mode the checked flags are the only record and the
-     * anchor acts as the cursor (keyboard / shift base) only. Enabling is a
-     * no-op for the record (the checked flag already mirrors the anchor);
-     * disabling transfers the sole checked item to the anchor or clears all.
+     * The selection set lives in m_arrSelFlags in both modes. Enabling is a
+     * no-op for the record (the range anchor starts at the cursor); disabling
+     * transfers the sole selected item to the cursor or clears everything.
      *
      * @param enable Enable flag
      */
@@ -318,43 +367,23 @@ class SOUI_EXP SListCtrl : public SPanel {
     {
         if (!enable && m_bMultiSelection)
         {
-            // Turning multi-selection off. The checked flag marks the
-            // selection in both modes; the anchor m_nSelectItem must follow
-            // it (single-selection paths read m_nSelectItem).
-            int iChecked = -1;
-            int nSelected = 0;
-            for (int i = 0; i < GetItemCount(); i++)
-            {
-                if (m_arrItems[i].checked)
-                {
-                    nSelected++;
-                    if (iChecked == -1)
-                        iChecked = i;
-                }
-            }
+            // Turning multi-selection off: the cursor m_nSelectItem must end
+            // up on the selection (single-selection paths read it).
+            int iSelected = -1;
+            UINT nSelected = GetSelectedCount();
             if (nSelected > 1)
             {
-                // Several items checked: the whole selection is cleared.
-                for (int i = 0; i < GetItemCount(); i++)
-                {
-                    if (m_arrItems[i].checked)
-                    {
-                        m_arrItems[i].checked = FALSE;
-                        RedrawItem(i);
-                        NotifyItemSelState(i, FALSE);
-                    }
-                }
+                ClearSelection();
                 m_nSelectItem = -1;
                 m_nSelAnchor = -1;
             }
             else if (nSelected == 1)
             {
-                // Exactly one item checked: it becomes the single selection
-                // (the flag is already set, only the anchor moves).
-                m_nSelectItem = iChecked;
-                m_nSelAnchor = iChecked;
+                iSelected = (int)(INT_PTR)GetFirstSelectedItemPosition() - 1;
+                m_nSelectItem = iSelected;
+                m_nSelAnchor = iSelected;
             }
-            // nSelected == 0: the anchor is kept unchanged.
+            // nSelected == 0: the cursor is kept unchanged.
         }
         else if (enable && !m_bMultiSelection)
         {
@@ -381,6 +410,35 @@ class SOUI_EXP SListCtrl : public SPanel {
     VOID EnableHotTrack(BOOL enable)
     {
         m_bHotTrack = enable;
+    }
+
+    /**
+     * @brief Starts in-place editing of a subitem label.
+     *
+     * Fires EventLCBeginEditLabel (cancelable) and overlays the subitem
+     * text with an SInplaceEdit child window initialized with the subitem
+     * text. Requires the editLabel attribute to be enabled.
+     * @param nItem Item index.
+     * @param nSubItem Subitem (column order) index.
+     * @return TRUE if the editor was created, FALSE otherwise.
+     */
+    BOOL BeginInplaceEdit(int nItem, int nSubItem = 0);
+
+    /**
+     * @brief Finishes the in-place editing session.
+     * @param bSave TRUE to write the edited text back to the subitem and
+     *        fire EventLCEndEditLabel with bCancel=FALSE; FALSE to discard
+     *        it and fire the event with bCancel=TRUE.
+     */
+    void EndInplaceEdit(BOOL bSave);
+
+    /**
+     * @brief Checks whether an in-place editing session is active.
+     * @return TRUE while the label editor exists.
+     */
+    BOOL IsInplaceEditing() const
+    {
+        return m_pInplaceEdit != NULL;
     }
 
   protected:
@@ -438,17 +496,16 @@ class SOUI_EXP SListCtrl : public SPanel {
      * @brief Notify of selection change
      * @param nOldSel Old selected index
      * @param nNewSel New selected index
-     * @param checkBox Whether the change is due to a checkbox
      * @param nFlags Modifier keys from the mouse message wParam (MK_CONTROL / MK_SHIFT);
      *              pass 0 for programmatic changes. Replaces the former
      *              GetKeyState() lookups so keyboard state is testable headless.
      */
-    void NotifySelChange(int nOldSel, int nNewSel, BOOL checkBox = FALSE, UINT nFlags = 0);
+    void NotifySelChange(int nOldSel, int nNewSel, UINT nFlags = 0);
 
     /**
      * @brief Fire the per-item selection state event (multi-selection)
-     * @param iItem Index of the item whose checked / selected state flipped
-     * @param bSelected New state: TRUE=selected(checked), FALSE=deselected
+     * @param iItem Index of the item whose selection state flipped
+     * @param bSelected New state: TRUE=selected, FALSE=deselected
      */
     void NotifyItemSelState(int iItem, BOOL bSelected)
     {
@@ -457,6 +514,41 @@ class SOUI_EXP SListCtrl : public SPanel {
         evt.bSelected = bSelected;
         FireEvent(evt);
     }
+
+    /**
+     * @brief Fire the per-item checkbox state event (independent of selection)
+     * @param iItem Index of the item whose check state flipped
+     * @param bCheck New state: TRUE=checked, FALSE=unchecked
+     */
+    void NotifyItemCheckState(int iItem, BOOL bCheck)
+    {
+        EventItemCheckState evt(this);
+        evt.iItem = iItem;
+        evt.bCheck = bCheck;
+        FireEvent(evt);
+    }
+
+    /**
+     * @brief Update the selection flag of one item (control-level record).
+     * @details No-op when the flag already matches. Fires the per-item
+     *          selection event and repaints only on an actual flip.
+     */
+    void SetItemSel(int iItem, BOOL bSelected);
+
+    /**
+     * @brief Deselect every selected item (the keyboard cursor is untouched).
+     */
+    void ClearSelection();
+
+    /**
+     * @brief Toggle the checkbox of an item without touching the selection.
+     *
+     * In multi-selection mode a checkbox click on a selected item applies
+     * its new check state to every selected item; a click on an unselected
+     * item toggles only that item.
+     * @param nItem Index of the clicked item.
+     */
+    void ToggleItemCheck(int nItem);
 
     /**
      * @brief Scrolls the list so an item becomes visible (keyboard navigation)
@@ -554,6 +646,22 @@ class SOUI_EXP SListCtrl : public SPanel {
      */
     void OnSize(UINT nType, CSize size);
 
+    /**
+     * @brief Computes the label rect of a subitem (client coordinates),
+     *        replicating the text layout of DrawItem.
+     * @param nItem Item index.
+     * @param nSubItem Subitem (column order) index.
+     * @param rcEdit Receives the editor rect.
+     * @return TRUE if the rect is valid, otherwise FALSE.
+     */
+    BOOL GetInplaceEditRect(int nItem, int nSubItem, CRect &rcEdit);
+
+    /**
+     * @brief IInplaceEditHost: ends the session (the text is read from the
+     *        edit window before it is destroyed).
+     */
+    virtual void OnInplaceEditEnd(BOOL bSave) OVERRIDE;
+
   protected:
     /**
      * @brief Handle left mouse button down when not drag scrolling
@@ -634,9 +742,10 @@ class SOUI_EXP SListCtrl : public SPanel {
     int m_nSelAnchor;               /**< Multi-selection range anchor: fixed base for Shift ranges; follows the cursor on every non-Shift change */
     int m_nSelectColumn;            /**< Index of the selected column */
     int m_nHoverItem;               /**< Index of the item under the mouse */
+    SArray<BOOL> m_arrSelFlags;     /**< Selection record: one flag per item, parallel to m_arrItems; kept at control level next to the hover state instead of inside DXLVITEM */
     BOOL m_bHotTrack;               /**< Hot tracking flag */
     int m_iBandOldSel;              /**< Selection anchor before a rubber band started */
-    SArray<BOOL> m_arrBandSnapshot; /**< Checked-state snapshot taken when the rubber band starts */
+    SArray<BOOL> m_arrBandSnapshot; /**< Selection snapshot taken when the rubber band starts */
 
     CPoint m_ptIcon; /**< Icon position */
     CPoint m_ptText; /**< Text position */
@@ -654,6 +763,11 @@ class SOUI_EXP SListCtrl : public SPanel {
     BOOL m_bCheckBox;                   /**< Checkbox enable flag */
     BOOL m_bMultiSelection;             /**< Multiple selection enable flag */
 
+    BOOL m_bEditLabel;                  /**< TRUE to allow in-place label editing (double click / F2 / BeginInplaceEdit) */
+    SInplaceEdit *m_pInplaceEdit;       /**< Current label editor (NULL while no session is active) */
+    int m_nEditItem;                    /**< Item being edited while a session is active */
+    int m_nEditSubItem;                 /**< Subitem being edited while a session is active */
+
   protected:
     typedef SArray<DXLVITEM> ArrLvItem; /**< Array of items */
 
@@ -667,6 +781,7 @@ class SOUI_EXP SListCtrl : public SPanel {
         ATTR_LAYOUTSIZE(L"itemHeight", m_nItemHeight, FALSE)
         ATTR_BOOL(L"checkBox", m_bCheckBox, TRUE)
         ATTR_BOOL(L"multiSel", m_bMultiSelection, TRUE)
+        ATTR_BOOL(L"editLabel", m_bEditLabel, TRUE)
         ATTR_SKIN(L"itemSkin", m_pItemSkin, TRUE)
         ATTR_SKIN(L"iconSkin", m_pIconSkin, TRUE)
         ATTR_SKIN(L"checkSkin", m_pCheckSkin, TRUE)

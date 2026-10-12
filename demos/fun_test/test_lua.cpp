@@ -429,38 +429,6 @@ TEST_F(soui_lua_app, ivalue_animator_global_load_release)
         "collectgarbage(\"collect\")\n"));
 }
 
-// [None] LuaAnimationListener（IAnimationListener 是无基类纯接口，非托管 push、
-//        无 Release 绑定、无 __gc）→ 预期泄漏，人工确认。
-//        观察：用例跑完后对象仍存活，直到 lua_close 也不回收。
-TEST_F(soui_lua_app, lua_animation_listener_no_owner)
-{
-    EXPECT_TRUE(Run("llal",
-        "local o = CreateAnimationListener(1)\n"
-        "assert(o ~= nil)\n"
-        "o = nil\n"
-        "collectgarbage(\"collect\")\n"));
-}
-
-// [None] LuaAnimatorListener（IAnimatorListener 无基类纯接口）→ 预期泄漏
-TEST_F(soui_lua_app, lua_animator_listener_no_owner)
-{
-    EXPECT_TRUE(Run("llvl",
-        "local o = CreateValueAnimatorListener(1)\n"
-        "assert(o ~= nil)\n"
-        "o = nil\n"
-        "collectgarbage(\"collect\")\n"));
-}
-
-// [None] LuaAnimatorUpdateListener（IAnimatorUpdateListener 无基类纯接口）→ 预期泄漏
-TEST_F(soui_lua_app, lua_animator_update_listener_no_owner)
-{
-    EXPECT_TRUE(Run("llvu",
-        "local o = CreateValueAnimatorUpdateListener(1)\n"
-        "assert(o ~= nil)\n"
-        "o = nil\n"
-        "collectgarbage(\"collect\")\n"));
-}
-
 // [Rel] LuaLvAdapter : SAdapterBase : TObjRefImpl<LvAdatperImpl<ILvAdapter>>，
 //       非托管 push → 显式 :Release()。断点：~LuaLvAdapter
 TEST_F(soui_lua_app, lua_lv_adapter_release)

@@ -1,4 +1,4 @@
-﻿﻿<?xml version="1.0"?>
+﻿﻿﻿﻿﻿<?xml version="1.0"?>
 <!--
   page_ctrls.xml - 基础控件演示分区
 
@@ -103,13 +103,13 @@
 		</page>
 		<page title="listctrl" layout="vbox" interval="12">
 				<text text="基础列表" font="size:16,bold:1" colorText="@color/clr_title"/>
-				<text text="报表式列表,演示表头排序、拖换与热跟踪光标;框选矩形使用可配置的 bandSkin(系统内置 _skin.sys.selband,colorrect 皮肤)" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
+				<text text="报表式列表,演示表头排序、拖换与热跟踪光标;框选矩形使用可配置的 bandSkin(系统内置 _skin.sys.selband,colorrect 皮肤);双击或 F2 可就地编辑单元格文本(editLabel);选中与勾选相互独立,多选状态下点击复选框,所有选中项的勾选状态同步变化(checkBox)" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
 				<window layout="hbox" interval="16">
 				<check name="chk_multi_lc" text="启用多选(关闭后点击为单选)" checked="1" font="size:12"/>
 				<check name="chk_band_lc" text="启用框选(关闭后多选拖动为 fling 滚动)" checked="1" font="size:12"/>
 				<text name="txt_lc_selcount" text="已选 0 项" font="size:12" colorText="@color/clr_primary" marginSize="8,0,0,0"/>
 				</window>
-				<listctrl name="lc_test" multiSel="1" bandEnable="1" hotTrack="1" size="-2,0" weight="1" itemHeight="28" headerHeight="30" colorBkgnd="@color/clr_card_bg" colorItemHotBkgnd="@color/clr_card_hover" colorItemSelBkgnd="#DBEAFE" colorText="@color/clr_text" colorSelText="@color/clr_title" bandSkin="_skin.sys.selband" sbSkin="skin_new_scrollbar" font="size:12">
+				<listctrl name="lc_test" multiSel="1" bandEnable="1" hotTrack="1" editLabel="1" checkBox="1" size="-2,0" weight="1" itemHeight="28" headerHeight="30" colorBkgnd="@color/clr_card_bg" colorItemHotBkgnd="@color/clr_card_hover" colorItemSelBkgnd="#DBEAFE" colorText="@color/clr_text" colorSelText="@color/clr_title" bandSkin="_skin.sys.selband" sbSkin="skin_new_scrollbar" font="size:12">
 				<headerStyle align="left" itemSwapEnable="1" fixWidth="0" sortHeader="1" sortSkin="skin_lcex_header_arrow" colorBkgnd="@color/clr_card_bg" colorText="@color/clr_title" font="size:12,bold:1">
 					<items>
 						<item width="150" weight="1">姓名</item>
@@ -199,7 +199,7 @@
 		<!-- ============ 树型控件 ============ -->
 		<page title="treectrl" layout="vbox" interval="12">
 				<text text="TreeCtrl" font="size:16,bold:1" colorText="@color/clr_title"/>
-				<text text="经典树控件,支持复选框、节点图标与多级组织结构" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
+				<text text="经典树控件,支持复选框、节点图标与多级组织结构;双击或 F2 可就地编辑节点文本(editLabel);多选状态下勾选任一选中节点,所有选中节点的勾选状态同步变化" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
 				<window layout="hbox" interval="16">
 					<check name="chk_multi_tree" text="启用多选(关闭后清除多选)" checked="1" font="size:12"/>
 					<check name="chk_band_tree" text="启用框选(关闭后多选拖动为 fling 滚动)" checked="1" font="size:12"/>

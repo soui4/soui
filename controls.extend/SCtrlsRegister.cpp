@@ -11,7 +11,6 @@
 #include "gif/SGifPlayer.h"
 #include "SScrollText.h"
 #include "SRatingBar.h"
-#include "SListCtrlEx.h"
 #include "SIPAddressCtrl.h"
 #include "STurn3DView.h"
 #include "SRadioBox2.h"

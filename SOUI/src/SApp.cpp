@@ -9,6 +9,7 @@
 
 #include "helper/STimerGenerator.h"
 #include "helper/SAutoBuf.h"
+#include <helper/STls.h>
 #include "helper/SToolTip.h"
 #include "helper/SAppDir.h"
 #include "helper/SwndFinder.h"
@@ -350,6 +351,7 @@ SApplication::~SApplication(void)
     _DestroySingletons();
     SRichEdit::UninitTextService();
     SNativeWndHelper::instance()->Uninit();
+    STls::Cleanup();
     ms_Singleton = NULL;
 }
 

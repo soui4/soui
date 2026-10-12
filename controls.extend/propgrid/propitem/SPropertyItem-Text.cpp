@@ -1,36 +1,36 @@
 ﻿#include "stdafx.h"
 #include "SPropertyItem-Text.h"
-#include "../SPropertyEmbedWndHelper.hpp"
 #include "../SPropertyGrid.h"
+#include <control/SInplaceEdit.h>
 
 SNSBEGIN
 
-class SPropEdit: public SEdit
+class SPropEdit: public SInplaceEdit
                    , public IPropInplaceWnd
+                   , protected IInplaceEditHost
     {
     public:
-        SPropEdit(IPropertyItem *pOwner):m_pOwner(pOwner)
+        SPropEdit(IPropertyItem *pOwner)
+            : SInplaceEdit(this)
+            , m_pOwner(pOwner)
         {
             SASSERT(m_pOwner);
+            GetStyle().SetScale(m_pOwner->GetOwner()->GetScale());
         }
-        
-        void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
+
+    protected:
+        // IInplaceEditHost: RETURN / focus loss commits, ESC discards and
+        // both end the in-place session of the owner item.
+        virtual void OnInplaceEditEnd(BOOL bSave) override
         {
-            if(nChar==VK_RETURN)
-            {
-                GetParent()->SetFocus();
-            }else
-            {
-                SEdit::OnKeyDown(nChar,nRepCnt,nFlags);            
-            }
+            if (bSave)
+                UpdateData();
+            m_pOwner->OnInplaceActive(FALSE);
         }
-        
-        SOUI_MSG_MAP_BEGIN()
-            MSG_WM_KEYDOWN(OnKeyDown)
-        SOUI_MSG_MAP_END()
-        
+
+    public:
         virtual IPropertyItem* GetOwner(){return m_pOwner;}
-        
+
         virtual void UpdateData()
         {
             SStringT strValue=GetWindowText();
@@ -87,15 +87,13 @@ class SPropEdit: public SEdit
         if(bActive)
         {
             SASSERT(!m_pEdit);
-            m_pEdit = new TplPropEmbedWnd<SPropEdit>(this);
+            m_pEdit = new SPropEdit(this);
+            m_pEdit->ApplyDefaultStyle();
 			SXmlNode inplaceStyle=m_pOwner->GetInplaceItemStyle(kEditStyle);			
             SXmlDoc xmlDoc;
 			if(!inplaceStyle)
 			{
 				inplaceStyle=xmlDoc.root();
-				inplaceStyle.append_attribute(L"colorBkgnd").set_value(L"#FFFFFF");
-				inplaceStyle.append_attribute(L"colorText").set_value(L"#000000");
-				inplaceStyle.append_attribute(L"autoWordSel").set_value(L"1");
 			}
             inplaceStyle.append_attribute(L"Number").set_value(m_isNumber ? L"1" : L"0");
             m_pOwner->OnInplaceActiveWndCreate(this,m_pEdit,inplaceStyle);

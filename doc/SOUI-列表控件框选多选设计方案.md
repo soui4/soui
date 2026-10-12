@@ -1,8 +1,8 @@
 # SOUI 列表类控件框选（Rubber Band）多选支持设计方案
 
-> 版本：2026-09-28（第 4 版，随实现同步更新）
+> 版本：2026-10-12（第 5 版，随实现同步更新；第 5 版：SListCtrl 选中记录从 `DXLVITEM::checked` 重构为控件级 `m_arrSelFlags`，API 对齐 MFC CListCtrl）
 > 范围：`SPanel` 框选框架 + `SListCtrl`、`STreeCtrl`、`SListView`、`SMCListView`、`STileView`、`STreeView` 六个控件的接入
-> 验证：`demos/fun_test/test_rubberband.cpp`（29 用例），门禁 `ctest -L '^soui-headless$'` 359/359 通过
+> 验证：`demos/fun_test/test_rubberband.cpp`（37 用例）+ `test_check_sync.cpp`（5 用例），门禁 `ctest -L '^soui-headless$'` 422/422 通过（另 1 例 Disabled）
 
 ## 1. 需求与约束
 
@@ -102,7 +102,7 @@ SOUI 中**鼠标消息坐标、`GetClientRect`、绘制 RT 的原点全部是 ho
 | `SListView` / `SMCListView` | `GetMultiSel() && adapter && locator` | 滚动轴区间：`Position2Item(nBandBegin..nBandEnd)`，**区间端点为排他坐标需 -1px** | O(区间) |
 | `STileView` | 同上（tile locator） | `CalcItemDrawRect(i)` 与 band 相交，`rcItem.top > band.bottom` 提前 break | O(可见) |
 | `STreeView` | `GetMultiSel() && adapter && locator` | `Item2Position - nPos` 逐可见项相交，`GetNextVisibleItem` 遍历 | O(可见) |
-| `SListCtrl` | `m_bMultiSelection` | `(band.top - listTop + origin) / itemHeight` 行区间，写 `DXLVITEM::checked` | O(区间) |
+| `SListCtrl` | `m_bMultiSelection` | `(band.top - listTop + origin) / itemHeight` 行区间，写控件级选中标记 `m_arrSelFlags`（经 `SetItemSel`，逐条发 `EventItemSelChanged`） | O(区间) |
 | `STreeCtrl` | `m_bMultiSel`（多选能力） | `bVisible` 计数 + `iVisible*nItemHei` 定位，collapsed 子树跳过 | O(可见) |
 
 公共语义：
@@ -113,8 +113,8 @@ SOUI 中**鼠标消息坐标、`GetClientRect`、绘制 RT 的原点全部是 ho
 - **编程选中 API 的统一语义**（`STreeView::SetSel`、`SViewBase::SetSel` 及三个子类包装、`STreeCtrl::SelectItem`、`SListCtrl::NotifySelChange` 普通分支）：① 单选态先经 `IsItemSelected` 判重，**同项重选直接返回、不发任何事件**；② 记录只在通过取消检查后才更新（`SelChanging` 被取消时选中记录保持原状，不做"先改后回滚"）；③ `hOldSel` 在任何修改前捕获，`SelChanged` 携带正确的旧/新值，在视觉更新之后发出；④ 单选态只写锚点、不发单项事件；多选态 = 清空集合（逐条单项事件）+ 光标跟随 + 记录新条目，不发锚点事件；清空入参（-1 / `ITEM_NULL`）等价于"选中空"。
 - 主选中项随 band 移动指向最后命中的条目（六个控件一致；多选态下锚点仅承担光标职责、不是选中记录，见 §3.2）。
 - 取消路径（`bCancelled=TRUE`，ESC 或外部取消）**还原 band 开始时的选择快照**并还原主选中项。注意快照拍摄于 `OnRubberBandStart`，即按下点的 click 选择已生效之后，"按下即选中"的行属于快照、ESC 后保留。
-- **多选 ↔ 单选切换的选中迁移**：运行时关闭多选时，若多选集合恰有一条选中项，该选中项迁移到单选标记（`SViewBase` 系迁移到 `m_iSelItem`、`STreeCtrl` 迁移到 `m_hSelItem`、`STreeView` 迁移到 `m_hSelected`、`SListCtrl` 将 `m_nSelectItem` 指向仅存的 checked 项），选中项得以保留；多条选中则整组清除（锚点一并复位）；零条不动。重新开启多选时反向迁移：锚点条目**直接写入 map**（无事件、无重绘——条目本就处于选中态），锚点自身保留**光标职责**不归零；`SListCtrl` 单选态 checked 本就与锚点同步、无需迁移。相关 API：`SViewBase::SetMultiSel`、`STreeView::SetMultiSel`、`STreeCtrl::EnableMultiSelection`、`SListCtrl::EnableMultiSelection`——四处的迁移语义已统一。
-- **双轨互斥与锚点的角色分化**：每种模式只有一个选中记录——单选 = 锚点，多选 = map（`SListCtrl` 为 checked 数组）。选中查询（`IsItemSelected` / `GetSelItemCount` / `GetSelItems`）严格按模式分支，只读各自记录，且是**唯一的选中判定入口**（内部代码与调用方一律经它判断，不直接比较锚点或查 map）。六控件全部提供 `GetSelItemCount` / `GetSelItems`（`SListCtrl` 本轮补齐）：多选态返回集合大小/枚举集合，单选态返回锚点 1/0 / 输出锚点。全部控件的锚点在多选态都保留**光标职责**（键盘导航基点、Shift 范围基点、`GetSelectedItem` 返回值），但不再作为选中记录被任何查询读取。
+- **多选 ↔ 单选切换的选中迁移**：运行时关闭多选时，若多选集合恰有一条选中项，该选中项迁移到单选标记（`SViewBase` 系迁移到 `m_iSelItem`、`STreeCtrl` 迁移到 `m_hSelItem`、`STreeView` 迁移到 `m_hSelected`、`SListCtrl` 将 `m_nSelectItem` 指向 `m_arrSelFlags` 中仅存的选中项），选中项得以保留；多条选中则整组清除（锚点一并复位）；零条不动。重新开启多选时反向迁移：锚点条目**直接写入 map**（无事件、无重绘——条目本就处于选中态），锚点自身保留**光标职责**不归零；`SListCtrl` 单选态选中标记本就与锚点同步、无需迁移。相关 API：`SViewBase::SetMultiSel`、`STreeView::SetMultiSel`、`STreeCtrl::EnableMultiSelection`、`SListCtrl::EnableMultiSelection`——四处的迁移语义已统一。
+- **双轨互斥与锚点的角色分化**：每种模式只有一个选中记录——单选 = 锚点，多选 = map（`SListCtrl` 为控件级标记数组 `m_arrSelFlags`，与条目数组平行、与 hover 状态同层；`DXLVITEM` 只携带 per-item 数据与 checkbox 状态 `bCheck`，不含选中记录）。选中查询严格按模式分支，只读各自记录，且是**唯一的选中判定入口**（内部代码与调用方一律经它判断，不直接比较锚点或查 map）：索引类四控件走 `IsItemSelected` / `GetSelItemCount` / `GetSelItems`，`SListCtrl` 走 `GetSelected` / `GetSelectedCount` / `GetSelItems` / `GetFirstSelectedItemPosition`+`GetNextSelectedItem`（MFC CListCtrl 风格，另提供 `GetItemState`/`SetItemState` 位查询，`S_LVIS_FOCUSED`/`S_LVIS_SELECTED`）。六控件全部提供 `GetSelItemCount` / `GetSelItems`：多选态返回集合大小/枚举集合，单选态返回锚点 1/0 / 输出锚点。全部控件的锚点在多选态都保留**光标职责**（键盘导航基点、Shift 范围基点、`GetSelectedItem` 返回值），但不再作为选中记录被任何查询读取。注意 `SListCtrl::SortItems` 的比较协议（qsort_s）不含条目身份，选中标记无法跟随条目移动，排序后**清空全部选中**。
 - **空白点击清除选择**：普通左键点击（无 Ctrl/Shift）落在无条目区域时清除全部选择并触发 `SelChanged`（新选中项为空）。Ctrl/Shift+点击空白不清除（保护多选结果）；右键/中键不改变选择。六个控件语义一致：adapter 视图在各自 `OnMouseEvent` 的 `HitTest()==NULL` 分支处理，`SPanel::Ex` 系控件（`SListCtrl` 经 `NotifySelChange(old,-1)` 原生支持、`STreeCtrl::OnLButtonDownEx` 显式处理）。
 
 ### 3.1 取消还原快照
@@ -124,7 +124,7 @@ SOUI 中**鼠标消息坐标、`GetClientRect`、绘制 RT 的原点全部是 ho
 | `SListView`/`SMCListView`/`STileView` | 多选集合索引数组（`SViewBase::SnapshotSelItems/RestoreSelItems`，共用 `m_arrBandSnapshot`） | `ClearSelItems` + 逐项 `AddSelItem` |
 | `STreeView` | `SArray<HSTREEITEM>`（遍历 `m_mapSelItems`）+ 光标快照 `m_hBandOldSel` | 同上；band 期间光标 `m_hSelected` 跟随最后命中项，ESC 还原到 band 前位置 |
 | `STreeCtrl` | `SArray<HSTREEITEM>`（遍历 `m_mapSelItems`）+ 光标快照 `m_hBandOldSel` | 同上；band 期间光标 `m_hSelItem` 跟随最后命中项，ESC 还原到 band 前位置 |
-| `SListCtrl` | 全部条目的 `checked` 数组 + `m_nSelectItem` | 逐行还原并只重绘变化行 |
+| `SListCtrl` | 全部条目的 `m_arrSelFlags` 选中标记 + `m_nSelectItem` | 逐行还原并只重绘变化行 |
 
 ### 3.2 STreeCtrl 多选与键盘交互
 
@@ -140,7 +140,7 @@ SOUI 中**鼠标消息坐标、`GetClientRect`、绘制 RT 的原点全部是 ho
 - **键盘交互**（`OnKeyDown` + `OnGetDlgCode` = `SC_WANTARROWS | SC_WANTSYSKEY`，语义对齐 `STreeView`/`SListView`）：
   - **单选态**：`↑`/`↓` 移动选中项（走 `SelectItem`，锚点事件正常发出）；`←`/`→` 在展开/折叠与移动间切换（有子且已展开 → 折叠，否则移到上/下一可见项）；`Home`/`End`/`PgUp`/`PgDn` 滚动并选中首/末/页首/页尾可见项；
   - **多选态**：普通 `↑`/`↓` = 整组替换为相邻可见项（同 `SelectItem` 多选分支）；`Ctrl+↑/↓` 只移光标不动集合（锚点跟随新光标）；`Shift+↑/↓`/`Shift+PgUp/PgDn/Home/End` = **锚点区间**（Explorer 语义，2026-09-29 第 28 轮定稿）：光标移动、固定锚点 `m_hSelAnchor` 不动，集合变为锚点..光标的**可见序 span**（区间替换，可扩大也可缩小）；`SPACE` toggle 光标条目；`Ctrl+A` 全选可见项；
-  - **锚点区间模型**（六控件统一）：每控件有独立范围锚点（`SViewBase::m_iSelAnchor` / `STreeCtrl::m_hSelAnchor` / `STreeView::m_hSelAnchor` / `SListCtrl::m_nSelAnchor`），多选态下 Shift 导航（键盘方向键、翻页键、Shift+点击）以"锚点..光标"为准，其余一切非 Shift 变更（普通点击/方向键、Ctrl+点击、Ctrl+方向键、`SPACE`、`Ctrl+A`、API `SetSel`、band 结束、空白点击、模式切换）都让锚点跟随光标；索引类控件的区间为连续索引（`SViewBase::SetSelRange`），树类为可见序 span（`STreeCtrl::SetSelRange` / `STreeView::SetSelRange`），`SListCtrl` 的 Shift+点击在 `NotifySelChange` 内按锚点区间替换 checked；
+  - **锚点区间模型**（六控件统一）：每控件有独立范围锚点（`SViewBase::m_iSelAnchor` / `STreeCtrl::m_hSelAnchor` / `STreeView::m_hSelAnchor` / `SListCtrl::m_nSelAnchor`），多选态下 Shift 导航（键盘方向键、翻页键、Shift+点击）以"锚点..光标"为准，其余一切非 Shift 变更（普通点击/方向键、Ctrl+点击、Ctrl+方向键、`SPACE`、`Ctrl+A`、API `SetSel`、band 结束、空白点击、模式切换）都让锚点跟随光标；索引类控件的区间为连续索引（`SViewBase::SetSelRange`），树类为可见序 span（`STreeCtrl::SetSelRange` / `STreeView::SetSelRange`），`SListCtrl` 的 Shift+点击在 `NotifySelChange` 内按锚点区间替换 `m_arrSelFlags` 选中标记；
   - 可见项遍历辅助：`GetNextVisibleItem` / `GetPrevVisibleItem` / `GetVisibleItemByRow` / `GetLastVisibleItem`（基于 `TVITEM::bVisible`，折叠子树自动跳过）；`ESC` 不拦截（`SetMsgHandled(FALSE)` 回落 `SPanel::OnKeyDown` 走 band 取消）；
   - 修饰键经 `GetKeyState` 读取（与 `SListView`/`STreeView` 一致），headless 测试只能覆盖无修饰键路径，`Ctrl/Shift` 组合键需 GUI 环境人工验证。
 

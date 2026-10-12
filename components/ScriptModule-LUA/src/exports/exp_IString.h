@@ -5,7 +5,7 @@ BOOL ExpLua_IStringA(lua_State *L)
 	try{
 
 		lua_tinker::class_add<IStringA>(L,"IStringA");
-		lua_tinker::class_inh<IStringA,IObjRef>(L);
+		lua_tinker::class_def<IStringA>(L, "Release", &IStringA::Release);
 
 		lua_tinker::class_def<IStringA>(L,"GetLength",&IStringA::GetLength);
 		lua_tinker::class_def<IStringA>(L,"IsEmpty",&IStringA::IsEmpty);
@@ -61,7 +61,7 @@ BOOL ExpLua_IStringW(lua_State *L)
 	try{
 
 		lua_tinker::class_add<IStringW>(L,"IStringW");
-		lua_tinker::class_inh<IStringW,IObjRef>(L);
+		lua_tinker::class_def<IStringW>(L, "Release", &IStringW::Release);
 
 		lua_tinker::class_def<IStringW>(L,"GetLength",&IStringW::GetLength);
 		lua_tinker::class_def<IStringW>(L,"IsEmpty",&IStringW::IsEmpty);

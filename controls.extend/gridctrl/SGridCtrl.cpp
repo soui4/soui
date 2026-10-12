@@ -501,25 +501,21 @@ BOOL  SGridCell::PrintCell(IRenderTarget* pRT, int nRow, int nCol, RECT rect)
 }
 
 IGridInplaceWnd *  SGridCell::CreateInplaceWnd(CTHIS_ int nRow,int nCol) SCONST{
-    TplGridInplaceWnd<SEdit>* pEdit = new TplGridInplaceWnd<SEdit>(m_pGrid, nRow, nCol);
+    SGridInplaceEdit* pEdit = new SGridInplaceEdit(m_pGrid, nRow, nCol);
     if (!pEdit)
         return NULL;
     // Set edit properties
-    pEdit->SetAttribute(L"colorBkgnd", L"#FFFFFF", TRUE);
-    pEdit->SetAttribute(L"colorText", L"#000000", TRUE);
-    pEdit->SetAttribute(L"autoWordSel", L"1", TRUE);
+    pEdit->ApplyDefaultStyle();
 
     return pEdit;
 }
 
 IGridInplaceWnd *  SGridNumricCell::CreateInplaceWnd(CTHIS_ int nRow,int nCol) SCONST{
-    TplGridInplaceWnd<SEdit>* pEdit = new TplGridInplaceWnd<SEdit>(m_pGrid, nRow, nCol);
+    SGridInplaceEdit* pEdit = new SGridInplaceEdit(m_pGrid, nRow, nCol);
     if (!pEdit)
         return NULL;
     // Set edit properties
-    pEdit->SetAttribute(L"colorBkgnd", L"#FFFFFF", TRUE);
-    pEdit->SetAttribute(L"colorText", L"#000000", TRUE);
-    pEdit->SetAttribute(L"autoWordSel", L"1", TRUE);
+    pEdit->ApplyDefaultStyle();
     pEdit->SetAttribute(L"number", L"1", TRUE);
 
     return pEdit;
@@ -4125,7 +4121,9 @@ BOOL SGridCtrl::RegisterCellFactory(IGridCellFactory *pFactory)
             return FALSE;
         }
     }
-    m_cellFactories.Add(pFactory->Clone());
+    IGridCellFactory* pCloneFac = pFactory->Clone();
+    m_cellFactories.Add(pCloneFac);
+    pCloneFac->Release();
     return TRUE;
 }
 
@@ -5814,14 +5812,15 @@ void SGridCtrl::EndInplaceEdit(BOOL bSave)
         pInplaceWnd->GetIWindow()->Destroy();
     }
 
-    // Reset state
+    // Reset state (keep the edited cell id for the redraw below)
+    SCellID cellEdit = m_cellEdit;
     m_bInEdit = FALSE;
     m_cellEdit = SCellID(-1, -1);
 
     // Redraw the cell
-    if (m_cellEdit.IsValid())
+    if (cellEdit.IsValid())
     {
-        RedrawCell(m_cellEdit.row, m_cellEdit.col);
+        RedrawCell(cellEdit.row, cellEdit.col);
     }
     SetFocus();
 }
@@ -6004,14 +6003,12 @@ void SGridColorCell::SetText(LPCTSTR szText)
 
 IGridInplaceWnd* SGridColorCell::CreateInplaceWnd(int nRow, int nCol) const
 {
-    TplGridInplaceWnd<SEdit>* pEdit = new TplGridInplaceWnd<SEdit>(m_pGrid, nRow, nCol);
+    SGridInplaceEdit* pEdit = new SGridInplaceEdit(m_pGrid, nRow, nCol);
     if (!pEdit)
         return NULL;
 
     // Set edit properties
-    pEdit->SetAttribute(L"colorBkgnd", L"#FFFFFF", TRUE);
-    pEdit->SetAttribute(L"colorText", L"#000000", TRUE);
-    pEdit->SetAttribute(L"autoWordSel", L"1", TRUE);
+    pEdit->ApplyDefaultStyle();
 
     return pEdit;
 }

@@ -1,0 +1,7 @@
+<window name="inplace_root" width="400" height="320">
+    <treectrl name="tc" size="-2,100" itemHeight="20" editLabel="1" sbSkin="_skin.sys.scrollbar"/>
+    <listctrl name="lc" size="-2,120" headerHeight="20" itemHeight="20" editLabel="1" sbSkin="_skin.sys.scrollbar">
+        <headerStyle wndclass="header"/>
+    </listctrl>
+    <treectrl name="tc_noedit" size="-2,80" itemHeight="20" sbSkin="_skin.sys.scrollbar"/>
+</window>

@@ -237,6 +237,9 @@ extern "C" void ClearTypeUnInitialize()
 
 #endif
 
+void RegisterFETCs();
+void InitFontCache();
+
 extern "C"
 {
 
@@ -324,6 +327,12 @@ BOOL WINAPI DllMain(HINSTANCE hmod, DWORD dwReason, LPVOID lpvReserved)
 
 		if(!RichFRegisterClass())
 			return FALSE;
+		W32->InitSysParams();
+		W32->InitPreferredFontInfo();
+		RegisterFETCs();					// Register new clipboard formats
+		CreateFormatCaches();				// Create global format caches
+		InitKinsokuClassify();
+		InitFontCache();
 
 #ifdef CLEARTYPE_DEBUG
 		ClearTypeInitialize();

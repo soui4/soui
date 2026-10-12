@@ -30,15 +30,22 @@ SListCtrl::SListCtrl()
     , m_bHotTrack(FALSE)
     , m_bCheckBox(FALSE)
     , m_bMultiSelection(FALSE)
+    , m_bEditLabel(FALSE)
+    , m_pInplaceEdit(NULL)
+    , m_nEditItem(-1)
+    , m_nEditSubItem(-1)
 {
     m_bClipClient = TRUE;
     m_bFocusable = TRUE;
     m_evtSet.addEvent(EVENTID(EventLCSelChanging));
     m_evtSet.addEvent(EVENTID(EventLCSelChanged));
     m_evtSet.addEvent(EVENTID(EventItemSelChanged));
+    m_evtSet.addEvent(EVENTID(EventItemCheckState));
     m_evtSet.addEvent(EVENTID(EventLCDbClick));
     m_evtSet.addEvent(EVENTID(EventLCItemDeleted));
     m_evtSet.addEvent(EVENTID(EventLCRClick));
+    m_evtSet.addEvent(EVENTID(EventLCBeginEditLabel));
+    m_evtSet.addEvent(EVENTID(EventLCEndEditLabel));
 }
 
 SListCtrl::~SListCtrl()
@@ -95,6 +102,9 @@ int SListCtrl::InsertItem(int nItem, LPCTSTR pszText, int nImage)
     subItem.nImage = nImage;
 
     m_arrItems.InsertAt(nItem, lvi);
+    // The selection record lives at the control level and must stay parallel
+    // to m_arrItems; a fresh item starts unselected.
+    m_arrSelFlags.InsertAt(nItem, FALSE);
 
     UpdateScrollBar();
 
@@ -232,11 +242,14 @@ BOOL SListCtrl::SetItemCount(int nItems, int nGrowBy)
     BOOL bRet = m_arrItems.SetCount(nItems, nGrowBy);
     if (bRet)
     {
+        BOOL bRetFlags = m_arrSelFlags.SetCount(nItems, nGrowBy);
         for (int i = nOldCount; i < nItems; i++)
         {
             DXLVITEM &lvi = m_arrItems[i];
             lvi.arSubItems = new ArrSubItem;
             lvi.arSubItems->SetCount(GetColumnCount());
+            if (bRetFlags)
+                m_arrSelFlags.SetAt(i, FALSE);
         }
     }
     UpdateScrollBar();
@@ -391,6 +404,8 @@ void SListCtrl::DeleteItem(int nItem)
         }
         delete lvi.arSubItems;
         m_arrItems.RemoveAt(nItem);
+        // Keep the control-level selection record parallel to m_arrItems.
+        m_arrSelFlags.RemoveAt(nItem);
 
         UpdateScrollBar();
     }
@@ -427,6 +442,7 @@ void SListCtrl::DeleteAllItems()
 {
     m_nSelectItem = -1;
     m_nSelAnchor = -1;
+    m_arrSelFlags.RemoveAll();
     for (int i = 0; i < GetItemCount(); i++)
     {
         DXLVITEM &lvi = m_arrItems[i];
@@ -572,6 +588,10 @@ BOOL SListCtrl::SortItems(PFNLVCOMPAREEX pfnCompare, void *pContext)
     m_nSelectItem = -1;
     m_nSelAnchor = -1;
     m_nHoverItem = -1;
+    // The comparison protocol carries no item identity, so the selection
+    // flags cannot follow their items through the sort: clear the record.
+    for (int i = 0; i < m_arrSelFlags.GetCount(); i++)
+        m_arrSelFlags.SetAt(i, FALSE);
     InvalidateRect(GetListRect());
     return TRUE;
 }
@@ -635,7 +655,7 @@ void SListCtrl::DrawItem(IRenderTarget *pRT, CRect rcItem, int nItem)
             crItemBg = m_crItemBg2;
     }
 
-    if (lvItem.checked)
+    if (GetSelected(nItem))
     { // Separated from the condition of the if below, so there is a distinction between sel and hot
         if (m_pItemSkin != NULL)
             nBgImg = 2;
@@ -710,7 +730,7 @@ void SListCtrl::DrawItem(IRenderTarget *pRT, CRect rcItem, int nItem)
             CRect rcCheck;
             rcCheck.SetRect(0, 0, sizeSkin.cx, sizeSkin.cy);
             rcCheck.OffsetRect(rcCol.left + nOffsetX, rcCol.top + nOffsetY);
-            m_pCheckSkin->DrawByIndex(pRT, rcCheck, lvItem.checked ? 4 : 0);
+            m_pCheckSkin->DrawByIndex(pRT, rcCheck, lvItem.bCheck ? 4 : 0);
 
             rcCol.left = sizeSkin.cx + 6 + rcCol.left;
         }
@@ -756,6 +776,8 @@ void SListCtrl::DrawItem(IRenderTarget *pRT, CRect rcItem, int nItem)
 
 void SListCtrl::OnDestroy()
 {
+    if (IsInplaceEditing())
+        EndInplaceEdit(FALSE);
     DeleteAllItems();
 
     __baseCls::OnDestroy();
@@ -821,13 +843,21 @@ void SListCtrl::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
     BOOL bShiftPressed = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
     BOOL bMultiMode = m_bMultiSelection || m_bCheckBox;
 
+    // F2 starts in-place editing of the cursor item's first subitem.
+    if (nChar == VK_F2)
+    {
+        if (m_nSelectItem != -1)
+            BeginInplaceEdit(m_nSelectItem, 0);
+        return;
+    }
+
     // SPACE toggles the cursor item in multi-selection mode (parity with
     // SListView::OnKeyDown); single-selection lets the dialog handle it.
     if (nChar == VK_SPACE)
     {
         if (bMultiMode && m_nSelectItem != -1)
         {
-            NotifySelChange(m_nSelectItem, m_nSelectItem, FALSE, MK_CONTROL);
+            NotifySelChange(m_nSelectItem, m_nSelectItem, MK_CONTROL);
             return;
         }
         SetMsgHandled(FALSE);
@@ -841,13 +871,7 @@ void SListCtrl::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
         {
             for (int i = 0; i < nCount; i++)
             {
-                DXLVITEM &lvItem = m_arrItems[i];
-                if (!lvItem.checked)
-                {
-                    lvItem.checked = TRUE;
-                    RedrawItem(i);
-                    NotifyItemSelState(i, TRUE);
-                }
+                SetItemSel(i, TRUE);
             }
             if (m_nSelectItem == -1)
                 m_nSelectItem = 0;
@@ -912,18 +936,17 @@ void SListCtrl::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
     // Explorer semantics, mirroring SListView::OnKeyDown). In single
     // selection mode the modifier is dropped: Shift just moves the
     // selection like a plain arrow.
-    NotifySelChange(m_nSelectItem, nNewSel, FALSE, (bMultiMode && bShiftPressed) ? MK_SHIFT : 0);
+    NotifySelChange(m_nSelectItem, nNewSel, (bMultiMode && bShiftPressed) ? MK_SHIFT : 0);
 }
 
-void SListCtrl::NotifySelChange(int nOldSel, int nNewSel, BOOL checkBox, UINT nFlags)
+void SListCtrl::NotifySelChange(int nOldSel, int nNewSel, UINT nFlags)
 {
     // Plain re-selecting the already-selected item (or clearing an already
     // empty selection) in single-selection mode changes nothing: skip the
     // anchor-style event pair entirely (same early-return semantics as
-    // STreeView::SetSel / SViewBase::SetSel).
-    // Checkbox and modifier-key paths are excluded - they may flip other
-    // items, which is a real change.
-    if (!m_bMultiSelection && !checkBox && !m_bCheckBox && (nFlags & (MK_CONTROL | MK_SHIFT)) == 0 && nNewSel == nOldSel)
+    // STreeView::SetSel / SViewBase::SetSel). Modifier-key paths are
+    // excluded - they may flip other items, which is a real change.
+    if (!m_bMultiSelection && (nFlags & (MK_CONTROL | MK_SHIFT)) == 0 && nNewSel == nOldSel)
         return;
 
     // The anchor-style LC SelChanging/SelChanged are a single-selection
@@ -941,83 +964,47 @@ void SListCtrl::NotifySelChange(int nOldSel, int nNewSel, BOOL checkBox, UINT nF
             return;
     }
 
-    if (checkBox)
+    if ((m_bMultiSelection || m_bCheckBox) && (nFlags & MK_CONTROL))
     {
         if (nNewSel != -1)
         {
-            DXLVITEM &newItem = m_arrItems[nNewSel];
-            newItem.checked = newItem.checked ? FALSE : TRUE;
+            SetItemSel(nNewSel, !GetSelected(nNewSel));
             m_nSelectItem = nNewSel;
-            RedrawItem(nNewSel);
-            NotifyItemSelState(nNewSel, newItem.checked);
+        }
+    }
+    else if ((m_bMultiSelection || m_bCheckBox) && (nFlags & MK_SHIFT))
+    {
+        // Shift+Click: select the anchored range [anchor..clicked]
+        // (Explorer semantics: the anchor stays fixed, the set is
+        // replaced, so the range can shrink as well as grow). The flags
+        // are diffed instead of clear-all + refill, so rows already in
+        // the desired state are never touched: growing the range only
+        // flips/redraws the newly added rows, shrinking only the removed
+        // ones.
+        if (nNewSel != -1)
+        {
+            int nAnchor = (m_nSelAnchor != -1) ? m_nSelAnchor : nNewSel;
+            int imax = (nAnchor > nNewSel) ? nAnchor : nNewSel;
+            int imin = (imax == nAnchor) ? nNewSel : nAnchor;
+            int nItemCount = GetItemCount();
+            for (int i = 0; i < nItemCount; i++)
+            {
+                BOOL bInRange = (i >= imin && i <= imax);
+                if (bInRange != m_arrSelFlags[i])
+                    SetItemSel(i, bInRange);
+            }
+            // The clicked item becomes the new cursor; the anchor stays
+            // fixed so a following Shift+Click can shrink the range.
+            m_nSelectItem = nNewSel;
         }
     }
     else
     {
-        if ((m_bMultiSelection || m_bCheckBox) && (nFlags & MK_CONTROL))
+        ClearSelection();
+        if (nNewSel != -1)
         {
-            if (nNewSel != -1)
-            {
-                DXLVITEM &newItem = m_arrItems[nNewSel];
-                newItem.checked = newItem.checked ? FALSE : TRUE;
-                m_nSelectItem = nNewSel;
-                RedrawItem(nNewSel);
-                NotifyItemSelState(nNewSel, newItem.checked);
-            }
-        }
-        else if ((m_bMultiSelection || m_bCheckBox) && (nFlags & MK_SHIFT))
-        {
-            // Shift+Click: select the anchored range [anchor..clicked]
-            // (Explorer semantics: the anchor stays fixed, the set is
-            // replaced, so the range can shrink as well as grow).
-            if (nNewSel != -1)
-            {
-                int nAnchor = (m_nSelAnchor != -1) ? m_nSelAnchor : nNewSel;
-                int imax = (nAnchor > nNewSel) ? nAnchor : nNewSel;
-                int imin = (imax == nAnchor) ? nNewSel : nAnchor;
-                for (int i = 0; i < GetItemCount(); i++)
-                {
-                    DXLVITEM &lvItem = m_arrItems[i];
-                    BOOL bWant = (i >= imin && i <= imax);
-                    if (lvItem.checked != bWant)
-                    {
-                        lvItem.checked = bWant;
-                        RedrawItem(i);
-                        NotifyItemSelState(i, bWant);
-                    }
-                }
-                // The clicked item becomes the new cursor; the anchor stays
-                // fixed so a following Shift+Click can shrink the range.
-                m_nSelectItem = nNewSel;
-            }
-        }
-        else
-        {
-            m_nSelectItem = -1;
-            for (int i = 0; i < GetItemCount(); i++)
-            {
-                DXLVITEM &lvItem = m_arrItems[i];
-                if (i != nNewSel && lvItem.checked)
-                {
-                    BOOL last = lvItem.checked;
-                    lvItem.checked = FALSE;
-                    if (last != lvItem.checked)
-                    {
-                        RedrawItem(i);
-                        NotifyItemSelState(i, FALSE);
-                    }
-                }
-            }
-            if (nNewSel != -1)
-            {
-                DXLVITEM &newItem = m_arrItems[nNewSel];
-                BOOL bLast = newItem.checked;
-                newItem.checked = TRUE;
-                m_nSelectItem = nNewSel;
-                RedrawItem(nNewSel);
-                if (bLast != newItem.checked)
-                    NotifyItemSelState(nNewSel, TRUE);
-            }
+            SetItemSel(nNewSel, TRUE);
+            m_nSelectItem = nNewSel;
         }
     }
 
@@ -1038,6 +1025,11 @@ void SListCtrl::NotifySelChange(int nOldSel, int nNewSel, BOOL checkBox, UINT nF
 BOOL SListCtrl::OnScroll(BOOL bVertical, UINT uCode, int nPos)
 {
     BOOL bRet = __baseCls::OnScroll(bVertical, uCode, nPos);
+
+    // The editor is a plain child window: it would stay put while the items
+    // scroll away underneath it, so commit and close it on any scroll.
+    if (IsInplaceEditing())
+        EndInplaceEdit(TRUE);
 
     if (bVertical)
     {
@@ -1072,12 +1064,15 @@ void SListCtrl::OnLButtonDownEx(UINT nFlags, CPoint pt)
     m_nHoverItem = HitTest(pt, &nSubItem);
     BOOL hitCheckBox = HitCheckBox(pt);
 
+    // Selection and checkbox are independent: a checkbox click only flips
+    // the check flag (plus the multi-selection sync), it never moves the
+    // selection or the keyboard cursor.
     if (hitCheckBox)
-        NotifySelChange(m_nSelectItem, m_nHoverItem, TRUE, nFlags);
+        ToggleItemCheck(m_nHoverItem);
     else if (m_nHoverItem != m_nSelectItem && !m_bHotTrack)
-        NotifySelChange(m_nSelectItem, m_nHoverItem, FALSE, nFlags);
+        NotifySelChange(m_nSelectItem, m_nHoverItem, nFlags);
     else if (m_nHoverItem != -1 || m_nSelectItem != -1)
-        NotifySelChange(m_nSelectItem, m_nHoverItem, FALSE, nFlags);
+        NotifySelChange(m_nSelectItem, m_nHoverItem, nFlags);
 }
 
 void SListCtrl::OnLButtonUpEx(UINT nFlags, CPoint pt)
@@ -1091,11 +1086,16 @@ void SListCtrl::OnLButtonDbClick(UINT nFlags, CPoint pt)
     int nSubItem = -1;
     m_nHoverItem = HitTest(pt, &nSubItem);
 
+    // In edit-label mode the double click starts label editing on the hit
+    // subitem instead of selecting a column / firing the double-click event.
+    if (m_bEditLabel && m_nHoverItem != -1 && nSubItem != -1 && BeginInplaceEdit(m_nHoverItem, nSubItem))
+        return;
+
     // Select column
     SetSelectedColumn(nSubItem);
 
     if (m_nHoverItem != m_nSelectItem)
-        NotifySelChange(m_nSelectItem, m_nHoverItem, FALSE, nFlags);
+        NotifySelChange(m_nSelectItem, m_nHoverItem, nFlags);
 
     EventLCDbClick evt2(this);
     evt2.nCurSel = m_nHoverItem;
@@ -1120,6 +1120,8 @@ void SListCtrl::UpdateChildrenPosition()
 
 void SListCtrl::OnSize(UINT nType, CSize size)
 {
+    if (IsInplaceEditing())
+        EndInplaceEdit(TRUE);
     __baseCls::OnSize(nType, size);
     UpdateScrollBar();
     UpdateHeaderCtrl();
@@ -1132,6 +1134,10 @@ BOOL SListCtrl::OnHeaderClick(IEvtArgs *pEvt)
 
 BOOL SListCtrl::OnHeaderSizeChanging(IEvtArgs *pEvt)
 {
+    // Column widths changed: the editor rect would no longer match the
+    // subitem, so commit and close it.
+    if (IsInplaceEditing())
+        EndInplaceEdit(TRUE);
     UpdateScrollBar();
     InvalidateRect(GetListRect());
 
@@ -1167,7 +1173,7 @@ void SListCtrl::OnRubberBandStart()
     m_arrBandSnapshot.RemoveAll();
     for (int i = 0; i < GetItemCount(); i++)
     {
-        m_arrBandSnapshot.Add(m_arrItems[i].checked);
+        m_arrBandSnapshot.Add(m_arrSelFlags[i]);
     }
 }
 
@@ -1187,19 +1193,13 @@ void SListCtrl::OnRubberBandSelect(const CRect &rcBand, BOOL bAdd)
     iFirst = smin(smax(iFirst, 0), nCount - 1);
     iLast = smin(smax(iLast, iFirst), nCount - 1);
 
-    // Per-item realtime feedback: every row whose checked state flips fires
-    // EventItemSelChanged (via NotifyItemSelState). The anchor-style SelChanged
+    // Per-item realtime feedback: every row whose selection flips fires
+    // EventItemSelChanged (via SetItemSel). The anchor-style SelChanged
     // is a single-selection event and is never fired in the band path.
     for (int i = 0; i < nCount; i++)
     {
-        BOOL bWant = (i >= iFirst && i <= iLast) || (bAdd && m_arrItems[i].checked);
-        BOOL bLast = m_arrItems[i].checked;
-        if (bLast != bWant)
-        {
-            m_arrItems[i].checked = bWant;
-            RedrawItem(i);
-            NotifyItemSelState(i, bWant);
-        }
+        BOOL bWant = (i >= iFirst && i <= iLast) || (bAdd && m_arrSelFlags[i]);
+        SetItemSel(i, bWant);
     }
     m_nSelectItem = iLast;
 }
@@ -1208,20 +1208,14 @@ void SListCtrl::OnRubberBandEnd(const CRect &rcBand, BOOL bCancelled)
 {
     if (bCancelled)
     {
-        // ESC / external cancel: restore the checked states taken at band
-        // start. Each restored row fires its per-item event
+        // ESC / external cancel: restore the selection snapshot taken at
+        // band start. Each restored row fires its per-item event
         // (EventItemSelChanged) below; the anchor-style SelChanged is a
         // single-selection event and is not fired for multi-selection bands.
         int nCount = smin(GetItemCount(), (int)m_arrBandSnapshot.GetCount());
         for (int i = 0; i < nCount; i++)
         {
-            BOOL bWant = m_arrBandSnapshot[i];
-            if (m_arrItems[i].checked != bWant)
-            {
-                m_arrItems[i].checked = bWant;
-                RedrawItem(i);
-                NotifyItemSelState(i, bWant);
-            }
+            SetItemSel(i, m_arrBandSnapshot[i]);
         }
         m_nSelectItem = m_iBandOldSel;
         m_nSelAnchor = m_nSelectItem;
@@ -1246,25 +1240,87 @@ void SListCtrl::OnMouseLeave()
     __baseCls::OnMouseLeave();
 }
 
-BOOL SListCtrl::GetCheckState(int nItem)
+void SListCtrl::SetItemSel(int iItem, BOOL bSelected)
 {
-    if (nItem >= GetItemCount())
-        return FALSE;
+    if (iItem < 0 || iItem >= GetItemCount())
+        return;
 
-    const DXLVITEM lvItem = m_arrItems[nItem];
-    return lvItem.checked;
+    // The selection record lives in the control-level flag array, parallel
+    // to m_arrItems; repaint and fire the per-item event only on a flip.
+    if (m_arrSelFlags[iItem] == bSelected)
+        return;
+    m_arrSelFlags.SetAt(iItem, bSelected);
+    RedrawItem(iItem);
+    NotifyItemSelState(iItem, bSelected);
 }
 
-BOOL SListCtrl::SetCheckState(int nItem, BOOL bCheck)
+void SListCtrl::ClearSelection()
+{
+    for (int i = 0; i < GetItemCount(); i++)
+    {
+        SetItemSel(i, FALSE);
+    }
+}
+
+BOOL SListCtrl::GetSelected(int nItem) const
+{
+    if (nItem < 0 || nItem >= m_arrSelFlags.GetCount())
+        return FALSE;
+
+    return m_arrSelFlags[nItem];
+}
+
+UINT SListCtrl::GetItemState(int nItem, UINT nMask) const
+{
+    UINT nState = 0;
+    if (nMask & S_LVIS_FOCUSED && nItem == m_nSelectItem)
+        nState |= S_LVIS_FOCUSED;
+    if (nMask & S_LVIS_SELECTED && GetSelected(nItem))
+        nState |= S_LVIS_SELECTED;
+    return nState;
+}
+
+void SListCtrl::SetItemState(int nItem, UINT nState, UINT nMask)
+{
+    if (nItem < 0 || nItem >= GetItemCount())
+        return;
+
+    if (nMask & S_LVIS_SELECTED)
+        SetItemSel(nItem, (nState & S_LVIS_SELECTED) != 0);
+    if (nMask & S_LVIS_FOCUSED && m_nSelectItem != nItem)
+    {
+        // Move the keyboard cursor without touching the selection set.
+        int nOldCursor = m_nSelectItem;
+        m_nSelectItem = nItem;
+        if (nOldCursor != -1)
+            RedrawItem(nOldCursor);
+        RedrawItem(nItem);
+    }
+}
+
+BOOL SListCtrl::GetCheck(int nItem) const
+{
+    if (nItem < 0 || nItem >= GetItemCount())
+        return FALSE;
+
+    return m_arrItems[nItem].bCheck;
+}
+
+BOOL SListCtrl::SetCheck(int nItem, BOOL bCheck)
 {
     if (!m_bCheckBox)
         return FALSE;
 
-    if (nItem >= GetItemCount())
+    if (nItem < 0 || nItem >= GetItemCount())
         return FALSE;
 
     DXLVITEM &lvItem = m_arrItems[nItem];
-    lvItem.checked = bCheck;
+    if (lvItem.bCheck != bCheck)
+    {
+        lvItem.bCheck = bCheck;
+        RedrawItem(nItem);
+        NotifyItemCheckState(nItem, bCheck);
+    }
 
     return TRUE;
 }
@@ -1275,51 +1331,66 @@ int SListCtrl::GetCheckedItemCount()
 
     for (int i = 0; i < GetItemCount(); i++)
     {
-        const DXLVITEM lvItem = m_arrItems[i];
-        if (lvItem.checked)
+        if (m_arrItems[i].bCheck)
             ret++;
     }
 
     return ret;
 }
 
-int SListCtrl::GetSelItemCount() const
+UINT SListCtrl::GetSelectedCount() const
 {
-    if (m_bMultiSelection)
+    UINT nCount = 0;
+    for (int i = 0; i < m_arrSelFlags.GetCount(); i++)
     {
-        // Multi-selection mode: the checked flags are the only record.
-        int nCount = 0;
-        for (int i = 0; i < GetItemCount(); i++)
-        {
-            if (m_arrItems[i].checked)
-                nCount++;
-        }
-        return nCount;
+        if (m_arrSelFlags[i])
+            nCount++;
     }
-    // Single-selection mode: 1 while the anchor is set.
-    return m_nSelectItem != -1 ? 1 : 0;
+    return nCount;
 }
 
-int SListCtrl::GetSelItems(int *items, int nMaxCount) const
+int SListCtrl::GetSelItems(int nMaxItems, int *rgIndex) const
 {
-    if (m_bMultiSelection)
+    int nCount = 0;
+    for (int i = 0; i < GetItemCount() && nCount < nMaxItems; i++)
     {
-        // Multi-selection mode: enumerate the checked items.
-        int nCount = 0;
-        for (int i = 0; i < GetItemCount() && nCount < nMaxCount; i++)
+        if (m_arrSelFlags[i])
+            rgIndex[nCount++] = i;
+    }
+    return nCount;
+}
+
+SPOSITION SListCtrl::GetFirstSelectedItemPosition() const
+{
+    for (int i = 0; i < GetItemCount(); i++)
+    {
+        if (m_arrSelFlags[i])
+            return (SPOSITION)(INT_PTR)(i + 1);
+    }
+    return NULL;
+}
+
+int SListCtrl::GetNextSelectedItem(SPOSITION &pos) const
+{
+    // The cursor encodes (item index + 1), so a valid position is never NULL.
+    int i = (int)(INT_PTR)pos - 1;
+    if (i < 0 || i >= GetItemCount() || !m_arrSelFlags[i])
+    {
+        pos = NULL;
+        return -1;
+    }
+
+    int nRet = i;
+    pos = NULL;
+    for (int j = i + 1; j < GetItemCount(); j++)
+    {
+        if (m_arrSelFlags[j])
         {
-            if (m_arrItems[i].checked)
-                items[nCount++] = i;
+            pos = (SPOSITION)(INT_PTR)(j + 1);
+            break;
         }
-        return nCount;
     }
-    // Single-selection mode: report the anchor.
-    if (m_nSelectItem != -1 && nMaxCount > 0)
-    {
-        items[0] = m_nSelectItem;
-        return 1;
-    }
-    return 0;
+    return nRet;
 }
 
 int SListCtrl::GetFirstCheckedItem()
@@ -1327,8 +1398,7 @@ int SListCtrl::GetFirstCheckedItem()
     int ret = -1;
     for (int i = 0; i < GetItemCount(); i++)
     {
-        const DXLVITEM lvItem = m_arrItems[i];
-        if (lvItem.checked)
+        if (m_arrItems[i].bCheck)
         {
             ret = i;
             break;
@@ -1343,8 +1413,7 @@ int SListCtrl::GetLastCheckedItem()
     int ret = -1;
     for (int i = GetItemCount() - 1; i >= 0; i--)
     {
-        const DXLVITEM lvItem = m_arrItems[i];
-        if (lvItem.checked)
+        if (m_arrItems[i].bCheck)
         {
             ret = i;
             break;
@@ -1354,9 +1423,165 @@ int SListCtrl::GetLastCheckedItem()
     return ret;
 }
 
+void SListCtrl::ToggleItemCheck(int nItem)
+{
+    if (!m_bCheckBox || nItem < 0 || nItem >= GetItemCount())
+        return;
+
+    // The clicked item flips its check state; in multi-selection mode a
+    // click on a selected item applies the new state to every selected
+    // item. The selection record and the keyboard cursor stay untouched.
+    DXLVITEM &lvItem = m_arrItems[nItem];
+    BOOL bNewCheck = lvItem.bCheck ? FALSE : TRUE;
+    lvItem.bCheck = bNewCheck;
+    RedrawItem(nItem);
+    NotifyItemCheckState(nItem, bNewCheck);
+    if (m_bMultiSelection && m_arrSelFlags[nItem])
+    {
+        for (int i = 0; i < GetItemCount(); i++)
+        {
+            DXLVITEM &item = m_arrItems[i];
+            if (i == nItem || !m_arrSelFlags[i] || item.bCheck == bNewCheck)
+                continue;
+            item.bCheck = bNewCheck;
+            RedrawItem(i);
+            NotifyItemCheckState(i, bNewCheck);
+        }
+    }
+}
+
 SHeaderCtrl *SListCtrl::GetHeaderCtrl() const
 {
     return m_pHeader;
+}
+
+//////////////////////////////////////////////////////////////////////////
+// In-place label editing
+
+BOOL SListCtrl::GetInplaceEditRect(int nItem, int nSubItem, CRect &rcEdit)
+{
+    rcEdit = GetItemRect(nItem, nSubItem);
+    if (rcEdit.IsRectEmpty())
+        return FALSE;
+
+    // Replicate the text rect offsets of DrawItem for the target column.
+    if (nSubItem == 0 && m_bCheckBox && m_pCheckSkin)
+    {
+        CSize sizeSkin = m_pCheckSkin->GetSkinSize();
+        rcEdit.left += sizeSkin.cx + 6;
+    }
+
+    const DXLVSUBITEM &subItem = m_arrItems[nItem].arSubItems->GetAt(nSubItem);
+    BOOL bHasIcon = subItem.nImage != -1 && m_pIconSkin != NULL;
+    if (m_ptText.x == -1)
+    {
+        if (bHasIcon)
+        {
+            int nItemHeight = m_nItemHeight.toPixelSize(GetScale());
+            CSize sizeSkin = m_pIconSkin->GetSkinSize();
+            int nOffsetX = m_ptIcon.x == -1 ? nItemHeight / 6 : m_ptIcon.x;
+            rcEdit.left += nOffsetX + sizeSkin.cx + nItemHeight / 6;
+        }
+        // Without an icon the text starts at the column left edge.
+    }
+    else
+    {
+        rcEdit.left += m_ptText.x;
+    }
+    // The right edge stays at the column's right edge.
+    return rcEdit.right > rcEdit.left;
+}
+
+BOOL SListCtrl::BeginInplaceEdit(int nItem, int nSubItem)
+{
+    if (!m_bEditLabel || IsInplaceEditing())
+        return FALSE;
+    if (!(nItem >= 0 && nItem < GetItemCount() && nSubItem >= 0 && nSubItem < GetColumnCount()))
+        return FALSE;
+
+    CRect rcEdit;
+    if (!GetInplaceEditRect(nItem, nSubItem, rcEdit))
+        return FALSE;
+
+    // Let the application cancel the session or style the editor.
+    SStringW strStyle;
+    EventLCBeginEditLabel evtBegin(this);
+    evtBegin.nItem = nItem;
+    evtBegin.nSubItem = nSubItem;
+    evtBegin.strStyle = &strStyle;
+    evtBegin.bCancel = FALSE;
+    FireEvent(evtBegin);
+    if (evtBegin.bCancel)
+        return FALSE;
+
+    SInplaceEdit *pEdit = new SInplaceEdit(this);
+    InsertIChild(pEdit);
+    pEdit->GetStyle().SetScale(GetScale());
+
+    if (strStyle.IsEmpty())
+    {
+        pEdit->ApplyDefaultStyle();
+        pEdit->InitFromXml(NULL);
+    }
+    else
+    {
+        SXmlDoc xmlDoc;
+        xmlDoc.LoadBufferInplace((void *)strStyle.c_str(), strStyle.GetLength() * sizeof(wchar_t),
+            xml_parse_default, sizeof(wchar_t) == 2 ? enc_utf16 : enc_utf32);
+        pEdit->InitFromXml(xmlDoc.Root()->FirstChild());
+    }
+
+    pEdit->SetWindowText(GetSubItemText(nItem, nSubItem));
+    pEdit->Move(rcEdit);
+    pEdit->SetVisible(TRUE, TRUE);
+    pEdit->SetFocus();
+    pEdit->SetSel(0, -1, TRUE);
+
+    m_pInplaceEdit = pEdit;
+    m_nEditItem = nItem;
+    m_nEditSubItem = nSubItem;
+    return TRUE;
+}
+
+void SListCtrl::EndInplaceEdit(BOOL bSave)
+{
+    if (!m_pInplaceEdit)
+        return;
+
+    int nEditItem = m_nEditItem;
+    int nEditSubItem = m_nEditSubItem;
+    SStringT strText = m_pInplaceEdit->GetWindowText();
+
+    // Detach first: handing the focus back (or destroying the editor)
+    // re-enters OnInplaceEditEnd through WM_KILLFOCUS.
+    SInplaceEdit *pEdit = m_pInplaceEdit;
+    m_pInplaceEdit = NULL;
+    m_nEditItem = -1;
+    m_nEditSubItem = -1;
+
+    if (bSave)
+        SetSubItemText(nEditItem, nEditSubItem, strText);
+
+    EventLCEndEditLabel evt(this);
+    evt.nItem = nEditItem;
+    evt.nSubItem = nEditSubItem;
+    evt.strText = &strText;
+    evt.bCancel = !bSave;
+    FireEvent(evt);
+
+    // Hand the focus back to the control before destroying the editor so
+    // the pending WM_KILLFOCUS finds a detached session (no-op).
+    SetFocus();
+
+    pEdit->SetVisible(FALSE, TRUE);
+    pEdit->Destroy();
+
+    RedrawItem(nEditItem);
+}
+
+void SListCtrl::OnInplaceEditEnd(BOOL bSave)
+{
+    EndInplaceEdit(bSave);
 }
 
 SNSEND

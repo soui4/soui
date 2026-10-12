@@ -3,5 +3,6 @@
         <file name="XML_CORE_E2E" path="xml\core_e2e.xml"/>
         <file name="XML_CORE_TEMPLATE_E2E" path="xml\core_e2e_template.xml"/>
         <file name="XML_FRAME_E2E" path="xml\core_e2e_frame.xml"/>
+        <file name="XML_INPLACE_EDIT_E2E" path="xml\core_e2e_inplace_edit.xml"/>
     </LAYOUT>
 </resource>
