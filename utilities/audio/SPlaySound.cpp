@@ -1,75 +1,98 @@
-// SPlaySound 的 Windows 实现:MCI 线程化播放(原 games/audio/win32_audio 模块
-// 并入 utilities4,导出函数由 Win32PlaySound 更名为 SPlaySound)。
-// 仅 Windows 编译:utilities/CMakeLists.txt 在 Windows 分支把本文件加入 utilities4。
-#include <windows.h>
+﻿#include <windows.h>
 #include <mmsystem.h>
+#include <process.h>
 #include <stdio.h>
 #include <tchar.h>
-#include <mutex>
-#include <map>
-#include <thread>
-#include <memory>
-#include <atomic>
-#include <chrono>
-
+#include <souicoll.h>
+#include <helper/slog.h>
+#define kLogTag "SPlaySound"
 #pragma comment(lib, "winmm.lib")
+
+SNSBEGIN
 
 // 播放状态结构体
 struct PlayStatus {
-    std::atomic<bool> bStop;
-    std::atomic<bool> bDone;
-    UINT deviceId; // MCI设备ID
-    TCHAR fileName[MAX_PATH]; // 音频文件名
+    HANDLE hStop;    // 手动重置事件:置位=请求停止本次播放
+    HANDLE hDone;    // 手动重置事件:置位=播放线程已退出
+    HANDLE hThread;  // 播放线程句柄(由 AudioPlayer 持有,回收时 WaitForSingleObject + CloseHandle)
+    DWORD  deviceId; // MCI设备ID(仅播放线程读写)
+    TCHAR  fileName[MAX_PATH]; // 音频文件名
+
+    PlayStatus() {
+        hStop = NULL;
+        hDone = NULL;
+        hThread = NULL;
+        deviceId = 0;
+        fileName[0] = _T('\0');
+    }
 };
 
 class AudioPlayer {
 private:
-    std::mutex m_mutex;
-    // 使用map存储线程ID到播放状态的映射
-    std::map<std::thread::id, std::shared_ptr<PlayStatus>> m_threads;
+    CRITICAL_SECTION m_cs;      // 保护 m_items
+    SList<PlayStatus *> m_items; // 尚未回收的播放项
 
-    AudioPlayer() {}
+    AudioPlayer() {
+        ::InitializeCriticalSection(&m_cs);
+    }
 
     ~AudioPlayer() {
         stopAll();
+        ::DeleteCriticalSection(&m_cs);
     }
 
-    // 停止所有音频播放
+    // 回收线程:bAll=TRUE 时请求全部停止并等待线程退出,否则只回收已退出的。
+    // 等待放在临界区之外,避免与播放线程互相阻塞。
+    void reapThreads(BOOL bAll) {
+        SList<PlayStatus *> localItems;
+
+        ::EnterCriticalSection(&m_cs);
+        SPOSITION pos = m_items.GetHeadPosition();
+        while (pos) {
+            // 先记住当前节点,GetNext 会把 pos 推进到下一个节点
+            SPOSITION posCur = pos;
+            PlayStatus *p = m_items.GetNext(pos);
+            if (bAll || ::WaitForSingleObject(p->hDone, 0) == WAIT_OBJECT_0) {
+                // 先置停止事件再摘除,线程随后会自行关闭MCI设备并置位 hDone
+                ::SetEvent(p->hStop);
+                localItems.AddTail(p);
+                m_items.RemoveAt(posCur);
+            }
+        }
+        ::LeaveCriticalSection(&m_cs);
+
+        // 等线程真正退出后才释放句柄与状态,避免线程使用已回收的对象
+        SPOSITION posWait = localItems.GetHeadPosition();
+        while (posWait) {
+            PlayStatus *p = localItems.GetNext(posWait);
+            ::WaitForSingleObject(p->hThread, INFINITE);
+            ::CloseHandle(p->hThread);
+            ::CloseHandle(p->hStop);
+            ::CloseHandle(p->hDone);
+            delete p;
+        }
+    }
+
+    // 停止所有音频播放(并等待播放线程退出)
     void stopAll() {
-        // 将线程列表移动到本地，避免持有互斥锁时等待线程
-        std::map<std::thread::id, std::shared_ptr<PlayStatus>> localThreads;
-        {
-            std::lock_guard<std::mutex> lock(m_mutex);
-            for (auto &pair : m_threads) {
-                pair.second->bStop.store(true);
-            }
-            // 转移所有权
-            localThreads.swap(m_threads);
-        }
-
-        // 关闭所有MCI设备
-        for (auto &pair : localThreads) {
-            if (pair.second->deviceId != 0) {
-                mciSendCommand(pair.second->deviceId, MCI_CLOSE, 0, 0);
-            }
-        }
+        reapThreads(TRUE);
     }
 
-    // 清理已完成的线程
+    // 清理已结束的线程
     void cleanupThreads() {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        for (auto it = m_threads.begin(); it != m_threads.end();) {
-            if (it->second->bDone.load()) {
-                // 线程已完成，从map中移除
-                it = m_threads.erase(it);
-            } else {
-                ++it;
-            }
-        }
+        reapThreads(FALSE);
     }
 
-    // 音频播放线程函数
-    static void playThreadFunc(std::shared_ptr<PlayStatus> status) {
+    // 音频播放线程函数(_beginthreadex 要求 __stdcall,返回 unsigned)
+    static unsigned __stdcall playThreadProc(void *pArg) {
+        PlayStatus *status = (PlayStatus *)pArg;
+
+        // 若已收到停止请求(极端顺序下可能发生),无需再打开设备
+        if (::WaitForSingleObject(status->hStop, 0) == WAIT_OBJECT_0) {
+            ::SetEvent(status->hDone);
+            return 0;
+        }
+
         // 打开MCI设备
         MCI_OPEN_PARMS mciOpenParms = { 0 };
         mciOpenParms.lpstrDeviceType = _T("waveaudio");
@@ -83,33 +106,33 @@ private:
             // 播放音频
             MCI_PLAY_PARMS mciPlayParms = { 0 };
             error = mciSendCommand(status->deviceId, MCI_PLAY, MCI_NOTIFY, (DWORD_PTR)&mciPlayParms);
-
+			//SLOGI() << "SPlaySound: Playing " << status->fileName << ", deviceId=" << status->deviceId << ", error=" << error;
             if (error == 0) {
-                // 等待播放完成或停止信号
+                // 等待播放完成或停止事件:超时 10ms 轮询一次播放状态,避免 CPU 空转
                 MCI_STATUS_PARMS mciStatusParms = { 0 };
                 mciStatusParms.dwItem = MCI_STATUS_MODE;
 
-                while (!status->bStop.load()) {
+                while (::WaitForSingleObject(status->hStop, 10) == WAIT_TIMEOUT) {
                     // 检查播放状态
                     mciSendCommand(status->deviceId, MCI_STATUS, MCI_STATUS_ITEM, (DWORD_PTR)&mciStatusParms);
                     if (mciStatusParms.dwReturn == MCI_MODE_STOP) {
                         break;
                     }
-                    // 短暂睡眠，避免CPU占用过高
-                    std::this_thread::sleep_for(std::chrono::milliseconds(10));
                 }
             }
 
-            // 关闭设备
-            mciSendCommand(status->deviceId, MCI_CLOSE, 0, 0);
+            // 关闭设备:唯一的关闭点,只由打开设备的线程执行
+            mciSendCommand(status->deviceId, MCI_CLOSE, MCI_WAIT, 0);
+			//SLOGI() << "SPlaySound: Closed deviceId=" << status->deviceId;
         }
 
-        // 设置播放完成标志
-        status->bDone.store(true);
+        // 通知回收方:本次播放已结束
+        ::SetEvent(status->hDone);
+        return 0;
     }
 
 public:
-    BOOL play(LPCSTR pszSound, BOOL bPurge) {
+    BOOL play(LPCTSTR pszSound, BOOL bPurge) {
         // 如果是停止播放请求
         if (pszSound == NULL || pszSound[0] == '\0') {
             stopAll();
@@ -119,35 +142,37 @@ public:
         // 如果需要清除当前播放
         if (bPurge) {
             stopAll();
+        } else {
+            // 清理已结束的线程
+            cleanupThreads();
         }
 
-        // 清理已完成的线程
-        cleanupThreads();
+        // 创建播放状态与同步用的内核对象
+        PlayStatus *status = new PlayStatus;
+        status->hStop = ::CreateEvent(NULL, TRUE, FALSE, NULL);
+        status->hDone = ::CreateEvent(NULL, TRUE, FALSE, NULL);
+        if (status->hStop == NULL || status->hDone == NULL) {
+            if (status->hStop) ::CloseHandle(status->hStop);
+            if (status->hDone) ::CloseHandle(status->hDone);
+            delete status;
+            return FALSE;
+        }
+        _tcsncpy(status->fileName, pszSound, MAX_PATH - 1);
 
-        // 创建播放状态
-        auto status = std::make_shared<PlayStatus>();
-        status->bStop.store(false);
-        status->bDone.store(false);
-        status->deviceId = 0;
+        // 先登记再启动线程(两步都在临界区内完成):这样 stopAll()/cleanupThreads()
+        // 在任意时刻都一定能看到这次播放并把它回收掉,不会漏掉线程与设备。
+        ::EnterCriticalSection(&m_cs);
+        status->hThread = (HANDLE)_beginthreadex(NULL, 0, playThreadProc, status, 0, NULL);
+        if (status->hThread != NULL) {
+            m_items.AddTail(status);
+        }
+        ::LeaveCriticalSection(&m_cs);
 
-        // 转换文件名到TCHAR
-        #ifdef _UNICODE
-        MultiByteToWideChar(CP_ACP, 0, pszSound, -1, status->fileName, MAX_PATH);
-        #else
-        strcpy(status->fileName, pszSound);
-        #endif
-
-        // 创建播放线程
-        std::thread playThread(playThreadFunc, status);
-        std::thread::id threadId = playThread.get_id();
-
-        // 分离线程，使其自动清理
-        playThread.detach();
-
-        // 将线程添加到map中
-        {
-            std::lock_guard<std::mutex> lock(m_mutex);
-            m_threads[threadId] = status;
+        if (status->hThread == NULL) {
+            ::CloseHandle(status->hStop);
+            ::CloseHandle(status->hDone);
+            delete status;
+            return FALSE;
         }
 
         return TRUE;
@@ -159,27 +184,15 @@ public:
     }
 };
 
+SNSEND
+
 // 增强版PlaySound函数，按照Linux版本的线程模型实现
-BOOL WINAPI SPlaySound(LPCTSTR pszSound, HMODULE hmod, DWORD fdwSound) {
+UTILITIES_API BOOL SPlaySound(LPCTSTR pszSound, HMODULE hmod, DWORD fdwSound) {
     // 检查是否是系统声音别名或资源
     if (pszSound != NULL && !(fdwSound & SND_FILENAME)) {
         // 回退到原始PlaySound处理系统声音或资源
         return PlaySound(pszSound, hmod, fdwSound);
     }
-
-    // 转换LPCTSTR到LPCSTR
-    LPCSTR soundStr = NULL;
-    char soundBuf[MAX_PATH];
-
-    if (pszSound != NULL) {
-        #ifdef _UNICODE
-        WideCharToMultiByte(CP_ACP, 0, pszSound, -1, soundBuf, MAX_PATH, NULL, NULL);
-        soundStr = soundBuf;
-        #else
-        soundStr = pszSound;
-        #endif
-    }
-
     // 调用AudioPlayer的play方法
-    return AudioPlayer::getInstance()->play(soundStr, fdwSound & SND_PURGE);
+    return SNS::AudioPlayer::getInstance()->play(pszSound, fdwSound & SND_PURGE);
 }

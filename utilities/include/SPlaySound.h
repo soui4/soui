@@ -11,6 +11,6 @@
 #include <windows.h>
 #include <mmsystem.h>
 
-BOOL WINAPI SPlaySound(LPCTSTR pszSound, HMODULE hmod, DWORD fdwSound);
+UTILITIES_API BOOL SPlaySound(LPCTSTR pszSound, HMODULE hmod, DWORD fdwSound);
 
 #endif//__SPLAYSOUND_H__
