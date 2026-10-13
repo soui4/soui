@@ -1,4 +1,4 @@
-﻿/**
+/**
  * test_lua.cpp —— script_lua 模块导出 SOUI 对象的创建/释放调试测试。
  *
  * 设计约束（按需求）：
@@ -475,4 +475,185 @@ TEST_F(soui_lua_app, lua_function_slot_release)
         "o:Release()\n"
         "o = nil\n"
         "collectgarbage(\"collect\")\n"));
+}
+
+// ========================================================================
+// C 组：demo lua 脚本(test.lua)游戏数据层回归
+// ========================================================================
+// demos/demo/uires/lua/test.lua 承载脚本演示页(跑马机/消消乐/俄罗斯方块)
+// 的全部逻辑。俄罗斯方块的数据层(形状预计算/旋转踢墙/碰撞/消行/计分/
+// 7-bag/加速曲线)是纯 lua 函数,所有 UI 调用都有 root/wndBoard == nil 守卫,
+// 因此整个脚本可以在 headless 的 scriptmodule-lua state 里整体执行后,
+// 直接驱动数据层做断言。该数据层曾出过两个真实缺陷(消行下沉丢行、
+// 消行计分表错位),这里把回归断言持久化。
+//
+// headless 执行 test.lua 的安全性依据:
+//   - 顶层仅定义全局常量/函数,唯一执行语句是 pcall(NativeCall,...)+slog,
+//     NativeCall 出错有 pcall 兜底,slog 经 exp_global::set_print_callback 注册;
+//   - 全局 T/L 由 SScriptModule_Lua 构造函数 luaL_dostring 注册
+//     (非 WIN32 分支为纯标识函数),不依赖 app/translator 资源;
+//   - tetris_set_start_btn/set_digits/show_state 有 root==nil 守卫,
+//     tetris_render/render_next 有 wndBoard==nil 守卫,
+//     tetris_game_over 在 wndBoard==nil 时不弹 SMessageBox 直接返回,
+//     tetris.timer 为 nil 时 start/pause/resume 跳过计时器操作。
+//
+// 断言方式:demo 脚本全文 + 断言片段拼成同一 chunk 经 executeScriptBuffer
+// 执行,任一 assert 失败即中止脚本 → flag 文件不出现 → 用例失败,
+// lua 错误消息(含 assert 的上下文文本)经 print_error 输出到 log4z 日志。
+static ::testing::AssertionResult LoadDemoTestLua(std::string &out)
+{
+    std::string path = std::string(SOUI_FUN_TEST_DEMO_UIRES) + "/lua/test.lua";
+    FILE *fp = fopen(path.c_str(), "rb");
+    if (!fp)
+        return ::testing::AssertionFailure() << "cannot open demo lua script: " << path;
+    char buf[8192];
+    size_t n;
+    while ((n = fread(buf, 1, sizeof(buf), fp)) > 0)
+        out.append(buf, n);
+    fclose(fp);
+    if (out.empty())
+        return ::testing::AssertionFailure() << "empty demo lua script: " << path;
+    return ::testing::AssertionSuccess();
+}
+
+// 形状预计算/边界碰撞/旋转踢墙(对应数据层回归 1-4 组)
+TEST_F(soui_lua_app, tetris_lua_shapes_collision)
+{
+    std::string script;
+    ASSERT_TRUE(LoadDemoTestLua(script));
+    script += R"LUA(
+-- UI 对象保持 nil 即为纯数据环境:数据层函数各自有 nil 守卫
+tetris.wndBoard = nil; tetris.wndNext = nil; tetris.root = nil; tetris.timer = nil;
+math.randomseed(42);
+tetris_build_cells();
+
+-- 1) 形状预计算:7 种方块 x 4 旋转态,每个态恰好 4 格
+for kind = 1, 7 do
+  for rot = 1, 4 do
+    assert(tetris_cells[kind][rot] ~= nil and #tetris_cells[kind][rot].cells == 4,
+           "cells of kind "..kind.." rot "..rot);
+  end
+end
+-- I 块横/竖尺寸交替 4x1 与 1x4
+assert(tetris_cells[1][1].w == 4 and tetris_cells[1][1].h == 1 and
+       tetris_cells[1][2].w == 1 and tetris_cells[1][2].h == 4,
+       "I piece rot dims alternate 4x1/1x4");
+-- O 块四个旋转态尺寸一致
+for rot = 2, 4 do
+  assert(tetris_cells[2][rot].w == tetris_cells[2][1].w and
+         tetris_cells[2][rot].h == tetris_cells[2][1].h,
+         "O piece rot "..rot.." dims identical");
+end
+
+-- 2) 边界与碰撞
+tetris_reset_data();
+assert(tetris_can_place(1, 1, 0, 0), "I horizontal fits at (0,0)");
+assert(tetris_can_place(1, 1, 6, 0), "I horizontal fits at x=6 (cells 6..9)");
+assert(not tetris_can_place(1, 1, 7, 0), "I horizontal rejected at x=7 (x=10 overflow)");
+assert(tetris_can_place(1, 1, 0, 19), "I horizontal fits at bottom row 19");
+assert(not tetris_can_place(1, 1, 0, 20), "I horizontal rejected below board");
+tetris.grid[0][3] = 1;
+assert(not tetris_can_place(1, 1, 0, 0), "overlap with locked cell rejected");
+
+-- 3) 旋转与踢墙:全部踢位重叠时旋转失败;单列障碍可被 +2 踢位越过
+tetris_reset_data();
+for y = 0, 3 do for x = 1, 5 do tetris.grid[y][x] = 1 end end -- 5 列宽障碍盖住全部踢位
+tetris.cur = {kind = 1, rot = 2, x = 0, y = 0};               -- I 竖态贴左墙
+assert(not tetris_try_rotate(), "rotate blocked when all kicks overlap");
+assert(tetris.cur.rot == 2, "rot unchanged after failed rotate");
+for y = 0, 3 do for x = 1, 5 do tetris.grid[y][x] = 0 end end
+assert(tetris_try_rotate(), "rotate succeeds once obstacle cleared");
+assert(tetris.cur.rot == 3, "rot advanced to 3");
+tetris_reset_data();
+for y = 0, 3 do tetris.grid[y][1] = 1 end                     -- 单列障碍
+tetris.cur = {kind = 1, rot = 2, x = 0, y = 0};
+assert(tetris_try_rotate(), "kick +2 crosses single-column obstacle");
+assert(tetris.cur.rot == 3 and tetris.cur.x == 2, "kick shifts piece 2 cells right");
+)LUA";
+    EXPECT_TRUE(Run("tetris1", script));
+}
+
+// 消行下沉与计分/升级加速/硬降/7-bag/暂停恢复/游戏结束(对应数据层回归 5-11 组)
+TEST_F(soui_lua_app, tetris_lua_clear_score_lifecycle)
+{
+    std::string script;
+    ASSERT_TRUE(LoadDemoTestLua(script));
+    script += R"LUA(
+tetris.wndBoard = nil; tetris.wndNext = nil; tetris.root = nil; tetris.timer = nil;
+math.randomseed(42);
+tetris_build_cells();
+
+-- 4) 锁定 + 单行消除 + 下沉 + 计分
+tetris_reset_data();
+for x = 2, 9 do tetris.grid[19][x] = 5 end          -- 底行留 0..1 两格
+tetris.grid[17][5] = 3;                             -- 标记块,消行后应下移 1 行
+tetris.cur = {kind = 1, rot = 1, x = 0, y = 19};    -- I 横态补满底行
+tetris_lock();
+assert(tetris.state == "clearing" and #tetris.flash_rows == 1 and tetris.flash_rows[1] == 19,
+       "lock detects full row 19 and enters clearing");
+tetris_collapse();
+assert(tetris.grid[17][5] == 0 and tetris.grid[18][5] == 3, "rows above cleared line drop by 1");
+assert(tetris.score == 100 and tetris.lines == 1 and tetris.level == 1, "single clear scores 100 at level 1");
+assert(tetris.state == "playing" and tetris.cur ~= nil, "next piece spawned after collapse");
+
+-- 5) 双行消除计分与下沉
+tetris_reset_data();
+for y = 18, 19 do for x = 2, 9 do tetris.grid[y][x] = 5 end end
+tetris.grid[15][7] = 6;                             -- 标记块应从 15 下移 2 行到 17
+tetris.cur = {kind = 2, rot = 1, x = 0, y = 18};    -- O 块 2x2 补满 18/19 两行的 0..1 列
+tetris_lock();
+tetris_collapse();
+assert(tetris.score == 300 and tetris.lines == 2, "double clear scores 300");
+assert(tetris.grid[17][7] == 6, "rows drop by 2 after double clear");
+
+-- 6) 升级与加速(reset_data 清零 lines,先复位再设 9 行)
+tetris_reset_data();
+tetris.lines = 9;
+for x = 2, 9 do tetris.grid[19][x] = 5 end
+tetris.cur = {kind = 1, rot = 1, x = 0, y = 19};
+tetris_lock(); tetris_collapse();
+assert(tetris.lines == 10 and tetris.level == 2, "level up at 10 lines");
+assert(tetris_gravity_ms() == 730, "gravity speeds up to 730ms at level 2");
+tetris.level = 12;
+assert(tetris_gravity_ms() == 100, "gravity clamped at 100ms");
+
+-- 7) 硬降计分 + 锁定
+tetris_reset_data();
+tetris.cur = {kind = 1, rot = 1, x = 3, y = 0};
+tetris_hard_drop();
+assert(tetris.score == 38, "hard drop of 19 rows scores +38");
+assert(tetris.cur ~= nil, "piece respawned after hard drop lock");
+for x = 3, 6 do assert(tetris.grid[19][x] == 1, "I piece locked into row 19 cols 3..6") end
+
+-- 8) 7-bag:每 70 次抽取每种恰好 10 次(bag 先清空,排除 reset_data 取走一块的影响)
+tetris_reset_data();
+tetris.bag = {};
+local count = {0,0,0,0,0,0,0};
+for i = 1, 70 do
+  local k = tetris_next_kind();	-- 每次循环只抽一次,不能在表达式两侧各调用一次
+  count[k] = count[k] + 1;
+end
+for k = 1, 7 do assert(count[k] == 10, "7-bag uniform: kind "..k.." count "..count[k]) end
+
+-- 9) 暂停/恢复(含 clearing 中暂停后恢复回 clearing)
+tetris.state = "playing";
+tetris_pause();
+assert(tetris.state == "paused" and tetris.pausedFrom == "playing", "pause from playing");
+tetris_resume();
+assert(tetris.state == "playing", "resume back to playing");
+tetris.state = "clearing";
+tetris_pause();
+assert(tetris.state == "paused" and tetris.pausedFrom == "clearing", "pause during clearing remembered");
+tetris_resume();
+assert(tetris.state == "clearing", "resume back to clearing");
+
+-- 10) 顶满游戏结束(headless 不弹窗:tetris_game_over 在 wndBoard==nil 时直接返回)
+tetris_reset_data();
+for x = 4, 6 do tetris.grid[0][x] = 1 end           -- T 出生点(x=3,占 (4,0),(3..5,1))已有一格
+tetris.nextKind = 3;                                -- T
+tetris.bag = {};
+tetris_spawn();
+assert(tetris.state == "over" and tetris.cur == nil, "spawn overlap => game over (headless, no dialog)");
+)LUA";
+    EXPECT_TRUE(Run("tetris2", script));
 }

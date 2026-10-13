@@ -29,8 +29,7 @@ if(SOUI_ENABLE_COM_LIB)
     target_link_libraries(${current_project} ${COM_LIBS}  ${COM_DEP_LIBS})
 endif()
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    # Link win32 audio library on Windows
-    target_link_libraries(${current_project} win32_audio)
+    # SPlaySound 已并入 utilities4(见 utilities/include/SPlaySound.h),无需单独链接 win32_audio
     if(MSVC)
     set(DPI_AWARE_MANIFEST "${PROJECT_SOURCE_DIR}/__cmake/dpi_aware.manifest")
     set_target_properties(${current_project} PROPERTIES

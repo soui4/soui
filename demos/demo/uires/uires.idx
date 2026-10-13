@@ -202,6 +202,11 @@
     <file name="xxl_fx_pop" path="anim\xxl_fx_pop.xml"/>
     <file name="xxl_fx_pop_fly" path="anim\xxl_fx_pop_fly.xml"/>
     <file name="xxl_fx_ring" path="anim\xxl_fx_ring.xml"/>
+    <file name="tetris_fx_beam" path="anim\tetris_fx_beam.xml"/>
+    <file name="tetris_over_card_in" path="anim\tetris_over_card_in.xml"/>
+    <file name="tetris_over_card_out" path="anim\tetris_over_card_out.xml"/>
+    <file name="tetris_over_mask_in" path="anim\tetris_over_mask_in.xml"/>
+    <file name="tetris_over_mask_out" path="anim\tetris_over_mask_out.xml"/>
   </anim>
   <valueAni>
     <file name="alphaAni" path="valueAni\alpha.xml"/>
@@ -242,6 +247,12 @@
 	<file name="xxl_btn_hint" path="svg\xxl_btn_hint.svg"/>
 	<file name="xxl_btn_shuffle" path="svg\xxl_btn_shuffle.svg"/>
 	<file name="coin" path="svg\coin.svg"/>
+	<file name="tetris_blocks" path="svg\tetris_blocks.svg"/>
+        <file name="tetris_fx" path="svg\tetris_fx.svg"/>
+        <file name="tetris_key_lr" path="svg\tetris_key_lr.svg"/>
+        <file name="tetris_key_ud" path="svg\tetris_key_ud.svg"/>
+        <file name="tetris_key_space" path="svg\tetris_key_space.svg"/>
+        <file name="tetris_key_p" path="svg\tetris_key_p.svg"/>
   </svg>
   <xml>
 	<file name="roomlist" path="xml\roomlist.xml"/>

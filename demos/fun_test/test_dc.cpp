@@ -1,4 +1,4 @@
-﻿/**
+/**
  * swinx GDI tests: GDI object management and GDI path recording.
  * The path tests were moved here from test.cpp during the fun_test
  * reorganization (they used to live in the PathAPITest fixture).
@@ -670,13 +670,42 @@ TEST_F(SwinxDcTest, draw_text_calc_rect_reports_extent)
     RECT rc = {0, 0, 0, 0};
     int ret = DrawTextA(hdc, "Hello", -1, &rc, DT_CALCRECT);
     EXPECT_GT(ret, 0);
-    EXPECT_EQ(rc.right - rc.left, sz.cx);
+    // swinx measures with fractional CoreText advances: DT_CALCRECT rounds the
+    // extent up so it always fits the text, while GetTextExtentPoint32 keeps
+    // the gdi32-compatible truncated width (tied to its lpnDx prefixes), so the
+    // two may differ by 1px.
+    EXPECT_LE(abs((rc.right - rc.left) - sz.cx), 1);
     EXPECT_EQ(rc.bottom - rc.top, sz.cy);
 
     // two lines -> double line height
     RECT rc2 = {0, 0, 1000, 1000};
     DrawTextA(hdc, "aa\nbb", -1, &rc2, DT_CALCRECT);
     EXPECT_EQ(rc2.bottom - rc2.top, 2 * sz.cy);
+}
+
+// Regression: the DT_CALCRECT extent used to be truncated down. Callers that
+// size a window from it (e.g. the msgbox STATIC) then wrapped the last
+// character of the widest line onto its own line ("Select render type:" ->
+// "Select render type" + ":") because the fractional line width exceeded the
+// truncated constraint by a fraction of a pixel. The reported extent must be
+// wide enough to hold every line: re-measuring under that exact width must
+// not add a line.
+TEST_F(SwinxDcTest, draw_text_calc_rect_extent_fits_word_wrap)
+{
+    const char *text = "Hello\nWorld";
+    RECT rcFree = {0, 0, 10000, 1000};
+    DrawTextA(hdc, text, -1, &rcFree, DT_CALCRECT);
+    ASSERT_GT(rcFree.right - rcFree.left, 0);
+
+    SIZE szA;
+    ASSERT_TRUE(GetTextExtentPoint32A(hdc, "A", 1, &szA));
+    ASSERT_GT(szA.cy, 0);
+    ASSERT_EQ((rcFree.bottom - rcFree.top) % szA.cy, 0) << "two lines of text";
+
+    RECT rcConstrained = {0, 0, rcFree.right - rcFree.left, 1000};
+    DrawTextA(hdc, text, -1, &rcConstrained, DT_CALCRECT);
+    EXPECT_EQ(rcConstrained.bottom - rcConstrained.top, rcFree.bottom - rcFree.top)
+        << "constraining to the reported extent must not wrap an extra line";
 }
 
 TEST_F(SwinxDcTest, get_text_face_roundtrip)

@@ -155,4 +155,14 @@
   <imglist name="svg_xxl_btn_restart" src="svg:xxl_btn_restart" states="3"/>
   <imglist name="svg_xxl_btn_hint" src="svg:xxl_btn_hint" states="3"/>
   <imglist name="svg_xxl_btn_shuffle" src="svg:xxl_btn_shuffle" states="3"/>
+  <!-- 俄罗斯方块(lua 版)方块雪碧图:17 态 = 0 空格 / 1-7 七种方块 / 8-14 幽灵块 / 15 消行闪白 / 16 标题图标 -->
+  <imglist name="svg_tetris_blocks" src="svg:tetris_blocks" states="17"/>
+  <!-- 俄罗斯方块消行光波(横向光带,配合 anim:tetris_fx_beam) -->
+  <imglist name="skin_tetris_fx" src="svg:tetris_fx"/>
+  <!-- 俄罗斯方块键帽图(纯键帽,含义文字在 page_script.xml 布局 text 上配置):
+       左右方向 / 上下方向 / 空格(Space 键面) / P 键 -->
+  <imglist name="svg_tetris_key_lr" src="svg:tetris_key_lr"/>
+  <imglist name="svg_tetris_key_ud" src="svg:tetris_key_ud"/>
+  <imglist name="svg_tetris_key_space" src="svg:tetris_key_space"/>
+  <imglist name="svg_tetris_key_p" src="svg:tetris_key_p"/>
 </skin>

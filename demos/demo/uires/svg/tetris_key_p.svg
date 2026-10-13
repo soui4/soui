@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  tetris_key_p.svg - 俄罗斯方块键帽图:P 键(暂停),键面字母 "P";
+  含义文字(暂停)在 page_script.xml 布局中配置。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 26 26">
+  <g>
+    <rect x="1" y="1" width="24" height="24" rx="5" fill="#F1F5F9" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="13" y="17.5" font-family="Arial" font-size="13" font-weight="bold" fill="#334155" text-anchor="middle">P</text>
+  </g>
+</svg>

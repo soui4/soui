@@ -19,9 +19,7 @@
 
 const int CMainDlg::ANI_TIP = 0x50;
 
-#ifdef _WIN32
-#include "win32_audio.h"
-#endif
+#include <SPlaySound.h>
 CMainDlg::CMainDlg(SGameTheme* pTheme)
 : SHostWnd(_T("LAYOUT:XML_MAINWND"))
 , m_pTheme(pTheme)
@@ -585,11 +583,6 @@ void CMainDlg::PlayWave(LPCTSTR pszSound)
 {
     if(m_bMute) return;
     
-#ifdef _WIN32
-    Win32PlaySound(pszSound, NULL, SND_ASYNC | SND_NOSTOP | SND_FILENAME);
-#else
-    // Use the default PlaySound implementation on other platforms
-    ::PlaySound(pszSound, NULL, SND_ASYNC | SND_NOSTOP | SND_FILENAME);
-#endif
+    SPlaySound(pszSound, NULL, SND_ASYNC | SND_NOSTOP | SND_FILENAME);
 }
 

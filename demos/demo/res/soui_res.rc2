@@ -1,4 +1,4 @@
-//stamp:01dd588352cf82a4
+//stamp:01dd5ac4bbcee609
 /*<------------------------------------------------------------------------------------------------->*/
 #define DEFINE_UIRES(name, type, file_path)\
     name type file_path
@@ -165,6 +165,11 @@ DEFINE_UIRES(xxl_scale_select,	anim,	"uires/anim/xxl_scale_select.xml")
 DEFINE_UIRES(xxl_fx_pop,	anim,	"uires/anim/xxl_fx_pop.xml")
 DEFINE_UIRES(xxl_fx_pop_fly,	anim,	"uires/anim/xxl_fx_pop_fly.xml")
 DEFINE_UIRES(xxl_fx_ring,	anim,	"uires/anim/xxl_fx_ring.xml")
+DEFINE_UIRES(tetris_fx_beam,	anim,	"uires/anim/tetris_fx_beam.xml")
+DEFINE_UIRES(tetris_over_card_in,	anim,	"uires/anim/tetris_over_card_in.xml")
+DEFINE_UIRES(tetris_over_card_out,	anim,	"uires/anim/tetris_over_card_out.xml")
+DEFINE_UIRES(tetris_over_mask_in,	anim,	"uires/anim/tetris_over_mask_in.xml")
+DEFINE_UIRES(tetris_over_mask_out,	anim,	"uires/anim/tetris_over_mask_out.xml")
 DEFINE_UIRES(alphaAni,	valueAni,	"uires/valueAni/alpha.xml")
 DEFINE_UIRES(colorAni,	valueAni,	"uires/valueAni/color.xml")
 DEFINE_UIRES(xxl_move,	animator,	"uires/animator/xxl_move.xml")
@@ -199,4 +204,10 @@ DEFINE_UIRES(xxl_btn_restart,	svg,	"uires/svg/xxl_btn_restart.svg")
 DEFINE_UIRES(xxl_btn_hint,	svg,	"uires/svg/xxl_btn_hint.svg")
 DEFINE_UIRES(xxl_btn_shuffle,	svg,	"uires/svg/xxl_btn_shuffle.svg")
 DEFINE_UIRES(coin,	svg,	"uires/svg/coin.svg")
+DEFINE_UIRES(tetris_blocks,	svg,	"uires/svg/tetris_blocks.svg")
+DEFINE_UIRES(tetris_fx,	svg,	"uires/svg/tetris_fx.svg")
+DEFINE_UIRES(tetris_key_lr,	svg,	"uires/svg/tetris_key_lr.svg")
+DEFINE_UIRES(tetris_key_ud,	svg,	"uires/svg/tetris_key_ud.svg")
+DEFINE_UIRES(tetris_key_space,	svg,	"uires/svg/tetris_key_space.svg")
+DEFINE_UIRES(tetris_key_p,	svg,	"uires/svg/tetris_key_p.svg")
 DEFINE_UIRES(roomlist,	xml,	"uires/xml/roomlist.xml")

@@ -1,4 +1,4 @@
-﻿//stamp:361161dc9f4acf4d
+﻿//stamp:36116707bb9fa9f0
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -206,6 +206,11 @@
 			const TCHAR * xxl_fx_pop;
 			const TCHAR * xxl_fx_pop_fly;
 			const TCHAR * xxl_fx_ring;
+			const TCHAR * tetris_fx_beam;
+			const TCHAR * tetris_over_card_in;
+			const TCHAR * tetris_over_card_out;
+			const TCHAR * tetris_over_mask_in;
+			const TCHAR * tetris_over_mask_out;
 			}anim;
 		struct _valueAni{
 			const TCHAR * alphaAni;
@@ -246,6 +251,12 @@
 			const TCHAR * xxl_btn_hint;
 			const TCHAR * xxl_btn_shuffle;
 			const TCHAR * coin;
+			const TCHAR * tetris_blocks;
+			const TCHAR * tetris_fx;
+			const TCHAR * tetris_key_lr;
+			const TCHAR * tetris_key_ud;
+			const TCHAR * tetris_key_space;
+			const TCHAR * tetris_key_p;
 			}svg;
 		struct _xml{
 			const TCHAR * roomlist;
@@ -455,6 +466,11 @@ struct _UIRES UIRES={
 			_T("anim:xxl_fx_pop"),
 			_T("anim:xxl_fx_pop_fly"),
 			_T("anim:xxl_fx_ring"),
+			_T("anim:tetris_fx_beam"),
+			_T("anim:tetris_over_card_in"),
+			_T("anim:tetris_over_card_out"),
+			_T("anim:tetris_over_mask_in"),
+			_T("anim:tetris_over_mask_out"),
 		},
 		{
 			_T("valueAni:alphaAni"),
@@ -495,6 +511,12 @@ struct _UIRES UIRES={
 			_T("svg:xxl_btn_hint"),
 			_T("svg:xxl_btn_shuffle"),
 			_T("svg:coin"),
+			_T("svg:tetris_blocks"),
+			_T("svg:tetris_fx"),
+			_T("svg:tetris_key_lr"),
+			_T("svg:tetris_key_ud"),
+			_T("svg:tetris_key_space"),
+			_T("svg:tetris_key_p"),
 		},
 		{
 			_T("xml:roomlist"),
@@ -545,6 +567,8 @@ struct _R{
 		 const wchar_t * btn_speed_dec;
 		 const wchar_t * btn_speed_inc;
 		 const wchar_t * btn_test;
+		 const wchar_t * btn_tetris_restart;
+		 const wchar_t * btn_tetris_start;
 		 const wchar_t * btn_text;
 		 const wchar_t * btn_tip;
 		 const wchar_t * btn_uninstall;
@@ -602,6 +626,15 @@ struct _R{
 		 const wchar_t * digit_score_0;
 		 const wchar_t * digit_score_1;
 		 const wchar_t * digit_score_2;
+		 const wchar_t * digit_tlevel_0;
+		 const wchar_t * digit_tlevel_1;
+		 const wchar_t * digit_tlines_0;
+		 const wchar_t * digit_tlines_1;
+		 const wchar_t * digit_tlines_2;
+		 const wchar_t * digit_tscore_0;
+		 const wchar_t * digit_tscore_1;
+		 const wchar_t * digit_tscore_2;
+		 const wchar_t * digit_tscore_3;
 		 const wchar_t * edit_drop_top1;
 		 const wchar_t * edit_drop_top2;
 		 const wchar_t * edit_repeat;
@@ -786,6 +819,7 @@ struct _R{
 		 const wchar_t * txt_path_length;
 		 const wchar_t * txt_score;
 		 const wchar_t * txt_size;
+		 const wchar_t * txt_tetris_state;
 		 const wchar_t * txt_tip;
 		 const wchar_t * txt_title;
 		 const wchar_t * txt_usetime;
@@ -799,8 +833,14 @@ struct _R{
 		 const wchar_t * wke_test;
 		 const wchar_t * wnd_ani_host;
 		 const wchar_t * wnd_container;
+		 const wchar_t * wnd_game;
+		 const wchar_t * wnd_gameover;
+		 const wchar_t * wnd_gameover_card;
 		 const wchar_t * wnd_rgn;
 		 const wchar_t * wnd_temp_host;
+		 const wchar_t * wnd_tetris_aniframe;
+		 const wchar_t * wnd_tetris_board;
+		 const wchar_t * wnd_tetris_next;
 		 const wchar_t * wnd_xxl_aniframe;
 		 const wchar_t * wnd_xxl_board;
 		 const wchar_t * __name__;
@@ -843,6 +883,8 @@ struct _R{
 		int btn_speed_dec;
 		int btn_speed_inc;
 		int btn_test;
+		int btn_tetris_restart;
+		int btn_tetris_start;
 		int btn_text;
 		int btn_tip;
 		int btn_uninstall;
@@ -900,6 +942,15 @@ struct _R{
 		int digit_score_0;
 		int digit_score_1;
 		int digit_score_2;
+		int digit_tlevel_0;
+		int digit_tlevel_1;
+		int digit_tlines_0;
+		int digit_tlines_1;
+		int digit_tlines_2;
+		int digit_tscore_0;
+		int digit_tscore_1;
+		int digit_tscore_2;
+		int digit_tscore_3;
 		int edit_drop_top1;
 		int edit_drop_top2;
 		int edit_repeat;
@@ -1084,6 +1135,7 @@ struct _R{
 		int txt_path_length;
 		int txt_score;
 		int txt_size;
+		int txt_tetris_state;
 		int txt_tip;
 		int txt_title;
 		int txt_usetime;
@@ -1097,8 +1149,14 @@ struct _R{
 		int wke_test;
 		int wnd_ani_host;
 		int wnd_container;
+		int wnd_game;
+		int wnd_gameover;
+		int wnd_gameover_card;
 		int wnd_rgn;
 		int wnd_temp_host;
+		int wnd_tetris_aniframe;
+		int wnd_tetris_board;
+		int wnd_tetris_next;
 		int wnd_xxl_aniframe;
 		int wnd_xxl_board;
 		int __name__;
@@ -1137,7 +1195,7 @@ struct _R{
 	struct {
 		enum {
 			name_3d_test = 65723,
-			ani_hot = 65770,
+			ani_hot = 65788,
 			ani_test = 65581,
 			btn4_1 = 65633,
 			btn4_2 = 65634,
@@ -1146,17 +1204,17 @@ struct _R{
 			btn4_5 = 65637,
 			btn4_6 = 65638,
 			btnSelectGif = 65735,
-			btn_ani_hostwnd = 65781,
-			btn_animator = 65776,
+			btn_ani_hostwnd = 65799,
+			btn_animator = 65794,
 			btn_append_msg = 65611,
 			btn_back = 65682,
 			btn_builtinskin = 51,
-			btn_close = 65772,
+			btn_close = 65790,
 			btn_create_by_temp = 65689,
 			btn_createchildren = 65711,
 			btn_display = 65686,
 			btn_filewnd = 65710,
-			btn_go_offcial_url = 65771,
+			btn_go_offcial_url = 65789,
 			btn_hidetst = 65687,
 			btn_icon = 65591,
 			btn_init_listbox = 65653,
@@ -1173,6 +1231,8 @@ struct _R{
 			btn_speed_dec = 65705,
 			btn_speed_inc = 65706,
 			btn_test = 65594,
+			btn_tetris_restart = 65775,
+			btn_tetris_start = 65774,
 			btn_text = 65592,
 			btn_tip = 65620,
 			btn_uninstall = 65583,
@@ -1201,7 +1261,7 @@ struct _R{
 			chk_band_mclv = 65562,
 			chk_band_tile = 65600,
 			chk_band_tree = 65604,
-			chk_band_tv = 65767,
+			chk_band_tv = 65785,
 			chk_fullrow_tree = 65605,
 			chk_mclv_sel = 65566,
 			chk_multi_lc = 65584,
@@ -1210,7 +1270,7 @@ struct _R{
 			chk_multi_mclv = 65561,
 			chk_multi_tile = 65599,
 			chk_multi_tree = 65603,
-			chk_multi_tv = 65766,
+			chk_multi_tv = 65784,
 			chromeTab = 65738,
 			clock_main = 65724,
 			col1 = 65567,
@@ -1230,9 +1290,18 @@ struct _R{
 			digit_score_0 = 65752,
 			digit_score_1 = 65751,
 			digit_score_2 = 65750,
+			digit_tlevel_0 = 65772,
+			digit_tlevel_1 = 65771,
+			digit_tlines_0 = 65770,
+			digit_tlines_1 = 65769,
+			digit_tlines_2 = 65768,
+			digit_tscore_0 = 65767,
+			digit_tscore_1 = 65766,
+			digit_tscore_2 = 65765,
+			digit_tscore_3 = 65764,
 			edit_drop_top1 = 65708,
 			edit_drop_top2 = 65709,
-			edit_repeat = 65765,
+			edit_repeat = 65783,
 			edit_rotate = 65716,
 			edit_scale = 65717,
 			edit_skew = 65718,
@@ -1263,7 +1332,7 @@ struct _R{
 			group2 = 65665,
 			home_card = 65544,
 			img_file_icon = 65602,
-			img_girl = 65778,
+			img_girl = 65796,
 			img_icon = 65568,
 			img_indicator = 65559,
 			img_round = 65617,
@@ -1287,8 +1356,8 @@ struct _R{
 			img_skin_7 = 16,
 			img_skin_8 = 17,
 			img_skin_9 = 18,
-			img_soui = 65775,
-			img_state = 65769,
+			img_soui = 65793,
+			img_state = 65787,
 			ip_test = 65609,
 			lb_test = 65652,
 			lc_test = 65587,
@@ -1337,7 +1406,7 @@ struct _R{
 			page_tileview = 104,
 			page_treectrl = 105,
 			page_treeview = 106,
-			pane_left = 65777,
+			pane_left = 65795,
 			player_1 = 65757,
 			player_2 = 65758,
 			player_3 = 65759,
@@ -1365,8 +1434,8 @@ struct _R{
 			rating_score = 65573,
 			re_gifhost = 65614,
 			re_temp_input = 65690,
-			re_xmlinput = 65764,
-			room_tv = 65768,
+			re_xmlinput = 65782,
+			room_tv = 65786,
 			rotate_x = 65720,
 			rotate_y = 65721,
 			rotate_z = 65722,
@@ -1396,12 +1465,12 @@ struct _R{
 			text2_6 = 65674,
 			text2_7 = 65675,
 			text2_8 = 65676,
-			tgl_left = 65780,
+			tgl_left = 65798,
 			tgl_switch = 65557,
 			timepicker = 65647,
 			title = 65555,
 			tray_008 = 65685,
-			tree_test = 65779,
+			tree_test = 65797,
 			txt_coins = 65763,
 			txt_desc = 65570,
 			txt_index = 65571,
@@ -1414,7 +1483,8 @@ struct _R{
 			txt_path_length = 65703,
 			txt_score = 65574,
 			txt_size = 65576,
-			txt_tip = 65773,
+			txt_tetris_state = 65773,
+			txt_tip = 65791,
 			txt_title = 65677,
 			txt_usetime = 65580,
 			txt_xxl_combo = 65753,
@@ -1425,10 +1495,16 @@ struct _R{
 			waveProgress2 = 65741,
 			webkit_toolbar = 65728,
 			wke_test = 65727,
-			wnd_ani_host = 65774,
+			wnd_ani_host = 65792,
 			wnd_container = 65713,
+			wnd_game = 65776,
+			wnd_gameover = 65778,
+			wnd_gameover_card = 65779,
 			wnd_rgn = 65714,
 			wnd_temp_host = 65691,
+			wnd_tetris_aniframe = 65781,
+			wnd_tetris_board = 65777,
+			wnd_tetris_next = 65780,
 			wnd_xxl_aniframe = 65755,
 			wnd_xxl_board = 65754,
 			__name__ = 65545
@@ -1478,6 +1554,8 @@ struct _R R={
 		L"btn_speed_dec",
 		L"btn_speed_inc",
 		L"btn_test",
+		L"btn_tetris_restart",
+		L"btn_tetris_start",
 		L"btn_text",
 		L"btn_tip",
 		L"btn_uninstall",
@@ -1535,6 +1613,15 @@ struct _R R={
 		L"digit_score_0",
 		L"digit_score_1",
 		L"digit_score_2",
+		L"digit_tlevel_0",
+		L"digit_tlevel_1",
+		L"digit_tlines_0",
+		L"digit_tlines_1",
+		L"digit_tlines_2",
+		L"digit_tscore_0",
+		L"digit_tscore_1",
+		L"digit_tscore_2",
+		L"digit_tscore_3",
 		L"edit_drop_top1",
 		L"edit_drop_top2",
 		L"edit_repeat",
@@ -1719,6 +1806,7 @@ struct _R R={
 		L"txt_path_length",
 		L"txt_score",
 		L"txt_size",
+		L"txt_tetris_state",
 		L"txt_tip",
 		L"txt_title",
 		L"txt_usetime",
@@ -1732,8 +1820,14 @@ struct _R R={
 		L"wke_test",
 		L"wnd_ani_host",
 		L"wnd_container",
+		L"wnd_game",
+		L"wnd_gameover",
+		L"wnd_gameover_card",
 		L"wnd_rgn",
 		L"wnd_temp_host",
+		L"wnd_tetris_aniframe",
+		L"wnd_tetris_board",
+		L"wnd_tetris_next",
 		L"wnd_xxl_aniframe",
 		L"wnd_xxl_board",
 		L"{{name}}"
@@ -1741,7 +1835,7 @@ struct _R R={
 	,
 	{
 		65723,
-		65770,
+		65788,
 		65581,
 		65633,
 		65634,
@@ -1750,17 +1844,17 @@ struct _R R={
 		65637,
 		65638,
 		65735,
-		65781,
-		65776,
+		65799,
+		65794,
 		65611,
 		65682,
 		51,
-		65772,
+		65790,
 		65689,
 		65711,
 		65686,
 		65710,
-		65771,
+		65789,
 		65687,
 		65591,
 		65653,
@@ -1777,6 +1871,8 @@ struct _R R={
 		65705,
 		65706,
 		65594,
+		65775,
+		65774,
 		65592,
 		65620,
 		65583,
@@ -1805,7 +1901,7 @@ struct _R R={
 		65562,
 		65600,
 		65604,
-		65767,
+		65785,
 		65605,
 		65566,
 		65584,
@@ -1814,7 +1910,7 @@ struct _R R={
 		65561,
 		65599,
 		65603,
-		65766,
+		65784,
 		65738,
 		65724,
 		65567,
@@ -1834,9 +1930,18 @@ struct _R R={
 		65752,
 		65751,
 		65750,
+		65772,
+		65771,
+		65770,
+		65769,
+		65768,
+		65767,
+		65766,
+		65765,
+		65764,
 		65708,
 		65709,
-		65765,
+		65783,
 		65716,
 		65717,
 		65718,
@@ -1867,7 +1972,7 @@ struct _R R={
 		65665,
 		65544,
 		65602,
-		65778,
+		65796,
 		65568,
 		65559,
 		65617,
@@ -1891,8 +1996,8 @@ struct _R R={
 		16,
 		17,
 		18,
-		65775,
-		65769,
+		65793,
+		65787,
 		65609,
 		65652,
 		65587,
@@ -1941,7 +2046,7 @@ struct _R R={
 		104,
 		105,
 		106,
-		65777,
+		65795,
 		65757,
 		65758,
 		65759,
@@ -1969,8 +2074,8 @@ struct _R R={
 		65573,
 		65614,
 		65690,
-		65764,
-		65768,
+		65782,
+		65786,
 		65720,
 		65721,
 		65722,
@@ -2000,12 +2105,12 @@ struct _R R={
 		65674,
 		65675,
 		65676,
-		65780,
+		65798,
 		65557,
 		65647,
 		65555,
 		65685,
-		65779,
+		65797,
 		65763,
 		65570,
 		65571,
@@ -2019,6 +2124,7 @@ struct _R R={
 		65574,
 		65576,
 		65773,
+		65791,
 		65677,
 		65580,
 		65753,
@@ -2029,10 +2135,16 @@ struct _R R={
 		65741,
 		65728,
 		65727,
-		65774,
+		65792,
 		65713,
+		65776,
+		65778,
+		65779,
 		65714,
 		65691,
+		65781,
+		65777,
+		65780,
 		65755,
 		65754,
 		65545

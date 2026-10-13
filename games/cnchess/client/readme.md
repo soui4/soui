@@ -42,7 +42,7 @@ uiresbuilder.exe -i uires\uires.idx -p uires -r res\soui_res.rc2 -h res\resource
 
 ## 平台差异要点
 
-- **Windows**：PE 内嵌资源；链接 `win32_audio`；DPI 感知 manifest。
+- **Windows**：PE 内嵌资源；音效播放 `SPlaySound` 已并入 utilities4；DPI 感知 manifest。
 - **Linux**：通过 swinx 的 xcb 事件泵运行；字体 `simsun.ttc` 位于源码树上三级目录，运行期 `AddFontResource`。
 - **macOS**：资源与框架库（`swinx`/`soui4`/…）拷入 `.app` Bundle；`MACOSX_BUNDLE` 配置；自动签名。
 - **iOS**：`SW_MAXIMIZE` 全屏；UI 资源与 Android 共享（`assets/uires`）；通过 `swinx_ios_entry` 接入 `UIApplicationMain`。

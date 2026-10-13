@@ -70,6 +70,12 @@ else()
     add_library(scriptmodule-lua STATIC ${ScriptModule-lua_src} ${ScriptModule-lua_header})
 endif()
 
+# PlaySound 音效导出(exp_SysApi.h):全平台统一走 utilities4 的跨平台 SPlaySound
+# (Windows=MCI 线程化实现;其余平台转发 swinx mmsystem 适配层,故非 Windows 补链 swinx)
+if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
+    target_link_libraries(scriptmodule-lua swinx)
+endif()
+
 set(COM_LIBS ${COM_LIBS} scriptmodule-lua CACHE INTERNAL "com_lib")
 if(SOUI_ENABLE_COM_LIB)
     set(COM_DEP_LIBS ${COM_DEP_LIBS} lua-54 CACHE INTERNAL "com_dep_libs")

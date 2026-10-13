@@ -9,6 +9,11 @@ file(GLOB_RECURSE CURRENT_SRCS  src/*.cpp)
  
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
     list(APPEND CURRENT_SRCS cursoricon/cursoricon.cpp)
+    # SPlaySound 音效播放(见 include/SPlaySound.h):Windows=MCI 线程化实现
+    list(APPEND CURRENT_SRCS audio/SPlaySound.cpp)
+else()
+    # SPlaySound 非 Windows 实现:转发到 swinx mmsystem 适配层 PlaySound
+    list(APPEND CURRENT_SRCS audio/SPlaySound_unix.cpp)
 endif()
 
 source_group("Header Files" FILES ${CURRENT_HEADERS})
@@ -40,7 +45,7 @@ if (NOT CMAKE_SYSTEM_NAME MATCHES Windows)
         endif()
     endif()
 else()
-    target_link_libraries(utilities4  Gdi32 shlwapi version)
+    target_link_libraries(utilities4  Gdi32 shlwapi version winmm)
 endif()
 
 set(SOUI_UTILITIES ${SOUI_UTILITIES} utilities4 CACHE INTERNAL "utilities_lib")

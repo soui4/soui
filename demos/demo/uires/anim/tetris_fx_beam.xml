@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 俄罗斯方块消行光波(参考消消乐 anim/xxl_fx_pop.xml 三段式):
+     光带从行中心向两侧爆开(scaleX 0.15->1.12 带回弹),收拢定格,随后淡出消失 -->
+<set fillAfter="true" shareInterpolator="false">
+    <scale duration="180" startOffset="0" fromXScale="0.15" toXScale="1.12" fromYScale="0.5" toYScale="1.0" pivotX="50%" pivotY="50%" interpolator="Decelerate"/>
+    <scale duration="120" startOffset="180" fromXScale="1.12" toXScale="1.0" fromYScale="1.0" toYScale="1.0" pivotX="50%" pivotY="50%" interpolator="Decelerate" fillAfter="true"/>
+    <alpha duration="280" startOffset="300" fromAlpha="1.0" toAlpha="0.0" interpolator="Accelerate" fillAfter="true"/>
+</set>

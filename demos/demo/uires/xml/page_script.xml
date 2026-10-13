@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
-  page_script.xml - 脚本演示页(跑马机 + 消消乐,lua 版)
+  page_script.xml - 脚本演示页(跑马机 + 消消乐 + 俄罗斯方块,lua 版)
 
   由原 misc 分区的 script 页(跑马机)与原 page_xxl.xml(消消乐)合并而成,
-  内层 tabctrl 两个子页切换;两个小游戏的逻辑都在 uires/lua/test.lua:
+  内层 tabctrl 三个子页切换;各小游戏的逻辑都在 uires/lua/test.lua:
   - 跑马机: game_wnd/game_canvas/players/flag_win,on_init 时初始化,
     on_run 启动计时器推进赛马,on_bet 下注,on_canvas_size 跟随布局;
   - 消消乐: 参考 soxxl(基于 soui4js 的消消乐)移植并完善为市场常见玩法,
@@ -22,8 +22,45 @@
     功能按钮("重新开始"/"提示")为 SVG 药丸形底(3 态)+SVG 图标(3 态)
     组合按钮(skin: xxl_btn_primary/xxl_btn_secondary)。
   棋盘/状态栏的名字与 id 约定见 test.lua 的 xxl_* 函数。
+  - 俄罗斯方块: 经典 10x20 玩法,棋盘/预览格由 lua 的 tetris_init 动态创建,
+    每格是一个 img,统一引用 svg/tetris_blocks.svg 17 帧雪碧图
+    (skin.xml: svg_tetris_blocks,帧 0=空格 1-7=七种方块 8-14=幽灵块
+    15=消行闪白 16=标题图标),渲染只切换 iconIndex;
+    布局左右卡片对称: 左侧计分卡(得分/行数/等级 LED + 状态 + 按钮),
+    右侧预览卡(下一个方块 + 键位说明);
+    动画参考消消乐: 消行时光波扫行 + 方块碎片飞散(skin_tetris_fx +
+    anim:tetris_fx_beam 光带从行中心爆开,碎片取 svg_tetris_blocks 原方块帧
+    重力抛散,均画在 wnd_tetris_aniframe 浮层),"+分数"文本沿抛物线飞向
+    得分 LED(LuaValueAnimator + animator:xxl_move 模板),得分 LED 随之滚动,
+    升级时 "LV N" 飞向等级 LED;
+    活动方块画在浮层活动层(4 个 img),左右移动/下落/软降 40ms 平移动画
+    滑入新格,动画中收到新输入(含硬降)立即贴齐目标格完成旧动画再起新动画,
+    grid 层只画锁定格与幽灵落点,锁定即安静落定不再闪白;硬降为 80ms 快速
+    下滑动画(tetris_slide_start kind="drop",动画结束即锁定,动画中收到
+    新输入立即完成再走正常流程);
+    游戏结束不用模态弹窗:棋盘 stack 顶层布局内静态窗口 wnd_gameover
+    (深色半透明遮罩+得分卡片 wnd_gameover_card),展示/隐藏动画全走
+    anim 模板 + SetAnimation(遮罩 tetris_over_mask_in/out,
+    卡片 tetris_over_card_in/out),lua 只刷新分数文本并挂载动画
+    (tetris_over_show/hide,不拼接 XML);on_animation_stop 回调在
+    隐藏段结束后真正 SetVisible(false);面板只显示结果,重开走左侧
+    "重新开始"按钮,开始游戏时结果窗口动画隐藏;
+    右侧键位说明区为 4 行键帽 SVG(svg_tetris_key_lr/ud/space/p,纯键帽,
+    "Space"/"P" 为键面字母)+ 布局 text 说明;
+    音效:lua 导出 PlaySound/GetAppDir(exp_SysApi.h,全平台统一走 utilities4
+    的 SPlaySound),wav 放 demo 源码目录 snd/(与 uires 分离,构建时拷到
+    程序资源目录 snd/ 下),旋转/锁定/消行/升级/结束各有音效,升级为 0.7s
+    上行琶音(方向键移动/软降不配音效;消行触发升级时改播升级音,避免
+    SND_NOSTOP 把它挡掉;tetris_play_snd,headless 无导出时跳过);
+    计分 LED:软降/硬降/消行加分统一走 tetris_score_count_begin 400ms 滚动
+    (消消乐 xxl_coin_count 同款),滚动重入自动废弃旧段从当前显示值续滚;
+    数据层(旋转/碰撞/消行/计分)与渲染层分离,可在裸 lua 中回归测试;
+    键盘: 棋盘 focusable + lua SubscribeEvent(EVT_KEYDOWN),← → 移动、
+    ↑ 旋转、↓ 软降、空格 硬降、P 暂停;7-bag 随机、旋转踢墙、消行闪白、
+    等级加速、结束面板重开;子页隐藏自动暂停。
+  棋盘/预览格的名字与 id 约定见 test.lua 的 tetris_* 函数。
 -->
-<tabctrl pos="0,0,-0,-0" tabWidth="100" tabAlign="left" curSel="0" animateSteps="20"
+<tabctrl pos="0,0,-0,-0" tabWidth="100" tabAlign="left" curSel="2" animateSteps="20"
          colorBkgnd="@color/clr_page_bg" colorText="@color/clr_title">
   <page title="消消乐">
     <window pos="0,0,-0,-0" layout="hbox" padding="15,12,15,15" interval="12">
@@ -164,5 +201,102 @@
         </window>
       </window>
     </window>
+  </page>
+  <page title="俄罗斯方块" on_visible_changed="tetris_on_page_vis">
+    <window pos="0,0,-0,-0" layout="hbox" padding="15,12,15,15" interval="12">
+      <!-- 左侧信息卡片:标题 / 下一块预览 / LED 计分区 / 功能按钮 / 操作说明 -->
+      <window size="192,-2" layout="vbox" interval="10" padding="14,12,14,12" colorBkgnd="@color/clr_card_bg">
+        <!-- 标题行:T 块图标 + 标题/副标题 -->
+        <window size="-2,-1" layout="hbox" interval="8">
+          <img size="30,30" skin="svg_tetris_blocks" iconIndex="16" layout_gravity="center"/>
+          <window size="-1,-2" layout="vbox" interval="1">
+            <text text="俄罗斯方块" font="size:16,bold:1" colorText="@color/clr_title"/>
+            <text text="LUA + SVG 完整版" font="size:10" colorText="@color/clr_text_sub"/>
+          </window>
+        </window>
+        <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
+        <!-- 计分区:七段 LED 翻页计数器 -->
+        <text text="得分" font="size:12" colorText="@color/clr_text_sub"/>
+        <window size="-2,-1" layout="hbox" interval="3">
+          <t:g.xxl_digit><data name="digit_tscore_3"/></t:g.xxl_digit>
+          <t:g.xxl_digit><data name="digit_tscore_2"/></t:g.xxl_digit>
+          <t:g.xxl_digit><data name="digit_tscore_1"/></t:g.xxl_digit>
+          <t:g.xxl_digit><data name="digit_tscore_0"/></t:g.xxl_digit>
+        </window>
+        <text text="行数" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
+        <window size="-2,-1" layout="hbox" interval="3">
+          <t:g.xxl_digit><data name="digit_tlines_2"/></t:g.xxl_digit>
+          <t:g.xxl_digit><data name="digit_tlines_1"/></t:g.xxl_digit>
+          <t:g.xxl_digit><data name="digit_tlines_0"/></t:g.xxl_digit>
+        </window>
+        <text text="等级" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
+        <window size="-2,-1" layout="hbox" interval="3">
+          <t:g.xxl_digit><data name="digit_tlevel_1"/></t:g.xxl_digit>
+          <t:g.xxl_digit><data name="digit_tlevel_0"/></t:g.xxl_digit>
+        </window>
+        <text name="txt_tetris_state" text="状态:待开始" extend_top="4" font="size:12" colorText="@color/clr_text_sub"/>
+        <window size="0,0" weight="1"/>
+        <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
+        <!-- 功能按钮:SVG 药丸形底(3 态),开始=主色实底,重新开始=白底描边 -->
+        <button name="btn_tetris_start" size="-2,36" skin="xxl_btn_primary" colorText="#FFFFFF" cursor="hand" on_command="tetris_on_start" tip="开始 / 暂停 / 继续">开始游戏</button>
+        <button name="btn_tetris_restart" size="-2,36" skin="xxl_btn_secondary" colorText="@color/clr_primary" cursor="hand" on_command="tetris_on_restart" tip="重新开始一局">重新开始</button>
+      </window>
+      <!-- 中间留白 + 棋盘(10x20 格,内容由 lua 动态创建,svg_tetris_blocks 雪碧图)+ 留白 -->
+      <window size="0,0" weight="1"/>
+      <stack name="wnd_game" size="-1,-2">
+        <window name="wnd_tetris_board" size="-1,-2"  layout_gravity="center" layout="gridlayout" rowCount="20" columnCount="10" interval="2" padding="8" gravity="fill" colorBkgnd="@color/clr_card_bg" focusable="1" tip="点击此处获取键盘焦点"/>
+        <!-- 结束窗口:布局内静态遮罩+得分卡片(动画全走 anim 模板 + SetAnimation,
+             lua 只刷新文本与挂载动画,不拼 XML);默认隐藏(visible=0),
+             展示/隐藏由 test.lua 的 tetris_over_show/hide 驱动 -->
+        <window name="wnd_gameover" size="-2,-2" layout="vbox" colorBkgnd="#990F172A" visible="0" msgTransparent="1" on_animation_stop="tetris_on_over_stop">
+          <window size="0,0" weight="1"/>
+          <window name="wnd_gameover_card" size="240,-1" layout_gravity="center" layout="vbox" interval="10" padding="24,22,24,20" colorBkgnd="@color/clr_card_bg">
+            <text text="游戏结束" font="size:22,bold:1" colorText="@color/clr_title" align="center"/>
+            <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
+            <text name="txt_score" text="本局得分 0" font="size:16,bold:1" colorText="@color/clr_primary" align="center"/>
+            <text text="点击「重新开始」再来一局" font="size:12" colorText="@color/clr_text_sub" align="center"/>
+          </window>
+          <window size="0,0" weight="1"/>
+        </window>
+      </stack>
+      <!-- 右侧预览卡:与左侧计分卡对称(下一个方块 + 键位说明) -->
+      <window size="0,0" weight="1"/>
+      <window size="192,-2" layout="vbox" interval="10" padding="14,12,14,12" colorBkgnd="@color/clr_card_bg">
+        <!-- 标题行:幽灵块图标 + 标题/副标题 -->
+        <window size="-2,-1" layout="hbox" interval="8">
+          <img size="30,30" skin="svg_tetris_blocks" iconIndex="8" layout_gravity="center"/>
+          <window size="-1,-2" layout="vbox" interval="1">
+            <text text="下一个" font="size:16,bold:1" colorText="@color/clr_title"/>
+            <text text="NEXT BLOCK" font="size:10" colorText="@color/clr_text_sub"/>
+          </window>
+        </window>
+        <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
+        <!-- 下一块预览:4x4 格,内容由 lua 动态创建(svg_tetris_blocks 帧) -->
+        <window name="wnd_tetris_next" size="-2,0" weight="1" layout="gridlayout" rowCount="4" columnCount="4" interval="2" gravity="fill" layout_gravity="center"/>
+        <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
+        <!-- 键位说明:4 行键帽 SVG + 布局文字(svg_tetris_key_*,键帽只画按键,
+             含义文字在下方 text 上配置) -->
+        <window size="-2,-1" layout="vbox" interval="6">
+          <window size="-2,26" layout="hbox" interval="8">
+            <img size="52,26" skin="svg_tetris_key_lr"/>
+            <text text="移动" font="size:11" colorText="@color/clr_text_sub" layout_gravity="center"/>
+          </window>
+          <window size="-2,26" layout="hbox" interval="8">
+            <img size="52,26" skin="svg_tetris_key_ud"/>
+            <text text="旋转 / 软降" font="size:11" colorText="@color/clr_text_sub" layout_gravity="center"/>
+          </window>
+          <window size="-2,26" layout="hbox" interval="8">
+            <img size="52,26" skin="svg_tetris_key_space"/>
+            <text text="硬降" font="size:11" colorText="@color/clr_text_sub" layout_gravity="center"/>
+          </window>
+          <window size="-2,26" layout="hbox" interval="8">
+            <img size="26,26" skin="svg_tetris_key_p"/>
+            <text text="暂停" font="size:11" colorText="@color/clr_text_sub" layout_gravity="center"/>
+          </window>
+        </window>
+      </window>
+    </window>
+    <!-- 动画浮层:消行光波/碎片 / 飞分文本画在这最顶层(参考消消乐 wnd_xxl_aniframe) -->
+    <window name="wnd_tetris_aniframe" pos="0,0,-0,-0" msgTransparent="1"/>
   </page>
 </tabctrl>
