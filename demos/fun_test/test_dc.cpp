@@ -1,4 +1,4 @@
-/**
+﻿/**
  * swinx GDI tests: GDI object management and GDI path recording.
  * The path tests were moved here from test.cpp during the fun_test
  * reorganization (they used to live in the PathAPITest fixture).
