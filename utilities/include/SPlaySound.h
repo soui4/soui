@@ -10,6 +10,7 @@
 //      macOS=AudioServices, Linux=alsa/aplay, Android=PlatformAPI)。
 #include <windows.h>
 #include <mmsystem.h>
+#include <utilities-def.h>
 
 UTILITIES_API BOOL SPlaySound(LPCTSTR pszSound, HMODULE hmod, DWORD fdwSound);
 
