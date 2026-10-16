@@ -2199,6 +2199,10 @@ end
 -- 滑动动画核心:4 个 img 从当前显示位滑向数据位;kind 供结束接力
 -- ("drop"结束时锁定)。返回是否起飞;起飞失败/无格子时回退 build 贴位。
 function tetris_slide_start(ms, kind)
+	tetris_active_finish_slide();	-- 必须先立即完成旧动画:贴齐其目标格并把
+	                                -- tetris.act.rcs 同步到真实显示位;否则新动画
+	                                -- 会用过期的起点接力,且旧动画未标 dead 会与新
+	                                -- 动画同时驱动同一批 img(快速连按软降可见方块回退)
 	local cur = tetris.cur;
 	local info = tetris_cells[cur.kind][cur.rot];
 	local from = {}; local to = {}; local ids = {};
