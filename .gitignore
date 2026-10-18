@@ -78,3 +78,4 @@ ios/
 *.deb
 /soui-ohos-lib/BuildProfile.ets
 demos/RIPDemo/
+/ppt

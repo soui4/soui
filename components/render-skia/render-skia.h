@@ -263,6 +263,7 @@ public:
 
 	STDMETHOD_(void,Clear)(THIS) OVERRIDE;
 protected:
+	friend class SRenderTarget_Skia;
 	SkRegion GetRegion() const;
 
 	void SetRegion(const SkRegion & rgn);
@@ -538,6 +539,57 @@ protected:
 	int				m_xferMode;
 };
 
+//////////////////////////////////////////////////////////////////////////
+// SRenderTarget_SkiaGL
+// 基于 OpenGL 硬件加速的渲染目标（绑定宿主窗口创建，对应不需要离屏渲染的场景）。
+// 所有绘制在 GPU 端 FBO 上完成；EndDraw 时回读到 CPU 位图，
+// 使 GetDC/BitBlt 等既有 CPU 像素消费路径保持不变。
+class SRenderTarget_SkiaGL : public SRenderTarget_Skia
+{
+	friend class SRenderFactory_Skia;
+public:
+	/// 创建 GPU 渲染目标，任何初始化步骤失败返回 FALSE（调用方回退软件渲染）
+	static BOOL Create(IRenderFactory *pRenderFactory,int nWid,int nHei,IRenderTarget **ppRenderTarget);
+
+	~SRenderTarget_SkiaGL();
+
+	STDMETHOD_(void, BeginDraw)(THIS) OVERRIDE;
+
+	STDMETHOD_(void, EndDraw)(THIS) OVERRIDE;
+
+	STDMETHOD_(HRESULT, Resize)(THIS_ SIZE sz) OVERRIDE;
+
+	STDMETHOD_(HDC, GetDC)(THIS_ UINT uFlag) OVERRIDE;
+
+	STDMETHOD_(void, ReleaseDC)(THIS_ HDC hdc,LPCRECT pRc) OVERRIDE;
+
+	STDMETHOD_(HRESULT, PushClipRect)(THIS_ LPCRECT pRect, UINT mode) OVERRIDE;
+
+	STDMETHOD_(HRESULT, PushClipRegion)(THIS_ IRegionS *pRegion, UINT mode) OVERRIDE;
+
+	STDMETHOD_(HRESULT, ClearRect)(THIS_ LPCRECT pRect,COLORREF cr) OVERRIDE;
+
+protected:
+	SRenderTarget_SkiaGL(IRenderFactory *pRenderFactory,int nWid,int nHei);
+
+	bool init(int nWid,int nHei);
+
+	/// GPU surface -> m_curBmp 回读（使用 m_rgnDraw 限定范围，空则全图）
+	void syncToBitmap();
+
+	/// 将 CPU 位图中 rgn 区域（空表示全图）上传到 GPU surface
+	void uploadRegion(const SkBitmap &bmp, const SkRegion &rgn);
+
+	/// 将 GPU surface 中 rgn 区域（空表示全图）回读到 CPU 位图
+	void downloadRegion(const SkBitmap &bmp, const SkRegion &rgn);
+
+protected:
+	SkSurface *	m_gpuSurface;
+	BOOL		m_bGdiInteropDC;	//GDI 互操作 DC 使用标记（GetDC(0) 置位，ReleaseDC 回传 GPU 后复位）
+	SkRegion	m_rgnDraw;			//本次绘制会话涉及的设备坐标脏区（各 Push 裁剪的并集）
+	SkRegion	m_rgnDrawPrev;		//上一会话的脏区，BeginDraw 仅增量上传该区域，避免每帧整图拷贝；空表示需整图上传（首帧或 Resize 后）
+};
+
 namespace RENDER_SKIA
 {
 	SOUI_COM_C BOOL SOUI_COM_API SCreateInstance(IObjRef ** ppRenderFactory);
@@ -546,3 +598,4 @@ SNSEND
 
 EXTERN_C BOOL SOUI_COM_API Render_Skia_SCreateInstance(IObjRef ** ppRenderFactory);
 EXTERN_C void SOUI_COM_API Render_Skia_SetFontFallback(FontFallback fontFallback);
+EXTERN_C void SOUI_COM_API Render_Skia_EnableGPU(BOOL bEnable);

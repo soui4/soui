@@ -22,6 +22,8 @@
 
 #include "render-skia.h"
 
+#include "GLContext-Skia.h"
+
 #include "skia2rop2.h"
 #include "PathEffect-Skia.h"
 #include "MaskFilter-Skia.h"
@@ -307,6 +309,7 @@ class SStrokeJoin {
 
 SRenderFactory_Skia::SRenderFactory_Skia()
 {
+    SGPURenderEnv::Acquire();
     SkGraphics::Init();
     SkGraphics::SetFontCacheCountLimit(500); // cache up to 500 font resource.
 
@@ -326,6 +329,7 @@ SRenderFactory_Skia::~SRenderFactory_Skia()
 {
     m_defFont = NULL;
     SkGraphics::Term();
+    SGPURenderEnv::Release();
 }
 
 void SRenderFactory_Skia::SetImgDecoderFactory(IImgDecoderFactory *pImgDecoderFac)
@@ -337,6 +341,9 @@ IImgDecoderFactory *SRenderFactory_Skia::GetImgDecoderFactory()
 {
     return m_imgDecoderFactory;
 }
+
+// OpenGL 硬件加速渲染目标开关，默认开启；Render_Skia_EnableGPU 可关闭
+static BOOL s_bSkiaEnableGPU = TRUE;
 
 BOOL SRenderFactory_Skia::CreateRenderTarget(IRenderTarget **ppRenderTarget, int nWid, int nHei)
 {
@@ -437,6 +444,9 @@ BOOL SRenderFactory_Skia::CreateRenderTarget2(THIS_ IRenderTarget **ppRenderTarg
 {
     RECT rc;
     ::GetClientRect(hWnd, &rc);
+    // 宿主窗口（不需要离屏渲染）优先使用 OpenGL 硬件加速渲染目标，失败时回退软件渲染
+    if (s_bSkiaEnableGPU && SRenderTarget_SkiaGL::Create(this, rc.right, rc.bottom, ppRenderTarget))
+        return TRUE;
     return CreateRenderTarget(ppRenderTarget, rc.right, rc.bottom);
 }
 
@@ -575,6 +585,255 @@ HRESULT SRenderTarget_Skia::Resize(SIZE sz)
     m_SkCanvas = new SkCanvas(m_curBmp->GetSkBitmap());
     return S_OK;
 }
+
+//////////////////////////////////////////////////////////////////////////
+// SRenderTarget_SkiaGL
+
+SRenderTarget_SkiaGL::SRenderTarget_SkiaGL(IRenderFactory *pRenderFactory, int nWid, int nHei)
+    : SRenderTarget_Skia(pRenderFactory, nWid, nHei)
+    , m_gpuSurface(NULL)
+    , m_bGdiInteropDC(FALSE)
+{
+}
+
+SRenderTarget_SkiaGL::~SRenderTarget_SkiaGL()
+{
+    if (m_gpuSurface)
+    {
+        // canvas 由 surface 所有，随 surface 一起释放
+        m_SkCanvas = NULL;
+        m_gpuSurface->unref();
+        m_gpuSurface = NULL;
+    }
+}
+
+BOOL SRenderTarget_SkiaGL::Create(IRenderFactory *pRenderFactory, int nWid, int nHei, IRenderTarget **ppRenderTarget)
+{
+    *ppRenderTarget = NULL;
+    if (nWid <= 0 || nHei <= 0)
+        return FALSE;
+    if (!SGPURenderEnv::GetGrContext())
+        return FALSE;
+
+    SRenderTarget_SkiaGL *pRT = new SRenderTarget_SkiaGL(pRenderFactory, nWid, nHei);
+    if (!pRT->init(nWid, nHei))
+    {
+        delete pRT;
+        return FALSE;
+    }
+    *ppRenderTarget = pRT;
+    return TRUE;
+}
+
+bool SRenderTarget_SkiaGL::init(int nWid, int nHei)
+{
+    GrContext *grCtx = SGPURenderEnv::GetGrContext();
+    if (!grCtx || !m_curBmp)
+        return false;
+
+    const SkBitmap &bmp = m_curBmp->GetSkBitmap();
+    if (bmp.isNull())
+        return false;
+
+    // GPU surface 与 CPU 影子位图使用同一像素布局（kN32Premul），保证无缝回读
+    m_gpuSurface = SkSurface::NewRenderTarget(grCtx, bmp.info(), 0);
+    if (!m_gpuSurface)
+        return false;
+
+    delete m_SkCanvas; // 替换基类构造的空光栅画布
+    m_SkCanvas = m_gpuSurface->getCanvas();
+    return true;
+}
+
+void SRenderTarget_SkiaGL::uploadRegion(const SkBitmap &bmp, const SkRegion &rgn)
+{
+    SkCanvas *canvas = m_gpuSurface->getCanvas();
+    if (rgn.isEmpty())
+    {
+        canvas->writePixels(bmp.info(), bmp.getPixels(), bmp.rowBytes(), 0, 0);
+        return;
+    }
+    const int nWid = bmp.width(), nHei = bmp.height();
+    SkRegion::Iterator it(rgn);
+    for (; !it.done(); it.next())
+    {
+        SkIRect rc = it.rect();
+        if (rc.fLeft < 0) rc.fLeft = 0;
+        if (rc.fTop < 0) rc.fTop = 0;
+        if (rc.fRight > nWid) rc.fRight = nWid;
+        if (rc.fBottom > nHei) rc.fBottom = nHei;
+        if (rc.isEmpty())
+            continue;
+        const void *src = (const char *)bmp.getPixels() + rc.fTop * bmp.rowBytes() + rc.fLeft * sizeof(SkPMColor);
+        SkImageInfo sub = SkImageInfo::MakeN32Premul(rc.width(), rc.height());
+        canvas->writePixels(sub, src, bmp.rowBytes(), rc.fLeft, rc.fTop);
+    }
+}
+
+void SRenderTarget_SkiaGL::downloadRegion(const SkBitmap &bmp, const SkRegion &rgn)
+{
+    SkCanvas *canvas = m_gpuSurface->getCanvas();
+    if (rgn.isEmpty())
+    {
+        canvas->readPixels(bmp.info(), bmp.getPixels(), bmp.rowBytes(), 0, 0);
+        return;
+    }
+    const int nWid = bmp.width(), nHei = bmp.height();
+    SkRegion::Iterator it(rgn);
+    for (; !it.done(); it.next())
+    {
+        SkIRect rc = it.rect();
+        if (rc.fLeft < 0) rc.fLeft = 0;
+        if (rc.fTop < 0) rc.fTop = 0;
+        if (rc.fRight > nWid) rc.fRight = nWid;
+        if (rc.fBottom > nHei) rc.fBottom = nHei;
+        if (rc.isEmpty())
+            continue;
+        void *dst = (char *)bmp.getPixels() + rc.fTop * bmp.rowBytes() + rc.fLeft * sizeof(SkPMColor);
+        SkImageInfo sub = SkImageInfo::MakeN32Premul(rc.width(), rc.height());
+        canvas->readPixels(sub, dst, bmp.rowBytes(), rc.fLeft, rc.fTop);
+    }
+}
+
+void SRenderTarget_SkiaGL::syncToBitmap()
+{
+    if (!m_gpuSurface || !m_curBmp)
+        return;
+    SkCanvas *canvas = m_gpuSurface->getCanvas();
+    canvas->flush();
+    // 注意：m47 的 SkBitmap 赋值拷贝会把 fPixels 置空（需 lockPixels 才恢复），
+    // 必须以引用持有原对象，否则 getPixels() 返回 NULL，readPixels 会向非法地址写入。
+    const SkBitmap &bmp = m_curBmp->GetSkBitmap();
+    if (bmp.isNull() || !bmp.getPixels())
+        return;
+    // 只回读本会话 Push 裁剪覆盖到的矩形。老版 skia 在 macOS 上对复杂区域走
+    // stencil 裁剪，存在把像素画到区域边界外的缺陷，脏区外一律保留 CPU 位图
+    // 内容，GPU 泄漏不进入呈现画面。
+    downloadRegion(bmp, m_rgnDraw);
+}
+
+void SRenderTarget_SkiaGL::BeginDraw(THIS)
+{
+    if (!m_gpuSurface)
+        return;
+    // CPU 位图是唯一权威画面：会话内只绘制脏区（Push 裁剪记录到 m_rgnDraw），
+    // EndDraw 时也只回读脏区。上传同样按需进行：GPU 上未重绘区域的内容与
+    // CPU 位图保持一致（上次同步的结果），只需回传上一会话改动过的区域
+    // （m_rgnDrawPrev）；该区域为空（首次绘制或 Resize 后）时整图上传。
+    m_rgnDraw.setEmpty();
+    const SkBitmap &bmp = m_curBmp->GetSkBitmap();
+    if (bmp.isNull() || !bmp.getPixels())
+        return;
+    uploadRegion(bmp, m_rgnDrawPrev);
+}
+
+void SRenderTarget_SkiaGL::EndDraw(THIS)
+{
+    syncToBitmap();
+    SRenderTarget_Skia::EndDraw();
+    // 记录本会话脏区，供下一会话 BeginDraw 增量上传
+    m_rgnDrawPrev = m_rgnDraw;
+}
+
+HRESULT SRenderTarget_SkiaGL::Resize(SIZE sz)
+{
+    if (!m_gpuSurface)
+        return E_FAIL;
+    m_rgnDraw.setEmpty();
+    m_rgnDrawPrev.setEmpty(); // 新 surface 内容未初始化，下次 BeginDraw 需整图上传
+    HRESULT hr = m_curBmp->Init(sz.cx, sz.cy, NULL);
+    if (FAILED(hr))
+        return hr;
+
+    // canvas 归 surface 所有，先解除引用再释放 surface，避免 double-free
+    m_SkCanvas = NULL;
+    m_gpuSurface->unref();
+    m_gpuSurface = NULL;
+    const SkBitmap &bmp = m_curBmp->GetSkBitmap();
+    if (!bmp.isNull())
+    {
+        m_gpuSurface = SkSurface::NewRenderTarget(SGPURenderEnv::GetGrContext(), bmp.info(), 0);
+    }
+    if (!m_gpuSurface)
+    {
+        // GPU surface 重建失败时回退软渲染画布，保证 RT 仍可继续绘制
+        m_SkCanvas = new SkCanvas(m_curBmp->GetSkBitmap());
+        return E_OUTOFMEMORY;
+    }
+    m_SkCanvas = m_gpuSurface->getCanvas();
+    return S_OK;
+}
+
+HRESULT SRenderTarget_SkiaGL::PushClipRect(LPCRECT pRect, UINT mode)
+{
+	// 记录本次 Push 后的精确裁剪范围（尊重 COPY/AND/DIFF 语义），
+	// 作为 EndDraw 时 GPU->CPU 的回读范围：既不能漏掉实际绘制区域，
+	// 也不能把裁剪挖除/缩小后未绘制的区域并入（老版 skia macOS stencil
+	// 裁剪会把像素画到区域边界外，多记会让泄漏进入 CPU 位图并上屏）。
+	HRESULT hr = SRenderTarget_Skia::PushClipRect(pRect, mode);
+	if (SUCCEEDED(hr) && m_SkCanvas)
+	{
+		SkRegion rgnClip = m_SkCanvas->getTotalClip();
+		m_rgnDraw.op(rgnClip, SkRegion::kUnion_Op);
+	}
+	return hr;
+}
+
+HRESULT SRenderTarget_SkiaGL::PushClipRegion(IRegionS *pRegion, UINT mode)
+{
+	HRESULT hr = SRenderTarget_Skia::PushClipRegion(pRegion, mode);
+	if (SUCCEEDED(hr) && m_SkCanvas)
+	{
+		SkRegion rgnClip = m_SkCanvas->getTotalClip();
+		m_rgnDraw.op(rgnClip, SkRegion::kUnion_Op);
+	}
+	return hr;
+}
+
+HRESULT SRenderTarget_SkiaGL::ClearRect(LPCRECT pRect,COLORREF cr)
+{
+	HRESULT hr = SRenderTarget_Skia::ClearRect(pRect, cr);
+	if (SUCCEEDED(hr) && m_SkCanvas)
+	{
+		// 清空同样受当前裁剪约束，并入当前裁剪保证回读完整
+		SkRegion rgnClip = m_SkCanvas->getTotalClip();
+		m_rgnDraw.op(rgnClip, SkRegion::kUnion_Op);
+	}
+	return hr;
+}
+
+HDC SRenderTarget_SkiaGL::GetDC(UINT uFlag)
+{
+    // GDI 互操作（uFlag==0，如 DrawIconEx）需要基于最新像素操作，补一次 GPU->CPU 同步；
+    // 呈现路径（uFlag!=0）直接使用 EndDraw 时同步好的影子位图，避免每帧额外回读。
+    if (uFlag == 0)
+    {
+        syncToBitmap();
+        m_bGdiInteropDC = TRUE;
+    }
+    return SRenderTarget_Skia::GetDC(uFlag);
+}
+
+void SRenderTarget_SkiaGL::ReleaseDC(HDC hdc, LPCRECT pRc)
+{
+    SRenderTarget_Skia::ReleaseDC(hdc, pRc);
+    // GDI 互操作可能修改了 CPU 位图，回传 GPU surface
+    if (m_bGdiInteropDC && m_gpuSurface && m_curBmp)
+    {
+        const SkBitmap &bmp = m_curBmp->GetSkBitmap();
+        if (!bmp.isNull() && bmp.getPixels())
+        {
+            // GDI 互操作的绘制受 GetDC 时同步到 DC 的裁剪限制，范围 ⊆ m_rgnDraw，
+            // 按该区域增量回传即可；m_rgnDraw 为空（会话外互操作）时整图回传兜底
+            uploadRegion(bmp, m_rgnDraw);
+        }
+#ifndef _WIN32
+        m_curBmp->MarkDirty();
+#endif // _WIN32
+    }
+    m_bGdiInteropDC = FALSE;
+}
+
 
 HRESULT SRenderTarget_Skia::PushClipRect(LPCRECT pRect, UINT mode /*=RGN_AND*/)
 {
@@ -3722,5 +3981,15 @@ EXTERN_C void Render_Skia_SetFontFallback(FontFallback fontFallback)
     else
     {
         SkScalerContext::SetFontFallback(NULL);
+    }
+}
+
+EXTERN_C void Render_Skia_EnableGPU(BOOL bEnable)
+{
+    SNS::s_bSkiaEnableGPU = bEnable;
+    // 尚未创建 GrContext 时直接释放 GL 环境；已创建时保留，避免影响存活的渲染目标
+    if (!bEnable && !SNS::SGPURenderEnv::IsAlive())
+    {
+        SNS::SGPURenderEnv::Shutdown();
     }
 }

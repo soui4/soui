@@ -832,13 +832,15 @@ HDC SNativeWnd::GetDC()
 
 BOOL SNativeWnd::KillTimer(UINT_PTR nIDEvent)
 {
-    SASSERT(IsWindow());
+    if(!IsWindow())
+        return FALSE;
     return ::KillTimer(m_hWnd, nIDEvent);
 }
 
 UINT_PTR SNativeWnd::SetTimer(UINT_PTR nIDEvent, UINT nElapse, void(CALLBACK *lpfnTimer)(HWND, UINT, UINT_PTR, DWORD) /**< = NULL */)
 {
-    SASSERT(IsWindow());
+    if(!IsWindow())
+        return 0;
     return ::SetTimer(m_hWnd, nIDEvent, nElapse, (TIMERPROC)lpfnTimer);
 }
 

@@ -270,6 +270,7 @@ HWND SHostWnd::CreateEx(HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, 
         dwExStyle |= WS_EX_COMPOSITED;
 #endif // _WIN32
     }
+    SSLOGI()<<"create host, translucent="<<m_hostAttr.m_bTranslucent;
     m_xmlInit = xmlInit;
     HWND hWnd = SNativeWnd::CreateNative(_T("HOSTWND"), dwStyle, dwExStyle, x, y, nWidth, nHeight, hWndParent, 0);
     m_xmlInit = NULL;

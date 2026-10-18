@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<resource>
+	<UIDEF>
+		<file name="XML_INIT" path="uidef\init.xml" />
+	</UIDEF>
+	<ICON>
+		<file name="ICON_LOGO" path="image\opengl_demo.ico" />
+	</ICON>
+	<layout>
+		<file name="opengl.demo" path="layout\opengl.demo.xml" />
+	</layout>
+</resource>

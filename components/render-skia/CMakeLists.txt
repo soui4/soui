@@ -10,6 +10,7 @@ set(render-skia_header
 	PathEffect-Skia.h
     MaskFilter-Skia.h
     ImageFilter-Skia.h
+    GLContext-Skia.h
 )
 set(render-skia_src
 	drawtext-skia.cpp
@@ -18,6 +19,7 @@ set(render-skia_src
 	PathEffect-Skia.cpp
     MaskFilter-Skia.cpp
     ImageFilter-Skia.cpp
+    GLContext-Skia.cpp
 )
 
 source_group("Header Files" FILES ${render-skia_header})
@@ -50,11 +52,14 @@ else()
             # 查找GLEW和GLFW包
         find_package(GLEW REQUIRED)
         find_package(glfw3 REQUIRED)
-        set(GL_LIB GLEW::GLEW glfw)
+        # CGL（OpenGL.framework）用于 Skia GPU 后端的离屏 GL 上下文
+        set(GL_LIB GLEW::GLEW glfw "-framework OpenGL")
     elseif(CMAKE_SYSTEM_NAME MATCHES Android)
         set(GL_LIB EGL GLESv2)
     else()
-        set(GL_LIB GL)
+        # GLX（X11）用于 Skia GPU 后端的离屏 GL 上下文
+        find_package(X11 REQUIRED)
+        set(GL_LIB GL ${X11_LIBRARIES})
     endif()
 endif()
 target_link_libraries(render-skia ${GL_LIB})
@@ -65,6 +70,10 @@ endif()
 target_compile_definitions(render-skia
   PUBLIC SOUI_RENDER_USE_SKIA
 )
+if(CMAKE_SYSTEM_NAME MATCHES "Darwin|iOS")
+    # CGL/OpenGL.framework 在 macOS 上标记为 deprecated，仅为 Skia GPU 后端使用
+    target_compile_options(render-skia PRIVATE -Wno-deprecated-declarations)
+endif()
 target_include_directories(render-skia
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
   PRIVATE ${SOUI_ROOT_DIR}/config
@@ -74,6 +83,8 @@ target_include_directories(render-skia
   PRIVATE ${SOUI_ROOT_DIR}/third-part/skia/include
   PRIVATE ${SOUI_ROOT_DIR}/third-part/skia/include/config
   PRIVATE ${SOUI_ROOT_DIR}/third-part/skia/include/core
+  PRIVATE ${SOUI_ROOT_DIR}/third-part/skia/include/gpu
+  PRIVATE ${SOUI_ROOT_DIR}/third-part/skia/include/utils
   PRIVATE ${SOUI_ROOT_DIR}/third-part/skia/include/xml
   PRIVATE ${SOUI_ROOT_DIR}/third-part/skia/include/svg
   PRIVATE ${SOUI_ROOT_DIR}/third-part/skia/src/core

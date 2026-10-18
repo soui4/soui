@@ -14,8 +14,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
+      # 子模块改从 GitHub 镜像拉取：.gitmodules 里指向 gitee，GitHub runner 上不可靠
+      # （clone 失败或超时）。映射表与 build.yml 保持一致，改一处要五处一起改。
+      - name: Checkout submodules from GitHub mirror
+        shell: bash
+        run: |
+          git config --global url."https://github.com/soui4/swinx".insteadOf "https://gitee.com/setoutsoft/swinx"
+          git config --global url."https://github.com/setoutsoft/libwebsockets".insteadOf "https://gitee.com/setoutsoft/libwebsockets"
+          git config --global url."https://github.com/setoutsoft/openssl-cmake".insteadOf "https://gitee.com/setoutsoft/openssl-cmake"
+          git config --global url."https://github.com/setoutsoft/curl".insteadOf "https://gitee.com/setoutsoft/curl"
+          git submodule update --init --recursive
       - uses: lukka/get-cmake@latest
         with:
           cmakeVersion: "^3.25.0"
@@ -29,6 +37,25 @@ jobs:
         run: cmake --build build --target fun_test --parallel 4
       - name: Run basic validation
         run: xvfb-run -a ctest --test-dir build -L '^soui-headless$' --output-on-failure
+      # OpenGL 冒烟：opengl_demo 的 --selftest 会跑 16 条 WGL 入口契约断言 +
+      # 三张截图（固定管线 / GLSL+VBO / 销毁重建上下文），并对失败返回非 0。
+      # 用 Xvfb + Mesa 软渲染（llvmpipe），不需要 GPU。
+      - name: Build opengl_demo
+        run: cmake --build build --target opengl_demo --parallel 4
+      - name: Run OpenGL smoke (WGL contract tests)
+        run: |
+          cd build/bin
+          LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe \
+            xvfb-run -a -s "-screen 0 1280x1024x24" ./opengl_demo --selftest
+      - name: Show OpenGL smoke report
+        if: always()
+        run: |
+          for f in build/bin/opengl_selftest.txt build/bin/opengl_apitest.txt; do
+            if [ -f "$f" ]; then
+              echo "===== $f"
+              cat "$f"
+            fi
+          done
       - name: Diagnose failing SOUI cases
         if: failure()
         run: |
@@ -41,8 +68,16 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
+      # 子模块改从 GitHub 镜像拉取：.gitmodules 里指向 gitee，GitHub runner 上不可靠
+      # （clone 失败或超时）。映射表与 build.yml 保持一致，改一处要五处一起改。
+      - name: Checkout submodules from GitHub mirror
+        shell: bash
+        run: |
+          git config --global url."https://github.com/soui4/swinx".insteadOf "https://gitee.com/setoutsoft/swinx"
+          git config --global url."https://github.com/setoutsoft/libwebsockets".insteadOf "https://gitee.com/setoutsoft/libwebsockets"
+          git config --global url."https://github.com/setoutsoft/openssl-cmake".insteadOf "https://gitee.com/setoutsoft/openssl-cmake"
+          git config --global url."https://github.com/setoutsoft/curl".insteadOf "https://gitee.com/setoutsoft/curl"
+          git submodule update --init --recursive
       - uses: lukka/get-cmake@latest
         with:
           cmakeVersion: "^3.25.0"
@@ -58,8 +93,16 @@ jobs:
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
+      # 子模块改从 GitHub 镜像拉取：.gitmodules 里指向 gitee，GitHub runner 上不可靠
+      # （clone 失败或超时）。映射表与 build.yml 保持一致，改一处要五处一起改。
+      - name: Checkout submodules from GitHub mirror
+        shell: bash
+        run: |
+          git config --global url."https://github.com/soui4/swinx".insteadOf "https://gitee.com/setoutsoft/swinx"
+          git config --global url."https://github.com/setoutsoft/libwebsockets".insteadOf "https://gitee.com/setoutsoft/libwebsockets"
+          git config --global url."https://github.com/setoutsoft/openssl-cmake".insteadOf "https://gitee.com/setoutsoft/openssl-cmake"
+          git config --global url."https://github.com/setoutsoft/curl".insteadOf "https://gitee.com/setoutsoft/curl"
+          git submodule update --init --recursive
       - uses: lukka/get-cmake@latest
         with:
           cmakeVersion: "^3.25.0"
@@ -77,3 +120,20 @@ jobs:
         run: cmake --build build --target fun_test --parallel 4
       - name: Run basic validation
         run: ctest --test-dir build -L '^soui-headless$' --output-on-failure
+      # OpenGL 冒烟：macOS 侧走 NSOpenGLContext（swinx 的 SGLBridge + 视图绑定栈），
+      # 与 Linux 的 GLX 分支是两套实现，必须各测一遍。
+      - name: Build opengl_demo
+        run: cmake --build build --target opengl_demo --parallel 4
+      - name: Run OpenGL smoke (WGL contract tests)
+        run: |
+          cd build/bin
+          ./opengl_demo --selftest
+      - name: Show OpenGL smoke report
+        if: always()
+        run: |
+          for f in build/bin/opengl_selftest.txt build/bin/opengl_apitest.txt; do
+            if [ -f "$f" ]; then
+              echo "===== $f"
+              cat "$f"
+            fi
+          done

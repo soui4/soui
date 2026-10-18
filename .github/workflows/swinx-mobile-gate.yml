@@ -1,0 +1,127 @@
+name: swinx mobile cross-compile
+
+# iOS / Android / OpenHarmony 原本没有任何自动构建：这三端的回归完全靠人工，
+# 而它们恰恰是 vendor 依赖最多、平台 API 最不标准的端。本工作流只做一件事——
+# 把「移动端还能编过」这条底线交给机器。
+#
+# 只编 swinx 目标（compat 层 + 它自带的 thirdparty），不拉 SOUI 其余部分，
+# 因此一次校验的成本远低于整包构建，也不需要真机或模拟器。
+#
+#   Android：用 runner 预装的 NDK；platform 固定 28（= 下游 app 的 minSdk，
+#            iconv 需要 28、ASharedMemory 需要 26，再低就编不过）
+#   OHOS   ：用公开的 OpenHarmony SDK（免注册下载，首次约 1GB 进缓存）
+
+on:
+  pull_request:
+    paths:
+      - 'swinx'
+      - '.github/workflows/swinx-mobile-gate.yml'
+  push:
+    branches:
+      - master
+    paths:
+      - 'swinx'
+      - '.github/workflows/swinx-mobile-gate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  android-arm64:
+    name: swinx-android-arm64
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # 子模块改从 GitHub 镜像拉取：.gitmodules 里指向 gitee，GitHub runner 上不可靠
+      # （clone 失败或超时）。映射表与 build.yml 保持一致，改一处要五处一起改。
+      - name: Checkout submodules from GitHub mirror
+        shell: bash
+        run: |
+          git config --global url."https://github.com/soui4/swinx".insteadOf "https://gitee.com/setoutsoft/swinx"
+          git config --global url."https://github.com/setoutsoft/libwebsockets".insteadOf "https://gitee.com/setoutsoft/libwebsockets"
+          git config --global url."https://github.com/setoutsoft/openssl-cmake".insteadOf "https://gitee.com/setoutsoft/openssl-cmake"
+          git config --global url."https://github.com/setoutsoft/curl".insteadOf "https://gitee.com/setoutsoft/curl"
+          git submodule update --init --recursive
+      - uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: "^3.25.0"
+
+      - name: Resolve Android NDK
+        run: |
+          NDK="${ANDROID_NDK_LATEST_HOME:-${ANDROID_NDK_HOME:-}}"
+          if [ -z "$NDK" ] || [ ! -f "$NDK/build/cmake/android.toolchain.cmake" ]; then
+            echo "::error::runner 镜像上没有 Android NDK（ANDROID_NDK_LATEST_HOME/ANDROID_NDK_HOME 均无效）"
+            exit 1
+          fi
+          echo "SWINX_NDK=$NDK" >> "$GITHUB_ENV"
+          grep -h Revision "$NDK/source.properties" 2>/dev/null || true
+          echo "NDK=$NDK"
+
+      - name: Cross-compile swinx (arm64-v8a, API 28)
+        run: |
+          python3 swinx/tools/cross_build.py android \
+            --sdk "$SWINX_NDK" \
+            --abi arm64-v8a \
+            --api 28 \
+            --generator Ninja \
+            --jobs 4 \
+            --build "$RUNNER_TEMP/swinx-android-arm64"
+
+  ohos-arm64:
+    name: swinx-ohos-arm64
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # 子模块改从 GitHub 镜像拉取：.gitmodules 里指向 gitee，GitHub runner 上不可靠
+      # （clone 失败或超时）。映射表与 build.yml 保持一致，改一处要五处一起改。
+      - name: Checkout submodules from GitHub mirror
+        shell: bash
+        run: |
+          git config --global url."https://github.com/soui4/swinx".insteadOf "https://gitee.com/setoutsoft/swinx"
+          git config --global url."https://github.com/setoutsoft/libwebsockets".insteadOf "https://gitee.com/setoutsoft/libwebsockets"
+          git config --global url."https://github.com/setoutsoft/openssl-cmake".insteadOf "https://gitee.com/setoutsoft/openssl-cmake"
+          git config --global url."https://github.com/setoutsoft/curl".insteadOf "https://gitee.com/setoutsoft/curl"
+          git submodule update --init --recursive
+      - uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: "^3.25.0"
+
+      # native SDK 解包后约 1.5GB；缓存按 SDK 版本号定 key，换版本时自然失效。
+      # key 末尾的 v2 必须随"解包逻辑改变"一起升：旧 key 里的树可能是上一版
+      # 解包器写坏的（符号链接被落成文本文件），而坏掉的链接无法靠事后修复还原。
+      - name: Cache OHOS native SDK
+        id: sdk
+        uses: actions/cache@v4
+        with:
+          path: ~/ohos-sdk-native
+          key: ohos-native-sdk-6.1-lts-v2
+
+      - name: Fetch OHOS native SDK
+        if: steps.sdk.outputs.cache-hit != 'true'
+        run: |
+          python3 swinx/tools/cross_build.py fetch-ohos-sdk \
+            --dest "$HOME/ohos-sdk-native"
+
+      - name: Cross-compile swinx (arm64-v8a)
+        run: |
+          python3 swinx/tools/cross_build.py ohos \
+            --sdk "$HOME/ohos-sdk-native" \
+            --abi arm64-v8a \
+            --generator Ninja \
+            --jobs 4 \
+            --build "$RUNNER_TEMP/swinx-ohos-arm64"
+
+      # SDK 是第三方二进制包，形态（是否符号链接、权限位）出问题时 CMake 的
+      # 报错会指向"编译器不能编译简单程序"，把人往工具链不兼容上带。失败时
+      # 直接把真实形态打出来。
+      - name: OHOS toolchain diagnostics
+        if: failure()
+        run: |
+          BIN="$HOME/ohos-sdk-native/native/llvm/bin"
+          echo "== ls -l $BIN =="
+          ls -l "$BIN" 2>/dev/null | head -30 || true
+          echo "== clang =="
+          file "$BIN/clang" 2>/dev/null || od -c -N 64 "$BIN/clang" 2>/dev/null || true
+          readlink -f "$BIN/clang" 2>/dev/null || true
+          "$BIN/clang" --version 2>&1 | head -3 || true

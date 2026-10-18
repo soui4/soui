@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SOUI name="opengl_demo" title="SOUI SRealWnd + SNativeWnd + OpenGL" width="920" height="640"
+      resizable="1" minsize="680,480" margin="5,5,5,5"
+      bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" trCtx="opengl_demo">
+  <root skin="_skin.sys.wnd.bkgnd" colorBkgnd="#f2f3f5" margin="1,1,1,1" colorBorder="#a0a0a0"
+        layout="vbox" padding="6,6,6,6">
+    <caption size="-2,34" layout="hbox" gravity="center" interval="6">
+      <icon src="ICON_LOGO:16"/>
+      <text font="size:15,weight:bold" colorText="#202020">SOUI SRealWnd + SNativeWnd + OpenGL</text>
+      <window size="0,0" weight="1"/>
+      <imgbtn name="btn_close" skin="_skin.sys.btn.close" animate="1" tip="关闭"/>
+    </caption>
+
+    <window size="-2,44" layout="hbox" interval="8" padding="0,7,0,7" gravity="center">
+      <button name="btn_anim" size="110,30">暂停动画</button>
+      <button name="btn_mode" size="140,30">切到 GLSL 着色器</button>
+      <button name="btn_recreate" size="130,30">重建 GL 上下文</button>
+      <button name="btn_probe" size="110,30">API 探针报告</button>
+      <button name="btn_apitest" size="110,30">API 测试</button>
+      <window size="0,0" weight="1"/>
+    </window>
+
+    <!-- 唯一的 realwnd：wndclass 与 CGLWnd 的窗口类名一致，由 CGLRealWndHandler 接管 -->
+    <realwnd name="glwnd" wndclass="SOUI_GLWnd" wndname="glwnd" size="-2,0" weight="1"/>
+
+    <text name="txt_info" size="-2,72" multiLines="1" font="size:12" colorText="#303030"
+          margin="0,6,0,0"/>
+  </root>
+</SOUI>

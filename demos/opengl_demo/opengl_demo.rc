@@ -1,0 +1,2 @@
+// opengl_demo.rc : exe 文件图标（资源 ID 1 = 应用默认图标）
+1 ICON "uires/image/opengl_demo.ico"

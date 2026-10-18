@@ -344,37 +344,58 @@ endmacro()
 macro(copy_targets_to_bundle app_name target_list)
 if(APPLE)
     if(CMAKE_SYSTEM_NAME MATCHES iOS)
+        # iOS 保持 POST_BUILD 方式（$<TARGET_BUNDLE_DIR> 的隐式依赖与 POST_BUILD 语义一致）
         set(_FW_DIR "$<TARGET_BUNDLE_DIR:${app_name}>/Frameworks")
-    else()
-        set(_FW_DIR "$<TARGET_BUNDLE_DIR:${app_name}>/Contents/Frameworks")
-    endif()
-    # 创建Frameworks目录
-    add_custom_command(TARGET ${app_name} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory
-            "${_FW_DIR}"
-        COMMENT "Creating Frameworks directory in ${app_name} bundle"
-    )
-
-    # 复制每个目标的库文件
-    foreach(target_name ${target_list})
-        if(TARGET ${target_name})
-            # 检查目标类型
-            get_target_property(target_type ${target_name} TYPE)
-            message(STATUS "Target name: ${target_name}, type: ${target_type}")
-            if(target_type STREQUAL "SHARED_LIBRARY" OR target_type STREQUAL "MODULE_LIBRARY")
-                add_custom_command(TARGET ${app_name} POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                        "$<TARGET_FILE:${target_name}>"
-                        "${_FW_DIR}/"
-                    COMMENT "Copying ${target_name} library to ${app_name} bundle"
-                )
-            else()
-                message(STATUS "Skipping ${target_name} (not a shared library)")
+        add_custom_command(TARGET ${app_name} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E make_directory "${_FW_DIR}"
+            COMMENT "Creating Frameworks directory in ${app_name} bundle"
+        )
+        foreach(target_name ${target_list})
+            if(TARGET ${target_name})
+                get_target_property(target_type ${target_name} TYPE)
+                if(target_type STREQUAL "SHARED_LIBRARY" OR target_type STREQUAL "MODULE_LIBRARY")
+                    add_custom_command(TARGET ${app_name} POST_BUILD
+                        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                            "$<TARGET_FILE:${target_name}>"
+                            "${_FW_DIR}/"
+                        COMMENT "Copying ${target_name} library to ${app_name} bundle"
+                    )
+                endif()
             endif()
-        else()
-            message(WARNING "Target not found: ${target_name}")
+        endforeach()
+    else()
+        # 组件库为运行时加载，app 重链不依赖它们，不能用 POST_BUILD——库更新后 bundle 会残留旧库。
+        # 改为独立 custom target：库变化时自动重拷(copy_if_different 保证内容不变时不动文件)，
+        # 并让 app 显式依赖它，保证单独构建 app 目标时 bundle 同步。
+        # bundle 目录用配置期路径，避免 $<TARGET_BUNDLE_DIR:app> 给 copy 目标引入对 app 的
+        # 隐式依赖（否则 add_dependencies(app copy_x) 会形成依赖环）。
+        get_target_property(_rt_out ${app_name} RUNTIME_OUTPUT_DIRECTORY)
+        if(NOT _rt_out)
+            set(_rt_out "${CMAKE_CURRENT_BINARY_DIR}")
         endif()
-    endforeach()
-
+        set(_FW_DIR "${_rt_out}/${app_name}.app/Contents/Frameworks")
+        foreach(target_name ${target_list})
+            if(TARGET ${target_name})
+                get_target_property(target_type ${target_name} TYPE)
+                message(STATUS "Target name: ${target_name}, type: ${target_type}")
+                if(target_type STREQUAL "SHARED_LIBRARY" OR target_type STREQUAL "MODULE_LIBRARY")
+                    add_custom_target(copy_${app_name}_${target_name} ALL
+                        COMMAND ${CMAKE_COMMAND} -E make_directory "${_FW_DIR}"
+                        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                            "$<TARGET_FILE:${target_name}>"
+                            "${_FW_DIR}/"
+                        DEPENDS ${target_name}
+                        COMMENT "Copying ${target_name} library to ${app_name} bundle"
+                        VERBATIM
+                    )
+                    add_dependencies(${app_name} copy_${app_name}_${target_name})
+                else()
+                    message(STATUS "Skipping ${target_name} (not a shared library)")
+                endif()
+            else()
+                message(WARNING "Target not found: ${target_name}")
+            endif()
+        endforeach()
+    endif()
 endif(APPLE)
 endmacro()
