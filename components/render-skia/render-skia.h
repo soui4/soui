@@ -586,6 +586,7 @@ protected:
 protected:
 	SkSurface *	m_gpuSurface;
 	BOOL		m_bGdiInteropDC;	//GDI 互操作 DC 使用标记（GetDC(0) 置位，ReleaseDC 回传 GPU 后复位）
+	int			m_nDrawDepth;		//BeginDraw/EndDraw 嵌套深度（SOUI 在绘制过程中可能再次触发 WM_PAINT）
 	SkRegion	m_rgnDraw;			//本次绘制会话涉及的设备坐标脏区（各 Push 裁剪的并集）
 	SkRegion	m_rgnDrawPrev;		//上一会话的脏区，BeginDraw 仅增量上传该区域，避免每帧整图拷贝；空表示需整图上传（首帧或 Resize 后）
 };

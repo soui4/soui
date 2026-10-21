@@ -343,7 +343,7 @@ IImgDecoderFactory *SRenderFactory_Skia::GetImgDecoderFactory()
 }
 
 // OpenGL 硬件加速渲染目标开关，默认开启；Render_Skia_EnableGPU 可关闭
-static BOOL s_bSkiaEnableGPU = FALSE;
+static BOOL s_bSkiaEnableGPU = TRUE;
 
 BOOL SRenderFactory_Skia::CreateRenderTarget(IRenderTarget **ppRenderTarget, int nWid, int nHei)
 {
@@ -593,6 +593,7 @@ SRenderTarget_SkiaGL::SRenderTarget_SkiaGL(IRenderFactory *pRenderFactory, int n
     : SRenderTarget_Skia(pRenderFactory, nWid, nHei)
     , m_gpuSurface(NULL)
     , m_bGdiInteropDC(FALSE)
+    , m_nDrawDepth(0)
 {
 }
 
@@ -716,6 +717,14 @@ void SRenderTarget_SkiaGL::BeginDraw(THIS)
 {
     if (!m_gpuSurface)
         return;
+    // SOUI 在绘制过程中可能再次触发 WM_PAINT（例如动画回调里的 Update()），
+    // 形成 BeginDraw/EndDraw 的嵌套。嵌套会话必须复用最外层的脏区与 GPU 内容：
+    // 不能重置 m_rgnDraw（否则外层已绘制的部分不会被回读），更不能重新上传
+    // m_rgnDrawPrev（那会用上一帧的 CPU 内容覆盖掉外层本次刚画好的像素，
+    // 表现为旧 item 的 hover/选中状态残留）。
+    m_nDrawDepth++;
+    if (m_nDrawDepth > 1)
+        return;
     // CPU 位图是唯一权威画面：会话内只绘制脏区（Push 裁剪记录到 m_rgnDraw），
     // EndDraw 时也只回读脏区。上传同样按需进行：GPU 上未重绘区域的内容与
     // CPU 位图保持一致（上次同步的结果），只需回传上一会话改动过的区域
@@ -723,12 +732,20 @@ void SRenderTarget_SkiaGL::BeginDraw(THIS)
     m_rgnDraw.setEmpty();
     const SkBitmap &bmp = m_curBmp->GetSkBitmap();
     if (bmp.isNull() || !bmp.getPixels())
+    {
+        m_nDrawDepth = 0;
         return;
+    }
     uploadRegion(bmp, m_rgnDrawPrev);
 }
 
 void SRenderTarget_SkiaGL::EndDraw(THIS)
 {
+    SASSERT(m_nDrawDepth>0);
+
+    m_nDrawDepth--;
+    if (m_nDrawDepth > 0)
+        return; // 嵌套会话结束：脏区继续累积，由最外层统一回读与呈现
     syncToBitmap();
     SRenderTarget_Skia::EndDraw();
     // 记录本会话脏区，供下一会话 BeginDraw 增量上传

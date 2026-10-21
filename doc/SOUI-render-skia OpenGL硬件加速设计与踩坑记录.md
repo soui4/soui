@@ -125,10 +125,28 @@ EndDraw ：flush 后只回读 m_rgnDraw 覆盖的矩形到 CPU 位图；记录 m
 
 skia m47 上游（`GrContext.cpp` 注释）明确说明：Mac 平台禁用了对 FBO attached 纹理的直接写入路径。因此 GPU RT 的像素更新必须走 `writePixels`（纹理上传）+ `readPixels`（回读），不能假设直写纹理可用。这也是本设计采用"上传/回读"而非"直写"的客观背景。
 
+### 坑五：BeginDraw/EndDraw 会嵌套——嵌套会话把"上一帧内容"回传上来，造成旧 item 状态残留
+
+**现象**：`demo` 与 `uieditor` 里，鼠标从一个 item 移到另一个 item 后，**前一个 item 的 hover/选中状态不消失**（treeview、tileview 都能复现），越移越多。把 `s_bSkiaEnableGPU` 关掉（软件 RT）立刻正常。
+
+**根因**：SOUI 的绘制不是严格"一帧一开一合"，绘制过程中可能再次进入 `_RedrawRegion`（动画回调里的 `Update()` → `::UpdateWindow` 同步触发 WM_PAINT 等），于是同一个 RT 上出现 `BeginDraw` 嵌套。而 `SRenderTarget_SkiaGL` 的会话状态是单份的：
+
+- 嵌套的 `BeginDraw` 会 `m_rgnDraw.setEmpty()` → 外层此前已绘制的区域从脏区里消失，外层 `EndDraw` 不再回读它；
+- 更致命的是嵌套的 `BeginDraw` 会 `uploadRegion(m_rgnDrawPrev)`，把**上一帧的 CPU 位图内容**覆盖到 GPU 上，正好把外层本次刚画好的"取消 hover"像素改回"仍是 hover"的旧像素。
+
+于是屏幕（由 CPU 位图呈现）上旧 item 一直保持 hover。软件 RT 的 `BeginDraw/EndDraw` 是空实现，所以只有开 GPU 才暴露。
+
+**定位方法**：临时在 `BeginDraw/EndDraw` 里全表面回读并与 CPU 位图逐像素比对。修复前日志显示 127 次 BeginDraw 中有 60 次嵌套，且 `preUpload/postDownload` 持续出现数千像素差异；修复后 70 次会话全部 `identical`。
+
+**修复**：加嵌套深度计数 `m_nDrawDepth`：只有最外层 `BeginDraw` 才重置脏区并上传上一帧脏区；嵌套 `EndDraw` 只出栈，不下载、不改 `m_rgnDrawPrev`，由最外层统一回读与呈现。脏区在外层与嵌套会话之间自然累积，因此回读范围仍是并集，正确性不受影响。
+
+**启示**：凡是"会话式"的 RT 状态（脏区、上传/下载、SaveClip 计数），都必须按嵌套深度管理，不能假设 BeginDraw/EndDraw 一一配对。
+
 ## 5. 验证方式
 
 - **单元级诊断**：`build/diag/diag_skia_gpu.cpp`（临时诊断程序，未纳入仓库）以纯 skia 层面验证 frame1~11 各场景，用于坑一的定位与修复方案模拟；
 - **无头回归**：`ctest --test-dir build -L '^soui-headless$'`，424 个用例（软件渲染路径）100% 通过，GPU 改动未影响 CPU 渲染；
+- **GPU/CPU 一致性自检**：在 `BeginDraw/EndDraw` 处临时全表面回读并与 CPU 影子位图逐像素比对，可精确断言"呈现内容与绘制内容一致"（定位坑五即用此法，详见该节）；
 - **人工验证**：macOS demo 启动、局部刷新、图标绘制路径（GDI 互操作）正常。
 
 ## 6. 已知限制
