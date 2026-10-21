@@ -1,6 +1,6 @@
 ﻿#include "souistd.h"
 #include "helper/SAppDir.h"
-#ifdef WIN32
+#if defined(WIN32) && !defined(FREERTOS_HOST)
 #include <shellapi.h>
 #include <helper/souidlgs.h>
 #else
@@ -33,7 +33,7 @@ typedef HRESULT(WINAPI *FunSHCreateItemFromParsingName)(PCWSTR, IBindCtx *, REFI
 
 BOOL SOUI_EXP SSelectFolder(TCHAR szPath[MAX_PATH], LPCTSTR pszTitle, LPCTSTR initPath)
 {
-#ifdef WIN32
+#if defined(WIN32) && !defined(FREERTOS_HOST)
     SStringT defPath(initPath);
     SStringT ret;
     bool bNewDialog = false;

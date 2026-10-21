@@ -6,6 +6,7 @@
 #include <animation/SInterpolatorImpl.h>
 #include <animation/STransformation.h>
 #include <sobject/Sobject.hpp>
+#include <helper/SAttrCracker.h>
 
 #define ATTR_VALUE_DESC(attribname, desc)                    \
     if (0 == strAttribName.CompareNoCase(attribname))        \

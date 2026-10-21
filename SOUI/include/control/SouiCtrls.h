@@ -33,7 +33,9 @@
 #include <control/SDockBar.h>
 #include <control/SDockFloatWnd.h>
 #include <control/SRebar.h>
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(FREERTOS_HOST)
+// SActiveX.h needs the system <mshtmhst.h> (no swinx shim); the freertos
+// simulator builds without the ActiveX hosting path.
 #include <control/SActiveX.h>
 #endif /**< _WIN32 */
 

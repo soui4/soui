@@ -33,7 +33,7 @@ LogCallback SLog::gs_logCallback = NULL;
 
 static bool IsConsoleProgram()
 {
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(FREERTOS_HOST)
     return GetConsoleWindow() != NULL;
 #else
     return true;

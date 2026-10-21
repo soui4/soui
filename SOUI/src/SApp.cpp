@@ -298,9 +298,9 @@ void SApplication::_InitApp(const ISystemObjectRegister &sysObjRegister)
 {
     assert(!ms_Singleton);
     ms_Singleton = this;
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(FREERTOS_HOST)
     SWndSurface::Init();
-#endif // _WIN32
+#endif // _WIN32 && !FREERTOS_HOST
     SRichEdit::InitTextService();
     memset(m_pSingletons, 0, sizeof(m_pSingletons));
     _CreateSingletons();

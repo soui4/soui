@@ -38,7 +38,12 @@
 #ifdef _WIN32
 #include <commctrl.h>
 #include <Oleacc.h>	/**< IAccessible */
+#if !defined(FREERTOS_HOST)
+// The swinx freertos host simulator has no shim for olectl.h; including the
+// system one would drag the whole system COM/Win32 header set into conflict
+// with the swinx shim types.
 #include <olectl.h>
+#endif
 #include <shellapi.h>
 #pragma comment(lib,"shell32.lib")
 #endif /**< _WIN32 */

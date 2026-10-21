@@ -1,6 +1,8 @@
 ﻿#include "GradientFillHelper.h"
 
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(FREERTOS_HOST)
+// the swinx shim's gdi.h already declares GradientFill/TRIVERTEX for the
+// freertos host simulator; the system <wingdi.h> would clash with it
 #include <Wingdi.h>
 #pragma comment(lib,"msimg32.lib")
 #endif

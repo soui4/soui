@@ -25,6 +25,7 @@ jobs:
           git config --global url."https://github.com/setoutsoft/libwebsockets".insteadOf "https://gitee.com/setoutsoft/libwebsockets"
           git config --global url."https://github.com/setoutsoft/openssl-cmake".insteadOf "https://gitee.com/setoutsoft/openssl-cmake"
           git config --global url."https://github.com/setoutsoft/curl".insteadOf "https://gitee.com/setoutsoft/curl"
+          git config --global url."https://github.com/setoutsoft/soui-freertos".insteadOf "https://gitee.com/setoutsoft/soui-freertos"
           # 本门禁只扫 swinx 头文件、不编译，因此只取 swinx 一个子模块：
           # 少拉三个 third-part 仓库就少三种失败模式。
           git submodule update --init swinx

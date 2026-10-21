@@ -3,7 +3,10 @@
 #include <core/SHostWnd.h>
 SNSBEGIN
 
-#ifdef _WIN32
+// On the FreeRTOS MinGW host there is no real user32: GetModuleHandleA is
+// swinx's stub and "user32" would fail SASSERT.  Use the same BitBlt
+// presenter branch as the non-Win32 (FreeRTOS ARM) build.
+#if defined(_WIN32) && !defined(FREERTOS_HOST)
 struct S_UPDATELAYEREDWINDOWINFO
 {
     DWORD cbSize;

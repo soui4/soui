@@ -12,3 +12,7 @@
 [submodule "third-part/libcurl"]
 	path = third-part/libcurl
 	url = https://gitee.com/setoutsoft/curl.git
+[submodule "soui-freertos"]
+	path = soui-freertos
+	url = https://gitee.com/setoutsoft/soui-freertos.git
+	branch = master

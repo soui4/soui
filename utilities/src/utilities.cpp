@@ -21,7 +21,7 @@ int RectHeight(LPCRECT rc) {return rc->bottom-rc->top;}
 #define HIMETRIC_PER_INCH   2540
 #define MAP_PIX_TO_LOGHIM(x,ppli)   MulDiv(HIMETRIC_PER_INCH, (x), (ppli))
 #define MAP_LOGHIM_TO_PIX(x,ppli)   MulDiv((ppli), (x), HIMETRIC_PER_INCH)
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(FREERTOS_HOST)
 HANDLE WINAPI LoadImageBuf(const void* buf, UINT length, UINT type,
     INT desiredx, INT desiredy, UINT loadflags);
 
@@ -111,6 +111,11 @@ static int getScaleOld(HWND hWnd = NULL)
 // 获取一个PE文件的version
 BOOL PEVersion(LPCTSTR pszFileName, WORD * wMajor, WORD* wMinor, WORD* wVer3, WORD* wVer4)
 {
+#if defined(FREERTOS_HOST)
+    // simulator: no PE version resources to query
+    (void)pszFileName; (void)wMajor; (void)wMinor; (void)wVer3; (void)wVer4;
+    return FALSE;
+#else
     DWORD dwResHandle;
     void* pBuf;
     DWORD dwVerInfoSize = GetFileVersionInfoSize(pszFileName, &dwResHandle);
@@ -131,6 +136,7 @@ BOOL PEVersion(LPCTSTR pszFileName, WORD * wMajor, WORD* wMinor, WORD* wVer3, WO
     }
     free(pBuf);
     return TRUE;
+#endif
 }
 
 static BOOL IsVerOrGreater(WORD wVers[4], WORD wMajor, WORD wMinor, WORD wSpBuild = 0)
@@ -223,15 +229,25 @@ static int CALLBACK DefFontsEnumProc(CONST LOGFONT* lplf,    // logical-font dat
 }
 
 BOOL HasFont(LPCTSTR fontName) {
+#if defined(FREERTOS_HOST)
+    // simulator: no font enumeration in the swinx freertos platform
+    (void)fontName;
+    return FALSE;
+#else
     HDC hdc = GetDC(NULL);
     BOOL bValidFont = FALSE;
     EnumFonts(hdc, fontName, DefFontsEnumProc, (LPARAM)&bValidFont);
     ReleaseDC(NULL, hdc);
     return bValidFont;
+#endif
 }
 
 BOOL IsSupportMaxMove()
 {
+#if defined(FREERTOS_HOST)
+    // simulator: hosted on a modern desktop OS
+    return TRUE;
+#else
     OSVERSIONINFOEX OSVerInfo;
     BOOL bOsVersionInfoEx;
 
@@ -260,6 +276,7 @@ BOOL IsSupportMaxMove()
         return TRUE;
     }
     return FALSE;
+#endif // FREERTOS_HOST
 }
 
 long file_length_A(const char* path) {

@@ -15,6 +15,7 @@
 #define __SSINGLETON2__H__
 
 #include <assert.h>
+#include <sdef.h>
 
 SNSBEGIN
 
