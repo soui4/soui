@@ -220,7 +220,7 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
      */
     STDMETHOD_(void, SetScriptFactory)(THIS_ IScriptFactory * pScriptModule) PURE;
 
-	STDMETHOD_(IScriptFactory *,GetScriptFactory)(CTHIS) SCONST PURE;
+    STDMETHOD_(IScriptFactory *, GetScriptFactory)(CTHIS) SCONST PURE;
 
     /**
      * @brief Initialize the name-id mapping table for XML resources

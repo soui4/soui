@@ -270,7 +270,7 @@ HWND SHostWnd::CreateEx(HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, 
         dwExStyle |= WS_EX_COMPOSITED;
 #endif // _WIN32
     }
-    SSLOGI()<<"create host, translucent="<<m_hostAttr.m_bTranslucent;
+    SSLOGI() << "create host, translucent=" << m_hostAttr.m_bTranslucent;
     m_xmlInit = xmlInit;
     HWND hWnd = SNativeWnd::CreateNative(_T("HOSTWND"), dwStyle, dwExStyle, x, y, nWidth, nHeight, hWndParent, 0);
     m_xmlInit = NULL;
@@ -297,7 +297,7 @@ BOOL SHostWnd::Attach(HWND hWnd, IXmlNode *xmlInit /**< = NULL */)
     if (NULL != m_hWnd)
         return FALSE;
     if (!::IsWindow(hWnd))
-        return NULL;
+        return FALSE;
     BOOL bSubclassed = SNativeWnd::SubclassWindow(hWnd);
     if (!bSubclassed)
         return FALSE;

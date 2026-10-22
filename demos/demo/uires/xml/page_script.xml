@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
-  page_script.xml - 脚本演示页(跑马机 + 消消乐 + 俄罗斯方块,lua 版)
+  page_script.xml - 脚本演示页(跑马机 + 消消乐 + 俄罗斯方块 + 坦克大战,lua 版)
 
   由原 misc 分区的 script 页(跑马机)与原 page_xxl.xml(消消乐)合并而成,
-  内层 tabctrl 三个子页切换;各小游戏的逻辑都在 uires/lua/test.lua:
+  内层 tabctrl 四个子页切换;各小游戏的逻辑都在 uires/lua/test.lua:
   - 跑马机: game_wnd/game_canvas/players/flag_win,on_init 时初始化,
     on_run 启动计时器推进赛马,on_bet 下注,on_canvas_size 跟随布局;
   - 消消乐: 参考 soxxl(基于 soui4js 的消消乐)移植并完善为市场常见玩法,
@@ -59,8 +59,26 @@
     ↑ 旋转、↓ 软降、空格 硬降、P 暂停;7-bag 随机、旋转踢墙、消行闪白、
     等级加速、结束面板重开;子页隐藏自动暂停。
   棋盘/预览格的名字与 id 约定见 test.lua 的 tetris_* 函数。
+  - 坦克大战: 经典 13x13 网格玩法,lua 的 tank_init 动态创建 169 个格子 img,
+    统一引用 svg/tank.svg 26 帧雪碧图(skin.xml: svg_tank,帧 0=空地
+    1-2=砖墙/残砖 3=钢墙 4=水 5=基地 6=基地被毁 7-10=玩家坦克
+    11-14=普通敌人 15-18=快速敌人 19-20=双方炮弹 21-23=爆炸
+    24=标题图标 25=出生信标),渲染只切换 iconIndex;
+    左侧计分卡(得分/生命/关卡 LED + 状态 + 开始/重开按钮),
+    右侧战况卡(剩余敌人 LED + 基地状态 + 键位说明);
+    玩法: 方向键/WASD 移动与转向,空格开炮,P 暂停,守住底部基地并消灭
+    本关全部敌人;砖墙可打两枪打穿,钢墙不可破坏,水挡坦克不挡炮弹,
+    基地被毁或生命耗尽即结束;敌人分批出生、朝基地/玩家移动并开炮,
+    快速敌人分数更高;通关有奖励分并自动进入下一关(3 张地图循环);
+    得分汇总复用消消乐/俄罗斯方块的七段 LED 滚动计数,击杀加分从坦克格
+    沿抛物线飞向得分 LED(wnd_tank_aniframe 浮层);
+    结束面板同样为布局内静态遮罩 + 卡片,动画走 anim 模板
+    (tank_over_mask_in/out、tank_over_card_in/out);
+    数据层(地图/移动/碰撞/炮弹/出生/计分)与渲染层分离,可在裸 lua 中
+    回归测试;子页隐藏自动暂停。
+  棋盘/格子 id 与界面名字约定见 test.lua 的 tank_* 函数。
 -->
-<tabctrl pos="0,0,-0,-0" tabWidth="100" tabAlign="left" curSel="2" animateSteps="20"
+<tabctrl pos="0,0,-0,-0" tabWidth="100" tabAlign="left" curSel="3" animateSteps="20"
          colorBkgnd="@color/clr_page_bg" colorText="@color/clr_title">
   <page title="消消乐">
     <window pos="0,0,-0,-0" layout="hbox" padding="15,12,15,15" interval="12">
@@ -298,5 +316,114 @@
     </window>
     <!-- 动画浮层:消行光波/碎片 / 飞分文本画在这最顶层(参考消消乐 wnd_xxl_aniframe) -->
     <window name="wnd_tetris_aniframe" pos="0,0,-0,-0" msgTransparent="1"/>
+  </page>
+  <page title="坦克大战" on_visible_changed="tank_on_page_vis">
+    <window pos="0,0,-0,-0" layout="hbox" padding="10,12,10,15" interval="8">
+      <!-- 左侧计分卡:标题 / 得分 / 生命 / 关卡 / 状态 / 功能按钮 -->
+      <window size="152,-2" layout="vbox" interval="10" padding="12,12,12,12" colorBkgnd="@color/clr_card_bg">
+        <window size="-2,-1" layout="hbox" interval="8">
+          <img size="30,30" skin="svg_tank" iconIndex="24" layout_gravity="center"/>
+          <window size="-1,-2" layout="vbox" interval="1">
+            <text text="坦克大战" font="size:16,bold:1" colorText="@color/clr_title"/>
+            <text text="LUA + SVG" font="size:10" colorText="@color/clr_text_sub"/>
+          </window>
+        </window>
+        <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
+        <text text="得分" font="size:12" colorText="@color/clr_text_sub"/>
+        <window size="-2,-1" layout="hbox" interval="3">
+          <t:g.xxl_digit><data name="digit_tank_score_3"/></t:g.xxl_digit>
+          <t:g.xxl_digit><data name="digit_tank_score_2"/></t:g.xxl_digit>
+          <t:g.xxl_digit><data name="digit_tank_score_1"/></t:g.xxl_digit>
+          <t:g.xxl_digit><data name="digit_tank_score_0"/></t:g.xxl_digit>
+        </window>
+        <text text="生命" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
+        <window size="-2,-1" layout="hbox" interval="3">
+          <t:g.xxl_digit><data name="digit_tank_lives_0"/></t:g.xxl_digit>
+        </window>
+        <text text="关卡" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
+        <window size="-2,-1" layout="hbox" interval="3">
+          <t:g.xxl_digit><data name="digit_tank_stage_1"/></t:g.xxl_digit>
+          <t:g.xxl_digit><data name="digit_tank_stage_0"/></t:g.xxl_digit>
+        </window>
+        <text name="txt_tank_state" text="状态:待开始" extend_top="4" font="size:12" colorText="@color/clr_text_sub"/>
+        <window size="0,0" weight="1"/>
+        <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
+        <button name="btn_tank_start" size="-2,36" skin="xxl_btn_primary" colorText="#FFFFFF" cursor="hand" on_command="tank_on_start" tip="开始 / 暂停 / 继续">开始游戏</button>
+        <button name="btn_tank_restart" size="-2,36" skin="xxl_btn_secondary" colorText="@color/clr_primary" cursor="hand" on_command="tank_on_restart" tip="重新开始一局">重新开始</button>
+      </window>
+      <window size="0,0" weight="1"/>
+      <!-- 中间战场:13x13 可玩格 + 上下各一行砖墙装饰,共 15 行;内容由 lua 的 tank_init
+           动态创建(svg_tank 雪碧图),装饰行平铺的砖墙与地图障碍同帧。
+           顶层依次是关卡提示条、结束遮罩卡片(静态布局,动画走 anim 模板) -->
+      <stack name="wnd_tank_stack" size="-1,-2">
+        <window size="-1,-2" layout="vbox">
+<window size="-2,0" weight="1" skin="svg_tank_wall"/>
+          <window name="wnd_tank_board" size="-2,-1" layout_gravity="center" layout="gridlayout" rowCount="15" columnCount="13" interval="1" padding="6" gravity="fill" colorBkgnd="@color/clr_card_bg" focusable="1" tip="点击此处获取键盘焦点"/>
+<window size="-2,0" weight="1" skin="svg_tank_wall"/>
+        </window>
+        <!-- 活动精灵层:坦克/炮弹/护盾环由 lua 动态创建并按像素位置 Move,
+             与棋盘格子对齐但可以停在格与格之间,实现连续移动;不参与布局、不挡鼠标 -->
+        <window name="wnd_tank_sprites" size="-2,-2" msgTransparent="1"/>
+        <!-- 关卡完成提示条:默认隐藏,tank_banner_show/hide 控制 -->
+        <window name="wnd_tank_banner" size="-2,-2" layout="vbox" visible="0" msgTransparent="1">
+          <window size="0,0" weight="1"/>
+          <window size="-2,-1" layout_gravity="center" colorBkgnd="#CC0F172A" padding="20,12,20,12">
+            <text name="txt_tank_banner" text="" font="size:18,bold:1" colorText="#FFFFFF" align="center"/>
+          </window>
+          <window size="0,0" weight="1"/>
+        </window>
+        <!-- 结束窗口:深色遮罩 + 结果卡片;展示/隐藏由 tank_over_show/hide 驱动 -->
+        <window name="wnd_tank_gameover" size="-2,-2" layout="vbox" colorBkgnd="#990F172A" visible="0" msgTransparent="1" on_animation_stop="tank_on_over_stop">
+          <window size="0,0" weight="1"/>
+          <window name="wnd_tank_gameover_card" size="250,-1" layout_gravity="center" layout="vbox" interval="10" padding="24,22,24,20" colorBkgnd="@color/clr_card_bg">
+            <text text="战斗结束" font="size:22,bold:1" colorText="@color/clr_title" align="center"/>
+            <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
+            <text name="txt_tank_gameover_score" text="本局得分 0" font="size:16,bold:1" colorText="@color/clr_primary" align="center"/>
+            <text name="txt_tank_gameover_reason" text="基地被摧毁" font="size:12" colorText="@color/clr_text_sub" align="center"/>
+            <text text="点击「重新开始」再战一局" font="size:12" colorText="@color/clr_text_sub" align="center"/>
+          </window>
+          <window size="0,0" weight="1"/>
+        </window>
+      </stack>
+      <window size="0,0" weight="1"/>
+      <!-- 右侧战况卡:剩余敌人 / 基地状态 / 键位说明 -->
+      <window size="152,-2" layout="vbox" interval="10" padding="12,12,12,12" colorBkgnd="@color/clr_card_bg">
+        <window size="-2,-1" layout="hbox" interval="8">
+          <img size="30,30" skin="svg_tank" iconIndex="15" layout_gravity="center"/>
+          <window size="-1,-2" layout="vbox" interval="1">
+            <text text="剩余敌人" font="size:16,bold:1" colorText="@color/clr_title"/>
+            <text text="ENEMY" font="size:10" colorText="@color/clr_text_sub"/>
+          </window>
+        </window>
+        <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
+        <window size="-2,-1" layout="hbox" interval="3">
+          <t:g.xxl_digit><data name="digit_tank_enemy_1"/></t:g.xxl_digit>
+          <t:g.xxl_digit><data name="digit_tank_enemy_0"/></t:g.xxl_digit>
+        </window>
+        <text name="txt_tank_base" text="基地完好" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
+        <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
+        <window size="-2,-1" layout="vbox" interval="6">
+          <window size="-2,26" layout="hbox" interval="8">
+            <img size="52,26" skin="svg_tetris_key_lr"/>
+            <text text="移动/转向" font="size:10" colorText="@color/clr_text_sub" layout_gravity="center"/>
+          </window>
+          <window size="-2,26" layout="hbox" interval="8">
+            <img size="52,26" skin="svg_tetris_key_ud"/>
+            <text text="上下移动" font="size:10" colorText="@color/clr_text_sub" layout_gravity="center"/>
+          </window>
+          <window size="-2,26" layout="hbox" interval="8">
+            <img size="52,26" skin="svg_tetris_key_space"/>
+            <text text="开炮" font="size:10" colorText="@color/clr_text_sub" layout_gravity="center"/>
+          </window>
+          <window size="-2,26" layout="hbox" interval="8">
+            <img size="26,26" skin="svg_tetris_key_p"/>
+            <text text="暂停" font="size:10" colorText="@color/clr_text_sub" layout_gravity="center"/>
+          </window>
+        </window>
+        <text text="守住底部基地，消灭本关全部敌人" extend_top="2" font="size:10" colorText="@color/clr_text_sub" multilines="1" wordbreak="1"/>
+      </window>
+    </window>
+    <!-- 动画浮层:击杀加分飞向得分 LED 的文本画在最顶层 -->
+    <window name="wnd_tank_aniframe" pos="0,0,-0,-0" msgTransparent="1"/>
   </page>
 </tabctrl>

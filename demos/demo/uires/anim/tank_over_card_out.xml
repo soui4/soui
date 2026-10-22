@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 坦克大战结束卡片收起:缩略 + 淡出,与遮罩 200ms 淡出同步(fillAfter 定格至遮罩隐藏) -->
+<set fillAfter="true" shareInterpolator="true" interpolator="Accelerate">
+    <scale duration="200" fromXScale="1.0" toXScale="0.82" fromYScale="1.0" toYScale="0.82" pivotX="50%" pivotY="50%"/>
+    <alpha duration="200" fromAlpha="1.0" toAlpha="0.0"/>
+</set>

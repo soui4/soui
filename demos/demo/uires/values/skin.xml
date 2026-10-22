@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <skin>
 	<!--全局skin对象-->
 	<imglist name="skin_switch" src="imgx:png_switch" states="8" checkAsPushdown="0"/>
@@ -165,4 +165,9 @@
   <imglist name="svg_tetris_key_ud" src="svg:tetris_key_ud"/>
   <imglist name="svg_tetris_key_space" src="svg:tetris_key_space"/>
   <imglist name="svg_tetris_key_p" src="svg:tetris_key_p"/>
+  <!-- 坦克大战雪碧图:27 态 = 0 空地 / 1 砖墙 / 2 残砖 / 3 钢墙 / 4 水 / 5 基地 / 6 基地被毁 /
+       7-10 玩家坦克(上下左右) / 11-14 普通敌人 / 15-18 快速敌人 / 19-20 炮弹 /
+       21-23 爆炸 / 24 标题图标 / 25 出生信标 / 26 无敌护盾环 -->
+  <imglist name="svg_tank" src="svg:tank" states="27"/>
+  <imglist name="svg_tank_wall" src="svg:tank_wall" tile="1"/>
 </skin>

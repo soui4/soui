@@ -19,7 +19,7 @@
 
 #define UIRES_INDEX _T("uires.idx") /**< File name of the file mapping table index for folder resources */
 
-#ifdef _WIN32
+#if defined(_WIN32)
 #define PATH_SLASH '\\'
 #ifdef _UNICODE
 #define TPATH_SLASH  L'\\'

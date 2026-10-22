@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <resource>
 	<UIDEF>
 		<file name="xml_init" path="uidef\init.xml" />
@@ -207,6 +207,10 @@
     <file name="tetris_over_card_out" path="anim\tetris_over_card_out.xml"/>
     <file name="tetris_over_mask_in" path="anim\tetris_over_mask_in.xml"/>
     <file name="tetris_over_mask_out" path="anim\tetris_over_mask_out.xml"/>
+    <file name="tank_over_card_in" path="anim\tank_over_card_in.xml"/>
+    <file name="tank_over_card_out" path="anim\tank_over_card_out.xml"/>
+    <file name="tank_over_mask_in" path="anim\tank_over_mask_in.xml"/>
+    <file name="tank_over_mask_out" path="anim\tank_over_mask_out.xml"/>
   </anim>
   <valueAni>
     <file name="alphaAni" path="valueAni\alpha.xml"/>
@@ -253,6 +257,8 @@
         <file name="tetris_key_ud" path="svg\tetris_key_ud.svg"/>
         <file name="tetris_key_space" path="svg\tetris_key_space.svg"/>
         <file name="tetris_key_p" path="svg\tetris_key_p.svg"/>
+        <file name="tank" path="svg\tank.svg"/>
+		<file name="tank_wall" path="svg\tank_wall.svg"/>
   </svg>
   <xml>
 	<file name="roomlist" path="xml\roomlist.xml"/>

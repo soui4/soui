@@ -752,9 +752,9 @@ void SApplication::SetScriptFactory(IScriptFactory *pScriptFactory)
     m_pScriptFactory = pScriptFactory;
 }
 
-IScriptFactory * SApplication::GetScriptFactory(CTHIS) const
+IScriptFactory *SApplication::GetScriptFactory(CTHIS) const
 {
-	return m_pScriptFactory;
+    return m_pScriptFactory;
 }
 
 HRESULT SApplication::CreateScriptModule(IScriptModule **ppScriptModule)

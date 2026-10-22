@@ -2340,8 +2340,7 @@ BOOL STreeCtrl::BeginInplaceEdit(HSTREEITEM hItem)
     else
     {
         SXmlDoc xmlDoc;
-        xmlDoc.LoadBufferInplace((void *)strStyle.c_str(), strStyle.GetLength() * sizeof(wchar_t),
-            xml_parse_default, sizeof(wchar_t) == 2 ? enc_utf16 : enc_utf32);
+        xmlDoc.LoadBufferInplace((void *)strStyle.c_str(), strStyle.GetLength() * sizeof(wchar_t), xml_parse_default, sizeof(wchar_t) == 2 ? enc_utf16 : enc_utf32);
         pEdit->InitFromXml(xmlDoc.Root()->FirstChild());
     }
 

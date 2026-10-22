@@ -94,7 +94,9 @@ typedef struct DXLVITEM
  * @brief List Control
  * @details A control that displays a list of items with multiple columns and subitems.
  */
-class SOUI_EXP SListCtrl : public SPanel, protected IInplaceEditHost {
+class SOUI_EXP SListCtrl
+    : public SPanel
+    , protected IInplaceEditHost {
     DEF_SOBJECT(SPanel, L"listctrl")
 
   public:
@@ -763,10 +765,10 @@ class SOUI_EXP SListCtrl : public SPanel, protected IInplaceEditHost {
     BOOL m_bCheckBox;                   /**< Checkbox enable flag */
     BOOL m_bMultiSelection;             /**< Multiple selection enable flag */
 
-    BOOL m_bEditLabel;                  /**< TRUE to allow in-place label editing (double click / F2 / BeginInplaceEdit) */
-    SInplaceEdit *m_pInplaceEdit;       /**< Current label editor (NULL while no session is active) */
-    int m_nEditItem;                    /**< Item being edited while a session is active */
-    int m_nEditSubItem;                 /**< Subitem being edited while a session is active */
+    BOOL m_bEditLabel;            /**< TRUE to allow in-place label editing (double click / F2 / BeginInplaceEdit) */
+    SInplaceEdit *m_pInplaceEdit; /**< Current label editor (NULL while no session is active) */
+    int m_nEditItem;              /**< Item being edited while a session is active */
+    int m_nEditSubItem;           /**< Subitem being edited while a session is active */
 
   protected:
     typedef SArray<DXLVITEM> ArrLvItem; /**< Array of items */

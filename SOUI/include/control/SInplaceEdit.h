@@ -18,8 +18,7 @@ SNSBEGIN
  * @class IInplaceEditHost
  * @brief Callback interface implemented by the control hosting an in-place edit.
  */
-class SOUI_EXP IInplaceEditHost
-{
+class SOUI_EXP IInplaceEditHost {
   public:
     /**
      * @brief Called when the in-place edit session finishes.

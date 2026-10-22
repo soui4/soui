@@ -2172,7 +2172,7 @@ class ATL_NO_VTABLE CColorDialogImpl : public CCommonDialogImplBase {
         if (uMsg == WM_INITDIALOG)
         {
             pT = (CCommonDialogImplBase *)lpCC->lCustData;
-ATLASSERT(pT != NULL);
+            ATLASSERT(pT != NULL);
             ATLASSERT(pT->m_hWnd == NULL);
             ATLASSERT(::IsWindow(hWnd));
             // subclass dialog's window

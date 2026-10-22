@@ -74,12 +74,12 @@ BLOCK "StringFileInfo"
 BEGIN
 BLOCK "080404b0"
 BEGIN
-VALUE "FileDescription", "demo2"
+VALUE "FileDescription", "demo"
 VALUE "FileVersion", "1, 0, 0, 1"
-VALUE "InternalName", "demo2"
+VALUE "InternalName", "demo"
 VALUE "LegalCopyright", "Copyright (C) 2011"
-VALUE "OriginalFilename", "demo2.exe"
-VALUE "ProductName", "demo2"
+VALUE "OriginalFilename", "demo.exe"
+VALUE "ProductName", "demo"
 VALUE "ProductVersion", "1, 0, 0, 1"
 END
 END

@@ -1,4 +1,4 @@
-﻿//stamp:36116707bb9fa9f0
+﻿//stamp:361194360bf2dc46
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -211,6 +211,10 @@
 			const TCHAR * tetris_over_card_out;
 			const TCHAR * tetris_over_mask_in;
 			const TCHAR * tetris_over_mask_out;
+			const TCHAR * tank_over_card_in;
+			const TCHAR * tank_over_card_out;
+			const TCHAR * tank_over_mask_in;
+			const TCHAR * tank_over_mask_out;
 			}anim;
 		struct _valueAni{
 			const TCHAR * alphaAni;
@@ -257,6 +261,8 @@
 			const TCHAR * tetris_key_ud;
 			const TCHAR * tetris_key_space;
 			const TCHAR * tetris_key_p;
+			const TCHAR * tank;
+			const TCHAR * tank_wall;
 			}svg;
 		struct _xml{
 			const TCHAR * roomlist;
@@ -471,6 +477,10 @@ struct _UIRES UIRES={
 			_T("anim:tetris_over_card_out"),
 			_T("anim:tetris_over_mask_in"),
 			_T("anim:tetris_over_mask_out"),
+			_T("anim:tank_over_card_in"),
+			_T("anim:tank_over_card_out"),
+			_T("anim:tank_over_mask_in"),
+			_T("anim:tank_over_mask_out"),
 		},
 		{
 			_T("valueAni:alphaAni"),
@@ -517,6 +527,8 @@ struct _UIRES UIRES={
 			_T("svg:tetris_key_ud"),
 			_T("svg:tetris_key_space"),
 			_T("svg:tetris_key_p"),
+			_T("svg:tank"),
+			_T("svg:tank_wall"),
 		},
 		{
 			_T("xml:roomlist"),
@@ -566,6 +578,8 @@ struct _R{
 		 const wchar_t * btn_skin;
 		 const wchar_t * btn_speed_dec;
 		 const wchar_t * btn_speed_inc;
+		 const wchar_t * btn_tank_restart;
+		 const wchar_t * btn_tank_start;
 		 const wchar_t * btn_test;
 		 const wchar_t * btn_tetris_restart;
 		 const wchar_t * btn_tetris_start;
@@ -626,6 +640,15 @@ struct _R{
 		 const wchar_t * digit_score_0;
 		 const wchar_t * digit_score_1;
 		 const wchar_t * digit_score_2;
+		 const wchar_t * digit_tank_enemy_0;
+		 const wchar_t * digit_tank_enemy_1;
+		 const wchar_t * digit_tank_lives_0;
+		 const wchar_t * digit_tank_score_0;
+		 const wchar_t * digit_tank_score_1;
+		 const wchar_t * digit_tank_score_2;
+		 const wchar_t * digit_tank_score_3;
+		 const wchar_t * digit_tank_stage_0;
+		 const wchar_t * digit_tank_stage_1;
 		 const wchar_t * digit_tlevel_0;
 		 const wchar_t * digit_tlevel_1;
 		 const wchar_t * digit_tlines_0;
@@ -819,6 +842,11 @@ struct _R{
 		 const wchar_t * txt_path_length;
 		 const wchar_t * txt_score;
 		 const wchar_t * txt_size;
+		 const wchar_t * txt_tank_banner;
+		 const wchar_t * txt_tank_base;
+		 const wchar_t * txt_tank_gameover_reason;
+		 const wchar_t * txt_tank_gameover_score;
+		 const wchar_t * txt_tank_state;
 		 const wchar_t * txt_tetris_state;
 		 const wchar_t * txt_tip;
 		 const wchar_t * txt_title;
@@ -837,6 +865,13 @@ struct _R{
 		 const wchar_t * wnd_gameover;
 		 const wchar_t * wnd_gameover_card;
 		 const wchar_t * wnd_rgn;
+		 const wchar_t * wnd_tank_aniframe;
+		 const wchar_t * wnd_tank_banner;
+		 const wchar_t * wnd_tank_board;
+		 const wchar_t * wnd_tank_gameover;
+		 const wchar_t * wnd_tank_gameover_card;
+		 const wchar_t * wnd_tank_sprites;
+		 const wchar_t * wnd_tank_stack;
 		 const wchar_t * wnd_temp_host;
 		 const wchar_t * wnd_tetris_aniframe;
 		 const wchar_t * wnd_tetris_board;
@@ -882,6 +917,8 @@ struct _R{
 		int btn_skin;
 		int btn_speed_dec;
 		int btn_speed_inc;
+		int btn_tank_restart;
+		int btn_tank_start;
 		int btn_test;
 		int btn_tetris_restart;
 		int btn_tetris_start;
@@ -942,6 +979,15 @@ struct _R{
 		int digit_score_0;
 		int digit_score_1;
 		int digit_score_2;
+		int digit_tank_enemy_0;
+		int digit_tank_enemy_1;
+		int digit_tank_lives_0;
+		int digit_tank_score_0;
+		int digit_tank_score_1;
+		int digit_tank_score_2;
+		int digit_tank_score_3;
+		int digit_tank_stage_0;
+		int digit_tank_stage_1;
 		int digit_tlevel_0;
 		int digit_tlevel_1;
 		int digit_tlines_0;
@@ -1135,6 +1181,11 @@ struct _R{
 		int txt_path_length;
 		int txt_score;
 		int txt_size;
+		int txt_tank_banner;
+		int txt_tank_base;
+		int txt_tank_gameover_reason;
+		int txt_tank_gameover_score;
+		int txt_tank_state;
 		int txt_tetris_state;
 		int txt_tip;
 		int txt_title;
@@ -1153,6 +1204,13 @@ struct _R{
 		int wnd_gameover;
 		int wnd_gameover_card;
 		int wnd_rgn;
+		int wnd_tank_aniframe;
+		int wnd_tank_banner;
+		int wnd_tank_board;
+		int wnd_tank_gameover;
+		int wnd_tank_gameover_card;
+		int wnd_tank_sprites;
+		int wnd_tank_stack;
 		int wnd_temp_host;
 		int wnd_tetris_aniframe;
 		int wnd_tetris_board;
@@ -1195,7 +1253,7 @@ struct _R{
 	struct {
 		enum {
 			name_3d_test = 65723,
-			ani_hot = 65788,
+			ani_hot = 65811,
 			ani_test = 65581,
 			btn4_1 = 65633,
 			btn4_2 = 65634,
@@ -1204,17 +1262,17 @@ struct _R{
 			btn4_5 = 65637,
 			btn4_6 = 65638,
 			btnSelectGif = 65735,
-			btn_ani_hostwnd = 65799,
-			btn_animator = 65794,
+			btn_ani_hostwnd = 65822,
+			btn_animator = 65817,
 			btn_append_msg = 65611,
 			btn_back = 65682,
 			btn_builtinskin = 51,
-			btn_close = 65790,
+			btn_close = 65813,
 			btn_create_by_temp = 65689,
 			btn_createchildren = 65711,
 			btn_display = 65686,
 			btn_filewnd = 65710,
-			btn_go_offcial_url = 65789,
+			btn_go_offcial_url = 65812,
 			btn_hidetst = 65687,
 			btn_icon = 65591,
 			btn_init_listbox = 65653,
@@ -1230,6 +1288,8 @@ struct _R{
 			btn_skin = 65678,
 			btn_speed_dec = 65705,
 			btn_speed_inc = 65706,
+			btn_tank_restart = 65791,
+			btn_tank_start = 65790,
 			btn_test = 65594,
 			btn_tetris_restart = 65775,
 			btn_tetris_start = 65774,
@@ -1261,7 +1321,7 @@ struct _R{
 			chk_band_mclv = 65562,
 			chk_band_tile = 65600,
 			chk_band_tree = 65604,
-			chk_band_tv = 65785,
+			chk_band_tv = 65808,
 			chk_fullrow_tree = 65605,
 			chk_mclv_sel = 65566,
 			chk_multi_lc = 65584,
@@ -1270,7 +1330,7 @@ struct _R{
 			chk_multi_mclv = 65561,
 			chk_multi_tile = 65599,
 			chk_multi_tree = 65603,
-			chk_multi_tv = 65784,
+			chk_multi_tv = 65807,
 			chromeTab = 65738,
 			clock_main = 65724,
 			col1 = 65567,
@@ -1290,6 +1350,15 @@ struct _R{
 			digit_score_0 = 65752,
 			digit_score_1 = 65751,
 			digit_score_2 = 65750,
+			digit_tank_enemy_0 = 65802,
+			digit_tank_enemy_1 = 65801,
+			digit_tank_lives_0 = 65786,
+			digit_tank_score_0 = 65785,
+			digit_tank_score_1 = 65784,
+			digit_tank_score_2 = 65783,
+			digit_tank_score_3 = 65782,
+			digit_tank_stage_0 = 65788,
+			digit_tank_stage_1 = 65787,
 			digit_tlevel_0 = 65772,
 			digit_tlevel_1 = 65771,
 			digit_tlines_0 = 65770,
@@ -1301,7 +1370,7 @@ struct _R{
 			digit_tscore_3 = 65764,
 			edit_drop_top1 = 65708,
 			edit_drop_top2 = 65709,
-			edit_repeat = 65783,
+			edit_repeat = 65806,
 			edit_rotate = 65716,
 			edit_scale = 65717,
 			edit_skew = 65718,
@@ -1332,7 +1401,7 @@ struct _R{
 			group2 = 65665,
 			home_card = 65544,
 			img_file_icon = 65602,
-			img_girl = 65796,
+			img_girl = 65819,
 			img_icon = 65568,
 			img_indicator = 65559,
 			img_round = 65617,
@@ -1356,8 +1425,8 @@ struct _R{
 			img_skin_7 = 16,
 			img_skin_8 = 17,
 			img_skin_9 = 18,
-			img_soui = 65793,
-			img_state = 65787,
+			img_soui = 65816,
+			img_state = 65810,
 			ip_test = 65609,
 			lb_test = 65652,
 			lc_test = 65587,
@@ -1406,7 +1475,7 @@ struct _R{
 			page_tileview = 104,
 			page_treectrl = 105,
 			page_treeview = 106,
-			pane_left = 65795,
+			pane_left = 65818,
 			player_1 = 65757,
 			player_2 = 65758,
 			player_3 = 65759,
@@ -1434,8 +1503,8 @@ struct _R{
 			rating_score = 65573,
 			re_gifhost = 65614,
 			re_temp_input = 65690,
-			re_xmlinput = 65782,
-			room_tv = 65786,
+			re_xmlinput = 65805,
+			room_tv = 65809,
 			rotate_x = 65720,
 			rotate_y = 65721,
 			rotate_z = 65722,
@@ -1465,12 +1534,12 @@ struct _R{
 			text2_6 = 65674,
 			text2_7 = 65675,
 			text2_8 = 65676,
-			tgl_left = 65798,
+			tgl_left = 65821,
 			tgl_switch = 65557,
 			timepicker = 65647,
 			title = 65555,
 			tray_008 = 65685,
-			tree_test = 65797,
+			tree_test = 65820,
 			txt_coins = 65763,
 			txt_desc = 65570,
 			txt_index = 65571,
@@ -1483,8 +1552,13 @@ struct _R{
 			txt_path_length = 65703,
 			txt_score = 65574,
 			txt_size = 65576,
+			txt_tank_banner = 65796,
+			txt_tank_base = 65803,
+			txt_tank_gameover_reason = 65800,
+			txt_tank_gameover_score = 65799,
+			txt_tank_state = 65789,
 			txt_tetris_state = 65773,
-			txt_tip = 65791,
+			txt_tip = 65814,
 			txt_title = 65677,
 			txt_usetime = 65580,
 			txt_xxl_combo = 65753,
@@ -1495,12 +1569,19 @@ struct _R{
 			waveProgress2 = 65741,
 			webkit_toolbar = 65728,
 			wke_test = 65727,
-			wnd_ani_host = 65792,
+			wnd_ani_host = 65815,
 			wnd_container = 65713,
 			wnd_game = 65776,
 			wnd_gameover = 65778,
 			wnd_gameover_card = 65779,
 			wnd_rgn = 65714,
+			wnd_tank_aniframe = 65804,
+			wnd_tank_banner = 65795,
+			wnd_tank_board = 65793,
+			wnd_tank_gameover = 65797,
+			wnd_tank_gameover_card = 65798,
+			wnd_tank_sprites = 65794,
+			wnd_tank_stack = 65792,
 			wnd_temp_host = 65691,
 			wnd_tetris_aniframe = 65781,
 			wnd_tetris_board = 65777,
@@ -1553,6 +1634,8 @@ struct _R R={
 		L"btn_skin",
 		L"btn_speed_dec",
 		L"btn_speed_inc",
+		L"btn_tank_restart",
+		L"btn_tank_start",
 		L"btn_test",
 		L"btn_tetris_restart",
 		L"btn_tetris_start",
@@ -1613,6 +1696,15 @@ struct _R R={
 		L"digit_score_0",
 		L"digit_score_1",
 		L"digit_score_2",
+		L"digit_tank_enemy_0",
+		L"digit_tank_enemy_1",
+		L"digit_tank_lives_0",
+		L"digit_tank_score_0",
+		L"digit_tank_score_1",
+		L"digit_tank_score_2",
+		L"digit_tank_score_3",
+		L"digit_tank_stage_0",
+		L"digit_tank_stage_1",
 		L"digit_tlevel_0",
 		L"digit_tlevel_1",
 		L"digit_tlines_0",
@@ -1806,6 +1898,11 @@ struct _R R={
 		L"txt_path_length",
 		L"txt_score",
 		L"txt_size",
+		L"txt_tank_banner",
+		L"txt_tank_base",
+		L"txt_tank_gameover_reason",
+		L"txt_tank_gameover_score",
+		L"txt_tank_state",
 		L"txt_tetris_state",
 		L"txt_tip",
 		L"txt_title",
@@ -1824,6 +1921,13 @@ struct _R R={
 		L"wnd_gameover",
 		L"wnd_gameover_card",
 		L"wnd_rgn",
+		L"wnd_tank_aniframe",
+		L"wnd_tank_banner",
+		L"wnd_tank_board",
+		L"wnd_tank_gameover",
+		L"wnd_tank_gameover_card",
+		L"wnd_tank_sprites",
+		L"wnd_tank_stack",
 		L"wnd_temp_host",
 		L"wnd_tetris_aniframe",
 		L"wnd_tetris_board",
@@ -1835,7 +1939,7 @@ struct _R R={
 	,
 	{
 		65723,
-		65788,
+		65811,
 		65581,
 		65633,
 		65634,
@@ -1844,17 +1948,17 @@ struct _R R={
 		65637,
 		65638,
 		65735,
-		65799,
-		65794,
+		65822,
+		65817,
 		65611,
 		65682,
 		51,
-		65790,
+		65813,
 		65689,
 		65711,
 		65686,
 		65710,
-		65789,
+		65812,
 		65687,
 		65591,
 		65653,
@@ -1870,6 +1974,8 @@ struct _R R={
 		65678,
 		65705,
 		65706,
+		65791,
+		65790,
 		65594,
 		65775,
 		65774,
@@ -1901,7 +2007,7 @@ struct _R R={
 		65562,
 		65600,
 		65604,
-		65785,
+		65808,
 		65605,
 		65566,
 		65584,
@@ -1910,7 +2016,7 @@ struct _R R={
 		65561,
 		65599,
 		65603,
-		65784,
+		65807,
 		65738,
 		65724,
 		65567,
@@ -1930,6 +2036,15 @@ struct _R R={
 		65752,
 		65751,
 		65750,
+		65802,
+		65801,
+		65786,
+		65785,
+		65784,
+		65783,
+		65782,
+		65788,
+		65787,
 		65772,
 		65771,
 		65770,
@@ -1941,7 +2056,7 @@ struct _R R={
 		65764,
 		65708,
 		65709,
-		65783,
+		65806,
 		65716,
 		65717,
 		65718,
@@ -1972,7 +2087,7 @@ struct _R R={
 		65665,
 		65544,
 		65602,
-		65796,
+		65819,
 		65568,
 		65559,
 		65617,
@@ -1996,8 +2111,8 @@ struct _R R={
 		16,
 		17,
 		18,
-		65793,
-		65787,
+		65816,
+		65810,
 		65609,
 		65652,
 		65587,
@@ -2046,7 +2161,7 @@ struct _R R={
 		104,
 		105,
 		106,
-		65795,
+		65818,
 		65757,
 		65758,
 		65759,
@@ -2074,8 +2189,8 @@ struct _R R={
 		65573,
 		65614,
 		65690,
-		65782,
-		65786,
+		65805,
+		65809,
 		65720,
 		65721,
 		65722,
@@ -2105,12 +2220,12 @@ struct _R R={
 		65674,
 		65675,
 		65676,
-		65798,
+		65821,
 		65557,
 		65647,
 		65555,
 		65685,
-		65797,
+		65820,
 		65763,
 		65570,
 		65571,
@@ -2123,8 +2238,13 @@ struct _R R={
 		65703,
 		65574,
 		65576,
+		65796,
+		65803,
+		65800,
+		65799,
+		65789,
 		65773,
-		65791,
+		65814,
 		65677,
 		65580,
 		65753,
@@ -2135,12 +2255,19 @@ struct _R R={
 		65741,
 		65728,
 		65727,
-		65792,
+		65815,
 		65713,
 		65776,
 		65778,
 		65779,
 		65714,
+		65804,
+		65795,
+		65793,
+		65797,
+		65798,
+		65794,
+		65792,
 		65691,
 		65781,
 		65777,

@@ -74,6 +74,8 @@ function on_init(args)
 	xxl_init(root);
 	--init the lua tetris game (page_script 的"俄罗斯方块"子页)
 	tetris_init(root);
+	--init the lua tank game (page_script 的"坦克大战"子页)
+	tank_init(root);
 end
 
 function on_exit(args)
@@ -83,6 +85,7 @@ function on_exit(args)
 	runTimer:Release();
 	xxl_exit();
 	tetris_exit();
+	tank_exit();
 end
 
 function on_timer(args)
@@ -2861,5 +2864,1539 @@ function tetris_exit()
 		tetris.over_ani_out = nil;
 	end
 	tetris.ani_ctx = {};
+end
+
+--[[
+==================== 坦克大战(lua 版) ====================
+经典 Battle City 玩法: 13x13 网格,守住底部基地,消灭本关全部敌人。
+地形与爆炸画在棋盘格上,坦克/炮弹/无敌护盾画在棋盘上方的精灵层:
+逻辑仍按格推进,渲染层用 vx/vy(可带小数的格坐标)在 60fps 定时器里逐帧插值,
+所以坦克与炮弹是连续滑动而不是逐格跳动。
+数据层(地图/移动/碰撞/炮弹/出生/计分)与渲染层分离,可在裸 lua 中回归测试。
+地形: 0 空地 / 1 砖墙 / 2 残砖 / 3 钢墙 / 4 水 / 5 基地 / 6 基地被毁。
+方向: 0 上 / 1 右 / 2 下 / 3 左。玩家用方向键或 WASD 移动/转向,空格开炮,P 暂停。
+]]
+
+tank_base_id = 64000;		-- 棋盘格子 id 段(195 个,按 y*13+x 递增)
+tank_fx_base_id = 67000;	-- 飞分文本 id 段
+tank_spr_base_id = 68000;	-- 活动精灵 id 段(护盾/玩家/敌人/炮弹)
+tank_row = 13;
+tank_col = 13;
+tank_pad_rows = 1;		-- 战场上下各一行砖墙装饰,与地图砖墙共用 svg_tank 帧
+tank_cell = 26;			-- 与 page_script.xml 中 152 宽侧边卡 + 8 间隔的布局匹配
+tank_tick_ms = 16;		-- 60fps:移动/炮弹靠像素插值,不再按格跳动
+tank_bullet_ms = 90;		-- 炮弹飞过一格所需时间
+tank_player_move_cd = 150;	-- 玩家连续移动的最小间隔(按住方向键时按此节奏匀速前进)
+tank_player_fire_cd = 260;
+tank_player_bullet_max = 2;	-- 同屏玩家炮弹上限
+tank_enemy_max = 4;			-- 同屏敌坦克上限
+tank_bullet_pool = 8;		-- 炮弹/敌坦克精灵池大小
+tank_invuln_ms = 2000;		-- 玩家重生后的无敌时间(护盾环缓慢呼吸+旋转,不闪烁)
+tank_respawn_ms = 1200;		-- 被击毁后的重生等待
+tank_shield_breath_ms = 1400;	-- 护盾环呼吸周期
+tank_shield_spin_ms = 3600;		-- 护盾环转一圈的时间
+tank_hit_dist = 0.45;			-- 子弹与坦克画面中心距离小于该值(格)才算接触
+
+-- 方向键映射(方向键 + WASD 都按同一套状态处理,支持按住连续移动)
+tank_key_dir = { [37] = 3, [39] = 1, [38] = 0, [40] = 2,
+	[65] = 3, [68] = 1, [87] = 0, [83] = 2 };
+
+-- 地形值(与雪碧图帧号 0-6 一一对应)
+tank_T_EMPTY = 0;
+tank_T_BRICK = 1;
+tank_T_BRICK_HALF = 2;
+tank_T_STEEL = 3;
+tank_T_WATER = 4;
+tank_T_BASE = 5;
+tank_T_BASE_DEAD = 6;
+
+-- 雪碧图帧号
+tank_F_PLAYER = 7;			-- + 方向(7-10)
+tank_F_ENEMY = 11;			-- + 方向(11-14)
+tank_F_ENEMY_FAST = 15;		-- + 方向(15-18)
+tank_F_BULLET_P = 19;
+tank_F_BULLET_E = 20;
+tank_F_EXP1 = 21;
+tank_F_EXP2 = 22;
+tank_F_EXP3 = 23;
+tank_F_SHIELD = 26;			-- 无敌护盾环(叠加在玩家坦克上)
+
+tank_dir_dx = {0, 1, 0, -1};
+tank_dir_dy = {-1, 0, 1, 0};
+
+tank_spawn_pts = { {0,0}, {6,0}, {12,0} };	-- 顶部三个出生点
+
+-- 关卡地图(13x13,共 10 关): . 空地 B 砖 S 钢 W 水 E 基地(基地在底部中央,周围有砖墙)
+-- 顶部三个敌人出生点(0,0)(6,0)(12,0)与玩家出生点(4,12)在各关都保持空地
+tank_maps = {
+	{
+		".....B.B.....",
+		".....B.B.....",
+		"..BBBB.BBBB..",
+		"..B.......B..",
+		"..B.BB.BB.B..",
+		"....B...B....",
+		"BB..B.S.B..BB",
+		"....B...B....",
+		"..B.BB.BB.B..",
+		"..B.......B..",
+		"..BBBB.BBBB..",
+		".....BBB.....",
+		".....BEB.....",
+	},
+	{
+		".....B.B.....",
+		"..S..B.B..S..",
+		"..B..B.B..B..",
+		"..B.BB.BB.B..",
+		".....B.B.....",
+		".WW...B...WW.",
+		".B.....S...B.",
+		".....BBBB....",
+		"..B..B..B..B.",
+		"..B..B..B..B.",
+		"..BBB...BBB..",
+		".....BBB.....",
+		".....BEB.....",
+	},
+	{
+		".....B.B.....",
+		"..B..B.B..B..",
+		"..B..B.B..B..",
+		"..B..BBB..B..",
+		"..B.......B..",
+		".WWW.B.B.WWW.",
+		"..B..B.B..B..",
+		"..B..B.B..B..",
+		"..B..B.B..B..",
+		"..BBBB.BBBB..",
+		".............",
+		".....BBB.....",
+		".....BEB.....",
+	},
+	-- 4 双环要塞:上下对称的砖环,两翼钢墙保护补给线
+	{
+		".....B.B.....",
+		"..S.......S..",
+		"..B.BB.BB.B..",
+		"...B.....B...",
+		".BB.B.S.B.BB.",
+		"...B.....B...",
+		"..B.BB.BB.B..",
+		"..S.......S..",
+		"...B.BBB.B...",
+		"...B.....B...",
+		"..BBB...BBB..",
+		".....BBB.....",
+		".....BEB.....",
+	},
+	-- 5 砖林:密集横墙,靠打穿砖块开辟纵向通道
+	{
+		".....B.B.....",
+		".BBBBB.BBBBB.",
+		".....B.B.....",
+		".BBB.B.B.BBB.",
+		".....B.B.....",
+		".BBBBB.BBBBB.",
+		".....B.B.....",
+		".BBB.B.B.BBB.",
+		".....B.B.....",
+		".BBBBB.BBBBB.",
+		".....B.B.....",
+		".....BBB.....",
+		".....BEB.....",
+	},
+	-- 6 钢卫走廊:中央纵向走廊,两侧钢墙与水池夹击
+	{
+		".....B.B.....",
+		"..SS.....SS..",
+		"..SS.....SS..",
+		".....BBB.....",
+		"..B..B.B..B..",
+		"..B..B.B..B..",
+		".WW..B.B..WW.",
+		"..B..B.B..B..",
+		"..B..B.B..B..",
+		".....BBB.....",
+		"..SS.....SS..",
+		".....BBB.....",
+		".....BEB.....",
+	},
+	-- 7 十字回廊:四角砖房 + 中央钢柱
+	{
+		".....B.B.....",
+		"..B.B...B.B..",
+		"..B.B.B.B.B..",
+		"..B...B...B..",
+		"..BBB.B.BBB..",
+		".....B.B.....",
+		".SS.BBBBB.SS.",
+		".....B.B.....",
+		"..BBB.B.BBB..",
+		"..B...B...B..",
+		"..B.B.B.B.B..",
+		".....BBB.....",
+		".....BEB.....",
+	},
+	-- 8 迷墙:错位砖墙 + 水池截断中路
+	{
+		".....B.B.....",
+		"...B...B.....",
+		".BBBB.B.BBBB.",
+		".....B.B.....",
+		".BB.B...B.BB.",
+		"...B.BBB.B...",
+		".WWB.....BWW.",
+		"...B.BBB.B...",
+		".BB.B...B.BB.",
+		".....B.B.....",
+		".BBBB.B.BBBB.",
+		".....BBB.....",
+		".....BEB.....",
+	},
+	-- 9 钢岛:开阔地形,中央四块钢墙做掩体
+	{
+		".....B.B.....",
+		".S...B.B...S.",
+		"..B..B.B..B..",
+		"..B.BB.BB.B..",
+		".W.........W.",
+		"..BB.S.S.BB..",
+		".W.........W.",
+		"..BB.S.S.BB..",
+		".W.........W.",
+		"..B.BB.BB.B..",
+		"..B..B.B..B..",
+		".....BBB.....",
+		".....BEB.....",
+	},
+	-- 10 最终要塞:中央水城 + 钢墙门柱,砖墙多层保护基地
+	{
+		".....B.B.....",
+		"..SSS.B.SSS..",
+		"..B...B...B..",
+		"..B.WWW.W.B..",
+		"..B.W...W.B..",
+		"..S.W.S.W.S..",
+		"..B.W...W.B..",
+		"..B.WWW.W.B..",
+		"..B...B...B..",
+		"..BBB.B.BBB..",
+		"..S..B.B..S..",
+		".....BBB.....",
+		".....BEB.....",
+	},
+};
+
+tank = {
+	root = nil, wndBoard = nil, aniframe = nil, timer = nil,
+	terrain = {}, player = nil, enemies = {}, bullets = {}, explosions = {},
+	score = 0, score_shown = 0, lives = 3, stage = 1,
+	state = "idle", total = 0, spawned = 0, killed = 0,
+	time_ms = 0, spawn_ms = 0, spawn_idx = 0, respawn_ms = 0, clear_ms = 0,
+	cache = {}, ani_move = nil, ani_ctx = {}, fx_seq = 0, count_ctx = 0,
+	over_wnd = nil, over_visible = false, over_hiding = false, over_reason = nil,
+	sprLayer = nil, geo = nil, sprCache = {}, sprEle = {},
+	key_dir = nil, held = {}, held_order = {},
+};
+
+function tank_slog(msg)
+	slog("tank: " .. msg);
+end
+
+-- ==================== 数据层: 地图 / 碰撞 / 移动 ====================
+
+function tank_map_at(stage)
+	return tank_maps[(stage - 1) % #tank_maps + 1];
+end
+
+function tank_parse_map(rows)
+	local legend = { ["."] = tank_T_EMPTY, ["B"] = tank_T_BRICK, ["S"] = tank_T_STEEL,
+		["W"] = tank_T_WATER, ["E"] = tank_T_BASE };
+	local grid = {};
+	for y = 0, tank_row-1 do
+		grid[y] = {};
+		local row = rows[y+1] or "";
+		for x = 0, tank_col-1 do
+			grid[y][x] = legend[string.sub(row, x+1, x+1)] or tank_T_EMPTY;
+		end
+	end
+	return grid;
+end
+
+function tank_in_bounds(x, y)
+	return x >= 0 and x < tank_col and y >= 0 and y < tank_row;
+end
+
+-- 地图格(x,y)对应棋盘子窗口 id;棋盘上下各有一行砖墙装饰,故行号整体下移
+function tank_cellid(x, y)
+	return tank_base_id + (y + tank_pad_rows)*tank_col + x;
+end
+
+function tank_terrain_blocks_tank(x, y)
+	local t = tank.terrain[y][x];
+	return t == tank_T_BRICK or t == tank_T_BRICK_HALF or t == tank_T_STEEL
+		or t == tank_T_WATER or t == tank_T_BASE;
+end
+
+-- 指定格上的坦克(ignore 为移动者自身);玩家已阵亡时不再占位
+function tank_tank_at(x, y, ignore)
+	local p = tank.player;
+	if p and p.alive and p ~= ignore and p.x == x and p.y == y then return p end
+	for _, e in ipairs(tank.enemies) do
+		if e.alive and e ~= ignore and e.x == x and e.y == y then return e end
+	end
+	return nil;
+end
+
+function tank_cell_free(x, y, mover)
+	if not tank_in_bounds(x, y) then return false end
+	if tank_terrain_blocks_tank(x, y) then return false end
+	if tank_tank_at(x, y, mover) then return false end
+	return true;
+end
+
+-- 坦克转向并尝试前进:被挡住也会转向(经典操作手感)
+-- dur: 这一格在画面上滑过去的时长(毫秒),渲染层用它做像素插值
+function tank_move_entity(ent, dir, dur)
+	ent.dir = dir;
+	local nx = ent.x + tank_dir_dx[dir+1];
+	local ny = ent.y + tank_dir_dy[dir+1];
+	if tank_cell_free(nx, ny, ent) then
+		ent.x = nx; ent.y = ny;
+		tank_anim_start(ent, dur or tank_player_move_cd);
+		return true;
+	end
+	return false;
+end
+
+-- 逻辑位置仍在格子上;vx/vy 是画面上连续的位置(以格为单位,可带小数)
+-- tox/toy: 动画终点,缺省为 ent.x/ent.y(坦克先把 x/y 改成目标格再调用)
+-- 炮弹的逻辑位置在到达前不改,所以必须显式传入下一格,否则画面会落后一格
+function tank_anim_start(ent, dur, tox, toy)
+	if ent.vx == nil then ent.vx = ent.x; ent.vy = ent.y end
+	ent.mx0 = ent.vx; ent.my0 = ent.vy;
+	ent.mx1 = tox or ent.x; ent.my1 = toy or ent.y;
+	ent.mv_ms = 0;
+	ent.mv_dur = dur or 0;
+end
+
+function tank_anim_advance(ent, dt)
+	if ent.vx == nil then ent.vx = ent.x; ent.vy = ent.y end
+	if ent.mv_dur and ent.mv_dur > 0 then
+		ent.mv_ms = ent.mv_ms + dt;
+		local t = ent.mv_ms / ent.mv_dur;
+		if t >= 1 then
+			t = 1;
+			ent.mv_dur = 0;
+		end
+		ent.vx = ent.mx0 + (ent.mx1 - ent.mx0) * t;
+		ent.vy = ent.my0 + (ent.my1 - ent.my0) * t;
+	else
+		ent.vx = ent.x; ent.vy = ent.y;
+	end
+end
+
+function tank_anim_snap(ent)
+	ent.vx = ent.x; ent.vy = ent.y;
+	ent.mv_dur = 0; ent.mv_ms = 0;
+	ent.mx0 = ent.x; ent.my0 = ent.y; ent.mx1 = ent.x; ent.my1 = ent.y;
+end
+
+function tank_player_move(dir)
+	local p = tank.player;
+	if p == nil or not p.alive or tank.state ~= "playing" then return false end
+	if p.move_cd > 0 then
+		p.dir = dir;	-- 冷却中仍允许转向
+		return false
+	end
+	p.move_cd = tank_player_move_cd;
+	tank_move_entity(p, dir, tank_player_move_cd);
+	return true
+end
+
+-- 按住方向键:记录按键栈,tank_tick 按 move_cd 节奏持续前进;
+-- 只依赖系统按键重复会让移动一顿一顿,这里改由 60fps 定时器接管。
+function tank_keys_clear()
+	tank.held = {};
+	tank.held_order = {};
+	tank.key_dir = nil;
+end
+
+function tank_key_down(key)
+	local d = tank_key_dir[key];
+	if d == nil then return nil end
+	local order = tank.held_order;
+	local found = false;
+	for i = 1, #order do
+		if order[i] == key then found = true; break end
+	end
+	if not found then order[#order+1] = key end
+	tank.key_dir = d;
+	return d;
+end
+
+function tank_key_up(key)
+	local d = tank_key_dir[key];
+	if d == nil then return nil end
+	local order = tank.held_order;
+	for i = #order, 1, -1 do
+		if order[i] == key then table.remove(order, i); break end
+	end
+	if tank.key_dir == d then
+		local last = order[#order];
+		tank.key_dir = last and tank_key_dir[last] or nil;
+	end
+	return d;
+end
+
+function tank_respawn_player()
+	local x, y = 4, tank_row-1;
+	if not tank_cell_free(x, y, nil) then
+		for d = 1, tank_col-1 do
+			local nx = x + d;
+			if nx < tank_col and tank_cell_free(nx, y, nil) then x = nx; break end
+			nx = x - d;
+			if nx >= 0 and tank_cell_free(nx, y, nil) then x = nx; break end
+		end
+	end
+	if not tank_cell_free(x, y, nil) then return false end
+	tank.player = { x = x, y = y, dir = 0, alive = true,
+		move_cd = 0, fire_cd = 0, invuln_ms = tank_invuln_ms };
+	tank_anim_snap(tank.player);
+	tank.respawn_ms = 0;
+	return true;
+end
+
+-- ==================== 数据层: 炮弹 ====================
+
+function tank_count_bullets(owner)
+	local n = 0;
+	for _, b in ipairs(tank.bullets) do
+		if not b.dead and b.owner == owner then n = n + 1 end
+	end
+	return n;
+end
+
+function tank_enemy_bullet_count(e)
+	local n = 0;
+	for _, b in ipairs(tank.bullets) do
+		if not b.dead and b.from == e then n = n + 1 end
+	end
+	return n;
+end
+
+-- 炮弹出生:逻辑位置是坦克所在格,画面从坦克当前视觉点立即滑向前方一格;
+-- 命中按画面位置判定(见 tank_bullet_touch),打到坦克/砖块的那一帧才出爆炸。
+function tank_spawn_bullet(owner, ent)
+	local b = { x = ent.x, y = ent.y, vx = ent.vx or ent.x, vy = ent.vy or ent.y,
+		dir = ent.dir, owner = owner, from = ent, ms = 0, leg_ms = 0, dead = false };
+	b.pvx = b.vx; b.pvy = b.vy;	-- 上一帧画面位置,用于本帧的线段命中检测
+	tank.bullets[#tank.bullets+1] = b;
+	tank_bullet_aim(b);
+	return b;
+end
+
+-- 设定炮弹下一格;画面按实际距离换算同一飞行速度,开炮瞬间不会突然加速
+function tank_bullet_aim(b)
+	local nx = b.x + tank_dir_dx[b.dir+1];
+	local ny = b.y + tank_dir_dy[b.dir+1];
+	if not tank_in_bounds(nx, ny) then
+		b.dead = true;
+		return false;
+	end
+	b.tx = nx; b.ty = ny;
+	local dist = math.abs(nx - (b.vx or b.x)) + math.abs(ny - (b.vy or b.y));
+	if dist < 0.001 then dist = 1 end
+	b.leg_ms = tank_bullet_ms * dist;
+	b.ms = 0;
+	tank_anim_start(b, b.leg_ms, nx, ny);
+	return true;
+end
+
+function tank_player_fire()
+	local p = tank.player;
+	if p == nil or not p.alive or tank.state ~= "playing" then return false end
+	if p.fire_cd > 0 then return false end
+	if tank_count_bullets("player") >= tank_player_bullet_max then return false end
+	p.fire_cd = tank_player_fire_cd;
+	return tank_spawn_bullet("player", p) ~= nil;
+end
+
+function tank_enemy_fire(e)
+	if tank.state ~= "playing" then return end
+	if tank_enemy_bullet_count(e) > 0 then return end
+	tank_spawn_bullet("enemy", e);
+end
+
+-- 爆炸按格子记录,同格重复命中只保留一个
+function tank_add_explosion(x, y, dur)
+	tank.explosions[y*tank_col+x] = { x = x, y = y, ms = dur, dur = dur };
+end
+
+-- 画面坐标(可带小数)换算到最近的格,爆炸/飞分按命中点落位
+function tank_cell_of(vx, vy)
+	local x = math.floor(vx + 0.5);
+	local y = math.floor(vy + 0.5);
+	if x < 0 then x = 0 elseif x > tank_col-1 then x = tank_col-1 end
+	if y < 0 then y = 0 elseif y > tank_row-1 then y = tank_row-1 end
+	return x, y;
+end
+
+function tank_kill_enemy(index, vx, vy)
+	local e = tank.enemies[index];
+	if e == nil then return end
+	table.remove(tank.enemies, index);
+	tank.killed = tank.killed + 1;
+	local hx, hy = tank_cell_of(vx or e.vx or e.x, vy or e.vy or e.y);
+	tank_add_explosion(hx, hy, 350);
+	-- 敌坦克被毁时它自己发出的炮弹一并消失(标记删除,避免和炮弹遍历互相干扰)
+	for _, b in ipairs(tank.bullets) do
+		if b.from == e then b.dead = true end
+	end
+	tank_show_enemy();
+	local pts = (e.kind == 2) and 200 or 100;
+	tank_score_add(pts, hx, hy, (e.kind == 2) and "#F87171" or "#FFD700");
+end
+
+function tank_player_hit(vx, vy)
+	local p = tank.player;
+	if p == nil or not p.alive then return end
+	if p.invuln_ms > 0 then return end
+	local hx, hy = tank_cell_of(vx or p.vx or p.x, vy or p.vy or p.y);
+	tank_add_explosion(hx, hy, 350);
+	tank.player = nil;
+	tank_keys_clear();
+	tank.lives = tank.lives - 1;
+	tank_show_lives();
+	if tank.lives <= 0 then
+		tank_game_over("tank");
+	else
+		tank.respawn_ms = tank_respawn_ms;
+		tank_show_state();
+	end
+end
+
+-- 本帧炮弹走过的线段(从上一帧画面位置到当前)是否扫到目标坦克;
+-- 一帧跨多毫秒时也不会从坦克身上穿过去。返回命中点和 true。
+function tank_bullet_contact(b, px, py)
+	local ax, ay = b.pvx or b.vx, b.pvy or b.vy;
+	local dx, dy = b.vx - ax, b.vy - ay;
+	local len2 = dx*dx + dy*dy;
+	local t = 0;
+	if len2 > 0.000001 then
+		t = ((px-ax)*dx + (py-ay)*dy) / len2;
+		if t < 0 then t = 0 elseif t > 1 then t = 1 end
+	end
+	local cx, cy = ax + dx*t, ay + dy*t;
+	if math.abs(px-cx) <= tank_hit_dist and math.abs(py-cy) <= tank_hit_dist then
+		return cx, cy;
+	end
+	return nil;
+end
+
+-- 按画面位置判定子弹与坦克的接触:逻辑格坐标在滑动开始时就已更新到目标格,
+-- 只有用 vx/vy 才能保证命中发生在子弹真正贴上坦克的那一帧。
+function tank_bullet_touch(b)
+	if b.owner == "player" then
+		for i, e in ipairs(tank.enemies) do
+			if e.alive and e ~= b.from then
+				local ix, iy = tank_bullet_contact(b, e.vx or e.x, e.vy or e.y);
+				if ix then
+					tank_kill_enemy(i, ix, iy);
+					return true;
+				end
+			end
+		end
+	else
+		local p = tank.player;
+		if p and p.alive and p ~= b.from then
+			local ix, iy = tank_bullet_contact(b, p.vx or p.x, p.vy or p.y);
+			if ix then
+				if p.invuln_ms > 0 then
+					local hx, hy = tank_cell_of(ix, iy);
+					tank_add_explosion(hx, hy, 150);
+				else
+					tank_player_hit(ix, iy);
+				end
+				return true;
+			end
+		end
+	end
+	return false;
+end
+
+-- 炮弹画面到达目标格,此时再处理地形;坦克命中在 tank_bullet_touch 里按画面位置判定
+function tank_bullet_arrive(b)
+	local nx, ny = b.tx, b.ty;
+
+	local t = tank.terrain[ny][nx];
+	if t == tank_T_BRICK then
+		tank.terrain[ny][nx] = tank_T_BRICK_HALF;
+		tank_add_explosion(nx, ny, 150);
+		return false
+	elseif t == tank_T_BRICK_HALF then
+		tank.terrain[ny][nx] = tank_T_EMPTY;
+		tank_add_explosion(nx, ny, 150);
+		return false
+	elseif t == tank_T_STEEL then
+		tank_add_explosion(nx, ny, 150);
+		return false
+	elseif t == tank_T_BASE then
+		tank.terrain[ny][nx] = tank_T_BASE_DEAD;
+		tank_add_explosion(nx, ny, 400);
+		tank_show_base();
+		tank_game_over("base");
+		return false
+	end
+
+	b.x = nx; b.y = ny;
+	return tank_bullet_aim(b);	-- 继续滑向下一格
+end
+
+-- ==================== 数据层: 敌人 AI / 出生 ====================
+
+function tank_enemy_choose_dir(e)
+	local tx, ty;
+	local p = tank.player;
+	if p and p.alive and math.random() < 0.45 then
+		tx, ty = p.x, p.y;
+	else
+		tx, ty = math.floor(tank_col/2), tank_row-1;
+	end
+	local dx = tx - e.x;
+	local dy = ty - e.y;
+	local candidates = {};
+	if math.abs(dx) > math.abs(dy) then
+		candidates[#candidates+1] = (dx > 0) and 1 or 3;
+		candidates[#candidates+1] = (dy > 0) and 2 or 0;
+	else
+		candidates[#candidates+1] = (dy > 0) and 2 or 0;
+		candidates[#candidates+1] = (dx > 0) and 1 or 3;
+	end
+	candidates[#candidates+1] = (e.dir + 2) % 4;	-- 兜底掉头
+	for _, d in ipairs(candidates) do
+		local nx = e.x + tank_dir_dx[d+1];
+		local ny = e.y + tank_dir_dy[d+1];
+		if tank_cell_free(nx, ny, e) then return d end
+	end
+	return math.random(0, 3);
+end
+
+function tank_enemy_move(e)
+	local dir = e.dir;
+	if math.random() < 0.30 then dir = tank_enemy_choose_dir(e) end
+	if not tank_move_entity(e, dir, e.speed_ms) then
+		tank_move_entity(e, tank_enemy_choose_dir(e), e.speed_ms);
+	end
+end
+
+function tank_enemy_update(e, dt)
+	e.move_ms = e.move_ms - dt;
+	if e.move_ms <= 0 then
+		e.move_ms = e.speed_ms;	-- 与滑行时长一致,连续推进不停顿
+		tank_enemy_move(e);
+	end
+	e.fire_ms = e.fire_ms - dt;
+	if e.fire_ms <= 0 then
+		e.fire_ms = math.max(700, 1800 - tank.stage*120) + math.random(0, 900);
+		tank_enemy_fire(e);
+	end
+end
+
+function tank_try_spawn_enemy()
+	if tank.spawned >= tank.total then return false end
+	if #tank.enemies >= tank_enemy_max then return false end
+	local sp = tank_spawn_pts[(tank.spawn_idx % #tank_spawn_pts) + 1];
+	tank.spawn_idx = tank.spawn_idx + 1;
+	if not tank_cell_free(sp[1], sp[2], nil) then return false end
+
+	local kind = 1;
+	if tank.stage >= 2 and math.random() < 0.35 then kind = 2 end
+	local speed = math.max(280, 520 - (tank.stage-1)*40) + math.random(0, 80);
+	local e = { x = sp[1], y = sp[2], dir = 2, kind = kind, alive = true,
+		move_ms = speed, speed_ms = speed,
+		fire_ms = 1000 + math.random(0, 900) };
+	tank_anim_snap(e);
+	tank.enemies[#tank.enemies+1] = e;
+	tank.spawned = tank.spawned + 1;
+	tank_add_explosion(sp[1], sp[2], 180);
+	return true;
+end
+
+-- ==================== 数据层: 每帧推进 ====================
+
+function tank_advance_visuals(dt)
+	local p = tank.player;
+	if p then tank_anim_advance(p, dt) end
+	for _, e in ipairs(tank.enemies) do tank_anim_advance(e, dt) end
+	for _, b in ipairs(tank.bullets) do
+		b.pvx = b.vx; b.pvy = b.vy;
+		tank_anim_advance(b, dt);
+	end
+end
+
+function tank_tick(dt)
+	tank.time_ms = tank.time_ms + dt;
+
+	tank_advance_visuals(dt);	-- 先把画面位置推进到本帧,逻辑再决定下一次移动
+
+	for k, ex in pairs(tank.explosions) do
+		ex.ms = ex.ms - dt;
+		if ex.ms <= 0 then tank.explosions[k] = nil end
+	end
+
+	if tank.state == "stageclear" then
+		tank.clear_ms = tank.clear_ms - dt;
+		if tank.clear_ms <= 0 then tank_next_stage() end
+		return;
+	end
+	if tank.state ~= "playing" then return end
+
+	local p = tank.player;
+	if p then
+		if p.move_cd > 0 then p.move_cd = p.move_cd - dt end
+		if p.fire_cd > 0 then p.fire_cd = p.fire_cd - dt end
+		if p.invuln_ms > 0 then
+			p.invuln_ms = p.invuln_ms - dt;
+			if p.invuln_ms < 0 then p.invuln_ms = 0 end
+		end
+		-- 按住方向键时由定时器按固定节奏放行,不依赖系统按键重复
+		if p.alive and tank.key_dir ~= nil and p.move_cd <= 0 then
+			tank_player_move(tank.key_dir);
+		end
+	elseif tank.respawn_ms > 0 then
+		tank.respawn_ms = tank.respawn_ms - dt;
+		if tank.respawn_ms <= 0 then
+			tank_respawn_player();
+			tank_show_state();
+		end
+	end
+
+	tank.spawn_ms = tank.spawn_ms - dt;
+	if tank.spawn_ms <= 0 then
+		tank.spawn_ms = 1400;
+		tank_try_spawn_enemy();
+	end
+
+	for i = #tank.enemies, 1, -1 do
+		local e = tank.enemies[i];
+		if e then tank_enemy_update(e, dt) end
+	end
+
+	-- 倒序遍历,便于删除消失的炮弹;dead 炮弹在推进前清掉
+	for i = #tank.bullets, 1, -1 do
+		local b = tank.bullets[i];
+		if b.dead then
+			table.remove(tank.bullets, i);
+		elseif tank_bullet_touch(b) then
+			table.remove(tank.bullets, i);
+		else
+			b.ms = b.ms + dt;
+			if b.ms >= b.leg_ms then
+				if not tank_bullet_arrive(b) then table.remove(tank.bullets, i) end
+			end
+		end
+		if tank.state ~= "playing" then break end
+	end
+
+	if tank.state == "playing" and tank.killed >= tank.total and #tank.enemies == 0 then
+		tank_stage_clear();
+	end
+end
+
+function tank_stage_clear()
+	tank.state = "stageclear";
+	tank.clear_ms = 1800;
+	tank_banner_show("第 " .. tank.stage .. " 关完成  +500");
+	tank_score_add(500);
+	tank_set_start_btn(T"开始游戏");
+	tank_show_state();
+end
+
+function tank_next_stage()
+	tank.stage = tank.stage + 1;
+	tank_setup_stage();
+end
+
+-- ==================== 渲染 ====================
+-- 棋盘 169 格只画地形与爆炸;坦克/炮弹/护盾是棋盘上方精灵层里的独立 img,
+-- 按 vx/vy(可带小数的格坐标)每帧 Move,于是移动是连续滑动而不是逐格跳。
+
+function tank_set_frame(id, frame)
+	if tank.cache[id] == frame then return end
+	tank.cache[id] = frame;
+	local ele = tank.wndBoard and tank.wndBoard:FindChildByID(id, -1);
+	if ele then
+		ele:SetAttribute(T"iconIndex", T(tostring(frame)), false);
+		ele:Invalidate();
+	end
+end
+
+-- 棋盘格子尺寸/间距/原点,布局变化(窗口缩放)后自动重建精灵
+function tank_ensure_geo()
+	if tank.wndBoard == nil or tank.sprLayer == nil then return false end
+	local c0 = tank.wndBoard:FindChildByID(tank_cellid(0, 0), -1);
+	local c1 = tank.wndBoard:FindChildByID(tank_cellid(1, 0), -1);
+	local c2 = tank.wndBoard:FindChildByID(tank_cellid(0, 1), -1);
+	if c0 == nil or c1 == nil or c2 == nil then return false end
+	local r0 = c0:GetWindowRect2();
+	local r1 = c1:GetWindowRect2();
+	local r2 = c2:GetWindowRect2();
+	local cw = r0:Width(); local ch = r0:Height();
+	if cw <= 0 or ch <= 0 then return false end
+	local px = r1.left - r0.left;
+	local py = r2.top - r0.top;
+	if px <= 0 or py <= 0 then return false end
+
+	-- 格子坐标相对棋盘客户区;精灵层与棋盘是同一父窗口下的兄弟,
+	-- 把精灵层贴到棋盘位置,两者原点一致,Move 时就能直接用格子坐标。
+	local rb = tank.wndBoard:GetWindowRect2();
+	local lx, ly = rb.left, rb.top;
+	local lw, lh = rb:Width(), rb:Height();
+	tank.sprLayer:Move(CRect(lx, ly, lx + lw, ly + lh));
+
+	local g = tank.geo;
+	if g and g.ox == r0.left and g.oy == r0.top and g.px == px
+		and g.py == py and g.cw == cw and g.ch == ch then
+		return true;
+	end
+	tank.geo = { ox = r0.left, oy = r0.top, px = px, py = py, cw = cw, ch = ch };
+	tank_sprite_pool_init();
+	return true;
+end
+
+function tank_sprite_xml(id, w, h, frame)
+	return '<img id="' .. id .. '" size="' .. w .. ',' .. h .. '" skin="svg_tank" iconIndex="'
+		.. frame .. '" msgTransparent="1" visible="0"/>';
+end
+
+-- 精灵池一次建好,顺序决定 z 序:护盾环 -> 玩家 -> 敌人 -> 炮弹
+function tank_sprite_pool_init()
+	local layer = tank.sprLayer;
+	local g = tank.geo;
+	if layer == nil or g == nil then return end
+	layer:DestroyAllChildren();
+	tank.sprCache = {}; tank.sprEle = {};
+	local xml = tank_sprite_xml(tank_spr_base_id + 1, g.cw, g.ch, tank_F_SHIELD);
+	xml = xml .. tank_sprite_xml(tank_spr_base_id + 2, g.cw, g.ch, tank_F_PLAYER);
+	for i = 1, tank_enemy_max do
+		xml = xml .. tank_sprite_xml(tank_spr_base_id + 10 + i, g.cw, g.ch, tank_F_ENEMY);
+	end
+	for i = 1, tank_bullet_pool do
+		xml = xml .. tank_sprite_xml(tank_spr_base_id + 20 + i, g.cw, g.ch, tank_F_BULLET_P);
+	end
+	layer:CreateChildrenFromXml(xml);
+end
+
+function tank_spr_ele(id)
+	local ele = tank.sprEle[id];
+	if ele == nil then
+		ele = tank.sprLayer and tank.sprLayer:FindChildByID(id, -1) or false;
+		tank.sprEle[id] = ele;
+	end
+	if ele == false then return nil end
+	return ele;
+end
+
+-- scale/alpha 可选:护盾环靠两者做缓慢呼吸
+function tank_spr_set(id, frame, fx, fy, scale, alpha)
+	local ele = tank_spr_ele(id);
+	local g = tank.geo;
+	if ele == nil or g == nil then return end
+	local sc = scale or 1;
+	local w = math.floor(g.cw * sc + 0.5);
+	local h = math.floor(g.ch * sc + 0.5);
+	local px = math.floor(g.ox + fx*g.px + (g.cw - w)/2 + 0.5);
+	local py = math.floor(g.oy + fy*g.py + (g.ch - h)/2 + 0.5);
+	local a = alpha or 255;
+	if a < 0 then a = 0 elseif a > 255 then a = 255 end
+	local c = tank.sprCache[id];
+	if c == nil then
+		c = { frame = -1, x = -1, y = -1, w = -1, h = -1, a = -1 };
+		tank.sprCache[id] = c;
+	end
+	if c.frame ~= frame then
+		ele:SetAttribute(T"iconIndex", T(tostring(frame)), false);
+		c.frame = frame;
+	end
+	if c.x ~= px or c.y ~= py or c.w ~= w or c.h ~= h then
+		ele:Move(CRect(px, py, px + w, py + h));
+		c.x = px; c.y = py; c.w = w; c.h = h;
+	end
+	if c.a ~= a then
+		ele:SetAlpha(a);
+		c.a = a;
+	end
+	if ele:IsVisible() == 0 then
+		ele:SetVisible(true, true);
+	end
+end
+
+function tank_spr_hide(id)
+	local ele = tank_spr_ele(id);
+	if ele and ele:IsVisible() ~= 0 then ele:SetVisible(false, true) end
+	tank.sprCache[id] = nil;	-- 下次显示按新位置重新落位
+end
+
+-- 只对精灵本身做绕中心的矩阵旋转(护盾环);alpha 仍由 SetAlpha 控制
+-- SOUI 矩阵按行向量存储: {Sx, SkewX, Tx, SkewY, Sy, Ty, P0, P1, P2}
+function tank_spr_rot(id, deg)
+	local ele = tank_spr_ele(id);
+	local c = tank.sprCache[id];
+	if ele == nil or c == nil then return end
+	local r = deg * math.pi / 180;
+	local cs = math.cos(r); local sn = math.sin(r);
+	local cx = c.w / 2; local cy = c.h / 2;
+	local tx = cx * (1 - cs) + sn * cy;
+	local ty = cy * (1 - cs) - sn * cx;
+	ele:SetMatrix({ cs, -sn, tx, sn, cs, ty, 0, 0, 1 }, true);
+end
+
+function tank_render_sprites()
+	-- 玩家:无敌时叠加一个缓慢呼吸+旋转的护盾环,坦克本身始终可见(不闪);
+	-- 无敌结束前 400ms 平滑淡出,避免护盾突然消失
+	local p = tank.player;
+	if p and p.alive then
+		if p.invuln_ms > 0 then
+			local bp = (tank.time_ms % tank_shield_breath_ms) / tank_shield_breath_ms;
+			local k = 0.5 - 0.5 * math.cos(bp * 2 * math.pi);	-- 0..1 平滑起伏
+			local a = math.floor(215 + 40 * k);
+			if p.invuln_ms < 400 then a = math.floor(a * p.invuln_ms / 400) end
+			-- 比坦克大一圈,罩在坦克外面才看得清
+			tank_spr_set(tank_spr_base_id + 1, tank_F_SHIELD, p.vx, p.vy,
+				1.3 + 0.08 * k, a);
+			tank_spr_rot(tank_spr_base_id + 1,
+				(tank.time_ms % tank_shield_spin_ms) / tank_shield_spin_ms * 360);
+		else
+			tank_spr_hide(tank_spr_base_id + 1);
+		end
+		tank_spr_set(tank_spr_base_id + 2, tank_F_PLAYER + p.dir, p.vx, p.vy);
+	else
+		tank_spr_hide(tank_spr_base_id + 1);
+		tank_spr_hide(tank_spr_base_id + 2);
+	end
+
+	for i = 1, tank_enemy_max do
+		local e = tank.enemies[i];
+		if e then
+			local frame = (e.kind == 2) and (tank_F_ENEMY_FAST + e.dir) or (tank_F_ENEMY + e.dir);
+			tank_spr_set(tank_spr_base_id + 10 + i, frame, e.vx, e.vy);
+		else
+			tank_spr_hide(tank_spr_base_id + 10 + i);
+		end
+	end
+
+	for i = 1, tank_bullet_pool do
+		local b = tank.bullets[i];
+		if b and not b.dead then
+			local frame = (b.owner == "player") and tank_F_BULLET_P or tank_F_BULLET_E;
+			tank_spr_set(tank_spr_base_id + 20 + i, frame, b.vx, b.vy);
+		else
+			tank_spr_hide(tank_spr_base_id + 20 + i);
+		end
+	end
+end
+
+function tank_render()
+	if tank.wndBoard == nil or tank.terrain == nil then return end
+
+	-- 静态层:地形,爆炸按格子覆盖在上面(爆炸本身就是格子大小的爆点)
+	local overlay = {};
+	for key, ex in pairs(tank.explosions) do
+		local t = 1 - ex.ms/ex.dur;
+		local frame = tank_F_EXP1;
+		if t >= 0.72 then frame = tank_F_EXP3
+		elseif t >= 0.36 then frame = tank_F_EXP2 end
+		overlay[key] = frame;
+	end
+	for y = 0, tank_row-1 do
+		for x = 0, tank_col-1 do
+			local key = y*tank_col + x;
+			local frame = overlay[key];
+			if frame == nil then frame = tank.terrain[y][x] end
+			tank_set_frame(tank_cellid(x, y), frame);
+		end
+	end
+
+	if tank_ensure_geo() then tank_render_sprites() end
+end
+
+-- ==================== UI: LED / 文本 / 提示条 ====================
+
+function tank_set_digits(prefix, num, ndigits)
+	if tank.root == nil then return end
+	for i = 0, ndigits-1 do
+		local stack = tank.root:FindChildByNameA(prefix .. "_" .. i, -1);
+		if stack then
+			local stackApi = QiIStackView(stack);
+			if stackApi then
+				stackApi:SelectPage(math.floor(num / 10^i) % 10, false);
+				stackApi:Release();
+			end
+		end
+	end
+end
+
+function tank_show_score() tank_set_digits("digit_tank_score", (tank.score_shown or 0) % 10000, 4) end
+function tank_show_lives() tank_set_digits("digit_tank_lives", tank.lives % 10, 1) end
+function tank_show_stage() tank_set_digits("digit_tank_stage", tank.stage % 100, 2) end
+function tank_show_enemy()
+	local left = tank.total - tank.killed;
+	if left < 0 then left = 0 end
+	tank_set_digits("digit_tank_enemy", left % 100, 2);
+end
+
+function tank_show_state()
+	if tank.root == nil then return end
+	local txt = tank.root:FindChildByNameA("txt_tank_state",-1);
+	if txt == nil then return end
+	local s = { idle = "待开始", playing = "战斗中", paused = "已暂停",
+		stageclear = "关卡完成", over = "战斗结束" };
+	local name = s[tank.state] or "";
+	if tank.state == "playing" and tank.player == nil then name = "等待重生" end
+	txt:SetWindowText(T("状态:" .. name));
+end
+
+function tank_show_base()
+	if tank.root == nil then return end
+	local txt = tank.root:FindChildByNameA("txt_tank_base",-1);
+	if txt == nil then return end
+	local alive = true;
+	for y = 0, tank_row-1 do
+		for x = 0, tank_col-1 do
+			if tank.terrain[y][x] == tank_T_BASE_DEAD then alive = false end
+		end
+	end
+	txt:SetWindowText(T(alive and "基地完好" or "基地已毁"));
+end
+
+function tank_set_start_btn(text)
+	if tank.root == nil then return end
+	local btn = tank.root:FindChildByNameA("btn_tank_start",-1);
+	if btn then btn:SetWindowText(text) end
+end
+
+function tank_banner_show(text)
+	if tank.root == nil then return end
+	local wnd = tank.root:FindChildByNameA("wnd_tank_banner",-1);
+	local txt = tank.root:FindChildByNameA("txt_tank_banner",-1);
+	if wnd and txt then
+		txt:SetWindowText(T(text));
+		wnd:SetVisible(true, true);
+	end
+end
+
+function tank_banner_hide()
+	if tank.root == nil then return end
+	local wnd = tank.root:FindChildByNameA("wnd_tank_banner",-1);
+	if wnd then wnd:SetVisible(false, true) end
+end
+
+-- ==================== 动画: 击杀飞分 + 得分 LED 滚动 ====================
+
+function tank_new_ani_ctx(ctx)
+	tank.fx_seq = tank.fx_seq + 1;
+	tank.ani_ctx[tank.fx_seq] = ctx;
+	return tank.fx_seq;
+end
+
+function tank_get_cell_rect(x, y)
+	if tank.wndBoard == nil then return nil end
+	local ele = tank.wndBoard:FindChildByID(tank_cellid(x, y), -1);
+	if ele == nil then return nil end
+	return ele:GetWindowRect2();
+end
+
+function tank_get_led_rect(prefix, ndigits)
+	local l, t, r, b;
+	for i = 0, ndigits-1 do
+		local d = tank.root and tank.root:FindChildByNameA(prefix .. "_" .. i, -1);
+		if d then
+			local rc = d:GetWindowRect2();
+			l = (l == nil) and rc.left or math.min(l, rc.left);
+			t = (t == nil) and rc.top or math.min(t, rc.top);
+			r = (r == nil) and rc.right or math.max(r, rc.right);
+			b = (b == nil) and rc.bottom or math.max(b, rc.bottom);
+		end
+	end
+	if l == nil then return nil end
+	return CRect(l, t, r, b);
+end
+
+-- 加分:从击杀格弹 "+分数" 飞向得分 LED;浮层不可用时直接滚动计数
+function tank_score_add(pts, x, y, color)
+	tank.score = tank.score + pts;
+	if x ~= nil and tank_fly_text(x, y, "+" .. pts, color) then return end
+	tank_score_count_begin();
+end
+
+function tank_fly_text(x, y, text, colorText)
+	if tank.aniframe == nil or tank.ani_move == nil then return false end
+	local rcFrom = tank_get_cell_rect(x, y);
+	local rcTo = tank_get_led_rect("digit_tank_score", 4);
+	if rcFrom == nil or rcTo == nil then return false end
+
+	tank.fx_seq = tank.fx_seq + 1;
+	local fid = tank_fx_base_id + tank.fx_seq;
+	local w = 64; local h = 24;
+	local px = rcFrom.left + math.floor(rcFrom:Width()/2) - math.floor(w/2);
+	local py = rcFrom.top + math.floor(rcFrom:Height()/2) - math.floor(h/2);
+	local xml = '<text id="' .. fid .. '" text="' .. text .. '" font="size:18,bold:1"'
+		.. ' colorText="' .. colorText .. '" align="center" valign="center" msgTransparent="1"/>';
+	tank.aniframe:CreateChildrenFromXml(xml);
+	local fy = tank.aniframe:FindChildByID(fid, -1);
+	if fy == nil then return false end
+	fy:Move(CRect(px, py, px + w, py + h));
+
+	local tx = rcTo.left + math.floor(rcTo:Width()/2) - math.floor(w/2);
+	local ty = rcTo.top + math.floor(rcTo:Height()/2) - math.floor(h/2);
+	local rc1 = CRect(px, py, px + w, py + h);
+	local rc2 = CRect(tx, ty, tx + w, ty + h);
+	local arc = math.max(40, math.min(120, math.abs(tx - px) * 0.3));
+
+	local ani = LuaValueAnimator();
+	ani:CopyFrom(tank.ani_move:GetIValueAnimator());	-- 模板无插值器 => fraction 即线性 t
+	ani:GetIValueAnimator():setDuration(450);
+	ani:SetRangeRect(rc1, rc2);
+	ani:SetOnUpdate("tank_fly_update");
+	ani:SetOnEnd("tank_fly_end");
+	local ctxId = tank_new_ani_ctx({ kind = "score", widget = fy, r1 = rc1, r2 = rc2, arc = arc, ani = ani });
+	ani:SetCtx(ctxId);
+	local ok = ani:Start(tank.aniframe);
+	if ok == 0 or ok == false then
+		tank.ani_ctx[ctxId] = nil;
+		fy:Destroy();
+		return false
+	end
+	return true
+end
+
+function tank_fly_update(luaAni, ctxId)
+	local c = tank.ani_ctx[ctxId];
+	if c == nil or c.widget == nil then return end
+	local t = luaAni:GetFraction();
+	local x = c.r1.left + (c.r2.left - c.r1.left) * t;
+	local y = c.r1.top + (c.r2.top - c.r1.top) * t - c.arc * 4 * t * (1 - t);
+	local l = math.floor(x); local tp = math.floor(y);
+	c.widget:Move(CRect(l, tp, l + c.r1:Width(), tp + c.r1:Height()));
+end
+
+function tank_fly_end(luaAni, ctxId)
+	local c = tank.ani_ctx[ctxId];
+	if c == nil then return end
+	if c.widget then c.widget:Destroy() end
+	tank.ani_ctx[ctxId] = nil;
+	tank_score_count_begin();	-- 落地后 LED 才滚动到新分数
+end
+
+-- 得分 LED 滚动(重入时废弃旧段,从当前显示值滚向最新分数)
+function tank_score_count_begin()
+	if tank.root == nil or tank.aniframe == nil or tank.ani_move == nil then
+		tank.score_shown = tank.score;
+		tank_show_score();
+		return
+	end
+	if tank.score_shown == tank.score then return end
+	tank_score_count_abort();
+	local ani = LuaValueAnimator();
+	ani:CopyFrom(tank.ani_move:GetIValueAnimator());
+	ani:GetIValueAnimator():setDuration(320);
+	ani:SetRangeRect(CRect(0,0,1,1), CRect(0,0,1,1));
+	ani:SetOnUpdate("tank_score_count_update");
+	ani:SetOnEnd("tank_score_count_end");
+	local ctxId = tank_new_ani_ctx({ kind = "count", ani = ani,
+		from = tank.score_shown, to = tank.score });
+	tank.count_ctx = ctxId;
+	ani:SetCtx(ctxId);
+	local ok = ani:Start(tank.aniframe);
+	if ok == 0 or ok == false then
+		tank.ani_ctx[ctxId] = nil;
+		tank.count_ctx = 0;
+		tank.score_shown = tank.score;
+		tank_show_score();
+	end
+end
+
+function tank_score_count_abort()
+	if tank.count_ctx and tank.count_ctx ~= 0 then
+		tank.ani_ctx[tank.count_ctx] = nil;
+		tank.count_ctx = 0;
+	end
+end
+
+function tank_score_count_update(luaAni, ctxId)
+	local c = tank.ani_ctx[ctxId];
+	if c == nil then return end
+	local v = math.floor(c.from + (c.to - c.from) * luaAni:GetFraction() + 0.5);
+	if v ~= tank.score_shown then
+		tank.score_shown = v;
+		tank_show_score();
+	end
+end
+
+function tank_score_count_end(luaAni, ctxId)
+	local c = tank.ani_ctx[ctxId];
+	if c == nil then return end
+	tank.ani_ctx[ctxId] = nil;
+	if tank.count_ctx == ctxId then tank.count_ctx = 0 end
+	tank.score_shown = tank.score;
+	tank_show_score();
+end
+
+function tank_fx_clear()
+	tank_score_count_abort();	-- 旧滚动段 end 会把显示值拉回旧分数
+	for _, c in pairs(tank.ani_ctx) do
+		if c.widget then c.widget:Destroy() end
+	end
+	tank.ani_ctx = {};
+end
+
+-- ==================== 流程: 开局 / 暂停 / 通关 / 结束 ====================
+
+function tank_setup_stage()
+	tank_fx_clear();
+	tank_keys_clear();
+	tank.terrain = tank_parse_map(tank_map_at(tank.stage));
+	tank.bullets = {};
+	tank.explosions = {};
+	tank.enemies = {};
+	tank.spawned = 0;
+	tank.killed = 0;
+	tank.total = math.min(20, 8 + tank.stage*2);
+	tank.spawn_idx = 0;
+	tank.spawn_ms = 800;
+	tank.respawn_ms = 0;
+	tank.time_ms = 0;
+	tank.score_shown = tank.score;
+	tank.cache = {};
+	tank.over_reason = nil;
+	tank.state = "playing";
+	tank.pausedFrom = nil;
+	tank.player = nil;
+	tank_respawn_player();
+	tank_banner_hide();
+	tank_set_start_btn(T"暂 停");
+	tank_show_score(); tank_show_lives(); tank_show_stage();
+	tank_show_enemy(); tank_show_state(); tank_show_base();
+	tank_try_spawn_enemy();
+	tank_try_spawn_enemy();
+	tank_render();
+end
+
+function tank_start()
+	slog("TANK start");
+	tank_over_hide();
+	tank.score = 0; tank.score_shown = 0;
+	tank.lives = 3; tank.stage = 1;
+	tank_setup_stage();
+	if tank.timer then
+		tank.timer:KillTimer();
+		tank.timer:StartTimer(tank_tick_ms, 1, 0);
+	end
+end
+
+function tank_pause(byPage)
+	if tank.state ~= "playing" and tank.state ~= "stageclear" then return end
+	tank.pausedFrom = tank.state;
+	tank.state = "paused";
+	tank.pausedByPage = byPage and true or false;
+	tank_keys_clear();
+	if tank.timer then tank.timer:KillTimer() end
+	tank_set_start_btn(T"继 续");
+	tank_show_state();
+end
+
+function tank_resume()
+	if tank.state ~= "paused" then return end
+	tank.state = tank.pausedFrom or "playing";
+	tank.pausedFrom = nil;
+	tank.pausedByPage = nil;
+	if tank.timer then tank.timer:StartTimer(tank_tick_ms, 1, 0) end
+	tank_set_start_btn(T"暂 停");
+	tank_show_state();
+end
+
+function tank_game_over(reason)
+	if tank.state == "over" then return end
+	tank.state = "over";
+	tank.over_reason = reason;
+	tank.pausedFrom = nil;
+	tank_keys_clear();
+	tank_banner_hide();
+	tank_set_start_btn(T"开始游戏");
+	tank_show_state();
+	tank_show_base();
+	tank_render();
+	tank_over_show();
+end
+
+-- ==================== 结束窗口(布局内静态遮罩 + 卡片,动画走 anim 模板) ====================
+
+function tank_over_wnd()
+	if tank.over_wnd == nil and tank.root ~= nil then
+		tank.over_wnd = tank.root:FindChildByNameA("wnd_tank_gameover",-1);
+	end
+	return tank.over_wnd;
+end
+
+function tank_over_ani_play(maskKey, cardKey, maskName, cardName)
+	local wnd = tank_over_wnd();
+	if wnd == nil then return end
+	if tank[maskKey] == nil then
+		tank[maskKey] = GetApp():LoadAnimation("anim:" .. maskName);
+	end
+	if tank[maskKey] then
+		local ani = tank[maskKey]:clone();
+		wnd:SetAnimation(ani);
+		ani:Release();
+	end
+	local card = wnd:FindChildByNameA("wnd_tank_gameover_card",-1);
+	if card == nil then return end
+	if tank[cardKey] == nil then
+		tank[cardKey] = GetApp():LoadAnimation("anim:" .. cardName);
+	end
+	if tank[cardKey] then
+		local ani = tank[cardKey]:clone();
+		card:SetAnimation(ani);
+		ani:Release();
+	end
+end
+
+function tank_on_over_stop(args)
+	local evt = toStEventSwndAnimationStop(args);
+	if evt == nil then return 0 end
+	local hiding = tank.over_hiding;
+	tank.over_hiding = false;
+	if hiding then
+		local wnd = tank_over_wnd();
+		if wnd then wnd:SetVisible(false, true) end
+	end
+	return 0;
+end
+
+function tank_over_show()
+	local wnd = tank_over_wnd();
+	if wnd == nil then return end
+	local txt = tank.root and tank.root:FindChildByNameA("txt_tank_gameover_score",-1);
+	if txt then txt:SetWindowText(T("本局得分 " .. tank.score)) end
+	local reason = tank.root and tank.root:FindChildByNameA("txt_tank_gameover_reason",-1);
+	if reason then
+		reason:SetWindowText(T(tank.over_reason == "base" and "基地被摧毁" or "坦克全部损毁"));
+	end
+	if tank.over_visible then return end
+	tank_over_ani_play("over_ani_mask_in", "over_ani_in",
+		"tank_over_mask_in", "tank_over_card_in");
+	wnd:SetVisible(true, true);
+	tank.over_visible = true;
+end
+
+function tank_over_hide()
+	local wnd = tank_over_wnd();
+	if wnd == nil then return end
+	if not tank.over_visible then
+		wnd:SetVisible(false, true);
+		return
+	end
+	tank.over_visible = false;
+	tank.over_hiding = true;	-- out 动画结束后 tank_on_over_stop 里隐藏
+	tank_over_ani_play("over_ani_mask_out", "over_ani_out",
+		"tank_over_mask_out", "tank_over_card_out");
+end
+
+-- ==================== 事件: 计时器 / 键盘 / 按钮 / 子页可见性 ====================
+
+function tank_on_timer(args)
+	if tank.state == "playing" or tank.state == "stageclear" then
+		tank_tick(tank_tick_ms);
+		tank_render();
+	elseif tank.state == "over" then
+		-- 结束后只推进爆炸动画,播完停表(避免基地爆炸定格在首帧)
+		local any = false;
+		for k, ex in pairs(tank.explosions) do
+			ex.ms = ex.ms - tank_tick_ms;
+			if ex.ms <= 0 then tank.explosions[k] = nil else any = true end
+		end
+		tank_render();
+		if not any and tank.timer then tank.timer:KillTimer() end
+	end
+	return 0;
+end
+
+function tank_on_key(args)
+	if tank.wndBoard == nil then return 0 end
+	local evt = toStEventKeyDown(args);
+	if evt == nil then return 0 end
+	local key = evt.nChar;
+	if tank.state == "playing" then
+		local dir = tank_key_dir[key];
+		if dir ~= nil then
+			tank_key_down(key);
+			tank_player_move(dir);
+			return 1;
+		elseif key == 32 then					-- 空格开炮
+			tank_player_fire();
+			return 1;
+		elseif key == 80 then					-- P 暂停
+			tank_pause();
+			return 1;
+		end
+	elseif tank.state == "paused" and key == 80 then
+		tank_resume();
+		return 1;
+	elseif (tank.state == "idle" or tank.state == "over") and key == 32 then
+		tank_start();
+		return 1;
+	end
+	return 0;
+end
+
+-- 松键后停止持续移动;多个方向键同时按住时回退到仍按住的最后一个方向
+function tank_on_keyup(args)
+	local evt = toStEventKeyUp(args);
+	if evt == nil then return 0 end
+	tank_key_up(evt.nChar);
+	return 0;
+end
+
+function tank_on_start(args)
+	if tank.wndBoard == nil then return 0 end
+	slog("TANK on_start state=" .. tostring(tank.state));
+	if tank.state == "playing" or tank.state == "stageclear" then
+		tank_pause();
+	elseif tank.state == "paused" then
+		tank_resume();
+	else
+		tank_start();
+	end
+	tank.wndBoard:SetFocus();
+	return 1;
+end
+
+function tank_on_restart(args)
+	if tank.wndBoard == nil then return 0 end
+	tank_start();
+	tank.wndBoard:SetFocus();
+	return 1;
+end
+
+function tank_on_page_vis(args)
+	if tank.wndBoard == nil then return 0 end
+	local evt = toStEventSwndVisibleChanged(args);
+	if evt == nil then return 0 end
+	slog("TANK page_vis visible=" .. tostring(evt.bVisible));
+	if evt.bVisible == 0 then
+		if tank.state == "playing" or tank.state == "stageclear" then
+			tank_pause(true);	-- 离开子页自动暂停,回来时自动继续
+		end
+	else
+		-- 子页刚显示时窗口才完成布局,棋盘几何此时才有效,重画一次让精灵就位
+		tank_render();
+		if tank.state == "paused" and tank.pausedByPage then
+			tank_resume();
+		end
+	end
+	return 0;
+end
+
+-- ==================== 初始化 / 退出 ====================
+
+function tank_init_board()
+	tank.wndBoard:DestroyAllChildren();
+	tank.cache = {};
+	local xml = "";
+	local rows = tank_row + tank_pad_rows*2;
+	for y = 0, rows-1 do
+		local frame = 0;
+		if y < tank_pad_rows or y >= tank_pad_rows + tank_row then
+			frame = tank_T_BRICK;	-- 上下装饰行直接铺满砖墙,和地图里的障碍同帧
+		end
+		for x = 0, tank_col-1 do
+			xml = xml .. '<img id="' .. (tank_base_id + y*tank_col + x)
+				.. '" size="' .. tank_cell .. ',' .. tank_cell
+				.. '" skin="svg_tank" iconIndex="' .. frame .. '"/>';
+		end
+	end
+	tank.wndBoard:CreateChildrenFromXml(xml);
+	tank.wndBoard:RequestRelayout();
+end
+
+function tank_init(root)
+	local wndBoard = root:FindChildByNameA("wnd_tank_board",-1);
+	if wndBoard == nil then
+		return 0;	-- demo 不含坦克大战子页,跳过
+	end
+	tank.root = root;
+	tank.wndBoard = wndBoard;
+	-- 棋盘上方的精灵层:坦克/炮弹/护盾环按像素位置绘制,不参与布局
+	tank.sprLayer = root:FindChildByNameA("wnd_tank_sprites",-1);
+	if tank.sprLayer == nil then
+		tank_slog("init: wnd_tank_sprites not found");
+	else
+		tank.sprLayer:SetVisible(true, true);	-- stack 只显示第一页,精灵层要单独打开
+	end
+	-- 动画浮层与 animator 模板缺失只影响飞分/滚动动画,游戏本体照常
+	tank.aniframe = root:FindChildByNameA("wnd_tank_aniframe",-1);
+	if tank.aniframe then
+		tank.ani_move = LuaValueAnimator();
+		if not tank.ani_move:LoadAnimator("animator:xxl_move") then
+			tank_slog("init: load animator:xxl_move failed");
+			tank.ani_move = nil;
+		end
+	end
+
+	local souiFac = CreateSouiFactory();
+	local timerSlot = CreateEventSlot("tank_on_timer");
+	tank.timer = souiFac:CreateTimer(timerSlot);
+	timerSlot:Release();
+	souiFac:Release();
+
+	tank_init_board();
+	local keySlot = CreateEventSlot("tank_on_key");
+	wndBoard:SubscribeEvent(8200, keySlot);	-- 8200 == EVT_KEYDOWN
+	keySlot:Release();
+	local keyUpSlot = CreateEventSlot("tank_on_keyup");
+	wndBoard:SubscribeEvent(8201, keyUpSlot);	-- 8201 == EVT_KEYUP
+	keyUpSlot:Release();
+
+	-- 进入子页先展示地图与空战场,点"开始游戏"才真正开局
+	tank.score = 0; tank.score_shown = 0; tank.lives = 3; tank.stage = 1;
+	tank.total = math.min(20, 8 + tank.stage*2);
+	tank.killed = 0; tank.spawned = 0; tank.spawn_idx = 0;
+	tank.player = nil; tank.enemies = {}; tank.bullets = {}; tank.explosions = {};
+	tank.terrain = tank_parse_map(tank_map_at(tank.stage));
+	tank.state = "idle";
+	tank.cache = {};
+	tank_show_score(); tank_show_lives(); tank_show_stage();
+	tank_show_enemy(); tank_show_state(); tank_show_base();
+	tank_render();
+	tank_slog("init done");
+	return 1;
+end
+
+function tank_exit()
+	tank_keys_clear();
+	if tank.timer then
+		tank.timer:KillTimer();
+		tank.timer:Release();
+		tank.timer = nil;
+	end
+	if tank.over_ani_mask_in then
+		tank.over_ani_mask_in:Release();
+		tank.over_ani_mask_in = nil;
+	end
+	if tank.over_ani_mask_out then
+		tank.over_ani_mask_out:Release();
+		tank.over_ani_mask_out = nil;
+	end
+	if tank.over_ani_in then
+		tank.over_ani_in:Release();
+		tank.over_ani_in = nil;
+	end
+	if tank.over_ani_out then
+		tank.over_ani_out:Release();
+		tank.over_ani_out = nil;
+	end
+	tank.ani_ctx = {};
 end
 

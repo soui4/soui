@@ -1,4 +1,4 @@
-//stamp:01dd5ac4bbcee609
+//stamp:01dd62d2d9ae6759
 /*<------------------------------------------------------------------------------------------------->*/
 #define DEFINE_UIRES(name, type, file_path)\
     name type file_path
@@ -170,6 +170,10 @@ DEFINE_UIRES(tetris_over_card_in,	anim,	"uires/anim/tetris_over_card_in.xml")
 DEFINE_UIRES(tetris_over_card_out,	anim,	"uires/anim/tetris_over_card_out.xml")
 DEFINE_UIRES(tetris_over_mask_in,	anim,	"uires/anim/tetris_over_mask_in.xml")
 DEFINE_UIRES(tetris_over_mask_out,	anim,	"uires/anim/tetris_over_mask_out.xml")
+DEFINE_UIRES(tank_over_card_in,	anim,	"uires/anim/tank_over_card_in.xml")
+DEFINE_UIRES(tank_over_card_out,	anim,	"uires/anim/tank_over_card_out.xml")
+DEFINE_UIRES(tank_over_mask_in,	anim,	"uires/anim/tank_over_mask_in.xml")
+DEFINE_UIRES(tank_over_mask_out,	anim,	"uires/anim/tank_over_mask_out.xml")
 DEFINE_UIRES(alphaAni,	valueAni,	"uires/valueAni/alpha.xml")
 DEFINE_UIRES(colorAni,	valueAni,	"uires/valueAni/color.xml")
 DEFINE_UIRES(xxl_move,	animator,	"uires/animator/xxl_move.xml")
@@ -210,4 +214,6 @@ DEFINE_UIRES(tetris_key_lr,	svg,	"uires/svg/tetris_key_lr.svg")
 DEFINE_UIRES(tetris_key_ud,	svg,	"uires/svg/tetris_key_ud.svg")
 DEFINE_UIRES(tetris_key_space,	svg,	"uires/svg/tetris_key_space.svg")
 DEFINE_UIRES(tetris_key_p,	svg,	"uires/svg/tetris_key_p.svg")
+DEFINE_UIRES(tank,	svg,	"uires/svg/tank.svg")
+DEFINE_UIRES(tank_wall,	svg,	"uires/svg/tank_wall.svg")
 DEFINE_UIRES(roomlist,	xml,	"uires/xml/roomlist.xml")

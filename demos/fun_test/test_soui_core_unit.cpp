@@ -528,7 +528,7 @@ TEST(soui_xml, buffer_loads_rebind_cached_objects)
     // 原地解析的缓冲区在文档生命周期内保持有效即可。
     const wchar_t wide[] = L"<root><gamma/></root>";
     std::vector<wchar_t> buffer(wide, wide + sizeof(wide) / sizeof(wide[0]));
-    ASSERT_TRUE(doc.LoadBufferInplace(buffer.data(), (buffer.size() - 1) * sizeof(wchar_t),
+    ASSERT_TRUE(doc.LoadBufferInplace(&buffer[0], (buffer.size() - 1) * sizeof(wchar_t),
                                       xml_parse_default, enc_wchar));
     pRoot = doc.Root()->Child(L"root", TRUE);
     ASSERT_TRUE(pRoot != NULL);
