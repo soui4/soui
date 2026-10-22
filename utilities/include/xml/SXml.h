@@ -967,30 +967,63 @@ private:
     /// @brief Result of the last parsing operation.
     mutable pugi::xml_parse_result _result;
 
-    /// @brief Map type for storing attributes.
-    typedef SMap<pugi::xml_attribute_struct *, SXmlAttr*> AttrMap;
+    /**
+     * @brief Cache of interface objects inside a document.
+     *
+     * A pugixml handle maps to exactly one interface object within a document, and the object
+     * lives as long as the document. Therefore IXmlNode and IXmlAttr pointers returned by the
+     * interface can be held indefinitely and must not be released by the caller.
+     * The interface objects are stored directly inside the SMap nodes (whose addresses are
+     * stable), so no separate allocation is needed for each handle.
+     */
+    template <typename THandle, typename TWrapper>
+    class HandleCache
+    {
+        typedef SMap<void *, TWrapper> CacheMap;
 
-    /// @brief Map for storing attributes.
-    AttrMap *m_attrMap;
+    public:
+        /// @brief Gets the interface object for a handle, creating it when absent.
+        TWrapper *Get(THandle handle)
+        {
+            if (!handle)
+                return NULL;
 
-    /// @brief Map type for storing nodes.
-    typedef SMap<pugi::xml_node_struct *, SXmlNode*> NodeMap;
+            void *key = handle.internal_object();
+            typename CacheMap::CPair *pair = m_map.Lookup(key);
+            if (!pair)
+                pair = static_cast<typename CacheMap::CPair *>(m_map.SetAt(key, TWrapper(handle)));
+            return pair ? &pair->m_value : NULL;
+        }
 
-    /// @brief Map for storing nodes.
-    NodeMap *m_nodeMap;
+        /// @brief Discards all interface objects.
+        void Clear()
+        {
+            m_map.RemoveAll();
+        }
 
-    /// @brief Converts a pugi::xml_attribute_struct to an IXmlAttr.
-    /// @param pAttr The attribute structure to convert.
+    private:
+        CacheMap m_map;
+    };
+
+    /// @brief Cache of attribute interface objects.
+    HandleCache<pugi::xml_attribute, SXmlAttr> m_attrCache;
+
+    /// @brief Cache of node interface objects.
+    HandleCache<pugi::xml_node, SXmlNode> m_nodeCache;
+
+    /// @brief Converts a pugi::xml_attribute to an IXmlAttr.
+    /// @param attr The attribute to convert.
     /// @return A pointer to the converted attribute.
-    IXmlAttr * toIXmlAttr(pugi::xml_attribute_struct *pAttr);
+    IXmlAttr * toIXmlAttr(pugi::xml_attribute attr);
 
-    /// @brief Converts a pugi::xml_node_struct to an IXmlNode.
-    /// @param pNode The node structure to convert.
+    /// @brief Converts a pugi::xml_node to an IXmlNode.
+    /// @param node The node to convert.
     /// @return A pointer to the converted node.
-    IXmlNode * toIXmlNode(pugi::xml_node_struct* pNode);
+    IXmlNode * toIXmlNode(pugi::xml_node node);
 
-    /// @brief Clears the attribute and node maps.
-    void clearMap();
+    /// @brief Discards cached interface objects after the underlying document content is rebuilt,
+    /// since all previous handles are invalidated.
+    void invalidateCache();
 
 public:
     /// @brief Constructor for SXmlDoc.

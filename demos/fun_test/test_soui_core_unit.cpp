@@ -1,10 +1,12 @@
-#include <souistd.h>
+﻿#include <souistd.h>
 #include <core/SLayoutSize.h>
 #include <core/SWnd.h>
 #include <matrix/SMatrix.h>
 #include <valueAnimator/SValueAnimator.h>
+#include <xml/SXml.h>
 #include <commgr2.h>
 #include <gtest/gtest.h>
+#include <vector>
 
 using namespace SOUI;
 
@@ -378,4 +380,286 @@ TEST(soui_window, own_attribute_table_never_sees_a_prefixed_name)
     EXPECT_TRUE(FAILED(host.SetAttribute(L"slider:duration", L"700", TRUE)));
     EXPECT_EQ(123, host.m_nOwnDuration);
     EXPECT_EQ(500, host.m_animator.getDuration());
+}
+
+TEST(soui_xml, interface_objects_are_unique_and_stable_per_handle)
+{
+    SXmlDoc doc;
+    ASSERT_TRUE(doc.LoadString(L"<root><item id=\"1\"/><item id=\"2\"/></root>", xml_parse_default));
+
+    IXmlNode *pRoot = doc.Root()->Child(L"root", TRUE);
+    ASSERT_TRUE(pRoot != NULL);
+
+    // 同一个句柄多次转换必须得到同一个接口对象。
+    IXmlNode *pFirst = pRoot->Child(L"item", TRUE);
+    ASSERT_TRUE(pFirst != NULL);
+    EXPECT_EQ(pFirst, pRoot->Child(L"item", TRUE));
+
+    // 不同句柄必须对应不同的接口对象。
+    IXmlNode *pSecond = pFirst->NextSibling();
+    ASSERT_TRUE(pSecond != NULL);
+    EXPECT_NE(pFirst, pSecond);
+
+    IXmlAttr *pAttr = pFirst->Attribute(L"id", TRUE);
+    ASSERT_TRUE(pAttr != NULL);
+    EXPECT_EQ(pAttr, pFirst->Attribute(L"id", TRUE));
+    EXPECT_STREQ(L"1", pAttr->Value());
+}
+
+TEST(soui_xml, reload_rebinds_interface_objects_to_new_document_content)
+{
+    SXmlDoc doc;
+    ASSERT_TRUE(doc.LoadString(L"<root><item/></root>", xml_parse_default));
+    IXmlNode *pRoot = doc.Root()->Child(L"root", TRUE);
+    ASSERT_TRUE(pRoot != NULL);
+    ASSERT_TRUE(pRoot->Child(L"item", TRUE) != NULL);
+
+    ASSERT_TRUE(doc.LoadString(L"<root><other/></root>", xml_parse_default));
+    pRoot = doc.Root()->Child(L"root", TRUE);
+    ASSERT_TRUE(pRoot != NULL);
+    EXPECT_TRUE(pRoot->Child(L"other", TRUE) != NULL);
+    EXPECT_TRUE(pRoot->Child(L"item", TRUE) == NULL);
+}
+
+TEST(soui_xml, value_and_interface_apis_share_the_same_handle)
+{
+    SXmlDoc doc;
+    ASSERT_TRUE(doc.LoadString(L"<root><item id=\"1\"/></root>", xml_parse_default));
+
+    SXmlNode valueRoot = doc.root().child(L"root");
+    ASSERT_FALSE(valueRoot.empty());
+
+    IXmlNode *pRoot = doc.Root()->Child(L"root", TRUE);
+    ASSERT_TRUE(pRoot != NULL);
+    EXPECT_EQ(valueRoot.GetPrivPtr(), pRoot->GetPrivPtr());
+
+    SStringW text;
+    pRoot->ToString(&text);
+    EXPECT_FALSE(text.IsEmpty());
+}
+
+TEST(soui_xml, traversal_walks_reuse_the_cached_wrappers)
+{
+    SXmlDoc doc;
+    ASSERT_TRUE(doc.LoadString(L"<root a=\"1\" b=\"2\"><item id=\"1\"><sub/></item><item id=\"2\"/></root>",
+                               xml_parse_default));
+
+    IXmlNode *pRoot = doc.Root()->Child(L"root", TRUE);
+    ASSERT_TRUE(pRoot != NULL);
+
+    // 属性链与按名查找必须指向同一个缓存对象。
+    IXmlAttr *pA = pRoot->FirstAttribute();
+    ASSERT_TRUE(pA != NULL);
+    EXPECT_STREQ(L"a", pA->Name());
+    EXPECT_EQ(pA, pRoot->Attribute(L"a", TRUE));
+
+    IXmlAttr *pB = pA->Next();
+    ASSERT_TRUE(pB != NULL);
+    EXPECT_STREQ(L"b", pB->Name());
+    EXPECT_EQ(pB, pRoot->Attribute(L"b", TRUE));
+    EXPECT_EQ(pB, pRoot->LastAttribute());
+    EXPECT_EQ(pA, pB->Prev());
+
+    // 子节点链与按名/按序查找也必须指向同一个缓存对象。
+    IXmlNode *pFirst = pRoot->FirstChild();
+    ASSERT_TRUE(pFirst != NULL);
+    EXPECT_EQ(pFirst, pRoot->Child(L"item", TRUE));
+
+    IXmlNode *pLast = pRoot->LastChild();
+    ASSERT_TRUE(pLast != NULL);
+    EXPECT_EQ(pLast, pFirst->NextSibling());
+    EXPECT_EQ(pLast, pFirst->NextSibling2(L"item", TRUE));
+    EXPECT_EQ(pFirst, pLast->PrevSibling());
+    EXPECT_EQ(pFirst, pLast->PrevSibling2(L"item", TRUE));
+    EXPECT_EQ(1, pFirst->Attribute(L"id", TRUE)->AsInt());
+    EXPECT_EQ(2, pLast->Attribute(L"id", TRUE)->AsInt());
+
+    IXmlNode *pSub = pFirst->Child(L"sub", TRUE);
+    ASSERT_TRUE(pSub != NULL);
+    EXPECT_EQ(pSub, pFirst->FirstChild());
+    EXPECT_EQ(pSub, pFirst->LastChild());
+    EXPECT_EQ(pSub, pLast->PrevSibling()->FirstChild());
+}
+
+TEST(soui_xml, missing_lookups_and_empty_nodes_return_null)
+{
+    SXmlDoc doc;
+    ASSERT_TRUE(doc.LoadString(L"<root><leaf/></root>", xml_parse_default));
+
+    IXmlNode *pRoot = doc.Root()->Child(L"root", TRUE);
+    ASSERT_TRUE(pRoot != NULL);
+    EXPECT_TRUE(pRoot->Child(L"missing", TRUE) == NULL);
+    EXPECT_TRUE(pRoot->Child(L"leaf", FALSE) != NULL);
+    EXPECT_TRUE(pRoot->Attribute(L"missing", TRUE) == NULL);
+
+    IXmlNode *pLeaf = pRoot->Child(L"leaf", TRUE);
+    ASSERT_TRUE(pLeaf != NULL);
+    EXPECT_TRUE(pLeaf->FirstChild() == NULL);
+    EXPECT_TRUE(pLeaf->LastChild() == NULL);
+    EXPECT_TRUE(pLeaf->FirstAttribute() == NULL);
+    EXPECT_TRUE(pLeaf->LastAttribute() == NULL);
+    EXPECT_TRUE(pLeaf->NextSibling() == NULL);
+    EXPECT_TRUE(pLeaf->PrevSibling() == NULL);
+    EXPECT_TRUE(pLeaf->NextSibling2(L"leaf", TRUE) == NULL);
+    EXPECT_TRUE(pLeaf->PrevSibling2(L"leaf", TRUE) == NULL);
+    EXPECT_TRUE(pLeaf->Child(L"missing", TRUE) == NULL);
+}
+
+TEST(soui_xml, buffer_loads_rebind_cached_objects)
+{
+    SXmlDoc doc;
+
+    const char utf8[] = "<root><alpha/></root>";
+    ASSERT_TRUE(doc.LoadBuffer(utf8, sizeof(utf8) - 1, xml_parse_default, enc_utf8));
+    IXmlNode *pRoot = doc.Root()->Child(L"root", TRUE);
+    ASSERT_TRUE(pRoot != NULL);
+    EXPECT_TRUE(pRoot->Child(L"alpha", TRUE) != NULL);
+
+    // 再次加载不同内容后，旧内容不可见，缓存对象必须绑定到新句柄。
+    const char reload[] = "<root><beta id=\"2\"/></root>";
+    ASSERT_TRUE(doc.LoadBuffer(reload, sizeof(reload) - 1, xml_parse_default, enc_utf8));
+    pRoot = doc.Root()->Child(L"root", TRUE);
+    ASSERT_TRUE(pRoot != NULL);
+    IXmlNode *pBeta = pRoot->Child(L"beta", TRUE);
+    ASSERT_TRUE(pBeta != NULL);
+    EXPECT_TRUE(pRoot->Child(L"alpha", TRUE) == NULL);
+    EXPECT_EQ(2, pBeta->Attribute(L"id", TRUE)->AsInt());
+
+    // 原地解析的缓冲区在文档生命周期内保持有效即可。
+    const wchar_t wide[] = L"<root><gamma/></root>";
+    std::vector<wchar_t> buffer(wide, wide + sizeof(wide) / sizeof(wide[0]));
+    ASSERT_TRUE(doc.LoadBufferInplace(buffer.data(), (buffer.size() - 1) * sizeof(wchar_t),
+                                      xml_parse_default, enc_wchar));
+    pRoot = doc.Root()->Child(L"root", TRUE);
+    ASSERT_TRUE(pRoot != NULL);
+    EXPECT_TRUE(pRoot->Child(L"gamma", TRUE) != NULL);
+    EXPECT_TRUE(pRoot->Child(L"beta", TRUE) == NULL);
+}
+
+TEST(soui_xml, copy_and_reset_discard_cached_objects)
+{
+    SXmlDoc src;
+    ASSERT_TRUE(src.LoadString(L"<src><item id=\"9\"/></src>", xml_parse_default));
+
+    SXmlDoc dst;
+    ASSERT_TRUE(dst.LoadString(L"<dst/>", xml_parse_default));
+    ASSERT_TRUE(dst.Root()->Child(L"dst", TRUE) != NULL);
+
+    dst.Copy(&src);
+    IXmlNode *pSrc = dst.Root()->Child(L"src", TRUE);
+    ASSERT_TRUE(pSrc != NULL);
+    EXPECT_TRUE(dst.Root()->Child(L"dst", TRUE) == NULL);
+
+    IXmlNode *pItem = pSrc->Child(L"item", TRUE);
+    ASSERT_TRUE(pItem != NULL);
+    EXPECT_EQ(pItem, pSrc->FirstChild());
+    IXmlAttr *pId = pItem->Attribute(L"id", TRUE);
+    ASSERT_TRUE(pId != NULL);
+    EXPECT_EQ(9, pId->AsInt());
+
+    dst.Reset();
+    EXPECT_TRUE(dst.Root()->FirstChild() == NULL);
+    EXPECT_TRUE(dst.Root()->Child(L"src", TRUE) == NULL);
+}
+
+TEST(soui_xml, file_roundtrip_works_through_ansi_and_unicode_overloads)
+{
+    SXmlDoc doc;
+    ASSERT_TRUE(doc.LoadString(L"<root ver=\"2\"><item id=\"1\"/></root>", xml_parse_default));
+
+    const wchar_t *wPath = L"sxml_unit_test_w.xml";
+    ASSERT_TRUE(doc.SaveFileW(wPath, L"\t", pugi::format_default, enc_utf8));
+    SXmlDoc loadedW;
+    ASSERT_TRUE(loadedW.LoadFileW(wPath, xml_parse_default, enc_utf8));
+    IXmlNode *pRoot = loadedW.Root()->Child(L"root", TRUE);
+    ASSERT_TRUE(pRoot != NULL);
+    EXPECT_EQ(2, pRoot->Attribute(L"ver", TRUE)->AsInt());
+    EXPECT_STREQ(L"1", pRoot->Child(L"item", TRUE)->Attribute(L"id", TRUE)->Value());
+    EXPECT_EQ(0, ::remove("sxml_unit_test_w.xml"));
+
+    const char *aPath = "sxml_unit_test_a.xml";
+    ASSERT_TRUE(doc.SaveFileA(aPath, L"\t", pugi::format_default, enc_utf8));
+    SXmlDoc loadedA;
+    ASSERT_TRUE(loadedA.LoadFileA(aPath, xml_parse_default, enc_utf8));
+    pRoot = loadedA.Root()->Child(L"root", TRUE);
+    ASSERT_TRUE(pRoot != NULL);
+    EXPECT_STREQ(L"root", pRoot->Name());
+    EXPECT_EQ(1, pRoot->Child(L"item", TRUE)->Attribute(L"id", TRUE)->AsInt());
+    EXPECT_EQ(0, ::remove(aPath));
+}
+
+TEST(soui_xml, parse_result_reports_last_operation)
+{
+    SXmlDoc doc;
+
+    const char broken[] = "<root><item></root>";
+    EXPECT_FALSE(doc.LoadBuffer(broken, sizeof(broken) - 1, xml_parse_default, enc_utf8));
+
+    XmlParseResult result = {};
+    doc.GetParseResult(&result);
+    EXPECT_NE(xml_ok, result.status);
+    EXPECT_GT(result.offset, 0);
+
+    ASSERT_TRUE(doc.LoadString(L"<root/>", xml_parse_default));
+    doc.GetParseResult(&result);
+    EXPECT_EQ(xml_ok, result.status);
+    EXPECT_EQ(0, result.offset);
+}
+
+TEST(soui_xml, mutation_methods_keep_cache_in_sync)
+{
+    SXmlDoc doc;
+    ASSERT_TRUE(doc.LoadString(L"<root a=\"1\"/>", xml_parse_default));
+
+    IXmlNode *pRoot = doc.Root()->Child(L"root", TRUE);
+    ASSERT_TRUE(pRoot != NULL);
+
+    IXmlAttr *pAttr = pRoot->FirstAttribute();
+    ASSERT_TRUE(pAttr != NULL);
+    EXPECT_EQ(pAttr, pRoot->Attribute(L"a", TRUE));
+    EXPECT_TRUE(pAttr->set_userdata(11));
+    EXPECT_EQ(11, pAttr->get_userdata());
+
+    IXmlNode *pFirst = pRoot->PrependChild(L"first");
+    ASSERT_TRUE(pFirst != NULL);
+    EXPECT_EQ(pFirst, pRoot->FirstChild());
+
+    IXmlNode *pChild = pRoot->AppendChild(L"child");
+    ASSERT_TRUE(pChild != NULL);
+    EXPECT_EQ(pChild, pRoot->Child(L"child", TRUE));
+    EXPECT_EQ(pChild, pRoot->LastChild());
+
+    EXPECT_TRUE(pChild->SetText(L"hello"));
+    EXPECT_STREQ(L"hello", pChild->Text());
+    EXPECT_TRUE(pChild->set_userdata(7));
+    EXPECT_EQ(7, pChild->get_userdata());
+
+    IXmlAttr *pId = pChild->AppendAttribute(L"id");
+    ASSERT_TRUE(pId != NULL);
+    EXPECT_EQ(pId, pChild->Attribute(L"id", TRUE));
+    SXmlAttr(pId).set_value(L"42");
+    EXPECT_EQ(42, pId->AsInt());
+
+    IXmlAttr *pCopyAttr = pChild->AppendCopyAttribute(pAttr);
+    ASSERT_TRUE(pCopyAttr != NULL);
+    EXPECT_STREQ(L"a", pCopyAttr->Name());
+    EXPECT_STREQ(L"1", pCopyAttr->Value());
+
+    // 复制出来的节点是新句柄，因此必须是新的缓存对象。
+    IXmlNode *pCopy = pRoot->AppendCopyNode(pChild);
+    ASSERT_TRUE(pCopy != NULL);
+    EXPECT_NE(pCopy, pChild);
+    EXPECT_EQ(pCopy, pRoot->LastChild());
+    EXPECT_STREQ(L"child", pCopy->Name());
+    EXPECT_EQ(42, pCopy->Attribute(L"id", TRUE)->AsInt());
+    EXPECT_NE(pCopy->Attribute(L"id", TRUE), pId);
+
+    EXPECT_TRUE(pRoot->RemoveAttribute(L"a"));
+    EXPECT_TRUE(pRoot->Attribute(L"a", TRUE) == NULL);
+
+    EXPECT_TRUE(pRoot->RemoveChild(L"first"));
+    EXPECT_TRUE(pRoot->Child(L"first", TRUE) == NULL);
+
+    EXPECT_TRUE(pRoot->RemoveAllChilden());
+    EXPECT_TRUE(pRoot->FirstChild() == NULL);
 }

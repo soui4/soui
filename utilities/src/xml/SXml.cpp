@@ -1,7 +1,7 @@
 #include <xml/SXml.h>
 #include <pugixml/pugixml.hpp>
 #include <string/sstringw.h>
-#include <string/strcpcvt.h>
+
 SNSBEGIN
 
 
@@ -27,7 +27,7 @@ IXmlAttr * SXmlAttr::toIXmlAttr(pugi::xml_attribute attr)
 {
 	if(!attr) return NULL;
 	SXmlDoc *pDoc = (SXmlDoc*)attr.get_doc_extra_data();
-	return pDoc->toIXmlAttr(attr.internal_object());
+	return pDoc ? pDoc->toIXmlAttr(attr) : NULL;
 }
 
 LPVOID SXmlAttr::GetPrivPtr(THIS) SCONST
@@ -346,7 +346,7 @@ IXmlNode * SXmlNode::toIXmlNode(pugi::xml_node node)
 {
 	if(!node) return NULL;
 	SXmlDoc *pDoc = (SXmlDoc*)node.get_doc_extra_data();
-	return pDoc->toIXmlNode(node.internal_object());
+	return pDoc ? pDoc->toIXmlNode(node) : NULL;
 }
 
 
@@ -639,17 +639,12 @@ SStringW SXmlNode::toString() const
 
 SXmlDoc::SXmlDoc()
 {
-	m_attrMap = new AttrMap;
-	m_nodeMap = new NodeMap;
 	_doc = new pugi::xml_document;
 	_doc->set_extra_data(this);
 }
 
 SXmlDoc::~SXmlDoc()
 {
-	clearMap();
-	delete m_attrMap;
-	delete m_nodeMap;
 	delete _doc;
 }
 
@@ -660,13 +655,12 @@ IXmlNode * SXmlDoc::Root(THIS) SCONST
 
 BOOL SXmlDoc::SaveFileW(THIS_ const wchar_t* path, const wchar_t* indent , unsigned int flags, XmlEncoding encoding) SCONST
 {
-	return _doc->save_file(path,indent,flags,(pugi::xml_encoding)encoding);
+	return save_file(path,indent,flags,encoding);
 }
 
 BOOL SXmlDoc::SaveFileA(THIS_ const char* path, const wchar_t* indent , unsigned int flags, XmlEncoding encoding) SCONST
 {
-	SStringW strPath = S_CA2W(path,CP_UTF8);
-	return SaveFileW(strPath.c_str(),indent,flags,encoding);
+	return save_file(path,indent,flags,encoding);
 }
 
 void SXmlDoc::SaveBinary(THIS_ FILE *f) SCONST
@@ -676,38 +670,32 @@ void SXmlDoc::SaveBinary(THIS_ FILE *f) SCONST
 
 BOOL SXmlDoc::LoadBufferInplaceOwn(THIS_ void* contents, size_t size, unsigned int options , XmlEncoding encoding)
 {
-	_result = _doc->load_buffer_inplace_own(contents,size,options,(pugi::xml_encoding)encoding);
-	return _result;
+	return load_buffer_inplace_own(contents,size,options,encoding);
 }
 
 BOOL SXmlDoc::LoadBufferInplace(THIS_ void* contents, size_t size, unsigned int options , XmlEncoding encoding)
 {
-	_result = _doc->load_buffer_inplace(contents,size,options,(pugi::xml_encoding)encoding);
-	return _result;
+	return load_buffer_inplace(contents,size,options,encoding);
 }
 
 BOOL SXmlDoc::LoadBuffer(THIS_ const void* contents, size_t size, unsigned int options , XmlEncoding encoding)
 {
-	_result = _doc->load_buffer(contents,size,options,(pugi::xml_encoding)encoding);
-	return _result;
+	return load_buffer(contents,size,options,encoding);
 }
 
 BOOL SXmlDoc::LoadFileW(THIS_ const wchar_t* path, unsigned int options , XmlEncoding encoding)
 {
-	_result = _doc->load_file(path,options,(pugi::xml_encoding)encoding);
-	return _result;
+	return load_file(path,options,encoding);
 }
 
 BOOL SXmlDoc::LoadFileA(THIS_ const char* path, unsigned int options, XmlEncoding encoding)
 {
-	SStringW strPath = S_CA2W(path,CP_UTF8);
-	return LoadFileW(strPath.c_str(),options,encoding);
+	return load_file(path,options,encoding);
 }
 
 BOOL SXmlDoc::LoadString(THIS_ const wchar_t* contents, unsigned int options)
 {
-	_result = _doc->load_string(contents,options);
-	return _result;
+	return load_string(contents,options);
 }
 
 void SXmlDoc::GetParseResult(THIS_ XmlParseResult *pResult) SCONST
@@ -721,12 +709,13 @@ void SXmlDoc::GetParseResult(THIS_ XmlParseResult *pResult) SCONST
 void SXmlDoc::Copy(THIS_ const IXmlDoc* proto)
 {
 	_doc->reset(*(pugi::xml_document*)proto->GetPrivPtr());
+	invalidateCache();
 }
 
 void SXmlDoc::Reset(THIS)
 {
 	_doc->reset();
-	clearMap();
+	invalidateCache();
 }
 
 LPVOID SXmlDoc::GetPrivPtr(THIS) SCONST
@@ -737,36 +726,42 @@ LPVOID SXmlDoc::GetPrivPtr(THIS) SCONST
 bool SXmlDoc::load_string(const wchar_t* contents, unsigned int options /*= xml_parse_default*/)
 {
 	_result = _doc->load_string(contents,options);
+	invalidateCache();
 	return _result;
 }
 
 bool SXmlDoc::load_file(const char* path, unsigned int options /*= xml_parse_default*/, XmlEncoding encoding /*= enc_auto*/)
 {
 	_result = _doc->load_file(path,options,(pugi::xml_encoding)encoding);
+	invalidateCache();
 	return _result;
 }
 
 bool SXmlDoc::load_file(const wchar_t* path, unsigned int options /*= xml_parse_default*/, XmlEncoding encoding /*= enc_auto*/)
 {
 	_result = _doc->load_file(path,options,(pugi::xml_encoding)encoding);
+	invalidateCache();
 	return _result;
 }
 
 bool SXmlDoc::load_buffer(const void* contents, size_t size, unsigned int options /*= xml_parse_default*/, XmlEncoding encoding /*= enc_auto*/)
 {
 	_result = _doc->load_buffer(contents,size,options,(pugi::xml_encoding)encoding);
+	invalidateCache();
 	return _result;
 }
 
 bool SXmlDoc::load_buffer_inplace(void* contents, size_t size, unsigned int options /*= xml_parse_default*/, XmlEncoding encoding /*= enc_auto*/)
 {
 	_result = _doc->load_buffer_inplace(contents,size,options,(pugi::xml_encoding)encoding);
+	invalidateCache();
 	return _result;
 }
 
 bool SXmlDoc::load_buffer_inplace_own(void* contents, size_t size, unsigned int options /*= xml_parse_default*/, XmlEncoding encoding /*= enc_auto*/)
 {
 	_result = _doc->load_buffer_inplace_own(contents,size,options,(pugi::xml_encoding)encoding);
+	invalidateCache();
 	return _result;
 }
 
@@ -792,44 +787,20 @@ const char * SXmlDoc::GetErrDesc(XmlStatus status)
 	return res.description();
 }
 
-IXmlAttr * SXmlDoc::toIXmlAttr(pugi::xml_attribute_struct *pAttr)
+IXmlAttr * SXmlDoc::toIXmlAttr(pugi::xml_attribute attr)
 {
-	AttrMap::CPair *pair = m_attrMap->Lookup(pAttr);
-	if(pair)
-		return pair->m_value;
-	SXmlAttr *pRet = new SXmlAttr(pAttr);
-	m_attrMap->SetAt(pAttr,pRet);
-	return pRet;
+	return m_attrCache.Get(attr);
 }
 
-IXmlNode * SXmlDoc::toIXmlNode(pugi::xml_node_struct* pNode)
+IXmlNode * SXmlDoc::toIXmlNode(pugi::xml_node node)
 {
-	NodeMap::CPair *pair = m_nodeMap->Lookup(pNode);
-	if(pair)
-		return pair->m_value;
-	SXmlNode *pRet = new SXmlNode(pNode);
-	m_nodeMap->SetAt(pNode,pRet);
-	return pRet;
+	return m_nodeCache.Get(node);
 }
 
-void SXmlDoc::clearMap()
+void SXmlDoc::invalidateCache()
 {
-	{
-		SPOSITION pos = m_attrMap->GetStartPosition();
-		while(pos){
-			SXmlAttr *pAttr = m_attrMap->GetNextValue(pos);
-			delete pAttr;
-		}
-		m_attrMap->RemoveAll();
-	}
-	{
-		SPOSITION pos = m_nodeMap->GetStartPosition();
-		while(pos){
-			SXmlNode *pNode = m_nodeMap->GetNextValue(pos);
-			delete pNode;
-		}
-		m_nodeMap->RemoveAll();
-	}
+	m_attrCache.Clear();
+	m_nodeCache.Clear();
 }
 
 SNSEND
