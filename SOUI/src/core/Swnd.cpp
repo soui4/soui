@@ -572,7 +572,7 @@ SWindow::SWindow()
     , m_nLayer(0)
     , m_bEnableLayer(FALSE)
     , m_dwState(WndState_Normal)
-    , m_bMsgTransparent(FALSE)
+    , m_msgTransparent(MSGTRANSPARENT_NONE)
     , m_bVisible(TRUE)
     , m_bDisplay(TRUE)
     , m_bDisable(FALSE)
@@ -916,7 +916,7 @@ BOOL SWindow::OnSetCursor(const CPoint &pt)
 /** Get SWindow state */
 DWORD SWindow::GetState(void) const
 {
-    if (m_dwState == WndState_Normal && IsMsgTransparent() && GetParent())
+    if (m_dwState == WndState_Normal && m_msgTransparent == MSGTRANSPARENT_INHERIT && GetParent())
         return GetParent()->GetState();
     return m_dwState;
 }
@@ -1223,7 +1223,8 @@ SWindow *SWindow::GetOwner() const
 
 BOOL SWindow::IsMsgTransparent() const
 {
-    return m_bMsgTransparent;
+    // MSGTRANSPARENT_TRANSPARENT(1) 与 MSGTRANSPARENT_INHERIT(2) 都不处理自身消息，消息穿透到下层
+    return m_msgTransparent != MSGTRANSPARENT_NONE;
 }
 
 const SwndStyle &SWindow::GetStyle() const

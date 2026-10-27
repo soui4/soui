@@ -7,7 +7,7 @@ SNSBEGIN
 //--------------------------------------------------------------------------------
 CJunqiBoardGrid::CJunqiBoardGrid(void)
 {
-    m_bMsgTransparent = FALSE;
+    m_msgTransparent = MSGTRANSPARENT_NONE;
     AddEvent(EVENTID(EvtGridClick));
 }
 

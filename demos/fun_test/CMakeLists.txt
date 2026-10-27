@@ -201,8 +201,11 @@ add_dependencies(fun_test gtest soui4 Scintilla ${COM_LIBS})
 target_link_libraries(fun_test gtest soui4 Scintilla)
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     # Windows 宿主直接跑真实 Win32 API，只需要带上系统资源与系统库。
+    # 后面这几个 .lib 是 swinx 在其它平台上自己实现的那批 Win32 入口在 Windows 上的
+    # 归属模块：wke 兼容性用例（usp10/shlwapi/version/crypt32/iphlpapi）在 Windows 上
+    # 走系统实现，所以必须显式链接，否则 fun_test 链接不过。
     add_dependencies(fun_test soui-sys-resource)
-    target_link_libraries(fun_test Msimg32 imm32 Oleacc)
+    target_link_libraries(fun_test Msimg32 imm32 Oleacc usp10 shlwapi version crypt32 iphlpapi)
 else()
     # 非 Windows 平台由 swinx 提供 Win32 API；dl 供 LoadLibrary 系列用例使用。
     add_dependencies(fun_test swinx)

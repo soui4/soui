@@ -17,7 +17,7 @@ SStatic::SStatic()
     , m_bWordbreak(false)
     , m_bNoPrefix(false)
 {
-    m_bMsgTransparent = TRUE;
+    m_msgTransparent = MSGTRANSPARENT_TRANSPARENT;
     m_style.SetAlign(DT_LEFT);
 }
 
@@ -590,7 +590,7 @@ SImageWnd::SImageWnd()
     , m_bKeepAspect(FALSE)
     , m_bFitImage(FALSE)
 {
-    m_bMsgTransparent = TRUE;
+    m_msgTransparent = MSGTRANSPARENT_TRANSPARENT;
 }
 
 SImageWnd::~SImageWnd()
@@ -779,7 +779,7 @@ SAnimateImgWnd::SAnimateImgWnd()
     , m_nRepeat(-1)
     , m_iRepeat(0)
 {
-    m_bMsgTransparent = TRUE;
+    m_msgTransparent = MSGTRANSPARENT_TRANSPARENT;
     GetEventSet()->addEvent(EVENTID(EventImageAnimateStart));
     GetEventSet()->addEvent(EVENTID(EventImageAnimateStop));
     GetEventSet()->addEvent(EVENTID(EventImageAnimateRepeat));

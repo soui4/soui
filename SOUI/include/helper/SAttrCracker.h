@@ -455,11 +455,17 @@ static const wchar_t *const VALUE = L"value:";               /**< SSliderBar's v
         varTemp = enumvalue;                   \
     else
 
-#define ATTR_ENUM_END(varname) \
-    return E_FAIL;             \
-                               \
-    varname = varTemp;         \
-    }                          \
+#define ATTR_ENUM_END(varname)                                                \
+    if (strValue.GetLength() > 0 && strValue[0] >= '0' && strValue[0] <= '9') \
+    {                                                                         \
+        int nValue = strValue.ToInt();                                        \
+        memcpy(&varTemp, &nValue, sizeof(varTemp));                           \
+    }                                                                         \
+    else                                                                      \
+        return E_FAIL;                                                        \
+                                                                              \
+    varname = varTemp;                                                        \
+    }                                                                         \
     else
 
 /** SwndStyle From StringA Key */

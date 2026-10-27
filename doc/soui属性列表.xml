@@ -155,7 +155,7 @@
     <Attribute name="pos" default="0,0,0,0" type="RECT" comment="控件位置 如(0,0,100,100)"/>
     <Attribute name="display" default="1" type="INT" comment="显示  0--隐藏不占位 1--隐藏占位（默认）"/>
     <Attribute name="tip" default="this is tip" type="STRING" comment="提示框"/>
-    <Attribute name="msgTransparent" default="0" type="INT" comment="鼠标消息穿透 决定是否可以收到鼠标消息 0--窗口接收鼠标键盘消息（默认） 1--不接收消息"/>
+    <Attribute name="msgTransparent" default="0" type="INT" comment="鼠标消息穿透 0--窗口接收鼠标键盘消息（默认） 1--不接收消息（消息穿透到下层） 2--不接收消息并继承父窗口状态（用于把子窗口嵌入父窗口、随父窗口状态显示，如按钮的文字与图标）"/>
     <Attribute name="sep" default="0" type="INT" comment="窗口默认间距 在下一个窗口没有指定pos属性时，自动横向布局时与本窗口的间距"/>
     <Attribute name="maxwidth" default="9999" type="INT" comment="窗口最大宽度，根据内容自适应窗口大小时窗口的最大宽度 如(100)"/>
     <Attribute name="maxheight" default="9999" type="INT" comment="窗口最大高度，如(30)"/>

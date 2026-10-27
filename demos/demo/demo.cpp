@@ -14,7 +14,7 @@
 
 #include "appledock/SDesktopDock.h"
 #include "SMatrixWindow.h"
-//#include <SScintillaView.h>
+#include <SScintillaView.h>
 #include <SEdit2.h>
 #include "clock/sclock.h"
 #include "FpsWnd.h"
@@ -161,7 +161,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 
     // Register externally extended controls and SkinObj classes into SApplication
     SWkeLoader wkeLoader;
-    wkeLoader.Init(_T("wke.dll"));
+    wkeLoader.Init(_T("wke"));
 
     SCtrlsRegister::RegisterCtrls(&app);
     app.RegisterSkinClass<SDemoSkin>();
@@ -171,7 +171,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
     app.RegisterWindowClass<SFreeMoveWindow>(); //
     app.RegisterWindowClass<SClock>();          //
     app.RegisterWindowClass<SDesktopDock>(); // register SDesktopDock
-    //app.RegisterWindowClass<SScintillaView>(); // register the windowless Scintilla edit control
+    app.RegisterWindowClass<SScintillaView>(); // register the windowless Scintilla edit control
 
     app.RegisterWindowClass<SInterpolatorView>();
     app.RegisterWindowClass<SPathView>();

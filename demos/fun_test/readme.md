@@ -314,6 +314,7 @@ fun_test/
   fontconfig/cairo（`FcPatternDuplicate`/`FcFontMatch`）与 swinx 单例的线程对象在每个子进程里    
   都被报成 `definitely lost`（每子进程约 95 KB，3 个子进程数字雷同）。这是 fork 假阳性而非真泄漏    
   ——同一份代码在主进程里是 `definitely lost: 0`。
+- **主进程泄漏基线（2026-10-26 实测，valgrind 3.18.1）**：`valgrind --leak-check=full --child-silent-after-fork=yes --suppressions=../swinx/valgrind-linux.supp ./fun_test --gtest_filter=-window.*` 只剩一份 heap summary，其中 `definitely lost: 0`、`indirectly lost: 0`、`possibly lost: 336`（glibc 线程栈缓存留下的 `_dl_allocate_tls` dtv 块——`CloseHandle` 已 `pthread_join`，是 glibc 复用缓存的假阳性，不是泄漏）、`ERROR SUMMARY: 1`。此前主进程另有两处真问题，均已修复：`~CursorMgr` 的 `DestroyIcon` 被自己的 `isStdCursor` 守卫短路，清表后遗留 7 个标准光标（280 B 直接 + 27,552 B 间接）；`SPanel::m_dwUpdateTime` 未在构造初始化，`ScrollUpdate()` 读到未初始化值。守卫语义由 `swinx_wke_cursor.standard_cursor_survives_unconditional_destroy`（标准光标销毁失败且句柄仍共享）与 `swinx_wke_cursor.caller_owned_icon_is_destroyable`（自己建的对象必须能释放，防止守卫退化成"一概不释放"）钉住；退出时的实际释放只能靠上面那条 valgrind 基线复现。看到主进程 nonzero `definitely lost` 时先按这两处对号，再判读新条目。
 - swinx 已知语义偏差（测试已按实际行为断言）：互斥锁为管道字节实现，**不支持 Win32 的属主线程递归等待**。
 - `test_lua.cpp`（script_lua 模块导出对象生命周期调试，套件 `soui_lua` + `soui_lua_app`，
   27 个用例）**零 lua 链接、无编译条件**：SComMgr2 加载 scriptmodule-lua（静态 COM

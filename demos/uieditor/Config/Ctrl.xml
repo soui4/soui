@@ -378,7 +378,7 @@
 					<propcolor title="Disable颜色" name="colorTextDisable" extendType="color" autoComplete="1" value="" description="Disable状态文本颜色"/>
 					<proprect title="边框大小" name="margin" extendType="dim" autoComplete="1" childrenTitles="左|上|右|下"  description="框架大小，和colorBorder或者ncSkin配合使用"/>
 					<proprect title="内边距" name="padding" extendType="dim" autoComplete="1" childrenTitles="左|上|右|下"  description="控件内边距，和inset属性相同"/>
-					<propoption title="消息穿透" name="msgTransparent" extendType="undef" value="" options="是:1|否:0" description="鼠标消息穿透，为TRUE是，控件不拦截鼠标消息"/>
+					<propoption title="消息穿透" name="msgTransparent" extendType="undef" value="" options="否:0|是:1|继承父状态:2" description="鼠标消息穿透：0-接收消息 1-不接收(消息穿透到下层) 2-不接收并继承父窗口状态"/>
 					<propoption title="省略号显示文本" name ="dotted" extendType="undef" options="是:1|否:0" description="是否支持省略号显示文本" />
 					<proptext title="透明度" name ="alpha" extendType="dim" autoComplete="1" description="数值在0-255之间"/>
 					<propoption title="跟踪鼠标" name ="trackMouseEvent" extendType="undef" options="是:1|否:0" description="窗口不在最顶层时可以收到mouseHover,mouseLeave消息" />

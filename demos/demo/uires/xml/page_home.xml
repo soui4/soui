@@ -21,9 +21,9 @@
     <template name="home_card">
       <imgbtn name="{{name}}" size="190,150" data="{{page}}" skin="svg_card_bg" layout="vbox" gravity="center" interval="10" animate="1">
         <window size="0,0" weight="1"/>
-        <img size="48,48" skin="svg_home_icons" iconIndex="{{icon}}" msgTransparent="1"/>
-        <text text="{{title}}" font="size:17,bold:1" colorText="@color/clr_title" msgTransparent="1"/>
-        <text text="{{desc}}" font="size:12" colorText="@color/clr_text_sub" msgTransparent="1"/>
+        <img size="48,48" skin="svg_home_icons" iconIndex="{{icon}}" msgTransparent="inherit"/>
+        <text text="{{title}}" font="size:17,bold:1" colorText="@color/clr_title" msgTransparent="inherit"/>
+        <text text="{{desc}}" font="size:12" colorText="@color/clr_text_sub" msgTransparent="inherit"/>
         <window size="0,0" weight="1"/>
       </imgbtn>
     </template>

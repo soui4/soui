@@ -41,8 +41,8 @@
 #include "SColorMask.h"
 #include "qrcode/SQrCtrl.h"
 #include "SScintillaView.h"
-#ifdef _WIN32
 #include "SWkeWebkit.h"
+#ifdef _WIN32
 #include "SStaticGdip.h"
 #include "SIECtrl.h"
 #endif//_WIN32
@@ -86,8 +86,8 @@ void SCtrlsRegister::RegisterCtrls(SApplication *theApp)
 	theApp->RegisterWindowClass<SSpeedMeter>();
 	theApp->RegisterWindowClass<SQrCtrl>();
 	theApp->RegisterWindowClass<SScintillaView>();
-#ifdef _WIN32
     theApp->RegisterWindowClass<SWkeWebkit>(); // 注册WKE浏览器
+#ifdef _WIN32
     theApp->RegisterWindowClass<SStaticGdip>();
 #ifndef __MINGW32__
     theApp->RegisterWindowClass<SIECtrl>(); // 注册IECtrl

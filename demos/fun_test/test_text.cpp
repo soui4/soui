@@ -7,7 +7,9 @@
 #include <windows.h>
 #include <wchar.h>
 #include <limits.h>
+#include <limits>
 #include <stdlib.h>
+#include <string.h>
 #include <vector>
 
 class TextTest : public ::testing::Test {
@@ -451,4 +453,83 @@ TEST_F(TextTest, extent_ex_point_prefix_widths_consistent)
         EXPECT_LE(abs((int)dx[i] - (int)sz.cx), 1)
             << "prefix of " << (i + 1) << " bytes: dx=" << dx[i] << " extent=" << sz.cx;
     }
+}
+
+// ------------------------------------------------------------------------
+// Regression for the tooltip measured as 0x0.
+//
+// wke 的 cairo win32 字体后端对零缩放字体计算 1/0，得到含 NaN 的世界变换，
+// 再通过 SetWorldTransform 写到 GetDC(NULL) 返回的共享桌面 DC 上。cairo 的
+// cairo_set_matrix 遇到不可逆矩阵会把整个上下文置成粘性错误
+// CAIRO_STATUS_INVALID_MATRIX，cairo_save/restore 救不回来，之后同一 DC 上
+// 的 DrawText(DT_CALCRECT) 一律得到 0x0，tooltip 就只剩边距。
+// Win32 语义下不可逆矩阵只是让调用失败；swinx 必须同样先校验再写入。
+// ------------------------------------------------------------------------
+
+TEST_F(TextTest, singular_world_transform_keeps_screen_dc_drawtext_measurable)
+{
+    // STextHost::TxGetDC() 把 GetDC(NULL) 交给 msftedit/wke，SToolTip::ShowTip
+    // 随后在同一个共享 DC 上用 DrawText(DT_CALCRECT) 计算文字尺寸。
+    HDC screen = GetDC(NULL);
+    ASSERT_TRUE(screen != NULL);
+    ASSERT_NE(SetGraphicsMode(screen, GM_ADVANCED), 0);
+
+    // 全零矩阵不可逆，Win32 拒绝它，swinx 同样不能把它写进 cairo。
+    XFORM singular;
+    memset(&singular, 0, sizeof(singular));
+    EXPECT_FALSE(SetWorldTransform(screen, &singular));
+
+    HFONT tipFont = CreateFontA(-12, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
+                                DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
+                                CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+                                DEFAULT_PITCH, "sans-serif");
+    ASSERT_TRUE(tipFont != NULL);
+    HGDIOBJ prev = SelectObject(screen, tipFont);
+
+    RECT rc = {0, 0, 500, 1000};
+    DrawTextA(screen, "tooltip", -1, &rc, DT_CALCRECT | DT_LEFT | DT_WORDBREAK);
+    EXPECT_GT(rc.right - rc.left, 0);
+    EXPECT_GT(rc.bottom - rc.top, 0);
+
+    SelectObject(screen, prev);
+    DeleteObject(tipFont);
+    ModifyWorldTransform(screen, NULL, MWT_IDENTITY);
+    SetGraphicsMode(screen, GM_COMPATIBLE);
+    ReleaseDC(NULL, screen);
+}
+
+TEST_F(TextTest, non_finite_world_transform_keeps_dc_measurable)
+{
+    ASSERT_NE(SetGraphicsMode(hdc, GM_ADVANCED), 0);
+
+    // 平台对非有限分量是否拒绝可以不同，所以这里不断言返回值；无论接受
+    // 与否，恢复单位矩阵后 DC 都必须还能测量文字。
+    XFORM nanXf;
+    memset(&nanXf, 0, sizeof(nanXf));
+    nanXf.eM11 = std::numeric_limits<float>::quiet_NaN();
+    nanXf.eM12 = std::numeric_limits<float>::quiet_NaN();
+    nanXf.eM21 = std::numeric_limits<float>::quiet_NaN();
+    nanXf.eM22 = std::numeric_limits<float>::quiet_NaN();
+    SetWorldTransform(hdc, &nanXf);
+    EXPECT_TRUE(ModifyWorldTransform(hdc, NULL, MWT_IDENTITY));
+
+    SIZE sz = {0, 0};
+    ASSERT_TRUE(GetTextExtentPoint32A(hdc, "A", 1, &sz));
+    EXPECT_GT(sz.cx, 0);
+    EXPECT_GT(sz.cy, 0);
+
+    // A valid transform is still accepted and still measurable.
+    XFORM scale2;
+    memset(&scale2, 0, sizeof(scale2));
+    scale2.eM11 = 2.0f;
+    scale2.eM22 = 2.0f;
+    EXPECT_TRUE(SetWorldTransform(hdc, &scale2));
+
+    sz.cx = sz.cy = 0;
+    ASSERT_TRUE(GetTextExtentPoint32A(hdc, "A", 1, &sz));
+    EXPECT_GT(sz.cx, 0);
+    EXPECT_GT(sz.cy, 0);
+
+    EXPECT_TRUE(ModifyWorldTransform(hdc, NULL, MWT_IDENTITY));
+    SetGraphicsMode(hdc, GM_COMPATIBLE);
 }

@@ -13,7 +13,7 @@ CChessPiece::CChessPiece()
 ,m_bLocalMove(TRUE)
 {
     SetIcon(m_chessMan*3+m_state);
-    m_bMsgTransparent = FALSE;
+    m_msgTransparent = MSGTRANSPARENT_NONE;
 }
 
 CChessPiece::~CChessPiece()

@@ -57,7 +57,14 @@ SWkeLoader::SWkeLoader()
 SWkeLoader::~SWkeLoader()
 {
     if (m_hModWke)
+    {
+        // wke 内部有常驻后台线程（例如 JavaScriptCore 的堆 block-free 线程），
+        // 必须在卸载镜像之前让 wke 自己把它们停掉，否则这些线程会在 FreeLibrary
+        // 之后继续执行已 unmap 的代码而崩溃。
+        if (m_funWkeShutdown)
+            m_funWkeShutdown();
         FreeLibrary(m_hModWke);
+    }
 }
 
 BOOL SWkeLoader::Init(LPCTSTR pszDll)

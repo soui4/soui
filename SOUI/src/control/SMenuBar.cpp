@@ -258,6 +258,7 @@ SMenuBar::SMenuBar()
     , m_iNowMenu(-1)
     , m_bUseMenuEx(FALSE)
 {
+    m_bClipClient = TRUE;
     m_evtSet.addEvent(EVENTID(EventSelectMenu));
     // 不在构造时占用 m_pMenuBar：仅在实际弹菜单（PopMenu）时绑定，避免多个实例相互覆盖
     m_pLayout.Attach(new SHBox());

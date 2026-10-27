@@ -162,7 +162,7 @@ void SHostPresenter::OnHostPresent(THIS_ HDC hdc, IRenderTarget *pMemRT, LPCRECT
     ::BitBlt(hdc, rcInvalid->left, rcInvalid->top, rcInvalid->right - rcInvalid->left, rcInvalid->bottom - rcInvalid->top, memdc, rcInvalid->left, rcInvalid->top, SRCCOPY);
     if (m_pHostWnd->GetHostAttr().m_bTranslucent && m_pHostWnd->GetHostAttr().m_bAutoShape)
     {
-        HBITMAP hBmp = GetCurrentObject(memdc, OBJ_BITMAP);
+        HBITMAP hBmp = (HBITMAP)GetCurrentObject(memdc, OBJ_BITMAP);
         HRGN hRgn = CreateRegionFromBitmap(hBmp, 0, 0xFF000000);
         SetWindowRgn(m_pHostWnd->m_hWnd, hRgn, FALSE);
         if (hRgn)

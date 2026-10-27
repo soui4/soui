@@ -378,16 +378,12 @@ namespace lua_tinker
    template<>  long long           read ( lua_State *L, int index );
    template<>  unsigned long long  read ( lua_State *L, int index );
    template<>  table               read ( lua_State *L, int index );
-#ifdef WIN32
    template<>  HANDLE              read ( lua_State *L, int index );
    template<>	HWND				read(lua_State *L, int index);
    template<>	HMENU				read(lua_State *L, int index);
    template<>	HDC					read(lua_State *L, int index);
    template<>	HICON				read(lua_State *L, int index);
    template<>	HBITMAP				read(lua_State *L, int index);
-#else
-   template<>	HGDIOBJ				read(lua_State *L, int index);
-#endif
    template<>	HINSTANCE			read(lua_State *L, int index);
 
    // push a value to lua stack 
@@ -413,16 +409,14 @@ namespace lua_tinker
    template<>  void push ( lua_State *L, long long ret );
    template<>  void push ( lua_State *L, unsigned long long ret );
    template<>  void push ( lua_State *L, table ret );
-#ifdef WIN32
+
    template<>  void push ( lua_State *L, HANDLE ret );
    template<>	void push(lua_State *L, HWND ret);
    template<>	void push(lua_State *L, HMENU ret);
    template<>	void push(lua_State *L, HDC ret);
    template<>	void push(lua_State *L, HICON ret);
    template<>	void push(lua_State *L, HBITMAP ret);
-#else
-   template<>	void push(lua_State *L, HGDIOBJ ret);
-#endif
+   /* 同上：HGDIOBJ 与 HANDLE 同型，push<HANDLE> 已覆盖。 */
    template<>	void push(lua_State *L, HINSTANCE ret);
 
    // pop a value from lua stack

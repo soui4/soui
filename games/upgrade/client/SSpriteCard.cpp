@@ -184,7 +184,7 @@ void SSpriteCard::SetMaskSkin(ISkinObj *pSkin)
 void SSpriteCard::SetSelectable(BOOL bSelectable)
 {
     m_bSelectable = bSelectable;
-    m_bMsgTransparent = !bSelectable;
+    m_msgTransparent = bSelectable ? MSGTRANSPARENT_NONE : MSGTRANSPARENT_TRANSPARENT;
     Invalidate();
 }
 

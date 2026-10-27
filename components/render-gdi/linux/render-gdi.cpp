@@ -433,7 +433,7 @@ HRESULT SBitmap_GDI::Save2(CTHIS_ LPCWSTR pszFileName, ImgFmt imgFmt) SCONST
 
 HBITMAP SBitmap_GDI::ToHBITMAP() const
 {
-    return RefGdiObj(m_hBmp);
+    return (HBITMAP)RefGdiObj(m_hBmp);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1104,8 +1104,8 @@ HRESULT SRenderTarget_GDI::DrawGradientRectEx(THIS_ LPCRECT pRect, POINT ptRound
         ::FillRect(m_hdc, pRect, hbr);
     else
     {
-        HPEN hOldPen = ::SelectObject(m_hdc, GetStockObject(NULL_PEN));
-        HBRUSH hOldBr = ::SelectObject(m_hdc, hbr);
+        HPEN hOldPen = (HPEN)::SelectObject(m_hdc, GetStockObject(NULL_PEN));
+        HBRUSH hOldBr = (HBRUSH)::SelectObject(m_hdc, hbr);
         ::RoundRect(m_hdc, pRect->left, pRect->top, pRect->right, pRect->bottom, ptRoundCorner.x, ptRoundCorner.y);
         ::SelectObject(m_hdc, hOldBr);
         ::SelectObject(m_hdc, hOldPen);

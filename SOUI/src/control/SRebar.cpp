@@ -122,6 +122,9 @@ SRebar::BandInfo *SRebar::GetBandInfo(int nIndex)
 BOOL SRebar::CreateChildren(SXmlNode xmlNode)
 {
     bool bRet = TRUE;
+    // Records the requested initial row for each band (parsed from the per-band
+    // `row` attribute). -1 means "not specified" and defaults to row 0.
+    SArray<int> rowOf;
 
     for (SXmlNode xmlChild = xmlNode.first_child(); xmlChild; xmlChild = xmlChild.next_sibling())
     {
@@ -134,6 +137,11 @@ BOOL SRebar::CreateChildren(SXmlNode xmlNode)
             SStringT title = S_CW2T(xmlChild.attribute(L"title").value());
             int height = xmlChild.attribute(L"height").as_int(24);
             bool bCollapsible = xmlChild.attribute(L"collapsible").as_bool(false);
+            // Optional explicit band width. When omitted (0) the width is derived
+            // from the child window's desired size (see CalculateBandLayout).
+            int bandWidth = xmlChild.attribute(L"width").as_int(0);
+            // Optional initial row (0-based). Only effective when singleRow is false.
+            int bandRow = xmlChild.attribute(L"row").as_int(-1);
 
             SWindow *pChild = NULL;
             for (SXmlNode xmlBandChild = xmlChild.first_child(); xmlBandChild; xmlBandChild = xmlBandChild.next_sibling())
@@ -145,7 +153,13 @@ BOOL SRebar::CreateChildren(SXmlNode xmlNode)
                 {
                     InsertChild(pChild);
                     pChild->InitFromXml(&xmlBandChild);
-                    AddBand(pChild, title, height, bCollapsible);
+                    int nIdx = AddBand(pChild, title, height, bCollapsible);
+                    if (nIdx >= 0)
+                    {
+                        if (bandWidth > 0)
+                            m_bands[nIdx].width = bandWidth;
+                        rowOf.Add(bandRow);
+                    }
                     break;
                 }
             }
@@ -154,6 +168,25 @@ BOOL SRebar::CreateChildren(SXmlNode xmlNode)
         {
             if (!CreateChild(xmlChild))
                 bRet = FALSE;
+        }
+    }
+
+    // Derive the bNewRow flags from the requested initial rows (only in multi-row
+    // mode). A band starts a new row when its row index differs from the previous
+    // band's; without a `row` attribute a band defaults to row 0 (single row).
+    if (!m_bSingleRow)
+    {
+        int prevRow = -999;
+        for (int i = 0; i < (int)m_bands.GetCount(); i++)
+        {
+            int r = (i < (int)rowOf.GetCount()) ? rowOf[i] : -1;
+            if (r < 0)
+                r = 0;
+            if (i == 0)
+                m_bands[i].bNewRow = true;
+            else
+                m_bands[i].bNewRow = (r != prevRow);
+            prevRow = r;
         }
     }
 
@@ -204,45 +237,47 @@ int SRebar::GetTotalHeightForWidth(int cx) const
     if (m_bands.IsEmpty())
         return 24;
 
-    if (m_bSingleRow)
-    {
-        // Single row: all bands on one row, height is the max height of a single row
-        int rowHeight = 0;
-        for (size_t i = 0; i < m_bands.GetCount(); i++)
-        {
-            int h = m_bands[i].bCollapsed ? 24 : m_bands[i].height;
-            rowHeight = smax(rowHeight, h);
-        }
-        return rowHeight > 0 ? rowHeight : 24;
-    }
-
-    // Multi-row: line breaks determined by bNewRow, independent of width (VS logic)
+    // Rows are separated by bands whose bNewRow flag is set. A single-row rebar is
+    // simply one with no bNewRow set. A hidden band contributes no space, so we just
+    // skip it (its bNewRow would have applied to the next visible band anyway).
+    // The height is independent of the available width (VS Rebar logic).
     int y = 0;
     int rowHeight = 0;
-    int left = kRebarGripperWidth;
 
     for (size_t i = 0; i < m_bands.GetCount(); i++)
     {
+        if (!IsBandShown((int)i))
+            continue;
         const BandInfo &band = m_bands[i];
-        int bandHeight = band.bCollapsed ? 24 : band.height;
-        int bandWidth = band.width > 0 ? band.width : 80;
 
-        if (i > 0 && band.bNewRow)
+        if (i > 0 && band.bNewRow && !m_bSingleRow)
         {
             y += rowHeight;
             rowHeight = 0;
         }
-        rowHeight = smax(rowHeight, bandHeight);
+        rowHeight = smax(rowHeight, band.height);
     }
     return y + (rowHeight == 0 ? 24 : rowHeight);
 }
 
 int SRebar::GetTotalHeight() const
 {
-    if (m_bands.GetCount())
+    if (m_bands.IsEmpty())
         return 24;
     // Height is determined by singleRow + bNewRow, independent of width
     return GetTotalHeightForWidth(0);
+}
+
+bool SRebar::IsBandShown(int i) const
+{
+    if (i < 0 || i >= (int)m_bands.GetCount())
+        return false;
+    const BandInfo &band = m_bands[i];
+    if (band.bCollapsed || !band.pChild)
+        return false;
+    // Respect the child's own visibility so external Show/Hide (e.g. a toolbar
+    // toggled by the "View" menu) hides the whole band.
+    return band.pChild->IsVisible(FALSE);
 }
 
 void SRebar::CalculateBandLayout()
@@ -292,27 +327,32 @@ void SRebar::UpdateBandLayout()
     int x = m_rcClient.left + kRebarGripperWidth;
     int y = m_rcClient.top;
     int rowHeight = 0;
-    int rightEdge = m_rcClient.right;
 
     for (size_t i = 0; i < m_bands.GetCount(); i++)
     {
         BandInfo &band = m_bands[i];
-        int bandHeight = band.bCollapsed ? 24 : band.height;
+        bool bShow = IsBandShown((int)i);
+        if (!bShow)
+        {
+            // Hidden band (collapsed / no child / child hidden): occupy no space,
+            // leave an empty rect so HitTest skips it.
+            m_bandRects[i].SetRectEmpty();
+            if (band.pChild)
+                band.pChild->SetVisible(FALSE);
+            continue;
+        }
+
+        int bandHeight = band.height;
         int bandWidth = band.width > 0 ? band.width : 80;
 
-        if (m_bSingleRow)
+        // Rows are broken by the bNewRow flag. When singleRow is locked, bNewRow is
+        // ignored so the rebar stays on one row regardless. Hidden bands were skipped
+        // above so they consume no space.
+        if (i > 0 && band.bNewRow && !m_bSingleRow)
         {
-            // Single row: no wrapping, fill one row
-        }
-        else
-        {
-            // Multi-row: line breaks only by bNewRow (VS logic, independent of width)
-            if (i > 0 && band.bNewRow)
-            {
-                x = m_rcClient.left + kRebarGripperWidth;
-                y += rowHeight;
-                rowHeight = 0;
-            }
+            x = m_rcClient.left + kRebarGripperWidth;
+            y += rowHeight;
+            rowHeight = 0;
         }
 
         CRect rcBand(x - kRebarGripperWidth, y, x - kRebarGripperWidth + bandWidth, y + bandHeight);
@@ -324,26 +364,19 @@ void SRebar::UpdateBandLayout()
 
         if (band.pChild)
         {
-            if (!band.bCollapsed)
-            {
-                int xChildLeft = rcBand.left + kRebarGripperWidth;
-                int xChildRight = rcBand.right - kRebarSplitterWidth;
-                // The child window must not exceed the Rebar client area; reduce its width if it does
-                int rightLimit = m_rcClient.right - kRebarSplitterWidth;
-                if (xChildRight > rightLimit)
-                    xChildRight = rightLimit;
-                if (xChildLeft < m_rcClient.left)
-                    xChildLeft = m_rcClient.left;
-                if (xChildRight <= xChildLeft)
-                    xChildRight = xChildLeft + 1;
-                CRect rcChild(xChildLeft, y, xChildRight, y + bandHeight);
-                band.pChild->Move(rcChild);
-                band.pChild->SetVisible(TRUE);
-            }
-            else
-            {
-                band.pChild->SetVisible(FALSE);
-            }
+            int xChildLeft = rcBand.left + kRebarGripperWidth;
+            int xChildRight = rcBand.right - kRebarSplitterWidth;
+            // The child window must not exceed the Rebar client area; reduce its width if it does
+            int rightLimit = m_rcClient.right - kRebarSplitterWidth;
+            if (xChildRight > rightLimit)
+                xChildRight = rightLimit;
+            if (xChildLeft < m_rcClient.left)
+                xChildLeft = m_rcClient.left;
+            if (xChildRight <= xChildLeft)
+                xChildRight = xChildLeft + 1;
+            CRect rcChild(xChildLeft, y, xChildRight, y + bandHeight);
+            band.pChild->Move(rcChild);
+            band.pChild->SetVisible(TRUE);
         }
 
         rowHeight = smax(rowHeight, bandHeight);
@@ -351,6 +384,14 @@ void SRebar::UpdateBandLayout()
     }
 
     GetParent()->RequestRelayout();
+}
+
+void SRebar::UpdateChildrenPosition()
+{
+    // We fully own the positioning of band children (see UpdateBandLayout), so
+    // the default SouiLayout must not reposition them by their own XML layout
+    // params - that would undo the manual Move() above.
+    UpdateBandLayout();
 }
 
 void SRebar::OnPaint(IRenderTarget *pRT)
@@ -429,8 +470,9 @@ void SRebar::DrawBand(IRenderTarget *pRT, int nIndex, const CRect &rcBand)
 
 void SRebar::DrawGripper(IRenderTarget *pRT, const CRect &rcGripper)
 {
-    COLORREF crGripperBg = RGBA(230, 230, 230, 255);
-    pRT->FillSolidRect(rcGripper, crGripperBg);
+    // The gripper strip background is driven by the `colorGripper` attribute
+    // (m_crGripper), so it can be made to match the rebar's own background.
+    pRT->FillSolidRect(rcGripper, m_crGripper);
 
     IPenS *pPen = NULL;
     if (SUCCEEDED(pRT->CreatePen(PS_SOLID, GetStyle().m_crBorder, 1, &pPen)))
@@ -601,7 +643,11 @@ BOOL SRebar::OnMouseMove(UINT nFlags, CPoint point)
         return TRUE;
     }
 
-    // Reordering logic
+    // Reordering logic.
+    // Dragging a band's gripper can move it to a different slot within a row (by X),
+    // or to a different row. Dropping it above the first row or below the last row
+    // (or into the vertical gap between rows) creates a NEW row - i.e. the rebar
+    // becomes multi-row on demand, just like MFC's CRebar.
     int bandCount = (int)m_bands.GetCount();
     if (bandCount < 2)
         return TRUE;
@@ -609,162 +655,232 @@ BOOL SRebar::OnMouseMove(UINT nFlags, CPoint point)
     if ((int)m_bandRects.GetCount() != bandCount)
         UpdateBandLayout();
 
-    // Build row-based ranges, find the row under the mouse (or above the first row / below the last row)
-    int rowIndex = -9999; // sentinel: not found
-    int firstRowTop = (bandCount > 0) ? m_bandRects[0].top : m_rcClient.top;
-    int start = 0;
-    int curRow = 0;
-    while (start < bandCount)
-    {
-        int rowFirst = start;
-        int rowLast = start;
-        int rowTop = m_bandRects[rowFirst].top;
-        int rowBottom = m_bandRects[rowFirst].bottom;
-        // Expand to all bands in this row (until the next bNewRow or the end)
-        while (rowLast + 1 < bandCount && !m_bands[rowLast + 1].bNewRow)
-        {
-            ++rowLast;
-            rowBottom = smax(rowBottom, m_bandRects[rowLast].bottom);
-        }
+    int dragBand = m_nDragBand;
+    if (dragBand < 0 || dragBand >= bandCount)
+        return TRUE;
 
-        if (point.y < rowTop)
-        {
-            rowIndex = -1; // Above all bands (above the first row)
-            break;
-        }
-        if (point.y <= rowBottom)
-        {
-            rowIndex = curRow; // In this row
-            break;
-        }
-        // Otherwise continue to the next row
-        start = rowLast + 1;
-        ++curRow;
-    }
-    if (start >= bandCount && rowIndex == -9999)
+    // Locked single-row mode: only reorder within the one row; never create a new
+    // row. The single-row invariant is preserved by keeping bNewRow true only on
+    // the first band.
+    if (m_bSingleRow)
     {
-        // If no row matched and the mouse Y is below the last row
-        rowIndex = INT_MAX; // Marked as below all bands
-    }
+        SWindow *pDragChild = m_bands[dragBand].pChild;
+        SArray<int> order;
+        for (int i = 0; i < bandCount; ++i)
+            if (i != dragBand)
+                order.Add(i);
 
-    // Handle being above the first row (place at the start of the first row)
-    if (rowIndex == -1)
-    {
-        if (m_nDragBand != 0)
+        int pos = (int)order.GetCount();
+        for (int k = 0; k < (int)order.GetCount(); ++k)
         {
-            // Preserve original line-break semantics: if the dragged item was bNewRow, pass the flag to its successor (to avoid loss)
-            bool wasNewRow = m_bands[m_nDragBand].bNewRow;
-            if (wasNewRow && m_nDragBand + 1 < (int)m_bands.GetCount())
+            int b = order[k];
+            if (b >= (int)m_bandRects.GetCount())
+                continue;
+            int midX = (m_bandRects[b].left + m_bandRects[b].right) / 2;
+            if (point.x < midX)
             {
-                m_bands[m_nDragBand + 1].bNewRow = true;
+                pos = k;
+                break;
             }
-            const BandInfo &curBand = m_bands[m_nDragBand];
-            m_bands.RemoveAt(m_nDragBand);
-            m_bands.InsertAt(0, curBand);
-            m_nDragBand = 0;
+            pos = k + 1;
         }
-        // If a second band exists, ensure it starts a new row (isolate the item dragged to the first position)
-        if ((int)m_bands.GetCount() > 1)
-            m_bands[1].bNewRow = true;
-        m_bands[0].bNewRow = true;
+        order.InsertAt(pos, dragBand);
+
+        SArray<BandInfo> ordered;
+        for (int k = 0; k < (int)order.GetCount(); ++k)
+            ordered.Add(m_bands[order[k]]);
+        m_bands.RemoveAll();
+        for (int k = 0; k < (int)ordered.GetCount(); ++k)
+            m_bands.Add(ordered[k]);
+        for (int k = 0; k < (int)m_bands.GetCount(); ++k)
+            m_bands[k].bNewRow = false;
+        if (m_bands.GetCount() > 0)
+            m_bands[0].bNewRow = true;
+
+        for (int k = 0; k < (int)m_bands.GetCount(); ++k)
+        {
+            if (m_bands[k].pChild == pDragChild)
+            {
+                m_nDragBand = k;
+                break;
+            }
+        }
         UpdateBandLayout();
         return TRUE;
     }
 
-    // Handle being below all bands (place at the end)
-    if (rowIndex == INT_MAX)
+    // 1) Compute current rows (row starters) from the bNewRow flags.
+    SArray<int> rowStarts;
+    rowStarts.Add(0);
+    for (int i = 1; i < bandCount; ++i)
     {
-        // If the dragged item was originally at the start of a row, pass the row-start semantics to its successor
-        bool wasNewRow = m_bands[m_nDragBand].bNewRow;
-        if (wasNewRow && m_nDragBand + 1 < (int)m_bands.GetCount())
+        if (m_bands[i].bNewRow)
+            rowStarts.Add(i);
+    }
+    int numRows = (int)rowStarts.GetCount();
+
+    // 2) Row rectangles for vertical (Y) hit testing.
+    SArray<CRect> rowRects;
+    for (int r = 0; r < numRows; ++r)
+    {
+        int s = rowStarts[r];
+        int e = (r + 1 < numRows) ? rowStarts[r + 1] - 1 : bandCount - 1;
+        CRect rcRow;
+        rcRow.SetRectEmpty();
+        for (int i = s; i <= e; ++i)
         {
-            m_bands[m_nDragBand + 1].bNewRow = true;
+            if (i < (int)m_bandRects.GetCount() && !m_bandRects[i].IsRectEmpty())
+            {
+                if (rcRow.IsRectEmpty())
+                    rcRow = m_bandRects[i];
+                else
+                    rcRow.UnionRect(rcRow, m_bandRects[i]);
+            }
         }
-        if (m_nDragBand != (int)m_bands.GetCount() - 1)
-        {
-            const BandInfo &curBand = m_bands[m_nDragBand];
-            m_bands.RemoveAt(m_nDragBand);
-            m_bands.Add(curBand); // append
-            m_nDragBand = (int)m_bands.GetCount() - 1;
-        }
-        m_bands[m_nDragBand].bNewRow = true;
-        UpdateBandLayout();
+        rowRects.Add(rcRow);
+    }
+    if (numRows <= 0)
         return TRUE;
-    }
 
-    // Inside a row: find row start/end indices
-    int targetRow = rowIndex;
-    int rowStart = 0;
-    int rowCounter = 0;
-    for (int i = 0; i < bandCount; ++i)
+    // 3) Determine the target row from the mouse Y.
+    bool bNewRowAbove = false;
+    bool bNewRowBelow = false;
+    int targetRow = -2; // -2 unset, -1 new row above, >=numRows new row below
+    if (point.y < rowRects[0].top)
     {
-        if (rowCounter == targetRow)
-        {
-            rowStart = i;
-            break;
-        }
-        if (i + 1 < bandCount && m_bands[i + 1].bNewRow)
-            ++rowCounter;
+        targetRow = -1;
+        bNewRowAbove = true;
     }
-    // Compute rowEnd
-    int rowEnd = rowStart;
-    while (rowEnd + 1 < bandCount && !m_bands[rowEnd + 1].bNewRow)
-        ++rowEnd;
-
-    // Within a row, decide insert before/after based on each band's midpoint. Skip self (m_nDragBand).
-    int insertIndex = rowEnd + 1; // Default insert at row end (rowEnd+1)
-    for (int i = rowStart; i <= rowEnd; ++i)
+    else if (point.y > rowRects[numRows - 1].bottom)
     {
-        if (i == m_nDragBand)
-            continue;
-        int midX = (m_bandRects[i].left + m_bandRects[i].right) / 2;
-        if (point.x < midX)
-        {
-            insertIndex = i;
-            break;
-        }
-        // Otherwise insert after i (continue checking the next one)
-        insertIndex = i + 1;
-    }
-
-    // If the insertion position equals the current drag position (unchanged), no reordering needed
-    if (insertIndex == m_nDragBand || insertIndex == m_nDragBand + 1)
-    {
-        // insertIndex == m_nDragBand + 1 means put back to original position (because index shifts left after remove)
-        return TRUE;
-    }
-
-    // First preserve the dragged item's bNewRow semantics and pass to its successor (to avoid loss)
-    bool dragWasNewRow = m_bands[m_nDragBand].bNewRow;
-    if (dragWasNewRow && m_nDragBand + 1 < (int)m_bands.GetCount())
-    {
-        m_bands[m_nDragBand + 1].bNewRow = true;
-    }
-
-    // Perform the actual remove and insert (watch index changes)
-    const BandInfo &curBand = m_bands[m_nDragBand];
-    m_bands.RemoveAt(m_nDragBand);
-    // Adjust insertIndex: if insertIndex is after the removed item, the index shifts left by 1 after removal
-    if (insertIndex > m_nDragBand)
-        insertIndex--;
-    if (insertIndex < 0)
-        insertIndex = 0;
-    if (insertIndex > (int)m_bands.GetCount())
-        insertIndex = (int)m_bands.GetCount();
-
-    m_bands.InsertAt(insertIndex, curBand);
-    m_nDragBand = insertIndex;
-
-    // If inserted at row start, ensure it is the row start; otherwise clear its row-start flag
-    if (insertIndex == rowStart)
-    {
-        m_bands[insertIndex].bNewRow = true;
-        if (insertIndex + 1 < (int)m_bands.GetCount())
-            m_bands[insertIndex + 1].bNewRow = false;
+        targetRow = numRows;
+        bNewRowBelow = true;
     }
     else
     {
-        m_bands[insertIndex].bNewRow = false;
+        for (int r = 0; r < numRows; ++r)
+        {
+            if (point.y <= rowRects[r].bottom)
+            {
+                targetRow = r;
+                break;
+            }
+        }
+        if (targetRow == -2)
+        {
+            targetRow = numRows;
+            bNewRowBelow = true;
+        }
+    }
+
+    // 4) For an existing target row, compute the X insertion position.
+    SArray<int> rowBands;
+    if (!bNewRowAbove && !bNewRowBelow && targetRow >= 0 && targetRow < numRows)
+    {
+        int s = rowStarts[targetRow];
+        int e = (targetRow + 1 < numRows) ? rowStarts[targetRow + 1] - 1 : bandCount - 1;
+        for (int i = s; i <= e; ++i)
+        {
+            if (i == dragBand)
+                continue;
+            rowBands.Add(i);
+        }
+        int pos = (int)rowBands.GetCount();
+        for (int k = 0; k < (int)rowBands.GetCount(); ++k)
+        {
+            int b = rowBands[k];
+            if (b >= (int)m_bandRects.GetCount())
+                continue;
+            int midX = (m_bandRects[b].left + m_bandRects[b].right) / 2;
+            if (point.x < midX)
+            {
+                pos = k;
+                break;
+            }
+            pos = k + 1;
+        }
+        rowBands.InsertAt(pos, dragBand);
+    }
+
+    // 5) Build the new band order and the list of row starters.
+    SArray<int> newOrder;
+    SArray<int> newStarts;
+    SWindow *pDragChild = m_bands[dragBand].pChild;
+
+    if (bNewRowAbove)
+    {
+        newOrder.Add(dragBand);
+        newStarts.Add(0);
+    }
+
+    for (int r = 0; r < numRows; ++r)
+    {
+        int s = rowStarts[r];
+        int e = (r + 1 < numRows) ? rowStarts[r + 1] - 1 : bandCount - 1;
+
+        if (!bNewRowAbove && !bNewRowBelow && r == targetRow)
+        {
+            // Target row: use the reordered rowBands (dragBand already inserted).
+            if ((int)rowBands.GetCount() > 0)
+            {
+                int groupStart = (int)newOrder.GetCount();
+                for (int k = 0; k < (int)rowBands.GetCount(); ++k)
+                    newOrder.Add(rowBands[k]);
+                newStarts.Add(groupStart);
+            }
+        }
+        else
+        {
+            // Keep the original row, but drop the dragged band (it moved out).
+            int groupStart = (int)newOrder.GetCount();
+            bool bHas = false;
+            for (int i = s; i <= e; ++i)
+            {
+                if (i == dragBand)
+                    continue;
+                newOrder.Add(i);
+                bHas = true;
+            }
+            if (bHas)
+                newStarts.Add(groupStart);
+        }
+    }
+
+    if (bNewRowBelow)
+    {
+        int groupStart = (int)newOrder.GetCount();
+        newOrder.Add(dragBand);
+        newStarts.Add(groupStart);
+    }
+
+    if ((int)newOrder.GetCount() != bandCount)
+    {
+        // A row became empty or the dragged band was lost - bail out safely.
+        return TRUE;
+    }
+
+    // 6) Apply: reorder m_bands and refresh bNewRow flags from the new starters.
+    SArray<BandInfo> ordered;
+    for (int k = 0; k < (int)newOrder.GetCount(); ++k)
+        ordered.Add(m_bands[newOrder[k]]);
+
+    m_bands.RemoveAll();
+    for (int k = 0; k < (int)ordered.GetCount(); ++k)
+        m_bands.Add(ordered[k]);
+
+    for (int k = 0; k < (int)m_bands.GetCount(); ++k)
+        m_bands[k].bNewRow = false;
+    for (int k = 0; k < (int)newStarts.GetCount(); ++k)
+        m_bands[newStarts[k]].bNewRow = true;
+
+    // Locate the dragged band again after the reorder.
+    for (int k = 0; k < (int)m_bands.GetCount(); ++k)
+    {
+        if (m_bands[k].pChild == pDragChild)
+        {
+            m_nDragBand = k;
+            break;
+        }
     }
 
     UpdateBandLayout();

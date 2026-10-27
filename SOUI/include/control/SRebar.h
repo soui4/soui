@@ -14,11 +14,15 @@ SNSBEGIN
  * It organizes multiple child windows (bands) together and supports the following features:
  *
  * Main features:
- * - Multi-row layout support: controlled via the singleRow attribute for single-row or multi-row mode
- * - Drag reordering: drag bands via the gripper to change order
+ * - Multi-row layout: when singleRow is false, rows are separated by each band's
+ *   bNewRow flag. A band starts a new row when its init `row` attribute differs
+ *   from the previous band's, and dragging a band to a different vertical position
+ *   creates a new row on demand (MFC CRebar style).
+ * - Locked single-row: when singleRow is true (default) the rebar is always one
+ *   row; dragging only reorders within that row and can NEVER create new rows.
+ * - Drag reordering: drag bands via the gripper to change order within/between rows
  * - Width adjustment: drag the splitter to adjust band width
  * - Collapse function: supports collapsing/expanding bands
- * - Auto wrap: bands can automatically wrap in multi-row mode
  * - Visual feedback: mouse hover highlight and drag state display
  *
  * Usage:
@@ -27,7 +31,14 @@ SNSBEGIN
  * 3. Configure band behavior via attributes (collapse, size limits, etc.)
  *
  * Attributes supported:
- * - singleRow: whether single-row mode (default true)
+ * - singleRow: hard constraint (default true). When true the rebar is locked to a
+ *   single row; dragging a band to a new vertical position only reorders within
+ *   that row and can NEVER create additional rows. When false, multi-row is
+ *   allowed: dragging a band above/below an existing row creates a new row (MFC
+ *   CRebar style), and the per-band `row` attribute sets the initial row.
+ * - row (per band): 0-based initial row index of the band, only effective when
+ *   singleRow is false. A band starts a new row when its row index differs from
+ *   the previous band's. Omitted bands default to row 0.
  * - colorGripper: gripper background color
  * - colorGripperDot: gripper dot color
  */
@@ -52,7 +63,7 @@ class SOUI_EXP SRebar : public SWindow {
         int width;         /**< Current width (used for horizontal Rebar) */
         int minWidth;      /**< Minimum width */
         int maxWidth;      /**< Maximum width */
-        bool bNewRow;      /**< In multi-row mode, true means starting a new row from this band (produced by dragging) */
+        bool bNewRow;      /**< In multi-row mode, true means starting a new row from this band (set at init from the per-band row attribute, or produced by dragging) */
         BandInfo()
             : height(24)
             , bCollapsible(false)
@@ -160,6 +171,16 @@ class SOUI_EXP SRebar : public SWindow {
 
     virtual BOOL CancelCaptureMode(int reason) override;
 
+    /** Override to take full ownership of band children positioning,
+     *  otherwise the default SouiLayout would reposition them by their own
+     *  XML layout params and undo the manual Move() done in UpdateBandLayout. */
+    STDMETHOD_(void, UpdateChildrenPosition)(THIS) OVERRIDE;
+
+    /** Whether a band should occupy space and be drawn.
+     *  A band is hidden when collapsed, when it has no child, or when its
+     *  child is explicitly hidden (e.g. toggled off via menu). */
+    bool IsBandShown(int i) const;
+
     /** Message map */
     SOUI_MSG_MAP_BEGIN()
         MSG_WM_PAINT_EX(OnPaint)
@@ -196,11 +217,14 @@ class SOUI_EXP SRebar : public SWindow {
     bool m_bDragging; /**< Dragging in progress (gripper reorder or splitter resize) */
     bool m_bResizing; /**< true=drag splitter to resize, false=drag gripper to reorder */
     CRect m_rcClient;
-    bool m_bSingleRow; /**< true=single row (default), false=multi-row (bNewRow from dragging determines wrapping) */
+    bool m_bSingleRow; /**< Hard constraint: true = the rebar is locked to a single row (default).
+                             When true, layout ignores every band's bNewRow flag and dragging never
+                             creates a new row. When false, multi-row layout (driven by bNewRow and
+                             the per-band `row` attribute) and drag-to-new-row are enabled. */
 
     /** Attribute map */
     SOUI_ATTRS_BEGIN()
-        ATTR_BOOL(L"singleRow", m_bSingleRow, FALSE)
+        ATTR_BOOL(L"singleRow", m_bSingleRow, TRUE)
         ATTR_COLOR(L"colorGripper", m_crGripper, TRUE)
         ATTR_COLOR(L"colorGripperDot", m_crGripperDot, TRUE)
     SOUI_ATTRS_END()

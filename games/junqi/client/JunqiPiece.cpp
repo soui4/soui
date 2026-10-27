@@ -44,7 +44,7 @@ CJunqiPiece::CJunqiPiece()
     , m_iColor(0)
     , m_bShow(TRUE)
 {
-    m_bMsgTransparent = FALSE;
+    m_msgTransparent = MSGTRANSPARENT_NONE;
     m_pos = { 0, 0 };
     m_target = { 0, 0 };
 }

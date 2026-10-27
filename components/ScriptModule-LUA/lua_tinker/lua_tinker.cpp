@@ -432,6 +432,9 @@ HWND lua_tinker::read(lua_State *L, int index)
 		return *(HWND*)lua_touserdata(L, index);
 }
 
+// swinx：非 Windows 平台 HMENU 是 HWND 的别名（同一种类型），
+// 上面的 HWND 特化已经覆盖 HMENU，重复定义同一个特化会编译失败。
+#ifdef WIN32
 template<>
 HMENU lua_tinker::read(lua_State *L, int index)
 {
@@ -440,6 +443,7 @@ HMENU lua_tinker::read(lua_State *L, int index)
 	else
 		return *(HMENU*)lua_touserdata(L, index);
 }
+#endif
 
 
 template<>
@@ -495,7 +499,6 @@ unsigned long lua_tinker::read ( lua_State *L, int index )
    return ( unsigned long ) lua_tonumber ( L, index );
 }
 
-#ifdef WIN32
 template<>
 HANDLE lua_tinker::read ( lua_State *L, int index )
 {
@@ -508,11 +511,15 @@ HWND lua_tinker::read(lua_State *L, int index)
 	return (HWND)(UINT_PTR)(UINT)lua_tonumber(L, index);
 }
 
+// swinx：非 Windows 平台 HMENU 是 HWND 的别名（同一种类型），
+// 上面的 HWND 特化已经覆盖 HMENU，重复定义同一个特化会编译失败。
+#ifdef WIN32
 template<>
 HMENU lua_tinker::read(lua_State *L, int index)
 {
 	return (HMENU)(UINT_PTR)(UINT)lua_tonumber(L, index);
 }
+#endif
 
 template<>
 HDC lua_tinker::read(lua_State *L, int index)
@@ -531,13 +538,6 @@ HBITMAP lua_tinker::read(lua_State *L, int index)
 {
 	return (HBITMAP)(UINT_PTR)(UINT)lua_tonumber(L, index);
 }
-#else
-template<>
-HGDIOBJ lua_tinker::read(lua_State *L, int index)
-{
-	return (HGDIOBJ)(UINT_PTR)(UINT)lua_tonumber(L, index);
-}
-#endif
 
 template<>
 HINSTANCE lua_tinker::read(lua_State *L, int index)
@@ -699,6 +699,9 @@ void lua_tinker::push(lua_State *L, HWND ret)
 	lua_setmetatable(L, -2);
 }
 
+// swinx：非 Windows 平台 HMENU 是 HWND 的别名（同一种类型），
+// 上面的 HWND 特化已经覆盖 HMENU，重复定义同一个特化会编译失败。
+#ifdef WIN32
 template<>
 void lua_tinker::push(lua_State *L, HMENU ret)
 {
@@ -706,6 +709,7 @@ void lua_tinker::push(lua_State *L, HMENU ret)
 	lua_getglobal(L,"__hmenu");
 	lua_setmetatable(L, -2);
 }
+#endif
 
 template<>
 void lua_tinker::push(lua_State *L, HDC ret)
@@ -752,7 +756,6 @@ void lua_tinker::push ( lua_State *L, unsigned long ret )
    lua_pushnumber ( L, ret );
 }
 
-#ifdef WIN32
 template<>
 void lua_tinker::push ( lua_State *L, HANDLE ret )
 {
@@ -765,11 +768,15 @@ void lua_tinker::push(lua_State *L, HWND ret)
 	lua_pushnumber ( L, ( UINT )(UINT_PTR)ret );
 }
 
+// swinx：非 Windows 平台 HMENU 是 HWND 的别名（同一种类型），
+// 上面的 HWND 特化已经覆盖 HMENU，重复定义同一个特化会编译失败。
+#ifdef WIN32
 template<>
 void lua_tinker::push(lua_State *L, HMENU ret)
 {
 	lua_pushnumber ( L, ( UINT )(UINT_PTR)ret );
 }
+#endif
 
 template<>
 void lua_tinker::push(lua_State *L, HDC ret)
@@ -788,13 +795,6 @@ void lua_tinker::push(lua_State *L, HBITMAP ret)
 {
 	lua_pushnumber ( L, ( UINT )(UINT_PTR)ret );
 }
-#else
-template<>
-void lua_tinker::push(lua_State *L, HGDIOBJ ret)
-{
-	lua_pushnumber ( L, ( UINT )(UINT_PTR)ret );
-}
-#endif
 
 template<>
 void lua_tinker::push(lua_State *L, HINSTANCE ret)
@@ -802,7 +802,8 @@ void lua_tinker::push(lua_State *L, HINSTANCE ret)
 	lua_pushnumber ( L, ( UINT )(UINT_PTR)ret );
 }
 
-#endif
+#endif//defined(__X86_64__) || defined(__X86_64) || defined(__amd_64) || defined(__amd_64__)
+
 
 template<>
 void lua_tinker::push ( lua_State *L, int ret )

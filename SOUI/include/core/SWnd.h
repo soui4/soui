@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright (C) 2014-2050
  * All rights reserved.
  *
@@ -137,6 +137,23 @@ enum WndState
     WndState_Check = 0x00000004UL,     /**< Check state */
     WndState_Invisible = 0x00000008UL, /**< Invisible state */
     WndState_Disable = 0x00000010UL    /**< Disable state */
+};
+
+/**
+ * @enum MsgTransparent
+ * @brief msgTransparent 属性取值，决定窗口是否接收鼠标/键盘消息，以及是否继承父窗口状态。
+ *
+ * - MSGTRANSPARENT_NONE(0):       接收鼠标键盘消息（默认，老版本 msgTransparent=0 行为）。
+ * - MSGTRANSPARENT_TRANSPARENT(1): 不接收消息，消息穿透到下层（老版本 msgTransparent=1 行为）。
+ * - MSGTRANSPARENT_INHERIT(2):     不接收消息，并且 GetState() 返回父窗口的状态。
+ *                                  适用于把子窗口（如按钮的文字、图标）嵌入父窗口中，
+ *                                  使其整体随父窗口状态（hover / pushdown 等）联动显示。
+ */
+enum MsgTransparent
+{
+    MSGTRANSPARENT_NONE = 0,        /**< 接收鼠标键盘消息（默认） */
+    MSGTRANSPARENT_TRANSPARENT = 1, /**< 不接收消息，消息穿透到下层 */
+    MSGTRANSPARENT_INHERIT = 2      /**< 不接收消息并继承父窗口状态 */
 };
 
 /**
@@ -2745,7 +2762,11 @@ SOUI_ATTRS_BEGIN()
     ATTR_CUSTOM(L"trackMouseEvent", OnAttrTrackMouseEvent)
     ATTR_CUSTOM(L"videoCanvas", OnAttrVideoCanvas)
     ATTR_CUSTOM(L"tip", OnAttrTip)
-    ATTR_BOOL(L"msgTransparent", m_bMsgTransparent, FALSE)
+    ATTR_ENUM_BEGIN(L"msgTransparent", MsgTransparent, FALSE)
+        ATTR_ENUM_VALUE(L"none", MSGTRANSPARENT_NONE)
+        ATTR_ENUM_VALUE(L"transparent", MSGTRANSPARENT_TRANSPARENT)
+        ATTR_ENUM_VALUE(L"inherit", MSGTRANSPARENT_INHERIT)
+    ATTR_ENUM_END(m_msgTransparent)
     ATTR_LAYOUTSIZE(L"maxWidth", m_nMaxWidth, FALSE)
     ATTR_BOOL(L"clipClient", m_bClipClient, FALSE)
     ATTR_BOOL(L"focusable", m_bFocusable, FALSE)
@@ -2863,20 +2884,20 @@ int m_nLayer;             /**< Layer of the window. */
 BOOL m_bEnableLayer;      /**< Indicates if the layer is enabled. */
 int m_nUpdateLockCnt;     /**< Update lock count. Prevents Invalidate messages to the host when locked. */
 
-DWORD m_dwState;        /**< State of the window during rendering. */
-BOOL m_bVisible;        /**< Visibility state of the window. */
-BOOL m_bDisable;        /**< Disabled state of the window. */
-BOOL m_bDisplay;        /**< Indicates if the window occupies space when hidden. */
-BOOL m_bClipClient;     /**< Flag indicating if client area clipping is enabled. */
-BOOL m_bMsgTransparent; /**< Message transparency flag. TRUE means no message processing. */
-BOOL m_bFocusable;      /**< Indicates if the window can receive focus. */
-BOOL m_bDrawFocusRect;  /**< Indicates if the default focus rectangle should be drawn. */
-BOOL m_bCacheDraw;      /**< Indicates if the window content is cached. */
-BOOL m_bCacheDirty;     /**< Indicates if the cache is dirty. */
-BOOL m_bLayeredWindow;  /**< Indicates if the window is layered. */
-BOOL m_isLoading;       /**< Loading state flag. */
-BOOL m_bHoverAware;     /**< Hover-aware state flag. */
-BOOL m_bMsgHandled;     /**< Message handled flag. */
+DWORD m_dwState;       /**< State of the window during rendering. */
+BOOL m_bVisible;       /**< Visibility state of the window. */
+BOOL m_bDisable;       /**< Disabled state of the window. */
+BOOL m_bDisplay;       /**< Indicates if the window occupies space when hidden. */
+BOOL m_bClipClient;    /**< Flag indicating if client area clipping is enabled. */
+int m_msgTransparent;  /**< msgTransparent 属性：0-接收消息 1-消息穿透 2-继承父窗口状态 */
+BOOL m_bFocusable;     /**< Indicates if the window can receive focus. */
+BOOL m_bDrawFocusRect; /**< Indicates if the default focus rectangle should be drawn. */
+BOOL m_bCacheDraw;     /**< Indicates if the window content is cached. */
+BOOL m_bCacheDirty;    /**< Indicates if the cache is dirty. */
+BOOL m_bLayeredWindow; /**< Indicates if the window is layered. */
+BOOL m_isLoading;      /**< Loading state flag. */
+BOOL m_bHoverAware;    /**< Hover-aware state flag. */
+BOOL m_bMsgHandled;    /**< Message handled flag. */
 
 LayoutDirtyType m_layoutDirty;         /**< Layout dirty state. */
 SAutoRefPtr<IRenderTarget> m_cachedRT; /**< Cached render target for the window. */
