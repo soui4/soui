@@ -90,7 +90,7 @@ protected:
 
     soui_lua() : m_module(NULL) {}
 
-    void SetUp() override
+    void SetUp()
     {
         IObjRef *pObj = NULL;
         ASSERT_TRUE(m_comMgr.CreateScrpit_Lua(&pObj));
@@ -103,7 +103,7 @@ protected:
         ASSERT_TRUE(m_module != NULL);
     }
 
-    void TearDown() override
+    void TearDown()
     {
         if (m_module)
         {
@@ -128,7 +128,7 @@ protected:
 
     soui_lua_app() : m_app(NULL) {}
 
-    void SetUp() override
+    void SetUp()
     {
         // SApplication ctor：注册窗口类 + _InitApp（创建 SUiDef/SWindowMgr/
         // STimerGenerator/SHostMgr 等单例 + SObjectDefaultRegister 注册全部
@@ -154,7 +154,7 @@ protected:
 		soui_lua::SetUp();
     }
 
-    void TearDown() override
+    void TearDown()
     {
 		soui_lua::TearDown();
         if (m_app)

@@ -173,7 +173,6 @@ namespace SevenZip{
 		return (S_OK == decompress.ExtractArchive(m_fileStreams, NULL, &pwd));
 	}
 
-#ifdef _WIN32
 	BOOL CZipArchive::Open(HMODULE hModule, LPCTSTR pszName, LPCSTR pszPassword, LPCTSTR pszType)
 	{
 		HRSRC hResInfo = ::FindResource(hModule, pszName, pszType);
@@ -197,7 +196,6 @@ namespace SevenZip{
 		decompress.SetArchiveData(hResData,dwLength);
 		return (S_OK == decompress.ExtractArchive(m_fileStreams, NULL, &pwd));
 	}
-#endif // _WIN32
 
 	void CZipArchive::CloseFile()
 	{ 

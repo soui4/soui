@@ -3098,10 +3098,24 @@ tank = {
 	over_wnd = nil, over_visible = false, over_hiding = false, over_reason = nil,
 	sprLayer = nil, geo = nil, sprCache = {}, sprEle = {},
 	key_dir = nil, held = {}, held_order = {},
+	snd_dir = nil,			-- 音效目录缓存(GetAppDir() .. "/snd",首次播放时才取)
 };
 
 function tank_slog(msg)
 	slog("tank: " .. msg);
+end
+
+-- 播放音效:程序资源目录 snd/ 下的 wav(与俄罗斯方块共用同一条通道,构建时由 CMake
+-- 拷入;headless 回归环境没有 PlaySound 导出时静默跳过)。
+-- nostop=true 表示"已有音效在播就放弃这条"(wasm 宿主按 Win32 的 SND_NOSTOP 实现,
+-- Windows 的 AudioPlayer 本身混音、该标志不生效),只给敌坦克开炮用:四辆齐射
+-- 叠在一起会糊成白噪声,不如让玩家的炮声与爆炸声优先。
+function tank_play_snd(name, nostop)
+	if GetAppDir == nil or PlaySound == nil then return end
+	if tank.snd_dir == nil then
+		tank.snd_dir = GetAppDir() .. "/snd/";
+	end
+	PlaySound(tank.snd_dir .. name .. ".wav", nostop and true or false);
 end
 
 -- ==================== 数据层: 地图 / 碰撞 / 移动 ====================
@@ -3265,6 +3279,7 @@ function tank_respawn_player()
 		move_cd = 0, fire_cd = 0, invuln_ms = tank_invuln_ms };
 	tank_anim_snap(tank.player);
 	tank.respawn_ms = 0;
+	tank_play_snd("tank_spawn");
 	return true;
 end
 
@@ -3320,13 +3335,16 @@ function tank_player_fire()
 	if p.fire_cd > 0 then return false end
 	if tank_count_bullets("player") >= tank_player_bullet_max then return false end
 	p.fire_cd = tank_player_fire_cd;
-	return tank_spawn_bullet("player", p) ~= nil;
+	local b = tank_spawn_bullet("player", p);
+	if b ~= nil then tank_play_snd("tank_fire") end
+	return b ~= nil;
 end
 
 function tank_enemy_fire(e)
 	if tank.state ~= "playing" then return end
 	if tank_enemy_bullet_count(e) > 0 then return end
 	tank_spawn_bullet("enemy", e);
+	tank_play_snd("tank_efire", true);
 end
 
 -- 爆炸按格子记录,同格重复命中只保留一个
@@ -3350,6 +3368,7 @@ function tank_kill_enemy(index, vx, vy)
 	tank.killed = tank.killed + 1;
 	local hx, hy = tank_cell_of(vx or e.vx or e.x, vy or e.vy or e.y);
 	tank_add_explosion(hx, hy, 350);
+	tank_play_snd("tank_boom");
 	-- 敌坦克被毁时它自己发出的炮弹一并消失(标记删除,避免和炮弹遍历互相干扰)
 	for _, b in ipairs(tank.bullets) do
 		if b.from == e then b.dead = true end
@@ -3365,6 +3384,7 @@ function tank_player_hit(vx, vy)
 	if p.invuln_ms > 0 then return end
 	local hx, hy = tank_cell_of(vx or p.vx or p.x, vy or p.vy or p.y);
 	tank_add_explosion(hx, hy, 350);
+	tank_play_snd("tank_die");
 	tank.player = nil;
 	tank_keys_clear();
 	tank.lives = tank.lives - 1;
@@ -3434,17 +3454,21 @@ function tank_bullet_arrive(b)
 	if t == tank_T_BRICK then
 		tank.terrain[ny][nx] = tank_T_BRICK_HALF;
 		tank_add_explosion(nx, ny, 150);
+		tank_play_snd("tank_brick");
 		return false
 	elseif t == tank_T_BRICK_HALF then
 		tank.terrain[ny][nx] = tank_T_EMPTY;
 		tank_add_explosion(nx, ny, 150);
+		tank_play_snd("tank_brick");
 		return false
 	elseif t == tank_T_STEEL then
 		tank_add_explosion(nx, ny, 150);
+		tank_play_snd("tank_steel");
 		return false
 	elseif t == tank_T_BASE then
 		tank.terrain[ny][nx] = tank_T_BASE_DEAD;
 		tank_add_explosion(nx, ny, 400);
+		tank_play_snd("tank_die");
 		tank_show_base();
 		tank_game_over("base");
 		return false
@@ -3521,6 +3545,7 @@ function tank_try_spawn_enemy()
 	tank.enemies[#tank.enemies+1] = e;
 	tank.spawned = tank.spawned + 1;
 	tank_add_explosion(sp[1], sp[2], 180);
+	tank_play_snd("tank_spawn");
 	return true;
 end
 
@@ -3609,6 +3634,7 @@ function tank_stage_clear()
 	tank.state = "stageclear";
 	tank.clear_ms = 1800;
 	tank_banner_show("第 " .. tank.stage .. " 关完成  +500");
+	tank_play_snd("tank_stage");
 	tank_score_add(500);
 	tank_set_start_btn(T"开始游戏");
 	tank_show_state();
@@ -4086,6 +4112,7 @@ end
 
 function tank_start()
 	slog("TANK start");
+	tank_play_snd("tank_start");
 	tank_over_hide();
 	tank.score = 0; tank.score_shown = 0;
 	tank.lives = 3; tank.stage = 1;
@@ -4121,6 +4148,7 @@ function tank_game_over(reason)
 	if tank.state == "over" then return end
 	tank.state = "over";
 	tank.over_reason = reason;
+	tank_play_snd("tank_over");
 	tank.pausedFrom = nil;
 	tank_keys_clear();
 	tank_banner_hide();

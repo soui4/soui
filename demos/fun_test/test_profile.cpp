@@ -1,4 +1,4 @@
-/**
+﻿/**
  * swinx INI profile APIs (GetPrivateProfile* /WritePrivateProfile* roundtrip).
  */
 #include <gtest/gtest.h>
@@ -24,12 +24,12 @@ static std::string iniPath()
 
 class ProfileTest : public ::testing::Test {
 protected:
-    void SetUp() override
+    void SetUp()
     {
         path = iniPath();
         DeleteFileA(path.c_str());
     }
-    void TearDown() override
+    void TearDown()
     {
         DeleteFileA(path.c_str());
     }

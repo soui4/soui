@@ -194,6 +194,13 @@ class SOUI_EXP SSkinImgList : public SSkinObjBase {
     SAutoRefPtr<IBitmapS> GetSvgCacheBitmap(IRenderTarget *pRT, int cxPerState, int cyPerState) const;
 
     /**
+     * @brief Drops every rasterized SVG cache slot.
+     * @details Not internally locked: callers must hold m_cs (or be in a
+     *          construction / single-threaded context).
+     */
+    void ClearSvgCache() const;
+
+    /**
      * @brief One-lock accessor for the drawing path: fetches BOTH the bitmap
      *        and the SVG object (either one is NULL) and performs the lazy
      *        load when neither has been loaded yet.
@@ -215,8 +222,17 @@ class SOUI_EXP SSkinImgList : public SSkinObjBase {
   protected:
     mutable SAutoRefPtr<ISvgObj> m_pSvg;       /**< Pointer to the SVG object */
     mutable SAutoRefPtr<IBitmapS> m_pImg;      /**< Pointer to the bitmap source */
-    mutable SAutoRefPtr<IBitmapS> m_pCacheBmp; /**< Rasterized SVG cache bitmap (contains all states) */
-    mutable CSize m_szPerStateCache;           /**< Per-state size used to generate the cache bitmap (cache key) */
+    enum
+    {
+        kSvgCacheSlots = 4
+    };
+    struct SSvgCacheSlot
+    {
+        SAutoRefPtr<IBitmapS> bmp;
+        CSize sz;
+    };
+    mutable SSvgCacheSlot m_aSvgCache[kSvgCacheSlots];
+    mutable int m_nSvgCacheNext;
     mutable SStringW m_strSrc;                 /**< Source string for the image */
     BOOL m_bLazyLoad;                          /**< Flag to indicate lazy loading */
     BOOL m_bCacheSvg;                          /**< Cache SVG as bitmap for drawing (enabled by default) */

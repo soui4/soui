@@ -509,6 +509,16 @@ void SHexEdit::CalculatePaintingDetails(IRenderTarget *pRT)
     }
     // count of visible lines
     GetClientRect(m_tPaintDetails.cPaintingRect);
+    // 滚动条浮在客户区右/下边缘上：可见时内容区必须让出其宽度/高度，
+    // 否则文字会画到滚动条底下 —— 轨道皮肤位图本身是全透明的（sys_scrollbar
+    // 的 SB_PAGEUP 部分无像素），文字就会从滚动条里透出来。
+    if (HasScrollBar(TRUE))
+        m_tPaintDetails.cPaintingRect.right -= GetSbWidth();
+    if (HasScrollBar(FALSE))
+        m_tPaintDetails.cPaintingRect.bottom -= GetSbWidth();
+    // 15px 常量随缩放同步放大，与 MeasureText 返回的物理字宽同口径
+    m_tPaintDetails.nAdrSpace = MulDiv(ADR_DATA_SPACE, GetScale(), 100);
+    m_tPaintDetails.nAsciiSpace = MulDiv(DATA_ASCII_SPACE, GetScale(), 100);
     if (true)
     {
         m_tPaintDetails.cPaintingRect.InflateRect(-CONTROL_BORDER_SPACEH, -CONTROL_BORDER_SPACEV, -CONTROL_BORDER_SPACEH, -CONTROL_BORDER_SPACEV);
@@ -552,7 +562,7 @@ void SHexEdit::CalculatePaintingDetails(IRenderTarget *pRT)
     if (m_bShowAddress)
     {
         m_tPaintDetails.nAddressPos = 0;
-        m_tPaintDetails.nAddressLen = ADR_DATA_SPACE + m_tPaintDetails.nCharacterWidth * m_nAdrSize;
+        m_tPaintDetails.nAddressLen = m_tPaintDetails.nAdrSpace + m_tPaintDetails.nCharacterWidth * m_nAdrSize;
     }
     else
     {
@@ -566,7 +576,7 @@ void SHexEdit::CalculatePaintingDetails(IRenderTarget *pRT)
         int iFreeSpace = m_tPaintDetails.cPaintingRect.Width() - m_tPaintDetails.nAddressLen;
         if (m_bShowAscii)
         {
-            iFreeSpace -= DATA_ASCII_SPACE;
+            iFreeSpace -= m_tPaintDetails.nAsciiSpace;
             if (iFreeSpace < 0)
             {
                 m_tPaintDetails.nBytesPerRow = 1;
@@ -614,7 +624,7 @@ void SHexEdit::CalculatePaintingDetails(IRenderTarget *pRT)
     m_tPaintDetails.nHexLen = (m_tPaintDetails.nBytesPerRow * 2 + m_tPaintDetails.nBytesPerRow - 1) * m_tPaintDetails.nCharacterWidth;
     // 2(HEXData) + 1(Space) (only n-1 spaces needed)
     int iWidth = m_tPaintDetails.nHexPos + m_tPaintDetails.nHexLen;
-    m_tPaintDetails.nHexLen += DATA_ASCII_SPACE;
+    m_tPaintDetails.nHexLen += m_tPaintDetails.nAsciiSpace;
 
     // position & size of the ascii-data
     if (m_bShowAscii)
@@ -678,7 +688,7 @@ void SHexEdit::PaintColNumber(IRenderTarget *pRT)
     cAdrFormatString.Format(_T("%%0%uX"), m_nColNumberSize);
     // the Rect for painting & background
     cAdrRect.left += m_tPaintDetails.nAddressLen - m_nScrollPostionX;
-    cAdrRect.right = cAdrRect.left + m_tPaintDetails.nAddressLen - ADR_DATA_SPACE; // without border
+    cAdrRect.right = cAdrRect.left + m_tPaintDetails.nAddressLen - m_tPaintDetails.nAdrSpace; // without border
     pRT->FillSolidRect(cAdrRect, m_tAdrBkgCol);
     cAdrRect.bottom = cAdrRect.top + m_tPaintDetails.nLineHeight;
 
@@ -706,7 +716,7 @@ void SHexEdit::PaintAddresses(IRenderTarget *pRT)
     cAdrRect.top += m_tPaintDetails.nColNumberPos;
     // the Rect for painting & background
     cAdrRect.left += m_tPaintDetails.nAddressPos - m_nScrollPostionX;
-    cAdrRect.right = cAdrRect.left + m_tPaintDetails.nAddressLen - ADR_DATA_SPACE; // without border
+    cAdrRect.right = cAdrRect.left + m_tPaintDetails.nAddressLen - m_tPaintDetails.nAdrSpace; // without border
     pRT->FillSolidRect(cAdrRect, m_tAdrBkgCol);
     cAdrRect.bottom = cAdrRect.top + m_tPaintDetails.nLineHeight;
 
@@ -758,7 +768,7 @@ void SHexEdit::PaintHexData(IRenderTarget *pRT)
     cHexRect.top += m_tPaintDetails.nColNumberPos;
     // the Rect for painting & background
     cHexRect.left += m_tPaintDetails.nHexPos - m_nScrollPostionX;
-    cHexRect.right = cHexRect.left + m_tPaintDetails.nHexLen - DATA_ASCII_SPACE;
+    cHexRect.right = cHexRect.left + m_tPaintDetails.nHexLen - m_tPaintDetails.nAsciiSpace;
     pRT->FillSolidRect(cHexRect, m_tHexBkgCol);
     cHexRect.bottom = cHexRect.top + m_tPaintDetails.nLineHeight;
 
@@ -1116,13 +1126,19 @@ void SHexEdit::SetScrollPositionY(UINT nPosition, bool bUpdate)
     {
         nPosition = m_nScrollRangeY;
     }
-    if ((nPosition != m_nScrollPostionY) && bUpdate)
+    if (nPosition != m_nScrollPostionY)
     {
         m_nScrollPostionY = nPosition;
-        Invalidate();
+        // 把新位置回写到 SPanel 的 SCROLLINFO（滑块视觉状态），否则键盘/滚轮
+        // 滚动后滑块不动。SetScrollPos -> OnScroll(SB_THUMBPOSITION) 只更新
+        // m_siVer.nPos，OnVScroll 不处理该码，无递归。
+        SetScrollPos(SSB_VERT, (int)nPosition, TRUE);
+        if (bUpdate)
+        {
+            Invalidate();
+        }
     }
     SetEditCaretPos(m_nCurrentAddress, m_bHighBits);
-    m_nScrollPostionY = nPosition;
 }
 
 void SHexEdit::SetScrollPositionX(UINT nPosition, bool bUpdate)
@@ -1131,13 +1147,17 @@ void SHexEdit::SetScrollPositionX(UINT nPosition, bool bUpdate)
     {
         nPosition = m_nScrollRangeX;
     }
-    if ((nPosition != m_nScrollPostionX) && bUpdate)
+    if (nPosition != m_nScrollPostionX)
     {
         m_nScrollPostionX = nPosition;
-        Invalidate();
-        SetEditCaretPos(m_nCurrentAddress, m_bHighBits);
+        // 同 SetScrollPositionY：回写滑块状态
+        SetScrollPos(SSB_HORZ, (int)nPosition, TRUE);
+        if (bUpdate)
+        {
+            Invalidate();
+            SetEditCaretPos(m_nCurrentAddress, m_bHighBits);
+        }
     }
-    m_nScrollPostionX = nPosition;
 }
 
 void SHexEdit::MoveScrollPostionY(int iDelta, bool bUpdate)
@@ -1344,9 +1364,9 @@ void SHexEdit::GetAddressFromPoint(const CPoint &cPt, UINT &nAddress, bool &bHig
     else
     {
         cPoint.x -= m_tPaintDetails.nHexPos;
-        if (cPoint.x >= (LONG)m_tPaintDetails.nHexLen - DATA_ASCII_SPACE)
+        if (cPoint.x >= (LONG)m_tPaintDetails.nHexLen - m_tPaintDetails.nAsciiSpace)
         {
-            cPoint.x = (LONG)m_tPaintDetails.nHexLen - DATA_ASCII_SPACE - 1;
+            cPoint.x = (LONG)m_tPaintDetails.nHexLen - m_tPaintDetails.nAsciiSpace - 1;
             m_bCaretAtLineEnd = true;
         }
     }

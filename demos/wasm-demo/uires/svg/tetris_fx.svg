@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  tetris_fx.svg - 俄罗斯方块消行特效:横向光波(nanosvg 兼容)
+  一条中心向两端渐隐的横向光带,青(左)->白芯->紫(右),取自 tetris_blocks.svg
+  的 I/J 块配色;配合 anim:tetris_fx_beam(中心向两侧展开后淡出)使用。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="24" viewBox="0 0 240 24">
+  <defs>
+    <linearGradient id="beam" x1="0" y1="0" x2="240" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#22C3E8" stop-opacity="0"/>
+      <stop offset="0.18" stop-color="#22C3E8" stop-opacity="0.55"/>
+      <stop offset="0.40" stop-color="#7DE8FA" stop-opacity="0.95"/>
+      <stop offset="0.50" stop-color="#FFFFFF" stop-opacity="1"/>
+      <stop offset="0.60" stop-color="#B79BF7" stop-opacity="0.95"/>
+      <stop offset="0.82" stop-color="#9C6BF0" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#9C6BF0" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="core" x1="0" y1="0" x2="240" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0"/>
+      <stop offset="0.30" stop-color="#FFFFFF" stop-opacity="0.85"/>
+      <stop offset="0.50" stop-color="#FFFFFF" stop-opacity="1"/>
+      <stop offset="0.70" stop-color="#FFFFFF" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 外层光晕(柔和宽带) -->
+  <rect x="0" y="2" width="240" height="20" rx="10" fill="url(#beam)" opacity="0.75"/>
+  <!-- 主光带 -->
+  <rect x="0" y="4" width="240" height="16" rx="8" fill="url(#beam)"/>
+  <!-- 白色高光芯 -->
+  <rect x="0" y="9" width="240" height="6" rx="3" fill="url(#core)"/>
+</svg>

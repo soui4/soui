@@ -1,0 +1,374 @@
+<!doctype html>
+<!--
+  index.html -- swinx wasm 裸窗口演示的 JS 宿主（Emscripten --shell-file）
+
+  这一页只做四件事，正好对应 src/platform/wasm/ 的四个宿主接缝：
+
+    1. 按 SwinxFbWidth()/Height()/Stride() 建同尺寸 canvas 和一块全画布 ImageData；
+       帧缓冲是 libswinx.a 里的静态 .bss，尺寸在编译期就定了，页面不能自己猜。
+    2. 实现 Module.swinxPresent(l,t,r,b)：这是 SwinxSetFbPresentCb() 注册的上屏
+       回调，由 EndPaint -> ReleaseDC -> commitCanvas() 触发，参数是屏幕坐标的
+       脏矩形。这里把脏矩形内的 ARGB32 像素转成 ImageData 的 RGBA 字节，再
+       putImageData 的脏子矩形——不需要每帧全窗拷贝。
+       换算：帧缓冲 uint32(小端) = 0xAARRGGBB（cairo ARGB32，预乘），
+       ImageData 要 R,G,B,A 字节。把 ImageData 的 buffer 当 Uint32Array 写，
+       小端下等价于 (A<<24)|(B<<16)|(G<<8)|R，所以是
+         out = (v & 0xFF00FF00) | ((v & 0xFF) << 16) | ((v >> 16) & 0xFF)
+       保留 A、G，交换 R/B。wasm 内存按规范是小端，浏览器宿主也都是小端，
+       所以这个式子两端都成立；本演示像素 alpha 恒为 255，预乘与直色等价。
+    3. 把 DOM 的指针/键盘事件翻译成 SwinxInjectMouse/SwinxInjectKey 调用。
+       canvas 像素坐标 == 屏幕坐标（窗口在 (0,0) 且尺寸 == 帧缓冲），
+       所以不需要再加窗口原点。
+    4. 读 C++ 侧计数器刷新数据面板；泵本身在 wasm 里由
+       emscripten_set_main_loop 驱动，页面不掺和。
+
+  页面文字说明放在 DOM 里而不是画在窗口里：浏览器内 fontconfig 没有字体目录，
+  swinx 的 TextOut 拿不到字形（阶段 2 预置 TTF 后才会把文字画进窗口）。
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>swinx WebAssembly 裸窗口演示</title>
+<style>
+  :root { color-scheme: dark; }
+  body {
+    margin: 0; padding: 16px 20px 40px;
+    background: #0d1117; color: #d6e2f0;
+    font: 14px/1.6 ui-sans-serif, "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+  }
+  h1 { font-size: 18px; margin: 0 0 4px; font-weight: 600; }
+  p.lead { margin: 0 0 14px; color: #8fa3b8; }
+  .wrap { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-start; }
+  canvas#screen {
+    width: 800px; height: 600px;
+    background: #000; border: 1px solid #2b3a4d; border-radius: 4px;
+    outline: none; touch-action: none; cursor: crosshair;
+  }
+  canvas#screen:focus { border-color: #4ea1ff; }
+  .panel {
+    min-width: 320px; max-width: 420px; flex: 1 1 320px;
+    background: #111a24; border: 1px solid #2b3a4d; border-radius: 4px;
+    padding: 12px 14px;
+  }
+  .panel h2 { font-size: 13px; margin: 0 0 8px; color: #7fd1b9; font-weight: 600; }
+  .panel + .panel { margin-top: 14px; }
+  dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; margin: 0; }
+  dt { color: #8fa3b8; }
+  dd { margin: 0; font-variant-numeric: tabular-nums; }
+  ul.tips { margin: 6px 0 0; padding-left: 18px; color: #8fa3b8; }
+  ul.tips li { margin: 2px 0; }
+  .btns { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; }
+  button {
+    background: #1c2b3d; color: #d6e2f0; border: 1px solid #33506e;
+    border-radius: 4px; padding: 5px 10px; font: inherit; cursor: pointer;
+  }
+  button:hover { border-color: #4ea1ff; }
+  #log { margin-top: 10px; color: #ffb08a; min-height: 1.4em; }
+  code { background: #0b1420; padding: 1px 4px; border-radius: 3px; }
+</style>
+</head>
+<body>
+  <h1>swinx WebAssembly 裸窗口演示</h1>
+  <p class="lead">
+    <code>RegisterClassA/CreateWindowExA</code> + <code>PeekMessage</code> 泵 +
+    <code>BeginPaint</code>/cairo 绘制 + <code>SwinxInjectMouse/SwinxInjectKey</code> 输入 +
+    脏矩形上屏。不依赖 SOUI 上层，只链 <code>libswinx.a</code>。
+  </p>
+
+  <div class="wrap">
+    <div>
+      <canvas id="screen" tabindex="0" aria-label="swinx 虚拟窗口画面"></canvas>
+      <div class="btns">
+        <button id="repaint" type="button">全窗重绘</button>
+        <button id="fakeclick" type="button">注入一次中心点击</button>
+        <button id="arrow" type="button">注入一次方向键</button>
+      </div>
+      <div id="log"></div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <h2>wasm 侧计数（由 <code>SwinxDemoStat</code> 读出）</h2>
+        <dl>
+          <dt>消息泵轮数</dt><dd id="s_pump">-</dd>
+          <dt>WM_PAINT 次数</dt><dd id="s_paint">-</dd>
+          <dt>WM_TIMER 次数</dt><dd id="s_timer">-</dd>
+          <dt>鼠标按下次数</dt><dd id="s_mouse">-</dd>
+          <dt>鼠标移动次数</dt><dd id="s_move">-</dd>
+          <dt>按键 down/up 次数</dt><dd id="s_key">-</dd>
+          <dt>WM_CHAR 次数</dt><dd id="s_char">-</dd>
+          <dt>GetTickCount</dt><dd id="s_tick">-</dd>
+        </dl>
+      </div>
+
+      <div class="panel">
+        <h2>JS 宿主侧（脏矩形上屏）</h2>
+        <dl>
+          <dt>帧缓冲</dt><dd id="j_fb">-</dd>
+          <dt>上屏次数</dt><dd id="j_blits">-</dd>
+          <dt>本次脏矩形</dt><dd id="j_rect">-</dd>
+          <dt>本次像素数</dt><dd id="j_area">-</dd>
+          <dt>累计拷贝像素</dt><dd id="j_pixels">-</dd>
+          <dt>节省比例</dt><dd id="j_saved">-</dd>
+          <dt>面板刷新 FPS</dt><dd id="j_fps">-</dd>
+        </dl>
+      </div>
+
+      <div class="panel">
+        <h2>操作</h2>
+        <ul class="tips">
+          <li>在黑色画面上移动鼠标：十字光标随 <code>WM_MOUSEMOVE</code> 走，每次只上屏 24×24 的两小块。</li>
+          <li>左键：留下一个圈（<code>WM_LBUTTONDOWN</code>）。攒满 24 个会整窗重绘一次。</li>
+          <li>右键：换标题带配色（<code>WM_RBUTTONDOWN</code>），脏矩形是标题带那一条。</li>
+          <li>方向键：移动右下角的圆角方块（两块 60×60 脏矩形）；其它键换配色。</li>
+          <li>进度条和转盘由 <code>SetTimer(50ms)</code> 驱动，脏矩形固定在动画带。</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    // ---- 宿主状态 ----------------------------------------------------------
+    const canvas = document.getElementById('screen');
+    const ctx = canvas.getContext('2d', { alpha: false });
+    const logEl = document.getElementById('log');
+
+    // Module 就是工厂函数的入参对象，也是它的返回值：这里先挂上上屏回调，
+    // wasm 侧 main() 里的第一次绘制就能立刻通知到宿主（不必等 Promise resolve）。
+    //
+    // 关于就绪时机：emscripten 在实例化前就把 Module._Xxx 装成"一调就 abort"的
+    // 占位函数（生成代码里的 makeInvalidEarlyAccess），所以 `typeof
+    // Module._SwinxDemoStat === 'function'` 这种判断是无效的，必须自己记 ready。
+    // 运行时的顺序是 initRuntime()（此时导出函数才可用）-> onRuntimeInitialized
+    // -> callMain()，所以挂在 onRuntimeInitialized 上既早于第一次绘制，又晚于
+    // 导出函数生效。
+    const Module = {
+      canvas: canvas,
+      print: (...a) => console.log(...a),
+      printErr: (...a) => console.error(...a),
+      swinxPresent: presentDirtyRect,
+      onRuntimeInitialized: onWasmReady,
+    };
+
+    let ready = false;    // 导出函数是否已经可用
+    let fb = null;        // { w, h, stride }
+    let img = null;       // 全画布 ImageData，反复复用
+    let img32 = null;     // img.data.buffer 的 Uint32Array 视图（小端）
+    let blits = 0, copiedPixels = 0, fullFramePixels = 0;
+    let lastRect = '-', lastArea = 0;
+
+    function fail(msg) { logEl.textContent = msg; console.error(msg); }
+
+    function onWasmReady() {
+      ready = true;
+      if (!ensureSurface()) { fail('运行时已就绪但拿不到帧缓冲尺寸'); return; }
+      // 整帧补一次：建窗期间那次 WM_PAINT 的像素已经在帧缓冲里，
+      // 这里是宿主"接上"已有帧缓冲的动作，而不是重新绘制。
+      presentDirtyRect(0, 0, fb.w, fb.h);
+    }
+
+    // 帧缓冲尺寸/像素指针只有在运行时就绪（导出函数生效）之后才拿得到。
+    function ensureSurface() {
+      if (fb) return true;
+      if (!ready || !Module.HEAPU32) return false;
+      const w = Module._SwinxFbWidth();
+      const h = Module._SwinxFbHeight();
+      const stride = Module._SwinxFbStride();
+      if (w < 1 || h < 1 || stride < w) { fail('帧缓冲尺寸异常: ' + w + 'x' + h + ' stride ' + stride); return false; }
+      canvas.width = w;
+      canvas.height = h;
+      // CSS 尺寸跟着帧缓冲走，保持 1:1 像素；canvasPoint() 仍按比例换算，
+      // 所以即使以后改成自适应缩放也不会错位。
+      canvas.style.width = w + 'px';
+      canvas.style.height = h + 'px';
+      img = ctx.createImageData(w, h);
+      img32 = new Uint32Array(img.data.buffer);
+      fullFramePixels = w * h;
+      fb = { w: w, h: h, stride: stride };
+      document.getElementById('j_fb').textContent = w + ' x ' + h + ' (stride ' + stride + ', ARGB32)';
+      return true;
+    }
+
+    // swinx 每次 EndPaint 后调过来；(l,t,r,b) 是屏幕坐标，也即 canvas 像素坐标。
+    function presentDirtyRect(l, t, r, b) {
+      if (!ready || !ensureSurface()) return;
+      if (l < 0) l = 0;
+      if (t < 0) t = 0;
+      if (r > fb.w) r = fb.w;
+      if (b > fb.h) b = fb.h;
+      if (l >= r || t >= b) return;
+
+      // 每次重新取视图：ALLOW_MEMORY_GROWTH 扩容后堆会换 ArrayBuffer。
+      const heap = Module.HEAPU32;
+      // 帧缓冲基址（字节）——指针是导出函数，返回线性内存偏移。
+      const base = Module._SwinxFbBits() >>> 2;
+      const w = r - l;
+      for (let y = t; y < b; ++y) {
+        let src = base + y * fb.stride + l;
+        let dst = y * fb.w + l;
+        for (let x = 0; x < w; ++x) {
+          const v = heap[src + x];
+          img32[dst + x] = (v & 0xFF00FF00) | ((v & 0xFF) << 16) | ((v >> 16) & 0xFF);
+        }
+      }
+      // 只把脏子矩形画上去：dx/dy=0 因为 img 本身就是整幅帧缓冲的镜像。
+      ctx.putImageData(img, 0, 0, l, t, w, b - t);
+
+      ++blits;
+      copiedPixels += w * (b - t);
+      lastArea = w * (b - t);
+      lastRect = l + ',' + t + ' - ' + r + ',' + b;
+    }
+
+    // ---- Win32 常量（与 swinx/include 的定义一致，JS 侧只能硬编码） --------
+    const WM_MOUSEMOVE = 0x0200, WM_LBUTTONDOWN = 0x0201, WM_LBUTTONUP = 0x0202;
+    const WM_RBUTTONDOWN = 0x0204, WM_RBUTTONUP = 0x0205, WM_MBUTTONDOWN = 0x0207, WM_MBUTTONUP = 0x0208;
+    const WM_KEYDOWN = 0x0100, WM_KEYUP = 0x0101, WM_SYSKEYDOWN = 0x0104, WM_SYSKEYUP = 0x0105;
+    const MK_LBUTTON = 0x0001, MK_RBUTTON = 0x0002, MK_MBUTTON = 0x0010;
+    const VK_BACK = 0x08, VK_TAB = 0x09, VK_RETURN = 0x0D, VK_SHIFT = 0x10,
+          VK_CONTROL = 0x11, VK_MENU = 0x12, VK_PAUSE = 0x13, VK_CAPITAL = 0x14,
+          VK_ESCAPE = 0x1B, VK_SPACE = 0x20, VK_PRIOR = 0x21, VK_NEXT = 0x22,
+          VK_END = 0x23, VK_HOME = 0x24, VK_LEFT = 0x25, VK_UP = 0x26,
+          VK_RIGHT = 0x27, VK_DOWN = 0x28, VK_INSERT = 0x2D, VK_DELETE = 0x2E;
+
+    const KEY_MAP = {
+      Backspace: VK_BACK, Tab: VK_TAB, Enter: VK_RETURN, Shift: VK_SHIFT,
+      Control: VK_CONTROL, Alt: VK_MENU, Pause: VK_PAUSE, CapsLock: VK_CAPITAL,
+      Escape: VK_ESCAPE, ' ': VK_SPACE, PageUp: VK_PRIOR, PageDown: VK_NEXT,
+      End: VK_END, Home: VK_HOME, ArrowLeft: VK_LEFT, ArrowUp: VK_UP,
+      ArrowRight: VK_RIGHT, ArrowDown: VK_DOWN, Insert: VK_INSERT, Delete: VK_DELETE,
+    };
+    function vkFromEvent(e) {
+      const k = e.key;
+      if (k === undefined || k === 'Unidentified') return 0;
+      if (k.length === 1) return k.toUpperCase().charCodeAt(0); // A-Z / 0-9 / 符号
+      if (k in KEY_MAP) return KEY_MAP[k];
+      const f = /^F([1-9]|1[0-2])$/.exec(k);                    // F1..F12 -> VK_F1..VK_F12 (0x70..0x7B)
+      if (f) return 0x70 + Number(f[1]) - 1;
+      return 0;
+    }
+
+    // ---- 输入注入：DOM 事件 -> swinx 消息队列 ------------------------------
+    function canvasPoint(e) {
+      const rc = canvas.getBoundingClientRect();
+      // CSS 尺寸可能与帧缓冲尺寸不同（本页默认 1:1），按比例换算。
+      const x = Math.floor((e.clientX - rc.left) * fb.w / rc.width);
+      const y = Math.floor((e.clientY - rc.top) * fb.h / rc.height);
+      return [Math.max(0, Math.min(fb.w - 1, x)), Math.max(0, Math.min(fb.h - 1, y))];
+    }
+
+    function buttonMessages(e) {
+      let keys = 0;
+      if (e.buttons & 1) keys |= MK_LBUTTON;
+      if (e.buttons & 2) keys |= MK_RBUTTON;
+      if (e.buttons & 4) keys |= MK_MBUTTON;
+      return keys;
+    }
+
+    function hookInput() {
+      canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+
+      canvas.addEventListener('pointermove', (e) => {
+        if (!ready || !fb) return;
+        const [x, y] = canvasPoint(e);
+        Module._SwinxDemoMouse(WM_MOUSEMOVE, x, y, buttonMessages(e));
+      });
+      const downMsg = { 0: WM_LBUTTONDOWN, 1: WM_MBUTTONDOWN, 2: WM_RBUTTONDOWN };
+      const upMsg = { 0: WM_LBUTTONUP, 1: WM_MBUTTONUP, 2: WM_RBUTTONUP };
+      canvas.addEventListener('pointerdown', (e) => {
+        if (!ready || !fb) return;
+        e.preventDefault(); canvas.focus();
+        const [x, y] = canvasPoint(e);
+        Module._SwinxDemoMouse(downMsg[e.button] || WM_LBUTTONDOWN, x, y, buttonMessages(e));
+      });
+      canvas.addEventListener('pointerup', (e) => {
+        if (!ready || !fb) return;
+        const [x, y] = canvasPoint(e);
+        Module._SwinxDemoMouse(upMsg[e.button] || WM_LBUTTONUP, x, y, buttonMessages(e));
+      });
+      canvas.addEventListener('pointerleave', (e) => {
+        if (!ready || !fb) return;
+        // 离开画面：把光标停在边界，避免窗口里留着中间位置的十字。
+        const [x, y] = canvasPoint(e);
+        Module._SwinxDemoMouse(WM_MOUSEMOVE, x, y, buttonMessages(e));
+      });
+
+      const sysKey = (e) => e.altKey || e.key === 'F10';
+      window.addEventListener('keydown', (e) => {
+        if (!ready) return;
+        if (e.target && /INPUT|TEXTAREA|SELECT|BUTTON/.test(e.target.tagName)) return;
+        const vk = vkFromEvent(e);
+        if (!vk) return;
+        if (vk !== VK_TAB) e.preventDefault(); // 留给键盘焦点切换
+        // scanCode 在本端口只填进 lParam 高位，不参与 WM_CHAR 生成
+        // （wasm/SConnection::TranslateMessage 直接按 vk 判定 ASCII），所以传 0。
+        Module._SwinxDemoKey(sysKey(e) ? WM_SYSKEYDOWN : WM_KEYDOWN, vk, 0);
+      });
+      window.addEventListener('keyup', (e) => {
+        if (!ready) return;
+        const vk = vkFromEvent(e);
+        if (!vk) return;
+        Module._SwinxDemoKey(sysKey(e) ? WM_SYSKEYUP : WM_KEYUP, vk, 0);
+      });
+
+      document.getElementById('repaint').addEventListener('click', () => {
+        if (ready) Module._SwinxDemoRepaint();
+      });
+      document.getElementById('fakeclick').addEventListener('click', () => {
+        if (!ready || !fb) return;
+        const x = fb.w >> 1, y = (fb.h >> 1) + 60;
+        Module._SwinxDemoMouse(WM_LBUTTONDOWN, x, y, MK_LBUTTON);
+        Module._SwinxDemoMouse(WM_LBUTTONUP, x, y, 0);
+      });
+      document.getElementById('arrow').addEventListener('click', () => {
+        if (!ready) return;
+        Module._SwinxDemoKey(WM_KEYDOWN, VK_LEFT, 0);
+        Module._SwinxDemoKey(WM_KEYUP, VK_LEFT, 0);
+      });
+    }
+
+    // ---- 数据面板 ----------------------------------------------------------
+    const STAT_IDS = ['s_pump', 's_paint', 's_timer', 's_mouse', 's_key', 's_char', 's_move'];
+    let frames = 0, fpsAt = performance.now();
+    function tickPanel(now) {
+      ++frames;
+      if (ready) {
+        // 下标顺序与 main.cpp 的 SwinxDemoStat() 保持一致
+        for (let i = 0; i < STAT_IDS.length; ++i)
+          document.getElementById(STAT_IDS[i]).textContent = String(Module._SwinxDemoStat(i));
+        document.getElementById('s_tick').textContent = String(Module._SwinxDemoStat(7));
+      }
+      document.getElementById('j_blits').textContent = String(blits);
+      document.getElementById('j_rect').textContent = lastRect;
+      document.getElementById('j_area').textContent = blits ? String(lastArea) : '-';
+      document.getElementById('j_pixels').textContent = String(copiedPixels);
+      document.getElementById('j_saved').textContent = blits && fullFramePixels
+        ? (100 * (1 - copiedPixels / (blits * fullFramePixels))).toFixed(1) + '% （相对整帧拷贝）'
+        : '-';
+      if (now - fpsAt >= 1000) {
+        document.getElementById('j_fps').textContent = (frames * 1000 / (now - fpsAt)).toFixed(1);
+        frames = 0; fpsAt = now;
+      }
+      requestAnimationFrame(tickPanel);
+    }
+
+    // ---- 启动：先挂输入和面板，再等 wasm 运行时就绪 ------------------------
+    hookInput();
+    requestAnimationFrame(tickPanel);
+
+    window.onerror = window.onunhandledrejection = (ev) => {
+      fail('运行时异常，详见控制台: ' + (ev && ev.message ? ev.message : ev));
+    };
+  </script>
+  {{{ SCRIPT }}}
+  <script type="text/javascript">
+    // 工厂函数的入参对象就是返回的实例，所以上面预挂的 Module.swinxPresent
+    // 在 main() 执行期间已经生效。就绪判定走 onRuntimeInitialized，这里只兜底
+    // 把实例化失败暴露到页面上（Promise 在 run() 之后才 resolve）。
+    createSwinxDemo(Module).then(() => {
+      if (!ready) onWasmReady();
+    }).catch((e) => fail('模块实例化失败: ' + e));
+  </script>
+</body>
+</html>

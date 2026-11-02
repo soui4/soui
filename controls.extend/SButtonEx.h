@@ -1,7 +1,6 @@
 ﻿#pragma once
 
-namespace SOUI
-{
+SNSBEGIN
 class SButtonEx : public SButton {
     DEF_SOBJECT(SButton, L"buttonex")
 
@@ -68,4 +67,4 @@ class SButtonEx : public SButton {
     bool m_bIconVisible;
 };
 
-} // namespace SOUI
+SNSEND

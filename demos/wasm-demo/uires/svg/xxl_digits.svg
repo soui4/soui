@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  xxl_digits.svg - 消消乐 LED 数字雪碧图(nanosvg 兼容)
+  10 帧横排,每帧 32x48,总尺寸 320x48。
+  经典七段 LED:深色面板 + 暗段常显 + 亮段红光(线性渐变)。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="48" viewBox="0 0 320 48">
+  <defs>
+    <linearGradient id="gLED" gradientUnits="userSpaceOnUse" x1="0" y1="4" x2="0" y2="44">
+      <stop offset="0" stop-color="#FF6B60"/>
+      <stop offset="0.5" stop-color="#F0392E"/>
+      <stop offset="1" stop-color="#C22218"/>
+    </linearGradient>
+  </defs>
+  <!-- 帧0:数字0 -->
+  <g transform="translate(0,0)">
+    <rect x="0.5" y="0.5" width="31" height="47" rx="5" fill="#20242C" stroke="#0C0E12"/>
+    <rect x="8.5" y="21.75" width="15" height="4.5" rx="2.2" fill="#3A2222" opacity="0.85"/>
+    <rect x="8.5" y="4" width="15" height="4.5" rx="2.2" fill="url(#gLED)"/>
+    <rect x="23.5" y="10" width="4.5" height="13" rx="2.2" fill="url(#gLED)"/>
+    <rect x="23.5" y="28" width="4.5" height="13" rx="2.2" fill="url(#gLED)"/>
+    <rect x="8.5" y="39.5" width="15" height="4.5" rx="2.2" fill="url(#gLED)"/>
+    <rect x="4" y="28" width="4.5" height="13" rx="2.2" fill="url(#gLED)"/>
+    <rect x="4" y="10" width="4.5" height="13" rx="2.2" fill="url(#gLED)"/>
+  </g>
+  <!-- 帧1:数字1 -->
+  <g transform="translate(32,0)">
+    <rect x="0.5" y="0.5" width="31" height="47" rx="5" fill="#20242C" stroke="#0C0E12"/>
+    <rect x="8.5" y="4" width="15" height="4.5" rx="2.2" fill="#3A2222" opacity="0.85"/>
+    <rect x="8.5" y="39.5" width="15" height="4.5" rx="2.2" fill="#3A2222" opacity="0.85"/>
+    <rect x="4" y="28" width="4.5" height="13" rx="2.2" fill="#3A2222" opacity="0.85"/>
+    <rect x="4" y="10" width="4.5" height="13" rx="2.2" fill="#3A2222" opacity="0.85"/>
+    <rect x="8.5" y="21.75" width="15" height="4.5" rx="2.2" fill="#3A2222" opacity="0.85"/>
+    <rect x="23.5" y="10" width="4.5" height="13" rx="2.2" fill="url(#gLED)"/>
+    <rect x="23.5" y="28" width="4.5" height="13" rx="2.2" fill="url(#gLED)"/>
+  </g>
+  <!-- 帧2:数字2 -->
+  <g transform="translate(64,0)">
+    <rect x="0.5" y="0.5" width="31" height="47" rx="5" fill="#20242C" stroke="#0C0E12"/>
+    <rect x="23.5" y="28" width="4.5" height="13" rx="2.2" fill="#3A2222" opacity="0.85"/>
+    <rect x="4" y="10" width="4.5" height="13" rx="2.2" fill="#3A2222" opacity="0.85"/>
+    <rect x="8.5" y="4" width="15" height="4.5" rx="2.2" fill="url(#gLED)"/>
+    <rect x="23.5" y="10" width="4.5" height="13" rx="2.2" fill="url(#gLED)"/>
+    <rect x="8.5" y="21.75" width="15" height="4.5" rx="2.2" fill="url(#gLED)"/>
+    <rect x="4" y="28" width="4.5" height="13" rx="2.2" fill="url(#gLED)"/>
+    <rect x="8.5" y="39.5" width="15" height="4.5" rx="2.2" fill="url(#gLED)"/>
+  </g>
+  <!-- 帧3:数字3 -->
+  <g transform="translate(96,0)">
+    <rect x="0.5" y="0.5" width="31" height="47" rx="5" fill="#20242C" stroke="#0C0E12"/>
+    <rect x="4" y="28" width="4.5" height="13" rx="2.2" fill="#3A2222" opacity="0.85"/>
+    <rect x="4" y="10" width="4.5" height="13" rx="2.2" fill="#3A2222" opacity="0.85"/>
+    <rect x="8.5" y="4" width="15" height="4.5" rx="2.2" fill="url(#gLED)"/>
+    <rect x="23.5" y="10" width="4.5" height="13" rx="2.2" fill="url(#gLED)"/>
+    <rect x="8.5" y="21.75" width="15" height="4.5" rx="2.2" fill="url(#gLED)"/>
+    <rect x="23.5" y="28" width="4.5" height="13" rx="2.2" fill="url(#gLED)"/>
+    <rect x="8.5" y="39.5" width="15" height="4.5" rx="2.2" fill="url(#gLED)"/>
+  </g>
+  <!-- 帧4:数字4 -->
+  <g transform="translate(128,0)">
+    <rect x="0.5" y="0.5" width="31" height="47" rx="5" fill="#20242C" stroke="#0C0E12"/>
+    <rect x="8.5" y="4" width="15" height="4.5" rx="2.2" fill="#3A2222" opacity="0.85"/>
+    <rect x="8.5" y="39.5" width="15" height="4.5" rx="2.2" fill="#3A2222" opacity="0.85"/>
+    <rect x="4" y="28" width="4.5" height="13" rx="2.2" fill="#3A2222" opacity="0.85"/>
+    <rect x="4" y="10" width="4.5" height="13" rx="2.2" fill="url(#gLED)"/>
+    <rect x="8.5" y="21.75" width="15" height="4.5" rx="2.2" fill="url(#gLED)"/>
+    <rect x="23.5" y="10" width="4.5" height="13" rx="2.2" fill="url(#gLED)"/>
+    <rect x="23.5" y="28" width="4.5" height="13" rx="2.2" fill="url(#gLED)"/>
+  </g>
+  <!-- 帧5:数字5 -->
+  <g transform="translate(160,0)">
+    <rect x="0.5" y="0.5" width="31" height="47" rx="5" fill="#20242C" stroke="#0C0E12"/>
+    <rect x="23.5" y="10" width="4.5" height="13" rx="2.2" fill="#3A2222" opacity="0.85"/>
+    <rect x="4" y="28" width="4.5" height="13" rx="2.2" fill="#3A2222" opacity="0.85"/>
+    <rect x="8.5" y="4" width="15" height="4.5" rx="2.2" fill="url(#gLED)"/>
+    <rect x="4" y="10" width="4.5" height="13" rx="2.2" fill="url(#gLED)"/>
+    <rect x="8.5" y="21.75" width="15" height="4.5" rx="2.2" fill="url(#gLED)"/>
+    <rect x="23.5" y="28" width="4.5" height="13" rx="2.2" fill="url(#gLED)"/>
+    <rect x="8.5" y="39.5" width="15" height="4.5" rx="2.2" fill="url(#gLED)"/>
+  </g>
+  <!-- 帧6:数字6 -->
+  <g transform="translate(192,0)">
+    <rect x="0.5" y="0.5" width="31" height="47" rx="5" fill="#20242C" stroke="#0C0E12"/>
+    <rect x="23.5" y="10" width="4.5" height="13" rx="2.2" fill="#3A2222" opacity="0.85"/>
+    <rect x="8.5" y="4" width="15" height="4.5" rx="2.2" fill="url(#gLED)"/>
+    <rect x="4" y="10" width="4.5" height="13" rx="2.2" fill="url(#gLED)"/>
+    <rect x="8.5" y="21.75" width="15" height="4.5" rx="2.2" fill="url(#gLED)"/>
+    <rect x="4" y="28" width="4.5" height="13" rx="2.2" fill="url(#gLED)"/>
+    <rect x="8.5" y="39.5" width="15" height="4.5" rx="2.2" fill="url(#gLED)"/>
+    <rect x="23.5" y="28" width="4.5" height="13" rx="2.2" fill="url(#gLED)"/>
+  </g>
+  <!-- 帧7:数字7 -->
+  <g transform="translate(224,0)">
+    <rect x="0.5" y="0.5" width="31" height="47" rx="5" fill="#20242C" stroke="#0C0E12"/>
+    <rect x="8.5" y="39.5" width="15" height="4.5" rx="2.2" fill="#3A2222" opacity="0.85"/>
+    <rect x="4" y="28" width="4.5" height="13" rx="2.2" fill="#3A2222" opacity="0.85"/>
+    <rect x="4" y="10" width="4.5" height="13" rx="2.2" fill="#3A2222" opacity="0.85"/>
+    <rect x="8.5" y="21.75" width="15" height="4.5" rx="2.2" fill="#3A2222" opacity="0.85"/>
+    <rect x="8.5" y="4" width="15" height="4.5" rx="2.2" fill="url(#gLED)"/>
+    <rect x="23.5" y="10" width="4.5" height="13" rx="2.2" fill="url(#gLED)"/>
+    <rect x="23.5" y="28" width="4.5" height="13" rx="2.2" fill="url(#gLED)"/>
+  </g>
+  <!-- 帧8:数字8 -->
+  <g transform="translate(256,0)">
+    <rect x="0.5" y="0.5" width="31" height="47" rx="5" fill="#20242C" stroke="#0C0E12"/>
+    <rect x="8.5" y="4" width="15" height="4.5" rx="2.2" fill="url(#gLED)"/>
+    <rect x="23.5" y="10" width="4.5" height="13" rx="2.2" fill="url(#gLED)"/>
+    <rect x="23.5" y="28" width="4.5" height="13" rx="2.2" fill="url(#gLED)"/>
+    <rect x="8.5" y="39.5" width="15" height="4.5" rx="2.2" fill="url(#gLED)"/>
+    <rect x="4" y="28" width="4.5" height="13" rx="2.2" fill="url(#gLED)"/>
+    <rect x="4" y="10" width="4.5" height="13" rx="2.2" fill="url(#gLED)"/>
+    <rect x="8.5" y="21.75" width="15" height="4.5" rx="2.2" fill="url(#gLED)"/>
+  </g>
+  <!-- 帧9:数字9 -->
+  <g transform="translate(288,0)">
+    <rect x="0.5" y="0.5" width="31" height="47" rx="5" fill="#20242C" stroke="#0C0E12"/>
+    <rect x="4" y="28" width="4.5" height="13" rx="2.2" fill="#3A2222" opacity="0.85"/>
+    <rect x="8.5" y="4" width="15" height="4.5" rx="2.2" fill="url(#gLED)"/>
+    <rect x="23.5" y="10" width="4.5" height="13" rx="2.2" fill="url(#gLED)"/>
+    <rect x="23.5" y="28" width="4.5" height="13" rx="2.2" fill="url(#gLED)"/>
+    <rect x="8.5" y="39.5" width="15" height="4.5" rx="2.2" fill="url(#gLED)"/>
+    <rect x="4" y="10" width="4.5" height="13" rx="2.2" fill="url(#gLED)"/>
+    <rect x="8.5" y="21.75" width="15" height="4.5" rx="2.2" fill="url(#gLED)"/>
+  </g>
+</svg>

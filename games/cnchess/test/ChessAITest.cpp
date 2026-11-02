@@ -60,6 +60,36 @@ namespace
     {
         return m.pt1.x < 0 || m.pt1.y < 0;
     }
+
+    // 执行一步历史着法, 并把搜索引擎需要的 MOVESTEP 记录到历史
+    void PlayMove(CChessLayout &layout, std::vector<MOVESTEP> &history,
+                  int x1, int y1, int x2, int y2)
+    {
+        POINT pt1 = { x1, y1 };
+        POINT pt2 = { x2, y2 };
+        MOVESTEP ms = layout.Move(pt1, pt2);
+        history.push_back(ms);
+    }
+
+    // 走完候选着法后是否触发长将/长捉判负
+    bool TriggersRepeatLoss(CChessLayout &layout, const std::vector<MOVESTEP> &history,
+                            const MOVESTEP &candidate, int nMaxJiang, int nMaxCatch)
+    {
+        CChessLayout sim;
+        sim.Copy(&layout);
+        MOVESTEP played = sim.Move(candidate.pt1, candidate.pt2);
+
+        std::vector<MOVESTEP> withCandidate = history;
+        withCandidate.push_back(played);
+
+        CHESSMAN chsEnemy = CHSMAN_NULL;
+        int nRepeat = (int)CChessLayout::GetFarthestRepeat(sim, withCandidate, chsEnemy);
+        if (chsEnemy == CHSMAN_RED_JIANG || chsEnemy == CHSMAN_BLK_JIANG)
+            return nRepeat >= nMaxJiang;
+        if (chsEnemy != CHSMAN_NULL)
+            return nRepeat >= nMaxCatch;
+        return false;
+    }
 }
 
 // 智力等级 -> 搜索深度 映射
@@ -326,4 +356,109 @@ TEST(ChessAITest, SearchDoesNotMutateLayout)
     for (int y = 0; y < 10; y++)
         for (int x = 0; x < 9; x++)
             EXPECT_EQ((int)idBefore[y][x], layout.m_nChsID[y][x]);
+}
+
+// 长将检测: 红车在(4,5)/(3,5)之间往返将军, 黑将在(4,0)/(3,0)之间往返躲避。
+// 历史最后再走 (3,5)->(4,5) 时, 应识别出重复走子步数并可被上层判负。
+TEST(ChessAITest, DetectsLongCheckRepeat)
+{
+    int board[10][9];
+    ClearBoard(board);
+    board[0][4] = CHSMAN_BLK_JIANG; // 黑将 (4,0)
+    board[9][5] = CHSMAN_RED_JIANG; // 红帅 (5,9)
+    board[5][3] = CHSMAN_RED_JU;    // 红车 (3,5)
+
+    CChessLayout layout;
+    layout.InitLayout(board, CS_RED);
+    std::vector<MOVESTEP> history;
+
+    PlayMove(layout, history, 3, 5, 4, 5); // 红车将军
+    PlayMove(layout, history, 4, 0, 3, 0); // 黑将躲避
+    PlayMove(layout, history, 4, 5, 3, 5); // 红车再将军
+    PlayMove(layout, history, 3, 0, 4, 0); // 黑将回位
+
+    POINT pt1 = { 3, 5 };
+    POINT pt2 = { 4, 5 };
+    MOVESTEP candidate = layout.Move(pt1, pt2); // 再次将军, 形成重复
+
+    std::vector<MOVESTEP> withCandidate = history;
+    withCandidate.push_back(candidate);
+
+    CHESSMAN chsEnemy = CHSMAN_NULL;
+    UINT nRepeat = CChessLayout::GetFarthestRepeat(layout, withCandidate, chsEnemy);
+    EXPECT_EQ(CHSMAN_BLK_JIANG, chsEnemy);
+    EXPECT_GE((int)nRepeat, 3) << "应识别出长将的重复走子步数";
+}
+
+// 长捉检测: 红车在(0,4)/(1,4)之间往返追捉同一只无根黑车, 黑车在(0,0)/(1,0)之间躲。
+TEST(ChessAITest, DetectsLongCatchRepeat)
+{
+    int board[10][9];
+    ClearBoard(board);
+    board[0][4] = CHSMAN_BLK_JIANG; // 黑将 (4,0)
+    board[9][5] = CHSMAN_RED_JIANG; // 红帅 (5,9)
+    board[4][1] = CHSMAN_RED_JU;    // 红车 (1,4)
+    board[0][0] = CHSMAN_BLK_JU;    // 黑车 (0,0), 无根
+
+    CChessLayout layout;
+    layout.InitLayout(board, CS_RED);
+    std::vector<MOVESTEP> history;
+
+    PlayMove(layout, history, 1, 4, 0, 4); // 红车追捉黑车
+    PlayMove(layout, history, 0, 0, 1, 0); // 黑车躲
+    PlayMove(layout, history, 0, 4, 1, 4); // 红车继续追捉
+    PlayMove(layout, history, 1, 0, 0, 0); // 黑车回位
+
+    POINT pt1 = { 1, 4 };
+    POINT pt2 = { 0, 4 };
+    MOVESTEP candidate = layout.Move(pt1, pt2); // 再次追捉, 形成重复
+
+    std::vector<MOVESTEP> withCandidate = history;
+    withCandidate.push_back(candidate);
+
+    CHESSMAN chsEnemy = CHSMAN_NULL;
+    UINT nRepeat = CChessLayout::GetFarthestRepeat(layout, withCandidate, chsEnemy);
+    EXPECT_EQ(CHSMAN_BLK_JU, chsEnemy);
+    EXPECT_GE((int)nRepeat, 3) << "应识别出长捉的重复走子步数";
+}
+
+// 机器人走棋时应利用参数传入的走棋历史避开长将判负着法,
+// 同时不得修改调用方传入的局面与历史(每步在独立线程执行, 数据需本地备份)。
+TEST(ChessAITest, RobotAvoidsLongCheckRepeat)
+{
+    int board[10][9];
+    ClearBoard(board);
+    board[0][4] = CHSMAN_BLK_JIANG; // 黑将 (4,0)
+    board[9][5] = CHSMAN_RED_JIANG; // 红帅 (5,9)
+    board[5][3] = CHSMAN_RED_JU;    // 红车 (3,5)
+
+    CChessLayout layout;
+    layout.InitLayout(board, CS_RED);
+    std::vector<MOVESTEP> history;
+
+    PlayMove(layout, history, 3, 5, 4, 5); // 红车将军
+    PlayMove(layout, history, 4, 0, 3, 0); // 黑将躲避
+    PlayMove(layout, history, 4, 5, 3, 5); // 红车再将军
+    PlayMove(layout, history, 3, 0, 4, 0); // 黑将回位
+
+    const int nMaxJiang = 3;
+    const int nMaxCatch = 3;
+    CHESSMAN before[10][9];
+    SaveBoard(before, layout);
+    size_t nHistoryBefore = history.size();
+
+    MOVESTEP best = CChessAI::SearchBestMove(layout, 2, 0, history, nMaxJiang, nMaxCatch);
+    ASSERT_FALSE(IsInvalidMove(best)) << "应能找到合规的替代着法";
+
+    // 被过滤的重复将军着法不允许返回
+    EXPECT_FALSE(best.pt1.x == 3 && best.pt1.y == 5
+                 && best.pt2.x == 4 && best.pt2.y == 5)
+        << "机器人不应继续长将";
+
+    // 返回着法走完后不能立即触发长将/长捉判负
+    EXPECT_FALSE(TriggersRepeatLoss(layout, history, best, nMaxJiang, nMaxCatch));
+
+    // 搜索必须在本地副本上工作, 不修改调用方的局面与历史
+    EXPECT_TRUE(BoardsEqual(before, layout.m_chesses));
+    EXPECT_EQ(nHistoryBefore, history.size());
 }

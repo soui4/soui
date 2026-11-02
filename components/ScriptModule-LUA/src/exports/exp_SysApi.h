@@ -1,16 +1,21 @@
 ﻿#include <windows.h>
 #include <SPlaySound.h>
 
-// PlaySound(path):播放 wav 音效(异步播放,SND_NOSTOP 不打断已有音效)。
+// PlaySound(path[, nostop]):播放 wav 音效(异步播放)。
 // path:wav 文件绝对路径,仅支持文件播放(SND_FILENAME)。
-// 返回:true=已提交播放(异步,不代表声音已播完);false=失败。
+// nostop:可选,缺省 true —— 带 SND_NOSTOP,已有音效在播就不打断它。wasm 宿主按
+//   Win32 语义实现该标志(有一路在响就丢弃新的这条);Windows 的 AudioPlayer 自己
+//   混音、标志无效。需要"炮声压过背景音效"的游戏(如坦克大战)传 false,让多条叠加。
+// 返回:true=已提交播放(异步,不代表声音已播完);false=失败或被 NOSTOP 丢弃。
 static int Lua_PlaySound(lua_State *L)
 {
 	const char *path = lua_tostring(L, 1);
 	if (path == NULL || path[0] == '\0')
 		return 0;
+	int bNoStop = (lua_gettop(L) >= 2) ? lua_toboolean(L, 2) : 1;
 	SStringT str = S_CA2T(path,CP_UTF8);
-	BOOL bRet = SPlaySound(str, NULL, SND_FILENAME | SND_ASYNC | SND_NOSTOP);
+	DWORD dwFlags = SND_FILENAME | SND_ASYNC | (bNoStop ? SND_NOSTOP : 0);
+	BOOL bRet = SPlaySound(str, NULL, dwFlags);
 	lua_pushboolean(L, bRet ? 1 : 0);
 	return 1;
 }

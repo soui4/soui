@@ -1,0 +1,4 @@
+<window name="richedit_root" width="400" height="200">
+    <edit name="re_plain" size="-2,40" autoHscroll="1"/>
+    <edit name="re_number" size="-2,40" number="1" autoHscroll="1"/>
+</window>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  uires.idx -- wasm 展示页的资源索引
+
+  SResProviderFiles::Init() 读的就是这个文件：<类型>/<file name= path=/>，
+  path 相对本目录。浏览器里这个目录要整体 --preload-file 进 MEMFS，挂载路径由
+  soui_main.cpp 的 kAppResDir 给出。
+
+  <lua> 组的键名没有意义：SHostWnd 解析 <script src="lua:games_script"> 时把冒号
+  前的部分当资源类型、后面当名字，最终落到 SResProviderFiles::GetRawBuffer。
+  也就是说脚本和 XML 走的是同一条资源索引链，不需要额外挂一个脚本加载器。
+
+  <svg>/<anim>/<animator>/<valueAni> 四组按名字回到这里查路径：skin 表里的
+  src="svg:名字"、lua 里的 GetApp():LoadAnimation("anim:名字") 与
+  GetApp():LoadValueAnimator("valueAni:名字") 都走同一条索引链。名字要和源文件名
+  一致（大小写也算），因为 SOUI 的资源名查找不区分大小写只在 Windows 的皮肤上
+  成立，索引本身是精确匹配。
+-->
+<resource>
+  <UIDEF>
+    <file name="XML_INIT" path="uidef/init.xml"/>
+  </UIDEF>
+  <LAYOUT>
+    <file name="XML_MAINWND" path="xml/dlg_main.xml"/>
+    <!-- Lua 游戏页：内层 tabctrl 三个子页（消消乐 / 俄罗斯方块 / 坦克大战），
+         由主布局的 <include src="layout:XML_PAGE_GAME"/> 引到 "Lua 游戏" 页里。
+         没有用 lua_panel.xml 那套 CreateChildrenFromResId 的容器写法：这一页的
+         内容不是脚本创建的，而是标准布局 + 脚本按名字找控件。 -->
+    <file name="XML_PAGE_GAME" path="xml/page_game.xml"/>
+    <!-- 模态表单页：宿主用 BeginModalViewSession(L"layout:XML_MODAL_FORM") 创建
+         SModalRoot，检索表单一节在 dlg_main.xml 的「模态表单」页里。 -->
+    <file name="XML_MODAL_FORM" path="xml/modal_form.xml"/>
+  </LAYOUT>
+  <lua>
+    <file name="games_script" path="lua/games.lua"/>
+  </lua>
+  <values>
+    <file name="string" path="values/string.xml"/>
+    <file name="color" path="values/color.xml"/>
+    <!-- skin：全部 src="svg:..."（要求 SOUI_ENABLE_SVG，见 values/skin.xml 顶部）；
+         template：t:g.xxl_ele（消消乐棋子）与 t:g.xxl_digit（七段 LED 数字位）。 -->
+    <file name="skin" path="values/skin.xml"/>
+    <file name="template" path="values/template.xml"/>
+  </values>
+  <svg>
+    <file name="mvc_prog_fill" path="svg/mvc_prog_fill.svg"/>
+    <file name="mvc_prog_track" path="svg/mvc_prog_track.svg"/>
+    <file name="star" path="svg/star.svg"/>
+    <file name="tank" path="svg/tank.svg"/>
+    <file name="tank_wall" path="svg/tank_wall.svg"/>
+    <file name="tetris_blocks" path="svg/tetris_blocks.svg"/>
+    <file name="tetris_fx" path="svg/tetris_fx.svg"/>
+    <file name="tetris_key_lr" path="svg/tetris_key_lr.svg"/>
+    <file name="tetris_key_p" path="svg/tetris_key_p.svg"/>
+    <file name="tetris_key_space" path="svg/tetris_key_space.svg"/>
+    <file name="tetris_key_ud" path="svg/tetris_key_ud.svg"/>
+    <file name="xxl_btn_hint" path="svg/xxl_btn_hint.svg"/>
+    <file name="xxl_btn_primary" path="svg/xxl_btn_primary.svg"/>
+    <file name="xxl_btn_restart" path="svg/xxl_btn_restart.svg"/>
+    <file name="xxl_btn_secondary" path="svg/xxl_btn_secondary.svg"/>
+    <file name="xxl_btn_shuffle" path="svg/xxl_btn_shuffle.svg"/>
+    <file name="xxl_digits" path="svg/xxl_digits.svg"/>
+    <file name="xxl_fx" path="svg/xxl_fx.svg"/>
+    <file name="xxl_fx2" path="svg/xxl_fx2.svg"/>
+    <file name="xxl_icons" path="svg/xxl_icons.svg"/>
+  </svg>
+  <anim>
+    <file name="tank_over_card_in" path="anim/tank_over_card_in.xml"/>
+    <file name="tank_over_card_out" path="anim/tank_over_card_out.xml"/>
+    <file name="tank_over_mask_in" path="anim/tank_over_mask_in.xml"/>
+    <file name="tank_over_mask_out" path="anim/tank_over_mask_out.xml"/>
+    <file name="tetris_fx_beam" path="anim/tetris_fx_beam.xml"/>
+    <file name="tetris_over_card_in" path="anim/tetris_over_card_in.xml"/>
+    <file name="tetris_over_card_out" path="anim/tetris_over_card_out.xml"/>
+    <file name="tetris_over_mask_in" path="anim/tetris_over_mask_in.xml"/>
+    <file name="tetris_over_mask_out" path="anim/tetris_over_mask_out.xml"/>
+    <file name="xxl_fx_pop" path="anim/xxl_fx_pop.xml"/>
+    <file name="xxl_fx_pop_fly" path="anim/xxl_fx_pop_fly.xml"/>
+    <file name="xxl_fx_ring" path="anim/xxl_fx_ring.xml"/>
+    <file name="xxl_scale_select" path="anim/xxl_scale_select.xml"/>
+    <!-- 动画页（dlg_main.xml 的「动画」页）：三段独立补间动画，由宿主的
+         btn_anim_tween 用 LoadAnimation("anim:名字") + SetAnimation 挂到目标窗口。 -->
+    <file name="anim_demo_alpha" path="anim/anim_demo_alpha.xml"/>
+    <file name="anim_demo_rotate" path="anim/anim_demo_rotate.xml"/>
+    <file name="anim_demo_translate" path="anim/anim_demo_translate.xml"/>
+    <!-- 模态表单页的 SModalView 进出场动画（modal_form.xml 里的
+         enterAnimation / exitAnimation）。 -->
+    <file name="modal_form_in" path="anim/modal_form_in.xml"/>
+    <file name="modal_form_out" path="anim/modal_form_out.xml"/>
+  </anim>
+  <animator>
+    <file name="xxl_move" path="animator/xxl_move.xml"/>
+  </animator>
+  <valueAni>
+    <!-- 动画页的 SValueAnimator 演示：LoadValueAnimator("valueAni:名字")，值本身
+         不绑定控件，由 CWasmHostWnd::onAnimationUpdate 消费。 -->
+    <file name="anim_demo_color" path="valueAni/anim_demo_color.xml"/>
+    <file name="anim_demo_float" path="valueAni/anim_demo_float.xml"/>
+  </valueAni>
+</resource>

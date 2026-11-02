@@ -2,8 +2,7 @@
 #include <vector>
 #include <string>
 
-namespace SOUI
-{
+SNSBEGIN
 class SByteArray {
   public:
     SByteArray();
@@ -63,4 +62,4 @@ class SByteArray {
     std::vector<BYTE> m_data;
 };
 
-} // namespace SOUI
+SNSEND

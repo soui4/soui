@@ -1,8 +1,7 @@
 ﻿#include "stdafx.h"
 #include "SMaskWnd.h"
 
-namespace SOUI
-{
+SNSBEGIN
 	SMaskWnd::SMaskWnd(void)
 	{
 		m_bLayeredWindow = TRUE;
@@ -131,4 +130,4 @@ namespace SOUI
 		MakeMaskTemp();
 	}
 
-} // namespace SOUI
+SNSEND

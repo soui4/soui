@@ -48,13 +48,13 @@ public:
     jobject getApplicationContext() const{return m_javaCtx;}
 
     /** 创建窗口（与 Win32 CreateWindowEx 语义一致）。@return 新窗口 HWND，失败返回 0。 */
-    UINT_PTR createWindow(UINT_PTR hParent,
+    HWND createWindow(HWND hParent,
                           const char* pszClsName, const char* pszTitle,
                           DWORD dwStyle, DWORD dwExStyle,
                           int x, int y, int nWidth, int nHeight,
-                          UINT_PTR hMenu, UINT_PTR hInstance, LPVOID lpParam);
+                          HMENU hMenu, UINT_PTR hInstance, LPVOID lpParam);
 
-    BOOL destroyWindow(UINT_PTR hWnd);
+    BOOL destroyWindow(HWND hWnd);
 
     HWND getWindow(HWND hWnd,int code);
 
@@ -83,7 +83,7 @@ public:
     void onTimerExpired(HWND hWnd, UINT_PTR timerId);
 
     /** 绑定 screenId 到原生屏幕 HWND。 */
-    void setScreenHwnd(jlong screenId, UINT_PTR hwnd);
+    void setScreenHwnd(jlong screenId, HWND hWnd);
     void eraseScreen(jlong screenId);
     HWND getScreenHwnd(jlong screenId) const;
     int getScreenWidth(jlong screenId) const;
@@ -92,11 +92,11 @@ public:
     int getScreenWidth() const;
     int getScreenHeight() const;
 
-    HWND setCapture(UINT_PTR hwnd);
+    HWND setCapture(HWND hWnd);
     BOOL releaseCapture();
 
     /** 设置输入焦点。@return 原焦点 HWND，无返回 0。 */
-    HWND setFocus(UINT_PTR hwnd);
+    HWND setFocus(HWND hWnd);
     /** 获取当前输入焦点。@return 焦点 HWND，无返回 0。 */
     HWND getFocus() const;
 
@@ -105,7 +105,7 @@ public:
      * 字符串参数通过字符串槽交换，纯数值消息按 Win32 语义传递。
      * @return LRESULT
      */
-    LRESULT sendMessage(UINT_PTR hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+    LRESULT sendMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
     /** 分配字符串槽，返回正整数 id（范围 [1..65535]，0 保留为无效）。 */
     int stringSlotAlloc(const char * pszStr);
@@ -158,10 +158,10 @@ public:
     BOOL clipboardHasFormat(UINT format);
 
     /** 向指定 HWND 发送 WM_IME_CHAR 消息。 */
-    void sendImeString(UINT_PTR hwnd, const char *utf8, size_t len);
+    void sendImeString(HWND hWnd, const char *utf8, size_t len);
 
     /** 将 HWND 转换为 Android View。@return View jobject LocalRef。 */
-    jobject hwndAsView(UINT_PTR hWnd);
+    jobject hwndAsView(HWND hWnd);
 
     /** 注册 nativeId 到 SouiSurfaceProxy 的映射。 */
     bool nativeViewInsert(jlong nativeId, std::shared_ptr<SouiSurfaceProxy> nativeView);
@@ -173,7 +173,7 @@ public:
     bool nativeViewErase(jlong nativeId);
 
     /** 检查 HWND 是否有效。 */
-    bool isValidHwnd(UINT_PTR hWnd) const;
+    bool isValidHwnd(HWND hWnd) const;
 
     UINT getRawInputDeviceList(PRAWINPUTDEVICELIST pRawInputDeviceList, PUINT puiNumDevices, UINT cbSize);
     UINT getRawInputDeviceInfoA(HRAWINPUT hDevice, UINT uiCommand, LPVOID pData, PUINT pcbSize);
@@ -234,10 +234,10 @@ private:
 
     AndroidPlatformAPI &operator=(const AndroidPlatformAPI &) = delete;
 
-    jobject HwndObj(UINT_PTR hWnd);
-    jobject HwndLocalObj(UINT_PTR hWnd);
+    jobject HwndObj(HWND hWnd);
+    jobject HwndLocalObj(HWND hWnd);
 
-    void unregisterWindowTimersInternal(UINT_PTR hWnd);
+    void unregisterWindowTimersInternal(HWND hWnd);
 
     POINT m_lastCursorPos;
     std::atomic<DWORD> m_mouseButtons{0};  // MK_LBUTTON | MK_RBUTTON | MK_MBUTTON
@@ -249,7 +249,7 @@ private:
     std::atomic<int> m_slotNextId{1};  // 0 保留为 invalid
     // 定时器条目：hWnd → (timerId → entry)；与 Java mBridgeTimerMap 镜像，但 C++ 层仅
     // 记录 TIMERPROC 回调与元数据，真正调度由 Java Handler 完成。
-    std::unordered_map<UINT_PTR, std::unordered_map<UINT_PTR, AndroidTimerEntry>> m_timerEntries;
+    std::unordered_map<HWND, std::unordered_map<UINT_PTR, AndroidTimerEntry>> m_timerEntries;
 
     // SouiSurfaceProxy 实例全局映射（并发 lookup 用 shared_ptr 保证安全）
     mutable std::mutex m_nativeViewMutex;

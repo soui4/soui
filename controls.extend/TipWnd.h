@@ -1,7 +1,6 @@
 #pragma once
 
-namespace SOUI
-{
+SNSBEGIN
 class STipWnd : public SHostWnd {
 	typedef SHostWnd __baseCls;
   public:
@@ -35,4 +34,4 @@ class STipWnd : public SHostWnd {
     CPoint m_ptAnchor;
     AnchorType m_anchorType;
 };
-} // namespace SOUI
+SNSEND

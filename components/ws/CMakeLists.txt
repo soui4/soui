@@ -3,6 +3,20 @@ set(CMAKE_CXX_STANDARD 11)
 include_directories(${SOUI_ROOT_DIR}/utilities/include)
 include_directories(${SOUI_ROOT_DIR}/SOUI/include)
 
+# wasm 下不用 libwebsockets（它会拉起自己的事件循环和工作线程），改用浏览器原生
+# WebSocket。实现只保留客户端；链接期需要 -lwebsocket.js，否则
+# emscripten_websocket_new 是未定义符号。
+if(EMSCRIPTEN)
+    add_library(ws STATIC
+        src/wasm/WsClientWasm.cpp
+        src/wasm/WsClientWasm.h
+        src/wasm/WsWasm.cpp)
+    target_link_libraries(ws PUBLIC utilities4 swinx websocket.js)
+    set(COM_LIBS ${COM_LIBS} ws CACHE INTERNAL "com_lib")
+    set_target_properties(ws PROPERTIES FOLDER components)
+    return()
+endif()
+
 file(GLOB HEADERS src/*.h)
 file(GLOB SOURCES src/*.cpp)
 

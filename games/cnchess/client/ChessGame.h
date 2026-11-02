@@ -298,6 +298,12 @@ protected:
     void ShowGameFx(int nFx);
     void HideGameFx(IWindow *pFx);
     BOOL OnFxAnimationStop(IEvtArgs* e);
+    /**
+     * @brief 为动画注册回调, 并在动画ID中记录当前游戏代次
+     * @param pAnimator 动画对象
+     * @param nId 动画类型ID(低8位)
+     */
+    void SetAnimatorListener(IValueAnimator *pAnimator, int nId);
     UINT GetFarthestRepeat(CHESSMAN & chsEnemy); //计算当前步最远的一次重复走棋，在计算长捉时使用
     BOOL CheckMove(POINT ptFrom,POINT ptTo, BOOL bSilent=FALSE);
 private:
@@ -335,4 +341,5 @@ private:
     int m_nUsedRegretCount;//已使用的悔棋次数
     std::list<MOVESTEP> m_history;
     int  m_nUndoLeft;   //正在执行悔棋过程时，记录剩余需要继续undo的步数
+    UINT m_nGameGeneration; ///< 游戏代次: 开局/结束时递增, 用于丢弃遗留的动画回调
 };

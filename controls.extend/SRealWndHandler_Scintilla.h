@@ -2,8 +2,7 @@
 
 #include <helper/obj-ref-impl.hpp>
 
-namespace SOUI
-{
+SNSBEGIN
     class SRealWndHandler_Scintilla :public TObjRefImpl2<IRealWndHandler,SRealWndHandler_Scintilla>
     {
     public:
@@ -50,4 +49,4 @@ namespace SOUI
 
 	};
 
-}
+SNSEND

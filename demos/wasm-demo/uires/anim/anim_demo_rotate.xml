@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 动画页 SAnimation 演示：绕自身中心旋转一整圈。
+     360 度的结束状态与起始状态等价，不设 fillAfter 也不会留下残余变换。 -->
+<set>
+    <rotate duration="800" fromDegrees="0" toDegrees="360" pivotX="50%" pivotY="50%" interpolator="AccelerateDecelerate"/>
+</set>

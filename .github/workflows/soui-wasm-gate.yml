@@ -1,0 +1,116 @@
+name: soui wasm gate
+
+# WASM 与 FreeRTOS 一样，此前完全不在 CI 里：浏览器端的一切结论靠人工构建 + 人眼。
+# 这条门禁只做一件事——把「wasm 产物还能构建、还能跑通无头烟测」交给机器。
+#
+# 判据是 demos/wasm-demo/smoke.js：node 直接加载 emscripten 产物，不需要浏览器，
+# 覆盖 模块启动链（SApplication → DoConfig → 资源 → SHostWnd → 控件树 → 渲染后端
+# 初始化）/ 渲染+上屏整链（SwinxFbPresents 计数随泵增长）/ 输入注入（鼠标/键盘/滚轮
+# /IME/剪贴板 经 SwinxInject* 进消息泵不崩）/ 无致命错误，共约 17 处断言，退出码即结论。smoke.js
+# 内部用最小假 DOM 顶上 canvas2d 后端（node 没有 document），所有绘制 no-op、只保证
+# measureText/getImageData/createImageData 返回正确形状。它明确不证明"像素好不好看、
+# 布局对不对、交互是否正确、字体字形对不对"——那些仍要人看（见 demos/wasm-demo/readme.md）。
+#
+# 演示产物（.wasm 约 5MB 级，取决于 CJK 字体子集化）只用于本次烟测，不上传。
+
+on:
+  pull_request:
+    paths:
+      - 'demos/wasm-demo/**'
+      - 'swinx/**'
+      - 'SOUI/**'
+      - 'components/**'
+      - 'CMakeLists.txt'
+      - '.github/workflows/soui-wasm-gate.yml'
+  push:
+    branches:
+      - master
+    paths:
+      - 'demos/wasm-demo/**'
+      - 'swinx/**'
+      - 'SOUI/**'
+      - 'components/**'
+      - 'CMakeLists.txt'
+      - '.github/workflows/soui-wasm-gate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-smoke:
+    name: wasm-build-and-smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      # 子模块改从 GitHub 镜像拉取：.gitmodules 里指向 gitee，GitHub runner 上不可靠。
+      # 映射表与 build.yml 保持一致，改一处要五处一起改。
+      - name: Checkout submodules from GitHub mirror
+        shell: bash
+        run: |
+          git config --global url."https://github.com/soui4/swinx".insteadOf "https://gitee.com/setoutsoft/swinx"
+          git config --global url."https://github.com/setoutsoft/libwebsockets".insteadOf "https://gitee.com/setoutsoft/libwebsockets"
+          git config --global url."https://github.com/setoutsoft/openssl-cmake".insteadOf "https://gitee.com/setoutsoft/openssl-cmake"
+          git config --global url."https://github.com/setoutsoft/curl".insteadOf "https://gitee.com/setoutsoft/curl"
+          git config --global url."https://github.com/setoutsoft/soui-freertos".insteadOf "https://gitee.com/setoutsoft/soui-freertos"
+          git submodule update --init --recursive
+
+      # 纯 emscripten 交叉编译，不需要原生 X11 依赖；ninja 是构建器。
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ninja-build
+          node --version
+
+      # 与 build.yml 一样钉住 CMake 3.25+：CMake 4.2 的 Emscripten 工具链会在
+      # 配置期报 "does not support emscripten shared libraries"，本仓的 wasm 构建
+      # 依赖 BUILD_SHARED_LIBS=OFF 的静态布局，不必去踩这条新边界。
+      - uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: "^3.25.0"
+
+      # 版本与本地验证所用一致（emcc 6.0.13）。升级时请同步改这里的 pin，
+      # 并在本地重跑一次 demos/wasm-demo/build-soui.sh + smoke.js 确认全过。
+      - name: Set up Emscripten
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: 6.0.13
+          actions-cache-folder: emsdk-cache
+
+      - name: Show toolchain
+        run: |
+          emcc --version | head -2
+          cmake --version | head -1
+          ninja --version
+
+      - name: Configure wasm build
+        run: |
+          emcmake cmake -S . -B build-wasm -G Ninja \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DSOUI_BUILD_WASM_DEMO=ON \
+            -DSOUI_FUN_TEST_POST_BUILD=OFF
+
+      # -j4 而不是 -j$(nproc)：emcc 在 8 核以上并发时会互相等待到疑似死锁（本地实测
+      # 曾在零 CPU 占用下卡住 20 分钟）。构建吞吐不是这条门禁的瓶颈，稳定才是。
+      - name: Build soui-wasm-demo
+        run: |
+          set -o pipefail
+          cmake --build build-wasm --target soui-wasm-demo -j4 2>&1 | tee wasm-build.log
+          ls -la demos/wasm-demo/out
+
+      - name: Headless smoke test (demos/wasm-demo, ~17 assertions, no browser)
+        run: |
+          node demos/wasm-demo/smoke.js 2>&1 | tee smoke.log
+
+      # 失败时把两份日志带出来，省去重跑一遍才能看报错。
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wasm-build-logs
+          path: |
+            wasm-build.log
+            smoke.log
+          if-no-files-found: warn

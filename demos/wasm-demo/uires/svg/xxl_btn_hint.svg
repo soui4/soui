@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  xxl_btn_hint.svg - "提示"按钮图标(灯泡)
+  3 帧横排,每帧 18x18,总尺寸 54x18。蓝色线条,叠在白底描边按钮上。
+  帧序:0=normal  1=hover  2=push
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="54" height="18" viewBox="0 0 54 18">
+  <!-- 帧0:normal #2563EB -->
+  <g transform="translate(0,0)" stroke="#2563EB" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <line x1="6.75" y1="13.5" x2="11.25" y2="13.5"/>
+    <line x1="7.5" y1="16.5" x2="10.5" y2="16.5"/>
+    <path d="M11.32,10.5 c0.14,-0.74 0.49,-1.31 1.06,-1.88 A3.49,3.49 0 0 0 13.5,6 A4.5,4.5 0 0 0 4.5,6 c0,0.75 0.17,1.67 1.13,2.63 c0.57,0.57 0.92,1.14 1.06,1.88"/>
+  </g>
+  <!-- 帧1:hover #1D4ED8 -->
+  <g transform="translate(18,0)" stroke="#1D4ED8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <line x1="6.75" y1="13.5" x2="11.25" y2="13.5"/>
+    <line x1="7.5" y1="16.5" x2="10.5" y2="16.5"/>
+    <path d="M11.32,10.5 c0.14,-0.74 0.49,-1.31 1.06,-1.88 A3.49,3.49 0 0 0 13.5,6 A4.5,4.5 0 0 0 4.5,6 c0,0.75 0.17,1.67 1.13,2.63 c0.57,0.57 0.92,1.14 1.06,1.88"/>
+  </g>
+  <!-- 帧2:push #1E40AF -->
+  <g transform="translate(36,0)" stroke="#1E40AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <line x1="6.75" y1="13.5" x2="11.25" y2="13.5"/>
+    <line x1="7.5" y1="16.5" x2="10.5" y2="16.5"/>
+    <path d="M11.32,10.5 c0.14,-0.74 0.49,-1.31 1.06,-1.88 A3.49,3.49 0 0 0 13.5,6 A4.5,4.5 0 0 0 4.5,6 c0,0.75 0.17,1.67 1.13,2.63 c0.57,0.57 0.92,1.14 1.06,1.88"/>
+  </g>
+</svg>

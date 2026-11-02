@@ -19,6 +19,22 @@ set(TaskLoop_src
 source_group("Header Files" FILES ${TaskLoop_header})
 source_group("Source Files" FILES ${TaskLoop_src})
 
+# wasm 没有线程：同一个 ITaskLoop 接口由 TaskLoopWasm.cpp 实现成"宿主主循环驱动
+# 的队列"（见该文件头的说明）。thread.cpp 与 pthread/信号量一并缺席。
+if(EMSCRIPTEN)
+    set(TaskLoop_header TaskLoopWasm.h)
+    set(TaskLoop_src TaskLoopWasm.cpp)
+    source_group("Header Files" FILES ${TaskLoop_header})
+    source_group("Source Files" FILES ${TaskLoop_src})
+    add_library(taskloop STATIC ${TaskLoop_src} ${TaskLoop_header})
+    target_link_libraries(taskloop utilities4)
+    set(COM_LIBS ${COM_LIBS} taskloop CACHE INTERNAL "com_lib")
+    set_target_properties (taskloop PROPERTIES
+        FOLDER components
+    )
+    return()
+endif()
+
 if (NOT SOUI_ENABLE_COM_LIB)
     set (TaskLoop_src  ${TaskLoop_src} TaskLoop.rc)
     add_library(taskloop SHARED ${TaskLoop_src} ${TaskLoop_header})

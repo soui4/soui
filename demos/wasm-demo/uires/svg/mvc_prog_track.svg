@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  mvc_prog_track.svg - MVC 行内进度条的轨道
+
+  16x16 的胶囊底，圆角 4。九宫格边距在 values/skin.xml 里配成 4：目标高度
+  只有 8dp 时，上下两块 4dp 的圆角刚好拼合成完整的胶囊，不会像系统 progress
+  皮肤（margin-y=8）那样因为目标高度小于边距和而只画出上下两段。
+
+  源尺寸取 16 而不是 64：显示高度是 8~10dp，缩放比接近 1，位图九宫格的
+  插值损失最小。轨道用纯色，避免缩放时出现渐变接缝。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <rect x="0" y="0" width="16" height="16" rx="4" ry="4" fill="#E5E7EB"/>
+</svg>

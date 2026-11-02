@@ -13,8 +13,7 @@
 #pragma once
 #include <core/SWnd.h>
 
-namespace SOUI
-{
+SNSBEGIN
  
     class SAnimImg : public SWindow , protected ITimelineHandler
     {
@@ -72,4 +71,4 @@ namespace SOUI
 		ISkinObj    *m_pAniOut;
     };
 
-}//namespace SOUI
+SNSEND

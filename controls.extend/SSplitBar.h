@@ -1,8 +1,7 @@
 ﻿#pragma once
 #include <core/SWnd.h>
 
-namespace SOUI
-{
+SNSBEGIN
 class SSplitBar : public SWindow {
     DEF_SOBJECT(SWindow, L"splitbar")
   public:
@@ -41,4 +40,4 @@ class SSplitBar : public SWindow {
     BOOL m_bVertical; /**< 是否垂直分割，默认是水平分割*/
 };
 
-}; // namespace SOUI
+SNSEND

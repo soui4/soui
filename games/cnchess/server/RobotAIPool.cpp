@@ -90,8 +90,11 @@ bool CRobotAIPool::Dispatch(const SRobotTask &task)
 
 void CRobotAIPool::RunTask(SRobotTask task)
 {
-    // run the best-move search on a pool thread against the board snapshot
-    MOVESTEP best = CChessAI::SearchBestMove(task.layout, task.depth, task.timeMs);
+    // run the best-move search on a pool thread against the board snapshot and
+    // the move-history snapshot carried by the task (no shared state is touched)
+    MOVESTEP best = CChessAI::SearchBestMove(task.layout, task.depth, task.timeMs,
+                                             task.history, task.maxRepeatJiang,
+                                             task.maxRepeatCatch);
     ApplySink apply;
     ServiceSink service;
     {

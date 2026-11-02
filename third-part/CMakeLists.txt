@@ -1,3 +1,35 @@
+if(SOUI_WASM_MINIMAL)
+    # wasm 最小构建：只拉起 components/imgdecoder-stb 需要的 aupng。
+    #
+    # 这里刻意不加 zlib：soui4/third-part/zlib 与 swinx/thirdparty/zlib（目标名
+    # zlib_static）是同一批 inflate/deflate 符号的两份拷贝。桌面构建里两者分处不同
+    # .so，靠符号插桩互不干扰；wasm 把所有东西链进同一个模块，wasm-ld 会直接报
+    # duplicate symbol。所以依赖 zlib 的组件（resprovider-zip）在 wasm 下不进构建图，
+    # 资源改用 SOUI 核心的 SResProviderFiles（见 doc/soui-wasm-port-plan.md）。
+    # stb 头文件是 header-only，由 imgdecoder-stb 直接用路径引用，无需子目录。
+    add_subdirectory(pbl_aupng)
+    # richedit41：SRichEdit 在 wasm 上没有 dlopen，只能静态链接 msftedit，
+    # 由 SOUI/CMakeLists.txt 的 INIT_RICHEDIT 分支把它挂到 soui4 上。
+    add_subdirectory(richedit41)
+    # Scintilla 进 wasm：controls.extend 的 SScintillaView 走它的 headless 接口
+    # （Scintilla_CreateHeadless + Scintilla_PaintHeadless），绘制落在 SOUI 的
+    # render target 上，不需要真窗口。异常处理按 Scintilla/CMakeLists.txt 的
+    # EMSCRIPTEN 分支关掉。
+    # SOUI_BUILD_WASM_SCINTILLA=OFF 时整条依赖链（Scintilla 库、SScintillaView.cpp、
+    # 注册入口、<scintilla> 标签）一起退出构建图。
+    if(SOUI_BUILD_WASM_SCINTILLA)
+    add_subdirectory(Scintilla)
+    endif()
+    # lua 5.4 进 wasm：ScriptModule-LUA 是纯 C + C++ 的静态库，不依赖 dlopen。
+    # 只编 C 源，setjmp/longjmp 在 wasm 上由 libc 提供，与桌面同一套语义。
+    # 跟 components/ScriptModule-LUA、soui-wasm 的 uires/lua 预载由同一个开关
+    # SOUI_BUILD_WASM_LUA 一起进退。
+    if(SOUI_BUILD_WASM_LUA)
+    add_subdirectory(lua-54)
+    endif()
+    return()
+endif()
+
 add_subdirectory(zlib)
 add_subdirectory(lua-54)
 if (NOT CMAKE_SYSTEM_NAME MATCHES Android)

@@ -736,6 +736,7 @@ namespace ChsAI
 
     SearchEngine::SearchEngine(int ttSizeBits)
         : m_board(), m_tt(ttSizeBits), m_nodes(0), m_startMs(0), m_timeLimitMs(0), m_stop(false)
+        , m_rootFilter(0), m_filterData(0)
     {
         memset(m_killers, 0, sizeof(m_killers));
         memset(m_history, 0, sizeof(m_history));
@@ -745,13 +746,16 @@ namespace ChsAI
     {
     }
 
-    SearchResult SearchEngine::Search(const SearchBoard &root, int maxDepth, int timeLimitMs)
+    SearchResult SearchEngine::Search(const SearchBoard &root, int maxDepth, int timeLimitMs,
+                                      RootMoveFilter rootFilter, void *filterData)
     {
         m_board.CloneFrom(root);
         m_nodes = 0;
         m_startMs = NowMs();
         m_timeLimitMs = timeLimitMs;
         m_stop = false;
+        m_rootFilter = rootFilter;
+        m_filterData = filterData;
         m_tt.NewGeneration();
         memset(m_killers, 0, sizeof(m_killers));
         memset(m_history, 0, sizeof(m_history));
@@ -817,6 +821,9 @@ namespace ChsAI
         for (int i = 0; i < nMoves; i++)
         {
             SearchMove m = moves[i];
+            // 根节点着法过滤(如排除会触发长将/长捉的着法), 被排除的着法不参与搜索
+            if (m_rootFilter && m_rootFilter(m.From, m.To, m_filterData))
+                continue;
             m_board.Make(m);
             if (m_board.IsSideInCheck(color))
             {

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 模态表单退场：淡出。fillAfter 保持终态，退场动画结束后由 SModalView 触发
+     OnFinish，SModalRoot 随后被 SHostWnd 从模态栈和窗口树里移除。 -->
+<set fillAfter="true" shareInterpolator="false">
+    <alpha duration="180" fromAlpha="1.0" toAlpha="0.0" interpolator="Accelerate"/>
+</set>

@@ -2,8 +2,7 @@
 #include "SChromeTabCtrl.h"
 #include <control/SCmnCtrl.h>
 
-namespace SOUI
-{
+SNSBEGIN
 const wchar_t KXmlTabStyle[] = L"tabStyle";
 const wchar_t KXmlCloseBtnStyle[] = L"closeBtnStyle";
 const wchar_t KXmlNewBtnStyle[] = L"newBtnStyle";
@@ -505,4 +504,4 @@ void SChromeTabCtrl::OnContainerChanged(ISwndContainer *pOldContainer,
     SWindow::OnContainerChanged(pOldContainer, pNewContainer);
 }
 
-} // namespace SOUI
+SNSEND

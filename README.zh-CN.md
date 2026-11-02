@@ -36,11 +36,11 @@
 
 SOUI4 是一套已经持续开发维护 **14年** 的轻量级**跨平台** C++ DirectUI 框架（内核编译后体积 1M 左右）。框架设计吸收了 `WTL`、`Android`、`QT`、`Flash` 等流行框架的特点，UI 展示基于 `xml` 配置，性能高效（可选择 GDI 或 [Skia](https://www.oschina.net/p/skia) 渲染），控件丰富，扩展灵活（可使用 xml + lua + js），真正做到 UI 界面与逻辑分离。
 
-借助内置的 **swinx** 层（在各平台重新实现 Windows API：`windows.h` / `winuser.h` / `gdi.h` …），**同一份 C++ UI 与业务代码**即可运行在 Windows、Linux、macOS、iOS、Android 与鸿蒙（OHOS）六大平台上。点击 [SOUI 官网](https://www.soui.com.cn) 了解更多。
+借助内置的 **swinx** 层（在各平台重新实现 Windows API：`windows.h` / `winuser.h` / `gdi.h` …），**同一份 C++ UI 与业务代码**即可运行在 Windows、Linux、macOS、iOS、Android 与鸿蒙（OHOS）六大平台上；同一套抽象还能把框架**下沉到裸机**（FreeRTOS / Cortex-M）与**上移到浏览器**（WebAssembly）。点击 [SOUI 官网](https://www.soui.com.cn) 了解更多。
 
 ##  跨平台支持 / Cross-Platform
 
-SOUI4 通过 swinx 覆盖六大平台：
+SOUI4 通过 swinx 覆盖八个目标，但分成两档成熟度：
 
 | 平台 | 状态 | 窗口系统 / 启动器 | 2D 后端 |
 | --- | --- | --- | --- |
@@ -50,12 +50,23 @@ SOUI4 通过 swinx 覆盖六大平台：
 | **iOS** | 已支持 | `UIApplicationMain`（由 `swinx_ios_entry` 托管） | Core Graphics |
 | **Android** | 已支持 | JVM 启动器，`PlatformAPI` 桥接 | Cairo |
 | **鸿蒙（OHOS）** | 已支持 | ArkTS 运行时，`PlatformAPI` 桥接 | Cairo |
+| **FreeRTOS** | 能力证明级 | 无 OS：FreeRTOS 任务驱动消息泵，宿主扫描帧缓冲上屏 | Cairo → 内存帧缓冲 |
+| **WebAssembly** | 能力证明级 | `emscripten_set_main_loop`，JS 宿主按脏矩形 blit 到 Canvas | Cairo → image surface → Canvas |
+
+两档的含义不同，不能互换：
+
+- **已支持**（上面六端）= 产品级：有 CI、有示例、有真机/实机验证。
+- **能力证明级**（FreeRTOS、WebAssembly）= 架构被验证能吸收新的宿主形态：目标能构建、
+  `SApp` 能端到端跑通，但仍有明确缺口（FreeRTOS：字体测宽、`ICON:` 仍是桩、未适配目标板；
+  WASM：产物约 66 MB、无 IME、无触摸）。它们说明"抽象能伸到这里"，不等于"可以交付"。
+  详见 `soui-freertos/README.md` 与 `doc/soui-wasm-port-plan.md`。
 
 swinx 在不同平台的分层方式：
 
 - **Windows** 不编译 swinx，直接使用系统的 Windows SDK。
 - **Linux / macOS / iOS** 在 swinx 内部自实现平台 API，且各自拥有自己的消息循环 / 启动器，无需额外桥接。
 - **Android / 鸿蒙** 由 JVM / ArkTS 运行时启动，没有自己的启动器；其平台桥接（`clipboard / window / ime / audio / path`）被填入 C 结构体 `PlatformAPI` 后，通过 `PlatformAPI_Init` 注册。
+- **FreeRTOS / WebAssembly** 把关系反过来：没有可对话的 OS 窗口管理器，于是由嵌入方驱动消息泵并消费帧缓冲。两者共用同一组四个宿主接缝（帧缓冲 / 输入 / 泵 / 资源），这也是第二个形态比第一个便宜得多的原因。
 
 SOUI 的渲染工厂（`Render_Gdi` / `Render_Skia` / `Render_D2d`）在各平台统一；跨平台工程通常统一使用 **`Render_Skia`** + `ImgDecoder_Stb`。移动端还额外提供 `SModalView`（替代 `SHostDialog` 的模态对话框实现，因为移动端运行时无法自行拉起消息循环），以及 `SPanel` 上的惯性 **fling** 滑动支持。
 
@@ -117,6 +128,8 @@ SOUI 的渲染工厂（`Render_Gdi` / `Render_Skia` / `Render_D2d`）在各平�
 - SOUI 讨论 #2: [点击加入](http://shang.qq.com/wpa/qunwpa?idkey=03d3294a2551beb1b54b4012086cec14b3f66d5c253debaeed241d9c623966e0)
 
 ##  [![编译](https://github.com/soui4/soui/actions/workflows/build.yml/badge.svg)](https://github.com/soui4/soui/actions/workflows/build.yml)
+##  [![FreeRTOS 门禁](https://github.com/soui4/soui/actions/workflows/soui-freertos-gate.yml/badge.svg)](https://github.com/soui4/soui/actions/workflows/soui-freertos-gate.yml)
+##  [![WASM 门禁](https://github.com/soui4/soui/actions/workflows/soui-wasm-gate.yml/badge.svg)](https://github.com/soui4/soui/actions/workflows/soui-wasm-gate.yml)
 
 ###  Windows 编译
 - 直接使用 cmake 生成工程文件，然后使用 Visual Studio 打开工程文件，编译即可。
@@ -144,6 +157,20 @@ SOUI 的渲染工厂（`Render_Gdi` / `Render_Skia` / `Render_D2d`）在各平�
 - 需要 HarmonyOS SDK 与 DevEco Studio。
 - 原生层位于 `entry/src/main/cpp`；UI 资源通过 `NativeResourceManager` 直接从 HAP 的 `rawfile` 目录读取（无需拷贝到沙箱）。
 - 在 DevEco Studio（或 `hvigor` 命令行）中编译 OHOS 模块。
+
+###  FreeRTOS（裸机）编译
+- 子模块 `soui-freertos` 是唯一入口：一个 `include` + 一个 `soui_fr_project()` 完成内核 / 三方库 / swinx 平台层 / SOUI / 资源打包。
+- 交叉编译到 QEMU 的 Cortex-M3 目标：
+  `cd soui-freertos/soui_fr && cmake -S . -B build -G Ninja -DCMAKE_TOOLCHAIN_FILE=../demo/cmake/toolchain-arm-freertos.cmake -DSOUI_FR_CENSUS=OFF -DCMAKE_BUILD_TYPE=MinSizeRel`
+  然后 `qemu-system-arm -M mps2-an385 -nographic -semihosting -kernel build/soui_fr.elf`。
+- 宿主侧迭代用 `soui_sim`（FreeRTOS Windows 模拟器，SDL2 出图），见 `soui-freertos/README.md` 与《SOUI5-FreeRTOS 开发指南》。
+
+###  WebAssembly 编译
+- 需要 [emsdk](https://emscripten.org/docs/getting_started/downloads.html)（本地验证用 6.0.13）。
+- `emcmake cmake -S . -B build-wasm -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DSOUI_BUILD_WASM_DEMO=ON`
+- `cmake --build build-wasm --target soui-wasm-demo -j4`，产物在 `demos/wasm-demo/out/`。
+- 浏览器里看效果用 `python3 -m http.server 8080 -d demos/wasm-demo/out` 打开 `soui-wasm-demo.html`。构建选项、验证步骤与已知限制见 [`demos/wasm-demo/readme.md`](./demos/wasm-demo/readme.md)。
+- 中国象棋客户端另有一个完整的 wasm 版：`-DSOUI_BUILD_WASM_CNCHESS=ON` + `cmake --build build-wasm --target cnchess-wasm`（或包装脚本 `games/cnchess/client/wasm/build-cnchess.sh`，Windows 主机用同目录的 `build-cnchess.bat`；两个脚本都带 `--release` 上线档），产物在 `games/cnchess/client/wasm/out/`；网络走浏览器原生 WebSocket、线程走单线程 TaskLoop，详见 `games/cnchess/client/wasm/readme.md`。
 
 ##  贡献名单
 参见 [贡献名单](./contributors.md)

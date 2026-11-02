@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 俄罗斯方块结束遮罩收起:淡出 200ms,与卡片 tetris_over_card_out 同步;
+     fillAfter 定格 alpha=0,on_animation_stop 里按隐藏段标志 SetVisible(false) -->
+<set fillAfter="true" shareInterpolator="true" interpolator="Accelerate">
+    <alpha duration="200" fromAlpha="1.0" toAlpha="0.0"/>
+</set>

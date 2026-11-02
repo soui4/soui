@@ -15,6 +15,9 @@ struct SRobotTask
     int generation;    // move-message counter at dispatch time, to drop stale results
     int timeMs;        // thinking time budget in ms (0 = fixed depth only)
     CChessLayout layout; // board snapshot (deep copied via Layout::Copy)
+    int maxRepeatJiang;  // long-check threshold: repeat steps >= this value means losing
+    int maxRepeatCatch;  // long-catch threshold: repeat steps >= this value means losing
+    std::vector<MOVESTEP> history; // move history snapshot ending at this position
 };
 
 #endif // !__ROBOTDISPATCH_H__

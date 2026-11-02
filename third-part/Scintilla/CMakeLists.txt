@@ -30,6 +30,14 @@ if (NOT CMAKE_SYSTEM_NAME MATCHES Windows)
     target_compile_options(Scintilla PRIVATE -fPIC)
    add_dependencies(Scintilla swinx)
 endif()
+
+if (EMSCRIPTEN)
+    # wasm 不打开 -fexceptions（整套 EH 只能全模块开，见 ScintillaNoExcept.h）；
+    # 用 -fno-exceptions 关掉异常机制，再由这个头把 try/catch/throw 语法降级。
+    target_compile_options(Scintilla PRIVATE
+        -fno-exceptions
+        -include ${CMAKE_CURRENT_SOURCE_DIR}/ScintillaNoExcept.h)
+endif()
 set(OPTION_LIBS ${OPTION_LIBS} Scintilla CACHE INTERNAL "option_lib")
 set_target_properties (Scintilla PROPERTIES
     FOLDER third-part

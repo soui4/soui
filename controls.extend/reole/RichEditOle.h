@@ -42,8 +42,7 @@ public:
     }
 };
 
-namespace SOUI
-{
+SNSBEGIN
     template<>
     class CElementTraits<ImageID > :
         public CElementTraitsBase<ImageID >
@@ -70,7 +69,7 @@ namespace SOUI
         }
     };
 
-}
+SNSEND
 
 class ImageItem
 {  

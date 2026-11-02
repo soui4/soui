@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  tank.svg - 坦克大战雪碧图(nanosvg 兼容)
+  27 帧横排,每帧 48x48,总尺寸 1296x48。
+  帧序: 0=空地 1=砖墙 2=残砖 3=钢墙 4=水 5=基地 6=基地被毁
+        7-10=玩家坦克(上/右/下/左) 11-14=普通敌人(上/右/下/左)
+        15-18=快速敌人(上/右/下/左) 19=玩家炮弹 20=敌方炮弹
+        21-23=爆炸小/中/大 24=标题图标 25=出生信标 26=无敌护盾环
+  风格: 与 tetris_blocks.svg / xxl_icons.svg 一致的糖果风高光 + 描边 + 落地阴影。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+  <defs>
+    <linearGradient id="gSteel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#CBD5E1"/>
+      <stop offset="0.5" stop-color="#94A3B8"/>
+      <stop offset="1" stop-color="#475569"/>
+    </linearGradient>
+    <radialGradient id="gBulletP" cx="0.4" cy="0.35" r="0.8">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="0.45" stop-color="#FDE047"/>
+      <stop offset="1" stop-color="#F59E0B"/>
+    </radialGradient>
+    <radialGradient id="gBulletE" cx="0.4" cy="0.35" r="0.8">
+      <stop offset="0" stop-color="#FFF7ED"/>
+      <stop offset="0.45" stop-color="#FB923C"/>
+      <stop offset="1" stop-color="#C2410C"/>
+    </radialGradient>
+    <radialGradient id="gBoom" cx="0.5" cy="0.5" r="0.6">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="0.35" stop-color="#FDE047"/>
+      <stop offset="0.7" stop-color="#FB923C"/>
+      <stop offset="1" stop-color="#B91C1C"/>
+    </radialGradient>
+  </defs>
+
+  <!-- ==================== 3 钢墙 ==================== -->
+  <g transform="translate(0,0)">
+    <rect x="1" y="1" width="46" height="46" rx="2.5" fill="url(#gSteel)" stroke="#334155" stroke-width="1.5"/>
+    <rect x="3.5" y="3.5" width="19" height="19" rx="2" fill="#E2E8F0" fill-opacity="0.35" stroke="#64748B" stroke-width="1"/>
+    <rect x="25.5" y="3.5" width="19" height="19" rx="2" fill="#E2E8F0" fill-opacity="0.20" stroke="#64748B" stroke-width="1"/>
+    <rect x="3.5" y="25.5" width="19" height="19" rx="2" fill="#E2E8F0" fill-opacity="0.20" stroke="#64748B" stroke-width="1"/>
+    <rect x="25.5" y="25.5" width="19" height="19" rx="2" fill="#E2E8F0" fill-opacity="0.35" stroke="#64748B" stroke-width="1"/>
+    <g fill="#F8FAFC" fill-opacity="0.85">
+      <circle cx="5.5" cy="5.5" r="1.3"/><circle cx="20.5" cy="5.5" r="1.3"/>
+      <circle cx="5.5" cy="20.5" r="1.3"/><circle cx="20.5" cy="20.5" r="1.3"/>
+      <circle cx="27.5" cy="27.5" r="1.3"/><circle cx="42.5" cy="27.5" r="1.3"/>
+      <circle cx="27.5" cy="42.5" r="1.3"/><circle cx="42.5" cy="42.5" r="1.3"/>
+    </g>
+    <line x1="4" y1="13" x2="22" y2="13" stroke="#FFFFFF" stroke-opacity="0.45" stroke-width="1"/>
+    <line x1="26" y1="35" x2="44" y2="35" stroke="#FFFFFF" stroke-opacity="0.45" stroke-width="1"/>
+  </g>
+
+</svg>

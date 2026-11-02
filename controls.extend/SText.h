@@ -2,8 +2,7 @@
 #pragma once
 #include "core/SWnd.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 class SText : public SStatic {
     DEF_SOBJECT(SStatic, L"textex")
@@ -15,4 +14,4 @@ class SText : public SStatic {
                           UINT uFormat);
 };
 
-}; // namespace SOUI
+SNSEND

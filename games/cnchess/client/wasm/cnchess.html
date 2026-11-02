@@ -1,0 +1,101 @@
+<!doctype html>
+<!--
+  中国象棋 wasm 客户端的页面外壳（Emscripten --shell-file）
+
+  宿主逻辑（带进度的下载、上屏、鼠标/键盘/滚轮注入、输入法代理、剪贴板、
+  WebAudio 音效、崩溃上报、加载遮罩）全部来自 soui-wasm/soui-host.js ——
+  与 SOUI 演示页共用同一份实现，这里不再维护第二份。页面只剩：标题、状态行、
+  配色，以及最后那段把产物名和导出名前缀告诉宿主的调用。
+
+  与演示页的差别只有三处：
+    1. 导出名是 Cnchess* 前缀（cnchess_main.cpp 的历史命名），用 api 覆盖；
+    2. 画布按 900px 显示（逻辑宽 800，与旧页面一致地放大 12.5%）；
+    3. 状态行每 500ms 读一次 CnchessStat，排障时不用开控制台。
+
+  emcc 的 --shell-file 要求文件里有 {{{ SCRIPT }}} 占位符（见文末 <template>），
+  它会被换成 <script src="cnchess-wasm.js">。我们不要那个标签——胶水由宿主带
+  时间戳按需载入（防"新 wasm 配旧胶水"的缓存问题），所以把占位符放进 <template>：
+  模板内容是惰性的，换进去的 script 不会执行，而占位符本身仍然存在。
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>中国象棋 · SOUI WebAssembly</title>
+  <style>
+    :root { color-scheme: dark; }
+    html, body { margin: 0; padding: 0; background: #16100a; color: #e8dcc8;
+                 font: 14px/1.5 "Noto Sans CJK SC", "Microsoft YaHei", sans-serif; }
+    #wrap { display: flex; flex-direction: column; align-items: center; padding: 12px; }
+    h1 { font-size: 16px; font-weight: 600; color: #ffd700; margin: 0 0 4px; }
+    /* 状态行：启动期写"正在加载…"，跑起来之后由下面的轮询刷成统计量，
+       失败时宿主经 onFatal 把原因写进这里（加载遮罩同时转红）。 */
+    #status { margin: 0 0 10px; font-size: 12px; color: #a89070; white-space: pre; }
+    /* 画布尺寸/边框/圆角由宿主注入的 .soui-canvas 管，这里只把配色改成棋盘的木色；
+       宽度用宿主按逻辑宽度设的 CSS 变量，不要写死像素（DPI 档位只改 backing 尺寸）。 */
+    canvas#screen { background: #2a1a0e; border-color: #5d4e37; }
+    canvas#screen.keyed { border-color: #ffd700; }
+  </style>
+</head>
+<body>
+<div id="wrap">
+  <h1>中国象棋 · SOUI WebAssembly</h1>
+  <p id="status">正在加载模块…</p>
+  <!-- 画布、加载遮罩、IME 代理框、错误行都由 soui-host.js 建在这个容器里 -->
+  <div id="app"></div>
+</div>
+
+<!-- emcc 的 --shell-file 要求 shell 里必须有 {{{ SCRIPT }}} 占位符；放进 <template>
+     让它惰性（见文件头说明）。 -->
+<template>{{{ SCRIPT }}}</template>
+
+<script src="soui-host.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var statusEl = document.getElementById('status');
+  var live = false;   // 起来了才轮询统计；启动期失败时状态行留给错误信息
+
+  var host = SouiHost.start({
+    container: document.getElementById('app'),
+    wasm: 'cnchess-wasm.wasm',        // 胶水 .js / .data 由它推导
+    factory: 'createCnchess',         // emcc -sEXPORT_NAME
+    width: 900,                       // 逻辑宽 800 显示成 900（与旧页面同口径）
+    loadingTitle: '中国象棋 · WebAssembly',
+    /* cnchess_main.cpp 的导出名是 Cnchess* 前缀，与演示页的 SwinxDemo* 不同名；
+       宿主缺省用后者，这里逐项覆盖。剪贴板那个本就共用 swinx 的导出，不用改。 */
+    api: {
+      pump: '_CnchessPump',
+      mouse: '_CnchessMouse',
+      key: '_CnchessKey',
+      wheel: '_CnchessWheel',
+      text: '_CnchessText',
+      caret: '_CnchessCaretPos'
+    },
+    onFatal: function (msg) { statusEl.textContent = msg; }
+  });
+
+  /* 观测点：CnchessStat 的下标契约见 cnchess_main.cpp，readme「观测点」一节有表。
+     500ms 一次、一次读 6 个 int，代价可以忽略。 */
+  host.whenReady.then(function () {
+    live = true;
+    /* 兼容 readme 里写的控制台用法（cnchess._CnchessStat(4)）：宿主把模块挂在
+       window.Module 上，这里再按老名字挂一份别名。 */
+    window.cnchess = window.Module;
+  });
+
+  setInterval(function () {
+    if (!live) return;
+    var M = window.Module;
+    if (!M || typeof M._CnchessStat !== 'function') return;
+    var s = function (i) { return M._CnchessStat(i) | 0; };
+    statusEl.textContent =
+      'pump ' + s(0) + ' · present ' + s(1) +
+      ' · theme ' + s(4) + ' · board ' + s(5) +
+      ' · taskloop ' + s(6) + '/' + s(7) + '/' + s(8);
+  }, 500);
+})();
+</script>
+</body>
+</html>

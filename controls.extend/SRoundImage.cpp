@@ -1,8 +1,7 @@
 #include "stdafx.h"
 #include "SRoundImage.h"
 
-namespace SOUI
-{
+SNSBEGIN
 	SRoundImage::SRoundImage():m_cornerSize(0)
 	{
 	}
@@ -76,4 +75,4 @@ namespace SOUI
 		return S_FALSE;
 	}
 
-}
+SNSEND

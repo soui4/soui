@@ -449,70 +449,8 @@ BOOL CCnChess::OnReqLongCatch(PWSCLIENT pClient, DWORD dwType, LPVOID pData, DWO
 //计算当前步最远的一次重复走棋，在计算长捉时使用
 UINT CCnChess::GetFarthestRepeat(CHESSMAN & chsEnemy)
 {
-	UINT nRet=0,nSteps=0;
-	int	nChsID=-1,nChsEnemy=-1;
-	POINT ptLastDest={-1,-1};
-	POINT ptEnemy={-1,-1};
-
-	CChessLayout layout;
-	layout.Copy(&m_layout);
-	CChsLytState state(&layout);
-	CHSSIDE actSide=(CHSSIDE)!layout.m_actSide;
-
-	chsEnemy=CHSMAN_NULL;
-
-	std::vector<MOVESTEP>::iterator p=m_lstMoves.end();
-	while(p!=m_lstMoves.begin())
-	{
-		p--;
-		if(CHSMANSIDE(layout.m_chesses[p->pt2.y][p->pt2.x])==actSide)
-		{
-			state.UpdateState();
-			nSteps++;
-			//找到攻击的无根子数量
-			CChsLytState::CChessInfo *pChessInfo=state.GetChessInfo(p->pt2);
-			int nNoRootChs=0;
-			POINT ptDest;
-			std::vector<POINT>::iterator p2=pChessInfo->m_lstDest.begin();
-			while(p2!=pChessInfo->m_lstDest.end())
-			{
-				if(CHSMANSIDE(layout.m_chesses[p2->y][p2->x])==layout.m_actSide
-					&& state.GetProtecter(*p2)==0
-					&& state.GetAttacter(*p2)==1)
-				{
-					nNoRootChs++;
-					ptDest=*p2;
-					if(nNoRootChs>1) break;
-				}
-				p2++;
-			}
-			if(nNoRootChs!=1) break;
-
-			if(nChsID==-1)
-			{//最后一步
-				nChsID=layout.m_nChsID[p->pt2.y][p->pt2.x];
-				nChsEnemy=layout.m_nChsID[ptDest.y][ptDest.x];
-				ptLastDest=p->pt2;
-				ptEnemy=ptDest;
-				chsEnemy=layout.m_chesses[ptDest.y][ptDest.x];
-			}else
-			{
-				//攻击及被攻击的棋子不是原棋或者退出计算
-				if(nChsID!=layout.m_nChsID[p->pt2.y][p->pt2.x]
-				|| nChsEnemy!=layout.m_nChsID[ptDest.y][ptDest.x] )
-					break;
-				if(p->pt2.x==ptLastDest.x && p->pt2.y==ptLastDest.y)
-					nRet=nSteps;//发现重复
-			}
-		}else
-		{
-			//移动的棋子不是被攻击棋子
-			if(layout.m_nChsID[p->pt2.y][p->pt2.x]!=nChsEnemy)
-				break;
-		}
-		layout.UndoMove(*p);
-	}
-	return nRet;
+	// 统一复用算法层的实现, 保证服务器判定与机器人规避的重复步数口径一致
+	return CChessLayout::GetFarthestRepeat(m_layout, m_lstMoves, chsEnemy);
 }
 
 void CCnChess::SetupRobot(int seatId, int nLevel)
@@ -568,6 +506,11 @@ void CCnChess::RobotMakeMove(int seatId)
 	task.timeMs = PropBag::getSingletonPtr()->GetRobotAITimeMs(m_nRobotLevel[seatId]);
 	task.generation = m_nChessMsg;
 	task.layout.Copy(&m_layout); // 深拷贝棋盘快照, 线程池仅操作副本
+	// 走棋历史与长将/长捉步限随任务一起深拷贝传给工作线程,
+	// 线程内不访问也无需加锁保护主线程的 m_lstMoves / m_dwProps
+	task.history = m_lstMoves;
+	task.maxRepeatJiang = (int)m_dwProps[PROPID_MAX_STP_JIANG];
+	task.maxRepeatCatch = (int)m_dwProps[PROPID_MAX_STP_CATCH];
 	CRobotAIPool::getSingletonPtr()->Dispatch(task);
 }
 

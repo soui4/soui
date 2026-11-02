@@ -3,6 +3,7 @@
 #include "ChessBook.h"
 #include "ChsAIEngine.h"
 #include <vector>
+#include <map>
 #include <stdlib.h>
 
 // ---------------------------------------------------------------------------
@@ -115,6 +116,71 @@ namespace
         return ms;
     }
 
+    // 根节点重复走子过滤上下文: 只存活于单次搜索调用内, 内部保存布局与历史的本地副本,
+    // 线程池中的每次机器人思考互不影响(不依赖调用方或跨调用的共享状态)。
+    struct SRepeatFilterCtx
+    {
+        bool                  bRedTop;
+        CChessLayout          layout;    // 当前局面本地副本
+        std::vector<MOVESTEP> history;   // 走到当前局面的历史本地副本
+        int                   nMaxRepeatJiang;
+        int                   nMaxRepeatCatch;
+        std::map<uint16_t, bool> cache;  // 根着法 -> 是否触发重复判负
+    };
+
+    // 判断某根着法是否会触发长将/长捉判负(与客户端/服务器的判定口径一致)
+    bool RootMoveViolatesRepeat(int fromSq, int toSq, void *userData)
+    {
+        SRepeatFilterCtx *pCtx = (SRepeatFilterCtx *)userData;
+        uint16_t code = (uint16_t)((fromSq << 8) | toSq);
+        std::map<uint16_t, bool>::iterator it = pCtx->cache.find(code);
+        if (it != pCtx->cache.end())
+            return it->second;
+
+        bool bViolates = false;
+        POINT pt1 = { ChsAI::SearchBoard::Col(fromSq),
+                      SearchRowToLayout(ChsAI::SearchBoard::Row(fromSq), pCtx->bRedTop) };
+        POINT pt2 = { ChsAI::SearchBoard::Col(toSq),
+                      SearchRowToLayout(ChsAI::SearchBoard::Row(toSq), pCtx->bRedTop) };
+
+        // 在本地副本上模拟该着法, 不能改动调用方传入的局面
+        CChessLayout sim;
+        sim.Copy(&pCtx->layout);
+        MOVESTEP ms = sim.Move(pt1, pt2);
+
+        // 快捷过滤: 移动后的棋子若攻击不到任何敌子, 不可能构成"将/捉"
+        POINT ptDest[MAX_MOVES];
+        int nDest = sim.GetPossibleMoves(pt2, ptDest);
+        CHSSIDE moveSide = CHSMANSIDE(sim.m_chesses[pt2.y][pt2.x]);
+        CHSSIDE enemySide = (moveSide == CS_RED) ? CS_BLACK : CS_RED;
+        bool bAttacksEnemy = false;
+        for (int i = 0; i < nDest; i++)
+        {
+            if (CHSMANSIDE(sim.m_chesses[ptDest[i].y][ptDest[i].x]) == enemySide)
+            {
+                bAttacksEnemy = true;
+                break;
+            }
+        }
+
+        if (bAttacksEnemy)
+        {
+            // 把候选着法追加到历史末尾, 计算最后行棋方的重复走子步数
+            pCtx->history.push_back(ms);
+            CHESSMAN chsEnemy = CHSMAN_NULL;
+            UINT nRepeat = CChessLayout::GetFarthestRepeat(sim, pCtx->history, chsEnemy);
+            pCtx->history.pop_back();
+
+            if (chsEnemy == CHSMAN_RED_JIANG || chsEnemy == CHSMAN_BLK_JIANG)
+                bViolates = (int)nRepeat >= pCtx->nMaxRepeatJiang;
+            else if (chsEnemy != CHSMAN_NULL)
+                bViolates = (int)nRepeat >= pCtx->nMaxRepeatCatch;
+        }
+
+        pCtx->cache[code] = bViolates;
+        return bViolates;
+    }
+
     MOVESTEP MakeInvalidStep()
     {
         MOVESTEP invalid;
@@ -142,6 +208,15 @@ MOVESTEP CChessAI::SearchBestMove(CChessLayout &layout, int nDepth)
 }
 
 MOVESTEP CChessAI::SearchBestMove(CChessLayout &layout, int nDepth, int nTimeMs)
+{
+    // 无历史调用: 不启用重复走子过滤(保持旧接口行为)
+    std::vector<MOVESTEP> history;
+    return SearchBestMove(layout, nDepth, nTimeMs, history, 0, 0);
+}
+
+MOVESTEP CChessAI::SearchBestMove(CChessLayout &layout, int nDepth, int nTimeMs,
+                                  const std::vector<MOVESTEP> &history,
+                                  int nMaxRepeatJiang, int nMaxRepeatCatch)
 {
     // 开局阶段先查经验数据库, 命中则直接采用(补充开局经验, 避免搜索浪费)
     POINT book1, book2;
@@ -178,14 +253,35 @@ MOVESTEP CChessAI::SearchBestMove(CChessLayout &layout, int nDepth, int nTimeMs)
             return MakeInvalidStep();
     }
 
+    // 历史与步限全部由参数传入, 并深拷贝成本次搜索的本地上下文;
+    // 机器人每一步在独立线程执行, 不依赖也不修改任何跨调用的共享状态。
+    SRepeatFilterCtx repeatCtx;
+    bool bFilterRepeat = !history.empty();
+    if (bFilterRepeat)
+    {
+        repeatCtx.bRedTop = bRedTop;
+        repeatCtx.layout.Copy(&layout);
+        repeatCtx.history = history;
+        repeatCtx.nMaxRepeatJiang = nMaxRepeatJiang;
+        repeatCtx.nMaxRepeatCatch = nMaxRepeatCatch;
+    }
+    ChsAI::RootMoveFilter repeatFilter = bFilterRepeat ? RootMoveViolatesRepeat : 0;
+    void *pFilterData = bFilterRepeat ? (void *)&repeatCtx : 0;
+
     ChsAI::SearchEngine &engine = GetEngine();
-    ChsAI::SearchResult result = engine.Search(sb, nDepth, nTimeMs);
+    ChsAI::SearchResult result = engine.Search(sb, nDepth, nTimeMs, repeatFilter, pFilterData);
 
     if (result.BestMove == 0)
     {
         // 预算过小, 连第 1 层都没算完: 不计时间补算 1 层, 保证永远返回合法着法
         // (根节点合法着法普查已确认至少存在 1 个, 此处必然得到有效着法)
-        result = engine.Search(sb, 1, 0);
+        result = engine.Search(sb, 1, 0, repeatFilter, pFilterData);
+        if (result.BestMove == 0 && bFilterRepeat)
+        {
+            // 所有合法着法都会触发长将/长捉判负(本步已无合规着法):
+            // 退回无过滤搜索, 至少完成本步, 由上层判定后续结果
+            result = engine.Search(sb, 1, 0);
+        }
         if (result.BestMove == 0)
             return MakeInvalidStep(); // 理论上不可达, 双保险
     }

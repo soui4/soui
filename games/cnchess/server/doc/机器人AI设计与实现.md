@@ -30,7 +30,8 @@
          ▼                                                    ▲
 ┌──────────────── 机器人线程池 CRobotAIPool (1..16 线程) ──────┤─────────┐
 │  RunTask(task)   ← 派发到任务最少的 ITaskLoop               │         │
-│    best = CChessAI::SearchBestMove(layout, depth, timeMs)   │         │
+│    best = SearchBestMove(layout, depth, timeMs,              │         │
+│                           history, maxRepeatJiang, maxRepeatCatch)     │
 │    service(λ{ apply(tableId,seatId,generation,best) })  ────┼─────────┘
 │        │ （经 SOUI 服务队列回到主线程）                              │
 └────────┼──────────────────────────────────────────────────────────────┘
@@ -75,6 +76,9 @@ task.depth   = nDepth;
 task.timeMs  = PropBag->GetRobotAITimeMs(m_nRobotLevel[seatId]);          // 时间预算
 task.generation = m_nChessMsg;                                            // 用于丢弃过期结果
 task.layout.Copy(&m_layout);   // 深拷贝棋盘快照，线程池只操作副本
+task.history = m_lstMoves;                                                // 深拷贝走棋历史
+task.maxRepeatJiang = m_dwProps[PROPID_MAX_STP_JIANG];                    // 长将判负步限
+task.maxRepeatCatch = m_dwProps[PROPID_MAX_STP_CATCH];                    // 长捉判负步限
 CRobotAIPool::getSingletonPtr()->Dispatch(task);
 ```
 
@@ -89,8 +93,13 @@ struct SRobotTask
     int        generation; // 派发时的走棋序号，用于丢弃过期结果
     int        timeMs;     // 思考时间预算（毫秒，0=只用固定深度）
     CChessLayout layout;   // 棋盘深拷贝快照（只有快照，不共享实时状态）
+    int        maxRepeatJiang;   // 长将判负步限（重复步数 >= 该值即判负）
+    int        maxRepeatCatch;   // 长捉判负步限（重复步数 >= 该值即判负）
+    std::vector<MOVESTEP> history; // 走到该局面的走棋历史深拷贝
 };
 ```
+
+> 线程约束：机器人每一步都在线程池的独立线程中执行，任务内只允许携带**深拷贝数据**。`layout`、`history`、两个步限都由主线程在派发瞬间拷贝进 `SRobotTask`，工作线程不读取也不修改主线程的 `m_layout` / `m_lstMoves` / `m_dwProps`。
 
 ### 2.4 线程池 `CRobotAIPool`
 
@@ -99,8 +108,8 @@ struct SRobotTask
 - **初始化** `Init(nThreads)`：线程数夹在 `[1,16]`，幂等（已初始化则直接返回）。线程名为 `RobotAI-0..N`。
 - **负载均衡派发** `Dispatch(task)`：选择当前排队任务**最少**的 `ITaskLoop` 派发副本，均衡各线程负载。
 - **计算** `RunTask(task)`：在线程池线程调用
-  `CChessAI::SearchBestMove(task.layout, task.depth, task.timeMs)`，
-  然后通过 `service` 回调把结果投递回主线程。
+  `CChessAI::SearchBestMove(task.layout, task.depth, task.timeMs, task.history, task.maxRepeatJiang, task.maxRepeatCatch)`，
+  然后通过 `service` 回调把结果投递回主线程。历史与步限随任务传入，搜索内部再复制一份到本次调用的本地上下文，不依赖任何跨调用的共享状态。
 - **回主线程**：`SetSink(serviceSink, applySink)` 在启动时由 `WebSocketGame` 接线：
   - `serviceSink` 用 `StdRunnable` 包一层后 `postServiceTask` 投递到 LWS 主线程；
   - `applySink` 定位 `tableId` 对应棋盘并调用 `pChess->ApplyRobotMove(best, seatId, generation)`。
@@ -134,7 +143,7 @@ struct SRobotTask
 
 ## 3. 搜索引擎
 
-核心入口 `CChessAI::SearchBestMove(layout, depth, timeMs)` 分为**适配层**与**搜索引擎**两层。
+核心入口 `CChessAI::SearchBestMove(...)` 分为**适配层**与**搜索引擎**两层；机器人实际调用带 `history` 与长将/长捉步限的重载（见 3.6），旧的 3 参数接口保持兼容、不启用重复过滤。
 
 ### 3.1 适配层（`ChessAI.cpp`）
 
@@ -145,7 +154,8 @@ struct SRobotTask
 3. **棋盘转换** `LayoutToSearchBoard`：`m_chesses[y][x]` 的 `CHESSMAN` 枚举 → 90 格一维 `int8_t`（正红负黑，类型 1..7 = 将士象马车炮卒），同时记录红帅/黑将所在格、行棋方，并从头计算 Zobrist 键。搜索全程在快照上运行，不修改调用方的 layout。
 4. **根节点合法着法普查**：`MoveGenerator::Generate` 全量生成后逐个 `Make → IsSideInCheck → Unmake` 数合法着法；**0 个合法**（将死/困毙/无子）直接返回无效走法 `pt1=pt2={-1,-1}`，上层 `ApplyRobotMove` 据此判负。
 5. **结果回转** `SearchMoveToStep`：压缩着法编码（起点高 8 位 + 终点低 8 位）还原为 `MOVESTEP`；`enemy/nEnemyID` 取自走子前的盘面快照。
-6. **兜底保证**：若时间预算过小导致引擎连第 1 层都没算完（`BestMove==0`），不计时间补算 1 层（`Search(sb, 1, 0)`），**保证永远返回合法着法**。
+6. **长将/长捉规避**（仅带历史的重载启用）：用 `task.history` 构造本次搜索的本地过滤上下文，根节点对每个候选着法在布局副本上模拟走子，追加到历史副本后调用算法层 `CChessLayout::GetFarthestRepeat`；若目标是将/帅且重复步数达到 `maxRepeatJiang`，或目标是其他棋子且重复步数达到 `maxRepeatCatch`，该根着法被过滤（见 3.6）。过滤只作用于根节点，常规搜索结果仍严格采用引擎最佳着法。
+7. **兜底保证**：若时间预算过小导致引擎连第 1 层都没算完（`BestMove==0`），不计时间补算 1 层（`Search(sb, 1, 0)`），**保证永远返回合法着法**；若所有合法着法都被重复规则过滤（本步已无合规着法），先退回无过滤的 1 层搜索完成本步，避免机器人直接卡死。
 
 > ⚠️ **严格采用引擎最佳着法（不要做根节点"等分随机挑选"）**：根节点子搜窗口随 alpha 收窄后，fail-high 返回的边界值会与最佳分"伪同分"——实测自对弈中 64% 的等分候选为伪等分，真实分值可差数百，随机/优先吃子挑选会系统性劣化棋力。此行为与 C# 原版一致。
 
@@ -196,6 +206,21 @@ for (d = 1; d <= maxDepth; d++):
 | 3 | 杀手着法[ply][0] | `900,000` |
 | 4 | 杀手着法[ply][1] | `800,000` |
 | 5 | 其它 | 历史启发累计值 |
+
+### 3.6 长将/长捉规避
+
+机器人如果不停重复将军或追捉同一棋子，会被服务器按"长将/长捉"判负。为避免这个问题，搜索入口新增带历史的重载：
+
+```cpp
+CChessAI::SearchBestMove(layout, depth, timeMs, history, maxRepeatJiang, maxRepeatCatch);
+```
+
+- **历史来源**：`history` 是 `CCnChess::m_lstMoves` 的深拷贝，由 `SRobotTask` 随任务传入；`maxRepeatJiang/maxRepeatCatch` 是服务器配置的判负步限。工作线程不访问主线程状态。
+- **检测复用**：算法层 `CChessLayout::GetFarthestRepeat(layout, history, chsEnemy)` 由服务器 `CCnChess::GetFarthestRepeat` 与机器人过滤共用，保证"判负口径"和"规避口径"完全一致。
+- **根节点过滤**：`SearchEngine::Search` 接受可选的 `RootMoveFilter`，`AlphaBetaRoot` 在根着法循环开头跳过被过滤的着法；内部节点不受影响。
+- **单项判定**：对每个根着法，在 `CChessLayout` 本地副本上 `Move` 后把 `MOVESTEP` 追加到历史副本，再算 `GetFarthestRepeat`。目标为红/黑将且重复步数 `>= maxRepeatJiang`、或目标为其他无根子且重复步数 `>= maxRepeatCatch` 时该着法被排除。
+- **性能**：先用"移动后棋子是否攻击到敌子"做快捷剪枝；其余候选在一次搜索内按着法编码缓存结果，避免迭代加深每层重复计算。
+- **无合规着法的兜底**：若全部合法着法都被过滤，说明本步已无法避免重复判负，退回无过滤的 1 层搜索完成本步，不返回无效着法导致机器人卡死。
 
 ---
 

@@ -203,6 +203,9 @@ namespace ChsAI
         SearchResult() : BestMove(0), Score(0), Depth(0), Nodes(0), ElapsedMs(0) {}
     };
 
+    /** 根节点着法过滤器: 返回 true 表示排除该根着法(仅作用于根节点, 不影响内部搜索) */
+    typedef bool (*RootMoveFilter)(int fromSq, int toSq, void *userData);
+
     /** 迭代加深 alpha-beta + PVS 搜索引擎(移植自 SearchEngine.cs) */
     class SearchEngine
     {
@@ -220,8 +223,12 @@ namespace ChsAI
          * @param root 根局面(不会被修改)
          * @param maxDepth 迭代加深最大深度
          * @param timeLimitMs 时间预算(毫秒), >0 时迭代间软停 + 搜内硬停; <=0 不限时
+         * @param rootFilter 可选的根节点着法过滤器, 返回 true 的根着法不参与搜索;
+         *                   传 0 表示不过滤
+         * @param filterData 传给 rootFilter 的上下文指针
          */
-        SearchResult Search(const SearchBoard &root, int maxDepth, int timeLimitMs);
+        SearchResult Search(const SearchBoard &root, int maxDepth, int timeLimitMs,
+                            RootMoveFilter rootFilter = 0, void *filterData = 0);
 
     private:
         SearchEngine(const SearchEngine &);
@@ -245,6 +252,8 @@ namespace ChsAI
         long long          m_startMs;
         int                m_timeLimitMs;
         bool               m_stop;    /**< 时间预算耗尽的停搜标记 */
+        RootMoveFilter     m_rootFilter;  /**< 根节点着法过滤器, 0 表示不过滤 */
+        void              *m_filterData;  /**< 过滤器上下文 */
 
         uint16_t m_killers[MaxPly][2];
         int      m_history[14][SearchBoard::Size];

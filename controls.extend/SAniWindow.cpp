@@ -1,8 +1,7 @@
 #include "stdafx.h"
 #include "SAniWindow.h"
 #include <animation/SInterpolatorImpl.h>
-namespace SOUI
-{
+SNSBEGIN
 SAniWindow::SAniWindow(void)
     : m_nSteps(20)
     , m_iAniStep(0)
@@ -130,4 +129,4 @@ void SAniWindow::EnableAnimate(bool bEnable)
     m_bEnableAni = bEnable;
 }
 
-} // namespace SOUI
+SNSEND

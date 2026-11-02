@@ -2,8 +2,7 @@
 #include "SIPAddressCtrl.h"
 #define SEP_EDIT 2
 
-namespace SOUI
-{
+SNSBEGIN
 class SEditIP : public SEdit {
     DEF_SOBJECT(SEdit, L"ipedit")
   public:
@@ -306,4 +305,4 @@ void SIPAddressCtrl::ClearAddress()
         m_ipFields[3] = 0;
     }
 }
-} // namespace SOUI
+SNSEND

@@ -5,8 +5,7 @@
 #pragma warning(disable : 4267)
 #pragma warning(disable : 4018)
 
-namespace SOUI
-{
+SNSBEGIN
 SByteArray::SByteArray()
 {
 }
@@ -276,4 +275,4 @@ std::string SByteArray::ToString()
     return std::string((const char *)&m_data[0], m_data.size());
 }
 
-} // namespace SOUI
+SNSEND

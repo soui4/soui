@@ -14,8 +14,7 @@
 #pragma once
 #include "core/SWnd.h"
 
-namespace SOUI
-{
+SNSBEGIN
     /**
      * @class      SCalendar
      * @brief      日历类
@@ -75,5 +74,5 @@ namespace SOUI
 		
 		int           m_iBeginYear;		
     };
-}//end of namespace
+SNSEND
 

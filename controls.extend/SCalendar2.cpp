@@ -24,7 +24,7 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CCalendar
 
-namespace SOUI{
+SNSBEGIN
 
 
 //子控件的名字
@@ -185,4 +185,4 @@ static const int KID_Year_Begin           = 2000;
         return true;
     }
 
-}//end of namespace
+SNSEND

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  mvc_prog_fill.svg - MVC 行内进度条的已完成部分
+
+  与 mvc_prog_track.svg 同尺寸、同圆角（16x16，rx=4），九宫格边距 4。
+  用纯色而不是竖向渐变：8dp 高度时上下边距正好占满，九宫格会跳过中间段，
+  渐变会在这里断开成两截；纯色不受影响。
+
+  颜色跟 @color/accent（#2563EB）同色，比再加一层高光更适合 8px 的高度。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <rect x="0" y="0" width="16" height="16" rx="4" ry="4" fill="#2563EB"/>
+</svg>

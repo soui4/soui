@@ -2,8 +2,7 @@
 #include "SSkinImgFrame3.h"
 #include <souicoll.h>
 
-namespace SOUI
-{
+SNSBEGIN
 typedef SMap<SStringW, IBitmapS *> IMGPOOL;
 static IMGPOOL s_imgPool;
 
@@ -82,4 +81,4 @@ void SSkinImgFrame3::_Draw(IRenderTarget *pRT, LPCRECT rcDraw, DWORD dwState, BY
                           byAlpha);
 }
 
-} // namespace SOUI
+SNSEND

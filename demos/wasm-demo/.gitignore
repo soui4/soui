@@ -1,0 +1,5 @@
+# build-soui.sh / build.sh 的全部产物（.wasm 约 30 MB、.data 约 19 MB），
+# 只能在本机经 emsdk 重新生成，不入库。见 readme.md 的"文件"表。
+/out/
+# 上线档（-O2 -DNDEBUG / MinSizeRel）的产物也待在这里，同理不入库。
+/release/

@@ -171,7 +171,7 @@ napi_value SouiSurfaceProxy::getLocalRef(napi_env env) {
 // ============================================================
 
 void SouiSurfaceProxy::onSizeChanged(int width, int height) {
-    HWND hWnd = getNativeId();
+    HWND hWnd = (HWND)(intptr_t)getNativeId();
     SLOGI()<<"hjx, onSizeChanged,hWnd="<<(void*)hWnd<<" width="<<width<<" height="<<height;
     SetWindowPos(hWnd, 0, 0, 0, width, height,
                  SWP_NOZORDER | SWP_NOMOVE);

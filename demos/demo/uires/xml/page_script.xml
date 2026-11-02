@@ -74,6 +74,11 @@
     沿抛物线飞向得分 LED(wnd_tank_aniframe 浮层);
     结束面板同样为布局内静态遮罩 + 卡片,动画走 anim 模板
     (tank_over_mask_in/out、tank_over_card_in/out);
+    音效: 与俄罗斯方块同一套通道(lua 导出 PlaySound/GetAppDir,wav 在 snd/
+    下,构建时拷入程序资源目录),tank_fire/efire(开炮,敌人那条带 NOSTOP
+    不压玩家的炮声)/brick/steel(砖墙碎裂、钢墙弹回)/boom/die(击毁、阵亡)/
+    spawn(敌人出生与重生)/start/stage/over,共 10 条,全部由
+    tools/sfx/gen_tank_sfx.py 合成(方波扫频 + 滤波噪声,无第三方素材);
     数据层(地图/移动/碰撞/炮弹/出生/计分)与渲染层分离,可在裸 lua 中
     回归测试;子页隐藏自动暂停。
   棋盘/格子 id 与界面名字约定见 test.lua 的 tank_* 函数。

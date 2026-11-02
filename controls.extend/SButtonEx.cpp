@@ -1,8 +1,7 @@
 ﻿#include "stdafx.h"
 #include "SButtonEx.h"
 
-namespace SOUI
-{
+SNSBEGIN
 SButtonEx::SButtonEx(void)
     : m_drawMode(HORZ_ICON_TEXT)
     , m_nSepSize(5)
@@ -209,4 +208,4 @@ void SButtonEx::SetIconVisible(bool bVisible)
     Invalidate();
 }
 
-} // namespace SOUI
+SNSEND

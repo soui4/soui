@@ -1,8 +1,7 @@
 ﻿#include "stdafx.h"
 #include "SImageMaskWnd.h"
 
-namespace SOUI
-{
+SNSBEGIN
 SImageMaskWnd::SImageMaskWnd(void)
 {
 }
@@ -158,4 +157,4 @@ void SImageMaskWnd::SetImage(IBitmapS *pBitmap, FilterLevel fl /*=kHigh_FilterLe
     Invalidate();
 }
 
-} // namespace SOUI
+SNSEND

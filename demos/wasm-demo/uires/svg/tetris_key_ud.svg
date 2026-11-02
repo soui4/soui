@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  tetris_key_ud.svg - 俄罗斯方块键帽图:上下方向键(↑ ↓),纯键帽无文字;
+  键帽浅灰描边圆角矩形 + 深灰箭头,含义文字在 page_script.xml 布局中配置。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="52" height="26" viewBox="0 0 52 26">
+  <g>
+    <rect x="1" y="1" width="24" height="24" rx="5" fill="#F1F5F9" stroke="#CBD5E1" stroke-width="1"/>
+    <polygon points="8.5,17 17.5,17 13,9" fill="#334155"/>
+    <rect x="27" y="1" width="24" height="24" rx="5" fill="#F1F5F9" stroke="#CBD5E1" stroke-width="1"/>
+    <polygon points="34.5,9 43.5,9 39,17" fill="#334155"/>
+  </g>
+</svg>

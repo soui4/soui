@@ -1,4 +1,4 @@
-#ifndef SWAVEPROGRESS_H
+﻿#ifndef SWAVEPROGRESS_H
 #define SWAVEPROGRESS_H
 
 #include <control/SCmnCtrl.h>
@@ -39,6 +39,7 @@ class SWaveProgress : public SProgress {
   private:
     void StartAnimation();
     void StopAnimation();
+    void BuildWavePath(IPathS *pPath, int cx, int cy, float fAmpScale);
 
     COLORREF m_crBorder;
     COLORREF m_crBackground;
@@ -47,9 +48,11 @@ class SWaveProgress : public SProgress {
     float m_fWaveSpeed;
     float m_fWaveHeight;
     int m_nWaveCount;
-    
-    int m_nOffset;
-    SAutoRefPtr<IPathS> m_path;
+
+    float m_fPhase;
+    float m_fPhase2;
+    SAutoRefPtr<IPathS> m_pathFront;
+    SAutoRefPtr<IPathS> m_pathBack;
 };
 
 SNSEND

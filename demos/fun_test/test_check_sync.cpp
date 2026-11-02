@@ -1,4 +1,4 @@
-#include <souistd.h>
+﻿#include <souistd.h>
 #include <core/SWnd.h>
 #include <core/SWndContainerImpl.h>
 #include <res.mgr/SUiDef.h>
@@ -44,7 +44,7 @@ namespace
         }
 
       protected:
-        void _DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iState, BYTE byAlpha) const override
+        void _DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iState, BYTE byAlpha) const
         {
         }
     };

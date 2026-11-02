@@ -1,0 +1,758 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  xml/dlg_main.xml -- SOUI on WebAssembly 展示页
+
+  这是官网展示用的那一版：一屏之内把 SOUI 的主要能力过一遍，版式和 demos/demo 的
+  桌面向导一致（顶栏 + 页签 + 内容页），但只保留能在 wasm 构建图里跑起来的部分。
+
+    0 概览      介绍 + 四张能力卡
+    1 基础控件  radio/check/switch/toggle/progress/slider/combobox/listbox/calendar
+    2 更多控件  hotkey/ipctrl（核心）+ ratingbar/lightbutton/verificationCodeEdit/
+                grouplist（controls.extend）
+    3 MVC       listview/tileview/treeview/mclistview，用一个子 tabctrl 切换；列表项与
+                树节点由宿主适配器填，见 soui_main.cpp
+    4 列表与树  treectrl + listctrl
+    5 布局      gridLayout 嵌套 + 行列权重
+    6 图形控件  progressRing / SpeedMeter / waveProgress / qrctrl
+    7 表格      gridctrl + propgrid
+    8 图表      HelloChart 折线 / 柱状 / 饼图
+    9 编辑器    richedit(<edit>，含一个 number="1" 的数字框) + hexedit + Scintilla
+   10 扩展控件  controls.extend 的 colorizeText / scrolltext
+   11 动画      SAnimation 补间、SValueAnimator 值动画、SPropAnimator 属性动画
+   12 Lua 游戏  消消乐 / 俄罗斯方块 / 坦克大战，内容来自 lua:games_script + layout:XML_PAGE_GAME
+   13 模态表单  SModalRoot + SModalView 弹出表单，提交结果回填主页面
+
+  尺寸按帧缓冲 800x600 写死（swinx/wasm.cmake 的 SWINX_FB_WIDTH/HEIGHT）；窗口由
+  soui_main.cpp 以 WS_POPUP 建在 (0,0)，所以 client 坐标 == canvas 像素坐标。
+
+  size 的特殊值按 SOUI 自己的定义（SOUI/include/interface/slayout-i.h）：
+  -1 = SIZE_WRAP_CONTENT 自适应内容，-2 = SIZE_MATCH_PARENT 填满父容器。
+  这和 Android 的 layout_width 约定正好相反，写反了不会报错，只会让自适应行
+  拿到整个父容器的高度、把后面的行一路推出可视区。
+-->
+<!-- sendWheel2Hover：滚轮按光标下的窗口派发。默认关闭时只发给焦点窗口，
+     而演示里的列表/树拿不到焦点，滚轮会被静默丢弃（桌面 demo 里这条也一直开着）。 -->
+<SOUI name="wasmHost" title="@string/title" width="800" height="600"
+       margin="0,0,0,0" resizable="0" wndType="appMain" appWnd="1" translucent="0"
+       sendWheel2Hover="1">
+  <!-- 脚本节点必须放在 <SOUI> 这一层：SHostWnd::Create 在解析完布局后按 src 取
+       资源原始缓冲交给脚本模块执行（SOUI/src/core/shostwnd.cpp），然后 root 的
+       on_init 才被调用。lua:games_script 对应 uires.idx 里 <lua> 组的 games_script。 -->
+  <script src="lua:games_script"/>
+
+  <root colorBkgnd="@color/page" layout="vbox"
+        padding="12dp,10dp,12dp,10dp" interval="8dp" on_init="on_init">
+
+    <!-- 顶栏：品牌 + 一句话介绍，右侧是官方 QQ 群与当前构建的渲染信息。
+         品牌文字由宿主在 main() 里填成 "SOUI <版本号>"（SOUI_VER1..4，
+         见 soui_main.cpp 的 fillBrand），XML 里只写一个占位词。
+         背景用 white 而不是 _skin.sys.wnd.bkgnd：那张九宫格图带边框，
+         在 800x600 的整屏上会把内容挤出一圈灰边。 -->
+    <window size="-2,-1" layout="hbox" colorBkgnd="@color/surface"
+            padding="12dp,7dp,12dp,7dp" interval="10dp" gravity="center">
+      <text class="brand" name="app_brand">SOUI</text>
+      <text class="hint">@string/hint</text>
+      <window size="0,0" weight="1" visible="0"/>
+      <text class="hint">@string/qq_group</text>
+      <text class="hint">@string/stack_hint</text>
+    </window>
+
+    <!-- 页签头显示的是 sys 资源的浅灰底图 + 选中项蓝色下划线，所以文字用中深灰。
+         不设 animateSteps：它会给 tabctrl 的动画器配时长，切页改走 STabSlider
+         过渡——过渡期间 tabctrl 把新旧两页都 SetVisible(FALSE)，只显示那个
+         覆盖整页的过渡窗口（STabCtrl.cpp:23-77）。过渡按时长推进，浏览器标签页
+         被挂起（后台标签 rAF 停摆）时会停在一页都不显示的状态；关掉后
+         SetCurSel 同步隐藏旧页、显示新页，点得更干脆。 -->
+    <tabctrl name="tab_main" size="-2,0" weight="1"
+             tabSkin="_skin.sys.tab.header" colorBkgnd="@color/page"
+             colorText="#4B5563" colorTextHover="@color/accent"
+             font="size:13dp" tabHeight="28dp" curSel="0">
+
+      <page title="概览" layout="vbox" padding="12dp,10dp,12dp,10dp" interval="10dp">
+        <text class="h1" size="-2,-1">@string/ov_title</text>
+        <text class="body" size="-2,-1" multiLines="1" wordBreak="1">@string/ov_body</text>
+        <!-- 2x2 能力卡。单元格宽度写死 371dp：(页宽 776 - 左右 padding 24 - 列间距 10) / 2，
+             卡片内文本区 = 371 - 左右 padding 24 = 347dp。
+             size 不能写 0：0 是 SIZE_SPEC 的"指定尺寸 = 0 像素"，不是"自适应"；
+             gridLayout 用子控件的期望尺寸决定行列大小，四张 0x0 的卡会全部叠在
+             左上角（文字画得出来，因为文本不裁剪，但看上去是一团重叠的文本）。
+             xGravity/yGravity=fill 之后行高会拉伸，卡片铺满整个网格区域。 -->
+        <window name="ov_grid" size="-2,0" weight="1" layout="gridLayout"
+                columnCount="2" rowCount="2" xInterval="10dp" yInterval="10dp"
+                xGravity="fill" yGravity="fill">
+          <window size="371dp,-1" rowWeight="1" colorBkgnd="@color/surface" layout="vbox"
+                  padding="12dp,10dp,12dp,10dp" interval="5dp">
+            <text class="h2" size="-2,-1">@string/ov_c1_t</text>
+            <text class="hint" size="-2,-1" multiLines="1" wordBreak="1">@string/ov_c1_d</text>
+          </window>
+          <window size="371dp,-1" rowWeight="1" colorBkgnd="@color/surface" layout="vbox"
+                  padding="12dp,10dp,12dp,10dp" interval="5dp">
+            <text class="h2" size="-2,-1">@string/ov_c2_t</text>
+            <text class="hint" size="-2,-1" multiLines="1" wordBreak="1">@string/ov_c2_d</text>
+          </window>
+          <window size="371dp,-1" rowWeight="1" colorBkgnd="@color/surface" layout="vbox"
+                  padding="12dp,10dp,12dp,10dp" interval="5dp">
+            <text class="h2" size="-2,-1">@string/ov_c3_t</text>
+            <text class="hint" size="-2,-1" multiLines="1" wordBreak="1">@string/ov_c3_d</text>
+          </window>
+          <window size="371dp,-1" rowWeight="1" colorBkgnd="@color/surface" layout="vbox"
+                  padding="12dp,10dp,12dp,10dp" interval="5dp">
+            <text class="h2" size="-2,-1">@string/ov_c4_t</text>
+            <text class="hint" size="-2,-1" multiLines="1" wordBreak="1">@string/ov_c4_d</text>
+          </window>
+        </window>
+      </page>
+
+      <page title="基础控件" layout="hbox" padding="12dp,10dp,12dp,10dp" interval="14dp">
+        <window size="0,-2" weight="1" layout="vbox" interval="10dp">
+          <text class="h1" size="-2,-1">@string/ctrls_h1</text>
+          <text class="hint" size="-2,-1" multiLines="1" wordBreak="1">@string/ctrls_body</text>
+          <window size="-2,-1" layout="hbox" interval="16dp" gravity="center">
+            <radio name="radio_a" colorText="@color/text" checked="1">选项 A</radio>
+            <radio name="radio_b" colorText="@color/text">选项 B</radio>
+            <radio name="radio_c" colorText="@color/text">选项 C</radio>
+          </window>
+          <window size="-2,-1" layout="hbox" interval="18dp" gravity="center">
+            <switch name="sw_demo" checked="1"/>
+            <toggle name="tgl_demo" toggled="1" skin="_skin.sys.tree.toggle"/>
+            <check name="chk_demo" text="复选框" skin="_skin.sys.checkbox" class="body"/>
+          </window>
+          <window size="-2,-1" layout="hbox" interval="12dp" gravity="center">
+            <text class="hint" size="70dp,-1">progress</text>
+            <!-- 百分比文字是 showText（SProgress 的 ATTR_BOOL(showText, m_bShowText)），
+                 写成 showPercent 不会报错，只是这个属性没人认，文字直接不画。 -->
+            <progress name="prog_demo" colorText="@color/text" size="220dp,16dp"
+                      value="62" min="0" max="100" showText="1"/>
+          </window>
+          <window size="-2,-1" layout="hbox" interval="12dp" gravity="center">
+            <text class="hint" size="70dp,-1">sliderbar</text>
+            <sliderbar name="slider_demo" size="220dp,-1" value="40" min="0" max="100"/>
+          </window>
+          <!-- combobox 的下拉窗是 SDropDownWnd（SHostWnd 子类）建的第二个软件宿主
+               窗口——这一页就是 swinx wasm 弹出窗支持的验收页：下拉窗、点外关闭、
+               关闭后的画面恢复全部走 swinx 的多窗口合成。dropDown="1" 只能下拉选；
+               dropDown="0" 的那支还能直接打字。animateTime="0" 关掉下拉动画：
+               STabSlider 的教训同样适用这里，动画时长在无真实时间推进的环境里不会结束。
+               编辑框外观统一走 uidef/init.xml 的 editbox 类（ncSkin + margin 出边框，
+               margin 为空时 OnNcPaint 不画边框）。 -->
+          <window size="-2,-1" layout="hbox" interval="12dp" gravity="center">
+            <text class="hint" size="70dp,-1">combobox</text>
+            <combobox name="cbx_demo" size="0,30dp" weight="1" class="editbox" dropDown="1"
+                      dropHeight="120dp" btnSkin="_skin.sys.dropbtn" animateTime="0" curSel="1"
+                      cueText="下拉选择一项" cueColor="@color/textsub">
+              <dropdownStyle>
+                <root colorBkgnd="@color/surface"/>
+              </dropdownStyle>
+              <liststyle itemHeight="26dp" colorText="@color/text" colorBkgnd="@color/surface"/>
+              <editstyle inset="5dp,0,5dp,0" margin="0" align="left" valign="center"
+                         colorText="@color/text" colorBkgnd="@color/surface"/>
+              <items>
+                <item text="canvas2d —— 全部平台的软件渲染后端"/>
+                <item text="imgdecoder-stb —— PNG/JPEG 解码"/>
+                <item text="ScriptModule-LUA —— 脚本扩展"/>
+                <item text="richedit41 —— 富文本编辑"/>
+                <item text="Scintilla —— 代码编辑器"/>
+              </items>
+            </combobox>
+          </window>
+          <text class="h2" size="-2,-1">listbox</text>
+          <listbox name="lb_demo" size="-2,0" weight="1" hotTrack="1" itemHeight="26dp"
+                   colorBkgnd="@color/surface" colorText="@color/text"
+                   colorItemHotBkgnd="#EFF3FB" colorItemSelBkgnd="@color/accentsoft"
+                   colorSelText="#1E3A8A">
+            <items>
+              <item text="SWindow —— 一切控件的基类"/>
+              <item text="SPanel —— 布局容器"/>
+              <item text="SHostWnd —— 宿主窗口与消息泵"/>
+              <item text="SAdapterBase —— 虚拟列表的数据源"/>
+              <item text="SSkinObj —— 皮肤体系"/>
+              <item text="SEventSet —— 事件订阅与冒泡"/>
+            </items>
+          </listbox>
+        </window>
+        <!-- calendar 没有皮肤也没有文字，GetDesiredSize 只能返回 0，写自适应会被压成
+             0 高；它的分区高度和 6 行日期都按客户区高度分摊，所以给满高。
+             colorHoverText 必须显式给：m_crHoverText 在 Init() 里没有初始化。 -->
+        <calendar name="cal_demo" size="250dp,-2"
+                  colorBkgnd="@color/surface" colorText="@color/text"
+                  colorOtherText="@color/textsub" colorHoverText="@color/accent"
+                  colorSelText="@color/text"/>
+      </page>
+
+      <!-- 更多控件页：hotkey / ipctrl 来自 SOUI 核心，ratingbar / lightbutton /
+           verificationCodeEdit / grouplist 来自 controls.extend（SCtrlsRegister
+           已把它们注册进 wasm 构建图）。grouplist 的折叠动画发生在页内的
+           aniwindow 容器里；hotkey/ipctrl 的编辑框外观统一走 uidef/init.xml 的
+           editbox 类（ncSkin + margin 出边框，margin 为空时 OnNcPaint 不画边框）。 -->
+      <page title="更多控件" layout="hbox" padding="12dp,10dp,12dp,10dp" interval="14dp">
+        <window size="0,-2" weight="1" layout="vbox" interval="8dp">
+          <text class="h1" size="-2,-1">@string/more_h1</text>
+          <text class="hint" size="-2,-1" multiLines="1" wordBreak="1">@string/more_body</text>
+          <window size="-2,-1" layout="hbox" interval="8dp" gravity="center">
+            <text class="hint" size="56dp,-1">hotkey</text>
+            <hotkey name="hk_demo" size="0,-1" weight="1" class="editbox" hotKey="ctrl+shift+f2"/>
+          </window>
+          <window size="-2,-1" layout="hbox" interval="8dp" gravity="center">
+            <text class="hint" size="56dp,-1">ipctrl</text>
+            <ipctrl name="ip_demo" size="0,-1" weight="1" class="editbox" ip="192.168.4.21"/>
+          </window>
+          <!-- ratingbar 的 starSkin 用 imglist 两帧雪碧图：DrawStars 按
+               DrawByIndex(rt, rc, bForeground ? 0 : 1) 取帧，所以第 0 帧=亮星、
+               第 1 帧=暗星（svg:star 的左半边/右半边）。 -->
+          <text class="h2">ratingbar</text>
+          <window size="-2,-1" layout="hbox" interval="12dp" gravity="center">
+            <ratingbar name="rating_demo" size="180dp,30dp" starSkin="svg_star"
+                       starNum="5" value="3.5"/>
+            <text class="hint">3.5 / 5</text>
+          </window>
+          
+          <text class="h2">verificationCodeEdit</text>
+          <!-- 自绘验证码格子：每格一位，输入时数字逐格回显，格子里的背景字符
+               是控件自己随机画的干扰码。 -->
+          <verificationCodeEdit name="vcode_demo" size="-1,40dp" maxBuffer="6"
+                                colorText="@color/text" colorBkgnd="@color/surface"/>
+        </window>
+        <window size="0,-2" weight="1" layout="vbox" interval="10dp">
+          <text class="h2">grouplist</text>
+          <!-- 折叠手风琴。groupTemplate 必须带 name="title" 的可点行和
+               name="container" 的动画容器；itemTemplate 的 class_name 决定条目
+               控件类，这里用 check2（SCheckBox2）做出可勾选条目。条目文字由
+               宿主在 EventGroupListInitGroup/InitItem 回调里写（id=301 对应
+               soui_main.cpp EVENT_MAP 里的三条 EVENT_ID_HANDLER），控件本身
+               只发事件不改文字。 -->
+          <grouplist name="gl_demo" id="301" size="-2,0" weight="1" layout="vbox" viewSize="-2,-1"
+                     colorBkgnd="@color/surface">
+            <groupTemplate layout="vbox" size="-2,-1">
+              <button name="title" size="-2,32dp" padding="10dp,5dp,10dp,5dp" layout="hbox"
+                      gravity="center" colorText="@color/text" colorBkgnd="#F3F4F6">
+                <text name="txt_label" weight="1" font="size:13dp,bold:1"/>
+                <toggle skin="_skin.sys.tree.toggle" name="tgl_switch" toggled="1"
+                        msgTransparent="1"/>
+              </button>
+              <aniwindow name="container" layout="vbox" size="-2,-1" Interpolator="Accelerate"
+                        factor="1.0" steps="10" gravity="center"/>
+            </groupTemplate>
+            <itemTemplate size="-2,28dp" layout="hbox" gravity="center"
+                          class_name="check2" skin="_skin.sys.list.item">
+              <text name="txt_label" extend_left="10dp" colorText="@color/text"/>
+            </itemTemplate>
+            <data>
+              <group text="SOUI 核心" id="100">
+                <item text="窗口与布局体系" id="101"/>
+                <item text="资源管理与皮肤" id="102"/>
+                <item text="事件与消息映射" id="103"/>
+              </group>
+              <group text="controls.extend" id="200">
+                <item text="Scintilla / hexedit" id="201"/>
+                <item text="图表与仪表盘" id="202"/>
+                <item text="Lua 脚本游戏" id="203"/>
+              </group>
+            </data>
+          </grouplist>
+        </window>
+      </page>
+
+      <!-- MVC 页：数据源 → 适配器 → 虚拟列表/树。行内容由 soui_main.cpp 的两个适配器
+           在 getView 里填（listview/tileview/mclistview 都不接受 XML 内联行，不挂
+           适配器只会画出一行空模板），所以这一页在宿主接线之前只有一副空壳。
+           四个视图塞进一个子 tabctrl：页签名就是控件类名，一眼能看出当前看的是哪个
+           视图。前三个视图共用同一份行数组——换视图不换数据，改数据只要 notify 一次；
+           treeview 走 STreeAdapterBase 的另一棵数据（树节点本来就不是一张平表），
+           同样由适配器在 getView 里按名字填 txt_label。
+           子 tabctrl 同样不设 animateSteps：外层页签头那段注释的理由对它一样成立。
+           行内控件用 pos 绝对定位：模板节点的 layout 不会传给回收复用的 SItemPanel，
+           写 hbox/vbox 只会得到一列叠在一行的控件。 -->
+      <page title="MVC" layout="vbox" padding="12dp,10dp,12dp,10dp" interval="8dp">
+        <text class="h1" size="-2,-1">MVC：500 行数据，四种视图，任意行模板</text>
+        <text class="hint" size="-2,-1" multiLines="1" wordBreak="1">SAdapterBase / SMcAdapterBase 把数据行绑定到模板窗口：下面的列表有 500 行，控件只为可视区里的十余行建窗口，滚动时回收复用。行模板不是一行文本——头像块、两行标题、说明、热度条、下载量都是模板里的普通控件，适配器按名字逐个填。四个视图用子页签切换，treeview 由 STreeAdapterBase 驱动。</text>
+        <window size="-2,-1" layout="hbox" interval="8dp">
+          <button name="btn_mvc_shuffle" text="打乱数据" skin="_skin.sys.btn.normal" class="body"/>
+          <button name="btn_mvc_add" text="追加一行" skin="_skin.sys.btn.normal" class="body"/>
+          <text name="mvc_status" class="stat" size="0,-1" weight="1"/>
+        </window>
+        <tabctrl name="tab_mvc" size="-2,0" weight="1"
+                 tabSkin="_skin.sys.tab.header" colorBkgnd="@color/surface"
+                 colorText="#4B5563" colorTextHover="@color/accent"
+                 font="size:12dp" tabHeight="24dp" curSel="0">
+          <!-- listview/tileview 的模板节点整体交给 SItemPanel::InitFromXml，
+               所以两个视图用同一套子控件名，适配器一份 getView 就能同时填两边。
+               行模板不是"一行文本"：头像块、两行名称/来源、说明、热度进度条、
+               下载量各占一个矩形，回收复用的行窗口会整棵子树一起换内容。 -->
+          <page title="listview" layout="vbox" padding="8dp,6dp,8dp,6dp" interval="6dp">
+            <text class="hint" size="-2,-1">SListView：500 行数据只创建可视区里的十余行；行模板可以是任意控件树。</text>
+            <listview name="mvc_lv" size="-2,0" weight="1" colorBkgnd="@color/surface"
+                      colorText="@color/text" colorSelected="@color/accentsoft">
+              <template itemHeight="48">
+                <window name="item_icon" pos="10,9" size="30dp,30dp" colorBkgnd="#DBEAFE"
+                        clipClient="1">
+                  <text name="item_initial" pos="0,0,-0,-0" align="center" colorText="#1D4ED8"
+                        font="size:14dp,bold:1"/>
+                </window>
+                <text name="item_name" pos="50,5" size="180dp,20dp" class="body"/>
+                <text name="item_kind" pos="50,26" size="180dp,16dp" class="hint"/>
+                <text name="item_note" pos="240,14" size="300dp,18dp" class="hint"/>
+                <progress name="item_score" pos="550,19" size="90dp,10dp" value="50"
+                          min="0" max="100" bkgndSkin="mvc_prog_track"
+                          posSkin="mvc_prog_fill" showText="0"/>
+                <text name="item_stat" pos="650,14" size="80dp,18dp" class="hint" align="right"/>
+              </template>
+            </listview>
+          </page>
+          <page title="tileview" layout="vbox" padding="8dp,6dp,8dp,6dp" interval="6dp">
+            <text class="hint" size="-2,-1">STileView：同一份数据排成卡片网格，列数随宽度自适应。</text>
+            <tileview name="mvc_tile" size="-2,0" weight="1" colorBkgnd="@color/surface"
+                      colorText="@color/text" colorSelected="@color/accentsoft">
+              <template itemWidth="168dp" itemHeight="100dp">
+                <window name="item_icon" pos="|0,10" offset="-0.5,0" size="34dp,34dp"
+                        colorBkgnd="#DBEAFE" clipClient="1">
+                  <text name="item_initial" pos="0,0,-0,-0" align="center" colorText="#1D4ED8"
+                        font="size:15dp,bold:1"/>
+                </window>
+                <text name="item_name" pos="|0,50" offset="-0.5,0" size="150dp,18dp"
+                      align="center" class="body"/>
+                <text name="item_kind" pos="|0,69" offset="-0.5,0" size="150dp,16dp"
+                      align="center" class="hint"/>
+                <progress name="item_score" pos="|0,88" offset="-0.5,0" size="120dp,8dp"
+                          value="50" min="0" max="100" bkgndSkin="mvc_prog_track"
+                          posSkin="mvc_prog_fill" showText="0"/>
+              </template>
+            </tileview>
+          </page>
+          <!-- treeview：行模板与 uieditor 的 workspace_treeview
+               （demos/uieditor/uires/xml/dlg_main_left.xml）同构；hasLines 画出
+               缩进连接线，点缩进区切换展开/收起（基类 ExpandItem 默认实现）。
+               名字不能叫 tree_demo：列表与树页的 treectrl 占用了这个名字，
+               FindChildByName2 按名字 + 类型找控件，重名会让命中顺序变得说不清。 -->
+          <page title="treeview" layout="vbox" padding="8dp,6dp,8dp,6dp" interval="6dp">
+            <text class="hint" size="-2,-1">STreeView：三层节点，点缩进区的箭头展开/收起；树节点同样由适配器按模板填。</text>
+            <treeview name="mvc_tree" size="-2,0" weight="1" hasLines="1" indent="14dp"
+                      colorBkgnd="@color/surface">
+              <template height="24dp" layout="hbox" gravity="center" padding="4dp,0,4dp,0"
+                        trackMouseEvent="1">
+                <text name="txt_label" size="-1,-1" colorText="@color/text"/>
+              </template>
+            </treeview>
+          </page>
+          <!-- mclistview 的列宽不由模板决定：控件按表头宽度依次把名为 col1/col2/… 的
+               子窗口 Move 到各列矩形（SMCListView.cpp:659-683），而 colN 这个名字来自
+               适配器的 GetColumnName。名字对不上就不会被搬到位，列内容会全部堆在模板
+               写死的 pos 上，拖动表头分隔线时更是纹丝不动。 -->
+          <page title="mclistview" layout="vbox" padding="8dp,6dp,8dp,6dp" interval="6dp">
+            <text class="hint" size="-2,-1">SMcListView：500 行、五列表格；表头分隔线可拖动，最后一列是每行自己的进度条。</text>
+            <mclistview name="mvc_mclv" size="-2,0" weight="1" headerHeight="26" dividerSize="1"
+                        colorBkgnd="@color/surface" colorText="@color/text">
+              <headerStyle align="left" fixWidth="0" colorBkgnd="#F9FAFB"
+                           colorText="#374151" font="size:12dp,bold:1">
+                <items>
+                  <item width="130">控件</item>
+                  <item width="110">来源</item>
+                  <item width="70">版本</item>
+                  <item width="310">说明</item>
+                  <item width="100">热度</item>
+                </items>
+              </headerStyle>
+              <template itemHeight="28">
+                <window name="col1" clipClient="1">
+                  <text name="mc_c1" pos="6,5,-10,-5" class="body" dotted="1"/>
+                </window>
+                <window name="col2" clipClient="1">
+                  <text name="mc_c2" pos="6,5,-10,-5" class="hint" dotted="1"/>
+                </window>
+                <window name="col3" clipClient="1">
+                  <text name="mc_c3" pos="6,5,-10,-5" class="hint" dotted="1"/>
+                </window>
+                <window name="col4" clipClient="1">
+                  <text name="mc_c4" pos="6,5,-10,-5" class="hint" dotted="1"/>
+                </window>
+                <window name="col5" clipClient="1">
+                  <progress name="mc_score" pos="6,9,-8,-9" value="50" min="0" max="100"
+                            bkgndSkin="mvc_prog_track" posSkin="mvc_prog_fill" showText="0"/>
+                </window>
+              </template>
+            </mclistview>
+          </page>
+        </tabctrl>
+      </page>
+
+      <page title="列表与树" layout="vbox" padding="12dp,10dp,12dp,10dp" interval="8dp">
+        <text class="h1" size="-2,-1">@string/list_h1</text>
+        <text class="hint" size="-2,-1" multiLines="1" wordBreak="1">@string/list_body</text>
+        <window size="-2,0" weight="1" layout="hbox" interval="12dp">
+          <!-- 选中行的底色来自 STreeCtrl 构造时默认挂上的内置 itemSkin，选中态文字
+               走 SWindowStyle 的 colorTextPush；不设就会回落到 colorText（深灰），
+               在浅蓝选中带上对比度不足。 -->
+          <treectrl name="tree_demo" size="0,-2" weight="1" itemHeight="24" indent="18"
+                    hasLines="1" fullRowSel="1"
+                    colorText="@color/text" colorTextPush="#1E3A8A">
+            <item text="SOUI 4" expand="1">
+              <item text="SOUI 核心" expand="1">
+                <item text="SWindow / 布局 / 皮肤"/>
+                <item text="消息循环与事件映射"/>
+                <item text="资源管理器（SResProviderFiles）"/>
+              </item>
+              <item text="components" expand="1">
+                <item text="render-gdi（canvas2d 后端）"/>
+                <item text="imgdecoder-stb"/>
+              </item>
+              <item text="controls.extend">
+                <item text="Scintilla 编辑器"/>
+                <item text="hexedit 十六进制视图"/>
+              </item>
+              <item text="swinx 平台层">
+                <item text="帧缓冲 + 上屏"/>
+                <item text="键盘/鼠标注入"/>
+              </item>
+            </item>
+          </treectrl>
+          <!-- 表头在 XML 里声明，行由宿主代码插入（SListCtrl 不支持内联 <item>）：
+               见 soui_main.cpp 的 fillListDemo。 -->
+          <listctrl name="lc_demo" size="0,-2" weight="1" itemHeight="26" headerHeight="28"
+                    multiSel="1" colorBkgnd="@color/surface" colorText="@color/text"
+                    colorItemHotBkgnd="#EFF3FB" colorItemSelBkgnd="@color/accentsoft"
+                    colorSelText="#1E3A8A">
+            <headerStyle align="left" fixWidth="0" colorBkgnd="#F9FAFB"
+                         colorText="#374151" font="size:12dp,bold:1">
+              <items>
+                <item width="110">控件</item>
+                <item width="150">来源</item>
+              </items>
+            </headerStyle>
+          </listctrl>
+        </window>
+      </page>
+
+      <page title="布局" layout="vbox" padding="12dp,10dp,12dp,10dp" interval="10dp">
+        <text class="h1" size="-2,-1">@string/layout_h1</text>
+        <text class="hint" size="-2,-1" multiLines="1" wordBreak="1">@string/layout_body</text>
+        <!-- 3x2 网格。单元格宽度 245dp = (页宽 776 - 左右 padding 24 - 两列间距 16) / 3。
+             和概览页一样，size 写 0 会被当成"指定 0 像素"，六个格子会叠到左上角，
+             所以这里给每张卡写死宽度、高度交回布局。
+             每张卡里放的是**真的按该属性排布的子窗口**（不是写着属性名的标签）：
+             烟测要能读矩形比对这些属性有没有生效，光有文字说明证明不了任何事。 -->
+        <window name="grid_demo" size="-2,0" weight="1" layout="gridLayout"
+                columnCount="3" rowCount="2" xInterval="8dp" yInterval="8dp"
+                xGravity="fill" yGravity="fill">
+          <window size="245dp,-1" rowWeight="1" colorBkgnd="@color/accentsoft" layout="vbox"
+                  padding="10dp,8dp,10dp,8dp" interval="3dp">
+            <text class="h2">weight = 1 : 2 : 3</text>
+            <text class="hint">剩余空间按权重分给三个子块</text>
+            <window name="lay_w_box" size="-2,0" weight="1" layout="hbox" interval="2dp" gravity="center">
+              <window name="lay_w1" size="0,34dp" weight="1" colorBkgnd="#1D4ED8"/>
+              <window name="lay_w2" size="0,34dp" weight="2" colorBkgnd="#3B82F6"/>
+              <window name="lay_w3" size="0,34dp" weight="3" colorBkgnd="#93C5FD"/>
+            </window>
+          </window>
+          <window size="245dp,-1" rowWeight="1" colorBkgnd="#E0F2FE" layout="vbox"
+                  padding="10dp,8dp,10dp,8dp" interval="3dp">
+            <text class="h2">interval = 14dp</text>
+            <text class="hint">间距由布局统一给，不写 margin</text>
+            <window size="-2,0" weight="1" layout="hbox" interval="14dp" gravity="center">
+              <window name="lay_i1" size="24dp,24dp" colorBkgnd="#0EA5E9"/>
+              <window name="lay_i2" size="24dp,24dp" colorBkgnd="#0EA5E9"/>
+              <window name="lay_i3" size="24dp,24dp" colorBkgnd="#0EA5E9"/>
+            </window>
+          </window>
+          <window size="245dp,-1" rowWeight="1" colorBkgnd="#DCFCE7" layout="vbox"
+                  padding="10dp,8dp,10dp,8dp" interval="3dp">
+            <text class="h2">layout_gravity</text>
+            <text class="hint">同一个容器里三个子块各自左/中/右</text>
+            <window name="lay_g_box" size="-2,0" weight="1" layout="vbox" interval="6dp">
+              <window name="lay_g_left" size="120dp,12dp" layout_gravity="left" colorBkgnd="#059669"/>
+              <window name="lay_g_center" size="120dp,12dp" layout_gravity="center" colorBkgnd="#10B981"/>
+              <window name="lay_g_right" size="120dp,12dp" layout_gravity="right" colorBkgnd="#34D399"/>
+            </window>
+          </window>
+          <!-- 容器 gravity 的轴由布局方向决定（SLinearLayout.cpp:414-445）：vbox 里它管**水平**
+               对齐（center/right），hbox 里它管**垂直**对齐，而且 hbox 分支只实现了 G_Center 和
+               G_Right——G_Right 走的是 `rcParent.Height() - rcChild.Height()`，也就是**底对齐**，
+               不是右对齐。上一张卡的 layout_gravity 是子块各自覆盖容器值，这张卡是容器给所有子块。 -->
+          <window size="245dp,-1" rowWeight="1" colorBkgnd="#FEF3C7" layout="vbox"
+                  padding="10dp,8dp,10dp,8dp" interval="3dp">
+            <text class="h2">容器 gravity=center</text>
+            <text class="hint">hbox 里管垂直：两个不同高度的子块同中线</text>
+            <window name="lay_gr_box" size="-2,0" weight="1" layout="hbox" interval="8dp" gravity="center">
+              <window name="lay_gr_a" size="96dp,26dp" colorBkgnd="#F59E0B"/>
+              <window name="lay_gr_b" size="40dp,12dp" colorBkgnd="#FBBF24"/>
+            </window>
+          </window>
+          <!-- pos 的三种参考（SouiLayout::PositionItem2Value）：
+               |0        = 相对父窗口中心，本身是"左边贴中心"，要再配 offset="-0.5,0" 才是水平居中；
+               %25       = 父窗口宽度的 25%；
+               四元组 x2,y2 写负值 = 这条边距父窗口右/下边界的距离，此时**不要**再写 size，
+               宽高由两端坐标决定，父窗口变化时跟着拉伸（二元组只给左边/上边，参考右/下必须写满四个）。 -->
+          <window size="245dp,-1" rowWeight="1" colorBkgnd="#FCE7F3" layout="vbox"
+                  padding="10dp,8dp,10dp,8dp" interval="3dp">
+            <text class="h2">pos 绝对定位</text>
+            <text class="hint">|0 居中 / %25 百分比 / 四元组负值拉伸</text>
+            <window name="lay_pos_box" size="-2,0" weight="1" colorBkgnd="#FDF2F8">
+              <text name="lay_pos_center" pos="|0,2" offset="-0.5,0" size="132dp,16dp"
+                    align="center" class="hint">|0 + offset -0.5</text>
+              <text name="lay_pos_pct" pos="%25,24" size="96dp,16dp" class="hint">%25</text>
+              <text name="lay_pos_neg" pos="2,46,-6,-6" align="center" class="hint">2,46,-6,-6 随父窗口拉伸</text>
+            </window>
+          </window>
+          <window size="245dp,-1" rowWeight="1" colorBkgnd="#EDE9FE" layout="vbox"
+                  padding="10dp,8dp,10dp,8dp" interval="3dp">
+            <text class="h2">嵌套</text>
+            <text class="hint">hbox 里套 vbox，右侧再挂一个自适应块</text>
+            <window size="-2,0" weight="1" layout="hbox" interval="6dp">
+              <window name="lay_n_box" size="60dp,-2" layout="vbox" interval="4dp">
+                <window name="lay_n1" size="-2,16dp" colorBkgnd="#7C3AED"/>
+                <window name="lay_n2" size="-2,16dp" colorBkgnd="#A78BFA"/>
+              </window>
+              <text name="lay_n3" class="hint" size="0,-1" weight="1">右侧 weight=1 撑满剩余宽度</text>
+            </window>
+          </window>
+        </window>
+      </page>
+
+      <page title="图形控件" layout="vbox" padding="12dp,10dp,12dp,10dp" interval="10dp">
+        <text class="h1" size="-2,-1">@string/chart_h1</text>
+        <text class="hint" size="-2,-1" multiLines="1" wordBreak="1">@string/chart_body</text>
+        <window size="-2,0" weight="1" layout="hbox" interval="18dp" gravity="center">
+          <progressRing name="ring_demo" size="130dp,130dp" value="68" min="0" max="100"
+                        showText="1" colorText="@color/text"
+                        colorBack="@color/divider" colorFore="@color/accent"/>
+          <!-- SpeedMeter 的 value 走 SFloatAnimator，改一次数值就能看到指针过渡。 -->
+          <SpeedMeter name="speed_demo" size="150dp,150dp"
+                      value="180" minValue="0" maxValue="300" RingWidth="14"/>
+          <!-- 水波靠 SOUI 的 timeline 心跳推进（SWaveProgress::OnNextFrame）：相位
+               以波长为单位连续累加，两层波按不同速度、反方向漂移，后景波更矮，
+               叠在一起才有一层层的水面感。静止的截图里看不出，浏览器里能看到波纹在动。 -->
+          <waveProgress name="wave_demo" size="110dp,130dp" value="62" min="0" max="100"
+                        colorBack="#F1F5F9" colorFore="@color/accent"
+                        colorBorder="@color/divider" colorWave="#93C5FD"/>
+          <qrctrl name="qr_demo" size="110dp,110dp" text="https://github.com/soui4/soui"
+                  colorBkgnd="@color/surface"/>
+        </window>
+      </page>
+
+      <!-- 表格页：SGridCtrl 是完整的电子表格（固定行列 + 多种单元格类型），
+           SPropertyGrid 是属性面板。两者的内容都不能只靠 XML：
+           gridctrl 的单元格文字必须走 SetItemText（XML 里没有内联单元格的语法），
+           propgrid 的分组和条目由 <groups> 声明。 -->
+      <page title="表格" layout="vbox" padding="12dp,10dp,12dp,10dp" interval="8dp">
+        <text class="h1" size="-2,-1">表格控件：gridctrl 与 propgrid</text>
+        <text class="hint" size="-2,-1" multiLines="1" wordBreak="1">SGridCtrl 带固定行列、单元格类型和就地编辑；SPropertyGrid 把属性按分组树排布，双击分组行折叠/展开，双击值列直接改。</text>
+        <window size="-2,-1" layout="hbox" interval="8dp">
+          <button name="btn_tbl_addrow" text="加一行" skin="_skin.sys.btn.normal" class="body"/>
+          <button name="btn_tbl_check" text="切换复选列" skin="_skin.sys.btn.normal" class="body"/>
+          <text name="tbl_status" class="stat" size="0,-1" weight="1"/>
+        </window>
+        <window size="-2,0" weight="1" layout="hbox" interval="12dp">
+          <!-- defColWidth 是像素：5 列 × 86 = 430，加上固定列后仍小于控件宽度，
+               不会出现"表头画得下、单元格被推到可视区外"。
+               单元格类型只用 TEXT/NUMERIC/CHECKBOX：URL 要 ShellExecute、COLOR 和
+               DATETIMEPICKER 要真弹出窗口（都依赖 HWND），wasm 上没有对应实现。 -->
+          <gridctrl name="tbl_grid" size="0,-2" weight="12" rowCount="7" colCount="5"
+                    fixedRows="1" fixedCols="1" defRowHeight="26" defColWidth="86"
+                    gridLineColor="@color/divider" gridBkColor="@color/surface"
+                    colorText="@color/text" editable="1"/>
+          <propgrid name="tbl_prop" size="0,-2" weight="8" titleWidth="110" itemHeight="26"
+                    orderType="group" colorBkgnd="@color/surface" colorText="@color/text"
+                    colorGroup="#EEF2FF" colorTitle="#F9FAFB" colorTitleSel="#E0F2FE"
+                    colorTitleText="#374151" colorTitleTextSel="#1E3A8A"
+                    colorItem="#FFFFFF" colorItemBorder="@color/divider">
+            <!-- cmdbtnstyle 不是可选项：SPropertyGrid::CreateChildren 第一行就
+                 child("cmdbtnstyle") + SASSERT（SPropertyGrid.cpp:341-342），少了这个
+                 节点整个模块直接 abort，不是"少一个按钮"而是白屏退出。控件会在创建时
+                 SetVisible(FALSE)，只在就地编辑弹出下拉/对话框时拿来当命令按钮。 -->
+            <cmdbtnstyle text="..." skin="_skin.sys.btn.normal"/>
+            <editStyle colorBkgnd="#FFFFFF"/>
+            <optionStyle colorBkgnd="#FFFFFF"/>
+            <groups>
+              <propgroup name="窗口" expanded="1">
+                <proptext name="标题" value="SOUI on wasm"/>
+                <propsize name="尺寸" value="800,600" childrenTitles="宽|高"/>
+                <proprect name="位置" value="20,20,820,620" childrenTitles="左|上|右|下" digit="1"/>
+              </propgroup>
+              <propgroup name="渲染" expanded="1">
+                <propoption name="后端" value="canvas2d" options="canvas2d|skia|opengl"/>
+                <propoption name="缩放" value="1.0" options="1.0|1.25|1.5"/>
+                <proptext name="消息泵" value="swinx PeekMessage" readOnly="1"/>
+              </propgroup>
+            </groups>
+          </propgrid>
+        </window>
+      </page>
+
+      <!-- HelloChart 页：三个图表控件的构造函数会各自生成一份 dummy 数据，所以
+           不接线也有画面；真正要演示的是宿主用模型 API 重建数据 + 动画重放，
+          见 soui_main.cpp 的 fillChartDemo / randomizeChartData。 -->
+      <page title="图表" layout="vbox" padding="12dp,10dp,12dp,10dp" interval="8dp">
+        <text class="h1" size="-2,-1">HelloChart：折线 / 柱状 / 饼图</text>
+        <text class="hint" size="-2,-1" multiLines="1" wordBreak="1">controls.extend/hellocharts 用 SLineChartData、SColumnChartData、SPieChartData 建模，由宿主在运行时交给视图；数据对象的所有权随之交给控件，控件析构时释放。</text>
+        <window size="-2,-1" layout="hbox" interval="8dp">
+          <button name="btn_chart_random" text="换一批数据" skin="_skin.sys.btn.normal" class="body"/>
+          <button name="btn_chart_anim" text="重放动画" skin="_skin.sys.btn.normal" class="body"/>
+          <text name="chart_status" class="stat" size="0,-1" weight="1"/>
+        </window>
+        <window size="-2,0" weight="1" layout="hbox" interval="12dp">
+          <lineChart name="chart_line" size="0,-2" weight="4" zoomEnabled="0"/>
+          <columnChart name="chart_column" size="0,-2" weight="3" zoomEnabled="0"/>
+          <pieChart name="chart_pie" size="0,-2" weight="3" zoomEnabled="0"/>
+        </window>
+      </page>
+
+      <page title="编辑器" layout="vbox" padding="12dp,10dp,12dp,10dp" interval="6dp">
+        <text class="h1" size="-2,-1">@string/edit_h1</text>
+        <!-- edit_hint / lua_hint 这两个名字是给宿主用的：SOUI_BUILD_WASM_SCINTILLA
+             或 SOUI_BUILD_WASM_LUA 关掉时，对应能力没编进来，页面上会留一块安静的
+             空白（未注册的标签被布局直接跳过）。noteDisabledFeatures() 会把原因写
+             在这两行说明里，而不是让人对着空白猜。 -->
+        <text name="edit_hint" class="hint" size="-2,-1" multiLines="1" wordBreak="1">@string/edit_body</text>
+        <!-- richedit 的默认字符格式在 SRichEdit::InitDefaultCharFormat 里取
+             BeforePaintEx() 之后的 pRT 文字色，不写 colorText 就会继承页签头的中灰。
+             autoSel="0"：SEdit 默认 autoSel=1（对标 Win32，聚焦即全选）会让鼠标首击
+             变成全选，紧接着打的字把整句替换掉——演示"点进来就能打字"的页面不能要
+             这个行为；Tab 进入仍按 re41 的原生语义。 -->
+        <edit name="edit_demo" size="-2,40dp" colorText="@color/text" autoSel="0"
+              text="点进来就能打字：这一行是 richedit41 静态链入 wasm 的证据" font="size:13dp"/>
+        <!-- number="1"（ES_NUMBER）的闸门在 SOUI 侧，不在 richedit41 里：re41 只有
+             winresrc.h:1000 那个定义，没有任何检查点。Windows 上 DefWindowProc 会把
+             WM_IME_CHAR 转成 WM_CHAR，输入法顺路就走过 OnChar 的数字过滤；swinx 没有
+             那步转换，所以非 Windows 平台得由 OnImeChar 自己挡，否则输入法能往数字框里
+             塞汉字。 -->
+        <window size="-2,-1" layout="hbox" interval="8dp" gravity="center">
+          <text class="hint" size="150dp,-1">number="1" 只收数字</text>
+          <edit name="edit_num" size="0,40dp" weight="1" number="1" colorText="@color/text"
+                text="1234" font="size:13dp"/>
+        </window>
+        <hexedit name="hex_demo" size="-2,66dp" AutoBytesPerRow="1"
+                 AddrBkColor="#F1F5F9" HexBkColor="#FFFFFF" AsciiBkColor="#ECFDF5"/>
+        <scintilla name="sci_demo" size="-2,0" weight="1" font="size:13dp" showLineNumber="1"
+                   text="// Scintilla on wasm: headless 渲染进 SOUI 的 IRenderTarget&#10;#include &lt;cstdio&gt;&#10;&#10;int main()&#10;{&#10;    for (int i = 0; i &lt; 6; ++i)&#10;    {&#10;        printf(&quot;line %d\n&quot;, i);&#10;    }&#10;    return 0;&#10;}"/>
+      </page>
+
+      <page title="扩展控件" layout="vbox" padding="12dp,10dp,12dp,10dp" interval="10dp">
+        <text class="h1" size="-2,-1">@string/ext_h1</text>
+        <text class="hint" size="-2,-1" multiLines="1" wordBreak="1">@string/ext_body</text>
+        <window size="-2,-1" layout="hbox" interval="12dp" gravity="center">
+          <text class="hint" size="80dp,-1">colorizeText</text>
+          <!-- text 必须写成属性且排在 key 前面。SColorizeText 只在 key 属性生效时
+               （OnAttrKey → OnContentChanged → UpdateTextColors）算一次着色区间，
+               而标签内联文本是 InitFromXml 在全部属性应用完之后才塞进 m_strText 的，
+               排到后面就永远算不出区间、一行都不着色。 -->
+          <colorizeText name="clr_demo" size="0,-1" weight="1" class="body"
+                        text="在 SOUI 中高亮关键字，用的是 SColorizeText 的 key/colorKey。"
+                        colorKey="@color/accent" key="SOUI"/>
+        </window>
+        <window size="-2,-1" layout="hbox" interval="12dp" gravity="center">
+          <text class="hint" size="80dp,-1">水平滚动</text>
+          <!-- 宽度故意写死 420dp：文字量出来比控件宽，SScrollText 才会启动水平
+               跑马灯；宽度自适应（size="-1"）时会量到刚好装下文字，一像素都不滚。
+               rolltype=0 是首尾衔接：滚到末尾后从右侧接上同一段文字。 -->
+          <scrolltext name="roll_hoz" size="420dp,24dp" speed="8" class="body">SScrollText 用 SOUI 定时器逐像素推进：这一行明显比它所在的窗口宽，所以文字从右向左循环滚动，滚到末尾再从头接上。</scrolltext>
+        </window>
+        <window size="-2,-1" layout="hbox" interval="12dp" gravity="center">
+          <text class="hint" size="80dp,-1">多行滚动</text>
+          <!-- 文本里的 &#10; 是换行符，SScrollText::UpdateScrollInfo 按它拆行；
+               拆出多行后走垂直模式：每行停留 staytime 毫秒，然后逐像素向上过渡到
+               下一行。行宽没有超过控件宽度，所以停留期不会触发水平展示。 -->
+          <scrolltext name="roll_v" size="0,24dp" weight="1" speed="10" staytime="1600" class="body">第一行：SScrollText 按换行符把文本拆成多行，一次只显示一行。&#10;第二行：每行停留 staytime 毫秒，然后逐像素向上滚动到下一行。&#10;第三行：滚到最后一行后回到第一行，继续循环。</scrolltext>
+        </window>
+      </page>
+
+      <!-- 动画页：SOUI 三种动画形态各占一张卡。
+           SAnimation 的目标窗口由宿主的 btn_anim_tween 挂 anim:anim_demo_*（alpha /
+           rotate / translate 三段补间），动画播完自动清掉，不残留变换。
+           SValueAnimator 只产生值：valueAni:anim_demo_color 与 anim_demo_float 在
+           CWasmHostWnd::onAnimationUpdate 里被消费成背景色和进度条数值。
+           SPropAnimator 走 Android ObjectAnimator 那套 API：width / alpha /
+           colorBkgnd 三个 PropertyValuesHolder 同时推进，布局属性由父容器重排。
+           舞台都加 clipClient，平移/旋转/缩放时不会画到旁边卡里。 -->
+      <page title="动画" layout="vbox" padding="12dp,10dp,12dp,10dp" interval="8dp">
+        <text class="h1" size="-2,-1">@string/anim_h1</text>
+        <text class="hint" size="-2,-1" multiLines="1" wordBreak="1">@string/anim_body</text>
+        <window size="-2,-1" layout="hbox" interval="8dp">
+          <button name="btn_anim_tween" text="SAnimation 补间" skin="_skin.sys.btn.normal" class="body"/>
+          <button name="btn_anim_value" text="SValueAnimator 值动画" skin="_skin.sys.btn.normal" class="body"/>
+          <button name="btn_anim_prop" text="SPropAnimator 属性动画" skin="_skin.sys.btn.normal" class="body"/>
+          <text name="anim_status" class="stat" size="0,-1" weight="1"/>
+        </window>
+        <window size="-2,0" weight="1" layout="hbox" interval="10dp">
+          <window size="0,-2" weight="1" colorBkgnd="@color/surface" layout="vbox"
+                  padding="10dp,8dp,10dp,8dp" interval="6dp">
+            <text class="h2" size="-2,-1">SAnimation</text>
+            <text class="hint" size="-2,-1" multiLines="1" wordBreak="1">XML 补间动画：alpha / rotate / translate</text>
+            <window name="tween_stage" size="-2,0" weight="1" colorBkgnd="#EEF2FF"
+                    clipClient="1" layout="vbox" gravity="center" interval="8dp">
+              <window name="tween_alpha" size="84dp,36dp" colorBkgnd="#4F46E5"
+                      layout="vbox" gravity="center">
+                <text class="hint" colorText="#FFFFFF">alpha</text>
+              </window>
+              <window name="tween_rotate" size="84dp,36dp" colorBkgnd="#0EA5E9"
+                      layout="vbox" gravity="center">
+                <text class="hint" colorText="#FFFFFF">rotate</text>
+              </window>
+              <window name="tween_translate" size="84dp,36dp" colorBkgnd="#10B981"
+                      layout="vbox" gravity="center">
+                <text class="hint" colorText="#FFFFFF">translate</text>
+              </window>
+            </window>
+          </window>
+          <window size="0,-2" weight="1" colorBkgnd="@color/surface" layout="vbox"
+                  padding="10dp,8dp,10dp,8dp" interval="6dp">
+            <text class="h2" size="-2,-1">SValueAnimator</text>
+            <text class="hint" size="-2,-1" multiLines="1" wordBreak="1">XML 值动画：颜色渐变与浮点进度</text>
+            <window name="value_stage" size="-2,0" weight="1" colorBkgnd="#F8FAFC"
+                    layout="vbox" padding="10dp,8dp,10dp,8dp" interval="8dp">
+              <window name="value_swatch" size="-2,0" weight="1" colorBkgnd="#6366F1"
+                      layout="vbox" gravity="center">
+                <text class="hint" colorText="#FFFFFF">colorAnimator</text>
+              </window>
+              <progress name="value_progress" size="-2,14dp" value="0" min="0" max="100"
+                        showText="0"/>
+              <text name="value_num" class="hint" size="-2,-1">floatAnimator: 0 / 100</text>
+            </window>
+          </window>
+          <window size="0,-2" weight="1" colorBkgnd="@color/surface" layout="vbox"
+                  padding="10dp,8dp,10dp,8dp" interval="6dp">
+            <text class="h2" size="-2,-1">SPropAnimator</text>
+            <text class="hint" size="-2,-1" multiLines="1" wordBreak="1">ObjectAnimator 风格：width / alpha / colorBkgnd 关键帧</text>
+            <window name="prop_stage" size="-2,0" weight="1" colorBkgnd="#FFF7ED"
+                    layout="vbox" padding="10dp,8dp,10dp,8dp" interval="8dp">
+              <window name="prop_box" size="110dp,52dp" colorBkgnd="#F59E0B" clipClient="1"
+                      layout="vbox" gravity="center">
+                <text class="hint" colorText="#FFFFFF">propBox</text>
+              </window>
+              <text class="hint" size="-2,-1" multiLines="1" wordBreak="1">布局属性写回 ILayoutParam 后由父容器重排，窗口属性直接改样式；两者都在同一帧里推进。</text>
+            </window>
+          </window>
+        </window>
+      </page>
+
+      <page title="Lua 游戏" layout="vbox" padding="8dp,6dp,8dp,6dp" interval="6dp">
+        <!-- 这一页原来是"C++ 侧留一个空容器、Lua 在 on_init 里建按钮"的最小样例，
+             现在换成 demos/demo 的三个 Lua 游戏（消消乐 / 俄罗斯方块 / 坦克大战）：
+             内容由 <include src="layout:XML_PAGE_GAME"/> 从 uires.idx 的 LAYOUT 组
+             取页签布局，棋盘格子仍由脚本创建（lua/games.lua 的 *_init）。
+             lua_hint 这个名字是给宿主用的：SOUI_BUILD_WASM_LUA=OFF 时脚本工厂没编
+             进来，noteDisabledFeatures() 把原因写在这行里，而不是让人对着空白猜。 -->
+        <text name="lua_hint" class="hint" size="-2,-1" multiLines="1" wordBreak="1">@string/lua_body</text>
+        <include src="layout:XML_PAGE_GAME"/>
+      </page>
+
+      <!-- 模态表单页：页内只放一个打开按钮；表单本身是独立资源
+           xml/modal_form.xml，由宿主的 btn_modal_open 用
+           BeginModalViewSession(L"layout:XML_MODAL_FORM") 建出来。
+           wasm 不能走 SHostDialog::DoModal：内层 PeekMessage 拿不到浏览器的新事件，
+           所以这里用 SModalRoot + SModalView，把遮罩窗口挂进 SRootWindow，
+           用普通的命中测试拦截输入，不需要第二条消息循环。 -->
+      <page title="模态表单" layout="vbox" padding="12dp,10dp,12dp,10dp" interval="10dp">
+        <text class="h1" size="-2,-1">@string/modal_h1</text>
+        <text class="hint" size="-2,-1" multiLines="1" wordBreak="1">@string/modal_body</text>
+        <window size="-2,-1" layout="hbox" interval="8dp" gravity="center">
+          <button name="btn_modal_open" text="打开表单" skin="_skin.sys.btn.normal" class="body"/>
+          <text name="modal_status" class="stat" size="0,-1" weight="1">尚未打开模态表单</text>
+        </window>
+        <window size="-2,0" weight="1" colorBkgnd="@color/surface" layout="vbox"
+                padding="12dp,10dp,12dp,10dp" interval="6dp">
+          <text class="h2" size="-2,-1">SModalRoot + SModalView</text>
+          <text class="hint" size="-2,-1" multiLines="1" wordBreak="1">弹出层铺满宿主客户区，遮罩是 modalroot 的半透明 colorBkgnd；唯一的子窗口 modalview 负责表单外观与进出场动画。提交 / 取消按钮由宿主订阅 EventCmd，结果经 EndModalViewSession 的 exitCode 从 EventExitModalView 传回主页面。</text>
+          <text class="hint" size="-2,-1" multiLines="1" wordBreak="1">SModalRoot 会话由 SHostWnd 的模态栈管理：退场动画完成后，根窗口连同整棵子树被移除并销毁，所以宿主只在这个会话内持有表单控件指针，不额外 AddRef。</text>
+        </window>
+      </page>
+    </tabctrl>
+  </root>
+</SOUI>

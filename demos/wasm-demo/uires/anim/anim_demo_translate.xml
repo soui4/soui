@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 动画页 SAnimation 演示：向左平移再回来。
+     位移值以像素为单位（80 等于 80px）；用两段 <translate> 拼出往返，结束时回到 0。 -->
+<set fillAfter="false" shareInterpolator="false">
+    <translate duration="360" startOffset="0" fromXDelta="0" toXDelta="-80" interpolator="Accelerate"/>
+    <translate duration="440" startOffset="360" fromXDelta="-80" toXDelta="0" interpolator="Decelerate"/>
+</set>

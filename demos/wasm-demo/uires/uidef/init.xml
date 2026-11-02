@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  uidef/init.xml -- wasm 展示页的 UI 定义
+
+  这个文件同时验证三件事：
+   1. <UIDEF> 节点解析与 <style> 类样式在控件树上的生效；
+   2. 平台文本栈选择 —— SUiDef.cpp 给 wasm 复用 <linux> 节点（Emscripten 不定义
+      __linux__，那个分支是加 __EMSCRIPTEN__ 补上的）；
+   3. deffont 的 face 名交给 swinx 的 fontconfig 匹配。浏览器里没有 /etc/fonts
+      和系统字体目录，字体由 build-soui.sh 用 --preload-file 塞进 /fonts，再由
+      soui_main.cpp 的 AddFontResource() 注册；一个字体都没有时 TextOut 只会画空白。
+
+  类样式只收敛"颜色 + 字号"这类纯展示属性；尺寸、间距留在布局里写，
+  免得多页共用同一个类时被一处改动带偏另一处。
+-->
+<UIDEF>
+  <unit defUnit="dp"/>
+  <deffont value="face:sans-serif,size:14dp"/>
+
+  <string src="values:string"/>
+  <color src="values:color"/>
+  <!-- 皮肤表与模板表：Lua 游戏页的三个棋盘全靠它们（imglist/imgframe 的
+       src="svg:..." 和 <t:g.xxl_digit> 实例）。这两行在没带游戏的构建里是
+       空表也不报错，但 values/skin.xml、values/template.xml 必须在 uires.idx
+       的 <values> 组里登记，否则 SResProviderFiles 找不到文件。 -->
+  <skin src="values:skin"/>
+  <template src="values:template"/>
+
+  <style>
+    <class name="brand" colorText="#111827" font="size:19dp,bold:1"/>
+    <class name="h1" colorText="#111827" font="size:17dp,bold:1"/>
+    <class name="h2" colorText="#111827" font="size:14dp,bold:1"/>
+    <class name="body" colorText="#374151" font="size:13dp"/>
+    <class name="hint" colorText="#6B7280" font="size:12dp"/>
+    <class name="stat" colorText="#2563EB" font="size:12dp,bold:1"/>
+    <class name="card" colorBkgnd="#FFFFFF"/>
+    <!-- 编辑框类外观：sys 资源的九宫格边框由 OnNcPaint 画，而 OnNcPaint 只在
+         margin 非空时才执行——margin-x/margin-y 为 0 的控件加 ncSkin 是白加。 -->
+    <class name="editbox" ncSkin="_skin.sys.border" margin-x="2" margin-y="2"
+           colorText="#374151" colorBkgnd="#FFFFFF"/>
+  </style>
+
+  <objattr>
+  </objattr>
+</UIDEF>

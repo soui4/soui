@@ -183,11 +183,10 @@ SResLoader::~SResLoader(void)
 BOOL SResLoader::LoadResFrom7z(LPCTSTR pszZipFile, LPCSTR pszZipPwd)
 {
     BOOL bLoaded = GetComMgr()->CreateResProvider_7ZIP((IObjRef **)&m_pResProvider);
-    SASSERT_FMT(bLoaded, _T("load interface [%s] failed!"), _T("resprovider_7zip"));
     if (!bLoaded)
         return FALSE;
     ZIP7RES_PARAM param;
-    Zip7File(&param, m_renderFactory, _T("uires.zip"), pszZipPwd);
+    Zip7File(&param, m_renderFactory, pszZipFile, pszZipPwd);
     bLoaded = m_pResProvider->Init((WPARAM)&param, 0);
     SASSERT(bLoaded);
     return bLoaded;

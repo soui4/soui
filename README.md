@@ -36,11 +36,11 @@ This README is available in the following languages:
 
 SOUI4 is a lightweight, **cross-platform** C++ DirectUI framework, continuously developed and maintained for **14 years**. The compiled core is about 2MB. The framework design draws inspiration from popular frameworks such as WTL, Android, QT, and Flash. UI presentation is based on XML configuration, with high performance (choose GDI or [Skia](https://www.oschina.net/p/skia) rendering), rich controls, and flexible extension (supports xml + lua + js), truly separating UI and logic.
 
-Thanks to the built-in **swinx** layer — a framework that re-implements the Windows API (windows.h / winuser.h / gdi.h …) on non-Windows platforms — the **same C++ UI and business code** runs on Windows, Linux, macOS, iOS, Android and HarmonyOS (OHOS). Visit the [SOUI Official Website](https://www.soui.com.cn).
+Thanks to the built-in **swinx** layer — a framework that re-implements the Windows API (windows.h / winuser.h / gdi.h …) on non-Windows platforms — the **same C++ UI and business code** runs on Windows, Linux, macOS, iOS, Android and HarmonyOS (OHOS). The same abstraction also carries the framework **down to bare metal** (FreeRTOS on Cortex-M) and **up into the browser** (WebAssembly). Visit the [SOUI Official Website](https://www.soui.com.cn).
 
 ## Cross-Platform Support
 
-SOUI4 covers six platforms through swinx:
+SOUI4 covers eight targets through swinx, in two maturity tiers:
 
 | Platform | Status | Windowing / Launcher | 2D Backend |
 | --- | --- | --- | --- |
@@ -50,12 +50,24 @@ SOUI4 covers six platforms through swinx:
 | **iOS** | Supported | `UIApplicationMain` (hosted by `swinx_ios_entry`) | Core Graphics |
 | **Android** | Supported | JVM launcher, `PlatformAPI` bridge | Cairo |
 | **HarmonyOS (OHOS)** | Supported | ArkTS runtime, `PlatformAPI` bridge | Cairo |
+| **FreeRTOS** | Proof of capability | No OS: a FreeRTOS task drives the pump, the host scans out the framebuffer | Cairo → memory framebuffer |
+| **WebAssembly** | Proof of capability | `emscripten_set_main_loop`, JS host blits dirty rects onto a canvas | Cairo → image surface → Canvas |
+
+The two tiers are not the same claim:
+
+- **Supported** (the six above) = shipping quality: CI builds, demos, real-device runs.
+- **Proof of capability** (FreeRTOS, WebAssembly) = the architecture was shown to absorb a
+  new host type; the targets build and run an `SApp` end to end, but they still have known
+  gaps (FreeRTOS: font metrics, `ICON:` stubs, no target board; WASM: ~66 MB artifacts, no
+  IME, no touch). Read them as "the abstraction reaches this far", not as "ready to ship".
+  See `soui-freertos/README.md` and `doc/soui-wasm-port-plan.md`.
 
 How swinx is layered per platform:
 
 - **Windows** does not compile swinx — it uses the system Windows SDK directly.
 - **Linux / macOS / iOS** implement their platform APIs *inside* swinx and own their own message loop / launcher, so they need no extra bridge.
 - **Android / HarmonyOS** are launched by the JVM / ArkTS runtime and have no launcher of their own; their platform bridges (`clipboard / window / ime / audio / path`) are filled into the C struct `PlatformAPI` and registered through `PlatformAPI_Init`.
+- **FreeRTOS / WebAssembly** invert the relationship: there is no OS window manager to talk to, so the embedding application drives the pump and consumes a framebuffer. Both share the same four host seams (`framebuffer`, `input`, `pump`, `resource`), which is why the second one cost far less than the first.
 
 The SOUI render factory (`Render_Gdi` / `Render_Skia` / `Render_D2d`) is uniform across platforms; cross-platform projects typically use **`Render_Skia`** + `ImgDecoder_Stb`. Mobile builds additionally provide `SModalView` (a modal-dialog implementation that replaces `SHostDialog`, since mobile runtimes cannot spin up their own message loop) and inertial **fling** scrolling on `SPanel`.
 
@@ -107,6 +119,8 @@ The latest souieditor is integrated in the demos folder. Build the demo to get s
 - SOUI Discussion #2: [Join](http://shang.qq.com/wpa/qunwpa?idkey=03d3294a2551beb1b54b4012086cec14b3f66d5c253debaeed241d9c623966e0)
 
 ## [![Build Instructions](https://github.com/soui4/soui/actions/workflows/build.yml/badge.svg)](https://github.com/soui4/soui/actions/workflows/build.yml)
+## [![FreeRTOS gate](https://github.com/soui4/soui/actions/workflows/soui-freertos-gate.yml/badge.svg)](https://github.com/soui4/soui/actions/workflows/soui-freertos-gate.yml)
+## [![WASM gate](https://github.com/soui4/soui/actions/workflows/soui-wasm-gate.yml/badge.svg)](https://github.com/soui4/soui/actions/workflows/soui-wasm-gate.yml)
 
 ### Windows
 - Use CMake to generate project files, open with Visual Studio, and compile
@@ -134,6 +148,19 @@ The latest souieditor is integrated in the demos folder. Build the demo to get s
 - Requires the HarmonyOS SDK and DevEco Studio.
 - The native layer lives under `entry/src/main/cpp`; UI resources are loaded directly from the HAP `rawfile` directory through `NativeResourceManager` (no copy to the sandbox).
 - Build the OHOS module from DevEco Studio (or the `hvigor` CLI).
+
+### FreeRTOS (bare metal)
+- The `soui-freertos` submodule is the only entry point: one `include` plus one `soui_fr_project()` brings up the kernel, third-party libs, the swinx platform layer, SOUI and the packed resources.
+- Cross-compile for the QEMU Cortex-M3 target:
+  `cd soui-freertos/soui_fr && cmake -S . -B build -G Ninja -DCMAKE_TOOLCHAIN_FILE=../demo/cmake/toolchain-arm-freertos.cmake -DSOUI_FR_CENSUS=OFF -DCMAKE_BUILD_TYPE=MinSizeRel`
+  then `qemu-system-arm -M mps2-an385 -nographic -semihosting -kernel build/soui_fr.elf`.
+- For host-side iteration use `soui_sim` (the FreeRTOS Windows simulator with an SDL2 window); see `soui-freertos/README.md` and the FreeRTOS development guide in that submodule.
+
+### WebAssembly
+- Requires [emsdk](https://emscripten.org/docs/getting_started/downloads.html) (verified locally with 6.0.13).
+- `emcmake cmake -S . -B build-wasm -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DSOUI_BUILD_WASM_DEMO=ON`
+- `cmake --build build-wasm --target soui-wasm-demo -j4`; artifacts land in `soui-wasm/out/`.
+- To look at it in a browser, serve with `python3 -m http.server 8080 -d soui-wasm/out` and open `soui-wasm-demo.html`. Build options, verification steps and known limits are in [`soui-wasm/readme.md`](./soui-wasm/readme.md).
 
 ## Contributors
 See [contributors.md](./contributors.md)

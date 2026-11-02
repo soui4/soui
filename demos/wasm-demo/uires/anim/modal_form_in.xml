@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 模态表单进场：淡入 + 从下方 16px 上移到最终位置。 -->
+<set fillAfter="false" shareInterpolator="false">
+    <alpha duration="200" fromAlpha="0.0" toAlpha="1.0" interpolator="Decelerate"/>
+    <translate duration="200" fromYDelta="16" toYDelta="0" interpolator="Decelerate"/>
+</set>

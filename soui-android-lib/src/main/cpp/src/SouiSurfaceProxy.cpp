@@ -135,7 +135,7 @@ jobject SouiSurfaceProxy::getLocallRef(){
 }
 
 void SouiSurfaceProxy::onSizeChanged(int width, int height) {
-    SetWindowPos(getNativeId(),0,0,0,width,height,SWP_NOZORDER|SWP_NOMOVE);
+    SetWindowPos((HWND)(UINT_PTR)getNativeId(),0,0,0,width,height,SWP_NOZORDER|SWP_NOMOVE);
 }
 
 WPARAM SouiSurfaceProxy::buildMouseWParam(int metaState, int extraMkBits) {

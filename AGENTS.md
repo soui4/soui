@@ -1,4 +1,4 @@
-# SOUI 4 仓库协作指引
+﻿# SOUI 4 仓库协作指引
 
 本文件适用于本仓库中的 AI 编码代理。目标是让每次修改从需求、验收标准到验证结果都可追溯。它描述代理应如何工作；CI、分支保护和发布权限仍以实际配置为准，不能因为本文件写了规则就宣称门禁已经生效。
 
@@ -9,6 +9,12 @@
 - 改动 `swinx/` 前先读 `swinx/AGENTS.md`：那里固定 swinx 的分层与登记点、平台差异收敛形态、句柄与退出期生存期约束、A/W 与错误码口径、API 面门禁与后端对称性要求。涉及 swinx 内部设计时以该文件为准，本文件只管仓库级流程。
 - `swinx/` 和部分 `third-part/` 目录是 Git 子模块。先确认文件归属，不要把子模块内的修改误当作主仓库普通文件提交；更新子模块指针须说明原因和兼容性。
 - 先阅读相关模块的 `CMakeLists.txt`、现有测试、`README.zh-CN.md` 和 `doc/` 中的说明。修改 XML 资源时同时检查引用它的代码、资源索引和相应演示。
+
+## 代码与文件约束
+
+- **不使用 C++11 及以后的语法和标准库。** 主仓库代码按 C++03 编写，必须保持 VS2008（MSVC 9.0，`_MSC_VER=1500`）能编译 `demos/fun_test` 等目标。禁用项包括但不限于：`nullptr`、`final`、`auto` 类型推导、范围 for、lambda、类内成员初始化（NSDMI）、委托构造、`std::unique_ptr`/`std::shared_ptr`、`std::function`/`std::bind`、`std::atomic`/`std::thread`/`std::chrono`。替代写法：`NULL`、`SCONST` 等既有宏、写出完整类型、传统索引循环、函数对象或 `FreeFunctionSlot`/`MemberFunctionSlot`、`SAutoRefPtr`。C++11 特性只允许出现在既有的能力宏（如 `ENABLE_STDFUNCTOR`、`SWINX_TEST_HAS_CPP11`、`_MSC_VER` 判断）保护之下，并保证未启用该宏的配置（含 VS2008）不参与编译；新增的版本/平台分支要在 VS2008 配置下实测。
+- **C++03 下的测试细节。** gtest 的 `ASSERT_NE(<指针>, NULL)` 会把 `NULL` 推导成 `int`，导致指针与整型比较报 C2446；改用 `ASSERT_TRUE(<ptr> != NULL)` / `EXPECT_TRUE(<ptr> == NULL)`。仅由返回类型决定模板参数的函数（如 `SouiTest::findByName`）必须显式写实参，如 `findByName<SWindow>(root, L"name")`。
+- **文件编码统一为 UTF-8 + BOM。** 所有源文件（`*.cpp`/`*.h`/`*.inl` 等）与文本资源（`*.xml` 等）保存为带 BOM 的 UTF-8，不得使用 GBK/ANSI 或无 BOM 的 UTF-8。新增文件、整体重写文件、用脚本批量改文件后都要检查首字节为 `EF BB BF`；改写时保留原有 BOM，不能因为只替换部分文本而丢失。
 
 ## 每个研发任务的闭环
 
@@ -35,10 +41,10 @@
 - 初始化需要的子模块：`git submodule update --init --recursive`。依赖安装与各平台构建细节见 `README.zh-CN.md`；不要在没有目标 SDK 的主机上声称完成移动端验证。
 - 桌面平台通常用 `cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug` 配置，再用 `cmake --build build --config Debug --parallel` 构建。macOS 可按 README 使用 Ninja。构建大仓库时可先构建受影响目标，再运行适用的完整验证。
 - `demos/fun_test` 使用 Google Test，全部 `test_*.cpp` 编进单一 `fun_test` 目标；启用 demo 构建后可构建它。Linux/macOS 的桌面构建默认在该目标完成后运行 `--gtest_filter=-window.*` 的全套非交互测试；PR 快速构建用 `-DSOUI_FUN_TEST_POST_BUILD=OFF` 关闭该构建后动作，再显式执行基础 CTest。Windows 或需要复跑全套时，应从构建输出目录手动运行 `fun_test` 并使用同一过滤条件。不要把"构建成功"泛化为全部测试通过。
-- 基本验证入口：构建 `fun_test` 后运行 `ctest --test-dir build -L '^soui-headless$' --output-on-failure`（当前 507 个用例：496 单元 + 1 集成 + 10 无窗口 E2E）。CTest 逐个注册并执行 `swinx`/`utilities` 单元测试、SOUI 核心函数单元测试、ZIP 资源提供器集成测试，以及资源索引与 XML 到控件树和状态变化的无窗口核心 E2E 测试；需要时可用 `ctest -R '^soui_matrix\.'` 等条件单独复跑。它还没有覆盖屏幕显示、鼠标输入、窗口事件派发、全部业务路径或平台。
+- 基本验证入口：构建 `fun_test` 后运行 `ctest --test-dir build -L '^soui-headless$' --output-on-failure`（当前注册 557 个用例：507 单元 + 1 集成 + 12 无窗口 E2E + 37 控件无头用例；其中 1 条 `swinx_misc.is_dbcs_lead_byte_codepage_dependent` 带 `DISABLED_` 前缀不执行，实跑 556）。CTest 逐个注册并执行 `swinx`/`utilities` 单元测试、SOUI 核心函数单元测试、ZIP 资源提供器集成测试，以及资源索引与 XML 到控件树和状态变化的无窗口核心 E2E 测试；需要时可用 `ctest -R '^soui_matrix\.'` 等条件单独复跑。它还没有覆盖屏幕显示、鼠标输入、窗口事件派发、全部业务路径或平台。
 - `swinx/` 另有一道不编译的 API 面门禁：`python swinx/doc/tools/api_scan.py --check` 比对 `swinx/include/*.h` 声明面与已提交的 `swinx/doc/tools/api_scan.json`，并校验没有函数低于 `api_baseline.json` 记录的能力下限；动了 swinx 声明或实现就要先不带参数重跑该脚本刷新清单，再用 `python swinx/doc/tools/gen_doc.py` 重生成 `swinx/doc/swinx-API实现清单.md`。CI 由 `.github/workflows/swinx-api-gate.yml` 执行同一检查，只初始化 `swinx` 一个子模块。
 - `components/network/test` 的 `network_test` 由 `SOUI_BUILD_NETWORK_TEST` 选项控制，默认关闭；游戏模块也有各自的测试目标。选择与改动有关的补充测试并记录实际命令和结果。
-- GUI 试点需在有桌面显示的环境配置 `-DSOUI_ENABLE_GUI_SMOKE=ON`，构建 `fun_test` 后执行 `ctest --test-dir build -L '^soui-gui$' --output-on-failure`；Linux CI 使用 Xvfb。该烟测创建真实宿主窗口并验证鼠标消息到按钮事件的派发，暂不证明视觉像素正确或全部窗口交互。默认选项关闭，门禁的 507 个无头用例不受影响。需要人工操作的演示窗口（`window.soui`、`window.gdi`）另由 `-DSOUI_ENABLE_INTERACTIVE_TESTS=ON` 控制，同样默认关闭，不得加入门禁。
+- GUI 试点需在有桌面显示的环境配置 `-DSOUI_ENABLE_GUI_SMOKE=ON`，构建 `fun_test` 后执行 `ctest --test-dir build -L '^soui-gui$' --output-on-failure`；Linux CI 使用 Xvfb。该烟测创建真实宿主窗口并验证鼠标消息到按钮事件的派发，暂不证明视觉像素正确或全部窗口交互。默认选项关闭，门禁的 557 个无头用例（实跑 556）不受影响。需要人工操作的演示窗口（`window.soui`、`window.gdi`）另由 `-DSOUI_ENABLE_INTERACTIVE_TESTS=ON` 控制，同样默认关闭，不得加入门禁。
 - C/C++ 格式以仓库根目录 `.clang-format` 为准；格式化仅限所改文件，避免形成无关的大规模 diff。
 
 ## PR、CI 与发布

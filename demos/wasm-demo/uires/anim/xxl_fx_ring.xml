@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 提示特效(青色冰环): 环体快速扩张 + 同步淡出,与金色星芒爆发(xx_fx_pop)区分 -->
+<set fillAfter="true" shareInterpolator="false">
+    <scale duration="380" startOffset="0" fromXScale="0.25" toXScale="1.35" fromYScale="0.25" toYScale="1.35" pivotX="50%" pivotY="50%" interpolator="Decelerate"/>
+    <alpha duration="300" startOffset="140" fromAlpha="1.0" toAlpha="0.0" interpolator="Accelerate" fillAfter="true"/>
+</set>

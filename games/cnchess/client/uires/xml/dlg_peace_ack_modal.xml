@@ -1,0 +1,15 @@
+<modalroot layout="anchor" colorBkgnd="@color/modal_mask">
+    <modalview size="-2,-1" pos="0,0,0" layout="vbox" colorBkgnd="@color/bg_modal" interval="0" padding="0,0,0,0" enterAnimation="anim:modal_up_in" exitAnimation="anim:modal_up_out">
+        <!-- 顶部金色装饰条 -->
+        <window size="-2,3" colorBkgnd="@color/gold"/>
+        <!-- 内容区 -->
+        <window size="-2,-1" layout="vbox" interval="10" padding="20,15,20,15">
+            <text text="对家发来和棋请求,理由如下:" font="size:14,bold" colorText="@color/gold"/>
+            <edit name="edit_desc" size="-2,80" multiLines="1" readonly="1" colorText="@color/text_light" colorBkgnd="@color/bg_edit" colorBorder="@color/border_dark" margin="2,2,2,2" font="size:14"/>
+            <window size="-2,-1" layout="hbox" interval="10" gravity="center">
+                <button name="btn_cancel" size="0,36" weight="1" text="拒绝" font="size:14" colorText="@color/text_cancel" colorBkgnd="@color/bg_edit" cursor="hand"/>
+                <button name="btn_ok" size="0,36" weight="1" text="同意" font="size:14,bold" skin="btn_primary" cursor="hand"/>
+            </window>
+        </window>
+    </modalview>
+</modalroot>

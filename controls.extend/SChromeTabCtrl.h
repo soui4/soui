@@ -3,8 +3,7 @@
 #include <core/SWnd.h>
 #include "SAnimator.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 #define EVT_CHROMETAB_BEGIN      (EVT_EXTERNAL_BEGIN + 400)
 #define EVT_CHROMETAB_NEW        (EVT_CHROMETAB_BEGIN + 0)
@@ -151,4 +150,4 @@ class SChromeTabCtrl
     SXmlDoc m_xmlStyle;
 };
 
-} // namespace SOUI
+SNSEND

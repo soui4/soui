@@ -1,7 +1,6 @@
 #pragma once
 
-namespace SOUI
-{
+SNSBEGIN
 class SImageMaskWnd : public SWindow {
     DEF_SOBJECT(SWindow, L"imageMask")
   public:
@@ -34,4 +33,4 @@ class SImageMaskWnd : public SWindow {
     SAutoRefPtr<IBitmapS> m_bmpMask;
     int m_iMaskChannel;
 };
-} // namespace SOUI
+SNSEND

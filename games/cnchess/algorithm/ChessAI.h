@@ -45,4 +45,18 @@ public:
     // 到点即返回已完成的最深层较优着法; ≤0 等价于纯迭代加深。
     // 预算过小导致第 1 层都未算完时, 自动不计时间补算 1 层, 保证总返回合法着法。
     static MOVESTEP SearchBestMove(CChessLayout &layout, int nDepth, int nTimeMs);
+
+    /**
+     * @brief 带走棋历史的搜索: 根节点排除会触发长将/长捉判负的着法
+     * @param layout  当前棋局(只读使用)
+     * @param nDepth  搜索深度
+     * @param nTimeMs 思考时间预算(毫秒, <=0 不限时)
+     * @param history 走到当前局面的完整走棋历史(最后一步为对方上一步)
+     * @param nMaxRepeatJiang 长将判负步限(重复步数 >= 该值即判负)
+     * @param nMaxRepeatCatch 长捉判负步限(重复步数 >= 该值即判负)
+     * @return 最佳走法; 无合法走法时返回无效着法
+     */
+    static MOVESTEP SearchBestMove(CChessLayout &layout, int nDepth, int nTimeMs,
+                                   const std::vector<MOVESTEP> &history,
+                                   int nMaxRepeatJiang, int nMaxRepeatCatch);
 };

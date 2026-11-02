@@ -1,0 +1,5 @@
+# 只有脚本和 README 入库：依赖与本地产物都不跟踪
+node_modules/
+*.png
+profile_*.json
+*.rec.json

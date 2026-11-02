@@ -3,8 +3,7 @@
 
 #define TIMER_END_TIP 100
 
-namespace SOUI
-{
+SNSBEGIN
 
 static SStringT s_TipLayout;
 
@@ -83,4 +82,4 @@ void STipWnd::OnTimer(UINT_PTR timerID)
         SNativeWnd::DestroyWindow();
     }
 }
-} // namespace SOUI
+SNSEND

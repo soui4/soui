@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 动画页 SValueAnimator 演示：浮点进度 0 → 1 → 0，驱动进度条与数字标签。
+     同样用 reverse 往返，结束时回到 0。 -->
+<floatAnimator duration="700" valueFrom="0" valueTo="1"
+               repeatCount="1" repeatMode="reverse" interpolator="AccelerateDecelerate"/>

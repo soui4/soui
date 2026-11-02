@@ -49,6 +49,7 @@ file(GLOB SOUI_TEST_ALL_SRC   CONFIGURE_DEPENDS ${SOUI_FUN_TEST_DIR}/test_*.cpp)
 file(GLOB SOUI_TEST_INTEG_SRC CONFIGURE_DEPENDS ${SOUI_FUN_TEST_DIR}/test_integration_*.cpp)
 file(GLOB SOUI_TEST_E2E_SRC   CONFIGURE_DEPENDS ${SOUI_FUN_TEST_DIR}/test_e2e_*.cpp)
 file(GLOB SOUI_TEST_GUI_SRC   CONFIGURE_DEPENDS ${SOUI_FUN_TEST_DIR}/test_gui_*.cpp)
+file(GLOB SOUI_TEST_UITEST_SRC CONFIGURE_DEPENDS ${SOUI_FUN_TEST_DIR}/test_soui_uitest_*.cpp)
 
 # 交互式演示用例：窗口打开后等待人工点击/关闭，程序无法自行判定结束点，因此单独成组
 # 且默认不注册 —— 否则一次裸 `ctest` 会永远挂在这里。
@@ -65,6 +66,7 @@ list(REMOVE_ITEM SOUI_TEST_UNIT_SRC
     ${SOUI_TEST_INTEG_SRC}
     ${SOUI_TEST_E2E_SRC}
     ${SOUI_TEST_GUI_SRC}
+    ${SOUI_TEST_UITEST_SRC}
     ${SOUI_TEST_INTERACTIVE_SRC}
 )
 
@@ -162,6 +164,15 @@ soui_assert_group_not_empty(SOUI_E2E_TESTS)
 set_tests_properties(${SOUI_E2E_TESTS}
     PROPERTIES LABELS "soui-headless;soui-e2e" TIMEOUT 60)
 
+# 无头 UI 测试（SouiTest 框架：Tier A 框架级注入 SSendMessage，无需显示，归入门禁）
+# 内部用例只允许 Tier A 注入；外部/保真对照用例见 test_gui_uitest_*（soui-gui 层）。
+gtest_add_tests(TARGET fun_test
+    SOURCES  ${SOUI_TEST_UITEST_SRC}
+    TEST_LIST SOUI_UITEST_TESTS)
+soui_assert_group_not_empty(SOUI_UITEST_TESTS)
+set_tests_properties(${SOUI_UITEST_TESTS}
+    PROPERTIES LABELS "soui-headless;soui-uitest" TIMEOUT 60)
+
 # ---------------------------------------------------------------------------
 # 5. 可选层：需要真实桌面 / 需要人工操作
 # ---------------------------------------------------------------------------
@@ -173,6 +184,7 @@ set_tests_properties(${SOUI_E2E_TESTS}
 option(SOUI_ENABLE_GUI_SMOKE
     "Register the SOUI native-window smoke test (needs a display; Xvfb on Linux)" OFF)
 if(SOUI_ENABLE_GUI_SMOKE)
+    add_definitions(-DSOUI_ENABLE_GUI_SMOKE)
     gtest_add_tests(TARGET fun_test
         SOURCES  ${SOUI_TEST_GUI_SRC}
         TEST_LIST SOUI_GUI_SMOKE_TESTS)
@@ -180,6 +192,13 @@ if(SOUI_ENABLE_GUI_SMOKE)
     set_tests_properties(${SOUI_GUI_SMOKE_TESTS}
         PROPERTIES LABELS soui-gui TIMEOUT 30)
 endif()
+
+# 容器控件（combobox / tabctrl）无头用例已并入常规 soui-uitest 门禁：
+# SouiTest 夹具在 SetUp 中调用 HeadlessApp::LoadSystemResource() 加载系统资源
+# soui-sys-resource，内置皮肤 _skin.sys.dropbtn / _skin.sys.tab.page /
+# _skin.sys.tab.header 均已就绪，因此 SComboBox / STabCtrl 可直接在无头环境下创建，
+# 无需额外开关或专属注册。HeadlessApp 本身仍保持极简（仅 scrollbar），以免改变
+# check_sync / rubberband 等既有用例刻意依赖的固定几何度量。
 
 # 交互式演示：window.soui / window.gdi 会开窗并等待人工操作，没有时间上界，
 # 所以 TIMEOUT 0（= 不设超时）。仅供人工手动跑。

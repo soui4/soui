@@ -1226,12 +1226,17 @@ void SPath_GDI::ExecuteCommands(HDC hdc) const
             float startRad = startAngle * 3.14159f / 180.0f;
             float endRad = (startAngle + sweepAngle) * 3.14159f / 180.0f;
 
+            // 角度按屏幕坐标换算（y 向下、3 点钟为 0、顺时针为正），与 Skia 的
+            // addArc 一致。GDI 的 Arc 从起点逆时针画到终点，所以要把终点当起点
+            // 传进去，逆时针从 end 走到 start 正好覆盖 [startAngle, +sweep]。
+            // 写成 y 向上再加不交换参数，会把圆弧镜像到另一边（SpeedMeter 的
+            // 缺口从下方跑到上方）。
             int xStart = (int)(centerX + radiusX * cos(startRad));
-            int yStart = (int)(centerY - radiusY * sin(startRad));
+            int yStart = (int)(centerY + radiusY * sin(startRad));
             int xEnd = (int)(centerX + radiusX * cos(endRad));
-            int yEnd = (int)(centerY - radiusY * sin(endRad));
+            int yEnd = (int)(centerY + radiusY * sin(endRad));
 
-            ::Arc(hdc, (int)left, (int)top, (int)right, (int)bottom, xStart, yStart, xEnd, yEnd);
+            ::Arc(hdc, (int)left, (int)top, (int)right, (int)bottom, xEnd, yEnd, xStart, yStart);
         }
         break;
 

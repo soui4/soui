@@ -41,12 +41,12 @@ static std::wstring tempPathW(const wchar_t *name)
 
 class FileTest : public ::testing::Test {
 protected:
-    void SetUp() override
+    void SetUp()
     {
         dir = tempPath("dir");
         CreateDirectoryA(dir.c_str(), NULL);
     }
-    void TearDown() override
+    void TearDown()
     {
         // best-effort cleanup, ignore errors
         DeleteFileA((dir + "/a.txt").c_str());

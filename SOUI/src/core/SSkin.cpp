@@ -218,6 +218,7 @@ SSkinImgList::SSkinImgList()
     , m_tileMode(TM_Both)
     , m_bLazyLoad(FALSE)
     , m_bCacheSvg(TRUE)
+	, m_nSvgCacheNext(0)
 {
 }
 
@@ -286,8 +287,7 @@ void SSkinImgList::LoadSrcImage() const
     {
         m_pSvg.Attach(CreateSvgFromResId(S_CW2T(m_strSrc)));
         // The SVG source changed (including first load); the rasterization cache is invalidated and rebuilt on demand
-        m_pCacheBmp = NULL;
-        m_szPerStateCache.cx = m_szPerStateCache.cy = 0;
+        ClearSvgCache();
     }
     else
     {
@@ -319,6 +319,16 @@ void SSkinImgList::GetDrawable(SAutoRefPtr<IBitmapS> &pImg, SAutoRefPtr<ISvgObj>
     pSvg = m_pSvg;
 }
 
+void SSkinImgList::ClearSvgCache() const
+{
+    for (int i = 0; i < kSvgCacheSlots; ++i)
+    {
+        m_aSvgCache[i].bmp = NULL;
+        m_aSvgCache[i].sz.cx = m_aSvgCache[i].sz.cy = 0;
+    }
+    m_nSvgCacheNext = 0;
+}
+
 SAutoRefPtr<IBitmapS> SSkinImgList::GetSvgCacheBitmap(IRenderTarget *pRT, int cxPerState, int cyPerState) const
 {
     // The cache may be built by one thread while other threads draw the same
@@ -329,10 +339,13 @@ SAutoRefPtr<IBitmapS> SSkinImgList::GetSvgCacheBitmap(IRenderTarget *pRT, int cx
     if (cxPerState <= 0 || cyPerState <= 0)
         return NULL;
 
-    // Cache hit: same per-state dimensions (skin's states/layout are immutable)
-    if (m_pCacheBmp && m_szPerStateCache.cx == cxPerState && m_szPerStateCache.cy == cyPerState)
+    // 命中判定按尺寸逐槽查：一张皮肤同时用几种尺寸画是常态（HUD 图标、棋盘格、
+    // 列表行……各占一档），单槽缓存会被后来者冲掉，导致每次切换尺寸都重建整张
+    // SVG 的光栅化。
+    for (int i = 0; i < kSvgCacheSlots; ++i)
     {
-        return m_pCacheBmp;
+        if (m_aSvgCache[i].bmp && m_aSvgCache[i].sz.cx == cxPerState && m_aSvgCache[i].sz.cy == cyPerState)
+            return m_aSvgCache[i].bmp;
     }
 
     IRenderFactory *pRenderFactory = GETRENDERFACTORY;
@@ -364,13 +377,15 @@ SAutoRefPtr<IBitmapS> SSkinImgList::GetSvgCacheBitmap(IRenderTarget *pRT, int cx
     pMemRT->EndDraw();
 
     IBitmapS *pNewBmp = (IBitmapS *)pMemRT->GetCurrentObject(OT_BITMAP);
-    if (pNewBmp)
-    {
-        m_pCacheBmp = pNewBmp;
-        m_szPerStateCache.cx = cxPerState;
-        m_szPerStateCache.cy = cyPerState;
-    }
-    return m_pCacheBmp;
+    if (!pNewBmp)
+        return NULL;
+    // 轮转占位：满了就覆盖最老的一槽（尺寸种类很少，4 档足够）。
+    int slot = m_nSvgCacheNext;
+    m_nSvgCacheNext = (m_nSvgCacheNext + 1) % kSvgCacheSlots;
+    m_aSvgCache[slot].bmp = pNewBmp;
+    m_aSvgCache[slot].sz.cx = cxPerState;
+    m_aSvgCache[slot].sz.cy = cyPerState;
+    return m_aSvgCache[slot].bmp;
 }
 
 void SSkinImgList::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const
@@ -512,8 +527,7 @@ bool SSkinImgList::SetImage(IBitmapS *pImg)
     m_pImg = pImg;
     m_bLazyLoad = FALSE;
     m_pSvg = NULL;
-    m_pCacheBmp = NULL;
-    m_szPerStateCache.cx = m_szPerStateCache.cy = 0;
+    ClearSvgCache();
     return true;
 }
 
@@ -523,8 +537,7 @@ bool SSkinImgList::SetSvg(ISvgObj *pSvg)
     m_pSvg = pSvg;
     m_pImg = NULL;
     m_bLazyLoad = FALSE;
-    m_pCacheBmp = NULL;
-    m_szPerStateCache.cx = m_szPerStateCache.cy = 0;
+    ClearSvgCache();
     return true;
 }
 
@@ -591,8 +604,7 @@ void SSkinImgList::OnColorize(COLORREF cr)
     }
     else if (m_pSvg)
     {
-        m_pCacheBmp = NULL; // reset cache.
-        m_szPerStateCache.cx = m_szPerStateCache.cy = 0;
+        ClearSvgCache(); // reset cache.
         if (!m_strSrc.IsEmpty())
         {
             // Copy-then-swap from the retained source: a fresh parse is an

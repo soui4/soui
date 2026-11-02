@@ -58,7 +58,7 @@ class CSouiWnd : public SHostWnd{
 public:
     CSouiWnd(): SHostWnd("layout:xml_soui"){}
 
-    void OnFinalMessage(HWND hWnd) override{
+    void OnFinalMessage(HWND hWnd){
         SHostWnd::OnFinalMessage(hWnd);
         delete this;
     }

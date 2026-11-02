@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  values/color.xml -- 颜色表
+
+  uidef/init.xml 里 <color src="values:color"/> 指向这张表，条目形状和
+  values/string.xml 一样是 <name value="..."/>（见 flowlayout_demo 的同名文件）。
+  这张表本身也是"自定义资源类型 + uires.idx 索引"这条链在 wasm 下能走通的证据。
+
+  整张表按浅色主题取值：soui-sys-resource 自带的内置皮肤（按钮/复选框/单选/滚动条/
+  页签头）本身就是浅色 PNG + 浅色描边的 colorrect，深色底下要逐项覆盖文字色才看得清；
+  展示页面向官网，直接用浅色底让系统皮肤按设计原样呈现。
+-->
+<color>
+  <page value="#F4F6FA"/>
+  <surface value="#FFFFFF"/>
+  <text value="#1F2937"/>
+  <textsub value="#6B7280"/>
+  <accent value="#2563EB"/>
+  <accentsoft value="#DBEAFE"/>
+  <divider value="#E5E7EB"/>
+  <ok value="#059669"/>
+  <!-- 以下 7 条只给 Lua 游戏页（xml/page_game.xml）用：那三页是从 demos/demo 的
+       page_script.xml 原样搬过来的，里面写的是 @color/clr_*，名字跟着源文件走
+       比对一遍颜色值省力。orange 在 demo 的 color.xml 里其实缺定义（渲染时按
+       非法色退成黑色），这里补上真值。 -->
+  <clr_page_bg value="rgba(255,255,255,0.7)"/>
+  <clr_card_bg value="#FFFFFF"/>
+  <clr_title value="#0F172A"/>
+  <clr_text_sub value="#64748B"/>
+  <clr_primary value="#2563EB"/>
+  <clr_divider value="#E2E8F0"/>
+  <orange value="#F97316"/>
+</color>

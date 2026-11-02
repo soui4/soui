@@ -1,6 +1,5 @@
 #pragma once
-namespace SOUI
-{
+SNSBEGIN
 	class SRoundImage : public SImageWnd
 	{
 		DEF_SOBJECT(SImageWnd,L"roundImg")
@@ -27,5 +26,5 @@ namespace SOUI
 		SOUI_MSG_MAP_END()
 	};
 
-}
+SNSEND
 

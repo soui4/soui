@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  xxl_icons.svg - 消消乐棋子雪碧图(nanosvg 兼容)
+  7 帧横排,每帧 64x64,总尺寸 448x64。
+  帧序: 0=苹果 1=橙子 2=柠檬 3=葡萄 4=西瓜 5=樱桃 6=星星
+  风格: 市面常见消消乐的糖果水果风(径向渐变+左上高光+落地阴影)。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="448" height="64" viewBox="0 0 448 64">
+  <defs>
+  <radialGradient id="gRed" cx="0.38" cy="0.30" r="0.85">
+    <stop offset="0" stop-color="#FF9E97"/>
+    <stop offset="0.45" stop-color="#F44336"/>
+    <stop offset="1" stop-color="#B01B24"/>
+  </radialGradient>
+  <radialGradient id="gOrange" cx="0.38" cy="0.30" r="0.85">
+    <stop offset="0" stop-color="#FFD08A"/>
+    <stop offset="0.45" stop-color="#FF9800"/>
+    <stop offset="1" stop-color="#D96A00"/>
+  </radialGradient>
+  <radialGradient id="gYellow" cx="0.38" cy="0.30" r="0.85">
+    <stop offset="0" stop-color="#FFF9B0"/>
+    <stop offset="0.45" stop-color="#FFE23F"/>
+    <stop offset="1" stop-color="#D9B400"/>
+  </radialGradient>
+  <radialGradient id="gPurple" cx="0.38" cy="0.30" r="0.85">
+    <stop offset="0" stop-color="#D3A8FF"/>
+    <stop offset="0.45" stop-color="#9C4DFF"/>
+    <stop offset="1" stop-color="#5E1AA8"/>
+  </radialGradient>
+  <radialGradient id="gPink" cx="0.38" cy="0.30" r="0.85">
+    <stop offset="0" stop-color="#FF9E97"/>
+    <stop offset="0.45" stop-color="#F0355A"/>
+    <stop offset="1" stop-color="#A80F3E"/>
+  </radialGradient>
+  <radialGradient id="gGold" cx="0.38" cy="0.30" r="0.85">
+    <stop offset="0" stop-color="#FFF3B0"/>
+    <stop offset="0.45" stop-color="#FFC107"/>
+    <stop offset="1" stop-color="#D68F00"/>
+  </radialGradient>
+  <radialGradient id="gRind" cx="0.5" cy="0.1" r="1.0">
+    <stop offset="0" stop-color="#8BC34A"/>
+    <stop offset="1" stop-color="#33691E"/>
+  </radialGradient>
+  <radialGradient id="gFlesh" cx="0.5" cy="0.1" r="1.0">
+    <stop offset="0" stop-color="#FF8A80"/>
+    <stop offset="1" stop-color="#E53935"/>
+  </radialGradient>
+  <linearGradient id="gLeaf" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#66BB6A"/>
+    <stop offset="1" stop-color="#2E7D32"/>
+  </linearGradient>
+  </defs>
+  <!-- 帧0:红苹果 -->
+  <g transform="translate(0,0)">
+    <ellipse cx="32" cy="59" rx="15" ry="2.6" fill="#000000" opacity="0.13"/>
+    <rect x="30" y="10" width="4" height="12" rx="2" fill="#795548"/>
+    <ellipse cx="41" cy="15" rx="8" ry="4.2" fill="url(#gLeaf)" transform="rotate(-25 41 15)"/>
+    <circle cx="32" cy="38" r="21" fill="url(#gRed)"/>
+    <ellipse cx="24" cy="30" rx="6" ry="4" fill="#FFFFFF" opacity="0.75"/>
+    <ellipse cx="40" cy="32" rx="3" ry="2" fill="#FFFFFF" opacity="0.4"/>
+  </g>
+  <!-- 帧1:橙子 -->
+  <g transform="translate(64,0)">
+    <ellipse cx="32" cy="59" rx="15" ry="2.6" fill="#000000" opacity="0.13"/>
+    <ellipse cx="34" cy="16" rx="9" ry="4.2" fill="url(#gLeaf)" transform="rotate(-8 34 16)"/>
+    <circle cx="32" cy="39" r="21" fill="url(#gOrange)"/>
+    <circle cx="24" cy="34" r="1.4" fill="#C96A00" opacity="0.5"/>
+    <circle cx="38" cy="30" r="1.4" fill="#C96A00" opacity="0.5"/>
+    <circle cx="34" cy="45" r="1.4" fill="#C96A00" opacity="0.5"/>
+    <circle cx="24" cy="46" r="1.4" fill="#C96A00" opacity="0.5"/>
+    <ellipse cx="24" cy="31" rx="6" ry="4" fill="#FFFFFF" opacity="0.75"/>
+  </g>
+  <!-- 帧2:柠檬 -->
+  <g transform="translate(128,0)">
+    <ellipse cx="32" cy="57" rx="17" ry="2.6" fill="#000000" opacity="0.13"/>
+    <ellipse cx="32" cy="37" rx="21" ry="16" fill="url(#gYellow)" transform="rotate(-12 32 37)"/>
+    <circle cx="12.5" cy="40" r="3.6" fill="url(#gYellow)"/>
+    <circle cx="51.5" cy="34" r="3.6" fill="url(#gYellow)"/>
+    <ellipse cx="24" cy="30" rx="6.5" ry="3.6" fill="#FFFFFF" opacity="0.8"/>
+  </g>
+  <!-- 帧3:葡萄 -->
+  <g transform="translate(192,0)">
+    <ellipse cx="32" cy="59" rx="14" ry="2.4" fill="#000000" opacity="0.13"/>
+    <path d="M32,8 C31,14 31,18 32,22" stroke="#795548" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <ellipse cx="41" cy="11" rx="8" ry="4.2" fill="url(#gLeaf)" transform="rotate(18 41 11)"/>
+    <circle cx="21" cy="28" r="9.2" fill="url(#gPurple)"/>
+    <circle cx="43" cy="28" r="9.2" fill="url(#gPurple)"/>
+    <circle cx="32" cy="24" r="9.4" fill="url(#gPurple)"/>
+    <circle cx="26" cy="42" r="9.2" fill="url(#gPurple)"/>
+    <circle cx="38" cy="42" r="9.2" fill="url(#gPurple)"/>
+    <circle cx="32" cy="53" r="8.6" fill="url(#gPurple)"/>
+    <ellipse cx="28" cy="22" rx="4.5" ry="3" fill="#FFFFFF" opacity="0.55"/>
+    <ellipse cx="23" cy="26" rx="2.6" ry="1.8" fill="#FFFFFF" opacity="0.45"/>
+    <ellipse cx="35" cy="40" rx="2.6" ry="1.8" fill="#FFFFFF" opacity="0.4"/>
+  </g>
+  <!-- 帧4:西瓜 -->
+  <g transform="translate(256,0)">
+    <ellipse cx="32" cy="52" rx="18" ry="2.4" fill="#000000" opacity="0.13"/>
+    <path d="M10,38 A22,22 0 0 1 54,38 Z" fill="url(#gRind)"/>
+    <path d="M13,38 A19,19 0 0 1 51,38 Z" fill="#F1F8E9"/>
+    <path d="M15,38 A17,17 0 0 1 49,38 Z" fill="url(#gFlesh)"/>
+    <ellipse cx="26" cy="30" rx="1.6" ry="2.6" fill="#33691E" transform="rotate(-30 26 30)"/>
+    <ellipse cx="38" cy="30" rx="1.6" ry="2.6" fill="#33691E" transform="rotate(25 38 30)"/>
+    <ellipse cx="32" cy="22" rx="1.6" ry="2.6" fill="#33691E" transform="rotate(0 32 22)"/>
+    <ellipse cx="22" cy="36" rx="1.6" ry="2.6" fill="#33691E" transform="rotate(-45 22 36)"/>
+    <ellipse cx="42" cy="36" rx="1.6" ry="2.6" fill="#33691E" transform="rotate(40 42 36)"/>
+    <ellipse cx="22" cy="24" rx="4" ry="2.2" fill="#FFFFFF" opacity="0.5"/>
+  </g>
+  <!-- 帧5:樱桃 -->
+  <g transform="translate(320,0)">
+    <ellipse cx="32" cy="59" rx="15" ry="2.4" fill="#000000" opacity="0.13"/>
+    <path d="M33,9 C31,18 26,24 22,31" stroke="#5D8A2E" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+    <path d="M33,9 C35,18 40,28 42,33" stroke="#5D8A2E" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+    <ellipse cx="38" cy="10" rx="7.5" ry="3.8" fill="url(#gLeaf)" transform="rotate(10 38 10)"/>
+    <circle cx="21" cy="42" r="10.5" fill="url(#gPink)"/>
+    <circle cx="43" cy="44" r="10.5" fill="url(#gPink)"/>
+    <ellipse cx="17.5" cy="38.5" rx="3.4" ry="2.3" fill="#FFFFFF" opacity="0.75"/>
+    <ellipse cx="39.5" cy="40.5" rx="3.4" ry="2.3" fill="#FFFFFF" opacity="0.75"/>
+  </g>
+  <!-- 帧6:星星 -->
+  <g transform="translate(384,0)">
+    <ellipse cx="32" cy="60" rx="14" ry="2.2" fill="#000000" opacity="0.13"/>
+    <polygon points="32.00,12.00 38.17,27.51 54.83,28.58 41.99,39.24 46.11,55.42 32.00,46.50 17.89,55.42 22.01,39.24 9.17,28.58 25.83,27.51" fill="url(#gGold)" stroke="#C77800" stroke-width="1.6" stroke-linejoin="round"/>
+    <polygon points="32.00,18.00 36.11,28.34 47.22,29.06 38.66,36.16 41.40,46.94 32.00,41.00 22.60,46.94 25.34,36.16 16.78,29.06 27.89,28.34" fill="#FFFFFF" opacity="0.35"/>
+    <ellipse cx="26" cy="28" rx="3.6" ry="2.4" fill="#FFFFFF" opacity="0.7"/>
+  </g>
+</svg>

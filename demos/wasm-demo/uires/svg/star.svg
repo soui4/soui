@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  star.svg - 评分条（ratingbar）的星星
+  2 帧横排，每帧 32x32，总尺寸 64x32。
+  帧序：0=亮星（已评分部分） 1=暗星（未评分部分）。
+  SRatingBar::DrawStars 用 DrawByIndex(rt, rc, bForeground ? 0 : 1) 取帧，
+  所以前景（亮）必须是第 0 帧。整帧填充同一色：ratingbar 自己按 value
+  裁剪亮星的绘制宽度，SVG 不需要做半帧渐变。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="32" viewBox="0 0 64 32">
+  <!-- 帧0：亮星 #F59E0B -->
+  <path d="M16,3 L19.17,12.13 L28.84,12.33 L21.14,18.17 L23.94,27.42 L16,21.9
+           L8.06,27.42 L10.86,18.17 L3.16,12.33 L12.83,12.13 Z"
+        fill="#F59E0B" stroke="#D97706" stroke-width="1" stroke-linejoin="round"/>
+  <!-- 帧1：暗星 #D1D5DB -->
+  <path d="M48,3 L51.17,12.13 L60.84,12.33 L53.14,18.17 L55.94,27.42 L48,21.9
+           L40.06,27.42 L42.86,18.17 L35.16,12.33 L44.83,12.13 Z"
+        fill="#D1D5DB" stroke="#9CA3AF" stroke-width="1" stroke-linejoin="round"/>
+</svg>

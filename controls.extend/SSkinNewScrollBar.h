@@ -1,7 +1,6 @@
 ﻿#pragma once
 
-namespace SOUI
-{
+SNSBEGIN
 //实现一个只有纵向滚动条皮肤
 /*img format: 1-normal, 2-hover, 3-pushdown, 4-disable
 1 2 3 4 //for thumb
@@ -133,4 +132,4 @@ class SSkinNewScrollbar : public SSkinScrollbar {
     SOUI_ATTRS_END()
 };
 
-} // namespace SOUI
+SNSEND

@@ -1,7 +1,6 @@
 #pragma once
 
-namespace SOUI
-{
+SNSBEGIN
 class SProgressRing : public SProgress {
     DEF_SOBJECT(SProgress, L"progressRing")
   public:
@@ -29,4 +28,4 @@ class SProgressRing : public SProgress {
     float m_fArcRate;
 };
 
-} // namespace SOUI
+SNSEND

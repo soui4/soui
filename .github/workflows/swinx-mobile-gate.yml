@@ -2,7 +2,7 @@ name: swinx mobile cross-compile
 
 # iOS / Android / OpenHarmony 原本没有任何自动构建：这三端的回归完全靠人工，
 # 而它们恰恰是 vendor 依赖最多、平台 API 最不标准的端。本工作流只做一件事——
-# 把「移动端还能编过」这条底线交给机器。
+# 把「移动端还能编过」这条底线交给机器。三端现在都在这里（iOS 于本轮补齐）。
 #
 # 只编 swinx 目标（compat 层 + 它自带的 thirdparty），不拉 SOUI 其余部分，
 # 因此一次校验的成本远低于整包构建，也不需要真机或模拟器。
@@ -10,6 +10,7 @@ name: swinx mobile cross-compile
 #   Android：用 runner 预装的 NDK；platform 固定 28（= 下游 app 的 minSdk，
 #            iconv 需要 28、ASharedMemory 需要 26，再低就编不过）
 #   OHOS   ：用公开的 OpenHarmony SDK（免注册下载，首次约 1GB 进缓存）
+#   iOS    ：macOS runner + Xcode 自带的 iphoneos SDK，只产出静态库（不需要签名）
 
 on:
   pull_request:
@@ -126,3 +127,47 @@ jobs:
           file "$BIN/clang" 2>/dev/null || od -c -N 64 "$BIN/clang" 2>/dev/null || true
           readlink -f "$BIN/clang" 2>/dev/null || true
           "$BIN/clang" --version 2>&1 | head -3 || true
+
+  # iOS 曾经是"三端里唯一没有任何自动构建"的那个：Android/OHOS 有了交叉编译门禁，
+  # iOS 仍然只能靠人在 Xcode 里点。它需要的只是 macOS runner + Xcode（runner 自带），
+  # 所以成本几乎为零。仍然只证明"编译链路不断"，不证明真机可运行。
+  ios-arm64:
+    name: swinx-ios-arm64
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      # 子模块改从 GitHub 镜像拉取：.gitmodules 里指向 gitee，GitHub runner 上不可靠
+      # （clone 失败或超时）。映射表与 build.yml 保持一致，改一处要五处一起改。
+      - name: Checkout submodules from GitHub mirror
+        shell: bash
+        run: |
+          git config --global url."https://github.com/soui4/swinx".insteadOf "https://gitee.com/setoutsoft/swinx"
+          git config --global url."https://github.com/setoutsoft/libwebsockets".insteadOf "https://gitee.com/setoutsoft/libwebsockets"
+          git config --global url."https://github.com/setoutsoft/openssl-cmake".insteadOf "https://gitee.com/setoutsoft/openssl-cmake"
+          git config --global url."https://github.com/setoutsoft/curl".insteadOf "https://gitee.com/setoutsoft/curl"
+          git config --global url."https://github.com/setoutsoft/soui-freertos".insteadOf "https://gitee.com/setoutsoft/soui-freertos"
+          git submodule update --init --recursive
+      - uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: "^3.25.0"
+
+      - name: Cross-compile swinx (arm64, iphoneos, static)
+        run: |
+          python3 swinx/tools/cross_build.py ios \
+            --abi arm64 \
+            --generator Ninja \
+            --jobs 4 \
+            --build "$RUNNER_TEMP/swinx-ios-arm64"
+
+      # 门禁的价值全在"产物真的是 arm64 Mach-O"：cross_build.py 现在会读 Mach-O
+      # 的 cputype 来比对，这里再用 lipo 独立复核一次，避免两处共用同一处误判。
+      - name: Verify the artifact is real arm64 Mach-O
+        run: |
+          LIB=$(find "$RUNNER_TEMP/swinx-ios-arm64" -name 'libswinx.a' | head -1)
+          if [ -z "$LIB" ]; then
+            echo "::error::没有生成 libswinx.a（iOS 侧应为静态库）"
+            exit 1
+          fi
+          file "$LIB"
+          lipo -info "$LIB" | tee /tmp/lipo.txt
+          grep -q arm64 /tmp/lipo.txt

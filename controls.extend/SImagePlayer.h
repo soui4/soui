@@ -2,8 +2,7 @@
 #include <core/SWnd.h>
 #include <gif/SSkinAni.h>
 
-namespace SOUI
-{
+SNSBEGIN
 
 /**
  * @class     SImagePlayer
@@ -83,4 +82,4 @@ class SImagePlayer
     int m_iCurFrame;
     int m_nNextInterval;
 };
-} // namespace SOUI
+SNSEND

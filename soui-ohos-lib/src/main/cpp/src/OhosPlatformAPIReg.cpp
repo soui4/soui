@@ -14,17 +14,17 @@ extern "C" PlatformAPI g_platformAPI;
 
 // ========= Window API wrappers ========= 
 
-static UINT_PTR ohosWin_createWindow(UINT_PTR hParent, LPCSTR className, LPCSTR title,
-                                     DWORD style, DWORD exStyle, int x, int y, int w, int h,
-                                     UINT_PTR hMenu, UINT_PTR hInstance, LPVOID lpParam)
+static HWND ohosWin_createWindow(HWND hParent, LPCSTR className, LPCSTR title,
+                                 DWORD style, DWORD exStyle, int x, int y, int w, int h,
+                                 HMENU hMenu, UINT_PTR hInstance, LPVOID lpParam)
 {
     (void)hInstance; (void)lpParam;
     UINT_PTR screenId = OhosPlatformAPI::instance().getActiveScreenId(); // 激活屏幕路由（HWND_DESKTOP 顶层窗口）
-    return (UINT_PTR)OhosPlatformAPI::instance().createWindow((HWND)hParent, screenId, className, title,
-                                                               style, exStyle, x, y, w, h, (HMENU)hMenu);
+    return OhosPlatformAPI::instance().createWindow(hParent, screenId, className, title,
+                                                   style, exStyle, x, y, w, h, hMenu);
 }
-static BOOL ohosWin_destroyWindow(UINT_PTR hWnd) {
-    return OhosPlatformAPI::instance().destroyWindow((HWND)hWnd);
+static BOOL ohosWin_destroyWindow(HWND hWnd) {
+    return OhosPlatformAPI::instance().destroyWindow(hWnd);
 }
 static HWND ohosWin_getWindow(HWND hWnd, int code) {
     return OhosPlatformAPI::instance().getWindow(hWnd, code);
@@ -115,16 +115,16 @@ static HWND ohosWin_setFocus(HWND hWnd) {
 static HWND ohosWin_getFocus() {
     return OhosPlatformAPI::instance().getFocus();
 }
-static UINT_PTR ohosWin_setTimer(UINT_PTR hWnd, UINT_PTR id, UINT uElapse, TIMERPROC proc) {
+static UINT_PTR ohosWin_setTimer(HWND hWnd, UINT_PTR id, UINT uElapse, TIMERPROC proc) {
     // 完整透传 proc：proc 型定时器（STimerGenerator/输入排水等）由
     // onTimerExpired 直接回调，不能丢弃（丢弃后 hWnd==NULL 定时器消息无处投递）
-    return (UINT_PTR)OhosPlatformAPI::instance().setTimer((HWND)hWnd, id, uElapse, proc);
+    return (UINT_PTR)OhosPlatformAPI::instance().setTimer(hWnd, id, uElapse, proc);
 }
-static BOOL ohosWin_killTimer(UINT_PTR hWnd, UINT_PTR id) {
-    return OhosPlatformAPI::instance().killTimer((HWND)hWnd, id);
+static BOOL ohosWin_killTimer(HWND hWnd, UINT_PTR id) {
+    return OhosPlatformAPI::instance().killTimer(hWnd, id);
 }
-static BOOL ohosWin_killWindowTimers(UINT_PTR hWnd) {
-    OhosPlatformAPI::instance().killWindowTimers((HWND)hWnd);
+static BOOL ohosWin_killWindowTimers(HWND hWnd) {
+    OhosPlatformAPI::instance().killWindowTimers(hWnd);
     return TRUE;
 }
 static BOOL ohosWin_showSoftKeyboard(HWND hWnd, BOOL bShow) {

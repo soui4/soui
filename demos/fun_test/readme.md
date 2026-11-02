@@ -13,14 +13,17 @@ ctest --test-dir build -L '^soui-headless$' --output-on-failure
 
 CTest 在**配置期**扫描测试源码，把每个 `TEST` / `TEST_F` 注册成独立用例，并按**文件名约定**分层打标签（分组的实现与理由见 `CMakeLists.txt` 文件头注释）：
 
-| 源文件                            | 层级标签                                                      | 注册用例数   |
-| ------------------------------ | --------------------------------------------------------- | ------- |
-| 其余 `test_*.cpp`                | `soui-unit`                                               | 396     |
-| `test_integration_*.cpp`       | `soui-integration`                                        | 1       |
-| `test_e2e_*.cpp`               | `soui-e2e`                                                | 3       |
-| **门禁合计**                       | **`soui-headless`**（= 上面三行）                               | **400** |
-| `test_gui_*.cpp`               | `soui-gui`，需 `-DSOUI_ENABLE_GUI_SMOKE=ON`                 | 1       |
-| `test_gdi.cpp`、`test_soui.cpp` | `soui-interactive`，需 `-DSOUI_ENABLE_INTERACTIVE_TESTS=ON` | 2       |
+| 源文件                            | 层级标签                                                      | 注册用例数（2026-10-29 实测） |
+| ------------------------------ | --------------------------------------------------------- | --------------------- |
+| 其余 `test_*.cpp`                | `soui-unit`                                               | 504                   |
+| `test_integration_*.cpp`       | `soui-integration`                                        | 1                     |
+| `test_e2e_*.cpp`               | `soui-e2e`                                                | 10                    |
+| `test_soui_uitest_*.cpp`       | `soui-uitest`（SouiTest 框架，Tier A 框架级注入，无头）            | 37                    |
+| **门禁合计**                       | **`soui-headless`**（= 上面四行）                               | **552**               |
+| `test_gui_*.cpp`               | `soui-gui`，需 `-DSOUI_ENABLE_GUI_SMOKE=ON`                 | 4                     |
+| `test_gdi.cpp`、`test_soui.cpp` | `soui-interactive`，需 `SOUI_ENABLE_INTERACTIVE_TESTS=ON`   | 2                     |
+
+> 用例数会随用例增删变化，以 `ctest --test-dir build -N -L '^soui-headless$' | tail -1` 为准；上表只用来一眼看出各层量级。
 
 `soui-headless` 是门禁标签，`pr-core.yml` 与 `build.yml` 都是 `ctest -L '^soui-headless$'`；`soui-unit` / `soui-integration` / `soui-e2e` 用来单跑某一层。最后两层**不带** `soui-headless`，所以打开它们的开关也不会把"需要桌面"或"需要人工操作"的用例拖进门禁。
 
@@ -29,6 +32,17 @@ CTest 在**配置期**扫描测试源码，把每个 `TEST` / `TEST_F` 注册成
 E2E 不打开交互窗口，暂不验证屏幕显示、鼠标输入或窗口容器中的事件派发。测试失败会输出用例日志并返回非零状态。
 
 Linux/macOS 默认在构建 `fun_test` 后运行全套非交互测试；PR 快速构建可配置 `-DSOUI_FUN_TEST_POST_BUILD=OFF` 关掉该构建后动作，再显式运行上面的 CTest 门禁。两条路径覆盖面一致（都是"除 `window.*` 外的全部用例"），差别只在粒度：门禁逐用例各起一个进程、可 `-j` 并行、失败定位到用例；构建后动作是单进程一次跑完，快得多。全套也可手动运行 `fun_test '--gtest_filter=-window.*'`。
+
+## 无头 UI 自动化测试（SouiTest）
+
+`test_soui_uitest_*.cpp` 属于 `soui-uitest` 标签，并随 `soui-headless` 门禁一起跑（无需显示设备）。它基于设计文档 `doc/SOUI4-UI自动化测试框架设计.md` 的 **SouiTest** 支撑库（`components/souitest/souitest.h`），用框架级事件注入（`SWindow::SSendMessage`，即 Tier A）驱动控件并验证行为：
+
+- **对象定位**：`SouiTest::findByName<T>` / `findByPath` / `findByClass` / `findIf`。
+- **输入注入**：`SouiTest::mouseClick` / `keyClick`（Tier A，无头）；`SouiTest::nativeMouseClick` 为 Tier B 原生级（仅 `test_gui_uitest_*` 对照用例使用）。
+- **行为验证**：`SouiTest::SignalSpy` 订阅任意事件（如 `EventCmd::EventID`、`EventCBSelChange::EventID`、`EventTabSelChanged::EventID`），等价 `QSignalSpy`。
+- **无头基座**：复用本目录 `test_container.h` 的 `TestContainer`（继承 `SwndContainerImpl`，桩掉绘制/宿主纯虚函数）+ `HeadlessApp` + `CreateRootFromXml`，使控件树有 `ISwndContainer` 从而 `FireEvent` 能派发，且不需要原生窗口。
+
+新增 UI 用例只需新建 `test_soui_uitest_*.cpp`、按上面的夹具写 `TEST_F(SouiTestFixture, ...)`，重新构建即自动纳入 `soui-uitest` / `soui-headless`，**不必改 CMakeLists**。用例内部只允许 Tier A 注入；需要完整输入管线保真（命中测试、焦点、hover、IME）的用例放 `test_gui_uitest_*.cpp`（受 `SOUI_ENABLE_GUI_SMOKE` 门控）。
 
 ## GUI 烟测
 

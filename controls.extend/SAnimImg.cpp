@@ -2,8 +2,7 @@
 #include "souistd.h"
 #include "SAnimImg.h"
  
-namespace SOUI
-{
+SNSBEGIN
 	SAnimImg::SAnimImg(void):
 		m_pAniIn(NULL),
 		m_pAniOut(NULL),
@@ -169,5 +168,5 @@ namespace SOUI
 		return szRet;
     }
 
-}
+SNSEND
  

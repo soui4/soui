@@ -47,9 +47,7 @@ public:
 	~CZipArchive();
 
 	BOOL Open(LPCTSTR pszFileName, LPCSTR pszPassword);
-#ifdef _WIN32
 	BOOL Open(HMODULE hModule, LPCTSTR pszName, LPCSTR pszPassword, LPCTSTR pszType = _T("7Z"));
-#endif // _WIN32
 
 	void Close();
 	BOOL IsOpen() const;

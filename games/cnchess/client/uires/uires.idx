@@ -14,7 +14,20 @@
     <file name="dlg_peace_ack" path="xml\dlg_peace_ack.xml"/>
     <file name="dlg_theme_progress" path="xml\dlg_theme_progress.xml"/>
     <file name="XML_MSGBOX" path="xml\msgbox.xml"/>
+    <!-- 模态视图布局：wasm 没有第二条消息循环，登录/确认/和棋这些原先走
+         SHostDialog::DoModal 的弹窗改用 SModalRoot + 动画。Android/iOS 早已用这
+         四份，桌面补齐是为了让三平台共用同一套资源。 -->
+    <file name="dlg_login_modal" path="xml\dlg_login_modal.xml"/>
+    <file name="dlg_confirm_modal" path="xml\dlg_confirm_modal.xml"/>
+    <file name="dlg_peace_req_modal" path="xml\dlg_peace_req_modal.xml"/>
+    <file name="dlg_peace_ack_modal" path="xml\dlg_peace_ack_modal.xml"/>
   </LAYOUT>
+  <anim>
+    <file name="modal_in" path="anim\modal_in.xml"/>
+    <file name="modal_out" path="anim\modal_out.xml"/>
+    <file name="modal_up_in" path="anim\modal_up_in.xml"/>
+    <file name="modal_up_out" path="anim\modal_up_out.xml"/>
+  </anim>
   <values>
     <file name="string" path="values\string.xml"/>
     <file name="color" path="values\color.xml"/>

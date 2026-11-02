@@ -1,0 +1,10 @@
+{
+  "name": "diag",
+  "version": "1.0.0",
+  "private": true,
+  "description": "soui-wasm 取证脚本：多数只用 Node 内置模块；Playwright 系（shot_dpr / probe_tank）靠 playwright-core 驱动本机 Edge 无头跑。",
+  "license": "ISC",
+  "dependencies": {
+    "playwright-core": "^1.64.1"
+  }
+}

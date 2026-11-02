@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  xml/modal_form.xml：“模态表单”页打开的 SModalRoot / SModalView 布局。
+
+  SModalRoot 铺满 SRootWindow，colorBkgnd 的半透明色就是遮罩；唯一的子窗口必须
+  是 SModalView，进场/退场动画分别挂在 enterAnimation / exitAnimation 上。
+  表单控件名由 soui_main.cpp 的 OnModalOpen 取：两个 <edit>、一个 <combobox>，
+  提交时在宿主订阅的 EventCmd 里读值，再用 EndModalViewSession(sessionID, IDOK)
+  结束会话；结果由 EventExitModalView 的 exitCode 回填主页面。
+
+  quitOnClick="0"：SModalRoot 的 OnEventCmd 会在任意命令冒泡到根窗口时结束会话，
+  开着它会让“提交 / 取消”按钮先关掉模态；这里把关闭方式留给两个按钮和 ESC。
+-->
+<modalroot layout="anchor" colorBkgnd="rgba(15,23,42,0.55)" quitOnClick="0" quitOnEsc="1">
+  <modalview name="modal_form" size="380dp,-1" pos="0,0,4" offset="-0.5,-0.5"
+             colorBkgnd="@color/surface" layout="vbox" interval="10dp"
+             padding="18dp,16dp,18dp,16dp"
+             enterAnimation="anim:modal_form_in" exitAnimation="anim:modal_form_out">
+    <text class="h1" size="-2,-1">新建成员</text>
+    <text class="hint" size="-2,-1" multiLines="1" wordBreak="1">这个窗口由 SModalView 承载；打开期间主界面的鼠标与键盘输入都由 SModalRoot 截获。</text>
+
+    <window size="-2,-1" layout="vbox" interval="4dp">
+      <text class="hint" size="-2,-1">姓名</text>
+      <edit name="modal_name" size="-2,34dp" class="editbox" autoSel="0"
+            text="张三" font="size:13dp"/>
+    </window>
+    <window size="-2,-1" layout="vbox" interval="4dp">
+      <text class="hint" size="-2,-1">邮箱</text>
+      <edit name="modal_email" size="-2,34dp" class="editbox" autoSel="0"
+            text="zhangsan@example.com" font="size:13dp"/>
+    </window>
+    <window size="-2,-1" layout="vbox" interval="4dp">
+      <text class="hint" size="-2,-1">部门</text>
+      <combobox name="modal_dept" size="-2,34dp" class="editbox" dropDown="1"
+                dropHeight="120dp" btnSkin="_skin.sys.dropbtn" animateTime="0" curSel="0">
+        <dropdownStyle>
+          <root colorBkgnd="@color/surface"/>
+        </dropdownStyle>
+        <liststyle itemHeight="26dp" colorText="@color/text" colorBkgnd="@color/surface"/>
+        <editstyle inset="5dp,0,5dp,0" margin="0" align="left" valign="center"
+                   colorText="@color/text" colorBkgnd="@color/surface"/>
+        <items>
+          <item text="研发中心"/>
+          <item text="设计中心"/>
+          <item text="市场部"/>
+          <item text="运营部"/>
+        </items>
+      </combobox>
+    </window>
+
+    <!-- 校验失败时宿主把提示写进这一行 -->
+    <text name="modal_err" class="hint" size="-2,-1" colorText="#DC2626"
+          multiLines="1" wordBreak="1"/>
+
+    <window size="-2,-1" layout="hbox" interval="10dp">
+      <button name="btn_modal_cancel" size="0,36dp" weight="1" text="取消"
+              skin="_skin.sys.btn.normal" class="body"/>
+      <button name="btn_modal_submit" size="0,36dp" weight="1" text="提交"
+              skin="_skin.sys.btn.normal" class="body"/>
+    </window>
+  </modalview>
+</modalroot>

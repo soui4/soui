@@ -13,8 +13,7 @@
 #pragma once
 #include <control/SCmnCtrl.h>
 
-namespace SOUI
-{
+SNSBEGIN
 enum ANI_STATUS
 {
     STATUS_NOR = 0,
@@ -92,4 +91,4 @@ class STabCtrl2
     SOUI_ATTRS_END()
 };
 
-} // namespace SOUI
+SNSEND

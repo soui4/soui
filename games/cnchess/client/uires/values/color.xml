@@ -31,4 +31,7 @@
   <gold_dark value="#B8860B"/>
   <text_light value="#CCCCCC"/>
   <text_muted value="#8B7355"/>
+  <!-- 模态视图遮罩与次要按钮文字，与移动端 color.xml 取值一致 -->
+  <modal_mask value="rgba(0,0,0,0.5)"/>
+  <text_cancel value="#222222"/>
 </color>

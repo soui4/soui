@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  values/skin.xml -- 皮肤表（Lua 游戏页用）
+
+  uidef/init.xml 的 <skin src="values:skin"/> 指向这张表。全部条目都是 SVG 源
+  （src="svg:名字"，落到 uires.idx 的 <svg> 组）：SOUI 侧 SSkinImgList 认得
+  "svg" 前缀（SOUI/src/core/SSkin.cpp:285），渲染走 render-gdi 的 DrawSVG。
+  这条链要求 SOUI_ENABLE_SVG 打开——根 CMakeLists 的 EMSCRIPTEN 分支已经改成 ON，
+  关掉的话 CreateSvgFromResId() 退化成返回 NULL 的桩（SOUI/src/core/Svg.cpp:141），
+  皮肤建得出来、画出来是空白，且不会有任何报错。
+
+  多帧雪碧图的 states 是"这张 SVG 被横向切成几格"：imglist 按 iconIndex 取第几格。
+  消消乐棋子 7 格、LED 数字 10 格、俄罗斯方块 17 格（0 空格 / 1-7 方块 /
+  8-14 幽灵 / 15 消行闪白 / 16 标题）、坦克 27 格；按钮底是 imgframe 九宫格，
+  margin 给出不可拉伸的内边距。
+-->
+<skin>
+  <!-- 消消乐：7 态糖果棋子 + 10 态七段 LED 数字 -->
+  <imglist name="svg_xxl_icons" src="svg:xxl_icons" states="7"/>
+  <imglist name="svg_xxl_digits" src="svg:xxl_digits" states="10"/>
+  <!-- 消除爆发（金色星芒）与提示冰环，配合 anim:xxl_fx_pop / anim:xxl_fx_ring -->
+  <imglist name="skin_xxl_fx" src="svg:xxl_fx"/>
+  <imglist name="skin_xxl_fx2" src="svg:xxl_fx2"/>
+  <!-- 功能按钮：药丸底（3 态九宫）+ 图标（3 态） -->
+  <imgframe name="xxl_btn_primary" src="svg:xxl_btn_primary" states="3" margin="20,10,20,10"/>
+  <imgframe name="xxl_btn_secondary" src="svg:xxl_btn_secondary" states="3" margin="20,10,20,10"/>
+  <imglist name="svg_xxl_btn_restart" src="svg:xxl_btn_restart" states="3"/>
+  <imglist name="svg_xxl_btn_hint" src="svg:xxl_btn_hint" states="3"/>
+  <imglist name="svg_xxl_btn_shuffle" src="svg:xxl_btn_shuffle" states="3"/>
+
+  <!-- 俄罗斯方块：17 态方块雪碧图 + 消行光带 + 4 枚键帽 -->
+  <imglist name="svg_tetris_blocks" src="svg:tetris_blocks" states="17"/>
+  <imglist name="skin_tetris_fx" src="svg:tetris_fx"/>
+  <imglist name="svg_tetris_key_lr" src="svg:tetris_key_lr"/>
+  <imglist name="svg_tetris_key_ud" src="svg:tetris_key_ud"/>
+  <imglist name="svg_tetris_key_space" src="svg:tetris_key_space"/>
+  <imglist name="svg_tetris_key_p" src="svg:tetris_key_p"/>
+
+  <!-- 坦克大战：27 态主雪碧图 + 可平铺的墙砖（tile="1"） -->
+  <imglist name="svg_tank" src="svg:tank" states="27"/>
+  <imglist name="svg_tank_wall" src="svg:tank_wall" tile="1"/>
+
+  <!-- 更多控件页：评分条的星星。两帧雪碧图，SRatingBar::DrawStars 按
+       DrawByIndex(rt, rc, bForeground ? 0 : 1) 取帧——第 0 帧=亮星（已评分）、
+       第 1 帧=暗星（未评分），所以左半边画金星、右半边画灰星。 -->
+  <imglist name="svg_star" src="svg:star" states="2"/>
+
+  <!-- MVC 行内进度条：系统 progress 皮肤的九宫格边距是 8/5，而 listview 的
+       行内进度条只有 10dp、tileview 只有 8dp——目标高度小于上下边距之和时，
+       九宫格只会画出固定的上下两段，胶囊两端被压扁。这里把边距收到 4，
+       8dp 高度正好由上下两块 4dp 圆角拼成完整胶囊；轨道与填充同尺寸，
+       切换 value 时两端轮廓一致。 -->
+  <imgframe name="mvc_prog_track" src="svg:mvc_prog_track" margin="4,4,4,4"/>
+  <imgframe name="mvc_prog_fill" src="svg:mvc_prog_fill" margin="4,4,4,4"/>
+</skin>

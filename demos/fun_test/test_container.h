@@ -19,6 +19,10 @@
 #include <res.mgr/SUiDef.h>
 #include <commgr2.h>
 #include <SouiFactory.h>
+// 非 Windows 的 zip 系统资源加载需要 ZIPRES_PARAM/ZipFile（inline-safe，可多处包含）。
+// 不能用 <SAppCfg.h>：它把 SAppCfg 成员函数直接定义在头里且未加 inline，是单 TU 头，
+// 被多个测试 TU 包含会触发 ODR 重复定义链接错误。
+#include <resprovider-zip/zipresprovider-param.h>
 #include <gtest/gtest.h>
 #include "common.h"
 
@@ -34,9 +38,31 @@ namespace funtest
 
     class TestContainer : public SwndContainerImpl
     {
-      public:
+	public:
+		int m_nFiredEvents;
+		DWORD m_nLastEventId;
+	public:
+		TestContainer():m_nFiredEvents(0),m_nLastEventId(0){
+		  }
+        /**
+         * @brief 容器层收到的事件计数。
+         *
+         * SWindow::FireEvent 的派发链是「本窗口事件槽 -> 脚本处理器 -> owner 窗口 ->
+         * 容器 OnFireEvent」。只有当事件仍处于 bubbleUp 状态时才会走到这里，因此
+         * 这两个计数可以用来验证"冒泡被终止后容器收不到事件"这类语义。
+         * 仅用于测试观测，不改变容器行为（仍然返回 FALSE = 未处理）。
+         */
+
+        void ResetEventCounter()
+        {
+            m_nFiredEvents = 0;
+            m_nLastEventId = 0;
+        }
+
         STDMETHOD_(BOOL, OnFireEvent)(IEvtArgs *evt) OVERRIDE
         {
+            ++m_nFiredEvents;
+            m_nLastEventId = evt ? evt->GetID() : 0;
             return FALSE;
         }
 
@@ -133,13 +159,14 @@ namespace funtest
         {
         }
 
-        void OnTimelineRequestChanged(BOOL bHasTimelineRequest) override {}
+        void OnTimelineRequestChanged(BOOL bHasTimelineRequest) {}
     };
 
     struct HeadlessApp
     {
         SComMgr2 comMgr;
         SAutoRefPtr<IRenderFactory> renderFactory;
+        SAutoRefPtr<IImgDecoderFactory> imgDecoderFactory; // 仅 LoadSystemResource 时惰性创建
         SApplication *app;
         SAutoRefPtr<IResProvider> provider;
 
@@ -175,6 +202,53 @@ namespace funtest
                 app->AddResProvider(provider, NULL);
                 provider->Release();
             }
+        }
+
+        /**
+         * @brief 按需把系统资源 soui-sys-resource 加载进当前无头 SApplication。
+         *
+         * 系统资源内含全部内置皮肤（_skin.sys.scrollbar / _skin.sys.dropbtn /
+         * _skin.sys.tab.page / _skin.sys.tab.header ...），SComboBox / STabCtrl 等容器控件
+         * 在 OnCreate 阶段需要它们，否则创建失败（如 SComboBase::OnCreate 取不到
+         * SKIN_SYS_DROPBTN 就返回 -1）。
+         *
+         * 这是【按需】接口：默认不加载，保持 HeadlessApp 极简（只有 scrollbar），
+         * 以免改变 check_sync / rubberband 等既有用例刻意依赖的固定几何度量。
+         * 需要完整内置皮肤的用例（SouiTest 夹具）显式调用即可。会顺带惰性创建
+         * 图片解码器（系统资源皮肤是 PNG），并作为成员持有以维持其生命周期。
+         */
+        void LoadSystemResource()
+        {
+            if (!imgDecoderFactory)
+            {
+                // COM_IMGDECODER 默认 imgdecoder-stb，随 bin/ 下的 libimgdecoder-stb.dll 分发。
+                if (comMgr.CreateImgDecoder((IObjRef **)&imgDecoderFactory) && imgDecoderFactory)
+                    renderFactory->SetImgDecoderFactory(imgDecoderFactory);
+            }
+#ifdef _WIN32
+            // Windows：系统资源为 PE(DLL)，与 fun_test.exe 同目录，LoadLibrary 后按 RES_PE 读。
+            HMODULE hSysRes = ::LoadLibrary(_T("soui-sys-resource"));
+            EXPECT_TRUE(hSysRes != NULL);
+            if (!hSysRes)
+                return;
+            SouiFactory souiFac;
+            SAutoRefPtr<IResProvider> sysRes;
+            sysRes.Attach(souiFac.CreateResProvider(RES_PE));
+            if (sysRes && sysRes->Init((WPARAM)hSysRes, 0))
+                app->LoadSystemNamedResource(sysRes);
+#else
+            // 非 Windows：系统资源以 zip 分发（仓库根 soui-sys-resource.zip）。
+            // 该分支未在本环境（Windows）实测，若各平台构建布局不同需调整 zip 路径。
+            SAutoRefPtr<IResProvider> sysRes;
+            if (comMgr.CreateResProvider_ZIP((IObjRef **)&sysRes))
+            {
+                ZIPRES_PARAM param;
+                SStringT zipPath = getSourceDir() + _T("/../../soui-sys-resource.zip");
+                ZipFile(&param, renderFactory, zipPath, NULL);
+                if (sysRes->Init((WPARAM)&param, 0))
+                    app->LoadSystemNamedResource(sysRes);
+            }
+#endif
         }
 
         ~HeadlessApp()

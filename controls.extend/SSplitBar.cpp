@@ -2,8 +2,7 @@
 #include "SSplitBar.h"
 #include <layout/SouiLayoutParamStruct.h>
 #include <layout/SouiLayout.h>
-namespace SOUI
-{
+SNSBEGIN
 
 SSplitBar::SSplitBar()
     : m_bDragging(FALSE)
@@ -156,4 +155,4 @@ void SSplitBar::ResizeHostWindow(int nOffset)
     }
 }
 
-} // namespace SOUI
+SNSEND

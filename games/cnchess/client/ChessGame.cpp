@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "ChessGame.h"
 #include "MainDlg.h"
-#if defined(__MOBILE__)
+#if defined(__MOBILE__) || defined(__EMSCRIPTEN__)
 #include <core/SModalViewSession.h>
 #else
 #include "PeaceReqDlg.h"
@@ -92,7 +92,10 @@ CChessGame::CChessGame(CMainDlg* pMainDlg, SGameTheme* pTheme)
     ,m_iSelfIndex(0)
     ,m_iRedIndex(-1)
     ,m_roundResult(RESULT_DRAW)
+    ,m_nGameGeneration(0)
     ,m_LytState(&m_layout)
+    ,m_nSelectedChessID(-1)
+    ,m_nUndoLeft(0)
 {
     memset(m_pUserInfo, 0, sizeof(m_pUserInfo));
     
@@ -135,17 +138,31 @@ void CChessGame::ShowPosFlags(POINT ptPiece, BOOL bShow)
     }
 }
 
+void CChessGame::SetAnimatorListener(IValueAnimator *pAnimator, int nId)
+{
+    // 动画ID高字节记录游戏代次, 代次变化后旧动画回调会被丢弃
+    pAnimator->SetID(nId | (int)(m_nGameGeneration << 8));
+    pAnimator->addListener(this);
+}
+
 void CChessGame::onAnimationEnd(IValueAnimator *pAnimator)
 {
     IPropertyAnimator *pPropAnimator = sobj_cast<IPropertyAnimator>(pAnimator);
-    if (pPropAnimator->GetID() == ANI_MOVE)
+    // 丢弃上一局/上一阶段遗留的动画, 避免游戏结束后仍继续改动棋盘状态
+    if ((pPropAnimator->GetID() >> 8) != (int)m_nGameGeneration)
+    {
+        SLOGW() << "ignore stale animation, id=" << pPropAnimator->GetID()
+                << ", generation=" << m_nGameGeneration;
+        return;
+    }
+    int nAniID = pPropAnimator->GetID() & 0xFF;
+    if (nAniID == ANI_MOVE)
     {
         CChessPiece *pPiece = (CChessPiece *)pPropAnimator->GetTarget();
         // start a new animation to move the piece down
         SLOGI()<<"restore piece scale: "<< 1.0f;
         auto pAni = Util::ScaleSprite(pPiece,1.0f, 1.0f/kPieceScale, 200);
-        pAni->SetID(ANI_MOVEDOWN);
-        pAni->addListener(this);
+        SetAnimatorListener(pAni, ANI_MOVEDOWN);
 
         // restore shadow height
         SWindow *pShadow = m_pGameBoard->FindChildByID(ID_SHADOW_BASE + pPiece->GetID()-ID_CHESS_BASE);
@@ -153,14 +170,14 @@ void CChessGame::onAnimationEnd(IValueAnimator *pAnimator)
         SLOGI()<<"restore shadow height: "<< kShadowHeight_Normal;
         Util::ChangeSpriteHeight(pShadow, kShadowHeight_Up, kShadowHeight_Normal, 200);
     }
-    else if (pPropAnimator->GetID() == ANI_DOWN)
+    else if (nAniID == ANI_DOWN)
     {
         CChessPiece *pPiece = (CChessPiece *)pPropAnimator->GetTarget();
         //set the piece to normal state
         pPiece->SetPicesState(CChessPiece::STATE_NORMAL);
         pPiece->SetLayer(SGameTheme::LAYER_PIESE);//restore layer
     }
-    else if (pPropAnimator->GetID() == ANI_MOVEDOWN)
+    else if (nAniID == ANI_MOVEDOWN)
     {
         CChessPiece *pPiece = (CChessPiece *)pPropAnimator->GetTarget();
         //move the piece down
@@ -265,7 +282,7 @@ void CChessGame::onAnimationEnd(IValueAnimator *pAnimator)
         }
         SLOGI() << "move animation done, restore msg receive";
         BLockReceive(FALSE);
-    }else if(pPropAnimator->GetID() == ANI_UP_MOVE){
+    }else if(nAniID == ANI_UP_MOVE){
         CChessPiece *pPiece = (CChessPiece *)pPropAnimator->GetTarget();
         POINT ptTarget = pPiece->GetTarget();
         MovePiece(pPiece->GetID()-ID_CHESS_BASE, ptTarget);
@@ -296,8 +313,7 @@ void CChessGame::DeselectPiece(int nId)
     CChessPiece *pSelPiece = m_pGameBoard->FindChildByID2<CChessPiece>(ID_CHESS_BASE+nId);
     SLOGI() << "chess piece clicked, id=" << m_nSelectedChessID << " restore scale to 1.0";
     auto pAni = Util::ScaleSprite(pSelPiece, 1.0f, 1.0f / kPieceScale, 200);
-    pAni->SetID(ANI_DOWN);
-    pAni->addListener(this);
+    SetAnimatorListener(pAni, ANI_DOWN);
     //hide possible move positions
     ShowPosFlags(pSelPiece->GetPos(), FALSE);
 
@@ -305,8 +321,7 @@ void CChessGame::DeselectPiece(int nId)
     SWindow *pShadow = m_pGameBoard->FindChildByID(ID_SHADOW_BASE + nId);
     CRect rc = pShadow->GetWindowRect();
     pAni = Util::ChangeSpriteHeight(pShadow, kShadowHeight_Up, kShadowHeight_Normal, 200);
-    pAni->SetID(ANI_SHADOW_RESTORE);
-    pAni->addListener(this);
+    SetAnimatorListener(pAni, ANI_SHADOW_RESTORE);
     m_nSelectedChessID = -1;
 }
 
@@ -325,8 +340,7 @@ void CChessGame::MovePiece(int nId, POINT ptTarget)
     pos.y.fSize = ptTarget.y;
     // move the piece to the target position
     auto pAnim = Util::MoveSpriteTo(pSelPiece, pos, 200);
-    pAnim->SetID(ANI_MOVE);
-    pAnim->addListener(this);
+    SetAnimatorListener(pAnim, ANI_MOVE);
     // move the shadow to the target position
     SWindow *pShadow = m_pGameBoard->FindChildByID(ID_SHADOW_BASE + nId);
     pParam = (SAnchorLayoutParam *)pShadow->GetLayoutParam();
@@ -353,10 +367,9 @@ void CChessGame::SelectAndMovePiece(int nId, POINT pt)
     // scale the piece by 110% of cell size for x and y
     auto pAni = Util::ScaleSprite(pTarget, 1.0f, kPieceScale, 200);
 
-    pAni->SetID(ANI_UP_MOVE);
+    SetAnimatorListener(pAni, ANI_UP_MOVE);
     pTarget->SetTarget(pt);
     pTarget->SetLocalMove(TRUE); // mark this is a local move, so we don't send the move to server after animation
-    pAni->addListener(this);
 
     //show possible move positions
     ShowPosFlags(pTarget->GetPos(), TRUE);
@@ -458,6 +471,11 @@ BOOL CChessGame::CheckMove(POINT ptFrom, POINT ptTo, BOOL bSilent){
 
 BOOL CChessGame::OnChessPieceClick(IEvtArgs *e)
 {
+    // 只有游戏中才允许操作棋子; 游戏结束后(已切到可点"开始")不再响应棋盘点击
+    if(m_stage != STAGE_PLAYING)
+    {
+        return TRUE;
+    }
     if(GetActivePlayerIndex() != GetSelfIndex()) 
     {
         m_pMainDlg->PlayTip(_T("It's not your turn"));
@@ -676,7 +694,7 @@ void CChessGame::OnBtnStart()
 
 void CChessGame::OnBtnReqPeace()
 {
-#if defined(__MOBILE__)
+#if defined(__MOBILE__) || defined(__EMSCRIPTEN__)
     SModalRoot *pModal = (SModalRoot*)SApplication::getSingleton().CreateWindowByName(SModalRoot::GetClassName());
     pModal->InitFromResId("layout:dlg_peace_req_modal");
 
@@ -714,7 +732,7 @@ void CChessGame::OnBtnReqPeace()
 
 void CChessGame::OnBtnReqSurrender()
 {
-#if defined(__MOBILE__)
+#if defined(__MOBILE__) || defined(__EMSCRIPTEN__)
     SModalRoot *pModal = (SModalRoot*)SApplication::getSingleton().CreateWindowByName(SModalRoot::GetClassName());
     pModal->InitFromResId("layout:dlg_confirm_modal");
 
@@ -1178,6 +1196,8 @@ BOOL CChessGame::_OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE> > da
 
 void CChessGame::OnGameStart(const void *pData, int nSize)
 {
+    // 新的一局开始, 递增代次使上一局遗留的动画回调全部失效
+    ++m_nGameGeneration;
     //remove vectory gif
     if (IWindow *pVectory = m_pGameBoard->FindChildByName(Sprites::sprite_vectory))
     {
@@ -1317,7 +1337,7 @@ void CChessGame::OnReqPeace(const void *pData, int nSize){
     if(pPeace->iIndex == m_iSelfIndex)
         return;
     SLOGI() << "Peace request, desc: " << pPeace->szMsg;
-#if defined(__MOBILE__)
+#if defined(__MOBILE__) || defined(__EMSCRIPTEN__)
     SModalRoot *pModal = (SModalRoot*)SApplication::getSingleton().CreateWindowByName(SModalRoot::GetClassName());
     pModal->InitFromResId("layout:dlg_peace_ack_modal");
 
@@ -1537,6 +1557,16 @@ void CChessGame::OnGifVectoryOver(IEvtArgs *e)
 
 void CChessGame::OnGameOver(const void *pData, int nSize)
 {
+    // 本局结束: 递增代次使未完成的走子/悔棋动画回调失效,
+    // 并清理选择与悔棋状态, 避免结束后仍能操作棋子或影响下一局
+    ++m_nGameGeneration;
+    m_nUndoLeft = 0;
+    if(m_nSelectedChessID != -1)
+    {
+        if(m_pGameBoard->FindChildByID(ID_CHESS_BASE + m_nSelectedChessID))
+            DeselectPiece(m_nSelectedChessID);
+        m_nSelectedChessID = -1;
+    }
     MSG_GAMEOVER *pOver = (MSG_GAMEOVER *)pData;
     SStringT strDesc = S_CA2T(pOver->szDesc, CP_UTF8);
     SLOGI() << "Game over, desc: " << strDesc.c_str();

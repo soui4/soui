@@ -14,7 +14,7 @@ static LRESULT CALLBACK AndroidEdit_WndProc(HWND hWnd, UINT message, WPARAM wPar
             const char* str = reinterpret_cast<const char*>(lParam);
             AutoStringSlot slot(str);
             return api.sendMessage(
-                    (UINT_PTR)hWnd, message, wParam, (LPARAM)slot.id());
+                    hWnd, message, wParam, (LPARAM)slot.id());
         }
 
         case WM_GETTEXT: {
@@ -23,7 +23,7 @@ static LRESULT CALLBACK AndroidEdit_WndProc(HWND hWnd, UINT message, WPARAM wPar
             if (buf == nullptr || maxCch <= 0) return 0;
 
             AutoStringSlot slot(NULL);
-            (void)api.sendMessage((UINT_PTR)hWnd, WM_GETTEXT,
+            (void)api.sendMessage(hWnd, WM_GETTEXT,
                                   (WPARAM)maxCch, (LPARAM)slot.id());
             const std::string result = slot.read();
 
@@ -45,7 +45,7 @@ static LRESULT CALLBACK AndroidEdit_WndProc(HWND hWnd, UINT message, WPARAM wPar
 
             AutoStringSlot slot(NULL);
             const LPARAM lpSlot = ((LPARAM)(UINT)maxCch << 16) | (LPARAM)(WORD)slot.id();
-            (void)api.sendMessage((UINT_PTR)hWnd, EM_GETLINE, (WPARAM)lineNo, lpSlot);
+            (void)api.sendMessage(hWnd, EM_GETLINE, (WPARAM)lineNo, lpSlot);
             const std::string result = slot.read();
 
             const size_t actual = std::min((size_t)maxCch, result.size());
@@ -54,7 +54,7 @@ static LRESULT CALLBACK AndroidEdit_WndProc(HWND hWnd, UINT message, WPARAM wPar
         }
 
         case WM_GETTEXTLENGTH:
-            return api.sendMessage((UINT_PTR)hWnd, message, 0, 0);
+            return api.sendMessage(hWnd, message, 0, 0);
 
         case EM_GETSEL:
         case EM_SETSEL:
@@ -75,7 +75,7 @@ static LRESULT CALLBACK AndroidEdit_WndProc(HWND hWnd, UINT message, WPARAM wPar
         case EM_GETPASSWORDCHAR:
         case EM_SCROLLCARET:
         case EM_GETLIMITTEXT:
-            return api.sendMessage((UINT_PTR)hWnd, message, wParam, lParam);
+            return api.sendMessage(hWnd, message, wParam, lParam);
 
         default:
             break;

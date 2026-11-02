@@ -1,7 +1,6 @@
 #pragma once
 
-namespace SOUI
-{
+SNSBEGIN
 class SFreeMoveWindow : public SWindow {
     DEF_SOBJECT(SWindow, L"freeMoveWindow")
   public:
@@ -70,4 +69,4 @@ class SFreeMoveWindow : public SWindow {
     SAutoRefPtr<ISkinObj> m_pCaptionSkin;
 };
 
-} // namespace SOUI
+SNSEND

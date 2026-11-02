@@ -1,8 +1,7 @@
 ﻿#pragma once
 #include <core/SSkin.h>
 
-namespace SOUI
-{
+SNSBEGIN
 /*usage
 <imgframe2 src="imgx:png_test{0,0,100,100}" xxx/>
 */
@@ -36,4 +35,4 @@ class SSkinImgFrame3 : public SSkinImgFrame {
     SStringW m_strImgKey;
 };
 
-} // namespace SOUI
+SNSEND

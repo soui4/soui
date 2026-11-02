@@ -136,6 +136,64 @@ endif()
 option(SOUI_ENABLE_ACC "Enable MSAA/IAccessible (provided by swinx)" OFF)
 endif(IS_OHOS)
 
+# ---------------------------------------------------------------------------
+# WebAssembly (Emscripten) 裁剪
+#
+# 浏览器形态下构建 swinx + utilities4 + SOUI 核心 + 最小静态组件（render-gdi、
+# imgdecoder-stb）：third-part 里的 skia/lua/sqlite/7z/curl/openssl…、controls.extend
+# 和资源包要么依赖桌面/联网能力，要么依赖宿主文件系统，第一阶段全部不进入构建图。
+# SOUI 核心与 utilities 均不 include third-part 头文件，只链接 utilities4 + swinx。
+#
+# 静态形态是必须的：浏览器没有 dlopen，组件库无法按 SOUI_ENABLE_CORE_LIB=OFF 的
+# DLL 方式在运行时加载，只能编进最终二进制。
+#
+# 组件白名单不写在根 CMakeLists 里，而是由 third-part/CMakeLists.txt 和
+# components/CMakeLists.txt 各自的 SOUI_WASM_MINIMAL 分支决定——那两个文件才是
+# 自己内容的所有者，根这里只负责把开关打开、把目录挂进构建图。
+# ---------------------------------------------------------------------------
+if(EMSCRIPTEN)
+    set(SOUI_WASM_MINIMAL ON CACHE INTERNAL "wasm build: swinx + utilities4 + SOUI core + minimal components")
+    set(SOUI_ENABLE_CORE_LIB ON CACHE BOOL "Enable compile 'core' as static lib" FORCE)
+    set(SOUI_ENABLE_COM_LIB ON CACHE BOOL "Enable compile 'components' as static lib" FORCE)
+    set(SOUI_BUILD_DEMOS OFF CACHE BOOL "Build builtin demos" FORCE)
+    set(SOUI_BUILD_GAMES OFF CACHE BOOL "Build soui games" FORCE)
+    set(SOUI_BUILD_TOOLS OFF CACHE BOOL "Build soui tools" FORCE)
+    set(SOUI_BUILD_HTTPCLIENT OFF CACHE BOOL "Build HTTP client component" FORCE)
+    set(SOUI_BUILD_WS OFF CACHE BOOL "Build Websocket module" FORCE)
+    # 页面上真正能打字的 <edit> 需要 richedit：SOUI 的 SRichEdit 有两条路，桌面
+    # 构建默认走 LoadLibrary 加载系统 riched20/msftedit，wasm 没有 dlopen，只能走
+    # INIT_RICHEDIT 的静态链接版本（SOUI/CMakeLists.txt 里由本开关决定）。
+    set(SOUI_BUILD_RICHEDIT ON CACHE BOOL "using richedit from source code" FORCE)
+    # SVG 在 wasm 下也开：Lua 游戏页（消消乐/俄罗斯方块/坦克大战）的皮肤全是
+    # src="svg:..."（多帧雪碧图 + 九宫药丸底），关掉之后这些 skin 拿不到 ISvgObj，
+    # 整页画成空白。实现只多一份 header-only 的 nanosvg（SOUI/src/core/Svg.cpp）
+    # 加 render-gdi 的 SVG 绘制分支，体积代价见 demos/wasm-demo/readme.md 的体积表。
+    set(SOUI_ENABLE_SVG ON CACHE BOOL "Enable SVG support" FORCE)
+    set(SOUI_ENABLE_SPY OFF CACHE BOOL "Enable Swnd Spy" FORCE)
+    set(SOUI_ENABLE_ACC OFF CACHE BOOL "Enable MSAA/IAccessible (provided by swinx)" FORCE)
+    # 两个"可选能力"开关：默认开，关掉能直接从 .wasm/.data 里省掉对应体积
+    # （lua-54 + ScriptModule-LUA + translator ≈ 数 MB；Scintilla 的 .cxx 更多）。
+    # 它们只影响 wasm 最小构建图（桌面构建不受这两个变量约束），消费的四个位置：
+    #   third-part/CMakeLists.txt   lua-54 / Scintilla 子目录
+    #   components/CMakeLists.txt   ScriptModule-LUA / translator 子目录
+    #   controls.extend/…           SScintillaView 源文件过滤 + 注册守卫
+    #   demos/wasm-demo/CMakeLists.txt  链接列表 + uires/lua 预载 + 传给宿主的宏
+    # 宿主的 SOUI_WASM_HAS_LUA/HAS_SCINTILLA 宏会汇总进 SwinxDemoFeatureMask()，
+    # 无头烟测据此跳过被关掉的页内断言（关功能不该让烟测变红）。
+    option(SOUI_BUILD_WASM_LUA "wasm: build ScriptModule-LUA + lua-54 + translator and preload uires/lua" ON)
+    option(SOUI_BUILD_WASM_SCINTILLA "wasm: build Scintilla and the <scintilla> control from controls.extend" ON)
+    # 中国象棋客户端（games/cnchess/client）的 wasm 版本。它比演示多要三个组件：
+    # TaskLoop 的单线程后端、ws 的浏览器 WebSocket 后端、resprovider-zip（解压
+    # 服务器下发的主题包）。开关只挂 games/cnchess/algorithm + client/wasm 两个
+    # 子目录，桌面构建不受影响。
+    option(SOUI_BUILD_WASM_CNCHESS "wasm: build the cnchess client (games/cnchess/client/wasm)" OFF)
+    # Emscripten 用 clang 编译，而下面 Darwin 分支的告警抑制只按目标平台判断，交叉编译
+    # 到 wasm 时不生效：同一批头文件会在 macOS/Linux 主机上各刷上万条
+    # -Winconsistent-missing-override。这里按编译器口径补一条，与 §Darwin 分支一致。
+    add_compile_options(-Wno-inconsistent-missing-override)
+    message(STATUS "SOUI_WASM_MINIMAL: swinx + utilities4 + SOUI core + render-gdi/imgdecoder-stb only")
+endif()
+
 include(__cmake/global.cmake)
 include(__cmake/windres.cmake)
 message(STATUS "ENABLE_RESOURCES_BUILD: ${ENABLE_RESOURCES_BUILD}")
@@ -225,15 +283,39 @@ link_directories(${CMAKE_BINARY_DIR}/bin)
 if(NOT CMAKE_SYSTEM_NAME MATCHES Windows)
         set(CMAKE_CXX_STANDARD 11)
 endif()
+# wasm 最小构建：third-part 与 components 只保留渲染器和图片解码器需要的条目，
+# 系统资源包（zip）不进入构建图（见各自 CMakeLists 的 SOUI_WASM_MINIMAL 分支）。
 add_subdirectory(third-part)
 add_subdirectory(utilities)
 add_subdirectory(components)
 add_subdirectory(SOUI)
-add_subdirectory(soui-sys-resource)
-add_subdirectory(soui-sys-resource2)
-add_subdirectory(soui-sys-resource-dark)
-add_subdirectory(soui-sys-resource-light)
+if(NOT SOUI_WASM_MINIMAL)
+    add_subdirectory(soui-sys-resource)
+    add_subdirectory(soui-sys-resource2)
+    add_subdirectory(soui-sys-resource-dark)
+    add_subdirectory(soui-sys-resource-light)
+endif()
+# 扩展控件在 wasm 下也进构建图：SScintillaView 走 Scintilla 的 headless 接口，
+# 其余控件只用 GDI。注册入口是 SCtrlsRegister::RegisterCtrls，由 demo 显式调用
+# （wasm 没有静态自注册）。
 add_subdirectory(controls.extend)
+# wasm 演示（demos/wasm-demo）不在 SOUI_BUILD_DEMOS 里：那个开关在 EMSCRIPTEN 下恒关，
+# 而这套移植唯一的端到端入口就是它。用独立开关、默认关，既有配置一概不受影响。
+# 打开后演示随全栈一起构建，链接命令全部在 demos/wasm-demo/CMakeLists.txt 里，宿主
+# 不需要 bash/sed/find（Windows 主机因此可以只靠 emcmake + cmake 构建）。
+# 注意 demos/CMakeLists.txt 不会遍历子目录（它显式列目标），所以这里直接指路径，
+# 与 SOUI_BUILD_DEMOS 不会重复加同一棵树。
+option(SOUI_BUILD_WASM_DEMO "Build the wasm demo in demos/wasm-demo (Emscripten hosts only)" OFF)
+if(EMSCRIPTEN AND SOUI_BUILD_WASM_DEMO)
+    add_subdirectory(demos/wasm-demo)
+endif()
+# 中国象棋的 wasm 客户端同样独立于 SOUI_BUILD_GAMES：那个开关在 EMSCRIPTEN 下恒关，
+# 且 games/ 的入口还要求 websockets 目标（wasm 不用 libwebsockets）。这里只挂客户
+# 端真正需要的两棵子树，服务器端的 server/ 留在桌面构建里。
+if(EMSCRIPTEN AND SOUI_BUILD_WASM_CNCHESS)
+        add_subdirectory(games/cnchess/algorithm)
+        add_subdirectory(games/cnchess/client/wasm)
+endif()
 if(SOUI_BUILD_TOOLS)
         add_subdirectory(tools)
 endif()

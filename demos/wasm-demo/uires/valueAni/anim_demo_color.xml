@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 动画页 SValueAnimator 演示：背景色在靛蓝与玫红之间往返。
+     repeatCount="1" + repeatMode="reverse" 表示播放一遍再倒放一遍，结束值回到 valueFrom,
+     所以宿主不必在动画结束后手动恢复颜色。值本身不绑定控件，由监听器消费。 -->
+<colorAnimator duration="700" valueFrom="RGBA(99,102,241,255)" valueTo="RGBA(236,72,153,255)"
+               repeatCount="1" repeatMode="reverse" interpolator="AccelerateDecelerate"/>

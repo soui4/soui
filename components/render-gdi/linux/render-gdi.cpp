@@ -1314,46 +1314,38 @@ HRESULT SRenderTarget_GDI::DrawGradientPath(THIS_ const IPathS *path, const Grad
         return E_INVALIDARG;
 
     const SPath_GDI *pGdiPath = static_cast<const SPath_GDI *>(path);
-    HRGN hRgn = pGdiPath->CreateRegionFromCommands();
-    if (!hRgn)
-        return E_FAIL;
+    (void)pRcBox; // 渐变的作用范围由描边路径的外接矩形给出（见 StrokePath）
 
-    // Get path bounds for gradient calculation
-    RECT rcBounds;
-    if (pRcBox)
+    // 语义与 render-skia 一致：渐变是画笔的填充，路径按当前画笔宽度描边，
+    // 而不是填充路径本身。SSpeedMeter 的彩色圆弧正是靠线宽描出环带。
+    HBRUSH hBr = ::CreateGradientBrush((const GRADIENTITEM *)pGradients, nCount,
+                                      (const GRADIENTINFO *)info, byAlpha, kTileMode_Clamp);
+    if (!hBr)
+        return E_INVALIDARG;
+
+    LOGBRUSH lb = { 0 };
+    lb.lbStyle = BS_BRUSH; // swinx 扩展：lbHatch 直接放画刷句柄，用于渐变描边
+    lb.lbHatch = (LONG_PTR)hBr;
+    int nWidth = m_curPen ? m_curPen->GetWidth() : 1;
+    DWORD dwStyle = m_curPen ? (DWORD)m_curPen->GetStyle()
+                             : (DWORD)(PS_SOLID | PS_GEOMETRIC | PS_ENDCAP_ROUND);
+    dwStyle = (dwStyle & ~PS_TYPE_MASK) | PS_GEOMETRIC;
+    if ((dwStyle & PS_STYLE_MASK) == 0)
+        dwStyle |= PS_SOLID;
+    HPEN hPen = ::ExtCreatePen(dwStyle, nWidth, &lb, 0, NULL);
+    if (!hPen)
     {
-        rcBounds = *pRcBox;
-    }
-    else
-    {
-        GetRgnBox(hRgn, &rcBounds);
-    }
-
-    // Use existing gradient rectangle implementation with path clipping
-    HRGN hOldClip = CreateRectRgn(0, 0, 0, 0);
-    int clipResult = GetClipRgn(m_hdc, hOldClip);
-
-    // Set path as clipping region
-    SelectClipRgn(m_hdc, hRgn);
-
-    // Draw gradient rectangle over the path bounds
-    POINT ptCorner = { 0, 0 };
-    HRESULT hr = DrawGradientRectEx(&rcBounds, ptCorner, pGradients, nCount, info, byAlpha);
-
-    // Restore original clipping
-    if (clipResult == 1)
-    {
-        SelectClipRgn(m_hdc, hOldClip);
-    }
-    else
-    {
-        SelectClipRgn(m_hdc, NULL);
+        DeleteObject(hBr);
+        return E_INVALIDARG;
     }
 
-    DeleteObject(hOldClip);
-    DeleteObject(hRgn);
-
-    return hr;
+    HGDIOBJ hOldPen = ::SelectObject(m_hdc, hPen);
+    pGdiPath->ExecuteCommands(m_hdc); // 内部 BeginPath...EndPath
+    ::StrokePath(m_hdc);
+    ::SelectObject(m_hdc, hOldPen);
+    DeleteObject(hPen);
+    DeleteObject(hBr);
+    return S_OK;
 }
 
 HRESULT SRenderTarget_GDI::CreateRegion(IRegionS **ppRegion)
@@ -1733,9 +1725,17 @@ static void renderNSVGshape(HDC hdc, const NSVGimage *image, const NSVGshape *sh
                 NSVGgradient *grad = shape->fill.gradient;
                 if (grad && grad->nstops > 0)
                 {
-                    // Get path bounds for gradient calculation
-                    RECT rcBounds;
-                    GetPathBounds(hdc, &rcBounds);
+                    /* GetPathBounds 拿不到路径点时返回 FALSE 且不写 rcBounds：下面要拿
+                     * 它算 width/height 和 radial.centerX = cx/width，未初始化的栈内容
+                     * 会变成 inf/NaN 喂进 cairo_pattern_create_radial。空路径本来也
+                     * FillPath 不出东西，跳过这个 paint order 条目。
+                     * 注意这条防御目前在本演示的资源下走不到（实测 fill/stroke 渐变分支
+                     * 进了、GetPathBounds 全部成功），它是把 UB 挡在门口，不是某次崩溃
+                     * 已被证实的修复。 */
+                    RECT rcBounds = {0};
+                    if (!GetPathBounds(hdc, &rcBounds) || rcBounds.right <= rcBounds.left
+                        || rcBounds.bottom <= rcBounds.top)
+                        continue;
                     float width = rcBounds.right - rcBounds.left;
                     float height = rcBounds.bottom - rcBounds.top;
 
@@ -1816,9 +1816,11 @@ static void renderNSVGshape(HDC hdc, const NSVGimage *image, const NSVGshape *sh
                     NSVGgradient *grad = shape->stroke.gradient;
                     if (grad && grad->nstops > 0)
                     {
-                        // Get path bounds for gradient calculation
-                        RECT rcBounds;
-                        GetPathBounds(hdc, &rcBounds);
+                        /* 同上：空路径不给出边界，跳过这条路径的描边（本来也画不出东西）。 */
+                        RECT rcBounds={0};
+                        if (!GetPathBounds(hdc, &rcBounds) || rcBounds.right <= rcBounds.left
+                            || rcBounds.bottom <= rcBounds.top)
+                            continue;
                         float width = rcBounds.right - rcBounds.left;
                         float height = rcBounds.bottom - rcBounds.top;
 
@@ -1915,14 +1917,15 @@ static void renderNSVGshape(HDC hdc, const NSVGimage *image, const NSVGshape *sh
                 {
                     penStyle |= PS_SOLID;
                 }
-                std::vector<DWORD> dashArray(shape->strokeDashCount);
+                DWORD dashArray[8] = {0};
                 for (int i = 0; i < shape->strokeDashCount; i++)
                 {
                     dashArray[i] = (DWORD)(shape->strokeDashArray[i]);
                 }
-                HPEN hPen = ExtCreatePen(penStyle, (int)shape->strokeWidth, &lb, shape->strokeDashCount, &dashArray[0]);
+                HPEN hPen = ExtCreatePen(penStyle, (int)shape->strokeWidth, &lb,
+                    shape->strokeDashCount,
+                    dashArray);
                 HGDIOBJ oldPen = ::SelectObject(hdc, hPen);
-                
                 StrokePath(hdc);
                 ::SelectObject(hdc, oldPen);
                 DeleteObject(hPen);
@@ -2836,12 +2839,17 @@ void SPath_GDI::ExecuteCommands(HDC hdc) const
             float startRad = startAngle * 3.14159f / 180.0f;
             float endRad = (startAngle + sweepAngle) * 3.14159f / 180.0f;
 
+            // 角度按屏幕坐标换算（y 向下、3 点钟为 0、顺时针为正），与 Skia 的
+            // addArc 一致。GDI 的 Arc 从起点逆时针画到终点，所以要把终点当起点
+            // 传进去，逆时针从 end 走到 start 正好覆盖 [startAngle, +sweep]。
+            // 写成 y 向上再加不交换参数，会把圆弧镜像到另一边（SpeedMeter 的
+            // 缺口从下方跑到上方）。
             int xStart = (int)(centerX + radiusX * cos(startRad));
-            int yStart = (int)(centerY - radiusY * sin(startRad));
+            int yStart = (int)(centerY + radiusY * sin(startRad));
             int xEnd = (int)(centerX + radiusX * cos(endRad));
-            int yEnd = (int)(centerY - radiusY * sin(endRad));
+            int yEnd = (int)(centerY + radiusY * sin(endRad));
 
-            ::Arc(hdc, (int)left, (int)top, (int)right, (int)bottom, xStart, yStart, xEnd, yEnd);
+            ::Arc(hdc, (int)left, (int)top, (int)right, (int)bottom, xEnd, yEnd, xStart, yStart);
         }
         break;
 

@@ -1,6 +1,5 @@
 ﻿#pragma once
-namespace SOUI
-{
+SNSBEGIN
 
 //实现一个只有纵向滚动条皮肤
 /*img format: 1-normal, 2-hover, 3-pushdown, 4-disable
@@ -57,4 +56,4 @@ class SSkinVScrollbar : public SSkinScrollbar {
     }
 };
 
-} // namespace SOUI
+SNSEND

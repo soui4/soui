@@ -92,18 +92,37 @@ BOOL WebSocketClient::ConnectToServer(LPCSTR pszSvr, LPCSTR args)
 	if (m_pWsClient)
 		return FALSE; // 已经初始化
 
-	// 解析服务器地址，格式：ip:port
-	const char* pColon = strchr(pszSvr, ':');
-	if (!pColon)
+	// 解析服务器地址，支持三种形式：
+	//   ip:port           明文 ws（桌面默认 124.222.50.176:3311）
+	//   ws://host[:port]  明文 ws
+	//   wss://host[:port] 安全 wss（HTTPS 页面必须用它）
+	// 缺省端口：wss->443，ws/明文->80；host 后若带 /path 则忽略（路径统一用 /cnchess/）。
+	const char* p = pszSvr;
+	BOOL bSecure = FALSE;
+	if (strncmp(p, "wss://", 6) == 0) { bSecure = TRUE;  p += 6; }
+	else if (strncmp(p, "ws://", 5) == 0) { bSecure = FALSE; p += 5; }
+
+	const char* pSlash = strchr(p, '/');
+	const char* pColon = strchr(p, ':');
+	if (pSlash && pColon && pColon > pSlash)
+		pColon = NULL; // ':' 在 path 内（如 IPv6 或误写），按无端口处理
+
+	int ipLen;
+	if (pColon)
+		ipLen = (int)(pColon - p);
+	else if (pSlash)
+		ipLen = (int)(pSlash - p);
+	else
+		ipLen = (int)strlen(p);
+	if (ipLen <= 0 || ipLen >= sizeof(m_szServerIP))
 		return FALSE;
 
-	int ipLen = pColon - pszSvr;
-	if (ipLen >= sizeof(m_szServerIP))
-		return FALSE;
-
-	strncpy(m_szServerIP, pszSvr, ipLen);
+	strncpy(m_szServerIP, p, ipLen);
 	m_szServerIP[ipLen] = '\0';
-	m_wPort = (WORD)atoi(pColon + 1);
+	if (pColon)
+		m_wPort = (WORD)atoi(pColon + 1);
+	else
+		m_wPort = bSecure ? 443 : 80;
 
 	// 创建WebSocket组件
 	BOOL bOK = m_comLoader.CreateWS((IObjRef**)&m_pWebsocket);
@@ -119,7 +138,7 @@ BOOL WebSocketClient::ConnectToServer(LPCSTR pszSvr, LPCSTR args)
 	if (!m_pWsClient)
 		return FALSE;
 	// 连接到服务器
-	ClientOption option = { FALSE, NULL, TRUE, TRUE, TRUE }; // 非安全连接
+	ClientOption option = { bSecure, NULL, TRUE, TRUE, TRUE };
 	char szPath[256];
 	snprintf(szPath, sizeof(szPath), "/cnchess/?%s", args);
 

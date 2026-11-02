@@ -1,0 +1,315 @@
+name: soui-freertos bare-metal gate
+
+# FreeRTOS 是 SOUI 唯一一个「没有 CI 的已宣称平台」，全部结论都靠人工本地构建。
+# 本工作流把它变成机器保证，三件事逐层加严：
+#
+#   1. census 链接（SOUI_FR_CENSUS=ON）：--whole-archive 保留每一个目标文件、
+#      关 gc-sections，任何"只在某个平台文件里才有定义"的符号都会在这里暴露。
+#      失败信息就是缺口清单（本工作流第一次跑就抓到 swinx strapi.cpp 的
+#      ftruncate——arm-none-eabi 的 newlib 不提供它）。
+#   2. 可运行镜像构建（CENSUS=OFF + MinSizeRel）：mps2-an385 的 FLASH 只有 4MB，
+#      text 越过 0x00400000 就与 RAM 物理重叠、复位即 HardFault。这里直接量
+#      .text 并在超限时失败，把"能链接"与"能跑"分开断言（-O0 的 SApp 是 5.0MB，
+#      必挂；-Os 是 2.4MB，能跑——这条差别以前只写在文档里）。
+#   3. QEMU 实跑（-semihosting）：断言 SApp 全链路走完（XML → 控件树 → cairo →
+#      帧缓冲），并检查程序自己 dump 的 320x240 PPM 不是空帧。这是"真的画出了
+#      东西"的最小机器证据，不再依赖人眼看截图。
+#
+# 4. 宿主模拟器（soui_sim，Windows 宿主）：见本文件末尾第 4 个 job。它用
+#    MSYS2 MinGW + SDL2 的 dummy 视频驱动做无头构建与实跑，证明"宿主侧构建不烂"
+#    且消息泵 / 渲染管线至少完整走一轮（dump 出一帧 BMP 作为机器证据）。
+#    struct _timeb/_ftime 已由 swinx/include/strapi.h 的 #if !SFR_HOSTED 收住；
+#    残余的 _chsize 包含顺序问题在该 job 里用一段 include_next 垫片临时修掉
+#    （应最终上游进 swinx 子模块，见 job 内注释）。
+
+on:
+  pull_request:
+    paths:
+      - 'soui-freertos/**'
+      - 'swinx/**'
+      - 'SOUI/**'
+      - 'utilities/**'
+      - '.github/workflows/soui-freertos-gate.yml'
+  push:
+    branches:
+      - master
+    paths:
+      - 'soui-freertos/**'
+      - 'swinx/**'
+      - 'SOUI/**'
+      - 'utilities/**'
+      - '.github/workflows/soui-freertos-gate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qemu-mps2-an385:
+    name: freertos-qemu-mps2-an385
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      # 子模块改从 GitHub 镜像拉取：.gitmodules 里指向 gitee，GitHub runner 上不可靠。
+      # 映射表与 build.yml 保持一致，改一处要五处一起改。
+      - name: Checkout submodules from GitHub mirror
+        shell: bash
+        run: |
+          git config --global url."https://github.com/soui4/swinx".insteadOf "https://gitee.com/setoutsoft/swinx"
+          git config --global url."https://github.com/setoutsoft/libwebsockets".insteadOf "https://gitee.com/setoutsoft/libwebsockets"
+          git config --global url."https://github.com/setoutsoft/openssl-cmake".insteadOf "https://gitee.com/setoutsoft/openssl-cmake"
+          git config --global url."https://github.com/setoutsoft/curl".insteadOf "https://gitee.com/setoutsoft/curl"
+          git config --global url."https://github.com/setoutsoft/soui-freertos".insteadOf "https://gitee.com/setoutsoft/soui-freertos"
+          git submodule update --init --recursive
+
+      - name: Install ARM toolchain and QEMU
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            gcc-arm-none-eabi libnewlib-arm-none-eabi qemu-system-arm ninja-build
+          arm-none-eabi-gcc --version | head -1
+          qemu-system-arm --version | head -1
+
+      # ---------------------------------------------------------------------
+      # 1. census: 全量符号解析（>4MB，只链不跑）
+      # ---------------------------------------------------------------------
+      - name: Configure census link
+        run: |
+          cmake -S soui-freertos/soui_fr -B build-census -G Ninja \
+            -DCMAKE_TOOLCHAIN_FILE=../demo/cmake/toolchain-arm-freertos.cmake \
+            -DSOUI_FR_CENSUS=ON
+
+      - name: Link census image (fails on any undefined symbol)
+        run: |
+          set -o pipefail
+          cmake --build build-census -j"$(nproc)" 2>&1 | tee census.log
+          # 链接成功即 0 未定义符号；再显式确认一遍，失败时说清楚是哪一类问题。
+          if grep -q "undefined reference" census.log; then
+            echo "::error::census 链接存在未定义符号（见上方 undefined reference 清单）"
+            exit 1
+          fi
+          arm-none-eabi-size build-census/soui_fr.elf
+
+      # ---------------------------------------------------------------------
+      # 2. 可运行镜像：-Os + gc-sections，text 必须装得进 4MB FLASH
+      # ---------------------------------------------------------------------
+      - name: Configure runnable image
+        run: |
+          cmake -S soui-freertos/soui_fr -B build-run -G Ninja \
+            -DCMAKE_TOOLCHAIN_FILE=../demo/cmake/toolchain-arm-freertos.cmake \
+            -DSOUI_FR_CENSUS=OFF \
+            -DCMAKE_BUILD_TYPE=MinSizeRel
+
+      - name: Build runnable image and check the 4MB FLASH budget
+        run: |
+          set -o pipefail
+          cmake --build build-run -j"$(nproc)" 2>&1 | tee run.log
+          arm-none-eabi-size build-run/soui_fr.elf
+          TEXT=$(arm-none-eabi-size -A build-run/soui_fr.elf | awk '/^\.text/ {print $2; exit}')
+          echo "text = ${TEXT} bytes"
+          python3 - "$TEXT" <<'PY'
+          import sys
+          text = int(sys.argv[1])
+          limit = 4 * 1024 * 1024          # mps2-an385 ZBT SSRAM1 = 4MB
+          if text >= limit:
+              print(f"::error::text {text} >= {limit}：镜像越过 4MB 后与 0x20000000 的 RAM 物理重叠，"
+                    f"QEMU 上复位即 HardFault。请用 MinSizeRel/-Os 或裁剪功能。")
+              sys.exit(1)
+          print(f"OK: text {text} / {limit} ({text * 100 // limit}%)")
+          PY
+
+      # ---------------------------------------------------------------------
+      # 3. QEMU 实跑 + 帧缓冲校验
+      # ---------------------------------------------------------------------
+      - name: Run under QEMU and capture the UART log
+        run: |
+          # 程序跑完 SApp 全链路后进入 for(;;) 保活，因此这里必须限时；
+          # 退出码 124（超时）是正常路径，真正的判据是日志里的完成标记。
+          timeout 120 qemu-system-arm -M mps2-an385 -nographic -semihosting \
+            -kernel build-run/soui_fr.elf > uart.log 2>&1 || true
+          tr -d '\r' < uart.log | tail -20
+
+      - name: Assert the SApp chain finished
+        run: |
+          tr -d '\r' < uart.log > uart.txt
+          fail=0
+          for want in "[app] SApplication created" \
+                      "[app] SHostWnd CreateEx hwnd=0x" \
+                      "[app] UpdateWindow rc=1" \
+                      "[app] dump rc=0" \
+                      "SOUISAPP FREERTOS DONE"; do
+            if grep -qF "$want" uart.txt; then
+              echo "PASS  $want"
+            else
+              echo "::error::缺少日志: $want"
+              fail=1
+            fi
+          done
+          # 反过来也要挡：HardFault / 断言 / 栈溢出都会打印这些前缀。
+          for bad in "*** ASSERT ***" "*** STACK OVERFLOW ***" "HardFault" "qemu: fatal"; do
+            if grep -qF "$bad" uart.txt; then
+              echo "::error::出现故障标记: $bad"
+              fail=1
+            fi
+          done
+          exit $fail
+
+      - name: Check the dumped framebuffer is a real 320x240 frame
+        run: |
+          python3 - <<'PY'
+          import sys
+          try:
+              data = open("soui_fb.ppm", "rb").read()
+          except FileNotFoundError:
+              print("::error::soui_fb.ppm 没有生成（dump_fb_ppm 失败或 semihosting 未生效）")
+              sys.exit(1)
+          head, dims, maxval, px = data.split(b"\n", 3)
+          if head != b"P6":
+              print(f"::error::不是 binary PPM: {head!r}")
+              sys.exit(1)
+          w, h = map(int, dims.split())
+          if (w, h) != (320, 240):
+              print(f"::error::帧缓冲尺寸 {w}x{h} != 320x240（与 SWINX_FB_* 不一致）")
+              sys.exit(1)
+          if len(px) != w * h * 3:
+              print(f"::error::像素字节数 {len(px)} != {w * h * 3}")
+              sys.exit(1)
+          colors = len(set(px))
+          if colors < 3:
+              print(f"::error::像素只有 {colors} 种取值，等于空帧（渲染链路没有真正落笔）")
+              sys.exit(1)
+          print(f"OK: {w}x{h} P6, {colors} distinct byte values, {len(px)} bytes")
+          PY
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: freertos-qemu-evidence
+          path: |
+            uart.log
+            soui_fb.ppm
+            census.log
+            run.log
+          if-no-files-found: warn
+
+  # ----------------------------------------------------------------------
+  # 4. Windows 宿主模拟器（soui_sim）构建 + 无头实跑
+  #
+  # soui_sim 是同一份 FreeRTOS 移植层 + 同一份 app 代码跑在 Windows 桌面
+  # （FreeRTOS-Kernel 的 MSVC-MingW port + swinx freertos 层 + SDL2 出图）。
+  # 它与 QEMU 目标 95% 同构，是最便宜的"日常宿主侧没烂"机器证据。
+  #
+  # 无头跑法：SDL 的 dummy 视频驱动（不需要真实显示会话）+ SOUI_SIM_AUTOEXIT
+  # （消息泵迭代约 60 次后自动注入关闭）+ SOUI_SIM_DUMP_FRAME=1（把第 1 帧写
+  # 成 sim_frame.bmp）。断言三件事：进程干净退出、BMP 真生成、日志里没有
+  # FreeRTOS ASSERT / HardFault。
+  #
+  # 已知宿主构建债（见 soui-freertos/README.md）：swinx 的 include 目录在搜索
+  # 顺序里先于系统头，会遮蔽 MinGW 的真 <io.h>，使 <unistd.h> 内联 ftruncate()
+  # 找不到 _chsize。下面用一段 include_next 透传 + _chsize 别名的垫片临时修掉；
+  # 该垫片应最终落到 swinx 子模块（与已有的 malloc.h 垫片同构），此处仅为让 CI
+  # 可复现而临时落盘。struct _timeb/_ftime 与 ftruncate 桩已在 strapi.h 用
+  # #if !SFR_HOSTED 收住，宿主构建不再撞。
+  # ----------------------------------------------------------------------
+  soui-sim-windows:
+    name: freertos-soui-sim (Windows/MinGW)
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      # 子模块改从 GitHub 镜像拉取（同 qemu-mps2-an385 job，gitee 在 runner 上不可靠）。
+      - name: Checkout submodules from GitHub mirror
+        shell: bash
+        run: |
+          git config --global url."https://github.com/soui4/swinx".insteadOf "https://gitee.com/setoutsoft/swinx"
+          git config --global url."https://github.com/setoutsoft/soui-freertos".insteadOf "https://gitee.com/setoutsoft/soui-freertos"
+          git submodule update --init --recursive
+
+      - name: Set up MSYS2 (MinGW-w64 + SDL2 + CMake + Ninja)
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            mingw-w64-x86_64-toolchain
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-ninja
+            mingw-w64-x86_64-SDL2
+            mingw-w64-x86_64-cairo
+            mingw-w64-x86_64-pixman
+            mingw-w64-x86_64-libpng
+            mingw-w64-x86_64-zlib
+            mingw-w64-x86_64-freetype
+            git
+
+      - name: Build soui_sim (headless-capable) and run it under SDL dummy driver
+        shell: msys2 {0}
+        run: |
+          set -o pipefail
+
+          # --- 宿主构建垫片：透传真 <io.h> 并补 _chsize ---
+          # swinx 的 include 目录在搜索顺序里先于系统头，会遮蔽 MinGW 的 <io.h>，
+          # 使 <unistd.h> 的内联 ftruncate() 找不到 _chsize。这里放一个垫片：
+          # include_next 把请求转给真实头，宿主 + Windows 时再别名 _chsize。
+          # 该文件应最终落到 swinx 子模块；此处仅为让 CI 可复现而临时落盘。
+          cat > swinx/include/io.h <<'EOF'
+          #ifndef SFR_IO_H_
+          #define SFR_IO_H_
+          #include_next <io.h>
+          #if defined(SFR_HOSTED) && defined(_WIN32)
+          #ifndef _chsize
+          #define _chsize chsize
+          #endif
+          #endif
+          #endif // SFR_IO_H_
+          EOF
+
+          # 宿主构建默认走系统包（SOUI_FR_USE_SYSTEM_DEPS=ON）：cairo/pixman/
+          # libpng/zlib/freetype 取 MSYS2 安装的那套，构建快且可复现。
+          cmake -S soui-freertos/soui_sim -B build-sim -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DSOUI_FR_USE_SYSTEM_DEPS=ON
+          cmake --build build-sim -j"$(nproc)" 2>&1 | tee sim-build.log
+
+          # --- 无头实跑：dummy 视频驱动 + 自动退出 + 落一帧 BMP ---
+          export SDL_VIDEODRIVER=dummy
+          export SDL_RENDER_DRIVER=software
+          export SOUI_SIM_AUTOEXIT=1
+          export SOUI_SIM_DUMP_FRAME=1
+          ./build-sim/soui_sim.exe > sim-run.log 2>&1
+          rc=$?
+          echo "exit code: $rc"
+          tr -d '\r' < sim-run.log
+          # 机器证据：渲染管线至少完整走了一轮并落盘了一帧。
+          if [ ! -f sim_frame.bmp ]; then
+            echo "::error::sim_frame.bmp 未生成（渲染管线没有真正落笔或无头窗口创建失败）"
+            exit 1
+          fi
+          if grep -qE "FreeRTOS ASSERT|HardFault|qemu: fatal" sim-run.log; then
+            echo "::error::soui_sim 运行中出现故障标记"
+            exit 1
+          fi
+          if ! grep -qF "[sim] frame #1 dumped" sim-run.log; then
+            echo "::error::未检测到 dump 日志（SOUI_SIM_DUMP_FRAME 未生效）"
+            exit 1
+          fi
+          if [ "$rc" -ne 0 ]; then
+            echo "::error::soui_sim 退出码非 0（$rc）"
+            exit 1
+          fi
+          echo "OK: soui_sim 无头构建通过，且渲染出一帧 BMP"
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: freertos-sim-evidence
+          path: |
+            sim-build.log
+            sim-run.log
+            sim_frame.bmp
+          if-no-files-found: warn

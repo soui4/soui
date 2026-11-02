@@ -39,13 +39,13 @@ public:
 protected:
     HKL m_saved;
 	
-    void SetUp() override
+    void SetUp()
     {
         // 记录当前线程布局，供 TearDown 还原（Windows 真实切换的副作用收敛）。
         m_saved = GetKeyboardLayout(0);
     }
 
-    void TearDown() override
+    void TearDown()
     {
         if (m_saved != NULL)
             ActivateKeyboardLayout(m_saved, 0);

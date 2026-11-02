@@ -103,7 +103,7 @@ Java_com_soui_android_SouiPlatformBridge_nativeViewFromHwnd(JNIEnv *env, jclass 
     (void)env;
     (void)clazz;
     if (hwnd == 0) return nullptr;
-    jobject view = AndroidPlatformAPI::instance().hwndAsView((UINT_PTR)hwnd);
+    jobject view = AndroidPlatformAPI::instance().hwndAsView((HWND)(UINT_PTR)hwnd);
     if (view == nullptr) {
         SLOGW()<<"nativeViewFromHwnd: hwnd="<<(long long)hwnd<<" INativeWindow.asView() returned null or raised exception";
     }
@@ -126,7 +126,7 @@ Java_com_soui_android_SouiPlatformBridge_nativeScreenStartup(JNIEnv *env, jobjec
     BOOL ret = RegisterVirtualHWND(screenHwnd,0,WS_POPUP,0,&rc,screenId);
     if(!ret)
         return 0;
-    AndroidPlatformAPI::instance().setScreenHwnd(screenId,screenHwnd);
+    AndroidPlatformAPI::instance().setScreenHwnd(screenId,(HWND)(UINT_PTR)screenHwnd);
 
     const char* layout = nullptr;
     if (jLayout) {
@@ -138,7 +138,7 @@ Java_com_soui_android_SouiPlatformBridge_nativeScreenStartup(JNIEnv *env, jobjec
     if (layout) {
         env->ReleaseStringUTFChars(jLayout, layout);
     }
-    return hWnd;
+    return (jlong)(UINT_PTR)hWnd;
 }
 
 JNIEXPORT void JNICALL
@@ -154,7 +154,7 @@ Java_com_soui_android_SouiPlatformBridge_nativeScreenShutdown(JNIEnv *env, jobje
     // 一个入口 = 业务销毁 + unregister（DeleteGlobalRef / 擦 bookkeeping / 擦 Context）原子完成。
     AndroidPlatformAPI::instance().screenShutdown(env, screenId);
     AndroidPlatformAPI::instance().eraseScreen(screenId);
-    UnregisterVirtualHWND(hwndScreen);
+    UnregisterVirtualHWND((UINT_PTR)hwndScreen);
 }
 
 extern "C"
@@ -208,14 +208,14 @@ Java_com_soui_android_SouiPlatformBridge_nativeNotifyFocusGained(JNIEnv *env, jc
     // 又会再调用 g_platformAPI.window.setFocus → bridge.setFocus。
     // 此时 Java 端 old==new（我们就是从 Java View.focus=true 来的），
     // bridge.setFocus 快速返回，不会死循环。
-    ::SetFocus(hwnd);
+    ::SetFocus((HWND)(UINT_PTR)hwnd);
 }
 
 JNIEXPORT void JNICALL
 Java_com_soui_android_SouiPlatformBridge_nativeSetScreenSize(JNIEnv *env, jclass clazz, jlong screen_id, jlong hMainWnd,
                                                      jint width, jint height) {
     SLOGW()<<"Java_com_soui_android_SouiPlatformBridge_nativeSetScreenSize, hMainWnd="<<(int)hMainWnd<<",wid="<<width<<",hei="<<height;
-    ::MoveWindow(hMainWnd,0,0,width,height,TRUE);
+    ::MoveWindow((HWND)(UINT_PTR)hMainWnd,0,0,width,height,TRUE);
 }
 
 
@@ -273,7 +273,7 @@ Java_com_soui_android_SouiPlatformBridge_nativeSendImeString(JNIEnv *env, jclass
     const char *utf8 = env->GetStringUTFChars(text, nullptr);
     if (!utf8) return;
     jsize utf8Len = env->GetStringUTFLength(text);
-    AndroidPlatformAPI::instance().sendImeString((UINT_PTR) hwnd, utf8, (size_t)utf8Len);
+    AndroidPlatformAPI::instance().sendImeString((HWND)(UINT_PTR) hwnd, utf8, (size_t)utf8Len);
     env->ReleaseStringUTFChars(text, utf8);
 }
 

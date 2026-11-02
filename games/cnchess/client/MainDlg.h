@@ -39,8 +39,8 @@ public:
     void SwitchToTab(int nIndex);
     // 切换到对局页(按窗口名查找, 兼容各平台页签顺序)
     void SwitchToGame();
-#if defined(__MOBILE__)
-    // 登录成功回调（模态视图方式，移动平台不支持独立消息循环）
+#if defined(__MOBILE__) || defined(__EMSCRIPTEN__)
+    // 登录成功回调（模态视图方式；移动平台与 wasm 都没有独立消息循环）
     void OnLoginSuccess(SStringT strSvr, SStringT strName, char cSex, int nAvatarId);
 #endif
 

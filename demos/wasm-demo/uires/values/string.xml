@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<string>
+  <title value="SOUI · WebAssembly"/>
+  <hint value="XML 布局 + C++ / Lua 控件树，跑在浏览器里"/>
+  <stack_hint value="swinx 800x600 · render-gdi"/>
+  <qq_group value="QQ 群 229313785"/>
+
+  <ov_title value="同一套 UI 代码，从桌面到浏览器"/>
+  <ov_body value="下面这些页面没有为 WebAssembly 重写一遍：布局是 XML，控件树、皮肤、事件、定时器都还是 SOUI 自己那套实现，只是把窗口系统换成了 swinx 的帧缓冲后端。"/>
+  <ov_c1_t value="XML 布局与皮肤"/>
+  <ov_c1_d value="hbox / vbox / gridLayout、weight 与 gravity 全部生效；内置皮肤来自 soui-sys-resource。"/>
+  <ov_c2_t value="完整的控件体系"/>
+  <ov_c2_d value="列表、树、日历、滑块、富文本、十六进制视图与 Scintilla 编辑器都在这一份二进制里。"/>
+  <ov_c3_t value="脚本扩展"/>
+  <ov_c3_d value="ScriptModule-LUA 静态链入：页面里的按钮和文字由 Lua 在 on_init 里创建，点击回脚本。"/>
+  <ov_c4_t value="跨平台"/>
+  <ov_c4_d value="Windows / Linux / macOS / Android / OHOS 共用同一份 SOUI 源码，平台差异收敛在 swinx 与渲染后端。"/>
+
+  <ctrls_h1 value="基础控件"/>
+  <ctrls_body value="复选框、单选、开关、进度、滑块、下拉框、列表框与日历。皮肤、焦点、命中测试全部来自 SOUI 自己的实现；下拉框的弹出列表还是第二个软件宿主窗口。"/>
+  <more_h1 value="更多控件"/>
+  <more_body value="左边是核心的热键与 IP 输入框，以及扩展库的评分条、指示灯按钮与验证码输入；右边是扩展库的折叠分组列表。折叠、勾选都在同一棵软件窗口树里完成。"/>
+  <list_h1 value="列表与树"/>
+  <list_body value="左侧是带多级展开与滚动条的树，右侧是带表头、选中带与就地编辑的多列列表。"/>
+  <layout_h1 value="布局"/>
+  <layout_body value="六张卡分别是 weight 权重分配、interval 统一间距、子块 layout_gravity、容器 gravity（在 hbox 里管的是垂直轴）、pos 的居中/百分比/右锚拉伸、hbox 套 vbox 的嵌套。每张卡里放的是真的按该属性排布的色块，不是写着属性名的标签。"/>
+  <chart_h1 value="图形化控件"/>
+  <chart_body value="进度环、仪表盘、水波进度与二维码都由 GDI 路径绘制，不依赖任何随包图片。"/>
+  <edit_h1 value="编辑器"/>
+  <edit_body value="richedit 走 WM_CHAR 与 ITextServices，十六进制视图与 Scintilla 各自独立渲染进同一棵控件树。点进编辑框后可用系统输入法（中/日/韩）：候选窗由浏览器给出并跟着 SOUI 的插入符走，选词的成品按码点作为 WM_IME_CHAR 注入。"/>
+  <ext_h1 value="扩展控件"/>
+  <ext_body value="controls.extend 里的控件已注册进 wasm 构建图：关键字着色与自绘滚动文字。滚动文字同时演示两种模式——内容宽于窗口的水平跑马灯，以及按换行符拆行、逐行向上过渡的多行滚动。"/>
+  <lua_h1 value="Lua 游戏"/>
+  <lua_body value="三个游戏（消消乐 / 俄罗斯方块 / 坦克大战）整段来自 demos/demo 的 lua/test.lua：布局、皮肤、动画模板都从资源索引取，棋盘格子由脚本在 on_init 里批量创建，键盘与计时器走 EVT_KEYDOWN 和 SOUI 定时器。棋子贴图全是 src=「svg:...」，所以这一页同时是 SOUI_ENABLE_SVG 的验收页。"/>
+
+  <anim_h1 value="动画：补间 / 值 / 属性三种形态"/>
+  <anim_body value="SAnimation 由 XML 描述 alpha、rotate、translate 等关键帧，SetAnimation 之后由控件自己的动画处理器推进；SValueAnimator 只产生值，宿主在 onAnimationUpdate 里自行消费；SPropAnimator 把值直接写回窗口或布局属性，随后由父窗口 RequestRelayout。三种形态共用同一条 10ms timeline 心跳，不需要 wasm 侧另设定时器。"/>
+
+  <modal_h1 value="模态表单：SModalRoot / SModalView"/>
+  <modal_body value="点“打开表单”弹出一个带遮罩的表单窗口。姓名或邮箱为空时提交会被拦下；提交成功后主页面回填结果，点“取消”或按 ESC 关闭。"/>
+</string>

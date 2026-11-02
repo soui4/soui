@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 动画页 SAnimation 演示：透明度先淡出再淡入。
+     两段 <alpha> 用 startOffset 串起来（第一段结束后第二段才开始），总时长 800ms。
+     结束时回到 1.0，和起始状态一致，所以不设 fillAfter，目标窗口不会被永久改掉。 -->
+<set fillAfter="false" shareInterpolator="false">
+    <alpha duration="360" startOffset="0" fromAlpha="1.0" toAlpha="0.15" interpolator="Accelerate"/>
+    <alpha duration="440" startOffset="360" fromAlpha="0.15" toAlpha="1.0" interpolator="Decelerate"/>
+</set>

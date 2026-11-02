@@ -17,6 +17,11 @@ SNSBEGIN
 /** thunk implementation reference: http://www.cppblog.com/proguru/archive/2008/08/24/59831.html */
 ///////////////////////////////////////////////////////////////////////
 
+// tagThunk 只在启用 thunk 时才有定义：所有使用点（sizeof/Init/GetCodeAddress）都在
+// #if ENABLE_THUNK 内，头文件只需要前向声明。禁用 thunk 的平台（wasm，以及 CMake 默认
+// ENABLE_THUNK=OFF 的 Linux/Android/OHOS）不必再枚举自己的架构，否则会撞进下面的
+// #error 分支。
+#if ENABLE_THUNK
 #if defined(__i386__) || defined(__X86__) || defined(_M_IX86)
 #pragma pack(push, 1)
 struct tagThunk
@@ -146,6 +151,7 @@ struct tagThunk /**< this should come out to 16 bytes */
 #else
 #error Only AMD64, ARM, ARM64 and X86 supported
 #endif
+#endif /**< ENABLE_THUNK */
 
 SNativeWndHelper::SNativeWndHelper()
     : m_hInst(0)

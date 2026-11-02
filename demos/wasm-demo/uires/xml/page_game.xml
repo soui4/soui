@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  xml/page_game.xml -- Lua 游戏页（消消乐 / 俄罗斯方块 / 坦克大战）
+
+  从 demos/demo 的 page_script.xml 搬过来，去掉第四个子页"跑马机"：那一页的
+  逻辑（game_wnd/game_canvas/players/flag_win + on_bet/on_run/on_canvas_size）
+  依赖 demos/demo 主界面的赛马布局，和三个游戏没有共用代码，留在 wasm 里只会
+  是多一份没人接的 XML。
+
+  这一页由主布局的 <include src="layout:XML_PAGE_GAME"/> 引到 "Lua 游戏" 页里，
+  棋盘/格子的名字与 id 约定见 lua/games.lua（xxl_* / tetris_* / tank_* 三组函数）。
+  四条约定别改：
+   - 这一层 <tabctrl> 不设 animateSteps（和外层 tab_main 同一个理由）：带动画时切页
+     走 STabSlider 过渡，过渡期间新旧两页都被 SetVisible(FALSE)，只画滑块。无头烟测
+     在切页后立刻问可见性会读到"两页都不可见"，浏览器里也要等动画跑完才看得见棋盘。
+   - 每个棋盘都是 <window name="wnd_*_board" layout="gridlayout">，格子由 lua 在
+     on_init 里按模板批量创建；命中测试要求父窗口矩形包住子控件，所以浮层
+     wnd_*_aniframe 用 pos="0,0,-0,-0" 铺满整页且 msgTransparent="1"（不抢输入）。
+   - LED 数字位是 <t:g.xxl_digit>（values/template.xml），三个游戏共用同一套模板，
+     只是 name 前缀不同（digit_coin_/digit_score_/digit_tscore_/...）。
+   - 游戏结束面板：消消乐在 lua 里弹（见 games.lua 的 xxl_game_over，wasm 不用
+     模态框），俄罗斯方块和坦克大战是页内静态遮罩 + 卡片，动画走
+     anim:tetris_over_mask_in 那组模板。
+   - 纵向预算只有 343dp：页区 [20,188,780,558]（tabctrl 的 tab 在左侧占 90dp）再减
+     hbox 的 padding。demos/demo 的原版尺寸在这里放不下——消消乐格子按 SVG 原始 64
+     排 8 列要 512，俄罗斯方块 20 行 x 24 要 518，坦克大战 15 行 x 26 要 404，全部
+     超出页底；gridlayout 的列/行宽取"该列最大请求宽"，放不下时不会压缩（权重只加
+     不减，见 SOUI/src/layout/SGridLayout.cpp pass 2），超出的行列直接排到画布外。
+     所以 wasm 侧把格子改成消消乐 38（values/template.xml）、方块 15、坦克 18
+     （games.lua 的 tetris_cell / tank_cell），卡片间距也压紧到 interval=6。改这些
+     数字前先看 smoke.js 的"按钮和棋盘都落在 tab_game 页区内"。
+-->
+<tabctrl name="tab_game" size="-2,0" weight="1" tabWidth="90" tabHeight="24dp" tabAlign="left" curSel="0"
+         colorBkgnd="@color/clr_page_bg" colorText="@color/clr_title">
+  <page title="消消乐">
+    <window pos="0,0,-0,-0" layout="hbox" padding="15,12,15,15" interval="12">
+      <!-- 左侧信息卡片:标题 / SVG 功能按钮 / LED 计分区 / 玩法说明
+           纵向尺寸别随意加:这一页可视高度只有 343dp（tabctrl 的 tab 占左侧 90dp，
+           页区 [110,188,780,558] 再减 hbox 上下 padding），卡片是 -2 自适应高度，
+           内容一超高，最后的按钮和说明就伸出页底、点不到。LED 数字位本身 32dp 高，
+           所以「金币」「得分」标签和数字放在同一行 hbox 里，不再各占一行。 -->
+      <window size="192,-2" layout="vbox" interval="6" padding="14,8,14,8" colorBkgnd="@color/clr_card_bg">
+        <!-- 标题行:糖果图标 + 标题/副标题 -->
+        <window size="-2,-1" layout="hbox" interval="8">
+          <img size="30,30" skin="svg_xxl_icons" iconIndex="0" layout_gravity="center"/>
+          <window size="-1,-2" layout="vbox" interval="1">
+            <text text="消消乐" font="size:16,bold:1" colorText="@color/clr_title"/>
+            <text text="LUA + SVG 完整版" font="size:10" colorText="@color/clr_text_sub"/>
+          </window>
+        </window>
+        <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
+        <!-- 功能按钮:SVG 药丸形底(3 态) + SVG 图标(3 态),重新开始=主色实底,提示/洗牌=白底描边并排一行 -->
+        <button name="btn_xxl_restart" size="-2,36" skin="xxl_btn_primary" gravity="center" layout="hbox" cursor="hand" on_command="xxl_on_restart" tip="重新开始一局">
+          <window size="0,0" weight="1"/>
+          <imgbtn size="16,16" skin="svg_xxl_btn_restart" msgTransparent="2"/>
+          <text text="重新开始" extend_left="6" font="size:13,bold:1" colorText="#FFFFFF"/>
+          <window size="0,0" weight="1"/>
+        </button>
+        <window size="-2,-1" layout="hbox" interval="6">
+          <button name="btn_xxl_hint" size="-1,36" weight="1" skin="xxl_btn_secondary" gravity="center" layout="hbox" cursor="hand" on_command="xxl_on_hint" tip="提示一步可行走法">
+            <imgbtn size="16,16" skin="svg_xxl_btn_hint" msgTransparent="2"/>
+            <text text="提 示" extend_left="4" font="size:13,bold:1" colorText="@color/clr_primary"/>
+          </button>
+          <!-- 洗牌:花 5 金币把全盘棋子受约束重排(随时可用);金币不足不能洗 -->
+          <button name="btn_xxl_shuffle" size="-1,36" weight="1" skin="xxl_btn_secondary" gravity="center" layout="hbox" cursor="hand" on_command="xxl_on_shuffle" tip="花 5 金币重排全部棋子">
+            <imgbtn size="16,16" skin="svg_xxl_btn_shuffle" msgTransparent="2"/>
+            <text text="洗牌(5)" extend_left="4" font="size:13,bold:1" colorText="@color/clr_primary"/>
+          </button>
+        </window>
+        <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
+        <!-- 计分区:七段 LED 翻页计数器;标签与数字同行 -->
+        <window size="-2,-1" layout="hbox" interval="4">
+          <text text="金币" font="size:12" colorText="@color/clr_text_sub" layout_gravity="bottom"/>
+          <t:g.xxl_digit><data name="digit_coin_2"/></t:g.xxl_digit>
+          <t:g.xxl_digit><data name="digit_coin_1"/></t:g.xxl_digit>
+          <t:g.xxl_digit><data name="digit_coin_0"/></t:g.xxl_digit>
+          <window size="0,0" weight="1"/>
+        </window>
+        <window size="-2,-1" layout="hbox" interval="4">
+          <text text="得分" font="size:12" colorText="@color/clr_text_sub" layout_gravity="bottom"/>
+          <t:g.xxl_digit><data name="digit_score_2"/></t:g.xxl_digit>
+          <t:g.xxl_digit><data name="digit_score_1"/></t:g.xxl_digit>
+          <t:g.xxl_digit><data name="digit_score_0"/></t:g.xxl_digit>
+          <window size="0,0" weight="1"/>
+        </window>
+        <text name="txt_xxl_combo" text="" size="-2,-1" font="size:26,bold:1" colorText="@color/orange"/>
+        <window size="0,0" weight="1"/>
+        <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
+        <text text="交换相邻棋子凑 3 连消除&#10;连击有加分，花 5 金币随时洗牌" font="size:11" colorText="@color/clr_text_sub" multilines="1"/>
+      </window>
+      <!-- 棋盘:8x8 格由 lua 批量建(每格 38,见 values/template.xml)。这里不用 weight
+           填满剩下的宽度:gridlayout 的列宽取"该列最大请求宽"，权重只把多余空间加给
+           有 weight 的列、从不压缩放不下的列，填满只会让 304 的格子堆在 436 的面板
+           左上角。改成 -1,-1 自适应 + 左右 weight 占位，面板就是棋盘本身大小并居中。 -->
+      <window size="0,0" weight="1"/>
+      <window name="wnd_xxl_board" size="-1,-1" layout_gravity="center" layout="gridlayout" columnCount="8" gravity="fill" padding="12,12,12,12" colorBkgnd="@color/clr_card_bg"/>
+      <window size="0,0" weight="1"/>
+    </window>
+    <window name="wnd_xxl_aniframe" pos="0,0,-0,-0" msgTransparent="1"/>
+  </page>
+  <page title="俄罗斯方块" on_visible_changed="tetris_on_page_vis">
+    <window pos="0,0,-0,-0" layout="hbox" padding="15,12,15,15" interval="12">
+      <!-- 左侧信息卡片:标题 / LED 计分区 / 状态 / 功能按钮（纵向尺寸限制见消消乐卡片注释） -->
+      <window size="192,-2" layout="vbox" interval="6" padding="14,8,14,8" colorBkgnd="@color/clr_card_bg">
+        <!-- 标题行:T 块图标 + 标题/副标题 -->
+        <window size="-2,-1" layout="hbox" interval="8">
+          <img size="30,30" skin="svg_tetris_blocks" iconIndex="16" layout_gravity="center"/>
+          <window size="-1,-2" layout="vbox" interval="1">
+            <text text="俄罗斯方块" font="size:16,bold:1" colorText="@color/clr_title"/>
+            <text text="LUA + SVG 完整版" font="size:10" colorText="@color/clr_text_sub"/>
+          </window>
+        </window>
+        <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
+        <!-- 计分区:七段 LED 翻页计数器;标签与数字同行 -->
+        <window size="-2,-1" layout="hbox" interval="4">
+          <text text="得分" font="size:12" colorText="@color/clr_text_sub" layout_gravity="bottom"/>
+          <t:g.xxl_digit><data name="digit_tscore_3"/></t:g.xxl_digit>
+          <t:g.xxl_digit><data name="digit_tscore_2"/></t:g.xxl_digit>
+          <t:g.xxl_digit><data name="digit_tscore_1"/></t:g.xxl_digit>
+          <t:g.xxl_digit><data name="digit_tscore_0"/></t:g.xxl_digit>
+          <window size="0,0" weight="1"/>
+        </window>
+        <window size="-2,-1" layout="hbox" interval="4">
+          <text text="行数" font="size:12" colorText="@color/clr_text_sub" layout_gravity="bottom"/>
+          <t:g.xxl_digit><data name="digit_tlines_2"/></t:g.xxl_digit>
+          <t:g.xxl_digit><data name="digit_tlines_1"/></t:g.xxl_digit>
+          <t:g.xxl_digit><data name="digit_tlines_0"/></t:g.xxl_digit>
+          <window size="0,0" weight="1"/>
+        </window>
+        <window size="-2,-1" layout="hbox" interval="4">
+          <text text="等级" font="size:12" colorText="@color/clr_text_sub" layout_gravity="bottom"/>
+          <t:g.xxl_digit><data name="digit_tlevel_1"/></t:g.xxl_digit>
+          <t:g.xxl_digit><data name="digit_tlevel_0"/></t:g.xxl_digit>
+          <window size="0,0" weight="1"/>
+        </window>
+        <text name="txt_tetris_state" text="状态:待开始" font="size:12" colorText="@color/clr_text_sub"/>
+        <window size="0,0" weight="1"/>
+        <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
+        <!-- 功能按钮:SVG 药丸形底(3 态),开始=主色实底,重新开始=白底描边 -->
+        <button name="btn_tetris_start" size="-2,36" skin="xxl_btn_primary" colorText="#FFFFFF" cursor="hand" on_command="tetris_on_start" tip="开始 / 暂停 / 继续">开始游戏</button>
+        <button name="btn_tetris_restart" size="-2,36" skin="xxl_btn_secondary" colorText="@color/clr_primary" cursor="hand" on_command="tetris_on_restart" tip="重新开始一局">重新开始</button>
+      </window>
+      <!-- 中间留白 + 棋盘(10x20 格,内容由 lua 动态创建,svg_tetris_blocks 雪碧图)+ 留白 -->
+      <window size="0,0" weight="1"/>
+      <stack name="wnd_game" size="-1,-2">
+        <window name="wnd_tetris_board" size="-1,-2"  layout_gravity="center" layout="gridlayout" rowCount="20" columnCount="10" interval="1" padding="8" gravity="fill" colorBkgnd="@color/clr_card_bg" focusable="1" tip="点击此处获取键盘焦点"/>
+        <!-- 结束窗口:布局内静态遮罩+得分卡片(动画全走 anim 模板 + SetAnimation,
+             lua 只刷新文本与挂载动画,不拼 XML);默认隐藏(visible=0),
+             展示/隐藏由 test.lua 的 tetris_over_show/hide 驱动 -->
+        <window name="wnd_gameover" size="-2,-2" layout="vbox" colorBkgnd="#990F172A" visible="0" msgTransparent="1" on_animation_stop="tetris_on_over_stop">
+          <window size="0,0" weight="1"/>
+          <window name="wnd_gameover_card" size="240,-1" layout_gravity="center" layout="vbox" interval="10" padding="24,22,24,20" colorBkgnd="@color/clr_card_bg">
+            <text text="游戏结束" font="size:22,bold:1" colorText="@color/clr_title" align="center"/>
+            <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
+            <text name="txt_score" text="本局得分 0" font="size:16,bold:1" colorText="@color/clr_primary" align="center"/>
+            <text text="点击「重新开始」再来一局" font="size:12" colorText="@color/clr_text_sub" align="center"/>
+          </window>
+          <window size="0,0" weight="1"/>
+        </window>
+      </stack>
+      <!-- 右侧预览卡:与左侧计分卡对称(下一个方块 + 键位说明) -->
+      <window size="0,0" weight="1"/>
+      <window size="192,-2" layout="vbox" interval="6" padding="14,8,14,8" colorBkgnd="@color/clr_card_bg">
+        <!-- 标题行:幽灵块图标 + 标题/副标题 -->
+        <window size="-2,-1" layout="hbox" interval="8">
+          <img size="30,30" skin="svg_tetris_blocks" iconIndex="8" layout_gravity="center"/>
+          <window size="-1,-2" layout="vbox" interval="1">
+            <text text="下一个" font="size:16,bold:1" colorText="@color/clr_title"/>
+            <text text="NEXT BLOCK" font="size:10" colorText="@color/clr_text_sub"/>
+          </window>
+        </window>
+        <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
+        <!-- 下一块预览:4x4 格,内容由 lua 动态创建(svg_tetris_blocks 帧) -->
+        <window name="wnd_tetris_next" size="-2,0" weight="1" layout="gridlayout" rowCount="4" columnCount="4" interval="2" gravity="fill" layout_gravity="center"/>
+        <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
+        <!-- 键位说明:4 行键帽 SVG + 布局文字(svg_tetris_key_*,键帽只画按键,
+             含义文字在下方 text 上配置) -->
+        <window size="-2,-1" layout="vbox" interval="6">
+          <window size="-2,26" layout="hbox" interval="8">
+            <img size="52,26" skin="svg_tetris_key_lr"/>
+            <text text="移动" font="size:11" colorText="@color/clr_text_sub" layout_gravity="center"/>
+          </window>
+          <window size="-2,26" layout="hbox" interval="8">
+            <img size="52,26" skin="svg_tetris_key_ud"/>
+            <text text="旋转 / 软降" font="size:11" colorText="@color/clr_text_sub" layout_gravity="center"/>
+          </window>
+          <window size="-2,26" layout="hbox" interval="8">
+            <img size="52,26" skin="svg_tetris_key_space"/>
+            <text text="硬降" font="size:11" colorText="@color/clr_text_sub" layout_gravity="center"/>
+          </window>
+          <window size="-2,26" layout="hbox" interval="8">
+            <img size="26,26" skin="svg_tetris_key_p"/>
+            <text text="暂停" font="size:11" colorText="@color/clr_text_sub" layout_gravity="center"/>
+          </window>
+        </window>
+      </window>
+    </window>
+    <!-- 动画浮层:消行光波/碎片 / 飞分文本画在这最顶层(参考消消乐 wnd_xxl_aniframe) -->
+    <window name="wnd_tetris_aniframe" pos="0,0,-0,-0" msgTransparent="1"/>
+  </page>
+  <page title="坦克大战" on_visible_changed="tank_on_page_vis">
+    <window pos="0,0,-0,-0" layout="hbox" padding="10,12,10,15" interval="8">
+      <!-- 左侧计分卡:标题 / 得分 / 生命 / 关卡 / 状态 / 功能按钮（纵向尺寸限制见消消乐卡片注释） -->
+      <window size="152,-2" layout="vbox" interval="6" padding="12,8,12,8" colorBkgnd="@color/clr_card_bg">
+        <window size="-2,-1" layout="hbox" interval="8">
+          <img size="30,30" skin="svg_tank" iconIndex="24" layout_gravity="center"/>
+          <window size="-1,-2" layout="vbox" interval="1">
+            <text text="坦克大战" font="size:16,bold:1" colorText="@color/clr_title"/>
+            <text text="LUA + SVG" font="size:10" colorText="@color/clr_text_sub"/>
+          </window>
+        </window>
+        <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
+        <window size="-2,-1" layout="hbox" interval="4">
+          <text text="得分" font="size:12" colorText="@color/clr_text_sub" layout_gravity="bottom"/>
+          <t:g.xxl_digit><data name="digit_tank_score_3"/></t:g.xxl_digit>
+          <t:g.xxl_digit><data name="digit_tank_score_2"/></t:g.xxl_digit>
+          <t:g.xxl_digit><data name="digit_tank_score_1"/></t:g.xxl_digit>
+          <t:g.xxl_digit><data name="digit_tank_score_0"/></t:g.xxl_digit>
+        </window>
+        <window size="-2,-1" layout="hbox" interval="4">
+          <text text="生命" font="size:12" colorText="@color/clr_text_sub" layout_gravity="bottom"/>
+          <t:g.xxl_digit><data name="digit_tank_lives_0"/></t:g.xxl_digit>
+          <window size="0,0" weight="1"/>
+        </window>
+        <window size="-2,-1" layout="hbox" interval="4">
+          <text text="关卡" font="size:12" colorText="@color/clr_text_sub" layout_gravity="bottom"/>
+          <t:g.xxl_digit><data name="digit_tank_stage_1"/></t:g.xxl_digit>
+          <t:g.xxl_digit><data name="digit_tank_stage_0"/></t:g.xxl_digit>
+          <window size="0,0" weight="1"/>
+        </window>
+        <text name="txt_tank_state" text="状态:待开始" font="size:12" colorText="@color/clr_text_sub"/>
+        <window size="0,0" weight="1"/>
+        <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
+        <button name="btn_tank_start" size="-2,36" skin="xxl_btn_primary" colorText="#FFFFFF" cursor="hand" on_command="tank_on_start" tip="开始 / 暂停 / 继续">开始游戏</button>
+        <button name="btn_tank_restart" size="-2,36" skin="xxl_btn_secondary" colorText="@color/clr_primary" cursor="hand" on_command="tank_on_restart" tip="重新开始一局">重新开始</button>
+      </window>
+      <window size="0,0" weight="1"/>
+      <!-- 中间战场:13x13 可玩格 + 上下各一行砖墙装饰,共 15 行;内容由 lua 的 tank_init
+           动态创建(svg_tank 雪碧图),装饰行平铺的砖墙与地图障碍同帧。
+           顶层依次是关卡提示条、结束遮罩卡片(静态布局,动画走 anim 模板) -->
+      <stack name="wnd_tank_stack" size="-1,-2">
+        <window size="-1,-2" layout="vbox">
+<window size="-2,0" weight="1" skin="svg_tank_wall"/>
+          <window name="wnd_tank_board" size="-2,-1" layout_gravity="center" layout="gridlayout" rowCount="15" columnCount="13" interval="1" padding="6" gravity="fill" colorBkgnd="@color/clr_card_bg" focusable="1" tip="点击此处获取键盘焦点"/>
+<window size="-2,0" weight="1" skin="svg_tank_wall"/>
+        </window>
+        <!-- 活动精灵层:坦克/炮弹/护盾环由 lua 动态创建并按像素位置 Move,
+             与棋盘格子对齐但可以停在格与格之间,实现连续移动;不参与布局、不挡鼠标 -->
+        <window name="wnd_tank_sprites" size="-2,-2" msgTransparent="1"/>
+        <!-- 关卡完成提示条:默认隐藏,tank_banner_show/hide 控制 -->
+        <window name="wnd_tank_banner" size="-2,-2" layout="vbox" visible="0" msgTransparent="1">
+          <window size="0,0" weight="1"/>
+          <window size="-2,-1" layout_gravity="center" colorBkgnd="#CC0F172A" padding="20,12,20,12">
+            <text name="txt_tank_banner" text="" font="size:18,bold:1" colorText="#FFFFFF" align="center"/>
+          </window>
+          <window size="0,0" weight="1"/>
+        </window>
+        <!-- 结束窗口:深色遮罩 + 结果卡片;展示/隐藏由 tank_over_show/hide 驱动 -->
+        <window name="wnd_tank_gameover" size="-2,-2" layout="vbox" colorBkgnd="#990F172A" visible="0" msgTransparent="1" on_animation_stop="tank_on_over_stop">
+          <window size="0,0" weight="1"/>
+          <window name="wnd_tank_gameover_card" size="250,-1" layout_gravity="center" layout="vbox" interval="10" padding="24,22,24,20" colorBkgnd="@color/clr_card_bg">
+            <text text="战斗结束" font="size:22,bold:1" colorText="@color/clr_title" align="center"/>
+            <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
+            <text name="txt_tank_gameover_score" text="本局得分 0" font="size:16,bold:1" colorText="@color/clr_primary" align="center"/>
+            <text name="txt_tank_gameover_reason" text="基地被摧毁" font="size:12" colorText="@color/clr_text_sub" align="center"/>
+            <text text="点击「重新开始」再战一局" font="size:12" colorText="@color/clr_text_sub" align="center"/>
+          </window>
+          <window size="0,0" weight="1"/>
+        </window>
+      </stack>
+      <window size="0,0" weight="1"/>
+      <!-- 右侧战况卡:剩余敌人 / 基地状态 / 键位说明 -->
+      <window size="152,-2" layout="vbox" interval="6" padding="12,8,12,8" colorBkgnd="@color/clr_card_bg">
+        <window size="-2,-1" layout="hbox" interval="8">
+          <img size="30,30" skin="svg_tank" iconIndex="15" layout_gravity="center"/>
+          <window size="-1,-2" layout="vbox" interval="1">
+            <text text="剩余敌人" font="size:16,bold:1" colorText="@color/clr_title"/>
+            <text text="ENEMY" font="size:10" colorText="@color/clr_text_sub"/>
+          </window>
+        </window>
+        <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
+        <window size="-2,-1" layout="hbox" interval="3">
+          <t:g.xxl_digit><data name="digit_tank_enemy_1"/></t:g.xxl_digit>
+          <t:g.xxl_digit><data name="digit_tank_enemy_0"/></t:g.xxl_digit>
+        </window>
+        <text name="txt_tank_base" text="基地完好" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
+        <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
+        <window size="-2,-1" layout="vbox" interval="6">
+          <window size="-2,26" layout="hbox" interval="8">
+            <img size="52,26" skin="svg_tetris_key_lr"/>
+            <text text="移动/转向" font="size:10" colorText="@color/clr_text_sub" layout_gravity="center"/>
+          </window>
+          <window size="-2,26" layout="hbox" interval="8">
+            <img size="52,26" skin="svg_tetris_key_ud"/>
+            <text text="上下移动" font="size:10" colorText="@color/clr_text_sub" layout_gravity="center"/>
+          </window>
+          <window size="-2,26" layout="hbox" interval="8">
+            <img size="52,26" skin="svg_tetris_key_space"/>
+            <text text="开炮" font="size:10" colorText="@color/clr_text_sub" layout_gravity="center"/>
+          </window>
+          <window size="-2,26" layout="hbox" interval="8">
+            <img size="26,26" skin="svg_tetris_key_p"/>
+            <text text="暂停" font="size:10" colorText="@color/clr_text_sub" layout_gravity="center"/>
+          </window>
+        </window>
+        <text text="守住底部基地，消灭本关全部敌人" extend_top="2" font="size:10" colorText="@color/clr_text_sub" multilines="1" wordbreak="1"/>
+      </window>
+    </window>
+    <!-- 动画浮层:击杀加分飞向得分 LED 的文本画在最顶层 -->
+    <window name="wnd_tank_aniframe" pos="0,0,-0,-0" msgTransparent="1"/>
+  </page>
+</tabctrl>

@@ -91,6 +91,13 @@ class CChessLayout
 	void SetActiveSide(CHSSIDE side){m_actSide=side;}
 
 	int GetAllChess(POINT ptChs[16],CHSSIDE side);
+
+	//!计算走棋历史中最后行棋方最远的一次重复走子步数(长将/长捉判定)
+	//!layout: 已走完 history 全部着法后的局面
+	//!history: 完整走棋历史(最后一步为最后走棋方的着法)
+	//!chsEnemy: 输出最后一步重复攻击的目标棋子类型, CHSMAN_NULL 表示未构成将/捉
+	//!返回值: 发现重复走子时的重复步数, 0 表示未发现重复
+	static UINT GetFarthestRepeat(const CChessLayout &layout, const std::vector<MOVESTEP> &history, CHESSMAN &chsEnemy);
 	
 	//!当前行棋方
 	CHSSIDE m_actSide;

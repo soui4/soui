@@ -17,6 +17,10 @@
 #include <valueAnimator/SPropertyAnimator.h>
 #define kLogTag "MainDlg"
 
+#if defined(__EMSCRIPTEN__)
+#include <emscripten.h>
+#endif
+
 const int CMainDlg::ANI_TIP = 0x50;
 
 #include <SPlaySound.h>
@@ -57,8 +61,11 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
     m_pTipContainer = FindChildByName("tip_container");
     #if defined (__IOS__)
     FindChildByName("pane_ios_header")->SetVisible(TRUE,TRUE);
+    #else defined(__EMSCRIPTEN__)
+    FindChildByName("sys_btns_container")->SetVisible(FALSE,TRUE);
     #endif
-    // 初始化主题下载缓存目录
+    // 初始化主题下载缓存目录。wasm 没有"个人目录"，但 Emscripten 的 MEMFS 里
+    // app dir 可写，主题包落地在 /opt/soui/theme_cache。
     #if defined(__MOBILE__)
         TCHAR szCachePath[MAX_PATH]={0};
         SHGetSpecialFolderPath(0,szCachePath,CSIDL_PERSONAL,TRUE);
@@ -75,9 +82,10 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 
     // 主题不在此加载，等待连接服务器成功后由 ThemeDownloadManager 下载加载
 
-#if defined(__MOBILE__)
-    // 移动平台：使用 SModalRoot/SModalView 替代 SHostDialog::DoModal()
-    // Android/iOS 平台不支持独立消息循环，必须使用模态视图方式
+#if defined(__MOBILE__) || defined(__EMSCRIPTEN__)
+    // 移动平台与 wasm：使用 SModalRoot/SModalView 替代 SHostDialog::DoModal()。
+    // 这两类平台都没有可重入的第二条消息循环：Android/iOS 的 UI 线程由运行时驱动，
+    // wasm 的浏览器事件循环在 DoModal 的内层 PeekMessage 里永远拿不到新事件。
     SModalRoot *pModal = (SModalRoot*)SApplication::getSingleton().CreateWindowByName(SModalRoot::GetClassName());
     pModal->InitFromResId("layout:dlg_login_modal");
 
@@ -104,6 +112,25 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
             }
         }
     }
+
+    // wasm：默认服务器地址跟随页面域名，走同源 wss://（HTTPS 页）或 ws://（HTTP 页），
+    // 由 Apache 在同一 origin 把 /cnchess/ 反向代理到同机 cnchess_server。
+    // 这样部署到任何域名都不必改代码，也不会把硬编码 IP 烧进产物。
+    // Node 无 location（无头烟测）时返回 0，保持 XML 默认值不动，交烟测自己覆盖。
+#if defined(__EMSCRIPTEN__)
+    {
+        char szSvr[256] = {0};
+        int bHasLoc = EM_ASM_INT({
+            if (typeof location === 'undefined') return 0;
+            var proto = (location.protocol === 'https:') ? 'wss://' : 'ws://';
+            var host  = (location.host && location.host.length) ? location.host : location.hostname;
+            stringToUTF8(proto + host, $0, 256);
+            return 1;
+        }, szSvr);
+        if (bHasLoc)
+            pEdtSvr->SetWindowText(S_CA2T(szSvr, CP_UTF8));
+    }
+#endif
 
     // 头像选择：仅提供内置头像(CHAIR 为空座位占位, 不提供), 选中项高亮
     auto UpdateAvatarSel = [pModal](int nId){
@@ -202,7 +229,7 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 #endif
 }
 
-#if defined(__MOBILE__)
+#if defined(__MOBILE__) || defined(__EMSCRIPTEN__)
 void CMainDlg::OnLoginSuccess(SStringT strSvr, SStringT strName, char cSex, int nAvatarId)
 {
     MyProfile* myProfile = MyProfile::getSingletonPtr();

@@ -404,6 +404,15 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
     void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
 
     /**
+     * @brief Handle IME character message
+     * @param uMsg Message identifier
+     * @param wParam Additional message-specific information
+     * @param lParam Additional message-specific information
+     * @return Result of the message processing
+     */
+    LRESULT OnImeChar(UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+    /**
      * @brief Handle set font message
      * @param font Font to apply
      * @param bRedraw Whether to redraw the control
@@ -524,6 +533,7 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
         MSG_WM_MOUSEWHEEL(OnMouseWheel)
         MSG_WM_KEYDOWN(OnKeyDown)
         MSG_WM_CHAR(OnChar)
+        MESSAGE_HANDLER_EX(WM_IME_CHAR, OnImeChar)
         MSG_WM_SETFONT_EX(OnSetFont)
         MESSAGE_HANDLER_EX(WM_LBUTTONDBLCLK, OnButtonClick)
         MESSAGE_HANDLER_EX(WM_SETTEXT, OnSetText)

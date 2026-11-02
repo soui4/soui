@@ -19,7 +19,7 @@ protected:
         , font(NULL)
         , oldFont(NULL)
     {}
-    void SetUp() override
+    void SetUp()
     {
         hdc = CreateCompatibleDC(NULL);
         ASSERT_NE(hdc, (HDC)NULL);
@@ -34,7 +34,7 @@ protected:
         ASSERT_TRUE(oldFont != NULL);
     }
 
-    void TearDown() override
+    void TearDown()
     {
         SelectObject(hdc, oldFont);
         DeleteObject(font);

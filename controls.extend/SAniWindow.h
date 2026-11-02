@@ -1,7 +1,6 @@
 #pragma once
 
-namespace SOUI
-{
+SNSBEGIN
 
 class SAniWindow
     : public SWindow
@@ -53,4 +52,4 @@ class SAniWindow
     bool m_bEnableAni;
 };
 
-} // namespace SOUI
+SNSEND

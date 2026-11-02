@@ -199,11 +199,11 @@ void AndroidPlatformAPI::deinit() {
     SLOGI()<<"AndroidPlatformAPI deinit done";
 }
 
-UINT_PTR AndroidPlatformAPI::createWindow(UINT_PTR hParent,
+HWND AndroidPlatformAPI::createWindow(HWND hParent,
                                           const char* pszClsName, const char* pszTitle,
                                           DWORD dwStyle, DWORD dwExStyle,
                                           int x, int y, int nWidth, int nHeight,
-                                          UINT_PTR hMenu, UINT_PTR hInstance, LPVOID lpParam) {
+                                          HMENU hMenu, UINT_PTR hInstance, LPVOID lpParam) {
     JNIEnv *env = getJNIEnv();
     if (!env || !m_javaBridge) {
         SLOGE()<<"createWindow: JNI bridge not ready";
@@ -213,16 +213,16 @@ UINT_PTR AndroidPlatformAPI::createWindow(UINT_PTR hParent,
         SLOGE()<<"createWindow: createWindow methodID missing (init failed?)";
         return 0;
     }
-    const bool isMessageOnly = (HWND)hParent == HWND_MESSAGE;
+    const bool isMessageOnly = hParent == HWND_MESSAGE;
     const bool isChild = (dwStyle & WS_CHILD) != 0;
-    UINT_PTR parentHwnd = hParent;
+    HWND parentHwnd = hParent;
     jobject parentView= nullptr;
     if(isMessageOnly){
         //set to invisible with size of (0,0)
         dwStyle = WS_POPUP;
         nWidth = nHeight = 0;
     }else{
-        if (!isChild && parentHwnd == HWND_DESKTOP) {
+        if (!isChild && hParent == HWND_DESKTOP) {
             jlong screenId = getActiveScreenId();
             parentHwnd = getScreenHwnd(screenId);
         }
@@ -258,10 +258,10 @@ UINT_PTR AndroidPlatformAPI::createWindow(UINT_PTR hParent,
         return 0;
     }
     SLOGI()<<"createWindow +++, ret="<<hwnd<<" class name="<<pszClsName<<" title="<<pszTitle;
-    return (UINT_PTR)hwnd;
+    return (HWND)hwnd;
 }
 
-BOOL AndroidPlatformAPI::destroyWindow(UINT_PTR hWnd) {
+BOOL AndroidPlatformAPI::destroyWindow(HWND hWnd) {
     JNIEnv *env = getJNIEnv();
     if (!env) return FALSE;
     jobject viewObj = HwndObj(hWnd);
@@ -279,7 +279,7 @@ BOOL AndroidPlatformAPI::destroyWindow(UINT_PTR hWnd) {
     return TRUE;
 }
 
-jobject AndroidPlatformAPI::HwndObj(UINT_PTR hWnd) {
+jobject AndroidPlatformAPI::HwndObj(HWND hWnd) {
     if (hWnd == 0) return nullptr;
     if (!isValidHwnd(hWnd)) {
         return nullptr;
@@ -287,7 +287,7 @@ jobject AndroidPlatformAPI::HwndObj(UINT_PTR hWnd) {
     return reinterpret_cast<jobject>(hWnd);
 }
 
-jobject AndroidPlatformAPI::HwndLocalObj(UINT_PTR hWnd) {
+jobject AndroidPlatformAPI::HwndLocalObj(HWND hWnd) {
     const jobject globalObj = HwndObj(hWnd);
     if(!globalObj)
         return nullptr;
@@ -315,9 +315,9 @@ bool AndroidPlatformAPI::nativeViewErase(jlong nativeId) {
     return m_nativeViewMap.erase(nativeId) > 0;
 }
 
-bool AndroidPlatformAPI::isValidHwnd(UINT_PTR hWnd) const {
+bool AndroidPlatformAPI::isValidHwnd(HWND hWnd) const {
     if (hWnd == 0) return false;
-    const jlong nativeId = static_cast<jlong>(hWnd);
+    const jlong nativeId = (jlong)(UINT_PTR)(hWnd);
     // 主 SouiSurface 的 HWND（= SouiSurfaceProxy.nativeId）
     {
         std::lock_guard<std::mutex> lock(m_nativeViewMutex);
@@ -328,7 +328,7 @@ bool AndroidPlatformAPI::isValidHwnd(UINT_PTR hWnd) const {
     return false;
 }
 
-jobject AndroidPlatformAPI::hwndAsView(UINT_PTR hWnd) {
+jobject AndroidPlatformAPI::hwndAsView(HWND hWnd) {
     if (!hWnd) return nullptr;
     JNIEnv *env = getJNIEnv();
     if (!env || !m_nwAsView) return nullptr;
@@ -345,7 +345,7 @@ jobject AndroidPlatformAPI::hwndAsView(UINT_PTR hWnd) {
 HWND AndroidPlatformAPI::getWindow(HWND hWnd,int code){
     JNIEnv *env = getJNIEnv();
     if (!env || !m_nwGetWindow) return 0;
-    jobject wndObj = HwndObj((UINT_PTR)hWnd);
+    jobject wndObj = HwndObj(hWnd);
     if (!wndObj)
         return 0;
     jlong res = env->CallLongMethod(wndObj, m_nwGetWindow,
@@ -357,7 +357,7 @@ HWND AndroidPlatformAPI::getWindow(HWND hWnd,int code){
 BOOL AndroidPlatformAPI::showWindow(HWND hWnd, int nCmdShow) {
     JNIEnv *env = getJNIEnv();
     if (!env || !m_nwShow) return FALSE;
-    jobject wndObj = HwndObj((UINT_PTR)hWnd);
+    jobject wndObj = HwndObj(hWnd);
     if (!wndObj) return FALSE;
     jboolean ok = env->CallBooleanMethod(wndObj, m_nwShow, (jint) nCmdShow);
     if (env->ExceptionCheck()) { ClearEx(env); return FALSE; }
@@ -367,7 +367,7 @@ BOOL AndroidPlatformAPI::showWindow(HWND hWnd, int nCmdShow) {
 BOOL AndroidPlatformAPI::enableWindow(HWND hWnd, BOOL bEnable) {
     JNIEnv *env = getJNIEnv();
     if (!env || !m_nwEnable) return FALSE;
-    jobject wndObj = HwndObj((UINT_PTR)hWnd);
+    jobject wndObj = HwndObj(hWnd);
     if (!wndObj) return FALSE;
     jboolean ok = env->CallBooleanMethod(wndObj, m_nwEnable, (jboolean) bEnable);
     if (env->ExceptionCheck()) { ClearEx(env); return FALSE; }
@@ -377,7 +377,7 @@ BOOL AndroidPlatformAPI::enableWindow(HWND hWnd, BOOL bEnable) {
 BOOL AndroidPlatformAPI::isWindowVisible(HWND hWnd) {
     JNIEnv *env = getJNIEnv();
     if (!env || !m_nwIsVisible) return FALSE;
-    jobject wndObj = HwndObj((UINT_PTR)hWnd);
+    jobject wndObj = HwndObj(hWnd);
     if (!wndObj) return FALSE;
     jboolean ok = env->CallBooleanMethod(wndObj, m_nwIsVisible);
     if (env->ExceptionCheck()) { ClearEx(env); return FALSE; }
@@ -387,7 +387,7 @@ BOOL AndroidPlatformAPI::isWindowVisible(HWND hWnd) {
 BOOL AndroidPlatformAPI::isWindowEnabled(HWND hWnd) {
     JNIEnv *env = getJNIEnv();
     if (!env || !m_nwIsEnabled) return FALSE;
-    jobject wndObj = HwndObj((UINT_PTR)hWnd);
+    jobject wndObj = HwndObj(hWnd);
     if (!wndObj) return FALSE;
     jboolean ok = env->CallBooleanMethod(wndObj, m_nwIsEnabled);
     if (env->ExceptionCheck()) { ClearEx(env); return FALSE; }
@@ -397,14 +397,14 @@ BOOL AndroidPlatformAPI::isWindowEnabled(HWND hWnd) {
 BOOL AndroidPlatformAPI::moveWindow(HWND hWnd, int x, int y, int nWidth, int nHeight, BOOL bRepaint) {
     JNIEnv *env = getJNIEnv();
     if (!env || !m_nwMove) return FALSE;
-    jobject wndObj = HwndObj((UINT_PTR)hWnd);
+    jobject wndObj = HwndObj(hWnd);
     if (!wndObj) return FALSE;
     jboolean ok = env->CallBooleanMethod(wndObj, m_nwMove,
                                          (jint) x, (jint) y, (jint) nWidth, (jint) nHeight);
     if (env->ExceptionCheck()) { ClearEx(env); return FALSE; }
     if (bRepaint && ok) {
         if (m_nwInvalidate) {
-            wndObj = HwndObj((UINT_PTR)hWnd);
+            wndObj = HwndObj(hWnd);
                 if (!wndObj) return FALSE;
             env->CallVoidMethod(wndObj, m_nwInvalidate, 0, 0, 0, 0);
             ClearEx(env);
@@ -416,7 +416,7 @@ BOOL AndroidPlatformAPI::moveWindow(HWND hWnd, int x, int y, int nWidth, int nHe
 BOOL AndroidPlatformAPI::setWindowSize(HWND hWnd, int cx, int cy) {
     JNIEnv *env = getJNIEnv();
     if (!env || !m_nwSetSize) return FALSE;
-    jobject wndObj = HwndObj((UINT_PTR)hWnd);
+    jobject wndObj = HwndObj(hWnd);
     if (!wndObj) return FALSE;
     jboolean ok = env->CallBooleanMethod(wndObj, m_nwSetSize,
                                          (jint) cx, (jint) cy);
@@ -427,7 +427,7 @@ BOOL AndroidPlatformAPI::setWindowSize(HWND hWnd, int cx, int cy) {
 BOOL AndroidPlatformAPI::setWindowPosEx(HWND hWnd, int x, int y) {
     JNIEnv *env = getJNIEnv();
     if (!env || !m_nwSetPosition) return FALSE;
-    jobject wndObj = HwndObj((UINT_PTR)hWnd);
+    jobject wndObj = HwndObj(hWnd);
     if (!wndObj) return FALSE;
     jboolean ok = env->CallBooleanMethod(wndObj, m_nwSetPosition,
                                          (jint) x, (jint) y);
@@ -444,7 +444,7 @@ BOOL AndroidPlatformAPI::setWindowPos(HWND hWnd, HWND hWndInsertAfter, int X, in
     if (hasSize && hasPos) {
         JNIEnv *env = getJNIEnv();
         if (!env || !m_nwMove) return FALSE;
-        jobject wndObj = HwndObj((UINT_PTR)hWnd);
+        jobject wndObj = HwndObj(hWnd);
         if (!wndObj) return FALSE;
         jboolean ok = env->CallBooleanMethod(wndObj, m_nwMove,
                                              (jint) X, (jint) Y, (jint) cx, (jint) cy);
@@ -460,7 +460,7 @@ bool AndroidPlatformAPI::invalidateRect(HWND hWnd, int left, int top, int right,
     JNIEnv *env = getJNIEnv();
     if (!env) return false;
     if (!m_nwInvalidate) return false;
-    jobject wndObj = HwndObj((UINT_PTR)hWnd);
+    jobject wndObj = HwndObj(hWnd);
     if (!wndObj) return false;
     env->CallVoidMethod(wndObj, m_nwInvalidate,
                         (jint) left, (jint) top, (jint) right, (jint) bottom);
@@ -472,16 +472,15 @@ bool AndroidPlatformAPI::invalidateRect(HWND hWnd, int left, int top, int right,
     return true;
 }
 
-void AndroidPlatformAPI::unregisterWindowTimersInternal(UINT_PTR hWnd) {
+void AndroidPlatformAPI::unregisterWindowTimersInternal(HWND hWnd) {
     m_timerEntries.erase(hWnd);
 }
 
 UINT_PTR AndroidPlatformAPI::setTimer(HWND hWnd, UINT_PTR id, UINT uElapse, TIMERPROC proc) {
     JNIEnv *env = getJNIEnv();
     if (!env || !m_javaBridge || !m_setTimerMethod) return 0;
-    const UINT_PTR hWndKey = reinterpret_cast<UINT_PTR>(hWnd);
     const jlong jid = env->CallLongMethod(m_javaBridge, m_setTimerMethod,
-                                          static_cast<jlong>(hWndKey),
+                                          (jlong)(UINT_PTR)(hWnd),
                                           static_cast<jlong>(id),
                                           static_cast<jint>(uElapse));
     ClearEx(env);
@@ -494,7 +493,7 @@ UINT_PTR AndroidPlatformAPI::setTimer(HWND hWnd, UINT_PTR id, UINT uElapse, TIME
         e.proc      = proc;
         e.interval  = uElapse;
         e.repeating = true;
-        m_timerEntries[hWndKey][actualTimerId] = e;
+        m_timerEntries[hWnd][actualTimerId] = e;
     }
     return actualTimerId;
 }
@@ -503,15 +502,14 @@ BOOL AndroidPlatformAPI::killTimer(HWND hWnd, UINT_PTR id) {
     if (id == 0) return FALSE;
     JNIEnv *env = getJNIEnv();
     if (!env || !m_javaBridge || !m_killTimerMethod) return FALSE;
-    const UINT_PTR hWndKey = reinterpret_cast<UINT_PTR>(hWnd);
     jboolean ok = env->CallBooleanMethod(m_javaBridge, m_killTimerMethod,
-                                         static_cast<jlong>(hWndKey),
+                                         (jlong)(UINT_PTR)(hWnd),
                                          static_cast<jlong>(id));
     ClearEx(env);
     // 本地 bookkeeping 同样按 (hWnd, timerId) 二元擦除
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        auto outerIt = m_timerEntries.find(hWndKey);
+        auto outerIt = m_timerEntries.find(hWnd);
         if (outerIt != m_timerEntries.end()) {
             outerIt->second.erase(id);
             if (outerIt->second.empty()) {
@@ -525,13 +523,12 @@ BOOL AndroidPlatformAPI::killTimer(HWND hWnd, UINT_PTR id) {
 BOOL AndroidPlatformAPI::killWindowTimers(HWND hWnd) {
     JNIEnv *env = getJNIEnv();
     if (!env || !m_javaBridge || !m_killWindowTimersMethod) return FALSE;
-    const UINT_PTR hWndKey = reinterpret_cast<UINT_PTR>(hWnd);
     env->CallVoidMethod(m_javaBridge, m_killWindowTimersMethod,
-                        static_cast<jlong>(hWndKey));
+                        (jlong)(UINT_PTR)(hWnd));
     ClearEx(env);
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        unregisterWindowTimersInternal(hWndKey);
+        unregisterWindowTimersInternal(hWnd);
     }
     return TRUE;
 }
@@ -539,10 +536,9 @@ BOOL AndroidPlatformAPI::killWindowTimers(HWND hWnd) {
 void AndroidPlatformAPI::onTimerExpired(HWND hWnd, UINT_PTR timerId) {
     if (timerId == 0) return;
     TIMERPROC proc = nullptr;
-    const UINT_PTR hWndKey = reinterpret_cast<UINT_PTR>(hWnd);
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        auto outerIt = m_timerEntries.find(hWndKey);
+        auto outerIt = m_timerEntries.find(hWnd);
         if (outerIt != m_timerEntries.end()) {
             auto innerIt = outerIt->second.find(timerId);
             if (innerIt != outerIt->second.end()) {
@@ -615,13 +611,13 @@ int AndroidPlatformAPI::getScreenHeight() const {
     return (screenId == 0) ? 0 : getScreenHeight(screenId);
 }
 
-HWND AndroidPlatformAPI::setCapture(UINT_PTR hwnd) {
+HWND AndroidPlatformAPI::setCapture(HWND hWnd) {
     JNIEnv *env = getJNIEnv();
     if (!env || !m_javaBridge || !m_setCaptureMethod) {
         return 0;
     }
     const jlong oldHwnd = env->CallLongMethod(
-        m_javaBridge, m_setCaptureMethod, (jlong)hwnd);
+        m_javaBridge, m_setCaptureMethod, (jlong)(UINT_PTR)hWnd);
     ClearEx(env);
     return reinterpret_cast<HWND>(static_cast<UINT_PTR>(oldHwnd));
 }
@@ -637,13 +633,13 @@ BOOL AndroidPlatformAPI::releaseCapture() {
     return ok ? TRUE : FALSE;
 }
 
-HWND AndroidPlatformAPI::setFocus(UINT_PTR hwnd) {
+HWND AndroidPlatformAPI::setFocus(HWND hWnd) {
     JNIEnv *env = getJNIEnv();
     if (!env || !m_javaBridge || !m_setFocusMethod) {
         return 0;
     }
     const jlong oldHwnd = env->CallLongMethod(
-        m_javaBridge, m_setFocusMethod, (jlong)hwnd);
+        m_javaBridge, m_setFocusMethod, (jlong)hWnd);
     ClearEx(env);
     return reinterpret_cast<HWND>(static_cast<UINT_PTR>(oldHwnd));
 }
@@ -708,11 +704,11 @@ void AndroidPlatformAPI::stringSlotFree(int id) {
 }
 
 
-LRESULT AndroidPlatformAPI::sendMessage(UINT_PTR hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-    if (hwnd == 0) return 0;
+LRESULT AndroidPlatformAPI::sendMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+    if (hWnd == 0) return 0;
     JNIEnv *env = getJNIEnv();
     if (!env) return 0;
-    jobject wndObj = reinterpret_cast<jobject>(hwnd);
+    jobject wndObj = reinterpret_cast<jobject>(hWnd);
     if (!m_nativeSendMessageMethod) return 0;
 
     const jlong res = env->CallLongMethod(wndObj, m_nativeSendMessageMethod,
@@ -728,14 +724,14 @@ LRESULT AndroidPlatformAPI::sendMessage(UINT_PTR hwnd, UINT msg, WPARAM wParam, 
     return (LRESULT)res;
 }
 
-void AndroidPlatformAPI::setScreenHwnd(jlong screenId, UINT_PTR hwnd) {
+void AndroidPlatformAPI::setScreenHwnd(jlong screenId, HWND hWnd) {
     if (screenId == 0) return;
     std::lock_guard<std::mutex> lock(m_mutex);
     auto it = m_screenContexts.find(screenId);
     if (it == m_screenContexts.end()) {
-        m_screenContexts.emplace(screenId, hwnd);
+        m_screenContexts.emplace(screenId, hWnd);
     } else {
-        it->second = hwnd;
+        it->second = hWnd;
     }
 }
 
@@ -1010,11 +1006,11 @@ BOOL AndroidPlatformAPI::clipboardHasFormat(UINT format) {
     return (BOOL)result;
 }
 
-void AndroidPlatformAPI::sendImeString(UINT_PTR hwnd, const char *utf8, size_t len) {
-    if (hwnd == 0 || !utf8 || len == 0) return;
+void AndroidPlatformAPI::sendImeString(HWND hWnd, const char *utf8, size_t len) {
+    if (hWnd == 0 || !utf8 || len == 0) return;
     SStringW strW = S_CA2W(SStringA(utf8,len), CP_UTF8);
     for (int i = 0; i < strW.GetLength(); i++) {
-        ::SendMessage((HWND)hwnd, WM_IME_CHAR, (WPARAM)strW[i], 0);
+        ::SendMessage(hWnd, WM_IME_CHAR, (WPARAM)strW[i], 0);
     }
 }
 

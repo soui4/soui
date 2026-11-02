@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  tetris_key_space.svg - 俄罗斯方块键帽图:空格键(宽键帽),键面文字 "Space";
+  含义文字(硬降)在 page_script.xml 布局中配置。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="52" height="26" viewBox="0 0 52 26">
+  <g>
+    <rect x="1" y="1" width="50" height="24" rx="5" fill="#F1F5F9" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="26" y="17" font-family="Arial" font-size="10" fill="#334155" text-anchor="middle">Space</text>
+  </g>
+</svg>

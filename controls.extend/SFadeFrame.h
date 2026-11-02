@@ -2,8 +2,7 @@
 
 #include "SAnimator.h"
 
-namespace SOUI
-{
+SNSBEGIN
 class SFadeFrame
     : public SWindow
     , public SAnimator
@@ -49,4 +48,4 @@ class SFadeFrame
     BOOL m_bInitShow;
 };
 
-} // namespace SOUI
+SNSEND

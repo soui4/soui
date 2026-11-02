@@ -13,16 +13,16 @@
 
 extern ATOM RegisterAndroidEdit();
 
-static UINT_PTR androidWindow_createWindow(UINT_PTR hParent, const char* pszClsName, const char*pszTitle, DWORD dwStyle,DWORD dwExStyle, int x, int y, int nWidth, int nHeight,
-                                           UINT_PTR hMenu, UINT_PTR hInstance, LPVOID lpParam) {
+static HWND androidWindow_createWindow(HWND hParent, const char* pszClsName, const char*pszTitle, DWORD dwStyle,DWORD dwExStyle, int x, int y, int nWidth, int nHeight,
+                                           HMENU hMenu, UINT_PTR hInstance, LPVOID lpParam) {
     return AndroidPlatformAPI::instance().createWindow(hParent,pszClsName,pszTitle,dwStyle,dwExStyle, x, y, nWidth, nHeight, hMenu, hInstance, lpParam);
 }
 
-static BOOL androidWindow_destroyWindow(UINT_PTR hWnd) {
+static BOOL androidWindow_destroyWindow(HWND hWnd) {
     return AndroidPlatformAPI::instance().destroyWindow(hWnd);
 }
 
-static UINT_PTR androidWindow_getWindow(UINT_PTR hWnd,int code){
+static HWND androidWindow_getWindow(HWND hWnd,int code){
     return AndroidPlatformAPI::instance().getWindow(hWnd,code);
 }
 
@@ -76,7 +76,7 @@ static HWND androidWindow_getFocus() {
 }
 
 static HWND androidWindow_setFocus(HWND hWnd) {
-    return AndroidPlatformAPI::instance().setFocus((UINT_PTR)hWnd);
+    return AndroidPlatformAPI::instance().setFocus(hWnd);
 }
 
 static int androidWindow_getScreenWidth(int screenIndex) {
@@ -95,19 +95,19 @@ static void androidWindow_getWorkArea(HMONITOR hMonitor, RECT *prc) {
     *prc = {0, 0, width, height};
 }
 
-static UINT_PTR androidWindow_setTimer(UINT_PTR hWnd, UINT_PTR id, UINT uElapse, TIMERPROC proc) {
+static UINT_PTR androidWindow_setTimer(HWND hWnd, UINT_PTR id, UINT uElapse, TIMERPROC proc) {
     return AndroidPlatformAPI::instance().setTimer(hWnd, id, uElapse, proc);
 }
 
-static BOOL androidWindow_killTimer(UINT_PTR hWnd, UINT_PTR id) {
+static BOOL androidWindow_killTimer(HWND hWnd, UINT_PTR id) {
     return AndroidPlatformAPI::instance().killTimer(hWnd, id);
 }
 
-static BOOL androidWindow_killWindowTimers(UINT_PTR hWnd) {
+static BOOL androidWindow_killWindowTimers(HWND hWnd) {
     return AndroidPlatformAPI::instance().killWindowTimers(hWnd);
 }
 
-static UINT_PTR androidWindow_setCapture(UINT_PTR hWnd){
+static HWND androidWindow_setCapture(HWND hWnd){
     return AndroidPlatformAPI::instance().setCapture(hWnd);
 }
 

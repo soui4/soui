@@ -151,7 +151,12 @@ UINT SUiDefInfo::Init2(IXmlNode *pNode, BOOL bGlobalDomain, IResProvider *pResPr
             defFontInfo = xmlFont.attribute(L"value").as_string();
 #ifdef __APPLE__
             const wchar_t *kPlatName = L"macos";
-#elif defined(__linux__)
+#elif defined(__linux__) || defined(__EMSCRIPTEN__)
+            // wasm（Emscripten）与 Linux 走同一套文本栈：swinx 的 posix 系统层 +
+            // src/gdi/cairo（freetype + fontconfig），字体名口径一致，所以复用
+            // <deffont> 的 linux 子节点。不要给 wasm 单开一个 <wasm> 节点名：
+            // 现有 uidef 里没有这个节点，而 <deffont> 自身的 value 是空的，
+            // 找不到子节点就等于把默认字体清空了。
             const wchar_t *kPlatName = L"linux";
 #else
             const wchar_t *kPlatName = L"win32";

@@ -2,8 +2,7 @@
 #include "SRealWndHandler_Scintilla.h"
 #include "ScintillaWnd.h"
 
-namespace SOUI
-{
+SNSBEGIN
 	SRealWndHandler_Scintilla::SRealWndHandler_Scintilla(void)
 	{
 	}
@@ -75,4 +74,4 @@ namespace SOUI
 		return TRUE;
 	}
 
-}
+SNSEND

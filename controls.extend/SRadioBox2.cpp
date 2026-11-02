@@ -1,8 +1,7 @@
 #include "stdafx.h"
 #include "SRadioBox2.h"
 
-namespace SOUI
-{
+SNSBEGIN
 SRadioBox2::SRadioBox2(void)
     : m_pIcon(NULL)
     , m_nTextOffset(0)
@@ -44,4 +43,4 @@ void SRadioBox2::OnPaint(IRenderTarget *pRT)
     SWindow::OnPaint(pRT);
 }
 
-} // namespace SOUI
+SNSEND

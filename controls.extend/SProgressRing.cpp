@@ -2,8 +2,7 @@
 #include "SProgressRing.h"
 #include <helper/SDIBHelper.h>
 
-namespace SOUI
-{
+SNSBEGIN
 SProgressRing::SProgressRing(void)
     : m_crBackground(RGBA(0xff, 0xff, 0xff, 0xff))
     , m_crForeground(RGBA(58, 171, 249, 255))
@@ -65,4 +64,4 @@ void SProgressRing::OnColorize(COLORREF cr)
     SDIBHelper::Colorize(m_crForeground, cr);
 }
 
-} // namespace SOUI
+SNSEND

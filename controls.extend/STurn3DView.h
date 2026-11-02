@@ -10,8 +10,7 @@
 #include "image3d/3dTransform.h"
 #include <event/SEvents.h>
 
-namespace SOUI
-{
+SNSBEGIN
 DEF_EVT_EXT(EventTurn3d, EVT_EXTERNAL_BEGIN + 4000, { BOOL bTurn2Front_; });
 
 class STurn3dView : public SWindow {
@@ -49,4 +48,4 @@ class STurn3dView : public SWindow {
     BOOL m_bTurning;   //正在翻转
 };
 
-} // namespace SOUI
+SNSEND

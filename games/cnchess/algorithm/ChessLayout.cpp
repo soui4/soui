@@ -314,6 +314,68 @@ BOOL CChessLayout::UndoMove(const MOVESTEP & moveStep)
 	return TRUE;
 }
 
+UINT CChessLayout::GetFarthestRepeat(const CChessLayout &layout, const std::vector<MOVESTEP> &history, CHESSMAN &chsEnemy)
+{
+	UINT nRet=0,nSteps=0;
+	int	nChsID=-1,nChsEnemy=-1;
+	POINT ptLastDest={-1,-1};
+
+	CChessLayout work;
+	work.Copy(&layout);
+	CChsLytState state(&work);
+	CHSSIDE actSide=(CHSSIDE)!work.m_actSide;
+
+	chsEnemy=CHSMAN_NULL;
+
+	for(auto p=history.rbegin();p!=history.rend();++p)
+	{
+		if(CHSMANSIDE(work.m_chesses[p->pt2.y][p->pt2.x])==actSide)
+		{
+			state.UpdateState();
+			nSteps++;
+			//找到攻击的无根子数量
+			CChsLytState::CChessInfo *pChessInfo=state.GetChessInfo(p->pt2);
+			int nNoRootChs=0;
+			POINT ptDest={-1,-1};
+			for(auto p2=pChessInfo->m_lstDest.begin();p2!=pChessInfo->m_lstDest.end();++p2)
+			{
+				if(CHSMANSIDE(work.m_chesses[p2->y][p2->x])==work.m_actSide
+					&& state.GetProtecter(*p2)==0
+					&& state.GetAttacter(*p2)==1)
+				{
+					nNoRootChs++;
+					ptDest=*p2;
+					if(nNoRootChs>1) break;
+				}
+			}
+			if(nNoRootChs!=1) break;
+
+			if(nChsID==-1)
+			{//最后一步
+				nChsID=work.m_nChsID[p->pt2.y][p->pt2.x];
+				nChsEnemy=work.m_nChsID[ptDest.y][ptDest.x];
+				ptLastDest=p->pt2;
+				chsEnemy=work.m_chesses[ptDest.y][ptDest.x];
+			}else
+			{
+				//攻击及被攻击的棋子不是原棋或者退出计算
+				if(nChsID!=work.m_nChsID[p->pt2.y][p->pt2.x]
+				|| nChsEnemy!=work.m_nChsID[ptDest.y][ptDest.x] )
+					break;
+				if(p->pt2.x==ptLastDest.x && p->pt2.y==ptLastDest.y)
+					nRet=nSteps;//发现重复
+			}
+		}else
+		{
+			//移动的棋子不是被攻击棋子
+			if(work.m_nChsID[p->pt2.y][p->pt2.x]!=nChsEnemy)
+				break;
+		}
+		work.UndoMove(*p);
+	}
+	return nRet;
+}
+
 int  CChessLayout::GetPossibleMoves(POINT ptFocus,POINT ptMoves[MAX_MOVES])
 {
 	return CChsMoveGenerator::GetPossiableMoves(m_chesses,m_selfSide==CS_RED,ptFocus,ptMoves);

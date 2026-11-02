@@ -1,7 +1,6 @@
 #pragma once
 
-namespace SOUI
-{
+SNSBEGIN
 class STabCtrlHeaderBinder {
   public:
     STabCtrlHeaderBinder(STabCtrl *phost = NULL);
@@ -24,4 +23,4 @@ class STabCtrlHeaderBinder {
     BOOL EvtHander(IEvtArgs *e);
     BOOL TabSelChanged(EventTabSelChanged *evt_sel);
 };
-} // namespace SOUI
+SNSEND

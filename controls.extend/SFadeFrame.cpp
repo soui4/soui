@@ -5,8 +5,7 @@
 #define TIMER_SHOW 1
 #define TIMER_HIDE 2
 
-namespace SOUI
-{
+SNSBEGIN
 SFadeFrame::SFadeFrame(void)
     : m_nAniTime(200)
     , m_nDelayTime(200)
@@ -101,4 +100,4 @@ int SFadeFrame::OnCreate(LPVOID)
     return 0;
 }
 
-} // namespace SOUI
+SNSEND

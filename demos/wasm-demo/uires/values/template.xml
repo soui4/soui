@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  values/template.xml -- 模板表（Lua 游戏页用）
+
+  uidef/init.xml 的 <template src="values:template"/> 指向这张表，布局里写
+  <t:g.xxl_digit><data name="..."/></t:g.xxl_digit> 就是实例化一次；{{...}} 由
+  外层 <data> 属性代入。棋盘那 64 个格子由 lua 拼同样的 XML 字符串批量创建
+  （见 lua/games.lua 的 xxl_init_board），两边共用这两个模板。
+-->
+<template>
+  <!-- 消消乐棋子：stack 翻页显示 7 种 SVG 棋子（svg_xxl_icons），lua SelectPage 驱动；
+       on_command 直接把点击路由到 lua 全局函数 xxl_on_cmd。
+       尺寸写死 38x38：-1 是 wrap-content，会拿到 SVG 棋子的原始 64x64，8 列就是 512，
+       wasm 的 800x600 帧缓冲里消消乐页只有 319dp 高（页区 [20,188,780,558] 再减卡片
+       padding），64 的格子既放不下、gridlayout 也不会把列压缩回去（权重只加不减，
+       见 SOUI/src/layout/SGridLayout.cpp 的 pass 2），第 7、8 列直接排到画布外。
+       38 = 8x8 落在 319x412 里还能保持正方形。首页 img 和其他 6 页一样用 -2 填满，
+       否则 wrap-content 又把格子顶回 64。 -->
+  <g.xxl_ele>
+    <stack id="{{id}}" size="38,38" curSel="0" aniType="fade" cursor="hand" on_command="xxl_on_cmd">
+      <img size="-2,-2" skin="svg_xxl_icons" iconIndex="0"/>
+      <img size="-2,-2" skin="svg_xxl_icons" iconIndex="1"/>
+      <img size="-2,-2" skin="svg_xxl_icons" iconIndex="2"/>
+      <img size="-2,-2" skin="svg_xxl_icons" iconIndex="3"/>
+      <img size="-2,-2" skin="svg_xxl_icons" iconIndex="4"/>
+      <img size="-2,-2" skin="svg_xxl_icons" iconIndex="5"/>
+      <img size="-2,-2" skin="svg_xxl_icons" iconIndex="6"/>
+    </stack>
+  </g.xxl_ele>
+  <!-- 消消乐 LED 数字位：10 页 stack（push 翻页），lua setDigit 用 SelectPage 驱动 -->
+  <g.xxl_digit>
+    <stack name="{{name}}" size="22,32" curSel="0" aniType="push" vertical="1" duration="200">
+      <img size="-2,-2" skin="svg_xxl_digits" iconIndex="0"/>
+      <img size="-2,-2" skin="svg_xxl_digits" iconIndex="1"/>
+      <img size="-2,-2" skin="svg_xxl_digits" iconIndex="2"/>
+      <img size="-2,-2" skin="svg_xxl_digits" iconIndex="3"/>
+      <img size="-2,-2" skin="svg_xxl_digits" iconIndex="4"/>
+      <img size="-2,-2" skin="svg_xxl_digits" iconIndex="5"/>
+      <img size="-2,-2" skin="svg_xxl_digits" iconIndex="6"/>
+      <img size="-2,-2" skin="svg_xxl_digits" iconIndex="7"/>
+      <img size="-2,-2" skin="svg_xxl_digits" iconIndex="8"/>
+      <img size="-2,-2" skin="svg_xxl_digits" iconIndex="9"/>
+    </stack>
+  </g.xxl_digit>
+</template>

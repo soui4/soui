@@ -79,3 +79,15 @@ ios/
 /soui-ohos-lib/BuildProfile.ets
 demos/RIPDemo/
 /ppt
+
+# Added by MD Pretty View — Markdown Preview Enhanced pan/zoom assets
+.crossnote/
+
+# wasm 演示的构建产物（demos/wasm-demo/build*.sh 输出到这里）
+# demos/wasm/out 是早期 /tmp 构建目录（SOUI_WASM_DEMO_OUT 指过去）留下的产物，
+# 现在默认输出是 demos/wasm-demo/out，两条都留着免得不小心提交几十 MB 的 wasm。
+/demos/wasm/out/
+/demos/wasm-demo/out/
+/demos/wasm-demo/release/
+/demos/wasm-demo/build/
+/demos/wasm-demo/out.cairo/

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  xxl_btn_shuffle.svg - "洗牌"按钮图标(双箭头交叉,经典 shuffle)
+  3 帧横排,每帧 18x18,总尺寸 54x18。蓝色线条,叠在白底描边按钮上。
+  帧序:0=normal  1=hover  2=push
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="54" height="18" viewBox="0 0 54 18">
+  <!-- 帧0:normal #2563EB -->
+  <g transform="translate(0,0)" stroke="#2563EB" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <polyline points="12,2.25 15.75,2.25 15.75,6"/>
+    <line x1="3" y1="15" x2="15.75" y2="2.25"/>
+    <polyline points="15.75,12 15.75,15.75 12,15.75"/>
+    <line x1="11.25" y1="11.25" x2="15.75" y2="15.75"/>
+    <line x1="3" y1="3" x2="6.75" y2="6.75"/>
+  </g>
+  <!-- 帧1:hover #1D4ED8 -->
+  <g transform="translate(18,0)" stroke="#1D4ED8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <polyline points="12,2.25 15.75,2.25 15.75,6"/>
+    <line x1="3" y1="15" x2="15.75" y2="2.25"/>
+    <polyline points="15.75,12 15.75,15.75 12,15.75"/>
+    <line x1="11.25" y1="11.25" x2="15.75" y2="15.75"/>
+    <line x1="3" y1="3" x2="6.75" y2="6.75"/>
+  </g>
+  <!-- 帧2:push #1E40AF -->
+  <g transform="translate(36,0)" stroke="#1E40AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <polyline points="12,2.25 15.75,2.25 15.75,6"/>
+    <line x1="3" y1="15" x2="15.75" y2="2.25"/>
+    <polyline points="15.75,12 15.75,15.75 12,15.75"/>
+    <line x1="11.25" y1="11.25" x2="15.75" y2="15.75"/>
+    <line x1="3" y1="3" x2="6.75" y2="6.75"/>
+  </g>
+</svg>

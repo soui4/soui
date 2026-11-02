@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 坦克大战结束遮罩展示:淡入 250ms,与卡片 tank_over_card_in 同步;
+     挂在 wnd_tank_gameover 上,on_animation_stop 里清展示段标志 -->
+<set fillAfter="true" shareInterpolator="true" interpolator="Decelerate">
+    <alpha duration="250" fromAlpha="0.0" toAlpha="1.0"/>
+</set>

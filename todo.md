@@ -1,6 +1,6 @@
 1 检查内存泄漏。 done
 2 gdi font fallback. done
-3 skia opengl support.
+3 skia opengl support. done
 4 addfontresourceex for apple, done
 5 review dead lock. done
 6 ime position support. done
@@ -11,3 +11,7 @@
 11 api table for swinx. done
 12 TLS using swinx defined TSL API. done
 13 rename acc func. done
+14 wasm.clipboard support.
+15 freertos.combobox.
+16 add wasm.modalview demo.
+17 richedit click and move will become select mode. ime backspace not work.

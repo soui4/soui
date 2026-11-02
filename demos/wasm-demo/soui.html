@@ -1,0 +1,87 @@
+<!doctype html>
+<!--
+  soui.html -- SOUI XML 演示的页面外壳（Emscripten --shell-file）
+
+  这个文件只剩「页面自己的东西」：标题、说明文字、排版、以及最后那一行启动调用。
+  宿主逻辑（下载/上屏/输入注入/IME/剪贴板/音效/崩溃上报）全在 soui-host.js 里，
+  别的新 wasm 程序直接引那个 js 即可，不用抄这个 html。
+
+  emcc 的 --shell-file 要求里面必须有 {{{ SCRIPT }}} 占位符（见文末 <template>），
+  它会把占位符换成 <script src="soui-wasm-demo.js">。我们不要那个标签——胶水改由
+  soui-host.js 带时间戳按需载入（防"新 wasm 配旧胶水"的缓存问题），所以把占位符
+  放进 <template>：模板内容是惰性的，换进去的 script 永远不会执行，而占位符本身
+  仍然存在，emcc 不会报错。
+
+  页面用到的 .soui-* 样式由 soui-host.js 自己注入（injectCss:true），这里只留
+  body/h1/p 这些纯页面排版。
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>SOUI on WebAssembly 演示</title>
+<style>
+  :root { color-scheme: dark; }
+  body {
+    margin: 0; padding: 16px 20px 40px;
+    background: #0d1117; color: #d6e2f0;
+    font: 14px/1.6 ui-sans-serif, "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+  }
+  h1 { font-size: 18px; margin: 0 0 4px; font-weight: 600; }
+  p.lead { margin: 0 0 14px; color: #8fa3b8; }
+  .wrap { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-start; }
+  code { background: #0b1420; padding: 1px 4px; border-radius: 3px; }
+</style>
+</head>
+<body>
+  <h1>SOUI on WebAssembly 演示</h1>
+  <p class="lead">
+    <code>SApplication + SAppCfg::DoConfig()</code>（render-gdi / imgdecoder-stb 静态组件）
+    + <code>SHostWnd</code> 装载 <code>uires/xml/dlg_main.xml</code>
+    + <code>SResProviderFiles</code> 从 MEMFS 读 <code>uires.idx</code>
+    + <code>emscripten_set_main_loop</code> 驱动 <code>PeekMessage</code> 泵。
+  </p>
+  <p class="lead">
+    画面下半部是一个十二页的 <code>&lt;tabctrl&gt;</code>，按能力分组：
+    <b>概览</b>（2x2 能力卡）、<b>基础控件</b>（progress / sliderbar / switch / toggle /
+    radio / calendar，以及 combobox 的弹出列表与 listbox）、<b>更多控件</b>（hotkey /
+    ipctrl 与 ratingbar / lightbutton / verificationCodeEdit / grouplist）、<b>MVC</b>
+    （嵌套 <code>&lt;tabctrl&gt;</code> 切换四个视图：listview / tileview / treeview /
+    mclistview 共享同一份 500 行数据，树由 STreeAdapterBase 单独驱动；行模板不再是
+    一行文本——头像块、两行标题、说明、热度进度条与下载量都是模板里的普通控件，控件只为
+    可视区建窗口，打乱与追加只 <code>notifyDataSetChanged()</code> 一次）、
+    <b>列表与树</b>（listctrl / treectrl）、<b>布局</b>（weight / interval /
+    layout_gravity / gravity / pos 绝对定位 / 嵌套，六张卡各自排出可见的子块）、
+    <b>图形控件</b>（progressRing / speedmeter / waveprogress / qrctrl）、
+    <b>表格</b>（gridctrl 的固定行列与复选单元格、propgrid 的分组属性树）、
+    <b>图表</b>（hellocharts 的折线 / 柱状 / 环形饼图，数据模型由宿主交给
+    视图）、<b>编辑器</b>（<code>&lt;edit&gt;</code> = richedit41、<code>&lt;hexedit&gt;</code>、
+    <code>&lt;scintilla&gt;</code>）、<b>扩展控件</b>（controls.extend 的
+    colorizeText / scrolltext，后者演示水平跑马灯与多行垂直切换两种模式）、
+    <b>Lua 游戏</b>（消消乐 / 俄罗斯方块 / 坦克大战：整页布局、
+    SVG 皮肤与动画模板都从资源索引取，棋盘格子由 ScriptModule-LUA 在
+    <code>on_init</code> 里创建，点击与键盘回到脚本）。这些控件分别来自核心、
+    <code>controls.extend</code>、<code>third-part/richedit41</code>、
+    <code>third-part/Scintilla</code> 与 <code>components/ScriptModule-LUA</code>，
+    全部静态链进同一个 wasm 模块——缺一项对应标签就会被静默跳过。
+  </p>
+
+  <!-- 画布、加载遮罩、IME 代理框、错误行都由 soui-host.js 建在这个容器里 -->
+  <div class="wrap" id="app"></div>
+
+  <!-- emcc 的 --shell-file 要求 shell 里必须有 {{{ SCRIPT }}} 占位符；放进 <template>
+       让它惰性（见文件头说明）。 -->
+  <template>{{{ SCRIPT }}}</template>
+
+  <script src="soui-host.js"></script>
+  <script>
+    // 新程序照抄这一段即可：只报产物名和工厂名，其余全在 C++ 里。
+    SouiHost.start({
+      container: document.getElementById('app'),
+      wasm: 'soui-wasm-demo.wasm',      // 胶水 .js / .data 由它推导
+      factory: 'createSouiDemo',        // emcc -sEXPORT_NAME
+      loadingTitle: 'SOUI on WebAssembly'
+    });
+  </script>
+</body>
+</html>

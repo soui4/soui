@@ -2,8 +2,7 @@
 
 #include <control/SCmnCtrl.h>
 
-namespace SOUI
-{
+SNSBEGIN
 class SRadioBox2 : public SRadioBox {
     DEF_SOBJECT(SRadioBox, L"radio2")
   public:
@@ -47,4 +46,4 @@ class SRadioBox2 : public SRadioBox {
     SOUI_ATTRS_END()
 };
 
-} // namespace SOUI
+SNSEND

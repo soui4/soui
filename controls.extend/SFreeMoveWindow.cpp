@@ -1,8 +1,7 @@
 #include "stdafx.h"
 #include "SFreeMoveWindow.h"
 
-namespace SOUI
-{
+SNSBEGIN
 SFreeMoveWindow::SFreeMoveWindow(void)
     : m_nFloatHAlign(HALIGN_RIGHT)
     , m_nFloatVAlign(VALIGN_BOTTOM)
@@ -240,4 +239,4 @@ void SFreeMoveWindow::OnNcPaint(IRenderTarget *pRT)
     }
 }
 
-} // namespace SOUI
+SNSEND

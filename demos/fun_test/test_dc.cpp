@@ -11,13 +11,13 @@ class SwinxDcTest : public ::testing::Test {
 public:
     SwinxDcTest() : hdc(NULL), m_font(NULL) {}
 protected:
-    void SetUp() override
+    void SetUp()
     {
         hdc = CreateCompatibleDC(NULL);
         ASSERT_NE(hdc, (HDC)NULL) << "Failed to create HDC";
     }
 
-    void TearDown() override
+    void TearDown()
     {
         if (m_font) {
             // deselect from the DC before deleting
@@ -191,6 +191,91 @@ TEST_F(SwinxDcTest, PathToRegion) {
 
     //     DeleteObject(hRegion);
     // }
+}
+
+
+static int RgnComplexity(HRGN hRgn) {
+    RECT bounds = {0};
+    return GetRgnBox(hRgn, &bounds);
+}
+
+// 非轴对齐路径转区域：cairo 后端原来用“裁剪矩形列表”导出路径几何，弧线、
+// 圆角矩形会被判为 CLIP_NOT_REPRESENTABLE，PathToRegion 因此返回空区域。
+// 区域必须按路径形状逐像素给出 —— 退化成包围盒同样算错。
+TEST_F(SwinxDcTest, PathToRegion_roundrect_keeps_shape)
+{
+    EXPECT_TRUE(BeginPath(hdc));
+    RoundRect(hdc, 20, 20, 120, 120, 60, 60); // 圆角半径 30
+    EXPECT_TRUE(EndPath(hdc));
+
+    HRGN hRegion = PathToRegion(hdc);
+    ASSERT_NE(hRegion, (HRGN)NULL);
+    if (hRegion)
+    {
+        EXPECT_NE(RgnComplexity(hRegion), NULLREGION);
+        EXPECT_TRUE(PtInRegion(hRegion, 70, 70));  // 中心
+        EXPECT_TRUE(PtInRegion(hRegion, 70, 22));  // 直边内侧
+        EXPECT_FALSE(PtInRegion(hRegion, 22, 22)); // 圆角外：包围盒退化会误报为真
+        EXPECT_FALSE(PtInRegion(hRegion, 5, 5));   // 路径之外
+        DeleteObject(hRegion);
+    }
+}
+
+// 连续的 LineTo 必须连成同一个图元。cairo 后端曾在记录期每次 LineTo 之后补一次
+// cairo_move_to，把一条折线拆成互不相连的子路径；填充时每个子路径各自隐式闭合，
+// 四边形就退化成三条线（SWaveProgress 的波浪矩形因此画成楔形）。
+TEST_F(SwinxDcTest, PathRecording_consecutive_lineto_stays_onefigure)
+{
+    EXPECT_TRUE(BeginPath(hdc));
+    MoveToEx(hdc, 0, 10, NULL);
+    LineTo(hdc, 100, 10);
+    LineTo(hdc, 100, 50);
+    LineTo(hdc, 0, 50);
+    EXPECT_TRUE(EndPath(hdc));
+
+    // 一个起点 + 三条线段。拆成子路径时每次补的 move_to 会各记一个点。
+    int n = GetPath(hdc, NULL, NULL, 0);
+    ASSERT_EQ(n, 4);
+    std::vector<POINT> points(n);
+    std::vector<BYTE> types(n);
+    ASSERT_EQ(GetPath(hdc, &points[0], &types[0], n), n);
+    EXPECT_EQ(types[0], PT_MOVETO);
+    for (int i = 1; i < n; i++)
+        EXPECT_EQ(types[i], PT_LINETO) << "第 " << i << " 个点又从 MoveTo 重新开始";
+
+    // 填充按 GDI 语义隐式闭合回起点 (0,10)，区域应覆盖整个四边形。
+    HRGN hRegion = PathToRegion(hdc);
+    ASSERT_NE(hRegion, (HRGN)NULL);
+    if (hRegion)
+    {
+        EXPECT_NE(RgnComplexity(hRegion), NULLREGION);
+        EXPECT_TRUE(PtInRegion(hRegion, 50, 20));  // 上部
+        EXPECT_TRUE(PtInRegion(hRegion, 50, 40));  // 右下：散成线段时这里必为空
+        EXPECT_FALSE(PtInRegion(hRegion, 50, 5));  // 顶边之上
+        DeleteObject(hRegion);
+    }
+}
+
+// SSpeedMeter 的彩色圆弧走 addArc + DrawGradientPath，落到 GDI 后端就是
+// “路径转区域当裁剪”。半圆饼只覆盖一侧，包围盒退化会把两侧都算进去。
+TEST_F(SwinxDcTest, PathToRegion_pie_covers_sector)
+{
+    EXPECT_TRUE(BeginPath(hdc));
+    Pie(hdc, 0, 0, 200, 200, 200, 100, 0, 100);
+    EXPECT_TRUE(EndPath(hdc));
+
+    HRGN hRegion = PathToRegion(hdc);
+    ASSERT_NE(hRegion, (HRGN)NULL);
+    if (hRegion)
+    {
+        EXPECT_NE(RgnComplexity(hRegion), NULLREGION);
+        BOOL bUp = PtInRegion(hRegion, 100, 60);
+        BOOL bDown = PtInRegion(hRegion, 100, 140);
+        EXPECT_NE(bUp, bDown); // 恰好覆盖一侧
+        EXPECT_FALSE(PtInRegion(hRegion, 1, 1));   // 圆外
+        EXPECT_FALSE(PtInRegion(hRegion, 199, 1)); // 圆外
+        DeleteObject(hRegion);
+    }
 }
 
 TEST_F(SwinxDcTest, SelectClipPath) {

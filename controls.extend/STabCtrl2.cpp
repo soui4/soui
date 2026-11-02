@@ -2,8 +2,7 @@
 #include "STabCtrl2.h"
 #include "SAnimImg.h"
 
-namespace SOUI
-{
+SNSBEGIN
 SPageAniObj::SPageAniObj()
     : m_aniStatus(STATUS_NOR)
     , m_iFrame(0)
@@ -319,4 +318,4 @@ void STabCtrl2::OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer
     SWindow::OnContainerChanged(pOldContainer, pNewContainer);
 }
 
-} // namespace SOUI
+SNSEND

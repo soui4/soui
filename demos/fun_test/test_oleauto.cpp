@@ -430,9 +430,9 @@ class CountingUnknown : public IUnknown
 {
 public:
     CountingUnknown() : m_cRef(1) {}
-    STDMETHOD_(ULONG, AddRef)() override { return (ULONG)(++m_cRef); }
-    STDMETHOD_(ULONG, Release)() override { return (ULONG)(--m_cRef); }
-    STDMETHOD(QueryInterface)(REFIID riid, void **ppv) override
+    STDMETHOD_(ULONG, AddRef)() { return (ULONG)(++m_cRef); }
+    STDMETHOD_(ULONG, Release)() { return (ULONG)(--m_cRef); }
+    STDMETHOD(QueryInterface)(REFIID riid, void **ppv)
     {
         if (!ppv)
             return E_INVALIDARG;

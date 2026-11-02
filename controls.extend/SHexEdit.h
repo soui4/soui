@@ -170,6 +170,11 @@ class SHexEdit : public SPanel {
         UINT nAddressPos;
         UINT nAddressLen;
         UINT nColNumberPos;
+        /* ADR_DATA_SPACE / DATA_ASCII_SPACE 按 GetScale() 缩放后的物理像素值。
+         * 原先直接用 15px 常量与 MeasureText 的物理字宽混算，scale>100 时
+         * 每行字节数与各列位置全部漂移（150% 下多排一列、文字顶进滚动条）。 */
+        UINT nAdrSpace;
+        UINT nAsciiSpace;
         CRect cPaintingRect;
     };
 

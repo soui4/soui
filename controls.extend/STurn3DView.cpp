@@ -9,8 +9,7 @@
 #include "stdafx.h"
 #include "STurn3DView.h"
 
-namespace SOUI
-{
+SNSBEGIN
 STurn3dView::STurn3dView()
     : m_bTurn2Front(FALSE)
     , m_nZStep(50)
@@ -149,4 +148,4 @@ void STurn3dView::OnPaint(IRenderTarget *pRT)
     pRT->DrawBitmap(&rcWnd, m_bmpTrans, 0, 0, 0xFF);
 }
 
-} // namespace SOUI
+SNSEND

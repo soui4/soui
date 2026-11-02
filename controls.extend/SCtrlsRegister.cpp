@@ -46,6 +46,14 @@
 #include "SStaticGdip.h"
 #include "SIECtrl.h"
 #endif//_WIN32
+
+// wasm 的 Scintilla 编译开关（见 controls.extend/CMakeLists.txt）：关掉的构建里
+// SScintillaView.cpp 不参与编译，只有头文件里的类声明还在，注册它会得到链接错误。
+// 其他平台/默认不设这个宏，等价于恒开。
+#ifndef SOUI_WASM_HAS_SCINTILLA
+#define SOUI_WASM_HAS_SCINTILLA 1
+#endif
+
 SNSBEGIN
 
 void SCtrlsRegister::RegisterCtrls(SApplication *theApp)
@@ -85,7 +93,9 @@ void SCtrlsRegister::RegisterCtrls(SApplication *theApp)
 	theApp->RegisterWindowClass<SLrcView>();
 	theApp->RegisterWindowClass<SSpeedMeter>();
 	theApp->RegisterWindowClass<SQrCtrl>();
+#if SOUI_WASM_HAS_SCINTILLA
 	theApp->RegisterWindowClass<SScintillaView>();
+#endif
     theApp->RegisterWindowClass<SWkeWebkit>(); // 注册WKE浏览器
 #ifdef _WIN32
     theApp->RegisterWindowClass<SStaticGdip>();

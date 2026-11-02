@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "STabCtrlHeaderBinder.h"
-namespace SOUI
-{
+SNSBEGIN
 
 STabCtrlHeaderBinder::STabCtrlHeaderBinder(STabCtrl *_host)
     : m_pTabHost(_host)
@@ -80,4 +79,4 @@ BOOL STabCtrlHeaderBinder::TabSelChanged(EventTabSelChanged *evt_sel)
     }
     return FALSE;
 }
-} // namespace SOUI
+SNSEND
