@@ -6,7 +6,10 @@
  <h1>SOUI 4</h1>
 
  <a>
-    <img alt="DirectUI" src="https://img.shields.io/badge/C%2B%2B-DirectUI%E5%BA%93-brightgreen?style=for-the-badge" />
+    <img alt="Cross-Platform DirectUI" src="https://img.shields.io/badge/C%2B%2B-Cross--Platform%20DirectUI-brightgreen?style=for-the-badge" />
+ </a>
+ <a>
+    <img alt="Supported platforms" src="https://img.shields.io/badge/platforms-Windows%20%7C%20Linux%20%7C%20macOS%20%7C%20iOS%20%7C%20Android%20%7C%20OHOS%20%7C%20FreeRTOS%20%7C%20WASM-blue?style=for-the-badge" />
  </a>
  <a href="https://github.com/soui4/soui/releases">
     <img alt="releases" src="https://img.shields.io/github/v/release/soui4/soui?color=blueviolet&include_prereleases&style=for-the-badge" />
@@ -34,13 +37,13 @@
 
 ##  指南 / Guide
 
-SOUI4 是一套已经持续开发维护 **14年** 的轻量级**跨平台** C++ DirectUI 框架（内核编译后体积 1M 左右）。框架设计吸收了 `WTL`、`Android`、`QT`、`Flash` 等流行框架的特点，UI 展示基于 `xml` 配置，性能高效（可选择 GDI 或 [Skia](https://www.oschina.net/p/skia) 渲染），控件丰富，扩展灵活（可使用 xml + lua + js），真正做到 UI 界面与逻辑分离。
+SOUI4 是一套已经持续开发维护 **14年** 的轻量级**跨平台** C++ DirectUI 框架（内核编译后最小体积约 2.3M，Release x86）。框架设计吸收了 `WTL`、`Android`、`QT`、`Flash` 等流行框架的特点，UI 展示基于 `xml` 配置，性能高效（可选择 GDI 或 [Skia](https://www.oschina.net/p/skia) 渲染），控件丰富，扩展灵活（可使用 xml + lua + js），真正做到 UI 界面与逻辑分离。
 
-借助内置的 **swinx** 层（在各平台重新实现 Windows API：`windows.h` / `winuser.h` / `gdi.h` …），**同一份 C++ UI 与业务代码**即可运行在 Windows、Linux、macOS、iOS、Android 与鸿蒙（OHOS）六大平台上；同一套抽象还能把框架**下沉到裸机**（FreeRTOS / Cortex-M）与**上移到浏览器**（WebAssembly）。点击 [SOUI 官网](https://www.soui.com.cn) 了解更多。
+SOUI4 起源于 Windows，但**不再只面向 Windows**。借助内置的 **swinx** 层（在非 Windows 平台重新实现 Windows API：`windows.h` / `winuser.h` / `gdi.h` …），**同一份 C++ UI 与业务代码**即可运行在 Windows、Linux、macOS、iOS、Android 与鸿蒙（OHOS）六大平台上；同一套抽象还能把框架**下沉到裸机**（FreeRTOS / Cortex-M）与**上移到浏览器**（WebAssembly）。API 面在各平台始终保持 Win32 形态，Windows 上写的代码与积累的经验可以直接沿用——**Windows 只是参考实现，不是前提条件**。点击 [SOUI 官网](https://www.soui.com.cn) 了解更多。
 
 ##  跨平台支持 / Cross-Platform
 
-SOUI4 通过 swinx 覆盖八个目标，但分成两档成熟度：
+Windows 只是 SOUI4 通过 swinx 覆盖的八个目标之一，这八端分成两档成熟度：
 
 | 平台 | 状态 | 窗口系统 / 启动器 | 2D 后端 |
 | --- | --- | --- | --- |
@@ -75,7 +78,7 @@ SOUI 的渲染工厂（`Render_Gdi` / `Render_Skia` / `Render_D2d`）在各平�
 ![demo1](./doc/demo_png/souidemo1.png)
 ![demo2](./doc/demo_png/souidemo2.png)
 
-如果您初次了解此库，可以下载自动化静态编译的 [demo.exe](https://github.com/soui4/soui/actions) 进行尝鲜体验（无需下载源代码和其他依赖，直接下载运行）。
+如果您初次了解此库，可以下载自动化静态编译的 **Windows** 版 [demo.exe](https://github.com/soui4/soui/actions) 进行尝鲜体验（无需下载源代码和其他依赖，直接下载运行）。其余平台按下方对应小节从源码编译同一套 demo。
 
 具体方法：
 
@@ -93,7 +96,7 @@ SOUI 的渲染工厂（`Render_Gdi` / `Render_Skia` / `Render_D2d`）在各平�
 
 ##  开始
 
-使用 SOUI 需要一定的 C++ 与 Win32 的基础，请您确保您掌握了上述技能。
+SOUI 在各平台都保持 **Win32 形态的 API**（窗口 / 消息 / GDI），因此 C++ 基础加上 Win32 经验可以直接沿用；在 Linux、macOS、iOS、Android、鸿蒙、FreeRTOS 与 WebAssembly 上，这层 API 由内置的 **swinx** 提供，而不是由 OS 提供。只有当 Windows 本身也是目标平台时，才需要 Windows 工具链。
 
 除本页说明外，您还可以查看更详细的 [官方文档](https://www.soui.com.cn/help)。
 
@@ -153,6 +156,19 @@ SOUI 的渲染工厂（`Render_Gdi` / `Render_Skia` / `Render_D2d`）在各平�
   `mkdir build && cd build && cmake .. -G Xcode -DCMAKE_SYSTEM_NAME=iOS`
 - 应用入口由 `swinx_ios_entry()` 托管（内部封装 `UIApplicationMain`），C++ 的 `_tWinMain` 在启动后于主线程派发执行。
 
+###  Android 编译
+- 拉取子模块：`git submodule update --init --recursive`
+- 依赖：Android Studio（AGP 7.2.1+）、与 AGP 匹配的 NDK（25.x / 26.x）、CMake 3.18.1+、JDK 11/17。
+- 编译 `demos/android-demo` 最小示例：
+  `cd demos/android-demo && ./gradlew :app:assembleDebug`（Windows 用 `gradlew.bat`），
+  然后 `adb install -r app/build/outputs/apk/debug/app-debug.apk`。
+- 不分发预编译的 `.so`：`soui-android-lib` 只提供 Java 平台桥（AAR）与 CMake 片段
+  `soui4_android.cmake`，由业务 app `include()` 后把 SOUI 编进自己的 `.so`；业务 C++ 实现
+  `Soui4AndroidEntry`（`InitApp` / `UninitApp` / `ScreenStartup` / `ScreenShutdown`），并通过
+  `InitSoui4AndroidEntry` 注册。
+- UI 资源通过 `AAssetManager` 直接从 APK 的 `assets` 读取。完整业务示例见
+  `games/cnchess/client/android`，分步指南见 `doc/SOUI5-Android开发入门指南.md`。
+
 ###  鸿蒙（OHOS）编译
 - 需要 HarmonyOS SDK 与 DevEco Studio。
 - 原生层位于 `entry/src/main/cpp`；UI 资源通过 `NativeResourceManager` 直接从 HAP 的 `rawfile` 目录读取（无需拷贝到沙箱）。
@@ -177,4 +193,4 @@ SOUI 的渲染工厂（`Render_Gdi` / `Render_Skia` / `Render_D2d`）在各平�
 
 ##  LICENSE
 
-请查看 [`license.txt`](./license.txt) 文档
+请查看 [`LICENSE-zh.md`](./LICENSE-zh.md) 文档（英文版见 [`LICENSE-en.md`](./LICENSE-en.md)）

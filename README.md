@@ -6,7 +6,10 @@
  <h1>SOUI 4</h1>
 
  <a>
-    <img alt="DirectUI" src="https://img.shields.io/badge/C%2B%2B-DirectUI%E5%BA%93-brightgreen?style=for-the-badge" />
+    <img alt="Cross-Platform DirectUI" src="https://img.shields.io/badge/C%2B%2B-Cross--Platform%20DirectUI-brightgreen?style=for-the-badge" />
+ </a>
+ <a>
+    <img alt="Supported platforms" src="https://img.shields.io/badge/platforms-Windows%20%7C%20Linux%20%7C%20macOS%20%7C%20iOS%20%7C%20Android%20%7C%20OHOS%20%7C%20FreeRTOS%20%7C%20WASM-blue?style=for-the-badge" />
  </a>
  <a href="https://github.com/soui4/soui/releases">
     <img alt="releases" src="https://img.shields.io/github/v/release/soui4/soui?color=blueviolet&include_prereleases&style=for-the-badge" />
@@ -34,13 +37,13 @@ This README is available in the following languages:
 
 ## Guide
 
-SOUI4 is a lightweight, **cross-platform** C++ DirectUI framework, continuously developed and maintained for **14 years**. The compiled core is about 2MB. The framework design draws inspiration from popular frameworks such as WTL, Android, QT, and Flash. UI presentation is based on XML configuration, with high performance (choose GDI or [Skia](https://www.oschina.net/p/skia) rendering), rich controls, and flexible extension (supports xml + lua + js), truly separating UI and logic.
+SOUI4 is a lightweight **cross-platform** C++ DirectUI framework, continuously developed and maintained for **14 years**; the compiled core is about 2.3 MB in its smallest Release build. The framework design draws inspiration from popular frameworks such as WTL, Android, QT, and Flash. UI presentation is based on XML configuration, with high performance (choose GDI or [Skia](https://www.oschina.net/p/skia) rendering), rich controls, and flexible extension (supports xml + lua + js), truly separating UI and logic.
 
-Thanks to the built-in **swinx** layer — a framework that re-implements the Windows API (windows.h / winuser.h / gdi.h …) on non-Windows platforms — the **same C++ UI and business code** runs on Windows, Linux, macOS, iOS, Android and HarmonyOS (OHOS). The same abstraction also carries the framework **down to bare metal** (FreeRTOS on Cortex-M) and **up into the browser** (WebAssembly). Visit the [SOUI Official Website](https://www.soui.com.cn).
+SOUI4 started on Windows but is **no longer a Windows-only framework**. Thanks to the built-in **swinx** layer — a framework that re-implements the Windows API (windows.h / winuser.h / gdi.h …) on non-Windows platforms — the **same C++ UI and business code** runs on Windows, Linux, macOS, iOS, Android and HarmonyOS (OHOS). The same abstraction also carries the framework **down to bare metal** (FreeRTOS on Cortex-M) and **up into the browser** (WebAssembly). The API surface stays Win32-shaped on every target, so Windows code and habits carry over unchanged; Windows is the reference implementation, not a prerequisite. Visit the [SOUI Official Website](https://www.soui.com.cn).
 
 ## Cross-Platform Support
 
-SOUI4 covers eight targets through swinx, in two maturity tiers:
+Windows is one of eight targets SOUI4 covers through swinx; they sit in two maturity tiers:
 
 | Platform | Status | Windowing / Launcher | 2D Backend |
 | --- | --- | --- | --- |
@@ -75,7 +78,7 @@ The SOUI render factory (`Render_Gdi` / `Render_Skia` / `Render_D2d`) is uniform
 ![demo1](./doc/demo_png/souidemo1.png)
 ![demo2](./doc/demo_png/souidemo2.png)
 
-If you are new to SOUI, you can download the statically compiled [demo.exe](https://github.com/soui4/soui/actions) for a quick try (no need for source code or dependencies, just download and run).
+If you are new to SOUI, you can download the statically linked **Windows** build [demo.exe](https://github.com/soui4/soui/actions) for a quick try (no need for source code or dependencies, just download and run). The same demo is built from source on the other platforms with the steps further down.
 
 Steps:
 1. Click the badge above to enter the page
@@ -89,7 +92,7 @@ Each demo is in a separate repository, clone as needed.
 
 ## Getting Started
 
-SOUI requires basic knowledge of C++ and Win32. Please ensure you are familiar with these skills.
+SOUI keeps a **Win32-shaped API** (windows / messages / GDI) on every target, so C++ background plus Win32 experience carries over directly; on Linux, macOS, iOS, Android, OHOS, FreeRTOS and WebAssembly that API surface is supplied by the bundled **swinx** layer instead of by the OS. A Windows toolchain is needed only when Windows is one of your targets.
 For more details, see the [official documentation](https://www.soui.com.cn/help).
 
 ### Git Repositories
@@ -144,6 +147,20 @@ The latest souieditor is integrated in the demos folder. Build the demo to get s
   `mkdir build && cd build && cmake .. -G Xcode -DCMAKE_SYSTEM_NAME=iOS`
 - The app entry is hosted by `swinx_ios_entry()`, which wraps `UIApplicationMain`; the C++ `_tWinMain` is dispatched on the main thread after launch.
 
+### Android
+- Pull submodules: `git submodule update --init --recursive`
+- Requirements: Android Studio with AGP 7.2.1+, a matching NDK (25.x / 26.x), CMake 3.18.1+, JDK 11/17.
+- Build the minimal sample in `demos/android-demo`:
+  `cd demos/android-demo && ./gradlew :app:assembleDebug` (use `gradlew.bat` on Windows), then
+  `adb install -r app/build/outputs/apk/debug/app-debug.apk`.
+- No prebuilt `.so` is shipped: `soui-android-lib` provides the Java platform bridge as an AAR plus
+  the CMake fragment `soui4_android.cmake`, which your app `include()`s so that SOUI is compiled
+  into your own `.so`. Your C++ implements `Soui4AndroidEntry` (`InitApp` / `UninitApp` /
+  `ScreenStartup` / `ScreenShutdown`) and registers it with `InitSoui4AndroidEntry`.
+- UI resources are read straight from the APK `assets` through `AAssetManager`. A complete business
+  sample is `games/cnchess/client/android`; the step-by-step guide is
+  `doc/SOUI5-Android开发入门指南.md`.
+
 ### HarmonyOS (OHOS)
 - Requires the HarmonyOS SDK and DevEco Studio.
 - The native layer lives under `entry/src/main/cpp`; UI resources are loaded directly from the HAP `rawfile` directory through `NativeResourceManager` (no copy to the sandbox).
@@ -159,8 +176,9 @@ The latest souieditor is integrated in the demos folder. Build the demo to get s
 ### WebAssembly
 - Requires [emsdk](https://emscripten.org/docs/getting_started/downloads.html) (verified locally with 6.0.13).
 - `emcmake cmake -S . -B build-wasm -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DSOUI_BUILD_WASM_DEMO=ON`
-- `cmake --build build-wasm --target soui-wasm-demo -j4`; artifacts land in `soui-wasm/out/`.
-- To look at it in a browser, serve with `python3 -m http.server 8080 -d soui-wasm/out` and open `soui-wasm-demo.html`. Build options, verification steps and known limits are in [`soui-wasm/readme.md`](./soui-wasm/readme.md).
+- `cmake --build build-wasm --target soui-wasm-demo -j4`; artifacts land in `demos/wasm-demo/out/`.
+- To look at it in a browser, serve with `python3 -m http.server 8080 -d demos/wasm-demo/out` and open `soui-wasm-demo.html`. Build options, verification steps and known limits are in [`demos/wasm-demo/readme.md`](./demos/wasm-demo/readme.md).
+- A second, much larger WebAssembly port ships with the Chinese-chess client: configure with `-DSOUI_BUILD_WASM_CNCHESS=ON` and build the `cnchess-wasm` target (or use the wrapper script `games/cnchess/client/wasm/build-cnchess.sh`, `build-cnchess.bat` on Windows; both have a `--release` profile). Artifacts land in `games/cnchess/client/wasm/out/`; networking uses the browser-native WebSocket and threading runs on a single-threaded `TaskLoop`. See `games/cnchess/client/wasm/readme.md`.
 
 ## Contributors
 See [contributors.md](./contributors.md)
