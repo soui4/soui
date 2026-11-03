@@ -61,7 +61,7 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
     m_pTipContainer = FindChildByName("tip_container");
     #if defined (__IOS__)
     FindChildByName("pane_ios_header")->SetVisible(TRUE,TRUE);
-    #else defined(__EMSCRIPTEN__)
+    #elif defined(__EMSCRIPTEN__)
     FindChildByName("sys_btns_container")->SetVisible(FALSE,TRUE);
     #endif
     // 初始化主题下载缓存目录。wasm 没有"个人目录"，但 Emscripten 的 MEMFS 里
