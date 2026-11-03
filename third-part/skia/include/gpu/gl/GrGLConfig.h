@@ -21,7 +21,11 @@
 #endif
 
 #if !defined(GR_GL_FUNCTION_TYPE)
+#if defined(_WIN32) && (defined(_M_IX86) || defined(__i386__))
+    #define GR_GL_FUNCTION_TYPE __stdcall
+#else
     #define GR_GL_FUNCTION_TYPE
+#endif
 #endif
 
 /**
