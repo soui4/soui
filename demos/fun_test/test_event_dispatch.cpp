@@ -10,20 +10,23 @@
  *    3. GetOwner()->FireEvent        (bubbling to the owner window)
  *    4. GetContainer()->OnFireEvent  (bubbling to the host container)
  *
- * A slot returning TRUE marks the event "handled" (bubble-up = false) and that
- * single fact does two things:
- *    - stops the remaining slots in stage 1  (SEvent::fire breaks, SWnd.cpp:71)
- *    - stops the owner / container tail       (SWindow::FireEvent breaks, SWnd.cpp:2258)
- * A slot returning FALSE leaves bubble-up true, so the event keeps travelling
- * until something handles it or it reaches the container.
+ * Stopping the chain is an explicit act: a handler must call
+ * SetBubbleUp(false). The EVENT_HANDLER family of macros (SEventCrack.h) call
+ * SetBubbleUp(false) *before* invoking the user handler, which is what makes a
+ * handler "handle" an event. A slot's return value alone does NOT stop the
+ * chain: in SEvent::fire a slot returning TRUE only increments HandleCount, and
+ * both the slot-interrupt branch and the owner/container-skip branch are gated
+ * purely on IsBubbleUp() (SWnd.cpp:2258). So a bare "return TRUE" free slot
+ * leaves bubble-up true and the event keeps travelling until something turns it
+ * off or it reaches the container.
  *
- * These two behaviours are the part of the event system that is pure
- * bookkeeping and therefore testable without a UI: this file pins them with
- * executable assertions so a future change to the dispatch order or the
- * interrupt rule has to break a red test on purpose (closes risk 15, event
- * side). It complements test_event_slot_identity.cpp, which pins the slot
- * equality contract and SNotifyCenter; together they cover the event system's
- * pure-bookkeeping surface.
+ * These four tests pin that pure-bookkeeping contract with a headless container
+ * (no host window, no real window tree): the stage-1 interrupt (newest-first
+ * slot that turns off bubble-up skips earlier slots AND the container), the
+ * full bubble to the container when nothing stops it, and the refuse-to-dispatch
+ * precondition. They complement test_event_slot_identity.cpp (slot equality +
+ * SNotifyCenter); together they cover the event system's pure-bookkeeping
+ * surface.
  *
  * Note on stages 2 and 3: the script-handler stage needs a script module wired
  * to the window and the owner stage needs a real owner window. Both share the
@@ -44,19 +47,26 @@ using namespace SOUI;
 
 namespace
 {
-    BOOL handledSlot(IEvtArgs *, void *)
+    // A free slot "handles" an event the same way a real SOUI event-map handler
+    // does: it explicitly turns off bubble-up (EVENT_HANDLER et al. call
+    // SetBubbleUp(false) before invoking the user handler). The return value
+    // alone would only bump HandleCount and would NOT stop the chain, so without
+    // SetBubbleUp(false) the event would keep bubbling to the container.
+    BOOL handledSlot(IEvtArgs *e, void *)
     {
-        return TRUE; // marks the event handled -> bubble-up stops
+        e->SetBubbleUp(false); // stop propagation to owner / container
+        return TRUE;           // counts as handled
     }
-    BOOL countAndHandle(IEvtArgs *, void *ctx)
+    BOOL countAndHandle(IEvtArgs *e, void *ctx)
     {
         ++*(int *)ctx;
-        return TRUE; // handles -> interrupt
+        e->SetBubbleUp(false); // stops bubble-up -> interrupts earlier subscribers
+        return TRUE;           // counts as handled
     }
-    BOOL countAndIgnore(IEvtArgs *, void *ctx)
+    BOOL countAndIgnore(IEvtArgs *e, void *ctx)
     {
         ++*(int *)ctx;
-        return FALSE; // does not handle -> event keeps bubbling
+        return FALSE; // does not turn off bubble-up -> event keeps travelling
     }
 }
 
@@ -104,8 +114,8 @@ TEST(soui_event_dispatch, unhandled_event_bubbles_to_container)
 }
 
 // ---------------------------------------------------------------------------
-// Within-stage interrupt: the latest subscriber runs first (SEvent::fire walks
-// slots newest-first) and, when it handles the event, earlier subscribers are
+// Within-stage interrupt: SEvent::fire walks slots newest-first, so the latest
+// subscriber runs first. When it turns off bubble-up, earlier subscribers are
 // skipped and the container is never reached.
 // ---------------------------------------------------------------------------
 TEST(soui_event_dispatch, later_subscriber_interrupts_earlier)
@@ -118,15 +128,15 @@ TEST(soui_event_dispatch, later_subscriber_interrupts_earlier)
     container.ResetEventCounter();
     int earlyCalls = 0, lateCalls = 0;
     FreeFunctionSlot early(countAndIgnore, &earlyCalls); // runs AFTER late
-    FreeFunctionSlot late(countAndHandle, &lateCalls);   // runs FIRST, handles
+    FreeFunctionSlot late(countAndHandle, &lateCalls);   // runs FIRST, turns off bubble-up
     ASSERT_TRUE(w.SubscribeEvent(EventCmd::EventID, &early));
     ASSERT_TRUE(w.SubscribeEvent(EventCmd::EventID, &late));
 
     EventCmd evt(&w);
     EXPECT_TRUE(w.FireEvent(evt));
     EXPECT_EQ(1, lateCalls) << L"latest subscriber runs first";
-    EXPECT_EQ(0, earlyCalls) << L"handled by the later slot => earlier skipped (interrupt)";
-    EXPECT_EQ(0, container.m_nFiredEvents) << L"handled => no bubble to container";
+    EXPECT_EQ(0, earlyCalls) << L"later slot turned off bubble-up => earlier skipped (interrupt)";
+    EXPECT_EQ(0, container.m_nFiredEvents) << L"bubble-up off => no bubble to container";
 }
 
 // ---------------------------------------------------------------------------
