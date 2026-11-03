@@ -54,7 +54,7 @@ Windows 只是 SOUI4 通过 swinx 覆盖的八个目标之一，这八端分成�
 | **Android** | 已支持 | JVM 启动器，`PlatformAPI` 桥接 | Cairo |
 | **鸿蒙（OHOS）** | 已支持 | ArkTS 运行时，`PlatformAPI` 桥接 | Cairo |
 | **FreeRTOS** | 能力证明级 | 无 OS：FreeRTOS 任务驱动消息泵，宿主扫描帧缓冲上屏 | Cairo → 内存帧缓冲 |
-| **WebAssembly** | 能力证明级 | `emscripten_set_main_loop`，JS 宿主按脏矩形 blit 到 Canvas | Cairo → image surface → Canvas |
+| **WebAssembly** | 能力证明级 | `emscripten_set_main_loop`，JS 宿主按脏矩形 blit 到 Canvas | Cavas2d API |
 
 两档的含义不同，不能互换：
 

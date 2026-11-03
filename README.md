@@ -54,7 +54,7 @@ Windows is one of eight targets SOUI4 covers through swinx; they sit in two matu
 | **Android** | Supported | JVM launcher, `PlatformAPI` bridge | Cairo |
 | **HarmonyOS (OHOS)** | Supported | ArkTS runtime, `PlatformAPI` bridge | Cairo |
 | **FreeRTOS** | Proof of capability | No OS: a FreeRTOS task drives the pump, the host scans out the framebuffer | Cairo → memory framebuffer |
-| **WebAssembly** | Proof of capability | `emscripten_set_main_loop`, JS host blits dirty rects onto a canvas | Cairo → image surface → Canvas |
+| **WebAssembly** | Proof of capability | `emscripten_set_main_loop`, JS host blits dirty rects onto a canvas | Canvas2d API |
 
 The two tiers are not the same claim:
 
