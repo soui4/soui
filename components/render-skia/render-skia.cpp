@@ -343,7 +343,7 @@ IImgDecoderFactory *SRenderFactory_Skia::GetImgDecoderFactory()
 }
 
 // OpenGL 硬件加速渲染目标开关，默认开启；Render_Skia_EnableGPU 可关闭
-static BOOL s_bSkiaEnableGPU = TRUE;
+static BOOL s_bSkiaEnableGPU = FALSE;
 
 BOOL SRenderFactory_Skia::CreateRenderTarget(IRenderTarget **ppRenderTarget, int nWid, int nHei)
 {
