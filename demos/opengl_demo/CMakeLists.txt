@@ -1,3 +1,9 @@
+if(CMAKE_SYSTEM_NAME MATCHES "iOS|Android|OHOS|OpenHarmony|HarmonyOS")
+    # opengl_demo 依赖桌面 GL 的窗口表面（WGL 落在 NSOpenGL/GLX），
+    # 移动端只有 GLES/EAGL 或 EGL，没有对应的 WGL 实现，故不参与移动端构建。
+    return()
+endif()
+
 #
 # opengl_demo : SRealWnd + SNativeWnd + OpenGL 子窗口演示（Windows / macOS / Linux）
 #

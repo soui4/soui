@@ -16,6 +16,8 @@
 #endif
 #include <windows.h>
 #include <utils/SkWGL.h>
+#elif defined(__IOS__)
+#include "gl/SkNativeGLContext.h"
 #elif defined(__APPLE__)
 #include <OpenGL/OpenGL.h>
 #elif defined(__OHOS__) || defined(__ANDROID__)
@@ -109,9 +111,53 @@ SGLContext *SGLContext::Create()
     return new SWGLContext();
 }
 
+#elif defined(__IOS__)
+//===================================================================================
+// iOS: EAGL（skia 的 iOS 原生 GLES 上下文实现，离屏 FBO 渲染不需要窗口）
+//===================================================================================
+namespace
+{
+    class SNativeGLContext : public SGLContext
+    {
+    public:
+        SNativeGLContext() : m_bInited(false) {}
+        virtual ~SNativeGLContext() { destroy(); }
+
+        virtual bool init() OVERRIDE
+        {
+            // 1x1 的宿主 FBO 仅用于让 GLES 上下文可被绑定，实际绘制目标由
+            // 调用方另行创建；iOS 只有 GLES，强制使用 GLES 标准。
+            if (!m_ctx.init(kGLES_GrGLStandard, 1, 1))
+                return false;
+            m_bInited = true;
+            return true;
+        }
+
+        virtual const GrGLInterface *glInterface() const OVERRIDE { return m_ctx.gl(); }
+
+        virtual void destroy() OVERRIDE
+        {
+            if (m_bInited)
+            {
+                m_ctx.testAbandon();
+                m_bInited = false;
+            }
+        }
+
+    private:
+        SkNativeGLContext m_ctx;
+        bool m_bInited;
+    };
+} // namespace
+
+SGLContext *SGLContext::Create()
+{
+    return new SNativeGLContext();
+}
+
 #elif defined(__APPLE__)
 //===================================================================================
-// macOS/iOS: CGL（纯 C 接口，离屏 FBO 渲染不需要窗口）
+// macOS: CGL（纯 C 接口，离屏 FBO 渲染不需要窗口）
 //===================================================================================
 namespace
 {

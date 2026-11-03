@@ -155,6 +155,7 @@ SOUI 在各平台都保持 **Win32 形态的 API**（窗口 / 消息 / GDI），
 - 用 CMake 生成 Xcode 工程并通过 Xcode 编译：
   `mkdir build && cd build && cmake .. -G Xcode -DCMAKE_SYSTEM_NAME=iOS`
 - 应用入口由 `swinx_ios_entry()` 托管（内部封装 `UIApplicationMain`），C++ 的 `_tWinMain` 在启动后于主线程派发执行。
+- Add -DCMAKE_OSX_SYSROOT=iphonesimulator for simulator
 
 ###  Android 编译
 - 拉取子模块：`git submodule update --init --recursive`

@@ -46,8 +46,10 @@ else()
         set(GL_LIB ${OHOS_EGL} ${OHOS_GLES} fontconfig)
     elseif(CMAKE_SYSTEM_NAME MATCHES iOS)
         # iOS 使用 OpenGL ES 框架，非桌面 GL
-        # 用 -framework 避免 find_library 缓存设备 SDK 路径（模拟器缺切片）
-        set(GL_LIB "-framework OpenGLES")
+        # 用 -framework 避免 find_library 缓存设备 SDK 路径（模拟器缺切片）。
+        # skia 的 SkNativeGLContext_iOS.mm 是 ObjC++，render-skia 本身是纯 C++，
+        # 静态库里的 ObjC 符号不会自动带出 libobjc，需显式链接。
+        set(GL_LIB "-framework OpenGLES" "-lobjc")
     elseif(CMAKE_SYSTEM_NAME MATCHES Darwin)
             # 查找GLEW和GLFW包
         find_package(GLEW REQUIRED)

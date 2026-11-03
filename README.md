@@ -146,6 +146,7 @@ The latest souieditor is integrated in the demos folder. Build the demo to get s
 - Generate an Xcode project and build with Xcode:
   `mkdir build && cd build && cmake .. -G Xcode -DCMAKE_SYSTEM_NAME=iOS`
 - The app entry is hosted by `swinx_ios_entry()`, which wraps `UIApplicationMain`; the C++ `_tWinMain` is dispatched on the main thread after launch.
+- Add -DCMAKE_OSX_SYSROOT=iphonesimulator for simulator
 
 ### Android
 - Pull submodules: `git submodule update --init --recursive`
