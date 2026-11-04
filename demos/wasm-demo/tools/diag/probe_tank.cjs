@@ -26,7 +26,13 @@ const server = http.createServer((req, res) => {
 (async () => {
   await new Promise((r) => server.listen(0, '127.0.0.1', r));
   const port = server.address().port;
-  const browser = await chromium.launch({ headless: true, channel: 'msedge' });
+  const browser = await chromium.launch({
+    headless: process.env.SWX_HEADED ? false : true,
+    channel: 'msedge',
+    /* 有头模式才能拿到真 GPU：无头下 canvas 走 SwiftShader 软件光栅，
+     * willReadFrequently 这类"GPU/CPU 后端"差异会被抹平，A/B 会得出反向结论。 */
+    args: process.env.SWX_HEADED ? ['--window-position=40,40', '--window-size=1440,1040'] : [],
+  });
   const page = await browser.newPage({ viewport: { width: 1400, height: 1000 } });
   page.on('pageerror', (e) => console.log('[err]', e.message));
   page.on('console', (m) => { const t = m.text(); if (/svgc/.test(t)) console.log('[c]', t); });

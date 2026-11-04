@@ -18,8 +18,10 @@
 #      全都要链进同一个模块；swinx 与 soui4 互相引用，靠 CMake 的静态循环展开。
 #   2. 资源预载：uires/ 与 soui-sys-resource/ 用 --preload-file 挂进 MEMFS，
 #      程序里按 /opt/soui/* 读（SResProviderFiles，不依赖 resprovider-zip）。
-#   3. 字体：route C（canvas2d）的文本走浏览器 Canvas 2D 的 fillText + 系统 CJK
-#      字体，不再需要 fontconfig/cairo 与预载 TTF；SOUI_DEMO_FONT 选项保留但已忽略。
+#   3. 字体：GDI 后端由 SWINX_WASM_GDI_BACKEND 选择（canvas2d 默认 / cairo）。
+#      canvas2d 的文本走浏览器 Canvas 2D 的 fillText + 系统 CJK 字体，不打包字体；
+#      cairo 走 freetype/fontconfig，必须预载字体到 /opt/soui/fonts（SOUI_DEMO_FONT
+#      指定的文件，目的名固定 demo.ttf，与 soui_main.cpp 的 kFontPath 一致）。
 #   4. 内存布局：显式 --stack-first（见文件末尾的说明，-O1 以上默认不是这个布局）。
 #   5. 运行时形状：MODULARIZE、内存增长、32 MB 栈（SOUI_DEMO_STACK 覆盖）、
 #      以及页面外壳要用的 SwinxDemo* / SwinxFb* 导出符号。
@@ -103,6 +105,16 @@ endforeach()
 # uires/lua 从 .data 里摘掉。uires.idx 仍然列着 <lua> 组，SResProviderFiles 找不到
 # 文件也只是取不到脚本——而这时脚本工厂本身就没编进来，SHostWnd 解析 <script> 时
 # CreateScriptModule() 直接返回 E_FAIL，那条索引永远不会被读到。
+# GDI 后端选择：与 swinx/wasm.cmake 的 SWINX_WASM_GDI_BACKEND 同源（cache 变量，
+# 命令行 -DSWINX_WASM_GDI_BACKEND=cairo 时整条链——swinx、本演示、cnchess——统一切换）。
+# canvas2d（默认）：文本走浏览器 Canvas 2D + 系统 CJK 字体，不打包字体；
+# cairo：软件光栅 + freetype/fontconfig，必须预载字体到 MEMFS 的 /opt/soui/fonts。
+if(NOT DEFINED SWINX_WASM_GDI_BACKEND OR SWINX_WASM_GDI_BACKEND STREQUAL "")
+    set(SWINX_WASM_GDI_BACKEND "canvas2d" CACHE STRING
+        "wasm GDI backend: canvas2d (browser font) | cairo (bundled font)" FORCE)
+endif()
+set(_soui_demo_gdi_backend "${SWINX_WASM_GDI_BACKEND}")
+
 set(_soui_demo_preload "")
 file(GLOB _soui_uires_items "${CMAKE_CURRENT_SOURCE_DIR}/uires/*")
 foreach(_item IN LISTS _soui_uires_items)
@@ -123,9 +135,27 @@ if(SOUI_BUILD_WASM_LUA)
         "--preload-file=${CMAKE_CURRENT_SOURCE_DIR}/snd@/opt/soui/snd")
 endif()
 if(_soui_demo_font)
-    # route C：GDI 后端已不读 MEMFS 字体（文本走浏览器系统字体 / CSS font-family），
-    # 预载 demo.ttf 只会白占 .data。保留开关仅为兼容旧命令行；此处不再打包字体。
-    message(STATUS "SOUI_WASM_DEMO: route C 不使用预载字体（SOUI_DEMO_FONT 已忽略）。")
+    if(_soui_demo_gdi_backend STREQUAL "cairo")
+        # cairo 后端：字体走 freetype/fontconfig，必须预载进 MEMFS 并由 soui_main.cpp
+        # 的 AddFontResource(kFontPath=/opt/soui/fonts/demo.ttf) 注册。目的文件名固定
+        # 为 demo.ttf（与 kFontPath 一致），源文件名无所谓。
+        # canvas2d 后端则忽略（文本走浏览器系统字体），不应打包字体白占 .data。
+        # 源路径统一成正斜杠：emcc 的 file_packager 按 '@' 切分，反斜杠在 Windows 上
+        # 会被当成转义（见本文件顶部 --preload-file 说明）。
+        file(TO_CMAKE_PATH "${_soui_demo_font}" _soui_demo_font_fwd)
+        list(APPEND _soui_demo_preload
+            "--preload-file=${_soui_demo_font_fwd}@/opt/soui/fonts/demo.ttf")
+        message(STATUS "SOUI_WASM_DEMO: GDI=${_soui_demo_gdi_backend}, 打包字体 -> /opt/soui/fonts/demo.ttf")
+    else()
+        message(STATUS "SOUI_WASM_DEMO: GDI=${_soui_demo_gdi_backend}, 不打包字体（浏览器系统字体）。")
+    endif()
+elseif(_soui_demo_gdi_backend STREQUAL "cairo")
+    # cairo 后端要求字体，但本机没有检测到任何候选 TTF/TTC；cairo 没有字体就画不出
+    # 任何字形（AddFontResource 直接失败）。这里直接报错，避免打出一个"能跑但全无文字"
+    # 的包。
+    message(FATAL_ERROR
+        "SOUI_WASM_DEMO: GDI 后端为 cairo 但没有任何字体可打包。请通过 "
+        "-DSOUI_DEMO_FONT=<ttf/ttc 路径> 指定一个同时覆盖拉丁与 CJK 的字体文件。")
 endif()
 
 # 导出表：页面外壳（soui.html）需要的全部符号。
@@ -281,10 +311,16 @@ file(GLOB_RECURSE _soui_demo_res
     "${CMAKE_CURRENT_SOURCE_DIR}/uires/*"
     "${CMAKE_CURRENT_SOURCE_DIR}/snd/*"
     "${CMAKE_SOURCE_DIR}/soui-sys-resource/*")
-set_property(TARGET soui-wasm-demo APPEND PROPERTY LINK_DEPENDS
+set(_soui_demo_link_deps
     ${_soui_demo_res}
     "${CMAKE_CURRENT_SOURCE_DIR}/soui.html"
     "${CMAKE_CURRENT_SOURCE_DIR}/soui-host.js")
+# cairo 后端时字体也参与链接期打包，改字体要重链（否则拿到上一份 .data）。
+if(_soui_demo_font AND _soui_demo_gdi_backend STREQUAL "cairo")
+    list(APPEND _soui_demo_link_deps "${_soui_demo_font_fwd}")
+endif()
+set_property(TARGET soui-wasm-demo APPEND PROPERTY LINK_DEPENDS
+    ${_soui_demo_link_deps})
 
 # 页面外壳的宿主逻辑在 soui-host.js 里（可被别的 wasm 程序复用，不限于本演示）；
 # emcc 只产出 .html/.js/.wasm/.data 四个文件，这一个得单独拷进产物目录。
@@ -297,5 +333,6 @@ add_custom_command(TARGET soui-wasm-demo POST_BUILD
     VERBATIM)
 
 message(STATUS "SOUI_WASM_DEMO: ${SWINX_FB_WIDTH}x${SWINX_FB_HEIGHT}, stack=${SOUI_DEMO_STACK}, "
-               "font=route-C(browser) -> ${SOUI_WASM_DEMO_OUT}")
+               "gdi-backend=${_soui_demo_gdi_backend}, "
+               "font=${_soui_demo_gdi_backend} -> ${SOUI_WASM_DEMO_OUT}")
 message(STATUS "SOUI_WASM_DEMO features: lua=${SOUI_BUILD_WASM_LUA} scintilla=${SOUI_BUILD_WASM_SCINTILLA}")

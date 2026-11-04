@@ -30,6 +30,12 @@
 #   SOUI_CNCHESS_STACK     -sSTACK_SIZE，默认 32MB（5MB 会在 SHostWnd::Create 踩爆）
 #   SOUI_WASM_CNCHESS_OUT  产物目录，默认 wasm/out；--release 时固定成 wasm/release
 #   SOUI_WASM_JOBS         并行度，透传给 cmake --build -j（不给就用 Ninja 的默认值）
+#
+# GDI 后端（也可用同名环境变量 SWINX_WASM_GDI_BACKEND）：
+#   --gdi=canvas2d|cairo   选择 swinx 的 wasm GDI 后端。canvas2d（默认）走浏览器
+#                          Canvas 2D + 系统字体，不打包字体；cairo 走软件光栅 +
+#                          freetype/fontconfig，必须把字体放进 wasm/fonts/ 一起打包。
+#                          --cairo / --canvas2d 是简写；不指定则沿用构建目录缓存值。
 # =============================================================================
 set -euo pipefail
 
@@ -40,14 +46,22 @@ TARGET="cnchess-wasm"
 die() { echo "错误: $*" >&2; exit 1; }
 
 RELEASE=0
+GDI_BACKEND="${SWINX_WASM_GDI_BACKEND:-}"
 POSITIONAL=()
 for _arg in "$@"; do
     case "$_arg" in
         -r|--release) RELEASE=1 ;;
+        --gdi=*)      GDI_BACKEND="${_arg#*=}" ;;
+        --cairo)      GDI_BACKEND="cairo" ;;
+        --canvas2d)   GDI_BACKEND="canvas2d" ;;
         -h|--help)    sed -n '/^set -euo pipefail/q;p' "${BASH_SOURCE[0]}"; exit 0 ;;
         *)            POSITIONAL+=("$_arg") ;;
     esac
 done
+case "$GDI_BACKEND" in
+    ""|canvas2d|cairo) ;;
+    *) die "--gdi 只支持 canvas2d 或 cairo（收到: $GDI_BACKEND）" ;;
+esac
 
 command -v em++ >/dev/null 2>&1 || die "找不到 em++；请先 source <emsdk>/emsdk_env.sh"
 [ -d "$ROOT/swinx/include" ] || die "找不到 $ROOT/swinx/include（子模块没检出？）"
@@ -70,6 +84,8 @@ BUILD="${BUILD:-$DEFAULT_BUILD}"
 RECONFIG=()
 [ -n "${SOUI_CNCHESS_STACK:-}" ] && RECONFIG+=("-DSOUI_CNCHESS_STACK=$SOUI_CNCHESS_STACK")
 [ -n "$OUT_DIR" ] && RECONFIG+=("-DSOUI_WASM_CNCHESS_OUT=$OUT_DIR")
+# GDI 后端：--gdi 或同名环境变量给出时才透传，否则沿用缓存里的值。
+[ -n "$GDI_BACKEND" ] && RECONFIG+=("-DSWINX_WASM_GDI_BACKEND=$GDI_BACKEND")
 
 FRESH_CONFIGURE=0
 if [ ! -f "$BUILD/CMakeCache.txt" ]; then

@@ -3,3 +3,7 @@
 /out/
 # 上线档（-O2 -DNDEBUG）的产物也待在这里，同理不入库。
 /release/
+# cairo 后端预载的字体（.ttf/.ttc/.otf，如 simsun.ttc 约 18 MB，且多为厂商版权字体，
+# 不适于直接入库）。启用 cairo 后端前需自行放入字体文件，缺目录时 cmake 会 FATAL_ERROR
+# 提示"cairo 后端需要字体目录 .../fonts（放 .ttf/.ttc/.otf）"。
+/fonts/

@@ -23,6 +23,7 @@
 #include <emscripten.h>
 #include <stdio.h>
 #include <string.h>
+#include <dirent.h>
 
 /* 客户端自己的预编译头：后面 MainDlg.h/LobbyHandler.h 里的 SObject/SWindow/
  * SAutoRefPtr 都是不带命名空间写的，靠 stdafx.h 末尾的 using namespace SOUI 才能解析。 */
@@ -57,7 +58,8 @@
 #include "input.h"
 
 /* MEMFS 挂载点，与 wasm/CMakeLists.txt 的 --preload-file 目标一一对应。
- * 文本走 canvas2d 的浏览器内置字体，不再挂载 /opt/soui/fonts。 */
+ * canvas2d 后端文本走浏览器内置字体，不挂字体目录；cairo 后端会额外把 fonts/
+ * 预载进 /opt/soui/fonts（见 CNCHESS_WASM_CAIRO_FONTS 分支的 AddFontResourceA）。 */
 static const TCHAR kSysResDir[] = _T("/opt/soui/soui-sys-resource");
 static const TCHAR kAppResDir[] = _T("/opt/soui/uires");
 static const TCHAR kAppDir[] = _T("/opt/soui");
@@ -380,11 +382,45 @@ int main()
     SwinxFbClear(0xFF2A1A0Eu);
     SwinxSetFbPresentCb(host_present);
 
+#ifdef CNCHESS_WASM_CAIRO_FONTS
+    /* cairo 后端：字体只来自 AddFontResource 注册的 app font（见 swinx 的
+     * FontFallback.cpp —— wasm 下系统没有字体目录，fontconfig 只认 app font）。
+     * 构建已把字体目录预载进 MEMFS 的 /opt/soui/fonts，这里枚举并逐个注册；
+     * 注册失败（目录为空 / 文件损坏）则 g_cFontOk 仍置 1，但中文会回退成豆腐块，
+     * 由下面的打印暴露"注册了几个"。 */
+    {
+        const char *fontDir = "/opt/soui/fonts";
+        int nFont = 0;
+        DIR *d = opendir(fontDir);
+        if (d)
+        {
+            struct dirent *e;
+            while ((e = readdir(d)) != NULL)
+            {
+                const char *name = e->d_name;
+                size_t len = strlen(name);
+                int isFont = (len > 4 && (!stricmp(name + len - 4, ".ttf") ||
+                                          !stricmp(name + len - 4, ".ttc") ||
+                                          !stricmp(name + len - 4, ".otf")));
+                if (!isFont)
+                    continue;
+                char path[512];
+                snprintf(path, sizeof(path), "%s/%s", fontDir, name);
+                if (AddFontResourceA(path) > 0)
+                    nFont++;
+            }
+            closedir(d);
+        }
+        g_cFontOk = (nFont > 0) ? 1 : 0;
+        printf("[cnchess-wasm] font=cairo(bundled), %d file(s) registered from %s\n", nFont, fontDir);
+    }
+#else
     /* canvas2d 后端用浏览器内置字体渲染文本（见 readme.md 的"字体"一节），
      * 不再从 MEMFS 预载 TTF，也不调用 AddFontResource。stat 3 固定报 1，
      * 表示"文本字形由浏览器提供"，与 wasm-demo 的 route C 一致。 */
     g_cFontOk = 1;
     printf("[cnchess-wasm] font=canvas2d(browser)\n");
+#endif
 
     /* 和演示一样：SApplication 是进程级单例，而 simulate_infinite_loop=1 会让
      * main() 以异常方式退出并展开栈，放栈上会在主循环刚开始时被析构。 */

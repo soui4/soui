@@ -21,15 +21,40 @@
 #   SOUI_BUILD_WASM_LUA         lua-54 + ScriptModule-LUA + translator + uires/lua 预载
 #   SOUI_BUILD_WASM_SCINTILLA   Scintilla + controls.extend 的 <scintilla> 控件
 # 关掉的那一项同时从 .wasm（静态库）和 .data（预载资源）里消失。
+#
+# 命令行开关（位置参数只接受一个构建目录；也可用同名环境变量）：
+#   --gdi=canvas2d|cairo  选择 swinx 的 wasm GDI 后端（等价环境变量
+#                         SWINX_WASM_GDI_BACKEND）。canvas2d（默认）走浏览器
+#                         Canvas 2D + 系统字体；cairo 走软件光栅 + 预载字体。
+#                         --cairo / --canvas2d 是简写。不指定则沿用构建目录缓存值。
 # =============================================================================
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$HERE/../.." && pwd)"   # 本目录是 demos/wasm-demo，仓库根在上两级
-BUILD="${1:-${SOUI_WASM_BUILD:-/tmp/build-soui-wasm}}"
 TARGET="soui-wasm-demo"
 
 die() { echo "错误: $*" >&2; exit 1; }
+
+# 位置参数：构建目录（可省略）；可选开关见文件头。--gdi 与同名环境变量等价，
+# 但命令行优先级更高（循环里后赋值覆盖先赋值）。
+GDI_BACKEND="${SWINX_WASM_GDI_BACKEND:-}"
+BUILD_ARG=""
+for _arg in "$@"; do
+    case "$_arg" in
+        --gdi=*)    GDI_BACKEND="${_arg#*=}" ;;
+        --cairo)    GDI_BACKEND="cairo" ;;
+        --canvas2d) GDI_BACKEND="canvas2d" ;;
+        -h|--help)  sed -n '/^set -euo pipefail/q;p' "${BASH_SOURCE[0]}"; exit 0 ;;
+        -*)         die "未知选项: $_arg（支持 --gdi=canvas2d|cairo、--cairo、--canvas2d）" ;;
+        *)          BUILD_ARG="$_arg" ;;
+    esac
+done
+case "$GDI_BACKEND" in
+    ""|canvas2d|cairo) ;;
+    *) die "--gdi 只支持 canvas2d 或 cairo（收到: $GDI_BACKEND）" ;;
+esac
+BUILD="${BUILD_ARG:-${SOUI_WASM_BUILD:-/tmp/build-soui-wasm}}"
 
 command -v em++ >/dev/null 2>&1 || die "找不到 em++；请先 source <emsdk>/emsdk_env.sh"
 [ -f "$BUILD/CMakeCache.txt" ] || die "没有 $BUILD/CMakeCache.txt —— 先用 emcmake cmake 配置 soui4 的 wasm 构建"
@@ -59,6 +84,8 @@ RECONFIG=()
 [ -n "${SOUI_WASM_DEMO_OUT:-}" ] && RECONFIG+=("-DSOUI_WASM_DEMO_OUT=$SOUI_WASM_DEMO_OUT")
 [ -n "${SOUI_BUILD_WASM_LUA:-}" ] && RECONFIG+=("-DSOUI_BUILD_WASM_LUA=$SOUI_BUILD_WASM_LUA")
 [ -n "${SOUI_BUILD_WASM_SCINTILLA:-}" ] && RECONFIG+=("-DSOUI_BUILD_WASM_SCINTILLA=$SOUI_BUILD_WASM_SCINTILLA")
+# GDI 后端：--gdi 或同名环境变量给出时才透传，否则沿用缓存里的值。
+[ -n "$GDI_BACKEND" ] && RECONFIG+=("-DSWINX_WASM_GDI_BACKEND=$GDI_BACKEND")
 
 # 老构建目录（本脚本还是手写 em++ 的时代留下的）没有这个目标，补一次配置。
 # 空数组在 set -u 下要写成 ${arr[@]+"${arr[@]}"}，macOS 自带的 bash 3.2 不认裸的 "${arr[@]}"。

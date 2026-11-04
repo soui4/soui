@@ -10,6 +10,8 @@ rem Usage (build dir = 1st arg, or %SOUI_WASM_BUILD%, default %TEMP%\build-soui-
 rem
 rem   call <emsdk>\emsdk_env.bat              (or put emsdk on PATH)
 rem   demos\wasm-demo\build.bat D:\build-soui-wasm
+rem   demos\wasm-demo\build.bat D:\build-soui-wasm --gdi=cairo
+rem   demos\wasm-demo\build.bat --cairo D:\build-soui-wasm
 rem
 rem Tunables are CMake cache variables, passed through from same-named env vars:
 rem   SOUI_DEMO_FONT             font file (overrides auto-detection)
@@ -19,6 +21,12 @@ rem   SOUI_BUILD_WASM_LUA        0/1, lua-54 + ScriptModule-LUA + uires/lua prel
 rem   SOUI_BUILD_WASM_SCINTILLA  0/1, Scintilla + the <scintilla> control
 rem   SOUI_WASM_JOBS             parallelism (default 2: emcc hangs at high -j on
 rem                              Windows, seen 2026-10-28; set e.g. 8 to override)
+rem
+rem GDI backend (also a script flag - see usage above; env var equivalent):
+rem   SWINX_WASM_GDI_BACKEND     canvas2d (default) | cairo. canvas2d uses the
+rem                              browser Canvas 2D + system fonts; cairo uses a
+rem                              software rasterizer + preloaded font. --cairo /
+rem                              --canvas2d are shortcuts for --gdi=<value>.
 rem
 rem NOTE: keep this file ASCII-only. cmd.exe decodes batch files line by line in
 rem the active OEM codepage; UTF-8 Chinese comments get split into phantom
@@ -32,7 +40,28 @@ rem this file lives in demos\wasm-demo, so the repo root is two levels up
 for %%I in ("%HERE%..\..") do set "ROOT=%%~fI"
 set "TARGET=soui-wasm-demo"
 
+rem ---- args: [build_dir] [--gdi <v>] [--cairo|--canvas2d], any order -----------
+rem cmd.exe splits batch arguments on '=', so "--gdi=cairo" arrives as two tokens
+rem ("--gdi" "cairo"); the --gdi <value> form below therefore accepts both the
+rem space and the '=' spelling. A shift-based loop consumes the value token; any
+rem leftover non-flag token is the build dir.
+set "GDI_BACKEND=%SWINX_WASM_GDI_BACKEND%"
+set "BUILD="
+set "NEXT_GDI=0"
+:parse_args
+if "%~1"=="" goto :args_done
+if "%NEXT_GDI%"=="1" ( set "GDI_BACKEND=%~1" & set "NEXT_GDI=0" & shift & goto :parse_args )
+if /i "%~1"=="--gdi"      ( set "NEXT_GDI=1" & shift & goto :parse_args )
+if /i "%~1"=="--cairo"    ( set "GDI_BACKEND=cairo"    & shift & goto :parse_args )
+if /i "%~1"=="--canvas2d" ( set "GDI_BACKEND=canvas2d" & shift & goto :parse_args )
 set "BUILD=%~1"
+shift
+goto :parse_args
+:args_done
+if not "%GDI_BACKEND%"=="" if /i not "%GDI_BACKEND%"=="canvas2d" if /i not "%GDI_BACKEND%"=="cairo" (
+    echo ERROR: GDI backend only accepts canvas2d or cairo, got "%GDI_BACKEND%" 1>&2
+    exit /b 2
+)
 if "%BUILD%"=="" set "BUILD=%SOUI_WASM_BUILD%"
 if "%BUILD%"=="" set "BUILD=%HERE%/build"
 
@@ -67,6 +96,7 @@ if defined SOUI_DEMO_STACK         set "RECONFIG=!RECONFIG! -DSOUI_DEMO_STACK=%S
 if defined SOUI_WASM_DEMO_OUT      set "RECONFIG=!RECONFIG! -DSOUI_WASM_DEMO_OUT=%SOUI_WASM_DEMO_OUT%"
 if defined SOUI_BUILD_WASM_LUA     set "RECONFIG=!RECONFIG! -DSOUI_BUILD_WASM_LUA=%SOUI_BUILD_WASM_LUA%"
 if defined SOUI_BUILD_WASM_SCINTILLA set "RECONFIG=!RECONFIG! -DSOUI_BUILD_WASM_SCINTILLA=%SOUI_BUILD_WASM_SCINTILLA%"
+if defined GDI_BACKEND set "RECONFIG=!RECONFIG! -DSWINX_WASM_GDI_BACKEND=!GDI_BACKEND!"
 
 rem ---- configure when missing, or when the old cache lacks the demo flag -----
 echo == configure: %BUILD%

@@ -20,8 +20,10 @@ SNSBEGIN
  *   creates a new row on demand (MFC CRebar style).
  * - Locked single-row: when singleRow is true (default) the rebar is always one
  *   row; dragging only reorders within that row and can NEVER create new rows.
+ * - Vertical layout: when vertical is true the bands are stacked top-to-bottom in
+ *   one column instead of laid out left-to-right.
  * - Drag reordering: drag bands via the gripper to change order within/between rows
- * - Width adjustment: drag the splitter to adjust band width
+ * - Width (or height, in vertical mode) adjustment: drag the splitter
  * - Collapse function: supports collapsing/expanding bands
  * - Visual feedback: mouse hover highlight and drag state display
  *
@@ -36,9 +38,15 @@ SNSBEGIN
  *   that row and can NEVER create additional rows. When false, multi-row is
  *   allowed: dragging a band above/below an existing row creates a new row (MFC
  *   CRebar style), and the per-band `row` attribute sets the initial row.
+ * - vertical: stack the bands top-to-bottom instead of left-to-right (default false).
+ *   In vertical mode the rebar is a single column: bands are full width, the
+ *   gripper sits on top of each band and the splitter on its bottom edge
+ *   (drag to change band height). singleRow is ignored.
  * - row (per band): 0-based initial row index of the band, only effective when
  *   singleRow is false. A band starts a new row when its row index differs from
  *   the previous band's. Omitted bands default to row 0.
+ * - width (per band): initial band width (horizontal mode); when omitted the width
+ *   is derived from the band child's desired size.
  * - colorGripper: gripper background color
  * - colorGripperDot: gripper dot color
  */
@@ -64,6 +72,8 @@ class SOUI_EXP SRebar : public SWindow {
         int minWidth;      /**< Minimum width */
         int maxWidth;      /**< Maximum width */
         bool bNewRow;      /**< In multi-row mode, true means starting a new row from this band (set at init from the per-band row attribute, or produced by dragging) */
+        bool bHeightUserSet; /**< Height was dragged by the user (vertical mode), so it is no longer derived from the child */
+        bool bChildHiddenByRebar; /**< The band child was hidden by this control (collapse), so expanding has to show it again */
         BandInfo()
             : height(24)
             , bCollapsible(false)
@@ -75,6 +85,8 @@ class SOUI_EXP SRebar : public SWindow {
             , minWidth(40)
             , maxWidth(2000)
             , bNewRow(false)
+            , bHeightUserSet(false)
+            , bChildHiddenByRebar(false)
         {
         }
     };
@@ -153,6 +165,35 @@ class SOUI_EXP SRebar : public SWindow {
      */
     BandInfo *GetBandInfo(int nIndex);
 
+    /**
+     * @brief Whether the bands are stacked top-to-bottom (vertical) or laid out left-to-right
+     */
+    bool IsVertical() const
+    {
+        return m_bVertical;
+    }
+
+    /**
+     * @brief Switch between the horizontal and the vertical layout and relayout
+     */
+    void SetVertical(bool bVertical);
+
+    /**
+     * @brief Read the current band order as a list of band titles
+     *
+     * Used by hosts that want to persist the arrangement the user dragged the
+     * bands into. Titles are the only stable identifier a band has.
+     */
+    void GetBandOrder(SArray<SStringT> *titles) const;
+
+    /**
+     * @brief Re-apply a band order saved earlier
+     *
+     * Titles that are not found are ignored; bands missing from the list keep
+     * their relative order at the end. Returns true when the order changed.
+     */
+    bool SetBandOrder(const SArray<SStringT> &titles);
+
   protected:
     /** Message handling methods */
     void OnPaint(IRenderTarget *pRT);
@@ -199,6 +240,11 @@ class SOUI_EXP SRebar : public SWindow {
     void DrawBand(IRenderTarget *pRT, int nIndex, const CRect &rcBand);
     void DrawGripper(IRenderTarget *pRT, const CRect &rcGripper);
 
+    /** Rectangle of the drag handle inside a band, depends on the orientation */
+    CRect GetGripperRect(const CRect &rcBand) const;
+    /** Rectangle of the width/height splitter inside a band, depends on the orientation */
+    CRect GetSplitterRect(const CRect &rcBand) const;
+
   protected:
     /** Color attributes */
     COLORREF m_crGripper;    /**< gripper color */
@@ -217,14 +263,13 @@ class SOUI_EXP SRebar : public SWindow {
     bool m_bDragging; /**< Dragging in progress (gripper reorder or splitter resize) */
     bool m_bResizing; /**< true=drag splitter to resize, false=drag gripper to reorder */
     CRect m_rcClient;
-    bool m_bSingleRow; /**< Hard constraint: true = the rebar is locked to a single row (default).
-                             When true, layout ignores every band's bNewRow flag and dragging never
-                             creates a new row. When false, multi-row layout (driven by bNewRow and
-                             the per-band `row` attribute) and drag-to-new-row are enabled. */
+    bool m_bSingleRow; /**< true=single row (default), false=multi-row (bNewRow from dragging determines wrapping) */
+    bool m_bVertical;  /**< true=bands stack top-to-bottom in a single column, false=left-to-right rows */
 
     /** Attribute map */
     SOUI_ATTRS_BEGIN()
-        ATTR_BOOL(L"singleRow", m_bSingleRow, TRUE)
+        ATTR_BOOL(L"singleRow", m_bSingleRow, FALSE)
+        ATTR_BOOL(L"vertical", m_bVertical, FALSE)
         ATTR_COLOR(L"colorGripper", m_crGripper, TRUE)
         ATTR_COLOR(L"colorGripperDot", m_crGripperDot, TRUE)
     SOUI_ATTRS_END()

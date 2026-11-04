@@ -21,8 +21,19 @@ set(SOUI_WASM_CNCHESS_OUT "${CMAKE_CURRENT_SOURCE_DIR}/out" CACHE PATH
 # 但 SHostWnd::Create() 的建窗递归仍按桌面线程栈深度写，5 MB 下会直接踩爆。
 set(SOUI_CNCHESS_STACK "32MB" CACHE STRING "cnchess wasm: -sSTACK_SIZE")
 
-# 字体：canvas2d 后端用浏览器的内置字体渲染文本（与 demos/wasm-demo 的 route C 一致），
-# 不再从 MEMFS 预载 TTF，也不再调用 AddFontResource。原 SOUI_CNCHESS_FONT 选项已废弃。
+# 字体：GDI 后端由 swinx/wasm.cmake 的 SWINX_WASM_GDI_BACKEND 决定（与 libswinx.a
+# 同一次编译参数，业务层在命令行 -DSWINX_WASM_GDI_BACKEND=... 即可同时驱动 swinx
+# 与 cnchess 两端）：
+#   canvas2d（默认）：文本走浏览器内置字体，不预载字体、不调 AddFontResource；
+#   cairo：文本/字体由 freetype + fontconfig 负责，必须把字体文件预载进 MEMFS 的
+#          /opt/soui/fonts，并在 cnchess_main.cpp 里 AddFontResourceA 注册。
+# 原 SOUI_CNCHESS_FONT 选项已废弃。
+
+# SWINX_WASM_GDI_BACKEND 是 swinx/wasm.cmake 定义的 cache 变量；这里给个回落默认，
+# 避免 cnchess 子目录先于 swinx 处理、而命令行又没传该变量时取到空值。
+if(NOT DEFINED SWINX_WASM_GDI_BACKEND OR SWINX_WASM_GDI_BACKEND STREQUAL "")
+    set(SWINX_WASM_GDI_BACKEND "canvas2d")
+endif()
 
 foreach(_req
         "${CMAKE_CURRENT_SOURCE_DIR}/../uires/uires.idx"
@@ -32,11 +43,22 @@ foreach(_req
     endif()
 endforeach()
 
-# 资源挂载点必须和 cnchess_main.cpp 里的 kAppResDir/kSysResDir 一致
-# （文本走 canvas2d 的浏览器内置字体，不再挂载 /opt/soui/fonts）。
+# 资源挂载点必须和 cnchess_main.cpp 里的 kAppResDir/kSysResDir 一致。
+# canvas2d 不挂字体目录；cairo 把 fonts/ 下的字体预载进 MEMFS 的 /opt/soui/fonts
+# （cnchess_main.cpp 在 CNCHESS_WASM_CAIRO_FONTS 宏下枚举并 AddFontResourceA）。
 set(_soui_cnchess_preload
     "--preload-file=${CMAKE_CURRENT_SOURCE_DIR}/../uires@/opt/soui/uires"
     "--preload-file=${PROJECT_SOURCE_DIR}/soui-sys-resource@/opt/soui/soui-sys-resource")
+set(_soui_cnchess_cairo_fonts OFF)
+if(SWINX_WASM_GDI_BACKEND STREQUAL "cairo")
+    set(_soui_cnchess_fonts_dir "${CMAKE_CURRENT_SOURCE_DIR}/fonts")
+    if(NOT IS_DIRECTORY "${_soui_cnchess_fonts_dir}")
+        message(FATAL_ERROR "cairo 后端需要字体目录 ${_soui_cnchess_fonts_dir}（放 .ttf/.ttc/.otf）")
+    endif()
+    list(APPEND _soui_cnchess_preload
+         "--preload-file=${_soui_cnchess_fonts_dir}@/opt/soui/fonts")
+    set(_soui_cnchess_cairo_fonts ON)
+endif()
 
 # _malloc/_free：JS 侧要把控件名/文本写进线性内存再传进来。
 # 观测口（CnchessStat/CnchessChildXxx）是无头烟测唯一的取证方式：
@@ -106,6 +128,10 @@ target_compile_options(cnchess-wasm PRIVATE -O0 -g -Wall -Wno-unused-variable)
 target_compile_definitions(cnchess-wasm PRIVATE
     SWINX_FB_WIDTH=${SWINX_FB_WIDTH}
     SWINX_FB_HEIGHT=${SWINX_FB_HEIGHT})
+if(_soui_cnchess_cairo_fonts)
+    # cnchess_main.cpp 据此把 /opt/soui/fonts 下的字体枚举并 AddFontResourceA。
+    target_compile_definitions(cnchess-wasm PRIVATE CNCHESS_WASM_CAIRO_FONTS)
+endif()
 
 target_include_directories(cnchess-wasm PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/..
@@ -172,5 +198,10 @@ add_custom_command(TARGET cnchess-wasm POST_BUILD
         "${SOUI_WASM_CNCHESS_OUT}/soui-host.js"
     COMMENT "Copying soui-host.js for cnchess-wasm")
 
+if(_soui_cnchess_cairo_fonts)
+    set(_soui_cnchess_font_mode "cairo(bundled) -> /opt/soui/fonts")
+else()
+    set(_soui_cnchess_font_mode "canvas2d(browser)")
+endif()
 message(STATUS "SOUI_WASM_CNCHESS: ${SWINX_FB_WIDTH}x${SWINX_FB_HEIGHT}, stack=${SOUI_CNCHESS_STACK}, "
-               "font=canvas2d(browser) -> ${SOUI_WASM_CNCHESS_OUT}")
+               "gdi-backend=${SWINX_WASM_GDI_BACKEND}, font=${_soui_cnchess_font_mode} -> ${SOUI_WASM_CNCHESS_OUT}")
