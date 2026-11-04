@@ -220,8 +220,8 @@ class SOUI_EXP SSkinImgList : public SSkinObjBase {
     FilterLevel m_filterLevel;         /**< Filter level for image scaling */
     TileMode m_tileMode;               /**< Tile mode for the image */
   protected:
-    mutable SAutoRefPtr<ISvgObj> m_pSvg;       /**< Pointer to the SVG object */
-    mutable SAutoRefPtr<IBitmapS> m_pImg;      /**< Pointer to the bitmap source */
+    mutable SAutoRefPtr<ISvgObj> m_pSvg;  /**< Pointer to the SVG object */
+    mutable SAutoRefPtr<IBitmapS> m_pImg; /**< Pointer to the bitmap source */
     enum
     {
         kSvgCacheSlots = 4
@@ -233,9 +233,9 @@ class SOUI_EXP SSkinImgList : public SSkinObjBase {
     };
     mutable SSvgCacheSlot m_aSvgCache[kSvgCacheSlots];
     mutable int m_nSvgCacheNext;
-    mutable SStringW m_strSrc;                 /**< Source string for the image */
-    BOOL m_bLazyLoad;                          /**< Flag to indicate lazy loading */
-    BOOL m_bCacheSvg;                          /**< Cache SVG as bitmap for drawing (enabled by default) */
+    mutable SStringW m_strSrc; /**< Source string for the image */
+    BOOL m_bLazyLoad;          /**< Flag to indicate lazy loading */
+    BOOL m_bCacheSvg;          /**< Cache SVG as bitmap for drawing (enabled by default) */
 
   protected:
     SIZE GetImageSize(BOOL bRaw = FALSE) const;

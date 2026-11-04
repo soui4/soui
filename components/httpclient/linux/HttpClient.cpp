@@ -1,4 +1,4 @@
-#include "HttpClient.h"
+﻿#include "HttpClient.h"
 #include <fstream>
 #include <sstream>
 #include "define.h"
@@ -56,6 +56,20 @@ size_t CWinHttp::write_data_string(void* ptr, size_t size, size_t nmemb, void* u
     std::stringstream * fout = (std::stringstream*)user_data;
     fout->write((const char*)ptr,size*nmemb);
     return nmemb;
+}
+
+// 收集响应头原文（逐行回调），交给 CookieUtil 解析 Set-Cookie
+size_t CWinHttp::collect_header(char* ptr, size_t size, size_t nmemb, void* user_data) {
+    std::string * pHeader = (std::string*)user_data;
+    const size_t len = size * nmemb;
+    if (pHeader && len) pHeader->append(ptr, len);
+    return len;
+}
+
+// 只要 Cookie，响应体全部丢弃（避免把整页 HTML 读进内存）
+size_t CWinHttp::discard_body(char* ptr, size_t size, size_t nmemb, void* user_data) {
+    (void)ptr; (void)user_data;
+    return size * nmemb;
 }
 
 // 进度回调函数
@@ -156,6 +170,9 @@ BOOL CWinHttp::Request(IStringA *out, LPCSTR lpUrl, RequestType type, LPCSTR lpP
 
 BOOL CWinHttp::Request2(IStringA *out, LPCSTR lpUrl, RequestType type, LPVOID lpPostData, DWORD dwDataLen, LPCSTR lpHeader/*=NULL*/ )
 {
+	// 先置为 -1：Init/perform 失败时调用方读 GetHttpCode 得到的是 -1（网络层失败），
+	// 而不是上一次请求残留的状态码。
+	m_httpCode = -1;
 	Close();
 	if ( !Init() )
 		return false;
@@ -175,11 +192,22 @@ BOOL CWinHttp::Request2(IStringA *out, LPCSTR lpUrl, RequestType type, LPVOID lp
         curl_easy_setopt(curl, CURLOPT_POST, 0L);
         break;
     }
+    // 与 WinHTTP 后端对齐：WinHTTP 默认跟随重定向，这里也开启，
+    // 否则遇到 301/302 会拿到空 body（东财部分接口会做 http->https 跳转）。
+    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+    curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 5L);
     std::string postData((const char*)lpPostData,dwDataLen);
     if(lpPostData && dwDataLen){
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postData.c_str());
     }
+    // 合并"全局头"（SetHeader 累积）与"本次请求头"（lpHeader）。
+    // 以前这里只用 m_header，lpHeader 被静默丢弃，导致同一个调用在 WinHTTP 后端
+    // 能带上 Referer/Cookie，在 libcurl 后端却发不出去 —— 跨平台行为不一致。
     std::string strHeader = m_header.toHttpHeaders();
+    if (lpHeader && lpHeader[0] != '\0') {
+        strHeader += lpHeader;
+        strHeader += http_newline;
+    }
     struct curl_slist* headers = add_headers_from_string(strHeader.c_str());
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
@@ -215,6 +243,64 @@ BOOL CWinHttp::Request2(IStringA *out, LPCSTR lpUrl, RequestType type, LPVOID lp
 void CWinHttp::SetHeader(LPCSTR pszKey,LPCSTR pszValue)
 {
 	m_header.addHeader(pszKey,pszValue);
+}
+
+BOOL CWinHttp::GetCookie(IStringA *out, LPCSTR lpUrl)
+{
+	if (out == NULL || lpUrl == NULL) {
+		m_error = Hir_ParamErr;
+		return FALSE;
+	}
+	out->Empty();
+
+	Close();
+	if (!Init()) {
+		m_error = Hir_InitErr;
+		return FALSE;
+	}
+
+	std::string strRawHeaders;
+	curl_easy_setopt(curl, CURLOPT_URL, lpUrl);
+	curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, m_nConnTimeout / 1000);
+	curl_easy_setopt(curl, CURLOPT_TIMEOUT, (m_nConnTimeout + m_nRecvTimeout) / 1000);
+	curl_easy_setopt(curl, CURLOPT_POST, 0L);
+	// 与 WinHTTP 行为对齐：WinHTTP 默认跟随重定向（且会在重定向链路里带上 Cookie），
+	// 所以这里也要开启，否则 ASP.NET 站点 302 之后就取不到 Set-Cookie 了。
+	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+	curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 5L);
+
+	std::string strHeader = m_header.toHttpHeaders();
+	struct curl_slist* headers = add_headers_from_string(strHeader.c_str());
+	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+
+	curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, collect_header);
+	curl_easy_setopt(curl, CURLOPT_HEADERDATA, &strRawHeaders);
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, discard_body);
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, NULL);
+
+	res = curl_easy_perform(curl);
+	m_httpCode = 0;
+	curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &m_httpCode);
+	if (headers) {
+		curl_slist_free_all(headers);
+	}
+	if (res != CURLE_OK) {
+		// 与 Win 端一致：网络层失败才算错误，状态码交给调用方判断
+		m_error = Hir_SendErr;
+		Close();
+		return FALSE;
+	}
+
+	std::string strCookie = CookieUtil::ParseFromRawHeaders(strRawHeaders);
+	Close();
+	if (strCookie.empty()) {
+		// 没有 Cookie 不算错误，调用方按"无会话"继续请求即可
+		m_error = Hir_Success;
+		return FALSE;
+	}
+	out->Assign2(strCookie.c_str(), (int)strCookie.size());
+	m_error = Hir_Success;
+	return TRUE;
 }
 
 namespace HttpClient

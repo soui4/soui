@@ -10,7 +10,7 @@ set(SOUI_ROOT_DIR ${SOUI_COM_DIR}/..)
 #     src/gdi/cairo 在 wasm 上编译通过；
 #   - imgdecoder-stb 是必填项：SAppCfg::DoConfig 拿不到 IImgDecoderFactory 会直接
 #     返回 FALSE，应用起不来。
-# 其余组件不进构建图：log4z/TaskLoop/SIpcObject/ws/network
+# 其余组件不进构建图：log4z/SIpcObject/network
 # 依赖桌面或联网能力，resprovider-7zip 依赖 7z，resprovider-zip 依赖
 # third-part/zlib —— 那份 zlib 和 swinx/thirdparty 里的 zlib_static 是同一批符号的
 # 两份拷贝，桌面构建分处不同 .so 无所谓，wasm 全链进一个模块会报 duplicate symbol
@@ -27,11 +27,13 @@ if(SOUI_BUILD_WASM_LUA)
 add_subdirectory(ScriptModule-LUA)
 add_subdirectory(translator)
 endif()
-# 中国象棋 wasm 客户端要多四个组件：TaskLoop（单线程队列）、ws（浏览器
-# WebSocket）、resprovider-zip（解压服务器下发的主题包）和它依赖的 zlib。
-# 三者都按 wasm 形态单独实现/接线，默认演示构建不受影响。
-if(SOUI_BUILD_WASM_CNCHESS)
+# TaskLoop 在 wasm 最小构建图里常驻：SOUI 的 ITaskLoop 是公共面（SApplication 和
+# 应用侧解压/AI 都靠它把慢活儿挪出 UI 线程），后端由 components/TaskLoop 自己按
+# EMSCRIPTEN 分派成"泵 / worker 线程"两条路。
 add_subdirectory(TaskLoop)
+# 中国象棋 wasm 客户端还要三个组件：ws（浏览器 WebSocket）、resprovider-zip
+# （解压服务器下发的主题包）和它依赖的 zlib，都按 wasm 形态单独实现/接线。
+if(SOUI_BUILD_WASM_CNCHESS)
 add_subdirectory(ws)
 add_subdirectory(resprovider-zip)
 endif()

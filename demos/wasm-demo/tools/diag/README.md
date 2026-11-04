@@ -335,3 +335,66 @@ node check_imports.cjs ../../demos/wasm/out
 
 注意 `bench_repaint.cjs` 的 `frames` 也是判据：上屏路径若对"非整行宽的脏矩形"逐行
 `putImageData`，12 次切页的上屏次数会从 24 次暴涨到上万次。
+
+## 三个"擦不干净 / 残影"取证脚本（canvas2d）
+
+动画出现拖影、旧内容擦不掉时，用这组脚本把问题切成三段：**画面 → 上屏 → 绘制**。
+都在"Lua 游戏"标签里的俄罗斯方块页面上跑，`click()` 里的坐标与 800x600 逻辑尺寸
+对应；换了 demo 要同步改。
+
+```bash
+# 1) 上屏是否精确：逐帧比对"窗口离屏画布"与"显示画布"，有差异就是脏矩形漏刷
+node prescmp.cjs 150
+
+# 2) 逐帧抓真像素（页面内 toDataURL，~60fps；CDP 截图在 dpr>1 时会被插值）
+node tetris_frames.cjs <tag> 400          # 输出 frames_<tag>/
+
+# 3) CDP 连拍 + 自动玩（硬降、堆高、消行），可带 dpr 档位复现浏览器缩放下的问题
+DSF=1.25 SWX_HEADED=1 node tetris_play.cjs <tag> 200
+```
+
+判读：
+
+* `prescmp.cjs` 的 `badCount` 必须是 **0**。不为 0 说明 `SwxPresentSurface` 合并脏
+  矩形时漏了区域 —— 问题在上屏，不在绘制。
+* 同一次输出里的 `id` 是命中窗口画布的 `__swxCtx` 下标，正常只剩"同时存活的画布数"
+  那么大（个位到几十）。**持续增长**就是下标没归还，即老问题"越玩越卡"。
+* `tetris_play.cjs` 存的是 CDP 给的设备像素，dpr=1.25 时会被浏览器插值，判色别直接
+  拿逻辑坐标除；要 1:1 真像素用 `tetris_frames.cjs`。
+
+2026-11 用它定位到的那次回归：`DrawBitmapEx` 把 NONE/TILE 的贴图也打开了平滑，块边界
+出现一圈半透明缝、底层内容透出来，看起来就像"动画轨道没擦干净"。
+
+### cliptrace.cjs —— clip 状态栈取证（不依赖颜色）
+
+`prescmp.cjs` 判的是「离屏画布 vs 显示画布」，两边一致地错它抓不到；颜色判据又容易被
+棋盘里的黄色方块、光波、碎片污染。要判定 canvas2d 的 `clip()` 状态栈是否错位，用
+`cliptrace.cjs`：它 hook `save/restore/beginPath/rect/clip/clearRect/fillRect`，自己维护
+一份 clip 栈镜像，统计 clip 次数、save/restore 是否配平、以及 fillRect/clearRect 的请求
+矩形被有效 clip 截断的次数。
+
+```bash
+SWX_OUT=out.canvas2d SWX_TAG=after DSF=1.25 node cliptrace.cjs 2400
+```
+
+判读：
+
+* `saves == restores` 且 `maxDepth` 稳定 ⇒ 状态栈没泄漏；`zeroClip > 0` 是明显异常。
+* `truncatedFill/clear` 偏高不一定有问题（控件窄 clip 是常态）。要看 `narrowFill` /
+  `narrowClear`：它统计「请求宽度 >100 但有效 clip 宽度 <20」，正是整窗擦除被一条
+  残留窄 clip 截断、旧动画位置擦不掉的特征。
+* 两版产物对比时先看 `clips` / `saves` 的量级变化，确认修复确实改变了运行时路径；
+  再配合静态像素 A/B（同一操作序列抓 `__swxDisplay.canvas.toDataURL()`）排除视觉回归。
+
+`prescmp.cjs` / `tetris_frames.cjs` / `tetris_play.cjs` / `cliptrace.cjs` 都支持 `SWX_OUT`
+（产物目录，默认 `out`）与 `DSF`（deviceScaleFactor），便于把 cairo 与 canvas2d 产物
+分目录放、互不覆盖。**改产物目录要用 `-DSOUI_WASM_DEMO_OUT=...` 重配 CMake cache，
+别直接改脚本去指错目录。**
+
+2026-11 第二次回归：四行消除的飞分文字沿抛物线留下一串 3~4px 宽的金色窄条（偶发，
+需多次重复）。`86aab48` 把 `canvas_blit_rect` 的 per-blit `SAVE/CLIP/RESTORE` 改成条件
+执行、并删掉 `DrawBitmapEx` / `DrawBitmap9Patch` 外层那一对；同时 `clipRectDevice()` 的
+「逻辑矩形相同就跳过」会在 viewport origin 变化时连 `clipBoxIntersect()` 一起跳过，
+`rcClip` 停留在旧框。canvas 的 clip 固化在设备空间且累积求交，`ClearRect()` 又是
+`save → clip → fillRect(copy) → restore`，一旦设备 clip 残留成窄条，擦除就只能清掉窄条
+内的像素。修复恢复保守 clip 语义，同机 A/B：静态首页 0 像素差异、帧间隔 +1.1%。

@@ -182,11 +182,42 @@ if(EMSCRIPTEN)
     # 无头烟测据此跳过被关掉的页内断言（关功能不该让烟测变红）。
     option(SOUI_BUILD_WASM_LUA "wasm: build ScriptModule-LUA + lua-54 + translator and preload uires/lua" ON)
     option(SOUI_BUILD_WASM_SCINTILLA "wasm: build Scintilla and the <scintilla> control from controls.extend" ON)
-    # 中国象棋客户端（games/cnchess/client）的 wasm 版本。它比演示多要三个组件：
-    # TaskLoop 的单线程后端、ws 的浏览器 WebSocket 后端、resprovider-zip（解压
-    # 服务器下发的主题包）。开关只挂 games/cnchess/algorithm + client/wasm 两个
-    # 子目录，桌面构建不受影响。
+    # 中国象棋客户端（games/cnchess/client）的 wasm 版本。它比演示多要两个组件：
+    # ws 的浏览器 WebSocket 后端、resprovider-zip（解压服务器下发的主题包）。
+    # TaskLoop 的 wasm 后端已是最小构建的常驻组件，不在此列。开关只挂
+    # games/cnchess/algorithm + client/wasm 两个子目录，桌面构建不受影响。
     option(SOUI_BUILD_WASM_CNCHESS "wasm: build the cnchess client (games/cnchess/client/wasm)" OFF)
+    # worker 线程能力开关。打开后整个 wasm 构建图带上 -pthread：
+    #   components/TaskLoop 的 worker 后端（ITaskLoop::start 建一条 worker 线程，
+    #   UI 只入队 + Atomics 唤醒）需要它；
+    #   同时必须 -sWASMFS=1 —— 默认的 JS 文件系统下，worker 里的任何 stdio 都要
+    #   浏览器主线程在 futex 忙等里代为处理请求，而本端口的主线程从不阻塞
+    #   （实测：主线程不睡时 worker 的 fopen 永不返回；WASMFS=1 后 47ms 跑完）。
+    # 代价是 SharedArrayBuffer，也就是站点必须 crossOriginIsolated（COOP+COEP 响应
+    # 头），python -m http.server 那套起法跑不了，见 demos/wasm-demo/serve-isolated.py。
+    # 默认关闭：关掉时构建图、产物与烟测和开这个选项之前完全一致。
+    option(SOUI_WASM_PTHREADS "wasm: build with -pthread so ITaskLoop can run on a worker thread" OFF)
+    if(SOUI_WASM_PTHREADS)
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+        # swinx 与 components 都按这个宏分派后端，不靠编译器宏：
+        # __EMSCRIPTEN_PTHREADS__ 只有编译单元自己带 -pthread 时才定义，
+        # 而宿主（soui-host.js / cnchess_main.cpp）需要知道链接期能力是否可用。
+        add_compile_definitions(SOUI_WASM_PTHREADS=1)
+        # 链接期三条设置放在根目录，让每个 wasm 可执行目标（演示、cnchess）拿到
+        # 同一份配置 —— 只在某个 demo 的 CMakeLists 里补，别的目标一开这个开关就会
+        # 在 wasm-ld 期报错（cnchess 实测：INITIAL_MEMORY 默认 16MB < STACK_SIZE 32MB）。
+        #   -sWASMFS=1        文件系统搬进线性内存。默认的 JS 文件系统下，worker 里的
+        #                     每次 stdio 都要浏览器主线程在 futex 忙等里代跑，而本端口
+        #                     的主线程从不阻塞（实测：主线程不睡时 worker 的 fopen 永不
+        #                     返回，换 WASMFS=1 后同一个读 47ms 跑完）。
+        #   -sINITIAL_MEMORY  Emscripten 硬性要求它大于 STACK_SIZE；栈是主线程的静态栈，
+        #                     worker 栈另从堆里按 4MB 一条分配（TaskLoopWasm.cpp）。
+        #   GrowableArrayBuffers 1 = 有 resizable buffer 就用，没有照旧。pthreads 与
+        #                     ALLOW_MEMORY_GROWTH 并存时，不用它的构建要走一段很慢的胶水。
+        add_link_options("-sWASMFS=1" "-sINITIAL_MEMORY=64MB" "-sGROWABLE_ARRAYBUFFERS=1")
+        message(STATUS "SOUI_WASM_PTHREADS: -pthread + -sWASMFS=1，产物需要 crossOriginIsolated 才能跑")
+    endif()
     # Emscripten 用 clang 编译，而下面 Darwin 分支的告警抑制只按目标平台判断，交叉编译
     # 到 wasm 时不生效：同一批头文件会在 macOS/Linux 主机上各刷上万条
     # -Winconsistent-missing-override。这里按编译器口径补一条，与 §Darwin 分支一致。

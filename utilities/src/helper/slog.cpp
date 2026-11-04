@@ -24,6 +24,9 @@ namespace {
 const unsigned int LOG_DOMAIN_SOUI_OHOS = 0x5350;
 }
 #endif//__OHOS__
+#ifdef __EMSCRIPTEN__
+#include <emscripten/emscripten.h>
+#endif//__EMSCRIPTEN__
 SNSBEGIN
 
 //////////////////////////////////////////////////////////////////////////
@@ -31,6 +34,7 @@ int SLog::s_logLevel = LOG_LEVEL_INFO;
 bool SLog::s_enableEcho = true;
 LogCallback SLog::gs_logCallback = NULL;
 
+#if !defined(__EMSCRIPTEN__)
 static bool IsConsoleProgram()
 {
 #if defined(_WIN32) && !defined(FREERTOS_HOST)
@@ -39,6 +43,7 @@ static bool IsConsoleProgram()
     return true;
 #endif
 }
+#endif//!defined(__EMSCRIPTEN__)
 
 SLog::SLog(const char *tag, int level, const char *filename, const char *funcname, int lineIndex, void *pAddr)
     : m_level(level)
@@ -63,9 +68,33 @@ SLog::~SLog()
     }
     if (s_enableEcho)
     {
+        uint32_t tid = (uint32_t)GetCurrentThreadId();
+#if defined(__EMSCRIPTEN__)
+        // Emscripten / WebAssembly：走浏览器 console 的分级通道，不经 stdio，
+        // 因此不受宿主覆写 Module.print 或 stdout 缓冲影响；worker 线程里
+        // fwrite(stdout) 也不可靠，而 console.* 在 worker 中同样可用。
+        // 浏览器控制台自带时间戳，这里不再调 GetLocalTime——wasm 上它会落到
+        // __localtime_js（建 JS Date + 分配 struct tm），是日志热路径的已知开销
+        // （见 doc/soui-wasm-port-plan.md 的性能章节）。
+        int flags = EM_LOG_CONSOLE;
+        const char *levelStr = "trace";
+        switch (m_level)
+        {
+        case LOG_LEVEL_TRACE: levelStr = "trace"; flags |= EM_LOG_DEBUG;  break;
+        case LOG_LEVEL_DEBUG: levelStr = "debug"; flags |= EM_LOG_DEBUG;  break;
+        case LOG_LEVEL_INFO:  levelStr = "info";  flags |= EM_LOG_INFO;   break;
+        case LOG_LEVEL_WARN:  levelStr = "warn";  flags |= EM_LOG_WARN;   break;
+        case LOG_LEVEL_ERROR: levelStr = "error"; flags |= EM_LOG_ERROR;  break;
+        case LOG_LEVEL_ALARM: levelStr = "alarm"; flags |= EM_LOG_ERROR;  break;
+        case LOG_LEVEL_FATAL: levelStr = "fatal"; flags |= EM_LOG_ERROR;  break;
+        default: break;
+        }
+        // m_logBuf 可能包含 '%'，必须作为 %s 实参，绝不能当格式串传给 emscripten_log。
+        emscripten_log(flags, "tid=%u [%s/%s] %s (%s %s:%d)",
+                       tid, m_tag, levelStr, m_logBuf, m_func, m_file, m_line);
+#else
         SYSTEMTIME wtm;
         GetLocalTime(&wtm);
-        uint32_t tid = (uint32_t)GetCurrentThreadId();
 #ifdef __ANDROID__
         int level = ANDROID_LOG_DEBUG;
         switch(m_level){
@@ -114,6 +143,7 @@ SLog::~SLog()
         }
         free(logbuf2);
 #endif//__ANDROID__
+#endif//__EMSCRIPTEN__
     }
 }
 
@@ -127,11 +157,20 @@ void SLog::setLogLevel(int nLevel)
     s_logLevel = nLevel;
 }
 
+int SLog::getLogLevel(){
+    return s_logLevel;
+}
 // setLogCallback is not thread safe.
 // call this at the beginning of program please.
-void SLog::setLogCallback(LogCallback logCallback)
+LogCallback SLog::setLogCallback(LogCallback logCallback)
 {
+    LogCallback ret = gs_logCallback;
     gs_logCallback = logCallback;
+    return ret;
+}
+
+LogCallback SLog::getLogCallback(){
+    return gs_logCallback;
 }
 
 void SLog::setLogEcho(bool bEnable)
@@ -139,6 +178,9 @@ void SLog::setLogEcho(bool bEnable)
     s_enableEcho = bEnable;
 }
 
+bool SLog::isLogEcho(){
+    return s_enableEcho;
+}
 //////////////////////////////////////////////////////////////////////////
 
 SLogStream::SLogStream(SLogStream &)

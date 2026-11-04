@@ -53,9 +53,13 @@
          仅在宫格以外的页面显示;
       3. tab_main 隐藏页签头(tabHeight=0),九宫格首页与 7 个演示分区页均由 tabctrl 承载,
          animateSteps=30(300ms)+Decelerate 插值器提供页面滑动切换动画,
-         页面切换统一由宫格卡片和返回按钮驱动(SetCurSel)。
+         页面切换统一由宫格卡片和返回按钮驱动(SetCurSel);
+      4. root 的 focusAniSkin 是焦点框皮肤(不配置就不显示焦点框),焦点切换时由 animator: 段的
+         rect 动画把焦点框移过去,到达后停留 2 秒再由 fade: 段的 alpha 动画淡出。
   -->
   <root skin="_skin.sys.wnd.bkgnd" cache="1" on_init="on_init" on_exit="on_exit"
+        focusAniSkin="skin_focus_ani" focusAni:duration="200" focusAni:interpolator="Decelerate"
+        fade:duration="200" fade:interpolator="Accelerate"
         enterAnimation="anim:alpha_in" exitAnimation="anim:alpha_out">
     <window pos="1,1,-1,-1" id="9527" skin="demoskinbk" cache="1" colorBkgnd="#169ada"/>
     <caption pos="0,0,-0,30" font="adding:2" layout="hbox" gravity="center" padding_left="10">

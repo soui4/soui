@@ -34,6 +34,7 @@
 #include <vector>
 
 #include <windows.h>
+#include <commdlg.h> // SwinxPickFileAsyncA：异步文件选择（swinx 私有扩展）
 #include <souistd.h>
 #include <SApp.h>
 #include <tchar.h>
@@ -46,7 +47,7 @@
  * third-part/zlib 与 swinx/thirdparty 的 zlib_static 是同一批符号的两份拷贝，
  * 链进同一个模块会 duplicate symbol）。按位关掉后对应分支编译成 return FALSE，
  * 不产生任何引用。 */
-#define SCOM_MASK (scom_mask_render_gdi | scom_mask_imgdecoder_stb)
+#define SCOM_MASK (scom_mask_render_gdi | scom_mask_imgdecoder_stb | scom_mask_taskloop)
 
 #include <SAppCfg.h>
 #include <core/SHostWnd.h>
@@ -58,6 +59,11 @@
 #include "SCtrlsRegister.h"
 #include "SHexEdit.h"
 #include "SProgressRing.h"
+/* ITaskLoop 的 wasm 后端（泵 / worker 线程两条路）与它的诊断计数。宿主既要在
+ * 每帧泵一次队列，也要在自测里断言"任务真的跑在了非 UI 线程上"。 */
+#include <TaskLoop/wasm/TaskLoopWasm.h>
+#include <interface/SMsgLoop-i.h>
+#include <helper/SFunctor.hpp>
 /* MVC 页要用的适配器契约（数据源 → ILvAdapter → SItemPanel 复用）和三个虚拟列表
    控件；表格页/图表页的控件都在 ExtendCtrls 里，头文件路径相对 controls.extend，
    demo 目标的 include 目录已经带了它。 */
@@ -1224,16 +1230,162 @@ static void host_present(const RECT *dirty)
     }, dirty->left, dirty->top, dirty->right, dirty->bottom);
 }
 
+/* ---- SwinxDemoTaskLoopSelfTest 的探针 ----
+ * 这条入口只给无头烟测（smoke.js）调用，浏览器页面不碰它：自测要在 UI 线程上轮询
+ * 最多 3 秒等后台产出，而浏览器主线程没有真正的 Atomics.wait（只有忙等模拟），
+ * 在页面里跑等于把整个标签页冻住 3 秒。 */
+struct SWasmStCounters
+{
+    volatile LONG nUiTid;       /* UI 线程 id，任务体用它判断自己跑在哪条线程上 */
+    volatile LONG nExecTotal;   /* 后台任务体进入次数：必须恰好等于投递数 */
+    volatile LONG nWorkerRuns;  /* 其中跑在非 UI 线程上的次数 */
+    volatile LONG nUiRuns;      /* 结果回抛后在 UI 线程执行的次数 */
+    volatile LONG nInlineRuns;  /* postTask(..., waitUntilDone=TRUE) 内联执行次数 */
+    volatile LONG nBeatRuns;    /* 心跳任务执行次数 */
+};
+static SWasmStCounters g_st = {0, 0, 0, 0, 0, 0};
+
+/* 应用消息循环：worker 把结果抛回 UI 线程的唯一通道（IMessageLoop::PostTask）。
+ * 裸指针不加引用：它是 SApplication 单例的一部分，自测期间必然活着；在投任务之前
+ * 写好、之后只读，所以不存在竞争。
+ * 这条链在 wasm 上有个前提：PostTask 内部 m_msgWnd.StartTimer() 带的是有效 HWND
+ * （SMsgLoop::startLoop 以 HWND_MESSAGE 建的消息窗口），swinx 因此按窗口找到 UI
+ * 线程的 SConnection，不会在 worker 线程上新建一份 —— 后者会执行
+ * emscripten_run_script，而 worker 的 JS realm 里没有页面那套 Module。 */
+static IMessageLoop *volatile g_pStMsgLoop = NULL;
+
+/* 回抛到 UI 线程的结果回调。计数只在 UI 线程加，所以 nUiRuns>0 就是"线程切对了"
+ * 的证据，而不是"回调跑了"的证据。 */
+class CWasmStUiResult : public SRunnable
+{
+    IMPL_GETCLASSINFO
+  public:
+    STDMETHOD_(IRunnable *, clone)(THIS) SCONST OVERRIDE
+    {
+        return new CWasmStUiResult();
+    }
+    STDMETHOD_(void, run)(THIS) OVERRIDE
+    {
+        if (GetCurrentThreadId() == g_st.nUiTid)
+            InterlockedIncrement(&g_st.nUiRuns);
+    }
+};
+
+/* 投进 ITaskLoop 的后台任务：只数自己、再把结果抛回 UI 线程，不碰窗口和画布。 */
+class CWasmStTask : public SRunnable
+{
+    IMPL_GETCLASSINFO
+  public:
+    STDMETHOD_(IRunnable *, clone)(THIS) SCONST OVERRIDE
+    {
+        return new CWasmStTask();
+    }
+    STDMETHOD_(void, run)(THIS) OVERRIDE
+    {
+        InterlockedIncrement(&g_st.nExecTotal);
+        if (GetCurrentThreadId() != g_st.nUiTid)
+            InterlockedIncrement(&g_st.nWorkerRuns);
+        IMessageLoop *pLoop = g_pStMsgLoop;
+        if (pLoop)
+        {
+            CWasmStUiResult result;
+            pLoop->PostTask(&result);
+        }
+    }
+};
+
+/* 内联探针：waitUntilDone=TRUE 走的是 send 语义，浏览器主线程不能等 worker，
+ * 所以实现里由调用线程直接跑掉。 */
+class CWasmStInline : public SRunnable
+{
+    IMPL_GETCLASSINFO
+  public:
+    STDMETHOD_(IRunnable *, clone)(THIS) SCONST OVERRIDE
+    {
+        return new CWasmStInline();
+    }
+    STDMETHOD_(void, run)(THIS) OVERRIDE
+    {
+        InterlockedIncrement(&g_st.nInlineRuns);
+    }
+};
+
+class CWasmStBeat : public SRunnable
+{
+    IMPL_GETCLASSINFO
+  public:
+    STDMETHOD_(IRunnable *, clone)(THIS) SCONST OVERRIDE
+    {
+        return new CWasmStBeat();
+    }
+    STDMETHOD_(void, run)(THIS) OVERRIDE
+    {
+        InterlockedIncrement(&g_st.nBeatRuns);
+    }
+};
+
+/* ---- SwinxDemoFilePickSelfTest 的探针 ----
+ * 异步文件选择（swinx 的 SwinxPickFileAsyncA）在这个演示里的落地口：浏览器页面上那颗
+ * 「选择文件」按钮只调阶段 0，结果由下面的回调打进页面日志；无头烟测按阶段取计数。
+ * 为什么必须分阶段：浏览器的选择结果只能在 JS 栈返回之后才回来（见 swinx
+ * include/commdlg.h 的异步契约），一次调用里拿不到。 */
+struct SWasmPickProbe
+{
+    volatile LONG nCbCount;   /* 回调执行次数 */
+    volatile LONG nLastResult;/* 最后一次回调的 nResult */
+    volatile LONG nBytesRead; /* 回调里用 fopen 读回到的字节数 */
+    volatile LONG nHeadByte;  /* 回读到的第一个字节，-1 = 没读到 */
+    volatile LONG nOnUiThread; /* 回调跑在发起线程上的次数 */
+    LONG nUiTid;              /* 发起请求时所在线程 */
+    char szLastPath[260];
+};
+static SWasmPickProbe g_pick = {0, 0, 0, 0, 0, 0, {0}};
+
+static void CALLBACK OnWasmFilePicked(int nResult, LPCSTR lpszUtf8Path, void *)
+{
+    InterlockedIncrement(&g_pick.nCbCount);
+    g_pick.nLastResult = nResult;
+    if (GetCurrentThreadId() == g_pick.nUiTid)
+        InterlockedIncrement(&g_pick.nOnUiThread);
+    g_pick.nBytesRead = 0;
+    g_pick.nHeadByte = -1;
+    g_pick.szLastPath[0] = 0;
+    if (nResult == 1 && lpszUtf8Path != NULL)
+    {
+        strncpy(g_pick.szLastPath, lpszUtf8Path, sizeof(g_pick.szLastPath) - 1);
+        g_pick.szLastPath[sizeof(g_pick.szLastPath) - 1] = 0;
+        /* 读一次回来自证"回调给的路径能直接 fopen"：wasm 把选中的字节落到 wasm
+         * 文件系统里，就是为了这句 fopen 在两个后端上写法一样。 */
+        FILE *fp = fopen(lpszUtf8Path, "rb");
+        if (fp)
+        {
+            const int c = fgetc(fp);
+            g_pick.nHeadByte = (c == EOF) ? -1 : c;
+            fseek(fp, 0, SEEK_END);
+            g_pick.nBytesRead = (LONG)ftell(fp);
+            fclose(fp);
+        }
+    }
+    /* 页面日志：浏览器里点按钮就看这一行，无头烟测不看它。 */
+    printf("[pick] result=%d path=%s bytes=%ld\n", nResult,
+           (nResult == 1 && lpszUtf8Path) ? lpszUtf8Path : "(none)", (long)g_pick.nBytesRead);
+}
+
+extern "C" void SwinxFilePickDone(int nId, int nResult, const char *pszName,
+                                  const unsigned char *pData, int nLen);
+
 extern "C"
 {
 
     /* 导出给 soui.html 的宿主入口只有六个功能口：
      *   SwinxDemoPump        消息泵（emscripten_set_main_loop 的回调）
      *   SwinxDemoMouse/Key   浏览器 pointer/keyboard 事件注入
-     *   SwinxDemoWheel       滚轮注入（WM_MOUSEWHEEL 的 wParam 打包与鼠标不同）
+     *   SwinxDemoWheel       滚轮注入（WM_MOUSEWHEEL 的 wParam 打包与鼠标不同），
+     *                        同步派发并返回 SOUI 是否消费了这一格
      *   SwinxDemoText        输入法成品文本注入（compositionend → WM_IME_CHAR）
      *   SwinxDemoCaretPos    读插入符位置，页面把 IME 代理框钉在光标处
-     * 连同 framebuffer.h 的 SwinxFb*（帧缓冲地址/尺寸/上屏计数）。 */
+     * 连同 framebuffer.h 的 SwinxFb*（帧缓冲地址/尺寸/上屏计数）。页面不调
+     * SwinxDemoTaskLoopSelfTest：它只给无头烟测用，说明见它自己的注释。 */
     void SwinxDemoPump(void)
     {
         MSG msg;
@@ -1258,6 +1410,23 @@ extern "C"
             if (emscripten_get_now() >= tDeadline)
                 break;
         }
+
+        /* 任务队列的两个消费点，与 games/cnchess/client/wasm/cnchess_main.cpp 同一
+         * 口径，缺一个的话"后台线程算完把结果抛回 UI"这条链就在 UI 侧断掉：
+         *   ExecutePendingTask  取走 IMessageLoop::PostTask 排进来的回调；
+         *   STaskLoopPump       驱动泵后端的 ITaskLoop（worker 后端的实例会被跳过）。
+         * 预算至少留 5ms，避免消息把 100ms 吃光时传进 0（0 在 API 里是"不限预算"）。 */
+        SApplication *pApp = SApplication::getSingletonPtr();
+        if (pApp)
+        {
+            SAutoRefPtr<IMessageLoop> pLoop = pApp->GetMsgLoop();
+            if (pLoop)
+                pLoop->ExecutePendingTask();
+        }
+        double left = tDeadline - emscripten_get_now();
+        if (left < 5.0)
+            left = 5.0;
+        STaskLoopPump(left);
     }
 
     void SwinxDemoMouse(UINT message, int x, int y, WPARAM fwKeys)
@@ -1266,11 +1435,21 @@ extern "C"
     }
 
     /* 滚轮也是鼠标消息，但 wParam 布局不同：低字仍是 MK_ 键位，高字是带符号的
-     * 滚动量。SwinxInjectMouse 会把这个值原样交给窗口，所以由这里打包（不新增
-     * swinx 接口）。zDelta 已由页面换算成 WHEEL_DELTA 的整数倍。 */
-    void SwinxDemoWheel(int x, int y, int zDelta, UINT fwKeys)
+     * 滚动量。这里不再走 SwinxInjectMouse 的异步投递：页面必须先把滚轮交给 SOUI，
+     * 再同步拿到"是否消费"的结果，异步消息要等下一次泵才派发，赶不上这个时机。
+     * 改为同步 SendMessageA，返回值即"SOUI 是否消费了这一格"：非 0 时页面不动，
+     * 0 时由宿主把这一下补偿给页面滚动。zDelta 已由页面换算成 WHEEL_DELTA 的整数倍。 */
+    int SwinxDemoWheel(int x, int y, int zDelta, UINT fwKeys)
     {
-        SwinxInjectMouse(g_hWnd, WM_MOUSEWHEEL, x, y, MAKEWPARAM((WORD)fwKeys, (WORD)zDelta));
+        /* SHostWnd::OnMouseWheel 不读滚轮消息自带的坐标，而是用最近一条
+         * WM_MOUSEMOVE 缓存的坐标做命中测试，先补一条同坐标的移动消息。
+         * 页面给的是屏幕坐标，和 SwinxInjectMouse 一致，这里按宿主窗口换算成 client。 */
+        POINT pt = { x, y };
+        ScreenToClient(g_hWnd, &pt);
+        SendMessageA(g_hWnd, WM_MOUSEMOVE, (WPARAM)fwKeys, MAKELPARAM(pt.x, pt.y));
+        LRESULT lr = SendMessageA(g_hWnd, WM_MOUSEWHEEL,
+                                  MAKEWPARAM((WORD)fwKeys, (WORD)zDelta), MAKELPARAM(pt.x, pt.y));
+        return (int)lr;
     }
 
     void SwinxDemoKey(UINT message, UINT vk, UINT scanCode)
@@ -1304,6 +1483,190 @@ extern "C"
             pXY[1] = pt.y;
         }
         return 1;
+    }
+
+    /* ITaskLoop 的 wasm 后端自测：一条 ITaskLoop 走完 start → 投递 → 排空 → stop →
+     * Release 的全生命周期，结果写进 pOut[12]（调用方给 12 个 int32）。
+     *
+     * 下标含义（smoke.js 按这些值断言，不是只看"有没有报错"）：
+     *   0  构建是否带 -pthread
+     *   1  start() 后由 worker 线程驱动的实例数（0 = 退回泵后端）
+     *   2  投递的后台任务数
+     *   3  后台任务体实际进入次数 —— 必须恰好等于 2：少了是丢任务/合并唤醒（布尔门
+     *      的缺陷），多了是 worker 与泵重复执行
+     *   4  其中跑在非 UI 线程上的次数（泵后端恒为 0，worker 后端应等于 2）
+     *   5  结果经 IMessageLoop::PostTask 回到 UI 线程执行的次数（两条后端都应等于 2）
+     *   6  waitUntilDone=TRUE 的 send 语义内联执行次数（应为 1）
+     *   7  心跳任务执行次数（应 >= 1）
+     *   8  排空后排队中的任务总数（应为 0）
+     *   9  stop() 之后的 isRunning()（应为 0）
+     *   10 Release 之后存活实例数的变化（应为 0：注册表要摘干净）
+     *   11 排空期间的 isRunning()（应为 1）
+     */
+    void SwinxDemoTaskLoopSelfTest(int *pOut)
+    {
+        const int kPosted = 8;
+        int i;
+        for (i = 0; i < 12; i++)
+            pOut[i] = 0;
+
+        g_st.nUiTid = (LONG)GetCurrentThreadId();
+        g_pStMsgLoop = NULL;
+        SApplication *pApp = SApplication::getSingletonPtr();
+        if (pApp)
+            g_pStMsgLoop = pApp->GetMsgLoop();
+
+#ifdef __EMSCRIPTEN_PTHREADS__
+        pOut[0] = 1;
+#endif
+
+        IObjRef *pObj = NULL;
+        /* 存活数基线必须在建实例之前取：应用自己已经通过 SCOM_MASK 建过一条队列，
+         * 建完再取基线会把这条新算进基线，Release 之后差值就成 -1。 */
+        const int nLive0 = STaskLoopLiveCount();
+        if (!TASKLOOP::SCreateInstance(&pObj) || !pObj)
+            return;
+        SAutoRefPtr<ITaskLoop> pLoop;
+        pLoop.Attach(static_cast<ITaskLoop *>(pObj));
+        pLoop->start("soui-wasm-selftest", Normal);
+        pOut[1] = STaskLoopWorkerCount();
+
+        CWasmStBeat beat;
+        pLoop->setHeartBeatTask(&beat, 20);
+        CWasmStTask tasks[kPosted];
+        for (i = 0; i < kPosted; i++)
+            pLoop->postTask(&tasks[i], FALSE, Normal);
+        pOut[2] = kPosted;
+
+        CWasmStInline inlineProbe;
+        pLoop->postTask(&inlineProbe, TRUE, High);
+        pOut[6] = (int)g_st.nInlineRuns;
+
+        /* 排空两条后端的队列：泵后端靠 STaskLoopPump 跑，worker 后端靠 futex 唤醒
+         * 后自己跑，UI 这边只管等。上限 3 秒 —— 拿不齐计数就带着部分结果返回，
+         * 由 smoke.js 判失败，而不是把烟测挂在死循环里。 */
+        const double tEnd = emscripten_get_now() + 3000.0;
+        while (emscripten_get_now() < tEnd)
+        {
+            if (g_st.nExecTotal >= kPosted && g_st.nUiRuns >= kPosted &&
+                STaskLoopPendingCount() == 0 && g_st.nBeatRuns > 0)
+                break;
+            STaskLoopPump(20);
+            if (g_pStMsgLoop)
+                g_pStMsgLoop->ExecutePendingTask();
+        }
+        pOut[3] = (int)g_st.nExecTotal;
+        pOut[4] = (int)g_st.nWorkerRuns;
+        pOut[5] = (int)g_st.nUiRuns;
+        pOut[7] = (int)g_st.nBeatRuns;
+        pOut[8] = STaskLoopPendingCount();
+        pOut[11] = pLoop->isRunning() ? 1 : 0;
+
+        pLoop->stop();
+        pOut[9] = pLoop->isRunning() ? 1 : 0;
+        pLoop.Release(); // 析构：注册表里必须摘掉这一条
+        pOut[10] = STaskLoopLiveCount() - nLive0;
+    }
+
+    /* 异步文件选择的自测探针，pOut 给 8 个 int32。nPhase 与下标含义
+     *（smoke.js 按这些值断言，不是只看"有没有报错"）：
+     *   0 —— 发起一次真实的选择请求：
+     *     0  SwinxPickFileAsyncA 的返回值（应为 1 = 已受理）
+     *     1  返回之后立刻看到的回调次数（必须是 0。这条就是"没有把浏览器主线程
+     *        挂在对话框上"的证据：任何同步化实现都会让它变成 1）
+     *     2  返回 0 时的 GetLastError
+     *     3  发起请求所在线程 id（宿主钩子只能在浏览器主线程上被调到）
+     *   1 —— 页面（或烟测里的假钩子）经 SwinxFilePickDone 回投之后取结果：
+     *     0  回调次数（应为 1）
+     *     1  最后一次 nResult（应为 1）
+     *     2  回读到的字节数（应等于回投过来的字节数）
+     *     3  回读到的第一个字节
+     *     4  回调跑在发起线程上的次数（应为 1）
+     *     5  回读到的路径长度
+     *   2 —— 负路径：不合法的请求必须在发起之前显式拒绝，不能悄悄降级。
+     *     0  p==NULL 的返回值（应为 0）
+     *     1  lpstrFile==NULL 的返回值（应为 0）
+     *     2  带 OFN_ALLOWMULTISELECT 的返回值（应为 0）
+     *     3  上一条的 GetLastError 是否为 ERROR_CALL_NOT_IMPLEMENTED（应为 1）
+     *     4  mode=SAVE 的返回值（wasm 应为 0；桌面后端会真起对话框，烟测不走这条）
+     *     5  上一条的 GetLastError 是否为 ERROR_CALL_NOT_IMPLEMENTED（wasm 应为 1）
+     *     6  用一个没人等的 nId 回投之后的回调次数（应仍是阶段 1 的 1：过期或重复
+     *        的回投必须丢掉，不能回调第二次）
+     */
+    void SwinxDemoFilePickSelfTest(int nPhase, int *pOut)
+    {
+        static OPENFILENAMEA s_of;
+        static char s_szFile[260];
+        /* 一段真实的 Win32 筛选串：描述与模式交替、双空结尾。swinx 把它换成浏览器
+         * <input accept> 用的 ".txt,.png"（见 SwinxFilterToAcceptA）。 */
+        static const char s_szFilter[] = "文本与图片\0*.txt;*.png\0\0";
+        int i;
+        for (i = 0; i < 8; i++)
+            pOut[i] = 0;
+
+        if (nPhase == 0)
+        {
+            memset(&s_of, 0, sizeof(s_of));
+            memset(s_szFile, 0, sizeof(s_szFile));
+            s_of.lStructSize = sizeof(s_of);
+            s_of.lpstrFilter = s_szFilter;
+            s_of.lpstrFile = s_szFile;
+            s_of.nMaxFile = sizeof(s_szFile);
+            s_of.lpstrTitle = "选择文件（swinx 异步文件选择）";
+            s_of.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR;
+            g_pick.nUiTid = GetCurrentThreadId();
+            pOut[0] = SwinxPickFileAsyncA(&s_of, OPEN, OnWasmFilePicked, NULL);
+            pOut[1] = (int)g_pick.nCbCount;
+            if (pOut[0] == 0)
+                pOut[2] = (int)GetLastError();
+            pOut[3] = g_pick.nUiTid;
+            return;
+        }
+
+        if (nPhase == 1)
+        {
+            pOut[0] = (int)g_pick.nCbCount;
+            pOut[1] = (int)g_pick.nLastResult;
+            pOut[2] = (int)g_pick.nBytesRead;
+            pOut[3] = (int)g_pick.nHeadByte;
+            pOut[4] = (int)g_pick.nOnUiThread;
+            pOut[5] = (int)strlen(g_pick.szLastPath);
+            return;
+        }
+
+        /* 阶段 2：三条参数不合法 + wasm 的 SAVE 不支持，都必须在发起前就返回 0。
+         * 这里都不该产生新的回调，所以最后再取一次 nCbCount 当证据。 */
+        memset(&s_of, 0, sizeof(s_of));
+        memset(s_szFile, 0, sizeof(s_szFile));
+        s_of.lStructSize = sizeof(s_of);
+        s_of.lpstrFile = s_szFile;
+        s_of.nMaxFile = sizeof(s_szFile);
+        pOut[0] = SwinxPickFileAsyncA(NULL, OPEN, OnWasmFilePicked, NULL);
+        SetLastError(0);
+        s_of.lpstrFile = NULL;
+        pOut[1] = SwinxPickFileAsyncA(&s_of, OPEN, OnWasmFilePicked, NULL);
+        s_of.lpstrFile = s_szFile;
+        s_of.Flags = OFN_ALLOWMULTISELECT;
+        SetLastError(0);
+        pOut[2] = SwinxPickFileAsyncA(&s_of, OPEN, OnWasmFilePicked, NULL);
+        pOut[3] = (GetLastError() == ERROR_CALL_NOT_IMPLEMENTED) ? 1 : 0;
+        s_of.Flags = OFN_OVERWRITEPROMPT;
+        SetLastError(0);
+        pOut[4] = SwinxPickFileAsyncA(&s_of, SAVE, OnWasmFilePicked, NULL);
+        pOut[5] = (GetLastError() == ERROR_CALL_NOT_IMPLEMENTED) ? 1 : 0;
+
+        /* 过期/重复回投：一个没人等的 id，必须被丢掉且不回调第二次。字节内容无所谓，
+         * 查不到槽位就返回。 */
+        const unsigned char one = 'x';
+        SwinxFilePickDone(0x7fff0001, 1, "stale.txt", &one, 1);
+        pOut[6] = (int)g_pick.nCbCount;
+    }
+
+    /* 上一次选择结果里的路径（g_pick 中那份拷贝）。烟测要拿它逐字符断言 —— pOut 只有
+     * 整数，钉不住"路径确实落在预期目录里、文件名也确实被消毒过"这两件事。 */
+    const char *SwinxDemoFilePickPath(void)
+    {
+        return g_pick.szLastPath;
     }
 
 }

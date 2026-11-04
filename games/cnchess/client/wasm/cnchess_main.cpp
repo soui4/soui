@@ -1,4 +1,4 @@
-/*
+﻿/*
  * cnchess_main.cpp -- 中国象棋客户端的 wasm 宿主入口
  *
  * 与桌面入口 main.cc 的差别只有"谁来驱动帧"和"谁来发网络事件"：
@@ -10,15 +10,17 @@
  *        b. IMessageLoop::ExecutePendingTask()——SApplication::Run() 本来在每条
  *           消息前后调它，绕开 Run() 就必须自己调，否则 ThemeDownloadManager 从
  *           解压流程 PostTask 回来的进度/结果永远不执行，主题不会落地；
- *        c. STaskLoopPump()——wasm 的 ITaskLoop 是一张主线程队列，解压任务就在这里
- *           跑。桌面版它是工作线程。
+ *        c. STaskLoopPump()——wasm 的 ITaskLoop 有两条后端：不带 -pthread 的产物里它是
+ *           一张主线程队列，解压任务就在这一行里跑完；带 -pthread 的产物里 start() 已经
+ *           建了一条 worker 线程，队列归它消费，这一行会跳过这些实例（本函数什么都不做，
+ *           慢任务一帧都不占）。桌面版它一直是工作线程。
  *   2) 网络：ws 组件在 wasm 下用 Emscripten 的 WebSocket，回调由浏览器事件循环在
  *      主线程同步投递（见 components/ws/src/wasm/），不再需要收包线程。
  *   3) 弹窗：登录、确认、求和都用 SModalRoot（CMainDlg 里的 __EMSCRIPTEN__ 分支），
  *      没有 SHostDialog::DoModal 的嵌套消息循环。
  *
- * 统计量 / 输入注入只服务于无头烟测：node 里加载这个模块，驱动登录、看主题是否
- * 落地、棋盘是否插入、TaskLoop 是否只在主线程上跑。
+ * 统计量 / 输入注入只服务于无头烟测：node 里加载这个模块，驱动登录、看主题是否落地、
+ * 棋盘是否插入、解压任务有没有按构建能力跑到 worker 线程上去（stat 19 与 6 是否相等）。
  */
 #include <emscripten.h>
 #include <stdio.h>
@@ -36,13 +38,15 @@
 /* SCOM_MASK 必须在 <SAppCfg.h> 之前定义：SAppCfg::DoConfig() 的 switch 无条件引用
  * 所有组件的 SCreateInstance，掩码全开时 wasm 构建图里没有的组件会变成真实链接依赖
  * （直接失败或把 libwebsockets / 7z 拉进来）。这里只要这五个。
- * taskloop 和 resprovider-zip 是客户端自己要的：解压主题包、单线程任务队列。 */
+ * taskloop 和 resprovider-zip 是客户端自己要的：解压主题包、任务队列（带 -pthread 时
+ * 是 worker 线程，不带时是主线程泵）。 */
 #define SCOM_MASK                                                                                  \
     (scom_mask_render_gdi | scom_mask_imgdecoder_stb | scom_mask_taskloop | scom_mask_ws |          \
      scom_mask_resprovider_zip)
 
 #include <SAppCfg.h>
-#include <TaskLoop/TaskLoopWasm.h>
+#include <TaskLoop/wasm/TaskLoopWasm.h>
+#include <ws/src/wasm/WsClientWasm.h>
 #include <gif/SSkinAni.h>
 #include <gif/SGifPlayer.h>
 #include <helper/slog.h>
@@ -139,11 +143,21 @@ extern "C"
      *   9  登录弹窗可见        10 根窗口宽           11 根窗口高
      *   12 上一帧是否超预算    13 GetTickCount()     14 主题进度弹窗可见
      *   15 登录弹窗存在        16 根窗口直接子节点数 17 主对话框已初始化
+     *   18 worker 后端的实例数  19 worker 线程执行的任务数  20 这份产物带没带 -pthread
+     *   21 ws 投递给监听器的帧数 22 其中发生在非主线程的帧数
      *
      * 4/5 是端到端的主证据：4 说明服务器下发的主题包走完了 ws 收包 + 落盘 + 解压
      * （TaskLoop）+ 加载；5 说明 InitGame 真的把背景/棋盘/90 个落子位插进了 chessboard
      * （game_container 里只有一个 chessboard，那是布局自带的结构，不能拿来做证据）。
-     * 6/7/8 证明 TaskLoop 后端在这条链上被用到，并且队列确实被宿主泵清空了。 */
+     * 6/7/8 证明 TaskLoop 后端在这条链上被用到，并且队列确实被宿主泵清空了。
+     * 18/19/20 是 worker 后端的取证三口：20 说这份产物链接时带没带 -pthread（构建能力），
+     * 18 说当前有几条队列真由 worker 线程驱动（运行时，页面没 crossOriginIsolated 时
+     * SharedArrayBuffer 拿不到，退回泵后端就是 0），19 说累计有几条任务是在 worker 上
+     * 跑掉的。19 与 6 相等才是"解压整条离开了 UI 线程"，光看 6>0 两条后端都给得出。
+     * 21/22 是同一口径用在收包链上：ws 组件自己开了一条投递队列（与桌面版每个连接
+     * 一条工作线程同形态），21 说有几帧真的交到了 IConnListener 手里，22 说其中几帧
+     * 不在主线程上。浏览器里 socket 对象建在主线程（工具链限制），所以"收包搬后台"能
+     * 证明的边界就是回调之后那一段 —— 22 与 21 相等即是这段全搬走了。 */
     int CnchessStat(int index)
     {
         switch (index)
@@ -194,6 +208,18 @@ extern "C"
             return pRoot ? (int)pRoot->GetChildrenCount() : 0;
         }
         case 17: return g_pMain ? 1 : 0;
+        case 18: return STaskLoopWorkerCount();
+        case 19: return (int)STaskLoopWorkerRunCount();
+        case 21: return (int)WS_WasmDeliveredFrames();
+        case 22: return (int)WS_WasmDeliveredFramesOffMain();
+        /* 构建能力，不是运行时状态：产物没带 -pthread 时这里是 0，烟测据此决定该期待
+         * 哪条后端。运行时有没有真起线程看 18 —— 页面缺 crossOriginIsolated 时 20 是 1
+         * 而 18 是 0，这条差值就是"能用但没并行"那个坑的取证入口。 */
+#ifdef __EMSCRIPTEN_PTHREADS__
+        case 20: return 1;
+#else
+        case 20: return 0;
+#endif
         default: return 0;
         }
     }
@@ -229,8 +255,9 @@ extern "C"
                 pLoop->ExecutePendingTask();
         }
 
-        /* 单线程 TaskLoop：解压这类任务就在这一行里跑完。预算至少留 5ms，
-         * 避免消息已经把 100ms 吃光时把 0 传进去（0 在 API 里是"不限预算"）。 */
+        /* 泵后端：解压这类任务就在这一行里跑完。worker 后端（带 -pthread 的产物）里
+         * 这些实例被跳过，这一行只剩泵后端那些没建线程的队列，预算照给不影响正确性。
+         * 预算至少留 5ms，避免消息已经把 100ms 吃光时把 0 传进去（0 在 API 里是"不限预算"）。 */
         double left = tDeadline - emscripten_get_now();
         if (left < 5.0)
             left = 5.0;
@@ -319,6 +346,24 @@ extern "C"
         pWnd->GetWindowRect(&rc);
         int x = (rc.left + rc.right) / 2;
         int y = (rc.top + rc.bottom) / 2;
+        /* 先泵到命中测试真的落到目标控件上再注入。原因：SModalView 在入场动画期间会
+         * 短路 SwndFromPoint（SOUI/src/core/SModalViewSession.cpp 里 m_isAnimating 那条
+         * 分支），整棵子树都收不到鼠标消息。动画靠 kPulseTimer 的 WM_TIMER 推进，而
+         * WM_TIMER 只按**真实时间**到期：实测 node 里空泵 32 帧只花 1ms，一帧动画都没推进
+         * （命中窗口仍是 modal 视图）；放开到 1.5s 墙上时间后约 140ms 命中就落到目标控件、
+         * 插入符随之出现。浏览器里真人点击天然落在动画结束之后，只有注入式烟测会撞上这两帧。
+         * 到上限仍没落点就照原样注入，让失败留在烟测断言里而不是这里静默吞掉。 */
+        SWindow *pRoot = g_pMain ? g_pMain->GetRoot() : NULL;
+        const double tDeadline = emscripten_get_now() + 1500.0;
+        for (int i = 0; pRoot && i < 100000; ++i)
+        {
+            CPoint ptClick(x, y);
+            if (pRoot->SwndFromPoint(ptClick, TRUE) == pWnd->GetSwnd())
+                break;
+            CnchessPump();
+            if (emscripten_get_now() >= tDeadline)
+                break;
+        }
         CnchessMouse(WM_MOUSEMOVE, x, y, 0);
         CnchessMouse(WM_LBUTTONDOWN, x, y, MK_LBUTTON);
         CnchessMouse(WM_LBUTTONUP, x, y, 0);

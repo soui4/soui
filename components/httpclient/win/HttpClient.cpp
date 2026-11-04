@@ -54,7 +54,10 @@ BOOL CWinHttp::Init()
 		m_error = Hir_InitErr;
 		return false;
 	}
-	::WinHttpSetTimeouts(m_hInternet, 0, m_nConnTimeout, m_nSendTimeout, m_nRecvTimeout);
+	// 第 1 个参数是 DNS 解析超时：传 0 表示"无限等待"（WinHTTP 默认值）。
+	// 解析卡住时后台线程会一直挂着，界面上表现为"点了刷新没反应"，所以跟连接超时对齐。
+	// 其余两个是发送/接收（接收是单次 recv 的空闲超时，不是整包总时长）。
+	::WinHttpSetTimeouts(m_hInternet, m_nConnTimeout, m_nConnTimeout, m_nSendTimeout, m_nRecvTimeout);
 
 	return true;
 }
@@ -210,6 +213,9 @@ BOOL CWinHttp::Request(IStringA *out, LPCSTR lpUrl, RequestType type, LPCSTR lpP
 
 BOOL CWinHttp::Request2(IStringA *out, LPCSTR lpUrl, RequestType type, LPVOID lpPostData, DWORD dwDataLen, LPCSTR lpHeader/*=NULL*/ )
 {
+	// 先置为 -1：InitConnect 失败时调用方读 GetHttpCode 得到的是 -1（网络层失败），
+	// 而不是上一次请求残留的状态码。
+	m_httpCode = -1;
 	if ( !InitConnect(lpUrl, type, lpHeader,lpPostData,dwDataLen) )
 		return FALSE;
 	m_httpCode = QueryStatusCode();
@@ -263,6 +269,66 @@ BOOL CWinHttp::QueryRawHeaders( OUT std::wstring& strHeaders )
 		free(lpData);
 	}
 	return bRet;
+}
+
+// 取原始响应头（CRLF 换行）并转成 UTF-8，供 CookieUtil 解析 Set-Cookie。
+// 注意：不能用上面的 QueryRawHeaders —— 那个取的是 NUL 分隔的 RAW_HEADERS，
+// 而且返回宽字符；这里直接要一段可直接按行扫描的文本。
+BOOL CWinHttp::QueryRawHeadersCrlf( OUT std::string& strHeaders )
+{
+	DWORD dwSize = 0;
+	::WinHttpQueryHeaders(m_hRequest, WINHTTP_QUERY_RAW_HEADERS_CRLF, WINHTTP_HEADER_NAME_BY_INDEX,
+		NULL, &dwSize, WINHTTP_NO_HEADER_INDEX);
+	if ( ERROR_INSUFFICIENT_BUFFER != GetLastError() || dwSize <= sizeof(wchar_t) )
+		return FALSE;
+
+	std::wstring strBuf;
+	strBuf.resize((size_t)dwSize / sizeof(wchar_t));
+	DWORD dwBufSize = dwSize;
+	if ( !::WinHttpQueryHeaders(m_hRequest, WINHTTP_QUERY_RAW_HEADERS_CRLF, WINHTTP_HEADER_NAME_BY_INDEX,
+		&strBuf[0], &dwBufSize, WINHTTP_NO_HEADER_INDEX) )
+		return FALSE;
+
+	SStringA strUtf8 = S_CW2A(strBuf.c_str(), CP_UTF8);
+	strHeaders = std::string(strUtf8.c_str(), (size_t)strUtf8.GetLength());
+	return TRUE;
+}
+
+BOOL CWinHttp::GetCookie( IStringA *out, LPCSTR lpUrl )
+{
+	if ( out == NULL || lpUrl == NULL )
+	{
+		m_error = Hir_ParamErr;
+		return FALSE;
+	}
+	out->Empty();
+
+	// InitConnect 内部完成 Close/Init/连接/发请求/收响应，失败时已设置具体错误码
+	if ( !InitConnect(lpUrl, Hr_Get) )
+		return FALSE;
+
+	m_httpCode = QueryStatusCode();
+
+	// 不看状态码：ASP.NET 站点经常在 302/404 的响应里下发 SessionId，
+	// 这里只要能解析出 Cookie 就算成功，状态码留给调用方用 GetHttpCode 判断。
+	std::string strRawHeaders;
+	if ( !QueryRawHeadersCrlf(strRawHeaders) )
+	{
+		m_error = Hir_HeaderErr;
+		return FALSE;
+	}
+
+	std::string strCookie = CookieUtil::ParseFromRawHeaders(strRawHeaders);
+	if ( strCookie.empty() )
+	{
+		// 没有 Cookie 不算错误，调用方按"无会话"继续请求即可
+		m_error = Hir_Success;
+		return FALSE;
+	}
+
+	out->Assign2(strCookie.c_str(), (int)strCookie.size());
+	m_error = Hir_Success;
+	return TRUE;
 }
 
 BOOL CWinHttp::QueryContentLength( OUT DWORD& dwLength )

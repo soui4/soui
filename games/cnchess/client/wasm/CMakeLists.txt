@@ -9,11 +9,27 @@
 #   2. 弹窗走 SModalRoot（登录、确认、求和/应答），不走 LoginDlg/PeaceXxxDlg 的
 #      SHostDialog::DoModal()：那两个类不进构建，因为 DoModal 是嵌套消息循环，
 #      在浏览器里拿不到新事件。
-#   3. 多链三个组件：taskloop（单线程队列）、ws（浏览器原生 WebSocket）、
+#   3. 多链三个组件：taskloop（任务队列，两条后端）、ws（浏览器原生 WebSocket）、
 #      resprovider-zip（解压服务器下发的主题包，wasm 下用 swinx 的 zlib_static）。
+#
+# TaskLoop 的后端由根 CMakeLists 的 SOUI_WASM_PTHREADS 决定，cnchess 的构建脚本默认
+# 打开它：主题包的解压因此跑在一条真正的 worker 线程上，与桌面版"工作线程解压"同口径，
+# 不再占 UI 帧。代价是产物要 crossOriginIsolated（COOP+COEP 响应头）才起得来线程 ——
+# 用 demos/wasm-demo/serve-isolated.py 起页面，python3 -m http.server 那一套不行。
+# 关掉它（build-cnchess.sh --no-pthreads）就退回泵后端：解压仍在 UI 线程的
+# STaskLoopPump 里跑完，页面不再需要隔离头。两种产物的 .js/.wasm/.data 是三件套，
+# 混在同一目录里换构建会出现"新 wasm 配旧胶水"的 LinkError，所以产物目录按后端分开。
 # =============================================================================
 
-set(SOUI_WASM_CNCHESS_OUT "${CMAKE_CURRENT_SOURCE_DIR}/out" CACHE PATH
+# 后端决定默认产物目录（out / out_pt），与演示那边同一套口径。显式给
+# SOUI_WASM_CNCHESS_OUT 时以它为准；构建脚本总会按请求的后端把它算好再传进来，
+# 免得老构建目录里缓存的 out 把 worker 产物盖到泵产物上。
+if(SOUI_WASM_PTHREADS)
+    set(_soui_cnchess_out_default "${CMAKE_CURRENT_SOURCE_DIR}/out_pt")
+else()
+    set(_soui_cnchess_out_default "${CMAKE_CURRENT_SOURCE_DIR}/out")
+endif()
+set(SOUI_WASM_CNCHESS_OUT "${_soui_cnchess_out_default}" CACHE PATH
     "cnchess wasm: output directory for cnchess.{html,js,wasm,data}")
 
 # 与 soui-wasm 用同一个默认栈：SOUI 在 wasm 下走 canvas2d 绘制后端（render-gdi 接
@@ -21,19 +37,8 @@ set(SOUI_WASM_CNCHESS_OUT "${CMAKE_CURRENT_SOURCE_DIR}/out" CACHE PATH
 # 但 SHostWnd::Create() 的建窗递归仍按桌面线程栈深度写，5 MB 下会直接踩爆。
 set(SOUI_CNCHESS_STACK "32MB" CACHE STRING "cnchess wasm: -sSTACK_SIZE")
 
-# 字体：GDI 后端由 swinx/wasm.cmake 的 SWINX_WASM_GDI_BACKEND 决定（与 libswinx.a
-# 同一次编译参数，业务层在命令行 -DSWINX_WASM_GDI_BACKEND=... 即可同时驱动 swinx
-# 与 cnchess 两端）：
-#   canvas2d（默认）：文本走浏览器内置字体，不预载字体、不调 AddFontResource；
-#   cairo：文本/字体由 freetype + fontconfig 负责，必须把字体文件预载进 MEMFS 的
-#          /opt/soui/fonts，并在 cnchess_main.cpp 里 AddFontResourceA 注册。
-# 原 SOUI_CNCHESS_FONT 选项已废弃。
-
-# SWINX_WASM_GDI_BACKEND 是 swinx/wasm.cmake 定义的 cache 变量；这里给个回落默认，
-# 避免 cnchess 子目录先于 swinx 处理、而命令行又没传该变量时取到空值。
-if(NOT DEFINED SWINX_WASM_GDI_BACKEND OR SWINX_WASM_GDI_BACKEND STREQUAL "")
-    set(SWINX_WASM_GDI_BACKEND "canvas2d")
-endif()
+# 字体：canvas2d 后端用浏览器的内置字体渲染文本（与 demos/wasm-demo 的 route C 一致），
+# 不再从 MEMFS 预载 TTF，也不再调用 AddFontResource。原 SOUI_CNCHESS_FONT 选项已废弃。
 
 foreach(_req
         "${CMAKE_CURRENT_SOURCE_DIR}/../uires/uires.idx"
@@ -43,27 +48,17 @@ foreach(_req
     endif()
 endforeach()
 
-# 资源挂载点必须和 cnchess_main.cpp 里的 kAppResDir/kSysResDir 一致。
-# canvas2d 不挂字体目录；cairo 把 fonts/ 下的字体预载进 MEMFS 的 /opt/soui/fonts
-# （cnchess_main.cpp 在 CNCHESS_WASM_CAIRO_FONTS 宏下枚举并 AddFontResourceA）。
+# 资源挂载点必须和 cnchess_main.cpp 里的 kAppResDir/kSysResDir 一致
+# （文本走 canvas2d 的浏览器内置字体，不再挂载 /opt/soui/fonts）。
 set(_soui_cnchess_preload
     "--preload-file=${CMAKE_CURRENT_SOURCE_DIR}/../uires@/opt/soui/uires"
     "--preload-file=${PROJECT_SOURCE_DIR}/soui-sys-resource@/opt/soui/soui-sys-resource")
-set(_soui_cnchess_cairo_fonts OFF)
-if(SWINX_WASM_GDI_BACKEND STREQUAL "cairo")
-    set(_soui_cnchess_fonts_dir "${CMAKE_CURRENT_SOURCE_DIR}/fonts")
-    if(NOT IS_DIRECTORY "${_soui_cnchess_fonts_dir}")
-        message(FATAL_ERROR "cairo 后端需要字体目录 ${_soui_cnchess_fonts_dir}（放 .ttf/.ttc/.otf）")
-    endif()
-    list(APPEND _soui_cnchess_preload
-         "--preload-file=${_soui_cnchess_fonts_dir}@/opt/soui/fonts")
-    set(_soui_cnchess_cairo_fonts ON)
-endif()
 
 # _malloc/_free：JS 侧要把控件名/文本写进线性内存再传进来。
 # 观测口（CnchessStat/CnchessChildXxx）是无头烟测唯一的取证方式：
 #   登录弹窗是否建出来、连接后主题是否落地、game_container 下棋盘是否插入、
-#   TaskLoop 是否真的只在主线程上跑（执行数/排队数/存活实例数）。
+#   TaskLoop 跑在哪条后端上（执行数/排队数/存活实例数，以及 worker 实例数与
+#   worker 上执行掉的任务数 —— 后者是"解压真的离开了 UI 线程"的唯一直接证据）。
 # 输入口按 soui-wasm 的同一套契约给全（漏一项，页面调用就是
 # "m._CnchessXxx is not a function" 直接抛异常）：
 #   _CnchessWheel        滚轮 -> WM_MOUSEWHEEL（wParam 高字是 ±120 的整数倍）
@@ -128,10 +123,6 @@ target_compile_options(cnchess-wasm PRIVATE -O0 -g -Wall -Wno-unused-variable)
 target_compile_definitions(cnchess-wasm PRIVATE
     SWINX_FB_WIDTH=${SWINX_FB_WIDTH}
     SWINX_FB_HEIGHT=${SWINX_FB_HEIGHT})
-if(_soui_cnchess_cairo_fonts)
-    # cnchess_main.cpp 据此把 /opt/soui/fonts 下的字体枚举并 AddFontResourceA。
-    target_compile_definitions(cnchess-wasm PRIVATE CNCHESS_WASM_CAIRO_FONTS)
-endif()
 
 target_include_directories(cnchess-wasm PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/..
@@ -198,10 +189,6 @@ add_custom_command(TARGET cnchess-wasm POST_BUILD
         "${SOUI_WASM_CNCHESS_OUT}/soui-host.js"
     COMMENT "Copying soui-host.js for cnchess-wasm")
 
-if(_soui_cnchess_cairo_fonts)
-    set(_soui_cnchess_font_mode "cairo(bundled) -> /opt/soui/fonts")
-else()
-    set(_soui_cnchess_font_mode "canvas2d(browser)")
-endif()
 message(STATUS "SOUI_WASM_CNCHESS: ${SWINX_FB_WIDTH}x${SWINX_FB_HEIGHT}, stack=${SOUI_CNCHESS_STACK}, "
-               "gdi-backend=${SWINX_WASM_GDI_BACKEND}, font=${_soui_cnchess_font_mode} -> ${SOUI_WASM_CNCHESS_OUT}")
+               "taskloop=${SOUI_WASM_PTHREADS} (ON=worker / OFF=pump), "
+               "font=canvas2d(browser) -> ${SOUI_WASM_CNCHESS_OUT}")

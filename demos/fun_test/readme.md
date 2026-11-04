@@ -13,13 +13,13 @@ ctest --test-dir build -L '^soui-headless$' --output-on-failure
 
 CTest 在**配置期**扫描测试源码，把每个 `TEST` / `TEST_F` 注册成独立用例，并按**文件名约定**分层打标签（分组的实现与理由见 `CMakeLists.txt` 文件头注释）：
 
-| 源文件                            | 层级标签                                                      | 注册用例数（2026-10-29 实测） |
+| 源文件                            | 层级标签                                                      | 注册用例数（2026-11-05 实测） |
 | ------------------------------ | --------------------------------------------------------- | --------------------- |
-| 其余 `test_*.cpp`                | `soui-unit`                                               | 504                   |
+| 其余 `test_*.cpp`                | `soui-unit`                                               | 511                   |
 | `test_integration_*.cpp`       | `soui-integration`                                        | 1                     |
-| `test_e2e_*.cpp`               | `soui-e2e`                                                | 10                    |
+| `test_e2e_*.cpp`               | `soui-e2e`                                                | 12                    |
 | `test_soui_uitest_*.cpp`       | `soui-uitest`（SouiTest 框架，Tier A 框架级注入，无头）            | 37                    |
-| **门禁合计**                       | **`soui-headless`**（= 上面四行）                               | **552**               |
+| **门禁合计**                       | **`soui-headless`**（= 上面四行；1 条 `DISABLED_` 不执行，实跑 560） | **561**               |
 | `test_gui_*.cpp`               | `soui-gui`，需 `-DSOUI_ENABLE_GUI_SMOKE=ON`                 | 4                     |
 | `test_gdi.cpp`、`test_soui.cpp` | `soui-interactive`，需 `SOUI_ENABLE_INTERACTIVE_TESTS=ON`   | 2                     |
 
@@ -46,7 +46,7 @@ Linux/macOS 默认在构建 `fun_test` 后运行全套非交互测试；PR 快�
 
 ## GUI 烟测
 
-在有桌面显示的环境配置 `-DSOUI_ENABLE_GUI_SMOKE=ON`，构建后运行 `ctest --test-dir build -L '^soui-gui$' --output-on-failure`。Linux 可用 `xvfb-run -a` 包裹 CTest。`window.gui_smoke_dispatches_button_click` 创建并显示真实 SOUI 宿主窗口，通过窗口过程发送鼠标消息并检查按钮事件；它不会长期等待人工操作。GUI 组默认不注册，门禁仍是 400 个无头用例；全套非交互 `fun_test` 的 `-window.*` 过滤器也排除 GUI 组。此烟测尚不比较渲染像素或验证真实设备鼠标。
+在有桌面显示的环境配置 `-DSOUI_ENABLE_GUI_SMOKE=ON`，构建后运行 `ctest --test-dir build -L '^soui-gui$' --output-on-failure`。Linux 可用 `xvfb-run -a` 包裹 CTest。`window.gui_smoke_dispatches_button_click` 创建并显示真实 SOUI 宿主窗口，通过窗口过程发送鼠标消息并检查按钮事件；它不会长期等待人工操作。GUI 组默认不注册，门禁仍是那批无头用例（见上表）；全套非交互 `fun_test` 的 `-window.*` 过滤器也排除 GUI 组。此烟测尚不比较渲染像素或验证真实设备鼠标。
 
 ## 交互式窗口用例
 
@@ -61,7 +61,52 @@ ctest --test-dir build -L '^soui-interactive$' --output-on-failure
 不要把它加进门禁：它既需要桌面，也需要人。
 
 
+## wasm 腿（swinx GDI 后端的 A/B）
+
+`swinx` 在 wasm 上有两个 GDI 后端：`canvas2d`（默认，光栅化交给浏览器 canvas）和 `cairo`（光栅化在 wasm 模块内）。桌面构建只能跑到其中一个，后端差异要靠同一批用例在两个后端各跑一遍才能暴露。`-DSOUI_BUILD_WASM_FUN_TEST=ON` 把 `test_dc.cpp` / `test_region.cpp` / `test_text.cpp` / `test_swinx_handle_type_unit.cpp` 四个纯 Win32 兼容面的 TU 编成一个 wasm 可执行文件（源集与不注册 CTest 的理由写在 `CMakeLists.txt` 第 0 节）。
+
+```sh
+source ~/emsdk/emsdk_env.sh
+EMC=~/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
+# 后端由 -DSWINX_WASM_GDI_BACKEND 选择，产物落在 demos/fun_test/out.<backend>/
+cmake -S . -B build-ft-c2d -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=$EMC \
+      -DSOUI_BUILD_WASM_FUN_TEST=ON -DSWINX_WASM_GDI_BACKEND=canvas2d
+cmake -S . -B build-ft-cai -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=$EMC \
+      -DSOUI_BUILD_WASM_FUN_TEST=ON -DSWINX_WASM_GDI_BACKEND=cairo
+cmake --build build-ft-c2d --target fun_test -j8
+cmake --build build-ft-cai --target fun_test -j8
+```
+
+两条运行载体，证明范围不同（细节见两份脚本的文件头注释）：
+
+```sh
+# node：假 DOM + 假 canvas，绘制调用是 no-op、getImageData 全 0
+node demos/fun_test/wasm/run-node.js demos/fun_test/out.canvas2d/fun_test-wasm.js \
+     [--gtest_filter=SwinxDcTest.TextPath*]
+node demos/fun_test/wasm/run-node.js demos/fun_test/out.cairo/fun_test-wasm.js
+
+# 浏览器：真 canvas、真字体。服务器根 = demos/fun_test
+python3 -m http.server 8931 --directory demos/fun_test
+# http://127.0.0.1:8931/wasm/browser-runner.html?backend=out.canvas2d
+# 取结果：window.__ftSummary() -> {done, failed[], okCount, lines}；__ftFailureText() 给断言原文
+```
+
+- **node 腿**证明：句柄与对象生命周期、参数编组、区域布尔运算、返回值与 `GetLastError` 口径、wasm↔JS 边界不崩不泄。**像素往返、依赖真实字形/光栅的断言在这一腿不可判定** —— 桩件不给像素，不是实现有错。
+- **浏览器腿**证明：canvas2d 的实际光栅结果与文本度量；cairo 腿在这一腿只是复认，它的光栅在模块内，node 已可信。
+- 以 cairo 为已知正确的基线做 A/B：两个后端跑同一批用例（当前 88 条），差集就是 canvas2d 的缺陷清单。
+  第二轮修复后的实测（2026-11-06，当时 87 条）：cairo node 87/87、cairo 浏览器 87/87、canvas2d 浏览器 87/87、canvas2d node 84/87（3 条属上面那类不可判定：`compatible_bitmap_and_pixels`、`dib_section_setpixel_updates_memory`、`patblt_blackness_whiteness_24bpp`）。
+  同一批用例跑在修复前的 swinx（子模块 `9f5484b1`，其余不变）上，canvas2d 浏览器腿失败 5 条，就是这一轮修的缺陷：`stock_objects`（库存对象被 `DeleteObject` 释放后成为悬垂句柄）、`selectcliprgn_replaces_previous_clip` / `extselectcliprgn_copy_recovers_from_leaked_clip` / `selectcliprgn_null_removes_clip`（canvas 的裁剪只会求交，替换/移除裁不掉旧裁剪，`GetClipBox` 回报 NULLREGION）、`moving_text_after_leaked_clip_leaves_no_residue`（漏出的窄裁剪把之后每一帧的清屏困住，飘字残影留在画布上）。cairo 两条腿在修复前后都是满通过，说明这批断言测的是后端差异而不是用例本身。
+- **Blt 族的 rop 是"替换"不是"叠加"**（第二轮，85 → 87）：`bitblt_srccopy_replaces_destination` 与 `stretchdibits_srccopy_replaces_destination` 先在目标上留一枚金色标记，再用**整块透明**的源（`ClearRect(mem, rc, 0)` 的内存 DC / 32bpp 全 0 的 DIB）以 `SRCCOPY` 盖过去，要求旧标记消失、源里那一枚不透明点到达、矩形外的蓝色标记活着。基线（子模块 `172b3ceb`，只把对应函数换回修复前）上这两条各红一次，红的都是"旧标记还在"那一条：`test_dc.cpp:898`（BitBlt）、`test_dc.cpp:973`（StretchDIBits）。canvas2d 把 rop 映成 `source-over`，透明源擦不掉任何东西；Win32 的 32bpp `SRCCOPY` 与 cairo 的 `CAIRO_OPERATOR_SOURCE` 都是连 alpha 一起替换。SOUI 的 present 只有这一次拷贝（`SHostPresenter::OnHostPresent`），而 `_RedrawRegion` 每帧先把脏矩形 `ClearRect(…, 0)` 清成全透明 —— 于是移动的文字会在身后拖出残影，就是 `demos/wasm-demo/bug.png` 那串金色抛物线。
+- **DrawText 自己要把字形裁进格式化矩形**（第三轮，87 → 88）：`drawtext_clips_to_format_rect` 是这一条的第一份证据。上面所有裁剪用例都是调用方先 `SelectClipRgn` 再画，而 Win32 的 `DrawText` 不看调用方的裁剪、自己裁 `RECT`（只有 `DT_NOCLIP` 放开）。SOUI 侧 `SWindow::DispatchPaint` 只应用控件显式的 `m_clipRgn`/`m_clipPath`，**不把孩子窗口裁到自己的窗口矩形**，脏矩形又只按控件矩形失效 —— 于是越出矩形的字墨此后再没有任何一次重绘会覆盖它，飘字动画就在轨迹上留下永久残影。cairo 后端 `src/gdi/cairo/drawtext.cpp` 一直是裁的，canvas2d 的 `drawTextLines()` 漏了，`DT_NOCLIP` 也被忽略。
+  用例三条断言配对：16x16 矩形里画 6 个 20px 粗体 `W` 时框内必须有墨（否则"整体不画"也能过）且框外必须全白；同一矩形带 `DT_NOCLIP` 重画时 `x>=32` 必须有墨（否则"永远不画"也能过）；随后 `x=40..56` 的 `FillRect` 必须到达（证明裁剪是 `SaveDC` 级作用域，没漏到调用方 DC）。
+  **证伪是在已知正确的基线上做的**：把 cairo 那侧的 `if (!(m_uFormat & DT_NOCLIP))` 临时改成 `if (false && …)` 重编原生 `fun_test`，用例红在"墨越界"这一条（`test_dc.cpp:1481: gold ink at 20,9 escaped the formatting rect`），恢复后转绿 —— 断言钉的就是矩形裁剪这件事，canvas2d 修复前缺的也是同一件。
+  第三轮实测（2026-11-06）：cairo node 88/88（cairo 的光栅在模块内，这一腿能判像素，新用例的证据来自这里）、canvas2d node 85/88（新用例被 `pixelsReadable()` 早退，本腿不作证据）、原生 `fun_test` 的 cairo 腿全绿；canvas2d 浏览器腿由人工开页复跑并通过 —— 产物做两份：`out.canvas2d`（含修复）与 `out.canvas2d.red`（`git show HEAD:` 的修复前 swinx 重编，`.wasm` 差 819 字节），红构建只在"墨越界"这一条断言上失败、绿构建通过。当时这条 A/B 只证明**后端不对称**，还不等于演示里 `bug.png` 那串残影结案；随后用户在 canvas2d 后端把俄罗斯方块 1–10 关连测 4 次（文字特效形态）全部无残影，应用腿才一并结案。因果链与"为什么这三条修齐才有效"见 `doc/soui-wasm-canvas2d-残影修复说明.md`，过程记录见 `doc/soui-wasm-port-plan.md` §31–§37。
+  结案后 `out.canvas2d.red/` 与 `/tmp/wasm-demo-red/` 这两份红产物已删除（本来就在 `.gitignore` 的 `/out.*/` 里）；要复跑红/绿 A/B 按 §36.4 记录的命令重建，注意主仓库历史里有两个 swinx 指针在本地和远端都取不到（`da85cbe1`、`56b70c82`），红基线要用能取到的修复前提交（`31179e6a`）。
+- **像素断言要成对写**：只断言"清屏后那个点是黑/白"分不清"裁剪放宽了"和"画布被整体清空"（`ctx.reset()` 就是把画布清成透明黑，读回来也是 0,0,0）。所以裁剪类用例同时在"旧裁剪内、新裁剪动作覆盖不到的地方"留一枚红色标记，要求它还在；`moving_text_after_leaked_clip_leaves_no_residue` 则要求整幅回到白色。把 `clipClearCanvas` 临时换成 `ctx.reset()` 版本重跑，这三条的"画布被清空"断言和残影用例全数失败，证明它们能挡住这种"以破坏换通过"的改法。Blt 族两条同理：单看"旧标记消失"会放过"把整块画布擦掉"的实现，必须同时要求不透明源点到达、矩形外不动。
+- 产物目录 `out.*/` 已在 `demos/fun_test/.gitignore` 里排除，不入库；`out_pt/` 之类的临时目录同理。
+
 ## 目录结构
+
 
 ```
 fun_test/
@@ -244,6 +289,16 @@ fun_test/
 ├── test_dc.cpp 补充  # CreateIconIndirect/GetIconInfo 往返（fIcon/hotspot/位图尺寸与内容、
 │                     # GetIconInfo 返回新拷贝需 DeleteObject；真机语义：icon 的 hotspot
 │                     # 强制取位图中心、mask 高度须等于 color 高度，2x 反报 87）
+│                     # 与裁剪/飘字一组：SelectClipRgn 是替换不是求交、ExtSelectClipRgn
+│                     # (RGN_COPY) 要能放宽回整幅、SelectClipRgn(hdc,NULL) 移除裁剪、
+│                     # 裁剪必须困住文字墨迹、飘字动画逐帧清屏后不留残影，以及"先漏出
+│                     # 窄裁剪再让帧清屏放宽"的俄罗斯方块"+分数"重现（bug.png）；
+│                     # 每条都带"旧裁剪内的标记必须活着"的配对断言
+│                     # 与 Blt 族一组：BitBlt / StretchDIBits 的 SRCCOPY 是替换不是叠加
+│                     # （透明源必须擦掉目标旧墨迹、不透明源点要到达、矩形外不动）
+├── wasm/             # wasm 腿的两条运行载体：run-node.js（node + 假 DOM/canvas 桩）、
+│                     # browser-runner.html（真 canvas，服务器根 = 本目录）。证明范围与
+│                     # 桩件边界见上面的"wasm 腿"一节
 └── ...
 ```
 

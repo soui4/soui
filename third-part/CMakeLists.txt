@@ -27,6 +27,12 @@ if(SOUI_WASM_MINIMAL)
     if(SOUI_BUILD_WASM_LUA)
     add_subdirectory(lua-54)
     endif()
+    # gtest 进 wasm：它只有 gtest-all.cc + gtest_main.cc 两个 TU，不依赖 dlopen、
+    # pthread 或系统时间源，可以直接编到 wasm 上。只有打开 wasm 单测腿
+    # （demos/fun_test 编成 wasm 可执行文件）才需要它，默认不进构建图。
+    if(SOUI_BUILD_WASM_FUN_TEST)
+    add_subdirectory(gtest)
+    endif()
     return()
 endif()
 

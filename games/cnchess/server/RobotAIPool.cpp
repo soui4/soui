@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "RobotAIPool.h"
 #include <ChessAI.h>
-#include <TaskLoop/TaskLoop.h>
+#include <TaskLoop/thread/TaskLoop.h>
 #include <helper/SFunctor.hpp>
 #include <helper/slog.h>
 #define  SCOM_MASK scom_mask_log4z|scom_mask_taskloop

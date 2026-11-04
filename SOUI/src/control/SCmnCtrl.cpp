@@ -401,30 +401,30 @@ SButton::SButton()
 
 void SButton::OnPaint(IRenderTarget *pRT)
 {
-    if (!m_pBgSkin)
-        return;
-    CRect rcClient;
-    GetClientRect(&rcClient);
-    if (m_byAlphaAni == 0xFF)
-    { // Not in the animation process
-        m_pBgSkin->DrawByState(pRT, rcClient, GetState());
-    }
-    else
-    { // In the animation process
-        if (GetState() & WndState_Hover)
-        {
-            // hovering
-            m_pBgSkin->DrawByState2(pRT, rcClient, WndState_Normal, 255 - m_byAlphaAni);
-            m_pBgSkin->DrawByState2(pRT, rcClient, WndState_Hover, m_byAlphaAni);
+    if (m_pBgSkin)
+    {
+        CRect rcClient;
+        GetClientRect(&rcClient);
+        if (m_byAlphaAni == 0xFF)
+        { // Not in the animation process
+            m_pBgSkin->DrawByState(pRT, rcClient, GetState());
         }
         else
-        {
-            // leaving
-            m_pBgSkin->DrawByState2(pRT, rcClient, WndState_Hover, 255 - m_byAlphaAni);
-            m_pBgSkin->DrawByState2(pRT, rcClient, WndState_Normal, m_byAlphaAni);
+        { // In the animation process
+            if (GetState() & WndState_Hover)
+            {
+                // hovering
+                m_pBgSkin->DrawByState2(pRT, rcClient, WndState_Normal, 255 - m_byAlphaAni);
+                m_pBgSkin->DrawByState2(pRT, rcClient, WndState_Hover, m_byAlphaAni);
+            }
+            else
+            {
+                // leaving
+                m_pBgSkin->DrawByState2(pRT, rcClient, WndState_Hover, 255 - m_byAlphaAni);
+                m_pBgSkin->DrawByState2(pRT, rcClient, WndState_Normal, m_byAlphaAni);
+            }
         }
     }
-
     SWindow::OnPaint(pRT);
 }
 
@@ -1553,7 +1553,7 @@ void SRadioBox::OnSetFocus(SWND wndOld, SFocusManager::FocusChangeReason reason)
         if (!IsChecked())
             SetCheck(TRUE);
     }
-    Invalidate();
+    __baseCls::OnSetFocus(wndOld);
 }
 
 void SRadioBox::OnLButtonUp(UINT nFlags, CPoint pt)

@@ -6,10 +6,23 @@ name: soui wasm gate
 # 判据是 demos/wasm-demo/smoke.js：node 直接加载 emscripten 产物，不需要浏览器，
 # 覆盖 模块启动链（SApplication → DoConfig → 资源 → SHostWnd → 控件树 → 渲染后端
 # 初始化）/ 渲染+上屏整链（SwinxFbPresents 计数随泵增长）/ 输入注入（鼠标/键盘/滚轮
-# /IME/剪贴板 经 SwinxInject* 进消息泵不崩）/ 无致命错误，共约 17 处断言，退出码即结论。smoke.js
-# 内部用最小假 DOM 顶上 canvas2d 后端（node 没有 document），所有绘制 no-op、只保证
+# /IME/剪贴板 经 SwinxInject* 进消息泵不崩）/ ITaskLoop 双后端自测（SwinxDemoTaskLoopSelfTest：
+# 投递数、后台执行数、回抛到 UI 线程的次数、内联探针、心跳、停止后与实例计数归零）/
+# 异步文件选择（SwinxDemoFilePickSelfTest + 假 Module.swinxPickFile：发起不阻塞主线程、筛选串
+# 换算成 accept、回投的字节落到可 fopen 的消毒路径、过期 id 丢弃、多选与 SAVE 显式拒绝）/ 无致命错误。
+#
+# 两条 matrix 腿分别跑两条 ITaskLoop 后端：wasm-pump 是不带 -pthread 的默认构建（30 处断言），
+# wasm-pthreads 带 -DSOUI_WASM_PTHREADS=ON（31 处，多出的两条要求 worker 线程真的起来、任务真的
+# 离开 UI 线程 —— 只有真实线程能给出 offUi==posted，泵后端必然给不出）。两条腿各占一台 runner：
+# 产物目录 demos/wasm-demo/out 是按源目录写死的（SOUI_WASM_DEMO_OUT），同一台机器上先后两次构建
+# 会互相覆盖，另一侧的 ninja 又因时间戳更新报 no work to do，于是"哪条腿测的是哪份产物"就不成立
+# （本地实测踩过，见 demos/wasm-demo/readme.md「无头烟测」）。
+#
+# smoke.js 内部用最小假 DOM 顶上 canvas2d 后端（node 没有 document），所有绘制 no-op、只保证
 # measureText/getImageData/createImageData 返回正确形状。它明确不证明"像素好不好看、
 # 布局对不对、交互是否正确、字体字形对不对"——那些仍要人看（见 demos/wasm-demo/readme.md）。
+# wasm-pthreads 这条也不证明浏览器侧能跑：worker 产物要 crossOriginIsolated（COOP+COEP 响应头），
+# node 里没有这道前提，Chromium 里仍要按 readme 清单人工过一遍。
 #
 # 演示产物（.wasm 约 5MB 级，取决于 CJK 字体子集化）只用于本次烟测，不上传。
 
@@ -39,9 +52,20 @@ permissions:
 
 jobs:
   build-and-smoke:
-    name: wasm-build-and-smoke
+    name: wasm-${{ matrix.backend }}
     runs-on: ubuntu-latest
     timeout-minutes: 120
+    # fail-fast=false：worker 腿坏了不要把默认腿的结论一起取消，两条后端各自的红/绿要分得开。
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - backend: pump
+            pthreads: 'OFF'
+            expect_pt: 0
+          - backend: pthreads
+            pthreads: 'ON'
+            expect_pt: 1
     steps:
       - uses: actions/checkout@v4
 
@@ -90,7 +114,8 @@ jobs:
           emcmake cmake -S . -B build-wasm -G Ninja \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DSOUI_BUILD_WASM_DEMO=ON \
-            -DSOUI_FUN_TEST_POST_BUILD=OFF
+            -DSOUI_FUN_TEST_POST_BUILD=OFF \
+            -DSOUI_WASM_PTHREADS=${{ matrix.pthreads }}
 
       # -j4 而不是 -j$(nproc)：emcc 在 8 核以上并发时会互相等待到疑似死锁（本地实测
       # 曾在零 CPU 占用下卡住 20 分钟）。构建吞吐不是这条门禁的瓶颈，稳定才是。
@@ -100,16 +125,24 @@ jobs:
           cmake --build build-wasm --target soui-wasm-demo -j4 2>&1 | tee wasm-build.log
           ls -la demos/wasm-demo/out
 
-      - name: Headless smoke test (demos/wasm-demo, ~17 assertions, no browser)
+      - name: Headless smoke test (demos/wasm-demo, ${{ matrix.backend }}, no browser)
         run: |
+          set -o pipefail
           node demos/wasm-demo/smoke.js 2>&1 | tee smoke.log
+          # 双保险：smoke.js 末尾只在全部断言通过时才打 "OK:"，所以这条 grep 同时能
+          # 抓住"进程被 abort / 提前退出后留下一份看着全绿的半截日志"——那种情况下
+          # 退出码未必是 1，但收尾行一定缺失。
+          grep -q '^OK: 全部断言通过$' smoke.log
+          # 再钉一句"这条腿吃的确实是这条配置的产物"：pt 由 C++ 侧的 __EMSCRIPTEN_PTHREADS__
+          # 决定，产物拿错了这里就对不上。
+          grep -q '\[taskloop\] pt=${{ matrix.expect_pt }}' smoke.log
 
-      # 失败时把两份日志带出来，省去重跑一遍才能看报错。
+      # 失败时把两份日志带出来，省去重跑一遍才能看报错。产物名带 matrix 标签，两条腿不覆盖。
       - name: Upload logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: wasm-build-logs
+          name: wasm-${{ matrix.backend }}-logs
           path: |
             wasm-build.log
             smoke.log

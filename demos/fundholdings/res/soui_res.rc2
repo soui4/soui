@@ -1,0 +1,14 @@
+//stamp:01dd6deeff4022b8
+/*<------------------------------------------------------------------------------------------------->*/
+#define DEFINE_UIRES(name, type, file_path)\
+    name type file_path
+
+DEFINE_UIRES(XML_INIT,	UIDEF,	"uires/uidef/init.xml")
+DEFINE_UIRES(dlg_main,	LAYOUT,	"uires/layout/dlg_main.xml")
+DEFINE_UIRES(ICON_LOGO,	ICON,	"uires/image/logo.ico")
+DEFINE_UIRES(string,	values,	"uires/values/string.xml")
+DEFINE_UIRES(color,	values,	"uires/values/color.xml")
+DEFINE_UIRES(skin,	values,	"uires/values/skin.xml")
+DEFINE_UIRES(font,	values,	"uires/values/font.xml")
+DEFINE_UIRES(logo,	svg,	"uires/svg/logo.svg")
+DEFINE_UIRES(scrollbar,	svg,	"uires/svg/scrollbar.svg")

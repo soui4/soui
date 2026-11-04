@@ -80,7 +80,7 @@ LRESULT SwndContainerImpl::DoFrameEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
         break;
     case WM_MOUSEWHEEL:
     case 0x20E: // WM_MOUSEHWHEEL
-        OnFrameMouseWheel(uMsg, wParam, lParam);
+        lRet = OnFrameMouseWheel(uMsg, wParam, lParam);
         break;
     default:
         if (uMsg >= WM_KEYFIRST && uMsg <= WM_KEYLAST)
@@ -345,8 +345,11 @@ void SwndContainerImpl::OnFrameMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lPara
     }
 }
 
-void SwndContainerImpl::OnFrameMouseWheel(UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT SwndContainerImpl::OnFrameMouseWheel(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+    // 返回值 = 目标窗口的 OnMouseWheel 是否真的消费了这一格滚轮。宿主（如 wasm 页面）
+    // 用它决定要不要把滚轮继续交给外部环境处理，所以不能像以前那样固定返回 0。
+    LRESULT lRet = 0;
     SWindow *pWndTarget = SWindowMgr::GetWindow(m_hCapture);
     if (!pWndTarget)
     {
@@ -365,13 +368,14 @@ void SwndContainerImpl::OnFrameMouseWheel(UINT uMsg, WPARAM wParam, LPARAM lPara
     if (pWndTarget && !pWndTarget->IsDisabled(TRUE))
     {
         BOOL bMsgHandled = FALSE;
-        pWndTarget->SSendMessage(uMsg, wParam, lParam, &bMsgHandled);
+        lRet = pWndTarget->SSendMessage(uMsg, wParam, lParam, &bMsgHandled);
         m_pRoot->SetMsgHandled(bMsgHandled);
     }
     else
     {
         m_pRoot->SetMsgHandled(FALSE);
     }
+    return lRet;
 }
 
 LRESULT SwndContainerImpl::OnFrameKeyEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)

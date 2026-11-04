@@ -1,6 +1,8 @@
 ﻿
 #include "httpHeader.h"
 #include "define.h"
+#include <cctype>
+#include <cstring>
 
 SNSBEGIN
 
@@ -158,5 +160,106 @@ bool CHttpHeader::Revolse(const std::string& strHeader)
 	} while (nFindPos != -1);
 	return true;
 }
+
+// ------------------------------------------------------------------ Cookie 解析
+namespace CookieUtil
+{
+
+// 比较 name 与全小写的字面量 a 是否相等（大小写不敏感）
+static bool EqualCI(const std::string& strName, const char* a)
+{
+	size_t n = strlen(a);
+	if (strName.size() != n)
+		return false;
+	for (size_t i = 0; i < n; ++i)
+	{
+		if (tolower((unsigned char)strName[i]) != a[i])
+			return false;
+	}
+	return true;
+}
+
+// Set-Cookie 里的修饰属性，不属于 Cookie 本身
+static bool IsCookieAttrName(const std::string& strName)
+{
+	static const char* kAttrs[] = {
+		"path", "expires", "domain", "secure", "httponly",
+		"samesite", "max-age", "version", "comment", "priority",
+	};
+	const size_t kCount = sizeof(kAttrs) / sizeof(kAttrs[0]);
+	for (size_t i = 0; i < kCount; ++i)
+	{
+		if (EqualCI(strName, kAttrs[i]))
+			return true;
+	}
+	return false;
+}
+
+static std::string Trim(const std::string& s)
+{
+	size_t a = s.find_first_not_of(" \t\r\n");
+	if (a == std::string::npos)
+		return std::string();
+	size_t b = s.find_last_not_of(" \t\r\n");
+	return s.substr(a, b - a + 1);
+}
+
+void AppendSetCookie(const std::string& strValue, std::string& outCookie)
+{
+	const size_t n = strValue.size();
+	size_t pos = 0;
+	while (pos <= n)
+	{
+		size_t semi = strValue.find(';', pos);
+		std::string part = (semi == std::string::npos) ? strValue.substr(pos)
+			                                          : strValue.substr(pos, semi - pos);
+		part = Trim(part);
+		if (!part.empty())
+		{
+			size_t eq = part.find('=');
+			// eq > 0：跳过 "=value" 这种没有名字的脏数据
+			if (eq != std::string::npos && eq > 0)
+			{
+				std::string name = Trim(part.substr(0, eq));
+				// Cookie 名不允许出现空格；属性项（Path/Expires/...）直接丢弃
+				if (!name.empty() && name.find(' ') == std::string::npos && !IsCookieAttrName(name))
+				{
+					if (!outCookie.empty())
+						outCookie += "; ";
+					outCookie += part;
+				}
+			}
+		}
+		if (semi == std::string::npos)
+			break;
+		pos = semi + 1;
+	}
+}
+
+std::string ParseFromRawHeaders(const std::string& strRawHeaders)
+{
+	std::string outCookie;
+	const size_t kKeyLen = 11; // strlen("set-cookie:")
+	const size_t n = strRawHeaders.size();
+	size_t pos = 0;
+	while (pos < n)
+	{
+		size_t eol = strRawHeaders.find('\n', pos);
+		std::string line = (eol == std::string::npos) ? strRawHeaders.substr(pos)
+		                                             : strRawHeaders.substr(pos, eol - pos);
+		pos = (eol == std::string::npos) ? n : eol + 1;
+		if (!line.empty() && line[line.size() - 1] == '\r')
+			line.erase(line.size() - 1);
+		if (line.size() <= kKeyLen)
+			continue;
+		// 前缀 "Set-Cookie:"，大小写不敏感
+		if (!EqualCI(line.substr(0, kKeyLen), "set-cookie:"))
+			continue;
+		AppendSetCookie(line.substr(kKeyLen), outCookie);
+	}
+	return outCookie;
+}
+
+} // namespace CookieUtil
 
 SNSEND

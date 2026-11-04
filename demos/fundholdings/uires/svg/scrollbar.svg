@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="126" height="42" viewBox="0 0 126 42">
+  <!-- 暗色滚动条皮肤：9 列 x 3 行，每格 14x14。
+       布局由 SSkinScrollbar::GetPartRect 决定：
+         列 0 / 1 = 竖直上、下箭头    列 2 = 竖直滑块    列 3 = 竖直槽
+         列 4 / 5 = 水平左、右箭头    列 6 = 水平滑块    列 7 = 水平槽
+         列 8 = 右下角(track) / 滑块把手
+       行 0 = normal，行 1 = hover，行 2 = push。
+       滑块用 9 宫格拉伸（skin.xml 里 margin=3），圆角取 3 保证拉伸后不被拉变形。 -->
+
+  <!-- ================= 行 0：normal ================= -->
+  <rect x="0" y="0" width="126" height="14" fill="#0f1621"/>
+  <rect x="29" y="1" width="12" height="12" rx="3" fill="#35435b"/>
+  <rect x="85" y="1" width="12" height="12" rx="3" fill="#35435b"/>
+  <polygon points="7,4 2.9,10 11.1,10" fill="#7d8da5"/>
+  <polygon points="21,10 16.9,4 25.1,4" fill="#7d8da5"/>
+  <polygon points="58.6,7 64.4,2.9 64.4,11.1" fill="#7d8da5"/>
+  <polygon points="81.4,7 75.6,2.9 75.6,11.1" fill="#7d8da5"/>
+
+  <!-- ================= 行 1：hover ================= -->
+  <rect x="0" y="14" width="126" height="14" fill="#101a27"/>
+  <rect x="29" y="15" width="12" height="12" rx="3" fill="#465872"/>
+  <rect x="85" y="15" width="12" height="12" rx="3" fill="#465872"/>
+  <polygon points="7,18 2.9,24 11.1,24" fill="#a4b3c8"/>
+  <polygon points="21,24 16.9,18 25.1,18" fill="#a4b3c8"/>
+  <polygon points="58.6,21 64.4,16.9 64.4,25.1" fill="#a4b3c8"/>
+  <polygon points="81.4,21 75.6,16.9 75.6,25.1" fill="#a4b3c8"/>
+
+  <!-- ================= 行 2：push ================= -->
+  <rect x="0" y="28" width="126" height="14" fill="#101a27"/>
+  <rect x="29" y="29" width="12" height="12" rx="3" fill="#5b708c"/>
+  <rect x="85" y="29" width="12" height="12" rx="3" fill="#5b708c"/>
+  <polygon points="7,32 2.9,38 11.1,38" fill="#dde5f0"/>
+  <polygon points="21,38 16.9,32 25.1,32" fill="#dde5f0"/>
+  <polygon points="58.6,35 64.4,30.9 64.4,39.1" fill="#dde5f0"/>
+  <polygon points="81.4,35 75.6,30.9 75.6,39.1" fill="#dde5f0"/>
+</svg>

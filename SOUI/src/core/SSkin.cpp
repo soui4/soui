@@ -218,7 +218,7 @@ SSkinImgList::SSkinImgList()
     , m_tileMode(TM_Both)
     , m_bLazyLoad(FALSE)
     , m_bCacheSvg(TRUE)
-	, m_nSvgCacheNext(0)
+    , m_nSvgCacheNext(0)
 {
 }
 

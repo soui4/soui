@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <interface/SHttpClient-i.h>
 #include <WinInet.h>
 #include <helper/obj-ref-impl.hpp>
@@ -22,6 +22,7 @@ public:
 	STDMETHOD_(void,SetDownloadCallback)(THIS_ IHttpCallback* pCallback)  OVERRIDE{ m_pCallback = pCallback; }
 	STDMETHOD_(BOOL,DownloadFile)(THIS_ LPCSTR lpUrl, LPCSTR lpFilePath)  OVERRIDE;
 	STDMETHOD_(int,GetHttpCode)(CTHIS) SCONST  OVERRIDE{return m_httpCode;}
+	STDMETHOD_(BOOL,GetCookie)(THIS_ IStringA *out,LPCSTR lpUrl) OVERRIDE;
 protected:
 	BOOL	Init();
 	void	Close();
@@ -32,6 +33,8 @@ protected:
 	BOOL	SendHttpRequest(LPCSTR lpHeader,LPVOID lpPostData, DWORD dataLen);
 	//query 
 	BOOL	QueryRawHeaders(OUT std::wstring& strHeaders);
+	//取原始响应头（CRLF 换行、已转 UTF-8），用于解析 Set-Cookie
+	BOOL	QueryRawHeadersCrlf(OUT std::string& strHeaders);
 	BOOL	QueryContentLength(OUT DWORD& dwLength);
 	int QueryStatusCode();
 private:

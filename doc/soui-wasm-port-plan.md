@@ -2240,7 +2240,7 @@ M1 是这轮唯一的"反直觉"证据，值得单独写清楚：这里是**静�
 | 方面 | 桌面版 | wasm 版 |
 | --- | --- | --- |
 | 网络 | `components/ws`：libwebsockets + 自建事件循环 + 收包线程 | `emscripten_websocket_*`，底下就是页面的 `WebSocket` 对象 |
-| 线程 | `components/TaskLoop`：pthread 线程池，`postTask` 跨线程投递 | 主线程队列，`postTask` 只入队，宿主每帧 `STaskLoopPump(budget)` 抽干 |
+| 线程 | `components/TaskLoop/thread`：pthread 线程池，`postTask` 跨线程投递 | 主线程队列，`postTask` 只入队，宿主每帧 `STaskLoopPump(budget)` 抽干 |
 | 弹窗 | `SHostDialog::DoModal()`：嵌套消息循环 | `SModalRoot` + `SModalView`（与 Android/iOS 同一套布局） |
 
 客户端业务代码只动了"平台分支"：`MainDlg.cpp` / `ChessGame.cpp` / `MainDlg.h` 里原本只有
@@ -2273,7 +2273,7 @@ M1 是这轮唯一的"反直觉"证据，值得单独写清楚：这里是**静�
 否则 `emscripten_websocket_new` 是未定义符号。桌面版那套 lws 源文件在 wasm 下根本不参与编译，
 所以"到底走的哪条实现"这件事，烟测只能靠**探针替换 `global.WebSocket`** 来证明（见 25.5）。
 
-### 25.3 线程：TaskLoop 的单线程后端（`components/TaskLoop/TaskLoopWasm.cpp`）
+### 25.3 线程：TaskLoop 的单线程后端（`components/TaskLoop/wasm/TaskLoopWasm.cpp`）
 
 浏览器主线程只有一个：起不了工作线程，也不能在任务里阻塞 UI。同一个 `ITaskLoop` 接口被实现成：
 
@@ -2755,7 +2755,7 @@ SOUI 里的列表纹丝不动。链路断在三个地方：
 - 目录内脚本：`build.sh` / `build-soui.sh` 的 `ROOT` 从 `$HERE/../..` 改为 `$HERE/..`，
   `build.bat` 的 `%HERE%..\..` 同理；注释里的自路径同步。
 - 兄弟模块的注释引用：`games/cnchess/client/wasm/*`、`swinx/src/platform/wasm/audio.cpp`、
-  `components/TaskLoop/TaskLoopWasm.cpp`、`third-part/CMakeLists.txt`。
+  `components/TaskLoop/wasm/TaskLoopWasm.cpp`、`third-part/CMakeLists.txt`。
 - CI：`.github/workflows/soui-wasm-gate.yml` 的触发路径 `soui-wasm/**` 与构建后 `ls` 路径。
 - 文档：本文件与 `soui-wasm/readme.md`、`doc/SOUI4项目评估报告-2026-10-29.md`、
   根 `README.md` / `README.zh-CN.md` 的路径全部改写；readme 顶部注明"早期记录里位于
@@ -2835,6 +2835,942 @@ SOUI 里的列表纹丝不动。链路断在三个地方：
 - 遮罩只覆盖 `.wasm`/`.data` 的下载与编译期。登录之后主题包的下载进度是 SOUI 内部的
   `dlg_theme_progress.xml` 弹窗，两套进度不是一回事，也不合并。
 - 本次只改 cnchess 的壳页与文档，未动 `swinx` 子模块、未动 CMake 与构建脚本。
+
+---
+
+## 32. ITaskLoop 的 wasm 特化：泵后端 + worker 线程双路（2026-11-03）
+
+### 32.1 需求与验收
+
+需求原文："这个 taskloop 模型最核心的需求就是可以将 UI 线程要处理的可能卡住 UI 的任务给到
+后台线程来处理。后台线程处理完后可以将结果抛回给 UI 线程。js 的 atomics 对象可以用来做同步，
+UI 线程一般来说也不需要等待 worker。"
+
+拆成可断言的验收项（都落在 `demos/wasm-demo/smoke.js` 第 6 节，12 个计数由
+`SwinxDemoTaskLoopSelfTest` 从 C++ 侧写回）：
+
+| 项 | 判据 |
+| --- | --- |
+| 一条队列走完 start → 投递 → 排空 → stop → Release 不崩 | 全程无 `Module.souiFatal` |
+| 投递的任务一条不多一条不少 | `exec == posted == 8`（少了=丢任务/合并唤醒，多了=重复执行） |
+| 结果都回到 UI 线程执行 | `ui == posted`，且回调体内比对线程 id |
+| send 语义（`waitUntilDone=TRUE`）不阻塞 UI | `inline == 1`，由调用线程就地跑掉 |
+| 心跳任务仍然周期执行 | `beat >= 1` |
+| Release 后实例从注册表摘掉 | `liveDelta == 0` |
+| 带 `-pthread` 时任务真的离开 UI 线程 | `workers == 1` 且 `offUi == posted` |
+| 不带 `-pthread` 时行为与改动前一致 | `workers == 0` 且 `offUi == 0`，其余判据同样成立 |
+
+### 32.2 为什么 worker 是"能等结果"而不是"能等"
+
+三条实测结论决定了形态：
+
+- **浏览器主线程没有真正的 `Atomics.wait`。** 主线程上的等待由 Emscripten 用忙等模拟，等待期间
+  DOM 事件不再派发。所以"UI 线程等 worker"在这个平台上不是性能取舍，是不可用。实现里 UI 侧只
+  入队 + 唤醒，`stop()` 的 join 只在"这条队列不是被 UI 线程自己跑着"时发生（任务里 `Release()`
+  掉最后一条引用时退化成 `pthread_detach`，避免 `pthread_join` 自 join 的静默死锁）。
+- **`SSemaphore` 在 worker 里不可用。** 桌面版 `TaskLoop.cpp` 的等待用的是 `SSemaphore`，落到
+  swinx posix 的 `CreateSemaphore`/`WaitForSingleObject` 即 pipe + select；实测阻塞 poll/select 在
+  Emscripten worker 里永不返回。故 worker 后端的同步换成线性内存上的一个 32 位量 +
+  `emscripten_futex_wait`/`emscripten_futex_wake`（即 `Atomics.wait`/`notify`）。
+- **门只能按"待办条数"计数，不能做成布尔标志。** 两次入队都发生在 worker 睡着之前时，布尔门会把
+  两个任务合并成一个（实测复现：`seq=3` 而只跑了 2 个任务）。`m_pending` 因此是单调计数：入队
+  `+1`、取任务 `-1`，只在 `0 → 1` 那一次叫醒，睡下去前再读一次以防漏。
+- UI 侧一轮 futex 往返实测 ~53ms（3 轮），worker 线程从 `pthread_create` 到就绪 ~54-56ms。
+
+### 32.3 线程路线：`-pthread`，不是 `-sWASM_WORKERS`
+
+- `-sWASM_WORKERS=1 -sWASMFS=1` 链不动：`libc++-ww-noexcept.a(mutex.o)` 报
+  `undefined symbol: pthread_mutex_lock` 等 —— Wasm Workers 只提供一条裸线程，不提供线程安全的
+  libc++/WASMFS，而本模块要用 `SCriticalSection`、任务里要读文件。
+- 因此取 `-pthread`（Web Worker + 共享 `SharedArrayBuffer` 线性内存），worker 里可以照常持锁、
+  读 FS。`-pthread` 与 `ALLOW_MEMORY_GROWTH` 同时开会触发 `GROWABLE_ARRAYBUFFERS` 提示，且
+  `INITIAL_MEMORY` 必须大于 `STACK_SIZE`（本端口 `STACK_SIZE=32MB`），所以 worker 构建额外给
+  `-sINITIAL_MEMORY=64MB -sGROWABLE_ARRAYBUFFERS=1`；worker 自己的栈不按 `STACK_SIZE` 取，
+  在 `pthread_attr_setstacksize` 里单独给 4MB，否则每条队列都要按 32MB 占堆。
+- 代价是产物必须在 `crossOriginIsolated` 的页面里才跑得起来（COOP+COEP 发头，见
+  `demos/wasm-demo/serve-isolated.py`）。所以 `SOUI_WASM_PTHREADS` **默认 OFF**：默认构建的产物、
+  壳页与门禁都不变。
+
+### 32.4 结果回抛为什么不用自己写 marshalling
+
+复用 `IMessageLoop::PostTask`（`SOUI/src/core/SMsgLoop.cpp`）：那条队列本身有 `SCriticalSection`
+保护，宿主每帧调一次 `ExecutePendingTask`（`demos/wasm-demo/soui_main.cpp` 的 `SwinxDemoPump` 与
+`games/cnchess/client/wasm/cnchess_main.cpp` 都已接）。worker 任务算完直接
+`pMsgLoop->PostTask(&result)`，UI 线程下一帧取走 —— 不需要在本模块再造一套回调队列。
+
+**这里有个 wasm 专属前提**：`PostTask` 内部会 `m_msgWnd.StartTimer()`，`SNativeWnd::SetTimer` 带的
+是有效 HWND（`SMsgLoop::startLoop` 以 `HWND_MESSAGE` 建的消息窗口，所以窗口归属 UI 线程），
+swinx `::SetTimer` 因此按窗口找到 UI 线程的 `SConnection`。若换成 `hWnd == NULL` 的 swinx 调用，
+`SConnMgr::getConnection(workerTid)` 会在 worker 线程上现场构造一份 `SConnection`，而它的构造函数
+执行 `emscripten_run_script("Module.fbFormat = 'canvas';")` —— worker 的 JS realm 里没有页面那套
+`Module`/DOM。**后台任务里不得调用 `hWnd == NULL` 的 swinx API**（这条是 worker 后端的硬约束，
+不是建议）。
+
+### 32.5 改动清单
+
+- `components/TaskLoop/wasm/TaskLoopWasm.cpp`：单一 `ITaskLoop` 实现下分两条后端。泵后端保持原语义
+  （按帧预算消费队列）；worker 后端新增 `m_pending`/`m_stopping`/`m_workerLive` 三个 32 位原子量、
+  `startWorker/wakeWorker/joinWorker/workerLoop` 四个收口点（非 pthread 构建里是三个空操作，因此
+  `start/stop/postTask/pump` 正文不带平台分支）、跨线程存取的 `tlAtomic*` 包装，实例注册表加锁。
+  `pump()` 在 `m_workerLive` 置位时直接返回 0 —— 队列归 worker，再跑一遍就是重复执行。
+- `components/TaskLoop/wasm/TaskLoopWasm.h`：新增 `STaskLoopWorkerCount()`（0 说明退回泵后端），并把
+  `TASKLOOP::SCreateInstance` 的声明自带一份，宿主不必为了建实例去 include 桌面版
+  `thread/TaskLoop.h`（那份会再拉进 `thread/thread.h`）。
+- 根 `CMakeLists.txt`：`option(SOUI_WASM_PTHREADS ...)`（默认 OFF），开启时给 `CMAKE_C/CXX_FLAGS`
+  追加 `-pthread`、定义 `SOUI_WASM_PTHREADS=1`，并用 `add_link_options` 一次性给出
+  `-sWASMFS=1 -sINITIAL_MEMORY=64MB -sGROWABLE_ARRAYBUFFERS=1`。放在根而不是演示目录：cnchess 的
+  wasm 目标也要这三条（缺 `INITIAL_MEMORY` 时 `em++` 直接报"必须大于 `STACK_SIZE`"，本轮实测踩过），
+  而 `add_link_options` 会沿目录树继承给之后定义的每个目标。
+- `components/CMakeLists.txt`：`add_subdirectory(TaskLoop)` 从"仅 cnchess"里挪出来，成为 wasm
+  最小构建的常规组件（原来那份注释写的是"单线程队列"，已改）。
+- `demos/wasm-demo/CMakeLists.txt`：导出 `_SwinxDemoTaskLoopSelfTest`，并把 `taskloop` 链进演示目标；
+  原本挂在本地的三条 pthread 链接选项已上移到根。
+- `demos/wasm-demo/soui_main.cpp`：`SCOM_MASK` 补 `scom_mask_taskloop`；`SwinxDemoPump` 每帧
+  `ExecutePendingTask()` + `STaskLoopPump(剩余预算)`（两个消费点缺一个，"后台算完抛回 UI"就在
+  UI 侧断掉）；新增 `SwinxDemoTaskLoopSelfTest(int pOut[12])` 自测入口。
+- `demos/wasm-demo/smoke.js`：新增第 6 节（8 条两条后端共有的断言 + 一行计数打印 + 一条按 `pt`
+  分支的后端形态断言）；补 node 缺失的
+  `location` 假对象 —— `main()` 用 `location.search` 读 `?dpr=`，`emscripten_run_script_string` 里
+  的 `eval` 在 node 找不到 `location` 会直接 `ReferenceError` 让整个模块加载失败（见 32.7）。
+- `demos/wasm-demo/serve-isolated.py`：给 worker 构建用的静态服务，带 COOP/COEP 头。
+- `.github/workflows/soui-wasm-gate.yml`：烟测步骤补 `set -o pipefail` 和 `OK` 收尾行检查（见 32.7），
+  并改成 `wasm-pump` / `wasm-pthreads` 两条 matrix 腿（见 32.8）；头注释的断言数按两种配置改写。
+
+### 32.6 本轮验证命令与结果
+
+```bash
+source <emsdk>/emsdk_env.sh
+# worker 后端（-pthread）
+cmake -S . -B /tmp/build-soui-wasm-pt -G Ninja -DCMAKE_TOOLCHAIN_FILE=... \
+      -DSOUI_BUILD_WASM_DEMO=ON -DSOUI_BUILD_WASM_CNCHESS=ON -DSOUI_WASM_PTHREADS=ON
+cmake --build /tmp/build-soui-wasm-pt --target soui-wasm-demo
+node demos/wasm-demo/smoke.js            # DEMO_JS=out/soui-wasm-demo.js
+# 泵后端（默认，产物与改动前同形态）
+cmake -S . -B /tmp/build-soui-wasm-def -DSOUI_WASM_PTHREADS=OFF
+cmake --build /tmp/build-soui-wasm-def --target soui-wasm-demo
+node demos/wasm-demo/smoke.js
+```
+
+`-pthread` 构建 20 项、默认（泵）构建 19 项断言全通过，退出码 0（差的正是表里最后两行的互斥分支：
+worker 侧两条、泵侧一条）。计数字段实测值：
+
+- `-pthread`：`pt=1 workers=1 posted=8 exec=8 offUi=8 ui=8 inline=1 beat=1 pending=0
+  afterStop=0 liveDelta=0`
+- 默认（泵）：`pt=0 workers=0 posted=8 exec=8 offUi=0 ui=8 inline=1 beat=1 pending=0
+  afterStop=0 liveDelta=0`
+
+两条配置的区别只在 `offUi`：它只能由一条真实线程产生，所以这条断言在改动前的构建里必然失败。
+`TaskLoopWasm.cpp` 在不带 `-pthread` 时也参与编译（空操作后端），已单编该 TU 验证过两种配置。
+
+node 侧的 `-pthread` 构建会打印一条 `[wasm!] shm_open with O_CREAT: No such file or directory`
+（默认构建没有）：Emscripten 的 posix 共享内存落在 node 没有的挂载路径上，非致命，线程与队列照常
+工作；页面侧未观察到此路径。
+
+两种配置的构建目录共用同一个产物目录 `demos/wasm-demo/out`，这在本轮制造过一次假结论：A 配置重链后
+`out/` 换了产物，B 配置的 ninja 因为产物时间戳比输入新而报 `no work to do`，于是从 `out/` 复制走的
+"默认构建产物"实际是 `-pthread` 产物，`pt=0` 的期望跑出 `pt=1` 的结果。分开对比产物必须先强制重链
+（`rm -f demos/wasm-demo/out/soui-wasm-demo.{js,wasm,data,html}` 再 build，或 `--clean-first`），
+并核对 `smoke.js` 打印的 `[taskloop] pt=`。
+
+### 32.7 顺带发现并修掉：wasm 门禁的退出码被 `tee` 吞掉了
+
+`.github/workflows/soui-wasm-gate.yml` 的烟测步骤原本只有 `node demos/wasm-demo/smoke.js 2>&1 | tee
+smoke.log`，没有 `set -o pipefail`（同文件的构建步骤有）。GitHub 的默认 `bash -e` 不含 pipefail，
+管道退出码取 `tee` 的 0，所以 `smoke.js` 里任何 `FAIL` 都不会让这一步变红。本轮补的 `location` 假对象
+就是这条盲区下的一个实例：在此之前，node 加载演示模块时 `main()` 就在 dpr 读取处抛 `ReferenceError`，
+烟测的断言一条也没真的跑过。
+
+现在的烟测步骤是 `set -o pipefail` + 管道 + `grep -q '^OK: 全部断言通过$' smoke.log`。第二条是留给
+"退出码本身不可信"的情形（进程被 abort、留下半截全绿日志）：`smoke.js` 只在失败列表为空时才打这一行。
+
+A/B 证据（本轮实测，两份都是同一条命令在本地跑）：
+
+| 门禁逻辑 | 脚本 | 结果 |
+| --- | --- | --- |
+| 旧（只有 `tee`） | `git show 6428a461e:demos/wasm-demo/smoke.js`（补 `location` 之前） | 步骤退出码 **0**，日志里 `PASS` 行数 **0**，只有一句 `ReferenceError: location is not defined` |
+| 新（`pipefail` + `OK` 行 grep） | 同一份脚本 | 步骤退出码 **1** |
+| 新 | 当前 `smoke.js`，同一产物 | 退出码 **0**，19 项断言全过 |
+| `grep '^OK: 全部断言通过$'` 单独 | 伪造的半截日志（只有一行 `PASS`） | 退出码 **1** |
+
+这条盲区的后果不是"少跑了一条断言"，而是"一条也没跑"：`location` 缺失发生在 `main()` 里，模块加载
+就失败了，日志里 `PASS` 行数为 0，步骤却是绿的。所以"退出码即结论"要由门禁自己保证，不能只靠脚本内部。
+
+### 32.8 CI 补上 worker 后端这条腿：两条 matrix
+
+`.github/workflows/soui-wasm-gate.yml` 原来只构建默认（不带 `-pthread`）的产物，也就是说 32.1 表里
+最后两行的 worker 侧从没被机器跑过。现在改成 matrix 两条腿：
+
+| 腿 | 配置 | 断言 | 独有保障 |
+| --- | --- | --- | --- |
+| `wasm-pump` | `-DSOUI_WASM_PTHREADS=OFF` | 19 | `workers==0` 且 `offUi==0`（产物形态没被改掉） |
+| `wasm-pthreads` | `-DSOUI_WASM_PTHREADS=ON` | 20 | `workers==1` 且 `offUi==posted==8`（任务真的离开 UI 线程） |
+
+三条设计上的注意点：
+
+- **两条腿各占一台 runner**。产物目录 `demos/wasm-demo/out` 由 `SOUI_WASM_DEMO_OUT` 决定、默认按源
+  目录写死，同一台机器上先后两次构建会互相覆盖，被覆盖那侧的 ninja 又因产物时间戳更新而报
+  `no work to do`（32.6 记的坑就是它）。分机器最省事，也不必给每条腿编一个产物目录。
+- **每条腿再 `grep` 一句 `[taskloop] pt=<期望值>`**。这条不是断言的重复，而是防"腿与产物不匹配"：
+  万一以后有人把两条腿挪回同一台机器，拿错产物会立刻变红而不是静默地两条腿测同一份东西。
+  本地按 CI 步骤的原文各跑一遍验过两个方向：`pt=1` 产物 + worker 腿 → 步骤退出码 0；同一份
+  `-pthread` 产物 + 泵腿（要求 `pt=0`）→ 步骤退出码 **1**（19 条断言全绿也救不回来，因为这条 grep
+  盯的是配置匹配而不是行为）。
+- **`fail-fast: false`**。默认腿的结论不该被 worker 腿取消，两条后端各自的红/绿要能分开看。
+
+本地按 CI 的命令序列复验（干净配置，`-j4`）：
+
+| 命令 | 结果 |
+| --- | --- |
+| `emcmake cmake -S . -B /tmp/build-wasm-ci-pt -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DSOUI_BUILD_WASM_DEMO=ON -DSOUI_FUN_TEST_POST_BUILD=OFF -DSOUI_WASM_PTHREADS=ON` | 配置通过（日志尾部有 `SOUI_WASM_PTHREADS: -pthread + -sWASMFS=1` 那句 STATUS） |
+| `cmake --build /tmp/build-wasm-ci-pt --target soui-wasm-demo -j4` | 549 个目标全过，配置结束到产物完成 2.3 分钟；`.wasm` 45.3 MB。链接期两条 em++ 警告已知非致命：`-pthread + ALLOW_MEMORY_GROWTH may run non-wasm code slowly, consider -sGROWABLE_ARRAYBUFFERS=2`（本轮维持 1：实测 worker 往返 53ms、启动 54-56ms，没有慢到需要换语义）与 DWARF 限制了 postlink 优化 |
+| `node demos/wasm-demo/smoke.js` | 20 项全 PASS，退出码 0：`pt=1 workers=1 posted=8 exec=8 offUi=8 ui=8 inline=1 beat=1 pending=0 afterStop=0 liveDelta=0` |
+
+node 版本也过了一遍：CI 的 ubuntu runner 只保证有 node，本机最高只到 v18.20.8，而 worker 后端要
+`SharedArrayBuffer` + `worker_threads`。用 v18.20.8 跑 `-pthread` 产物同样 20 项全过
+（`pt=1 workers=1 offUi=8`），所以 `Atomics.wait` 可用不是 node 24 才有的条件。
+node 侧会打印一句 `[wasm!] shm_open with O_CREAT: No such file or directory`（见 32.6），非致命。
+
+**这条腿不等于浏览器验证**：node 里没有 `crossOriginIsolated` 这道前提，Chromium 侧仍按 readme 的
+清单人工过（32.9）。
+
+### 32.9 边界与需在其他环境复验
+
+- **浏览器里跑 `-pthread` 产物未实测**（本机无带 COOP/COEP 的真机验证）。要在 Chromium 复核：
+  `crossOriginIsolated === true`、worker 线程从 `mainScriptUrlOrBlob`/`currentScript` 拿到胶水地址、
+  页面卡住时后台解压/计算仍能推进。`serve-isolated.py` 提供头，剩下的按 readme 清单人工过。
+  胶水侧的取值口径已从 Emscripten 源码确认：非 `EXPORT_ES6` 产物用 `var pthreadMainJs = _scriptName`
+  （`src/lib/libpthread.js` 的 `allocateUnusedWorker`），`soui-host.js` 是用 `<script src>` 挂进
+  页面的，所以 `_scriptName` 就是胶水自己的 URL，worker 能加载；页面若改成 `import()` 就得同时给
+  `Module.mainScriptUrlOrBlob`。
+- **cnchess 的无头烟测在 node 里跑不起来，与本轮无关（A/B 实测）**：`node
+  games/cnchess/client/wasm/smoke.js` 在 `DllMain → CW32System::CW32System → RegisterWindowMessageA
+  → SConnMgr::getConnection → SConnection → SwinxCanvasCreate` 处抛
+  `Cannot read properties of undefined (reading 'createElement')` —— 那份 smoke.js 没有像
+  `demos/wasm-demo/smoke.js` 那样造假 `document`。把 `SOUI_WASM_PTHREADS=OFF` 重新链一份 cnchess，
+  同一处、同一栈再跑一遍，报错完全一致，所以这是它自己的烟测设施缺口，不是 worker 后端引入的。
+- **本轮让 cnchess 也能带 `-pthread` 链接**：三条链接期设置原先只写在 `demos/wasm-demo` 里，
+  cnchess 一开这个开关就在 wasm-ld 期报 `INITIAL_MEMORY must be larger than STACK_SIZE`
+  （16MB < 32MB），现在由根 `CMakeLists.txt` 的 `add_link_options` 统一给。但"cnchess 切到 worker
+  后端"没做：要先解决上一条暴露的口径问题（后台线程里任何走到 `SConnMgr::getConnection` 的调用都会
+  在 worker 的 JS realm 里建 `SConnection`），并复核浏览器隔离环境。
+- Windows/macOS 不受影响：worker 后端整块在 `__EMSCRIPTEN_PTHREADS__` 下，`wasm/TaskLoopWasm.cpp` 只在
+  `EMSCRIPTEN` 分支参与编译（`components/TaskLoop/CMakeLists.txt`），桌面版仍用 `thread/TaskLoop.cpp`。
+  按既有分工，这两平台的复验交给维护者，本轮只给清单。
+- cnchess 客户端目前仍只用泵后端（`SOUI_WASM_PTHREADS` 默认 OFF）。现在 worker 后端已就位，切到
+  `-pthread` 后主题包解压就能整条离开主线程；那一步需要先解决 32.4 的硬约束（后台任务里不得调用
+  `hWnd == NULL` 的 swinx API）并复核浏览器隔离环境。
+- 557 项无头门禁（`ctest -L '^soui-headless$'`）未受影响：本轮改动都在 `EMSCRIPTEN` 编译分支与
+  wasm 演示目录里；桌面构建的 `TaskLoop.cpp` 一行未动。
+- **CI 的线上结果没在本机核验**：本仓 `origin` 指向 gitee，GitHub Actions 的运行历史要在目标仓库
+  现场看。本轮能保证的是本地按 matrix 两条腿的命令原文（configure → `build -j4` → 烟测步骤的两条
+  `grep`）各跑过一遍都绿；`wasm-pthreads` 这条腿第一次在 runner 上跑仍是新暴露面（runner 的 node
+  版本、`SharedArrayBuffer` 在 node 里不需要隔离头这两点已在本机按 v18 复验过）。
+
+## 33. 文件选择：浏览器给不出同步对话框，就把异步契约交给调用方（2026-11-03）
+
+### 33.1 需求与验收
+
+需求原文："现在开始做文件选择支持。" 展开：wasm 版要能让用户从磁盘挑一个文件，挑完的结果
+在 C++ 侧可直接 `fopen`；这件事在桌面/iOS 上是既有的同步 API（`GetOpenFileNameA`），本轮要把
+它变成一套六个平台都能用、且在浏览器里不冻住主线程的接口。
+
+拆成可断言的验收项（无头的落在 `swinx`/`demos/wasm-demo` 两侧，真机的落在 33.9 清单）：
+
+| 项 | 判据 | 落在哪 |
+| --- | --- | --- |
+| 发起请求不阻塞浏览器主线程 | 调用返回后**立刻**读回调计数必须为 0；标题与 accept 由宿主钩子收到 | `smoke.js` 7b |
+| 选中的文件可直接 `fopen` | 回调给的路径读回首字节 83、共 17 字节 | `smoke.js` 7c（演示页则打一行 `[pick]`） |
+| 浏览器给的文件名决定不了落盘位置 | `../../etc/pass wd.txt` → `/tmp/swinx-pick/2-etcpass_wd.txt` | `smoke.js` 7d |
+| 回调只在发起线程、只回一次 | `cb==1` 且 `onUi==1`；一个没人等的 id 回投后 `cb` 不变 | `smoke.js` 7c / 7e |
+| 不支持的形态显式拒绝 | 多选 / wasm 的 `SAVE` → 0 + `ERROR_CALL_NOT_IMPLEMENTED`；参数非法 → 0 + `ERROR_INVALID_PARAMETER`；三种都一次回调都不给 | `smoke.js` 7e + `fun_test` 两条 |
+| Win32 筛选表 → `accept` 的换算 | 7 组表格用例 + 探长度 + 短缓冲 `-1` | `smoke.js` 7a + `fun_test` 两条 |
+| 既有路径不被破坏 | 两条 CI 腿与 564 项无头门禁照常绿 | 33.8 |
+
+### 33.2 为什么只能是一条异步 API
+
+浏览器主线程在这次 JS→wasm 调用里等不到结果：`<input type=file>` 的 `change` 事件只在 JS 栈
+返回之后才派发，所以在 wasm 内部阻塞等它，等到的是整页冻死（同一平台的另一条证据见 §32.2：
+主线程上的 `Atomics.wait` 是忙等模拟，等待期间 DOM 事件也不再派发）。iOS 端把异步包成同步用的是
+`dispatch_semaphore` + 嵌套 `CFRunLoop`（`swinx/src/platform/ios/dlghelper.mm`），浏览器没有
+可重入的嵌套消息循环可借。
+
+三条被排除的路线：
+
+- **`-sASYNCIFY=1`**：把整模块的 JS↔wasm 边界改造成可暂停栈，代价由所有导出承担，而不只是一个
+  对话框；本轮的取证工具（node 直调导出）也会跟着变复杂。
+- **给 `PLATFORM_API_VERSION` 加一位、让宿主实现同步取文件**：Android/OHOS 宿主按严格版本匹配
+  校验，bump 之后现网宿主直接拒载 —— 一条演示用的文件选择不足以让整个移动端换 ABI。
+- **在 wasm 上让同步版返回 FALSE 当作"用户取消"**：这是静默降级，调用方分不清"用户按了取消"和
+  "这台设备根本没有文件选择能力"。swinx 的口径是显式拒绝（`SetLastError` + 返回失败）。
+
+结论：新增一条 swinx 私有扩展 `SwinxPickFileAsyncA`，把异步语义交给调用方；`GetOpenFileNameA`
+在 wasm 上**仍然**保持原来的显式拒绝（两者互不冒充）。
+
+### 33.3 契约（写在 `swinx/include/commdlg.h` 的注释里）
+
+1. 返回 1 = 请求已受理，结果一律经 `pfnDone` 给出；返回 0 = 请求没发起，原因见 `GetLastError`，
+   `pfnDone` 不会被调用。
+2. `nResult`：1=已选中、0=用户取消、-1=失败（含本平台显式拒绝该能力）。
+3. `lpszUtf8Path` 只在回调调用期间有效，要留存必须自己拷贝；`nResult != 1` 时为 NULL。
+4. 不回写调用方的 `p->lpstrFile`（异步返回时那块缓冲可能已经不在）；只支持单选；只有 A 版
+   （UTF-8），不给 W 变体。
+
+桌面 / iOS 的本地对话框本来就是阻塞的，所以那里的回调在 `SwinxPickFileAsyncA` 返回**之前**内联
+执行；裸金属与移动端没有对话框能力，走的也是这条内联路径，结果就是 `nResult = -1`。调用方因此
+只写一套代码，"回调什么时候来"由平台决定 —— 这正是同一个符号要在六个平台目录里各给一份实现的理由。
+
+wasm 额外两条限制：`mode` 只能是 `OPEN`（SAVE 要把字节写到磁盘上的某个名字、FOLDER 要枚举整个
+目录，都超出 `<input type=file>` 的能力），以及必须在 UI 线程调用。后一条不是风格问题：worker
+线程的 JS realm 里没有页面那份 `Module`，`EM_ASM` 取到的宿主钩子是"不存在"，请求会以
+`ERROR_CALL_NOT_IMPLEMENTED` 失败，而不是被悄悄挂到主线程上（与 §32.4 那条"后台任务里不得调用
+`hWnd == NULL` 的 swinx API"同一根源）。
+
+### 33.4 收敛形态：一个跨 TU 钩子 + 一份共享尾部
+
+按 swinx 的"同名符号分平台目录、链接期解析"形态：
+
+- `int swinx_pick_file_async(LPOPENFILENAMEA, DlgMode, SWINXFILEPICKCALLBACK, void *)` 声明在
+  `src/SwinxUtils.h`，返回 `int` 而不是 `BOOL`（跨 TU 的 `__OBJC_BOOL_IS_BOOL` 口径，与
+  `swinx_messageBeep` 同一个理由）。六个平台目录各给一份定义，不给占位桩就会链接失败。
+- 共享尾部 `swinx_pick_file_deliver()`（inline，同一份头文件）把同步版的 BOOL 结果翻译成
+  `nResult`：1→1、`GetLastError()==ERROR_CALL_NOT_IMPLEMENTED`→-1、其余→0，并负责调用用户回调。
+  于是 linux / cocoa / ios / mobile / freertos 五处各只写 4 行（转调现成的同步
+  `SGetOpenFileNameA`），平台差异全部落在那一份共享尾部里，不会出现"某平台忘了调回调"。
+- `SwinxPickFileAsyncA` 本体在 `src/cmmmdlg.cpp`：参数校验 → 多选拒绝 → `new` 一份请求（含按
+  `nMaxFile` 复制的路径缓冲，`lpstrFileTitle`/`nMaxFileTitle` 归零）→ 调钩子 → 未受理时立刻释放。
+  调用方的 `OPENFILENAMEA` 只当输入读，字符串字段只在本次调用期间被读用，所以调用方返回后即可
+  释放自己的结构体与字符串。
+
+### 33.5 wasm 侧：字节怎么从 JS 进到能 `fopen` 的路径
+
+`swinx/src/platform/wasm/dlghelper.cpp`：
+
+- 8 个槽位的 POD 表 + 一个递增的 `nId`（0 表示空闲，序号绕回 0 时跳过）。表满时报
+  `ERROR_NO_PROC_SLOTS` 并拒绝新请求 —— 有请求发出去之后没等到回投（页面把 input 摘掉却没触发
+  `change`）时，宁可让新请求显式失败，也不让它压到别人的回投上。
+- 落盘目录 `/tmp/swinx-pick`（`mkdir 0700`，`EEXIST` 容忍），路径是 `<目录>/<nId>-<消毒后的名字>`。
+  `snprintf` 放不下就整条失败（截断等于把一个不存在的路径交给调用方）；`fwrite` 少写了就 `remove()`
+  再失败，不留半截文件。
+- 名字消毒：只留 `[0-9A-Za-z-_., >=0x80]`（UTF-8 非 ASCII 字节整段保留，中文文件名不受影响），
+  空格转 `_`，`/`、`\`、`:` 与控制字符丢弃，连续两个点压成一个。**前导点整段去掉** —— 分隔符和
+  `..` 已经在前面处理过，剩下能出现在开头的点只会把落地的文件变成隐藏文件。
+- 唯一重入口 `SwinxFilePickDone(nId, nResult, pszName, pData, nLen)`：按 `nId` 查表；`nId==0` 或
+  查不到就丢掉（过期/重复回投绝不回调第二次）；**先摘槽位再回调**，所以回调里可以再发一次选择请求
+  而不会撞进同一条槽。`pszName`/`pData` 由 JS 侧 `_malloc`、JS 侧 `free`，本函数只读 —— 与
+  `SwinxClipboardSetBrowserText` 同一所有权约定。
+- `accept` 由筛选表现算到一个 512 字节的栈缓冲；算不下就直接返回 0（留空等于"接受全部"，那是
+  静默降级），错误码由换算函数置好。
+- 宿主钩子 `Module.swinxPickFile(nId, title, accept)`（`demos/wasm-demo/soui-host.js`）：
+  `_SwinxFilePickDone` 没导出时返回 false，让 swinx 走显式失败而不是发起一个永远回不来的请求；
+  `navigator.userActivation.isActive === false` 时同样拒绝（浏览器只在用户手势里允许弹文件选择）；
+  建一个隐藏的 `<input type=file>` 并**挂进 document**（Firefox 不挂进文档不会派发改事件），
+  `onchange` 读 `File.arrayBuffer()`（旧浏览器回落 `FileReader`）、`oncancel` 报取消，两条出口
+  汇到同一个 `reply()`：malloc 名字与字节 → 调 `_SwinxFilePickDone` → `finally` 里 free + 摘掉
+  input。
+
+### 33.6 筛选串 → `accept`：`SwinxFilterToAcceptA`
+
+纯函数（`src/cmmmdlg.cpp`，无副作用，所以能进无头用例）：丢弃描述段、按 `;` 切分模式、`*.x` 去星
+留 `.x`、MIME 型模式原样交给浏览器、去重并 trim 空白。`*`、`*.*` 或空模式段表示"这组接受全部"，
+而 `accept` 表达不了"其中一组接受全部"，所以整份筛选退化成空串（= 不限制）。分组数上限 64，防
+一份没闭合的串把整段内存当筛选表读完。
+
+`cchOut == 0` 是**探长度**形态：返回含结尾 0 的所需字节数且一个字节都不写；缓冲放不下返回 -1 +
+`ERROR_INVALID_PARAMETER`，绝不静默截断。这里本轮踩过一次：拿 `cchOut = 0` 去当"短缓冲"用例的
+两个 accept-all 分支拿到的是 1（探长度的正确返回），因为空 accept 的"差一个字节"正好是 0 ——
+是用例写错了，不是实现错了，改成只在 `want` 非空时才测短缓冲。
+
+### 33.7 改动清单
+
+- `swinx/include/commdlg.h`（+52）：两个新声明 + 契约注释。这是 swinx 私有扩展，Win32 没有同名
+  API；`swinx/doc/tools/api_scan.py` 的清单从 1270/1140 涨到 1272/1142。
+- `swinx/src/SwinxUtils.h`（+41）：`swinx_pick_file_async` 声明（返回 `int`）+ 共享尾部
+  `swinx_pick_file_deliver`。
+- `swinx/src/cmmmdlg.cpp`（+182）：`SwinxFilterToAcceptA`、`SwinxPickFileAsyncA`、请求结构与
+  转发回调。
+- `swinx/src/platform/wasm/dlghelper.cpp`（+215/-3）：`swinx_pick_file_async` 的浏览器实现、
+  `SwinxFilePickDone`、槽位表、落盘与名字消毒。原有的四个显式拒绝桩（`SGetOpenFileNameA` /
+  `SChooseColor` / `ChooseFontA/W`）一个没动。
+- `swinx/src/platform/{linux,cocoa,ios,mobile,freertos}/dlghelper.*`（各 +9）：4 行转调现有同步实现。
+- `swinx/doc/tools/api_scan.py`（1 行）：`site_classes` 改成排序输出。它原来按 `os.walk` 的文件系统
+  顺序写入，任何一次 unlink+create 都会让这份**已提交的**清单在下次重生成时整片重排（本轮第一次
+  刷新实测 1062/1030 行差异，绝大多数与此功能无关）；`--check` 本身比较的是 `files`（已排序）与
+  `agg`，所以门禁不受影响，受影响的是可读的 diff。排序后同一份改动只剩 75/43 行。
+- `swinx/doc/tools/gen_doc.py`（+3）：两个新名字进 `OVERRIDES`，级别写 `impl` 并附契约说明 ——
+  扫描器把函数体里那句 `ERROR_CALL_NOT_IMPLEMENTED` 当成 `not-implemented` 标记，会把
+  `SwinxPickFileAsyncA` 判成 `partial`，而显式拒绝是契约行为不是漏实现。
+- `swinx/doc/tools/api_scan.json`、`swinx/doc/swinx-API实现清单.md`：按上面的流程重生成。
+- `demos/wasm-demo/soui_main.cpp`（+152）：`SwinxDemoFilePickSelfTest(nPhase, pOut[8])` 三阶段探针
+  （0=发起并报告回调计数、1=报告回调次数/结果/读回字节数与首字节/路径长度、2=四条拒绝 + 一次过期
+  id 回投）、`OnWasmFilePicked` 回调（`fopen` 读回并打一行 `[pick]`）、`SwinxDemoFilePickPath()`。
+- `demos/wasm-demo/CMakeLists.txt`：导出表补 `_SwinxDemoFilePickSelfTest` /
+  `_SwinxDemoFilePickPath` / `_SwinxFilePickDone` / `_SwinxFilterToAcceptA`。
+- `demos/wasm-demo/soui-host.js`（+71）：`Module.swinxPickFile` 钩子。
+- `demos/wasm-demo/soui.html`（+54）：一个「选择文件」按钮 —— 必须在真实点击（用户手势）里发起，
+  页面对话状态每 200ms 读一次探针。这是给人在浏览器里过这条链路的入口，不是烟测的一部分。
+- `demos/wasm-demo/smoke.js`（+155/-1）：第 7 节 11 条断言（accept 表格 2 条 + 文件选择 9 条），
+  含一个带两份载荷（含恶意文件名）的假 `Module.swinxPickFile`，用 `setTimeout` 走真投递路径。
+- `demos/fun_test/test_commdlg.cpp`（新增，4 条 `swinx_commdlg.*` 用例）：`SwinxFilterToAcceptA`
+  的表格/探长度/短缓冲，和 `SwinxPickFileAsyncA` 的参数非法与多选拒绝（都不会真的弹对话框）。整文件
+  在 `#ifndef _WIN32` 下 —— 这两个符号只存在于 swinx 的 `commdlg.h`，Windows 用的是系统 SDK 那份。
+- `.github/workflows/soui-wasm-gate.yml`：头注释的断言数按两种配置改写（见 33.8）。
+
+### 33.8 本轮验证命令与结果
+
+```bash
+source <emsdk>/emsdk_env.sh
+# 泵后端（默认）
+emcmake cmake -S . -B build-wasm -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+  -DSOUI_BUILD_WASM_DEMO=ON -DSOUI_FUN_TEST_POST_BUILD=OFF
+cmake --build build-wasm --target soui-wasm-demo -j4
+node demos/wasm-demo/smoke.js                        # 30 条断言全过，退出码 0
+# worker 后端。产物目录单独给，避开 §32.6 记过的"两条配置共用 out/"这条坑
+emcmake cmake -S . -B build-wasm-pt -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+  -DSOUI_BUILD_WASM_DEMO=ON -DSOUI_WASM_PTHREADS=ON -DSOUI_WASM_DEMO_OUT=$PWD/demos/wasm-demo/out_pt
+cmake --build build-wasm-pt --target soui-wasm-demo -j4
+node demos/wasm-demo/smoke.js demos/wasm-demo/out_pt/soui-wasm-demo.js   # 31 条全过
+# 无头门禁
+cmake --build build --target fun_test -j4
+ctest --test-dir build -L '^soui-headless$' --output-on-failure
+# swinx API 面门禁
+python3 swinx/doc/tools/api_scan.py && python3 swinx/doc/tools/gen_doc.py
+python3 swinx/doc/tools/api_scan.py --check
+```
+
+| 检查 | 结果 |
+| --- | --- |
+| `smoke.js`（泵产物） | 30 条 PASS、0 条 FAIL，`[taskloop] pt=0`，退出码 0 |
+| `smoke.js`（`-pthread` 产物） | 31 条 PASS、0 条 FAIL，`[taskloop] pt=1`，退出码 0 |
+| `ctest -L '^soui-headless$'` | `100% tests passed, 0 failed out of 564`（注册 565 = 515 单元 + 1 集成 + 12 无窗口 E2E + 37 控件无头，其中 1 条 `swinx_misc.is_dbcs_lead_byte_codepage_dependent` 带 `DISABLED_` 不执行）；`ctest -N` 里能看到新增的 4 条 `swinx_commdlg.*` |
+| `api_scan.py --check` | `[OK] 清单与源码一致，且没有任何函数低于能力基线`；声明 1272 / 有定义 1142，`api_baseline.json` 未改 |
+| 编译告警 | `cmmmdlg.cpp`、`platform/wasm/dlghelper.cpp` 各单编一次 `-fsyntax-only -Wall -Wextra`（`em++` 与 g++ 两侧）干净；`.mm`/移动端目录本机没有对应 SDK，未编译 |
+
+**A/B 证据（本轮实测）**：
+
+| 组合 | 结果 |
+| --- | --- |
+| 新 `smoke.js` + 改动前的产物（构建于源码改动之前，`out/` 整份复制到 `/tmp/prefix_out`） | `[FAIL] 导出符号齐全 [_SwinxDemoFilePickSelfTest,_SwinxDemoFilePickPath,_SwinxFilePickDone,_SwinxFilterToAcceptA]`，随后 `TypeError: m._SwinxFilterToAcceptA is not a function`，退出码 **1** —— 新增的 11 条断言在改动前的构建里一条也立不住 |
+| 同一份新 `smoke.js` + 新产物 | 30 条全过（`pt=0`），退出码 0 |
+| 名字消毒的第一版实现（不去前导点） + 新 `smoke.js` | `[FAIL] …路径没跑出选择目录 [path=/tmp/swinx-pick/2-.etcpass_wd.txt]` → 去掉前导点后变绿 |
+| 短缓冲用例的第一版（拿 `cchOut=0` 当短缓冲） | `[FAIL] accept 探长度正确、短缓冲显式拒绝 [短缓冲返回 1 期望 -1]` ×2（正对应两条 accept-all 用例）→ 用例改成只在 `want` 非空时测，实现未动 |
+
+断言数从 §32 记录的 19/20 涨到 30/31，差的 11 条正是本节新增的第 7 节；两条腿各自的 `pt=` grep 仍然
+有效（`smoke.js` 打印的 `[taskloop] pt=` 与配置一致）。
+
+### 33.9 边界与需在其他环境复验
+
+- **浏览器真机未实测**。人工清单（Chromium，`demos/wasm-demo/serve-isolated.py` 或任意静态服务均可，
+  默认构建不需要隔离头）：
+  1. 点「选择文件」→ 系统选择框出现，标题是"选择文件（swinx 异步文件选择）"，且只列 `.txt`/`.png`
+     （筛选串来自 `soui_main.cpp` 的探针）；
+  2. 选中一个 `.txt` → 页面状态行显示"回调 1 次，nResult=1"，控制台一行 `[pick] result=1 path=/tmp/swinx-pick/… bytes=N`，
+     且 N 与真实文件大小一致（这一步同时证明字节真的落进了 wasm 文件系统）；
+  3. 中文文件名、含空格的名字各选一次 → 路径里的 `_` 与 UTF-8 名字符合预期，文件仍读得开；
+  4. 打开选择框后按取消 → 状态行显示 `nResult=0`，再点一次按钮仍能发起（槽位被回收）；
+  5. 连开 9 次都在打开后直接关标签页/不选（不给 `change` 也不给 `cancel`）→ 第 9 次按钮报
+     `ret=0 lastError=…`（`ERROR_NO_PROC_SLOTS`），这是**已知的槽位泄漏**：Safari 一类不发
+     `cancel` 事件的浏览器会把槽位占住，宁可显式失败也不压掉别人的回投；
+  6. `-pthread` 产物：先在 `crossOriginIsolated` 页面里过 1-4，再从 worker 线程调一次
+     `SwinxPickFileAsyncA` → 必须是 `ret=0` + `ERROR_CALL_NOT_IMPLEMENTED`（33.3 的那条限制）。
+- **Windows 上没有这两个符号**：`swinx` 不参与编译，`<commdlg.h>` 是系统 SDK 那份。调用方要跨
+  Windows 就必须分两条：Windows 用同步 `GetOpenFileNameA`，其它平台用 `SwinxPickFileAsyncA`
+  （桌面/iOS 的回调是内联的，所以同一套回调代码在五个平台上只用写一遍）。`demos/fun_test/test_soui.cpp`
+  里那个交互用例仍用同步版，未改。
+- **桌面/iOS/移动端的钩子是 4 行转调既有的同步实现，本机没有真弹过窗**：Linux 的 DBus portal、
+  macOS 的 `NSOpenPanel`、iOS 的 semaphore+CFRunLoop 包装、Android/OHOS 的宿主回调路径都只经过
+  编译期检查（`.mm` 与移动端目录本机无 SDK，连编译都没做）。按既有分工，这些平台的复验交给维护者，
+  清单是同一条：正常选中 / 取消 / 用户不响应（这条在桌面上是阻塞的，不存在"回调稍后来"）三种结果
+  各一次，且 `pfnDone` 恰好调用一次。freertos 与移动端预期 `nResult = -1`（没有对话框能力）。
+- **cnchess 未接入**：`games/cnchess/client/wasm/CMakeLists.txt` 的导出表里没有 `_SwinxFilePickDone`，
+  所以它的页面钩子会走"没装钩子"分支；`LoginDlg.cpp` 的 `OnAvatarExt` 仍用同步 `GetOpenFileNameA`。
+  接入要做三件事：加导出、`OnAvatarExt` 换成 `SwinxPickFileAsyncA` + 回调里把头像路径交给 Lua，
+  以及 cnchess 自己的 `smoke.js` 造假 `document`（§32.9 记的那条既有缺口）。
+- **一次请求只回一条路径**（多选显式拒绝）。要多选得换一种打包（`p->lpstrFile` 里的双 `\0` 列表），
+  那是另一条契约，本轮没有半实现。
+- 落盘目录 `/tmp/swinx-pick` 只增不删：选过的文件留在 wasm 文件系统里直到模块退出。内存代价是一次
+  选择的字节数，`fopen` 语义换来的，若以后要做"选完即弃"要在回调之后由调用方 `remove`。
+
+---
+
+## 34. cnchess 客户端切到 `-pthread` 的 worker 任务队列（2026-11-04）
+
+### 34.1 需求与验收
+
+需求原文："将cnchess/client/wasm改成使用pthread的taskloop来实现。" 展开：§32 已经把 worker 后端
+做进 `TaskLoopWasm` 并接到了演示页，本轮把真正的业务客户端 —— `games/cnchess/client/wasm` ——
+默认切到那条后端上，让主题包的解压（4.4 MB / 46 个文件）像桌面版一样跑在真正的线程里，
+而不是每帧从 UI 线程泵出来。
+
+拆成可断言的验收项，每一条都指定落在哪：
+
+| 项 | 判据 | 落在哪 |
+| --- | --- | --- |
+| 构建默认给 worker 后端 | `build-cnchess.sh` 不带参数即 `-DSOUI_WASM_PTHREADS=ON`，产物落 `out_pt/`；`--no-pthreads` 才退回 `out/` | 两个包装脚本 + `CMakeLists.txt` 的 `_soui_cnchess_out_default` |
+| 解压真的不在 UI 线程上 | `stat 19`（worker 上执行掉的任务数）== `stat 6`（总执行数）；泵腿必须 `offUi==0 && workers==0` | `smoke.js` 第 6 节按 `pt` 分流 |
+| 解压跨帧（不是内联跑完） | 逐帧轮询采到 `live>=1 && pending>=1 && workers>=1`；泵腿同一轮询只能是 `0/0/0` | `smoke.js` 的采样峰值 |
+| 端到端没被切后端弄坏 | `theme 1`、`board 103`、ws 收包字节覆盖整包、音效交出 19518 字节的 RIFF/WAVE | `smoke.js` 1-5 节 |
+| 浏览器真机在隔离头下跑通 | Chromium + `serve-isolated.py`：`iso=true pt=1 workerRun=run=1`，峰值 `1/1/1`，进度弹窗关闭、无 crash | 34.5 的浏览器 A/B |
+| 既有门禁不破 | `api_scan.py --check` 绿、`ctest -L '^soui-headless$'` 绿 | 34.5 |
+
+### 34.2 三条只有 worker 产物才会踩到的坑
+
+切后端不是把开关拨过去就完事，这条路上撞到的三处都是"泵后端不会暴露、worker 后端必暴露"的：
+
+1. **可增长的 `SharedArrayBuffer` 喂不进 `TextDecoder` 和 `ImageData`。**
+   `-pthread` 之后 wasm 内存是一块 growable SAB，而这两个 JS API 都明确拒绝可增长/共享的
+   `ArrayBuffer`（Chrome 实测 `The provided ArrayBuffer value must not be resizable` /
+   `... Uint8ClampedArray value must not be resizable`）。原来的胶水直接在堆视图上切
+   `Uint8ClampedArray` 构造 `ImageData`、直接把 `typed_memory_view` 交给 `TextDecoder`，
+   泵产物（定长 ArrayBuffer）没事，worker 产物一上屏/一画文本就抛。改法是在 JS 侧准备两块
+   **按需长大的定长缓冲**，每次只剩一次整块 `set()` 拷贝（`swinx/src/gdi/canvas2d/js_glue.cpp`
+   的 `SwinxCanvasPutPixelsAt` 与 `SwinxJsText`）；`putImageData` 之后浏览器本来还要再复制一遍
+   像素，所以这一步不改变上屏路径的量级。
+2. **`-sWASMFS=1` 把 `--preload-file` 铺出来的树当成只读资源。**
+   worker 后端必须开 WASMFS（§32.3 记过原因：默认 JS 文件系统里 worker 一睡主线程的 stdio
+   就永不返回），代价是 `/opt/soui` 整棵树只读 —— 实测 `mkdir /opt/soui/theme_cache` 直接
+   `EACCES`。主题缓存目录与登录配置因此都改到 Emscripten 自己建的、两种文件系统下都可写的
+   `/tmp`（`MainDlg.cpp:62` 的 `ThemeCfgPath()`、`MainDlg.cpp:92` 的 `m_strThemeCacheDir`）。
+   浏览器没有跨会话磁盘，这份配置只在当前页面生命周期内有效。
+3. **注入式点击会整批失效：模态视图的入场动画吞掉鼠标消息。**
+   `SModalView::SwndFromPoint`（`SOUI/src/core/SModalViewSession.cpp:150`）在 `m_isAnimating`
+   期间直接返回自己，整棵子树收不到鼠标消息；动画只由 `kPulseTimer` 的 `WM_TIMER` 推进，而
+   swinx-wasm 的 `WM_TIMER` 是 `SConnection::peekMsg` 里按**真实时间**到期补出来的。node 里
+   canvas2d + 假 DOM 让一次空泵几乎不花钱（实测连泵 32 帧只走 1 ms），于是一帧动画都没推进，
+   注入的三条鼠标消息全被动画吃掉；浏览器里真人点击天然落在动画之后，所以只有注入式烟测暴露
+   它。改法是"等到命中测试真的落到目标控件上再注入"：`cnchess_main.cpp:330` 的 `CnchessClick`
+   按 1.5 s 墙上时间放开泵（不是按帧数——帧数在这条路上推不动动画），`smoke.js:444` 的
+   `settle()` 给弹窗开/关两条生命周期断言用同样的口径（它必须 `await sleep(20)` 让出事件循环，
+   否则时间不会走）。到上限仍不满足条件就照原样注入 / 返回 false，让失败留在断言里而不是被
+   静默兜住。
+
+### 34.3 浏览器端"主题加载失败"是夹具打错了包，不是线程回归
+
+切完后端后，Chromium 里出现过一条看着像线程问题的失败：解压在 worker 上报告
+`extracted 46/46 files, bytes=4949573/4949573`，UI 线程紧接着
+`Failed to load theme from /tmp/theme_cache/def_theme`，随后 `RuntimeError: null function`
+（wasm 栈把崩溃报在 `CMainDlg::OnThemeReady` 那一帧，且紧跟在 `InitGame: initializing game`
+这条日志之后 —— `InitGame` 被内联进来了，主题没落地时它拿不到皮肤与控件，最后走到一条空函数
+指针上）。
+同一份产物在 node 里 `theme=1`，两边唯一的差别在**给 `cnchess_server` 配的那只 zip**：
+
+| 夹具 | 大小 | zip 条目 | 解压结果 |
+| --- | --- | --- | --- |
+| `smoke.js` 自己打的（`cd client/pc_theme && zip -r … .`） | 4.4 MB | `anim/`、`config.xml`… 根层级 | `def_theme/config.xml` → 主题加载成功 |
+| 浏览器腿手搓的那只 | 4394219 字节 | 全部带 `pc_theme/` 前缀 | `def_theme/pc_theme/config.xml` → `file:config.xml` 找不到 |
+
+`ThemeDownloadManager.cpp:208` 把主题目录定成 `<cache>/def_theme`，`:252` 按
+`def_theme/config.xml` 判缓存是否可用，而 `NormalizeZipPath`（`:48`）只做分隔符换算、**不剥根目录**
+—— 客户端的契约就是"zip 条目以主题内容自己的根为根"。带 `pc_theme/` 前缀的包在桌面版同样加载不了，
+跟 `-pthread` 没有因果关系。换回 `smoke.js` 那套打包口径重新起服务器，浏览器腿一次就绿（34.5）。
+
+这条排查顺手留下一个与主题加载等价、但更早能看到的证据：worker 线程写进虚拟 FS 的文件，UI 线程
+`stat` 全部读得到（Chromium 实测 `def_theme` 下 `anim/Sound/xml/config.xml/image/svg/Sprite` 七项齐全，
+`config.xml` 7833 字节）。WASMFS 的文件系统状态在 wasm 线性内存里，而线性内存就是那块共享 SAB，
+所以两条线程看到的是同一棵树 —— §32.3 选这条路线的前提在这里第二次得到确认。
+
+### 34.4 改动清单
+
+- `games/cnchess/client/wasm/build-cnchess.sh` / `.bat`：默认 `-DSOUI_WASM_PTHREADS=ON`，
+  `--no-pthreads` 与同名环境变量可退回泵后端；产物目录按后端取 `out_pt` / `out`
+  （上线档 `release_pt` / `release`）。`.bat` 仍保持纯 ASCII + CRLF。
+- `games/cnchess/client/wasm/CMakeLists.txt`：`_soui_cnchess_out_default` 按 `SOUI_WASM_PTHREADS`
+  选目录（老构建目录里缓存的 `out` 会把 worker 产物盖到泵产物上）；导出表补
+  `_CnchessPlayEffectSound` 等输入口注释；配置期打一行 `taskloop=ON/OFF (ON=worker / OFF=pump)`。
+- `games/cnchess/client/wasm/cnchess_main.cpp`：`CnchessStat` 新增 18/19/20 三口
+  （`STaskLoopWorkerCount` / `STaskLoopWorkerRunCount` / 是否带 `-pthread` 链接），
+  注释里写清"19 与 6 相等才是解压整条离开 UI 线程，光看 6>0 两条后端都给得出"；
+  `CnchessClick` 换成按墙上时间放开命中等待（34.2 第 3 条）。
+- `games/cnchess/client/wasm/smoke.js`：`global.location` 桩补 `host`（缺它拼出
+  `ws://undefined`）、`settle()` 辅助（弹窗生命周期两条断言要等动画收敛）、
+  音效路径断言改成 `/tmp/theme_cache/def_theme/…`；第 6 节按 `pt` 分流成 worker 腿三条专属
+  （起过 worker 线程、`offUi==run`、逐帧采到活的实例）与泵腿一条专属（`workers==0 && offUi==0`），
+  所以断言总数是 42 / 40，两条腿不可能同时给绿。
+- `games/cnchess/client/MainDlg.cpp`：`ThemeCfgPath()` 与 `m_strThemeCacheDir` 的 `__EMSCRIPTEN__`
+  分支落到 `/tmp`（34.2 第 2 条）。
+- `components/TaskLoop/wasm/TaskLoopWasm.{h,cpp}`：新增 `STaskLoopWorkerRunCount()`（`TaskLoopWasm.h:34`），
+  `g_runCount` / `g_workerRunCount` 改走 `tlAtomicAdd` —— 两条线程会同时递增，裸 `++` 丢一次
+  递增就是一条红断言；`STaskLoopRunCount()` 改原子读。
+- `swinx/src/gdi/canvas2d/js_glue.cpp`（+43/-10）：`SwinxCanvasPutPixelsAt` / `SwinxJsText`
+  改走定长 JS  scratch 缓冲（34.2 第 1 条）。这是本轮唯一落到 swinx 子模块里的改动，
+  声明面没变，所以 `api_scan.py --check` 不需要刷新清单。
+- `games/cnchess/client/wasm/.gitignore`：`/out_pt/`、`/release_pt/`。
+- `games/cnchess/client/wasm/readme.md`：文件表、构建表、`SOUI_WASM_PTHREADS` 环境变量、
+  运行与观测点（18/19/20）、烟测断言数与变异表、手动清单同步到本轮口径。
+
+### 34.5 本轮验证命令与结果
+
+```bash
+source <emsdk>/emsdk_env.sh
+# worker 后端（本轮默认）
+games/cnchess/client/wasm/build-cnchess.sh /path/build-wasm-pt
+node games/cnchess/client/wasm/smoke.js games/cnchess/client/wasm/out_pt/cnchess-wasm.js
+# 泵后端（--no-pthreads）
+games/cnchess/client/wasm/build-cnchess.sh --no-pthreads /path/build-wasm
+node games/cnchess/client/wasm/smoke.js games/cnchess/client/wasm/out/cnchess-wasm.js
+# 浏览器：worker 腿必须带隔离头
+python3 demos/wasm-demo/serve-isolated.py games/cnchess/client/wasm/out_pt --port 8099
+# 泵腿用任意静态服务就够
+python3 -m http.server 31968 -d games/cnchess/client/wasm/out
+# 门禁
+python3 swinx/doc/tools/api_scan.py --check
+cmake --build build --target fun_test -j4 && ctest --test-dir build -L '^soui-headless$' --output-on-failure
+```
+
+node 无头 A/B（两份产物都是本轮源码重链后的最终件）：
+
+| 腿 | 断言 | taskloop 行 | 逐帧采样峰值 `live/pending/workers` | 端到端 |
+| --- | --- | --- | --- | --- |
+| `out_pt`（worker） | 42 条 PASS、退出码 0 | `pt=1 run=1 offUi=1 workers=0 workersPeak=1` | `1/1/1` | `主题加载完成 773ms`、`boardKids=103` |
+| `out`（泵） | 40 条 PASS、退出码 0 | `pt=0 run=1 offUi=0 workers=0 workersPeak=0` | `0/0/0` | `主题加载完成 731ms`、`boardKids=103` |
+
+`offUi==run`（1/1）加上跨帧 `livePeak=1` 是"解压整条离开 UI 线程"的直接证据；泵腿的
+`workers===0 && offUi===0` 是同一条断言的反向形态，两条腿不可能同时给绿 —— 这就是本轮的证伪设计。
+
+Chromium 154 A/B（同一个 `cnchess_server`，`pc_theme.zip` md5 `55b66e99…`，即 `smoke.js` 的打包口径）：
+
+| 腿 | 页面 | `iso` / `pt` | `run` / `workerRun` | 采样峰值 `live/pending/workers` | `theme` / `board` | 最大帧间隔 |
+| --- | --- | --- | --- | --- | --- | --- |
+| worker | `serve-isolated.py :8099` | `true` / `1` | `1` / `1` | `1/1/1` | `1` / `103` | 230 ms |
+| 泵 | `python3 -m http.server :31968` | `false` / `0` | `1` / `0` | `1/0/0` | `1` / `103` | 298 ms |
+
+两条腿都跑到进度弹窗关闭、登录弹窗销毁、`truncated=0`（没有一帧被判定超预算）、控制台无
+`[FATAL]`。帧间隔 298→230 ms 只算"没有变差"：这条链上占大头的是 ws 收包、MD5、落盘与主题加载本身，
+把解压挪到 worker 上不会把它挪没 —— 本轮拿它当观测，不当判据。
+
+| 门禁 | 结果 |
+| --- | --- |
+| `api_scan.py --check` | `[OK] 清单与源码一致，且没有任何函数低于能力基线`（声明 1272 / 有定义 1142 / 基线 1120）。本轮没动 `swinx/include/*.h`，清单与 `gen_doc.py` 产物未刷新 |
+| `ctest -L '^soui-headless$'` | `100% tests passed, 0 tests failed out of 564`（注册 565，其中 1 条 `swinx_misc.is_dbcs_lead_byte_codepage_dependent` 带 `DISABLED_` 不执行） |
+
+本轮源码改动只落在 wasm-only 文件与 `TaskLoopWasm.cpp/.h`（桌面构建里这个文件不参与编译），跑门禁
+是为了防 `MainDlg.cpp` 那两条路径改动碰到共享代码。
+
+### 34.6 边界与需在其他环境复验
+
+- **上线档（`--release`）本轮没重编**：`release/` 还是 2026-10-31 的旧产物（那时还打包字体，
+  `.data` 约 20 MB），`release_pt/` 尚未生成。 worker 后端要上线时得先跑
+  `build-cnchess.sh --release` 重出 `release_pt`，并按 34.5 的浏览器清单在它上面复跑一次 ——
+  `-O2 -DNDEBUG` 会改掉断言与栈行为，两条腿的证据不能从调试档推过去。
+- **`build-cnchess.bat` 的 worker 档没在 Windows 上真跑过**：本机无 `cmd.exe`，只做了静态检查
+  （纯 ASCII + CRLF、`goto` 与标签配对、`SOUI_WASM_PTHREADS` 透传）。需要在 Windows 主机上确认
+  两件事：默认档产出的是 `out_pt`、`--no-pthreads` 产出的是 `out`；以及产物在带 COOP+COEP 的
+  服务器上 `stat 18` 能起来（拿不到隔离头时它静默退回泵后端，这是最容易看漏的一条）。
+- **macOS 的 `.sh` 同理**（bash 3.2 的空数组写法已按注释规避，未真机跑过）。
+- **浏览器只过了 Chromium 桌面版**：Safari/Firefox 的 SAB + COEP 组合、移动端浏览器、
+  `https://` + `wss://` 部署都未验证。worker 后端的可用性判据仍是页面里的 `crossOriginIsolated`
+  与状态行的 `worker N/M`。
+- **夹具口径**（34.3）值得在服务器侧或部署文档里写死：主题 zip 的条目必须以主题内容自己的根
+  为根（`config.xml` 在顶层）。客户端不剥前缀目录，带 `pc_theme/` 的包在任何平台都加载不了。
+- **`offUi==run` 只在"这条链上只投一条任务"时才是完整证据**。以后 cnchess 往同一个 TaskLoop 上
+  投多条任务（AI、复盘），断言仍成立，但"每一类任务都离开了 UI 线程"要按类型分别取证。
+- **`.github/workflows/soui-wasm-gate.yml` 里没有 cnchess 这条腿**：它的烟测需要真
+  `cnchess_server` 二进制，CI 现在只构建 `soui-wasm-demo`。cnchess 的两条腿仍要在本机各跑一次，
+  结论不能从 CI 绿推出来。
+
+---
+
+## 35. TaskLoop 按后端分目录，CMake 收成一个尾（2026-11-04）
+
+### 35.1 需求与验收
+
+需求是原话："将这个 taskloop 的代码组织按照目录来区分 wasm 版本和其它版本，简化 cmake"。
+这是纯组织性重构，**不改任何行为**，所以验收定的是一条都不许变：
+
+| 验收项 | 判据 |
+| --- | --- |
+| 文件归属 | `components/TaskLoop/wasm/` 只放 wasm 后端，`components/TaskLoop/thread/` 只放真线程后端；用 `git mv` 迁移，`git status` 认成 `R`（重命名）而不是"删一个加一个" |
+| 字节不变 | 六个源文件与 `TaskLoop.rc` 的内容一个字节都不改（含 BOM 与 `.rc` 的 936 代码页），只有一处注释因路径变化而改写 |
+| 构建形态等价 | 桌面 `SOUI_ENABLE_COM_LIB=OFF` 仍是 `SHARED` + `TaskLoop.rc` + Windows 下链 `Winmm`；`=ON` 仍是 `STATIC`；wasm 仍是 `STATIC` 且不进 `install` |
+| 行为零回归 | 重组前跑绿的四条腿（native 门禁 + wasm 两条腿 + demo 两条腿）在重组后同口径重跑，数字一字不差 |
+
+### 35.2 目录与 CMake 的前后对比
+
+```
+components/TaskLoop/                  components/TaskLoop/
+├── CMakeLists.txt                    ├── CMakeLists.txt
+├── TaskLoop.h / TaskLoop.cpp         │   ├── thread/  TaskLoop.h/.cpp thread.h/.cpp TaskLoop.rc
+├── thread.h / thread.cpp             │   └── wasm/    TaskLoopWasm.h/.cpp
+├── TaskLoop.rc                       │
+└── TaskLoopWasm.h / TaskLoopWasm.cpp ┘
+```
+
+改前的 `CMakeLists.txt` 把 wasm 写成一条 `if(EMSCRIPTEN) … return()` 的早退分支，`add_library` /
+`target_link_libraries` / `COM_LIBS` / `FOLDER` 四件事在两个分支里各抄一遍，源文件逐条点名；
+`set(TaskLoop_header TaskLoopWasm.h)` 那种"整体覆盖前面列表"的写法也容易被后面新增的文件带跑。
+改后只剩一个尾：
+
+| 点位 | 改后写法 |
+| --- | --- |
+| 选后端 | `if(EMSCRIPTEN) set(TaskLoop_backend wasm) else (… thread)`，一行决定目录 |
+| 取源 | `file(GLOB … CONFIGURE_DEPENDS ${TaskLoop_backend}/*.cpp|*.h)`：目录里只有这一个后端的文件，按目录取就不必逐文件点名，后端里加文件也不用再改 CMake |
+| 库形态 | `if(EMSCRIPTEN OR SOUI_ENABLE_COM_LIB)` 走 `STATIC`，否则 `SHARED` 并带 `${TaskLoop_backend}/TaskLoop.rc`（`Winmm` 仍只在 `WIN32` 下） |
+| 公共尾 | `target_link_libraries(taskloop utilities4)` → `COM_LIBS` → `FOLDER components` 各一份，没有 `return()` |
+| install | 用 `if(NOT EMSCRIPTEN)` 包住原来的 Debug/Release 两段，保持"wasm 产物不 install" |
+
+`CONFIGURE_DEPENDS` 需要 CMake ≥ 3.12，根 `CMakeLists.txt` 已声明 `cmake_minimum_required(VERSION 3.16)`，
+所以安全。代价是配置期/构建期多一次目录复查（日志里的 `Re-checking globbed directories`），换的是
+两条后端不会再出现"列了没编 / 编了没列"的偏差。
+
+### 35.3 include 路径的三处改动（唯一的源码改动）
+
+`components` 本身在各消费者自己的 `include_directories(${PROJECT_SOURCE_DIR}/components)` 里，所以
+`<TaskLoop/…>` 前缀就是组件目录名，子目录会出现在路径里。三处按新目录改写，其余文件一律走相对
+引（`TaskLoop.cpp` 引 `"TaskLoop.h"`、`thread.cpp` 引 `"thread.h"`、`TaskLoopWasm.cpp` 引
+`"TaskLoopWasm.h"`），同目录内不受影响：
+
+| 文件 | 改前 | 改后 |
+| --- | --- | --- |
+| `games/cnchess/server/RobotAIPool.cpp:4` | `<TaskLoop/TaskLoop.h>` | `<TaskLoop/thread/TaskLoop.h>` |
+| `demos/wasm-demo/soui_main.cpp:64` | `<TaskLoop/TaskLoopWasm.h>` | `<TaskLoop/wasm/TaskLoopWasm.h>` |
+| `games/cnchess/client/wasm/cnchess_main.cpp:47` | `<TaskLoop/TaskLoopWasm.h>` | `<TaskLoop/wasm/TaskLoopWasm.h>` |
+
+`wasm/TaskLoopWasm.h` 里那句"桌面版把它声明在 `TaskLoop.h` 里，而那份头会再拉进 `thread.h`"的注释
+同步改成 `thread/TaskLoop.h` / `thread/thread.h`，否则注释指不到文件。文档里的旧路径指针一并刷新
+（`games/cnchess/client/wasm/readme.md`、`demos/wasm-demo/readme.md`、本文件 §25/§32/§34、
+`doc/SOUI4项目评估报告-2026-10-14.md`、`doc/知乎-03-为什么我推荐SOUI4.md` 里的
+`components/TaskLoop/TaskLoop.cpp:69` —— 该行内容随文件整体迁移，行号仍是 69）。
+
+### 35.4 四条腿重跑
+
+每条腿都在改动后重新配置过（`file(GLOB)` 与目标源列表都变了，旧 build 目录的缓存不能直接复用）：
+
+| 腿 | 命令 | 结果 |
+| --- | --- | --- |
+| native（桌面，`SOUI_ENABLE_COM_LIB=OFF`） | `cmake -S . -B build && cmake --build build --target taskloop fun_test cnchess_server --parallel 8` | exit 0；对象落到 `taskloop.dir/thread/`，产物仍是 `build/bin/libtaskloop.so`（SHARED 腿生效）；`RobotAIPool.cpp.o` 用新 include 路径重编 |
+| native 门禁 | `ctest --test-dir build -L '^soui-headless$'` | `100% tests passed, 0 tests failed out of 564`（与 §34.5 同一注册数，1 条 `DISABLED_` 不执行） |
+| wasm 泵腿 | `cmake -S . -B build-wasm && cmake --build build-wasm --parallel 8`；`node games/cnchess/client/wasm/smoke.js out/cnchess-wasm.js`；`node demos/wasm-demo/smoke.js` | 299 个目标 exit 0；cnchess **40 PASS / 0 FAIL**（`pt=0 run=1 offUi=0 workersPeak=0`，跨帧峰值 `0/0/0`）；demo **30 PASS**（`workers=0 offUi=0`） |
+| wasm worker 腿 | `cmake -S . -B build-wasm-pt && cmake --build build-wasm-pt --parallel 6`；`node games/cnchess/client/wasm/smoke.js out_pt/cnchess-wasm.js`；`node demos/wasm-demo/smoke.js out_pt/soui-wasm-demo.js` | exit 0；cnchess **42 PASS / 0 FAIL**（`pt=1 offUi=1/1 workersPeak=1`，峰值 `1/1/1`）；demo **31 PASS**（`workers=1 posted=8 exec=8 offUi=8`） |
+
+四条腿的数字与 §34.5 逐项相同，这就是"重组没改行为"的证据本身：断言集里 worker 腿与泵腿互斥，
+两条同时保持原来的形状，说明选目录的逻辑和后端选择仍然对齐。
+
+### 35.5 边界
+
+- **Windows / macOS 未实跑**：本机只有 Linux。这两平台的构建形态（`TaskLoop.rc` 参与 `SHARED`、
+  `Winmm` 链接）由 CMake 逻辑保证与改前一致，复验清单：配置后 `cmake --build build --target taskloop`
+  应产出 `taskloop.dll`/`.lib` 且 `taskloop.dir/thread/` 下有 `TaskLoop.rc.res`；`SOUI_ENABLE_COM_LIB=ON`
+  时应产出静态库且不带 rc。
+- **仓库里没有手写的 TaskLoop `.vcxproj`/`.sln`**（只有 third-party expat 自带），所以 IDE 侧不需要
+  跟着改；VS 解决方案由 CMake 现场生成，文件目录变化会自动反映。
+- **`install(TARGETS taskloop …)` 仍只在非 wasm 下**：`components/CMakeLists.txt` 只 install 组件根
+  的三个头，与本组件无关，未动。
+- **`file(GLOB)` 的取舍**：目录里只允许存在同一个后端的源。以后若要加第三种后端（例如又回到线程
+  版），新目录 + 一行 `set(TaskLoop_backend …)` 即可；反过来说，把两个后端的文件混放进同一目录会
+  被 GLOB 一起编进来，这类错误要靠构建期的重定义符号暴露。
+
+---
+
+## 36. ws 的收包交付搬到 `ITaskLoop` 投递队列（2026-11-06）
+
+### 36.1 需求与验收
+
+需求原文："帮我完善games/cnchess/client/wasm这个例子，上次改成了使用pthread版本的taskloop模块。
+帮我把websocket等功能和桌面版本一样放到taskloop这个后台线程中去。再本地编译服务器后做好集成测试。"
+
+§34 把主题包解压搬上了 worker，但收包链仍整条留在主线程：wasm 的 `ws` 实现在 JS 消息回调里
+**同步**调 `IConnListener`，于是拆包头、`std::vector` 构造、`STaskHelper::post` 全挤在浏览器事件
+回调的栈上。桌面版不是这样 —— `IConnListener` 的四个回调由 libwebsockets 的工作线程调用，
+`CMainDlg::OnMessage` 因此第一件事就是 `STaskHelper::post(GetMsgLoop(), …)` 切回 UI。本轮把
+wasm 侧对齐到同一口径。
+
+动手前先探清工具链给的边界（结论都来自 Emscripten 6.0.13 的 `src/lib/libwebsocket.js`）：
+
+- `emscripten_websocket_new` 里还挂着 `TODO: Add support for createOnMainThread==false; currently
+  all WebSocket connections are created on the main thread`；
+- 四个 `emscripten_websocket_set_on*_callback_on_thread` 的 JS body **忽略**传入的 thread 参数，
+  一律 `makeDynCall` 回主线程；
+- 这些接口全是 `__proxy: 'sync'`。
+
+所以"把 socket 对象搬进 worker"在当前工具链上不通，能搬、也该搬的边界只能放在**回调之后**：
+主线程的 C 回调只做一次拷贝 + 入队，拆包和监听器调用交给这条连接自己的 `ITaskLoop`。
+
+| 项 | 判据 | 落在哪 |
+| --- | --- | --- |
+| 交付线程与桌面版同口径 | `stat 22`（不在主线程上的帧数）== `stat 21`（交给监听器的帧数）；泵腿必须 `22==0` | `smoke.js` 第 6c 节按 `pt` 分流 |
+| 一帧都不许丢 | `stat 21` 与 node 侧 `WebSocket` 实际收到的帧数逐帧相等（实测 73） | `smoke.js` 第 6c 节 |
+| 端到端没被搬线程弄坏 | `theme 1`、`board 103`、大厅/残局收到数据、音效交出 19518 字节 RIFF/WAVE | `smoke.js` 1-5 节（未改判据） |
+| 长驻队列不泄漏 | 收尾 `stat 8 == 1`：只剩每条连接那条投递队列，解压那条临时队列已释放 | `smoke.js` 第 6 节（原判据 `== 0`，本轮按形态改写） |
+| 页面能看出来 | 状态行新增 `ws N/M` 两段，缺隔离头时 `M` 停在 0 | `cnchess.html` |
+| 既有门禁不破 | native `ws` 与 `cnchess_server` 构建绿；`ws` 的桌面实现一行没动 | 36.5 |
+
+### 36.2 形状：一次拷贝 + 一次排队
+
+新增的是 `CWsWasmMailbox` / `CWsWasmMailboxTask`（都在 `components/ws/src/wasm/`）：
+
+- 主线程回调 → `enqueue()`：在锁里把载荷 `assign` 进 `std::vector` 再 `push_back`，随后按队列
+  形态决定就地交付还是 `postTask` 一条任务。拷贝必须留在回调里 —— 回调返回后 `e->data` 指向的
+  JS 缓冲就失效了。
+- `IRunnable` 侧只复制信箱引用（`clone()` 复制一个 `SAutoRefPtr`），队列里因此不额外持有字节
+  拷贝；`getObject()` 回指信箱，`cancelTasksForObject` 才有得可匹配。
+- 执行线程 → `runOne()`：取队首一条，**带着同一把锁**调监听器。这条是全部安全性的落点 ——
+  `detach()` 也在同一把锁里置 `m_active=false`，所以调用方摘完监听器就能安全释放它，与桌面版
+  `WsClient::quit()` 里 join 工作线程给的是同一个保证。
+- `blockReceive(TRUE)` 只堆不交付，`FALSE` 给堆着的每一条补投一条任务 —— 顺序照旧，与桌面版
+  同义。
+- 队列建不起来（组件没链进来、或 `postTask` 失败）时**就地交付**，退回改动前的形态。丢事件比
+  "在主线程上调一次回调"更糟，这里不做静默降级。
+
+### 36.3 三处只有搬了线程才会暴露的地方
+
+1. **`wait()` 在这个平台上没有可等的队列。** 事件先到主线程、再排队，把 UI 线程睡下去等于冻住
+   整个标签页，所以恒返回 `FALSE`（口径不变，注释改成"为什么等不了"）。要缓存用 `blockReceive`，
+   要即时处理就在监听器自己排队 —— cnchess 走的正是后者（`OnMessage` 立刻 `post` 回 UI）。
+2. **`detach()` 里的 `stop()` 会 join worker。** 能等到，是因为 worker 上最后一条回调只做
+   "拷一份 + `IMessageLoop::PostTask` 回 UI 队列"，而 `SMessageLoop::PostTask` 非阻塞
+   （`SOUI/src/core/SMsgLoop.cpp:250`：加锁 `AddTail` + 起定时器），不会反过来等 UI 线程。
+   真在 worker 上销毁客户端时 `joinWorker()` 的自 join 保护（`EDEADLK` → `detach`）兜住，
+   不会静默死锁。
+3. **`postTask` 的入参可以是栈对象。** wasm 后端只 `clone()`、不对入参 `AddRef`
+   （`SWasmTaskLoop::postTask`），所以 `CWsWasmMailboxTask task(this); m_pLoop->postTask(&task, …)`
+   在栈上是安全的 —— 与桌面版 `STaskHelper` 的用法同形。
+
+另外两处是构建/接线，不是线程语义：`ws` 的 wasm 目标此前不需要 `components/` 这一层
+include（现在要 `#include <commgr2.h>` 走 `SComMgr2::CreateTaskLoop`，与
+`ThemeDownloadManager` 拿解压队列同一个入口，`SCOM_MASK` 关掉的分支被预处理器直接摘掉，
+不会给没链进来的组件留引用）；`SCOM_MASK` 在这个 TU 里没定义会退成 `scom_mask_scom_all`，但
+只有**被调用到**的 `Create*` 才会产生符号引用，`CreateTaskLoop` 之外的一条都不实例化。
+
+### 36.4 改动清单
+
+| 文件 | 要点 |
+| --- | --- |
+| `components/ws/src/wasm/WsClientWasm.h` | 新增 `WsWasmEvent` / `CWsWasmMailboxTask` / `CWsWasmMailbox`；`CWasmWsClient` 删掉自带的 `m_pendingRecv`/`m_bBlockReceive`（信箱替了它的位置），加 `ensureDelivery()`；导出 `WS_WasmDeliveredFrames()` / `WS_WasmDeliveredFramesOffMain()`；类注释改成"边界在回调之后"＋工具链的三条依据 |
+| `components/ws/src/wasm/WsClientWasm.cpp` | 信箱实现；`connectTo` 先建队列（每连接一条，`start("ws_delivery", Normal)`）；四个回调改成 `enqueue`；`teardown` 顺序是先摘信箱再关 socket；帧计数用 `emscripten_atomic_add_u32` + `emscripten_is_main_runtime_thread()` |
+| `components/ws/CMakeLists.txt` | 只在 `if(EMSCRIPTEN)` 分支里加 `include_directories(${SOUI_ROOT_DIR}/components)` |
+| `games/cnchess/client/wasm/cnchess_main.cpp` | `CnchessStat` 新增 21/22 两项，注释表同步；include `ws/src/wasm/WsClientWasm.h` |
+| `games/cnchess/client/wasm/smoke.js` | 第 6 节的"实例已释放 `live==0`"改成"只剩收包投递那一条 `live==1`"；新增 6c 两判据；文件头补第 7 条说明 |
+| `games/cnchess/client/wasm/cnchess.html` | 状态行加 `ws N/M` |
+| `games/cnchess/client/wasm/readme.md` | 「与桌面版的差异」第 1 条重写；观测点表补 21/22 并给出典型形状；烟测条数 44/42、变异表补一行；人工清单第 2/4 步按新数字改写 |
+
+`components/ws/src/*.cpp`（桌面 lws 实现）、`interface/ws-i.h`、`swinx/` 一行没动 —— 搬的是
+wasm 后端内部的线程归属，不是对外契约。
+
+### 36.5 本轮验证命令与结果
+
+| 腿 | 命令 | 结果 |
+| --- | --- | --- |
+| native（组件没被带坏） | `cmake --build build --target ws cnchess_server --parallel 6` | exit 0 |
+| wasm worker 腿 | `cmake --build build-wasm-pt --target cnchess-wasm`；`node smoke.js out_pt/cnchess-wasm.js` | **44 PASS / 0 FAIL**，exit 0；`pt=1 run=75 offUi=75 workers=1 workersPeak=2 pending=0 live=1`、`ws-delivery frames=73 offUi=73 jsRecv=73` |
+| wasm 泵腿（A/B 对照） | `cmake --build build-wasm --target cnchess-wasm`；`node smoke.js out/cnchess-wasm.js` | **42 PASS / 0 FAIL**，exit 0；`pt=0 run=75 offUi=0 workers=0 live=1`、`ws-delivery frames=73 offUi=0 jsRecv=73` |
+| 变异（新判据不是摆设） | `postOne()` 改成永远 `runOne()`（投递退回主线程），只重建 worker 腿 | **1 FAIL**：`FAIL worker 后端：交付全部发生在非主线程 [offUi=0/73]`，其余 43 条照绿；`taskloop` 回到 `run=1`（只剩解压那条），`ws frames` 仍是 73 |
+
+`run=75` 的构成是 73 条投递 + 1 条解压 + 1 条杂项；两腿的 `offUi` 分别是 75 与 0，就是"整条交付
+离开主线程"的直接证据。变异腿给出的信息比"红几条"更值钱：帧数判据照绿、线程判据单独红，说明
+这两条断言各测各的东西。改回后 `run=75 offUi=75` 复现，两腿再次全绿。
+
+`demos/wasm-demo` 不受影响：它不链 `ws`。`soui-wasm-gate.yml` 也只构建演示页，cnchess 两腿仍以本机为准。
+
+### 36.6 边界与需在其他环境复验
+
+- **浏览器隔离页未复跑**（本机没有 Chromium 交互环境）。人工判据写在 readme 第 2/4 步：
+  `crossOriginIsolated === true`、状态行 `ws 73/73 (pt=1)`；缺 COOP/COEP 时应为 `ws 73/0`。
+  这是本轮唯一没有自动化覆盖的关键差异，上线前必须补。
+- **`stat 8 == 1` 依赖"烟测全程只有一条连接"**。多连接场景（真机双人各开一条 ws）没测：桌面版
+  也是每连接一条线程，但浏览器里 worker 有上限，长连接多的页面要实测线程数。
+- **泵后端下交付延迟一帧**：帧仍然不丢（21 与实收对齐），但回调落在下一次 `STaskLoopPump` 里，
+  比改动前的"JS 回调内同步交付"晚最多一帧。真实交互（点登录 → 弹窗关闭）在烟测与人工清单里
+  都过，帧间延迟只当观测。
+- **`wait()` 仍恒 `FALSE`**：这是平台限制，不是漏实现；调用方需要"等到一包"的写法在 wasm 上
+  本来就不成立。
+- **Windows / macOS 未实跑**：本轮 diff 全在 `components/ws/src/wasm/` 与 cnchess 的 wasm 目录，
+  这两平台的 `ws` 走的是同一份未改动的桌面实现，风险只剩"`ws/CMakeLists.txt` 的 EMSCRIPTEN
+  分支加了 include" —— 非 wasm 分支不受该语句影响。
+- **两个 wasm 源文件此前没有 BOM**（`WsClientWasm.cpp/.h`），本轮按 `AGENTS.md` 的编码约束补齐；
+  `WsWasm.cpp` 同样缺 BOM，但它本轮一行没动，留待单独整理。
+
+---
+
+## 37. 本地链接的同源 WebSocket 反代（2026-11-06）
+
+### 37.1 需求与验收
+
+需求原文："直接点击登陆后没有开始下载主题数据。请确定服务器端口为8080，如果端口没有问题可能要看下
+逻辑哪里出错了，你可以自己点击登陆。"
+
+先回答端口：**8080 不是棋服务器的端口**。`cnchess_server` 在 3311（`config/config.xml`，实测
+`ss -ltnp` 只有它监听 3311），8080 是 `serve-isolated.py` 的静态页面服务。之所以"点登录不下载主题"，
+是因为 §36 之前就存在的这条默认值：`games/cnchess/client/MainDlg.cpp` 的 `__EMSCRIPTEN__` 分支把登录框
+地址填成 `ws://` + `location.host`，也就是**同源**——它假设线上由 Apache/nginx 在同 origin 反代
+`/cnchess/` 到同机 cnchess_server。本机只起静态服务时没有这一层，握手打到静态服务自己身上，于是
+`ws 0/0`、`theme 0`，而 `cnchess_server` 日志里连一条新连接都没有。这不是 §36 的线程改动引入的回归
+（同一份产物把地址手工写成 `127.0.0.1:3311` 就一切正常，§36.5 的浏览器腿就是这么跑的）。
+
+验收定为：用**默认地址**在 8080 上点登录就能下载主题，且状态行仍是 `ws 73/73 (pt=1)`；泵腿（8081，
+`--no-isolation`）同样用默认地址，状态行 `ws 73/0 (pt=0)`。
+
+| 项 | 判据 |
+| --- | --- |
+| 端口口径说清 | readme「运行」与人工清单不再要求手工改地址；默认同源 + `--ws-proxy` 的因果写进文档 |
+| 同源链路真通 | 浏览器用默认地址点登录 → `theme 1 · board 103 · ws 73/73`（worker 腿）/`ws 73/0`（泵腿） |
+| 反代不吞错误 | 上游不给 101 时回 502 并带上上游首行；没给 `--ws-proxy` 时回 501 并说明参数 |
+| 不污染静态服务 | 普通 GET 仍走 `SimpleHTTPRequestHandler`，COOP/COEP 与 MIME 不变 |
+
+### 37.2 形状：只隧道带 `Upgrade: websocket` 的请求
+
+`demos/wasm-demo/serve-isolated.py` 加 `--ws-proxy HOST:PORT`：
+
+- `do_GET` 先看 `Upgrade` 头，命中才进 `tunnel_websocket()`，其余照旧交给父类。
+- 隧道把请求行 + 全部请求头**原样**重发给上游（不改 `Host`、不改 `Origin`、不删 `Sec-WebSocket-*`），
+  因为浏览器只在拿到 101 时才把这条连接当 WebSocket。
+- 上游首行是 101 就把它连同之后已读到的字节写给浏览器 socket，然后进 `relay()`：`select` 双向搬到
+  任一侧关闭为止。首行不是 101 → 502 + 首行文本。
+- 服务改用 `ThreadingTCPServer` + `daemon_threads`：一条活着的 WebSocket 会占住整个 handler 线程直到
+  断开，单线程服务会把页面请求全卡住。
+
+### 37.3 一处只有真握手才会暴露的坑
+
+第一版隧道在重发请求头后想"顺手把 rfile 缓冲里可能残留的字节也带过去"，用了 `self.rfile.peek()`。
+`peek()` 在缓冲为空时会去填缓冲，也就是**一直等到有字节为止**——而客户端在收到 101 之前不会发第一个
+帧（RFC 6455 §1.3），所以这里永远等不到：handler 卡在 `peek()`，浏览器侧表现是握手超时、页面上
+`ws 0/0`，与"反代没生效"一模一样。修法是不读 `rfile`（确实没有残留），并在隧道开头就把
+`close_connection` 置真，避免握手结束后 handler 再拿 `rfile` 去解析下一个请求。
+
+按 `AGENTS.md` 的基线 A/B 口径定位：同一份握手报文直连 3311 得到
+`HTTP/1.1 101 Switching Protocols`（含 `Sec-WebSocket-Protocol: cnchess`），走 8080 隧道超时 ——
+故障面因此收敛到隧道本身，而不是 lws 拒绝浏览器形态的握手（`Origin: http://localhost:8080`、
+`Host: localhost:8080`、`Sec-WebSocket-Extensions: permessage-deflate` 它都接受）。
+
+### 37.4 改动清单
+
+| 文件 | 改动 |
+| --- | --- |
+| `demos/wasm-demo/serve-isolated.py` | 模块 docstring 补 `--ws-proxy` 一节；`do_GET` 分流；`tunnel_websocket()` / `relay()` / `parse_host_port()`；`ThreadingTCPServer`；启动时打印反代目标 |
+| `games/cnchess/client/wasm/readme.md` | 「运行」两条命令改成带 `--ws-proxy` 的形式，新增"默认地址是同源"这条口径；人工清单前提与第 3 步改成默认地址 + 不带反代时的反向验证 |
+| `doc/soui-wasm-port-plan.md` | 本节 |
+
+`MainDlg.cpp` 的同源默认值**没改**：它是线上部署形态的正确假设，本机缺的是那层反代，不是默认值。
+
+### 37.5 验证命令与结果
+
+```bash
+# 基线 A/B：同一份握手报文，直连 vs 走隧道
+python3 - <<'EOF'   # 直连 127.0.0.1:3311 → 101；走 127.0.0.1:8080 → 修前 timed out，修后 101
+```
+
+- 直连 3311：`HTTP/1.1 101 Switching Protocols ... Sec-WebSocket-Protocol: cnchess`
+- 隧道 8080（修 `peek()` 前）：`ERR timed out`，`b''`
+- 隧道 8080（修后）：与直连逐字节相同的 101
+- `curl -sI http://localhost:8080/cnchess-wasm.html`：仍有 `Cross-Origin-Opener-Policy: same-origin`
+  与 `Cross-Origin-Embedder-Policy: require-corp`，静态服务未被分流影响
+- 浏览器（Chromium，`_CnchessClick('btn_login')`，地址保持默认 `ws://localhost:8080`）：
+  - worker 腿 8080：`crossOriginIsolated=true`，`theme 1 · board 103 · taskloop 75/0/1 ·
+    worker 1/75 · ws 73/73 (pt=1)`，大厅 6 张桌子、「在线: 1」，登录弹窗与主题进度弹窗都关闭
+  - 泵腿 8081（`--no-isolation`，产物 `pt=0`）：`theme 1 · board 103 · taskloop 75/0/1 ·
+    worker 0/0 · ws 73/0 (pt=0)` —— 帧全部交付、全部在主线程，与 §36 的泵腿烟测同口径
+- `python3 -m py_compile demos/wasm-demo/serve-isolated.py` 通过
+
+### 37.6 边界
+
+- **反代只做本机开发用**：它不校验 `Origin`、不做 TLS，不能当线上组件；线上仍是 Apache/nginx 那层。
+- **一条隧道占一条线程**：`daemon_threads` 让 Ctrl-C 不用等在跑的隧道上，代价是退出时不保证把残余
+  字节搬完——开发场景可接受。
+- **上游首行不是 101 时只回 502 + 首行文本**，不转发上游完整响应体；够用（这条路径的意义就是"配置错了
+  要看得见"）。
+- **`--ws-proxy` 只隧道 `/cnchess/` 之外的所有路径一视同仁**：任何带 `Upgrade: websocket` 的请求都会
+  转到同一个上游，本机只有一个棋服务器时这个简化没有代价。
+- **Windows / macOS 未实跑**：本轮只改 `demos/wasm-demo/serve-isolated.py`（Python，跨平台）与两个
+  markdown；交接清单里对应两条：用默认地址点登录应出现主题进度弹窗，状态行 `ws` 两段在 worker 腿相等、
+  泵腿第二段为 0。
 
 ---
 

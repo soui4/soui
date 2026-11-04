@@ -281,7 +281,7 @@ BOOL CMainDlg::OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE>> data)
 
 **服务端方向**也一样干净：`RobotAIPool` 用 `getTaskCount()` 挑排队最少的 loop 投递，`RunTask` 只对**棋盘深拷贝快照**计算，结果回主线程落子，并校验 `generation` 丢弃过期结果（悔棋 / 新局场景）——**共享状态始终只有一个线程在写，业务代码里连一把显式锁都不需要。**
 
-> 顺手把边界也写清楚，免得误用：`IMessageLoop::PostTask` 是纯异步、无等待语义；`ITaskLoop::postTask` 的 `waitUntilDone=TRUE` 才同步等待（跨线程用信号量）——**同线程 + `waitUntilDone` 已被实现短路为直接 inline 执行**（`components/TaskLoop/TaskLoop.cpp:69`），所以不会自锁。
+> 顺手把边界也写清楚，免得误用：`IMessageLoop::PostTask` 是纯异步、无等待语义；`ITaskLoop::postTask` 的 `waitUntilDone=TRUE` 才同步等待（跨线程用信号量）——**同线程 + `waitUntilDone` 已被实现短路为直接 inline 执行**（`components/TaskLoop/thread/TaskLoop.cpp:69`），所以不会自锁。
 
 ---
 

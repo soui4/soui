@@ -533,10 +533,14 @@ BOOL SPanel::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
         }
         ScrollUpdate();
     }
+    // 自己滚过的格数即"已消费"；一格都没滚时，剩余量交给父窗口，父窗口也只滚 0 格
+    // 就说明整条链都没人消费这一格，返回值给宿主据此把滚轮放行给外部环境。
+    BOOL bConsumed = (i > 0);
     if (i < nLines)
     { // Returning FALSE means scrolling can no longer proceed, and it can be passed through to the parent window
         delta = (nLines - i) * WHEEL_DELTA * (delta > 0 ? 1 : -1);
-        SWindow::OnMouseWheel(nFlags, delta, pt);
+        if (SWindow::OnMouseWheel(nFlags, delta, pt))
+            bConsumed = TRUE;
     }
     if (nLines != 0)
     {
@@ -550,7 +554,7 @@ BOOL SPanel::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
         ::SendMessage(hHost, WM_MOUSEMOVE, nFlags, MAKELPARAM(pt.x, pt.y));
         ::SendMessage(hHost, WM_SETCURSOR, WPARAM(hHost), MAKELPARAM(HTCLIENT, WM_MOUSEMOVE));
     }
-    return FALSE;
+    return bConsumed;
 }
 
 BOOL SPanel::OnScroll(BOOL bVertical, UINT uCode, int nPos)

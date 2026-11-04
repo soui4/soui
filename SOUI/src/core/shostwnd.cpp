@@ -55,6 +55,7 @@ class SDummyWnd : public SNativeWnd {
 ///////////////////////////////////////////////////////////////////////
 /** SHostWndAttr */
 ///////////////////////////////////////////////////////////////////////
+
 SHostWndAttr::SHostWndAttr(void)
     : m_hAppIconSmall(NULL)
     , m_hAppIconBig(NULL)
@@ -704,6 +705,9 @@ void SHostWnd::_RedrawRegion(IRegionS *pRgnUpdate, CRect &rcInvalid)
     m_memRT->RestoreClip(clipState);
     _PaintVideoCanvasForeground(m_memRT); // paint foreground of video canvas.
 
+    // The focus frame is painted on top of the whole window tree.
+    m_pRoot->DrawFocusAni(m_memRT);
+
     m_memRT->PopClip();
 
     m_pRoot->AfterPaint(m_memRT, painter);
@@ -830,6 +834,7 @@ int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
         m_pRoot = NULL;
     }
     m_pRoot = CreateRoot();
+
     // SSLOGI()<<"CreateRoot, root="<<m_pRoot<<" tid="<<GetCurrentThreadId()<<" hwnd="<<m_hWnd;
     m_pRoot->SetContainer(this);
     SwndContainerImpl::SetRoot(m_pRoot);

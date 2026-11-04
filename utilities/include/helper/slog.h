@@ -195,18 +195,25 @@ class UTILITIES_API SLog {
      */
     static void setLogLevel(int nLevel);
 
+    static int getLogLevel();
+
     /**
      * @brief 设置日志回调函数
      * @param logCallback 日志回调函数指针
      */
-    static void setLogCallback(LogCallback logCallback);
+    static LogCallback setLogCallback(LogCallback logCallback);
 
+    /**
+     * @brief get log callback
+     */
+    static LogCallback getLogCallback();
     /**
      * @brief 设置日志回显功能
      * @param bEnable 是否启用回显
      */
     static void setLogEcho(bool bEnable);
 
+    static bool isLogEcho();
   private:
     /**
      * @brief 默认日志回调函数

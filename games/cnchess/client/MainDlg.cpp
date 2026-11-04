@@ -55,6 +55,19 @@ CMainDlg::~CMainDlg()
     delete m_pEndgameHandler;
 }
 
+// 登录配置的读写路径。桌面端放在 app dir（和 cnchess_cfg.xml 一起发布），wasm 端不能：
+// 带 -pthread 的产物开着 -sWASMFS=1，--preload-file 铺出来的 /opt/soui 整棵树是只读的，
+// 往里存配置会静默失败，所以指向 Emscripten 自己建的、两种文件系统下都可写的 /tmp。
+// 浏览器里没有跨会话的磁盘，这份配置只在当前页面生命周期内有效。
+static SStringT ThemeCfgPath()
+{
+#if defined(__EMSCRIPTEN__)
+    return SStringT(_T("/tmp/cnchess_cfg.xml"));
+#else
+    return SApplication::getSingleton().GetAppDir() + _T("/cnchess_cfg.xml");
+#endif
+}
+
 BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 {
     m_modalRoot = FindChildByName("modal_root");
@@ -64,12 +77,19 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
     #elif defined(__EMSCRIPTEN__)
     FindChildByName("sys_btns_container")->SetVisible(FALSE,TRUE);
     #endif
-    // 初始化主题下载缓存目录。wasm 没有"个人目录"，但 Emscripten 的 MEMFS 里
-    // app dir 可写，主题包落地在 /opt/soui/theme_cache。
+    // 初始化主题下载缓存目录。wasm 没有"个人目录"，但 Emscripten 的文件系统里
+    // 有可写的临时目录，主题包落地在它下面。
     #if defined(__MOBILE__)
         TCHAR szCachePath[MAX_PATH]={0};
         SHGetSpecialFolderPath(0,szCachePath,CSIDL_PERSONAL,TRUE);
         m_strThemeCacheDir = szCachePath;
+    #elif defined(__EMSCRIPTEN__)
+        // 不能放在 app dir（/opt/soui）下面：带 -pthread 的产物必须开 -sWASMFS=1
+        // （默认的 JS 文件系统里 worker 一睡，主线程的 stdio 就永不返回），而 WASMFS
+        // 把 --preload-file 铺出来的整棵树当成只读资源，在里面建目录直接 EACCES
+        // （实测 mkdir /opt/soui/theme_cache = Permission denied，主题落地失败）。
+        // /tmp 是 Emscripten 自己建的运行期目录，两种文件系统下都可写。
+        m_strThemeCacheDir = _T("/tmp");
     #else
         m_strThemeCacheDir = SApplication::getSingleton().GetAppDir();
     #endif
@@ -94,7 +114,7 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
     SWindow *pEdtName = pModal->FindChildByName2<SEdit>(L"edt_name");
     SComboBox *pComboSex = pModal->FindChildByName2<SComboBox>(L"cbx_sex");
 
-    SStringT strCfg = SApplication::getSingleton().GetAppDir() + _T("/cnchess_cfg.xml");
+    SStringT strCfg = ThemeCfgPath();
     if(GetFileAttributes(strCfg) != INVALID_FILE_ATTRIBUTES)
     {
         SXmlDoc doc;
@@ -174,7 +194,7 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
             node.attribute2(L"sex").set_value(cSex);
             node.attribute2(L"avatar_id").set_value(m_nSelAvatarId);
         }
-        SStringT strCfg = SApplication::getSingleton().GetAppDir() + _T("/cnchess_cfg.xml");
+        SStringT strCfg = ThemeCfgPath();
         doc.save_file(strCfg);
 
         EndModalViewSession(session_id, IDOK);

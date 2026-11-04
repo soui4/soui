@@ -69,11 +69,69 @@
   <!-- 画布、加载遮罩、IME 代理框、错误行都由 soui-host.js 建在这个容器里 -->
   <div class="wrap" id="app"></div>
 
+  <!-- 异步文件选择的手工验证件。浏览器只在用户手势里允许打开选择框，所以这一步必须由
+       页面按钮发起：C++ 侧调 SwinxPickFileAsyncA → swinx 经 Module.swinxPickFile 建
+       <input type=file> → 选完之后字节回投、落到 wasm 文件系统 → 回调里的路径可直接
+       fopen。完整路径打在控制台的那行 [pick] … 里（Module.print 转的）。
+       这里复用演示的自测探针入口（阶段 0 = 发起，阶段 1 = 取回计数），不再另开一个
+       C++ 口。 -->
+  <p class="lead">
+    <button id="btnPick" disabled>选择文件</button>
+    <span id="pickState">等待 wasm 载入…</span>
+  </p>
+  <script>
+    (function () {
+      var btn = document.getElementById('btnPick');
+      var st = document.getElementById('pickState');
+      function whenReady() {
+        var M = window.Module;
+        if (M && typeof M._SwinxDemoFilePickSelfTest === 'function' &&
+            typeof M.swinxPickFile === 'function') {
+          btn.disabled = false;
+          st.textContent = '就绪（选择框由浏览器持有，结果只经回调回来）';
+          return;
+        }
+        setTimeout(whenReady, 200);
+      }
+      function readInts(M, buf, n) {
+        var h = M.HEAP32, out = [];   // 线性内存可能扩容，视图每次重取
+        for (var i = 0; i < n; ++i) out.push(h[(buf >> 2) + i]);
+        return out;
+      }
+      whenReady();
+      btn.addEventListener('click', function () {
+        var M = window.Module, p = M._malloc(32);
+        M._SwinxDemoFilePickSelfTest(0, p);
+        var r = readInts(M, p, 8);
+        M._free(p);
+        if (r[0] !== 1) {
+          st.textContent = '发起失败，GetLastError=' + r[2] + '（120 = 该平台/宿主没有这项能力）';
+          return;
+        }
+        /* 阶段 0 之后回调计数必须还是 0 —— 浏览器主线程没被对话框挂住。 */
+        st.textContent = '已发起，等待选择…（发起时回调计数=' + r[1] + '）';
+        (function poll() {
+          var q = M._malloc(32);
+          M._SwinxDemoFilePickSelfTest(1, q);
+          var v = readInts(M, q, 8);
+          M._free(q);
+          if (v[0] === 0) { setTimeout(poll, 200); return; }
+          st.textContent = '回调 ' + v[0] + ' 次，nResult=' + v[1] + '，读回 ' + v[2] +
+            ' 字节，路径 ' + v[5] + ' 字符（见控制台 [pick] 行）';
+        })();
+      });
+    })();
+  </script>
+
   <!-- emcc 的 --shell-file 要求 shell 里必须有 {{{ SCRIPT }}} 占位符；放进 <template>
        让它惰性（见文件头说明）。 -->
   <template>{{{ SCRIPT }}}</template>
 
-  <script src="soui-host.js"></script>
+  <!-- 宿主脚本也带时间戳加载。胶水 .js 早就是这样，唯独 soui-host.js 原来直接引用，
+       浏览器会按 Last-Modified 做启发式缓存，重新构建后仍可能跑旧的宿主逻辑（滚轮
+       这类宿主侧策略会停在旧版本）。document.write 在解析阶段同步执行，下面那段
+       SouiHost.start 仍能立刻拿到宿主对象。 -->
+  <script>document.write('<script src="soui-host.js?v=' + Date.now() + '"><\/script>');</script>
   <script>
     // 新程序照抄这一段即可：只报产物名和工厂名，其余全在 C++ 里。
     SouiHost.start({

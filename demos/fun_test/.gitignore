@@ -1,0 +1,4 @@
+# wasm 腿的产物（fun_test-wasm.{html,js,wasm}，单份 .wasm 约 20 MB），由
+# -DSOUI_BUILD_WASM_FUN_TEST=ON 生成，只能本机经 emsdk 重新出包，不入库。
+# 目录名带 GDI 后端（out.canvas2d / out.cairo），两条腿的产物不同名同路径会互相覆盖。
+/out.*/

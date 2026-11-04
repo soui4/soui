@@ -21,6 +21,7 @@
 #include <helper/STimerGenerator.h>
 #include <proxy/SNativeWndProxy.h>
 #include <core/SRootWindow.h>
+#include <valueAnimator/SValueAnimator.h>
 SNSBEGIN
 
 /**
@@ -172,6 +173,7 @@ class SOUI_EXP SHostWndAttr : public TObjRefImpl<SObject> {
     BOOL m_bAllowSpy;        /**< Flag indicating if spy is allowed */
     BOOL m_bSendWheel2Hover; /**< Flag indicating if wheel messages should be sent to the hover window */
     BOOL m_bHasMsgLoop;      /**< Flag indicating if the window has a message loop, affecting tooltip RelayEvent timing */
+
     DWORD m_dwStyle;
     DWORD m_dwExStyle;
 

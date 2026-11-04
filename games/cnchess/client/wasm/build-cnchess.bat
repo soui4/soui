@@ -15,10 +15,7 @@ rem   games\cnchess\client\wasm\build-cnchess.bat                    rem debug t
 rem   games\cnchess\client\wasm\build-cnchess.bat release            rem ship tier
 rem   games\cnchess\client\wasm\build-cnchess.bat D:\build-soui-wasm rem debug, given dir
 rem   games\cnchess\client\wasm\build-cnchess.bat D:\ship release    rem ship, given dir
-rem   games\cnchess\client\wasm\build-cnchess.bat D:\build --gdi=cairo  rem cairo backend
-rem   games\cnchess\client\wasm\build-cnchess.bat --cairo release       rem cairo, ship
-rem   -r, --release and /release work too; --gdi=canvas2d|cairo (or the --cairo /
-rem   --canvas2d shortcuts) selects the GDI backend. The order of the args does not
+rem   -r, --release and /release work too; the order of the two args does not
 rem   matter, but at most one build dir and one release flag are accepted. The
 rem   ship flag is spelled "--release" in build-cnchess.sh and "release" here,
 rem   because cmd.exe would hand a leading "-" to cmake as an option.
@@ -32,17 +29,21 @@ rem
 rem Tunables are CMake cache variables, passed through from same-named env vars:
 rem   SOUI_CNCHESS_STACK       -sSTACK_SIZE, default 32MB (5MB overruns
 rem                            SHostWnd::Create)
-rem   SOUI_WASM_CNCHESS_OUT    output dir, default wasm\out; the ship tier always
-rem                            forces it to wasm\release
+rem   SOUI_WASM_CNCHESS_OUT    output dir, default wasm\out_pt (or wasm\out when
+rem                            the pump backend is selected); the ship tier uses
+rem                            release_pt / release
+rem   SOUI_WASM_PTHREADS       ON (default) or OFF. ON builds the wasm ITaskLoop
+rem                            worker backend (-pthread), which is what the theme
+rem                            unpack uses; the artifacts then only start a
+rem                            worker when the page is crossOriginIsolated, so
+rem                            serve them with
+rem                            python demos\wasm-demo\serve-isolated.py - plain
+rem                            http.server silently falls back to the pump
+rem                            backend (unpack runs on the UI thread again). OFF
+rem                            builds the pump backend, which needs no headers
 rem   SOUI_WASM_JOBS           parallelism, default 2 - emcc wedges at high -j on
 rem                            Windows (seen 2026-10-28); raise it on a host that
 rem                            behaves
-rem
-rem GDI backend (also a script arg --gdi=canvas2d|cairo, or --cairo / --canvas2d):
-rem   SWINX_WASM_GDI_BACKEND   canvas2d (default) | cairo. canvas2d uses the
-rem                            browser Canvas 2D + system fonts; cairo uses a
-rem                            software rasterizer + freetype/fontconfig and needs
-rem                            wasm\fonts\ populated so the font is packed.
 rem
 rem NOTE: keep this file ASCII-only. cmd.exe decodes batch files line by line in
 rem the active OEM codepage; UTF-8 Chinese comments get split into phantom
@@ -62,36 +63,20 @@ set "TARGET=cnchess-wasm"
 set "BUILD="
 set "RELEASE=0"
 
-rem ---- args: [build_dir] [release] [--gdi <v>], any order ---------------------
-rem cmd.exe splits batch arguments on '=', so "--gdi=cairo" arrives as two tokens
-rem ("--gdi" "cairo"); the --gdi <value> form below accepts both the space and
-rem the '=' spelling. A shift-based loop consumes the value token; leftover args
-rem are classified as release flags or the (single) build dir.
-set "GDI_BACKEND=%SWINX_WASM_GDI_BACKEND%"
-set "BUILD="
-set "NEXT_GDI=0"
-:parse_args
-if "%~1"=="" goto :args_done
-if "%NEXT_GDI%"=="1" ( set "GDI_BACKEND=%~1" & set "NEXT_GDI=0" & shift & goto :parse_args )
-if /i "%~1"=="--gdi"      ( set "NEXT_GDI=1" & shift & goto :parse_args )
-if /i "%~1"=="--cairo"    ( set "GDI_BACKEND=cairo"    & shift & goto :parse_args )
-if /i "%~1"=="--canvas2d" ( set "GDI_BACKEND=canvas2d" & shift & goto :parse_args )
-if /i "%~1"=="release"    ( set "RELEASE=1" & shift & goto :parse_args )
-if /i "%~1"=="-r"         ( set "RELEASE=1" & shift & goto :parse_args )
-if /i "%~1"=="--release"  ( set "RELEASE=1" & shift & goto :parse_args )
-if /i "%~1"=="/release"   ( set "RELEASE=1" & shift & goto :parse_args )
-if not defined BUILD goto :first_dir
-set "SECOND_DIR=%~1"
-goto :two_dirs
-:first_dir
-set "BUILD=%~1"
-shift
-goto :parse_args
-:args_done
-if not "%GDI_BACKEND%"=="" if /i not "%GDI_BACKEND%"=="canvas2d" if /i not "%GDI_BACKEND%"=="cairo" (
-    echo ERROR: GDI backend only accepts canvas2d or cairo, got "%GDI_BACKEND%" 1>&2
-    exit /b 2
-)
+rem ---- args: [build_dir] [release flag], either order ------------------------
+if /i "%~1"=="release"   set "RELEASE=1"
+if /i "%~1"=="-r"        set "RELEASE=1"
+if /i "%~1"=="--release" set "RELEASE=1"
+if /i "%~1"=="/release"  set "RELEASE=1"
+if /i "%~2"=="release"   set "RELEASE=1"
+if /i "%~2"=="-r"        set "RELEASE=1"
+if /i "%~2"=="--release" set "RELEASE=1"
+if /i "%~2"=="/release"  set "RELEASE=1"
+
+if not "%~1"=="" if /i not "%~1"=="release" if /i not "%~1"=="-r" if /i not "%~1"=="--release" if /i not "%~1"=="/release" set "BUILD=%~1"
+if not "%~2"=="" if /i not "%~2"=="release" if /i not "%~2"=="-r" if /i not "%~2"=="--release" if /i not "%~2"=="/release" set "SECOND_DIR=%~2"
+if defined BUILD if defined SECOND_DIR goto :two_dirs
+if defined SECOND_DIR set "BUILD=%SECOND_DIR%"
 
 rem ---- tier selects the build type, the default dir and the output dir -------
 rem Flat on purpose: nested ( ... ) blocks are parsed before they run, so a value
@@ -103,18 +88,35 @@ rem raw, and %HERE% / %TEMP% / a user font path can all contain spaces.
 set "BUILD_TYPE=RelWithDebInfo"
 if "%RELEASE%"=="1" set "BUILD_TYPE=Release"
 
+rem ---- TaskLoop backend: ON unless SOUI_WASM_PTHREADS says otherwise ----------
+rem Anything that is not OFF/off/0/FALSE is treated as ON, same as build-cnchess.sh.
+rem The backend picks the default output dir, so it has to be settled first.
+set "PTHREADS=ON"
+if /i "%SOUI_WASM_PTHREADS%"=="OFF" set "PTHREADS=OFF"
+if /i "%SOUI_WASM_PTHREADS%"=="0"   set "PTHREADS=OFF"
+if /i "%SOUI_WASM_PTHREADS%"=="FALSE" set "PTHREADS=OFF"
+set "PT_SUFFIX="
+if "%PTHREADS%"=="ON" set "PT_SUFFIX=_pt"
+
 set "D_OUT="
 set "D_STACK="
-set "D_GDI="
-if "%RELEASE%"=="1" set D_OUT=-DSOUI_WASM_CNCHESS_OUT="!HERE!release"
-if "%RELEASE%"=="0" if defined SOUI_WASM_CNCHESS_OUT set D_OUT=-DSOUI_WASM_CNCHESS_OUT="%SOUI_WASM_CNCHESS_OUT%"
+set "D_PTHREADS=-DSOUI_WASM_PTHREADS=%PTHREADS%"
+rem An explicit SOUI_WASM_CNCHESS_OUT always wins; otherwise the dir follows the
+rem tier and the backend, so pump and worker artifacts never share one directory.
+set "D_OUT="
+set "D_STACK="
+set "D_PTHREADS=-DSOUI_WASM_PTHREADS=%PTHREADS%"
+rem Always passed: the cached value must agree with the dir the artifacts go to,
+rem and switching backends means a full rebuild either way.
+if defined SOUI_WASM_CNCHESS_OUT set D_OUT=-DSOUI_WASM_CNCHESS_OUT="%SOUI_WASM_CNCHESS_OUT%"
+if not defined D_OUT if "%RELEASE%"=="1" set D_OUT=-DSOUI_WASM_CNCHESS_OUT="!HERE!release!PT_SUFFIX!"
+if not defined D_OUT if "%RELEASE%"=="0" set D_OUT=-DSOUI_WASM_CNCHESS_OUT="!HERE!out!PT_SUFFIX!"
 if defined SOUI_CNCHESS_STACK set D_STACK=-DSOUI_CNCHESS_STACK="%SOUI_CNCHESS_STACK%"
-if defined GDI_BACKEND set D_GDI=-DSWINX_WASM_GDI_BACKEND="!GDI_BACKEND!"
 
 set "RECONFIG="
 if defined D_OUT   set RECONFIG=!D_OUT!
 if defined D_STACK set RECONFIG=!RECONFIG! !D_STACK!
-if defined D_GDI   set RECONFIG=!RECONFIG! !D_GDI!
+set RECONFIG=!RECONFIG! !D_PTHREADS!
 
 if "%BUILD%"=="" if "%RELEASE%"=="0" set "BUILD=%SOUI_WASM_BUILD%"
 if "%BUILD%"=="" if "%RELEASE%"=="1" set "BUILD=%SOUI_CNCHESS_SHIP_BUILD%"
@@ -210,15 +212,21 @@ if errorlevel 1 (
 rem ---- read the output dir back from CMakeCache ------------------------------
 set "OUT="
 for /f "tokens=1,* delims==" %%A in ('findstr /b /c:"SOUI_WASM_CNCHESS_OUT:" "%BUILD%\CMakeCache.txt" 2^>nul') do set "OUT=%%B"
-if "%OUT%"=="" set "OUT=%HERE%out"
+if "%OUT%"=="" set "OUT=%HERE%out%PT_SUFFIX%"
 
 echo.
-echo artifacts ^(!OUT!^):
+echo artifacts ^(!OUT!, TaskLoop backend=%PTHREADS%^):
 dir /b "!OUT!"
 echo.
-echo run : python -m http.server 8080 -d "!OUT!"   then open http://localhost:8080/%TARGET%.html
+if "%PTHREADS%"=="OFF" echo run : python -m http.server 8080 -d "!OUT!"   then open http://localhost:8080/%TARGET%.html
+if "%PTHREADS%"=="ON"  echo run : python demos\wasm-demo\serve-isolated.py "!OUT!" --port 8080
+if "%PTHREADS%"=="ON"  echo       then open http://localhost:8080/%TARGET%.html and check that
+if "%PTHREADS%"=="ON"  echo       window.crossOriginIsolated is true - without the COOP/COEP headers
+if "%PTHREADS%"=="ON"  echo       the page keeps the pump backend ^(unpack runs on the UI thread again,
+if "%PTHREADS%"=="ON"  echo       the worker counters in the status line stay 0/0^)
 echo       ^(the page must point at a reachable cnchess_server, e.g. 127.0.0.1:3311^)
-echo headless smoke test: see readme.md ^(needs a native cnchess_server binary^)
+echo headless smoke test: see readme.md ^(needs a native cnchess_server binary^);
+echo       for the pthreads build pass the artifact path: node smoke.js "!OUT!\%TARGET%.js"
 endlocal
 exit /b 0
 

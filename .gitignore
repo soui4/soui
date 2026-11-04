@@ -91,3 +91,4 @@ demos/RIPDemo/
 /demos/wasm-demo/release/
 /demos/wasm-demo/build/
 /demos/wasm-demo/out.cairo/
+/demos/wasm-demo/out.canvas2d/

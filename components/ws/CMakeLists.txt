@@ -7,6 +7,9 @@ include_directories(${SOUI_ROOT_DIR}/SOUI/include)
 # WebSocket。实现只保留客户端；链接期需要 -lwebsocket.js，否则
 # emscripten_websocket_new 是未定义符号。
 if(EMSCRIPTEN)
+    # commgr2.h 在 components/ 下，建投递队列要用它的 SComMgr2::CreateTaskLoop；
+    # 桌面侧由各应用的 include 路径带到，wasm 分支自己点名这一层。
+    include_directories(${SOUI_ROOT_DIR}/components)
     add_library(ws STATIC
         src/wasm/WsClientWasm.cpp
         src/wasm/WsClientWasm.h

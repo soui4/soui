@@ -556,6 +556,24 @@ class TValueAnimator : public SValueAnimator {
     }
 
     /**
+     * @brief set from value
+     * @param from Initial value.
+     */
+    void setStart(T from)
+    {
+        mValueEvaluator.setStart(from);
+    }
+
+    /**
+     * @brief set to value
+     * @param to Final value.
+     */
+    void setEnd(T to)
+    {
+        mValueEvaluator.setEnd(to);
+    }
+
+    /**
      * @brief Copies the properties of another animation to this animation.
      * @param pSrc The source animation to copy properties from.
      */

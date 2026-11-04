@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ============================================================
+     基金持仓 · 盘中估值助手（暗色主题）
+     布局：
+       标题栏 → 工具栏 → 基金页签（自选） → KPI ×5 → 走势/贡献度 → 表格区 → 状态栏
+     ============================================================ -->
+<SOUI name="mainWindow" title="@string/title" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16"
+      width="1440" height="860" margin="0,0,0,0" resizable="1" wndType="appMain"
+      colorBkgnd="#070a0f" sendWheel2Hover="1">
+  <root colorBkgnd="#070a0f" layout="vbox">
+
+    <!-- ==================== 标题栏 ==================== -->
+    <caption size="-2,46" layout="hbox" colorBkgnd="#0e141e" padding_left="16" padding_right="6" gravity="center">
+      <window skin="skin_logo" size="16,16"/>
+      <text text="基金持仓" font="f13b" colorText="#e8edf5" extend_left="9"/>
+      <text text="·" font="f12" colorText="#77849a" extend_left="6"/>
+      <text text="盘中估值" font="f13b" colorText="#f0b429" extend_left="6"/>
+      <text text="助手" font="f13b" colorText="#e8edf5" extend_left="6"/>
+
+      <text name="txt_fund_chip" text="161725" skin="skin_chip" font="f11" colorText="#aab6c8"
+            size="-1,24" padding="9,0,9,0" align="center" valign="middle" extend_left="16"
+           />
+      <text text="数据源 天天基金" skin="skin_chip" font="f11" colorText="#aab6c8"
+            size="-1,24" padding="9,0,9,0" align="center" valign="middle" extend_left="8"
+           />
+
+      <window size="0,0" weight="1"/>
+
+      <text name="txt_market" text="交易中" skin="skin_badge_live" font="f11b" colorText="#5ee08f"
+            size="-1,26" padding="12,0,12,0" align="center" valign="middle"/>
+      <text name="txt_market_off" text="已收盘" skin="skin_badge_closed" font="f11b"
+            colorText="#9aa8bd" size="-1,26" padding="12,0,12,0" align="center" valign="middle"
+            show="0"/>
+
+      <button name="btn_min" text="—" skin="skin_capbtn" size="34,28" class="cls_capbtn"
+              extend_left="8"/>
+		<window size="34,28">
+			<button name="btn_max" text="□" skin="skin_capbtn" pos="0,0,-0,-0" class="cls_capbtn"
+					gravity="center"/>
+			<button name="btn_restore" text="▣" skin="skin_capbtn" pos="0,0,-0,-0" class="cls_capbtn"
+					gravity="center" show="0"/>
+		</window>
+
+		<button name="btn_close" text="×" skin="skin_capbtn" size="34,28" class="cls_capbtn_close"
+             />
+    </caption>
+
+    <!-- ==================== 工具栏 ==================== -->
+    <window size="-2,58" layout="hbox" colorBkgnd="#0b1119" padding_left="16" padding_right="16">
+      <window size="112,-2" layout="vbox" padding_top="6">
+        <text text="基金代码" class="cls_field" size="-2,16"/>
+        <edit name="edit_code" text="161725" size="-2,32"/>
+      </window>
+
+      <button name="btn_query" text="查询持仓" skin="skin_btn_primary" size="100,34"
+              class="cls_btn_primary" extend_left="14" gravity="center"/>
+      <button name="btn_watch_add" text="＋ 收藏" skin="skin_btn_ghost" size="82,34"
+              class="cls_btn_ghost" extend_left="8" gravity="center"/>
+      <button name="btn_refresh" text="刷新估值" skin="skin_btn_ghost" size="88,34"
+              class="cls_btn_ghost" extend_left="8" gravity="center"/>
+      <button name="btn_sim_off" text="模拟盘中 关" skin="skin_btn_ghost" size="100,34"
+              class="cls_btn_ghost" extend_left="8" gravity="center"/>
+      <button name="btn_sim_on" text="模拟盘中 开" skin="skin_btn_primary" size="100,34"
+              class="cls_btn_primary" extend_left="8" gravity="center" show="0"/>
+
+      <window size="0,0" weight="1"/>
+      <text text="每分钟自动刷新" font="f10" colorText="#5c6779" size="-1,-2" gravity="center"/>
+      <text name="txt_upd" text="更新于 --:--:--" font="f11" colorText="#77849a"
+            size="-1,-2" extend_left="12" gravity="center"/>
+    </window>
+
+    <!-- ============ 大盘三大指数速览 ============
+         常驻在工具栏下方：与自选基金数量无关，0 支基金时同样定时刷新。 -->
+    <fundindexbar name="index_bar" size="-2,46"/>
+
+    <!-- ==================== 工作区：行情 / 空状态 / SOUI5 介绍 ====================
+         三个视图用同一套 pos 绝对定位叠放，只显示其中一个；
+         父容器不设 layout（SouiLayout 按 pos 排），因此切换视图不需要重排兄弟窗口。 -->
+    <window name="workspace" size="-2,0" weight="1">
+      <window name="view_main" pos="0,0,-2,-2" layout="vbox">
+
+    <!-- ============ 基金页签（收藏列表 + 多基金工作区） ============ -->
+    <window size="-2,74" layout="hbox" padding_left="16" padding_right="16" padding_top="10">
+      <!-- sbWid=0：滚动条占位 0px 不显示，但 HasScrollBar(horz) 仍为真，SPanel 的
+           拖拽滚动 / fling 惯性才可用；enableDragScroll 显式打开拖拽。 -->
+      <fundwatchtabs name="watch_tabs" size="0,-2" weight="1" cursor="hand"
+                     sbWid="0" enableDragScroll="1"/>
+      <text name="txt_watch_cnt" text="0 只" font="f11" colorText="#77849a" size="-1,-2"
+            extend_left="10" gravity="center"/>
+    </window>
+
+    <!-- ==================== KPI 卡片 ==================== -->
+    <window size="-2,96" layout="hbox" padding_left="16" padding_right="16" padding_top="6">
+      <fundkpi name="kpi_hero" size="0,-2" weight="24"/>
+      <fundkpi name="kpi_nav" size="0,-2" weight="16" extend_left="10"/>
+      <fundkpi name="kpi_cover" size="0,-2" weight="18" extend_left="10"/>
+      <fundkpi name="kpi_pull" size="0,-2" weight="21" extend_left="10"/>
+      <fundkpi name="kpi_drag" size="0,-2" weight="21" extend_left="10"/>
+    </window>
+
+    <!-- ==================== 走势 + 贡献度 ==================== -->
+    <window size="-2,224" layout="hbox" padding_left="16" padding_right="16" padding_top="10">
+      <window size="0,-2" weight="60" skin="skin_card" layout="vbox" padding="14,10,14,8">
+        <window size="-2,22" layout="hbox">
+          <text text="估算分时走势" font="f13b" colorText="#e8edf5" size="-1,-2" gravity="center"/>
+          <text name="txt_chart_sub" text="—" font="f11" colorText="#77849a" size="-1,-2"
+                extend_left="10" gravity="center"/>
+          <window size="0,0" weight="1"/>
+          <text text="估算涨跌幅" font="f11" colorText="#ff5c5c" size="-1,-2" gravity="center"/>
+          <text text="09:30–11:30 / 13:00–15:00" font="f10" colorText="#77849a" size="-1,-2"
+                extend_left="12" gravity="center"/>
+        </window>
+        <fundspark name="chart_est" size="-2,0" weight="1" extend_top="6"/>
+      </window>
+
+      <window size="0,-2" weight="40" skin="skin_card" layout="vbox" padding="14,10,14,8"
+              extend_left="10">
+        <window size="-2,22" layout="hbox">
+          <text text="贡献度分解" font="f13b" colorText="#e8edf5" size="-1,-2" gravity="center"/>
+          <text text="按 |贡献| 排序" font="f11" colorText="#77849a" size="-1,-2"
+                extend_left="10" gravity="center"/>
+        </window>
+        <fundcontrib name="contrib_list" size="-2,0" weight="1" extend_top="8"/>
+      </window>
+    </window>
+
+    <!-- ==================== 表格区 ==================== -->
+    <window size="-2,0" weight="1" skin="skin_card" layout="vbox" padding="12,8,12,10"
+            margin="16,10,16,10">
+      <window size="-2,38" layout="hbox">
+        <fundtabs name="tabs" size="340,-2" cursor="hand"/>
+        <window size="0,0" weight="1"/>
+        <edit name="edit_filter" cueText="筛选代码 / 名称" cueColor="#5c6779" size="150,30"
+              gravity="center"/>
+        <button name="btn_filter" text="筛选" skin="skin_btn_ghost" size="58,30"
+                class="cls_btn_ghost" extend_left="6" gravity="center"/>
+        <button name="btn_reset" text="重置" skin="skin_btn_ghost" size="58,30"
+                class="cls_btn_ghost" extend_left="6" gravity="center"/>
+        <!-- 仅在「请求日志」页签显示：清空内存里的日志缓冲（不影响落盘文件） -->
+        <button name="btn_log_clear" text="清空日志" skin="skin_btn_ghost" size="78,30"
+                class="cls_btn_ghost" extend_left="6" gravity="center" show="0"/>
+      </window>
+
+      <window size="-2,0" weight="1" extend_top="6">
+        <window name="pane_change" pos="0,0,-2,-2">
+          <gridctrl name="grid_holdings" pos="0,0,-2,-2"
+                    rowCount="1" colCount="17" fixedRows="1" fixedCols="0"
+                    defRowHeight="30" defColWidth="90"
+                    gridLines="3" gridLineColor="#1c2534" gridBkColor="#121a26"
+                    font="f12" colorText="#aab6c8" editable="0"/>
+        </window>
+        <window name="pane_est" pos="0,0,-2,-2" show="0">
+          <gridctrl name="grid_est" pos="0,0,-2,-2"
+                    rowCount="1" colCount="6" fixedRows="1" fixedCols="0"
+                    defRowHeight="30" defColWidth="110"
+                    gridLines="3" gridLineColor="#1c2534" gridBkColor="#121a26"
+                    font="f12" colorText="#aab6c8" editable="0"/>
+        </window>
+        <window name="pane_log" pos="0,0,-2,-2" show="0" colorBkgnd="#0b1119">
+          <!-- 只读 rich edit：原生滚动/选中/复制，追加文本时不会整篇重排布局 -->
+          <richedit name="re_log" pos="10,8,-10,-8" multiLines="1" readonly="1"
+                    vscrollBar="1" autoVScroll="1" wordWrap="1" hscrollBar="0" wantReturn="0"
+                    enableDragdrop="0" colorBkgnd="#0b1119" colorText="#8b98ab" font="mono11"/>
+        </window>
+      </window>
+    </window>
+      </window> <!-- /view_main -->
+
+      <!-- ===== 0 支基金：空界面（工具栏、指数条、状态栏保持常驻） ===== -->
+      <window name="view_empty" pos="0,0,-2,-2" show="0" colorBkgnd="#070a0f" layout="hbox">
+        <window size="0,0" weight="1"/>
+        <window size="580,300" gravity="center" skin="skin_card" layout="vbox" padding="34,30,34,30">
+          <text text="◇  暂无收藏" font="f13b" colorText="#f0b429" size="-2,28" align="center"/>
+          <text text="还没有收藏基金" font="f21b" colorText="#e8edf5" size="-2,44"
+                align="center" extend_top="6"/>
+          <text text="支持 0 支基金收藏，大盘指数速览仍会定时刷新。" font="f12"
+                colorText="#aab6c8" size="-2,24" align="center"/>
+          <text text="在上方输入 6 位基金代码，点「＋ 收藏」开始分析持仓变化与盘中估值。"
+                font="f12" colorText="#77849a" size="-2,24" align="center"/>
+          <text text="收藏列表保存在本地，随时可以全部移除。" font="f11" colorText="#5c6779"
+                size="-2,22" align="center" extend_top="4"/>
+          <window size="0,0" weight="1"/>
+          <window size="-2,36" layout="hbox">
+            <window size="0,0" weight="1"/>
+            <button name="btn_add_sample" text="＋ 添加示例基金 161725" skin="skin_btn_primary"
+                    size="200,34" class="cls_btn_primary"/>
+            <window size="0,0" weight="1"/>
+          </window>
+        </window>
+        <window size="0,0" weight="1"/>
+      </window>
+
+      <!-- ===== SOUI5 介绍页 ===== -->
+      <window name="view_about" pos="0,0,-2,-2" show="0" colorBkgnd="#070a0f"
+              layout="vbox" padding="16,8,16,10">
+        <window size="-2,36" layout="hbox">
+          <text text="关于 SOUI5" font="f13b" colorText="#e8edf5" size="-1,-2" gravity="center"/>
+          <window size="0,0" weight="1"/>
+          <button name="btn_about_back" text="← 返回行情" skin="skin_btn_ghost" size="110,32"
+                  class="cls_btn_ghost" gravity="center"/>
+        </window>
+        <fundabout name="about_view" size="-2,0" weight="1" extend_top="8"/>
+      </window>
+    </window> <!-- /workspace -->
+
+    <!-- ==================== 状态栏 ==================== -->
+    <window size="-2,30" layout="hbox" colorBkgnd="#0b1119" padding_left="16" padding_right="16">
+      <text name="txt_status" text="@string/status_ready" class="cls_status" size="-1,-2"
+            gravity="center"/>
+      <window size="0,0" weight="1"/>
+      <text text="涨" font="f11" colorText="#ff5c5c" size="-1,-2" gravity="center"/>
+      <text text="跌" font="f11" colorText="#22c55e" size="-1,-2" extend_left="10" gravity="center"/>
+      <text text="估算仅供参考，非实际净值" font="f10" colorText="#77849a" size="-1,-2"
+            extend_left="14" gravity="center"/>
+
+      <!-- 署名放在状态栏最右：低对比小字 + 无边框皮肤，只作低调入口。
+           点击进入 SOUI5 介绍页，介绍页里再点一次则退回行情/空界面。 -->
+      <button name="btn_about" text="powered by soui5" skin="skin_link_status"
+              class="cls_link_status" size="-1,-2" extend_left="18" gravity="center"/>
+    </window>
+  </root>
+</SOUI>

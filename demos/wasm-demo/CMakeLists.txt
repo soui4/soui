@@ -169,8 +169,15 @@ endif()
 # "m._SwinxDemoXxx is not a function" 直接抛异常。
 #   _SwinxClipboardSetBrowserText -- 浏览器 paste 事件把剪贴板文本写进 swinx 的
 #     SClipboard（CF_UNICODETEXT/CF_TEXT 双格式），随后的 Ctrl+V 注入才能读到。
+#   _SwinxDemoFilePickSelfTest -- 异步文件选择的分阶段探针（0 发起 / 1 取结果 /
+#     2 负路径）；页面上那颗「选择文件」按钮只调阶段 0，结果由回调打进页面日志。
+#   _SwinxDemoFilePickPath -- 探针上一次拿到的路径，烟测要逐字符钉住它（pOut 只有整数）。
+#   _SwinxFilePickDone -- 页面把选择结果送回 wasm 的唯一重入口（符号在 swinx 的
+#     src/platform/wasm/dlghelper.cpp 里，不是演示专有）。漏了这一项，宿主钩子
+#     选完文件也只能报 "Module._SwinxFilePickDone is not a function"。
+#   _SwinxFilterToAcceptA -- swinx 的筛选串换算，烟测直接拿它对 accept 串做断言。
 set(_soui_demo_exports
-    "_main,_SwinxDemoPump,_SwinxDemoMouse,_SwinxDemoWheel,_SwinxDemoKey,_SwinxDemoText,_SwinxDemoCaretPos,_SwinxClipboardSetBrowserText,_malloc,_free,_SwinxFbBits,_SwinxFbWidth,_SwinxFbHeight,_SwinxFbStride,_SwinxFbLogicalWidth,_SwinxFbLogicalHeight,_SwinxFbRequests,_SwinxFbPresents")
+    "_main,_SwinxDemoPump,_SwinxDemoMouse,_SwinxDemoWheel,_SwinxDemoKey,_SwinxDemoText,_SwinxDemoCaretPos,_SwinxClipboardSetBrowserText,_SwinxDemoTaskLoopSelfTest,_SwinxDemoFilePickSelfTest,_SwinxDemoFilePickPath,_SwinxFilePickDone,_SwinxFilterToAcceptA,_malloc,_free,_SwinxFbBits,_SwinxFbWidth,_SwinxFbHeight,_SwinxFbStride,_SwinxFbLogicalWidth,_SwinxFbLogicalHeight,_SwinxFbRequests,_SwinxFbPresents")
 
 add_executable(soui-wasm-demo soui_main.cpp)
 
@@ -218,7 +225,7 @@ target_include_directories(soui-wasm-demo PRIVATE
 # 因此也不再需要它们间接拉起的 brotli（freetype 才 PRIVATE 链 brotlidec，brotli 在
 # Emscripten 下又删掉 dec -> common 这条边）。wasm 端字体由浏览器系统字体提供。
 target_link_libraries(soui-wasm-demo PRIVATE
-    soui4 utilities4 swinx
+    soui4 utilities4 swinx taskloop
     render-gdi imgdecoder-stb aupng
     ExtendCtrls msftedit msls31
     m)
@@ -276,6 +283,11 @@ if(_soui_asan_pos GREATER -1)
 else()
     set(_soui_demo_stack_first "-Wl,--stack-first")
 endif()
+
+# -pthread 打开时的三条链接期设置（-sWASMFS=1 / -sINITIAL_MEMORY=64MB /
+# GrowableArrayBuffers）在根 CMakeLists 的 SOUI_WASM_PTHREADS 分支里用
+# add_link_options 统一给，原因和实测数据记在那边：cnchess 也要能开这个开关，
+# 放在单个 demo 里就会漏。
 
 target_link_options(soui-wasm-demo PRIVATE
     # route C（canvas2d）：GDI 后端用 emscripten::val 持有离屏 canvas / 2D context，

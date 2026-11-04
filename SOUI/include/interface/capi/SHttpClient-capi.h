@@ -59,6 +59,9 @@ extern "C" {
 #define IHttpClient_GetHttpCode(This) \
     ((This)->lpVtbl->GetHttpCode(This))
 
+#define IHttpClient_GetCookie(This, out, lpUrl) \
+    ((This)->lpVtbl->GetCookie(This, out, lpUrl))
+
 #ifdef __cplusplus
 }
 #endif

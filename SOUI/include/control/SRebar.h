@@ -61,18 +61,18 @@ class SOUI_EXP SRebar : public SWindow {
      */
     struct BandInfo
     {
-        SStringT title;    /**< Band title text */
-        int height;        /**< Band height (pixels) */
-        bool bCollapsible; /**< Whether collapsible */
-        bool bCollapsed;   /**< Whether currently in collapsed state */
-        SWindow *pChild;   /**< Pointer to the band content child window */
-        int minHeight;     /**< Minimum height */
-        int maxHeight;     /**< Maximum height */
-        int width;         /**< Current width (used for horizontal Rebar) */
-        int minWidth;      /**< Minimum width */
-        int maxWidth;      /**< Maximum width */
-        bool bNewRow;      /**< In multi-row mode, true means starting a new row from this band (set at init from the per-band row attribute, or produced by dragging) */
-        bool bHeightUserSet; /**< Height was dragged by the user (vertical mode), so it is no longer derived from the child */
+        SStringT title;           /**< Band title text */
+        int height;               /**< Band height (pixels) */
+        bool bCollapsible;        /**< Whether collapsible */
+        bool bCollapsed;          /**< Whether currently in collapsed state */
+        SWindow *pChild;          /**< Pointer to the band content child window */
+        int minHeight;            /**< Minimum height */
+        int maxHeight;            /**< Maximum height */
+        int width;                /**< Current width (used for horizontal Rebar) */
+        int minWidth;             /**< Minimum width */
+        int maxWidth;             /**< Maximum width */
+        bool bNewRow;             /**< In multi-row mode, true means starting a new row from this band (set at init from the per-band row attribute, or produced by dragging) */
+        bool bHeightUserSet;      /**< Height was dragged by the user (vertical mode), so it is no longer derived from the child */
         bool bChildHiddenByRebar; /**< The band child was hidden by this control (collapse), so expanding has to show it again */
         BandInfo()
             : height(24)

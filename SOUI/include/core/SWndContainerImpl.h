@@ -292,8 +292,9 @@ class SOUI_EXP SwndContainerImpl
      * @param uMsg Message identifier.
      * @param wParam Additional message-specific information.
      * @param lParam Additional message-specific information.
+     * @return Non-zero if the wheel delta was consumed by the target window.
      */
-    void OnFrameMouseWheel(UINT uMsg, WPARAM wParam, LPARAM lParam);
+    LRESULT OnFrameMouseWheel(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
     /**
      * @brief Handles key events within the frame.

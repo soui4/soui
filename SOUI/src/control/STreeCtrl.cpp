@@ -917,9 +917,13 @@ void STreeCtrl::DrawItem(IRenderTarget *pRT, const CRect &rc, HSTREEITEM hItem)
     CRect rcText(m_nItemOffset + m_nItemMargin.toPixelSize(GetScale()), 0, pItem->nContentWidth, nItemHei);
     rcText.OffsetRect(m_nItemMargin.toPixelSize(GetScale()), 0);
     COLORREF crText = GetStyle().GetTextColor(IsItemSelected(hItem) ? 2 : 0);
-    COLORREF crOldText = pRT->SetTextColor(crText);
-    pRT->DrawText(pItem->strText, -1, rcText, align);
-    pRT->SetTextColor(crOldText);
+
+    COLORREF crOldText = CR_INVALID;
+    if (CR_INVALID != crText)
+        crOldText = pRT->SetTextColor(crText);
+    DrawText(pRT, pItem->strText, -1, rcText, align);
+    if (CR_INVALID != crText)
+        pRT->SetTextColor(crOldText);
 
     pRT->OffsetViewportOrg(-rc.left - pItem->nLevel * m_nIndent.toPixelSize(GetScale()), -rc.top, NULL);
 }

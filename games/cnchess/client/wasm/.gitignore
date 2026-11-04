@@ -1,9 +1,9 @@
 # build-cnchess.sh 的全部产物（.wasm 约 40 MB、.data 约 20 MB），
 # 只能在本机经 emsdk 重新生成，不入库。见 readme.md 的"文件"表。
 /out/
+# 默认后端（-pthread 的 worker 任务队列）另起一个目录：两条后端的 .js/.wasm/.data
+# 是三件套，混在一起换构建会拿错胶水（LinkError），构建脚本按后端选目录。
+/out_pt/
 # 上线档（-O2 -DNDEBUG）的产物也待在这里，同理不入库。
 /release/
-# cairo 后端预载的字体（.ttf/.ttc/.otf，如 simsun.ttc 约 18 MB，且多为厂商版权字体，
-# 不适于直接入库）。启用 cairo 后端前需自行放入字体文件，缺目录时 cmake 会 FATAL_ERROR
-# 提示"cairo 后端需要字体目录 .../fonts（放 .ttf/.ttc/.otf）"。
-/fonts/
+/release_pt/

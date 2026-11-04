@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <interface/SHttpClient-i.h>
 #include <helper/obj-ref-impl.hpp>
 #include <string>
@@ -23,6 +23,7 @@ public:
 	STDMETHOD_(void,SetDownloadCallback)(THIS_ IHttpCallback* pCallback)  OVERRIDE{ m_pCallback = pCallback; }
 	STDMETHOD_(BOOL,DownloadFile)(THIS_ LPCSTR lpUrl, LPCSTR lpFilePath)  OVERRIDE;
 	STDMETHOD_(int,GetHttpCode)(CTHIS) SCONST  OVERRIDE{return m_httpCode;}
+	STDMETHOD_(BOOL,GetCookie)(THIS_ IStringA *out,LPCSTR lpUrl) OVERRIDE;
 
 protected:
 	BOOL	Init();
@@ -31,6 +32,11 @@ protected:
 	static size_t write_data_file(void* ptr, size_t size, size_t nmemb, void* user_data);
 	static size_t write_data_string(void* ptr, size_t size, size_t nmemb, void* user_data);
 	static int progress_dl_callback(void* user_data, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow);
+	//GetCookie 用：收集响应头原文 / 丢弃响应体
+	//签名与 libcurl 的 CURLOPT_HEADERFUNCTION / CURLOPT_WRITEFUNCTION 完全一致，
+	//避免 curl 的 typecheck 宏（curl/typecheck-gcc.h）在编译期报回调类型不匹配。
+	static size_t collect_header(char* ptr, size_t size, size_t nmemb, void* user_data);
+	static size_t discard_body(char* ptr, size_t size, size_t nmemb, void* user_data);
 
 private:
 

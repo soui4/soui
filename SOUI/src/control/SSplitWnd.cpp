@@ -330,7 +330,7 @@ int SSplitWnd::PaneIndex(const SStringW &strName) const
 SSplitPane *SSplitWnd::GetPane(UINT iPane)
 {
     if (iPane >= m_lstPane.GetCount())
-        return FALSE;
+        return NULL;
     return m_lstPane[iPane];
 }
 

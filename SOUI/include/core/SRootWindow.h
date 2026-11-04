@@ -1,6 +1,7 @@
 ﻿#ifndef __ROOTROOTWINDOW__H__
 #define __ROOTROOTWINDOW__H__
 #include <core/SWnd.h>
+#include <valueAnimator/SValueAnimator.h>
 #include <souicoll.h>
 
 SNSBEGIN
@@ -27,7 +28,10 @@ enum AniState
 };
 
 class SHostWnd;
-class SOUI_EXP SRootWindow : public SWindow {
+class SOUI_EXP SRootWindow
+    : public SWindow
+    , public IAnimatorUpdateListener
+    , public SAnimatorListener {
     /** DEF_SOBJECT macro defines the type name of the class */
     DEF_SOBJECT(SWindow, L"root")
     /** Declare SHostWnd as a friend class to allow access to private members */
@@ -70,6 +74,8 @@ class SOUI_EXP SRootWindow : public SWindow {
      */
     void FireMenuCmd(int menuID);
 
+    void DrawFocusAni(IRenderTarget *pRT);
+
   public:
     /**
      * @brief Updates the layout of the window.
@@ -104,6 +110,9 @@ class SOUI_EXP SRootWindow : public SWindow {
      * @param bErase Flag indicating whether to erase the animation.
      */
     virtual void OnAnimationInvalidate(bool bErase) OVERRIDE;
+
+    STDMETHOD_(void, onAnimationUpdate)(THIS_ IValueAnimator *pAnimator) OVERRIDE;
+    STDMETHOD_(void, onAnimationEnd)(THIS_ IValueAnimator *pAnimator) OVERRIDE;
 
   protected: /**< SWindow virtual methods */
     /**
@@ -159,14 +168,46 @@ class SOUI_EXP SRootWindow : public SWindow {
      */
     virtual void RequestRelayout(SWND hSource, BOOL bSourceResizable) OVERRIDE;
 
+    void OnDecendantFocusChanged(SWND swnd, BOOL bSet) OVERRIDE;
+
   public:
     /** Define attributes for enter and exit animations */
     SOUI_ATTRS_BEGIN()
         ATTR_ANIMATION(L"enterAnimation", m_aniEnter, FALSE)
         ATTR_ANIMATION(L"exitAnimation", m_aniExit, FALSE)
+        ATTR_SKIN(L"focusAniSkin", m_pSkinFocusAni, FALSE)                     /**< Skin of the focus moving frame; without it the feature is off */
+        ATTR_CHAIN_PTR_PREFIX(m_focusAnimator, 0, SAttrChainPrefix::FOCUSANI)  /**< animator:duration / animator:interpolator of the move */
+        ATTR_CHAIN_PTR_PREFIX(m_focusAlphaAnimator, 0, SAttrChainPrefix::FADE) /**< fade:duration / fade:interpolator of the fade out */
     SOUI_ATTRS_END()
 
   protected:
+    /**
+     * @brief Skin painting the focus moving frame.
+     *
+     * It is the switch of the feature as well: an empty skin means no frame is painted and no
+     * animation is started, so no extra boolean is needed.
+     */
+    SAutoRefPtr<ISkinObj> m_pSkinFocusAni;
+
+    /**
+     * @brief RECT animator driving the focus moving frame.
+     *
+     * Its parameters come from the animator: namespace of the SOUI node, e.g.
+     * animator:duration="200" animator:interpolator="Decelerate".
+     */
+    SAutoRefPtr<SRectAnimator> m_focusAnimator;
+
+    /**
+     * @brief Alpha animator that ends the life of the focus frame.
+     *
+     * Once the frame has arrived it stays opaque on the target for a while, then fades out; when this
+     * animator ends the frame is forgotten and repainted away. It is driven by the fade: namespace of
+     * the SOUI node, e.g. fade:duration="200" fade:interpolator="Decelerate".
+     */
+    SAutoRefPtr<SByteAnimator> m_focusAlphaAnimator;
+
+    CRect m_rcFocusAni; /**< Frame rect painted last, kept to repaint (erase) it when the frame moves. */
+    SWND m_hFocus;      /**< Window that held the focus when the frame was last pointed at a target. */
     /** Auto-managed pointers for enter and exit animations */
     SAutoRefPtr<IAnimation> m_aniEnter, m_aniExit;
     /** Pointer to the host window */

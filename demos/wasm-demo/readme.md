@@ -30,6 +30,8 @@
 | `soui-host.js` | **可复用的浏览器宿主**（本仓库两个 wasm 程序通用）：下载进度、上屏、鼠标/键盘/滚轮注入、输入法代理、剪贴板、WebAudio、崩溃上报。新程序引这一个 JS 即可，见下面「复用宿主」 |
 | `soui.html` | 阶段 2 的 `--shell-file`，现在只剩页面排版 + 一行 `SouiHost.start({...})`（宿主逻辑都在 `soui-host.js`） |
 | `build-soui.sh` | CMake 包装器：查 `em++`、确保构建目录打开了 `SOUI_BUILD_WASM_DEMO`、`cmake --build --target soui-wasm-demo`。编译与链接命令本身在 `demos/wasm-demo/CMakeLists.txt` |
+| `smoke.js` | node 无头烟测（wasm 门禁的执行体，默认构建 30 条断言、`-pthread` 构建 31 条）：加载产物、手动驱动 `SwinxDemoPump`、注入输入、跑 `ITaskLoop` 双后端自测、跑 `SwinxPickFileAsyncA` 的异步文件选择（假宿主钩子）；见下面「无头烟测」 |
+| `serve-isolated.py` | 带 COOP/COEP 头的静态服务，`-DSOUI_WASM_PTHREADS=ON` 的产物要在浏览器里跑 worker 后端时用它；`--no-isolation` 可对照验证降级到泵后端 |
 | `uires/` | SOUI 资源树：`xml/` 布局与控件、`values/` 字符串/颜色/皮肤/模板、`anim/` 与 `animator/` 动画、`svg/` 皮肤、`lua/` 三个游戏脚本，以及生成的 `uires.idx`；预载范围受"两个可选能力的编译开关"影响（关掉 Lua/Scintilla 时对应脚本与源文件不进 `.data`），页面片段说明见各节 |
 | `out/` | 默认（调试）构建的产物，即 `-O2 -g`（未纳入版本控制） |
 | `release/` | 上线档的产物（`-O2 -DNDEBUG` 或 `MinSizeRel`，见下面"上线前的编译参数"）；`.data`/`.html`/`.js`/`.wasm` 四个文件必须放在一起，`.data` 按当前工作目录找（未纳入版本控制） |
@@ -58,10 +60,11 @@
 | 下载与进度 | 自己 `fetch(…,{cache:'no-cache'})` 拉 `.wasm`/`.data`，走 `ReadableStream` 显示百分比/速度/剩余时间，再经 `getPreloadedPackage` + `instantiateWasm` 交给加载器 |
 | 胶水载入 | 动态 `<script>` 带 `?v=<时间戳>`，避开"新 wasm 配旧胶水"的启发式缓存；实例化前用 `WebAssembly.Module.imports()` 预检，缺项时报人话而不是裸 `LinkError` |
 | 上屏 | 三条路径按 `Module.fbFormat` 选：`'canvas'`（canvas2d 后端已由 C++ `drawImage` 合成，JS 只统计）/ `'rgba'`（零拷贝 `ImageData` + 单次 `putImageData`）/ 兜底 ARGB 换序 |
-| 输入 | 鼠标（含 `pointerup` 挂 window、失焦清按键）、滚轮（攒满 `WHEEL_DELTA` 才注入）、键盘（按 `e.code` 算 VK、每次注入后同步抽干消息队列） |
+| 输入 | 鼠标（含 `pointerup` 挂 window、失焦清按键）、滚轮（攒满 `WHEEL_DELTA` 才注入；同步派发，SOUI 没消费时才由宿主 `scrollBy` 补偿页面滚动）、键盘（按 `e.code` 算 VK、每次注入后同步抽干消息队列） |
 | 输入法 | 透明 `textarea` 代理 + `compositionend`/`input(insertText)` 双路提交，代理框每帧钉在 C++ 报的插入符坐标上 |
 | 剪贴板 | `paste` 同步读 `clipboardData` 再注入 Ctrl+V；反向走 `Module.souixClipboardWrite` |
 | 音效 | `Module.swinxAudioPlay` → WebAudio，autoplay 未放行时排队、`onstatechange` 冲刷 |
+| 文件选择 | `Module.swinxPickFile` → 隐藏 `<input type=file>`（`accept` 由 swinx 从 Win32 筛选串换算而来）。选完的字节由 JS `malloc` 后交给 `_SwinxFilePickDone`，swinx 把它落到 wasm 文件系统的 `/tmp/swinx-pick/<id>-<消毒后的名字>`，回调里给的就是这个可直接 `fopen` 的路径。只在用户手势里允许发起（`navigator.userActivation`），取消走 `nResult=0`。契约与限制见 `doc/soui-wasm-port-plan.md` §33 |
 | 崩溃 | `window.onerror` / `onunhandledrejection` 把 `err.stack` 打到控制台，遮罩显示一句人话 |
 
 C++ 侧要提供的导出（名字可用 `api:{...}` 覆盖，缺了对应功能自动降级、不抛异常）：
@@ -69,8 +72,13 @@ C++ 侧要提供的导出（名字可用 `api:{...}` 覆盖，缺了对应功能
 ```
 _SwinxDemoPump _SwinxDemoMouse _SwinxDemoKey _SwinxDemoWheel
 _SwinxDemoText _SwinxDemoCaretPos _SwinxClipboardSetBrowserText
+_SwinxFilePickDone
 _malloc _free _SwinxFbBits _SwinxFbWidth _SwinxFbHeight _SwinxFbStride
 ```
+
+`_SwinxFilePickDone` 没有导出时，`Module.swinxPickFile` 直接返回"没受理"，`SwinxPickFileAsyncA`
+因此报 `ERROR_CALL_NOT_IMPLEMENTED` 而不是发起一个永远回不来的请求。`_SwinxDemoFilePickSelfTest`
+和 `_SwinxDemoFilePickPath` 是演示自己的探针导出，新程序不需要。
 
 外加两条 `EM_ASM` 回调：`Module.swinxPresent(l,t,r,b)`（脏矩形上屏）与 `Module.souiFatal(str)`
 （启动失败）。`soui_main.cpp` 的「宿主接线」一节就是这部分的完整实现，新程序抄过去即可。
@@ -132,9 +140,11 @@ python3 -m http.server 8090 -d demos/wasm-demo/out
    合并成一次回调；互不相交的区域仍分别上屏（并起来是更大的包围盒，见"坑与已知限制"）。
 3. **输入**：`SwinxInjectMouse/SwinxInjectKey`（演示里由 `SwinxDemoMouse/SwinxDemoKey` 包一层）
    收**屏幕坐标**，内部按 `wndObj->rc` 换算 client，并把消息投进目标窗口所在线程的队列，
-   所以宿主在哪个线程回调都不影响投递目标。滚轮另包一层 `SwinxDemoWheel`：它和鼠标共用注入
-   入口，但 `WM_MOUSEWHEEL` 的 `wParam` 高字是带符号滚动量、低字才是 `MK_` 键位，坐标系
-   仍是屏幕坐标（`SwinxInjectMouse` 把这个值原样交给窗口，打包得在调用前做）。
+   所以宿主在哪个线程回调都不影响投递目标。滚轮另包一层 `SwinxDemoWheel`：`WM_MOUSEWHEEL`
+   的 `wParam` 高字是带符号滚动量、低字才是 `MK_` 键位，打包得在调用前做。它不用
+   `SwinxInjectMouse` 的异步投递，而是同步 `SendMessage` 并返回 SOUI 是否消费了这一格——
+   页面始终 `preventDefault`（否则浏览器会抢先把页面滚到底），SOUI 没消费时再由宿主
+   手动 `scrollBy` 补偿页面滚动，保证顺序是"SOUI 先、页面后"。
 4. **消息泵**：`emscripten_set_main_loop(SwinxDemoPump, 0, 1)` 由 requestAnimationFrame 驱动，
    泵内只做 `PeekMessage + TranslateMessage + DispatchMessage`。浏览器主线程不能阻塞，
    所以演示不用 `GetMessage`；也因为一次调用必须返回，`SwinxDemoPump` 只工作 100ms 预算就带着
@@ -395,6 +405,65 @@ SOUI_BUILD_WASM_LUA=0 SOUI_BUILD_WASM_SCINTILLA=0 \
 `.wasm` 减 11,067,485 B（−20.3%），`.data` 基本不变（字体才是大头）。产物体积治理仍是未收的账，
 见 `doc/soui-wasm-port-plan.md` 的"已知缺口"。
 
+### worker 线程构建开关（SOUI_WASM_PTHREADS，默认 OFF）
+
+`ITaskLoop` 的 wasm 后端有两条路（`components/TaskLoop/wasm/TaskLoopWasm.cpp`，设计缘由与实测数据在
+`doc/soui-wasm-port-plan.md` §32）。默认构建是**泵后端**：不建线程，队列由 `SwinxDemoPump` 按帧预算
+消费，慢任务只会拖长一帧。开 `-pthread` 才是**worker 后端**：`start()` 建一条 wasm worker 线程，
+UI 线程只入队 + `Atomics.notify` 唤醒，任务算完用 `IMessageLoop::PostTask` 把结果抛回 UI 线程，
+下一帧由 `ExecutePendingTask()` 取走 —— 慢任务（解压、AI）整条离开主线程。
+
+```bash
+cmake -S . -B /tmp/build-soui-wasm-pt -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+      -DCMAKE_TOOLCHAIN_FILE=<emsdk>/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake \
+      -DSOUI_BUILD_WASM_DEMO=ON -DSOUI_WASM_PTHREADS=ON
+cmake --build /tmp/build-soui-wasm-pt --target soui-wasm-demo
+node demos/wasm-demo/smoke.js          # 无头验证在 node 里能跑通：node 不需要隔离头
+```
+
+这条命令已经是 CI 的一部分：`.github/workflows/soui-wasm-gate.yml` 用 matrix 跑两条腿，
+`wasm-pump`（`-DSOUI_WASM_PTHREADS=OFF`，30 条断言）和 `wasm-pthreads`（`=ON`，31 条，多出
+`workers=1` 与 `offUi=posted` 两条 worker 专属断言）。两条腿各占一台 runner —— 产物目录
+`demos/wasm-demo/out` 是按源目录写死的，同一台机器上先后两次构建会互相覆盖，被覆盖那侧的 ninja
+还会报 `no work to do`；每条腿再各自 `grep` 一句 `[taskloop] pt=<期望值>`，拿错产物就变红。
+`fail-fast: false`，默认腿的结论不会被 worker 腿取消。
+
+本地要同时留两份产物时别再共用 `out/`：给第二条配置单独指一个产物目录
+（`-DSOUI_WASM_DEMO_OUT=$PWD/demos/wasm-demo/out_pt`，`node smoke.js <那个目录>/soui-wasm-demo.js`
+即可指定），这条是 §32.6 那个坑的根治办法。
+
+开关一起做三件事：给 `CMAKE_C/CXX_FLAGS` 追加 `-pthread`、`add_link_options` 给出
+`-sWASMFS=1 -sINITIAL_MEMORY=64MB -sGROWABLE_ARRAYBUFFERS=1`（根 `CMakeLists.txt`，每个 wasm
+可执行目标都继承 —— 只在演示目录里补的话，cnchess 一开这个开关就会在 wasm-ld 期报
+`INITIAL_MEMORY` 默认 16MB 小于 `STACK_SIZE` 32MB；`-pthread` 硬性要求前者大于后者，本端口
+`STACK_SIZE=32MB`；线程里的文件读只靠 WASMFS 才可用 —— 实测 JS MEMFS
+下 worker 的读请求要等 UI 线程睡在 futex 里才推进，而 UI 线程在浏览器里从不睡）。产物形态因此
+变了，代价是**浏览器只在 `crossOriginIsolated` 的页面里才给 `SharedArrayBuffer`**：
+
+```bash
+python3 demos/wasm-demo/serve-isolated.py demos/wasm-demo   # 带 COOP/COEP 的静态服务
+# 打开 http://localhost:8080/soui.html，控制台里先确认 crossOriginIsolated === true
+python3 demos/wasm-demo/serve-isolated.py --no-isolation demos/wasm-demo   # 对照：验证降级路径
+```
+
+没隔离头时 `pthread_create` 起不来，实现会**静默退回泵后端**（页面照常跑，只是不并行），所以判断
+"worker 后端到底生效没有"要看计数：`STaskLoopWorkerCount()` 非 0，或烟测里的 `workers=1 offUi=8`。
+
+**写后台任务时的硬约束**：任务体里不得调用 `hWnd == NULL` 的 swinx API。那会走到
+`SConnMgr::getConnection(workerTid)`，在 worker 线程现场构造一份 `SConnection`，而它的构造函数执行
+`emscripten_run_script("Module.fbFormat = 'canvas';")` —— worker 的 JS realm 里没有页面那套
+`Module`/DOM。`IMessageLoop::PostTask` 不在此列：它带的是 `HWND_MESSAGE` 消息窗口，swinx 按窗口
+找到 UI 线程的 `SConnection`，不会新建。
+
+Chromium 侧的人工验证清单（本机无法自动化）：
+
+1. 页面控制台：`crossOriginIsolated === true`，且没有 `SharedArrayBuffer is not defined`。
+2. 打开「特效」页点一个长动画，同时在别处（DevTools Performance 或另一个标签页）确认帧率没掉到
+   动画时长以下；worker 后端下主线程不应被后台任务占用。
+3. DevTools → Network/Threads：能看到一条 worker 线程；worker 启动耗时约 50ms（本机 node 实测）。
+4. 切 `--no-isolation` 再刷一次：页面仍要能跑（降级到泵后端），控制台不出现未捕获异常。
+5. 关页面/刷新不残留线程（DevTools 的 worker 列表随页面销毁清空）。
+
 ### Windows 主机构建
 
 移植本身不依赖 bash：链接命令在 `demos/wasm-demo/CMakeLists.txt` 里，`--preload-file` 的宿主路径
@@ -561,15 +630,67 @@ FORCE 成 ON。关掉它不报错，症状是**整页空白**——`CreateSvgFro
   仍然"可见"，只是点不到、看不见。现在改成消消乐 38（`values/template.xml`）、方块 15、
   坦克 18（`games.lua` 的 `tetris_cell` / `tank_cell`；坦克的精灵步长是从格子实测矩形算的，
   改一个数就够）。回归盯法：坦克棋盘底边不得越过页区底 558（改之前是 616）。
+- **canvas2d 飘字残影的诊断脚手架已于 2026-11-06 结案后删除**（本 bug 结案，判读链见
+  `doc/soui-wasm-port-plan.md` §31–§37 与修复说明 `doc/soui-wasm-canvas2d-残影修复说明.md`）：
+  捡分特效的形态开关 `TETRIS_FLY_IMG` 与图片分支（`tetris_fly_text` 恢复原始签名，得分特效就是
+  `<text>`）、Lua 游戏页第 4 页「特效台」（`page_game.xml` 的 `wnd_flybench` 与 `games.lua` 的
+  `flybench_*`）、以及 `tools/diag/` 里本轮新增的 4 个残影取证脚本都已移除，游戏页回到三个游戏的形态。
+  留在仓库里的只有 `demos/fun_test/test_dc.cpp` 的回归用例 —— 那是唯一能挡住这类回归的东西，别跟着删。
+  要重跑修复前/修复后的 A/B，按 §36.4 记录的命令重建红产物（`git show <修复前 swinx 提交>:` 重编 +
+  独立端口服务），`.data` 与 `out/` 同步即可。
 
-### 无头烟测（已随测试设施移除）
+### 无头烟测（smoke.js）
 
-这版 demo 曾带一套 node 无头烟测（`smoke.js` + 一批 `SwinxDemo*` 探针导出，最多 74 条断言），覆盖：
-控件树建立与逐页布局、布局几何逐条比矩形、MVC/表格/图表数据、图形控件像素、Lua 游戏的脚本事件与
-`ITimer` 回调、键盘逐键字符、输入法逐码点、脏矩形与合并上屏。按“demo 不带测试性质内容”的要求，
-`smoke.js` 与全部探针导出已删除，宿主只留五个功能口
-（`SwinxDemoPump/Mouse/Key/Text/CaretPos`）与帧缓冲/上屏导出；断言清单与各轮变异 A/B 数据
-见 git 历史与 `doc/soui-wasm-port-plan.md` §19、§21。
+阶段 2 那套 74 条断言的烟测（逐页布局比矩形、控件树、脚本事件、像素对比）确实按"demo 不带测试性质
+内容"删掉了；现在这份 `smoke.js` 是后来重新立的最小门禁，由 `.github/workflows/soui-wasm-gate.yml`
+的两条 matrix 腿执行（`wasm-pump` 跑默认构建，`wasm-pthreads` 跑 `-DSOUI_WASM_PTHREADS=ON`，见上面
+「worker 线程构建开关」），覆盖的是"整链能不能跑"而不是"画面对不对"：
+
+```bash
+source <emsdk>/emsdk_env.sh
+bash demos/wasm-demo/build-soui.sh              # 或 cmake --build <dir> --target soui-wasm-demo
+node demos/wasm-demo/smoke.js                    # 退出码即结论；DEMO_JS 可指定别的产物
+```
+
+默认（泵后端）构建 30 条断言，`-pthread` 构建 31 条：模块加载与导出符号齐全、帧缓冲几何与指针有效、
+上屏/帧请求计数随泵增长、鼠标/键盘/滚轮/IME/剪贴板注入不崩、插入符坐标合法、`ITaskLoop` 自测
+（默认 9 条 / `-pthread` 10 条，见下）、`SwinxPickFileAsyncA` 的异步文件选择 11 条（见下）、
+全程无 `Module.souiFatal`。它**不能**证明像素、布局或交互正确 —— 那些仍在 Chromium 里人工过。
+
+烟测在 node 里跑，没有 DOM，所以文件头部给了三样假东西：假 canvas/2D 上下文（绘制 no-op，但
+`measureText`/`getImageData` 要返回正确形状，否则布局与读像素会崩）、`requestAnimationFrame` 的
+no-op（主循环由烟测手动驱动），以及 `location`（`main()` 用 `location.search` 读 `?dpr=`，
+`emscripten_run_script_string` 里的 `eval` 在 node 找不到 `location` 会 `ReferenceError`，整个模块
+加载失败）。最后这条曾经把整条门禁骗过去：workflow 的烟测步骤写的是 `node smoke.js 2>&1 | tee log`
+而没带 `set -o pipefail`，管道退出码取 `tee` 的 0，所以断言一条也没跑过、CI 仍是绿的。
+`doc/soui-wasm-port-plan.md` §32.7 记了这次的 A/B 证据。workflow 的烟测步骤已经补上 `set -o
+pipefail`，并额外 `grep` 一次日志末尾的 `OK: 全部断言通过` —— 后者还能抓住"进程被 abort、
+留下一份看着全绿的半截日志"这种退出码不可信的情形。
+
+`ITaskLoop` 的自测（字段含义见 `soui_main.cpp` 的注释）在两种构建下都必须成立的是"投递 8 条就跑
+8 条、结果 8 条都回到 UI 线程、send 语义内联跑掉、心跳跑过、队列排空、stop 后不再运行、Release
+后从注册表摘掉"；只有 `-pthread` 构建额外要求"8 条都跑在非 UI 线程上"，只有默认构建额外要求"没有
+worker 线程、任务仍在 UI 线程上跑"。也就是说这条断言集分别钉住了两条后端各自的形态，换成改动前的
+实现（只有一条主线程队列）会在 `offUi` 上失败。
+
+文件选择这 11 条用一份假 `Module.swinxPickFile` 顶上真对话框：它按队列交出两份载荷，第二份故意用
+`../../etc/pass wd.txt` 这种恶意名字，两份都由 `setTimeout` 经 `_malloc` + `_SwinxFilePickDone`
+投回，走的是浏览器里同一条重入口。钉住的是：筛选串换算（`*.txt;*.png` → `.txt,.png`、`*.*` → 空
+accept、去重、MIME 原样，外加探长度与短缓冲必须 `-1`）、发起后**立刻**读回调计数为 0（这条就是
+"没把主线程挂在对话框上"的证据，同步实现必然红）、宿主钩子收到的标题与 accept、回调只回一次且在
+发起线程、读回的字节数与首字节、回投的字节落到 `/tmp/swinx-pick/<id>-<消毒后的名字>` 这个可直接
+`fopen` 的路径（逐字符比对，钉住"文件名决定不了落盘位置"）、多选/`SAVE`/参数非法各自 `ret=0` 且
+错误码是 `ERROR_CALL_NOT_IMPLEMENTED` 或 `ERROR_INVALID_PARAMETER`、以及一个没人等的 id 回投后回调
+计数不变。A/B 已过：同一份 `smoke.js` 跑改动前的产物时报"导出符号齐全"失败并在第一条换算断言处
+`TypeError`，退出码 1。
+
+两种构建目录共用同一个产物目录（`demos/wasm-demo/out`），所以拿它当"某一个配置的产物"是不成立的：
+`cmake --build <另一个配置的目录>` 之后 `out/` 就换了一份，而被换掉的那侧 ninja 因为产物时间戳比输入
+新会报 `no work to do`，于是你复制到别处的"默认构建产物"其实是 `-pthread` 产物（本轮实测被这条骗过
+一次，`pt=0` 的断言集跑出 `pt=1` 的结果）。要对比两份产物就先强制重链：`rm -f
+demos/wasm-demo/out/soui-wasm-demo.{js,wasm,data,html}` 再 build，或直接
+`cmake --build <dir> --target soui-wasm-demo --clean-first`，然后立刻用 `smoke.js` 打印的
+`[taskloop] pt=` 确认手里是哪一份。
 
 两条从烟测里沉淀下来、并且仍然成立的时序约定：
 
@@ -594,16 +715,24 @@ FORCE 成 ON。关掉它不报错，症状是**整页空白**——`CreateSvgFro
 
 ### 滚轮的人工验证步骤（Chromium）
 
-目标行为：光标在画布上时，滚轮归 SOUI（滚动光标下的列表/树），页面正文不跟着滚。
+目标行为：光标在画布上时，滚轮**始终先**交给 SOUI；光标下的控件（或它的父窗口链）消费了这一格，
+页面正文不动；没人消费才由宿主把这段位移手动滚给页面。监听里始终 `preventDefault`，否则浏览器会
+先把页面滚到底、之后才让 SOUI 滚，顺序正好反了。
 
 1. `python3 -m http.server 8085 -d demos/wasm-demo/out`，打开 `http://localhost:8085/soui-wasm-demo.html`。
+   重新构建后第一次打开请硬刷新（Chromium `Cmd/Ctrl+Shift+R`）：胶水 `.js` 与 `soui-host.js`
+   都带 `?v=<时间戳>` 载入，但**页面 HTML 自身**不在其列，`http.server` 只发 `Last-Modified`，
+   浏览器会启发式复用旧 HTML，连带跑上一版的宿主脚本（表现正是滚轮又变回“浏览器先滚”或
+   “页面和列表一起滚”）。也可以在 URL 后面加 `?t=<任意值>` 绕开。
 2. 切到「MVC」页，点子页签 `mclistview`（五列表格）。把光标放到表格中间滚一格。预期：行内容随滚轮
    上下走（首列的仪表盘名字变化），页面本身**停在原位**——正文既不抖也不慢慢下沉。
 3. 反向滚同样格数。预期：回到原来的行（同样的首行文字与进度条长度），说明一格滚轮恰好换一行。
-4. 光标移到画布外的正文或留白上再滚。预期：这时才是页面正文滚动（监听只挂在 canvas 上）。
-5. 按住 `Ctrl`/`⌘` 滚轮。预期：浏览器缩放，画布内容不滚（组合键事件不拦也不注入）。
-6. 触控板两指小幅滑动：预期连续、平滑地滚，不会"滑很多下才动一格"——页面按小数累积
-   `WHEEL_DELTA`，攒满一格才注入。
+4. 光标移到画布内不可滚动的留白处（例如顶栏文字或页签头上）滚一格。预期：SOUI 不消费，
+   页面正文开始滚动。
+5. 光标移到画布外的正文或留白上再滚。预期：同样是页面正文滚动（监听只挂在 canvas 上）。
+6. 按住 `Ctrl`/`⌘` 滚轮。预期：浏览器缩放，画布内容不滚（组合键事件不拦也不注入）。
+7. 触控板两指小幅滑动：预期连续、平滑地滚，不会"滑很多下才动一格"——页面按小数累积
+   `WHEEL_DELTA`，攒满一格才注入；攒小数期间沿用上一整格的判定，避免控件和页面同时滚。
 
 这一轮在 Chromium 里用脚本代跑过第 2、3 步：在画布上派发 `WheelEvent`，`defaultPrevented` 为真，
 页面 `scrollY` 不变，帧缓冲里 mclistview 的进度条行有 43 行发生变化，反向再滚 43 行后逐像素回到
@@ -822,6 +951,33 @@ headless 绘制与输入、键盘消息要经过控件焦点这三段；后三�
 第 3、4 步的键盘链与动画观感是自动化覆盖不到的：当初烟测点一次「开始游戏」、按一次 `VK_P` 验证
 `EVT_CMD`/`EVT_KEYDOWN` 能进 lua，再用真实时间等几个重力节拍验证 `ITimer` 在跑（烟测已移除）。
 方向键→ lua → 棋盘重画、闪白的明暗节奏、光波/碎片/飞分的动画是否好看，都要人工确认。
+
+### 文件选择的人工验证步骤（Chromium）
+
+无头烟测用假钩子过了"受理 / 非阻塞 / 消毒后的落地路径 / 过期回投"这几件事，剩下的只有真浏览器能给：
+`<input type=file>` 的手势限制、真文件名（含中文与空格）、真取消、以及字节真的落进 wasm 文件系统。
+
+```bash
+python3 -m http.server 8137 -d demos/wasm-demo/out      # 默认构建不需要隔离头
+# 打开 http://localhost:8137/soui-wasm-demo.html
+```
+
+1. 页面标题下方有一个「选择文件」按钮（它只在真实点击里发起请求，`Module.swinxPickFile` 会先查
+   `navigator.userActivation`）。预期：系统文件选择框出现，标题是"选择文件（swinx 异步文件选择）"，
+   类型下拉里只有"文本与图片"，且只能选 `.txt` / `.png`（筛选串来自 `soui_main.cpp` 的探针）。
+2. 选中一个 `.txt` → 按钮右侧状态行变成"回调 1 次，nResult=1，读回 N 字节…"，控制台一行
+   `[pick] result=1 path=/tmp/swinx-pick/<id>-<名字> bytes=N`。**N 与文件大小一致**才算这条过——
+   它证明 JS 交回来的字节真的写进了 wasm 文件系统、回调给的路径真的能 `fopen`。
+3. 换成中文文件名和含空格的文件名各选一次 → 路径里的空格变成 `_`、中文段原样保留，`bytes` 照样对。
+   文件名里的 `/`、`..` 会被消毒掉，落盘路径始终在 `/tmp/swinx-pick/` 里（这条由烟测逐字符钉住，
+   真机只需要确认没被消毒成空名导致的一串 `_`）。
+4. 打开选择框后按取消 → 状态行 `nResult=0`，再点一次按钮仍能发起（槽位已回收）。
+5. 连点 8 次都在选择框打开后直接关掉标签页/不选也不给取消 → 第 9 次按钮报 `ret=0`，`GetLastError`
+   是 `ERROR_NO_PROC_SLOTS`。这是**已知的槽位泄漏**（8 个槽，不自动回收），Safari 一类不发 `cancel`
+   事件的浏览器会走到这里；显式失败是设计选择，不去压掉别人的回投。
+6. `-pthread` 产物（`serve-isolated.py`，`crossOriginIsolated === true`）：先重复 1-4，再从后台任务
+   里调一次 `SwinxPickFileAsyncA` —— 必须是 `ret=0` + `ERROR_CALL_NOT_IMPLEMENTED`。worker 的 JS
+   realm 里没有页面那份 `Module`，所以文件选择只能在 UI 线程发起（`doc/soui-wasm-port-plan.md` §33.3）。
 
 ### 阶段 2 特有的坑
 

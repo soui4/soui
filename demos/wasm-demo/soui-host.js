@@ -505,6 +505,77 @@
           _audioPending.push({ cached: false, ab: ab, key: key, loop: loop, noStop: noStop });
         }
         return true;
+      },
+
+      /* 文件选择桥：wasm 里 SwinxPickFileAsyncA 经 EM_ASM 调到这里（实现在 swinx 的
+       * src/platform/wasm/dlghelper.cpp）。nId = swinx 的请求编号，title = 标题，
+       * accept = swinx 从 lpstrFilter 换算出来的 <input accept>（空串 = 全部）。
+       * 返回 false = 这次请求没发起，swinx 会 SetLastError 而不是把请求挂着。
+       *
+       * 三个浏览器事实决定了这里的形状：
+       *   1. 文件选择框只认用户手势（navigator.userActivation.isActive 判瞬时激活；
+       *      没有这个 API 的浏览器只能试，被拒时连事件都不发）；
+       *   2. change 事件在本次 JS 栈返回之后才派发 —— 所以 swinx 那侧只能是异步契约；
+       *   3. File 对象在事件回调之后就失效，所以要把整份字节读出来再交给
+       *      _SwinxFilePickDone，由 swinx 落到 wasm 文件系统里换成一个可 fopen 的路径。
+       * 取消：Chrome 87+/Safari 会发 cancel 事件；更老的浏览器不发，那条路径上 swinx
+       * 的请求会一直占着槽位（8 个之后新请求显式失败，见 swinx 侧说明）。 */
+      swinxPickFile: function (nId, title, accept) {
+        var done = Module._SwinxFilePickDone;
+        if (typeof done !== 'function' || !document.createElement) return false;
+        if (navigator.userActivation && navigator.userActivation.isActive === false) {
+          console.warn('swinxPickFile: 没有用户手势，浏览器不会打开选择框');
+          return false;
+        }
+        var input = document.createElement('input');
+        input.type = 'file';
+        if (accept) input.accept = accept;
+        input.style.display = 'none';
+        var settled = false;
+        /* 结果一律经这一个出口：把名字与字节写进线性内存、调重入口、再立刻 free
+         * （与 souixClipboardWrite 同一所有权约定：C++ 只读，JS 负责释放）。 */
+        function reply(nResult, name, buf) {
+          if (settled) return;
+          settled = true;
+          if (input.parentNode) input.parentNode.removeChild(input);
+          var pName = 0, pData = 0, nLen = 0;
+          try {
+            if (name) {
+              var nb = new TextEncoder().encode(name);
+              pName = Module._malloc(nb.length + 1);
+              Module.HEAPU8.set(nb, pName);
+              Module.HEAPU8[pName + nb.length] = 0;
+            }
+            if (buf && buf.byteLength > 0) {
+              nLen = buf.byteLength;
+              pData = Module._malloc(nLen);
+              Module.HEAPU8.set(new Uint8Array(buf, 0, nLen), pData);
+            }
+            done(nId, nResult, pName, pData, nLen);
+          } catch (err) {
+            console.warn('swinxPickFile: 回投失败', err);
+          } finally {
+            if (pName) Module._free(pName);
+            if (pData) Module._free(pData);
+          }
+        }
+        input.onchange = function () {
+          var f = input.files && input.files[0];
+          if (!f) { reply(0, null, null); return; }
+          var p = f.arrayBuffer ? f.arrayBuffer() : new Promise(function (res, rej) {
+            var fr = new FileReader();
+            fr.onload = function () { res(fr.result); };
+            fr.onerror = function () { rej(fr.error); };
+            fr.readAsArrayBuffer(f);
+          });
+          p.then(function (ab) { reply(1, f.name, ab); },
+                 function (err) { console.warn('swinxPickFile: 读取失败', err); reply(-1, null, null); });
+        };
+        input.oncancel = function () { reply(0, null, null); };
+        /* Firefox 要求元素在文档里才允许 click()，Chrome 不要求 —— 挂上再摘掉，两边都能用。 */
+        if (document.body) document.body.appendChild(input);
+        input.click();
+        return true;
       }
     };
 
@@ -829,25 +900,66 @@
         callFn(api.mouse, WM_MBUTTONUP, -1, -1, 0);
       });
 
-      /* 滚轮：Win32 用 ±120 的整数倍表达一格，浏览器给的是像素/行/页三种单位。
-       * 先按"格"记小数，攒够一整格才注入 —— 否则触控板一次几像素的增量会被取整成
-       * 0，OnMouseWheel 永远凑不满 WHEEL_DELTA。指针在画布上时始终 preventDefault：
-       * 这块区域的滚动权归 SOUI。Ctrl/⌘+滚轮是浏览器缩放，不拦也不注入。 */
+      /* 滚轮：先归 SOUI，SOUI 明确返回"没消费"后才把这一下交给页面。
+       * 不能靠"不 preventDefault"把滚轮让给浏览器：默认滚动在事件派发之后才发生，
+       * 浏览器会先滚页面、页面到底后才轮到 SOUI，顺序正好反了。所以这里始终
+       * preventDefault，SOUI 没消费时再用 scrollBy 手动补上页面滚动量。
+       * Win32 用 ±WHEEL_DELTA（120）的整数倍表达一格，浏览器给的是像素/行/页三种
+       * 单位：先按"格"记小数，攒够一整格才注入（否则触控板几像素的增量会被取整成 0）。
+       * 注入值必须还原成 120 的整数倍——SPanel::OnMouseWheel 自己也按 120 攒格，
+       * 传 4 这种"格数"会被它当成不足一格，返回"没消费"，页面跟着滚。
+       * 不足一格时不能立刻交给页面：触控板还在列表上，页面先滚几像素、又把攒下的
+       * 小数清零，列表就永远攒不满一格。只有"指针没动且上一次整格明确归页面"时
+       * 才把小数增量直接给页面，其余情况先攒着等整格判定。
+       * Ctrl/⌘+滚轮是浏览器缩放，不拦也不注入。 */
       var wheelRest = 0;
+      /* 上一次整格注入的指针位置（viewport 坐标：页面滚动会把画布移走，帧缓冲
+       * 坐标不能拿来做"指针有没有动"的比较）和消费结果。 */
+      var wheelAnchor = null;
+      var WHEEL_ANCHOR_SLOP = 20;
+      function wheelPageScroll(e) {
+        if (e.deltaMode === 1) return e.deltaY * 16; /* 行 */
+        if (e.deltaMode === 2) return e.deltaY * (window.innerHeight || 800); /* 页 */
+        return e.deltaY; /* 像素 */
+      }
+      /* 一整格对应的页面滚动距离：整格被 SOUI 拒绝时按这个补，不能用当时那个
+       * 原始事件的小增量（整格是攒出来的）。 */
+      function wheelNotchScroll(e) {
+        if (e.deltaMode === 1) return 3 * 16;
+        if (e.deltaMode === 2) return (window.innerHeight || 800);
+        return 100;
+      }
       canvas.addEventListener('wheel', function (e) {
         if (!ready || !fb) return;
         if (e.ctrlKey || e.metaKey) return;
         e.preventDefault();
         var p = canvasPoint(e);
         var keys = buttonMessages(e);
-        /* SHostWnd::OnMouseWheel 不读滚轮消息自带的 lParam，而是用最近一条
-         * WM_MOUSEMOVE 缓存的坐标做命中测试；先补一条同坐标的移动消息。 */
-        callFn(api.mouse, WM_MOUSEMOVE, p[0], p[1], keys);
         var perNotch = e.deltaMode === 1 ? 3 : (e.deltaMode === 2 ? 1 : 100);
-        wheelRest += (-e.deltaY * WHEEL_DELTA) / perNotch;
+        wheelRest += (-e.deltaY) / perNotch;
         var whole = wheelRest < 0 ? -Math.floor(-wheelRest) : Math.floor(wheelRest);
-        wheelRest -= whole;
-        if (whole) callFn(api.wheel, p[0], p[1], whole, keys);
+        if (whole) {
+          wheelRest -= whole;
+          /* C++ 侧 SwinxDemoWheel 会先补一条同坐标的 WM_MOUSEMOVE（SHostWnd 用
+           * 最近一条移动消息做命中测试），再同步派发滚轮，所以这里不单独注入。
+           * zDelta 按 Win32 语义给 ±120 的整数倍，SOUI 才能按整格判定消费。 */
+          var ret = callFn(api.wheel, p[0], p[1], whole * WHEEL_DELTA, keys);
+          wheelAnchor = { x: e.clientX, y: e.clientY, handled: !!ret };
+          if (!ret) {
+            window.scrollBy(0, -whole * wheelNotchScroll(e));
+            wheelRest = 0;
+          }
+        } else {
+          /* 指针没动、上一次整格明确归页面：小数增量直接给页面，触控板才平滑；
+           * 指针换了位置（可能已挪到可滚控件上）就先攒着，等整格判定。 */
+          var near = wheelAnchor &&
+                     Math.abs(e.clientX - wheelAnchor.x) <= WHEEL_ANCHOR_SLOP &&
+                     Math.abs(e.clientY - wheelAnchor.y) <= WHEEL_ANCHOR_SLOP;
+          if (near && !wheelAnchor.handled) {
+            window.scrollBy(0, wheelPageScroll(e));
+            wheelRest = 0;
+          }
+        }
       }, { passive: false });
 
       /* 键盘：只有画面拿到焦点后才注入，避免吃掉页面本身的快捷键；Tab 留给页面导航。

@@ -90,10 +90,19 @@
     var M = window.Module;
     if (!M || typeof M._CnchessStat !== 'function') return;
     var s = function (i) { return M._CnchessStat(i) | 0; };
+    /* taskloop 三段：执行数/排队数/存活实例数；worker 两段：worker 实例数/在 worker
+       上执行掉的任务数。产物带 -pthread（pt=1）而 worker 一直是 0/0，说明这个页面不是
+       crossOriginIsolated（缺 COOP/COEP 头），线程建不起来、解压静默退回 UI 线程 ——
+       表现一样能玩，只是没并行，看状态行才分得出来。
+       ws 两段：交给监听器的帧数/其中不在主线程的帧数。第一段和收包数对得上就说明
+       没有帧被投递链吞掉；第二段等于第一段才是"拆包和回调都不在 UI 线程上"，与
+       worker 那一对同一个读法，缺隔离头时它恒为 0。 */
     statusEl.textContent =
       'pump ' + s(0) + ' · present ' + s(1) +
       ' · theme ' + s(4) + ' · board ' + s(5) +
-      ' · taskloop ' + s(6) + '/' + s(7) + '/' + s(8);
+      ' · taskloop ' + s(6) + '/' + s(7) + '/' + s(8) +
+      ' · worker ' + s(18) + '/' + s(19) +
+      ' · ws ' + s(21) + '/' + s(22) + ' (pt=' + s(20) + ')';
   }, 500);
 })();
 </script>

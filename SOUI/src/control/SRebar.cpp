@@ -666,8 +666,7 @@ void SRebar::DrawBand(IRenderTarget *pRT, int nIndex, const CRect &rcBand)
         CRect rcGripper = GetGripperRect(rcBand);
         DrawGripper(pRT, rcGripper);
         // The splitter sits on the trailing edge; drag to resize
-        bool bRoomForSplitter = m_bVertical ? (rcBand.Height() > kRebarGripperWidth + kRebarSplitterWidth)
-                                            : (rcBand.Width() > kRebarGripperWidth + kRebarSplitterWidth);
+        bool bRoomForSplitter = m_bVertical ? (rcBand.Height() > kRebarGripperWidth + kRebarSplitterWidth) : (rcBand.Width() > kRebarGripperWidth + kRebarSplitterWidth);
         if (bRoomForSplitter)
         {
             CRect rcSplitter = GetSplitterRect(rcBand);

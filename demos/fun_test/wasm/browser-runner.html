@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<!--
+  swinx wasm fun_test 的浏览器运行载体（真 canvas + 真字体）。
+
+  为什么需要它：node 载体（run-node.js）里像素和文本度量都是桩值，pixel/region/
+  文本度量类断言在 node 里无法判定；canvas2d 后端的光栅化发生在浏览器侧，只有这里
+  能给出结论。cairo 后端的光栅在 wasm 模块内，node 腿即可信。
+
+  用法（服务器根 = demos/fun_test）：
+    http://127.0.0.1:8931/wasm/browser-runner.html?backend=out.canvas2d
+    ...&filter=SwinxDcTest.TextPath:*            # gtest 过滤器，只跑关心的用例
+    ...&backend=out.cairo                        # A/B 的另一条腿
+  结果不靠翻 console：stdout 全量收进 window.__ftLog，取用时只要
+    window.__ftSummary()   -> {ran, passed, failed, failures:[...]}
+  失败详情：window.__ftFailureText() 返回每个失败用例附近的断言原文。
+-->
+<html>
+<head>
+<meta charset="utf-8">
+<title>swinx wasm fun_test runner</title>
+</head>
+<body>
+<canvas id="canvas" width="640" height="480"></canvas>
+<div id="status">loading...</div>
+<script type="text/javascript">
+  var qs = new URLSearchParams(location.search);
+  var backend = qs.get('backend') || 'out.canvas2d';
+  var filter = qs.get('filter');
+  var gargs = [];
+  if (filter) gargs.push('--gtest_filter=' + filter);
+
+  var __ftLog = [];
+  window.__ftLog = __ftLog;
+  /* 一次 print 不一定正好是一行，统一按换行拆开后存进同一个数组。 */
+  function emit(chunk, sink) {
+    String(chunk).split('\n').forEach(function (line) {
+      __ftLog.push(line);
+      sink(line);
+    });
+  }
+  window.__ftSummary = function () {
+    var failed = [], ran = 0, passed = 0;
+    for (var i = 0; i < __ftLog.length; i++) {
+      var l = __ftLog[i];
+      if (l.indexOf('[  FAILED  ]') === 0) failed.push(l.replace('[  FAILED  ] ', ''));
+      else if (l.indexOf('[       OK ]') === 0) passed++;
+      else if (l.indexOf('[  PASSED  ]') === 0) ran = 1;
+    }
+    /* 汇总区也会重复列一遍失败用例，按名字去重。 */
+    var seen = {}, uniq = [];
+    failed.forEach(function (n) { n = n.split(' (')[0]; if (!seen[n]) { seen[n] = 1; uniq.push(n); } });
+    return { done: !!ran, failed: uniq, okCount: passed, lines: __ftLog.length };
+  };
+  window.__ftFailureText = function () {
+    var keep = [];
+    for (var i = 0; i < __ftLog.length; i++) {
+      var l = __ftLog[i];
+      if (l.indexOf('Failure') >= 0 || l.indexOf('Value of:') >= 0 ||
+          l.indexOf('Actual:') >= 0 || l.indexOf('Expected:') >= 0 ||
+          l.indexOf('[  FAILED  ]') === 0 || l.indexOf(': error:') >= 0)
+        keep.push(i + ': ' + l);
+    }
+    return keep.join('\n');
+  };
+
+  var Module = {
+    arguments: gargs,
+    canvas: document.getElementById('canvas'),
+    print: function (t) { emit(t, function (x) { console.log(x); }); },
+    printErr: function (t) { emit(t, function (x) { console.warn(x); }); },
+    setStatus: function (t) { document.getElementById('status').textContent = t; },
+    onAbort: function (reason) { emit('ABORT: ' + reason, function (x) { console.error(x); }); },
+    totalDependencies: 0,
+    monitorRunDependencies: function (left) {
+      this.totalDependencies = Math.max(this.totalDependencies, left);
+      Module.setStatus(left ? 'preparing... (' + (this.totalDependencies - left) + '/' + this.totalDependencies + ')' : 'all downloads complete');
+    }
+  };
+  window.onerror = function (m) { emit('WINDOW ERROR: ' + m, function (x) { console.error(x); }); };
+</script>
+<script type="text/javascript">
+  /* 后端由查询参数决定，所以脚本要动态插入：wasm 档案按 scriptDirectory 解析，
+     相对 ../out.<backend>/ 的路径能同时带出 .js 和 .wasm。 */
+  var s = document.createElement('script');
+  s.type = 'text/javascript';
+  s.async = true;
+  s.src = '../' + backend + '/fun_test-wasm.js';
+  document.body.appendChild(s);
+</script>
+</body>
+</html>

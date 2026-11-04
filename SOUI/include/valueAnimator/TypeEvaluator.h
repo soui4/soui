@@ -81,6 +81,16 @@ class TypeEvaluator : public TObjRefImpl<IObjRef> {
         mEnd = end;
     }
 
+    void setStart(T start)
+    {
+        mStart = start;
+    }
+
+    void setEnd(T end)
+    {
+        mEnd = end;
+    }
+
     /**
      * @brief Copies the properties of another TypeEvaluator.
      * @param src The source TypeEvaluator to copy from.

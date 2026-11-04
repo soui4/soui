@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<skin>
+  <!-- ===================== 暗色主题形状皮肤 =====================
+       <shape> 会按目标矩形实时绘制，因此同一皮肤可用于任意尺寸的卡片。 -->
+
+  <!-- 圆角卡片：深底 + 1px 描边 -->
+  <shape name="skin_card" shape="rectangle">
+    <corners radius="10"/>
+    <solid color="#121a26"/>
+    <stroke style="solid" width="1" color="#212b3a"/>
+  </shape>
+
+  <!-- 卡片内的次级区块（表头等） -->
+  <shape name="skin_card_soft" shape="rectangle">
+    <corners radius="8"/>
+    <solid color="#0f1622"/>
+    <stroke style="solid" width="1" color="#1c2534"/>
+  </shape>
+
+  <!-- 标题栏 / 工具栏底色 -->
+  <shape name="skin_titlebar" shape="rectangle">
+    <solid color="#0e141e"/>
+  </shape>
+  <shape name="skin_toolbar" shape="rectangle">
+    <solid color="#0b1119"/>
+  </shape>
+
+  <!-- 信息胶囊 -->
+  <shape name="skin_chip" shape="rectangle">
+    <corners radius="6"/>
+    <solid color="#151d2b"/>
+    <stroke style="solid" width="1" color="#2b3648"/>
+  </shape>
+
+  <!-- 品牌标记（金色圆点） -->
+	<imglist name="skin_logo" src="svg:logo"/>
+
+  <!-- 标题栏按钮（与标题栏同色，仅提供可点击区域与文字状态色） -->
+  <shape name="skin_capbtn" shape="rectangle">
+    <corners radius="6"/>
+    <solid color="#0e141e"/>
+  </shape>
+
+  <!-- 交易状态徽标 -->
+  <shape name="skin_badge_live" shape="rectangle">
+    <corners radius="14"/>
+    <solid color="#0e2c1b"/>
+    <stroke style="solid" width="1" color="#1c6b3a"/>
+  </shape>
+  <shape name="skin_badge_closed" shape="rectangle">
+    <corners radius="14"/>
+    <solid color="#161e2b"/>
+    <stroke style="solid" width="1" color="#2b3648"/>
+  </shape>
+
+  <!-- 主按钮（金） -->
+  <shape name="skin_btn_primary" shape="rectangle">
+    <corners radius="8"/>
+    <solid color="#f0b429"/>
+    <stroke style="solid" width="1" color="#ffca4d"/>
+  </shape>
+
+  <!-- 次按钮（深色描边） -->
+  <shape name="skin_btn_ghost" shape="rectangle">
+    <corners radius="8"/>
+    <solid color="#151d2b"/>
+    <stroke style="solid" width="1" color="#2b3648"/>
+  </shape>
+
+  <!-- 状态栏署名链接：与状态栏同底色、无描边，视觉上只剩一行小字。
+       坑：SButton::OnPaint 在 m_pBgSkin 为空时会直接 return，连 SWindow::OnPaint
+       （文字）都不画；所以「只要文字」的按钮也必须挂一个 skin。
+       shape 皮肤 GetStates()==1，normal/hover/push 都绘制同一份纯色底。 -->
+  <shape name="skin_link_status" shape="rectangle">
+    <solid color="#0b1119"/>
+  </shape>
+
+  <!-- 输入框 -->
+  <shape name="skin_input" shape="rectangle">
+    <corners radius="8"/>
+    <solid color="#0c121c"/>
+    <stroke style="solid" width="1" color="#2b3648"/>
+  </shape>
+
+  <!-- 页签选中态胶囊 -->
+  <shape name="skin_tab_on" shape="rectangle">
+    <corners radius="7"/>
+    <solid color="#1a2333"/>
+    <stroke style="solid" width="1" color="#2b3648"/>
+  </shape>
+
+  <!-- ===================== 暗色滚动条 =====================
+       9 列 x 3 行（normal / hover / push），图形见 uires/svg/scrollbar.svg：
+       箭头 + 滑块 + 槽，水平与竖直各占 4 列，第 9 列放右下角与滑块把手。
+       margin=3 是滑块 9 宫格的保留边宽（圆角在 SVG 里取 3，拉伸后不变形）。
+       hasgripper=0：滑块中间不画把手点阵。
+       ideal size = 126/9 = 14dp，高分屏下按 scale 放大。 -->
+  <scrollbar name="skin_scrollbar_dark" src="svg:scrollbar" margin="3" hasgripper="0"/>
+</skin>

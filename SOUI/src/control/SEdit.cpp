@@ -13,14 +13,14 @@ SEdit::SEdit()
 
 void SEdit::OnKillFocus(SWND wndFocus)
 {
-    SRichEdit::OnKillFocus(wndFocus);
+    __baseCls::OnKillFocus(wndFocus);
     if (!m_strCue.GetText(FALSE).IsEmpty() && GetWindowTextLength() == 0)
         Invalidate();
 }
 
 void SEdit::OnSetFocus(SWND wndOld)
 {
-    SRichEdit::OnSetFocus(wndOld);
+    __baseCls::OnSetFocus(wndOld);
     if (!m_strCue.GetText(FALSE).IsEmpty() && GetWindowTextLength() == 0)
         Invalidate();
 }

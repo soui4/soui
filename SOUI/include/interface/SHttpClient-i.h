@@ -171,6 +171,29 @@ DECLARE_INTERFACE_(IHttpClient, IObjRef)
      * @return int - HTTP status code
      */
     STDMETHOD_(int, GetHttpCode)(CTHIS) SCONST PURE;
+
+    /**
+     * @brief Visit the URL and retrieve the session cookies returned by the response
+     *        (the "Set-Cookie" header), so the caller can replay them later through
+     *        SetHeader("Cookie", ...) to keep a browser-like session.
+     *
+     *        The output is ready to be used as an outgoing "Cookie: xxx" header value,
+     *        e.g. "ASP.NET_SessionId=abc123; foo=bar". Cookie attributes
+     *        (Path / Expires / Domain / Secure / HttpOnly / SameSite / Max-Age / Version)
+     *        are stripped, multiple cookies are joined with "; ".
+     *
+     *        This method is platform independent by design: the Windows backend uses
+     *        WinHTTP, all other platforms use libcurl. Application code therefore never
+     *        needs to touch WinHTTP just to obtain a cookie.
+     *
+     *        The caller is expected to call this on a worker thread: it performs a real
+     *        blocking HTTP request with the timeout configured by SetTimeOut.
+     *
+     * @param out - output cookie text, set to empty when the response carries no cookie
+     * @param lpUrl - URL to visit
+     * @return BOOL - TRUE when at least one cookie was retrieved
+     */
+    STDMETHOD_(BOOL, GetCookie)(THIS_ IStringA * out, LPCSTR lpUrl) PURE;
 };
 
 SNSEND

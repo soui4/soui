@@ -91,6 +91,7 @@ static const wchar_t *const INTERPOLATOR = L"interpolator:"; /**< chained interp
 static const wchar_t *const GRADIENT = L"gradient:";         /**< chained gradient object */
 static const wchar_t *const HOVER = L"hover:";               /**< SButton's hover animator */
 static const wchar_t *const FADE = L"fade:";                 /**< chained fade interpolator */
+static const wchar_t *const FOCUSANI = L"focusAni:";         /**< chained focus animator */
 static const wchar_t *const SLIDER = L"slider:";             /**< STabCtrl's slider animator */
 static const wchar_t *const THUMB = L"thumb:";               /**< SSliderBar's thumb animator */
 static const wchar_t *const VALUE = L"value:";               /**< SSliderBar's value animator */

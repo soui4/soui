@@ -1788,8 +1788,13 @@ void SRichEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 LRESULT SRichEdit::OnImeChar(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    if (m_dwStyle & ES_NUMBER && !isdigit(wParam) && wParam != '-' && wParam != '.' && wParam != ',')
-        return 0;
+    if (m_dwStyle & ES_NUMBER)
+    {
+        if (!isascii(wParam))
+            return 0;
+        if (!isdigit(wParam) && wParam != '-' && wParam != '.' && wParam != ',')
+            return 0;
+    }
     m_pTxtHost->GetTextService()->TxSendMessage(uMsg, wParam, lParam, NULL);
     return 0;
 }

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SOUI name="mainWindow" title="@string/title" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" width="1000" height="680" margin="5,5,5,5" resizable="1" wndType="appMain">
+  <root skin="_skin.sys.wnd.bkgnd" cache="1" layout="vbox">
+    <caption size="-2,30" layout="hbox" gravity="center" padding="5,0,5,0">
+      <icon size="-1,-1" src="ICON_LOGO:16"/>
+      <text size="-1,-1" extend_left="5" font="name:test,bold:1">@string/title</text>
+      <window size="0,0" weight="1" visible="0"/>
+      <imgbtn size="-1,-1" name="btn_min" skin="_skin.sys.btn.minimize"  animate="1" />
+      <window size="-1,-1">
+        <imgbtn pos="0,0" name="btn_max" skin="_skin.sys.btn.maximize"  animate="1" />
+        <imgbtn pos="0,0" name="btn_restore" skin="_skin.sys.btn.restore"  show="0" animate="1" />
+      </window>
+      <imgbtn size="-1,-1" name="btn_close" skin="_skin.sys.btn.close"  tip="close" animate="1"/>
+    </caption>
+
+    <!-- 查询栏 -->
+    <window size="-2,40" layout="hbox" gravity="center" padding="8,4,8,4" colorBkgnd="#eef3fb">
+      <text text="基金代码:" size="-1,-1" colorText="#333333"/>
+      <edit name="edit_code" tip="@string/tip_code" text="161725" size="110,-1" height="26" class="cls_border"/>
+      <text text="年份:" size="-1,-1" colorText="#333333" extend_left="10"/>
+      <edit name="edit_year" tip="@string/tip_year" text="2026" size="70,-1" height="26" class="cls_border"/>
+      <button name="btn_query" text="查询" size="80,-1" height="26" class="cls_query_btn" extend_left="10"/>
+      <text name="txt_status" text="@string/status_ready" size="-1,-1" weight="1" colorText="#666666" extend_left="12" font="size:11"/>
+    </window>
+
+    <!-- 持仓表格 -->
+    <window size="-2,0" weight="1" layout="vbox" padding="4,4,4,4">
+      <gridctrl name="grid_holdings" size="-2,-2"
+                rowCount="1"
+                colCount="17"
+                fixedRows="1"
+                fixedCols="0"
+                defRowHeight="24"
+                defColWidth="90"
+                gridLines="3"
+                gridLineColor="#C8C8C8"
+                gridBkColor="#FFFFFF"
+                editable="0"/>
+    </window>
+
+    <!-- 状态栏 -->
+    <window size="-2,28" colorBkgnd="#F0F0F0">
+      <text name="txt_footer" pos="10,5,-10,-5" text="数据来源：天天基金网 FundArchivesDatas (akshare 逻辑 C++ 重写)" font="size:10" colorText="#888888"/>
+    </window>
+  </root>
+</SOUI>

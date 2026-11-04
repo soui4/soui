@@ -1,0 +1,83 @@
+// fundholdings_demo.rc - application icon, version info, hi-dpi manifest
+//
+// Keep this file ASCII-only on purpose: rc.exe treats a BOM-less file as ANSI
+// (GBK on a Chinese Windows), so non-ASCII comments would be mis-decoded and
+// could swallow a trailing backslash into the next line.
+
+#include "resource.h"
+#include <winresrc.h>
+
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Manifest
+//
+// HI-DPI awareness has to be in place before the first window is created,
+// therefore it is embedded into the executable. MSVC gets the very same
+// manifest from the linker (/MANIFEST:EMBED + /MANIFESTINPUT, see
+// CMakeLists.txt); MinGW/windres has no equivalent linker switch, so the
+// manifest is embedded here as an RT_MANIFEST resource instead. The
+// SOUI_EMBED_MANIFEST define is only set for the non-MSVC build.
+#ifdef SOUI_EMBED_MANIFEST
+1                       RT_MANIFEST             "../../__cmake/dpi_aware.manifest"
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+// Icon
+//
+// 与 demos/uieditor 一致：exe 主图标直接引用 uires 里的 .ico（png-in-ico，7 个尺寸）。
+// 窗口标题栏/任务栏图标另由 uires.idx 的 ICON_LOGO 提供。
+IDI_ICON1               ICON                    "uires/image/logo.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+// Version
+//
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,0
+ PRODUCTVERSION 1,0,0,0
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "080404b0"
+        BEGIN
+            VALUE "FileDescription", "Fund Holdings Assistant"
+            VALUE "FileVersion", "1.0.0.0"
+            VALUE "InternalName", "fundholdings_demo"
+            VALUE "LegalCopyright", "Copyright (C) 2026 soui4"
+            VALUE "OriginalFilename", "fundholdings_demo.exe"
+            VALUE "ProductName", "Fund Holdings Assistant"
+            VALUE "ProductVersion", "1.0.0.0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x804, 1200
+    END
+END
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+LANGUAGE 4, 2
+#pragma code_page(936)
+#include "res/soui_res.rc2" //SOUI Resource
+#if (defined(LIB_CORE) && defined(LIB_SOUI_COM))
+#include "theme_sys_res.rc2" //SOUI SYS Resource
+#endif
+
+#endif
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
