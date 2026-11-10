@@ -170,7 +170,4 @@
        21-23 爆炸 / 24 标题图标 / 25 出生信标 / 26 无敌护盾环 -->
   <imglist name="svg_tank" src="svg:tank" states="27"/>
   <imglist name="svg_tank_wall" src="svg:tank_wall" tile="1"/>
-  <!-- 焦点移动动画框(root 节点的 focusAniSkin,配合 animator:duration/interpolator):
-       必须关掉 cacheSvg —— 每次焦点变化都按目标窗口的矩形重新矢量绘制,缓存成位图会被拉伸失真 -->
-  <imgframe name="skin_focus_ani" src="svg:focus_ani" cacheSvg="0" margin-x="6" margin-y="6"/>
 </skin>
