@@ -1,0 +1,6 @@
+{
+  "name": "libfundholdings.so",
+  "types": "./Index.d.ts",
+  "version": "1.0.0",
+  "description": "SOUI OHOS fundholdings business native module."
+}

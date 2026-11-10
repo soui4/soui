@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
+  <linearGradient id="vert-prog-bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#e0e0e0"/>
+    <stop offset="100%" stop-color="#d0d0d0"/>
+  </linearGradient>
+  <rect width="17" height="17" fill="url(#vert-prog-bg-gradient)" rx="2" ry="2"/>
+  <rect x="1" y="1" width="15" height="15" fill="#f5f5f5" rx="1" ry="1"/>
+</svg>

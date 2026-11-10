@@ -9,7 +9,7 @@
   常规子页统一页头版式;edit_xml/wnd_container/wnd_rgn/matrix_test/3d_test/
   rotate_x/y/z/fmw_test/svg_test 等被源码引用,不可改动。
 -->
-<tabctrl pos="0,0,-0,-0" colorBkgnd="@color/clr_page_bg" colorText="@color/clr_title" tabAlign="left" tabInterSize="2" tabWidth="200" iconSkin="svg_tab_misc" icon-x="6" icon-y="5">
+<tabctrl pos="0,0,-0,-0" colorBkgnd="@color/clr_page_bg" colorText="@color/clr_title" tabAlign="left" tabInterSize="2" tabWidth="200" iconSkin="svg_tab_misc" icon-x="6" icon-y="5" enableDragSwitch="1">
     <page title="drag drop" iconIndex="1" layout="vbox" interval="10" padding="15,12,15,15">
       <text text="拖放" font="size:16,bold:1" colorText="@color/clr_title"/>
       <text text="将文件拖入下方编辑框，观察 enableDragdrop 的接收效果" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
@@ -64,7 +64,7 @@
     <page title="transform" iconIndex="7" layout="vbox" padding="15,12,15,15" interval="10">
       <text text="矩阵变换" font="size:16,bold:1" colorText="@color/clr_title"/>
       <text text="2D 矩阵（rotate/scale/skew/translate）、3D 旋转与表盘时钟" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
-      <tabctrl tabHeight="30" size="-2,0" weight="1">
+      <tabctrl tabHeight="30" size="-2,0" weight="1" enableDragSwitch="1">
         <page title="2d">
           <matrixWindow pos="5,5,-5,-5" skin="skin_avatar_low" name="matrix_test" clipClient="1">
             <text pos="5,5">rotate:</text>
@@ -104,7 +104,7 @@
       </freeMoveWindow>
     </page>
   <page title="svg" iconIndex="9">
-    <tabctrl tabHeight="30" size="-2,-2" tabAlign="middle" animateSteps="20">
+    <tabctrl tabHeight="30" size="-2,-2" tabAlign="middle" animateSteps="20" enableDragSwitch="1">
       <page title="tiger">
         <img name="svg_test" pos="|0,|0" offset="-0.5,-0.5" skin="svg_tiger"/>
       </page>

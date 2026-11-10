@@ -19,10 +19,10 @@ if(CMAKE_SYSTEM_NAME MATCHES "iOS|Android|HarmonyOS")
 endif()
 
 set(SOUI_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/..")
-file(GLOB_RECURSE CURRENT_HEADERS  *.h *.hpp)
-file(GLOB_RECURSE CURRENT_SRCS  *.cpp)
-file(GLOB_RECURSE CURRENT_UIRES  *.xml *.idx *.ico)
-file(GLOB_RECURSE CURRENT_RC *.rc *.rc2)
+file(GLOB_RECURSE CURRENT_HEADERS CONFIGURE_DEPENDS *.h *.hpp)
+file(GLOB_RECURSE CURRENT_SRCS CONFIGURE_DEPENDS *.cpp)
+file(GLOB_RECURSE CURRENT_UIRES CONFIGURE_DEPENDS *.xml *.idx *.ico)
+file(GLOB_RECURSE CURRENT_RC CONFIGURE_DEPENDS *.rc *.rc2)
 file(GLOB_RECURSE NANOSVG_HEADERS  ${SOUI_ROOT_DIR}/third-part/nanosvg/nanosvg.h)
 
 # Tests belong to SOUI but must be compiled by the test target, not soui4.

@@ -1,8 +1,13 @@
 ﻿#pragma once
+// 头文件自查依赖：事件宏、fund_uint64、R、SHostWnd 均在 PCH 中声明。
+// 桌面 .cpp 会先包含 stdafx.h，但移动端入口 android_entry.cc 走的是另一条
+// 包含链，缺了这些声明就编译不过，因此这里显式包含一次（有 #pragma once 去重）。
+#include "stdafx.h"
+#include <control/STabCtrl.h>
 #include "fund_eastmoney.h"
 #include "fund_estimate.h"
 #include "SFundWidgets.h"
-
+#include "events.h"
 // 单只基金的完整运行时状态：每个页签一份，持仓/净值/估值/走势互不干扰。
 // 切换页签时不需要重新请求，直接用缓存渲染。
 struct WatchFund {
@@ -120,7 +125,31 @@ class CMainDlg : public SHostWnd,
     void PumpLog(bool bRebuild);
     void AppendLogText(const SStringT &text);
     void ShowPane(int idx);
+    // 页签选中态、筛选行与日志刷新的统一收尾：点击页签和手势滑动切页都走这里
+    void UpdatePaneChrome(int idx);
+    // 移动版 tabctrl 的切页通知（用户左右滑动时触发）
+    BOOL OnPaneSwipeChanged(EventTabSelChanged *evt);
+    // 移动版：fund_swipe 一支基金一页，滑动时由 tabctrl 真正换页
+    BOOL OnFundSwipeChanged(EventTabSelChanged *evt);
     void SyncTabCounts();
+
+    // 一支基金一页：详情控件查找先落在「当前渲染页」，找不到再回退宿主根。
+    // 三端布局都有 fund_swipe；layout 缺失时 DetailPage / CurDetailRoot 返回 NULL。
+    SWindow *DetailPage(int idx);
+    SWindow *CurDetailRoot();
+    SWindow *FindWnd(int id);
+    template <class T>
+    T *FindCtrl(int id) {
+        SWindow *p = FindWnd(id);
+        return (p && p->IsClass(T::GetClassName())) ? (T *)p : NULL;
+    }
+    STabCtrl *CurPaneSwipe();
+    SRichEdit *CurLog();
+    void SyncFundPages();                  // tabctrl 页数与自选列表对齐
+    void InitDetailPage(SWindow *pPage);   // 初始化一页内的页签 / 面板 / 日志控件
+    void RenderFundPage(int idx);          // 用 m_watch[idx] 渲染指定页
+    void RenderNeighborPages();            // 预渲染当前页 ±1，供拖动快照使用
+    void SyncFundChrome();                 // 切基金后同步页外的全局 UI
     void UpdateViewMode();   // 按「是否在介绍页 / 收藏数是否为 0」切换三个视图
     void ShowEmptyState();   // 0 支基金时清空当前数据并显示空界面
     void UpdateIndexBar();
@@ -131,7 +160,7 @@ class CMainDlg : public SHostWnd,
     void RefreshAllQuotes(bool withMeta);  // 触发一次行情抓取（后台线程）
     void RefreshIndexes();                // 触发一次大盘指数抓取（与基金列表无关）
     void SaveWatch();
-
+    void OnFilterSetFocus(IEvtArgs *e);
     EVENT_MAP_BEGIN()
         EVENT_HANDLER(EventWatchResult::EventID, OnWatchResult)
         EVENT_HANDLER(EventMarketResult::EventID, OnMarketResult)
@@ -151,6 +180,7 @@ class CMainDlg : public SHostWnd,
         EVENT_ID_COMMAND(R.ID.btn_about, OnAbout)
         EVENT_ID_COMMAND(R.ID.btn_about_back, OnAboutBack)
         EVENT_ID_COMMAND(R.ID.btn_add_sample, OnAddSample)
+        EVENT_ID_HANDLER(R.ID.edit_filter,EventSetFocus::EventID,OnFilterSetFocus)
     EVENT_MAP_END2(SHostWnd)
 
     BEGIN_MSG_MAP_EX(CMainDlg)
@@ -193,7 +223,13 @@ class CMainDlg : public SHostWnd,
     BOOL m_bSimulated;  // 模拟盘中
     UINT_PTR m_timer;   // 自动刷新定时器
 
-    SRichEdit *m_pLog;    // 「请求日志」面板（只读 rich edit）
+    // 隐藏页头的 tabctrl：一支基金一页；桌面版布局没有，保持 NULL。
+    // 页内控件每页一份，所以不再缓存 re_log / pane_swipe 指针，改按当前页动态取。
+    STabCtrl *m_pFundSwipe;
+    // 预渲染相邻页时临时指向该页，渲染完复位。
+    SWindow *m_pRenderRoot;
+    // SyncFundPages 增删页期间抑制 tabctrl 自动 SetCurSel 引发的切页重入。
+    BOOL m_bSyncingFundPages;
     fund_uint64 m_logSeen;  // 已经显示到 CLogSink 的第几条
     UINT_PTR m_logTimer;    // 日志增量刷新定时器（轮询内存队列，不做文件 IO）
 

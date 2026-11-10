@@ -13,6 +13,9 @@ SNSBEGIN
 SwndContainerImpl::SwndContainerImpl()
     : m_hCapture(0)
     , m_hHover(0)
+    , m_hTouchTarget(0)
+    , m_hTouchInterceptor(0)
+    , m_ptTouchDown(0, 0)
     , m_uNcHitTest(HTCLIENT)
     , m_bZorderDirty(TRUE)
     , m_pRoot(NULL)
@@ -37,6 +40,12 @@ LRESULT SwndContainerImpl::DoFrameEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
     pRoot->AddRef();
     pRoot->SetMsgHandled(TRUE);
 
+    if (DispatchTouchEvent(uMsg, wParam, lParam))
+    {
+        pRoot->Release();
+        return lRet;
+    }
+
     switch (uMsg)
     {
     case WM_MOUSEMOVE:
@@ -47,6 +56,9 @@ LRESULT SwndContainerImpl::DoFrameEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
         break;
     case WM_MOUSELEAVE:
         OnFrameMouseLeave();
+        break;
+    case WM_CANCELMODE:
+        // DispatchTouchEvent() already delivered ACTION_CANCEL to the touch owner.
         break;
     case WM_SETCURSOR:
         lRet = OnFrameSetCursor(CPoint(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)));
@@ -144,6 +156,146 @@ SWND SwndContainerImpl::GetFocus() const
 SWND SwndContainerImpl::GetHover() const
 {
     return m_hHover;
+}
+
+void SwndContainerImpl::ResetTouchState()
+{
+    if (m_hTouchInterceptor && m_hCapture == m_hTouchInterceptor)
+    {
+        OnReleaseSwndCapture();
+    }
+    m_hTouchInterceptor = 0;
+    m_hTouchTarget = 0;
+    m_ptTouchDown = CPoint(0, 0);
+}
+
+BOOL SwndContainerImpl::IsDisallowIntercept(SWindow *pTarget) const
+{
+    // Equivalent of walking up ViewParent.requestDisallowInterceptTouchEvent().
+    for (SWindow *p = pTarget; p; p = p->GetParent())
+    {
+        if (p->IsDisallowIntercept())
+            return TRUE;
+    }
+    return FALSE;
+}
+
+BOOL SwndContainerImpl::DispatchTouchEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    if (!m_pRoot)
+        return FALSE;
+    if (uMsg != WM_LBUTTONDOWN && uMsg != WM_MOUSEMOVE && uMsg != WM_LBUTTONUP && uMsg != WM_CANCELMODE)
+        return FALSE;
+
+    // Once a container has intercepted, it owns the whole remaining event stream.
+    if (m_hTouchInterceptor)
+    {
+        SWindow *pInterceptor = SWindowMgr::GetWindow(m_hTouchInterceptor);
+        if (!pInterceptor)
+        {
+            ResetTouchState();
+            return FALSE;
+        }
+        pInterceptor->OnTouchEvent(uMsg, wParam, lParam);
+        if (uMsg == WM_LBUTTONUP || uMsg == WM_CANCELMODE)
+            ResetTouchState();
+        return TRUE;
+    }
+
+    CPoint pt(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+    SWindow *pTarget = SWindowMgr::GetWindow(m_hCapture);
+
+    if (uMsg == WM_LBUTTONDOWN)
+    {
+        // ACTION_DOWN is never intercepted: the child keeps its complete click stream.
+        ResetTouchState();
+        pTarget = SWindowMgr::GetWindow(m_pRoot->SwndFromPoint(pt));
+        m_hTouchTarget = pTarget ? pTarget->GetSwnd() : 0;
+        m_ptTouchDown = pt;
+        // ViewGroup clears FLAG_DISALLOW_INTERCEPT on ACTION_DOWN.
+        for (SWindow *p = pTarget; p; p = p->GetParent())
+            p->RequestDisallowInterceptTouchEvent(FALSE);
+        // Let every ancestor initialize its gesture detector, outermost first.
+        SList<SWindow *> chain;
+        for (SWindow *p = pTarget ? pTarget->GetParent() : NULL; p; p = p->GetParent())
+            chain.AddHead(p);
+        SPOSITION pos = chain.GetHeadPosition();
+        while (pos)
+            chain.GetNext(pos)->OnInterceptTouchEvent(uMsg, wParam, lParam);
+        return FALSE;
+    }
+
+    if (!pTarget)
+        pTarget = SWindowMgr::GetWindow(m_pRoot->SwndFromPoint(pt));
+
+    if (uMsg == WM_LBUTTONUP || uMsg == WM_CANCELMODE)
+    {
+        if (uMsg == WM_CANCELMODE && pTarget)
+            pTarget->SSendMessage(WM_CANCELMODE);
+        ResetTouchState();
+        return FALSE;
+    }
+
+    // WM_MOUSEMOVE: only while the button is held and a DOWN target exists.
+    if (!(wParam & MK_LBUTTON) || !m_hTouchTarget || !pTarget)
+        return FALSE;
+    if (IsDisallowIntercept(pTarget))
+        return FALSE;
+
+    // Ask the innermost candidate first. Android reaches the same result by
+    // letting an inner ViewPager call requestDisallowInterceptTouchEvent(true)
+    // so that its parents stop asking; in SOUI the container owns the decision,
+    // so walking outwards from the hit window gives the most local handler
+    // priority. With the old outermost-first walk, two nested STabCtrls that
+    // share an axis both cross touchSlop on the same MOVE and the outer one
+    // always won (reproduced by the two tabAlign=top tabs in page_skia.xml).
+    // pTarget itself is included so a tabctrl hit directly can also claim it.
+    SList<SWindow *> chain;
+    for (SWindow *p = pTarget; p; p = p->GetParent())
+        chain.AddTail(p);
+
+    SPOSITION pos = chain.GetHeadPosition();
+    while (pos)
+    {
+        SWindow *pCandidate = chain.GetNext(pos);
+        if (!pCandidate->OnInterceptTouchEvent(uMsg, wParam, lParam))
+            continue;
+
+        // Ask the child to give up its gesture. A FALSE reply means it refuses
+        // (SPanel does this while it scrolls along the drag axis or is doing a
+        // rubber-band selection), so the parent must not steal the event stream.
+        // The reason carries the axis declared by the interceptor: a vertically
+        // scrolling list must not veto a horizontal page switch of an outer tab.
+        SWindow *pCancel = SWindowMgr::GetWindow(m_hCapture ? m_hCapture : m_hTouchTarget);
+        if (pCancel && pCancel != pCandidate)
+        {
+            // Prefer the axis declared by the interceptor: a 45 degree or
+            // zigzag drag has no reliable "dominant" direction, while the
+            // candidate knows exactly which axis it will consume.
+            int nReason = pCandidate->GetTouchInterceptAxis();
+            if (!CANCEL_REASON_IS_SCROLL(nReason))
+            {
+                // Legacy fallback for interceptors that do not declare an axis.
+                int nDx = pt.x - m_ptTouchDown.x;
+                int nDy = pt.y - m_ptTouchDown.y;
+                if (nDx < 0)
+                    nDx = -nDx;
+                if (nDy < 0)
+                    nDy = -nDy;
+                nReason = (nDx >= nDy) ? CANCEL_REASON_SCROLL_H : CANCEL_REASON_SCROLL_V;
+            }
+            if (!pCancel->CancelCaptureMode(nReason))
+                return FALSE;
+            pCancel->SSendMessage(WM_CANCELMODE);
+        }
+
+        OnFrameMouseLeave();
+        pCandidate->SetCapture();
+        m_hTouchInterceptor = pCandidate->GetSwnd();
+        pCandidate->OnTouchEvent(uMsg, wParam, lParam);
+        return TRUE;
+    }
+    return FALSE;
 }
 
 void SwndContainerImpl::OnFrameMouseMove(UINT uFlag, CPoint pt)

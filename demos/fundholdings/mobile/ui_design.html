@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>基金持仓 · 移动版 UI 设计稿 (390×844)</title>
+<style>
+  :root{
+    --bkg:#070a0f; --panel:#0b1119; --card:#121a26; --card2:#0e151f;
+    --line:#1c2534; --text:#e8edf5; --text2:#aab6c8; --text3:#77849a; --dim:#5c6779;
+    --pos:#ff5c5c; --neg:#22c55e; --gold:#f0b429; --green:#5ee08f;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:#15181d;color:var(--text);
+    font-family:"PingFang SC","Noto Sans CJK SC","Microsoft YaHei UI",system-ui,sans-serif;
+    display:flex;flex-direction:column;align-items:center;padding:28px 12px 40px;
+  }
+  .doc-title{color:#8b98ab;font-size:13px;letter-spacing:.5px;margin-bottom:14px}
+  .doc-title b{color:#e8edf5;font-weight:600}
+  /* ---------- 手机外框 ---------- */
+  .phone{
+    width:390px;height:844px;background:var(--bkg);border-radius:28px;overflow:hidden;
+    border:1px solid #2a3242;box-shadow:0 24px 60px rgba(0,0,0,.55);
+    display:flex;flex-direction:column;position:relative;
+  }
+  /* ---------- 标题栏 ---------- */
+  .caption{height:42px;background:#0e141e;display:flex;align-items:center;gap:6px;padding:0 12px;flex:none}
+  .logo{width:14px;height:14px;border-radius:4px;background:linear-gradient(135deg,#f0b429,#ff8a3d);
+        box-shadow:0 0 10px rgba(240,180,41,.45);flex:none}
+  .caption .name{font-size:12px;font-weight:700}
+  .caption .dot{color:var(--text3);font-size:11px}
+  .caption .accent{font-size:12px;font-weight:700;color:var(--gold)}
+  .spacer{flex:1}
+  .chip{font-size:10px;color:var(--text2);background:#161e2b;border:1px solid #26303f;
+        border-radius:11px;padding:3px 8px;line-height:1}
+  .badge-live{font-size:10px;font-weight:700;color:var(--green);background:rgba(94,224,143,.10);
+              border:1px solid rgba(94,224,143,.35);border-radius:11px;padding:4px 9px;line-height:1}
+  /* ---------- 工具栏 ---------- */
+  .toolbar{background:var(--panel);padding:7px 12px 5px;flex:none}
+  .row{display:flex;align-items:center;gap:6px}
+  .row+.row{margin-top:5px}
+  .edit{flex:1;height:34px;display:flex;align-items:center;padding:0 10px;
+        background:#0f1622;border:1px solid #243044;border-radius:8px;
+        color:var(--text);font-size:13px;letter-spacing:.5px}
+  .edit .cue{color:var(--dim);font-size:12px}
+  .btn{height:34px;display:flex;align-items:center;justify-content:center;border-radius:8px;
+       font-size:12px;white-space:nowrap;border:1px solid transparent}
+  .btn.primary{background:linear-gradient(180deg,#f0b429,#d99a12);color:#1a1200;font-weight:700;padding:0 12px}
+  .btn.ghost{background:#111a27;border-color:#26303f;color:var(--text2);padding:0 10px}
+  .btn.sm{height:30px;font-size:11px}
+  .upd{margin-left:auto;font-size:10px;color:var(--text3);white-space:nowrap}
+  /* ---------- 指数条 ---------- */
+  .indexbar{height:36px;display:flex;align-items:center;padding:0 12px;gap:10px;flex:none;
+            background:#0a1018;border-bottom:1px solid #131b27;font-size:10px;overflow:hidden}
+  .idx{display:flex;gap:4px;align-items:baseline;white-space:nowrap}
+  .idx .nm{color:var(--text3)}
+  .idx .v{color:var(--text2)}
+  .idx .p{color:var(--pos)}
+  .idx .p.down{color:var(--neg)}
+  /* ---------- 工作区 ---------- */
+  .workspace{flex:1;display:flex;flex-direction:column;min-height:0}
+  /* 自选页签 */
+  .watch{height:68px;display:flex;align-items:center;padding:4px 12px 0;gap:7px;flex:none}
+  .wcard{width:118px;height:60px;border-radius:10px;background:var(--card);
+         border:1px solid #202a3a;padding:7px 9px;display:flex;flex-direction:column;justify-content:center}
+  .wcard.sel{border-color:rgba(240,180,41,.55);background:#161e28;
+             box-shadow:inset 0 0 0 1px rgba(240,180,41,.12)}
+  .wcard .top{display:flex;justify-content:space-between;font-size:11px;color:var(--text2)}
+  .wcard .top b{color:var(--text);font-size:11px}
+  .wcard .top .x{color:var(--dim)}
+  .wcard .pct{font-size:15px;font-weight:700;color:var(--pos);margin-top:4px}
+  .wcard .nav{font-size:10px;color:var(--text3);margin-top:1px}
+  .wcnt{font-size:10px;color:var(--text3);white-space:nowrap}
+  /* KPI */
+  .kpi-wrap{padding:6px 12px 0;flex:none}
+  .kpi{background:linear-gradient(180deg,#121a26,#0f1622);border:1px solid #202a3a;
+       border-radius:11px;padding:9px 11px;position:relative;overflow:hidden}
+  .kpi.hero{height:88px}
+  .kpi .lb{font-size:10px;color:var(--text3)}
+  .kpi .val{font-size:12px;color:var(--text);margin-top:5px}
+  .kpi .val em{font-style:normal;color:var(--pos);font-weight:700}
+  .kpi .sub{font-size:9px;color:var(--text3);margin-top:3px}
+  .kpi.hero .lb{font-size:11px;color:var(--text2)}
+  .kpi.hero .big{font-size:30px;font-weight:700;color:var(--pos);line-height:1.05;margin-top:5px;
+                 font-variant-numeric:tabular-nums}
+  .kpi.hero .sub{font-size:11px;color:var(--text2);margin-top:5px}
+  .pill{position:absolute;right:10px;top:9px;font-size:9px;color:var(--green);
+        border:1px solid rgba(94,224,143,.35);background:rgba(94,224,143,.08);
+        border-radius:9px;padding:2px 6px}
+  .kpi2{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:5px}
+  .kpi2 .kpi{height:78px;padding:8px 9px}
+  .kpi2 .kpi .lb{font-size:9px}
+  .kpi2 .kpi .v{font-size:13px;font-weight:700;margin-top:4px}
+  .kpi2 .kpi .sub{font-size:8.5px}
+  .kpi2 .pos{color:var(--pos)} .kpi2 .gold{color:var(--gold)}
+  /* 卡片：走势 / 贡献度 */
+  .card{background:var(--card);border:1px solid #1b2432;border-radius:11px;margin:0 12px}
+  .card-head{display:flex;align-items:center;gap:7px;padding:7px 10px 0;font-size:11px}
+  .card-head b{font-size:12px;color:var(--text)}
+  .card-head .muted{font-size:10px;color:var(--text3)}
+  .card-head .red{margin-left:auto;font-size:10px;color:var(--pos)}
+  .chart{height:112px;margin-top:2px}
+  .contrib{height:80px;padding:3px 10px 8px 10px}
+  .bar-row{display:grid;grid-template-columns:56px 1fr 44px;align-items:center;gap:6px;
+           height:14px;font-size:9.5px;color:var(--text3)}
+  .bar-row .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2)}
+  .bar-track{position:relative;height:5px;background:#0d141e;border-radius:3px}
+  .bar-track i{position:absolute;top:0;height:5px;border-radius:3px}
+  .bar-track i.up{background:linear-gradient(90deg,rgba(255,92,92,.35),#ff5c5c)}
+  .bar-track i.down{background:linear-gradient(90deg,#22c55e,rgba(34,197,94,.35))}
+  .bar-row .v{text-align:right;font-variant-numeric:tabular-nums}
+  /* 表格区 */
+  .tablecard{flex:1;min-height:0;margin:5px 12px 6px;background:var(--card);
+             border:1px solid #1b2432;border-radius:11px;display:flex;flex-direction:column;
+             padding:6px 8px}
+  .ftabs{height:30px;display:flex;gap:4px;align-items:center;flex:none}
+  .ftab{padding:5px 11px;border-radius:9px;background:#0f1622;color:var(--text2);font-size:11px}
+  .ftab.on{background:rgba(240,180,41,.12);color:var(--gold);font-weight:700;
+           box-shadow:inset 0 0 0 1px rgba(240,180,41,.30)}
+  .filter{display:flex;gap:5px;align-items:center;margin-top:4px;flex:none}
+  .filter .edit{height:30px;font-size:11px}
+  .grid-wrap{flex:1;min-height:0;margin-top:4px;overflow:auto;border:1px solid #1b2432;
+             border-radius:6px;background:#121a26}
+  table{border-collapse:collapse;width:100%;font-size:10.5px;color:var(--text2)}
+  thead th{position:sticky;top:0;background:#0f1622;color:var(--text3);font-weight:400;
+           text-align:right;padding:5px 5px;white-space:nowrap;border-bottom:1px solid #1c2534}
+  thead th.l{text-align:left}
+  tbody td{text-align:right;padding:6px 5px;border-bottom:1px solid #161f2c;
+           font-variant-numeric:tabular-nums;white-space:nowrap}
+  tbody td.l{text-align:left}
+  tbody tr:nth-child(even) td{background:#0e151f}
+  tbody td.pos{color:var(--pos)} tbody td.neg{color:var(--neg)}
+  tbody td .tag{display:inline-block;padding:1px 4px;border-radius:4px;background:#1a2432;
+                color:var(--text3);font-size:9px}
+  /* 状态栏 */
+  .statusbar{height:28px;background:var(--panel);display:flex;align-items:center;
+             padding:0 12px;gap:8px;font-size:10px;color:var(--text3);flex:none}
+  .statusbar .link{margin-left:auto;color:#4c5666;font-size:9.5px}
+  .legend{display:flex;gap:8px;font-size:9.5px;color:var(--text3)}
+  .legend .up{color:var(--pos)} .legend .down{color:var(--neg)}
+</style>
+</head>
+<body>
+
+<div class="doc-title"><b>基金持仓 · 盘中估值助手</b>　移动版设计稿　390 × 844</div>
+
+<div class="phone">
+
+  <!-- 标题栏 -->
+  <div class="caption">
+    <span class="logo"></span>
+    <span class="name">基金持仓</span><span class="dot">·</span><span class="accent">盘中估值</span>
+    <span class="spacer"></span>
+    <span class="chip">161725</span>
+    <span class="badge-live">交易中</span>
+  </div>
+
+  <!-- 工具栏 -->
+  <div class="toolbar">
+    <div class="row">
+      <div class="edit">161725</div>
+      <div class="btn primary">查询持仓</div>
+      <div class="btn ghost">＋ 收藏</div>
+    </div>
+    <div class="row">
+      <div class="btn ghost sm">刷新估值</div>
+      <div class="btn ghost sm">模拟盘中 关</div>
+      <span class="upd">更新于 14:32:08</span>
+    </div>
+  </div>
+
+  <!-- 指数条 -->
+  <div class="indexbar">
+    <div class="idx"><span class="nm">上证</span><span class="v">3987.23</span><span class="p">+0.52%</span></div>
+    <div class="idx"><span class="nm">深证</span><span class="v">13210.65</span><span class="p">+0.38%</span></div>
+    <div class="idx"><span class="nm">创业板</span><span class="v">2815.42</span><span class="p down">-0.12%</span></div>
+  </div>
+
+  <div class="workspace">
+
+    <!-- 自选页签 -->
+    <div class="watch">
+      <div class="wcard sel">
+        <div class="top"><b>161725</b><span class="x">×</span></div>
+        <div class="pct">+1.23%</div>
+        <div class="nav">估 0.9876</div>
+      </div>
+      <div class="wcard">
+        <div class="top"><b>110022</b><span class="x">×</span></div>
+        <div class="pct" style="color:var(--pos)">+0.56%</div>
+        <div class="nav">估 2.1530</div>
+      </div>
+      <div class="wcard">
+        <div class="top"><b>005827</b><span class="x">×</span></div>
+        <div class="pct" style="color:var(--neg)">-0.32%</div>
+        <div class="nav">估 0.7412</div>
+      </div>
+      <span class="wcnt">3 只</span>
+    </div>
+
+    <!-- KPI：主卡 -->
+    <div class="kpi-wrap">
+      <div class="kpi hero">
+        <span class="pill">实时估算</span>
+        <div class="lb">盘中估算涨跌幅</div>
+        <div class="big">+1.23%</div>
+        <div class="sub">估算净值 0.9876　较昨收 +0.0123</div>
+      </div>
+      <!-- KPI：四张小卡 -->
+      <div class="kpi2">
+        <div class="kpi">
+          <div class="lb">最新净值</div>
+          <div class="v">0.9753</div>
+          <div class="sub">2026-11-06</div>
+        </div>
+        <div class="kpi">
+          <div class="lb">行情覆盖</div>
+          <div class="v gold">92%</div>
+          <div class="sub">23 / 25 只</div>
+        </div>
+        <div class="kpi">
+          <div class="lb">T+1 预估</div>
+          <div class="v pos">+0.80%</div>
+          <div class="sub">18:00 更新</div>
+        </div>
+        <div class="kpi">
+          <div class="lb">拖动贡献</div>
+          <div class="v pos">+0.32pp</div>
+          <div class="sub">前五大重仓</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 走势 -->
+    <div class="card" style="margin-top:6px">
+      <div class="card-head">
+        <b>估算分时走势</b><span class="muted">2026-11-07 · 盘中</span>
+        <span class="red">估算涨跌幅</span>
+      </div>
+      <svg class="chart" viewBox="0 0 356 112" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="fill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#ff5c5c" stop-opacity=".28"/>
+            <stop offset="100%" stop-color="#ff5c5c" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <line x1="0" y1="56" x2="356" y2="56" stroke="#26303f" stroke-dasharray="3 4"/>
+        <path d="M0,62 L28,58 L56,66 L84,52 L112,46 L140,55 L168,40 L196,34 L224,44 L252,30 L280,26 L308,22 L336,28 L356,24"
+              fill="none" stroke="#ff5c5c" stroke-width="1.6"/>
+        <path d="M0,62 L28,58 L56,66 L84,52 L112,46 L140,55 L168,40 L196,34 L224,44 L252,30 L280,26 L308,22 L336,28 L356,24 L356,112 L0,112 Z"
+              fill="url(#fill)"/>
+        <g font-size="8" fill="#5c6779">
+          <text x="0" y="110">09:30</text><text x="170" y="110">11:30</text><text x="330" y="110">15:00</text>
+        </g>
+      </svg>
+    </div>
+
+    <!-- 贡献度 -->
+    <div class="card" style="margin-top:5px">
+      <div class="card-head"><b>贡献度分解</b><span class="muted">按 |贡献| 排序</span></div>
+      <div class="contrib">
+        <div class="bar-row"><span class="nm">山西汾酒</span>
+          <span class="bar-track"><i class="up" style="left:50%;width:34%"></i></span>
+          <span class="v" style="color:var(--pos)">+0.42</span></div>
+        <div class="bar-row"><span class="nm">贵州茅台</span>
+          <span class="bar-track"><i class="up" style="left:50%;width:26%"></i></span>
+          <span class="v" style="color:var(--pos)">+0.31</span></div>
+        <div class="bar-row"><span class="nm">五粮液</span>
+          <span class="bar-track"><i class="up" style="left:50%;width:15%"></i></span>
+          <span class="v" style="color:var(--pos)">+0.18</span></div>
+        <div class="bar-row"><span class="nm">泸州老窖</span>
+          <span class="bar-track"><i class="down" style="right:50%;width:6%"></i></span>
+          <span class="v" style="color:var(--neg)">-0.06</span></div>
+        <div class="bar-row"><span class="nm">洋河股份</span>
+          <span class="bar-track"><i class="down" style="right:50%;width:9%"></i></span>
+          <span class="v" style="color:var(--neg)">-0.12</span></div>
+      </div>
+    </div>
+
+    <!-- 表格区 -->
+    <div class="tablecard">
+      <div class="ftabs">
+        <span class="ftab on">持仓变化表</span>
+        <span class="ftab">估值明细</span>
+        <span class="ftab">请求日志</span>
+      </div>
+      <div class="filter">
+        <div class="edit"><span class="cue">筛选代码 / 名称</span></div>
+        <div class="btn ghost sm" style="padding:0 8px">筛选</div>
+        <div class="btn ghost sm" style="padding:0 8px">重置</div>
+      </div>
+      <div class="grid-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="l">代码</th><th class="l">名称</th>
+              <th>最新%</th><th>Q3%</th><th>Δ净值</th><th class="l">变动</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="l">600809</td><td class="l">山西汾酒</td>
+              <td>17.92</td><td>18.54</td><td class="pos">+1.85</td>
+              <td class="l"><span class="tag">加仓</span></td>
+            </tr>
+            <tr>
+              <td class="l">600519</td><td class="l">贵州茅台</td>
+              <td>15.36</td><td>15.02</td><td class="pos">+0.34</td>
+              <td class="l"><span class="tag">加仓</span></td>
+            </tr>
+            <tr>
+              <td class="l">000858</td><td class="l">五粮液</td>
+              <td>12.41</td><td>12.88</td><td class="neg">-0.47</td>
+              <td class="l"><span class="tag">减仓</span></td>
+            </tr>
+            <tr>
+              <td class="l">000568</td><td class="l">泸州老窖</td>
+              <td>8.73</td><td>8.73</td><td>0.00</td>
+              <td class="l"><span class="tag">不变</span></td>
+            </tr>
+            <tr>
+              <td class="l">002304</td><td class="l">洋河股份</td>
+              <td>6.28</td><td>6.75</td><td class="neg">-0.47</td>
+              <td class="l"><span class="tag">减仓</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 状态栏 -->
+  <div class="statusbar">
+    <span>已加载 25 只重仓股 · 数据源天天基金</span>
+    <span class="legend"><span class="up">涨</span><span class="down">跌</span></span>
+    <span class="link">powered by soui5</span>
+  </div>
+</div>
+
+</body>
+</html>

@@ -135,7 +135,8 @@ void SFreeMoveWindow::OnNcLButtonUp(UINT nFlags, CPoint pt)
 
 BOOL SFreeMoveWindow::CancelCaptureMode(int reason)
 {
-    if (reason == CANCEL_REASON_SCROLL && m_bDraging)
+    // Accept the axis-specific scroll reasons as well as the legacy untyped one.
+    if (CANCEL_REASON_IS_SCROLL(reason) && m_bDraging)
         return FALSE;
     return __baseCls::CancelCaptureMode(reason);
 }

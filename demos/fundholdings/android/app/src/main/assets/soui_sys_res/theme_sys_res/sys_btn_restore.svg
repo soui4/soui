@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="91" height="31" viewBox="0 0 91 31">
+  <!-- 正常状态 -->
+  <g id="normal" transform="translate(0, 0)">
+    <rect x="9" y="9" width="12" height="12" fill="none" stroke="#666666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="12" y="12" width="12" height="12" fill="none" stroke="#666666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <!-- 悬停状态 -->
+  <g id="hover" transform="translate(30, 0)">
+    <rect x="9" y="9" width="12" height="12" fill="none" stroke="#333333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="12" y="12" width="12" height="12" fill="none" stroke="#333333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <!-- 按下状态 -->
+  <g id="pressed" transform="translate(60, 0)">
+    <rect x="9" y="9" width="12" height="12" fill="none" stroke="#666666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="12" y="12" width="12" height="12" fill="none" stroke="#666666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

@@ -102,7 +102,7 @@ void SScrollBar::OnLButtonUp(UINT nFlags, CPoint point)
 
 BOOL SScrollBar::CancelCaptureMode(int reason)
 {
-    if (reason == CANCEL_REASON_SCROLL && m_sbHandler.GetClickPart() == SB_THUMBTRACK)
+    if (CANCEL_REASON_IS_SCROLL(reason) && m_sbHandler.GetClickPart() == SB_THUMBTRACK)
         return FALSE;
     return __baseCls::CancelCaptureMode(reason);
 }

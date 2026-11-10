@@ -118,8 +118,8 @@ struct WatchTabItem {
 
 // 自选基金页签：横向滚动条 + 拖拽滚动 + fling 惯性全部复用 SPanel
 // （与 SListView 同一套机制），这里只负责卡片自绘和滚动范围的维护。
-// 鼠标的 LBUTTONDOWN / MOUSEMOVE / LBUTTONUP / MOUSEWHEEL 不在此映射，
-// 由 SOUI_MSG_MAP_END() 回退到 SPanel，否则拖拽/fling 会被派生类截胡。
+// LBUTTONDOWN / MOUSEWHEEL 不在此映射，由 SOUI_MSG_MAP_END() 回退到 SPanel；
+// MOUSEMOVE / LBUTTONUP 用常规映射拦截后先链式调用 SPanel，再跑自己的逻辑。
 class SFundWatchTabs : public SPanel {
     DEF_SOBJECT(SPanel, L"fundwatchtabs")
   public:
@@ -136,9 +136,9 @@ class SFundWatchTabs : public SPanel {
     void OnSize(UINT nType, CSize size);
     void OnMouseLeave();
 
-    // SPanel 给派生类留的「非拖拽」扩展点：拖拽/fling 期间不会调用它们。
-    void OnLButtonUpEx(UINT nFlags, CPoint pt);
-    void OnMouseMoveEx(UINT nFlags, CPoint pt);
+    // 常规消息映射拦截：先链式调用 SPanel 的手势处理，被吞掉就直接返回。
+    void OnLButtonUp(UINT nFlags, CPoint pt);
+    void OnMouseMove(UINT nFlags, CPoint pt);
     // 滚轮一格滚过一张卡片，比 SPanel 默认的 10px 更跟手。
     int GetScrollLineSize(BOOL bVertical);
 
@@ -146,6 +146,8 @@ class SFundWatchTabs : public SPanel {
         MSG_WM_PAINT_EX(OnPaint)
         MSG_WM_SIZE(OnSize)
         MSG_WM_MOUSELEAVE(OnMouseLeave)
+        MSG_WM_MOUSEMOVE(OnMouseMove)
+        MSG_WM_LBUTTONUP(OnLButtonUp)
     SOUI_MSG_MAP_END()
 
   private:
@@ -220,6 +222,26 @@ class SFundIndexBar : public SWindow {
   private:
     std::vector<IndexQuote> m_items;
     SStringT m_note;
+};
+
+// ------------------------------------------------- 竖向滚动容器
+// SScrollView 的拖拽滚动只处理直接落到自己身上的鼠标消息；移动端内容都是子窗口，
+// 按下后由子窗口捕获鼠标，滚动容器收不到后续 MOVE。这里复用 SOUI 的触摸拦截链
+// （SwndContainerImpl::DispatchTouchEvent），只声明纵向轴：
+//   - 纵向拖动由本控件接管并滚动，子窗口的点击行为不受影响；
+//   - 横向拖动仍交给外层 fund_swipe（切换基金）和内层 pane_swipe（切换表格页）。
+// 移动版 dlg_main.xml 用它包住 KPI/走势/贡献度/表格，屏幕高度不足时可上下滚动。
+class SFundScroll : public SScrollView {
+    DEF_SOBJECT(SScrollView, L"fundscroll")
+  protected:
+    // 只声明策略：识别 / 接管 / 惯性与 fling 全部走 SPanel 的共享状态机。
+    BOOL CanInterceptTouchGesture() const OVERRIDE;
+    SGestureDetector::Axis GetGestureAxis() const OVERRIDE;
+    BOOL CanScrollByGesture(const CPoint &ptDelta) const OVERRIDE;
+    int GetTouchInterceptAxis() const OVERRIDE;
+
+  private:
+    BOOL CanScrollVertical() const;
 };
 
 // ------------------------------------------------------------ SOUI5 介绍页

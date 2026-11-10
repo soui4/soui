@@ -565,11 +565,10 @@ void STileView::OnMouseLeave()
         m_pHoverItem = NULL;
     }
 
-    // Cancel drag pending if mouse leaves (capture lost or window deactivated)
-    if (m_bDragPending)
-    {
-        m_bDragPending = FALSE;
-    }
+    // Capture may be lost (or the window deactivated) while a gesture is
+    // armed. Reset the detector too, otherwise a stale DOWN state would keep
+    // accepting the next MOVE as a continuation of this gesture.
+    CancelDragGesture();
 }
 
 void STileView::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)

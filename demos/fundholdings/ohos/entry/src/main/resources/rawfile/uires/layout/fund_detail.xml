@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- 基金详情页模板：一支基金一页。MainDlg::SyncFundPages 调用
+     STabCtrl::InsertItem(L"<include src='layout:fund_detail'/>")，框架加载本文件后
+     把「第一个元素节点」当作 STabPage 节点使用 —— 所以根节点必须叫 <page>，
+     写成 <include>/<window> 会静默返回 -1、一页都建不出来。
+     控件名与桌面版完全一致，业务代码按「当前页根」查找控件。 -->
+<page layout="vbox">
+    <!-- ==================== KPI 卡片 ====================
+         覆盖度卡片右侧要画圆环，宽度不能低于 180dp，否则圆环会压住左侧文字；
+         因此第一行放「主数值 + 覆盖度」，第二行放三个等宽小卡。 -->
+    <window size="-2,94" layout="hbox" padding="12,6,12,0">
+      <fundkpi name="kpi_hero" size="0,-2" weight="1"/>
+      <fundkpi name="kpi_cover" size="180,-2" extend_left="6"/>
+    </window>
+    <window size="-2,84" layout="hbox" padding="12,5,12,0">
+      <fundkpi name="kpi_nav" size="0,-2" weight="1"/>
+      <fundkpi name="kpi_pull" size="0,-2" weight="1" extend_left="6"/>
+      <fundkpi name="kpi_drag" size="0,-2" weight="1" extend_left="6"/>
+    </window>
+
+    <!-- ==================== 走势 ==================== -->
+    <window size="-2,116" skin="skin_card" layout="vbox" padding="10,6,10,6"
+            margin="12,6,12,0">
+      <window size="-2,18" layout="hbox">
+        <text text="估算分时走势" font="f12b" colorText="#e8edf5" size="-1,-2" gravity="center"/>
+        <text name="txt_chart_sub" text="—" font="f10" colorText="#77849a" size="-1,-2"
+              extend_left="7" gravity="center"/>
+        <window size="0,0" weight="1"/>
+        <text text="估算涨跌幅" font="f10" colorText="#ff5c5c" size="-1,-2" gravity="center"/>
+      </window>
+      <fundspark name="chart_est" size="-2,0" weight="1" extend_top="4"/>
+    </window>
+
+    <!-- ==================== 贡献度 ==================== -->
+    <window size="-2,84" skin="skin_card" layout="vbox" padding="10,5,10,5"
+            margin="12,5,12,0">
+      <window size="-2,16" layout="hbox">
+        <text text="贡献度分解" font="f12b" colorText="#e8edf5" size="-1,-2" gravity="center"/>
+        <text text="按 |贡献| 排序" font="f10" colorText="#77849a" size="-1,-2"
+              extend_left="7" gravity="center"/>
+      </window>
+      <fundcontrib name="contrib_list" size="-2,0" weight="1" extend_top="3"/>
+    </window>
+
+    <!-- ==================== 表格区 ==================== -->
+    <window size="-2,0" weight="1" skin="skin_card" layout="vbox" padding="8,6,8,6"
+            margin="12,5,12,6">
+      <fundtabs name="tabs" size="-2,30" cursor="hand"/>
+
+      <window size="-2,32" layout="hbox" extend_top="4">
+        <edit name="edit_filter" cueText="筛选代码 / 名称" cueColor="#5c6779" size="0,30"
+              weight="1" gravity="center"/>
+        <button name="btn_filter" text="筛选" skin="skin_btn_ghost" size="46,30"
+                class="cls_btn_ghost" extend_left="5" gravity="center"/>
+        <button name="btn_reset" text="重置" skin="skin_btn_ghost" size="46,30"
+                class="cls_btn_ghost" extend_left="5" gravity="center"/>
+        <button name="btn_log_clear" text="清空日志" skin="skin_btn_ghost" size="64,30"
+                class="cls_btn_ghost" extend_left="5" gravity="center" show="0"/>
+      </window>
+
+      <!-- 页面容器：用 tabctrl 承载三个面板，开启拖动切页（Android ViewPager 风格）。
+           页头高度为 0：可见的页签仍由上面的 fundtabs 绘制，tabctrl 只负责页面切换，
+           因此视觉与桌面/设计稿一致，业务代码仍按 pane_change / pane_est / pane_log 找面板。
+           移动端触摸与桌面鼠标拖动都走同一套手势。 -->
+      <tabctrl name="pane_swipe" size="-2,0" weight="1" extend_top="4"
+               tabWidth="0" tabHeight="0" enableDragSwitch="1"
+               dragThreshold="8" dragSwitchRatio="35" dragFling="1" dragCommitDuration="200">
+        <page title="持仓变化表">
+          <window name="pane_change" pos="0,0,-2,-2">
+            <!-- 移动版按 6 列展示：代码 / 名称 / 最新占净值 / Q3占净值 /
+                 占净值Δ / 变动标记；7 列在 390dp 下会挤到换行。
+                 列定义仍由 gridctrl 自己解析。 -->
+            <gridctrl name="grid_holdings" pos="0,0,-2,-2"
+                      rowCount="1" colCount="6" fixedRows="1" fixedCols="0"
+                      defRowHeight="28" defColWidth="80"
+                      gridLines="3" gridLineColor="#1c2534" gridBkColor="#121a26"
+                      font="f10" colorText="#aab6c8" editable="0" gestureScroll="1">
+              <columns>
+                <col key="code" title="代码" weight="16" align="left"/>
+                <col key="name" title="名称" weight="23" align="left"/>
+                <col key="lp_pct" title="最新%" weight="15" align="right"/>
+                <col key="q3_pct" title="Q3%" weight="15" align="right"/>
+                <col key="pct_chg" title="Δ净值" weight="15" align="right"/>
+                <col key="tag" title="变动" weight="16" align="left"/>
+              </columns>
+            </gridctrl>
+          </window>
+        </page>
+        <page title="估值明细">
+          <window name="pane_est" pos="0,0,-2,-2">
+            <gridctrl name="grid_est" pos="0,0,-2,-2"
+                      rowCount="1" colCount="6" fixedRows="1" fixedCols="0"
+                      defRowHeight="28" defColWidth="80"
+                      gridLines="3" gridLineColor="#1c2534" gridBkColor="#121a26"
+                      font="f10" colorText="#aab6c8" editable="0" gestureScroll="1">
+              <columns>
+                <col key="code" title="代码" weight="16" align="left"/>
+                <col key="name" title="名称" weight="20" align="left"/>
+                <col key="weight" title="权重%" weight="13" align="right"/>
+                <col key="price" title="现价" weight="16" align="right"/>
+                <col key="chg_pct" title="涨跌%" weight="14" align="right"/>
+                <col key="contrib" title="贡献" weight="15" align="right"/>
+              </columns>
+            </gridctrl>
+          </window>
+        </page>
+        <page title="请求日志">
+          <window name="pane_log" pos="0,0,-2,-2" colorBkgnd="#0b1119">
+            <richedit name="re_log" pos="8,6,-8,-6" multiLines="1" readonly="1"
+                      vscrollBar="1" autoVScroll="1" wordWrap="1" hscrollBar="0" wantReturn="0"
+                      enableDragdrop="0" colorBkgnd="#0b1119" colorText="#8b98ab" font="mono11"/>
+          </window>
+        </page>
+      </tabctrl>
+    </window>
+</page>

@@ -125,7 +125,7 @@ public:
     SStringW(const wchar_t* psz);
 
     /// @brief Destructor.
-    ~SStringW();
+    virtual ~SStringW();
 
 public:
     /// @brief Retrieves the length of the string.

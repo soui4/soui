@@ -332,7 +332,7 @@ void SHeaderCtrl::OnLButtonUp(UINT nFlags, CPoint pt)
 
 BOOL SHeaderCtrl::CancelCaptureMode(int reason)
 {
-    if (reason == CANCEL_REASON_SCROLL && m_bDragging)
+    if (CANCEL_REASON_IS_SCROLL(reason) && m_bDragging)
         return FALSE;
     return __baseCls::CancelCaptureMode(reason);
 }

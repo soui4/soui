@@ -36,8 +36,13 @@ enum
     UM_SOUI_END,
 };
 
-/** CancelCaptureMode reason constants */
-#define CANCEL_REASON_SCROLL 1 /**< The parent container starts scrolling; notify child controls to cancel touch operations */
+/** CancelCaptureMode reason flags (bitmask; OR both flags for an axis-agnostic takeover). */
+#define CANCEL_REASON_SCROLL_H 1 /**< Parent container starts scrolling; the drag's dominant axis is horizontal */
+#define CANCEL_REASON_SCROLL_V 2 /**< Same as above, the drag's dominant axis is vertical */
+
+/** TRUE when reason reports a parent scroll takeover, whatever its axis. */
+#define CANCEL_REASON_IS_SCROLL(reason)                                                                            \
+    (((reason) & (CANCEL_REASON_SCROLL_H | CANCEL_REASON_SCROLL_V)) != 0)
 
 typedef BOOL (*FunSwndProc)(IWindow *pSwnd, UINT uMsg, WPARAM wp, LPARAM lp, LRESULT *pbHandled);
 

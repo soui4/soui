@@ -1,4 +1,4 @@
-#ifndef __SGRIDCTRL__H__
+﻿#ifndef __SGRIDCTRL__H__
 #define __SGRIDCTRL__H__
 
 #include "SSelRangeMgr.h"
@@ -625,6 +625,13 @@ public:
     STDMETHOD_(void, SetDefCellHeight)(THIS_ int nHeight) OVERRIDE;
     STDMETHOD_(void, SetDefCellWidth)(THIS_ int nWidth) OVERRIDE;
 
+    // 列布局：由 <columns> 子节点解析，业务层按 key 填值。
+    BOOL CreateChildren(SXmlNode xmlNode) OVERRIDE;
+    const SStringW &GetColumnKey(int nCol) const;
+    int GetColumnDefWidth(int nCol) const;  // 固定宽度(dp)，权重列返回 0
+    int GetColumnWeight(int nCol) const;    // 权重，固定列返回 0
+    int GetColumnAlign(int nCol) const;     // DT_LEFT / DT_RIGHT
+
     // Image list support
     STDMETHOD_(void, SetImageList)(THIS_ ISkinObj* pSkin) OVERRIDE;
     STDMETHOD_(ISkinObj*, GetImageList)(THIS) SCONST OVERRIDE;
@@ -819,6 +826,7 @@ public:
     HRESULT OnAttrColCount(const SStringW &strValue, BOOL bLoading);
     HRESULT OnAttrFixedRows(const SStringW &strValue, BOOL bLoading);
     HRESULT OnAttrFixedCols(const SStringW &strValue, BOOL bLoading);
+    BOOL ParseColumnsXml(SXmlNode xmlColumns);
 
     SOUI_ATTRS_BEGIN()
         ATTR_CUSTOM(L"rowCount", OnAttrRowCount)
@@ -834,6 +842,7 @@ public:
         ATTR_BOOL(L"listMode", m_bListMode, FALSE)
         ATTR_BOOL(L"singleRowSel", m_bSingleRowSelection, FALSE)
         ATTR_BOOL(L"singleColSel", m_bSingleColSelection, FALSE)
+        ATTR_BOOL(L"gestureScroll", m_bGestureScroll, FALSE)
     SOUI_ATTRS_END()
 
 protected:
@@ -868,6 +877,17 @@ protected:
     virtual void OnMouseMove(UINT nFlags, CPoint pt);
     virtual void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
     virtual BOOL OnScroll(BOOL bVertical, UINT uCode, int nPos);
+    // 手势滚动只提供策略：识别、接管、惯性与 fling 全部复用 SPanel 的共享状态机
+    virtual BOOL CanInterceptTouchGesture() const override;
+    virtual BOOL CanScrollByGesture(const CPoint &ptDelta) const override;
+    virtual void OnGestureIntercepted() override;
+    virtual void OnTouchGestureEnd() override;
+    virtual int GetTouchInterceptAxis() const override;
+    // 即使内容没超出视口（无滚动条）也要武装共享状态机，否则落在表格上的
+    // 竖向拖动根本进不了仲裁，会被容器直接让给外层 fundscroll。
+    virtual BOOL IsEnableDragMode() const override;
+    // 表格只消费竖向手势，轴仲裁仍由 SGestureDetector 完成。
+    virtual SGestureDetector::Axis GetGestureAxis() const override;
 
     // Cell event handlers
     virtual void OnFixedCellClick(SCellID cell);
@@ -942,6 +962,7 @@ protected:
     BOOL OnSetCursor(const CPoint &pt) override;
     void BeforePaint(IRenderTarget *pRT, SPainter &painter) const override;
     virtual BOOL CancelCaptureMode(int reason) override;
+
     SOUI_MSG_MAP_BEGIN()
         MSG_WM_PAINT_EX(OnPaint)
         MSG_WM_SIZE(OnSize)
@@ -959,6 +980,10 @@ protected:
     int m_nCols;                    /**< Number of columns */
     int m_nFixedRows;               /**< Number of fixed rows */
     int m_nFixedCols;               /**< Number of fixed columns */
+    SArray<SStringW> m_colKeys;     /**< 列 key（业务层按 key 填值） */
+    SArray<int> m_colWidths;        /**< 固定列宽(dp)，权重列为 0 */
+    SArray<int> m_colWeights;       /**< 列权重，固定列为 0 */
+    SArray<int> m_colAligns;        /**< 列水平对齐：DT_LEFT / DT_RIGHT */
 
     // Cell dimensions
     int m_nDefCellWidth;            /**< Default cell width */
@@ -976,6 +1001,7 @@ protected:
     BOOL m_bListMode;               /**< List mode flag */
     BOOL m_bSingleRowSelection;     /**< Single row selection mode */
     BOOL m_bSingleColSelection;     /**< Single column selection mode */
+    BOOL m_bGestureScroll;          /**< 是否允许手势（拖拽）滚动，默认关闭以免改变桌面拖选语义 */
 
     // Selection and focus
     SCellID m_cellFocus;            /**< Currently focused cell */

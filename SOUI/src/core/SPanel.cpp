@@ -160,13 +160,12 @@ SPanel::SPanel()
     , m_sbHorz(this, false)
     , m_fadeFrames(0)
     , m_bySbThumbTrackMinAlpha(128)
+    , m_gesture(this)
     , m_bDragPending(FALSE)
     , m_bDragScrolling(FALSE)
-    , m_bDragStarted(FALSE)
     , m_bItemDragScrollEnabled(TRUE)
-    , m_fLastVelocityX(0.0f)
-    , m_fLastVelocityY(0.0f)
-    , m_nLastMoveTime(0)
+    , m_dwGestureFlags(0)
+    , m_bGestureFling(FALSE)
     , m_fFlingVStartPos(0.0f)
     , m_fFlingVTargetPos(0.0f)
     , m_fFlingHStartPos(0.0f)
@@ -647,12 +646,8 @@ void SPanel::ClearDragState()
     StopFlingAnimation();
     EndRubberBandSel(TRUE);
     if (m_bDragPending || m_bDragScrolling)
-    {
-        m_bDragPending = FALSE;
-        m_bDragScrolling = FALSE;
-        m_bDragStarted = FALSE;
         ReleaseCapture();
-    }
+    CancelDragGesture();
 }
 
 void SPanel::OnShowWindow(BOOL bShow, UINT nStatus)
@@ -707,6 +702,7 @@ void SPanel::OnColorize(COLORREF cr)
 void SPanel::OnScaleChanged(int nScale)
 {
     __baseCls::OnScaleChanged(nScale);
+    PrepareGesture(); // touchSlop follows the new DPI scale
     if (m_pSkinSb)
     {
         SAutoRefPtr<ISkinObj> pSkin = (ISkinObj *)m_pSkinSb;
@@ -726,6 +722,7 @@ int SPanel::GetSbWidth() const
 
 void SPanel::OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer)
 {
+    CancelDragGesture(); // the gesture stream belongs to the old container
     m_sbHorz.OnContainerChanged(pOldContainer, pNewContainer);
     m_sbVert.OnContainerChanged(pOldContainer, pNewContainer);
     SWindow::OnContainerChanged(pOldContainer, pNewContainer);
@@ -1035,192 +1032,260 @@ void SPanel::StartDragPending(const CPoint &pt)
 {
     m_bDragPending = TRUE;
     m_ptDragStart = pt;
-    m_bDragStarted = FALSE;
     SetCapture();
+}
+
+void SPanel::PrepareGesture()
+{
+    // 8dp keeps the legacy 8px feel at 100% scale while following DPI scale,
+    // exactly like STabCtrl's dragThreshold. A plain panel scrolls X and Y in
+    // the same gesture; a single-axis view overrides GetGestureAxis() instead
+    // of re-implementing the recognizer.
+    m_gesture.SetAxis(GetGestureAxis());
+    m_gesture.SetTouchSlop(SLayoutSize(8.f, dp).toPixelSize(GetScale()));
+    // SPanel historically started a fling for almost any non-zero release
+    // velocity (>0.01 px/ms). Keep that sensitivity; the detector contributes
+    // the 100ms velocity-window freshness check instead of a single-frame delta.
+    m_gesture.SetMinFlingVelocity(0.01f);
+}
+
+void SPanel::CancelDragGesture()
+{
+    m_gesture.Reset();
+    m_bDragPending = FALSE;
+    m_bDragScrolling = FALSE;
+    m_bGestureFling = FALSE;
+    m_dwGestureFlags = 0;
+}
+
+SGestureDetector::Axis SPanel::GetGestureAxis() const
+{
+    return SGestureDetector::AxisBoth;
+}
+
+BOOL SPanel::CanInterceptTouchGesture() const
+{
+    // Off by default: panels that did not opt in keep relying on
+    // CancelCaptureMode() to veto an outer interceptor.
+    return FALSE;
+}
+
+void SPanel::OnGestureIntercepted()
+{
+}
+
+void SPanel::OnTouchGestureEnd()
+{
+}
+
+BOOL SPanel::CanScrollTowardsDrag(BOOL bVertical, int nDelta) const
+{
+    if (!HasScrollBar(bVertical) || nDelta == 0)
+        return FALSE;
+    const SCROLLINFO *psi = GetScrollBarInfo(bVertical);
+    if (!psi)
+        return FALSE;
+    int nMaxPos = psi->nMax - (int)psi->nPage + 1;
+    int nPos = GetScrollPos(bVertical);
+    // Finger up / left (delta < 0) grows the scroll position.
+    return nDelta < 0 ? nPos < nMaxPos : nPos > psi->nMin;
+}
+
+BOOL SPanel::CanScrollByGesture(const CPoint &ptDelta) const
+{
+    int nDx = ptDelta.x < 0 ? -ptDelta.x : ptDelta.x;
+    int nDy = ptDelta.y < 0 ? -ptDelta.y : ptDelta.y;
+    // Vertical first, and only when the panel can still move that way: a
+    // horizontal drag (or a drag already at the edge) must remain available
+    // to an enclosing page / tab container instead of being swallowed here.
+    if (HasScrollBar(TRUE))
+        return nDy > nDx && CanScrollTowardsDrag(TRUE, ptDelta.y);
+    if (HasScrollBar(FALSE))
+        return nDx > nDy && CanScrollTowardsDrag(FALSE, ptDelta.x);
+    return FALSE;
+}
+
+BOOL SPanel::OnInterceptTouchEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    if (!CanInterceptTouchGesture())
+        return FALSE;
+    if (uMsg == WM_LBUTTONDOWN)
+    {
+        // When the panel itself was hit, the message map already fed DOWN.
+        // As an ancestor we only see DOWN here and must arm the detector.
+        if (!m_gesture.IsDown())
+        {
+            PrepareGesture();
+            m_gesture.OnInterceptTouchEvent(uMsg, wParam, lParam);
+        }
+        return FALSE; // ACTION_DOWN is never intercepted
+    }
+    if (uMsg != WM_MOUSEMOVE || !m_gesture.IsDown())
+        return FALSE;
+    if (!m_gesture.OnInterceptTouchEvent(uMsg, wParam, lParam))
+        return FALSE; // touch slop / axis not crossed yet
+    CPoint pt(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+    if (!CanScrollByGesture(pt - m_gesture.GetDownPoint()))
+        return FALSE;
+    OnGestureIntercepted();
+    return TRUE;
+}
+
+BOOL SPanel::OnTouchEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    if (!m_gesture.IsDown() && !m_bDragScrolling)
+        return FALSE;
+    LRESULT lRet = 0;
+    if (uMsg == WM_LBUTTONDOWN)
+        PrepareGesture();
+    // The very same detector / HandleMouseDrag used when the panel is hit
+    // directly: drag scroll, capture, release and fling live in one place.
+    BOOL bRet = HandleMouseDrag(uMsg, wParam, lParam, lRet);
+    if (uMsg == WM_LBUTTONUP || uMsg == WM_CANCELMODE)
+    {
+        m_gesture.Reset();
+        OnTouchGestureEnd();
+    }
+    return bRet;
+}
+
+void SPanel::OnCancelMode()
+{
+    // Sent by SwndContainerImpl when an ancestor intercepted the gesture, or
+    // by the platform when the gesture is aborted. Never start a fling here.
+    if (m_gesture.IsDown())
+        m_gesture.OnTouchEvent(WM_CANCELMODE, 0, 0);
+    EndRubberBandSel(TRUE);
+    CancelDragGesture();
+    ReleaseCapture();
 }
 
 BOOL SPanel::HandleMouseDrag(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lRet)
 {
     CPoint pt(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+    m_dwGestureFlags = (DWORD)wParam;
 
     // === Rubber band selection active: consume left button events ===
     if (m_bRubberBandActive)
     {
         if (uMsg == WM_MOUSEMOVE)
-        {
-            BOOL bAdd = (wParam & MK_CONTROL) != 0;
-            UpdateRubberBandSel(pt, bAdd);
-        }
+            UpdateRubberBandSel(pt, (wParam & MK_CONTROL) != 0);
         else if (uMsg == WM_LBUTTONUP)
-        {
             EndRubberBandSel(FALSE);
-            m_nLastMoveTime = 0;
-        }
-
-        // While banding, only consume messages related to the left button band
         if (uMsg == WM_MOUSEMOVE || uMsg == WM_LBUTTONUP)
             return TRUE;
         return FALSE;
     }
 
-    // === Drag scrolling active: consume left button events ===
+    // === A press while the fling animation runs stops the inertia. The press
+    // is still consumed (no item click), but it feeds the detector so a
+    // following drag goes through the very same touch slop / velocity path.
+    BOOL bFlingRunning = (m_pFlingAnimatorV && m_pFlingAnimatorV->isRunning()) || (m_pFlingAnimatorH && m_pFlingAnimatorH->isRunning());
+    if (bFlingRunning && uMsg == WM_LBUTTONDOWN)
+    {
+        StopFlingAnimation();
+        m_bDragPending = FALSE;
+        m_bDragScrolling = FALSE;
+        m_bGestureFling = FALSE;
+    }
+
+    // The legacy state machine only armed a gesture when a rubber band or a
+    // real scrollbar needed one. Keep that gate: otherwise every plain drag on
+    // a non-scrollable panel would swallow MOVE/UP once it moves 8px, and the
+    // derived classes would lose their own click / hover logic.
+    // Once a gesture is armed the gate must not be re-evaluated: a scrollbar
+    // can disappear while dragging, and the matching UP still has to be
+    // consumed instead of turning into a click.
+    if (!m_gesture.IsDown() && !m_bDragScrolling && !IsRubberBandSelEnabled() && !IsEnableDragMode())
+        return (uMsg == WM_LBUTTONDOWN && bFlingRunning) ? TRUE : FALSE;
+
+    if (uMsg == WM_LBUTTONDOWN)
+        PrepareGesture();
+
+    BOOL bRet = m_gesture.OnTouchEvent(uMsg, wParam, lParam);
+    if (uMsg == WM_LBUTTONDOWN && bFlingRunning)
+        return TRUE;
+    return bRet;
+}
+
+void SPanel::OnGestureDown(const CPoint &pt)
+{
+    m_ptDragStart = pt;
+    m_bGestureFling = FALSE;
+}
+
+void SPanel::OnGestureScroll(const CPoint &ptDown, const CPoint &ptCur, int dx, int dy)
+{
+    if (!m_bDragScrolling)
+    {
+        // First MOVE past the touch slop: decide once who owns this gesture.
+        BOOL bAdd = (m_dwGestureFlags & MK_CONTROL) != 0;
+        if (IsRubberBandSelEnabled())
+        {
+            if (StartRubberBandSel(ptDown, bAdd))
+            {
+                UpdateRubberBandSel(ptCur, bAdd);
+                // The band owns capture until its own LBUTTONUP. Leave the
+                // detector dragging so this MOVE is consumed (returns TRUE);
+                // the next DOWN feeds a fresh state anyway.
+                return;
+            }
+            // Refused by the item: abandon the gesture like the legacy path.
+            CancelDragGesture();
+            return;
+        }
+        // Both axes set: this panel owns the whole gesture, no axis is known yet.
+        if (!OnDragCancelCapture(CANCEL_REASON_SCROLL_H | CANCEL_REASON_SCROLL_V))
+        {
+            CancelDragGesture();
+            return;
+        }
+        m_bDragPending = FALSE;
+        m_bDragScrolling = TRUE;
+        SetCapture();
+        OnDragScrollStart();
+        return; // the threshold-crossing MOVE never scrolls (legacy behaviour)
+    }
+
+    float fVx = m_gesture.GetVelocityX();
+    float fVy = m_gesture.GetVelocityY();
+    if (dy != 0)
+        ScrollByDrag(TRUE, dy, fVy);
+    if (dx != 0)
+        ScrollByDrag(FALSE, dx, fVx);
+}
+
+void SPanel::OnGestureFling(float, float)
+{
+    m_bGestureFling = TRUE;
+}
+
+void SPanel::OnGestureUp(const CPoint &, float fVelocityX, float fVelocityY)
+{
     if (m_bDragScrolling)
     {
-        if (uMsg == WM_MOUSEMOVE)
-        {
-            int dx = 0, dy = 0;
-            if (m_ptDragLast == CPoint(0, 0))
-            {
-                m_ptDragLast = pt;
-                m_nLastMoveTime = 0;
-                m_fLastVelocityX = 0.0f;
-                m_fLastVelocityY = 0.0f;
-            }
-            else
-            {
-                dx = pt.x - m_ptDragLast.x;
-                dy = pt.y - m_ptDragLast.y;
-                m_ptDragLast = pt;
-
-                if (m_nLastMoveTime > 0)
-                {
-                    uint64_t now = GetTickCount64();
-                    uint64_t dt = now - m_nLastMoveTime;
-                    if (dt > 0)
-                    {
-                        m_fLastVelocityX = (float)dx / (float)dt;
-                        m_fLastVelocityY = (float)dy / (float)dt;
-                    }
-                }
-                m_nLastMoveTime = GetTickCount64();
-            }
-            if (dy != 0)
-                ScrollByDrag(TRUE, dy, m_fLastVelocityY);
-            if (dx != 0)
-                ScrollByDrag(FALSE, dx, m_fLastVelocityX);
-        }
-        else if (uMsg == WM_LBUTTONUP)
-        {
-            m_bDragScrolling = FALSE;
-            m_ptDragLast = CPoint(0, 0);
-
-            float fReleaseVX = 0.0f, fReleaseVY = 0.0f;
-            if (m_nLastMoveTime > 0)
-            {
-                uint64_t now = GetTickCount64();
-                if (now - m_nLastMoveTime < 100)
-                {
-                    fReleaseVX = m_fLastVelocityX;
-                    fReleaseVY = m_fLastVelocityY;
-                }
-            }
-
-            OnDragScrollEnd();
-            ReleaseCapture();
-
-            if (fabs(fReleaseVX) > 0.01f || fabs(fReleaseVY) > 0.01f)
-                StartFlingAnimation(fReleaseVX, fReleaseVY);
-            m_nLastMoveTime = 0;
-            return TRUE;
-        }
-
-        // During drag-scrolling, only consume messages related to left-button dragging
-        if (uMsg == WM_MOUSEMOVE || uMsg == WM_LBUTTONUP)
-            return TRUE;
-        return FALSE;
+        m_bDragScrolling = FALSE;
+        OnDragScrollEnd();
+        ReleaseCapture();
+        if (m_bGestureFling)
+            StartFlingAnimation(fVelocityX, fVelocityY);
     }
-
-    // === Fling animation running: consume left button events to stop fling ===
-    BOOL bFlingRunning = (m_pFlingAnimatorV && m_pFlingAnimatorV->isRunning()) || (m_pFlingAnimatorH && m_pFlingAnimatorH->isRunning());
-    if (bFlingRunning)
+    else if (m_bDragPending)
     {
-        if (uMsg == WM_LBUTTONDOWN)
-        {
-            StopFlingAnimation();
-        }
-        else if (uMsg == WM_MOUSEMOVE)
-        {
-            if (wParam & MK_LBUTTON)
-            {
-                StopFlingAnimation();
-                // Rubber band selection has priority over drag scroll / fling
-                if (IsRubberBandSelEnabled() && StartRubberBandSel(pt, (wParam & MK_CONTROL) != 0))
-                {
-                    return TRUE;
-                }
-                m_bDragPending = FALSE;
-                m_bDragScrolling = TRUE;
-                m_ptDragLast = pt;
-                m_ptDragStart = pt;
-                m_bDragStarted = TRUE;
-                m_nLastMoveTime = 0;
-                m_fLastVelocityX = 0.0f;
-                m_fLastVelocityY = 0.0f;
-                OnDragScrollStart();
-            }
-        }
-
-        // During fling, only consume messages related to the left button
-        if (uMsg == WM_LBUTTONDOWN || uMsg == WM_MOUSEMOVE)
-            return TRUE;
-        return FALSE;
+        m_bDragPending = FALSE;
+        ReleaseCapture();
     }
+    m_bGestureFling = FALSE;
+    m_dwGestureFlags = 0;
+}
 
-    // === Waiting for drag threshold ===
-    // m_ptDragStart was already set to the press point by StartDragPending;
-    // the 8px threshold and the rubber band origin both refer to that point.
-    if (m_bDragPending)
-    {
-        if (uMsg == WM_MOUSEMOVE)
-        {
-            int dx = abs(pt.x - m_ptDragStart.x);
-            int dy = abs(pt.y - m_ptDragStart.y);
-            if (dx > 8 || dy > 8)
-            {
-                // Rubber band selection has priority over drag scroll / fling
-                if (IsRubberBandSelEnabled())
-                {
-                    BOOL bAdd = (wParam & MK_CONTROL) != 0;
-                    if (StartRubberBandSel(m_ptDragStart, bAdd))
-                    {
-                        // the move that crossed the threshold also updates the band
-                        UpdateRubberBandSel(pt, bAdd);
-                        return TRUE;
-                    }
-                    // refused by the item: fall through like a refused drag scroll
-                    m_bDragPending = FALSE;
-                    m_bDragStarted = FALSE;
-                    return FALSE;
-                }
-                if (OnDragCancelCapture(CANCEL_REASON_SCROLL))
-                {
-                    m_bDragPending = FALSE;
-                    m_bDragScrolling = TRUE;
-                    m_ptDragLast = pt;
-                    m_nLastMoveTime = 0;
-                    m_fLastVelocityX = 0.0f;
-                    m_fLastVelocityY = 0.0f;
-                    SetCapture();
-                    OnDragScrollStart();
-                    return TRUE;
-                }
-                else
-                {
-                    m_bDragPending = FALSE;
-                    m_bDragStarted = FALSE;
-                    return FALSE;
-                }
-            }
-        }
-        else if (uMsg == WM_LBUTTONUP)
-        {
-            m_bDragPending = FALSE;
-            m_bDragStarted = FALSE;
-            ReleaseCapture();
-        }
-    }
-
-    return FALSE;
+void SPanel::OnGestureCancel()
+{
+    m_bDragScrolling = FALSE;
+    m_bDragPending = FALSE;
+    m_bGestureFling = FALSE;
+    EndRubberBandSel(TRUE);
+    ReleaseCapture();
 }
 
 void SPanel::ScrollByDrag(BOOL bVert, int delta, float fVelocity)
@@ -1265,13 +1330,28 @@ void SPanel::OnDragScrollEnd()
 
 BOOL SPanel::CancelCaptureMode(int reason)
 {
-    if (reason == CANCEL_REASON_SCROLL)
+    if (CANCEL_REASON_IS_SCROLL(reason))
     {
         // Rubber band selection (multi-select) has priority over scrolling:
         // refuse to cancel while banding, even if an outer container starts scrolling.
         if (m_bRubberBandActive)
             return FALSE;
-        if (HasScrollBar(TRUE) || HasScrollBar(FALSE))
+        // A rubber band can start along ANY axis. The container asks for
+        // cancellation during the probe phase of the very MOVE that crosses
+        // touchSlop, before OnGestureScroll() has set m_bRubberBandActive, so
+        // checking only the axis on which this panel can scroll would let an
+        // outer tabctrl steal a horizontal drag from a vertically scrolling,
+        // multi-select list. When rubber band is enabled, veto every takeover.
+        if (IsRubberBandSelEnabled())
+            return FALSE;
+        // Only veto when this panel can actually scroll along the direction the
+        // parent is taking over. Refusing a horizontal page switch merely because
+        // a vertical scrollbar is visible would make a tabCtrl unusable over a list.
+        // reason is a bitmask; both bits set means an axis-agnostic takeover, which
+        // must veto whenever either scrollbar is present (legacy untyped behaviour).
+        if ((reason & CANCEL_REASON_SCROLL_H) && HasScrollBar(FALSE))
+            return FALSE;
+        if ((reason & CANCEL_REASON_SCROLL_V) && HasScrollBar(TRUE))
             return FALSE;
     }
     // really cancelled: give up an in-progress rubber band
@@ -1300,17 +1380,16 @@ BOOL SPanel::StartRubberBandSel(const CPoint &pt, BOOL bAdd)
 {
     // Ask the view to release the captured item first; a refused item keeps
     // its own drag operation and the band will not start.
-    if (!OnDragCancelCapture(CANCEL_REASON_SCROLL))
+    // Both axes set: a rubber band can start along any axis.
+    if (!OnDragCancelCapture(CANCEL_REASON_SCROLL_H | CANCEL_REASON_SCROLL_V))
     {
         m_bDragPending = FALSE;
-        m_bDragStarted = FALSE;
         return FALSE;
     }
     OnDragClearItemCapture();
     // The band replaces the drag-pending state entirely; a leftover pending
     // flag would let button-less mouse moves re-trigger a band after mouse up.
     m_bDragPending = FALSE;
-    m_bDragStarted = FALSE;
     // Own the capture for the whole band session. Idempotent when the press
     // already captured us (drag-pending path); required for the fling path
     // where the press was consumed without capturing.
@@ -1444,7 +1523,6 @@ void SPanel::EndRubberBandSel(BOOL bCancelled)
         return;
     m_bRubberBandActive = FALSE;
     m_bDragPending = FALSE;
-    m_bDragStarted = FALSE;
     m_bBandTimerOn = FALSE;
     KillTimer(Timer_BandAutoScroll);
     m_nBandScrollV = 0;
@@ -1623,55 +1701,35 @@ BOOL SPanel::IsEnableDragMode() const
     return m_bItemDragScrollEnabled && (HasScrollBar(TRUE) || HasScrollBar(FALSE));
 }
 
-void SPanel::OnLButtonDown(UINT nFlags, CPoint pt)
+BOOL SPanel::OnLButtonDown(UINT nFlags, CPoint pt)
 {
     LRESULT lRet = 0;
     if (HandleMouseDrag(WM_LBUTTONDOWN, nFlags, MAKELPARAM(pt.x, pt.y), lRet))
-    {
-        return;
-    }
-    OnLButtonDownEx(nFlags, pt);
+        return TRUE;
+    __baseCls::OnLButtonDown(nFlags, pt);
     if (IsRubberBandSelEnabled() || IsEnableDragMode())
     {
         StartDragPending(pt);
     }
+    return FALSE;
 }
 
-void SPanel::OnMouseMove(UINT nFlags, CPoint pt)
+BOOL SPanel::OnMouseMove(UINT nFlags, CPoint pt)
 {
     LRESULT lRet = 0;
     if (HandleMouseDrag(WM_MOUSEMOVE, nFlags, MAKELPARAM(pt.x, pt.y), lRet))
-    {
-        return;
-    }
-
-    OnMouseMoveEx(nFlags, pt);
+        return TRUE;
+    __baseCls::OnMouseMove(nFlags, pt);
+    return FALSE;
 }
 
-void SPanel::OnLButtonUp(UINT nFlags, CPoint pt)
+BOOL SPanel::OnLButtonUp(UINT nFlags, CPoint pt)
 {
     LRESULT lRet = 0;
     if (HandleMouseDrag(WM_LBUTTONUP, nFlags, MAKELPARAM(pt.x, pt.y), lRet))
-    {
-        return;
-    }
-
-    OnLButtonUpEx(nFlags, pt);
-}
-
-void SPanel::OnLButtonDownEx(UINT nFlags, CPoint pt)
-{
-    __baseCls::OnLButtonDown(nFlags, pt);
-}
-
-void SPanel::OnMouseMoveEx(UINT nFlags, CPoint pt)
-{
-    __baseCls::OnMouseMove(nFlags, pt);
-}
-
-void SPanel::OnLButtonUpEx(UINT nFlags, CPoint pt)
-{
+        return TRUE;
     __baseCls::OnLButtonUp(nFlags, pt);
+    return FALSE;
 }
 
 SNSEND

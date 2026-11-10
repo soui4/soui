@@ -6,12 +6,28 @@ include_directories(${PROJECT_SOURCE_DIR}/soui-sys-resource)
 include_directories(${PROJECT_SOURCE_DIR}/controls.extend)
 include_directories(${PROJECT_SOURCE_DIR}/controls.extend/gridctrl)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+if(NOT CMAKE_SYSTEM_NAME MATCHES Windows)
+    include_directories(${PROJECT_SOURCE_DIR}/swinx/include)
+endif()
+
+# iOS 与 Android 共用 mobile/uires：窗口尺寸、控件 name 完全一致，
+# 只由 XML 布局决定手机竖屏的排布。
+if(CMAKE_SYSTEM_NAME MATCHES "iOS")
+    add_definitions(-D__MOBILE__)
+endif()
 
 file(GLOB_RECURSE CURRENT_HEADERS  *.h *.hpp)
 file(GLOB_RECURSE CURRENT_SRCS  *.cpp)
 file(GLOB_RECURSE CURRENT_SOUIS  *.xml *.idx *.ico *.png *.jpg *.bmp *.svg *.icns)
 file(GLOB_RECURSE CURRENT_RC *.rc *.rc2)
 file(GLOB_RECURSE GRIDCTRL_SRC ${PROJECT_SOURCE_DIR}/controls.extend/gridctrl/*.*)
+
+# android/ 与 ohos/ 是独立的移动端工程（各自带 CMakeLists、Gradle/Hvigor 构建缓存、
+# 平台资源），不能被桌面目标的递归 glob 扫进来：否则 .cxx 里的
+# CMakeCXXCompilerId.cpp 会混进 exe 源文件，导致 main 重复定义。
+list(FILTER CURRENT_HEADERS EXCLUDE REGEX "/(android|ohos|mobile)/")
+list(FILTER CURRENT_SRCS EXCLUDE REGEX "/(android|ohos|mobile)/")
+list(FILTER CURRENT_SOUIS EXCLUDE REGEX "/(android|ohos)/")
 
 source_group("Header Files" FILES ${CURRENT_HEADERS})
 source_group("Source Files" FILES ${CURRENT_SRCS})
@@ -107,6 +123,55 @@ if (CMAKE_SYSTEM_NAME MATCHES Windows)
         set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/${current_project}.rc"
             PROPERTIES COMPILE_DEFINITIONS "SOUI_EMBED_MANIFEST")
     endif ()
+elseif (CMAKE_SYSTEM_NAME MATCHES "iOS")
+    # ---- Info.plist 字段（plist.in 会把这些变量填进模板） ----
+    set(MACOSX_BUNDLE_BUNDLE_NAME          "FundHoldings")
+    set(MACOSX_BUNDLE_GUI_IDENTIFIER       "com.soui.fundholdings")
+    set(MACOSX_BUNDLE_INFO_STRING          "Fund Holdings Assistant")
+    set(MACOSX_BUNDLE_BUNDLE_VERSION       "1.0")
+    set(MACOSX_BUNDLE_SHORT_VERSION_STRING "1.0")
+    set(MACOSX_BUNDLE_LONG_VERSION_STRING  "1.0.0")
+    set(MACOSX_BUNDLE_COPYRIGHT            "Copyright (c) 2026 soui4")
+
+    set_macos_icon(${current_project}
+        ${CMAKE_CURRENT_SOURCE_DIR}/logo.icns
+        ${PROJECT_SOURCE_DIR}/__cmake/plist.in)
+
+    # iOS 和 Android 共享同一份移动版 uires（mobile/uires）
+    add_macos_res_folder(${current_project} ${CMAKE_CURRENT_SOURCE_DIR}/mobile/uires uires)
+
+    # iOS 真机不允许读取系统 CA 证书文件，libcurl(OpenSSL) 因此无法校验 https，
+    # 请求会以 CURLE_PEER_FAILED_VERIFICATION(60) 失败。把 Mozilla CA bundle 拷到
+    # .app 根目录（与可执行文件同级），httpclient 会按可执行文件目录查找 cacert.pem
+    # 并作为 CURLOPT_CAINFO 使用。
+    add_macos_res_file(${current_project}
+        ${CMAKE_CURRENT_SOURCE_DIR}/ca/cacert.pem
+        .)
+
+    # 系统资源：与 macOS 桌面版相同，从 .app 资源包加载
+    add_macos_res_folder(${current_project}
+        ${PROJECT_SOURCE_DIR}/soui-sys-resource-dark/theme_sys_res
+        soui-sys-resource-dark/theme_sys_res)
+    add_macos_res_file(${current_project}
+        ${PROJECT_SOURCE_DIR}/soui-sys-resource-dark/uires.idx
+        soui-sys-resource-dark)
+
+    set(TARGET_LIST
+        swinx
+        soui4
+        msftedit
+        utilities4
+        imgdecoder-stb
+        log4z
+        translator
+        render-skia
+        httpclient
+        taskloop
+    )
+    if (NOT SOUI_ENABLE_CORE_LIB)
+        list(APPEND TARGET_LIST "default")
+    endif ()
+    copy_targets_to_bundle(${current_project} "${TARGET_LIST}")
 elseif (CMAKE_SYSTEM_NAME MATCHES Darwin)
     # ---- Info.plist 字段（plist.in 会把这些变量填进模板） ----
     set(MACOSX_BUNDLE_BUNDLE_NAME          "FundHoldings")

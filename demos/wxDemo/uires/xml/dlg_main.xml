@@ -20,7 +20,11 @@
 				<imgbtn name="btn_favorites" pos="{0,[10,@32,@32" skin="skin_favorites" cursor="hand"/>
 			</caption>
 			
-			<tabctrl pos="[0,0,-0,-0" name="tab_main_opt" tabHeight="0">
+			<!-- 无 tab 头的纯页面容器：模拟移动端 fragment，左右拖动即可切换页面。
+		     页面内控件仍可正常点击/滚动；只有横向位移超过 dragThreshold 才接管手势。 -->
+		<tabctrl pos="[0,0,-0,-0" name="tab_main_opt" tabWidth="0" tabAlign="left"
+		         enableDragSwitch="1" dragThreshold="10dp" dragSwitchRatio="35"
+		         dragFling="1" dragCommitDuration="180">
 				<page title="page_msg">
 					<include src="LAYOUT:XML_PAGE_MSG" />
 				</page>

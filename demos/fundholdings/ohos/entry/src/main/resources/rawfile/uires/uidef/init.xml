@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UIDEF>
+  <unit defUnit="dp"/>
+  <caret color="rgb(255,0,0)" animate="true" fadeTime="20" showTime="10" interpolator="Accelerate"/>
+  <!-- ===================== 字体 =====================
+       默认字体用 <deffont>，命名字体用 <font src="values:font"/> 到值表里定义。
+       注意：<deffont> 必须存在。若只有 <font src=...>，SUiDef 会把第一个 <font>
+       节点当成 4.4 兼容写法去读它的属性，而该节点只有 src、没有 face/size，
+       默认字体就会被清空，界面回落成系统默认字体（宋体 12）。 -->
+  <!-- 未指定字体时的全局默认；Linux/macOS 下由 swinx 的 fontconfig 回落到本机 CJK 字体 -->
+  <deffont value="face:Microsoft YaHei UI,size:13">
+    <macos value="face:PingFang SC,size:13"/>
+    <linux value="face:Noto Sans CJK SC,size:13"/>
+  </deffont>
+
+  <!-- 命名字体表：f10/f11/f12… 数字为设计字号（dp），b 后缀为加粗 -->
+  <font src="values:font"/>
+  <string src="values:string" />
+  <skin src="values:skin"/>
+  <color src="values:color"/>
+
+  <style>
+    <!-- 标题栏按钮 -->
+    <class name="cls_capbtn" colorText="#77849a" colorTextHover="#e8edf5"
+           font="size:13" align="center" valign="middle" cursor="hand"/>
+    <class name="cls_capbtn_close" colorText="#77849a" colorTextHover="#ffffff"
+           font="size:14" align="center" valign="middle" cursor="hand"/>
+
+    <!-- 工具栏字段标签 -->
+    <class name="cls_field" colorText="#77849a" font="f10" align="left" valign="middle"/>
+
+    <!-- 输入框 -->
+    <class name="cls_edit" colorText="#e8edf5" colorBkgnd="#0c121c"
+           font="f12" align="left" valign="middle" cursor="ibeam"/>
+
+    <!-- 主按钮 -->
+    <class name="cls_btn_primary" colorText="#0b1119" colorTextPush="#0b1119"
+           font="f13b" align="center" valign="middle" cursor="hand"/>
+    <!-- 次按钮 -->
+    <class name="cls_btn_ghost" colorText="#aab6c8" colorTextHover="#e8edf5"
+           font="f12" align="center" valign="middle" cursor="hand"/>
+
+    <!-- 状态栏文本 -->
+    <class name="cls_status" colorText="#77849a" font="f11" align="left" valign="middle"/>
+
+    <!-- 状态栏署名链接（powered by soui5）：比状态文本更淡，仅 hover 提亮，
+         没有按钮边框/底色，避免像广告。 -->
+    <class name="cls_link_status" colorText="#5c6779" colorTextHover="#aab6c8"
+           font="f10" align="center" valign="middle" cursor="hand"/>
+  </style>
+
+  <objattr>
+    <edit class="cls_edit"/>
+    <!-- 所有 panel 派生控件（gridctrl / listctrl / treeview / scrollview / richedit …）
+         的滚动条统一换成暗色皮肤；控件里显式写 sbSkin 仍可单独覆盖。 -->
+    <div sbSkin="skin_scrollbar_dark"/>
+  </objattr>
+</UIDEF>

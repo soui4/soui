@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "SOUI for OpenHarmony fundholdings module"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "fundholdings-ohos entry"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "基金持仓"
+    }
+  ]
+}

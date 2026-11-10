@@ -211,7 +211,8 @@ void SImageKnob::OnLButtonUp(UINT nFlags, CPoint pt)
 
 BOOL SImageKnob::CancelCaptureMode(int reason)
 {
-	if (reason == CANCEL_REASON_SCROLL && m_state)
+	// The container may report an axis-specific scroll reason.
+	if (CANCEL_REASON_IS_SCROLL(reason) && m_state)
 		return FALSE;
 	return __baseCls::CancelCaptureMode(reason);
 }

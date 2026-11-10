@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="103" height="18" viewBox="0 0 103 18">
+  <!-- 展开状态 - 正常 -->
+  <g id="expand_normal" transform="translate(0, 0)">
+    <path d="M10,8 L6,12 L6,4 Z" stroke="#cccccc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="#666666"/>
+  </g>
+  <!-- 展开状态 - 悬停 -->
+  <g id="expand_hover" transform="translate(17, 0)">
+    <path d="M10,8 L6,12 L6,4 Z" stroke="#ffffff" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="#666666"/>
+  </g>
+  <!-- 展开状态 - 按下 -->
+  <g id="expand_pressed" transform="translate(34, 0)">
+    <path d="M10,8 L6,12 L6,4 Z" stroke="#cccccc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="#666666"/>
+  </g>
+
+  <!-- 折叠状态 - 正常 -->
+  <g id="collapse_normal" transform="translate(51, 0)">
+    <path d="M8,10 L12,6 L4,6 Z" stroke="#cccccc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="#666666"/>
+  </g>
+  <!-- 折叠状态 - 悬停 -->
+  <g id="collapse_hover" transform="translate(68, 0)">
+    <path d="M8,10 L12,6 L4,6 Z" stroke="#ffffff" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="#666666"/>
+  </g>
+  <!-- 折叠状态 - 按下 -->
+  <g id="collapse_pressed" transform="translate(85, 0)">
+    <path d="M8,10 L12,6 L4,6 Z" stroke="#cccccc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="#666666"/>
+  </g>
+</svg>

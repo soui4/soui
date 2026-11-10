@@ -13,7 +13,7 @@ include_directories(${SOUI_ROOT_DIR}/soui-sys-resource)
 include_directories(${SOUI_ROOT_DIR}/controls.extend)
 include_directories(${SOUI_ROOT_DIR}/third-part/Scintilla/include)
 include_directories(${SOUI_ROOT_DIR}/third-part/wke/include)
-file(GLOB_RECURSE CTRLS_SRC ${SOUI_ROOT_DIR}/controls.extend/*.*)
+file(GLOB_RECURSE CTRLS_SRC CONFIGURE_DEPENDS ${SOUI_ROOT_DIR}/controls.extend/*.*)
 
 # wasm 的 Scintilla 开关（根 CMakeLists 的 EMSCRIPTEN 分支定义，默认 ON）。
 # 关掉时三个源文件一起退出编译：SScintillaView（headless 控件）、ScintillaWnd

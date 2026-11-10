@@ -353,25 +353,13 @@ class SOUI_EXP SListBox : public TPanelProxy<IListBox> {
 
   protected:
     /**
-     * @brief Handle left mouse button down when not drag scrolling
-     * @param nFlags Flags
-     * @param pt Mouse coordinates
+     * @brief Ordinary message handlers. Chain to SPanel first so a drag /
+     *        fling / rubber band gesture keeps priority; when the base
+     *        returns TRUE the event was consumed and no click logic runs.
      */
-    void OnLButtonDownEx(UINT nFlags, CPoint pt) override;
-
-    /**
-     * @brief Handle mouse move when not drag scrolling
-     * @param nFlags Flags
-     * @param pt Mouse coordinates
-     */
-    void OnMouseMoveEx(UINT nFlags, CPoint pt) override;
-
-    /**
-     * @brief Handle left mouse button up when not drag scrolling
-     * @param nFlags Flags
-     * @param pt Mouse coordinates
-     */
-    void OnLButtonUpEx(UINT nFlags, CPoint pt) override;
+    void OnLButtonDown(UINT nFlags, CPoint pt);
+    void OnMouseMove(UINT nFlags, CPoint pt);
+    void OnLButtonUp(UINT nFlags, CPoint pt);
 
     BOOL IsEnableDragMode() const override;
 
@@ -426,6 +414,9 @@ class SOUI_EXP SListBox : public TPanelProxy<IListBox> {
         MSG_WM_MOUSELEAVE(OnMouseLeave)
         MSG_WM_DESTROY(OnDestroy)
         MSG_WM_SIZE(OnSize)
+        MSG_WM_LBUTTONDOWN(OnLButtonDown)
+        MSG_WM_MOUSEMOVE(OnMouseMove)
+        MSG_WM_LBUTTONUP(OnLButtonUp)
     SOUI_MSG_MAP_END()
 };
 

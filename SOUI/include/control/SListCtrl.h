@@ -666,25 +666,12 @@ class SOUI_EXP SListCtrl
 
   protected:
     /**
-     * @brief Handle left mouse button down when not drag scrolling
-     * @param nFlags Flags
-     * @param pt Mouse coordinates
+     * @brief Ordinary message handlers. Chain to SPanel first so a drag /
+     *        fling / rubber band gesture keeps priority; when the base
+     *        returns TRUE the event was consumed and no click logic runs.
      */
-    void OnLButtonDownEx(UINT nFlags, CPoint pt) override;
-
-    /**
-     * @brief Handle mouse move when not drag scrolling
-     * @param nFlags Flags
-     * @param pt Mouse coordinates
-     */
-    void OnMouseMoveEx(UINT nFlags, CPoint pt) override;
-
-    /**
-     * @brief Handle left mouse button up when not drag scrolling
-     * @param nFlags Flags
-     * @param pt Mouse coordinates
-     */
-    void OnLButtonUpEx(UINT nFlags, CPoint pt) override;
+    void OnLButtonDown(UINT nFlags, CPoint pt);
+    void OnMouseMove(UINT nFlags, CPoint pt);
 
     /**
      * @brief Checks whether rubber band selection is enabled (multi-selection on).
@@ -809,6 +796,8 @@ class SOUI_EXP SListCtrl
         MSG_WM_MOUSELEAVE(OnMouseLeave)
         MSG_WM_KILLFOCUS_EX(OnKillFocus)
         MSG_WM_KEYDOWN(OnKeyDown)
+        MSG_WM_LBUTTONDOWN(OnLButtonDown)
+        MSG_WM_MOUSEMOVE(OnMouseMove)
     SOUI_MSG_MAP_END()
 };
 

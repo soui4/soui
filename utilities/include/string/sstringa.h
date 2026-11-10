@@ -125,7 +125,7 @@ public:
     SStringA(const char* psz);
 
     /// @brief Destructor.
-    ~SStringA();
+    virtual ~SStringA();
 
 public:
     /// @brief Retrieves the length of the string.

@@ -1151,25 +1151,13 @@ class SOUI_EXP STreeCtrl
     virtual UINT WINAPI OnGetDlgCode() const OVERRIDE;
 
     /**
-     * @brief Handles left mouse button down when not drag scrolling.
-     * @param nFlags Flags associated with the mouse event.
-     * @param pt Mouse position.
+     * @brief Ordinary message handlers. Chain to SPanel first so a drag /
+     *        fling / rubber band gesture keeps priority; when the base
+     *        returns TRUE the event was consumed and no click logic runs.
      */
-    void OnLButtonDownEx(UINT nFlags, CPoint pt) override;
-
-    /**
-     * @brief Handles mouse move when not drag scrolling.
-     * @param nFlags Flags associated with the mouse event.
-     * @param pt Mouse position.
-     */
-    void OnMouseMoveEx(UINT nFlags, CPoint pt) override;
-
-    /**
-     * @brief Handles left mouse button up when not drag scrolling.
-     * @param nFlags Flags associated with the mouse event.
-     * @param pt Mouse position.
-     */
-    void OnLButtonUpEx(UINT nFlags, CPoint pt) override;
+    void OnLButtonDown(UINT nFlags, CPoint pt);
+    void OnMouseMove(UINT nFlags, CPoint pt);
+    void OnLButtonUp(UINT nFlags, CPoint pt);
 
     SOUI_MSG_MAP_BEGIN()
         MSG_WM_PAINT_EX(OnPaint)
@@ -1180,6 +1168,9 @@ class SOUI_EXP STreeCtrl
         MSG_WM_MOUSELEAVE(OnMouseLeave)
         MSG_WM_SIZE(OnSize)
         MSG_WM_KEYDOWN(OnKeyDown)
+        MSG_WM_LBUTTONDOWN(OnLButtonDown)
+        MSG_WM_MOUSEMOVE(OnMouseMove)
+        MSG_WM_LBUTTONUP(OnLButtonUp)
     SOUI_MSG_MAP_END()
 };
 

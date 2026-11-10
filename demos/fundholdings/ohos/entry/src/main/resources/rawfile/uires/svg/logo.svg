@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <!--
+    基金持仓 · 盘中估值助手 应用图标
+    画布 1024，主体内容 880x880 居中（四周留 72 透明边，兼顾 Windows 满画布观感与 macOS Big Sur 留白规范）
+    配色与程序界面一致：底板 #1b2637（深蓝黑卡片色）、走势面积/折线 #f0b429（主题金）、当前值 #ffd75e（亮金）
+    图形语义：一条 4 段折线由左下抬升至右上 + 下方极淡面积 = 净值分时走势；末端实心圆点 = 当前估算点位
+    无渐变、无 clipPath、无 filter，确保 nanosvg 渲染器完整支持
+  -->
+  <rect x="72" y="72" width="880" height="880" rx="196" fill="#1b2637"/>
+  <path d="M196,660 L400,524 L568,566 L748,336 L748,748 L196,748 Z"
+        fill="#2e2818"/>
+  <path d="M196,660 L400,524 L568,566 L748,336"
+        fill="none" stroke="#f0b429" stroke-width="96"
+        stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="748" cy="336" r="72" fill="#ffd75e"/>
+</svg>

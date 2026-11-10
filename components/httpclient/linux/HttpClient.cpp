@@ -1,8 +1,60 @@
 ﻿#include "HttpClient.h"
 #include <fstream>
 #include <sstream>
+#include <string>
+#include <stdlib.h>
+#include <unistd.h>
 #include "define.h"
+#ifdef __ANDROID__
+#include <android/log.h>
+#endif
+#ifdef __APPLE__
+#include <mach-o/dyld.h>
+#endif
 using namespace std;
+
+#ifndef __ANDROID__
+// libcurl 使用的默认 CA 来自 OpenSSL 编译期的 OPENSSLDIR（构建机上的 install 前缀），
+// 在移动设备和部分 Linux 发行版上并不存在，找不到证书时 https 会报
+// CURLE_PEER_FAILED_VERIFICATION(60)。这里按平台探测系统预置的证书 bundle。
+// Android 没有通用路径，由启动阶段（AndroidPlatformAPI::initSouiApp）把证书拼成
+// PEM 后写入 SOUI_CA_BUNDLE，因此不参与这里的探测。
+static const char * FindCaBundle()
+{
+    static const char * s_caBundles[] = {
+        "/etc/ssl/certs/cacert.pem",           // OpenHarmony 系统预置 CA
+        "/etc/ssl/certs/ca-certificates.crt",  // Debian/Ubuntu
+        "/etc/ssl/cert.pem",                   // macOS（iOS 模拟器走同一路径）
+        "/etc/pki/tls/cert.pem",               // RHEL/Fedora
+    };
+    for (size_t i = 0; i < sizeof(s_caBundles) / sizeof(s_caBundles[0]); ++i) {
+        if (access(s_caBundles[i], R_OK) == 0)
+            return s_caBundles[i];
+    }
+#ifdef __APPLE__
+    // iOS 真机没有可读的系统证书文件，需要把 cacert.pem 拷进 .app 根目录（与可执行文件同级），
+    // 这里按可执行文件所在目录查找。
+    static string s_strAppCa;
+    if (s_strAppCa.empty()) {
+        char szExe[1024];
+        uint32_t uSize = sizeof(szExe);
+        if (_NSGetExecutablePath(szExe, &uSize) != 0)
+            return NULL;
+        string strPath(szExe);
+        size_t nPos = strPath.find_last_of('/');
+        if (nPos == string::npos)
+            return NULL;
+        strPath.erase(nPos + 1);
+        strPath += "cacert.pem";
+        if (access(strPath.c_str(), R_OK) != 0)
+            return NULL;
+        s_strAppCa = strPath;
+    }
+    return s_strAppCa.c_str();
+#endif
+    return NULL;
+}
+#endif
 
 SNSBEGIN
 
@@ -27,6 +79,24 @@ BOOL CWinHttp::Init()
 
     // 初始化 CURL 指针
     curl = curl_easy_init();
+    if(curl)
+    {
+        // 必须显式指定 CA：libcurl 默认使用 OpenSSL 编译期写死的 OPENSSLDIR，
+        // 在移动设备/部分发行版上不存在，https 会因找不到证书报
+        // CURLE_PEER_FAILED_VERIFICATION(60)。
+        //   1) SOUI_CA_BUNDLE：平台层生成的 PEM（Android）
+        //   2) SSL_CERT_FILE：OpenSSL 环境变量约定
+        //   3) FindCaBundle()：系统预置证书 / Apple 应用包内的 cacert.pem
+        const char *pszCaBundle = getenv("SOUI_CA_BUNDLE");
+        if(!pszCaBundle || !pszCaBundle[0])
+            pszCaBundle = getenv("SSL_CERT_FILE");
+#ifndef __ANDROID__
+        if(!pszCaBundle || !pszCaBundle[0])
+            pszCaBundle = FindCaBundle();
+#endif
+        if(pszCaBundle && pszCaBundle[0])
+            curl_easy_setopt(curl, CURLOPT_CAINFO, pszCaBundle);
+    }
 
 	return curl!=NULL;
 }
@@ -223,6 +293,10 @@ BOOL CWinHttp::Request2(IStringA *out, LPCSTR lpUrl, RequestType type, LPVOID lp
     m_st  = DS_Start;
     // 执行下载操作
     res = curl_easy_perform(curl);
+#ifdef __ANDROID__
+    if(res != CURLE_OK)
+        __android_log_print(ANDROID_LOG_WARN, "httpclient", "curl error %d: %s url=%s", (int)res, curl_easy_strerror(res), lpUrl);
+#endif
     m_httpCode = -1;
     curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &m_httpCode);
     if(headers){

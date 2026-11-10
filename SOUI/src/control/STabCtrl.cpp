@@ -11,10 +11,15 @@ class STabSlider
     DEF_SOBJECT(SWindow, L"tabslider")
 
   public:
-    STabSlider(STabCtrl *pTabCtrl, int iFrom, int iTo)
+    STabSlider(STabCtrl *pTabCtrl, int iFrom, int iTo, BOOL bDragMode = FALSE)
         : m_pTabCtrl(pTabCtrl)
         , m_iFrom(iFrom)
         , m_iTo(iTo)
+        , m_bDragMode(bDragMode)
+        , m_fDragFraction(0.f)
+        , m_bCommitting(FALSE)
+        , m_fCommitFrom(0.f)
+        , m_fCommitTo(1.f)
     {
         SWindow::EnableAcc(FALSE);
         SASSERT(pTabCtrl);
@@ -74,7 +79,12 @@ class STabSlider
         // hide page from and page to
         pageFrom->SetVisible(FALSE);
         pageTo->SetVisible(FALSE);
-        pTabCtrl->m_aniSlider->start(GetContainer());
+        // In drag mode the finger position drives the transition instead of the
+        // animator; CommitDrag() starts it once the button is released.
+        if (!m_bDragMode)
+        {
+            pTabCtrl->m_aniSlider->start(GetContainer());
+        }
         SetVisible(TRUE, TRUE);
         SWindow::EnableAcc(TRUE);
     }
@@ -88,6 +98,46 @@ class STabSlider
     void Stop()
     {
         m_pTabCtrl->OnSliderFinish();
+    }
+
+    /** Drive the transition from the finger displacement (drag mode only). */
+    void SetDragFraction(float f)
+    {
+        if (!m_bDragMode)
+            return;
+        if (f < 0.f)
+            f = 0.f;
+        if (f > 1.f)
+            f = 1.f;
+        if (f != m_fDragFraction)
+        {
+            m_fDragFraction = f;
+            Invalidate();
+        }
+    }
+
+    float GetDragFraction() const
+    {
+        return m_fDragFraction;
+    }
+
+    /** Finish a drag: animate from the current fraction to 1 (switch) or 0 (snap back). */
+    void CommitDrag(BOOL bSwitch, long nDuration)
+    {
+        if (!m_bDragMode)
+            return;
+        m_bDragMode = FALSE;
+        m_fCommitFrom = m_fDragFraction;
+        m_fCommitTo = bSwitch ? 1.f : 0.f;
+        m_bCommitting = TRUE;
+        if (nDuration <= 0)
+        {
+            // No timeline needed (headless friendly): finish synchronously.
+            Stop();
+            return;
+        }
+        m_pTabCtrl->m_aniSlider->setDuration(nDuration);
+        m_pTabCtrl->m_aniSlider->start(GetContainer());
     }
 
   protected:
@@ -112,7 +162,16 @@ class STabSlider
     void OnPaint(IRenderTarget *pRT)
     {
         CRect rcWnd = GetClientRect();
-        float fraction = m_pTabCtrl->m_aniSlider->getAnimatedFraction();
+        float fraction = 0.f;
+        if (m_bDragMode)
+            fraction = m_fDragFraction;
+        else if (m_bCommitting)
+        {
+            float f = m_pTabCtrl->m_aniSlider->getAnimatedFraction();
+            fraction = m_fCommitFrom + (m_fCommitTo - m_fCommitFrom) * f;
+        }
+        else
+            fraction = m_pTabCtrl->m_aniSlider->getAnimatedFraction();
         if (m_pTabCtrl->m_nTabAlign == STabCtrl::AlignMiddle)
         {
             int nHeight = rcWnd.Height();
@@ -232,6 +291,11 @@ class STabSlider
     int m_iFrom, m_iTo;
     bool m_bVertical;
     STabCtrl *m_pTabCtrl;
+    BOOL m_bDragMode;      /**< TRUE while the finger position drives the transition */
+    float m_fDragFraction; /**< fraction supplied by SetDragFraction() */
+    BOOL m_bCommitting;    /**< TRUE while animating from m_fCommitFrom to m_fCommitTo */
+    float m_fCommitFrom;   /**< fraction at the moment the button was released */
+    float m_fCommitTo;     /**< 1 = switch page, 0 = snap back */
     SOUI_MSG_MAP_BEGIN()
         MSG_WM_PAINT_EX(OnPaint)
         MSG_WM_SIZE(OnSize)
@@ -253,6 +317,19 @@ STabCtrl::STabCtrl()
     , m_nTabAlign(AlignTop)
     , m_tabSlider(NULL)
     , m_txtDir(Text_Horz)
+    , m_bDragSwitchEnable(FALSE)
+    , m_nDragThreshold(8.f, dp)
+    , m_nDragSwitchRatio(35)
+    , m_bDragFlingEnable(TRUE)
+    , m_nDragCommitDuration(200)
+    , m_gesture(this)
+    , m_bDragArmed(FALSE)
+    , m_bDragSwitching(FALSE)
+    , m_bDragCommitting(FALSE)
+    , m_bDragFling(FALSE)
+    , m_nDragFrom(-1)
+    , m_nDragTo(-1)
+    , m_nDragSavedDuration(0)
 {
     m_ptText[0] = m_ptText[1] = SLayoutSize(-1.f, px);
     m_szTab[0] = m_szTab[1] = SLayoutSize(-1.f, px);
@@ -373,6 +450,57 @@ void STabCtrl::OnLButtonDown(UINT nFlags, CPoint point)
     {
         SetCurSel(iClickItem);
     }
+    // When this window itself is the hit target, the container's interception
+    // chain does not include us: drive the same detector from the message map.
+    m_bDragArmed = CanDragSwitch() && IsPointInPage(point);
+    if (m_bDragArmed)
+    {
+        PrepareGesture();
+        m_gesture.OnTouchEvent(WM_LBUTTONDOWN, nFlags, MAKELPARAM(point.x, point.y));
+    }
+    else
+    {
+        m_gesture.Reset();
+    }
+}
+
+void STabCtrl::OnLButtonUp(UINT nFlags, CPoint point)
+{
+    // Finish the drag before the base class releases capture: ReleaseCapture()
+    // fires OnCaptureChanged(FALSE), which cancels an in-progress drag.
+    if (m_bDragArmed)
+        m_gesture.OnTouchEvent(WM_LBUTTONUP, nFlags, MAKELPARAM(point.x, point.y));
+    m_bDragArmed = FALSE;
+    m_gesture.Reset();
+    __baseCls::OnLButtonUp(nFlags, point);
+}
+
+void STabCtrl::OnCaptureChanged(BOOL bCaptured)
+{
+    // Capture was taken away without an UP (focus loss, another window captured,
+    // scrollbar grabbed...). Drop the drag state, otherwise the live slider keeps
+    // both pages hidden until the next DOWN.
+    if (!bCaptured && m_bDragSwitching)
+        CancelDragSwitch();
+    if (!bCaptured)
+        m_bDragArmed = FALSE;
+    __baseCls::OnCaptureChanged(bCaptured);
+}
+
+void STabCtrl::OnShowWindow(BOOL bShow, UINT nStatus)
+{
+    __baseCls::OnShowWindow(bShow, nStatus);
+    // IsVisible(TRUE) also covers the ParentShow case, where bShow is TRUE but
+    // an ancestor just got hidden.
+    if (!IsVisible(TRUE) && m_bDragSwitching)
+        CancelDragSwitch();
+}
+
+void STabCtrl::OnEnable(BOOL bEnable, UINT nStatus)
+{
+    __baseCls::OnEnable(bEnable, nStatus);
+    if (IsDisabled(TRUE) && m_bDragSwitching)
+        CancelDragSwitch();
 }
 
 BOOL STabCtrl::RemoveItem(int nIndex, int nSelPage /**< =0 */)
@@ -419,6 +547,10 @@ void STabCtrl::RemoveAllItems(void)
 
 void STabCtrl::OnMouseMove(UINT nFlags, CPoint point)
 {
+    // While dragging, skip hover bookkeeping so tab items do not flicker under
+    // the finger and no hover events leak into the page switch.
+    if (m_bDragArmed && m_gesture.OnTouchEvent(WM_MOUSEMOVE, nFlags, MAKELPARAM(point.x, point.y)))
+        return;
     CRect rcItem;
     int nOldHover = m_nHoverTabItem;
     m_nHoverTabItem = -1;
@@ -520,16 +652,34 @@ IWindow *STabCtrl::GetPage(int iPage)
 
 void STabCtrl::OnSliderFinish()
 {
-    SASSERT(m_tabSlider);
+    // Clear the drag-commit state even when the slider is already gone (e.g. a
+    // subscriber re-entered SetCurSel() from EventTabSelChanged). Otherwise the
+    // next programmatic switch would keep the temporary drag commit duration.
+    if (m_bDragCommitting)
+    {
+        m_bDragCommitting = FALSE;
+        m_aniSlider->setDuration(m_nDragSavedDuration);
+    }
+    // A late animation callback (e.g. the page list was emptied while the
+    // commit animation was still running) must not touch a destroyed slider.
+    if (!m_tabSlider)
+        return;
     DestroyChild(m_tabSlider);
     m_tabSlider = NULL;
-    STabPage *pPage = m_lstPages[m_nCurrentPage];
-    SASSERT(pPage);
-    pPage->SetVisible(TRUE, TRUE);
+    if (m_nCurrentPage >= 0 && m_nCurrentPage < GetItemCount())
+    {
+        STabPage *pPage = m_lstPages[m_nCurrentPage];
+        SASSERT(pPage);
+        pPage->SetVisible(TRUE, TRUE);
+    }
 }
 
 BOOL STabCtrl::SetCurSel(int nIndex)
 {
+    // A programmatic/click selection must abort an in-progress drag first,
+    // otherwise the two transitions would fight over m_tabSlider.
+    if (m_bDragSwitching)
+        CancelDragSwitch();
     if (nIndex < 0 || nIndex > (int)GetItemCount() - 1 || (m_nCurrentPage == nIndex))
         return FALSE;
     int nOldPage = m_nCurrentPage;
@@ -669,6 +819,8 @@ int STabCtrl::InsertItem(SXmlNode xmlNode, int iInsert /**< =-1 */, BOOL bLoadin
 
     if (!bLoading)
     {
+        if (GetScale() != 100)
+            pChild->SDispatchMessage(UM_SETSCALE, GetScale(), 0);
         CRect rcPage;
         GetChildrenLayoutRect(&rcPage);
         pChild->Move(&rcPage);
@@ -1084,6 +1236,10 @@ HRESULT STabCtrl::OnLanguageChanged()
 
 void STabCtrl::OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer)
 {
+    // A gesture is bound to the container that owns the capture/timeline.
+    // Abort it before the container goes away.
+    if (m_bDragSwitching || m_bDragArmed)
+        CancelDragSwitch();
     if (m_aniSlider->isRunning())
         m_aniSlider->end();
     __baseCls::OnContainerChanged(pOldContainer, pNewContainer);
@@ -1122,6 +1278,259 @@ HRESULT STabCtrl::OnAttrTabAlign(const SStringW &strValue, BOOL bLoading)
         m_nTabAlign = nAlign;
         return S_FALSE;
     }
+}
+
+///////////////////////////////////////////////////////////////////////
+/** === Android ViewPager-style drag-to-switch implementation ===
+ * The container decides gesture ownership (OnInterceptTouchEvent), the shared
+ * SGestureDetector supplies touch slop / axis arbitration / velocity, and this
+ * class only maps the gesture to page selection and STabSlider's snapshots.
+ */
+
+BOOL STabCtrl::CanDragSwitch() const
+{
+    return m_bDragSwitchEnable && GetItemCount() > 1 && m_nCurrentPage >= 0;
+}
+
+BOOL STabCtrl::IsPointInPage(const CPoint &pt) const
+{
+    // Host coordinate system: GetChildrenLayoutRect() and the lParam delivered
+    // by SwndContainerImpl share it (TransformPointEx does not shift the origin).
+    CRect rcPage;
+    GetChildrenLayoutRect(&rcPage);
+    return rcPage.PtInRect(pt);
+}
+
+void STabCtrl::PrepareGesture()
+{
+    m_gesture.SetAxis(IsDragAxisVertical() ? SGestureDetector::AxisVertical : SGestureDetector::AxisHorizontal);
+    m_gesture.SetTouchSlop(m_nDragThreshold.toPixelSize(GetScale()));
+}
+
+BOOL STabCtrl::IsDragAxisVertical() const
+{
+    // Same axis as STabSlider::m_bVertical, so the transition follows the finger.
+    return m_nTabAlign == AlignLeft || m_nTabAlign == AlignRight;
+}
+
+int STabCtrl::GetTouchInterceptAxis() const
+{
+    // Declaring our own axis keeps CancelCaptureMode()'s reason correct even
+    // when the drag is diagonal or changes direction mid-gesture.
+    return IsDragAxisVertical() ? CANCEL_REASON_SCROLL_V : CANCEL_REASON_SCROLL_H;
+}
+
+int STabCtrl::GetDragPageSize() const
+{
+    CRect rcPage;
+    GetChildrenLayoutRect(&rcPage);
+    return IsDragAxisVertical() ? rcPage.Height() : rcPage.Width();
+}
+
+BOOL STabCtrl::OnInterceptTouchEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    if (!CanDragSwitch())
+        return FALSE;
+    if (uMsg == WM_LBUTTONDOWN)
+    {
+        // Never arm a gesture on the tab header: tapping a tab keeps its
+        // "select this page" behaviour.
+        m_bDragArmed = IsPointInPage(CPoint(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)));
+        if (m_bDragArmed)
+            PrepareGesture();
+        else
+            m_gesture.Reset();
+    }
+    if (!m_bDragArmed)
+        return FALSE;
+    if (!m_gesture.OnInterceptTouchEvent(uMsg, wParam, lParam))
+        return FALSE;
+    if (uMsg == WM_MOUSEMOVE)
+    {
+        // ViewPager's "canScroll at the edge" rule: a boundary drag must not be
+        // claimed here. Otherwise the container has already taken capture by the
+        // time StartDragSwitch() finds there is no neighbour page, and the whole
+        // gesture is swallowed with no visual feedback. Declining lets the next
+        // candidate outwards (an enclosing tabctrl) take it instead.
+        CPoint pt(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+        const CPoint &ptDown = m_gesture.GetDownPoint();
+        int nDelta = IsDragAxisVertical() ? (pt.y - ptDown.y) : (pt.x - ptDown.x);
+        // Same direction rule as StartDragSwitch(): left/up -> next, right/down -> previous.
+        int iTo = nDelta < 0 ? m_nCurrentPage + 1 : m_nCurrentPage - 1;
+        if (iTo < 0 || iTo >= GetItemCount())
+            return FALSE;
+    }
+    return TRUE;
+}
+
+BOOL STabCtrl::OnTouchEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    if (!CanDragSwitch() || !m_bDragArmed)
+        return FALSE;
+    BOOL bRet = m_gesture.OnTouchEvent(uMsg, wParam, lParam);
+    if (uMsg == WM_LBUTTONUP || uMsg == WM_CANCELMODE)
+    {
+        m_bDragArmed = FALSE;
+        m_gesture.Reset();
+    }
+    return bRet;
+}
+
+void STabCtrl::OnGestureScroll(const CPoint &ptDown, const CPoint &ptCur, int, int)
+{
+    if (!m_bDragSwitching)
+        StartDragSwitch(ptDown, ptCur);
+    if (m_bDragSwitching)
+        UpdateDragSwitch(ptDown, ptCur);
+}
+
+void STabCtrl::OnGestureFling(float, float)
+{
+    m_bDragFling = TRUE;
+}
+
+void STabCtrl::OnGestureUp(const CPoint &, float fVelocityX, float fVelocityY)
+{
+    EndDragSwitch(IsDragAxisVertical() ? fVelocityY : fVelocityX);
+}
+
+void STabCtrl::OnGestureCancel()
+{
+    CancelDragSwitch();
+}
+
+void STabCtrl::StartDragSwitch(const CPoint &ptDown, const CPoint &ptCur)
+{
+    m_nDragFrom = m_nCurrentPage;
+    int nDelta = IsDragAxisVertical() ? (ptCur.y - ptDown.y) : (ptCur.x - ptDown.x);
+    // Drag left/up -> next page, drag right/down -> previous page.
+    int iTo = nDelta < 0 ? m_nDragFrom + 1 : m_nDragFrom - 1;
+    if (iTo < 0 || iTo >= GetItemCount())
+        return; // boundary: no neighbour to reveal, leave the gesture inactive
+
+    // Capture ownership was already settled by SwndContainerImpl::DispatchTouchEvent
+    // (CancelCaptureMode + WM_CANCELMODE + SetCapture). Only visual setup remains.
+    if (m_aniSlider->isRunning())
+        m_aniSlider->end();
+    if (m_tabSlider)
+        m_tabSlider->Stop();
+
+    m_nDragSavedDuration = m_aniSlider->getDuration();
+    m_nDragTo = iTo;
+    m_bDragSwitching = TRUE;
+    m_bDragFling = FALSE;
+    m_tabSlider = new STabSlider(this, m_nDragFrom, iTo, TRUE);
+    UpdateDragSwitch(ptDown, ptCur);
+}
+
+void STabCtrl::UpdateDragSwitch(const CPoint &ptDown, const CPoint &ptCur)
+{
+    int nAxis = IsDragAxisVertical() ? (ptCur.y - ptDown.y) : (ptCur.x - ptDown.x);
+    // Progress is positive only while moving towards the target page.
+    int nProgress = (m_nDragTo > m_nDragFrom) ? -nAxis : nAxis;
+    if (nProgress < 0)
+        nProgress = 0;
+    int nPage = GetDragPageSize();
+    float f = nPage > 0 ? (float)nProgress / (float)nPage : 0.f;
+    if (f > 1.f)
+        f = 1.f;
+    if (m_tabSlider)
+        m_tabSlider->SetDragFraction(f);
+}
+
+void STabCtrl::EndDragSwitch(float fAxisVelocity)
+{
+    if (!m_bDragSwitching)
+    {
+        m_bDragFling = FALSE;
+        return;
+    }
+    m_bDragSwitching = FALSE;
+
+    float f = m_tabSlider ? m_tabSlider->GetDragFraction() : 0.f;
+    float fVelocity = (m_nDragTo > m_nDragFrom) ? -fAxisVelocity : fAxisVelocity;
+    int nRatio = m_nDragSwitchRatio;
+    if (nRatio < 1)
+        nRatio = 1;
+    if (nRatio > 100)
+        nRatio = 100;
+
+    // ViewPager.determineTargetPage(): distance ratio first, then fling velocity.
+    BOOL bSwitch = (f * 100.f >= (float)nRatio);
+    if (!bSwitch && m_bDragFlingEnable && m_bDragFling && fVelocity > 0.5f && f > 0.02f)
+        bSwitch = TRUE;
+
+    if (bSwitch)
+    {
+        EventTabSelChanging evt(this);
+        evt.bCancel = FALSE;
+        evt.uOldSel = m_nCurrentPage;
+        evt.uNewSel = m_nDragTo;
+        FireEvent(evt);
+        if (evt.bCancel)
+            bSwitch = FALSE;
+    }
+
+    int nOld = m_nCurrentPage;
+    if (bSwitch)
+    {
+        m_nCurrentPage = m_nDragTo;
+        UpdateChildrenPosition();
+        CRect rcItem;
+        GetItemRect(nOld, rcItem);
+        InvalidateRect(rcItem);
+        GetItemRect(m_nCurrentPage, rcItem);
+        InvalidateRect(rcItem);
+    }
+
+    if (m_tabSlider)
+    {
+        // OnSliderFinish() restores the original animator duration.
+        m_bDragCommitting = TRUE;
+        m_tabSlider->CommitDrag(bSwitch, m_nDragCommitDuration);
+    }
+    else if (m_bDragCommitting)
+    {
+        m_bDragCommitting = FALSE;
+        m_aniSlider->setDuration(m_nDragSavedDuration);
+    }
+
+    // SelectionChanged must be delivered AFTER the drag commit. Subscribers
+    // (e.g. fundholdings' three-page "swipe to next fund" container) re-enter
+    // SetCurSel() to reset the baseline page; firing the event earlier stops
+    // and destroys the drag slider before CommitDrag(), swallowing the
+    // follow-the-finger animation and leaving m_bDragCommitting inconsistent.
+    // This also matches SetCurSel()'s "build the slider, then notify" ordering.
+    if (bSwitch)
+    {
+        EventTabSelChanged evt2(this);
+        evt2.uNewSel = m_nCurrentPage;
+        evt2.uOldSel = nOld;
+        FireEvent(evt2);
+        accNotifyEvent(EVENT_OBJECT_SELECTION);
+    }
+    m_bDragFling = FALSE;
+    m_nDragFrom = -1;
+    m_nDragTo = -1;
+}
+
+void STabCtrl::CancelDragSwitch()
+{
+    m_bDragSwitching = FALSE;
+    m_bDragArmed = FALSE;
+    m_bDragFling = FALSE;
+    m_nDragFrom = -1;
+    m_nDragTo = -1;
+    m_gesture.Reset();
+    if (m_bDragCommitting)
+    {
+        m_bDragCommitting = FALSE;
+        m_aniSlider->setDuration(m_nDragSavedDuration);
+    }
+    if (m_aniSlider->isRunning())
+        m_aniSlider->end();
+    if (m_tabSlider)
+        m_tabSlider->Stop();
 }
 
 SNSEND

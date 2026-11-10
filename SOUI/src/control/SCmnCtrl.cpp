@@ -1833,9 +1833,48 @@ SKeyboardSpacer::SKeyboardSpacer()
 
 void SKeyboardSpacer::OnKeyboardHeight(int height)
 {
+    // 键盘高度是广播到整棵窗口树的。本控件构造时 m_bVisible=FALSE，加载时
+    // WM_SHOWWINDOW(ParentShow) 据此置 WndState_Invisible，IsVisible(TRUE) 恒为
+    // FALSE；只有业务层在目标 edit 获得焦点时 SetVisible(TRUE) 才激活本占位。
+    // 这样其它输入框（例如基金代码 edit_code）弹出的键盘不会把页面顶起来。
+    // 键盘收起(height==0)后自动回到未激活态，等下一次 EventSetFocus 再打开。
+    if (!IsVisible(TRUE))
+        return;
+    SSLOGI() << "OnKeyboardHeight, height=" << height;
+    if (height < 0)
+        height = 0;
+    SLayoutSize oldHei;
+    m_pLayoutParam->GetSpecifiedSize(Vert, &oldHei);
+    int nOldHei = oldHei.isSpecifiedSize() ? oldHei.toPixelSize(GetScale()) : 0;
+    int nDelta = height - nOldHei;
+    if (nDelta == 0)
+        return;
+    // Java 层上报的 imeHeight 已是物理像素，布局度量同样是物理像素，用 px 直接落值。
     SLayoutSize hei(height, px);
     m_pLayoutParam->SetSpecifiedSize(Vert, &hei);
-    GetParent()->RequestRelayout();
+
+    SWindow *pParent = GetParent();
+    if (!pParent)
+        return;
+    pParent->RequestRelayout();
+
+    IScrollView *pScrollView = NULL;
+    if (SUCCEEDED(pParent->QueryInterface(IID_IScrollView, (IObjRef **)&pScrollView)) && pScrollView)
+    {
+        pParent->UpdateLayout();
+        POINT ptOrigin = { 0, 0 };
+        pScrollView->GetViewOrigin(&ptOrigin);
+        ptOrigin.y += nDelta;
+        pScrollView->SetViewOrigin(ptOrigin);
+        pScrollView->Release();
+    }
+
+    // 高度归零后恢复未激活：后续键盘若由其它输入框唤起，本控件不再响应。
+    if (height == 0 && nOldHei > 0)
+    {
+        SetVisible(FALSE);
+        SSLOGI() << "OnKeyboardHeight, hide keyboard spacer";
+    }
 }
 
 SNSEND

@@ -1,10 +1,11 @@
-//stamp:01dd6deeff4022b8
+//stamp:01dd70045470d2d2
 /*<------------------------------------------------------------------------------------------------->*/
 #define DEFINE_UIRES(name, type, file_path)\
     name type file_path
 
 DEFINE_UIRES(XML_INIT,	UIDEF,	"uires/uidef/init.xml")
 DEFINE_UIRES(dlg_main,	LAYOUT,	"uires/layout/dlg_main.xml")
+DEFINE_UIRES(fund_detail,	LAYOUT,	"uires/layout/fund_detail.xml")
 DEFINE_UIRES(ICON_LOGO,	ICON,	"uires/image/logo.ico")
 DEFINE_UIRES(string,	values,	"uires/values/string.xml")
 DEFINE_UIRES(color,	values,	"uires/values/color.xml")

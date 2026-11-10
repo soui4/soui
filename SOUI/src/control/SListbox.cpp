@@ -495,9 +495,10 @@ BOOL SListBox::IsEnableDragMode() const
     return __baseCls::IsEnableDragMode();
 }
 
-void SListBox::OnLButtonDownEx(UINT nFlags, CPoint pt)
+void SListBox::OnLButtonDown(UINT nFlags, CPoint pt)
 {
-    __baseCls::OnLButtonDownEx(nFlags, pt);
+    if (__baseCls::OnLButtonDown(nFlags, pt))
+        return;
     if (!m_bHotTrack)
     {
         m_iHoverItem = HitTest(pt);
@@ -510,8 +511,10 @@ void SListBox::OnLButtonDownEx(UINT nFlags, CPoint pt)
     }
 }
 
-void SListBox::OnLButtonUpEx(UINT nFlags, CPoint pt)
+void SListBox::OnLButtonUp(UINT nFlags, CPoint pt)
 {
+    if (__baseCls::OnLButtonUp(nFlags, pt))
+        return;
     if (m_bHotTrack)
     {
         CPoint pt2(pt);
@@ -520,7 +523,6 @@ void SListBox::OnLButtonUpEx(UINT nFlags, CPoint pt)
             NotifySelChange(m_iSelItem, m_iHoverItem);
     }
     m_iClickItem = -1;
-    __baseCls::OnLButtonUpEx(nFlags, pt);
 }
 
 void SListBox::OnRButtonUp(UINT nFlags, CPoint pt)
@@ -545,9 +547,10 @@ void SListBox::OnLButtonDbClick(UINT nFlags, CPoint pt)
     FireEvent(evt2);
 }
 
-void SListBox::OnMouseMoveEx(UINT nFlags, CPoint pt)
+void SListBox::OnMouseMove(UINT nFlags, CPoint pt)
 {
-    __baseCls::OnMouseMoveEx(nFlags, pt);
+    if (__baseCls::OnMouseMove(nFlags, pt))
+        return;
     int nOldHover = m_iHoverItem;
     m_iHoverItem = HitTest(pt);
 

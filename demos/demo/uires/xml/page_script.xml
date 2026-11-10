@@ -84,7 +84,7 @@
   棋盘/格子 id 与界面名字约定见 test.lua 的 tank_* 函数。
 -->
 <tabctrl pos="0,0,-0,-0" tabWidth="100" tabAlign="left" curSel="3" animateSteps="20"
-         colorBkgnd="@color/clr_page_bg" colorText="@color/clr_title">
+         colorBkgnd="@color/clr_page_bg" colorText="@color/clr_title" enableDragSwitch="1">
   <page title="消消乐">
     <window pos="0,0,-0,-0" layout="hbox" padding="15,12,15,15" interval="12">
       <!-- 左侧信息卡片:标题 / SVG 功能按钮 / LED 计分区 / 玩法说明 -->

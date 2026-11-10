@@ -64,10 +64,26 @@ static void DrawStr(IRenderTarget *pRT, const SStringT &s, CRect rc, UINT fmt, I
                     COLORREF clr) {
     SAutoRefPtr<IRenderObj> oldFont;
     if (font) pRT->SelectObject(font, &oldFont);
+    // Skia 后端把 COLORREF 最高字节当 alpha：纯 RGB 值（alpha=0）会画成全透明，
+    // 而 GDI 后端忽略该字节，于是出现「桌面看得见、Android 上文字消失」。
+    // 统一补成不透明，避免非法 / 未带 alpha 的颜色值让文字隐身。
+    if (((clr >> 24) & 0xFF) == 0)
+        clr |= 0xFF000000;
     COLORREF oldClr = pRT->SetTextColor(clr);
     pRT->DrawText(s, s.GetLength(), &rc, fmt);
     pRT->SetTextColor(oldClr);
     if (font) pRT->SelectObject(oldFont, NULL);
+}
+
+// 量一段文字在指定字体下的宽度；用完把字体选回去，不污染 pRT 状态。
+static int MeasureW(IRenderTarget *pRT, IFontPtr font, const SStringT &s) {
+    if (s.IsEmpty()) return 0;
+    SAutoRefPtr<IRenderObj> oldFont;
+    if (font) pRT->SelectObject(font, &oldFont);
+    SIZE sz = {0, 0};
+    pRT->MeasureText(s, s.GetLength(), &sz);
+    if (font) pRT->SelectObject(oldFont, NULL);
+    return sz.cx;
 }
 
 // =============================================================== KPI 卡片
@@ -110,11 +126,10 @@ void SFundKpiCard::OnPaint(IRenderTarget *pRT) {
     CRect rcBody = rc;
     rcBody.DeflateRect(padX, SP(10, scale), padX, SP(9, scale));
 
-    // 顶部：小标题（左）+ 状态胶囊（右）
+    // 顶部：先给右上角状态胶囊留出位置，再画左侧小标题。
+    // 顺序不能反：以前标题先画满整行、胶囊再盖上去，窄卡片里标题会被盖住一半。
     CRect rcLabel = rcBody;
     rcLabel.bottom = rcLabel.top + SP(16, scale);
-    DrawStr(pRT, m_label, rcLabel, DT_LEFT | DT_SINGLELINE | DT_VCENTER,
-            UiFont(12, false, scale), kText3);
 
     if (!m_pill.IsEmpty()) {
         IFontPtr fPill = UiFont(11, false, scale);
@@ -131,6 +146,9 @@ void SFundKpiCard::OnPaint(IRenderTarget *pRT) {
         DrawStr(pRT, m_pill, rcPill, DT_CENTER | DT_SINGLELINE | DT_VCENTER, fPill, kText2);
         rcLabel.right = rcPill.left - SP(6, scale);
     }
+    // 剩余宽度放不下时尾省略，避免文字越过卡片右边界被硬裁断。
+    DrawStr(pRT, m_label, rcLabel, DT_LEFT | DT_SINGLELINE | DT_VCENTER | DT_END_ELLIPSIS,
+            UiFont(12, false, scale), kText3);
 
     if (m_bRing) {
         // 圆环画在右侧，主数值区让出右侧一块
@@ -170,11 +188,15 @@ void SFundKpiCard::OnPaint(IRenderTarget *pRT) {
     rcVal.bottom = valTop + SP(m_bHero ? 40 : 32, scale);
 
     SIZE szVal = {0, 0};
-    {
-        SAutoRefPtr<IRenderObj> oldFont;
-        pRT->SelectObject(fVal, &oldFont);
-        pRT->MeasureText(m_value, m_value.GetLength(), &szVal);
-        pRT->SelectObject(oldFont, NULL);
+    szVal.cx = MeasureW(pRT, fVal, m_value);
+    // 股票名是中文字串，21dp 粗体在手机三等分卡片里很容易超宽而被裁掉。
+    // 按实测宽度退一档字号，保证名称至少完整可见。
+    if (!m_value.IsEmpty() && szVal.cx > rcVal.Width() && rcVal.Width() > 0) {
+        IFontPtr fSmall = UiFont(m_bHero ? 21 : 15, true, scale);
+        if (fSmall) {
+            fVal = fSmall;
+            szVal.cx = MeasureW(pRT, fVal, m_value);
+        }
     }
     DrawStr(pRT, m_value, rcVal, DT_LEFT | DT_SINGLELINE | DT_VCENTER, fVal, m_valueClr);
 
@@ -189,7 +211,7 @@ void SFundKpiCard::OnPaint(IRenderTarget *pRT) {
     if (!m_sub.IsEmpty()) {
         CRect rcSub = rcBody;
         rcSub.top = rcBody.bottom - SP(16, scale);
-        DrawStr(pRT, m_sub, rcSub, DT_LEFT | DT_SINGLELINE | DT_VCENTER,
+        DrawStr(pRT, m_sub, rcSub, DT_LEFT | DT_SINGLELINE | DT_VCENTER | DT_END_ELLIPSIS,
                 UiFont(11, false, scale), kText3);
     }
 }
@@ -569,10 +591,10 @@ void SFundWatchTabs::StepScroll(int dir) {
     Invalidate();
 }
 
-// SPanel 的「非拖拽」扩展点：拖拽/fling 结束时 HandleMouseDrag 会直接吞掉
-// WM_LBUTTONUP，不会走到这里，因此甩动列表不会误触发选中/关闭。
-void SFundWatchTabs::OnLButtonUpEx(UINT nFlags, CPoint pt) {
-    __baseCls::OnLButtonUpEx(nFlags, pt);
+// 常规映射拦截：先链式调用 SPanel，拖拽/fling 吞掉 WM_LBUTTONUP 时直接返回，
+// 因此甩动列表不会误触发选中/关闭。
+void SFundWatchTabs::OnLButtonUp(UINT nFlags, CPoint pt) {
+    if (__baseCls::OnLButtonUp(nFlags, pt)) return;
     // 箭头优先于卡片：只滚一个元素，不改选中项、不触发 EnsureSelVisible。
     // 用「抬起位置」判定而不是按下位置，这样 fling 运行中那次按下被
     // HandleMouseDrag 吞掉（顺便 StopFlingAnimation）时，本次点击依然生效。
@@ -592,8 +614,8 @@ void SFundWatchTabs::OnLButtonUpEx(UINT nFlags, CPoint pt) {
     if (m_pListener) m_pListener->OnFundWatchSel(i);
 }
 
-void SFundWatchTabs::OnMouseMoveEx(UINT nFlags, CPoint pt) {
-    __baseCls::OnMouseMoveEx(nFlags, pt);
+void SFundWatchTabs::OnMouseMove(UINT nFlags, CPoint pt) {
+    if (__baseCls::OnMouseMove(nFlags, pt)) return;
     // 箭头浮在卡片之上，命中箭头时不要同时把底下那张卡标成 hover。
     const int arrow = HitArrow(pt);
     bool bClose = false;
@@ -832,6 +854,8 @@ void SFundTabs::OnPaint(IRenderTarget *pRT) {
 // 接口未返回名称时的兜底显示名。用 _T 宽字符串，避免窄字符串里的中文
 // 在 MSVC 下被按执行字符集(GBK)转码后与 UTF-8 解码不匹配。
 static const TCHAR *kIndexLabels[3] = {_T("上证指数"), _T("深证成指"), _T("创业板指")};
+// 窄屏简称：390dp 下每个格子只有 ~90dp，四字全称会和涨跌幅压在一起。
+static const TCHAR *kIndexShortLabels[3] = {_T("上证"), _T("深证"), _T("创业")};
 
 // 数值格式化：整数部分插入千分位；sign=true 时正数前补 "+"。
 static SStringT FmtIndexNum(double v, int dec, bool sign) {
@@ -883,27 +907,41 @@ void SFundIndexBar::OnPaint(IRenderTarget *pRT) {
     body.DeflateRect(SP(14, scale), SP(3, scale), SP(14, scale), SP(4, scale));
     if (body.IsRectEmpty()) return;
 
-    const int labelW = SP(82, scale);
-    const int noteW = SP(196, scale);
+    IFontPtr fTitle = UiFont(12, true, scale);
+    IFontPtr fName = UiFont(10, false, scale);
+    IFontPtr fPct = UiFont(11, true, scale);
+    IFontPtr fPrice = UiFont(15, true, scale);
+    IFontPtr fAmt = UiFont(10, false, scale);
+
+    // 标题区按「大盘速览」实测宽度自适应：手机窄屏不再白占 82dp，
+    // 宽屏也不会超过原设计值。尺寸统一用 SP 跟 scale 走，不依赖绝对像素阈值。
+    const int titleW = MeasureW(pRT, fTitle, SStringT(_T("大盘速览"))) + SP(10, scale);
+    const int labelW = titleW < SP(82, scale) ? titleW : SP(82, scale);
+    const int gap = SP(4, scale);
+    int noteW = SP(196, scale);
+    if (body.Width() < labelW + noteW + SP(120, scale)) noteW = 0;
 
     CRect rcLabel(body.left, body.top, body.left + labelW, body.bottom);
     DrawStr(pRT, _T("大盘速览"), rcLabel, DT_LEFT | DT_SINGLELINE | DT_VCENTER,
-            UiFont(12, true, scale), kAccent);
+            fTitle, kAccent);
 
-    CRect rcNote(body.right - noteW, body.top, body.right, body.bottom);
-    if (!m_note.IsEmpty())
+    if (noteW > 0 && !m_note.IsEmpty()) {
+        CRect rcNote(body.right - noteW, body.top, body.right, body.bottom);
         DrawStr(pRT, m_note, rcNote, DT_RIGHT | DT_SINGLELINE | DT_VCENTER,
                 UiFont(10, false, scale), kText3);
+    }
 
-    CRect rcGrid(body.left + labelW + SP(6, scale), body.top,
-                 body.right - noteW - SP(6, scale), body.bottom);
+    CRect rcGrid(body.left + labelW + gap, body.top,
+                 body.right - noteW - gap, body.bottom);
     if (rcGrid.Width() < SP(120, scale)) return;
 
     const int cells = 3;
     const int cellW = rcGrid.Width() / cells;
+    const int pad = SP(4, scale);
+    const int rowGap = SP(4, scale);
     for (int i = 0; i < cells; ++i) {
-        CRect c(rcGrid.left + i * cellW + SP(8, scale), rcGrid.top + SP(2, scale),
-                rcGrid.left + (i + 1) * cellW - SP(8, scale), rcGrid.bottom - SP(2, scale));
+        CRect c(rcGrid.left + i * cellW + pad, rcGrid.top + SP(2, scale),
+                rcGrid.left + (i + 1) * cellW - pad, rcGrid.bottom - SP(2, scale));
         if (c.IsRectEmpty()) continue;
 
         if (i > 0) {
@@ -920,21 +958,62 @@ void SFundIndexBar::OnPaint(IRenderTarget *pRT) {
         COLORREF clr = kText2;
         if (ok) clr = q->chgPct > 0 ? kUp : (q->chgPct < 0 ? kDown : kText2);
 
+        SStringT sPct = ok ? (FmtIndexNum(q->chgPct, 2, true) + SStringT(_T("%")))
+                           : SStringT(_T("—"));
+        SStringT sPrice = ok ? FmtIndexNum(q->price, 2, false) : SStringT(_T("—"));
+        SStringT sAmt = ok ? FmtIndexNum(q->chgAmt, 2, true) : SStringT();
+
         CRect r1(c.left, c.top, c.right, c.top + c.Height() / 2);
         CRect r2(c.left, r1.bottom, c.right, c.bottom);
 
-        DrawStr(pRT, name, r1, DT_LEFT | DT_SINGLELINE | DT_VCENTER, UiFont(10, false, scale),
-                kText3);
-        DrawStr(pRT, ok ? (FmtIndexNum(q->chgPct, 2, true) + SStringT(_T("%")))
-                        : SStringT(_T("—")),
-                r1, DT_RIGHT | DT_SINGLELINE | DT_VCENTER, UiFont(11, true, scale), clr);
-        DrawStr(pRT, ok ? FmtIndexNum(q->price, 2, false) : SStringT(_T("—")), r2,
-                DT_LEFT | DT_SINGLELINE | DT_VCENTER, UiFont(15, true, scale),
+        // 第一行：名称左 / 涨跌幅右。全称放不下先退两字简称，仍放不下
+        // 就只画涨跌幅；任何宽度下都不让两段文字叠在一起。
+        const int wPct = MeasureW(pRT, fPct, sPct);
+        if (MeasureW(pRT, fName, name) + wPct + rowGap > r1.Width())
+            name = SStringT(kIndexShortLabels[i]);
+        if (MeasureW(pRT, fName, name) + wPct + rowGap <= r1.Width()) {
+            DrawStr(pRT, name, r1, DT_LEFT | DT_SINGLELINE | DT_VCENTER, fName, kText3);
+            DrawStr(pRT, sPct, r1, DT_RIGHT | DT_SINGLELINE | DT_VCENTER, fPct, clr);
+        } else {
+            DrawStr(pRT, sPct, r1, DT_LEFT | DT_SINGLELINE | DT_VCENTER, fPct, clr);
+        }
+
+        // 第二行：点数为主，涨跌额只在确实放得下时才画。
+        DrawStr(pRT, sPrice, r2, DT_LEFT | DT_SINGLELINE | DT_VCENTER, fPrice,
                 ok ? kText : kText3);
-        if (ok)
-            DrawStr(pRT, FmtIndexNum(q->chgAmt, 2, true), r2,
-                    DT_RIGHT | DT_SINGLELINE | DT_VCENTER, UiFont(10, false, scale), clr);
+        if (!sAmt.IsEmpty() &&
+            MeasureW(pRT, fPrice, sPrice) + MeasureW(pRT, fAmt, sAmt) + rowGap <= r2.Width()) {
+            DrawStr(pRT, sAmt, r2, DT_RIGHT | DT_SINGLELINE | DT_VCENTER, fAmt, clr);
+        }
     }
+}
+
+// ============================================================== 竖向滚动容器
+BOOL SFundScroll::CanInterceptTouchGesture() const {
+    // 内容未超出视口时无需接管，避免吞掉子窗口的拖动行为。
+    return m_bItemDragScrollEnabled && CanScrollVertical();
+}
+
+SGestureDetector::Axis SFundScroll::GetGestureAxis() const {
+    // 只声明纵向轴：横向拖动必须留给外层/内层 tabctrl 切页。
+    // 拦截链与自身消息映射走同一个 detector，无需在两处重复设置。
+    return SGestureDetector::AxisVertical;
+}
+
+BOOL SFundScroll::CanScrollByGesture(const CPoint &) const {
+    // AxisVertical 已在共享 detector 里完成纵向主导判定，这里只确认内容溢出。
+    return CanScrollVertical();
+}
+
+int SFundScroll::GetTouchInterceptAxis() const {
+    // 让容器在取消子窗口手势时拿到正确原因：纵向滚动，不否决外层横向切页。
+    return CANCEL_REASON_SCROLL_V;
+}
+
+BOOL SFundScroll::CanScrollVertical() const {
+    SIZE szView = {0, 0};
+    GetViewSize(&szView);
+    return szView.cy > GetClientRect().Height();
 }
 
 // ============================================================== SOUI5 介绍页

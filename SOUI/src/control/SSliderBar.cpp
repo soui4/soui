@@ -226,7 +226,7 @@ void SSliderBar::OnLButtonUp(UINT nFlags, CPoint point)
 
 BOOL SSliderBar::CancelCaptureMode(int reason)
 {
-    if (reason == CANCEL_REASON_SCROLL && m_bDrag)
+    if (CANCEL_REASON_IS_SCROLL(reason) && m_bDrag)
         return FALSE;
     return __baseCls::CancelCaptureMode(reason);
 }

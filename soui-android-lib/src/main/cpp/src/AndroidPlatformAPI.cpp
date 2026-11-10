@@ -8,6 +8,9 @@
 #include <soui4android.h>
 #include <sys/stat.h>
 #include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <dirent.h>
 #define kLogTag "AndroidPlatformAPI"
 
 using namespace SNS;
@@ -22,6 +25,69 @@ namespace {
         if (env && env->ExceptionCheck()) {
             env->ExceptionDescribe();
             env->ExceptionClear();
+        }
+    }
+
+    // 把目录下的证书文件追加到 PEM bundle。
+    bool AppendCaDir(const char *pszDir, FILE *pOut) {
+        DIR *pDir = opendir(pszDir);
+        if (!pDir) return false;
+        bool bOk = false;
+        struct dirent *pEnt = NULL;
+        while ((pEnt = readdir(pDir)) != NULL) {
+            if (pEnt->d_name[0] == '.') continue;
+            char szPath[512];
+            snprintf(szPath, sizeof(szPath), "%s/%s", pszDir, pEnt->d_name);
+            FILE *pIn = fopen(szPath, "rb");
+            if (!pIn) continue;
+            char szBuf[8192];
+            size_t nRead = 0;
+            while ((nRead = fread(szBuf, 1, sizeof(szBuf), pIn)) > 0) {
+                fwrite(szBuf, 1, nRead, pOut);
+            }
+            fclose(pIn);
+            fputc('\n', pOut);
+            bOk = true;
+        }
+        closedir(pDir);
+        return bOk;
+    }
+
+    // Android 没有 OpenSSL 默认使用的 /etc/ssl/certs，系统根证书散落在
+    // /apex/com.android.conscrypt/cacerts（Android 14+）或 /system/etc/security/cacerts，
+    // 文件名是 Android 自己的哈希格式，libcurl 直接拿它当 CAPATH 查找不到，
+    // 表现为所有 https 请求返回 CURLE_PEER_FAILED_VERIFICATION(60)。
+    // 这里把证书拼成一个 PEM bundle，并通过 SOUI_CA_BUNDLE 告知 httpclient 用 CURLOPT_CAINFO。
+    void prepareCaBundle(const char *pszAppFilesDir) {
+        const char *pszEnv = getenv("SOUI_CA_BUNDLE");
+        if (pszEnv && pszEnv[0]) return;
+        if (!pszAppFilesDir || !pszAppFilesDir[0]) return;
+
+        std::string strBundle = pszAppFilesDir;
+        strBundle += "/cacert.pem";
+
+        struct stat st;
+        if (stat(strBundle.c_str(), &st) == 0 && st.st_size > 0) {
+            setenv("SOUI_CA_BUNDLE", strBundle.c_str(), 1);
+            SLOGI() << "ca bundle reused: " << strBundle.c_str();
+            return;
+        }
+
+        FILE *pOut = fopen(strBundle.c_str(), "wb");
+        if (!pOut) {
+            SLOGW() << "can't create ca bundle: " << strBundle.c_str();
+            return;
+        }
+        bool bOk = AppendCaDir("/apex/com.android.conscrypt/cacerts", pOut);
+        if (!bOk) bOk = AppendCaDir("/system/etc/security/cacerts", pOut);
+        fclose(pOut);
+
+        if (bOk) {
+            setenv("SOUI_CA_BUNDLE", strBundle.c_str(), 1);
+            SLOGI() << "ca bundle generated: " << strBundle.c_str();
+        } else {
+            remove(strBundle.c_str());
+            SLOGW() << "no system ca certs found on this device";
         }
     }
 }
@@ -801,6 +867,7 @@ bool AndroidPlatformAPI::initSouiApp(JNIEnv *env, jobject assetManagerJ, jstring
 
     const char* appFilesDir = env->GetStringUTFChars(appFilesDirJ, nullptr);
     SLOGI()<<"nativeInitSouiApp: AAssetManager*="<<assetMgr<<" filesDir="<<appFilesDir;
+    prepareCaBundle(appFilesDir);
     SASSERT(s_entry);
     BOOL ret = s_entry->InitApp(assetMgr,appFilesDir);
     env->ReleaseStringUTFChars(appFilesDirJ,appFilesDir);

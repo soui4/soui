@@ -1284,7 +1284,7 @@ void SRichEdit::OnSetFocus(SWND wndOld)
             SetSel((DWORD)MAKELONG(0, -1), TRUE);
     }
 
-    if (ES_PASSWORD & m_dwStyle || ES_NUMBER & m_dwStyle)
+    if (m_dwStyle & (ES_NUMBER|ES_PASSWORD|ES_READONLY))
     {
         GetContainer()->EnableIME(FALSE);
     }

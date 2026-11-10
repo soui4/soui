@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 基金详情页模板（桌面版）：一支基金一页。MainDlg::SyncFundPages 调用
+     STabCtrl::InsertItem(L"<include src='layout:fund_detail'/>")，框架加载本文件后
+     把「第一个元素节点」当作 STabPage 节点使用 —— 所以根节点必须叫 <page>，
+     写成 <include>/<window> 会静默返回 -1、一页都建不出来。
+     与 mobile / ohos 版是同一套布局模型：fund_swipe 一支基金一页，本模板内部的
+     pane_swipe 再用 tabctrl 承载三个面板，两端共用 STabSlider 连续换页动画。
+     控件名与 dlg_main.xml 时代完全一致，业务代码按「当前页根」查找控件。 -->
+<page layout="vbox">
+
+    <!-- ==================== KPI 卡片 ==================== -->
+    <window size="-2,96" layout="hbox" padding_left="16" padding_right="16" padding_top="6">
+      <fundkpi name="kpi_hero" size="0,-2" weight="24"/>
+      <fundkpi name="kpi_nav" size="0,-2" weight="16" extend_left="10"/>
+      <fundkpi name="kpi_cover" size="0,-2" weight="18" extend_left="10"/>
+      <fundkpi name="kpi_pull" size="0,-2" weight="21" extend_left="10"/>
+      <fundkpi name="kpi_drag" size="0,-2" weight="21" extend_left="10"/>
+    </window>
+
+    <!-- ==================== 走势 + 贡献度 ==================== -->
+    <window size="-2,224" layout="hbox" padding_left="16" padding_right="16" padding_top="10">
+      <window size="0,-2" weight="60" skin="skin_card" layout="vbox" padding="14,10,14,8">
+        <window size="-2,22" layout="hbox">
+          <text text="估算分时走势" font="f13b" colorText="#e8edf5" size="-1,-2" gravity="center"/>
+          <text name="txt_chart_sub" text="—" font="f11" colorText="#77849a" size="-1,-2"
+                extend_left="10" gravity="center"/>
+          <window size="0,0" weight="1"/>
+          <text text="估算涨跌幅" font="f11" colorText="#ff5c5c" size="-1,-2" gravity="center"/>
+          <text text="09:30–11:30 / 13:00–15:00" font="f10" colorText="#77849a" size="-1,-2"
+                extend_left="12" gravity="center"/>
+        </window>
+        <fundspark name="chart_est" size="-2,0" weight="1" extend_top="6"/>
+      </window>
+
+      <window size="0,-2" weight="40" skin="skin_card" layout="vbox" padding="14,10,14,8"
+              extend_left="10">
+        <window size="-2,22" layout="hbox">
+          <text text="贡献度分解" font="f13b" colorText="#e8edf5" size="-1,-2" gravity="center"/>
+          <text text="按 |贡献| 排序" font="f11" colorText="#77849a" size="-1,-2"
+                extend_left="10" gravity="center"/>
+        </window>
+        <fundcontrib name="contrib_list" size="-2,0" weight="1" extend_top="8"/>
+      </window>
+    </window>
+
+    <!-- ==================== 表格区 ====================
+         weight=1 吃掉剩余高度；三个面板由 pane_swipe(tabctrl) 承载，
+         拖动切页与基金切换共用 STabSlider 的连续过渡动画。 -->
+    <window size="-2,0" weight="1" skin="skin_card" layout="vbox" padding="12,8,12,10"
+            margin="16,10,16,10">
+      <window size="-2,38" layout="hbox">
+        <fundtabs name="tabs" size="340,-2" cursor="hand"/>
+        <window size="0,0" weight="1"/>
+        <edit name="edit_filter" cueText="筛选代码 / 名称" cueColor="#5c6779" size="150,30"
+              gravity="center"/>
+        <button name="btn_filter" text="筛选" skin="skin_btn_ghost" size="58,30"
+                class="cls_btn_ghost" extend_left="6" gravity="center"/>
+        <button name="btn_reset" text="重置" skin="skin_btn_ghost" size="58,30"
+                class="cls_btn_ghost" extend_left="6" gravity="center"/>
+        <button name="btn_log_clear" text="清空日志" skin="skin_btn_ghost" size="78,30"
+                class="cls_btn_ghost" extend_left="6" gravity="center" show="0"/>
+      </window>
+
+      <tabctrl name="pane_swipe" size="-2,0" weight="1" extend_top="6"
+               tabWidth="0" tabHeight="0" enableDragSwitch="1"
+               dragThreshold="8" dragSwitchRatio="35" dragFling="1" dragCommitDuration="200">
+        <page title="持仓变化表">
+          <window name="pane_change" pos="0,0,-2,-2">
+            <gridctrl name="grid_holdings" pos="0,0,-2,-2"
+                      rowCount="1" colCount="17" fixedRows="1" fixedCols="0"
+                      defRowHeight="30" defColWidth="90"
+                      gridLines="3" gridLineColor="#1c2534" gridBkColor="#121a26"
+                      font="f12" colorText="#aab6c8" editable="0">
+              <columns>
+                <col key="lp_pct" title="最新占净值%" width="106" align="right"/>
+                <col key="code" title="代码" width="84" align="left"/>
+                <col key="name" title="名称" width="108" align="left"/>
+                <col key="q1_pct" title="Q1占净值%" width="92" align="right"/>
+                <col key="q2_pct" title="Q2占净值%" width="92" align="right"/>
+                <col key="q3_pct" title="Q3占净值%" width="92" align="right"/>
+                <col key="q1_sh" title="Q1持股(万)" width="100" align="right"/>
+                <col key="q2_sh" title="Q2持股(万)" width="100" align="right"/>
+                <col key="q3_sh" title="Q3持股(万)" width="100" align="right"/>
+                <col key="q1_mv" title="Q1市值(万)" width="100" align="right"/>
+                <col key="q2_mv" title="Q2市值(万)" width="100" align="right"/>
+                <col key="q3_mv" title="Q3市值(万)" width="100" align="right"/>
+                <col key="pct_chg" title="占净值Δ(Q3-Q1)" width="118" align="right"/>
+                <col key="sh_chg" title="持股Δ(Q3-Q1)" width="112" align="right"/>
+                <col key="mv_chg" title="市值Δ(Q3-Q1)" width="112" align="right"/>
+                <col key="quarters" title="持有季度" width="96" align="left"/>
+                <col key="tag" title="变动标记" width="120" align="left"/>
+              </columns>
+            </gridctrl>
+          </window>
+        </page>
+        <page title="估值明细">
+          <window name="pane_est" pos="0,0,-2,-2">
+            <gridctrl name="grid_est" pos="0,0,-2,-2"
+                      rowCount="1" colCount="6" fixedRows="1" fixedCols="0"
+                      defRowHeight="30" defColWidth="110"
+                      gridLines="3" gridLineColor="#1c2534" gridBkColor="#121a26"
+                      font="f12" colorText="#aab6c8" editable="0">
+              <columns>
+                <col key="code" title="代码" weight="12" align="left"/>
+                <col key="name" title="名称" weight="26" align="left"/>
+                <col key="weight" title="权重%" weight="14" align="right"/>
+                <col key="price" title="现价" weight="14" align="right"/>
+                <col key="chg_pct" title="涨跌幅%" weight="16" align="right"/>
+                <col key="contrib" title="贡献pp" weight="18" align="right"/>
+              </columns>
+            </gridctrl>
+          </window>
+        </page>
+        <page title="请求日志">
+          <window name="pane_log" pos="0,0,-2,-2" colorBkgnd="#0b1119">
+            <richedit name="re_log" pos="10,8,-10,-8" multiLines="1" readonly="1"
+                      vscrollBar="1" autoVScroll="1" wordWrap="1" hscrollBar="0" wantReturn="0"
+                      enableDragdrop="0" colorBkgnd="#0b1119" colorText="#8b98ab" font="mono11"/>
+          </window>
+        </page>
+      </tabctrl>
+    </window>
+</page>

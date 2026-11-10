@@ -13,6 +13,7 @@
 #define __STABCTRL__H__
 
 #include <core/SWnd.h>
+#include <core/SGestureDetector.h>
 #include <helper/SplitString.h>
 #include <proxy/SWindowProxy.h>
 #include <interface/SCtrls-i.h>
@@ -115,7 +116,9 @@ class STabSlider;
  *
  * This class represents a tab control that can manage multiple tab pages with various customization options.
  */
-class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
+class SOUI_EXP STabCtrl
+    : public TWindowProxy<ITabCtrl>
+    , public IGestureListener {
     friend class STabSlider;
 #ifdef SOUI_ENABLE_ACC
     /** Access the protected GetItemRect (tab header item rectangle) to build ACC virtual children. */
@@ -156,6 +159,27 @@ class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
         Text_Vert,
     } m_txtDir;
     SAutoRefPtr<SFloatAnimator> m_aniSlider;
+
+    /** === Android ViewPager-style drag-to-switch page ===
+     * Enabled by enableDragSwitch. The container's touch interception chain
+     * (SWindow::OnInterceptTouchEvent / OnTouchEvent) decides gesture ownership;
+     * SGestureDetector supplies touch slop, axis arbitration and velocity.
+     * STabSlider is driven by the finger instead of an animator while dragging.
+     */
+    BOOL m_bDragSwitchEnable;     /**< enableDragSwitch, default FALSE */
+    SLayoutSize m_nDragThreshold; /**< dragThreshold, default 8dp */
+    int m_nDragSwitchRatio;       /**< dragSwitchRatio in percent, default 35 */
+    BOOL m_bDragFlingEnable;      /**< dragFling: allow velocity to commit, default TRUE */
+    int m_nDragCommitDuration;    /**< dragCommitDuration in ms, 0 = finish immediately */
+
+    SGestureDetector m_gesture; /**< GestureDetector + VelocityTracker equivalent */
+    BOOL m_bDragArmed;          /**< DOWN landed in the page area and drag is enabled */
+    BOOL m_bDragSwitching;      /**< drag gesture in progress */
+    BOOL m_bDragCommitting;     /**< commit animation started, restore animator duration on finish */
+    BOOL m_bDragFling;          /**< GestureDetector reported an onFling for this gesture */
+    int m_nDragFrom;            /**< source page of the current drag */
+    int m_nDragTo;              /**< target page of the current drag (-1 = boundary) */
+    long m_nDragSavedDuration;  /**< animator duration before a drag commit */
 
   public:
     /**
@@ -362,6 +386,32 @@ class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
 
     void OnSliderFinish();
 
+    /** SWindow touch hooks: DOWN initializes the detector, MOVE decides whether
+     *  this container takes over the gesture, OnTouchEvent owns it afterwards. */
+    virtual BOOL OnInterceptTouchEvent(UINT uMsg, WPARAM wParam, LPARAM lParam);
+    virtual BOOL OnTouchEvent(UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+    /** The container uses this axis as the CancelCaptureMode() reason, so a
+     *  vertical tabctrl never vetoes a horizontal list on the child below. */
+    virtual int GetTouchInterceptAxis() const;
+
+    /** IGestureListener: only gesture decisions, no message plumbing. */
+    virtual void OnGestureScroll(const CPoint &ptDown, const CPoint &ptCur, int dx, int dy);
+    virtual void OnGestureFling(float fVelocityX, float fVelocityY);
+    virtual void OnGestureUp(const CPoint &pt, float fVelocityX, float fVelocityY);
+    virtual void OnGestureCancel();
+
+    /** Drag-to-switch helpers. */
+    BOOL CanDragSwitch() const;
+    BOOL IsPointInPage(const CPoint &pt) const;
+    void PrepareGesture();
+    BOOL IsDragAxisVertical() const;
+    int GetDragPageSize() const;
+    void StartDragSwitch(const CPoint &ptDown, const CPoint &ptCur);
+    void UpdateDragSwitch(const CPoint &ptDown, const CPoint &ptCur);
+    void EndDragSwitch(float fAxisVelocity);
+    void CancelDragSwitch();
+
   protected:
     /**
      * @brief Outputs text vertically.
@@ -422,6 +472,11 @@ class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
     }
 
     /**
+     * @brief Handles the left mouse button up event (finishes a drag gesture).
+     */
+    void OnLButtonUp(UINT nFlags, CPoint point);
+
+    /**
      * @brief Handles the key down event.
      * @param nChar Virtual key code of the key.
      * @param nRepCnt Repeat count for the key.
@@ -434,13 +489,32 @@ class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
      */
     void OnDestroy();
 
+    /**
+     * @brief Cancels an in-progress page drag when the capture is lost.
+     * @param bCaptured TRUE when this window just got the capture.
+     */
+    virtual void OnCaptureChanged(BOOL bCaptured);
+
+    /**
+     * @brief Cancels an in-progress page drag when the control gets hidden.
+     */
+    void OnShowWindow(BOOL bShow, UINT nStatus);
+
+    /**
+     * @brief Cancels an in-progress page drag when the control gets disabled.
+     */
+    void OnEnable(BOOL bEnable, UINT nStatus);
+
     SOUI_MSG_MAP_BEGIN()
         MSG_WM_PAINT_EX(OnPaint)
         MSG_WM_DESTROY(OnDestroy)
         MSG_WM_LBUTTONDOWN(OnLButtonDown)
         MSG_WM_MOUSEMOVE(OnMouseMove)
+        MSG_WM_LBUTTONUP(OnLButtonUp)
         MSG_WM_MOUSELEAVE(OnMouseLeave)
         MSG_WM_KEYDOWN(OnKeyDown)
+        MSG_WM_SHOWWINDOW(OnShowWindow)
+        MSG_WM_ENABLE_EX(OnEnable)
     SOUI_MSG_MAP_END()
 
     HRESULT OnAttrTabAlign(const SStringW &strValue, BOOL bLoading);
@@ -468,6 +542,11 @@ class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
             ATTR_ENUM_VALUE(L"vertical", Text_Vert)   /**< Vertical text direction. */
         ATTR_ENUM_END(m_txtDir)
         ATTR_CHAIN_PTR_PREFIX(m_aniSlider, 0, SAttrChainPrefix::SLIDER) /**< Chain attributes to slider animator. */
+        ATTR_BOOL(L"enableDragSwitch", m_bDragSwitchEnable, FALSE)      /**< Enable drag-to-switch-page gesture. */
+        ATTR_LAYOUTSIZE(L"dragThreshold", m_nDragThreshold, FALSE)      /**< Drag threshold along the active axis. */
+        ATTR_INT(L"dragSwitchRatio", m_nDragSwitchRatio, FALSE)         /**< Commit ratio in percent of page size. */
+        ATTR_BOOL(L"dragFling", m_bDragFlingEnable, FALSE)              /**< Allow release velocity to commit a switch. */
+        ATTR_INT(L"dragCommitDuration", m_nDragCommitDuration, FALSE)   /**< Commit/back animation duration in ms, 0 = immediate. */
     SOUI_ATTRS_END()
 };
 

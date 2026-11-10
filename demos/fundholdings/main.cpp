@@ -11,6 +11,10 @@
 #define INIT_R_DATA
 #include "res/resource.h"
 
+#if defined(__IOS__)
+#include <ios_entry.h>
+#endif
+
 #define kLogTag "fundhold"
 
 // exe 所在目录：cmake 的 add_app_res_folder 会把 uires 拷到这里
@@ -95,13 +99,20 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
     app.RegisterWindowClass<SFundWatchTabs>(); // <fundwatchtabs>
     app.RegisterWindowClass<SFundIndexBar>(); // <fundindexbar> 大盘三大指数速览
     app.RegisterWindowClass<SFundAbout>();    // <fundabout> SOUI5 介绍页
+    app.RegisterWindowClass<SFundScroll>();   // <fundscroll> 移动版竖向滚动容器
 
     {
         CMainDlg dlgMain;
         dlgMain.Create(GetActiveWindow());
         dlgMain.SendMessage(WM_INITDIALOG);
         dlgMain.CenterWindow(dlgMain.m_hWnd);
+#ifdef __IOS__
+        // 手机只有一个全屏窗口，直接最大化；
+        // 布局本身由 mobile/uires 的 dlg_main.xml 决定，这里不做 UI 逻辑分支。
+        dlgMain.ShowWindow(SW_MAXIMIZE);
+#else
         dlgMain.ShowWindow(SW_SHOWNORMAL);
+#endif
         nRet = app.Run(dlgMain.m_hWnd);
 
         // 窗口已经销毁，此时再等后台线程收尾，用户看不到任何卡顿。
@@ -114,7 +125,11 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
     return nRet;
 }
 
-#if !defined(_WIN32) || defined(__MINGW32__)
+#if defined(__IOS__)
+int main(int argc, char **argv) {
+    return swinx_ios_entry(argc, argv, _tWinMain);
+}
+#elif !defined(_WIN32) || defined(__MINGW32__)
 int main(int argc, char** argv) {
     HINSTANCE hInst = GetModuleHandle(NULL);
     return _tWinMain(hInst, 0, NULL, SW_SHOWNORMAL);

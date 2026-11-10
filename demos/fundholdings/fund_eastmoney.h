@@ -1,4 +1,8 @@
 ﻿#pragma once
+#include <string>
+#include <vector>
+#include <interface/SHttpClient-i.h>
+
 // 基金持仓单条记录（等价于 akshare fund_portfolio_hold_em 返回的一行）
 struct FundHolding {
     std::string quarter;  // 季度标签，如 "2026Q3"（纯 ASCII，仅供日志/展示）

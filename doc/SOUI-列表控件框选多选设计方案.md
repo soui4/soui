@@ -45,7 +45,7 @@ SPanel（框架层，不认识"条目"）
 ### 2.3 与 fling 的冲突裁决
 
 - **主动优先**：上述 3、4 两处，框选判定先于滚动分支。
-- **被动拒绝**：`SPanel::CancelCaptureMode(CANCEL_REASON_SCROLL)` 在框选中返回 `FALSE`，外层容器开始滚动时无法抢走 capture。
+- **被动拒绝**：`SPanel::CancelCaptureMode()` 收到任意滚动 reason（`CANCEL_REASON_SCROLL_H` / `_V` 或其按位或组合）时，在框选中返回 `FALSE`，外层容器开始滚动时无法抢走 capture。
 - **ESC 取消**：框选启动时 `SetFocus()` 保证键盘可达；`SPanel::OnKeyDown` 收到 `VK_ESCAPE` 时经统一结束路径 `EndRubberBandSel(bCancelled)` 取消 band，控件侧以 band 开始时的**选择快照**还原（详见 3.1）。
 - band 激活期间滚轮被吞（`OnMouseWheel` 直接返回 TRUE）：滚动会让 band 矩形与所覆盖条目错位。
 
@@ -115,7 +115,7 @@ SOUI 中**鼠标消息坐标、`GetClientRect`、绘制 RT 的原点全部是 ho
 - 取消路径（`bCancelled=TRUE`，ESC 或外部取消）**还原 band 开始时的选择快照**并还原主选中项。注意快照拍摄于 `OnRubberBandStart`，即按下点的 click 选择已生效之后，"按下即选中"的行属于快照、ESC 后保留。
 - **多选 ↔ 单选切换的选中迁移**：运行时关闭多选时，若多选集合恰有一条选中项，该选中项迁移到单选标记（`SViewBase` 系迁移到 `m_iSelItem`、`STreeCtrl` 迁移到 `m_hSelItem`、`STreeView` 迁移到 `m_hSelected`、`SListCtrl` 将 `m_nSelectItem` 指向 `m_arrSelFlags` 中仅存的选中项），选中项得以保留；多条选中则整组清除（锚点一并复位）；零条不动。重新开启多选时反向迁移：锚点条目**直接写入 map**（无事件、无重绘——条目本就处于选中态），锚点自身保留**光标职责**不归零；`SListCtrl` 单选态选中标记本就与锚点同步、无需迁移。相关 API：`SViewBase::SetMultiSel`、`STreeView::SetMultiSel`、`STreeCtrl::EnableMultiSelection`、`SListCtrl::EnableMultiSelection`——四处的迁移语义已统一。
 - **双轨互斥与锚点的角色分化**：每种模式只有一个选中记录——单选 = 锚点，多选 = map（`SListCtrl` 为控件级标记数组 `m_arrSelFlags`，与条目数组平行、与 hover 状态同层；`DXLVITEM` 只携带 per-item 数据与 checkbox 状态 `bCheck`，不含选中记录）。选中查询严格按模式分支，只读各自记录，且是**唯一的选中判定入口**（内部代码与调用方一律经它判断，不直接比较锚点或查 map）：索引类四控件走 `IsItemSelected` / `GetSelItemCount` / `GetSelItems`，`SListCtrl` 走 `GetSelected` / `GetSelectedCount` / `GetSelItems` / `GetFirstSelectedItemPosition`+`GetNextSelectedItem`（MFC CListCtrl 风格，另提供 `GetItemState`/`SetItemState` 位查询，`S_LVIS_FOCUSED`/`S_LVIS_SELECTED`）。六控件全部提供 `GetSelItemCount` / `GetSelItems`：多选态返回集合大小/枚举集合，单选态返回锚点 1/0 / 输出锚点。全部控件的锚点在多选态都保留**光标职责**（键盘导航基点、Shift 范围基点、`GetSelectedItem` 返回值），但不再作为选中记录被任何查询读取。注意 `SListCtrl::SortItems` 的比较协议（qsort_s）不含条目身份，选中标记无法跟随条目移动，排序后**清空全部选中**。
-- **空白点击清除选择**：普通左键点击（无 Ctrl/Shift）落在无条目区域时清除全部选择并触发 `SelChanged`（新选中项为空）。Ctrl/Shift+点击空白不清除（保护多选结果）；右键/中键不改变选择。六个控件语义一致：adapter 视图在各自 `OnMouseEvent` 的 `HitTest()==NULL` 分支处理，`SPanel::Ex` 系控件（`SListCtrl` 经 `NotifySelChange(old,-1)` 原生支持、`STreeCtrl::OnLButtonDownEx` 显式处理）。
+- **空白点击清除选择**：普通左键点击（无 Ctrl/Shift）落在无条目区域时清除全部选择并触发 `SelChanged`（新选中项为空）。Ctrl/Shift+点击空白不清除（保护多选结果）；右键/中键不改变选择。六个控件语义一致：adapter 视图在各自 `OnMouseEvent` 的 `HitTest()==NULL` 分支处理，`SPanel` 系控件（`SListCtrl` 经 `NotifySelChange(old,-1)` 原生支持、`STreeCtrl::OnLButtonDown` 显式处理；三者均在各自 `SOUI_MSG_MAP` 里拦截并链式调用 `SPanel`）。
 
 ### 3.1 取消还原快照
 
@@ -135,7 +135,7 @@ SOUI 中**鼠标消息坐标、`GetClientRect`、绘制 RT 的原点全部是 ho
 - 选中判定 `IsItemSelected(hItem)`：单选查锚点、多选查 map（严格模式分支——多选态光标不参与判定）；
 - 删除条目时级联清理其全部后代的多选标记；`RemoveAllItems` 全清；
 - **模式切换迁移**（`EnableMultiSelection`，与 `SViewBase::SetMultiSel` 等统一）：开启时把锚点迁入 map，锚点留作光标（状态不变：无事件、不重绘）；关闭时若 map 恰一条则把该条迁移到锚点（同样无事件、不重绘），多条则 `ClearSelItems` 整组清除（逐条发单项事件）并把锚点归零，零条不动；
-- 点击路径的修饰键语义与 `STreeView` 对齐（在 `OnLButtonDownEx` 分流）：Ctrl+点击条目为 toggle（`IsItemSelected ? RemoveSelItem : AddSelItem`）并把光标移到被点击条目；Ctrl/Shift+点击空白、Shift+点击条目均不动选择；无修饰键点击条目走 `SelectItem`（多选分支 = 整组替换 + 光标跟随；点击唯一选中项只移光标、不动集合）；无修饰键点击空白清除全部选择——多选态只走 `ClearSelItems`（逐条单项事件），锚点式 `TCSelChanging`/`TCSelChanged` 是单选协议、多选态不发；
+- 点击路径的修饰键语义与 `STreeView` 对齐（在 `OnLButtonDown` 分流）：Ctrl+点击条目为 toggle（`IsItemSelected ? RemoveSelItem : AddSelItem`）并把光标移到被点击条目；Ctrl/Shift+点击空白、Shift+点击条目均不动选择；无修饰键点击条目走 `SelectItem`（多选分支 = 整组替换 + 光标跟随；点击唯一选中项只移光标、不动集合）；无修饰键点击空白清除全部选择——多选态只走 `ClearSelItems`（逐条单项事件），锚点式 `TCSelChanging`/`TCSelChanged` 是单选协议、多选态不发；
 - **band 与光标**（与其他五控件统一）：band 启动时快照光标（`m_hBandOldSel`）；band 期间光标跟随最后命中的条目；正常结束光标留在最后命中项（键盘导航从 band 末端继续）；ESC 取消时光标随选择快照一起还原到 band 前位置；
 - **键盘交互**（`OnKeyDown` + `OnGetDlgCode` = `SC_WANTARROWS | SC_WANTSYSKEY`，语义对齐 `STreeView`/`SListView`）：
   - **单选态**：`↑`/`↓` 移动选中项（走 `SelectItem`，锚点事件正常发出）；`←`/`→` 在展开/折叠与移动间切换（有子且已展开 → 折叠，否则移到上/下一可见项）；`Home`/`End`/`PgUp`/`PgDn` 滚动并选中首/末/页首/页尾可见项；
@@ -174,7 +174,7 @@ STreeCtrl 是自绘控件，选中高亮由 `itemSkin` 皮肤配置，`fullRowSe
 3. **阈值 move 不丢帧**。跨过 8px 阈值的那个 move 事件在启动 band 后立即用于更新 band，快速拖动 + 松开不会得到停在按下点的空 band。
 4. **映射按需重跑**。`UpdateRubberBandSel` 仅在 band 矩形变化时调用 `OnRubberBandSelect`（鼠标移动但覆盖集合不变不触发映射）；边缘自动滚动的速度评估独立于矩形变化，每次 move 都执行。
 5. **排他坐标端点**。`rcBand.bottom` 是排他边界，用 `Position2Item(bottom)` 换算会多选一行；必须 `-1` 后换算（`SListCtrl` 的 `(bottom-1-listTop)/h` 与 `SListView`/`SMCListView` 的 `nBandEnd-1` 已统一该语义）。
-6. **修饰键状态来源统一**。band 路径与 `SListCtrl` 的点击路径（`NotifySelChange` 的 Ctrl toggle / Shift range，`nFlags` 参数，调用方为 `OnLButtonDownEx`/`OnLButtonDbClick` 等，编程式调用传 0）都从消息 `wParam` 取修饰键，不查 `GetKeyState()`——两个来源真实交互下等价，但 wParam 可测试且路径一致。
+6. **修饰键状态来源统一**。band 路径与 `SListCtrl` 的点击路径（`NotifySelChange` 的 Ctrl toggle / Shift range，`nFlags` 参数，调用方为 `OnLButtonDown`/`OnLButtonDbClick` 等，编程式调用传 0）都从消息 `wParam` 取修饰键，不查 `GetKeyState()`——两个来源真实交互下等价，但 wParam 可测试且路径一致。
 
 ### 4.2 测试基建约束
 

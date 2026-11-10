@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 命名字体表：节点名即字体名，value 为字体描述串。
+     由 uidef/init.xml 的 <font src="values:font"/> 载入，layout 里 font="f11"、
+     代码里 SFontPool::GetFont(L"@font/f11", scale) 都从这里取名。
+     字号是设计字号（dp），运行时由 SFontPool 按 scale 换算成像素。 -->
+<font>
+  <!-- 正文默认 -->
+  <default value="face:Microsoft YaHei UI,size:13"/>
+  <defaultb value="face:Microsoft YaHei UI,size:13,bold:1"/>
+
+  <!-- 常规字号：b 后缀为加粗 -->
+  <f10 value="face:Microsoft YaHei UI,size:10"/>
+  <f11 value="face:Microsoft YaHei UI,size:11"/>
+  <f11b value="face:Microsoft YaHei UI,size:11,bold:1"/>
+  <f12 value="face:Microsoft YaHei UI,size:12"/>
+  <f12b value="face:Microsoft YaHei UI,size:12,bold:1"/>
+  <f13 value="face:Microsoft YaHei UI,size:13"/>
+  <f13b value="face:Microsoft YaHei UI,size:13,bold:1"/>
+  <f14 value="face:Microsoft YaHei UI,size:14"/>
+  <f14b value="face:Microsoft YaHei UI,size:14,bold:1"/>
+
+  <!-- 自绘控件用的大字号：卡片标题 / KPI 数值 -->
+  <f15b value="face:Microsoft YaHei UI,size:15,bold:1"/>
+  <f21b value="face:Microsoft YaHei UI,size:21,bold:1"/>
+  <f26b value="face:Microsoft YaHei UI,size:26,bold:1"/>
+
+  <!-- 数字列等宽字体，便于上下对齐 -->
+  <mono11 value="face:Consolas,size:11"/>
+  <mono12 value="face:Consolas,size:12"/>
+</font>

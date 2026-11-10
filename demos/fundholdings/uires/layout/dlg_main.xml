@@ -89,81 +89,15 @@
             extend_left="10" gravity="center"/>
     </window>
 
-    <!-- ==================== KPI 卡片 ==================== -->
-    <window size="-2,96" layout="hbox" padding_left="16" padding_right="16" padding_top="6">
-      <fundkpi name="kpi_hero" size="0,-2" weight="24"/>
-      <fundkpi name="kpi_nav" size="0,-2" weight="16" extend_left="10"/>
-      <fundkpi name="kpi_cover" size="0,-2" weight="18" extend_left="10"/>
-      <fundkpi name="kpi_pull" size="0,-2" weight="21" extend_left="10"/>
-      <fundkpi name="kpi_drag" size="0,-2" weight="21" extend_left="10"/>
-    </window>
-
-    <!-- ==================== 走势 + 贡献度 ==================== -->
-    <window size="-2,224" layout="hbox" padding_left="16" padding_right="16" padding_top="10">
-      <window size="0,-2" weight="60" skin="skin_card" layout="vbox" padding="14,10,14,8">
-        <window size="-2,22" layout="hbox">
-          <text text="估算分时走势" font="f13b" colorText="#e8edf5" size="-1,-2" gravity="center"/>
-          <text name="txt_chart_sub" text="—" font="f11" colorText="#77849a" size="-1,-2"
-                extend_left="10" gravity="center"/>
-          <window size="0,0" weight="1"/>
-          <text text="估算涨跌幅" font="f11" colorText="#ff5c5c" size="-1,-2" gravity="center"/>
-          <text text="09:30–11:30 / 13:00–15:00" font="f10" colorText="#77849a" size="-1,-2"
-                extend_left="12" gravity="center"/>
-        </window>
-        <fundspark name="chart_est" size="-2,0" weight="1" extend_top="6"/>
-      </window>
-
-      <window size="0,-2" weight="40" skin="skin_card" layout="vbox" padding="14,10,14,8"
-              extend_left="10">
-        <window size="-2,22" layout="hbox">
-          <text text="贡献度分解" font="f13b" colorText="#e8edf5" size="-1,-2" gravity="center"/>
-          <text text="按 |贡献| 排序" font="f11" colorText="#77849a" size="-1,-2"
-                extend_left="10" gravity="center"/>
-        </window>
-        <fundcontrib name="contrib_list" size="-2,0" weight="1" extend_top="8"/>
-      </window>
-    </window>
-
-    <!-- ==================== 表格区 ==================== -->
-    <window size="-2,0" weight="1" skin="skin_card" layout="vbox" padding="12,8,12,10"
-            margin="16,10,16,10">
-      <window size="-2,38" layout="hbox">
-        <fundtabs name="tabs" size="340,-2" cursor="hand"/>
-        <window size="0,0" weight="1"/>
-        <edit name="edit_filter" cueText="筛选代码 / 名称" cueColor="#5c6779" size="150,30"
-              gravity="center"/>
-        <button name="btn_filter" text="筛选" skin="skin_btn_ghost" size="58,30"
-                class="cls_btn_ghost" extend_left="6" gravity="center"/>
-        <button name="btn_reset" text="重置" skin="skin_btn_ghost" size="58,30"
-                class="cls_btn_ghost" extend_left="6" gravity="center"/>
-        <!-- 仅在「请求日志」页签显示：清空内存里的日志缓冲（不影响落盘文件） -->
-        <button name="btn_log_clear" text="清空日志" skin="skin_btn_ghost" size="78,30"
-                class="cls_btn_ghost" extend_left="6" gravity="center" show="0"/>
-      </window>
-
-      <window size="-2,0" weight="1" extend_top="6">
-        <window name="pane_change" pos="0,0,-2,-2">
-          <gridctrl name="grid_holdings" pos="0,0,-2,-2"
-                    rowCount="1" colCount="17" fixedRows="1" fixedCols="0"
-                    defRowHeight="30" defColWidth="90"
-                    gridLines="3" gridLineColor="#1c2534" gridBkColor="#121a26"
-                    font="f12" colorText="#aab6c8" editable="0"/>
-        </window>
-        <window name="pane_est" pos="0,0,-2,-2" show="0">
-          <gridctrl name="grid_est" pos="0,0,-2,-2"
-                    rowCount="1" colCount="6" fixedRows="1" fixedCols="0"
-                    defRowHeight="30" defColWidth="110"
-                    gridLines="3" gridLineColor="#1c2534" gridBkColor="#121a26"
-                    font="f12" colorText="#aab6c8" editable="0"/>
-        </window>
-        <window name="pane_log" pos="0,0,-2,-2" show="0" colorBkgnd="#0b1119">
-          <!-- 只读 rich edit：原生滚动/选中/复制，追加文本时不会整篇重排布局 -->
-          <richedit name="re_log" pos="10,8,-10,-8" multiLines="1" readonly="1"
-                    vscrollBar="1" autoVScroll="1" wordWrap="1" hscrollBar="0" wantReturn="0"
-                    enableDragdrop="0" colorBkgnd="#0b1119" colorText="#8b98ab" font="mono11"/>
-        </window>
-      </window>
-    </window>
+    <!-- ==================== 每支基金的分析内容 ====================
+         fund_swipe 与移动端是同一个布局模型：一支基金一页的 tabctrl（页头隐藏），
+         页数由 MainDlg::SyncFundPages 按自选列表动态 InsertItem / RemoveItem 维护，
+         每页通过 include 载入 fund_detail.xml 里的完整分析控件树。拖动时 STabSlider
+         对前后两页拍快照并跟手平移，松手后 CommitDrag 连续滑到目标页；模板里的
+         pane_swipe 用的是同一套 tabctrl 换页动画。 -->
+    <tabctrl name="fund_swipe" size="-2,0" weight="1"
+             tabWidth="0" tabHeight="0" enableDragSwitch="1"
+             dragThreshold="8" dragSwitchRatio="35" dragFling="1" dragCommitDuration="200"/>
       </window> <!-- /view_main -->
 
       <!-- ===== 0 支基金：空界面（工具栏、指数条、状态栏保持常驻） ===== -->

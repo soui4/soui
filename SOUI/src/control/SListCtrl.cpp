@@ -1057,9 +1057,10 @@ void SListCtrl::OnKillFocus(SWND wndFocus)
         Invalidate();
 }
 
-void SListCtrl::OnLButtonDownEx(UINT nFlags, CPoint pt)
+void SListCtrl::OnLButtonDown(UINT nFlags, CPoint pt)
 {
-    __baseCls::OnLButtonDownEx(nFlags, pt);
+    if (__baseCls::OnLButtonDown(nFlags, pt))
+        return;
     int nSubItem = -1;
     m_nHoverItem = HitTest(pt, &nSubItem);
     BOOL hitCheckBox = HitCheckBox(pt);
@@ -1073,11 +1074,6 @@ void SListCtrl::OnLButtonDownEx(UINT nFlags, CPoint pt)
         NotifySelChange(m_nSelectItem, m_nHoverItem, nFlags);
     else if (m_nHoverItem != -1 || m_nSelectItem != -1)
         NotifySelChange(m_nSelectItem, m_nHoverItem, nFlags);
-}
-
-void SListCtrl::OnLButtonUpEx(UINT nFlags, CPoint pt)
-{
-    __baseCls::OnLButtonUpEx(nFlags, pt);
 }
 
 void SListCtrl::OnLButtonDbClick(UINT nFlags, CPoint pt)
@@ -1151,9 +1147,10 @@ BOOL SListCtrl::OnHeaderSwap(IEvtArgs *pEvt)
     return true;
 }
 
-void SListCtrl::OnMouseMoveEx(UINT nFlags, CPoint pt)
+void SListCtrl::OnMouseMove(UINT nFlags, CPoint pt)
 {
-    __baseCls::OnMouseMoveEx(nFlags, pt);
+    if (__baseCls::OnMouseMove(nFlags, pt))
+        return;
     int nHoverItem = HitTest(pt);
     if (m_bHotTrack && nHoverItem != m_nHoverItem)
     {

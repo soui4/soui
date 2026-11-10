@@ -268,6 +268,28 @@ class SOUI_EXP SwndContainerImpl
     void OnFrameMouseMove(UINT uFlag, CPoint pt);
 
     /**
+     * @brief Android ViewGroup-style touch dispatch gate, run before normal mouse dispatch.
+     * @param uMsg WM_LBUTTONDOWN, WM_MOUSEMOVE, WM_LBUTTONUP or WM_CANCELMODE.
+     * @param wParam Mouse flags (MK_LBUTTON, ...).
+     * @param lParam Mouse position in host coordinates.
+     * @return TRUE when the interception chain handled the message and the regular
+     *         SwndFromPoint/capture dispatch must be skipped entirely.
+     * @details DOWN is never intercepted: it is delivered to the hit target and used to
+     *          initialize the whole parent chain. On MOVE the chain is asked from the
+     *          outermost parent inwards; the first ancestor returning TRUE takes over
+     *          after the original target agrees to CancelCaptureMode() and receives
+     *          WM_CANCELMODE. From then on only OnTouchEvent() of the interceptor is
+     *          called, exactly like ACTION_CANCEL + parent.onTouchEvent in Android.
+     */
+    BOOL DispatchTouchEvent(UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+    /** Reset the gesture state and release a capture held by the interceptor. */
+    void ResetTouchState();
+
+    /** True when the target or any ancestor requested parent-interception to be disabled. */
+    BOOL IsDisallowIntercept(SWindow *pTarget) const;
+
+    /**
      * @brief Handles mouse leave events within the frame.
      */
     void OnFrameMouseLeave();
@@ -330,6 +352,9 @@ class SOUI_EXP SwndContainerImpl
     SWindow *m_pRoot;                          /**< Root window of the container */
     SWND m_hCapture;                           /**< Window handle with capture */
     SWND m_hHover;                             /**< Window handle that is hovered */
+    SWND m_hTouchTarget;                       /**< Hit window of the current touch gesture */
+    SWND m_hTouchInterceptor;                  /**< Ancestor that intercepted the gesture, 0 if none */
+    CPoint m_ptTouchDown;                      /**< DOWN position of the current touch gesture */
     UINT m_uNcHitTest;                         /**< Non-client value */
     SFocusManager m_focusMgr;                  /**< Focus manager */
     SDropTargetDispatcher m_dropTarget;        /**< Drop target dispatcher */

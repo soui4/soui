@@ -2941,6 +2941,56 @@ SAutoRefPtr<IAccProxy> m_pAccProxy; /**< Accessibility proxy object. */
 #ifdef _DEBUG
 tid_t m_nMainThreadId; /**< ID of the main thread hosting the window. */
 #endif
+
+public:
+/**
+ * @brief Android ViewGroup-style touch interception hook.
+ * @details The container calls this on the hit window and every ancestor, from the
+ *          outermost parent inwards, before dispatching a touch message. Like
+ *          ACTION_DOWN, WM_LBUTTONDOWN is never intercepted; a container returns
+ *          TRUE on WM_MOUSEMOVE once its gesture wins the touch slop / axis test.
+ *          After interception the original target receives WM_CANCELMODE and all
+ *          following events are delivered to OnTouchEvent() instead.
+ * @param uMsg WM_LBUTTONDOWN, WM_MOUSEMOVE, WM_LBUTTONUP or WM_CANCELMODE.
+ * @param wParam Mouse flags (MK_LBUTTON, ...).
+ * @param lParam Mouse position in the shared host coordinate system.
+ * @return TRUE to intercept the gesture. Default FALSE.
+ */
+virtual BOOL OnInterceptTouchEvent(UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+/**
+ * @brief Receives the touch event stream that this window owns.
+ * @details Called by the container after this window intercepted a gesture, and
+ *          also while it is the original hit target. Coordinates are in the shared
+ *          host coordinate system, same as GetWindowRect()/GetChildrenLayoutRect().
+ * @return TRUE if the event was consumed. Default FALSE.
+ */
+virtual BOOL OnTouchEvent(UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+/**
+ * @brief Declares which axis this window consumes when it intercepts a gesture.
+ * @details The container uses the returned value as the CancelCaptureMode()
+ *          reason when it asks the previous capture owner to stand down. A
+ *          DOWN-to-MOVE displacement is ambiguous for 45 degree or zigzag
+ *          drags, while the interceptor knows its own axis (STabCtrl derives
+ *          it from tabAlign), so it must be the one declaring the reason.
+ * @return CANCEL_REASON_SCROLL_H / CANCEL_REASON_SCROLL_V (bit flags; OR both
+ *         for an axis-agnostic handler). Return 0 when no axis is declared:
+ *         the container then falls back to the drag direction.
+ */
+virtual int GetTouchInterceptAxis() const;
+
+/**
+ * @brief Equivalent of ViewParent.requestDisallowInterceptTouchEvent().
+ * @details A child can ask its ancestors not to intercept the current gesture.
+ *          The container checks this flag along the hit window's parent chain on
+ *          every WM_MOUSEMOVE and resets it when a new gesture starts.
+ */
+void RequestDisallowInterceptTouchEvent(BOOL bDisallow);
+BOOL IsDisallowIntercept() const;
+
+private:
+BOOL m_bDisallowIntercept; /**< TRUE while this window refuses parent interception. */
 }
 ;
 

@@ -51,7 +51,7 @@
 			</group>
 		</data>
 	</grouplist>
-	<tabctrl size="0,-2" weight="1" padding="5,5,5,5" name="tab_ctrls" colorText="@color/clr_title" animateSteps="20" tabAlign="left" tabWidth="0">
+	<tabctrl size="0,-2" weight="1" padding="5,5,5,5" name="tab_ctrls" colorText="@color/clr_title" animateSteps="20" tabAlign="left" tabWidth="0" enableDragSwitch="1">
 		<!-- ============ 列表类演示:页头 + 全区域列表(weight 撑满) ============ -->
 		<page title="mclistview" layout="vbox" interval="12">
 				<text text="多列列表" font="size:16,bold:1" colorText="@color/clr_title"/>
@@ -338,7 +338,7 @@
 				<button size="70,30" name="btn4_5">page 5</button>
 				<button size="70,30" name="btn4_6">page 6</button>
 			</group>
-			<tabctrl size="-2,0" weight="1" animateSteps="10" name="tab_radio2" tabHeight="0" cursel="3">
+			<tabctrl size="-2,0" weight="1" animateSteps="10" name="tab_radio2" tabHeight="0" cursel="3" enableDragSwitch="1">
 				<page layout="vbox" gravity="center" interval="12">
 					<img size="48,48" skin="svg_tab_page" iconIndex="0" msgTransparent="1"/>
 					<text text="首页总览" font="size:17,bold:1" colorText="@color/clr_title"/>

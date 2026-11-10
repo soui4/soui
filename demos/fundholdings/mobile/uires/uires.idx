@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resource>
+  <UIDEF>
+    <file name="XML_INIT" path="uidef\init.xml"  />
+  </UIDEF>
+  <LAYOUT>
+    <file name="dlg_main" path="layout\dlg_main.xml"/>
+    <file name="fund_detail" path="layout\fund_detail.xml"/>
+  </LAYOUT>
+
+  <ICON>
+    <file name="ICON_LOGO" path="image\logo.ico"/>
+  </ICON>
+
+  <values>
+    <file name="string" path="values\string.xml"/>
+    <file name="color" path="values\color.xml"/>
+    <file name="skin" path="values\skin.xml"/>
+    <file name="font" path="values\font.xml"/>
+  </values>
+	<svg>
+		<file name="logo" path="svg\logo.svg"/>
+		<file name="scrollbar" path="svg\scrollbar.svg"/>
+	</svg>
+</resource>

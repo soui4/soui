@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="30" viewBox="0 0 200 30">
+  <!-- 正常状态 -->
+  <g id="normal" transform="translate(0, 0)">
+    <linearGradient id="tab-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f0f0f0"/>
+      <stop offset="100%" stop-color="#e0e0e0"/>
+    </linearGradient>
+    <rect width="50" height="30" fill="url(#tab-gradient)"/>
+    <rect x="0" y="29" width="50" height="1" fill="#e0e0e0"/>
+  </g>
+  <!-- 悬停状态 -->
+  <g id="hover" transform="translate(50, 0)">
+    <linearGradient id="tab-hover-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#e8e8e8"/>
+      <stop offset="100%" stop-color="#d8d8d8"/>
+    </linearGradient>
+    <rect width="50" height="30" fill="url(#tab-hover-gradient)"/>
+    <rect x="0" y="29" width="50" height="1" fill="#d8d8d8"/>
+  </g>
+  <!-- 按下状态（选中） -->
+  <g id="pressed" transform="translate(100, 0)">
+    <linearGradient id="tab-pressed-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#d8d8d8"/>
+      <stop offset="100%" stop-color="#c8c8c8"/>
+    </linearGradient>
+    <rect width="50" height="30" fill="url(#tab-pressed-gradient)"/>
+    <rect x="0" y="29" width="50" height="1" fill="#4a89dc"/>
+  </g>
+  <!-- 禁用状态 -->
+  <g id="disabled" transform="translate(150, 0)">
+    <linearGradient id="tab-disabled-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f5f5f5"/>
+      <stop offset="100%" stop-color="#e8e8e8"/>
+    </linearGradient>
+    <rect width="50" height="30" fill="url(#tab-disabled-gradient)"/>
+    <rect x="0" y="29" width="50" height="1" fill="#e8e8e8"/>
+  </g>
+</svg>

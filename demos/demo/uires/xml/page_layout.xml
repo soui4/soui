@@ -12,7 +12,7 @@
   btn_display/btn_hidetst/btn_open_wrap_content/btn_create_by_temp、
   re_temp_input/wnd_temp_host 及 id=100/10000/4321/1236 被源码引用,不可改动。
 -->
-<tabctrl pos="0,0,-0,-0" colorBkgnd="@color/clr_page_bg" colorText="@color/clr_title" animateSteps="20" tabAlign="left" tabInterSize="2" tabWidth="150" iconSkin="svg_tab_layout" icon-x="6" icon-y="5" curSel="0">
+<tabctrl pos="0,0,-0,-0" colorBkgnd="@color/clr_page_bg" colorText="@color/clr_title" animateSteps="20" tabAlign="left" tabInterSize="2" tabWidth="150" iconSkin="svg_tab_layout" icon-x="6" icon-y="5" curSel="0" enableDragSwitch="1">
 		<page title="soui layout" iconIndex="0" layout="vbox" padding="15,12,15,15" interval="10">
 			<text text="soui 绝对布局" font="size:16,bold:1" colorText="@color/clr_title"/>
 			<text text="演示 pos / offset / 相对兄弟节点(sib) / 百分比与 @ 固定尺寸等定位语法" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>

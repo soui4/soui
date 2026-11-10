@@ -20,8 +20,8 @@ if(EMSCRIPTEN)
     return()
 endif()
 
-file(GLOB HEADERS src/*.h)
-file(GLOB SOURCES src/*.cpp)
+file(GLOB HEADERS CONFIGURE_DEPENDS src/*.h)
+file(GLOB SOURCES CONFIGURE_DEPENDS src/*.cpp)
 
 source_group("Header Files" FILES ${HEADERS})
 source_group("Source Files" FILES ${SOURCES})

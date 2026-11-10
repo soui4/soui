@@ -602,6 +602,7 @@ SWindow::SWindow()
     , m_funSwndProc(NULL)
     , m_pivotX(0.5f)
     , m_pivotY(0.5f)
+    , m_bDisallowIntercept(FALSE)
 #ifdef _DEBUG
     , m_nMainThreadId(::GetCurrentThreadId()) /**< The thread that initializes the object is not necessarily the main thread */
 #endif
@@ -4650,6 +4651,31 @@ BOOL SWindow::AddEvent(THIS_ DWORD dwEventID, LPCWSTR pszEventHandlerName)
 BOOL SWindow::RemoveEvent(THIS_ DWORD dwEventID)
 {
     return m_evtSet.removeEvent(dwEventID);
+}
+
+BOOL SWindow::OnInterceptTouchEvent(UINT, WPARAM, LPARAM)
+{
+    return FALSE;
+}
+
+BOOL SWindow::OnTouchEvent(UINT, WPARAM, LPARAM)
+{
+    return FALSE;
+}
+
+int SWindow::GetTouchInterceptAxis() const
+{
+    return 0; // 0 = no declared axis, container falls back to the drag direction
+}
+
+void SWindow::RequestDisallowInterceptTouchEvent(BOOL bDisallow)
+{
+    m_bDisallowIntercept = bDisallow;
+}
+
+BOOL SWindow::IsDisallowIntercept() const
+{
+    return m_bDisallowIntercept;
 }
 
 void SWindow::GetVisibleRect(LPRECT prc) const

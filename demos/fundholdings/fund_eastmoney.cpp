@@ -579,6 +579,56 @@ std::string quarterLabel(int year, int qn) {
     return std::string(buf);
 }
 
+// 从基金详情页里找“查看相关ETF”链接对应的 6 位 ETF 代码。
+// 该链接只出现在 ETF 联接基金的页面；中文用显式 UTF-8 字节匹配，
+// 避免 MSVC 按执行字符集(GBK)编译窄字面量后匹配不到 UTF-8 页面。
+std::string extractRelatedEtfCode(const std::string& html) {
+    static const char kMark[] =
+        "\xE6\x9F\xA5\xE7\x9C\x8B\xE7\x9B\xB8\xE5\x85\xB3"  // 查看相关
+        "ETF";
+    size_t p = html.find(kMark);
+    if (p == std::string::npos) return "";
+
+    // 形如：<a ... href="http://fund.eastmoney.com/159755.html">查看相关ETF></a>
+    size_t h = html.rfind("href=\"", p);
+    if (h == std::string::npos) return "";
+    h += 6;
+    size_t e = html.find('"', h);
+    if (e == std::string::npos) return "";
+    std::string href = html.substr(h, e - h);
+
+    size_t slash = href.rfind('/');
+    if (slash == std::string::npos) return "";
+    size_t dot = href.find('.', slash);
+    if (dot == std::string::npos) return "";
+    std::string code = href.substr(slash + 1, dot - slash - 1);
+    if (code.size() != 6) return "";
+    if (code.find_first_not_of("0123456789") != std::string::npos) return "";
+    return code;
+}
+
+// 查询 ETF 联接基金对应的目标 ETF。
+// 普通基金页面没有“查看相关ETF”，返回空，调用方保持原结果。
+bool resolveTargetEtf(SOUI::IHttpClient *pHttp, const std::string& fundCode,
+                      std::string& etfCode) {
+    etfCode.clear();
+    if (!pHttp || fundCode.empty()) return false;
+
+    std::string url = "https://fund.eastmoney.com/" + fundCode + ".html";
+    std::string body;
+    int httpCode = 0;
+    std::string diag;
+    if (!httpGetText(pHttp, url, url, body, httpCode, diag)) {
+        SLOGI() << "[fetch] 查询相关 ETF 失败 code=" << fundCode.c_str()
+                << " httpCode=" << httpCode;
+        return false;
+    }
+    etfCode = extractRelatedEtfCode(body);
+    SLOGI() << "[fetch] 相关 ETF 查询 code=" << fundCode.c_str()
+            << " etf=" << etfCode.c_str();
+    return !etfCode.empty();
+}
+
 // 变动标记用的中文片段（显式 UTF-8 字节，理由同上）
 const char* const kUtf8XinJin = "\xE6\x96\xB0\xE8\xBF\x9B";  // 新进
 const char* const kUtf8TuiChu = "\xE9\x80\x80\xE5\x87\xBA";  // 退出
@@ -619,11 +669,13 @@ void configureHttpClient(SOUI::IHttpClient *pHttp) {
     pHttp->SetHeader("X-Requested-With", "XMLHttpRequest");
 }
 
-bool fetchFundHoldings(SOUI::IHttpClient *pHttp,
-                       const std::string& fundCode,
-                       const std::string& year,
-                       std::vector<FundHolding>& out,
-                       std::string& errMsg) {
+// 从指定代码直接抓取股票持仓。ETF 联接基金的回退逻辑由下方 fetchFundHoldings 负责，
+// 这里只负责一次完整的“请求 + 解析”，避免回退分支与主流程重复代码。
+static bool fetchFundHoldingsFromSource(SOUI::IHttpClient *pHttp,
+                                        const std::string& fundCode,
+                                        const std::string& year,
+                                        std::vector<FundHolding>& out,
+                                        std::string& errMsg) {
     out.clear();
     errMsg.clear();
     SLOGI() << "[fetch] fundCode=" << fundCode.c_str() << " year=" << year.c_str();
@@ -789,6 +841,40 @@ bool fetchFundHoldings(SOUI::IHttpClient *pHttp,
 
     if (out.empty()) errMsg = "解析完成但无持仓数据";
     return true;
+}
+
+bool fetchFundHoldings(SOUI::IHttpClient *pHttp,
+                       const std::string& fundCode,
+                       const std::string& year,
+                       std::vector<FundHolding>& out,
+                       std::string& errMsg) {
+    out.clear();
+    errMsg.clear();
+
+    std::string firstErr;
+    const bool ok = fetchFundHoldingsFromSource(pHttp, fundCode, year, out, firstErr);
+    if (ok && !out.empty()) return true;
+
+    // 没有股票持仓时，检查是否为 ETF 联接基金。联接基金主要持有目标 ETF，
+    // 天天基金的股票持仓接口会返回空 content；此时改用目标 ETF 的股票持仓。
+    std::string etfCode;
+    if (resolveTargetEtf(pHttp, fundCode, etfCode) && etfCode != fundCode) {
+        SLOGI() << "[fetch] 联接基金改用目标 ETF code=" << etfCode.c_str();
+        std::vector<FundHolding> etfHoldings;
+        std::string etfErr;
+        const bool etfOk =
+            fetchFundHoldingsFromSource(pHttp, etfCode, year, etfHoldings, etfErr);
+        if (etfOk && !etfHoldings.empty()) {
+            out.swap(etfHoldings);
+            errMsg.clear();
+            return true;
+        }
+        SLOGI() << "[fetch] 目标 ETF 仍无持仓 code=" << etfCode.c_str()
+                << " err=" << etfErr.c_str();
+    }
+
+    errMsg = firstErr;
+    return ok;
 }
 
 // 将扁平的（季度×股票）持仓列表，透视成“按股票”的持仓变化表。

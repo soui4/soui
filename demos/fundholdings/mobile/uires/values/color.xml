@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<color>
+  <!-- ===================== 暗色主题调色板 =====================
+       与 ui_mockup.html 的 CSS 变量一一对应。
+       涨=红 / 跌=绿 为 A 股惯例，请勿按欧美习惯互换。 -->
+  <bg_0       value="#070a0f"/>  <!-- 窗口底色 -->
+  <bg_1       value="#0b1119"/>  <!-- 工具栏 / 状态栏 -->
+  <bg_2       value="#121a26"/>  <!-- 卡片 -->
+  <bg_3       value="#151d2b"/>  <!-- 胶囊 / 次按钮 -->
+  <bg_4       value="#1a2333"/>  <!-- 悬停 -->
+
+  <line       value="#212b3a"/>  <!-- 卡片描边 -->
+  <line_2     value="#2b3648"/>  <!-- 控件描边 -->
+
+  <text_1     value="#e8edf5"/>  <!-- 主文本 -->
+  <text_2     value="#aab6c8"/>  <!-- 次文本 -->
+  <text_3     value="#77849a"/>  <!-- 辅助文本 -->
+
+  <accent     value="#f0b429"/>  <!-- 主题金 -->
+  <up         value="#ff5c5c"/>  <!-- 涨 -->
+  <down       value="#22c55e"/>  <!-- 跌 -->
+
+  <!-- 兼容旧引用 -->
+  <blue value="rgb(0,0,255)"/>
+  <red value="rgb(255,0,0)"/>
+  <green value="rgb(0,128,0)"/>
+  <gray value="rgb(128,128,128)"/>
+  <white value="rgb(255,255,255)"/>
+  <black value="rgb(0,0,0)"/>
+</color>

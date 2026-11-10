@@ -5,6 +5,7 @@
   </UIDEF>
   <LAYOUT>
     <file name="dlg_main" path="layout\dlg_main.xml"/>
+    <file name="fund_detail" path="layout\fund_detail.xml"/>
   </LAYOUT>
 
   <ICON>

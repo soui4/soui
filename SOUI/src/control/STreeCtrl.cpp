@@ -1270,9 +1270,10 @@ void STreeCtrl::OnPaint(IRenderTarget *pRT)
     AfterPaint(pRT, painter);
 }
 
-void STreeCtrl::OnLButtonDownEx(UINT nFlags, CPoint pt)
+void STreeCtrl::OnLButtonDown(UINT nFlags, CPoint pt)
 {
-    __baseCls::OnLButtonDownEx(nFlags, pt);
+    if (__baseCls::OnLButtonDown(nFlags, pt))
+        return;
     m_hHoverItem = HitTest(pt);
 
     if (m_bMultiSel && m_hHoverItem && (nFlags & MK_CONTROL))
@@ -1391,9 +1392,10 @@ void STreeCtrl::OnRButtonUp(UINT nFlags, CPoint pt)
     __baseCls::OnRButtonUp(nFlags, pt);
 }
 
-void STreeCtrl::OnLButtonUpEx(UINT nFlags, CPoint pt)
+void STreeCtrl::OnLButtonUp(UINT nFlags, CPoint pt)
 {
-    __baseCls::OnLButtonUpEx(nFlags, pt);
+    if (__baseCls::OnLButtonUp(nFlags, pt))
+        return;
     m_hHoverItem = HitTest(pt);
 
     if (m_hCaptureItem)
@@ -1412,9 +1414,10 @@ void STreeCtrl::OnLButtonDbClick(UINT nFlags, CPoint pt)
     ItemLButtonDbClick(m_hHoverItem, nFlags, pt);
 }
 
-void STreeCtrl::OnMouseMoveEx(UINT nFlags, CPoint pt)
+void STreeCtrl::OnMouseMove(UINT nFlags, CPoint pt)
 {
-    __baseCls::OnMouseMoveEx(nFlags, pt);
+    if (__baseCls::OnMouseMove(nFlags, pt))
+        return;
     HSTREEITEM hHitTest = HitTest(pt);
 
     if (hHitTest != m_hHoverItem)

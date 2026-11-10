@@ -15,6 +15,7 @@
 #define __SPANEL__H__
 
 #include <core/SWnd.h>
+#include <core/SGestureDetector.h>
 #include <core/SScrollBarHandler.h>
 #include <interface/SCtrls-i.h>
 #include <proxy/SWindowProxy.h>
@@ -35,7 +36,8 @@ class SOUI_EXP SPanel
     : public TWindowProxy<IPanel>
     , protected IScrollBarHost
     , public IAnimatorUpdateListener
-    , public SAnimatorListener {
+    , public SAnimatorListener
+    , public IGestureListener {
     DEF_SOBJECT(SWindow, L"div")
 
   public:
@@ -294,6 +296,52 @@ class SOUI_EXP SPanel
     virtual void OnDragClearItemCapture();
     virtual BOOL CancelCaptureMode(int reason) override;
 
+    /** === Unified gesture recognizer (SGestureDetector) ===
+     * Drag threshold, velocity tracking, fling detection and UP/CANCEL state
+     * now live in SGestureDetector. SPanel only maps the callbacks onto the
+     * existing rubber-band / drag-scroll / fling business rules, so all four
+     * MVC views and STabCtrl share one gesture state machine.
+     */
+    virtual void OnGestureDown(const CPoint &pt);
+    virtual void OnGestureScroll(const CPoint &ptDown, const CPoint &ptCur, int dx, int dy);
+    virtual void OnGestureFling(float fVelocityX, float fVelocityY);
+    virtual void OnGestureUp(const CPoint &pt, float fVelocityX, float fVelocityY);
+    virtual void OnGestureCancel();
+
+    /** === Container-level gesture ownership (Android ViewGroup style) ===
+     * A panel owns exactly one SGestureDetector. When a drag starts on a child
+     * the host asks every ancestor through OnInterceptTouchEvent(); once a
+     * panel claims it, the remaining stream arrives at OnTouchEvent() and is
+     * fed into the SAME detector through HandleMouseDrag(). Derived classes
+     * must not implement a second recognizer - they only override the policy
+     * hooks below.
+     */
+    virtual BOOL OnInterceptTouchEvent(UINT uMsg, WPARAM wParam, LPARAM lParam) OVERRIDE;
+    virtual BOOL OnTouchEvent(UINT uMsg, WPARAM wParam, LPARAM lParam) OVERRIDE;
+
+    /** Opt in to claiming gestures that started on a child window. The default
+     *  FALSE keeps the legacy "CancelCaptureMode veto" behaviour unchanged for
+     *  every existing panel / MVC view. */
+    virtual BOOL CanInterceptTouchGesture() const;
+    /** Axis fed into the shared detector. AxisVertical for a vertical scroller. */
+    virtual SGestureDetector::Axis GetGestureAxis() const;
+    /** Whether this panel consumes the drag: axis arbitration + scroll edges. */
+    virtual BOOL CanScrollByGesture(const CPoint &ptDelta) const;
+    /** Called once when the panel takes a gesture over from a child. */
+    virtual void OnGestureIntercepted();
+    /** Called when an intercepted stream ends (UP / CANCELMODE). */
+    virtual void OnTouchGestureEnd();
+
+    /** TRUE while bVertical can still move in the direction of nDelta. */
+    BOOL CanScrollTowardsDrag(BOOL bVertical, int nDelta) const;
+
+    /** Injects touch slop (dp * scale), the axis and the fling threshold. */
+    virtual void PrepareGesture();
+    /** Aborts an armed/dragging gesture and resets the detector (e.g. on mouse leave). */
+    void CancelDragGesture();
+    /** WM_CANCELMODE: the container took the gesture away from us. */
+    void OnCancelMode();
+
     /** === Rubber band (marquee) multi-selection support ===
      * When a derived control supports multi-selection, dragging in the client area
      * starts a rubber band selection. The rubber band takes priority over drag
@@ -452,18 +500,14 @@ class SOUI_EXP SPanel
     int m_fadeFrames;                                      /**< Number of fade frames */
     BYTE m_bySbThumbTrackMinAlpha;                         /**< Minimum alpha value for thumb track */
 
-    /** Drag scroll state */
-    BOOL m_bDragPending;           /**< TRUE when mouse down, waiting for drag threshold */
-    BOOL m_bDragScrolling;         /**< TRUE when drag scrolling is active */
-    BOOL m_bDragStarted;           /**< TRUE when m_ptDragStart has been initialized */
-    CPoint m_ptDragStart;          /**< Mouse position when drag started */
-    CPoint m_ptDragLast;           /**< Last mouse position during drag */
+    /** Drag scroll state: recognition is delegated to SGestureDetector. */
+    SGestureDetector m_gesture;    /**< Shared GestureDetector + VelocityTracker */
+    BOOL m_bDragPending;           /**< TRUE while armed, waiting for the touch slop */
+    BOOL m_bDragScrolling;         /**< TRUE while drag scrolling is active */
+    CPoint m_ptDragStart;          /**< Press point, also the rubber band anchor */
     BOOL m_bItemDragScrollEnabled; /**< Enable drag-scroll */
-
-    /** Velocity tracking */
-    float m_fLastVelocityX;   /**< Instantaneous velocity X in pixels/ms */
-    float m_fLastVelocityY;   /**< Instantaneous velocity Y in pixels/ms */
-    uint64_t m_nLastMoveTime; /**< Timestamp of last MOUSEMOVE (ms) */
+    DWORD m_dwGestureFlags;        /**< wParam of the current MOVE (MK_CONTROL for band) */
+    BOOL m_bGestureFling;          /**< detector reported onFling for this gesture */
 
     /** Fling animation */
     SAutoRefPtr<SFloatAnimator> m_pFlingAnimatorV;
@@ -623,35 +667,19 @@ class SOUI_EXP SPanel
     /** SAnimatorListener */
     STDMETHOD_(void, onAnimationEnd)(THIS_ IValueAnimator *pAnimator) OVERRIDE;
 
-    /** Drag scroll mouse handlers (for plain SPanel) */
-    void OnLButtonDown(UINT nFlags, CPoint pt);
-    void OnMouseMove(UINT nFlags, CPoint pt);
-    void OnLButtonUp(UINT nFlags, CPoint pt);
+    /**
+     * @brief Ordinary MSG_WM_LBUTTONDOWN / MOUSEMOVE / LBUTTONUP handlers.
+     *        Derived classes intercept the same messages in their own
+     *        SOUI_MSG_MAP and chain with __baseCls::OnLButtonDown/Move/Up().
+     * @return TRUE when a drag / fling / rubber band gesture consumed the event;
+     *         the derived handler must then return without running its own
+     *         click / hover logic. FALSE means a normal click: SPanel has
+     *         already called the SWindow default handler.
+     */
+    BOOL OnLButtonDown(UINT nFlags, CPoint pt);
+    BOOL OnMouseMove(UINT nFlags, CPoint pt);
+    BOOL OnLButtonUp(UINT nFlags, CPoint pt);
     void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
-
-    /**
-     * @brief Called when left mouse button is pressed and drag scroll is not active.
-     *        Derived classes should override this to handle their own click logic.
-     * @param nFlags Flags for the message.
-     * @param pt Point where the button was pressed.
-     */
-    virtual void OnLButtonDownEx(UINT nFlags, CPoint pt);
-
-    /**
-     * @brief Called when mouse moves and drag scroll is not active.
-     *        Derived classes should override this to handle their own mouse move logic.
-     * @param nFlags Flags for the message.
-     * @param pt Point where the mouse moved.
-     */
-    virtual void OnMouseMoveEx(UINT nFlags, CPoint pt);
-
-    /**
-     * @brief Called when left mouse button is released and drag scroll is not active.
-     *        Derived classes should override this to handle their own button up logic.
-     * @param nFlags Flags for the message.
-     * @param pt Point where the button was released.
-     */
-    virtual void OnLButtonUpEx(UINT nFlags, CPoint pt);
 
     /**
      * @brief Checks if drag mode is enabled.
@@ -677,6 +705,7 @@ class SOUI_EXP SPanel
         MSG_WM_LBUTTONDOWN(OnLButtonDown)
         MSG_WM_MOUSEMOVE(OnMouseMove)
         MSG_WM_LBUTTONUP(OnLButtonUp)
+        MSG_WM_CANCELMODE(OnCancelMode)
         MSG_WM_KEYDOWN(OnKeyDown)
     SOUI_MSG_MAP_END()
 };

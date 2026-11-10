@@ -79,7 +79,7 @@
       </frame>
     </caption>
 
-    <tabctrl name="tab_main" pos="5,30,-5,-5" interpolator="Decelerate" curSel="0" focusable="0" animateSteps="30" tabHeight="0">
+    <tabctrl name="tab_main" pos="5,30,-5,-5" interpolator="Decelerate" curSel="0" focusable="0" animateSteps="30" tabHeight="0" enableDragSwitch="0">
       <page title="home">
         <include src="layout:page_home"/>
       </page>
@@ -91,7 +91,7 @@
             <text name="txt_nav_title" font="size:18,bold:1" colorText="@color/clr_title" msgTransparent="1"/>
           </button>
         </window>
-        <tabctrl name="tab_contents" size="-2,0" weight="1" interpolator="Decelerate" curSel="0" focusable="0" animateSteps="30" tabHeight="0" text-y="50" tabSkin="_skin.sys.tab.header" iconSkin="skin_page_icons" icon-x="10" colorTextHover="#ff0000" fontHover="italic:1">
+        <tabctrl name="tab_contents" size="-2,0" weight="1" interpolator="Decelerate" curSel="0" focusable="0" animateSteps="30" tabHeight="0" text-y="50" tabSkin="_skin.sys.tab.header" iconSkin="skin_page_icons" icon-x="10" colorTextHover="#ff0000" fontHover="italic:1" enableDragSwitch="0">
           <page title="基础控件">
             <include src="layout:page_ctrls"/>
           </page>

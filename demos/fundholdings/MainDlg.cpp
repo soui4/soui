@@ -211,7 +211,9 @@ static void SaveWatchCodes(const std::vector<std::string> &codes) {
 CMainDlg::CMainDlg()
     : SHostWnd(_T("LAYOUT:dlg_main")),
       m_cur(-1), m_bBusy(FALSE), m_bQuoteBusy(FALSE), m_bSimulated(FALSE), m_timer(0),
-      m_pLog(NULL), m_logSeen(0), m_logTimer(0), m_bAbout(FALSE), m_bIndexBusy(FALSE) {
+      m_pFundSwipe(NULL), m_pRenderRoot(NULL), m_bSyncingFundPages(FALSE),
+      m_logSeen(0), m_logTimer(0),
+      m_bAbout(FALSE), m_bIndexBusy(FALSE) {
 }
 
 CMainDlg::~CMainDlg() {
@@ -273,31 +275,22 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam) {
     m_indexNote = _T("正在获取大盘指数…");
     UpdateIndexBar();
 
-    // 「请求日志」用只读 rich edit 显示：原生支持滚动/选中/复制，
-    // 文本量大时也不会像 multiLines 的 text 那样每次重排布局。
-    m_pLog = FindChildByID2<SRichEdit>(R.ID.re_log);
-    if (m_pLog) {
-        m_pLog->SetReadOnly(TRUE);
-        m_pLog->SetWordWrap(TRUE);
-        m_pLog->SetLimitText(1024 * 1024);  // 清空由 PumpLog/CLogSink 负责，这里给足容量
-    }
+    // 「请求日志」只读 rich edit 每页一份，统一在 InitDetailPage 里按页初始化。
 
-    // 表格内的视图页签：持仓变化表 / 估值明细 / 请求日志
-    if (SFundTabs *p = FindChildByID2<SFundTabs>(R.ID.tabs)) {
-        std::vector<std::pair<SStringT, int> > items;
-        items.push_back(std::make_pair(SStringT(_T("持仓变化表")), 0));
-        items.push_back(std::make_pair(SStringT(_T("估值明细")), 0));
-        items.push_back(std::make_pair(SStringT(_T("请求日志")), -1));
-        p->SetItems(items);
-        p->SetListener(this);
-    }
+    // 桌面 / mobile / ohos 三套 uires 共用同一个布局模型：fund_swipe 是隐藏
+    // 页头的真实 tabctrl，一支基金一页，页数由自选列表决定（SyncFundPages
+    // 动态建页）。只订阅 Changed：滑动时让 tabctrl 自己完成换页 + CommitDrag
+    // 连续动画，不再在 Changing 里 bCancel 掉换页、也不再复位到「中间页」。
+    m_pFundSwipe = FindChildByName2<STabCtrl>("fund_swipe");
+    if (m_pFundSwipe)
+        m_pFundSwipe->GetEventSet()->subscribeEvent(
+            EventTabSelChanged::EventID, Subscriber(&CMainDlg::OnFundSwipeChanged, this));
 
     // 基金页签（自选列表）：点击切换、点 × 关闭
-    if (SFundWatchTabs *p = FindChildByID2<SFundWatchTabs>(R.ID.watch_tabs)) {
+    if (SFundWatchTabs *p = FindCtrl<SFundWatchTabs>(R.ID.watch_tabs)) {
         p->SetListener(this);
     }
 
-    ShowPane(0);
     UpdateBadge();
 
     // 载入自选列表：允许 0 支收藏。首次启动或用户清空后保持空界面，
@@ -309,6 +302,12 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam) {
         m_watch.push_back(w);
     }
     m_year = CurrentYear();  // 持仓查询年度（UI 不再提供输入，按当前年份自动确定）
+
+    // 每一支基金建一个真实 page（include fund_detail.xml）；三端都有 fund_swipe，
+    // 建页完成后 ShowPane 才能按页找到 pane_swipe。保留 NULL 兜底兼容旧布局。
+    SyncFundPages();
+    if (!m_pFundSwipe) InitDetailPage(NULL);
+    ShowPane(0);
 
     UpdateViewMode();
     if (m_watch.empty()) {
@@ -339,7 +338,7 @@ void CMainDlg::OnClose() {
         ::KillTimer(m_hWnd, 2);
         m_logTimer = 0;
     }
-    m_pLog = NULL;  // 窗口销毁后 rich edit 随即析构，避免日志回调期间再被访问
+    // 日志控件按当前页动态取，不再缓存指针；窗口销毁后由控件树统一析构。
     DestroyWindow();
 }
 
@@ -349,52 +348,77 @@ void CMainDlg::OnMinimize() { SendMessage(WM_SYSCOMMAND, SC_MINIMIZE); }
 
 void CMainDlg::OnSize(UINT nType, CSize size) {
     if (nType == SIZE_MAXIMIZED) {
-        if (SWindow *p = FindChildByID(R.ID.btn_max)) p->SetVisible(FALSE);
-        if (SWindow *p = FindChildByID(R.ID.btn_restore)) p->SetVisible(TRUE);
+        if (SWindow *p = FindWnd(R.ID.btn_max)) p->SetVisible(FALSE);
+        if (SWindow *p = FindWnd(R.ID.btn_restore)) p->SetVisible(TRUE);
     } else {
-        if (SWindow *p = FindChildByID(R.ID.btn_max)) p->SetVisible(TRUE);
-        if (SWindow *p = FindChildByID(R.ID.btn_restore)) p->SetVisible(FALSE);
+        if (SWindow *p = FindWnd(R.ID.btn_max)) p->SetVisible(TRUE);
+        if (SWindow *p = FindWnd(R.ID.btn_restore)) p->SetVisible(FALSE);
     }
     SetMsgHandled(FALSE);
 }
 
 void CMainDlg::SetStatus(const SStringT &s) {
-    if (SWindow *p = FindChildByID(R.ID.txt_status)) p->SetWindowText(s);
+    if (SWindow *p = FindWnd(R.ID.txt_status)) p->SetWindowText(s);
 }
 
 void CMainDlg::SetBusy(BOOL bBusy) {
     m_bBusy = bBusy;
-    if (SWindow *p = FindChildByID(R.ID.btn_query)) p->EnableWindow(!bBusy);
+    if (SWindow *p = FindWnd(R.ID.btn_query)) p->EnableWindow(!bBusy);
     if (bBusy) {
-        if (SWindow *p = FindChildByID(R.ID.txt_status))
+        if (SWindow *p = FindWnd(R.ID.txt_status))
             p->SetWindowText(_T("正在请求天天基金并解析季度持仓…"));
     }
 }
 
 // ------------------------------------------------------------- 页签/面板
 void CMainDlg::ShowPane(int idx) {
-    const int paneIds[3] = {R.ID.pane_change, R.ID.pane_est, R.ID.pane_log};
-    SWindow *pTarget = NULL;
-    for (int i = 0; i < 3; ++i) {
-        if (SWindow *p = FindChildByID(paneIds[i])) {
-            p->SetVisible(i == idx);
-            if (i == idx) pTarget = p;
+    if (idx < 0 || idx > 2) return;
+
+    BOOL bSwitched = FALSE;
+    STabCtrl *pSwipe = CurPaneSwipe();
+    if (pSwipe) {
+        // 移动版：三个面板是 tabctrl 的 page，页面可见性由 tabctrl 维护；
+        // SetCurSel 成功会回调 OnPaneSwipeChanged → UpdatePaneChrome，只有
+        // 真正切页时才省略这里的收尾，避免日志页整篇重填两次。
+        if (pSwipe->GetCurSel() != idx) bSwitched = pSwipe->SetCurSel(idx);
+    } else {
+        const int paneIds[3] = {R.ID.pane_change, R.ID.pane_est, R.ID.pane_log};
+        for (int i = 0; i < 3; ++i) {
+            if (SWindow *p = FindWnd(paneIds[i])) p->SetVisible(i == idx);
         }
     }
+    if (!bSwitched) UpdatePaneChrome(idx);
+}
+
+// 用户左右滑动切页：同步上方自绘页签的选中态、筛选行与日志内容
+BOOL CMainDlg::OnPaneSwipeChanged(EventTabSelChanged *evt) {
+    STabCtrl *pSwipe = CurPaneSwipe();
+    const int idx = evt ? (int)evt->uNewSel : (pSwipe ? pSwipe->GetCurSel() : 0);
+    UpdatePaneChrome(idx);
+    return FALSE;
+}
+
+void CMainDlg::UpdatePaneChrome(int idx) {
+    if (idx < 0 || idx > 2) return;
+    const int paneIds[3] = {R.ID.pane_change, R.ID.pane_est, R.ID.pane_log};
+    SWindow *pTarget = FindWnd(paneIds[idx]);
 
     // 「请求日志」页签下，筛选相关的控件没有意义，换成「清空日志」
     // 注意第二个参数必须传 TRUE：只改可见性而不失效区域时，
     // 隐藏后留下的旧像素不会被擦掉，看起来像"控件没藏住"。
     const BOOL bLog = (idx == 2);
-    if (SWindow *p = FindChildByID(R.ID.edit_filter)) p->SetVisible(!bLog, TRUE);
-    if (SWindow *p = FindChildByID(R.ID.btn_filter)) p->SetVisible(!bLog, TRUE);
-    if (SWindow *p = FindChildByID(R.ID.btn_reset)) p->SetVisible(!bLog, TRUE);
-    if (SWindow *p = FindChildByID(R.ID.btn_log_clear)) p->SetVisible(bLog, TRUE);
+    if (SWindow *p = FindWnd(R.ID.edit_filter)) p->SetVisible(!bLog, TRUE);
+    if (SWindow *p = FindWnd(R.ID.btn_filter)) p->SetVisible(!bLog, TRUE);
+    if (SWindow *p = FindWnd(R.ID.btn_reset)) p->SetVisible(!bLog, TRUE);
+    if (SWindow *p = FindWnd(R.ID.btn_log_clear)) p->SetVisible(bLog, TRUE);
 
     // SetVisible(FALSE) 只改可见性，被隐藏面板的旧像素不会自动擦掉，
     // 这里显式重绘目标面板与父容器，避免切页签后仍看到上一页的内容。
     if (pTarget) pTarget->Invalidate();
     Invalidate();
+
+    // 手势切页时把上方自绘页签的选中态同步过来；SetCurSel 不会再回调监听器，不会递归。
+    if (SFundTabs *p = FindCtrl<SFundTabs>(R.ID.tabs)) p->SetCurSel(idx);
 
     if (bLog) PumpLog(true);  // 切到日志页时整篇重填一次（取最近 200 行）
 }
@@ -415,7 +439,7 @@ void CMainDlg::UpdateViewMode() {
                          (!bAbout && bEmpty) ? TRUE : FALSE,
                          bAbout ? TRUE : FALSE};
     for (int i = 0; i < 3; ++i) {
-        if (SWindow *p = FindChildByID(viewIds[i])) p->SetVisible(vis[i], TRUE);
+        if (SWindow *p = FindWnd(viewIds[i])) p->SetVisible(vis[i], TRUE);
     }
     // 状态栏的 powered by soui5 是常驻署名，不随视图切换忽隐忽现。
     Invalidate();
@@ -436,13 +460,13 @@ void CMainDlg::ShowEmptyState() {
     RefreshWatchTabs();
 
     std::vector<double> empty;
-    if (SFundSpark *p = FindChildByID2<SFundSpark>(R.ID.chart_est)) p->SetSeries(empty);
-    if (SWindow *p = FindChildByID(R.ID.txt_fund_chip)) p->SetWindowText(_T("未选择基金"));
-    if (SWindow *p = FindChildByID(R.ID.txt_upd)) p->SetWindowText(_T("更新于 --:--:--"));
+    if (SFundSpark *p = FindCtrl<SFundSpark>(R.ID.chart_est)) p->SetSeries(empty);
+    if (SWindow *p = FindWnd(R.ID.txt_fund_chip)) p->SetWindowText(_T("未选择基金"));
+    if (SWindow *p = FindWnd(R.ID.txt_upd)) p->SetWindowText(_T("更新于 --:--:--"));
 }
 
 void CMainDlg::UpdateIndexBar() {
-    if (SFundIndexBar *p = FindChildByID2<SFundIndexBar>(R.ID.index_bar)) {
+    if (SFundIndexBar *p = FindCtrl<SFundIndexBar>(R.ID.index_bar)) {
         p->SetItems(m_indexes);
         p->SetNote(m_indexNote);
     }
@@ -468,40 +492,41 @@ void CMainDlg::OnAboutBack() {
 }
 
 void CMainDlg::OnAddSample() {
-    if (SEdit *p = FindChildByID2<SEdit>(R.ID.edit_code)) p->SetWindowText(_T("161725"));
+    if (SEdit *p = FindCtrl<SEdit>(R.ID.edit_code)) p->SetWindowText(_T("161725"));
     OnWatchAdd();
 }
 
 void CMainDlg::AppendLogText(const SStringT &text) {
-    if (!m_pLog || text.IsEmpty()) return;
+    SRichEdit *pLog = CurLog();
+    if (!pLog || text.IsEmpty()) return;
 
     // 控件里的文本总量要有个上限：日志是滚动窗口，留太长既浪费内存，
     // 也会让 rich edit 每次插入后的内部排版变慢。超过阈值就先丢掉前半段。
-    long nLen = (long)m_pLog->SSendMessage(WM_GETTEXTLENGTH, 0, 0);
-    const long kTrimAt = 160000;  // 字符数
+    long nLen = (long)pLog->SSendMessage(WM_GETTEXTLENGTH, 0, 0);
+    const long kTrimAt = 40000;  // 字符数
     if (nLen > kTrimAt) {
-        m_pLog->SSendMessage(EM_SETSEL, 0, nLen / 2);
-        m_pLog->ReplaceSel(_T(""), FALSE);
-        nLen = (long)m_pLog->SSendMessage(WM_GETTEXTLENGTH, 0, 0);
+        pLog->SSendMessage(EM_SETSEL, 0, nLen / 2);
+        pLog->ReplaceSel(_T(""), FALSE);
     }
 
     // 追加而不是整篇 SetWindowText：只重排新增的那几百字节，
     // 日志再多也不会出现"每刷新一次就整篇重排"的卡顿。
     // EM_SETSEL(-1,0) 把插入点移到末尾，ReplaceSel 在只读 rich edit 上依然有效
     //（只读只拦用户输入，不拦程序调用），ipcdemo 的日志窗口也是这个用法。
-    m_pLog->SSendMessage(EM_SETSEL, (WPARAM)-1, 0);
-    m_pLog->ReplaceSel(text, FALSE);
-    m_pLog->SSendMessage(EM_SCROLLCARET, 0, 0);
+    pLog->SSendMessage(EM_SETSEL, (WPARAM)-1, (LPARAM)-1);
+    pLog->ReplaceSel(text, FALSE);
+    pLog->SSendMessage(EM_SCROLLCARET, 0, 0);
 }
 
 void CMainDlg::PumpLog(bool bRebuild) {
-    if (!m_pLog) return;
+    SRichEdit *pLog = CurLog();
+    if (!pLog) return;
 
     CLogSink &sink = CLogSink::Instance();
     const unsigned long long total = sink.Count();
 
     if (bRebuild) {
-        m_pLog->SetWindowText(_T(""));
+        pLog->SetWindowText(_T(""));
         // 只回填最近 200 行：日志是滚动窗口，翻太久的没有意义
         m_logSeen = (total > 200) ? total - 200 : 0;
     } else if (total == m_logSeen) {
@@ -522,7 +547,7 @@ void CMainDlg::PumpLog(bool bRebuild) {
 
 void CMainDlg::OnLogClear() {
     CLogSink::Instance().Clear();
-    if (m_pLog) m_pLog->SetWindowText(_T(""));
+    if (SRichEdit *pLog = CurLog()) pLog->SetWindowText(_T(""));
     m_logSeen = CLogSink::Instance().Count();
     SetStatus(_T("已清空请求日志（log4z 落盘的日志文件不受影响）"));
 }
@@ -546,9 +571,24 @@ void CMainDlg::SaveWatch() {
     SaveWatchCodes(codes);
 }
 
+void CMainDlg::OnFilterSetFocus(IEvtArgs *e)
+{
+    // 只有筛选框获得焦点时才激活键盘占位：输入基金代码等其它位置弹键盘
+    // 时不应把详情页顶起来。keyboardSpacer 初始未激活，SKeyboardSpacer 会
+    // 在键盘收起时自动回到未激活态，等下一次焦点事件再打开。
+    if (SWindow *root = CurDetailRoot())
+    {
+        SWindow *pKbSpacer = root->FindChildByName("kbspacer");
+        if(pKbSpacer){
+            SLOGI()<<"show keyboard spacer";
+            pKbSpacer->SetVisible(TRUE);
+        }
+    }
+}
+
 // 把 m_watch 同步到页签控件（代码/名称/涨跌幅/净值/加载状态）
 void CMainDlg::RefreshWatchTabs() {
-    SFundWatchTabs *p = FindChildByID2<SFundWatchTabs>(R.ID.watch_tabs);
+    SFundWatchTabs *p = FindCtrl<SFundWatchTabs>(R.ID.watch_tabs);
     if (!p) return;
 
     std::vector<WatchTabItem> items;
@@ -571,21 +611,162 @@ void CMainDlg::RefreshWatchTabs() {
     // 拉回第 0 张卡片。要「让选中项可见」只在用户主动切换时由 ActivateFund 做。
     p->SyncCurSel(m_cur);
 
-    if (SWindow *t = FindChildByID(R.ID.txt_watch_cnt)) {
+    if (SWindow *t = FindWnd(R.ID.txt_watch_cnt)) {
         SStringT s;
         s.Format(_T("%d 只"), (int)m_watch.size());
         t->SetWindowText(s);
     }
 }
 
-// 切换当前基金：优先用缓存渲染，不发起请求；未加载时才触发后台抓取
+// ------------------------------------------------------------- 一支基金一页（三端统一）
+// 桌面 / mobile / ohos 的 fund_swipe 都是页头隐藏的真实 tabctrl：页数与自选
+// 列表一一对应，每页通过 <include src="layout:fund_detail"/> 载入完整分析控件树。
+// 下面所有 helper 先限定在当前页子树里找，页外控件再回退到宿主根。
+SWindow *CMainDlg::DetailPage(int idx) {
+    if (!m_pFundSwipe || idx < 0 || idx >= m_pFundSwipe->GetItemCount()) return NULL;
+    return m_pFundSwipe->GetItem(idx);
+}
+
+SWindow *CMainDlg::CurDetailRoot() {
+    if (m_pRenderRoot) return m_pRenderRoot;
+    return DetailPage(m_pFundSwipe ? m_pFundSwipe->GetCurSel() : -1);
+}
+
+SWindow *CMainDlg::FindWnd(int id) {
+    // 每支基金一页、页内控件 ID 同名：必须先限定在当前页的子树里找。
+    // SWindow::_FindChildByID 不跳过隐藏页，且 SWindowFinder 按 (parent,id)
+    // 缓存，直接从宿主根查会一直命中第 0 页的控件。
+    if (SWindow *root = CurDetailRoot())
+        if (SWindow *p = root->FindChildByID(id)) return p;
+    // 页外控件（工具条 / 状态栏 / 视图容器 / 自选页签 / 指数条 / edit_code …）
+    // 挂在宿主根上，不在任何 page 子树内；layout 里没有 fund_swipe 时
+    // CurDetailRoot() 恒为 NULL，也一律走这里。
+    return SHostWnd::FindChildByID(id);
+}
+
+STabCtrl *CMainDlg::CurPaneSwipe() {
+    SWindow *root = CurDetailRoot();
+    if (!root) return NULL;
+    // 按名字查找：三端模板同名，且不必依赖 R.ID 表里的注册顺序。
+    SWindow *p = root->FindChildByName(L"pane_swipe");
+    return (p && p->IsClass(STabCtrl::GetClassName())) ? (STabCtrl *)p : NULL;
+}
+
+SRichEdit *CMainDlg::CurLog() {
+    return FindCtrl<SRichEdit>(R.ID.re_log);
+}
+
+void CMainDlg::InitDetailPage(SWindow *pPage) {
+    // 表格上方自绘页签：每页一份，都要接同一个监听器。
+    SFundTabs *pTabs = pPage ? pPage->FindChildByID2<SFundTabs>(R.ID.tabs)
+                             : FindCtrl<SFundTabs>(R.ID.tabs);
+    if (pTabs) {
+        std::vector<std::pair<SStringT, int> > items;
+        items.push_back(std::make_pair(SStringT(_T("持仓变化表")), 0));
+        items.push_back(std::make_pair(SStringT(_T("估值明细")), 0));
+        items.push_back(std::make_pair(SStringT(_T("请求日志")), -1));
+        pTabs->SetItems(items);
+        pTabs->SetListener(this);
+    }
+    // 面板 tabctrl 的滑动切页通知：每页一份。
+    if (pPage) {
+        SWindow *p = pPage->FindChildByName(L"pane_swipe");
+        if (p && p->IsClass(STabCtrl::GetClassName())) {
+            ((STabCtrl *)p)->GetEventSet()->subscribeEvent(
+                EventTabSelChanged::EventID, Subscriber(&CMainDlg::OnPaneSwipeChanged, this));
+        }
+    }
+    // 「请求日志」只读 rich edit：原生支持滚动/选中/复制，文本量大时也不会
+    // 像 multiLines 的 text 那样每次重排布局。
+    SRichEdit *pLog = pPage ? pPage->FindChildByID2<SRichEdit>(R.ID.re_log) : CurLog();
+    if (pLog) {
+        pLog->SetReadOnly(TRUE);
+        pLog->SetWordWrap(TRUE);
+        pLog->SetLimitText(1024 * 1024);  // 清空由 PumpLog/CLogSink 负责，这里给足容量
+    }
+}
+
+void CMainDlg::SyncFundPages() {
+    if (!m_pFundSwipe) return;
+    // RemoveItem 删到当前页时会自动 SetCurSel，期间的 Changed 一律忽略，
+    // 否则会在收藏列表还没稳定时反过来改写 m_cur。
+    m_bSyncingFundPages = TRUE;
+    const int nWant = (int)m_watch.size();
+    while (m_pFundSwipe->GetItemCount() > nWant)
+        m_pFundSwipe->RemoveItem(m_pFundSwipe->GetItemCount() - 1, 0);
+    while (m_pFundSwipe->GetItemCount() < nWant) {
+        const int nBefore = m_pFundSwipe->GetItemCount();
+        const int i = m_pFundSwipe->InsertItem(
+            L"<include src='layout:fund_detail'/>");
+        InitDetailPage(DetailPage(i));
+    }
+    m_bSyncingFundPages = FALSE;
+}
+
+void CMainDlg::RenderFundPage(int idx) {
+    if (!m_pFundSwipe || idx < 0 || idx >= (int)m_watch.size()) return;
+    SWindow *pPage = DetailPage(idx);
+    if (!pPage) return;
+
+    // 预渲染邻页：临时把「当前基金数据副本 + 渲染目标页」切到该基金，
+    // 复用现有的一整套渲染函数，渲染完立刻恢复。这样 STabSlider 在手指刚
+    // 开始拖动时拍到的就是真实的新基金页面，而不是空白过渡页。
+    SWindow *pOldRoot = m_pRenderRoot;
+    std::vector<HoldingChange> oldRows = m_rows, oldView = m_view;
+    FundMeta oldMeta = m_meta;
+    FundEstimate oldEst = m_est;
+    int oldCur = m_cur;
+
+    m_pRenderRoot = pPage;
+    m_cur = idx;
+    m_rows = m_watch[idx].rows;
+    m_view = m_rows;
+    m_meta = m_watch[idx].meta;
+    m_est = m_watch[idx].est;
+
+    FillGrid(m_rows);
+    FillEstGrid(m_est);
+    UpdateEstimateUI(m_est, false);  // 预渲染绝不追加走势采样点
+    SyncTabCounts();
+    if (SFundSpark *p = FindCtrl<SFundSpark>(R.ID.chart_est)) p->SetSeries(m_watch[idx].series);
+
+    m_pRenderRoot = pOldRoot;
+    m_cur = oldCur;
+    m_rows = oldRows;
+    m_view = oldView;
+    m_meta = oldMeta;
+    m_est = oldEst;
+}
+
+void CMainDlg::RenderNeighborPages() {
+    if (!m_pFundSwipe) return;
+    for (int i = m_cur - 1; i <= m_cur + 1; ++i)
+        RenderFundPage(i);
+}
+
+void CMainDlg::SyncFundChrome() {
+    if (m_cur < 0 || m_cur >= (int)m_watch.size()) return;
+    const WatchFund &w = m_watch[m_cur];
+    if (SEdit *p = FindCtrl<SEdit>(R.ID.edit_code)) p->SetWindowText(U8(w.code));
+    if (SWindow *p = FindWnd(R.ID.txt_fund_chip)) {
+        SStringT s;
+        s.Format(_T("%s  %s"), U8(w.code).c_str(),
+                 w.name.empty() ? _T("加载中…") : U8(w.name).c_str());
+        p->SetWindowText(s);
+    }
+    if (SFundWatchTabs *tabs = FindCtrl<SFundWatchTabs>(R.ID.watch_tabs)) tabs->SetCurSel(m_cur);
+}
+
+// 切换当前基金：优先用缓存渲染，不发起请求；未加载时才触发后台抓取。
+// 移动版点击自选卡片时也让 fund_swipe 真正换页；滑动换页由 OnFundSwipeChanged
+// 负责，那边绝不能反过来调 SetCurSel（会 Stop 掉正在播放的 STabSlider）。
 void CMainDlg::ActivateFund(int idx) {
     if (idx < 0 || idx >= (int)m_watch.size()) return;
     m_cur = idx;
     WatchFund &w = m_watch[idx];
 
-    if (SEdit *p = FindChildByID2<SEdit>(R.ID.edit_code)) p->SetWindowText(U8(w.code));
-    if (SEdit *p = FindChildByID2<SEdit>(R.ID.edit_filter)) p->SetWindowText(_T(""));
+    if (SEdit *p = FindCtrl<SEdit>(R.ID.edit_code)) p->SetWindowText(U8(w.code));
+    if (SEdit *p = FindCtrl<SEdit>(R.ID.edit_filter)) p->SetWindowText(_T(""));
 
     m_rows = w.rows;
     m_view = m_rows;
@@ -594,8 +775,13 @@ void CMainDlg::ActivateFund(int idx) {
 
     // 该基金还没有采样序列但有估值时，先放一个点，避免走势图空白
     if (w.series.empty() && w.est.valid) w.series.push_back(w.est.estPct);
-    if (SFundSpark *p = FindChildByID2<SFundSpark>(R.ID.chart_est)) p->SetSeries(w.series);
 
+    // 点击页签也走 tabctrl 换页：桌面版没有该控件，直接渲染即可。
+    // SetCurSel 会 Stop 掉正在播放的 slider，所以只在「用户主动点击」时用。
+    if (m_pFundSwipe && m_pFundSwipe->GetCurSel() != idx)
+        m_pFundSwipe->SetCurSel(idx);
+
+    if (SFundSpark *p = FindCtrl<SFundSpark>(R.ID.chart_est)) p->SetSeries(w.series);
     FillGrid(m_rows);
     FillEstGrid(m_est);
     UpdateEstimateUI(w.est, false);  // 切页签只是重绘，不再往走势里追加采样点
@@ -604,15 +790,18 @@ void CMainDlg::ActivateFund(int idx) {
     RefreshWatchTabs();
     // 用户主动切换 / 新增收藏时才把选中卡片滚进可视区；
     // 后台刷新走的 RefreshWatchTabs() 已改成 SyncCurSel，不会碰滚动位置。
-    if (SFundWatchTabs *tabs = FindChildByID2<SFundWatchTabs>(R.ID.watch_tabs))
+    if (SFundWatchTabs *tabs = FindCtrl<SFundWatchTabs>(R.ID.watch_tabs))
         tabs->SetCurSel(m_cur);
 
-    if (SWindow *p = FindChildByID(R.ID.txt_fund_chip)) {
+    if (SWindow *p = FindWnd(R.ID.txt_fund_chip)) {
         SStringT s;
         s.Format(_T("%s  %s"), U8(w.code).c_str(),
                  w.name.empty() ? _T("加载中…") : U8(w.name).c_str());
         p->SetWindowText(s);
     }
+
+    // 预渲染相邻页：下一次手指刚开始拖动，STabSlider 拍到的就是真实的新基金页面。
+    RenderNeighborPages();
 
     if (!w.loaded && !w.loading) {
         LoadWatchFund(idx);
@@ -647,7 +836,7 @@ void CMainDlg::LoadNextPending() {
 }
 
 void CMainDlg::SyncTabCounts() {
-    SFundTabs *p = FindChildByID2<SFundTabs>(R.ID.tabs);
+    SFundTabs *p = FindCtrl<SFundTabs>(R.ID.tabs);
     if (!p) return;
     std::vector<std::pair<SStringT, int> > items;
     items.push_back(std::make_pair(SStringT(_T("持仓变化表")), (int)m_rows.size()));
@@ -658,7 +847,7 @@ void CMainDlg::SyncTabCounts() {
 
 // ------------------------------------------------------------- 查询 / 自选
 void CMainDlg::OnQuery() {
-    SEdit *pCode = FindChildByID2<SEdit>(R.ID.edit_code);
+    SEdit *pCode = FindCtrl<SEdit>(R.ID.edit_code);
     if (!pCode) return;
 
     std::string code = toAscii(pCode->GetWindowText());
@@ -688,12 +877,13 @@ void CMainDlg::OnQuery() {
     m_bAbout = FALSE;
     UpdateViewMode();
     SetBusy(TRUE);
+    SyncFundPages();
     ActivateFund(idx);
     RestartTimer();
 }
 
 void CMainDlg::OnWatchAdd() {
-    SEdit *pCode = FindChildByID2<SEdit>(R.ID.edit_code);
+    SEdit *pCode = FindCtrl<SEdit>(R.ID.edit_code);
     if (!pCode) return;
 
     std::string code = toAscii(pCode->GetWindowText());
@@ -713,6 +903,7 @@ void CMainDlg::OnWatchAdd() {
     SaveWatch();
     m_bAbout = FALSE;
     UpdateViewMode();  // 从空界面切回完整分析页
+    SyncFundPages();
     ActivateFund((int)m_watch.size() - 1);
     RestartTimer();
 
@@ -726,11 +917,36 @@ void CMainDlg::OnWatchSel(int idx) {
     ActivateFund(idx);
 }
 
+// 移动版：左右滑动切换基金。tabctrl 一支基金一页，STabSlider 在拖动开始时
+// 已对前后两页拍好快照并跟手平移，松手后 CommitDrag 连续滑到目标页 —— 与
+// 下方「持仓变化 / 估值明细 / 请求日志」用的是完全相同的 tabctrl 换页动画。
+// 这里只同步「当前基金」的数据副本和页外 UI；绝不能调 SetCurSel / ActivateFund，
+// 因为 SetCurSel 会 Stop 掉刚 start 的 slider，把整段连续过渡动画吞掉。
+BOOL CMainDlg::OnFundSwipeChanged(EventTabSelChanged *evt) {
+    if (!evt || !m_pFundSwipe || m_bSyncingFundPages) return FALSE;
+    const int sel = (int)evt->uNewSel;
+    if (sel == m_cur) return FALSE;  // ActivateFund 的程序化切页，已经处理过了
+    if (sel < 0 || sel >= (int)m_watch.size()) return FALSE;
+
+    m_cur = sel;
+    const WatchFund &w = m_watch[sel];
+    m_rows = w.rows;
+    m_view = m_rows;
+    m_meta = w.meta;
+    m_est = w.est;
+
+    SyncFundChrome();
+    UpdateStatusSummary();
+    RenderNeighborPages();
+    return FALSE;
+}
+
 void CMainDlg::OnWatchClose(int idx) {
     if (idx < 0 || idx >= (int)m_watch.size()) return;
 
     m_watch.erase(m_watch.begin() + idx);
     SaveWatch();
+    SyncFundPages();  // tabctrl 页数跟着自选列表走
 
     // 允许删到 0 支：不再要求「至少保留一只」。收藏清空后显示空界面，
     // 大盘指数条与定时器照常工作，用户随时可以重新添加。
@@ -825,6 +1041,7 @@ void CMainDlg::OnWatchResult(EventArgs *e) {
     if (!anyLoading) SetBusy(FALSE);
 
     RefreshWatchTabs();
+    RenderNeighborPages();  // 持仓回来后刷新当前页与相邻页，保证拖动快照是最新数据
 
     // 有新持仓后立刻拉一次行情，让该基金的估值出来
     if (e2->bOk) RefreshAllQuotes(false);
@@ -849,7 +1066,7 @@ void CMainDlg::RestartTimer() {
 void CMainDlg::OnTimer(UINT_PTR idEvent) {
     if (idEvent == 2) {
         // 日志增量刷新：只在「请求日志」页签可见时干活，避免无谓的重排
-        if (SWindow *p = FindChildByID(R.ID.pane_log)) {
+        if (SWindow *p = FindWnd(R.ID.pane_log)) {
             if (p->IsVisible()) PumpLog(false);
         }
         return;
@@ -862,6 +1079,7 @@ void CMainDlg::OnTimer(UINT_PTR idEvent) {
     // 净值是日频数据，只在手动刷新时重拉，避免每分钟多打 N 个接口。
     RefreshIndexes();
     RefreshAllQuotes(false);
+    SetMsgHandled(FALSE);
 }
 
 void CMainDlg::OnRefreshAll() {
@@ -932,7 +1150,7 @@ void CMainDlg::RefreshAllQuotes(bool withMeta) {
     m_bQuoteBusy = TRUE;
     // 后台请求没有回投结果前，界面必须给出"正在干活"的反馈，
     // 否则网络慢的时候用户会以为界面卡住了。
-    if (SWindow *p = FindChildByID(R.ID.txt_upd)) p->SetWindowText(_T("刷新中…"));
+    if (SWindow *p = FindWnd(R.ID.txt_upd)) p->SetWindowText(_T("刷新中…"));
     SFunctor3<CMainDlg, PFN_FetchMarket, std::string, std::string, bool> task(
         this, &CMainDlg::doFetchMarket, csv, metaCsv, m_bSimulated ? true : false);
     m_taskLoop->postTask(&task, FALSE, 0);
@@ -1011,7 +1229,7 @@ void CMainDlg::OnMarketResult(EventArgs *e) {
         UpdateStatusSummary();
         SyncTabCounts();
 
-        if (SWindow *p = FindChildByID(R.ID.txt_fund_chip)) {
+        if (SWindow *p = FindWnd(R.ID.txt_fund_chip)) {
             SStringT s;
             s.Format(_T("%s  %s"), U8(m_watch[m_cur].code).c_str(),
                      m_watch[m_cur].name.empty() ? _T("—") : U8(m_watch[m_cur].name).c_str());
@@ -1026,8 +1244,10 @@ void CMainDlg::OnMarketResult(EventArgs *e) {
         SStringT upd;
         upd.Format(_T("更新于 %s · %d/%d 只"), U8(m_est.updatedAt).c_str(), okCount,
                    (int)m_watch.size());
-        if (SWindow *p = FindChildByID(R.ID.txt_upd)) p->SetWindowText(upd);
+        if (SWindow *p = FindWnd(R.ID.txt_upd)) p->SetWindowText(upd);
     }
+    // 各基金估值重算后，把当前页与相邻页一起刷成最新数据
+    RenderNeighborPages();
     // 日志面板由定时器按增量刷新，这里不再主动读文件/整篇重填
 }
 
@@ -1076,8 +1296,8 @@ void CMainDlg::UpdateBadge() {
     EMarketSession s = m_bSimulated ? MS_SIMULATED : detectMarketSession(std::time(NULL));
     bool live = (s == MS_TRADING || s == MS_SIMULATED);
 
-    SWindow *pLive = FindChildByID(R.ID.txt_market);
-    SWindow *pOff = FindChildByID(R.ID.txt_market_off);
+    SWindow *pLive = FindWnd(R.ID.txt_market);
+    SWindow *pOff = FindWnd(R.ID.txt_market_off);
     if (pLive) {
         pLive->SetWindowText(marketSessionLabel(s));
         pLive->SetVisible(live);
@@ -1137,7 +1357,7 @@ void CMainDlg::UpdateEstimateUI(const FundEstimate &est, bool bAppend) {
     const SStringT dash = _T("—");
 
     // 主卡：估算涨跌幅
-    if (SFundKpiCard *p = FindChildByID2<SFundKpiCard>(R.ID.kpi_hero)) {
+    if (SFundKpiCard *p = FindCtrl<SFundKpiCard>(R.ID.kpi_hero)) {
         SStringT pill;
         if (m_bSimulated) pill = _T("模拟盘中");
         else pill = marketSessionLabel(detectMarketSession(std::time(NULL)));
@@ -1151,7 +1371,7 @@ void CMainDlg::UpdateEstimateUI(const FundEstimate &est, bool bAppend) {
     }
 
     // 估算净值
-    if (SFundKpiCard *p = FindChildByID2<SFundKpiCard>(R.ID.kpi_nav)) {
+    if (SFundKpiCard *p = FindCtrl<SFundKpiCard>(R.ID.kpi_nav)) {
         SStringT v = dash, sub;
         if (est.estNav > 0) {
             v = formatNumber(est.estNav, 4);
@@ -1163,20 +1383,19 @@ void CMainDlg::UpdateEstimateUI(const FundEstimate &est, bool bAppend) {
         p->SetContent(_T("估算净值"), v, _T(""), sub, _T(""), kText);
     }
 
-    // 持仓覆盖度（圆环）
-    if (SFundKpiCard *p = FindChildByID2<SFundKpiCard>(R.ID.kpi_cover)) {
+    // 持仓覆盖度（圆环）：百分比只画在圆环内，卡片左侧不再重复同一数值，
+    // 说明文字也只由 SetRing 的 note 提供，避免两个「94%」和重复说明相互压叠。
+    if (SFundKpiCard *p = FindCtrl<SFundKpiCard>(R.ID.kpi_cover)) {
         if (est.valid) {
             SStringT center, note;
             center.Format(_T("%.0f%%"), est.coverPct);
             note.Format(_T("权重股 %d 只\n现金及其他 %.1f%%"), est.holdCount,
                         100.0 - est.coverPct);
             p->SetRing((float)(est.coverPct / 100.0), center, note);
-            SStringT sub;
-            sub.Format(_T("权重股 %d 只"), est.holdCount);
-            p->SetContent(_T("持仓覆盖度"), center, _T(""), sub, _T(""), kText);
+            p->SetContent(_T("持仓覆盖度"), _T(""), _T(""), _T(""), _T(""), kText);
         } else {
             p->SetRing(0.f, dash, _T(""));
-            p->SetContent(_T("持仓覆盖度"), dash, _T(""), _T("等待行情"), _T(""), kText3);
+            p->SetContent(_T("持仓覆盖度"), _T(""), _T(""), _T("等待行情"), _T(""), kText3);
         }
     }
 
@@ -1184,11 +1403,12 @@ void CMainDlg::UpdateEstimateUI(const FundEstimate &est, bool bAppend) {
     const int kpiIds[2] = {R.ID.kpi_pull, R.ID.kpi_drag};
     for (int k = 0; k < 2; ++k) {
         int idx = (k == 0) ? est.bestIdx : est.worstIdx;
-        SFundKpiCard *p = FindChildByID2<SFundKpiCard>(kpiIds[k]);
+        SFundKpiCard *p = FindCtrl<SFundKpiCard>(kpiIds[k]);
         if (!p) continue;
         if (est.valid && idx >= 0 && idx < (int)est.items.size()) {
             const ContributionItem &it = est.items[idx];
-            SStringT v = U8(it.name);
+            // 行情源偶尔只给代码不给名称，回退显示代码，避免主数值整块空白。
+            SStringT v = it.name.empty() ? U8(it.code) : U8(it.name);
             SStringT sub;
             sub.Format(_T("%s%% · 贡献 %spp"), formatDelta(it.chgPct, 2).c_str(),
                        formatDelta(it.contrib, 3).c_str());
@@ -1205,12 +1425,12 @@ void CMainDlg::UpdateEstimateUI(const FundEstimate &est, bool bAppend) {
         if (WatchFund *w = CurFund()) {
             w->series.push_back(est.estPct);
             if (w->series.size() > 241) w->series.erase(w->series.begin());
-            if (SFundSpark *p = FindChildByID2<SFundSpark>(R.ID.chart_est)) p->SetSeries(w->series);
+            if (SFundSpark *p = FindCtrl<SFundSpark>(R.ID.chart_est)) p->SetSeries(w->series);
         }
     }
 
     // 贡献度分解
-    if (SFundContrib *p = FindChildByID2<SFundContrib>(R.ID.contrib_list)) p->SetItems(est.items);
+    if (SFundContrib *p = FindCtrl<SFundContrib>(R.ID.contrib_list)) p->SetItems(est.items);
 
     // 走势图右上角说明与更新时间
     {
@@ -1227,111 +1447,236 @@ void CMainDlg::UpdateEstimateUI(const FundEstimate &est, bool bAppend) {
         SStringT sub;
         sub.Format(_T("%s · %s"), U8(std::string(dateBuf)).c_str(),
                    m_bSimulated ? _T("模拟盘中") : marketSessionLabel(detectMarketSession(t)));
-        if (SWindow *p = FindChildByID(R.ID.txt_chart_sub)) p->SetWindowText(sub);
+        if (SWindow *p = FindWnd(R.ID.txt_chart_sub)) p->SetWindowText(sub);
 
         SStringT upd;
         if (!est.updatedAt.empty()) {
             upd.Format(_T("更新于 %s"), U8(est.updatedAt).c_str());
-            if (SWindow *p = FindChildByID(R.ID.txt_upd)) p->SetWindowText(upd);
+            if (SWindow *p = FindWnd(R.ID.txt_upd)) p->SetWindowText(upd);
         }
     }
 }
 
 // ------------------------------------------------------------- 表格填充
+// 单元格内边距（dp）：宽屏保留 6dp 观感；手机竖屏压到 2dp，
+// 否则左右共 12dp 会吃掉数值列最后一位（如代码 600519 只显示 60051）。
+static int CellMarginDp(int parentWidth, int sc) {
+    const int dpi = sc > 0 ? sc : 100;
+    return parentWidth < 600 * dpi / 100 ? 2 : 6;
+}
+
 // 批量填表时统一设置单元格文本/对齐/边距/底色。
 // 原先这里是就地写的 lambda，VS2008 不支持 lambda，改为文件级函数。
-static void SetCellText(SGridCtrl *pGrid, int sc, int row, int c, const SStringT &s, DWORD fmt,
-                        COLORREF clr) {
+static void SetCellText(SGridCtrl *pGrid, int row, int c, const SStringT &s, DWORD fmt,
+                        COLORREF clr, int margin) {
     pGrid->SetItemText(row, c, s);
     IGridCell *cell = pGrid->GetCell(row, c);
     if (!cell) return;
     cell->SetFormat(fmt);
-    cell->SetMargin(6 * sc / 100);
+    cell->SetMargin(margin);
     cell->SetBackClr((row & 1) ? kRowBg2 : kRowBg);
     cell->SetTextClr(clr ? clr : kText2);
 }
 
+// ------------------------------------------------- XML 列布局驱动
+// 行高/列宽/表头样式一次性应用到 grid。列定义已由 SGridCtrl 从 <columns>
+// 子节点解析好，这里只按 DPI 和窗口宽度计算实际尺寸。
+// 固定宽度按 DPI 缩放；权重列按权重分摊父窗口可用宽度。
+static void ApplyGridColumns(SGridCtrl *pGrid, int parentWidth, int sc, int rowCount) {
+    int rowH = pGrid->GetDefCellHeight() * sc / 100;
+    if (rowH <= 0) rowH = 30 * sc / 100;
+    for (int r = 0; r < rowCount; ++r) pGrid->SetRowHeight(r, rowH);
+
+    const int nCols = pGrid->GetColumnCount();
+    int totalWeight = 0;
+    for (int c = 0; c < nCols; ++c) totalWeight += pGrid->GetColumnWeight(c);
+
+    int avail = 0;
+    if (totalWeight > 0) {
+        avail = parentWidth - 100;  // 扣掉卡片 margin/padding 与垂直滚动条
+        if (avail < 400) {
+            // 窄屏（手机竖屏）：100dp 的预留太大，按实际客户区宽度分配；
+            // 仍是同一套权重算法，桌面宽度下走上面的分支，行为不变。
+            // 68dp = 两侧卡片 margin(12+12) + padding(8+8) + 网格内滚动条与边框；
+            // 必须随 DPI 缩放，否则 125% 缩放下会多留几像素并出现横向滚动条。
+            avail = parentWidth - 68 * sc / 100;
+            if (avail < 100) avail = 1340;  // 首次布局宽度尚未就绪时的兜底
+        }
+    }
+
+    int used = 0;
+    for (int c = 0; c < nCols; ++c) {
+        int w = 0;
+        int weight = pGrid->GetColumnWeight(c);
+        if (weight > 0) {
+            if (c == nCols - 1)
+                w = avail - used;
+            else
+                w = avail * weight / totalWeight;
+            if (w < 40 * sc / 100) w = 40 * sc / 100;  // 手机竖屏列多、单列窄，下限随 DPI 缩放
+        } else {
+            w = pGrid->GetColumnDefWidth(c) * sc / 100;
+        }
+        pGrid->SetColumnWidth(c, w);
+        used += w;
+
+        // 表头文字/对齐已由控件解析，这里只补应用层的配色与边距。
+        IGridCell *hc = pGrid->GetCell(0, c);
+        if (!hc) continue;
+        hc->SetMargin(CellMarginDp(parentWidth, sc));
+        hc->SetTextClr(kText3);
+        hc->SetBackClr(kHeadBg);
+    }
+}
+
+// q1_xxx / q2_xxx / q3_xxx 中的季度下标；不是这类 key 返回 -1。
+static int QuarterFromKey(const SStringW &key) {
+    if (key.GetLength() < 4 || key[0] != L'q') return -1;
+    wchar_t q = key[1];
+    if (q < L'1' || q > L'3') return -1;
+    return (int)(q - L'1');
+}
+
+static BOOL DeltaCell(BOOL bValid, double v, int dec, const SStringT &dash, SStringT *out,
+                      COLORREF *clr) {
+    if (!bValid) {
+        *out = dash;
+        *clr = kDim;
+    } else {
+        *out = formatDelta(v, dec);
+        *clr = deltaColor(v);
+    }
+    return TRUE;
+}
+
+// 按 XML key 生成持仓变化表的单元格；返回 FALSE 表示 XML 中出现了未知列。
+static BOOL HoldingCellValue(const HoldingChange &d, const SStringW &key, const SStringT &dash,
+                             SStringT *out, COLORREF *clr) {
+    *clr = 0;
+    int q = QuarterFromKey(key);
+    if (q >= 0) {
+        if (key.EndsWith(L"_pct"))
+            *out = cellNum(d.pct[q], d.hasQ[q], 2, dash);
+        else if (key.EndsWith(L"_sh"))
+            *out = cellNum(d.shares[q], d.hasQ[q], 2, dash);
+        else if (key.EndsWith(L"_mv"))
+            *out = cellNum(d.mv[q], d.hasQ[q], 0, dash);
+        else
+            return FALSE;
+        return TRUE;
+    }
+
+    if (key == L"lp_pct") {
+        *out = (d.lpQuarter > 0)
+                   ? cellNum(d.pct[d.lpQuarter - 1], d.hasQ[d.lpQuarter - 1], 2, dash)
+                   : dash;
+        *clr = kAccent;
+    } else if (key == L"code") {
+        *out = U8(d.code);
+        *clr = kText3;
+    } else if (key == L"name") {
+        *out = U8(d.name);
+        *clr = kText;
+    } else if (key == L"pct_chg") {
+        return DeltaCell(d.chgValid, d.pctChg, 2, dash, out, clr);
+    } else if (key == L"sh_chg") {
+        return DeltaCell(d.chgValid, d.shChg, 2, dash, out, clr);
+    } else if (key == L"mv_chg") {
+        return DeltaCell(d.chgValid, d.mvChg, 0, dash, out, clr);
+    } else if (key == L"quarters") {
+        *out = S_CA2T(d.status.c_str(), CP_UTF8);
+        *clr = kText2;
+    } else if (key == L"tag") {
+        *out = d.tag.empty() ? dash : S_CA2T(d.tag.c_str(), CP_UTF8);
+        *clr = d.tag.empty() ? kDim : kAccent;
+    } else {
+        return FALSE;
+    }
+    return TRUE;
+}
+
+// 按 XML key 生成估值明细的单元格。
+static BOOL EstCellValue(const ContributionItem &it, const SStringW &key, const SStringT &dash,
+                         SStringT *out, COLORREF *clr) {
+    *clr = 0;
+    if (key == L"code") {
+        *out = U8(it.code);
+        *clr = kText3;
+    } else if (key == L"name") {
+        *out = U8(it.name);
+        *clr = kText;
+    } else if (key == L"weight") {
+        *out = formatNumber(it.weight, 2);
+    } else if (key == L"price") {
+        *out = it.quoted ? formatNumber(it.price, 2) : dash;
+        *clr = kDim;
+    } else if (key == L"chg_pct") {
+        return DeltaCell(TRUE, it.chgPct, 2, dash, out, clr);
+    } else if (key == L"contrib") {
+        return DeltaCell(TRUE, it.contrib, 3, dash, out, clr);
+    } else {
+        return FALSE;
+    }
+    return TRUE;
+}
+
+// 估值明细的合计行：同一批 key，但取值来自整只基金的汇总数据。
+static BOOL EstSumCellValue(const FundEstimate &est, const SStringW &key, SStringT *out,
+                            COLORREF *clr) {
+    *clr = 0;
+    if (key == L"code") {
+        *out = _T("合计");
+        *clr = kText2;
+    } else if (key == L"weight") {
+        *out = formatNumber(est.coverPct, 2);
+        *clr = kAccent;
+    } else if (key == L"contrib") {
+        *out = formatDelta(est.estPct, 3);
+        *clr = deltaColor(est.estPct);
+    } else if (key == L"name" || key == L"price" || key == L"chg_pct") {
+        *out = _T("");
+    } else {
+        return FALSE;
+    }
+    return TRUE;
+}
+
 void CMainDlg::FillGrid(const std::vector<HoldingChange> &list) {
-    SGridCtrl *pGrid = FindChildByID2<SGridCtrl>(R.ID.grid_holdings);
+    SGridCtrl *pGrid = FindCtrl<SGridCtrl>(R.ID.grid_holdings);
     if (!pGrid) return;
 
-    // 17 列 × 上百行会有上千次 SetItemText/GetCell，若每次都触发重绘，
+    // 列集合来自 XML 的 <columns> 子节点：移动版可只声明 7 列，这段逻辑不用改。
+    const int nCols = pGrid->GetColumnCount();
+    if (nCols <= 0) return;
+
+    // 上百行 × 十几列会产生上千次 SetItemText/GetCell，若每次都触发重绘，
     // 在 UI 线程上就是"点一下卡半秒"。这里先锁住刷新，填完统一重绘一次。
     pGrid->LockUpdate();
 
-    const int cols = 17;
-    static const SStringT hdr[cols] = {
-        _T("最新占净值%"), _T("代码"), _T("名称"),
-        _T("Q1占净值%"), _T("Q2占净值%"), _T("Q3占净值%"),
-        _T("Q1持股(万)"), _T("Q2持股(万)"), _T("Q3持股(万)"),
-        _T("Q1市值(万)"), _T("Q2市值(万)"), _T("Q3市值(万)"),
-        _T("占净值Δ(Q3-Q1)"), _T("持股Δ(Q3-Q1)"), _T("市值Δ(Q3-Q1)"),
-        _T("持有季度"), _T("变动标记")};
-    static const int cw[cols] = {106, 84, 108, 92, 92, 92, 100, 100, 100,
-                                 100, 100, 100, 118, 112, 112, 96, 120};
-
-    int rows = (int)list.size() + 1;
+    const int rows = (int)list.size() + 1;
     pGrid->SetRowCount(rows);
-    pGrid->SetColumnCount(cols);
+    pGrid->SetColumnCount(nCols);
     pGrid->SetFixedRowCount(1);
     pGrid->SetFixedColumnCount(0);
 
-    // SGridCtrl 的列宽 / defRowHeight 都是裸 int，不参与 SOUI 的 DPI 缩放，
-    // 高 DPI 下字体放大了而格子没放大，文字会被挤掉，所以这里按 GetScale() 一起放大。
     const int sc = GetScale();
-    const int rowH = 30 * sc / 100;
-    for (int r = 0; r < rows; ++r) pGrid->SetRowHeight(r, rowH);
+    const int parentW = GetClientRect().Width();
+    ApplyGridColumns(pGrid, parentW, sc, rows);
+    const int cellMargin = CellMarginDp(parentW, sc);
 
-    for (int c = 0; c < cols; ++c) {
-        pGrid->SetItemText(0, c, hdr[c]);
-        pGrid->SetColumnWidth(c, cw[c] * sc / 100);
-    }
-
-    const DWORD fmtR = DT_RIGHT | DT_VCENTER;
-    const DWORD fmtL = DT_LEFT | DT_VCENTER;
     const SStringT dash = _T("—");
 
     // 注意：SGridCell 默认背景是纯白，必须为每个单元格显式设置背景色，
     // 否则浅色文字会落在白底上（视觉上像半透明残影）。
-
     for (int r = 0; r < (int)list.size(); ++r) {
         int row = r + 1;
         const HoldingChange &d = list[r];
-
-        SStringT sLp = (d.lpQuarter > 0)
-                           ? cellNum(d.pct[d.lpQuarter - 1], d.hasQ[d.lpQuarter - 1], 2, dash)
-                           : dash;
-        SetCellText(pGrid, sc, row, 0, sLp, fmtR, kAccent);
-        SetCellText(pGrid, sc, row, 1, U8(d.code), fmtL, kText3);
-        SetCellText(pGrid, sc, row, 2, U8(d.name), fmtL, kText);
-
-        for (int q = 0; q < 3; ++q) SetCellText(pGrid, sc, row, 3 + q, cellNum(d.pct[q], d.hasQ[q], 2, dash), fmtR, 0);
-        for (int q = 0; q < 3; ++q)
-            SetCellText(pGrid, sc, row, 6 + q, cellNum(d.shares[q], d.hasQ[q], 2, dash), fmtR, 0);
-        for (int q = 0; q < 3; ++q)
-            SetCellText(pGrid, sc, row, 9 + q, cellNum(d.mv[q], d.hasQ[q], 0, dash), fmtR, 0);
-
-        if (d.chgValid) {
-            SetCellText(pGrid, sc, row, 12, formatDelta(d.pctChg, 2), fmtR, deltaColor(d.pctChg));
-            SetCellText(pGrid, sc, row, 13, formatDelta(d.shChg, 2), fmtR, deltaColor(d.shChg));
-            SetCellText(pGrid, sc, row, 14, formatDelta(d.mvChg, 0), fmtR, deltaColor(d.mvChg));
-        } else {
-            for (int c = 12; c <= 14; ++c) SetCellText(pGrid, sc, row, c, dash, fmtR, kDim);
+        for (int c = 0; c < nCols; ++c) {
+            SStringT s;
+            COLORREF clr = 0;
+            if (!HoldingCellValue(d, pGrid->GetColumnKey(c), dash, &s, &clr)) continue;
+            SetCellText(pGrid, row, c, s, pGrid->GetColumnAlign(c) | DT_VCENTER, clr, cellMargin);
         }
-
-        SetCellText(pGrid, sc, row, 15, S_CA2T(d.status.c_str(), CP_UTF8), fmtL, kText2);
-        SetCellText(pGrid, sc, row, 16, d.tag.empty() ? dash : S_CA2T(d.tag.c_str(), CP_UTF8), fmtL,
-            d.tag.empty() ? kDim : kAccent);
-    }
-
-    // 表头：深色底 + 灰字
-    for (int c = 0; c < cols; ++c) {
-        IGridCell *hc = pGrid->GetCell(0, c);
-        if (!hc) continue;
-        hc->SetFormat((c == 1 || c == 2 || c == 15 || c == 16) ? fmtL : fmtR);
-        hc->SetMargin(6 * sc / 100);
-        hc->SetTextClr(kText3);
-        hc->SetBackClr(kHeadBg);
     }
 
     pGrid->UnlockUpdate();
@@ -1339,72 +1684,44 @@ void CMainDlg::FillGrid(const std::vector<HoldingChange> &list) {
 }
 
 void CMainDlg::FillEstGrid(const FundEstimate &est) {
-    SGridCtrl *pGrid = FindChildByID2<SGridCtrl>(R.ID.grid_est);
+    SGridCtrl *pGrid = FindCtrl<SGridCtrl>(R.ID.grid_est);
     if (!pGrid) return;
+
+    const int nCols = pGrid->GetColumnCount();
+    if (nCols <= 0) return;
 
     pGrid->LockUpdate();  // 同上：批量填完再统一重绘
 
-    const int cols = 6;
-    static const SStringT hdr[cols] = {_T("代码"),  _T("名称"),   _T("权重%"),
-                                       _T("现价"), _T("涨跌幅%"), _T("贡献pp")};
-
     int n = est.valid ? (int)est.items.size() : 0;
     pGrid->SetRowCount(n + 2);  // 表头 + 明细 + 合计
-    pGrid->SetColumnCount(cols);
+    pGrid->SetColumnCount(nCols);
     pGrid->SetFixedRowCount(1);
     pGrid->SetFixedColumnCount(0);
 
     const int sc = GetScale();
-    const int rowH = 30 * sc / 100;
-    for (int r = 0; r < n + 2; ++r) pGrid->SetRowHeight(r, rowH);
+    const int parentW = GetClientRect().Width();
+    ApplyGridColumns(pGrid, parentW, sc, n + 2);
+    const int cellMargin = CellMarginDp(parentW, sc);
 
-    // 列宽按可用宽度分配，否则 6 列只占左半屏、右侧留一大片空白。
-    // 注意 grid 的列宽单位是逻辑像素(dp)，这里按窗口宽度减去表格卡片的外边距推算，
-    // 不能直接用 pGrid->GetClientRect()：首次填充时面板还没完成布局，会拿到偏小的值。
-    int avail = GetClientRect().Width() - 100;  // 扣掉卡片 margin/padding 与垂直滚动条
-    if (avail < 400) avail = 1340;
-    static const int ratio[cols] = {12, 26, 14, 14, 16, 18};
-    int used = 0;
-    for (int c = 0; c < cols; ++c) {
-        int w = (c == cols - 1) ? (avail - used) : avail * ratio[c] / 100;
-        if (w < 70) w = 70;
-        pGrid->SetColumnWidth(c, w);
-        used += w;
-        pGrid->SetItemText(0, c, hdr[c]);
-        IGridCell *hc = pGrid->GetCell(0, c);
-        if (hc) {
-            hc->SetFormat(c >= 2 ? (DT_RIGHT | DT_VCENTER) : (DT_LEFT | DT_VCENTER));
-            hc->SetMargin(6 * sc / 100);
-            hc->SetTextClr(kText3);
-            hc->SetBackClr(kHeadBg);
-        }
-    }
-
-    const DWORD fmtR = DT_RIGHT | DT_VCENTER;
-    const DWORD fmtL = DT_LEFT | DT_VCENTER;
+    const SStringT dash = _T("—");
 
     for (int i = 0; i < n; ++i) {
-        const ContributionItem &it = est.items[i];
         int row = i + 1;
-        SetCellText(pGrid, sc, row, 0, U8(it.code), fmtL, kText3);
-        SetCellText(pGrid, sc, row, 1, U8(it.name), fmtL, kText);
-        SetCellText(pGrid, sc, row, 2, formatNumber(it.weight, 2), fmtR, 0);
-        SetCellText(pGrid, sc, row, 3, it.quoted ? formatNumber(it.price, 2) : _T("—"), fmtR, kDim);
-        SetCellText(pGrid, sc, row, 4, formatDelta(it.chgPct, 2), fmtR, deltaColor(it.chgPct));
-        SetCellText(pGrid, sc, row, 5, formatDelta(it.contrib, 3), fmtR, deltaColor(it.contrib));
+        for (int c = 0; c < nCols; ++c) {
+            SStringT s;
+            COLORREF clr = 0;
+            if (!EstCellValue(est.items[i], pGrid->GetColumnKey(c), dash, &s, &clr)) continue;
+            SetCellText(pGrid, row, c, s, pGrid->GetColumnAlign(c) | DT_VCENTER, clr, cellMargin);
+        }
     }
 
     // 合计行
     int sumRow = n + 1;
-    SetCellText(pGrid, sc, sumRow, 0, _T("合计"), fmtL, kText2);
-    SetCellText(pGrid, sc, sumRow, 1, _T(""), fmtL, 0);
-    SetCellText(pGrid, sc, sumRow, 2, formatNumber(est.coverPct, 2), fmtR, kAccent);
-    SetCellText(pGrid, sc, sumRow, 3, _T(""), fmtR, 0);
-    SetCellText(pGrid, sc, sumRow, 4, _T(""), fmtR, 0);
-    SetCellText(pGrid, sc, sumRow, 5, formatDelta(est.estPct, 3), fmtR, deltaColor(est.estPct));
-    for (int c = 0; c < cols; ++c) {
-        if (IGridCell *cell = pGrid->GetCell(sumRow, c))
-            cell->SetBackClr((sumRow & 1) ? kRowBg2 : kRowBg);
+    for (int c = 0; c < nCols; ++c) {
+        SStringT s;
+        COLORREF clr = 0;
+        if (!EstSumCellValue(est, pGrid->GetColumnKey(c), &s, &clr)) continue;
+        SetCellText(pGrid, sumRow, c, s, pGrid->GetColumnAlign(c) | DT_VCENTER, clr, cellMargin);
     }
 
     pGrid->UnlockUpdate();
@@ -1415,7 +1732,7 @@ void CMainDlg::FillEstGrid(const FundEstimate &est) {
 void CMainDlg::OnFilter() {
     if (m_rows.empty()) return;
 
-    SEdit *pEdit = FindChildByID2<SEdit>(R.ID.edit_filter);
+    SEdit *pEdit = FindCtrl<SEdit>(R.ID.edit_filter);
     SStringT key = pEdit ? pEdit->GetWindowText() : _T("");
     key.TrimBlank();
 
@@ -1439,7 +1756,7 @@ void CMainDlg::OnFilter() {
 }
 
 void CMainDlg::OnResetSort() {
-    if (SEdit *p = FindChildByID2<SEdit>(R.ID.edit_filter)) p->SetWindowText(_T(""));
+    if (SEdit *p = FindCtrl<SEdit>(R.ID.edit_filter)) p->SetWindowText(_T(""));
     m_view = m_rows;
     FillGrid(m_view);
     UpdateStatusSummary();
@@ -1448,8 +1765,8 @@ void CMainDlg::OnResetSort() {
 // ------------------------------------------------------------- 模拟盘中
 void CMainDlg::OnSimOn() {
     m_bSimulated = TRUE;
-    if (SWindow *p = FindChildByID(R.ID.btn_sim_off)) p->SetVisible(FALSE);
-    if (SWindow *p = FindChildByID(R.ID.btn_sim_on)) p->SetVisible(TRUE);
+    if (SWindow *p = FindWnd(R.ID.btn_sim_off)) p->SetVisible(FALSE);
+    if (SWindow *p = FindWnd(R.ID.btn_sim_on)) p->SetVisible(TRUE);
     RestartTimer();
     RefreshAllQuotes(false);
     UpdateBadge();
@@ -1458,8 +1775,8 @@ void CMainDlg::OnSimOn() {
 
 void CMainDlg::OnSimOff() {
     m_bSimulated = FALSE;
-    if (SWindow *p = FindChildByID(R.ID.btn_sim_off)) p->SetVisible(TRUE);
-    if (SWindow *p = FindChildByID(R.ID.btn_sim_on)) p->SetVisible(FALSE);
+    if (SWindow *p = FindWnd(R.ID.btn_sim_off)) p->SetVisible(TRUE);
+    if (SWindow *p = FindWnd(R.ID.btn_sim_on)) p->SetVisible(FALSE);
     RestartTimer();
     RefreshAllQuotes(false);
     UpdateBadge();

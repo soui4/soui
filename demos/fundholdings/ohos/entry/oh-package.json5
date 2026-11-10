@@ -1,0 +1,12 @@
+{
+  "name": "entry",
+  "version": "1.0.0",
+  "description": "SOUI for OpenHarmony fundholdings entry module.",
+  "main": "",
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "@soui/ohos": "file:../../../../soui-ohos-lib",
+    "libfundholdings.so": "file:./src/main/cpp/types/libfundholdings"
+  }
+}

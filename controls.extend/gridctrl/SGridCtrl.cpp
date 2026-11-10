@@ -874,6 +874,7 @@ SGridCtrl::SGridCtrl()
     , m_bListMode(FALSE)
     , m_bSingleRowSelection(FALSE)
     , m_bSingleColSelection(FALSE)
+    , m_bGestureScroll(FALSE)
     , m_cellFocus(-1, -1)
     , m_bInEdit(FALSE)
     , m_cellEdit(-1, -1)
@@ -1928,6 +1929,113 @@ HRESULT SGridCtrl::OnAttrFixedCols(const SStringW &strValue, BOOL bLoading)
     return bLoading ? S_OK : S_FALSE;
 }
 
+BOOL SGridCtrl::CreateChildren(SXmlNode xmlNode)
+{
+    // <columns> 只是列布局数据，不是子窗口；解析后标记 userdata，
+    // 让基类跳过该节点，避免尝试创建一个名为 columns 的窗口。
+    SXmlNode xmlColumns = xmlNode.child(L"columns");
+    if (xmlColumns)
+    {
+        ParseColumnsXml(xmlColumns);
+        xmlColumns.set_userdata(1);
+    }
+    return __baseCls::CreateChildren(xmlNode);
+}
+
+BOOL SGridCtrl::ParseColumnsXml(SXmlNode xmlColumns)
+{
+    m_colKeys.RemoveAll();
+    m_colWidths.RemoveAll();
+    m_colWeights.RemoveAll();
+    m_colAligns.RemoveAll();
+
+    // 第一遍：收集 key/宽度/权重/对齐，并确定列数。
+    for (SXmlNode xmlCol = xmlColumns.first_child(); xmlCol; xmlCol = xmlCol.next_sibling())
+    {
+        if (xmlCol.type() != node_element || _wcsicmp(xmlCol.name(), L"col") != 0)
+            continue;
+
+        SStringW strKey = xmlCol.attribute(L"key").as_string();
+        strKey.Trim();
+        if (strKey.IsEmpty())
+            continue;
+
+        int nWidth = xmlCol.attribute(L"width").as_int(m_nDefCellWidth);
+        if (nWidth <= 0)
+            nWidth = m_nDefCellWidth;
+        int nWeight = xmlCol.attribute(L"weight").as_int(0);
+        if (nWeight < 0)
+            nWeight = 0;
+        int nAlign = DT_LEFT;
+        if (_wcsicmp(xmlCol.attribute(L"align").as_string(), L"right") == 0)
+            nAlign = DT_RIGHT;
+
+        m_colKeys.Add(strKey);
+        m_colWidths.Add(nWidth);
+        m_colWeights.Add(nWeight);
+        m_colAligns.Add(nAlign);
+    }
+
+    int nCols = (int)m_colKeys.GetCount();
+    if (nCols == 0)
+        return FALSE;
+
+    SetColumnCount(nCols);
+    if (m_nRows < 1)
+        SetRowCount(1);
+
+    // 第二遍：把表头文字和对齐写进固定行。列宽留给业务层，
+    // 因为固定宽度要按 DPI 缩放、权重列要按窗口可用宽度分配。
+    int nCol = 0;
+    for (SXmlNode xmlCol = xmlColumns.first_child(); xmlCol; xmlCol = xmlCol.next_sibling())
+    {
+        if (xmlCol.type() != node_element || _wcsicmp(xmlCol.name(), L"col") != 0)
+            continue;
+
+        SStringW strKey = xmlCol.attribute(L"key").as_string();
+        strKey.Trim();
+        if (strKey.IsEmpty())
+            continue;
+
+        SStringW strTitleW = xmlCol.attribute(L"title").as_string();
+        SetItemText(0, nCol, S_CW2T(strTitleW));
+        IGridCell *pCell = GetCell(0, nCol);
+        if (pCell)
+            pCell->SetFormat(m_colAligns[nCol] | DT_VCENTER);
+        ++nCol;
+    }
+    return TRUE;
+}
+
+const SStringW &SGridCtrl::GetColumnKey(int nCol) const
+{
+    static const SStringW s_empty;
+    if (nCol < 0 || nCol >= (int)m_colKeys.GetCount())
+        return s_empty;
+    return m_colKeys.GetAt(nCol);
+}
+
+int SGridCtrl::GetColumnDefWidth(int nCol) const
+{
+    if (nCol < 0 || nCol >= (int)m_colWidths.GetCount())
+        return 0;
+    return m_colWidths.GetAt(nCol);
+}
+
+int SGridCtrl::GetColumnWeight(int nCol) const
+{
+    if (nCol < 0 || nCol >= (int)m_colWeights.GetCount())
+        return 0;
+    return m_colWeights.GetAt(nCol);
+}
+
+int SGridCtrl::GetColumnAlign(int nCol) const
+{
+    if (nCol < 0 || nCol >= (int)m_colAligns.GetCount())
+        return DT_LEFT;
+    return m_colAligns.GetAt(nCol);
+}
+
 // Operations implementation
 int SGridCtrl::InsertColumn(LPCTSTR strHeading, UINT nFormat, int nColumn)
 {
@@ -2971,10 +3079,89 @@ void SGridCtrl::OnLButtonUp(UINT nFlags, CPoint pt)
 
 BOOL SGridCtrl::CancelCaptureMode(int reason)
 {
-    if (reason == CANCEL_REASON_SCROLL &&
+    // The container now reports the takeover axis (_H/_V) instead of the
+    // legacy untyped reason; accept all scroll reasons so an outer tabctrl
+    // cannot steal a resize / row drag that is already in progress.
+    if (CANCEL_REASON_IS_SCROLL(reason) &&
         (m_MouseMode == MOUSE_SIZING_ROW || m_MouseMode == MOUSE_SIZING_COL || m_MouseMode == MOUSE_DRAGGING))
         return FALSE;
+    // 只有外层「横向」切页（tabctrl）才允许在表格尚未进入滚动态时把事件流
+    // 接过去；竖向手势归表格独占，不能因为还在探测阶段就主动让位。
+    if (CANCEL_REASON_IS_SCROLL(reason) && reason == CANCEL_REASON_SCROLL_H &&
+        m_bGestureScroll && m_gesture.IsDown() && !m_bDragScrolling)
+    {
+        CancelDragGesture();
+        m_bLMouseButtonDown = FALSE;
+        m_MouseMode = MOUSE_NOTHING;
+        if (GetCapture() == GetSwnd())
+            ReleaseCapture();
+        return TRUE;
+    }
     return __baseCls::CancelCaptureMode(reason);
+}
+
+BOOL SGridCtrl::IsEnableDragMode() const
+{
+    // gestureScroll 打开时，即使表格内容没超出视口（没有滚动条）也要武装
+    // SPanel 的共享状态机：否则落在表格上的竖向拖动根本不会进入容器的归属
+    // 仲裁，外层 fundscroll 会直接接管，表现为「在表格里上下滑、整页在滚」。
+    // 开关关闭时完全沿用 SPanel 的判定，桌面拖选语义不受影响。
+    return m_bGestureScroll || __baseCls::IsEnableDragMode();
+}
+
+SGestureDetector::Axis SGridCtrl::GetGestureAxis() const
+{
+    // 只声明纵向轴：横向拖动必须留给外层 tabctrl 切页。轴向仲裁由共享的
+    // SGestureDetector 完成，表格不另起一套识别逻辑。
+    // 未打开 gestureScroll 时沿用 SPanel 默认值，桌面语义完全不变。
+    if (!m_bGestureScroll)
+        return __baseCls::GetGestureAxis();
+    return SGestureDetector::AxisVertical;
+}
+
+BOOL SGridCtrl::CanInterceptTouchGesture() const
+{
+    // gestureScroll 是移动端显式打开的开关：桌面拖选语义保持不变。
+    // 状态机已由 IsEnableDragMode() 武装，这里不再额外要求滚动条存在。
+    return m_bGestureScroll;
+}
+
+BOOL SGridCtrl::CanScrollByGesture(const CPoint &ptDelta) const
+{
+    // 调整行列宽高、拖拽行或编辑单元格时不得抢手势。
+    if (m_MouseMode == MOUSE_SIZING_ROW || m_MouseMode == MOUSE_SIZING_COL ||
+        m_MouseMode == MOUSE_DRAGGING || IsInplaceEditing())
+        return FALSE;
+    // 竖向手势一旦起点落在表格内就由表格独占，不做「滚到顶/底就让位给父容器」
+    // 的边界判定。容器沿父链自内向外询问，表格作为最内层候选返回 TRUE 后会
+    // 短路整条链，外层 fundscroll 再也拿不到后续 MOVE，手势不会穿透到上一层。
+    // 没有可滚内容时只是原地静止（OnDragScroll 有 HasScrollBar 保护），不会
+    // 连带把整页滚走。横向手势一律让位，pane_swipe / fund_swipe 仍能切页。
+    int nDx = ptDelta.x < 0 ? -ptDelta.x : ptDelta.x;
+    int nDy = ptDelta.y < 0 ? -ptDelta.y : ptDelta.y;
+    return nDy >= nDx && nDy > 0;
+}
+
+void SGridCtrl::OnGestureIntercepted()
+{
+    // 表格接管手势：结束单元格框选 / 拖拽准备状态并清掉按下标记。
+    m_MouseMode = MOUSE_NOTHING;
+    m_bLMouseButtonDown = FALSE;
+}
+
+void SGridCtrl::OnTouchGestureEnd()
+{
+    m_bLMouseButtonDown = FALSE;
+    m_MouseMode = MOUSE_NOTHING;
+}
+
+int SGridCtrl::GetTouchInterceptAxis() const
+{
+    if (!m_bGestureScroll)
+        return HasScrollBar(TRUE) ? CANCEL_REASON_SCROLL_V : CANCEL_REASON_SCROLL_H;
+    // 表格独占竖向手势，容器据此生成 CancelCaptureMode 的 reason，
+    // 外层竖向滚动容器不会把事件流从表格手里接走。
+    return CANCEL_REASON_SCROLL_V;
 }
 
 void SGridCtrl::OnLButtonDbClick(UINT nFlags, CPoint pt)
