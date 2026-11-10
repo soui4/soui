@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="12" viewBox="0 0 48 12">
+  <!--
+    acc_prog_bar.svg - 进度条/滑块填充段,4 态横向精灵(每帧 12x12,圆角 3)
+
+    为什么用 SVG:进度条与滑块共用这一个皮肤对象,colorrect 不参与
+    OnColorize,SProgress 虽然把 posSkin 转发了染色,但纯色皮肤没有 OnColorize
+    实现,换肤后仍停在青色;换成 SVG 后可按主题色相重染。
+
+    为什么用九宫格(imgframe margin=3):控件里最小高度/宽度只有 6(滑块轨道 6px,
+    进度条 12px),直接横向拉伸会把两端圆角拉成椭圆;九宫格把 3px 圆角固定,
+    中间段拉伸,横竖两个方向都不会变形。
+
+    帧序:0=normal 1=hover 2=pushdown 3=disable
+  -->
+  <rect x="0" y="0" width="12" height="12" rx="3" fill="#0E9F9F"/>
+  <rect x="12" y="0" width="12" height="12" rx="3" fill="#0B8888"/>
+  <rect x="24" y="0" width="12" height="12" rx="3" fill="#0A7A7A"/>
+  <rect x="36" y="0" width="12" height="12" rx="3" fill="#CFEDED"/>
+</svg>

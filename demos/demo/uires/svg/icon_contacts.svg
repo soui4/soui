@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  icon_contacts.svg - 图标型单选 icon_contacts (3 态,nanosvg 兼容)
+  每帧 44x44,总尺寸 132x44。
+  imglist 默认 checkAsPushdown=true:0=normal(灰线) 1=hover(深灰线) 2=checked(青色实底)。
+  画布不透明填充卡片白,避免分层窗口下边缘半透明像素被按预乘 alpha 解释而发灰。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="132" height="44" viewBox="0 0 132 44">
+  <g transform="translate(0,0)">
+    <rect x="0" y="0" width="44" height="44" fill="#FFFFFF"/>
+    <g stroke="#8A919C" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="22" cy="17" r="5.5"/>
+    <path d="M12,34 C12,27 16.5,24 22,24 C27.5,24 32,27 32,34"/>
+    </g>
+  </g>
+  <g transform="translate(44,0)">
+    <rect x="0" y="0" width="44" height="44" fill="#FFFFFF"/>
+    <g stroke="#3F4650" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="22" cy="17" r="5.5"/>
+    <path d="M12,34 C12,27 16.5,24 22,24 C27.5,24 32,27 32,34"/>
+    </g>
+  </g>
+  <g transform="translate(88,0)">
+    <rect x="0" y="0" width="44" height="44" fill="#FFFFFF"/>
+    <circle cx="22" cy="22" r="21" fill="#0E9F9F"/>
+    <g stroke="#FFFFFF" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="22" cy="17" r="5.5"/>
+    <path d="M12,34 C12,27 16.5,24 22,24 C27.5,24 32,27 32,34"/>
+    </g>
+  </g>
+</svg>

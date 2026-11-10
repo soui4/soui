@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="112" height="28" viewBox="0 0 112 28">
+  <!--
+    消息框标题栏关闭按钮:横向 4 帧,每帧 28x28。
+    帧序对应 imglist 的 normal(0) / hover(1) / pushdown(2) / disable(3)。
+    交叉线用矢量描边绘制,任意 DPI 下都按目标尺寸栅格化,不会出现位图拉伸的锯齿。
+    悬停/按下用现代窗口惯用的红色反馈(#C42B1C / #B32A1E)+ 白色叉,
+    与标题栏关闭按钮 skin_cap_close 保持一致的观感。
+  -->
+  <!-- 帧0 常态:透明底 + 中灰叉 -->
+  <path d="M9.5,9.5 L18.5,18.5 M18.5,9.5 L9.5,18.5" stroke="#9AA1AC" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <!-- 帧1 悬停:红色圆角底(Win11 关闭红) + 白叉 -->
+  <rect x="28" y="0" width="28" height="28" rx="6" fill="#C42B1C"/>
+  <path d="M37.5,9.5 L46.5,18.5 M46.5,9.5 L37.5,18.5" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <!-- 帧2 按下:更深的红 + 白叉 -->
+  <rect x="56" y="0" width="28" height="28" rx="6" fill="#B32A1E"/>
+  <path d="M65.5,9.5 L74.5,18.5 M74.5,9.5 L65.5,18.5" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <!-- 帧3 禁用:透明底 + 浅灰叉 -->
+  <path d="M93.5,9.5 L102.5,18.5 M102.5,9.5 L93.5,18.5" stroke="#C9CDD4" stroke-width="2" stroke-linecap="round" fill="none"/>
+</svg>

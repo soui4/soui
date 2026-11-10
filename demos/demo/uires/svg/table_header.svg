@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  table_header.svg - 报表列表表头单元格背景精灵(nanosvg 兼容)
+  横向 4 帧,每帧 20x36,总尺寸 80x36。
+  设计意图:表头不再是整块灰色带,而是"透明白底 + 底部 1px 发丝线",
+  由 SHeaderCtrl 按单元格矩形拉伸绘制(见 SHeaderCtrl::DrawItem),
+  底部发丝线在横向拉伸时被拉成连续的一条,从而形成现代表格的细分隔。
+  帧序(与 WndState 对应):
+    0 = normal   (透明白底 + 底部 #E8EAED 1px)
+    1 = hover    (浅灰 #F7F8FA 悬停反馈 + 底部 #E8EAED 1px)
+    2 = pushdown (浅青 #E9F7F7 按下反馈 + 底部 #CFEDED 1px)
+    3 = disable  (透明白底 + 底部 #E8EAED 1px,用于表头右侧空白填充区,保持线条连续)
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="36" viewBox="0 0 80 36">
+
+  <!-- 帧0:normal 透明底,仅底部 1px 发丝线 -->
+  <g transform="translate(0,0)">
+    <rect x="0" y="35" width="20" height="1" fill="#E8EAED"/>
+  </g>
+
+  <!-- 帧1:hover 浅灰底,底部同色发丝线 -->
+  <g transform="translate(20,0)">
+    <rect x="0" y="0" width="20" height="36" fill="#F7F8FA"/>
+    <rect x="0" y="35" width="20" height="1" fill="#E8EAED"/>
+  </g>
+
+  <!-- 帧2:pushdown 浅青底,底部改用青色描边表示按下 -->
+  <g transform="translate(40,0)">
+    <rect x="0" y="0" width="20" height="36" fill="#E9F7F7"/>
+    <rect x="0" y="35" width="20" height="1" fill="#CFEDED"/>
+  </g>
+
+  <!-- 帧3:disable 与 normal 一致,保证填充区与数据列底边线连续 -->
+  <g transform="translate(60,0)">
+    <rect x="0" y="35" width="20" height="1" fill="#E8EAED"/>
+  </g>
+</svg>

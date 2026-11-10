@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="20" viewBox="0 0 80 20">
+  <!--
+    托盘菜单「循环播放」按钮:横向 4 帧,每帧 20x20,双箭头循环符号。
+    帧序:0=常态 1=悬停 2=按下 3=禁用。
+    配色:灰 #5F6672 → 深灰 #1F2329 → 更深灰 #101418 → 禁用 #C9CDD4
+    (弹窗不参与换肤染色,统一使用中性灰)。
+  -->
+  <path d="M4,7 H13 M16,13 H7" stroke="#5F6672" stroke-width="1.6" fill="none"/>
+  <path d="M13,4.6 L16.4,7 L13,9.4 Z" fill="#5F6672"/>
+  <path d="M7,10.6 L3.6,13 L7,15.4 Z" fill="#5F6672"/>
+
+  <path d="M24,7 H33 M36,13 H27" stroke="#1F2329" stroke-width="1.6" fill="none"/>
+  <path d="M33,4.6 L36.4,7 L33,9.4 Z" fill="#1F2329"/>
+  <path d="M27,10.6 L23.6,13 L27,15.4 Z" fill="#1F2329"/>
+
+  <path d="M44,7 H53 M56,13 H47" stroke="#101418" stroke-width="1.6" fill="none"/>
+  <path d="M53,4.6 L56.4,7 L53,9.4 Z" fill="#101418"/>
+  <path d="M47,10.6 L43.6,13 L47,15.4 Z" fill="#101418"/>
+
+  <path d="M64,7 H73 M76,13 H67" stroke="#C9CDD4" stroke-width="1.6" fill="none"/>
+  <path d="M73,4.6 L76.4,7 L73,9.4 Z" fill="#C9CDD4"/>
+  <path d="M67,10.6 L63.6,13 L67,15.4 Z" fill="#C9CDD4"/>
+</svg>

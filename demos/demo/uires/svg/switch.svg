@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  switch.svg - 开关 8 态精灵(nanosvg 兼容)
+
+  SSwitch 的绘制逻辑:先画 skin(轨道,固定第 0 帧),再把 skinforce 按
+  rcDst.OffsetRect(rcWnd.Width() - skSize.cx, 0) 覆盖上去。也就是说
+  "选中"时对齐到右边缘、"未选中"时对齐到左边缘。
+
+  SSkinImgList 经 SVG 栅格化后的 GetSkinSize 与控件逻辑宽度在高 DPI 下
+  会有 1~2px 的舍入差,一旦 skSize.cx < 控件宽度,未被覆盖的那一侧就会
+  露出轨道底色(表现为"左边一块灰底"、"关闭态边缘发毛")。
+
+  因此这里把每帧宽度做成 42(药丸 38 + 右侧 4px 透明留白):
+    - 未选中帧:药丸画在 [0,38),右侧留白让出 skSize 的舍入差;
+    - 选中帧:药丸画在 [4,42),被 -4 的偏移拉回 [0,38)。
+  两种状态都恰好铺满控件,轨道底色完全被盖住,不再有灰边;
+  药丸用纯填充(无描边),边缘由矢量抗锯齿生成,不会出现锯齿。
+
+  帧序:0=normal 1=hover 2=pushdown 3=disable 4=checked 5=checked-hover 6=checked-pushdown 7=checked-disable
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="336" height="20" viewBox="0 0 336 20">
+
+  <!-- 未选中:灰药丸 + 左侧白点 -->
+  <g transform="translate(0,0)">
+    <rect x="0" y="0" width="38" height="20" rx="10" fill="#DDE1E6"/>
+    <circle cx="10" cy="10" r="7" fill="#FFFFFF"/>
+  </g>
+  <g transform="translate(42,0)">
+    <rect x="0" y="0" width="38" height="20" rx="10" fill="#D2D7DE"/>
+    <circle cx="10" cy="10" r="7" fill="#FFFFFF"/>
+  </g>
+  <g transform="translate(84,0)">
+    <rect x="0" y="0" width="38" height="20" rx="10" fill="#C9CFD7"/>
+    <circle cx="10" cy="10" r="7" fill="#FFFFFF"/>
+  </g>
+  <g transform="translate(126,0)">
+    <rect x="0" y="0" width="38" height="20" rx="10" fill="#EDEFF3"/>
+    <circle cx="10" cy="10" r="7" fill="#FFFFFF"/>
+  </g>
+
+  <!-- 选中:青药丸 + 右侧白点(整体右移 4px,靠 SSwitch 的负偏移拉回) -->
+  <g transform="translate(168,0)">
+    <rect x="4" y="0" width="38" height="20" rx="10" fill="#0E9F9F"/>
+    <circle cx="32" cy="10" r="7" fill="#FFFFFF"/>
+  </g>
+  <g transform="translate(210,0)">
+    <rect x="4" y="0" width="38" height="20" rx="10" fill="#0B8888"/>
+    <circle cx="32" cy="10" r="7" fill="#FFFFFF"/>
+  </g>
+  <g transform="translate(252,0)">
+    <rect x="4" y="0" width="38" height="20" rx="10" fill="#0A7A7A"/>
+    <circle cx="32" cy="10" r="7" fill="#FFFFFF"/>
+  </g>
+  <g transform="translate(294,0)">
+    <rect x="4" y="0" width="38" height="20" rx="10" fill="#EDEFF3"/>
+    <circle cx="32" cy="10" r="7" fill="#FFFFFF"/>
+  </g>
+</svg>

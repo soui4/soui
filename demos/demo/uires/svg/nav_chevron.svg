@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  nav_chevron.svg - 侧栏分组展开箭头 8 态精灵(nanosvg 兼容)
+  每帧 12x12,总尺寸 96x12。
+  帧序:0=normal 1=hover 2=pushdown 3=disable 4=checked 5=checked-hover 6=checked-pushdown 7=checked-disable
+  SToggle 用 DrawByState 绘制,checked 对应索引 4。
+  分组回调 CMainDlg::OnInitGroup / OnGroupStateChanged 里执行 SetToggle(!bCollapsed):
+    展开 -> checked(索引 4) -> 向下箭头
+    折叠 -> unchecked(索引 0) -> 向右箭头
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="12" viewBox="0 0 96 12">
+
+  <!-- 0:未选中/折叠 正常:右箭头 -->
+  <g transform="translate(0,0)">
+    <path d="M4.5 3 L7.5 6 L4.5 9" fill="none" stroke="#9AA1AC" stroke-width="1.5"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <!-- 1:未选中/折叠 悬停:右箭头(颜色加深) -->
+  <g transform="translate(12,0)">
+    <path d="M4.5 3 L7.5 6 L4.5 9" fill="none" stroke="#6B7280" stroke-width="1.5"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <!-- 2:未选中/折叠 按下:右箭头 -->
+  <g transform="translate(24,0)">
+    <path d="M4.5 3 L7.5 6 L4.5 9" fill="none" stroke="#4B5563" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <!-- 3:未选中/折叠 禁用:右箭头 -->
+  <g transform="translate(36,0)">
+    <path d="M4.5 3 L7.5 6 L4.5 9" fill="none" stroke="#D5DAE1" stroke-width="1.5"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- 4:选中/展开 正常:下箭头 -->
+  <g transform="translate(48,0)">
+    <path d="M3 4.5 L6 7.5 L9 4.5" fill="none" stroke="#9AA1AC" stroke-width="1.5"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <!-- 5:选中/展开 悬停:下箭头 -->
+  <g transform="translate(60,0)">
+    <path d="M3 4.5 L6 7.5 L9 4.5" fill="none" stroke="#6B7280" stroke-width="1.5"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <!-- 6:选中/展开 按下:下箭头 -->
+  <g transform="translate(72,0)">
+    <path d="M3 4.5 L6 7.5 L9 4.5" fill="none" stroke="#4B5563" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <!-- 7:选中/展开 禁用:下箭头 -->
+  <g transform="translate(84,0)">
+    <path d="M3 4.5 L6 7.5 L9 4.5" fill="none" stroke="#D5DAE1" stroke-width="1.5"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

@@ -1,3 +1,13 @@
-﻿<menu iconSkin="skin_small_icons" itemHeight="26" iconMargin="4" textMargin="8" maxWidth="90">
-  <item id="100" check="1">删除</item>
-</menu>
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  列表项右键菜单(SMenu:menu_lv)— SMenuEx 自绘菜单(menuRoot 格式)
+  保留 24px 勾选图标列(checkSkin 画单选/多选标记),其余(圆角卡片 / 白底菜单项 / 字体)现代化。
+-->
+<menuRoot skin="skin_menu_bg" padding="10,8,10,8"
+          itemSkin="skin_menu_item" itemHeight="32" itemPadding="0,0,0,0"
+          iconBarWidth="24" textOffset="6" minWidth="140" maxWidth="200"
+          sepSkin="skin_menu_sep" checkSkin="skin_menu_check" arrowSkin="skin_menu_arrow"
+          font="face:微软雅黑,size:13" colorText="@color/clr_text" colorBkgnd="@color/clr_card_bg">
+  <!-- 删除(带选中勾) -->
+  <menuItem id="100" check="1">删除</menuItem>
+</menuRoot>

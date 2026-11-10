@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  menu_arrow.svg - 子菜单箭头(SMenuEx arrowSkin)
+  2 帧横排,每帧 16x16,总尺寸 32x16。
+  帧序与 SMenuExItem::OnPaint 一致:0=normal  1=hover(鼠标悬停在本项上时)。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="16" viewBox="0 0 32 16">
+  <!-- 帧0:normal 浅灰右向 chevron -->
+  <path d="M6.5 3.5 L11 8 L6.5 12.5" fill="none" stroke="#9AA1AC" stroke-width="1.6"/>
+  <!-- 帧1:hover 深灰右向 chevron -->
+  <path d="M22.5 3.5 L27 8 L22.5 12.5" fill="none" stroke="#4B5563" stroke-width="1.6"/>
+</svg>

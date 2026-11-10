@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="36" viewBox="0 0 96 36">
+  <!-- 动画页"收起/展开树形区域"按钮的 6 态雪碧:每帧 16x36,横排 6 帧。
+       帧序与 imglist 的 states 映射一致:
+         0 normal / 1 hover / 2 pushdown / 3 normal&checked / 4 hover&checked / 5 pushdown&checked。
+       造型:16x36 圆角胶囊(rx=8) + 居中 1.5px 圆头 chevron;
+         checked(树已展开)= 箭头朝左 <(点击收起), 未选中 = 箭头朝右 >。
+       配色走弱:normal 浅灰底 #E9EDF3 + 灰箭头 #8C93A2, hover/push 逐级加深,
+       不再用整条深色块 + 粗箭头的老位图,避免 125% DPI 拉伸后的锯齿。 -->
+  <!-- frame 0: normal(箭头朝右,树收起) -->
+  <rect x="0" y="0" width="16" height="36" rx="8" fill="#E9EDF3"/>
+  <path d="M6 13.5l4.4 4.5-4.4 4.5" fill="none" stroke="#8C93A2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- frame 1: hover -->
+  <rect x="16" y="0" width="16" height="36" rx="8" fill="#DEE4EC"/>
+  <path d="M22 13.5l4.4 4.5-4.4 4.5" fill="none" stroke="#6B7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- frame 2: pushdown -->
+  <rect x="32" y="0" width="16" height="36" rx="8" fill="#CFD6E0"/>
+  <path d="M38 13.5l4.4 4.5-4.4 4.5" fill="none" stroke="#4B5563" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- frame 3: normal&checked(箭头朝左,树已展开) -->
+  <rect x="48" y="0" width="16" height="36" rx="8" fill="#E9EDF3"/>
+  <path d="M58 13.5l-4.4 4.5 4.4 4.5" fill="none" stroke="#8C93A2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- frame 4: hover&checked -->
+  <rect x="64" y="0" width="16" height="36" rx="8" fill="#DEE4EC"/>
+  <path d="M74 13.5l-4.4 4.5 4.4 4.5" fill="none" stroke="#6B7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- frame 5: pushdown&checked -->
+  <rect x="80" y="0" width="16" height="36" rx="8" fill="#CFD6E0"/>
+  <path d="M90 13.5l-4.4 4.5 4.4 4.5" fill="none" stroke="#4B5563" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

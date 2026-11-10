@@ -9,12 +9,20 @@
   常规子页统一页头版式;edit_xml/wnd_container/wnd_rgn/matrix_test/3d_test/
   rotate_x/y/z/fmw_test/svg_test 等被源码引用,不可改动。
 -->
-<tabctrl pos="0,0,-0,-0" colorBkgnd="@color/clr_page_bg" colorText="@color/clr_title" tabAlign="left" tabInterSize="2" tabWidth="200" iconSkin="svg_tab_misc" icon-x="6" icon-y="5" enableDragSwitch="1">
-    <page title="drag drop" iconIndex="1" layout="vbox" interval="10" padding="15,12,15,15">
-      <text text="拖放" font="size:16,bold:1" colorText="@color/clr_title"/>
-      <text text="将文件拖入下方编辑框，观察 enableDragdrop 的接收效果" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
-      <edit name="edit_drop_top1" size="-2,0" weight="1" multilines="1" cueText="draging a file to me to see what will happen"  vscrollbar="1"  margin="2,2"/>
-      <edit name="edit_drop_top2" size="-2,0" weight="1" multilines="1" cueText="draging a file to me to see what will happen"  vscrollbar="1"  margin="2,2"/>
+<tabctrl pos="0,0,-0,-0" colorBkgnd="@color/clr_window_bg" colorText="@color/clr_text" colorTextHover="@color/clr_title" colorTextPush="@color/clr_primary" font="face:微软雅黑,size:13" fontPush="bold:1" focusable="0" tabAlign="left" tabSkin="skin_tab_nav" tabInterSize="4" tabPos="8" tabWidth="200" tabHeight="40" iconSkin="svg_tab_misc" icon-x="18" icon-y="12" text-x="42" drawFocusRect="0">
+    <page title="drag drop" iconIndex="1" layout="vbox" padding="20,16,20,18">
+      <!-- 页头 -->
+      <text text="拖放" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
+      <text text="将文件拖入下方编辑框，观察 enableDragdrop 的接收效果" extend_top="6" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
+      <!-- 卡片:两个接收区 -->
+      <window size="-2,0" weight="1" layout="vbox" interval="12" extend_top="16">
+        <window size="-2,0" weight="1" skin="skin_card" padding="14,13,14,15">
+          <edit name="edit_drop_top1" size="-2,-2" multilines="1" cueText="draging a file to me to see what will happen"  vscrollbar="1" sbSkin="skin_scrollbar" sbWid="6" sbArrowSize="0" class="cls_edit" font="face:微软雅黑,size:13" colorText="@color/clr_text"/>
+        </window>
+        <window size="-2,0" weight="1" skin="skin_card" padding="14,13,14,15">
+          <edit name="edit_drop_top2" size="-2,-2" multilines="1" cueText="draging a file to me to see what will happen"  vscrollbar="1" sbSkin="skin_scrollbar" sbWid="6" sbArrowSize="0" class="cls_edit" font="face:微软雅黑,size:13" colorText="@color/clr_text"/>
+        </window>
+      </window>
     </page>
     <page title="animation" iconIndex="2" font="adding:10" clipClient="1">
       <text pos="|0,|0" offset="-0.5,-0.5" colorText="@color/clr_text_sub">动画效果只在Vista及以上版本的操作系统能够演示</text>
@@ -27,15 +35,16 @@
       <text pos="|0,|0" offset="-0.5,-0.5" colorText="@color/clr_text_sub">IE CTRL需要窗口句柄，在半透明宿主上不能正常显示</text>
       <iectrl pos="0,0,-0,-0" url="http://www.baidu.com"/>
     </page>
-    <page title="create window" iconIndex="4" layout="vbox" padding="15,12,15,15" interval="10">
-      <text text="动态创建窗口" font="size:16,bold:1" colorText="@color/clr_title"/>
-      <text text="从 XML 字符串 / 文件创建窗口树，上面输入 XML，下面预览结果" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
-      <window size="-2,-1" layout="hbox" interval="10">
-        <button name="btn_filewnd" size="150,30">从文件创建窗口</button>
-        <button name="btn_createchildren" size="150,30">CreateChildren</button>
+    <page title="create window" iconIndex="4" layout="vbox" padding="20,16,20,18">
+      <!-- 页头 -->
+      <text text="动态创建窗口" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
+      <text text="从 XML 字符串 / 文件创建窗口树，上面输入 XML，下面预览结果" extend_top="6" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
+      <window size="-2,-1" layout="hbox" interval="10" extend_top="16">
+        <button name="btn_filewnd" size="150,30" skin="skin_btn" font="face:微软雅黑,size:13" colorText="@color/clr_title" drawFocusRect="0">从文件创建窗口</button>
+        <button name="btn_createchildren" size="150,30" skin="skin_btn" font="face:微软雅黑,size:13" colorText="@color/clr_title" drawFocusRect="0">CreateChildren</button>
       </window>
-      <window size="-2,0" weight="1" layout="vbox" interval="10">
-        <scintilla name="edit_xml" size="-2,0" weight="1" showLineNumber="1" lexer="xml" text="&lt;button pos=&quot;|0,|0,@200,@40&quot; offset=&quot;-0.5,-0.5&quot; on_command=&quot;onDynBtnCmd&quot;&gt;lua button: click me&lt;/button&gt;"/>
+      <window size="-2,0" weight="1" layout="vbox" interval="10" extend_top="12">
+        <scintilla name="edit_xml" size="-2,0" weight="1" showLineNumber="1" lexer="xml" sbSkin="skin_scrollbar" sbWid="6" sbArrowSize="0" text="&lt;button pos=&quot;|0,|0,@200,@40&quot; offset=&quot;-0.5,-0.5&quot; on_command=&quot;onDynBtnCmd&quot;&gt;lua button: click me&lt;/button&gt;"/>
         <!--
           wnd_container 配 svg_container_bg(SVG 虚线框+角标)作为背景,
           标识"这里是一个容器";SWindow 指定 skin 后 colorBkgnd 不再生效,故移除。
@@ -53,7 +62,7 @@
       </deskdock>
     </page>
     <page title="SetWindowRgn" iconIndex="6">
-      <scrollview pos="0,0,-0,-0" viewSize="-1,-1">
+      <scrollview pos="0,0,-0,-0" viewSize="-1,-1" sbSkin="skin_scrollbar" sbWid="6" sbArrowSize="0">
         <!--viewSize 根据子窗口内容自动计算-->
         <window name="wnd_rgn" pos="100,100,@100,@50" offset="-0.5,-0.5" colorBkgnd="#ff000088" cursor="hand" class="cls_border">Region</window>
         <imageMask pos="{0,[10,@100,@100" skin="skin_avatar" mask="imgx:png_mask.g"/>
@@ -61,27 +70,28 @@
         <img pos="0,[0" skin="skin_bkgnd"/>
       </scrollview>
     </page>
-    <page title="transform" iconIndex="7" layout="vbox" padding="15,12,15,15" interval="10">
-      <text text="矩阵变换" font="size:16,bold:1" colorText="@color/clr_title"/>
-      <text text="2D 矩阵（rotate/scale/skew/translate）、3D 旋转与表盘时钟" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
-      <tabctrl tabHeight="30" size="-2,0" weight="1" enableDragSwitch="1">
+    <page title="transform" iconIndex="7" layout="vbox" padding="20,16,20,18">
+      <!-- 页头 -->
+      <text text="矩阵变换" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
+      <text text="2D 矩阵（rotate/scale/skew/translate）、3D 旋转与表盘时钟" extend_top="6" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
+      <tabctrl tabHeight="36" size="-2,0" weight="1" extend_top="16" tabSkin="skin_tab_nav_top" tabInterSize="4" focusable="0" tabWidth="90" font="face:微软雅黑,size:13" colorText="@color/clr_text" colorTextHover="@color/clr_title" colorTextPush="@color/clr_primary" fontPush="bold:1" drawFocusRect="0">
         <page title="2d">
           <matrixWindow pos="5,5,-5,-5" skin="skin_avatar_low" name="matrix_test" clipClient="1">
-            <text pos="5,5">rotate:</text>
-            <edit pos="100,{0,@100,@30" name="edit_rotate" notifyChange="1">0</edit>
-            <text pos="5,[5">scale:</text>
-            <edit pos="100,{0,@100,@30" name="edit_scale" notifyChange="1">1,1</edit>
-            <text pos="5,[5">skew:</text>
-            <edit pos="100,{0,@100,@30" name="edit_skew" notifyChange="1">0,0</edit>
-            <text pos="5,[5">translate:</text>
-            <edit pos="100,{0,@100,@30" name="edit_translate" notifyChange="1">0,0</edit>
+            <text pos="5,5" colorBkgnd="@color/clr_card_bg" padding="6,3,6,3" font="face:微软雅黑,size:12" colorText="@color/clr_title">rotate:</text>
+            <edit pos="100,{0,@100,@30" name="edit_rotate" notifyChange="1" class="cls_edit" colorText="@color/clr_text">0</edit>
+            <text pos="5,[5" colorBkgnd="@color/clr_card_bg" padding="6,3,6,3" font="face:微软雅黑,size:12" colorText="@color/clr_title">scale:</text>
+            <edit pos="100,{0,@100,@30" name="edit_scale" notifyChange="1" class="cls_edit" colorText="@color/clr_text">1,1</edit>
+            <text pos="5,[5" colorBkgnd="@color/clr_card_bg" padding="6,3,6,3" font="face:微软雅黑,size:12" colorText="@color/clr_title">skew:</text>
+            <edit pos="100,{0,@100,@30" name="edit_skew" notifyChange="1" class="cls_edit" colorText="@color/clr_text">0,0</edit>
+            <text pos="5,[5" colorBkgnd="@color/clr_card_bg" padding="6,3,6,3" font="face:微软雅黑,size:12" colorText="@color/clr_title">translate:</text>
+            <edit pos="100,{0,@100,@30" name="edit_translate" notifyChange="1" class="cls_edit" colorText="@color/clr_text">0,0</edit>
           </matrixWindow>
         </page>
         <page title="3d" layout="vbox">
           <window size="-2,-1" layout="hbox">
-            <radio name="rotate_x" text="rotate x"/>
-            <radio name="rotate_y" text="rotate y" checked="1"/>
-            <radio name="rotate_z" text="rotate z"/>
+            <radio name="rotate_x" text="rotate x" skin="skin_radio" font="face:微软雅黑,size:12" colorText="@color/clr_text" drawFocusRect="0"/>
+            <radio name="rotate_y" text="rotate y" checked="1" skin="skin_radio" font="face:微软雅黑,size:12" colorText="@color/clr_text" drawFocusRect="0"/>
+            <radio name="rotate_z" text="rotate z" skin="skin_radio" font="face:微软雅黑,size:12" colorText="@color/clr_text" drawFocusRect="0"/>
             <text colorText="@color/clr_text_sub" text="只有使用skia渲染才有3D变换效果!"/>
           </window>
           <s3dview name="3d_test" size="-2,0" weight="1" skin_fore="skin_avatar_low" skin_back="skin_bkgnd" clipClient="1"/>
@@ -97,14 +107,16 @@
 
     </page>
     <page title="free move" iconIndex="8" clipClient="1">
-      <text pos="15,12" text="自由窗口 free move" font="size:16,bold:1" colorText="@color/clr_title"/>
-      <text pos="15,36" text="拖动标题栏移动窗口，拉伸边缘缩放，靠近边缘自动磁吸" font="size:12" colorText="@color/clr_text_sub"/>
-      <freeMoveWindow name="fmw_test" margin="5,25,5,5" clipClient="1" captionHeight="20" captionSkin="skin_caption" colorBorder="#cccccc" width="160" height="100" valign="0x20" halign="0x02" distx="20" disty="20" colorBkgnd="@color/blue">
-        <text pos="|0,|0" offset="-0.5,-0.5" multilines="1" colorText="@color/red">drag and resize\n the host to see\n what will happen.</text>
+      <text pos="20,16" text="自由窗口 free move" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
+      <text pos="20,50" text="拖动标题栏移动窗口，拉伸边缘缩放，靠近边缘自动磁吸" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
+      <!-- margin 收窄到 4px:原来的 5px 非客户区会露出一圈明显浅灰边框;标题条 24 高、白底带 1px 底线,
+       整体像一张悬浮卡片而不是 2003 风格的灰框窗口 -->
+  <freeMoveWindow name="fmw_test" margin="4,28,4,4" clipClient="1" captionHeight="24" captionSkin="skin_caption" colorBorder="@color/clr_line" width="160" height="100" valign="0x20" halign="0x02" distx="20" disty="20" colorBkgnd="@color/clr_card_bg">
+        <text pos="|0,|0" offset="-0.5,-0.5" multilines="1" font="face:微软雅黑,size:12" colorText="@color/clr_text">drag and resize\n the host to see\n what will happen.</text>
       </freeMoveWindow>
     </page>
   <page title="svg" iconIndex="9">
-    <tabctrl tabHeight="30" size="-2,-2" tabAlign="middle" animateSteps="20" enableDragSwitch="1">
+    <tabctrl tabHeight="36" size="-2,-2" extend_top="16" tabSkin="skin_tab_nav_top" tabInterSize="4" tabWidth="110" focusable="0" font="face:微软雅黑,size:13" colorText="@color/clr_text" colorTextHover="@color/clr_title" colorTextPush="@color/clr_primary" fontPush="bold:1" drawFocusRect="0">
       <page title="tiger">
         <img name="svg_test" pos="|0,|0" offset="-0.5,-0.5" skin="svg_tiger"/>
       </page>
@@ -119,21 +131,22 @@
       </page>
     </tabctrl>
   </page>
-  <page title="webp" iconIndex="10" layout="vbox" interval="12" padding="15,12,15,15">
-    <text text="WebP 解码(基于 stb / libwebp)" font="size:16,bold:1" colorText="@color/clr_title"/>
-    <text text="有损 VP8 / 无损 VP8L / 透明 ALPH 三种 webp 素材经 imgdecoder-stb 解码显示" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
-    <window size="-2,0" weight="1" layout="hflow" interval="16" gravity="center">
-      <window size="-2,-1" layout="vbox" interval="6" gravity="center" padding="14,12,14,12" colorBkgnd="@color/clr_card_bg">
+  <page title="webp" iconIndex="10" layout="vbox" padding="20,16,20,18">
+    <!-- 页头 -->
+    <text text="WebP 解码(基于 stb / libwebp)" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
+    <text text="有损 VP8 / 无损 VP8L / 透明 ALPH 三种 webp 素材经 imgdecoder-stb 解码显示" extend_top="6" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
+    <window size="-2,0" weight="1" layout="hflow" interval="16" gravity="center" extend_top="16">
+      <window size="-2,-1" layout="vbox" interval="6" gravity="center" padding="14,13,14,15" skin="skin_card">
         <window skin="skin_webp_lossy" size="200,150"/>
-        <text text="有损 VP8(200x150)" font="size:12" colorText="@color/clr_text"/>
+        <text text="有损 VP8(200x150)" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
       </window>
-      <window size="-1,-1" layout="vbox" interval="6" gravity="center" padding="14,12,14,12" colorBkgnd="@color/clr_card_bg">
+      <window size="-1,-1" layout="vbox" interval="6" gravity="center" padding="14,13,14,15" skin="skin_card">
         <img skin="skin_webp_lossless" size="200,150" />
-        <text text="无损 VP8L(200x150)" font="size:12" colorText="@color/clr_text"/>
+        <text text="无损 VP8L(200x150)" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
       </window>
-      <window size="-1,-1" layout="vbox" interval="6" gravity="center" padding="14,12,14,12" colorBkgnd="@color/clr_card_bg">
+      <window size="-1,-1" layout="vbox" interval="6" gravity="center" padding="14,13,14,15" skin="skin_card">
         <img skin="skin_webp_alpha" size="200,150" />
-        <text text="透明 ALPH(200x150)" font="size:12" colorText="@color/clr_text"/>
+        <text text="透明 ALPH(200x150)" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
       </window>
     </window>
   </page>

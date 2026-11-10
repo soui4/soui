@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 表头排序指示箭头:横向 2 帧 x 10x12,
+     帧0=升序(向上 chevron) 帧1=降序(向下 chevron),对应 SHeaderCtrl 的 HDF_SORTUP/SORTDOWN,
+     替代位图 png_lcex_header_arrow 的 3D 三角块 -->
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="12" viewBox="0 0 20 12">
+  <!-- 帧0 升序:向上箭头,主色青 -->
+  <path d="M2.5 8.5 L5 5.5 L7.5 8.5" fill="none" stroke="#0E9F9F" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 帧1 降序:向下箭头,主色青 -->
+  <path d="M12.5 3.5 L15 6.5 L17.5 3.5" fill="none" stroke="#0E9F9F" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

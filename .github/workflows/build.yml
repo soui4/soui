@@ -39,7 +39,7 @@ jobs:
             dist: macos-15  # Intel-based runner for x64
           - os: macOS
             arch: arm64
-            dist: macos-14  # Apple Silicon runner for arm64
+            dist: macos-15  # Apple Silicon runner for arm64；macos-14 已于 2026-11-02 退役
         exclude:
           - os: Linux
             arch: x86

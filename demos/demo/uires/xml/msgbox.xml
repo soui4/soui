@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  demo 消息框模板(替代 soui-sys-resource 里的旧版 sys_xml_msgbox.xml)。
+  启用方式:demo.cpp 在 DoConfig 之后调用 SetMessageBoxTemplateResId(_T("LAYOUT:XML_MSGBOX"))。
+  设计语言与 demo 其它页面一致:白卡片 + 1px 浅灰描边 + 10px 圆角、微软雅黑、青色主色、中性灰文字。
+
+  不可修改的约定(由 SOUI/src/control/SMessageBox.cpp 硬编码):
+    1. 控件名必须是 msgtitle / msgtext / msgicon / btnSwitch / button1st / button2nd / button3rd;
+    2. btnSwitch 必须是 tabctrl,3 个 page 分别表示 1/2/3 个按钮,页序号 = 按钮数 - 1;
+    3. 关闭按钮必须保持 id=2(IDCANCEL),这样点击才能触发 SHostWnd 的 EndDialog;
+    4. 根节点必须带 minSize="宽,高",否则 SetMessageBoxTemplateResId 会拒绝加载;
+    5. buttonText 子节点里的文本 key(ok/cancel/...)与 accel 由 OnInitDialog 读取。
+-->
+<SOUI title="messagebox"
+      width="-1"
+      height="-1"
+      appwin="0"
+      minSize="380,156"
+      resize="0"
+      translucent="1"
+      trCtx="messagebox">
+  <style>
+    <!-- 主按钮(每页第一个按钮):品牌青实心 + 白字,圆角 6,悬停/按下加深。
+         消息框是独立 popup 窗口,不参与换肤染色,所以这里取静态的品牌青(SVG 九宫格),
+         而不是之前的中性深色——深色实心按钮在任何界面里都显得像"禁用/暗色弹窗"。 -->
+    <class name="msgbtn_primary" skin="skin_btn_primary" font="face:微软雅黑,size:13"
+           colorText="#FFFFFF" colorTextHover="#FFFFFF" colorTextPush="#FFFFFF" colorTextDisable="#FFFFFF" cursor="hand"
+           drawFocusRect="0" margin-x="0"/>
+    <!-- 次按钮(取消/否/忽略等):白底 + 1px 浅灰描边,悬停底色加深 -->
+    <class name="msgbtn_secondary" skin="skin_btn" font="face:微软雅黑,size:13"
+           colorText="@color/clr_text" colorTextDisable="@color/clr_text_sub" cursor="hand"
+           drawFocusRect="0" margin-x="0"/>
+  </style>
+
+  <!-- 按钮文案与快捷键:OnInitDialog 按 MB_xxx 类型取对应 key,再走翻译引擎。
+       文案不再带 (&X) 助记符(现代界面不显示下划线助记),键盘操作仍由 accel 属性提供。 -->
+  <buttonText>
+    <ok accel="Ctrl+O">确定</ok>
+    <cancel accel="Ctrl+C">取消</cancel>
+    <abort accel="Ctrl+A">中止</abort>
+    <retry accel="Ctrl+R">重试</retry>
+    <yes accel="Ctrl+Y">是</yes>
+    <no accel="Ctrl+N">否</no>
+    <ignore accel="Ctrl+I">忽略</ignore>
+  </buttonText>
+
+  <!-- 根节点:vbox(标题行 / 内容区 / 按钮行),背景为圆角白卡片 -->
+  <root skin="skin_msgbox_bg" layout="vbox">
+    <!-- 标题行:高度固定 46;标题文字占满剩余宽度,关闭按钮贴右 -->
+    <caption size="-2,46" layout="hbox" gravity="center"
+             padding_left="20" padding_right="8" padding_top="12">
+      <!-- 标题:15 号加粗深色字,与页面标题同级 -->
+      <text name="msgtitle" size="-1,-1" weight="1" font="face:微软雅黑,size:15,bold:1"
+            colorText="@color/clr_title" valign="center"/>
+      <!-- 关闭按钮:矢量叉,28x28;id 必须为 2(IDCANCEL) -->
+      <imgbtn id="2" skin="skin_msgbox_close" size="28,28" tip="关闭"
+              drawFocusRect="0" animate="0"/>
+    </caption>
+
+    <!-- 内容区:weight=1 吃掉标题行与按钮行之外的全部高度。
+         注意:size 的 -2 是"等于父窗口全高",不是"剩余高度";要让中间区域自适应必须用 weight,
+         否则内容区会占满整窗,把下面的按钮行顶出可视区域(表现为按钮完全消失)。 -->
+    <window size="-2,0" weight="1" layout="hbox" gravity="center" interval="16" padding="20,4,20,12">
+      <!-- 类型图标:帧号由 SMessageBoxImpl::OnSetIcon 设置 -->
+      <img name="msgicon" size="36,36" display="0" skin="skin_msgbox_icon"/>
+      <!-- 正文:13 号中性灰,自动换行,最大排版宽度 400 -->
+      <text name="msgtext" size="-1,-1" weight="1" font="face:微软雅黑,size:13"
+            colorText="@color/clr_text" multilines="1" valign="top" maxWidth="400"/>
+    </window>
+
+    <!-- 按钮区:高度固定 54;tabHeight=0 隐藏页签头,只借用它的多页切换能力。
+         每页必须显式声明 layout="hbox":page 窗口默认走 soui 布局(只认 pos),不声明则 size 不生效、按钮不显示。 -->
+    <tabctrl size="-2,54" name="btnSwitch" tabHeight="0">
+      <!-- 页0:1 个按钮 -->
+      <page layout="hbox" padding="20,8,20,14">
+        <!-- 弹性占位:把按钮组推到右边 -->
+        <window size="0,0" weight="1"/>
+        <!-- 按钮组:高 32,按钮间距 10 -->
+        <window size="-1,-1" layout="hbox" gravity="center" interval="10">
+          <button name="button1st" class="msgbtn_primary" size="88,32">button1</button>
+        </window>
+      </page>
+      <!-- 页1:2 个按钮 -->
+      <page layout="hbox" padding="20,8,20,14">
+        <window size="0,0" weight="1"/>
+        <window size="-1,-1" layout="hbox" gravity="center" interval="10">
+          <button name="button1st" class="msgbtn_primary" size="88,32">button1</button>
+          <button name="button2nd" class="msgbtn_secondary" size="88,32">button2</button>
+        </window>
+      </page>
+      <!-- 页2:3 个按钮 -->
+      <page layout="hbox" padding="20,8,20,14">
+        <window size="0,0" weight="1"/>
+        <window size="-1,-1" layout="hbox" gravity="center" interval="10">
+          <button name="button1st" class="msgbtn_primary" size="88,32">button1</button>
+          <button name="button2nd" class="msgbtn_secondary" size="88,32">button2</button>
+          <button name="button3rd" class="msgbtn_secondary" size="88,32">button3</button>
+        </window>
+      </page>
+    </tabctrl>
+  </root>
+</SOUI>

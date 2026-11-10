@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="54" height="18" viewBox="0 0 54 18">
+  <!--
+    托盘菜单项图标:横向 3 帧,每帧 18x18,帧号 = menuItem 的 icon 属性值。
+    0 = 显示桌面歌词(音符) / 1 = 设置(滑杆) / 2 = 退出(电源)。
+    单状态图标,统一使用正文灰 #5F6672,与菜单文字同色。
+  -->
+  <!-- 帧0 音符:实心符头 + 竖杆 + 尾部弧线 -->
+  <circle cx="5.4" cy="12.8" r="2.4" fill="#5F6672"/>
+  <rect x="6.9" y="4.2" width="1.5" height="8.6" fill="#5F6672"/>
+  <path d="M8.4,4.2 C11,4.2 12.6,5.6 13.2,7.4" stroke="#5F6672" stroke-width="1.5" fill="none"/>
+
+  <!-- 帧1 设置:三条滑杆 + 圆点旋钮 -->
+  <path d="M21,4.5 H33 M21,9 H33 M21,13.5 H33" stroke="#5F6672" stroke-width="1.4" fill="none"/>
+  <circle cx="29.5" cy="4.5" r="1.9" fill="#5F6672"/>
+  <circle cx="25" cy="9" r="1.9" fill="#5F6672"/>
+  <circle cx="31" cy="13.5" r="1.9" fill="#5F6672"/>
+
+  <!-- 帧2 退出:断口电源符号 -->
+  <path d="M42,5 A5,5 0 1 1 48,5" stroke="#5F6672" stroke-width="1.6" fill="none"/>
+  <path d="M45,3 V9.2" stroke="#5F6672" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+</svg>

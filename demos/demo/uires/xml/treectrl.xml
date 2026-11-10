@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<treectrl size="full,full"  name="mytree" multiSel="1" bandEnable="1" itemHeight="22" indent="22" hasLines="true" iconSkin="skin_tree_icon" checkBox="1" font="underline:1" itemSkin="_skin.sys.list.item" fullRowSel="1" editLabel="1" >
+<!--
+  treectrl.xml - TreeCtrl 演示子布局(page_ctrls 的 treectrl 子页 include)
+  只做外观改造:节点图标改矢量、行高加大、去掉虚线连接、选中走浅青底。
+  节点数据与 name(mytree) 不可改动。
+-->
+<!-- 行高 30、缩进 14:28/20 在 125% DPI 下层级缩进约 47px,树看起来又散又空;
+     缩进收紧后相邻层级的图标与文字更紧凑,行高略加给复选框留出呼吸空间。 -->
+<treectrl size="full,full" name="mytree" multiSel="1" bandEnable="1" itemHeight="30" indent="14"
+          hasLines="false" iconSkin="skin_tree_icon" toggleSkin="skin_tree_toggle" checkBox="1"
+          checkSkin="skin_tree_chk" itemSkin="skin_tree_item" font="face:微软雅黑,size:13"
+          fullRowSel="1" editLabel="1" colorBkgnd="@color/clr_card_bg"
+          colorItemBkgnd="@color/clr_card_bg" colorItemSelBkgnd="@color/clr_accent_t"
+          colorText="@color/clr_text" sbSkin="skin_scrollbar" >
   <item text="Root" img="0" selImg="1"/>
   <item text="组织机构" img="0" selImg="1"  expand="1">
     <item text="市场部" img="0" selImg="1">

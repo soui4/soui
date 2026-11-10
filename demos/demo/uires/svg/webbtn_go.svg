@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  webbtn_go.svg - 浏览器"转到/确认"按钮图标(SVG 1.1,nanosvg 兼容)
-  3 帧横排,每帧 20x20,总尺寸 60x20。
-  帧序:0=normal #64748B  1=hover #2563EB  2=push #1D4ED8
-  图形:回车/确认箭头(↵),与"前进"的右向直箭头区分。
+  webbtn_go.svg - 浏览器"转到"按钮图标(SVG 1.1,nanosvg 兼容)
+  3 帧横排,每帧 24x24,总尺寸 72x24,与 imgbtn 24x24 1:1 对应。
+  帧序:0=normal #5F6672  1=hover #0E9F9F  2=push #0B8888
+  图形:右向箭头(横线 + 箭头),替代原来的"↵ 回车脚" —— 原图形与前进键同义,
+  在地址栏右侧容易被误读;直线箭头语义清晰,且笔画重量与前进/后退一致。
 -->
-<svg xmlns="http://www.w3.org/2000/svg" width="60" height="20" viewBox="0 0 60 20">
-  <!-- 帧0:normal #64748B -->
-  <g transform="translate(0,0)" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M5 4 L5 13 L14 13"/>
-    <path d="M11 10 L14 13 L11 16"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="72" height="24" viewBox="0 0 72 24">
+  <!-- 帧0:normal #5F6672 -->
+  <g transform="translate(0,0)" fill="none" stroke="#5F6672" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="7" y1="12" x2="16.5" y2="12"/>
+    <path d="M13 8.5 L16.5 12 L13 15.5"/>
   </g>
-  <!-- 帧1:hover #2563EB -->
-  <g transform="translate(20,0)" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M5 4 L5 13 L14 13"/>
-    <path d="M11 10 L14 13 L11 16"/>
+  <!-- 帧1:hover #0E9F9F -->
+  <g transform="translate(24,0)" fill="none" stroke="#0E9F9F" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="7" y1="12" x2="16.5" y2="12"/>
+    <path d="M13 8.5 L16.5 12 L13 15.5"/>
   </g>
-  <!-- 帧2:push #1D4ED8 -->
-  <g transform="translate(40,0)" fill="none" stroke="#1D4ED8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M5 4 L5 13 L14 13"/>
-    <path d="M11 10 L14 13 L11 16"/>
+  <!-- 帧2:push #0B8888 -->
+  <g transform="translate(48,0)" fill="none" stroke="#0B8888" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="7" y1="12" x2="16.5" y2="12"/>
+    <path d="M13 8.5 L16.5 12 L13 15.5"/>
   </g>
 </svg>

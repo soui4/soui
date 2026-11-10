@@ -1656,9 +1656,39 @@ void STreeCtrl::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
     BOOL bCtrlPressed = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
     BOOL bShiftPressed = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
 
-    // SPACE toggles the item at the cursor in multi-selection mode.
+    // SPACE: with checkboxes it toggles the cursor item's check state
+    // (parity with MFC CTreeCtrl); without checkboxes it toggles the
+    // selection in multi-selection mode.
     if (nChar == VK_SPACE && m_hSelItem)
     {
+        if (m_bCheckBox)
+        {
+            // Toggle the cursor item's check state, mirroring the mouse path
+            // in ItemLButtonDown: in multi-selection mode a selected cursor
+            // toggles every selected item (children cascade and parents
+            // recompute through SetCheckState). The cursor stays put.
+            LPTVITEM pItem = CSTree<LPTVITEM>::GetItem(m_hSelItem);
+            BOOL bCheck = pItem->nCheckBoxValue == STVICheckBox_Checked ? FALSE : TRUE;
+            if (m_bMultiSel && IsItemSelected(m_hSelItem))
+            {
+                HSTREEITEM hSel = 0;
+                BOOL bVal = FALSE;
+                for (SPOSITION pos = m_mapSelItems.GetStartPosition(); pos;)
+                {
+                    m_mapSelItems.GetNextAssoc(pos, hSel, bVal);
+                    SetCheckState(hSel, bCheck);
+                }
+            }
+            else
+            {
+                SetCheckState(pItem->hItem, bCheck);
+            }
+            EventTCCheckState evt(this);
+            evt.hItem = m_hSelItem;
+            evt.uCheckState = pItem->dwCheckBoxState;
+            FireEvent(&evt);
+            return;
+        }
         if (m_bMultiSel)
         {
             if (IsItemSelected(m_hSelItem))

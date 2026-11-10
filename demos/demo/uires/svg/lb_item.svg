@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  lb_item.svg - 列表框/下拉列表行底,横向 3 帧,每帧 24x24
+
+  帧内四周内缩 4px 画一个圆角 6px 的填充块,配合 imgframe margin="10,10,10,10"
+  做九宫格拉伸:高亮左右各让出 4px、四角 6px 圆角(10px 边距刚好完整包住
+  "4px 透明 + 6px 圆角"),行与行之间不会互相顶死,也不会盖住列表框自身的圆角描边。
+  悬停用中性浅灰,选中用主题浅青(可随换肤重染)。
+  帧序:0=normal(全透明,透出列表底色) 1=hover 2=pushdown(选中)
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="72" height="24" viewBox="0 0 72 24">
+  <!-- 帧1:悬停,中性浅灰,内缩 4px + 圆角 6 -->
+  <rect x="28" y="4" width="16" height="16" rx="6" fill="#F4F5F7"/>
+  <!-- 帧2:选中,主题浅青 -->
+  <rect x="52" y="4" width="16" height="16" rx="6" fill="#E9F7F7"/>
+</svg>

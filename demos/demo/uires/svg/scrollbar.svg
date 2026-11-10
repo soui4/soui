@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  scrollbar.svg - 滚动条 9x4 网格皮肤(nanosvg 兼容)
+
+  SSkinScrollbar 的网格:列=部件,行=状态,单元格边长 = 图宽 / 9。
+    列 0=上箭头 1=下箭头 2=滑块 3=翻页区 4..7=水平同名部件 8=角落
+    行 0=normal 1=hover 2=pushdown 3=inactive
+  单元格 6px,总尺寸 54x24。
+
+  只画滑块的三态,其余部件留空 —— 视觉上就是一条细滑块,没有老式箭头和轨道。
+  滑块在单元格内左右/上下各留 1px 透明边,拉伸后就是 4px 细滑块,不贴控件边缘。
+  注意:垂直滑块画在列 2(x=12),水平滑块必须画在列 6(x=36),否则水平滚动条不显示。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="54" height="24" viewBox="0 0 54 24">
+  <!-- 垂直滑块:normal / hover / pushdown -->
+  <rect x="13" y="0"  width="4" height="6" fill="#C9CFD7"/>
+  <rect x="13" y="6"  width="4" height="6" fill="#B6BCC5"/>
+  <rect x="13" y="12" width="4" height="6" fill="#9AA1AC"/>
+  <!-- 水平滑块:normal / hover / pushdown -->
+  <rect x="36" y="1"  width="6" height="4" fill="#C9CFD7"/>
+  <rect x="36" y="7"  width="6" height="4" fill="#B6BCC5"/>
+  <rect x="36" y="13" width="6" height="4" fill="#9AA1AC"/>
+</svg>

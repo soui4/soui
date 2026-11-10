@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  home_icons_teal.svg - 宫格首页分类图标雪碧图(nanosvg 兼容)
+  8 帧横排,每帧 48x48,总尺寸 384x48。
+  帧序与原 page_icons.png 一致:
+    0=基础控件  1=教程  2=动画  3=布局  4=杂项  5=skia  6=关于  7=脚本
+  配色:现代蓝色系 #0E9F9F -> #0B7F7F 渐变
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="384" height="48" viewBox="0 0 384 48">
+  <defs>
+    <linearGradient id="gBlue" gradientUnits="userSpaceOnUse" x1="0" y1="6" x2="0" y2="42">
+      <stop offset="0" stop-color="#2BB3B3"/>
+      <stop offset="1" stop-color="#0B7F7F"/>
+    </linearGradient>
+    <linearGradient id="gCyan" gradientUnits="userSpaceOnUse" x1="0" y1="6" x2="0" y2="42">
+      <stop offset="0" stop-color="#59D3D3"/>
+      <stop offset="1" stop-color="#0E9F9F"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 帧0:基础控件(九宫格)
+       注意:图形必须落在 48x48 单元格的正中(3..45),否则缩到 20px 显示时
+       会整体偏右下约 1px,看起来像"图标没居中"。 -->
+  <g transform="translate(0,0)" fill="url(#gBlue)"><rect x="0" y="0" width="48" height="48" fill="#E9F7F7"/>
+    <rect x="3"  y="3"  width="12" height="12" rx="3"/>
+    <rect x="18" y="3"  width="12" height="12" rx="3" opacity="0.75"/>
+    <rect x="33" y="3"  width="12" height="12" rx="3"/>
+    <rect x="3"  y="18" width="12" height="12" rx="3" opacity="0.75"/>
+    <rect x="18" y="18" width="12" height="12" rx="3"/>
+    <rect x="33" y="18" width="12" height="12" rx="3" opacity="0.75"/>
+    <rect x="3"  y="33" width="12" height="12" rx="3"/>
+    <rect x="18" y="33" width="12" height="12" rx="3"/>
+    <rect x="33" y="33" width="12" height="12" rx="3" opacity="0.75"/>
+  </g>
+
+  <!-- 帧1:教程(打开的书本) -->
+  <g transform="translate(48,0)"><rect x="0" y="0" width="48" height="48" fill="#E9F7F7"/>
+    <path d="M24,13 C19,9 13,8 7,9 L7,36 C13,35 19,36 24,40 Z" fill="#A8E4E4"/>
+    <path d="M24,13 C29,9 35,8 41,9 L41,36 C35,35 29,36 24,40 Z" fill="url(#gBlue)"/>
+    <path d="M24,13 L24,40" stroke="#086666" stroke-width="2" fill="none"/>
+  </g>
+
+  <!-- 帧2:动画(播放按钮) -->
+  <g transform="translate(96,0)"><rect x="0" y="0" width="48" height="48" fill="#E9F7F7"/>
+    <circle cx="24" cy="24" r="17" fill="url(#gBlue)"/>
+    <path d="M20,16 L33,24 L20,32 Z" fill="#FFFFFF"/>
+  </g>
+
+  <!-- 帧3:布局(分区线框) -->
+  <g transform="translate(144,0)"><rect x="0" y="0" width="48" height="48" fill="#E9F7F7"/>
+    <rect x="7" y="7" width="34" height="34" rx="3" fill="none" stroke="url(#gBlue)" stroke-width="2.5"/>
+    <rect x="7" y="7" width="34" height="9" rx="3" fill="url(#gBlue)"/>
+    <rect x="10.5" y="19" width="11" height="19" rx="2" fill="#A8E4E4"/>
+    <rect x="25" y="19" width="13" height="19" rx="2" fill="none" stroke="#0E9F9F" stroke-width="2"/>
+  </g>
+
+  <!-- 帧4:杂项(四色方块组合) -->
+  <g transform="translate(192,0)"><rect x="0" y="0" width="48" height="48" fill="#E9F7F7"/>
+    <rect x="4"  y="4"  width="19" height="19" rx="4" fill="url(#gBlue)"/>
+    <rect x="26" y="4"  width="19" height="19" rx="4" fill="#A8E4E4"/>
+    <rect x="4"  y="26" width="19" height="19" rx="4" fill="#5FC9C9"/>
+    <rect x="26" y="26" width="19" height="19" rx="4" fill="url(#gCyan)"/>
+  </g>
+
+  <!-- 帧5:skia(画笔) -->
+  <g transform="translate(240,0)"><rect x="0" y="0" width="48" height="48" fill="#E9F7F7"/>
+    <path d="M32,5 L43,16 L21,38 L10,42 L7,39 L11,27 Z" fill="url(#gBlue)"/>
+    <path d="M10,42 L7,39 L11,27 L21,38 Z" fill="#A8E4E4"/>
+    <path d="M7,39 L4,44 L10,42 Z" fill="#086666"/>
+    <path d="M28,9 L39,20" stroke="#FFFFFF" stroke-width="1.5" opacity="0.6" fill="none"/>
+  </g>
+
+  <!-- 帧6:关于(信息) -->
+  <g transform="translate(288,0)"><rect x="0" y="0" width="48" height="48" fill="#E9F7F7"/>
+    <circle cx="24" cy="24" r="17" fill="url(#gBlue)"/>
+    <circle cx="24" cy="15.5" r="2.6" fill="#FFFFFF"/>
+    <rect x="21.4" y="20.5" width="5.2" height="13.5" rx="2.6" fill="#FFFFFF"/>
+  </g>
+
+  <!-- 帧7:脚本(代码编辑器窗口 + </> 符号) -->
+  <g transform="translate(336,0)"><rect x="0" y="0" width="48" height="48" fill="#E9F7F7"/>
+    <rect x="4" y="9" width="40" height="31" rx="5" fill="url(#gBlue)"/>
+    <circle cx="10" cy="13.5" r="1.8" fill="#FCA5A5"/>
+    <circle cx="15" cy="13.5" r="1.8" fill="#FCD34D"/>
+    <circle cx="20" cy="13.5" r="1.8" fill="#86EFAC"/>
+    <line x1="6" y1="18.5" x2="42" y2="18.5" stroke="#075A5A" stroke-width="1"/>
+    <path d="M16,23 L10,29 L16,35" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M22,35 L31,23" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M27,23 L33,29 L27,35" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

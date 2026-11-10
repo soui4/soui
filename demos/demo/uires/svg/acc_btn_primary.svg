@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="16" viewBox="0 0 64 16">
+  <!--
+    acc_btn_primary.svg - 主按钮底色,4 态横向精灵(每帧 16x16,圆角 6)
+
+    为什么用 SVG 而不是 colorrect:colorrect 皮肤没有 OnColorize 实现,换肤到
+    其它主题色时不会重染,会一直停在青色;SVG(imgframe)走 SSkinImgList 的
+    OnColorize,可以按主题色重算色相,让主按钮跟随换肤。
+
+    由 skin.xml 以 <imgframe margin="7,7,7,7"/> 九宫格绘制,任意按钮尺寸下
+    圆角都不会被拉伸变形(约束:圆角半径 6 <= margin 7)。
+
+    帧序(SSkinImgList DrawByState):0=normal 1=hover 2=pushdown 3=disable
+  -->
+  <rect x="0" y="0" width="16" height="16" rx="6" fill="#0E9F9F"/>
+  <rect x="16" y="0" width="16" height="16" rx="6" fill="#0B8888"/>
+  <rect x="32" y="0" width="16" height="16" rx="6" fill="#0A7A7A"/>
+  <rect x="48" y="0" width="16" height="16" rx="6" fill="#CFEDED"/>
+</svg>

@@ -92,7 +92,8 @@ jobs:
 
   core-macos-arm64:
     name: core-macos-arm64
-    runs-on: macos-14
+    # macos-14 镜像已于 2026-11-02 退役，硬编码该标签会被直接拒绝。
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
       # 子模块改从 GitHub 镜像拉取：.gitmodules 里指向 gitee，GitHub runner 上不可靠

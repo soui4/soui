@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  avatar_round.svg - 演示头像:圆角方形(nanosvg 兼容)
+  单帧 64x64,整帧不透明(理由同 avatar.svg:避免 layered window 的
+  非预乘 alpha 混色在边缘产生灰边)。
+  圆角半径 11,略小于 roundImg 的 cornerSize=12,让区域裁剪的硬边界
+  落在白色留白里,不可见。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="gAvatar2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7FDEDE"/>
+      <stop offset="1" stop-color="#0E9F9F"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="64" height="64" fill="#FFFFFF"/>
+  <rect x="2" y="2" width="60" height="60" rx="11" fill="url(#gAvatar2)"/>
+  <circle cx="32" cy="25" r="9" fill="#FFFFFF" opacity="0.95"/>
+  <path d="M17,55 C17,44 24,39 32,39 C40,39 47,44 47,55 Z" fill="#FFFFFF" opacity="0.95"/>
+</svg>

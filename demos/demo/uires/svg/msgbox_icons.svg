@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="40" viewBox="0 0 200 40">
+  <!--
+    消息框类型图标:横向 5 帧,每帧 40x40,对应 SImageWnd 的 iconIndex 0..4。
+    SMessageBoxImpl::OnSetIcon 的帧映射固定,不可调整顺序:
+      0 = MB_USERICON(中性)/ 1 = MB_ICONWARNING / 2 = MB_ICONINFORMATION
+      3 = MB_ICONSTOP / 4 = MB_ICONQUESTION
+    统一造型:实心圆 + 白色符号;警示/错误保留琥珀与红作为语义色,
+    信息/询问改用中性灰蓝(消息框是独立 popup 窗口,不参与换肤染色,
+    用主题青会在其它主题下与界面主色冲突)。矢量绘制,无位图锯齿。
+  -->
+  <!-- 帧0 用户图标占位:中性灰实心圆 + 白色信息符号 -->
+  <circle cx="20" cy="20" r="18" fill="#8A94A6"/>
+  <circle cx="20" cy="10" r="2" fill="#FFFFFF"/>
+  <rect x="18.5" y="15" width="3" height="12" rx="1.5" fill="#FFFFFF"/>
+
+  <!-- 帧1 警告:琥珀色实心圆 + 白色感叹号 -->
+  <circle cx="60" cy="20" r="18" fill="#F5A623"/>
+  <rect x="58.2" y="9" width="3.6" height="13" rx="1.8" fill="#FFFFFF"/>
+  <circle cx="60" cy="27" r="2" fill="#FFFFFF"/>
+
+  <!-- 帧2 信息:中性灰蓝实心圆 + 白色 i -->
+  <circle cx="100" cy="20" r="18" fill="#5F6672"/>
+  <circle cx="100" cy="10" r="2" fill="#FFFFFF"/>
+  <rect x="98.5" y="15" width="3" height="12" rx="1.5" fill="#FFFFFF"/>
+
+  <!-- 帧3 错误/停止:红色实心圆 + 白色叉 -->
+  <circle cx="140" cy="20" r="18" fill="#E5484D"/>
+  <path d="M134,14 L146,26 M146,14 L134,26" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round" fill="none"/>
+
+  <!-- 帧4 询问:中性灰蓝实心圆 + 白色问号(用路径绘制,nanosvg 不支持 text 元素) -->
+  <circle cx="180" cy="20" r="18" fill="#5F6672"/>
+  <path d="M175,14 A 5,5 0 1 1 185,14 C 185,19 180,19 180,23"
+        stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="180" cy="28" r="2" fill="#FFFFFF"/>
+</svg>

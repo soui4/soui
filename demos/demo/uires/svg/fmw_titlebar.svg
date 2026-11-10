@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  fmw_titlebar.svg - 自由拖动窗口(freeMoveWindow)标题条底
+  24x24 画布:白色底 + 底部 1px 浅灰分割线,配合 imgframe margin="10,2,10,2"
+  九宫格拉伸(左右各 10px 固定、上下各 2px 固定,中间白色区域自由拉伸),
+  这样标题条高度随 captionHeight 变化时,只有白底被拉伸,底部细线始终保留 1px。
+  用法:skin_caption -> 该图,freeMoveWindow 的 captionSkin。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <!-- 标题条白底 -->
+  <rect x="0" y="0" width="24" height="24" fill="#FFFFFF"/>
+  <!-- 标题条与客户区之间的 1px 分割线 -->
+  <rect x="0" y="23" width="24" height="1" fill="#E8EAED"/>
+</svg>

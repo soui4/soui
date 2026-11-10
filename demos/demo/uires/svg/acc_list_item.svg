@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="24" viewBox="0 0 96 24">
+  <!--
+    acc_list_item.svg - 列表/表格行底,4 态横向精灵(每帧 24x24,左右内缩 4px、上下内缩 2px,圆角 6)
+
+    左右留 4px 让高亮块不压住列表自身的左/右边框;上下只留 2px,
+    相邻两行的空隙就是 2+2=4px,列表按 0 分隔(dividerSize=0)时行距不再显得空。
+    配合 imgframe margin="10,10,10,10" 九宫格拉伸(10px 边距刚好包住"2px 透明 + 6px 圆角")。
+    悬停用中性浅灰,选中用主题浅青。
+    帧序:0=normal(全透明) 1=hover(#F4F5F7) 2=pushdown(选中 #E9F7F7) 3=disable(全透明)
+  -->
+  <rect x="28" y="2" width="16" height="20" rx="6" fill="#F4F5F7"/>
+  <rect x="52" y="2" width="16" height="20" rx="6" fill="#E9F7F7"/>
+</svg>

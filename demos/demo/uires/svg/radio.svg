@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  radio.svg - 单选框 8 态精灵(nanosvg 兼容)
+  每帧 18x18,总尺寸 144x18。
+  帧序:0=normal 1=hover 2=pushdown 3=disable 4=checked 5=checked-hover 6=checked-pushdown 7=checked-disable
+  未选中为 1.5px 灰色描边圆环;选中为青色圆环 + 青色实心点。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="144" height="18" viewBox="0 0 144 18">
+
+  <g transform="translate(0,0)">
+    <circle cx="9" cy="9" r="7" fill="#FFFFFF" stroke="#C9CFD4" stroke-width="1.5"/>
+  </g>
+
+  <g transform="translate(18,0)">
+    <circle cx="9" cy="9" r="7" fill="#F7F8FA" stroke="#B6BCC5" stroke-width="1.5"/>
+  </g>
+
+  <g transform="translate(36,0)">
+    <circle cx="9" cy="9" r="7" fill="#EFF1F3" stroke="#B6BCC5" stroke-width="1.5"/>
+  </g>
+
+  <g transform="translate(54,0)">
+    <circle cx="9" cy="9" r="7" fill="#F4F5F7" stroke="#E4E7EB" stroke-width="1.5"/>
+  </g>
+
+  <g transform="translate(72,0)">
+    <circle cx="9" cy="9" r="7" fill="#FFFFFF" stroke="#0E9F9F" stroke-width="1.5"/>
+    <circle cx="9" cy="9" r="3.4" fill="#0E9F9F"/>
+  </g>
+
+  <g transform="translate(90,0)">
+    <circle cx="9" cy="9" r="7" fill="#F7F8FA" stroke="#0B8888" stroke-width="1.5"/>
+    <circle cx="9" cy="9" r="3.4" fill="#0B8888"/>
+  </g>
+
+  <g transform="translate(108,0)">
+    <circle cx="9" cy="9" r="7" fill="#EFF1F3" stroke="#0A7A7A" stroke-width="1.5"/>
+    <circle cx="9" cy="9" r="3.4" fill="#0A7A7A"/>
+  </g>
+
+  <g transform="translate(126,0)">
+    <circle cx="9" cy="9" r="7" fill="#F4F5F7" stroke="#CFEDED" stroke-width="1.5"/>
+    <circle cx="9" cy="9" r="3.4" fill="#CFEDED"/>
+  </g>
+</svg>

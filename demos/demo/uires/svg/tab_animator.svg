@@ -1,14 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="60" height="20" viewBox="0 0 60 20">
-  <!-- frame 0: animation controls (play) -->
-  <circle cx="10" cy="10" r="7.5" fill="none" stroke="#2563EB" stroke-width="2"/>
-  <path d="M8 6.5l6 3.5-6 3.5z" fill="#2563EB"/>
-  <!-- frame 1: interpolator (easing curve) -->
-  <path d="M23 15c4 0 5-10 13-10" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round"/>
-  <circle cx="23" cy="15" r="1.8" fill="#93C5FD"/>
-  <circle cx="36" cy="5" r="1.8" fill="#93C5FD"/>
-  <!-- frame 2: android animation (android head) -->
-  <path d="M43 13a7 6 0 0 1 14 0z" fill="#2563EB"/>
-  <path d="M45.5 5l1.5 3M54.5 5l-1.5 3" stroke="#2563EB" stroke-width="1.5" stroke-linecap="round"/>
-  <circle cx="47.5" cy="10" r="0.9" fill="#fff"/>
-  <circle cx="52.5" cy="10" r="0.9" fill="#fff"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="16" viewBox="0 0 60 20">
+  <!-- 动画分区页签图标:3 帧横排,20x20 网格,渲染到 16x16。
+       笔画规格与 ctrl_icons 一致:主描边 1.5px、辅助线 1.3px,实心形状只用低透明填充。 -->
+  <!-- frame 0: animation controls(播放圆环 + 三角) -->
+  <circle cx="10" cy="10" r="7.2" fill="none" stroke="#6B7280" stroke-width="1.5"/>
+  <path d="M8.2 6.7l5.6 3.3-5.6 3.3z" fill="#6B7280" fill-opacity="0.8"/>
+  <!-- frame 1: interpolator(缓动曲线 + 两端锚点) -->
+  <path d="M23 15.5c4.2 0 5-11 12.5-11" fill="none" stroke="#6B7280" stroke-width="1.5" stroke-linecap="round"/>
+  <circle cx="23" cy="15.5" r="1.6" fill="#B6BCC5"/>
+  <circle cx="35.5" cy="4.5" r="1.6" fill="#B6BCC5"/>
+  <!-- frame 2: android animation(安卓头轮廓) -->
+  <path d="M43 13.5a7.5 5.5 0 0 1 15 0z" fill="#6B7280" fill-opacity="0.22"/>
+  <path d="M43 13.5a7.5 5.5 0 0 1 15 0" fill="none" stroke="#6B7280" stroke-width="1.5"/>
+  <path d="M46 6.4l1.4 2.6M55 6.4l-1.4 2.6" stroke="#6B7280" stroke-width="1.3" stroke-linecap="round"/>
+  <circle cx="47.8" cy="10.4" r="0.9" fill="#6B7280"/>
+  <circle cx="53.2" cy="10.4" r="0.9" fill="#6B7280"/>
 </svg>

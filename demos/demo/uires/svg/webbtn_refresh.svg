@@ -1,24 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   webbtn_refresh.svg - 浏览器"刷新"按钮图标(SVG 1.1,nanosvg 兼容)
-  3 帧横排,每帧 20x20,总尺寸 60x20。
-  帧序:0=normal #64748B  1=hover #2563EB  2=push #1D4ED8
-  图形:环形箭头(刷新/重新加载)。圆心(10,10),半径 6。
+  3 帧横排,每帧 24x24,总尺寸 72x24,与 imgbtn 26x26 近似 1:1。
+  帧序:0=normal #5F6672  1=hover #0E9F9F  2=push #0B8888
+  图形:采用 Feather "refresh-cw" 的构造 —— 一条 6.48 半径的圆弧 + 圆弧末端折到
+  右上角的一小段直线,折角本身就是箭头,不需要另外画三角。
+  上一版用"圆弧 + 一个 L 形短折线"拼箭头,小尺寸下折角错位,渲染出来像个"C"字挂钩,
+  所以改成这条成熟路径。
 -->
-<svg xmlns="http://www.w3.org/2000/svg" width="60" height="20" viewBox="0 0 60 20">
-  <!-- 帧0:normal #64748B -->
-  <g transform="translate(0,0)" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M10 4 A6 6 0 1 0 10 16"/>
-    <path d="M6.5 4 L10 4 L10 7.5"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="72" height="24" viewBox="0 0 72 24">
+  <!-- 帧0:normal #5F6672 -->
+  <g transform="translate(0,0)" fill="none" stroke="#5F6672" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="19.56,5.88 19.56,10.2 15.24,10.2"/>
+    <path d="M17.75 13.8 a6.48 6.48 0 1 1 -1.53 -6.74 L19.56 10.2"/>
   </g>
-  <!-- 帧1:hover #2563EB -->
-  <g transform="translate(20,0)" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M10 4 A6 6 0 1 0 10 16"/>
-    <path d="M6.5 4 L10 4 L10 7.5"/>
+  <!-- 帧1:hover #0E9F9F -->
+  <g transform="translate(24,0)" fill="none" stroke="#0E9F9F" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="19.56,5.88 19.56,10.2 15.24,10.2"/>
+    <path d="M17.75 13.8 a6.48 6.48 0 1 1 -1.53 -6.74 L19.56 10.2"/>
   </g>
-  <!-- 帧2:push #1D4ED8 -->
-  <g transform="translate(40,0)" fill="none" stroke="#1D4ED8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M10 4 A6 6 0 1 0 10 16"/>
-    <path d="M6.5 4 L10 4 L10 7.5"/>
+  <!-- 帧2:push #0B8888 -->
+  <g transform="translate(48,0)" fill="none" stroke="#0B8888" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="19.56,5.88 19.56,10.2 15.24,10.2"/>
+    <path d="M17.75 13.8 a6.48 6.48 0 1 1 -1.53 -6.74 L19.56 10.2"/>
   </g>
 </svg>

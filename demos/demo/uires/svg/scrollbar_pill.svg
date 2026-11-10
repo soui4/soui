@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="108" height="48" viewBox="0 0 108 48">
+  <!--
+    滚动条九宫格精灵:12px 单元格 x 9 列 x 4 行,供 SSkinScrollbar 的 GetPartRect 按列/行取格。
+    列 0 上箭头 / 1 下箭头 / 2 纵向滑块 / 3 纵向轨道 / 4 左箭头 / 5 右箭头 / 6 横向滑块 / 7 横向轨道 / 8 角落。
+    本精灵只画滑块列(2、6),箭头列与轨道列保持透明,因此滚动条没有上下三角箭头、也没有轨道底色。
+    行 0 normal / 1 hover / 2 pushdown / 3 inactive。
+    滑块宽 8px、在 12px 单元格内左右各留 2px 透明;渲染到 8px 宽的滚动条后即 5px 滑块 + 1px 间隙,
+    相对侧栏右边线有一条视觉缝隙,不会和 1px 分隔线连成一根"竖线"。
+    圆角半径 4 = 皮肤的 margin 值,保证上下各 4px 的圆角帽完整落在不被拉伸的帽区里,两端才是真圆头。
+  -->
+  <rect x="26" y="0" width="8" height="12" rx="4" ry="4" fill="#C9CFD9"/>
+  <rect x="72" y="2" width="12" height="8" rx="4" ry="4" fill="#C9CFD9"/>
+  <rect x="26" y="12" width="8" height="12" rx="4" ry="4" fill="#AEB6C1"/>
+  <rect x="72" y="14" width="12" height="8" rx="4" ry="4" fill="#AEB6C1"/>
+  <rect x="26" y="24" width="8" height="12" rx="4" ry="4" fill="#949EAC"/>
+  <rect x="72" y="26" width="12" height="8" rx="4" ry="4" fill="#949EAC"/>
+  <rect x="26" y="36" width="8" height="12" rx="4" ry="4" fill="#E7EAEE"/>
+  <rect x="72" y="38" width="12" height="8" rx="4" ry="4" fill="#E7EAEE"/>
+</svg>

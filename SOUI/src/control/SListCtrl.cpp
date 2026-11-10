@@ -851,11 +851,18 @@ void SListCtrl::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
         return;
     }
 
-    // SPACE toggles the cursor item in multi-selection mode (parity with
-    // SListView::OnKeyDown); single-selection lets the dialog handle it.
+    // SPACE: with checkboxes it toggles the cursor item's check state
+    // (parity with MFC CListCtrl); without checkboxes it toggles the
+    // selection in multi-selection mode. Single-selection without a checkbox
+    // lets the dialog handle the key.
     if (nChar == VK_SPACE)
     {
-        if (bMultiMode && m_nSelectItem != -1)
+        if (m_nSelectItem != -1 && m_bCheckBox)
+        {
+            ToggleItemCheck(m_nSelectItem);
+            return;
+        }
+        if (m_nSelectItem != -1 && m_bMultiSelection)
         {
             NotifySelChange(m_nSelectItem, m_nSelectItem, MK_CONTROL);
             return;

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="16" viewBox="0 0 64 16">
+  <!--
+    acc_nav_item.svg - 侧边导航项底色,4 态横向精灵(每帧 16x16,圆角 6)
+
+    白底与浅灰底没有色相,重染后保持不变;只有选中态的浅青会跟随主题色变化。
+    换成 SVG 是因为 colorrect 不参与 OnColorize,换肤后选中态会一直是浅青。
+
+    由 skin.xml 以 <imgframe margin="7,7,7,7"/> 九宫格绘制(圆角 6 <= margin 7),
+    导航项宽度变化时圆角不会变形。
+    帧序:0=normal 1=hover 2=pushdown(选中) 3=disable
+  -->
+  <rect x="0" y="0" width="16" height="16" rx="6" fill="#FFFFFF"/>
+  <rect x="16" y="0" width="16" height="16" rx="6" fill="#F2F3F5"/>
+  <rect x="32" y="0" width="16" height="16" rx="6" fill="#E9F7F7"/>
+  <rect x="48" y="0" width="16" height="16" rx="6" fill="#FFFFFF"/>
+</svg>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="12" height="14" viewBox="0 0 12 14">
+  <!--
+    acc_nav_bar.svg - 导航选中项左侧 3px 竖条,4 态横向精灵(每帧 3x14,圆角 2)
+
+    未选中时与导航项底色相同(白/浅灰)视觉隐身,选中时显示主色;
+    换成 SVG 后选中态可随主题色重染。页面里尺寸固定为 3x14,imglist 直接绘制。
+    帧序:0=normal 1=hover 2=pushdown(选中) 3=disable
+  -->
+  <rect x="0" y="0" width="3" height="14" rx="2" fill="#FFFFFF"/>
+  <rect x="3" y="0" width="3" height="14" rx="2" fill="#F2F3F5"/>
+  <rect x="6" y="0" width="3" height="14" rx="2" fill="#0E9F9F"/>
+  <rect x="9" y="0" width="3" height="14" rx="2" fill="#FFFFFF"/>
+</svg>

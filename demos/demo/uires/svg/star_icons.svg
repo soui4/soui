@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  star_icons.svg - 评分星标 2 态精灵(nanosvg 兼容)
+  每帧 14x14,总尺寸 28x14。
+  帧序:0=点亮(主色青实心) 1=未点亮(浅灰底 + 灰描边)
+  ratingbar 通过 DrawByIndex(0/1) 选择帧,替换原 png_star1 的绿色星星。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="28" height="14" viewBox="0 0 28 14">
+
+  <!-- 帧0:点亮星 -->
+  <g transform="translate(0,0)">
+    <path d="M7,0.8 L8.6,4.8 L12.9,5.1 L9.6,7.8 L10.6,12.0 L7,9.7 L3.4,12.0 L4.4,7.8 L1.1,5.1 L5.4,4.8 Z"
+          fill="#0E9F9F"/>
+  </g>
+
+  <!-- 帧1:未点亮星 -->
+  <g transform="translate(14,0)">
+    <path d="M7,0.8 L8.6,4.8 L12.9,5.1 L9.6,7.8 L10.6,12.0 L7,9.7 L3.4,12.0 L4.4,7.8 L1.1,5.1 L5.4,4.8 Z"
+          fill="#F2F3F5" stroke="#C9CDD4" stroke-width="1" stroke-linejoin="round"/>
+  </g>
+</svg>

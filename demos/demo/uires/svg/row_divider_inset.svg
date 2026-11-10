@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  row_divider_inset.svg - 列表行分隔线(左右内缩版)
+
+  40x1 的画布只在中间 12~28 区间画 1px 浅灰线,配合 imgframe margin="12,0,12,0"
+  做九宫格横向拉伸:分隔线左右各内缩 12px,与行高亮的内缩边界对齐,
+  不再从列表最左/最右一直拉到底,形成现代表格常见的"浮起"分割线。
+  颜色 #F0F2F5 比表头底线 #E8EAED 更弱,保持"表头重、行间轻"的层级。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="1" viewBox="0 0 40 1">
+  <rect x="12" y="0" width="16" height="1" fill="#F0F2F5"/>
+</svg>

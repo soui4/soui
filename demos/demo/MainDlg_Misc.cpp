@@ -11,7 +11,7 @@
 * Describe    收纳无法归入其他主题文件的功能演示:
 *               - 磁吸子窗口(OnBtnLRC)     :把一个 SHostWnd 子窗口吸附到主窗口四边
 *               - GIF 播放器(OnBtnSelectGIF):运行期选择 gif 文件并播放
-*               - 自绘菜单(OnBtnMenu)     :SMenu 弹出菜单
+*               - 自绘菜单(OnBtnMenu)     :SMenuEx 弹出菜单
 *               - 消息框(OnBtnMsgBox)     :SMessageBox 的按钮组合与 3 秒强退
 *               - 气泡提示(OnBtnTip)      :STipWnd 定点气泡
 *               - 控件显隐(OnBtnHideTest) :btn_display 的可见性切换
@@ -24,7 +24,7 @@
 
 #include "stdafx.h"
 #include "MainDlg.h"
-#include "helper/SMenu.h"
+#include "helper/SMenuEx.h"
 #include <controls.extend/FileHelper.h>
 #include <controls.extend/SSpeedMeter.h>
 #include "SMatrixWindow.h"
@@ -102,18 +102,20 @@ void CMainDlg::OnBtnSelectGIF()
 /**
 * @brief      弹出自绘菜单
 *
-* Describe    SMenu 从资源包加载菜单模板(SMenu:menu_test)后在光标处弹出,
+* Describe    用 SMenuEx 从资源包加载菜单模板(SMenu:menu_test)后在光标处弹出,
 *             菜单项的命令响应统一走 OnCommand。
+*             注意:menu_test.xml 是 SMenuEx 的 menuRoot 格式(圆角卡片背景),
+*             不能用 SMenu(原生菜单)加载,否则圆角/描边会退化成系统蓝框。
 */
 void CMainDlg::OnBtnMenu()
 {
     CPoint pt;
     GetCursorPos(&pt);
 
-    //使用自绘菜单
-    SMenu menu;
-	menu.LoadMenu(_T("SMenu:menu_test"));
-    menu.TrackPopupMenu(0,pt.x,pt.y,m_hWnd,0,GetScale());
+    //使用 SMenuEx 自绘菜单
+    SMenuEx menu;
+    menu.LoadMenu(_T("SMenu:menu_test"));
+    menu.TrackPopupMenu(0, pt.x, pt.y, m_hWnd, GetScale());
 }
 
 /**

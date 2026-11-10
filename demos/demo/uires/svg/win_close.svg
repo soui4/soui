@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  win_close.svg - 标题栏"关闭"按钮 4 态精灵(nanosvg 兼容)
+  每帧 30x26(与 dlg_main.xml 里 id=1 的 imgbtn 尺寸一致),总尺寸 120x26。
+  帧序:0=normal 1=hover 2=pushdown 3=disable。
+
+  关闭按钮的反馈色单独做成一套皮肤,不再复用 skin_cap 的浅灰:
+  悬停时红色底 + 白色叉,按下时更深的红 + 白色叉,符合 Windows 11 等现代窗口的惯例;
+  常态保持透明底(露出白色标题栏)+ 深灰叉,与最小化/最大化按钮观感一致。
+  红底与叉同时画在这一张图里,避免"红底 + 深灰叉"叠在一起导致看不清。
+  用法:values/skin.xml 的 skin_cap_close;dlg_main.xml 的标题栏关闭按钮直接用该皮肤,
+  不要再在按钮内嵌 <img skin="svg_win_icons" iconIndex="3">,否则会盖住这张图的白色叉。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="26" viewBox="0 0 120 26">
+
+  <!-- 帧0 常态:透明底 + 深灰叉(与其它窗口按钮一致) -->
+  <g transform="translate(0,0)">
+    <path d="M11.6,9.6 L18.4,16.4 M18.4,9.6 L11.6,16.4"
+          stroke="#4E5560" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+  </g>
+
+  <!-- 帧1 悬停:红色底(Win11 关闭红) + 白色叉 -->
+  <g transform="translate(30,0)">
+    <rect x="0" y="0" width="30" height="26" rx="4" fill="#C42B1C"/>
+    <path d="M11.6,9.6 L18.4,16.4 M18.4,9.6 L11.6,16.4"
+          stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+  </g>
+
+  <!-- 帧2 按下:更深的红 + 白色叉 -->
+  <g transform="translate(60,0)">
+    <rect x="0" y="0" width="30" height="26" rx="4" fill="#B32A1E"/>
+    <path d="M11.6,9.6 L18.4,16.4 M18.4,9.6 L11.6,16.4"
+          stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+  </g>
+
+  <!-- 帧3 禁用:透明底 + 浅灰叉 -->
+  <g transform="translate(90,0)">
+    <path d="M11.6,9.6 L18.4,16.4 M18.4,9.6 L11.6,16.4"
+          stroke="#C9CDD4" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+  </g>
+</svg>

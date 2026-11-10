@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 组合框/日期下拉按钮:扁平矢量箭头,横向 4 帧(正常/悬停/按下/禁用),替代系统渐变位图 _skin.sys.dropbtn -->
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="30" viewBox="0 0 120 30">
+  <!-- 帧0 正常:正文灰 -->
+  <path d="M10.5 12.5 L15 17 L19.5 12.5" fill="none" stroke="#4E5969" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 帧1 悬停:主色青 -->
+  <path d="M40.5 12.5 L45 17 L49.5 12.5" fill="none" stroke="#0E9F9F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 帧2 按下:深青 -->
+  <path d="M70.5 12.5 L75 17 L79.5 12.5" fill="none" stroke="#0B7C7C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 帧3 禁用:浅灰 -->
+  <path d="M100.5 12.5 L105 17 L109.5 12.5" fill="none" stroke="#C9CDD4" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

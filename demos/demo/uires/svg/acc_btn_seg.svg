@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="16" viewBox="0 0 64 16">
+  <!--
+    acc_btn_seg.svg - 分段按钮底色,4 态横向精灵(每帧 16x16,圆角 6,1px 描边)
+
+    选中态走 pushdown 帧(浅青底 + 浅青描边),所以选中色也必须能被换肤重染。
+    描边画在帧内(rect 内缩 0.5px),九宫格拉伸时边框不会变粗。
+    帧序:0=normal 1=hover 2=pushdown(选中) 3=disable
+  -->
+  <g>
+    <rect x="0.5" y="0.5" width="15" height="15" rx="6" fill="#FFFFFF" stroke="#E8EAED" stroke-width="1"/>
+    <rect x="16.5" y="0.5" width="15" height="15" rx="6" fill="#F4F5F7" stroke="#C9CFD7" stroke-width="1"/>
+    <rect x="32.5" y="0.5" width="15" height="15" rx="6" fill="#E9F7F7" stroke="#CFEDED" stroke-width="1"/>
+    <rect x="48.5" y="0.5" width="15" height="15" rx="6" fill="#F4F5F7" stroke="#E8EAED" stroke-width="1"/>
+  </g>
+</svg>

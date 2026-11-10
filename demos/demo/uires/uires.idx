@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resource>
 	<UIDEF>
 		<file name="xml_init" path="uidef\init.xml" />
@@ -56,6 +56,7 @@
 		<file name="dlg_wrap_content" path="xml\dlg_wrap_content.xml" />
     <file name="page_ani3" path="xml\page_ani3.xml"/>
     <file name="xml_love" path="xml\love.xml"/>
+    <file name="XML_MSGBOX" path="xml\msgbox.xml"/>
   </LAYOUT>
 	<IMGX>
 		<file name="png_knob" path="image\knob.png"/>
@@ -66,6 +67,9 @@
 		<file name="qrbg" path="image\thDKT76T9X.png" />
 		<file name="img_busy" path="image\img_busy.png" />
 		<file name="btn_expand" path="image\btn_expand.png" />
+		<!-- 展开条浅色版:黑底白箭头重染为浅灰底深灰箭头 -->
+		<file name="btn_expand_light" path="image\btn_expand_light.png" />
+		<!-- 滚动条滑块改用 SVG 九宫格精灵,见下方 svg 段的 scrollbar_pill -->
 		<file name="jpg_bkgnd" path="image\Tulips.png" />
 		<file name="png_page_icons"   path="image\page_icons.png" />
 		<file name="png_small_icons" path="image\small_icons.png" />
@@ -225,7 +229,73 @@
     <file name="advanced" path="svg\test_advanced.svg"/>
     <file name="comprehensive" path="svg\test_comprehensive.svg"/>
     <file name="home_icons" path="svg\home_icons.svg"/>
+    <file name="home_icons_teal" path="svg\home_icons_teal.svg"/>
+    <file name="win_icons" path="svg\win_icons.svg"/>
+    <!-- 标题栏关闭按钮的 4 态合成图(红底悬停/按下 + 白叉),见 skin_cap_close -->
+    <file name="win_close" path="svg\win_close.svg"/>
+    <!-- spinButton 的上下箭头 3 态矢量图,见 skin_spin_up / skin_spin_down -->
+    <file name="spin_up" path="svg\spin_up.svg"/>
+    <file name="spin_down" path="svg\spin_down.svg"/>
+    <file name="chk" path="svg\chk.svg"/>
+    <file name="radio" path="svg\radio.svg"/>
+    <file name="switch" path="svg\switch.svg"/>
+    <file name="nav_chevron" path="svg\nav_chevron.svg"/>
+    <file name="avatar" path="svg\avatar.svg"/>
+    <file name="avatar_round" path="svg\avatar_round.svg"/>
+    <file name="scrollbar" path="svg\scrollbar.svg"/>
+    <!-- 滚动条胶囊滑块:9 列 x 4 行,单元格 12px,箭头/轨道列透明 -->
+    <file name="scrollbar_pill" path="svg\scrollbar_pill.svg"/>
+    <!-- 动画页"收起/展开树形区域"按钮:6 态横排,每帧 16x48 圆角胶囊 + 细 chevron -->
+    <file name="toggle_expand" path="svg\toggle_expand.svg"/>
+    <file name="icon_msg" path="svg\icon_msg.svg"/>
+    <file name="icon_contacts" path="svg\icon_contacts.svg"/>
+    <file name="icon_group" path="svg\icon_group.svg"/>
     <file name="ctrl_icons" path="svg\ctrl_icons.svg"/>
+    <file name="tree_icons" path="svg\tree_icons.svg"/>
+    <file name="cbx_arrow" path="svg\cbx_arrow.svg"/>
+    <file name="knob" path="svg\knob.svg"/>
+    <file name="lb_item" path="svg\lb_item.svg"/>
+    <file name="menu_bg" path="svg\menu_bg.svg"/>
+    <file name="menu_arrow" path="svg\menu_arrow.svg"/>
+    <file name="menu_check" path="svg\menu_check.svg"/>
+    <file name="msgbox_bg" path="svg\msgbox_bg.svg"/>
+    <file name="msgbox_close" path="svg\msgbox_close.svg"/>
+    <file name="msgbox_icons" path="svg\msgbox_icons.svg"/>
+    <file name="tray_icon" path="svg\tray_icon.svg"/>
+    <file name="tray_pre" path="svg\tray_pre.svg"/>
+    <file name="tray_play" path="svg\tray_play.svg"/>
+    <file name="tray_next" path="svg\tray_next.svg"/>
+    <file name="tray_like" path="svg\tray_like.svg"/>
+    <file name="tray_loop" path="svg\tray_loop.svg"/>
+    <file name="tray_volume" path="svg\tray_volume.svg"/>
+    <!-- 可参与换肤重染的主色块皮肤:主按钮 / 图标底 / 卡片标题竖条 -->
+    <file name="acc_btn_primary" path="svg\acc_btn_primary.svg"/>
+    <file name="acc_icon_tile" path="svg\acc_icon_tile.svg"/>
+    <file name="acc_bar" path="svg\acc_bar.svg"/>
+    <file name="acc_prog_bar" path="svg\acc_prog_bar.svg"/>
+    <file name="acc_nav_item" path="svg\acc_nav_item.svg"/>
+    <file name="acc_nav_bar" path="svg\acc_nav_bar.svg"/>
+    <file name="acc_btn_ghost" path="svg\acc_btn_ghost.svg"/>
+    <file name="acc_btn_seg" path="svg\acc_btn_seg.svg"/>
+    <file name="acc_cal_day" path="svg\acc_cal_day.svg"/>
+    <file name="acc_tree_item" path="svg\acc_tree_item.svg"/>
+    <file name="acc_list_item" path="svg\acc_list_item.svg"/>
+    <!-- 通用页面图标集(7 帧,每帧 48x48):替代原来的 1x PNG page_icons.png,矢量绘制任意 DPI 都清晰 -->
+    <file name="page_icons" path="svg\page_icons.svg"/>
+    <file name="busy" path="svg\busy.svg"/>
+    <file name="prop_switch" path="svg\prop_switch.svg"/>
+    <file name="sort_arrow" path="svg\sort_arrow.svg"/>
+    <file name="table_header" path="svg\table_header.svg"/>
+    <!-- 列表行分隔线(左右内缩版) -->
+    <file name="row_divider_inset" path="svg\row_divider_inset.svg"/>
+    <!-- 自由拖动窗口标题条(白底 + 1px 底线) -->
+    <file name="fmw_titlebar" path="svg\fmw_titlebar.svg"/>
+    <file name="tab_new" path="svg\tab_new.svg"/>
+    <file name="tab_close" path="svg\tab_close.svg"/>
+    <file name="tree_toggle" path="svg\tree_toggle.svg"/>
+    <file name="tree_chk" path="svg\tree_chk.svg"/>
+    <file name="slider_thumb" path="svg\slider_thumb.svg"/>
+    <file name="star_icons" path="svg\star_icons.svg"/>
     <file name="card_bg" path="svg\card_bg.svg"/>
     <file name="btn_skin" path="svg\btn_skin.svg"/>
     <file name="btn_menu" path="svg\btn_menu.svg"/>
@@ -236,10 +306,16 @@
 	<file name="tab_layout" path="svg\tab_layout.svg"/>
 	<file name="tab_animator" path="svg\tab_animator.svg"/>
 	<file name="tab_misc" path="svg\tab_misc.svg"/>
+	<file name="tab_nav" path="svg\tab_nav.svg"/>
+	<file name="tab_nav_top" path="svg\tab_nav_top.svg"/>
+	<!-- 浏览器风格页签:页签行底(4 态,上方圆角) + 页签条底色(单帧,上方圆角) -->
+	<file name="tab_item" path="svg\tab_item.svg"/>
+	<file name="tabstrip_bg" path="svg\tabstrip_bg.svg"/>
 	<file name="webbtn_back" path="svg\webbtn_back.svg"/>
 	<file name="webbtn_forward" path="svg\webbtn_forward.svg"/>
 	<file name="webbtn_go" path="svg\webbtn_go.svg"/>
 	<file name="webbtn_refresh" path="svg\webbtn_refresh.svg"/>
+	<file name="web_toolbar_bg" path="svg\web_toolbar_bg.svg"/>
 	<file name="container_bg" path="svg\container_bg.svg"/>
 	<file name="xxl_icons" path="svg\xxl_icons.svg"/>
 	<file name="xxl_digits" path="svg\xxl_digits.svg"/>

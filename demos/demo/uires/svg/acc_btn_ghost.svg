@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="16" viewBox="0 0 64 16">
+  <!--
+    acc_btn_ghost.svg - 幽灵按钮底色,4 态横向精灵(每帧 16x16,圆角 6)
+
+    normal 白底(与卡片同色)、hover 浅青、pushdown 深一档浅青、disable 白底。
+    换 SVG 的原因:colorrect 不参与 OnColorize,换主题色后 hover 仍会是浅青;
+    SVG 皮肤可随主题色重染。由 skin.xml 以 margin=7 的九宫格绘制。
+    帧序:0=normal 1=hover 2=pushdown 3=disable
+  -->
+  <rect x="0" y="0" width="16" height="16" rx="6" fill="#FFFFFF"/>
+  <rect x="16" y="0" width="16" height="16" rx="6" fill="#E9F7F7"/>
+  <rect x="32" y="0" width="16" height="16" rx="6" fill="#CFEDED"/>
+  <rect x="48" y="0" width="16" height="16" rx="6" fill="#FFFFFF"/>
+</svg>

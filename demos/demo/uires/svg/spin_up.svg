@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  spin_up.svg - spinButton 的上箭头 3 态精灵(nanosvg 兼容)
+  每帧 16x15(与 spinButton 一半的高度一致),总尺寸 48x15。
+  帧序:0=normal 1=hover 2=pushdown,对应 SSpinButtonCtrl::OnPaint 里 GetDefIndex 取得的三态索引。
+  用矢量 chevron 代替内置位图箭头(SKIN_SYS_SPIN_UP):位图在 125%/150% DPI 下被非整数倍
+  拉伸会出现锯齿和模糊,矢量按目标尺寸栅格化,边缘始终干净。
+  笔画 1.4px、圆头端点,颜色与导航列表的分组箭头同一套灰阶。
+  用法:values/skin.xml 的 skin_spin_up;spinButton 属性 upskin="skin_spin_up"。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="15" viewBox="0 0 48 15">
+
+  <!-- 帧0 常态 -->
+  <g transform="translate(0,0)">
+    <path d="M4,9.5 L8,5.5 L12,9.5" fill="none" stroke="#9AA1AC" stroke-width="1.6"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- 帧1 悬停 -->
+  <g transform="translate(16,0)">
+    <path d="M4,9.5 L8,5.5 L12,9.5" fill="none" stroke="#6B7280" stroke-width="1.6"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- 帧2 按下 -->
+  <g transform="translate(32,0)">
+    <path d="M4,9.5 L8,5.5 L12,9.5" fill="none" stroke="#4B5563" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

@@ -1,4 +1,4 @@
-﻿<SOUI trCtx="dlg_main"
+<SOUI trCtx="dlg_main"
       title="SOUI-DEMO"
       bigIcon="ICON_LOGO:32"
       smallIcon="ICON_LOGO:16"
@@ -18,7 +18,10 @@
   </skin>
   <style>
     <!--局部style对象-->
-    <class name="cls_edit" ncSkin="_skin.sys.border" margin-x="2" margin-y="2" />
+    <!-- 输入类控件统一外观:skin_edit_nc 圆角描边。用 skin(背景皮肤)而非 ncSkin:
+         ncSkin 由 OnNcPaint 绘制时会用 RGN_DIFF 裁掉客户区,只留 1px 外环,圆角弧线落在被裁区域内会缺四个角。
+         padding 作用于 richedit 文字内缩 / combobox 子编辑框位置 / listbox 项区 -->
+    <class name="cls_edit" skin="skin_edit_nc" ncSkin="skin_edit_nc" margin="0" colorText="@color/clr_title" padding="8,4,8,4"/>
   </style>
   <script src="lua:lua_test">
     <!--当没有指定src属性时从cdata段中加载脚本-->
@@ -39,7 +42,7 @@
     function onEvtTstClick(args)
 	    local txt3=SStringW(L"append",-1);
 	    local sender=toSWindow(args.sender);
-	    sender:GetParent():CreateChildrenFromString(L"<button pos=\"0,0,150,30\" on_command=\"onEvtTest2\">lua btn 中文</button>");
+	    sender:GetParent():CreateChildrenFromString(L"<button pos=\"0,0,150,30\" on_command=\"onEvtTest2\" drawFocusRect="0">lua btn 中文</button>");
 	    sender:SetVisible(0,1);
 	    return 1;
     end
@@ -57,37 +60,57 @@
   -->
   <root skin="_skin.sys.wnd.bkgnd" cache="1" on_init="on_init" on_exit="on_exit"
         enterAnimation="anim:alpha_in" exitAnimation="anim:alpha_out">
-    <window pos="1,1,-1,-1" id="9527" skin="demoskinbk" cache="1" colorBkgnd="#169ada"/>
-    <caption pos="0,0,-0,30" font="adding:2" layout="hbox" gravity="center" padding_left="10">
+    <!--
+      换肤背景载体:默认 demoskinbk 为空(不画图也不画色),此时底下这层 colorBkgnd 会透出来。
+      它必须用中性窗口底色(@color/clr_window_bg),不能写死旧版蓝色 #169ada:
+      内容页统一是半透明底色,叠在上面会把这层底色透出来,写死蓝色会让"内置皮肤"
+      以及任何主题下整个界面都偏蓝,看起来像换肤没生效。
+    -->
+    <window pos="1,1,-1,-1" id="9527" skin="demoskinbk" cache="1" colorBkgnd="@color/clr_window_bg"/>
+    <caption pos="0,0,-0,36" font="adding:1" layout="hbox" gravity="center" padding_left="10" colorBkgnd="#FFFFFF">
       <frame size="-2,-2" layout="hbox" gravity="center">
         <!--show where a frame widget can be used-->
         <icon src="ICON_LOGO:16"/>
         <text name="txt_title" extend_left="5"/>
         <window size="0,0" weight="1" visible="0"/>
-        <imgbtn name="btn_skin" skin="svg_btn_skin" size="20,20" animate="1"/>
-        <imgbtn name="btn_menu" skin="svg_btn_menu" size="20,20" animate="1" extend_left="8"/>
-        <imgbtn id="5" skin="_skin.sys.btn.minimize"  animate="1" />
-        <window size="-1,-1">
-          <imgbtn id="2" skin="_skin.sys.btn.maximize"  pos="0,0" animate="1" />
-          <imgbtn id="3" skin="_skin.sys.btn.restore"  pos="0,0" show="0" animate="1" />
+        <imgbtn name="btn_skin" skin="svg_btn_skin" size="20,20" animate="0" extend_left="6" drawFocusRect="0"/>
+        <imgbtn name="btn_menu" skin="svg_btn_menu" size="20,20" animate="0" extend_left="6" drawFocusRect="0"/>
+        <imgbtn id="5" skin="skin_cap" size="30,26" animate="0" extend_left="8" drawFocusRect="0">
+          <img skin="svg_win_icons" iconIndex="0" size="18,18" pos="|0,|0" offset="-0.5,-0.5" msgTransparent="1"/>
+        </imgbtn>
+        <window size="30,26">
+          <imgbtn id="2" skin="skin_cap" size="30,26" pos="0,0" animate="0" drawFocusRect="0">
+            <img skin="svg_win_icons" iconIndex="1" size="18,18" pos="|0,|0" offset="-0.5,-0.5" msgTransparent="1"/>
+          </imgbtn>
+          <imgbtn id="3" skin="skin_cap" size="30,26" pos="0,0" show="0" animate="0" drawFocusRect="0">
+            <img skin="svg_win_icons" iconIndex="2" size="18,18" pos="|0,|0" offset="-0.5,-0.5" msgTransparent="1"/>
+          </imgbtn>
         </window>
-        <imgbtn id="1" skin="_skin.sys.btn.close"  tip="close" animate="1"/>
+        <imgbtn id="1" skin="skin_cap_close" size="30,26" animate="0" drawFocusRect="0"/>
       </frame>
     </caption>
 
-    <tabctrl name="tab_main" pos="5,30,-5,-5" interpolator="Decelerate" curSel="0" focusable="0" animateSteps="30" tabHeight="0" enableDragSwitch="0">
+    <tabctrl name="tab_main" pos="0,36,-0,-0" interpolator="Decelerate" curSel="0" focusable="0" animateSteps="30" tabHeight="0" drawFocusRect="0">
       <page title="home">
         <include src="layout:page_home"/>
       </page>
-      <page title="contents" layout="vbox">
-        <!--全局导航栏:进入演示分区时显示;背景保持透明以露出换肤层(demoskinbk); back 按钮与标题文字组合为同一个按钮,点击任意位置均可返回宫格首页-->
-        <window name="nav_bar" size="-2,44" layout="hbox" gravity="center" padding_left="10">
-          <button name="btn_back" layout="hbox" gravity="center" interval="6" padding="8,4,12,4" skin="skin_nav_back_bk" cursor="hand" tip="返回宫格首页">
-            <img skin="svg_btn_back" size="20,20"/>
-            <text name="txt_nav_title" font="size:18,bold:1" colorText="@color/clr_title" msgTransparent="1"/>
+      <page title="contents" layout="vbox" colorBkgnd="@color/clr_window_bg">
+        <!--
+          全局导航栏:与页面同色的细条(无底边线),左侧为返回钮(箭头 + 分区标题),
+          标题文本由 CMainDlg::NavigateToPage 按 tab_contents 当前页 title 设置。
+          点击整块返回钮回到宫格首页。
+        -->
+        <window name="nav_bar" size="-2,32" layout="hbox" gravity="center"
+                padding_left="8" padding_right="12" colorBkgnd="@color/clr_window_bg">
+          <!-- 尺寸用 "-1,24":-1 = wrapContent,返回钮宽度由"箭头 + 分区标题"撑开;
+               之前写成 -2(填满父窗口),按钮被拉伸成整条导航栏,点击热区覆盖全宽,看着很怪 -->
+          <button name="btn_back" size="-1,24" layout="hbox" gravity="center" interval="5"
+                  padding="4,0,10,0" skin="skin_nav_back_bk" cursor="hand" tip="返回宫格首页" drawFocusRect="0">
+            <img skin="svg_btn_back" size="14,14"/>
+            <text name="txt_nav_title" font="face:微软雅黑,size:12" colorText="@color/clr_text_sub" msgTransparent="1"/>
           </button>
         </window>
-        <tabctrl name="tab_contents" size="-2,0" weight="1" interpolator="Decelerate" curSel="0" focusable="0" animateSteps="30" tabHeight="0" text-y="50" tabSkin="_skin.sys.tab.header" iconSkin="skin_page_icons" icon-x="10" colorTextHover="#ff0000" fontHover="italic:1" enableDragSwitch="0">
+        <tabctrl name="tab_contents" size="-2,0" weight="1" interpolator="Decelerate" curSel="0" focusable="0" animateSteps="30" tabHeight="0" text-y="50" tabSkin="skin_tab_nav_top" iconSkin="skin_page_icons" icon-x="10" colorTextHover="@color/clr_title" drawFocusRect="0">
           <page title="基础控件">
             <include src="layout:page_ctrls"/>
           </page>

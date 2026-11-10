@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  tabstrip_bg.svg - 浏览器风格页签条的底色,单帧 24x24(nanosvg 兼容)
+  形状:上方两角圆角 12px、下方直角,用来垫在 chromeTabCtrl 底下。
+  颜色:中性灰 #E7EAEE —— 与整页的窗口底、卡片、分隔线同属一个中性灰体系,
+        不带蓝调,避免和页面上其余青色/中性色控件冲突。
+  九宫格:配合 skin.xml 里 <imgframe margin="11"> 使用。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <path d="M0,24 L0,12 Q0,0 12,0 Q24,0 24,12 L24,24 Z" fill="#E7EAEE"/>
+</svg>

@@ -1,22 +1,25 @@
-﻿﻿<!--
+﻿<!--
     page_webkit.xml - 内嵌浏览器(教程)演示分区
     fadeframe 实现工具栏"自动隐藏":鼠标移到顶部区域时 webkit_toolbar 渐显,移开后延时渐隐;
     targetName 指向 webkit_toolbar。
     wke_test/edit_url/btn_webkit_back/fore/refresh/go 被 MainDlg_Webkit.cpp 引用,不可改名。
-    工具栏背景 skin_webkit_nav_bk 与图标按钮(webbtn_*.svg)均沿用 demo 浅色圆角卡片 + 蓝灰主题。
+    工具栏背景 skin_webkit_nav_bk 与图标按钮(webbtn_*.svg)均沿用 demo 浅色圆角卡片 + 青色主题。
   -->
-  <window size="-2,-2" colorBkgnd="@color/clr_page_bg">
+  <window size="-2,-2" colorBkgnd="@color/clr_window_bg">
     <text pos="8,8,-8,-8" align="center" valign="center" colorText="@color/clr_text_sub" multiLines="1">没有找到 wke.dll,请将 third-part\wke\wke.7z 解压到 bin 目录。\nwke.dll目前只有32位</text>
-    <fadeframe pos="8,8,-16,48" targetName="webkit_toolbar" showAlpha="235">
+    <fadeframe pos="16,16,-16,56" targetName="webkit_toolbar" showAlpha="235">
       <!--自动隐藏:鼠标进入顶部区域时工具栏渐显,移开后延时渐隐-->
     </fadeframe>
     <wkeWebkit pos="8,8,-8,-8" url="https://soui.com.cn" name="wke_test"/>
-    <window pos="8,8,-16,48" name="webkit_toolbar" skin="skin_webkit_nav_bk" layeredWindow="1" layout="hbox" gravity="center" padding="6,0,6,0" interval="6">
-      <!--这个窗口是前面的 fadeframe 的作用对象;图标按钮用 SVG 三态图标(石楠灰→主蓝)-->
-      <imgbtn name="btn_webkit_back" skin="skin_webbtn_back" size="22,22" animate="1" tip="后退"/>
-      <imgbtn name="btn_webkit_fore" skin="skin_webbtn_forward" size="22,22" animate="1" tip="前进"/>
-      <imgbtn name="btn_webkit_refresh" skin="skin_webbtn_refresh" size="22,22" animate="1" tip="刷新"/>
-      <edit2 size="0,-2" weight="1" height="30" class="cls_edit" name="edit_url">https://soui.com.cn</edit2>
-      <imgbtn name="btn_webkit_go" skin="skin_webbtn_go" size="30,30" animate="1" tip="转到"/>
+    <window pos="16,16,-16,56" name="webkit_toolbar" skin="skin_webkit_nav_bk" layeredWindow="1" layout="hbox" gravity="center" padding="8,0,8,0" interval="6">
+      <!--这个窗口是前面的 fadeframe 的作用对象;图标按钮用 SVG 三态图标(灰→主色青)。
+          工具栏底色是浅灰,中间地址栏是白色药丸(skin_url_box),两者形成"灰条 + 白输入框"的
+          浏览器常规结构;四个按钮统一 26x26(原来"转到"是 30x30,比其它三个大一圈)。
+          工具栏高度 40(60-16 改为 56-16),不再用 44 的大空白条。-->
+      <imgbtn name="btn_webkit_back" skin="skin_webbtn_back" size="26,26" animate="1" tip="后退" drawFocusRect="0"/>
+      <imgbtn name="btn_webkit_fore" skin="skin_webbtn_forward" size="26,26" animate="1" tip="前进" drawFocusRect="0"/>
+      <imgbtn name="btn_webkit_refresh" skin="skin_webbtn_refresh" size="26,26" animate="1" tip="刷新" drawFocusRect="0"/>
+      <edit2 size="0,-2" weight="1" height="28" class="cls_edit" name="edit_url">https://soui.com.cn</edit2>
+      <imgbtn name="btn_webkit_go" skin="skin_webbtn_go" size="26,26" animate="1" tip="转到" drawFocusRect="0"/>
     </window>
   </window>

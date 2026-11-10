@@ -1,4 +1,15 @@
-﻿<menu iconSkin="" itemHeight="26" iconMargin="4" textMargin="8" maxWidth="120">
-	<item name="menu_help" id="101">帮助</item>
-	<item name="menu_about" id="102">关于</item>
-</menu>
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  帮助菜单(菜单栏「帮助(H)」下拉)— SMenuEx 自绘菜单(menuRoot 格式)
+  样式与 menu_file.xml 保持一致(圆角卡片 + 32px 行高 + 微软雅黑 13)。
+-->
+<menuRoot skin="skin_menu_bg" padding="10,8,10,8"
+          itemSkin="skin_menu_item" itemHeight="32" itemPadding="0,0,0,0"
+          iconBarWidth="0" textOffset="14" minWidth="150" maxWidth="240"
+          sepSkin="skin_menu_sep" arrowSkin="skin_menu_arrow"
+          font="face:微软雅黑,size:13" colorText="@color/clr_text" colorBkgnd="@color/clr_card_bg">
+  <!-- 帮助 -->
+  <menuItem name="menu_help" id="101">帮助</menuItem>
+  <!-- 关于 -->
+  <menuItem name="menu_about" id="102">关于</menuItem>
+</menuRoot>

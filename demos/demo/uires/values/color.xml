@@ -9,18 +9,32 @@
   <white_50 value="rgba(255,255,255,0.5)"/>
   <gray value="#808080"/>
 
-  <!-- 宫格首页及导航使用的现代蓝色系配色 -->
-  <clr_window_bg value="#F1F5F9"/>
+  <!--
+    工具型中性色板:近白中性底 + 白卡片 + 单一青色强调。
+    彩色只用于主按钮/开关/勾选/进度/选中竖条/图标底,其余全部中性灰。
+  -->
+  <clr_window_bg value="#F7F8FA"/>
   <clr_card_bg value="#FFFFFF"/>
-  <clr_card_hover value="#EFF6FF"/>
-  <clr_primary value="#2563EB"/>
-  <clr_primary_dark value="#1D4ED8"/>
-  <clr_title value="#0F172A"/>
-  <clr_text value="#334155"/>
-  <clr_text_sub value="#64748B"/>
+  <clr_card_hover value="#FCFCFD"/>
+  <clr_primary value="#0E9F9F"/>
+  <clr_primary_dark value="#0B8888"/>
+  <clr_accent_t value="#E9F7F7"/>
+  <clr_accent_b value="#CFEDED"/>
+  <clr_title value="#1F2329"/>
+  <clr_text value="#5F6672"/>
+  <clr_text_sub value="#9AA1AC"/>
+  <clr_text3 value="#9AA1AC"/>
+  <clr_line value="#E8EAED"/>
+  <clr_line_hover value="#C9CFD7"/>
+  <clr_sunk value="#F4F5F7"/>
   <clr_nav_bg value="#FFFFFF"/>
-  <clr_divider value="#E2E8F0"/>
+  <clr_divider value="#E8EAED"/>
   <!--内容页统一半透明底色:叠在换肤层(demoskinbk)之上,透出主题色/皮肤图-->
   <clr_page_bg value="rgba(255,255,255,0.7)"/>
+
+  <!--语义色:只用于文字与徽标,不用于大块填充-->
+  <clr_success value="#2C7A2C"/>
+  <clr_success_t value="#EEF7EE"/>
+  <clr_danger value="#C62A1E"/>
 </color>
  

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
+  <!--
+    acc_icon_tile.svg - 卡片图标浅青底(单帧 20x20,圆角 8)
+
+    换成 SVG 的原因同主按钮:colorrect 无法被主题色重染,换肤后图标底会与
+    已经变色的主色块脱节;SVG 皮肤支持 OnColorize,可整体跟随主题色。
+
+    由 skin.xml 以 <imgframe margin="9,9,9,9"/> 九宫格绘制,52x52 / 34x34 等
+    不同尺寸都能保持 8px 圆角(约束:圆角 8 <= margin 9)。
+  -->
+  <rect x="0" y="0" width="20" height="20" rx="8" fill="#E9F7F7"/>
+</svg>

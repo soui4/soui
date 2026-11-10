@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  tab_nav_top.svg - 顶部页签皮肤(3 帧,nanosvg 兼容)
+  每帧 120x36,总尺寸 360x36。配合 imgframe margin="10,10,10,6" 九宫格拉伸:
+  底部 6px 区域内的选中下划线保持 3px 厚度,横向随页签宽度伸缩。
+  帧序:normal(全透明) / hover(白底圆角) / pushdown=选中(主色下划线,无底色)。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="36" viewBox="0 0 360 36">
+  <!-- frame 0: normal,全透明(仅占位,保证帧尺寸) -->
+  <rect x="1" y="1" width="118" height="34" rx="6" fill="#FFFFFF" fill-opacity="0"/>
+  <!-- frame 1: hover,白底圆角 -->
+  <rect x="121" y="1" width="118" height="34" rx="6" fill="#FFFFFF"/>
+  <!-- frame 2: 选中,底部 3px 主色下划线(通栏,无底色) -->
+  <rect x="240" y="32" width="120" height="3" fill="#0E9F9F"/>
+</svg>

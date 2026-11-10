@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+  <!--
+    消息框背景:9 宫格圆角白卡片(与弹出菜单同一设计语言)。
+    用法:消息框模板根节点 skin="skin_msgbox_bg",皮肤侧 margin=12,窗口非客户区无需留边。
+    约束:内缩(1) + 圆角半径(10) <= 9 宫格 margin(12),否则圆角弧会被拉伸变形。
+  -->
+  <rect x="1" y="1" width="38" height="38" rx="10" fill="#FFFFFF" stroke="#E4E7EC" stroke-width="1"/>
+</svg>

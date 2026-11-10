@@ -1,21 +1,22 @@
-﻿<SOUI trCtx="dlg_formatmsg" title="format msg" width="500" height="300" margin="5,5,5,5" resizable="0" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" translucent="1" alpha="255">
+<SOUI trCtx="dlg_formatmsg" title="format msg" width="500" height="300" margin="5,5,5,5" resizable="0" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" translucent="1" alpha="255">
   <style>
-    <!--局部style对象-->
-    <class name="cls_edit" ncSkin="_skin.sys.border" margin-x="2" margin-y="2" />
+    <!--局部style对象:与主窗口 cls_edit 同款外框(圆角描边),文字色/内边距一致-->
+    <!-- 输入类控件统一外观:skin 画圆角描边,ncSkin 覆盖内置蓝框,margin=0 屏蔽 NC 环(详见 skin.xml 注释) -->
+    <class name="cls_edit" skin="skin_edit_nc" ncSkin="skin_edit_nc" margin="0" colorText="@color/clr_title" padding="8,4,8,4"/>
   </style>
   <root class="cls_dlg_frame" cache="1">
     <caption pos="0,0,-0,30" show="1" font="adding:8">
       <icon pos="10,8" src="ICON_LOGO:16"/>
-      <text class="cls_txt_red">输入XML格式消息</text>
-      <imgbtn id="IDCANCEL" skin="_skin.sys.btn.close"    pos="-45,0" tip="close" animate="1"/>
+      <text font="face:微软雅黑,size:13,bold:1" colorText="@color/clr_title">输入XML格式消息</text>
+      <imgbtn id="IDCANCEL" skin="skin_chrome_tab_close" pos="-30,5" size="20,20" tip="close" animate="0" drawFocusRect="0"/>
     </caption>
-    <richedit name="re_xmlinput" pos="5,[5,-5,-35" class="cls_edit" enableDragdrop="1" multiLines="1" vscrollBar="1" sbSkin="skin_vscrollbar" wordWrap="1"  autoVscroll="1" hscrollBar="0" wantReturn="1" >
+    <richedit name="re_xmlinput" pos="5,[5,-5,-35" class="cls_edit" enableDragdrop="1" multiLines="1" vscrollBar="1" sbSkin="skin_scrollbar" sbArrowSize="0" wordWrap="1"  autoVscroll="1" hscrollBar="0" wantReturn="1" >
       &lt;color value="#ff0000"&gt;abc&lt;link color="#0000ff"&gt;home&lt;/link&gt;&lt;smiley id="1"/&gt;&lt;underline&gt;efg&lt;italic&gt;abc&lt;bold&gt;abc&lt;strike&gt;afc&lt;font value="华文行楷"&gt;&lt;size value="25"&gt; 启程&lt;/size&gt;软件SOUI&lt;/font&gt;&lt;/strike&gt;&lt;/bold&gt;&lt;/italic&gt;&lt;/underline&gt;&lt;/color&gt;
     </richedit>
 
     <text pos="5,[5">重复次数:</text>
-    <edit pos="[5,{0,@50,@25" name="edit_repeat">1</edit>
+    <edit pos="[5,{0,@50,@25" name="edit_repeat" class="cls_edit">1</edit>
     
-    <button id="IDOK" pos="-10,{0,@100,@25" offset="-1,0">OK</button>
+    <button id="IDOK" pos="-10,{0,@100,@25" offset="-1,0" class="cls_btn_primary" font="face:微软雅黑,size:13" colorText="#FFFFFF" drawFocusRect="0">OK</button>
   </root>
 </SOUI>

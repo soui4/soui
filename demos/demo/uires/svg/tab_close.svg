@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  tab_close.svg - Chrome 页签"关闭"按钮图标 3 态精灵(nanosvg 兼容)
+  每帧 16x16,总尺寸 48x16。
+  帧序:0=普通(灰) 1=悬停(红) 2=按下(深红)
+  纯线条叉号,无底色,适配浅色卡片背景。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="16" viewBox="0 0 48 16">
+
+  <!-- 帧0:普通 -->
+  <g transform="translate(0,0)">
+    <path d="M4.5,4.5 l7,7 M11.5,4.5 l-7,7" stroke="#9AA1AC" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+  </g>
+
+  <!-- 帧1:悬停 -->
+  <g transform="translate(16,0)">
+    <path d="M4.5,4.5 l7,7 M11.5,4.5 l-7,7" stroke="#D9534F" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+  </g>
+
+  <!-- 帧2:按下 -->
+  <g transform="translate(32,0)">
+    <path d="M4.5,4.5 l7,7 M11.5,4.5 l-7,7" stroke="#B23A36" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+  </g>
+</svg>

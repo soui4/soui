@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  tab_item.svg - Chrome 风格页签条目的行底,4 态横向精灵(nanosvg 兼容)
+  每帧 24x24,总尺寸 96x24。
+
+  形状:上方两角圆角 7px、下方直角 —— 浏览器页签的典型造型,
+        底部直角是为了与下方的页签内容区无缝相接。
+  九宫格:配合 skin.xml 里 <imgframe margin="8"> 使用,左右圆角不被拉伸。
+
+  配色:全部改用中性灰阶(与页面其余控件的灰体系一致,不再用偏蓝的灰),三级层次为
+        页签条底色 #E7EAEE(最深) → 未选中页签 #F1F3F6 → 选中页签 纯白。
+  帧序(checked 默认映射到 pushdown 帧,见 SState2Index::GetDefIndex 的 checkAsPushdown):
+    0 = normal    未选中页签 #F1F3F6
+    1 = hover     悬停 #F8FAFB
+    2 = pushdown  选中(checked) 纯白 #FFFFFF,与下方内容区同色 = 连成一体
+    3 = disable   禁用 #F0F2F4
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="24" viewBox="0 0 96 24">
+  <!-- 帧0:normal -->
+  <path d="M0,24 L0,7 Q0,0 7,0 L17,0 Q24,0 24,7 L24,24 Z" fill="#F1F3F6"/>
+  <!-- 帧1:hover -->
+  <g transform="translate(24,0)">
+    <path d="M0,24 L0,7 Q0,0 7,0 L17,0 Q24,0 24,7 L24,24 Z" fill="#F8FAFB"/>
+  </g>
+  <!-- 帧2:pushdown(选中) -->
+  <g transform="translate(48,0)">
+    <path d="M0,24 L0,7 Q0,0 7,0 L17,0 Q24,0 24,7 L24,24 Z" fill="#FFFFFF"/>
+  </g>
+  <!-- 帧3:disable -->
+  <g transform="translate(72,0)">
+    <path d="M0,24 L0,7 Q0,0 7,0 L17,0 Q24,0 24,7 L24,24 Z" fill="#F0F2F4"/>
+  </g>
+</svg>

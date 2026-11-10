@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="20" viewBox="0 0 80 20">
+  <!--
+    托盘菜单「上一曲」按钮:横向 4 帧,每帧 20x20。
+    帧序:0=常态 1=悬停 2=按下 3=禁用。
+    配色:灰 #5F6672 → 深灰 #1F2329 → 更深灰 #101418 → 禁用 #C9CDD4。
+    说明:托盘菜单是独立 popup 窗口,不参与换肤染色,所以这里刻意只用中性灰,
+    换成任何主题色都不会与界面主色冲突。
+  -->
+  <rect x="3.5" y="4" width="2" height="12" rx="1" fill="#5F6672"/>
+  <path d="M15.5,4 L15.5,16 L7.5,10 Z" fill="#5F6672"/>
+
+  <rect x="23.5" y="4" width="2" height="12" rx="1" fill="#1F2329"/>
+  <path d="M35.5,4 L35.5,16 L27.5,10 Z" fill="#1F2329"/>
+
+  <rect x="43.5" y="4" width="2" height="12" rx="1" fill="#101418"/>
+  <path d="M55.5,4 L55.5,16 L47.5,10 Z" fill="#101418"/>
+
+  <rect x="63.5" y="4" width="2" height="12" rx="1" fill="#C9CDD4"/>
+  <path d="M75.5,4 L75.5,16 L67.5,10 Z" fill="#C9CDD4"/>
+</svg>

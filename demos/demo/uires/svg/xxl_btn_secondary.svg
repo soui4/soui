@@ -6,9 +6,9 @@
 -->
 <svg xmlns="http://www.w3.org/2000/svg" width="300" height="40" viewBox="0 0 300 40">
   <!-- 帧0:normal 白底灰描边 -->
-  <rect x="0.5" y="0.5" width="99" height="39" rx="19" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+  <rect x="0.5" y="0.5" width="99" height="39" rx="19" fill="#FFFFFF" stroke="#C9CDD4" stroke-width="1.5"/>
   <!-- 帧1:hover 浅蓝底蓝描边 -->
-  <rect x="100.5" y="0.5" width="99" height="39" rx="19" fill="#EFF6FF" stroke="#2563EB" stroke-width="1.5"/>
+  <rect x="100.5" y="0.5" width="99" height="39" rx="19" fill="#E9F7F7" stroke="#0E9F9F" stroke-width="1.5"/>
   <!-- 帧2:push 深蓝描边 -->
-  <rect x="200.5" y="0.5" width="99" height="39" rx="19" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.8"/>
+  <rect x="200.5" y="0.5" width="99" height="39" rx="19" fill="#D4F0F0" stroke="#0B8888" stroke-width="1.8"/>
 </svg>

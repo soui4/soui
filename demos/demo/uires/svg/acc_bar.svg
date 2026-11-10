@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3" height="12" viewBox="0 0 3 12">
+  <!--
+    acc_bar.svg - 卡片标题左侧 3px 青色竖条(单帧 3x12,圆角 2)
+
+    改成 SVG 后可参与 OnColorize,换肤时竖条会跟着主色一起变。
+    页面上该元素尺寸固定为 size="3,12",不需要九宫格,imglist 直接按目标
+    矩形绘制即可。
+  -->
+  <rect x="0" y="0" width="3" height="12" rx="2" fill="#0E9F9F"/>
+</svg>

@@ -1,25 +1,50 @@
-﻿﻿﻿﻿﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <!--
   page_ctrls.xml - 基础控件演示分区
 
   左侧 grouplist(gl_catalog) 为控件分类目录,右侧 tab_ctrls(tabWidth=0 隐藏页签)
   承载 16 个控件演示子页,页切换由 MainDlg_List.cpp 响应目录点击驱动。
-  每个子页采用统一版式:页头(标题+说明) -> 演示区(卡片容器无底色,由页面根的
-  半透明 clr_page_bg 统一衬底,透出换肤层 demoskinbk);列表类演示页同为页头 + 全区域列表(weight 撑满)。
+  每个子页采用统一版式:页头(标题+说明) -> 卡片式演示区。页面底色为不透明的
+  clr_window_bg(近白中性底),卡片为纯白 + 1px 描边 + 8px 圆角,零阴影。
   注意:控件 name/id 被 demos\demo 源码按名引用,不可改动。
 -->
-<window size="-2,-2" layout="hbox" colorBkgnd="@color/clr_page_bg">
-	<grouplist size="200,-2" name="gl_catalog" layout="vbox" viewSize="-2,-1" colorBkgnd="@color/clr_card_bg">
-		<groupTemplate layout="vbox" size="-2,-1">
-			<button name="title" size="-2,38" padding="10,5,10,5" layout="hbox" gravity="center" colorText="@color/clr_title">
-				<text name="txt_label" weight="1" font="adding:5,bold:1" />
-				<toggle skin="_skin.sys.tree.toggle" name="tgl_switch" toggled="1" msgTransparent="1" />
+<window size="-2,-2" layout="hbox" colorBkgnd="@color/clr_window_bg">
+	<!--
+	  侧边导航:白底,内边距 8,与右侧内容区之间不再画 1px 分隔线(靠白底和页面底色差自然分界);
+	  分组头 = 可展开按钮,12px 次要灰(只作章节标题,悬停才转为正文色),组间留 8px 断点;
+	  导航项 = check2,悬停浅灰、选中圆角浅青底 + 加粗深青字。
+	  选中态只保留"底色 + 字色"两个信号,不再额外加左侧竖条:竖条贴在 1px 内边距上,
+	  和 6px 圆角的胶囊底本来就错位,三重强调也显得过重。
+	  滚动条不采用"完全隐形、只有鼠标精确悬停窄边才淡入"的覆盖式做法:鼠标划过列表时根本看不见
+	  滚动条出现,反而不易察觉这里可以滚。改成"半透明常驻 + 悬停/滚轮提亮":
+	  sbTrumbTrackMinAlpha=200 让静止时滑块仍有约 78% 的不透明度(淡淡可见),
+	  sbFadeFrames=30 在鼠标进入滚动条或滚轮滚动时淡入到 100%,鼠标离开 2 秒后淡回 78%;
+	  sbWid=10 同时把滚动条的命中区拓宽到 10px,鼠标更容易触发淡入、也更容得下胶囊。
+	  滑块本体是圆头胶囊(精灵 rx=4 配皮肤 margin=4),两侧各留透明缝,不会和面板边缘连成一条竖线。
+	-->
+	<grouplist size="216,-2" name="gl_catalog" layout="vbox" viewSize="-2,-1"
+	           colorBkgnd="@color/clr_card_bg" padding="8,8,8,8" sbSkin="skin_scrollbar"
+	           sbWid="10" sbArrowSize="0" sbFadeFrames="30" sbTrumbTrackMinAlpha="200">
+		<!-- extend_top=8:组与组之间留出断点,5 个分组不再连成一片 -->
+		<groupTemplate layout="vbox" size="-2,-1" extend_top="8">
+			<!-- 组头降一级:12px、常规字重、次要灰;它只是"章节标题",不该和可点条目抢视觉 -->
+			<button name="title" size="-2,30" padding="8,0,8,0" layout="hbox" gravity="center"
+			        skin="skin_nav_group" colorText="@color/clr_text_sub" colorTextHover="@color/clr_text"
+			        drawFocusRect="0">
+				<text name="txt_label" weight="1" font="face:微软雅黑,size:12" msgTransparent="inherit"/>
+				<toggle skin="svg_nav_chevron" size="10,10" name="tgl_switch" toggled="1" msgTransparent="1" drawFocusRect="0"/>
 			</button>
-			<aniwindow name="container" layout="vbox" size="-2,-1" Interpolator="Accelerate" factor="1.0" steps="10" gravity="center" />
+			<aniwindow name="container" layout="vbox" size="-2,-1" Interpolator="Accelerate" factor="1.0" steps="10" gravity="center"/>
 		</groupTemplate>
-		<itemTemplate size="-2,30" layout="hbox" gravity="center" class_name="check2" skin="_skin.sys.list.item">
-			<img skin="svg_ctrl_icons" name="img_indicator" size="20,20" iconIndex="0" />
-			<text name="txt_label" extend_left="10" colorText="@color/clr_text" />
+		<itemTemplate size="-2,32" layout="hbox" gravity="center" class_name="check2" skin="skin_nav_item" drawFocusRect="0">
+			<!-- 图标用 16x16:svg_ctrl_icons 单帧是 24x24,缩到 16x16 更精致,与 13px 导航文字的比例更协调;
+			     布局/动画/杂项分区的 tabctrl iconSkin 也把单帧改成了 16x16,四个分区的导航图标尺寸统一;
+			     extend_left 11 保证文字起点不变 -->
+			<img skin="svg_ctrl_icons" name="img_indicator" size="16,16" iconIndex="0" extend_left="11"/>
+			<text name="txt_label" weight="1" extend_left="8" colorText="@color/clr_text"
+			      colorTextPush="@color/clr_primary_dark"
+			      font="face:微软雅黑,size:13" fontPush="face:微软雅黑,size:13,bold:1"
+			      msgTransparent="inherit"/>
 		</itemTemplate>
 		<data>
 			<group text="列表控件" id="1000" tip="列表控件TIP">
@@ -51,400 +76,856 @@
 			</group>
 		</data>
 	</grouplist>
-	<tabctrl size="0,-2" weight="1" padding="5,5,5,5" name="tab_ctrls" colorText="@color/clr_title" animateSteps="20" tabAlign="left" tabWidth="0" enableDragSwitch="1">
+	<!-- 内容区页签:与其它分区的二级页签同一套皮肤(skin_tab_nav_top),避免回落到内置的 3D 页签头 -->
+	<tabctrl size="0,-2" weight="1" padding="0,0,0,0" name="tab_ctrls" animateSteps="20" tabAlign="left" tabWidth="0"
+	         tabSkin="skin_tab_nav_top" tabHeight="36" tabInterSize="4" font="face:微软雅黑,size:13"
+	         colorText="@color/clr_text" colorTextHover="@color/clr_title" colorTextPush="@color/clr_primary"
+	         fontPush="bold:1" drawFocusRect="0">
 		<!-- ============ 列表类演示:页头 + 全区域列表(weight 撑满) ============ -->
-		<page title="mclistview" layout="vbox" interval="12">
-				<text text="多列列表" font="size:16,bold:1" colorText="@color/clr_title"/>
-				<text text="报表式多列虚拟列表,表头支持排序拖换与全选,条目模板内可嵌入任意控件" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
-				<window layout="hbox" interval="16">
-				<check name="chk_multi_mclv" text="启用多选(关闭后点击为单选)" checked="1" font="size:12"/>
-				<check name="chk_band_mclv" text="启用框选(关闭后多选拖动为 fling 滚动)" checked="1" font="size:12"/>
-				<text name="txt_mclv_selcount" text="已选 0 项" font="size:12" colorText="@color/clr_primary" marginSize="8,0,0,0"/>
+		<page title="mclistview" layout="vbox" padding="20,16,20,18" colorBkgnd="@color/clr_window_bg">
+			<!-- 页头 -->
+			<text text="多列列表" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
+			<text text="报表式多列虚拟列表,表头支持排序、列宽拖换与全选,条目模板内可嵌入任意控件" extend_top="6" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
+
+			<!-- 卡片:整块列表区,顶部工具栏 + 满幅列表 -->
+			<window size="-2,0" weight="1" skin="skin_card" layout="vbox" padding="14,13,14,15" extend_top="16">
+				<window size="-2,26" layout="hbox" gravity="center" interval="8">
+					<window size="3,12" skin="skin_card_bar"/>
+					<text text="浏览器卸载榜" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_text_sub"/>
+					<window size="0,0" weight="1"/>
+					<check name="chk_multi_mclv" text="多选" checked="1" skin="skin_check" size="60,24"
+					       font="face:微软雅黑,size:12" colorText="@color/clr_text" focusable="0" drawFocusRect="0"/>
+					<check name="chk_band_mclv" text="框选" checked="1" skin="skin_check" size="60,24"
+					       font="face:微软雅黑,size:12" colorText="@color/clr_text" focusable="0" drawFocusRect="0"/>
+					<text name="txt_mclv_selcount" text="已选 0 项" font="face:微软雅黑,size:12"
+					      colorText="@color/clr_primary" extend_left="8"/>
 				</window>
-				<mclistview name="mclv_test" multiSel="1" bandEnable="1" colorBkgnd="@color/clr_card_bg" size="-2,0" weight="1" headerHeight="30" dividerSize="1">
-				<headerStyle wndclass="header" align="center" name="mclv_test_header" sortSkin="skin_lcex_header_arrow" itemSwapEnable="1" fixWidth="0" font="underline:0,adding:-3" sortHeader="1" colorBkgnd="#ffffff">
+				<window size="-2,1" colorBkgnd="@color/clr_line" extend_top="12"/>
+				<mclistview name="mclv_test" multiSel="1" bandEnable="1" colorBkgnd="@color/clr_card_bg"
+				            size="-2,0" weight="1" headerHeight="38" dividerSize="1" dividerSkin="skin_row_divider"
+				            extend_top="6" sbSkin="skin_scrollbar">
+				<headerStyle wndclass="header" align="center" name="mclv_test_header" itemSkin="skin_header"
+				             sortSkin="skin_lcex_header_arrow" itemSwapEnable="1" fixWidth="0" sortHeader="1"
+				             colorBkgnd="@color/clr_card_bg" colorText="@color/clr_text" font="face:微软雅黑,size:12">
 					<items>
-						<item weight="480" align="left">@string/mccol_1</item>
-						<item weight="95" >@string/mccol_2</item>
-						<item weight="100" >@string/mccol_3</item>
-						<item weight="100" align="right">@string/mccol_4</item>
-						<item weight="100">@string/mccol_5</item>
-						<item weight="100">@string/mccol_6</item>
+						<!-- 表头列宽算法:先取 width 作基准,再把剩余宽度按 weight 比例追加;
+						     故各列统一 50dp 基准,weight = 目标宽度 - 50(212→162 实配 168 / 88→38 实配 50 / 60→10 / 72→22 / 58→8 / 68→18)
+						     第二列(评分+投票)多要 10 份权重:原 88dp 里"投票"链接只有 22dp,高清缩放下两个汉字放不下,
+						     第一列(名称+描述)留白充足,故从第一列挪 10 份权重给第二列 -->
+						<item width="50dp" weight="168" align="left">@string/mccol_1</item>
+						<item width="50dp" weight="50">@string/mccol_2</item>
+						<item width="50dp" weight="10">@string/mccol_3</item>
+						<item width="50dp" weight="22">@string/mccol_4</item>
+						<item width="50dp" weight="8">@string/mccol_5</item>
+						<item width="50dp" weight="18">@string/mccol_6</item>
 					</items>
-					<check name="chk_mclv_sel" text="全选" />
+					<check name="chk_mclv_sel" text="全选" skin="skin_check" font="face:微软雅黑,size:12"
+					       colorText="@color/clr_text" focusable="0" drawFocusRect="0"/>
 				</headerStyle>
-				<template itemHeight="80" colorHover="@color/clr_card_hover" colorSelected="#DBEAFE">
+				<!-- 行底挂在模板根节点上:MCListView 的每一行是一个 item panel,panel 自己的 skin 才是
+				     行背景的来源(控件上的 itemSkin 属性 SMCListView 并不支持,写了会被忽略),
+				     skin_list_item 的 1/2 帧分别对应悬停(浅灰)与选中(浅青),都是圆角胶囊、无描边 -->
+				<template itemHeight="64" colorHover="@color/clr_window_bg" colorSelected="@color/clr_accent_t"
+				          skin="skin_list_item">
 					<window name="col1" clipClient="1">
-						<img name="img_icon" skin="skin_icon6" pos="10,8,@64,@64" />
-						<text name="txt_name" pos="[5,16" font="bold:1,adding:-1" colorText="@color/clr_title">火狐浏览器</text>
-						<text name="txt_desc" pos="{0,36,-10,-10" font="bold:1,adding:-4" dotted="1" colorText="@color/clr_text_sub">速度最快的浏览器</text>
-						<text name="txt_index" pos="|0,|0" offset="-0.5,-0.5" font="adding:10" colorText="rgba(37,99,235,53%)">10</text>
+						<img name="img_icon" skin="skin_icon6" pos="8,16,@32,@32" />
+						<!-- 行内统一双行基线:第一行 y=12(高20),第二行 y=34(高16),六列全部按此对齐;
+						     名称行右侧预留 40dp 余量,dotted=1 让超长名称以省略号收尾 -->
+						<text name="txt_name" pos="48,12,-40,@20" dotted="1" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_title">火狐浏览器</text>
+						<!-- 头像 32x32 距单元格左边 8px(与表头留白对齐)并垂直居中(y=(64-32)/2=16),名称与描述缩进到头像右侧 40dp 处 -->
+						<text name="txt_desc" pos="48,34,-48,@16" dotted="1" font="face:微软雅黑,size:11" colorText="@color/clr_text_sub">速度最快的浏览器</text>
+						<!-- 行号:贴描述行右端、与描述同基线(y=34),作为整行的附属元信息;
+						     9 号极浅灰弱化存在感,位置固定不随名称长度漂移 -->
+						<text name="txt_index" pos="-44,34,-8,@16" font="face:微软雅黑,size:11" align="right" colorText="@color/clr_line_hover">10</text>
 					</window>
 					<window name="col2" clipClient="1">
-						<ratingbar name="rating_score" starSkin="skin_star1" starNum="5" value="3.5" pos="10,16" />
-						<text name="txt_score" pos="10,36" font="adding:-5">8.5分</text>
-						<link pos="[5,36" cursor="hand" colorText="@color/clr_primary" href="www.163.com" font="adding:-5">投票</link>
+						<!-- 星级 5x14=70dp 水平居中,与名称行同基线 y=12;评分值与"投票"链接在第二行 y=34 左右贴边分布;
+						     本列内容宽约 90dp,评分占 6~46、"投票"占 48~84(留 6dp 右内边距):
+						     链接框原先只有 22dp,高清缩放下两个汉字放不下,"投"被裁掉,故加宽到 36dp -->
+						<ratingbar name="rating_score" starSkin="skin_star1" starNum="5" value="3.5" pos="|0,12" />
+						<text name="txt_score" pos="6,34,-44,@16" font="face:微软雅黑,size:11" colorText="@color/clr_text">8.5分</text>
+						<link pos="-42,34,-6,@16" cursor="hand" colorText="@color/clr_primary" href="www.163.com"
+						      align="right" font="face:微软雅黑,size:11">投票</link>
 					</window>
 					<window name="col3" clipClient="1">
-						<text name="txt_size" pos="0,26,-0,-26" font="adding:-4" align="center">85.92M</text>
+						<!-- 单值列纵向居中:y=(64-16)/2=24 -->
+						<text name="txt_size" pos="0,24,-0,@16" font="face:微软雅黑,size:11" align="center" colorText="@color/clr_text">85.92M</text>
 					</window>
 					<window name="col4" clipClient="1">
-						<text name="txt_installtime" pos="0,26,-0,-26" font="adding:-4" align="center">2015-01-09</text>
+						<text name="txt_installtime" pos="0,24,-0,@16" font="face:微软雅黑,size:11" align="center" colorText="@color/clr_text_sub">2015-01-09</text>
 					</window>
 					<window name="col5" clipClient="1">
-						<text name="txt_usetime" pos="0,26,-0,-26" font="adding:-4" align="center">今天</text>
-						<animateimg pos="|0,|0" offset="-0.5,-0.5" skin="skin_busy" name="ani_test" tip="animateimg is used here" msgTransparent="0" />
+						<!-- "今天"与名称行同基线 y=12;忙碌图标在第二行 y=32 居中,与描述/评分行对齐 -->
+						<text name="txt_usetime" pos="0,12,-0,@16" font="face:微软雅黑,size:11" align="center" colorText="@color/clr_text">今天</text>
+						<animateimg pos="|0,32,@24,@24" offset="-0.5,0" skin="skin_busy" name="ani_test" tip="animateimg is used here" msgTransparent="0" />
 					</window>
 					<window name="col6" clipClient="1">
-						<button animate="1" pos="|-35,|-14,@60,@26" font="adding:-3" align="center" name="btn_uninstall">卸载</button>
+						<!-- 按钮 54x28 居中;C++ 会给它叠加 10 度旋转矩阵,旋转后外接框约 58x37,仍在列宽内 -->
+						<button animate="1" pos="|-27,|-14,@54,@28" skin="skin_btn" drawFocusRect="0"
+						        font="face:微软雅黑,size:13" colorText="@color/clr_title" align="center" name="btn_uninstall">卸载</button>
 					</window>
 				</template>
 			</mclistview>
-		</page>
-		<page title="listctrl" layout="vbox" interval="12">
-				<text text="基础列表" font="size:16,bold:1" colorText="@color/clr_title"/>
-				<text text="报表式列表,演示表头排序、拖换与热跟踪光标;框选矩形使用可配置的 bandSkin(系统内置 _skin.sys.selband,colorrect 皮肤);双击或 F2 可就地编辑单元格文本(editLabel);选中与勾选相互独立,多选状态下点击复选框,所有选中项的勾选状态同步变化(checkBox)" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
-				<window layout="hbox" interval="16">
-				<check name="chk_multi_lc" text="启用多选(关闭后点击为单选)" checked="1" font="size:12"/>
-				<check name="chk_band_lc" text="启用框选(关闭后多选拖动为 fling 滚动)" checked="1" font="size:12"/>
-				<text name="txt_lc_selcount" text="已选 0 项" font="size:12" colorText="@color/clr_primary" marginSize="8,0,0,0"/>
-				</window>
-				<listctrl name="lc_test" multiSel="1" bandEnable="1" hotTrack="1" editLabel="1" checkBox="1" size="-2,0" weight="1" itemHeight="28" headerHeight="30" colorBkgnd="@color/clr_card_bg" colorItemHotBkgnd="@color/clr_card_hover" colorItemSelBkgnd="#DBEAFE" colorText="@color/clr_text" colorSelText="@color/clr_title" bandSkin="_skin.sys.selband" sbSkin="skin_new_scrollbar" font="size:12">
-				<headerStyle align="left" itemSwapEnable="1" fixWidth="0" sortHeader="1" sortSkin="skin_lcex_header_arrow" colorBkgnd="@color/clr_card_bg" colorText="@color/clr_title" font="size:12,bold:1">
-					<items>
-						<item width="150" weight="1">姓名</item>
-						<item width="100">性别</item>
-						<item width="80">年龄</item>
-						<item width="100">成绩</item>
-					</items>
-				</headerStyle>
-			</listctrl>
-		</page>
-		<page title="listview(fix)" layout="vbox" interval="10" >
-			<text text="固定高度列表 listview" font="size:16,bold:1" colorText="@color/clr_title"/>
-			<text text="横向与纵向的定高虚拟列表,item 内可嵌入任意子控件" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
-			<window layout="hbox" interval="16">
-			<check name="chk_multi_lvfix" text="启用多选(关闭后点击为单选)" checked="1" font="size:12"/>
-			<check name="chk_band_lvfix" text="启用框选(关闭后多选拖动为 fling 滚动)" checked="1" font="size:12"/>
 			</window>
-			<listview size="-2,100" name="lv_test_fix_horz" multiSel="1" bandEnable="1" dividerSize="5" wantTab="1" sbFadeFrames="30" vertical="0">
-				<template itemWidth="100" trackMouseEvent="1">
-					<imgbtn size="-2,-2" layout="vbox" gravity="center" interval="10">
-						<img size="-1,-1" name="btn_icon" skin="skin_page_icons" iconIndex="0"/>
-						<text size="-1,-1" name="btn_text" text="hello"/>
-					</imgbtn>
-				</template>
-			</listview>
-			<listview size="-2,0" weight="1" name="lv_test_fix" multiSel="1" bandEnable="1" dividerSize="5" wantTab="1" sbFadeFrames="30">
-				<template itemHeight="50" trackMouseEvent="1">
-					<button pos="10,5,@150,@25" name="btn_test" tip="click the button to see how to writing the response function">btn</button>
-					<animateimg pos="[10,{0" skin="skin_busy" name="ani_test" tip="animateimg is used here" msgTransparent="0" />
-					<combobox name="cbx_in_lv" pos="[10,{0,@200,@30" dropDown="1" dropHeight="300" class="cls_edit" dotted="0" animateTime="200" curSel="2">
-						<dropdownStyle>
-							<root colorBkgnd="#ffffff"/>
-						</dropdownStyle>
-						<liststyle class="cls_edit" iconSkin="skin_menuicon" itemHeight="30"/>
-						<editstyle inset="5,0,5,0" margin="0" align="left"/>
+		</page>
+		<page title="listctrl" layout="vbox" padding="20,16,20,18" colorBkgnd="@color/clr_window_bg">
+			<!-- 页头 -->
+			<text text="基础列表" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
+			<text text="报表式列表,演示表头排序与拖换、框选、热跟踪光标、就地编辑与多选同步勾选" extend_top="6" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
+
+			<!-- 卡片:整块列表区 -->
+			<window size="-2,0" weight="1" skin="skin_card" layout="vbox" padding="14,13,14,15" extend_top="16">
+				<window size="-2,26" layout="hbox" gravity="center" interval="8">
+					<window size="3,12" skin="skin_card_bar"/>
+					<text text="人员名单" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_text_sub"/>
+					<window size="0,0" weight="1"/>
+					<check name="chk_multi_lc" text="多选" checked="1" skin="skin_check" size="60,24"
+					       font="face:微软雅黑,size:12" colorText="@color/clr_text" focusable="0" drawFocusRect="0"/>
+					<check name="chk_band_lc" text="框选" checked="1" skin="skin_check" size="60,24"
+					       font="face:微软雅黑,size:12" colorText="@color/clr_text" focusable="0" drawFocusRect="0"/>
+					<text name="txt_lc_selcount" text="已选 0 项" font="face:微软雅黑,size:12"
+					      colorText="@color/clr_primary" extend_left="8"/>
+				</window>
+				<window size="-2,1" colorBkgnd="@color/clr_line" extend_top="12"/>
+				<!-- drawFocusRect="0":关掉键盘焦点虚线框。注意:SListCtrl::DrawItem 里针对多选/勾选的
+				     "键盘光标虚线"目前是硬编码绘制,资源只能关掉基类焦点框,要彻底去掉还需一行 C++ 判断 -->
+				<listctrl name="lc_test" multiSel="1" bandEnable="1" hotTrack="1" editLabel="1" checkBox="1" drawFocusRect="0"
+				          size="-2,0" weight="1" itemHeight="32" headerHeight="38" extend_top="6" dividerSize="1" dividerSkin="skin_row_divider"
+				          colorBkgnd="@color/clr_card_bg" colorItemBkgnd="@color/clr_card_bg"
+				          colorItemBkgnd2="@color/clr_card_bg" colorItemHotBkgnd="@color/clr_window_bg"
+				          colorItemSelBkgnd="@color/clr_accent_t" colorText="@color/clr_text"
+				          colorSelText="@color/clr_title" itemSkin="skin_list_item" checkSkin="skin_check"
+				          sbSkin="skin_scrollbar"
+				          font="face:微软雅黑,size:12">
+					<headerStyle align="left" itemSkin="skin_header" itemSwapEnable="1" fixWidth="0" sortHeader="1"
+					             sortSkin="skin_lcex_header_arrow" colorBkgnd="@color/clr_card_bg"
+					             colorText="@color/clr_text" font="face:微软雅黑,size:12">
 						<items>
-							<item text="combobox.item1" icon="1" data="100" />
-							<item text="combobox.item2" icon="2" data="100" />
-							<item text="combobox.item3" icon="3" data="103" />
-							<item text="combobox.item4" icon="4" data="100" />
-							<item text="combobox.item5" icon="5" data="105" />
-							<item text="combobox.item6" icon="0" data="100" />
+							<!-- 列宽同样按"width 基准 + 余量按 weight 比例追加"分配;
+							     这里用相对权重 3/2/1.5/2 让余量均摊,避免首列吃掉全部剩余宽度 -->
+							<item width="120" weight="3">姓名</item>
+							<item width="90" weight="2">性别</item>
+							<item width="70" weight="1.5">年龄</item>
+							<item width="90" weight="2">成绩</item>
 						</items>
-					</combobox>
-					<text pos="-20,{0" offset="-1,0">text item</text>
-				</template>
-			</listview>
+					</headerStyle>
+				</listctrl>
+			</window>
 		</page>
-		<page title="listview(flex)" layout="vbox" interval="12">
-				<text text="可变高度列表" font="size:16,bold:1" colorText="@color/clr_title"/>
-				<text text="奇偶行使用不同模板与高度的虚拟列表,悬停态可单独定制" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
-				<window layout="hbox" interval="16">
-				<check name="chk_multi_lvflex" text="启用多选(关闭后点击为单选)" checked="1" font="size:12"/>
-				<check name="chk_band_lvflex" text="启用框选(关闭后多选拖动为 fling 滚动)" checked="1" font="size:12"/>
+		<page title="listview(fix)" layout="vbox" padding="20,16,20,18" colorBkgnd="@color/clr_window_bg">
+			<!-- 页头 -->
+			<text text="固定高度列表" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
+			<text text="横向与纵向的定高虚拟列表,条目模板内可嵌入任意子控件" extend_top="6" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
+
+			<!-- 卡片:横向定高条 + 纵向定高列表 -->
+			<window size="-2,0" weight="1" skin="skin_card" layout="vbox" padding="14,13,14,15" extend_top="16">
+				<window size="-2,26" layout="hbox" gravity="center" interval="8">
+					<window size="3,12" skin="skin_card_bar"/>
+					<text text="listview" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_text_sub"/>
+					<window size="0,0" weight="1"/>
+					<check name="chk_multi_lvfix" text="多选" checked="1" skin="skin_check" size="60,24"
+					       font="face:微软雅黑,size:12" colorText="@color/clr_text" focusable="0" drawFocusRect="0"/>
+					<check name="chk_band_lvfix" text="框选" checked="1" skin="skin_check" size="60,24"
+					       font="face:微软雅黑,size:12" colorText="@color/clr_text" focusable="0" drawFocusRect="0"/>
 				</window>
-				<listview size="-2,0" weight="1" name="lv_test_flex" multiSel="1" bandEnable="1" dividerSize="5" sbFadeFrames="30">
-				<template defHeight="50" oddHeight="50" evenHeight="60" evenSelHeight="90">
-					<itemOdd>
-						<button pos="10,5,@150,@25" name="btn_test" tip="click the button to see how to writing the response function">btn</button>
-						<text pos="10,[0" multiLines="1" maxWidth="500" colorText="@color/clr_primary">text in odd item</text>
-					</itemOdd>
-					<itemEven>
-						<button pos="10,5,@150,@25" name="btn_test" tip="click the button to see how to writing the response function">btn</button>
-						<text pos="20,[0" colorText="@color/clr_text">text in even item</text>
-					</itemEven>
-					<itemEvenHover>
-						<button pos="10,5,@150,@25" name="btn_test" tip="click the button to see how to writing the response function">btn</button>
-						<text pos="20,[0" colorText="@color/clr_text" multilines="1">text in even item been hovered.\n the second line</text>
-					</itemEvenHover>
-				</template>
-			</listview>
+				<window size="-2,1" colorBkgnd="@color/clr_line" extend_top="12"/>
+				<listview size="-2,96" name="lv_test_fix_horz" multiSel="1" bandEnable="1" dividerSize="4" wantTab="1"
+				          sbFadeFrames="30" vertical="0" extend_top="6" colorBkgnd="@color/clr_card_bg"
+				          sbSkin="skin_scrollbar" extend_bottom="8">
+					<!-- skin="skin_list_item":横向列表的单元格高亮同样是圆角胶囊,与纵向列表/表格统一 -->
+					<template itemWidth="100" trackMouseEvent="1" skin="skin_list_item">
+						<imgbtn size="-2,-2" layout="vbox" gravity="center" interval="10" skin="skin_btn" drawFocusRect="0">
+							<img size="-1,-1" name="btn_icon" skin="skin_page_icons" iconIndex="0"/>
+							<text size="-1,-1" name="btn_text" text="hello" font="face:微软雅黑,size:12"
+							      colorText="@color/clr_text"/>
+						</imgbtn>
+					</template>
+				</listview>
+				<listview size="-2,0" weight="1" name="lv_test_fix" multiSel="1" bandEnable="1" dividerSize="0"
+				          wantTab="1" sbFadeFrames="30" colorBkgnd="@color/clr_card_bg" sbSkin="skin_scrollbar">
+					<!-- skin="skin_list_item":固定高度列表的行底也换成圆角精灵,悬停/选中的高亮内缩成圆角胶囊 -->
+					<!-- 行高 50dp,子控件的 y 一律按"行高 - 自身高 / 2"写死,保证四个子控件在同一条中线上:
+					     button/animateimg/combobox 均 30dp 高 -> y=10;text 约 18dp 高 -> y=16。
+					     原先子控件用 pos 里占位的 {0(解析为 0)且 button 写死 y=5,内容整体偏上 4~5dp,
+					     且各控件偏上幅度不一致,看上去就没对齐 -->
+					<template itemHeight="50" trackMouseEvent="1" skin="skin_list_item">
+						<button pos="10,10,@150,@30" name="btn_test" skin="skin_btn" drawFocusRect="0"
+						        font="face:微软雅黑,size:12" colorText="@color/clr_title"
+						        tip="click the button to see how to writing the response function">btn</button>
+						<animateimg pos="[10,11" skin="skin_busy" name="ani_test" tip="animateimg is used here" msgTransparent="0" />
+						<combobox name="cbx_in_lv" pos="[10,10,@200,@30" dropDown="1" dropHeight="300" class="cls_edit" dotted="0" animateTime="200" curSel="2" btnSkin="skin_cbx_btn" drawFocusRect="0">
+							<dropdownStyle>
+								<root colorBkgnd="@color/clr_card_bg"/>
+							</dropdownStyle>
+							<!-- 下拉列表:skin="none" 去掉内置 class 皮肤的画在客户区上的描边,
+							     改由 ncskin 画在窗口非客户区(最外 6px 环)上,这样 6px 滚动条落在客户区内、被圆角描边包住 -->
+							<liststyle class="cls_edit" skin="none" ncskin="skin_popup" margin="6"
+							           colorBkgnd="@color/clr_card_bg" sbSkin="skin_scrollbar" sbWid="6" sbArrowSize="0"
+							           iconSkin="skin_menuicon" itemHeight="30" itemSkin="skin_lb_item" drawFocusRect="0"/>
+							<!-- 内嵌编辑框:圆角白底 + 空 ncSkin,不再把组合框左上/左下圆角抹平 -->
+							<editstyle inset="7,0,7,0" margin="1" skin="skin_edit_fill" ncskin="none"
+							           colorText="@color/clr_text" align="left" colorBkgnd="@color/clr_card_bg"/>
+							<items>
+								<item text="combobox.item1" icon="1" data="100" />
+								<item text="combobox.item2" icon="2" data="100" />
+								<item text="combobox.item3" icon="3" data="103" />
+								<item text="combobox.item4" icon="4" data="100" />
+								<item text="combobox.item5" icon="5" data="105" />
+								<item text="combobox.item6" icon="0" data="100" />
+							</items>
+						</combobox>
+						<text pos="-20,16" offset="-1,0" font="face:微软雅黑,size:12" colorText="@color/clr_text">text item</text>
+					</template>
+				</listview>
+			</window>
 		</page>
-		<page title="tileview" layout="vbox" interval="12">
-				<text text="TileView" font="size:16,bold:1" colorText="@color/clr_title"/>
-				<text text="平铺网格虚拟列表,适合图标卡片式内容展示" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
-				<window layout="hbox" interval="16">
-				<check name="chk_multi_tile" text="启用多选(关闭后点击为单选)" checked="1" font="size:12"/>
-				<check name="chk_band_tile" text="启用框选(关闭后多选拖动为 fling 滚动)" checked="1" font="size:12"/>
+		<page title="listview(flex)" layout="vbox" padding="20,16,20,18" colorBkgnd="@color/clr_window_bg">
+			<!-- 页头 -->
+			<text text="可变高度列表" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
+			<text text="奇偶行使用不同模板与不同高度的虚拟列表,悬停态可单独定制" extend_top="6" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
+
+			<!-- 卡片:整块列表区 -->
+			<window size="-2,0" weight="1" skin="skin_card" layout="vbox" padding="14,13,14,15" extend_top="16">
+				<window size="-2,26" layout="hbox" gravity="center" interval="8">
+					<window size="3,12" skin="skin_card_bar"/>
+					<text text="listview(flex)" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_text_sub"/>
+					<window size="0,0" weight="1"/>
+					<check name="chk_multi_lvflex" text="多选" checked="1" skin="skin_check" size="60,24"
+					       font="face:微软雅黑,size:12" colorText="@color/clr_text" focusable="0" drawFocusRect="0"/>
+					<check name="chk_band_lvflex" text="框选" checked="1" skin="skin_check" size="60,24"
+					       font="face:微软雅黑,size:12" colorText="@color/clr_text" focusable="0" drawFocusRect="0"/>
 				</window>
-				<tileview size="-2,0" weight="1" name="lv_test_tile" multiSel="1" bandEnable="1" wantTab="1" marginSize="5" sbFadeFrames="30">
-				<template itemHeight="130" itemWidth="135" trackMouseEvent="1">
-					<img pos="|0,0,@100,@100" offset="-0.5,0" name="img_file_icon" />
-					<button pos="|0,[5,@115,@22" offset="-0.5,0" name="btn_test" tip="click the button to see how to writing the response function">btn</button>
-				</template>
-			</tileview>
+				<window size="-2,1" colorBkgnd="@color/clr_line" extend_top="12"/>
+				<!-- 行底:skin_list_item 为 4 态圆角精灵(0=normal 透明 / 1=hover #F4F5F7 / 2=选中 #E9F7F7 / 3=禁止 透明),
+				     与 mclistview、listctrl 同款,避免 SListView 内置的直角色块 + 蓝边;
+				     行内沿用 pos 定位(模板里线性布局不生效,会导致子控件尺寸为 0 而不显示),
+				     button 按三种行高垂直居中:odd 50 -> y=10,even 60 -> y=15,evenHover 90 -> y=30;
+				     text 用上下等距的满高区域(其默认 valign=middle,单行/两行都会自动垂直居中);
+				     dividerSize=0:行底精灵自身每边内缩 4dp,相邻两行已有 8dp 空隙,
+				     再叠 4dp 分隔会让行距显得过高,故不再额外留白 -->
+				<listview size="-2,0" weight="1" name="lv_test_flex" multiSel="1" bandEnable="1" dividerSize="0"
+				          sbFadeFrames="30" colorBkgnd="@color/clr_card_bg" sbSkin="skin_scrollbar" extend_top="6">
+					<template defHeight="50" oddHeight="50" evenHeight="60" evenSelHeight="90">
+						<itemOdd skin="skin_list_item">
+							<button pos="14,10,@150,@30" name="btn_test" skin="skin_btn" drawFocusRect="0"
+							        font="face:微软雅黑,size:12" colorText="@color/clr_title"
+							        tip="click the button to see how to writing the response function">btn</button>
+							<text pos="[20,0,-14,-0" multiLines="1" maxWidth="500" font="face:微软雅黑,size:12"
+							      colorText="@color/clr_primary">text in odd item</text>
+						</itemOdd>
+						<itemEven skin="skin_list_item">
+							<button pos="14,15,@150,@30" name="btn_test" skin="skin_btn" drawFocusRect="0"
+							        font="face:微软雅黑,size:12" colorText="@color/clr_title"
+							        tip="click the button to see how to writing the response function">btn</button>
+							<text pos="[20,0,-14,-0" font="face:微软雅黑,size:12" colorText="@color/clr_text">text in even item</text>
+						</itemEven>
+						<itemEvenHover skin="skin_list_item">
+							<button pos="14,30,@150,@30" name="btn_test" skin="skin_btn" drawFocusRect="0"
+							        font="face:微软雅黑,size:12" colorText="@color/clr_title"
+							        tip="click the button to see how to writing the response function">btn</button>
+							<text pos="[20,0,-14,-0" font="face:微软雅黑,size:12" colorText="@color/clr_text" multilines="1">text in even item been hovered.\n the second line</text>
+						</itemEvenHover>
+					</template>
+				</listview>
+			</window>
+		</page>
+		<page title="tileview" layout="vbox" padding="20,16,20,18" colorBkgnd="@color/clr_window_bg">
+			<!-- 页头 -->
+			<text text="TileView" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
+			<text text="平铺网格虚拟列表,适合图标卡片式内容展示" extend_top="6" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
+
+			<!-- 卡片:整块平铺区 -->
+			<window size="-2,0" weight="1" skin="skin_card" layout="vbox" padding="14,13,14,15" extend_top="16">
+				<window size="-2,26" layout="hbox" gravity="center" interval="8">
+					<window size="3,12" skin="skin_card_bar"/>
+					<text text="tileview" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_text_sub"/>
+					<window size="0,0" weight="1"/>
+					<check name="chk_multi_tile" text="多选" checked="1" skin="skin_check" size="60,24"
+					       font="face:微软雅黑,size:12" colorText="@color/clr_text" focusable="0" drawFocusRect="0"/>
+					<check name="chk_band_tile" text="框选" checked="1" skin="skin_check" size="60,24"
+					       font="face:微软雅黑,size:12" colorText="@color/clr_text" focusable="0" drawFocusRect="0"/>
+				</window>
+				<window size="-2,1" colorBkgnd="@color/clr_line" extend_top="12"/>
+				<tileview size="-2,0" weight="1" name="lv_test_tile" multiSel="1" bandEnable="1" wantTab="1"
+				          marginSize="5" sbFadeFrames="30" extend_top="6" colorBkgnd="@color/clr_card_bg" sbSkin="skin_scrollbar">
+					<!-- skin="skin_list_item":单元格的悬停/选中也从内置直角色块换成圆角胶囊,与其余列表统一 -->
+					<template itemHeight="130" itemWidth="135" trackMouseEvent="1" skin="skin_list_item">
+						<img pos="|0,8,@80,@80" offset="-0.5,0" name="img_file_icon" />
+						<button pos="|0,-34,@110,@26" offset="-0.5,0" name="btn_test" skin="skin_btn" drawFocusRect="0"
+						        font="face:微软雅黑,size:12" colorText="@color/clr_title"
+						        tip="click the button to see how to writing the response function">btn</button>
+					</template>
+				</tileview>
+			</window>
 		</page>
 		<!-- ============ 树型控件 ============ -->
-		<page title="treectrl" layout="vbox" interval="12">
-				<text text="TreeCtrl" font="size:16,bold:1" colorText="@color/clr_title"/>
-				<text text="经典树控件,支持复选框、节点图标与多级组织结构;双击或 F2 可就地编辑节点文本(editLabel);多选状态下勾选任一选中节点,所有选中节点的勾选状态同步变化" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
-				<window layout="hbox" interval="16">
-					<check name="chk_multi_tree" text="启用多选(关闭后清除多选)" checked="1" font="size:12"/>
-					<check name="chk_band_tree" text="启用框选(关闭后多选拖动为 fling 滚动)" checked="1" font="size:12"/>
-					<check name="chk_fullrow_tree" text="整行选中(关闭后只高亮文本)" checked="1" font="size:12"/>
+		<page title="treectrl" layout="vbox" padding="20,16,20,18" colorBkgnd="@color/clr_window_bg">
+			<!-- 页头 -->
+			<text text="TreeCtrl" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
+			<text text="经典树控件,支持复选框、节点图标与多级组织结构;双击或 F2 可就地编辑节点文本" extend_top="6" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
+
+			<!-- 卡片:整块树区 -->
+			<window size="-2,0" weight="1" skin="skin_card" layout="vbox" padding="14,13,14,15" extend_top="16">
+				<window size="-2,26" layout="hbox" gravity="center" interval="8">
+					<window size="3,12" skin="skin_card_bar"/>
+					<text text="组织结构" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_text_sub"/>
+					<window size="0,0" weight="1"/>
+					<check name="chk_multi_tree" text="多选" checked="1" skin="skin_check" size="60,24"
+					       font="face:微软雅黑,size:12" colorText="@color/clr_text" focusable="0" drawFocusRect="0"/>
+					<check name="chk_band_tree" text="框选" checked="1" skin="skin_check" size="60,24"
+					       font="face:微软雅黑,size:12" colorText="@color/clr_text" focusable="0" drawFocusRect="0"/>
+					<check name="chk_fullrow_tree" text="整行选中" checked="1" skin="skin_check" size="86,24"
+					       font="face:微软雅黑,size:12" colorText="@color/clr_text" focusable="0" drawFocusRect="0"/>
 				</window>
-				<window size="-2,0" weight="1" clipClient="1">
+				<window size="-2,1" colorBkgnd="@color/clr_line" extend_top="12"/>
+				<window size="-2,0" weight="1" clipClient="1" extend_top="6">
 					<include src="layout:treectrl" />
 				</window>
-			</page>
+			</window>
+		</page>
 		<page title="treeview">
 			<include src="layout:page_treeview" />
 		</page>
 		<!-- ============ 编辑器及热键 ============ -->
-		<page title="edit" layout="vbox" interval="12">
-			<text text="编辑器" font="size:16,bold:1" colorText="@color/clr_title"/>
-			<text text="单行编辑、数字调节、热键、IP 地址与十六进制编辑" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
-			<window size="-2,-1" padding="14,12,14,12" layout="vbox" interval="12">
-				<text text="单行编辑器（外层 window 开启 trackMouseEvent 可感知悬停）" font="bold:1" colorText="@color/clr_title"/>
-				<window size="-2,-1" layout="hbox" interval="10">
-					<window class="cls_edit" size="200,30" trackMouseEvent="1">
-						<edit pos="0,0,-30,-0" font="adding:10" margin="0" cueText="cue text" cueColor="rgb(255,0,0)" password="1">scroll edit</edit>
-						<button pos="-30,0,-0,-0">:)</button>
+		<page title="edit" layout="vbox" padding="20,16,20,18" colorBkgnd="@color/clr_window_bg">
+			<!-- 页头 -->
+			<text text="编辑器" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
+			<text text="单行编辑、数字调节、热键、IP 地址与十六进制编辑" extend_top="6" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
+
+			<window size="-2,0" weight="1" layout="hbox" interval="10" extend_top="16">
+
+				<!-- 卡片:文本输入 -->
+				<window size="0,-2" weight="1" skin="skin_card" layout="vbox" padding="14,13,14,15">
+					<window size="-2,14" layout="hbox" gravity="center" interval="8">
+						<window size="3,12" skin="skin_card_bar"/>
+						<text text="文本输入" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_text_sub"/>
 					</window>
-					<window size="100,30" class="cls_edit" trackMouseEvent="1">
-						<edit pos="0,0,-16,-0" name="edit_spin" notifyChange="1" margin-x="0" margin-y="0" />
-						<spinButton pos="[0,0,-0,-0" max="100" min="1" value="31" buddy="edit_spin" />
+
+					<text text="单行编辑，外层 window 已开启鼠标悬停跟踪" extend_top="12"
+					      font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
+					<window size="-2,30" layout="hbox" interval="10" extend_top="6">
+						<!-- 宽度改为 weight=1:卡片按三列均分,固定 200+10+110 的总宽在窗口变窄时会顶到卡片右边框,
+						     让单行编辑吃掉剩余宽度,spin 固定 110,整行始终留有卡片自己的 padding -->
+						<window class="cls_edit" size="0,30" weight="1" trackMouseEvent="1">
+							<!-- passwordChar="•"(U+2022 圆点)替代默认的"*":星号是上标字形,
+							     在 30px 高的输入框里视觉必然偏上;圆点的重心更接近文本行中线,看起来才是居中的。
+							     字体不要再用 adding:10:adding 只是把字高加大到 22px,单行编辑的行盒随之变高,
+							     文本基线被压到框的下半部分,内容才会显得偏下;用 size:12 让行高回到字体的自然高度 -->
+							<edit pos="8,0,-30,-0" font="face:微软雅黑,size:12" margin="0" vcenter="1" cueText="cue text"
+							      cueColor="@color/clr_text_sub" password="1" passwordChar="•" colorText="@color/clr_text">scroll edit</edit>
+							<button pos="-30,0,-0,-0" skin="skin_btn_ghost" drawFocusRect="0"
+							        font="face:微软雅黑,size:12" colorText="@color/clr_text">:)</button>
+						</window>
+						<window size="110,30" class="cls_edit" trackMouseEvent="1">
+							<edit pos="8,0,-16,-0" name="edit_spin" notifyChange="1" margin-x="0" margin-y="0" colorText="@color/clr_text"/>
+							<!-- 原来写成 pos="[0,0,-0,-0"(多了一个"["),位置解析失败后按钮按 0,0,0,0 处理,
+							     才会向右溢出、压到卡片边框外;这里改为右侧 16px 宽,与上面 edit 的 -16 留白对齐 -->
+							<spinButton pos="-16,0,-0,-0" max="100" min="1" value="31" buddy="edit_spin"
+							            upskin="skin_spin_up" downskin="skin_spin_down"/>
+						</window>
 					</window>
+
+					<text text="热键" extend_top="16" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
+					<hotkey name="ctrl_hk1" width="200" height="30" class="cls_edit" hotKey="ctrl+shift+f2" extend_top="6"/>
+					<hotkey name="ctrl_hk2" width="200" height="30" class="cls_edit" hotKey="ctrl+alt+f1" extend_top="12"/>
+
+					<text text="IP 地址" extend_top="16" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
+					<window size="-2,30" layout="hbox" gravity="center" interval="10" extend_top="6">
+						<ipctrl name="ip_test" width="200" height="30" class="cls_edit" ip="192.168.0.130"/>
+					</window>
+					<window size="0,0" weight="1"/>
 				</window>
-				<window size="-2,-1" layout="hbox" interval="10">
-					<text>hotkey 1:</text>
-					<hotkey name="ctrl_hk1" width="200" height="25" class="cls_edit" hotKey="ctrl+shift+f2"/>
-					<text extend_left="20">hotkey 2:</text>
-					<hotkey name="ctrl_hk2" width="200" height="25" class="cls_edit" hotKey="ctrl+alt+f1"/>
+
+				<!-- 卡片:十六进制编辑器 -->
+				<window size="0,-2" weight="1" skin="skin_card" layout="vbox" padding="14,13,14,15">
+					<window size="-2,14" layout="hbox" gravity="center" interval="8">
+						<window size="3,12" skin="skin_card_bar"/>
+						<text text="十六进制编辑器" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_text_sub"/>
+					</window>
+					<!-- 十六进制编辑器的三块背景:HEX 区纯白,地址区与 ASCII 区用极浅灰做分区;
+					     原来三块都是 #F7F8FA/#F4F5F7,和卡片白底几乎没有层次,整块显得糊 -->
+					<hexedit name="ctrl_hexedit" size="-2,0" weight="1" AutoBytesPerRow="1" extend_top="12"
+					         AddrBkColor="#FAFBFC" HexBkColor="#FFFFFF" AsciiBkColor="#FAFBFC" clipClient="1"/>
 				</window>
-				<window size="-2,-1" layout="hbox" interval="10" gravity="center">
-					<text>ip address control:</text>
-					<ipctrl name="ip_test" width="200" height="25" class="cls_edit" ip="192.168.0.130"/>
-				</window>
-			</window>
-			<window size="-2,0" weight="1" padding="14,12,14,12" layout="vbox" interval="8">
-				<text text="hexedit 十六进制编辑器" font="bold:1" colorText="@color/clr_title"/>
-				<hexedit name="ctrl_hexedit" size="-2,0" weight="1" AutoBytesPerRow="1" HexBkColor="#ffff80" AsciiBkColor="#78ebe6" clipClient="1"/>
 			</window>
 		</page>
-		<page title="richedit" layout="vbox" interval="12" >
-			<text text="富文本编辑器" font="size:16,bold:1" colorText="@color/clr_title"/>
-			<text text="图文混排、格式化消息追加与 RTF 导入导出" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
-			<window size="-2,-1" layout="hbox" interval="10">
-				<button name="btn_insert_gif" size="150,30" id="#id_test1">insert gif</button>
-				<button name="btn_append_msg" size="150,30">append format msg</button>
-				<button name="btn_richedit_open" size="150,30">open from rtf</button>
-				<button name="btn_richedit_save" size="150,30">save to rtf</button>
+		<page title="richedit" layout="vbox" padding="20,16,20,18" colorBkgnd="@color/clr_window_bg">
+			<!-- 页头 -->
+			<text text="富文本编辑器" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
+			<text text="图文混排、格式化消息追加与 RTF 导入导出" extend_top="6" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
+
+			<!-- 卡片:工具条 -->
+			<window size="-2,62" skin="skin_card" layout="hbox" gravity="center" padding="14,0,14,0" interval="8" extend_top="16">
+				<window size="3,12" skin="skin_card_bar"/>
+				<text text="操作" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_text_sub" extend_right="8"/>
+				<button name="btn_insert_gif" size="105,30" id="#id_test1" class="cls_btn_primary"
+				        font="face:微软雅黑,size:13" colorText="#FFFFFF" drawFocusRect="0">insert gif</button>
+				<button name="btn_append_msg" size="125,30" skin="skin_btn"
+				        font="face:微软雅黑,size:13" colorText="@color/clr_title" drawFocusRect="0">append format msg</button>
+				<button name="btn_richedit_open" size="110,30" skin="skin_btn"
+				        font="face:微软雅黑,size:13" colorText="@color/clr_title" drawFocusRect="0">open from rtf</button>
+				<button name="btn_richedit_save" size="105,30" skin="skin_btn"
+				        font="face:微软雅黑,size:13" colorText="@color/clr_title" drawFocusRect="0">save to rtf</button>
 			</window>
-			<chatedit name="re_gifhost" size="-2,0" weight="1" bkgndBlend="1" class="cls_edit" sbFadeFrames="30" enableDragdrop="1" multiLines="1" vscrollBar="1"  wordWrap="1" autoVscroll="1" hscrollBar="0" wantReturn="1" wantTab="1" maxBuf="6400000" rtf="rtf:rtf_test" />
+
+			<!-- 卡片:正文 -->
+			<window size="-2,0" weight="1" skin="skin_card" layout="vbox" padding="14,13,14,15" extend_top="12">
+				<window size="-2,14" layout="hbox" gravity="center" interval="8">
+					<window size="3,12" skin="skin_card_bar"/>
+					<text text="内容" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_text_sub"/>
+				</window>
+				<chatedit name="re_gifhost" size="-2,0" weight="1" bkgndBlend="0" class="cls_edit"
+				          sbFadeFrames="30" enableDragdrop="1" multiLines="1" vscrollBar="1" wordWrap="1" sbSkin="skin_scrollbar" sbArrowSize="0"
+				          autoVscroll="1" hscrollBar="0" wantReturn="1" wantTab="1" maxBuf="6400000"
+				          rtf="rtf:rtf_test" extend_top="12" colorBkgnd="@color/clr_card_bg" colorText="@color/clr_text"/>
+			</window>
 		</page>
 		<!-- ============ 按钮类 ============ -->
-		<page title="buttons" layout="vbox" interval="12" >
-			<text text="按钮与交互" font="size:16,bold:1" colorText="@color/clr_title"/>
-			<text text="消息框按钮、开关、超链接、图片消息处理、圆形裁剪与线条绘制" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
-			<window size="-2,-1" padding="14,12,14,12" layout="vbox" interval="12">
-				<window size="-2,-1" layout="hbox" interval="20" gravity="center">
-					<imgbtn name="btn_msgbox" width="200" height="40" accel="ctrl+alt+f9" font="bold:1" skin="win10btn" animate="1">show msg box</imgbtn>
-					<text size="-1,-1" layout_gravity="center" multiLines="1">press "ctrl+alt+f9" to activate\nthe msgbox button</text>
-					<window size="-1,-1" layout="hbox" interval="20" gravity="center">
-						<switch />
-						<switch checked="1"/>
+		<!-- ============ 按钮类:卡片式版式 ============ -->
+		<page title="buttons" layout="vbox" padding="20,16,20,18" colorBkgnd="@color/clr_window_bg">
+			<!-- 页头 -->
+			<text text="按钮与交互" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
+			<text text="消息框按钮、开关、超链接、图片消息处理、圆形裁剪与线条绘制" extend_top="6"
+			      font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
+
+			<!-- 两列卡片区:每列 3 张卡片,等高均分 -->
+			<window size="-2,0" weight="1" layout="hbox" interval="10" extend_top="16">
+				<window size="0,-2" weight="1" layout="vbox" interval="10">
+
+					<!-- 卡片:按钮 -->
+					<window size="-2,140" skin="skin_card" layout="vbox" padding="14,13,14,15">
+						<window size="-2,14" layout="hbox" gravity="center" interval="8">
+							<window size="3,12" skin="skin_card_bar"/>
+							<text text="按钮" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_text_sub"/>
+						</window>
+						<window size="-2,-1" layout="hflow" interval="8" gravity="center" extend_top="12">
+							<button size="56,30" class="cls_btn_primary" font="face:微软雅黑,size:13"
+							        colorText="#FFFFFF" drawFocusRect="0">确定</button>
+							<button size="56,30" skin="skin_btn" font="face:微软雅黑,size:13"
+							        colorText="@color/clr_title" drawFocusRect="0">取消</button>
+							<button size="72,30" skin="skin_btn_ghost" font="face:微软雅黑,size:13"
+							        colorText="@color/clr_primary" drawFocusRect="0">了解更多</button>
+							<button size="56,30" skin="skin_btn_danger" font="face:微软雅黑,size:13"
+							        colorText="@color/clr_danger" drawFocusRect="0">删除</button>
+						</window>
 					</window>
+
+					<!-- 卡片:超链接与图片消息 -->
+					<window size="-2,120" skin="skin_card" layout="vbox" padding="14,13,14,15">
+						<window size="-2,14" layout="hbox" gravity="center" interval="8">
+							<window size="3,12" skin="skin_card_bar"/>
+							<text text="超链接与图片" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_text_sub"/>
+						</window>
+						<window size="-2,-1" layout="hbox" gravity="center" interval="12" extend_top="8">
+							<link maxWidth="200" dotted="1" font="face:微软雅黑,size:13"
+							      colorText="@color/clr_primary" colorTextHover="@color/clr_primary_dark"
+							      fontHover="underline:1" href="https://gitee.com/setoutsoft/soui4">gitee.com/setoutsoft/soui4</link>
+						<window size="52,52" skin="skin_icon_tile"><img size="28,28" pos="|0,|0" offset="-0.5,-0.5" skin="skin_page_icons" iconIndex="2"
+							     tip="图片消息:把 msgTransparent 设为 0 即可自行处理鼠标消息" msgTransparent="0"/></window>
+						</window>
+					</window>
+
+					<!-- 卡片:线条控件 hr(演示水平/倾斜/垂直三种 mode,以及线型、线宽、颜色可独立配置) -->
+					<window size="-2,150" skin="skin_card" layout="vbox" padding="14,13,14,15">
+						<window size="-2,14" layout="hbox" gravity="center" interval="8">
+							<window size="3,12" skin="skin_card_bar"/>
+							<text text="hr 线条控件（水平 / 倾斜 / 垂直）" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_text_sub"/>
+						</window>
+						<window size="-2,-1" weight="1" extend_top="10">
+							<!-- 水平:点划线(dashdotdot),线高 2dp;pos 4 值 = left,top,right,bottom -->
+							<hr pos="10,0,-10,@2" lineStyle="dashdotdot" mode="horizontal" lineColor="#E5484D"/>
+							<!-- 倾斜:虚线,自动从矩形左上角连到右下角,用来演示 mode="tilt" -->
+							<hr pos="0,10,-0,-0" lineStyle="dash" mode="tilt" lineColor="#30A46C"/>
+							<!-- 垂直:实线,lineSize=2 加粗,演示竖线与横向线共用同一套线型配置 -->
+							<hr pos="10,10,@2,-0" lineStyle="solid" mode="vertical" lineColor="#2F6FD0" lineSize="2"/>
+						</window>
+					</window>
+					<window size="0,0" weight="1"/>
 				</window>
-				<window size="-2,-1" layout="hbox" interval="20" gravity="center">
-					<link maxWidth="200" class="cls_btn_weblink" dotted="1" href="https://gitee.com/setoutsoft/soui4">https://gitee.com/setoutsoft/soui4</link>
-					<img size="100,100" skin="skin_page_icons" iconIndex="2" tip="the image show how to handle message in SImageWnd,\n you can do it by simply setting msgTransparent to 0" msgTransparent="0" />
-				</window>
-				<window size="-2,-1" layout="hbox" interval="15" gravity="center">
-					<button size="100,30" name="btn_lrc">磁吸窗口</button>
-					<roundImg size="50,50" name="img_round" cornerSize="0" skin="skin_avatar_high" />
-					<roundImg size="50,50" name="img_round2" cornerSize="10" skin="skin_avatar_high" />
-					<roundWnd size="50,50" name="img_round3" cornerSize="20">
-						<img pos="0,0,-0,-0" skin="skin_avatar_high"/>
-						<button pos="0,-20,-0,-0" text="hello"/>
-					</roundWnd>
-					<button.link size="130,30" name="btn_tip">提示窗口演示</button.link>
-				</window>
-			</window>
-			<window size="-2,0" weight="1" padding="14,12,14,12" layout="vbox" interval="8">
-				<text text="hr 线条控件（水平 / 垂直 / 倾斜，可配置线型）" font="bold:1" colorText="@color/clr_title"/>
-				<window size="-2,0" weight="1">
-					<hr pos="10,[20,-10,@2" lineStyle="dashdotdot" mode="horizontal" lineColor="#ff0000" />
-					<hr pos="10,{0,-10,-10" lineStyle="dash" mode="tilt" lineColor="#00ff00" />
-					<hr pos="10,{0,@2,-10" lineStyle="solid" mode="vertical" lineColor="#0000ff" lineSize="2" />
+
+				<window size="0,-2" weight="1" layout="vbox" interval="10">
+
+					<!-- 卡片:开关与选择 -->
+					<window size="-2,140" skin="skin_card" layout="vbox" padding="14,13,14,15">
+						<window size="-2,14" layout="hbox" gravity="center" interval="8">
+							<window size="3,12" skin="skin_card_bar"/>
+							<text text="开关与选择" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_text_sub"/>
+						</window>
+						<window size="-2,-1" layout="hbox" gravity="center" interval="16" extend_top="12">
+							<text text="已启用" font="face:微软雅黑,size:13" colorText="@color/clr_text"/>
+							<!-- 开关:skin 与 skinforce 都指向同一个 SVG 皮肤对象。
+							     SSwitch 没有转发 OnColorize,m_pSkinForce 不会被换肤染色;
+							     而 skinforce 与 skin 取的是皮肤池里的同一个对象,所以把 skin
+							     也设成 skin_switch_full 后,窗口自身的背景皮肤会被 DoColorize
+							     染色,开关就跟着主题色一起变(force 会完全盖住底下那层,视觉无差异)。 -->
+							<switch size="38,20" skin="skin_switch_full" skinforce="skin_switch_full" checked="1" drawFocusRect="0"/>
+							<text text="已关闭" extend_left="6" font="face:微软雅黑,size:13" colorText="@color/clr_text"/>
+							<switch size="38,20" skin="skin_switch_full" skinforce="skin_switch_full" drawFocusRect="0"/>
+						</window>
+						<window size="-2,-1" layout="hbox" gravity="center" interval="16" extend_top="4">
+							<check size="68,24" skin="skin_check" text="多选" checked="1"
+							       font="face:微软雅黑,size:13" colorText="@color/clr_text" drawFocusRect="0"/>
+							<check size="80,24" skin="skin_check" text="未选中"
+							       font="face:微软雅黑,size:13" colorText="@color/clr_text" drawFocusRect="0"/>
+						</window>
+						<window size="-2,-1" layout="hbox" gravity="center" interval="16" extend_top="2">
+							<radio size="68,24" skin="skin_radio" text="单选" checked="1"
+							       font="face:微软雅黑,size:13" colorText="@color/clr_text" drawFocusRect="0"/>
+							<radio size="80,24" skin="skin_radio" text="未选中"
+							       font="face:微软雅黑,size:13" colorText="@color/clr_text" drawFocusRect="0"/>
+						</window>
+					</window>
+
+					<!-- 卡片:消息框与快捷键 -->
+					<window size="-2,120" skin="skin_card" layout="vbox" padding="14,13,14,15">
+						<window size="-2,14" layout="hbox" gravity="center" interval="8">
+							<window size="3,12" skin="skin_card_bar"/>
+							<text text="消息框与快捷键" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_text_sub"/>
+						</window>
+						<window size="-2,-1" layout="hbox" gravity="center" extend_top="8">
+							<button name="btn_msgbox" size="112,30" accel="ctrl+alt+f9"
+							        skin="skin_btn" font="face:微软雅黑,size:13" colorText="@color/clr_title" drawFocusRect="0">显示消息框</button>
+							<text size="-1,-1" layout_gravity="center" extend_left="12"
+							      font="face:微软雅黑,size:12" colorText="@color/clr_text_sub">Ctrl + Alt + F9 同样触发</text>
+						</window>
+					</window>
+
+					<!-- 卡片:圆角裁剪与窗口 -->
+					<window size="-2,150" skin="skin_card" layout="vbox" padding="14,13,14,15">
+						<window size="-2,14" layout="hbox" gravity="center" interval="8">
+							<window size="3,12" skin="skin_card_bar"/>
+							<text text="圆形裁剪与窗口" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_text_sub"/>
+						</window>
+						<!-- 头像行与按钮行分两行排布:单行总宽 388dp 会超出 250dp 的卡片内容宽度,导致按钮被裁掉 -->
+						<window size="-2,-1" layout="vbox" extend_top="8">
+							<window size="-2,-1" layout="hbox" gravity="center" interval="10">
+								<roundImg size="44,44" name="img_round" cornerSize="22" skin="svg_avatar"/>
+								<roundImg size="44,44" name="img_round2" cornerSize="12" skin="svg_avatar_round"/>
+								<roundWnd size="44,44" name="img_round3" cornerSize="22">
+									<img pos="0,0,-0,-0" skin="svg_avatar"/>
+									<button pos="0,-20,-0,-0" text="hello" skin="skin_btn" drawFocusRect="0" font="face:微软雅黑,size:11"/>
+								</roundWnd>
+							</window>
+							<window size="-2,-1" layout="hbox" gravity="center" interval="10" extend_top="12">
+								<button size="90,30" name="btn_lrc" skin="skin_btn"
+								        font="face:微软雅黑,size:13" colorText="@color/clr_title" drawFocusRect="0">磁吸窗口</button>
+								<button size="106,30" name="btn_tip" skin="skin_btn_ghost"
+								        font="face:微软雅黑,size:13" colorText="@color/clr_primary" drawFocusRect="0">提示窗口演示</button>
+							</window>
+						</window>
+					</window>
+					<window size="0,0" weight="1"/>
 				</window>
 			</window>
 		</page>
 		<!-- ============ 单选按钮 ============ -->
-		<page title="radiobox" layout="vbox" interval="12">
-			<text text="单选按钮" font="size:16,bold:1" colorText="@color/clr_title"/>
-			<text text="经典 radio、图片 radio、按钮组与 tabctrl 联动切换、图标型单选" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
-			<window size="-2,-1" interval="12" layout="hbox">
-				<group size="0,-1" weight="1" text="经典 radio" layout="grid" columnCount="3" rowCount="2" padding="14,12,14,12" interval="10" colorText="@color/clr_title">
-					<radio height="28" name="radio_1">radio 1</radio>
-					<radio height="28" name="radio_2">radio 2</radio>
-					<radio height="28" name="radio_3">radio 3</radio>
-					<radio height="28" name="radio_4" checked="1">radio 4</radio>
-					<radio height="28" name="radio_5">radio 5</radio>
-					<radio height="28" name="radio_6">radio 6</radio>
-				</group>
-				<group size="0,-1" weight="1" layout="hbox" text="图片 radio" colorText="@color/clr_title">
-					<window size="0,0" weight="1" />
-					<window size="-1,-2" layout="grid" columnCount="3" rowCount="2" padding="14,12,14,12" interval="14">
-						<radio2 name="radio3_1" skin="skin_svg_radio_num" size="28,28">
-							<text text="1" pos="|0,|0" offset="-0.5,-0.5" colorText="@color/clr_primary"/>
-						</radio2>
-						<radio2 name="radio3_2" skin="skin_svg_radio_num" size="28,28">
-							<text text="2" pos="|0,|0" offset="-0.5,-0.5" colorText="@color/clr_primary"/>
-						</radio2>
-						<radio2 name="radio3_3" skin="skin_svg_radio_num" size="28,28">
-							<text text="3" pos="|0,|0" offset="-0.5,-0.5" colorText="@color/clr_primary"/>
-						</radio2>
-						<radio2 name="radio3_4" checked="1" skin="skin_svg_radio_num" size="28,28">
-							<text text="4" pos="|0,|0" offset="-0.5,-0.5" colorText="@color/clr_primary"/>
-						</radio2>
-						<radio2 name="radio3_5" skin="skin_svg_radio_num" size="28,28">
-							<text text="5" pos="|0,|0" offset="-0.5,-0.5" colorText="@color/clr_primary"/>
-						</radio2>
-						<radio2 name="radio3_6" skin="skin_svg_radio_num" size="28,28">
-							<text text="6" pos="|0,|0" offset="-0.5,-0.5" colorText="@color/clr_primary"/>
-						</radio2>
+		<!-- ============ 单选按钮:卡片式版式 ============ -->
+		<page title="radiobox" layout="vbox" padding="20,16,20,18" colorBkgnd="@color/clr_window_bg">
+			<!-- 页头 -->
+			<text text="单选按钮" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
+			<text text="经典单选、图片单选、图标型单选，以及按钮组与页签联动" extend_top="6"
+			      font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
+
+			<window size="-2,0" weight="1" layout="hbox" interval="10" extend_top="16">
+
+				<!-- 左列 -->
+				<window size="0,-2" weight="1" layout="vbox" interval="10">
+
+					<!-- 卡片:经典单选 -->
+					<window size="-2,150" skin="skin_card" layout="vbox" padding="14,13,14,15">
+						<window size="-2,14" layout="hbox" gravity="center" interval="8">
+							<window size="3,12" skin="skin_card_bar"/>
+							<text text="经典单选" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_text_sub"/>
+						</window>
+						<window size="-2,0" weight="1" layout="grid" columnCount="2" rowCount="3" xInterval="24" yInterval="4" extend_top="8">
+							<radio name="radio_1" size="-1,26" skin="skin_radio" text="radio 1"
+							       font="face:微软雅黑,size:13" colorText="@color/clr_text" focusable="0" drawFocusRect="0"/>
+							<radio name="radio_2" size="-1,26" skin="skin_radio" text="radio 2"
+							       font="face:微软雅黑,size:13" colorText="@color/clr_text" focusable="0" drawFocusRect="0"/>
+							<radio name="radio_3" size="-1,26" skin="skin_radio" text="radio 3"
+							       font="face:微软雅黑,size:13" colorText="@color/clr_text" focusable="0" drawFocusRect="0"/>
+							<radio name="radio_4" size="-1,26" skin="skin_radio" text="radio 4" checked="1"
+							       font="face:微软雅黑,size:13" colorText="@color/clr_text" focusable="0" drawFocusRect="0"/>
+							<radio name="radio_5" size="-1,26" skin="skin_radio" text="radio 5"
+							       font="face:微软雅黑,size:13" colorText="@color/clr_text" focusable="0" drawFocusRect="0"/>
+							<radio name="radio_6" size="-1,26" skin="skin_radio" text="radio 6"
+							       font="face:微软雅黑,size:13" colorText="@color/clr_text" focusable="0" drawFocusRect="0"/>
+						</window>
 					</window>
-					<window size="0,0" weight="1" />
-				</group>
+
+					<!-- 卡片:图片单选 -->
+					<window size="-2,150" skin="skin_card" layout="vbox" padding="14,13,14,15">
+						<window size="-2,14" layout="hbox" gravity="center" interval="8">
+							<window size="3,12" skin="skin_card_bar"/>
+							<text text="图片单选" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_text_sub"/>
+						</window>
+						<window size="-2,0" weight="1" layout="grid" columnCount="3" rowCount="2" xInterval="16" yInterval="8" extend_top="8">
+							<radio2 name="radio3_1" skin="skin_svg_radio_num" size="36,36" drawFocusRect="0">
+								<text text="1" pos="|0,|0" offset="-0.5,-0.5" font="face:微软雅黑,size:13"
+								      msgTransparent="inherit" colorText="@color/clr_text" colorTextPush="#FFFFFF"/>
+							</radio2>
+							<radio2 name="radio3_2" skin="skin_svg_radio_num" size="36,36" drawFocusRect="0">
+								<text text="2" pos="|0,|0" offset="-0.5,-0.5" font="face:微软雅黑,size:13"
+								      msgTransparent="inherit" colorText="@color/clr_text" colorTextPush="#FFFFFF"/>
+							</radio2>
+							<radio2 name="radio3_3" skin="skin_svg_radio_num" size="36,36" drawFocusRect="0">
+								<text text="3" pos="|0,|0" offset="-0.5,-0.5" font="face:微软雅黑,size:13"
+								      msgTransparent="inherit" colorText="@color/clr_text" colorTextPush="#FFFFFF"/>
+							</radio2>
+							<radio2 name="radio3_4" skin="skin_svg_radio_num" size="36,36" checked="1" drawFocusRect="0">
+								<text text="4" pos="|0,|0" offset="-0.5,-0.5" font="face:微软雅黑,size:13"
+								      msgTransparent="inherit" colorText="@color/clr_text" colorTextPush="#FFFFFF"/>
+							</radio2>
+							<radio2 name="radio3_5" skin="skin_svg_radio_num" size="36,36" drawFocusRect="0">
+								<text text="5" pos="|0,|0" offset="-0.5,-0.5" font="face:微软雅黑,size:13"
+								      msgTransparent="inherit" colorText="@color/clr_text" colorTextPush="#FFFFFF"/>
+							</radio2>
+							<radio2 name="radio3_6" skin="skin_svg_radio_num" size="36,36" drawFocusRect="0">
+								<text text="6" pos="|0,|0" offset="-0.5,-0.5" font="face:微软雅黑,size:13"
+								      msgTransparent="inherit" colorText="@color/clr_text" colorTextPush="#FFFFFF"/>
+							</radio2>
+						</window>
+					</window>
+
+					<!-- 卡片:图标型单选 -->
+					<window size="-2,0" weight="1" skin="skin_card" layout="vbox" padding="14,13,14,15">
+						<window size="-2,14" layout="hbox" gravity="center" interval="8">
+							<window size="3,12" skin="skin_card_bar"/>
+							<text text="图标型单选" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_text_sub"/>
+						</window>
+						<window size="-2,0" weight="1" layout="hbox" gravity="center" interval="16" extend_top="6">
+							<radio name="radio_icon_1" size="84,72" skin="skin_icon_msg" focusable="0"
+							       iconAlign="center" iconValign="top" text="消息" align="center" valign="top"
+							       font="face:微软雅黑,size:12" colorText="@color/clr_text" checked="1" drawFocusRect="0"/>
+							<radio name="radio_icon_2" size="84,72" skin="skin_icon_contacts" focusable="0"
+							       iconAlign="center" iconValign="top" text="联系人" align="center" valign="top"
+							       font="face:微软雅黑,size:12" colorText="@color/clr_text" drawFocusRect="0"/>
+							<radio name="radio_icon_3" size="84,72" skin="skin_icon_group" focusable="0"
+							       iconAlign="center" iconValign="top" text="群组" align="center" valign="top"
+							       font="face:微软雅黑,size:12" colorText="@color/clr_text" drawFocusRect="0"/>
+						</window>
+					</window>
+				</window>
+
+				<!-- 右列 -->
+				<window size="0,-2" weight="1" layout="vbox" interval="10">
+
+					<!-- 卡片:按钮组 -->
+					<window size="-2,150" skin="skin_card" layout="vbox" padding="14,13,14,15">
+						<window size="-2,14" layout="hbox" gravity="center" interval="8">
+							<window size="3,12" skin="skin_card_bar"/>
+							<text text="按钮组联动" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_text_sub"/>
+						</window>
+						<window size="-2,0" weight="1" layout="hflow" gravity="center" interval="8" extend_top="8">
+							<button name="btn4_1" size="68,30" skin="skin_btn_seg" drawFocusRect="0" font="face:微软雅黑,size:13"
+							        colorText="@color/clr_text" colorTextPush="@color/clr_primary_dark">page 1</button>
+							<button name="btn4_2" size="68,30" skin="skin_btn_seg" drawFocusRect="0" font="face:微软雅黑,size:13"
+							        colorText="@color/clr_text" colorTextPush="@color/clr_primary_dark">page 2</button>
+							<button name="btn4_3" size="68,30" skin="skin_btn_seg" drawFocusRect="0" font="face:微软雅黑,size:13"
+							        colorText="@color/clr_text" colorTextPush="@color/clr_primary_dark">page 3</button>
+							<button name="btn4_4" size="68,30" skin="skin_btn_seg" drawFocusRect="0" font="face:微软雅黑,size:13"
+							        colorText="@color/clr_text" colorTextPush="@color/clr_primary_dark" checked="1">page 4</button>
+							<button name="btn4_5" size="68,30" skin="skin_btn_seg" drawFocusRect="0" font="face:微软雅黑,size:13"
+							        colorText="@color/clr_text" colorTextPush="@color/clr_primary_dark">page 5</button>
+							<button name="btn4_6" size="68,30" skin="skin_btn_seg" drawFocusRect="0" font="face:微软雅黑,size:13"
+							        colorText="@color/clr_text" colorTextPush="@color/clr_primary_dark">page 6</button>
+						</window>
+					</window>
+
+					<!-- 卡片:关联页签 -->
+					<window size="-2,0" weight="1" skin="skin_card" layout="vbox" padding="14,13,14,15">
+						<window size="-2,14" layout="hbox" gravity="center" interval="8">
+							<window size="3,12" skin="skin_card_bar"/>
+							<text text="关联页签预览" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_text_sub"/>
+						</window>
+						<tabctrl name="tab_radio2" size="-2,0" weight="1" animateSteps="10" tabHeight="0"
+						         cursel="3" extend_top="6" focusable="0" drawFocusRect="0">
+							<page layout="vbox">
+								<window size="0,0" weight="1"/>
+								<window size="-2,-2" layout="vbox" gravity="center" interval="10">
+									<img size="40,40" skin="svg_tab_page" iconIndex="0" msgTransparent="1" layout_gravity="center"/>
+									<text text="首页总览" font="face:微软雅黑,size:15,bold:1" colorText="@color/clr_title" layout_gravity="center"/>
+									<text text="点击上方数字单选框或按钮组切换本页签" font="face:微软雅黑,size:12" colorText="@color/clr_text_sub" layout_gravity="center"/>
+								</window>
+								<window size="0,0" weight="1"/>
+							</page>
+							<page layout="vbox">
+								<window size="0,0" weight="1"/>
+								<window size="-2,-2" layout="vbox" gravity="center" interval="10">
+									<img size="40,40" skin="svg_tab_page" iconIndex="1" msgTransparent="1" layout_gravity="center"/>
+									<text text="个人中心" font="face:微软雅黑,size:15,bold:1" colorText="@color/clr_title" layout_gravity="center"/>
+									<text text="头像、昵称与账号信息管理" font="face:微软雅黑,size:12" colorText="@color/clr_text_sub" layout_gravity="center"/>
+								</window>
+								<window size="0,0" weight="1"/>
+							</page>
+							<page layout="vbox">
+								<window size="0,0" weight="1"/>
+								<window size="-2,-2" layout="vbox" gravity="center" interval="10">
+									<img size="40,40" skin="svg_tab_page" iconIndex="2" msgTransparent="1" layout_gravity="center"/>
+									<text text="消息通知" font="face:微软雅黑,size:15,bold:1" colorText="@color/clr_title" layout_gravity="center"/>
+									<text text="未读消息与系统提醒在此聚合" font="face:微软雅黑,size:12" colorText="@color/clr_text_sub" layout_gravity="center"/>
+								</window>
+								<window size="0,0" weight="1"/>
+							</page>
+							<page layout="vbox">
+								<window size="0,0" weight="1"/>
+								<window size="-2,-2" layout="vbox" gravity="center" interval="10">
+									<img size="40,40" skin="svg_tab_page" iconIndex="3" msgTransparent="1" layout_gravity="center"/>
+									<text text="数据统计" font="face:微软雅黑,size:15,bold:1" colorText="@color/clr_title" layout_gravity="center"/>
+									<text text="本周访问量与转化趋势一览" font="face:微软雅黑,size:12" colorText="@color/clr_text_sub" layout_gravity="center"/>
+								</window>
+								<window size="0,0" weight="1"/>
+							</page>
+							<page layout="vbox">
+								<window size="0,0" weight="1"/>
+								<window size="-2,-2" layout="vbox" gravity="center" interval="10">
+									<img size="40,40" skin="svg_tab_page" iconIndex="4" msgTransparent="1" layout_gravity="center"/>
+									<text text="邮件订阅" font="face:微软雅黑,size:15,bold:1" colorText="@color/clr_title" layout_gravity="center"/>
+									<text text="订阅产品动态，第一时间送达邮箱" font="face:微软雅黑,size:12" colorText="@color/clr_text_sub" layout_gravity="center"/>
+								</window>
+								<window size="0,0" weight="1"/>
+							</page>
+							<page layout="vbox">
+								<window size="0,0" weight="1"/>
+								<window size="-2,-2" layout="vbox" gravity="center" interval="10">
+									<img size="40,40" skin="svg_tab_page" iconIndex="5" msgTransparent="1" layout_gravity="center"/>
+									<text text="收藏关注" font="face:微软雅黑,size:15,bold:1" colorText="@color/clr_title" layout_gravity="center"/>
+									<text text="星标内容与关注的主题列表" font="face:微软雅黑,size:12" colorText="@color/clr_text_sub" layout_gravity="center"/>
+								</window>
+								<window size="0,0" weight="1"/>
+							</page>
+						</tabctrl>
+					</window>
+				</window>
 			</window>
-			<group size="-2,-1" text="radio button(点击切换下方 tab 页)" padding="14,12,14,12" layout="hbox" interval="-1" colorText="@color/clr_title">
-				<button size="70,30" name="btn4_1">page 1</button>
-				<button size="70,30" name="btn4_2">page 2</button>
-				<button size="70,30" name="btn4_3">page 3</button>
-				<button size="70,30" name="btn4_4" checked="1">page 4</button>
-				<button size="70,30" name="btn4_5">page 5</button>
-				<button size="70,30" name="btn4_6">page 6</button>
-			</group>
-			<tabctrl size="-2,0" weight="1" animateSteps="10" name="tab_radio2" tabHeight="0" cursel="3" enableDragSwitch="1">
-				<page layout="vbox" gravity="center" interval="12">
-					<img size="48,48" skin="svg_tab_page" iconIndex="0" msgTransparent="1"/>
-					<text text="首页总览" font="size:17,bold:1" colorText="@color/clr_title"/>
-					<text text="点击上方数字单选框或按钮组切换本页签" font="size:12" colorText="@color/clr_text_sub"/>
-				</page>
-				<page layout="vbox" gravity="center" interval="12">
-					<img size="48,48" skin="svg_tab_page" iconIndex="1" msgTransparent="1"/>
-					<text text="个人中心" font="size:17,bold:1" colorText="@color/clr_title"/>
-					<text text="头像、昵称与账号信息管理" font="size:12" colorText="@color/clr_text_sub"/>
-				</page>
-				<page layout="vbox" gravity="center" interval="12">
-					<img size="48,48" skin="svg_tab_page" iconIndex="2" msgTransparent="1"/>
-					<text text="消息通知" font="size:17,bold:1" colorText="@color/clr_title"/>
-					<text text="未读消息与系统提醒在此聚合" font="size:12" colorText="@color/clr_text_sub"/>
-				</page>
-				<page layout="vbox" gravity="center" interval="12">
-					<img size="48,48" skin="svg_tab_page" iconIndex="3" msgTransparent="1"/>
-					<text text="数据统计" font="size:17,bold:1" colorText="@color/clr_title"/>
-					<text text="本周访问量与转化趋势一览" font="size:12" colorText="@color/clr_text_sub"/>
-				</page>
-				<page layout="vbox" gravity="center" interval="12">
-					<img size="48,48" skin="svg_tab_page" iconIndex="4" msgTransparent="1"/>
-					<text text="邮件订阅" font="size:17,bold:1" colorText="@color/clr_title"/>
-					<text text="订阅产品动态，第一时间送达邮箱" font="size:12" colorText="@color/clr_text_sub"/>
-				</page>
-				<page layout="vbox" gravity="center" interval="12">
-					<img size="48,48" skin="svg_tab_page" iconIndex="5" msgTransparent="1"/>
-					<text text="收藏关注" font="size:17,bold:1" colorText="@color/clr_title"/>
-					<text text="星标内容与关注的主题列表" font="size:12" colorText="@color/clr_text_sub"/>
-				</page>
-			</tabctrl>
-			<group size="-2,110" layout="hbox" gravity="center" interval="-1" text="radio icon(图标型单选)" padding="10,8,10,8" colorText="@color/clr_title">
-				<radio size="-1,-2" focusable="0" skin="skin_message" iconAlign="center" iconValign="top" text="消息" align="center" valign="top" />
-				<radio size="-1,-2" focusable="0" skin="skin_contacts" iconAlign="center" text="联系人" align="center" />
-				<radio size="-1,-2" focusable="0" skin="skin_group" iconAlign="center" iconValign="bottom" text="群组" align="center" valign="bottom" />
-			</group>
 		</page>
 		<!-- ============ 进度条 ============ -->
-		<page title="prog and slider" layout="vbox" interval="15" >
-			<text text="进度条与滑块" font="size:16,bold:1" colorText="@color/clr_title"/>
-			<text text="水平 / 垂直进度条、滑块、滚动条与圆环进度" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
-			<window size="-2,-1" layout="vbox" interval="20" id="5000" padding="14,12,14,12">
-				<text text="水平方向" font="bold:1" colorText="@color/clr_title"/>
-				<progress name="prog_test" size="-2,15" font="adding:-8" value="20" min="0" max="100" showPercent="1" />
-				<sliderbar name="slider_test" size="-2,-1" thumbInRail="0" alpha="200" value="20" min="0" max="100" />
-				<scrollbar name="sb_test1" size="-2,16" min="0" max="100" value="10" page="10" />
+		<page title="prog and slider" layout="vbox" padding="20,16,20,18" colorBkgnd="@color/clr_window_bg">
+			<!-- 页头 -->
+			<text text="进度条与滑块" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
+			<text text="水平 / 垂直进度条、滑块、滚动条与圆环进度" extend_top="6" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
+
+			<!-- 卡片:水平方向 -->
+			<window size="-2,150" skin="skin_card" layout="vbox" padding="14,13,14,15" extend_top="16">
+				<window size="-2,14" layout="hbox" gravity="center" interval="8">
+					<window size="3,12" skin="skin_card_bar"/>
+					<text text="水平方向" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_text_sub"/>
+				</window>
+				<progress name="prog_test" size="-2,12" font="face:微软雅黑,size:11" value="20" min="0" max="100"
+				          showText="1" extend_top="16" bkgndSkin="skin_prog_bk" posSkin="skin_prog_bar"/>
+				<!-- sliderbar 实为带手柄的进度控件:轨道用 bkgndSkin、填充段用 posSkin,不能写 skin -->
+				<sliderbar name="slider_test" size="-2,30" thumbInRail="0" alpha="200" value="20" min="0" max="100"
+				           bkgndSkin="skin_slider_rail" posSkin="skin_prog_bar" thumbSkin="skin_slider_thumb" extend_top="16"/>
+				<scrollbar name="sb_test1" size="-2,12" min="0" max="100" value="10" page="10"
+				           skin="skin_scrollbar" arrowSize="0" extend_top="16"/>
 			</window>
-			<window size="-2,0" weight="1" padding="14,12,14,12" layout="vbox" interval="10">
-				<text text="垂直方向与圆环" font="bold:1" colorText="@color/clr_title"/>
-				<window size="-2,-1" layout="hbox" interval="20" gravity="center">
+
+			<!-- 卡片:垂直方向与圆环 -->
+			<window size="-2,0" weight="1" skin="skin_card" layout="vbox" padding="14,13,14,15" extend_top="12">
+				<window size="-2,14" layout="hbox" gravity="center" interval="8">
+					<window size="3,12" skin="skin_card_bar"/>
+					<text text="垂直方向与圆环" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_text_sub"/>
+				</window>
+				<window size="-2,0" weight="1" layout="hbox" gravity="center" interval="20" extend_top="12">
 					<window size="0,0" weight="1" visible="0" />
-					<progress name="prog_test2" size="15,-2" vertical="1" alpha="200" value="20" min="0" max="100" />
-					<sliderbar name="slider_test2" size="-1,-2" thumbInRail="1" vertical="1" alpha="200" value="20" min="0" max="100" />
-					<scrollbar name="sb_test2" size="16,-2" vertical="1" min="0" max="100" value="10" page="10" />
-					<progressRing name="prog_ring" size="200,200" arcRate="0.5" min="0" max="100" value="32" showPercent="1" />
+					<progress name="prog_test2" size="12,-2" vertical="1" alpha="200" value="20" min="0" max="100"
+					          bkgndSkin="skin_prog_bk" posSkin="skin_prog_bar"/>
+					<sliderbar name="slider_test2" size="-1,-2" thumbInRail="1" vertical="1" alpha="200" value="20"
+					           min="0" max="100" bkgndSkin="skin_slider_rail" posSkin="skin_prog_bar" thumbSkin="skin_slider_thumb"/>
+					<scrollbar name="sb_test2" size="12,-2" vertical="1" min="0" max="100" value="10" page="10"
+					           skin="skin_scrollbar" arrowSize="0"/>
+					<progressRing name="prog_ring" size="160,160" arcRate="0.5" min="0" max="100" value="32" showText="1"
+					              colorBack="@color/clr_line" colorFore="@color/clr_primary"/>
 					<window size="0,0" weight="1" visible="0" />
 				</window>
 			</window>
 		</page>
 		<!-- ============ 日历 ============ -->
-		<page title="calendar" layout="vbox" interval="12" >
-			<text text="日历" font="size:16,bold:1" colorText="@color/clr_title"/>
-			<text text="日期时间选择器与月历控件" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
-			<window size="-2,-1" padding="14,12,14,12" layout="hbox">
-				<dateTimePicker size="240,30" name="timepicker" padding="4,0,4,0" dropWidth="300" timeEnable="1">
-					<calstyle ncSkin="_skin.sys.border" daySkin="_skin.sys.btn.normal" margin="1" font="face:微软雅黑,size=14" />
+		<page title="calendar" layout="vbox" padding="20,16,20,18" colorBkgnd="@color/clr_window_bg">
+			<!-- 页头 -->
+			<text text="日历" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
+			<text text="日期时间选择器与月历控件" extend_top="6" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
+
+			<!-- 卡片:日期时间选择器 -->
+			<window size="-2,76" skin="skin_card" layout="hbox" gravity="center" padding="14,0,14,0" interval="12" extend_top="16">
+				<window size="3,12" skin="skin_card_bar"/>
+				<text text="日期时间" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_text_sub" extend_right="8"/>
+				<!-- ncskin="none":SDateTimePicker 悬停时会把 m_pNcSkin(默认是内置 _skin.sys.border 方角边框)
+				     画到右侧下拉按钮区,叠在 skin 的 6px 圆角描边上形成"边框重叠";置 none 后只有 skin 一层圆角边框 -->
+				<dateTimePicker size="240,30" name="timepicker" padding="4,0,4,0" dropWidth="300" timeEnable="1"
+				                skin="skin_edit_nc" ncskin="none" margin="0" btnSkin="skin_cbx_btn" font="face:微软雅黑,size:13" colorText="@color/clr_text">
+					<!-- 下拉月历外框:与输入框统一的圆角描边(skin 画圆角,margin=0 屏蔽内置蓝框) -->
+					<calstyle skin="skin_edit_nc" daySkin="skin_cal_day" margin="0" font="face:微软雅黑,size:13"
+					          colorSelText="@color/clr_primary_dark" colorSelBg="@color/clr_accent_b" />
 				</dateTimePicker>
 			</window>
-			<window size="-2,0" weight="1" padding="10,10,10,10">
-				<calendar size="-2,-2" daySkin="_skin.sys.btn.normal" todayHeight="0" yearHeight="0" weekHeight="50" textSunday="sunday" textMonday="monday" textTuesday="tuesday" textWednesday="Wednesday" textThursday="thursday" textFriday="friday" textSaturday="saturday" />
+
+			<!-- 卡片:月历 -->
+			<window size="-2,0" weight="1" skin="skin_card" layout="vbox" padding="14,13,14,15" extend_top="12">
+				<window size="-2,14" layout="hbox" gravity="center" interval="8">
+					<window size="3,12" skin="skin_card_bar"/>
+					<text text="月历" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_text_sub"/>
+				</window>
+				<calendar size="-2,0" weight="1" daySkin="skin_cal_day" todayHeight="0" yearHeight="0"
+				          weekHeight="40" colorBkgnd="@color/clr_card_bg" colorText="@color/clr_text"
+				          colorSelText="@color/clr_primary_dark" colorSelBg="@color/clr_accent_b"
+				          textSunday="周日" textMonday="周一" textTuesday="周二" textWednesday="周三"
+				          textThursday="周四" textFriday="周五" textSaturday="周六" extend_top="12"/>
 			</window>
 		</page>
 		<!-- ============ 分割窗口 ============ -->
-		<page title="split" layout="vbox" interval="12">
-				<text text="分割窗口" font="size:16,bold:1" colorText="@color/clr_title"/>
-				<text text="splitrow / splitcol 水平垂直嵌套分割,窗格按优先级与理想尺寸分配" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
-				<splitrow name="split_row" size="-2,0" weight="1" sepSize="6">
-				<pane idealSize="250" minSize="30" priority="2" colorBkgnd="#2563EB" clipClient="1">
-					<text pos="|0,|-20" offset="-0.5,0" colorText="#ffffff">pane1 priority=2</text>
-					<text2 pos="|0,[20" offset="-0.5,0" font="face:微软雅黑,adding:10" colorText="@color/red">GDI+渲染文字,render by gdiplus</text2>
+		<page title="split" layout="vbox" padding="20,16,20,18" colorBkgnd="@color/clr_window_bg">
+			<!-- 页头 -->
+			<text text="分割窗口" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
+			<text text="splitrow / splitcol 水平垂直嵌套分割,窗格按优先级与理想尺寸分配" extend_top="6" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
+
+			<!-- 分割区:窗格用主题色区分层级,分割条留 8px 便于拖拽 -->
+			<splitrow name="split_row" size="-2,0" weight="1" sepSize="8" extend_top="16">
+				<pane idealSize="250" minSize="30" priority="2" colorBkgnd="@color/clr_primary" clipClient="1">
+					<text pos="|0,|-20" offset="-0.5,0" colorText="#ffffff" font="face:微软雅黑,size:13">pane1 priority=2</text>
+					<text2 pos="|0,[20" offset="-0.5,0" font="face:微软雅黑,size:15,adding:10" colorText="#ffffff">GDI+ 渲染文字,render by gdiplus</text2>
 				</pane>
 				<pane idealSize="400" minSize="30" priority="1">
-					<splitcol name="split_col" pos="0,0,-0,-0" sepSize="6">
-						<pane idealSize="200" minSize="30" priority="0" colorBkgnd="#1D4ED8" clipClient="1">
-							<text pos="|-50,|-20" colorText="#ffffff">pane2.1 priority=0</text>
+					<splitcol name="split_col" pos="0,0,-0,-0" sepSize="8">
+						<pane idealSize="200" minSize="30" priority="0" colorBkgnd="@color/clr_primary_dark" clipClient="1">
+							<text pos="|0,|-20" offset="-0.5,0" colorText="#ffffff" font="face:微软雅黑,size:13">pane2.1 priority=0</text>
 						</pane>
-						<pane idealSize="400" minSize="30" priority="1" colorBkgnd="#60A5FA" clipClient="1">
-							<text pos="|-50,|-20" colorText="@color/clr_title">pane2.2 priority=1</text>
+						<pane idealSize="400" minSize="30" priority="1" colorBkgnd="@color/clr_accent_t" clipClient="1">
+							<text pos="|0,|-20" offset="-0.5,0" colorText="@color/clr_title" font="face:微软雅黑,size:13">pane2.2 priority=1</text>
 						</pane>
 					</splitcol>
 				</pane>
 			</splitrow>
 		</page>
 		<!-- ============ 列表框与组合框 ============ -->
-		<page title="combobox and listbox" layout="vbox" interval="12">
-			<text text="列表框与组合框" font="size:16,bold:1" colorText="@color/clr_title"/>
-			<text text="combobox 可编辑与纯下拉两种模式对比,listbox 支持由代码动态初始化" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
-			<window size="-2,0" weight="1" layout="hbox" interval="12">
-				<group text="combobox" size="0,-1" weight="1" layout="vbox" padding="14,12,14,12" interval="8" colorText="@color/clr_title">
-					<text text="dropDown=0,编辑框可见,支持输入与自动匹配" font="size:12" colorText="@color/clr_text_sub"/>
-					<combobox name="cbx_test" cueText="输入或下拉选择" cueColor="@color/clr_text_sub" size="-2,30" dropDown="0" dropHeight="120" class="cls_edit" dotted="0" animateTime="200" curSel="2">
+		<page title="combobox and listbox" layout="vbox" padding="20,16,20,18" colorBkgnd="@color/clr_window_bg">
+			<!-- 页头 -->
+			<text text="列表框与组合框" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
+			<text text="combobox 可编辑与纯下拉两种模式对比,listbox 支持由代码动态初始化" extend_top="6" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
+
+			<window size="-2,0" weight="1" layout="hbox" interval="10" extend_top="16">
+
+				<!-- 卡片:combobox -->
+				<window size="0,-2" weight="1" skin="skin_card" layout="vbox" padding="14,13,14,15">
+					<window size="-2,14" layout="hbox" gravity="center" interval="8">
+						<window size="3,12" skin="skin_card_bar"/>
+						<text text="combobox" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_text_sub"/>
+					</window>
+					<text text="dropDown=0:编辑框可见,支持输入与自动匹配" extend_top="12" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
+					<combobox name="cbx_test" cueText="输入或下拉选择" cueColor="@color/clr_text_sub" size="-2,30" dropDown="0"
+					          dropHeight="120" class="cls_edit" dotted="0" animateTime="200" curSel="2" extend_top="6"
+					          btnSkin="skin_cbx_btn" font="face:微软雅黑,size:13" drawFocusRect="0">
 						<dropdownStyle>
 							<root colorBkgnd="@color/clr_card_bg"/>
 						</dropdownStyle>
-						<liststyle class="cls_edit" iconSkin="skin_menuicon" itemHeight="30" />
-						<editstyle inset="5,0,5,0" margin="0" colorText="@color/clr_text" align="left" colorBkgnd="@color/clr_card_bg" />
+						<!-- 下拉列表:边框改由 ncskin 画在窗口非客户区,滚动条(6px)落在客户区内、被圆角描边包住 -->
+						<liststyle class="cls_edit" skin="none" ncskin="skin_popup" margin="6"
+						           colorBkgnd="@color/clr_card_bg" sbSkin="skin_scrollbar" sbWid="6" sbArrowSize="0"
+						           iconSkin="skin_menuicon" itemHeight="30" itemSkin="skin_lb_item" drawFocusRect="0" />
+						<!-- 内嵌编辑框 margin=1:圆角白底(内缩 1px)让组合框自身的 1px 圆角描边(含左上/左下圆弧)完整露出;
+						     ncskin="none" 屏蔽 SRichEdit 内置的矩形蓝色外环(它会裁掉圆角) -->
+						<editstyle inset="7,0,7,0" margin="1" skin="skin_edit_fill" ncskin="none"
+						           colorText="@color/clr_text" align="left" colorBkgnd="@color/clr_card_bg" />
 						<items>
 							<item text="combobox.item1" icon="1" data="100" />
 							<item text="combobox.item2" icon="2" data="100" />
@@ -454,13 +935,19 @@
 							<item text="combobox.item6" icon="0" data="100" />
 						</items>
 					</combobox>
-					<button size="-2,30" extend_top="6" on_command="on_btn_select_cbx">setcursel(-1)</button>
-					<text text="dropDown=1,纯下拉选择,隐藏编辑框" extend_top="8" font="size:12" colorText="@color/clr_text_sub"/>
-					<combobox name="cbx_dropdown" cueText="仅下拉选择" cueColor="@color/clr_text_sub" size="-2,30" dropDown="1" dropHeight="120" class="cls_edit" dotted="0" animateTime="200" curSel="1">
+					<button size="-2,30" extend_top="12" skin="skin_btn" font="face:微软雅黑,size:13"
+					        colorText="@color/clr_title" on_command="on_btn_select_cbx" drawFocusRect="0">setcursel(-1)</button>
+
+					<text text="dropDown=1:纯下拉选择,隐藏编辑框" extend_top="20" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
+					<combobox name="cbx_dropdown" cueText="仅下拉选择" cueColor="@color/clr_text_sub" size="-2,30" dropDown="1"
+					          dropHeight="120" class="cls_edit" dotted="0" animateTime="200" curSel="1" extend_top="6"
+					          btnSkin="skin_cbx_btn" font="face:微软雅黑,size:13" drawFocusRect="0">
 						<dropdownStyle>
 							<root colorBkgnd="@color/clr_card_bg"/>
 						</dropdownStyle>
-						<liststyle class="cls_edit" iconSkin="skin_menuicon" itemHeight="30" />
+						<liststyle class="cls_edit" skin="none" ncskin="skin_popup" margin="6"
+						           colorBkgnd="@color/clr_card_bg" sbSkin="skin_scrollbar" sbWid="6" sbArrowSize="0"
+						           iconSkin="skin_menuicon" itemHeight="30" itemSkin="skin_lb_item" drawFocusRect="0" />
 						<items>
 							<item text="城市列表" icon="1" />
 							<item text="版本列表" icon="2" />
@@ -468,10 +955,21 @@
 							<item text="语言列表" icon="4" />
 						</items>
 					</combobox>
-				</group>
-				<group text="listbox" size="0,-2" weight="1" layout="vbox" padding="14,12,14,12" interval="8" colorText="@color/clr_title">
-					<text text="hotTrack 悬停高亮,双击触发 LBDbClick 事件" font="size:12" colorText="@color/clr_text_sub"/>
-					<listbox name="lb_test" size="-2,0" weight="1" hotTrack="1" class="cls_edit" iconSkin="skin_menuicon" itemHeight="30">
+					<window size="0,0" weight="1"/>
+				</window>
+
+				<!-- 卡片:listbox -->
+				<window size="0,-2" weight="1" skin="skin_card" layout="vbox" padding="14,13,14,15">
+					<window size="-2,14" layout="hbox" gravity="center" interval="8">
+						<window size="3,12" skin="skin_card_bar"/>
+						<text text="listbox" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_text_sub"/>
+					</window>
+					<text text="hotTrack 悬停高亮,双击触发 LBDbClick 事件" extend_top="12" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
+					<!-- 列表框:同下拉列表,描边由 ncskin 画在最外 6px 环上,滚动条落在客户区内、被圆角描边包住 -->
+					<listbox name="lb_test" size="-2,0" weight="1" hotTrack="1" class="cls_edit" iconSkin="skin_menuicon"
+					         itemSkin="skin_lb_item" itemHeight="30" extend_top="6" font="face:微软雅黑,size:13" drawFocusRect="0"
+					         skin="none" ncskin="skin_popup" margin="6" colorBkgnd="@color/clr_card_bg"
+					         sbSkin="skin_scrollbar" sbWid="6" sbArrowSize="0">
 						<items>
 							<item text="item1" icon="1" data="100" />
 							<item text="item2" icon="2" data="100" />
@@ -481,27 +979,66 @@
 							<item text="item6" icon="0" data="100" />
 						</items>
 					</listbox>
-					<button size="-2,30" extend_top="6" name="btn_init_listbox">init listbox</button>
-				</group>
+					<button size="-2,30" extend_top="12" name="btn_init_listbox" skin="skin_btn"
+					        font="face:微软雅黑,size:13" colorText="@color/clr_title" drawFocusRect="0">init listbox</button>
+				</window>
 			</window>
 		</page>
 		<!-- ============ 属性表 ============ -->
-		<page title="propertygrid" layout="vbox" interval="12" >
-			<text text="属性表控件" font="size:16,bold:1" colorText="@color/clr_title"/>
-			<text text="分组属性网格,支持文本 / 选项 / 尺寸 / 颜色等属性编辑器" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
-			<window size="-2,-1" layout="hbox" interval="5" gravity="center">
-				<text text="target:" />
-				<edit name="prop_target" size="100,30" text="text1.1" />
-				<text text="property:" />
-				<edit name="prop_prop" size="100,30" text="value" />
-				<text text="value:" />
-				<edit name="prop_value" size="150,30" text="haha" />
-				<button name="btn_set_prop_value" text="set prop" size="100,30" />
+		<page title="propertygrid" layout="vbox" padding="20,16,20,18" colorBkgnd="@color/clr_window_bg">
+			<!-- 页头 -->
+			<text text="属性表控件" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
+			<text text="分组属性网格,支持文本 / 选项 / 尺寸 / 颜色等属性编辑器" extend_top="6" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
+
+			<!-- 卡片:操作条 -->
+			<window size="-2,66" skin="skin_card" layout="hbox" gravity="center" padding="14,0,14,0" interval="8" extend_top="16">
+				<window size="3,12" skin="skin_card_bar"/>
+				<text text="target" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_text_sub"/>
+				<edit name="prop_target" size="70,30" text="text1.1" class="cls_edit" font="face:微软雅黑,size:13" colorText="@color/clr_text"/>
+				<text text="property" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_text_sub"/>
+				<edit name="prop_prop" size="70,30" text="value" class="cls_edit" font="face:微软雅黑,size:13" colorText="@color/clr_text"/>
+				<text text="value" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_text_sub"/>
+				<edit name="prop_value" size="100,30" text="haha" class="cls_edit" font="face:微软雅黑,size:13" colorText="@color/clr_text"/>
+				<button name="btn_set_prop_value" text="set prop" size="84,30" class="cls_btn_primary"
+				        font="face:微软雅黑,size:13" colorText="#FFFFFF" drawFocusRect="0"/>
 			</window>
-			<propgrid name="prop_test" size="-2,0" weight="1" titleWidth="180" orderType="group" switchSkin="skin_propswitch" colorBkgnd="#ffffff" itemHeight="30">
-				<cmdbtnstyle skin="_skin.sys.btn.normal">...</cmdbtnstyle>
-				<editStyle colorBkgnd="#ffffff"/>
-				<groups>
+
+			<!-- 卡片:属性网格 -->
+			<window size="-2,0" weight="1" skin="skin_card" layout="vbox" padding="14,13,14,15" extend_top="12">
+				<window size="-2,14" layout="hbox" gravity="center" interval="8">
+					<window size="3,12" skin="skin_card_bar"/>
+					<text text="属性网格" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_text_sub"/>
+				</window>
+				<!-- 属性网格:margin-left=10 给表格左侧留一道内缩的空白。
+				     SPropertyGrid 的名称列从行内缩进列(宽度 = 行高 30dp)之后直接落笔,自身没有左内边距,
+				     不缩进时"group1/text1.2"这类根节点文字会紧贴卡片左边框;
+				     margin 会收缩控件的客户区(GetClientRect 按 margin 内缩),整张表随之右移,右侧不留空 -->
+				<propgrid name="prop_test" size="-2,0" weight="1" titleWidth="180" orderType="group" switchSkin="skin_propswitch"
+				          margin="10,0,0,0"
+				          sbSkin="skin_scrollbar" sbWid="6" sbArrowSize="0"
+				          colorBkgnd="@color/clr_card_bg" colorGroup="@color/clr_sunk" colorTitle="@color/clr_card_bg"
+				          colorTitleSel="@color/clr_accent_t" colorTitleText="@color/clr_text" colorTitleTextSel="@color/clr_primary_dark"
+				          colorItem="@color/clr_card_bg" colorItemBorder="@color/clr_line"
+				          itemHeight="30" extend_top="12" font="face:微软雅黑,size:13">
+					<cmdbtnstyle skin="skin_btn" font="face:微软雅黑,size:13">...</cmdbtnstyle>
+					<!-- 选项属性(propoption)的内嵌下拉框:替换控件内置 XML 的黑色 1px 边框(liststyle colorBorder="#000000"),
+					     并把行底换成 itemSkin 九宫格,使行高亮内缩 1px,不盖住下拉列表自身的圆角描边;drawFocusRect="0" 去掉焦点虚线 -->
+					<optionStyle dropDown="1" class="cls_edit" drawFocusRect="0" btnSkin="skin_cbx_btn"
+					            colorText="@color/clr_text" colorBkgnd="@color/clr_card_bg" font="face:微软雅黑,size:13">
+						<dropdownStyle>
+							<root colorBkgnd="@color/clr_card_bg"/>
+						</dropdownStyle>
+						<liststyle class="cls_edit" skin="none" ncskin="skin_popup" margin="6"
+						           colorBkgnd="@color/clr_card_bg" sbSkin="skin_scrollbar" sbWid="6" sbArrowSize="0"
+						           iconSkin="skin_menuicon" itemHeight="30" itemSkin="skin_lb_item" drawFocusRect="0"/>
+						<editstyle margin="1" skin="skin_edit_fill" ncskin="none"
+						           colorText="@color/clr_text" align="left" colorBkgnd="@color/clr_card_bg"/>
+					</optionStyle>
+					<!-- 属性单元格的内嵌编辑框:margin="0" 屏蔽 SRichEdit 构造时挂上的内置蓝色外环(_skin.sys.border),
+					     ncSkin 指到 skin_edit_nc 防止蓝框回来,单元格内编辑时不再出现醒目的蓝色边框 -->
+					<editStyle colorBkgnd="@color/clr_card_bg" colorText="@color/clr_text" font="face:微软雅黑,size:13"
+					           margin="0" ncSkin="skin_edit_nc"/>
+					<groups>
 					<propgroup name="group1" description="desc of group1">
 						<proptext name="text1.1" value="value 1.1">
 							<proptext name="text1.1.3" value="value 1.1.3" />
@@ -527,6 +1064,7 @@
 					</propgroup>
 				</groups>
 			</propgrid>
+			</window>
 		</page>
 		<page title="morectrl">
 			<include src="layout:page_morectrl"/>

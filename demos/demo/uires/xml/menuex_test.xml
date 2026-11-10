@@ -1,32 +1,44 @@
-﻿<menuRoot itemHeight="38" iconPos="12" iconSkin="TrayMenu_menu_ico" textOffset="18" font="face:微软雅黑,size:14"
-          sepSkin="TrayMenu_menu_sep"  itemSkin="TrayMenu_menu_bkgnd" maxWidth="198" minWidth="198"
-          margin="2,2,2,2" colorBkgnd="#ffffff" ncSkin="TrayMenu_border" alpha="220">
+<menuRoot itemHeight="34" iconPos="6" iconBarWidth="26" textOffset="10" iconSkin="TrayMenu_menu_ico"
+          font="face:微软雅黑,size:13"
+          sepSkin="TrayMenu_menu_sep" itemSkin="TrayMenu_menu_bkgnd"
+          skin="skin_menu_bg" padding="10,8,10,8"
+          minWidth="210" maxWidth="300"
+          colorText="@color/clr_text" colorBkgnd="@color/clr_card_bg"
+          arrowSkin="skin_menu_arrow">
+  <!-- 播放控制行:上一曲 / 播放 / 下一曲,三个 20/24px 矢量按钮横向居中 -->
   <menuItem height="56">
-    <window pos="0,0" size="-2,-2" colorBkgnd="#ffffff">
-      <imgbtn pos="]-20,|" offset="-1,-0.5" cursor="hand" skin="TrayMenu_btn_pre" name="menu_btn_pre" tip="prev"/>
-      <imgbtn pos="|,|" offset="-0.5,-0.5" cursor="hand" skin="TrayMenu_btn_play" name="menu_btn_play" tip="play"/>
-      <imgbtn pos="[+20,|" offset="0,-0.5" cursor="hand" skin="TrayMenu_btn_next" name="menu_btn_next" tip="next"/>
+    <window pos="0,0" size="-2,-2">
+      <imgbtn pos="]-20,|" offset="-1,-0.5" cursor="hand" skin="TrayMenu_btn_pre" name="menu_btn_pre" tip="prev" drawFocusRect="0"/>
+      <imgbtn pos="|,|" offset="-0.5,-0.5" cursor="hand" skin="TrayMenu_btn_play" name="menu_btn_play" tip="play" drawFocusRect="0"/>
+      <imgbtn pos="[+20,|" offset="0,-0.5" cursor="hand" skin="TrayMenu_btn_next" name="menu_btn_next" tip="next" drawFocusRect="0"/>
     </window>
   </menuItem>
-  <menuItem>
-    <window pos="0,0" size="-2,-2" colorBkgnd="#ffffff">
-      <imgbtn pos="12,|"  cursor="hand" offset="0,-0.5" skin="TrayMenu_btn_ilike" name="menu_btn_ilike"/>
-      <text pos="34,0,-34,-0" align="center" valign="middle" dotted="1" name="menu_btn_play" text="我是你心中的一首歌"/>
-      <imgbtn pos="-12,|"  cursor="hand" offset="-1,-0.5" skin="TrayMenu_btn_circulation" name="menu_btn_cir"/>
+  <!-- 曲目信息行:喜欢 / 歌名 / 循环;歌名去掉旧的虚线下划线,改为中性灰 13 号 -->
+  <menuItem height="40">
+    <window pos="0,0" size="-2,-2">
+      <imgbtn pos="12,|"  cursor="hand" offset="0,-0.5" skin="TrayMenu_btn_ilike" name="menu_btn_ilike" drawFocusRect="0"/>
+      <text pos="34,0,-34,-0" align="center" valign="middle" name="menu_btn_play" text="我是你心中的一首歌"
+            font="face:微软雅黑,size:13" colorText="@color/clr_text"/>
+      <imgbtn pos="-12,|"  cursor="hand" offset="-1,-0.5" skin="TrayMenu_btn_circulation" name="menu_btn_cir" drawFocusRect="0"/>
     </window>
   </menuItem>
-  <!--指定线宽的方法<sep size="-2,2"/>-->
-  <sep/>
-  <menuItem>
-    <window pos="0,0" size="-2,-2" colorBkgnd="#ffffff">
-      <imgbtn pos="12,|" offset="0,-0.5" skin="TrayMenu_btn_volume" name="menu_btn_vol"/>
-      <sliderbar pos="[+12,|-10,-12,|10" name="menu_slider_vol"/>
+  <!-- 分隔线:1px 浅灰,左右各内缩 6 -->
+  <sep size="-2,9" margin="6,4,6,4"/>
+  <!-- 音量行:喇叭图标 + 现代滑块(浅灰轨道 + 中性灰进度 + 圆形手柄) -->
+  <menuItem height="36">
+    <window pos="0,0" size="-2,-2">
+      <imgbtn pos="12,|" offset="0,-0.5" skin="TrayMenu_btn_volume" name="menu_btn_vol" drawFocusRect="0"/>
+      <sliderbar pos="[+12,|-9,-12,|9" name="menu_slider_vol"
+                 bkgndSkin="skin_slider_rail" posSkin="TrayMenu_prog_neutral" thumbSkin="skin_slider_thumb"
+                 thumbInRail="1" value="35" min="0" max="100"/>
     </window>
   </menuItem>
+  <sep size="-2,9" margin="6,4,6,4"/>
   <menuItem icon="0" cursor="hand">显示桌面歌词</menuItem>
-  <sep margin="0,1,0,5"/>
-  <menuItem icon="1" cursor="hand" >设置</menuItem>
-  <sep margin="0,5,0,1"/>
+  <sep size="-2,9" margin="6,4,6,4"/>
+  <menuItem icon="1" cursor="hand">设置</menuItem>
+  <sep size="-2,9" margin="6,4,6,4"/>
+  <!-- 子菜单:父项右侧箭头使用现代 chevron(arrowSkin),子项文本不能混入缩进空白 -->
   <menuItem cursor="hand" text="SubMenu">
     <menuItem icon="0" cursor="hand">显示桌面歌词1</menuItem>
     <menuItem icon="0" cursor="hand">显示桌面歌词2</menuItem>

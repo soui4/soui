@@ -3,7 +3,8 @@
 	<!--全局skin对象-->
 	<imglist name="skin_switch" src="imgx:png_switch" states="8" checkAsPushdown="0"/>
 	<imglist name="skin_switch_bg" src="imgx:png_switch_bg" states="1"/>
-	<imglist name="skin_knob" src="imgx:png_knob" states="2">
+	<!-- 旋钮:改用矢量表盘 svg(帧0 正常 帧1 禁用),替换位图 png_knob,帧映射保持不变 -->
+	<imglist name="skin_knob" src="svg:knob" states="2">
 		<states>
 			<state index="0" value="normal|hover|pushdown"/>
 			<state index="1" value="disable"/>
@@ -13,10 +14,11 @@
 	<imglist name="skin_webp_lossy" src="imgx:webp_lossy" states="1"/>
 	<imglist name="skin_webp_lossless" src="imgx:webp_lossless" states="1"/>
 	<imglist name="skin_webp_alpha" src="imgx:webp_alpha" states="1"/>
-	<imglist name="skin_page_icons"	src="imgx:png_page_icons" states="7"/>
+	<!-- 页面图标集:7 帧矢量图标,每帧 48x48;供顶部 tab 图标、横向列表的 imgbtn 图标等复用 -->
+	<imglist name="skin_page_icons"	src="svg:page_icons" states="7"/>
 	<imglist name="skin_ctrl_icons" src="imgx:png_ctrl_icons" states="18"/>
 	<imglist name="skin_small_icons" src="imgx:png_small_icons" states="12" />
-	<imglist name="skin_tree_icon" src="imgx:png_treeicon" states="3" />
+	<imglist name="skin_tree_icon" src="svg:tree_icons" states="3" />
 	<imglist name="skin_menuicon" src="imgx:png_small_icons" states="12" />
 	<imglist name="skin_webbtn_back" src="svg:webbtn_back" states="3" />
 	<imglist name="skin_webbtn_forward" src="svg:webbtn_forward" states="3" />
@@ -27,12 +29,15 @@
 	<imglist name="skin_group" src="imgx:group" states="3"  />
 	<imglist name="skin_tab_left_splitter" src="imgx:png_tab_left_splitter" />
 	<imglist name="skin_btn_menu" src="imgx:btn_menu" states="3" />
-	<imglist name="skin_propswitch" src="imgx:png_propswitch" states="4" />
+	<!-- 属性表折叠箭头:改用矢量(0=组展开 1=组折叠 2=子项展开 3=子项折叠),替换位图 png_propswitch -->
+	<imglist name="skin_propswitch" src="svg:prop_switch" states="4" />
+	<!-- 组合框/日期下拉按钮:扁平矢量箭头(正常/悬停/按下/禁用),替换系统渐变位图 _skin.sys.dropbtn -->
+	<imglist name="skin_cbx_btn" src="svg:cbx_arrow" states="4" />
 	<imglist name="skin_bkgnd" src="IMGX:jpg_bkgnd" />
 	<vscrollbar name="skin_vscrollbar" src="imgx:png_vscroll" states="3" margin="4" />
 	<newScrollbar name="skin_new_scrollbar" srcVert="imgx:png_vscroll" srcHorz="imgx:png_hscroll" states="3" margin="4" />
-	<imglist name="skin_chrome_tab_new" src="imgx:png_chrome_tab_new" states="3" />
-	<imglist name="skin_chrome_tab_close" src="imgx:png_chrome_tab_close" states="3" />
+	<imglist name="skin_chrome_tab_new" src="svg:tab_new" states="3" />
+	<imglist name="skin_chrome_tab_close" src="svg:tab_close" states="3" />
 	<imgframe name="skin_btn_curve" src="img.calendar2:png_skin_btn_curve" />
 	<imgframe name="skin_btn_semiarc" src="img.calendar2:png_skin_btn_semiarc" />
 	<imgframe name="skin_png_line_1px" src="img.calendar2:png_line_1px" />
@@ -40,21 +45,25 @@
 	<imgframe name="cal_arrow_left" src="img.calendar2:cal_arrow_left" states="3" />
 	<imgframe name="cal_arrow_right" src="img.calendar2:cal_arrow_right" states="3" />
 	<imgframe name="cal_btn_day" src="img.calendar2:cal_btn_day" states="3" />
-	<imgframe name="skin_lcex_header_arrow" src="imgx:png_lcex_header_arrow" states="2" />
+	<!-- 表头排序箭头:改用矢量 chevron(0=升序 1=降序),替代位图 png_lcex_header_arrow 的立体三角块 -->
+	<imglist name="skin_lcex_header_arrow" src="svg:sort_arrow" states="2" />
 	<imgframe name="skin_lcex_selectrange" src="imgx:png_lcex_selectrange" margin-x="1" margin-y="1" />
 	<imgframe name="skin_icon1" src="imgx:png_icon1" />
 	<imgframe name="skin_icon2" src="imgx:png_icon2" />
 	<imgframe name="skin_icon3" src="imgx:png_icon3" />
 	<imgframe name="skin_icon4" src="imgx:png_icon4" />
 	<imgframe name="skin_icon5" src="imgx:png_icon5" />
-	<imgframe name="skin_icon6" src="imgx:png_icon6" />
+	<!-- 多列列表行头像:改用矢量人物 svg(单帧),替换位图 png_icon6 -->
+	<imglist name="skin_icon6" src="svg:avatar" states="1" />
 	<imgframe name="skin_icon7" src="imgx:png_icon7" />
-	<imgframe name="skin_star1" src="imgx:png_star1" states="2" />
+	<!-- 评分星标:改用矢量精灵(0=点亮青星 1=未点亮灰星),替换原绿色 png_star1 -->
+	<imglist name="skin_star1" src="svg:star_icons" states="2" />
 	<gif name="gif_horse" src="img.game:gif_horse" />
 	<gif name="gif_win" src="img.game:gif_win" />
 	<imglist name="img_coin" src="img.game:img_coin" />
 	<imglist name="skin_avatar" src="imgx:png_avatar" />
-	<imglist name="skin_busy" src="imgx:img_busy" states="8" />
+	<!-- 忙碌等待动画:改用矢量圆环弧(横向 8 帧转圈),替换位图 img_busy -->
+	<imglist name="skin_busy" src="svg:busy" states="8" />
 	<imglist name="skin_dock_bg" src="img.dock:PNG_MAINBK" />
 	<imglist name="skin_png_icon_1" src="img.dock:PNG_ICON_1" />
 	<imglist name="skin_png_icon_2" src="img.dock:PNG_ICON_2" />
@@ -82,21 +91,33 @@
 	<imglist name="skin_bkimg_7" src="bkimg:skin_pic_7" colorizeEnable="0" autoFit="0" />
 	<demoskin name="demoskinbk" />
 	<imglist name="skin_qrbg" src="imgx:qrbg" />
-	<imgframe name="skin_tip_bg" src="imgx:tip_bg" margin="46,5,5,20" />
-	<!--menuex-->
-	<imglist name="TrayMenu_btn_circulation" src="ImgTrayMenu:circulation" states="8" />
-	<imglist name="TrayMenu_btn_ilike" src="ImgTrayMenu:ilike" states="4" />
-	<imglist name="TrayMenu_btn_next" src="ImgTrayMenu:next" states="3" />
+	<!-- 提示气泡:白底 + 1px 描边 + 6px 圆角,替代旧位图 tip_bg 的立体气泡 -->
+	<colorrect name="skin_tip_bg" normal="@color/clr_card_bg" normalBorder="@color/clr_line" borderWidth="1" cornerRadius="6" />
+	<!-- 托盘右键菜单(SMenuEx):全部改为矢量图标 + 现代配色,替代 ImgTrayMenu 里的旧位图。
+	     统一 4 态(常态/悬停/按下/禁用),颜色沿用 灰 #5F6672 → 主色青 #0E9F9F → 深青 #0B8888 → 禁用 #C9CDD4。 -->
+	<imglist name="TrayMenu_btn_circulation" src="svg:tray_loop" states="4" />
+	<imglist name="TrayMenu_btn_ilike" src="svg:tray_like" states="4" />
+	<imglist name="TrayMenu_btn_next" src="svg:tray_next" states="4" />
+	<!-- 暂停按钮当前模板未使用,保留旧资源以免其它代码引用时找不到皮肤 -->
 	<imglist name="TrayMenu_btn_pause" src="ImgTrayMenu:pause" states="3" />
-	<imglist name="TrayMenu_btn_play" src="ImgTrayMenu:play" states="3" />
-	<imglist name="TrayMenu_btn_pre" src="ImgTrayMenu:pre" states="3" />
-	<imglist name="TrayMenu_btn_volume" src="ImgTrayMenu:volume" states="4" />
-	<imglist name="TrayMenu_menu_ico" src="ImgTrayMenu:menu_ico" states="3" />
-	<colorrect name="TrayMenu_menu_bkgnd" hover="#cccccc" />
-	<colorrect name="TrayMenu_menu_sep" normal="#cccccc" />
-	<imgframe name="TrayMenu_border" src="IMGX:png_menu_border" margin="2,2,2,2" />
+	<imglist name="TrayMenu_btn_play" src="svg:tray_play" states="4" />
+	<imglist name="TrayMenu_btn_pre" src="svg:tray_pre" states="4" />
+	<imglist name="TrayMenu_btn_volume" src="svg:tray_volume" states="4" />
+	<!-- 菜单项图标:18x18 单状态,3 帧对应 icon=0 音符 / 1 滑杆 / 2 电源 -->
+	<imglist name="TrayMenu_menu_ico" src="svg:tray_icon" states="3" />
+	<!-- 菜单项底色:白卡片 + 中性浅灰悬停圆角 4。
+	     这里不用浅青:托盘菜单是独立 popup 窗口,不参与主窗口的 DoColorize 染色,
+	     换肤后浅青会与主题色冲突,所以统一用无色相的中性灰,任何主题下都协调。 -->
+	<colorrect name="TrayMenu_menu_bkgnd" normal="@color/clr_card_bg" hover="#F4F5F7" cornerRadius="4" />
+	<!-- 托盘菜单音量条填充:同样因为 popup 不参与染色,用中性灰阶代替主色青 -->
+	<!-- 托盘菜单进度条:中性灰,4px 圆角(与 skin_prog_bk 同档) -->
+	<colorrect name="TrayMenu_prog_neutral" normal="#8A94A6" hover="#5F6672" cornerRadius="4" />
+	<!-- 分隔线:1px 浅灰,与其它页面统一 -->
+	<colorrect name="TrayMenu_menu_sep" normal="@color/clr_divider" />
 	<button name="win10btn" colorBorder="#ADADAD" colorUp="#E1E1E1" colorDown="#E1E1E1" colorBorderHover="#0078D7" colorUpHover="#E5F1FB" colorDownHover="#E5F1FB" colorBorderPush="#005499" colorUpPush="#CCE4F7" colorDownPush="#CCE4F7" cornerPercent="0.5" />
-	<gradation name="skin_caption" colorFrom="#0000bb" colorTo="#0000ff" vertical="0" />
+	<!-- freeMoveWindow 演示窗标题条:白底 + 底部 1px 浅灰分割线(九宫格,标题条高度变化时细线不拉伸)。
+	     替代原来的蓝色渐变标题条。用法:page_misc.xml 的 fmw_test 的 captionSkin。 -->
+	<imgframe name="skin_caption" src="svg:fmw_titlebar" states="1" margin="10,2,10,2"/>
 	<imgframe name="skin_btn_skin1_png" src="IMGX:btn_skin1_png" states="4" autoFit="1" margin-x="1" margin-y="1" />
   <imglist name="skin_icons"	src="imgx:icons.png" states="11"/>
 
@@ -105,7 +126,11 @@
   <imglist name="skin_girl"	src="imgx:png_girl" alpha="150"/>
   <imglist name="skin_love"	src="imgx:png_love" />
   <imglist name="skin_soui"	src="imgx:png_soui"/>
-  <imglist name="skin_btn_expand" src="imgx:btn_expand" states="6">
+  <!-- treeview/动画页的"收起/展开"竖条:矢量 6 态(16x36 圆角胶囊 + 1.5px 圆头 chevron),
+       normal 浅灰 / hover / push 逐级加深,checked 时箭头朝左表示"点击可收起";
+       取代原来的 6 态 PNG(btn_expand_light),避免 125% DPI 拉伸后的锯齿。
+       用法:page_ani3.xml 的 tgl_left。 -->
+  <imglist name="skin_btn_expand" src="svg:toggle_expand" states="6">
     <states>
       <state index="0" value="normal"/>
       <state index="1" value="hover"/>
@@ -128,14 +153,22 @@
   <imglist name="svg_btn_menu" src="svg:btn_menu" states="3"/>
   <imglist name="svg_btn_back" src="svg:btn_back" states="3"/>
   <imglist name="svg_nav_bg" src="svg:nav_bg"/>
-  <colorrect name="skin_nav_back_bk" normal="#00FFFFFF" hover="#BFDBFE" pushdown="#93C5FD" cornerRadius="6"/>
-  <!-- 浏览器工具栏背景:沿用 demo 浅色圆角卡片风格(frosted white + 浅灰描边) -->
-  <colorrect name="skin_webkit_nav_bk" normal="#E6FFFFFF" hover="#E6FFFFFF" pushdown="#E6FFFFFF" normalBorder="#E2E8F0" hoverBorder="#E2E8F0" borderWidth="1" cornerRadius="10"/>
+  <colorrect name="skin_nav_back_bk" normal="#FFFFFF" hover="@color/clr_sunk" pushdown="#E8EAED" cornerRadius="6"/>
+  <!-- 浏览器工具栏背景:浅灰圆角条。
+       用 SVG 九宫格(imgframe)而不是 colorrect:colorrect 设 borderWidth 后圆角描边会画成直角,
+       改由 web_toolbar_bg.svg 出圆角和描边,九宫格只拉伸中间段。
+       margin=12 与 SVG 的圆角半径 10 匹配,保证角不被拉伸变形 -->
+  <imgframe name="skin_webkit_nav_bk" src="svg:web_toolbar_bg" margin="12,12,12,12"/>
   <imglist name="skin_svg_radio_num" src="svg:radio_num" states="3"/>
   <imglist name="svg_tab_page" src="svg:tab_page" states="6"/>
   <imglist name="svg_tab_layout" src="svg:tab_layout" states="6"/>
   <imglist name="svg_tab_animator" src="svg:tab_animator" states="3"/>
   <imglist name="svg_tab_misc" src="svg:tab_misc" states="11"/>
+  <!-- 左侧竖排导航页签:normal 透明 / hover 白底 / 选中浅青底圆角+左侧 3px 主色指示条(页切换主导航需要指示条强化当前位置),
+       替代 _skin.sys.tab.page 的系统默认页签;左 20px 九宫格保护区包住圆角与指示条不被拉伸 -->
+  <imgframe name="skin_tab_nav" src="svg:tab_nav" states="3" margin="20,10,20,10"/>
+  <!-- 顶部页签:normal 透明 / hover 白底圆角 / 选中主色下划线(无底色) -->
+  <imgframe name="skin_tab_nav_top" src="svg:tab_nav_top" states="3" margin="10,10,10,6"/>
   <!-- 动态创建窗口演示页:wnd_container 的容器标识背景(蓝色虚线框+角标) -->
   <imglist name="svg_container_bg" src="svg:container_bg"/>
   <!-- 跑马机下注金币(SVG 重制版,3 态:normal/hover/push) -->
@@ -170,4 +203,238 @@
        21-23 爆炸 / 24 标题图标 / 25 出生信标 / 26 无敌护盾环 -->
   <imglist name="svg_tank" src="svg:tank" states="27"/>
   <imglist name="svg_tank_wall" src="svg:tank_wall" tile="1"/>
+
+  <!-- ============ 工具型中性风格(首页) ============ -->
+  <!-- 卡片:白底 + 1px 浅灰描边 + 10px 圆角,悬停只加深描边,不用阴影 -->
+  <colorrect name="skin_card" normal="@color/clr_card_bg" hover="@color/clr_card_bg" pushdown="@color/clr_sunk"
+             normalBorder="@color/clr_line" hoverBorder="@color/clr_line_hover" pushdownBorder="@color/clr_line_hover"
+             borderWidth="1" cornerRadius="10"/>
+  <!-- 首页宫格卡片(可点击):悬停底色 #FCFCFD + 描边转主色,按下回落到浅灰底。
+       与 skin_card 同一圆角档(10),只给首页 imgbtn 使用;普通容器卡片仍用 skin_card。 -->
+  <colorrect name="skin_card_click" normal="@color/clr_card_bg" hover="@color/clr_card_hover"
+             pushdown="@color/clr_sunk" normalBorder="@color/clr_line" hoverBorder="@color/clr_primary"
+             pushdownBorder="@color/clr_primary_dark" borderWidth="1" cornerRadius="10"/>
+  <!-- 图标底:青色浅底。用 imgframe(矢量九宫格)而非 colorrect,colorrect 不参与
+       OnColorize,换肤时会停在青色;imgframe 走 SVG 重染,可跟随主题色。
+       margin=9 保证 52x52 / 34x34 等尺寸下 8px 圆角不变形。 -->
+  <imgframe name="skin_icon_tile" src="svg:acc_icon_tile" margin="9,9,9,9"/>
+  <!-- 青色图标精灵(由 home_icons.svg 改色而来) -->
+  <imglist name="svg_home_icons_teal" src="svg:home_icons_teal" states="8"/>
+
+  <!--
+    标题栏窗口按钮:用矢量图标替代 _skin.sys.btn.* 位图皮肤。
+    位图在高 DPI 下会被非整数倍拉伸,边缘发虚并出现锯齿;矢量按目标尺寸栅格化。
+    skin_cap 只负责最小化/最大化/还原按钮的悬停、按下底色,图标由子 <img> 绘制。
+  -->
+  <imglist name="svg_win_icons" src="svg:win_icons" states="4"/>
+  <!-- colorrect 不支持全透明(#00xxxxxx 会退化成纯色),这里用与标题栏同色的白底 -->
+  <colorrect name="skin_cap" normal="#FFFFFF" hover="#F2F3F5" pushdown="#E8EAED" cornerRadius="4"/>
+  <!-- 关闭按钮:单独一套 4 态皮肤(红底 + 白叉),不用 skin_cap 的浅灰反馈。
+       常态透明底 + 深灰叉,悬停 #C42B1C 红底白叉,按下 #B32A1E 更深红 + 白叉。
+       用法:dlg_main.xml 的 id=1 关闭按钮 skin="skin_cap_close",不要再内嵌 svg_win_icons 图标。 -->
+  <imglist name="skin_cap_close" src="svg:win_close" states="4"/>
+  <!-- spinButton(数字输入框右侧的上下箭头)的箭头皮肤:
+       内置皮肤 SKIN_SYS_SPIN_UP/DOWN 是位图,在 125%/150% DPI 下会被非整数倍拉伸,
+       出现锯齿和模糊;这里换成矢量 chevron,3 态 = normal / hover / pushdown。
+       用法:spinButton upskin="skin_spin_up" downskin="skin_spin_down"。 -->
+  <imglist name="skin_spin_up" src="svg:spin_up" states="3"/>
+  <imglist name="skin_spin_down" src="svg:spin_down" states="3"/>
+
+  <!-- ============ 内容页:侧边导航 ============ -->
+  <!-- 导航项:未选中白底(与侧栏同色)、悬停浅灰、选中青色浅底。
+       用 imgframe(SVG 九宫格)替代 colorrect,colorrect 不能被换肤重染,
+       选中态会一直停在浅青;SVG 皮肤可随主题色变化。margin=7 对应圆角 6。 -->
+  <imgframe name="skin_nav_item" src="svg:acc_nav_item" states="4" margin="7,7,7,7"/>
+  <!-- 选中项左侧 3px 竖条:normal/hover 与导航项底色一致(视觉上隐身),选中才显示主色。
+       同样换成 SVG imglist 以便跟随换肤。 -->
+  <imglist name="skin_nav_bar" src="svg:acc_nav_bar" states="4"/>
+  <!-- 分组标题:悬停浅灰 -->
+  <colorrect name="skin_nav_group" normal="@color/clr_card_bg" hover="@color/clr_sunk"
+             pushdown="@color/clr_sunk" cornerRadius="6"/>
+
+  <!-- ============ 按钮 ============ -->
+  <!-- 次要按钮:白底 + 1px 描边,悬停加深描边,按下变浅灰 -->
+  <colorrect name="skin_btn" normal="@color/clr_card_bg" hover="@color/clr_sunk"
+             pushdown="#E8EAED" disable="#F4F5F7"
+             normalBorder="@color/clr_line" hoverBorder="@color/clr_line_hover"
+             pushdownBorder="@color/clr_line_hover" disableBorder="@color/clr_line"
+             borderWidth="1" cornerRadius="6"/>
+  <!-- 主按钮:青色实心。改用 4 态 imgframe(SVG 九宫格)替代 colorrect:
+       colorrect 没有 OnColorize,换主题色时不会重染,会一直停在青色;
+       imgframe 由 SSkinImgList 的 SVG 重染实现,能跟随换肤。
+       帧序:0=normal 1=hover 2=pushdown 3=disable。 -->
+  <imgframe name="skin_btn_primary" src="svg:acc_btn_primary" states="4" margin="7,7,7,7"/>
+  <!-- 幽灵按钮:与卡片同色,只有浅青悬停底。
+       hover/pushdown 的浅青必须能跟随主题色,所以用 SVG imgframe 替代 colorrect
+       (colorrect 不参与 OnColorize)。帧序:0=normal 1=hover 2=pushdown 3=disable。 -->
+  <imgframe name="skin_btn_ghost" src="svg:acc_btn_ghost" states="4" margin="7,7,7,7"/>
+  <!-- 危险按钮:白底 + 红色描边 -->
+  <colorrect name="skin_btn_danger" normal="@color/clr_card_bg" hover="#FDF1F0"
+             pushdown="#FBE4E2" normalBorder="#F0C9C5" hoverBorder="#E6A9A3"
+             pushdownBorder="#E6A9A3" borderWidth="1" cornerRadius="6"/>
+
+  <!-- ============ 选择控件 ============ -->
+  <!-- checkAsPushdown 默认为 true,会把 checked 映射到 pushdown 帧(2);置 0 才能用 4..7 的选中帧 -->
+  <imglist name="skin_check" src="svg:chk" states="8" checkAsPushdown="0"/>
+  <imglist name="skin_radio" src="svg:radio" states="8" checkAsPushdown="0"/>
+  <!-- 树控件专用复选框:9 态(0..2 未选 / 3..5 选中 / 6..8 半选)。
+       STreeCtrl 把 toggle、复选框、节点图标按各自宽度紧挨着排(没有间隙属性可调),
+       所以这里用 18px 画布 + 中间 12px 方框,靠帧内 3px 透明边形成间隙,
+       否则 18px 的通用 skin_check 会又大又贴着箭头和图标。
+       注意:checkAsPushdown 也要关掉,选中态才会走 3..5 帧而不是复用 2 帧。 -->
+  <imglist name="skin_tree_chk" src="svg:tree_chk" states="9" checkAsPushdown="0"/>
+  <!-- 开关:轨道(single) + 覆盖式滑块(8 态,轨道颜色随状态变化) -->
+  <!-- 开关轨道:用卡片同色让轨道"隐形"。SSwitch 先画轨道再画 skinforce 覆盖,
+       轨道若为灰色,在覆盖不足的一侧(高 DPI 舍入)会露出灰边/锯齿。 -->
+  <colorrect name="skin_switch_track" normal="@color/clr_card_bg" cornerRadius="10"/>
+  <imglist name="skin_switch_full" src="svg:switch" states="8" checkAsPushdown="0"/>
+
+  <!-- 卡片标题左侧 3px 青色竖条。改用 SVG imglist 以便参与换肤重染;
+       页面里固定为 size="3,12",不需要九宫格。 -->
+  <imglist name="skin_card_bar" src="svg:acc_bar"/>
+  <!-- 分组展开箭头:8 态,0..3 折叠(右箭头) 4..7 展开(下箭头),与 SetToggle(!bCollapsed) 对应 -->
+  <!-- 分段按钮:checked 走 pushdown 帧,所以用浅青底 + 浅青描边表示选中。
+       选中态的浅青/描边要随主题色变化,改成 4 帧 SVG imgframe(含 1px 描边)。 -->
+  <imgframe name="skin_btn_seg" src="svg:acc_btn_seg" states="4" margin="7,7,7,7"/>
+  <!-- 图标型单选:3 态(灰线/深灰线/青色实底),画布不透明避免分层窗口灰边 -->
+  <imglist name="skin_icon_msg" src="svg:icon_msg" states="3"/>
+  <imglist name="skin_icon_contacts" src="svg:icon_contacts" states="3"/>
+  <imglist name="skin_icon_group" src="svg:icon_group" states="3"/>
+  <!-- checkAsPushdown 默认为 true(checked 会画第 2 帧=按下态),这里置 0 才能用 4..7 的选中帧:
+       收起 -> 第 0 帧(右箭头),展开 -> 第 4 帧(下箭头) -->
+  <imglist name="svg_nav_chevron" src="svg:nav_chevron" states="8" checkAsPushdown="0"/>
+  <!-- 演示头像:几何图形绘制,替代低分辨率位图 -->
+  <imglist name="svg_avatar" src="svg:avatar" states="1"/>
+  <imglist name="svg_avatar_round" src="svg:avatar_round" states="1"/>
+  <!-- 滚动条滑块:圆角胶囊、无箭头、轨道全透明。
+       scrollbar_pill.svg 沿用 scrollbar 皮肤的九宫格约定:单元格 12px,9 列(0 上箭头 / 1 下箭头 / 2 纵向滑块 /
+       3 纵向轨道 / 4 左箭头 / 5 右箭头 / 6 横向滑块 / 7 横向轨道 / 8 角落) x 4 行(normal / hover / pushdown /
+       inactive);箭头列与轨道列留空。滑块宽 8px、左右各留 2px 空白,渲染到 8px 宽的滚动条后即 5px 滑块 + 1px 间隙。
+       margin=4 触发九宫格:上下(横向时为左右)各 4px 的圆角帽不被拉伸,滑块两端才是圆头。
+       用法:控件 sbSkin="skin_scrollbar" + sbWid="8"。想让滚动条默认隐形、悬停或滚轮时才淡入,
+       再配 sbFadeFrames="30" + sbTrumbTrackMinAlpha="0"(0 = 静止时完全透明)。 -->
+  <scrollbar name="skin_scrollbar" src="svg:scrollbar_pill" margin="4"/>
+
+  <!-- ============ 列表 / 进度 / 日历 / 输入框:通用中性件 ============ -->
+  <!-- 列表表头单元格:透明白底 + 底部 1px 发丝线(由 table_header.svg 拉伸绘制),
+       悬停/按下用浅底反馈可排序;禁用帧用于表头右侧空白填充区,保证底边线连续。
+       表头不再整块铺灰,只保留一条发丝线做分隔,视觉上更接近现代表格 -->
+  <imglist name="skin_header" src="svg:table_header" states="4">
+    <states>
+      <!-- 帧0:常规 -->
+      <state index="0" value="normal"/>
+      <!-- 帧1:悬停(可点击排序) -->
+      <state index="1" value="hover"/>
+      <!-- 帧2:按下 -->
+      <state index="2" value="pushdown"/>
+      <!-- 帧3:禁用/空白填充 -->
+      <state index="3" value="disable"/>
+    </states>
+  </imglist>
+  <!-- 数据行分隔线:1px 极浅灰,只做横向分隔,不画竖线 -->
+  <!-- 列表行分隔线:左右内缩 12px(九宫格横向拉伸),与行高亮的内缩边界对齐,
+       形成"浮起"的分割线而不是通栏直线。用法:mclistview/listctrl 的 dividerSkin="skin_row_divider"。
+       注意 imgframe 竖向 margin 必须为 0,分隔线本身只有 1px 高。 -->
+  <imgframe name="skin_row_divider" src="svg:row_divider_inset" states="1" margin="12,0,12,0"/>
+  <!-- 进度条:浅灰轨道 + 青色进行段(4px 圆角),替代 _skin.sys.prog.* 的渐变 3D 槽 -->
+
+  <!-- 底槽 4px 圆角;圆角档位统一为 4(小元件)/6(按钮与输入框)/10(卡片与浮层) -->
+  <colorrect name="skin_prog_bk" normal="#E4E7EB" cornerRadius="4"/>
+  <!-- 进度条/滑块填充段:改用 SVG 九宫格(imgframe)代替 colorrect。
+       进度条(posSkin)与滑块填充共用同一皮肤对象,SProgress 会把 posSkin 转发给
+       OnColorize;只有 SVG 皮肤才会按主题色重染,换肤后才能跟着主色一起变。
+       margin=3 让 6px 高的滑块轨道与 12px 高的进度条都不拉坏圆角。 -->
+  <imgframe name="skin_prog_bar" src="svg:acc_prog_bar" states="4" margin="3,3,3,3"/>
+  <!-- 滑块轨道:必须带 size 的 shape 皮肤,sliderbar 会用轨道尺寸参与居中计算,
+       纯 colorrect 尺寸为 0 会让轨道高度收敛为 0(不绘制) -->
+  <shape name="skin_slider_rail" shape="rectangle">
+    <size width="6" height="6"/>
+    <solid color="#E4E7EB"/>
+    <corners radius="3"/>
+  </shape>
+  <imglist name="skin_slider_thumb" src="svg:slider_thumb" states="4" />
+  <!-- 树展开开关:0..2 收起箭头 / 3..5 展开箭头,替代 _skin.sys.tree.toggle 的 ± 方块 -->
+  <imglist name="skin_tree_toggle" src="svg:tree_toggle" states="6" />
+  <!-- 日历单元格:白底 + 浅灰描边,悬停浅青,选中深浅青 + 主色描边。
+       浅青与描边都要跟随换肤,改成 4 帧 SVG imgframe(margin=5 对应圆角 4)。 -->
+  <imgframe name="skin_cal_day" src="svg:acc_cal_day" states="4" margin="5,5,5,5"/>
+  <!-- 树节点行底:选中态映射到 pushdown 帧(浅青)。
+       改成 SVG imgframe,选中行的浅青才能跟随主题色。 -->
+  <imgframe name="skin_tree_item" src="svg:acc_tree_item" states="4" margin="5,5,5,5"/>
+  <!-- 页签项:浏览器页签造型——上方圆角 7px、下方直角,未选中浅蓝灰、悬停深一档、选中纯白(与内容区连成一体)。
+       替代原 colorrect(直角边框矩形,视觉上像灰色按钮块)。
+       ChromeTab 选中态是 WndState_Check(4),而精灵只有 0~3 帧,必须把 checked 映射到 pushdown 帧,
+       否则选中页签与未选中外观完全相同。 -->
+  <imgframe name="skin_tab_item" src="svg:tab_item" states="4" margin="8,8,8,8">
+    <states>
+      <state index="2" value="checked"/>
+    </states>
+  </imgframe>
+  <!-- 页签条底色:浅蓝灰,上方两角圆角 12px、下方直角。垫在 chromeTabCtrl 底下,
+       让未选中页签有层次、选中页签(白)与下方内容区连成一体。用法:包住 chromeTabCtrl 的父 window 设此 skin。 -->
+  <imgframe name="skin_tabstrip_bg" src="svg:tabstrip_bg" states="1" margin="11,11,11,11"/>
+  <!-- 列表行底:normal/hover/选中(映射 pushdown 帧)/disable。
+       改成九宫格 imgframe(margin 10):行高亮四周内缩 4px、四角 6px 圆角,选中行是"胶囊"而不是整条色带。 -->
+  <imgframe name="skin_list_item" src="svg:acc_list_item" states="4" margin="10,10,10,10"/>
+  <!-- 列表框/下拉列表行底:3 态(normal 透明 / hover 浅灰 / 选中 浅青),四周内缩 4px + 6px 圆角。
+       用法:listbox/liststyle 设 itemSkin="skin_lb_item"。
+       作用:行高亮不再通铺到客户区边缘,四周内缩 4px 形成明显的"胶囊",也不会盖住列表框自身的圆角描边。 -->
+  <imgframe name="skin_lb_item" src="svg:lb_item" states="3" margin="10,10,10,10"/>
+  <!-- 输入类控件外框:白底 + 1px 浅灰线,悬停变主色描边,6px 圆角,替代内置 _skin.sys.border 的蓝色凹框。
+       用法:控件同时设 skin(画完整圆角描边) + ncSkin + margin="0"。
+       原因:SRichEdit/SDateTimePicker 构造时会把内置 _skin.sys.border 设为 m_pNcSkin,margin="0" 让 OnNcPaint 直接返回,从而屏蔽这个蓝色外环;
+       ncSkin 必须指到本皮肤,避免内置蓝框回来。OnNcPaint 只有 normal(0)/hover(1) 两帧,焦点态无法映射。 -->
+  <colorrect name="skin_edit_nc" normal="@color/clr_card_bg" hover="@color/clr_card_bg"
+             normalBorder="@color/clr_line" hoverBorder="@color/clr_primary"
+             borderWidth="1" cornerRadius="6"/>
+  <!-- 组合框内嵌编辑框的底色:白色 6px 圆角块,无描边。
+       用法:<editstyle margin="1" skin="skin_edit_fill" ncskin="none" colorBkgnd="@color/clr_card_bg"/>
+       作用:编辑框客户区(内缩 1px)只填白色圆角块,不遮挡组合框自身的 1px 圆角描边。
+       原因:直接用 colorBkgnd 的方形白底会把左上/左下圆角抹平;ncskin="none" 用于屏蔽 SRichEdit 内置的蓝色外环
+            (该外环是矩形环,会把圆角弧裁掉,所以不能用 skin_edit_nc 当 ncSkin)。 -->
+  <colorrect name="skin_edit_fill" normal="@color/clr_card_bg" hover="@color/clr_card_bg" cornerRadius="6"/>
+  <!-- 下拉列表/列表框外框:白底 + 1px 浅灰描边 + 6px 圆角。
+       用法:listbox / liststyle 设 margin="6" ncskin="skin_popup" skin="none"
+            colorBkgnd="@color/clr_card_bg" sbSkin="skin_scrollbar" sbWid="6" sbArrowSize="0"
+       作用:描边画在窗口非客户区(最外 6px 环)上,而滚动条在客户区内,于是滚动条被这圈描边包住。
+       注意:margin 必须 >= cornerRadius,否则 OnNcPaint 的 RGN_DIFF(客户区) 会把圆角弧裁成缺口。 -->
+  <colorrect name="skin_popup" normal="@color/clr_card_bg" normalBorder="@color/clr_line"
+             borderWidth="1" cornerRadius="6"/>
+
+  <!-- ============ 弹出菜单(SMenuEx 自绘菜单) ============ -->
+  <!-- 菜单背景:9 宫格圆角白卡片 + 1px 浅灰描边(不带投影,避免 9 宫格拉伸出灰黑硬边)。
+       用法:menuRoot 根节点设 skin="skin_menu_bg"(SMenuEx 宿主窗口是 translucent,支持真 alpha)。
+       margin=10 是皮肤自身 9 宫格的分块尺寸,与窗口非客户区无关。 -->
+  <imgframe name="skin_menu_bg" src="svg:menu_bg" margin="10,10,10,10"/>
+  <!-- 子菜单箭头:两帧(normal/hover),用法:menuRoot 根节点设 arrowSkin="skin_menu_arrow"。 -->
+  <imgframe name="skin_menu_arrow" src="svg:menu_arrow" states="2"/>
+  <!-- 菜单项底色:白底 + 悬停中性浅灰圆角底。
+       弹窗菜单不在主窗口的染色遍历里,所以这里刻意用无色相的灰,
+       避免换肤后弹窗里的浅青与主题色打架。 -->
+  <colorrect name="skin_menu_item" normal="@color/clr_card_bg" hover="@color/clr_sunk" cornerRadius="4"/>
+  <!-- 菜单分隔线:1px 浅灰实线(colorrect 无固有尺寸,sep 自动取高度 1px)。 -->
+  <colorrect name="skin_menu_sep" normal="@color/clr_divider"/>
+  <!-- 菜单勾选标记:两帧(normal/备用),用法:menuRoot 根节点设 checkSkin="skin_menu_check"。 -->
+  <imgframe name="skin_menu_check" src="svg:menu_check" states="2"/>
+
+  <!-- ============ 消息框(SMessageBox 模板) ============ -->
+  <!-- 消息框主按钮:中性深色实心 + 白字。
+       消息框是独立 popup 窗口,不参与换肤染色;如果用主题青,换到红色主题后会
+       停在青色,所以改用无色相的中性深色,任何主题下都成立。
+       用法:xml/msgbox.xml 的 style msgbtn_primary。 -->
+  <colorrect name="skin_btn_primary_neutral" normal="#1F2329" hover="#33383F"
+             pushdown="#14181D" disable="#C9CDD4" cornerRadius="6"/>
+  <!-- 消息框背景:9 宫格圆角白卡片 + 1px 浅灰描边,不带投影(与弹出菜单同一设计语言)。
+       用法:xml/msgbox.xml 的 <root> 节点设 skin="skin_msgbox_bg"。
+       margin=12 是皮肤自身的 9 宫格分块尺寸,与宿主窗口非客户区无关。 -->
+  <imgframe name="skin_msgbox_bg" src="svg:msgbox_bg" margin="12,12,12,12"/>
+  <!-- 标题栏关闭按钮:4 态(normal/hover/pushdown/disable)28x28 矢量叉,
+       替代位图皮肤 _skin.sys.btn.close,高 DPI 下不再出现拉伸锯齿。
+       用法:<imgbtn id="2" skin="skin_msgbox_close" size="28,28" drawFocusRect="0"/> -->
+  <imglist name="skin_msgbox_close" src="svg:msgbox_close" states="4"/>
+  <!-- 消息框类型图标:5 帧,帧号 0..4 依次对应 MB_USERICON/WARNING/INFORMATION/STOP/QUESTION,
+       与 SMessageBoxImpl::OnSetIcon 的 SetIcon(0..4) 一一对应。
+       用法:<img name="msgicon" skin="skin_msgbox_icon" size="36,36"/> -->
+  <imglist name="skin_msgbox_icon" src="svg:msgbox_icons" states="5"/>
+
 </skin>

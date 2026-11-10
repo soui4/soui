@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="336" height="48" viewBox="0 0 336 48" fill="none">
+  <!--
+    page_icons.svg - 通用页面图标集,7 帧横向排布,每帧 48x48,等比于原 image/page_icons.png
+    (原 PNG 是 1x 位图,125% DPI 下被放大后发糊、边缘锯齿;这里改成矢量,任意 DPI 都清晰)
+
+    统一风格:中性灰 #6B7280、线宽 3.2、圆头线帽/圆角连接,局部用主题青 #12A594 点缀。
+    帧序:0=控件(面板) 1=教程(书) 2=脚本/收藏(星) 3=布局(四宫格) 4=杂项(分层) 5=动画(画笔) 6=关于(信息)
+  -->
+
+  <!-- 帧 0(+0):控件 -- 带标题栏的面板 -->
+  <rect x="10" y="11" width="28" height="26" rx="4" stroke="#6B7280" stroke-width="3.2"/>
+  <path d="M10 19.5 H38" stroke="#6B7280" stroke-width="3.2"/>
+  <circle cx="15.5" cy="15.2" r="1.6" fill="#6B7280" stroke="none"/>
+
+  <!-- 帧 1(+48):教程 -- 摊开的书,右页夹一枚青色书签 -->
+  <path d="M72 15 C67 11.2 59 11.2 56 13 L56 34 C59 32.2 67 32.2 72 36 C77 32.2 85 32.2 88 34 L88 13 C85 11.2 77 11.2 72 15 Z"
+        stroke="#6B7280" stroke-width="3.2" stroke-linejoin="round"/>
+  <path d="M78 12.4 L78 21 L81 19.2 L84 21 L84 12.4 Z" fill="#12A594" stroke="none"/>
+
+  <!-- 帧 2(+96):星 -->
+  <path d="M120 8 L123.76 18.82 L135.2 19.06 L126.09 25.98 L129.4 36.94 L120 30.4 L110.6 36.94
+           L113.91 25.98 L104.8 19.06 L116.24 18.82 Z"
+        stroke="#6B7280" stroke-width="3.2" stroke-linejoin="round"/>
+
+  <!-- 帧 3(+144):布局 -- 四宫格 -->
+  <rect x="154" y="10" width="12" height="12" rx="3" stroke="#6B7280" stroke-width="3.2"/>
+  <rect x="170" y="10" width="12" height="12" rx="3" stroke="#6B7280" stroke-width="3.2"/>
+  <rect x="154" y="26" width="12" height="12" rx="3" stroke="#6B7280" stroke-width="3.2"/>
+  <rect x="170" y="26" width="12" height="12" rx="3" stroke="#6B7280" stroke-width="3.2"/>
+
+  <!-- 帧 4(+192):杂项 -- 三层叠加 -->
+  <path d="M216 10 L230 17 L216 24 L202 17 Z" stroke="#6B7280" stroke-width="3.2" stroke-linejoin="round"/>
+  <path d="M202 24 L216 31 L230 24" stroke="#6B7280" stroke-width="3.2" stroke-linejoin="round"/>
+  <path d="M202 31 L216 38 L230 31" stroke="#6B7280" stroke-width="3.2" stroke-linejoin="round"/>
+
+  <!-- 帧 5(+240):画笔 -- 斜置的笔身 + 笔尖 -->
+  <path d="M254 36 L258 27 L269 16 L276 23 L265 34 Z" stroke="#6B7280" stroke-width="3.2" stroke-linejoin="round"/>
+  <path d="M269 16 L276 23" stroke="#12A594" stroke-width="3.2" stroke-linejoin="round"/>
+
+  <!-- 帧 6(+288):关于 -- 圆圈 info -->
+  <circle cx="312" cy="24" r="14" stroke="#6B7280" stroke-width="3.2"/>
+  <circle cx="312" cy="16.5" r="1.8" fill="#6B7280" stroke="none"/>
+  <path d="M312 22 L312 33" stroke="#6B7280" stroke-width="3.2"/>
+</svg>

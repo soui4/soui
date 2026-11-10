@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <UIDEF>
-  <deffont value="face:宋体,size:16">
-    <macos value="face:simsun,size:16"/>
+  <deffont value="face:微软雅黑,size:13">
+    <macos value="face:simsun,size:13"/>
   </deffont>
 
   <unit defUnit="dp"/>
@@ -23,9 +23,11 @@
 
     <class name="cls_btn_link"    cursor="hand" colorHover="#0A84D2" />
     <!--定义文字按钮的样式-->
-    <class name="cls_btn_weblink" cursor="hand" colorText="#1e78d5" colorTextHover="#1e78d5" fontHover="underline:1,italic:1" />
+    <!-- 外链:统一改用主色青,悬停仅下划线(去掉旧的蓝色+斜体) -->
+    <class name="cls_btn_weblink" cursor="hand" colorText="@color/clr_primary" colorTextHover="@color/clr_primary_dark" fontHover="underline:1" />
 
-    <class name="cls_txt_red"     font="face:宋体,bold:1"  colorText="#FF0000" />
+    <!-- 警示文字:统一用现代无衬线字体与设计令牌危险色,替代旧宋体纯红 -->
+    <class name="cls_txt_red"     font="face:微软雅黑,size:12,bold:1"  colorText="@color/clr_danger" />
     <!--定义白色粗体宋体-->
     <class name="cls_txt_black"   font="face:宋体,bold:1"  colorText="#000000" />
     <!--定义黑色粗体宋体-->
@@ -42,6 +44,12 @@
 
     <class name="linkimage" cursor="hand"/>
     <class name="cls_border" margin="2,2,2,2" ncSkin="_skin.sys.border"/>
+    <!-- 主按钮(品牌青实底):四态文字固定白色。
+         不写这几个字色会继承 objattr 里 window 的 thm_txt_hover / thm_txt_push(深灰),
+         白字在悬停/按下时会变成灰/黑,压在青色实底上几乎看不清。 -->
+    <class name="cls_btn_primary" skin="skin_btn_primary" cursor="hand"
+           colorText="#FFFFFF" colorTextHover="#FFFFFF" colorTextPush="#FFFFFF" colorTextDisable="#FFFFFF"
+           font="face:微软雅黑,size:13" drawFocusRect="0"/>
     <!--演示使用新的style定义方式，在布局里可以直接引用button.link来创建一个button控件，并且使用下面button.link定义的style-->
     <button.link cursor="hand" colorText="#1e78d5" colorTextHover="#1e78d5" fontHover="underline:1,italic:1"/>
     <link.web cursor="hand" colorText="#1e78d5" colorTextHover="#1e78d5" fontHover="underline:1,italic:1"/>

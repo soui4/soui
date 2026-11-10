@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  slider_thumb.svg - 滑块手柄 4 态精灵(nanosvg 兼容)
+  每帧 18x18,总尺寸 72x18。
+  帧序:0=普通 1=悬停 2=按下 3=禁用
+  实心圆无底色(圆形内部即背景色),与浅灰轨道形成对比。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="72" height="18" viewBox="0 0 72 18">
+
+  <!-- 帧0:普通 -->
+  <g transform="translate(0,0)">
+    <circle cx="9" cy="9" r="7.2" fill="#FFFFFF" stroke="#D0D5DD" stroke-width="1.2"/>
+  </g>
+
+  <!-- 帧1:悬停 -->
+  <g transform="translate(18,0)">
+    <circle cx="9" cy="9" r="7.2" fill="#FFFFFF" stroke="#0E9F9F" stroke-width="1.4"/>
+  </g>
+
+  <!-- 帧2:按下 -->
+  <g transform="translate(36,0)">
+    <circle cx="9" cy="9" r="7.2" fill="#E9F7F7" stroke="#0E9F9F" stroke-width="1.4"/>
+  </g>
+
+  <!-- 帧3:禁用 -->
+  <g transform="translate(54,0)">
+    <circle cx="9" cy="9" r="7.2" fill="#F2F3F5" stroke="#E4E7EB" stroke-width="1.2"/>
+  </g>
+</svg>

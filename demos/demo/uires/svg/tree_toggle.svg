@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  tree_toggle.svg - 树控件展开/收起开关图标 6 态精灵(nanosvg 兼容)
+  每帧 14x14,总尺寸 84x14。
+  帧序:0..2 = 收起(箭头朝右) / 3..5 = 展开(箭头朝下),每段内为 普通/悬停/按下。
+  造型直接沿用"基础控件"页左侧导航列表分组头的箭头(svg/nav_chevron.svg):
+  同一组 chevron 路径、1.5px 圆头笔画、同一组三段灰阶(#9AA1AC / #6B7280 / #4B5563),
+  只是把 12x12 的图形整体偏移 (+1,+1) 居中放进 14x14 帧,保证 toggle 的占位宽度
+  和节点图标(16px)、复选框不变,树行不会因为换图标而左右跳动。
+  之前的版本是自绘的青色尖角箭头(线宽 1.3、端点为平角),和导航列表的箭头观感不一致。
+  用法:values/skin.xml 的 skin_tree_toggle(treectrl 的 toggleSkin、treeview 的 toggleSkin);
+  STreeCtrl 取帧规则:nImage = 普通/悬停/按下(0..2),展开时再 +3。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="84" height="14" viewBox="0 0 84 14">
+
+  <!-- 帧0:收起-普通 -->
+  <g transform="translate(0,0)">
+    <path d="M5.5 4 L8.5 7 L5.5 10" fill="none" stroke="#9AA1AC" stroke-width="1.5"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- 帧1:收起-悬停 -->
+  <g transform="translate(14,0)">
+    <path d="M5.5 4 L8.5 7 L5.5 10" fill="none" stroke="#6B7280" stroke-width="1.5"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- 帧2:收起-按下 -->
+  <g transform="translate(28,0)">
+    <path d="M5.5 4 L8.5 7 L5.5 10" fill="none" stroke="#4B5563" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- 帧3:展开-普通 -->
+  <g transform="translate(42,0)">
+    <path d="M4 5.5 L7 8.5 L10 5.5" fill="none" stroke="#9AA1AC" stroke-width="1.5"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- 帧4:展开-悬停 -->
+  <g transform="translate(56,0)">
+    <path d="M4 5.5 L7 8.5 L10 5.5" fill="none" stroke="#6B7280" stroke-width="1.5"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- 帧5:展开-按下 -->
+  <g transform="translate(70,0)">
+    <path d="M4 5.5 L7 8.5 L10 5.5" fill="none" stroke="#4B5563" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

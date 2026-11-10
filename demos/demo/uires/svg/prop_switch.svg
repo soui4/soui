@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 属性表分组折叠箭头:12x12 横向 4 帧,顺序对应 SPropertyGrid 的 iState
+     (0=组展开/向下 1=组折叠/向右 2=子项展开/向下 3=子项折叠/向右),替代位图 png_propswitch -->
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="12" viewBox="0 0 48 12">
+  <!-- 帧0 组展开:向下箭头,正文灰加粗 -->
+  <path d="M3 4 L6 7.5 L9 4" fill="none" stroke="#4E5969" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 帧1 组折叠:向右箭头,正文灰加粗 -->
+  <path d="M16.5 3 L20 6 L16.5 9" fill="none" stroke="#4E5969" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 帧2 子项展开:向下箭头,次要灰细线 -->
+  <path d="M27 4 L30 7.5 L33 4" fill="none" stroke="#86909C" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 帧3 子项折叠:向右箭头,次要灰细线 -->
+  <path d="M40.5 3 L44 6 L40.5 9" fill="none" stroke="#86909C" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

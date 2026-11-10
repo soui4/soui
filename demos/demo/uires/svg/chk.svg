@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  chk.svg - 复选框 8 态精灵(nanosvg 兼容)
+  每帧 18x18,总尺寸 144x18。
+  帧序:0=normal 1=hover 2=pushdown 3=disable 4=checked 5=checked-hover 6=checked-pushdown 7=checked-disable
+  圆角 3(原来 4 在 18px 画布上太"圆肥"),描边 1.2 且未选中边框加深到 #B6BCC5,
+  保证在 125% DPI 放大后轮廓依然清晰;选中态纯色填充 + 白色对勾。
+  用法:values/skin.xml 的 skin_check(skin_radio 同理,只是另有一份 radio.svg)。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="144" height="18" viewBox="0 0 144 18">
+
+  <g transform="translate(0,0)">
+    <rect x="1.4" y="1.4" width="15.2" height="15.2" rx="3" fill="#FFFFFF" stroke="#B6BCC5" stroke-width="1.2"/>
+  </g>
+
+  <g transform="translate(18,0)">
+    <rect x="1.4" y="1.4" width="15.2" height="15.2" rx="3" fill="#F7F8FA" stroke="#8A94A6" stroke-width="1.2"/>
+  </g>
+
+  <g transform="translate(36,0)">
+    <rect x="1.4" y="1.4" width="15.2" height="15.2" rx="3" fill="#EFF1F3" stroke="#8A94A6" stroke-width="1.2"/>
+  </g>
+
+  <g transform="translate(54,0)">
+    <rect x="1.4" y="1.4" width="15.2" height="15.2" rx="3" fill="#F4F5F7" stroke="#DDE1E6" stroke-width="1.2"/>
+  </g>
+
+  <g transform="translate(72,0)">
+    <rect x="1" y="1" width="16" height="16" rx="3" fill="#0E9F9F"/>
+    <path d="M4.9 9.2 L7.6 11.9 L13.1 6.4" fill="none" stroke="#FFFFFF" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <g transform="translate(90,0)">
+    <rect x="1" y="1" width="16" height="16" rx="3" fill="#0B8888"/>
+    <path d="M4.9 9.2 L7.6 11.9 L13.1 6.4" fill="none" stroke="#FFFFFF" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <g transform="translate(108,0)">
+    <rect x="1" y="1" width="16" height="16" rx="3" fill="#0A7A7A"/>
+    <path d="M4.9 9.2 L7.6 11.9 L13.1 6.4" fill="none" stroke="#FFFFFF" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <g transform="translate(126,0)">
+    <rect x="1" y="1" width="16" height="16" rx="3" fill="#CFEDED"/>
+    <path d="M4.9 9.2 L7.6 11.9 L13.1 6.4" fill="none" stroke="#FFFFFF" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  tab_nav.svg - 左侧竖排导航页签皮肤(3 帧,nanosvg 兼容)
+  每帧 200x40,总尺寸 600x40。配合 imgframe margin="20,10,20,10" 九宫格拉伸:
+  左 20px 区域内的圆角与指示条保持不拉伸,中间区域随 tabWidth 伸缩。
+  帧序:normal(全透明) / hover(白底圆角) / pushdown=选中(浅青底+主色指示条)。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="40" viewBox="0 0 600 40">
+  <!-- frame 0: normal,全透明(仅占位,保证帧尺寸) -->
+  <rect x="2" y="1" width="196" height="38" rx="6" fill="#FFFFFF" fill-opacity="0"/>
+  <!-- frame 1: hover,白底圆角 -->
+  <rect x="202" y="1" width="196" height="38" rx="6" fill="#FFFFFF"/>
+  <!-- frame 2: 选中,浅青底圆角 + 左侧 3px 主色指示条。
+       tabctrl 是"一次只看一页"的页切换主导航,指示条能强化当前位置;
+       指示条放在胶囊内 6px 处(不贴最左),与图标左缘留 9px,不会和图标/文字凑成三根竖线 -->
+  <rect x="402" y="1" width="196" height="38" rx="6" fill="#E9F7F7"/>
+  <rect x="408" y="10" width="3" height="20" rx="1.5" fill="#0E9F9F"/>
+</svg>

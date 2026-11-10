@@ -1,4 +1,4 @@
-﻿﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   page_morectrl.xml - 更多扩展控件演示(page_ctrls 的 morectrl 子页)
 
@@ -6,40 +6,102 @@
   旋钮(imgknob)、水波进度(waveProgress)与验证码输入(verificationCodeEdit)。
   chromeTab 的 EventCmd 事件由 CMainDlg 按名绑定,不可改名。
 -->
-<window size="-2,-2" layout="vbox" interval="12" colorBkgnd="@color/clr_page_bg">
-	<text text="更多控件" font="size:16,bold:1" colorText="@color/clr_title"/>
-	<text text="菜单栏、Chrome 页签、旋钮、水波进度与验证码输入" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
-	<window size="-2,-1" padding="10,8,10,8" layout="hbox" gravity="center" interval="5">
-		<text text="menubar:" colorText="@color/clr_text"/>
-		<menubar size="-1,30">
-			<btnstyle skin="_skin.sys.list.item" padding="2"/>
-			<menus>
-				<menuItem src="SMENU:MENU_FILE">文件(&F)</menuItem>
-				<menuItem src="SMENU:MENU_EDIT">编辑(&E)</menuItem>
-				<menuItem src="SMENU:MENU_HELP">帮助(&H)</menuItem>
-			</menus>
-		</menubar>
-	</window>
-	<chromeTabCtrl size="-2,40" name="chromeTab" tabDesiredSize="200" enableDrag="1">
-		<tabStyle skin="_skin.sys.btn.normal"/>
-		<newBtnStyle size="40,30" skin="skin_chrome_tab_new"/>
-		<closeBtnStyle pos="-2,2" offset="-1,0" skin="skin_chrome_tab_close"/>
-		<tabs>
-			<chromeTab tip="the tab #1">tab1</chromeTab>
-			<chromeTab tip="the tab #2">tab2</chromeTab>
-			<chromeTab tip="the tab #3">tab3</chromeTab>
-		</tabs>
-	</chromeTabCtrl>
-	<window size="-2,-1" padding="12,10,12,10" layout="hbox" gravity="center" interval="20">
-		<imgknob size="80,80"  skin="skin_knob" min="0" max="1" value="0.5"/>
-		<imgknob size="80,80"  skin="skin_knob" min="0" max="1" value="0"/>
-	</window>
-	<window size="-2,-1" padding="12,10,12,10" layout="hbox" gravity="center" interval="20">
-		<waveProgress size="100,100" name="waveProgress0" value="50" min="0" max="100"/>
-		<waveProgress size="100,100" name="waveProgress1" value="60" min="0" max="100"/>
-		<waveProgress size="100,100" name="waveProgress2" value="80" min="0" max="100"/>
-	</window>
-	<window size="-2,-1" padding="12,10,12,10" layout="hbox" gravity="center">
-		<verificationCodeEdit size="300,40" name="verificationCodeEdit" maxBuffer="6"/>
+<window size="-2,-2" layout="vbox" padding="20,16,20,18" colorBkgnd="@color/clr_window_bg">
+	<!-- 页头 -->
+	<text text="更多控件" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
+	<text text="菜单栏、Chrome 页签、旋钮、水波进度与验证码输入" extend_top="6" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
+
+	<window size="-2,0" weight="1" layout="vbox" interval="10" extend_top="16">
+
+		<!-- 卡片:菜单栏 + Chrome 页签 -->
+		<window size="-2,0" weight="1" skin="skin_card" layout="vbox" padding="14,13,14,15">
+			<window size="-2,14" layout="hbox" gravity="center" interval="8">
+				<window size="3,12" skin="skin_card_bar"/>
+				<text text="菜单栏与页签" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_text_sub"/>
+			</window>
+			<!-- useMenuEx=1:下拉菜单改用 SMenuEx(SOUI 自绘窗口),才能做出圆角卡片/外发光/悬停态;
+			     若保持 0 会走原生 #32768 菜单窗口,只能有系统蓝框,且圆角透明像素会被 BitBlt 染黑。 -->
+			<menubar size="-2,30" extend_top="12" useMenuEx="1" font="face:微软雅黑,size:13">
+				<btnstyle skin="skin_btn_ghost" padding="6" colorText="@color/clr_text"/>
+				<menus>
+					<menuItem src="SMENU:MENU_FILE">文件(&amp;F)</menuItem>
+					<menuItem src="SMENU:MENU_EDIT">编辑(&amp;E)</menuItem>
+					<menuItem src="SMENU:MENU_HELP">帮助(&amp;H)</menuItem>
+				</menus>
+			</menubar>
+			<!-- 浏览器风格页签条:40dp 高的深色条(skin_tabstrip_bg,上圆角下直角),内部上留 6dp 让页签顶部圆角露出来 -->
+			<window size="-2,40" skin="skin_tabstrip_bg" padding="0,6,0,0" extend_top="12">
+				<chromeTabCtrl size="-2,-2" name="chromeTab" tabDesiredSize="200" enableDrag="1">
+					<!-- 页签行底:skin_tab_item(4 态,上圆角下直角;checked 映射到白色帧) -->
+					<tabStyle skin="skin_tab_item" font="face:微软雅黑,size:13" colorText="@color/clr_title"/>
+					<!-- 新建按钮:图标帧本身是 24x34,十字画在正中,所以这里写 24,34 不会被拉伸 -->
+					<newBtnStyle size="24,34" skin="skin_chrome_tab_new"/>
+					<!-- 关闭按钮:16x16,距右边 22dp、距页签顶 9dp(页签高 34,垂直居中) -->
+					<closeBtnStyle pos="-22,9" skin="skin_chrome_tab_close"/>
+					<tabs>
+						<chromeTab tip="the tab #1">tab1</chromeTab>
+						<chromeTab tip="the tab #2">tab2</chromeTab>
+						<chromeTab tip="the tab #3">tab3</chromeTab>
+					</tabs>
+				</chromeTabCtrl>
+			</window>
+			<!-- 页签内容区(占位):白底,与选中页签连成一体,模拟浏览器"页签条 + 网页"的层次 -->
+			<window size="-2,0" weight="1" layout="vbox" padding="18,14,18,14">
+				<text text="页签内容区 —— 拖拽页签可排序,点击 + 新建,点击 × 关闭" font="face:微软雅黑,size:12"
+				      colorText="@color/clr_text_sub"/>
+			</window>
+		</window>
+
+		<!-- 卡片行:旋钮 / 水波进度 / 验证码 -->
+		<window size="-2,0" weight="1" layout="hbox" interval="10">
+			<window size="0,-2" weight="1" skin="skin_card" layout="vbox" padding="14,13,14,15">
+				<window size="-2,14" layout="hbox" gravity="center" interval="8">
+					<window size="3,12" skin="skin_card_bar"/>
+					<text text="旋钮" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_text_sub"/>
+				</window>
+				<window size="-2,0" weight="1" layout="hbox" gravity="center" interval="8" extend_top="12">
+					<!-- 旋钮:外观分两块,互不干扰:
+					     ① 灰色轨道环 + 青色进度弧都由控件内置弧尺绘制(colorRulerBack = 浅灰轨道,
+					        colorRulerForeEnable = 主色青),两条弧共用画笔与矩形,几何天然对齐;
+					     ② svg:knob 只提供白色盘面与指针(矢量,平滑,随 value 旋转)。
+					     内置弧尺线宽固定 10px、画在客户区四边内缩 5 的圆上,故 62x62 时环带为 21~31,
+					     svg 盘面 r=19 正好内收 2px 留出白缝。
+					     尺寸 62x62 是按卡片实际可用宽度(约 133dp)反算的上限:2*62 + 8 = 132。 -->
+					<imgknob size="62,62"  skin="skin_knob" min="0" max="1" value="0.5"
+					         colorRulerBack="@color/clr_line" colorRulerForeEnable="@color/clr_primary" colorRulerForeDisable="@color/clr_text_sub"/>
+					<imgknob size="62,62"  skin="skin_knob" min="0" max="1" value="0"
+					         colorRulerBack="@color/clr_line" colorRulerForeEnable="@color/clr_primary" colorRulerForeDisable="@color/clr_text_sub"/>
+				</window>
+			</window>
+
+			<window size="0,-2" weight="1.5" skin="skin_card" layout="vbox" padding="14,13,14,15">
+				<window size="-2,14" layout="hbox" gravity="center" interval="8">
+					<window size="3,12" skin="skin_card_bar"/>
+					<text text="水波进度" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_text_sub"/>
+				</window>
+				<window size="-2,0" weight="1" layout="hbox" gravity="center" interval="6" extend_top="12">
+					<!-- 水波进度:尺寸按卡片可用宽度(约 213dp)反算:3*66 + 2*6 = 210 -->
+					<waveProgress size="66,66" name="waveProgress0" value="50" min="0" max="100"
+					              colorBack="#EFF2F6" colorWave="#7FD4D4" colorFore="#0E9F9F" colorBorder="#C4CAD3"/>
+					<waveProgress size="66,66" name="waveProgress1" value="60" min="0" max="100"
+					              colorBack="#EFF2F6" colorWave="#7FD4D4" colorFore="#0E9F9F" colorBorder="#C4CAD3"/>
+					<waveProgress size="66,66" name="waveProgress2" value="80" min="0" max="100"
+					              colorBack="#EFF2F6" colorWave="#7FD4D4" colorFore="#0E9F9F" colorBorder="#C4CAD3"/>
+				</window>
+			</window>
+
+			<window size="220,-2" skin="skin_card" layout="vbox" padding="14,13,14,15">
+				<window size="-2,14" layout="hbox" gravity="center" interval="8">
+					<window size="3,12" skin="skin_card_bar"/>
+					<text text="验证码输入" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_text_sub"/>
+				</window>
+				<window size="-2,0" weight="1" layout="vbox" gravity="center" extend_top="12">
+					<!-- 格子边框改用设计令牌灰,激活格用主色青;skin 画圆角描边,margin=0 屏蔽内置蓝框 -->
+					<verificationCodeEdit size="-2,32" name="verificationCodeEdit" maxBuffer="6"
+					                      skin="skin_edit_nc" ncskin="skin_edit_nc" margin="0" boxColor="@color/clr_line" activeBoxColor="@color/clr_primary"
+					                      textColor="@color/clr_title" boxWidth="25" boxHeight="28" boxSpacing="6"/>
+				</window>
+			</window>
+		</window>
 	</window>
 </window>

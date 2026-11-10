@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   webbtn_back.svg - 浏览器"后退"按钮图标(SVG 1.1,nanosvg 兼容)
-  3 帧横排,每帧 20x20,总尺寸 60x20。
+  3 帧横排,每帧 24x24,总尺寸 72x24,与 imgbtn 24x24 1:1 对应(不做额外缩放)。
   帧序与 SOUI imgbtn 三态约定一致:0=normal  1=hover  2=push
-  图形:左向箭头。配色沿用 demo 主题:normal 石板灰 / hover 主蓝 / push 深蓝。
+  图形:左向尖角(chevron),不再带尾巴 —— 现代浏览器(Chrome/Safari)后退键的通用画法,
+  比"箭头+横线"更轻,视觉重量不压地址栏。
+  配色:normal 次要灰 #5F6672 / hover 主青 #0E9F9F / push 深青 #0B8888;
+  笔画 1.6px(125% DPI 下约 2px),比原来 2px/2.4px 细一档。
 -->
-<svg xmlns="http://www.w3.org/2000/svg" width="60" height="20" viewBox="0 0 60 20">
-  <!-- 帧0:normal #64748B -->
-  <g transform="translate(0,0)" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <line x1="15" y1="10" x2="5" y2="10"/>
-    <path d="M10 5 L5 10 L10 15"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="72" height="24" viewBox="0 0 72 24">
+  <!-- 帧0:normal #5F6672 -->
+  <g transform="translate(0,0)" fill="none" stroke="#5F6672" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 7 L9.5 12 L14 17"/>
   </g>
-  <!-- 帧1:hover #2563EB -->
-  <g transform="translate(20,0)" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <line x1="15" y1="10" x2="5" y2="10"/>
-    <path d="M10 5 L5 10 L10 15"/>
+  <!-- 帧1:hover #0E9F9F -->
+  <g transform="translate(24,0)" fill="none" stroke="#0E9F9F" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 7 L9.5 12 L14 17"/>
   </g>
-  <!-- 帧2:push #1D4ED8 -->
-  <g transform="translate(40,0)" fill="none" stroke="#1D4ED8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-    <line x1="15" y1="10" x2="5" y2="10"/>
-    <path d="M10 5 L5 10 L10 15"/>
+  <!-- 帧2:push #0B8888 -->
+  <g transform="translate(48,0)" fill="none" stroke="#0B8888" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 7 L9.5 12 L14 17"/>
   </g>
 </svg>

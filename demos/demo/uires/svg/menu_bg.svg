@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  menu_bg.svg - SMenuEx 弹出菜单背景(9 宫格,圆角白卡片 + 1px 描边)
+  画布 40x40,皮肤 margin=10:四角 10x10 角块不被拉伸,
+  角块内必须容纳"内缩 1.5 + 圆角 8 = 9.5 <= 10",圆角弧才不会被 9 宫格拉变形。
+  说明:这里**不再画投影/外发光**。之前用三层低透明度圆角矩形在 4.5px 内做"假阴影",
+  9 宫格拉伸后形成一圈灰黑硬边,观感很差;改为只留 1px 描边 + 圆角,边缘干净。
+  菜单宿主是 translucent 窗口,卡片外的 1.5px 是透明的,不会出现黑边。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+  <!-- 卡片本体:白底 + 1px 浅灰描边 + 8px 圆角 -->
+  <rect x="1.5" y="1.5" width="37" height="37" rx="8" fill="#FFFFFF" stroke="#E4E7EC" stroke-width="1"/>
+</svg>

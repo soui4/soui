@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   page_script.xml - 脚本演示页(跑马机 + 消消乐 + 俄罗斯方块 + 坦克大战,lua 版)
 
@@ -83,8 +83,9 @@
     回归测试;子页隐藏自动暂停。
   棋盘/格子 id 与界面名字约定见 test.lua 的 tank_* 函数。
 -->
-<tabctrl pos="0,0,-0,-0" tabWidth="100" tabAlign="left" curSel="3" animateSteps="20"
-         colorBkgnd="@color/clr_page_bg" colorText="@color/clr_title" enableDragSwitch="1">
+<tabctrl pos="0,0,-0,-0" tabWidth="100" tabHeight="40" tabAlign="left" tabSkin="skin_tab_nav" tabInterSize="4" tabPos="8" text-x="16" curSel="3" animateSteps="20" focusable="0"
+         font="face:微软雅黑,size:13" fontPush="bold:1"
+         colorBkgnd="@color/clr_window_bg" colorText="@color/clr_text" colorTextHover="@color/clr_title" colorTextPush="@color/clr_primary" drawFocusRect="0">
   <page title="消消乐">
     <window pos="0,0,-0,-0" layout="hbox" padding="15,12,15,15" interval="12">
       <!-- 左侧信息卡片:标题 / SVG 功能按钮 / LED 计分区 / 玩法说明 -->
@@ -93,49 +94,49 @@
         <window size="-2,-1" layout="hbox" interval="8">
           <img size="30,30" skin="svg_xxl_icons" iconIndex="0" layout_gravity="center"/>
           <window size="-1,-2" layout="vbox" interval="1">
-            <text text="消消乐" font="size:16,bold:1" colorText="@color/clr_title"/>
-            <text text="LUA + SVG 完整版" font="size:10" colorText="@color/clr_text_sub"/>
+            <text text="消消乐" font="face:微软雅黑,size:16,bold:1" colorText="@color/clr_title"/>
+            <text text="LUA + SVG 完整版" font="face:微软雅黑,size:11" colorText="@color/clr_text_sub"/>
           </window>
         </window>
         <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
         <!-- 功能按钮:SVG 药丸形底(3 态) + SVG 图标(3 态),重新开始=主色实底,提示=白底描边 -->
-        <button name="btn_xxl_restart" size="-2,36" skin="xxl_btn_primary" gravity="center" layout="hbox" cursor="hand" on_command="xxl_on_restart" tip="重新开始一局">
+        <button name="btn_xxl_restart" size="-2,36" skin="xxl_btn_primary" gravity="center" layout="hbox" cursor="hand" on_command="xxl_on_restart" tip="重新开始一局" drawFocusRect="0">
           <window size="0,0" weight="1"/>
-          <imgbtn size="16,16" skin="svg_xxl_btn_restart" msgTransparent="2"/>
-          <text text="重新开始" extend_left="6" font="size:13,bold:1" colorText="#FFFFFF"/>
+          <imgbtn size="16,16" skin="svg_xxl_btn_restart" msgTransparent="2" drawFocusRect="0"/>
+          <text text="重新开始" extend_left="6" font="face:微软雅黑,size:13,bold:1" colorText="#FFFFFF"/>
           <window size="0,0" weight="1"/>
         </button>
-        <button name="btn_xxl_hint" size="-2,36" skin="xxl_btn_secondary" gravity="center" layout="hbox" cursor="hand" on_command="xxl_on_hint" tip="提示一步可行走法">
+        <button name="btn_xxl_hint" size="-2,36" skin="xxl_btn_secondary" gravity="center" layout="hbox" cursor="hand" on_command="xxl_on_hint" tip="提示一步可行走法" drawFocusRect="0">
           <window size="0,0" weight="1" />
-          <imgbtn size="16,16" skin="svg_xxl_btn_hint"   msgTransparent="2"/>
-          <text text="提 示" extend_left="6" font="size:13,bold:1" colorText="@color/clr_primary"/>
+          <imgbtn size="16,16" skin="svg_xxl_btn_hint"   msgTransparent="2" drawFocusRect="0"/>
+          <text text="提 示" extend_left="6" font="face:微软雅黑,size:13,bold:1" colorText="@color/clr_primary"/>
           <window size="0,0" weight="1"/>
         </button>
         <!-- 洗牌:花 5 金币把全盘棋子受约束重排(随时可用);金币不足不能洗 -->
-        <button name="btn_xxl_shuffle" size="-2,36" skin="xxl_btn_secondary" gravity="center" layout="hbox" cursor="hand" on_command="xxl_on_shuffle" tip="花 5 金币重排全部棋子">
+        <button name="btn_xxl_shuffle" size="-2,36" skin="xxl_btn_secondary" gravity="center" layout="hbox" cursor="hand" on_command="xxl_on_shuffle" tip="花 5 金币重排全部棋子" drawFocusRect="0">
           <window size="0,0" weight="1" />
-          <imgbtn size="16,16" skin="svg_xxl_btn_shuffle"  msgTransparent="2"/>
-          <text text="洗牌(5金币)" extend_left="6" font="size:13,bold:1" colorText="@color/clr_primary"/>
+          <imgbtn size="16,16" skin="svg_xxl_btn_shuffle"  msgTransparent="2" drawFocusRect="0"/>
+          <text text="洗牌(5金币)" extend_left="6" font="face:微软雅黑,size:13,bold:1" colorText="@color/clr_primary"/>
           <window size="0,0" weight="1"/>
         </button>
         <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
         <!-- 计分区:七段 LED 翻页计数器 -->
-        <text text="金币" font="size:12" colorText="@color/clr_text_sub"/>
+        <text text="金币" font="face:微软雅黑,size:12" colorText="@color/clr_text_sub"/>
         <window size="-2,-1" layout="hbox" interval="3">
           <t:g.xxl_digit><data name="digit_coin_2"/></t:g.xxl_digit>
           <t:g.xxl_digit><data name="digit_coin_1"/></t:g.xxl_digit>
           <t:g.xxl_digit><data name="digit_coin_0"/></t:g.xxl_digit>
         </window>
-        <text text="得分" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
+        <text text="得分" extend_top="2" font="face:微软雅黑,size:12" colorText="@color/clr_text_sub"/>
         <window size="-2,-1" layout="hbox" interval="3">
           <t:g.xxl_digit><data name="digit_score_2"/></t:g.xxl_digit>
           <t:g.xxl_digit><data name="digit_score_1"/></t:g.xxl_digit>
           <t:g.xxl_digit><data name="digit_score_0"/></t:g.xxl_digit>
         </window>
-        <text name="txt_xxl_combo" text="" size="-2,-1" extend_top="4" font="size:26,bold:1" colorText="@color/orange"/>
+        <text name="txt_xxl_combo" text="" size="-2,-1" extend_top="4" font="face:微软雅黑,size:26,bold:1" colorText="@color/orange"/>
         <window size="0,0" weight="1"/>
         <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
-        <text text="交换相邻棋子凑 3 连消除&#10;连击有加分&#10;花 5 金币随时洗牌" font="size:11" colorText="@color/clr_text_sub" multilines="1"/>
+        <text text="交换相邻棋子凑 3 连消除&#10;连击有加分&#10;花 5 金币随时洗牌" font="face:微软雅黑,size:11" colorText="@color/clr_text_sub" multilines="1"/>
       </window>
       <window name="wnd_xxl_board" size="0,-2" weight="1" layout="gridlayout" columnCount="8" gravity="fill" padding="12,12,12,12" colorBkgnd="@color/clr_card_bg"/>
     </window>
@@ -143,15 +144,15 @@
   </page>
   <page title="跑马机">
     <!-- 根容器:纵向三段(标题 / 赛道+下注 / 工具栏) -->
-    <window size="full,full" name="game_wnd" id="300" layout="vbox" padding="14,14,14,14" interval="12" colorBkgnd="@color/clr_page_bg">
+    <window size="full,full" name="game_wnd" id="300" layout="vbox" padding="14,14,14,14" interval="12" colorBkgnd="@color/clr_window_bg">
       <!-- 标题栏 -->
       <window size="-2,-1" layout="hbox" interval="10" gravity="center" padding="14,10,14,10" colorBkgnd="@color/clr_card_bg">
         <img size="30,30" skin="svg_home_icons" iconIndex="7" layout_gravity="center" msgTransparent="2"/>
         <text text="SOUI + LUA 跑马机" font="face:微软雅黑,size:20,bold:1" colorText="@color/clr_title" layout_gravity="center"/>
         <window size="0,0" weight="1"/>
-        <window size="-1,-1" layout="hbox" gravity="center" interval="6" colorBkgnd="#EFF6FF" padding="12,4,12,4">
-          <text text="赔率" font="size:13" colorText="@color/clr_text_sub"/>
-          <text text="x4" font="size:16,bold:1" colorText="@color/clr_primary"/>
+        <window size="-1,-1" layout="hbox" gravity="center" interval="6" colorBkgnd="#F7F8FA" padding="12,4,12,4">
+          <text text="赔率" font="face:微软雅黑,size:13" colorText="@color/clr_text_sub"/>
+          <text text="x4" font="face:微软雅黑,size:16,bold:1" colorText="@color/clr_primary"/>
         </window>
       </window>
 
@@ -170,21 +171,21 @@
           <window pos="0,%75,-0,@1" colorBkgnd="#C8E3D2"/>
           <!-- 赛马(lua 定位,编号随马移动) -->
           <gifplayer name="player_1" float="1" skin="gif_horse">
-            <window size="20,20" pos="0,0" colorBkgnd="@color/clr_primary" layout="hbox" gravity="center" msgTransparent="1"><text text="1" font="size:12,bold:1" colorText="#FFFFFF"/></window>
+            <window size="20,20" pos="0,0" colorBkgnd="@color/clr_primary" layout="hbox" gravity="center" msgTransparent="1"><text text="1" font="face:微软雅黑,size:12,bold:1" colorText="#FFFFFF"/></window>
           </gifplayer>
           <gifplayer name="player_2" float="1" skin="gif_horse">
-            <window size="20,20" pos="0,0" colorBkgnd="@color/clr_primary" layout="hbox" gravity="center" msgTransparent="1"><text text="2" font="size:12,bold:1" colorText="#FFFFFF"/></window>
+            <window size="20,20" pos="0,0" colorBkgnd="@color/clr_primary" layout="hbox" gravity="center" msgTransparent="1"><text text="2" font="face:微软雅黑,size:12,bold:1" colorText="#FFFFFF"/></window>
           </gifplayer>
           <gifplayer name="player_3" float="1" skin="gif_horse">
-            <window size="20,20" pos="0,0" colorBkgnd="@color/clr_primary" layout="hbox" gravity="center" msgTransparent="1"><text text="3" font="size:12,bold:1" colorText="#FFFFFF"/></window>
+            <window size="20,20" pos="0,0" colorBkgnd="@color/clr_primary" layout="hbox" gravity="center" msgTransparent="1"><text text="3" font="face:微软雅黑,size:12,bold:1" colorText="#FFFFFF"/></window>
           </gifplayer>
           <gifplayer name="player_4" float="1" skin="gif_horse">
-            <window size="20,20" pos="0,0" colorBkgnd="@color/clr_primary" layout="hbox" gravity="center" msgTransparent="1"><text text="4" font="size:12,bold:1" colorText="#FFFFFF"/></window>
+            <window size="20,20" pos="0,0" colorBkgnd="@color/clr_primary" layout="hbox" gravity="center" msgTransparent="1"><text text="4" font="face:微软雅黑,size:12,bold:1" colorText="#FFFFFF"/></window>
           </gifplayer>
           <gifplayer name="flag_win" float="1" skin="gif_win" show="0" id="400"/>
           <!-- 终点线:贴 game_canvas 右边缘,并排在赛马之后绘制,避免白底 GIF 盖住 -->
           <window pos="-3,0,-0,@3" colorBkgnd="#16A34A"/>
-          <text pos="-32,4,-3,@16" text="终点" font="size:11,bold:1" colorText="#15803D" align="center"/>
+          <text pos="-32,4,-3,@16" text="终点" font="face:微软雅黑,size:11,bold:1" colorText="#15803D" align="center"/>
         </window>
         <!-- 跑道与下注区之间的分隔线 -->
         <window size="1,-2" colorBkgnd="@color/clr_divider"/>
@@ -192,35 +193,35 @@
         <window size="92,-2" layout="vbox" interval="0">
           <window size="-2,0" weight="1" layout="hbox" interval="0" margin="0,2,0,2" colorBkgnd="#F8FAFC">
             <window size="3,-2" colorBkgnd="@color/clr_primary"/>
-            <window size="18,18" layout="hbox" gravity="center" colorBkgnd="@color/clr_primary" msgTransparent="2" layout_gravity="center"><text text="1" font="size:12,bold:1" colorText="#FFFFFF"/></window>
-            <window size="44,44" layout_gravity="center" skin="svg_coin" id="101" tip="下注1号马" on_command="on_bet" align="center" valign="center" font="size:15,bold:1" colorText="#7A4A00">0</window>
+            <window size="18,18" layout="hbox" gravity="center" colorBkgnd="@color/clr_primary" msgTransparent="2" layout_gravity="center"><text text="1" font="face:微软雅黑,size:12,bold:1" colorText="#FFFFFF"/></window>
+            <window size="44,44" layout_gravity="center" skin="svg_coin" id="101" tip="下注1号马" on_command="on_bet" align="center" valign="center" font="face:微软雅黑,size:15,bold:1" colorText="#7A4A00">0</window>
           </window>
           <window size="-2,0" weight="1" layout="hbox" interval="0" margin="0,2,0,2" colorBkgnd="#F8FAFC">
             <window size="3,-2" colorBkgnd="@color/clr_primary"/>
-            <window size="18,18" layout="hbox" gravity="center" colorBkgnd="@color/clr_primary" msgTransparent="2" layout_gravity="center"><text text="2" font="size:12,bold:1" colorText="#FFFFFF"/></window>
-            <window size="44,44" layout_gravity="center" skin="svg_coin" id="102" tip="下注2号马" on_command="on_bet" align="center" valign="center" font="size:15,bold:1" colorText="#7A4A00">0</window>
+            <window size="18,18" layout="hbox" gravity="center" colorBkgnd="@color/clr_primary" msgTransparent="2" layout_gravity="center"><text text="2" font="face:微软雅黑,size:12,bold:1" colorText="#FFFFFF"/></window>
+            <window size="44,44" layout_gravity="center" skin="svg_coin" id="102" tip="下注2号马" on_command="on_bet" align="center" valign="center" font="face:微软雅黑,size:15,bold:1" colorText="#7A4A00">0</window>
           </window>
           <window size="-2,0" weight="1" layout="hbox" interval="0" margin="0,2,0,2" colorBkgnd="#F8FAFC">
             <window size="3,-2" colorBkgnd="@color/clr_primary"/>
-            <window size="18,18" layout="hbox" gravity="center" colorBkgnd="@color/clr_primary" msgTransparent="2" layout_gravity="center"><text text="3" font="size:12,bold:1" colorText="#FFFFFF"/></window>
-            <window size="44,44" layout_gravity="center" skin="svg_coin" id="103" tip="下注3号马" on_command="on_bet" align="center" valign="center" font="size:15,bold:1" colorText="#7A4A00">0</window>
+            <window size="18,18" layout="hbox" gravity="center" colorBkgnd="@color/clr_primary" msgTransparent="2" layout_gravity="center"><text text="3" font="face:微软雅黑,size:12,bold:1" colorText="#FFFFFF"/></window>
+            <window size="44,44" layout_gravity="center" skin="svg_coin" id="103" tip="下注3号马" on_command="on_bet" align="center" valign="center" font="face:微软雅黑,size:15,bold:1" colorText="#7A4A00">0</window>
           </window>
           <window size="-2,0" weight="1" layout="hbox" interval="0" margin="0,2,0,2" colorBkgnd="#F8FAFC">
             <window size="3,-2" colorBkgnd="@color/clr_primary"/>
-            <window size="18,18" layout="hbox" gravity="center" colorBkgnd="@color/clr_primary" msgTransparent="2" layout_gravity="center"><text text="4" font="size:12,bold:1" colorText="#FFFFFF"/></window>
-            <window size="44,44" layout_gravity="center" skin="svg_coin" id="104" tip="下注4号马" on_command="on_bet" align="center" valign="center" font="size:15,bold:1" colorText="#7A4A00">0</window>
+            <window size="18,18" layout="hbox" gravity="center" colorBkgnd="@color/clr_primary" msgTransparent="2" layout_gravity="center"><text text="4" font="face:微软雅黑,size:12,bold:1" colorText="#FFFFFF"/></window>
+            <window size="44,44" layout_gravity="center" skin="svg_coin" id="104" tip="下注4号马" on_command="on_bet" align="center" valign="center" font="face:微软雅黑,size:15,bold:1" colorText="#7A4A00">0</window>
           </window>
         </window>
       </window>
 
       <!-- 工具栏 -->
       <window size="-2,-1" layout="hbox" interval="10" gravity="center" padding="12,10,12,10" colorBkgnd="@color/clr_card_bg" name="game_toolbar">
-        <button name="btn_run" size="110,36" skin="xxl_btn_primary" colorText="#FFFFFF" cursor="hand" on_command="on_run" gravity="center" align="center">run</button>
+        <button name="btn_run" size="110,36" skin="xxl_btn_primary" colorText="#FFFFFF" cursor="hand" on_command="on_run" gravity="center" align="center" drawFocusRect="0">run</button>
         <window size="0,0" weight="1"/>
-        <text text="现有金币" font="size:13" colorText="@color/clr_text_sub" layout_gravity="center"/>
+        <text text="现有金币" font="face:微软雅黑,size:13" colorText="@color/clr_text_sub" layout_gravity="center"/>
         <window size="-1,-1" layout="hbox" gravity="center" colorBkgnd="#FEF3C7" padding="12,4,12,4">
-          <text name="txt_coins" text="100" font="size:18,bold:1" colorText="#B45309"/>
-          <text text="枚" font="size:12" colorText="#B45309" extend_left="2"/>
+          <text name="txt_coins" text="100" font="face:微软雅黑,size:18,bold:1" colorText="#B45309"/>
+          <text text="枚" font="face:微软雅黑,size:12" colorText="#B45309" extend_left="2"/>
         </window>
       </window>
     </window>
@@ -233,36 +234,36 @@
         <window size="-2,-1" layout="hbox" interval="8">
           <img size="30,30" skin="svg_tetris_blocks" iconIndex="16" layout_gravity="center"/>
           <window size="-1,-2" layout="vbox" interval="1">
-            <text text="俄罗斯方块" font="size:16,bold:1" colorText="@color/clr_title"/>
-            <text text="LUA + SVG 完整版" font="size:10" colorText="@color/clr_text_sub"/>
+            <text text="俄罗斯方块" font="face:微软雅黑,size:16,bold:1" colorText="@color/clr_title"/>
+            <text text="LUA + SVG 完整版" font="face:微软雅黑,size:11" colorText="@color/clr_text_sub"/>
           </window>
         </window>
         <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
         <!-- 计分区:七段 LED 翻页计数器 -->
-        <text text="得分" font="size:12" colorText="@color/clr_text_sub"/>
+        <text text="得分" font="face:微软雅黑,size:12" colorText="@color/clr_text_sub"/>
         <window size="-2,-1" layout="hbox" interval="3">
           <t:g.xxl_digit><data name="digit_tscore_3"/></t:g.xxl_digit>
           <t:g.xxl_digit><data name="digit_tscore_2"/></t:g.xxl_digit>
           <t:g.xxl_digit><data name="digit_tscore_1"/></t:g.xxl_digit>
           <t:g.xxl_digit><data name="digit_tscore_0"/></t:g.xxl_digit>
         </window>
-        <text text="行数" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
+        <text text="行数" extend_top="2" font="face:微软雅黑,size:12" colorText="@color/clr_text_sub"/>
         <window size="-2,-1" layout="hbox" interval="3">
           <t:g.xxl_digit><data name="digit_tlines_2"/></t:g.xxl_digit>
           <t:g.xxl_digit><data name="digit_tlines_1"/></t:g.xxl_digit>
           <t:g.xxl_digit><data name="digit_tlines_0"/></t:g.xxl_digit>
         </window>
-        <text text="等级" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
+        <text text="等级" extend_top="2" font="face:微软雅黑,size:12" colorText="@color/clr_text_sub"/>
         <window size="-2,-1" layout="hbox" interval="3">
           <t:g.xxl_digit><data name="digit_tlevel_1"/></t:g.xxl_digit>
           <t:g.xxl_digit><data name="digit_tlevel_0"/></t:g.xxl_digit>
         </window>
-        <text name="txt_tetris_state" text="状态:待开始" extend_top="4" font="size:12" colorText="@color/clr_text_sub"/>
+        <text name="txt_tetris_state" text="状态:待开始" extend_top="4" font="face:微软雅黑,size:12" colorText="@color/clr_text_sub"/>
         <window size="0,0" weight="1"/>
         <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
         <!-- 功能按钮:SVG 药丸形底(3 态),开始=主色实底,重新开始=白底描边 -->
-        <button name="btn_tetris_start" size="-2,36" skin="xxl_btn_primary" colorText="#FFFFFF" cursor="hand" on_command="tetris_on_start" tip="开始 / 暂停 / 继续">开始游戏</button>
-        <button name="btn_tetris_restart" size="-2,36" skin="xxl_btn_secondary" colorText="@color/clr_primary" cursor="hand" on_command="tetris_on_restart" tip="重新开始一局">重新开始</button>
+        <button name="btn_tetris_start" size="-2,36" skin="xxl_btn_primary" colorText="#FFFFFF" cursor="hand" on_command="tetris_on_start" tip="开始 / 暂停 / 继续" drawFocusRect="0">开始游戏</button>
+        <button name="btn_tetris_restart" size="-2,36" skin="xxl_btn_secondary" colorText="@color/clr_primary" cursor="hand" on_command="tetris_on_restart" tip="重新开始一局" drawFocusRect="0">重新开始</button>
       </window>
       <!-- 中间留白 + 棋盘(10x20 格,内容由 lua 动态创建,svg_tetris_blocks 雪碧图)+ 留白 -->
       <window size="0,0" weight="1"/>
@@ -274,10 +275,10 @@
         <window name="wnd_gameover" size="-2,-2" layout="vbox" colorBkgnd="#990F172A" visible="0" msgTransparent="1" on_animation_stop="tetris_on_over_stop">
           <window size="0,0" weight="1"/>
           <window name="wnd_gameover_card" size="240,-1" layout_gravity="center" layout="vbox" interval="10" padding="24,22,24,20" colorBkgnd="@color/clr_card_bg">
-            <text text="游戏结束" font="size:22,bold:1" colorText="@color/clr_title" align="center"/>
+            <text text="游戏结束" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title" align="center"/>
             <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
-            <text name="txt_score" text="本局得分 0" font="size:16,bold:1" colorText="@color/clr_primary" align="center"/>
-            <text text="点击「重新开始」再来一局" font="size:12" colorText="@color/clr_text_sub" align="center"/>
+            <text name="txt_score" text="本局得分 0" font="face:微软雅黑,size:16,bold:1" colorText="@color/clr_primary" align="center"/>
+            <text text="点击「重新开始」再来一局" font="face:微软雅黑,size:12" colorText="@color/clr_text_sub" align="center"/>
           </window>
           <window size="0,0" weight="1"/>
         </window>
@@ -289,8 +290,8 @@
         <window size="-2,-1" layout="hbox" interval="8">
           <img size="30,30" skin="svg_tetris_blocks" iconIndex="8" layout_gravity="center"/>
           <window size="-1,-2" layout="vbox" interval="1">
-            <text text="下一个" font="size:16,bold:1" colorText="@color/clr_title"/>
-            <text text="NEXT BLOCK" font="size:10" colorText="@color/clr_text_sub"/>
+            <text text="下一个" font="face:微软雅黑,size:16,bold:1" colorText="@color/clr_title"/>
+            <text text="NEXT BLOCK" font="face:微软雅黑,size:11" colorText="@color/clr_text_sub"/>
           </window>
         </window>
         <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
@@ -302,19 +303,19 @@
         <window size="-2,-1" layout="vbox" interval="6">
           <window size="-2,26" layout="hbox" interval="8">
             <img size="52,26" skin="svg_tetris_key_lr"/>
-            <text text="移动" font="size:11" colorText="@color/clr_text_sub" layout_gravity="center"/>
+            <text text="移动" font="face:微软雅黑,size:11" colorText="@color/clr_text_sub" layout_gravity="center"/>
           </window>
           <window size="-2,26" layout="hbox" interval="8">
             <img size="52,26" skin="svg_tetris_key_ud"/>
-            <text text="旋转 / 软降" font="size:11" colorText="@color/clr_text_sub" layout_gravity="center"/>
+            <text text="旋转 / 软降" font="face:微软雅黑,size:11" colorText="@color/clr_text_sub" layout_gravity="center"/>
           </window>
           <window size="-2,26" layout="hbox" interval="8">
             <img size="52,26" skin="svg_tetris_key_space"/>
-            <text text="硬降" font="size:11" colorText="@color/clr_text_sub" layout_gravity="center"/>
+            <text text="硬降" font="face:微软雅黑,size:11" colorText="@color/clr_text_sub" layout_gravity="center"/>
           </window>
           <window size="-2,26" layout="hbox" interval="8">
             <img size="26,26" skin="svg_tetris_key_p"/>
-            <text text="暂停" font="size:11" colorText="@color/clr_text_sub" layout_gravity="center"/>
+            <text text="暂停" font="face:微软雅黑,size:11" colorText="@color/clr_text_sub" layout_gravity="center"/>
           </window>
         </window>
       </window>
@@ -329,32 +330,32 @@
         <window size="-2,-1" layout="hbox" interval="8">
           <img size="30,30" skin="svg_tank" iconIndex="24" layout_gravity="center"/>
           <window size="-1,-2" layout="vbox" interval="1">
-            <text text="坦克大战" font="size:16,bold:1" colorText="@color/clr_title"/>
-            <text text="LUA + SVG" font="size:10" colorText="@color/clr_text_sub"/>
+            <text text="坦克大战" font="face:微软雅黑,size:16,bold:1" colorText="@color/clr_title"/>
+            <text text="LUA + SVG" font="face:微软雅黑,size:11" colorText="@color/clr_text_sub"/>
           </window>
         </window>
         <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
-        <text text="得分" font="size:12" colorText="@color/clr_text_sub"/>
+        <text text="得分" font="face:微软雅黑,size:12" colorText="@color/clr_text_sub"/>
         <window size="-2,-1" layout="hbox" interval="3">
           <t:g.xxl_digit><data name="digit_tank_score_3"/></t:g.xxl_digit>
           <t:g.xxl_digit><data name="digit_tank_score_2"/></t:g.xxl_digit>
           <t:g.xxl_digit><data name="digit_tank_score_1"/></t:g.xxl_digit>
           <t:g.xxl_digit><data name="digit_tank_score_0"/></t:g.xxl_digit>
         </window>
-        <text text="生命" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
+        <text text="生命" extend_top="2" font="face:微软雅黑,size:12" colorText="@color/clr_text_sub"/>
         <window size="-2,-1" layout="hbox" interval="3">
           <t:g.xxl_digit><data name="digit_tank_lives_0"/></t:g.xxl_digit>
         </window>
-        <text text="关卡" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
+        <text text="关卡" extend_top="2" font="face:微软雅黑,size:12" colorText="@color/clr_text_sub"/>
         <window size="-2,-1" layout="hbox" interval="3">
           <t:g.xxl_digit><data name="digit_tank_stage_1"/></t:g.xxl_digit>
           <t:g.xxl_digit><data name="digit_tank_stage_0"/></t:g.xxl_digit>
         </window>
-        <text name="txt_tank_state" text="状态:待开始" extend_top="4" font="size:12" colorText="@color/clr_text_sub"/>
+        <text name="txt_tank_state" text="状态:待开始" extend_top="4" font="face:微软雅黑,size:12" colorText="@color/clr_text_sub"/>
         <window size="0,0" weight="1"/>
         <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
-        <button name="btn_tank_start" size="-2,36" skin="xxl_btn_primary" colorText="#FFFFFF" cursor="hand" on_command="tank_on_start" tip="开始 / 暂停 / 继续">开始游戏</button>
-        <button name="btn_tank_restart" size="-2,36" skin="xxl_btn_secondary" colorText="@color/clr_primary" cursor="hand" on_command="tank_on_restart" tip="重新开始一局">重新开始</button>
+        <button name="btn_tank_start" size="-2,36" skin="xxl_btn_primary" colorText="#FFFFFF" cursor="hand" on_command="tank_on_start" tip="开始 / 暂停 / 继续" drawFocusRect="0">开始游戏</button>
+        <button name="btn_tank_restart" size="-2,36" skin="xxl_btn_secondary" colorText="@color/clr_primary" cursor="hand" on_command="tank_on_restart" tip="重新开始一局" drawFocusRect="0">重新开始</button>
       </window>
       <window size="0,0" weight="1"/>
       <!-- 中间战场:13x13 可玩格 + 上下各一行砖墙装饰,共 15 行;内容由 lua 的 tank_init
@@ -373,7 +374,7 @@
         <window name="wnd_tank_banner" size="-2,-2" layout="vbox" visible="0" msgTransparent="1">
           <window size="0,0" weight="1"/>
           <window size="-2,-1" layout_gravity="center" colorBkgnd="#CC0F172A" padding="20,12,20,12">
-            <text name="txt_tank_banner" text="" font="size:18,bold:1" colorText="#FFFFFF" align="center"/>
+            <text name="txt_tank_banner" text="" font="face:微软雅黑,size:18,bold:1" colorText="#FFFFFF" align="center"/>
           </window>
           <window size="0,0" weight="1"/>
         </window>
@@ -381,11 +382,11 @@
         <window name="wnd_tank_gameover" size="-2,-2" layout="vbox" colorBkgnd="#990F172A" visible="0" msgTransparent="1" on_animation_stop="tank_on_over_stop">
           <window size="0,0" weight="1"/>
           <window name="wnd_tank_gameover_card" size="250,-1" layout_gravity="center" layout="vbox" interval="10" padding="24,22,24,20" colorBkgnd="@color/clr_card_bg">
-            <text text="战斗结束" font="size:22,bold:1" colorText="@color/clr_title" align="center"/>
+            <text text="战斗结束" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title" align="center"/>
             <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
-            <text name="txt_tank_gameover_score" text="本局得分 0" font="size:16,bold:1" colorText="@color/clr_primary" align="center"/>
-            <text name="txt_tank_gameover_reason" text="基地被摧毁" font="size:12" colorText="@color/clr_text_sub" align="center"/>
-            <text text="点击「重新开始」再战一局" font="size:12" colorText="@color/clr_text_sub" align="center"/>
+            <text name="txt_tank_gameover_score" text="本局得分 0" font="face:微软雅黑,size:16,bold:1" colorText="@color/clr_primary" align="center"/>
+            <text name="txt_tank_gameover_reason" text="基地被摧毁" font="face:微软雅黑,size:12" colorText="@color/clr_text_sub" align="center"/>
+            <text text="点击「重新开始」再战一局" font="face:微软雅黑,size:12" colorText="@color/clr_text_sub" align="center"/>
           </window>
           <window size="0,0" weight="1"/>
         </window>
@@ -396,8 +397,8 @@
         <window size="-2,-1" layout="hbox" interval="8">
           <img size="30,30" skin="svg_tank" iconIndex="15" layout_gravity="center"/>
           <window size="-1,-2" layout="vbox" interval="1">
-            <text text="剩余敌人" font="size:16,bold:1" colorText="@color/clr_title"/>
-            <text text="ENEMY" font="size:10" colorText="@color/clr_text_sub"/>
+            <text text="剩余敌人" font="face:微软雅黑,size:16,bold:1" colorText="@color/clr_title"/>
+            <text text="ENEMY" font="face:微软雅黑,size:11" colorText="@color/clr_text_sub"/>
           </window>
         </window>
         <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
@@ -405,27 +406,27 @@
           <t:g.xxl_digit><data name="digit_tank_enemy_1"/></t:g.xxl_digit>
           <t:g.xxl_digit><data name="digit_tank_enemy_0"/></t:g.xxl_digit>
         </window>
-        <text name="txt_tank_base" text="基地完好" extend_top="2" font="size:12" colorText="@color/clr_text_sub"/>
+        <text name="txt_tank_base" text="基地完好" extend_top="2" font="face:微软雅黑,size:12" colorText="@color/clr_text_sub"/>
         <hr size="-2,1" mode="horizontal" colorLine="@color/clr_divider"/>
         <window size="-2,-1" layout="vbox" interval="6">
           <window size="-2,26" layout="hbox" interval="8">
             <img size="52,26" skin="svg_tetris_key_lr"/>
-            <text text="移动/转向" font="size:10" colorText="@color/clr_text_sub" layout_gravity="center"/>
+            <text text="移动/转向" font="face:微软雅黑,size:11" colorText="@color/clr_text_sub" layout_gravity="center"/>
           </window>
           <window size="-2,26" layout="hbox" interval="8">
             <img size="52,26" skin="svg_tetris_key_ud"/>
-            <text text="上下移动" font="size:10" colorText="@color/clr_text_sub" layout_gravity="center"/>
+            <text text="上下移动" font="face:微软雅黑,size:11" colorText="@color/clr_text_sub" layout_gravity="center"/>
           </window>
           <window size="-2,26" layout="hbox" interval="8">
             <img size="52,26" skin="svg_tetris_key_space"/>
-            <text text="开炮" font="size:10" colorText="@color/clr_text_sub" layout_gravity="center"/>
+            <text text="开炮" font="face:微软雅黑,size:11" colorText="@color/clr_text_sub" layout_gravity="center"/>
           </window>
           <window size="-2,26" layout="hbox" interval="8">
             <img size="26,26" skin="svg_tetris_key_p"/>
-            <text text="暂停" font="size:10" colorText="@color/clr_text_sub" layout_gravity="center"/>
+            <text text="暂停" font="face:微软雅黑,size:11" colorText="@color/clr_text_sub" layout_gravity="center"/>
           </window>
         </window>
-        <text text="守住底部基地，消灭本关全部敌人" extend_top="2" font="size:10" colorText="@color/clr_text_sub" multilines="1" wordbreak="1"/>
+        <text size="-2,-1" text="守住底部基地，消灭本关全部敌人" extend_top="2" font="face:微软雅黑,size:11" colorText="@color/clr_text_sub" multilines="1" wordbreak="1"/>
       </window>
     </window>
     <!-- 动画浮层:击杀加分飞向得分 LED 的文本画在最顶层 -->

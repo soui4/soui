@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  tree_chk.svg - 树控件专用复选框 9 态精灵(nanosvg 兼容)
+  每帧 18x18,总尺寸 162x18。
+  帧序:0..2 = 未选中(普通/悬停/按下),3..5 = 选中,6..8 = 半选(STVICheckBox_PartChecked)。
+  为什么单独做一份:STreeCtrl 的 ItemLayout 把 toggle、复选框、节点图标按各自宽度
+  紧挨着排(没有任何间隙属性可调)。用 18px 的通用 skin_check 时方框满铺整帧,
+  又大又贴着箭头和后面的图标。这里画布保持 18px(占位与原来一致,行宽不变),
+  但方框只画中间 12px,四周各留 3px 透明边,等于给相邻元素天然留出间隙,
+  方框视觉尺寸也从 18px 收到 12px,和 13px 文字、16px 节点图标协调。
+  用法:values/skin.xml 的 skin_tree_chk → treectrl.xml 的 checkSkin。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="162" height="18" viewBox="0 0 162 18">
+
+  <!-- 帧0:未选中-普通 -->
+  <g transform="translate(0,0)">
+    <rect x="3" y="3" width="12" height="12" rx="2.5" fill="#FFFFFF" stroke="#B6BCC5" stroke-width="1.1"/>
+  </g>
+
+  <!-- 帧1:未选中-悬停 -->
+  <g transform="translate(18,0)">
+    <rect x="3" y="3" width="12" height="12" rx="2.5" fill="#F7F8FA" stroke="#8A94A6" stroke-width="1.1"/>
+  </g>
+
+  <!-- 帧2:未选中-按下 -->
+  <g transform="translate(36,0)">
+    <rect x="3" y="3" width="12" height="12" rx="2.5" fill="#EFF1F3" stroke="#8A94A6" stroke-width="1.1"/>
+  </g>
+
+  <!-- 帧3:选中-普通 -->
+  <g transform="translate(54,0)">
+    <rect x="3" y="3" width="12" height="12" rx="2.5" fill="#0E9F9F"/>
+    <path d="M6.4 9.2 L8.8 11.5 L12.8 6.9" fill="none" stroke="#FFFFFF" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- 帧4:选中-悬停 -->
+  <g transform="translate(72,0)">
+    <rect x="3" y="3" width="12" height="12" rx="2.5" fill="#0B8888"/>
+    <path d="M6.4 9.2 L8.8 11.5 L12.8 6.9" fill="none" stroke="#FFFFFF" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- 帧5:选中-按下 -->
+  <g transform="translate(90,0)">
+    <rect x="3" y="3" width="12" height="12" rx="2.5" fill="#0A7A7A"/>
+    <path d="M6.4 9.2 L8.8 11.5 L12.8 6.9" fill="none" stroke="#FFFFFF" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- 帧6:半选-普通 -->
+  <g transform="translate(108,0)">
+    <rect x="3" y="3" width="12" height="12" rx="2.5" fill="#0E9F9F"/>
+    <rect x="6.4" y="8.55" width="5.2" height="0.9" fill="#FFFFFF"/>
+  </g>
+
+  <!-- 帧7:半选-悬停 -->
+  <g transform="translate(126,0)">
+    <rect x="3" y="3" width="12" height="12" rx="2.5" fill="#0B8888"/>
+    <rect x="6.4" y="8.55" width="5.2" height="0.9" fill="#FFFFFF"/>
+  </g>
+
+  <!-- 帧8:半选-按下 -->
+  <g transform="translate(144,0)">
+    <rect x="3" y="3" width="12" height="12" rx="2.5" fill="#0A7A7A"/>
+    <rect x="6.4" y="8.55" width="5.2" height="0.9" fill="#FFFFFF"/>
+  </g>
+</svg>

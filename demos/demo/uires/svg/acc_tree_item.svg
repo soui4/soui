@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="12" viewBox="0 0 48 12">
+  <!--
+    acc_tree_item.svg - 树节点行底,4 态横向精灵(每帧 12x12,圆角 4)
+
+    白底 / 悬停近白 / 选中浅青。选中的浅青必须能跟随换肤,否则换成红色主题后
+    树里选中的行还是青色,所以从 colorrect 换成 SVG(九宫格 margin=5)。
+    帧序:0=normal 1=hover 2=pushdown(选中) 3=disable
+  -->
+  <rect x="0" y="0" width="12" height="12" rx="4" fill="#FFFFFF"/>
+  <rect x="12" y="0" width="12" height="12" rx="4" fill="#FCFCFD"/>
+  <rect x="24" y="0" width="12" height="12" rx="4" fill="#E9F7F7"/>
+  <rect x="36" y="0" width="12" height="12" rx="4" fill="#FFFFFF"/>
+</svg>

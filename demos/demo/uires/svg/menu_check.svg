@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  menu_check.svg - 菜单项勾选标记(SMenuEx checkSkin)
+  2 帧横排,每帧 16x16,总尺寸 32x16。
+  说明:SMenuExItem::OnPaint 对普通勾选项只用第 0 帧(normal),第 1 帧留作单选态备用。
+  颜色:中性深灰 #1F2329 —— 弹窗菜单不参与换肤染色,用主题青会与其它主题冲突。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="16" viewBox="0 0 32 16">
+  <!-- 帧0:normal 中性深灰对勾 -->
+  <path d="M3.5 8.5 L6.5 11.5 L12.5 4.5" fill="none" stroke="#1F2329" stroke-width="1.8"
+        stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 帧1:备用(与帧0同色) -->
+  <path d="M19.5 8.5 L22.5 11.5 L28.5 4.5" fill="none" stroke="#1F2329" stroke-width="1.8"
+        stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

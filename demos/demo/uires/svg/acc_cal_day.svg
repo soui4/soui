@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="12" viewBox="0 0 48 12">
+  <!--
+    acc_cal_day.svg - 日历单元格底色,4 态横向精灵(每帧 12x12,圆角 4,1px 描边)
+
+    白底 + 浅灰线 = 普通日期;hover 浅青底 + 浅青线;选中(映射 pushdown 帧)深一档
+    浅青底 + 主色描边。这些浅青都必须能跟随换肤,所以从 colorrect 换成 SVG。
+    帧序:0=normal 1=hover 2=pushdown(选中) 3=disable
+  -->
+  <g>
+    <rect x="0.5" y="0.5" width="11" height="11" rx="4" fill="#FFFFFF" stroke="#E8EAED" stroke-width="1"/>
+    <rect x="12.5" y="0.5" width="11" height="11" rx="4" fill="#E9F7F7" stroke="#CFEDED" stroke-width="1"/>
+    <rect x="24.5" y="0.5" width="11" height="11" rx="4" fill="#CFEDED" stroke="#0E9F9F" stroke-width="1"/>
+    <rect x="36.5" y="0.5" width="11" height="11" rx="4" fill="#FFFFFF" stroke="#E8EAED" stroke-width="1"/>
+  </g>
+</svg>

@@ -203,9 +203,9 @@ jobs:
   # 它与 QEMU 目标 95% 同构，是最便宜的"日常宿主侧没烂"机器证据。
   #
   # 无头跑法：SDL 的 dummy 视频驱动（不需要真实显示会话）+ SOUI_SIM_AUTOEXIT
-  # （消息泵迭代约 60 次后自动注入关闭）+ SOUI_SIM_DUMP_FRAME=1（把第 1 帧写
-  # 成 sim_frame.bmp）。断言三件事：进程干净退出、BMP 真生成、日志里没有
-  # FreeRTOS ASSERT / HardFault。
+  # （消息泵迭代约 60 次后向主窗口投递 WM_CLOSE）+ SOUI_SIM_DUMP_FRAME=1（把第 1
+  # 帧写成 sim_frame.bmp）。断言三件事：进程干净退出、BMP 真生成、日志里没有
+  # FreeRTOS ASSERT / HardFault。exe 另有 120s timeout 兜底，避免再次挂满 job 超时。
   #
   # 已知宿主构建债（见 soui-freertos/README.md）：swinx 的 include 目录在搜索
   # 顺序里先于系统头，会遮蔽 MinGW 的真 <io.h>，使 <unistd.h> 内联 ftruncate()
@@ -217,7 +217,7 @@ jobs:
   soui-sim-windows:
     name: freertos-soui-sim (Windows/MinGW)
     runs-on: windows-latest
-    timeout-minutes: 60
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
@@ -247,6 +247,7 @@ jobs:
             git
 
       - name: Build soui_sim (headless-capable) and run it under SDL dummy driver
+        timeout-minutes: 15
         shell: msys2 {0}
         run: |
           set -o pipefail
@@ -280,21 +281,34 @@ jobs:
           export SDL_RENDER_DRIVER=software
           export SOUI_SIM_AUTOEXIT=1
           export SOUI_SIM_DUMP_FRAME=1
-          ./build-sim/soui_sim.exe > sim-run.log 2>&1
-          rc=$?
+          # 限时 + 实时日志：上一次 AUTOEXIT 未生效时 exe 空转到 job 超时，
+          # 而 "> sim-run.log" 把输出全吞掉，CI 日志里 53 分钟一行都没有。
+          if ! command -v timeout >/dev/null 2>&1; then
+            echo "::error::MSYS2 coreutils timeout 缺失，无法限制 soui_sim 运行时长"
+            exit 1
+          fi
+          timeout -k 10 120 ./build-sim/soui_sim.exe 2>&1 | tee sim-run.log
+          rc=${PIPESTATUS[0]}
           echo "exit code: $rc"
-          tr -d '\r' < sim-run.log
+          if [ "$rc" -eq 124 ]; then
+            echo "::error::soui_sim 在 120s 内未退出（AUTOEXIT 未生效 / 消息泵挂死）"
+            exit 1
+          fi
           # 机器证据：渲染管线至少完整走了一轮并落盘了一帧。
           if [ ! -f sim_frame.bmp ]; then
-            echo "::error::sim_frame.bmp 未生成（渲染管线没有真正落笔或无头窗口创建失败）"
+            echo "::error::sim_frame.bmp 未生成（present 回调未触发 dump / 写盘失败 / 无头窗口创建失败）"
             exit 1
           fi
           if grep -qE "FreeRTOS ASSERT|HardFault|qemu: fatal" sim-run.log; then
             echo "::error::soui_sim 运行中出现故障标记"
             exit 1
           fi
-          if ! grep -qF "[sim] frame #1 dumped" sim-run.log; then
-            echo "::error::未检测到 dump 日志（SOUI_SIM_DUMP_FRAME 未生效）"
+          if ! grep -qE "\[sim\] frame #[0-9]+ dumped" sim-run.log; then
+            echo "::error::未检测到 dump 日志（SOUI_SIM_DUMP_FRAME 未生效或 present 回调未触发）"
+            exit 1
+          fi
+          if ! grep -qF "[sim] autoexit: posting WM_CLOSE" sim-run.log; then
+            echo "::error::未检测到 autoexit 日志（SOUI_SIM_AUTOEXIT 未生效）"
             exit 1
           fi
           if [ "$rc" -ne 0 ]; then

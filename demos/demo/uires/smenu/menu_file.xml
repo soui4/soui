@@ -1,6 +1,25 @@
-﻿<menu iconSkin="" itemHeight="26" iconMargin="4" textMargin="8" maxWidth="180">
-  <item name="menu_open_lib" id="13">open</item>
-  <item name="menu_save_lib" id="14">save</item>
-	<sep/>
-	<item name="menu_exit" id="12">exit(&X)</item>
-</menu>
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  文件菜单(菜单栏「文件(E)」下拉)— SMenuEx 自绘菜单(menuRoot 格式)
+  现代样式:
+    skin      = skin_menu_bg(9 宫格圆角白卡片 + 1px 描边 + 外发光)
+    padding   = 10,8,10,8 让菜单项与卡片边缘留白,悬停色块不贴边
+    itemSkin  = skin_menu_item(normal 白 / hover 浅青 + 4px 圆角)
+    iconBarWidth= 0,textOffset=14:无图标菜单,文字从 14px 处开始
+    itemHeight= 32(125% DPI 下约 40px),字体统一微软雅黑 13
+-->
+<menuRoot skin="skin_menu_bg" padding="10,8,10,8"
+          itemSkin="skin_menu_item" itemHeight="32" itemPadding="0,0,0,0"
+          iconBarWidth="0" textOffset="14" minWidth="150" maxWidth="240"
+          sepSkin="skin_menu_sep" arrowSkin="skin_menu_arrow"
+          font="face:微软雅黑,size:13" colorText="@color/clr_text" colorBkgnd="@color/clr_card_bg">
+  <!-- 打开 -->
+  <menuItem name="menu_open_lib" id="13">open</menuItem>
+  <!-- 保存 -->
+  <menuItem name="menu_save_lib" id="14">save</menuItem>
+  <!-- 分隔线:窗口高 9px,客户区=窗口矩形去掉 margin 后只剩 1px(即线条本身),
+       上下 margin 4px 形成留白,左右 margin 12px 让线条两端内缩不贴卡片边缘。 -->
+  <sep size="-2,9" margin="12,4,12,4"/>
+  <!-- 退出 -->
+  <menuItem name="menu_exit" id="12">exit(X)</menuItem>
+</menuRoot>

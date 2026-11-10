@@ -134,7 +134,13 @@ jobs:
   # 所以成本几乎为零。仍然只证明"编译链路不断"，不证明真机可运行。
   ios-arm64:
     name: swinx-ios-arm64
-    runs-on: macos-14
+    # macos-14 镜像已于 2026-11-02 退役（含 macos-14 / macos-14-large /
+    # macos-14-xlarge），硬编码该标签会被直接拒绝，报
+    # "The configuration 'macos-14-arm64-us-default' is not supported"。
+    # 改用仍受支持的 macos-15（arm64 Apple Silicon，自带 Xcode，足以产出
+    # iphoneos arm64 静态库）；未用 macos-latest 是为了避免 Xcode 大版本
+    # 跟随 macos-26 跳变带来意外。
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
       # 子模块改从 GitHub 镜像拉取：.gitmodules 里指向 gitee，GitHub runner 上不可靠

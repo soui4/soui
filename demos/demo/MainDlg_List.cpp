@@ -22,7 +22,7 @@
 
 #include "stdafx.h"
 #include "MainDlg.h"
-#include "helper/SMenu.h"
+#include "helper/SMenuEx.h"
 
 #define kLogTag "listdlg"
 
@@ -107,12 +107,13 @@ void CMainDlg::OnMclvCtxMenu(IEvtArgs *pEvt)
         }
 
     }
-    SMenu menu;
+    //改用 SMenuEx 自绘菜单:menu_lv.xml 是 menuRoot 格式,原生 SMenu 无法正确绘制圆角卡片
+    SMenuEx menu;
 	menu.LoadMenu(_T("smenu:menu_lv"));
 
     ClientToScreen(&pt);
 
-    menu.TrackPopupMenu(0,pt.x,pt.y,m_hWnd);
+    menu.TrackPopupMenu(0,pt.x,pt.y,m_hWnd,GetScale());
 }
 
 /**
@@ -353,7 +354,6 @@ void CMainDlg::OnInitListBox()
 			int iItem = pLb->AddString(SStringT().Format(_T("new item：%d"),nCount+i));
 			pLb->EnsureVisible(iItem);
 			pLb->Update();
-			Sleep(10);
 		}
 	}
 }

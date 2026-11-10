@@ -1,5 +1,17 @@
-﻿<menu  itemHeight="26" iconMargin="4" textMargin="8" maxWidth="190" contextHelpId="1">
-  <item id="5">关于SOUI</item>
-  <sep/>
-  <item id="6">退出(&X)</item>
-</menu>
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  杂项页「弹出菜单」按钮的示例菜单(SMenu:menu_test)— SMenuEx 自绘菜单(menuRoot 格式)
+  样式与菜单栏下拉保持一致(圆角卡片 + 32px 行高 + 微软雅黑 13)。
+-->
+<menuRoot skin="skin_menu_bg" padding="10,8,10,8"
+          itemSkin="skin_menu_item" itemHeight="32" itemPadding="0,0,0,0"
+          iconBarWidth="0" textOffset="14" minWidth="150" maxWidth="240"
+          sepSkin="skin_menu_sep" arrowSkin="skin_menu_arrow"
+          font="face:微软雅黑,size:13" colorText="@color/clr_text" colorBkgnd="@color/clr_card_bg">
+  <!-- 关于 -->
+  <menuItem id="5">关于SOUI</menuItem>
+  <!-- 分隔线:窗口高 9px,客户区(去 margin 后)剩 1px 为线条;上下留白 4px,左右内缩 12px -->
+  <sep size="-2,9" margin="12,4,12,4"/>
+  <!-- 退出 -->
+  <menuItem id="6">退出(X)</menuItem>
+</menuRoot>

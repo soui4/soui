@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  tree_icons.svg - 树控件节点图标 3 态精灵(nanosvg 兼容)
+  每帧 16x16,总尺寸 48x16。
+  帧序:0=普通节点(灰色文件夹) 1=选中节点(青色文件夹) 2=叶子节点(灰色圆点)
+  风格:细描边线条 + 极浅灰填充。原来只有白色填充,在白卡片上只剩一圈细线,
+  看起来"发虚";加深描边(#8A94A6)并给一点底色后轮廓更实,同时保持中性(不抢文字)。
+  用法:values/skin.xml 的 skin_tree_icon(treectrl 的 iconSkin、treeview 模板的 img_state)。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="16" viewBox="0 0 48 16">
+
+  <!-- 帧0:普通节点 -->
+  <g transform="translate(0,0)">
+    <path d="M2.5,4.2 h4.3 l1.6,1.6 h5.1 a1,1 0 0 1 1,1 v5.6 a1,1 0 0 1 -1,1 h-11 a1,1 0 0 1 -1,-1 v-7.2 a1,1 0 0 1 1,-1 z"
+          fill="#F4F5F7" stroke="#8A94A6" stroke-width="1.3" stroke-linejoin="round"/>
+  </g>
+
+  <!-- 帧1:选中节点 -->
+  <g transform="translate(16,0)">
+    <path d="M2.5,4.2 h4.3 l1.6,1.6 h5.1 a1,1 0 0 1 1,1 v5.6 a1,1 0 0 1 -1,1 h-11 a1,1 0 0 1 -1,-1 v-7.2 a1,1 0 0 1 1,-1 z"
+          fill="#E9F7F7" stroke="#0E9F9F" stroke-width="1.3" stroke-linejoin="round"/>
+  </g>
+
+  <!-- 帧2:叶子节点(小一号的圆点,避免看起来像项目符号) -->
+  <g transform="translate(32,0)">
+    <circle cx="8" cy="8" r="2.2" fill="#C9CFD7"/>
+  </g>
+</svg>

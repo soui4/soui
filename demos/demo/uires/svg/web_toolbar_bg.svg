@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  web_toolbar_bg.svg - 浏览器工具栏背景(单帧,九宫格拉伸)
+  24x24,rx=9.5 加 0.5 内缩,视觉外圆角 10;浅灰底 + 1px 浅灰描边。
+  为什么用 SVG 九宫格而不是 colorrect:colorrect 同时设置 borderWidth 时,
+  圆角描边不生效(直角边框),所以这里改用 imgframe + SVG,九宫格只拉伸中间段,
+  四个圆角保持原始像素。
+  配合 skin.xml 中 margin="12,12,12,12" 使用(圆角半径 ≤ margin)。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <rect x="0.5" y="0.5" width="23" height="23" rx="9.5" fill="#F7F8FA" stroke="#E8EAED" stroke-width="1"/>
+</svg>

@@ -5,10 +5,10 @@
   帧序与 SOUI button 三态约定一致:0=normal  1=hover  2=push
 -->
 <svg xmlns="http://www.w3.org/2000/svg" width="300" height="40" viewBox="0 0 300 40">
-  <!-- 帧0:normal #2563EB -->
-  <rect x="0.5" y="0.5" width="99" height="39" rx="19" fill="#2563EB"/>
-  <!-- 帧1:hover #3B82F6 -->
-  <rect x="100.5" y="0.5" width="99" height="39" rx="19" fill="#3B82F6"/>
-  <!-- 帧2:push #1D4ED8 -->
-  <rect x="200.5" y="0.5" width="99" height="39" rx="19" fill="#1D4ED8"/>
+  <!-- 帧0:normal #0E9F9F 主色青 -->
+  <rect x="0.5" y="0.5" width="99" height="39" rx="19" fill="#0E9F9F"/>
+  <!-- 帧1:hover #12B2B2 亮青 -->
+  <rect x="100.5" y="0.5" width="99" height="39" rx="19" fill="#12B2B2"/>
+  <!-- 帧2:push #0B8888 深青(clr_primary_dark) -->
+  <rect x="200.5" y="0.5" width="99" height="39" rx="19" fill="#0B8888"/>
 </svg>

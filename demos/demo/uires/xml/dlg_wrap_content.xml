@@ -1,21 +1,21 @@
 <?xml version="1.0"?>
 <SOUI name="wrap_content" title="wrap_content" margin="5,5,5,5" resizable="1" wndType="normal" translucent="1">
   <!--演示root大小自动计算,注意soui结点width,height的设置，哪一个值需要自动计算就设置为-1-->
-	<root size="-2,-1" layout="vbox" padding="5,5,5,5" colorBkgnd="#ffffff">
-    <caption size="-2,-1" colorBkgnd="#ffff00">
-      <text size="-1,-1" font="bold:1" text="窗口大小自适应演示,支持左右拉伸"/>
+	<root size="-2,-1" layout="vbox" padding="5,5,5,5" colorBkgnd="@color/clr_card_bg">
+    <caption size="-2,-1" colorBkgnd="@color/clr_card_bg">
+      <text size="-1,-1" font="face:微软雅黑,size:13,bold:1" colorText="@color/clr_title" text="窗口大小自适应演示,支持左右拉伸"/>
     </caption>
     <window size="-2,100" layout="hbox">
-      <window size="0,-2" text="水平平分窗口1" weight="1" colorBkgnd="#ff0000"/>
-      <window size="0,-2" text="水平平分窗口2" weight="1" colorBkgnd="#00ff00"/>
-      <window size="0,-2" text="水平平分窗口3" weight="1" colorBkgnd="#0000ff"/>
+      <window size="0,-2" text="水平平分窗口1" weight="1" colorBkgnd="@color/clr_primary" colorText="#FFFFFF"/>
+      <window size="0,-2" text="水平平分窗口2" weight="1" colorBkgnd="@color/clr_accent_b" colorText="@color/clr_title"/>
+      <window size="0,-2" text="水平平分窗口3" weight="1" colorBkgnd="@color/clr_sunk" colorText="@color/clr_text"/>
     </window>
-    <text size="-1,-1" text="使用layout_gravity属性居中对齐" layout_gravity="center"/>
-    <window size="-1,-1" layout_gravity="right" extend_top="5" layout="hbox">
+    <text size="-1,-1" text="使用layout_gravity属性居中对齐" layout_gravity="center" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
+    <window size="-1,-1" layout_gravity="right" extend_top="6" layout="hbox">
       <!--IDCANCEL支持enter退出窗口-->
-      <button size="-1,-1" padding="10,5,10,5" id="IDOK" text="确定"/>
+      <button size="-1,-1" padding="10,5,10,5" id="IDOK" text="确定" class="cls_btn_primary" font="face:微软雅黑,size:13" colorText="#FFFFFF" drawFocusRect="0"/>
       <!--IDCANCEL支持esc退出窗口-->
-      <button size="-1,-1" padding="10,5,10,5" extend_left="10" id="IDCANCEL" text="取消"/>
+      <button size="-1,-1" padding="10,5,10,5" extend_left="10" id="IDCANCEL" text="取消" skin="skin_btn" font="face:微软雅黑,size:13" colorText="@color/clr_title" drawFocusRect="0"/>
     </window>
 	</root>
 </SOUI>

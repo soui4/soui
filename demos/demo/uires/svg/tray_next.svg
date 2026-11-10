@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="20" viewBox="0 0 80 20">
+  <!--
+    托盘菜单「下一曲」按钮:横向 4 帧,每帧 20x20。
+    帧序:0=常态 1=悬停 2=按下 3=禁用。
+    配色:灰 #5F6672 → 深灰 #1F2329 → 更深灰 #101418 → 禁用 #C9CDD4
+    (弹窗不参与换肤染色,统一用中性灰,任何主题下都协调)。
+  -->
+  <path d="M4.5,4 L4.5,16 L12.5,10 Z" fill="#5F6672"/>
+  <rect x="14.5" y="4" width="2" height="12" rx="1" fill="#5F6672"/>
+
+  <path d="M24.5,4 L24.5,16 L32.5,10 Z" fill="#1F2329"/>
+  <rect x="34.5" y="4" width="2" height="12" rx="1" fill="#1F2329"/>
+
+  <path d="M44.5,4 L44.5,16 L52.5,10 Z" fill="#101418"/>
+  <rect x="54.5" y="4" width="2" height="12" rx="1" fill="#101418"/>
+
+  <path d="M64.5,4 L64.5,16 L72.5,10 Z" fill="#C9CDD4"/>
+  <rect x="74.5" y="4" width="2" height="12" rx="1" fill="#C9CDD4"/>
+</svg>

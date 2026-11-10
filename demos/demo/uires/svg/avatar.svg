@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  avatar.svg - 头像:浅青圆底 + 主色青人形(nanosvg 兼容)
+  供 svg_avatar(image 页 roundImg / roundWnd)与 skin_icon6(多列列表行头像)使用。
+  注意:1) 画布先铺一层不透明白底(SRoundWnd 的源表面因此整块不透明,
+       蒙版边界处不会把 controls.extend 里硬编码的米灰蒙版色混进来);
+       2) 圆半径取 21(超出 40x40 画布被裁掉),画布内所有像素都是不透明的。
+       原因:SRoundImage/SRoundWnd 的裁剪蒙版是实色(RGBA(0xBA,0xB3,0x99)),
+       蒙版用 SrcIn 与图像合成,图像一旦有半透明抗锯齿像素就会透出米灰色,
+       表现为头像圆外一圈灰边。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+  <!-- 不透明白底:保证蒙版边界处源图像 alpha=1,避免米灰蒙版色渗出 -->
+  <rect x="0" y="0" width="40" height="40" fill="#FFFFFF"/>
+  <!-- 浅青圆底(超出画布 1px,保证边缘像素不透明) -->
+  <circle cx="20" cy="20" r="21" fill="#E9F7F7"/>
+  <!-- 头部 -->
+  <circle cx="20" cy="15.5" r="5.5" fill="#0E9F9F"/>
+  <!-- 肩部 -->
+  <path d="M9.5 31 C11 24.5 15 22.5 20 22.5 C25 22.5 29 24.5 30.5 31 C27.5 33.5 24 34.5 20 34.5 C16 34.5 12.5 33.5 9.5 31 Z" fill="#0E9F9F"/>
+</svg>

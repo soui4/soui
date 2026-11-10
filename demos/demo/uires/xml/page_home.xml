@@ -1,39 +1,68 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   page_home.xml - 宫格首页(SOUI 功能演示启动器)
 
-  以卡片宫格形式展示 demo 的 8 个演示分区,点击卡片由 CMainDlg::OnNavToPage
-  切换到 tab_main 中对应页面;卡片背景使用 svg_card_bg 三态皮肤实现
-  normal/hover/push 视觉反馈。卡片 name 与页序号的对应关系见 MainDlg_Nav.cpp。
+  设计基调:工具型中性风格。近白中性底(#F7F8FA) + 纯白卡片 + 1px 浅灰描边 +
+  10px 圆角 + 零阴影;彩色只出现在图标底的青色浅底(#E9F7F7)与图标本身。
+
+  版式:标题区上留白 -> 标题/副标题 -> 固定 40dp 间距 -> 宫格(4 列 x 2 行) -> 页脚。
+  标题与宫格靠上成组,窗口变高时多出来的空间全部留在宫格与页脚之间(下方 weight 撑开),
+  避免"上下各分一半"把标题和内容拉开。
 
   卡片结构用 XML 内联模板描述:<template name="home_card"> 定义模板体,
   <t:home_card .../> 引用并实例化,引用节点的属性替换模板体中的 {{attr}} 占位。
-  内联模板须先定义后引用;模板解析见 SWindow::CreateChildren(Swnd.cpp)。
+  卡片 name 与页序号的对应关系见 MainDlg_Nav.cpp。
 -->
-<window layout="vbox" size="-2,-2" padding="30,24,30,24" clipClient="1" colorBkgnd="@color/clr_page_bg">
-  <!-- 头部标题区 -->
-  <text layout_gravity="center" text="SOUI 功能演示" font="face:微软雅黑,size:30,bold:1" colorText="@color/clr_title"/>
-  <text layout_gravity="center" extend_top="6" text="选择一个分类,开始体验 SOUI 5 的核心能力" font="size:15" colorText="@color/clr_text_sub"/>
+<window size="-2,-2" colorBkgnd="@color/clr_window_bg" layout="vbox" clipClient="1">
 
-  <!-- 宫格卡片区分4列排布,卡片点击事件统一由 CMainDlg 处理 -->
-  <window size="-2,0" weight="1" layout="hflow" interval="16" gravity="center" extend_top="24">
+  <!-- 头部标题区 -->
+  <window size="-2,34"/>
+  <text layout_gravity="center" text="SOUI 功能演示"
+        font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
+  <text layout_gravity="center" extend_top="6" text="选择一个分类，开始体验 SOUI 5 的核心能力"
+        font="face:微软雅黑,size:13" colorText="@color/clr_text"/>
+
+  <!-- 宫格上方固定留白 40dp:标题区与宫格保持一个紧凑的整体,不随窗口高度漂移 -->
+  <window size="-2,40"/>
+
+  <!-- 宫格卡片区:4 列 x 2 行,卡片 190x136,间距 12(2 行合计 136*2+12=284) -->
+  <window size="-2,284" layout="hflow" interval="12" gravity="center">
+
     <!-- 内联模板:宫格卡片(不创建窗口,仅注册) -->
     <template name="home_card">
-      <imgbtn name="{{name}}" size="190,150" data="{{page}}" skin="svg_card_bg" layout="vbox" gravity="center" interval="10" animate="1">
-        <window size="0,0" weight="1"/>
-        <img size="48,48" skin="svg_home_icons" iconIndex="{{icon}}" msgTransparent="inherit"/>
-        <text text="{{title}}" font="size:17,bold:1" colorText="@color/clr_title" msgTransparent="inherit"/>
-        <text text="{{desc}}" font="size:12" colorText="@color/clr_text_sub" msgTransparent="inherit"/>
-        <window size="0,0" weight="1"/>
+      <!-- 悬停三联动:底色 #FCFCFD + 描边转主色 + 图标底保持浅青(见 skin_card_click) -->
+      <imgbtn name="{{name}}" size="190,136" data="{{page}}" skin="skin_card_click"
+              layout="vbox" animate="0" padding="16,16,16,14" cursor="hand" drawFocusRect="0">
+        <window size="34,34" skin="skin_icon_tile" msgTransparent="inherit">
+          <!-- pos="|0,|0" 表示参考父窗口中心;soui 布局的 pos 只接受 2 或 4 段,
+               配合 offset="-0.5,-0.5"(按自身尺寸回退一半)才是真正的两轴居中。
+               注意:vbox/hbox 的 gravity 只作用于交叉轴,不能用来做垂直居中。 -->
+          <img size="20,20" pos="|0,|0" offset="-0.5,-0.5" skin="svg_home_icons_teal"
+               iconIndex="{{icon}}" msgTransparent="inherit"/>
+        </window>
+        <text text="{{title}}" extend_top="12" font="face:微软雅黑,size:13,bold:1"
+              colorText="@color/clr_title" msgTransparent="inherit"/>
+        <text text="{{desc}}" extend_top="6" font="face:微软雅黑,size:12"
+              colorText="@color/clr_text_sub" msgTransparent="inherit"/>
       </imgbtn>
     </template>
-    <t:home_card name="card_ctrls" icon="0" page="1" title="基础控件" desc="列表 / 树 / 编辑器等 18 种控件"/>
-    <t:home_card name="card_webkit" icon="1" page="2" title="SOUI官网" desc="基于 WKE 的内嵌网页浏览器"/>
-    <t:home_card name="card_animator" icon="2" page="3" title="动画" desc="GIF / APNG 动图播放演示"/>
-    <t:home_card name="card_layout" icon="3" page="4" title="布局" desc="线性 / 网格 / 模板布局能力"/>
-    <t:home_card name="card_misc" icon="4" page="5" title="杂项" desc="脚本 / 拖放 / 矩阵变换 / SVG 等"/>
-    <t:home_card name="card_skia" icon="5" page="6" title="Skia" desc="Skia 渲染高级特性演示"/>
-    <t:home_card name="card_xxl" icon="7" page="7" title="脚本" desc="lua 跑马机 / 消消乐(match-3)"/>
-    <t:home_card name="card_about" icon="6" page="8" title="关于" desc="版本信息与社区链接"/>
+
+    <t:home_card name="card_ctrls"    icon="0" page="1" title="基础控件" desc="列表 / 树 / 编辑器等 18 种"/>
+    <t:home_card name="card_webkit"   icon="1" page="2" title="网页浏览器" desc="基于 WKE 的内嵌网页容器"/>
+    <t:home_card name="card_animator" icon="2" page="3" title="动画"      desc="GIF / APNG 动图与补间动画"/>
+    <t:home_card name="card_layout"   icon="3" page="4" title="布局"      desc="线性 / 网格 / 模板布局能力"/>
+    <t:home_card name="card_misc"     icon="4" page="5" title="杂项"      desc="脚本 / 拖放 / 矩阵变换 / SVG"/>
+    <t:home_card name="card_skia"     icon="5" page="6" title="Skia"      desc="Skia 渲染高级特性演示"/>
+    <t:home_card name="card_xxl"      icon="7" page="7" title="脚本"      desc="Lua 跑马机 / 消消乐 / 方块"/>
+    <t:home_card name="card_about"    icon="6" page="8" title="关于"      desc="版本信息与社区链接"/>
+  </window>
+  <window size="0,0" weight="1"/>
+
+  <!-- 页脚:静态信息,不带交互,避免出现"看起来能点但点不动"的假链接 -->
+  <window size="-2,1" colorBkgnd="@color/clr_line"/>
+  <window size="-2,36" colorBkgnd="@color/clr_card_bg" layout="hbox" gravity="center" padding="16,0,16,0">
+    <text text="SOUI 5.3.2.1" font="face:微软雅黑,size:11" colorText="@color/clr_text_sub"/>
+    <window size="0,0" weight="1"/>
+    <text text="© setoutsoft" font="face:微软雅黑,size:11" colorText="@color/clr_text_sub"/>
   </window>
 </window>

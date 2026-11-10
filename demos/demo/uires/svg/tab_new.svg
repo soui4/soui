@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  tab_new.svg - 页签条"新建页签"按钮图标,3 态横向精灵(nanosvg 兼容)
+  每帧 24x34(与页签高度一致,页签条 40 高、上方留 6px),总尺寸 72x34。
+  十字图形画在 24x34 的正中央(中心 12,17),所以 newBtnStyle 用 size="24,34"
+  时图标不会被拉伸、也不会贴在页签条顶端。
+
+  帧序:0=普通(灰) 1=悬停(青) 2=按下(深青)
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="72" height="34" viewBox="0 0 72 34">
+  <!-- 帧0:普通 -->
+  <path d="M12,10 v14 M5,17 h14" stroke="#9AA1AC" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+  <!-- 帧1:悬停 -->
+  <g transform="translate(24,0)">
+    <path d="M12,10 v14 M5,17 h14" stroke="#12A594" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+  </g>
+  <!-- 帧2:按下 -->
+  <g transform="translate(48,0)">
+    <path d="M12,10 v14 M5,17 h14" stroke="#0E8C80" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+  </g>
+</svg>
