@@ -92,3 +92,8 @@ demos/RIPDemo/
 /demos/wasm-demo/build/
 /demos/wasm-demo/out.cairo/
 /demos/wasm-demo/out.canvas2d/
+# 基金持仓工具 wasm 版的产物（demos/fundholdings/wasm/build-fundholdings.sh）
+/demos/fundholdings/wasm/out/
+/demos/fundholdings/wasm/out_pt/
+/demos/fundholdings/wasm/release/
+/demos/fundholdings/wasm/release_pt/

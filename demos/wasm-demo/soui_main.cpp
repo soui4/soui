@@ -434,7 +434,7 @@ public:
     void fillHexDemo();
     /* <listctrl> 的行只能由代码插入，见 fillListDemo 上的说明。 */
     void fillListDemo();
-    /* 编译期被关掉的可选能力（SOUI_BUILD_WASM_LUA / SOUI_BUILD_WASM_SCINTILLA）在
+    /* 编译期被关掉的可选能力（SOUI_BUILD_SCRIPT_LUA / SOUI_BUILD_WASM_SCINTILLA）在
      * 页面上留一句说明：标签还在 XML 里、只是没注册或被 no-op 掉，画面表现为页内
      * 一块空白。空白和"布局坏了"在截图上分不出来，所以要把原因写在页面上。 */
     void noteDisabledFeatures();
@@ -1198,7 +1198,7 @@ void CWasmHostWnd::noteDisabledFeatures()
 {
 #if !SOUI_WASM_HAS_LUA
     setLabel(_T("lua_hint"),
-             _T("本构建没带 Lua 脚本模块（-DSOUI_BUILD_WASM_LUA=OFF）：这一页的三个游戏（消消乐 / 俄罗斯方块 / 坦克大战）整页内容都由 lua/games.lua 在 on_init 里建，现在只剩一行说明和空的页签。"));
+             _T("本构建没带 Lua 脚本模块（-DSOUI_BUILD_SCRIPT_LUA=OFF）：这一页的三个游戏（消消乐 / 俄罗斯方块 / 坦克大战）整页内容都由 lua/games.lua 在 on_init 里建，现在只剩一行说明和空的页签。"));
 #endif
 #if !SOUI_WASM_HAS_SCINTILLA
     setLabel(_T("edit_hint"),
@@ -1788,7 +1788,7 @@ int main()
      * 调 SApplication::CreateScriptModule()，工厂这时必须已经在 app 上。浏览器里没有
      * COM，SCreateInstance 直接 new 出 SIScriptFactory；SetScriptFactory 内部持有
      * 一份引用，这里的局部引用随即释放。
-     * SOUI_BUILD_WASM_LUA=OFF 时这三样都不在构建图里，布局里的 <script> 节点会走到
+     * SOUI_BUILD_SCRIPT_LUA=OFF 时这三样都不在构建图里，布局里的 <script> 节点会走到
      * SApplication::CreateScriptModule() 的 "没有工厂就返回 E_FAIL" 分支（SApp.cpp:760），
      * 是个无害的 no-op —— 所以 XML 不需要跟着开关变。 */
 #if SOUI_WASM_HAS_LUA
@@ -1804,7 +1804,7 @@ int main()
         host_fatal("Script_Lua_SCreateInstance() 失败：脚本页面会没有脚本引擎");
     }
 #else
-    printf("[soui-wasm] script factory=none (SOUI_BUILD_WASM_LUA=OFF)\n");
+    printf("[soui-wasm] script factory=none (SOUI_BUILD_SCRIPT_LUA=OFF)\n");
 #endif
 
     /* 宿主窗口建在**逻辑**尺寸（800x600）：DPI 缩放由 SDpiHandler 在

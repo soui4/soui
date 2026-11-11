@@ -34,6 +34,7 @@ on:
       - 'SOUI/**'
       - 'components/**'
       - 'CMakeLists.txt'
+      - '__cmake/**'
       - '.github/workflows/soui-wasm-gate.yml'
   push:
     branches:
@@ -44,6 +45,7 @@ on:
       - 'SOUI/**'
       - 'components/**'
       - 'CMakeLists.txt'
+      - '__cmake/**'
       - '.github/workflows/soui-wasm-gate.yml'
   workflow_dispatch:
 
@@ -111,10 +113,8 @@ jobs:
 
       - name: Configure wasm build
         run: |
-          emcmake cmake -S . -B build-wasm -G Ninja \
+          emcmake cmake -S demos/wasm-demo -B build-wasm -G Ninja \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-            -DSOUI_BUILD_WASM_DEMO=ON \
-            -DSOUI_FUN_TEST_POST_BUILD=OFF \
             -DSOUI_WASM_PTHREADS=${{ matrix.pthreads }}
 
       # -j4 而不是 -j$(nproc)：emcc 在 8 核以上并发时会互相等待到疑似死锁（本地实测

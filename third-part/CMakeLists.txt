@@ -1,11 +1,11 @@
 if(SOUI_WASM_MINIMAL)
-    # wasm 最小构建：只拉起 components/imgdecoder-stb 需要的 aupng。
+    # wasm 最小构建：按开关拉起最小第三方集（aupng / richedit41 / Scintilla / lua-54 / gtest）。
     #
     # 这里刻意不加 zlib：soui4/third-part/zlib 与 swinx/thirdparty/zlib（目标名
     # zlib_static）是同一批 inflate/deflate 符号的两份拷贝。桌面构建里两者分处不同
     # .so，靠符号插桩互不干扰；wasm 把所有东西链进同一个模块，wasm-ld 会直接报
-    # duplicate symbol。所以依赖 zlib 的组件（resprovider-zip）在 wasm 下不进构建图，
-    # 资源改用 SOUI 核心的 SResProviderFiles（见 doc/soui-wasm-port-plan.md）。
+    # duplicate symbol。resprovider-zip 仍可由统一开关 SOUI_BUILD_RES_ZIP 编进来，
+    # 但链接 swinx 的 zlib_static；不开时资源走 SResProviderFiles（见 swinx/doc/swinx-wasm-design.md §3.3）。
     # stb 头文件是 header-only，由 imgdecoder-stb 直接用路径引用，无需子目录。
     add_subdirectory(pbl_aupng)
     # richedit41：SRichEdit 在 wasm 上没有 dlopen，只能静态链接 msftedit，
@@ -22,14 +22,14 @@ if(SOUI_WASM_MINIMAL)
     endif()
     # lua 5.4 进 wasm：ScriptModule-LUA 是纯 C + C++ 的静态库，不依赖 dlopen。
     # 只编 C 源，setjmp/longjmp 在 wasm 上由 libc 提供，与桌面同一套语义。
-    # 跟 components/ScriptModule-LUA、soui-wasm 的 uires/lua 预载由同一个开关
-    # SOUI_BUILD_WASM_LUA 一起进退。
-    if(SOUI_BUILD_WASM_LUA)
+    # 与桌面 / 移动端一致，由统一的 SOUI_BUILD_SCRIPT_LUA（默认 ON）决定是否编
+    # lua-54；translator 由 components/CMakeLists.txt 的 SOUI_BUILD_TRANSLATOR 控制。
+    if(SOUI_BUILD_SCRIPT_LUA)
     add_subdirectory(lua-54)
     endif()
     # gtest 进 wasm：它只有 gtest-all.cc + gtest_main.cc 两个 TU，不依赖 dlopen、
-    # pthread 或系统时间源，可以直接编到 wasm 上。只有打开 wasm 单测腿
-    # （demos/fun_test 编成 wasm 可执行文件）才需要它，默认不进构建图。
+    # pthread 或系统时间源，可以直接编到 wasm 上。只有 fun_test 的 wasm 单测腿需要，
+    # 由 demos/fun_test/wasm/CMakeLists.txt 把本开关设为 ON；其余 app 默认不进构建图。
     if(SOUI_BUILD_WASM_FUN_TEST)
     add_subdirectory(gtest)
     endif()
@@ -121,6 +121,7 @@ if(SOUI_BUILD_HTTPCLIENT AND NOT CMAKE_SYSTEM_NAME MATCHES Windows)
         set(CURL_USE_GNUTLS OFF CACHE BOOL "Enable GnuTLS for SSL/TLS" FORCE)
         set(CURL_USE_RUSTLS OFF CACHE BOOL "Enable Rustls for SSL/TLS" FORCE)
         set(CURL_USE_SCHANNEL OFF CACHE BOOL "Enable Windows native SSL/TLS (Schannel)" FORCE)
+        set(BUILD_LIBCURL_DOCS OFF CACHE BOOL "disable curl doc" FORCE)
         
         add_subdirectory(libcurl)
 endif()

@@ -1,7 +1,22 @@
+cmake_minimum_required(VERSION 3.16)
+project(cnchess-wasm)
+
+# 本文件是 cnchess wasm 客户端的顶层 CMake 工程入口；由 build-cnchess.sh 以
+# `cmake -S games/cnchess/client/wasm` 调用。SOUI4_DIR 指向仓库根，
+# wasm-lib-config.cmake 把 SOUI 库本身编成 wasm 形态，随后把仓库根作为子目录
+# add_subdirectory 进来（仅编库），并单独编算法库 games/cnchess/algorithm。
+set(SOUI4_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../../../" CACHE PATH
+    "soui4 repo root (four levels up from games/cnchess/client/wasm)")
+set(SOUI4_BUILD "${CMAKE_BINARY_DIR}/soui4" CACHE PATH
+    "soui4 build dir (library only)")
+include("${SOUI4_DIR}/__cmake/wasm-lib-config.cmake")
+add_subdirectory(${SOUI4_DIR} ${SOUI4_BUILD})
+add_subdirectory(${SOUI4_DIR}/games/cnchess/algorithm ${CMAKE_BINARY_DIR}/cnchess_algorithm)
+
 # =============================================================================
 # games/cnchess/client/wasm/CMakeLists.txt -- 中国象棋客户端的 wasm 入口
 #
-# 只在 Emscripten 下、且根 CMakeLists 打开 SOUI_BUILD_WASM_CNCHESS 时进入。
+# 本文件是 cnchess wasm 客户端的顶层 CMake 工程入口（不再由根 CMakeLists 选择）。
 #
 # 和 soui-wasm 的区别只有三处：
 #   1. 客户端自身的源码（../*.cpp）要一起编进这个模块；桌面入口 main.cc 和
@@ -15,7 +30,7 @@
 # TaskLoop 的后端由根 CMakeLists 的 SOUI_WASM_PTHREADS 决定，cnchess 的构建脚本默认
 # 打开它：主题包的解压因此跑在一条真正的 worker 线程上，与桌面版"工作线程解压"同口径，
 # 不再占 UI 帧。代价是产物要 crossOriginIsolated（COOP+COEP 响应头）才起得来线程 ——
-# 用 demos/wasm-demo/serve-isolated.py 起页面，python3 -m http.server 那一套不行。
+# 用 tools/wasm/serve-isolated.py 起页面，python3 -m http.server 那一套不行。
 # 关掉它（build-cnchess.sh --no-pthreads）就退回泵后端：解压仍在 UI 线程的
 # STaskLoopPump 里跑完，页面不再需要隔离头。两种产物的 .js/.wasm/.data 是三件套，
 # 混在同一目录里换构建会出现"新 wasm 配旧胶水"的 LinkError，所以产物目录按后端分开。
@@ -42,7 +57,7 @@ set(SOUI_CNCHESS_STACK "32MB" CACHE STRING "cnchess wasm: -sSTACK_SIZE")
 
 foreach(_req
         "${CMAKE_CURRENT_SOURCE_DIR}/../uires/uires.idx"
-        "${PROJECT_SOURCE_DIR}/soui-sys-resource/uires.idx")
+        "${SOUI4_DIR}/soui-sys-resource/uires.idx")
     if(NOT EXISTS "${_req}")
         message(FATAL_ERROR "cnchess wasm: 缺少 ${_req}（资源目录没检出？）")
     endif()
@@ -52,7 +67,7 @@ endforeach()
 # （文本走 canvas2d 的浏览器内置字体，不再挂载 /opt/soui/fonts）。
 set(_soui_cnchess_preload
     "--preload-file=${CMAKE_CURRENT_SOURCE_DIR}/../uires@/opt/soui/uires"
-    "--preload-file=${PROJECT_SOURCE_DIR}/soui-sys-resource@/opt/soui/soui-sys-resource")
+    "--preload-file=${SOUI4_DIR}/soui-sys-resource@/opt/soui/soui-sys-resource")
 
 # _malloc/_free：JS 侧要把控件名/文本写进线性内存再传进来。
 # 观测口（CnchessStat/CnchessChildXxx）是无头烟测唯一的取证方式：
@@ -74,7 +89,7 @@ set(_soui_cnchess_exports
 # 键鼠/滚轮注入、IME 代理、剪贴板、WebAudio 音效、崩溃上报都在里面）。壳页
 # cnchess.html 只写自己的排版与启动参数，不再维护第二份宿主实现。
 # 产物目录里必须有它：页面用相对路径 <script src="soui-host.js">，缺了直接白屏。
-set(_soui_host_js_default "${PROJECT_SOURCE_DIR}/demos/wasm-demo/soui-host.js")
+set(_soui_host_js_default "${SOUI4_DIR}/demos/wasm-demo/soui-host.js")
 set(SOUI_HOST_JS "${_soui_host_js_default}" CACHE FILEPATH
     "cnchess wasm: shared soui-host.js, copied next to the artifacts")
 # CACHE 变量只写一次：搬迁（soui-wasm/ -> demos/wasm-demo/）之前配置过的构建目录里
@@ -128,20 +143,21 @@ target_include_directories(cnchess-wasm PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/..
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include
     ${CMAKE_CURRENT_SOURCE_DIR}/../../algorithm
-    ${PROJECT_SOURCE_DIR}
-    ${PROJECT_SOURCE_DIR}/config
-    ${PROJECT_SOURCE_DIR}/utilities/include
-    ${PROJECT_SOURCE_DIR}/SOUI/include
-    ${PROJECT_SOURCE_DIR}/components
-    ${PROJECT_SOURCE_DIR}/controls.extend
-    ${PROJECT_SOURCE_DIR}/soui-sys-resource
-    ${PROJECT_SOURCE_DIR}/swinx/include
-    ${PROJECT_SOURCE_DIR}/swinx/src/platform/wasm
-    ${PROJECT_BINARY_DIR}/config)
+    ${SOUI4_DIR}
+    ${SOUI4_DIR}/config
+    ${SOUI4_DIR}/utilities/include
+    ${SOUI4_DIR}/SOUI/include
+    ${SOUI4_DIR}/components
+    ${SOUI4_DIR}/controls.extend
+    ${SOUI4_DIR}/soui-sys-resource
+    ${SOUI4_DIR}/swinx/include
+    ${SOUI4_DIR}/swinx/src/platform/wasm
+    ${SOUI4_BUILD}/config)
 
-# taskloop/ws/resprovider-zip 由 components/CMakeLists.txt 的 SOUI_WASM_MINIMAL
-# 分支在 SOUI_BUILD_WASM_CNCHESS 打开时加入；zlib_static 是 swinx 自带的那份，
-# 不能再链 third-part/zlib（同一批符号的第二份拷贝）。
+# taskloop/ws/resprovider-zip 由 components/CMakeLists.txt 的 SOUI_WASM_MINIMAL 分支
+# 按统一开关加入：ws / resprovider-zip 走 SOUI_BUILD_WS / SOUI_BUILD_RES_ZIP（本 app
+# 的构建脚本显式打开），taskloop 默认 ON。zlib_static 是 swinx 自带的那份，不能再链
+# third-part/zlib（同一批符号的第二份拷贝）。
 target_link_libraries(cnchess-wasm PRIVATE
     cnchess_algorithm
     soui4 utilities4 swinx
@@ -174,7 +190,7 @@ target_link_options(cnchess-wasm PRIVATE
 
 file(GLOB_RECURSE _soui_cnchess_res
     "${CMAKE_CURRENT_SOURCE_DIR}/../uires/*"
-    "${PROJECT_SOURCE_DIR}/soui-sys-resource/*")
+    "${SOUI4_DIR}/soui-sys-resource/*")
 set_property(TARGET cnchess-wasm APPEND PROPERTY LINK_DEPENDS
     ${_soui_cnchess_res}
     "${CMAKE_CURRENT_SOURCE_DIR}/cnchess.html"

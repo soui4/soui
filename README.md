@@ -61,9 +61,10 @@ The two tiers are not the same claim:
 - **Supported** (the six above) = shipping quality: CI builds, demos, real-device runs.
 - **Proof of capability** (FreeRTOS, WebAssembly) = the architecture was shown to absorb a
   new host type; the targets build and run an `SApp` end to end, but they still have known
-  gaps (FreeRTOS: font metrics, `ICON:` stubs, no target board; WASM: ~66 MB artifacts, no
-  IME, no touch). Read them as "the abstraction reaches this far", not as "ready to ship".
-  See `soui-freertos/README.md` and `doc/soui-wasm-port-plan.md`.
+  gaps (FreeRTOS: font metrics, `ICON:` stubs, no target board; WASM: no system IME or OLE
+  drag-and-drop, no real-device touch validation). Read them as "the abstraction reaches
+  this far", not as "ready to ship". See `soui-freertos/README.md` and
+  `swinx/doc/swinx-wasm-design.md`.
 
 How swinx is layered per platform:
 
@@ -176,10 +177,12 @@ The latest souieditor is integrated in the demos folder. Build the demo to get s
 
 ### WebAssembly
 - Requires [emsdk](https://emscripten.org/docs/getting_started/downloads.html) (verified locally with 6.0.13).
-- `emcmake cmake -S . -B build-wasm -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DSOUI_BUILD_WASM_DEMO=ON`
+- `emcmake cmake -S demos/wasm-demo -B build-wasm -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo` (each wasm port is its own standalone top-level CMake project; the SOUI library is pulled in via `add_subdirectory`).
 - `cmake --build build-wasm --target soui-wasm-demo -j4`; artifacts land in `demos/wasm-demo/out/`.
 - To look at it in a browser, serve with `python3 -m http.server 8080 -d demos/wasm-demo/out` and open `soui-wasm-demo.html`. Build options, verification steps and known limits are in [`demos/wasm-demo/readme.md`](./demos/wasm-demo/readme.md).
-- A second, much larger WebAssembly port ships with the Chinese-chess client: configure with `-DSOUI_BUILD_WASM_CNCHESS=ON` and build the `cnchess-wasm` target (or use the wrapper script `games/cnchess/client/wasm/build-cnchess.sh`, `build-cnchess.bat` on Windows; both have a `--release` profile). Artifacts land in `games/cnchess/client/wasm/out/`; networking uses the browser-native WebSocket and threading runs on a single-threaded `TaskLoop`. See `games/cnchess/client/wasm/readme.md`.
+- A second, much larger WebAssembly port ships with the Chinese-chess client. Configure it as its own project: `emcmake cmake -S games/cnchess/client/wasm -B build-wasm-cnchess -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo`, then `cmake --build build-wasm-cnchess --target cnchess-wasm` (or use the wrapper script `games/cnchess/client/wasm/build-cnchess.sh`, `build-cnchess.bat` on Windows; both have a `--release` profile). Artifacts land in `games/cnchess/client/wasm/out/`; networking uses the browser-native WebSocket and threading runs on a single-threaded `TaskLoop`. See `games/cnchess/client/wasm/readme.md`.
+- A third port is the fund-holdings demo. Configure it as its own project: `emcmake cmake -S demos/fundholdings/wasm -B build-wasm-fund -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DSOUI_WASM_PTHREADS=ON -DSOUI_BUILD_HTTPCLIENT=ON -DSWINX_FB_WIDTH=390 -DSWINX_FB_HEIGHT=844`, then `cmake --build build-wasm-fund --target fundholdings-wasm` (or the wrapper `demos/fundholdings/wasm/build-fundholdings.sh`, `build-fundholdings.bat` on Windows; both have a `--release` profile). It reuses the demo's `soui-host.js`, uses the 390x844 mobile resources and fetches quotes through the same-origin proxy in `demos/fundholdings/wasm/serve-fundholdings.py` (an app-specific entry built on the shared `tools/wasm/serve-isolated.py`); pthreads are on by default, so the page must be cross-origin isolated and plain `python3 -m http.server` will not work. Artifacts land in `demos/fundholdings/wasm/out_pt/` (`out/` with `--no-pthreads`).
+- The `fun_test` GDI suite also has a wasm leg for A/B-testing the two swinx GDI backends: `emcmake cmake -S demos/fun_test/wasm -B build-ft -G Ninja -DCMAKE_BUILD_TYPE=Debug -DSWINX_WASM_GDI_BACKEND=canvas2d` (or `cairo`), then `cmake --build build-ft --target fun_test` and `node demos/fun_test/wasm/run-node.js`. See `demos/fun_test/readme.md`.
 
 ## Contributors
 See [contributors.md](./contributors.md)

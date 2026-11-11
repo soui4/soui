@@ -244,11 +244,21 @@ const LONG cInitTextMax = (32 * 1024) - 1;
 #define FValidPF(_ppf)   ((_ppf)->cbSize == sizeof(PARAFORMAT2))
 #define TIMER_INVALIDATE 6
 
+// The two text-service IIDs.  richedit41 defines both of them itself
+// (edit.cpp) whenever it is linked in statically (INIT_RICHEDIT), and that is
+// the definition to use: SELECT_ANY is __attribute__((weak)) here, and on
+// MinGW an *address taken from a weak definition that a strong one in another
+// archive overrides* is bound through a COFF .refptr that keeps pointing at the
+// zero-filled weak slot.  QueryInterface() then receives an all-zero IID and
+// returns E_NOINTERFACE, so every <edit> fails to create with
+//   "init ITextHost Failed!" (SRichEdit::OnCreate).
+#ifndef INIT_RICHEDIT
 EXTERN_C SELECT_ANY const IID IID_ITextServices = /**< 8d33f740-cf58-11ce-a89d-00aa006cadc5 */
     { 0x8d33f740, 0xcf58, 0x11ce, { 0xa8, 0x9d, 0x00, 0xaa, 0x00, 0x6c, 0xad, 0xc5 } };
 
 EXTERN_C SELECT_ANY const IID IID_ITextHost = /**< c5bdd8d0-d26e-11ce-a89e-00aa006cadc5 */
     { 0xc5bdd8d0, 0xd26e, 0x11ce, { 0xa8, 0x9e, 0x00, 0xaa, 0x00, 0x6c, 0xad, 0xc5 } };
+#endif // INIT_RICHEDIT
 
 /** Convert Device Pixels to Himetric */
 LONG DtoHimetric(LONG d, LONG dPerInch)
@@ -1234,10 +1244,10 @@ void SRichEdit::OnPaint(IRenderTarget *pRT)
     {
         int nOldMode = ::SetGraphicsMode(hdc, GM_COMPATIBLE); // richedit needs to force GraphicMode to GM_COMPATIBLE
 
-#ifdef _WIN32
+#if SOUI_PLATFORM_WIN32
         ALPHAINFO ai;
         CGdiAlpha::AlphaBackup(hdc, &rcClient, ai);
-#endif // _WIN32
+#endif // SOUI_PLATFORM_WIN32
         LONG lPos = 0;
         m_pTxtHost->GetTextService()->TxGetVScroll(NULL, NULL, &lPos, NULL, NULL);
         RECTL rcL = { rcClient.left, rcClient.top, rcClient.right, rcClient.bottom };
@@ -1253,9 +1263,9 @@ void SRichEdit::OnPaint(IRenderTarget *pRT)
                                              NULL,             // Call back function
                                              0,                // Call back parameter
                                              TXTVIEW_ACTIVE);
-#ifdef _WIN32
+#if SOUI_PLATFORM_WIN32
         CGdiAlpha::AlphaRestore(ai);
-#endif // _WIN32
+#endif // SOUI_PLATFORM_WIN32
         ::SetGraphicsMode(hdc, nOldMode);
     }
     rt->ReleaseDC(hdc, &rcClient);
@@ -1468,11 +1478,14 @@ HRESULT SRichEdit::InitDefaultCharFormat(CHARFORMAT2W *pcf, IFontS *pFont)
     pcf->cbSize = sizeof(CHARFORMAT2W);
     pcf->dwMask = CFM_SIZE | CFM_OFFSET | CFM_FACE | CFM_CHARSET | CFM_COLOR | CFM_BOLD | CFM_ITALIC | CFM_UNDERLINE;
 
-#ifdef _WIN32
+#if SOUI_PLATFORM_WIN32
+    // The real GDI has no alpha byte, so it must not be handed one.
     pcf->crTextColor = pRT->GetTextColor() & 0x00ffffff;
 #else
+    // swinx honours the alpha byte: stripping it would hand richedit
+    // 0x00000000 for plain black and paint the text fully transparent.
     pcf->crTextColor = pRT->GetTextColor();
-#endif // _WIN32
+#endif // SOUI_PLATFORM_WIN32
     HDC hdc = GetDC(NULL);
     LONG yPixPerInch = GetDeviceCaps(hdc, LOGPIXELSY);
     ReleaseDC(NULL, hdc);
@@ -2141,11 +2154,11 @@ HRESULT SRichEdit::OnAttrRTF(const SStringW &strValue, BOOL bLoading)
 COLORREF SRichEdit::SetDefaultTextColor(COLORREF cr)
 {
     COLORREF crOld = m_cfDef.crTextColor;
-#ifdef _WIN32
+#if SOUI_PLATFORM_WIN32
     m_cfDef.crTextColor = cr & 0x00ffffff;
 #else
     m_cfDef.crTextColor = cr;
-#endif // _WIN32
+#endif // SOUI_PLATFORM_WIN32
     m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_CHARFORMATCHANGE, TXTBIT_CHARFORMATCHANGE);
     return crOld;
 }

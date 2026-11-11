@@ -29,93 +29,13 @@
 ###############################################################################
 
 # ---------------------------------------------------------------------------
-# 0. wasm 腿：同一批用例编到 wasm 上，换 GDI 后端跑 A/B
+# 0. wasm 腿：独立顶层工程，不在这里
 # ---------------------------------------------------------------------------
-# 下面那套桌面流程在 wasm 上有三条不成立，因此这里走一条独立分支并提前 return：
-#   * 源集只能是子集。其余 TU 依赖 wasm 构建图里根本没有的能力 —— log4z / ws / network
-#     等组件（见 components/CMakeLists.txt 的 SOUI_WASM_MINIMAL 白名单）、dlopen
-#     （test_hook / test_module 的 LoadLibrary 路径）、pthread（test_thread / test_sync /
-#     test_cs）、zlib 资源包（test_integration_*，wasm 下没有 resprovider-zip）、真窗口
-#     与显示（test_gui_* / test_soui.cpp）。列进来是链接错误，不是运行期降级，所以按
-#     能力剔除，并把"为什么没进来"写在下面。
-#   * 不注册 CTest。宿主没有 wasm 测试启动器，ctest 起不了 .js；执行由
-#     wasm/run-node.js（node + 假 DOM/canvas 桩）与产物自带的 .html（浏览器真 canvas）
-#     两条腿承担，见 demos/fun_test/readme.md 的"wasm 腿"一节。
-#   * 不跑 §7 的 POST_BUILD —— 那条命令会去 exec 一个 .html。
-if(EMSCRIPTEN)
-    # 只取 swinx 的 GDI / 文本 / 区域 / 句柄这一层：四个 TU 全是纯 Win32 兼容面调用
-    # （CreateCompatibleDC、ExtTextOut、CombineRgn、GetGuiResources），不碰 SOUI 控件树，
-    # 也不碰系统资源包，因此不需要 --preload-file。
-    set(FUN_TEST_WASM_SRC
-        ${CMAKE_CURRENT_SOURCE_DIR}/test_dc.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/test_region.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/test_text.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/test_swinx_handle_type_unit.cpp)
-
-    # 产物目录按 GDI 后端分开：两条腿的 .wasm 名字相同，混在一个目录里 A/B 会互相覆盖。
-    # 后端变量由 swinx/wasm.cmake 拥有（swinx 先于本目录进入构建图，这里只读）。
-    if(NOT DEFINED SWINX_WASM_GDI_BACKEND OR SWINX_WASM_GDI_BACKEND STREQUAL "")
-        set(SWINX_WASM_GDI_BACKEND "canvas2d")
-    endif()
-    set(_fun_test_out "${CMAKE_CURRENT_SOURCE_DIR}/out.${SWINX_WASM_GDI_BACKEND}")
-
-    set(SOUI_WASM_FUN_TEST_STACK "32MB" CACHE STRING "wasm fun_test: -sSTACK_SIZE")
-    # 找缺陷的产物默认带可读断言：abort 时给出具体原因，而不是 "Aborted()"。
-    option(SOUI_WASM_FUN_TEST_ASSERTIONS "wasm fun_test: link with -sASSERTIONS=2" ON)
-
-    add_executable(fun_test ${FUN_TEST_WASM_SRC})
-    target_include_directories(fun_test PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}
-        ${CMAKE_SOURCE_DIR}/utilities/include
-        ${CMAKE_SOURCE_DIR}/third-part/gtest/include
-        ${CMAKE_SOURCE_DIR}/swinx/include
-        ${CMAKE_BINARY_DIR}/config)
-
-    # swinx 是这层唯一的实现方：GDI 后端的差异全在 swinx 内部按 SWINX_WASM_GDI_BACKEND
-    # 分派，本目标不带 soui4 —— 这几个用例只调 Win32 兼容面。
-    target_link_libraries(fun_test PRIVATE gtest swinx utilities4 m)
-    # cairo 后端：freetype 只 PRIVATE 链 brotlidec，而 brotli 的 CMakeLists 在 Emscripten
-    # 下删掉了 dec -> common 这条链接边（见 swinx/wasm.cmake 同处的说明），所以最终链接
-    # 必须显式带上 brotlicommon，否则 _kBrotliPrefixCodeRanges 等符号全 undefined。
-    # canvas2d 分支不构建 brotli，TARGET 不存在时自然跳过。
-    if(TARGET brotlicommon)
-        target_link_libraries(fun_test PRIVATE brotlicommon)
-    endif()
-    target_compile_options(fun_test PRIVATE -Wall)
-
-    set_target_properties(fun_test PROPERTIES
-        CXX_STANDARD 11
-        CXX_STANDARD_REQUIRED ON
-        OUTPUT_NAME "fun_test-wasm"
-        # emcc 只有在输出名是 .html 时才生成浏览器外壳；.js 仍然单独可用，node 腿直接
-        # require 它（先在 wasm/run-node.js 里装好假 DOM/canvas 桩）。
-        SUFFIX ".html"
-        RUNTIME_OUTPUT_DIRECTORY "${_fun_test_out}")
-    foreach(_cfg IN ITEMS DEBUG RELEASE RELWITHDEBINFO MINSIZEREL)
-        set_target_properties(fun_test PROPERTIES
-            RUNTIME_OUTPUT_DIRECTORY_${_cfg} "${_fun_test_out}")
-    endforeach()
-
-    target_link_options(fun_test PRIVATE
-        # canvas2d 后端用 emscripten::val 持有离屏 canvas / 2D context，emval 运行时由
-        # embind 提供；cairo 后端不引用这些符号，多带一份不改变产物。
-        "-lembind"
-        "-sALLOW_MEMORY_GROWTH=1"
-        "-sSTACK_SIZE=${SOUI_WASM_FUN_TEST_STACK}"
-        "-sEXPORTED_FUNCTIONS=_main,_malloc,_free"
-        # gtest 跑完 main 返回即退出：node 腿要拿到退出码，浏览器腿只是停止泵帧。
-        "-sEXIT_RUNTIME=1"
-        # 数据段必须落在 0x10000 以上，否则 swinx 的 IS_INTRESOURCE 会把串字面量当成
-        # 原子号（同一件事的完整说明见 demos/wasm-demo/CMakeLists.txt 末尾）。
-        "-Wl,--stack-first")
-    if(SOUI_WASM_FUN_TEST_ASSERTIONS)
-        target_link_options(fun_test PRIVATE "-sASSERTIONS=2")
-    endif()
-
-    message(STATUS "SOUI_WASM_FUN_TEST: gdi-backend=${SWINX_WASM_GDI_BACKEND}, out=${_fun_test_out}, "
-                   "stack=${SOUI_WASM_FUN_TEST_STACK}, assertions=${SOUI_WASM_FUN_TEST_ASSERTIONS}")
-    return()
-endif()
+# wasm 版 fun_test 由 demos/fun_test/wasm/CMakeLists.txt 作为独立顶层工程构建
+# （project(fun_test-wasm) + include(__cmake/wasm-lib-config.cmake) +
+#  add_subdirectory(<soui4>) 仅编库）。wasm 下 SOUI_BUILD_DEMOS 恒 OFF，demos/
+# 不进构建图，因此本文件只在桌面 / 移动端构建图里出现，不再走 EMSCRIPTEN 分支。
+# 源集、链接参数与 A/B 后端的说明一并搬到了那份 CMakeLists 里。
 
 # ---------------------------------------------------------------------------
 # 1. 编译设置与头文件搜索路径
@@ -344,7 +264,7 @@ set_target_properties(fun_test PROPERTIES
 # 测试出现非零退出（有用例失败）会让构建失败，便于第一时间发现回归。
 # iOS / OHOS 的交叉编译目标是移动设备，不在本机执行。
 option(SOUI_FUN_TEST_POST_BUILD "Run the non-interactive fun_test suite after building it" ON)
-if(SOUI_FUN_TEST_POST_BUILD AND NOT CMAKE_SYSTEM_NAME MATCHES "Windows|iOS" AND NOT IS_OHOS)
+if(SOUI_FUN_TEST_POST_BUILD AND NOT CMAKE_SYSTEM_NAME MATCHES "iOS" AND NOT IS_OHOS)
     add_custom_command(TARGET fun_test POST_BUILD
         COMMAND $<TARGET_FILE:fun_test> --gtest_filter=-window.* --gtest_color=yes
         COMMENT "fun_test: running the non-interactive suite (window.* excluded)..."

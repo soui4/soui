@@ -8,7 +8,7 @@
  *   T2  the same timer driven from a blocking GetMessage loop; proc posts WM_QUIT -> GetMessage returns FALSE
  *   T3  GetMessage with an empty queue sleeps until another thread posts (wall time >> CPU time)
  *
- * Build/run: see doc/soui-wasm-port-plan.md section 23.8.
+ * Timer behaviour is documented in swinx/doc/swinx-wasm-design.md section 4.3.
  */
 #include <windows.h>
 #include "SConnection.h"

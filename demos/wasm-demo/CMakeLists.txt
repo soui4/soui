@@ -1,16 +1,16 @@
 # =============================================================================
 # demos/wasm-demo/CMakeLists.txt -- wasm 演示的构建入口
 #
-# 只在 Emscripten 下、且根 CMakeLists 打开 SOUI_BUILD_WASM_DEMO 时进入。
+# 本文件是 wasm 演示的顶层 CMake 工程入口；由 build-soui.sh 以 `cmake -S demos/wasm-demo` 调用，
 # 目录原先叫 soui-wasm/（在仓库根下），现在挪到 demos/wasm-demo/，深度多了一层；
-# 下面所有指向仓库根的路径都用 CMAKE_SOURCE_DIR，不要用 PROJECT_SOURCE_DIR ——
-# project() 会把 PROJECT_SOURCE_DIR 重置成本目录，指向根的那些路径就全错了。
+# 下面所有指向仓库根的路径都用 SOUI4_DIR（由本文件顶部设定，指向 soui4 仓库根），不要用 CMAKE_SOURCE_DIR ——
+# 顶层工程里 CMAKE_SOURCE_DIR 已是本目录，必须用 SOUI4_DIR 才能指到仓库根。
 #
 # 这个文件存在的理由：演示的链接命令原先写在 build-soui.sh 里，用了 bash 数组、
 # sed、find 与进程替换，Windows 主机上根本没有这些工具——同一套移植在 Windows
 # 上就出不了包。搬进 CMake 之后三平台都是同两条命令：
 #
-#   emcmake cmake -S <soui4> -B <build> -G Ninja -DSOUI_BUILD_WASM_DEMO=ON
+#   emcmake cmake -S demos/wasm-demo -B <build> -G Ninja
 #   cmake --build <build>
 #
 # 链接期的五件事都在这里：
@@ -26,8 +26,16 @@
 #   5. 运行时形状：MODULARIZE、内存增长、32 MB 栈（SOUI_DEMO_STACK 覆盖）、
 #      以及页面外壳要用的 SwinxDemo* / SwinxFb* 导出符号。
 # =============================================================================
+cmake_minimum_required(VERSION 3.16)
 project(wasm-demo)
-# CMAKE_SOURCE_DIR 才是仓库根（本文件由根 CMakeLists 的 add_subdirectory 进入）。
+
+set(SOUI4_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../.." CACHE PATH
+    "soui4 repo root (parent of demos/wasm-demo)")
+set(SOUI4_BUILD "${CMAKE_BINARY_DIR}/soui4" CACHE PATH
+    "soui4 build dir (library only)")
+include("${SOUI4_DIR}/__cmake/wasm-lib-config.cmake")
+add_subdirectory(${SOUI4_DIR} ${SOUI4_BUILD})
+# SOUI4_DIR 是仓库根（本文件是顶层工程，SOUI4_DIR 由本文件顶部设定）。
 
 set(SOUI_WASM_DEMO_OUT "${CMAKE_CURRENT_SOURCE_DIR}/out" CACHE PATH
     "wasm demo: output directory for soui-wasm-demo.{html,js,wasm,data}")
@@ -90,7 +98,7 @@ endif()
 
 foreach(_req
         "${CMAKE_CURRENT_SOURCE_DIR}/uires/uires.idx"
-        "${CMAKE_SOURCE_DIR}/soui-sys-resource/uires.idx")
+        "${SOUI4_DIR}/soui-sys-resource/uires.idx")
     if(NOT EXISTS "${_req}")
         message(FATAL_ERROR
             "wasm demo: 缺少 ${_req}（应用资源或系统资源目录没检出？资源目录里必须有 uires.idx）")
@@ -101,7 +109,7 @@ endforeach()
 # 宿主机路径一律用 CMake 给出的正斜杠形式：emcc 的 file_packager 按 '@' 切分，
 # 反斜杠会在 Windows 上被当成转义。
 #
-# uires 逐个条目预载（而不是整目录一次）：SOUI_BUILD_WASM_LUA=OFF 时要把
+# uires 逐个条目预载（而不是整目录一次）：SOUI_BUILD_SCRIPT_LUA=OFF 时要把
 # uires/lua 从 .data 里摘掉。uires.idx 仍然列着 <lua> 组，SResProviderFiles 找不到
 # 文件也只是取不到脚本——而这时脚本工厂本身就没编进来，SHostWnd 解析 <script> 时
 # CreateScriptModule() 直接返回 E_FAIL，那条索引永远不会被读到。
@@ -119,18 +127,18 @@ set(_soui_demo_preload "")
 file(GLOB _soui_uires_items "${CMAKE_CURRENT_SOURCE_DIR}/uires/*")
 foreach(_item IN LISTS _soui_uires_items)
     get_filename_component(_item_name "${_item}" NAME)
-    if(_item_name STREQUAL "lua" AND NOT SOUI_BUILD_WASM_LUA)
+    if(_item_name STREQUAL "lua" AND NOT SOUI_BUILD_SCRIPT_LUA)
         continue()
     endif()
     list(APPEND _soui_demo_preload
         "--preload-file=${_item}@/opt/soui/uires/${_item_name}")
 endforeach()
 list(APPEND _soui_demo_preload
-    "--preload-file=${CMAKE_SOURCE_DIR}/soui-sys-resource@/opt/soui/soui-sys-resource")
+    "--preload-file=${SOUI4_DIR}/soui-sys-resource@/opt/soui/soui-sys-resource")
 # 音效：uires/lua/games.lua 按 GetAppDir() .. "/snd/" 拼路径，而 soui_main.cpp 把
 # app dir 设成 /opt/soui，所以这里必须挂成 /opt/soui/snd。只在编译了 Lua 时预载——
 # 没有脚本工厂就没有游戏，预载进来只是白占 .data（6 个 wav 共约 140 KB）。
-if(SOUI_BUILD_WASM_LUA)
+if(SOUI_BUILD_SCRIPT_LUA)
     list(APPEND _soui_demo_preload
         "--preload-file=${CMAKE_CURRENT_SOURCE_DIR}/snd@/opt/soui/snd")
 endif()
@@ -205,17 +213,17 @@ target_compile_definitions(soui-wasm-demo PRIVATE
     SWINX_FB_HEIGHT=${SWINX_FB_HEIGHT}
     # 宿主用这两个宏决定：装不装脚本工厂、页面上的提示语写什么。
     # 值必须和下面的链接列表同源。
-    SOUI_WASM_HAS_LUA=$<BOOL:${SOUI_BUILD_WASM_LUA}>
+    SOUI_WASM_HAS_LUA=$<BOOL:${SOUI_BUILD_SCRIPT_LUA}>
     SOUI_WASM_HAS_SCINTILLA=$<BOOL:${SOUI_BUILD_WASM_SCINTILLA}>)
 
 target_include_directories(soui-wasm-demo PRIVATE
-    ${CMAKE_SOURCE_DIR}/utilities/include
-    ${CMAKE_SOURCE_DIR}/SOUI/include
-    ${CMAKE_SOURCE_DIR}/components
-    ${CMAKE_SOURCE_DIR}/controls.extend
-    ${CMAKE_SOURCE_DIR}/swinx/include
-    ${CMAKE_SOURCE_DIR}/swinx/src/platform/wasm
-    ${CMAKE_BINARY_DIR}/config)
+    ${SOUI4_DIR}/utilities/include
+    ${SOUI4_DIR}/SOUI/include
+    ${SOUI4_DIR}/components
+    ${SOUI4_DIR}/controls.extend
+    ${SOUI4_DIR}/swinx/include
+    ${SOUI4_DIR}/swinx/src/platform/wasm
+    ${SOUI4_BUILD}/config)
 
 # 静态库之间的循环（soui4 调 Win32 API、swinx 的回调又进 SOUI）交给 CMake 的
 # 静态循环展开处理：它会把库按依赖图重排、必要时重复列几遍。不要在这里手写
@@ -242,12 +250,15 @@ endif()
 if(SOUI_BUILD_WASM_SCINTILLA)
     target_link_libraries(soui-wasm-demo PRIVATE Scintilla)
 endif()
-# Lua 三个库是一组：lua-54 是解释器，scriptmodule-lua 是 SOUI 的适配层，
-# translator 被脚本导出表里的 CreateTranslatorMgr 直接引用（缺了是未定义符号，
-# 不是运行时才失败）。
-if(SOUI_BUILD_WASM_LUA)
+# Lua 适配层（scriptmodule-lua）里的 CreateTranslatorMgr 已用编译宏 SOUI_BUILD_TRANSLATOR
+# 包住：只有 translator 模块被编译（SOUI_BUILD_TRANSLATOR=ON）时才导出该函数，因此 Lua
+# 与 translator 不再有编译/链接耦合，二者可独立开关。下面只按各自开关链接。
+if(SOUI_BUILD_SCRIPT_LUA)
     target_link_libraries(soui-wasm-demo PRIVATE
-        scriptmodule-lua lua-54 translator)
+        scriptmodule-lua lua-54)
+endif()
+if(SOUI_BUILD_TRANSLATOR)
+    target_link_libraries(soui-wasm-demo PRIVATE translator)
 endif()
 
 option(SOUI_WASM_LINK_DEBUG
@@ -310,8 +321,8 @@ target_link_options(soui-wasm-demo PRIVATE
     # emcc 在 -O0 下默认就是 --stack-first（数据段排在栈之后），-O1 及以上换成
     # --no-stack-first，所以这里显式钉住，避免链接优化级别决定运行结果。
     # 同一份 .o、同一批 .a 的实测：-O2 不钉 → 26 项烟测全挂；-O2 钉住 → 全过；
-    # -O0 再加 -Wl,--no-stack-first → 复现失败。swinx 侧的根治方式见
-    # doc/soui-wasm-port-plan.md（需要改子模块，未在本轮改动内）。
+    # -O0 再加 -Wl,--no-stack-first → 复现失败。swinx 侧的启动自检见
+    # swinx/doc/swinx-wasm-design.md §4.7（lowmem.cpp 在数据段下界过低时 abort）。
     # ASAN 与 --stack-first 不兼容（em++ 直接报错）；ASAN 检查构建固定用 -O0，
     # 而 -O0 下 emcc 默认就是 --stack-first，语义不变，直接省略。
     ${_soui_demo_stack_first}
@@ -322,7 +333,7 @@ target_link_options(soui-wasm-demo PRIVATE
 file(GLOB_RECURSE _soui_demo_res
     "${CMAKE_CURRENT_SOURCE_DIR}/uires/*"
     "${CMAKE_CURRENT_SOURCE_DIR}/snd/*"
-    "${CMAKE_SOURCE_DIR}/soui-sys-resource/*")
+    "${SOUI4_DIR}/soui-sys-resource/*")
 set(_soui_demo_link_deps
     ${_soui_demo_res}
     "${CMAKE_CURRENT_SOURCE_DIR}/soui.html"
@@ -347,4 +358,4 @@ add_custom_command(TARGET soui-wasm-demo POST_BUILD
 message(STATUS "SOUI_WASM_DEMO: ${SWINX_FB_WIDTH}x${SWINX_FB_HEIGHT}, stack=${SOUI_DEMO_STACK}, "
                "gdi-backend=${_soui_demo_gdi_backend}, "
                "font=${_soui_demo_gdi_backend} -> ${SOUI_WASM_DEMO_OUT}")
-message(STATUS "SOUI_WASM_DEMO features: lua=${SOUI_BUILD_WASM_LUA} scintilla=${SOUI_BUILD_WASM_SCINTILLA}")
+message(STATUS "SOUI_WASM_DEMO features: lua=${SOUI_BUILD_SCRIPT_LUA} scintilla=${SOUI_BUILD_WASM_SCINTILLA}")

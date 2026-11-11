@@ -107,7 +107,6 @@ void SComboBox::OnDestroyDropDown(SDropDownWnd *pDropDown)
 
 void SComboBox::OnSelChanged()
 {
-    m_pListBox->GetCurSel();
     if (m_pEdit && !m_pEdit->GetEventSet()->isMuted())
     {
         SStringT strText = GetLBText(m_pListBox->GetCurSel());
@@ -121,14 +120,19 @@ void SComboBox::OnSelChanged()
 
 BOOL SComboBox::FireEvent(IEvtArgs *evt)
 {
-    if (evt->IdFrom() == IDC_DROPDOWN_LIST && m_pDropDownWnd)
+    if (evt->IdFrom() == IDC_DROPDOWN_LIST)
     {
+        // The selection-changed event of the dropdown list must be handled even when the
+        // dropdown is already gone: a mouse click on an item first reaches
+        // SWindow::OnLButtonUp, which sends EVT_CMD and closes the dropdown, and only then
+        // does SListBox raise EVT_LB_SELCHANGED. Gating on m_pDropDownWnd here would drop
+        // that event, leaving the embedded edit (editable combo) out of sync.
         if (evt->GetID() == EventLBSelChanged::EventID)
         {
             OnSelChanged();
             return TRUE;
         }
-        if (evt->GetID() == EventCmd::EventID)
+        if (m_pDropDownWnd && evt->GetID() == EventCmd::EventID)
         {
             CloseUp();
             return TRUE;

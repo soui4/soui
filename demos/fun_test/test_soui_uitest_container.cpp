@@ -1,6 +1,6 @@
 ﻿/**
  * @file  test_soui_uitest_container.cpp
- * @brief SouiTest —— 容器控件（组合框/选项卡）无头用例（Tier A）
+ * @brief SouiTest —— 容器控件（组合框/选项卡/列表视图）无头用例（Tier A）
  *
  * 这些用例与其它无头用例一样直接参与 soui-uitest 门禁：SouiTest 夹具在 SetUp 中调用
  * HeadlessApp::LoadSystemResource() 加载系统资源 soui-sys-resource，因此 SComboBox /
@@ -10,11 +10,14 @@
  * 用例验证内容：
  *   - 组合框：程序化 InsertItem + SetCurSel 触发 EventCBSelChange，且 GetCurSel / 项文本同步
  *   - 选项卡：InsertItem 建两页 + SetCurSel 触发 EventTabSelChanged，且 GetCurSel 同步
+ *   - 组合视图：下拉内容是一个 listview，绑定适配器后 GetCount / SetCurSel / 项文本同步
+ *   - 列表视图：适配器驱动 GetCount，SetSel(bNotify) 发事件，多选集合可增删查询
  * 它们完全复用 SouiTest 的 mouseClick / keyClick / SignalSpy / findByName 机制，
  * 与 button/checkbox/radio 用例同一条事件注入 + 监听路径。
  */
 #include "test_soui_uitest_common.h"
 #include <SApp.h>
+#include <helper/SAdapterBase.h>
 
 using namespace SOUI;
 
@@ -88,4 +91,135 @@ TEST_F(SouiTestFixture, tab_switch_fires_event)
 
     EXPECT_EQ(spy.count(), 1);
     EXPECT_EQ(tabs->GetCurSel(), target);
+}
+
+namespace
+{
+// 固定 3 项的只读适配器：comboview 的下拉 listview 与 listview 用例共用。
+class CTestFixedAdapter : public SAdapterBase
+{
+public:
+    virtual void WINAPI InitByTemplate(SXmlNode xmlTemplate)
+    {
+        m_nItemHeight = GETLAYOUTSIZE(xmlTemplate.attribute(L"itemHeight").as_string(L"30dp"));
+    }
+
+    virtual int WINAPI getCount()
+    {
+        return 3;
+    }
+
+    virtual void WINAPI getView(int nItem, SItemPanel *pItem, SXmlNode xmlTemplate)
+    {
+        if (pItem->GetChildrenCount() == 0)
+            pItem->InitFromXml(&xmlTemplate);
+    }
+
+    virtual void WINAPI getViewDesiredSize(SIZE *retSize, int nItem, SItemPanel *pItem, int nWid, int nHei)
+    {
+        retSize->cx = 0;
+        retSize->cy = m_nItemHeight.toPixelSize(pItem->GetScale());
+    }
+
+    virtual SStringW WINAPI getItemDesc(int nItem)
+    {
+        static const LPCWSTR kItems[] = {L"Alpha", L"Beta", L"Gamma"};
+        return kItems[nItem % ARRAYSIZE(kItems)];
+    }
+
+private:
+    SLayoutSize m_nItemHeight;
+};
+} // namespace
+
+// comboview：下拉内容由内部 listview 承载，绑定适配器后可选第 3 项，
+// 选择事件、下拉列表选中项与控件显示文本应保持一致。
+TEST_F(SouiTestFixture, comboview_listview_selection)
+{
+    SWindow *root = loadUi(L"<window layout='vbox' width='240' height='80'/>");
+
+    SComboView *cbv = (SComboView *)SApplication::getSingleton().CreateWindowByName(L"comboview");
+    ASSERT_TRUE(cbv != NULL);
+    cbv->SetContainer(container());
+
+    const wchar_t *kXml =
+        L"<comboview name='cbv' width='200' height='26' dropDown='1'>"
+        L"<listStyle wndclass='listview' colorBkgnd='#FFFFFF'>"
+        L"<template itemHeight='30'><text pos='0,0,-0,-0' name='txt'/></template>"
+        L"</listStyle>"
+        L"</comboview>";
+    SXmlDoc doc;
+    ASSERT_TRUE(doc.load_buffer(kXml, (size_t)wcslen(kXml) * sizeof(wchar_t),
+                               xml_parse_default, funtest::WCHAR_ENC));
+    SXmlNode node = doc.root().first_child();
+    ASSERT_TRUE(node);
+    ASSERT_TRUE(cbv->InitFromXml(&node));
+
+    root->InsertChild(cbv);
+
+    // listStyle 已在 InitFromXml 时建成 listview，并因 template 的 itemHeight 生成定高定位器。
+    SListView *lv = cbv->GetListView();
+    ASSERT_TRUE(lv != NULL);
+
+    CTestFixedAdapter *adapter = new CTestFixedAdapter;
+    ASSERT_TRUE(lv->SetAdapter(adapter));
+    adapter->Release(); // 引用由 listview 持有
+
+    ASSERT_EQ(cbv->GetCount(), 3);
+    EXPECT_EQ(cbv->GetCurSel(), -1);
+
+    SouiTest::SignalSpy spy(cbv, EventCBSelChange::EventID);
+    EXPECT_TRUE(cbv->SetCurSel(2));
+
+    EXPECT_EQ(spy.count(), 1);
+    EXPECT_EQ(cbv->GetCurSel(), 2);
+    EXPECT_EQ(lv->GetSel(), 2);
+
+    // 下拉列表数据同时驱动控件显示文本（getItemDesc）。
+    SStringT itemText;
+    EXPECT_TRUE(cbv->GetItemText(2, TRUE, &itemText));
+    EXPECT_EQ(itemText, _T("Gamma"));
+}
+
+// listview：适配器提供数据；SetSel(bNotify=TRUE) 发选择事件；
+// 多选模式下 AddSelItem / RemoveSelItem 维护选择集合并可查询。
+TEST_F(SouiTestFixture, listview_adapter_and_multiselect)
+{
+    SWindow *root = loadUi(
+        L"<window layout='vbox' width='300' height='200'>"
+        L"<listview name='lv' width='280' height='180'>"
+        L"<template itemHeight='30'><text pos='0,0,-0,-0' name='txt'/></template>"
+        L"</listview>"
+        L"</window>");
+    SListView *lv = SouiTest::findByName<SListView>(root, L"lv");
+    ASSERT_TRUE(lv != NULL);
+
+    CTestFixedAdapter *adapter = new CTestFixedAdapter;
+    ASSERT_TRUE(lv->SetAdapter(adapter));
+    adapter->Release();
+
+    ASSERT_TRUE(lv->GetAdapter() != NULL);
+    EXPECT_EQ(lv->GetAdapter()->getCount(), 3);
+
+    // 单选：显式通知才发 EVT_LV_SELCHANGED。
+    lv->SetSel(0, FALSE);
+    EXPECT_EQ(lv->GetSel(), 0);
+
+    SouiTest::SignalSpy spy(lv, EventLVSelChanged::EventID);
+    lv->SetSel(1, TRUE);
+    EXPECT_EQ(spy.count(), 1);
+    EXPECT_EQ(lv->GetSel(), 1);
+
+    // 多选：选择多个项，计数与命中查询同步；移除后立即反映。
+    lv->SetMultiSel(TRUE);
+    EXPECT_TRUE(lv->GetMultiSel());
+    lv->AddSelItem(1);
+    lv->AddSelItem(2);
+    EXPECT_EQ(lv->GetSelItemCount(), 2);
+    EXPECT_TRUE(lv->IsItemSelected(2));
+
+    lv->RemoveSelItem(1);
+    EXPECT_EQ(lv->GetSelItemCount(), 1);
+    EXPECT_FALSE(lv->IsItemSelected(1));
+    EXPECT_TRUE(lv->IsItemSelected(2));
 }

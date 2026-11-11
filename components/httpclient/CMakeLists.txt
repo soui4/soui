@@ -16,7 +16,19 @@ set(srcs
 	httpHeader.cpp
 )
 
-if (CMAKE_SYSTEM_NAME MATCHES Windows)
+if (EMSCRIPTEN)
+    # wasm：没有 WinHTTP/libcurl，改用浏览器 XMLHttpRequest（同步 XHR，跑在
+    # TaskLoop 的 wasm worker 线程上）。请求经同源代理转发，见 wasm/HttpClient.cpp。
+    set(headers
+        ${headers}
+        wasm/HttpClient.h
+    )
+
+    set(srcs
+        ${srcs}
+        wasm/HttpClient.cpp
+    )
+elseif (CMAKE_SYSTEM_NAME MATCHES Windows)
     set(enable_http ON)
     set(headers
         ${headers}
@@ -72,7 +84,7 @@ set(COM_LIBS ${COM_LIBS} httpclient CACHE INTERNAL "com_lib")
 if(SOUI_ENABLE_COM_LIB)
     if (CMAKE_SYSTEM_NAME MATCHES Windows)
         set(COM_DEP_LIBS ${COM_DEP_LIBS} Winhttp.lib CACHE INTERNAL "com_dep_libs")
-    else()
+    elseif (NOT EMSCRIPTEN)
         set(COM_DEP_LIBS ${COM_DEP_LIBS} curl ssl_1_1 crypto_1_1 CACHE INTERNAL "com_dep_libs")
     endif()
 endif()

@@ -63,16 +63,16 @@ ctest --test-dir build -L '^soui-interactive$' --output-on-failure
 
 ## wasm 腿（swinx GDI 后端的 A/B）
 
-`swinx` 在 wasm 上有两个 GDI 后端：`canvas2d`（默认，光栅化交给浏览器 canvas）和 `cairo`（光栅化在 wasm 模块内）。桌面构建只能跑到其中一个，后端差异要靠同一批用例在两个后端各跑一遍才能暴露。`-DSOUI_BUILD_WASM_FUN_TEST=ON` 把 `test_dc.cpp` / `test_region.cpp` / `test_text.cpp` / `test_swinx_handle_type_unit.cpp` 四个纯 Win32 兼容面的 TU 编成一个 wasm 可执行文件（源集与不注册 CTest 的理由写在 `CMakeLists.txt` 第 0 节）。
+`swinx` 在 wasm 上有两个 GDI 后端：`canvas2d`（默认，光栅化交给浏览器 canvas）和 `cairo`（光栅化在 wasm 模块内）。桌面构建只能跑到其中一个，后端差异要靠同一批用例在两个后端各跑一遍才能暴露。wasm 单测腿现在是**独立顶层工程**（`demos/fun_test/wasm/CMakeLists.txt`：`project(fun_test-wasm)` + `include(__cmake/wasm-lib-config.cmake)` + `add_subdirectory(<soui4>)` 仅编库），把 `test_dc.cpp` / `test_region.cpp` / `test_text.cpp` / `test_swinx_handle_type_unit.cpp` 四个纯 Win32 兼容面的 TU 编成一个 wasm 可执行文件；源集与不注册 CTest 的理由写在那份 CMakeLists 里。gtest 由该工程内部把 `SOUI_BUILD_WASM_FUN_TEST` 设为 ON 拉进最小构建图，命令行不用再传。
 
 ```sh
 source ~/emsdk/emsdk_env.sh
-EMC=~/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
+# 独立顶层工程：cmake -S 指向 demos/fun_test/wasm，emcmake 自动带 Emscripten toolchain
 # 后端由 -DSWINX_WASM_GDI_BACKEND 选择，产物落在 demos/fun_test/out.<backend>/
-cmake -S . -B build-ft-c2d -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=$EMC \
-      -DSOUI_BUILD_WASM_FUN_TEST=ON -DSWINX_WASM_GDI_BACKEND=canvas2d
-cmake -S . -B build-ft-cai -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=$EMC \
-      -DSOUI_BUILD_WASM_FUN_TEST=ON -DSWINX_WASM_GDI_BACKEND=cairo
+emcmake cmake -S demos/fun_test/wasm -B build-ft-c2d -G Ninja -DCMAKE_BUILD_TYPE=Debug \
+      -DSWINX_WASM_GDI_BACKEND=canvas2d
+emcmake cmake -S demos/fun_test/wasm -B build-ft-cai -G Ninja -DCMAKE_BUILD_TYPE=Debug \
+      -DSWINX_WASM_GDI_BACKEND=cairo
 cmake --build build-ft-c2d --target fun_test -j8
 cmake --build build-ft-cai --target fun_test -j8
 ```
@@ -100,8 +100,8 @@ python3 -m http.server 8931 --directory demos/fun_test
 - **DrawText 自己要把字形裁进格式化矩形**（第三轮，87 → 88）：`drawtext_clips_to_format_rect` 是这一条的第一份证据。上面所有裁剪用例都是调用方先 `SelectClipRgn` 再画，而 Win32 的 `DrawText` 不看调用方的裁剪、自己裁 `RECT`（只有 `DT_NOCLIP` 放开）。SOUI 侧 `SWindow::DispatchPaint` 只应用控件显式的 `m_clipRgn`/`m_clipPath`，**不把孩子窗口裁到自己的窗口矩形**，脏矩形又只按控件矩形失效 —— 于是越出矩形的字墨此后再没有任何一次重绘会覆盖它，飘字动画就在轨迹上留下永久残影。cairo 后端 `src/gdi/cairo/drawtext.cpp` 一直是裁的，canvas2d 的 `drawTextLines()` 漏了，`DT_NOCLIP` 也被忽略。
   用例三条断言配对：16x16 矩形里画 6 个 20px 粗体 `W` 时框内必须有墨（否则"整体不画"也能过）且框外必须全白；同一矩形带 `DT_NOCLIP` 重画时 `x>=32` 必须有墨（否则"永远不画"也能过）；随后 `x=40..56` 的 `FillRect` 必须到达（证明裁剪是 `SaveDC` 级作用域，没漏到调用方 DC）。
   **证伪是在已知正确的基线上做的**：把 cairo 那侧的 `if (!(m_uFormat & DT_NOCLIP))` 临时改成 `if (false && …)` 重编原生 `fun_test`，用例红在"墨越界"这一条（`test_dc.cpp:1481: gold ink at 20,9 escaped the formatting rect`），恢复后转绿 —— 断言钉的就是矩形裁剪这件事，canvas2d 修复前缺的也是同一件。
-  第三轮实测（2026-11-06）：cairo node 88/88（cairo 的光栅在模块内，这一腿能判像素，新用例的证据来自这里）、canvas2d node 85/88（新用例被 `pixelsReadable()` 早退，本腿不作证据）、原生 `fun_test` 的 cairo 腿全绿；canvas2d 浏览器腿由人工开页复跑并通过 —— 产物做两份：`out.canvas2d`（含修复）与 `out.canvas2d.red`（`git show HEAD:` 的修复前 swinx 重编，`.wasm` 差 819 字节），红构建只在"墨越界"这一条断言上失败、绿构建通过。当时这条 A/B 只证明**后端不对称**，还不等于演示里 `bug.png` 那串残影结案；随后用户在 canvas2d 后端把俄罗斯方块 1–10 关连测 4 次（文字特效形态）全部无残影，应用腿才一并结案。因果链与"为什么这三条修齐才有效"见 `doc/soui-wasm-canvas2d-残影修复说明.md`，过程记录见 `doc/soui-wasm-port-plan.md` §31–§37。
-  结案后 `out.canvas2d.red/` 与 `/tmp/wasm-demo-red/` 这两份红产物已删除（本来就在 `.gitignore` 的 `/out.*/` 里）；要复跑红/绿 A/B 按 §36.4 记录的命令重建，注意主仓库历史里有两个 swinx 指针在本地和远端都取不到（`da85cbe1`、`56b70c82`），红基线要用能取到的修复前提交（`31179e6a`）。
+  第三轮实测（2026-11-06）：cairo node 88/88（cairo 的光栅在模块内，这一腿能判像素，新用例的证据来自这里）、canvas2d node 85/88（新用例被 `pixelsReadable()` 早退，本腿不作证据）、原生 `fun_test` 的 cairo 腿全绿；canvas2d 浏览器腿由人工开页复跑并通过 —— 产物做两份：`out.canvas2d`（含修复）与 `out.canvas2d.red`（`git show HEAD:` 的修复前 swinx 重编，`.wasm` 差 819 字节），红构建只在"墨越界"这一条断言上失败、绿构建通过。当时这条 A/B 只证明**后端不对称**，还不等于演示里 `bug.png` 那串残影结案；随后用户在 canvas2d 后端把俄罗斯方块 1–10 关连测 4 次（文字特效形态）全部无残影，应用腿才一并结案。因果链与"为什么这三条修齐才有效"见 `swinx/doc/swinx-wasm-canvas2d-残影修复说明.md`。
+  结案后 `out.canvas2d.red/` 与 `/tmp/wasm-demo-red/` 这两份红产物已删除（本来就在 `.gitignore` 的 `/out.*/` 里）；要复跑红/绿 A/B 需按当时的 `git show HEAD:` 重编方式重建，注意主仓库历史里有两个 swinx 指针在本地和远端都取不到（`da85cbe1`、`56b70c82`），红基线要用能取到的修复前提交（`31179e6a`）。
 - **像素断言要成对写**：只断言"清屏后那个点是黑/白"分不清"裁剪放宽了"和"画布被整体清空"（`ctx.reset()` 就是把画布清成透明黑，读回来也是 0,0,0）。所以裁剪类用例同时在"旧裁剪内、新裁剪动作覆盖不到的地方"留一枚红色标记，要求它还在；`moving_text_after_leaked_clip_leaves_no_residue` 则要求整幅回到白色。把 `clipClearCanvas` 临时换成 `ctx.reset()` 版本重跑，这三条的"画布被清空"断言和残影用例全数失败，证明它们能挡住这种"以破坏换通过"的改法。Blt 族两条同理：单看"旧标记消失"会放过"把整块画布擦掉"的实现，必须同时要求不透明源点到达、矩形外不动。
 - 产物目录 `out.*/` 已在 `demos/fun_test/.gitignore` 里排除，不入库；`out_pt/` 之类的临时目录同理。
 
@@ -296,9 +296,9 @@ fun_test/
 │                     # 每条都带"旧裁剪内的标记必须活着"的配对断言
 │                     # 与 Blt 族一组：BitBlt / StretchDIBits 的 SRCCOPY 是替换不是叠加
 │                     # （透明源必须擦掉目标旧墨迹、不透明源点要到达、矩形外不动）
-├── wasm/             # wasm 腿的两条运行载体：run-node.js（node + 假 DOM/canvas 桩）、
-│                     # browser-runner.html（真 canvas，服务器根 = 本目录）。证明范围与
-│                     # 桩件边界见上面的"wasm 腿"一节
+├── wasm/             # wasm 腿：CMakeLists.txt（独立顶层工程入口）、两条运行载体
+│                     # run-node.js（node + 假 DOM/canvas 桩）、browser-runner.html（真 canvas）
+│                     # 证明范围与桩件边界见上面的"wasm 腿"一节
 └── ...
 ```
 

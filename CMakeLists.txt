@@ -21,7 +21,7 @@ if(NOT CMAKE_BUILD_TYPE)
 set(CMAKE_BUILD_TYPE "Release")
 endif()
 message(STATUS "build type is ${CMAKE_BUILD_TYPE}")
-set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/__cmake/")
+set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/__cmake/")
 include(__cmake/internal_utils.cmake)
 
 set(BUILD_FOR_ARM OFF)
@@ -136,94 +136,6 @@ endif()
 option(SOUI_ENABLE_ACC "Enable MSAA/IAccessible (provided by swinx)" OFF)
 endif(IS_OHOS)
 
-# ---------------------------------------------------------------------------
-# WebAssembly (Emscripten) 裁剪
-#
-# 浏览器形态下构建 swinx + utilities4 + SOUI 核心 + 最小静态组件（render-gdi、
-# imgdecoder-stb）：third-part 里的 skia/lua/sqlite/7z/curl/openssl…、controls.extend
-# 和资源包要么依赖桌面/联网能力，要么依赖宿主文件系统，第一阶段全部不进入构建图。
-# SOUI 核心与 utilities 均不 include third-part 头文件，只链接 utilities4 + swinx。
-#
-# 静态形态是必须的：浏览器没有 dlopen，组件库无法按 SOUI_ENABLE_CORE_LIB=OFF 的
-# DLL 方式在运行时加载，只能编进最终二进制。
-#
-# 组件白名单不写在根 CMakeLists 里，而是由 third-part/CMakeLists.txt 和
-# components/CMakeLists.txt 各自的 SOUI_WASM_MINIMAL 分支决定——那两个文件才是
-# 自己内容的所有者，根这里只负责把开关打开、把目录挂进构建图。
-# ---------------------------------------------------------------------------
-if(EMSCRIPTEN)
-    set(SOUI_WASM_MINIMAL ON CACHE INTERNAL "wasm build: swinx + utilities4 + SOUI core + minimal components")
-    set(SOUI_ENABLE_CORE_LIB ON CACHE BOOL "Enable compile 'core' as static lib" FORCE)
-    set(SOUI_ENABLE_COM_LIB ON CACHE BOOL "Enable compile 'components' as static lib" FORCE)
-    set(SOUI_BUILD_DEMOS OFF CACHE BOOL "Build builtin demos" FORCE)
-    set(SOUI_BUILD_GAMES OFF CACHE BOOL "Build soui games" FORCE)
-    set(SOUI_BUILD_TOOLS OFF CACHE BOOL "Build soui tools" FORCE)
-    set(SOUI_BUILD_HTTPCLIENT OFF CACHE BOOL "Build HTTP client component" FORCE)
-    set(SOUI_BUILD_WS OFF CACHE BOOL "Build Websocket module" FORCE)
-    # 页面上真正能打字的 <edit> 需要 richedit：SOUI 的 SRichEdit 有两条路，桌面
-    # 构建默认走 LoadLibrary 加载系统 riched20/msftedit，wasm 没有 dlopen，只能走
-    # INIT_RICHEDIT 的静态链接版本（SOUI/CMakeLists.txt 里由本开关决定）。
-    set(SOUI_BUILD_RICHEDIT ON CACHE BOOL "using richedit from source code" FORCE)
-    # SVG 在 wasm 下也开：Lua 游戏页（消消乐/俄罗斯方块/坦克大战）的皮肤全是
-    # src="svg:..."（多帧雪碧图 + 九宫药丸底），关掉之后这些 skin 拿不到 ISvgObj，
-    # 整页画成空白。实现只多一份 header-only 的 nanosvg（SOUI/src/core/Svg.cpp）
-    # 加 render-gdi 的 SVG 绘制分支，体积代价见 demos/wasm-demo/readme.md 的体积表。
-    set(SOUI_ENABLE_SVG ON CACHE BOOL "Enable SVG support" FORCE)
-    set(SOUI_ENABLE_SPY OFF CACHE BOOL "Enable Swnd Spy" FORCE)
-    set(SOUI_ENABLE_ACC OFF CACHE BOOL "Enable MSAA/IAccessible (provided by swinx)" FORCE)
-    # 两个"可选能力"开关：默认开，关掉能直接从 .wasm/.data 里省掉对应体积
-    # （lua-54 + ScriptModule-LUA + translator ≈ 数 MB；Scintilla 的 .cxx 更多）。
-    # 它们只影响 wasm 最小构建图（桌面构建不受这两个变量约束），消费的四个位置：
-    #   third-part/CMakeLists.txt   lua-54 / Scintilla 子目录
-    #   components/CMakeLists.txt   ScriptModule-LUA / translator 子目录
-    #   controls.extend/…           SScintillaView 源文件过滤 + 注册守卫
-    #   demos/wasm-demo/CMakeLists.txt  链接列表 + uires/lua 预载 + 传给宿主的宏
-    # 宿主的 SOUI_WASM_HAS_LUA/HAS_SCINTILLA 宏会汇总进 SwinxDemoFeatureMask()，
-    # 无头烟测据此跳过被关掉的页内断言（关功能不该让烟测变红）。
-    option(SOUI_BUILD_WASM_LUA "wasm: build ScriptModule-LUA + lua-54 + translator and preload uires/lua" ON)
-    option(SOUI_BUILD_WASM_SCINTILLA "wasm: build Scintilla and the <scintilla> control from controls.extend" ON)
-    # 中国象棋客户端（games/cnchess/client）的 wasm 版本。它比演示多要两个组件：
-    # ws 的浏览器 WebSocket 后端、resprovider-zip（解压服务器下发的主题包）。
-    # TaskLoop 的 wasm 后端已是最小构建的常驻组件，不在此列。开关只挂
-    # games/cnchess/algorithm + client/wasm 两个子目录，桌面构建不受影响。
-    option(SOUI_BUILD_WASM_CNCHESS "wasm: build the cnchess client (games/cnchess/client/wasm)" OFF)
-    # worker 线程能力开关。打开后整个 wasm 构建图带上 -pthread：
-    #   components/TaskLoop 的 worker 后端（ITaskLoop::start 建一条 worker 线程，
-    #   UI 只入队 + Atomics 唤醒）需要它；
-    #   同时必须 -sWASMFS=1 —— 默认的 JS 文件系统下，worker 里的任何 stdio 都要
-    #   浏览器主线程在 futex 忙等里代为处理请求，而本端口的主线程从不阻塞
-    #   （实测：主线程不睡时 worker 的 fopen 永不返回；WASMFS=1 后 47ms 跑完）。
-    # 代价是 SharedArrayBuffer，也就是站点必须 crossOriginIsolated（COOP+COEP 响应
-    # 头），python -m http.server 那套起法跑不了，见 demos/wasm-demo/serve-isolated.py。
-    # 默认关闭：关掉时构建图、产物与烟测和开这个选项之前完全一致。
-    option(SOUI_WASM_PTHREADS "wasm: build with -pthread so ITaskLoop can run on a worker thread" OFF)
-    if(SOUI_WASM_PTHREADS)
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-        # swinx 与 components 都按这个宏分派后端，不靠编译器宏：
-        # __EMSCRIPTEN_PTHREADS__ 只有编译单元自己带 -pthread 时才定义，
-        # 而宿主（soui-host.js / cnchess_main.cpp）需要知道链接期能力是否可用。
-        add_compile_definitions(SOUI_WASM_PTHREADS=1)
-        # 链接期三条设置放在根目录，让每个 wasm 可执行目标（演示、cnchess）拿到
-        # 同一份配置 —— 只在某个 demo 的 CMakeLists 里补，别的目标一开这个开关就会
-        # 在 wasm-ld 期报错（cnchess 实测：INITIAL_MEMORY 默认 16MB < STACK_SIZE 32MB）。
-        #   -sWASMFS=1        文件系统搬进线性内存。默认的 JS 文件系统下，worker 里的
-        #                     每次 stdio 都要浏览器主线程在 futex 忙等里代跑，而本端口
-        #                     的主线程从不阻塞（实测：主线程不睡时 worker 的 fopen 永不
-        #                     返回，换 WASMFS=1 后同一个读 47ms 跑完）。
-        #   -sINITIAL_MEMORY  Emscripten 硬性要求它大于 STACK_SIZE；栈是主线程的静态栈，
-        #                     worker 栈另从堆里按 4MB 一条分配（TaskLoopWasm.cpp）。
-        #   GrowableArrayBuffers 1 = 有 resizable buffer 就用，没有照旧。pthreads 与
-        #                     ALLOW_MEMORY_GROWTH 并存时，不用它的构建要走一段很慢的胶水。
-        add_link_options("-sWASMFS=1" "-sINITIAL_MEMORY=64MB" "-sGROWABLE_ARRAYBUFFERS=1")
-        message(STATUS "SOUI_WASM_PTHREADS: -pthread + -sWASMFS=1，产物需要 crossOriginIsolated 才能跑")
-    endif()
-    # Emscripten 用 clang 编译，而下面 Darwin 分支的告警抑制只按目标平台判断，交叉编译
-    # 到 wasm 时不生效：同一批头文件会在 macOS/Linux 主机上各刷上万条
-    # -Winconsistent-missing-override。这里按编译器口径补一条，与 §Darwin 分支一致。
-    add_compile_options(-Wno-inconsistent-missing-override)
-    message(STATUS "SOUI_WASM_MINIMAL: swinx + utilities4 + SOUI core + render-gdi/imgdecoder-stb only")
-endif()
 
 include(__cmake/global.cmake)
 include(__cmake/windres.cmake)
@@ -314,39 +226,23 @@ link_directories(${CMAKE_BINARY_DIR}/bin)
 if(NOT CMAKE_SYSTEM_NAME MATCHES Windows)
         set(CMAKE_CXX_STANDARD 11)
 endif()
-# wasm 最小构建：third-part 与 components 只保留渲染器和图片解码器需要的条目，
-# 系统资源包（zip）不进入构建图（见各自 CMakeLists 的 SOUI_WASM_MINIMAL 分支）。
+
+# 组件开关必须在 third-part 之前写进 CMake cache：third-part 的 wasm 分支要按
+# SOUI_BUILD_SCRIPT_LUA 决定编不编 lua-54，各 wasm app 顶层也要读同一批开关来决定
+# 链接库与资源预载。普通变量只在 components/ 子树可见，会让这些读取点全部落空
+# （见 __cmake/component-options.cmake 顶部的说明）。
+include("${CMAKE_CURRENT_LIST_DIR}/__cmake/component-options.cmake")
+
 add_subdirectory(third-part)
 add_subdirectory(utilities)
 add_subdirectory(components)
 add_subdirectory(SOUI)
-if(NOT SOUI_WASM_MINIMAL)
-    add_subdirectory(soui-sys-resource)
-    add_subdirectory(soui-sys-resource2)
-    add_subdirectory(soui-sys-resource-dark)
-    add_subdirectory(soui-sys-resource-light)
-endif()
-# 扩展控件在 wasm 下也进构建图：SScintillaView 走 Scintilla 的 headless 接口，
-# 其余控件只用 GDI。注册入口是 SCtrlsRegister::RegisterCtrls，由 demo 显式调用
-# （wasm 没有静态自注册）。
+add_subdirectory(soui-sys-resource)
+add_subdirectory(soui-sys-resource2)
+add_subdirectory(soui-sys-resource-dark)
+add_subdirectory(soui-sys-resource-light)
+
 add_subdirectory(controls.extend)
-# wasm 演示（demos/wasm-demo）不在 SOUI_BUILD_DEMOS 里：那个开关在 EMSCRIPTEN 下恒关，
-# 而这套移植唯一的端到端入口就是它。用独立开关、默认关，既有配置一概不受影响。
-# 打开后演示随全栈一起构建，链接命令全部在 demos/wasm-demo/CMakeLists.txt 里，宿主
-# 不需要 bash/sed/find（Windows 主机因此可以只靠 emcmake + cmake 构建）。
-# 注意 demos/CMakeLists.txt 不会遍历子目录（它显式列目标），所以这里直接指路径，
-# 与 SOUI_BUILD_DEMOS 不会重复加同一棵树。
-option(SOUI_BUILD_WASM_DEMO "Build the wasm demo in demos/wasm-demo (Emscripten hosts only)" OFF)
-if(EMSCRIPTEN AND SOUI_BUILD_WASM_DEMO)
-    add_subdirectory(demos/wasm-demo)
-endif()
-# 中国象棋的 wasm 客户端同样独立于 SOUI_BUILD_GAMES：那个开关在 EMSCRIPTEN 下恒关，
-# 且 games/ 的入口还要求 websockets 目标（wasm 不用 libwebsockets）。这里只挂客户
-# 端真正需要的两棵子树，服务器端的 server/ 留在桌面构建里。
-if(EMSCRIPTEN AND SOUI_BUILD_WASM_CNCHESS)
-        add_subdirectory(games/cnchess/algorithm)
-        add_subdirectory(games/cnchess/client/wasm)
-endif()
 if(SOUI_BUILD_TOOLS)
         add_subdirectory(tools)
 endif()
@@ -418,24 +314,3 @@ configure_file("${PROJECT_SOURCE_DIR}/__cmake/soui4.pc.in"
                "${PROJECT_BINARY_DIR}/soui4.pc" @ONLY)
 install(FILES "${PROJECT_BINARY_DIR}/soui4.pc"
         DESTINATION lib/pkgconfig)
-
-
-# Install cmake files
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/__cmake
-        DESTINATION ${CMAKE_INSTALL_PREFIX}
-        FILES_MATCHING PATTERN "*.cmake"
-)
-install(FILES ${PROJECT_SOURCE_DIR}/__cmake/plist.in ${PROJECT_SOURCE_DIR}/__cmake/dpi_aware.manifest ${PROJECT_SOURCE_DIR}/__cmake/export_res_sym.lst
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/__cmake
-)
-
-install(FILES 
-        ${PROJECT_SOURCE_DIR}/soui-sys-resource.zip
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/resources
-)
-
-install(FILES 
-        ${PROJECT_SOURCE_DIR}/LICENSE-en.md
-        ${PROJECT_SOURCE_DIR}/LICENSE-zh.md
-        DESTINATION ${CMAKE_INSTALL_PREFIX}
-)

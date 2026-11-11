@@ -188,6 +188,7 @@ void SScreenToClient(INativeWnd *pWnd,CRect & rc){
 }
 
 SComMgr2* GetLuaScriptComMgr2();
+#ifdef SOUI_BUILD_TRANSLATOR
 // ---------------------------------------------------------------------------
 // new global factories (parity with soui4js)
 // ---------------------------------------------------------------------------
@@ -196,6 +197,7 @@ ITranslatorMgr * CreateTranslatorMgr(){
 	GetLuaScriptComMgr2()->CreateTranslator((IObjRef**)&pRet);
 	return pRet;
 }
+#endif // SOUI_BUILD_TRANSLATOR
 
 ILogMgr * GetLogMgr(){
 	return SApplication::getSingleton().GetLogManager();
@@ -265,8 +267,9 @@ BOOL ExpLua_Global(lua_State *L)
 		lua_tinker::def(L,"SScreenToClient",SScreenToClient);
 		lua_tinker::def(L,"SClientToScreen",SClientToScreen);
 
-		// new in soui5 parity
+#ifdef SOUI_BUILD_TRANSLATOR
 		lua_tinker::def(L,"CreateTranslatorMgr",CreateTranslatorMgr);
+#endif // SOUI_BUILD_TRANSLATOR
 		lua_tinker::def(L,"GetLogMgr",GetLogMgr);
 		lua_tinker::def(L,"IsX64",IsX64);
 		lua_tinker::def(L,"OsType",OsType);

@@ -222,6 +222,7 @@ void CMainDlg::InitRichEditHost()
 *               - SMCListView(多列虚拟列表 mclv_test)
 *               - STileView(宫格列表 lv_test_tile)
 *               - STreeView(树形列表 room_tv)
+*               - SComboView(下拉列表 cbv_fix / cbv_flex)
 *             SetAdapter 会增加适配器引用计数,初始化后释放一次由控件托管。
 */
 void CMainDlg::InitListViews()
@@ -278,6 +279,24 @@ void CMainDlg::InitListViews()
 		CTreeViewAdapter * pTreeViewAdapter = new CTreeViewAdapter;
 		pTreeView->SetAdapter(pTreeViewAdapter);
 		pTreeViewAdapter->Release();
+	}
+
+	//comboview 的下拉内容由内部 listview 承载,这里分别绑定定高/变高两套 item 模板
+	SComboView *pCbvFix = FindChildByName2<SComboView>("cbv_fix");
+	if (pCbvFix && pCbvFix->GetListView())
+	{
+		ILvAdapter *pAdapter = new CTestComboViewAdapter(FALSE);
+		pCbvFix->GetListView()->SetAdapter(pAdapter);
+		pAdapter->Release();
+		pCbvFix->SetCurSel(0);
+	}
+	SComboView *pCbvFlex = FindChildByName2<SComboView>("cbv_flex");
+	if (pCbvFlex && pCbvFlex->GetListView())
+	{
+		ILvAdapter *pAdapter = new CTestComboViewAdapter(TRUE);
+		pCbvFlex->GetListView()->SetAdapter(pAdapter);
+		pAdapter->Release();
+		pCbvFlex->SetCurSel(1); //选中偶数项,展示双行模板
 	}
 }
 

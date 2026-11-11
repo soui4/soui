@@ -597,7 +597,7 @@
       <page title="编辑器" layout="vbox" padding="12dp,10dp,12dp,10dp" interval="6dp">
         <text class="h1" size="-2,-1">@string/edit_h1</text>
         <!-- edit_hint / lua_hint 这两个名字是给宿主用的：SOUI_BUILD_WASM_SCINTILLA
-             或 SOUI_BUILD_WASM_LUA 关掉时，对应能力没编进来，页面上会留一块安静的
+             或 SOUI_BUILD_SCRIPT_LUA 关掉时，对应能力没编进来，页面上会留一块安静的
              空白（未注册的标签被布局直接跳过）。noteDisabledFeatures() 会把原因写
              在这两行说明里，而不是让人对着空白猜。 -->
         <text name="edit_hint" class="hint" size="-2,-1" multiLines="1" wordBreak="1">@string/edit_body</text>
@@ -727,7 +727,7 @@
              现在换成 demos/demo 的三个 Lua 游戏（消消乐 / 俄罗斯方块 / 坦克大战）：
              内容由 <include src="layout:XML_PAGE_GAME"/> 从 uires.idx 的 LAYOUT 组
              取页签布局，棋盘格子仍由脚本创建（lua/games.lua 的 *_init）。
-             lua_hint 这个名字是给宿主用的：SOUI_BUILD_WASM_LUA=OFF 时脚本工厂没编
+             lua_hint 这个名字是给宿主用的：SOUI_BUILD_SCRIPT_LUA=OFF 时脚本工厂没编
              进来，noteDisabledFeatures() 把原因写在这行里，而不是让人对着空白猜。 -->
         <text name="lua_hint" class="hint" size="-2,-1" multiLines="1" wordBreak="1">@string/lua_body</text>
         <include src="layout:XML_PAGE_GAME"/>

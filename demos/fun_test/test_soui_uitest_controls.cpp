@@ -7,6 +7,8 @@
  *   - 组合框：InsertItem + SetCurSel 触发 EventCBSelChange，且 GetCurSel / 文本同步
  *   - 选项卡：SetCurSel 触发 EventTabSelChanged，且 GetCurSel 同步
  *   - 复选框：点击触发 EventCmd；SetCheck 切换 WndState_Check
+ *   - 列表框：XML items 建项，文本/数据/查找可用；SetCurSel 触发 EventLBSelChanged
+ *   - 进度条：XML min/max/value 生效，SetValue/SetRange 把值钳制在区间内
  */
 #include "test_soui_uitest_common.h"
 
@@ -67,4 +69,65 @@ TEST_F(SouiTestFixture, radio_click_fires_command)
     SouiTest::SignalSpy spy(rb, EventCmd::EventID);
     SouiTest::mouseClick(rb);
     EXPECT_EQ(spy.count(), 1);
+}
+
+// 列表框：XML <items> 建项后，文本/数据/查找均可读；SetCurSel(bNotify=TRUE) 触发选择事件。
+TEST_F(SouiTestFixture, listbox_items_and_selchange)
+{
+    SWindow *root = loadUi(
+        L"<window layout='vbox' width='200' height='160'>"
+        L"<listbox name='lb' width='180' height='120'>"
+        L"<items>"
+        L"<item text='alpha' data='1'/>"
+        L"<item text='beta' data='2'/>"
+        L"<item text='gamma' data='3'/>"
+        L"</items>"
+        L"</listbox>"
+        L"</window>");
+    SListBox *lb = SouiTest::findByName<SListBox>(root, L"lb");
+    ASSERT_TRUE(lb != NULL);
+
+    ASSERT_EQ(lb->GetCount(), 3);
+    EXPECT_EQ(lb->GetText(1), _T("beta"));
+    EXPECT_EQ(lb->GetItemData(1), (LPARAM)2);
+    // FindString 从 iFindAfter 之后开始环形查找，点击前缀即可命中。
+    EXPECT_EQ(lb->FindString(-1, _T("gam")), 2);
+
+    SouiTest::SignalSpy spy(lb, EventLBSelChanged::EventID);
+    EXPECT_TRUE(lb->SetCurSel(2, TRUE));
+    EXPECT_EQ(spy.count(), 1);
+    EXPECT_EQ(lb->GetCurSel(), 2);
+
+    // 选中项没变化时不重复发事件。
+    EXPECT_FALSE(lb->SetCurSel(2, TRUE));
+    EXPECT_EQ(spy.count(), 1);
+}
+
+// 进度条：XML 的 min/max/value 生效；SetValue 越界时钳制，SetRange 收窄时同步收敛当前值。
+TEST_F(SouiTestFixture, progress_value_clamped_to_range)
+{
+    SWindow *root = loadUi(
+        L"<window layout='vbox' width='200' height='80'>"
+        L"<progress name='pg' min='10' max='90' value='50' width='150' height='12'/>"
+        L"</window>");
+    SProgress *pg = SouiTest::findByName<SProgress>(root, L"pg");
+    ASSERT_TRUE(pg != NULL);
+
+    int nMin = 0, nMax = 0;
+    pg->GetRange(&nMin, &nMax);
+    EXPECT_EQ(nMin, 10);
+    EXPECT_EQ(nMax, 90);
+    EXPECT_EQ(pg->GetValue(), 50);
+
+    pg->SetValue(200);
+    EXPECT_EQ(pg->GetValue(), 90);
+    pg->SetValue(5);
+    EXPECT_EQ(pg->GetValue(), 10);
+
+    // 新区间不含当前值时，值收敛到新区间端点。
+    pg->SetRange(20, 40);
+    pg->GetRange(&nMin, &nMax);
+    EXPECT_EQ(nMin, 20);
+    EXPECT_EQ(nMax, 40);
+    EXPECT_EQ(pg->GetValue(), 20);
 }

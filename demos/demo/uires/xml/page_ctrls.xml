@@ -901,7 +901,7 @@
 		<page title="combobox and listbox" layout="vbox" padding="20,16,20,18" colorBkgnd="@color/clr_window_bg">
 			<!-- 页头 -->
 			<text text="列表框与组合框" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
-			<text text="combobox 可编辑与纯下拉两种模式对比,listbox 支持由代码动态初始化" extend_top="6" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
+			<text text="combobox 可编辑与纯下拉两种模式对比,listbox 支持由代码动态初始化,comboview 用 listview 承载下拉内容" extend_top="6" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
 
 			<window size="-2,0" weight="1" layout="hbox" interval="10" extend_top="16">
 
@@ -981,6 +981,71 @@
 					</listbox>
 					<button size="-2,30" extend_top="12" name="btn_init_listbox" skin="skin_btn"
 					        font="face:微软雅黑,size:13" colorText="@color/clr_title" drawFocusRect="0">init listbox</button>
+				</window>
+			</window>
+
+			<!-- 卡片:comboview -->
+			<window size="-2,150" skin="skin_card" layout="vbox" padding="14,13,14,15" extend_top="10">
+				<window size="-2,14" layout="hbox" gravity="center" interval="8">
+					<window size="3,12" skin="skin_card_bar"/>
+					<text text="comboview" font="face:微软雅黑,size:12,bold:1" colorText="@color/clr_text_sub"/>
+					<window size="0,0" weight="1"/>
+					<text text="下拉内容是一个完整的 listview,item 模板可自由布局" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
+				</window>
+				<window size="-2,0" weight="1" layout="hbox" interval="16" extend_top="10">
+					<!-- 定高:图标 + 双行文本 + 右对齐价格,行内控件全部用 pos 绝对定位 -->
+					<window size="0,-2" weight="1" layout="vbox">
+						<text text="定高行:图标 + 双行文本 + 右侧价格" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
+						<comboview name="cbv_fix" cueText="选择套餐" cueColor="@color/clr_text_sub" size="-2,30" dropDown="1"
+						           dropHeight="320" class="cls_edit" dotted="0" animateTime="200" btnSkin="skin_cbx_btn"
+						           font="face:微软雅黑,size:13" drawFocusRect="0" extend_top="6">
+							<dropdownStyle>
+								<root colorBkgnd="@color/clr_card_bg"/>
+							</dropdownStyle>
+							<!-- 下拉用 wndclass=listview 的虚拟列表承载,模板里可以摆放任意控件 -->
+							<listStyle wndclass="listview" skin="none" ncskin="skin_popup" margin="6"
+							           colorBkgnd="@color/clr_card_bg" sbSkin="skin_scrollbar" sbWid="6" sbArrowSize="0"
+							           dividerSize="0" drawFocusRect="0">
+								<template itemHeight="54" trackMouseEvent="1" skin="skin_lb_item">
+									<img pos="10,11,@32,@32" name="cbv_icon" skin="skin_page_icons" iconIndex="0"/>
+									<text pos="50,8,-160,28" name="cbv_title" font="face:微软雅黑,size:13" colorText="@color/clr_text"/>
+									<text pos="50,30,-160,48" name="cbv_desc" font="face:微软雅黑,size:12" colorText="@color/clr_text_sub"/>
+									<text pos="-150,0,@140,-0" name="cbv_value" align="right" font="face:微软雅黑,size:13,bold:1"
+									      colorText="@color/clr_primary"/>
+								</template>
+							</listStyle>
+						</comboview>
+					</window>
+					<!-- 变高:奇偶行使用不同模板、不同行高,同样由同一个 listview 承载 -->
+					<window size="0,-2" weight="1" layout="vbox">
+						<text text="变高行:奇偶行不同模板与高度" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
+						<comboview name="cbv_flex" cueText="选择版本" cueColor="@color/clr_text_sub" size="-2,30" dropDown="1"
+						           dropHeight="320" class="cls_edit" dotted="0" animateTime="200" btnSkin="skin_cbx_btn"
+						           font="face:微软雅黑,size:13" drawFocusRect="0" extend_top="6">
+							<dropdownStyle>
+								<root colorBkgnd="@color/clr_card_bg"/>
+							</dropdownStyle>
+							<listStyle wndclass="listview" skin="none" ncskin="skin_popup" margin="6"
+							           colorBkgnd="@color/clr_card_bg" sbSkin="skin_scrollbar" sbWid="6" sbArrowSize="0"
+							           dividerSize="0" drawFocusRect="0">
+								<template defHeight="42" oddHeight="42" evenHeight="66" trackMouseEvent="1">
+									<itemOdd skin="skin_lb_item">
+										<img pos="10,7,@28,@28" name="cbv_icon" skin="skin_page_icons" iconIndex="0"/>
+										<text pos="46,0,-160,-0" name="cbv_title" font="face:微软雅黑,size:13" colorText="@color/clr_text"/>
+										<text pos="-150,0,@140,-0" name="cbv_value" align="right" font="face:微软雅黑,size:13"
+										      colorText="@color/clr_text_sub"/>
+									</itemOdd>
+									<itemEven skin="skin_lb_item">
+										<img pos="10,17,@32,@32" name="cbv_icon" skin="skin_page_icons" iconIndex="0"/>
+										<text pos="50,12,-160,32" name="cbv_title" font="face:微软雅黑,size:13" colorText="@color/clr_text"/>
+										<text pos="50,34,-160,52" name="cbv_desc" font="face:微软雅黑,size:12" colorText="@color/clr_text_sub"/>
+										<text pos="-150,12,@140,34" name="cbv_value" align="right" font="face:微软雅黑,size:13,bold:1"
+										      colorText="@color/clr_primary"/>
+									</itemEven>
+								</template>
+							</listStyle>
+						</comboview>
+					</window>
 				</window>
 			</window>
 		</page>

@@ -76,6 +76,14 @@ if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
     target_link_libraries(scriptmodule-lua swinx)
 endif()
 
+# CreateTranslatorMgr() 直接引用 translator 的 COM 工厂。仅当 translator 组件一并编入
+#（SOUI_BUILD_TRANSLATOR=ON）时才定义该宏，使 ScriptModule-LUA 不依赖 translator：
+# 关掉 translator 时 CreateTranslatorMgr 整体不编译，wasm 静态链接也不会再出现对
+# translator 符号的未定义引用。
+if(SOUI_BUILD_TRANSLATOR)
+    target_compile_definitions(scriptmodule-lua PRIVATE SOUI_BUILD_TRANSLATOR)
+endif()
+
 set(COM_LIBS ${COM_LIBS} scriptmodule-lua CACHE INTERNAL "com_lib")
 if(SOUI_ENABLE_COM_LIB)
     set(COM_DEP_LIBS ${COM_DEP_LIBS} lua-54 CACHE INTERNAL "com_dep_libs")

@@ -81,7 +81,6 @@ void SComboView::OnDestroyDropDown(SDropDownWnd *pDropDown)
 
 void SComboView::OnSelChanged()
 {
-    m_pListBox->GetSel();
     if (m_pEdit && !m_pEdit->GetEventSet()->isMuted())
     {
         SStringT strText = GetLBText(m_pListBox->GetSel(), FALSE);
@@ -95,14 +94,17 @@ void SComboView::OnSelChanged()
 
 BOOL SComboView::FireEvent(IEvtArgs *evt)
 {
-    if (evt->IdFrom() == IDC_DROPDOWN_LIST && m_pDropDownWnd)
+    if (evt->IdFrom() == IDC_DROPDOWN_LIST)
     {
+        // Same ordering problem as SComboBox: the click closes the dropdown (EVT_CMD) before
+        // the list view raises its selection-changed event, so the dropdown liveness must not
+        // gate the selection sync of the embedded edit.
         if (evt->GetID() == EventLVSelChanged::EventID)
         {
             OnSelChanged();
             return TRUE;
         }
-        if (evt->GetID() == EventCmd::EventID)
+        if (m_pDropDownWnd && evt->GetID() == EventCmd::EventID)
         {
             CloseUp();
             return TRUE;

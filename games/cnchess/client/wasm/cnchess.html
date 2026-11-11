@@ -3,7 +3,7 @@
   中国象棋 wasm 客户端的页面外壳（Emscripten --shell-file）
 
   宿主逻辑（带进度的下载、上屏、鼠标/键盘/滚轮注入、输入法代理、剪贴板、
-  WebAudio 音效、崩溃上报、加载遮罩）全部来自 soui-wasm/soui-host.js ——
+  WebAudio 音效、崩溃上报、加载遮罩）全部来自 demos/wasm-demo/soui-host.js ——
   与 SOUI 演示页共用同一份实现，这里不再维护第二份。页面只剩：标题、状态行、
   配色，以及最后那段把产物名和导出名前缀告诉宿主的调用。
 

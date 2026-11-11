@@ -1,0 +1,164 @@
+﻿<!doctype html>
+<!--
+  基金持仓工具 wasm 版的页面外壳（Emscripten --shell-file）
+
+  宿主逻辑（带进度的下载、上屏、鼠标/键盘/滚轮注入、输入法代理、剪贴板、
+  崩溃上报、加载遮罩）全部来自 demos/wasm-demo/soui-host.js，与 SOUI 演示页、
+  中国象棋页面共用同一份实现。页面只剩标题、状态行、配色，以及最后那段把产物名
+  和导出名前缀告诉宿主的调用。
+
+  与其它页面的差别：
+    1. 导出名是 Fund* 前缀，用 api 覆盖；
+    2. 画布按 390px 显示（mobile/uires 的竖屏逻辑宽度，SWINX_FB_WIDTH=390）；
+    3. 东财接口需要同源转发：起服务要用本目录的专用入口并带 --http-proxy
+         python3 demos/fundholdings/wasm/serve-fundholdings.py demos/fundholdings/wasm/out_pt --port 8080 --http-proxy
+       通用服务 tools/wasm/serve-isolated.py 不含转发端点（404），漏了 --http-proxy
+       则是 501；python -m http.server 之类纯静态服务同样是 404，取数全部失败；
+    4. 只有 -pthread（worker）产物要求 window.crossOriginIsolated === true（COOP/COEP
+       头，缺了 worker 建不起来）。-P/--no-pthreads 的泵产物没有 worker，静态服务器
+       也能起页面，隔离头对它不是要求。壳页用 emcc shell 的 #if PTHREADS 预处理指令
+       注入 IS_PTHREAD_BUILD，两类提示分别探测、分别显示，别把泵版误报成 worker 故障。
+
+  emcc 的 --shell-file 要求文件里有 {{{ SCRIPT }}} 占位符（见文末 <template>），
+  它会被换成胶水脚本标签。我们不用那个标签——胶水由宿主带时间戳按需载入——所以
+  把占位符放进 <template> 让它惰性；占位符本身仍然存在。
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>基金持仓 · SOUI WebAssembly</title>
+  <style>
+    :root { color-scheme: dark; }
+    html, body { margin: 0; padding: 0; background: #0b1017; color: #e8edf5;
+                 font: 14px/1.5 "Noto Sans CJK SC", "Microsoft YaHei", sans-serif; }
+    #wrap { display: flex; flex-direction: column; align-items: center; padding: 12px; }
+    h1 { font-size: 16px; font-weight: 600; color: #f0b429; margin: 0 0 4px; }
+    /* 状态行：启动期写"正在加载…"，跑起来之后由下面的轮询刷成统计量，
+       失败时宿主经 onFatal 把原因写进这里（加载遮罩同时转红）。 */
+    /* pre-wrap：代理/隔离告警是长句，pre 会把状态行撑出 390px 的画布。 */
+    #status { margin: 0 0 10px; max-width: 390px; font-size: 12px; color: #8fa3b8;
+              white-space: pre-wrap; }
+    /* 画布尺寸/边框/圆角由宿主注入的 .soui-canvas 管；这里只改配色。
+       宽度用宿主按逻辑宽度设的 CSS 变量，不写死像素。 */
+    canvas#screen { background: #0e1520; border-color: #223146; }
+    canvas#screen.keyed { border-color: #f0b429; }
+  </style>
+</head>
+<body>
+<div id="wrap">
+  <h1>基金持仓 · SOUI WebAssembly</h1>
+  <p id="status">正在加载模块…</p>
+  <!-- 画布、加载遮罩、IME 代理框、错误行都由 soui-host.js 建在这个容器里 -->
+  <div id="app"></div>
+</div>
+
+<!-- emcc 的 --shell-file 要求 shell 里必须有 {{{ SCRIPT }}} 占位符；放进 <template>
+     让它惰性（见文件头说明）。 -->
+<template>{{{ SCRIPT }}}</template>
+
+<script src="soui-host.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var statusEl = document.getElementById('status');
+  var live = false;
+
+  /* emcc 处理 --shell-file 时会跑 JS 预处理器：#if PTHREADS 让同一份壳页在
+     worker 产物里注入 true、泵产物里注入 false。源 html 里的这几行只有链接时
+     才被消掉，别直接把 wasm/fundholdings.html 当页面打开。 */
+#if PTHREADS
+  var IS_PTHREAD_BUILD = true;
+#else
+  var IS_PTHREAD_BUILD = false;
+#endif
+
+  /* 两类问题互相独立：隔离状态只对 worker 产物是硬要求，转发端点决定取数能不能
+     出去。状态行每 500ms 重刷一次，所以提示要存成变量在轮询里拼接，不能只写一次
+     textContent 就被统计量覆盖掉。 */
+  var warnIsolation = '';
+  var warnProxy = '';
+  var infoBuild = '';
+
+  if (IS_PTHREAD_BUILD) {
+    if (window.crossOriginIsolated !== true) {
+      warnIsolation = 'worker 产物要求 crossOriginIsolated，当前页面不是，TaskLoop worker 建不起来；' +
+                      '用 serve-fundholdings.py 启动，不要加 --no-isolation';
+    }
+  } else {
+    /* 泵产物根本没有 worker，COOP/COEP 对它不是要求；以前把它写成红色
+       "worker 建不起来"是误报。这里改成中性说明，方便两版对照。 */
+    infoBuild = window.crossOriginIsolated === true
+      ? 'pump 产物（无 pthread）：不需要隔离头，开了 COOP/COEP 也不影响'
+      : 'pump 产物（无 pthread）：不需要 crossOriginIsolated，静态服务器也能起页面';
+  }
+
+  /* 探测同源转发端点：不带 url 参数时不会真的请求上游。
+       serve-fundholdings.py 带 --http-proxy -> 400（缺 url，端点正常）
+       没带 --http-proxy                     -> 501
+       python -m http.server / 通用 serve-isolated.py -> 404（压根没这个端点）
+     线上换了反代路径时，探测路径跟着 window.souiHttpProxy 走。 */
+  var proxyPrefix = (window.souiHttpProxy && String(window.souiHttpProxy)) ||
+                    '/__soui_http?url=';
+  var probePath = proxyPrefix.split('?')[0];
+  fetch(probePath, { cache: 'no-store' }).then(function (r) {
+    var fix = '；改用 serve-fundholdings.py --http-proxy 启动，取数才会成功';
+    if (r.status === 501) {
+      warnProxy = '取数端点 ' + probePath + ' 返回 501（服务没带 --http-proxy）' + fix;
+    } else if (r.status === 404 || r.status === 410) {
+      warnProxy = '取数端点 ' + probePath + ' 返回 ' + r.status +
+                  '（当前服务没有转发端点，例如 python -m http.server 或通用 serve-isolated.py）' + fix;
+    } else if (r.status !== 400 && r.status !== 405 && r.status >= 400) {
+      warnProxy = '取数端点 ' + probePath + ' 返回 ' + r.status + '（转发端点异常）' + fix;
+    }
+  }, function () {
+    warnProxy = '取数端点 ' + probePath + ' 不可达；改用 serve-fundholdings.py --http-proxy 启动';
+  });
+
+  var host = SouiHost.start({
+    container: document.getElementById('app'),
+    wasm: 'fundholdings.wasm',        // 胶水 .js / .data 由它推导
+    factory: 'createFundHoldings',    // emcc -sEXPORT_NAME
+    width: 390,                       // mobile/uires 的竖屏逻辑宽度
+    loadingTitle: '基金持仓 · WebAssembly',
+    /* fundholdings_main.cpp 的导出名是 Fund* 前缀，与演示页的 SwinxDemo* 不同名；
+       宿主缺省用后者，这里逐项覆盖。剪贴板那个本就共用 swinx 的导出，不用改。 */
+    api: {
+      pump: '_FundPump',
+      mouse: '_FundMouse',
+      key: '_FundKey',
+      wheel: '_FundWheel',
+      text: '_FundText',
+      caret: '_FundCaretPos'
+    },
+    onFatal: function (msg) { statusEl.textContent = msg; }
+  });
+
+  /* 观测点：FundStat 的下标契约见 fundholdings_main.cpp。 */
+  host.whenReady.then(function () {
+    live = true;
+    window.fund = window.Module;
+  });
+
+  setInterval(function () {
+    if (!live) return;
+    var M = window.Module;
+    if (!M || typeof M._FundStat !== 'function') return;
+    var s = function (i) { return M._FundStat(i) | 0; };
+    var txt = 'pump ' + s(1) + ' · present ' + s(2) +
+              ' · ready ' + s(0) + ' · watch ' + s(7) +
+              ' · rows ' + s(8) + ' · pages ' + s(9) +
+              ' · ' + (IS_PTHREAD_BUILD ? 'worker 版' : 'pump 版');
+    if (s(5)) txt += ' · FATAL';
+    /* 警告/说明常驻在统计量下面，别被下一次轮询刷掉。 */
+    if (warnIsolation) txt += '\n警告：' + warnIsolation;
+    if (warnProxy)     txt += '\n警告：' + warnProxy;
+    if (infoBuild)     txt += '\n' + infoBuild;
+    statusEl.textContent = txt;
+    statusEl.style.color = (warnIsolation || warnProxy) ? '#ff8080' : '#8fa3b8';
+  }, 500);
+})();
+</script>
+</body>
+</html>

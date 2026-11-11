@@ -75,7 +75,7 @@ SLog::~SLog()
         // fwrite(stdout) 也不可靠，而 console.* 在 worker 中同样可用。
         // 浏览器控制台自带时间戳，这里不再调 GetLocalTime——wasm 上它会落到
         // __localtime_js（建 JS Date + 分配 struct tm），是日志热路径的已知开销
-        // （见 doc/soui-wasm-port-plan.md 的性能章节）。
+        // 这一项由本分支规避，勿回退。
         int flags = EM_LOG_CONSOLE;
         const char *levelStr = "trace";
         switch (m_level)

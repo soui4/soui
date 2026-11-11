@@ -29,7 +29,7 @@
    - **worker 后端（默认，带 `-pthread`）**：`start()` 建一条 wasm worker 线程，队列归它消费，
      UI 线程只入队 + `Atomics.notify` 唤醒，与桌面版同口径 —— 解压整条离开 UI 线程，一帧都
      不被它拖住。代价是产物要 `crossOriginIsolated`（COOP+COEP 响应头）才建得起线程，
-     起页面必须用 `demos/wasm-demo/serve-isolated.py`。
+     起页面必须用 `tools/wasm/serve-isolated.py`。
    - **泵后端（`--no-pthreads`）**：不建线程，`postTask` 只入队（按优先级稳定排序），
      `waitUntilDone` 内联执行（浏览器主线程等 worker 等于冻住标签页），真正的执行由宿主的
      `STaskLoopPump(预算毫秒)` 在每帧泵里抽干 —— "异步解压"在浏览器里等于"下一帧解压"。
@@ -137,12 +137,17 @@ games\cnchess\client\wasm\build-cnchess.bat D:\build-soui-wasm
 games\cnchess\client\wasm\build-cnchess.bat release
 ```
 
-构建目录取第一个位置参数，其次是同名环境变量，最后是每档的默认值；`/tmp` 会被清空的机器
-就用 `SOUI_WASM_BUILD`（调试档）与 `SOUI_CNCHESS_SHIP_BUILD`（上线档）指到持久目录：
+构建目录取第一个位置参数，其次是同名环境变量，最后是每档的默认值：
 
 | 环境变量 | 调试档默认 | 上线档默认 |
 | --- | --- | --- |
-| `SOUI_WASM_BUILD` / `SOUI_CNCHESS_SHIP_BUILD` | `/tmp/build-soui-wasm`（与演示页共用一个目录也行） | `/tmp/build-cnchess-ship` |
+| `SOUI_WASM_BUILD` / `SOUI_CNCHESS_SHIP_BUILD` | `wasm/build` | `wasm/build-release` |
+
+默认落在**本 app 自己的 wasm 目录下**，四个 wasm app 各自一棵独立的 CMake 构建树。
+以前几个 app 共用 `%TEMP%\build-soui-wasm` / `/tmp/build-soui-wasm` 时，先编过别的 app
+的目录里残留 `CMakeCache.txt`，再编 cnchess 就会报 `The source ... does not match the
+source used to generate cache`（只能删掉整个目录重配）。需要指到别处（更快的盘、CI
+持久缓存）时再用这两个环境变量或位置参数覆盖。
 
 已经配好的目录只把下面的缓存变量透传进去重新配置，其余选项保持不变，所以增量构建不会被
 脚本毁掉；档位切换（`CMAKE_BUILD_TYPE`）会触发整树重编，脚本不替用户做这个决定——上线档
@@ -155,7 +160,7 @@ games\cnchess\client\wasm\build-cnchess.bat release
 
 | 变量 | 默认 | 说明 |
 | --- | --- | --- |
-| `SOUI_WASM_PTHREADS` | `ON` | TaskLoop 后端。`ON` 给 `-pthread`，主题解压跑在真正的 worker 线程上，产物要 `crossOriginIsolated`（`demos/wasm-demo/serve-isolated.py`）才起得来线程；`OFF` 退回 `STaskLoopPump` 的泵后端，页面不再需要隔离头 |
+| `SOUI_WASM_PTHREADS` | `ON` | TaskLoop 后端。`ON` 给 `-pthread`，主题解压跑在真正的 worker 线程上，产物要 `crossOriginIsolated`（`tools/wasm/serve-isolated.py`）才起得来线程；`OFF` 退回 `STaskLoopPump` 的泵后端，页面不再需要隔离头 |
 | `SOUI_CNCHESS_STACK` | `32MB` | `-sSTACK_SIZE`。SOUI 在 wasm 下走 canvas2d 绘制后端（render-gdi 接 swinx 的 canvas2d 实现，没有 freetype/cairo 递归绘制链），但 `SHostWnd::Create()` 的建窗递归仍按桌面线程栈深度写，5 MB 下直接踩爆 |
 | 字体 | 浏览器内置 | canvas2d 后端用浏览器内置字体渲染文本，不再有 `SOUI_CNCHESS_FONT` 选项，也不预载 TTF（原选项已废弃） |
 | `SOUI_WASM_CNCHESS_OUT` | 按后端取 `wasm/out_pt` / `wasm/out` | 产物目录；`--release` / `release` 档取 `wasm/release_pt` / `wasm/release`，不接受环境变量覆盖 |
@@ -179,11 +184,11 @@ wasm 产物走 swinx 的 canvas2d 绘制后端（`render-gdi` 在 wasm 下接 ca
 这与 `demos/wasm-demo` 的 route C 行为一致；需要离线/可控字形时再考虑把 canvas2d 后端换成
 带字体子集化的 cairo 分支（那是另一条线，不在本目录的默认构建里）。
 
-> `build-cnchess.bat` 保持纯 ASCII：`cmd.exe` 按活动 OEM 代码页逐行解码批处理文件，UTF-8 的
-> 中文注释会被切成幽灵命令（`chcp 65001` 也修不干净，分块读取仍会截断多字节序列）。中文说明
-> 写在 `build-cnchess.sh` 与本文件里。它同时保持 CRLF 行尾：脚本用 `goto` 跳转，而 `cmd.exe`
-> 是按块扫描批处理文件里的标签的，LF 行尾的标签正好跨块边界时会被找不到；线性的
-> `soui-wasm\build.bat` 没有这个暴露面，所以那个文件是 LF。
+> 所有 wasm 的 `.bat`（各 app 的薄包装与 `__cmake\wasm-build-common.bat` 共享驱动）都保持纯
+> ASCII + CRLF：`cmd.exe` 按活动 OEM 代码页逐行解码批处理文件，UTF-8 的中文注释会被切成幽灵命令
+> （`chcp 65001` 也修不干净，分块读取仍会截断多字节序列）；共享驱动用 `goto` 跳转，而 `cmd.exe`
+> 按块扫描标签，LF 行尾的标签正好跨块边界时会被找不到。中文说明写在同目录的 `.sh` 包装器和
+> 本文件里。
 
 ## 运行
 
@@ -193,10 +198,10 @@ worker 建不起来：
 
 ```bash
 # 1) 页面 —— worker 产物用隔离服务，并把它反代到棋服务器（口径见下面第 3 条）
-python3 demos/wasm-demo/serve-isolated.py games/cnchess/client/wasm/out_pt \
+python3 tools/wasm/serve-isolated.py games/cnchess/client/wasm/out_pt \
     --port 8080 --ws-proxy 127.0.0.1:3311
 #    泵产物（out/）不需要隔离头，但同样需要这条反代才能用默认地址：
-python3 demos/wasm-demo/serve-isolated.py games/cnchess/client/wasm/out \
+python3 tools/wasm/serve-isolated.py games/cnchess/client/wasm/out \
     --port 8081 --no-isolation --ws-proxy 127.0.0.1:3311
 
 # 2) 棋服务器：主题包必须放在可执行文件旁边（wasm 客户端报的是 OS_ID_WINDOWS，
@@ -215,12 +220,12 @@ Linux 下 `cnchess_server` 不带参数时走 `run(NULL)`，只认默认端口 3
 三条容易踩空的口径：
 
 - **缺隔离头不报错**：`window.crossOriginIsolated` 为 false 时页面照跑，只是静默退回泵后端，
-  状态行的 `worker N/M` 会一直停在 `0/0`。`serve-isolated.py` 带 `--no-isolation` 就是专门用来
+  状态行的 `worker N/M` 会一直停在 `0/0`。`tools/wasm/serve-isolated.py` 带 `--no-isolation` 就是专门用来
   复现这条退出的。
 - **默认地址是同源，不是 3311**：`MainDlg.cpp` 的 `__EMSCRIPTEN__` 分支把登录框默认值填成
   `ws://` + `location.host`，跟线上"页面和 `/cnchess/` 同域名、由 Apache/nginx 反代到同机
   cnchess_server"的部署形态一致。所以只起静态服务（`python3 -m http.server`、或
-  `serve-isolated.py` 没给 `--ws-proxy`）时，点了登录不会有任何下载 —— 握手打到了静态服务
+  `tools/wasm/serve-isolated.py` 没给 `--ws-proxy`）时，点了登录不会有任何下载 —— 握手打到了静态服务
   自己身上，症状是状态行 `ws 0/0`、`theme 0`，而 `cnchess_server` 日志里连一条新连接都没有。
   `--ws-proxy HOST:PORT` 就是把这一层反代在本机顶上：带 `Upgrade: websocket` 的请求原样隧道
   给上游，拿到 101 后双向搬字节。
@@ -262,6 +267,14 @@ wasm 端没有"个人目录"，主题缓存与登录配置都放在 `/tmp` 下�
 
 > 跨域：`ws://` 连接不经过 CORS，但页面必须是 `http://`（或 `https://`）加载的；
 > 用 `https://` 部署页面时服务器那端要是 `wss://`，浏览器不允许 `https` 页面连明文 `ws`。
+
+> **HTTPS 站点不要给默认地址补 `:3311`**：登录框默认填的是 `wss://` + `location.host`
+> （例如 `wss://www.soui.com.cn`），端口留空即 443；`WebSocketClient.cpp` 会把请求路径写成
+> `/cnchess/?...`，由 Apache/nginx 把 `/cnchess/` 反代到同机 `cnchess_server:3311`（配置见
+> `conf/extra/httpd-cnchess.conf`）。后端 3311 监听的是**明文 ws**，写 `wss://host:3311` 会
+> 在 TLS 握手就失败（`ERR_SSL_PROTOCOL_ERROR`），写 `ws://host:3311` 又会被 HTTPS 页面按混合
+> 内容拦掉。两种都是「点登录没反应」。要验证反代是否通，用 curl 带 `Upgrade: websocket` 打
+> `https://<域名>/cnchess/`，期望 101。
 
 ## 观测点
 
@@ -322,7 +335,7 @@ node games/cnchess/client/wasm/smoke.js games/cnchess/client/wasm/out/cnchess-wa
 弹窗相关的两条断言（进度弹窗已关闭 / 登录弹窗已销毁）走 `settle()` 而不是"注入 + 泵一帧"：
 SOUI 的模态入场/出场动画只由 `kPulseTimer` 的 `WM_TIMER` 推进，而 `WM_TIMER` 按**真实时间**到期，
 node 里连续空泵几乎不花钱（实测 32 帧只走 1 ms），一帧动画都推不动。同一道理在
-`CnchessClick` 里按 1.5 s 墙上时间放开命中等待，见 `doc/soui-wasm-port-plan.md` §34.2。
+`CnchessClick` 里按 1.5 s 墙上时间放开命中等待。
 
 环境变量：`CNCHESS_SERVER`（服务器二进制）、`CNCHESS_THEME_ZIP`（主题包）、
 `CNCHESS_TIMEOUT`（默认 30 s）、`CNCHESS_KEEP=1`（保留临时目录）。
@@ -340,7 +353,7 @@ node 里连续空泵几乎不花钱（实测 32 帧只走 1 ms），一帧动画
 ## 手动验证清单（Chromium，一次约 2 分钟）
 
 前提：`cnchess_server` 跑着、`pc_theme.zip` 按上面的口径打包（`config.xml` 在 zip 顶层），
-页面用 `serve-isolated.py` 起（worker 产物必须要 COOP+COEP，并且要带
+页面用 `tools/wasm/serve-isolated.py` 起（worker 产物必须要 COOP+COEP，并且要带
 `--ws-proxy 127.0.0.1:<棋服务器端口>`，否则默认的同源地址打不到棋服务器）。
 
 1. 打开页面 → 遮罩先给出下载进度（百分比、已下/总 MB、速度与剩余时间），随后显示
@@ -378,7 +391,7 @@ node 里连续空泵几乎不花钱（实测 32 帧只走 1 ms），一帧动画
    WebAudio）。这条在无头烟测里只证明字节交到了钩子上（RIFF/WAVE + 19518 字节），出声要在这里看。
 9. 控制台没有 `[FATAL]`，也没有 `memory access out of bounds`、没有
    `must not be resizable`（后者是 growable SAB 直接喂给 `TextDecoder`/`ImageData` 的症状，
-   见 `doc/soui-wasm-port-plan.md` §34.2）。
+   见 `swinx/doc/swinx-wasm-design.md` §5.4）。
 
 已知未覆盖：Windows 主机上的 `build-cnchess.bat`（本机没有 `cmd.exe`，只做过静态检查：纯
 ASCII + CRLF、标签与 `goto` 配对、引号成对；两档实测结论都来自 `.sh`）、`macOS` 的 `.sh`

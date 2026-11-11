@@ -8,7 +8,7 @@
  * 会真弹对话框的路径（返回 1 之后由平台回调）在无头环境不可测：Linux 会去连 DBus portal，
  * macOS 会弹 NSOpenPanel，wasm 会要页面宿主钩子 —— 那部分由 demos/wasm-demo/smoke.js 用假
  * 钩子覆盖（受理/非阻塞/消毒后的落地路径/过期 id 丢弃），浏览器真机按
- * doc/soui-wasm-port-plan.md 的清单人工过。
+ * swinx/doc/swinx-wasm-design.md §8.4 的契约清单人工过。
  *
  * 整个文件被 #ifndef _WIN32 包住：这两个符号只存在于 swinx 的 commdlg.h，Windows 上
  * <commdlg.h> 是系统 SDK 的，没有它们（CTest 在 Windows 仍会注册条目但二进制里没有，

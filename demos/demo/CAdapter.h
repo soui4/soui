@@ -193,6 +193,119 @@ public:
 
 };
 
+/**
+ * comboview 的下拉适配器:下拉内容本身是一个完整的 listview,
+ * bFlex=FALSE 时所有行共用定高模板;bFlex=TRUE 时奇偶行使用不同模板与不同行高。
+ * 用于演示 listview item 模板的布局灵活性。
+ */
+class CTestComboViewAdapter : public SAdapterBase
+{
+public:
+	CTestComboViewAdapter(BOOL bFlex)
+		: m_bFlex(bFlex)
+	{
+		m_nItemHeight[0] = GETLAYOUTSIZE(L"54dp");
+		m_nItemHeight[1] = GETLAYOUTSIZE(L"66dp");
+	}
+
+	virtual void WINAPI InitByTemplate(SXmlNode xmlTemplate)
+	{
+		if (m_bFlex)
+		{
+			m_nItemHeight[0] = GETLAYOUTSIZE(xmlTemplate.attribute(L"oddHeight").as_string(L"42dp"));
+			m_nItemHeight[1] = GETLAYOUTSIZE(xmlTemplate.attribute(L"evenHeight").as_string(L"66dp"));
+		}
+		else
+		{
+			SLayoutSize nHeight = GETLAYOUTSIZE(xmlTemplate.attribute(L"itemHeight").as_string(L"54dp"));
+			m_nItemHeight[0] = nHeight;
+			m_nItemHeight[1] = nHeight;
+		}
+	}
+
+	virtual int WINAPI getCount()
+	{
+		return 6;
+	}
+
+	virtual int WINAPI getViewTypeCount()
+	{
+		return m_bFlex ? 2 : 1;
+	}
+
+	virtual int WINAPI getItemViewType(int position, DWORD dwState)
+	{
+		return m_bFlex ? (position % 2) : 0;
+	}
+
+	virtual void WINAPI getViewDesiredSize(SIZE *retSize, int position, SItemPanel *pItem, int nWid, int nHei)
+	{
+		int nType = getItemViewType(position, pItem->GetState());
+		*retSize = CSize(0, m_nItemHeight[nType].toPixelSize(pItem->GetScale()));
+	}
+
+	virtual void WINAPI getView(int position, SItemPanel* pItem, SXmlNode xmlTemplate)
+	{
+		if (pItem->GetChildrenCount() == 0)
+		{
+			if (m_bFlex)
+			{
+				SXmlNode xmlItem = xmlTemplate.child(position % 2 == 0 ? L"itemOdd" : L"itemEven");
+				pItem->InitFromXml(&xmlItem);
+			}
+			else
+			{
+				pItem->InitFromXml(&xmlTemplate);
+			}
+		}
+
+		SImageWnd *pIcon = pItem->FindChildByName2<SImageWnd>(L"cbv_icon");
+		if (pIcon)
+			pIcon->SetIcon(position % 7);
+
+		SWindow *pTitle = pItem->FindChildByName(L"cbv_title");
+		if (pTitle)
+			pTitle->SetWindowText(S_CW2T(GetTitle(position)));
+		SWindow *pDesc = pItem->FindChildByName(L"cbv_desc");
+		if (pDesc)
+			pDesc->SetWindowText(S_CW2T(GetDesc(position)));
+		SWindow *pValue = pItem->FindChildByName(L"cbv_value");
+		if (pValue)
+			pValue->SetWindowText(S_CW2T(GetValue(position)));
+	}
+
+	virtual SStringW WINAPI getItemDesc(int position)
+	{
+		return GetTitle(position);
+	}
+
+private:
+	static LPCWSTR GetTitle(int position)
+	{
+		static const LPCWSTR kTitles[] = {
+			L"标准版", L"专业版", L"企业版", L"旗舰版", L"教育版", L"体验版"};
+		return kTitles[position % ARRAYSIZE(kTitles)];
+	}
+
+	static LPCWSTR GetDesc(int position)
+	{
+		static const LPCWSTR kDescs[] = {
+			L"基础功能,适合个人使用", L"高级组件与优先支持", L"团队协作与私有部署",
+			L"全部能力与专属服务", L"面向学校与培训机构", L"免费体验全部功能"};
+		return kDescs[position % ARRAYSIZE(kDescs)];
+	}
+
+	static LPCWSTR GetValue(int position)
+	{
+		static const LPCWSTR kValues[] = {
+			L"¥0", L"¥29/月", L"¥99/月", L"¥199/月", L"¥49/月", L"免费"};
+		return kValues[position % ARRAYSIZE(kValues)];
+	}
+
+	BOOL m_bFlex;
+	SLayoutSize m_nItemHeight[2];
+};
+
 class CTestMcAdapterFix : public SMcAdapterBase
 {
 #define NUMSCALE 100000

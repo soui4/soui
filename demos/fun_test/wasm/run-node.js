@@ -40,8 +40,8 @@ for (const a of argv) {
 }
 if (!jsPath) jsPath = path.join(FUN_TEST_DIR, 'out.canvas2d', 'fun_test-wasm.js');
 if (!fs.existsSync(jsPath)) {
-    console.error('没有 ' + jsPath + '\n先构建 wasm 腿：\n' +
-        '  emcmake cmake -S <soui4> -B <build> -G Ninja -DSOUI_BUILD_WASM_FUN_TEST=ON ' +
+    console.error('没有 ' + jsPath + '\n先构建 wasm 腿（独立顶层工程）：\n' +
+        '  emcmake cmake -S <soui4>/demos/fun_test/wasm -B <build> -G Ninja ' +
         '-DSWINX_WASM_GDI_BACKEND=canvas2d\n  cmake --build <build> --target fun_test');
     process.exit(2);
 }

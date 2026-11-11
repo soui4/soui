@@ -23,11 +23,12 @@ file(GLOB_RECURSE CURRENT_RC *.rc *.rc2)
 file(GLOB_RECURSE GRIDCTRL_SRC ${PROJECT_SOURCE_DIR}/controls.extend/gridctrl/*.*)
 
 # android/ 与 ohos/ 是独立的移动端工程（各自带 CMakeLists、Gradle/Hvigor 构建缓存、
-# 平台资源），不能被桌面目标的递归 glob 扫进来：否则 .cxx 里的
-# CMakeCXXCompilerId.cpp 会混进 exe 源文件，导致 main 重复定义。
-list(FILTER CURRENT_HEADERS EXCLUDE REGEX "/(android|ohos|mobile)/")
-list(FILTER CURRENT_SRCS EXCLUDE REGEX "/(android|ohos|mobile)/")
-list(FILTER CURRENT_SOUIS EXCLUDE REGEX "/(android|ohos)/")
+# 平台资源），wasm/ 是浏览器入口（自己的 CMakeLists 与 main），都不能被桌面目标的
+# 递归 glob 扫进来：否则 .cxx 里的 CMakeCXXCompilerId.cpp 或 wasm 的 main 会混进
+# exe 源文件，导致 main 重复定义。
+list(FILTER CURRENT_HEADERS EXCLUDE REGEX "/(android|ohos|mobile|wasm)/")
+list(FILTER CURRENT_SRCS EXCLUDE REGEX "/(android|ohos|mobile|wasm)/")
+list(FILTER CURRENT_SOUIS EXCLUDE REGEX "/(android|ohos|wasm)/")
 
 source_group("Header Files" FILES ${CURRENT_HEADERS})
 source_group("Source Files" FILES ${CURRENT_SRCS})

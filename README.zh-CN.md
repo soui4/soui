@@ -54,15 +54,16 @@ Windows 只是 SOUI4 通过 swinx 覆盖的八个目标之一，这八端分成�
 | **Android** | 已支持 | JVM 启动器，`PlatformAPI` 桥接 | Cairo |
 | **鸿蒙（OHOS）** | 已支持 | ArkTS 运行时，`PlatformAPI` 桥接 | Cairo |
 | **FreeRTOS** | 能力证明级 | 无 OS：FreeRTOS 任务驱动消息泵，宿主扫描帧缓冲上屏 | Cairo → 内存帧缓冲 |
-| **WebAssembly** | 能力证明级 | `emscripten_set_main_loop`，JS 宿主按脏矩形 blit 到 Canvas | Cavas2d API |
+| **WebAssembly** | 能力证明级 | `emscripten_set_main_loop`，JS 宿主按脏矩形 blit 到 Canvas | Canvas 2D API |
 
 两档的含义不同，不能互换：
 
 - **已支持**（上面六端）= 产品级：有 CI、有示例、有真机/实机验证。
 - **能力证明级**（FreeRTOS、WebAssembly）= 架构被验证能吸收新的宿主形态：目标能构建、
   `SApp` 能端到端跑通，但仍有明确缺口（FreeRTOS：字体测宽、`ICON:` 仍是桩、未适配目标板；
-  WASM：产物约 66 MB、无 IME、无触摸）。它们说明"抽象能伸到这里"，不等于"可以交付"。
-  详见 `soui-freertos/README.md` 与 `doc/soui-wasm-port-plan.md`。
+  WASM：无系统级 IME / OLE 拖放、触摸与真机输入法未系统验证）。它们说明"抽象能伸到这里"，
+  不等于"可以交付"。详见 `soui-freertos/README.md` 与 wasm 设计实现文档
+  `swinx/doc/swinx-wasm-design.md`。
 
 swinx 在不同平台的分层方式：
 
@@ -184,10 +185,12 @@ SOUI 在各平台都保持 **Win32 形态的 API**（窗口 / 消息 / GDI），
 
 ###  WebAssembly 编译
 - 需要 [emsdk](https://emscripten.org/docs/getting_started/downloads.html)（本地验证用 6.0.13）。
-- `emcmake cmake -S . -B build-wasm -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DSOUI_BUILD_WASM_DEMO=ON`
+- `emcmake cmake -S demos/wasm-demo -B build-wasm -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo`（每个 wasm 版都是独立的顶层 CMake 工程，SOUI 库通过 `add_subdirectory` 拉入）。
 - `cmake --build build-wasm --target soui-wasm-demo -j4`，产物在 `demos/wasm-demo/out/`。
 - 浏览器里看效果用 `python3 -m http.server 8080 -d demos/wasm-demo/out` 打开 `soui-wasm-demo.html`。构建选项、验证步骤与已知限制见 [`demos/wasm-demo/readme.md`](./demos/wasm-demo/readme.md)。
-- 中国象棋客户端另有一个完整的 wasm 版：`-DSOUI_BUILD_WASM_CNCHESS=ON` + `cmake --build build-wasm --target cnchess-wasm`（或包装脚本 `games/cnchess/client/wasm/build-cnchess.sh`，Windows 主机用同目录的 `build-cnchess.bat`；两个脚本都带 `--release` 上线档），产物在 `games/cnchess/client/wasm/out/`；网络走浏览器原生 WebSocket、线程走单线程 TaskLoop，详见 `games/cnchess/client/wasm/readme.md`。
+- 中国象棋客户端另有一个完整的 wasm 版：以独立工程配置——`emcmake cmake -S games/cnchess/client/wasm -B build-wasm-cnchess -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo`，再 `cmake --build build-wasm-cnchess --target cnchess-wasm`（或包装脚本 `games/cnchess/client/wasm/build-cnchess.sh`，Windows 主机用同目录的 `build-cnchess.bat`；两个脚本都带 `--release` 上线档），产物在 `games/cnchess/client/wasm/out/`；网络走浏览器原生 WebSocket、线程走单线程 TaskLoop，详见 `games/cnchess/client/wasm/readme.md`。
+- 基金持仓工具也有一个 wasm 版：以独立工程配置——`emcmake cmake -S demos/fundholdings/wasm -B build-wasm-fund -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DSOUI_WASM_PTHREADS=ON -DSOUI_BUILD_HTTPCLIENT=ON -DSWINX_FB_WIDTH=390 -DSWINX_FB_HEIGHT=844`，再 `cmake --build build-wasm-fund --target fundholdings-wasm`（或包装脚本 `demos/fundholdings/wasm/build-fundholdings.sh`，Windows 主机用同目录的 `build-fundholdings.bat`；两个脚本都带 `--release` 上线档）。它复用演示页的 `soui-host.js`、使用 mobile 的 390x844 竖屏资源，基金行情经 `demos/fundholdings/wasm/serve-fundholdings.py` 的同源代理转发（通用静态服务在 `tools/wasm/serve-isolated.py`）；默认开 pthreads，页面必须 crossOriginIsolated，`python3 -m http.server` 起不来。产物在 `demos/fundholdings/wasm/out_pt/`（加 `--no-pthreads` 时落在 `out/`）。
+- `fun_test` 的 GDI 用例另有一条 wasm 单测腿，用来对两个 swinx GDI 后端做 A/B：`emcmake cmake -S demos/fun_test/wasm -B build-ft -G Ninja -DCMAKE_BUILD_TYPE=Debug -DSWINX_WASM_GDI_BACKEND=canvas2d`（或 `cairo`），再 `cmake --build build-ft --target fun_test`，用 `node demos/fun_test/wasm/run-node.js` 跑；详见 `demos/fun_test/readme.md`。
 
 ##  贡献名单
 参见 [贡献名单](./contributors.md)

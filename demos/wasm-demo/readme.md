@@ -1,8 +1,10 @@
 # WebAssembly 演示：swinx 裸窗口 与 SOUI XML
 
 > **目录位置**：`demos/wasm-demo/`（原先在仓库根的 `soui-wasm/`）。下面命令里的 `<soui4>` 指仓库根；
-> 两个构建脚本都用 `HERE/../..` 自己解析仓库根，所以从任何工作目录调用都行，不用先 `cd` 到根。
-> 根 `CMakeLists.txt` 在 `SOUI_BUILD_WASM_DEMO=ON` 时 `add_subdirectory(demos/wasm-demo)`。
+> 本目录的 `CMakeLists.txt` 是 wasm 演示的**顶层 CMake 工程**（`project(wasm-demo)` 之后
+> `include(__cmake/wasm-lib-config.cmake)` 把 SOUI 库编成 wasm 形态，再 `add_subdirectory(<soui4>)` 只编库），
+> 所以手动配置时 `-S` 要指到本目录（`emcmake cmake -S <soui4>/demos/wasm-demo`），不再指仓库根。
+> 仓库根由 `CMakeLists.txt` 顶部的 `SOUI4_DIR` 按 `CMAKE_CURRENT_SOURCE_DIR` 推导，构建脚本从任何工作目录调用都行。
 
 本目录有两个演示，共用同一套宿主接缝（帧缓冲 / 上屏回调 / 输入注入 / 消息泵）：
 
@@ -17,7 +19,7 @@
   页面按 SOUI 的能力分成十二页 `<tabctrl>`（概览 / 基础控件 / 更多控件 / MVC / 列表与树 / 布局 /
   图形控件 / 表格 / 图表 / 编辑器 / 扩展控件 / Lua 游戏），可以整包发到官网上当在线演示。其中非核心的几页分别靠
   `richedit41`、`Scintilla`、`controls.extend`、`ScriptModule-LUA` 静态链入；后两项各有一个独立开关
-  `SOUI_BUILD_WASM_LUA` / `SOUI_BUILD_WASM_SCINTILLA`，见"两个可选能力的编译开关"一节。
+  `SOUI_BUILD_SCRIPT_LUA`（Lua 脚本能力，`translator` 由 `SOUI_BUILD_TRANSLATOR` 同进退） / `SOUI_BUILD_WASM_SCINTILLA`，见"两个可选能力的编译开关"一节。
 
 ## 文件
 
@@ -29,9 +31,9 @@
 | `soui_main.cpp` | 阶段 2 演示程序：`SApplication` + `SHostWnd` 子类 + 事件映射表 + 数据控件填充（MVC / gridctrl / HelloChart / grouplist），以及「宿主接线」一节的 6 个导出 |
 | `soui-host.js` | **可复用的浏览器宿主**（本仓库两个 wasm 程序通用）：下载进度、上屏、鼠标/键盘/滚轮注入、输入法代理、剪贴板、WebAudio、崩溃上报。新程序引这一个 JS 即可，见下面「复用宿主」 |
 | `soui.html` | 阶段 2 的 `--shell-file`，现在只剩页面排版 + 一行 `SouiHost.start({...})`（宿主逻辑都在 `soui-host.js`） |
-| `build-soui.sh` | CMake 包装器：查 `em++`、确保构建目录打开了 `SOUI_BUILD_WASM_DEMO`、`cmake --build --target soui-wasm-demo`。编译与链接命令本身在 `demos/wasm-demo/CMakeLists.txt` |
+| `build-soui.sh` | CMake 包装器：查 `em++`、确保构建目录是 `wasm-demo` 顶层工程、`cmake --build --target soui-wasm-demo`。编译与链接命令本身在 `demos/wasm-demo/CMakeLists.txt` |
 | `smoke.js` | node 无头烟测（wasm 门禁的执行体，默认构建 30 条断言、`-pthread` 构建 31 条）：加载产物、手动驱动 `SwinxDemoPump`、注入输入、跑 `ITaskLoop` 双后端自测、跑 `SwinxPickFileAsyncA` 的异步文件选择（假宿主钩子）；见下面「无头烟测」 |
-| `serve-isolated.py` | 带 COOP/COEP 头的静态服务，`-DSOUI_WASM_PTHREADS=ON` 的产物要在浏览器里跑 worker 后端时用它；`--no-isolation` 可对照验证降级到泵后端 |
+| `tools/wasm/serve-isolated.py` | 仓库级共用服务（已不在本目录）：带 COOP/COEP 头的静态服务，`-DSOUI_WASM_PTHREADS=ON` 的产物要在浏览器里跑 worker 后端时用它；`--no-isolation` 可对照验证降级到泵后端。它不含 app 专有端点，需要同源 HTTP 转发的 fundholdings 用自己的 `wasm/serve-fundholdings.py` |
 | `uires/` | SOUI 资源树：`xml/` 布局与控件、`values/` 字符串/颜色/皮肤/模板、`anim/` 与 `animator/` 动画、`svg/` 皮肤、`lua/` 三个游戏脚本，以及生成的 `uires.idx`；预载范围受"两个可选能力的编译开关"影响（关掉 Lua/Scintilla 时对应脚本与源文件不进 `.data`），页面片段说明见各节 |
 | `out/` | 默认（调试）构建的产物，即 `-O2 -g`（未纳入版本控制） |
 | `release/` | 上线档的产物（`-O2 -DNDEBUG` 或 `MinSizeRel`，见下面"上线前的编译参数"）；`.data`/`.html`/`.js`/`.wasm` 四个文件必须放在一起，`.data` 按当前工作目录找（未纳入版本控制） |
@@ -64,7 +66,7 @@
 | 输入法 | 透明 `textarea` 代理 + `compositionend`/`input(insertText)` 双路提交，代理框每帧钉在 C++ 报的插入符坐标上 |
 | 剪贴板 | `paste` 同步读 `clipboardData` 再注入 Ctrl+V；反向走 `Module.souixClipboardWrite` |
 | 音效 | `Module.swinxAudioPlay` → WebAudio，autoplay 未放行时排队、`onstatechange` 冲刷 |
-| 文件选择 | `Module.swinxPickFile` → 隐藏 `<input type=file>`（`accept` 由 swinx 从 Win32 筛选串换算而来）。选完的字节由 JS `malloc` 后交给 `_SwinxFilePickDone`，swinx 把它落到 wasm 文件系统的 `/tmp/swinx-pick/<id>-<消毒后的名字>`，回调里给的就是这个可直接 `fopen` 的路径。只在用户手势里允许发起（`navigator.userActivation`），取消走 `nResult=0`。契约与限制见 `doc/soui-wasm-port-plan.md` §33 |
+| 文件选择 | `Module.swinxPickFile` → 隐藏 `<input type=file>`（`accept` 由 swinx 从 Win32 筛选串换算而来）。选完的字节由 JS `malloc` 后交给 `_SwinxFilePickDone`，swinx 把它落到 wasm 文件系统的 `/tmp/swinx-pick/<id>-<消毒后的名字>`，回调里给的就是这个可直接 `fopen` 的路径。只在用户手势里允许发起（`navigator.userActivation`），取消走 `nResult=0`。契约与限制见 `swinx/doc/swinx-wasm-design.md` §8.4 |
 | 崩溃 | `window.onerror` / `onunhandledrejection` 把 `err.stack` 打到控制台，遮罩显示一句人话 |
 
 C++ 侧要提供的导出（名字可用 `api:{...}` 覆盖，缺了对应功能自动降级、不抛异常）：
@@ -206,7 +208,7 @@ create({ noExitRuntime: true, swinxPresent: () => ++presents,
   `PageUp`、`Insert/Delete`、`F1..F4`、小键盘数字全都会伪造字符，`Enter/Tab/Backspace`
   反而一个都不发。现在按 Win32 的分工做：注入侧报**物理键位 VK**，端口按 US 布局结合
   Shift/CapsLock 状态算字符（当初由无头烟测逐键断言并 A/B；烟测已移除）。仍缺的是中文组合输入
-  （`composition* → ImmGetCompositionString`），见 `doc/soui-wasm-port-plan.md` §12。
+  （`composition* → ImmGetCompositionString`），事件映射见 `swinx/doc/swinx-wasm-design.md` §7.3。
 - **~~一次重绘有三次同矩形上屏~~ 已修**：框架的 `WM_PAINT` 默认处理、应用的 `BeginPaint/EndPaint`
   和 `WM_NCPAINT` 各走一次 `ReleaseDC -> commitCanvas`，memcpy 幂等所以画面正确，但拷贝与 JS
   回调是重复的。现在 `commitCanvas()` 只在请求期解析裁剪、把窗口局部矩形并进待上屏队列，
@@ -216,7 +218,7 @@ create({ noExitRuntime: true, swinxPresent: () => ++presents,
   **合并只对重叠的矩形做**：无条件取并集会让互不相交的小块（动画条带 300×250 + 光标 24×24 两块）
   并成一个空旷包围盒，同一输入脚本下 18 次上屏的累计拷贝从 1,461,708 像素涨到 2,258,856（+54.5%）
   而次数一次没省，所以现在按面积判据合并，不相交时先上屏已欠的那块再重新记账。
-  见 `doc/soui-wasm-port-plan.md` §13。
+  见 `swinx/doc/swinx-wasm-design.md` §6。
 - **`hInstance` 只是占位**：演示传 `(HINSTANCE)0x1000`，wasm 上 `RegisterClassA` 不校验它。
 - **控制台那条 `readlink`**：`GetModuleFileNameA(NULL,...)` 在无 `/proc` 的浏览器里必然失败并
   `perror`，属预期输出；`DllLoader` 的构造已经容忍这个失败（拿不到可执行文件路径时只保留
@@ -229,8 +231,8 @@ create({ noExitRuntime: true, swinxPresent: () => ++presents,
 同一套宿主接缝之上跑真正的 SOUI：`SApplication` + `SAppCfg::DoConfig()`（渲染器
 `components/render-gdi`、图片解码器 `components/imgdecoder-stb`，都是静态编进模块）+
 `SHostWnd` 装载 `uires/xml/dlg_main.xml`，资源由 `SResProviderFiles` 从 MEMFS 里的 `uires.idx`
-读取。移植侧的完整实施记录、构建图取舍与跨平台待复验清单在
-`doc/soui-wasm-port-plan.md` §11，这一节只写"怎么跑起来"和"页面上哪一块证明哪条链"。
+读取。构建配置与运行方式见
+`swinx/doc/swinx-wasm-design.md` §3.5；这一节只写"怎么跑起来"和"页面上哪一块证明哪条链"。
 
 ### 构建与运行
 
@@ -239,24 +241,31 @@ source "$EMSDK/emsdk_env.sh"
 
 # 1) 配置 + 构建。一条 CMake 命令出全部静态库与演示目标（链接命令、--preload-file、
 #    字体探测、导出符号都在 demos/wasm-demo/CMakeLists.txt 里，不依赖 bash）
-emcmake cmake -S <soui4> -B /tmp/build-soui-wasm -G Ninja \
-    -DCMAKE_BUILD_TYPE=RelWithDebInfo -DSOUI_BUILD_WASM_DEMO=ON
+emcmake cmake -S <soui4>/demos/wasm-demo -B /tmp/build-soui-wasm -G Ninja \
+    -DCMAKE_BUILD_TYPE=RelWithDebInfo
 cmake --build /tmp/build-soui-wasm --target soui-wasm-demo
 
 # 2) 起静态服务，浏览器打开 http://localhost:8081/soui-wasm-demo.html
 python3 -m http.server 8081 -d demos/wasm-demo/out
 ```
 
-`demos/wasm-demo/build-soui.sh /tmp/build-soui-wasm` 是上面第 1 步的包装器（老构建目录没开
-`SOUI_BUILD_WASM_DEMO` 时它会补一次配置），保留它只是为了不改变既有的脚本用法。
+`demos/wasm-demo/build-soui.sh` 是上面第 1 步的包装器（构建目录默认用本目录下的 `build`，
+没配过时直接用 `emcmake` 现场配置，配过则把环境变量透传进缓存后重配）。上面手动命令里的
+`/tmp/build-soui-wasm` 只是示例，位置参数可以指到任意目录；四个 wasm app 的默认构建目录
+各自独立，不要共用同一棵 CMake 构建树。
+四个 wasm app 的包装脚本都只是声明式元数据 + `SOUI_WASM_CONFIG`，共用
+`__cmake/wasm-build-common.sh` / `wasm-build-common.bat` 那一套流程；本 app 的 config 只多
+`-DSOUI_BUILD_WS=OFF -DSOUI_BUILD_RES_ZIP=OFF` 两条。
 Windows 主机用 `demos\wasm-demo\build.bat`（同样的流程与环境变量：`SOUI_DEMO_FONT` /
-`SOUI_DEMO_STACK` / `SOUI_WASM_DEMO_OUT` / `SOUI_BUILD_WASM_LUA` / `SOUI_BUILD_WASM_SCINTILLA`，
-另加 `SOUI_WASM_JOBS` 覆盖并行度——Windows 上 emcc 高并发会挂死，默认 `-j2`）。
+`SOUI_DEMO_STACK` / `SOUI_WASM_DEMO_OUT` / `SOUI_BUILD_SCRIPT_LUA` / `SOUI_BUILD_WASM_SCINTILLA`，
+另加 `SOUI_WASM_JOBS` 覆盖并行度——Windows 上 emcc 高并发会挂死，本 app 默认 `-j8`）。
 该文件**必须保持纯 ASCII**：cmd 按当前代码页逐行解码批处理，UTF-8 中文注释会被拆成
 幽灵命令，`chcp 65001` 也修不干净（分块读取仍会截断多字节序列）；中文说明看本文件和 build-soui.sh。
 
-`SOUI_BUILD_WASM_DEMO` 默认关：只有 Emscripten 构建并且显式打开才进入 `demos/wasm-demo`，
-桌面构建图与改动前一致。演示目标不在 `SOUI_BUILD_DEMOS` 里——那个开关在 EMSCRIPTEN 下恒关。
+`demos/wasm-demo` 现在是独立的顶层工程，根 `CMakeLists.txt` 不再感知 wasm、也不再决定编译哪个 app；
+SOUI 库本身由 `__cmake/wasm-lib-config.cmake` 编成 wasm 形态，`components/CMakeLists.txt` 里各模块
+仍由 `SOUI_BUILD_<NAME>` 统一开关控制（默认全 ON，wasm 下按 app 选择）。`SOUI_BUILD_DEMOS` 在
+EMSCRIPTEN 下恒关，但演示目标本就不在那个开关里。
 
 三个和阶段 0 不同的前提：
 
@@ -270,8 +279,8 @@ Windows 主机用 `demos\wasm-demo\build.bat`（同样的流程与环境变量�
 - **`.data` 按当前工作目录找**，浏览器侧无感（`fetch` 按同目录解析），node/无头用法才需要 `locateFile`。
 - **内存布局是钉住的，而且不合法时会当场报出来**：链接期显式加 `-Wl,--stack-first`。`-O1` 及以上
   emcc 默认换成 `--no-stack-first --global-base=1024`，数据段会落到 64 KB 以下，swinx 的
-  `IS_INTRESOURCE` 判据把窗口类名当成原子号，`SHostWnd::Create()` 直接失败且 `err=0`。根因与 A/B 见
-  `doc/soui-wasm-port-plan.md` §15.3。swinx 在第一次登记窗口类 / 第一次建 `SConnection` 时会自检这一前提，
+  `IS_INTRESOURCE` 判据把窗口类名当成原子号，`SHostWnd::Create()` 直接失败且 `err=0`。根因见
+  `swinx/doc/swinx-wasm-design.md` §4.7。swinx 在第一次登记窗口类 / 第一次建 `SConnection` 时会自检这一前提，
   不满足就打印数据段下界与修法然后 `abort()`——看到 `[swinx/wasm] 致命：静态数据落在低 64 KB`
   就去查链接选项，别去查 XML。改链接选项时注意 `--global-base=` **必须带 `-Wl,` 前缀**，
   裸写会被 emcc 的默认值覆盖（等于没写）。
@@ -308,17 +317,17 @@ Windows 主机用 `demos\wasm-demo\build.bat`（同样的流程与环境变量�
 
 ```bash
 # 推荐：MinSizeRel（阶段 6 末实测整包 gzip 32.95 MB → 17.79 MB，本机测不出相对 -O2 的重绘代价）
-emcmake cmake -S <soui4> -B /tmp/build-soui-min -G Ninja \
-    -DCMAKE_BUILD_TYPE=MinSizeRel -DSOUI_BUILD_WASM_DEMO=ON \
+emcmake cmake -S <soui4>/demos/wasm-demo -B /tmp/build-soui-min -G Ninja \
+    -DCMAKE_BUILD_TYPE=MinSizeRel \
     -DSOUI_WASM_DEMO_OUT=<soui4>/demos/wasm-demo/release
 cmake --build /tmp/build-soui-min --target soui-wasm-demo
 
 # 备选：不想动优化级别，只去掉 -g、补上 -DNDEBUG（整包 17.95 MB，比上面多 0.9% gz）
-emcmake cmake -S <soui4> -B /tmp/build-soui-ship -G Ninja \
+emcmake cmake -S <soui4>/demos/wasm-demo -B /tmp/build-soui-ship -G Ninja \
     -DCMAKE_BUILD_TYPE=RelWithDebInfo \
     -DCMAKE_CXX_FLAGS_RELWITHDEBINFO="-O2 -DNDEBUG" \
     -DCMAKE_C_FLAGS_RELWITHDEBINFO="-O2 -DNDEBUG" \
-    -DSOUI_BUILD_WASM_DEMO=ON -DSOUI_WASM_DEMO_OUT=<soui4>/demos/wasm-demo/release
+    -DSOUI_WASM_DEMO_OUT=<soui4>/demos/wasm-demo/release
 cmake --build /tmp/build-soui-ship --target soui-wasm-demo
 ```
 
@@ -330,7 +339,7 @@ cmake --build /tmp/build-soui-ship --target soui-wasm-demo
 | 配置 | `.wasm` | 整包 gz | 备注 |
 | --- | --- | --- | --- |
 | `-O2 -g`（默认，调试用，**含 SVG + 三个游戏页 + Lua 计时器派发修复 + MVC 500 行富模板与子页签 + MVC 行内进度条 SVG 胶囊皮肤 + waveProgress 双层波 + scrolltext 两种模式 + 壳页加载进度 + 滚轮交给 SOUI**） | 54,933,142 | 33.31 MB | 87.4% 是调试信息，别直接上线 |
-| 同上但 `SOUI_ENABLE_SVG` OFF（阶段 7 早前，主循环预算修复之前） | 54,215,867 | — | SVG 的代码代价 +570,403 B（+1.05%）；`.data` 与上面**逐字节相同**（`md5 c198940b…`，`uires/svg/` 不管开关都预载）。**这行要重测必须改根 `CMakeLists.txt:171`**，见下面"SVG 开关在 wasm 下被强制打开" |
+| 同上但 `SOUI_ENABLE_SVG` OFF（阶段 7 早前，主循环预算修复之前） | 54,215,867 | — | SVG 的代码代价 +570,403 B（+1.05%）；`.data` 与上面**逐字节相同**（`md5 c198940b…`，`uires/svg/` 不管开关都预载）。**这行要重测必须改 `__cmake/wasm-lib-config.cmake` 里的 `SOUI_ENABLE_SVG`**，见下面"SVG 开关在 wasm 下被强制打开" |
 | `-O2 -DNDEBUG` | 6,315,766 | 18.23 MB | **当前 `demos/wasm-demo/release/` 里放的就是这一档**，含 SVG、三个游戏页、主循环预算与 Lua 计时器派发修复、MVC 500 行富模板与子页签、MVC 行内进度条 SVG 胶囊皮肤、waveProgress 双层波、scrolltext 两种模式、壳页加载进度与滚轮接收权；2026-10-31 迁移到根目录 `demos/wasm-demo/` 后重测（gz 一律按 `wasm+data+js+html` 四个文件各自 `gzip -9` 相加；`.data` 20,012,101 B） |
 | `Release`（`-O3 -DNDEBUG`） | 6,318,469 | 17.97 MB | 比 `-O2` 还多 66 KB，不推荐；阶段 6 末实测 |
 | `MinSizeRel`（`-Os -DNDEBUG`） | 5,356,946 | **17.79 MB** | 阶段 6 末实测（当时 65/66） |
@@ -369,19 +378,22 @@ cmake --build /tmp/build-soui-ship --target soui-wasm-demo
 
 ### 两个可选能力的编译开关
 
-`SOUI_BUILD_WASM_LUA` 与 `SOUI_BUILD_WASM_SCINTILLA`（根 `CMakeLists.txt:179-180`，默认都 ON）
-把两块"体积大、但不是所有人都要"的能力做成独立开关：
+`SOUI_BUILD_SCRIPT_LUA`（Lua 脚本能力，与桌面 / 移动端同一开关；`translator` 由独立的
+`SOUI_BUILD_TRANSLATOR` 控制，二者在 wasm 静态链接下必须同时 ON 或同时 OFF）与
+`SOUI_BUILD_WASM_SCINTILLA`（默认都 ON）把两块"体积大、但不是所有人都要"的能力做成独立开关：
 
 ```bash
 # 只要核心 + 控件，不要 Lua 与 Scintilla
-SOUI_BUILD_WASM_LUA=0 SOUI_BUILD_WASM_SCINTILLA=0 \
-    bash demos/wasm-demo/build-soui.sh /tmp/build-soui-wasm
+# （wasm 下 Lua 与 translator 同进退：关 Lua 必须同时关 translator）
+SOUI_BUILD_SCRIPT_LUA=0 SOUI_BUILD_TRANSLATOR=0 SOUI_BUILD_WASM_SCINTILLA=0 \
+    bash demos/wasm-demo/build-soui.sh
 ```
 
 `build-soui.sh` 把这两个环境变量（以及 `SOUI_WASM_DEMO_OUT`）转成 `-D` 写进缓存，其余选项保持不变。
 关掉的 effects 是三处一起生效的：
 
-- **构建图**：`lua-54` / `ScriptModule-LUA` / `translator` 与 `Scintilla` + `controls.extend` 的
+- **构建图**：`lua-54` / `ScriptModule-LUA`（`SOUI_BUILD_SCRIPT_LUA`）与 `translator`
+  （`SOUI_BUILD_TRANSLATOR`）不再进入链接；`Scintilla` + `controls.extend` 的
   `<scintilla>` 不再进入链接；`uires/lua/` 也不再有 `--preload-file`。
 - **页面**：Lua 页留一行 `lua_hint` 说明"本构建没带 Lua 脚本模块"——游戏页的三张子页是 XML，
   照常建出来，但棋盘是空的（格子全部由脚本在 `on_init` 里建，脚本没编进来就没有格子）；
@@ -403,20 +415,19 @@ SOUI_BUILD_WASM_LUA=0 SOUI_BUILD_WASM_SCINTILLA=0 \
 所以两种构建各自的**绝对**条数与体积都变了，`-20.3%` 这个量级只能当阶段 5 的参考值。
 
 `.wasm` 减 11,067,485 B（−20.3%），`.data` 基本不变（字体才是大头）。产物体积治理仍是未收的账，
-见 `doc/soui-wasm-port-plan.md` 的"已知缺口"。
+见 `swinx/doc/swinx-wasm-design.md` §10。
 
 ### worker 线程构建开关（SOUI_WASM_PTHREADS，默认 OFF）
 
-`ITaskLoop` 的 wasm 后端有两条路（`components/TaskLoop/wasm/TaskLoopWasm.cpp`，设计缘由与实测数据在
-`doc/soui-wasm-port-plan.md` §32）。默认构建是**泵后端**：不建线程，队列由 `SwinxDemoPump` 按帧预算
+`ITaskLoop` 的 wasm 后端有两条路（`components/TaskLoop/wasm/TaskLoopWasm.cpp`，两条后端的设计见
+`swinx/doc/swinx-wasm-design.md` §8.1）。默认构建是**泵后端**：不建线程，队列由 `SwinxDemoPump` 按帧预算
 消费，慢任务只会拖长一帧。开 `-pthread` 才是**worker 后端**：`start()` 建一条 wasm worker 线程，
 UI 线程只入队 + `Atomics.notify` 唤醒，任务算完用 `IMessageLoop::PostTask` 把结果抛回 UI 线程，
 下一帧由 `ExecutePendingTask()` 取走 —— 慢任务（解压、AI）整条离开主线程。
 
 ```bash
-cmake -S . -B /tmp/build-soui-wasm-pt -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-      -DCMAKE_TOOLCHAIN_FILE=<emsdk>/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake \
-      -DSOUI_BUILD_WASM_DEMO=ON -DSOUI_WASM_PTHREADS=ON
+emcmake cmake -S <soui4>/demos/wasm-demo -B /tmp/build-soui-wasm-pt -G Ninja \
+      -DCMAKE_BUILD_TYPE=RelWithDebInfo -DSOUI_WASM_PTHREADS=ON
 cmake --build /tmp/build-soui-wasm-pt --target soui-wasm-demo
 node demos/wasm-demo/smoke.js          # 无头验证在 node 里能跑通：node 不需要隔离头
 ```
@@ -430,7 +441,7 @@ node demos/wasm-demo/smoke.js          # 无头验证在 node 里能跑通：nod
 
 本地要同时留两份产物时别再共用 `out/`：给第二条配置单独指一个产物目录
 （`-DSOUI_WASM_DEMO_OUT=$PWD/demos/wasm-demo/out_pt`，`node smoke.js <那个目录>/soui-wasm-demo.js`
-即可指定），这条是 §32.6 那个坑的根治办法。
+即可指定），这条是该问题的根治办法。
 
 开关一起做三件事：给 `CMAKE_C/CXX_FLAGS` 追加 `-pthread`、`add_link_options` 给出
 `-sWASMFS=1 -sINITIAL_MEMORY=64MB -sGROWABLE_ARRAYBUFFERS=1`（根 `CMakeLists.txt`，每个 wasm
@@ -441,9 +452,9 @@ node demos/wasm-demo/smoke.js          # 无头验证在 node 里能跑通：nod
 变了，代价是**浏览器只在 `crossOriginIsolated` 的页面里才给 `SharedArrayBuffer`**：
 
 ```bash
-python3 demos/wasm-demo/serve-isolated.py demos/wasm-demo   # 带 COOP/COEP 的静态服务
+python3 tools/wasm/serve-isolated.py demos/wasm-demo   # 带 COOP/COEP 的静态服务
 # 打开 http://localhost:8080/soui.html，控制台里先确认 crossOriginIsolated === true
-python3 demos/wasm-demo/serve-isolated.py --no-isolation demos/wasm-demo   # 对照：验证降级路径
+python3 tools/wasm/serve-isolated.py --no-isolation demos/wasm-demo   # 对照：验证降级路径
 ```
 
 没隔离头时 `pthread_create` 起不来，实现会**静默退回泵后端**（页面照常跑，只是不并行），所以判断
@@ -476,8 +487,8 @@ Windows 上是交叉编译（`CMAKE_SYSTEM_NAME=Emscripten`，`_WIN32` 不成立
 C:\emsdk\emsdk_env.bat
 
 :: 2) 配置。Ninja 是硬要求：Emscripten 工具链不支持 Visual Studio 生成器
-emcmake cmake -S <soui4> -B C:\bw -G Ninja ^
-    -DCMAKE_BUILD_TYPE=RelWithDebInfo -DSOUI_BUILD_WASM_DEMO=ON
+emcmake cmake -S <soui4>\demos\wasm-demo -B C:\bw -G Ninja ^
+    -DCMAKE_BUILD_TYPE=RelWithDebInfo
 
 :: 3) 构建
 cmake --build C:\bw --target soui-wasm-demo
@@ -502,8 +513,8 @@ macOS 主机与 Linux 用同一条命令，不需要额外参数：
 
 ```bash
 source "$EMSDK/emsdk_env.sh"
-emcmake cmake -S <soui4> -B /tmp/build-soui-wasm -G Ninja \
-    -DCMAKE_BUILD_TYPE=RelWithDebInfo -DSOUI_BUILD_WASM_DEMO=ON
+emcmake cmake -S <soui4>/demos/wasm-demo -B /tmp/build-soui-wasm -G Ninja \
+    -DCMAKE_BUILD_TYPE=RelWithDebInfo
 cmake --build /tmp/build-soui-wasm --target soui-wasm-demo
 ```
 
@@ -553,12 +564,12 @@ Retina（dpr=2）下 canvas 的 CSS 尺寸与 backing store 都仍是 800x600，
 
 `<hexedit>` 是 `controls.extend` 里纯 GDI 的 `SPanel`（自己画地址/十六进制/ASCII 三栏），**不依赖 Scintilla**；数据要宿主喂，演示里 `CWasmHostWnd::fillHexDemo()` 送 128 字节 0..127 并设三栏颜色。`<listctrl>` 的行同理，见 `fillListDemo()`。
 
-Scintilla 在 wasm 下关掉了异常：`third-part/Scintilla/CMakeLists.txt` 的 `EMSCRIPTEN` 分支加 `-fno-exceptions -include ScintillaNoExcept.h`，后者把 `try/catch` 降级成 `if(true)/if(false)`、`throw` 映射到 `abort()`。不开全模块 `-fexceptions` 的理由与代价见 `doc/soui-wasm-port-plan.md` §14.2。
+Scintilla 在 wasm 下关掉了异常：`third-part/Scintilla/CMakeLists.txt` 的 `EMSCRIPTEN` 分支加 `-fno-exceptions -include ScintillaNoExcept.h`，后者把 `try/catch` 降级成 `if(true)/if(false)`、`throw` 映射到 `abort()`。不开全模块 `-fexceptions` 会与 `controls.extend` / `richedit41` 的异常使用面冲突（见 `swinx/doc/swinx-wasm-design.md` §10）。
 
 图形控件那一页的两条后端前提（都是"画得不报错、就是不对"的类型）：
 
-- **sweep（锥形）渐变**：`SpeedMeter` 的外圈是 `grad_sweep` + `DrawGradientPath`。swinx 的 cairo 后端补了 `CreateSweepGradientPattern`（把 180 段扇形拼成一张 mesh 图案），`GRADIENTINFO.sweep` 的成员顺序也改成和 SOUI 的 `GradientInfo::sweep` 一致（`startAngle/centerX/centerY`，SOUI 直接强转结构体交给 `CreateGradientBrush`）。apple 后端目前退回"第一个色标的纯色"并打一次警告，属已知缺口（见 §16.6）。
-- **路径转区域**：`SpeedMeter`/`SProgressRing` 会 `SetClipPath`，这要求 `PathToRegion` 对**非矩形路径**（圆弧）返回真实区域。cairo 原先用 `cairo_copy_clip_rectangle_list` 导出裁剪矩形，遇到非轴对齐路径直接返回 `CAIRO_STATUS_CLIP_NOT_REPRESENTABLE`（错误码 22）而不是空列表——表现为仪表盘外圈整块不画。现在两个后端都改成"把路径栅格化成 1bpp 掩码、再按行合并成 RECT 填 `RGNDATA`"。回归用例在 `demos/fun_test/test_dc.cpp`：`PathToRegion_roundrect_keeps_shape` 与 `PathToRegion_pie_covers_sector`，都在改前实现上会失败（A/B 见 `doc/soui-wasm-port-plan.md` §16.5）。
+- **sweep（锥形）渐变**：`SpeedMeter` 的外圈是 `grad_sweep` + `DrawGradientPath`。swinx 的 cairo 后端补了 `CreateSweepGradientPattern`（把 180 段扇形拼成一张 mesh 图案），`GRADIENTINFO.sweep` 的成员顺序也改成和 SOUI 的 `GradientInfo::sweep` 一致（`startAngle/centerX/centerY`，SOUI 直接强转结构体交给 `CreateGradientBrush`）。apple 后端目前退回"第一个色标的纯色"并打一次警告，属已知缺口。
+- **路径转区域**：`SpeedMeter`/`SProgressRing` 会 `SetClipPath`，这要求 `PathToRegion` 对**非矩形路径**（圆弧）返回真实区域。cairo 原先用 `cairo_copy_clip_rectangle_list` 导出裁剪矩形，遇到非轴对齐路径直接返回 `CAIRO_STATUS_CLIP_NOT_REPRESENTABLE`（错误码 22）而不是空列表——表现为仪表盘外圈整块不画。现在两个后端都改成"把路径栅格化成 1bpp 掩码、再按行合并成 RECT 填 `RGNDATA`"。回归用例在 `demos/fun_test/test_dc.cpp`：`PathToRegion_roundrect_keeps_shape` 与 `PathToRegion_pie_covers_sector`，都在改前实现上会失败。
 
 
 ### 三页"数据控件"的宿主契约（MVC / 表格 / 图表）
@@ -592,7 +603,7 @@ Scintilla 在 wasm 下关掉了异常：`third-part/Scintilla/CMakeLists.txt` �
 `<cmdbtnstyle>`；另外两个就地样式名是 `editStyle` 与 `optionStyle`（注册处见
 `propitem/SPropertyItem-Text.cpp:54`、`propitem/SPropertyItem-Option.cpp:63-64`）。
 本轮第一次把 `<propgrid>` 加进 XML 时，wasm 在 `SHostWnd::Create()` 阶段直接
-`Assertion failed: xmlCmdBtn` 终止，其余各页一起没了画面——这类“一个标签炸掉整页”的坑当初是无头烟测在上线前拦住的（烟测已随测试设施移除，记录见 `doc/soui-wasm-port-plan.md`）。
+`Assertion failed: xmlCmdBtn` 终止，其余各页一起没了画面——这类“一个标签炸掉整页”的坑当初是无头烟测在上线前拦住的（烟测已随测试设施移除）。
 
 ### Lua 游戏页：三个脚本游戏与 SVG 皮肤（阶段 7）
 
@@ -631,12 +642,12 @@ FORCE 成 ON。关掉它不报错，症状是**整页空白**——`CreateSvgFro
   坦克 18（`games.lua` 的 `tetris_cell` / `tank_cell`；坦克的精灵步长是从格子实测矩形算的，
   改一个数就够）。回归盯法：坦克棋盘底边不得越过页区底 558（改之前是 616）。
 - **canvas2d 飘字残影的诊断脚手架已于 2026-11-06 结案后删除**（本 bug 结案，判读链见
-  `doc/soui-wasm-port-plan.md` §31–§37 与修复说明 `doc/soui-wasm-canvas2d-残影修复说明.md`）：
+  修复说明 `swinx/doc/swinx-wasm-canvas2d-残影修复说明.md` 与 `swinx/doc/swinx-wasm-design.md` §5.3）：
   捡分特效的形态开关 `TETRIS_FLY_IMG` 与图片分支（`tetris_fly_text` 恢复原始签名，得分特效就是
   `<text>`）、Lua 游戏页第 4 页「特效台」（`page_game.xml` 的 `wnd_flybench` 与 `games.lua` 的
   `flybench_*`）、以及 `tools/diag/` 里本轮新增的 4 个残影取证脚本都已移除，游戏页回到三个游戏的形态。
   留在仓库里的只有 `demos/fun_test/test_dc.cpp` 的回归用例 —— 那是唯一能挡住这类回归的东西，别跟着删。
-  要重跑修复前/修复后的 A/B，按 §36.4 记录的命令重建红产物（`git show <修复前 swinx 提交>:` 重编 +
+  要重跑修复前/修复后的 A/B，需自行重建红产物（`git show <修复前 swinx 提交>:` 重编 +
   独立端口服务），`.data` 与 `out/` 同步即可。
 
 ### 无头烟测（smoke.js）
@@ -663,7 +674,7 @@ no-op（主循环由烟测手动驱动），以及 `location`（`main()` 用 `lo
 `emscripten_run_script_string` 里的 `eval` 在 node 找不到 `location` 会 `ReferenceError`，整个模块
 加载失败）。最后这条曾经把整条门禁骗过去：workflow 的烟测步骤写的是 `node smoke.js 2>&1 | tee log`
 而没带 `set -o pipefail`，管道退出码取 `tee` 的 0，所以断言一条也没跑过、CI 仍是绿的。
-`doc/soui-wasm-port-plan.md` §32.7 记了这次的 A/B 证据。workflow 的烟测步骤已经补上 `set -o
+workflow 的烟测步骤已经补上 `set -o
 pipefail`，并额外 `grep` 一次日志末尾的 `OK: 全部断言通过` —— 后者还能抓住"进程被 abort、
 留下一份看着全绿的半截日志"这种退出码不可信的情形。
 
@@ -737,8 +748,8 @@ demos/wasm-demo/out/soui-wasm-demo.{js,wasm,data,html}` 再 build，或直接
 这一轮在 Chromium 里用脚本代跑过第 2、3 步：在画布上派发 `WheelEvent`，`defaultPrevented` 为真，
 页面 `scrollY` 不变，帧缓冲里 mclistview 的进度条行有 43 行发生变化，反向再滚 43 行后逐像素回到
 原状态。A/B：把根节点 `sendWheel2Hover` 改回 `0` 重建，同一脚本下滚动行数为 0——证明这条属性是
-滚轮能落到列表上的必要条件，而不是"加了个监听就碰巧好了"。实现细节见
-`doc/soui-wasm-port-plan.md` §29。
+滚轮能落到列表上的必要条件，而不是"加了个监听就碰巧好了"。事件注入路径见
+`swinx/doc/swinx-wasm-design.md` §7.3。
 
 **没覆盖的**：Windows Edge、Firefox（`deltaMode=1` 的分支只按 3 行/格换算，没在真机 Firefox 上跑）、
 Safari 触控板、手机浏览器；滚动惯性与真实手感也只能人手判断。wasm 产物没有无头断言，
@@ -779,7 +790,7 @@ Windows 不用应用操心：`DefWindowProc` 先把 `WM_IME_CHAR` 转成 `WM_CHA
 
 **因此 `SRichEdit` 侧那处改动不是 wasm 专属**：它补的是整个非 Windows 平台缺的
 `ES_NUMBER` 闸门（`number="1"` 的编辑框以前能用输入法塞进汉字），编辑器页因此多了一个
-`number="1"` 的数字框。可证伪证据见 `doc/soui-wasm-port-plan.md` §19.4 与
+`number="1"` 的数字框。回归用例见
 `demos/fun_test/test_e2e_richedit_ime.cpp`。
 
 人工验证步骤（Chromium，需要本机装一个中文输入法）：
@@ -794,11 +805,11 @@ Windows 不用应用操心：`DefWindowProc` 先把 `WM_IME_CHAR` 转成 `WM_CHA
    （组合型输入法只该收到一次成品）。
 
 本机（Linux + headless node）能自动化的部分当初在 `smoke.js`（逐码点 `WM_IME_CHAR`、整串逐字进文档、
-不伪造键盘链、插入符前进、数字框丢弃 `人`）；烟测已随测试设施移除，A/B 数据见
-`doc/soui-wasm-port-plan.md` §19.4。
+不伪造键盘链、插入符前进、数字框丢弃 `人`）；烟测已随测试设施移除。
+组合输入的现行实现见 `swinx/doc/swinx-wasm-design.md` §7.3。
 
 上面 1–4 步里**不依赖真实输入法**的部分，本轮在 Chromium 里用脚本代跑过一遍（`evaluate_script`
-派发 `CompositionEvent` 到 `#ime-proxy`，见 `doc/soui-wasm-port-plan.md` §19.6 的表）：代理框落在
+派发 `CompositionEvent` 到 `#ime-proxy`，事件映射见 `swinx/doc/swinx-wasm-design.md` §7.3）：代理框落在
 插入符的换算坐标上（行首 `[24,210]` → `[44,203]`、行尾 `[378,210]` → `[399,203]`，误差 0）；组合期间
 文档不变、面板显示拼音原文、期间的 `keydown` 被丢弃；`compositionend('输入法验证')` 后码点序列
 `[36755,20837,27861,39564,35777]` 逐字相等、文档按插入点精确拼接、`WM_CHAR` 计数仍为 0；组合结束后
@@ -815,7 +826,7 @@ Safari 与手机软键盘（第 5 步）。
 修复前 `n/i/h/a/o` 五键之后代理框 `value` 全是 `""`（缓冲被清，真实输入法会在这里断）；
 修复后依次是 `n → ni → nih → niha → nihao`，组合期间文档与 `WM_CHAR` 计数都不动，
 `compositionend('你好')` 后按插入点精确拼接、框清空、`WM_IME_CHAR` +2。
-复现用的探针与判据见 `doc/soui-wasm-port-plan.md` §19.8。
+以上步骤可在浏览器里人工复现。
 
 真输入法下如果候选窗仍然一闪就没了，下一个嫌疑是**第一个按键的 `keydown` 被
 `preventDefault()`**（组合还没被输入法认领时，`isComposing` 与 `keyCode===229` 两个信号都还没亮，
@@ -862,7 +873,7 @@ for (const t of ['keydown','keyup','compositionstart','compositionupdate','compo
    **缺口在正下方、左端绿右端红橙**、指针指向 180；`waveProgress` 是**矩形填充 + 贝塞尔波浪顶边**
    （不是楔形/三角形），波纹在动（靠 SOUI timeline 心跳，静止截图里看不出）；
    `qrctrl` 是一个能扫出 `https://github.com/soui4/soui` 的二维码。若外圈变成实心扇形或整块消失，
-   先查 `PathToRegion` 与 `DrawGradientPath` 两条路径（§16.2、§16.3）；若环带镜像、波浪缺角，
+   先查 `PathToRegion` 与 `DrawGradientPath` 两条路径；若环带镜像、波浪缺角，
    查"图形页的两处镜像缺陷"那一节（`LineTo` 记录期与 `PATH_CMD_ADDARC`）。
 5. 点「编辑器」页签。预期：三块都存在——`<edit>` 一行带底色的可编辑框、`<hexedit>` 的
    地址/十六进制/ASCII 三栏（数据是 00..7F，ASCII 栏是绿底）、`<scintilla>` 带行号的代码。
@@ -913,8 +924,8 @@ headless 绘制与输入、键盘消息要经过控件焦点这三段；后三�
 
 ### Lua 游戏页的人工验证步骤（Chromium）
 
-“格子建出来了、事件回脚本、`ITimer` 回调被派发”这些链路当初由无头烟测验证（已移除，记录见
-`doc/soui-wasm-port-plan.md`）；**能不能玩**必须人工在浏览器里看。前提：这次构建的 `SOUI_ENABLE_SVG` 是 ON（根 `CMakeLists.txt` 的 wasm 分支里
+“格子建出来了、事件回脚本、`ITimer` 回调被派发”这些链路当初由无头烟测验证（烟测已移除，现行验证方式见 `swinx/doc/swinx-wasm-design.md` §11.2）。
+**能不能玩**必须人工在浏览器里看。前提：这次构建的 `SOUI_ENABLE_SVG` 是 ON（根 `CMakeLists.txt` 的 wasm 分支里
 `FORCE`，不用额外传参）；关掉时这些 `.wasm` 照样链得出来，但整页只剩背景色——SVG 皮肤拿不到
 `ISvgObj` 时 SOUI 不报错，只画空。
 
@@ -975,9 +986,9 @@ python3 -m http.server 8137 -d demos/wasm-demo/out      # 默认构建不需要�
 5. 连点 8 次都在选择框打开后直接关掉标签页/不选也不给取消 → 第 9 次按钮报 `ret=0`，`GetLastError`
    是 `ERROR_NO_PROC_SLOTS`。这是**已知的槽位泄漏**（8 个槽，不自动回收），Safari 一类不发 `cancel`
    事件的浏览器会走到这里；显式失败是设计选择，不去压掉别人的回投。
-6. `-pthread` 产物（`serve-isolated.py`，`crossOriginIsolated === true`）：先重复 1-4，再从后台任务
+6. `-pthread` 产物（`tools/wasm/serve-isolated.py`，`crossOriginIsolated === true`）：先重复 1-4，再从后台任务
    里调一次 `SwinxPickFileAsyncA` —— 必须是 `ret=0` + `ERROR_CALL_NOT_IMPLEMENTED`。worker 的 JS
-   realm 里没有页面那份 `Module`，所以文件选择只能在 UI 线程发起（`doc/soui-wasm-port-plan.md` §33.3）。
+   realm 里没有页面那份 `Module`，所以文件选择只能在 UI 线程发起（`swinx/doc/swinx-wasm-design.md` §8.4）。
 
 ### 阶段 2 特有的坑
 
@@ -1002,7 +1013,7 @@ python3 -m http.server 8137 -d demos/wasm-demo/out      # 默认构建不需要�
   可用但不是 macOS 习惯。中文组合输入仍未覆盖。
 - **产物体积**：默认构建 `.wasm` 约 54.5 MB、`.data` 约 19.6 MB（字体与系统资源目录都内联在 `.data` 里）。
   相对阶段 2 的 30.9 MB，增量全部来自 `richedit41` + `Scintilla` + `controls.extend` + Lua 那几个静态库，
-  不是资源；不是可发布形态。`SOUI_BUILD_WASM_LUA=0 SOUI_BUILD_WASM_SCINTILLA=0` 能砍到约 43.5 MB
+  不是资源；不是可发布形态。`SOUI_BUILD_SCRIPT_LUA=0 SOUI_BUILD_TRANSLATOR=0 SOUI_BUILD_WASM_SCINTILLA=0` 能砍到约 43.5 MB
   （−20.3%，见"两个可选能力的编译开关"），体积治理见 §11.6 第 3 项。
   **阶段 7 之后**是 `.wasm` 54,786,558 B / `.data` 19,854,263 B：多出的 0.57 MB 代码是 nanosvg 分支，
   多出的 0.25 MB 资源是 `uires/svg|anim|animator`（三个游戏页的皮肤）。
@@ -1121,7 +1132,7 @@ python3 -m http.server 8137 -d demos/wasm-demo/out      # 默认构建不需要�
   `PGRADIENTINFO` 交给 `CreateGradientBrush`，所以 swinx `include/gdi.h` 里
   `{startAngle, centerX, centerY}` 的顺序不能改（改了是静默错位，不是编译错误）。
   cairo 后端用 180 段扇形拼 mesh 图案实现 sweep；apple 后端目前退化成"第一个色标的纯色"并打一次
-  警告——这是已知缺口，见 `doc/soui-wasm-port-plan.md` §16.6。
+  警告——这是 cairo / apple 后端的已知缺口。
 - **cairo 后端的默认字体大小从 0 改成了 12px**。`CreateFont` 没给 `lfHeight` 时（SOUI 有些路径
   只设字体名与 weight），老实现按 0 处理，字形按 0 号字画——内容存在但不可见。现在按 12px
   兜底，apple 后端同步改了同样的兜底。
