@@ -4,11 +4,11 @@
 
   左侧 grouplist(gl_catalog) 为控件分类目录,右侧 tab_ctrls(tabWidth=0 隐藏页签)
   承载 16 个控件演示子页,页切换由 MainDlg_List.cpp 响应目录点击驱动。
-  每个子页采用统一版式:页头(标题+说明) -> 卡片式演示区。页面底色为不透明的
-  clr_window_bg(近白中性底),卡片为纯白 + 1px 描边 + 8px 圆角,零阴影。
+  每个子页采用统一版式:页头(标题+说明) -> 卡片式演示区。页面底色为半透明的
+  clr_page_bg(叠在换肤层 demoskinbk 之上,透出背景图),子页本身透明;卡片为纯白 + 1px 描边 + 8px 圆角,零阴影。
   注意:控件 name/id 被 demos\demo 源码按名引用,不可改动。
 -->
-<window size="-2,-2" layout="hbox" colorBkgnd="@color/clr_window_bg">
+<window size="-2,-2" layout="hbox" colorBkgnd="@color/clr_page_bg">
 	<!--
 	  侧边导航:白底,内边距 8,与右侧内容区之间不再画 1px 分隔线(靠白底和页面底色差自然分界);
 	  分组头 = 可展开按钮,12px 次要灰(只作章节标题,悬停才转为正文色),组间留 8px 断点;
@@ -82,7 +82,7 @@
 	         colorText="@color/clr_text" colorTextHover="@color/clr_title" colorTextPush="@color/clr_primary"
 	         fontPush="bold:1" drawFocusRect="0">
 		<!-- ============ 列表类演示:页头 + 全区域列表(weight 撑满) ============ -->
-		<page title="mclistview" layout="vbox" padding="20,16,20,18" colorBkgnd="@color/clr_window_bg">
+		<page title="mclistview" layout="vbox" padding="20,16,20,18">
 			<!-- 页头 -->
 			<text text="多列列表" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
 			<text text="报表式多列虚拟列表,表头支持排序、列宽拖换与全选,条目模板内可嵌入任意控件" extend_top="6" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
@@ -168,7 +168,7 @@
 			</mclistview>
 			</window>
 		</page>
-		<page title="listctrl" layout="vbox" padding="20,16,20,18" colorBkgnd="@color/clr_window_bg">
+		<page title="listctrl" layout="vbox" padding="20,16,20,18">
 			<!-- 页头 -->
 			<text text="基础列表" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
 			<text text="报表式列表,演示表头排序与拖换、框选、热跟踪光标、就地编辑与多选同步勾选" extend_top="6" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
@@ -212,7 +212,7 @@
 				</listctrl>
 			</window>
 		</page>
-		<page title="listview(fix)" layout="vbox" padding="20,16,20,18" colorBkgnd="@color/clr_window_bg">
+		<page title="listview(fix)" layout="vbox" padding="20,16,20,18">
 			<!-- 页头 -->
 			<text text="固定高度列表" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
 			<text text="横向与纵向的定高虚拟列表,条目模板内可嵌入任意子控件" extend_top="6" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
@@ -279,7 +279,7 @@
 				</listview>
 			</window>
 		</page>
-		<page title="listview(flex)" layout="vbox" padding="20,16,20,18" colorBkgnd="@color/clr_window_bg">
+		<page title="listview(flex)" layout="vbox" padding="20,16,20,18">
 			<!-- 页头 -->
 			<text text="可变高度列表" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
 			<text text="奇偶行使用不同模板与不同高度的虚拟列表,悬停态可单独定制" extend_top="6" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
@@ -329,7 +329,7 @@
 				</listview>
 			</window>
 		</page>
-		<page title="tileview" layout="vbox" padding="20,16,20,18" colorBkgnd="@color/clr_window_bg">
+		<page title="tileview" layout="vbox" padding="20,16,20,18">
 			<!-- 页头 -->
 			<text text="TileView" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
 			<text text="平铺网格虚拟列表,适合图标卡片式内容展示" extend_top="6" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
@@ -359,7 +359,7 @@
 			</window>
 		</page>
 		<!-- ============ 树型控件 ============ -->
-		<page title="treectrl" layout="vbox" padding="20,16,20,18" colorBkgnd="@color/clr_window_bg">
+		<page title="treectrl" layout="vbox" padding="20,16,20,18">
 			<!-- 页头 -->
 			<text text="TreeCtrl" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
 			<text text="经典树控件,支持复选框、节点图标与多级组织结构;双击或 F2 可就地编辑节点文本" extend_top="6" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
@@ -387,7 +387,7 @@
 			<include src="layout:page_treeview" />
 		</page>
 		<!-- ============ 编辑器及热键 ============ -->
-		<page title="edit" layout="vbox" padding="20,16,20,18" colorBkgnd="@color/clr_window_bg">
+		<page title="edit" layout="vbox" padding="20,16,20,18">
 			<!-- 页头 -->
 			<text text="编辑器" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
 			<text text="单行编辑、数字调节、热键、IP 地址与十六进制编辑" extend_top="6" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
@@ -449,7 +449,7 @@
 				</window>
 			</window>
 		</page>
-		<page title="richedit" layout="vbox" padding="20,16,20,18" colorBkgnd="@color/clr_window_bg">
+		<page title="richedit" layout="vbox" padding="20,16,20,18">
 			<!-- 页头 -->
 			<text text="富文本编辑器" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
 			<text text="图文混排、格式化消息追加与 RTF 导入导出" extend_top="6" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
@@ -482,7 +482,7 @@
 		</page>
 		<!-- ============ 按钮类 ============ -->
 		<!-- ============ 按钮类:卡片式版式 ============ -->
-		<page title="buttons" layout="vbox" padding="20,16,20,18" colorBkgnd="@color/clr_window_bg">
+		<page title="buttons" layout="vbox" padding="20,16,20,18">
 			<!-- 页头 -->
 			<text text="按钮与交互" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
 			<text text="消息框按钮、开关、超链接、图片消息处理、圆形裁剪与线条绘制" extend_top="6"
@@ -620,7 +620,7 @@
 		</page>
 		<!-- ============ 单选按钮 ============ -->
 		<!-- ============ 单选按钮:卡片式版式 ============ -->
-		<page title="radiobox" layout="vbox" padding="20,16,20,18" colorBkgnd="@color/clr_window_bg">
+		<page title="radiobox" layout="vbox" padding="20,16,20,18">
 			<!-- 页头 -->
 			<text text="单选按钮" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
 			<text text="经典单选、图片单选、图标型单选，以及按钮组与页签联动" extend_top="6"
@@ -800,7 +800,7 @@
 			</window>
 		</page>
 		<!-- ============ 进度条 ============ -->
-		<page title="prog and slider" layout="vbox" padding="20,16,20,18" colorBkgnd="@color/clr_window_bg">
+		<page title="prog and slider" layout="vbox" padding="20,16,20,18">
 			<!-- 页头 -->
 			<text text="进度条与滑块" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
 			<text text="水平 / 垂直进度条、滑块、滚动条与圆环进度" extend_top="6" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
@@ -841,7 +841,7 @@
 			</window>
 		</page>
 		<!-- ============ 日历 ============ -->
-		<page title="calendar" layout="vbox" padding="20,16,20,18" colorBkgnd="@color/clr_window_bg">
+		<page title="calendar" layout="vbox" padding="20,16,20,18">
 			<!-- 页头 -->
 			<text text="日历" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
 			<text text="日期时间选择器与月历控件" extend_top="6" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
@@ -874,7 +874,7 @@
 			</window>
 		</page>
 		<!-- ============ 分割窗口 ============ -->
-		<page title="split" layout="vbox" padding="20,16,20,18" colorBkgnd="@color/clr_window_bg">
+		<page title="split" layout="vbox" padding="20,16,20,18">
 			<!-- 页头 -->
 			<text text="分割窗口" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
 			<text text="splitrow / splitcol 水平垂直嵌套分割,窗格按优先级与理想尺寸分配" extend_top="6" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
@@ -898,7 +898,7 @@
 			</splitrow>
 		</page>
 		<!-- ============ 列表框与组合框 ============ -->
-		<page title="combobox and listbox" layout="vbox" padding="20,16,20,18" colorBkgnd="@color/clr_window_bg">
+		<page title="combobox and listbox" layout="vbox" padding="20,16,20,18">
 			<!-- 页头 -->
 			<text text="列表框与组合框" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
 			<text text="combobox 可编辑与纯下拉两种模式对比,listbox 支持由代码动态初始化,comboview 用 listview 承载下拉内容" extend_top="6" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>
@@ -1050,7 +1050,7 @@
 			</window>
 		</page>
 		<!-- ============ 属性表 ============ -->
-		<page title="propertygrid" layout="vbox" padding="20,16,20,18" colorBkgnd="@color/clr_window_bg">
+		<page title="propertygrid" layout="vbox" padding="20,16,20,18">
 			<!-- 页头 -->
 			<text text="属性表控件" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
 			<text text="分组属性网格,支持文本 / 选项 / 尺寸 / 颜色等属性编辑器" extend_top="6" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>

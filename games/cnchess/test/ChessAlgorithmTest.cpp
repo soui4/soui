@@ -388,6 +388,77 @@ TEST(ChessAlgorithmTest, UndoMove)
     EXPECT_EQ(layout.m_chesses[2][4], CHSMAN_NULL);    // 新位置变为空
 }
 
+// 悔棋不仅要恢复棋子位置，还要恢复棋子 ID。长捉判定依赖 ID 区分"同类型不同棋子"，
+// 若 ID 未随悔棋还原，客户端后续用 ID 比对选中棋子/标志会出现错乱（见客户端
+// CChessGame::UndoLastMove / OnAckRegret 的选中态清理）。
+TEST(ChessAlgorithmTest, UndoMoveRestoresPieceId)
+{
+    CChessLayout layout;
+    int initLayout[10][9];
+    for (int y = 0; y < 10; y++)
+        for (int x = 0; x < 9; x++)
+            initLayout[y][x] = CHSMAN_NULL;
+
+    initLayout[4][4] = CHSMAN_RED_JU;
+    layout.InitLayout(initLayout, CS_RED);
+
+    int nIdAt44 = layout.m_nChsID[4][4];
+    MOVESTEP move = layout.Move({4, 4}, {4, 2});
+
+    // 走子后：棋子与 ID 一起移动到目标格（POINT{4,2} 对应棋盘 [y=2][x=4]），原格清空
+    EXPECT_EQ(layout.m_nChsID[2][4], nIdAt44);
+    EXPECT_EQ(layout.m_nChsID[4][4], 0);
+
+    BOOL ok = layout.UndoMove(move);
+    EXPECT_TRUE(ok);
+
+    // 悔棋后：位置与 ID 必须精确还原（目标格 [2][4] 清空，原格 [4][4] 恢复）
+    EXPECT_EQ(layout.m_chesses[4][4], CHSMAN_RED_JU);
+    EXPECT_EQ(layout.m_nChsID[4][4], nIdAt44);
+    EXPECT_EQ(layout.m_chesses[2][4], CHSMAN_NULL);
+    EXPECT_EQ(layout.m_nChsID[2][4], 0);
+}
+
+// 多步悔棋：连走红、黑各一步后依次悔棋，整个棋盘（含棋子与 ID、行棋方）必须精确回到初始。
+// 客户端"选中后可走标志"依赖悔棋后局面与历史完全一致；若不一致，标志会指向错误格子。
+// 注：UI 层的选中态（m_nSelectedChessID）与"可走标志"清理属于 CChessGame 职责，
+// 需在 UndoLastMove / OnAckRegret 中显式 DeselectPiece，见对应源文件。
+TEST(ChessAlgorithmTest, UndoMoveMultiStepRestoresBoard)
+{
+    CChessLayout layout;
+    int initLayout[10][9];
+    for (int y = 0; y < 10; y++)
+        for (int x = 0; x < 9; x++)
+            initLayout[y][x] = CHSMAN_NULL;
+
+    initLayout[4][4] = CHSMAN_RED_JU;
+    initLayout[0][0] = CHSMAN_BLK_JU;
+    layout.InitLayout(initLayout, CS_RED);
+
+    int before[10][9];
+    int beforeId[10][9];
+    for (int y = 0; y < 10; y++)
+        for (int x = 0; x < 9; x++) {
+            before[y][x] = layout.m_chesses[y][x];
+            beforeId[y][x] = layout.m_nChsID[y][x];
+        }
+
+    MOVESTEP m1 = layout.Move({4, 4}, {4, 2}); // 红车走
+    MOVESTEP m2 = layout.Move({0, 0}, {0, 2}); // 黑车走
+    EXPECT_NE(layout.m_chesses[4][4], CHSMAN_RED_JU);
+
+    // 依次悔棋（后走的先悔）
+    EXPECT_TRUE(layout.UndoMove(m2));
+    EXPECT_TRUE(layout.UndoMove(m1));
+
+    for (int y = 0; y < 10; y++)
+        for (int x = 0; x < 9; x++) {
+            EXPECT_EQ(layout.m_chesses[y][x], before[y][x]) << "chess y=" << y << " x=" << x;
+            EXPECT_EQ(layout.m_nChsID[y][x], beforeId[y][x]) << "id y=" << y << " x=" << x;
+        }
+    EXPECT_EQ(layout.m_actSide, CS_RED); // 行棋方回到初始（红方）
+}
+
 // 测试走棋描述功能
 TEST(ChessAlgorithmTest, MoveDescription)
 {

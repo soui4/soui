@@ -9,11 +9,13 @@
 
   与其它页面的差别：
     1. 导出名是 Fund* 前缀，用 api 覆盖；
-    2. 画布按 390px 显示（mobile/uires 的竖屏逻辑宽度，SWINX_FB_WIDTH=390）；
-    3. 东财接口需要同源转发：起服务要用本目录的专用入口并带 --http-proxy
+    2. 画布按 1440px 显示（桌面版 uires 的逻辑宽度，SWINX_FB_WIDTH=1440），
+       窄屏由宿主的 max-width:100% 等比缩到窗口宽度；
+    3. 东财接口需要同源转发：本地开发用本目录的专用入口并带 --http-proxy
          python3 demos/fundholdings/wasm/serve-fundholdings.py demos/fundholdings/wasm/out_pt --port 8080 --http-proxy
        通用服务 tools/wasm/serve-isolated.py 不含转发端点（404），漏了 --http-proxy
-       则是 501；python -m http.server 之类纯静态服务同样是 404，取数全部失败；
+       则是 501；python -m http.server 之类纯静态服务同样是 404，取数全部失败。
+       Apache 部署见同目录 apache/fundholdings.conf（静态文件 + 反代 /__soui_http）；
     4. 只有 -pthread（worker）产物要求 window.crossOriginIsolated === true（COOP/COEP
        头，缺了 worker 建不起来）。-P/--no-pthreads 的泵产物没有 worker，静态服务器
        也能起页面，隔离头对它不是要求。壳页用 emcc shell 的 #if PTHREADS 预处理指令
@@ -36,8 +38,8 @@
     h1 { font-size: 16px; font-weight: 600; color: #f0b429; margin: 0 0 4px; }
     /* 状态行：启动期写"正在加载…"，跑起来之后由下面的轮询刷成统计量，
        失败时宿主经 onFatal 把原因写进这里（加载遮罩同时转红）。 */
-    /* pre-wrap：代理/隔离告警是长句，pre 会把状态行撑出 390px 的画布。 */
-    #status { margin: 0 0 10px; max-width: 390px; font-size: 12px; color: #8fa3b8;
+    /* pre-wrap：代理/隔离告警是长句，pre 会把状态行撑出画布宽度。 */
+    #status { margin: 0 0 10px; max-width: 1440px; font-size: 12px; color: #8fa3b8;
               white-space: pre-wrap; }
     /* 画布尺寸/边框/圆角由宿主注入的 .soui-canvas 管；这里只改配色。
        宽度用宿主按逻辑宽度设的 CSS 变量，不写死像素。 */
@@ -57,7 +59,9 @@
      让它惰性（见文件头说明）。 -->
 <template>{{{ SCRIPT }}}</template>
 
-<script src="soui-host.js"></script>
+<!-- 宿主脚本带时间戳加载：产物名固定，纯 script 标签会被浏览器启发式缓存，
+     重新构建后仍可能跑旧的宿主逻辑（与 wasm-demo/soui.html 同一处理）。 -->
+<script>document.write('<script src="soui-host.js?v=' + Date.now() + '"><\/script>');</script>
 <script>
 (function () {
   'use strict';
@@ -120,7 +124,7 @@
     container: document.getElementById('app'),
     wasm: 'fundholdings.wasm',        // 胶水 .js / .data 由它推导
     factory: 'createFundHoldings',    // emcc -sEXPORT_NAME
-    width: 390,                       // mobile/uires 的竖屏逻辑宽度
+    width: 1440,                      // 桌面版 uires 的逻辑宽度
     loadingTitle: '基金持仓 · WebAssembly',
     /* fundholdings_main.cpp 的导出名是 Fund* 前缀，与演示页的 SwinxDemo* 不同名；
        宿主缺省用后者，这里逐项覆盖。剪贴板那个本就共用 swinx 的导出，不用改。 */

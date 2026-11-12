@@ -5,7 +5,7 @@
     path 页演示 pathView 路径编辑(txt_path_length/pv_test 为代码引用名);
     SpeedMeter 页演示仪表盘控件(speed_ctrl/btn_speed_dec/btn_speed_inc 为代码引用名)。
   -->
-  <tabctrl pos="0,0,-0,-0" colorBkgnd="@color/clr_window_bg" colorText="@color/clr_text" colorTextHover="@color/clr_title" colorTextPush="@color/clr_primary" font="face:微软雅黑,size:13" fontPush="bold:1" focusable="0" tabAlign="top" tabSkin="skin_tab_nav_top" tabInterSize="4" tabHeight="36" tabWidth="110" drawFocusRect="0">
+  <tabctrl pos="0,0,-0,-0" colorBkgnd="@color/clr_page_bg" colorText="@color/clr_text" colorTextHover="@color/clr_title" colorTextPush="@color/clr_primary" font="face:微软雅黑,size:13" fontPush="bold:1" focusable="0" tabAlign="top" tabSkin="skin_tab_nav_top" tabInterSize="4" tabHeight="36" tabWidth="110" drawFocusRect="0">
 
     <page title="filter level">
       <tabctrl pos="0,0,-0,-0" colorText="@color/clr_text" colorTextHover="@color/clr_title" colorTextPush="@color/clr_primary" font="face:微软雅黑,size:13" fontPush="bold:1" focusable="0" tabAlign="top" tabSkin="skin_tab_nav_top" tabInterSize="4" tabHeight="36" tabWidth="90" drawFocusRect="0">

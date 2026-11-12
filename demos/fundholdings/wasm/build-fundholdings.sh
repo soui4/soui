@@ -18,9 +18,9 @@
 # --http-proxy（基金站点不给 CORS 头、XHR 也不能设 Cookie/Referer）。通用服务
 # tools/wasm/serve-isolated.py 不含 /__soui_http 端点，别拿它直接跑基金持仓。
 #
-# 资源与布局：wasm 版用 demos/fundholdings/mobile/uires（竖屏 390x844），预载到
+# 资源与布局：wasm 版用 demos/fundholdings/uires（桌面版 1440x860），预载到
 # MEMFS 的 /opt/soui/uires；因此 config 必须固定 SWINX_FB_WIDTH/HEIGHT，否则缓存
-# 里残留别的尺寸会把竖屏布局裁掉。
+# 里残留别的尺寸会把桌面布局裁掉。
 #
 # 构建目录：位置参数 > $SOUI_WASM_BUILD > <本目录>/build；上线档用
 #   $SOUI_FUNDHOLDINGS_SHIP_BUILD > <本目录>/build-release。
@@ -50,7 +50,7 @@ SOUI_WASM_OUT_VAR="SOUI_WASM_FUNDHOLDINGS_OUT"
 SOUI_WASM_OUT_PATTERN="@SRC@/out@PT@"
 SOUI_WASM_SHIP_OUT_PATTERN="@SRC@/release@PT@"
 SOUI_WASM_ENV_VARS="SOUI_FUNDHOLDINGS_STACK"
-SOUI_WASM_CONFIG=(-DSOUI_BUILD_HTTPCLIENT=ON -DSWINX_FB_WIDTH=390 -DSWINX_FB_HEIGHT=844)
+SOUI_WASM_CONFIG=(-DSOUI_BUILD_HTTPCLIENT=ON -DSWINX_FB_WIDTH=1440 -DSWINX_FB_HEIGHT=860)
 SOUI_WASM_JOBS_DEFAULT="2"
 SOUI_WASM_USE_PTHREADS=1
 SOUI_WASM_USE_GDI=1

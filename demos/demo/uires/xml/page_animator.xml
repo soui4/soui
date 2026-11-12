@@ -9,7 +9,7 @@
   giftest/gif_test/btnSelectGif/cbx_interpolator/view_interpolator 的
   name 被 MainDlg_Misc.cpp / MainDlg_Animation.cpp 引用,不可改动。
 -->
-<tabctrl size="-2,-2" colorBkgnd="@color/clr_window_bg" colorText="@color/clr_text" colorTextHover="@color/clr_title" colorTextPush="@color/clr_primary" font="face:微软雅黑,size:13" fontPush="bold:1" focusable="0" animateSteps="10" animateType="1" tabAlign="left" tabSkin="skin_tab_nav" tabInterSize="4" tabPos="8" tabWidth="200" tabHeight="40" iconSkin="svg_tab_animator" icon-x="18" icon-y="12" text-x="42" drawFocusRect="0">
+<tabctrl size="-2,-2" colorBkgnd="@color/clr_page_bg" colorText="@color/clr_text" colorTextHover="@color/clr_title" colorTextPush="@color/clr_primary" font="face:微软雅黑,size:13" fontPush="bold:1" focusable="0" animateSteps="10" animateType="1" tabAlign="left" tabSkin="skin_tab_nav" tabInterSize="4" tabPos="8" tabWidth="200" tabHeight="40" iconSkin="svg_tab_animator" icon-x="18" icon-y="12" text-x="42" drawFocusRect="0">
   <page title="controls" iconIndex="0" layout="vbox" padding="20,16,20,18">
     <!-- 页头 -->
     <text text="动图播放" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>

@@ -22,7 +22,7 @@ add_subdirectory(${SOUI4_DIR} ${SOUI4_BUILD})
 #   2. 渲染器从 Skia 换成 render-gdi（wasm 的 canvas2d 后端），图片解码仍是 stb；
 #   3. IHttpClient 换成 components/httpclient/wasm（同步 XHR，跑在 TaskLoop 的
 #      worker 线程上），请求经本目录 serve-fundholdings.py 的同源代理转发；
-#   4. 资源用 mobile/uires（竖屏 390x844），不加载系统资源。
+#   4. 资源用桌面版 uires（1440x860），不加载系统资源。
 # =============================================================================
 
 if(SOUI_WASM_PTHREADS)
@@ -38,15 +38,15 @@ set(SOUI_WASM_FUNDHOLDINGS_OUT "${_soui_fund_out_default}" CACHE PATH
 set(SOUI_FUNDHOLDINGS_STACK "32MB" CACHE STRING "fundholdings wasm: -sSTACK_SIZE")
 
 foreach(_req
-        "${CMAKE_CURRENT_SOURCE_DIR}/../mobile/uires/uires.idx")
+        "${CMAKE_CURRENT_SOURCE_DIR}/../uires/uires.idx")
     if(NOT EXISTS "${_req}")
-        message(FATAL_ERROR "fundholdings wasm: 缺少 ${_req}（移动版资源没检出？）")
+        message(FATAL_ERROR "fundholdings wasm: 缺少 ${_req}（桌面版资源没检出？）")
     endif()
 endforeach()
 
 # 挂载点必须和 fundholdings_main.cpp 里的 kAppResDir 一致。
 set(_soui_fund_preload
-    "--preload-file=${CMAKE_CURRENT_SOURCE_DIR}/../mobile/uires@/opt/soui/uires")
+    "--preload-file=${CMAKE_CURRENT_SOURCE_DIR}/../uires@/opt/soui/uires")
 
 # 观测口 / 输入口与 soui-wasm、cnchess 同一套契约。
 set(_soui_fund_exports
@@ -131,17 +131,24 @@ target_link_options(fundholdings-wasm PRIVATE
     "-Wl,--stack-first"
     ${_soui_fund_preload})
 
-file(GLOB_RECURSE _soui_fund_res "${CMAKE_CURRENT_SOURCE_DIR}/../mobile/uires/*")
+file(GLOB_RECURSE _soui_fund_res "${CMAKE_CURRENT_SOURCE_DIR}/../uires/*")
 set_property(TARGET fundholdings-wasm APPEND PROPERTY LINK_DEPENDS
     ${_soui_fund_res}
     "${CMAKE_CURRENT_SOURCE_DIR}/fundholdings.html"
-    "${SOUI_HOST_JS}")
+    "${SOUI_HOST_JS}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/serve-fundholdings.py"
+    "${CMAKE_CURRENT_SOURCE_DIR}/start-server.bat")
 
+# 产物目录要能整体拷走独立部署：静态页 + wasm 产物 + 自带的服务脚本与启动脚本。
 add_custom_command(TARGET fundholdings-wasm POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "${SOUI_HOST_JS}"
         "${SOUI_WASM_FUNDHOLDINGS_OUT}/soui-host.js"
-    COMMENT "Copying soui-host.js for fundholdings-wasm")
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/serve-fundholdings.py"
+        "${CMAKE_CURRENT_SOURCE_DIR}/start-server.bat"
+        "${SOUI_WASM_FUNDHOLDINGS_OUT}"
+    COMMENT "Copying soui-host.js / server scripts for fundholdings-wasm")
 
 message(STATUS "fundholdings-wasm: ${SWINX_FB_WIDTH}x${SWINX_FB_HEIGHT}, "
                "stack=${SOUI_FUNDHOLDINGS_STACK}, taskloop=${SOUI_WASM_PTHREADS} "

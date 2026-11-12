@@ -13,7 +13,7 @@
   <t:home_card .../> 引用并实例化,引用节点的属性替换模板体中的 {{attr}} 占位。
   卡片 name 与页序号的对应关系见 MainDlg_Nav.cpp。
 -->
-<window size="-2,-2" colorBkgnd="@color/clr_window_bg" layout="vbox" clipClient="1">
+<window size="-2,-2" colorBkgnd="@color/clr_page_bg" layout="vbox" clipClient="1">
 
   <!-- 头部标题区 -->
   <window size="-2,34"/>
@@ -58,10 +58,13 @@
   </window>
   <window size="0,0" weight="1"/>
 
-  <!-- 页脚:静态信息,不带交互,避免出现"看起来能点但点不动"的假链接 -->
+  <!-- 页脚(状态栏):静态信息,不带交互,避免出现"看起来能点但点不动"的假链接。
+       txt_home_version 的文本由 CMainDlg::OnInitDialog 用 soui-version.h 的 SOUI_VER1..4 覆盖,
+       XML 里的静态串只作兜底;QQ 群号与"关于"页、LICENSE 保持一致。 -->
   <window size="-2,1" colorBkgnd="@color/clr_line"/>
-  <window size="-2,36" colorBkgnd="@color/clr_card_bg" layout="hbox" gravity="center" padding="16,0,16,0">
-    <text text="SOUI 5.3.2.1" font="face:微软雅黑,size:11" colorText="@color/clr_text_sub"/>
+  <window size="-2,36" colorBkgnd="@color/clr_card_bg" layout="hbox" gravity="center" padding="16,0,16,0" interval="16">
+    <text name="txt_home_version" text="SOUI 5.3.2.3" font="face:微软雅黑,size:11" colorText="@color/clr_text_sub"/>
+    <text text="QQ交流群：229313785" font="face:微软雅黑,size:11" colorText="@color/clr_text_sub"/>
     <window size="0,0" weight="1"/>
     <text text="© setoutsoft" font="face:微软雅黑,size:11" colorText="@color/clr_text_sub"/>
   </window>

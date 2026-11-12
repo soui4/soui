@@ -2,10 +2,10 @@
 <!--
   page_about.xml - 关于页
   统一版式:页头(22 号粗体标题 + 12 号灰说明) + 三张卡片(欢迎与协议 / QQ 群 / 代码仓库)。
-  卡片用 skin_card(白底+1px 描边+10px 圆角),页面底 @color/clr_window_bg。
+  卡片用 skin_card(白底+1px 描边+10px 圆角),页面底 @color/clr_page_bg(半透明,透出换肤背景图)。
   无 name/id 控件被源码引用,链接 href 与 cls_btn_weblink 样式保持不变。
 -->
-<window layout="vbox" size="-2,-2" padding="20,16,20,18" colorBkgnd="@color/clr_window_bg">
+<window layout="vbox" size="-2,-2" padding="20,16,20,18" colorBkgnd="@color/clr_page_bg">
   <!-- 页头 -->
   <text text="关于 SOUI" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
   <text text="开源协议、版权信息与社区资源入口" extend_top="6" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>

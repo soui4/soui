@@ -2,11 +2,13 @@
     page_webkit.xml - 内嵌浏览器(教程)演示分区
     fadeframe 实现工具栏"自动隐藏":鼠标移到顶部区域时 webkit_toolbar 渐显,移开后延时渐隐;
     targetName 指向 webkit_toolbar。
+    首行 text 是 wkeWebkit 创建失败（缺 wke.dll）时的兜底提示：WM_CREATE 返回非 0 时控件被父窗口销毁，
+    铺在它下面的 text 才会露出；wke 正常加载时网页会覆盖这段文字。
     wke_test/edit_url/btn_webkit_back/fore/refresh/go 被 MainDlg_Webkit.cpp 引用,不可改名。
     工具栏背景 skin_webkit_nav_bk 与图标按钮(webbtn_*.svg)均沿用 demo 浅色圆角卡片 + 青色主题。
   -->
-  <window size="-2,-2" colorBkgnd="@color/clr_window_bg">
-    <text pos="8,8,-8,-8" align="center" valign="center" colorText="@color/clr_text_sub" multiLines="1">没有找到 wke.dll,请将 third-part\wke\wke.7z 解压到 bin 目录。\nwke.dll目前只有32位</text>
+  <window size="-2,-2" colorBkgnd="@color/clr_page_bg">
+    <text pos="8,8,-8,-8" align="center" valign="center" colorText="@color/clr_text_sub" multiLines="1">没有找到可用的 wke.dll，网页无法加载。\n仓库自带的 wke.dll 仅有 32 位版本；64 位及其他平台请从以下仓库自行编译：\nhttps://gitee.com/setoutsoft/wkex.git\n再把编译产物（wke.dll / libwke.so / libwke.dylib）复制到 demo 运行目录\n（与 demo.exe 同目录），然后重启程序。</text>
     <fadeframe pos="16,16,-16,56" targetName="webkit_toolbar" showAlpha="235">
       <!--自动隐藏:鼠标进入顶部区域时工具栏渐显,移开后延时渐隐-->
     </fadeframe>

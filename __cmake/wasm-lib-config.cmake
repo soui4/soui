@@ -66,9 +66,12 @@ if(SOUI_WASM_PTHREADS)
     # 那个宏只有编译单元自己带 -pthread 时才定义，而宿主需要知道链接期能力是否可用）。
     add_compile_options("-pthread")
     add_compile_definitions(SOUI_WASM_PTHREADS=1)
-    # 链接期三条设置放在这里，让每个 wasm 可执行目标（演示 / cnchess / fundholdings）
+    # 链接期四条设置放在这里，让每个 wasm 可执行目标（演示 / cnchess / fundholdings）
     # 拿到同一份配置 —— 只在某个 app 的 CMakeLists 里补，别的目标一开这个开关就会
     # 在 wasm-ld 期报错（cnchess 实测：INITIAL_MEMORY 默认 16MB < STACK_SIZE 32MB）。
+    #   -pthread          只有编译期带它时 __EMSCRIPTEN_PTHREADS__ 才成立，链接期不带
+    #                     则 emcc 不会注入 PThread 运行时和 worker.js，pthread_create
+    #                     退化成 stub（页面仍显示 pump 产物）。两处必须成对出现。
     #   -sWASMFS=1        文件系统搬进线性内存。默认的 JS 文件系统下，worker 里的
     #                     每次 stdio 都要浏览器主线程在 futex 忙等里代跑，而本端口
     #                     的主线程从不阻塞（实测：主线程不睡时 worker 的 fopen 永不
@@ -77,7 +80,7 @@ if(SOUI_WASM_PTHREADS)
     #                     worker 栈另从堆里按 4MB 一条分配（TaskLoopWasm.cpp）。
     #   GrowableArrayBuffers 1 = 有 resizable buffer 就用，没有照旧。pthreads 与
     #                     ALLOW_MEMORY_GROWTH 并存时，不用它的构建要走一段很慢的胶水。
-    add_link_options("-sWASMFS=1" "-sINITIAL_MEMORY=64MB" "-sGROWABLE_ARRAYBUFFERS=1")
+    add_link_options("-pthread" "-sWASMFS=1" "-sINITIAL_MEMORY=64MB" "-sGROWABLE_ARRAYBUFFERS=1")
     message(STATUS "SOUI_WASM_PTHREADS: -pthread + -sWASMFS=1，产物需要 crossOriginIsolated 才能跑")
 endif()
 

@@ -46,7 +46,8 @@ crossOriginIsolated 为 true。
 
 `add_arguments` 里加的参数会出现在 `self._options` 上；`startup_hook(root, args)` 在
 服务打印完启动信息、进入 serve_forever 之前调用，用来补 app 自己的提示/校验。
-参考实现：demos/fundholdings/wasm/serve-fundholdings.py（同源 /__soui_http 转发）。
+需要独立部署的单文件服务（不依赖本模块）应复制这套静态服务逻辑自成一文件，
+参考 demos/fundholdings/wasm/serve-fundholdings.py（同源 /__soui_http 转发）。
 """
 
 import argparse
@@ -222,6 +223,8 @@ def build_parser(description=None, add_arguments=None):
     ap.add_argument('directory', nargs='?', default=os.getcwd(),
                     help='要服务的目录，默认当前工作目录')
     ap.add_argument('--port', type=int, default=8080)
+    ap.add_argument('--bind', default='',
+                    help='监听地址，默认所有网卡；放在 Apache/Nginx 后面时用 127.0.0.1 只允许本机反代访问')
     ap.add_argument('--no-isolation', action='store_true',
                     help='不发 COOP/COEP，用来验证退回泵后端的降级路径')
     ap.add_argument('--ws-proxy', type=parse_host_port, metavar='HOST:PORT',
@@ -241,12 +244,12 @@ def serve(args, handler_class=IsolatedHandler, startup_hook=None):
     socketserver.ThreadingTCPServer.allow_reuse_address = True
     # 一条活着的 WebSocket 会占住整个 handler 到断开为止，所以必须每连接一条线程；
     # daemon_threads 让 Ctrl-C 不用等在跑的隧道上。
-    with socketserver.ThreadingTCPServer(('', args.port), handler) as httpd:
+    with socketserver.ThreadingTCPServer((args.bind or '', args.port), handler) as httpd:
         httpd.daemon_threads = True
         state = '关闭（--no-isolation）' if args.no_isolation else '开启'
         print('服务 %s' % root)
-        print('http://localhost:%d/%s   crossOriginIsolated 头：%s'
-              % (args.port, guess_page(root), state))
+        print('http://%s:%d/%s   crossOriginIsolated 头：%s'
+              % (args.bind or 'localhost', args.port, guess_page(root), state))
         if args.no_isolation:
             print('  注意：这个模式下浏览器不会给出 SharedArrayBuffer，wasm 构建会退回泵后端。')
         if args.ws_proxy:

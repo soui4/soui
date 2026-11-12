@@ -1,52 +1,48 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""serve-fundholdings.py -- 基金持仓 wasm 版的本地静态服务入口。
+"""serve-fundholdings.py -- 基金持仓 wasm 版的独立静态服务 + /__soui_http 转发。
 
-通用部分（.wasm MIME、COOP/COEP、--no-isolation、--ws-proxy）全部继承
-tools/wasm/serve-isolated.py，本文件只放基金持仓独有的那块：同源 HTTP 转发端点
-/__soui_http。这样通用服务里不会出现任何 app 名、页面名或上游接口约定。
+本文件不依赖仓库里的 tools/wasm/serve-isolated.py，和 5 个 wasm 产物放在同一
+目录就能独立部署（构建时由 CMake 自动复制到 out_pt / release_pt，Windows 下
+可直接运行同目录的 start-server.bat）。
 
-为什么必须有这个端点：浏览器里的 XHR 不允许脚本设置 Cookie / Referer /
-User-Agent（禁止头），也不允许读取 Set-Cookie，而东财接口恰好两样都要。客户端
-components/httpclient/wasm/HttpClient.cpp 把每个请求改写成本端点，并把禁止头
-改名成 X-Soui-Cookie / X-Soui-Referer / X-Soui-User-Agent /
-X-Soui-Accept-Language；本端点还原成真正的上游请求头，响应的 Set-Cookie 经
-CookieJar 汇总后放进 X-Soui-Cookie 响应头回给页面。同源路径同时绕开了 CORS
-（fundf10.eastmoney.com 不返回 Access-Control-Allow-Origin，直连一定被拦）。
+用法（directory 缺省是当前工作目录）：
 
-用法（worker 产物 out_pt / 泵产物 out 都要带 --http-proxy）：
+    # 本机开发，浏览器直接开 http://localhost:8080/fundholdings.html
+    python serve-fundholdings.py . --http-proxy
 
-    python3 demos/fundholdings/wasm/serve-fundholdings.py \
-        demos/fundholdings/wasm/out_pt --port 8080 --http-proxy
+    # 放在 Apache 后面：只监听 loopback，由 Apache 反代 /__soui_http
+    python serve-fundholdings.py . --bind 127.0.0.1 --port 18080 ^
+        --http-proxy --allow-host eastmoney.com
 
-漏了 --http-proxy 页面照样能打开（静态资源是本地的），但取数请求全部撞 501，
-页面上不容易看出网络错误；所以启动时会按落地页名字检查并打印重启命令。
-不带这个端点时（例如只用通用 serve-isolated.py 或 python -m http.server），
-页面探测 /__soui_http 得到 404，状态行同样会给出警告。
+为什么不能直接用 `python -m http.server`：
 
-安全提示：这个端点没有上游域名白名单，本质是开放代理。只用于本机开发，
-监听范围请限制在 127.0.0.1 / 本机防火墙内，不要直接暴露到公网。
+1. `-pthread` 产物把线性内存放在 SharedArrayBuffer 里，浏览器只在页面
+   crossOriginIsolated 时才允许创建；隔离状态由两个响应头决定：
+       Cross-Origin-Opener-Policy: same-origin
+       Cross-Origin-Embedder-Policy: require-corp
+   缺一个时 worker 线程建不起来，TaskLoop 静默退回泵后端（不报错，只是不并行）。
+   起页面后先确认控制台里 crossOriginIsolated 为 true。
+2. 东财接口要求 Cookie/Referer，浏览器 XHR 不允许脚本设置这两个头，也不允许读
+   Set-Cookie；客户端把请求改写成同源 /__soui_http?url=<编码后的绝对URL>，
+   本服务还原成真正的上游请求。X-Soui-Cookie / X-Soui-Referer / X-Soui-User-Agent
+   / X-Soui-Accept-Language 是那些禁止头的替身，Set-Cookie 汇总后放
+   X-Soui-Cookie 响应头回给页面。同源路径同时绕开 CORS。
+
+安全提示：这个端点本质是代理，默认不限制上游域名，只适合本机开发；部署到
+服务器时用 --allow-host 限定上游域名（可重复匹配子域），并用 --bind 127.0.0.1
+只允许 Apache 等本机反代访问。完整 Apache 配置见同目录 apache/fundholdings.conf。
 """
 
+import argparse
+import functools
 import http.cookiejar
-import importlib.util
+import http.server
 import os
-import pathlib
-import sys
+import socketserver
 import urllib.error
 import urllib.parse
 import urllib.request
-
-# 通用服务的文件名带连字符，不能直接 import；按仓库根用 importlib 装载。
-# __file__ = <repo>/demos/fundholdings/wasm/serve-fundholdings.py，parents[3] = <repo>。
-_REPO_ROOT = pathlib.Path(__file__).resolve().parents[3]
-_GENERIC = _REPO_ROOT / 'tools' / 'wasm' / 'serve-isolated.py'
-_spec = importlib.util.spec_from_file_location('soui_serve_isolated', _GENERIC)
-_base = importlib.util.module_from_spec(_spec)
-# 通用服务是被按路径加载的模块，默认会在 tools/wasm/ 下留一份 __pycache__；
-# 那是共享工具目录，不该被开发时的字节码污染。
-sys.dont_write_bytecode = True
-_spec.loader.exec_module(_base)
 
 # 取数依赖 /__soui_http 的落地页。按文件名识别，仅供"漏了 --http-proxy"的
 # 启动期提醒，不是转发逻辑的一部分；新增同类页面时登记到这里即可。
@@ -60,14 +56,63 @@ def needs_http_proxy(directory):
         return False
 
 
-class FundHoldingsHandler(_base.IsolatedHandler):
+def guess_page(directory):
+    """启动提示里的落地页：优先 fundholdings.html，否则取目录里最靠前的 .html。"""
+    if os.path.isfile(os.path.join(directory, 'fundholdings.html')):
+        return 'fundholdings.html'
+    try:
+        pages = sorted(f for f in os.listdir(directory)
+                       if f.lower().endswith(('.html', '.htm')))
+    except OSError:
+        pages = []
+    return pages[0] if pages else 'fundholdings.html'
+
+
+class FundHoldingsHandler(http.server.SimpleHTTPRequestHandler):
+    # 常见扩展名的 MIME；缺了 application/wasm 时浏览器会按 text/plain 编流，
+    # 大模块直接放弃编译（Chrome 报 "Refused to apply mime type"）。
+    extensions_map = {
+        **http.server.SimpleHTTPRequestHandler.extensions_map,
+        '.wasm': 'application/wasm',
+        '.data': 'application/octet-stream',
+        '.js': 'text/javascript',
+        '.mjs': 'text/javascript',
+        '.html': 'text/html',
+        '.idx': 'application/octet-stream',
+        '.xml': 'text/xml',
+        '.ttf': 'font/ttf',
+    }
+
+    def __init__(self, *args, isolated=True, options=None, **kwargs):
+        self._isolated = isolated
+        self._options = options
+        super().__init__(*args, **kwargs)
+
+    # ------------------------------------------------------------- 路由
+    def do_GET(self):
+        if self.handle_custom_request():
+            return
+        super().do_GET()
+
+    def do_POST(self):
+        if self.handle_custom_request():
+            return
+        # 先把请求体读干净再回 501：带未读数据就关连接，Windows 会发 RST，
+        # 客户端连状态码都收不到（表现为 ConnectionAbortedError）。
+        length = int(self.headers.get('Content-Length') or 0)
+        if length > 0:
+            self.rfile.read(length)
+        self.send_error(501, 'POST is not supported by this server')
+
     def handle_custom_request(self):
+        """命中 /__soui_http 就自行应答并返回 True，否则交回静态文件处理。"""
         # 必须在静态文件之前判断：这个路径不对应磁盘文件。
         if not self.path.startswith('/__soui_http'):
             return False
         self.forward_http()
         return True
 
+    # ----------------------------------------------------- 同源 HTTP 转发
     @staticmethod
     def _default_user_agent():
         return ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
@@ -90,6 +135,14 @@ class FundHoldingsHandler(_base.IsolatedHandler):
         if not url.lower().startswith(('http://', 'https://')):
             self.send_error(400, 'url must be an absolute http(s) URL')
             return
+
+        allowed = [h.strip().lower().lstrip('.')
+                   for h in (self._options.allow_host or []) if h.strip()]
+        if allowed:
+            host = (urllib.parse.urlparse(url).hostname or '').lower()
+            if not any(host == h or host.endswith('.' + h) for h in allowed):
+                self.send_error(403, 'upstream host %s is not in --allow-host' % host)
+                return
 
         headers = {'User-Agent': self.headers.get('X-Soui-User-Agent') or self._default_user_agent()}
         for src, dst in (('X-Soui-Referer', 'Referer'),
@@ -141,25 +194,81 @@ class FundHoldingsHandler(_base.IsolatedHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    # ------------------------------------------------------------- 响应头
+    def end_headers(self):
+        if self._isolated:
+            self.send_header('Cross-Origin-Opener-Policy', 'same-origin')
+            self.send_header('Cross-Origin-Embedder-Policy', 'require-corp')
+        # 产物文件名固定，缓存下来会拿到旧胶水/旧数据（表现是 LinkError）。
+        self.send_header('Cache-Control', 'no-store')
+        super().end_headers()
+
+    def log_message(self, fmt, *args):
+        # 只打异常与非 2xx：加载一次模块就有几十条 200，刷屏看不清问题。
+        code = args[1] if len(args) > 1 else ''
+        if isinstance(code, int) and code >= 400:
+            super().log_message(fmt, *args)
+
 
 def _add_arguments(ap):
     ap.add_argument('--http-proxy', action='store_true',
                     help='打开同源 HTTP 转发端点 /__soui_http?url=...；漏了它页面能打开但取数全部 501')
+    ap.add_argument('--allow-host', action='append', default=[], metavar='DOMAIN',
+                    help='只转发到该域名或其子域，可重复；缺省不限制，仅适合本机开发')
+
+
+def build_parser():
+    ap = argparse.ArgumentParser(
+        description='基金持仓 wasm 版：带 COOP/COEP 与 /__soui_http 转发的静态服务')
+    ap.add_argument('directory', nargs='?', default=os.getcwd(),
+                    help='要服务的目录，默认当前工作目录')
+    ap.add_argument('--port', type=int, default=8080)
+    ap.add_argument('--bind', default='',
+                    help='监听地址，默认所有网卡；放在 Apache/Nginx 后面时用 127.0.0.1 只允许本机反代访问')
+    ap.add_argument('--no-isolation', action='store_true',
+                    help='不发 COOP/COEP，用来验证退回泵后端的降级路径')
+    _add_arguments(ap)
+    return ap
 
 
 def _startup(root, args):
-    if args.http_proxy:
-        print('  HTTP 转发：/__soui_http?url=<百分号编码的绝对 URL>')
+    print('  HTTP 转发：/__soui_http?url=<百分号编码的绝对 URL>')
+    if args.allow_host:
+        print('  允许转发的上游：%s' % '、'.join(args.allow_host))
     elif needs_http_proxy(root):
-        print('')
-        print('  警告：该目录的页面取数要走 /__soui_http，本次没带 --http-proxy。')
-        print('        页面能打开，但数据请求会全部失败（端点固定返回 501）。')
-        print('        请 Ctrl+C 后重启： python "%s" "%s" --port %d --http-proxy'
-              % (__file__, root, args.port))
+        print('  警告：没带 --allow-host，/__soui_http 会转发到任意 http(s) 地址，'
+              '只适合本机开发；对公网部署请加上 --allow-host eastmoney.com。')
+
+
+def serve(args):
+    root = os.path.abspath(args.directory)
+    handler = functools.partial(FundHoldingsHandler,
+                                directory=root,
+                                isolated=not args.no_isolation,
+                                options=args)
+    socketserver.ThreadingTCPServer.allow_reuse_address = True
+    # 每连接一条线程，一个慢请求不会堵住 wasm 模块的并发加载。
+    with socketserver.ThreadingTCPServer((args.bind or '', args.port), handler) as httpd:
+        httpd.daemon_threads = True
+        state = '关闭（--no-isolation）' if args.no_isolation else '开启'
+        print('服务 %s' % root)
+        print('http://%s:%d/%s   crossOriginIsolated 头：%s'
+              % (args.bind or 'localhost', args.port, guess_page(root), state))
+        if args.no_isolation:
+            print('  注意：这个模式下浏览器不会给出 SharedArrayBuffer，wasm 构建会退回泵后端。')
+        if args.http_proxy:
+            _startup(root, args)
+        elif needs_http_proxy(root):
+            print('')
+            print('  警告：该目录的页面取数要走 /__soui_http，本次没带 --http-proxy。')
+            print('        页面能打开，但数据请求会全部失败（端点固定返回 501）。')
+            print('        请 Ctrl+C 后重启： python "%s" "%s" --port %d --http-proxy'
+                  % (__file__, root, args.port))
+        try:
+            httpd.serve_forever()
+        except KeyboardInterrupt:
+            pass
 
 
 if __name__ == '__main__':
-    _base.main(handler_class=FundHoldingsHandler,
-               add_arguments=_add_arguments,
-               description='基金持仓 wasm 版：带 COOP/COEP 与 /__soui_http 转发的静态服务',
-               startup_hook=_startup)
+    serve(build_parser().parse_args())

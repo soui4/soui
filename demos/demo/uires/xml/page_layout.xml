@@ -12,7 +12,7 @@
   btn_display/btn_hidetst/btn_open_wrap_content/btn_create_by_temp、
   re_temp_input/wnd_temp_host 及 id=100/10000/4321/1236 被源码引用,不可改动。
 -->
-<tabctrl pos="0,0,-0,-0" colorBkgnd="@color/clr_window_bg" colorText="@color/clr_text" colorTextHover="@color/clr_title" colorTextPush="@color/clr_primary" font="face:微软雅黑,size:13" fontPush="bold:1" focusable="0" animateSteps="20" tabAlign="left" tabSkin="skin_tab_nav" tabInterSize="4" tabPos="8" tabWidth="200" tabHeight="40" iconSkin="svg_tab_layout" icon-x="18" icon-y="12" text-x="42" curSel="0" drawFocusRect="0">
+<tabctrl pos="0,0,-0,-0" colorBkgnd="@color/clr_page_bg" colorText="@color/clr_text" colorTextHover="@color/clr_title" colorTextPush="@color/clr_primary" font="face:微软雅黑,size:13" fontPush="bold:1" focusable="0" animateSteps="20" tabAlign="left" tabSkin="skin_tab_nav" tabInterSize="4" tabPos="8" tabWidth="200" tabHeight="40" iconSkin="svg_tab_layout" icon-x="18" icon-y="12" text-x="42" curSel="0" drawFocusRect="0">
 		<page title="soui layout" iconIndex="0" layout="vbox" padding="20,16,20,18">
 			<text text="soui 绝对布局" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
 			<text text="演示 pos / offset / 相对兄弟节点(sib) / 百分比与 @ 固定尺寸等定位语法" extend_top="6" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>

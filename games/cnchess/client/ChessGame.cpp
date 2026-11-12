@@ -1396,6 +1396,13 @@ void CChessGame::OnAckRegret(const void *pData, int nSize)
     {
         m_nUsedRegretCount++;
     }
+    // 悔棋开始前清除当前选中态: 否则选中棋子的可走棋标志/抬起状态/阴影会在悔棋后残留
+    if (m_nSelectedChessID != -1)
+    {
+        if (m_pGameBoard->FindChildByID(ID_CHESS_BASE + m_nSelectedChessID))
+            DeselectPiece(m_nSelectedChessID);
+        m_nSelectedChessID = -1;
+    }
     m_nUndoLeft = 2;
     UndoLastMove();
 }
@@ -1466,70 +1473,13 @@ void CChessGame::OnChessMove(const MOVESTEP & mstep,BOOL bCheckResult)
 //计算当前步最远的一次重复走棋，在计算长捉时使用
 UINT CChessGame::GetFarthestRepeat(CHESSMAN & chsEnemy)
 {
-	UINT nRet=0,nSteps=0;
-	int	nChsID=-1,nChsEnemy=-1;
-	POINT ptLastDest={-1,-1};
-	POINT ptEnemy={-1,-1};
-	
-	CChessLayout layout;
-	layout.Copy(&m_layout);
-	CChsLytState state(&layout);
-	CHSSIDE actSide=(CHSSIDE)!layout.m_actSide;
-
-	chsEnemy=CHSMAN_NULL;
-
-	auto p=m_history.end();
-	while(p!=m_history.begin())
-	{
-		p--;
-		if(CHSMANSIDE(layout.m_chesses[p->pt2.y][p->pt2.x])==actSide)
-		{
-			state.UpdateState();
-			nSteps++;
-			//找到攻击的无根子数量
-			CChsLytState::CChessInfo *pChessInfo=state.GetChessInfo(p->pt2);
-			int nNoRootChs=0;
-			POINT ptDest;
-			std::vector<POINT>::iterator p2=pChessInfo->m_lstDest.begin();
-			while(p2!=pChessInfo->m_lstDest.end())
-			{
-				if(CHSMANSIDE(layout.m_chesses[p2->y][p2->x])==layout.m_actSide
-					&& state.GetProtecter(*p2)==0
-					&& state.GetAttacter(*p2)==1)
-				{
-					nNoRootChs++;
-					ptDest=*p2;
-					if(nNoRootChs>1) break;
-				}
-				p2++;
-			}
-			if(nNoRootChs!=1) break;
-
-			if(nChsID==-1)
-			{//最后一步
-				nChsID=layout.m_nChsID[p->pt2.y][p->pt2.x];
-				nChsEnemy=layout.m_nChsID[ptDest.y][ptDest.x];
-				ptLastDest=p->pt2;
-				ptEnemy=ptDest;
-				chsEnemy=layout.m_chesses[ptDest.y][ptDest.x];
-			}else
-			{
-				//攻击及被攻击的棋子不是原棋或者退出计算
-				if(nChsID!=layout.m_nChsID[p->pt2.y][p->pt2.x]
-				|| nChsEnemy!=layout.m_nChsID[ptDest.y][ptDest.x] )
-					break;
-				if(p->pt2.x==ptLastDest.x && p->pt2.y==ptLastDest.y)
-					nRet=nSteps;//发现重复
-			}
-		}else
-		{
-			//移动的棋子不是被攻击棋子
-			if(layout.m_nChsID[p->pt2.y][p->pt2.x]!=nChsEnemy)
-				break;
-		}
-		layout.UndoMove(*p);
-	}
-	return nRet;
+	// 统一复用算法层实现: 与服务器判定、机器人规避共用同一份逻辑。
+	// 这里原本有一份拷贝, 算法层修复后拷贝不会同步(客户端不投诉 => 服务端也不判),
+	// 长将/长捉就会形同失效。
+	// m_history 是 std::list, 算法层接口接收 std::vector, 这里做一次历史转换
+	// (每步只多一次 O(n) 拷贝, 与判定本身同阶)
+	std::vector<MOVESTEP> history(m_history.begin(), m_history.end());
+	return CChessLayout::GetFarthestRepeat(m_layout, history, chsEnemy);
 }
 
 

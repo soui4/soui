@@ -61,13 +61,13 @@
   <root skin="_skin.sys.wnd.bkgnd" cache="1" on_init="on_init" on_exit="on_exit"
         enterAnimation="anim:alpha_in" exitAnimation="anim:alpha_out">
     <!--
-      换肤背景载体:默认 demoskinbk 为空(不画图也不画色),此时底下这层 colorBkgnd 会透出来。
-      它必须用中性窗口底色(@color/clr_window_bg),不能写死旧版蓝色 #169ada:
-      内容页统一是半透明底色,叠在上面会把这层底色透出来,写死蓝色会让"内置皮肤"
-      以及任何主题下整个界面都偏蓝,看起来像换肤没生效。
+      换肤背景载体:指定 skin 后 OnEraseBkgnd 只画皮肤,colorBkgnd 不生效;内容页保持半透明才能透出背景图。
+      这层 colorBkgnd 只是 skin 缺失时的兜底,不要写死旧版蓝色 #169ada;
+      内容页/导航栏必须保持半透明(@color/clr_page_bg)或完全透明,
+      否则不透明底色会把整张背景图盖住,换肤窗口里选了图也看不出效果。
     -->
     <window pos="1,1,-1,-1" id="9527" skin="demoskinbk" cache="1" colorBkgnd="@color/clr_window_bg"/>
-    <caption pos="0,0,-0,36" font="adding:1" layout="hbox" gravity="center" padding_left="10" colorBkgnd="#FFFFFF">
+    <caption pos="0,0,-0,36" font="adding:1" layout="hbox" gravity="center" padding_left="10" colorBkgnd="@color/clr_page_bg">
       <frame size="-2,-2" layout="hbox" gravity="center">
         <!--show where a frame widget can be used-->
         <icon src="ICON_LOGO:16"/>
@@ -94,14 +94,14 @@
       <page title="home">
         <include src="layout:page_home"/>
       </page>
-      <page title="contents" layout="vbox" colorBkgnd="@color/clr_window_bg">
+      <page title="contents" layout="vbox">
         <!--
           全局导航栏:与页面同色的细条(无底边线),左侧为返回钮(箭头 + 分区标题),
           标题文本由 CMainDlg::NavigateToPage 按 tab_contents 当前页 title 设置。
           点击整块返回钮回到宫格首页。
         -->
         <window name="nav_bar" size="-2,32" layout="hbox" gravity="center"
-                padding_left="8" padding_right="12" colorBkgnd="@color/clr_window_bg">
+                padding_left="8" padding_right="12">
           <!-- 尺寸用 "-1,24":-1 = wrapContent,返回钮宽度由"箭头 + 分区标题"撑开;
                之前写成 -2(填满父窗口),按钮被拉伸成整条导航栏,点击热区覆盖全宽,看着很怪 -->
           <button name="btn_back" size="-1,24" layout="hbox" gravity="center" interval="5"

@@ -21,8 +21,8 @@ PropBag::PropBag()
     m_dwProps[PROPID_REGRET] = 2;
     m_dwProps[PROPID_TIME_STEP] = 60;
     m_dwProps[PROPID_TIME_ROUND] = 0;
-    m_dwProps[PROPID_MAX_STP_JIANG] = 10;
-    m_dwProps[PROPID_MAX_STP_CATCH] = 10;
+    m_dwProps[PROPID_MAX_STP_JIANG] = 3;
+    m_dwProps[PROPID_MAX_STP_CATCH] = 3;
     m_dwProps[PROPID_MAX_STP_PEACE] = 100;
     m_dwProps[PROPID_MIN_STEPS] = 10;
 }

@@ -9,7 +9,7 @@
   常规子页统一页头版式;edit_xml/wnd_container/wnd_rgn/matrix_test/3d_test/
   rotate_x/y/z/fmw_test/svg_test 等被源码引用,不可改动。
 -->
-<tabctrl pos="0,0,-0,-0" colorBkgnd="@color/clr_window_bg" colorText="@color/clr_text" colorTextHover="@color/clr_title" colorTextPush="@color/clr_primary" font="face:微软雅黑,size:13" fontPush="bold:1" focusable="0" tabAlign="left" tabSkin="skin_tab_nav" tabInterSize="4" tabPos="8" tabWidth="200" tabHeight="40" iconSkin="svg_tab_misc" icon-x="18" icon-y="12" text-x="42" drawFocusRect="0">
+<tabctrl pos="0,0,-0,-0" colorBkgnd="@color/clr_page_bg" colorText="@color/clr_text" colorTextHover="@color/clr_title" colorTextPush="@color/clr_primary" font="face:微软雅黑,size:13" fontPush="bold:1" focusable="0" tabAlign="left" tabSkin="skin_tab_nav" tabInterSize="4" tabPos="8" tabWidth="200" tabHeight="40" iconSkin="svg_tab_misc" icon-x="18" icon-y="12" text-x="42" drawFocusRect="0">
     <page title="drag drop" iconIndex="1" layout="vbox" padding="20,16,20,18">
       <!-- 页头 -->
       <text text="拖放" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>

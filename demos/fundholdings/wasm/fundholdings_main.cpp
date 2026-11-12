@@ -18,6 +18,7 @@
  */
 #include <emscripten.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 /* SCOM_MASK 必须在任何包含 commgr2.h 的头之前定义：SAppCfg::DoConfig() 和
@@ -38,6 +39,8 @@
 #include <TaskLoop/wasm/TaskLoopWasm.h>
 #include <HttpClient.h>
 
+#include <helper/SDpiScale.h>
+
 #include "framebuffer.h"
 #include "input.h"
 
@@ -47,7 +50,7 @@
 #include "res/resource.h"
 
 // MEMFS 挂载点，与 wasm/CMakeLists.txt 的 --preload-file 目标一一对应。
-// wasm 版按 mobile/uires（竖屏 390x844）加载，皮肤/字体/滚动条皮肤都在 uires 里，
+// wasm 版按桌面版 uires（1440x860）加载，皮肤/字体/滚动条皮肤都在 uires 里，
 // 因此不加载系统资源，SAppCfg 遇到 ResType_Unknown 会跳过这一段。
 static const TCHAR kAppResDir[] = _T("/opt/soui/uires");
 static const TCHAR kAppDir[] = _T("/opt/soui");
@@ -57,6 +60,9 @@ static const double kPumpBudgetMs = 100.0;
 
 static HWND g_hWnd = NULL;
 static CMainDlg *g_pMain = NULL;
+// main() 选出的渲染档位（dpr 向上贴到内置档位后的结果）。帧缓冲按它建立，
+// HandleScaleChange 也以它为准 —— SDpiHandler 归一后的档位可能比它小。
+static int g_nWasmDpiScale = 100;
 static int g_fbW = 0;
 static int g_fbH = 0;
 static int g_cPumps = 0;
@@ -251,8 +257,71 @@ static void ApplyDeepLink()
     pBtn->FireCommand();
 }
 
+// wasm 宿主的 DPI 处理。CMainDlg 已经继承了 SDpiHandler 并把 handler 串在
+// WM_INITDIALOG 之前，这里只覆盖缩放目标的矩形：桌面版允许窗口跟着 DPI 挪动，
+// 而 wasm 的 canvas 必须始终从 (0,0) 铺满物理帧缓冲，否则按窗口中心放大可能
+// 得到负原点、右下留黑边。档位以 main() 建帧缓冲时选的值（g_nWasmDpiScale）
+// 为准 —— SDpiHandler 传下来的是向下归一后的值，与帧缓冲的档位可能不一致。
+class CWasmMainDlg : public CMainDlg
+{
+  protected:
+    virtual void HandleScaleChange(WORD nScale, const RECT *desRect) OVERRIDE
+    {
+        (void)desRect;
+        int nWant = g_nWasmDpiScale > 0 ? g_nWasmDpiScale : (int)nScale;
+        if (nWant == GetRoot()->GetScale())
+            return;
+        RECT rcFb = {0, 0, SwinxFbWidth(), SwinxFbHeight()};
+        SetScale(nWant, &rcFb);
+    }
+};
+
 int main()
 {
+    // HiDPI（与 demos/wasm-demo/soui_main.cpp 同一套）：把浏览器 devicePixelRatio
+    // 向上贴到内置档位，交给 swinx 把帧缓冲建成「逻辑 1440x860 x 档位」的物理
+    // 分辨率；缩放本体走 CMainDlg 已有的 SDpiHandler —— 建窗后显式发
+    // WM_INITDIALOG 触发 ScaleHost，再经 CWasmMainDlg::HandleScaleChange 广播
+    // UM_SETSCALE，布局/字体/皮肤按档位放大，GDI 绘制坐标就是物理像素。
+    // 向上贴是为了永远不拉伸（浏览器只会把画布缩下来），但超采样倍率超过
+    // 1.15 就退化成 dpr 的精确百分点，避免白烧填充率。?dpr=1 可强制 100% 对照。
+    {
+        double scale = 0.0;
+        const char *q = emscripten_run_script_string(
+            "location.search.includes('dpr=') ? location.search.split('dpr=')[1].split('&')[0] : ''");
+        if (q && *q)
+            scale = atof(q);
+        else
+        {
+            double dpr = emscripten_get_device_pixel_ratio();
+            if (dpr > 0.5)
+                scale = dpr;
+        }
+        if (scale <= 0.5)
+            scale = 1.0;
+        int nExact = (int)(scale * 100.0 + 0.5);
+        if (nExact < 100)
+            nExact = 100; // dpr<1 不缩排：字会糊，直接按 100% 画
+        const int *pScales = SDpiScale::GetBuiltinScales();
+        int nCount = SDpiScale::GetBuiltinScaleCount();
+        int nScale = pScales[nCount - 1];
+        for (int i = 0; i < nCount; i++)
+        {
+            if (pScales[i] >= nExact)
+            {
+                nScale = pScales[i];
+                break;
+            }
+        }
+        const double kMaxOverSample = 1.15;
+        if (nScale > nExact * kMaxOverSample)
+            nScale = nExact;
+        g_nWasmDpiScale = nScale;
+        SwinxSetCanvasScale(nScale / 100.0);
+        printf("[fundholdings-wasm] dpi dpr=%.3f -> scale=%d%% (fb %dx%d physical)\n", scale, nScale,
+               SwinxFbWidth(), SwinxFbHeight());
+    }
+
     g_fbW = SwinxFbWidth();
     g_fbH = SwinxFbHeight();
 
@@ -306,8 +375,10 @@ int main()
     app->RegisterWindowClass<SFundAbout>();
     app->RegisterWindowClass<SFundScroll>();
 
-    g_pMain = new CMainDlg();
-    g_hWnd = g_pMain->Create(NULL, 0, 0, g_fbW, g_fbH);
+    // 宿主窗口建在**逻辑**尺寸：ScaleHost 会在 WM_INITDIALOG 里把它放大到物理
+    // 分辨率（SetWindowPos 触发 WM_SIZE，swinx 把窗口 canvas 重建为物理尺寸）。
+    g_pMain = new CWasmMainDlg();
+    g_hWnd = g_pMain->Create(NULL, 0, 0, SwinxFbLogicalWidth(), SwinxFbLogicalHeight());
     if (!g_hWnd)
     {
         char msg[192];

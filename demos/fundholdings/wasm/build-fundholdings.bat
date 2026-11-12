@@ -21,9 +21,9 @@ rem and served by this dir's serve-fundholdings.py --http-proxy (the app-specifi
 rem entry that adds the /__soui_http endpoint). Worker artifacts go to
 rem out_pt / release_pt, pump artifacts to out / release.
 rem
-rem The wasm layout is the mobile one (390x844), so the config always pins
-rem SWINX_FB_WIDTH=390 / SWINX_FB_HEIGHT=844; a cache with other dimensions
-rem would crop the portrait layout.
+rem The wasm layout is the desktop one (1440x860), so the config always pins
+rem SWINX_FB_WIDTH=1440 / SWINX_FB_HEIGHT=860; a cache with other dimensions
+rem would crop the desktop layout.
 rem
 rem Tunables (CMake cache variables, same-named environment variables):
 rem   SOUI_FUNDHOLDINGS_STACK     -sSTACK_SIZE, default 32MB
@@ -41,7 +41,7 @@ for %%I in ("%~dp0..\..\..") do set "SOUI_WASM_REPO=%%~fI"
 set "SOUI_WASM_PROJECT=fundholdings-wasm"
 set "SOUI_WASM_TARGET=fundholdings-wasm"
 set "SOUI_WASM_PAGE=fundholdings.html"
-set "SOUI_WASM_BUILD_TYPE=RelWithDebInfo"
+set "SOUI_WASM_BUILD_TYPE=Release"
 set "SOUI_WASM_SHIP_TYPE=Release"
 set "SOUI_WASM_BUILD_ENV=SOUI_WASM_BUILD"
 set "SOUI_WASM_SHIP_BUILD_ENV=SOUI_FUNDHOLDINGS_SHIP_BUILD"
@@ -51,7 +51,7 @@ set "SOUI_WASM_OUT_VAR=SOUI_WASM_FUNDHOLDINGS_OUT"
 set "SOUI_WASM_OUT_PATTERN=@SRC@\out@PT@"
 set "SOUI_WASM_SHIP_OUT_PATTERN=@SRC@\release@PT@"
 set "SOUI_WASM_ENV_VARS=SOUI_FUNDHOLDINGS_STACK"
-set "SOUI_WASM_CONFIG=-DSOUI_BUILD_HTTPCLIENT=ON -DSWINX_FB_WIDTH=390 -DSWINX_FB_HEIGHT=844"
+set "SOUI_WASM_CONFIG=-DSOUI_BUILD_HTTPCLIENT=ON -DSWINX_FB_WIDTH=1440 -DSWINX_FB_HEIGHT=860"
 set "SOUI_WASM_JOBS_DEFAULT=2"
 set "SOUI_WASM_USE_PTHREADS=1"
 set "SOUI_WASM_USE_GDI=1"

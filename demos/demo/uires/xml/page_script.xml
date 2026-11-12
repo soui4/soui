@@ -85,7 +85,7 @@
 -->
 <tabctrl pos="0,0,-0,-0" tabWidth="100" tabHeight="40" tabAlign="left" tabSkin="skin_tab_nav" tabInterSize="4" tabPos="8" text-x="16" curSel="3" animateSteps="20" focusable="0"
          font="face:微软雅黑,size:13" fontPush="bold:1"
-         colorBkgnd="@color/clr_window_bg" colorText="@color/clr_text" colorTextHover="@color/clr_title" colorTextPush="@color/clr_primary" drawFocusRect="0">
+         colorBkgnd="@color/clr_page_bg" colorText="@color/clr_text" colorTextHover="@color/clr_title" colorTextPush="@color/clr_primary" drawFocusRect="0">
   <page title="消消乐">
     <window pos="0,0,-0,-0" layout="hbox" padding="15,12,15,15" interval="12">
       <!-- 左侧信息卡片:标题 / SVG 功能按钮 / LED 计分区 / 玩法说明 -->
@@ -144,7 +144,7 @@
   </page>
   <page title="跑马机">
     <!-- 根容器:纵向三段(标题 / 赛道+下注 / 工具栏) -->
-    <window size="full,full" name="game_wnd" id="300" layout="vbox" padding="14,14,14,14" interval="12" colorBkgnd="@color/clr_window_bg">
+    <window size="full,full" name="game_wnd" id="300" layout="vbox" padding="14,14,14,14" interval="12" colorBkgnd="@color/clr_page_bg">
       <!-- 标题栏 -->
       <window size="-2,-1" layout="hbox" interval="10" gravity="center" padding="14,10,14,10" colorBkgnd="@color/clr_card_bg">
         <img size="30,30" skin="svg_home_icons" iconIndex="7" layout_gravity="center" msgTransparent="2"/>

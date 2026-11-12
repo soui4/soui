@@ -94,9 +94,15 @@ LRESULT CMainDlg::OnInitDialog( HWND hWnd, LPARAM lParam )
     //基础控件页:列表控件演示数据
     InitListCtrl();
 
-    //使用 GETSTRING 宏从 string.xml 中取出标题模板并格式化版本号
-    SStringW strTitle = SStringW().Format(GETSTRING(R.string.title),SOUI_VER1,SOUI_VER2,SOUI_VER3,SOUI_VER4);
-    FindChildByID(R.id.txt_title)->SetWindowText(S_CW2T(GetRoot()->tr(strTitle)));
+    SStringW strTitle = GETSTRING(R.string.title);
+    FindChildByID(R.id.txt_title)->SetWindowText(S_CW2T(strTitle));
+
+    //首页底部状态栏是版本号唯一的显示位置,取自 soui-version.h 的 SOUI_VER1..4;
+    //XML 里的静态串只作兜底,避免升版本后数字脱节。
+    SStringT strHomeVer = SStringT().Format(_T("SOUI %d.%d.%d.%d"),SOUI_VER1,SOUI_VER2,SOUI_VER3,SOUI_VER4);
+    SWindow *pHomeVer = FindChildByName(L"txt_home_version");
+    if(pHomeVer)
+        pHomeVer->SetWindowText(strHomeVer);
 
 	//OLE 拖放演示
 	InitDragDrop();

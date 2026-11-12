@@ -83,6 +83,8 @@ int run(LPCTSTR pszCfg){
         propBag->Init(pszCfg);
         int nPort = propBag->GetPort();
         SLOGI() << "start chess server on port " << nPort;
+        // 打印生效的长将/长捉步限, 便于确认限制是否按预期生效(与 config.xml 一致)
+        SLOGI() << "step limit jiang/catch = " << propBag->GetProp(PROPID_MAX_STP_JIANG) << "/" << propBag->GetProp(PROPID_MAX_STP_CATCH);
 
         // 加载多平台主题资源包
         ThemeResourceProvider* pThemeProv = ThemeResourceProvider::GetInstance();

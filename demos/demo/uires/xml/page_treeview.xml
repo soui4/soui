@@ -6,7 +6,7 @@
   template 内 img_state/txt_label/ani_hot/btn_go_offcial_url 的 name
   被 CMainDlg 的树适配器按名引用,不可改动。
 -->
-<window size="-2,-2" layout="vbox" padding="20,16,20,18" colorBkgnd="@color/clr_window_bg">
+<window size="-2,-2" layout="vbox" padding="20,16,20,18">
 	<!-- 页头 -->
 	<text text="TreeView" font="face:微软雅黑,size:22,bold:1" colorText="@color/clr_title"/>
 	<text text="支持节点模板的树形列表,以房间列表为演示场景" extend_top="6" font="face:微软雅黑,size:12" colorText="@color/clr_text"/>

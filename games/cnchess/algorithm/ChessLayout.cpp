@@ -333,22 +333,30 @@ UINT CChessLayout::GetFarthestRepeat(const CChessLayout &layout, const std::vect
 		{
 			state.UpdateState();
 			nSteps++;
-			//找到攻击的无根子数量
+			//找出该攻击子威胁的敌方目标: 先判断是否将军, 再判断是否捉无根子。
+			//将军不要求"恰好只有一个无根子"——车/炮将军的同时顺带攻着别的无根子非常常见,
+			//旧实现用 nNoRootChs!=1 直接 break, 会让长将永远数不满步限(机器人因此可以无限长将)。
 			CChsLytState::CChessInfo *pChessInfo=state.GetChessInfo(p->pt2);
 			int nNoRootChs=0;
 			POINT ptDest={-1,-1};
+			BOOL bJiangJun=FALSE;
 			for(auto p2=pChessInfo->m_lstDest.begin();p2!=pChessInfo->m_lstDest.end();++p2)
 			{
-				if(CHSMANSIDE(work.m_chesses[p2->y][p2->x])==work.m_actSide
-					&& state.GetProtecter(*p2)==0
-					&& state.GetAttacter(*p2)==1)
-				{
-					nNoRootChs++;
+				if(CHSMANSIDE(work.m_chesses[p2->y][p2->x])!=work.m_actSide) continue;
+				if(work.m_chesses[p2->y][p2->x]==CHSMAN_RED_JIANG
+					|| work.m_chesses[p2->y][p2->x]==CHSMAN_BLK_JIANG)
+				{//对方将/帅在攻击范围内 => 将军, 被攻击目标固定为将/帅
+					bJiangJun=TRUE;
 					ptDest=*p2;
-					if(nNoRootChs>1) break;
+					continue;
+				}
+				if(state.GetProtecter(*p2)==0 && state.GetAttacter(*p2)==1)
+				{//无根子: 长捉的攻击目标
+					nNoRootChs++;
+					if(!bJiangJun) ptDest=*p2;
 				}
 			}
-			if(nNoRootChs!=1) break;
+			if(!bJiangJun && nNoRootChs!=1) break;
 
 			if(nChsID==-1)
 			{//最后一步
