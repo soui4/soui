@@ -4,14 +4,14 @@
 4 addfontresourceex for apple, done
 5 review dead lock. done
 6 ime position support. done
-7 dockbar support float.
+7 dockbar support float. done
 8 IAccessible for linux and macos. done
 9 fullscreen op for macos. done
 10 finish lua script. done
 11 api table for swinx. done
 12 TLS using swinx defined TSL API. done
 13 rename acc func. done
-14 wasm.clipboard support.
-15 freertos.combobox.
-16 add wasm.modalview demo.
-17 richedit click and move will become select mode. ime backspace not work.
+14 wasm.clipboard support. done
+15 freertos.combobox. done
+16 add wasm.modalview demo. done
+17 richedit click and move will become select mode. ime backspace not work. done
