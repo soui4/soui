@@ -39,6 +39,14 @@ static SStringT getResDir() {
     return getAppDir();
 }
 
+static SStringT getSysResDir() {
+#ifdef __APPLE__
+    return getResDir();
+#endif
+    SStringA strFile(__FILE__);
+    return S_CA2T(strFile.Left(strFile.ReverseFind(PATH_SLASH)) + "/../..");
+}
+
 int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lpstrCmdLine, int /*nCmdShow*/) {
     HRESULT hRes = OleInitialize(NULL);
     SASSERT(SUCCEEDED(hRes));
@@ -53,7 +61,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
     SApplication app(hInstance);
     SAppCfg cfg;
     const SStringT resDir = getResDir();
-
+    const SStringT sysResDir = getSysResDir();
     cfg.SetRender(Render_Skia)
         .SetImgDecoder(ImgDecoder_Stb)
         .SetAppDir(resDir)
@@ -68,15 +76,10 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
     cfg.SetAppResFile(resDir + _T("/uires"));
 #endif
 
-    // 系统资源不使用 zip 包：
-    //   Apple - CMake 把 soui-sys-resource-dark（uires.idx + theme_sys_res/）
-    //           拷进 .app 资源包，这里用目录型资源提供者从资源包加载；
-    //           非 Win32 下 SResProviderFiles::Init 会把 uires.idx 里的
-    //           "theme_sys_res\xxx" 自动换成 "theme_sys_res/xxx"。
-    //   其它平台 - 皮肤/字体/滚动条皮肤全部定义在 uires 里，不加载系统资源，
-    //             DoConfig() 遇到 ResType_Unknown 会直接跳过这一段。
-#ifdef __APPLE__
-    cfg.SetSysResFile(resDir + _T("/soui-sys-resource-dark"));
+#ifdef ENABLE_BUILD_RESOURCE
+    cfg.SetSysResPeHandle(hInstance);
+#else
+    cfg.SetSysResFile(sysResDir + _T("/soui-sys-resource-dark"));
 #endif
 
     if (!cfg.DoConfig(&app)) {

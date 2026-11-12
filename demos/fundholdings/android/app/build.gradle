@@ -33,12 +33,13 @@ android {
                         // components 默认全量编译，移动端按需显式挑选要关闭的组件。
                         // 基金持仓 app 不需要的组件在此关闭，APK 不再包含以下 .so：
                         //   libws.so / libnetwork.so / libresprovider-zip.so /
-                        //   libscriptmodule-lua.so / libtranslator.so
+                        //   libscriptmodule-lua.so / libtranslator.so / libsipcobject.so
                         "-DSOUI_BUILD_WS=OFF",
                         "-DSOUI_BUILD_NETWORK=OFF",
                         "-DSOUI_BUILD_RES_ZIP=OFF",
                         "-DSOUI_BUILD_SCRIPT_LUA=OFF",
-                        "-DSOUI_BUILD_TRANSLATOR=OFF"
+                        "-DSOUI_BUILD_TRANSLATOR=OFF",
+                        "-DSOUI_BUILD_RES_IPC=OFF"
             }
         }
         ndk {
