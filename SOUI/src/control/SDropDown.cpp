@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Copyright (C) 2014-2050 SOUI team
  * All rights reserved.
  *
@@ -108,7 +108,7 @@ void SDropDownWnd::OnLButtonDown(UINT nFlags, CPoint point)
         {
             CPoint ptTarget = point;
             ::ScreenToClient(hwndTarget, &ptTarget);
-            ::PostMessage(hwndTarget, WM_LBUTTONDOWN, nFlags, MAKELPARAM(ptTarget.x, ptTarget.y));
+            ::SendMessage(hwndTarget, WM_LBUTTONDOWN, nFlags, MAKELPARAM(ptTarget.x, ptTarget.y));
         }
     }
     else
