@@ -166,7 +166,10 @@ SkScalar SkTextLayoutEx::drawLine( SkCanvas *canvas, SkScalar x, SkScalar y, int
         {
             SkScalar x1 = m_paint->measureText(text,(m_prefix[i]-iBegin)*sizeof(wchar_t));
             SkScalar x2 = m_paint->measureText(text,(m_prefix[i]-iBegin+1)*sizeof(wchar_t));
-            canvas->drawLine(xBase+x1,y+1,xBase+x2,y+1,*m_paint); //绘制下划线
+            SkPaint up(*m_paint);
+            up.setAntiAlias(false);
+            SkScalar uy = (SkScalar)(int)(y + 4) + 0.5f;
+            canvas->drawLine(xBase+x1,uy,xBase+x2,uy,up); //绘制下划线(下移+去锯齿，避免与字母重叠且清晰)
             i++;
         }
     }
@@ -231,7 +234,10 @@ SkRect SkTextLayoutEx::draw( SkCanvas* canvas )
 
     canvas->save();
 
-    canvas->clipRect(m_rcBound);
+    // 底部多留 4px 给助记符下划线（drawLine 里画在 y+4），否则会被裁掉看不见
+    SkRect clipRc = m_rcBound;
+    clipRc.fBottom += 4;
+    canvas->clipRect(clipRc);
 
     float height = m_rcBound.height();
     float y=m_rcBound.fTop - (bUseAllHeight?metrics.fTop:metrics.fAscent);
