@@ -1289,21 +1289,27 @@ void SHostWnd::OnGetMinMaxInfo(LPMINMAXINFO lpMMI)
 {
     HMONITOR hMonitor = ::MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONULL);
 
-    if (hMonitor && GetRoot())
+    if (hMonitor)
     {
         MONITORINFO mi = { sizeof(MONITORINFO) };
         ::GetMonitorInfo(hMonitor, &mi);
 
         CRect rcWork = mi.rcWork, rcMonitor = mi.rcMonitor;
-        CRect rcMaxInset = m_hostAttr.GetMaxInset(GetScale());
+        // 无标题/边框窗口（ncPainter 为空）没有真正的非客户区可留白，inset 恒为 0。
+        // 注意：此处不可调用 GetScale()——WM_GETMINMAXINFO 在 Create 阶段（GetRoot() 仍为空）
+        // 就会到达，那时取缩放会访问尚未初始化完成的对象，导致窗口过程内异常（0xC000041D）。
+        CRect rcMaxInset(0, 0, 0, 0);
         lpMMI->ptMaxPosition.x = abs(rcWork.left - rcMonitor.left) - rcMaxInset.left;
         lpMMI->ptMaxPosition.y = abs(rcWork.top - rcMonitor.top) - rcMaxInset.top;
         lpMMI->ptMaxSize.x = abs(rcWork.Width()) + rcMaxInset.right + rcMaxInset.left;
         lpMMI->ptMaxSize.y = abs(rcWork.Height()) + rcMaxInset.bottom + rcMaxInset.top;
         lpMMI->ptMaxTrackSize.x = abs(rcWork.Width()) + rcMaxInset.right + rcMaxInset.left;
         lpMMI->ptMaxTrackSize.y = abs(rcWork.Height()) + rcMaxInset.bottom + rcMaxInset.top;
-        CSize szMin = m_hostAttr.GetMinSize(GetScale());
-        lpMMI->ptMinTrackSize = CPoint(szMin.cx, szMin.cy);
+        if (GetRoot())
+        {
+            CSize szMin = m_hostAttr.GetMinSize(GetScale());
+            lpMMI->ptMinTrackSize = CPoint(szMin.cx, szMin.cy);
+        }
     }
     else
     {
