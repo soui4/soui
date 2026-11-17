@@ -1966,8 +1966,13 @@ static void renderNSVGtext(HDC hdc, const NSVGtext *text, BYTE byAlpha, LPCRECT 
     {
         strcpy(szFace, "Arial");
     }
-    strcpy(lf.lfFaceName, szFace);
-    // MultiByteToWideChar(CP_UTF8, 0, szFace, -1, lf.lfFaceName, LF_FACESIZE);
+#ifdef _UNICODE
+    // szFace 是 UTF-8 窄字符，lfFaceName 在 UNICODE 下是 wchar_t[]，必须做编码转换。
+    // 65001 = CP_UTF8（用数值避免依赖 CP_UTF8 宏是否可见）。
+    MultiByteToWideChar(65001, 0, szFace, -1, lf.lfFaceName, LF_FACESIZE);
+#else
+    strncpy(lf.lfFaceName, szFace, LF_FACESIZE - 1);
+#endif
     if (text->fontWeight >= 7)
         lf.lfWeight = FW_BOLD;
     if (text->fontStyle == 1 || text->fontStyle == 2)
