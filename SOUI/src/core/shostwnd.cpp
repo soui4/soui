@@ -9,10 +9,9 @@
 #include <helper/SHostMgr.h>
 #include <helper/SMenuEx.h>
 #include <core/SHostPresenter.h>
-#ifdef _WIN32
-#include <Imm.h>
-#pragma comment(lib, "imm32.lib")
-#endif
+#include <core/SPaintProbe.h>
+#include <imm.h>
+
 SNSBEGIN
 
 ///////////////////////////////////////////////////////////////////////
@@ -125,7 +124,7 @@ CSize SHostWndAttr::GetMinSize(int nScale) const
     return szRet;
 }
 
-void SHostWndAttr::SetTranslucent(bool bTranslucent)
+void SHostWndAttr::SetTranslucent(BOOL bTranslucent)
 {
     m_bTranslucent = bTranslucent;
 }
@@ -135,7 +134,7 @@ void SHostWndAttr::SetTrCtx(const SStringW &strTrCtx)
     m_strTrCtx = strTrCtx;
 }
 
-void SHostWndAttr::SetSendWheel2Hover(bool value)
+void SHostWndAttr::SetSendWheel2Hover(BOOL value)
 {
     m_bSendWheel2Hover = value;
 }
@@ -271,7 +270,7 @@ HWND SHostWnd::CreateEx(HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, 
         dwExStyle |= WS_EX_COMPOSITED;
 #endif // _WIN32
     }
-    //SSLOGI() << "create host, translucent=" << m_hostAttr.m_bTranslucent;
+    // SSLOGI() << "create host, translucent=" << m_hostAttr.m_bTranslucent;
     m_xmlInit = xmlInit;
     HWND hWnd = SNativeWnd::CreateNative(_T("HOSTWND"), dwStyle, dwExStyle, x, y, nWidth, nHeight, hWndParent, 0);
     m_xmlInit = NULL;
@@ -384,6 +383,77 @@ void SHostWnd::EnablePrivateUiDef(THIS_ BOOL bEnable)
         if (--m_cEnableUiDefCount == 0)
             GETUIDEF->PopUiDefInfo(m_privateUiDefInfo, TRUE);
     }
+}
+
+void SHostWnd::_UpdateHostSurface()
+{
+    DWORD dwExStyle = SNativeWnd::GetExStyle();
+    if (IsTranslucent())
+    { // Per-pixel alpha: a layered window painted offscreen and blitted by UpdateLayeredWindow.
+#ifdef _WIN32
+        if (!m_dummyWnd)
+        {
+            SetWindowLongPtr(GWL_EXSTYLE, GetWindowLongPtr(GWL_EXSTYLE) | WS_EX_LAYERED);
+            m_dummyWnd = new SDummyWnd(this);
+            HMONITOR hMonitor = MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST);
+            MONITORINFO info = { sizeof(MONITORINFO) };
+            GetMonitorInfo(hMonitor, &info);
+            SStringT dummyTitle = SStringT().Format(_T("%s_dummy"), m_hostAttr.m_strTitle.c_str());
+            m_dummyWnd->CreateNative(dummyTitle, WS_POPUP, WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE, info.rcWork.left, info.rcWork.top, 1, 1, m_hWnd, 0, NULL);
+            m_dummyWnd->SetWindowLongPtr(GWL_EXSTYLE, WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE | WS_EX_LAYERED);
+            ::SetLayeredWindowAttributes(m_dummyWnd->m_hWnd, 0, 0, LWA_ALPHA);
+            if (IsWindowVisible())
+            {
+                m_dummyWnd->ShowWindow(SW_SHOWNOACTIVATE);
+            }
+        }
+#else
+        if (!(dwExStyle & WS_EX_LAYERED))
+            ModifyStyleEx(0, WS_EX_LAYERED | WS_EX_COMPOSITED);
+#endif // _WIN32
+    }
+    else if (dwExStyle & WS_EX_LAYERED || GetRoot()->GetAlpha() != 0xFF)
+    { // Uniform alpha: keep a layered window and blend the whole surface with one alpha.
+        if (m_dummyWnd)
+        {
+            m_dummyWnd->DestroyWindow(); // m_dummyWnd will be set to null in SDummyWnd::OnDestroy
+        }
+        if (!(dwExStyle & WS_EX_LAYERED))
+        {
+#ifdef _WIN32
+            ModifyStyleEx(0, WS_EX_LAYERED);
+#else
+            ModifyStyleEx(0, WS_EX_LAYERED | WS_EX_COMPOSITED);
+#endif // _WIN32
+        }
+        SetLayeredWindowAttributes(0, GetRoot()->GetAlpha(), LWA_ALPHA);
+    }
+    // The render target kind follows the presentation path: a translucent host
+    // paints offscreen, a normal host paints straight into the window surface.
+    m_memRT = NULL;
+    if (IsTranslucent())
+    {
+        CRect rcWnd;
+        SNativeWnd::GetWindowRect(&rcWnd);
+        GETRENDERFACTORY->CreateRenderTarget(&m_memRT, rcWnd.Width(), rcWnd.Height());
+    }
+    else
+    {
+        GETRENDERFACTORY->CreateRenderTarget2(&m_memRT, m_hWnd);
+    }
+}
+
+void SHostWnd::SetTranslucent(BOOL bTranslucent)
+{
+    if (m_hostAttr.m_bTranslucent == bTranslucent)
+        return;
+    m_hostAttr.SetTranslucent(bTranslucent);
+    if (!IsWindow())
+        return; // Not created yet: CreateEx() applies the attribute through the XML node.
+    // Layer style, paint-pump dummy window and render target must move together;
+    // poking the attribute alone leaves a layered host that never gets painted.
+    _UpdateHostSurface();
+    _Redraw();
 }
 
 BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
@@ -535,54 +605,7 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
 
     GetRoot()->InitFromXml(&xmlRoot);
 
-    if (IsTranslucent())
-    {
-#ifdef _WIN32
-        if (!m_dummyWnd)
-        {
-            SetWindowLongPtr(GWL_EXSTYLE, GetWindowLongPtr(GWL_EXSTYLE) | WS_EX_LAYERED);
-            m_dummyWnd = new SDummyWnd(this);
-            HMONITOR hMonitor = MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST);
-            MONITORINFO info = { sizeof(MONITORINFO) };
-            GetMonitorInfo(hMonitor, &info);
-            SStringT dummyTitle = SStringT().Format(_T("%s_dummy"), m_hostAttr.m_strTitle.c_str());
-            m_dummyWnd->CreateNative(dummyTitle, WS_POPUP, WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE, info.rcWork.left, info.rcWork.top, 1, 1, m_hWnd, 0, NULL);
-            m_dummyWnd->SetWindowLongPtr(GWL_EXSTYLE, WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE | WS_EX_LAYERED);
-            ::SetLayeredWindowAttributes(m_dummyWnd->m_hWnd, 0, 0, LWA_ALPHA);
-            if (IsWindowVisible())
-            {
-                m_dummyWnd->ShowWindow(SW_SHOWNOACTIVATE);
-            }
-        }
-#endif // _WIN32
-    }
-    else if (dwExStyle & WS_EX_LAYERED || GetRoot()->GetAlpha() != 0xFF)
-    {
-        if (m_dummyWnd)
-        {
-            m_dummyWnd->DestroyWindow(); // m_dummyWnd will be set to null in SDummyWnd::OnDestroy
-        }
-        if (!(dwExStyle & WS_EX_LAYERED))
-        {
-#ifdef _WIN32
-            ModifyStyleEx(0, WS_EX_LAYERED);
-#else
-            ModifyStyleEx(0, WS_EX_LAYERED | WS_EX_COMPOSITED);
-#endif // _WIN32
-        }
-        SetLayeredWindowAttributes(0, GetRoot()->GetAlpha(), LWA_ALPHA);
-    }
-    m_memRT = NULL;
-    if (IsTranslucent())
-    {
-        CRect rcWnd;
-        SNativeWnd::GetWindowRect(&rcWnd);
-        GETRENDERFACTORY->CreateRenderTarget(&m_memRT, rcWnd.Width(), rcWnd.Height());
-    }
-    else
-    {
-        GETRENDERFACTORY->CreateRenderTarget2(&m_memRT, m_hWnd);
-    }
+    _UpdateHostSurface();
 
     BuildWndTreeZorder();
 
@@ -733,11 +756,22 @@ void SHostWnd::OnPrint(HDC dc, UINT uFlags)
     {
         m_bNeedRepaint = FALSE;
         BuildWndTreeZorder();
-        // m_rgnInvalidate may be modified during RedrawRegion, so a temporary region object must be created
+        // m_rgnInvalidate may be modified during RedrawRegion, so the region
+        // being painted is detached first.  Reuse the previous frame's object
+        // (m_rgnSpare) instead of allocating a new region every paint.
         SAutoRefPtr<IRegionS> pRgnUpdate = m_rgnInvalidate;
-        m_rgnInvalidate = NULL;
-        GETRENDERFACTORY->CreateRegion(&m_rgnInvalidate);
+        m_rgnInvalidate = m_rgnSpare;
+        m_rgnSpare = NULL;
+        if (m_rgnInvalidate)
+        {
+            m_rgnInvalidate->Clear();
+        }
+        else
+        {
+            GETRENDERFACTORY->CreateRegion(&m_rgnInvalidate);
+        }
         _RedrawRegion(pRgnUpdate, rcInvalid);
+        m_rgnSpare = pRgnUpdate;
     }
     else
     { // The cache is already updated; just update it to the window again
@@ -1295,21 +1329,18 @@ void SHostWnd::OnGetMinMaxInfo(LPMINMAXINFO lpMMI)
         ::GetMonitorInfo(hMonitor, &mi);
 
         CRect rcWork = mi.rcWork, rcMonitor = mi.rcMonitor;
-        // 无标题/边框窗口（ncPainter 为空）没有真正的非客户区可留白，inset 恒为 0。
-        // 注意：此处不可调用 GetScale()——WM_GETMINMAXINFO 在 Create 阶段（GetRoot() 仍为空）
-        // 就会到达，那时取缩放会访问尚未初始化完成的对象，导致窗口过程内异常（0xC000041D）。
         CRect rcMaxInset(0, 0, 0, 0);
+        if(GetRoot()){
+            rcMaxInset = m_hostAttr.GetMaxInset(GetScale());
+            CSize szMin = m_hostAttr.GetMinSize(GetScale());
+            lpMMI->ptMinTrackSize = CPoint(szMin.cx, szMin.cy);
+        }
         lpMMI->ptMaxPosition.x = abs(rcWork.left - rcMonitor.left) - rcMaxInset.left;
         lpMMI->ptMaxPosition.y = abs(rcWork.top - rcMonitor.top) - rcMaxInset.top;
         lpMMI->ptMaxSize.x = abs(rcWork.Width()) + rcMaxInset.right + rcMaxInset.left;
         lpMMI->ptMaxSize.y = abs(rcWork.Height()) + rcMaxInset.bottom + rcMaxInset.top;
         lpMMI->ptMaxTrackSize.x = abs(rcWork.Width()) + rcMaxInset.right + rcMaxInset.left;
         lpMMI->ptMaxTrackSize.y = abs(rcWork.Height()) + rcMaxInset.bottom + rcMaxInset.top;
-        if (GetRoot())
-        {
-            CSize szMin = m_hostAttr.GetMinSize(GetScale());
-            lpMMI->ptMinTrackSize = CPoint(szMin.cx, szMin.cy);
-        }
     }
     else
     {

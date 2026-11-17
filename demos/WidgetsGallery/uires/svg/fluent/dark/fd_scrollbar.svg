@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="108" height="48" viewBox="0 0 108 48">
+  <!-- 9 列 × 4 行：列序必须与 SSkinScrollbar::GetPartRect 一致
+       col0 v-up / col1 v-down / col2 v-thumb / col3 v-rail /
+       col4 h-left / col5 h-right / col6 h-thumb / col7 h-rail / col8 corner
+       行序 = normal / hover / pressed / disabled -->
+  <g id="v_up_normal" transform="translate(0, 0)">
+    <path d="M4,7 L6,5 L8,7" stroke="#C8C8C8" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g id="v_down_normal" transform="translate(12, 0)">
+    <path d="M4,5 L6,7 L8,5" stroke="#C8C8C8" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g id="v_thumb_normal" transform="translate(24, 0)">
+    <rect x="4.5" y="0" width="3" height="12" rx="1.5" fill="#FFFFFF" fill-opacity="0.35"/>
+  </g>
+  <g id="v_rail_normal" transform="translate(36, 0)">
+    <rect width="12" height="12" fill="none"/>
+  </g>
+  <g id="h_left_normal" transform="translate(48, 0)">
+    <path d="M7,4 L5,6 L7,8" stroke="#C8C8C8" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g id="h_right_normal" transform="translate(60, 0)">
+    <path d="M5,4 L7,6 L5,8" stroke="#C8C8C8" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g id="h_thumb_normal" transform="translate(72, 0)">
+    <rect x="0" y="4.5" width="12" height="3" rx="1.5" fill="#FFFFFF" fill-opacity="0.35"/>
+  </g>
+  <g id="h_rail_normal" transform="translate(84, 0)">
+    <rect width="12" height="12" fill="none"/>
+  </g>
+  <g id="corner_normal" transform="translate(96, 0)">
+    <rect width="12" height="12" fill="none"/>
+  </g>
+  <g id="v_up_hover" transform="translate(0, 12)">
+    <path d="M4,7 L6,5 L8,7" stroke="#FFFFFF" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g id="v_down_hover" transform="translate(12, 12)">
+    <path d="M4,5 L6,7 L8,5" stroke="#FFFFFF" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g id="v_thumb_hover" transform="translate(24, 12)">
+    <rect x="4.5" y="0" width="3" height="12" rx="1.5" fill="#FFFFFF" fill-opacity="0.5"/>
+  </g>
+  <g id="v_rail_hover" transform="translate(36, 12)">
+    <rect width="12" height="12" fill="none"/>
+  </g>
+  <g id="h_left_hover" transform="translate(48, 12)">
+    <path d="M7,4 L5,6 L7,8" stroke="#FFFFFF" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g id="h_right_hover" transform="translate(60, 12)">
+    <path d="M5,4 L7,6 L5,8" stroke="#FFFFFF" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g id="h_thumb_hover" transform="translate(72, 12)">
+    <rect x="0" y="4.5" width="12" height="3" rx="1.5" fill="#FFFFFF" fill-opacity="0.5"/>
+  </g>
+  <g id="h_rail_hover" transform="translate(84, 12)">
+    <rect width="12" height="12" fill="none"/>
+  </g>
+  <g id="corner_hover" transform="translate(96, 12)">
+    <rect width="12" height="12" fill="none"/>
+  </g>
+  <g id="v_up_pressed" transform="translate(0, 24)">
+    <path d="M4,7 L6,5 L8,7" stroke="#FFFFFF" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g id="v_down_pressed" transform="translate(12, 24)">
+    <path d="M4,5 L6,7 L8,5" stroke="#FFFFFF" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g id="v_thumb_pressed" transform="translate(24, 24)">
+    <rect x="4.5" y="0" width="3" height="12" rx="1.5" fill="#FFFFFF" fill-opacity="0.65"/>
+  </g>
+  <g id="v_rail_pressed" transform="translate(36, 24)">
+    <rect width="12" height="12" fill="none"/>
+  </g>
+  <g id="h_left_pressed" transform="translate(48, 24)">
+    <path d="M7,4 L5,6 L7,8" stroke="#FFFFFF" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g id="h_right_pressed" transform="translate(60, 24)">
+    <path d="M5,4 L7,6 L5,8" stroke="#FFFFFF" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g id="h_thumb_pressed" transform="translate(72, 24)">
+    <rect x="0" y="4.5" width="12" height="3" rx="1.5" fill="#FFFFFF" fill-opacity="0.65"/>
+  </g>
+  <g id="h_rail_pressed" transform="translate(84, 24)">
+    <rect width="12" height="12" fill="none"/>
+  </g>
+  <g id="corner_pressed" transform="translate(96, 24)">
+    <rect width="12" height="12" fill="none"/>
+  </g>
+  <g id="v_up_disabled" transform="translate(0, 36)">
+    <path d="M4,7 L6,5 L8,7" stroke="#5C5C5C" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g id="v_down_disabled" transform="translate(12, 36)">
+    <path d="M4,5 L6,7 L8,5" stroke="#5C5C5C" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g id="v_thumb_disabled" transform="translate(24, 36)">
+    <rect x="4.5" y="0" width="3" height="12" rx="1.5" fill="#FFFFFF" fill-opacity="0.2"/>
+  </g>
+  <g id="v_rail_disabled" transform="translate(36, 36)">
+    <rect width="12" height="12" fill="none"/>
+  </g>
+  <g id="h_left_disabled" transform="translate(48, 36)">
+    <path d="M7,4 L5,6 L7,8" stroke="#5C5C5C" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g id="h_right_disabled" transform="translate(60, 36)">
+    <path d="M5,4 L7,6 L5,8" stroke="#5C5C5C" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g id="h_thumb_disabled" transform="translate(72, 36)">
+    <rect x="0" y="4.5" width="12" height="3" rx="1.5" fill="#FFFFFF" fill-opacity="0.2"/>
+  </g>
+  <g id="h_rail_disabled" transform="translate(84, 36)">
+    <rect width="12" height="12" fill="none"/>
+  </g>
+  <g id="corner_disabled" transform="translate(96, 36)">
+    <rect width="12" height="12" fill="none"/>
+  </g>
+</svg>

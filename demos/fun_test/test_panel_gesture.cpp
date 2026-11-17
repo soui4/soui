@@ -440,3 +440,22 @@ TEST(soui_panel_gesture_detector, axis_both_touch_stream_and_cancel)
     EXPECT_EQ(0, rec.up);
     EXPECT_FALSE(detector.IsDown());
 }
+
+// ---------------------------------------------------------------------------
+// 属性统一回归：SPanel 的 enableGesture（原 enableDragScroll）。
+// 默认打开；XML 显式置 0 时应当关闭。
+// ---------------------------------------------------------------------------
+TEST_F(PanelGestureTest, enable_gesture_attr_parses_from_xml)
+{
+    SWindow *root = loadUi(L"<window width='300' height='200'>"
+                             L"<div name='p'/>"
+                             L"<div name='pOff' enableGesture='0'/>"
+                             L"</window>", CRect(0, 0, 300, 200));
+    ASSERT_TRUE(root != NULL);
+    SPanel *def = (SPanel *)root->FindChildByName(L"p");
+    SPanel *off = (SPanel *)root->FindChildByName(L"pOff");
+    ASSERT_TRUE(def != NULL);
+    ASSERT_TRUE(off != NULL);
+    EXPECT_TRUE(def->IsItemDragScrollEnabled());
+    EXPECT_FALSE(off->IsItemDragScrollEnabled());
+}

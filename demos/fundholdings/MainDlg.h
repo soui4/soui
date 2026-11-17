@@ -144,7 +144,7 @@ class CMainDlg : public SHostWnd,
         return (p && p->IsClass(T::GetClassName())) ? (T *)p : NULL;
     }
     STabCtrl *CurPaneSwipe();
-    SRichEdit *CurLog();
+    SEdit *CurLog();
     void SyncFundPages();                  // tabctrl 页数与自选列表对齐
     void InitDetailPage(SWindow *pPage);   // 初始化一页内的页签 / 面板 / 日志控件
     void RenderFundPage(int idx);          // 用 m_watch[idx] 渲染指定页

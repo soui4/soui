@@ -24,6 +24,8 @@
  *  2. 在 number="1" 的编辑框里用输入法提交汉字 -> 汉字不进文档，数字照常进
  */
 
+#ifndef SOUI_EDIT_LITE
+
 #include <souistd.h>
 #include <core/SWnd.h>
 #include <control/SRichEdit.h>
@@ -141,3 +143,12 @@ TEST(soui_richedit_ime_e2e, number_style_drops_non_digit_ime_chars)
 
     root.DestroyAllChildren();
 }
+
+#else // SOUI_EDIT_LITE
+// SRichEdit is not compiled in SOUI_EDIT_LITE builds; these IME tests are richedit-specific.
+#include <gtest/gtest.h>
+TEST(soui_richedit_ime_e2e, disabled_in_lite_build)
+{
+    SUCCEED() << "SRichEdit unavailable in SOUI_EDIT_LITE build";
+}
+#endif // SOUI_EDIT_LITE

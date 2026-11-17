@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="72" height="24" viewBox="0 0 72 24">
+<g id="state0" transform="translate(0,0)"><g fill="none" stroke="#1B1B1B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5v14"/></g></g>
+<g id="state1" transform="translate(24,0)"><g fill="none" stroke="#1B1B1B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h12l3 3v13H4V4ZM8 4v6h8V4M8 20v-6h8v6"/></g></g>
+<g id="state2" transform="translate(48,0)"><g fill="none" stroke="#1B1B1B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8M9 4v6l-3 4v2h12v-2l-3-4V4M12 16v5"/></g></g>
+</svg>

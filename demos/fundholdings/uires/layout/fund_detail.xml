@@ -62,8 +62,8 @@
       </window>
 
       <tabctrl name="pane_swipe" size="-2,0" weight="1" extend_top="6"
-               tabWidth="0" tabHeight="0" enableDragSwitch="1"
-               dragThreshold="8" dragSwitchRatio="35" dragFling="1" dragCommitDuration="200">
+               tabWidth="0" tabHeight="0" enableGesture="1"
+               dragThreshold="8" dragSwitchRatio="35" dragCommitDuration="200">
         <page title="持仓变化表">
           <window name="pane_change" pos="0,0,-2,-2">
             <gridctrl name="grid_holdings" pos="0,0,-2,-2"

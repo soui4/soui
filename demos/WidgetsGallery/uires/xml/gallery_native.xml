@@ -1,0 +1,14 @@
+<SOUI title="Native child host" wndType="normal" appWnd="0" translucent="0" resizable="0">
+  <root size="560dp,308dp" skin="gallery_card" layout="vbox">
+    <caption size="-2,48dp" layout="hbox" gravity="center" padding="8dp,0,0,0" font="size:14dp,bold:1">
+      <text text="Native child-window integration" font="size:14dp,bold:1" />
+      <window size="0,0" weight="1" />
+      <imgbtn name="btn_close" skin="_skin.sys.btn.close" size="46dp,40dp" />
+    </caption>
+    <window size="-2,0" weight="1" layout="vbox" padding="20dp,32dp,20dp,20dp" interval="16dp">
+      <text text="SRealWnd creates, positions, and destroys a local child HWND." colorText="@color/fluent_text_secondary" />
+      <realwnd name="sample_realwnd" wndclass="SOUIWidgetsGalleryNativePreview" wndname="Native preview" size="-2,120dp" init="0" />
+      <gallerybutton name="native_done" text="Done" class="fluent_btn_primary" size="120dp,36dp" />
+    </window>
+  </root>
+</SOUI>

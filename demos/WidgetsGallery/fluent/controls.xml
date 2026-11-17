@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Demo-only defaults; copied into each selected demo's UIDEF, never into the system UIDEF. -->
+<UIDEF>
+  <deffont value="face:Segoe UI,size:14">
+    <macos value="face:.AppleSystemUIFont,size:14"/>
+    <linux value="face:Noto Sans,size:14"/>
+  </deffont>
+  <style>
+    <class name="fluent_card" skin="fluent_card" padding="12dp,12dp,12dp,12dp"/>
+    <class name="fluent_caption" colorText="@color/fluent_text" font="bold:1"/>
+    <class name="fluent_btn_primary" skin="fluent_btn_primary" colorText="@color/fluent_on_accent" colorTextHover="@color/fluent_on_accent" colorTextPush="@color/fluent_on_accent" colorTextDisable="@color/fluent_text_disabled" cursor="hand"/>
+    <class name="fluent_btn_secondary" skin="fluent_btn_secondary" colorText="@color/fluent_text" colorTextHover="@color/fluent_text" colorTextPush="@color/fluent_text" colorTextDisable="@color/fluent_text_disabled" cursor="hand"/>
+    <class name="fluent_text_secondary" colorText="@color/fluent_text_secondary" font="size:12"/>
+    <class name="fluent_link" cursor="hand" colorText="@color/fluent_accent" colorTextHover="@color/fluent_accent_hover" colorTextPush="@color/fluent_accent_pressed" colorTextDisable="@color/fluent_text_disabled"/>
+    <class name="fluent_row_label" padding="8dp,0,8dp,0"/>
+  </style>
+  <objattr>
+    <window colorText="@color/fluent_text"/>
+    <div sbSkin="_skin.sys.scrollbar" bandSkin="_skin.sys.selband"/>
+    <button skin="fluent_btn_secondary" colorText="@color/fluent_text" colorTextHover="@color/fluent_text" colorTextPush="@color/fluent_text" colorTextDisable="@color/fluent_text_disabled" cursor="hand"/>
+    <listbox itemSkin="_skin.sys.list.item" colorText="@color/fluent_text" colorSelText="@color/fluent_text" colorItemBkgnd="@color/fluent_card_bg" colorItemHotBkgnd="@color/fluent_fill_hover" colorItemSelBkgnd="@color/fluent_fill_pressed" text-x="8dp" itemHeight="32dp"/>
+    <radio skin="_skin.sys.radio" focusSkin="_skin.sys.focusradio" colorText="@color/fluent_text"/>
+    <check skin="_skin.sys.checkbox" focusSkin="_skin.sys.focuscheckbox" colorText="@color/fluent_text"/>
+    <edit skin="fluent_edit" ncSkin="" colorText="@color/fluent_text" padding="6dp,6dp,6dp,6dp"/>
+    <combobox skin="fluent_edit" btnSkin="_skin.sys.dropbtn" colorText="@color/fluent_text" colorBkgnd="@color/fluent_card_bg" padding="8dp,0,8dp,0"/>
+    <tabctrl tabSkin="_skin.sys.tab.page" colorText="@color/fluent_text" tabHeight="32dp"/>
+    <header itemSkin="_skin.sys.header" colorText="@color/fluent_text"/>
+    <dockbar captionSkin="fluent_card" closeBtnSkin="_skin.sys.btn.mini.close" colorBkgnd="@color/fluent_card_bg" colorText="@color/fluent_text"/>
+  </objattr>
+</UIDEF>

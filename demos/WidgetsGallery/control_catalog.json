@@ -1,0 +1,648 @@
+{
+  "categories": [
+    {
+      "key": "home",
+      "title": "Overview",
+      "description": "The built-in SOUI catalog, with paired Fluent styles and exact usage.",
+      "api": "58 registered classes / 57 live scene examples"
+    },
+    {
+      "key": "buttons",
+      "title": "Buttons",
+      "description": "Clear actions, quiet surfaces, and consistent interaction states.",
+      "api": "SButton / SImageButton / SLink"
+    },
+    {
+      "key": "selection",
+      "title": "Selection",
+      "description": "Checkboxes and radio buttons for choices big and small.",
+      "api": "SCheckBox / SRadioBox / SRadioGroup / SToggle / SSwitch"
+    },
+    {
+      "key": "input",
+      "title": "Text input",
+      "description": "Comfortable inputs with focus, read-only, and disabled states.",
+      "api": "SHotKeyCtrl / SSpinButtonCtrl / SRichEdit / SEdit / SKeyboardSpacer"
+    },
+    {
+      "key": "combo",
+      "title": "ComboBox",
+      "description": "Choose a value from a Fluent-styled dropdown.",
+      "api": "SComboEdit / SComboBox / SComboView / SSearchDropdownList"
+    },
+    {
+      "key": "progress",
+      "title": "Progress",
+      "description": "Keep people informed with ranges, labels, and semantic colors.",
+      "api": "SProgress"
+    },
+    {
+      "key": "slider",
+      "title": "Sliders & scrollbars",
+      "description": "Make an adjustment and see the value change immediately.",
+      "api": "SSliderBar / SScrollBar"
+    },
+    {
+      "key": "list",
+      "title": "ListBox",
+      "description": "Browse, select, add, and remove items in a simple list.",
+      "api": "SListBox"
+    },
+    {
+      "key": "tree",
+      "title": "TreeView",
+      "description": "Explore nested information with expandable branches.",
+      "api": "STreeCtrl / STreeView"
+    },
+    {
+      "key": "tabs",
+      "title": "Tabs & stacks",
+      "description": "Switch between related views without losing your place.",
+      "api": "STabCtrl / STabPage / SStackView / SStackPage"
+    },
+    {
+      "key": "dialog",
+      "title": "Dialogs",
+      "description": "A focused conversation with clear primary and secondary actions.",
+      "api": "SHostDialog / SModalRoot / SModalView"
+    },
+    {
+      "key": "icons",
+      "title": "Icons & images",
+      "description": "Crisp, theme-aware SVG assets. No bitmap icon dependencies.",
+      "api": "SImageWnd / SIconWnd / SAnimateImgWnd"
+    },
+    {
+      "key": "type",
+      "title": "Typography",
+      "description": "A quiet type scale that makes the important things easy to read.",
+      "api": "SStatic / SHrLine"
+    },
+    {
+      "key": "layout",
+      "title": "Layout",
+      "description": "Responsive stacks and weighted columns, expressed in SOUI XML.",
+      "api": "SWindow / SPanel / SScrollView / SLinearLayout"
+    },
+    {
+      "key": "listview",
+      "title": "ListView",
+      "description": "Stored and virtual lists, multi-column sorting, and independent headers.",
+      "api": "SHeaderCtrl / SListCtrl / SListView / SMCListView"
+    },
+    {
+      "key": "tileview",
+      "title": "TileView",
+      "description": "Data-bound, responsive collections of recycled cards.",
+      "api": "STileView"
+    },
+    {
+      "key": "datetime",
+      "title": "Date & time",
+      "description": "Native calendars, segmented date input, and calendar popups.",
+      "api": "SCalendar / SDateTimePicker"
+    },
+    {
+      "key": "commands",
+      "title": "Menus & toolbars",
+      "description": "Real menu sessions, command items, checkable tools, and rebar bands.",
+      "api": "SMenuBar / SToolBar / SRebar"
+    },
+    {
+      "key": "containers",
+      "title": "Containers",
+      "description": "Split panes, groups, frames, and a docked inspector.",
+      "api": "SGroup / SSplitPane / SSplitWnd / SSplitWnd_Col / SSplitWnd_Row / SFrame / SDockBar"
+    },
+    {
+      "key": "hosting",
+      "title": "Hosting & platform",
+      "description": "Native host contracts and explicit platform integration limits.",
+      "api": "SRootWindow / SRealWnd / SCaption / SActiveX"
+    }
+  ],
+  "controls": [
+    {
+      "cpp": "SWindow",
+      "tag": "window",
+      "category": "layout",
+      "sample": "sample_window",
+      "scope": "live",
+      "style": "gallery_subtle",
+      "definition": "SOUI/include/core/SWnd.h"
+    },
+    {
+      "cpp": "SRootWindow",
+      "tag": "root",
+      "category": "hosting",
+      "sample": "sample_rootwindow",
+      "scope": "composite",
+      "style": "_skin.sys.wnd.bkgnd",
+      "definition": "SOUI/include/core/SRootWindow.h"
+    },
+    {
+      "cpp": "SPanel",
+      "tag": "div",
+      "category": "layout",
+      "sample": "sample_panel",
+      "scope": "live",
+      "style": "_skin.sys.scrollbar",
+      "definition": "SOUI/include/core/SPanel.h"
+    },
+    {
+      "cpp": "SStatic",
+      "tag": "text",
+      "category": "type",
+      "sample": "sample_static",
+      "scope": "live",
+      "style": "fluent_text",
+      "definition": "SOUI/include/control/SCmnCtrl.h"
+    },
+    {
+      "cpp": "SButton",
+      "tag": "button",
+      "category": "buttons",
+      "sample": "sample_native_button",
+      "scope": "live",
+      "style": "fluent_btn_primary",
+      "definition": "SOUI/include/control/SCmnCtrl.h"
+    },
+    {
+      "cpp": "SImageWnd",
+      "tag": "img",
+      "category": "icons",
+      "sample": "sample_image",
+      "scope": "live",
+      "style": "gallery_icon_layout",
+      "definition": "SOUI/include/control/SCmnCtrl.h"
+    },
+    {
+      "cpp": "SProgress",
+      "tag": "progress",
+      "category": "progress",
+      "sample": "progress_standard",
+      "scope": "live",
+      "style": "gallery_progress_track / blue",
+      "definition": "SOUI/include/control/SCmnCtrl.h"
+    },
+    {
+      "cpp": "SImageButton",
+      "tag": "imgbtn",
+      "category": "buttons",
+      "sample": "sample_image_button",
+      "scope": "live",
+      "style": "gallery_image_button",
+      "definition": "SOUI/include/control/SCmnCtrl.h"
+    },
+    {
+      "cpp": "SHrLine",
+      "tag": "hr",
+      "category": "type",
+      "sample": "sample_hr",
+      "scope": "live",
+      "style": "gallery_stroke",
+      "definition": "SOUI/include/control/SCmnCtrl.h"
+    },
+    {
+      "cpp": "SCheckBox",
+      "tag": "check",
+      "category": "selection",
+      "sample": "sample_check",
+      "scope": "live",
+      "style": "_skin.sys.checkbox / focuscheckbox",
+      "definition": "SOUI/include/control/SCmnCtrl.h"
+    },
+    {
+      "cpp": "SIconWnd",
+      "tag": "icon",
+      "category": "icons",
+      "sample": "sample_icon",
+      "scope": "live",
+      "style": "SVG-to-HICON / gallery_icon_layout",
+      "definition": "SOUI/include/control/SCmnCtrl.h"
+    },
+    {
+      "cpp": "SRadioBox",
+      "tag": "radio",
+      "category": "selection",
+      "sample": "sample_radio_light",
+      "scope": "live",
+      "style": "_skin.sys.radio / focusradio",
+      "definition": "SOUI/include/control/SCmnCtrl.h"
+    },
+    {
+      "cpp": "SRadioGroup",
+      "tag": "radioGroup",
+      "category": "selection",
+      "sample": "sample_radiogroup",
+      "scope": "composite",
+      "style": "themed radio children",
+      "definition": "SOUI/include/control/SCmnCtrl.h"
+    },
+    {
+      "cpp": "SLink",
+      "tag": "link",
+      "category": "buttons",
+      "sample": "sample_link",
+      "scope": "live",
+      "style": "fluent_link",
+      "definition": "SOUI/include/control/SCmnCtrl.h"
+    },
+    {
+      "cpp": "SGroup",
+      "tag": "group",
+      "category": "containers",
+      "sample": "sample_group",
+      "scope": "live",
+      "style": "gallery_stroke",
+      "definition": "SOUI/include/control/SCmnCtrl.h"
+    },
+    {
+      "cpp": "SAnimateImgWnd",
+      "tag": "animateimg",
+      "category": "icons",
+      "sample": "sample_animateimg",
+      "scope": "live",
+      "style": "gallery_spinner",
+      "definition": "SOUI/include/control/SCmnCtrl.h"
+    },
+    {
+      "cpp": "SScrollView",
+      "tag": "scrollview",
+      "category": "layout",
+      "sample": "sample_scrollview",
+      "scope": "live",
+      "style": "_skin.sys.scrollbar",
+      "definition": "SOUI/include/core/SPanel.h"
+    },
+    {
+      "cpp": "SRealWnd",
+      "tag": "realwnd",
+      "category": "hosting",
+      "sample": "sample_realwnd",
+      "scope": "dynamic",
+      "style": "native owner-draw + Fluent colors",
+      "definition": "SOUI/include/control/SRealWnd.h"
+    },
+    {
+      "cpp": "SToggle",
+      "tag": "toggle",
+      "category": "selection",
+      "sample": "sample_toggle",
+      "scope": "live",
+      "style": "gallery_toggle / gallery_focus",
+      "definition": "SOUI/include/control/SCmnCtrl.h"
+    },
+    {
+      "cpp": "STabCtrl",
+      "tag": "tabctrl",
+      "category": "tabs",
+      "sample": "sample_tabs",
+      "scope": "live",
+      "style": "_skin.sys.tab.page / gallery_focus",
+      "definition": "SOUI/include/control/STabCtrl.h"
+    },
+    {
+      "cpp": "STabPage",
+      "tag": "page",
+      "category": "tabs",
+      "sample": "sample_tabpage",
+      "scope": "composite",
+      "style": "gallery_subtle",
+      "definition": "SOUI/include/control/STabCtrl.h"
+    },
+    {
+      "cpp": "SSplitPane",
+      "tag": "pane",
+      "category": "containers",
+      "sample": "sample_pane",
+      "scope": "composite",
+      "style": "gallery_subtle",
+      "definition": "SOUI/include/control/SSplitWnd.h"
+    },
+    {
+      "cpp": "SSplitWnd",
+      "tag": "splitwnd",
+      "category": "containers",
+      "sample": "sample_splitwnd",
+      "scope": "live",
+      "style": "gallery_separator",
+      "definition": "SOUI/include/control/SSplitWnd.h"
+    },
+    {
+      "cpp": "SSplitWnd_Col",
+      "tag": "splitcol",
+      "category": "containers",
+      "sample": "sample_splitcol",
+      "scope": "live",
+      "style": "gallery_separator",
+      "definition": "SOUI/include/control/SSplitWnd.h"
+    },
+    {
+      "cpp": "SSplitWnd_Row",
+      "tag": "splitrow",
+      "category": "containers",
+      "sample": "sample_splitrow",
+      "scope": "live",
+      "style": "gallery_separator",
+      "definition": "SOUI/include/control/SSplitWnd.h"
+    },
+    {
+      "cpp": "SSliderBar",
+      "tag": "sliderbar",
+      "category": "slider",
+      "sample": "sample_slider",
+      "scope": "live",
+      "style": "gallery_progress_track / slider_thumb",
+      "definition": "SOUI/include/control/SSliderBar.h"
+    },
+    {
+      "cpp": "STreeCtrl",
+      "tag": "treectrl",
+      "category": "tree",
+      "sample": "sample_tree",
+      "scope": "live",
+      "style": "gallery_tree_toggle / themed item",
+      "definition": "SOUI/include/control/STreeCtrl.h"
+    },
+    {
+      "cpp": "SScrollBar",
+      "tag": "scrollbar",
+      "category": "slider",
+      "sample": "sample_scrollbar",
+      "scope": "live",
+      "style": "_skin.sys.scrollbar",
+      "definition": "SOUI/include/control/SScrollbar.h"
+    },
+    {
+      "cpp": "SHeaderCtrl",
+      "tag": "header",
+      "category": "listview",
+      "sample": "sample_header",
+      "scope": "live",
+      "style": "_skin.sys.header / gallery_sort",
+      "definition": "SOUI/include/control/SHeaderCtrl.h"
+    },
+    {
+      "cpp": "SListCtrl",
+      "tag": "listctrl",
+      "category": "listview",
+      "sample": "sample_listctrl",
+      "scope": "live",
+      "style": "_skin.sys.list.item / header",
+      "definition": "SOUI/include/control/SListCtrl.h"
+    },
+    {
+      "cpp": "SListBox",
+      "tag": "listbox",
+      "category": "list",
+      "sample": "sample_list",
+      "scope": "live",
+      "style": "_skin.sys.list.item",
+      "definition": "SOUI/include/control/SListbox.h"
+    },
+    {
+      "cpp": "SHotKeyCtrl",
+      "tag": "hotkey",
+      "category": "input",
+      "sample": "sample_hotkey",
+      "scope": "live",
+      "style": "fluent_edit",
+      "definition": "SOUI/include/control/SHotKeyCtrl.h"
+    },
+    {
+      "cpp": "SSpinButtonCtrl",
+      "tag": "spinButton",
+      "category": "input",
+      "sample": "sample_spin",
+      "scope": "live",
+      "style": "gallery_arrow_up / down",
+      "definition": "SOUI/include/control/SSpinButtonCtrl.h"
+    },
+    {
+      "cpp": "SListView",
+      "tag": "listview",
+      "category": "listview",
+      "sample": "sample_listview",
+      "scope": "live",
+      "style": "_skin.sys.list.item / two-line template",
+      "definition": "SOUI/include/control/SListView.h"
+    },
+    {
+      "cpp": "SMCListView",
+      "tag": "mclistview",
+      "category": "listview",
+      "sample": "sample_mclistview",
+      "scope": "live",
+      "style": "_skin.sys.list.item / header / gallery_sort",
+      "definition": "SOUI/include/control/SMCListView.h"
+    },
+    {
+      "cpp": "STileView",
+      "tag": "tileview",
+      "category": "tileview",
+      "sample": "sample_tileview",
+      "scope": "live",
+      "style": "gallery_card / SVG icon",
+      "definition": "SOUI/include/control/STileView.h"
+    },
+    {
+      "cpp": "STreeView",
+      "tag": "treeview",
+      "category": "tree",
+      "sample": "sample_treeview",
+      "scope": "live",
+      "style": "gallery_tree_expander / item template",
+      "definition": "SOUI/include/control/STreeView.h"
+    },
+    {
+      "cpp": "SCalendar",
+      "tag": "calendar",
+      "category": "datetime",
+      "sample": "sample_calendar",
+      "scope": "live",
+      "style": "gallery_arrow_prev / next / day colors",
+      "definition": "SOUI/include/control/SCalendar.h"
+    },
+    {
+      "cpp": "SDateTimePicker",
+      "tag": "dateTimePicker",
+      "category": "datetime",
+      "sample": "sample_datetime",
+      "scope": "live",
+      "style": "fluent_edit / themed calstyle",
+      "definition": "SOUI/include/control/SDateTimePicker.h"
+    },
+    {
+      "cpp": "SFrame",
+      "tag": "frame",
+      "category": "containers",
+      "sample": "sample_frame",
+      "scope": "live",
+      "style": "gallery_subtle",
+      "definition": "SOUI/include/control/SFrame.h"
+    },
+    {
+      "cpp": "SStackView",
+      "tag": "stack",
+      "category": "tabs",
+      "sample": "sample_stack",
+      "scope": "live",
+      "style": "gallery_subtle",
+      "definition": "SOUI/include/control/SStackView.h"
+    },
+    {
+      "cpp": "SStackPage",
+      "tag": "stackPage",
+      "category": "tabs",
+      "sample": "sample_stackpage",
+      "scope": "composite",
+      "style": "gallery_subtle",
+      "definition": "SOUI/include/control/SStackView.h"
+    },
+    {
+      "cpp": "SRichEdit",
+      "tag": "richedit",
+      "category": "input",
+      "sample": "sample_richedit",
+      "scope": "live",
+      "style": "fluent_edit",
+      "definition": "SOUI/include/control/SRichEdit.h"
+    },
+    {
+      "cpp": "SEdit",
+      "tag": "edit",
+      "category": "input",
+      "sample": "sample_input",
+      "scope": "live",
+      "style": "fluent_edit",
+      "definition": "SOUI/include/control/SEdit.h"
+    },
+    {
+      "cpp": "SComboEdit",
+      "tag": "ComboEdit",
+      "category": "combo",
+      "sample": "sample_comboedit",
+      "scope": "composite",
+      "style": "transparent nested edit / Fluent text",
+      "definition": "SOUI/include/control/SComboBase.h"
+    },
+    {
+      "cpp": "SComboBox",
+      "tag": "combobox",
+      "category": "combo",
+      "sample": "sample_combo",
+      "scope": "live",
+      "style": "fluent_edit / _skin.sys.dropbtn",
+      "definition": "SOUI/include/control/SComboBox.h"
+    },
+    {
+      "cpp": "SComboView",
+      "tag": "comboview",
+      "category": "combo",
+      "sample": "sample_comboview",
+      "scope": "live",
+      "style": "fluent_edit / virtual item template",
+      "definition": "SOUI/include/control/SComboView.h"
+    },
+    {
+      "cpp": "SCaption",
+      "tag": "caption",
+      "category": "hosting",
+      "sample": "sample_caption",
+      "scope": "composite",
+      "style": "Fluent caption / system-button SVGs",
+      "definition": "SOUI/include/control/SCaption.h"
+    },
+    {
+      "cpp": "SMenuBar",
+      "tag": "menubar",
+      "category": "commands",
+      "sample": "sample_menubar",
+      "scope": "live",
+      "style": "gallery_quiet / MenuEx items",
+      "definition": "SOUI/include/control/SMenuBar.h"
+    },
+    {
+      "cpp": "SSwitch",
+      "tag": "switch",
+      "category": "selection",
+      "sample": "sample_switch",
+      "scope": "live",
+      "style": "gallery_switch_track / thumb",
+      "definition": "SOUI/include/control/SSwitch.h"
+    },
+    {
+      "cpp": "SSearchDropdownList",
+      "tag": "searchdropdownlist",
+      "category": "combo",
+      "sample": "sample_suggestions",
+      "scope": "live",
+      "style": "virtual listStyle / dropdownStyle",
+      "definition": "SOUI/include/control/SSearchDropdownList.h"
+    },
+    {
+      "cpp": "SToolBar",
+      "tag": "toolbar",
+      "category": "commands",
+      "sample": "sample_toolbar",
+      "scope": "live",
+      "style": "gallery_toolbar_icons / quiet",
+      "definition": "SOUI/include/control/SToolBar.h"
+    },
+    {
+      "cpp": "SDockBar",
+      "tag": "dockbar",
+      "category": "containers",
+      "sample": "sample_dockbar",
+      "scope": "live",
+      "style": "gallery_subtle / mini.close",
+      "definition": "SOUI/include/control/SDockBar.h"
+    },
+    {
+      "cpp": "SRebar",
+      "tag": "rebar",
+      "category": "commands",
+      "sample": "sample_rebar",
+      "scope": "live",
+      "style": "gallery_stroke / fluent_text_secondary",
+      "definition": "SOUI/include/control/SRebar.h"
+    },
+    {
+      "cpp": "SKeyboardSpacer",
+      "tag": "keyboardSpacer",
+      "category": "input",
+      "sample": "sample_keyboardspacer",
+      "scope": "composite",
+      "style": "IME-dependent layout (desktop height 0)",
+      "definition": "SOUI/include/control/SCmnCtrl.h"
+    },
+    {
+      "cpp": "SModalRoot",
+      "tag": "modalroot",
+      "category": "dialog",
+      "sample": "sample_modalroot",
+      "scope": "dynamic",
+      "style": "40% scrim / modal session",
+      "definition": "SOUI/include/core/SModalViewSession.h"
+    },
+    {
+      "cpp": "SModalView",
+      "tag": "modalview",
+      "category": "dialog",
+      "sample": "sample_modalview",
+      "scope": "dynamic",
+      "style": "gallery_card",
+      "definition": "SOUI/include/core/SModalViewSession.h"
+    },
+    {
+      "cpp": "SActiveX",
+      "tag": "activex",
+      "category": "hosting",
+      "sample": "sample_activex_usage",
+      "scope": "platform_recipe",
+      "style": "external COM server owns its internal UI",
+      "definition": "SOUI/include/control/SActiveX.h"
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+<menuRoot itemSkin="_skin.sys.menu.skin" checkSkin="_skin.sys.menu.check" arrowSkin="_skin.sys.menu.arrow" sepSkin="_skin.sys.menu.sep" colorText="@color/fluent_text" colorTextDisable="@color/fluent_text_disabled" iconBarWidth="28dp" itemHeight="34dp" skin="_skin.sys.menu.border" colorBkgnd="@color/fluent_card_bg" padding="4dp,4dp,4dp,4dp" minWidth="210dp">
+  <menuItem id="4710" text="New collection" />
+  <menuItem id="4711" text="Rename collection" />
+  <sep />
+  <menuItem id="4712" text="Archive" />
+</menuRoot>

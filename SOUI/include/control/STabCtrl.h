@@ -161,15 +161,14 @@ class SOUI_EXP STabCtrl
     SAutoRefPtr<SFloatAnimator> m_aniSlider;
 
     /** === Android ViewPager-style drag-to-switch page ===
-     * Enabled by enableDragSwitch. The container's touch interception chain
+     * Enabled by enableGesture (drag + fling). The container's touch interception chain
      * (SWindow::OnInterceptTouchEvent / OnTouchEvent) decides gesture ownership;
      * SGestureDetector supplies touch slop, axis arbitration and velocity.
      * STabSlider is driven by the finger instead of an animator while dragging.
      */
-    BOOL m_bDragSwitchEnable;     /**< enableDragSwitch, default FALSE */
+    BOOL m_bDragSwitchEnable;     /**< enableGesture: drag + fling master switch, default FALSE */
     SLayoutSize m_nDragThreshold; /**< dragThreshold, default 8dp */
     int m_nDragSwitchRatio;       /**< dragSwitchRatio in percent, default 35 */
-    BOOL m_bDragFlingEnable;      /**< dragFling: allow velocity to commit, default TRUE */
     int m_nDragCommitDuration;    /**< dragCommitDuration in ms, 0 = finish immediately */
 
     SGestureDetector m_gesture; /**< GestureDetector + VelocityTracker equivalent */
@@ -542,10 +541,9 @@ class SOUI_EXP STabCtrl
             ATTR_ENUM_VALUE(L"vertical", Text_Vert)   /**< Vertical text direction. */
         ATTR_ENUM_END(m_txtDir)
         ATTR_CHAIN_PTR_PREFIX(m_aniSlider, 0, SAttrChainPrefix::SLIDER) /**< Chain attributes to slider animator. */
-        ATTR_BOOL(L"enableDragSwitch", m_bDragSwitchEnable, FALSE)      /**< Enable drag-to-switch-page gesture. */
+        ATTR_BOOL(L"enableGesture", m_bDragSwitchEnable, FALSE)      /**< Enable drag + velocity fling to switch page. */
         ATTR_LAYOUTSIZE(L"dragThreshold", m_nDragThreshold, FALSE)      /**< Drag threshold along the active axis. */
         ATTR_INT(L"dragSwitchRatio", m_nDragSwitchRatio, FALSE)         /**< Commit ratio in percent of page size. */
-        ATTR_BOOL(L"dragFling", m_bDragFlingEnable, FALSE)              /**< Allow release velocity to commit a switch. */
         ATTR_INT(L"dragCommitDuration", m_nDragCommitDuration, FALSE)   /**< Commit/back animation duration in ms, 0 = immediate. */
     SOUI_ATTRS_END()
 };

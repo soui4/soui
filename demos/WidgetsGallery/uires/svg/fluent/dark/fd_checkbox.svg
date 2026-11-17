@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="20" viewBox="0 0 160 20">
+  <g id="state0" transform="translate(0, 0)">
+    <rect x="1.5" y="1.5" width="17" height="17" rx="4" fill="none" stroke="#9E9E9E" stroke-width="1"/>
+  </g>
+  <g id="state1" transform="translate(20, 0)">
+    <rect x="1.5" y="1.5" width="17" height="17" rx="4" fill="#383838" stroke="#C8C8C8" stroke-width="1"/>
+  </g>
+  <g id="state2" transform="translate(40, 0)">
+    <rect x="1.5" y="1.5" width="17" height="17" rx="4" fill="#414141" stroke="#5C5C5C" stroke-width="1"/>
+  </g>
+  <g id="state3" transform="translate(60, 0)">
+    <rect x="1.5" y="1.5" width="17" height="17" rx="4" fill="none" stroke="#5C5C5C" stroke-width="1"/>
+  </g>
+  <g id="state4" transform="translate(80, 0)">
+    <rect x="1.5" y="1.5" width="17" height="17" rx="4" fill="#60CDFF" stroke="#60CDFF" stroke-width="1"/>
+    <path d="M5.5,10.2 L8.8,13.4 L14.5,7.2" fill="none" stroke="#000000" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g id="state5" transform="translate(100, 0)">
+    <rect x="1.5" y="1.5" width="17" height="17" rx="4" fill="#7BD9FF" stroke="#7BD9FF" stroke-width="1"/>
+    <path d="M5.5,10.2 L8.8,13.4 L14.5,7.2" fill="none" stroke="#000000" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g id="state6" transform="translate(120, 0)">
+    <rect x="1.5" y="1.5" width="17" height="17" rx="4" fill="#54C7F5" stroke="#54C7F5" stroke-width="1"/>
+    <path d="M5.5,10.2 L8.8,13.4 L14.5,7.2" fill="none" stroke="#000000" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g id="state7" transform="translate(140, 0)">
+    <rect x="1.5" y="1.5" width="17" height="17" rx="4" fill="#2F2F2F" stroke="#5C5C5C" stroke-width="1"/>
+    <path d="M5.5,10.2 L8.8,13.4 L14.5,7.2" fill="none" stroke="#5C5C5C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

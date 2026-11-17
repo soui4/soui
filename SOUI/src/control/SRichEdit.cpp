@@ -28,6 +28,7 @@ extern "C"
 }
 #endif /**< INIT_RICHEDIT */
 
+#ifndef SOUI_EDIT_LITE
 SNSBEGIN
 ///////////////////////////////////////////////////////////////////////
 /** STextServiceHelper */
@@ -106,8 +107,14 @@ STextServiceHelper::STextServiceHelper()
     else
     {
 #ifndef _WIN32
+        // dlerror() legally returns NULL when no diagnostic is available (the
+        // swinx FreeRTOS shim always does, and glibc only resets it on the next
+        // dl* call).  Passing NULL to printf's %s is UB: glibc prints
+        // "(null)", but newlib's vfprintf dereferences it -- on the ESP32-S3
+        // target that is a LoadProhibited panic inside SApplication's
+        // constructor, several frames away from the real problem.
         const char *err = dlerror();
-        printf("load so failed, err=%s\n", err);
+        printf("load so failed, err=%s\n", err ? err : "(no dlerror message)");
 #endif
     }
 #endif // INIT_RICHEDIT
@@ -1294,7 +1301,7 @@ void SRichEdit::OnSetFocus(SWND wndOld)
             SetSel((DWORD)MAKELONG(0, -1), TRUE);
     }
 
-    if (m_dwStyle & (ES_NUMBER|ES_PASSWORD|ES_READONLY))
+    if (m_dwStyle & (ES_NUMBER | ES_PASSWORD | ES_READONLY))
     {
         GetContainer()->EnableIME(FALSE);
     }
@@ -2392,3 +2399,5 @@ BOOL SRichEdit::IsRichScale() const
 }
 
 SNSEND
+
+#endif // SOUI_EDIT_LITE

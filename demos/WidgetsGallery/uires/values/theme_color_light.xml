@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='utf-8'?>
+<UIDEF>
+  <color>
+    <thm_color value="#FFFFFF" />
+    <thm_border value="#E5E5E5" />
+    <thm_txt_normal value="#1B1B1B" />
+    <thm_txt_hover value="#000000" />
+    <thm_txt_push value="#616161" />
+    <thm_txt_disable value="#9B9B9B" />
+    <thm_txt_disabled value="#9B9B9B" />
+    <fluent_window_bg value="#F3F3F3" />
+    <fluent_card_bg value="#FFFFFF" />
+    <fluent_fill_hover value="#F5F5F5" />
+    <fluent_fill_pressed value="#EBEBEB" />
+    <fluent_fill_ctrl value="#EAEAEA" />
+    <fluent_border value="#E5E5E5" />
+    <fluent_divider value="#E0E0E0" />
+    <fluent_text value="#1B1B1B" />
+    <fluent_text_secondary value="#616161" />
+    <fluent_text_disabled value="#9B9B9B" />
+    <fluent_accent value="#0067C0" />
+    <fluent_accent_hover value="#1975C5" />
+    <fluent_accent_pressed value="#3183CA" />
+    <fluent_on_accent value="#FFFFFF" />
+    <fluent_close_hover value="#C42B1C" />
+    <gallery_sidebar value="#F7F8FA" />
+    <gallery_canvas value="#F3F5F8" />
+    <gallery_subtle value="#F7F9FC" />
+    <gallery_stroke value="#E5E5E5" />
+    <gallery_success value="#0F7B0F" />
+    <gallery_warning value="#B96B00" />
+    <gallery_lilac value="#7664CA" />
+  </color>
+</UIDEF>

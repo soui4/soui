@@ -152,6 +152,7 @@ fun_test/
 │                     # SetEndOfFile 截断、GetFileSizeEx、
 │                     # GetCurrentDirectory/SetCurrentDirectory、Get/SetFileTime 往返、
 │                     # GetStdHandle 写出（invalid selector → INVALID_HANDLE_VALUE）、
+│                     # _wfopen 宽路径往返（路径/模式都转 UTF-8，缺失路径返回 NULL）、
 │                     # 打开既有 uires.zip 并读取（自 test.cpp 迁入）
 ├── test_string.cpp   # 字符串：UTF-8/CP936 转换回环、GetStringTypeExW/A（ctype1 回归用例）、
 │                     # CharLower/lstrlen
@@ -163,7 +164,8 @@ fun_test/
 │                     #  GetTabbedTextExtent 默认 8 字符制表位；世界变换：Set/Modify/
 │                     #  GetWorldTransform 平移与缩放、LPtoDP/DPtoLP 往返、MWT_IDENTITY 重置）├── test_hook.cpp     # 钩子：Set/Unhook/CallHook 分发与类型隔离、
 │                     # 并发 unhook vs CallHook 回归用例（引用计数生命周期修复）
-├── test_time.cpp     # 时间：GetTickCount 单调性、QueryPerformanceCounter/Frequency、
+├── test_time.cpp     # 时间：GetTickCount 单调性、QueryPerformanceCounter/Frequency
+│                     # （swinx 侧刻度固定 10 MHz）、
 │                     # GetLocalTime/GetSystemTime 合法性、FILETIME 转换族
 │                     # （CompareFileTime 排序、LocalFileTime 双向往返、DOS 日期时间往返）
 ├── test_oleauto.cpp  # OLE 自动化数据 API：BSTR（SysAllocString/AllocLen/AllocByteLen、
@@ -261,19 +263,25 @@ fun_test/
 │                     # （组件级语义：盘根含分隔符、部分组件不算、大小写不敏感；
 │                     #   POSIX 侧 '/' 根非组件边界，CP("/foobar","/foo")=0），
 │                     # CoCreateGuid 唯一性、SafeArray 全生命周期
-├── test_misc.cpp     # 杂项：环境变量、MulDiv（四舍五入语义）、IsBadReadPtr（注释保留）、
-│                     # InterlockedCompareExchange/Decrement、Sleep 最短时长、
+├── test_misc.cpp     # 杂项：环境变量、MulDiv（四舍五入语义；除数为 0 / 结果溢出都返回 -1，
+│                     # 前者另置 ERROR_INT_DIVIDE_BY_ZERO，仅非 Windows）、IsBadReadPtr（注释保留）、
+│                     # InterlockedCompareExchange/Decrement、InterlockedExchangeAdd
+│                     # （**返回加之前的值**——posix 侧曾用 __sync_add_and_fetch 返回新值）、
+│                     # SetLastError/GetLastError 往返、Sleep 最短时长、
 │                     # Sleep(1000) 真的睡满（tv_usec 越界回归）
 │                     # GetSystemInfo/GetVersionEx(NT 平台位)、GetCommandLineA 非空、
 │                     # GetComputerName/GetUserName（nSize 语义：前者不含 NUL、后者含）、
 │                     # IsBadStringPtrA、IsDBCSLeadByte（swinx=UTF-8 首字节判定，仅非 Windows）、
-│                     # GetSystemMetrics（屏幕/边框正值）、SMatrix 缩放矩阵乘法组合
+│                     # GetSystemMetrics（屏幕/边框正值）、
+│                     # DPI 缩放钩子（SM_CXICON=32×scale/100、macOS 光标不放大，仅非 Windows）、
+│                     # LoadCursorA/W 拿同一共享句柄、GetDoubleClickTime 单一来源、SMatrix 缩放矩阵乘法组合
 │                     # （自 test.cpp 迁入）
 ├── test_strapi.cpp   # 字符串辅助：_splitpath/_wsplitpath（绝对/相对/混合分隔符/多点扩展名、
 │                     # 盘符仅真机）、CharNextA（ASCII 步进；UTF-8 多字节步进仅非 Windows）、
 │                     # CharToOem/OemToChar（A/W 往返、Buff 按长度转换不终止）、
-│                     # StrToIntExA/StrToInt64ExA（符号、前导零、截断于首个非数字、
-│                     # 0x 十六进制需 STIF_SUPPORT_HEX、int64 全幅、非数字拒绝）、
+│                     # StrToIntExA/StrToInt64ExA/W（符号、前导零=十进制而非八进制、前导空白
+│                     # 只认空格/\t/\n、截断于首个非数字、0x 十六进制需 STIF_SUPPORT_HEX 且
+│                     # 符号被丢弃、失败时输出参数清 0、int64 全幅、非数字拒绝、W 与 A 逐例一致）、
 │                     # GetACP（swinx=CP_UTF8）/IsValidCodePage
 ├── test_kernel.cpp   # 内核对象：TLS、Atom（本地/全局表）、SRWLock TryAcquire、
 │                     # 可等待定时器（一次性/周期/取消/重设 due/命名 Open/TimerQueue，全工程

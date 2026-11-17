@@ -48,6 +48,38 @@ TEST(swinx_misc, mul_div_rounds_to_nearest)
     EXPECT_EQ(MulDiv(-1, 1, 2), -1);
 }
 
+// 除数为 0 / 结果溢出都返回 -1（Win32 的取值），不是崩溃也不是 0。
+// swinx 另外置 ERROR_INT_DIVIDE_BY_ZERO；真实 Windows 的 MulDiv 不置 last error
+// （实测 err=0），所以那条断言只在 swinx 侧成立。
+TEST(swinx_misc, mul_div_failure_paths)
+{
+    EXPECT_EQ(MulDiv(1, 1, 0), -1);
+    EXPECT_EQ(MulDiv(0, 0, 0), -1);
+
+#ifndef _WIN32
+    SetLastError(0);
+    EXPECT_EQ(MulDiv(1, 1, 0), -1);
+    EXPECT_EQ(GetLastError(), (DWORD)ERROR_INT_DIVIDE_BY_ZERO);
+#endif
+
+    // 结果超出 int 范围
+    EXPECT_EQ(MulDiv(2147483647, 2, 1), -1);
+    EXPECT_EQ(MulDiv(2147483647, -2, 1), -1);
+    // 边界内不能被误判成溢出
+    EXPECT_EQ(MulDiv(2147483647, 1, 1), 2147483647);
+}
+
+// SetLastError / GetLastError 在 swinx 上是 errno 的代理（各平台同一条口径，
+// 所以这两个函数被下沉到 common/sysapi.cpp）。语义要求：存什么读什么。
+TEST(swinx_misc, last_error_roundtrip)
+{
+    SetLastError(1234);
+    EXPECT_EQ(GetLastError(), 1234);
+
+    SetLastError(0);
+    EXPECT_EQ(GetLastError(), 0);
+}
+
 //TEST(swinx_misc, is_bad_read_ptr)
 //{
 //    int local = 42;
@@ -72,6 +104,26 @@ TEST(swinx_misc, interlocked_decrement)
     LONG v = 5;
     EXPECT_EQ(InterlockedDecrement(&v), 4);
     EXPECT_EQ(v, 4);
+}
+
+// Regression：InterlockedExchangeAdd 必须返回**加之前**的值（Win32 语义）。
+// 下沉时抓到 posix 侧用的是 __sync_add_and_fetch（返回加完之后的值），
+// freertos 侧用 __atomic_fetch_add（正确）—— 两份逐字"看起来一样"的实现里
+// 藏着这条分叉。原来的唯一调用点（STls.cpp）传的增量是 0，所以一直没暴露；
+// 这条用例用非零增量把它锁死。
+TEST(swinx_misc, interlocked_exchange_add_returns_previous_value)
+{
+    LONG v = 10;
+    EXPECT_EQ(InterlockedExchangeAdd(&v, 5), 10);
+    EXPECT_EQ(v, 15);
+
+    // 负增量同样是"返回加之前的值"
+    EXPECT_EQ(InterlockedExchangeAdd(&v, -20), 15);
+    EXPECT_EQ(v, -5);
+
+    // 增量为 0：旧值与新值相同，只能验证不破坏原值
+    EXPECT_EQ(InterlockedExchangeAdd(&v, 0), -5);
+    EXPECT_EQ(v, -5);
 }
 
 TEST(swinx_misc, sleep_at_least_requested)
@@ -214,6 +266,58 @@ TEST(swinx_metrics, screen_metrics_positive)
     // border/edge metrics are small positive values on both platforms
     EXPECT_GT(GetSystemMetrics(SM_CXEDGE), 0);
     EXPECT_GT(GetSystemMetrics(SM_CYEDGE), 0);
+}
+
+#ifndef _WIN32
+// GetSystemMetrics 的 SM_* 取值表已下沉到 common/sysapi.cpp，唯一留给平台的是
+// swinx_system_metric_scale()（"这个度量值要不要按 DPI 放大"）。下面用两条互逆的
+// 关系把这个钩子锁住：如果它返回 0（忘了实现）或漏乘，图标尺寸立刻对不上。
+// GetSystemScale() 是 swinx 自有的（声明在 swinx/include/sysapi.h，windows.h 里已带），
+// 真实 Windows 上没有这个符号，所以整条用例只在 swinx 侧跑。
+TEST(swinx_metrics, dpi_scale_hook_reaches_fixed_metrics)
+{
+    const int scale = GetSystemScale();
+    ASSERT_GT(scale, 0); // 0 会让所有可缩放度量变成 0
+
+    EXPECT_EQ(GetSystemMetrics(SM_CXICON), MulDiv(32, scale, 100));
+    EXPECT_EQ(GetSystemMetrics(SM_CYICON), MulDiv(32, scale, 100));
+    EXPECT_EQ(GetSystemMetrics(SM_CXSMICON), 16); // 小图标不在取值表里乘，保持原值
+    EXPECT_EQ(GetSystemMetrics(SM_CXMINTRACK), MulDiv(6, scale, 100));
+
+#ifdef __APPLE__
+    // 平台契约里唯一的例外：CoreGraphics 的光标尺寸本身就是 point，再乘 DPI 会翻倍
+    EXPECT_EQ(GetSystemMetrics(SM_CXCURSOR), 24);
+#else
+    EXPECT_EQ(GetSystemMetrics(SM_CXCURSOR), MulDiv(24, scale, 100));
+#endif
+}
+#endif // !_WIN32
+
+// GetDoubleClickTime 现在只转发到 SConnection::GetDoubleClickTime()。
+// 旧 freertos 在 win32_rich.cpp 里还留着一份硬编码 500 的副本，与它自己
+// SConnection 里的 400 互相矛盾（板上双击间隔因此差了 100ms）。这里至少保证它
+// 有单一来源、稳定、非零，且在人类可用的区间内。
+TEST(swinx_misc, double_click_time_is_stable_and_sane)
+{
+    const UINT t = GetDoubleClickTime();
+    EXPECT_GE(t, 100u);
+    EXPECT_LE(t, 5000u);
+    EXPECT_EQ(GetDoubleClickTime(), t);
+}
+
+// LoadCursorW 随第二批下沉进 common：资源 ID（IS_INTRESOURCE）分支转发到 A 版。
+// 标准光标是进程内共享对象，两条入口必须拿到同一个句柄 —— 否则 wke 的
+// SharedCursor 缓存会漏，退出时还可能重复释放。
+TEST(swinx_misc, load_cursor_w_resource_matches_ansi)
+{
+    // IDC_ARROW 展开成 MAKEINTRESOURCE，类型随 UNICODE 宏在 LPSTR/LPWSTR 之间切换，
+    // 两条入口各自显式转型
+    HCURSOR a = LoadCursorA(NULL, (LPCSTR)IDC_ARROW);
+    ASSERT_TRUE(a != NULL);
+
+    HCURSOR w = LoadCursorW(NULL, (LPCWSTR)IDC_ARROW);
+    ASSERT_TRUE(w != NULL);
+    EXPECT_EQ(a, w);
 }
 
 // 迁自 test.cpp（原 soui.matrix）：SOUI SMatrix 缩放矩阵的乘法组合律

@@ -82,9 +82,9 @@
     <!-- ============ 基金页签（收藏列表 + 多基金工作区） ============ -->
     <window size="-2,74" layout="hbox" padding_left="16" padding_right="16" padding_top="10">
       <!-- sbWid=0：滚动条占位 0px 不显示，但 HasScrollBar(horz) 仍为真，SPanel 的
-           拖拽滚动 / fling 惯性才可用；enableDragScroll 显式打开拖拽。 -->
+           拖拽滚动 / fling 惯性才可用；enableGesture 显式打开拖拽。 -->
       <fundwatchtabs name="watch_tabs" size="0,-2" weight="1" cursor="hand"
-                     sbWid="0" enableDragScroll="1"/>
+                     sbWid="0" enableGesture="1"/>
       <text name="txt_watch_cnt" text="0 只" font="f11" colorText="#77849a" size="-1,-2"
             extend_left="10" gravity="center"/>
     </window>
@@ -96,8 +96,8 @@
          对前后两页拍快照并跟手平移，松手后 CommitDrag 连续滑到目标页；模板里的
          pane_swipe 用的是同一套 tabctrl 换页动画。 -->
     <tabctrl name="fund_swipe" size="-2,0" weight="1"
-             tabWidth="0" tabHeight="0" enableDragSwitch="1"
-             dragThreshold="8" dragSwitchRatio="35" dragFling="1" dragCommitDuration="200"/>
+             tabWidth="0" tabHeight="0" enableGesture="1"
+             dragThreshold="8" dragSwitchRatio="35" dragCommitDuration="200"/>
       </window> <!-- /view_main -->
 
       <!-- ===== 0 支基金：空界面（工具栏、指数条、状态栏保持常驻） ===== -->

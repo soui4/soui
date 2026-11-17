@@ -279,6 +279,7 @@ BOOL ExpLua_ICtrl(lua_State *L)
 		lua_tinker::class_def<IHotKeyCtrl>(L,"GetHotKey",&IHotKeyCtrl:: GetHotKey);
 		DEF_QICTRL(L,IHotKeyCtrl,SHotKeyCtrl);
 
+#ifndef SOUI_EDIT_LITE
 		lua_tinker::class_add<IRichEdit>(L,"IRichEdit");
 		lua_tinker::class_inh<IRichEdit,ICtrl>(L);
 		lua_tinker::class_def<IRichEdit>(L,"SaveRtf",&IRichEdit::SaveRtf);
@@ -300,6 +301,7 @@ BOOL ExpLua_ICtrl(lua_State *L)
 		lua_tinker::class_def<IRichEdit>(L,"SetSaveSelection",&IRichEdit::SetSaveSelection);
 		lua_tinker::class_def<IRichEdit>(L,"SetDefaultTextColor",&IRichEdit::SetDefaultTextColor);
 		DEF_QICTRL(L,IRichEdit,SRichEdit);
+#endif
 
 		lua_tinker::class_add<IEdit>(L,"IEdit");
 		lua_tinker::class_inh<IEdit,ICtrl>(L);

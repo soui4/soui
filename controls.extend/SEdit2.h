@@ -1,7 +1,8 @@
 ﻿#ifndef _SEDIT2_H_
 #define _SEDIT2_H_
 
-#include <control/SRichEdit.h>
+#include <control/SEdit.h>
+
 SNSBEGIN
 
 #ifndef EVT_EDIT2_BEGIN

@@ -85,7 +85,7 @@ void CServerDlg::OnInit(IEvtArgs *e)
 {
     SetWindowText(SVR_NAME);
     m_ipcSvr->Init((ULONG_PTR)m_hWnd, this);
-    m_reLog = FindChildByName2<SRichEdit>(_T("re_log"));
+    m_reLog = FindChildByName2<SEdit>(_T("re_log"));
 }
 
 BOOL CServerDlg::OnEnumClient(IIpcConnection *pConn, ULONG_PTR data)

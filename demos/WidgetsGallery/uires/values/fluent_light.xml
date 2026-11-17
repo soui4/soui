@@ -1,0 +1,99 @@
+<?xml version='1.0' encoding='utf-8'?>
+<skin>
+  <imglist name="_skin.sys.radio" src="SVG:FL_RADIO" states="8" checkAsPushdown="0" />
+  <imglist name="_skin.sys.focusradio" src="SVG:FL_FOCUS_RADIO" />
+  <imglist name="_skin.sys.checkbox" src="SVG:FL_CHECKBOX" states="8" checkAsPushdown="0" />
+  <imglist name="_skin.sys.focuscheckbox" src="SVG:FL_FOCUS_CHECKBOX" />
+  <imglist name="_skin.sys.dropbtn" src="SVG:FL_DROPBTN" states="3" />
+  <imgframe name="_skin.sys.border" src="SVG:FL_BORDER" states="2" margin="4,4,4,4" />
+  <imgframe name="_skin.sys.header" src="SVG:FL_HEADER" states="4" margin-x="2" margin-y="2" />
+  <imgframe name="_skin.sys.list.item" src="SVG:FL_LIST_ITEM" states="4" margin="5,5,5,5" />
+  <imgframe name="_skin.sys.tab.page" src="SVG:FL_TAB_PAGE" states="4" margin="5,2,5,7" />
+  <imgframe name="_skin.sys.tab.header" src="SVG:FL_TAB_HEADER" states="4" margin="3,3,3,3" />
+  <scrollbar name="_skin.sys.scrollbar" src="SVG:FL_SCROLLBAR" margin="4" hasgripper="0" />
+  <imglist name="_skin.sys.menu.check" src="SVG:FL_MENU_CHECK" states="3" />
+  <imglist name="_skin.sys.menu.sep" src="SVG:FL_MENU_SEP" />
+  <imglist name="_skin.sys.menu.arrow" src="SVG:FL_MENU_ARROW" states="2" />
+  <imgframe name="_skin.sys.menu.border" src="SVG:FL_MENU_BORDER" margin-x="2" margin-y="2" />
+  <imgframe name="_skin.sys.menu.skin" src="SVG:FL_MENU_SKIN" states="2" margin="26,2,5,2" />
+  <imglist name="_skin.sys.btn.minimize" src="SVG:FL_BTN_MIN" states="3" />
+  <imglist name="_skin.sys.btn.maximize" src="SVG:FL_BTN_MAX" states="3" />
+  <imglist name="_skin.sys.btn.restore" src="SVG:FL_BTN_RESTORE" states="3" />
+  <imglist name="_skin.sys.btn.close" src="SVG:FL_BTN_CLOSE" states="3" />
+  <imglist name="_skin.sys.btn.mini.close" src="SVG:FL_BTN_MINI_CLOSE" states="4" />
+  <imgframe name="_skin.sys.wnd.bkgnd" src="SVG:FL_WND_BKGND" left="9" right="9" top="9" bottom="9" />
+  <colorrect name="_skin.sys.selband" normal="rgba(0,103,192,12%)" normalBorder="#0067C0" borderWidth="1" cornerRadius="3" />
+  <imgframe name="fluent_card" src="SVG:FL_CARD" left="9" right="9" top="9" bottom="9" />
+  <imgframe name="fluent_popup" src="SVG:FL_POPUP" left="9" right="9" top="9" bottom="9" />
+  <imgframe name="fluent_edit" src="SVG:FL_EDIT" states="2" margin="4,4,4,4" />
+  <imgframe name="fluent_edit_focus" src="SVG:FL_EDIT_FOCUS" margin="4,4,4,4" />
+  <imgframe name="fluent_btn_primary" src="SVG:FL_BTN_PRIMARY" states="4" margin="6,6,6,6" />
+  <imgframe name="fluent_btn_secondary" src="SVG:FL_BTN_SECONDARY" states="4" margin="6,6,6,6" />
+  <imglist name="fluent_btn_icon_theme" src="SVG:FL_BTN_ICON_THEME" states="4" />
+  <imgframe name="_skin.sys.btn.normal" src="SVG:FL_BTN_SECONDARY" states="4" margin="6,6,6,6" />
+  <imgframe name="gallery_toggle" src="SVG:GALLERY_LIGHT_GALLERY_TOGGLE" states="8" margin="6,6,6,6" checkAsPushdown="0" />
+  <imglist name="gallery_switch_track" src="SVG:GALLERY_LIGHT_GALLERY_SWITCH_TRACK" states="1" />
+  <imglist name="gallery_switch_thumb" src="SVG:GALLERY_LIGHT_GALLERY_SWITCH_THUMB" states="8" checkAsPushdown="0" />
+  <imglist name="gallery_arrow_up" src="SVG:GALLERY_LIGHT_GALLERY_ARROW_UP" states="4" />
+  <imglist name="gallery_arrow_down" src="SVG:GALLERY_LIGHT_GALLERY_ARROW_DOWN" states="4" />
+  <imglist name="gallery_arrow_prev" src="SVG:GALLERY_LIGHT_GALLERY_ARROW_PREV" states="4" />
+  <imglist name="gallery_arrow_next" src="SVG:GALLERY_LIGHT_GALLERY_ARROW_NEXT" states="4" />
+  <imglist name="gallery_tree_expander" src="SVG:GALLERY_LIGHT_GALLERY_TREE_EXPANDER" states="8" checkAsPushdown="0" />
+  <imglist name="gallery_sort" src="SVG:GALLERY_LIGHT_GALLERY_SORT" states="2" />
+  <imglist name="gallery_toolbar_icons" src="SVG:GALLERY_LIGHT_GALLERY_TOOLBAR_ICONS" states="3" />
+  <imglist name="gallery_image_button" src="SVG:GALLERY_LIGHT_GALLERY_IMAGE_BUTTON" states="4" />
+  <imglist name="gallery_spinner" src="SVG:GALLERY_LIGHT_GALLERY_SPINNER" states="12" />
+  <imglist name="gallery_separator" src="SVG:GALLERY_LIGHT_GALLERY_SEPARATOR" states="1" />
+  <imgframe name="gallery_nav" src="SVG:GALLERY_LIGHT_GALLERY_NAV" states="4" margin="6,6,6,6" />
+  <imgframe name="gallery_nav_selected" src="SVG:GALLERY_LIGHT_GALLERY_NAV_SELECTED" states="4" margin="6,6,6,6" />
+  <imgframe name="gallery_card" src="SVG:GALLERY_LIGHT_GALLERY_CARD" states="1" margin="9,9,9,9" />
+  <imgframe name="gallery_subtle" src="SVG:GALLERY_LIGHT_GALLERY_SUBTLE" states="1" margin="9,9,9,9" />
+  <imgframe name="gallery_badge" src="SVG:GALLERY_LIGHT_GALLERY_BADGE" states="1" margin="6,6,6,6" />
+  <imgframe name="gallery_quiet" src="SVG:GALLERY_LIGHT_GALLERY_QUIET" states="4" margin="6,6,6,6" />
+  <imgframe name="gallery_focus" src="SVG:GALLERY_LIGHT_GALLERY_FOCUS" states="1" margin="7,7,7,7" />
+  <imgframe name="gallery_progress_track" src="SVG:GALLERY_LIGHT_GALLERY_PROGRESS_TRACK" states="1" margin="2,1,2,1" />
+  <imgframe name="gallery_progress_blue" src="SVG:GALLERY_LIGHT_GALLERY_PROGRESS_BLUE" states="1" margin="2,1,2,1" />
+  <imgframe name="gallery_progress_green" src="SVG:GALLERY_LIGHT_GALLERY_PROGRESS_GREEN" states="1" margin="2,1,2,1" />
+  <imgframe name="gallery_progress_orange" src="SVG:GALLERY_LIGHT_GALLERY_PROGRESS_ORANGE" states="1" margin="2,1,2,1" />
+  <imgframe name="gallery_progress_lilac" src="SVG:GALLERY_LIGHT_GALLERY_PROGRESS_LILAC" states="1" margin="2,1,2,1" />
+  <imgframe name="gallery_progress_track_pill" src="SVG:GALLERY_LIGHT_GALLERY_PROGRESS_TRACK_PILL" states="1" margin="8,8,8,8" />
+  <imgframe name="gallery_progress_pill" src="SVG:GALLERY_LIGHT_GALLERY_PROGRESS_PILL" states="1" margin="8,8,8,8" />
+  <imglist name="gallery_slider_thumb" src="SVG:GALLERY_LIGHT_GALLERY_SLIDER_THUMB" states="4" />
+  <imglist name="gallery_tree_toggle" src="SVG:GALLERY_LIGHT_GALLERY_TREE_TOGGLE" states="6" />
+  <imglist name="_skin.sys.tree.checkbox" src="SVG:GALLERY_LIGHT_GALLERY_TREE_CHECKBOX" states="9" />
+  <treelines name="_skin.sys.tree.lines" lineWidth="1" colorLine="#E5E5E5" colorCross="#616161" />
+  <imglist name="_skin.sys.slider.thumb" src="SVG:GALLERY_LIGHT_GALLERY_SLIDER_THUMB" states="4" />
+  <imglist name="_skin.sys.tree.toggle" src="SVG:GALLERY_LIGHT_GALLERY_TREE_TOGGLE" states="6" />
+  <imgframe name="gallery_btn_quiet" src="SVG:GALLERY_LIGHT_GALLERY_QUIET" states="4" margin="6,6,6,6" />
+  <imgframe name="gallery_progress_amber" src="SVG:GALLERY_LIGHT_GALLERY_PROGRESS_PILL" states="1" margin="8,8,8,8" />
+  <imgframe name="gallery_progress_purple" src="SVG:GALLERY_LIGHT_GALLERY_PROGRESS_LILAC" states="1" margin="2,1,2,1" />
+  <imglist name="gallery_icon_home" src="SVG:GALLERY_LIGHT_ICON_HOME" states="1" />
+  <imglist name="gallery_icon_buttons" src="SVG:GALLERY_LIGHT_ICON_BUTTONS" states="1" />
+  <imglist name="gallery_icon_selection" src="SVG:GALLERY_LIGHT_ICON_SELECTION" states="1" />
+  <imglist name="gallery_icon_input" src="SVG:GALLERY_LIGHT_ICON_INPUT" states="1" />
+  <imglist name="gallery_icon_combo" src="SVG:GALLERY_LIGHT_ICON_COMBO" states="1" />
+  <imglist name="gallery_icon_progress" src="SVG:GALLERY_LIGHT_ICON_PROGRESS" states="1" />
+  <imglist name="gallery_icon_slider" src="SVG:GALLERY_LIGHT_ICON_SLIDER" states="1" />
+  <imglist name="gallery_icon_list" src="SVG:GALLERY_LIGHT_ICON_LIST" states="1" />
+  <imglist name="gallery_icon_tree" src="SVG:GALLERY_LIGHT_ICON_TREE" states="1" />
+  <imglist name="gallery_icon_tabs" src="SVG:GALLERY_LIGHT_ICON_TABS" states="1" />
+  <imglist name="gallery_icon_dialog" src="SVG:GALLERY_LIGHT_ICON_DIALOG" states="1" />
+  <imglist name="gallery_icon_icons" src="SVG:GALLERY_LIGHT_ICON_ICONS" states="1" />
+  <imglist name="gallery_icon_type" src="SVG:GALLERY_LIGHT_ICON_TYPE" states="1" />
+  <imglist name="gallery_icon_layout" src="SVG:GALLERY_LIGHT_ICON_LAYOUT" states="1" />
+  <imglist name="gallery_icon_search" src="SVG:GALLERY_LIGHT_ICON_SEARCH" states="1" />
+  <imglist name="gallery_icon_chevron" src="SVG:GALLERY_LIGHT_ICON_CHEVRON" states="1" />
+  <imglist name="gallery_icon_check" src="SVG:GALLERY_LIGHT_ICON_CHECK" states="1" />
+  <imglist name="gallery_icon_copy" src="SVG:GALLERY_LIGHT_ICON_COPY" states="1" />
+  <imglist name="gallery_icon_play" src="SVG:GALLERY_LIGHT_ICON_PLAY" states="1" />
+  <imglist name="gallery_icon_reset" src="SVG:GALLERY_LIGHT_ICON_RESET" states="1" />
+  <imglist name="gallery_icon_code" src="SVG:GALLERY_LIGHT_ICON_CODE" states="1" />
+  <imglist name="gallery_icon_info" src="SVG:GALLERY_LIGHT_ICON_INFO" states="1" />
+  <imglist name="gallery_icon_arrow" src="SVG:GALLERY_LIGHT_ICON_ARROW" states="1" />
+  <imglist name="gallery_icon_sun" src="SVG:GALLERY_LIGHT_ICON_SUN" states="1" />
+  <imglist name="gallery_icon_moon" src="SVG:GALLERY_LIGHT_ICON_MOON" states="1" />
+  <imglist name="gallery_icon_sparkle" src="SVG:GALLERY_LIGHT_ICON_SPARKLE" states="1" />
+  <imglist name="gallery_hero" src="SVG:GALLERY_LIGHT_HERO" states="1" />
+  <imgframe name="fluent_window_shadow" src="img:window_light" states="1" margin="26,20,26,32" />
+  <imgframe name="fluent_popup_shadow" src="img:popup_light" states="1" margin="26,20,26,32" />
+</skin>

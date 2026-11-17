@@ -1,6 +1,8 @@
 ﻿#ifndef _SCHAT_EDIT_H_
 #define _SCHAT_EDIT_H_
 
+#ifndef SOUI_EDIT_LITE
+
 SNSBEGIN
 
 #define EVT_CHATEDIT_KEYRETURN (EVT_EXTERNAL_BEGIN + 500)
@@ -47,6 +49,8 @@ class SChatEdit : public SRichEdit {
 };
 
 SNSEND
+
+#endif//SOUI_EDIT_LITE
 
 #endif//_SCHAT_EDIT_H_
 

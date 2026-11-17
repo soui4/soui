@@ -42,7 +42,7 @@ static void CALLBACK quitProc(HWND h, UINT msg, UINT_PTR id, DWORD ts)
         // PostMessageA(NULL, WM_QUIT, ...) does not reach the queue on this
         // port: core wnd.cpp:1747 treats a NULL hWnd as an IPC post and drops
         // it, and PostQuitMessage routes through the freertos stub
-        // PostThreadMessageA (sysbridge.cpp:1318), which ignores its arguments.
+        // PostThreadMessageA (freertos/sysapi.cpp), which ignores its arguments.
         // So the quit goes straight through the connection, the way a driver
         // would post it.
         SConnMgr::instance()->getConnection(g_mainTid)->postMsg(NULL, WM_QUIT, 0, 0);

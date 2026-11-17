@@ -19,7 +19,7 @@
 
 #include "stdafx.h"
 #include "MainDlg.h"
-#include <controls.extend/reole/RichEditOle.h>
+//#include <controls.extend/reole/RichEditOle.h>
 #include "CAdapter.h"
 
 //#define SHOW_AERO //open aero for vista and win7
@@ -79,7 +79,7 @@ void CMainDlg::OnDestory()
 		delete m_pTabBinder;
 	if (m_pTabBinder2)
 		delete m_pTabBinder2;
-#ifdef _WIN32
+#if defined( _WIN32) && !defined( SOUI_EDIT_LITE) && !defined(__MINGW32__)
     CSmileySource::GdiplusShutdown();
 #endif //_WIN32
 }

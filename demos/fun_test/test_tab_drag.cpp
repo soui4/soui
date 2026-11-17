@@ -9,7 +9,7 @@
  * 以及 SGestureDetector 本身的探针/回调语义。
  *
  * dragCommitDuration="0" 让提交/回弹同步完成，不依赖 timeline 泵；
- * dragFling="0" 排除释放速度的干扰，断言只取决于位移比例。
+ * MakeTabs 里的 detector 把 fling 阈值调到极大，排除释放速度干扰，断言只取决于位移比例。
  */
 #include "test_soui_uitest_common.h"
 #include <SApp.h>
@@ -79,6 +79,28 @@ namespace
             static void (STabCtrl::*pFinish)() = &TabHook::OnSliderFinish;
             (p->*pFinish)();
         }
+        // 旧 dragFling='0' 已随属性合并移除；测试通过抬高 fling 阈值保持确定性。
+        static void DisableFling(STabCtrl *p)
+        {
+            static SGestureDetector STabCtrl::*pGesture = &TabHook::m_gesture;
+            (p->*pGesture).SetMinFlingVelocity(1e9f);
+        }
+        // 直接驱动拖动状态，验证 enableGesture 对 fling 提交的管辖。
+        static void BeginDrag(STabCtrl *p, const CPoint &down, const CPoint &cur)
+        {
+            static void (STabCtrl::*fn)(const CPoint &, const CPoint &) = &TabHook::StartDragSwitch;
+            (p->*fn)(down, cur);
+        }
+        static void EndDrag(STabCtrl *p, float fAxisVelocity)
+        {
+            static void (STabCtrl::*fn)(float) = &TabHook::EndDragSwitch;
+            (p->*fn)(fAxisVelocity);
+        }
+        static void MarkFling(STabCtrl *p)
+        {
+            static BOOL STabCtrl::*pFling = &TabHook::m_bDragFling;
+            (p->*pFling) = TRUE;
+        }
     };
 
     /** 模拟 fundholdings 的三页滑动容器：订阅者在 Changed 里同步复位到基准页。 */
@@ -117,6 +139,7 @@ namespace
             SWindow *root = loadUi(xml.c_str(), CRect(0, 0, 300, 200));
             STabCtrl *tabs = (STabCtrl *)root->FindChildByName(L"tabs");
             EXPECT_TRUE(tabs != NULL);
+            TabHook::DisableFling(tabs); // 与旧 dragFling='0' 等价：断言只取决于位移比例
             // SwndContainerImpl 默认不设置 root；容器级 DoFrameEvent 需要它。
             container()->SetRoot(root);
             return tabs;
@@ -135,6 +158,8 @@ namespace
             SWindow *root = loadUi(xml.c_str(), CRect(0, 0, 300, 200));
             *ppOuter = (STabCtrl *)root->FindChildByName(L"outer");
             *ppInner = (STabCtrl *)root->FindChildByName(L"inner");
+            TabHook::DisableFling(*ppOuter);
+            TabHook::DisableFling(*ppInner);
             container()->SetRoot(root);
         }
 
@@ -171,7 +196,7 @@ namespace
         }
     };
 
-    const wchar_t *kDragOn = L"enableDragSwitch='1' dragCommitDuration='0' dragFling='0'";
+    const wchar_t *kDragOn = L"enableGesture='1' dragCommitDuration='0'";
 
     struct GestureRecorder : public IGestureListener
     {
@@ -195,7 +220,7 @@ namespace
 // 默认关闭：即使完整拖动也不切页、不发事件。
 TEST_F(TabDragTest, drag_disabled_by_default)
 {
-    STabCtrl *tabs = MakeTabs(L"dragCommitDuration='0' dragFling='0'");
+    STabCtrl *tabs = MakeTabs(L"dragCommitDuration='0'");
     ASSERT_TRUE(tabs != NULL);
     SouiTest::SignalSpy spy(tabs, EventTabSelChanged::EventID);
     Drag(tabs, 250, 100, 200, 100, 50, 100);
@@ -363,7 +388,7 @@ TEST_F(TabDragTest, cancel_mode_snaps_back)
 // tabAlign=left 时自动改用垂直轴：上下拖动切页，水平拖动不响应。
 TEST_F(TabDragTest, drag_axis_follows_tab_align)
 {
-    const wchar_t *attrs = L"enableDragSwitch='1' tabAlign='left' tabWidth='0' dragCommitDuration='0' dragFling='0'";
+    const wchar_t *attrs = L"enableGesture='1' tabAlign='left' tabWidth='0' dragCommitDuration='0'";
     STabCtrl *tabs = MakeTabs(attrs);
     ASSERT_TRUE(tabs != NULL);
     Drag(tabs, 100, 180, 100, 120, 100, 20);
@@ -454,7 +479,7 @@ TEST(soui_gesture_detector, touch_stream_and_cancel)
 // ---------------------------------------------------------------------------
 namespace
 {
-    const wchar_t *kDragAnimating = L"enableDragSwitch='1' dragCommitDuration='300' dragFling='0'";
+    const wchar_t *kDragAnimating = L"enableGesture='1' dragCommitDuration='300'";
 
     // 按下并越过阈值，让 STabSlider 创建出来（此时两个页面都被隐藏）。
     void ArmDrag(STabCtrl *tabs)
@@ -545,12 +570,12 @@ TEST_F(TabDragTest, slider_finish_after_pages_removed)
 // ---------------------------------------------------------------------------
 TEST_F(TabDragTest, intercept_axis_matches_tab_align)
 {
-    STabCtrl *hori = MakeTabs(L"enableDragSwitch='1' dragCommitDuration='0'");
+    STabCtrl *hori = MakeTabs(L"enableGesture='1' dragCommitDuration='0'");
     ASSERT_TRUE(hori != NULL);
     SWindow *pBase = hori;
     EXPECT_EQ(CANCEL_REASON_SCROLL_H, pBase->GetTouchInterceptAxis());
 
-    STabCtrl *vert = MakeTabs(L"enableDragSwitch='1' tabAlign='left' dragCommitDuration='0'");
+    STabCtrl *vert = MakeTabs(L"enableGesture='1' tabAlign='left' dragCommitDuration='0'");
     ASSERT_TRUE(vert != NULL);
     EXPECT_EQ(CANCEL_REASON_SCROLL_V, ((SWindow *)vert)->GetTouchInterceptAxis());
 }
@@ -560,7 +585,7 @@ TEST_F(TabDragTest, intercept_axis_matches_tab_align)
 // ---------------------------------------------------------------------------
 TEST_F(TabDragTest, cancel_reason_uses_declared_axis_on_diagonal_drag)
 {
-    STabCtrl *tabs = MakeTabs(L"enableDragSwitch='1' tabAlign='left' dragCommitDuration='0' dragFling='0'");
+    STabCtrl *tabs = MakeTabs(L"enableGesture='1' tabAlign='left' dragCommitDuration='0'");
     ASSERT_TRUE(tabs != NULL);
     CancelSpyWindow *spy = AddSpy(tabs);
     ASSERT_TRUE(spy != NULL);
@@ -592,3 +617,20 @@ TEST_F(TabDragTest, selchanged_reentrant_setcursel_after_commit)
     EXPECT_FALSE(TabHook::HasSlider(tabs));
 }
 
+
+// ---------------------------------------------------------------------------
+// 属性合并回归：enableGesture 同时管辖拖拽与甩动提交。
+// 旧 dragFling 已移除；开启总开关后 fling 速度必须能提交不足比例的拖动。
+// ---------------------------------------------------------------------------
+TEST_F(TabDragTest, enable_drag_switch_also_gates_fling_commit)
+{
+    STabCtrl *tabs = MakeTabs(L"enableGesture='1' dragCommitDuration='0'");
+    ASSERT_TRUE(tabs != NULL);
+    SouiTest::SignalSpy spy(tabs, EventTabSelChanged::EventID);
+    // 页宽 300px，位移 50px ≈ 17% < dragSwitchRatio 35%：单靠距离不能切页。
+    TabHook::BeginDrag(tabs, CPoint(250, 100), CPoint(200, 100));
+    TabHook::MarkFling(tabs); // 模拟 detector 触发过 onFling
+    TabHook::EndDrag(tabs, -1.0f); // 朝下一页方向速度 1.0 px/ms > 0.5
+    EXPECT_EQ(tabs->GetCurSel(), 1);
+    EXPECT_EQ(spy.count(), 1);
+}

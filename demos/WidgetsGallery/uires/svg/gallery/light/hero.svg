@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="240" viewBox="0 0 520 240">
+<defs><clipPath id="gallery_hero_clip"><rect width="520" height="240" rx="16"/></clipPath></defs>
+<g clip-path="url(#gallery_hero_clip)"><rect width="520" height="240" rx="16" fill="#F7F9FC"/>
+<circle cx="419" cy="55" r="105" fill="#E5F1FC"/>
+<circle cx="77" cy="230" r="100" fill="#E5F1FC"/>
+<rect x="171" y="24" width="238" height="153" rx="13" fill="#D5E9FA"/>
+<rect x="66" y="47" width="277" height="151" rx="12" fill="#FFFFFF" stroke="#E5E5E5"/>
+<path d="M67 79h275" fill="none" stroke="#E5E5E5"/>
+<rect x="83" y="60" width="11" height="7" rx="2" fill="#0067C0"/>
+<rect x="104" y="60" width="72" height="7" rx="3.5" fill="#E5E5E5"/>
+<rect x="83" y="97" width="66" height="82" rx="6" fill="#F7F9FC"/>
+<rect x="96" y="108" width="39" height="5" rx="2.5" fill="#0067C0"/>
+<rect x="96" y="127" width="29" height="5" rx="2.5" fill="#E5E5E5"/>
+<rect x="96" y="146" width="35" height="5" rx="2.5" fill="#E5E5E5"/>
+<rect x="165" y="97" width="79" height="9" rx="4.5" fill="#E5E5E5"/>
+<rect x="165" y="120" width="154" height="6" rx="3" fill="#E5E5E5"/>
+<rect x="165" y="120" width="92" height="6" rx="3" fill="#0067C0"/>
+<rect x="165" y="147" width="61" height="28" rx="4" fill="#0067C0"/>
+<rect x="240" y="147" width="78" height="28" rx="4" fill="#FFFFFF" stroke="#E5E5E5"/>
+<rect x="283" y="92" width="185" height="113" rx="12" fill="#FFFFFF" stroke="#E5E5E5"/>
+<rect x="299" y="109" width="65" height="7" rx="3.5" fill="#E5E5E5"/>
+<rect x="299" y="132" width="103" height="5" rx="2.5" fill="#E5E5E5"/>
+<rect x="299" y="150" width="80" height="5" rx="2.5" fill="#E5E5E5"/>
+<rect x="421" y="129" width="30" height="16" rx="8" fill="#0067C0"/>
+<circle cx="443" cy="137" r="5" fill="#FFFFFF"/>
+<rect x="299" y="172" width="152" height="5" rx="2.5" fill="#E5E5E5"/>
+<rect x="299" y="172" width="104" height="5" rx="2.5" fill="#0F7B0F"/>
+<circle cx="403" cy="174.5" r="8" fill="#FFFFFF" stroke="#E5E5E5"/>
+<circle cx="403" cy="174.5" r="4" fill="#0F7B0F"/>
+<rect x="36" y="121" width="55" height="55" rx="12" fill="#7664CA"/>
+<g transform="translate(51,136)"><g fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 2.3 6.7L21 12l-6.7 2.3L12 21l-2.3-6.7L3 12l6.7-2.3Z"/></g></g>
+<circle cx="439" cy="55" r="18" fill="#B96B00"/>
+<g transform="translate(427,43)"><g fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4.5 4.5L19 7"/></g></g></g>
+</svg>

@@ -175,6 +175,7 @@ public:
         pwnd->CreateEx(m_hWnd,WS_POPUP|WS_VISIBLE,WS_EX_LAYERED,rc.right+5,rc.top,0,0);
     }
     void OnBtnSaveRtf(){
+#if !defined(SOUI_EDIT_LITE)
         SRichEdit *pEdit = FindChildByName2<SRichEdit>("re_test");
         if(pEdit){
             SOUI::SStringT srcDir = getSourceDir() + _T("/uires/rtf/test.rtf");
@@ -182,6 +183,9 @@ public:
         }else{
             SLOGE()<<"find re_test as richedit failed!";
         }
+#else
+        // SRichEdit unavailable in SOUI_EDIT_LITE build
+#endif
     }
     void OnBtnPickColor(){
         static COLORREF acrCustClr[16]; // array of custom colors

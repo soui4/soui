@@ -497,7 +497,7 @@ void CMainDlg::OnAddSample() {
 }
 
 void CMainDlg::AppendLogText(const SStringT &text) {
-    SRichEdit *pLog = CurLog();
+    SEdit *pLog = CurLog();
     if (!pLog || text.IsEmpty()) return;
 
     // 控件里的文本总量要有个上限：日志是滚动窗口，留太长既浪费内存，
@@ -519,7 +519,7 @@ void CMainDlg::AppendLogText(const SStringT &text) {
 }
 
 void CMainDlg::PumpLog(bool bRebuild) {
-    SRichEdit *pLog = CurLog();
+    SEdit *pLog = CurLog();
     if (!pLog) return;
 
     CLogSink &sink = CLogSink::Instance();
@@ -547,7 +547,7 @@ void CMainDlg::PumpLog(bool bRebuild) {
 
 void CMainDlg::OnLogClear() {
     CLogSink::Instance().Clear();
-    if (SRichEdit *pLog = CurLog()) pLog->SetWindowText(_T(""));
+    if (SEdit *pLog = CurLog()) pLog->SetWindowText(_T(""));
     m_logSeen = CLogSink::Instance().Count();
     SetStatus(_T("已清空请求日志（log4z 落盘的日志文件不受影响）"));
 }
@@ -652,8 +652,8 @@ STabCtrl *CMainDlg::CurPaneSwipe() {
     return (p && p->IsClass(STabCtrl::GetClassName())) ? (STabCtrl *)p : NULL;
 }
 
-SRichEdit *CMainDlg::CurLog() {
-    return FindCtrl<SRichEdit>(R.ID.re_log);
+SEdit *CMainDlg::CurLog() {
+    return FindCtrl<SEdit>(R.ID.re_log);
 }
 
 void CMainDlg::InitDetailPage(SWindow *pPage) {
@@ -678,7 +678,7 @@ void CMainDlg::InitDetailPage(SWindow *pPage) {
     }
     // 「请求日志」只读 rich edit：原生支持滚动/选中/复制，文本量大时也不会
     // 像 multiLines 的 text 那样每次重排布局。
-    SRichEdit *pLog = pPage ? pPage->FindChildByID2<SRichEdit>(R.ID.re_log) : CurLog();
+    SEdit *pLog = pPage ? pPage->FindChildByID2<SEdit>(R.ID.re_log) : CurLog();
     if (pLog) {
         pLog->SetReadOnly(TRUE);
         pLog->SetWordWrap(TRUE);

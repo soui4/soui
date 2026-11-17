@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="184" height="40" viewBox="0 0 184 40">
+  <g id="state0" transform="translate(0, 0)">
+    <rect x="3" y="0" width="40" height="40" rx="6" fill="none" />
+    <g transform="translate(13, 10)">
+      <path d="M13.4,3.2 A7.2,7.2 0 1 0 16.8,13.6 A8.4,8.4 0 0 1 13.4,3.2 Z" fill="#1B1B1B" stroke="none" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+  </g>
+  <g id="state1" transform="translate(46, 0)">
+    <rect x="3" y="0" width="40" height="40" rx="6" fill="#E5E5E5" />
+    <g transform="translate(13, 10)">
+      <path d="M13.4,3.2 A7.2,7.2 0 1 0 16.8,13.6 A8.4,8.4 0 0 1 13.4,3.2 Z" fill="#1B1B1B" stroke="none" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+  </g>
+  <g id="state2" transform="translate(92, 0)">
+    <rect x="3" y="0" width="40" height="40" rx="6" fill="#D6D6D6" />
+    <g transform="translate(13, 10)">
+      <path d="M13.4,3.2 A7.2,7.2 0 1 0 16.8,13.6 A8.4,8.4 0 0 1 13.4,3.2 Z" fill="#1B1B1B" stroke="none" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+  </g>
+  <g id="state3" transform="translate(138, 0)">
+    <rect x="3" y="0" width="40" height="40" rx="6" fill="none" />
+    <g transform="translate(13, 10)">
+      <path d="M13.4,3.2 A7.2,7.2 0 1 0 16.8,13.6 A8.4,8.4 0 0 1 13.4,3.2 Z" fill="#9B9B9B" stroke="none" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+  </g>
+</svg>

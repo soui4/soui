@@ -159,14 +159,22 @@ void SHostPresenter::OnHostPresent(THIS_ HDC hdc, IRenderTarget *pMemRT, LPCRECT
     if (bGetDC)
         hdc = m_pHostWnd->GetDC();
     HDC memdc = pMemRT->GetDC(1);
-    ::BitBlt(hdc, rcInvalid->left, rcInvalid->top, rcInvalid->right - rcInvalid->left, rcInvalid->bottom - rcInvalid->top, memdc, rcInvalid->left, rcInvalid->top, SRCCOPY);
-    if (m_pHostWnd->GetHostAttr().m_bTranslucent && m_pHostWnd->GetHostAttr().m_bAutoShape)
+    // A window-attached render target (CreateRenderTarget2 -> IsOffscreen() ==
+    // FALSE) already draws into this very HDC.  UpdatePresenter() only reaches
+    // us with uFlag != 0 in that case, and BitBlt(hdc, ..., hdc, ...) makes
+    // gdi.cpp snapshot the whole surface for a self-copy.  Skip the copy but
+    // keep the GetDC/ReleaseDC pair balanced.
+    if (hdc != memdc)
     {
-        HBITMAP hBmp = (HBITMAP)GetCurrentObject(memdc, OBJ_BITMAP);
-        HRGN hRgn = CreateRegionFromBitmap(hBmp, 0, 0xFF000000);
-        SetWindowRgn(m_pHostWnd->m_hWnd, hRgn, FALSE);
-        if (hRgn)
-            DeleteObject(hRgn);
+        ::BitBlt(hdc, rcInvalid->left, rcInvalid->top, rcInvalid->right - rcInvalid->left, rcInvalid->bottom - rcInvalid->top, memdc, rcInvalid->left, rcInvalid->top, SRCCOPY);
+        if (m_pHostWnd->GetHostAttr().m_bTranslucent && m_pHostWnd->GetHostAttr().m_bAutoShape)
+        {
+            HBITMAP hBmp = (HBITMAP)GetCurrentObject(memdc, OBJ_BITMAP);
+            HRGN hRgn = CreateRegionFromBitmap(hBmp, 0, 0xFF000000);
+            SetWindowRgn(m_pHostWnd->m_hWnd, hRgn, FALSE);
+            if (hRgn)
+                DeleteObject(hRgn);
+        }
     }
     pMemRT->ReleaseDC(memdc, NULL);
     if (bGetDC)

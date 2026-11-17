@@ -50,7 +50,7 @@ class CServerDlg
     : public SHostWnd
     , IIpcSvrCallback {
     SComMgr2 m_comMgr;
-    SRichEdit *m_reLog;
+    SEdit *m_reLog;
     SOUI::SAutoRefPtr<SOUI::IIpcServer> m_ipcSvr;
   public:
 	CServerDlg();

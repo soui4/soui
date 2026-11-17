@@ -267,27 +267,33 @@ void SMenuExItem::BeforePaint(IRenderTarget *pRT, SPainter &painter) const
 
 void SMenuExItem::OnPaint(IRenderTarget *pRT)
 {
-    // 菜单项文本约定为 "标题\t快捷键"。'\t' 在 GDI 下会推进到制表位，但在
-    // Skia/cairo 等渲染器里 U+0009 没有字形，会被画成 .notdef 方块，两段也
-    // 挤在一起。这里把快捷键拆出来单独右对齐绘制（两平台表现一致）。
-    SStringT strFull = m_strText.GetText();
-    int nTab = strFull.ReverseFind(L'\t');
+    SPainter painter;
+    BeforePaint(pRT, painter);
+
+    CRect rcText;
+    GetTextRect(&rcText);
+    SStringT strText = GetWindowText(FALSE);
+    int nTab = strText.ReverseFind(L'\t');
     if (nTab != -1)
     {
-        SStringT strKey = strFull.Mid(nTab + 1);
-        m_strText.SetText(strFull.Left(nTab), false);
-        __baseCls::OnPaint(pRT);
-        m_strText.SetText(strFull, false);
-
-        CRect rcKey;
-        GetTextRect(&rcKey);
+        SStringT strTitle = strText.Left(nTab);
+        SStringT strKey = strText.Mid(nTab + 1);
+        DrawText(pRT, strTitle, strTitle.GetLength(), &rcText, GetTextAlign());
+        // 右对齐的快捷键需要额外留出菜单项右内边距，避免贴到菜单边缘
+        CRect rcKey = rcText;
+        rcKey.right -= GetStyle().GetPadding().right;
         DrawText(pRT, strKey, strKey.GetLength(), &rcKey,
                  DT_SINGLELINE | DT_VCENTER | DT_RIGHT | DT_END_ELLIPSIS);
     }
     else
     {
-        __baseCls::OnPaint(pRT);
+        DrawText(pRT, strText, strText.GetLength(), &rcText, GetTextAlign());
     }
+
+    if (IsFocused())
+        DrawFocus(pRT);
+
+    AfterPaint(pRT, painter);
 
     CRect rc = GetClientRect();
     SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot());

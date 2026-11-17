@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="10" viewBox="0 0 20 10">
+  <g id="state0" transform="translate(0, 0)">
+    <rect x="0.5" y="0.5" width="9" height="9" rx="3.5" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="1.0"/>
+  </g>
+  <g id="state1" transform="translate(10, 0)">
+    <rect x="0.5" y="0.5" width="9" height="9" rx="3.5" fill="#FFFFFF" stroke="#616161" stroke-width="1.0"/>
+  </g>
+</svg>

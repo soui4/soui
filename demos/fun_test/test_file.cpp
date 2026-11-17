@@ -746,3 +746,35 @@ TEST(swinx_file, open_existing_and_read)
         CloseHandle(hFile);
     }
 }
+
+// ------------------------------------------------------------------------
+// _wfopen（宽字符路径的 fopen）
+//
+// 随第二批下沉进 common/sysapi.cpp：路径与模式都要先转成 UTF-8 再交给 libc。
+// 这里真的落盘读回一次 —— 只测"返回非 NULL"看不出模式串转换是否正确
+// （旧实现里模式串是从 wchar_t 直接 memcpy 过去的，写模式会变成乱码）。
+// ------------------------------------------------------------------------
+
+TEST(swinx_file, wfopen_roundtrip_with_wide_path)
+{
+    std::wstring path = tempPathW(L"wfopen.txt");
+
+    FILE *f = _wfopen(path.c_str(), L"wb");
+    ASSERT_TRUE(f != NULL);
+    const char msg[] = "wide fopen roundtrip";
+    ASSERT_EQ(fwrite(msg, 1, sizeof(msg) - 1, f), sizeof(msg) - 1);
+    fclose(f);
+
+    // 模式串 "rb" 也必须正确转换，否则这里拿到的是写模式的 fd
+    f = _wfopen(path.c_str(), L"rb");
+    ASSERT_TRUE(f != NULL);
+    char buf[64] = {0};
+    EXPECT_EQ(fread(buf, 1, sizeof(buf) - 1, f), sizeof(msg) - 1);
+    fclose(f);
+    EXPECT_STREQ(buf, msg);
+
+    // 不存在的路径：返回 NULL 而不是崩溃
+    EXPECT_TRUE(_wfopen(L"/nonexistent/swinx_dir/wfopen.txt", L"rb") == NULL);
+
+    EXPECT_TRUE(DeleteFileW(path.c_str()));
+}

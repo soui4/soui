@@ -1,0 +1,1135 @@
+<?xml version='1.0' encoding='utf-8'?>
+<SOUI name="SOUIWidgetsGalleryDemo" title="SOUI Widgets Gallery" resizable="1" sendWheel2Hover="1" wndType="appMain" appWnd="1" translucent="1" margin="5dp,5dp,5dp,5dp" minsize="960dp,640dp">
+  <style>
+    <class name="gallery_card" skin="gallery_card" size="-2,-1" layout="vbox" padding="22dp,18dp,22dp,18dp" interval="12dp" />
+    <class name="section_title" font="size:18dp,bold:1" colorText="@color/fluent_text" />
+    <class name="meta" font="size:13dp" colorText="@color/fluent_text_secondary" />
+  </style>
+  <root skin="_skin.sys.wnd.bkgnd" size="1220dp,840dp" layout="vbox" cache="1" name="sample_rootwindow">
+    <caption size="-2,48dp" layout="hbox" gravity="center" padding="8dp,0,0,0" name="sample_caption" font="size:14dp,bold:1">
+      <img skin="gallery_icon_layout" size="16dp,16dp" msgTransparent="1" />
+      <text text="SOUI Widgets Gallery" font="size:14dp,bold:1" extend_left="5dp" />
+      <window size="0,0" weight="1" />
+      <text text="Fluent Design" class="meta" margin="0,0,12dp,0" font="size:14dp,bold:1" />
+      <imgbtn name="fluent_theme_toggle" id="65000" skin="fluent_btn_icon_theme" size="40dp,32dp" tip="Switch light / dark theme" focusable="1" />
+      <imgbtn name="btn_min" skin="_skin.sys.btn.minimize" size="46dp,40dp" tip="Minimize" />
+      <window size="46dp,40dp">
+        <imgbtn name="btn_max" skin="_skin.sys.btn.maximize" pos="0,0" size="46dp,40dp" tip="Maximize" />
+        <imgbtn name="btn_restore" skin="_skin.sys.btn.restore" pos="0,0" size="46dp,40dp" show="0" tip="Restore" />
+      </window>
+      <imgbtn name="btn_close" skin="_skin.sys.btn.close" size="46dp,40dp" tip="Close" />
+    </caption>
+    <window size="-2,0" weight="1" layout="hbox">
+      <window name="gallery_sidebar" size="228dp,-2" colorBkgnd="@color/gallery_sidebar" layout="vbox" padding="12dp,20dp,12dp,18dp" interval="16dp">
+        <window size="-2,-1" layout="vbox" padding="12dp,0,12dp,0" interval="5dp">
+          <text text="WIDGETS" font="size:12dp,bold:1" colorText="@color/fluent_text_secondary" />
+          <text text="A component collection" class="meta" />
+        </window>
+        <edit name="gallery_search" notifyChange="1" size="-2,34dp" cueText="Search controls..." cueColor="@color/fluent_text_secondary" padding="12dp,6dp,8dp,6dp" maxLength="80" />
+        <scrollview size="-2,0" weight="1" viewSize="-2,-1" layout="vbox" interval="4dp">
+          <gallerybutton name="nav_home" id="4100" skin="gallery_nav" size="-2,36dp" display="0" layout="hbox" gravity="center" interval="12dp" padding="14dp,0,10dp,0" text="" focusable="1" dotted="0" tip="Overview">
+            <img skin="gallery_icon_home" size="20dp,20dp" msgTransparent="1" />
+            <text text="Overview" msgTransparent="1" size="0,-1" weight="1" font="size:14dp" />
+          </gallerybutton>
+          <gallerybutton name="nav_buttons" id="4101" skin="gallery_nav" size="-2,36dp" display="0" layout="hbox" gravity="center" interval="12dp" padding="14dp,0,10dp,0" text="" focusable="1" dotted="0" tip="Buttons">
+            <img skin="gallery_icon_buttons" size="20dp,20dp" msgTransparent="1" />
+            <text text="Buttons" msgTransparent="1" size="0,-1" weight="1" font="size:14dp" />
+          </gallerybutton>
+          <gallerybutton name="nav_selection" id="4102" skin="gallery_nav" size="-2,36dp" display="0" layout="hbox" gravity="center" interval="12dp" padding="14dp,0,10dp,0" text="" focusable="1" dotted="0" tip="Selection">
+            <img skin="gallery_icon_selection" size="20dp,20dp" msgTransparent="1" />
+            <text text="Selection" msgTransparent="1" size="0,-1" weight="1" font="size:14dp" />
+          </gallerybutton>
+          <gallerybutton name="nav_input" id="4103" skin="gallery_nav" size="-2,36dp" display="0" layout="hbox" gravity="center" interval="12dp" padding="14dp,0,10dp,0" text="" focusable="1" dotted="0" tip="Text input">
+            <img skin="gallery_icon_input" size="20dp,20dp" msgTransparent="1" />
+            <text text="Text input" msgTransparent="1" size="0,-1" weight="1" font="size:14dp" />
+          </gallerybutton>
+          <gallerybutton name="nav_combo" id="4104" skin="gallery_nav" size="-2,36dp" display="0" layout="hbox" gravity="center" interval="12dp" padding="14dp,0,10dp,0" text="" focusable="1" dotted="0" tip="ComboBox">
+            <img skin="gallery_icon_combo" size="20dp,20dp" msgTransparent="1" />
+            <text text="ComboBox" msgTransparent="1" size="0,-1" weight="1" font="size:14dp" />
+          </gallerybutton>
+          <gallerybutton name="nav_progress" id="4105" skin="gallery_nav_selected" size="-2,36dp" display="0" layout="hbox" gravity="center" interval="12dp" padding="14dp,0,10dp,0" text="" focusable="1" dotted="0" tip="Progress">
+            <img skin="gallery_icon_progress" size="20dp,20dp" msgTransparent="1" />
+            <text text="Progress" msgTransparent="1" size="0,-1" weight="1" font="size:14dp" />
+          </gallerybutton>
+          <gallerybutton name="nav_slider" id="4106" skin="gallery_nav" size="-2,36dp" display="0" layout="hbox" gravity="center" interval="12dp" padding="14dp,0,10dp,0" text="" focusable="1" dotted="0" tip="Sliders &amp; scrollbars">
+            <img skin="gallery_icon_slider" size="20dp,20dp" msgTransparent="1" />
+            <text text="Sliders &amp; scrollbars" msgTransparent="1" size="0,-1" weight="1" font="size:14dp" />
+          </gallerybutton>
+          <gallerybutton name="nav_list" id="4107" skin="gallery_nav" size="-2,36dp" display="0" layout="hbox" gravity="center" interval="12dp" padding="14dp,0,10dp,0" text="" focusable="1" dotted="0" tip="ListBox">
+            <img skin="gallery_icon_list" size="20dp,20dp" msgTransparent="1" />
+            <text text="ListBox" msgTransparent="1" size="0,-1" weight="1" font="size:14dp" />
+          </gallerybutton>
+          <gallerybutton name="nav_tree" id="4108" skin="gallery_nav" size="-2,36dp" display="0" layout="hbox" gravity="center" interval="12dp" padding="14dp,0,10dp,0" text="" focusable="1" dotted="0" tip="TreeView">
+            <img skin="gallery_icon_tree" size="20dp,20dp" msgTransparent="1" />
+            <text text="TreeView" msgTransparent="1" size="0,-1" weight="1" font="size:14dp" />
+          </gallerybutton>
+          <gallerybutton name="nav_tabs" id="4109" skin="gallery_nav" size="-2,36dp" display="0" layout="hbox" gravity="center" interval="12dp" padding="14dp,0,10dp,0" text="" focusable="1" dotted="0" tip="Tabs &amp; stacks">
+            <img skin="gallery_icon_tabs" size="20dp,20dp" msgTransparent="1" />
+            <text text="Tabs &amp; stacks" msgTransparent="1" size="0,-1" weight="1" font="size:14dp" />
+          </gallerybutton>
+          <gallerybutton name="nav_dialog" id="4110" skin="gallery_nav" size="-2,36dp" display="0" layout="hbox" gravity="center" interval="12dp" padding="14dp,0,10dp,0" text="" focusable="1" dotted="0" tip="Dialogs">
+            <img skin="gallery_icon_dialog" size="20dp,20dp" msgTransparent="1" />
+            <text text="Dialogs" msgTransparent="1" size="0,-1" weight="1" font="size:14dp" />
+          </gallerybutton>
+          <gallerybutton name="nav_icons" id="4111" skin="gallery_nav" size="-2,36dp" display="0" layout="hbox" gravity="center" interval="12dp" padding="14dp,0,10dp,0" text="" focusable="1" dotted="0" tip="Icons &amp; images">
+            <img skin="gallery_icon_icons" size="20dp,20dp" msgTransparent="1" />
+            <text text="Icons &amp; images" msgTransparent="1" size="0,-1" weight="1" font="size:14dp" />
+          </gallerybutton>
+          <gallerybutton name="nav_type" id="4112" skin="gallery_nav" size="-2,36dp" display="0" layout="hbox" gravity="center" interval="12dp" padding="14dp,0,10dp,0" text="" focusable="1" dotted="0" tip="Typography">
+            <img skin="gallery_icon_type" size="20dp,20dp" msgTransparent="1" />
+            <text text="Typography" msgTransparent="1" size="0,-1" weight="1" font="size:14dp" />
+          </gallerybutton>
+          <gallerybutton name="nav_layout" id="4113" skin="gallery_nav" size="-2,36dp" display="0" layout="hbox" gravity="center" interval="12dp" padding="14dp,0,10dp,0" text="" focusable="1" dotted="0" tip="Layout">
+            <img skin="gallery_icon_layout" size="20dp,20dp" msgTransparent="1" />
+            <text text="Layout" msgTransparent="1" size="0,-1" weight="1" font="size:14dp" />
+          </gallerybutton>
+          <text text="No matching controls.&#10;Try another search." name="gallery_no_results" multiLines="1" class="meta" size="-2,60dp" padding="12dp,12dp,12dp,12dp" show="0" display="0" />
+          <gallerybutton name="nav_listview" id="4114" skin="gallery_nav" size="-2,36dp" display="0" layout="hbox" gravity="center" interval="12dp" padding="14dp,0,10dp,0" text="" focusable="1" dotted="0" tip="ListView">
+            <img skin="gallery_icon_list" size="20dp,20dp" msgTransparent="1" />
+            <text text="ListView" msgTransparent="1" size="0,-1" weight="1" font="size:14dp" noPrefix="1" />
+          </gallerybutton>
+          <gallerybutton name="nav_tileview" id="4115" skin="gallery_nav" size="-2,36dp" display="0" layout="hbox" gravity="center" interval="12dp" padding="14dp,0,10dp,0" text="" focusable="1" dotted="0" tip="TileView">
+            <img skin="gallery_icon_layout" size="20dp,20dp" msgTransparent="1" />
+            <text text="TileView" msgTransparent="1" size="0,-1" weight="1" font="size:14dp" noPrefix="1" />
+          </gallerybutton>
+          <gallerybutton name="nav_datetime" id="4116" skin="gallery_nav" size="-2,36dp" display="0" layout="hbox" gravity="center" interval="12dp" padding="14dp,0,10dp,0" text="" focusable="1" dotted="0" tip="Date &amp; time">
+            <img skin="gallery_icon_tabs" size="20dp,20dp" msgTransparent="1" />
+            <text text="Date &amp; time" msgTransparent="1" size="0,-1" weight="1" font="size:14dp" noPrefix="1" />
+          </gallerybutton>
+          <gallerybutton name="nav_commands" id="4117" skin="gallery_nav" size="-2,36dp" display="0" layout="hbox" gravity="center" interval="12dp" padding="14dp,0,10dp,0" text="" focusable="1" dotted="0" tip="Menus &amp; toolbars">
+            <img skin="gallery_icon_buttons" size="20dp,20dp" msgTransparent="1" />
+            <text text="Menus &amp; toolbars" msgTransparent="1" size="0,-1" weight="1" font="size:14dp" noPrefix="1" />
+          </gallerybutton>
+          <gallerybutton name="nav_containers" id="4118" skin="gallery_nav" size="-2,36dp" display="0" layout="hbox" gravity="center" interval="12dp" padding="14dp,0,10dp,0" text="" focusable="1" dotted="0" tip="Containers">
+            <img skin="gallery_icon_layout" size="20dp,20dp" msgTransparent="1" />
+            <text text="Containers" msgTransparent="1" size="0,-1" weight="1" font="size:14dp" noPrefix="1" />
+          </gallerybutton>
+          <gallerybutton name="nav_hosting" id="4119" skin="gallery_nav" size="-2,36dp" display="0" layout="hbox" gravity="center" interval="12dp" padding="14dp,0,10dp,0" text="" focusable="1" dotted="0" tip="Hosting &amp; platform">
+            <img skin="gallery_icon_dialog" size="20dp,20dp" msgTransparent="1" />
+            <text text="Hosting &amp; platform" msgTransparent="1" size="0,-1" weight="1" font="size:14dp" noPrefix="1" />
+          </gallerybutton>
+        </scrollview>
+        <window size="-2,-1" layout="vbox" padding="12dp,0,12dp,0" interval="8dp">
+          <hr size="-2,1dp" lineColor="@color/gallery_stroke" />
+          <text text="Made with SOUI" font="size:13dp,bold:1" margin="0,4dp,0,0" />
+          <text text="20 / 20 categories" name="gallery_category_count" class="meta" font="size:12dp" />
+        </window>
+      </window>
+      <window size="0,-2" weight="1" colorBkgnd="@color/gallery_canvas" layout="vbox" padding="28dp,22dp,28dp,16dp" interval="18dp">
+        <window size="-2,-1" layout="vbox" interval="8dp">
+          <window size="-2,-1" layout="hbox" gravity="center" interval="12dp">
+            <text text="Widgets  /" class="meta" font="size:12dp" />
+            <text text="Progress" name="gallery_breadcrumb" class="meta" font="size:12dp" />
+            <window size="0,0" weight="1" />
+            <text text="SProgress" name="gallery_api" class="meta" font="size:12dp" size="420dp,28dp" textAlign="right" multiLines="1" wordBreak="1" />
+          </window>
+          <window size="-2,-1" layout="hbox" gravity="center" interval="12dp">
+            <text text="Progress" name="gallery_title" font="size:28dp,bold:1" height="44dp" />
+            <window size="0,0" weight="1" />
+            <gallerybutton text="View XML" name="btn_source" class="fluent_btn_secondary" size="136dp,34dp" width="108dp" />
+          </window>
+          <text text="Keep people informed with ranges, labels, and semantic colors." name="gallery_description" class="meta" size="-2,24dp" />
+        </window>
+        <tabctrl name="gallery_pages" focusable="0" drawFocusRect="0" size="-2,0" weight="1" tabHeight="0" tabSkin="_skin.sys.tab.page" curSel="5" duration="0">
+          <page name="page_home" title="Overview">
+            <scrollview size="-2,-2" viewSize="-2,-1" layout="vbox" interval="12dp" padding="0,0,2dp,0">
+              <window skin="gallery_card" size="-2,264dp" layout="hbox" padding="28dp,28dp,28dp,28dp" gravity="center">
+                <window size="0,-2" weight="1" layout="vbox" interval="14dp">
+                  <text text="Every control.&#10;One Fluent language." font="size:28dp,bold:1" size="-2,72dp" multiLines="1" />
+                  <text text="57 live control scenes, exact XML examples,&#10;and paired light / dark Fluent styles." class="meta" size="-2,64dp" multiLines="1" wordBreak="1" />
+                  <gallerybutton text="Explore Progress" name="home_progress" class="fluent_btn_primary" size="136dp,34dp" id="4304" />
+                </window>
+                <img skin="gallery_hero" size="0,200dp" weight="1" keepAspect="1" />
+              </window>
+              <text text="58 registered types  /  20 categories  /  57 live scenes  /  ActiveX integration recipe" class="meta" size="-2,32dp" multiLines="1" wordBreak="1" />
+              <window size="-2,-1" layout="hbox" gravity="center" interval="12dp">
+                <window class="gallery_card" size="0,206dp" weight="1">
+                  <text text="Made to interact" class="section_title" />
+                  <text text="57 real control scenes." class="meta" size="-2,44dp" multiLines="1" wordBreak="1" />
+                  <img skin="gallery_icon_buttons" size="28dp,28dp" msgTransparent="1" />
+                  <gallerybutton text="Try the buttons" name="home_buttons" class="fluent_btn_secondary" size="136dp,34dp" id="4305" />
+                </window>
+                <window class="gallery_card" size="0,206dp" weight="1">
+                  <text text="Light &amp; dark" class="section_title" />
+                  <text text="One design, two comfortable themes." class="meta" size="-2,44dp" multiLines="1" wordBreak="1" />
+                  <img skin="gallery_icon_sun" size="28dp,28dp" msgTransparent="1" />
+                  <text text="Use the theme button in the title bar." class="meta" size="-2,40dp" multiLines="1" wordBreak="1" />
+                </window>
+                <window class="gallery_card" size="0,206dp" weight="1">
+                  <text text="Vector by default" class="section_title" />
+                  <text text="Crisp at every display scale." class="meta" size="-2,44dp" multiLines="1" wordBreak="1" />
+                  <img skin="gallery_icon_icons" size="28dp,28dp" msgTransparent="1" />
+                  <gallerybutton text="Browse the icons" name="home_icons" class="fluent_btn_secondary" size="136dp,34dp" id="4306" />
+                </window>
+              </window>
+              <window skin="gallery_subtle" size="-2,48dp" layout="hbox" gravity="center" padding="16dp,0,16dp,0" interval="12dp">
+                <img skin="gallery_icon_info" size="20dp,20dp" msgTransparent="1" />
+                <text text="Built from native SOUI controls. All styling is local to this demo." class="meta" size="0,-1" weight="1" />
+              </window>
+            </scrollview>
+          </page>
+          <page name="page_buttons" title="Buttons">
+            <scrollview size="-2,-2" viewSize="-2,-1" layout="vbox" interval="12dp" padding="0,0,2dp,0">
+              <text name="types_buttons" text="&lt;button&gt; / &lt;imgbtn&gt; / &lt;link&gt;" class="meta" font="size:12dp" size="-2,32dp" multiLines="1" wordBreak="1" noPrefix="1" />
+              <window class="gallery_card">
+                <text text="Button variants" class="section_title" />
+                <text text="Use emphasis to communicate the importance of an action." class="meta" />
+                <window size="-2,-1" layout="hbox" gravity="center" interval="12dp">
+                  <gallerybutton text="Continue" name="sample_primary" class="fluent_btn_primary" size="136dp,34dp" id="4300" />
+                  <gallerybutton text="Save draft" name="sample_secondary" class="fluent_btn_secondary" size="136dp,34dp" id="4301" />
+                  <gallerybutton name="sample_quiet" text="Learn more" skin="gallery_btn_quiet" size="136dp,34dp" colorText="@color/fluent_accent" id="4302" />
+                </window>
+              </window>
+              <window class="gallery_card">
+                <text text="Native button" class="section_title" />
+                <text text="SButton  /  &lt;button&gt;  /  fluent_btn_primary" class="meta" />
+                <button name="sample_native_button" id="4311" text="Native SButton" class="fluent_btn_primary" size="180dp,36dp" drawFocusRect="0" />
+              </window>
+              <window class="gallery_card">
+                <text text="Image button" class="section_title" />
+                <text text="SImageButton  /  &lt;imgbtn&gt;  /  gallery_image_button" class="meta" />
+                <window size="-2,40dp" layout="hbox" gravity="center" interval="14dp">
+                  <imgbtn name="sample_image_button" id="4312" skin="gallery_image_button" size="40dp,36dp" tip="Add a new item" drawFocusRect="0" />
+                  <text text="A four-state SVG button, with an accessible tooltip." class="meta" />
+                </window>
+              </window>
+              <window class="gallery_card">
+                <text text="Hyperlink" class="section_title" />
+                <text text="SLink  /  &lt;link&gt;  /  fluent_link" class="meta" />
+                <link name="sample_link" class="fluent_link" text="SOUI source on GitHub" href="https://github.com/soui4/soui" size="240dp,32dp" />
+                <text text="Opens the project in your browser only when activated." class="meta" size="-2,36dp" multiLines="1" wordBreak="1" />
+              </window>
+              <window class="gallery_card">
+                <text text="States" class="section_title" />
+                <text text="Hover, press, focus, and disabled states share the same geometry." class="meta" />
+                <window size="-2,-1" layout="hbox" gravity="center" interval="12dp">
+                  <gallerybutton text="Enabled" name="sample_enabled" class="fluent_btn_secondary" size="136dp,34dp" id="4303" />
+                  <gallerybutton text="Disabled" name="sample_disabled" class="fluent_btn_secondary" size="136dp,34dp" enable="0" />
+                  <gallerybutton text="Disabled primary" name="sample_primary_disabled" class="fluent_btn_primary" size="136dp,34dp" enable="0" />
+                </window>
+              </window>
+              <window class="gallery_card">
+                <text text="Live feedback" class="section_title" />
+                <text text="Click any enabled sample above." class="meta" />
+                <text text="Your next action will appear here." name="button_feedback" class="meta" size="-2,44dp" />
+              </window>
+              <window skin="gallery_subtle" size="-2,48dp" layout="hbox" gravity="center" padding="16dp,0,16dp,0" interval="12dp">
+                <img skin="gallery_icon_info" size="20dp,20dp" msgTransparent="1" />
+                <text text="Tab focuses an action; Space or Enter activates it. Disabled controls do not fire actions." class="meta" size="0,-1" weight="1" />
+              </window>
+            </scrollview>
+          </page>
+          <page name="page_selection" title="Selection">
+            <scrollview size="-2,-2" viewSize="-2,-1" layout="vbox" interval="12dp" padding="0,0,2dp,0">
+              <text name="types_selection" text="&lt;check&gt; / &lt;radio&gt; / &lt;radioGroup&gt; / &lt;toggle&gt; / &lt;switch&gt;" class="meta" font="size:12dp" size="-2,32dp" multiLines="1" wordBreak="1" noPrefix="1" />
+              <window class="gallery_card">
+                <text text="Checkboxes" class="section_title" />
+                <text text="Independent choices can be selected together." class="meta" />
+                <window size="-2,-1" layout="hbox" gravity="center" interval="12dp">
+                  <check id="4400" name="sample_check" text="Send notifications" size="210dp,32dp" checked="1" />
+                  <check id="4401" text="Remember my choice" size="230dp,32dp" />
+                  <check text="Unavailable" size="170dp,32dp" enable="0" />
+                </window>
+              </window>
+              <window class="gallery_card">
+                <text text="Toggle button" class="section_title" />
+                <text text="SToggle  /  &lt;toggle&gt;  /  gallery_toggle" class="meta" />
+                <window size="-2,38dp" layout="hbox" interval="12dp">
+                  <toggle name="sample_toggle" text="" size="160dp,36dp" focusable="1" layout="hbox" gravity="center">
+                    <text text="Pin collection" size="-2,-2" textAlign="center" msgTransparent="1" colorText="@color/fluent_text" />
+                  </toggle>
+                  <toggle name="sample_toggle_checked" text="" checked="1" size="140dp,36dp" layout="hbox" gravity="center">
+                    <text text="Pinned" size="-2,-2" textAlign="center" msgTransparent="1" colorText="@color/fluent_text" />
+                  </toggle>
+                  <toggle text="" enable="0" size="140dp,36dp" layout="hbox" gravity="center">
+                    <text text="Unavailable" size="-2,-2" textAlign="center" msgTransparent="1" colorText="@color/fluent_text_disabled" />
+                  </toggle>
+                </window>
+              </window>
+              <window class="gallery_card">
+                <text text="Animated switch" class="section_title" />
+                <text text="SSwitch  /  &lt;switch&gt;  /  gallery_switch_track + thumb" class="meta" />
+                <window size="-2,32dp" layout="hbox" gravity="center" interval="14dp">
+                  <switch name="sample_switch" size="44dp,24dp" checked="1" tip="Enable sync" />
+                  <text name="switch_feedback" text="Sync is on" />
+                  <switch name="sample_switch_off" size="44dp,24dp" tip="Secondary switch" />
+                </window>
+              </window>
+              <window class="gallery_card">
+                <text text="Radio group" class="section_title" />
+                <text text="SRadioGroup  /  &lt;radioGroup&gt;  /  themed child radios" class="meta" />
+                <radioGroup name="sample_radiogroup" size="-2,36dp" layout="hbox" interval="24dp">
+                  <radio name="sample_group_daily" text="Daily" size="110dp,32dp" checked="1" />
+                  <radio name="sample_group_weekly" text="Weekly" size="110dp,32dp" />
+                  <radio name="sample_group_monthly" text="Monthly" size="130dp,32dp" />
+                </radioGroup>
+              </window>
+              <window class="gallery_card">
+                <text text="Radio buttons" class="section_title" />
+                <text text="Choose one option from the group." class="meta" />
+                <window size="-2,42dp" layout="hbox" gravity="center" interval="32dp">
+                  <radio id="4402" name="sample_radio_light" text="Light" size="130dp,32dp" checked="1" group="appearance" />
+                  <radio id="4403" name="sample_radio_dark" text="Dark" size="130dp,32dp" group="appearance" />
+                  <radio id="4404" name="sample_radio_system" text="System" size="150dp,32dp" group="appearance" />
+                </window>
+              </window>
+              <window class="gallery_card">
+                <text text="Selection feedback" class="section_title" />
+                <text text="Changes are reflected here immediately." class="meta" />
+                <text text="Send notifications is selected." name="selection_feedback" class="meta" />
+              </window>
+              <window skin="gallery_subtle" size="-2,48dp" layout="hbox" gravity="center" padding="16dp,0,16dp,0" interval="12dp">
+                <img skin="gallery_icon_info" size="20dp,20dp" msgTransparent="1" />
+                <text text="These are choice examples; the title-bar theme button controls the gallery appearance." class="meta" size="0,-1" weight="1" />
+              </window>
+            </scrollview>
+          </page>
+          <page name="page_input" title="Text input">
+            <scrollview size="-2,-2" viewSize="-2,-1" layout="vbox" interval="12dp" padding="0,0,2dp,0">
+              <text name="types_input" text="&lt;hotkey&gt; / &lt;spinButton&gt; / &lt;richedit&gt; / &lt;edit&gt; / &lt;keyboardSpacer&gt;" class="meta" font="size:12dp" size="-2,32dp" multiLines="1" wordBreak="1" noPrefix="1" />
+              <window class="gallery_card">
+                <text text="Single-line input" class="section_title" />
+                <text text="Type something. The character count updates as you edit." class="meta" />
+                <edit name="sample_input" notifyChange="1" size="320dp,36dp" cueText="Enter your name" cueColor="@color/fluent_text_secondary" />
+                <text text="0 characters  /  Start typing to try the input." name="input_feedback" class="meta" />
+              </window>
+              <window class="gallery_card">
+                <text text="Rich text editor" class="section_title" />
+                <text text="SRichEdit  /  &lt;richedit&gt;  /  fluent_edit" class="meta" />
+                <richedit name="sample_richedit" size="-2,112dp" rich="1" multiLines="1" wantReturn="1" vscrollBar="1" notifyChange="1" text="Native rich text. Select a phrase and edit it.&#10;This editor has its own text-service implementation." />
+              </window>
+              <window class="gallery_card">
+                <text text="Numeric stepper" class="section_title" />
+                <text text="SSpinButtonCtrl  /  &lt;spinButton&gt;  /  gallery_arrow_up + down" class="meta" />
+                <window size="-2,38dp" layout="hbox" gravity="center" interval="10dp">
+                  <edit name="sample_number" text="4" number="1" size="120dp,36dp" notifyChange="1" />
+                  <spinButton name="sample_spin" buddy="sample_number" min="0" max="12" step="1" circle="0" value="4" size="24dp,36dp" />
+                  <text name="number_feedback" text="Range 0-12, step 1" class="meta" />
+                </window>
+                <text text="The real spin control updates its buddy edit. Values are clamped at both bounds." class="meta" size="-2,36dp" multiLines="1" wordBreak="1" />
+              </window>
+              <window class="gallery_card">
+                <text text="Keyboard shortcut" class="section_title" />
+                <text text="SHotKeyCtrl  /  &lt;hotkey&gt;  /  fluent_edit" class="meta" />
+                <window size="-2,38dp" layout="hbox" gravity="center" interval="14dp">
+                  <hotkey name="sample_hotkey" hotKey="ctrl+shift+g" size="260dp,36dp" />
+                  <text name="hotkey_feedback" text="Focus and press a shortcut" class="meta" />
+                </window>
+              </window>
+              <window class="gallery_card">
+                <text text="Input states" class="section_title" />
+                <text text="A consistent surface, even when editing is unavailable." class="meta" />
+                <window size="-2,-1" layout="hbox" gravity="center" interval="12dp">
+                  <window size="0,-1" weight="1" layout="vbox" interval="10dp">
+                    <text text="Read-only" class="meta" />
+                    <edit name="sample_readonly" size="320dp,36dp" cueText="" cueColor="@color/fluent_text_secondary" text="SOUI Widgets Gallery" readOnly="1" width="-2" />
+                  </window>
+                  <window size="0,-1" weight="1" layout="vbox" interval="10dp">
+                    <text text="Disabled" class="meta" />
+                    <edit name="sample_input_disabled" size="320dp,36dp" cueText="Unavailable" cueColor="@color/fluent_text_secondary" enable="0" width="-2" />
+                  </window>
+                </window>
+              </window>
+              <window class="gallery_card">
+                <text text="Multiple lines" class="section_title" />
+                <text text="A comfortable area for longer thoughts." class="meta" />
+                <edit name="sample_multiline" size="-2,112dp" multiLines="1" wantReturn="1" vscrollBar="1" cueText="Write a few lines..." cueColor="@color/fluent_text_secondary" padding="12dp,10dp,12dp,10dp" text="Good interfaces are made of small, considered details.&#10;&#10;This text remains in place when you switch themes." />
+              </window>
+              <window skin="gallery_subtle" size="-2,48dp" layout="hbox" gravity="center" padding="16dp,0,16dp,0" interval="12dp">
+                <img skin="gallery_icon_info" size="20dp,20dp" msgTransparent="1" />
+                <text text="Focus adds a clear accent boundary. Your edits survive navigation and light / dark changes." class="meta" size="0,-1" weight="1" />
+              </window>
+              <window class="gallery_card">
+                <text text="On-screen keyboard spacer" class="section_title" />
+                <text text="SKeyboardSpacer  /  &lt;keyboardSpacer&gt;  /  layout helper" class="meta" />
+                <window size="-2,-1" layout="vbox">
+                  <text text="Adds space only while the platform IME is visible." class="meta" />
+                  <keyboardSpacer name="sample_keyboardspacer" size="-2,0" />
+                </window>
+                <text text="Desktop: zero-height by design; mobile keyboard behavior requires a device." class="meta" size="-2,36dp" multiLines="1" wordBreak="1" />
+              </window>
+            </scrollview>
+          </page>
+          <page name="page_combo" title="ComboBox">
+            <scrollview size="-2,-2" viewSize="-2,-1" layout="vbox" interval="12dp" padding="0,0,2dp,0">
+              <text name="types_combo" text="&lt;ComboEdit&gt; / &lt;combobox&gt; / &lt;comboview&gt; / &lt;searchdropdownlist&gt;" class="meta" font="size:12dp" size="-2,32dp" multiLines="1" wordBreak="1" noPrefix="1" />
+              <window class="gallery_card">
+                <text text="Choose a font" class="section_title" />
+                <text text="An easy-to-scan list with the same Fluent surface as the input." class="meta" />
+                <combobox name="sample_combo" size="320dp,36dp" dropdown="1" dropHeight="172dp" curSel="0" autoFitDropBtn="0" animateTime="200" dotted="0">
+                  <dropdownStyle translucent="1">
+                    <root colorBkgnd="@color/fluent_card_bg" />
+                  </dropdownStyle>
+                  <liststyle itemHeight="36dp" text-x="12dp" />
+                  <items>
+                    <item text="Segoe UI" />
+                    <item text="Noto Sans" />
+                    <item text="Inter" />
+                    <item text="Source Sans 3" />
+                  </items>
+                </combobox>
+              </window>
+              <window class="gallery_card">
+                <text text="Template-backed combo" class="section_title" />
+                <text text="SComboView  /  &lt;comboview&gt;  /  fluent_edit + virtual item template" class="meta" />
+                <comboview name="sample_comboview" size="320dp,36dp" dropDown="1" dropHeight="240dp" id_text="1" autoFitDropBtn="0" animateTime="200" drawFocusRect="1">
+                  <dropdownStyle translucent="1">
+                    <root colorBkgnd="@color/fluent_card_bg" />
+                  </dropdownStyle>
+                  <listStyle colorBkgnd="@color/fluent_card_bg" hotTrack="1">
+                    <template itemHeight="48dp" height="48dp" skin="_skin.sys.list.item" colorBkgnd="@color/fluent_card_bg" layout="vbox" padding="12dp,5dp,12dp,5dp" interval="2dp">
+                      <text id="1" text="Collection" font="size:14dp,bold:1" />
+                      <text id="2" text="Details" colorText="@color/fluent_text_secondary" font="size:12dp" />
+                    </template>
+                  </listStyle>
+                </comboview>
+                <text text="Gallery::InitializeViews supplies the adapter. The dropdown contains real recycled item panels." class="meta" size="-2,36dp" multiLines="1" wordBreak="1" />
+              </window>
+              <window class="gallery_card">
+                <text text="Search suggestions" class="section_title" />
+                <text text="SSearchDropdownList  /  &lt;searchdropdownlist&gt;  /  themed virtual suggestions" class="meta" />
+                <window size="-2,-1" layout="vbox" interval="12dp">
+                  <window size="-2,36dp" layout="hbox" interval="12dp">
+                    <edit name="sample_suggestion_input" size="320dp,36dp" text="" cueText="Try list, view, or leave empty" />
+                    <gallerybutton name="btn_suggest" text="Show suggestions" size="170dp,36dp" />
+                  </window>
+                  <text name="suggestion_feedback" text="Enter a keyword or leave empty, then choose a suggestion." class="meta" />
+                  <searchdropdownlist name="sample_suggestions" maxDropHeight="240dp" dropAlign="left">
+                    <dropdownStyle>
+                      <root colorBkgnd="@color/fluent_card_bg" />
+                    </dropdownStyle>
+                    <listStyle colorBkgnd="@color/fluent_card_bg" hotTrack="1">
+                      <template itemHeight="48dp" height="48dp" skin="_skin.sys.list.item" colorBkgnd="@color/fluent_card_bg" layout="vbox" padding="12dp,5dp,12dp,5dp" interval="2dp">
+                        <text id="1" text="Collection" font="size:14dp,bold:1" />
+                        <text id="2" text="Details" colorText="@color/fluent_text_secondary" font="size:12dp" />
+                      </template>
+                    </listStyle>
+                  </searchdropdownlist>
+                </window>
+                <text text="Fill, selected, and buddy-rectangle events are wired to the controller." class="meta" size="-2,36dp" multiLines="1" wordBreak="1" />
+              </window>
+              <window class="gallery_card">
+                <text text="Editable ComboBox" class="section_title" />
+                <text text="Choose from the list or enter your own value." class="meta" />
+                <combobox name="sample_combo_edit" size="320dp,36dp" dropdown="0" dropHeight="172dp" curSel="0" autoFitDropBtn="0" animateTime="0" dotted="0">
+                  <dropdownStyle translucent="1">
+                    <root colorBkgnd="@color/fluent_card_bg" />
+                  </dropdownStyle>
+                  <liststyle itemHeight="36dp" text-x="12dp" />
+                  <items>
+                    <item text="Segoe UI" />
+                    <item text="Noto Sans" />
+                    <item text="Inter" />
+                    <item text="Source Sans 3" />
+                  </items>
+                  <editStyle name="sample_comboedit" skin="" ncSkin="" colorText="@color/fluent_text" padding="2dp,0,2dp,0" />
+                </combobox>
+              </window>
+              <window class="gallery_card">
+                <text text="Selection feedback" class="section_title" />
+                <text text="Open the dropdown to try its hover and selection states." class="meta" />
+                <text text="Selected: Segoe UI" name="combo_feedback" class="meta" />
+              </window>
+              <window skin="gallery_subtle" size="-2,48dp" layout="hbox" gravity="center" padding="16dp,0,16dp,0" interval="12dp">
+                <img skin="gallery_icon_info" size="20dp,20dp" msgTransparent="1" />
+                <text text="Dropdown surfaces, selection colors, scrollbars, and text adapt to the current theme." class="meta" size="0,-1" weight="1" />
+              </window>
+            </scrollview>
+          </page>
+          <page name="page_progress" title="Progress">
+            <scrollview size="-2,-2" viewSize="-2,-1" layout="vbox" interval="12dp" padding="0,0,2dp,0">
+              <window size="-2,-1" layout="hbox" gravity="center" interval="12dp" height="36dp">
+                <text text="Determinate progress" class="section_title" />
+                <window size="0,0" weight="1" />
+                <gallerybutton text="Reset" name="btn_reset" class="fluent_btn_secondary" size="136dp,34dp" width="84dp" />
+                <gallerybutton text="Animate values" name="btn_animate" class="fluent_btn_primary" size="136dp,34dp" width="148dp" />
+              </window>
+              <window class="gallery_card" height="112dp" interval="10dp">
+                <window size="-2,-1" layout="hbox" gravity="center" interval="12dp">
+                  <text text="Standard" font="size:15dp,bold:1" />
+                  <window size="0,0" weight="1" />
+                  <text text="25%" name="progress_standard_label" colorText="@color/fluent_accent" font="size:16dp,bold:1" />
+                </window>
+                <text text="A simple, determinate indicator." class="meta" />
+                <progress name="progress_standard" size="-2,16dp" range="0,100" value="25" posSkin="gallery_progress_blue" bkgndSkin="gallery_progress_track" />
+              </window>
+              <window class="gallery_card" height="112dp" interval="10dp">
+                <window size="-2,-1" layout="hbox" gravity="center" interval="12dp">
+                  <text text="With percentage" font="size:15dp,bold:1" />
+                  <window size="0,0" weight="1" />
+                  <text text="60%" name="progress_success_label" colorText="@color/fluent_text" font="size:16dp,bold:1" />
+                </window>
+                <text text="A meaningful color and a label that updates with the value." class="meta" />
+                <progress name="progress_success" size="-2,22dp" range="0,100" value="60" posSkin="gallery_progress_green" showText="1" colorText="@color/fluent_on_accent" />
+              </window>
+              <window class="gallery_card" height="112dp" interval="10dp">
+                <window size="-2,-1" layout="hbox" gravity="center" interval="12dp">
+                  <text text="Rounded indicator" font="size:15dp,bold:1" />
+                  <window size="0,0" weight="1" />
+                  <text text="90%" name="progress_pill_label" colorText="@color/fluent_text" font="size:16dp,bold:1" />
+                </window>
+                <text text="Soft ends with the same compact visual rhythm." class="meta" />
+                <progress name="progress_pill" size="-2,16dp" range="0,100" value="90" bkgndSkin="gallery_progress_track_pill" posSkin="gallery_progress_amber" />
+              </window>
+              <window class="gallery_card" height="112dp" interval="10dp">
+                <window size="-2,-1" layout="hbox" gravity="center" interval="12dp">
+                  <text text="Custom range" font="size:15dp,bold:1" />
+                  <window size="0,0" weight="1" />
+                  <text text="35 / 80" name="progress_custom_label" colorText="@color/fluent_text" font="size:16dp,bold:1" />
+                </window>
+                <text text="Range 20–80. Value 35 fills one quarter of the track." class="meta" />
+                <progress name="progress_custom" size="-2,16dp" range="20,80" value="35" posSkin="gallery_progress_purple" />
+              </window>
+              <window skin="gallery_subtle" size="-2,48dp" layout="hbox" gravity="center" padding="16dp,0,16dp,0" interval="12dp">
+                <img skin="gallery_icon_info" size="20dp,20dp" msgTransparent="1" />
+                <text text="Animate to new targets, click again to retarget, or Reset to restore the initial values." class="meta" size="0,-1" weight="1" />
+              </window>
+              <window class="gallery_card">
+                <text text="Vertical progress" class="section_title" />
+                <text text="SProgress  /  vertical=&quot;1&quot;  /  same semantic skins" class="meta" />
+                <window size="-2,110dp" layout="hbox" interval="20dp" gravity="center">
+                  <progress name="sample_progress_vertical" size="14dp,100dp" vertical="1" range="0,100" value="65" />
+                  <text text="65% / Bottom-to-top fill" class="meta" />
+                </window>
+              </window>
+            </scrollview>
+          </page>
+          <page name="page_slider" title="Sliders &amp; scrollbars">
+            <scrollview size="-2,-2" viewSize="-2,-1" layout="vbox" interval="12dp" padding="0,0,2dp,0">
+              <text name="types_slider" text="&lt;sliderbar&gt; / &lt;scrollbar&gt;" class="meta" font="size:12dp" size="-2,32dp" multiLines="1" wordBreak="1" noPrefix="1" />
+              <window class="gallery_card">
+                <text text="Continuous slider" class="section_title" />
+                <text text="Drag the thumb to adjust the value." class="meta" />
+                <window size="-2,-1" layout="hbox" gravity="center" interval="12dp">
+                  <sliderbar name="sample_slider" id="4500" size="0,36dp" weight="1" range="0,100" value="40" thumbInRail="1" dragTip="1" />
+                  <text text="40%" name="slider_value" size="80dp,30dp" font="size:18dp,bold:1" textAlign="right" />
+                </window>
+              </window>
+              <window class="gallery_card">
+                <text text="A smaller range" class="section_title" />
+                <text text="The same interaction, with values from 0 to 10." class="meta" />
+                <window size="-2,-1" layout="hbox" gravity="center" interval="12dp">
+                  <sliderbar name="sample_slider_steps" id="4501" size="0,36dp" weight="1" range="0,10" value="6" thumbInRail="1" dragTip="1" />
+                  <text text="6 / 10" name="slider_steps_value" size="80dp,30dp" font="size:18dp,bold:1" textAlign="right" />
+                </window>
+              </window>
+              <window class="gallery_card">
+                <text text="Disabled slider" class="section_title" />
+                <text text="Unavailable controls remain recognizable." class="meta" />
+                <sliderbar size="-2,36dp" range="0,100" value="35" enable="0" thumbInRail="1" />
+              </window>
+              <window skin="gallery_subtle" size="-2,48dp" layout="hbox" gravity="center" padding="16dp,0,16dp,0" interval="12dp">
+                <img skin="gallery_icon_info" size="20dp,20dp" msgTransparent="1" />
+                <text text="The current value is shown beside the control and in its drag tooltip." class="meta" size="0,-1" weight="1" />
+              </window>
+              <window class="gallery_card">
+                <text text="Standalone scrollbar" class="section_title" />
+                <text text="SScrollBar  /  &lt;scrollbar&gt;  /  _skin.sys.scrollbar" class="meta" />
+                <window size="-2,92dp" layout="vbox" interval="10dp">
+                  <scrollbar name="sample_scrollbar" size="-2,16dp" vertical="0" min="0" max="100" page="20" value="30" />
+                  <text name="scrollbar_feedback" text="Drag the thumb or use the arrows." class="meta" />
+                </window>
+              </window>
+            </scrollview>
+          </page>
+          <page name="page_list" title="ListBox">
+            <scrollview size="-2,-2" viewSize="-2,-1" layout="vbox" interval="12dp" padding="0,0,2dp,0">
+              <text name="types_list" text="&lt;listbox&gt;" class="meta" font="size:12dp" size="-2,32dp" multiLines="1" wordBreak="1" noPrefix="1" />
+              <window class="gallery_card">
+                <text text="Your collections" class="section_title" />
+                <text text="Select a row, add a collection, or remove the selected item." class="meta" />
+                <listbox name="sample_list" size="-2,248dp" itemHeight="42dp" text-x="16dp" hotTrack="1" curSel="0">
+                  <items>
+                    <item text="Design inspiration" />
+                    <item text="Getting started" />
+                    <item text="Fluent components" />
+                    <item text="Personal favorites" />
+                    <item text="Release notes" />
+                  </items>
+                </listbox>
+                <window size="-2,-1" layout="hbox" gravity="center" interval="12dp">
+                  <gallerybutton text="Add collection" name="btn_add_item" class="fluent_btn_primary" size="136dp,34dp" />
+                  <gallerybutton text="Remove selected" name="btn_remove_item" class="fluent_btn_secondary" size="136dp,34dp" />
+                </window>
+                <text text="Selected row 1  /  5 items" name="list_feedback" class="meta" />
+              </window>
+              <window skin="gallery_subtle" size="-2,48dp" layout="hbox" gravity="center" padding="16dp,0,16dp,0" interval="12dp">
+                <img skin="gallery_icon_info" size="20dp,20dp" msgTransparent="1" />
+                <text text="The list handles the empty state safely. Selection and added items remain when changing theme." class="meta" size="0,-1" weight="1" />
+              </window>
+            </scrollview>
+          </page>
+          <page name="page_tree" title="TreeView">
+            <scrollview size="-2,-2" viewSize="-2,-1" layout="vbox" interval="12dp" padding="0,0,2dp,0">
+              <text name="types_tree" text="&lt;treectrl&gt; / &lt;treeview&gt;" class="meta" font="size:12dp" size="-2,32dp" multiLines="1" wordBreak="1" noPrefix="1" />
+              <window class="gallery_card">
+                <text text="Project explorer" class="section_title" />
+                <text text="Expand a branch and select a file." class="meta" />
+                <treectrl name="sample_tree" size="-2,320dp" itemHeight="36dp" indent="24dp" itemMargin="8dp" hasLines="0" fullRowSel="1" itemSkin="_skin.sys.list.item" toggleSkin="gallery_tree_toggle" colorItemBkgnd="@color/fluent_card_bg" colorItemSelBkgnd="@color/fluent_fill_pressed" colorItemText="@color/fluent_text" colorItemSelText="@color/fluent_text">
+                  <item text="SOUI Widgets Gallery" expand="1">
+                    <item text="uires" expand="1">
+                      <item text="xml" expand="1">
+                        <item text="gallery.xml" />
+                        <item text="dialog.xml" />
+                      </item>
+                      <item text="svg" expand="0">
+                        <item text="Fluent icons" />
+                      </item>
+                      <item text="values" expand="0">
+                        <item text="Light theme" />
+                        <item text="Dark theme" />
+                      </item>
+                    </item>
+                    <item text="MainDlg.cpp" />
+                    <item text="GalleryModel.h" />
+                  </item>
+                </treectrl>
+                <text text="Select any item to see its name." name="tree_feedback" class="meta" />
+              </window>
+              <window skin="gallery_subtle" size="-2,48dp" layout="hbox" gravity="center" padding="16dp,0,16dp,0" interval="12dp">
+                <img skin="gallery_icon_info" size="20dp,20dp" msgTransparent="1" />
+                <text text="Double-click a branch or use its chevron to expand and collapse it." class="meta" size="0,-1" weight="1" />
+              </window>
+              <window class="gallery_card">
+                <text text="Adapter-based tree" class="section_title" />
+                <text text="STreeView  /  &lt;treeview&gt;  /  nested virtual item panels" class="meta" />
+                <treeview name="sample_treeview" size="-2,260dp" indent="22dp" hasLines="0">
+                  <template height="36dp" skin="_skin.sys.list.item" colorBkgnd="@color/fluent_card_bg" layout="hbox" gravity="center" interval="8dp" padding="8dp,0,8dp,0">
+                    <toggle name="tgl" id="10" skin="gallery_tree_expander" size="16dp,16dp" focusSkin="" />
+                    <text id="1" text="Node" dotted="1" size="0,-1" weight="1" />
+                    <text id="2" text="" dotted="1" colorText="@color/fluent_text_secondary" size="180dp,-1" />
+                  </template>
+                </treeview>
+                <text text="Expand a branch, select a child, and scroll; this is STreeView, not STreeCtrl." class="meta" size="-2,36dp" multiLines="1" wordBreak="1" />
+              </window>
+            </scrollview>
+          </page>
+          <page name="page_tabs" title="Tabs &amp; stacks">
+            <scrollview size="-2,-2" viewSize="-2,-1" layout="vbox" interval="12dp" padding="0,0,2dp,0">
+              <text name="types_tabs" text="&lt;tabctrl&gt; / &lt;page&gt; / &lt;stack&gt; / &lt;stackPage&gt;" class="meta" font="size:12dp" size="-2,32dp" multiLines="1" wordBreak="1" noPrefix="1" />
+              <window class="gallery_card">
+                <text text="Related views" class="section_title" />
+                <text text="A familiar tab strip with clear selected and hover states." class="meta" />
+                <gallerytabs name="sample_tabs" size="-2,300dp" tabHeight="38dp" tabWidth="130dp" tabInterSize="4dp" curSel="0" tabSkin="_skin.sys.tab.page" duration="0">
+                  <page title="General" layout="vbox" padding="22dp,26dp,22dp,22dp" interval="16dp" name="sample_tabpage">
+                    <text text="General settings" class="section_title" />
+                    <text text="These controls keep their state when you switch tabs." class="meta" />
+                    <check text="Enable automatic updates" checked="1" size="-2,32dp" />
+                    <edit name="tab_input" size="320dp,36dp" cueText="Display name" cueColor="@color/fluent_text_secondary" text="My workspace" />
+                  </page>
+                  <page title="Appearance" layout="vbox" padding="22dp,26dp,22dp,22dp" interval="16dp">
+                    <text text="A comfortable workspace" class="section_title" />
+                    <text text="The gallery supports both light and dark themes." class="meta" />
+                    <window skin="gallery_subtle" size="-2,48dp" layout="hbox" gravity="center" padding="16dp,0,16dp,0" interval="12dp">
+                      <img skin="gallery_icon_info" size="20dp,20dp" msgTransparent="1" />
+                      <text text="Use the theme button in the title bar to try the alternate palette." class="meta" size="0,-1" weight="1" />
+                    </window>
+                  </page>
+                  <page title="About" layout="vbox" padding="22dp,26dp,22dp,22dp" interval="16dp">
+                    <text text="SOUI Widgets Gallery" class="section_title" />
+                    <text text="Native C++ controls. Declarative XML. Fluent Design." class="meta" />
+                    <text text="Built as an independent demo, without modifying shared system skins." class="meta" />
+                  </page>
+                </gallerytabs>
+              </window>
+              <window skin="gallery_subtle" size="-2,48dp" layout="hbox" gravity="center" padding="16dp,0,16dp,0" interval="12dp">
+                <img skin="gallery_icon_info" size="20dp,20dp" msgTransparent="1" />
+                <text text="Tab changes use the native STabCtrl event path; the gallery navigation is independent." class="meta" size="0,-1" weight="1" />
+              </window>
+              <window class="gallery_card">
+                <text text="Stacked views" class="section_title" />
+                <text text="SStackView + SStackPage  /  &lt;stack&gt; + &lt;stackPage&gt;" class="meta" />
+                <window size="-2,-1" layout="vbox" interval="12dp">
+                  <window size="-2,36dp" layout="hbox" interval="12dp">
+                    <gallerybutton name="btn_stack_prev" text="Previous view" size="150dp,36dp" />
+                    <gallerybutton name="btn_stack_next" text="Next view" class="fluent_btn_primary" size="150dp,36dp" />
+                  </window>
+                  <stack name="sample_stack" size="-2,140dp" curSel="0" aniType="none">
+                    <stackPage name="sample_stackpage" skin="gallery_subtle" layout="vbox" padding="20dp,20dp,20dp,20dp" interval="10dp">
+                      <text text="Your workspace" font="size:18dp,bold:1" />
+                      <edit name="sample_stack_edit" size="300dp,36dp" text="This value survives switching views." />
+                    </stackPage>
+                    <stackPage skin="gallery_subtle" layout="vbox" padding="20dp,20dp,20dp,20dp" interval="10dp">
+                      <text text="Activity" font="size:18dp,bold:1" />
+                      <text text="A second native stack page. No header is required." class="meta" />
+                    </stackPage>
+                  </stack>
+                </window>
+              </window>
+            </scrollview>
+          </page>
+          <page name="page_dialog" title="Dialogs">
+            <scrollview size="-2,-2" viewSize="-2,-1" layout="vbox" interval="12dp" padding="0,0,2dp,0">
+              <text name="types_dialog" text="&lt;modalroot&gt; / &lt;modalview&gt;" class="meta" font="size:12dp" size="-2,32dp" multiLines="1" wordBreak="1" noPrefix="1" />
+              <window class="gallery_card">
+                <text text="A focused decision" class="section_title" />
+                <text text="Open a real modal SOUI dialog, not an imitation inside the page." class="meta" />
+                <window size="-2,-1" layout="hbox" gravity="center" interval="12dp">
+                  <img skin="gallery_icon_dialog" size="40dp,40dp" msgTransparent="1" />
+                  <window size="0,-1" weight="1" layout="vbox" interval="8dp">
+                    <text text="Save your workspace?" font="size:18dp,bold:1" />
+                    <text text="Try Confirm, Cancel, the close button, or Escape." class="meta" />
+                  </window>
+                </window>
+                <gallerybutton text="Open dialog" name="btn_dialog" class="fluent_btn_primary" size="136dp,34dp" width="148dp" />
+              </window>
+              <window class="gallery_card">
+                <text text="Dialog result" class="section_title" />
+                <text text="The parent receives the result when the dialog closes." class="meta" />
+                <text text="No dialog has been opened yet." name="dialog_feedback" class="meta" />
+              </window>
+              <window skin="gallery_subtle" size="-2,48dp" layout="hbox" gravity="center" padding="16dp,0,16dp,0" interval="12dp">
+                <img skin="gallery_icon_info" size="20dp,20dp" msgTransparent="1" />
+                <text text="Modal focus is owned by SHostDialog. The gallery is disabled until the dialog is dismissed." class="meta" size="0,-1" weight="1" />
+              </window>
+              <window class="gallery_card">
+                <text text="In-window modal view" class="section_title" />
+                <text text="SModalRoot + SModalView  /  actual host modal session" class="meta" />
+                <gallerybutton name="btn_modal" text="Open in-window dialog" class="fluent_btn_primary" size="220dp,36dp" />
+                <text text="Uses BeginModalViewSession / EndModalViewSession. Escape and the dimmed backdrop dismiss it." class="meta" size="-2,36dp" multiLines="1" wordBreak="1" />
+              </window>
+            </scrollview>
+          </page>
+          <page name="page_icons" title="Icons &amp; images">
+            <scrollview size="-2,-2" viewSize="-2,-1" layout="vbox" interval="12dp" padding="0,0,2dp,0">
+              <text name="types_icons" text="&lt;img&gt; / &lt;icon&gt; / &lt;animateimg&gt;" class="meta" font="size:12dp" size="-2,32dp" multiLines="1" wordBreak="1" noPrefix="1" />
+              <window class="gallery_card">
+                <text text="A shared icon language" class="section_title" />
+                <text text="Simple 20 px line icons, authored as SVG and paired for both themes." class="meta" />
+                <window size="-2,-1" layout="vbox" interval="16dp">
+                  <window size="-2,-1" layout="hbox" gravity="center" interval="12dp">
+                    <window size="0,94dp" weight="1" layout="vbox" gravity="center" interval="12dp">
+                      <img skin="gallery_icon_home" size="28dp,28dp" msgTransparent="1" name="sample_image" />
+                      <text text="Overview" class="meta" size="-2,20dp" textAlign="center" font="size:11dp" />
+                    </window>
+                    <window size="0,94dp" weight="1" layout="vbox" gravity="center" interval="12dp">
+                      <img skin="gallery_icon_buttons" size="28dp,28dp" msgTransparent="1" />
+                      <text text="Buttons" class="meta" size="-2,20dp" textAlign="center" font="size:11dp" />
+                    </window>
+                    <window size="0,94dp" weight="1" layout="vbox" gravity="center" interval="12dp">
+                      <img skin="gallery_icon_selection" size="28dp,28dp" msgTransparent="1" />
+                      <text text="Selection" class="meta" size="-2,20dp" textAlign="center" font="size:11dp" />
+                    </window>
+                    <window size="0,94dp" weight="1" layout="vbox" gravity="center" interval="12dp">
+                      <img skin="gallery_icon_input" size="28dp,28dp" msgTransparent="1" />
+                      <text text="Text input" class="meta" size="-2,20dp" textAlign="center" font="size:11dp" />
+                    </window>
+                    <window size="0,94dp" weight="1" layout="vbox" gravity="center" interval="12dp">
+                      <img skin="gallery_icon_combo" size="28dp,28dp" msgTransparent="1" />
+                      <text text="ComboBox" class="meta" size="-2,20dp" textAlign="center" font="size:11dp" />
+                    </window>
+                    <window size="0,94dp" weight="1" layout="vbox" gravity="center" interval="12dp">
+                      <img skin="gallery_icon_progress" size="28dp,28dp" msgTransparent="1" />
+                      <text text="Progress" class="meta" size="-2,20dp" textAlign="center" font="size:11dp" />
+                    </window>
+                    <window size="0,94dp" weight="1" layout="vbox" gravity="center" interval="12dp">
+                      <img skin="gallery_icon_slider" size="28dp,28dp" msgTransparent="1" />
+                      <text text="Sliders" class="meta" size="-2,20dp" textAlign="center" font="size:11dp" />
+                    </window>
+                  </window>
+                  <window size="-2,-1" layout="hbox" gravity="center" interval="12dp">
+                    <window size="0,94dp" weight="1" layout="vbox" gravity="center" interval="12dp">
+                      <img skin="gallery_icon_list" size="28dp,28dp" msgTransparent="1" />
+                      <text text="Lists" class="meta" size="-2,20dp" textAlign="center" font="size:11dp" />
+                    </window>
+                    <window size="0,94dp" weight="1" layout="vbox" gravity="center" interval="12dp">
+                      <img skin="gallery_icon_tree" size="28dp,28dp" msgTransparent="1" />
+                      <text text="TreeView" class="meta" size="-2,20dp" textAlign="center" font="size:11dp" />
+                    </window>
+                    <window size="0,94dp" weight="1" layout="vbox" gravity="center" interval="12dp">
+                      <img skin="gallery_icon_tabs" size="28dp,28dp" msgTransparent="1" />
+                      <text text="Tabs" class="meta" size="-2,20dp" textAlign="center" font="size:11dp" />
+                    </window>
+                    <window size="0,94dp" weight="1" layout="vbox" gravity="center" interval="12dp">
+                      <img skin="gallery_icon_dialog" size="28dp,28dp" msgTransparent="1" />
+                      <text text="Dialogs" class="meta" size="-2,20dp" textAlign="center" font="size:11dp" />
+                    </window>
+                    <window size="0,94dp" weight="1" layout="vbox" gravity="center" interval="12dp">
+                      <img skin="gallery_icon_icons" size="28dp,28dp" msgTransparent="1" />
+                      <text text="Icons" class="meta" size="-2,20dp" textAlign="center" font="size:11dp" />
+                    </window>
+                    <window size="0,94dp" weight="1" layout="vbox" gravity="center" interval="12dp">
+                      <img skin="gallery_icon_type" size="28dp,28dp" msgTransparent="1" />
+                      <text text="Typography" class="meta" size="-2,20dp" textAlign="center" font="size:11dp" />
+                    </window>
+                    <window size="0,94dp" weight="1" layout="vbox" gravity="center" interval="12dp">
+                      <img skin="gallery_icon_layout" size="28dp,28dp" msgTransparent="1" />
+                      <text text="Layout" class="meta" size="-2,20dp" textAlign="center" font="size:11dp" />
+                    </window>
+                  </window>
+                </window>
+              </window>
+              <window class="gallery_card">
+                <text text="Vector illustration" class="section_title" />
+                <text text="A small composition made from the same shapes as the controls." class="meta" />
+                <img skin="gallery_hero" size="520dp,208dp" />
+              </window>
+              <window skin="gallery_subtle" size="-2,48dp" layout="hbox" gravity="center" padding="16dp,0,16dp,0" interval="12dp">
+                <img skin="gallery_icon_info" size="20dp,20dp" msgTransparent="1" />
+                <text text="All gallery illustration and UI icons are vector resources; no generated bitmap artwork was needed." class="meta" size="0,-1" weight="1" />
+              </window>
+              <window class="gallery_card">
+                <text text="Animated image strip" class="section_title" />
+                <text text="SAnimateImgWnd  /  &lt;animateimg&gt;  /  gallery_spinner (12 SVG frames)" class="meta" />
+                <window size="-2,40dp" layout="hbox" gravity="center" interval="14dp">
+                  <animateimg name="sample_animateimg" skin="gallery_spinner" size="24dp,24dp" speed="90" autoStart="1" repeat="-1" />
+                  <text text="A deterministic vector animation, not a bitmap GIF." class="meta" />
+                </window>
+              </window>
+              <window class="gallery_card">
+                <text text="Native icon handle" class="section_title" />
+                <text text="SIconWnd  /  &lt;icon&gt;  /  SVG converted to owned HICON at runtime" class="meta" />
+                <window size="-2,40dp" layout="hbox" gravity="center" interval="14dp">
+                  <icon name="sample_icon" size="32dp,32dp" />
+                  <text text="Same gallery vector mark, rendered through the native icon API." class="meta" />
+                </window>
+                <text text="A dedicated HICON bridge is required by SIconWnd; it is not an extra image resource." class="meta" size="-2,36dp" multiLines="1" wordBreak="1" />
+              </window>
+            </scrollview>
+          </page>
+          <page name="page_type" title="Typography">
+            <scrollview size="-2,-2" viewSize="-2,-1" layout="vbox" interval="12dp" padding="0,0,2dp,0">
+              <text name="types_type" text="&lt;text&gt; / &lt;hr&gt;" class="meta" font="size:12dp" size="-2,32dp" multiLines="1" wordBreak="1" noPrefix="1" />
+              <window class="gallery_card">
+                <text text="A readable hierarchy" class="section_title" name="sample_static" />
+                <text text="Segoe UI on Windows; platform-appropriate defaults on Linux and macOS." class="meta" />
+                <text text="Make room for what matters." font="size:28dp,bold:1" height="44dp" />
+                <text text="Section heading" font="size:20dp,bold:1" height="32dp" />
+                <text text="Body text is clear, calm, and easy to scan." font="size:14dp" height="24dp" />
+                <text text="Secondary text supports the primary content." class="meta" height="24dp" />
+                <text text="CAPTION / 12 DP" class="meta" font="size:12dp,bold:1" height="22dp" />
+              </window>
+              <window class="gallery_card">
+                <text text="Semantic color" class="section_title" />
+                <text text="Use color with purpose, and never as the only signal." class="meta" />
+                <window size="-2,-1" layout="hbox" gravity="center" interval="12dp">
+                  <text text="Primary text" colorText="@color/fluent_text" />
+                  <text text="Secondary text" colorText="@color/fluent_text_secondary" />
+                  <text text="Accent link" colorText="@color/fluent_accent" />
+                </window>
+              </window>
+              <window skin="gallery_subtle" size="-2,48dp" layout="hbox" gravity="center" padding="16dp,0,16dp,0" interval="12dp">
+                <img skin="gallery_icon_info" size="20dp,20dp" msgTransparent="1" />
+                <text text="The type scale, spacing, and color tokens are shared by every specimen." class="meta" size="0,-1" weight="1" />
+              </window>
+              <window class="gallery_card">
+                <text text="Horizontal and vertical rules" class="section_title" />
+                <text text="SHrLine  /  &lt;hr&gt;  /  fluent stroke token" class="meta" />
+                <window size="-2,64dp" layout="vbox" interval="12dp">
+                  <hr name="sample_hr" size="-2,1dp" colorLine="@color/gallery_stroke" />
+                  <window size="-2,30dp" layout="hbox" gravity="center" interval="16dp">
+                    <text text="Leading" />
+                    <hr size="1dp,28dp" mode="vertical" colorLine="@color/gallery_stroke" />
+                    <text text="Trailing" />
+                  </window>
+                </window>
+              </window>
+            </scrollview>
+          </page>
+          <page name="page_layout" title="Layout">
+            <scrollview size="-2,-2" viewSize="-2,-1" layout="vbox" interval="12dp" padding="0,0,2dp,0" name="sample_scrollview">
+              <text name="types_layout" text="&lt;window&gt; / &lt;div&gt; / &lt;scrollview&gt;" class="meta" font="size:12dp" size="-2,32dp" multiLines="1" wordBreak="1" noPrefix="1" />
+              <window class="gallery_card">
+                <text text="Weighted columns" class="section_title" />
+                <text text="Resize the window. Each column takes an equal share of the available space." class="meta" />
+                <window size="-2,-1" layout="hbox" gravity="center" interval="12dp">
+                  <window skin="gallery_subtle" size="0,128dp" weight="1" layout="vbox" padding="20dp,24dp,20dp,20dp" interval="12dp">
+                    <img skin="gallery_icon_layout" size="24dp,24dp" msgTransparent="1" />
+                    <text text="01 / Discover" font="size:15dp,bold:1" />
+                  </window>
+                  <window skin="gallery_subtle" size="0,128dp" weight="1" layout="vbox" padding="20dp,24dp,20dp,20dp" interval="12dp">
+                    <img skin="gallery_icon_layout" size="24dp,24dp" msgTransparent="1" />
+                    <text text="02 / Build" font="size:15dp,bold:1" />
+                  </window>
+                  <window skin="gallery_subtle" size="0,128dp" weight="1" layout="vbox" padding="20dp,24dp,20dp,20dp" interval="12dp">
+                    <img skin="gallery_icon_layout" size="24dp,24dp" msgTransparent="1" />
+                    <text text="03 / Refine" font="size:15dp,bold:1" />
+                  </window>
+                </window>
+              </window>
+              <window class="gallery_card">
+                <text text="A horizontal stack" class="section_title" />
+                <text text="One rhythm for controls, labels, and supporting actions." class="meta" />
+                <window size="-2,-1" layout="hbox" gravity="center" interval="12dp">
+                  <gallerybutton text="Primary action" name="layout_primary" class="fluent_btn_primary" size="136dp,34dp" id="4307" />
+                  <gallerybutton text="Secondary" name="layout_secondary" class="fluent_btn_secondary" size="136dp,34dp" id="4308" />
+                  <text text="12 dp between controls" class="meta" />
+                </window>
+              </window>
+              <window class="gallery_card">
+                <text text="A vertical stack" class="section_title" />
+                <text text="Layout is declarative, and sizes are authored in density-independent units." class="meta" />
+                <text text="8 / 12 / 16 / 24 / 32" font="size:22dp,bold:1" />
+                <text text="A small spacing scale keeps the entire gallery consistent." class="meta" />
+              </window>
+              <window skin="gallery_subtle" size="-2,48dp" layout="hbox" gravity="center" padding="16dp,0,16dp,0" interval="12dp">
+                <img skin="gallery_icon_info" size="20dp,20dp" msgTransparent="1" />
+                <text text="This is native SOUI hbox / vbox with layout weights, not a web view." class="meta" size="0,-1" weight="1" />
+              </window>
+              <window class="gallery_card">
+                <text text="Base window and scroll panel" class="section_title" />
+                <text text="SWindow + SPanel + SScrollView  /  &lt;window&gt; + &lt;div&gt; + &lt;scrollview&gt;" class="meta" />
+                <window name="sample_window" size="-2,-1" layout="vbox" interval="12dp">
+                  <div name="sample_panel" size="-2,110dp" vscrollBar="1" colorBkgnd="@color/gallery_subtle">
+                    <text pos="12dp,12dp" text="SPanel owns scrollbars; SScrollView also lays out a larger child view." />
+                  </div>
+                </window>
+              </window>
+            </scrollview>
+          </page>
+          <page name="page_listview" title="ListView">
+            <scrollview size="-2,-2" viewSize="-2,-1" layout="vbox" interval="12dp" padding="0,0,2dp,0">
+              <text name="types_listview" text="&lt;header&gt; / &lt;listctrl&gt; / &lt;listview&gt; / &lt;mclistview&gt;" class="meta" font="size:12dp" size="-2,32dp" multiLines="1" wordBreak="1" noPrefix="1" />
+              <window class="gallery_card">
+                <text text="Virtual list" class="section_title" />
+                <text text="SListView  /  &lt;listview&gt;  /  200 recycled two-line rows" class="meta" />
+                <listview name="sample_listview" size="-2,254dp" hotTrack="1">
+                  <template itemHeight="48dp" height="48dp" skin="_skin.sys.list.item" colorBkgnd="@color/fluent_card_bg" layout="vbox" padding="12dp,5dp,12dp,5dp" interval="2dp">
+                    <text id="1" text="Collection" font="size:14dp,bold:1" />
+                    <text id="2" text="Details" colorText="@color/fluent_text_secondary" font="size:12dp" />
+                  </template>
+                </listview>
+                <text text="Selection reports the model row, not the reused panel index. Scroll to create more rows." class="meta" size="-2,36dp" multiLines="1" wordBreak="1" />
+              </window>
+              <window class="gallery_card">
+                <text text="Multi-column virtual view" class="section_title" />
+                <text text="SMCListView  /  &lt;mclistview&gt;  /  80 rows + sortable header" class="meta" />
+                <mclistview name="sample_mclistview" size="-2,250dp" headerHeight="36dp" hotTrack="1" colorGrid="@color/gallery_stroke">
+                  <headerStyle itemSkin="_skin.sys.header" sortSkin="gallery_sort" sortHeader="1">
+                    <items>
+                      <item width="300dp">Collection</item>
+                      <item width="180dp">Owner</item>
+                      <item width="200dp">Status</item>
+                    </items>
+                  </headerStyle>
+                  <template itemHeight="38dp" height="38dp" skin="_skin.sys.list.item" colorBkgnd="@color/fluent_card_bg">
+                    <text id="1" name="col_name" dotted="1" padding="12dp,0,12dp,0" />
+                    <text id="2" name="col_owner" dotted="1" padding="12dp,0,12dp,0" />
+                    <text id="3" name="col_status" dotted="1" padding="12dp,0,12dp,0" />
+                  </template>
+                </mclistview>
+                <text text="Click a column to sort. Drag column dividers to resize." class="meta" size="-2,36dp" multiLines="1" wordBreak="1" />
+              </window>
+              <window class="gallery_card">
+                <text text="Stored report list" class="section_title" />
+                <text text="SListCtrl  /  &lt;listctrl&gt;  /  InsertItem + SetSubItemText" class="meta" />
+                <listctrl name="sample_listctrl" size="-2,238dp" headerHeight="36dp" itemHeight="36dp" checkBox="0" multiSel="0">
+                  <headerStyle sortSkin="gallery_sort">
+                    <items>
+                      <item width="300dp">Document</item>
+                      <item width="180dp">Kind</item>
+                      <item width="200dp">Updated</item>
+                    </items>
+                  </headerStyle>
+                </listctrl>
+                <text text="Unlike the virtual views above, SListCtrl owns its inserted cells." class="meta" size="-2,36dp" multiLines="1" wordBreak="1" />
+              </window>
+              <window class="gallery_card">
+                <text text="Standalone header" class="section_title" />
+                <text text="SHeaderCtrl  /  &lt;header&gt;  /  _skin.sys.header + gallery_sort" class="meta" />
+                <header name="sample_header" size="-2,36dp" sortHeader="1" sortSkin="gallery_sort">
+                  <items>
+                    <item width="300dp">Name</item>
+                    <item width="180dp">Size</item>
+                    <item width="200dp">Modified</item>
+                  </items>
+                </header>
+                <text text="A real independent header; clicking changes its sort indicator." class="meta" size="-2,36dp" multiLines="1" wordBreak="1" />
+              </window>
+              <text name="views_feedback" text="Select a row to inspect its index." class="meta" size="-2,36dp" />
+            </scrollview>
+          </page>
+          <page name="page_tileview" title="TileView">
+            <scrollview size="-2,-2" viewSize="-2,-1" layout="vbox" interval="12dp" padding="0,0,2dp,0">
+              <text name="types_tileview" text="&lt;tileview&gt;" class="meta" font="size:12dp" size="-2,32dp" multiLines="1" wordBreak="1" noPrefix="1" />
+              <window class="gallery_card">
+                <text text="Virtual tile collection" class="section_title" />
+                <text text="STileView  /  &lt;tileview&gt;  /  30 data-bound cards" class="meta" />
+                <tileview name="sample_tileview" size="-2,410dp" marginSize="12dp">
+                  <template itemWidth="220dp" itemHeight="164dp" height="164dp" skin="gallery_card" layout="vbox" padding="16dp,14dp,16dp,14dp" interval="9dp">
+                    <img skin="gallery_icon_layout" size="24dp,24dp" />
+                    <text id="1" text="Collection" font="size:14dp,bold:1" size="-2,38dp" multiLines="1" wordBreak="1" />
+                    <text id="2" text="Details" font="size:12dp" colorText="@color/fluent_text_secondary" size="-2,48dp" multiLines="1" wordBreak="1" />
+                  </template>
+                </tileview>
+                <text text="Resize the window to reflow cards. Scroll and select to exercise recycled item panels." class="meta" size="-2,36dp" multiLines="1" wordBreak="1" />
+              </window>
+              <text name="tiles_feedback" text="No collection selected." class="meta" size="-2,32dp" />
+            </scrollview>
+          </page>
+          <page name="page_datetime" title="Date &amp; time">
+            <scrollview size="-2,-2" viewSize="-2,-1" layout="vbox" interval="12dp" padding="0,0,2dp,0">
+              <text name="types_datetime" text="&lt;calendar&gt; / &lt;dateTimePicker&gt;" class="meta" font="size:12dp" size="-2,32dp" multiLines="1" wordBreak="1" noPrefix="1" />
+              <window class="gallery_card">
+                <text text="Calendar" class="section_title" />
+                <text text="SCalendar  /  &lt;calendar&gt;  /  theme-aware day and navigation skins" class="meta" />
+                <calendar name="sample_calendar" size="420dp,300dp" todayHeight="36dp" yearHeight="38dp" weekHeight="30dp" />
+                <text text="Select a day; navigate months and years using the header." class="meta" size="-2,36dp" multiLines="1" wordBreak="1" />
+              </window>
+              <window class="gallery_card">
+                <text text="Date and time picker" class="section_title" />
+                <text text="SDateTimePicker  /  &lt;dateTimePicker&gt;  /  fluent_edit + calendar popup" class="meta" />
+                <window size="-2,-1" layout="vbox" interval="12dp">
+                  <dateTimePicker name="sample_datetime" size="340dp,38dp" timeEnable="1">
+                    <calstyle colorBkgnd="@color/fluent_card_bg" colorText="@color/fluent_text" />
+                  </dateTimePicker>
+                  <dateTimePicker name="sample_date" size="260dp,38dp" timeEnable="0">
+                    <calstyle colorBkgnd="@color/fluent_card_bg" colorText="@color/fluent_text" />
+                  </dateTimePicker>
+                  <text name="date_feedback" text="Use arrow keys to edit the focused date segment." class="meta" />
+                </window>
+              </window>
+            </scrollview>
+          </page>
+          <page name="page_commands" title="Menus &amp; toolbars">
+            <scrollview size="-2,-2" viewSize="-2,-1" layout="vbox" interval="12dp" padding="0,0,2dp,0">
+              <text name="types_commands" text="&lt;menubar&gt; / &lt;toolbar&gt; / &lt;rebar&gt;" class="meta" font="size:12dp" size="-2,32dp" multiLines="1" wordBreak="1" noPrefix="1" />
+              <window class="gallery_card">
+                <text text="Menu bar" class="section_title" />
+                <text text="SMenuBar  /  &lt;menubar&gt;  /  Fluent MenuEx item surfaces" class="meta" />
+                <menubar name="sample_menubar" size="-2,38dp" useMenuEx="1">
+                  <btnStyle skin="gallery_quiet" colorText="@color/fluent_text" padding="14dp,6dp,14dp,6dp" />
+                  <menus>
+                    <menuItem src="SMENU:gallery_actions">Collection</menuItem>
+                    <menuItem src="SMENU:gallery_view">View</menuItem>
+                  </menus>
+                </menubar>
+                <text text="Menu actions report feedback; no file system or network actions are performed." class="meta" size="-2,36dp" multiLines="1" wordBreak="1" />
+              </window>
+              <window class="gallery_card">
+                <text text="Toolbar" class="section_title" />
+                <text text="SToolBar  /  &lt;toolbar&gt;  /  vector icons + item state skin" class="meta" />
+                <toolbar name="sample_toolbar" size="-2,42dp" itemSize="-2" skin="gallery_quiet" iconSkin="gallery_toolbar_icons" sepSkin="gallery_separator" dropArrowSkin="_skin.sys.dropbtn">
+                  <data>
+                    <item id="4700" text="New" iconIndex="0" showText="1" />
+                    <item id="4701" text="Save" iconIndex="1" showText="1" />
+                    <sep />
+                    <item id="4702" text="Pin" iconIndex="2" check="1" showText="1" />
+                  </data>
+                </toolbar>
+                <text text="Click commands or toggle Pin. These are toolbar items, not nested buttons." class="meta" size="-2,36dp" multiLines="1" wordBreak="1" />
+              </window>
+              <window class="gallery_card">
+                <text text="Rebar bands" class="section_title" />
+                <text text="SRebar  /  &lt;rebar&gt;  /  themed grippers and hosted controls" class="meta" />
+                <galleryrebar name="sample_rebar" colorBkgnd="@color/fluent_card_bg" colorBorder="@color/gallery_stroke" size="-2,100dp" colorGripper="@color/gallery_stroke" colorGripperDot="@color/fluent_text_secondary">
+                  <band title="Search" height="44" collapsible="1">
+                    <edit name="sample_rebar_edit" text="A resizable rebar band" size="260dp,36dp" />
+                  </band>
+                  <band title="Tools" height="44" collapsible="1">
+                    <window size="-2,36dp" layout="hbox" gravity="center" padding="12dp,0,12dp,0" interval="14dp">
+                      <img skin="gallery_icon_layout" size="20dp,20dp" />
+                      <text text="A second hosted band" />
+                    </window>
+                  </band>
+                </galleryrebar>
+                <text text="Double-click the gripper to collapse a band." class="meta" size="-2,36dp" multiLines="1" wordBreak="1" />
+              </window>
+              <text name="commands_feedback" text="Ready for a command." class="meta" size="-2,36dp" />
+            </scrollview>
+          </page>
+          <page name="page_containers" title="Containers">
+            <scrollview size="-2,-2" viewSize="-2,-1" layout="vbox" interval="12dp" padding="0,0,2dp,0">
+              <text name="types_containers" text="&lt;group&gt; / &lt;pane&gt; / &lt;splitwnd&gt; / &lt;splitcol&gt; / &lt;splitrow&gt; / &lt;frame&gt; / &lt;dockbar&gt;" class="meta" font="size:12dp" size="-2,32dp" multiLines="1" wordBreak="1" noPrefix="1" />
+              <window class="gallery_card">
+                <text text="Split columns" class="section_title" />
+                <text text="SSplitWnd_Col + SSplitPane  /  &lt;splitcol&gt; + &lt;pane&gt;" class="meta" />
+                <splitcol name="sample_splitcol" size="-2,170dp" sepSize="8">
+                  <pane name="sample_pane" idealSize="240dp" minSize="100dp" skin="gallery_subtle" layout="vbox" padding="16dp,16dp,16dp,16dp" interval="10dp">
+                    <text text="Navigation" font="size:15dp,bold:1" />
+                    <text text="Drag the divider" class="meta" />
+                  </pane>
+                  <pane idealSize="520dp" minSize="140dp" skin="gallery_subtle" layout="vbox" padding="16dp,16dp,16dp,16dp" interval="10dp">
+                    <text text="Content" font="size:15dp,bold:1" />
+                    <edit name="sample_split_edit" text="Pane state is preserved" size="-2,36dp" />
+                  </pane>
+                </splitcol>
+              </window>
+              <window class="gallery_card">
+                <text text="Split rows" class="section_title" />
+                <text text="SSplitWnd_Row  /  &lt;splitrow&gt;" class="meta" />
+                <splitrow name="sample_splitrow" size="-2,170dp" sepSize="8">
+                  <pane idealSize="70dp" minSize="40dp" skin="gallery_subtle" layout="hbox" gravity="center" padding="16dp,0,16dp,0">
+                    <text text="Top pane" />
+                  </pane>
+                  <pane idealSize="90dp" minSize="40dp" skin="gallery_subtle" layout="hbox" gravity="center" padding="16dp,0,16dp,0">
+                    <text text="Bottom pane" />
+                  </pane>
+                </splitrow>
+              </window>
+              <window class="gallery_card">
+                <text text="Configurable split host" class="section_title" />
+                <text text="SSplitWnd  /  &lt;splitwnd&gt;  /  explicit vertical orientation" class="meta" />
+                <splitwnd name="sample_splitwnd" size="-2,100dp" vertical="0" sepSize="8">
+                  <pane idealSize="220dp" minSize="80dp" skin="gallery_subtle" layout="hbox" gravity="center" padding="16dp,0,16dp,0">
+                    <text text="Primary pane" />
+                  </pane>
+                  <pane idealSize="420dp" minSize="80dp" skin="gallery_subtle" layout="hbox" gravity="center" padding="16dp,0,16dp,0">
+                    <text text="Secondary pane" />
+                  </pane>
+                </splitwnd>
+              </window>
+              <window class="gallery_card">
+                <text text="Group box" class="section_title" />
+                <text text="SGroup  /  &lt;group&gt;  /  Fluent stroke + rounded corners" class="meta" />
+                <group name="sample_group" text="Workspace preferences" size="-2,110dp" padding="16dp,26dp,16dp,12dp" layout="vbox" interval="8dp">
+                  <check text="Keep recent collections" size="260dp,30dp" checked="1" />
+                  <check text="Show activity badges" size="260dp,30dp" />
+                </group>
+              </window>
+              <window class="gallery_card">
+                <text text="Frame" class="section_title" />
+                <text text="SFrame  /  &lt;frame&gt;  /  gallery_subtle" class="meta" />
+                <frame name="sample_frame" skin="gallery_subtle" size="-2,70dp" layout="hbox" gravity="center" padding="16dp,0,16dp,0" interval="12dp">
+                  <img skin="gallery_icon_layout" size="24dp,24dp" />
+                  <text text="A non-scrolling, framed native container" />
+                </frame>
+              </window>
+              <window class="gallery_card">
+                <text text="Dock bar" class="section_title" />
+                <text text="SDockBar  /  &lt;dockbar&gt;  /  Fluent caption and control skins" class="meta" />
+                <dockbar name="sample_dockbar" text="Properties" size="-2,140dp" captionHeight="32dp" captionSkin="gallery_subtle" colorBkgnd="@color/fluent_card_bg" closeBtnSkin="_skin.sys.btn.mini.close" dockBtnSkin="gallery_arrow_down" floatable="0" resizable="0">
+                  <window pos="0,32dp,-0,-0" layout="vbox" padding="16dp,12dp,16dp,12dp" interval="8dp">
+                    <text text="Docked inspector" />
+                    <text text="Close hides this bar; use Restore below to bring it back." class="meta" />
+                  </window>
+                </dockbar>
+              </window>
+              <gallerybutton name="btn_dock_restore" text="Restore dock bar" size="170dp,36dp" />
+            </scrollview>
+          </page>
+          <page name="page_hosting" title="Hosting &amp; platform">
+            <scrollview size="-2,-2" viewSize="-2,-1" layout="vbox" interval="12dp" padding="0,0,2dp,0">
+              <text name="types_hosting" text="&lt;root&gt; / &lt;realwnd&gt; / &lt;caption&gt; / &lt;activex&gt;" class="meta" font="size:12dp" size="-2,32dp" multiLines="1" wordBreak="1" noPrefix="1" />
+              <window class="gallery_card">
+                <text text="Native child-window host" class="section_title" />
+                <text text="SRealWnd  /  &lt;realwnd&gt;  /  explicit creation + destroy callbacks" class="meta" />
+                <gallerybutton name="btn_native_host" text="Open native child host" class="fluent_btn_primary" size="230dp,36dp" />
+                <text text="Opens an opaque Fluent dialog: native child HWNDs are not composited into a layered SOUI host." class="meta" size="-2,36dp" multiLines="1" wordBreak="1" />
+              </window>
+              <window class="gallery_card">
+                <text text="Windows ActiveX integration" class="section_title" />
+                <text text="SActiveX  /  &lt;activex&gt;  /  platform adapter, not a universal Fluent widget" class="meta" />
+                <window size="-2,-1" layout="vbox" interval="12dp">
+                  <text text="Opt-in integration example (Windows, non-MinGW)." />
+                  <edit name="sample_activex_usage" size="-2,80dp" multiLines="1" readOnly="1" text="&lt;activex clsID=&quot;{YOUR-COM-CLSID}&quot; delay=&quot;1&quot; size=&quot;-2,160dp&quot; /&gt;" />
+                  <text text="No external COM component is activated by this gallery." class="meta" />
+                </window>
+                <text text="Requires an installed COM server. Its internal UI is not controllable by SOUI skins; excluded from live-style coverage." class="meta" size="-2,36dp" multiLines="1" wordBreak="1" />
+              </window>
+            </scrollview>
+          </page>
+        </tabctrl>
+        <window name="gallery_source_panel" show="0" display="0" skin="gallery_card" size="-2,220dp" layout="vbox" padding="16dp,12dp,16dp,12dp" interval="8dp">
+          <text text="SOUI XML / example" class="meta" font="size:12dp,bold:1" />
+          <edit name="gallery_source" size="-2,0" weight="1" skin="" ncSkin="" multiLines="1" readOnly="1" font="face:Consolas,size:12dp" padding="0,0,0,0" vscrollBar="1" wantReturn="1" />
+        </window>
+        <window size="-2,22dp" layout="hbox" gravity="center" interval="8dp">
+          <img skin="gallery_icon_check" size="16dp,16dp" msgTransparent="1" />
+          <text text="Progress selected  /  Native SOUI examples" name="gallery_status" class="meta" font="size:12dp" size="0,-1" weight="1" />
+          <text text="SOUI 4" class="meta" font="size:12dp" />
+        </window>
+      </window>
+    </window>
+  </root>
+</SOUI>

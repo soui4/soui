@@ -8,6 +8,8 @@
 #define LY_PER_INCH 1440
 #endif
 
+#ifndef SOUI_EDIT_LITE
+
 SNSBEGIN
 
 const SStringW KLabelColor = L"color";
@@ -334,3 +336,5 @@ SStringW SChatEdit::GetFormatText()
 }
 
 SNSEND
+
+#endif//SOUI_EDIT_LITE

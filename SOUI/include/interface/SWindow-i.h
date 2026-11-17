@@ -41,8 +41,7 @@ enum
 #define CANCEL_REASON_SCROLL_V 2 /**< Same as above, the drag's dominant axis is vertical */
 
 /** TRUE when reason reports a parent scroll takeover, whatever its axis. */
-#define CANCEL_REASON_IS_SCROLL(reason)                                                                            \
-    (((reason) & (CANCEL_REASON_SCROLL_H | CANCEL_REASON_SCROLL_V)) != 0)
+#define CANCEL_REASON_IS_SCROLL(reason) (((reason) & (CANCEL_REASON_SCROLL_H | CANCEL_REASON_SCROLL_V)) != 0)
 
 typedef BOOL (*FunSwndProc)(IWindow *pSwnd, UINT uMsg, WPARAM wp, LPARAM lp, LRESULT *pbHandled);
 

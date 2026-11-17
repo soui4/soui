@@ -163,7 +163,7 @@
 				<button size="180,30" name="btn_create_by_temp" text="创建模板窗口" padding="10,5,10,5" skin="skin_btn" font="face:微软雅黑,size:13" colorText="@color/clr_title" drawFocusRect="0"/>
 				<text text="模板定义见 values/template.xml" size="-1,-1" layout_gravity="center" colorText="@color/clr_text_sub"/>
 			</window>
-			<richedit name="re_temp_input" size="-2,100" class="cls_edit" multiLines="1" vscrollBar="1" sbSkin="skin_scrollbar" sbArrowSize="0" wordWrap="1"  autoVscroll="1" hscrollBar="0">
+			<edit name="re_temp_input" size="-2,100" class="cls_edit" multiLines="1" vscrollBar="1" sbSkin="skin_scrollbar" sbArrowSize="0" wordWrap="1"  autoVscroll="1" hscrollBar="0">
 				<![CDATA[
 				<t:g.block>
 				<data name="tpl_soime" color="#ff0000" text="soime.cn!"/>
@@ -172,7 +172,7 @@
 				<data name="tpl_soui" color="#0000ff" text="soui4js.com"/>
 				</t:g.block>
 				]]>
-			</richedit>
+			</edit>
 			<scrollview name="wnd_temp_host" size="-2,0" weight="1" viewSize="-1,-1" layout="vbox" sbSkin="skin_scrollbar" sbWid="6" sbArrowSize="0"/>
 		</page>
 		<page title="frame layout" iconIndex="4" layout="vbox" padding="20,16,20,18">

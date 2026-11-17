@@ -22,6 +22,8 @@ enum
     MENU_USER = 20,
 };
 
+#ifndef SOUI_EDIT_LITE
+
 /**
  * @class SRichEdit
  * @brief RichEdit Control
@@ -705,6 +707,8 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
     STextHost *m_pTxtHost;                      /**< Host of Richedit*/
     SMap<UINT, SAutoRefPtr<ITimer>> m_mapTimer; /**< map of timer to id*/
 };
+
+#endif // SOUI_EDIT_LITE
 
 SNSEND
 

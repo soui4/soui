@@ -67,8 +67,12 @@ jobs:
       - name: Install ARM toolchain and QEMU
         run: |
           sudo apt-get update
+          # libstdc++-arm-none-eabi-newlib 必须显式安装：--no-install-recommends 会跳过
+          # gcc-arm-none-eabi 的推荐包，导致 arm-none-eabi-g++ 找不到 <string> 等
+          # C++ 标准库头（该包依赖 libstdc++-arm-none-eabi-dev 提供头文件）。
           sudo apt-get install -y --no-install-recommends \
-            gcc-arm-none-eabi libnewlib-arm-none-eabi qemu-system-arm ninja-build
+            gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib \
+            qemu-system-arm ninja-build
           arm-none-eabi-gcc --version | head -1
           qemu-system-arm --version | head -1
 
@@ -77,8 +81,10 @@ jobs:
       # ---------------------------------------------------------------------
       - name: Configure census link
         run: |
+          # 工具链文件在 soui_fr 自己的 cmake/ 下（原 demo/ 已并入 soui_fr），
+          # 用绝对路径喂进去，避免 CMAKE_TOOLCHAIN_FILE 相对路径的解析基准歧义。
           cmake -S soui-freertos/soui_fr -B build-census -G Ninja \
-            -DCMAKE_TOOLCHAIN_FILE=../demo/cmake/toolchain-arm-freertos.cmake \
+            -DCMAKE_TOOLCHAIN_FILE="$PWD/soui-freertos/soui_fr/cmake/toolchain-arm-freertos.cmake" \
             -DSOUI_FR_CENSUS=ON
 
       - name: Link census image (fails on any undefined symbol)
@@ -98,7 +104,7 @@ jobs:
       - name: Configure runnable image
         run: |
           cmake -S soui-freertos/soui_fr -B build-run -G Ninja \
-            -DCMAKE_TOOLCHAIN_FILE=../demo/cmake/toolchain-arm-freertos.cmake \
+            -DCMAKE_TOOLCHAIN_FILE="$PWD/soui-freertos/soui_fr/cmake/toolchain-arm-freertos.cmake" \
             -DSOUI_FR_CENSUS=OFF \
             -DCMAKE_BUILD_TYPE=MinSizeRel
 
@@ -135,7 +141,10 @@ jobs:
         run: |
           tr -d '\r' < uart.log > uart.txt
           fail=0
-          for want in "[app] SApplication created" \
+          # 这些字符串对应 soui_fr/soui_app.cpp 里的实际 tprint 调用。
+          # 改那边的日志就同步改这里，否则 gate 会红在一个已经不存在/新增的输出上。
+          for want in "[app] SAppCfg::DoConfig=1" \
+                      "[app] COFF resource blob bytes=" \
                       "[app] SHostWnd CreateEx hwnd=0x" \
                       "[app] UpdateWindow rc=1" \
                       "[app] dump rc=0" \
@@ -150,6 +159,50 @@ jobs:
           # 反过来也要挡：HardFault / 断言 / 栈溢出都会打印这些前缀。
           for bad in "*** ASSERT ***" "*** STACK OVERFLOW ***" "HardFault" "qemu: fatal"; do
             if grep -qF "$bad" uart.txt; then
+              echo "::error::出现故障标记: $bad"
+              fail=1
+            fi
+          done
+          exit $fail
+
+      # ---------------------------------------------------------------------
+      # 3b. 平台层自测镜像（soui_fr_selftest.elf，SOUI_FR_SELFTEST 默认 ON）
+      #     覆盖 app 镜像碰不到的那一层：消息泵 / 定时器（走 FreeRTOS 队列）、
+      #     SwinxInjectMouse|Key 输入注入、framebuffer 提交、半主机 dump、sysapi 语义。
+      #     这套用例原来是一个独立工程（swinx_test/），2026-11 并入 soui_fr。
+      # ---------------------------------------------------------------------
+      - name: Run the platform self-test image under QEMU
+        run: |
+          timeout 180 qemu-system-arm -M mps2-an385 -nographic -semihosting \
+            -kernel build-run/soui_fr_selftest.elf > selftest.log 2>&1 || true
+          tr -d '\r' < selftest.log > selftest.txt
+          tail -20 selftest.txt
+          fail=0
+          # 断言串取自 selftest/*.cpp 里的实际 tprint —— 每个模块挑一条代表性的：
+          # 消息泵 / 定时器 / 渲染提交 / 输入注入 / 半主机 dump / sysapi 语义。
+          for want in "[conn] post/get + paint/mousemove coalescing OK" \
+                      "[conn] SetTimer fires via tick + KillTimer stops OK" \
+                      "[fb] window paint -> commitCanvas -> framebuffer OK" \
+                      "[inp] mouse move/click routing + cursor tracking OK" \
+                      "[inp] cross-task injection wakes WaitMessage OK" \
+                      "[dump] semihosting write rc=0" \
+                      "[sysapi] StrToIntEx decimal/hex/wide OK" \
+                      "SOUI_FR SELFTEST PASS"; do
+            if grep -qF "$want" selftest.txt; then
+              echo "PASS  $want"
+            else
+              echo "::error::缺少日志: $want"
+              fail=1
+            fi
+          done
+          # 自测的判据是自己打印的 PASS/FAIL，不能只看末行标记（check 失败只打印 "FAIL: "）。
+          if grep -qF "FAIL: " selftest.txt; then
+            echo "::error::自测里有失败用例（见上方 FAIL: 行）"
+            grep -F "FAIL: " selftest.txt | head -20
+            fail=1
+          fi
+          for bad in "*** ASSERT ***" "*** STACK OVERFLOW ***" "HardFault" "qemu: fatal"; do
+            if grep -qF "$bad" selftest.txt; then
               echo "::error::出现故障标记: $bad"
               fail=1
             fi
@@ -190,7 +243,9 @@ jobs:
           name: freertos-qemu-evidence
           path: |
             uart.log
+            selftest.log
             soui_fb.ppm
+            fb.ppm
             census.log
             run.log
           if-no-files-found: warn

@@ -63,8 +63,8 @@
            因此视觉与桌面/设计稿一致，业务代码仍按 pane_change / pane_est / pane_log 找面板。
            移动端触摸与桌面鼠标拖动都走同一套手势。 -->
       <tabctrl name="pane_swipe" size="-2,0" weight="1" extend_top="4"
-               tabWidth="0" tabHeight="0" enableDragSwitch="1"
-               dragThreshold="8" dragSwitchRatio="35" dragFling="1" dragCommitDuration="200">
+               tabWidth="0" tabHeight="0" enableGesture="1"
+               dragThreshold="8" dragSwitchRatio="35" dragCommitDuration="200">
         <page title="持仓变化表">
           <window name="pane_change" pos="0,0,-2,-2">
             <!-- 移动版按 6 列展示：代码 / 名称 / 最新占净值 / Q3占净值 /

@@ -3,6 +3,7 @@
 #include "SGridCtrl-i.h"
 
 #include <control/SEdit.h>
+#include <control/SRichEdit.h>
 #include <control/SComboBox.h>
 #include <control/SCmnCtrl.h>
 #include <control/SDateTimePicker.h>
@@ -12,7 +13,6 @@
 #include <commdlg.h>
 #include <res.mgr/SNamedValue.h>
 #include "SGridCtrl.h"
-
 
 // Custom clipboard format for cell types
 static UINT CF_GRIDCELLTYPES = 0;

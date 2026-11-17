@@ -9,6 +9,7 @@
 #include "GradientFillHelper.h"
 
 #include <src/nanosvg.h>
+
 SNSBEGIN
 
 //////////////////////////////////////////////////////////////////////////
@@ -35,9 +36,12 @@ BOOL SRenderFactory_Gdi::CreateRenderTarget(IRenderTarget **ppRenderTarget, int 
 
 BOOL SRenderFactory_Gdi::CreateRenderTarget2(THIS_ IRenderTarget **ppRenderTarget, HWND hWnd)
 {
-    RECT rc;
-    ::GetClientRect(hWnd, &rc);
-    return CreateRenderTarget(ppRenderTarget, rc.right, rc.bottom);
+    // A host window that does not need translucency draws straight into its
+    // own canvas.  IsOffscreen() then returns FALSE and SHostWnd::
+    // UpdatePresenter() skips the memRT -> window BitBlt, saving one full
+    // dirty-area copy per frame (plus the offscreen bitmap itself).
+    *ppRenderTarget = new SRenderTarget_GDI(this, hWnd);
+    return TRUE;
 }
 
 BOOL SRenderFactory_Gdi::CreateFont(IFontS **ppFont, const LOGFONT *lf)
@@ -442,11 +446,15 @@ SRegion_GDI::SRegion_GDI(IRenderFactory *pRenderFac)
     : TGdiRenderObjImpl<IRegionS, OT_RGN>(pRenderFac)
 {
     m_hRgn = ::CreateRectRgn(0, 0, 0, 0);
+    m_hTmp = ::CreateRectRgn(0, 0, 0, 0);
+    m_rcBox.left = m_rcBox.top = m_rcBox.right = m_rcBox.bottom = 0;
+    m_bBoxValid = FALSE;
 }
 
 SRegion_GDI::~SRegion_GDI()
 {
     DeleteObject(m_hRgn);
+    DeleteObject(m_hTmp);
 }
 
 /*
@@ -465,9 +473,8 @@ RGN_XOR Creates the union of two combined regions except for any overlapping are
 */
 void SRegion_GDI::CombineRect(LPCRECT lprect, int nCombineMode)
 {
-    HRGN hRgn = ::CreateRectRgnIndirect(lprect);
-    _CombineRgn(hRgn, nCombineMode);
-    DeleteObject(hRgn);
+    ::SetRectRgn(m_hTmp, lprect->left, lprect->top, lprect->right, lprect->bottom);
+    _CombineRgn(m_hTmp, nCombineMode);
 }
 
 void SRegion_GDI::CombinePolygon(const POINT *pts, int count, int nPolygonMode, int nCombineMode)
@@ -486,6 +493,7 @@ void SRegion_GDI::CombineRgn(const IRegionS *pRgnSrc, int nCombineMode)
 
 void SRegion_GDI::_CombineRgn(HRGN hRgn, int nCombineMode)
 {
+    m_bBoxValid = FALSE;
     if (nCombineMode == RGN_DIFF)
     {
         ::CombineRgn(m_hRgn, m_hRgn, hRgn, RGN_DIFF);
@@ -510,7 +518,12 @@ BOOL SRegion_GDI::RectInRegion(LPCRECT lprect) const
 void SRegion_GDI::GetRgnBox(LPRECT lprect) const
 {
     SASSERT(lprect);
-    ::GetRgnBox(m_hRgn, lprect);
+    if (!m_bBoxValid)
+    {
+        ::GetRgnBox(m_hRgn, &m_rcBox);
+        m_bBoxValid = TRUE;
+    }
+    *lprect = m_rcBox;
 }
 
 BOOL SRegion_GDI::IsEmpty() const
@@ -522,6 +535,9 @@ BOOL SRegion_GDI::IsEmpty() const
 
 void SRegion_GDI::Offset(POINT pt)
 {
+    if(m_bBoxValid){
+        ::OffsetRect(&m_rcBox,pt.x,pt.y);
+    }
     ::OffsetRgn(m_hRgn, pt.x, pt.y);
 }
 
@@ -532,12 +548,14 @@ HRGN SRegion_GDI::GetRegion() const
 
 void SRegion_GDI::Clear()
 {
+    m_bBoxValid = FALSE;
     ::SetRectRgn(m_hRgn, 0, 0, 0, 0);
 }
 
 void SRegion_GDI::CombineRoundRect(LPCRECT lprect, POINT ptRadius, int nCombineMode)
 {
     HRGN hRgn = ::CreateRoundRectRgn(lprect->left, lprect->top, lprect->right, lprect->bottom, ptRadius.x * 2, ptRadius.y * 2);
+    m_bBoxValid = FALSE;
     ::CombineRgn(m_hRgn, hRgn, NULL, nCombineMode);
     DeleteObject(hRgn);
 }
@@ -545,6 +563,7 @@ void SRegion_GDI::CombineRoundRect(LPCRECT lprect, POINT ptRadius, int nCombineM
 void SRegion_GDI::CombineEllipse(LPCRECT lprect, int nCombineMode)
 {
     HRGN hRgn = ::CreateEllipticRgnIndirect(lprect);
+    m_bBoxValid = FALSE;
     ::CombineRgn(m_hRgn, hRgn, NULL, nCombineMode);
     DeleteObject(hRgn);
 }
@@ -553,10 +572,41 @@ void SRegion_GDI::CombineEllipse(LPCRECT lprect, int nCombineMode)
 //	SRenderTarget_GDI
 //////////////////////////////////////////////////////////////////////////
 
+
+// Select one of the target's own render objects into a raw HDC, returning the
+// object that was selected before it.  Mirrors SRenderTarget_GDI::SelectObject()
+// without touching its m_cur* bookkeeping: this is used to install/remove the
+// defaults around a borrowed window canvas.
+static HGDIOBJ SelectRenderObj(HDC hdc, IRenderObj *pObj)
+{
+    if (!hdc || !pObj)
+        return NULL;
+    switch (pObj->ObjectType())
+    {
+    case OT_PEN:
+        return ::SelectObject(hdc, static_cast<SPen_GDI *>(pObj)->GetPen());
+    case OT_BRUSH:
+        return ::SelectObject(hdc, static_cast<SBrush_GDI *>(pObj)->GetBrush());
+    case OT_FONT:
+        return ::SelectObject(hdc, static_cast<SFont_GDI *>(pObj)->GetFont());
+    case OT_BITMAP:
+        return ::SelectObject(hdc, static_cast<SBitmap_GDI *>(pObj)->GetBitmap());
+    default:
+        break;
+    }
+    return NULL;
+}
+
 SRenderTarget_GDI::SRenderTarget_GDI(IRenderFactory *pRenderFactory, int nWid, int nHei)
     : m_hdc(NULL)
+    , m_hWnd(0)
+    , m_nDcLevels(0)
+    , m_hOldPen(NULL)
+    , m_hOldBrush(NULL)
+    , m_hOldFont(NULL)
+    , m_nOldBkMode(0)
+    , m_nOldGraphicsMode(0)
     , m_curColor(0xFF000000) // 默认黑色
-    , m_uGetDCFlag(0)
 {
     m_pRenderFactory = pRenderFactory;
 
@@ -579,9 +629,116 @@ SRenderTarget_GDI::SRenderTarget_GDI(IRenderFactory *pRenderFactory, int nWid, i
     SelectObject(m_defBmp, NULL);
 }
 
+SRenderTarget_GDI::SRenderTarget_GDI(IRenderFactory *pRenderFactory, HWND hWnd)
+    : m_hdc(NULL)
+    , m_hWnd(hWnd)
+    , m_nDcLevels(0)
+    , m_hOldPen(NULL)
+    , m_hOldBrush(NULL)
+    , m_hOldFont(NULL)
+    , m_nOldBkMode(0)
+    , m_nOldGraphicsMode(0)
+    , m_curColor(0xFF000000)
+{
+    m_pRenderFactory = pRenderFactory;
+
+    // No DC here.  The canvas is only borrowed while a frame draws
+    // (BeginDraw .. EndDraw) and nothing reads the DC outside that bracket, so
+    // an eager GetDC/ReleaseDC pair would buy nothing -- worse, on this port
+    // ReleaseDC() owns the canvas commit, so it would present an unpainted
+    // canvas during InitFromXml.
+    //
+    // Also never CreateCompatibleDC and never select a bitmap into the window
+    // DC: selecting one rebinds hdc->cairo to a fresh surface (gdi.cpp
+    // OBJ_BITMAP branch) and detaches us from the canvas commitCanvas() /
+    // blitCanvas() actually present.  m_defBmp / m_curBmp stay empty.
+    CreatePen(PS_SOLID, SColor(0, 0, 0).toCOLORREF(), 1, &m_defPen);
+    CreateSolidColorBrush(SColor(0, 0, 0).toCOLORREF(), &m_defBrush);
+    m_defFont = pRenderFactory->GetDefFont();
+}
+
+void SRenderTarget_GDI::AttachWindowDC()
+{
+    if (!m_hWnd)
+        return;
+    HDC hdc = ::GetDC(m_hWnd);
+    if (!hdc)
+        return;
+    m_hdc = hdc;
+    // Nested acquire: an outer level already installed the defaults, and the
+    // DC state it saved is what this level's ReleaseDC() will restore.
+    if (m_nDcLevels++ > 0)
+        return;
+
+    // Remember what the canvas looked like, so DetachWindowDC() can hand it
+    // back untouched.  This is deliberately explicit rather than delegating to
+    // the port's SaveDC/RestoreDC: that path only restores the object slots
+    // when SaveDC() succeeded, and a DC without a backing surface reports
+    // failure -- the objects would then stay selected in the window DC (and
+    // dangle as soon as this target is destroyed).
+    m_hOldPen = SelectRenderObj(hdc, m_defPen);
+    m_hOldBrush = SelectRenderObj(hdc, m_defBrush);
+    m_hOldFont = SelectRenderObj(hdc, m_defFont);
+    m_nOldBkMode = ::SetBkMode(hdc, TRANSPARENT);
+    m_nOldGraphicsMode = ::SetGraphicsMode(hdc, GM_ADVANCED);
+
+    // Keep the bookkeeping in sync with what is really selected, otherwise
+    // SetCurrentObject() would skip re-installing the defaults next frame.
+    m_curPen = static_cast<SPen_GDI *>((IPenS *)m_defPen);
+    m_curBrush = static_cast<SBrush_GDI *>((IBrushS *)m_defBrush);
+    m_curFont = static_cast<SFont_GDI *>((IFontS *)m_defFont);
+}
+
+void SRenderTarget_GDI::DetachWindowDC()
+{
+    if (!m_hWnd || m_nDcLevels <= 0)
+        return;
+    HDC hdc = m_hdc;
+    const bool bOutermost = (--m_nDcLevels == 0);
+
+    if (bOutermost)
+    {
+        // Put the canvas' own objects and modes back before it is released.
+        if (hdc)
+        {
+            if (m_hOldFont)
+                ::SelectObject(hdc, m_hOldFont);
+            if (m_hOldBrush)
+                ::SelectObject(hdc, m_hOldBrush);
+            if (m_hOldPen)
+                ::SelectObject(hdc, m_hOldPen);
+            if (m_nOldBkMode)
+                ::SetBkMode(hdc, m_nOldBkMode);
+            if (m_nOldGraphicsMode)
+                ::SetGraphicsMode(hdc, m_nOldGraphicsMode);
+        }
+        m_hOldPen = m_hOldBrush = m_hOldFont = NULL;
+        m_nOldBkMode = m_nOldGraphicsMode = 0;
+        // Nothing of ours is selected any more; make SetCurrentObject() reload
+        // the defaults instead of trusting the stale m_cur* pointers.
+        m_curPen = NULL;
+        m_curBrush = NULL;
+        m_curFont = NULL;
+    }
+    if (hdc)
+        ::ReleaseDC(m_hWnd, hdc);
+    // m_hdc is deliberately kept: releasing only pops the state layer, while
+    // the canvas object itself belongs to the window.  Resize() clears it when
+    // the port swaps in a fresh _SDC, and AttachWindowDC() re-reads either way.
+}
+
 SRenderTarget_GDI::~SRenderTarget_GDI()
 {
-    DeleteDC(m_hdc);
+    // An attached target borrows the window's DC; the window owns and frees it.
+    if (!m_hWnd)
+    {
+        DeleteDC(m_hdc);
+        return;
+    }
+    // Never leave a GetDC() level behind: the port commits the canvas when the
+    // outermost level closes, so a leaked level would freeze the window.
+    while (m_nDcLevels > 0)
+        DetachWindowDC();
 }
 
 HRESULT SRenderTarget_GDI::CreatePen(int iStyle, COLORREF cr, int cWidth, IPenS **ppPen)
@@ -614,6 +771,17 @@ HRESULT SRenderTarget_GDI::CreateGradientBrush(THIS_ const GradientItem *pGradie
 
 HRESULT SRenderTarget_GDI::Resize(SIZE sz)
 {
+    if (m_hWnd)
+    {
+        // The canvas itself is resized by the port (the WM_SIZE handler swaps
+        // wndObj->hdc for a new _SDC before SHostWnd::OnSize runs), so all we
+        // owe is to drop the now-stale pointer: AttachWindowDC() re-reads it at
+        // the next frame.  Do not open a GetDC/ReleaseDC pair just to refresh
+        // it -- closing that pair would present a canvas nothing has painted.
+        if (m_nDcLevels == 0)
+            m_hdc = NULL;
+        return S_OK;
+    }
     HBITMAP hBmp = CreateCompatibleBitmap(m_hdc, 0, 0);
     ::SelectObject(m_hdc, hBmp);
     m_curBmp->Init(sz.cx, sz.cy, NULL);
@@ -916,7 +1084,16 @@ HRESULT SRenderTarget_GDI::TextOut(int x, int y, LPCTSTR lpszString, int nCount)
         }
         else
         {
-            RECT rc2 = { 0, 0, (LONG)m_curBmp->Width(), (LONG)m_curBmp->Height() };
+            RECT rc2 = { 0, 0, 0, 0 };
+            if (m_curBmp)
+            {
+                rc2.right = (LONG)m_curBmp->Width();
+                rc2.bottom = (LONG)m_curBmp->Height();
+            }
+            else if (m_hWnd)
+            {
+                ::GetClientRect(m_hWnd, &rc2);
+            }
             rc = rc2;
         }
         ::TextOut(m_hdc, x, y, lpszString, nCount);
@@ -1027,6 +1204,10 @@ HRESULT SRenderTarget_GDI::SelectObject(IRenderObj *pObj, IRenderObj **ppOldObj 
     switch (pObj->ObjectType())
     {
     case OT_BITMAP:
+        // A window-attached RT must never rebind the HDC to another bitmap:
+        // that would swap out the very canvas commitCanvas() presents.
+        if (m_hWnd)
+            return S_FALSE;
         pRet = m_curBmp;
         m_curBmp = (SBitmap_GDI *)pObj;
         ::SelectObject(m_hdc, m_curBmp->GetBitmap());
@@ -1075,16 +1256,20 @@ HRESULT SRenderTarget_GDI::SetViewportOrg(POINT pt)
 
 HDC SRenderTarget_GDI::GetDC(UINT uFlag)
 {
-    m_uGetDCFlag = uFlag;
+    // Every caller pairs this with ReleaseDC(), which closes one level.  On an
+    // attached target that is a nested level on the window canvas.
+    // OnHostPresent() (WM_PRINT / uFlag != 0) comes through here without a
+    // BeginDraw(), so this also refreshes a canvas that went stale on WM_SIZE.
+    (void)uFlag;
+    AttachWindowDC();
     return m_hdc;
 }
 
 void SRenderTarget_GDI::ReleaseDC(HDC hdc, LPCRECT pRc)
 {
-    if (hdc == m_hdc)
-    {
-        m_uGetDCFlag = 0;
-    }
+    (void)hdc;
+    (void)pRc;
+    DetachWindowDC();
 }
 
 HRESULT SRenderTarget_GDI::DrawGradientRect(THIS_ LPCRECT pRect, BOOL bVert, POINT ptRoundCorner, const GradientItem *pGradients, int nCount, BYTE byAlpha)
@@ -1274,7 +1459,11 @@ HRESULT SRenderTarget_GDI::GetTransform(float matrix[9]) const
 COLORREF SRenderTarget_GDI::GetPixel(int x, int y)
 {
     if (!m_curBmp)
-        return CR_INVALID;
+    {
+        // Window-attached target: read through the DC so cairo applies the
+        // current viewport origin / world transform for us.
+        return (m_hWnd && m_hdc) ? ::GetPixel(m_hdc, x, y) : CR_INVALID;
+    }
     const COLORREF *pBits = (const COLORREF *)m_curBmp->GetPixelBits();
     POINT pt;
     GetViewportOrg(&pt);
@@ -1289,7 +1478,13 @@ COLORREF SRenderTarget_GDI::GetPixel(int x, int y)
 COLORREF SRenderTarget_GDI::SetPixel(int x, int y, COLORREF cr)
 {
     if (!m_curBmp)
-        return CR_INVALID;
+    {
+        if (!m_hWnd || !m_hdc)
+            return CR_INVALID;
+        const COLORREF crRet = ::GetPixel(m_hdc, x, y);
+        ::SetPixel(m_hdc, x, y, cr);
+        return crRet;
+    }
     COLORREF *pBits = (COLORREF *)m_curBmp->LockPixelBits();
     POINT pt;
     GetViewportOrg(&pt);
@@ -1968,8 +2163,7 @@ static void renderNSVGtext(HDC hdc, const NSVGtext *text, BYTE byAlpha, LPCRECT 
     }
 #ifdef _UNICODE
     // szFace 是 UTF-8 窄字符，lfFaceName 在 UNICODE 下是 wchar_t[]，必须做编码转换。
-    // 65001 = CP_UTF8（用数值避免依赖 CP_UTF8 宏是否可见）。
-    MultiByteToWideChar(65001, 0, szFace, -1, lf.lfFaceName, LF_FACESIZE);
+    MultiByteToWideChar(CP_UTF8, 0, szFace, -1, lf.lfFaceName, LF_FACESIZE);
 #else
     strncpy(lf.lfFaceName, szFace, LF_FACESIZE - 1);
 #endif

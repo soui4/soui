@@ -40,6 +40,7 @@ typedef enum _ResType
     ResType_7zFile,   /**< 7z archive */
     ResType_AndroidAsset, /**< android assets */
     ResType_OhosRawFile, /**< ohos rawfile */
+    ResType_Mem,          /**< caller-provided IResProvider instance */
 } ResType;
 
 
@@ -77,6 +78,8 @@ public:
     SAppCfg & SetAppResFile(LPCTSTR pszPath);
     SAppCfg & SetAppResZip(LPCTSTR pszZipFile, LPCSTR pszPwd = NULL);
     SAppCfg & SetAppRes7z(LPCTSTR psz7zFile, LPCSTR pszPwd = NULL);
+    SAppCfg & SetSysResMem(IResProvider *pResProvider);
+    SAppCfg & SetAppResMem(IResProvider *pResProvider);
 #ifdef __ANDROID__
     SAppCfg& SetSysResAndroidAsset(AAssetManager* assetMgr, LPCTSTR pszPath);
     SAppCfg& SetAppResAndroidAsset(AAssetManager* assetMgr, LPCTSTR pszPath);
@@ -100,6 +103,7 @@ class SResDesc {
     SStringT m_szFile;    /**< Resource file name */
     SStringA m_szPwd;     /**< Archive password */
     HMODULE m_hResModule; /**< Resource module handle */
+    SAutoRefPtr<IResProvider> m_pResProvider; /**< ResType_Mem: caller-provided provider */
 #ifdef __ANDROID__
     AAssetManager *m_assetMgr;
 #endif /**< __ANDROID__ */
@@ -149,6 +153,7 @@ class SResLoader {
     BOOL LoadResFromZip(LPCTSTR pszZipFile, LPCSTR pszZipPwd = NULL);
     BOOL LoadResFrom7z(LPCTSTR pszZipFile, LPCSTR pszZipPwd = NULL);
     BOOL LoadResFromRes(HMODULE hResModule);
+    BOOL LoadResFromMem(IResProvider *pResProvider);
 #ifdef __ANDROID__
     BOOL LoadResFromAndroidAsset(AAssetManager *assetMgr, LPCTSTR pszPath);
 #endif /**< __ANDROID__ */
@@ -216,6 +221,14 @@ BOOL SResLoader::LoadResFromRes(HMODULE hResModule)
     SouiFactory souiFac;
     m_pResProvider.Attach(souiFac.CreateResProvider(RES_PE));
     return m_pResProvider->Init((WPARAM)hResModule, 0);
+}
+
+BOOL SResLoader::LoadResFromMem(IResProvider *pResProvider)
+{
+    if (!pResProvider)
+        return FALSE;
+    m_pResProvider = pResProvider;
+    return TRUE;
 }
 
 #ifdef __ANDROID__
@@ -394,6 +407,20 @@ SAppCfg &SAppCfg::SetUidefId(const SStringT &strUidefId)
     return *this;
 }
 
+SAppCfg &SAppCfg::SetSysResMem(IResProvider *pResProvider)
+{
+    m_sysResDesc->m_type = ResType_Mem;
+    m_sysResDesc->m_pResProvider = pResProvider;
+    return *this;
+}
+
+SAppCfg &SAppCfg::SetAppResMem(IResProvider *pResProvider)
+{
+    m_appResDesc->m_type = ResType_Mem;
+    m_appResDesc->m_pResProvider = pResProvider;
+    return *this;
+}
+
 SAppCfg &SAppCfg::SetLog(BOOL bLogEnable, int nLogLevel, LPCSTR pszLogName)
 {
     m_logDesc->m_bLogEnable = bLogEnable;
@@ -502,6 +529,9 @@ BOOL SAppCfg::DoConfig(SApplication *pApp) const
                 bLoaded = resLoader.LoadResFromRes(hModResource);
             }
             break;
+        case ResType_Mem:
+            bLoaded = resLoader.LoadResFromMem(m_sysResDesc->m_pResProvider);
+            break;
 #ifdef __ANDROID__
         case ResType_AndroidAsset:
             bLoaded = resLoader.LoadResFromAndroidAsset(m_sysResDesc->m_assetMgr, m_sysResDesc->m_szFile);
@@ -556,6 +586,9 @@ BOOL SAppCfg::DoConfig(SApplication *pApp) const
             }
         }
         break;
+        case ResType_Mem:
+            bLoaded = resLoader.LoadResFromMem(m_appResDesc->m_pResProvider);
+            break;
 #ifdef __ANDROID__
         case ResType_AndroidAsset:
             bLoaded = resLoader.LoadResFromAndroidAsset(m_appResDesc->m_assetMgr, m_appResDesc->m_szFile);

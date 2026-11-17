@@ -5,6 +5,7 @@
 #include "ScintillaWnd.h"
 
 #include "SciLexer.h"
+#include <richedit.h>
 
 static LPCTSTR KScintillaClass = _T("Scintilla");
 

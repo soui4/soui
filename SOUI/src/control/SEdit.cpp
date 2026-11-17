@@ -1,5 +1,6 @@
-#include <souistd.h>
+﻿#include <souistd.h>
 #include <control/SEdit.h>
+#if !defined(SOUI_EDIT_LITE)
 
 SNSBEGIN
 
@@ -38,7 +39,7 @@ UINT SEdit::GetCueTextAlign()
 
 void SEdit::OnPaint(IRenderTarget *pRT)
 {
-    SRichEdit::OnPaint(pRT);
+    __baseCls::OnPaint(pRT);
     SStringT strCue = GetCueText();
     if (!strCue.IsEmpty() && GetWindowTextLength() == 0 && !IsFocused())
     {
@@ -76,3 +77,4 @@ HRESULT SEdit::OnLanguageChanged()
 }
 
 SNSEND
+#endif /**< !SOUI_EDIT_LITE */

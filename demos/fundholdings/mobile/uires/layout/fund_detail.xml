@@ -12,7 +12,7 @@
          不能两维都用 -2(fill parent)：那会把卡片总高锁死在视口内，表格只剩
          一百多 dp，连表头带一行数据都显示不全。 -->
     <fundscroll name="page_scroll" size="-2,-2" viewSize="-2,-1" layout="vbox"
-                sbWid="0" enableDragScroll="1">
+                sbWid="0" enableGesture="1">
 
     <!-- ==================== KPI 卡片 ====================
          覆盖度卡片右侧要画圆环，宽度不能低于 180dp，否则圆环会压住左侧文字；
@@ -74,8 +74,8 @@
            因此视觉与桌面/设计稿一致，业务代码仍按 pane_change / pane_est / pane_log 找面板。
            移动端触摸与桌面鼠标拖动都走同一套手势。 -->
       <tabctrl name="pane_swipe" size="-2,0" weight="1" extend_top="4"
-               tabWidth="0" tabHeight="0" enableDragSwitch="1"
-               dragThreshold="8" dragSwitchRatio="35" dragFling="1" dragCommitDuration="200">
+               tabWidth="0" tabHeight="0" enableGesture="1"
+               dragThreshold="8" dragSwitchRatio="35" dragCommitDuration="200">
         <page title="持仓变化表">
           <window name="pane_change" pos="0,0,-2,-2">
             <!-- 移动版按 6 列展示：代码 / 名称 / 最新占净值 / Q3占净值 /

@@ -115,7 +115,7 @@ class SOUI_EXP SHostWndAttr : public TObjRefImpl<SObject> {
      *
      * @param bTranslucent TRUE if the window is translucent, FALSE otherwise.
      */
-    void SetTranslucent(bool bTranslucent);
+    void SetTranslucent(BOOL bTranslucent);
 
     /**
      * @brief Sets the translation context.
@@ -129,7 +129,7 @@ class SOUI_EXP SHostWndAttr : public TObjRefImpl<SObject> {
      *
      * @param value TRUE to send wheel messages to the hover window, FALSE otherwise.
      */
-    void SetSendWheel2Hover(bool value);
+    void SetSendWheel2Hover(BOOL value);
 
     /**
      * @brief Defines the attribute list for serialization and deserialization.
@@ -213,7 +213,12 @@ class SOUI_EXP SHostWnd
 
     SAutoRefPtr<IToolTip> m_pTipCtrl; /**< Interface for tooltip control. */
 
-    SAutoRefPtr<IRegionS> m_rgnInvalidate;      /**< Invalid region requiring redraw. */
+    SAutoRefPtr<IRegionS> m_rgnInvalidate; /**< Invalid region requiring redraw. */
+    /** Recycled dirty region.  _RedrawRegion() needs a region object it can
+     *  mutate while the new invalidations accumulate into m_rgnInvalidate, and
+     *  creating a fresh one per paint is two heap blocks (SRegion_GDI +
+     *  CreateRectRgn) plus two frees per frame.  Ping-pong instead. */
+    SAutoRefPtr<IRegionS> m_rgnSpare;
     SAutoRefPtr<IRenderTarget> m_memRT;         /**< Rendering cache. */
     SAutoRefPtr<IUiDefInfo> m_privateUiDefInfo; /**< Local UI definition information. */
     int m_cEnableUiDefCount;                    /**< Count of enabled local UI definitions. */
@@ -650,6 +655,19 @@ class SOUI_EXP SHostWnd
     }
 
     /**
+     * @brief Switches translucent (per-pixel alpha) presentation at runtime.
+     *
+     * A translucent host paints into an offscreen render target and presents it
+     * with UpdateLayeredWindow, so the layer style, the dummy paint-pump window
+     * and the render target must change together. Writing
+     * SHostWndAttr::SetTranslucent() directly bypasses all of that and leaves a
+     * layered host that never receives a paint.
+     *
+     * @param bTranslucent TRUE for per-pixel alpha presentation.
+     */
+    void SetTranslucent(BOOL bTranslucent);
+
+    /**
      * @brief Gets the tooltip interface.
      *
      * @return Pointer to the tooltip interface.
@@ -785,6 +803,14 @@ class SOUI_EXP SHostWnd
      * @brief Restores the click state of the window.
      */
     void _RestoreClickState();
+
+    /**
+     * @brief (Re)builds the window surface setup implied by the host attributes.
+     *
+     * Keeps the layered style, the dummy paint-pump window, the uniform-alpha
+     * setting and the render target kind in sync with SHostWndAttr::m_bTranslucent.
+     */
+    void _UpdateHostSurface();
 
     /**
      * @brief Invalidates a specific region of the window.

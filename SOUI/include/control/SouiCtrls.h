@@ -25,7 +25,10 @@
 #include <control/SDateTimePicker.h>
 #include <control/SFrame.h>
 #include <control/SStackView.h>
+#if !defined(SOUI_EDIT_LITE)
 #include <control/SRichEdit.h>
+#endif /**< SOUI_EDIT_LITE */
+#include <control/SEdit.h>
 #include <control/SMenuBar.h>
 #include <control/SSwitch.h>
 #include <control/SSearchDropdownList.h>

@@ -1,0 +1,636 @@
+[
+  {
+    "type": "click",
+    "x": 120,
+    "y": 150
+  },
+  {
+    "type": "key",
+    "key": "HOME"
+  },
+  {
+    "type": "key",
+    "key": "DELETE",
+    "count": 80
+  },
+  {
+    "type": "text",
+    "text": "home"
+  },
+  {
+    "type": "wait",
+    "seconds": 0.15
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 200
+  },
+  {
+    "type": "capture",
+    "label": "page_home"
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 150
+  },
+  {
+    "type": "key",
+    "key": "HOME"
+  },
+  {
+    "type": "key",
+    "key": "DELETE",
+    "count": 80
+  },
+  {
+    "type": "text",
+    "text": "buttons"
+  },
+  {
+    "type": "wait",
+    "seconds": 0.15
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 200
+  },
+  {
+    "type": "capture",
+    "label": "page_buttons"
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 150
+  },
+  {
+    "type": "key",
+    "key": "HOME"
+  },
+  {
+    "type": "key",
+    "key": "DELETE",
+    "count": 80
+  },
+  {
+    "type": "text",
+    "text": "selection"
+  },
+  {
+    "type": "wait",
+    "seconds": 0.15
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 200
+  },
+  {
+    "type": "capture",
+    "label": "page_selection"
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 150
+  },
+  {
+    "type": "key",
+    "key": "HOME"
+  },
+  {
+    "type": "key",
+    "key": "DELETE",
+    "count": 80
+  },
+  {
+    "type": "text",
+    "text": "Text input"
+  },
+  {
+    "type": "wait",
+    "seconds": 0.15
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 200
+  },
+  {
+    "type": "capture",
+    "label": "page_input"
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 150
+  },
+  {
+    "type": "key",
+    "key": "HOME"
+  },
+  {
+    "type": "key",
+    "key": "DELETE",
+    "count": 80
+  },
+  {
+    "type": "text",
+    "text": "ComboBox"
+  },
+  {
+    "type": "wait",
+    "seconds": 0.15
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 200
+  },
+  {
+    "type": "capture",
+    "label": "page_combo"
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 150
+  },
+  {
+    "type": "key",
+    "key": "HOME"
+  },
+  {
+    "type": "key",
+    "key": "DELETE",
+    "count": 80
+  },
+  {
+    "type": "text",
+    "text": "progress"
+  },
+  {
+    "type": "wait",
+    "seconds": 0.15
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 200
+  },
+  {
+    "type": "capture",
+    "label": "page_progress"
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 150
+  },
+  {
+    "type": "key",
+    "key": "HOME"
+  },
+  {
+    "type": "key",
+    "key": "DELETE",
+    "count": 80
+  },
+  {
+    "type": "text",
+    "text": "slider"
+  },
+  {
+    "type": "wait",
+    "seconds": 0.15
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 200
+  },
+  {
+    "type": "capture",
+    "label": "page_slider"
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 150
+  },
+  {
+    "type": "key",
+    "key": "HOME"
+  },
+  {
+    "type": "key",
+    "key": "DELETE",
+    "count": 80
+  },
+  {
+    "type": "text",
+    "text": "SListBox"
+  },
+  {
+    "type": "wait",
+    "seconds": 0.15
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 200
+  },
+  {
+    "type": "capture",
+    "label": "page_list"
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 150
+  },
+  {
+    "type": "key",
+    "key": "HOME"
+  },
+  {
+    "type": "key",
+    "key": "DELETE",
+    "count": 80
+  },
+  {
+    "type": "text",
+    "text": "STreeCtrl"
+  },
+  {
+    "type": "wait",
+    "seconds": 0.15
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 200
+  },
+  {
+    "type": "capture",
+    "label": "page_tree"
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 150
+  },
+  {
+    "type": "key",
+    "key": "HOME"
+  },
+  {
+    "type": "key",
+    "key": "DELETE",
+    "count": 80
+  },
+  {
+    "type": "text",
+    "text": "tabs"
+  },
+  {
+    "type": "wait",
+    "seconds": 0.15
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 200
+  },
+  {
+    "type": "capture",
+    "label": "page_tabs"
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 150
+  },
+  {
+    "type": "key",
+    "key": "HOME"
+  },
+  {
+    "type": "key",
+    "key": "DELETE",
+    "count": 80
+  },
+  {
+    "type": "text",
+    "text": "dialog"
+  },
+  {
+    "type": "wait",
+    "seconds": 0.15
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 200
+  },
+  {
+    "type": "capture",
+    "label": "page_dialog"
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 150
+  },
+  {
+    "type": "key",
+    "key": "HOME"
+  },
+  {
+    "type": "key",
+    "key": "DELETE",
+    "count": 80
+  },
+  {
+    "type": "text",
+    "text": "icons"
+  },
+  {
+    "type": "wait",
+    "seconds": 0.15
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 200
+  },
+  {
+    "type": "capture",
+    "label": "page_icons"
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 150
+  },
+  {
+    "type": "key",
+    "key": "HOME"
+  },
+  {
+    "type": "key",
+    "key": "DELETE",
+    "count": 80
+  },
+  {
+    "type": "text",
+    "text": "Typography"
+  },
+  {
+    "type": "wait",
+    "seconds": 0.15
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 200
+  },
+  {
+    "type": "capture",
+    "label": "page_type"
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 150
+  },
+  {
+    "type": "key",
+    "key": "HOME"
+  },
+  {
+    "type": "key",
+    "key": "DELETE",
+    "count": 80
+  },
+  {
+    "type": "text",
+    "text": "SLinearLayout"
+  },
+  {
+    "type": "wait",
+    "seconds": 0.15
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 200
+  },
+  {
+    "type": "capture",
+    "label": "page_layout"
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 150
+  },
+  {
+    "type": "key",
+    "key": "HOME"
+  },
+  {
+    "type": "key",
+    "key": "DELETE",
+    "count": 80
+  },
+  {
+    "type": "text",
+    "text": "listview"
+  },
+  {
+    "type": "wait",
+    "seconds": 0.15
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 200
+  },
+  {
+    "type": "capture",
+    "label": "page_listview"
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 150
+  },
+  {
+    "type": "key",
+    "key": "HOME"
+  },
+  {
+    "type": "key",
+    "key": "DELETE",
+    "count": 80
+  },
+  {
+    "type": "text",
+    "text": "tileview"
+  },
+  {
+    "type": "wait",
+    "seconds": 0.15
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 200
+  },
+  {
+    "type": "capture",
+    "label": "page_tileview"
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 150
+  },
+  {
+    "type": "key",
+    "key": "HOME"
+  },
+  {
+    "type": "key",
+    "key": "DELETE",
+    "count": 80
+  },
+  {
+    "type": "text",
+    "text": "datetime"
+  },
+  {
+    "type": "wait",
+    "seconds": 0.15
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 200
+  },
+  {
+    "type": "capture",
+    "label": "page_datetime"
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 150
+  },
+  {
+    "type": "key",
+    "key": "HOME"
+  },
+  {
+    "type": "key",
+    "key": "DELETE",
+    "count": 80
+  },
+  {
+    "type": "text",
+    "text": "commands"
+  },
+  {
+    "type": "wait",
+    "seconds": 0.15
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 200
+  },
+  {
+    "type": "capture",
+    "label": "page_commands"
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 150
+  },
+  {
+    "type": "key",
+    "key": "HOME"
+  },
+  {
+    "type": "key",
+    "key": "DELETE",
+    "count": 80
+  },
+  {
+    "type": "text",
+    "text": "containers"
+  },
+  {
+    "type": "wait",
+    "seconds": 0.15
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 200
+  },
+  {
+    "type": "capture",
+    "label": "page_containers"
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 150
+  },
+  {
+    "type": "key",
+    "key": "HOME"
+  },
+  {
+    "type": "key",
+    "key": "DELETE",
+    "count": 80
+  },
+  {
+    "type": "text",
+    "text": "hosting"
+  },
+  {
+    "type": "wait",
+    "seconds": 0.15
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 200
+  },
+  {
+    "type": "capture",
+    "label": "page_hosting"
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 150
+  },
+  {
+    "type": "key",
+    "key": "HOME"
+  },
+  {
+    "type": "key",
+    "key": "DELETE",
+    "count": 80
+  }
+]

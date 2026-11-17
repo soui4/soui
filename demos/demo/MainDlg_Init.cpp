@@ -22,7 +22,6 @@
 #include "stdafx.h"
 #include "MainDlg.h"
 #include <controls.extend/SHexEdit.h>
-#include <controls.extend/reole/RichEditOle.h>           //CSmileySource/SetSRicheditOleCallback
 #include "SMatrixWindow.h"
 #include "skin/SSkinLoader.h"
 #include "trayicon/SShellTray.h"
@@ -30,8 +29,9 @@
 #include "CDropTarget.h"
 #include "skin/SetSkinWnd2.h"
 
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(SOUI_EDIT_LITE) && !defined(__MINGW32__)
 //由 MainDlg_RichEdit.cpp 提供:创建 GIF 表情数据源的回调
+#include <controls.extend/reole/RichEditOle.h>
 ISmileySource * CreateSource2();
 #endif
 
@@ -52,8 +52,8 @@ LRESULT CMainDlg::OnInitDialog( HWND hWnd, LPARAM lParam )
 {
 	SLOGI()<<"OnInitDialog";
 
-#ifdef _WIN32
-    //Smiley 表情 COM 组件依赖 Gdiplus,使用前必须初始化
+#if defined(_WIN32) && !defined(SOUI_EDIT_LITE) && !defined(__MINGW32__)
+	//Smiley 表情 COM 组件依赖 Gdiplus,使用前必须初始化
     CSmileySource::GdiplusStartup();
 #endif//_WIN32
 
@@ -200,17 +200,18 @@ void CMainDlg::InitDragDrop()
 */
 void CMainDlg::InitRichEditHost()
 {
+#ifndef SOUI_EDIT_LITE
     //演示 RichEdit 的 OLE 回调:向富文本中插入 GIF 表情需要 SetSRicheditOleCallback
     SRichEdit *pEdit = FindChildByName2<SRichEdit>(L"re_gifhost");
     if(pEdit)
     {
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__MINGW32__)
         SetSRicheditOleCallback(pEdit,CreateSource2);
 #endif
         //演示从资源中加载 RTF 内容(资源注册于 uires.idx 的 <rtf> 节点)
         pEdit->SetAttribute(L"rtf",L"rtf:rtf_test");
     }
-
+#endif//SOUI_EDIT_LITE
     //演示如何响应Edit的EN_CHANGE事件:先打开 ENM_CHANGE 掩码
     SEdit *pEditUrl = FindChildByName2<SEdit>(L"edit_url");
     if(pEditUrl)

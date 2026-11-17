@@ -100,5 +100,6 @@
         "xutility": "cpp",
         "*.inc": "cpp",
         "xlocale": "cpp"
-    }
+    },
+    "git.ignoreLimitWarning": true
 }

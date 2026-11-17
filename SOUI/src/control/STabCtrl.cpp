@@ -320,7 +320,6 @@ STabCtrl::STabCtrl()
     , m_bDragSwitchEnable(FALSE)
     , m_nDragThreshold(8.f, dp)
     , m_nDragSwitchRatio(35)
-    , m_bDragFlingEnable(TRUE)
     , m_nDragCommitDuration(200)
     , m_gesture(this)
     , m_bDragArmed(FALSE)
@@ -1457,7 +1456,7 @@ void STabCtrl::EndDragSwitch(float fAxisVelocity)
 
     // ViewPager.determineTargetPage(): distance ratio first, then fling velocity.
     BOOL bSwitch = (f * 100.f >= (float)nRatio);
-    if (!bSwitch && m_bDragFlingEnable && m_bDragFling && fVelocity > 0.5f && f > 0.02f)
+    if (!bSwitch && m_bDragFling && fVelocity > 0.5f && f > 0.02f)
         bSwitch = TRUE;
 
     if (bSwitch)

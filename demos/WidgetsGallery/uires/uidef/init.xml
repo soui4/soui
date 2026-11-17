@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='utf-8'?>
+<UIDEF>
+  <unit defUnit="dp" />
+  <deffont value="face:Segoe UI,size:14">
+    <macos value="face:.AppleSystemUIFont,size:14" />
+    <linux value="face:Noto Sans,size:14" />
+  </deffont>
+  <style>
+    <class name="fluent_card" skin="fluent_card" padding="12dp,12dp,12dp,12dp" />
+    <class name="fluent_caption" colorText="@color/fluent_text" font="bold:1" />
+    <class name="fluent_btn_primary" skin="fluent_btn_primary" colorText="@color/fluent_on_accent" colorTextHover="@color/fluent_on_accent" colorTextPush="@color/fluent_on_accent" colorTextDisable="@color/fluent_text_disabled" cursor="hand" />
+    <class name="fluent_btn_secondary" skin="fluent_btn_secondary" colorText="@color/fluent_text" colorTextHover="@color/fluent_text" colorTextPush="@color/fluent_text" colorTextDisable="@color/fluent_text_disabled" cursor="hand" />
+    <class name="fluent_text_secondary" colorText="@color/fluent_text_secondary" font="size:14" />
+    <class name="fluent_link" cursor="hand" colorText="@color/fluent_accent" colorTextHover="@color/fluent_accent_hover" colorTextPush="@color/fluent_accent_pressed" colorTextDisable="@color/fluent_text_disabled" />
+    <class name="fluent_row_label" padding="8dp,0,8dp,0" />
+    <class name="gallery_nav" skin="gallery_nav" colorText="@color/fluent_text" cursor="hand" colorTextHover="@color/fluent_text" colorTextPush="@color/fluent_text" colorTextDisable="@color/fluent_text_disabled" />
+    <class name="gallery_nav_selected" skin="gallery_nav_selected" colorText="@color/fluent_text" cursor="hand" colorTextHover="@color/fluent_text" colorTextPush="@color/fluent_text" colorTextDisable="@color/fluent_text_disabled" />
+    <class name="gallery_card" skin="gallery_card" colorText="@color/fluent_text" />
+    <class name="gallery_subtle" skin="gallery_subtle" colorText="@color/fluent_text" />
+    <class name="gallery_badge" skin="gallery_badge" colorText="@color/fluent_text" />
+    <class name="gallery_quiet" skin="gallery_quiet" colorText="@color/fluent_text" cursor="hand" colorTextHover="@color/fluent_text" colorTextPush="@color/fluent_text" colorTextDisable="@color/fluent_text_disabled" />
+  </style>
+  <objattr>
+    <window colorText="@color/fluent_text" />
+    <div sbSkin="_skin.sys.scrollbar" bandSkin="_skin.sys.selband" />
+    <button skin="fluent_btn_secondary" colorText="@color/fluent_text" colorTextHover="@color/fluent_text" colorTextPush="@color/fluent_text" colorTextDisable="@color/fluent_text_disabled" cursor="hand" />
+    <listbox itemSkin="_skin.sys.list.item" colorText="@color/fluent_text" colorSelText="@color/fluent_text" colorItemBkgnd="@color/fluent_card_bg" colorItemHotBkgnd="@color/fluent_fill_hover" colorItemSelBkgnd="@color/fluent_fill_pressed" text-x="8dp" itemHeight="32dp" />
+    <radio skin="_skin.sys.radio" focusSkin="_skin.sys.focusradio" colorText="@color/fluent_text" />
+    <check skin="_skin.sys.checkbox" focusSkin="_skin.sys.focuscheckbox" colorText="@color/fluent_text" />
+    <edit skin="fluent_edit" ncSkin="" colorText="@color/fluent_text" padding="6dp,6dp,6dp,6dp" multiLines="0" />
+    <combobox skin="fluent_edit" btnSkin="_skin.sys.dropbtn" colorText="@color/fluent_text" colorBkgnd="@color/fluent_card_bg" padding="8dp,0,8dp,0" />
+    <tabctrl tabSkin="_skin.sys.tab.page" colorText="@color/fluent_text" tabHeight="32dp" />
+    <header itemSkin="_skin.sys.header" colorText="@color/fluent_text" sortSkin="gallery_sort" colorTextHover="@color/fluent_text" colorTextPush="@color/fluent_text_secondary" colorTextDisable="@color/fluent_text_disabled" />
+    <dockbar captionSkin="fluent_card" closeBtnSkin="_skin.sys.btn.mini.close" colorBkgnd="@color/fluent_card_bg" colorText="@color/fluent_text" />
+    <gallerybutton skin="fluent_btn_secondary" colorText="@color/fluent_text" colorTextHover="@color/fluent_text" colorTextPush="@color/fluent_text" colorTextDisable="@color/fluent_text_disabled" cursor="hand" />
+    <gallerytabs tabSkin="_skin.sys.tab.page" colorText="@color/fluent_text" tabHeight="32dp" drawFocusRect="0" />
+    <text noPrefix="1" />
+    <progress bkgndSkin="gallery_progress_track" posSkin="gallery_progress_blue" colorText="@color/fluent_text" showText="0" />
+    <sliderbar bkgndSkin="gallery_progress_track" posSkin="gallery_progress_blue" thumbSkin="gallery_slider_thumb" colorText="@color/fluent_text" sepColor="@color/gallery_stroke" showText="0" />
+    <treectrl toggleSkin="gallery_tree_toggle" checkSkin="_skin.sys.tree.checkbox" lineSkin="_skin.sys.tree.lines" itemSkin="gallery_nav_selected" colorText="@color/fluent_text" colorTextPush="@color/fluent_text" colorItemBkgnd="@color/fluent_card_bg" colorItemSelBkgnd="@color/gallery_subtle" hasLines="0" itemHeight="32dp" itemMargin="8dp" indent="20dp" />
+    <imgbtn colorText="@color/fluent_text" colorTextHover="@color/fluent_text" colorTextPush="@color/fluent_text_secondary" colorTextDisable="@color/fluent_text_disabled" />
+    <toggle skin="gallery_toggle" focusSkin="gallery_focus" />
+    <switch skin="gallery_switch_track" skinforce="gallery_switch_thumb" focusable="1" />
+    <hotkey skin="fluent_edit" colorText="@color/fluent_text" padding="8dp,6dp,8dp,6dp" />
+    <richedit skin="fluent_edit" ncSkin="" colorText="@color/fluent_text" padding="8dp,6dp,8dp,6dp" multiLines="1" sbSkin="_skin.sys.scrollbar" />
+    <spinButton upSkin="gallery_arrow_up" downSkin="gallery_arrow_down" />
+    <calendar skin="gallery_card" colorBkgnd="@color/fluent_card_bg" colorText="@color/fluent_text" colorSelText="@color/fluent_on_accent" colorOtherText="@color/fluent_text_secondary" colorSelBg="@color/fluent_accent" colorHoverText="@color/fluent_accent" prevSkin="gallery_arrow_prev" nextSkin="gallery_arrow_next" daySkin="" weekSkin="" />
+    <dateTimePicker skin="fluent_edit" ncSkin="" btnSkin="gallery_arrow_down" colorText="@color/fluent_text" cueColor="@color/fluent_text_secondary" padding="8dp,0,8dp,0" />
+    <listctrl skin="gallery_card" colorBkgnd="@color/fluent_card_bg" colorText="@color/fluent_text" colorSelText="@color/fluent_text" colorItemBkgnd="@color/fluent_card_bg" colorItemBkgnd2="@color/gallery_subtle" colorItemHotBkgnd="@color/fluent_fill_hover" colorItemSelBkgnd="@color/fluent_fill_pressed" itemSkin="_skin.sys.list.item" checkSkin="_skin.sys.checkbox" sbSkin="_skin.sys.scrollbar" />
+    <listview colorText="@color/fluent_text" colorBkgnd="@color/fluent_card_bg" sbSkin="_skin.sys.scrollbar" />
+    <mclistview colorText="@color/fluent_text" colorBkgnd="@color/fluent_card_bg" sbSkin="_skin.sys.scrollbar" />
+    <tileview colorText="@color/fluent_text" colorBkgnd="@color/fluent_card_bg" sbSkin="_skin.sys.scrollbar" />
+    <scrollbar skin="_skin.sys.scrollbar" />
+    <group colorText="@color/fluent_text" colorLine1="@color/gallery_stroke" colorLine2="@color/gallery_stroke" round="4dp" />
+    <splitwnd sepSkin="gallery_separator" colorBkgnd="@color/fluent_card_bg" />
+    <splitcol sepSkin="gallery_separator" colorBkgnd="@color/fluent_card_bg" />
+    <splitrow sepSkin="gallery_separator" colorBkgnd="@color/fluent_card_bg" />
+    <frame skin="gallery_card" colorText="@color/fluent_text" />
+    <stackPage colorBkgnd="@color/fluent_card_bg" colorText="@color/fluent_text" />
+    <comboview skin="fluent_edit" btnSkin="_skin.sys.dropbtn" colorText="@color/fluent_text" colorBkgnd="@color/fluent_card_bg" padding="8dp,0,8dp,0" />
+  </objattr>
+</UIDEF>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="36" viewBox="0 0 160 36">
+<g id="state0" transform="translate(0,0)"><rect x="0.5" y="0.5" width="39" height="35" rx="4" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="1"/><g fill="none" stroke="#1B1B1B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18h12M20 12v12"/></g></g>
+<g id="state1" transform="translate(40,0)"><rect x="0.5" y="0.5" width="39" height="35" rx="4" fill="#F5F5F5" stroke="#E5E5E5" stroke-width="1"/><g fill="none" stroke="#1B1B1B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18h12M20 12v12"/></g></g>
+<g id="state2" transform="translate(80,0)"><rect x="0.5" y="0.5" width="39" height="35" rx="4" fill="#EBEBEB" stroke="#E5E5E5" stroke-width="1"/><g fill="none" stroke="#616161" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18h12M20 12v12"/></g></g>
+<g id="state3" transform="translate(120,0)"><rect x="0.5" y="0.5" width="39" height="35" rx="4" fill="#F7F9FC" stroke="#E5E5E5" stroke-width="1"/><g fill="none" stroke="#9B9B9B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18h12M20 12v12"/></g></g>
+</svg>

@@ -1,0 +1,5 @@
+<menuRoot itemSkin="_skin.sys.menu.skin" checkSkin="_skin.sys.menu.check" arrowSkin="_skin.sys.menu.arrow" sepSkin="_skin.sys.menu.sep" colorText="@color/fluent_text" colorTextDisable="@color/fluent_text_disabled" itemHeight="34dp" skin="_skin.sys.menu.border" colorBkgnd="@color/fluent_card_bg" padding="4dp,4dp,4dp,4dp" minWidth="210dp">
+  <menuItem id="4713" text="Compact view" />
+  <menuItem id="4714" text="Comfortable view" />
+  <menuItem id="4715" text="Unavailable" disable="1" />
+</menuRoot>

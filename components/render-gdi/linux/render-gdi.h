@@ -298,6 +298,10 @@ protected:
 	void _CombineRgn(HRGN hRgn,int nCombineMode);
 
 	HRGN    m_hRgn;
+	HRGN    m_hTmp;
+	//note:测试发现在esp32设备上,通过GetRgnBox可能涉及跨模块调用，导致耗时，通过增加这个rcBox缓存，将刷新fps从45提高到55
+	mutable RECT  m_rcBox;
+	mutable BOOL  m_bBoxValid;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -434,12 +438,23 @@ protected:
 class SRenderTarget_GDI: public TObjRefImpl<IRenderTarget>
 {
 public:
+	// Offscreen target: owns a compatible DC and its own bitmap.
 	SRenderTarget_GDI(IRenderFactory* pRenderFactory,int nWid,int nHei);
+	// Window-attached target: draws directly into the HWND's canvas DC.
+	// No offscreen bitmap is allocated and IsOffscreen() returns FALSE, so
+	// SHostWnd::UpdatePresenter() skips the extra BitBlt to the window.
+	SRenderTarget_GDI(IRenderFactory* pRenderFactory,HWND hWnd);
 	~SRenderTarget_GDI();
 
-	STDMETHOD_(void, BeginDraw)(THIS) OVERRIDE{}
-	STDMETHOD_(void, EndDraw)(THIS) OVERRIDE{}
-	STDMETHOD_(BOOL,IsOffscreen)(CTHIS) SCONST {return TRUE;}
+	// A frame borrows the window canvas: BeginDraw() opens a GetDC() level and
+	// EndDraw() closes it.  The DC is handed back exactly as it was found --
+	// the GDI objects this target installs (pen/brush/font), the ones the frame
+	// selects while drawing, and bk/graphics mode are all restored.  On this
+	// port ReleaseDC() also owns the canvas commit, and it fires on the
+	// outermost level (BeginPaint/EndPaint), i.e. once per frame.
+	STDMETHOD_(void, BeginDraw)(THIS) OVERRIDE{ AttachWindowDC(); }
+	STDMETHOD_(void, EndDraw)(THIS) OVERRIDE{ DetachWindowDC(); }
+	STDMETHOD_(BOOL,IsOffscreen)(CTHIS) SCONST {return m_hWnd == 0;}
 
 	STDMETHOD_(HRESULT,CreatePen)(THIS_ int iStyle,COLORREF cr,int cWidth,IPenS ** ppPen) OVERRIDE;
 	STDMETHOD_(HRESULT,CreateSolidColorBrush)(THIS_ COLORREF cr,IBrushS ** ppBrush) OVERRIDE;
@@ -532,7 +547,21 @@ public:
 	STDMETHOD_(HRESULT, DrawSVG)(THIS_ ISvgObj * pSvg, LPCRECT pRect, LPCRECT prcSrc DEF_VAL(NULL), BYTE byAlpha DEF_VAL(0xFF)) OVERRIDE;
 
 protected:
-	HDC               m_hdc;
+	// Open one GetDC() level on the window canvas.  The outermost open records
+	// the canvas' current objects/modes and installs the target's defaults.
+	void AttachWindowDC();
+	// Close one level; the outermost close restores what AttachWindowDC() found
+	// and then releases the canvas (which is what presents it on this port).
+	void DetachWindowDC();
+
+	HDC               m_hdc;         // borrowed canvas, valid between attach/detach
+	HWND              m_hWnd;        // non-zero => attached to a window canvas
+	int               m_nDcLevels;   // open GetDC() levels; 0 => canvas released
+	HGDIOBJ           m_hOldPen;     // canvas objects/modes to restore on close
+	HGDIOBJ           m_hOldBrush;
+	HGDIOBJ           m_hOldFont;
+	int               m_nOldBkMode;
+	int               m_nOldGraphicsMode;
 	SColor            m_curColor;
 	SAutoRefPtr<SBitmap_GDI> m_curBmp;
 	SAutoRefPtr<SPen_GDI> m_curPen;
@@ -545,7 +574,6 @@ protected:
 	SAutoRefPtr<IBrushS> m_defBrush;
 	SAutoRefPtr<IFontS> m_defFont;
 	SAutoRefPtr<IRenderFactory> m_pRenderFactory;
-	UINT m_uGetDCFlag;
 };
 
 namespace RENDER_GDI

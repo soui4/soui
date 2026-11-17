@@ -1,0 +1,340 @@
+[
+  {
+    "type": "click",
+    "x": 120,
+    "y": 150
+  },
+  {
+    "type": "key",
+    "key": "HOME"
+  },
+  {
+    "type": "key",
+    "key": "DELETE",
+    "count": 80
+  },
+  {
+    "type": "text",
+    "text": "selection"
+  },
+  {
+    "type": "wait",
+    "seconds": 0.15
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 200
+  },
+  {
+    "type": "capture",
+    "label": "selection_styles"
+  },
+  {
+    "type": "click",
+    "x": 370,
+    "y": 504
+  },
+  {
+    "type": "click",
+    "x": 320,
+    "y": 654
+  },
+  {
+    "type": "capture",
+    "label": "selection_toggled"
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 150
+  },
+  {
+    "type": "key",
+    "key": "HOME"
+  },
+  {
+    "type": "key",
+    "key": "DELETE",
+    "count": 80
+  },
+  {
+    "type": "text",
+    "text": "listview"
+  },
+  {
+    "type": "wait",
+    "seconds": 0.15
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 200
+  },
+  {
+    "type": "click",
+    "x": 470,
+    "y": 407
+  },
+  {
+    "type": "capture",
+    "label": "virtual_selection"
+  },
+  {
+    "type": "wheel",
+    "x": 1190,
+    "y": 700,
+    "delta": -600
+  },
+  {
+    "type": "capture",
+    "label": "report_views"
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 150
+  },
+  {
+    "type": "key",
+    "key": "HOME"
+  },
+  {
+    "type": "key",
+    "key": "DELETE",
+    "count": 80
+  },
+  {
+    "type": "text",
+    "text": "tileview"
+  },
+  {
+    "type": "wait",
+    "seconds": 0.15
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 200
+  },
+  {
+    "type": "click",
+    "x": 500,
+    "y": 410
+  },
+  {
+    "type": "capture",
+    "label": "tile_styles"
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 150
+  },
+  {
+    "type": "key",
+    "key": "HOME"
+  },
+  {
+    "type": "key",
+    "key": "DELETE",
+    "count": 80
+  },
+  {
+    "type": "text",
+    "text": "commands"
+  },
+  {
+    "type": "wait",
+    "seconds": 0.15
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 200
+  },
+  {
+    "type": "capture",
+    "label": "command_styles"
+  },
+  {
+    "type": "click",
+    "x": 342,
+    "y": 359
+  },
+  {
+    "type": "wait",
+    "seconds": 0.25
+  },
+  {
+    "type": "capture",
+    "target": "popup",
+    "label": "menu_popup"
+  },
+  {
+    "type": "key",
+    "key": "DOWN",
+    "target": "popup"
+  },
+  {
+    "type": "key",
+    "key": "ENTER",
+    "target": "popup"
+  },
+  {
+    "type": "wait",
+    "seconds": 0.2
+  },
+  {
+    "type": "capture",
+    "label": "menu_command"
+  },
+  {
+    "type": "click",
+    "x": 490,
+    "y": 562
+  },
+  {
+    "type": "capture",
+    "label": "toolbar_pin"
+  },
+  {
+    "type": "click",
+    "x": 1050,
+    "y": 36
+  },
+  {
+    "type": "click",
+    "x": 342,
+    "y": 359
+  },
+  {
+    "type": "wait",
+    "seconds": 0.25
+  },
+  {
+    "type": "capture",
+    "target": "popup",
+    "label": "menu_popup_dark"
+  },
+  {
+    "type": "key",
+    "key": "DOWN",
+    "target": "popup"
+  },
+  {
+    "type": "key",
+    "key": "ENTER",
+    "target": "popup"
+  },
+  {
+    "type": "wait",
+    "seconds": 0.2
+  },
+  {
+    "type": "capture",
+    "label": "menu_command_dark"
+  },
+  {
+    "type": "click",
+    "x": 1050,
+    "y": 36
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 150
+  },
+  {
+    "type": "key",
+    "key": "HOME"
+  },
+  {
+    "type": "key",
+    "key": "DELETE",
+    "count": 80
+  },
+  {
+    "type": "text",
+    "text": "hosting"
+  },
+  {
+    "type": "wait",
+    "seconds": 0.15
+  },
+  {
+    "type": "click",
+    "x": 120,
+    "y": 200
+  },
+  {
+    "type": "capture",
+    "label": "native_recipe"
+  },
+  {
+    "type": "click",
+    "x": 400,
+    "y": 359
+  },
+  {
+    "type": "wait",
+    "seconds": 0.3
+  },
+  {
+    "type": "capture",
+    "target": "popup",
+    "label": "native_child_host"
+  },
+  {
+    "type": "click",
+    "target": "popup",
+    "x": 520,
+    "y": 34
+  },
+  {
+    "type": "wait",
+    "seconds": 0.2
+  },
+  {
+    "type": "capture",
+    "label": "native_child_closed"
+  },
+  {
+    "type": "click",
+    "x": 1050,
+    "y": 36
+  },
+  {
+    "type": "click",
+    "x": 400,
+    "y": 359
+  },
+  {
+    "type": "wait",
+    "seconds": 0.3
+  },
+  {
+    "type": "capture",
+    "target": "popup",
+    "label": "native_child_host_dark"
+  },
+  {
+    "type": "click",
+    "target": "popup",
+    "x": 520,
+    "y": 34
+  },
+  {
+    "type": "wait",
+    "seconds": 0.2
+  },
+  {
+    "type": "capture",
+    "label": "native_child_closed_dark"
+  },
+  {
+    "type": "click",
+    "x": 1050,
+    "y": 36
+  }
+]

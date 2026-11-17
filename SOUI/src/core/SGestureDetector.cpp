@@ -7,8 +7,8 @@
 
 SNSBEGIN
 
-
-static DWORD Ts32Diff(DWORD ts2, DWORD ts1) {
+static DWORD Ts32Diff(DWORD ts2, DWORD ts1)
+{
     // Unsigned 32-bit subtraction is well defined modulo 2^32: it handles the
     // GetTickCount() 49-day wraparound and returns 0 when both ticks are equal.
     return ts2 - ts1;
@@ -79,7 +79,7 @@ BOOL SGestureDetector::OnTouchEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
         BOOL bWasDragging = m_bDragging;
         float fVx = m_fVelocityX, fVy = m_fVelocityY;
         // VelocityTracker data is only valid while the samples are fresh.
-        if (m_nSampleCount == 0 || Ts32Diff(GetTickCount() , m_samples[m_nSampleCount - 1].t) > kVelocityWindowMs)
+        if (m_nSampleCount == 0 || Ts32Diff(GetTickCount(), m_samples[m_nSampleCount - 1].t) > kVelocityWindowMs)
         {
             fVx = 0.f;
             fVy = 0.f;
@@ -155,7 +155,7 @@ void SGestureDetector::AddSample(const CPoint &pt)
     int nKeep = 0;
     for (int i = 0; i < m_nSampleCount; ++i)
     {
-        if (Ts32Diff(now , m_samples[i].t) <= kVelocityWindowMs)
+        if (Ts32Diff(now, m_samples[i].t) <= kVelocityWindowMs)
             m_samples[nKeep++] = m_samples[i];
     }
     m_nSampleCount = nKeep;

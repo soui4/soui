@@ -13,6 +13,7 @@
 #include "core/SCaret.h"
 #include <atl.mini/SComCli.h>
 #include <core/SModalViewSession.h>
+#include <core/SPaintProbe.h>
 SNSBEGIN
 
 ///////////////////////////////////////////////////////////////////////
@@ -1929,12 +1930,27 @@ bool SWindow::_WndRectInRgn(const CRect &rc, const IRegionS *rgn) const
 {
     CRect rc2;
     rgn->GetRgnBox(&rc2);
-
+    BOOL bRet = FALSE;
     SMatrix mtx = _GetMatrixEx();
-    if (mtx.isIdentity() && !rc2.IntersectRect(rc2, rc))
-        return false;
-    SAutoRefPtr<IRegionS> rgn2 = ConvertRect2RenderRegion(rc, mtx);
-    return RgnInRgn(rgn, rgn2);
+    if (mtx.isIdentity())
+    {
+        // Identity transform => the window rect is axis-aligned in device space,
+        // so a bounding-box overlap IS the answer: no region object, no boolean
+        // op.  Answering "true" when the boxes overlap is conservative (paint a
+        // window that the precise test might have rejected), which is exactly
+        // what a conservative cull is allowed to do -- the clip still limits the
+        // pixels.  This matters because in this port every IRegionS operation is
+        // a GDI handle alloc/free: the precise test costs ~1.5ms, and
+        // DispatchPaint asks this question three times per window per paint.
+        bRet = !!rc2.IntersectRect(rc2, rc);
+    }
+    else
+    { // non-identity transform (scale/rotate): the rect maps to a quad, so it
+      // really does need the polygon-aware region comparison
+        SAutoRefPtr<IRegionS> rgn2 = ConvertRect2RenderRegion(rc, mtx);
+        bRet = RgnInRgn(rgn, rgn2);
+    }
+    return bRet;
 }
 
 void SWindow::_PaintChildren(IRenderTarget *pRT, IRegionS *pRgn, UINT iBeginZorder, UINT iEndZorder)
@@ -1979,11 +1995,16 @@ void SWindow::DispatchPaint(IRenderTarget *pRT, IRegionS *pRgn, UINT iZorderBegi
 {
     if (!IsVisible(FALSE) || !GetContainer())
         return;
+    CRect rcWnd = GetWindowRect();
+    if (pRgn && !pRgn->IsEmpty())
+    {
+        if (!_WndRectInRgn(rcWnd, pRgn))
+            return;
+    }
 
     SMatrix oriMtx;
     bool bMtx = _ApplyMatrix(pRT, oriMtx);
 
-    CRect rcWnd = GetWindowRect();
     CRect rcClient = GetClientRect();
     float fMat[9];
     pRT->GetTransform(fMat);
@@ -2006,10 +2027,11 @@ void SWindow::DispatchPaint(IRenderTarget *pRT, IRegionS *pRgn, UINT iZorderBegi
     if (IsLayeredWindow())
     { // Obtain the current LayeredWindow RT to draw content
         pRTBackup = pRT;
-        pRT = NULL;
-        GETRENDERFACTORY->CreateRenderTarget(&pRT, rcWnd.Width(), rcWnd.Height());
+        if (!m_layeredRT)
+            GETRENDERFACTORY->CreateRenderTarget(&m_layeredRT, rcWnd.Width(), rcWnd.Height());
+        pRT = m_layeredRT;
         pRT->BeginDraw();
-        pRT->OffsetViewportOrg(-rcWnd.left, -rcWnd.top, NULL);
+        pRT->SetViewportOrg(-rcWnd.TopLeft());
         // Draw onto the window's cache; need to inherit the original RT's drawing attributes
         pRT->SelectObject(pRTBackup->GetCurrentObject(OT_FONT), NULL);
         pRT->SelectObject(pRTBackup->GetCurrentObject(OT_PEN), NULL);
@@ -2019,7 +2041,8 @@ void SWindow::DispatchPaint(IRenderTarget *pRT, IRegionS *pRgn, UINT iZorderBegi
     }
     // save clip state
     int nSave1 = -1;
-    pRT->SaveClip(&nSave1);
+    if (m_clipRgn || m_clipPath)
+        pRT->SaveClip(&nSave1);
     if (m_clipRgn)
     {
         m_clipRgn->Offset(rcWnd.TopLeft());
@@ -2050,14 +2073,6 @@ void SWindow::DispatchPaint(IRenderTarget *pRT, IRegionS *pRgn, UINT iZorderBegi
 
     SPainter painter;
     BeforePaint(pRT, painter);
-
-    CRect rcText;
-    GetTextRect(rcText);
-    if (rcText != rcClient && IsClipClient())
-    {
-        pRT->PushClipRect(rcText, RGN_AND);
-    }
-
     _PaintChildren(pRT, pRgn, iZorderBegin, iZorderEnd);
     AfterPaint(pRT, painter);
     pRT->RestoreClip(nSave2);
@@ -2067,14 +2082,15 @@ void SWindow::DispatchPaint(IRenderTarget *pRT, IRegionS *pRgn, UINT iZorderBegi
         _PaintNonClient(pRT);
     }
     // restore clip state.
-    pRT->RestoreClip(nSave1);
+    if (nSave1 != -1)
+        pRT->RestoreClip(nSave1);
 
     if (IsLayeredWindow())
     { // Return the image drawn onto the window's cache to the upper-level RT
         SASSERT(pRTBackup);
         pRT->EndDraw();
         OnCommitSurface(pRTBackup, &rcWnd, pRT, &rcWnd, GetAlpha());
-        pRT->Release();
+        // m_layeredRT is kept for the next frame (see its declaration)
         pRT = pRTBackup;
     }
     if (bMtx)
@@ -2173,7 +2189,7 @@ void SWindow::InvalidateRect(const CRect &rect, BOOL bFromThis /**< =TRUE */, BO
     CRect rcIntersect = rect & rcWnd;
     if (rcIntersect.IsRectEmpty())
         return;
-    if (!bClip)
+    if (!bClip && bFromThis)
         MarkCacheDirty(true);
 
     STransformation xForm = GetTransformation();
@@ -3150,8 +3166,7 @@ void SWindow::UpdateLayout()
     if (m_layoutDirty != dirty_clean && GetChildrenCount())
     {
         UpdateChildrenPosition();
-        if (m_layoutDirty == dirty_child)
-            m_layoutDirty = dirty_clean;
+        m_layoutDirty = dirty_clean;
     }
 }
 
@@ -3841,6 +3856,7 @@ void SWindow::OnSize(UINT nType, CSize size)
 
         MarkCacheDirty(true);
     }
+    m_layeredRT = NULL;
 
     EventSwndSize evt(this);
     evt.szWnd = size;

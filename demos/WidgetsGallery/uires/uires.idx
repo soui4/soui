@@ -1,0 +1,206 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resource>
+  <layout>
+    <file name="gallery" path="xml\gallery.xml" />
+    <file name="gallery_dialog" path="xml\dialog.xml" />
+    <file name="gallery_modal" path="xml\gallery_modal.xml" />
+    <file name="gallery_native" path="xml\gallery_native.xml" />
+  </layout>
+  <uidef>
+    <file name="xml_init" path="uidef\init.xml" />
+  </uidef>
+  <SVG>
+    <file name="FL_RADIO" path="svg\fluent\light\fl_radio.svg" />
+    <file name="FL_FOCUS_RADIO" path="svg\fluent\light\fl_focus_radio.svg" />
+    <file name="FL_CHECKBOX" path="svg\fluent\light\fl_checkbox.svg" />
+    <file name="FL_FOCUS_CHECKBOX" path="svg\fluent\light\fl_focus_checkbox.svg" />
+    <file name="FL_DROPBTN" path="svg\fluent\light\fl_dropbtn.svg" />
+    <file name="FL_BORDER" path="svg\fluent\light\fl_border.svg" />
+    <file name="FL_HEADER" path="svg\fluent\light\fl_header.svg" />
+    <file name="FL_LIST_ITEM" path="svg\fluent\light\fl_list_item.svg" />
+    <file name="FL_TAB_PAGE" path="svg\fluent\light\fl_tab_page.svg" />
+    <file name="FL_TAB_HEADER" path="svg\fluent\light\fl_tab_header.svg" />
+    <file name="FL_SCROLLBAR" path="svg\fluent\light\fl_scrollbar.svg" />
+    <file name="FL_MENU_CHECK" path="svg\fluent\light\fl_menu_check.svg" />
+    <file name="FL_MENU_SEP" path="svg\fluent\light\fl_menu_sep.svg" />
+    <file name="FL_MENU_ARROW" path="svg\fluent\light\fl_menu_arrow.svg" />
+    <file name="FL_MENU_BORDER" path="svg\fluent\light\fl_menu_border.svg" />
+    <file name="FL_MENU_SKIN" path="svg\fluent\light\fl_menu_skin.svg" />
+    <file name="FL_BTN_MIN" path="svg\fluent\light\fl_btn_min.svg" />
+    <file name="FL_BTN_MAX" path="svg\fluent\light\fl_btn_max.svg" />
+    <file name="FL_BTN_RESTORE" path="svg\fluent\light\fl_btn_restore.svg" />
+    <file name="FL_BTN_CLOSE" path="svg\fluent\light\fl_btn_close.svg" />
+    <file name="FL_BTN_MINI_CLOSE" path="svg\fluent\light\fl_btn_mini_close.svg" />
+    <file name="FL_WND_BKGND" path="svg\fluent\light\fl_wnd_bkgnd.svg" />
+    <file name="FL_CARD" path="svg\fluent\light\fl_card.svg" />
+    <file name="FL_POPUP" path="svg\fluent\light\fl_popup.svg" />
+    <file name="FL_EDIT" path="svg\fluent\light\fl_edit.svg" />
+    <file name="FL_EDIT_FOCUS" path="svg\fluent\light\fl_edit_focus.svg" />
+    <file name="FL_BTN_PRIMARY" path="svg\fluent\light\fl_btn_primary.svg" />
+    <file name="FL_BTN_SECONDARY" path="svg\fluent\light\fl_btn_secondary.svg" />
+    <file name="FL_BTN_ICON_THEME" path="svg\fluent\light\fl_btn_icon_theme.svg" />
+    <file name="FD_RADIO" path="svg\fluent\dark\fd_radio.svg" />
+    <file name="FD_FOCUS_RADIO" path="svg\fluent\dark\fd_focus_radio.svg" />
+    <file name="FD_CHECKBOX" path="svg\fluent\dark\fd_checkbox.svg" />
+    <file name="FD_FOCUS_CHECKBOX" path="svg\fluent\dark\fd_focus_checkbox.svg" />
+    <file name="FD_DROPBTN" path="svg\fluent\dark\fd_dropbtn.svg" />
+    <file name="FD_BORDER" path="svg\fluent\dark\fd_border.svg" />
+    <file name="FD_HEADER" path="svg\fluent\dark\fd_header.svg" />
+    <file name="FD_LIST_ITEM" path="svg\fluent\dark\fd_list_item.svg" />
+    <file name="FD_TAB_PAGE" path="svg\fluent\dark\fd_tab_page.svg" />
+    <file name="FD_TAB_HEADER" path="svg\fluent\dark\fd_tab_header.svg" />
+    <file name="FD_SCROLLBAR" path="svg\fluent\dark\fd_scrollbar.svg" />
+    <file name="FD_MENU_CHECK" path="svg\fluent\dark\fd_menu_check.svg" />
+    <file name="FD_MENU_SEP" path="svg\fluent\dark\fd_menu_sep.svg" />
+    <file name="FD_MENU_ARROW" path="svg\fluent\dark\fd_menu_arrow.svg" />
+    <file name="FD_MENU_BORDER" path="svg\fluent\dark\fd_menu_border.svg" />
+    <file name="FD_MENU_SKIN" path="svg\fluent\dark\fd_menu_skin.svg" />
+    <file name="FD_BTN_MIN" path="svg\fluent\dark\fd_btn_min.svg" />
+    <file name="FD_BTN_MAX" path="svg\fluent\dark\fd_btn_max.svg" />
+    <file name="FD_BTN_RESTORE" path="svg\fluent\dark\fd_btn_restore.svg" />
+    <file name="FD_BTN_CLOSE" path="svg\fluent\dark\fd_btn_close.svg" />
+    <file name="FD_BTN_MINI_CLOSE" path="svg\fluent\dark\fd_btn_mini_close.svg" />
+    <file name="FD_WND_BKGND" path="svg\fluent\dark\fd_wnd_bkgnd.svg" />
+    <file name="FD_CARD" path="svg\fluent\dark\fd_card.svg" />
+    <file name="FD_POPUP" path="svg\fluent\dark\fd_popup.svg" />
+    <file name="FD_EDIT" path="svg\fluent\dark\fd_edit.svg" />
+    <file name="FD_EDIT_FOCUS" path="svg\fluent\dark\fd_edit_focus.svg" />
+    <file name="FD_BTN_PRIMARY" path="svg\fluent\dark\fd_btn_primary.svg" />
+    <file name="FD_BTN_SECONDARY" path="svg\fluent\dark\fd_btn_secondary.svg" />
+    <file name="FD_BTN_ICON_THEME" path="svg\fluent\dark\fd_btn_icon_theme.svg" />
+    <file name="GALLERY_LIGHT_GALLERY_NAV" path="svg\gallery\light\gallery_nav.svg" />
+    <file name="GALLERY_LIGHT_GALLERY_NAV_SELECTED" path="svg\gallery\light\gallery_nav_selected.svg" />
+    <file name="GALLERY_LIGHT_GALLERY_CARD" path="svg\gallery\light\gallery_card.svg" />
+    <file name="GALLERY_LIGHT_GALLERY_SUBTLE" path="svg\gallery\light\gallery_subtle.svg" />
+    <file name="GALLERY_LIGHT_GALLERY_BADGE" path="svg\gallery\light\gallery_badge.svg" />
+    <file name="GALLERY_LIGHT_GALLERY_QUIET" path="svg\gallery\light\gallery_quiet.svg" />
+    <file name="GALLERY_LIGHT_GALLERY_PROGRESS_TRACK" path="svg\gallery\light\gallery_progress_track.svg" />
+    <file name="GALLERY_LIGHT_GALLERY_PROGRESS_BLUE" path="svg\gallery\light\gallery_progress_blue.svg" />
+    <file name="GALLERY_LIGHT_GALLERY_PROGRESS_GREEN" path="svg\gallery\light\gallery_progress_green.svg" />
+    <file name="GALLERY_LIGHT_GALLERY_PROGRESS_ORANGE" path="svg\gallery\light\gallery_progress_orange.svg" />
+    <file name="GALLERY_LIGHT_GALLERY_PROGRESS_LILAC" path="svg\gallery\light\gallery_progress_lilac.svg" />
+    <file name="GALLERY_LIGHT_GALLERY_SLIDER_THUMB" path="svg\gallery\light\gallery_slider_thumb.svg" />
+    <file name="GALLERY_LIGHT_GALLERY_TREE_TOGGLE" path="svg\gallery\light\gallery_tree_toggle.svg" />
+    <file name="GALLERY_LIGHT_GALLERY_TREE_CHECKBOX" path="svg\gallery\light\gallery_tree_checkbox.svg" />
+    <file name="GALLERY_LIGHT_ICON_HOME" path="svg\gallery\light\icon_home.svg" />
+    <file name="GALLERY_LIGHT_ICON_BUTTONS" path="svg\gallery\light\icon_buttons.svg" />
+    <file name="GALLERY_LIGHT_ICON_SELECTION" path="svg\gallery\light\icon_selection.svg" />
+    <file name="GALLERY_LIGHT_ICON_INPUT" path="svg\gallery\light\icon_input.svg" />
+    <file name="GALLERY_LIGHT_ICON_COMBO" path="svg\gallery\light\icon_combo.svg" />
+    <file name="GALLERY_LIGHT_ICON_PROGRESS" path="svg\gallery\light\icon_progress.svg" />
+    <file name="GALLERY_LIGHT_ICON_SLIDER" path="svg\gallery\light\icon_slider.svg" />
+    <file name="GALLERY_LIGHT_ICON_LIST" path="svg\gallery\light\icon_list.svg" />
+    <file name="GALLERY_LIGHT_ICON_TREE" path="svg\gallery\light\icon_tree.svg" />
+    <file name="GALLERY_LIGHT_ICON_TABS" path="svg\gallery\light\icon_tabs.svg" />
+    <file name="GALLERY_LIGHT_ICON_DIALOG" path="svg\gallery\light\icon_dialog.svg" />
+    <file name="GALLERY_LIGHT_ICON_ICONS" path="svg\gallery\light\icon_icons.svg" />
+    <file name="GALLERY_LIGHT_ICON_TYPE" path="svg\gallery\light\icon_type.svg" />
+    <file name="GALLERY_LIGHT_ICON_LAYOUT" path="svg\gallery\light\icon_layout.svg" />
+    <file name="GALLERY_LIGHT_ICON_SEARCH" path="svg\gallery\light\icon_search.svg" />
+    <file name="GALLERY_LIGHT_ICON_CHEVRON" path="svg\gallery\light\icon_chevron.svg" />
+    <file name="GALLERY_LIGHT_ICON_CHECK" path="svg\gallery\light\icon_check.svg" />
+    <file name="GALLERY_LIGHT_ICON_COPY" path="svg\gallery\light\icon_copy.svg" />
+    <file name="GALLERY_LIGHT_ICON_PLAY" path="svg\gallery\light\icon_play.svg" />
+    <file name="GALLERY_LIGHT_ICON_RESET" path="svg\gallery\light\icon_reset.svg" />
+    <file name="GALLERY_LIGHT_ICON_CODE" path="svg\gallery\light\icon_code.svg" />
+    <file name="GALLERY_LIGHT_ICON_INFO" path="svg\gallery\light\icon_info.svg" />
+    <file name="GALLERY_LIGHT_ICON_ARROW" path="svg\gallery\light\icon_arrow.svg" />
+    <file name="GALLERY_LIGHT_ICON_SUN" path="svg\gallery\light\icon_sun.svg" />
+    <file name="GALLERY_LIGHT_ICON_MOON" path="svg\gallery\light\icon_moon.svg" />
+    <file name="GALLERY_LIGHT_ICON_SPARKLE" path="svg\gallery\light\icon_sparkle.svg" />
+    <file name="GALLERY_LIGHT_HERO" path="svg\gallery\light\hero.svg" />
+    <file name="GALLERY_DARK_GALLERY_NAV" path="svg\gallery\dark\gallery_nav.svg" />
+    <file name="GALLERY_DARK_GALLERY_NAV_SELECTED" path="svg\gallery\dark\gallery_nav_selected.svg" />
+    <file name="GALLERY_DARK_GALLERY_CARD" path="svg\gallery\dark\gallery_card.svg" />
+    <file name="GALLERY_DARK_GALLERY_SUBTLE" path="svg\gallery\dark\gallery_subtle.svg" />
+    <file name="GALLERY_DARK_GALLERY_BADGE" path="svg\gallery\dark\gallery_badge.svg" />
+    <file name="GALLERY_DARK_GALLERY_QUIET" path="svg\gallery\dark\gallery_quiet.svg" />
+    <file name="GALLERY_DARK_GALLERY_PROGRESS_TRACK" path="svg\gallery\dark\gallery_progress_track.svg" />
+    <file name="GALLERY_DARK_GALLERY_PROGRESS_BLUE" path="svg\gallery\dark\gallery_progress_blue.svg" />
+    <file name="GALLERY_DARK_GALLERY_PROGRESS_GREEN" path="svg\gallery\dark\gallery_progress_green.svg" />
+    <file name="GALLERY_DARK_GALLERY_PROGRESS_ORANGE" path="svg\gallery\dark\gallery_progress_orange.svg" />
+    <file name="GALLERY_DARK_GALLERY_PROGRESS_LILAC" path="svg\gallery\dark\gallery_progress_lilac.svg" />
+    <file name="GALLERY_DARK_GALLERY_SLIDER_THUMB" path="svg\gallery\dark\gallery_slider_thumb.svg" />
+    <file name="GALLERY_DARK_GALLERY_TREE_TOGGLE" path="svg\gallery\dark\gallery_tree_toggle.svg" />
+    <file name="GALLERY_DARK_GALLERY_TREE_CHECKBOX" path="svg\gallery\dark\gallery_tree_checkbox.svg" />
+    <file name="GALLERY_DARK_ICON_HOME" path="svg\gallery\dark\icon_home.svg" />
+    <file name="GALLERY_DARK_ICON_BUTTONS" path="svg\gallery\dark\icon_buttons.svg" />
+    <file name="GALLERY_DARK_ICON_SELECTION" path="svg\gallery\dark\icon_selection.svg" />
+    <file name="GALLERY_DARK_ICON_INPUT" path="svg\gallery\dark\icon_input.svg" />
+    <file name="GALLERY_DARK_ICON_COMBO" path="svg\gallery\dark\icon_combo.svg" />
+    <file name="GALLERY_DARK_ICON_PROGRESS" path="svg\gallery\dark\icon_progress.svg" />
+    <file name="GALLERY_DARK_ICON_SLIDER" path="svg\gallery\dark\icon_slider.svg" />
+    <file name="GALLERY_DARK_ICON_LIST" path="svg\gallery\dark\icon_list.svg" />
+    <file name="GALLERY_DARK_ICON_TREE" path="svg\gallery\dark\icon_tree.svg" />
+    <file name="GALLERY_DARK_ICON_TABS" path="svg\gallery\dark\icon_tabs.svg" />
+    <file name="GALLERY_DARK_ICON_DIALOG" path="svg\gallery\dark\icon_dialog.svg" />
+    <file name="GALLERY_DARK_ICON_ICONS" path="svg\gallery\dark\icon_icons.svg" />
+    <file name="GALLERY_DARK_ICON_TYPE" path="svg\gallery\dark\icon_type.svg" />
+    <file name="GALLERY_DARK_ICON_LAYOUT" path="svg\gallery\dark\icon_layout.svg" />
+    <file name="GALLERY_DARK_ICON_SEARCH" path="svg\gallery\dark\icon_search.svg" />
+    <file name="GALLERY_DARK_ICON_CHEVRON" path="svg\gallery\dark\icon_chevron.svg" />
+    <file name="GALLERY_DARK_ICON_CHECK" path="svg\gallery\dark\icon_check.svg" />
+    <file name="GALLERY_DARK_ICON_COPY" path="svg\gallery\dark\icon_copy.svg" />
+    <file name="GALLERY_DARK_ICON_PLAY" path="svg\gallery\dark\icon_play.svg" />
+    <file name="GALLERY_DARK_ICON_RESET" path="svg\gallery\dark\icon_reset.svg" />
+    <file name="GALLERY_DARK_ICON_CODE" path="svg\gallery\dark\icon_code.svg" />
+    <file name="GALLERY_DARK_ICON_INFO" path="svg\gallery\dark\icon_info.svg" />
+    <file name="GALLERY_DARK_ICON_ARROW" path="svg\gallery\dark\icon_arrow.svg" />
+    <file name="GALLERY_DARK_ICON_SUN" path="svg\gallery\dark\icon_sun.svg" />
+    <file name="GALLERY_DARK_ICON_MOON" path="svg\gallery\dark\icon_moon.svg" />
+    <file name="GALLERY_DARK_ICON_SPARKLE" path="svg\gallery\dark\icon_sparkle.svg" />
+    <file name="GALLERY_DARK_HERO" path="svg\gallery\dark\hero.svg" />
+    <file name="GALLERY_LIGHT_GALLERY_PROGRESS_TRACK_PILL" path="svg\gallery\light\gallery_progress_track_pill.svg" />
+    <file name="GALLERY_LIGHT_GALLERY_PROGRESS_PILL" path="svg\gallery\light\gallery_progress_pill.svg" />
+    <file name="GALLERY_DARK_GALLERY_PROGRESS_TRACK_PILL" path="svg\gallery\dark\gallery_progress_track_pill.svg" />
+    <file name="GALLERY_DARK_GALLERY_PROGRESS_PILL" path="svg\gallery\dark\gallery_progress_pill.svg" />
+    <file name="GALLERY_LIGHT_GALLERY_FOCUS" path="svg\gallery\light\gallery_focus.svg" />
+    <file name="GALLERY_DARK_GALLERY_FOCUS" path="svg\gallery\dark\gallery_focus.svg" />
+    <file name="GALLERY_LIGHT_GALLERY_TOGGLE" path="svg\gallery\light\gallery_toggle.svg" />
+    <file name="GALLERY_LIGHT_GALLERY_SWITCH_TRACK" path="svg\gallery\light\gallery_switch_track.svg" />
+    <file name="GALLERY_LIGHT_GALLERY_SWITCH_THUMB" path="svg\gallery\light\gallery_switch_thumb.svg" />
+    <file name="GALLERY_LIGHT_GALLERY_ARROW_UP" path="svg\gallery\light\gallery_arrow_up.svg" />
+    <file name="GALLERY_LIGHT_GALLERY_ARROW_DOWN" path="svg\gallery\light\gallery_arrow_down.svg" />
+    <file name="GALLERY_LIGHT_GALLERY_ARROW_PREV" path="svg\gallery\light\gallery_arrow_prev.svg" />
+    <file name="GALLERY_LIGHT_GALLERY_ARROW_NEXT" path="svg\gallery\light\gallery_arrow_next.svg" />
+    <file name="GALLERY_LIGHT_GALLERY_SORT" path="svg\gallery\light\gallery_sort.svg" />
+    <file name="GALLERY_LIGHT_GALLERY_TOOLBAR_ICONS" path="svg\gallery\light\gallery_toolbar_icons.svg" />
+    <file name="GALLERY_LIGHT_GALLERY_IMAGE_BUTTON" path="svg\gallery\light\gallery_image_button.svg" />
+    <file name="GALLERY_LIGHT_GALLERY_SPINNER" path="svg\gallery\light\gallery_spinner.svg" />
+    <file name="GALLERY_LIGHT_GALLERY_SEPARATOR" path="svg\gallery\light\gallery_separator.svg" />
+    <file name="GALLERY_DARK_GALLERY_TOGGLE" path="svg\gallery\dark\gallery_toggle.svg" />
+    <file name="GALLERY_DARK_GALLERY_SWITCH_TRACK" path="svg\gallery\dark\gallery_switch_track.svg" />
+    <file name="GALLERY_DARK_GALLERY_SWITCH_THUMB" path="svg\gallery\dark\gallery_switch_thumb.svg" />
+    <file name="GALLERY_DARK_GALLERY_ARROW_UP" path="svg\gallery\dark\gallery_arrow_up.svg" />
+    <file name="GALLERY_DARK_GALLERY_ARROW_DOWN" path="svg\gallery\dark\gallery_arrow_down.svg" />
+    <file name="GALLERY_DARK_GALLERY_ARROW_PREV" path="svg\gallery\dark\gallery_arrow_prev.svg" />
+    <file name="GALLERY_DARK_GALLERY_ARROW_NEXT" path="svg\gallery\dark\gallery_arrow_next.svg" />
+    <file name="GALLERY_DARK_GALLERY_SORT" path="svg\gallery\dark\gallery_sort.svg" />
+    <file name="GALLERY_DARK_GALLERY_TOOLBAR_ICONS" path="svg\gallery\dark\gallery_toolbar_icons.svg" />
+    <file name="GALLERY_DARK_GALLERY_IMAGE_BUTTON" path="svg\gallery\dark\gallery_image_button.svg" />
+    <file name="GALLERY_DARK_GALLERY_SPINNER" path="svg\gallery\dark\gallery_spinner.svg" />
+    <file name="GALLERY_DARK_GALLERY_SEPARATOR" path="svg\gallery\dark\gallery_separator.svg" />
+    <file name="GALLERY_LIGHT_GALLERY_TREE_EXPANDER" path="svg\gallery\light\gallery_tree_expander.svg" />
+    <file name="GALLERY_DARK_GALLERY_TREE_EXPANDER" path="svg\gallery\dark\gallery_tree_expander.svg" />
+    <file name="logo" path="svg\logo.svg"/>
+  </SVG>
+  <values>
+    <file name="fluent_light" path="values\fluent_light.xml" />
+    <file name="theme_color_light" path="values\theme_color_light.xml" />
+    <file name="fluent_dark" path="values\fluent_dark.xml" />
+    <file name="theme_color_dark" path="values\theme_color_dark.xml" />
+  </values>
+  <img>
+    <file name="window_light" path="image\window_light.png" />
+    <file name="popup_light" path="image\popup_light.png" />
+    <file name="window_dark" path="image\window_dark.png" />
+    <file name="popup_dark" path="image\popup_dark.png" />
+  </img>
+  <SMENU>
+    <file name="gallery_actions" path="xml\gallery_actions.xml" />
+    <file name="gallery_view" path="xml\gallery_view.xml" />
+  </SMENU>
+  <icon>
+    <file name="icon_logo" path="image\logo.ico"/>
+  </icon>
+</resource>

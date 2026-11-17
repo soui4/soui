@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="24" viewBox="0 0 192 24">
+<g id="state0" transform="translate(0,0)"><circle cx="12" cy="12" r="6" fill="#616161"/></g>
+<g id="state1" transform="translate(24,0)"><circle cx="12" cy="12" r="7" fill="#616161"/></g>
+<g id="state2" transform="translate(48,0)"><circle cx="12" cy="12" r="5" fill="#616161"/></g>
+<g id="state3" transform="translate(72,0)"><circle cx="12" cy="12" r="6" fill="#9B9B9B"/></g>
+<g id="state4" transform="translate(96,0)"><circle cx="12" cy="12" r="6" fill="#0067C0"/></g>
+<g id="state5" transform="translate(120,0)"><circle cx="12" cy="12" r="7" fill="#1975C5"/></g>
+<g id="state6" transform="translate(144,0)"><circle cx="12" cy="12" r="5" fill="#3183CA"/></g>
+<g id="state7" transform="translate(168,0)"><circle cx="12" cy="12" r="6" fill="#9B9B9B"/></g>
+</svg>

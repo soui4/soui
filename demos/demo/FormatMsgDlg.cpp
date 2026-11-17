@@ -14,11 +14,13 @@ namespace SOUI
 
     void CFormatMsgDlg::OnOK()
     {
-        SRichEdit *pEdit = FindChildByName2<SRichEdit>(L"re_xmlinput");
-        m_strMsg = pEdit->GetWindowText();
-        SEdit *pRepeat = FindChildByName2<SEdit>(L"edit_repeat");
-        SStringT strRepeat = pRepeat->GetWindowText();
-        m_nRepeat = _tstoi(strRepeat);
+        SEdit *pEdit = FindChildByName2<SEdit>(L"re_xmlinput");
+        if (pEdit) {
+            m_strMsg = pEdit->GetWindowText();
+            SEdit* pRepeat = FindChildByName2<SEdit>(L"edit_repeat");
+            SStringT strRepeat = pRepeat->GetWindowText();
+            m_nRepeat = _tstoi(strRepeat);
+        }
         EndDialog(IDOK);
     }
 }

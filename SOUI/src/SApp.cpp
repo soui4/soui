@@ -177,7 +177,9 @@ void SObjectDefaultRegister::RegisterWindows(SObjectFactoryMgr *objFactory) cons
     objFactory->TplRegisterFactory<SFrame>();
     objFactory->TplRegisterFactory<SStackView>();
     objFactory->TplRegisterFactory<SStackPage>();
+#if !defined(SOUI_EDIT_LITE)
     objFactory->TplRegisterFactory<SRichEdit>();
+#endif // !SOUI_EDIT_LITE
     objFactory->TplRegisterFactory<SEdit>();
     objFactory->TplRegisterFactory<SComboEdit>();
     objFactory->TplRegisterFactory<SComboBox>();
@@ -301,7 +303,9 @@ void SApplication::_InitApp(const ISystemObjectRegister &sysObjRegister)
 #if defined(_WIN32) && !defined(FREERTOS_HOST)
     SWndSurface::Init();
 #endif // _WIN32 && !FREERTOS_HOST
+#if !defined(SOUI_EDIT_LITE)
     SRichEdit::InitTextService();
+#endif // !SOUI_EDIT_LITE
     memset(m_pSingletons, 0, sizeof(m_pSingletons));
     _CreateSingletons();
 
@@ -349,7 +353,9 @@ SApplication::~SApplication(void)
 {
     SResProviderMgr::RemoveAll();
     _DestroySingletons();
+#if !defined(SOUI_EDIT_LITE)
     SRichEdit::UninitTextService();
+#endif // !SOUI_EDIT_LITE
     SNativeWndHelper::instance()->Uninit();
     STls::Cleanup();
     ms_Singleton = NULL;
@@ -397,10 +403,12 @@ IAccProxy *SApplication::CreateAccProxy(IWindow *pWnd) const
     {
         return new SAccProxyCombobox(pWnd);
     }
+#if !defined(SOUI_EDIT_LITE)
     else if (pWnd->IsClass(SRichEdit::GetClassName()))
     {
         return new SAccProxyEdit(pWnd);
     }
+#endif // !SOUI_EDIT_LITE
     else if (pWnd->IsClass(SCheckBox::GetClassName()))
     {
         return new SAccProxyCheckButton(pWnd);

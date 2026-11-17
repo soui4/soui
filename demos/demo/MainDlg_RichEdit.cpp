@@ -20,12 +20,13 @@
 #include "MainDlg.h"
 #include <controls.extend/FileHelper.h> //CFileDialogEx 文件对话框
 #include "FormatMsgDlg.h"
-#include <controls.extend/SChatEdit.h>
 #include <controls.extend/SScintillaView.h>
+
+#if defined(_WIN32) && !defined(SOUI_EDIT_LITE)
+#include <controls.extend/SChatEdit.h>
 #include <controls.extend/reole/RichEditOle.h>
 #include "SmileyCreateHook.h"
 
-#ifdef _WIN32
 /**
 * @brief      GIF 表情数据源:按表情 ID 映射到 demo 源码目录下的 gif/N.gif
 *
@@ -67,6 +68,7 @@ ISmileySource * CreateSource2()
 */
 void CMainDlg::OnBtnInsertGif2RE()
 {
+#ifndef SOUI_EDIT_LITE
     SRichEdit *pEdit = FindChildByName2<SRichEdit>(L"re_gifhost");
     if(pEdit)
     {
@@ -123,6 +125,7 @@ void CMainDlg::OnBtnInsertGif2RE()
 #endif
         }
     }
+#endif//SOUI_EDIT_LITE
 }
 
 /**
@@ -133,6 +136,8 @@ void CMainDlg::OnBtnInsertGif2RE()
 */
 void CMainDlg::OnBtnAppendMsg()
 {
+#ifndef SOUI_EDIT_LITE
+
     SChatEdit *pEdit = FindChildByName2<SChatEdit>(L"re_gifhost");
     if(pEdit)
     {
@@ -143,6 +148,7 @@ void CMainDlg::OnBtnAppendMsg()
                 pEdit->AppendFormatText(S_CT2W(SStringT().Format(_T("line:%d "),i) + formatMsgDlg.m_strMsg));
         }
     }
+#endif//SOUI_EDIT_LITE
 }
 
 /**
@@ -150,6 +156,7 @@ void CMainDlg::OnBtnAppendMsg()
 */
 void CMainDlg::OnBtnRtfSave()
 {
+#ifndef SOUI_EDIT_LITE
     SRichEdit *pEdit = FindChildByName2<SRichEdit>(L"re_gifhost");
     if(pEdit)
     {
@@ -159,6 +166,7 @@ void CMainDlg::OnBtnRtfSave()
             pEdit->SaveRtf(openDlg.m_szFileName);
         }
     }
+#endif//SOUI_EDIT_LITE
 }
 
 /**
@@ -166,6 +174,7 @@ void CMainDlg::OnBtnRtfSave()
 */
 void CMainDlg::OnBtnRtfOpen()
 {
+#ifndef SOUI_EDIT_LITE
     SRichEdit *pEdit = FindChildByName2<SRichEdit>(L"re_gifhost");
     if(pEdit)
     {
@@ -175,6 +184,7 @@ void CMainDlg::OnBtnRtfOpen()
             pEdit->LoadRtf(openDlg.m_szFileName);
         }
     }
+#endif//SOUI_EDIT_LITE
 }
 
 /**

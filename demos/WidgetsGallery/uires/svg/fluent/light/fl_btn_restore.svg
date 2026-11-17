@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="138" height="40" viewBox="0 0 138 40">
+  <g id="state0" transform="translate(0, 0)">
+    <rect x="17.5" y="11.5" width="8" height="8" fill="none" stroke="#1B1B1B" stroke-width="1" transform="translate(0, 4)" />
+    <rect x="20.5" y="14.5" width="8" height="8" fill="none" stroke="#1B1B1B" stroke-width="1" transform="translate(0, 4)" />
+  </g>
+  <g id="state1" transform="translate(46, 0)">
+    <rect x="3" y="0" width="40" height="40" rx="6" fill="#E5E5E5" />
+    <rect x="17.5" y="11.5" width="8" height="8" fill="none" stroke="#1B1B1B" stroke-width="1" transform="translate(0, 4)" />
+    <rect x="20.5" y="14.5" width="8" height="8" fill="none" stroke="#1B1B1B" stroke-width="1" transform="translate(0, 4)" />
+  </g>
+  <g id="state2" transform="translate(92, 0)">
+    <rect x="3" y="0" width="40" height="40" rx="6" fill="#D6D6D6" />
+    <rect x="17.5" y="11.5" width="8" height="8" fill="none" stroke="#1B1B1B" stroke-width="1" transform="translate(0, 4)" />
+    <rect x="20.5" y="14.5" width="8" height="8" fill="none" stroke="#1B1B1B" stroke-width="1" transform="translate(0, 4)" />
+  </g>
+</svg>

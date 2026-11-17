@@ -72,7 +72,7 @@
     <!-- ============ 基金页签（自选列表） ============ -->
     <window size="-2,68" layout="hbox" padding="12,4,12,0">
       <fundwatchtabs name="watch_tabs" size="0,-2" weight="1" cursor="hand"
-                     sbWid="0" enableDragScroll="1"/>
+                     sbWid="0" enableGesture="1"/>
       <text name="txt_watch_cnt" text="0 只" font="f10" colorText="#77849a" size="-1,-2"
             extend_left="7" gravity="center"/>
     </window>
@@ -84,8 +84,8 @@
          拍快照并跟随手指平移，松手后 CommitDrag 连续滑到目标页 —— 和下方
          pane_swipe 用的是同一套 tabctrl 换页动画，不再靠取消换页 + 回弹假装。 -->
     <tabctrl name="fund_swipe" size="-2,0" weight="1"
-             tabWidth="0" tabHeight="0" enableDragSwitch="1"
-             dragThreshold="8" dragSwitchRatio="35" dragFling="1" dragCommitDuration="200"/>
+             tabWidth="0" tabHeight="0" enableGesture="1"
+             dragThreshold="8" dragSwitchRatio="35" dragCommitDuration="200"/>
       </window> <!-- /view_main -->
 
       <!-- ===== 0 支基金：空界面 ===== -->

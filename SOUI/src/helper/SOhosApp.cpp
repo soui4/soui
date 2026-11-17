@@ -5,7 +5,9 @@
 #include <SouiFactory.h>
 #include <control/SComboBase.h>
 #include <control/SEdit.h>
+#if !defined(SOUI_EDIT_LITE)
 #include <control/SRichEdit.h>
+#endif // !SOUI_EDIT_LITE
 #include <core/SWindowMgr.h>
 
 #include <ace/xcomponent/native_interface_xcomponent.h>
@@ -175,7 +177,12 @@ bool focusedWindowNeedsIme()
         return false;
 
     SWindow *focus = SWindowMgr::GetWindow(container->GetFocus());
-    bool needsIme = focus && (focus->IsClass(SEdit::GetClassName()) || focus->IsClass(SRichEdit::GetClassName()) || focus->IsClass(SComboEdit::GetClassName()));
+    bool needsIme = focus
+        && (focus->IsClass(SEdit::GetClassName()) || focus->IsClass(SComboEdit::GetClassName())
+#if !defined(SOUI_EDIT_LITE)
+            || focus->IsClass(SRichEdit::GetClassName())
+#endif // !SOUI_EDIT_LITE
+        );
     if (!focus && swinx::ohos::IsImeProxyActive() && g_lastImeFocusNeedsIme.load())
     {
         SOHOS_LOGI("focused window is nil while IME proxy is active; keep previous edit IME state");
@@ -337,6 +344,7 @@ void insertQueuedImeText(const std::string &text)
         focus = container ? SWindowMgr::GetWindow(container->GetFocus()) : nullptr;
     }
 
+#if !defined(SOUI_EDIT_LITE)
     SRichEdit *edit = focus && focus->IsClass(SRichEdit::GetClassName()) ? sobj_cast<SRichEdit>(focus) : nullptr;
     if (!edit)
     {
@@ -349,6 +357,10 @@ void insertQueuedImeText(const std::string &text)
     edit->SSendMessage(EM_REPLACESEL, (WPARAM)TRUE, (LPARAM)str.c_str());
     std::string prefix = formatUtf8Prefix(text);
     SOHOS_LOGI("insert IME text len=%{public}u wlen=%{public}u bytes=%{public}s swnd=%{public}u class=%{public}ls", static_cast<unsigned int>(text.size()), static_cast<unsigned int>(str.GetLength()), prefix.c_str(), edit->GetSwnd(), edit->GetObjectClass());
+#else
+    SOHOS_LOGW("insert IME text skipped: SRichEdit unavailable in SOUI_EDIT_LITE build (focus=%{public}p swnd=%{public}u)", reinterpret_cast<void *>(focus), swnd);
+    (void)text;
+#endif // !SOUI_EDIT_LITE
 }
 
 bool isPrintableUnicode(UINT unicode)

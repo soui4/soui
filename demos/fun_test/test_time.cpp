@@ -25,6 +25,11 @@ TEST(swinx_time, query_performance_counter_monotonic)
     LARGE_INTEGER f = {0};
     ASSERT_TRUE(QueryPerformanceFrequency(&f));
     EXPECT_GT(f.QuadPart, 0);
+#ifndef _WIN32
+    // QPF/QPC 已统一到 common/perfclock.cpp，刻度固定 10 MHz：
+    // 各平台只回答"现在多少 tick"（swinx_perf_ticks_100ns），不再各自定刻度。
+    EXPECT_EQ(f.QuadPart, 10000000);
+#endif
 
     LARGE_INTEGER c1 = {0}, c2 = {0};
     ASSERT_TRUE(QueryPerformanceCounter(&c1));

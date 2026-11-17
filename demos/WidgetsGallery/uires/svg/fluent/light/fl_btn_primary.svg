@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="16" viewBox="0 0 64 16">
+  <g id="state0" transform="translate(0, 0)">
+    <rect x="0.5" y="0.5" width="15" height="15" rx="3.5" fill="#0067C0" stroke="#0067C0" stroke-width="1"/>
+  </g>
+  <g id="state1" transform="translate(16, 0)">
+    <rect x="0.5" y="0.5" width="15" height="15" rx="3.5" fill="#1975C5" stroke="#1975C5" stroke-width="1"/>
+  </g>
+  <g id="state2" transform="translate(32, 0)">
+    <rect x="0.5" y="0.5" width="15" height="15" rx="3.5" fill="#3183CA" stroke="#3183CA" stroke-width="1"/>
+  </g>
+  <g id="state3" transform="translate(48, 0)">
+    <rect x="0.5" y="0.5" width="15" height="15" rx="3.5" fill="#EAEAEA" stroke="#9B9B9B" stroke-width="1"/>
+  </g>
+</svg>

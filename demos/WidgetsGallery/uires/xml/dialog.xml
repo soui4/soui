@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='utf-8'?>
+<SOUI title="Save workspace" resizable="0" translucent="1" margin="4dp,4dp,4dp,4dp">
+  <root skin="_skin.sys.wnd.bkgnd" size="460dp,278dp" layout="vbox">
+    <caption size="-2,48dp" layout="hbox" gravity="center" padding="8dp,0,0,0" font="size:14dp,bold:1">
+      <text text="SOUI Widgets Gallery" colorText="@color/fluent_text_secondary" font="size:14dp,bold:1" />
+      <window size="0,0" weight="1" />
+      <imgbtn name="btn_close" skin="_skin.sys.btn.close" size="46dp,40dp" tip="Close" />
+    </caption>
+    <window size="-2,0" weight="1" layout="vbox" padding="28dp,16dp,28dp,24dp" interval="16dp">
+      <text text="Save your workspace?" font="size:22dp,bold:1" />
+      <text text="Your layout and preferences will be kept for the next session. This is a demonstration; no file is written." colorText="@color/fluent_text_secondary" font="size:14dp" size="-2,64dp" multiLines="1" wordBreak="1" />
+      <window size="-2,0" weight="1" />
+      <window size="-2,36dp" layout="hbox" gravity="center" interval="12dp">
+        <window size="0,0" weight="1" />
+        <gallerybutton name="dialog_cancel" id="2" text="Cancel" size="100dp,34dp" />
+        <gallerybutton name="dialog_confirm" id="1" text="Save workspace" class="fluent_btn_primary" size="144dp,34dp" />
+      </window>
+    </window>
+  </root>
+</SOUI>

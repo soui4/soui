@@ -24,7 +24,7 @@
 		</window>
 		<window size="-2,1" colorBkgnd="@color/clr_line" extend_top="12"/>
 		<treeview name="room_tv" multiSel="1" bandEnable="1" size="-2,0" weight="1" margin="1,1"
-		          colorBorder="@color/clr_line" hasLines="false" indent="14" extend_top="6" toggleSkin="skin_tree_toggle"
+		          colorBorder="@color/clr_line" hasLines="true" indent="14" extend_top="6" toggleSkin="skin_tree_toggle"
 		          colorBkgnd="@color/clr_card_bg" colorItemSelBkgnd="@color/clr_accent_t"
 		          sbSkin="skin_scrollbar">
 			<!-- 行高 28、缩进 14:原来 32/18 在 125% DPI 下每级缩进约 47px,层级显得格外松散 -->

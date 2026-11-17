@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="40" viewBox="0 0 160 40">
+<g id="state0" transform="translate(0,0)"><rect x="0.5" y="0.5" width="39" height="39" rx="4" fill="none"/>
+</g>
+<g id="state1" transform="translate(40,0)"><rect x="0.5" y="0.5" width="39" height="39" rx="4" fill="#383838"/>
+</g>
+<g id="state2" transform="translate(80,0)"><rect x="0.5" y="0.5" width="39" height="39" rx="4" fill="#414141"/>
+</g>
+<g id="state3" transform="translate(120,0)"><rect x="0.5" y="0.5" width="39" height="39" rx="4" fill="none"/>
+</g>
+</svg>

@@ -2901,11 +2901,22 @@ BOOL m_bMsgHandled;    /**< Message handled flag. */
 
 LayoutDirtyType m_layoutDirty;         /**< Layout dirty state. */
 SAutoRefPtr<IRenderTarget> m_cachedRT; /**< Cached render target for the window. */
-SAutoRefPtr<IRegionS> m_clipRgn;       /**< Clipping region for the window. */
-SAutoRefPtr<IPathS> m_clipPath;        /**< Clipping path for the window. */
-SAutoRefPtr<ISkinObj> m_pBgSkin;       /**< Background skin object. */
-SAutoRefPtr<ISkinObj> m_pNcSkin;       /**< Non-client area skin object. */
-ULONG_PTR m_uData;                     /**< User data for the window. */
+/**
+ * Offscreen target for IsLayeredWindow() windows (alpha != 255, or an
+ * explicit WS_EX_LAYERED style), reused across frames.
+ *
+ * It used to be created and released inside every DispatchPaint(), which
+ * means a cairo surface + cairo_t allocation per frame per translucent
+ * window.  On a software rasteriser that shows up as several milliseconds
+ * of the frame budget for a window as small as 40x16 (measured on
+ * ESP32-S3), so keep it around and let ClearRect() wipe it instead.
+ */
+SAutoRefPtr<IRenderTarget> m_layeredRT;
+SAutoRefPtr<IRegionS> m_clipRgn; /**< Clipping region for the window. */
+SAutoRefPtr<IPathS> m_clipPath;  /**< Clipping path for the window. */
+SAutoRefPtr<ISkinObj> m_pBgSkin; /**< Background skin object. */
+SAutoRefPtr<ISkinObj> m_pNcSkin; /**< Non-client area skin object. */
+ULONG_PTR m_uData;               /**< User data for the window. */
 
 SLayoutSize m_nMaxWidth; /**< Maximum width of the window when calculating size automatically. */
 

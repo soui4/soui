@@ -1,0 +1,5144 @@
+{
+  "source": "Original checked-in demo contracts before Fluent migration; excludes palette/style definitions.",
+  "demos": [
+    "demo",
+    "demo2",
+    "wxDemo",
+    "flowlayout_demo",
+    "framelayout_demo",
+    "gridctrl_demo",
+    "hellocharts_demo",
+    "lightbutton_demo",
+    "mclistview_demo",
+    "propanimator_demo",
+    "sci_demo",
+    "wallpaper",
+    "ipcdemo"
+  ],
+  "layouts": {
+    "demos/demo/uires/smenu/menu_edit.xml": {
+      "size": {},
+      "root_content_size": {},
+      "pages": 0,
+      "named": [
+        [
+          "item",
+          "menu_230",
+          "230",
+          1
+        ],
+        [
+          "item",
+          "menu_231",
+          "231",
+          1
+        ],
+        [
+          "item",
+          "menu_add_group",
+          "21",
+          1
+        ],
+        [
+          "item",
+          "menu_clear_group",
+          "24",
+          1
+        ],
+        [
+          "item",
+          "menu_del_group",
+          "",
+          1
+        ],
+        [
+          "item",
+          "menu_modify_group",
+          "22",
+          1
+        ]
+      ]
+    },
+    "demos/demo/uires/smenu/menu_file.xml": {
+      "size": {},
+      "root_content_size": {},
+      "pages": 0,
+      "named": [
+        [
+          "item",
+          "menu_exit",
+          "12",
+          1
+        ],
+        [
+          "item",
+          "menu_open_lib",
+          "13",
+          1
+        ],
+        [
+          "item",
+          "menu_save_lib",
+          "14",
+          1
+        ]
+      ]
+    },
+    "demos/demo/uires/smenu/menu_help.xml": {
+      "size": {},
+      "root_content_size": {},
+      "pages": 0,
+      "named": [
+        [
+          "item",
+          "menu_about",
+          "102",
+          1
+        ],
+        [
+          "item",
+          "menu_help",
+          "101",
+          1
+        ]
+      ]
+    },
+    "demos/demo/uires/smenu/menu_lv.xml": {
+      "size": {},
+      "root_content_size": {},
+      "pages": 0,
+      "named": [
+        [
+          "item",
+          "",
+          "100",
+          1
+        ]
+      ]
+    },
+    "demos/demo/uires/smenu/menu_test.xml": {
+      "size": {},
+      "root_content_size": {},
+      "pages": 0,
+      "named": [
+        [
+          "item",
+          "",
+          "5",
+          1
+        ],
+        [
+          "item",
+          "",
+          "6",
+          1
+        ]
+      ]
+    },
+    "demos/demo/uires/xml/dlg_formatmsg.xml": {
+      "size": {
+        "width": "500",
+        "height": "300"
+      },
+      "root_content_size": {},
+      "pages": 0,
+      "named": [
+        [
+          "button",
+          "",
+          "IDOK",
+          1
+        ],
+        [
+          "class",
+          "cls_edit",
+          "",
+          1
+        ],
+        [
+          "edit",
+          "edit_repeat",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "",
+          "IDCANCEL",
+          1
+        ],
+        [
+          "richedit",
+          "re_xmlinput",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/demo/uires/xml/dlg_main.xml": {
+      "size": {
+        "width": "1000",
+        "height": "700"
+      },
+      "root_content_size": {},
+      "pages": 10,
+      "named": [
+        [
+          "apng",
+          "apng_haha",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_back",
+          "",
+          1
+        ],
+        [
+          "class",
+          "cls_edit",
+          "",
+          1
+        ],
+        [
+          "gif",
+          "gif_penguin",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "",
+          "1",
+          1
+        ],
+        [
+          "imgbtn",
+          "",
+          "2",
+          1
+        ],
+        [
+          "imgbtn",
+          "",
+          "3",
+          1
+        ],
+        [
+          "imgbtn",
+          "",
+          "5",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_menu",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_skin",
+          "",
+          1
+        ],
+        [
+          "shellnotifyicon",
+          "tray_008",
+          "",
+          1
+        ],
+        [
+          "tabctrl",
+          "tab_contents",
+          "",
+          1
+        ],
+        [
+          "tabctrl",
+          "tab_main",
+          "",
+          1
+        ],
+        [
+          "text",
+          "txt_nav_title",
+          "",
+          1
+        ],
+        [
+          "text",
+          "txt_title",
+          "",
+          1
+        ],
+        [
+          "window",
+          "",
+          "9527",
+          1
+        ],
+        [
+          "window",
+          "nav_bar",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/demo/uires/xml/dlg_set_skin.xml": {
+      "size": {},
+      "root_content_size": {
+        "width": "214",
+        "height": "220"
+      },
+      "pages": 0,
+      "named": [
+        [
+          "class",
+          "cls_border",
+          "",
+          1
+        ],
+        [
+          "img",
+          "img_skin_0",
+          "10",
+          1
+        ],
+        [
+          "img",
+          "img_skin_1",
+          "11",
+          1
+        ],
+        [
+          "img",
+          "img_skin_2",
+          "12",
+          1
+        ],
+        [
+          "img",
+          "img_skin_3",
+          "13",
+          1
+        ],
+        [
+          "img",
+          "img_skin_4",
+          "14",
+          1
+        ],
+        [
+          "img",
+          "img_skin_5",
+          "15",
+          1
+        ],
+        [
+          "img",
+          "img_skin_6",
+          "16",
+          1
+        ],
+        [
+          "img",
+          "img_skin_7",
+          "17",
+          1
+        ],
+        [
+          "imglist",
+          "skin_bkimg_0_fit",
+          "",
+          1
+        ],
+        [
+          "imglist",
+          "skin_bkimg_1_fit",
+          "",
+          1
+        ],
+        [
+          "imglist",
+          "skin_bkimg_2_fit",
+          "",
+          1
+        ],
+        [
+          "imglist",
+          "skin_bkimg_3_fit",
+          "",
+          1
+        ],
+        [
+          "imglist",
+          "skin_bkimg_4_fit",
+          "",
+          1
+        ],
+        [
+          "imglist",
+          "skin_bkimg_5_fit",
+          "",
+          1
+        ],
+        [
+          "imglist",
+          "skin_bkimg_6_fit",
+          "",
+          1
+        ],
+        [
+          "imglist",
+          "skin_bkimg_7_fit",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/demo/uires/xml/dlg_skiatext.xml": {
+      "size": {},
+      "root_content_size": {
+        "size": "300,50"
+      },
+      "pages": 0,
+      "named": []
+    },
+    "demos/demo/uires/xml/dlg_skinset.xml": {
+      "size": {},
+      "root_content_size": {
+        "width": "758",
+        "height": "500"
+      },
+      "pages": 0,
+      "named": [
+        [
+          "button",
+          "btn_builtinskin",
+          "51",
+          1
+        ],
+        [
+          "class",
+          "skin_border",
+          "",
+          1
+        ],
+        [
+          "img",
+          "img_skin_0",
+          "10",
+          1
+        ],
+        [
+          "img",
+          "img_skin_1",
+          "11",
+          1
+        ],
+        [
+          "img",
+          "img_skin_10",
+          "19",
+          1
+        ],
+        [
+          "img",
+          "img_skin_11",
+          "20",
+          1
+        ],
+        [
+          "img",
+          "img_skin_12",
+          "21",
+          1
+        ],
+        [
+          "img",
+          "img_skin_13",
+          "22",
+          1
+        ],
+        [
+          "img",
+          "img_skin_14",
+          "23",
+          1
+        ],
+        [
+          "img",
+          "img_skin_15",
+          "24",
+          1
+        ],
+        [
+          "img",
+          "img_skin_16",
+          "25",
+          1
+        ],
+        [
+          "img",
+          "img_skin_17",
+          "26",
+          1
+        ],
+        [
+          "img",
+          "img_skin_18",
+          "27",
+          1
+        ],
+        [
+          "img",
+          "img_skin_2",
+          "12",
+          1
+        ],
+        [
+          "img",
+          "img_skin_4",
+          "13",
+          1
+        ],
+        [
+          "img",
+          "img_skin_5",
+          "14",
+          1
+        ],
+        [
+          "img",
+          "img_skin_6",
+          "15",
+          1
+        ],
+        [
+          "img",
+          "img_skin_7",
+          "16",
+          1
+        ],
+        [
+          "img",
+          "img_skin_8",
+          "17",
+          1
+        ],
+        [
+          "img",
+          "img_skin_9",
+          "18",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_close",
+          "",
+          1
+        ],
+        [
+          "imglist",
+          "skin_bkimg_0_fit",
+          "",
+          1
+        ],
+        [
+          "imglist",
+          "skin_bkimg_10_fit",
+          "",
+          1
+        ],
+        [
+          "imglist",
+          "skin_bkimg_11_fit",
+          "",
+          1
+        ],
+        [
+          "imglist",
+          "skin_bkimg_12_fit",
+          "",
+          1
+        ],
+        [
+          "imglist",
+          "skin_bkimg_13_fit",
+          "",
+          1
+        ],
+        [
+          "imglist",
+          "skin_bkimg_14_fit",
+          "",
+          1
+        ],
+        [
+          "imglist",
+          "skin_bkimg_15_fit",
+          "",
+          1
+        ],
+        [
+          "imglist",
+          "skin_bkimg_16_fit",
+          "",
+          1
+        ],
+        [
+          "imglist",
+          "skin_bkimg_17_fit",
+          "",
+          1
+        ],
+        [
+          "imglist",
+          "skin_bkimg_1_fit",
+          "",
+          1
+        ],
+        [
+          "imglist",
+          "skin_bkimg_2_fit",
+          "",
+          1
+        ],
+        [
+          "imglist",
+          "skin_bkimg_3_fit",
+          "",
+          1
+        ],
+        [
+          "imglist",
+          "skin_bkimg_4_fit",
+          "",
+          1
+        ],
+        [
+          "imglist",
+          "skin_bkimg_5_fit",
+          "",
+          1
+        ],
+        [
+          "imglist",
+          "skin_bkimg_6_fit",
+          "",
+          1
+        ],
+        [
+          "imglist",
+          "skin_bkimg_7_fit",
+          "",
+          1
+        ],
+        [
+          "imglist",
+          "skin_bkimg_8_fit",
+          "",
+          1
+        ],
+        [
+          "imglist",
+          "skin_bkimg_9_fit",
+          "",
+          1
+        ],
+        [
+          "window",
+          "",
+          "30",
+          1
+        ],
+        [
+          "window",
+          "",
+          "31",
+          1
+        ],
+        [
+          "window",
+          "",
+          "32",
+          1
+        ],
+        [
+          "window",
+          "",
+          "33",
+          1
+        ],
+        [
+          "window",
+          "",
+          "34",
+          1
+        ],
+        [
+          "window",
+          "",
+          "35",
+          1
+        ],
+        [
+          "window",
+          "",
+          "36",
+          1
+        ],
+        [
+          "window",
+          "",
+          "37",
+          1
+        ],
+        [
+          "window",
+          "",
+          "38",
+          1
+        ],
+        [
+          "window",
+          "",
+          "39",
+          1
+        ],
+        [
+          "window",
+          "",
+          "40",
+          1
+        ],
+        [
+          "window",
+          "",
+          "41",
+          1
+        ],
+        [
+          "window",
+          "",
+          "42",
+          1
+        ],
+        [
+          "window",
+          "",
+          "43",
+          1
+        ],
+        [
+          "window",
+          "",
+          "44",
+          1
+        ],
+        [
+          "window",
+          "",
+          "45",
+          1
+        ],
+        [
+          "window",
+          "",
+          "46",
+          1
+        ],
+        [
+          "window",
+          "",
+          "9527",
+          1
+        ]
+      ]
+    },
+    "demos/demo/uires/xml/dlg_tip.xml": {
+      "size": {},
+      "root_content_size": {
+        "size": "-1,-1"
+      },
+      "pages": 0,
+      "named": [
+        [
+          "text",
+          "txt_tip",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/demo/uires/xml/dlg_wrap_content.xml": {
+      "size": {},
+      "root_content_size": {
+        "size": "-2,-1"
+      },
+      "pages": 0,
+      "named": [
+        [
+          "SOUI",
+          "wrap_content",
+          "",
+          1
+        ],
+        [
+          "button",
+          "",
+          "IDCANCEL",
+          1
+        ],
+        [
+          "button",
+          "",
+          "IDOK",
+          1
+        ]
+      ]
+    },
+    "demos/demo/uires/xml/love.xml": {
+      "size": {},
+      "root_content_size": {},
+      "pages": 0,
+      "named": []
+    },
+    "demos/demo/uires/xml/menuex_test.xml": {
+      "size": {},
+      "root_content_size": {},
+      "pages": 0,
+      "named": [
+        [
+          "imgbtn",
+          "menu_btn_cir",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "menu_btn_ilike",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "menu_btn_next",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "menu_btn_play",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "menu_btn_pre",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "menu_btn_vol",
+          "",
+          1
+        ],
+        [
+          "menuItem",
+          "",
+          "6",
+          1
+        ],
+        [
+          "sliderbar",
+          "menu_slider_vol",
+          "",
+          1
+        ],
+        [
+          "text",
+          "menu_btn_play",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/demo/uires/xml/page_about.xml": {
+      "size": {},
+      "root_content_size": {},
+      "pages": 0,
+      "named": []
+    },
+    "demos/demo/uires/xml/page_ani3.xml": {
+      "size": {},
+      "root_content_size": {},
+      "pages": 0,
+      "named": [
+        [
+          "button",
+          "btn_ani_hostwnd",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_animator",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_test",
+          "",
+          1
+        ],
+        [
+          "img",
+          "img_girl",
+          "",
+          1
+        ],
+        [
+          "img",
+          "img_soui",
+          "",
+          1
+        ],
+        [
+          "include",
+          "tree_test",
+          "",
+          1
+        ],
+        [
+          "toggle",
+          "tgl_left",
+          "",
+          1
+        ],
+        [
+          "window",
+          "pane_left",
+          "",
+          1
+        ],
+        [
+          "window",
+          "wnd_ani_host",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/demo/uires/xml/page_animator.xml": {
+      "size": {},
+      "root_content_size": {},
+      "pages": 3,
+      "named": [
+        [
+          "button",
+          "btnSelectGif",
+          "",
+          1
+        ],
+        [
+          "combobox",
+          "cbx_interpolator",
+          "",
+          1
+        ],
+        [
+          "gifplayer",
+          "gif_test",
+          "1000",
+          1
+        ],
+        [
+          "gifplayer",
+          "giftest",
+          "",
+          1
+        ],
+        [
+          "interpolatorView",
+          "view_interpolator",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/demo/uires/xml/page_ctrls.xml": {
+      "size": {},
+      "root_content_size": {},
+      "pages": 23,
+      "named": [
+        [
+          "animateimg",
+          "ani_test",
+          "",
+          2
+        ],
+        [
+          "aniwindow",
+          "container",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn4_1",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn4_2",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn4_3",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn4_4",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn4_5",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn4_6",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_append_msg",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_init_listbox",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_insert_gif",
+          "#id_test1",
+          1
+        ],
+        [
+          "button",
+          "btn_lrc",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_richedit_open",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_richedit_save",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_set_prop_value",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_test",
+          "",
+          5
+        ],
+        [
+          "button",
+          "btn_uninstall",
+          "",
+          1
+        ],
+        [
+          "button",
+          "title",
+          "",
+          1
+        ],
+        [
+          "button.link",
+          "btn_tip",
+          "",
+          1
+        ],
+        [
+          "chatedit",
+          "re_gifhost",
+          "",
+          1
+        ],
+        [
+          "check",
+          "chk_band_lc",
+          "",
+          1
+        ],
+        [
+          "check",
+          "chk_band_lvfix",
+          "",
+          1
+        ],
+        [
+          "check",
+          "chk_band_lvflex",
+          "",
+          1
+        ],
+        [
+          "check",
+          "chk_band_mclv",
+          "",
+          1
+        ],
+        [
+          "check",
+          "chk_band_tile",
+          "",
+          1
+        ],
+        [
+          "check",
+          "chk_band_tree",
+          "",
+          1
+        ],
+        [
+          "check",
+          "chk_fullrow_tree",
+          "",
+          1
+        ],
+        [
+          "check",
+          "chk_mclv_sel",
+          "",
+          1
+        ],
+        [
+          "check",
+          "chk_multi_lc",
+          "",
+          1
+        ],
+        [
+          "check",
+          "chk_multi_lvfix",
+          "",
+          1
+        ],
+        [
+          "check",
+          "chk_multi_lvflex",
+          "",
+          1
+        ],
+        [
+          "check",
+          "chk_multi_mclv",
+          "",
+          1
+        ],
+        [
+          "check",
+          "chk_multi_tile",
+          "",
+          1
+        ],
+        [
+          "check",
+          "chk_multi_tree",
+          "",
+          1
+        ],
+        [
+          "combobox",
+          "cbx_dropdown",
+          "",
+          1
+        ],
+        [
+          "combobox",
+          "cbx_in_lv",
+          "",
+          1
+        ],
+        [
+          "combobox",
+          "cbx_test",
+          "",
+          1
+        ],
+        [
+          "dateTimePicker",
+          "timepicker",
+          "",
+          1
+        ],
+        [
+          "edit",
+          "edit_spin",
+          "",
+          1
+        ],
+        [
+          "edit",
+          "prop_prop",
+          "",
+          1
+        ],
+        [
+          "edit",
+          "prop_target",
+          "",
+          1
+        ],
+        [
+          "edit",
+          "prop_value",
+          "",
+          1
+        ],
+        [
+          "group",
+          "",
+          "1000",
+          1
+        ],
+        [
+          "group",
+          "",
+          "2000",
+          1
+        ],
+        [
+          "group",
+          "",
+          "3000",
+          1
+        ],
+        [
+          "group",
+          "",
+          "4000",
+          1
+        ],
+        [
+          "group",
+          "",
+          "5000",
+          1
+        ],
+        [
+          "grouplist",
+          "gl_catalog",
+          "",
+          1
+        ],
+        [
+          "headerStyle",
+          "mclv_test_header",
+          "",
+          1
+        ],
+        [
+          "hexedit",
+          "ctrl_hexedit",
+          "",
+          1
+        ],
+        [
+          "hotkey",
+          "ctrl_hk1",
+          "",
+          1
+        ],
+        [
+          "hotkey",
+          "ctrl_hk2",
+          "",
+          1
+        ],
+        [
+          "img",
+          "btn_icon",
+          "",
+          1
+        ],
+        [
+          "img",
+          "img_file_icon",
+          "",
+          1
+        ],
+        [
+          "img",
+          "img_icon",
+          "",
+          1
+        ],
+        [
+          "img",
+          "img_indicator",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_msgbox",
+          "",
+          1
+        ],
+        [
+          "ipctrl",
+          "ip_test",
+          "",
+          1
+        ],
+        [
+          "item",
+          "page_button",
+          "109",
+          1
+        ],
+        [
+          "item",
+          "page_calendar",
+          "112",
+          1
+        ],
+        [
+          "item",
+          "page_edit",
+          "107",
+          1
+        ],
+        [
+          "item",
+          "page_fix_height_listview",
+          "102",
+          1
+        ],
+        [
+          "item",
+          "page_flex_height_listview",
+          "103",
+          1
+        ],
+        [
+          "item",
+          "page_listbox",
+          "114",
+          1
+        ],
+        [
+          "item",
+          "page_listctrl",
+          "101",
+          1
+        ],
+        [
+          "item",
+          "page_mclistview",
+          "100",
+          1
+        ],
+        [
+          "item",
+          "page_morectrl",
+          "116",
+          1
+        ],
+        [
+          "item",
+          "page_progress",
+          "111",
+          1
+        ],
+        [
+          "item",
+          "page_property",
+          "115",
+          1
+        ],
+        [
+          "item",
+          "page_radio_button",
+          "110",
+          1
+        ],
+        [
+          "item",
+          "page_richedit",
+          "108",
+          1
+        ],
+        [
+          "item",
+          "page_splitwnd",
+          "113",
+          1
+        ],
+        [
+          "item",
+          "page_tileview",
+          "104",
+          1
+        ],
+        [
+          "item",
+          "page_treectrl",
+          "105",
+          1
+        ],
+        [
+          "item",
+          "page_treeview",
+          "106",
+          1
+        ],
+        [
+          "listbox",
+          "lb_test",
+          "",
+          1
+        ],
+        [
+          "listctrl",
+          "lc_test",
+          "",
+          1
+        ],
+        [
+          "listview",
+          "lv_test_fix",
+          "",
+          1
+        ],
+        [
+          "listview",
+          "lv_test_fix_horz",
+          "",
+          1
+        ],
+        [
+          "listview",
+          "lv_test_flex",
+          "",
+          1
+        ],
+        [
+          "mclistview",
+          "mclv_test",
+          "",
+          1
+        ],
+        [
+          "progress",
+          "prog_test",
+          "",
+          1
+        ],
+        [
+          "progress",
+          "prog_test2",
+          "",
+          1
+        ],
+        [
+          "progressRing",
+          "prog_ring",
+          "",
+          1
+        ],
+        [
+          "propcolor",
+          "color2.1",
+          "",
+          1
+        ],
+        [
+          "propgrid",
+          "prop_test",
+          "",
+          1
+        ],
+        [
+          "propgroup",
+          "group1",
+          "",
+          1
+        ],
+        [
+          "propgroup",
+          "group2",
+          "",
+          1
+        ],
+        [
+          "propoption",
+          "option2.1",
+          "",
+          1
+        ],
+        [
+          "propsize",
+          "size2.1",
+          "",
+          1
+        ],
+        [
+          "proptext",
+          "text1.1",
+          "",
+          1
+        ],
+        [
+          "proptext",
+          "text1.1.1",
+          "",
+          1
+        ],
+        [
+          "proptext",
+          "text1.1.2",
+          "",
+          2
+        ],
+        [
+          "proptext",
+          "text1.1.3",
+          "",
+          1
+        ],
+        [
+          "proptext",
+          "text1.2",
+          "",
+          1
+        ],
+        [
+          "proptext",
+          "text2.1",
+          "",
+          1
+        ],
+        [
+          "proptext",
+          "text2.2",
+          "",
+          1
+        ],
+        [
+          "proptext",
+          "text2.3",
+          "",
+          1
+        ],
+        [
+          "proptext",
+          "text2.4",
+          "",
+          1
+        ],
+        [
+          "proptext",
+          "text2.5",
+          "",
+          1
+        ],
+        [
+          "proptext",
+          "text2.6",
+          "",
+          1
+        ],
+        [
+          "proptext",
+          "text2.7",
+          "",
+          1
+        ],
+        [
+          "proptext",
+          "text2.8",
+          "",
+          1
+        ],
+        [
+          "radio",
+          "radio_1",
+          "",
+          1
+        ],
+        [
+          "radio",
+          "radio_2",
+          "",
+          1
+        ],
+        [
+          "radio",
+          "radio_3",
+          "",
+          1
+        ],
+        [
+          "radio",
+          "radio_4",
+          "",
+          1
+        ],
+        [
+          "radio",
+          "radio_5",
+          "",
+          1
+        ],
+        [
+          "radio",
+          "radio_6",
+          "",
+          1
+        ],
+        [
+          "radio2",
+          "radio3_1",
+          "",
+          1
+        ],
+        [
+          "radio2",
+          "radio3_2",
+          "",
+          1
+        ],
+        [
+          "radio2",
+          "radio3_3",
+          "",
+          1
+        ],
+        [
+          "radio2",
+          "radio3_4",
+          "",
+          1
+        ],
+        [
+          "radio2",
+          "radio3_5",
+          "",
+          1
+        ],
+        [
+          "radio2",
+          "radio3_6",
+          "",
+          1
+        ],
+        [
+          "ratingbar",
+          "rating_score",
+          "",
+          1
+        ],
+        [
+          "roundImg",
+          "img_round",
+          "",
+          1
+        ],
+        [
+          "roundImg",
+          "img_round2",
+          "",
+          1
+        ],
+        [
+          "roundWnd",
+          "img_round3",
+          "",
+          1
+        ],
+        [
+          "scrollbar",
+          "sb_test1",
+          "",
+          1
+        ],
+        [
+          "scrollbar",
+          "sb_test2",
+          "",
+          1
+        ],
+        [
+          "sliderbar",
+          "slider_test",
+          "",
+          1
+        ],
+        [
+          "sliderbar",
+          "slider_test2",
+          "",
+          1
+        ],
+        [
+          "splitcol",
+          "split_col",
+          "",
+          1
+        ],
+        [
+          "splitrow",
+          "split_row",
+          "",
+          1
+        ],
+        [
+          "tabctrl",
+          "tab_ctrls",
+          "",
+          1
+        ],
+        [
+          "tabctrl",
+          "tab_radio2",
+          "",
+          1
+        ],
+        [
+          "text",
+          "btn_text",
+          "",
+          1
+        ],
+        [
+          "text",
+          "txt_desc",
+          "",
+          1
+        ],
+        [
+          "text",
+          "txt_index",
+          "",
+          1
+        ],
+        [
+          "text",
+          "txt_installtime",
+          "",
+          1
+        ],
+        [
+          "text",
+          "txt_label",
+          "",
+          2
+        ],
+        [
+          "text",
+          "txt_lc_selcount",
+          "",
+          1
+        ],
+        [
+          "text",
+          "txt_mclv_selcount",
+          "",
+          1
+        ],
+        [
+          "text",
+          "txt_name",
+          "",
+          1
+        ],
+        [
+          "text",
+          "txt_score",
+          "",
+          1
+        ],
+        [
+          "text",
+          "txt_size",
+          "",
+          1
+        ],
+        [
+          "text",
+          "txt_usetime",
+          "",
+          1
+        ],
+        [
+          "tileview",
+          "lv_test_tile",
+          "",
+          1
+        ],
+        [
+          "toggle",
+          "tgl_switch",
+          "",
+          1
+        ],
+        [
+          "window",
+          "",
+          "5000",
+          1
+        ],
+        [
+          "window",
+          "col1",
+          "",
+          1
+        ],
+        [
+          "window",
+          "col2",
+          "",
+          1
+        ],
+        [
+          "window",
+          "col3",
+          "",
+          1
+        ],
+        [
+          "window",
+          "col4",
+          "",
+          1
+        ],
+        [
+          "window",
+          "col5",
+          "",
+          1
+        ],
+        [
+          "window",
+          "col6",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/demo/uires/xml/page_home.xml": {
+      "size": {},
+      "root_content_size": {},
+      "pages": 0,
+      "named": [
+        [
+          "imgbtn",
+          "{{name}}",
+          "",
+          1
+        ],
+        [
+          "t_home_card",
+          "card_about",
+          "",
+          1
+        ],
+        [
+          "t_home_card",
+          "card_animator",
+          "",
+          1
+        ],
+        [
+          "t_home_card",
+          "card_ctrls",
+          "",
+          1
+        ],
+        [
+          "t_home_card",
+          "card_layout",
+          "",
+          1
+        ],
+        [
+          "t_home_card",
+          "card_misc",
+          "",
+          1
+        ],
+        [
+          "t_home_card",
+          "card_skia",
+          "",
+          1
+        ],
+        [
+          "t_home_card",
+          "card_webkit",
+          "",
+          1
+        ],
+        [
+          "t_home_card",
+          "card_xxl",
+          "",
+          1
+        ],
+        [
+          "template",
+          "home_card",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/demo/uires/xml/page_layout.xml": {
+      "size": {},
+      "root_content_size": {},
+      "pages": 6,
+      "named": [
+        [
+          "button",
+          "",
+          "4321",
+          1
+        ],
+        [
+          "button",
+          "btn_create_by_temp",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_display",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_hidetst",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_open_wrap_content",
+          "",
+          1
+        ],
+        [
+          "group",
+          "",
+          "10000",
+          1
+        ],
+        [
+          "richedit",
+          "re_temp_input",
+          "",
+          1
+        ],
+        [
+          "scrollview",
+          "wnd_temp_host",
+          "",
+          1
+        ],
+        [
+          "text",
+          "",
+          "100",
+          1
+        ],
+        [
+          "window",
+          "",
+          "10000",
+          1
+        ],
+        [
+          "window",
+          "",
+          "1236",
+          1
+        ],
+        [
+          "window",
+          "fl_b1",
+          "",
+          1
+        ],
+        [
+          "window",
+          "fl_b2",
+          "",
+          1
+        ],
+        [
+          "window",
+          "fl_b3",
+          "",
+          1
+        ],
+        [
+          "window",
+          "fl_bottom",
+          "",
+          1
+        ],
+        [
+          "window",
+          "fl_fill",
+          "",
+          1
+        ],
+        [
+          "window",
+          "fl_left",
+          "",
+          1
+        ],
+        [
+          "window",
+          "fl_main",
+          "",
+          1
+        ],
+        [
+          "window",
+          "fl_main2",
+          "",
+          1
+        ],
+        [
+          "window",
+          "fl_right",
+          "",
+          1
+        ],
+        [
+          "window",
+          "fl_title",
+          "",
+          1
+        ],
+        [
+          "window",
+          "fl_top",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/demo/uires/xml/page_misc.xml": {
+      "size": {},
+      "root_content_size": {},
+      "pages": 17,
+      "named": [
+        [
+          "button",
+          "btn_createchildren",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_filewnd",
+          "",
+          1
+        ],
+        [
+          "clock",
+          "clock_main",
+          "",
+          1
+        ],
+        [
+          "edit",
+          "edit_drop_top1",
+          "",
+          1
+        ],
+        [
+          "edit",
+          "edit_drop_top2",
+          "",
+          1
+        ],
+        [
+          "edit",
+          "edit_rotate",
+          "",
+          1
+        ],
+        [
+          "edit",
+          "edit_scale",
+          "",
+          1
+        ],
+        [
+          "edit",
+          "edit_skew",
+          "",
+          1
+        ],
+        [
+          "edit",
+          "edit_translate",
+          "",
+          1
+        ],
+        [
+          "freeMoveWindow",
+          "fmw_test",
+          "",
+          1
+        ],
+        [
+          "img",
+          "svg_test",
+          "",
+          4
+        ],
+        [
+          "matrixWindow",
+          "matrix_test",
+          "",
+          1
+        ],
+        [
+          "radio",
+          "rotate_x",
+          "",
+          1
+        ],
+        [
+          "radio",
+          "rotate_y",
+          "",
+          1
+        ],
+        [
+          "radio",
+          "rotate_z",
+          "",
+          1
+        ],
+        [
+          "s3dview",
+          "3d_test",
+          "",
+          1
+        ],
+        [
+          "scintilla",
+          "edit_xml",
+          "",
+          1
+        ],
+        [
+          "window",
+          "wnd_container",
+          "",
+          1
+        ],
+        [
+          "window",
+          "wnd_rgn",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/demo/uires/xml/page_morectrl.xml": {
+      "size": {},
+      "root_content_size": {},
+      "pages": 0,
+      "named": [
+        [
+          "chromeTabCtrl",
+          "chromeTab",
+          "",
+          1
+        ],
+        [
+          "verificationCodeEdit",
+          "verificationCodeEdit",
+          "",
+          1
+        ],
+        [
+          "waveProgress",
+          "waveProgress0",
+          "",
+          1
+        ],
+        [
+          "waveProgress",
+          "waveProgress1",
+          "",
+          1
+        ],
+        [
+          "waveProgress",
+          "waveProgress2",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/demo/uires/xml/page_script.xml": {
+      "size": {},
+      "root_content_size": {},
+      "pages": 2,
+      "named": [
+        [
+          "button",
+          "btn_run",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_xxl_hint",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_xxl_restart",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_xxl_shuffle",
+          "",
+          1
+        ],
+        [
+          "data",
+          "digit_coin_0",
+          "",
+          1
+        ],
+        [
+          "data",
+          "digit_coin_1",
+          "",
+          1
+        ],
+        [
+          "data",
+          "digit_coin_2",
+          "",
+          1
+        ],
+        [
+          "data",
+          "digit_score_0",
+          "",
+          1
+        ],
+        [
+          "data",
+          "digit_score_1",
+          "",
+          1
+        ],
+        [
+          "data",
+          "digit_score_2",
+          "",
+          1
+        ],
+        [
+          "gifplayer",
+          "flag_win",
+          "400",
+          1
+        ],
+        [
+          "gifplayer",
+          "player_1",
+          "",
+          1
+        ],
+        [
+          "gifplayer",
+          "player_2",
+          "",
+          1
+        ],
+        [
+          "gifplayer",
+          "player_3",
+          "",
+          1
+        ],
+        [
+          "gifplayer",
+          "player_4",
+          "",
+          1
+        ],
+        [
+          "text",
+          "txt_coins",
+          "",
+          1
+        ],
+        [
+          "text",
+          "txt_xxl_combo",
+          "",
+          1
+        ],
+        [
+          "window",
+          "",
+          "101",
+          1
+        ],
+        [
+          "window",
+          "",
+          "102",
+          1
+        ],
+        [
+          "window",
+          "",
+          "103",
+          1
+        ],
+        [
+          "window",
+          "",
+          "104",
+          1
+        ],
+        [
+          "window",
+          "game_canvas",
+          "",
+          1
+        ],
+        [
+          "window",
+          "game_toolbar",
+          "",
+          1
+        ],
+        [
+          "window",
+          "game_wnd",
+          "300",
+          1
+        ],
+        [
+          "window",
+          "wnd_xxl_aniframe",
+          "",
+          1
+        ],
+        [
+          "window",
+          "wnd_xxl_board",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/demo/uires/xml/page_skia.xml": {
+      "size": {},
+      "root_content_size": {},
+      "pages": 7,
+      "named": [
+        [
+          "SpeedMeter",
+          "speed_ctrl",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_speed_dec",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_speed_inc",
+          "",
+          1
+        ],
+        [
+          "pathView",
+          "pv_test",
+          "",
+          1
+        ],
+        [
+          "text",
+          "txt_path_length",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/demo/uires/xml/page_treeview.xml": {
+      "size": {},
+      "root_content_size": {},
+      "pages": 0,
+      "named": [
+        [
+          "animateimg",
+          "ani_hot",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_go_offcial_url",
+          "",
+          1
+        ],
+        [
+          "check",
+          "chk_band_tv",
+          "",
+          1
+        ],
+        [
+          "check",
+          "chk_multi_tv",
+          "",
+          1
+        ],
+        [
+          "img",
+          "img_state",
+          "",
+          1
+        ],
+        [
+          "text",
+          "txt_label",
+          "",
+          1
+        ],
+        [
+          "treeview",
+          "room_tv",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/demo/uires/xml/page_webkit.xml": {
+      "size": {},
+      "root_content_size": {},
+      "pages": 0,
+      "named": [
+        [
+          "edit2",
+          "edit_url",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_webkit_back",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_webkit_fore",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_webkit_go",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_webkit_refresh",
+          "",
+          1
+        ],
+        [
+          "window",
+          "webkit_toolbar",
+          "",
+          1
+        ],
+        [
+          "wkeWebkit",
+          "wke_test",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/demo/uires/xml/roomlist.xml": {
+      "size": {},
+      "root_content_size": {},
+      "pages": 0,
+      "named": [
+        [
+          "platform",
+          "KK",
+          "",
+          1
+        ],
+        [
+          "platform",
+          "YY",
+          "",
+          1
+        ],
+        [
+          "platform",
+          "九秀",
+          "",
+          1
+        ],
+        [
+          "platform",
+          "哔哩哔哩",
+          "",
+          1
+        ],
+        [
+          "platform",
+          "我秀",
+          "",
+          1
+        ],
+        [
+          "platform",
+          "映客",
+          "",
+          1
+        ],
+        [
+          "platform",
+          "棉花糖",
+          "",
+          1
+        ],
+        [
+          "platform",
+          "花椒",
+          "",
+          1
+        ],
+        [
+          "platform",
+          "迅雷",
+          "",
+          1
+        ],
+        [
+          "room",
+          "",
+          "109993149",
+          1
+        ],
+        [
+          "room",
+          "",
+          "13144131",
+          1
+        ],
+        [
+          "room",
+          "",
+          "1344874094",
+          1
+        ],
+        [
+          "room",
+          "",
+          "1346369664",
+          1
+        ],
+        [
+          "room",
+          "",
+          "1382738518",
+          1
+        ],
+        [
+          "room",
+          "",
+          "1454717441",
+          1
+        ],
+        [
+          "room",
+          "",
+          "1463537773",
+          1
+        ],
+        [
+          "room",
+          "",
+          "1512837",
+          1
+        ],
+        [
+          "room",
+          "",
+          "162294416",
+          1
+        ],
+        [
+          "room",
+          "",
+          "1676067039",
+          1
+        ],
+        [
+          "room",
+          "",
+          "1731858960",
+          1
+        ],
+        [
+          "room",
+          "",
+          "1784134215",
+          1
+        ],
+        [
+          "room",
+          "",
+          "18578166",
+          1
+        ],
+        [
+          "room",
+          "",
+          "22302689",
+          1
+        ],
+        [
+          "room",
+          "",
+          "22490906",
+          1
+        ],
+        [
+          "room",
+          "",
+          "23564688",
+          1
+        ],
+        [
+          "room",
+          "",
+          "27650992",
+          1
+        ],
+        [
+          "room",
+          "",
+          "2909844780",
+          1
+        ],
+        [
+          "room",
+          "",
+          "2915096765",
+          1
+        ],
+        [
+          "room",
+          "",
+          "31797565",
+          1
+        ],
+        [
+          "room",
+          "",
+          "336927703",
+          1
+        ],
+        [
+          "room",
+          "",
+          "54880976",
+          1
+        ],
+        [
+          "room",
+          "",
+          "57092721",
+          1
+        ],
+        [
+          "room",
+          "",
+          "63260471",
+          1
+        ],
+        [
+          "room",
+          "",
+          "701796998",
+          1
+        ],
+        [
+          "room",
+          "",
+          "761864571",
+          1
+        ],
+        [
+          "room",
+          "",
+          "7842",
+          1
+        ],
+        [
+          "room",
+          "",
+          "86300079",
+          1
+        ],
+        [
+          "room",
+          "",
+          "930571",
+          1
+        ],
+        [
+          "room",
+          "",
+          "930935",
+          1
+        ],
+        [
+          "room",
+          "",
+          "931221",
+          1
+        ],
+        [
+          "room",
+          "",
+          "935718",
+          1
+        ],
+        [
+          "room",
+          "",
+          "9649520",
+          1
+        ],
+        [
+          "type",
+          "girl",
+          "",
+          6
+        ],
+        [
+          "type",
+          "才艺",
+          "",
+          1
+        ],
+        [
+          "type",
+          "游戏",
+          "",
+          2
+        ],
+        [
+          "type",
+          "美女",
+          "",
+          2
+        ],
+        [
+          "type",
+          "跳舞",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/demo/uires/xml/treectrl.xml": {
+      "size": {},
+      "root_content_size": {},
+      "pages": 0,
+      "named": [
+        [
+          "treectrl",
+          "mytree",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/demo2/uires/xml/dlg_main.xml": {
+      "size": {},
+      "root_content_size": {
+        "width": "600",
+        "height": "400"
+      },
+      "pages": 0,
+      "named": [
+        [
+          "SOUI",
+          "mainWindow",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_add",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_clean",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_dialog",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_flash",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_menu",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_menuex",
+          "",
+          1
+        ],
+        [
+          "icon",
+          "",
+          "sysid_icon",
+          1
+        ],
+        [
+          "imgbtn",
+          "",
+          "sysid_close",
+          1
+        ],
+        [
+          "imgbtn",
+          "",
+          "sysid_max",
+          1
+        ],
+        [
+          "imgbtn",
+          "",
+          "sysid_min",
+          1
+        ],
+        [
+          "imgbtn",
+          "",
+          "sysid_restore",
+          1
+        ],
+        [
+          "listview",
+          "lv_test",
+          "",
+          1
+        ],
+        [
+          "sliderbar",
+          "tst_slider",
+          "",
+          1
+        ],
+        [
+          "testCtrl",
+          "testWnd",
+          "",
+          1
+        ],
+        [
+          "text",
+          "",
+          "sysid_title",
+          1
+        ],
+        [
+          "text",
+          "txt_pos",
+          "",
+          1
+        ],
+        [
+          "text",
+          "txt_test",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/demo2/uires/xml/dlg_test.xml": {
+      "size": {},
+      "root_content_size": {
+        "width": "400",
+        "height": "300"
+      },
+      "pages": 0,
+      "named": [
+        [
+          "SOUI",
+          "mainWindow",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_close",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/demo2/uires/xml/menu_test.xml": {
+      "size": {},
+      "root_content_size": {},
+      "pages": 0,
+      "named": [
+        [
+          "item",
+          "",
+          "1",
+          1
+        ],
+        [
+          "item",
+          "",
+          "2",
+          1
+        ],
+        [
+          "item",
+          "",
+          "3",
+          1
+        ],
+        [
+          "item",
+          "",
+          "4",
+          1
+        ],
+        [
+          "item",
+          "",
+          "5",
+          1
+        ],
+        [
+          "item",
+          "",
+          "51",
+          1
+        ],
+        [
+          "item",
+          "",
+          "52",
+          1
+        ],
+        [
+          "item",
+          "",
+          "53",
+          1
+        ],
+        [
+          "item",
+          "",
+          "54",
+          1
+        ],
+        [
+          "item",
+          "",
+          "6",
+          1
+        ]
+      ]
+    },
+    "demos/demo2/uires/xml/menuex_test.xml": {
+      "size": {},
+      "root_content_size": {},
+      "pages": 0,
+      "named": [
+        [
+          "imgbtn",
+          "menu_btn_cir",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "menu_btn_ilike",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "menu_btn_next",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "menu_btn_play",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "menu_btn_pre",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "menu_btn_vol",
+          "",
+          1
+        ],
+        [
+          "menuItem",
+          "",
+          "6",
+          1
+        ],
+        [
+          "sliderbar",
+          "menu_slider_vol",
+          "",
+          1
+        ],
+        [
+          "text",
+          "menu_btn_play",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/wxDemo/uires/menuex/emoji.xml": {
+      "size": {},
+      "root_content_size": {},
+      "pages": 0,
+      "named": [
+        [
+          "img",
+          "emotion",
+          "",
+          1
+        ],
+        [
+          "tileview",
+          "emoji_titleview",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/wxDemo/uires/xml/dlg_main.xml": {
+      "size": {
+        "width": "910",
+        "height": "640"
+      },
+      "root_content_size": {},
+      "pages": 3,
+      "named": [
+        [
+          "SOUI",
+          "mainWindow",
+          "",
+          1
+        ],
+        [
+          "img",
+          "main_logo",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_contact",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_favorites",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_message",
+          "",
+          1
+        ],
+        [
+          "tabctrl",
+          "tab_main_opt",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/wxDemo/uires/xml/dlg_snapshot.xml": {
+      "size": {
+        "width": "1400",
+        "height": "800"
+      },
+      "root_content_size": {},
+      "pages": 0,
+      "named": [
+        [
+          "SnapshotCtrl",
+          "snapshot",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/wxDemo/uires/xml/menu_tray.xml": {
+      "size": {},
+      "root_content_size": {},
+      "pages": 0,
+      "named": [
+        [
+          "item",
+          "",
+          "1",
+          1
+        ],
+        [
+          "item",
+          "",
+          "2",
+          1
+        ],
+        [
+          "item",
+          "",
+          "3",
+          1
+        ],
+        [
+          "item",
+          "",
+          "4",
+          1
+        ],
+        [
+          "item",
+          "",
+          "5",
+          1
+        ],
+        [
+          "item",
+          "",
+          "51",
+          1
+        ],
+        [
+          "item",
+          "",
+          "52",
+          1
+        ],
+        [
+          "item",
+          "",
+          "53",
+          1
+        ],
+        [
+          "item",
+          "",
+          "54",
+          1
+        ],
+        [
+          "item",
+          "",
+          "6",
+          1
+        ]
+      ]
+    },
+    "demos/wxDemo/uires/xml/page_collect.xml": {
+      "size": {},
+      "root_content_size": {},
+      "pages": 0,
+      "named": [
+        [
+          "imgbtn",
+          "btn_close",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_max",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_menu",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_min",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_restore",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_skin",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/wxDemo/uires/xml/page_comm_dyh.xml": {
+      "size": {},
+      "root_content_size": {},
+      "pages": 0,
+      "named": []
+    },
+    "demos/wxDemo/uires/xml/page_comm_filehelper.xml": {
+      "size": {},
+      "root_content_size": {},
+      "pages": 0,
+      "named": [
+        [
+          "edit",
+          "edit_recv",
+          "",
+          1
+        ],
+        [
+          "edit",
+          "edit_send",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_emotion",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_file",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_history",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_image",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_send",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_snapshot",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_snapshot_arrow",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/wxDemo/uires/xml/page_comm_group.xml": {
+      "size": {},
+      "root_content_size": {},
+      "pages": 0,
+      "named": [
+        [
+          "edit",
+          "edit_recv",
+          "",
+          1
+        ],
+        [
+          "edit",
+          "edit_send",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_audio_video",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_emotion",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_file",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_history",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_image",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_live",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_send",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_snapshot",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_snapshot_arrow",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/wxDemo/uires/xml/page_comm_gzh.xml": {
+      "size": {},
+      "root_content_size": {},
+      "pages": 0,
+      "named": []
+    },
+    "demos/wxDemo/uires/xml/page_comm_news.xml": {
+      "size": {},
+      "root_content_size": {},
+      "pages": 0,
+      "named": []
+    },
+    "demos/wxDemo/uires/xml/page_comm_personal.xml": {
+      "size": {},
+      "root_content_size": {},
+      "pages": 0,
+      "named": [
+        [
+          "edit",
+          "edit_recv",
+          "",
+          1
+        ],
+        [
+          "edit",
+          "edit_send",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_audio",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_emotion",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_file",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_history",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_image",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_send",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_snapshot",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_snapshot_arrow",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_video",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/wxDemo/uires/xml/page_contact.xml": {
+      "size": {},
+      "root_content_size": {},
+      "pages": 8,
+      "named": [
+        [
+          "edit",
+          "edit_contact_search",
+          "",
+          1
+        ],
+        [
+          "hr",
+          "hr",
+          "",
+          1
+        ],
+        [
+          "img",
+          "face",
+          "",
+          1
+        ],
+        [
+          "img",
+          "item_avatar",
+          "",
+          5
+        ],
+        [
+          "imgbtn",
+          "btn_accept",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_close",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_contact_mgr",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_contact_search_cancel",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_max",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_menu",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_min",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_restore",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_send_grpmsg",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_skin",
+          "",
+          1
+        ],
+        [
+          "listview",
+          "lv_newfrined",
+          "",
+          1
+        ],
+        [
+          "tabctrl",
+          "tab_contact_info",
+          "",
+          1
+        ],
+        [
+          "tabctrl",
+          "tab_contact_search",
+          "",
+          1
+        ],
+        [
+          "text",
+          "contact_userinfo_addsrc",
+          "",
+          1
+        ],
+        [
+          "text",
+          "contact_userinfo_area",
+          "",
+          1
+        ],
+        [
+          "text",
+          "contact_userinfo_mark",
+          "",
+          1
+        ],
+        [
+          "text",
+          "contact_userinfo_name",
+          "",
+          1
+        ],
+        [
+          "text",
+          "contact_userinfo_sign",
+          "",
+          1
+        ],
+        [
+          "text",
+          "contact_userinfo_wxnumber",
+          "",
+          1
+        ],
+        [
+          "text",
+          "item_message",
+          "",
+          1
+        ],
+        [
+          "text",
+          "item_name",
+          "",
+          4
+        ],
+        [
+          "text",
+          "name",
+          "",
+          2
+        ],
+        [
+          "text",
+          "text_contact_title",
+          "",
+          1
+        ],
+        [
+          "text",
+          "text_state",
+          "",
+          1
+        ],
+        [
+          "tileview",
+          "tileview_dyh",
+          "",
+          1
+        ],
+        [
+          "tileview",
+          "tileview_grpmbr",
+          "",
+          1
+        ],
+        [
+          "tileview",
+          "tileview_gzh",
+          "",
+          1
+        ],
+        [
+          "treeview",
+          "tv_contact",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/wxDemo/uires/xml/page_msg.xml": {
+      "size": {},
+      "root_content_size": {},
+      "pages": 0,
+      "named": [
+        [
+          "edit",
+          "edit_msg_search",
+          "",
+          1
+        ],
+        [
+          "img",
+          "item_avatar",
+          "",
+          2
+        ],
+        [
+          "img",
+          "item_reminder",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_close",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_max",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_menu",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_min",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_msg_search_cancel",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_restore",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_skin",
+          "",
+          1
+        ],
+        [
+          "listview",
+          "lv_message",
+          "",
+          1
+        ],
+        [
+          "listview",
+          "lv_message_search",
+          "",
+          1
+        ],
+        [
+          "tabctrl",
+          "tab_msg_comm",
+          "",
+          1
+        ],
+        [
+          "text",
+          "item_content",
+          "",
+          1
+        ],
+        [
+          "text",
+          "item_name",
+          "",
+          2
+        ],
+        [
+          "text",
+          "item_time",
+          "",
+          1
+        ],
+        [
+          "text",
+          "text_talk_title",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/flowlayout_demo/uires/xml/dlg_main.xml": {
+      "size": {},
+      "root_content_size": {
+        "width": "600",
+        "height": "400"
+      },
+      "pages": 3,
+      "named": [
+        [
+          "SOUI",
+          "mainWindow",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_test",
+          "",
+          1
+        ],
+        [
+          "check",
+          "",
+          "1000",
+          1
+        ],
+        [
+          "checkgroup",
+          "ckg_area",
+          "",
+          1
+        ],
+        [
+          "checkgroup",
+          "ckg_type",
+          "",
+          1
+        ],
+        [
+          "class",
+          "demo_btn",
+          "",
+          1
+        ],
+        [
+          "class",
+          "title",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_close",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_max",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_min",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_restore",
+          "",
+          1
+        ],
+        [
+          "tabctrl",
+          "",
+          "1000",
+          1
+        ]
+      ]
+    },
+    "demos/flowlayout_demo/uires/xml/model_view.xml": {
+      "size": {},
+      "root_content_size": {},
+      "pages": 0,
+      "named": [
+        [
+          "button",
+          "btn_cancel",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_ok",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/framelayout_demo/uires/xml/dlg_main.xml": {
+      "size": {},
+      "root_content_size": {
+        "width": "600",
+        "height": "400"
+      },
+      "pages": 0,
+      "named": [
+        [
+          "SOUI",
+          "mainWindow",
+          "",
+          1
+        ],
+        [
+          "dockbar",
+          "left1",
+          "",
+          1
+        ],
+        [
+          "dockbar",
+          "left2",
+          "",
+          1
+        ],
+        [
+          "dockbar",
+          "right1",
+          "",
+          1
+        ],
+        [
+          "dockbar",
+          "right2",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_close",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_max",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_min",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_restore",
+          "",
+          1
+        ],
+        [
+          "window",
+          "mainview",
+          "",
+          1
+        ],
+        [
+          "window.bar",
+          "bottom1",
+          "",
+          1
+        ],
+        [
+          "window.bar",
+          "top1",
+          "",
+          1
+        ],
+        [
+          "window.bar",
+          "top2",
+          "",
+          1
+        ],
+        [
+          "window.bar",
+          "top3",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/gridctrl_demo/uires/layout/dlg_main.xml": {
+      "size": {
+        "width": "800",
+        "height": "600"
+      },
+      "root_content_size": {},
+      "pages": 0,
+      "named": [
+        [
+          "SOUI",
+          "mainWindow",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_merge",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_unmerge",
+          "",
+          1
+        ],
+        [
+          "gridctrl",
+          "grid_test",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_close",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_max",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_min",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_restore",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/hellocharts_demo/uires/layout/dlg_main.xml": {
+      "size": {
+        "width": "800",
+        "height": "600"
+      },
+      "root_content_size": {},
+      "pages": 6,
+      "named": [
+        [
+          "SOUI",
+          "mainWindow",
+          "",
+          1
+        ],
+        [
+          "bubbleChart",
+          "bubble_chart",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_clear_data",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_generate_data",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_test_pie",
+          "",
+          1
+        ],
+        [
+          "check",
+          "btn_toggle_animation",
+          "",
+          1
+        ],
+        [
+          "columnChart",
+          "column_chart",
+          "",
+          1
+        ],
+        [
+          "comboChart",
+          "combo_chart",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_close",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_max",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_min",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_restore",
+          "",
+          1
+        ],
+        [
+          "lineChart",
+          "line_chart",
+          "",
+          1
+        ],
+        [
+          "pieChart",
+          "pie_chart",
+          "",
+          1
+        ],
+        [
+          "radarChart",
+          "radar_chart",
+          "",
+          1
+        ],
+        [
+          "tabctrl",
+          "chart_tabs",
+          "",
+          1
+        ],
+        [
+          "text",
+          "txt_selection_info",
+          "",
+          1
+        ],
+        [
+          "text",
+          "txt_status",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/lightbutton_demo/uires/layout/dlg_main.xml": {
+      "size": {
+        "width": "800",
+        "height": "600"
+      },
+      "root_content_size": {},
+      "pages": 0,
+      "named": [
+        [
+          "SOUI",
+          "mainWindow",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_black",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_blue",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_gray",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_green",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_light_blue",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_light_green",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_light_red",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_red",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_start_alarm",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_stop_alarm",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_toggle_overlay",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_toggle_rect",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_yellow",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_close",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_max",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_min",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_restore",
+          "",
+          1
+        ],
+        [
+          "lightbutton",
+          "lightbutton1",
+          "",
+          1
+        ],
+        [
+          "lightbutton",
+          "lightbutton2",
+          "",
+          1
+        ],
+        [
+          "lightbutton",
+          "lightbutton3",
+          "",
+          1
+        ],
+        [
+          "lightbutton",
+          "lightbutton4",
+          "100",
+          1
+        ],
+        [
+          "lightbutton",
+          "lightbutton6",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/mclistview_demo/uires/layout/dlg.student.sms.xml": {
+      "size": {
+        "width": "550",
+        "height": "466"
+      },
+      "root_content_size": {},
+      "pages": 0,
+      "named": [
+        [
+          "SOUI",
+          "student_sms",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_send_sms",
+          "",
+          1
+        ],
+        [
+          "check",
+          "chk_select_group",
+          "",
+          1
+        ],
+        [
+          "check",
+          "txt_nick",
+          "",
+          1
+        ],
+        [
+          "edit",
+          "edit_input",
+          "",
+          1
+        ],
+        [
+          "edit",
+          "edit_sms_input",
+          "",
+          1
+        ],
+        [
+          "img",
+          "img_sms_help",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "",
+          "IDCANCEL",
+          1
+        ],
+        [
+          "link",
+          "btn_sms_record",
+          "",
+          1
+        ],
+        [
+          "listview",
+          "lv_sms_record",
+          "",
+          1
+        ],
+        [
+          "mclistview",
+          "tv_student",
+          "",
+          1
+        ],
+        [
+          "radio",
+          "scale_100",
+          "",
+          1
+        ],
+        [
+          "radio",
+          "scale_150",
+          "",
+          1
+        ],
+        [
+          "radio",
+          "scale_200",
+          "",
+          1
+        ],
+        [
+          "searchDropdownList",
+          "search_dropdown",
+          "",
+          1
+        ],
+        [
+          "text",
+          "txt_group",
+          "",
+          1
+        ],
+        [
+          "text",
+          "txt_key",
+          "",
+          1
+        ],
+        [
+          "text",
+          "txt_loyal_degree",
+          "",
+          1
+        ],
+        [
+          "text",
+          "txt_send_time",
+          "",
+          1
+        ],
+        [
+          "text",
+          "txt_sms_checked_num",
+          "",
+          1
+        ],
+        [
+          "text",
+          "txt_sms_content",
+          "",
+          1
+        ],
+        [
+          "text",
+          "txt_sms_number",
+          "",
+          1
+        ],
+        [
+          "text",
+          "txt_sms_receiver",
+          "",
+          1
+        ],
+        [
+          "text",
+          "txt_time_span",
+          "",
+          1
+        ],
+        [
+          "text",
+          "txt_wordcount",
+          "",
+          1
+        ],
+        [
+          "toggle",
+          "tgl_tv_expand",
+          "",
+          1
+        ],
+        [
+          "window",
+          "col_loyal_degree",
+          "",
+          2
+        ],
+        [
+          "window",
+          "col_nick",
+          "",
+          2
+        ],
+        [
+          "window",
+          "col_time_span",
+          "",
+          2
+        ],
+        [
+          "window",
+          "wnd_record_frame",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/propanimator_demo/uires/xml/dlg_main.xml": {
+      "size": {},
+      "root_content_size": {
+        "width": "800",
+        "height": "600"
+      },
+      "pages": 3,
+      "named": [
+        [
+          "SOUI",
+          "mainWindow",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_ani",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_complex_anim",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_height_anim",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_multi_anim",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_parallel_anim",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_sequential_anim",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_set_restore",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_size_anim",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_weight_anim",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_width_anim",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_close",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_max",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_min",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_restore",
+          "",
+          1
+        ],
+        [
+          "window",
+          "animation_target",
+          "",
+          1
+        ],
+        [
+          "window",
+          "linear_container",
+          "",
+          1
+        ],
+        [
+          "window",
+          "set_left_bottom",
+          "",
+          1
+        ],
+        [
+          "window",
+          "set_left_top",
+          "",
+          1
+        ],
+        [
+          "window",
+          "set_right_bottom",
+          "",
+          1
+        ],
+        [
+          "window",
+          "set_right_top",
+          "",
+          1
+        ],
+        [
+          "window",
+          "win_center",
+          "",
+          1
+        ],
+        [
+          "window",
+          "win_left_bottom",
+          "",
+          1
+        ],
+        [
+          "window",
+          "win_left_top",
+          "",
+          1
+        ],
+        [
+          "window",
+          "win_right_bottom",
+          "",
+          1
+        ],
+        [
+          "window",
+          "win_right_top",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/sci_demo/uires/layout/sci.demo.xml": {
+      "size": {
+        "width": "760",
+        "height": "480"
+      },
+      "root_content_size": {},
+      "pages": 0,
+      "named": [
+        [
+          "SOUI",
+          "sci_demo",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "",
+          "IDCANCEL",
+          1
+        ],
+        [
+          "scintilla",
+          "sci_editor",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/wallpaper/uires/xml/dlg_main.xml": {
+      "size": {
+        "width": "600",
+        "height": "400"
+      },
+      "root_content_size": {},
+      "pages": 0,
+      "named": [
+        [
+          "SOUI",
+          "mainWindow",
+          "",
+          1
+        ],
+        [
+          "img",
+          "img_1",
+          "500",
+          1
+        ],
+        [
+          "img",
+          "img_2",
+          "501",
+          1
+        ],
+        [
+          "img",
+          "img_3",
+          "502",
+          1
+        ],
+        [
+          "img",
+          "img_4",
+          "503",
+          1
+        ],
+        [
+          "img",
+          "img_5",
+          "504",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_close",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_max",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_min",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_restore",
+          "",
+          1
+        ],
+        [
+          "listbox",
+          "lb_catetory",
+          "",
+          1
+        ],
+        [
+          "listview",
+          "lv_thumbnail",
+          "",
+          1
+        ]
+      ]
+    },
+    "demos/ipcdemo/uires/xml/dlg_client.xml": {
+      "size": {},
+      "root_content_size": {
+        "width": "600",
+        "height": "-1"
+      },
+      "pages": 0,
+      "named": [
+        [
+          "SOUI",
+          "client",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_conn",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_sum",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_sum_math",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_sum_str",
+          "",
+          1
+        ],
+        [
+          "edit",
+          "edit_param1",
+          "",
+          1
+        ],
+        [
+          "edit",
+          "edit_param2",
+          "",
+          1
+        ],
+        [
+          "edit",
+          "edit_result",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_close",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_max",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_min",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_restore",
+          "",
+          1
+        ],
+        [
+          "text",
+          "txt_status",
+          "",
+          2
+        ]
+      ]
+    },
+    "demos/ipcdemo/uires/xml/dlg_server.xml": {
+      "size": {},
+      "root_content_size": {
+        "width": "600",
+        "height": "400"
+      },
+      "pages": 0,
+      "named": [
+        [
+          "SOUI",
+          "svr",
+          "",
+          1
+        ],
+        [
+          "button",
+          "btn_break",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_close",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_max",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_min",
+          "",
+          1
+        ],
+        [
+          "imgbtn",
+          "btn_restore",
+          "",
+          1
+        ],
+        [
+          "richedit",
+          "re_log",
+          "",
+          1
+        ]
+      ]
+    }
+  },
+  "revision": "81810edf512cfd0dcd43226530a9b441b8333acb",
+  "generated_ids": {
+    "demos/demo/res/resource.h": {},
+    "demos/demo2/res/resource.h": {
+      "btn_add": 65545,
+      "btn_clean": 65546,
+      "btn_close": 65547,
+      "btn_dialog": 65539,
+      "btn_flash": 65536,
+      "btn_menu": 65537,
+      "btn_menuex": 65538,
+      "lv_test": 65543,
+      "menu_btn_cir": 65552,
+      "menu_btn_ilike": 65551,
+      "menu_btn_next": 65550,
+      "menu_btn_play": 65549,
+      "menu_btn_pre": 65548,
+      "menu_btn_vol": 65553,
+      "menu_slider_vol": 65554,
+      "testWnd": 65540,
+      "tst_slider": 65541,
+      "txt_pos": 65542,
+      "txt_test": 65544
+    },
+    "demos/wxDemo/res/resource.h": {
+      "btn_audio": 65576,
+      "btn_audio_video": 65575,
+      "btn_close": 65541,
+      "btn_contact": 65538,
+      "btn_contact_mgr": 65560,
+      "btn_contact_search_cancel": 65558,
+      "btn_emotion": 65566,
+      "btn_favorites": 65539,
+      "btn_file": 65568,
+      "btn_history": 65571,
+      "btn_image": 65567,
+      "btn_live": 65574,
+      "btn_max": 65542,
+      "btn_menu": 65545,
+      "btn_message": 65537,
+      "btn_min": 65544,
+      "btn_msg_search_cancel": 65548,
+      "btn_restore": 65543,
+      "btn_send": 65573,
+      "btn_skin": 65546,
+      "btn_snapshot": 65569,
+      "btn_snapshot_arrow": 65570,
+      "btn_video": 65577,
+      "edit_contact_search": 65557,
+      "edit_msg_search": 65547,
+      "edit_recv": 65565,
+      "edit_send": 65572,
+      "face": 65564,
+      "hr": 65562,
+      "item_avatar": 65550,
+      "item_content": 65552,
+      "item_name": 65551,
+      "item_reminder": 65554,
+      "item_time": 65553,
+      "lv_message": 65549,
+      "main_logo": 65536,
+      "name": 65563,
+      "snapshot": 65578,
+      "tab_contact_search": 65559,
+      "tab_main_opt": 65540,
+      "tab_msg_comm": 65556,
+      "text_talk_title": 65555,
+      "tv_contact": 65561
+    },
+    "demos/flowlayout_demo/res/resource.h": {
+      "btn_close": 65539,
+      "btn_max": 65537,
+      "btn_min": 65536,
+      "btn_restore": 65538,
+      "ckg_area": 65540,
+      "ckg_type": 65541
+    },
+    "demos/framelayout_demo/res/resource.h": {
+      "btn_close": 65539,
+      "btn_max": 65537,
+      "btn_min": 65536,
+      "btn_restore": 65538
+    },
+    "demos/lightbutton_demo/res/resource.h": {
+      "btn_black": 65550,
+      "btn_blue": 65549,
+      "btn_close": 65539,
+      "btn_gray": 65551,
+      "btn_green": 65546,
+      "btn_light_blue": 65552,
+      "btn_light_green": 65554,
+      "btn_light_red": 65553,
+      "btn_max": 65537,
+      "btn_min": 65536,
+      "btn_red": 65547,
+      "btn_restore": 65538,
+      "btn_start_alarm": 65555,
+      "btn_stop_alarm": 65556,
+      "btn_toggle_overlay": 65558,
+      "btn_toggle_rect": 65557,
+      "btn_yellow": 65548,
+      "lightbutton1": 65540,
+      "lightbutton2": 65541,
+      "lightbutton3": 65542,
+      "lightbutton4": 65543,
+      "lightbutton5": 65544,
+      "lightbutton6": 65545
+    },
+    "demos/mclistview_demo/res/resource.h": {
+      "btn_send_sms": 65563,
+      "btn_sms_record": 65560,
+      "chk_select_group": 65545,
+      "col_loyal_degree": 65549,
+      "col_nick": 65544,
+      "col_time_span": 65548,
+      "edit_input": 65540,
+      "edit_sms_input": 65553,
+      "img_sms_help": 65562,
+      "lv_sms_record": 65556,
+      "scale_100": 65536,
+      "scale_150": 65537,
+      "scale_200": 65538,
+      "search_dropdown": 65541,
+      "tgl_tv_expand": 65546,
+      "tv_student": 65543,
+      "txt_group": 65547,
+      "txt_key": 65542,
+      "txt_loyal_degree": 65552,
+      "txt_nick": 65550,
+      "txt_send_time": 65557,
+      "txt_sms_checked_num": 65539,
+      "txt_sms_content": 65559,
+      "txt_sms_number": 65561,
+      "txt_sms_receiver": 65558,
+      "txt_time_span": 65551,
+      "txt_wordcount": 65554,
+      "wnd_record_frame": 65555
+    },
+    "demos/propanimator_demo/res/resource.h": {
+      "animation_target": 65541,
+      "btn_close": 65539,
+      "btn_height_anim": 65543,
+      "btn_max": 65537,
+      "btn_min": 65536,
+      "btn_multi_anim": 65546,
+      "btn_offset_anim": 65547,
+      "btn_reset": 65548,
+      "btn_restore": 65538,
+      "btn_size_anim": 65544,
+      "btn_weight_anim": 65545,
+      "btn_width_anim": 65542,
+      "linear_container": 65540
+    },
+    "demos/wallpaper/res/resource.h": {
+      "btn_close": 65536,
+      "btn_max": 65537,
+      "btn_min": 65539,
+      "btn_restore": 65538,
+      "img_1": 500,
+      "img_2": 501,
+      "img_3": 502,
+      "img_4": 503,
+      "img_5": 504,
+      "lb_catetory": 65540,
+      "lv_thumbnail": 65541
+    },
+    "demos/ipcdemo/res/resource.h": {
+      "btn_break": 65541,
+      "btn_close": 65536,
+      "btn_conn": 65543,
+      "btn_max": 65537,
+      "btn_min": 65539,
+      "btn_restore": 65538,
+      "btn_sum": 65549,
+      "btn_sum_math": 65547,
+      "btn_sum_str": 65548,
+      "edit_param1": 65544,
+      "edit_param2": 65545,
+      "edit_result": 65546,
+      "re_log": 65540,
+      "txt_status": 65542
+    }
+  },
+  "default_units": {
+    "demo": "dp",
+    "demo2": "px",
+    "wxDemo": "px",
+    "flowlayout_demo": "dp",
+    "framelayout_demo": "dp",
+    "gridctrl_demo": "px",
+    "hellocharts_demo": "px",
+    "lightbutton_demo": "px",
+    "mclistview_demo": "dp",
+    "propanimator_demo": "px",
+    "sci_demo": "dp",
+    "wallpaper": "px",
+    "ipcdemo": "px"
+  }
+}

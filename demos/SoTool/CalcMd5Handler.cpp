@@ -83,7 +83,7 @@ void CCalcMd5Handler::CalcFileMd5( const SStringT &strFileName )
     {
         strMd5 += strFileName;
     }
-    SRichEdit *pEditOutput = m_pPageRoot->FindChildByName2<SRichEdit>(L"edit_output");
+    SEdit *pEditOutput = m_pPageRoot->FindChildByName2<SEdit>(L"edit_output");
     SASSERT(pEditOutput);
     if(pEditOutput->GetWindowTextLength()!=0)
     {

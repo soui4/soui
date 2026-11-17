@@ -505,7 +505,7 @@ class SOUI_EXP SPanel
     BOOL m_bDragPending;           /**< TRUE while armed, waiting for the touch slop */
     BOOL m_bDragScrolling;         /**< TRUE while drag scrolling is active */
     CPoint m_ptDragStart;          /**< Press point, also the rubber band anchor */
-    BOOL m_bItemDragScrollEnabled; /**< Enable drag-scroll */
+    BOOL m_bItemDragScrollEnabled; /**< enableGesture: allow drag-scroll + fling, default TRUE */
     DWORD m_dwGestureFlags;        /**< wParam of the current MOVE (MK_CONTROL for band) */
     BOOL m_bGestureFling;          /**< detector reported onFling for this gesture */
 
@@ -552,7 +552,7 @@ class SOUI_EXP SPanel
         ATTR_INT(L"sbTrumbTrackMinAlpha", m_bySbThumbTrackMinAlpha, FALSE)
         ATTR_INTERPOLATOR(L"sbFadeInterpolator", m_fadeInterpolator, FALSE)
         ATTR_CHAIN_PTR_PREFIX(m_fadeInterpolator, 0, SAttrChainPrefix::FADE)
-        ATTR_BOOL(L"enableDragScroll", m_bItemDragScrollEnabled, FALSE)
+        ATTR_BOOL(L"enableGesture", m_bItemDragScrollEnabled, FALSE)  /**< Enable gesture drag-scroll / fling. */
         ATTR_SKIN(L"bandSkin", m_pSkinBand, FALSE)
         ATTR_BOOL(L"bandEnable", m_bBandEnable, FALSE)
     SOUI_ATTRS_END()

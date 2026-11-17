@@ -14,7 +14,7 @@
 #ifndef _SDATETIMEEDIT_H_
 #define _SDATETIMEEDIT_H_
 
-#include <control/SRichEdit.h>
+#include <control/SEdit.h>
 #include <helper/STime.h>
 
 SNSBEGIN

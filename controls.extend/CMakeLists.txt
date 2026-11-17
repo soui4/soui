@@ -28,6 +28,11 @@ else()
     set(_soui_extend_scintilla ON)
 endif()
 
+# SOUI_EDIT_LITE: richedit-only extend controls cannot build without SRichEdit.
+if(SOUI_EDIT_LITE)
+    list(FILTER CTRLS_SRC EXCLUDE REGEX "(SChatEdit|RichEditOle|dataobject)\\.cpp$")
+endif()
+
 add_library(ExtendCtrls STATIC ${CTRLS_SRC})
 set(OPTION_LIBS ${OPTION_LIBS} ExtendCtrls CACHE INTERNAL "option_lib")
 

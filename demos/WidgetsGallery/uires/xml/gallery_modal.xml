@@ -1,0 +1,10 @@
+<modalroot name="sample_modalroot" layout="anchor" colorBkgnd="rgba(0,0,0,40%)" quitOnEsc="1">
+  <modalview name="sample_modalview" pos="0,0,4" offset="-0.5,-0.5" size="420dp,210dp" skin="gallery_card" layout="vbox" padding="24dp,24dp,24dp,24dp" interval="18dp">
+    <text text="An in-window conversation" font="size:20dp,bold:1" />
+    <text text="Modal input is isolated until this conversation ends." size="-2,40dp" multiLines="1" wordBreak="1" colorText="@color/fluent_text_secondary" />
+    <window size="-2,36dp" layout="hbox" interval="12dp">
+      <gallerybutton name="modal_confirm" text="Done" class="fluent_btn_primary" size="150dp,36dp" />
+      <gallerybutton name="modal_cancel" text="Cancel" size="150dp,36dp" />
+    </window>
+  </modalview>
+</modalroot>

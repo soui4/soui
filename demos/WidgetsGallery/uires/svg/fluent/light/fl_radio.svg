@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="20" viewBox="0 0 160 20">
+  <g id="state0" transform="translate(0, 0)">
+    <circle cx="10" cy="10" r="8.5" fill="none" stroke="#8A8A8A" stroke-width="1"/>
+  </g>
+  <g id="state1" transform="translate(20, 0)">
+    <circle cx="10" cy="10" r="8.5" fill="#F5F5F5" stroke="#616161" stroke-width="1"/>
+  </g>
+  <g id="state2" transform="translate(40, 0)">
+    <circle cx="10" cy="10" r="8.5" fill="#EBEBEB" stroke="#9B9B9B" stroke-width="1"/>
+  </g>
+  <g id="state3" transform="translate(60, 0)">
+    <circle cx="10" cy="10" r="8.5" fill="none" stroke="#9B9B9B" stroke-width="1"/>
+  </g>
+  <g id="state4" transform="translate(80, 0)">
+    <circle cx="10" cy="10" r="8.5" fill="#0067C0" stroke="#8A8A8A" stroke-width="1"/>
+    <circle cx="10" cy="10" r="3.5" fill="#FFFFFF"/>
+  </g>
+  <g id="state5" transform="translate(100, 0)">
+    <circle cx="10" cy="10" r="8.5" fill="#1975C5" stroke="#616161" stroke-width="1"/>
+    <circle cx="10" cy="10" r="3.5" fill="#FFFFFF"/>
+  </g>
+  <g id="state6" transform="translate(120, 0)">
+    <circle cx="10" cy="10" r="8.5" fill="#3183CA" stroke="#616161" stroke-width="1"/>
+    <circle cx="10" cy="10" r="3.5" fill="#FFFFFF"/>
+  </g>
+  <g id="state7" transform="translate(140, 0)">
+    <circle cx="10" cy="10" r="8.5" fill="#EAEAEA" stroke="#9B9B9B" stroke-width="1"/>
+    <circle cx="10" cy="10" r="3.5" fill="#9B9B9B"/>
+  </g>
+</svg>

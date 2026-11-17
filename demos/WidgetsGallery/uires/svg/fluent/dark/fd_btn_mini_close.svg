@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="16" viewBox="0 0 64 16">
+  <g id="state0" transform="translate(0, 0)">
+    <rect x="0.5" y="0.5" width="15" height="15" rx="3.5" fill="#2B2B2B" stroke="#3A3A3A" stroke-width="1"/>
+    <path d="M6,6 L10,10 M6,10 L10,6" fill="none" stroke="#C8C8C8" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g id="state1" transform="translate(16, 0)">
+    <rect x="0.5" y="0.5" width="15" height="15" rx="3.5" fill="#383838" stroke="#3A3A3A" stroke-width="1"/>
+    <path d="M6,6 L10,10 M6,10 L10,6" fill="none" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g id="state2" transform="translate(32, 0)">
+    <rect x="0.5" y="0.5" width="15" height="15" rx="3.5" fill="#414141" stroke="#3A3A3A" stroke-width="1"/>
+    <path d="M6,6 L10,10 M6,10 L10,6" fill="none" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g id="state3" transform="translate(48, 0)">
+    <rect x="0.5" y="0.5" width="15" height="15" rx="3.5" fill="#202020" stroke="#3A3A3A" stroke-width="1"/>
+    <path d="M6,6 L10,10 M6,10 L10,6" fill="none" stroke="#5C5C5C" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

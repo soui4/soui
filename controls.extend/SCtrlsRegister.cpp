@@ -29,7 +29,9 @@
 #include "SImgCanvas.h"
 #include "SEdit2.h"
 #include "SVerificationCodeEdit.h"
+#if !defined(SOUI_EDIT_LITE)
 #include "SChatEdit.h"
+#endif // !SOUI_EDIT_LITE
 #include "SRoundImage.h"
 #include "SRoundWnd.h"
 #include "SImageKnob.h"
@@ -80,9 +82,11 @@ void SCtrlsRegister::RegisterCtrls(SApplication *theApp)
 	theApp->RegisterWindowClass<SImageBtnEx>();
 	theApp->RegisterWindowClass<SImgCanvas>();
 	theApp->RegisterWindowClass<SEdit2>();
-	theApp->RegisterWindowClass<SVerificationCodeEdit>();//SVerificationCodeEdit
+    theApp->RegisterWindowClass<SVerificationCodeEdit>();//SVerificationCodeEdit
 
+#if !defined(SOUI_EDIT_LITE)
     theApp->RegisterWindowClass<SChatEdit>();      // 注册ChatEdit
+#endif // !SOUI_EDIT_LITE
     theApp->RegisterWindowClass<SRoundImage>();
     theApp->RegisterWindowClass<SRoundWnd>();
     theApp->RegisterWindowClass<SImageKnob>();

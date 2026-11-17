@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="12" viewBox="0 0 48 12">
+  <g id="state0" transform="translate(0, 0)">
+    <rect x="0" y="0" width="12" height="12" fill="#FFFFFF"/>
+    <rect x="0" y="11" width="12" height="1" fill="#E0E0E0"/>
+  </g>
+  <g id="state1" transform="translate(12, 0)">
+    <rect x="0" y="0" width="12" height="12" fill="#F5F5F5"/>
+    <rect x="0" y="11" width="12" height="1" fill="#E0E0E0"/>
+  </g>
+  <g id="state2" transform="translate(24, 0)">
+    <rect x="0" y="0" width="12" height="12" fill="#EBEBEB"/>
+    <rect x="0" y="11" width="12" height="1" fill="#E0E0E0"/>
+  </g>
+  <g id="state3" transform="translate(36, 0)">
+    <rect x="0" y="0" width="12" height="12" fill="#FFFFFF"/>
+    <rect x="0" y="11" width="12" height="1" fill="#E0E0E0"/>
+  </g>
+</svg>

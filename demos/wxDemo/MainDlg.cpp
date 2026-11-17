@@ -700,7 +700,7 @@ void CMainDlg::OnEmotionItemClick(const std::string& strID)
         SASSERT(pTabMessageComm);
 
 		SWindow *pPage = static_cast<SWindow *>(pTabMessageComm->GetPage(pTabMessageComm->GetCurSel()));
-        SRichEdit *edit = pPage->FindChildByName2<SRichEdit>("edit_send");
+        SEdit *edit = pPage->FindChildByName2<SEdit>("edit_send");
         if (edit)
         {
             edit->SetSel(-1);

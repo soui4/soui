@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="16" viewBox="0 0 48 16">
+  <g id="state0" transform="translate(0, 0)">
+    <path d="M3.5,8.5 L6.8,11.8 L12.5,5.5" fill="none" stroke="#0067C0" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g id="state1" transform="translate(16, 0)">
+    <path d="M3.5,8.5 L6.8,11.8 L12.5,5.5" fill="none" stroke="#1975C5" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g id="state2" transform="translate(32, 0)">
+    <path d="M3.5,8.5 L6.8,11.8 L12.5,5.5" fill="none" stroke="#3183CA" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="20" viewBox="0 0 180 20">
+<g transform="translate(0,0)"><rect x="2.5" y="2.5" width="15" height="15" rx="3" fill="#FFFFFF" stroke="#616161"/></g>
+<g transform="translate(20,0)"><rect x="2.5" y="2.5" width="15" height="15" rx="3" fill="#FFFFFF" stroke="#0067C0"/></g>
+<g transform="translate(40,0)"><rect x="2.5" y="2.5" width="15" height="15" rx="3" fill="#FFFFFF" stroke="#0067C0"/></g>
+<g transform="translate(60,0)"><rect x="2.5" y="2.5" width="15" height="15" rx="3" fill="#0067C0" stroke="#0067C0"/><g fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m6 10 3 3 5-6"/></g></g>
+<g transform="translate(80,0)"><rect x="2.5" y="2.5" width="15" height="15" rx="3" fill="#0067C0" stroke="#0067C0"/><g fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m6 10 3 3 5-6"/></g></g>
+<g transform="translate(100,0)"><rect x="2.5" y="2.5" width="15" height="15" rx="3" fill="#0067C0" stroke="#0067C0"/><g fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m6 10 3 3 5-6"/></g></g>
+<g transform="translate(120,0)"><rect x="2.5" y="2.5" width="15" height="15" rx="3" fill="#0067C0" stroke="#0067C0"/><g fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10h8"/></g></g>
+<g transform="translate(140,0)"><rect x="2.5" y="2.5" width="15" height="15" rx="3" fill="#0067C0" stroke="#0067C0"/><g fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10h8"/></g></g>
+<g transform="translate(160,0)"><rect x="2.5" y="2.5" width="15" height="15" rx="3" fill="#0067C0" stroke="#0067C0"/><g fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10h8"/></g></g>
+</svg>

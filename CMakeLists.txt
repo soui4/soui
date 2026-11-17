@@ -136,6 +136,18 @@ endif()
 option(SOUI_ENABLE_ACC "Enable MSAA/IAccessible (provided by swinx)" OFF)
 endif(IS_OHOS)
 
+# Lightweight self-implemented plain-text <edit> (replaces the RichEdit-backed SRichEdit).
+# Default OFF keeps the RichEdit-backed <edit>. When ON, SEdit becomes the self-contained
+# lightweight implementation (SEditLite.cpp) and SRichEdit.cpp compiles as an empty TU;
+# SOUI_BUILD_RICHEDIT is forced OFF so the (large) RichEdit engine is not linked.
+# Useful for resource-constrained targets (e.g. FreeRTOS) that do not need rich-text editing.
+# The public SEdit class/header is identical in both modes, so dependent code is unaffected.
+option(SOUI_EDIT_LITE "Use lightweight self-implemented SEdit for <edit> instead of RichEdit-backed SRichEdit" OFF)
+if(SOUI_EDIT_LITE)
+    set(SOUI_BUILD_RICHEDIT OFF CACHE BOOL "richedit disabled when using lite edit" FORCE)
+    add_definitions(-DSOUI_EDIT_LITE)
+endif()
+
 
 include(__cmake/global.cmake)
 include(__cmake/windres.cmake)

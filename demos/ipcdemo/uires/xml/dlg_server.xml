@@ -13,7 +13,7 @@ toolWindow="0"
 			<imgbtn name="btn_min" skin="_skin.sys.btn.minimize" pos="-121,0" animate="1" />
 		</caption>
 		<text text="日志:"/>
-		<richedit name="re_log" size="-2,0" weight="1" multiLines="1" vscrollbar="1" autovscroll="1" readonly="1"/>
+		<edit name="re_log" size="-2,0" weight="1" multiLines="1" vscrollbar="1" autovscroll="1" readonly="1"/>
 		<window size="-2,-1" layout="hbox">
 			<window size="0,0" weight="1"/>
 			<button size="100,30" text="break conns" name="btn_break" />

@@ -40,7 +40,7 @@ flowchart TB
 |---|---|---|---|
 | 拖动滚动 + 惯性（fling） | 控件自身消息映射 → detector | `SPanel` 及 `SListView` / `SMCListView` / `STileView` / `STreeView` | 有滚动条或框选能力时启用 |
 | 框选（rubber band）多选 | 同上，优先于滚动 | 支持多选的派生控件（`bandEnable`） | 由控件决定 |
-| 拖动切换页面（ViewPager 形状） | 容器拦截链 → detector | `STabCtrl` | `enableDragSwitch="0"` 关闭 |
+| 拖动切换页面（ViewPager 形状） | 容器拦截链 → detector | `STabCtrl` | `enableGesture="0"` 关闭 |
 | 同轴向 / 异轴向嵌套裁决 | 容器自内向外询问 | 任意容器 | 内置，无需配置 |
 | 轴向感知的放弃捕获 | `CANCEL_REASON_SCROLL_H/V` + `GetTouchInterceptAxis()` | `SPanel` / 扩展控件 / `STabCtrl` | 内置（§3.8） |
 | 手势打断与清理 | `WM_CANCELMODE` | 全部接入者 | 内置 |
@@ -304,6 +304,8 @@ detector 不依赖窗口 / 容器 / 资源，可脱离运行环境直接单测�
 
 四个 MVC 列表 `SListView` / `SMCListView` / `STileView` / `STreeView` 的 `OnMouseEvent()` 都先调 `HandleMouseDrag()`，签名与调用点**未改动**。
 
+`SPanel` 的拖动滚动 / fling 惯性由 XML 属性 `enableGesture` 控制（默认 `1`，即打开）；它与 `STabCtrl` 的 `enableGesture`（默认 `0`）同名但各自独立——前者管页面内容滚动，后者管多页切换，两者不共存于同一控件。
+
 ### 5.2 arm 门槛（兼容性关键）
 
 ```cpp
@@ -386,7 +388,7 @@ void SListCtrl::OnLButtonDown(UINT nFlags, CPoint pt)
 | DOWN 落在页面子控件 | 容器拦截链 → `OnInterceptTouchEvent(DOWN/MOVE)` → 拦截后 `OnTouchEvent()` | `STabCtrl.cpp` 手势实现段 |
 | DOWN 落在 `STabCtrl` 自身（tab 头 / 空白区） | 自身消息映射 → `m_gesture.OnTouchEvent()` | `STabCtrl.cpp:445-474`、`:518-523` |
 
-`OnInterceptTouchEvent(DOWN)` 只在**页面区**内 `m_bDragArmed = TRUE`（`IsPointInPage()` 判 `GetChildrenLayoutRect()`），tab 头点击仍是既有 `SetCurSel()`。`CanDragSwitch()` 还要求 `enableDragSwitch` 打开、页数 > 1、当前页有效。
+`OnInterceptTouchEvent(DOWN)` 只在**页面区**内 `m_bDragArmed = TRUE`（`IsPointInPage()` 判 `GetChildrenLayoutRect()`），tab 头点击仍是既有 `SetCurSel()`。`CanDragSwitch()` 还要求 `enableGesture` 打开、页数 > 1、当前页有效。
 
 MOVE 分支在 detector 探针返回 TRUE 之后追加**边界方向预判**：按 `StartDragSwitch()` 同样的规则算目标页（左/上拖 → 下一页，右/下拖 → 上一页），无相邻页就返回 FALSE 让位给更外层容器（ViewPager 的 `canScroll` 语义）。
 
@@ -404,7 +406,7 @@ MOVE 分支在 detector 探针返回 TRUE 之后追加**边界方向预判**：�
 `EndDragSwitch()` 的提交判据：
 
 1. `bSwitch = fraction * 100 >= dragSwitchRatio`（默认 35）；
-2. 否则若 `dragFling` 开启、detector 触发过 fling（默认阈值 0.5 px/ms）、朝目标页速度 `> 0.5 px/ms` 且已有 `> 2%` 可见位移，也提交；
+2. 否则若 detector 触发过 fling（默认阈值 0.5 px/ms）、朝目标页速度 `> 0.5 px/ms` 且已有 `> 2%` 可见位移，也提交（fling 与拖拽由 `enableGesture` 统一开关）；
 3. 提交前发 `EventTabSelChanging`，`bCancel = TRUE` 则改为回弹；
 4. 确认后更新 `m_nCurrentPage`、`UpdateChildrenPosition()`、重绘 tab 头；
 5. `CommitDrag(bSwitch, dragCommitDuration)`，`OnSliderFinish()` 恢复被临时改写的 animator duration；
@@ -424,10 +426,9 @@ MOVE 分支在 detector 探针返回 TRUE 之后追加**边界方向预判**：�
 
 | 属性 | 类型 | 默认 | 语义 |
 |---|---|---|---|
-| `enableDragSwitch` | BOOL | `0` | 总开关；关闭时 `CanDragSwitch()` 为 FALSE，拦截链对该控件完全不生效 |
+| `enableGesture` | BOOL | `0` | 手势总开关：开启后拖拽与甩动（fling）提交同时生效；关闭时 `CanDragSwitch()` 为 FALSE，拦截链对该控件完全不生效。与 `SPanel` 的拖动滚动共用同一属性名 |
 | `dragThreshold` | LAYOUTSIZE | `8dp` | touchSlop，`toPixelSize(GetScale())` 随 DPI 缩放 |
 | `dragSwitchRatio` | INT | `35` | 松手提交所需位移百分比（1–100） |
-| `dragFling` | BOOL | `1` | 是否允许甩动速度触发提交 |
 | `dragCommitDuration` | INT (ms) | `200` | 提交 / 回弹补间时长；`0` = 立即完成（无头测试用） |
 
 方向自动跟随 `tabAlign`（`IsDragAxisVertical()`）：`left/right` 走垂直，其余水平，与 `STabSlider::m_bVertical` 同判据。
@@ -436,8 +437,8 @@ MOVE 分支在 detector 探针返回 TRUE 之后追加**边界方向预判**：�
 
 ```xml
 <tabctrl pos="[0,0,-0,-0" name="tab_main_opt" tabWidth="0" tabAlign="left"
-         enableDragSwitch="1" dragThreshold="10dp" dragSwitchRatio="35"
-         dragFling="1" dragCommitDuration="180">
+         enableGesture="1" dragThreshold="10dp" dragSwitchRatio="35"
+         dragCommitDuration="180">
     <page title="page_msg"><include src="LAYOUT:XML_PAGE_MSG" /></page>
     ...
 </tabctrl>
@@ -470,7 +471,7 @@ flowchart TD
 
 ## 8. Demo 配置现状
 
-`demos/demo/uires/xml/` 下 7 个 XML 共 12 个 `<tabctrl>` 实例显式配置了 `enableDragSwitch`，专门用于验证最多 **4 层**嵌套（`tab_main → tab_contents → 页面级 tabctrl → 页内 tabctrl`）。当前工作区状态：
+`demos/demo/uires/xml/` 下 7 个 XML 共 12 个 `<tabctrl>` 实例显式配置了 `enableGesture`，专门用于验证最多 **4 层**嵌套（`tab_main → tab_contents → 页面级 tabctrl → 页内 tabctrl`）。当前工作区状态：
 
 | 层级 | 控件 | 位置 | `tabAlign` | 拖动轴 | 开关 |
 |---|---|---|---|---|---|
@@ -487,7 +488,7 @@ flowchart TD
 
 `demos/fundholdings` 的移动版布局（`uires/layout/dlg_main.xml` 与 `mobile/` 副本）用两个隐藏页头的 `tabctrl`：`pane_swipe` 承载三个面板的左右滑切页（`dragCommitDuration="200"`），`fund_swipe` 用「上一支 / 当前 / 下一支」三页实现左右滑切基金（`dragCommitDuration="0"`，切页后由 `EventTabSelChanged` 复位到中间页并 `ActivateFund(next)`）。后者正是 §6.3 事件顺序的现实用例。
 
-隔离测法：把目标层以上的 `enableDragSwitch` 改成 `0`，即可只留该层；逐层调 `dragThreshold` / `dragCommitDuration` 也能区分是哪一层在响应。
+隔离测法：把目标层以上的 `enableGesture` 改成 `0`，即可只留该层；逐层调 `dragThreshold` / `dragCommitDuration` 也能区分是哪一层在响应。
 
 ---
 
@@ -505,7 +506,7 @@ flowchart TD
 
 ### 9.2 测试技巧
 
-- `dragCommitDuration='0' dragFling='0'` 让断言只取决于位移比例，不依赖定时器。
+- `dragCommitDuration='0'` 让断言只取决于位移比例，不依赖定时器；测试夹具把 detector 的 fling 阈值抬到极大来排除速度干扰。
 - `container()->SetRoot(root)` 是容器级 `DoFrameEvent()` 的前提。
 - `CancelSpyWindow` 继承 `SWindow` 并覆写 `CancelCaptureMode()`，用 `m_lastReason` 观察轴向 reason、用 `m_refuse` 模拟「拒绝放弃」；`MakeNestedTabs()` 用真实 XML 构造两层 `tabctrl` 复现 `page_skia.xml`。
 - `SwipeResetter` 在 `EventTabSelChanged` 里同步 `SetCurSel()` 复位，并用 `TabHook::HasSlider()` 记录通知到达时 drag slider 是否还在，用来断言「事件必须晚于提交」。
