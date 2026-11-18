@@ -88,13 +88,20 @@ jobs:
       # ---------------------------------------------------------------------
       # 1. census: 全量符号解析（>4MB，只链不跑）
       # ---------------------------------------------------------------------
+      # 裸机没有 TLS：swinx 的 s_nCallStack / t_inDispatchWinEvents 与 stb_image
+      # 的 STBI_THREAD_LOCAL 会生成 .tbss 段和 __aeabi_read_tp 引用，而
+      # arm-none-eabi 的 newlib 不提供这个符号（链接报 undefined reference +
+      # dangerous relocation）。这里借项目自带的 SOUI_FR_DEFINITIONS 扩展点在
+      # 预处理阶段把 thread_local 关键字置空——裸机 UI 只有 swinx-thr 一个任务，
+      # 退化成普通 static 语义正确，与 pixman 的 PIXMAN_NO_TLS 是同一思路。
       - name: Configure census link
         run: |
           # 工具链文件在 soui_fr 自己的 cmake/ 下（原 demo/ 已并入 soui_fr），
           # 用绝对路径喂进去，避免 CMAKE_TOOLCHAIN_FILE 相对路径的解析基准歧义。
           cmake -S soui-freertos/soui_fr -B build-census -G Ninja \
             -DCMAKE_TOOLCHAIN_FILE="$PWD/soui-freertos/soui_fr/cmake/toolchain-arm-freertos.cmake" \
-            -DSOUI_FR_CENSUS=ON
+            -DSOUI_FR_CENSUS=ON \
+            -DSOUI_FR_DEFINITIONS=thread_local=
 
       - name: Link census image (fails on any undefined symbol)
         run: |
@@ -115,7 +122,8 @@ jobs:
           cmake -S soui-freertos/soui_fr -B build-run -G Ninja \
             -DCMAKE_TOOLCHAIN_FILE="$PWD/soui-freertos/soui_fr/cmake/toolchain-arm-freertos.cmake" \
             -DSOUI_FR_CENSUS=OFF \
-            -DCMAKE_BUILD_TYPE=MinSizeRel
+            -DCMAKE_BUILD_TYPE=MinSizeRel \
+            -DSOUI_FR_DEFINITIONS=thread_local=
 
       - name: Build runnable image and check the 4MB FLASH budget
         run: |
