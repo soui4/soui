@@ -74,6 +74,13 @@ if(NOT DEFINED SOUI_BUILD_WS)
     set(SOUI_BUILD_WS ON)
 endif()
 
+# 组件开关必须在 third-part 之前写进 CMake cache，与仓库根 CMakeLists.txt 保持一致。
+# third-part/CMakeLists.txt 按 SOUI_BUILD_RENDER_SKIA 决定是否 add_subdirectory(skia)，
+# components/CMakeLists.txt 按同一个开关编 render-skia。若等到 components 里才 include，
+# third-part 阶段该变量还不存在 → skia 不进构建图，而 render-skia 的
+# add_dependencies(render-skia skia) 会在 Generate 阶段报 "dependency target ... does not exist"。
+include("${SOUI_ROOT_DIR}/__cmake/component-options.cmake")
+
 configure_file("${SOUI_ROOT_DIR}/__cmake/soui4-config.cmake.in" "${PROJECT_BINARY_DIR}/soui-config.cmake" @ONLY)
 configure_file("${SOUI_ROOT_DIR}/config/config.h.in" "${PROJECT_BINARY_DIR}/config/config.h" @ONLY)
 configure_file("${SOUI_ROOT_DIR}/config/build.cfg.in" "${PROJECT_BINARY_DIR}/config/build.cfg" @ONLY)
