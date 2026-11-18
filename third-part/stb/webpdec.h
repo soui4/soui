@@ -1985,7 +1985,13 @@ static WEBP_INLINE int _mm256_cvtsi256_si32(__m256i a) {
 // inclusion of arm64_neon.h; Visual Studio 2019 includes this file in
 // arm_neon.h. Compile errors were seen with Visual Studio 2019 16.4 with
 // vtbl4_u8(); a fix was made in 16.6.
-#if defined(_MSC_VER) &&                      \
+// Local patch: this stb port of webpdec declares the WebP*NEON() DSP init
+// functions but never defines them (in upstream libwebp they live in
+// separate *_neon.c compilation units that were not ported). Enabling
+// WEBP_USE_NEON under MSVC/ARM64 therefore fails to link (LNK2019/LNK1120
+// in imgdecoder-stb). Keep NEON off for MSVC unless explicitly opted in:
+// the C fallback implementations are used instead.
+#if defined(_MSC_VER) && defined(WEBP_MSVC_NEON) && \
     ((_MSC_VER >= 1700 && defined(_M_ARM)) || \
      (_MSC_VER >= 1926 && (defined(_M_ARM64) || defined(_M_ARM64EC))))
 #define WEBP_USE_NEON
