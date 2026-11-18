@@ -154,7 +154,9 @@ LRESULT SNcPainter::OnNcCalcSize(BOOL bCalcValidRects, LPARAM lParam)
         }
         else
         {
-            pNative->GetWindowRect((LPRECT)lParam);
+            CRect rc;
+            pNative->GetWindowRect(rc);
+            ::CopyRect((LPRECT)lParam, &rc);
         }
     }
     else
