@@ -64,17 +64,26 @@ jobs:
           git config --global url."https://github.com/setoutsoft/soui-freertos".insteadOf "https://gitee.com/setoutsoft/soui-freertos"
           git submodule update --init --recursive
 
-      - name: Install ARM toolchain and QEMU
+      - name: Install ARM toolchain, QEMU and MinGW windres
         run: |
           sudo apt-get update
           # libstdc++-arm-none-eabi-newlib 必须显式安装：--no-install-recommends 会跳过
           # gcc-arm-none-eabi 的推荐包，导致 arm-none-eabi-g++ 找不到 <string> 等
           # C++ 标准库头（该包依赖 libstdc++-arm-none-eabi-dev 提供头文件）。
+          #
+          # mingw-w64 提供 x86_64-w64-mingw32-windres：soui_fr/main.rc -> COFF 的
+          # 资源流水线在 cmake 的 configure 阶段就 find_program(windres /
+          # x86_64-w64-mingw32-windres)，缺了它 CMake 直接 FATAL_ERROR（日志里的
+          # "windres not found"）。装完整元包而不是只装 binutils-mingw-w64-x86-64：
+          # windres 预处理会转给交叉 gcc，元包把交叉 gcc + MinGW 头一起带上；
+          # 与 swinx/doc/跨平台rc编译及资源管理.md 的安装说明保持一致。
           sudo apt-get install -y --no-install-recommends \
             gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib \
-            qemu-system-arm ninja-build
+            qemu-system-arm ninja-build \
+            mingw-w64
           arm-none-eabi-gcc --version | head -1
           qemu-system-arm --version | head -1
+          x86_64-w64-mingw32-windres --version | head -1
 
       # ---------------------------------------------------------------------
       # 1. census: 全量符号解析（>4MB，只链不跑）
