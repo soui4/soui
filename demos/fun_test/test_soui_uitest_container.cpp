@@ -223,3 +223,158 @@ TEST_F(SouiTestFixture, listview_adapter_and_multiselect)
     EXPECT_FALSE(lv->IsItemSelected(1));
     EXPECT_TRUE(lv->IsItemSelected(2));
 }
+
+namespace
+{
+// WM_CREATE 计数探针：把消息计数后交回基类处理（SetMsgHandled(FALSE)），
+// 因此不改变控件行为，只用来观测"列表被创建了几次"。
+// 通过 SApplication::RegisterWindowClass<T>() 注册后，可由 listStyle 的 wndclass 指定。
+class SCreateCountingListBox : public SListBox
+{
+  public:
+    DEF_SOBJECT(SListBox, L"listbox_create_counter")
+
+    static int s_nCreateCount;
+
+  protected:
+    int OnWmCreateProbe(LPVOID)
+    {
+        ++s_nCreateCount;
+        SetMsgHandled(FALSE); // 继续走 SWindow 默认的 WM_CREATE 处理
+        return 0;
+    }
+
+    SOUI_MSG_MAP_BEGIN()
+        MSG_WM_CREATE(OnWmCreateProbe)
+    SOUI_MSG_MAP_END()
+};
+
+int SCreateCountingListBox::s_nCreateCount = 0;
+
+class SCreateCountingListView : public SListView
+{
+  public:
+    DEF_SOBJECT(SListView, L"listview_create_counter")
+
+    static int s_nCreateCount;
+
+  protected:
+    int OnWmCreateProbe(LPVOID)
+    {
+        ++s_nCreateCount;
+        SetMsgHandled(FALSE);
+        return 0;
+    }
+
+    SOUI_MSG_MAP_BEGIN()
+        MSG_WM_CREATE(OnWmCreateProbe)
+    SOUI_MSG_MAP_END()
+};
+
+int SCreateCountingListView::s_nCreateCount = 0;
+} // namespace
+
+// SComboBox：声明 <listStyle> 时，内部下拉列表只能收到一次 WM_CREATE。
+//
+// 回归背景：listStyle 分支会先调用 m_pListBox->InitFromXml(&listStyle)，而
+// SWindow::InitFromXml 内部已经派发过 WM_CREATE；若之后再无条件下发一次，
+// 列表的 OnCreate 就会跑两遍（重复的 EVT_CREATE 与无障碍 EVENT_OBJECT_CREATE，
+// listStyle 里若用自定义 wndclass，其 OnCreate 里的资源初始化也会重复）。
+TEST_F(SouiTestFixture, combobox_liststyle_creates_list_once)
+{
+    ASSERT_TRUE(SApplication::getSingleton().RegisterWindowClass<SCreateCountingListBox>());
+
+    SWindow *root = loadUi(L"<window layout='vbox' width='200' height='80'/>");
+
+    SComboBox *cbx = (SComboBox *)SApplication::getSingleton().CreateWindowByName(L"combobox");
+    ASSERT_TRUE(cbx != NULL);
+    cbx->SetContainer(container());
+
+    // 必须在 InitFromXml（内部建列表）之前清零。
+    SCreateCountingListBox::s_nCreateCount = 0;
+
+    const wchar_t *kXml =
+        L"<combobox name='cbx' width='150' height='24'>"
+        L"<listStyle wndclass='listbox_create_counter' colorBkgnd='#FFFFFF'/>"
+        L"</combobox>";
+    SXmlDoc doc;
+    ASSERT_TRUE(doc.load_buffer(kXml, (size_t)wcslen(kXml) * sizeof(wchar_t), xml_parse_default, funtest::WCHAR_ENC));
+    SXmlNode node = doc.root().first_child();
+    ASSERT_TRUE(node);
+    ASSERT_TRUE(cbx->InitFromXml(&node));
+
+    root->InsertChild(cbx);
+
+    EXPECT_EQ(SCreateCountingListBox::s_nCreateCount, 1);
+
+    // 单次创建不能以功能缺失为代价：列表仍可正常使用。
+    ASSERT_TRUE(cbx->GetIListBox() != NULL);
+    ASSERT_EQ(cbx->InsertItem(0, _T("Apple"), 0, 0), 0);
+    EXPECT_EQ(cbx->GetCount(), 1);
+}
+
+// SComboView：同上，listStyle 分支的下拉 listview 也只能收到一次 WM_CREATE。
+TEST_F(SouiTestFixture, comboview_liststyle_creates_list_once)
+{
+    ASSERT_TRUE(SApplication::getSingleton().RegisterWindowClass<SCreateCountingListView>());
+
+    SWindow *root = loadUi(L"<window layout='vbox' width='240' height='80'/>");
+
+    SComboView *cbv = (SComboView *)SApplication::getSingleton().CreateWindowByName(L"comboview");
+    ASSERT_TRUE(cbv != NULL);
+    cbv->SetContainer(container());
+
+    SCreateCountingListView::s_nCreateCount = 0;
+
+    const wchar_t *kXml =
+        L"<comboview name='cbv' width='200' height='26' dropDown='1'>"
+        L"<listStyle wndclass='listview_create_counter' colorBkgnd='#FFFFFF'>"
+        L"<template itemHeight='30'><text pos='0,0,-0,-0' name='txt'/></template>"
+        L"</listStyle>"
+        L"</comboview>";
+    SXmlDoc doc;
+    ASSERT_TRUE(doc.load_buffer(kXml, (size_t)wcslen(kXml) * sizeof(wchar_t), xml_parse_default, funtest::WCHAR_ENC));
+    SXmlNode node = doc.root().first_child();
+    ASSERT_TRUE(node);
+    ASSERT_TRUE(cbv->InitFromXml(&node));
+
+    root->InsertChild(cbv);
+
+    EXPECT_EQ(SCreateCountingListView::s_nCreateCount, 1);
+    ASSERT_TRUE(cbv->GetListView() != NULL);
+    EXPECT_EQ(cbv->GetCount(), 0);
+}
+
+// 没有 <listStyle> 的路径不走 InitFromXml，必须保留那一次显式 WM_CREATE：
+// 用默认 listbox 时无从计数，这里验证列表仍能正常工作（插入 / 选中 / 回读文本），
+// 防止"删掉显式发送"式的修复把这条路径的创建消息一起弄丢。
+TEST_F(SouiTestFixture, combobox_without_liststyle_still_usable)
+{
+    SWindow *root = loadUi(L"<window layout='vbox' width='200' height='80'/>");
+
+    SComboBox *cbx = (SComboBox *)SApplication::getSingleton().CreateWindowByName(L"combobox");
+    ASSERT_TRUE(cbx != NULL);
+    cbx->SetContainer(container());
+
+    const wchar_t *kXml = L"<combobox name='cbx_plain' width='150' height='24'/>";
+    SXmlDoc doc;
+    ASSERT_TRUE(doc.load_buffer(kXml, (size_t)wcslen(kXml) * sizeof(wchar_t), xml_parse_default, funtest::WCHAR_ENC));
+    SXmlNode node = doc.root().first_child();
+    ASSERT_TRUE(node);
+    ASSERT_TRUE(cbx->InitFromXml(&node));
+
+    root->InsertChild(cbx);
+
+    ASSERT_TRUE(cbx->GetIListBox() != NULL);
+    ASSERT_EQ(cbx->InsertItem(0, _T("Apple"), 0, 0), 0);
+    ASSERT_EQ(cbx->InsertItem(1, _T("Banana"), 0, 0), 1);
+
+    SouiTest::SignalSpy spy(cbx, EventCBSelChange::EventID);
+    cbx->SetCurSel(1);
+    EXPECT_EQ(spy.count(), 1);
+    EXPECT_EQ(cbx->GetCurSel(), 1);
+
+    SStringT itemText;
+    EXPECT_TRUE(cbx->GetItemText(1, TRUE, &itemText));
+    EXPECT_EQ(itemText, _T("Banana"));
+}

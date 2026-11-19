@@ -34,7 +34,7 @@ BOOL SComboBoxEx::CreateListBox(SXmlNode xmlNode)
     m_pListBox->SetOwner(this); // chain notify message to combobox
     m_pListBox->SetID(IDC_DROPDOWN_LIST);
 	m_pListBox->SSendMessage(UM_SETSCALE, GetScale());
-    m_pListBox->SSendMessage(WM_CREATE);
+    // InitFromXml above already dispatched WM_CREATE; a second send would duplicate it.
     //初始化列表数据
     SXmlNode xmlNode_Items = xmlNode.child(L"items");
     if (xmlNode_Items)
