@@ -19,7 +19,9 @@
 
 #include "stdafx.h"
 #include "MainDlg.h"
-//#include <controls.extend/reole/RichEditOle.h>
+#if defined( _WIN32) && !defined( SOUI_EDIT_LITE) && !defined(__MINGW32__)
+#include <controls.extend/reole/RichEditOle.h>
+#endif
 #include "CAdapter.h"
 
 //#define SHOW_AERO //open aero for vista and win7
