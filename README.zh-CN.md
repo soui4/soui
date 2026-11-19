@@ -53,17 +53,18 @@ Windows 只是 SOUI4 通过 swinx 覆盖的八个目标之一，这八端分成�
 | **iOS** | 已支持 | `UIApplicationMain`（由 `swinx_ios_entry` 托管） | Core Graphics |
 | **Android** | 已支持 | JVM 启动器，`PlatformAPI` 桥接 | Cairo |
 | **鸿蒙（OHOS）** | 已支持 | ArkTS 运行时，`PlatformAPI` 桥接 | Cairo |
-| **FreeRTOS** | 能力证明级 | 无 OS：FreeRTOS 任务驱动消息泵，宿主扫描帧缓冲上屏 | Cairo → 内存帧缓冲 |
+| **FreeRTOS** | 能力证明级 | 无 OS：FreeRTOS 任务驱动消息泵；QEMU Cortex-M3 或 ESP32-S3 真机 | Cairo → 帧缓冲 / SPI LCD |
 | **WebAssembly** | 能力证明级 | `emscripten_set_main_loop`，JS 宿主按脏矩形 blit 到 Canvas | Canvas 2D API |
 
 两档的含义不同，不能互换：
 
 - **已支持**（上面六端）= 产品级：有 CI、有示例、有真机/实机验证。
-- **能力证明级**（FreeRTOS、WebAssembly）= 架构被验证能吸收新的宿主形态：目标能构建、
-  `SApp` 能端到端跑通，但仍有明确缺口（FreeRTOS：字体测宽、`ICON:` 仍是桩、未适配目标板；
-  WASM：无系统级 IME / OLE 拖放、触摸与真机输入法未系统验证）。它们说明"抽象能伸到这里"，
-  不等于"可以交付"。详见 `soui-freertos/README.md` 与 wasm 设计实现文档
-  `swinx/doc/swinx-wasm-design.md`。
+- **能力证明级**（FreeRTOS、WebAssembly）= 架构被验证能吸收新的宿主形态：目标能在模拟器
+  与真机上构建并端到端跑通 `SApp`（FreeRTOS 已跑 QEMU Cortex-M3 **和 ESP32-S3 + ILI9341 SPI 屏**，
+  并有 CI 门禁），但仍有明确缺口（FreeRTOS：字体测宽与 `ICON:` 仍是桩；WASM：无系统级 IME /
+  OLE 拖放、触摸与真机输入法未系统验证）。它们说明"抽象能伸到这里"，不等于"通用发布质量"。
+  详见 [`soui-freertos/README.md`](./soui-freertos/README.md) 与 wasm 设计实现文档
+  [`swinx/doc/swinx-wasm-design.md`](./swinx/doc/swinx-wasm-design.md)。
 
 swinx 在不同平台的分层方式：
 
@@ -74,10 +75,12 @@ swinx 在不同平台的分层方式：
 
 SOUI 的渲染工厂（`Render_Gdi` / `Render_Skia` / `Render_D2d`）在各平台统一；跨平台工程通常统一使用 **`Render_Skia`** + `ImgDecoder_Stb`。移动端还额外提供 `SModalView`（替代 `SHostDialog` 的模态对话框实现，因为移动端运行时无法自行拉起消息循环），以及 `SPanel` 上的惯性 **fling** 滑动支持。
 
-##  demo 基本界面
+##  Demo 截图 / Demo Screenshots
 
-![demo1](./doc/demo_png/souidemo1.png)
-![demo2](./doc/demo_png/souidemo2.png)
+下图来自本仓库**Widgets Gallery** 示例（`WidgetsGallery.exe`）：浅色主题的 Overview 页与深色主题的 Progress 页。截图由示例自带的 `--snapshot` 模式通过 `PrintWindow` 采集（不激活窗口、不注入桌面输入）；完整控件目录见 [`demos/WidgetsGallery/README.md`](./demos/WidgetsGallery/README.md)。
+
+![Widgets Gallery - Overview（浅色）](./doc/demo_png/souidemo1.png)
+![Widgets Gallery - Progress（深色）](./doc/demo_png/souidemo2.png)
 
 如果您初次了解此库，可以下载自动化静态编译的 **Windows** 版 [demo.exe](https://github.com/soui4/soui/actions) 进行尝鲜体验（无需下载源代码和其他依赖，直接下载运行）。其余平台按下方对应小节从源码编译同一套 demo。
 
@@ -177,13 +180,13 @@ SOUI 在各平台都保持 **Win32 形态的 API**（窗口 / 消息 / GDI），
 - 在 DevEco Studio（或 `hvigor` 命令行）中编译 OHOS 模块。
 
 ###  FreeRTOS（裸机）编译
-- 子模块 `soui-freertos` 是唯一入口：一个 `include` + 一个 `soui_fr_project()` 完成内核 / 三方库 / swinx 平台层 / SOUI / 资源打包。
-- 交叉编译到 QEMU 的 Cortex-M3 目标：
-  `cd soui-freertos/soui_fr && cmake -S . -B build -G Ninja -DCMAKE_TOOLCHAIN_FILE=../demo/cmake/toolchain-arm-freertos.cmake -DSOUI_FR_CENSUS=OFF -DCMAKE_BUILD_TYPE=MinSizeRel`
-  然后 `qemu-system-arm -M mps2-an385 -nographic -semihosting -kernel build/soui_fr.elf`。
-- 宿主侧迭代用 `soui_sim`（FreeRTOS Windows 模拟器，SDL2 出图），见 `soui-freertos/README.md` 与《SOUI5-FreeRTOS 开发指南》。
+- 子模块 `soui-freertos` 是唯一入口：一个 `include` + 一个 `soui_fr_project()` 完成内核 / 三方库 / swinx 平台层 / SOUI / 资源打包；构建"机制"（`soui-freertos/cmake/`）与各工程的入口（`<工程>/cmake/project.cmake`）分离。
+- QEMU Cortex-M3（mps2-an385）：`cd soui-freertos/soui_fr && ./build.sh --run`（Windows 用 `build.bat --run`）。脚本自动找 arm-none-eabi 工具链与 QEMU，编出 `soui_fr.elf`（应用冒烟）与 `soui_fr_selftest.elf`（swinx 平台层自测）并依次运行。手动配置用 `-DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-arm-freertos.cmake -DCMAKE_BUILD_TYPE=MinSizeRel`。
+- **ESP32-S3 真机**：`soui-freertos/esp32s3` 是 ESP-IDF v5.4.1 工程，驱动 320x240 的 ILI9341 SPI 屏；编译烧录与串口抓日志见 [`soui-freertos/esp32s3/BUILD_FLASH.md`](./soui-freertos/esp32s3/BUILD_FLASH.md)，帧率与优化过程见 [`PERFORMANCE.md`](./soui-freertos/esp32s3/PERFORMANCE.md)（双动画约 40 fps，单动画 56-58 fps）。
+- 宿主侧迭代用 `soui_sim`（FreeRTOS Windows 模拟器，SDL2 出图）或可直接复制的 `templates/app`，详见 [`soui-freertos/README.md`](./soui-freertos/README.md)。
 
 ###  WebAssembly 编译
+- wasm 与 FreeRTOS 共用同一组四个宿主接缝（帧缓冲 / 输入 / 消息泵 / 资源），这也是第二个形态比第一个便宜得多的原因。可复用的浏览器宿主 `soui-host.js` 负责画布上屏、鼠标/键盘/滚轮、输入法代理、剪贴板、音效与文件选择，新工程只需接好少量 C++ 导出。两端都有独立的 CI 门禁（见上方徽章）。
 - 需要 [emsdk](https://emscripten.org/docs/getting_started/downloads.html)（本地验证用 6.0.13）。
 - `emcmake cmake -S demos/wasm-demo -B build-wasm -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo`（每个 wasm 版都是独立的顶层 CMake 工程，SOUI 库通过 `add_subdirectory` 拉入）。
 - `cmake --build build-wasm --target soui-wasm-demo -j4`，产物在 `demos/wasm-demo/out/`。

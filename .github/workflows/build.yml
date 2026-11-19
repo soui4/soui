@@ -36,10 +36,10 @@ jobs:
             platform: ARM64
           - os: macOS
             arch: x64
-            dist: macos-15  # Intel-based runner for x64
+            dist: macos-26-intel  # Intel runner；macos-15/26 裸标签是 arm64，x64 必须用 -intel
           - os: macOS
             arch: arm64
-            dist: macos-15  # Apple Silicon runner for arm64；macos-14 已于 2026-11-02 退役
+            dist: macos-26  # Apple Silicon runner for arm64；macos-14 已退役、arm64 队列用最新 GA 镜像
         exclude:
           - os: Linux
             arch: x86
@@ -75,7 +75,9 @@ jobs:
 
     - name: Install dependencies (Ubuntu)
       if: startsWith(matrix.dist, 'ubuntu')
-      run: sudo apt-get update && sudo apt install -y cmake  build-essential xvfb libxcb1-dev libxcb-render0-dev uuid-dev libasound2-dev libgl1-mesa-dev freeglut3-dev pkg-config mingw-w64 --fix-missing
+      # swinx_wke_script 的 SSA_FALLBACK 用例要求系统有覆盖 U+4E2D/U+6587 的字体；
+      # ubuntu-22.04-arm 镜像只预装 fonts-noto-color-emoji，必须显式补 CJK 字体。
+      run: sudo apt-get update && sudo apt install -y cmake  build-essential xvfb libxcb1-dev libxcb-render0-dev uuid-dev libasound2-dev libgl1-mesa-dev freeglut3-dev pkg-config mingw-w64 fonts-noto-cjk --fix-missing
 
     - name: Install dependencies (macOS)
       if: matrix.os == 'macOS'
@@ -201,3 +203,53 @@ jobs:
       with:
         name: file_structure-${{ matrix.os }}-${{ matrix.arch }}
         path: file_structure.txt
+
+
+  build-ios:
+    name: Build for iOS-arm64
+    # build.yml 原本只有桌面 matrix，iOS 完全不在主流程里（仅在 mobile gate 且只有
+    # swinx 子模块变化时触发）。这里补一个固定 arm64 的 job：iOS 只允许静态库，
+    # 复用 swinx 自带的 cross_build.py，产物形态与 mobile gate 保持一致。
+    runs-on: macos-26
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 2
+
+    - name: Checkout submodules from GitHub mirror
+      shell: bash
+      run: |
+        # 映射表与主 build job 保持一致，改一处要五处一起改。
+        git config --global url."https://github.com/soui4/swinx".insteadOf "https://gitee.com/setoutsoft/swinx"
+        git config --global url."https://github.com/setoutsoft/libwebsockets".insteadOf "https://gitee.com/setoutsoft/libwebsockets"
+        git config --global url."https://github.com/setoutsoft/openssl-cmake".insteadOf "https://gitee.com/setoutsoft/openssl-cmake"
+        git config --global url."https://github.com/setoutsoft/curl".insteadOf "https://gitee.com/setoutsoft/curl"
+        git config --global url."https://github.com/setoutsoft/soui-freertos".insteadOf "https://gitee.com/setoutsoft/soui-freertos"
+        git submodule update --init --recursive
+
+    - name: Set up CMake
+      uses: lukka/get-cmake@latest
+      with:
+        cmakeVersion: "^3.25.0"
+
+    - name: Cross-compile swinx (arm64, iphoneos, static)
+      run: |
+        python3 swinx/tools/cross_build.py ios \
+          --abi arm64 \
+          --generator Ninja \
+          --jobs 4 \
+          --build "$RUNNER_TEMP/swinx-ios-arm64"
+
+    # cross_build.py 已按 Mach-O cputype 比对过架构，这里用 lipo 独立复核一次，
+    # 避免两处共用同一套误判逻辑而同时放行错误产物。
+    - name: Verify the artifact is real arm64 Mach-O
+      run: |
+        LIB=$(find "$RUNNER_TEMP/swinx-ios-arm64" -name 'libswinx.a' | head -1)
+        if [ -z "$LIB" ]; then
+          echo "::error::没有生成 libswinx.a（iOS 侧应为静态库）"
+          exit 1
+        fi
+        file "$LIB"
+        lipo -info "$LIB" | tee /tmp/lipo.txt
+        grep -q arm64 /tmp/lipo.txt

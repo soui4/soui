@@ -486,7 +486,7 @@ TEST(swinx_wke_script, fallback_probe_records_the_chosen_font_into_the_emf)
     memset(&probe, 0, sizeof(probe));
     ASSERT_TRUE(EnumEnhMetaFile(NULL, hmf, emfEnumProc, &probe, NULL) != FALSE);
     // Two records at least: the base font and the font selected by the fallback.
-    EXPECT_GE(probe.fontRecords, 2);
+    EXPECT_GE(probe.fontRecords, 2) << "SSA_FALLBACK needs a font covering U+4E2D/U+6587; install fonts-noto-cjk on Linux";
     EXPECT_EQ(probe.records, probe.fontRecords);
     EXPECT_TRUE(DeleteEnhMetaFile(hmf) != FALSE);
     DeleteObject(base);
@@ -540,8 +540,8 @@ TEST(swinx_wke_script, string_analysis_utf8_matches_the_wchar_result)
     // the base font already covers, so no fallback would be selected and only one
     // font record would exist. Two records plus the same family is the proof that
     // both口径 produced the same two code points.
-    EXPECT_GE(wide.fontRecords, 2);
-    EXPECT_GE(ansi.fontRecords, 2);
+    EXPECT_GE(wide.fontRecords, 2) << "needs a font covering U+4E2D/U+6587; install fonts-noto-cjk on Linux";
+    EXPECT_GE(ansi.fontRecords, 2) << "needs a font covering U+4E2D/U+6587; install fonts-noto-cjk on Linux";
     EXPECT_TRUE(wide.lastFace[0] != 0);
     EXPECT_TRUE(sameFace(wide.lastFace, ansi.lastFace));
 }

@@ -88,3 +88,6 @@ endif()
 # 交叉编译到 wasm 时不生效：同一批头文件会在 macOS/Linux 主机上各刷上万条
 # -Winconsistent-missing-override。这里按编译器口径补一条，与 Darwin 分支一致。
 add_compile_options(-Wno-inconsistent-missing-override)
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_definitions(-D_DEBUG)
+endif()
