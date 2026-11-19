@@ -53,18 +53,20 @@ Windows is one of eight targets SOUI4 covers through swinx; they sit in two matu
 | **iOS** | Supported | `UIApplicationMain` (hosted by `swinx_ios_entry`) | Core Graphics |
 | **Android** | Supported | JVM launcher, `PlatformAPI` bridge | Cairo |
 | **HarmonyOS (OHOS)** | Supported | ArkTS runtime, `PlatformAPI` bridge | Cairo |
-| **FreeRTOS** | Proof of capability | No OS: a FreeRTOS task drives the pump, the host scans out the framebuffer | Cairo → memory framebuffer |
+| **FreeRTOS** | Proof of capability | No OS: a FreeRTOS task drives the pump; QEMU Cortex-M3 or ESP32-S3 real board | Cairo → framebuffer / SPI LCD |
 | **WebAssembly** | Proof of capability | `emscripten_set_main_loop`, JS host blits dirty rects onto a canvas | Canvas2d API |
 
 The two tiers are not the same claim:
 
 - **Supported** (the six above) = shipping quality: CI builds, demos, real-device runs.
 - **Proof of capability** (FreeRTOS, WebAssembly) = the architecture was shown to absorb a
-  new host type; the targets build and run an `SApp` end to end, but they still have known
-  gaps (FreeRTOS: font metrics, `ICON:` stubs, no target board; WASM: no system IME or OLE
-  drag-and-drop, no real-device touch validation). Read them as "the abstraction reaches
-  this far", not as "ready to ship". See `soui-freertos/README.md` and
-  `swinx/doc/swinx-wasm-design.md`.
+  new host type; the targets build and run an `SApp` end to end on both emulated and real
+  hardware (FreeRTOS runs on QEMU Cortex-M3 **and on an ESP32-S3 + ILI9341 SPI panel**, with
+  CI gating), but known gaps remain (FreeRTOS: font metrics and `ICON:` are still stubs;
+  WASM: no system IME or OLE drag-and-drop, no real-device touch validation). Read them as
+  "the abstraction reaches this far", not as "general release quality". See
+  [`soui-freertos/README.md`](./soui-freertos/README.md) and
+  [`swinx/doc/swinx-wasm-design.md`](./swinx/doc/swinx-wasm-design.md).
 
 How swinx is layered per platform:
 
@@ -76,8 +78,11 @@ How swinx is layered per platform:
 The SOUI render factory (`Render_Gdi` / `Render_Skia` / `Render_D2d`) is uniform across platforms; cross-platform projects typically use **`Render_Skia`** + `ImgDecoder_Stb`. Mobile builds additionally provide `SModalView` (a modal-dialog implementation that replaces `SHostDialog`, since mobile runtimes cannot spin up their own message loop) and inertial **fling** scrolling on `SPanel`.
 
 ## Demo Screenshots
-![demo1](./doc/demo_png/souidemo1.png)
-![demo2](./doc/demo_png/souidemo2.png)
+
+The shots below are captured from the **Widgets Gallery** demo (`WidgetsGallery.exe`) in this repository: the Overview page in the light theme and the Progress page in the dark theme. They are grabbed with the demo's own `--snapshot` mode through `PrintWindow` (no desktop input, no foreground activation); see [`demos/WidgetsGallery/README.md`](./demos/WidgetsGallery/README.md) for the full control catalog.
+
+![Widgets Gallery - Overview (light)](./doc/demo_png/souidemo1.png)
+![Widgets Gallery - Progress (dark)](./doc/demo_png/souidemo2.png)
 
 If you are new to SOUI, you can download the statically linked **Windows** build [demo.exe](https://github.com/soui4/soui/actions) for a quick try (no need for source code or dependencies, just download and run). The same demo is built from source on the other platforms with the steps further down.
 
@@ -169,13 +174,13 @@ The latest souieditor is integrated in the demos folder. Build the demo to get s
 - Build the OHOS module from DevEco Studio (or the `hvigor` CLI).
 
 ### FreeRTOS (bare metal)
-- The `soui-freertos` submodule is the only entry point: one `include` plus one `soui_fr_project()` brings up the kernel, third-party libs, the swinx platform layer, SOUI and the packed resources.
-- Cross-compile for the QEMU Cortex-M3 target:
-  `cd soui-freertos/soui_fr && cmake -S . -B build -G Ninja -DCMAKE_TOOLCHAIN_FILE=../demo/cmake/toolchain-arm-freertos.cmake -DSOUI_FR_CENSUS=OFF -DCMAKE_BUILD_TYPE=MinSizeRel`
-  then `qemu-system-arm -M mps2-an385 -nographic -semihosting -kernel build/soui_fr.elf`.
-- For host-side iteration use `soui_sim` (the FreeRTOS Windows simulator with an SDL2 window); see `soui-freertos/README.md` and the FreeRTOS development guide in that submodule.
+- The `soui-freertos` submodule is the only entry point: one `include` plus one `soui_fr_project()` brings up the kernel, third-party libs, the swinx platform layer, SOUI and the packed resources. Build "mechanism" (`soui-freertos/cmake/`) is separated from each project's entry (`<project>/cmake/project.cmake`).
+- QEMU Cortex-M3 (mps2-an385): `cd soui-freertos/soui_fr && ./build.sh --run` (Windows: `build.bat --run`). The wrapper locates the arm-none-eabi toolchain and QEMU, builds `soui_fr.elf` (app smoke) plus `soui_fr_selftest.elf` (swinx selftest) and boots both. Manual configure uses `-DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-arm-freertos.cmake -DCMAKE_BUILD_TYPE=MinSizeRel`.
+- **ESP32-S3 real board**: `soui-freertos/esp32s3` is an ESP-IDF v5.4.1 project driving a 320x240 ILI9341 SPI panel; build/flash and serial capture are in [`soui-freertos/esp32s3/BUILD_FLASH.md`](./soui-freertos/esp32s3/BUILD_FLASH.md), frame rates and the optimization history in [`PERFORMANCE.md`](./soui-freertos/esp32s3/PERFORMANCE.md) (~40 fps with two layered animations, 56-58 fps with one).
+- Host-side iteration uses `soui_sim` (FreeRTOS Windows simulator with an SDL2 window) or the copy-and-go `templates/app`; see [`soui-freertos/README.md`](./soui-freertos/README.md).
 
 ### WebAssembly
+- The wasm ports and FreeRTOS share the same four host seams (framebuffer / input / pump / resources); that is why the second one cost far less than the first. The reusable browser host `soui-host.js` handles canvas blit, pointer/keyboard/wheel, an IME proxy, clipboard, audio and file picking, so a new port only wires up a few C++ exports. Both targets have dedicated CI gates (badges above).
 - Requires [emsdk](https://emscripten.org/docs/getting_started/downloads.html) (verified locally with 6.0.13).
 - `emcmake cmake -S demos/wasm-demo -B build-wasm -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo` (each wasm port is its own standalone top-level CMake project; the SOUI library is pulled in via `add_subdirectory`).
 - `cmake --build build-wasm --target soui-wasm-demo -j4`; artifacts land in `demos/wasm-demo/out/`.
