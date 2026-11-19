@@ -6,12 +6,6 @@
 #include "res/soui_res.rc2"
 #include "theme_sys_res.rc2"
 
-// MinGW/windres and VS2008 have no /MANIFESTINPUT linker switch, so CMake
-// defines SOUI_EMBED_MANIFEST and the PerMonitorV2 manifest is embedded here
-// as an RT_MANIFEST resource instead.
-#ifdef SOUI_EMBED_MANIFEST
-1 RT_MANIFEST "dpi_aware.manifest"
-#endif
 
 1 VERSIONINFO
 FILEVERSION 1,0,0,0
