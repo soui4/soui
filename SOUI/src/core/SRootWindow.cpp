@@ -18,6 +18,7 @@ SRootWindow::SRootWindow()
 {
     GetEventSet()->addEvent(EVENTID(EventInit));
     GetEventSet()->addEvent(EVENTID(EventExit));
+    GetEventSet()->addEvent(EVENTID(EventReload));
     GetEventSet()->addEvent(EVENTID(EventMenuCmd));
     GetEventSet()->addEvent(EVENTID(EventUpdateCmdUI));
     GetEventSet()->addEvent(EVENTID(EventUpdateCmdTip));

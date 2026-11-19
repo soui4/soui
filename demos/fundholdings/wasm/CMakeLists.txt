@@ -52,18 +52,10 @@ set(_soui_fund_preload
 set(_soui_fund_exports
     "_main,_FundStat,_FundPump,_FundMouse,_FundWheel,_FundKey,_FundText,_FundCaretPos,_FundTextOf,_FundClick,_SwinxClipboardSetBrowserText,_malloc,_free,_SwinxFbBits,_SwinxFbWidth,_SwinxFbHeight,_SwinxFbStride,_SwinxFbLogicalWidth,_SwinxFbLogicalHeight,_SwinxFbRequests,_SwinxFbPresents")
 
-# 宿主页与 wasm-demo 共用 soui-host.js（下载进度、上屏、键鼠/滚轮注入、IME 代理、
-# 剪贴板、崩溃上报）。壳页 fundholdings.html 只写排版与启动参数。
-set(_soui_host_js_default "${SOUI4_DIR}/demos/wasm-demo/soui-host.js")
-set(SOUI_HOST_JS "${_soui_host_js_default}" CACHE FILEPATH
-    "fundholdings wasm: shared soui-host.js, copied next to the artifacts")
-if(NOT EXISTS "${SOUI_HOST_JS}" AND EXISTS "${_soui_host_js_default}")
-    set(SOUI_HOST_JS "${_soui_host_js_default}" CACHE FILEPATH
-        "fundholdings wasm: shared soui-host.js" FORCE)
-endif()
-if(NOT EXISTS "${SOUI_HOST_JS}")
-    message(WARNING "SOUI_HOST_JS 不存在: ${SOUI_HOST_JS} —— 产物目录里不会有 soui-host.js")
-endif()
+# 宿主脚本用仓库级共用的 tools/wasm/soui-host.js（下载进度、上屏、键鼠/滚轮注入、
+# IME 代理、剪贴板、崩溃上报都在里面）。壳页 fundholdings.html 只写排版与启动参数。
+# 路径、LINK_DEPENDS、POST_BUILD 拷贝由共享 helper 处理，三个 wasm app 同一口径。
+include("${SOUI4_DIR}/__cmake/wasm-host-js.cmake")
 
 # SGridCtrl 与桌面构建同口径：直接把 controls.extend/gridctrl 的源文件编进来，
 # 不走 ExtendCtrls（那会把 hellocharts/Scintilla 等无关控件一起拉进 wasm）。
@@ -132,23 +124,21 @@ target_link_options(fundholdings-wasm PRIVATE
     ${_soui_fund_preload})
 
 file(GLOB_RECURSE _soui_fund_res "${CMAKE_CURRENT_SOURCE_DIR}/../uires/*")
+# 宿主 js 的 LINK_DEPENDS（改 js 重链）与 POST_BUILD 拷贝由共享 helper 装到 target 上。
+soui_wasm_host_js(fundholdings-wasm "${SOUI_WASM_FUNDHOLDINGS_OUT}")
 set_property(TARGET fundholdings-wasm APPEND PROPERTY LINK_DEPENDS
     ${_soui_fund_res}
     "${CMAKE_CURRENT_SOURCE_DIR}/fundholdings.html"
-    "${SOUI_HOST_JS}"
     "${CMAKE_CURRENT_SOURCE_DIR}/serve-fundholdings.py"
     "${CMAKE_CURRENT_SOURCE_DIR}/start-server.bat")
 
 # 产物目录要能整体拷走独立部署：静态页 + wasm 产物 + 自带的服务脚本与启动脚本。
 add_custom_command(TARGET fundholdings-wasm POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${SOUI_HOST_JS}"
-        "${SOUI_WASM_FUNDHOLDINGS_OUT}/soui-host.js"
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "${CMAKE_CURRENT_SOURCE_DIR}/serve-fundholdings.py"
         "${CMAKE_CURRENT_SOURCE_DIR}/start-server.bat"
         "${SOUI_WASM_FUNDHOLDINGS_OUT}"
-    COMMENT "Copying soui-host.js / server scripts for fundholdings-wasm")
+    COMMENT "Copying server scripts for fundholdings-wasm")
 
 message(STATUS "fundholdings-wasm: ${SWINX_FB_WIDTH}x${SWINX_FB_HEIGHT}, "
                "stack=${SOUI_FUNDHOLDINGS_STACK}, taskloop=${SOUI_WASM_PTHREADS} "

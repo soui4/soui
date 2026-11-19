@@ -59,7 +59,7 @@ def outputs():
         "tileview": "// C++: use ILvAdapter::getView(position, itemPanel, xmlTemplate); SetAdapter retains a reference.\n// GalleryAdapters.h binds 30 model rows to the template IDs 1 and 2.",
         "tree": "// C++: GalleryAdapters.h implements STreeAdapterBase node data and expansion.\n// STreeCtrl emits EventTCSelChanged; STreeView emits EventTVSelChanged.",
         "combo": "// C++: SComboView::GetListView()->SetAdapter(adapter).\n// SSearchDropdownList: handle EventDropdownListFill / GetBuddyRect / Selected; see MainDlg.cpp.",
-        "dialog": "// C++: new SModalRoot; InitFromResId(layout:gallery_modal); BeginModalViewSession(modal);\n// EndModalViewSession(0, IDOK) closes the active host-managed session.",
+        "dialog": "// C++: new SModalRoot; InitFromResId(layout:gallery_modal); BeginModalViewSession(modal);\n// The session owns the window tree, so Release() the creation reference right after it.\n// EndModalViewSession(0, IDOK) closes the active host-managed session.",
         "icons": "// C++: sample_icon->SetIcon(Gallery::CreateVectorIcon(scale)); SIconWnd takes ownership.\n// Vector-to-HICON and native resource lifetimes: GalleryNative.h.",
         "hosting": "// C++: EventRealWndCreate returns a local HWND; EventRealWndDestroy destroys it.\n// SActiveX requires Windows (non-MinGW) and an installed COM server; the gallery activates none.",
         "tabs": "// C++: STabCtrl::SetCurSel(index); SStackView::SelectPage(index, FALSE);\n// Both retain the existing child tree and edit state.",

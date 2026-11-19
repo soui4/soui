@@ -1113,10 +1113,10 @@ void CWasmHostWnd::onAnimationUpdate(IValueAnimator *pAnimator)
  * PeekMessage 拿不到浏览器的新事件，模态必须挂在 SRootWindow 的模态容器里，
  * 由普通命中测试拦截输入（SModalRoot/SModalView 就是为此设计的）。
  *
- * 引用计数：BeginModalViewSession(pszLayout) 内部 CreateWindowByName 得到的那份
- * 引用在插进窗口树时转交给父节点，模态栈自己再 AddRef 一份；返回的指针不额外
- * 持有引用，所以这里不 Release、也不存到成员里。表单控件指针只在本次会话内
- * 使用——会话结束时 SHostWnd 会移除并销毁整棵子树。 */
+ * 引用计数：会话自己持有两份引用（一份替窗口树、一份给自己的会话栈），
+ * BeginModalViewSession(pszLayout) 内部 CreateWindowByName 得到的那份已在返回前
+ * Release，所以返回的指针是借用的：这里不 Release、也不存到成员里。表单控件指针
+ * 只在本次会话内使用——会话结束时 SHostWnd 会移除并销毁整棵子树。 */
 void CWasmHostWnd::OnModalOpen()
 {
     if (!m_hWnd)

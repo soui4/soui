@@ -36,6 +36,22 @@ SNSBEGIN
 #endif
 
 /**
+ * @brief Macro enabling the hot-key that reloads the layout resource.
+ *
+ * When set to 1, pressing F5 on a host window re-reads its layout XML and
+ * rebuilds the SOUI window tree in place, so an UI resource can be edited and
+ * refreshed without restarting the application. See SHostWnd::ReloadLayout().
+ *
+ * The hot-key is handled inside the SOUI library, therefore this macro must be
+ * defined while building SOUI itself (the SOUI_ENABLE_RELOAD CMake option, or
+ * -DSOUI_ENABLE_RELOAD=1); defining it in a client project has no effect on the
+ * library and only changes how the client sees the switch.
+ */
+#ifndef SOUI_ENABLE_RELOAD
+#define SOUI_ENABLE_RELOAD 0
+#endif
+
+/**
  * @class SHostWndAttr
  * @brief Class defining attributes for the host window.
  *
@@ -260,12 +276,25 @@ class SOUI_EXP SHostWnd
 
     ModalRootStack m_modalRootStack; /**< Stack of active modal root windows. */
 
+    SModalRootPtr m_endlingModalView; /**< The session whose exit animation is running, if any. */
+
     /**
      * @brief Initializes a modal root window (cancel capture, set focus, relayout, redraw).
      *
      * @param pModalRoot Pointer to the modal root window to initialize.
      */
     void InitModalRoot(SModalRoot *pModalRoot);
+
+    /**
+     * @brief Closes every modal view session of this host, newest first, without
+     *        playing their exit animations.
+     *
+     * Each session finishes synchronously inside this call, so EventExitModalView is
+     * fired (and the windows are removed from the tree) before it returns.
+     *
+     * @param exitCode Exit code reported to the subscribers.
+     */
+    void CloseAllModalViews(int exitCode);
 
   public:
     /**
@@ -313,6 +342,40 @@ class SOUI_EXP SHostWnd
      * @return TRUE if initialization succeeds, FALSE otherwise.
      */
     STDMETHOD_(BOOL, InitFromXml)(THIS_ IXmlNode *pNode) OVERRIDE;
+
+    /**
+     * @brief Rebuilds the SOUI window tree of this host from its layout resource.
+     *
+     * Re-reads the layout XML through OnGetInitXmlNode() (so a subclass that
+     * overrides the loader keeps working), destroys the current root window
+     * (firing EventExit first) and builds a fresh one inside the same HWND, so
+     * the result matches what the application gets from its initial creation.
+     * Window position/size, the host presenter, the tooltip and the HWND itself
+     * (including one attached via Attach()) are preserved, which makes this
+     * usable as an in-place "reload UI" while editing resources.
+     *
+     * Once the new tree is initialized, EventReload is fired on the root window:
+     * windows and observers of the old tree are gone, so business code re-runs
+     * there whatever it normally does in its init handler.
+     *
+     * The new XML is loaded first: if it cannot be loaded, if the host window
+     * does not exist yet, the current window tree is left untouched and FALSE is
+     * returned.  Modal view sessions belong to the old tree, so they are closed
+     * synchronously (no exit animation, EventExitModalView is still fired) before
+     * the teardown starts.
+     *
+     * @note Only the layout XML is re-read. Skin images, strings, colors and
+     *       other resources still come from the caches maintained by the global
+     *       skin/string pools, and a zip resource provider is not reopened.
+     * @note Window styles follow the XML only for the flags that are added to the
+     *       HWND here (resizable/appWnd/toolWnd); a flag that the XML no longer
+     *       asks for is left in place, exactly like the creation path.
+     * @note Enabled on F5 when SOUI is built with SOUI_ENABLE_RELOAD, see the
+     *       macro of the same name above.
+     *
+     * @return TRUE if the layout was reloaded, FALSE otherwise.
+     */
+    BOOL ReloadLayout();
 
     /**
      * @brief Destroys the host window.
@@ -716,6 +779,11 @@ class SOUI_EXP SHostWnd
      *              The window must not already be attached to a parent.
      * @return A unique session identifier if successful, 0 otherwise.
      *
+     * @note Ownership: the session takes its own references on the window (one for
+     *       the window tree, one for the session), so the caller keeps ownership of
+     *       the reference it created the window with. Release that reference once
+     *       the pointer is no longer needed - the window itself stays alive until
+     *       the session ends.
      * @note To receive notification when the modal session ends, subscribe to
      *       EventExitModalView on the SModalRoot window.
      */
@@ -727,17 +795,33 @@ class SOUI_EXP SHostWnd
      * @param pszLayout Layout resource identifier.
      * @param pRoot Optional parent window for the modal view.
      * @return Pointer to the created modal view window, or NULL if failed.
+     *
+     * @note The returned pointer is borrowed: it carries no reference of its own
+     *       and gets invalid when the session ends. Do not Release() it.
      */
     SModalRoot *BeginModalViewSession(LPCTSTR pszLayout, SWindow *pRoot = NULL);
 
     /**
      * @brief Ends a modal view session.
      *
-     * @param sessionID The session identifier returned by beginModalViewSession.
+     * The session is removed from the modal stack immediately, but the window is
+     * only destroyed after its exit animation (if any) has finished - see
+     * OnModalViewFinish(). During that time the host keeps a reference to it in
+     * m_endlingModalView, and the session still blocks a new modal view from
+     * animating: starting or ending another session first forces this one to finish.
+     *
+     * @param sessionID The session identifier returned by beginModalViewSession;
+     *        0 ends the top-most session.
      * @param exitCode The result code that will be included in the EventExitModalView event.
-     * @return TRUE if successful, FALSE otherwise (e.g., invalid session ID or wrong order).
+     * @param bNoAnimation TRUE to close the session synchronously, without the exit
+     *        animation: EventExitModalView is fired and the modal window is removed
+     *        and destroyed inside this call. A session that is already closing is
+     *        finished immediately instead of being ignored, which makes this the way
+     *        to force a running close to complete now.
+     * @return TRUE if the session was ended (or was already closing and got finished
+     *         by this call), FALSE otherwise.
      */
-    BOOL EndModalViewSession(ModalViewSessionID sessionID = 0, int exitCode = 0);
+    BOOL EndModalViewSession(ModalViewSessionID sessionID = 0, int exitCode = 0, BOOL bNoAnimation = FALSE);
 
     /**
      * @brief Gets the last modal view session identifier.
@@ -1063,6 +1147,16 @@ class SOUI_EXP SHostWnd
      */
     void OnCommand(UINT uNotifyCode, int nID, HWND wndCtl);
 
+    /**
+     * @brief Completes a modal view session: removes the modal root from the
+     *        window tree, destroys it and drops the session reference.
+     *
+     * Called by the SModalRoot exit callback, i.e. once the exit animation has
+     * finished (or immediately when the layout defines none). The modal root may
+     * be freed by this call, so the caller must not touch it afterwards.
+     *
+     * @param pModalRoot The modal root whose session has finished.
+     */
     void OnModalViewFinish(SModalRoot *pModalRoot);
 #if (!DISABLE_SWNDSPY)
   protected:

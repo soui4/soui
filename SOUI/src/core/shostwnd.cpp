@@ -691,6 +691,118 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
     return TRUE;
 }
 
+BOOL SHostWnd::ReloadLayout()
+{
+    if (!SNativeWnd::IsWindow())
+        return FALSE;
+    if (!m_pRoot)
+        return FALSE;
+    // Load the new layout before touching the live tree, so a broken resource
+    // leaves the current window tree (and the user's unsaved state) untouched.
+    SXmlDoc xmlDoc;
+    SXmlNode xmlRoot = OnGetInitXmlNode(xmlDoc);
+    if (!xmlRoot)
+    {
+        SSLOGW() << "ReloadLayout: failed to load layout, layoutId=" << m_strXmlLayout.c_str();
+        return FALSE;
+    }
+    SSLOGD() << "reload layout";
+
+    // Modal view sessions live in the tree that is about to be torn down, and their
+    // exit animations report back into the host, so close them all first - without
+    // animation, which lets them report and leave the tree synchronously.
+    CloseAllModalViews(IDCANCEL);
+
+    if (m_bAttached)
+    { // An attached host has no application-set size; keep the current client
+      // size instead of letting InitFromXml fall back to wrap-content layout.
+        CRect rcClient;
+        SNativeWnd::GetClientRect(&rcClient);
+        m_szAppSetted = rcClient.Size();
+    }
+    // The window scale lives on the windows themselves, so it has to be replayed
+    // onto the new tree after it is built (children created while m_isLoading is
+    // set do not inherit the parent scale).
+    int nScale = m_pRoot->GetScale();
+
+    // Stop the host animations together with the window they run on. The Ani_win
+    // bit is cleared by SRootWindow::onAnimationEnd, a callback the destroyed root
+    // can no longer deliver; a stale bit makes InitFromXml assert in debug builds
+    // and makes DestroyWindow() leave the window open forever.
+    if (m_AniState & Ani_host)
+        StopHostAnimation();
+    if (m_AniState & Ani_win)
+    {
+        m_pRoot->ClearAnimation();
+        m_AniState &= ~Ani_win;
+    }
+
+    // Tear the old root down completely.  InitFromXml only re-parses into the
+    // root it finds, so it keeps that root's own state and the observers the app
+    // attached to it; releasing it and creating a fresh one makes the reload
+    // behave exactly like the first creation.
+    m_pRoot->LockUpdate();
+    EventExit evtExit(m_pRoot);
+    m_pRoot->FireEvent(evtExit);
+    m_pRoot->SSendMessage(WM_DESTROY);
+    m_pRoot->UnlockUpdate();
+
+    if (m_pScriptModule)
+    {
+        IIdleHandler *pIdleHandler = m_pScriptModule->getIdleHandler();
+        if (pIdleHandler)
+            GetMsgLoop()->RemoveIdleHandler(pIdleHandler);
+        m_pScriptModule = NULL;
+    }
+    // InitFromXml overwrites the private uidef below without popping the one
+    // the previous init pushed, so release it here like the destroy path does.
+    if (!s_HideLocalUiDef)
+        EnablePrivateUiDef(FALSE);
+
+    // Tasks posted by the old tree target SWNDs that are gone after the teardown.
+    SPOSITION pos = m_runnables.GetHeadPosition();
+    while (pos)
+    {
+        m_runnables.GetNext(pos)->Release();
+    }
+    m_runnables.RemoveAll();
+
+    m_pRoot->Release();
+    m_pRoot = CreateRoot();
+    if (!m_pRoot)
+        return FALSE;
+    m_pRoot->SetContainer(this);
+    SwndContainerImpl::SetRoot(m_pRoot);
+
+    // Refresh the host attributes exactly like the creation path (CreateEx/Attach),
+    // so title, resizable, translucent... follow the edited XML as well.
+    m_hostAttr.Init();
+    m_hostAttr.InitFromXml(&xmlRoot);
+    BOOL bRet = InitFromXml(&xmlRoot);
+
+    if (bRet)
+    {
+        // Restore the scale the host had before the reload.  This must happen
+        // after InitFromXml: the tree is built while m_isLoading suppresses the
+        // scale inheritance, exactly like the initial creation path.
+        m_pRoot->SDispatchMessage(UM_SETSCALE, nScale);
+        // The non-client painter re-parsed its own XML above and its windows do
+        // not inherit the scale either.
+        GetNcPainter()->GetRoot()->SDispatchMessage(UM_SETSCALE, nScale);
+        // The window tree and its windows are new objects, so let business
+        // windows re-run their own initialization (EventInit of the new tree has
+        // already been fired by InitFromXml).
+        EventReload evtReload(GetRoot());
+        GetRoot()->FireEvent(evtReload);
+        _Redraw(); // InitFromXml clears the invalid region; request a full repaint.
+        // The non-client area (title/frame) is painted on WM_NCPAINT, which the
+        // client repaint above does not cover, so an edited title shows up only
+        // after the next frame event otherwise.
+        SendMessage(WM_NCPAINT, 1);
+    }
+    return bRet;
+}
+
 void SHostWnd::_Redraw()
 {
     m_bNeedAllRepaint = TRUE;
@@ -910,11 +1022,10 @@ void SHostWnd::OnDestroy()
         SSLOGW() << "m_hwnd:" << m_hWnd << " is not an valid window handle!!!";
         return;
     }
-    // Clear all modal view sessions before destroying the window
-    while (!m_modalRootStack.IsEmpty())
-    {
-        EndModalViewSession(m_modalRootStack.GetTail()->GetSessionID());
-    }
+    // Clear all modal view sessions before destroying the window: they belong to
+    // the tree below and report their exit into this host, so they are finished
+    // synchronously (no animation) while the tree is still intact.
+    CloseAllModalViews(IDCANCEL);
 
     m_presenter->OnHostDestroy();
     m_presenter = NULL;
@@ -1113,6 +1224,16 @@ LRESULT SHostWnd::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 LRESULT SHostWnd::OnKeyEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+#if SOUI_ENABLE_RELOAD
+    if (uMsg == WM_KEYDOWN && wParam == VK_F5 && !(lParam & (1 << 30)))
+    { // Debug helper: F5 rebuilds this host from its layout resource.  Bit 30
+      // of lParam is the previous key state, so an auto-repeated key is ignored
+      // and one press reloads exactly once.  The key is only swallowed when the
+      // reload really happened (a modal view session, for instance, refuses it).
+        if (ReloadLayout())
+            return 0;
+    }
+#endif // SOUI_ENABLE_RELOAD
     if (uMsg == WM_SYSKEYDOWN || uMsg == WM_SYSKEYUP)
     {
         SWindow *pFocus = SWindowMgr::GetWindow(m_focusMgr.GetFocusedHwnd());
@@ -2466,11 +2587,27 @@ ModalViewSessionID SHostWnd::BeginModalViewSession(SModalRoot *pModalRoot, SWind
     // Bind the session id and exit callback directly to the modal root.
     pModalRoot->AssignSessionID();
 
+    // Only one session can be closing at a time: the host keeps the closing one in
+    // m_endlingModalView, whose entry would otherwise be overwritten (leaving that
+    // window in the tree forever). Finish it now - without animation, so it reports
+    // and leaves the tree before the new session is inserted.
+    if (m_endlingModalView)
+        m_endlingModalView->EndModalViewSession(NULL, IDCANCEL, TRUE);
+
     if (!pRoot)
         pRoot = m_pRoot;
     // Add the modal root tree to the SRootWindow modal container. This call
     // lazily creates m_pModalContainer if this is the first modal session.
     SASSERT(pRoot != NULL);
+    if (!pRoot)
+        return 0;
+
+    // The window tree never AddRef()s a child when it is inserted, but it always
+    // releases it once when the child is destroyed (Destroy() / DestroyAllChildren()),
+    // so the session has to own exactly that reference. Taking it here instead of
+    // relying on the caller handing over the reference it created the window with
+    // makes the API safe for callers that Release() what they created.
+    pModalRoot->AddRef();
     pRoot->InsertChild(pModalRoot);
     CRect rcLayout;
     pRoot->GetChildrenLayoutRect(&rcLayout);
@@ -2488,21 +2625,40 @@ ModalViewSessionID SHostWnd::BeginModalViewSession(SModalRoot *pModalRoot, SWind
 SModalRoot *SHostWnd::BeginModalViewSession(LPCTSTR pszLayout, SWindow *pRoot)
 {
     SModalRoot *pModal = (SModalRoot *)SApplication::getSingletonPtr()->CreateWindowByName(SModalRoot::GetClassName());
-    pModal->InitFromResId(pszLayout);
+    if (!pModal)
+        return NULL;
+    if (!pModal->InitFromResId(pszLayout))
+    { // InitFromResId failed: the window never entered the tree, so the creation
+      // reference is the only one and must be dropped here.
+        pModal->Release();
+        return NULL;
+    }
     ModalViewSessionID session_id = BeginModalViewSession(pModal);
     if (session_id == 0)
     {
         pModal->Release();
         return NULL;
     }
+    // The session owns its own references now, so the reference returned by
+    // CreateWindowByName is not passed on to the caller: the returned pointer is
+    // borrowed and stays valid until the session ends.
+    pModal->Release();
     return pModal;
 }
 
 void SHostWnd::OnModalViewFinish(SModalRoot *pModalRoot)
 {
     SWindow *pParent = pModalRoot->GetParent();
-    if (pParent->RemoveChild(pModalRoot))
+    if (pParent && pParent->RemoveChild(pModalRoot))
+    { // Destroy() consumes the reference the window tree owns (see BeginModalViewSession).
         pModalRoot->Destroy();
+    }
+
+    // Drop the reference that kept the closing session alive. This may be the last
+    // one, so pModalRoot must not be touched after it.
+    if (m_endlingModalView == pModalRoot)
+        m_endlingModalView = NULL;
+
     // If there's another modal session active under us, reinitialize it
     // (restore focus to the now top-most modal view).
     if (!m_modalRootStack.IsEmpty())
@@ -2511,23 +2667,62 @@ void SHostWnd::OnModalViewFinish(SModalRoot *pModalRoot)
     }
 }
 
-BOOL SHostWnd::EndModalViewSession(ModalViewSessionID sessionID, int exitCode)
+BOOL SHostWnd::EndModalViewSession(ModalViewSessionID sessionID, int exitCode, BOOL bNoAnimation)
 {
-    if (m_modalRootStack.IsEmpty())
-        return FALSE;
+    // A session whose exit animation is running is still the top-most one on screen,
+    // and it is the only one the host tracks in that state. A request that targets it
+    // is passed through (so a repeated ESC stays a no-op, and a forced close really
+    // ends it), while a request for a session below it has to finish it first -
+    // otherwise m_endlingModalView would be overwritten and that window left in the
+    // tree forever.
+    if (m_endlingModalView)
+    {
+        ModalViewSessionID closingID = m_endlingModalView->GetSessionID();
+        if (sessionID == 0 || sessionID == closingID)
+        {
+            if (!bNoAnimation)
+                return FALSE; // already closing: ignore, like SModalRoot does
+            m_endlingModalView->EndModalViewSession(NULL, exitCode, TRUE);
+            return TRUE;
+        }
+        m_endlingModalView->EndModalViewSession(NULL, IDCANCEL, TRUE);
+    }
 
-    if (sessionID != 0 && m_modalRootStack.GetTail()->GetSessionID() != sessionID)
+    if (sessionID == 0 && !m_modalRootStack.IsEmpty())
+        sessionID = m_modalRootStack.GetTail()->GetSessionID();
+    if (m_modalRootStack.IsEmpty() || m_modalRootStack.GetTail()->GetSessionID() != sessionID)
         return FALSE;
-
-    // Grab the top-most modal root and remove it from the stack.
-    SModalRootPtr pModalRoot = m_modalRootStack.GetTail();
-    m_modalRootStack.RemoveTail();
 
     SASSERT(m_pRoot);
+    // Take the session off the stack, but keep the reference alive in
+    // m_endlingModalView: the exit animation may still run after this call returns,
+    // and OnModalViewFinish() is what finally releases it. Releasing here would free
+    // the window while its animation is in flight.
+    SModalRootPtr pModalRoot = m_modalRootStack.GetTail();
+    m_modalRootStack.RemoveTail();
+    m_endlingModalView = pModalRoot;
+
     SModalRootFinishCallback *pCallback = new SModalRootFinishCallback(this);
-    pModalRoot->EndModalViewSession(pCallback, exitCode);
+    pModalRoot->EndModalViewSession(pCallback, exitCode, bNoAnimation);
     pCallback->Release();
     return TRUE;
+}
+
+void SHostWnd::CloseAllModalViews(int exitCode)
+{
+    // Every round either finishes the session that is already closing or takes the
+    // top-most one off the stack and closes it synchronously, so the loop terminates.
+    while (m_endlingModalView || !m_modalRootStack.IsEmpty())
+    {
+        SModalRoot *pBefore = m_endlingModalView;
+        if (!EndModalViewSession(0, exitCode, TRUE))
+            break;
+        if (pBefore && (SModalRoot *)m_endlingModalView == pBefore)
+        { // That session did not report back (its tree is already being torn down);
+          // drop the reference instead of asking a dead session again forever.
+            m_endlingModalView = NULL;
+        }
+    }
 }
 
 ModalViewSessionID SHostWnd::GetLastModalViewSessionID() const
@@ -2553,7 +2748,8 @@ void SHostWnd::InitModalRoot(SModalRoot *pModalRoot)
         pTarget->SetFocus();
     }
     pModalRoot->RequestRelayout();
-    pTarget->PlayEnterAnimation();
+    if (pTarget)
+        pTarget->PlayEnterAnimation();
     pModalRoot->Invalidate();
 }
 

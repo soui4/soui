@@ -58,6 +58,9 @@
      * 直接写 style.width 会跟 max-width 打架，变量不会。 */
     'canvas.soui-canvas{display:block;width:var(--soui-logical-w,800px);max-width:100%;',
     'height:auto;background:#000;border:1px solid #2b3a4d;border-radius:4px;',
+    /* touch-action:none 是刻意的：触摸手势由宿主自己判定（见 hookInput 里的
+     * touchPending）。纵向滑动翻成滚轮语义（SOUI 优先、拒绝才滚页面），
+     * 横向滑动保留拖拽。交给浏览器接管就再也收不到完整的 touchmove。 */
     'outline:none;touch-action:none;}',
     'canvas.soui-canvas.keyed{border-color:#4ea1ff;}',
     '.soui-loading{position:absolute;inset:0;display:flex;flex-direction:column;',
@@ -162,6 +165,10 @@
       wrap.appendChild(canvas);
     } else {
       canvas.classList.add('soui-canvas');
+      /* 外部传入的画布也要能拿焦点：键盘事件按 activeElement 放行，而触摸
+       * 点击时我们 focus 的是 canvas（不是 IME 代理），没有 tabindex 时
+       * focus() 无效，键盘就永远收不到。 */
+      if (!canvas.hasAttribute('tabindex')) canvas.setAttribute('tabindex', '0');
       wrap.appendChild(canvas);
     }
 
@@ -783,19 +790,31 @@
       if (!proxy) return;
       try { proxy.focus({ preventScroll: true }); } catch (err) { proxy.focus(); }
     }
+    /* 让画面自身拿焦点。canvas 不是可编辑元素，focus 它不会拉起软键盘——
+     * 触摸端点击普通控件时用它，既保留键盘事件的落点（hasKeyFocus），
+     * 又不至于像以前那样一点就 focus 代理框、把输入法拱出来。 */
+    function focusCanvas() {
+      if (document.activeElement === canvas) return;
+      try { canvas.focus({ preventScroll: true }); } catch (err) { canvas.focus(); }
+    }
     function hasKeyFocus() {
       var a = document.activeElement;
       return a === proxy || a === canvas;
     }
 
     var caretBuf = 0;
+    /* 当前是否有插入符（= 焦点落在编辑类控件上）。GetCaretPos 返回 0 说明
+     * 还没有窗口创建过插入符，此时不该激活 IME 代理。 */
+    function caretNow() {
+      if (!ready || !fb || !hasFn(api.caret)) return false;
+      if (!caretBuf) caretBuf = Module._malloc(8);
+      return !!Module[api.caret](caretBuf);
+    }
     /* 把代理框钉在 SOUI 的插入符上：浏览器的候选词窗跟着焦点元素走，代理在光标处，
      * 候选窗就在正在输入的那行字旁边。每帧一次，成本是读两个 int。 */
     function syncProxyPos() {
-      if (!proxy || !ready || !fb || !hasFn(api.caret)) return;
-      if (!caretBuf) caretBuf = Module._malloc(8);
+      if (!proxy || !caretNow()) return;
       var heap = Module.HEAP32;   // ALLOW_MEMORY_GROWTH 扩容后要重新取视图
-      if (!Module[api.caret](caretBuf)) return;
       var rc = canvas.getBoundingClientRect();
       var x = heap[caretBuf >> 2], y = heap[(caretBuf >> 2) + 1];
       proxy.style.left = Math.round(rc.left + (x * rc.width) / fb.w) + 'px';
@@ -862,18 +881,100 @@
     function hookInput() {
       canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
 
+      var downMsg = { 0: WM_LBUTTONDOWN, 1: WM_MBUTTONDOWN, 2: WM_RBUTTONDOWN };
+      var upMsg = { 0: WM_LBUTTONUP, 1: WM_MBUTTONUP, 2: WM_RBUTTONUP };
+
+      /* ---------------- 触摸：单指滑动按滚轮语义 ----------------
+       * 触摸没有滚轮，如果把 pointer 事件原样翻成鼠标拖拽，页面就完全滚不动
+       * （canvas 还设了 touch-action:none）。这里把单指手势分三种：
+       *   轻点      → 补一次完整点击，再据插入符决定要不要激活 IME；
+       *   纵向滑动  → 折算成 WM_MOUSEWHEEL，SOUI 拒绝才滚页面，与 wheel 同口径；
+       *   横向滑动  → 仍按拖拽注入，保住滑块/框选这类交互。
+       * 方向未定之前不注入 down，避免"先按下再撤销"给 SOUI 制造假点击。 */
+      var touchPending = null;
+      var touchRest = 0;          /* 不足一格的手势位移，攒够 TOUCH_NOTCH_PX 才注入 */
+      var TOUCH_SLOP = 8;         /* 超过这个位移才判定方向，之下仍算轻点 */
+      var TOUCH_NOTCH_PX = 40;    /* 一格滚轮对应多少像素滑动 */
+
+      /* 把一段纵向滑动交给 SOUI；SOUI 返回"没消费"才折算成页面滚动。符号与
+       * WM_MOUSEWHEEL 一致：手指下滑（dy>0）= 向前滚一格（zDelta>0），
+       * 页面同时向上滚，内容跟着手指走。 */
+      function scrollByTouch(dy, cx, cy) {
+        touchRest += dy;
+        var notches = touchRest < 0
+          ? -Math.floor(-touchRest / TOUCH_NOTCH_PX)
+          : Math.floor(touchRest / TOUCH_NOTCH_PX);
+        if (!notches) return;
+        touchRest -= notches * TOUCH_NOTCH_PX;
+        var p = canvasPoint({ clientX: cx, clientY: cy });
+        var ret = callFn(api.wheel, p[0], p[1], notches * WHEEL_DELTA, 0);
+        if (!ret) window.scrollBy(0, -notches * TOUCH_NOTCH_PX);
+      }
+
+      /* 轻点之后：只有真的把焦点落进编辑控件（有插入符）才激活 IME 代理。
+       * 同一次手势里 pump 一次，让 SOUI 完成命中测试与焦点转移再判断；有的控件
+       * 要等下一轮消息泵才 SetCaretPos（走的是 pending task），再抽一次兜底。
+       * 全部同步完成是硬要求：iOS 只允许在用户手势栈内拉起软键盘。 */
+      function syncImeAfterTap() {
+        callFn(api.pump);
+        if (!caretNow()) callFn(api.pump);
+        if (caretNow()) focusProxy();
+        else if (proxy && document.activeElement === proxy) proxy.blur();
+      }
+
       canvas.addEventListener('pointermove', function (e) {
         if (!ready || !fb) return;
+        if (touchPending && e.pointerId === touchPending.id) {
+          var tp = touchPending;
+          var totalDy = e.clientY - tp.y0;
+          var totalDx = e.clientX - tp.x0;
+          if (!tp.mode) {
+            if (Math.abs(totalDy) < TOUCH_SLOP && Math.abs(totalDx) < TOUCH_SLOP) return;
+            if (Math.abs(totalDy) >= Math.abs(totalDx)) {
+              tp.mode = 'scroll';
+              /* 从起点算起：判定前已经滑掉的这段位移也要计入，否则每次手势
+               * 都会少滚一格（手指划 200px 只滚 160px）。 */
+              tp.lastY = tp.y0;
+              touchRest = 0;
+            } else {
+              tp.mode = 'drag';
+              var p0 = canvasPoint({ clientX: tp.x0, clientY: tp.y0 });
+              callFn(api.mouse, WM_LBUTTONDOWN, p0[0], p0[1], MK_LBUTTON);
+            }
+          }
+          e.preventDefault();
+          if (tp.mode === 'scroll') {
+            var dy = e.clientY - tp.lastY;
+            tp.lastY = e.clientY;
+            scrollByTouch(dy, e.clientX, e.clientY);
+          } else {
+            var pd = canvasPoint(e);
+            callFn(api.mouse, WM_MOUSEMOVE, pd[0], pd[1], MK_LBUTTON);
+          }
+          return;
+        }
+        if (e.pointerType === 'touch' || e.pointerType === 'pen') return;
         var p = canvasPoint(e);
         callFn(api.mouse, WM_MOUSEMOVE, p[0], p[1], buttonMessages(e));
       });
 
-      var downMsg = { 0: WM_LBUTTONDOWN, 1: WM_MBUTTONDOWN, 2: WM_RBUTTONDOWN };
-      var upMsg = { 0: WM_LBUTTONUP, 1: WM_MBUTTONUP, 2: WM_RBUTTONUP };
-
       canvas.addEventListener('pointerdown', function (e) {
         if (!ready || !fb) return;
         e.preventDefault();
+        if (e.pointerType === 'touch' || e.pointerType === 'pen') {
+          /* 触摸：先让画面自己拿焦点（不会弹软键盘）；多指时放弃手势判定。
+           * 按下暂不注入，等 pointermove/pointerup 决定是轻点、滚动还是拖拽。 */
+          focusCanvas();
+          if (touchPending) return;
+          touchPending = {
+            id: e.pointerId,
+            x0: e.clientX, y0: e.clientY,
+            lastY: e.clientY,
+            mode: null
+          };
+          return;
+        }
+        /* 桌面端保持原样：IME 组合输入需要代理框持焦点。 */
         focusProxy();
         var p = canvasPoint(e);
         callFn(api.mouse, downMsg[e.button] || WM_LBUTTONDOWN, p[0], p[1], buttonMessages(e));
@@ -884,17 +985,45 @@
        * 按下态，richedit 弹起后仍会继续扩展选区。window 级同时兜住 pointercancel。 */
       global.addEventListener('pointerup', function (e) {
         if (!ready || !fb) return;
+        if (touchPending && e.pointerId === touchPending.id) {
+          var tp = touchPending;
+          touchPending = null;
+          if (!tp.mode) {
+            /* 轻点：pointerdown 时故意没注入，这里补一次完整点击。 */
+            var pt = canvasPoint(e);
+            callFn(api.mouse, WM_LBUTTONDOWN, pt[0], pt[1], MK_LBUTTON);
+            callFn(api.mouse, WM_LBUTTONUP, pt[0], pt[1], 0);
+            syncImeAfterTap();
+          } else if (tp.mode === 'drag') {
+            var pd = canvasPoint(e);
+            callFn(api.mouse, WM_LBUTTONUP, pd[0], pd[1], 0);
+          }
+          /* mode==='scroll'：整段手势已按滚轮消费，不再补鼠标消息。 */
+          return;
+        }
+        if (e.pointerType === 'touch' || e.pointerType === 'pen') return;
         var p = canvasPoint(e);
         callFn(api.mouse, upMsg[e.button] || WM_LBUTTONUP, p[0], p[1], buttonMessages(e));
       });
       global.addEventListener('pointercancel', function (e) {
         if (!ready || !fb) return;
+        if (touchPending && e.pointerId === touchPending.id) {
+          var tp = touchPending;
+          touchPending = null;
+          if (tp.mode === 'drag') {
+            var pd = canvasPoint(e);
+            callFn(api.mouse, WM_LBUTTONUP, pd[0], pd[1], 0);
+          }
+          return;
+        }
+        if (e.pointerType === 'touch' || e.pointerType === 'pen') return;
         var p = canvasPoint(e);
         callFn(api.mouse, WM_LBUTTONUP, p[0], p[1], 0);
       });
       // 页面失焦（切标签页/切窗口）时物理按键必然全部释放
       global.addEventListener('blur', function () {
         if (!ready || !fb) return;
+        touchPending = null;   /* 触摸手势跨失焦没收尾，别留着等下一次 pointerup */
         callFn(api.mouse, WM_LBUTTONUP, -1, -1, 0);
         callFn(api.mouse, WM_RBUTTONUP, -1, -1, 0);
         callFn(api.mouse, WM_MBUTTONUP, -1, -1, 0);

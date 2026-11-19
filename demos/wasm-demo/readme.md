@@ -29,7 +29,7 @@
 | `index.html` | 阶段 0 的 Emscripten `--shell-file`，即 JS 宿主：canvas、上屏 blit、输入注入、数据面板 |
 | `build.sh` | 调 `em++` 链接 `libswinx.a` 与 vendor 静态库，产出 `out/swinx-wasm-demo.{html,js,wasm}` |
 | `soui_main.cpp` | 阶段 2 演示程序：`SApplication` + `SHostWnd` 子类 + 事件映射表 + 数据控件填充（MVC / gridctrl / HelloChart / grouplist），以及「宿主接线」一节的 6 个导出 |
-| `soui-host.js` | **可复用的浏览器宿主**（本仓库两个 wasm 程序通用）：下载进度、上屏、鼠标/键盘/滚轮注入、输入法代理、剪贴板、WebAudio、崩溃上报。新程序引这一个 JS 即可，见下面「复用宿主」 |
+| `tools/wasm/soui-host.js` | **仓库级共用的浏览器宿主**（已不在本目录，原在 `demos/wasm-demo/`；本仓库全部 wasm 程序——本演示、fundholdings、cnchess——引用同一份）：下载进度、上屏、鼠标/键盘/滚轮注入、输入法代理、剪贴板、WebAudio、崩溃上报。新程序引这一个 JS 即可，见下面「复用宿主」；构建时由 `__cmake/wasm-host-js.cmake` 的 `soui_wasm_host_js()` 拷进各 app 的产物目录。目录定位、接入契约与改动注意事项见 `tools/wasm/README.md` |
 | `soui.html` | 阶段 2 的 `--shell-file`，现在只剩页面排版 + 一行 `SouiHost.start({...})`（宿主逻辑都在 `soui-host.js`） |
 | `build-soui.sh` | CMake 包装器：查 `em++`、确保构建目录是 `wasm-demo` 顶层工程、`cmake --build --target soui-wasm-demo`。编译与链接命令本身在 `demos/wasm-demo/CMakeLists.txt` |
 | `smoke.js` | node 无头烟测（wasm 门禁的执行体，默认构建 30 条断言、`-pthread` 构建 31 条）：加载产物、手动驱动 `SwinxDemoPump`、注入输入、跑 `ITaskLoop` 双后端自测、跑 `SwinxPickFileAsyncA` 的异步文件选择（假宿主钩子）；见下面「无头烟测」 |
@@ -38,7 +38,7 @@
 | `out/` | 默认（调试）构建的产物，即 `-O2 -g`（未纳入版本控制） |
 | `release/` | 上线档的产物（`-O2 -DNDEBUG` 或 `MinSizeRel`，见下面"上线前的编译参数"）；`.data`/`.html`/`.js`/`.wasm` 四个文件必须放在一起，`.data` 按当前工作目录找（未纳入版本控制） |
 
-## 复用宿主：soui-host.js（新程序只写 C++）
+## 复用宿主：tools/wasm/soui-host.js（新程序只写 C++）
 
 页面侧的东西全部收在 `soui-host.js` 里，一个 Emscripten `MODULARIZE` 产物只要在页面上写三行：
 

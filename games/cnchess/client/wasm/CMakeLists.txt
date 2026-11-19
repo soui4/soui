@@ -85,21 +85,13 @@ set(_soui_cnchess_preload
 set(_soui_cnchess_exports
     "_main,_CnchessStat,_CnchessPump,_CnchessMouse,_CnchessWheel,_CnchessKey,_CnchessText,_CnchessCaretPos,_CnchessPlayEffectSound,_CnchessClick,_CnchessChildRect,_CnchessChildText,_CnchessChildVisible,_CnchessChildCount,_CnchessSetText,_SwinxClipboardSetBrowserText,_malloc,_free,_SwinxFbBits,_SwinxFbWidth,_SwinxFbHeight,_SwinxFbStride,_SwinxFbLogicalWidth,_SwinxFbLogicalHeight,_SwinxFbRequests,_SwinxFbPresents")
 
-# 页面宿主：与 demos/wasm-demo/soui.html 共用同一份 soui-host.js（下载进度、上屏、
-# 键鼠/滚轮注入、IME 代理、剪贴板、WebAudio 音效、崩溃上报都在里面）。壳页
-# cnchess.html 只写自己的排版与启动参数，不再维护第二份宿主实现。
+# 页面宿主用仓库级共用的 tools/wasm/soui-host.js（下载进度、上屏、键鼠/滚轮注入、
+# IME 代理、剪贴板、WebAudio 音效、崩溃上报都在里面）。壳页 cnchess.html 只写自己的
+# 排版与启动参数，不在这里维护第二份宿主实现。
 # 产物目录里必须有它：页面用相对路径 <script src="soui-host.js">，缺了直接白屏。
-set(_soui_host_js_default "${SOUI4_DIR}/demos/wasm-demo/soui-host.js")
-set(SOUI_HOST_JS "${_soui_host_js_default}" CACHE FILEPATH
-    "cnchess wasm: shared soui-host.js, copied next to the artifacts")
-# CACHE 变量只写一次：搬迁（soui-wasm/ -> demos/wasm-demo/）之前配置过的构建目录里
-# 还留着旧路径，文件已经不在了。这里回落到新默认值，免得 cnchess 产物没有宿主 js。
-if(NOT EXISTS "${SOUI_HOST_JS}" AND EXISTS "${_soui_host_js_default}")
-    set(SOUI_HOST_JS "${_soui_host_js_default}" CACHE FILEPATH "cnchess wasm: shared soui-host.js" FORCE)
-endif()
-if(NOT EXISTS "${SOUI_HOST_JS}")
-    message(WARNING "SOUI_HOST_JS 不存在: ${SOUI_HOST_JS} —— 产物目录里不会有 soui-host.js，页面打不开")
-endif()
+# 定路径、加 LINK_DEPENDS、POST_BUILD 拷贝都由共享 helper 处理；它在旧构建目录里
+# 遇到搬迁前缓存的路径（soui-wasm/ 或 demos/wasm-demo/）会自动回落到新默认值。
+include("${SOUI4_DIR}/__cmake/wasm-host-js.cmake")
 
 # LoginDlg/PeaceReqDlg/PeaceAckDlg 的 DoModal 版本在 wasm 里没有入口（见文件头
 # 第 2 条），不参与编译也就不会把 SHostDialog 的第二条消息循环链进来。
@@ -191,19 +183,13 @@ target_link_options(cnchess-wasm PRIVATE
 file(GLOB_RECURSE _soui_cnchess_res
     "${CMAKE_CURRENT_SOURCE_DIR}/../uires/*"
     "${SOUI4_DIR}/soui-sys-resource/*")
+# 宿主 js 拷到产物目录（与 cnchess-wasm.html 同目录）。LINK_DEPENDS + POST_BUILD
+# copy_if_different 都在共享 helper 里：改 soui-host.js 会重链并重拷，换目标不重编时
+# 也能补上。
+soui_wasm_host_js(cnchess-wasm "${SOUI_WASM_CNCHESS_OUT}")
 set_property(TARGET cnchess-wasm APPEND PROPERTY LINK_DEPENDS
     ${_soui_cnchess_res}
-    "${CMAKE_CURRENT_SOURCE_DIR}/cnchess.html"
-    "${SOUI_HOST_JS}")
-
-# 宿主 js 拷到产物目录（与 cnchess-wasm.html 同目录）。同时进了上面的
-# LINK_DEPENDS，所以改 soui-host.js 会重链并重拷；这里再 copy_if_different，
-# 换目标不重编时也能补上。
-add_custom_command(TARGET cnchess-wasm POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${SOUI_HOST_JS}"
-        "${SOUI_WASM_CNCHESS_OUT}/soui-host.js"
-    COMMENT "Copying soui-host.js for cnchess-wasm")
+    "${CMAKE_CURRENT_SOURCE_DIR}/cnchess.html")
 
 message(STATUS "SOUI_WASM_CNCHESS: ${SWINX_FB_WIDTH}x${SWINX_FB_HEIGHT}, stack=${SOUI_CNCHESS_STACK}, "
                "taskloop=${SOUI_WASM_PTHREADS} (ON=worker / OFF=pump), "

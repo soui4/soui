@@ -136,6 +136,14 @@ endif()
 option(SOUI_ENABLE_ACC "Enable MSAA/IAccessible (provided by swinx)" OFF)
 endif(IS_OHOS)
 
+# 调试热键：宿主窗口按 F5 从布局资源重建窗口树（见 SHostWnd::ReloadLayout）。
+# 热键和 ReloadLayout 都实现在 SOUI 库内部，所以必须由库的构建开关打开——
+# 客户端工程自己 #define SOUI_ENABLE_RELOAD 不会改变已编译的库。
+option(SOUI_ENABLE_RELOAD "Enable the F5 host layout reload hot-key" OFF)
+if(SOUI_ENABLE_RELOAD)
+    add_definitions(-DSOUI_ENABLE_RELOAD=1)
+endif()
+
 # Lightweight self-implemented plain-text <edit> (replaces the RichEdit-backed SRichEdit).
 # Default OFF keeps the RichEdit-backed <edit>. When ON, SEdit becomes the self-contained
 # lightweight implementation (SEditLite.cpp) and SRichEdit.cpp compiles as an empty TU;

@@ -336,8 +336,7 @@ file(GLOB_RECURSE _soui_demo_res
     "${SOUI4_DIR}/soui-sys-resource/*")
 set(_soui_demo_link_deps
     ${_soui_demo_res}
-    "${CMAKE_CURRENT_SOURCE_DIR}/soui.html"
-    "${CMAKE_CURRENT_SOURCE_DIR}/soui-host.js")
+    "${CMAKE_CURRENT_SOURCE_DIR}/soui.html")
 # cairo 后端时字体也参与链接期打包，改字体要重链（否则拿到上一份 .data）。
 if(_soui_demo_font AND _soui_demo_gdi_backend STREQUAL "cairo")
     list(APPEND _soui_demo_link_deps "${_soui_demo_font_fwd}")
@@ -345,15 +344,12 @@ endif()
 set_property(TARGET soui-wasm-demo APPEND PROPERTY LINK_DEPENDS
     ${_soui_demo_link_deps})
 
-# 页面外壳的宿主逻辑在 soui-host.js 里（可被别的 wasm 程序复用，不限于本演示）；
-# emcc 只产出 .html/.js/.wasm/.data 四个文件，这一个得单独拷进产物目录。
-# 放进 LINK_DEPENDS 是为了"只改了 js 也触发一次重链"——重链顺带跑下面的 POST_BUILD，
-# 否则改完 js 刷新页面看到的还是上一份。
-add_custom_command(TARGET soui-wasm-demo POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${CMAKE_CURRENT_SOURCE_DIR}/soui-host.js"
-            "${SOUI_WASM_DEMO_OUT}/soui-host.js"
-    VERBATIM)
+# 页面外壳的宿主逻辑在 tools/wasm/soui-host.js 里 —— 那是仓库级的共用宿主，所有 wasm
+# 程序（本演示、fundholdings、cnchess）引用同一份，不在这里维护第二份实现。
+# emcc 只产出 .html/.js/.wasm/.data 四个文件，这一个得单独拷进产物目录：
+# 定 SOUI_HOST_JS、加 LINK_DEPENDS、POST_BUILD 拷贝都在 __cmake/wasm-host-js.cmake 里。
+include("${SOUI4_DIR}/__cmake/wasm-host-js.cmake")
+soui_wasm_host_js(soui-wasm-demo "${SOUI_WASM_DEMO_OUT}")
 
 message(STATUS "SOUI_WASM_DEMO: ${SWINX_FB_WIDTH}x${SWINX_FB_HEIGHT}, stack=${SOUI_DEMO_STACK}, "
                "gdi-backend=${_soui_demo_gdi_backend}, "

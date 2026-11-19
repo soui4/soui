@@ -616,6 +616,8 @@ void GalleryMainDialog::OnModal()
         return;
     }
     modal->FindChildByName(L"modal_confirm")->SetFocus();
+    // 会话持有窗口树的引用，弹窗在会话结束前一直存活；抛掉创建引用的最后一份。
+    modal->Release();
 }
 BOOL GalleryMainDialog::OnModalClose(IEvtArgs *event)
 {

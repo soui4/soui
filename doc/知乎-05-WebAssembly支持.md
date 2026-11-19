@@ -116,7 +116,7 @@ python3 -m http.server 8080 -d demos/wasm-demo/out
 | 完整设计与能力矩阵 | `swinx/doc/swinx-wasm-design.md`（§10） |
 | 两个渲染后端的性能口径 | `swinx/doc/swinx-wasm-canvas2d-性能优化与cairo对比.md` |
 | 平台层、消息与窗口 | `swinx/src/platform/wasm/` |
-| 输入法与键鼠注入 | `demos/wasm-demo/soui-host.js`、`swinx/src/platform/wasm/input.cpp` |
+| 输入法与键鼠注入 | `tools/wasm/soui-host.js`、`swinx/src/platform/wasm/input.cpp` |
 | 三个应用各自的入口 | `demos/wasm-demo/`、`games/cnchess/client/wasm/`、`demos/fundholdings/wasm/` |
 | 构建开关与导出表 | `__cmake/wasm-lib-config.cmake`、`swinx/wasm.cmake`、各 app 的 `CMakeLists.txt` |
 

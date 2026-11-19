@@ -65,12 +65,13 @@
 `LinkError`，所以产物目录按后端分开；`.data` 只装 `uires` 与 `soui-sys-resource` 两份预载资源
 （约 0.5 MB，字体不再打包，见下文"字体"一节）。
 
-## 页面宿主：复用 `demos/wasm-demo/soui-host.js`
+## 页面宿主：复用 `tools/wasm/soui-host.js`
 
 上屏、键鼠/滚轮注入、输入法代理、剪贴板双向桥、WebAudio 音效、崩溃上报、加载遮罩
-这一整套，全在 `demos/wasm-demo/soui-host.js` 里——和 SOUI 演示页是**同一份文件**，构建时由
-`CMakeLists.txt` 的 POST_BUILD 拷到产物目录（`SOUI_HOST_JS` 可覆盖路径），并进了
-`LINK_DEPENDS`，所以改宿主 js 会重链重拷。
+这一整套，全在仓库级共用的 `tools/wasm/soui-host.js` 里——和 SOUI 演示页、fundholdings
+是**同一份文件**，构建时由 `__cmake/wasm-host-js.cmake` 的 `soui_wasm_host_js()` 拷到产物
+目录（`SOUI_HOST_JS` 可覆盖路径），并进了 `LINK_DEPENDS`，所以改宿主 js 会重链重拷。
+目录定位、接入契约与改动注意事项见 `tools/wasm/README.md`。
 
 `cnchess.html` 里只剩下三行有信息量的东西：
 

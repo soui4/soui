@@ -47,6 +47,11 @@ void CMainDlg::OnBtnModalInput() {
     SModalRoot *pModal = (SModalRoot*)SApplication::getSingleton().CreateWindowByName(SModalRoot::GetClassName());
     pModal->InitFromResId("layout:model_view");
     ModalViewSessionID session_id = BeginModalViewSession(pModal);
+    if (session_id == 0)
+    { // 会话没建立：窗口还没进树，这里释放的就是唯一一份引用。
+        pModal->Release();
+        return;
+    }
     pModal->FindChildByName("btn_ok")->SubscribeEvent(EventCmd::EventID, [=](IEvtArgs *e){
         EndModalViewSession(session_id,IDOK);
         return TRUE;
@@ -62,6 +67,9 @@ void CMainDlg::OnBtnModalInput() {
         ShowToastAndroid(strToast.c_str());
         return TRUE;
     });
+    // 会话自己持有窗口树的引用，弹窗在会话结束前一直存活；这里释放
+    // CreateWindowByName 得到的那份创建引用，避免每弹一次窗漏一份。
+    pModal->Release();
 }
 
 void CMainDlg::OnBtnClick()

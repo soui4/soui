@@ -701,6 +701,11 @@ void CChessGame::OnBtnReqPeace()
     SEdit *pEdtDesc = pModal->FindChildByName2<SEdit>(L"edit_desc");
 
     ModalViewSessionID session_id = m_pMainDlg->BeginModalViewSession(pModal,m_pMainDlg->getModalRoot());
+    if (session_id == 0)
+    { // 会话没建立：窗口还没进树，这里释放的就是唯一一份引用。
+        pModal->Release();
+        return;
+    }
 
     pModal->FindChildByName(L"btn_ok")->SubscribeEvent(EventCmd::EventID, [=](IEvtArgs *e){
         MSG_PEACE msg;
@@ -717,6 +722,8 @@ void CChessGame::OnBtnReqPeace()
         m_pMainDlg->EndModalViewSession(session_id, IDCANCEL);
         return TRUE;
     });
+    // 会话持有窗口树的引用，弹窗在会话结束前一直存活；抛掉创建引用的最后一份。
+    pModal->Release();
 #else
     CPeaceReqDlg dlg;
     if(dlg.DoModal(m_pMainDlg->m_hWnd) == IDOK){
@@ -739,6 +746,11 @@ void CChessGame::OnBtnReqSurrender()
     pModal->FindChildByName(L"txt_message")->SetWindowText(_T("确定要认输吗？"));
 
     ModalViewSessionID session_id = m_pMainDlg->BeginModalViewSession(pModal,m_pMainDlg->getModalRoot());
+    if (session_id == 0)
+    { // 会话没建立：窗口还没进树，这里释放的就是唯一一份引用。
+        pModal->Release();
+        return;
+    }
 
     pModal->FindChildByName(L"btn_ok")->SubscribeEvent(EventCmd::EventID, [=](IEvtArgs *e){
         MSG_SURRENDER msg;
@@ -757,6 +769,8 @@ void CChessGame::OnBtnReqSurrender()
     pModal->SubscribeEvent(EventExitModalView::EventID, [=](IEvtArgs *e){
         return TRUE;
     });
+    // 会话持有窗口树的引用，弹窗在会话结束前一直存活；抛掉创建引用的最后一份。
+    pModal->Release();
 #else
     if(SMessageBox(m_pMainDlg->m_hWnd,_T("确定要认输吗？"),_T("提示"),MB_YESNO) == IDYES){
         MSG_SURRENDER msg;
@@ -1345,6 +1359,11 @@ void CChessGame::OnReqPeace(const void *pData, int nSize){
     pEdtDesc->SetWindowText(S_CA2T(pPeace->szMsg, CP_UTF8));
 
     ModalViewSessionID session_id = m_pMainDlg->BeginModalViewSession(pModal,m_pMainDlg->getModalRoot());
+    if (session_id == 0)
+    { // 会话没建立：窗口还没进树，这里释放的就是唯一一份引用。
+        pModal->Release();
+        return;
+    }
 
     pModal->FindChildByName(L"btn_ok")->SubscribeEvent(EventCmd::EventID, [=](IEvtArgs *e){
         m_pMainDlg->EndModalViewSession(session_id, IDOK);
@@ -1364,6 +1383,8 @@ void CChessGame::OnReqPeace(const void *pData, int nSize){
         wsSendMsg(MSG_ACK_PEACE, &msg, sizeof(msg));
         return TRUE;
     });
+    // 会话持有窗口树的引用，弹窗在会话结束前一直存活；抛掉创建引用的最后一份。
+    pModal->Release();
 #else
     CPeaceAckDlg ackDlg(pPeace->szMsg);
     MSG_PEACE msg;

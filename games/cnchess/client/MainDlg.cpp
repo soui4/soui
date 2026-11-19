@@ -31,7 +31,6 @@ CMainDlg::CMainDlg(SGameTheme* pTheme)
 , m_bThemeLoaded(false)
 , m_bGameInited(false)
 , m_bConnected(false)
-, m_pThemeProgressModal(NULL)
 , m_themeProgressSession(0)
 , m_bThemeBusy(false)
 , m_modalRoot(NULL)
@@ -176,6 +175,11 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
     }
 
     ModalViewSessionID session_id = BeginModalViewSession(pModal,m_modalRoot);
+    if (session_id == 0)
+    { // 会话没建立：窗口还没进树，这里释放的就是唯一一份引用。
+        pModal->Release();
+        return FALSE;
+    }
 
     // 登录按钮事件
     pModal->FindChildByName(L"btn_login")->SubscribeEvent(EventCmd::EventID, [=](IEvtArgs *e){
@@ -215,6 +219,8 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
         }
         return TRUE;
     });
+    // 会话持有窗口树的引用，弹窗在会话结束前一直存活；抛掉创建引用的最后一份。
+    pModal->Release();
     return TRUE;
 #else
     CLoginDlg dlgLogin;
@@ -533,7 +539,7 @@ void CMainDlg::ShowThemeProgress()
         pModal->Release();
         return;
     }
-    m_pThemeProgressModal = pModal;
+    m_pThemeProgressModal.Attach(pModal);
     m_themeProgressSession = session;
 }
 
@@ -542,6 +548,8 @@ void CMainDlg::HideThemeProgress()
     if (!m_pThemeProgressModal) return;
 
     EndModalViewSession(m_themeProgressSession, IDOK);
+    // 模态会话自己持有窗口树的引用，弹窗的销毁由会话负责；这里释放的是
+    // ShowThemeProgress 里 CreateWindowByName 得到的那一份（本类保存它做保活）。
     m_pThemeProgressModal = NULL;
     m_themeProgressSession = 0;
 }

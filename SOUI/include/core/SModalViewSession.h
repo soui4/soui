@@ -98,13 +98,22 @@ class SOUI_EXP SModalRoot : public SWindow {
     /**
      * @brief Initiates the modal view session exit process.
      *
-     * Starts the exit animation (if defined) and schedules cleanup.
-     * This method is called by SHostWnd::endModalViewSession.
+     * What happens depends on the animation state of the modal view:
+     *  - enter animation still playing: it is finished first, so the exit
+     *    animation does not have to start on top of it;
+     *  - exit animation already playing: a plain request is ignored (a repeated
+     *    ESC / backdrop click cannot schedule the cleanup twice), while
+     *    bNoAnimation drops that animation and finishes the session right now;
+     *  - no animation playing: the exit animation is started, or - when
+     *    bNoAnimation is set or the view defines no exit animation - the session
+     *    finishes synchronously.
      *
-     * @param pCb Optional callback invoked when exit animation completes.
+     * @param pCb Optional callback invoked when the session finishes.
      * @param exitCode The exit code to pass to subscribers of EventExitModalView.
+     * @param bNoAnimation TRUE to close the session now, without playing (or
+     *        waiting for) the exit animation.
      */
-    void EndModalViewSession(IModalViewExitCallback *pCb, int exitCode);
+    void EndModalViewSession(IModalViewExitCallback *pCb, int exitCode, BOOL bNoAnimation = FALSE);
 
   public:
     SOUI_ATTRS_BEGIN()
@@ -141,6 +150,15 @@ class SOUI_EXP SModalRoot : public SWindow {
      * @brief Called when the exit animation has finished.
      *
      * Invokes the exit callback (if set) and completes the session cleanup.
+     *
+     * Only the first call has an effect: the session is marked finished before
+     * the notification is fired, and a modal root that is already being destroyed
+     * (its parent tree is going away) ignores the call instead of removing itself
+     * from a tree that is mid-teardown.
+     *
+     * The notification can destroy this window (SHostWnd removes the modal root
+     * from the window tree and drops the session reference inside the callback),
+     * so this object keeps itself alive until the callback has returned.
      */
     void OnFinish();
 
@@ -150,6 +168,7 @@ class SOUI_EXP SModalRoot : public SWindow {
     BOOL m_bQuitOnEsc;                                  /**<  If TRUE, press escape dismisses modal view. */
     SAutoRefPtr<IModalViewExitCallback> m_exitCallback; /**<  Callback invoked when exit animation completes. */
     int m_exitCode;                                     /**<  Exit code to pass to EventExitModalView subscribers. */
+    BOOL m_bFinished;                                   /**<  TRUE once OnFinish() has run. */
     static ModalViewSessionID s_sessionIDCounter;       /**<  Global counter for generating unique session IDs. */
 };
 
@@ -169,10 +188,35 @@ class SOUI_EXP SModalView : public SWindow {
     friend class SHostWnd;
 
   public:
+    /** @brief Animation state of the visible modal view. */
+    enum AniState
+    {
+        AniState_None = 0, /**<  No animation is playing. */
+        AniState_Enter,    /**<  The enter animation is playing. */
+        AniState_Exit,     /**<  The exit animation is playing. */
+    };
+
+  public:
     SModalView();
     ~SModalView();
 
   public:
+    /**
+     * @brief Returns the animation currently playing on this view.
+     */
+    AniState GetAniState() const
+    {
+        return m_aniState;
+    }
+
+    /**
+     * @brief Returns TRUE if the view defines an exit animation.
+     */
+    BOOL HasExitAnimation() const
+    {
+        return m_aniExit != NULL;
+    }
+
     /**
      * @brief Requests the enter animation to be played.
      *
@@ -188,6 +232,19 @@ class SOUI_EXP SModalView : public SWindow {
      * the session cleanup.
      */
     void PlayExitAnimation();
+
+    /**
+     * @brief Drops a running animation, optionally completing the session.
+     *
+     * A running animation is cancelled synchronously, so this is the way to skip
+     * the remaining frames of an enter or an exit animation.
+     *
+     * @param bFinishSession TRUE to complete the session as well: the owning
+     *        modal root's OnFinish() runs here (directly when the animation never
+     *        started, through its stop notification otherwise), which may destroy
+     *        this window, so do not touch the view after the call.
+     */
+    void FinishAnimation(BOOL bFinishSession = FALSE);
 
   protected:
     SWND SwndFromPoint(CPoint &pt, BOOL bIncludeMsgTransparent) const override;
@@ -208,6 +265,7 @@ class SOUI_EXP SModalView : public SWindow {
   protected:
     SAutoRefPtr<IAnimation> m_aniEnter; /**<  Show/enter animation. */
     SAutoRefPtr<IAnimation> m_aniExit;  /**<  Hide/exit animation. */
+    AniState m_aniState;                /**<  Animation currently playing. */
 };
 
 SNSEND

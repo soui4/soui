@@ -114,7 +114,7 @@ private:
     bool m_bConnected;      // WebSocket是否已连接
 
     // 主题下载进度弹窗
-    SModalRoot* m_pThemeProgressModal;
+    SAutoRefPtr<SModalRoot> m_pThemeProgressModal;
     ModalViewSessionID m_themeProgressSession;
     // 主题资源(检查/下载/解压/应用)准备阶段标志: 期间进度弹窗保持显示,
     // 只有主题可用(OnThemeReady)或失败(OnThemeError)之后才关闭。

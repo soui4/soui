@@ -32,6 +32,7 @@ SModalRoot::SModalRoot()
     , m_bQuitOnClick(TRUE)
     , m_bQuitOnEsc(TRUE)
     , m_exitCode(-1)
+    , m_bFinished(FALSE)
 {
     GetEventSet()->addEvent(EVENTID(EventExitModalView));
     MemberFunctionSlot<SModalRoot, IEvtArgs> slot = Subscriber(&SModalRoot::OnEventCmd, this);
@@ -48,19 +49,32 @@ BOOL SModalRoot::OnEventCmd(IEvtArgs *e)
     {
         // If the modal view is clicked, quit the modal session.
         SRootWindow *pRoot = sobj_cast<SRootWindow>(GetRoot());
-        pRoot->GetHostWnd()->EndModalViewSession(m_sessionID, IDCANCEL);
+        if (pRoot && pRoot->GetHostWnd())
+            pRoot->GetHostWnd()->EndModalViewSession(m_sessionID, IDCANCEL);
     }
     return TRUE;
 }
 void SModalRoot::OnFinish()
 {
-    if (m_exitCallback)
-    {
-        AddRef();
-        FireExitCallback(m_exitCode);
-        m_exitCallback->OnModalViewExit(this);
-        Release();
-    }
+    // A modal root that is already being destroyed (the host is tearing the whole
+    // window tree down) must not try to remove itself from that tree: the parent's
+    // DestroyAllChildren() already owns the teardown, and calling RemoveChild()
+    // there would release this window a second time.
+    if (m_bFinished || m_isDestroying)
+        return;
+    m_bFinished = TRUE;
+
+    if (!m_exitCallback)
+        return; // nothing to report (session started without a host callback)
+
+    // The notification can destroy this modal root: SHostWnd removes it from the
+    // window tree and drops the session reference inside OnModalViewExit(), which
+    // is what finally releases the window.  Hold a reference of our own so `this`
+    // stays valid until the callback has returned; it is released at scope exit,
+    // and nothing touches `this` afterwards.
+    SAutoRefPtr<SModalRoot> pThis(this);
+    FireExitCallback(m_exitCode);
+    m_exitCallback->OnModalViewExit(this);
 }
 
 SModalView *SModalRoot::GetModalView() const
@@ -68,11 +82,46 @@ SModalView *SModalRoot::GetModalView() const
     return sobj_cast<SModalView>(GetWindow(GSW_FIRSTCHILD));
 }
 
-void SModalRoot::EndModalViewSession(IModalViewExitCallback *pCb, int exitCode)
+void SModalRoot::EndModalViewSession(IModalViewExitCallback *pCb, int exitCode, BOOL bNoAnimation)
 {
-    m_exitCallback = pCb;
+    if (m_bFinished)
+        return;
+
+    // The finish path can run synchronously (forced close / no exit animation) and
+    // the host drops the session reference inside the callback, which may free this
+    // window; keep an own reference so `this` stays valid for the whole call.
+    SAutoRefPtr<SModalRoot> pThis(this);
+
+    SModalView *pView = GetModalView();
+    if (pView)
+    {
+        if (pView->GetAniState() == SModalView::AniState_Enter)
+        { // Still opening: finish the enter animation first so the exit animation
+          // does not have to start on top of it.
+            pView->FinishAnimation();
+        }
+        else if (pView->GetAniState() == SModalView::AniState_Exit)
+        { // Already closing: an ordinary request (a repeated ESC / backdrop click)
+          // must not schedule the cleanup twice, while a forced one ends the run of
+          // the animation now instead of waiting for its remaining frames.
+            if (!bNoAnimation)
+                return;
+            if (pCb && !m_exitCallback)
+                m_exitCallback = pCb;
+            m_exitCode = exitCode;
+            pView->FinishAnimation(TRUE);
+            return;
+        }
+    }
+
     m_exitCode = exitCode;
-    GetModalView()->PlayExitAnimation();
+    if (pCb)
+        m_exitCallback = pCb;
+
+    if (!bNoAnimation && pView && pView->HasExitAnimation())
+        pView->PlayExitAnimation();
+    else // Forced close, or nothing to animate
+        OnFinish();
 }
 
 void SModalRoot::AssignSessionID()
@@ -94,7 +143,8 @@ void SModalRoot::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
     {
         // If the modal view is clicked, quit the modal session.
         SRootWindow *pRoot = sobj_cast<SRootWindow>(GetRoot());
-        pRoot->GetHostWnd()->EndModalViewSession(m_sessionID, IDCANCEL);
+        if (pRoot && pRoot->GetHostWnd())
+            pRoot->GetHostWnd()->EndModalViewSession(m_sessionID, IDCANCEL);
     }
     else
     {
@@ -106,6 +156,7 @@ void SModalRoot::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 ///////////////////////////////////////////////////////////////////////
 
 SModalView::SModalView()
+    : m_aniState(AniState_None)
 {
 }
 
@@ -118,19 +169,56 @@ void SModalView::PlayEnterAnimation()
     if (!m_aniEnter)
         return;
     m_aniEnter->SetID(Ani_win_enter);
+    // Set the state after StartAnimation(): it cancels an animation that is still
+    // running, and that cancel reports its end synchronously, which resets the state
+    // to None - assigning before the call would be overwritten by it.
     StartAnimation(m_aniEnter, TRUE);
+    m_aniState = AniState_Enter;
 }
 
 void SModalView::PlayExitAnimation()
 {
-    ClearAnimation(); // stop any running animation first
+    SModalRoot *pRoot = GetModalRoot();
+    if (!pRoot)
+        return;
+    if (m_aniState == AniState_Enter)
+        FinishAnimation(); // one animation at a time
     if (!m_aniExit)
     {
-        GetModalRoot()->OnFinish();
+        pRoot->OnFinish();
         return;
     }
     m_aniExit->SetID(Ani_win_exit);
-    StartAnimation(m_aniExit);
+    StartAnimation(m_aniExit); // same reason as above: assign after it
+    m_aniState = AniState_Exit;
+}
+
+void SModalView::FinishAnimation(BOOL bFinishSession)
+{
+    if (m_aniState == AniState_None)
+    {
+        if (bFinishSession)
+        { // Nothing to cancel, but the caller still wants the session to end.
+            SModalRoot *pRoot = GetModalRoot();
+            if (pRoot)
+                pRoot->OnFinish();
+        }
+        return;
+    }
+    m_aniState = AniState_None;
+    // ClearAnimation() cancels the running animation, and cancel() reports its end
+    // synchronously, which finishes (and may destroy) this view through
+    // SModalRoot::OnFinish().  Hold a reference of our own so the rest of
+    // ClearAnimation() works on a live object.
+    SAutoRefPtr<SModalView> pThis(this);
+    ClearAnimation();
+    if (bFinishSession)
+    { // cancel() only notifies while the animation has actually started; cover the
+      // case where it never got its first frame.
+        SModalRoot *pRoot = GetModalRoot();
+        if (pRoot)
+            pRoot->OnFinish();
+    }
 }
 
 SModalRoot *SModalView::GetModalRoot() const
@@ -141,9 +229,14 @@ SModalRoot *SModalView::GetModalRoot() const
 void SModalView::OnAnimationStop(IAnimation *pAni)
 {
     __baseCls::OnAnimationStop(pAni);
+    // The animation is over, whatever kind it was: the view must not keep claiming
+    // that it is still opening/closing (EndModalViewSession and the host rely on it).
+    m_aniState = AniState_None;
     if (pAni->GetID() == Ani_win_exit)
-    {
-        GetModalRoot()->OnFinish();
+    { // The session is complete once the exit animation has played out.
+        SModalRoot *pRoot = GetModalRoot();
+        if (pRoot)
+            pRoot->OnFinish();
     }
 }
 

@@ -33,6 +33,7 @@ typedef enum _SOUI_EVENTS
     EVT_EXIT,        /**<  Exit event */
     EVT_TIMER,       /**<  Timer event */
     EVT_GET_CARET,   /**<  Get cursor event */
+    EVT_RELOAD,      /**<  Host window rebuilt from its layout resource */
 
     /** Basic window events */
     EVT_SETFOCUS = 8100,  /**<  Set focus event */
@@ -387,6 +388,16 @@ class SOUI_EXP SEvtArgs : public TObjRefImpl<SObjectImpl<IEvtArgs>> {
 DEF_EVT(EventInit, EVT_INIT, on_init, { int fake; })
 
 DEF_EVT(EventExit, EVT_EXIT, on_exit, { int fake; })
+
+/**
+ * @brief Fired on the root window after SHostWnd::ReloadLayout() has rebuilt the
+ *        window tree from its layout resource.
+ *
+ * Every window of the tree (and the observers the app attached to them) is
+ * recreated by then, so a business window re-runs here whatever it normally does
+ * in its init handler.  Fired after EventInit of the new tree.
+ */
+DEF_EVT(EventReload, EVT_RELOAD, on_reload, { int fake; })
 
 DEF_EVT(EventTimer, EVT_TIMER, on_timer, {
     UINT uID;     /**<  Timer ID */
