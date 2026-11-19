@@ -75,7 +75,9 @@ jobs:
 
     - name: Install dependencies (Ubuntu)
       if: startsWith(matrix.dist, 'ubuntu')
-      run: sudo apt-get update && sudo apt install -y cmake  build-essential xvfb libxcb1-dev libxcb-render0-dev uuid-dev libasound2-dev libgl1-mesa-dev freeglut3-dev pkg-config mingw-w64 --fix-missing
+      # swinx_wke_script 的 SSA_FALLBACK 用例要求系统有覆盖 U+4E2D/U+6587 的字体；
+      # ubuntu-22.04-arm 镜像只预装 fonts-noto-color-emoji，必须显式补 CJK 字体。
+      run: sudo apt-get update && sudo apt install -y cmake  build-essential xvfb libxcb1-dev libxcb-render0-dev uuid-dev libasound2-dev libgl1-mesa-dev freeglut3-dev pkg-config mingw-w64 fonts-noto-cjk --fix-missing
 
     - name: Install dependencies (macOS)
       if: matrix.os == 'macOS'
