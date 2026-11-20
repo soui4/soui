@@ -7501,7 +7501,7 @@ namespace pugi
 
 	void SaveAsBin::_build_str_map(xml_node xmlNode,STRMAP &strMap) 
 	{
-		if(xmlNode.type()<node_document || xmlNode.type()>node_comment)
+     if(xmlNode.type()<node_document || xmlNode.type()>node_doctype)
 			return;
 		_AddStr2Map(strMap,xmlNode.name());
 		_AddStr2Map(strMap,xmlNode.value());
@@ -7550,7 +7550,7 @@ namespace pugi
 	{
 		//save node type
 		xml_node_type type = xmlNode.type();
-		if(type<node_document || type>node_comment)
+     if(type<node_document || type>node_doctype)
 			return;
 		if(type > node_document)
 		{//save string with the last end character
