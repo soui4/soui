@@ -9,7 +9,7 @@ void convertDir(LPCTSTR pszDir,bool toBin)
 {
 	WIN32_FIND_DATA wfd;
 	TCHAR szFilter[MAX_PATH];
-	_stprintf(szFilter,_T("%s\\*.*"),pszDir);
+	_stprintf(szFilter,_T("%s/*.*"),pszDir);
 	HANDLE hFind = FindFirstFile(szFilter,&wfd);
 	if(hFind)
 	{
@@ -17,7 +17,7 @@ void convertDir(LPCTSTR pszDir,bool toBin)
 		{
 			SOUI::SStringT strName(wfd.cFileName);
 			strName.MakeLower();
-			SOUI::SStringT strPath=SOUI::SStringT().Format(_T("%s\\%s"),pszDir,wfd.cFileName);
+			SOUI::SStringT strPath=SOUI::SStringT().Format(_T("%s/%s"),pszDir,wfd.cFileName);
 			if(wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 			{
 				if(strName != _T(".") && strName!=_T("..") )
