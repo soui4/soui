@@ -321,9 +321,11 @@ static uint8_t* convert_lum_to_rgba(const uint8_t *lum_data, unsigned width, uns
     }
     else
     {
-        /* 1, 2, 4-bit grayscale */
+        /* 1, 2, 4-bit grayscale: scanlines are padded to whole bytes */
+        unsigned row_stride = (width * bitdepth + 7) / 8;
         for (y = 0; y < height; y++)
         {
+            unsigned row_offset = y * row_stride;
             for (x = 0; x < width; x++)
             {
                 unsigned pixel_pos = y * width + x;
@@ -331,22 +333,22 @@ static uint8_t* convert_lum_to_rgba(const uint8_t *lum_data, unsigned width, uns
 
                 if (bitdepth == 4)
                 {
-                    unsigned byte_pos = pixel_pos / 2;
-                    unsigned bit_offset = (pixel_pos % 2) ? 0 : 4;
+                    unsigned byte_pos = row_offset + x / 2;
+                    unsigned bit_offset = (x % 2) ? 0 : 4;
                     lum = (lum_data[byte_pos] >> bit_offset) & 0x0F;
                     lum = (lum << 4) | lum; /* Scale 4-bit to 8-bit */
                 }
                 else if (bitdepth == 2)
                 {
-                    unsigned byte_pos = pixel_pos / 4;
-                    unsigned bit_offset = 6 - ((pixel_pos % 4) * 2);
+                    unsigned byte_pos = row_offset + x / 4;
+                    unsigned bit_offset = 6 - ((x % 4) * 2);
                     lum = (lum_data[byte_pos] >> bit_offset) & 0x03;
                     lum = (lum << 6) | (lum << 4) | (lum << 2) | lum; /* Scale 2-bit to 8-bit */
                 }
                 else if (bitdepth == 1)
                 {
-                    unsigned byte_pos = pixel_pos / 8;
-                    unsigned bit_offset = 7 - (pixel_pos % 8);
+                    unsigned byte_pos = row_offset + x / 8;
+                    unsigned bit_offset = 7 - (x % 8);
                     lum = (lum_data[byte_pos] >> bit_offset) & 0x01;
                     lum = lum ? 255 : 0; /* 1-bit: 0 or 255 */
                 }
@@ -370,6 +372,7 @@ static uint8_t* convert_palette_to_rgba(upng_t *upng, const uint8_t *indexed_dat
     unsigned long rgba_size = width * height * 4; /* RGBA = 4 bytes per pixel */
     uint8_t *rgba_data = NULL;
     unsigned x, y;
+    unsigned row_stride;
     upng_rgb *palette = upng->palette;
     uint8_t *alpha = upng->alpha;
     unsigned palette_entries = upng->palette_entries;
@@ -380,6 +383,11 @@ static uint8_t* convert_palette_to_rgba(upng_t *upng, const uint8_t *indexed_dat
         SET_ERROR(upng, UPNG_EMALFORMED);
         return NULL;
     }
+
+    /* Each unfiltered scanline is padded to a whole byte. For sub-byte pixel
+       depths the row start must be aligned to this stride; a flat y*width+x
+       index would drift once width*bpp is not a multiple of 8. */
+    row_stride = (width * bpp + 7) / 8;
 
     rgba_data = (uint8_t*)UPNG_MEM_ALLOC(rgba_size);
     if (rgba_data == NULL)
@@ -393,6 +401,7 @@ static uint8_t* convert_palette_to_rgba(upng_t *upng, const uint8_t *indexed_dat
     /* Convert indexed pixels to RGBA */
     for (y = 0; y < height; y++)
     {
+        unsigned row_offset = y * row_stride;
         for (x = 0; x < width; x++)
         {
             unsigned palette_index = 0;
@@ -402,24 +411,24 @@ static uint8_t* convert_palette_to_rgba(upng_t *upng, const uint8_t *indexed_dat
             /* Extract palette index based on bit depth */
             if (bitdepth == 8)
             {
-                palette_index = indexed_data[pixel_pos];
+                palette_index = indexed_data[row_offset + x];
             }
             else if (bitdepth == 4)
             {
-                unsigned byte_pos = pixel_pos / 2;
-                unsigned bit_offset = (pixel_pos % 2) ? 0 : 4;
+                unsigned byte_pos = row_offset + x / 2;
+                unsigned bit_offset = (x % 2) ? 0 : 4;
                 palette_index = (indexed_data[byte_pos] >> bit_offset) & 0x0F;
             }
             else if (bitdepth == 2)
             {
-                unsigned byte_pos = pixel_pos / 4;
-                unsigned bit_offset = 6 - ((pixel_pos % 4) * 2);
+                unsigned byte_pos = row_offset + x / 4;
+                unsigned bit_offset = 6 - ((x % 4) * 2);
                 palette_index = (indexed_data[byte_pos] >> bit_offset) & 0x03;
             }
             else if (bitdepth == 1)
             {
-                unsigned byte_pos = pixel_pos / 8;
-                unsigned bit_offset = 7 - (pixel_pos % 8);
+                unsigned byte_pos = row_offset + x / 8;
+                unsigned bit_offset = 7 - (x % 8);
                 palette_index = (indexed_data[byte_pos] >> bit_offset) & 0x01;
             }
 
