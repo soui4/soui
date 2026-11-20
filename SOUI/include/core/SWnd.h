@@ -47,6 +47,17 @@
 
 SNSBEGIN
 
+enum
+{
+    MENU_CUT = 1,
+    MENU_COPY,
+    MENU_PASTE,
+    MENU_DEL,
+    MENU_SELALL,
+    //---------------
+    MENU_USER = 20,
+};
+
 /** String constants for SWindow template support */
 namespace SWindow_style
 {

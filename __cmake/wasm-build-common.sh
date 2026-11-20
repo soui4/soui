@@ -31,6 +31,12 @@
 #   SOUI_WASM_USE_GDI       1: expose --gdi=.../--cairo/--canvas2d (default 1)
 #   SOUI_WASM_JOBS_DEFAULT  default -j for cmake --build (default 2)
 #
+# Editlite (library-level, all apps): -e/--editlite turns SOUI_EDIT_LITE=ON,
+# -E/--no-editlite (default) pins it OFF. SOUI_EDIT_LITE env is the initial
+# value. The flag is always passed to cmake so a cached value cannot leak
+# between runs. Default build/out dirs gain an _editlite suffix; an explicit
+# build dir is used as given.
+#
 # NOTE: keep this file ASCII-only; it is shared by every host.
 # =============================================================================
 set -euo pipefail
@@ -62,8 +68,9 @@ SOUI_WASM_USE_GDI="${SOUI_WASM_USE_GDI:-1}"
 SOUI_WASM_JOBS_DEFAULT="${SOUI_WASM_JOBS_DEFAULT:-2}"
 if ! declare -p SOUI_WASM_CONFIG >/dev/null 2>&1; then SOUI_WASM_CONFIG=(); fi
 
-# ---- args: [build_dir] [--release] [--gdi=v] [--pthreads|--no-pthreads] -----
+# ---- args: [build_dir] [--release] [--gdi=v] [--pthreads|--no-pthreads] [--editlite|--no-editlite] ----
 RELEASE=0
+EDITLITE="${SOUI_EDIT_LITE:-OFF}"
 GDI_BACKEND="${SWINX_WASM_GDI_BACKEND:-}"
 PTHREADS=OFF
 if [ "$SOUI_WASM_USE_PTHREADS" = 1 ]; then PTHREADS="${SOUI_WASM_PTHREADS:-ON}"; fi
@@ -73,6 +80,10 @@ while [ $# -gt 0 ]; do
         -h|--help)
             awk 'NR==1 {next} /^#/ || /^[[:space:]]*$/ {print; next} {exit}' \
                 "$SOUI_WASM_WRAPPER"
+            echo
+            echo "Shared flags (wasm-build-common.sh):"
+            echo "  -e, --editlite      SOUI_EDIT_LITE=ON; default out/build dirs + _editlite"
+            echo "  -E, --no-editlite   SOUI_EDIT_LITE=OFF (default); unpins a cached ON"
             exit 0 ;;
         -r|--release) RELEASE=1 ;;
         --gdi=*)
@@ -92,6 +103,8 @@ while [ $# -gt 0 ]; do
         -P|--no-pthreads)
             [ "$SOUI_WASM_USE_PTHREADS" = 1 ] || die "pthreads tier is not supported by this app"
             PTHREADS=OFF ;;
+        -e|--editlite)    EDITLITE=ON ;;
+        -E|--no-editlite) EDITLITE=OFF ;;
         -*) die "unknown option: $1" ;;
         *)  POSITIONAL+=("$1") ;;
     esac
@@ -119,6 +132,14 @@ fi
 PT_SUFFIX=""
 if [ "$SOUI_WASM_USE_PTHREADS" = 1 ] && [ "$PTHREADS" = ON ]; then PT_SUFFIX="_pt"; fi
 
+case "$EDITLITE" in
+    ON|on|1|TRUE|true) EDITLITE=ON ;;
+    OFF|off|0|FALSE|false) EDITLITE=OFF ;;
+    *) echo "WARN: SOUI_EDIT_LITE='$EDITLITE', using OFF" >&2; EDITLITE=OFF ;;
+esac
+EDITLITE_SUFFIX=""
+if [ "$EDITLITE" = ON ]; then EDITLITE_SUFFIX="_editlite"; fi
+
 # ---- tier: build type, default build dir, output pattern --------------------
 if [ "$RELEASE" = 1 ]; then
     BUILD_TYPE="$SOUI_WASM_SHIP_TYPE"
@@ -136,6 +157,9 @@ if [ -n "$BUILD_ENV" ]; then
     if [ -n "$_env_default" ]; then DEFAULT_BUILD="$_env_default"; fi
 fi
 BUILD="${POSITIONAL[0]:-$DEFAULT_BUILD}"
+# An explicit build dir is used verbatim; only the default gets a suffix, so
+# a normal build tree is never silently switched to (or from) editlite.
+if [ ${#POSITIONAL[@]} -eq 0 ]; then BUILD="${BUILD}${EDITLITE_SUFFIX}"; fi
 
 OUT_DIR="${OUT_PATTERN//@SRC@/$SOUI_WASM_SRC}"
 OUT_DIR="${OUT_DIR//@PT@/$PT_SUFFIX}"
@@ -144,6 +168,7 @@ if [ -n "$SOUI_WASM_OUT_VAR" ]; then
     eval "_out_env=\${${SOUI_WASM_OUT_VAR}:-}"
     if [ -n "$_out_env" ]; then OUT_DIR="$_out_env"; fi
 fi
+OUT_DIR="${OUT_DIR}${EDITLITE_SUFFIX}"
 
 # ---- tool / tree checks -----------------------------------------------------
 command -v em++ >/dev/null 2>&1 || die "em++ not found; source <emsdk>/emsdk_env.sh first"
@@ -167,6 +192,9 @@ else
     # build tree configured for another app keeps -pthread in its compile flags.
     RECONFIG+=("-DSOUI_WASM_PTHREADS=OFF")
 fi
+# Pin editlite on every run: a cached ON must not leak into a normal build
+# and a cached OFF must not silently defeat -e.
+RECONFIG+=("-DSOUI_EDIT_LITE=$EDITLITE")
 if [ ${#GDI_ARGS[@]} -gt 0 ]; then RECONFIG+=("${GDI_ARGS[@]}"); fi
 if [ ${#SOUI_WASM_CONFIG[@]} -gt 0 ]; then RECONFIG+=("${SOUI_WASM_CONFIG[@]}"); fi
 

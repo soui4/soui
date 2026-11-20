@@ -1,4 +1,4 @@
-#include "MainDlg.h"
+﻿#include "MainDlg.h"
 #include "GalleryAdapters.h"
 #include "GalleryCatalog.h"
 #include "GalleryNative.h"

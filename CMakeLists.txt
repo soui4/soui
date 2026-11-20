@@ -140,7 +140,7 @@ endif(IS_OHOS)
 # 热键和 ReloadLayout 都实现在 SOUI 库内部，所以必须由库的构建开关打开——
 # 客户端工程自己 #define SOUI_ENABLE_RELOAD 不会改变已编译的库。
 option(SOUI_ENABLE_RELOAD "Enable the F5 host layout reload hot-key" OFF)
-if(SOUI_ENABLE_RELOAD)
+if(SOUI_ENABLE_RELOAD AND NOT SOUI_WASM_MINIMAL)
     add_definitions(-DSOUI_ENABLE_RELOAD=1)
 endif()
 
@@ -153,7 +153,9 @@ endif()
 option(SOUI_EDIT_LITE "Use lightweight self-implemented SEdit for <edit> instead of RichEdit-backed SRichEdit" OFF)
 if(SOUI_EDIT_LITE)
     set(SOUI_BUILD_RICHEDIT OFF CACHE BOOL "richedit disabled when using lite edit" FORCE)
-    add_definitions(-DSOUI_EDIT_LITE)
+    if(NOT SOUI_WASM_MINIMAL)
+        add_definitions(-DSOUI_EDIT_LITE)
+    endif()
 endif()
 
 

@@ -11,17 +11,6 @@
 
 SNSBEGIN
 
-enum
-{
-    MENU_CUT = 1,
-    MENU_COPY,
-    MENU_PASTE,
-    MENU_DEL,
-    MENU_SELALL,
-    //---------------
-    MENU_USER = 20,
-};
-
 #ifndef SOUI_EDIT_LITE
 
 /**

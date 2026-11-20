@@ -3,7 +3,6 @@
 #include "SGridCtrl-i.h"
 
 #include <control/SEdit.h>
-#include <control/SRichEdit.h>
 #include <control/SComboBox.h>
 #include <control/SCmnCtrl.h>
 #include <control/SDateTimePicker.h>

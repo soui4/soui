@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "SIPAddressCtrl.h"
+#include <imm.h>
 #define SEP_EDIT 2
 
 SNSBEGIN

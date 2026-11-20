@@ -31,10 +31,15 @@ set(SOUI_BUILD_TOOLS OFF CACHE BOOL "Build soui tools")
 set(SOUI_BUILD_HTTPCLIENT OFF CACHE BOOL "Build HTTP client component")
 set(SOUI_BUILD_WS OFF CACHE BOOL "Build Websocket module")
 
-# 页面上真正能打字的 <edit> 需要 richedit：SOUI 的 SRichEdit 有两条路，桌面构建
-# 默认走 LoadLibrary 加载系统 riched20/msftedit，wasm 没有 dlopen，只能走
-# INIT_RICHEDIT 的静态链接版本（SOUI/CMakeLists.txt 里由本开关决定）。
-set(SOUI_BUILD_RICHEDIT ON CACHE BOOL "using richedit from source code")
+if(SOUI_EDIT_LITE)
+    set(SOUI_BUILD_RICHEDIT OFF CACHE BOOL "richedit disabled when using lite edit" FORCE)
+    add_compile_definitions(SOUI_EDIT_LITE)
+else()
+    set(SOUI_BUILD_RICHEDIT ON CACHE BOOL "using richedit from source code")
+endif()
+if(SOUI_ENABLE_RELOAD)
+    add_compile_definitions(SOUI_ENABLE_RELOAD=1)
+endif()
 
 # SVG 在 wasm 下也开：Lua 游戏页（消消乐/俄罗斯方块/坦克大战）的皮肤全是
 # src="svg:..."（多帧雪碧图 + 九宫药丸底），关掉之后这些 skin 拿不到 ISvgObj，

@@ -30,6 +30,12 @@ rem                           append @PT@ to the output dir (default 0)
 rem   SOUI_WASM_USE_GDI       1: expose --gdi=.../--cairo/--canvas2d (default 1)
 rem   SOUI_WASM_JOBS_DEFAULT  default -j for cmake --build (default 2)
 rem
+rem EDITLITE (library-level, all apps): --editlite / -e turns SOUI_EDIT_LITE=ON,
+rem --no-editlite / -E (default) pins it OFF. The SOUI_EDIT_LITE env var is the
+rem initial value. The flag is always passed to cmake so a cached value cannot
+rem leak between runs. Default build/out dirs gain an _editlite suffix; an
+rem explicit build dir is used as given.
+rem
 rem WINDOWS QUOTING: -S / -B values must NEVER end with a backslash. emcmake is
 rem a Python script; cmd passes the raw command line to it and the MSVCRT argv
 rem parser reads \ followed by " as a literal quote, swallowing every following
@@ -75,7 +81,7 @@ rem fail with "source does not match the source used to generate cache".
 if not defined SOUI_WASM_BUILD_DIR set "SOUI_WASM_BUILD_DIR=!SOUI_WASM_SRC!\build"
 if not defined SOUI_WASM_SHIP_BUILD_DIR set "SOUI_WASM_SHIP_BUILD_DIR=!SOUI_WASM_SRC!\build-release"
 
-rem ---- args: [build_dir] [--release] [--gdi=v] [--pthreads|--no-pthreads] ---
+rem ---- args: [build_dir] [--release] [--gdi=v] [--pthreads|--no-pthreads] [--editlite|--no-editlite] ----
 set "BUILD="
 set "SOUI_WASM_BUILD_ARG="
 set "SECOND_DIR="
@@ -84,6 +90,8 @@ set "NEXT_GDI=0"
 set "GDI_FLAG=0"
 set "PTHREAD_FLAG=0"
 set "GDI_BACKEND=%SWINX_WASM_GDI_BACKEND%"
+set "EDITLITE=OFF"
+if defined SOUI_EDIT_LITE set "EDITLITE=%SOUI_EDIT_LITE%"
 set "PTHREADS=OFF"
 if "%SOUI_WASM_USE_PTHREADS%"=="1" set "PTHREADS=%SOUI_WASM_PTHREADS%"
 if "%SOUI_WASM_USE_PTHREADS%"=="1" if not defined PTHREADS set "PTHREADS=ON"
@@ -106,12 +114,27 @@ if "%~1"=="-p" ( set "PTHREADS=ON" & set "PTHREAD_FLAG=1" & shift & goto :parse_
 if "%~1"=="-P" ( set "PTHREADS=OFF" & set "PTHREAD_FLAG=1" & shift & goto :parse_args )
 if /i "%~1"=="--pthreads" ( set "PTHREADS=ON" & set "PTHREAD_FLAG=1" & shift & goto :parse_args )
 if /i "%~1"=="--no-pthreads" ( set "PTHREADS=OFF" & set "PTHREAD_FLAG=1" & shift & goto :parse_args )
+if "%~1"=="-e" ( set "EDITLITE=ON" & shift & goto :parse_args )
+if "%~1"=="-E" ( set "EDITLITE=OFF" & shift & goto :parse_args )
+if /i "%~1"=="--editlite" ( set "EDITLITE=ON" & shift & goto :parse_args )
+if /i "%~1"=="--no-editlite" ( set "EDITLITE=OFF" & shift & goto :parse_args )
 if "!_A:~0,1!"=="-" goto :bad_flag
 if not defined SOUI_WASM_BUILD_ARG ( set "SOUI_WASM_BUILD_ARG=%~1" & shift & goto :parse_args )
 set "SECOND_DIR=%~1"
 shift
 goto :parse_args
 :args_done
+
+set "EDITLITE_SUFFIX="
+if /i "%EDITLITE%"=="ON" goto :editlite_on
+if "%EDITLITE%"=="1" goto :editlite_on
+if /i "%EDITLITE%"=="TRUE" goto :editlite_on
+set "EDITLITE=OFF"
+goto :editlite_done
+:editlite_on
+set "EDITLITE=ON"
+set "EDITLITE_SUFFIX=_editlite"
+:editlite_done
 
 if "%NEXT_GDI%"=="1" ( echo ERROR: --gdi needs a value: canvas2d or cairo 1>&2 & exit /b 2 )
 if defined SECOND_DIR goto :two_dirs
@@ -150,8 +173,12 @@ if "%TIER%"=="1" (
 set "_ENV_VALUE="
 if defined BUILD_ENV call :get_env_value "!BUILD_ENV!"
 if defined _ENV_VALUE set "DEFAULT_BUILD=!_ENV_VALUE!"
-if not "!SOUI_WASM_BUILD_ARG!"=="" set "BUILD=!SOUI_WASM_BUILD_ARG!"
-if not defined BUILD set "BUILD=!DEFAULT_BUILD!"
+rem An explicit build dir is used as given; only the default gets a suffix.
+if not "!SOUI_WASM_BUILD_ARG!"=="" (
+    set "BUILD=!SOUI_WASM_BUILD_ARG!"
+) else (
+    set "BUILD=!DEFAULT_BUILD!!EDITLITE_SUFFIX!"
+)
 rem Normalize the build dir too: a user-supplied "D:\build\" would break -B.
 for %%I in ("!BUILD!\.") do set "BUILD=%%~fI"
 
@@ -166,6 +193,7 @@ set "OUT_DIR=!OUT_DIR:@GDI@=%_GDI_REP%!"
 set "_ENV_VALUE="
 if defined SOUI_WASM_OUT_VAR call :get_env_value "!SOUI_WASM_OUT_VAR!"
 if defined _ENV_VALUE set "OUT_DIR=!_ENV_VALUE!"
+set "OUT_DIR=!OUT_DIR!!EDITLITE_SUFFIX!"
 
 rem ---- reconfigure args: generic env passthrough + app-specific config -------
 set "RECONFIG="
@@ -179,6 +207,9 @@ if "%SOUI_WASM_USE_PTHREADS%"=="1" (
 ) else (
     set "RECONFIG=!RECONFIG! -DSOUI_WASM_PTHREADS=OFF"
 )
+rem Always pin SOUI_EDIT_LITE: a cached ON must not leak into a normal build,
+rem and a cached OFF must not silently defeat -e.
+set "RECONFIG=!RECONFIG! -DSOUI_EDIT_LITE=!EDITLITE!"
 if defined GDI_BACKEND set "RECONFIG=!RECONFIG! -DSWINX_WASM_GDI_BACKEND=%GDI_BACKEND%"
 set "RECONFIG=!RECONFIG! %SOUI_WASM_CONFIG%"
 
@@ -276,6 +307,8 @@ echo   -r, --release          ship tier (Release, its own build/out dir)
 echo   --gdi=VALUE            swinx wasm GDI backend, VALUE is canvas2d or cairo
 echo   -p, --pthreads         worker backend (env SOUI_WASM_PTHREADS)
 echo   -P, --no-pthreads      pump backend
+echo   -e, --editlite         SOUI_EDIT_LITE=ON; default out/build dirs + _editlite
+echo   -E, --no-editlite      SOUI_EDIT_LITE=OFF (default); unpins a cached ON
 echo   -h, --help             show the app wrapper header (see build-soui.sh)
 echo.
 echo App-specific cmake configure args live in SOUI_WASM_CONFIG in the wrapper.
