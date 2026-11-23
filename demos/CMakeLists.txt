@@ -35,3 +35,7 @@ if(NOT CMAKE_SYSTEM_NAME MATCHES Darwin)
 #darwin不支持ipc
 add_subdirectory(ipcdemo)
 endif()
+if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+# X11 / Wayland 后端性能对比：同一份源码按后端编出两个可执行文件
+add_subdirectory(perf_demo)
+endif()

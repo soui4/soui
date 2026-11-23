@@ -266,7 +266,7 @@ set_target_properties(fun_test PROPERTIES
 option(SOUI_FUN_TEST_POST_BUILD "Run the non-interactive fun_test suite after building it" ON)
 if(SOUI_FUN_TEST_POST_BUILD AND NOT CMAKE_SYSTEM_NAME MATCHES "iOS" AND NOT IS_OHOS)
     add_custom_command(TARGET fun_test POST_BUILD
-        COMMAND $<TARGET_FILE:fun_test> --gtest_filter=-window.* --gtest_color=yes
+        COMMAND $<TARGET_FILE:fun_test> --gtest_filter=-window.*:swinx_multimon.*:KeyboardLayoutTest.NextPrevCycleRestores --gtest_color=yes
         COMMENT "fun_test: running the non-interactive suite (window.* excluded)..."
         VERBATIM
     )

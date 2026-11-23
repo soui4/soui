@@ -57,6 +57,9 @@ SNSBEGIN
 #ifndef ENM_CHANGE
 #define ENM_CHANGE 0x00000001
 #endif
+#ifndef EM_REDO
+#define EM_REDO 0x00C8 // Win8+; older SDKs (and swinx) do not declare it
+#endif
 
 /**
  * @class SEdit
@@ -71,14 +74,21 @@ SNSBEGIN
  *  constrained FreeRTOS builds.
  *
  *  Rich-text-only features (RTF load/save, rich text flag, char/paragraph
- *  formatting, vertical text, IME composition underline, drag & drop) are
- *  intentionally unsupported and degrade to no-ops. Clipboard is an in-process
- *  static buffer (no OS clipboard on bare metal).
+ *  formatting, vertical text, IME composition underline) are intentionally
+ *  unsupported and degrade to no-ops. Clipboard is an in-process static buffer
+ *  (no OS clipboard on bare metal). Dragging a selection uses the same OLE
+ *  mechanism as the RichEdit-backed build: an IDropSource/IDataObject pair is
+ *  handed to DoDragDrop and the control registers an IDropTarget by default
+ *  (the XML "enableDragdrop" attribute can turn it off). On hosts without a
+ *  window (headless tests, bare-metal runtimes) a small in-process fallback
+ *  keeps a drop inside the same control or on another lightweight <edit> of
+ *  the same process.
  */
 class SOUI_EXP SEdit
     : public IEdit
     , public TPanelProxy<IRichEdit> {
     friend class SApplication;
+    friend class SEditDropTarget;
 
   public:
     DEF_SOBJECT(SPanel, L"edit")
@@ -150,6 +160,10 @@ class SOUI_EXP SEdit
     LRESULT OnSetSel(UINT uMsg, WPARAM wParam, LPARAM lParam);
     LRESULT OnReplaceSel(UINT uMsg, WPARAM wParam, LPARAM lParam);
     LRESULT OnSetEventMask(UINT uMsg, WPARAM wParam, LPARAM lParam);
+    LRESULT OnUndo(UINT uMsg, WPARAM wParam, LPARAM lParam);
+    LRESULT OnCanUndo(UINT uMsg, WPARAM wParam, LPARAM lParam);
+    LRESULT OnRedo(UINT uMsg, WPARAM wParam, LPARAM lParam);
+    LRESULT OnEmptyUndoBuffer(UINT uMsg, WPARAM wParam, LPARAM lParam);
     void OnSetFont(IFontS *font, BOOL bRedraw);
     void OnEnable(BOOL bEnable, UINT nStatus);
 
@@ -160,6 +174,18 @@ class SOUI_EXP SEdit
     virtual void OnScaleChanged(int nScale) OVERRIDE;
     virtual void OnRebuildFont() OVERRIDE;
     virtual HRESULT OnLanguageChanged() OVERRIDE;
+    /**
+     * @brief Refuse an outer scroll container taking the mouse capture while a
+     *        selection is being dragged, otherwise a drop released over another
+     *        edit would never reach this control.
+     */
+    virtual BOOL CancelCaptureMode(int reason) OVERRIDE;
+    virtual void OnCaptureChanged(BOOL bCaptured) OVERRIDE;
+    /**
+     * @brief Show a drag cursor while a selection is being dragged, the visual
+     *        feedback DoDragDrop provides through the OLE default cursors.
+     */
+    virtual BOOL OnSetCursor(const CPoint &pt) OVERRIDE;
 
   public:
     // ----- cue text (hint text), kept in the control itself for the lite build -----
@@ -247,6 +273,10 @@ class SOUI_EXP SEdit
         MESSAGE_HANDLER_EX(EM_SETSEL, OnSetSel)
         MESSAGE_HANDLER_EX(EM_REPLACESEL, OnReplaceSel)
         MESSAGE_HANDLER_EX(EM_SETEVENTMASK, OnSetEventMask)
+        MESSAGE_HANDLER_EX(EM_UNDO, OnUndo)
+        MESSAGE_HANDLER_EX(EM_CANUNDO, OnCanUndo)
+        MESSAGE_HANDLER_EX(EM_REDO, OnRedo)
+        MESSAGE_HANDLER_EX(EM_EMPTYUNDOBUFFER, OnEmptyUndoBuffer)
         MSG_WM_SETFONT_EX(OnSetFont)
     SOUI_MSG_MAP_END()
 
@@ -335,13 +365,26 @@ class SOUI_EXP SEdit
     SArray<int> m_arrLineStart; /**< visual line start char indices */
     SArray<int> m_arrLineEnd;   /**< visual line end (exclusive, excludes '\n') */
 
-    // ----- drag select -----
+    // ----- drag select / selection drag & drop -----
     BOOL m_bDragSel;
+    BOOL m_bSelDragPending; /**< pressed inside the selection, drag not started yet */
+    BOOL m_bSelDragActive;  /**< mouse passed the drag threshold, drop pending */
+    CPoint m_ptSelDragDown; /**< press point of a pending selection drag */
 
-    // ----- simple undo -----
-    SStringT m_strUndoText;
-    int m_nUndoCaret;
-    BOOL m_bUndoValid;
+    // ----- undo / redo -----
+    /** @brief One reversible edit: the whole text plus the selection at the time. */
+    struct SEditUndoState
+    {
+        SStringT strText;
+        int nCaret;
+        int nAnchor;
+    };
+    enum
+    {
+        UNDO_LIMIT = 100 /**< max undo levels; the oldest one is dropped first */
+    };
+    SArray<SEditUndoState> m_arrUndo; /**< states before each edit (oldest first) */
+    SArray<SEditUndoState> m_arrRedo; /**< states undone, restored by redo */
 
   protected:
     void RecalcLayout(IRenderTarget *pRT);
@@ -357,12 +400,30 @@ class SOUI_EXP SEdit
     int GetLineLeft(IRenderTarget *pRT, int nLine, int nInnerW);
     void FireTextChanged();
     void DeleteSelection();
-    void InsertText(LPCTSTR pszText);
+    void InsertText(LPCTSTR pszText, BOOL bCanUndo = TRUE);
     void CopySel();
     void CutSel();
     void PasteSel();
     void SelectAll();
+    /** @brief Push the current text/selection as one undo step (clears redo). */
     void PushUndo();
+    /** @brief Restore the previous undo step, moving the current state to redo. */
+    BOOL Undo();
+    /** @brief Re-apply the last undone step. */
+    BOOL Redo();
+    /** @brief Restore text/selection/scroll from an undo snapshot. */
+    void ApplyUndoState(const SEditUndoState &state);
+    void DropSelDrag(CPoint pt, BOOL bCopy);
+    /** @brief Find the lightweight <edit> under a host-coordinate point, if any. */
+    SEdit *HitTestEditAt(CPoint pt) const;
+
+    // ----- OLE drag & drop (same mechanism as the RichEdit-backed build) -----
+    /** @brief Register/unregister the OLE drop target of this control. */
+    void OnEnableDragDrop(BOOL bEnable);
+    /** @brief Hand the current selection to DoDragDrop (needs a host window). */
+    void StartOleDrag();
+    /** @brief Insert text dropped by OLE at a client point. */
+    BOOL DropTextAt(const SStringW &strText, CPoint pt, BOOL bCopy, BOOL bSelf);
 
     COLORREF GetTextColor() const;
 };

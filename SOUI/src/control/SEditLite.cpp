@@ -1,6 +1,8 @@
 ﻿#include <souistd.h>
 #include <control/SEdit.h>
 #include <core/SSkinObjBase.h>
+#include <core/SWindowMgr.h>
+#include <helper/SUnkImpl.h>
 
 #if defined(SOUI_EDIT_LITE)
 
@@ -8,6 +10,457 @@ SNSBEGIN
 
 // In-process clipboard buffer (no OS clipboard on bare-metal targets).
 static SStringT g_EditClipboard;
+
+// The drag source of the OLE drag currently running (NULL when idle). OLE drag
+// is modal, so at most one edit per UI thread can be the source; the drop
+// target uses it to tell a self-drop from a cross-control drop.
+static SEdit *s_pDragSource = NULL;
+// Set by the drop target when a self-drop already moved the text, so the source
+// does not delete the block a second time after DoDragDrop returns.
+static BOOL s_bSelfDropDone = FALSE;
+
+static void ReleaseMedium(STGMEDIUM &medium)
+{
+    if (medium.pUnkForRelease)
+        medium.pUnkForRelease->Release();
+    else if (medium.hGlobal)
+        GlobalFree(medium.hGlobal);
+    medium.hGlobal = NULL;
+    medium.pUnkForRelease = NULL;
+}
+
+/** @brief Check whether an IDataObject carries plain text. */
+static BOOL QueryTextFormat(IDataObject *pDataObj, FORMATETC *pFmt)
+{
+    if (!pDataObj)
+        return FALSE;
+    pFmt->ptd = NULL;
+    pFmt->dwAspect = DVASPECT_CONTENT;
+    pFmt->lindex = -1;
+    pFmt->tymed = TYMED_HGLOBAL;
+    pFmt->cfFormat = CF_UNICODETEXT;
+    if (pDataObj->QueryGetData(pFmt) == S_OK)
+        return TRUE;
+    pFmt->cfFormat = CF_TEXT;
+    return pDataObj->QueryGetData(pFmt) == S_OK;
+}
+
+/** @brief Read plain text (Unicode preferred, ANSI fallback) from an IDataObject. */
+static BOOL GetTextFromDataObject(IDataObject *pDataObj, SStringW &strText)
+{
+    FORMATETC fmt;
+    if (!QueryTextFormat(pDataObj, &fmt))
+        return FALSE;
+
+    STGMEDIUM medium;
+    if (FAILED(pDataObj->GetData(&fmt, &medium)))
+        return FALSE;
+
+    if (fmt.cfFormat == CF_UNICODETEXT)
+    {
+        LPCWSTR psz = (LPCWSTR)GlobalLock(medium.hGlobal);
+        if (psz)
+        {
+            strText = psz;
+            GlobalUnlock(medium.hGlobal);
+        }
+    }
+    else
+    {
+        LPCSTR psz = (LPCSTR)GlobalLock(medium.hGlobal);
+        if (psz)
+        {
+            strText = S_CA2W(psz);
+            GlobalUnlock(medium.hGlobal);
+        }
+    }
+    ReleaseMedium(medium);
+    return !strText.IsEmpty();
+}
+
+/** @brief Check whether an IDataObject carries dropped files (CF_HDROP). */
+static BOOL QueryFileFormat(IDataObject *pDataObj, FORMATETC *pFmt)
+{
+    if (!pDataObj)
+        return FALSE;
+    pFmt->ptd = NULL;
+    pFmt->dwAspect = DVASPECT_CONTENT;
+    pFmt->lindex = -1;
+    pFmt->tymed = TYMED_HGLOBAL;
+    pFmt->cfFormat = CF_HDROP;
+    return pDataObj->QueryGetData(pFmt) == S_OK;
+}
+
+/** @brief Read dropped file paths from an IDataObject as insertion text. */
+static BOOL GetFilesFromDataObject(IDataObject *pDataObj, BOOL bMultiLine, SStringW &strText)
+{
+    FORMATETC fmt;
+    if (!QueryFileFormat(pDataObj, &fmt))
+        return FALSE;
+
+    STGMEDIUM medium;
+    if (FAILED(pDataObj->GetData(&fmt, &medium)))
+        return FALSE;
+
+    HDROP hDrop = (HDROP)GlobalLock(medium.hGlobal);
+    if (!hDrop)
+    {
+        ReleaseMedium(medium);
+        return FALSE;
+    }
+
+    UINT nFiles = ::DragQueryFileW(hDrop, (UINT)-1, NULL, 0);
+    for (UINT i = 0; i < nFiles; ++i)
+    {
+        WCHAR szFile[MAX_PATH + 1] = {0};
+        if (::DragQueryFileW(hDrop, i, szFile, MAX_PATH) == 0)
+            continue;
+        strText += szFile;
+        // A plain-text edit has to turn the file list into visible text; a
+        // newline per file matches the demo/RichEdit file-drop behaviour,
+        // while a single-line edit keeps everything on one line.
+        strText += bMultiLine ? L"\n" : L" ";
+    }
+
+    GlobalUnlock(medium.hGlobal);
+    ReleaseMedium(medium);
+    return !strText.IsEmpty();
+}
+
+/** @brief Minimal IEnumFORMATETC over the fixed format list of a text data object. */
+class SEditEnumFormatEtc : public SUnkImpl<IEnumFORMATETC>
+{
+  public:
+    SEditEnumFormatEtc(const FORMATETC *pFmts, int nCount)
+        : m_nIndex(0)
+        , m_nCount(nCount)
+    {
+        for (int i = 0; i < nCount && i < 2; ++i)
+            m_arrFmt[i] = pFmts[i];
+    }
+
+    IUNKNOWN_BEGIN(IEnumFORMATETC)
+    IUNKNOWN_END()
+
+    STDMETHODIMP Next(ULONG celt, FORMATETC *rgelt, ULONG *pceltFetched)
+    {
+        ULONG nCopied = 0;
+        while (nCopied < celt && m_nIndex < m_nCount)
+            rgelt[nCopied++] = m_arrFmt[m_nIndex++];
+        if (pceltFetched)
+            *pceltFetched = nCopied;
+        return (nCopied == celt) ? S_OK : S_FALSE;
+    }
+
+    STDMETHODIMP Skip(ULONG celt)
+    {
+        m_nIndex += (int)celt;
+        if (m_nIndex > m_nCount)
+            m_nIndex = m_nCount;
+        return (m_nIndex < m_nCount) ? S_OK : S_FALSE;
+    }
+
+    STDMETHODIMP Reset()
+    {
+        m_nIndex = 0;
+        return S_OK;
+    }
+
+    STDMETHODIMP Clone(IEnumFORMATETC **ppEnum)
+    {
+        if (!ppEnum)
+            return E_INVALIDARG;
+        *ppEnum = new SEditEnumFormatEtc(m_arrFmt, m_nCount);
+        return *ppEnum ? S_OK : E_OUTOFMEMORY;
+    }
+
+  private:
+    FORMATETC m_arrFmt[2];
+    int m_nIndex;
+    int m_nCount;
+};
+
+/** @brief IDataObject exposing the dragged selection as CF_UNICODETEXT / CF_TEXT. */
+class SEditTextDataObject : public SUnkImpl<IDataObject>
+{
+  public:
+    SEditTextDataObject(const SStringT &strText)
+        : m_strText(strText)
+    {
+    }
+
+    IUNKNOWN_BEGIN(IDataObject)
+    IUNKNOWN_END()
+
+    STDMETHODIMP GetData(FORMATETC *pformatetcIn, STGMEDIUM *pmedium)
+    {
+        if (!pformatetcIn || !pmedium)
+            return E_INVALIDARG;
+        if ((pformatetcIn->tymed & TYMED_HGLOBAL) == 0)
+            return DV_E_FORMATETC;
+        if (pformatetcIn->cfFormat == CF_UNICODETEXT)
+        {
+            SStringW strW = S_CT2W(m_strText.c_str());
+            return PutBlock(pmedium, strW.c_str(), (int)(strW.GetLength() + 1) * sizeof(wchar_t));
+        }
+        if (pformatetcIn->cfFormat == CF_TEXT)
+        {
+            SStringA strA = S_CT2A(m_strText.c_str());
+            return PutBlock(pmedium, strA.c_str(), strA.GetLength() + 1);
+        }
+        return DV_E_FORMATETC;
+    }
+
+    STDMETHODIMP GetDataHere(FORMATETC *, STGMEDIUM *)
+    {
+        return E_NOTIMPL;
+    }
+
+    STDMETHODIMP QueryGetData(FORMATETC *pformatetc)
+    {
+        if (!pformatetc)
+            return E_INVALIDARG;
+        if ((pformatetc->tymed & TYMED_HGLOBAL) == 0)
+            return DV_E_FORMATETC;
+        if (pformatetc->cfFormat == CF_UNICODETEXT || pformatetc->cfFormat == CF_TEXT)
+            return S_OK;
+        return DV_E_FORMATETC;
+    }
+
+    STDMETHODIMP GetCanonicalFormatEtc(FORMATETC *, FORMATETC *pformatetcOut)
+    {
+        if (pformatetcOut)
+            pformatetcOut->ptd = NULL;
+        return E_NOTIMPL;
+    }
+
+    STDMETHODIMP SetData(FORMATETC *, STGMEDIUM *, BOOL)
+    {
+        return E_NOTIMPL;
+    }
+
+    STDMETHODIMP EnumFormatEtc(DWORD dwDirection, IEnumFORMATETC **ppEnumFormatEtc)
+    {
+        if (!ppEnumFormatEtc)
+            return E_INVALIDARG;
+        if (dwDirection != DATADIR_GET)
+            return E_NOTIMPL;
+        FORMATETC fmts[2];
+        fmts[0] = MakeFormatEtc(CF_UNICODETEXT);
+        fmts[1] = MakeFormatEtc(CF_TEXT);
+        *ppEnumFormatEtc = new SEditEnumFormatEtc(fmts, 2);
+        return *ppEnumFormatEtc ? S_OK : E_OUTOFMEMORY;
+    }
+
+    STDMETHODIMP DAdvise(FORMATETC *, DWORD, IAdviseSink *, DWORD *)
+    {
+        return OLE_E_ADVISENOTSUPPORTED;
+    }
+
+    STDMETHODIMP DUnadvise(DWORD)
+    {
+        return OLE_E_ADVISENOTSUPPORTED;
+    }
+
+    STDMETHODIMP EnumDAdvise(IEnumSTATDATA **)
+    {
+        return OLE_E_ADVISENOTSUPPORTED;
+    }
+
+  private:
+    static FORMATETC MakeFormatEtc(WORD cfFormat)
+    {
+        FORMATETC fmt;
+        fmt.cfFormat = cfFormat;
+        fmt.ptd = NULL;
+        fmt.dwAspect = DVASPECT_CONTENT;
+        fmt.lindex = -1;
+        fmt.tymed = TYMED_HGLOBAL;
+        return fmt;
+    }
+
+    HRESULT PutBlock(STGMEDIUM *pmedium, const void *pData, int nBytes)
+    {
+        HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE | GMEM_ZEROINIT, nBytes);
+        if (!hMem)
+            return E_OUTOFMEMORY;
+        void *pDst = GlobalLock(hMem);
+        if (!pDst)
+        {
+            GlobalFree(hMem);
+            return E_OUTOFMEMORY;
+        }
+        memcpy(pDst, pData, nBytes);
+        GlobalUnlock(hMem);
+        pmedium->tymed = TYMED_HGLOBAL;
+        pmedium->hGlobal = hMem;
+        pmedium->pUnkForRelease = NULL;
+        return S_OK;
+    }
+
+    SStringT m_strText;
+};
+
+/** @brief IDropSource that ends the drag on release and cancels on Escape. */
+class SEditDropSource : public SUnkImpl<IDropSource>
+{
+  public:
+    IUNKNOWN_BEGIN(IDropSource)
+    IUNKNOWN_END()
+
+    STDMETHODIMP QueryContinueDrag(BOOL fEscapePressed, DWORD grfKeyState)
+    {
+        if (fEscapePressed)
+            return DRAGDROP_S_CANCEL;
+        if ((grfKeyState & MK_LBUTTON) == 0)
+        {
+            // The first query OLE makes can carry an empty key state before it
+            // pumps the pending mouse messages (the RichEdit-based demo hits the
+            // same thing and tolerates it). Fall back to the physical button
+            // state, otherwise a drag would end the instant it starts.
+            if ((::GetAsyncKeyState(VK_LBUTTON) & 0x8000) != 0)
+                return S_OK;
+            return DRAGDROP_S_DROP;
+        }
+        return S_OK;
+    }
+
+    STDMETHODIMP GiveFeedback(DWORD)
+    {
+        // Same as the RichEdit drag source: let OLE draw its default move/copy
+        // cursors instead of a custom feedback.
+        return DRAGDROP_S_USEDEFAULTCURSORS;
+    }
+};
+
+/** @brief IDropTarget accepting plain text and dropped files for one lightweight <edit>. */
+class SEditDropTarget : public SUnkImpl<IDropTarget>
+{
+  public:
+    SEditDropTarget(SEdit *pEdit)
+        : m_pEdit(pEdit)
+        , m_eDrop(EDropNone)
+    {
+        if (m_pEdit)
+            m_pEdit->AddRef();
+    }
+
+    virtual ~SEditDropTarget()
+    {
+        if (m_pEdit)
+            m_pEdit->Release();
+    }
+
+    IUNKNOWN_BEGIN(IDropTarget)
+    IUNKNOWN_END()
+
+    STDMETHODIMP DragEnter(IDataObject *pDataObj, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect)
+    {
+        m_eDrop = EDropNone;
+        if (m_pEdit && !m_pEdit->m_fReadOnly)
+        {
+            FORMATETC fmt;
+            // Files first: a file drag must never be mistaken for plain text,
+            // otherwise the source could perform a MOVE on the real files.
+            if (QueryFileFormat(pDataObj, &fmt))
+                m_eDrop = EDropFiles;
+            else if (QueryTextFormat(pDataObj, &fmt))
+                m_eDrop = EDropText;
+        }
+        if (m_eDrop == EDropNone)
+        {
+            *pdwEffect = DROPEFFECT_NONE;
+            return S_OK;
+        }
+        return DragOver(grfKeyState, pt, pdwEffect);
+    }
+
+    STDMETHODIMP DragOver(DWORD grfKeyState, POINTL, DWORD *pdwEffect)
+    {
+        if (m_eDrop == EDropText)
+            *pdwEffect = (grfKeyState & MK_CONTROL) ? DROPEFFECT_COPY : DROPEFFECT_MOVE;
+        else if (m_eDrop == EDropFiles)
+            *pdwEffect = DROPEFFECT_LINK;
+        else
+            *pdwEffect = DROPEFFECT_NONE;
+        return S_OK;
+    }
+
+    STDMETHODIMP DragLeave(void)
+    {
+        m_eDrop = EDropNone;
+        return S_OK;
+    }
+
+    STDMETHODIMP Drop(IDataObject *pDataObj, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect)
+    {
+        EDropKind eDrop = m_eDrop;
+        m_eDrop = EDropNone;
+        if (!m_pEdit || eDrop == EDropNone)
+        {
+            *pdwEffect = DROPEFFECT_NONE;
+            return S_OK;
+        }
+
+        SStringW strText;
+        BOOL bCopy = (grfKeyState & MK_CONTROL) != 0;
+        if (eDrop == EDropText)
+        {
+            if (!GetTextFromDataObject(pDataObj, strText))
+            {
+                *pdwEffect = DROPEFFECT_NONE;
+                return S_FALSE;
+            }
+        }
+        else if (!GetFilesFromDataObject(pDataObj, m_pEdit->m_fMultiLine, strText))
+        {
+            *pdwEffect = DROPEFFECT_NONE;
+            return S_FALSE;
+        }
+
+        // OLE reports the drop point in screen coordinates.
+        CPoint ptClient(pt.x, pt.y);
+        ISwndContainer *pContainer = m_pEdit->GetContainer();
+        if (pContainer && pContainer->GetHostHwnd())
+            ::ScreenToClient(pContainer->GetHostHwnd(), &ptClient);
+
+        // Only text coming from this very control is a self-move: the drop
+        // target then has to remove the dragged block itself.
+        BOOL bSelf = (eDrop == EDropText) && (s_pDragSource == m_pEdit);
+        if (!m_pEdit->DropTextAt(strText, ptClient, bCopy, bSelf))
+        {
+            *pdwEffect = DROPEFFECT_NONE;
+            return S_OK;
+        }
+
+        if (eDrop == EDropFiles)
+        {
+            *pdwEffect = DROPEFFECT_LINK;
+        }
+        else if (bCopy)
+        {
+            *pdwEffect = DROPEFFECT_COPY;
+        }
+        else
+        {
+            if (bSelf)
+                s_bSelfDropDone = TRUE; // the target already moved the block
+            *pdwEffect = DROPEFFECT_MOVE;
+        }
+        return S_OK;
+    }
+
+  private:
+    enum EDropKind
+    {
+        EDropNone,
+        EDropText,
+        EDropFiles
+    };
+
+    SEdit *m_pEdit;
+    EDropKind m_eDrop;
+};
 
 SEdit::SEdit()
     : m_nCaret(0)
@@ -25,8 +478,9 @@ SEdit::SEdit()
     , m_nScrollX(0)
     , m_bLayoutDirty(TRUE)
     , m_bDragSel(FALSE)
-    , m_nUndoCaret(0)
-    , m_bUndoValid(FALSE)
+    , m_bSelDragPending(FALSE)
+    , m_bSelDragActive(FALSE)
+    , m_ptSelDragDown(0, 0)
 {
     // Keep the defaults in sync with SRichEdit so an <edit> renders and behaves
     // the same no matter which implementation is compiled in.
@@ -50,7 +504,12 @@ SEdit::SEdit()
     m_fWantTab = FALSE;
     m_fSingleLineVCenter = TRUE;
     m_fScrollPending = FALSE;
-    m_fEnableDragDrop = FALSE;
+    // Unlike the RichEdit-backed build, the lightweight edit takes part in OLE
+    // drag & drop by default (dragging a selection out already works without any
+    // XML attribute). Registering the drop target here keeps <edit> usable for
+    // both kinds of drops without per-app opt-in; "enableDragdrop=0" still turns
+    // it off for apps that need to block drops.
+    m_fEnableDragDrop = TRUE;
     m_fNotifyChange = FALSE;
     m_fDisableCaret = FALSE;
     m_fReadOnly = FALSE;
@@ -102,7 +561,9 @@ void SEdit::SetWindowText(LPCTSTR lpszText)
         m_strEditText = m_strEditText.Left((int)m_cchTextMost);
     m_nCaret = m_strEditText.GetLength();
     m_nAnchor = m_nCaret;
-    m_bUndoValid = FALSE;
+    // An externally assigned text starts a new edit history.
+    m_arrUndo.RemoveAll();
+    m_arrRedo.RemoveAll();
     m_bLayoutDirty = TRUE;
     UpdateScrollBar();
     UpdateCaretPos();
@@ -138,17 +599,31 @@ int SEdit::GetWindowTextLength() const
 // ---------------------------------------------------------------------------
 void SEdit::SetSel(long nStartChar, long nEndChar, BOOL bNoScroll)
 {
+    // EM_SETSEL semantics (see CTxtEdit::OnSetSel in richedit41): a negative
+    // start does NOT mean "from the beginning", it collapses the selection.
+    // Dropping file names calls SetSel(-1, -1) to park the caret at the end of
+    // the text before ReplaceSel(); mapping that to 0..len would select all and
+    // turn the append into a replace.
     int nLen = m_strEditText.GetLength();
     if (nStartChar < 0)
-        nStartChar = 0;
-    if (nEndChar < 0)
-        nEndChar = nLen;
-    if (nStartChar > nLen)
-        nStartChar = nLen;
-    if (nEndChar > nLen)
-        nEndChar = nLen;
-    m_nAnchor = (int)nStartChar;
-    m_nCaret = (int)nEndChar;
+    {
+        int nPos = (nEndChar < 0) ? nLen : m_nCaret;
+        if (nPos > nLen)
+            nPos = nLen;
+        if (nPos < 0)
+            nPos = 0;
+        m_nAnchor = nPos;
+        m_nCaret = nPos;
+    }
+    else
+    {
+        if (nStartChar > nLen)
+            nStartChar = nLen;
+        if (nEndChar < 0 || nEndChar > nLen)
+            nEndChar = nLen;
+        m_nAnchor = (int)nStartChar;
+        m_nCaret = (int)nEndChar;
+    }
     if (!bNoScroll)
         EnsureCaretVisible();
     UpdateCaretPos();
@@ -165,17 +640,25 @@ void SEdit::SetSel(DWORD dwSelection, BOOL bNoScroll)
 
 void SEdit::ReplaceSel(LPCTSTR pszText, BOOL bCanUndo)
 {
-    if (bCanUndo)
-        PushUndo();
-    DeleteSelection();
+    if (m_fReadOnly)
+        return;
     if (pszText && *pszText)
-        InsertText(pszText);
-    else
     {
-        UpdateCaretPos();
-        EnsureCaretVisible();
-        Invalidate();
+        // Deleting the selection and inserting the new text is one undo step;
+        // InsertText must not push a second snapshot.
+        InsertText(pszText, bCanUndo);
+        return;
     }
+    if (m_nCaret != m_nAnchor)
+    {
+        if (bCanUndo)
+            PushUndo();
+        DeleteSelection();
+        FireTextChanged();
+    }
+    UpdateCaretPos();
+    EnsureCaretVisible();
+    Invalidate();
 }
 
 BOOL SEdit::GetWordWrap() const
@@ -276,9 +759,67 @@ DWORD SEdit::LoadRtf(LPCTSTR pszFileName)
 // ---------------------------------------------------------------------------
 void SEdit::PushUndo()
 {
-    m_strUndoText = m_strEditText;
-    m_nUndoCaret = m_nCaret;
-    m_bUndoValid = TRUE;
+    size_t nCount = m_arrUndo.GetCount();
+    if (nCount >= (size_t)UNDO_LIMIT)
+        m_arrUndo.RemoveAt(0, nCount - (size_t)UNDO_LIMIT + 1);
+
+    SEditUndoState state;
+    state.strText = m_strEditText;
+    state.nCaret = m_nCaret;
+    state.nAnchor = m_nAnchor;
+    m_arrUndo.Add(state);
+
+    // A fresh edit makes every undone step unreachable.
+    if (!m_arrRedo.IsEmpty())
+        m_arrRedo.RemoveAll();
+}
+
+BOOL SEdit::Undo()
+{
+    if (m_fReadOnly || m_arrUndo.IsEmpty())
+        return FALSE;
+
+    SEditUndoState cur;
+    cur.strText = m_strEditText;
+    cur.nCaret = m_nCaret;
+    cur.nAnchor = m_nAnchor;
+    m_arrRedo.Add(cur);
+
+    SEditUndoState state = m_arrUndo[m_arrUndo.GetCount() - 1];
+    m_arrUndo.RemoveAt(m_arrUndo.GetCount() - 1);
+    ApplyUndoState(state);
+    return TRUE;
+}
+
+BOOL SEdit::Redo()
+{
+    if (m_fReadOnly || m_arrRedo.IsEmpty())
+        return FALSE;
+
+    SEditUndoState cur;
+    cur.strText = m_strEditText;
+    cur.nCaret = m_nCaret;
+    cur.nAnchor = m_nAnchor;
+    m_arrUndo.Add(cur);
+
+    SEditUndoState state = m_arrRedo[m_arrRedo.GetCount() - 1];
+    m_arrRedo.RemoveAt(m_arrRedo.GetCount() - 1);
+    ApplyUndoState(state);
+    return TRUE;
+}
+
+void SEdit::ApplyUndoState(const SEditUndoState &state)
+{
+    m_strEditText = state.strText;
+    int nLen = m_strEditText.GetLength();
+    m_nCaret = (state.nCaret < 0) ? 0 : (state.nCaret > nLen ? nLen : state.nCaret);
+    m_nAnchor = (state.nAnchor < 0) ? 0 : (state.nAnchor > nLen ? nLen : state.nAnchor);
+    m_bLayoutDirty = TRUE;
+    UpdateScrollBar();
+    UpdateCaretPos();
+    EnsureCaretVisible();
+    Invalidate();
+    FireTextChanged();
 }
 
 void SEdit::DeleteSelection()
@@ -293,12 +834,10 @@ void SEdit::DeleteSelection()
     m_bLayoutDirty = TRUE;
 }
 
-void SEdit::InsertText(LPCTSTR pszText)
+void SEdit::InsertText(LPCTSTR pszText, BOOL bCanUndo)
 {
     if (m_fReadOnly || !pszText || !(*pszText))
         return;
-    PushUndo();
-    DeleteSelection();
 
     SStringT strIns;
     int nSrcLen = (int)_tcslen(pszText);
@@ -329,9 +868,24 @@ void SEdit::InsertText(LPCTSTR pszText)
     }
     if (nInsLen <= 0)
     {
+        // A non-empty input can still become empty when truncating at the
+        // maxBuf limit; a selected range must still be replaced by nothing.
+        if (m_nCaret != m_nAnchor)
+        {
+            if (bCanUndo)
+                PushUndo();
+            DeleteSelection();
+            FireTextChanged();
+            EnsureCaretVisible();
+            Invalidate();
+        }
         UpdateCaretPos();
         return;
     }
+    // Only take an undo snapshot once the edit is known to change the text.
+    if (bCanUndo)
+        PushUndo();
+    DeleteSelection();
     int nStart = (m_nCaret < m_nAnchor) ? m_nCaret : m_nAnchor;
     m_strEditText.Insert(nStart, strIns);
     m_nCaret = nStart + nInsLen;
@@ -369,8 +923,9 @@ void SEdit::CopySel()
 
 void SEdit::CutSel()
 {
-    if (m_fReadOnly)
+    if (m_fReadOnly || m_nCaret == m_nAnchor)
         return;
+    PushUndo();
     CopySel();
     DeleteSelection();
     FireTextChanged();
@@ -855,11 +1410,16 @@ int SEdit::OnCreate(LPVOID lpCreateStruct)
     // XML "text" attribute has to be pushed into the editor buffer here. This
     // mirrors SRichEdit::OnCreate.
     SetWindowText(SWindow::GetWindowText());
+    // Register the OLE drop target for editable controls. Drag & drop is on by
+    // default in the lightweight build (see the constructor) and can be turned
+    // off with the XML "enableDragdrop" attribute.
+    OnEnableDragDrop(!m_fReadOnly && m_fEnableDragDrop);
     return 0;
 }
 
 void SEdit::OnDestroy()
 {
+    OnEnableDragDrop(FALSE);
     ShowCaret(FALSE);
     KillFocus();
     __baseCls::OnDestroy();
@@ -1026,6 +1586,8 @@ void SEdit::OnSetFocus(SWND wndOld)
 void SEdit::OnKillFocus(SWND wndFocus)
 {
     ShowCaret(FALSE);
+    m_bSelDragPending = FALSE;
+    m_bSelDragActive = FALSE;
 
     if (!m_fSaveSelection)
     {
@@ -1066,11 +1628,17 @@ void SEdit::OnLButtonDown(UINT nFlags, CPoint point)
     // OnSetFocus when autoSel is on; a click inside an already focused edit
     // still positions the caret normally.
     BOOL bHadFocus = IsFocused();
+    m_bSelDragPending = FALSE;
+    m_bSelDragActive = FALSE;
     // Give SPanel the first chance: a click on the scrollbar must not move the
-    // caret. SPanel also sets focus, pushes the button state and captures the
-    // mouse for us.
+    // caret. SPanel also sets focus and captures the mouse for us.
     if (__baseCls::OnLButtonDown(nFlags, point))
         return;
+    // SWindow::OnLButtonDown turns on WndState_PushDown, but the nc/border skin
+    // only has normal + hover frames: a pushdown index falls back to normal and
+    // the border flickers on every click. SRichEdit never enters the pushdown
+    // state, so drop it again to keep the hover look while the button is down.
+    ModifyState(0, WndState_PushDown, TRUE);
 
     if (!bHadFocus && m_fAutoSel && m_strEditText.GetLength() > 0)
     {
@@ -1085,6 +1653,20 @@ void SEdit::OnLButtonDown(UINT nFlags, CPoint point)
     {
         int nPos = CharFromPoint(point, pRT);
         ReleaseRenderTarget(pRT);
+
+        int nSelMin = (m_nCaret < m_nAnchor) ? m_nCaret : m_nAnchor;
+        int nSelMax = (m_nCaret < m_nAnchor) ? m_nAnchor : m_nCaret;
+        if (!m_fReadOnly && (nFlags & MK_SHIFT) == 0 && nSelMax > nSelMin && nPos >= nSelMin
+            && nPos < nSelMax)
+        {
+            // Pressing inside the selection must not collapse it: wait for the
+            // mouse to move far enough to start dragging the block.
+            m_bSelDragPending = TRUE;
+            m_ptSelDragDown = point;
+            m_bDragSel = FALSE;
+            return;
+        }
+
         if ((nFlags & MK_SHIFT) == 0)
             m_nAnchor = nPos;
         m_nCaret = nPos;
@@ -1132,12 +1714,345 @@ void SEdit::OnLButtonDblClk(UINT nFlags, CPoint point)
 
 void SEdit::OnLButtonUp(UINT nFlags, CPoint point)
 {
+    // Ignore the click the OLE modal loop may replay to the source control.
+    if (s_pDragSource == this)
+        return;
+    if (m_bSelDragActive)
+    {
+        m_bSelDragActive = FALSE;
+        m_bSelDragPending = FALSE;
+        DropSelDrag(point, (nFlags & MK_CONTROL) != 0);
+        m_bDragSel = FALSE;
+        __baseCls::OnLButtonUp(nFlags, point);
+        // Restore the text cursor without waiting for the next WM_SETCURSOR.
+        __baseCls::OnSetCursor(point);
+        return;
+    }
+    if (m_bSelDragPending)
+    {
+        // The press stayed inside the selection and never turned into a drag:
+        // collapse the selection to the click point, as a native edit does.
+        m_bSelDragPending = FALSE;
+        EnsureLayout();
+        IRenderTarget *pRT = GetRenderTarget(NULL, GRT_NODRAW, TRUE);
+        if (pRT)
+        {
+            int nPos = CharFromPoint(point, pRT);
+            ReleaseRenderTarget(pRT);
+            m_nCaret = nPos;
+            m_nAnchor = nPos;
+            EnsureCaretVisible();
+            Invalidate();
+        }
+    }
     m_bDragSel = FALSE;
     __baseCls::OnLButtonUp(nFlags, point);
 }
 
+SEdit *SEdit::HitTestEditAt(CPoint pt) const
+{
+    SWindow *pRoot = GetRoot();
+    if (!pRoot)
+        return NULL;
+    // Windows and message points share the same coordinate space (see
+    // SWindow::GetClientRect), so the release point can be tested directly.
+    SWND hWnd = pRoot->SwndFromPoint(pt);
+    SWindow *pWnd = SWindowMgr::GetWindow(hWnd);
+    // The hit window may be a child of the edit; walk up to the control itself.
+    while (pWnd)
+    {
+        if (pWnd->IsClass(L"edit"))
+            return static_cast<SEdit *>(pWnd);
+        pWnd = pWnd->GetParent();
+    }
+    return NULL;
+}
+
+void SEdit::DropSelDrag(CPoint pt, BOOL bCopy)
+{
+    if (m_fReadOnly)
+        return;
+
+    int nSelMin = (m_nCaret < m_nAnchor) ? m_nCaret : m_nAnchor;
+    int nSelMax = (m_nCaret < m_nAnchor) ? m_nAnchor : m_nCaret;
+    if (nSelMax <= nSelMin)
+        return;
+
+    // There is no OLE drag source: this control keeps the mouse capture for the
+    // whole gesture, so a release over *another* <edit> never reaches that edit
+    // as a drop. Resolve the window under the release point instead.
+    SEdit *pTarget = HitTestEditAt(pt);
+    if (!pTarget)
+        return; // dropped on empty space / a non-edit control: cancel
+
+    SStringT strSel = m_strEditText.Mid(nSelMin, nSelMax - nSelMin);
+
+    if (pTarget != this)
+    {
+        // Cross-control drop: insert at the release point of the target and, for
+        // a move (no Ctrl), remove the block from this control afterwards.
+        if (pTarget->m_fReadOnly)
+            return;
+        pTarget->EnsureLayout();
+        IRenderTarget *pRT = pTarget->GetRenderTarget(NULL, GRT_NODRAW, TRUE);
+        if (!pRT)
+            return;
+        int nPos = pTarget->CharFromPoint(pt, pRT);
+        pTarget->ReleaseRenderTarget(pRT);
+
+        int nInsLen = strSel.GetLength();
+        if (pTarget->m_cchTextMost > 0)
+        {
+            int nRemain = (int)pTarget->m_cchTextMost - pTarget->m_strEditText.GetLength();
+            if (nInsLen > nRemain)
+                nInsLen = (nRemain > 0) ? nRemain : 0;
+        }
+        if (nInsLen <= 0)
+            return;
+
+        pTarget->PushUndo();
+        pTarget->m_strEditText.Insert(nPos, strSel.Left(nInsLen));
+        pTarget->m_nCaret = nPos + nInsLen;
+        pTarget->m_nAnchor = pTarget->m_nCaret;
+        pTarget->m_bLayoutDirty = TRUE;
+        pTarget->FireTextChanged();
+        pTarget->EnsureCaretVisible();
+        pTarget->Invalidate();
+
+        if (!bCopy)
+        {
+            PushUndo();
+            m_strEditText.Delete(nSelMin, nSelMax - nSelMin);
+            m_nCaret = nSelMin;
+            m_nAnchor = nSelMin;
+            m_bLayoutDirty = TRUE;
+            FireTextChanged();
+            UpdateCaretPos();
+            EnsureCaretVisible();
+            Invalidate();
+        }
+        return;
+    }
+
+    // Drop inside this control: only a point in the client area counts, and a
+    // drop onto the selection itself changes nothing.
+    CRect rcClient;
+    GetClientRect(&rcClient);
+    if (!rcClient.PtInRect(pt))
+        return;
+
+    EnsureLayout();
+    IRenderTarget *pRT = GetRenderTarget(NULL, GRT_NODRAW, TRUE);
+    if (!pRT)
+        return;
+    int nPos = CharFromPoint(pt, pRT);
+    ReleaseRenderTarget(pRT);
+
+    if (nPos >= nSelMin && nPos <= nSelMax)
+        return; // dropped onto the selection itself: nothing changes
+
+    int nSelLen = nSelMax - nSelMin;
+
+    PushUndo();
+    if (!bCopy)
+    {
+        m_strEditText.Delete(nSelMin, nSelLen);
+        if (nPos > nSelMax)
+            nPos -= nSelLen;
+    }
+
+    int nInsLen = strSel.GetLength();
+    if (m_cchTextMost > 0)
+    {
+        int nRemain = (int)m_cchTextMost - m_strEditText.GetLength();
+        if (nInsLen > nRemain)
+            nInsLen = (nRemain > 0) ? nRemain : 0;
+    }
+    if (nInsLen > 0)
+    {
+        m_strEditText.Insert(nPos, strSel.Left(nInsLen));
+        m_nCaret = nPos + nInsLen;
+    }
+    else
+    {
+        m_nCaret = nPos;
+    }
+    m_nAnchor = m_nCaret;
+    m_bLayoutDirty = TRUE;
+    FireTextChanged();
+    UpdateCaretPos();
+    EnsureCaretVisible();
+    Invalidate();
+}
+
+// ---------------------------------------------------------------------------
+// OLE drag & drop (same mechanism as the RichEdit-backed build)
+// ---------------------------------------------------------------------------
+void SEdit::OnEnableDragDrop(BOOL bEnable)
+{
+    if (!GetContainer())
+    {
+        return;
+    }
+    if (bEnable)
+    {
+        SEditDropTarget *pDropTarget = new SEditDropTarget(this);
+        BOOL bRet = GetContainer()->RegisterDragDrop(m_swnd, pDropTarget);
+        pDropTarget->Release();
+    }
+    else
+    {
+        BOOL bRet = GetContainer()->UnregisterDragDrop(m_swnd);
+    }
+}
+
+void SEdit::StartOleDrag()
+{
+    int nSelMin = (m_nCaret < m_nAnchor) ? m_nCaret : m_nAnchor;
+    int nSelMax = (m_nCaret < m_nAnchor) ? m_nAnchor : m_nCaret;
+    if (nSelMax <= nSelMin)
+        return;
+
+    SStringT strSel = m_strEditText.Mid(nSelMin, nSelMax - nSelMin);
+    if (strSel.IsEmpty())
+    {
+        return;
+    }
+
+    SEditTextDataObject *pDataObj = new SEditTextDataObject(strSel);
+    SEditDropSource *pDropSrc = new SEditDropSource();
+
+    // OLE takes over the mouse: the drop target under the cursor (possibly
+    // another edit or another process) has to see the mouse messages.
+    ReleaseCapture();
+
+    s_pDragSource = this;
+    s_bSelfDropDone = FALSE;
+    DWORD dwEffect = DROPEFFECT_NONE;
+    HRESULT hr = ::DoDragDrop(pDataObj, pDropSrc, DROPEFFECT_COPY | DROPEFFECT_MOVE, &dwEffect);
+    s_pDragSource = NULL;
+
+    pDropSrc->Release();
+    pDataObj->Release();
+
+    if (!s_bSelfDropDone && (dwEffect & DROPEFFECT_MOVE))
+    {
+        // Cross-control move: the target inserted the text, so remove the block
+        // from this control. A self-drop already did that in the drop target,
+        // and a copy / cancelled drag must leave the selection untouched.
+        PushUndo();
+        m_strEditText.Delete(nSelMin, nSelMax - nSelMin);
+        m_nCaret = nSelMin;
+        m_nAnchor = nSelMin;
+        m_bLayoutDirty = TRUE;
+        FireTextChanged();
+        UpdateCaretPos();
+        EnsureCaretVisible();
+        Invalidate();
+    }
+}
+
+BOOL SEdit::DropTextAt(const SStringW &strText, CPoint pt, BOOL bCopy, BOOL bSelf)
+{
+    if (m_fReadOnly || strText.IsEmpty())
+        return FALSE;
+
+    EnsureLayout();
+    IRenderTarget *pRT = GetRenderTarget(NULL, GRT_NODRAW, TRUE);
+    if (!pRT)
+        return FALSE;
+    int nPos = CharFromPoint(pt, pRT);
+    ReleaseRenderTarget(pRT);
+
+    int nSelMin = (m_nCaret < m_nAnchor) ? m_nCaret : m_nAnchor;
+    int nSelMax = (m_nCaret < m_nAnchor) ? m_nAnchor : m_nCaret;
+
+    // Dropping the block onto the selection itself changes nothing.
+    if (bSelf && nSelMax > nSelMin && nPos >= nSelMin && nPos <= nSelMax)
+        return FALSE;
+
+    SStringT strIns = S_CW2T(strText.c_str());
+    int nInsLen = strIns.GetLength();
+    if (m_cchTextMost > 0)
+    {
+        int nRemain = (int)m_cchTextMost - m_strEditText.GetLength();
+        if (nInsLen > nRemain)
+            nInsLen = (nRemain > 0) ? nRemain : 0;
+    }
+    if (nInsLen <= 0)
+        return FALSE;
+
+    PushUndo();
+    if (bSelf && !bCopy && nSelMax > nSelMin)
+    {
+        // Move inside the same control: remove the block first and fix the
+        // insertion index for the shifted text.
+        int nSelLen = nSelMax - nSelMin;
+        m_strEditText.Delete(nSelMin, nSelLen);
+        if (nPos > nSelMax)
+            nPos -= nSelLen;
+    }
+
+    m_strEditText.Insert(nPos, strIns.Left(nInsLen));
+    m_nCaret = nPos + nInsLen;
+    m_nAnchor = m_nCaret;
+    m_bLayoutDirty = TRUE;
+    FireTextChanged();
+    UpdateCaretPos();
+    EnsureCaretVisible();
+    Invalidate();
+    return TRUE;
+}
+
 void SEdit::OnMouseMove(UINT nFlags, CPoint point)
 {
+    // DoDragDrop runs a modal loop; ignore the mouse messages it replays to the
+    // source control while the drag is in flight.
+    if (s_pDragSource == this)
+        return;
+    if (m_bSelDragPending)
+    {
+        if ((nFlags & MK_LBUTTON) == 0)
+        {
+            m_bSelDragPending = FALSE;
+        }
+        else
+        {
+            int nDx = point.x - m_ptSelDragDown.x;
+            int nDy = point.y - m_ptSelDragDown.y;
+            if (nDx < 0)
+                nDx = -nDx;
+            if (nDy < 0)
+                nDy = -nDy;
+            int nThreshold = 4 * GetScale() / 100;
+            if (nThreshold < 1)
+                nThreshold = 1;
+            if (nDx > nThreshold || nDy > nThreshold)
+            {
+                // Far enough from the press point: this is a selection drag, not
+                // a click. With a real host window the gesture is handed to OLE,
+                // exactly like the RichEdit-backed build; a window-less host
+                // (headless tests / bare metal) keeps the in-process fallback.
+                m_bSelDragPending = FALSE;
+                ISwndContainer *pContainer = GetContainer();
+                HWND hHost = pContainer ? pContainer->GetHostHwnd() : NULL;
+                if (hHost)
+                {
+                    StartOleDrag();
+                }
+                else
+                {
+                    m_bSelDragActive = TRUE;
+                    // Update the cursor at once instead of waiting for the next
+                    // WM_SETCURSOR, so the drag is visible as soon as it starts.
+                    OnSetCursor(point);
+                }
+            }
+            return;
+        }
+    }
+    if (m_bSelDragActive)
+        return;
     if (m_bDragSel && (nFlags & MK_LBUTTON))
     {
         EnsureLayout();
@@ -1210,17 +2125,15 @@ void SEdit::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
             return;
         case 'Z':
         case 'z':
-            if (m_bUndoValid)
-            {
-                SetWindowText(m_strUndoText);
-                m_nCaret = m_nUndoCaret;
-                m_nAnchor = m_nCaret;
-                m_bUndoValid = FALSE;
-                m_bLayoutDirty = TRUE;
-                UpdateCaretPos();
-                EnsureCaretVisible();
-                Invalidate();
-            }
+            // Ctrl+Shift+Z is the common alternative redo shortcut.
+            if (bShift)
+                Redo();
+            else
+                Undo();
+            return;
+        case 'Y':
+        case 'y':
+            Redo();
             return;
         default:
             break;
@@ -1313,13 +2226,14 @@ void SEdit::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
     {
         if (m_fReadOnly)
             break;
-        PushUndo();
         if (m_nCaret != m_nAnchor)
         {
+            PushUndo();
             DeleteSelection();
         }
         else if (m_nCaret > 0)
         {
+            PushUndo();
             m_strEditText.Delete(m_nCaret - 1, 1);
             m_nCaret--;
             m_nAnchor = m_nCaret;
@@ -1327,7 +2241,7 @@ void SEdit::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
         }
         else
         {
-            m_bUndoValid = FALSE;
+            break; // nothing to delete, no undo step either
         }
         FireTextChanged();
         UpdateCaretPos();
@@ -1339,19 +2253,20 @@ void SEdit::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
     {
         if (m_fReadOnly)
             break;
-        PushUndo();
         if (m_nCaret != m_nAnchor)
         {
+            PushUndo();
             DeleteSelection();
         }
         else if (m_nCaret < nLen)
         {
+            PushUndo();
             m_strEditText.Delete(m_nCaret, 1);
             m_bLayoutDirty = TRUE;
         }
         else
         {
-            m_bUndoValid = FALSE;
+            break; // nothing to delete, no undo step either
         }
         FireTextChanged();
         UpdateCaretPos();
@@ -1423,7 +2338,8 @@ LRESULT SEdit::OnGetSel(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 LRESULT SEdit::OnSetSel(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    // EM_SETSEL semantics: wParam = start, lParam = end (-1 means "the end").
+    // EM_SETSEL semantics: wParam = start, lParam = end. A negative start
+    // collapses the selection (end < 0 collapses it at the text end).
     SetSel((long)(int)wParam, (long)(int)lParam, FALSE);
     return 0;
 }
@@ -1445,6 +2361,29 @@ LRESULT SEdit::OnSetEventMask(UINT uMsg, WPARAM wParam, LPARAM lParam)
     {
         m_fNotifyChange = (lParam & ENM_CHANGE) ? TRUE : FALSE;
     }
+    return 0;
+}
+
+LRESULT SEdit::OnUndo(UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    Undo();
+    return 0;
+}
+
+LRESULT SEdit::OnCanUndo(UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    return (!m_fReadOnly && !m_arrUndo.IsEmpty()) ? TRUE : FALSE;
+}
+
+LRESULT SEdit::OnRedo(UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    return Redo() ? TRUE : FALSE;
+}
+
+LRESULT SEdit::OnEmptyUndoBuffer(UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    m_arrUndo.RemoveAll();
+    m_arrRedo.RemoveAll();
     return 0;
 }
 
@@ -1473,6 +2412,41 @@ UINT WINAPI SEdit::OnGetDlgCode() const
     if (m_fWantReturn)
         uCode |= SC_WANTRETURN;
     return uCode;
+}
+
+BOOL SEdit::CancelCaptureMode(int reason)
+{
+    // A selection drag keeps the mouse captured until the release point is
+    // hit-tested (it may be another edit). Letting an outer scroll container
+    // steal the capture would end the gesture silently.
+    if (m_bSelDragPending || m_bSelDragActive)
+        return FALSE;
+    return __baseCls::CancelCaptureMode(reason);
+}
+
+BOOL SEdit::OnSetCursor(const CPoint &pt)
+{
+    if (m_bSelDragActive)
+    {
+        // Emulate what the OLE default drag cursors show in re41: a move cursor
+        // over a valid drop target and a "no drop" cursor elsewhere.
+        HCURSOR hCursor =
+            HitTestEditAt(pt) ? GETRESPROVIDER->LoadCursor(IDC_SIZEALL) : GETRESPROVIDER->LoadCursor(IDC_NO);
+        ::SetCursor(hCursor);
+        return TRUE;
+    }
+    return __baseCls::OnSetCursor(pt);
+}
+
+void SEdit::OnCaptureChanged(BOOL bCaptured)
+{
+    if (!bCaptured)
+    {
+        m_bSelDragPending = FALSE;
+        m_bSelDragActive = FALSE;
+        m_bDragSel = FALSE;
+    }
+    __baseCls::OnCaptureChanged(bCaptured);
 }
 
 void SEdit::OnScaleChanged(int nScale)
@@ -1718,6 +2692,8 @@ HRESULT SEdit::OnAttrPasswordChar(const SStringW &strValue, BOOL bLoading)
 HRESULT SEdit::OnAttrEnableDragdrop(const SStringW &strValue, BOOL bLoading)
 {
     m_fEnableDragDrop = (strValue.CompareNoCase(L"1") == 0 || strValue.CompareNoCase(L"true") == 0);
+    if (!bLoading && GetContainer())
+        OnEnableDragDrop(!m_fReadOnly && m_fEnableDragDrop);
     return S_OK;
 }
 

@@ -31,6 +31,203 @@ TEST_F(SouiTestFixture, edit_text_set_and_read)
     EXPECT_EQ(ed->GetWindowText(), _T(""));
 }
 
+// edit lite：边框皮肤只有 normal/hover 两态，按下鼠标不能进入 PushDown，
+// 否则状态索引落到不存在的第 3 帧而被回退成 normal（点击后边框“闪”一下）。
+TEST_F(SouiTestFixture, edit_lite_click_keeps_hover_border_state)
+{
+#if !defined(SOUI_EDIT_LITE)
+    SUCCEED() << "edit lite is not enabled in this build";
+    return;
+#else
+    SWindow *root = loadUi(
+        L"<window layout='vbox' width='200' height='80'>"
+        L"<edit name='ed' width='150' height='24'/>"
+        L"</window>");
+    SEdit *ed = SouiTest::findByName<SEdit>(root, L"ed");
+    ASSERT_TRUE(ed != NULL);
+
+    ed->SetFocus();
+    ed->ModifyState(WndState_Hover, 0, FALSE);
+    CPoint pt = SouiTest::centerOf(ed);
+    SouiTest::mousePress(ed, pt);
+    EXPECT_TRUE((ed->GetState() & WndState_Hover) != 0);
+    EXPECT_TRUE((ed->GetState() & WndState_PushDown) == 0);
+    SouiTest::mouseRelease(ed, pt);
+#endif
+}
+
+// edit lite：EM_SETSEL 的负数起点表示“取消选择并折叠光标”，而非从 0 开始。
+// 资源管理器拖放文件时正是先 SetSel(-1,-1) 再 ReplaceSel() 来追加文件名。
+TEST_F(SouiTestFixture, edit_lite_set_sel_negative_collapses)
+{
+#if !defined(SOUI_EDIT_LITE)
+    SUCCEED() << "edit lite is not enabled in this build";
+    return;
+#else
+    SWindow *root = loadUi(
+        L"<window layout='vbox' width='200' height='80'>"
+        L"<edit name='ed' width='150' height='24'/>"
+        L"</window>");
+    SEdit *ed = SouiTest::findByName<SEdit>(root, L"ed");
+    ASSERT_TRUE(ed != NULL);
+
+    ed->SetWindowText(_T("abc"));
+    ed->SetSel(-1, -1, FALSE);
+    ed->ReplaceSel(_T("d"), FALSE);
+    EXPECT_EQ(ed->GetWindowText(), _T("abcd"));
+
+    // 起点为负、终点非负：折叠到当前活动端（caret），不改变选区起点语义。
+    ed->SetSel(0, 2, TRUE);
+    ed->SetSel(-1, 1, TRUE);
+    ed->ReplaceSel(_T("X"), FALSE);
+    EXPECT_EQ(ed->GetWindowText(), _T("abXcd"));
+#endif
+}
+
+// edit lite：多级 undo/redo。每次文本修改一层，redo 在产生新编辑后失效。
+TEST_F(SouiTestFixture, edit_lite_undo_redo_multiple_steps)
+{
+#if !defined(SOUI_EDIT_LITE)
+    SUCCEED() << "edit lite is not enabled in this build";
+    return;
+#else
+    SWindow *root = loadUi(
+        L"<window layout='vbox' width='200' height='80'>"
+        L"<edit name='ed' width='150' height='24'/>"
+        L"</window>");
+    SEdit *ed = SouiTest::findByName<SEdit>(root, L"ed");
+    ASSERT_TRUE(ed != NULL);
+
+    ed->SetWindowText(_T("a"));
+    ed->ReplaceSel(_T("b"), TRUE);
+    ed->ReplaceSel(_T("c"), TRUE);
+    ed->ReplaceSel(_T("d"), TRUE);
+    EXPECT_EQ(ed->GetWindowText(), _T("abcd"));
+    EXPECT_TRUE(ed->SSendMessage(EM_CANUNDO) != 0);
+
+    // 逐级回退；栈空后 EM_UNDO 返回 0 且文本保持不变。
+    ed->SSendMessage(EM_UNDO);
+    EXPECT_EQ(ed->GetWindowText(), _T("abc"));
+    ed->SSendMessage(EM_UNDO);
+    EXPECT_EQ(ed->GetWindowText(), _T("ab"));
+    ed->SSendMessage(EM_UNDO);
+    EXPECT_EQ(ed->GetWindowText(), _T("a"));
+    EXPECT_EQ(ed->SSendMessage(EM_CANUNDO), 0);
+    EXPECT_EQ(ed->SSendMessage(EM_UNDO), 0);
+    EXPECT_EQ(ed->GetWindowText(), _T("a"));
+
+    // 逐级重做；栈空后 EM_REDO 返回 0。
+    EXPECT_TRUE(ed->SSendMessage(EM_REDO) != 0);
+    EXPECT_EQ(ed->GetWindowText(), _T("ab"));
+    ed->SSendMessage(EM_REDO);
+    ed->SSendMessage(EM_REDO);
+    EXPECT_EQ(ed->GetWindowText(), _T("abcd"));
+    EXPECT_EQ(ed->SSendMessage(EM_REDO), 0);
+    EXPECT_EQ(ed->GetWindowText(), _T("abcd"));
+
+    // 新编辑使 redo 失效。
+    ed->ReplaceSel(_T("e"), TRUE);
+    EXPECT_EQ(ed->GetWindowText(), _T("abcde"));
+    EXPECT_EQ(ed->SSendMessage(EM_REDO), 0);
+    EXPECT_EQ(ed->GetWindowText(), _T("abcde"));
+
+    // EM_EMPTYUNDOBUFFER 同时清空 undo/redo。
+    ed->SSendMessage(EM_EMPTYUNDOBUFFER);
+    EXPECT_EQ(ed->SSendMessage(EM_CANUNDO), 0);
+    EXPECT_EQ(ed->SSendMessage(EM_UNDO), 0);
+    EXPECT_EQ(ed->GetWindowText(), _T("abcde"));
+#endif
+}
+
+// edit lite：按住选中文本拖动可移动；按住 Ctrl 拖动为复制。
+TEST_F(SouiTestFixture, edit_lite_selection_drag_moves_and_copies)
+{
+#if !defined(SOUI_EDIT_LITE)
+    SUCCEED() << "edit lite is not enabled in this build";
+    return;
+#else
+    SWindow *root = loadUi(
+        L"<window layout='vbox' width='400' height='100'>"
+        L"<edit name='ed' width='300' height='30'/>"
+        L"</window>");
+    SEdit *ed = SouiTest::findByName<SEdit>(root, L"ed");
+    ASSERT_TRUE(ed != NULL);
+
+    // 先取得焦点，避免首次点击触发 autoSel 全选。
+    ed->SetFocus();
+    SStringT strText = _T("0123456789AB");
+    ed->SetWindowText(strText);
+    ed->SetSel(0, 6, TRUE);
+
+    CRect rcClient;
+    ed->GetClientRect(&rcClient);
+    int y = rcClient.top + rcClient.Height() / 2;
+    CPoint ptDown(rcClient.left + 20, y);         // 落在选区内
+    CPoint ptMove(rcClient.left + 40, y);         // 越过 4px 拖动阈值
+    CPoint ptDrop(rcClient.right - 2, y);         // 文本末尾之后，落点索引稳定为文本长度
+
+    ed->SSendMessage(WM_LBUTTONDOWN, MK_LBUTTON, MAKELPARAM(ptDown.x, ptDown.y));
+    ed->SSendMessage(WM_MOUSEMOVE, MK_LBUTTON, MAKELPARAM(ptMove.x, ptMove.y));
+    ed->SSendMessage(WM_LBUTTONUP, 0, MAKELPARAM(ptDrop.x, ptDrop.y));
+    EXPECT_EQ(ed->GetWindowText(), _T("6789AB012345"));
+
+    // Ctrl 落下为复制：原文保留，选中块插入到落点。
+    ed->SetWindowText(strText);
+    ed->SetSel(0, 6, TRUE);
+    ed->SSendMessage(WM_LBUTTONDOWN, MK_LBUTTON, MAKELPARAM(ptDown.x, ptDown.y));
+    ed->SSendMessage(WM_MOUSEMOVE, MK_LBUTTON, MAKELPARAM(ptMove.x, ptMove.y));
+    ed->SSendMessage(WM_LBUTTONUP, MK_CONTROL, MAKELPARAM(ptDrop.x, ptDrop.y));
+    EXPECT_EQ(ed->GetWindowText(), _T("0123456789AB012345"));
+#endif
+}
+
+// edit lite：选中文本可以拖到另一个 edit（同一进程内）；无 Ctrl 为移动，Ctrl 为复制。
+// 该场景没有 OLE 拖放源，源控件持有鼠标捕获，因此落点由源控件命中测试解析。
+TEST_F(SouiTestFixture, edit_lite_selection_drag_between_edits)
+{
+#if !defined(SOUI_EDIT_LITE)
+    SUCCEED() << "edit lite is not enabled in this build";
+    return;
+#else
+    SWindow *root = loadUi(
+        L"<window layout='vbox' width='300' height='120'>"
+        L"<edit name='ed1' width='250' height='30'/>"
+        L"<edit name='ed2' width='250' height='30'/>"
+        L"</window>");
+    SEdit *ed1 = SouiTest::findByName<SEdit>(root, L"ed1");
+    SEdit *ed2 = SouiTest::findByName<SEdit>(root, L"ed2");
+    ASSERT_TRUE(ed1 != NULL);
+    ASSERT_TRUE(ed2 != NULL);
+
+    ed1->SetFocus();
+    ed1->SetWindowText(_T("0123456789AB"));
+    ed1->SetSel(0, 6, TRUE);
+
+    CRect rc1, rc2;
+    ed1->GetClientRect(&rc1);
+    ed2->GetClientRect(&rc2);
+    CPoint ptDown(rc1.left + 20, rc1.top + rc1.Height() / 2); // 落在选区内
+    CPoint ptMove(rc1.left + 40, rc1.top + rc1.Height() / 2); // 越过拖动阈值
+    CPoint ptDrop(rc2.left + 4, rc2.top + rc2.Height() / 2);  // 另一个 edit 的文本起点
+
+    ed1->SSendMessage(WM_LBUTTONDOWN, MK_LBUTTON, MAKELPARAM(ptDown.x, ptDown.y));
+    ed1->SSendMessage(WM_MOUSEMOVE, MK_LBUTTON, MAKELPARAM(ptMove.x, ptMove.y));
+    ed1->SSendMessage(WM_LBUTTONUP, 0, MAKELPARAM(ptDrop.x, ptDrop.y));
+    EXPECT_EQ(ed1->GetWindowText(), _T("6789AB"));
+    EXPECT_EQ(ed2->GetWindowText(), _T("012345"));
+
+    // Ctrl 落下为复制：源文本保持不变。
+    ed1->SetWindowText(_T("0123456789AB"));
+    ed1->SetSel(0, 6, TRUE);
+    ed2->SetWindowText(_T(""));
+    ed1->SSendMessage(WM_LBUTTONDOWN, MK_LBUTTON, MAKELPARAM(ptDown.x, ptDown.y));
+    ed1->SSendMessage(WM_MOUSEMOVE, MK_LBUTTON, MAKELPARAM(ptMove.x, ptMove.y));
+    ed1->SSendMessage(WM_LBUTTONUP, MK_CONTROL, MAKELPARAM(ptDrop.x, ptDrop.y));
+    EXPECT_EQ(ed1->GetWindowText(), _T("0123456789AB"));
+    EXPECT_EQ(ed2->GetWindowText(), _T("012345"));
+#endif
+}
+
 // 复选框（toggle）：点击触发 EventCmd；SetCheck 切换勾选态。
 TEST_F(SouiTestFixture, checkbox_click_toggles_and_commands)
 {
