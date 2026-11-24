@@ -1,6 +1,6 @@
 # 跨平台 GUI 选型：为什么我推荐 SOUI
 
-*（仓库目录叫 `soui4`，内核版本 5.3.2.5，官网对外标 SOUI5，本文统称 SOUI。同一套 C++ 跑在 **8 个运行目标**上——Windows / Linux / macOS / iOS / Android / OpenHarmony / FreeRTOS 裸机 / 浏览器 WebAssembly——而两个真实应用的业务源码里 `__ANDROID__` 出现 **0 次**。这篇只讲能逐行核对的证据，短板一并写清。）*
+*（仓库目录叫 `soui4`，内核版本 5.3.2.6，官网对外标 SOUI5，本文统称 SOUI。同一套 C++ 跑在 **8 个运行目标**上——Windows / Linux / macOS / iOS / Android / OpenHarmony / FreeRTOS 裸机 / 浏览器 WebAssembly——而两个真实应用的业务源码里 `__ANDROID__` 出现 **0 次**。这篇只讲能逐行核对的证据，短板一并写清。）*
 
 ---
 
@@ -11,10 +11,11 @@
 | 维度 | 当前值 |
 |---|---|
 | 运行目标 | **8**：Windows / Linux / macOS / iOS / Android / OpenHarmony / FreeRTOS / WebAssembly |
-| 自有源码 | **1,199 文件 / 547,951 行**（内核 `SOUI/`+`utilities/` 189,536 行） |
-| `swinx` 兼容层 | **209,615 行 / 303 文件**，57 个公共头 |
-| API 面 | 声明 **1,153** / 有定义 **1,143**（99.1%），能力基线门禁 1,120 项 |
-| 测试门禁 | **638 条** ctest（headless 633 / GUI 5） |
+| 两仓合计 | **1,230 文件 / 562,513 行**（内核 `SOUI/`+`utilities/` 190,957 行） |
+| 其中主仓自有 | 898 文件 / 339,767 行 |
+| `swinx` 兼容层 | **222,746 行 / 332 文件**，59 个公共头（含 `GL/` 2） |
+| API 面 | 声明 **1,150** / 有定义 **1,148**（99.8%），能力基线 1,146 项；`--check` **PASS** |
+| 测试门禁 | **661 条** ctest（headless 646 / GUI 15） |
 | CI | **7 个工作流**，八个目标全部纳入构建门禁 |
 | WASM | 浏览器端**生产可用**：3 个真实应用，桌面与移动浏览器人工验证触摸（触摸屏 / 触控板）、软键盘与中文输入法 |
 | 许可 | 自有商业条款，非商用免费 |
@@ -63,7 +64,7 @@
 | **产品级** | Windows / Linux / macOS | 门禁 + 完整示例 + 系统级能力（无障碍、菜单、原生控件、对话框）齐备 | — |
 | **产品级（移动）** | Android / OHOS / iOS | 交叉编译进 PR 门禁、宿主库齐备、应用有对应壳 | **无运行期回归**；OHOS 的无障碍被构建层强制关闭 |
 | **产品级（浏览器）** | WebAssembly | 3 个真实应用、双后端、可选真线程；**桌面与移动浏览器人工验证通过**（触摸屏 / 触控板手势、软键盘、中文输入法），已达到生产可用 | 自动化烟测只在 node 侧；移动端为人工验证，尚未进 CI |
-| **能力证明级+** | FreeRTOS | QEMU + **ESP32-S3 真机**、四道门禁、有完整性能参数 | 字形只烘了 ASCII、只有一块板、双动画仍低于单动画、无输入法 |
+| **能力证明级+** | FreeRTOS | QEMU + **ESP32-S3 真机**、四道门禁、有完整性能参数；**新增 ASCII 软键盘**（四模式、聚焦自动弹出，真机输入到 `qA`） | 字形只烘了 ASCII、软键盘无中文候选窗 / IME、只有一块板、双动画仍低于单动画 |
 
 这张表是全篇最重要的读法。**"能构建、`SApp` 能端到端跑通"与"能交付项目"之间的差，全在最后一列。**
 
@@ -97,15 +98,16 @@
 | 项 | 实测值 |
 |---|---|
 | SoC / 屏 / 触摸 | ESP32-S3 rev0.2，16 MB Flash，8 MB PSRAM / ILI9341V SPI 320×240 / FT6X36 电容触摸 |
-| 固件 | **4,098,192 字节（≈3.91 MB，6 MB app 分区余 35%）** |
+| 固件 | **4,119,088 字节（≈3.93 MB，6 MB app 分区余 35%）**，含 ASCII 软键盘 |
+| 输入 | ASCII 软键盘 `common/softkeyboard/SoftKeyboard.{h,cpp}`（2 文件 / 553 行）：lower/upper/number/special 四模式约 40 键，聚焦自动弹出；`SwinxInjectText()` 逐码点投 `WM_IME_CHAR`，QEMU selftest / `soui_sim` / ESP32-S3 真机均验到 `qA` |
 | 冷启动 → 首帧 | 约 **4.4 s**（含 COFF 资源解析、布局 + SVG 皮肤、cairo 首帧、整屏 SPI） |
 | 稳态刷新（单动画） | **56~58 fps**（frame 17.3 ms / paint 14.2 ms，探针关） |
 | 稳态刷新（双动画，当前设备版本） | 约 **40 fps** |
 | 资源 | windres COFF **87,352 B / 59 条**，桌面同一条 `SResProviderPE` / `FindResource` 路径 |
 | 渲染链路 | `render-gdi` → `gdi/cairo` → PSRAM 帧缓冲（ARGB32）→ RGB565 → SPI |
-| 上游改动 | **4 处**（配置宏、临界区分支、线程 ID、`dlerror()` 判空），**内核零移植改动** |
+| 上游改动 | **4 处**（配置宏、临界区分支、线程 ID、`dlerror()` 判空）；内核只为软键盘把两处既有 `ShowSoftKeyboard()` 条件编译扩到 `SOUI_PLATFORM_FREERTOS` / `FREERTOS_HOST` |
 
-裸机载体累计约 13,881 行，其中框架适配 6,976 行、ESP32-S3 整套板级 2,394 行。也就是说：**把抽象从"有窗口系统的 OS"退到"没有 OS"，框架侧的代价只有 7 千行，其余全是工程胶水。**
+裸机工程胶水现为 **44 文件 / 7,819 行**，其中软键盘组件 2 文件 / 553 行、ESP32-S3 板级 6 文件 / 2,581 行。也就是说：**把抽象从"有窗口系统的 OS"退到"没有 OS"，框架侧的代价不到 8 千行，其余全是工程胶水。**
 
 优化过程里有三条结论对别的目标也成立，我单独摘出来：
 
@@ -478,7 +480,7 @@ BOOL CMainDlg::OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE>> data)
 3. **单作者项目（bus factor = 1）**：知识高度集中在一人身上，且边界知识（canvas2d 像素差异、GLX 时序、ESP32 内存仲裁、wasm 线程参数）进一步集中。缓解措施是 `AGENTS.md`（仓库级 + swinx 级）已把规则写成机器可读，但这是缓解，不是解决。
 4. **迁移"既有 Windows 程序"目前不是零成本**（见 4.2）：窗口菜单栏未提供；原生控件只有 `Static`/`Button`/`ListBox`；没有资源对话框。**如果你要做的是"把既有 Win32 程序搬到多平台"，先按 4.2 逐条自查**——尤其注意 `CreateWindowEx` 建原生控件失败时是**返回 `NULL` 而不是编译报错**。若你想的是"用 SOUI 写一套新程序覆盖多端"，这一条不影响你。
 5. **OHOS 无障碍在构建层被强制关闭**：`CMakeLists.txt:124` 里写着 `set(SOUI_ENABLE_ACC OFF)`。桌面三平台的无障碍是可用的（Windows 走系统 `oleacc`、macOS 走 NSAccessibility 桥、Linux 走 AT-SPI2 桥，约 6,240 行自研），但**如果鸿蒙端的无障碍是硬性合规要求，目前不满足**。
-6. **FreeRTOS 仍是"能力证明级"，不是"通用发布质量"**：字形只烘了 ASCII（中文要按码位重烘）、`<edit>` 无输入法、只有一块板一块屏、双动画 40 fps 仍低于单动画。**WASM 不在此列**——浏览器端的触摸屏 / 触控板手势、软键盘与中文输入法已人工验证通过，达到生产可用；它的边界是形态性的：自绘 UI 不复用系统原生控件，也没有系统级 OLE 拖放。
+6. **FreeRTOS 仍是"能力证明级"，不是"通用发布质量"**：字形只烘了 ASCII（中文要按码位重烘）、已有 ASCII 软键盘四模式（聚焦自动弹出，真机验到 `qA`）但无中文候选窗 / IME，数字/符号/退格/回车/OK 未全部脚本断言、只有一块板一块屏、双动画 40 fps 仍低于单动画。**WASM 不在此列**——浏览器端的触摸屏 / 触控板手势、软键盘与中文输入法已人工验证通过，达到生产可用；它的边界是形态性的：自绘 UI 不复用系统原生控件，也没有系统级 OLE 拖放。
 7. **OpenGL 面有明确语义上限**：无 MSAA（没有 `wglChoosePixelFormatARB`）、`wglShareLists` 只在资源创建前有效、单 drawable、macOS 只有 legacy/3.2/4.1 core 且 `NSOpenGLContext` 自 10.14 起 deprecated。
 8. **vendor 代码体量大**：`third-part/` + `swinx/thirdparty/` 合计 **11,770 个受控文件，占两个仓库的 64.9%**。换来的是零版本兼容风险（cairo / fontconfig / freetype / xkbcommon / dbus / skia 全部按源码 vendor 化，构建不依赖发行版给什么版本），代价是 clone 体积与全文检索体验。
 9. **配套细节的不完美**：错误码语义跨端不统一（`GetLastError`、`errno`、C++ 异常三者并存）；资源没有条目级失效；XML `on_*` 声明式绑定与脚本处理器段还缺直接用例；文档与示例偶有漂移（例如 demo 里两个从不参与编译的资源分支调用了不存在的 API 名）。
@@ -500,7 +502,7 @@ BOOL CMainDlg::OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE>> data)
 ctest --test-dir build -L '^soui-headless$'
 ```
 
-当前应当是 **633 条全部通过**（门禁总数 638 条，另外 5 条是需要显示环境的 GUI 烟测，不在这个标签里）。数字会随提交增长，以当前 HEAD 为准。
+当前应当是 **646 条全部通过**（门禁总数 661 条，另外 15 条是需要显示环境的 GUI 烟测，不在这个标签里）。数字会随提交增长，以当前 HEAD 为准。
 
 - 跑 `games/cnchess` 桌面端，联机下一盘棋，**观察 AI 思考时界面是否依然流畅**——那就是 7.2 那套异步任务在干活；
 - 有浏览器的话，直接点开官网的 wasm 版三个应用，切页、拖动、在 Lua 游戏页按方向键、在编辑框里打几个汉字。**这一步不花你任何构建时间，却能最快判断"自绘 UI 的手感"你能不能接受：**
@@ -527,7 +529,7 @@ ctest --test-dir build -L '^soui-headless$'
 
 这套方案最值得讲的不是"支持了 8 个平台"这个数字，而是两个极端都已落地：
 
-- **抽象能伸到"没有 OS"**：ESP32-S3 上 3.91 MB 固件、单动画 56~58 fps，跑的是完整 `SApp` + XML 布局 + 动画，上游只改 4 处。这一端仍是能力证明级。
+- **抽象能伸到"没有 OS"**：ESP32-S3 上 3.93 MB 固件（含 ASCII 软键盘）、单动画 56~58 fps，跑的是完整 `SApp` + XML 布局 + 动画，上游只改 4 处，软键盘在真机输入到 `qA`。这一端仍是能力证明级。
 - **抽象能伸到"浏览器沙箱"**：三个真实应用、双渲染后端、可开真线程，应用侧资源被压到 0.5 MB；浏览器端的触摸屏 / 触控板手势、软键盘与中文输入法均已人工验证通过，**已经达到生产可用**。
 
 两端都落在 `swinx/src/platform/<name>/` 里，**内核改动都没超出显式 include 和一两个注册点**。这就是我敢说"再吸收一个新宿主形态也不会推翻设计"的依据。
@@ -551,4 +553,4 @@ ctest --test-dir build -L '^soui-headless$'
 
 ---
 
-*本文数据主体取自 2026-11-17 的源码实测与真机参数（详见仓库内 `doc/SOUI4项目评估报告-2026-11-17.md`）：规模用 `git ls-files` 统计受控文件、按字节计行数；`swinx` 的 API 计数取自 `swinx/doc/tools/api_scan.json`；测试数取自 `ctest -N`；帧率取自 ESP32-S3 串口实测与 `esp32s3/PERFORMANCE.md`；wasm 性能取自同机两版交替跑的 A/B 记录。文中引用的每一处源码位置（`MainDlg.cpp:314`、`ChessAI.cpp:23`、`ChsAIEngine.cpp:803`、`TaskLoop.cpp:69`、`SMsgLoop.cpp:257`、`CMakeLists.txt:124` 等）均已逐条核对。WASM 移动端的人工验证结论与 5.3.2.5 的软键盘/手势修复按 2026-11-20 当前 HEAD 更新；数字会随提交变化，看结论时请以仓库当前 HEAD 为准。*
+*本文数据主体取自 2026-11-24 的源码实测与真机参数（详见仓库内 `doc/SOUI4项目评估报告-2026-11-24.md`）：规模用 `git ls-files` 统计受控文件、按字节计行数；`swinx` 的 API 计数取自 `swinx/doc/tools/api_scan.json`；测试数取自 `ctest -N`；帧率取自 ESP32-S3 串口实测与 `esp32s3/PERFORMANCE.md`；wasm 性能取自同机两版交替跑的 A/B 记录。文中引用的每一处源码位置（`MainDlg.cpp:314`、`ChessAI.cpp:23`、`ChsAIEngine.cpp:803`、`TaskLoop.cpp:69`、`SMsgLoop.cpp:257`、`CMakeLists.txt:124` 等）均已逐条核对。WASM 移动端的人工验证结论与 5.3.2.5 的软键盘/手势修复按 2026-11-20 记录更新；FreeRTOS 软键盘、5.3.2.6 与子模块指针按 2026-11-24 当前 HEAD 更新；数字会随提交变化，看结论时请以仓库当前 HEAD 为准。*

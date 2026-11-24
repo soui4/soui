@@ -1573,7 +1573,8 @@ void SEdit::OnSetFocus(SWND wndOld)
     }
     else if (GetContainer())
     {
-#if defined(__ANDROID__) || defined(__IOS__) || defined(__OHOS__)
+#if defined(__ANDROID__) || defined(__IOS__) || defined(__OHOS__) || \
+    defined(SOUI_PLATFORM_FREERTOS) || defined(FREERTOS_HOST)
         ShowSoftKeyboard(GetContainer()->GetHostHwnd(), TRUE);
 #endif
     }
@@ -1599,7 +1600,8 @@ void SEdit::OnKillFocus(SWND wndFocus)
     {
         if (m_fPassword || m_fNumber)
             GetContainer()->EnableIME(TRUE);
-#if defined(__ANDROID__) || defined(__IOS__) || defined(__OHOS__)
+#if defined(__ANDROID__) || defined(__IOS__) || defined(__OHOS__) || \
+    defined(SOUI_PLATFORM_FREERTOS) || defined(FREERTOS_HOST)
         ShowSoftKeyboard(GetContainer()->GetHostHwnd(), FALSE);
 #endif
         // Prevent the cursor from being hidden while editing.
