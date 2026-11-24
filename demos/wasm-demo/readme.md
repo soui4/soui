@@ -354,7 +354,7 @@ cmake --build /tmp/build-soui-ship --target soui-wasm-demo
 
 - **换档位不为难性能**：11 页轮转整帧重绘的基准里，`-O2` / `-O3` / `-Os` 中位数是 15.68 / 15.45 /
   16.15 ms 每页，相差 4%，而同一档位重复跑的内部极差就有 39%——本机测不出差异，按体积选就行。
-  真机（手机浏览器 + 移动端 SoC）没测。
+  功能已在手机浏览器真机验收；上述档位性能对比仍是桌面 Chromium 数据，移动端 SoC 未测。
 
 - **`-flto`、链后 `wasm-opt`、`--closure 1` 都不划算**：前者 +0.3% gz，中者 −0.1%，后两者只动
   `.js`/`.html`（占整包 gz 的 0.19%）。`-fno-exceptions`/`-fno-rtti` 不要用——`components` 有 36 处
@@ -752,7 +752,7 @@ demos/wasm-demo/out/soui-wasm-demo.{js,wasm,data,html}` 再 build，或直接
 `swinx/doc/swinx-wasm-design.md` §7.3。
 
 **没覆盖的**：Windows Edge、Firefox（`deltaMode=1` 的分支只按 3 行/格换算，没在真机 Firefox 上跑）、
-Safari 触控板、手机浏览器；滚动惯性与真实手感也只能人手判断。wasm 产物没有无头断言，
+Safari 触控板；此脚本只覆盖桌面 Chromium，移动端触摸手势已另行真机人工验收（结论见 `doc/知乎-03-为什么我推荐SOUI4.md` 与评估报告）。滚动惯性与真实手感也只能人手判断。wasm 产物没有无头断言，
 `ctest -L '^soui-headless$'` 覆盖不到这一层。
 
 ### 输入法（CJK 组合输入）
@@ -815,8 +815,7 @@ Windows 不用应用操心：`DefWindowProc` 先把 `WM_IME_CHAR` 转成 `WM_CHA
 `[36755,20837,27861,39564,35777]` 逐字相等、文档按插入点精确拼接、`WM_CHAR` 计数仍为 0；组合结束后
 同一个 `keydown('a')` 立刻恢复注入（`WM_CHAR 0 → 1`），证明"被丢弃"是组合状态造成的；数字框收到
 `12人3` 的四个码点但文档只多 `123`；帧缓冲里那 5 个汉字有墨列 65 / 有墨像素 407，同行空白区为 0。
-**脚本代跑不了的**：候选窗的真实外观与时序、marked text、退格逐字删（第 3 步的后半）、
-Safari 与手机软键盘（第 5 步）。
+**脚本代跑不了的**：候选窗的真实外观与时序、marked text、退格逐字删（第 3 步的后半）；Safari 与手机软键盘已由真机人工验收通过（触摸 / 软键盘 / 中文输入法），但未进自动化。
 
 **这条脚本代跑一度给出过错误结论**，值得记下来：上面那轮合成事件只发了
 `compositionstart → compositionupdate → compositionend`，**没发中间那些
@@ -844,8 +843,8 @@ for (const t of ['keydown','keyup','compositionstart','compositionupdate','compo
 `compositionstart`，就是第一个键被吞了。
 
 **没覆盖的**：画布里不显示组合期的预编辑文本（marked text / 带下划线的拼音串）——浏览器只在
-候选窗里显示它，wasm 侧没有把它画进 `SRichEdit`；真机移动端浏览器、真实 HIMC/
-`ImmGetCompositionString` 那条 Windows 路径也没验证过。
+候选窗里显示它，wasm 侧没有把它画进 `SRichEdit`；脚本没覆盖真机移动端浏览器（真机人工验收已通过），真实 HIMC/
+`ImmGetCompositionString` 那条 Windows 路径仍未验证。
 
 ### 合并上屏的人工验证步骤（Chromium）
 

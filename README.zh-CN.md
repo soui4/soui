@@ -54,15 +54,15 @@ Windows 只是 SOUI4 通过 swinx 覆盖的八个目标之一，这八端分成�
 | **Android** | 已支持 | JVM 启动器，`PlatformAPI` 桥接 | Cairo |
 | **鸿蒙（OHOS）** | 已支持 | ArkTS 运行时，`PlatformAPI` 桥接 | Cairo |
 | **FreeRTOS** | 能力证明级 | 无 OS：FreeRTOS 任务驱动消息泵；QEMU Cortex-M3 或 ESP32-S3 真机 | Cairo → 帧缓冲 / SPI LCD |
-| **WebAssembly** | 能力证明级 | `emscripten_set_main_loop`，JS 宿主按脏矩形 blit 到 Canvas | Canvas 2D API |
+| **WebAssembly** | 产品级（浏览器） | `emscripten_set_main_loop`，JS 宿主按脏矩形 blit 到 Canvas | Canvas 2D API |
 
-两档的含义不同，不能互换：
+三档的含义不同，不能互换：
 
 - **已支持**（上面六端）= 产品级：有 CI、有示例、有真机/实机验证。
-- **能力证明级**（FreeRTOS、WebAssembly）= 架构被验证能吸收新的宿主形态：目标能在模拟器
+- **产品级（浏览器）**（WebAssembly）= 有 CI、有真实应用；桌面与移动浏览器已人工验收触摸（触摸屏 / 触控板）、软键盘与中文输入法，达到生产可用；自动化烟测只在 node 侧，设备×浏览器矩阵未沉淀，无系统级 IME / OLE 拖放。
+- **能力证明级**（FreeRTOS）= 架构被验证能吸收新的宿主形态：目标能在模拟器
   与真机上构建并端到端跑通 `SApp`（FreeRTOS 已跑 QEMU Cortex-M3 **和 ESP32-S3 + ILI9341 SPI 屏**，
-  并有 CI 门禁），但仍有明确缺口（FreeRTOS：字体测宽与 `ICON:` 仍是桩；WASM：无系统级 IME /
-  OLE 拖放、触摸与真机输入法未系统验证）。它们说明"抽象能伸到这里"，不等于"通用发布质量"。
+  并有 CI 门禁），但仍有明确缺口（字体测宽与 `ICON:` 仍是桩、字形只烘 ASCII、只有一块板、双动画约 40 fps）。它说明"抽象能伸到这里"，不等于"通用发布质量"。
   详见 [`soui-freertos/README.md`](./soui-freertos/README.md) 与 wasm 设计实现文档
   [`swinx/doc/swinx-wasm-design.md`](./swinx/doc/swinx-wasm-design.md)。
 
