@@ -171,6 +171,20 @@ TEST(swinx_sync, wait_multiple_any)
     CloseHandle(evts[1]);
 }
 
+TEST(swinx_sync, wait_multiple_any_preserves_other_signaled_objects)
+{
+    HANDLE semaphore = CreateSemaphoreA(NULL, 1, 1, NULL);
+    HANDLE event = CreateEventA(NULL, FALSE, TRUE, NULL);
+    ASSERT_TRUE(semaphore != NULL && event != NULL);
+
+    HANDLE waits[2] = { semaphore, event };
+    EXPECT_EQ(WaitForMultipleObjects(2, waits, FALSE, 100), WAIT_OBJECT_0);
+    EXPECT_EQ(WaitForSingleObject(event, 0), WAIT_OBJECT_0);
+
+    CloseHandle(event);
+    CloseHandle(semaphore);
+}
+
 // ------------------------------------------------------------------------
 // Mutex
 // ------------------------------------------------------------------------
